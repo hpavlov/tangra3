@@ -1,0 +1,19 @@
+; TangraVideo.def : Declares the module parameters for the DLL.
+
+; Marshalling Types
+; http://msdn.microsoft.com/en-us/magazine/cc164123.aspx
+; http://msdn.microsoft.com/en-us/library/aa446538.aspx
+; http://msdn.microsoft.com/en-us/library/s97shtze(v=vs.80).aspx
+
+LIBRARY
+
+EXPORTS
+    ; Explicit exports can go here
+
+	TangraVideoEnumVideoEngines
+	TangraVideoSetVideoEngine
+	TangraVideoOpenFile
+	TangraVideoCloseFile
+	TangraVideoGetFrame
+	TangraVideoGetFramePixels
+	TangraVideoGetIntegratedFrame

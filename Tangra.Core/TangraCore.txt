@@ -1,0 +1,1 @@
+./Debug/adv_file.o ./Debug/adv_frames_index.o ./Debug/adv_image_layout.o ./Debug/adv_image_section.o ./Debug/adv_status_section.o ./Debug/IntegrationUtils.o ./Debug/IotaVtiOcr.o ./Debug/PixelMapUtils.o ./Debug/PreProcessing.o ./Debug/quicklz.o ./Debug/Tangra.Orc.IotaVti.o ./Debug/Tangra.Pixelmap.o ./Debug/TangraADV.o ./Debug/utils.o  

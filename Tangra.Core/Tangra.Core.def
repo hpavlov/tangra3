@@ -1,0 +1,56 @@
+LIBRARY TangraCore.dll
+
+EXPORTS
+    ; Explicit exports can go here
+
+	; ADV Exports
+	ADVOpenFile
+	ADVCloseFile
+	ADVGetFrame
+	ADVGetFrame2
+	ADVGetIntegratedFrame
+	ADVGetFramePixels
+
+	; Video and Image Config
+	InitTangraCore
+	Set8BitColourChannel
+	;SuggestImageDisplayThreasholds
+
+	; Preprocessing	
+	PreProcessingClearAll
+	PreProcessingAddStretching
+	PreProcessingAddClipping
+	PreProcessingAddBrightnessContrast
+	PreProcessingAddDigitalFilter
+	PreProcessingAddGammaCorrection
+	PreProcessingAddDarkFrame
+	PreProcessingAddFlatFrame
+	PreProcessingUsesPreProcessing
+	PreProcessingGetConfig	
+
+
+	; Video Helpers
+	IntegrationManagerGetFirstFrameToIntegrate
+	IntergationManagerStartNew
+	IntegrationManagerFreeResources
+	IntegrationManagerAddFrame
+	IntegrationManagerProduceIntegratedFrame
+	GetBitmapPixels
+	GetPixelMapBits
+	GetPixelMapPixelsOnly
+	ApplyPreProcessing
+	ApplyPreProcessingPixelsOnly
+	UsesPreProcessing
+	
+	; IOTA-VTI OCR
+	;IOTAVTIOCR_Initialise
+	;IOTAVTIOCR_SetCharacterConfiguration
+	;IOTAVTIOCR_CalibratePixelMap
+	;IOTAVTIOCR_ExtractTimeStamp
+
+		
+	;IOTAVTIOCR_CalibratePixelMapField
+	;IOTAVTIOCR_ExtractFieldTimeStamp
+	;IOTAVTIOCR_SetLocationCoefficients
+	;IOTAVTIOCR_SetScaleCoefficients
+	;IOTAVTIOCR_GetCalibrationCoefficients
