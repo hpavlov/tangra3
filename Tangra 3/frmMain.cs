@@ -19,7 +19,9 @@ namespace Tangra
 
 		private void miAbout_Click(object sender, EventArgs e)
 		{
-
+		    string[] engines = TangraVideo.EnumVideoEngines();
+		    MessageBox.Show("First supported video engine is: " + engines[0], "Tangra 3 OS Test");
+		    TangraVideo.CloseFile();
 		}
 	}
 }
