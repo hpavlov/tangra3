@@ -1,13 +1,9 @@
 #include "stdafx.h"
-#include "PixelMapUtils.h"
-#include "Tangra.Core.h"
+#include "TangraCore.h"
+#include "TangraVideo.h"
 #include <dshow.h>
 #include <tchar.h>
 #include <atlbase.h>
-
-#include "IntegrationUtils.h"
-#include "PreProcessing.h"
-
 
 // http://jaewon.mine.nu/jaewon/2009/06/17/a-workaround-for-a-missing-file-dxtrans-h-in-directx-sdk/
 
@@ -186,10 +182,10 @@ HRESULT DirectShowGetFrame(long frameNo, unsigned long* pixels, BYTE* bitmapPixe
 		hr = m_MediaDet->GetBitmapBits(frametime, NULL, m_pBuffer, m_Width, m_Height);
 		if (SUCCEEDED(hr))
 		{
-			hr = GetPixelMapBits((BYTE*)(m_pBuffer), &m_Width, &m_Height, 0, pixels, bitmapPixels, bitmapBytes);
+			hr = TangraCore::GetPixelMapBits((BYTE*)(m_pBuffer), &m_Width, &m_Height, 0, pixels, bitmapPixels, bitmapBytes);
 
-			if (g_UsesPreProcessing && SUCCEEDED(hr))
-				hr = ApplyPreProcessing(pixels, m_Width, m_Height, 8, bitmapPixels, bitmapBytes);
+			if (TangraCore::UsesPreProcessing() && SUCCEEDED(hr))
+				hr = TangraCore::ApplyPreProcessing(pixels, m_Width, m_Height, 8, bitmapPixels, bitmapBytes);
 		}
 		else
 		{
@@ -227,10 +223,10 @@ HRESULT DirectShowGetFramePixels(long frameNo, unsigned long* pixels)
 		hr = m_MediaDet->GetBitmapBits(frametime, NULL, m_pBuffer, m_Width, m_Height);
 		if (SUCCEEDED(hr))
 		{
-			hr = GetPixelMapPixelsOnly((BYTE*)(m_pBuffer), m_Width, m_Height, pixels);
+			hr = TangraCore::GetPixelMapPixelsOnly((BYTE*)(m_pBuffer), m_Width, m_Height, pixels);
 
-			if (g_UsesPreProcessing && SUCCEEDED(hr)) 
-				hr = ApplyPreProcessingPixelsOnly(pixels, m_Width, m_Height, 8);
+			if (TangraCore::UsesPreProcessing() && SUCCEEDED(hr)) 
+				hr = TangraCore::ApplyPreProcessingPixelsOnly(pixels, m_Width, m_Height, 8);
 		}
 		else
 		{
@@ -247,23 +243,23 @@ HRESULT DirectShowGetIntegratedFrame(long startFrameNo, long framesToIntegrate, 
 {	
 	HRESULT rv;
 
-	int firstFrameToIntegrate = IntegrationManagerGetFirstFrameToIntegrate(startFrameNo, framesToIntegrate, isSlidingIntegration);
-	IntergationManagerStartNew(m_Width, m_Height, isMedianAveraging);
+	int firstFrameToIntegrate = TangraCore::IntegrationManagerGetFirstFrameToIntegrate(startFrameNo, framesToIntegrate, isSlidingIntegration);
+	TangraCore::IntergationManagerStartNew(m_Width, m_Height, isMedianAveraging);
 
 	for(int idx = 0; idx < framesToIntegrate; idx++)
 	{
 		rv = DirectShowGetFramePixels(firstFrameToIntegrate + idx, pixels);	
 		if (rv != S_OK)
 		{
-			IntegrationManagerFreeResources();
+			TangraCore::IntegrationManagerFreeResources();
 			return rv;
 		}
 
-		IntegrationManagerAddFrame(pixels);
+		TangraCore::IntegrationManagerAddFrame(pixels);
 	}
 
-	IntegrationManagerProduceIntegratedFrame(pixels);
-	IntegrationManagerFreeResources();
+	TangraCore::IntegrationManagerProduceIntegratedFrame(pixels);
+	TangraCore::IntegrationManagerFreeResources();
 
-	return GetBitmapPixels(m_Width, m_Height, pixels, bitmapPixels, bitmapBytes, false, 8);
+	return TangraCore::GetBitmapPixels(m_Width, m_Height, pixels, bitmapPixels, bitmapBytes, false, 8);
 }
