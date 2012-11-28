@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CodeLite_Project Name="TangraCore_Linux" InternalType="Library">
+  <Plugins>
+    <Plugin Name="qmake">
+      <![CDATA[00020001N0005Debug0000000000000001N0007Release000000000000]]>
+    </Plugin>
+  </Plugins>
+  <Description/>
+  <Dependencies/>
+  <VirtualDirectory Name="src">
+    <File Name="adv_file.cpp"/>
+    <File Name="adv_frames_index.cpp"/>
+    <File Name="adv_image_layout.cpp"/>
+    <File Name="adv_image_section.cpp"/>
+    <File Name="adv_status_section.cpp"/>
+    <File Name="IntegrationUtils.cpp"/>
+    <File Name="IotaVtiOcr.cpp"/>
+    <File Name="PixelMapUtils.cpp"/>
+    <File Name="PreProcessing.cpp"/>
+    <File Name="quicklz.cpp"/>
+    <File Name="Tangra.Orc.IotaVti.cpp"/>
+    <File Name="Tangra.Pixelmap.cpp"/>
+    <File Name="TangraADV.cpp"/>
+    <File Name="utils.cpp"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="include">
+    <File Name="adv_file.h"/>
+    <File Name="adv_frames_index.h"/>
+    <File Name="adv_image_layout.h"/>
+    <File Name="adv_image_section.h"/>
+    <File Name="adv_status_section.h"/>
+    <File Name="CoreContext.h"/>
+    <File Name="IntegrationUtils.h"/>
+    <File Name="IotaVtiOcr.h"/>
+    <File Name="PixelMapUtils.h"/>
+    <File Name="PreProcessing.h"/>
+    <File Name="quicklz.h"/>
+    <File Name="Tangra.Orc.IotaVti.h"/>
+    <File Name="utils.h"/>
+    <File Name="TangraADV.h"/>
+    <File Name="cross_platform.h"/>
+  </VirtualDirectory>
+  <Settings Type="Dynamic Library">
+    <GlobalSettings>
+      <Compiler Options="" C_Options="">
+        <IncludePath Value="."/>
+      </Compiler>
+      <Linker Options="">
+        <LibraryPath Value="."/>
+      </Linker>
+      <ResourceCompiler Options=""/>
+    </GlobalSettings>
+    <Configuration Name="Debug" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Dynamic Library" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-g -D_FILE_OFFSET_BITS=64 -fvisibility=hidden -fvisibility-inlines-hidden" C_Options="-g -D_FILE_OFFSET_BITS=64 -fvisibility=hidden -fvisibility-inlines-hidden" Required="yes" PreCompiledHeader="">
+        <IncludePath Value="."/>
+      </Compiler>
+      <Linker Options="" Required="yes"/>
+      <ResourceCompiler Options="" Required="no"/>
+      <General OutputFile="$(IntermediateDirectory)/libTangraCore.so" IntermediateDirectory="./Debug" Command="" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;"/>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild>
+        <Command Enabled="yes">ar ruv ./Debug/TangraCore.a</Command>
+      </PostBuild>
+      <CustomBuild Enabled="no">
+        <RebuildCommand/>
+        <CleanCommand/>
+        <BuildCommand/>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
+        <WorkingDirectory/>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+    </Configuration>
+    <Configuration Name="Release" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Dynamic Library" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-D_FILE_OFFSET_BITS=64" C_Options="-D_FILE_OFFSET_BITS=64" Required="yes" PreCompiledHeader="">
+        <IncludePath Value="."/>
+      </Compiler>
+      <Linker Options="-O2 Tangra.Core.def -Wl,--subsystem,windows,--out-implib,./Release/TangraCoredll.lib" Required="yes"/>
+      <ResourceCompiler Options="" Required="no"/>
+      <General OutputFile="$(IntermediateDirectory)/$(ProjectName).dll" IntermediateDirectory="./Release" Command="" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;"/>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild/>
+      <CustomBuild Enabled="no">
+        <RebuildCommand/>
+        <CleanCommand/>
+        <BuildCommand/>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName/>
+        <WorkingDirectory/>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+    </Configuration>
+  </Settings>
+</CodeLite_Project>

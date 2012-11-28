@@ -42,15 +42,6 @@ extern "C"
 {
 #endif
 
-int GetProductVersion()
-{
-	int major = 3;
-	int minor = 0;
-	int revision = 200;
-	
-	return (major << 28) + (minor << 16) + revision;
-};
-
 HRESULT InitTangraCore()
 {
 	s_COLOR_CHANNEL = 0;
@@ -64,6 +55,15 @@ HRESULT Set8BitColourChannel(long colourChannel)
 
 	return S_OK;
 };
+
+DLL_PUBLIC int GetProductVersion()
+{
+	int major = 3;
+	int minor = 0;
+	int revision = 85;
+
+	return (major << 28) + (minor << 16) + revision;
+}
 
 #ifdef __cplusplus
 } // __cplusplus defined.

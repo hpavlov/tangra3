@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cross_platform.h"
+
 extern bool g_UsesPreProcessing;
 
 enum PreProcessingFilter
@@ -23,20 +25,20 @@ extern "C"
 {
 #endif
 
-bool UsesPreProcessing();
-long PreProcessingClearAll();
-long PreProcessingAddStretching(unsigned int fromValue, unsigned int toValue);
-long PreProcessingAddClipping(unsigned int  fromValue, unsigned int  toValue);
-long PreProcessingAddBrightnessContrast(long brigtness, long contrast);
-long PreProcessingAddDigitalFilter(enum PreProcessingFilter filter);
-long PreProcessingAddGammaCorrection(float gamma);
-long PreProcessingAddDarkFrame(long* darkFramePixels, unsigned int pixelsCount);
-long PreProcessingAddFlatFrame(long* flatFramePixels, unsigned int pixelsCount, unsigned long flatFrameMedian);
-long PreProcessingUsesPreProcessing(bool* usesPreProcessing);
-long PreProcessingGetConfig(PreProcessingType* preProcessingType, unsigned int* fromValue, unsigned int* toValue, long* brigtness, long* contrast, PreProcessingFilter* filter, float* gamma, unsigned int* darkPixelsCount, unsigned int* flatPixelsCount);
+DLL_PUBLIC bool UsesPreProcessing();
+DLL_PUBLIC long PreProcessingClearAll();
+DLL_PUBLIC long PreProcessingAddStretching(unsigned int fromValue, unsigned int toValue);
+DLL_PUBLIC long PreProcessingAddClipping(unsigned int  fromValue, unsigned int  toValue);
+DLL_PUBLIC long PreProcessingAddBrightnessContrast(long brigtness, long contrast);
+DLL_PUBLIC long PreProcessingAddDigitalFilter(enum PreProcessingFilter filter);
+DLL_PUBLIC long PreProcessingAddGammaCorrection(float gamma);
+DLL_PUBLIC long PreProcessingAddDarkFrame(long* darkFramePixels, unsigned int pixelsCount);
+DLL_PUBLIC long PreProcessingAddFlatFrame(long* flatFramePixels, unsigned int pixelsCount, unsigned long flatFrameMedian);
+DLL_PUBLIC long PreProcessingUsesPreProcessing(bool* usesPreProcessing);
+DLL_PUBLIC long PreProcessingGetConfig(PreProcessingType* preProcessingType, unsigned int* fromValue, unsigned int* toValue, long* brigtness, long* contrast, PreProcessingFilter* filter, float* gamma, unsigned int* darkPixelsCount, unsigned int* flatPixelsCount);
 
-long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height, int bpp);
-long ApplyPreProcessing(unsigned long* pixels, long width, long height, int bpp, BYTE* bitmapPixels, BYTE* bitmapBytes);
+DLL_PUBLIC long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height, int bpp);
+DLL_PUBLIC long ApplyPreProcessing(unsigned long* pixels, long width, long height, int bpp, BYTE* bitmapPixels, BYTE* bitmapBytes);
 
 #ifdef __cplusplus
 } // __cplusplus defined.

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CodeLite_Workspace Name="Tangra.Core.Linux" Database="./Tangra.Core.Linux.tags">
+  <Project Name="TangraCore_Linux" Path="TangraCore_Linux.project" Active="Yes"/>
+  <Project Name="TangraVideo_Linux" Path="../Tangra.Video/Linux/TangraVideo_Linux.project"/>
+  <BuildMatrix>
+    <WorkspaceConfiguration Name="Debug" Selected="yes">
+      <Project Name="TangraCore_Linux" ConfigName="Debug"/>
+      <Project Name="TangraVideo_Linux" ConfigName="Debug"/>
+    </WorkspaceConfiguration>
+    <WorkspaceConfiguration Name="Release" Selected="yes">
+      <Project Name="TangraCore_Linux" ConfigName="Release"/>
+      <Project Name="TangraVideo_Linux" ConfigName="Release"/>
+    </WorkspaceConfiguration>
+  </BuildMatrix>
+</CodeLite_Workspace>
