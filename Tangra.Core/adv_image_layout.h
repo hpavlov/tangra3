@@ -9,6 +9,7 @@
 #include <string>
 
 #include "adv_image_section.h"
+#include "cross_platform.h"
 
 using namespace std;
 using std::string;

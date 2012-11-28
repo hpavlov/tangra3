@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <vector>
 #include "utils.h"
+#include "cross_platform.h"
 
 // http://stackoverflow.com/questions/965725/large-file-support-in-c
 // -D_FILE_OFFSET_BITS=64
@@ -101,7 +102,7 @@ void AdvFile::OpenFile(const char* fileName, AdvFileInfo* fileInfo)
 			__int64 sectionHeaderOffset;
 			fread(&sectionHeaderOffset, 8, 1, m_File);
 
-			sectionDefs.insert(make_pair(sectionHeaderOffset, string(sectionType)));
+			sectionDefs.insert(make_pair((long long)(sectionHeaderOffset), string(sectionType)));
 
 			delete sectionType;
         }
@@ -109,7 +110,7 @@ void AdvFile::OpenFile(const char* fileName, AdvFileInfo* fileInfo)
 		map<__int64, string>::iterator curr = sectionDefs.begin();
 		while (curr != sectionDefs.end()) 
 		{			
-			fseek(m_File, curr->first, SEEK_SET);
+			advfsetpos(m_File, &curr->first);
 			const char* sectionName = curr->second.c_str();
 
 			if (0 == strcmp("IMAGE", sectionName))
@@ -125,11 +126,11 @@ void AdvFile::OpenFile(const char* fileName, AdvFileInfo* fileInfo)
 			curr++;
 		}
 
-        fseek(m_File, indexTableOffset, SEEK_SET);
+        advfsetpos(m_File, &indexTableOffset);
 		m_Index = new AdvLib::AdvFramesIndex(m_File);
 
 		// Reads the system metadata table
-		fseek(m_File, metadataSystemTableOffset, SEEK_SET);
+		advfsetpos(m_File, &metadataSystemTableOffset);
 
 		unsigned int numTags;
 		fread(&numTags, 4, 1, m_File);
@@ -148,7 +149,7 @@ void AdvFile::OpenFile(const char* fileName, AdvFileInfo* fileInfo)
 		}
 
 		// Reads the user metadata table
-		fseek(m_File, metadataUserTableOffset, SEEK_SET);
+		advfsetpos(m_File, &metadataUserTableOffset);
 
 		fread(&numTags, 4, 1, m_File);
 			
@@ -175,7 +176,7 @@ void AdvFile::GetFrameImageSectionHeader(int frameId, unsigned char* layoutId, e
 {
 	AdvLib::IndexEntry* indexEntry = m_Index->GetIndexForFrame(frameId);
 
-	fseek(m_File, indexEntry->FrameOffset, SEEK_SET);
+	advfsetpos(m_File, &indexEntry->FrameOffset);
 
 
 	long frameDataMagic;
@@ -199,7 +200,7 @@ void AdvFile::GetFrameSectionData(int frameId, unsigned long* prevFrame, unsigne
 {
 	 AdvLib::IndexEntry* indexEntry = m_Index->GetIndexForFrame(frameId);
 
-	fseek(m_File, indexEntry->FrameOffset, SEEK_SET);
+	advfsetpos(m_File, &indexEntry->FrameOffset);
 
 	long frameDataMagic;
 	fread(&frameDataMagic, 4, 1, m_File);

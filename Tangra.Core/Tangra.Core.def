@@ -41,6 +41,7 @@ EXPORTS
 	ApplyPreProcessing
 	ApplyPreProcessingPixelsOnly
 	UsesPreProcessing
+	GetProductVersion
 	
 	; IOTA-VTI OCR
 	;IOTAVTIOCR_Initialise

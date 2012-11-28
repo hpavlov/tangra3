@@ -6,8 +6,12 @@ struct VideoFileInfo
 	long Height;
 	float FrameRate;
 	long CountFrames;
+	long FirstFrame;
+	long BitmapImageSize;
 };
 
+
+int GetProductVersion();
 
 HRESULT TangraVideoEnumVideoEngines(char* videoEngines);
 

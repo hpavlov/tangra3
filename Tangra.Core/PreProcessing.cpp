@@ -1,3 +1,4 @@
+#include "cross_platform.h"
 #include "PreProcessing.h"
 #include "PixelMapUtils.h"
 

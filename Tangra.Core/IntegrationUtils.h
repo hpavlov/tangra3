@@ -6,12 +6,12 @@ extern "C"
 {
 #endif
 
-void __cdecl IntergationManagerStartNew(int width, int height, bool isMedianAveraging);
-void __cdecl IntegrationManagerAddFrame(unsigned long* framePixels);
+void IntergationManagerStartNew(int width, int height, bool isMedianAveraging);
+void IntegrationManagerAddFrame(unsigned long* framePixels);
 void IntegrationManagerAddFrameEx(unsigned long* framePixels, bool isLittleEndian, int bpp);
-void __cdecl IntegrationManagerProduceIntegratedFrame(unsigned long* framePixels);
-void __cdecl IntegrationManagerFreeResources();
-int __cdecl IntegrationManagerGetFirstFrameToIntegrate(int producedFirstFrame, int frameCount, bool isSlidingIntegration);
+void IntegrationManagerProduceIntegratedFrame(unsigned long* framePixels);
+void IntegrationManagerFreeResources();
+int IntegrationManagerGetFirstFrameToIntegrate(int producedFirstFrame, int frameCount, bool isSlidingIntegration);
 
 #ifdef __cplusplus
 } // __cplusplus defined.

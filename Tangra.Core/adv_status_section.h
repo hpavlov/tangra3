@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include "utils.h"
 
+#include "cross_platform.h"
+
 using namespace std;
 using std::string;
 

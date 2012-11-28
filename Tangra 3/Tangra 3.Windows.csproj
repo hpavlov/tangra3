@@ -1,0 +1,181 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{A5DB96B1-35BE-47F8-AA30-FB223E637E35}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Tangra</RootNamespace>
+    <AssemblyName>Tangra</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;WIN32</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;WIN32</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>Tangra.Program</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>tangra-big.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Controller\VideoController.cs" />
+    <Compile Include="frmAbout.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmAbout.Designer.cs">
+      <DependentUpon>frmAbout.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmMain.Designer.cs">
+      <DependentUpon>frmMain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmSplashScreen.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmSplashScreen.Designer.cs">
+      <DependentUpon>frmSplashScreen.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PInvoke\TangraCore.cs" />
+    <Compile Include="PInvoke\TangraVideo.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Video\AstroDigitalVideoStream.cs" />
+    <Compile Include="Video\AstroDigitalVideo\AdvFile.cs" />
+    <Compile Include="Video\AstroDigitalVideo\AdvFramesIndex.cs" />
+    <Compile Include="Video\AstroDigitalVideo\AdvImageLayout.cs" />
+    <Compile Include="Video\AstroDigitalVideo\AdvImageSection.cs" />
+    <Compile Include="Video\AstroDigitalVideo\AdvLib.cs" />
+    <Compile Include="Video\AstroDigitalVideo\AdvOverlayManager.cs" />
+    <Compile Include="Video\AstroDigitalVideo\AdvSectionFactory.cs" />
+    <Compile Include="Video\AstroDigitalVideo\AdvStatusSection.cs" />
+    <Compile Include="Video\AstroDigitalVideo\AdvTags.cs" />
+    <Compile Include="Video\AstroDigitalVideo\Compression\QuickLZ.cs" />
+    <Compile Include="Video\AstroDigitalVideo\frmAdvIndexRebuilder.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Video\AstroDigitalVideo\frmAdvIndexRebuilder.Designer.cs">
+      <DependentUpon>frmAdvIndexRebuilder.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Video\AstroDigitalVideo\frmAdvStatusPopup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Video\AstroDigitalVideo\frmAdvStatusPopup.Designer.cs">
+      <DependentUpon>frmAdvStatusPopup.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Video\AstroDigitalVideo\frmAdvViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Video\AstroDigitalVideo\frmAdvViewer.Designer.cs">
+      <DependentUpon>frmAdvViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Video\AstroDigitalVideo\Interfaces.cs" />
+    <Compile Include="Video\AstroDigitalVideo\UI\AdvTagValuePair.cs" />
+    <Compile Include="Video\FramePlayer.cs" />
+    <Compile Include="Video\IFramePlayer.cs" />
+    <Compile Include="Video\VideoStream.cs" />
+    <Compile Include="View\VideoFileView.cs" />
+    <EmbeddedResource Include="frmAbout.resx">
+      <DependentUpon>frmAbout.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmMain.resx">
+      <DependentUpon>frmMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSplashScreen.resx">
+      <DependentUpon>frmSplashScreen.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <EmbeddedResource Include="Video\AstroDigitalVideo\frmAdvIndexRebuilder.resx">
+      <DependentUpon>frmAdvIndexRebuilder.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Video\AstroDigitalVideo\frmAdvStatusPopup.resx">
+      <DependentUpon>frmAdvStatusPopup.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Video\AstroDigitalVideo\frmAdvViewer.resx">
+      <DependentUpon>frmAdvViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="app.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <None Include="WindowsFiles\app.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Model\" />
+    <Folder Include="Task\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="img\stop24.bmp" />
+    <None Include="img\play24.bmp" />
+    <None Include="img\aboutbox.bmp" />
+    <Content Include="tangra-big.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Tangra.Model\Tangra.Model.csproj">
+      <Project>{70BBC9A7-7DD9-4A4D-B972-6665C65875C6}</Project>
+      <Name>Tangra.Model</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>xcopy "$(SolutionDir)Tangra.Core\$(ConfigurationName)\TangraCore.dll" "$(TargetDir)" /y
+xcopy "$(SolutionDir)Tangra.Video\Windows\$(ConfigurationName)\TangraVideo.dll" "$(TargetDir)" /y</PreBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

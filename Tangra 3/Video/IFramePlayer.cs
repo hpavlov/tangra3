@@ -1,0 +1,88 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+using Tangra.Model.Image;
+using Tangra.Model.Video;
+
+namespace Tangra.Video
+{
+	public delegate void RenderFrameCallback(
+		int currentFrameIndex,
+		Pixelmap currentPixelmap,
+		MovementType movementType,
+		bool isLastFrame,
+		int milisecondsToWait);
+
+
+
+	public interface IVideoFrameRenderer
+	{
+		void PlayerStarted();
+		void PlayerStopped();
+		void RenderFrame(int currentFrameIndex, Pixelmap currentPixelmap, MovementType movementType, bool isLastFrame, int msToWait);
+	}
+
+	public interface IFrameStream
+	{
+		int Width { get; }
+		int Height { get; }
+		int BitPix { get; }
+		int FirstFrame { get; }
+		int LastFrame { get; }
+		int CountFrames { get; }
+		double FrameRate { get; }
+		double MillisecondsPerFrame { get; }
+		Pixelmap GetPixelmap(int index);
+		int RecommendedBufferSize { get; }
+		string VideoFileType { get; }
+
+		Pixelmap GetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging);
+		string Engine { get; }
+	}
+
+	public interface IFramePlayer
+	{
+		void SetFrameRenderer(IVideoFrameRenderer frameRenderer);
+		bool IsRunning { get; }
+		bool IsAstroDigitalVideo { get; }
+		void Start(FramePlaySpeed mode, uint step);
+		void Stop();
+		void StepForward();
+		void StepBackward();
+		void StepForward(int seconds);
+		void StepBackward(int seconds);
+		void MoveToFrame(int frameNo);
+		Pixelmap GetFrame(int frameNo, bool noIntegrate);
+		void DisposeResources();
+		void OpenVideo(IFrameStream frameStream);
+		void CloseVideo();
+		IFrameStream Video { get; }
+		int FrameStep { get; }
+		void RefreshCurrentFrame();
+	}
+
+	public class PlayerContext
+	{
+		private Control m_MainThreadControl;
+		private IVideoFrameRenderer m_FrameRenderer;
+
+		public Control MainThreadControl
+		{
+			get { return m_MainThreadControl; }
+		}
+
+		public IVideoFrameRenderer FrameRenderer
+		{
+			get { return m_FrameRenderer; }
+		}
+
+		public PlayerContext(object hostForm)
+		{
+			m_MainThreadControl = hostForm as Control;
+			m_FrameRenderer = hostForm as IVideoFrameRenderer;
+		}
+	}
+}

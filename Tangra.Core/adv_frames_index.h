@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <stdio.h>
+#include "cross_platform.h"
 
 using namespace std;
 

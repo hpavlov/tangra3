@@ -1,6 +1,9 @@
 #include "PixelMapUtils.h"
 #include "CoreContext.h"
 #include <stdlib.h>
+#include "cross_platform.h"
+#include <stdio.h>
+#include <string.h>
 
 
 void CopyPixelsInTriplets(BYTE* pDIB, BITMAPINFOHEADER bih, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
@@ -208,8 +211,9 @@ HRESULT GetPixelMapBits(BYTE* pDIB, long* width, long* height, DWORD imageSize, 
 
 HRESULT GetPixelMapBitsAndHBitmap(BYTE* pDIB, long* width, long* height, DWORD imageSize, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, HBITMAP hBitmap)
 {
+	//OutputDebugString("GetPixelMapBitsAndHBitmap.214");
 	BITMAPINFOHEADER bih;
-	RtlMoveMemory(&bih.biSize, pDIB, sizeof(BITMAPINFOHEADER));
+	memmove(&bih.biSize, pDIB, sizeof(BITMAPINFOHEADER));
 
 	if (*width == 0) *width = bih.biWidth;
 	if (*height == 0) *height = bih.biHeight;
@@ -222,7 +226,7 @@ HRESULT GetPixelMapBitsAndHBitmap(BYTE* pDIB, long* width, long* height, DWORD i
 
 	////and BitmapInfo variable-length UDT
 	BYTE memBitmapInfo[40];
-	RtlMoveMemory(memBitmapInfo, &bih, sizeof(bih));
+	memmove(memBitmapInfo, &bih, sizeof(bih));
 
 	BITMAPFILEHEADER bfh;
 	bfh.bfType=19778;    //BM header
@@ -232,9 +236,9 @@ HRESULT GetPixelMapBitsAndHBitmap(BYTE* pDIB, long* width, long* height, DWORD i
 	bfh.bfOffBits=sizeof(BITMAPINFOHEADER) + sizeof(BITMAPFILEHEADER); //54
 
 	// Copy the display bitmap including the header
-	RtlMoveMemory(bitmapPixels, &bfh, sizeof(bfh));
-	RtlMoveMemory(bitmapPixels + sizeof(bfh), &memBitmapInfo, sizeof(memBitmapInfo));
-	RtlMoveMemory(bitmapPixels + sizeof(bfh) + sizeof(memBitmapInfo), pDIB + sizeof(BITMAPINFOHEADER), bih.biSizeImage);
+	memmove(bitmapPixels, &bfh, sizeof(bfh));
+	memmove(bitmapPixels + sizeof(bfh), &memBitmapInfo, sizeof(memBitmapInfo));
+	memmove(bitmapPixels + sizeof(bfh) + sizeof(memBitmapInfo), pDIB + sizeof(BITMAPINFOHEADER), bih.biSizeImage);
 	
 	//BITMAPINFO bmi;
 	//ZeroMemory(&bmi, sizeof(BITMAPINFO));
@@ -285,7 +289,7 @@ HRESULT GetBitmapPixels(long width, long height, unsigned long* pixels, BYTE* bi
 
 	// and BitmapInfo variable-length UDT
 	BYTE memBitmapInfo[40];
-	RtlMoveMemory(memBitmapInfo, &bih, sizeof(bih));
+	memmove(memBitmapInfo, &bih, sizeof(bih));
 
 	BITMAPFILEHEADER bfh;
 	bfh.bfType=19778;    //BM header
@@ -295,8 +299,8 @@ HRESULT GetBitmapPixels(long width, long height, unsigned long* pixels, BYTE* bi
 	bfh.bfOffBits=sizeof(BITMAPINFOHEADER) + sizeof(BITMAPFILEHEADER); //54
 
 	// Copy the display bitmap including the header
-	RtlMoveMemory(bitmapPixels, &bfh, sizeof(bfh));
-	RtlMoveMemory(bitmapPixels + sizeof(bfh), &memBitmapInfo, sizeof(memBitmapInfo));
+	memmove(bitmapPixels, &bfh, sizeof(bfh));
+	memmove(bitmapPixels + sizeof(bfh), &memBitmapInfo, sizeof(memBitmapInfo));
 
 	bitmapPixels = bitmapPixels + sizeof(bfh) + sizeof(memBitmapInfo);
 

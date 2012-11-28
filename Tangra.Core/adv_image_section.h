@@ -7,6 +7,7 @@
 
 #include <map>
 #include <string>
+#include "cross_platform.h"
 
 using namespace std;
 using std::string;

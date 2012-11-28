@@ -6,11 +6,15 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Tangra 3")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription(
+	"Software package for astronomical video data reduction." +
+	"For loading and saving FITS files Tangra uses the CCharpFITS package which is a C# port of Tom McGlynn's nom.tam.fits Java package, initially ported by  Samuel Carliles\r\n" +
+    "nom.tam.fits is Copyright: Thomas McGlynn 1997-2007.\r\n" +
+    "CCharpFITS is Copyright: 2007 Virtual Observatory - India.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Hristo Pavlov")]
 [assembly: AssemblyProduct("Tangra 3")]
-[assembly: AssemblyCopyright("Copyright ©  2012")]
+[assembly: AssemblyCopyright("Copyright © 2012 Hristo Pavlov")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +36,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("3.0.0.0")]
+[assembly: AssemblyFileVersion("3.0.0.*")]

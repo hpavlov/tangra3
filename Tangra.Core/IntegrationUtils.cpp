@@ -1,6 +1,7 @@
 #include <vector>
 #include "stdlib.h"
-#include "strings.h"
+#include <strings.h>
+#include <cstring>
 #include "IntegrationUtils.h"
 
 double* s_IntegratedValues = NULL;
@@ -11,7 +12,7 @@ int s_Width;
 int s_Height;
 int s_FrameCount;
 
-int __cdecl IntegrationManagerGetFirstFrameToIntegrate(int producedFirstFrame, int frameCount, bool isSlidingIntegration)
+int IntegrationManagerGetFirstFrameToIntegrate(int producedFirstFrame, int frameCount, bool isSlidingIntegration)
 {
 	if (isSlidingIntegration)
 	{
@@ -24,7 +25,7 @@ int __cdecl IntegrationManagerGetFirstFrameToIntegrate(int producedFirstFrame, i
 	}
 }
 
-void __cdecl IntergationManagerStartNew(int width, int height, bool isMedianAveraging)
+void IntergationManagerStartNew(int width, int height, bool isMedianAveraging)
 {
 	s_IntegratedValues = (double*)malloc(width * height * sizeof(double));
 	memset(s_IntegratedValues, 0, width * height * sizeof(double));
@@ -47,7 +48,7 @@ void __cdecl IntergationManagerStartNew(int width, int height, bool isMedianAver
 	}
 }
 
-void __cdecl IntegrationManagerAddFrame(unsigned long* framePixels)
+void IntegrationManagerAddFrame(unsigned long* framePixels)
 {
 	double* pIntegrated = s_IntegratedValues;
 	unsigned long* pPixels = framePixels;
@@ -103,7 +104,7 @@ void IntegrationManagerAddFrameEx(unsigned long* framePixels, bool isLittleEndia
 	s_FrameCount++;
 }
 
-void __cdecl IntegrationManagerProduceIntegratedFrame(unsigned long* framePixels)
+void IntegrationManagerProduceIntegratedFrame(unsigned long* framePixels)
 {
 	double* pIntegrated = s_IntegratedValues;
 	unsigned long* pPixels = framePixels;
@@ -121,7 +122,7 @@ void __cdecl IntegrationManagerProduceIntegratedFrame(unsigned long* framePixels
 	}	
 }
 
-void __cdecl IntegrationManagerFreeResources()
+void IntegrationManagerFreeResources()
 {
 	if (s_IntegratedValues != NULL)
 		delete s_IntegratedValues;

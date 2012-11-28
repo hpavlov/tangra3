@@ -2,12 +2,8 @@
 
 #include <stdlib.h>
 
-#include <time.h>
-#include <stdio.h>
-#include <windows.h>
-#include <vfw.h>
-
 #include "TangraCore.h"
+#include "TangraAVIFile.h"
 
 long s_AviImageWidth;
 long s_AviImageHeight;
@@ -15,22 +11,25 @@ WORD s_AviBitCount;
 DWORD s_AviImageSize;
 DWORD s_AviCompression;
 
-HRESULT AviFileOpenFile(LPCTSTR szFileName, PAVISTREAM* paviStream)
+namespace TangraAviFile
 {
-	AVIFileInit();
+
+	HRESULT AviFileOpenFile(LPCTSTR szFileName, PAVISTREAM* paviStream)
+	{
+		AVIFileInit();
     
-	HRESULT hr = AVIStreamOpenFromFile(paviStream, szFileName, streamtypeVIDEO, 0, OF_READ, NULL);
+		HRESULT hr = AVIStreamOpenFromFile(paviStream, szFileName, streamtypeVIDEO, 0, OF_READ, NULL);
 
-    if(FAILED(hr))
-    {
-        printf("Could not locate AVI file <%s>.\n", szFileName);
-		return E_FAIL;
-    }
+		if(FAILED(hr))
+		{
+			printf("Could not locate AVI file <%s>.\n", szFileName);
+			return E_FAIL;
+		}
 
-	return S_OK;
-}
+		return S_OK;
+	}
 
-HRESULT AviFileGetStreamInfo(PAVISTREAM paviStream, AVISTREAMINFO* streamInfo, BITMAPINFOHEADER *lpFormat, long* firstFrame, long* countFrames)
+																																																																		HRESULT AviFileGetStreamInfo(PAVISTREAM paviStream, AVISTREAMINFO* streamInfo, BITMAPINFOHEADER *lpFormat, long* firstFrame, long* countFrames)
 {
 	HRESULT hr = AVIStreamInfo(paviStream, streamInfo, sizeof(AVISTREAMINFO));
 
@@ -109,87 +108,91 @@ HRESULT AviFileGetStreamInfo(PAVISTREAM paviStream, AVISTREAMINFO* streamInfo, B
 	return S_OK;
 }
 
-PGETFRAME AviFileGetFrameOpen(PAVISTREAM paviStream, BITMAPINFOHEADER *bih)
-{
-	PGETFRAME pgfFrame;
-
-	if(NULL == (pgfFrame = AVIStreamGetFrameOpen(paviStream, bih))) 
+	PGETFRAME AviFileGetFrameOpen(PAVISTREAM paviStream, BITMAPINFOHEADER *bih)
 	{
-        printf("Opening AVI Stream was unsuccessful\n");
-    	return 0;
-    }
+		PGETFRAME pgfFrame;
 
-   return pgfFrame;
-}
-
-HRESULT AviFileGetFrameClose(PGETFRAME frameObject)
-{
-	if (0 != frameObject)
-		AVIStreamGetFrameClose(frameObject);
-
-	return S_OK;
-}
-
-HRESULT AviFileGetFrame(PGETFRAME frameObject, long frameNo, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
-{
-	if (s_AviImageSize == 0)
-		throw "Not Supported";
-
-    //Decompress the frame and return a pointer to the DIB
-    BYTE* pDIB = (BYTE*) AVIStreamGetFrame(frameObject, frameNo);
-
-	long width = 0;
-	long height = 0;
-	HRESULT rv = TangraCore::GetPixelMapBits(pDIB, &width, &height, s_AviImageSize, pixels, bitmapPixels, bitmapBytes);
-	
-	if (TangraCore::UsesPreProcessing() && SUCCEEDED(rv)) 
-		rv = TangraCore::ApplyPreProcessing(pixels, width, height, 8, bitmapPixels, bitmapBytes);
-
-	return rv;
-}
-
-HRESULT AviFileGetFramePixels(PGETFRAME frameObject, long frameNo, unsigned long* pixels)
-{
-    //Decompress the frame and return a pointer to the DIB
-    BYTE* pDIB = (BYTE*) AVIStreamGetFrame(frameObject, frameNo);
-
-	HRESULT rv = TangraCore::GetPixelMapPixelsOnly(pDIB, s_AviImageWidth, s_AviImageHeight, pixels);
-
-	if (TangraCore::UsesPreProcessing() && SUCCEEDED(rv)) 
-		rv = TangraCore::ApplyPreProcessingPixelsOnly(pixels, s_AviImageWidth, s_AviImageHeight, 8);
-
-	return rv;
-}
-
-HRESULT AviGetIntegratedFrame(PGETFRAME frameObject, long startFrameNo, long framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
-{	
-	HRESULT rv;
-	int firstFrameToIntegrate = TangraCore::IntegrationManagerGetFirstFrameToIntegrate(startFrameNo, framesToIntegrate, isSlidingIntegration);
-	TangraCore::IntergationManagerStartNew(s_AviImageWidth, s_AviImageHeight, isMedianAveraging);
-
-	for(int idx = 0; idx < framesToIntegrate; idx++)
-	{
-		rv = AviFileGetFramePixels(frameObject, firstFrameToIntegrate + idx, pixels);	
-		if (rv != S_OK)
+		if(NULL == (pgfFrame = AVIStreamGetFrameOpen(paviStream, bih))) 
 		{
-			TangraCore::IntegrationManagerFreeResources();
-			return rv;
+			printf("Opening AVI Stream was unsuccessful\n");
+    		return 0;
 		}
 
-		TangraCore::IntegrationManagerAddFrame(pixels);
+	   return pgfFrame;
 	}
 
-	TangraCore::IntegrationManagerProduceIntegratedFrame(pixels);
-	TangraCore::IntegrationManagerFreeResources();
+	HRESULT AviFileGetFrameClose(PGETFRAME frameObject)
+	{
+		if (0 != frameObject)
+			AVIStreamGetFrameClose(frameObject);
 
-	return TangraCore::GetBitmapPixels(s_AviImageWidth, s_AviImageHeight, pixels, bitmapPixels, bitmapBytes, false, 8);
-}
+		return S_OK;
+	}
 
-HRESULT AviFileCloseStream(PAVISTREAM paviStream)
-{
-	AVIStreamClose(paviStream);
+	HRESULT AviFileGetFrame(PGETFRAME frameObject, long frameNo, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
+	{
+		if (s_AviImageSize == 0)
+			throw "Not Supported";
 
-	return S_OK;
+		//Decompress the frame and return a pointer to the DIB
+		BYTE* pDIB = (BYTE*) AVIStreamGetFrame(frameObject, frameNo);
+
+		long width = 0;
+		long height = 0;
+		// TODO: How to debug TangraCore.dll ??
+		//pixels = (unsigned long*)malloc(800 * 800 * 4);
+		HRESULT rv = TangraCore::GetPixelMapBits(pDIB, &width, &height, s_AviImageSize, pixels, bitmapPixels, bitmapBytes);
+	
+		if (TangraCore::UsesPreProcessing() && SUCCEEDED(rv)) 
+			rv = TangraCore::ApplyPreProcessing(pixels, width, height, 8, bitmapPixels, bitmapBytes);
+
+		return rv;
+	}
+
+	HRESULT AviFileGetFramePixels(PGETFRAME frameObject, long frameNo, unsigned long* pixels)
+	{
+		//Decompress the frame and return a pointer to the DIB
+		BYTE* pDIB = (BYTE*) AVIStreamGetFrame(frameObject, frameNo);
+
+		HRESULT rv = TangraCore::GetPixelMapPixelsOnly(pDIB, s_AviImageWidth, s_AviImageHeight, pixels);
+
+		if (TangraCore::UsesPreProcessing() && SUCCEEDED(rv)) 
+			rv = TangraCore::ApplyPreProcessingPixelsOnly(pixels, s_AviImageWidth, s_AviImageHeight, 8);
+
+		return rv;
+	}
+
+	HRESULT AviGetIntegratedFrame(PGETFRAME frameObject, long startFrameNo, long framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
+	{	
+		HRESULT rv;
+		int firstFrameToIntegrate = TangraCore::IntegrationManagerGetFirstFrameToIntegrate(startFrameNo, framesToIntegrate, isSlidingIntegration);
+		TangraCore::IntergationManagerStartNew(s_AviImageWidth, s_AviImageHeight, isMedianAveraging);
+
+		for(int idx = 0; idx < framesToIntegrate; idx++)
+		{
+			rv = AviFileGetFramePixels(frameObject, firstFrameToIntegrate + idx, pixels);	
+			if (rv != S_OK)
+			{
+				TangraCore::IntegrationManagerFreeResources();
+				return rv;
+			}
+
+			TangraCore::IntegrationManagerAddFrame(pixels);
+		}
+
+		TangraCore::IntegrationManagerProduceIntegratedFrame(pixels);
+		TangraCore::IntegrationManagerFreeResources();
+
+		return TangraCore::GetBitmapPixels(s_AviImageWidth, s_AviImageHeight, pixels, bitmapPixels, bitmapBytes, false, 8);
+	}
+
+	HRESULT AviFileCloseStream(PAVISTREAM paviStream)
+	{
+		AVIStreamClose(paviStream);
+
+		return S_OK;
+	}
+
 }
 
 void cpy(unsigned char *src, unsigned long *dst, size_t length)

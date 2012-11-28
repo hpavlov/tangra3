@@ -11,6 +11,8 @@
 #include <stdio.h>
 #include "quicklz.h"
 
+#include "cross_platform.h"
+
 using namespace std;
 using std::string;
 
@@ -23,7 +25,8 @@ namespace AdvLib
 		float FrameRate;
 		long CountFrames;
 		long Bpp;
-	};	
+	};
+	
 
 	class AdvFile {
 		public:
