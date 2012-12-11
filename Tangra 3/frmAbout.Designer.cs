@@ -33,7 +33,6 @@
 			this.lblProductName = new System.Windows.Forms.Label();
 			this.lblComponentVersions = new System.Windows.Forms.Label();
 			this.lblCopyright = new System.Windows.Forms.Label();
-			((System.ComponentModel.ISupportInitialize)(this.logoPictureBox)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// textBoxDescription
@@ -114,7 +113,6 @@
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "About Tangra";
-			((System.ComponentModel.ISupportInitialize)(this.logoPictureBox)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

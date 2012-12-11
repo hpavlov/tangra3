@@ -13,6 +13,7 @@ namespace Tangra.View
 		private frmMain m_MainForm;
 		private int m_ExtraWidth;
 		private int m_ExtraHeight;
+		private IFramePlayer m_FramePlayer;
 
 		public VideoFileView(frmMain mainForm)
 		{
@@ -20,6 +21,11 @@ namespace Tangra.View
 
 			m_ExtraWidth = m_MainForm.Width - m_MainForm.pictureBox.Width;
 			m_ExtraHeight = m_MainForm.Height - m_MainForm.pictureBox.Height;
+		}
+
+		internal void SetFramePlayer(IFramePlayer framePlayer)
+		{
+			m_FramePlayer = framePlayer;
 		}
 
 		public void Update()
@@ -49,12 +55,18 @@ namespace Tangra.View
 			//m_MainForm.tbtnCross.Enabled = CanChangeTool && HasAnyFileLoaded;
 			//m_MainForm.tbtnFrameSize.Enabled = CanChangeTool && HasAnyFileLoaded && !OSDExcludeToolDisabled;
 
-			m_MainForm.pnlPlayControls.Enabled = TangraContext.Current.HasVideoLoaded && TangraContext.Current.CanScrollFrames;
+			m_MainForm.pnlPlayControls.Enabled = TangraContext.Current.HasVideoLoaded;
 			m_MainForm.pnlPlayButtons.Enabled = TangraContext.Current.HasVideoLoaded;
-			m_MainForm.btnJumpTo.Enabled = TangraContext.Current.HasVideoLoaded && TangraContext.Current.CanScrollFrames;
+			m_MainForm.btnJumpTo.Enabled = TangraContext.Current.HasVideoLoaded;
 
 			m_MainForm.btnPlay.Enabled = TangraContext.Current.HasVideoLoaded && TangraContext.Current.CanPlayVideo;
 			m_MainForm.btnStop.Enabled = TangraContext.Current.HasVideoLoaded && TangraContext.Current.CanPlayVideo;
+			m_MainForm.btn10SecMinus.Enabled = TangraContext.Current.HasVideoLoaded && TangraContext.Current.CanScrollFrames;
+			m_MainForm.btn10SecPlus.Enabled = TangraContext.Current.HasVideoLoaded && TangraContext.Current.CanScrollFrames;
+			m_MainForm.btn1FrMinus.Enabled = TangraContext.Current.HasVideoLoaded && TangraContext.Current.CanScrollFrames;
+			m_MainForm.btn1FrPlus.Enabled = TangraContext.Current.HasVideoLoaded && TangraContext.Current.CanScrollFrames;
+			m_MainForm.btn1SecMinus.Enabled = TangraContext.Current.HasVideoLoaded && TangraContext.Current.CanScrollFrames;
+			m_MainForm.btn1SecPlus.Enabled = TangraContext.Current.HasVideoLoaded && TangraContext.Current.CanScrollFrames;
 
 			//m_MainForm.miDetectIntegration.Enabled = HasVideoLoaded && CanPlayVideo;
 
@@ -63,12 +75,14 @@ namespace Tangra.View
 			//m_MainForm.miTargetPSFViewer.Enabled = HasVideoLoaded;
 
 			UpdateConfigurationControls();
-
-			UpdateVideoSizeAndLengthControls();
 		}
 
 		private void UpdateConfigurationControls()
 		{
+			m_MainForm.ssFPS.Visible = m_FramePlayer.IsRunning;
+			if (!m_FramePlayer.IsRunning)
+				m_MainForm.ssFPS.Text = string.Empty;
+
 			//ssGamma.Text = string.Format("Gamma = {0}", TangraConfig.Settings.Photometry.EncodingGamma.ToString("0.00"));
 
 			//if (TangraConfig.Settings.Photometry.EncodingGamma != 1)
@@ -136,7 +150,7 @@ namespace Tangra.View
 			//ssFPS.Visible = TangraConfig.Settings.Generic.ShowProcessingSpeed && m_FramePlayer.IsRunning;
 		}
 
-		private void UpdateVideoSizeAndLengthControls()
+		public void UpdateVideoSizeAndLengthControls()
 		{
 			int width = Math.Max(800, TangraContext.Current.FrameWidth + m_ExtraWidth);
 			int height = Math.Max(600, TangraContext.Current.FrameHeight + m_ExtraHeight);

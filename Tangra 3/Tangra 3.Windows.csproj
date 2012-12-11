@@ -52,7 +52,70 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Config\frmTangraSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Config\frmTangraSettings.Designer.cs">
+      <DependentUpon>frmTangraSettings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Config\SettingPannels\SettingsPannel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucADVSVideo12bit.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucADVSVideo12bit.Designer.cs">
+      <DependentUpon>ucADVSVideo12bit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucAnalogueVideo8bit.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucAnalogueVideo8bit.Designer.cs">
+      <DependentUpon>ucAnalogueVideo8bit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucCustomizeLightCurves.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucCustomizeLightCurves.Designer.cs">
+      <DependentUpon>ucCustomizeLightCurves.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucCustomizeLightCurveViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucCustomizeLightCurveViewer.Designer.cs">
+      <DependentUpon>ucCustomizeLightCurveViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucGeneralTangra.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucGeneralTangra.Designer.cs">
+      <DependentUpon>ucGeneralTangra.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucPhotometry.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucPhotometry.Designer.cs">
+      <DependentUpon>ucPhotometry.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucTracking.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucTracking.Designer.cs">
+      <DependentUpon>ucTracking.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controller\VideoController.cs" />
+    <Compile Include="Controls\ucColorPicker.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\ucColorPicker.Designer.cs">
+      <DependentUpon>ucColorPicker.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ucUtcTimePicker.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\ucUtcTimePicker.Designer.cs">
+      <DependentUpon>ucUtcTimePicker.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmAbout.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -71,6 +134,8 @@
     <Compile Include="frmSplashScreen.Designer.cs">
       <DependentUpon>frmSplashScreen.cs</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\Extensions.cs" />
+    <Compile Include="Helpers\NotificationManager.cs" />
     <Compile Include="PInvoke\TangraCore.cs" />
     <Compile Include="PInvoke\TangraVideo.cs" />
     <Compile Include="Program.cs" />
@@ -110,6 +175,36 @@
     <Compile Include="Video\IFramePlayer.cs" />
     <Compile Include="Video\VideoStream.cs" />
     <Compile Include="View\VideoFileView.cs" />
+    <EmbeddedResource Include="Config\frmTangraSettings.resx">
+      <DependentUpon>frmTangraSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Config\SettingPannels\ucADVSVideo12bit.resx">
+      <DependentUpon>ucADVSVideo12bit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Config\SettingPannels\ucAnalogueVideo8bit.resx">
+      <DependentUpon>ucAnalogueVideo8bit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Config\SettingPannels\ucCustomizeLightCurves.resx">
+      <DependentUpon>ucCustomizeLightCurves.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Config\SettingPannels\ucCustomizeLightCurveViewer.resx">
+      <DependentUpon>ucCustomizeLightCurveViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Config\SettingPannels\ucGeneralTangra.resx">
+      <DependentUpon>ucGeneralTangra.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Config\SettingPannels\ucPhotometry.resx">
+      <DependentUpon>ucPhotometry.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Config\SettingPannels\ucTracking.resx">
+      <DependentUpon>ucTracking.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\ucColorPicker.resx">
+      <DependentUpon>ucColorPicker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\ucUtcTimePicker.resx">
+      <DependentUpon>ucUtcTimePicker.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmAbout.resx">
       <DependentUpon>frmAbout.cs</DependentUpon>
     </EmbeddedResource>
@@ -147,7 +242,9 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="WindowsFiles\app.config" />
+    <None Include="WindowsFiles\app.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Model\" />

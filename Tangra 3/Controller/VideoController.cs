@@ -22,6 +22,7 @@ namespace Tangra.Controller
 		{
 			m_FramePlayer = new FramePlayer();
 			m_VideoFileView = videoFileView;
+			videoFileView.SetFramePlayer(m_FramePlayer);
 		}
 
 		public void OpenVideoFile(string fileName)
@@ -60,6 +61,8 @@ namespace Tangra.Controller
 
 				TangraContext.Current.HasImageLoaded = true;
 
+				m_VideoFileView.UpdateVideoSizeAndLengthControls();
+
 				m_VideoFileView.Update();
 			}
 			else
@@ -69,11 +72,12 @@ namespace Tangra.Controller
 		}
 
 		public void PlayVideo()
-		{			
-			TangraContext.Current.CanScrollFrames = false;
-
+		{
 			m_FramePlayer.Start(FramePlaySpeed.Fastest, 1);
 
+			OnVideoPlayerStarted();
+
+			// NOTE: Will this always be called in the UI thread?
 			m_VideoFileView.Update();
 		}
 
@@ -81,9 +85,20 @@ namespace Tangra.Controller
 		{
 			m_FramePlayer.Stop();
 
-			TangraContext.Current.CanScrollFrames = true;
+			OnVideoPlayerStopped();
 
+			// NOTE: Will this always be called in the UI thread?
 			m_VideoFileView.Update();
+		}
+
+		private void OnVideoPlayerStarted()
+		{
+			TangraContext.Current.CanScrollFrames = false;
+		}
+
+		private void OnVideoPlayerStopped()
+		{
+			TangraContext.Current.CanScrollFrames = true;
 		}
 
 		public void RefreshCurrentFrame()
@@ -113,8 +128,15 @@ namespace Tangra.Controller
 			m_FramePlayer = null;
 		}
 
+		public void UpdateViews()
+		{
+			m_VideoFileView.Update();
+		}
+
 		void IVideoFrameRenderer.PlayerStarted()
 		{
+			OnVideoPlayerStarted();
+
 			// TODO: Notify all views
 
 			try
@@ -123,10 +145,14 @@ namespace Tangra.Controller
 			}
 			catch (ObjectDisposedException)
 			{ }
+
+			UpdateViews();
 		}
 
 		void IVideoFrameRenderer.PlayerStopped()
 		{
+			OnVideoPlayerStopped();
+
 			// TODO: Notify all views
 
 			try
@@ -136,6 +162,7 @@ namespace Tangra.Controller
 			catch (ObjectDisposedException)
 			{ }
 
+			UpdateViews();
 		}
 
 		void IVideoFrameRenderer.RenderFrame(int currentFrameIndex, Pixelmap currentPixelmap, MovementType movementType, bool isLastFrame, int msToWait)

@@ -139,8 +139,7 @@ namespace TangraAviFile
 
 		long width = 0;
 		long height = 0;
-		// TODO: How to debug TangraCore.dll ??
-		//pixels = (unsigned long*)malloc(800 * 800 * 4);
+
 		HRESULT rv = TangraCore::GetPixelMapBits(pDIB, &width, &height, s_AviImageSize, pixels, bitmapPixels, bitmapBytes);
 	
 		if (TangraCore::UsesPreProcessing() && SUCCEEDED(rv)) 

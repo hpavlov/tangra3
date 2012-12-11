@@ -48,7 +48,7 @@ namespace Tangra
 
 		static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
 		{
-			// TODO: Log the error in a log file (Where to put the file so it works on all supported OSes?)
+			// TODO: Log the error in a log file (Where to put the file so it works on all supported OS-es?)
 			MessageBox.Show(e.Exception.Message + "\n\r" + e.Exception.StackTrace, e.Exception.GetType().ToString());
 
 			Debugger.Break();

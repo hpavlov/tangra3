@@ -8,7 +8,9 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using Tangra.Config;
 using Tangra.Controller;
+using Tangra.Model.Config;
 using Tangra.Model.Context;
 using Tangra.Model.Image;
 using Tangra.Model.Video;
@@ -20,17 +22,18 @@ namespace Tangra
 {
 	public partial class frmMain : Form, IVideoFrameRenderer
 	{
-		private VideoController videoController;
-		private VideoFileView videoFileView;
+		private VideoController m_VideoController;
+		private VideoFileView m_VideoFileView;
 		private bool m_FormLoaded = false;
 
 		public frmMain()
 		{
 			InitializeComponent();
 
-			videoFileView = new VideoFileView(this);
-			videoController = new VideoController(videoFileView);
-			
+			TangraConfig.Load();
+
+			m_VideoFileView = new VideoFileView(this);
+			m_VideoController = new VideoController(m_VideoFileView);			
 		}
 
 		/// <summary>
@@ -46,7 +49,7 @@ namespace Tangra
 
 			base.Dispose(disposing);
 
-			videoController.Dispose();
+			m_VideoController.Dispose();
 		}
 
 		#region Frame Rendering
@@ -56,12 +59,12 @@ namespace Tangra
 
 		public void PlayerStarted()
 		{
-			// TODO
+			m_VideoController.UpdateViews();
 		}
 
 		public void PlayerStopped()
 		{
-			// TODO
+			m_VideoController.UpdateViews();
 		}
 
 		public void RenderFrame(
@@ -142,7 +145,7 @@ namespace Tangra
 				try
 				{
 					if (m_RefreshAtTheEndOfRenderFrame)
-						videoController.RefreshCurrentFrame();
+						m_VideoController.RefreshCurrentFrame();
 				}
 				finally
 				{
@@ -176,6 +179,9 @@ namespace Tangra
 					m_ReentrancyGuard.Exit();
 			}
 		}
+
+		private int m_FPSLastFrameNo;
+		private long m_FPSLastSavedTicks;
 
 		private void DoRenderFrame(Pixelmap currentPixelmap, RenderFrameContext frameContext)
 		{
@@ -212,33 +218,33 @@ namespace Tangra
 #endif
 			scrollBarFrames.Value = frameContext.CurrentFrameIndex;
 
-			//if (VideoContext.Current.FirstPlayedIndex == -1) VideoContext.Current.FirstPlayedIndex = currentFrameIndex;
+			//if (m_VideoContext.FirstPlayedIndex == -1) m_VideoContext.FirstPlayedIndex = frameContext.CurrentFrameIndex;
 
 			//if (TangraConfig.Settings.Generic.ShowProcessingSpeed &&
 			//    m_FramePlayer.IsRunning &&
 			//    VideoContext.Current.PlayStarted != DateTime.MaxValue)
-			//{
-			//    // If the interval between now and the last saved ticks is more than X (1 sec):
-			//    //  - Compute and display the new FPS
-			//    //  - Save current Ticks and Frame
-			//    if (m_FPSLastFrameNo != -1)
-			//    {
-			//        double totalSec = (new TimeSpan(DateTime.Now.Ticks - m_FPSLastSavedTicks)).TotalSeconds;
-			//        if (totalSec >= 1.0)
-			//        {
-			//            int totalFrames = currentFrameIndex - m_FPSLastFrameNo;
-			//            ssFPS.Text = string.Format("{0} fps", ((double)(totalFrames / (totalSec * m_FramePlayer.FrameStep))).ToString("0.0"));
+			{
+			    // If the interval between now and the last saved ticks is more than X (1 sec):
+			    //  - Compute and display the new FPS
+			    //  - Save current Ticks and Frame
+			    if (m_FPSLastFrameNo != -1)
+			    {
+			        double totalSec = (new TimeSpan(DateTime.Now.Ticks - m_FPSLastSavedTicks)).TotalSeconds;
+			        if (totalSec >= 1.0)
+			        {
+						int totalFrames = frameContext.CurrentFrameIndex - m_FPSLastFrameNo;
+						ssFPS.Text = string.Format("{0} fps", ((double)totalFrames / (totalSec /* m_FramePlayer.FrameStep*/)).ToString("0.0"));
 
-			//            m_FPSLastFrameNo = currentFrameIndex;
-			//            m_FPSLastSavedTicks = DateTime.Now.Ticks;
-			//        }
-			//    }
-			//    else
-			//    {
-			//        m_FPSLastFrameNo = currentFrameIndex;
-			//        m_FPSLastSavedTicks = DateTime.Now.Ticks;
-			//    }
-			//}
+						m_FPSLastFrameNo = frameContext.CurrentFrameIndex;
+			            m_FPSLastSavedTicks = DateTime.Now.Ticks;
+			        }
+			    }
+			    else
+			    {
+					m_FPSLastFrameNo = frameContext.CurrentFrameIndex;
+			        m_FPSLastSavedTicks = DateTime.Now.Ticks;
+			    }
+			}
 
 			//TODO: The ZoomImage should be another view? or is it part of the current main view? The question is do we allow actions/tools to modify the ZoomImage, and the answer it probably YES
 			//ClearZoomImage();
@@ -393,13 +399,13 @@ namespace Tangra
 		{
 			if (openVideoFileDialog.ShowDialog(this) == DialogResult.OK)
 			{
-				videoController.OpenVideoFile(openVideoFileDialog.FileName);				
+				m_VideoController.OpenVideoFile(openVideoFileDialog.FileName);				
 			}
 		}
 
 		private void frmMain_Load(object sender, EventArgs e)
 		{
-			videoController.InitVideoSystem(new PlayerContext(this));
+			m_VideoController.InitVideoSystem(new PlayerContext(this));
 
 			m_FormLoaded = true;
 		}
@@ -434,12 +440,19 @@ namespace Tangra
 
 		private void btnPlay_Click(object sender, EventArgs e)
 		{
-			videoController.PlayVideo();
+			m_VideoController.PlayVideo();
 		}
 
 		private void btnStop_Click(object sender, EventArgs e)
 		{
-			videoController.StopVideo();
+			m_VideoController.StopVideo();
+		}
+
+		private void miSettings_Click(object sender, EventArgs e)
+		{
+			// TODO: Pass the ADVS State form
+			var frmSettings = new frmTangraSettings(null, null);
+			frmSettings.ShowDialog(this);
 		}
 	}
 }

@@ -95,16 +95,11 @@
 			this.timerScrolling = new System.Windows.Forms.Timer(this.components);
 			this.tabControl.SuspendLayout();
 			this.tpTags.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.dgvFileTags)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.advTagValuePairBindingSource)).BeginInit();
 			this.tpSummary.SuspendLayout();
 			this.groupBox3.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.dgvImageTags)).BeginInit();
 			this.groupBox2.SuspendLayout();
 			this.groupBox1.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.dgvLayoutTags)).BeginInit();
 			this.tpFrames.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.picSmallImage)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// tabControl
@@ -751,21 +746,15 @@
 			this.Load += new System.EventHandler(this.frmAdvViewer_Load);
 			this.tabControl.ResumeLayout(false);
 			this.tpTags.ResumeLayout(false);
-			((System.ComponentModel.ISupportInitialize)(this.dgvFileTags)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.advTagValuePairBindingSource)).EndInit();
 			this.tpSummary.ResumeLayout(false);
 			this.tpSummary.PerformLayout();
 			this.groupBox3.ResumeLayout(false);
 			this.groupBox3.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.dgvImageTags)).EndInit();
 			this.groupBox2.ResumeLayout(false);
 			this.groupBox1.ResumeLayout(false);
-			((System.ComponentModel.ISupportInitialize)(this.dgvLayoutTags)).EndInit();
 			this.tpFrames.ResumeLayout(false);
 			this.tpFrames.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.picSmallImage)).EndInit();
 			this.ResumeLayout(false);
-
 		}
 
 		#endregion
