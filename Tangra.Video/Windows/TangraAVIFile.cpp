@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 
-#include "TangraCore.h"
+#include "include/TangraCore.h"
 #include "TangraAVIFile.h"
 
 long s_AviImageWidth;

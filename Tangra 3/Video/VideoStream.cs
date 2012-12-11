@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using Tangra.Model.Config;
 using Tangra.Model.Image;
 using Tangra.PInvoke;
 
@@ -15,6 +16,8 @@ namespace Tangra.Video
 		{
 			try
 			{
+                TangraVideo.SetVideoEngine(TangraConfig.Settings.Generic.PreferredRenderingEngineIndex);
+
 				VideoFileInfo fileInfo = TangraVideo.OpenFile(fileName);
 				return new VideoStream(fileInfo);
 			}

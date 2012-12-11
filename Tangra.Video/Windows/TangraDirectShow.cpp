@@ -1,13 +1,7 @@
 #include "stdafx.h"
-#include "PixelMapUtils.h"
-#include "Tangra.Core.h"
 #include <dshow.h>
 #include <tchar.h>
 #include <atlbase.h>
-
-#include "IntegrationUtils.h"
-#include "PreProcessing.h"
-
 
 // http://jaewon.mine.nu/jaewon/2009/06/17/a-workaround-for-a-missing-file-dxtrans-h-in-directx-sdk/
 
@@ -17,6 +11,9 @@
 #define __IDxtJpeg_INTERFACE_DEFINED__ 
 #define __IDxtKey_INTERFACE_DEFINED__ 
 #include <Qedit.h>
+
+#include "include/TangraCore.h"
+#include "TangraDirectShow.h"
 
 char *m_pBuffer = NULL;
 IMediaDet* m_MediaDet = NULL;
@@ -42,7 +39,7 @@ void WINAPI FreeMediaType(AM_MEDIA_TYPE& mt)
     }
 }
 
-HRESULT DirectShowCloseFile()
+HRESULT TangraDirectShow::DirectShowCloseFile()
 {
 	if(m_pBuffer){
 		delete [] m_pBuffer;
@@ -57,7 +54,7 @@ HRESULT DirectShowCloseFile()
 	return S_OK;
 }
 
-HRESULT DirectShowOpenFile(LPCTSTR fileName, VideoFileInfo* fileInfo)
+HRESULT TangraDirectShow::DirectShowOpenFile(LPCTSTR fileName, VideoFileInfo* fileInfo)
 {
 	DirectShowCloseFile();
 
@@ -127,6 +124,7 @@ HRESULT DirectShowOpenFile(LPCTSTR fileName, VideoFileInfo* fileInfo)
 			
 			fileInfo->Width = pVih->bmiHeader.biWidth;
 			fileInfo->Height = pVih->bmiHeader.biHeight;
+			fileInfo->BitmapImageSize= pVih->bmiHeader.biWidth * pVih->bmiHeader.biHeight * 3; // Will be always working with 24bit BMP
 
 			m_Width = pVih->bmiHeader.biWidth;
 			m_Height = pVih->bmiHeader.biHeight;
@@ -166,7 +164,7 @@ HRESULT DirectShowOpenFile(LPCTSTR fileName, VideoFileInfo* fileInfo)
 }
 
 
-HRESULT DirectShowGetFrame(long frameNo, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
+HRESULT TangraDirectShow::DirectShowGetFrame(long frameNo, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
 {
 	// Find the required buffer size.
 	HRESULT hr = 1; //Only important if !mFrameDataSize, so make default 1
@@ -174,22 +172,21 @@ HRESULT DirectShowGetFrame(long frameNo, unsigned long* pixels, BYTE* bitmapPixe
 
 	if (SUCCEEDED(hr)) 
 	{
-		if(!m_pBuffer){
+		if(!m_pBuffer)
 			m_pBuffer = new char[m_FrameDataSize];
-		}
-		if (!m_pBuffer){
+
+		if (!m_pBuffer)
 			return E_OUTOFMEMORY;
-		}
 
 		double frametime = frameNo * m_FrameRateMS  / 1000.0;
 
 		hr = m_MediaDet->GetBitmapBits(frametime, NULL, m_pBuffer, m_Width, m_Height);
 		if (SUCCEEDED(hr))
 		{
-			hr = GetPixelMapBits((BYTE*)(m_pBuffer), &m_Width, &m_Height, 0, pixels, bitmapPixels, bitmapBytes);
+			hr = TangraCore::GetPixelMapBits((BYTE*)(m_pBuffer), &m_Width, &m_Height, 0, pixels, bitmapPixels, bitmapBytes);
 
-			if (g_UsesPreProcessing && SUCCEEDED(hr))
-				hr = ApplyPreProcessing(pixels, m_Width, m_Height, 8, bitmapPixels, bitmapBytes);
+			if (TangraCore::UsesPreProcessing() && SUCCEEDED(hr))
+				hr = TangraCore::ApplyPreProcessing(pixels, m_Width, m_Height, 8, bitmapPixels, bitmapBytes);
 		}
 		else
 		{
@@ -202,7 +199,7 @@ HRESULT DirectShowGetFrame(long frameNo, unsigned long* pixels, BYTE* bitmapPixe
 	return hr;
 }
 
-HRESULT DirectShowGetFramePixels(long frameNo, unsigned long* pixels)
+HRESULT TangraDirectShow::DirectShowGetFramePixels(long frameNo, unsigned long* pixels)
 {
 	// Find the required buffer size.
 	HRESULT hr = 1; //Only important if !mFrameDataSize, so make default 1
@@ -227,10 +224,10 @@ HRESULT DirectShowGetFramePixels(long frameNo, unsigned long* pixels)
 		hr = m_MediaDet->GetBitmapBits(frametime, NULL, m_pBuffer, m_Width, m_Height);
 		if (SUCCEEDED(hr))
 		{
-			hr = GetPixelMapPixelsOnly((BYTE*)(m_pBuffer), m_Width, m_Height, pixels);
+			hr = TangraCore::GetPixelMapPixelsOnly((BYTE*)(m_pBuffer), m_Width, m_Height, pixels);
 
-			if (g_UsesPreProcessing && SUCCEEDED(hr)) 
-				hr = ApplyPreProcessingPixelsOnly(pixels, m_Width, m_Height, 8);
+			if (TangraCore::UsesPreProcessing() && SUCCEEDED(hr)) 
+				hr = TangraCore::ApplyPreProcessingPixelsOnly(pixels, m_Width, m_Height, 8);
 		}
 		else
 		{
@@ -243,27 +240,27 @@ HRESULT DirectShowGetFramePixels(long frameNo, unsigned long* pixels)
 	return hr;
 }
 
-HRESULT DirectShowGetIntegratedFrame(long startFrameNo, long framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
+HRESULT TangraDirectShow::DirectShowGetIntegratedFrame(long startFrameNo, long framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
 {	
 	HRESULT rv;
 
-	int firstFrameToIntegrate = IntegrationManagerGetFirstFrameToIntegrate(startFrameNo, framesToIntegrate, isSlidingIntegration);
-	IntergationManagerStartNew(m_Width, m_Height, isMedianAveraging);
+	int firstFrameToIntegrate = TangraCore::IntegrationManagerGetFirstFrameToIntegrate(startFrameNo, framesToIntegrate, isSlidingIntegration);
+	TangraCore::IntergationManagerStartNew(m_Width, m_Height, isMedianAveraging);
 
 	for(int idx = 0; idx < framesToIntegrate; idx++)
 	{
 		rv = DirectShowGetFramePixels(firstFrameToIntegrate + idx, pixels);	
 		if (rv != S_OK)
 		{
-			IntegrationManagerFreeResources();
+			TangraCore::IntegrationManagerFreeResources();
 			return rv;
 		}
 
-		IntegrationManagerAddFrame(pixels);
+		TangraCore::IntegrationManagerAddFrame(pixels);
 	}
 
-	IntegrationManagerProduceIntegratedFrame(pixels);
-	IntegrationManagerFreeResources();
+	TangraCore::IntegrationManagerProduceIntegratedFrame(pixels);
+	TangraCore::IntegrationManagerFreeResources();
 
-	return GetBitmapPixels(m_Width, m_Height, pixels, bitmapPixels, bitmapBytes, false, 8);
+	return TangraCore::GetBitmapPixels(m_Width, m_Height, pixels, bitmapPixels, bitmapBytes, false, 8);
 }

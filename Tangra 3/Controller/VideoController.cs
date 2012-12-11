@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Model.Config;
 using Tangra.Model.Context;
 using Tangra.Model.Image;
 using Tangra.Model.Video;
@@ -34,15 +35,17 @@ namespace Tangra.Controller
 			TangraContext.Current.UsingADV = false;
 			TangraContext.Current.UsingDirectShow = false;
 
-			if (fileExtension == ".adv")
-			{
-				frameStream = AstroDigitalVideoStream.OpenFile(fileName);
-				TangraContext.Current.UsingADV = true;
-			}
-			else
-				frameStream = VideoStream.OpenFile(fileName);
+            if (fileExtension == ".adv")
+            {
+                frameStream = AstroDigitalVideoStream.OpenFile(fileName);
+                TangraContext.Current.UsingADV = true;
+            }
+            else
+            {
+                frameStream = VideoStream.OpenFile(fileName);
+            }
 
-			if (frameStream != null)
+		    if (frameStream != null)
 			{
 				m_FramePlayer.OpenVideo(frameStream);
 				
@@ -116,8 +119,7 @@ namespace Tangra.Controller
 
 			m_FramePlayer.SetFrameRenderer(this);
 
-			// TODO: Get the configured "prefered" video engine from Tangra Config
-			TangraVideo.SetVideoEngine(0);
+            TangraVideo.SetVideoEngine(TangraConfig.Settings.Generic.PreferredRenderingEngineIndex);
 
 			m_VideoFileView.Reset();
 		}

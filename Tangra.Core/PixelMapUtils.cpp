@@ -222,7 +222,7 @@ HRESULT GetPixelMapBitsAndHBitmap(BYTE* pDIB, long* width, long* height, DWORD i
 		bih.biSizeImage = ((((*width * bih.biBitCount) + 31) & ~31) / 8) * *height;
 
 	if (imageSize != 0 && bih.biSizeImage != imageSize)
-		throw "Image size mismatch exception";
+		bih.biSizeImage = imageSize;
 
 	////and BitmapInfo variable-length UDT
 	BYTE memBitmapInfo[40];

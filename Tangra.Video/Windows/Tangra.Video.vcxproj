@@ -41,6 +41,7 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(ProjectDir)$(Configuration)\</OutDir>
     <TargetName>TangraVideo</TargetName>
+    <IncludePath>D:\Program Files\Microsoft SDKs\Windows\v6.0\Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -53,14 +54,15 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;TANGRAVIDEO_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>./include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>Vfw32.lib;Strmiids.lib;TangraCoredll.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>TangraVideo.def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>.\lib\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\lib\Debug;D:\Program Files\Microsoft SDKs\Windows\v6.0\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -90,6 +92,7 @@
     <ClInclude Include="include\TangraCore.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TangraAVIFile.h" />
+    <ClInclude Include="TangraDirectShow.h" />
     <ClInclude Include="TangraVideo.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
@@ -104,6 +107,7 @@
     </ClCompile>
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="TangraAVIFile.cpp" />
+    <ClCompile Include="TangraDirectShow.cpp" />
     <ClCompile Include="TangraVideo.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
