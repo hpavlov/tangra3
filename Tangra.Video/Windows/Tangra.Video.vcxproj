@@ -64,6 +64,9 @@
       <ModuleDefinitionFile>TangraVideo.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>.\lib\Debug;D:\Program Files\Microsoft SDKs\Windows\v6.0\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy "$(TargetDir)TangraVideo.dll" "$(SolutionDir)Tangra 3\WindowsFiles" /y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>

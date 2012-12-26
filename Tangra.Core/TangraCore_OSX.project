@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<CodeLite_Project Name="TangraVideo_Linux" InternalType="Library">
+<CodeLite_Project Name="TangraCore_OSX" InternalType="Library">
   <Plugins>
     <Plugin Name="qmake">
       <![CDATA[00020001N0005Debug0000000000000001N0007Release000000000000]]>
@@ -8,12 +8,37 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
-    <File Name="TangraVideo.cpp"/>
+    <File Name="adv_file.cpp"/>
+    <File Name="adv_frames_index.cpp"/>
+    <File Name="adv_image_layout.cpp"/>
+    <File Name="adv_image_section.cpp"/>
+    <File Name="adv_status_section.cpp"/>
+    <File Name="IntegrationUtils.cpp"/>
+    <File Name="IotaVtiOcr.cpp"/>
+    <File Name="PixelMapUtils.cpp"/>
+    <File Name="PreProcessing.cpp"/>
+    <File Name="quicklz.cpp"/>
+    <File Name="Tangra.Orc.IotaVti.cpp"/>
+    <File Name="Tangra.Pixelmap.cpp"/>
+    <File Name="TangraADV.cpp"/>
+    <File Name="utils.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="include">
-    <File Name="include/TangraCore.h"/>
-    <File Name="TangraVideo.h"/>
-    <File Name="WindowsTypes.h"/>
+    <File Name="adv_file.h"/>
+    <File Name="adv_frames_index.h"/>
+    <File Name="adv_image_layout.h"/>
+    <File Name="adv_image_section.h"/>
+    <File Name="adv_status_section.h"/>
+    <File Name="CoreContext.h"/>
+    <File Name="IntegrationUtils.h"/>
+    <File Name="IotaVtiOcr.h"/>
+    <File Name="PixelMapUtils.h"/>
+    <File Name="PreProcessing.h"/>
+    <File Name="quicklz.h"/>
+    <File Name="Tangra.Orc.IotaVti.h"/>
+    <File Name="utils.h"/>
+    <File Name="TangraADV.h"/>
+    <File Name="cross_platform.h"/>
   </VirtualDirectory>
   <Settings Type="Dynamic Library">
     <GlobalSettings>
@@ -26,15 +51,12 @@
       <ResourceCompiler Options=""/>
     </GlobalSettings>
     <Configuration Name="Debug" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Dynamic Library" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-g" C_Options="-g" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
+      <Compiler Options="-g -m32 -arch i386 -D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -fvisibility=hidden -fvisibility-inlines-hidden" C_Options="-g -D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -fvisibility=hidden -fvisibility-inlines-hidden" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
         <IncludePath Value="."/>
       </Compiler>
-      <Linker Options="" Required="yes">
-        <LibraryPath Value="./lib"/>
-        <Library Value="TangraCore"/>
-      </Linker>
+      <Linker Options="-arch i386" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
-      <General OutputFile="$(IntermediateDirectory)/libTangraVideo.so" IntermediateDirectory="./Debug" Command="" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes"/>
+      <General OutputFile="$(IntermediateDirectory)/libTangraCore.dylib" IntermediateDirectory="./Debug" Command="" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>
@@ -42,14 +64,8 @@
         <PostConnectCommands/>
         <StartupCommands/>
       </Debugger>
-      <PreBuild>
-        <Command Enabled="yes">rm -f lib/libTangraCore.so</Command>
-        <Command Enabled="yes">cp ../../Tangra.Core/Debug/libTangraCore.so lib/</Command>
-      </PreBuild>
-      <PostBuild>
-        <Command Enabled="yes">rm -f ../../Tangra\ 3/bin/Debug/libTangraVideo.so</Command>
-        <Command Enabled="yes">cp Debug/libTangraVideo.so ../../Tangra\ 3/bin/Debug/</Command>
-      </PostBuild>
+      <PreBuild/>
+      <PostBuild/>
       <CustomBuild Enabled="no">
         <RebuildCommand/>
         <CleanCommand/>
@@ -57,7 +73,7 @@
         <PreprocessFileCommand/>
         <SingleFileCommand/>
         <MakefileGenerationCommand/>
-        <ThirdPartyToolName/>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
         <WorkingDirectory/>
       </CustomBuild>
       <AdditionalRules>
@@ -72,12 +88,12 @@
       </Completion>
     </Configuration>
     <Configuration Name="Release" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Dynamic Library" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="" C_Options="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
+      <Compiler Options="-D_FILE_OFFSET_BITS=64" C_Options="-D_FILE_OFFSET_BITS=64" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
         <IncludePath Value="."/>
       </Compiler>
-      <Linker Options="-O2" Required="yes"/>
+      <Linker Options="-O2 Tangra.Core.def -Wl,--subsystem,windows,--out-implib,./Release/TangraCoredll.lib" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
-      <General OutputFile="$(IntermediateDirectory)/libTangraVideo.so" IntermediateDirectory="./Release" Command="" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes"/>
+      <General OutputFile="$(IntermediateDirectory)/$(ProjectName).dll" IntermediateDirectory="./Release" Command="" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>
@@ -85,14 +101,8 @@
         <PostConnectCommands/>
         <StartupCommands/>
       </Debugger>
-      <PreBuild>
-        <Command Enabled="yes">rm -f lib/libTangraCore.so</Command>
-        <Command Enabled="yes">cp ../../Tangra.Core/Release/libTangraCore.so lib/</Command>
-      </PreBuild>
-      <PostBuild>
-        <Command Enabled="yes">rm -f ../../Tangra\ 3/bin/Release/libTangraVideo.so</Command>
-        <Command Enabled="yes">cp Release/libTangraVideo.so ../../Tangra\ 3/bin/Release/</Command>
-      </PostBuild>
+      <PreBuild/>
+      <PostBuild/>
       <CustomBuild Enabled="no">
         <RebuildCommand/>
         <CleanCommand/>

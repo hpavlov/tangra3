@@ -30,11 +30,12 @@ namespace Tangra.Config.SettingPannels
 		public override void LoadSettings()
 		{
 			nudSaturation12bit.SetNUDValue((int)TangraConfig.Settings.Photometry.Saturation.Saturation12Bit);
+			cbxADVEngine.SetCBXIndex((int)TangraConfig.Settings.ADVS.AdvEngine);
 
 			cbxAdvsOsdTimeStamp.Checked = TangraConfig.Settings.ADVS.OverlayTimestamp;
 			cbxAdvsOsdGamma.Checked = TangraConfig.Settings.ADVS.OverlayGamma;
 			cbxAdvsOsdGain.Checked = TangraConfig.Settings.ADVS.OverlayGain;
-			cbxAdvsOsdMessages.Checked = TangraConfig.Settings.ADVS.OverlayAllMessages;
+			cbxAdvsOsdMessages.Checked = TangraConfig.Settings.ADVS.OverlayAllMessages;		
 
 			cbxAdvsPopupTimeStamp.Checked = TangraConfig.Settings.ADVS.PopupTimestamp;
             cbxAdvsPopupExposure.Checked = TangraConfig.Settings.ADVS.PopupExposure;
@@ -51,6 +52,7 @@ namespace Tangra.Config.SettingPannels
         public override void SaveSettings()
 		{
 			TangraConfig.Settings.Photometry.Saturation.Saturation12Bit = (uint)nudSaturation12bit.Value;
+			TangraConfig.Settings.ADVS.AdvEngine = (AdvEngine)cbxADVEngine.SelectedIndex;
 
         	TangraConfig.Settings.ADVS.OverlayTimestamp = cbxAdvsOsdTimeStamp.Checked;
 			TangraConfig.Settings.ADVS.OverlayGamma = cbxAdvsOsdGamma.Checked;
@@ -75,9 +77,32 @@ namespace Tangra.Config.SettingPannels
 			}
 		}
 
-		private void PopUpFormConfigChanged(object sender, EventArgs e)
+		private AdvsSettings BuildCurrentSettings()
 		{
-			// TODO: Would be nice if the Status Form changes as the individual show/hide checkboxes values change
+			var rv = new AdvsSettings()
+			{
+				PopupTimestamp = cbxAdvsPopupTimeStamp.Checked,
+				PopupExposure = cbxAdvsPopupExposure.Checked,
+				PopupVideoCameraFrameId = cbxAdvsPopupVideoCameraFrameId.Checked,
+				PopupSystemTime = cbxAdvsPopupSystemTime.Checked,
+				PopupSatellites = cbxAdvsPopupSatellites.Checked,
+				PopupOffset = cbxAdvsPopupOffset.Checked,
+				PopupGamma = cbxAdvsPopupGamma.Checked,
+				PopupGain = cbxAdvsPopupGain.Checked,
+				PopupGPSFix = cbxAdvsPopupGPSFix.Checked,
+				PopupAlmanac = cbxAdvsPopupAlmanac.Checked,
+			};
+
+			return rv;
+		}
+
+		private void OnAdvPopupSettingChanged(object sender, EventArgs e)
+		{
+			if (m_AdvPopupCustomizer != null)
+			{
+				m_AdvPopupCustomizer.UpdateSettings(BuildCurrentSettings());
+				m_AdvPopupCustomizer.RefreshState();
+			}
 		}
 	}
 }

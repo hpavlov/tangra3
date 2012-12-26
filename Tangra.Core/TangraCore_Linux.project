@@ -14,11 +14,9 @@
     <File Name="adv_image_section.cpp"/>
     <File Name="adv_status_section.cpp"/>
     <File Name="IntegrationUtils.cpp"/>
-    <File Name="IotaVtiOcr.cpp"/>
     <File Name="PixelMapUtils.cpp"/>
     <File Name="PreProcessing.cpp"/>
     <File Name="quicklz.cpp"/>
-    <File Name="Tangra.Orc.IotaVti.cpp"/>
     <File Name="Tangra.Pixelmap.cpp"/>
     <File Name="TangraADV.cpp"/>
     <File Name="utils.cpp"/>
@@ -31,11 +29,9 @@
     <File Name="adv_status_section.h"/>
     <File Name="CoreContext.h"/>
     <File Name="IntegrationUtils.h"/>
-    <File Name="IotaVtiOcr.h"/>
     <File Name="PixelMapUtils.h"/>
     <File Name="PreProcessing.h"/>
     <File Name="quicklz.h"/>
-    <File Name="Tangra.Orc.IotaVti.h"/>
     <File Name="utils.h"/>
     <File Name="TangraADV.h"/>
     <File Name="cross_platform.h"/>
@@ -51,13 +47,15 @@
       <ResourceCompiler Options=""/>
     </GlobalSettings>
     <Configuration Name="Debug" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Dynamic Library" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-g -D_FILE_OFFSET_BITS=64 -fvisibility=hidden -fvisibility-inlines-hidden" C_Options="-g -D_FILE_OFFSET_BITS=64 -fvisibility=hidden -fvisibility-inlines-hidden" Required="yes" PreCompiledHeader="">
+      <Compiler Options="-g -D_FILE_OFFSET_BITS=64 -fvisibility=hidden -fvisibility-inlines-hidden" C_Options="-g -D_FILE_OFFSET_BITS=64 -fvisibility=hidden -fvisibility-inlines-hidden" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
         <IncludePath Value="."/>
       </Compiler>
       <Linker Options="" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/libTangraCore.so" IntermediateDirectory="./Debug" Command="" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes"/>
-      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
+        <![CDATA[]]>
+      </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
         <PostConnectCommands/>
         <StartupCommands/>
@@ -65,6 +63,8 @@
       <PreBuild/>
       <PostBuild>
         <Command Enabled="yes">ar ruv ./Debug/TangraCore.a</Command>
+        <Command Enabled="yes">rm -f ../Tangra\ 3/bin/Debug/libTangraCore.so</Command>
+        <Command Enabled="yes">cp Debug/libTangraCore.so ../Tangra\ 3/bin/Debug/</Command>
       </PostBuild>
       <CustomBuild Enabled="no">
         <RebuildCommand/>
@@ -80,21 +80,33 @@
         <CustomPostBuild/>
         <CustomPreBuild/>
       </AdditionalRules>
+      <Completion EnableCpp11="no">
+        <ClangCmpFlagsC/>
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
     </Configuration>
     <Configuration Name="Release" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Dynamic Library" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-D_FILE_OFFSET_BITS=64" C_Options="-D_FILE_OFFSET_BITS=64" Required="yes" PreCompiledHeader="">
+      <Compiler Options="-D_FILE_OFFSET_BITS=64 -fvisibility=hidden -fvisibility-inlines-hidden" C_Options="-D_FILE_OFFSET_BITS=64 -fvisibility=hidden -fvisibility-inlines-hidden" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
         <IncludePath Value="."/>
       </Compiler>
-      <Linker Options="-O2 Tangra.Core.def -Wl,--subsystem,windows,--out-implib,./Release/TangraCoredll.lib" Required="yes"/>
+      <Linker Options="-O2" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
-      <General OutputFile="$(IntermediateDirectory)/$(ProjectName).dll" IntermediateDirectory="./Release" Command="" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes"/>
-      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;"/>
+      <General OutputFile="$(IntermediateDirectory)/libTangraCore.so" IntermediateDirectory="./Release" Command="" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
+        <![CDATA[]]>
+      </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
         <PostConnectCommands/>
         <StartupCommands/>
       </Debugger>
       <PreBuild/>
-      <PostBuild/>
+      <PostBuild>
+        <Command Enabled="yes">ar ruv ./Release/TangraCore.a</Command>
+        <Command Enabled="yes">rm -f ../Tangra\ 3/bin/Release/libTangraCore.so</Command>
+        <Command Enabled="yes">cp Release/libTangraCore.so ../Tangra\ 3/bin/Release/</Command>
+      </PostBuild>
       <CustomBuild Enabled="no">
         <RebuildCommand/>
         <CleanCommand/>
@@ -109,6 +121,12 @@
         <CustomPostBuild/>
         <CustomPreBuild/>
       </AdditionalRules>
+      <Completion EnableCpp11="no">
+        <ClangCmpFlagsC/>
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
     </Configuration>
   </Settings>
 </CodeLite_Project>

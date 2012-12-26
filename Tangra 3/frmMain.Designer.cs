@@ -15,6 +15,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
+			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
 			this.mainMenu = new System.Windows.Forms.MenuStrip();
 			this.miFile = new System.Windows.Forms.ToolStripMenuItem();
@@ -70,10 +71,15 @@
 			this.btn1FrMinus = new System.Windows.Forms.Button();
 			this.scrollBarFrames = new System.Windows.Forms.HScrollBar();
 			this.openVideoFileDialog = new System.Windows.Forms.OpenFileDialog();
+			this.displayFrameTimer = new System.Windows.Forms.Timer(this.components);
+			this.targetPSFViewerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.miADVStatusData = new System.Windows.Forms.ToolStripMenuItem();
 			this.mainMenu.SuspendLayout();
 			this.statusStrip.SuspendLayout();
 			this.panelRight.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.zoomedImage)).BeginInit();
 			this.panelVideo.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
 			this.pnlPlayControls.SuspendLayout();
 			this.pnlPlayButtons.SuspendLayout();
 			this.SuspendLayout();
@@ -184,9 +190,13 @@
 			// 
 			// miTools
 			// 
+			this.miTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.targetPSFViewerToolStripMenuItem,
+            this.miADVStatusData});
 			this.miTools.Name = "miTools";
 			this.miTools.Size = new System.Drawing.Size(44, 20);
 			this.miTools.Text = "&Tools";
+			this.miTools.DropDownOpening += new System.EventHandler(this.miTools_DropDownOpening);
 			// 
 			// miSettings
 			// 
@@ -471,6 +481,7 @@
 			this.btnJumpTo.TabIndex = 10;
 			this.btnJumpTo.Text = "Jump To";
 			this.btnJumpTo.UseVisualStyleBackColor = false;
+			this.btnJumpTo.Click += new System.EventHandler(this.btnJumpTo_Click);
 			// 
 			// btn1SecMinus
 			// 
@@ -481,6 +492,7 @@
 			this.btn1SecMinus.TabIndex = 7;
 			this.btn1SecMinus.Text = "-1sec";
 			this.btn1SecMinus.UseVisualStyleBackColor = false;
+			this.btn1SecMinus.Click += new System.EventHandler(this.btn1SecMinus_Click);
 			// 
 			// btn10SecMinus
 			// 
@@ -491,6 +503,7 @@
 			this.btn10SecMinus.TabIndex = 9;
 			this.btn10SecMinus.Text = "-10sec";
 			this.btn10SecMinus.UseVisualStyleBackColor = false;
+			this.btn10SecMinus.Click += new System.EventHandler(this.btn10SecMinus_Click);
 			// 
 			// btnPlay
 			// 
@@ -512,6 +525,7 @@
 			this.btn10SecPlus.TabIndex = 8;
 			this.btn10SecPlus.Text = "10sec+";
 			this.btn10SecPlus.UseVisualStyleBackColor = false;
+			this.btn10SecPlus.Click += new System.EventHandler(this.btn10SecPlus_Click);
 			// 
 			// btnStop
 			// 
@@ -533,6 +547,7 @@
 			this.btn1FrPlus.TabIndex = 4;
 			this.btn1FrPlus.Text = "1Fr+";
 			this.btn1FrPlus.UseVisualStyleBackColor = false;
+			this.btn1FrPlus.Click += new System.EventHandler(this.btn1FrPlus_Click);
 			// 
 			// btn1SecPlus
 			// 
@@ -543,6 +558,7 @@
 			this.btn1SecPlus.TabIndex = 6;
 			this.btn1SecPlus.Text = "1sec+";
 			this.btn1SecPlus.UseVisualStyleBackColor = false;
+			this.btn1SecPlus.Click += new System.EventHandler(this.btn1SecPlus_Click);
 			// 
 			// btn1FrMinus
 			// 
@@ -553,6 +569,7 @@
 			this.btn1FrMinus.TabIndex = 5;
 			this.btn1FrMinus.Text = "-1Fr";
 			this.btn1FrMinus.UseVisualStyleBackColor = false;
+			this.btn1FrMinus.Click += new System.EventHandler(this.btn1FrMinus_Click);
 			// 
 			// scrollBarFrames
 			// 
@@ -563,11 +580,30 @@
 			this.scrollBarFrames.Name = "scrollBarFrames";
 			this.scrollBarFrames.Size = new System.Drawing.Size(583, 16);
 			this.scrollBarFrames.TabIndex = 11;
+			this.scrollBarFrames.Scroll += new System.Windows.Forms.ScrollEventHandler(this.scrollBarFrames_Scroll);
 			// 
 			// openVideoFileDialog
 			// 
 			this.openVideoFileDialog.DefaultExt = "avi";
 			this.openVideoFileDialog.Filter = "All Supported Files (*.avi;*.avs;*.adv)|*.avi;*.avs;*.adv";
+			// 
+			// displayFrameTimer
+			// 
+			this.displayFrameTimer.Interval = 150;
+			this.displayFrameTimer.Tick += new System.EventHandler(this.displayFrameTimer_Tick);
+			// 
+			// targetPSFViewerToolStripMenuItem
+			// 
+			this.targetPSFViewerToolStripMenuItem.Name = "targetPSFViewerToolStripMenuItem";
+			this.targetPSFViewerToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
+			this.targetPSFViewerToolStripMenuItem.Text = "Target PSF Viewer";
+			// 
+			// miADVStatusData
+			// 
+			this.miADVStatusData.Name = "miADVStatusData";
+			this.miADVStatusData.Size = new System.Drawing.Size(189, 22);
+			this.miADVStatusData.Text = "ADV Status Data Viewer";
+			this.miADVStatusData.Click += new System.EventHandler(this.miADVStatusData_Click);
 			// 
 			// frmMain
 			// 
@@ -585,13 +621,16 @@
 			this.Name = "frmMain";
 			this.Text = "Tangra v3.0";
 			this.Load += new System.EventHandler(this.frmMain_Load);
+			this.Move += new System.EventHandler(this.frmMain_Move);
 			this.Resize += new System.EventHandler(this.frmMain_Resize);
 			this.mainMenu.ResumeLayout(false);
 			this.mainMenu.PerformLayout();
 			this.statusStrip.ResumeLayout(false);
 			this.statusStrip.PerformLayout();
 			this.panelRight.ResumeLayout(false);
+			((System.ComponentModel.ISupportInitialize)(this.zoomedImage)).EndInit();
 			this.panelVideo.ResumeLayout(false);
+			((System.ComponentModel.ISupportInitialize)(this.pictureBox)).EndInit();
 			this.pnlPlayControls.ResumeLayout(false);
 			this.pnlPlayButtons.ResumeLayout(false);
 			this.ResumeLayout(false);
@@ -655,6 +694,9 @@
 		protected internal System.Windows.Forms.ToolStripStatusLabel tslblFlatFrameLoaded;
 		protected internal System.Windows.Forms.ToolStripStatusLabel ssMoreInfo;
 		protected internal System.Windows.Forms.ToolStripStatusLabel pnlNewVersionAvailable;
+		private System.Windows.Forms.Timer displayFrameTimer;
+		private System.Windows.Forms.ToolStripMenuItem targetPSFViewerToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem miADVStatusData;
 	}
 }
 

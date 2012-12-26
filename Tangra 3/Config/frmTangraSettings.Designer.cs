@@ -119,12 +119,12 @@
 			// btnCancel
 			// 
 			this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
 			this.btnCancel.Location = new System.Drawing.Point(581, 373);
 			this.btnCancel.Name = "btnCancel";
 			this.btnCancel.Size = new System.Drawing.Size(75, 23);
 			this.btnCancel.TabIndex = 13;
 			this.btnCancel.Text = "Cancel";
+			this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
 			// 
 			// frmTangraSettings
 			// 

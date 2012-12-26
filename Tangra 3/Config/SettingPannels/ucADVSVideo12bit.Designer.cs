@@ -50,6 +50,7 @@
 			this.cbxAdvsPopupGain = new System.Windows.Forms.CheckBox();
 			this.cbxAdvsPopupTimeStamp = new System.Windows.Forms.CheckBox();
 			this.groupControl1.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.nudSaturation12bit)).BeginInit();
 			this.groupControl2.SuspendLayout();
 			this.groupControl3.SuspendLayout();
 			this.SuspendLayout();
@@ -73,7 +74,7 @@
 			this.cbxADVEngine.Items.AddRange(new object[] {
             "Native",
             "Managed"});
-			this.cbxADVEngine.Location = new System.Drawing.Point(92, 37);
+			this.cbxADVEngine.Location = new System.Drawing.Point(92, 25);
 			this.cbxADVEngine.Name = "cbxADVEngine";
 			this.cbxADVEngine.Size = new System.Drawing.Size(97, 21);
 			this.cbxADVEngine.TabIndex = 46;
@@ -81,7 +82,7 @@
 			// label2
 			// 
 			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(13, 40);
+			this.label2.Location = new System.Drawing.Point(13, 28);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(68, 13);
 			this.label2.TabIndex = 44;
@@ -89,7 +90,7 @@
 			// 
 			// nudSaturation12bit
 			// 
-			this.nudSaturation12bit.Location = new System.Drawing.Point(135, 79);
+			this.nudSaturation12bit.Location = new System.Drawing.Point(135, 67);
 			this.nudSaturation12bit.Maximum = new decimal(new int[] {
             4095,
             0,
@@ -107,7 +108,7 @@
 			// label1
 			// 
 			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(13, 82);
+			this.label1.Location = new System.Drawing.Point(13, 70);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(116, 13);
 			this.label1.TabIndex = 43;
@@ -184,6 +185,7 @@
 			this.cbxAdvsPopupVideoCameraFrameId.Size = new System.Drawing.Size(161, 19);
 			this.cbxAdvsPopupVideoCameraFrameId.TabIndex = 53;
 			this.cbxAdvsPopupVideoCameraFrameId.Text = "Camera Frame #";
+			this.cbxAdvsPopupVideoCameraFrameId.CheckedChanged += new System.EventHandler(this.OnAdvPopupSettingChanged);
 			// 
 			// cbxAdvsPopupExposure
 			// 
@@ -192,6 +194,7 @@
 			this.cbxAdvsPopupExposure.Size = new System.Drawing.Size(161, 19);
 			this.cbxAdvsPopupExposure.TabIndex = 52;
 			this.cbxAdvsPopupExposure.Text = "Exposure Duration";
+			this.cbxAdvsPopupExposure.CheckedChanged += new System.EventHandler(this.OnAdvPopupSettingChanged);
 			// 
 			// cbxAdvsPopupGPSFix
 			// 
@@ -200,6 +203,7 @@
 			this.cbxAdvsPopupGPSFix.Size = new System.Drawing.Size(120, 19);
 			this.cbxAdvsPopupGPSFix.TabIndex = 51;
 			this.cbxAdvsPopupGPSFix.Text = "GPS Fix";
+			this.cbxAdvsPopupGPSFix.CheckedChanged += new System.EventHandler(this.OnAdvPopupSettingChanged);
 			// 
 			// cbxAdvsPopupAlmanac
 			// 
@@ -208,6 +212,7 @@
 			this.cbxAdvsPopupAlmanac.Size = new System.Drawing.Size(120, 19);
 			this.cbxAdvsPopupAlmanac.TabIndex = 50;
 			this.cbxAdvsPopupAlmanac.Text = "Almanac Status";
+			this.cbxAdvsPopupAlmanac.CheckedChanged += new System.EventHandler(this.OnAdvPopupSettingChanged);
 			// 
 			// cbxAdvsPopupSatellites
 			// 
@@ -216,6 +221,7 @@
 			this.cbxAdvsPopupSatellites.Size = new System.Drawing.Size(120, 19);
 			this.cbxAdvsPopupSatellites.TabIndex = 49;
 			this.cbxAdvsPopupSatellites.Text = "Tracked Satellites";
+			this.cbxAdvsPopupSatellites.CheckedChanged += new System.EventHandler(this.OnAdvPopupSettingChanged);
 			// 
 			// cbxAdvsPopupOffset
 			// 
@@ -224,6 +230,7 @@
 			this.cbxAdvsPopupOffset.Size = new System.Drawing.Size(75, 19);
 			this.cbxAdvsPopupOffset.TabIndex = 48;
 			this.cbxAdvsPopupOffset.Text = "Offset";
+			this.cbxAdvsPopupOffset.CheckedChanged += new System.EventHandler(this.OnAdvPopupSettingChanged);
 			// 
 			// cbxAdvsPopupSystemTime
 			// 
@@ -232,6 +239,7 @@
 			this.cbxAdvsPopupSystemTime.Size = new System.Drawing.Size(120, 19);
 			this.cbxAdvsPopupSystemTime.TabIndex = 47;
 			this.cbxAdvsPopupSystemTime.Text = "System Time";
+			this.cbxAdvsPopupSystemTime.CheckedChanged += new System.EventHandler(this.OnAdvPopupSettingChanged);
 			// 
 			// cbxAdvsPopupGamma
 			// 
@@ -240,6 +248,7 @@
 			this.cbxAdvsPopupGamma.Size = new System.Drawing.Size(120, 19);
 			this.cbxAdvsPopupGamma.TabIndex = 46;
 			this.cbxAdvsPopupGamma.Text = "Gamma";
+			this.cbxAdvsPopupGamma.CheckedChanged += new System.EventHandler(this.OnAdvPopupSettingChanged);
 			// 
 			// cbxAdvsPopupGain
 			// 
@@ -248,6 +257,7 @@
 			this.cbxAdvsPopupGain.Size = new System.Drawing.Size(120, 19);
 			this.cbxAdvsPopupGain.TabIndex = 45;
 			this.cbxAdvsPopupGain.Text = "Gain";
+			this.cbxAdvsPopupGain.CheckedChanged += new System.EventHandler(this.OnAdvPopupSettingChanged);
 			// 
 			// cbxAdvsPopupTimeStamp
 			// 
@@ -256,7 +266,7 @@
 			this.cbxAdvsPopupTimeStamp.Size = new System.Drawing.Size(161, 19);
 			this.cbxAdvsPopupTimeStamp.TabIndex = 44;
 			this.cbxAdvsPopupTimeStamp.Text = "Central Exposure Time";
-			this.cbxAdvsPopupTimeStamp.CheckedChanged += new System.EventHandler(this.PopUpFormConfigChanged);
+			this.cbxAdvsPopupTimeStamp.CheckedChanged += new System.EventHandler(this.OnAdvPopupSettingChanged);
 			// 
 			// ucADVSVideo12bit
 			// 
@@ -270,6 +280,7 @@
 			this.Size = new System.Drawing.Size(454, 325);
 			this.groupControl1.ResumeLayout(false);
 			this.groupControl1.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.nudSaturation12bit)).EndInit();
 			this.groupControl2.ResumeLayout(false);
 			this.groupControl3.ResumeLayout(false);
 			this.ResumeLayout(false);

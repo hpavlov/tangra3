@@ -55,7 +55,7 @@ int GetProductVersion()
 {	
 	int major = 3;
 	int minor = 0;
-	int revision = 10;
+	int revision = 15;
 
 	return (major << 28) + (minor << 16) + revision;
 }

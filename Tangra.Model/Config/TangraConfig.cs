@@ -23,9 +23,127 @@ namespace Tangra.Model.Config
 		void RefreshState();
 	}
 
+	public enum RecentFileType
+	{
+		Video,
+		LightCurve
+	}
+
+	public class RecentFilesConfig
+	{
+		internal RecentFilesConfig()
+        {
+			Lists.Clear();
+			Lists.Add(0, new List<string>());
+			Lists.Add(1, new List<string>());
+			Lists.Add(2, new List<string>());
+        }
+
+		private int MAX_RECENT_FILES = 20;
+
+		public Dictionary<int, List<string>> Lists = new Dictionary<int, List<string>>();
+
+		public void NewRecentFile(RecentFileType recentFilesGroup, string filePath)
+		{
+			if (Lists[(int)recentFilesGroup].IndexOf(filePath) != -1)
+				Lists[(int)recentFilesGroup].Remove(filePath);
+
+			Lists[(int)recentFilesGroup].Insert(0, filePath);
+
+			while (Lists.Count > MAX_RECENT_FILES)
+				Lists[(int)recentFilesGroup].RemoveAt(MAX_RECENT_FILES - 1);
+		}
+
+		private void LoadRecentFiles(string savedContent)
+		{
+			Lists[0].Clear();
+			Lists[1].Clear();
+			Lists[2].Clear();
+
+			string[] lines = savedContent.Split('\n');
+			foreach(string line in lines)
+			{
+				string[] tokens = line.Split('=');
+
+				int listId = 0;
+				if (tokens.Length == 2 && int.TryParse(tokens[0], out listId))
+				{
+					Lists[listId].Add(tokens[1].Trim());					
+				}
+			}
+		}
+
+		private string GetRecentFilesList()
+		{
+			var output = new StringBuilder();
+
+			foreach (int key in Lists.Keys)
+			{
+				foreach (string fileName in Lists[key])
+				{
+					output.Append(string.Format("{0}={1}\n", key, fileName));
+				}				
+			}
+
+			return output.ToString();
+		}
+
+		public void Save()
+		{
+			string contentString = GetRecentFilesList();
+			try
+			{
+				using (IsolatedStorageFile fs = IsolatedStorageFile.GetMachineStoreForAssembly())
+				using (IsolatedStorageFileStream isolatedStorageFileStream = new IsolatedStorageFileStream("TangraRecentFiles.lst", FileMode.Create, fs))
+				{
+					using (TextWriter wrt = new StreamWriter(isolatedStorageFileStream))
+					{
+						wrt.Write(contentString);
+						isolatedStorageFileStream.Flush(true);
+					}
+				}
+			}
+			catch (UnauthorizedAccessException)
+			{
+				// TODO: We may have already deleted the previous settings. Think of a better way to save the settings
+			}
+			catch (IOException ex)
+			{
+				Trace.WriteLine(ex.ToString());
+			}			
+		}
+		
+		public void Load()
+		{
+			try
+			{
+				using (IsolatedStorageFile fs = IsolatedStorageFile.GetMachineStoreForAssembly())
+				using (IsolatedStorageFileStream isolatedStorageFileStream = new IsolatedStorageFileStream("TangraRecentFiles.lst", FileMode.OpenOrCreate, fs))
+				{
+					string savedContent;
+					using (TextReader rdr = new StreamReader(isolatedStorageFileStream))
+					{
+						savedContent = rdr.ReadToEnd();
+					}
+
+					LoadRecentFiles(savedContent);
+				}
+			}
+			catch (Exception ex)
+			{
+				Trace.WriteLine(ex);
+
+				Lists[0].Clear();
+				Lists[1].Clear();
+				Lists[2].Clear();
+			}				
+		}	
+	}
+
 	public class TangraConfig
 	{
 		public static TangraConfig Settings = new TangraConfig(false);
+		public static RecentFilesConfig RecentFiles = new RecentFilesConfig();
 
 		public TangraConfig()
 			: this(true)

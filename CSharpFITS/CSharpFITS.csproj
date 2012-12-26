@@ -8,14 +8,11 @@
     <NoStandardLibraries>false</NoStandardLibraries>
     <AssemblyName>CSharpFITS</AssemblyName>
     <RootNamespace>CSharpFITS</RootNamespace>
-    <StartupObject>
-    </StartupObject>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <OldToolsVersion>3.5</OldToolsVersion>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <PublishUrl>http://localhost/CSharpFITS_v1.1/</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Web</InstallFrom>
@@ -33,7 +30,6 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>Tangra.snk</AssemblyOriginatorKeyFile>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -43,6 +39,8 @@
     <DocumentationFile>bin\Debug\CSharpFITS.xml</DocumentationFile>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
+    <WarningLevel>4</WarningLevel>
+    <Optimize>false</Optimize>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <OutputPath>bin\x86\Release\</OutputPath>
@@ -52,6 +50,7 @@
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x86</PlatformTarget>
+    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

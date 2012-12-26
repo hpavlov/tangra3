@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -10,30 +10,39 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Tangra</RootNamespace>
     <AssemblyName>Tangra</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;WIN32</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;__linux__</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ConsolePause>false</ConsolePause>
+    <EnvironmentVariables>
+      <EnvironmentVariables>
+        <Variable name="LD_LIBRARY_PATH" value="." />
+      </EnvironmentVariables>
+    </EnvironmentVariables>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;WIN32</DefineConstants>
+    <DefineConstants>TRACE;__linux__</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <EnvironmentVariables>
+      <EnvironmentVariables>
+        <Variable name="LD_LIBRARY_PATH" value="." />
+      </EnvironmentVariables>
+    </EnvironmentVariables>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>Tangra.Program</StartupObject>
@@ -46,6 +55,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
@@ -242,36 +252,28 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="WindowsFiles\app.config">
-      <SubType>Designer</SubType>
-    </None>
+    <None Include="LinuxFiles\app.config" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Model\" />
     <Folder Include="Task\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="WindowsFiles\TangraCore.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="WindowsFiles\TangraVideo.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <None Include="img\stop24.bmp" />
     <None Include="img\play24.bmp" />
     <None Include="img\aboutbox.bmp" />
     <Content Include="tangra-big.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Tangra.Model\Tangra.Model.csproj">
-      <Project>{70BBC9A7-7DD9-4A4D-B972-6665C65875C6}</Project>
-      <Name>Tangra.Model</Name>
-    </ProjectReference>
+    <Content Include="LinuxFiles\libTangraCore.so">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="LinuxFiles\libTangraVideo.so">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>
-    </PreBuildEvent>
+    <PreBuildEvent>xcopy "$(SolutionDir)Tangra.Core\$(ConfigurationName)\TangraCore.dll" "$(TargetDir)" /y
+xcopy "$(SolutionDir)Tangra.Video\Windows\$(ConfigurationName)\TangraVideo.dll" "$(TargetDir)" /y</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -280,4 +282,10 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <ProjectReference Include="..\Tangra.Model\Tangra.Model.csproj">
+      <Project>{70BBC9A7-7DD9-4A4D-B972-6665C65875C6}</Project>
+      <Name>Tangra.Model</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

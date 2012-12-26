@@ -32,18 +32,18 @@
 			this.logoPictureBox = new System.Windows.Forms.PictureBox();
 			this.lblProductName = new System.Windows.Forms.Label();
 			this.lblComponentVersions = new System.Windows.Forms.Label();
-			this.lblCopyright = new System.Windows.Forms.Label();
+			((System.ComponentModel.ISupportInitialize)(this.logoPictureBox)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// textBoxDescription
 			// 
-			this.textBoxDescription.Location = new System.Drawing.Point(174, 141);
+			this.textBoxDescription.Location = new System.Drawing.Point(174, 72);
 			this.textBoxDescription.Margin = new System.Windows.Forms.Padding(6, 3, 3, 3);
 			this.textBoxDescription.Multiline = true;
 			this.textBoxDescription.Name = "textBoxDescription";
 			this.textBoxDescription.ReadOnly = true;
 			this.textBoxDescription.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-			this.textBoxDescription.Size = new System.Drawing.Size(271, 123);
+			this.textBoxDescription.Size = new System.Drawing.Size(271, 192);
 			this.textBoxDescription.TabIndex = 24;
 			this.textBoxDescription.TabStop = false;
 			// 
@@ -78,27 +78,17 @@
 			// lblComponentVersions
 			// 
 			this.lblComponentVersions.AutoSize = true;
-			this.lblComponentVersions.Location = new System.Drawing.Point(174, 68);
+			this.lblComponentVersions.Location = new System.Drawing.Point(174, 37);
 			this.lblComponentVersions.Name = "lblComponentVersions";
 			this.lblComponentVersions.Size = new System.Drawing.Size(152, 26);
 			this.lblComponentVersions.TabIndex = 28;
 			this.lblComponentVersions.Text = "Tangra Core v3.0.200\r\nTangra Video Engine v3.0.100";
-			// 
-			// lblCopyright
-			// 
-			this.lblCopyright.AutoSize = true;
-			this.lblCopyright.Location = new System.Drawing.Point(174, 39);
-			this.lblCopyright.Name = "lblCopyright";
-			this.lblCopyright.Size = new System.Drawing.Size(156, 13);
-			this.lblCopyright.TabIndex = 29;
-			this.lblCopyright.Text = "Copyright © 2012 Hristo Pavlov";
 			// 
 			// frmAbout
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(460, 305);
-			this.Controls.Add(this.lblCopyright);
 			this.Controls.Add(this.lblComponentVersions);
 			this.Controls.Add(this.lblProductName);
 			this.Controls.Add(this.logoPictureBox);
@@ -113,6 +103,7 @@
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "About Tangra";
+			((System.ComponentModel.ISupportInitialize)(this.logoPictureBox)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -125,7 +116,6 @@
 		private System.Windows.Forms.PictureBox logoPictureBox;
 		private System.Windows.Forms.Label lblProductName;
 		private System.Windows.Forms.Label lblComponentVersions;
-		private System.Windows.Forms.Label lblCopyright;
 
 	}
 }

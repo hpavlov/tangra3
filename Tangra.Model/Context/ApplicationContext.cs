@@ -55,6 +55,9 @@ namespace Tangra.Model.Context
 		public int FirstFrame = -1;
 		public int LastFrame = 0;
 
+		public string FileName;
+		public string FileFormat;
+
 		private bool m_RestartRequest = false;
 		public bool HasRestartRequest()
 		{
@@ -87,6 +90,9 @@ namespace Tangra.Model.Context
 			FrameHeight = 0;
 			FirstFrame = -1;
 			LastFrame = 0;
+
+			FileName = null;
+			FileFormat = null;
 		}
 	}
 }

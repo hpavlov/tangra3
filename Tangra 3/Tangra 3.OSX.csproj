@@ -10,30 +10,33 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Tangra</RootNamespace>
     <AssemblyName>Tangra</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
+    <DebugSymbols>True</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>False</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;WIN32</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;__APPLE__</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <EnvironmentVariables>
+      <EnvironmentVariables>
+        <Variable name="DYLD_LIBRARY_PATH" value="." />
+      </EnvironmentVariables>
+    </EnvironmentVariables>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
     <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
+    <Optimize>True</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE;WIN32</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>Tangra.Program</StartupObject>
@@ -242,25 +245,24 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="WindowsFiles\app.config">
-      <SubType>Designer</SubType>
-    </None>
+    <None Include="MacFiles\app.config" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Model\" />
     <Folder Include="Task\" />
+    <Folder Include="MacFiles\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="WindowsFiles\TangraCore.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="WindowsFiles\TangraVideo.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <None Include="img\stop24.bmp" />
     <None Include="img\play24.bmp" />
     <None Include="img\aboutbox.bmp" />
     <Content Include="tangra-big.ico" />
+    <Content Include="MacFiles\libTangraCore.dylib">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="MacFiles\libTangraVideo.dylib">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tangra.Model\Tangra.Model.csproj">
@@ -270,8 +272,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>
-    </PreBuildEvent>
+    <PreBuildEvent>xcopy "$(SolutionDir)Tangra.Core\$(ConfigurationName)\TangraCore.dll" "$(TargetDir)" /y
+xcopy "$(SolutionDir)Tangra.Video\Windows\$(ConfigurationName)\TangraVideo.dll" "$(TargetDir)" /y</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

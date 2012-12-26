@@ -30,12 +30,15 @@ namespace Tangra.View
 
 		public void Update()
 		{
+			if (TangraContext.Current.HasVideoLoaded)
+				m_MainForm.Text = string.Format("Tangra v3.0 [Beta Version] - {0}, {1}", TangraContext.Current.FileName, TangraContext.Current.FileFormat);
+			else
+				m_MainForm.Text = "Tangra v3.0 [Beta Version]";
 #if PRODUCTION
                 m_MainForm.miViewTrackingDebug.Visible = false;
                 m_MainForm.miOpenFailedCalibration.Visible = false;
 				m_MainForm.miOpenFailedPlateSolveFile.Visible = false;
 #endif
-
 			m_MainForm.pnlPlayControls.Enabled = TangraContext.Current.HasVideoLoaded;
 
 			m_MainForm.miExportToFits.Enabled = TangraContext.Current.HasAnyFileLoaded;
@@ -93,19 +96,19 @@ namespace Tangra.View
 			//tslblDarkFrameLoaded.Visible = VideoContext.Current.DarkField != null;
 			//tslblFlatFrameLoaded.Visible = VideoContext.Current.FlatField != null;
 
-			//if (UsingDirectShow || UsingAviSynth || UsingADV)
-			//{
-			//    if (UsingAviSynth)
-			//        tslblUsingAviSynth.Text = "AviSynth";
-			//    else if (UsingDirectShow)
-			//        tslblUsingAviSynth.Text = "DirectShow";
-			//    else if (UsingADV)
-			//        tslblUsingAviSynth.Text = "ADV";
+			if (TangraContext.Current.UsingDirectShow || TangraContext.Current.UsingAviSynth || TangraContext.Current.UsingADV)
+			{
+				if (TangraContext.Current.UsingAviSynth)
+					m_MainForm.tslblUsingAviSynth.Text = "AviSynth";
+				else if (TangraContext.Current.UsingDirectShow)
+					m_MainForm.tslblUsingAviSynth.Text = "DirectShow";
+				else if (TangraContext.Current.UsingADV)
+					m_MainForm.tslblUsingAviSynth.Text = "ADV";
 
-			//    tslblUsingAviSynth.Visible = true;
-			//}
-			//else
-			//    tslblUsingAviSynth.Visible = false;
+				m_MainForm.tslblUsingAviSynth.Visible = true;
+			}
+			else
+				m_MainForm.tslblUsingAviSynth.Visible = false;
 
 			//ssPreProcessing.Visible = PreProcessingInfo != null &&
 			//                          PreProcessingInfo.PreProcessing;
@@ -146,8 +149,7 @@ namespace Tangra.View
 			//tslblRecDbg.Visible = RecordingDebugSession;
 			m_MainForm.tslblIntegration.Text = string.Format("Integrating {0} frames", TangraContext.Current.NumberFramesToIntegrate);
 			m_MainForm.tslblIntegration.Visible = TangraContext.Current.UsingIntegration;
-			m_MainForm.ssFrameNo.Visible = TangraContext.Current.HasVideoLoaded;
-			//ssFPS.Visible = TangraConfig.Settings.Generic.ShowProcessingSpeed && m_FramePlayer.IsRunning;
+			m_MainForm.ssFrameNo.Visible = TangraContext.Current.HasVideoLoaded;			
 		}
 
 		public void UpdateVideoSizeAndLengthControls()

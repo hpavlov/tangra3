@@ -17,6 +17,7 @@ namespace Tangra.Config
 		private Dictionary<int, SettingsPannel> m_PropertyPages = new Dictionary<int, SettingsPannel>();
 
 		private SettingsPannel m_CurrentPanel = null;
+		private IAdvStatusPopupFormCustomizer m_AdvPopupCustomizer;
 
 		public bool ShowCatalogRequiredHint = false;
 
@@ -27,6 +28,8 @@ namespace Tangra.Config
 			InitAllPropertyPages();
 
 			TangraConfig.Load();
+
+			m_AdvPopupCustomizer = advPopupCustomizer;
 
 			ucCustomizeLightCurveViewer lightCurvesColoursPanel = m_PropertyPages.Select(kvp => kvp.Value).FirstOrDefault(x => x is ucCustomizeLightCurveViewer) as ucCustomizeLightCurveViewer;
 			if (lightCurvesColoursPanel != null)
@@ -154,6 +157,19 @@ namespace Tangra.Config
 			DialogResult = DialogResult.OK;
 			Close();
 
+		}
+
+		private void btnCancel_Click(object sender, EventArgs e)
+		{
+			if (m_AdvPopupCustomizer != null)
+			{
+				// Restore the displayed ADV status settings and they may have been changed by the user during the use of the dialog
+				m_AdvPopupCustomizer.UpdateSettings(TangraConfig.Settings.ADVS);
+				m_AdvPopupCustomizer.RefreshState();				
+			}
+
+			DialogResult = DialogResult.Cancel;
+			Close();
 		}
 	}
 }

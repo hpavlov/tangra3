@@ -11,7 +11,7 @@ using Tangra.Model.Image;
 
 namespace Tangra.Video.AstroDigitalVideo
 {
-	public partial class frmAdvStatusPopup : Form
+	public partial class frmAdvStatusPopup : Form, IAdvStatusPopupFormCustomizer
 	{
 		private FrameStateData m_FrameState;
 		private AdvsSettings m_AdvSettings;
@@ -74,7 +74,7 @@ namespace Tangra.Video.AstroDigitalVideo
 				statusText.AppendLine(string.Format("Camera Frame #: {0}", m_FrameState.VideoCameraFrameId.ToString("###,###,###,##0")));
 			if (m_AdvSettings.PopupTimestamp)
 				statusText.AppendLine(string.Format("Central Exposure Time: {0}", m_FrameState.CentralExposureTime.ToString("dd MMM yyyy HH:mm:ss.fff")));
-            if (m_AdvSettings.PopupTimestamp)
+			if (m_AdvSettings.PopupExposure)
                  statusText.AppendLine(string.Format("Exposure Duration: {0} ms", m_FrameState.ExposureInMilliseconds.ToString("0")));
 
 			if (m_AdvSettings.PopupTimestamp || m_AdvSettings.PopupExposure || m_AdvSettings.PopupVideoCameraFrameId)

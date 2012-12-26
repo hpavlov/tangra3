@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CodeLite_Workspace Name="Tangra.Core.OSX" Database="./Tangra.Core.Linux.tags">
+  <Project Name="TangraCore_OSX" Path="TangraCore_OSX.project" Active="Yes"/>
+  <Project Name="TangraVideo_OSX" Path="../Tangra.Video/Mac/TangraVideo_OSX.project"/>
+  <BuildMatrix>
+    <WorkspaceConfiguration Name="Debug" Selected="yes">
+      <Project Name="TangraVideo_OSX" ConfigName="Debug"/>
+      <Project Name="TangraCore_OSX" ConfigName="Debug"/>
+      <Project Name="TangraVideo_OSX" ConfigName="Debug"/>
+    </WorkspaceConfiguration>
+    <WorkspaceConfiguration Name="Release" Selected="yes">
+      <Project Name="TangraVideo_OSX" ConfigName="Release"/>
+      <Project Name="TangraCore_OSX" ConfigName="Release"/>
+      <Project Name="TangraVideo_OSX" ConfigName="Release"/>
+    </WorkspaceConfiguration>
+  </BuildMatrix>
+</CodeLite_Workspace>

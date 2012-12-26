@@ -51,15 +51,15 @@ typedef struct tagBITMAPFILEHEADER {
 } BITMAPFILEHEADER, *PBITMAPFILEHEADER;
 #pragma pack()
 
+typedef long long __int64;
+
 #else
 
 #include "windows.h"
 
 #endif
 
-#ifdef __linux__
-typedef long long __int64;
-#endif
+
 
 int advfsetpos(FILE* file, const __int64* pos);
 

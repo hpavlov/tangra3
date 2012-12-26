@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -16,6 +17,7 @@ using Tangra.Model.Image;
 using Tangra.Model.Video;
 using Tangra.PInvoke;
 using Tangra.Video;
+using Tangra.Video.AstroDigitalVideo;
 using Tangra.View;
 
 namespace Tangra
@@ -33,7 +35,9 @@ namespace Tangra
 			TangraConfig.Load();
 
 			m_VideoFileView = new VideoFileView(this);
-			m_VideoController = new VideoController(m_VideoFileView);			
+			m_VideoController = new VideoController(this, m_VideoFileView);
+
+			BuildRecentFilesMenu();
 		}
 
 		/// <summary>
@@ -209,8 +213,7 @@ namespace Tangra
 			if (currentPixelmap == null)
 				return;
 
-			//VideoContext.Current.DisplayBitmap = currentPixelmap.CreateNewDisplayBitmapDoNotDispose();
-			
+			//VideoContext.Current.DisplayBitmap = currentPixelmap.CreateNewDisplayBitmapDoNotDispose();			
 
 #if !PRODUCTION
 			Trace.Assert(frameContext.CurrentFrameIndex >= scrollBarFrames.Minimum);
@@ -259,14 +262,15 @@ namespace Tangra
 				// Only set the AstroImage if this is not a Refresh. Otherwise the pre-processing will be lost in 
 				// consequative refreshes and the AstroImage will be wrong even after the first Refresh
 				//VideoContext.Current.AstroImage = new AstroImage(currentPixelmap, false);
-				//VideoContext.Current.AstroImageState = currentPixelmap.FrameState;
+
+				m_VideoController.SetFrameStateData(currentPixelmap.FrameState);
 			}
 
 #if PROFILING
                 Profiler.Instance.StopTimer("PAINTING");
 #endif
 
-			//ssFrameNo.Text = string.Format("Frame: {0}", currentFrameIndex);
+			ssFrameNo.Text = string.Format("Frame: {0}", frameContext.CurrentFrameIndex);
 
 //            if (m_CurrentOperation != null)
 //            {
@@ -319,15 +323,6 @@ namespace Tangra
                 Profiler.Instance.StopTimer("PAINTING");
 #endif
 
-			//if (m_FramePlayer.IsAstroDigitalVideo &&
-			//    m_AdvStatusForm != null &&
-			//    m_AdvStatusForm.Visible)
-			//{
-			//    m_AdvStatusForm.ShowStatus(VideoContext.Current.AstroImageState);
-			//}
-
-
-
 #if PROFILING
             }
             finally
@@ -355,10 +350,10 @@ namespace Tangra
 
 			pictureBox.Image = m_VideoContext.Pixelmap.DisplayBitmap;
 
-			//if (!VideoContext.Current.AstroImageState.IsEmpty())
-			//{
-			//    m_OverlayManager.OverlayStateForFrame(VideoContext.Current.DisplayBitmap, VideoContext.Current.AstroImageState, currentFrameIndex);
-			//}
+			if (m_VideoController.HasAstroImageState)
+			{
+				m_VideoController.OverlayStateForFrame(m_VideoContext.Pixelmap.DisplayBitmap, m_CurrentFrameId);
+			}
 
 
 			//if (m_ImageTool != null)
@@ -399,7 +394,7 @@ namespace Tangra
 		{
 			if (openVideoFileDialog.ShowDialog(this) == DialogResult.OK)
 			{
-				m_VideoController.OpenVideoFile(openVideoFileDialog.FileName);				
+				OpenTangraFile(openVideoFileDialog.FileName);
 			}
 		}
 
@@ -420,6 +415,21 @@ namespace Tangra
 			}
 
 			ConfigureImageScrollbars();
+		}
+
+		public void OpenTangraFile(string fileName)
+		{
+			string fileExt = Path.GetExtension(fileName);
+
+			if (fileExt == ".lc")
+			{
+				// TODO: Load a light curve file
+			}
+			else
+			{
+				if (m_VideoController.OpenVideoFile(fileName))
+					RegisterRecentFile(RecentFileType.Video, fileName);
+			}
 		}
 
 		private void ConfigureImageScrollbars()
@@ -450,9 +460,186 @@ namespace Tangra
 
 		private void miSettings_Click(object sender, EventArgs e)
 		{
-			// TODO: Pass the ADVS State form
-			var frmSettings = new frmTangraSettings(null, null);
-			frmSettings.ShowDialog(this);
+			// TODO: Pass the LC form
+
+			var frmSettings = new frmTangraSettings(null, m_VideoController.AdvStatusPopupFormCustomizer);
+			frmSettings.StartPosition = FormStartPosition.CenterParent;
+			if (frmSettings.ShowDialog(this) == DialogResult.OK)
+			{
+				m_VideoController.RefreshCurrentFrame();
+			}
+		}
+
+		private void scrollBarFrames_Scroll(object sender, ScrollEventArgs e)
+		{
+			if (!TangraContext.Current.CanScrollFrames)
+				return;
+
+			if (e.Type == ScrollEventType.EndScroll)
+			{
+				if (!m_VideoController.IsRunning)
+				{
+					m_VideoController.MoveToFrame(e.NewValue);
+				}
+			}
+			else
+			{
+				//ssFrameNo.Text = "Frame: " + e.NewValue.ToString();
+
+				displayFrameTimer.Tag = e;
+				displayFrameTimer.Enabled = false;
+				displayFrameTimer.Enabled = true;
+			}
+		}
+
+		private void displayFrameTimer_Tick(object sender, EventArgs e)
+		{
+			displayFrameTimer.Enabled = false;
+
+			ScrollEventArgs se = displayFrameTimer.Tag as ScrollEventArgs;
+
+			if (se != null)
+			{
+				if (!m_VideoController.IsRunning)
+				{
+					m_VideoController.MoveToFrame(se.NewValue);
+				}
+			}
+		}
+
+		private void btn1FrMinus_Click(object sender, EventArgs e)
+		{
+			if (!m_VideoController.IsRunning)
+			{
+				m_VideoController.StepBackward();
+			}
+		}
+
+		private void btn1FrPlus_Click(object sender, EventArgs e)
+		{
+			if (!m_VideoController.IsRunning)
+			{
+				m_VideoController.StepForward();
+			}
+		}
+
+		private void btn1SecMinus_Click(object sender, EventArgs e)
+		{
+			if (!m_VideoController.IsRunning)
+			{
+				m_VideoController.StepBackward(1);
+			}
+		}
+
+		private void btn1SecPlus_Click(object sender, EventArgs e)
+		{
+			if (!m_VideoController.IsRunning)
+			{
+				m_VideoController.StepForward(1);
+			}
+		}
+
+		private void btn10SecMinus_Click(object sender, EventArgs e)
+		{
+			if (!m_VideoController.IsRunning)
+			{
+				m_VideoController.StepBackward(10);
+			}
+		}
+
+		private void btn10SecPlus_Click(object sender, EventArgs e)
+		{
+			if (!m_VideoController.IsRunning)
+			{
+				m_VideoController.StepForward(10);
+			}
+		}
+
+		private void btnJumpTo_Click(object sender, EventArgs e)
+		{
+			if (!m_VideoController.IsRunning)
+			{
+				//frmJumpToFrame frm = new frmJumpToFrame();
+				//frm.nudFrameToJumpTo.Properties.MinValue = m_VideoController.Video.FirstFrame;
+				//frm.nudFrameToJumpTo.Properties.MaxValue = m_VideoController.Video.LastFrame;
+				//frm.nudFrameToJumpTo.Value = m_CurrentFrameId;
+
+				//if (frm.ShowDialog(this) == DialogResult.OK)
+				//    m_FramePlayer.MoveToFrame((int)frm.nudFrameToJumpTo.Value);
+			}
+		}
+
+		private void miTools_DropDownOpening(object sender, EventArgs e)
+		{
+			miADVStatusData.Checked = m_VideoController.IsAdvStatusFormVisible;
+			//miTargetPSFViewer.Checked = m_TargetPSFViewerForm != null && m_TargetPSFViewerForm.Visible;
+		}
+
+		private void miADVStatusData_Click(object sender, EventArgs e)
+		{
+			if (m_VideoController.IsAstroDigitalVideo)
+			{
+				m_VideoController.ToggleAdvStatusForm();
+			}
+		}
+
+		private void frmMain_Move(object sender, EventArgs e)
+		{
+			m_VideoController.NotifyMainFormMoved();
+		}
+
+        private void BuildRecentFilesMenu()
+        {
+            miRecentVideos.DropDownItems.Clear();
+	        TangraConfig.RecentFiles.Load();
+
+			foreach (string recentFilePath in TangraConfig.RecentFiles.Lists[(int)RecentFileType.Video])
+            {
+                if (File.Exists(recentFilePath))
+                {
+                    ToolStripMenuItem miRecentFile = (ToolStripMenuItem)miRecentVideos.DropDownItems.Add(recentFilePath);
+                    miRecentFile.Tag = recentFilePath;
+                    miRecentFile.Click += new EventHandler(miRecentFileMenuItemClick);
+                }
+            }
+
+            miRecentVideos.Enabled = miRecentVideos.DropDownItems.Count > 0;
+
+			miRecentLightCurves.DropDownItems.Clear();
+
+			foreach (string recentFilePath in TangraConfig.RecentFiles.Lists[(int)RecentFileType.LightCurve])
+			{
+				if (File.Exists(recentFilePath))
+				{
+					ToolStripMenuItem miRecentFile = (ToolStripMenuItem)miRecentLightCurves.DropDownItems.Add(recentFilePath);
+					miRecentFile.Tag = recentFilePath;
+					miRecentFile.Click += new EventHandler(miRecentFileMenuItemClick);
+				}
+			}
+
+			miRecentLightCurves.Enabled = miRecentLightCurves.DropDownItems.Count > 0;
+        }
+
+		internal void RegisterRecentFile(RecentFileType type, string fileName)
+        {
+			TangraConfig.RecentFiles.NewRecentFile(type, fileName);
+			TangraConfig.RecentFiles.Save();
+
+            BuildRecentFilesMenu();
+        }
+
+		private void miRecentFileMenuItemClick(object sender, EventArgs e)
+		{
+			ToolStripMenuItem mi = (sender as ToolStripMenuItem);
+			if (mi != null && mi.Tag is string)
+			{
+				string filePath = mi.Tag as string;
+				if (!string.IsNullOrEmpty(filePath) &&
+					File.Exists(filePath))
+				{
+					OpenTangraFile(filePath);
+				}
+			}
 		}
 	}
 }

@@ -22,8 +22,8 @@ namespace Tangra
 		        "Windows";
 #elif __linux__
 				"Linux";
-#elif MAC
-				"Mac";
+#elif __APPLE__
+				"Mac OSX";
 #else
 				INVALID BUILD TYPE
 #endif
@@ -31,7 +31,6 @@ namespace Tangra
 
             this.Text = String.Format("About {0}", AssemblyTitle);
 			this.lblProductName.Text = String.Format("{0}, Version {1}, {2} Build", AssemblyProduct, AssemblyVersion, environment);
-            this.lblCopyright.Text = AssemblyCopyright;
 			this.lblComponentVersions.Text = string.Format("Tangra Core v{0}\n\rTangra Video Engine v{1}", tangraCoreVersion, tangraVideoEngineVersion);
 	        this.textBoxDescription.Text = AssemblyDescription;
         }
@@ -86,19 +85,6 @@ namespace Tangra
                     return "";
                 }
                 return ((AssemblyProductAttribute)attributes[0]).Product;
-            }
-        }
-
-        public string AssemblyCopyright
-        {
-            get
-            {
-                object[] attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
-                if (attributes.Length == 0)
-                {
-                    return "";
-                }
-                return ((AssemblyCopyrightAttribute)attributes[0]).Copyright;
             }
         }
 

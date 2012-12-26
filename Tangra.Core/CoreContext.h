@@ -31,6 +31,8 @@ int advfsetpos(FILE* file, const __int64* pos)
 	return fsetpos64(file, reinterpret_cast<const fpos64_t*>(pos));
 #elif _WIN32
 	return fseeko64(file, *pos, SEEK_SET);
+#elif __APPLE__
+	return fseeko(file, (off_t )*pos, SEEK_SET);
 #else
 	#error Platform not supported
 #endif

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Tangra.Config;
+using Tangra.Helpers;
 using Tangra.Model.Config;
 
 namespace Tangra.Config.SettingPannels
@@ -49,11 +50,11 @@ namespace Tangra.Config.SettingPannels
 
 				cbxColorScheme.SelectedIndex = (int)m_DisplaySettings.ColorScheme;
 				cbxTangraTargetColors.Checked = m_DisplaySettings.UseTangraTargetColors;
-				nudPointSize.Value = (decimal)m_DisplaySettings.DatapointSize;
+				nudPointSize.SetNUDValue((decimal)m_DisplaySettings.DatapointSize);
 				cbxDrawGrid.Checked = m_DisplaySettings.DrawGrid;
 
 				cpFocusArea.SelectedColor = m_DisplaySettings.SmallGraphFocusBackgroundBrushColor;
-				cpSelectionCursor.SelectedColor = m_DisplaySettings.SelectionCursorColor;
+				cpSelectionCursor.SelectedColor = m_DisplaySettings.SelectionCursorColor;		
 
 				SetColorScheme(m_DisplaySettings.ColorScheme);
 			}

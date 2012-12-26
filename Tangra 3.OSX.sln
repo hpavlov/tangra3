@@ -1,0 +1,41 @@
+
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpFITS", "CSharpFITS\CSharpFITS.csproj", "{93C93A99-D18F-495E-8AC9-6B6F6F7F273E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangra.SDK", "Tangra.SDK\Tangra.SDK.csproj", "{77CCC7AE-FF0D-4FDE-B8C4-94C39585BAA6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangra.Model", "Tangra.Model\Tangra.Model.csproj", "{70BBC9A7-7DD9-4A4D-B972-6665C65875C6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangra 3.OSX", "Tangra 3\Tangra 3.OSX.csproj", "{A5DB96B1-35BE-47F8-AA30-FB223E637E35}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{70BBC9A7-7DD9-4A4D-B972-6665C65875C6}.Debug|x86.ActiveCfg = Debug|x86
+		{70BBC9A7-7DD9-4A4D-B972-6665C65875C6}.Debug|x86.Build.0 = Debug|x86
+		{70BBC9A7-7DD9-4A4D-B972-6665C65875C6}.Release|x86.ActiveCfg = Release|x86
+		{70BBC9A7-7DD9-4A4D-B972-6665C65875C6}.Release|x86.ActiveCfg = Release|x86
+		{77CCC7AE-FF0D-4FDE-B8C4-94C39585BAA6}.Debug|x86.ActiveCfg = Debug|x86
+		{77CCC7AE-FF0D-4FDE-B8C4-94C39585BAA6}.Debug|x86.Build.0 = Debug|x86
+		{77CCC7AE-FF0D-4FDE-B8C4-94C39585BAA6}.Release|x86.ActiveCfg = Release|x86
+		{77CCC7AE-FF0D-4FDE-B8C4-94C39585BAA6}.Release|x86.Build.0 = Release|x86
+		{93C93A99-D18F-495E-8AC9-6B6F6F7F273E}.Debug|x86.ActiveCfg = Debug|x86
+		{93C93A99-D18F-495E-8AC9-6B6F6F7F273E}.Debug|x86.Build.0 = Debug|x86
+		{93C93A99-D18F-495E-8AC9-6B6F6F7F273E}.Release|x86.ActiveCfg = Release|x86
+		{93C93A99-D18F-495E-8AC9-6B6F6F7F273E}.Release|x86.Build.0 = Release|x86
+		{A5DB96B1-35BE-47F8-AA30-FB223E637E35}.Debug|x86.ActiveCfg = Debug|x86
+		{A5DB96B1-35BE-47F8-AA30-FB223E637E35}.Debug|x86.Build.0 = Debug|x86
+		{A5DB96B1-35BE-47F8-AA30-FB223E637E35}.Release|x86.ActiveCfg = Release|x86
+		{A5DB96B1-35BE-47F8-AA30-FB223E637E35}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Tangra 3\Tangra 3.OSX.csproj
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
