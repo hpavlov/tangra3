@@ -67,10 +67,45 @@ namespace Tangra.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap lc_logo {
+            get {
+                object obj = ResourceManager.GetObject("lc_logo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static byte[] PanCursor {
+            get {
+                object obj = ResourceManager.GetObject("PanCursor", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        internal static byte[] PanEnabledCursor {
+            get {
+                object obj = ResourceManager.GetObject("PanEnabledCursor", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap play24 {
             get {
                 object obj = ResourceManager.GetObject("play24", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static byte[] RotateCursor {
+            get {
+                object obj = ResourceManager.GetObject("RotateCursor", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        internal static byte[] RotateEnabledCursor {
+            get {
+                object obj = ResourceManager.GetObject("RotateEnabledCursor", resourceCulture);
+                return ((byte[])(obj));
             }
         }
         

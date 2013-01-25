@@ -28,6 +28,7 @@ namespace Tangra
 	public partial class frmMain : Form, IVideoFrameRenderer
 	{
 		private VideoController m_VideoController;
+	    private LightCurveController m_LightCurveController;
 		private VideoFileView m_VideoFileView;
         private ZoomedImageView m_ZoomedImageView;
 		private bool m_FormLoaded = false;
@@ -42,6 +43,7 @@ namespace Tangra
 		    m_ZoomedImageView = new ZoomedImageView(zoomedImage, this);
 
             m_VideoController = new VideoController(this, m_VideoFileView, m_ZoomedImageView, pnlControlerPanel);
+            m_LightCurveController = new LightCurveController(this, m_VideoController);
 
 			BuildRecentFilesMenu();
 		}
@@ -261,6 +263,7 @@ namespace Tangra
 #if PROFILING
                 Profiler.Instance.StartTimer("PAINTING");
 #endif
+            bool isNewFrame = m_CurrentFrameId != frameContext.CurrentFrameIndex;
 			m_CurrentFrameId = frameContext.CurrentFrameIndex;
 
 			if (frameContext.MovementType != MovementType.Refresh)
@@ -300,8 +303,8 @@ namespace Tangra
 
 			Update();
 
-			// TODO: Replace with an Observer Pattern that notifies all views that are interested!
-			//NotificationManager.PostMessage(this, MSG_ID_FRAME_CHANGED, currentFrameIndex, null);
+            if (isNewFrame)
+                NotificationManager.Instance.NotifyCurrentFrameChanged(m_CurrentFrameId);
 
 #if PROFILING
                 Profiler.Instance.StopTimer("PAINTING");
@@ -682,5 +685,10 @@ namespace Tangra
 				m_VideoController.RepairAdvFile(openCorruptedAdvFileDialog.FileName);
 			}
 		}
+
+        private void miOpenLightCurve_Click(object sender, EventArgs e)
+        {
+            m_LightCurveController.LoadLightCurve();
+        }
 	}
 }

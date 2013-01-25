@@ -103,8 +103,12 @@
     <Compile Include="Config\SettingPannels\ucTracking.Designer.cs">
       <DependentUpon>ucTracking.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controller\LightCurveController.cs" />
     <Compile Include="Controller\VideoController.cs" />
     <Compile Include="Controller\VideoOperationController.cs" />
+    <Compile Include="Controls\SmoothPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\ucColorPicker.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -152,10 +156,12 @@
     <Compile Include="Helpers\NotificationManager.cs" />
     <Compile Include="Helpers\TangraEnvironment.cs" />
     <Compile Include="ImageTools\ArrowTool.cs" />
+    <Compile Include="OCR\ITimestampOcr.cs" />
     <Compile Include="PInvoke\TangraCore.cs" />
     <Compile Include="PInvoke\TangraVideo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Resources\CustomCursors.cs" />
     <Compile Include="VideoOperations\LightCurves\DisplayBitmapConverter.cs" />
     <Compile Include="VideoOperations\LightCurves\frmAddOrEditSingleTarget.cs">
       <SubType>Form</SubType>
@@ -163,12 +169,86 @@
     <Compile Include="VideoOperations\LightCurves\frmAddOrEditSingleTarget.Designer.cs">
       <DependentUpon>frmAddOrEditSingleTarget.cs</DependentUpon>
     </Compile>
+    <Compile Include="VideoOperations\LightCurves\frmConfigureReprocessing.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\frmConfigureReprocessing.Designer.cs">
+      <DependentUpon>frmConfigureReprocessing.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\frmCustomBinning.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\frmCustomBinning.Designer.cs">
+      <DependentUpon>frmCustomBinning.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\frmEditLcDataSeries.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\frmEditLcDataSeries.Designer.cs">
+      <DependentUpon>frmEditLcDataSeries.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\frmLightCurve.Computations.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\frmLightCurve.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\frmLightCurve.Designer.cs">
+      <DependentUpon>frmLightCurve.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\frmLightCurve.Drawing.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\frmLightCurveSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\frmLightCurveSettings.Designer.cs">
+      <DependentUpon>frmLightCurveSettings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\frmReprocessSeries.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\frmReprocessSeries.Designer.cs">
+      <DependentUpon>frmReprocessSeries.cs</DependentUpon>
+    </Compile>
     <Compile Include="VideoOperations\LightCurves\frmSelectReductionType.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="VideoOperations\LightCurves\frmSelectReductionType.Designer.cs">
       <DependentUpon>frmSelectReductionType.cs</DependentUpon>
     </Compile>
+    <Compile Include="VideoOperations\LightCurves\InfoForms\frmBackgroundHistograms.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\InfoForms\frmBackgroundHistograms.Designer.cs">
+      <DependentUpon>frmBackgroundHistograms.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\InfoForms\frmNoiseDistribution.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\InfoForms\frmNoiseDistribution.Designer.cs">
+      <DependentUpon>frmNoiseDistribution.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\InfoForms\frmPixelDistribution.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\InfoForms\frmPixelDistribution.Designer.cs">
+      <DependentUpon>frmPixelDistribution.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\InfoForms\frmPSFFits.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\InfoForms\frmPSFFits.Designer.cs">
+      <DependentUpon>frmPSFFits.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\InfoForms\frmZoomedPixels.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\InfoForms\frmZoomedPixels.Designer.cs">
+      <DependentUpon>frmZoomedPixels.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\LCFile.cs" />
+    <Compile Include="VideoOperations\LightCurves\LCFileSeriesEntry.cs" />
     <Compile Include="VideoOperations\LightCurves\LCStateMachine.cs" />
     <Compile Include="VideoOperations\LightCurves\LCStateReadyToRun.cs" />
     <Compile Include="VideoOperations\LightCurves\LCStateRunning.cs" />
@@ -288,8 +368,41 @@
     <EmbeddedResource Include="VideoOperations\LightCurves\frmAddOrEditSingleTarget.resx">
       <DependentUpon>frmAddOrEditSingleTarget.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\frmConfigureReprocessing.resx">
+      <DependentUpon>frmConfigureReprocessing.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\frmCustomBinning.resx">
+      <DependentUpon>frmCustomBinning.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\frmEditLcDataSeries.resx">
+      <DependentUpon>frmEditLcDataSeries.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\frmLightCurve.resx">
+      <DependentUpon>frmLightCurve.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\frmLightCurveSettings.resx">
+      <DependentUpon>frmLightCurveSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\frmReprocessSeries.resx">
+      <DependentUpon>frmReprocessSeries.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\LightCurves\frmSelectReductionType.resx">
       <DependentUpon>frmSelectReductionType.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\InfoForms\frmBackgroundHistograms.resx">
+      <DependentUpon>frmBackgroundHistograms.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\InfoForms\frmNoiseDistribution.resx">
+      <DependentUpon>frmNoiseDistribution.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\InfoForms\frmPixelDistribution.resx">
+      <DependentUpon>frmPixelDistribution.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\InfoForms\frmPSFFits.resx">
+      <DependentUpon>frmPSFFits.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\InfoForms\frmZoomedPixels.resx">
+      <DependentUpon>frmZoomedPixels.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\LightCurves\ucLightCurves.resx">
       <DependentUpon>ucLightCurves.cs</DependentUpon>
@@ -326,6 +439,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="img\aboutbox4.bmp" />
+    <None Include="img\lc_logo.bmp" />
+    <None Include="Resources\Cursor_191.cur" />
+    <None Include="Resources\Cursor_11.cur" />
+    <None Include="Resources\Cursor_51.cur" />
+    <None Include="Resources\Cursor_181.cur" />
     <Content Include="WindowsFiles\TangraCore.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -334,7 +452,6 @@
     </Content>
     <None Include="img\stop24.bmp" />
     <None Include="img\play24.bmp" />
-    <None Include="img\aboutbox.bmp" />
     <Content Include="tangra-big.ico" />
   </ItemGroup>
   <ItemGroup>

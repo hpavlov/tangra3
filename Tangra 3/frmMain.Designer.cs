@@ -140,6 +140,7 @@
             this.miOpenLightCurve.Name = "miOpenLightCurve";
             this.miOpenLightCurve.Size = new System.Drawing.Size(182, 22);
             this.miOpenLightCurve.Text = "Open &Light Curve";
+            this.miOpenLightCurve.Click += new System.EventHandler(this.miOpenLightCurve_Click);
             // 
             // miRecentLightCurves
             // 
