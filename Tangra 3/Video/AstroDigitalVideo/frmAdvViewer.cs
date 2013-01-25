@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -35,7 +36,7 @@ namespace Tangra.Video.AstroDigitalVideo
 			if (m_AdvFile.IsCorrupted)
 				MessageBox.Show(
 					this,
-					"This is not an ADV file or it is corrupted. Try using [Tools] -> [Repair ADV File] to repair it.",
+					"This is not an ADV file or it is corrupted. Try using [Tools] -> [ADV Tools] -> [Repair ADV File] to repair it.",
 					"Tangra",
 					MessageBoxButtons.OK,
 					MessageBoxIcon.Error);
@@ -262,6 +263,14 @@ namespace Tangra.Video.AstroDigitalVideo
 				{
 					int almanacStatus = int.Parse(tagValue);
 					tagValue = AdvStatusValuesHelper.TranslateGpsAlmanacStatus(almanacStatus);
+				}
+				else if (statusTag.Name == "GPSAlmanacOffset" && !string.IsNullOrEmpty(tagValue))
+				{
+					int almanacOffset = int.Parse(tagValue);
+					if ((almanacOffset & 0x80) == 0x80)
+						almanacOffset = (short) (almanacOffset + (0xFF << 8));
+
+					tagValue = AdvStatusValuesHelper.TranslateGpsAlmanacOffset(1, almanacOffset, false);
 				}
 				else if (statusTag.Name == "GPSFixStatus" && !string.IsNullOrEmpty(tagValue))
 				{

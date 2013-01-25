@@ -33,6 +33,7 @@ namespace Tangra.PInvoke
 			GPSTrackedSattelites = copyFrom.GPSTrackedSattelites;
 			GPSAlmanacStatus = copyFrom.GPSAlmanacStatus;
 			GPSFixStatus = copyFrom.GPSFixStatus;
+			GPSAlmanacOffset = copyFrom.GPSAlmanacOffset;
 			VideoCameraFrameIdLo = copyFrom.VideoCameraFrameIdLo;
 			VideoCameraFrameIdHi = copyFrom.VideoCameraFrameIdHi;
 			HardwareTimerFrameIdLo = copyFrom.HardwareTimerFrameIdLo;
@@ -97,6 +98,8 @@ namespace Tangra.PInvoke
 		public byte GPSAlmanacStatus;
 		[FieldOffset(38)]
 		public byte GPSFixStatus;
+		[FieldOffset(39)]
+		public byte GPSAlmanacOffset;
 		[FieldOffset(40)]
 		public uint VideoCameraFrameIdLo;
 		[FieldOffset(44)]
@@ -152,6 +155,20 @@ namespace Tangra.PInvoke
 			{
 				return (((long)HardwareTimerFrameIdHi) << 32) + (long)HardwareTimerFrameIdLo;
 			}
+		}
+
+		public short GetSignedAlamancOffset()
+		{
+			short signedOffset = GPSAlmanacOffset;
+			if ((GPSAlmanacOffset & 0x80) == 0x80)
+				signedOffset = (short) (GPSAlmanacOffset + (0xFF << 8));
+
+			return signedOffset;
+		}
+
+		public bool AlmanacStatusIsGood
+		{
+			get { return GPSAlmanacStatus != 0x00; }			
 		}
 	}
 

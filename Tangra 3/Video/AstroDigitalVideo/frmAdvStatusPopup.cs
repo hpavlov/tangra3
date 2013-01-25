@@ -49,14 +49,8 @@ namespace Tangra.Video.AstroDigitalVideo
 			
 			if (m_AdvSettings.PopupAlmanac)
 			{
-				int intStatus;
-				string strStatus;
-				if (int.TryParse(m_FrameState.AlmanacStatus, out intStatus))
-					strStatus = AdvStatusValuesHelper.TranslateGpsAlmanacStatus(intStatus);
-				else
-					strStatus = m_FrameState.AlmanacStatus;
-
-				statusText.AppendLine(string.Format("Almanac Status: {0}", strStatus));
+				statusText.AppendLine(string.Format("Almanac Status: {0}", m_FrameState.AlmanacStatus));
+				statusText.AppendLine(string.Format("Almanac Offset: {0}", m_FrameState.AlmanacOffset));
 			}
 
 			if (m_AdvSettings.PopupGPSFix)

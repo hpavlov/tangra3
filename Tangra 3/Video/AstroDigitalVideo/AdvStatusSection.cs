@@ -198,8 +198,10 @@ namespace Tangra.Video.AstroDigitalVideo
 			if (status == 0)
 				return "No Fix";
 			else if (status == 1)
-				return "G Fix";
+				return "Internal Time-keeping";
 			else if (status == 2)
+				return "G Fix";
+			else if (status == 3)
 				return "P Fix";
 			else
 				return "Unknown";
@@ -211,6 +213,25 @@ namespace Tangra.Video.AstroDigitalVideo
 				return "Uncertain";
 			else if (status == 1)
 				return "Good";
+			else if (status == 2)
+				return "Certain";
+			else
+				return "Unknown";
+		}
+
+		public static string TranslateGpsAlmanacOffset(int status, int offset, bool applied)
+		{
+			if (status > 0)
+			{
+				//if (string.IsNullOrEmpty(offset))
+				//	return "N/A";
+				//else 
+				string sign = "";
+				if (offset < 0) sign = "-";
+				if (offset > 0) sign = "+";
+
+				return string.Format("{0}{1} sec{2}", sign, Math.Abs(offset), (applied && offset  != 0) ? " (Applied)" : "");
+			}
 			else
 				return "Unknown";
 		}

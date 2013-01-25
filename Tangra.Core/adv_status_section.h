@@ -29,7 +29,7 @@ struct AdvFrameInfo
 	unsigned char GPSTrackedSattelites;
 	unsigned char GPSAlmanacStatus;
 	unsigned char GPSFixStatus;
-	unsigned char Reserved;
+	char GPSAlmanacOffset;
 	long VideoCameraFrameIdLo;
 	long VideoCameraFrameIdHi;
 	long HardwareTimerFrameIdLo;

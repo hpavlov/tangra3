@@ -20,7 +20,8 @@ namespace Tangra.Video
                 TangraVideo.SetVideoEngine(TangraConfig.Settings.Generic.PreferredRenderingEngineIndex);
 
 				VideoFileInfo fileInfo = TangraVideo.OpenFile(fileName);
-				return new VideoStream(fileInfo);
+
+				return new VideoStream(fileInfo, fileName);
 			}
 			catch (Exception ex)
 			{
@@ -29,11 +30,18 @@ namespace Tangra.Video
 			}
 		}
 
+		private string m_FileName;
 		private VideoFileInfo m_OpenedFileInfo;
 
-		private VideoStream(VideoFileInfo openedfileInfo)
+		private VideoStream(VideoFileInfo openedfileInfo, string fileName)
 		{
 			m_OpenedFileInfo = openedfileInfo;
+			m_FileName = fileName;
+		}
+
+		public string FileName
+		{
+			get { return m_FileName; }
 		}
 
 		public int Width

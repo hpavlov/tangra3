@@ -325,8 +325,6 @@
     <Folder Include="Task\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="img\aboutbox2.bmp" />
-    <None Include="img\aboutbox3.bmp" />
     <None Include="img\aboutbox4.bmp" />
     <Content Include="WindowsFiles\TangraCore.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -17,6 +17,7 @@ namespace Tangra.Model.Image
 		public string Messages;
 		public int NumberSatellites;
 		public string AlmanacStatus;
+		public string AlmanacOffset;
 		public string GPSFixStatus;
 
 		public bool IsEmpty()

@@ -57,6 +57,9 @@ namespace Tangra.Video
 		private int m_BitPix;
 		private bool m_FileOpened;
 
+		private int m_AlmanacOffsetLastFrame;
+		private bool m_AlamanacOffsetLastFrameIsGood;
+
 		private AdvFrameInfo m_CurrentFrameInfo;
 
 		private AstroDigitalVideoStream(string fileName, ref AdvEquipmentInfo equipmentInfo)
@@ -77,7 +80,28 @@ namespace Tangra.Video
 			m_Height = fileInfo.Height;
 			m_FrameRate = 25; // ??
 
+			// Get the last frame in the video and read the Almanac Offset and Almanac Status so they are applied 
+			// to the frames that didn't have Almanac Status = Updated
+			if (m_CountFrames > 0)
+			{
+				GetPixelmap(m_FirstFrame + m_CountFrames - 1);
+
+				m_AlamanacOffsetLastFrameIsGood = m_CurrentFrameInfo.AlmanacStatusIsGood;
+				m_AlmanacOffsetLastFrame = m_CurrentFrameInfo.GetSignedAlamancOffset();
+			}
+			else
+			{
+				m_AlamanacOffsetLastFrameIsGood = false;
+				m_AlmanacOffsetLastFrame = 0;
+			}
+
+
 			m_FileOpened = true;			
+		}
+
+		public string FileName
+		{
+			get { return m_FileName; }
 		}
 
 		public int Width
@@ -189,13 +213,27 @@ namespace Tangra.Video
 				rv.SystemTime = m_CurrentFrameInfo.SystemTime;
 				rv.ExposureInMilliseconds = m_CurrentFrameInfo.Exposure10thMs / 10.0f;
 
+				int almanacStatus = m_CurrentFrameInfo.GPSAlmanacStatus;
+				int almanacOffset = m_CurrentFrameInfo.GetSignedAlamancOffset();
+
+				if (!m_CurrentFrameInfo.AlmanacStatusIsGood && m_AlamanacOffsetLastFrameIsGood)
+				{
+					// When the current almanac is not good, but last frame is, then apply the known almanac offset automatically
+					almanacOffset = m_AlmanacOffsetLastFrame;
+					rv.CentralExposureTime = rv.CentralExposureTime.AddSeconds(m_AlmanacOffsetLastFrame);
+					almanacStatus = 2; // Certain
+				}
+				
+
 				rv.Gain = m_CurrentFrameInfo.Gain;
 				rv.Gamma = m_CurrentFrameInfo.Gamma;
 				rv.Offset = m_CurrentFrameInfo.Offset;
 
 				rv.NumberSatellites = m_CurrentFrameInfo.GPSTrackedSattelites;
 
-				rv.AlmanacStatus = m_CurrentFrameInfo.GPSAlmanacStatus.ToString("#");
+				rv.AlmanacStatus = AdvStatusValuesHelper.TranslateGpsAlmanacStatus(almanacStatus);
+
+				rv.AlmanacOffset = AdvStatusValuesHelper.TranslateGpsAlmanacOffset(almanacStatus, almanacOffset, almanacStatus > 0);
 
 				rv.GPSFixStatus = m_CurrentFrameInfo.GPSFixStatus.ToString("#");
 
@@ -269,7 +307,7 @@ namespace Tangra.Video
 				throw new ADVFormatException("The file ADV version is not supported yet.");
 
 			if (fileIsCorrupted)
-				throw new ADVFormatException("The ADV file may be corrupted.\r\n\r\nTry to recover it from Tools -> Repair ADV File");
+				throw new ADVFormatException("The ADV file may be corrupted.\r\n\r\nTry to recover it from Tools -> ADV Tools -> Repair ADV File");
 		}
 
 		private void DoConsistencyCheck(AdvFile advFile, ref bool fileIsCorrupted, ref bool isADVFormat, ref int advFormatVersion)

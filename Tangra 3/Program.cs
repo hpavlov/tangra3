@@ -59,9 +59,6 @@ namespace Tangra
 		{
 			// TODO: Log the error in a log file (Where to put the file so it works on all supported OS-es?)
 			MessageBox.Show(e.Exception.Message + "\n\r" + e.Exception.StackTrace, e.Exception.GetType().ToString());
-
-			Debugger.Break();
-			throw new NotImplementedException();
 		}
 
 		private static void CheckUnmanagedLibraries()

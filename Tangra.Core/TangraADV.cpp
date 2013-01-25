@@ -183,7 +183,7 @@ HRESULT ADVGetFramePixels(int frameNo, unsigned long* pixels, AdvLib::AdvFrameIn
     else
         return E_FAIL; 
 
-	return E_NOTIMPL;
+	return E_FAIL;
 }
 
 HRESULT ADVGetFrame(int frameNo, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, AdvLib::AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError)

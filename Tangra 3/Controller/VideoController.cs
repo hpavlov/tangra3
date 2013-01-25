@@ -500,6 +500,25 @@ namespace Tangra.Controller
                 m_TargetPSFViewerForm.ShowTargetPSF(m_TargetPsfFit, m_FramePlayer.Video.BitPix);
         }
 
+		public void ShowFSTSFileViewer()
+		{
+			if (m_FramePlayer.IsAstroDigitalVideo)
+			{
+				var viewer = new frmAdvViewer(m_FramePlayer.Video.FileName);
+				viewer.Show(m_MainFormView);
+			}
+		}
+
+		public void RepairAdvFile(string fileName)
+		{
+			var frmRebuilder = new frmAdvIndexRebuilder(fileName);
+			if (frmRebuilder.ShowDialog(m_MainFormView) == DialogResult.OK &&
+				File.Exists(frmRebuilder.NewFileName))
+			{
+				OpenVideoFile(frmRebuilder.NewFileName);
+			}		
+		}
+
 		public void NotifyMainFormMoved()
 		{
 			PositionAdvstatusForm();

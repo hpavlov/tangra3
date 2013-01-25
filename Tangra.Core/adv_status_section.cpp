@@ -84,6 +84,12 @@ void AdvStatusSection::GetDataFromDataBytes(unsigned char* data, int sectionData
 			frameInfo->GPSAlmanacStatus = val;
 			statusData+=2;
 		}
+		else if (strcmp("GPSAlmanacOffset", tagName) == 0)
+		{
+			char val = *(statusData + 1);
+			frameInfo->GPSAlmanacOffset = val;
+			statusData+=2;
+		}
 		else if (strcmp("GPSFixStatus", tagName) == 0)
 		{
 			char val = *(statusData + 1);

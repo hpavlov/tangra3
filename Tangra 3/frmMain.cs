@@ -669,5 +669,18 @@ namespace Tangra
         {
             m_VideoController.ActivateOperation<ReduceLightCurveOperation>();
         }
+
+		private void miFSTSFileViewer_Click(object sender, EventArgs e)
+		{
+			m_VideoController.ShowFSTSFileViewer();
+		}
+
+		private void miRepairAdvFile_Click(object sender, EventArgs e)
+		{
+			if (openCorruptedAdvFileDialog.ShowDialog(this) == DialogResult.OK)
+			{
+				m_VideoController.RepairAdvFile(openCorruptedAdvFileDialog.FileName);
+			}
+		}
 	}
 }

@@ -75,9 +75,10 @@ namespace Tangra.View
 
 			//m_MainForm.miDetectIntegration.Enabled = HasVideoLoaded && CanPlayVideo;
 
-			//m_MainForm.miADVDataViewer.Enabled = HasVideoLoaded;
-			//m_MainForm.miADVStatusData.Enabled = HasVideoLoaded;
-			//m_MainForm.miTargetPSFViewer.Enabled = HasVideoLoaded;
+			m_MainForm.miADVStatusData.Enabled = TangraContext.Current.HasVideoLoaded && TangraContext.Current.UsingADV;
+			m_MainForm.miTargetPSFViewer.Enabled = TangraContext.Current.HasVideoLoaded;
+
+			m_MainForm.miFSTSFileViewer.Enabled = TangraContext.Current.HasVideoLoaded && TangraContext.Current.UsingADV;
 
 			UpdateConfigurationControls();
 		}
