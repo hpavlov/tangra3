@@ -30,7 +30,7 @@ namespace Tangra.Config.SettingPannels
 			cbxPsfQuadrature.SetCBXIndex((int)TangraConfig.Settings.Photometry.PsfQuadrature);
 			cbxPsfFittingMethod.SetCBXIndex((int)TangraConfig.Settings.Photometry.PsfFittingMethod);
 			nudUserSpecifiedFWHM.SetNUDValue((int)TangraConfig.Settings.Photometry.UserSpecifiedFWHM);
-			//rgSeeing.SelectedIndex = TangraConfig.Settings.Photometry.UseUserSpecifiedFWHM ? 1 : 0;
+            rbSeeingUser.Checked = TangraConfig.Settings.Photometry.UseUserSpecifiedFWHM;
         }
 
         public override void SaveSettings()
@@ -43,7 +43,7 @@ namespace Tangra.Config.SettingPannels
             TangraConfig.Settings.Photometry.PsfQuadrature = (TangraConfig.PsfQuadrature)cbxPsfQuadrature.SelectedIndex;
 			TangraConfig.Settings.Photometry.PsfFittingMethod = (TangraConfig.PsfFittingMethod)cbxPsfFittingMethod.SelectedIndex;
 			TangraConfig.Settings.Photometry.UserSpecifiedFWHM = (float)nudUserSpecifiedFWHM.Value;
-			//TangraConfig.Settings.Photometry.UseUserSpecifiedFWHM = rgSeeing.SelectedIndex == 1;
+            TangraConfig.Settings.Photometry.UseUserSpecifiedFWHM = rbSeeingUser.Checked;
         }
 
 		public TangraConfig.BackgroundMethod ComboboxIndexToBackgroundMethod()
@@ -86,9 +86,9 @@ namespace Tangra.Config.SettingPannels
 			}
 		}
 
-		//private void rbSeeingUserValue_CheckedChanged(object sender, EventArgs e)
-		//{
-		//    pnlUserSeeing.Enabled = rgSeeing.SelectedIndex == 1;
-		//}
+        private void rbSeeingUser_CheckedChanged(object sender, EventArgs e)
+        {
+            pnlUserSeeing.Enabled = rbSeeingUser.Checked;
+        }
 	}
 }

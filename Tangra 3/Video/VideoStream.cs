@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using Tangra.Model.Config;
 using Tangra.Model.Image;
+using Tangra.Model.Video;
 using Tangra.PInvoke;
 
 namespace Tangra.Video
@@ -82,9 +83,10 @@ namespace Tangra.Video
 
 			uint[] pixels;
 			Bitmap videoFrame;
-			TangraVideo.GetFrame(index, out pixels, out videoFrame);
+		    byte[] bitmapBytes;
+            TangraVideo.GetFrame(index, out pixels, out videoFrame, out bitmapBytes);
 
-			return new Pixelmap(Width, Height, 8, pixels, videoFrame);
+            return new Pixelmap(Width, Height, 8, pixels, videoFrame, bitmapBytes);
 		}
 
 		public int RecommendedBufferSize

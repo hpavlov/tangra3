@@ -11,6 +11,8 @@ using System.Threading;
 using System.Windows.Forms;
 using Tangra.Config;
 using Tangra.Controller;
+using Tangra.Helpers;
+using Tangra.ImageTools;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
 using Tangra.Model.Image;
@@ -18,6 +20,7 @@ using Tangra.Model.Video;
 using Tangra.PInvoke;
 using Tangra.Video;
 using Tangra.Video.AstroDigitalVideo;
+using Tangra.VideoOperations.LightCurves;
 using Tangra.View;
 
 namespace Tangra
@@ -26,16 +29,19 @@ namespace Tangra
 	{
 		private VideoController m_VideoController;
 		private VideoFileView m_VideoFileView;
+        private ZoomedImageView m_ZoomedImageView;
 		private bool m_FormLoaded = false;
 
 		public frmMain()
 		{
 			InitializeComponent();
 
-			TangraConfig.Load();
+			TangraConfig.Load(ApplicationSettingsSerializer.Instance);
 
 			m_VideoFileView = new VideoFileView(this);
-			m_VideoController = new VideoController(this, m_VideoFileView);
+		    m_ZoomedImageView = new ZoomedImageView(zoomedImage, this);
+
+            m_VideoController = new VideoController(this, m_VideoFileView, m_ZoomedImageView, pnlControlerPanel);
 
 			BuildRecentFilesMenu();
 		}
@@ -261,9 +267,7 @@ namespace Tangra
 			{
 				// Only set the AstroImage if this is not a Refresh. Otherwise the pre-processing will be lost in 
 				// consequative refreshes and the AstroImage will be wrong even after the first Refresh
-				//VideoContext.Current.AstroImage = new AstroImage(currentPixelmap, false);
-
-				m_VideoController.SetFrameStateData(currentPixelmap.FrameState);
+                m_VideoController.SetImage(currentPixelmap, frameContext);
 			}
 
 #if PROFILING
@@ -272,27 +276,7 @@ namespace Tangra
 
 			ssFrameNo.Text = string.Format("Frame: {0}", frameContext.CurrentFrameIndex);
 
-//            if (m_CurrentOperation != null)
-//            {
-//                m_CurrentOperation.NextFrame(currentFrameIndex, movementType, isLastFrame);
-
-//#if PROFILING
-//                    Profiler.Instance.StartTimer("PAINTING");
-//#endif
-//                if (m_CurrentOperation.HasCustomZoomImage &&
-//                    zoomedImage.Image != null)
-//                {
-//                    using (Graphics g = Graphics.FromImage(zoomedImage.Image))
-//                    {
-//                        m_CurrentOperation.DrawCustomZoomImage(g, zoomedImage.Image.Width, zoomedImage.Image.Height);
-//                        g.Save();
-//                        zoomedImage.Invalidate();
-//                    }
-//                }
-//#if PROFILING
-//                    Profiler.Instance.StopTimer("PAINTING");
-//#endif
-//            }
+            m_VideoController.NewFrameDisplayed();
 
 #if PROFILING
                 Profiler.Instance.StartTimer("PAINTING");
@@ -346,8 +330,6 @@ namespace Tangra
 
 		private void CompleteRenderFrame()
 		{
-			//VideoContext.Current.DisplayBitmap = bitmapDoNotDispose;
-
 			pictureBox.Image = m_VideoContext.Pixelmap.DisplayBitmap;
 
 			if (m_VideoController.HasAstroImageState)
@@ -355,31 +337,14 @@ namespace Tangra
 				m_VideoController.OverlayStateForFrame(m_VideoContext.Pixelmap.DisplayBitmap, m_CurrentFrameId);
 			}
 
+            using (Graphics g = Graphics.FromImage(m_VideoContext.Pixelmap.DisplayBitmap))
+            {
+                m_VideoController.CompleteRenderFrame(g);
 
-			//if (m_ImageTool != null)
-			//    m_ImageTool.OnNewFrame(currentFrameIndex, isLastFrame);
+                g.Save();
 
-
-			//using (Graphics g = Graphics.FromImage(VideoContext.Current.DisplayBitmap))
-			//{
-			//    if (m_CurrentOperation != null)
-			//        m_CurrentOperation.PreDraw(g);
-
-			//    //if (m_CurrentOperation != null &&
-			//    //   (m_CurrentOperation.Type & OperationTypes.DrawStars) != 0)
-			//    //{
-			//    //    foreach (AstroPixel star in stars)
-			//    //    {
-			//    //        m_CurrentOperation.DrawStar(g, star);
-			//    //    }
-			//    //}
-
-			//    if (m_CurrentOperation != null)
-			//        m_CurrentOperation.PostDraw(g);
-
-			//    g.Save();
-			//    //VideoContext.Current.DisplayBitmap.Save(@"C:\Tangra-DisplayBitmap.bmp");
-			//}
+                //m_VideoContext.Pixelmap.DisplayBitmap.Save(@"C:\Tangra-DisplayBitmap.bmp");
+            }
 		}
 
 		#endregion
@@ -392,7 +357,19 @@ namespace Tangra
 
 		private void miOpenVideo_Click(object sender, EventArgs e)
 		{
-			if (openVideoFileDialog.ShowDialog(this) == DialogResult.OK)
+            if (CurrentOS.IsWindows)
+            {
+                openVideoFileDialog.Filter = "All Supported Files (*.avi;*.avs;*.adv)|*.avi;*.avs;*.adv";
+                openVideoFileDialog.DefaultExt = "avi";
+            }
+            else
+            {
+                // On Non-Windows OS currently only ADV files are supported
+                openVideoFileDialog.Filter = "All Supported Files (*.adv)|*.adv";
+                openVideoFileDialog.DefaultExt = "adv";
+            }
+
+		    if (openVideoFileDialog.ShowDialog(this) == DialogResult.OK)
 			{
 				OpenTangraFile(openVideoFileDialog.FileName);
 			}
@@ -572,7 +549,7 @@ namespace Tangra
 		private void miTools_DropDownOpening(object sender, EventArgs e)
 		{
 			miADVStatusData.Checked = m_VideoController.IsAdvStatusFormVisible;
-			//miTargetPSFViewer.Checked = m_TargetPSFViewerForm != null && m_TargetPSFViewerForm.Visible;
+		    miTargetPSFViewer.Checked = m_VideoController.IsTargetPSFViewerFormVisible;
 		}
 
 		private void miADVStatusData_Click(object sender, EventArgs e)
@@ -583,6 +560,11 @@ namespace Tangra
 			}
 		}
 
+        private void miTargetPSFViewer_Click(object sender, EventArgs e)
+        {
+            m_VideoController.TogglePSFViewerForm();
+        }
+
 		private void frmMain_Move(object sender, EventArgs e)
 		{
 			m_VideoController.NotifyMainFormMoved();
@@ -591,9 +573,8 @@ namespace Tangra
         private void BuildRecentFilesMenu()
         {
             miRecentVideos.DropDownItems.Clear();
-	        TangraConfig.RecentFiles.Load();
 
-			foreach (string recentFilePath in TangraConfig.RecentFiles.Lists[(int)RecentFileType.Video])
+            foreach (string recentFilePath in TangraConfig.Settings.RecentFiles.Lists[(int)RecentFileType.Video])
             {
                 if (File.Exists(recentFilePath))
                 {
@@ -607,7 +588,7 @@ namespace Tangra
 
 			miRecentLightCurves.DropDownItems.Clear();
 
-			foreach (string recentFilePath in TangraConfig.RecentFiles.Lists[(int)RecentFileType.LightCurve])
+			foreach (string recentFilePath in TangraConfig.Settings.RecentFiles.Lists[(int)RecentFileType.LightCurve])
 			{
 				if (File.Exists(recentFilePath))
 				{
@@ -622,8 +603,8 @@ namespace Tangra
 
 		internal void RegisterRecentFile(RecentFileType type, string fileName)
         {
-			TangraConfig.RecentFiles.NewRecentFile(type, fileName);
-			TangraConfig.RecentFiles.Save();
+			TangraConfig.Settings.RecentFiles.NewRecentFile(type, fileName);
+            TangraConfig.Settings.Save();
 
             BuildRecentFilesMenu();
         }
@@ -641,5 +622,52 @@ namespace Tangra
 				}
 			}
 		}
+
+        private void miExit_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        private void miOnlineHelp_Click(object sender, EventArgs e)
+        {
+            Process.Start("http://www.hristopavlov.net/Tangra3");
+        }
+
+        #region Picture Box Events
+        private void pictureBox_MouseClick(object sender, MouseEventArgs e)
+        {
+            m_VideoController.MouseClick(e.Location);
+        }
+
+        private void pictureBox_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            m_VideoController.MouseDoubleClick(e.Location);
+        }
+
+        private void pictureBox_MouseDown(object sender, MouseEventArgs e)
+        {
+            m_VideoController.MouseDown(e.Location);
+        }
+
+        private void pictureBox_MouseLeave(object sender, EventArgs e)
+        {
+            m_VideoController.MouseLeave();
+        }
+
+        private void pictureBox_MouseMove(object sender, MouseEventArgs e)
+        {
+            m_VideoController.MouseMove(e.Location);
+        }
+
+        private void pictureBox_MouseUp(object sender, MouseEventArgs e)
+        {
+            m_VideoController.MouseUp(e.Location);
+        }
+        #endregion
+
+        private void miReduceLightCurve_Click(object sender, EventArgs e)
+        {
+            m_VideoController.ActivateOperation<ReduceLightCurveOperation>();
+        }
 	}
 }

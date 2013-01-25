@@ -40,6 +40,7 @@
     <File Name="Tangra.Core.def"/>
     <File Name="TangraADV.h"/>
     <File Name="cross_platform.h"/>
+    <File Name="version.h"/>
   </VirtualDirectory>
   <Settings Type="Dynamic Library">
     <GlobalSettings>

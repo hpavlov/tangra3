@@ -17,6 +17,7 @@ namespace Tangra.Video.AstroDigitalVideo
 		private static Brush s_PropertiesGreenBrush = new SolidBrush(Color.LimeGreen);
 		private static Brush s_PropertiesRedBrush = new SolidBrush(Color.Red);
 		private static Brush s_PropertiesYellowBrush = new SolidBrush(Color.Yellow);
+        private static Brush s_PropertiesWhiteBrush = new SolidBrush(Color.White);
 
 		private int m_CurrentImageWidth = 0;
 		private float m_CurrentFontSize = 28.0f;
@@ -24,16 +25,26 @@ namespace Tangra.Video.AstroDigitalVideo
 		private float m_YPosUpper = 50;
 
 	    private int m_LastFrameNo = -1;
+	    private bool m_EquipmentInfoDisplayed = false;
+        private int m_FirstFrameNo = -1;
         private int m_FramesLeftToDiplayMessage = -1;
 	    private string m_LastMessage = null;
 
+	    private AdvEquipmentInfo m_EquipmentInfo;
 
 		public void Reset()
 		{
-			
+            m_EquipmentInfoDisplayed = false;
 		}
 
-		public void OverlayStateForFrame(Bitmap currentImage, FrameStateData state, int currentFrameNo)
+        public void Init(AdvEquipmentInfo equipmentInfo, int firstFrameNo)
+        {
+            m_EquipmentInfo = equipmentInfo;
+            m_FirstFrameNo = firstFrameNo;
+        }
+
+
+	    public void OverlayStateForFrame(Bitmap currentImage, FrameStateData state, int currentFrameNo)
 		{			
 			using (Graphics g = Graphics.FromImage(currentImage))
 			{
@@ -47,18 +58,21 @@ namespace Tangra.Video.AstroDigitalVideo
                     g.Save();                    
                 }
 
+                int numTopLines = 0;
                 if (TangraConfig.Settings.ADVS.OverlayGamma)
                 {
 					string gammaStr = string.Format("Gamma: {0} {1}", state.Gamma.ToString("0.000"), AdvStatusValuesHelper.GetWellKnownGammaForValue(state.Gamma));
-					g.DrawString(gammaStr, s_PropertiesFont, s_PropertiesGreenBrush, 10, 10);
+                    g.DrawString(gammaStr, s_PropertiesFont, s_PropertiesGreenBrush, 10, 10 + numTopLines * (s_PropertiesFont.Size + 5));
 					g.Save();
+                    numTopLines++;
                 }
 
                 if (TangraConfig.Settings.ADVS.OverlayGain)
                 {
 					string gammaStr = string.Format(" Gain: {0} dB", state.Gain.ToString("0"));
-					g.DrawString(gammaStr, s_PropertiesFont, s_PropertiesGreenBrush, 10, 10 + s_PropertiesFont.Size + 5);
+                    g.DrawString(gammaStr, s_PropertiesFont, s_PropertiesGreenBrush, 10, 10 + numTopLines * (s_PropertiesFont.Size + 5));
 					g.Save();
+                    numTopLines++;
                 }
 
                 if (m_LastFrameNo + 1 != currentFrameNo)
@@ -69,13 +83,55 @@ namespace Tangra.Video.AstroDigitalVideo
 					!string.IsNullOrEmpty(state.Messages) &&
                     state.Messages.Trim().Length > 0)
 				{
-				    m_LastMessage = state.Messages;
+                    m_LastMessage = state.Messages.Trim();
 				    m_FramesLeftToDiplayMessage = 10;
 				}
 
+                if ((TangraConfig.Settings.ADVS.OverlayAdvsInfo || TangraConfig.Settings.ADVS.OverlayCameraInfo) &&
+                    (!m_EquipmentInfoDisplayed || m_FirstFrameNo == currentFrameNo))
+                {
+                    int numLines = 0;
+                    int lineNo = 0;
+                    if (TangraConfig.Settings.ADVS.OverlayCameraInfo) numLines += 2;
+                    if (TangraConfig.Settings.ADVS.OverlayAdvsInfo) numLines += 2;
+
+                    float startingY = currentImage.Height - numLines * (s_PropertiesFont.Size + 5) - 10;
+                    if (TangraConfig.Settings.ADVS.OverlayTimestamp) startingY -= m_YPosUpper;
+
+                    if (TangraConfig.Settings.ADVS.OverlayAdvsInfo)
+                    {
+                        g.DrawString(m_EquipmentInfo.Recorder, s_PropertiesFont, s_PropertiesWhiteBrush, 10, startingY + lineNo * (s_PropertiesFont.Size + 5));
+                        lineNo++;
+                        if (!string.IsNullOrEmpty(m_EquipmentInfo.AdvrVersion))
+                        {
+                            g.DrawString(
+                                string.Format("ADVR v{0} HTCC v{1}", m_EquipmentInfo.AdvrVersion, m_EquipmentInfo.HtccFirmareVersion),
+                                s_PropertiesFont, s_PropertiesWhiteBrush, 10, startingY + lineNo * (s_PropertiesFont.Size + 5));
+                        }
+                        lineNo++;
+                    }
+
+                    if (TangraConfig.Settings.ADVS.OverlayCameraInfo)
+                    {
+                        if (!string.IsNullOrEmpty(m_EquipmentInfo.SensorInfo))
+                            g.DrawString(m_EquipmentInfo.SensorInfo, s_PropertiesFont, s_PropertiesWhiteBrush, 10, startingY + lineNo * (s_PropertiesFont.Size + 5));
+                        lineNo++;
+                        if (!string.IsNullOrEmpty(m_EquipmentInfo.Camera))
+                            g.DrawString(m_EquipmentInfo.Camera, s_PropertiesFont, s_PropertiesWhiteBrush, 10, startingY + lineNo * (s_PropertiesFont.Size + 5));
+                        lineNo++;
+                    }
+
+                    g.Save();
+
+                    m_EquipmentInfoDisplayed = true;
+                }
+
                 if (m_FramesLeftToDiplayMessage > 0)
                 {
-                    g.DrawString(m_LastMessage, s_PropertiesFont, s_PropertiesYellowBrush, 10, 10 + 2 * (s_PropertiesFont.Size + 5));
+                    if (TangraConfig.Settings.ADVS.OverlayGamma || TangraConfig.Settings.ADVS.OverlayGain)
+                        numTopLines++;
+
+                    g.DrawString(m_LastMessage, s_PropertiesFont, s_PropertiesYellowBrush, 10, 10 + numTopLines * (s_PropertiesFont.Size + 5));
                     g.Save();
                     m_FramesLeftToDiplayMessage--;
                 }

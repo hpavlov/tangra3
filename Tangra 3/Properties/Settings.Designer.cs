@@ -22,5 +22,29 @@ namespace Tangra.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TangraSettings {
+            get {
+                return ((string)(this["TangraSettings"]));
+            }
+            set {
+                this["TangraSettings"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TangraRecentFiles {
+            get {
+                return ((string)(this["TangraRecentFiles"]));
+            }
+            set {
+                this["TangraRecentFiles"] = value;
+            }
+        }
     }
 }

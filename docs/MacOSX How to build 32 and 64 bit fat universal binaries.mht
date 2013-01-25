@@ -1,0 +1,1303 @@
+From: <Saved by Windows Internet Explorer 8>
+Subject: How to build 32/64 bit fat (universal) binaries | :: (Bloggable a) => a -> IO ()
+Date: Wed, 26 Dec 2012 16:46:45 +1100
+MIME-Version: 1.0
+Content-Type: multipart/related;
+	type="text/html";
+	boundary="----=_NextPart_000_0000_01CDE388.975CEF40"
+X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2900.6157
+
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_0000_01CDE388.975CEF40
+Content-Type: text/html;
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://blog.omega-prime.co.uk/?p=102
+
+=EF=BB=BF<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" =
+"http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd">
+<HTML dir=3Dltr lang=3Den-US =
+xmlns=3D"http://www.w3.org/1999/xhtml"><HEAD=20
+profile=3D"http://gmpg.org/xfn/11"><TITLE>How to build 32/64 bit fat =
+(universal) binaries | :: (Bloggable a) =3D> a -> IO ()</TITLE>
+<META content=3D"text/html; charset=3DUTF-8" =
+http-equiv=3DContent-Type><LINK=20
+rel=3Dstylesheet type=3Dtext/css=20
+href=3D"http://blog.omega-prime.co.uk/wp-content/themes/elegant-grunge/st=
+yle.css"=20
+media=3Dscreen><LINK rel=3Dstylesheet type=3Dtext/css=20
+href=3D"http://blog.omega-prime.co.uk/wp-content/themes/elegant-grunge/st=
+yle-additional.css"=20
+media=3Dscreen><!--[if IE]><LINK rel=3Dstylesheet type=3Dtext/css=20
+href=3D"http://blog.omega-prime.co.uk/wp-content/themes/elegant-grunge/ie=
+.css">
+<STYLE type=3Dtext/css>#footer #subscribe A {
+	FILTER: =
+progid:DXImageTransform.Microsoft.AlphaImageLoader(src=3D'http://blog.ome=
+ga-prime.co.uk/wp-content/themes/elegant-grunge/images/rss.png'); =
+BACKGROUND: none transparent scroll repeat 0% 0%
+}
+</STYLE>
+<![endif]--><LINK title=3D":: (Bloggable a) =3D> a -> IO () RSS Feed" =
+rel=3Dalternate=20
+type=3Dapplication/rss+xml =
+href=3D"http://blog.omega-prime.co.uk/?feed=3Drss2"><LINK=20
+rel=3Dpingback href=3D"http://blog.omega-prime.co.uk/xmlrpc.php"><LINK=20
+title=3D":: (Bloggable a) =3D> a -> IO () =C2=BB How to build 32/64 bit =
+fat (universal) binaries Comments Feed"=20
+rel=3Dalternate type=3Dapplication/rss+xml=20
+href=3D"http://blog.omega-prime.co.uk/?feed=3Drss2&amp;p=3D102">
+<SCRIPT type=3Dtext/javascript=20
+src=3D"http://blog.omega-prime.co.uk/wp-includes/js/comment-reply.js?ver=3D=
+3.4.2"></SCRIPT>
+<LINK title=3DRSD rel=3DEditURI type=3Dapplication/rsd+xml=20
+href=3D"http://blog.omega-prime.co.uk/xmlrpc.php?rsd"><LINK =
+rel=3Dwlwmanifest=20
+type=3Dapplication/wlwmanifest+xml=20
+href=3D"http://blog.omega-prime.co.uk/wp-includes/wlwmanifest.xml"><LINK =
+
+title=3D"Solving GHC iconv problems on OS X 10.6" rel=3Dprev=20
+href=3D"http://blog.omega-prime.co.uk/?p=3D96"><LINK=20
+title=3D"Security implications of PEP 383" rel=3Dnext=20
+href=3D"http://blog.omega-prime.co.uk/?p=3D107">
+<META name=3DGENERATOR content=3D"MSHTML 8.00.6001.19393"><LINK =
+rel=3Dcanonical=20
+href=3D"http://blog.omega-prime.co.uk/?p=3D102"><LINK rel=3Dshortlink=20
+href=3D"http://wp.me/p7P6X-1E"></HEAD>
+<BODY>
+<DIV id=3Dpage>
+<DIV id=3Dmenu>
+<UL>
+  <LI class=3D"page_item "><A =
+href=3D"http://blog.omega-prime.co.uk/">Home</A></LI>
+  <LI class=3D"page_item page-item-16"><A=20
+  =
+href=3D"http://blog.omega-prime.co.uk/?page_id=3D16">About</A></LI></UL>
+<DIV class=3Dclear></DIV></DIV>
+<DIV id=3Dheader-wrap>
+<DIV id=3Dheader>
+<DIV>
+<H1><A href=3D"http://blog.omega-prime.co.uk/">:: (Bloggable a) =3D&gt; =
+a -&gt; IO=20
+()</A></H1><SPAN id=3Dblog-description></SPAN></DIV></DIV></DIV><!-- end =
+header -->
+<DIV id=3Dcontent-container>
+<DIV id=3Dcontent>
+<DIV id=3Dbody>
+<DIV id=3Dpost-102 class=3Dpost>
+<H2>How to build 32/64 bit fat (universal) binaries</H2>
+<DIV class=3Dentry>
+<P>The OS X version of the <A =
+href=3D"http://www.haskell.org/ghc/">Glasgow Haskell=20
+Compiler</A> compiles Haskell into 32-bit code. Unfortunately, this =
+means that=20
+if you are on a system where it is the default for libraries to be built =
+in=20
+64-bit mode, you tend to get errors when linking Haskell code telling =
+you that=20
+you are trying to link 32-bit code against 64-bit code.</P>
+<P>The best solution to this problem is to build all libraries you =
+intend to=20
+link to from Haskell code as universal binaries that include both 32-bit =
+and=20
+64-bit versions of the code. These libraries will then work seamlessly =
+with both=20
+Haskell code and also when pulled in as part of the build process for=20
+non-Haskell 64-bit executables.</P>
+<P>If you can install the library using MacPorts, this is easy to do. =
+Instead of=20
+doing:</P>
+<P><CODE>sudo port install mylibrary<BR></CODE></P>
+<P>Just do:</P>
+<P><CODE>sudo port install mylibrary +universal<BR></CODE></P>
+<P>However, if the library you want is not available through MacPorts or =
+the=20
+MacPorts version is not up to date you will need to know how to build =
+these=20
+universal libraries for yourself. This is the process that I aim to =
+explain in=20
+this post. I'm going to use <A =
+href=3D"http://igraph.sourceforge.net/">igraph</A>=20
+as my example library because it's what I needed to install (I needed to =
+install=20
+the unreleased v0.6).</P>
+<H3>The easy method</H3>
+<P>If you are lucky, building a universal library is as simple as =
+changing how=20
+you invoke <TT>make</TT>. Run the library's <TT>configure</TT> scripts =
+etc as=20
+usual, and then invoke <TT>make</TT> as follows:</P>
+<P><CODE>make CXXFLAGS=3D"-arch i386 -arch x86_64" CFLAGS=3D"-arch i386 =
+-arch=20
+x86_64" LDFLAGS=3D"-arch i386 -arch x86_64"<BR></CODE></P>
+<P>The <TT>-arch</TT> flags tell GCC and the linker to build and link =
+both=20
+versions of the library. If this works, you are done. In the case of =
+igraph,=20
+this wasn't quite enough - the above command failed with this error:</P>
+<P><CODE>gcc-4.2: -E, -S, -save-temps and -M options are not allowed =
+with=20
+multiple -arch flags<BR></CODE></P>
+<P>The reason that this occurs is because igraph invokes GCC with the=20
+<TT>-M</TT> series of flags that generate makefile dependency rules from =
+the C=20
+code - but GCC doesn't like generating those rules for two architectures =
+
+simultaneously. Luckily, there was an easy workaround in my case - I =
+just needed=20
+to reconfigure igraph as follows:</P>
+<P><CODE>./configure --disable-dependency-tracking<BR></CODE></P>
+<P>The <TT>--disable-dependency-tracking</TT> <A=20
+href=3D"http://www.gnu.org/software/hello/manual/automake/Dependencies.ht=
+ml">flag</A>=20
+just stops Automake from determining the dependencies of each C file as =
+it=20
+compiles it. It is totally harmless to disable this because that =
+dependency=20
+information is only used in order to rebuild less stuff upon subsequent=20
+invocations of <TT>make</TT> - the worst that happens when you disable =
+it is=20
+that if you <TT>make</TT> more than once you will have to wait a bit =
+longer. For=20
+more information on this feature see also <A=20
+href=3D"http://www.gnu.org/software/hello/manual/automake/Dependency-Trac=
+king.html#Dependency-Tracking">the=20
+relevant section of the Automake manual</A>.</P>
+<P>After reconfiguring in this manner, the original <TT>make</TT> =
+invocation=20
+worked correctly for igraph.</P>
+<H3>The hard method</H3>
+<P>The above method may perhaps fail for some libraries, in which case =
+you can=20
+use this more arduous manual method. The idea is to run the library's =
+build=20
+process from scratch twice: once to get the 32-bit library and once for =
+the=20
+64-bit library. We can then use the <TT>lipo</TT> to glue together the =
+build=20
+artifacts from the two runs.</P>
+<P>We start by building the 32-bit version:</P>
+<P><CODE>make clean<BR>make CXXFLAGS=3D-m32 CFLAGS=3D-m32 LDFLAGS=3D-m32 =
+
+-j12<BR></CODE></P>
+<P>We now need to store the 32-bit build artifacts somewhere. Exactly =
+which=20
+files you have to save will vary according to the library you are =
+building, but=20
+for igraph this was sufficient:</P>
+<P><CODE>mkdir -p ~/Junk/32 ~/Junk/64<BR>cp =
+src/.libs/libigraph.{a,0.dylib}=20
+~/Junk/32<BR></CODE></P>
+<P>Now do the 64-bit build and once again save the artifacts =
+somewhere:</P>
+<P><CODE>make clean<BR>make CXXFLAGS=3D-m64 CFLAGS=3D-m64 LDFLAGS=3D-m64 =
+-j12<BR>cp=20
+src/.libs/libigraph.{a,0.dylib} ~/Junk/64<BR></CODE></P>
+<P>Finally we can use <TT>lipo</TT> to finish up:</P>
+<P><CODE>lipo -create ~/Junk/{32,64}/libigraph.a -output=20
+src/.libs/libigraph.a<BR>lipo -create ~/Junk/{32,64}/libigraph.0.dylib =
+-output=20
+src/.libs/libigraph.0.dylib<BR></CODE></P>
+<P>At this point, you can do <TT>sudo make install</TT> and get a =
+universal=20
+version of the library installed.</P>
+<P>If you want to check that your libraries are indeed universal, you =
+can use=20
+<TT>lipo -info</TT>:</P>
+<P><CODE>$ lipo -info src/.libs/libigraph.a<BR>Architectures in the fat =
+file:=20
+src/.libs/libigraph.a are: i386 x86_64<BR></CODE></P>
+<H2>Conclusions</H2>
+<P>Building universal 32-bit/64-bit binaries is apparently fairly=20
+straightforward but it was tricky to find documentation for the process. =
+I hope=20
+this article helps others who need to get this done.</P></DIV>
+<DIV class=3Dclear></DIV>
+<DIV class=3Dmetadata>This entry was posted on Tuesday, March 8th, 2011 =
+at 2:49=20
+pmand is filed under Apple, Haskell, Solutions. You can follow any =
+responses to=20
+this entry through the <A=20
+href=3D"http://blog.omega-prime.co.uk/?feed=3Drss2&amp;p=3D102">RSS =
+2.0</A> feed. Both=20
+comments and pings are currently closed. </DIV></DIV>
+<DIV class=3Dhr>
+<HR>
+</DIV><!-- You can start editing here. -->
+<H4 id=3Dcomments>One Response to =E2=80=9CHow to build 32/64 bit fat =
+(universal)=20
+binaries=E2=80=9D</H4>
+<DIV class=3Dnavigation>
+<DIV class=3Dalignleft></DIV>
+<DIV class=3Dalignright></DIV></DIV>
+<DIV class=3Dclear></DIV>
+<UL class=3Dcommentlist>
+  <LI id=3Dcomment-438>
+  <DIV class=3Dcomment-content>
+  <DIV class=3Dbefore-comment></DIV>
+  <DIV class=3Dcomment><IMG class=3D"avatar avatar-32 photo" alt=3D""=20
+  =
+src=3D"http://0.gravatar.com/avatar/6f4d592eab04f593a4b62ff87015dbea?s=3D=
+32&amp;d=3Dhttp%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9=
+bb6523536%3Fs%3D32&amp;r=3DG"=20
+  width=3D32 height=3D32> <CITE><A class=3Durl =
+href=3D"http://morepypy.blogspot.com/"=20
+  rel=3D"external nofollow">Laura Creighton</A></CITE> Says: <BR><SMALL=20
+  class=3Dcommentmetadata><A title=3D""=20
+  href=3D"http://blog.omega-prime.co.uk/?p=3D102#comment-438">March =
+29th, 2011 at=20
+  6:52 pm</A> </SMALL>
+  <DIV class=3Dcomment-text>
+  <P>I just needed to do this. Thank you very much for =
+writing.</P></DIV>
+  <DIV class=3Dreply></DIV></DIV>
+  <DIV class=3Dafter-comment>
+  <DIV></DIV></DIV></DIV></LI></LI></UL>
+<DIV class=3Dnavigation>
+<DIV class=3Dalignleft></DIV>
+<DIV class=3Dalignright></DIV></DIV>
+<DIV class=3Dclear></DIV></DIV><!-- End body /-->
+<DIV id=3Dsidebar class=3Dsidebar>
+<UL>
+  <LI>
+  <FORM id=3Dsearchform method=3Dget =
+action=3Dhttp://blog.omega-prime.co.uk/>
+  <DIV><INPUT onblur=3D"if (this.value =3D=3D '') {this.value =3D =
+'search';}" id=3Ds=20
+  onfocus=3D"if (this.value =3D=3D 'search') {this.value =3D '';}" =
+value=3Dsearch=20
+  type=3Dtext name=3Ds> <INPUT id=3Dsearchsubmit value=3DGo =
+type=3Dsubmit>=20
+  </DIV></FORM></LI><!-- Author information is disabled per default. =
+Uncomment and fill in your details if you want to use it.=0A=
+		<li><h2>Author</h2>=0A=
+		<p>A little something about you, the author. Nothing lengthy, just an =
+overview.</p>=0A=
+		</li>=0A=
+		-->
+  <LI class=3Dpagenav>
+  <H2>Pages</H2>
+  <UL>
+    <LI class=3D"page_item page-item-16"><A=20
+    =
+href=3D"http://blog.omega-prime.co.uk/?page_id=3D16">About</A></LI></UL><=
+/LI>
+  <LI>
+  <H2>Archives</H2>
+  <UL>
+    <LI><A title=3D"December 2012"=20
+    href=3D"http://blog.omega-prime.co.uk/?m=3D201212">December =
+2012</A></LI>
+    <LI><A title=3D"September 2011"=20
+    href=3D"http://blog.omega-prime.co.uk/?m=3D201109">September =
+2011</A></LI>
+    <LI><A title=3D"July 2011" =
+href=3D"http://blog.omega-prime.co.uk/?m=3D201107">July=20
+    2011</A></LI>
+    <LI><A title=3D"April 2011"=20
+    href=3D"http://blog.omega-prime.co.uk/?m=3D201104">April =
+2011</A></LI>
+    <LI><A title=3D"March 2011"=20
+    href=3D"http://blog.omega-prime.co.uk/?m=3D201103">March =
+2011</A></LI>
+    <LI><A title=3D"January 2011"=20
+    href=3D"http://blog.omega-prime.co.uk/?m=3D201101">January =
+2011</A></LI>
+    <LI><A title=3D"April 2010"=20
+    href=3D"http://blog.omega-prime.co.uk/?m=3D201004">April =
+2010</A></LI>
+    <LI><A title=3D"June 2009" =
+href=3D"http://blog.omega-prime.co.uk/?m=3D200906">June=20
+    2009</A></LI>
+    <LI><A title=3D"May 2009" =
+href=3D"http://blog.omega-prime.co.uk/?m=3D200905">May=20
+    2009</A></LI>
+    <LI><A title=3D"December 2008"=20
+    href=3D"http://blog.omega-prime.co.uk/?m=3D200812">December =
+2008</A></LI>
+    <LI><A title=3D"November 2008"=20
+    href=3D"http://blog.omega-prime.co.uk/?m=3D200811">November =
+2008</A></LI>
+    <LI><A title=3D"August 2008"=20
+    href=3D"http://blog.omega-prime.co.uk/?m=3D200808">August =
+2008</A></LI>
+    <LI><A title=3D"July 2008" =
+href=3D"http://blog.omega-prime.co.uk/?m=3D200807">July=20
+    2008</A></LI>
+    <LI><A title=3D"June 2008" =
+href=3D"http://blog.omega-prime.co.uk/?m=3D200806">June=20
+    2008</A></LI>
+    <LI><A title=3D"May 2008" =
+href=3D"http://blog.omega-prime.co.uk/?m=3D200805">May=20
+    2008</A></LI>
+    <LI><A title=3D"April 2008"=20
+    href=3D"http://blog.omega-prime.co.uk/?m=3D200804">April =
+2008</A></LI>
+    <LI><A title=3D"March 2008"=20
+    href=3D"http://blog.omega-prime.co.uk/?m=3D200803">March =
+2008</A></LI>
+    <LI><A title=3D"February 2008"=20
+    href=3D"http://blog.omega-prime.co.uk/?m=3D200802">February =
+2008</A></LI>
+    <LI><A title=3D"October 2007"=20
+    href=3D"http://blog.omega-prime.co.uk/?m=3D200710">October =
+2007</A></LI>
+    <LI><A title=3D"September 2007"=20
+    href=3D"http://blog.omega-prime.co.uk/?m=3D200709">September =
+2007</A></LI>
+    <LI><A title=3D"August 2007"=20
+    href=3D"http://blog.omega-prime.co.uk/?m=3D200708">August =
+2007</A></LI>
+    <LI><A title=3D"June 2007" =
+href=3D"http://blog.omega-prime.co.uk/?m=3D200706">June=20
+    2007</A></LI>
+    <LI><A title=3D"May 2007" =
+href=3D"http://blog.omega-prime.co.uk/?m=3D200705">May=20
+    2007</A></LI>
+    <LI><A title=3D"April 2007"=20
+    href=3D"http://blog.omega-prime.co.uk/?m=3D200704">April =
+2007</A></LI></UL></LI>
+  <LI class=3Dcategories>
+  <H2>Categories</H2>
+  <UL>
+    <LI class=3D"cat-item cat-item-3"><A title=3D"View all posts filed =
+under .NET"=20
+    href=3D"http://blog.omega-prime.co.uk/?cat=3D3">.NET</A> (4) </LI>
+    <LI class=3D"cat-item cat-item-4"><A title=3D"View all posts filed =
+under Apple"=20
+    href=3D"http://blog.omega-prime.co.uk/?cat=3D4">Apple</A> (5) </LI>
+    <LI class=3D"cat-item cat-item-5"><A=20
+    title=3D"View all posts filed under Assembly"=20
+    href=3D"http://blog.omega-prime.co.uk/?cat=3D5">Assembly</A> (4) =
+</LI>
+    <LI class=3D"cat-item cat-item-6"><A=20
+    title=3D"View all posts filed under Bitesize"=20
+    href=3D"http://blog.omega-prime.co.uk/?cat=3D6">Bitesize</A> (3) =
+</LI>
+    <LI class=3D"cat-item cat-item-7"><A title=3D"View all posts filed =
+under C#"=20
+    href=3D"http://blog.omega-prime.co.uk/?cat=3D7">C#</A> (2) </LI>
+    <LI class=3D"cat-item cat-item-25"><A=20
+    title=3D"View all posts filed under Chinese"=20
+    href=3D"http://blog.omega-prime.co.uk/?cat=3D25">Chinese</A> (1) =
+</LI>
+    <LI class=3D"cat-item cat-item-8"><A=20
+    title=3D"View all posts filed under Cryptography"=20
+    href=3D"http://blog.omega-prime.co.uk/?cat=3D8">Cryptography</A> (3) =
+</LI>
+    <LI class=3D"cat-item cat-item-9"><A title=3D"View all posts filed =
+under Erlang"=20
+    href=3D"http://blog.omega-prime.co.uk/?cat=3D9">Erlang</A> (1) </LI>
+    <LI class=3D"cat-item cat-item-10"><A title=3D"View all posts filed =
+under F#"=20
+    href=3D"http://blog.omega-prime.co.uk/?cat=3D10">F#</A> (1) </LI>
+    <LI class=3D"cat-item cat-item-11"><A=20
+    title=3D"View all posts filed under Haskell"=20
+    href=3D"http://blog.omega-prime.co.uk/?cat=3D11">Haskell</A> (22) =
+</LI>
+    <LI class=3D"cat-item cat-item-12"><A title=3D"View all posts filed =
+under Java"=20
+    href=3D"http://blog.omega-prime.co.uk/?cat=3D12">Java</A> (1) </LI>
+    <LI class=3D"cat-item cat-item-13"><A=20
+    title=3D"View all posts filed under Javascript"=20
+    href=3D"http://blog.omega-prime.co.uk/?cat=3D13">Javascript</A> (1) =
+</LI>
+    <LI class=3D"cat-item cat-item-14"><A title=3D"View all posts filed =
+under JVM"=20
+    href=3D"http://blog.omega-prime.co.uk/?cat=3D14">JVM</A> (3) </LI>
+    <LI class=3D"cat-item cat-item-15"><A=20
+    title=3D"View all posts filed under Linkage"=20
+    href=3D"http://blog.omega-prime.co.uk/?cat=3D15">Linkage</A> (2) =
+</LI>
+    <LI class=3D"cat-item cat-item-24"><A=20
+    title=3D"View all posts filed under Papers"=20
+    href=3D"http://blog.omega-prime.co.uk/?cat=3D24">Papers</A> (1) =
+</LI>
+    <LI class=3D"cat-item cat-item-16"><A=20
+    title=3D"View all posts filed under Ranting"=20
+    href=3D"http://blog.omega-prime.co.uk/?cat=3D16">Ranting</A> (5) =
+</LI>
+    <LI class=3D"cat-item cat-item-26"><A=20
+    title=3D"View all posts filed under Real World"=20
+    href=3D"http://blog.omega-prime.co.uk/?cat=3D26">Real World</A> (1) =
+</LI>
+    <LI class=3D"cat-item cat-item-17"><A title=3D"View all posts filed =
+under Ruby"=20
+    href=3D"http://blog.omega-prime.co.uk/?cat=3D17">Ruby</A> (3) </LI>
+    <LI class=3D"cat-item cat-item-18"><A title=3D"View all posts filed =
+under Scala"=20
+    href=3D"http://blog.omega-prime.co.uk/?cat=3D18">Scala</A> (2) </LI>
+    <LI class=3D"cat-item cat-item-19"><A=20
+    title=3D"View all posts filed under Solutions"=20
+    href=3D"http://blog.omega-prime.co.uk/?cat=3D19">Solutions</A> (19) =
+</LI>
+    <LI class=3D"cat-item cat-item-20"><A=20
+    title=3D"View all posts filed under Summer Of Code"=20
+    href=3D"http://blog.omega-prime.co.uk/?cat=3D20">Summer Of Code</A> =
+(7) </LI>
+    <LI class=3D"cat-item cat-item-1"><A=20
+    title=3D"View all posts filed under Uncategorized"=20
+    href=3D"http://blog.omega-prime.co.uk/?cat=3D1">Uncategorized</A> =
+(5) </LI>
+    <LI class=3D"cat-item cat-item-21"><A title=3D"View all posts filed =
+under Unix"=20
+    href=3D"http://blog.omega-prime.co.uk/?cat=3D21">Unix</A> (4) </LI>
+    <LI class=3D"cat-item cat-item-23"><A=20
+    title=3D"View all posts filed under Windows"=20
+    href=3D"http://blog.omega-prime.co.uk/?cat=3D23">Windows</A> (3) =
+</LI>
+    <LI class=3D"cat-item cat-item-22"><A title=3D"View all posts filed =
+under YAWS"=20
+    href=3D"http://blog.omega-prime.co.uk/?cat=3D22">YAWS</A> (1)=20
+</LI></UL></LI></UL></DIV></DIV>
+<DIV class=3Dclear></DIV></DIV></DIV><!-- End page /-->
+<DIV id=3Dfooter-wrap-outer>
+<DIV id=3Dfooter-wrap>
+<DIV id=3Dfooter>
+<DIV id=3Dsubscribe><A =
+href=3D"http://blog.omega-prime.co.uk/?feed=3Drss2">Subscribe=20
+RSS</A> </DIV>
+<DIV class=3Dclear></DIV>
+<DIV class=3Dlegal>Copyright =C2=A9 2009 :: (Bloggable a) =3D&gt; a =
+-&gt; IO ()</DIV>
+<DIV class=3Dcredit><A href=3D"http://wordpress.org/" =
+target=3D_blank>WordPress</A>=20
+Theme by <A href=3D"http://michael.tyson.id.au/wordpress" =
+target=3D_blank>Michael=20
+Tyson</A>.</DIV><!--stats_footer_test-->
+<SCRIPT type=3Dtext/javascript=20
+src=3D"http://stats.wordpress.com/e-201252.js"></SCRIPT>
+
+<SCRIPT type=3Dtext/javascript>=0A=
+st_go({blog:'1864771',v:'ext',post:'102'});=0A=
+var load_cmc =3D function(){linktracker_init(1864771,102,2);};=0A=
+if ( typeof addLoadEvent !=3D 'undefined' ) addLoadEvent(load_cmc);=0A=
+else load_cmc();=0A=
+</SCRIPT>
+</DIV></DIV></DIV></BODY></HTML>
+
+------=_NextPart_000_0000_01CDE388.975CEF40
+Content-Type: application/octet-stream
+Content-Transfer-Encoding: base64
+Content-Location: http://0.gravatar.com/avatar/6f4d592eab04f593a4b62ff87015dbea?s=32&d=http%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D32&r=G
+
+iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABxUlEQVRYw+2WTauqQBjH/+NkaUqi
+YZEvocsBF33/fZ+hXeRmYFoZClFgnsWFy7nk6c7YyOHAeZY688zveX/Ifr/v8I1i4JvlF+BnA5im
+iel0+hbARPWC4ziIogi+72My+XO9bVtUVQXOOeq6Hg8gSRKkaQpCyD/fKaVYLpcIggCcc5RlqT8E
+SZJgu90+Pf5ZCCGI4xhZlukFcBwHaZpKK91sNlgsFvoAoih6aflXntAG4Pu+cnZ7ngfDMN4HME3z
+b7Yr1bdhYDabvQ+g4vpRGtH9fkfbtsqKu67D7XbTkwNVVSkDXC4XPB4PPQCcc3Sd2trAOddXBXVd
+SysEACGEtNekO2FZllKeEELgeDyOMw2FEGia5sv/TdMoh0uqwCmlyLIMq9XqZVm6rovdbofz+YzT
+6SRVPf8FsG0bjDFYliXdhtfrNTzPw+FwwPV6HR4C27ZRFIX045/FsiwURQHbtocBUErBGINpmm9t
+TIwxUErVAfI8H2R5nyfyPFcDcF0XYRhq6/dhGMJ1XXmAOI61DqFX+4HRF7cgCLRPvSAIevPJ6Ds4
+xggmhPQa9gQgu8sNkT7dTwDz+Xw0gD7dTwAya9RQ6dP9AQ5xdGTXt3GMAAAAAElFTkSuQmCC
+
+------=_NextPart_000_0000_01CDE388.975CEF40
+Content-Type: text/css;
+	charset="koi8-r"
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://blog.omega-prime.co.uk/wp-content/themes/elegant-grunge/style.css
+
+BODY {
+	PADDING-BOTTOM: 0px; MARGIN: 0px; PADDING-LEFT: 0px; PADDING-RIGHT: =
+0px; FONT-FAMILY: "Palatino", "Georgia", "Baskerville", serif; =
+BACKGROUND: #4c4c4c; COLOR: #666; PADDING-TOP: 0px
+}
+A {
+	COLOR: #5f5f5f
+}
+IMG {
+	BORDER-BOTTOM: 0px; BORDER-LEFT: 0px; BORDER-TOP: 0px; BORDER-RIGHT: =
+0px
+}
+#menu {
+	BORDER-BOTTOM: #373737 1px solid; BACKGROUND-COLOR: #191919; HEIGHT: =
+3em
+}
+#menu UL {
+	PADDING-BOTTOM: 0px; LIST-STYLE-TYPE: none; MARGIN: 0px auto; =
+PADDING-LEFT: 0px; WIDTH: 800px; BOTTOM: 0px; PADDING-RIGHT: 0px; =
+LIST-STYLE-IMAGE: none; PADDING-TOP: 0px; LEFT: 0px
+}
+.double-right-sidebar #menu UL {
+	WIDTH: 947px
+}
+#menu UL LI {
+	FLOAT: left
+}
+#menu .page_item A {
+	LINE-HEIGHT: 3em; PADDING-RIGHT: 40px; DISPLAY: block; COLOR: #868686; =
+TEXT-DECORATION: none
+}
+#menu .current_page_item A {
+	COLOR: #fff
+}
+#menu .page_item A:hover {
+	COLOR: #fff
+}
+#header-wrap {
+	BACKGROUND: url(images/header-repeat.jpg) repeat-x center top
+}
+#header {
+	BACKGROUND: url(images/header.jpg) no-repeat center 50%; HEIGHT: 216px
+}
+.no-sidebar DIV #header {
+	BACKGROUND-IMAGE: url(images/header-no-sidebar.jpg)
+}
+.double-right-sidebar DIV #header {
+	BACKGROUND-IMAGE: url(images/header-double-sidebar.jpg)
+}
+#header DIV {
+	MARGIN: 0px auto; WIDTH: 800px
+}
+.double-right-sidebar #header DIV {
+	WIDTH: 947px
+}
+#header H1 {
+	MARGIN: 0px; FONT: 2.2em/169px "Georgia", "Baskerville", serif
+}
+#header H1 A {
+	FONT-STYLE: normal; FLOAT: left; COLOR: #d3d3d3; FONT-WEIGHT: normal; =
+TEXT-DECORATION: none; text-shadow: #000 0 1px 2px
+}
+#blog-description {
+	POSITION: relative; COLOR: #616161; TOP: 60px; LEFT: 1.3em; =
+text-shadow: #000 0 1px 1px
+}
+#content-container {
+	BACKGROUND: url(images/body.jpg) #f3f4ee repeat-y center top
+}
+.no-sidebar DIV #content-container {
+	BACKGROUND-IMAGE: url(images/body-no-sidebar.jpg)
+}
+.double-right-sidebar DIV #content-container {
+	BACKGROUND-IMAGE: url(images/body-double-sidebar.jpg)
+}
+#content {
+	MARGIN: 0px auto; WIDTH: 800px
+}
+.double-right-sidebar #content {
+	WIDTH: 947px
+}
+#body {
+	PADDING-LEFT: 20px; WIDTH: 490px; PADDING-RIGHT: 20px; FLOAT: left
+}
+.no-sidebar DIV DIV #body {
+	WIDTH: 760px; FLOAT: none
+}
+#sidebar {
+	POSITION: relative; WIDTH: 220px; FLOAT: right; FONT-SIZE: 0.9em; LEFT: =
+-15px
+}
+.double-right-sidebar #sidebar {
+	POSITION: relative; WIDTH: 181px; FLOAT: left; FONT-SIZE: 0.8em; LEFT: =
+28px
+}
+.double-right-sidebar #sidebar2 {
+	POSITION: relative; WIDTH: 169px; FLOAT: right; FONT-SIZE: 0.8em; LEFT: =
+-8px
+}
+#footer-wrap-outer {
+	MARGIN-TOP: -51px; BACKGROUND: url(images/footer-repeat.jpg) #4c4c4c =
+repeat-x center top
+}
+#footer-wrap {
+	PADDING-BOTTOM: 30px; WIDTH: 100%; BACKGROUND: url(images/footer.jpg) =
+no-repeat center top; PADDING-TOP: 91px
+}
+.no-sidebar DIV #footer-wrap {
+	BACKGROUND-IMAGE: url(images/footer-no-sidebar.jpg)
+}
+.double-right-sidebar DIV #footer-wrap {
+	BACKGROUND-IMAGE: url(images/footer-double-sidebar.jpg)
+}
+#footer {
+	MARGIN: 0px auto; MIN-HEIGHT: 30px; PADDING-LEFT: 7px; WIDTH: 800px; =
+PADDING-RIGHT: 7px; PADDING-TOP: 90px
+}
+H2 {
+	FONT-STYLE: normal; MARGIN-TOP: 0px; MARGIN-BOTTOM: 0.5em; COLOR: =
+#3b3b3b; FONT-SIZE: 2.4em; FONT-WEIGHT: normal
+}
+H2 A {
+	COLOR: #3b3b3b; TEXT-DECORATION: none
+}
+.post .entry {
+	LINE-HEIGHT: 1.3em; CLEAR: both; FONT-SIZE: 0.9em
+}
+.post .author {
+	POSITION: relative; COLOR: #949494; FONT-SIZE: 0.8em; TOP: -1.5em
+}
+.post .info {
+	COLOR: #bcbcbc; FONT-SIZE: 0.8em
+}
+.post .date {
+	BACKGROUND-IMAGE: url(images/date.jpg); TEXT-ALIGN: center; =
+TEXT-TRANSFORM: uppercase; WIDTH: 89px; FLOAT: right; HEIGHT: 73px
+}
+.post .date .month {
+	LINE-HEIGHT: 17px; DISPLAY: block; COLOR: #a9a9a9; FONT-SIZE: 14px; =
+FONT-WEIGHT: bold; PADDING-TOP: 3px
+}
+.post .date .day {
+	LINE-HEIGHT: 18px; DISPLAY: block; COLOR: #afafaf; FONT-SIZE: 20px; =
+FONT-WEIGHT: bold; PADDING-TOP: 3px
+}
+.post .date .year {
+	DISPLAY: block; COLOR: #a5a5a5; FONT-SIZE: 0.7em; PADDING-TOP: 3px
+}
+.metadata {
+	TEXT-ALIGN: center; MARGIN-TOP: 40px; COLOR: #797979; FONT-SIZE: 0.7em
+}
+.metadata A {
+	TEXT-DECORATION: none
+}
+.photoblog-thumbnail {
+	DISPLAY: inline; VERTICAL-ALIGN: middle
+}
+.more-link {
+	MARGIN-TOP: 30px; PADDING-LEFT: 30px; DISPLAY: block; BACKGROUND: =
+url(images/more-link.png) no-repeat left center; COLOR: #88897b; =
+MARGIN-LEFT: 20px; CLEAR: both; FONT-SIZE: 0.9em
+}
+.hr {
+	BACKGROUND-IMAGE: url(images/hr.jpg); BORDER-BOTTOM: 0px; BORDER-LEFT: =
+0px; BACKGROUND-COLOR: #f8faf7; MARGIN: -8px auto 0px; WIDTH: 426px; =
+HEIGHT: 121px; COLOR: #f8faf7; CLEAR: both; BORDER-TOP: 0px; =
+BORDER-RIGHT: 0px
+}
+.hr HR {
+	DISPLAY: none
+}
+.navigation {
+	MARGIN-TOP: 50px; WIDTH: 100%
+}
+.navigation A {
+	FONT-SIZE: 0.7em; TEXT-DECORATION: none
+}
+.navigation .previous {
+	FLOAT: right
+}
+.navigation .next {
+	FLOAT: left
+}
+.search_result {
+	MARGIN-LEFT: 20px
+}
+.search_result H4 {
+	MARGIN-LEFT: -20px
+}
+.search_result H4 A {
+	TEXT-DECORATION: none
+}
+.search_result .metadata {
+	TEXT-ALIGN: left; MARGIN-TOP: 10px; COLOR: #bfc4c1
+}
+.search_result .metadata A {
+	COLOR: #bfc4c1
+}
+.aligncenter {
+	DISPLAY: block; MARGIN-LEFT: auto; MARGIN-RIGHT: auto
+}
+DIV.aligncenter {
+	DISPLAY: block; MARGIN-LEFT: auto; MARGIN-RIGHT: auto
+}
+.alignleft {
+	FLOAT: left
+}
+.alignright {
+	FLOAT: right
+}
+.clear {
+	CLEAR: both
+}
+.wp-caption {
+	BORDER-BOTTOM: medium none; TEXT-ALIGN: center; BORDER-LEFT: medium =
+none; BACKGROUND-COLOR: #f8faf7; BORDER-TOP: medium none; BORDER-RIGHT: =
+medium none; PADDING-TOP: 4px
+}
+.wp-caption IMG {
+	BORDER-BOTTOM: 0px; BORDER-LEFT: 0px; PADDING-BOTTOM: 0px; MARGIN: 0px; =
+PADDING-LEFT: 0px; PADDING-RIGHT: 0px; BORDER-TOP: 0px; BORDER-RIGHT: =
+0px; PADDING-TOP: 0px
+}
+.wp-caption P.wp-caption-text {
+	PADDING-BOTTOM: 5px; LINE-HEIGHT: 17px; MARGIN: 0px; PADDING-LEFT: 4px; =
+PADDING-RIGHT: 4px; FONT-SIZE: 11px; PADDING-TOP: 0px
+}
+.commentlist {
+	PADDING-BOTTOM: 0px; LIST-STYLE-TYPE: none; MARGIN-TOP: 16px; =
+PADDING-LEFT: 0px; PADDING-RIGHT: 0px; MARGIN-LEFT: 0px; PADDING-TOP: =
+0px
+}
+.commentlist LI {
+	MARGIN-TOP: 16px; MAX-WIDTH: 460px; MARGIN-LEFT: 30px
+}
+.commentlist LI .comment-content {
+	BACKGROUND: url(images/comment.jpg) no-repeat right top
+}
+.commentlist LI .before-comment {
+	BACKGROUND: url(images/comment.jpg) no-repeat right top
+}
+.commentlist LI .after-comment {
+	BACKGROUND: url(images/comment.jpg) no-repeat right top
+}
+.commentlist LI .after-comment DIV {
+	BACKGROUND: url(images/comment.jpg) no-repeat right top
+}
+.commentlist LI .comment-content {
+	POSITION: relative; PADDING-BOTTOM: 0px; PADDING-LEFT: 0px; =
+PADDING-RIGHT: 0px; ZOOM: 1; PADDING-TOP: 28px; _overflow-y: hidden
+}
+.commentlist LI .before-comment {
+	POSITION: absolute; WIDTH: 27px; BACKGROUND-POSITION: left top; HEIGHT: =
+100%; MARGIN-LEFT: -27px; TOP: 0px; LEFT: 0px; _height: 1600px
+}
+.commentlist LI .after-comment {
+	POSITION: relative; WIDTH: 100%
+}
+.commentlist LI .after-comment {
+	HEIGHT: 40px; FONT-SIZE: 1px
+}
+.commentlist LI .after-comment DIV {
+	HEIGHT: 40px; FONT-SIZE: 1px
+}
+.commentlist LI .after-comment {
+	BACKGROUND-POSITION: right bottom
+}
+.commentlist LI .after-comment DIV {
+	POSITION: relative; WIDTH: 27px; BACKGROUND-POSITION: left bottom; =
+MARGIN-LEFT: -27px
+}
+.commentlist .comment {
+	MARGIN: 0px; PADDING-RIGHT: 27px; FONT-SIZE: 0.8em
+}
+.comment-text {
+	MARGIN-TOP: 24px; MARGIN-LEFT: 42px; FONT-SIZE: 0.9em; MARGIN-RIGHT: =
+10px
+}
+.comment-text * {
+	PADDING-BOTTOM: 0px; MARGIN-BOTTOM: 0px
+}
+.commentlist .comment .reply {
+	Z-INDEX: 100; POSITION: relative; TEXT-ALIGN: right; FONT-SIZE: 0.9em; =
+TOP: 15px
+}
+.commentlist .comment .reply A {
+	COLOR: #d7dbd8; TEXT-DECORATION: none
+}
+.avatar {
+	MARGIN: 0px 10px 0px 0px; FLOAT: left
+}
+INPUT.text {
+	BORDER-BOTTOM: #f2f2f2 1px solid; BORDER-LEFT: #f2f2f2 1px solid; =
+PADDING-BOTTOM: 5px; PADDING-LEFT: 5px; WIDTH: 200px; PADDING-RIGHT: =
+5px; BORDER-TOP: #f2f2f2 1px solid; BORDER-RIGHT: #f2f2f2 1px solid; =
+PADDING-TOP: 5px
+}
+TEXTAREA {
+	BORDER-BOTTOM: #f2f2f2 1px solid; BORDER-LEFT: #f2f2f2 1px solid; =
+PADDING-BOTTOM: 5px; MARGIN: 0px; PADDING-LEFT: 5px; WIDTH: 410px; =
+PADDING-RIGHT: 5px; HEIGHT: 100px; BORDER-TOP: #f2f2f2 1px solid; =
+BORDER-RIGHT: #f2f2f2 1px solid; PADDING-TOP: 5px
+}
+.aligncenter.frame-outer {
+	TEXT-ALIGN: center
+}
+.frame-outer SPAN {
+	DISPLAY: inline-block; BACKGROUND: url(images/frame-top-left.jpg) =
+no-repeat left top
+}
+.frame-outer SPAN SPAN {
+	BACKGROUND: url(images/frame-bottom-left.jpg) no-repeat left bottom
+}
+.frame-outer SPAN SPAN SPAN {
+	BACKGROUND: url(images/frame-top-right.jpg) no-repeat right top
+}
+.frame-outer SPAN SPAN SPAN SPAN {
+	MIN-WIDTH: 150px; TEXT-ALIGN: center; PADDING-BOTTOM: 32px; MIN-HEIGHT: =
+150px; PADDING-LEFT: 32px; PADDING-RIGHT: 32px; BACKGROUND: =
+url(images/frame-bottom-right.jpg) no-repeat right bottom; OVERFLOW: =
+hidden; PADDING-TOP: 32px
+}
+.frame-outer SPAN SPAN SPAN SPAN * {
+	MAX-WIDTH: 425px
+}
+.small.frame-outer SPAN {
+	BACKGROUND: url(images/frame-top-left-small.jpg) no-repeat left top
+}
+.small.frame-outer SPAN SPAN {
+	BACKGROUND: url(images/frame-bottom-left-small.jpg) no-repeat left =
+bottom
+}
+.small.frame-outer SPAN SPAN SPAN {
+	BACKGROUND: url(images/frame-top-right-small.jpg) no-repeat right top
+}
+.small.frame-outer SPAN SPAN SPAN SPAN {
+	MIN-WIDTH: 38px; PADDING-BOTTOM: 10px; MIN-HEIGHT: 38px; PADDING-LEFT: =
+10px; PADDING-RIGHT: 10px; BACKGROUND: =
+url(images/frame-bottom-right-small.jpg) no-repeat right bottom; =
+PADDING-TOP: 10px
+}
+.frame-outer SPAN SPAN SPAN SPAN SPAN {
+	BACKGROUND: none transparent scroll repeat 0% 0%
+}
+.frame-outer SPAN SPAN SPAN SPAN .wp-caption-text {
+	MARGIN-TOP: 10px
+}
+.sidebar H2 {
+	MARGIN-BOTTOM: 20px; COLOR: #676767; FONT-SIZE: 1.4em
+}
+.sidebar A {
+	COLOR: #9f9f9f
+}
+.sidebar UL {
+	PADDING-BOTTOM: 0px; MARGIN: 0px; PADDING-LEFT: 0px; PADDING-RIGHT: =
+0px; PADDING-TOP: 0px
+}
+.sidebar UL OL {
+	PADDING-BOTTOM: 0px; MARGIN: 0px; PADDING-LEFT: 0px; PADDING-RIGHT: =
+0px; PADDING-TOP: 0px
+}
+.sidebar UL LI {
+	LIST-STYLE-TYPE: none; MARGIN-BOTTOM: 25px; LIST-STYLE-IMAGE: none
+}
+.sidebar UL P {
+	MARGIN: 5px 0px 8px
+}
+.sidebar UL SELECT {
+	MARGIN: 5px 0px 8px
+}
+.sidebar UL UL {
+	MARGIN: 5px 0px 0px 10px
+}
+.sidebar UL OL {
+	MARGIN: 5px 0px 0px 10px
+}
+.sidebar UL UL UL {
+	MARGIN: 0px 0px 0px 10px
+}
+.sidebar UL OL {
+	MARGIN: 0px 0px 0px 10px
+}
+OL LI {
+	LIST-STYLE-POSITION: outside; LIST-STYLE-TYPE: decimal
+}
+.sidebar UL OL LI {
+	LIST-STYLE-POSITION: outside; LIST-STYLE-TYPE: decimal
+}
+.sidebar UL UL LI {
+	PADDING-BOTTOM: 0px; MARGIN: 3px 0px 0px; PADDING-LEFT: 0px; =
+PADDING-RIGHT: 0px; PADDING-TOP: 0px
+}
+.sidebar UL OL LI {
+	PADDING-BOTTOM: 0px; MARGIN: 3px 0px 0px; PADDING-LEFT: 0px; =
+PADDING-RIGHT: 0px; PADDING-TOP: 0px
+}
+.sidebar #searchform DIV {
+	BACKGROUND-IMAGE: url(images/searchform.jpg); WIDTH: 226px; HEIGHT: =
+49px; MARGIN-LEFT: -7px
+}
+.sidebar #searchform DIV #s {
+	BORDER-BOTTOM: 0px; BORDER-LEFT: 0px; MARGIN-TOP: 14px; OUTLINE-STYLE: =
+none; OUTLINE-COLOR: invert; OUTLINE-WIDTH: medium; WIDTH: 149px; =
+HEIGHT: 16px; COLOR: #909090; MARGIN-LEFT: 19px; FONT-SIZE: 1em; =
+BORDER-TOP: 0px; BORDER-RIGHT: 0px
+}
+.sidebar #searchform DIV #searchsubmit {
+	BORDER-BOTTOM: 0px; BORDER-LEFT: 0px; TEXT-TRANSFORM: lowercase; WIDTH: =
+39px; FONT-FAMILY: "Palatino", "Georgia", "Baskerville", serif; =
+BACKGROUND: none transparent scroll repeat 0% 0%; HEIGHT: 26px; COLOR: =
+#999; MARGIN-LEFT: 4px; FONT-SIZE: 0.7em; OVERFLOW: hidden; BORDER-TOP: =
+0px; CURSOR: pointer; BORDER-RIGHT: 0px
+}
+.double-right-sidebar .sidebar #searchform DIV {
+	BACKGROUND-IMAGE: url(images/searchform-double-sidebar.jpg); WIDTH: =
+190px; HEIGHT: 45px; MARGIN-LEFT: -3px
+}
+.double-right-sidebar .sidebar #searchform DIV #s {
+	BORDER-BOTTOM: 0px; BORDER-LEFT: 0px; MARGIN-TOP: 14px; OUTLINE-STYLE: =
+none; OUTLINE-COLOR: invert; OUTLINE-WIDTH: medium; WIDTH: 117px; =
+HEIGHT: 16px; COLOR: #909090; MARGIN-LEFT: 19px; FONT-SIZE: 0.9em; =
+BORDER-TOP: 0px; BORDER-RIGHT: 0px
+}
+.widget_tag_cloud A {
+	TEXT-DECORATION: none
+}
+#calendar_wrap {
+	MARGIN: 0px
+}
+#wp-calendar {
+	WIDTH: 100%
+}
+#wp-calendar TH {
+	TEXT-ALIGN: left
+}
+.sidebar .elegant_grunge_photoblog DIV {
+	TEXT-ALIGN: center
+}
+.sidebar .photoblog-thumbnail IMG {
+	BORDER-BOTTOM: #aaa 1px solid; BORDER-LEFT: #aaa 1px solid; =
+PADDING-BOTTOM: 3px; PADDING-LEFT: 3px; PADDING-RIGHT: 3px; DISPLAY: =
+inline; BACKGROUND: #fff; BORDER-TOP: #aaa 1px solid; BORDER-RIGHT: #aaa =
+1px solid; PADDING-TOP: 3px
+}
+#footer #subscribe A {
+	BACKGROUND-IMAGE: url(images/rss.png); POSITION: absolute; MARGIN-TOP: =
+-68px; TEXT-INDENT: -2000px; WIDTH: 149px; DISPLAY: block; HEIGHT: =
+126px; MARGIN-LEFT: -126px; OVERFLOW: hidden
+}
+#footer .legal {
+	COLOR: #5f5f5f
+}
+#footer .credit {
+	COLOR: #5f5f5f
+}
+#footer .legal {
+	FLOAT: left
+}
+#footer .credit A {
+	TEXT-DECORATION: none
+}
+#footer .credit {
+	FLOAT: right
+}
+#footer .widget-wrap {
+	WIDTH: 264px; MARGIN-BOTTOM: 36px; FLOAT: left
+}
+#footer .widget {
+	MARGIN-LEFT: 21px; MARGIN-RIGHT: 21px
+}
+#footer {
+	LINE-HEIGHT: 1.1em; FONT-SIZE: 0.8em
+}
+#footer A {
+	COLOR: #a3a3a3
+}
+#footer H2 {
+	FONT-STYLE: normal; MARGIN-BOTTOM: 15px; COLOR: #fff; FONT-SIZE: 1.3em; =
+FONT-WEIGHT: normal
+}
+
+------=_NextPart_000_0000_01CDE388.975CEF40
+Content-Type: text/css;
+	charset="koi8-r"
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://blog.omega-prime.co.uk/wp-content/themes/elegant-grunge/style-additional.css
+
+BODY {
+	PADDING-BOTTOM: 0px; MARGIN: 0px; PADDING-LEFT: 0px; PADDING-RIGHT: =
+0px; PADDING-TOP: 0px
+}
+PRE.textmate-source {
+	PADDING-BOTTOM: 0px; LINE-HEIGHT: 1.3em; MARGIN: 0px; PADDING-LEFT: =
+2px; PADDING-RIGHT: 0px; FONT-FAMILY: Monaco, monospace; WORD-WRAP: =
+break-word; WHITE-SPACE: pre-wrap; FONT-SIZE: 11px; PADDING-TOP: 0px
+}
+PRE.textmate-source {
+	BACKGROUND-COLOR: #141414; COLOR: #f8f8f8
+}
+PRE.textmate-source .linenum {
+	PADDING-BOTTOM: 0.2em; BACKGROUND-COLOR: #eee; PADDING-LEFT: 0px; =
+WIDTH: 75px; PADDING-RIGHT: 1em; COLOR: #888; PADDING-TOP: 0.1em
+}
+PRE.textmate-source SPAN {
+	PADDING-BOTTOM: 0.1em; PADDING-TOP: 0.2em
+}
+PRE.textmate-source .comment {
+	FONT-STYLE: italic; COLOR: #5f5a60
+}
+PRE.textmate-source .constant {
+	COLOR: #cf6a4c
+}
+PRE.textmate-source .entity {
+	COLOR: #9b703f
+}
+PRE.textmate-source .keyword {
+	COLOR: #cda869
+}
+PRE.textmate-source .storage {
+	COLOR: #f9ee98
+}
+PRE.textmate-source .string {
+	COLOR: #8f9d6a
+}
+PRE.textmate-source .support {
+	COLOR: #9b859d
+}
+PRE.textmate-source .variable {
+	COLOR: #7587a6
+}
+PRE.textmate-source .invalid_deprecated {
+	FONT-STYLE: italic; COLOR: #d2a8a1; TEXT-DECORATION: underline
+}
+PRE.textmate-source .invalid_illegal {
+	COLOR: #f8f8f8
+}
+PRE.textmate-source .text .source {
+=09
+}
+PRE.textmate-source .text_html_ruby .source {
+=09
+}
+PRE.textmate-source .entity_other_inherited-class {
+	FONT-STYLE: italic; COLOR: #9b5c2e
+}
+PRE.textmate-source .string .source {
+	COLOR: #daefa3
+}
+PRE.textmate-source .string .constant {
+	COLOR: #ddf2a4
+}
+PRE.textmate-source .string_regexp {
+	COLOR: #e9c062
+}
+PRE.textmate-source .string_regexp .constant_character_escape {
+	COLOR: #cf7d34
+}
+PRE.textmate-source .string_regexp .source_ruby_embedded {
+	COLOR: #cf7d34
+}
+PRE.textmate-source .string_regexp .string_regexp_arbitrary-repitition {
+	COLOR: #cf7d34
+}
+PRE.textmate-source .string .variable {
+	COLOR: #8a9a95
+}
+PRE.textmate-source .support_function {
+	COLOR: #dad085
+}
+PRE.textmate-source .support_constant {
+	COLOR: #cf6a4c
+}
+PRE.textmate-source .meta_preprocessor_c {
+	COLOR: #8996a8
+}
+PRE.textmate-source .meta_preprocessor_c .keyword {
+	COLOR: #afc4db
+}
+PRE.textmate-source .meta_tag_sgml_doctype {
+	COLOR: #494949
+}
+PRE.textmate-source .meta_tag_sgml_doctype .entity {
+	COLOR: #494949
+}
+PRE.textmate-source .meta_tag_sgml_doctype .string {
+	COLOR: #494949
+}
+PRE.textmate-source .meta_tag_preprocessor_xml {
+	COLOR: #494949
+}
+PRE.textmate-source .meta_tag_preprocessor_xml .entity {
+	COLOR: #494949
+}
+PRE.textmate-source .meta_tag_preprocessor_xml .string {
+	COLOR: #494949
+}
+PRE.textmate-source .declaration_tag {
+	COLOR: #ac885b
+}
+PRE.textmate-source .declaration_tag .entity {
+	COLOR: #ac885b
+}
+PRE.textmate-source .meta_tag {
+	COLOR: #ac885b
+}
+PRE.textmate-source .meta_tag .entity {
+	COLOR: #ac885b
+}
+PRE.textmate-source .declaration_tag_inline {
+	COLOR: #e0c589
+}
+PRE.textmate-source .declaration_tag_inline .entity {
+	COLOR: #e0c589
+}
+PRE.textmate-source .source .entity_name_tag {
+	COLOR: #e0c589
+}
+PRE.textmate-source .source .entity_other_attribute-name {
+	COLOR: #e0c589
+}
+PRE.textmate-source .meta_tag_inline {
+	COLOR: #e0c589
+}
+PRE.textmate-source .meta_tag_inline .entity {
+	COLOR: #e0c589
+}
+PRE.textmate-source .meta_selector_css .entity_name_tag {
+	COLOR: #cda869
+}
+PRE.textmate-source .meta_selector_css =
+.entity_other_attribute-name_tag_pseudo-class {
+	COLOR: #8f9d6a
+}
+PRE.textmate-source .meta_selector_css .entity_other_attribute-name_id {
+	COLOR: #8b98ab
+}
+PRE.textmate-source .meta_selector_css =
+.entity_other_attribute-name_class {
+	COLOR: #9b703f
+}
+PRE.textmate-source .support_type_property-name_css {
+	COLOR: #c5af75
+}
+PRE.textmate-source .meta_property-group =
+.support_constant_property-value_css {
+	COLOR: #f9ee98
+}
+PRE.textmate-source .meta_property-value =
+.support_constant_property-value_css {
+	COLOR: #f9ee98
+}
+PRE.textmate-source .meta_preprocessor_at-rule .keyword_control_at-rule =
+{
+	COLOR: #8693a5
+}
+PRE.textmate-source .meta_property-value =
+.support_constant_named-color_css {
+	COLOR: #ca7840
+}
+PRE.textmate-source .meta_property-value .constant {
+	COLOR: #ca7840
+}
+PRE.textmate-source .meta_constructor_argument_css {
+	COLOR: #8f9d6a
+}
+PRE.textmate-source .meta_diff {
+	BACKGROUND-COLOR: #0e2231; FONT-STYLE: italic; COLOR: #f8f8f8
+}
+PRE.textmate-source .meta_diff_header {
+	BACKGROUND-COLOR: #0e2231; FONT-STYLE: italic; COLOR: #f8f8f8
+}
+PRE.textmate-source .meta_separator {
+	BACKGROUND-COLOR: #0e2231; FONT-STYLE: italic; COLOR: #f8f8f8
+}
+PRE.textmate-source .markup_deleted {
+	BACKGROUND-COLOR: #420e09; COLOR: #f8f8f8
+}
+PRE.textmate-source .markup_changed {
+	BACKGROUND-COLOR: #4a410d; COLOR: #f8f8f8
+}
+PRE.textmate-source .markup_inserted {
+	BACKGROUND-COLOR: #253b22; COLOR: #f8f8f8
+}
+PRE.textmate-source .markup_list {
+	COLOR: #f9ee98
+}
+PRE.textmate-source .markup_heading {
+	COLOR: #cf6a4c
+}
+
+------=_NextPart_000_0000_01CDE388.975CEF40
+Content-Type: text/css;
+	charset="koi8-r"
+Content-Transfer-Encoding: 7bit
+Content-Location: http://blog.omega-prime.co.uk/wp-content/themes/elegant-grunge/ie.css
+
+.sidebar #searchform DIV #searchsubmit {
+	POSITION: relative; TOP: 3px
+}
+.sidebar #searchform DIV #s {
+	MARGIN-LEFT: 25px
+}
+.double-right-sidebar .sidebar #searchform DIV #s {
+	WIDTH: 119px
+}
+.hr {
+	MARGIN-TOP: 0px
+}
+.frame-outer SPAN SPAN SPAN SPAN * {
+	
+}
+.frame-outer .alignright {
+	FLOAT: none
+}
+.frame-outer .aligncenter {
+	DISPLAY: inline-block
+}
+#footer-wrap-outer {
+	MARGIN-TOP: 0px
+}
+#footer {
+	HEIGHT: auto !important
+}
+
+------=_NextPart_000_0000_01CDE388.975CEF40
+Content-Type: application/octet-stream
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://blog.omega-prime.co.uk/wp-includes/js/comment-reply.js?ver=3.4.2
+
+addComment=3D{moveForm:function(d,f,i,c){var =
+m=3Dthis,a,h=3Dm.I(d),b=3Dm.I(i),l=3Dm.I("cancel-comment-reply-link"),j=3D=
+m.I("comment_parent"),k=3Dm.I("comment_post_ID");if(!h||!b||!l||!j){retur=
+n}m.respondId=3Di;c=3Dc||false;if(!m.I("wp-temp-form-div")){a=3Ddocument.=
+createElement("div");a.id=3D"wp-temp-form-div";a.style.display=3D"none";b=
+.parentNode.insertBefore(a,b)}h.parentNode.insertBefore(b,h.nextSibling);=
+if(k&&c){k.value=3Dc}j.value=3Df;l.style.display=3D"";l.onclick=3Dfunctio=
+n(){var =
+n=3DaddComment,e=3Dn.I("wp-temp-form-div"),o=3Dn.I(n.respondId);if(!e||!o=
+){return}n.I("comment_parent").value=3D"0";e.parentNode.insertBefore(o,e)=
+;e.parentNode.removeChild(e);this.style.display=3D"none";this.onclick=3Dn=
+ull;return false};try{m.I("comment").focus()}catch(g){}return =
+false},I:function(a){return document.getElementById(a)}};
+------=_NextPart_000_0000_01CDE388.975CEF40
+Content-Type: application/octet-stream
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://stats.wordpress.com/e-201252.js
+
+function st_go(a){var =
+i,u=3Ddocument.location.protocol+'//stats.wordpress.com/g.gif?host=3D'+es=
+cape(document.location.host)+'&rand=3D'+Math.random();for(i in =
+a){u=3Du+'&'+i+'=3D'+escape(a[i]);}u=3Du+'&ref=3D'+escape(document.referr=
+er);document.open();document.write("<img id=3D\"wpstats\" =
+src=3D\""+u+"\" alt=3D\"\" />");document.close();}=0A=
+function wpcomAddEvent(el,ev,fn){var =
+isIE=3Dwindow.attachEvent?true:false;if(isIE)el.attachEvent('on'+ev,fn);e=
+lse if(el.addEventListener)el.addEventListener(ev,fn,false);}=0A=
+function linkmousedown(event){var =
+isIE=3Dwindow.attachEvent?true:false;event=3Devent?event:(window.event?wi=
+ndow.event:"");var =
+m=3DisIE?window.event.srcElement:event.currentTarget;m.modo=3Dtrue;}=0A=
+function linkmouseout(event){var =
+isIE=3Dwindow.attachEvent?true:false;event=3Devent?event:(window.event?wi=
+ndow.event:"");var =
+m=3DisIE?window.event.srcElement:event.currentTarget;m.modo=3Dfalse;}=0A=
+function linkmouseup(event){var =
+isIE=3Dwindow.attachEvent?true:false;event=3Devent?event:(window.event?wi=
+ndow.event:"");var =
+m=3DisIE?window.event.srcElement:event.currentTarget;if(m.modo)linktracke=
+r_record(event);}=0A=
+function linkclick(event){var =
+isIE=3Dwindow.attachEvent?true:false;event=3Devent?event:(window.event?wi=
+ndow.event:"");linktracker_record(event);}=0A=
+function linktracker_init(b,p){_blog=3Db;_post=3Dp;if(typeof =
+document.location.host!=3D'undefined')=0A=
+var localserver=3Ddocument.location.host;else=0A=
+var =
+localserver=3Ddocument.location.toString().replace(/^[^\/]*\/+([^\/]*)(\/=
+.*)?/,'$1');var els=3Ddocument.getElementsByTagName('a');for(var =
+i=3D0;i<els.length;i++){var =
+href=3Dels[i].href;if(href.match(eval('/^(http(s)?:\\/\\/)?'+localserver+=
+'/')))continue;wpcomAddEvent(els[i],'mousedown',linkmousedown);wpcomAddEv=
+ent(els[i],'mouseout',linkmouseout);wpcomAddEvent(els[i],'mouseup',linkmo=
+useup);}}=0A=
+function linktracker_record(event){var =
+isIE=3Dwindow.attachEvent?true:false;event=3Devent?event:(window.event?wi=
+ndow.event:"");var =
+b=3DisIE?window.event.srcElement:event.currentTarget;while(b.nodeName!=3D=
+"A"){if(typeof b.parentNode=3D=3D'undefined')return;b=3Db.parentNode;}=0A=
+var bh=3Db.href;var pr=3Ddocument.location.protocol||'http:';var =
+b=3D(typeof _blog!=3D'undefined')?_blog:0;var p=3D(typeof =
+_post!=3D'undefined')?_post:0;var i=3Dnew =
+Image(1,1);i.src=3Dpr+'//stats.wordpress.com/c.gif?s=3D2&b=3D'+b+'&p=3D'+=
+p+'&u=3D'+escape(bh);i.onLoad=3Dfunction(){cmcVoid();}}=0A=
+function cmcVoid(){return;}=0A=
+if(typeof _wpdq=3D=3D"undefined"){var =
+_qevents=3D_qevents||[];(function(){var =
+elem=3Ddocument.createElement('script');elem.src=3D(document.location.pro=
+tocol=3D=3D"https:"?"https://secure":"http://edge")+".quantserve.com/quan=
+t.js";elem.async=3Dtrue;elem.type=3D"text/javascript";var =
+scpt=3Ddocument.getElementsByTagName('script')[0];scpt.parentNode.insertB=
+efore(elem,scpt);})();_qevents.push({qacct:"p-18-mFEk4J448M",labels:"type=
+.wporg"});}
+------=_NextPart_000_0000_01CDE388.975CEF40--

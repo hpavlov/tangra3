@@ -5,7 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
+using Tangra.Helpers;
 using Tangra.PInvoke;
+using Tangra.Properties;
 
 namespace Tangra
 {
@@ -19,12 +21,19 @@ namespace Tangra
 		{
 			Trace.WriteLine(string.Format("Starting Tangra v{0}", Assembly.GetExecutingAssembly().GetName().Version));
 
-			Application.EnableVisualStyles();
+		    PlatformID platform = Environment.OSVersion.Platform;
+            if (platform != PlatformID.MacOSX && platform != PlatformID.Unix && 
+                platform != PlatformID.Win32Windows && platform != PlatformID.Win32NT && platform != PlatformID.Win32S)
+            {
+                // NOTE: Show a warning message that this may be unsupported or untested platform
+            }
+
+		    Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 			
 			Application.ThreadException += new System.Threading.ThreadExceptionEventHandler(Application_ThreadException);
 
-			SetupDllSearchPath();
+			//SetupDllSearchPath();
 
 			bool fatalError = false;
 			try

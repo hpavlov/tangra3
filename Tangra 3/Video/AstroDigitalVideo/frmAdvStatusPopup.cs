@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Helpers;
 using Tangra.Model.Config;
 using Tangra.Model.Image;
 
@@ -19,6 +20,9 @@ namespace Tangra.Video.AstroDigitalVideo
 		public frmAdvStatusPopup(AdvsSettings advSettings)
 		{
 			InitializeComponent();
+
+            if (CurrentOS.IsMac)
+                this.FormBorderStyle = FormBorderStyle.None;
 
 			m_AdvSettings = advSettings;
 		}

@@ -46,16 +46,69 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Astro\AstroImage.cs" />
+    <Compile Include="Astro\StarFinder.cs" />
+    <Compile Include="Astro\PSFFit.cs" />
     <Compile Include="Config\AdvsSettings.cs" />
     <Compile Include="Config\TangraConfig.cs" />
     <Compile Include="Context\ApplicationContext.cs" />
     <Compile Include="Context\RenderFrameContext.cs" />
     <Compile Include="Context\VideoContext.cs" />
+    <Compile Include="Controls\ucColorPicker.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\ucColorPicker.Designer.cs">
+      <DependentUpon>ucColorPicker.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ucUtcTimePicker.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\ucUtcTimePicker.Designer.cs">
+      <DependentUpon>ucUtcTimePicker.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Helpers\AllGrayPens.cs" />
+    <Compile Include="Helpers\AngleUtility.cs" />
+    <Compile Include="Helpers\AstroConvert.cs" />
+    <Compile Include="Helpers\Extensions.cs" />
+    <Compile Include="ImageTools\ImageTool.cs" />
+    <Compile Include="ImageTools\ObjectClickEventArgs.cs" />
+    <Compile Include="Image\Convolution.cs" />
     <Compile Include="Image\FrameStateData.cs" />
+    <Compile Include="Image\ImageFilters.cs" />
+    <Compile Include="Image\ImagePixel.cs" />
+    <Compile Include="Image\MeasurementsHelper.cs" />
     <Compile Include="Image\Pixelmap.cs" />
+    <Compile Include="Astro\frmPSFViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Astro\frmPSFViewer.Designer.cs">
+      <DependentUpon>frmPSFViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Numerical\Integration.cs" />
+    <Compile Include="Numerical\LinearRegression.cs" />
+    <Compile Include="Numerical\SafeMatrix.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VideoOperations\CompositeFramePreProcessor.cs" />
+    <Compile Include="VideoOperations\IImageHostCallbacks.cs" />
+    <Compile Include="VideoOperations\IMeasuredObject.cs" />
+    <Compile Include="VideoOperations\IVideoController.cs" />
+    <Compile Include="VideoOperations\IVideoOperation.cs" />
+    <Compile Include="VideoOperations\VideoOperationBase.cs" />
     <Compile Include="Video\FramePlayerTypes.cs" />
+    <Compile Include="Video\IFramePlayer.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Astro\frmPSFViewer.resx">
+      <DependentUpon>frmPSFViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\ucColorPicker.resx">
+      <DependentUpon>ucColorPicker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\ucUtcTimePicker.resx">
+      <DependentUpon>ucUtcTimePicker.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -60,9 +60,9 @@ namespace Tangra.Properties {
             }
         }
         
-        internal static System.Drawing.Bitmap aboutbox {
+        internal static System.Drawing.Bitmap aboutbox4 {
             get {
-                object obj = ResourceManager.GetObject("aboutbox", resourceCulture);
+                object obj = ResourceManager.GetObject("aboutbox4", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -65,7 +65,8 @@
       <AdditionalLibraryDirectories>.\lib\Debug;D:\Program Files\Microsoft SDKs\Windows\v6.0\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(TargetDir)TangraVideo.dll" "$(SolutionDir)Tangra 3\WindowsFiles" /y</Command>
+      <Command>xcopy "$(TargetDir)TangraVideo.dll" "$(SolutionDir)Tangra 3\WindowsFiles" /y
+xcopy "$(ProjectDir)lib\$(Configuration)\TangraCore.dll" "$(SolutionDir)Tangra 3\WindowsFiles" /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -87,6 +88,10 @@
       <AdditionalDependencies>Vfw32.lib;Strmiids.lib;TangraCoredll.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>TangraVideo.def</ModuleDefinitionFile>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy "$(TargetDir)TangraVideo.dll" "$(SolutionDir)Tangra 3\WindowsFiles" /y
+xcopy "$(ProjectDir)lib\$(Configuration)\TangraCore.dll" "$(SolutionDir)Tangra 3\WindowsFiles" /y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="TangraVideo.def" />

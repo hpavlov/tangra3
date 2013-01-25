@@ -14,7 +14,7 @@ using System.Runtime.InteropServices;
 	"CCharpFITS is Copyright by Virtual Observatory - India 2007.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Hristo Pavlov")]
-[assembly: AssemblyProduct("Tangra 3")]
+[assembly: AssemblyProduct("Tangra")]
 [assembly: AssemblyCopyright("Tangra is developed in 2012-2013 by Hristo Pavlov")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -38,4 +38,4 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("3.0.0.0")]
-[assembly: AssemblyFileVersion("3.0.0.*")]
+[assembly: AssemblyFileVersion("3.0.18")]

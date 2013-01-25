@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
+using Tangra.Helpers;
 using Tangra.PInvoke;
 
 namespace Tangra
@@ -13,26 +14,11 @@ namespace Tangra
     {
         public frmAbout()
         {
-            InitializeComponent();
+            InitializeComponent();        
 
-	        string tangraCoreVersion = TangraCore.GetTangraCoreVersion();
-	        string tangraVideoEngineVersion = TangraVideo.GetVideoEngineVersion();
-	        string environment = 
-#if WIN32
-		        "Windows";
-#elif __linux__
-				"Linux";
-#elif __APPLE__
-				"Mac OSX";
-#else
-				INVALID BUILD TYPE
-#endif
-		        
-
-            this.Text = String.Format("About {0}", AssemblyTitle);
-			this.lblProductName.Text = String.Format("{0}, Version {1}, {2} Build", AssemblyProduct, AssemblyVersion, environment);
-			this.lblComponentVersions.Text = string.Format("Tangra Core v{0}\n\rTangra Video Engine v{1}", tangraCoreVersion, tangraVideoEngineVersion);
+            this.Text = String.Format("About {0}", AssemblyTitle);			
 	        this.textBoxDescription.Text = AssemblyDescription;
+            this.lblProductName.Text = String.Format("{0} v{1}", AssemblyProduct, AssemblyFileVersion);
         }
 
         #region Assembly Attribute Accessorsw
@@ -59,6 +45,18 @@ namespace Tangra
             get
             {
                 return Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            }
+        }
+
+        public string AssemblyFileVersion
+        {
+            get
+            {
+                object[] atts = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyFileVersionAttribute), true);
+                if (atts != null && atts.Length == 1)
+                    return ((AssemblyFileVersionAttribute)atts[0]).Version;
+                else
+                    return AssemblyVersion;
             }
         }
 
@@ -101,5 +99,11 @@ namespace Tangra
             }
         }
         #endregion
+
+        private void btnSystemInfo_Click(object sender, EventArgs e)
+        {
+            frmSystemInfo frm = new frmSystemInfo();
+            frm.ShowDialog(this);
+        }
     }
 }

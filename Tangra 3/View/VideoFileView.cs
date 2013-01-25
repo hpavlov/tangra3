@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using Tangra.Model.Config;
 using Tangra.Model.Context;
+using Tangra.Model.Video;
 using Tangra.Video;
 
 namespace Tangra.View
@@ -86,12 +88,14 @@ namespace Tangra.View
 			if (!m_FramePlayer.IsRunning)
 				m_MainForm.ssFPS.Text = string.Empty;
 
-			//ssGamma.Text = string.Format("Gamma = {0}", TangraConfig.Settings.Photometry.EncodingGamma.ToString("0.00"));
-
-			//if (TangraConfig.Settings.Photometry.EncodingGamma != 1)
-			//    ssGamma.BackColor = Color.FromArgb(255, 255, 192);
-			//else
-			//    ssGamma.BackColor = ssFrameNo.BackColor;
+            if (TangraConfig.Settings.Photometry.EncodingGamma != 1)
+            {
+                m_MainForm.ssGamma.Visible = true;
+                m_MainForm.ssGamma.BackColor = Color.FromArgb(255, 255, 192);
+                m_MainForm.ssGamma.Text = string.Format("Gamma = {0}", TangraConfig.Settings.Photometry.EncodingGamma.ToString("0.00"));
+            }
+            else
+                m_MainForm.ssGamma.Visible = false;
 
 			//tslblDarkFrameLoaded.Visible = VideoContext.Current.DarkField != null;
 			//tslblFlatFrameLoaded.Visible = VideoContext.Current.FlatField != null;
@@ -168,6 +172,11 @@ namespace Tangra.View
 			TangraContext.Current.Reset();
 			Update();
 		}
+
+        public void StatusChanged(string displayName)
+        {
+            m_MainForm.ssStatus.Text = displayName;
+        }
         
 	}
 }

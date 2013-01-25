@@ -111,7 +111,14 @@ namespace Tangra.PInvoke
 			get
 			{
 				long millisecondsElapsed = (((long)MidFrameTimeStampMillisecondsHi) << 32) + (long)MidFrameTimeStampMillisecondsLo;
-				return REFERENCE_DATETIME.AddMilliseconds(millisecondsElapsed);
+                try
+                {
+                    return REFERENCE_DATETIME.AddMilliseconds(millisecondsElapsed);    
+                }
+                catch(ArgumentOutOfRangeException)
+                {
+                    return REFERENCE_DATETIME;
+                }
 			}
 		}
 
@@ -120,7 +127,14 @@ namespace Tangra.PInvoke
 			get
 			{
 				long millisecondsElapsed = (((long)SystemTimeHi) << 32) + (long)SystemTimeLo;
-				return REFERENCE_DATETIME.AddMilliseconds(millisecondsElapsed);
+                try
+                {
+                    return REFERENCE_DATETIME.AddMilliseconds(millisecondsElapsed);
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    return REFERENCE_DATETIME;
+                }
 			}
 		}
 

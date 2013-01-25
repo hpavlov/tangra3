@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Tangra.Model.Image;
+using Tangra.Model.Video;
 using Tangra.PInvoke;
 using Tangra.Video.AstroDigitalVideo;
 
@@ -18,13 +19,24 @@ namespace Tangra.Video
 		{ }
 	}
 
+    public class AdvEquipmentInfo
+    {
+        public string Recorder;
+        public string AdvrVersion;
+        public string HtccFirmareVersion;
+        public string Camera;
+        public string SensorInfo;
+    }
+
 	public class AstroDigitalVideoStream : IFrameStream
 	{
-		public static AstroDigitalVideoStream OpenFile(string fileName)
+		public static AstroDigitalVideoStream OpenFile(string fileName, out AdvEquipmentInfo equipmentInfo)
 		{
+            equipmentInfo = new AdvEquipmentInfo();
+
 			try
 			{
-				return new AstroDigitalVideoStream(fileName);
+				return new AstroDigitalVideoStream(fileName, ref equipmentInfo);
 			}
 			catch(ADVFormatException ex)
 			{
@@ -47,9 +59,9 @@ namespace Tangra.Video
 
 		private AdvFrameInfo m_CurrentFrameInfo;
 
-		private AstroDigitalVideoStream(string fileName)
+		private AstroDigitalVideoStream(string fileName, ref AdvEquipmentInfo equipmentInfo)
 		{
-			CheckAdvFileFormat(fileName);
+            CheckAdvFileFormat(fileName, ref equipmentInfo);
 
 			m_FileName = fileName;
 			var fileInfo = new AdvFileInfo();
@@ -151,7 +163,7 @@ namespace Tangra.Video
 			{
 				Bitmap displayBitmap = (Bitmap)Bitmap.FromStream(memStr);
 
-				var rv = new Pixelmap(m_Width, m_Height, m_BitPix, pixels, displayBitmap);
+                var rv = new Pixelmap(m_Width, m_Height, m_BitPix, pixels, displayBitmap, displayBitmapBytes);
 				rv.FrameState = GetCurrentFrameState();
 				return rv;
 			}
@@ -221,7 +233,7 @@ namespace Tangra.Video
 			{
 				Bitmap displayBitmap = (Bitmap)Bitmap.FromStream(memStr);
 
-				return new Pixelmap(m_Width, m_Height, m_BitPix, pixels, displayBitmap);
+                return new Pixelmap(m_Width, m_Height, m_BitPix, pixels, displayBitmap, displayBitmapBytes);
 			}
 		}
 
@@ -230,11 +242,17 @@ namespace Tangra.Video
 			get { return "ADV"; }
 		}
 
-		private void CheckAdvFileFormat(string fileName)
+        private void CheckAdvFileFormat(string fileName, ref AdvEquipmentInfo equipmentInfo)
 		{
-			var advFile = AdvFile.OpenFile(fileName);
+			AdvFile advFile = AdvFile.OpenFile(fileName);
 
 			CheckAdvFileFormatInternal(advFile);
+
+            equipmentInfo.Recorder = advFile.AdvFileTags["RECORDER"];
+            equipmentInfo.AdvrVersion = advFile.AdvFileTags["ADVR-SOFTWARE-VERSION"];
+            equipmentInfo.HtccFirmareVersion = advFile.AdvFileTags["HTCC-FIRMWARE-VERSION"];
+            equipmentInfo.Camera = advFile.AdvFileTags["CAMERA-MODEL"];
+            equipmentInfo.SensorInfo = advFile.AdvFileTags["CAMERA-SENSOR-INFO"];
 		}
 
 		private void CheckAdvFileFormatInternal(AdvFile advFile)

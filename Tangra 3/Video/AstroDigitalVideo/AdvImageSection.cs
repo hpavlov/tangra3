@@ -228,7 +228,7 @@ namespace Tangra.Video.AstroDigitalVideo
 			// TODO:
 			Bitmap displayBitmap = null; //PixelmapFactory.ConstructBitmapFromBitmapPixels(displayBitmapBytes, (int) Width, (int) Height);
 
-			Pixelmap rv = new Pixelmap((int)Width, (int)Height, BitsPerPixel, pixels, displayBitmap);
+            Pixelmap rv = new Pixelmap((int)Width, (int)Height, BitsPerPixel, pixels, displayBitmap, displayBitmapBytes);
 
 			return rv;
 		}

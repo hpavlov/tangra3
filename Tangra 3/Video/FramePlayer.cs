@@ -166,7 +166,12 @@ namespace Tangra.Video
 			return currentBitmap;
 		}
 
-		public void StepBackward()
+        public Pixelmap GetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging)
+        {
+            return m_VideoStream.GetIntegratedFrame(startFrameNo, framesToIntegrate, isSlidingIntegration, isMedianAveraging);
+        }
+
+	    public void StepBackward()
 		{
 			m_CurrentFrameIndex--;
 			if (m_CurrentFrameIndex < m_VideoStream.FirstFrame) m_CurrentFrameIndex = m_VideoStream.FirstFrame;

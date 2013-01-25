@@ -110,13 +110,13 @@ namespace Tangra.PInvoke
 			s_fileInfo = null;
 		}
 
-		public static void GetFrame(int frameNo, out uint[] pixels, out Bitmap videoFrame)
+        public static void GetFrame(int frameNo, out uint[] pixels, out Bitmap videoFrame, out byte[] bitmapBytes)
 		{
 			if (s_fileInfo != null)
 			{
 				pixels = new uint[s_fileInfo.Width * s_fileInfo.Height];
 				byte[] bitmapPixels = new byte[s_fileInfo.BitmapImageSize + 40 + 14 + 1];
-				byte[] bitmapBytes = new byte[s_fileInfo.Width * s_fileInfo.Height];
+				bitmapBytes = new byte[s_fileInfo.Width * s_fileInfo.Height];
 
 				TangraVideoGetFrame(frameNo, pixels, bitmapPixels, bitmapBytes);
 

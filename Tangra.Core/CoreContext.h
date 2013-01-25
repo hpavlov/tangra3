@@ -2,6 +2,7 @@
 #define CORE_CONTEXT
 
 #include "cross_platform.h"
+#include "version.h"
 
 enum ColorChannel
 {
@@ -60,11 +61,7 @@ HRESULT Set8BitColourChannel(long colourChannel)
 
 DLL_PUBLIC int GetProductVersion()
 {
-	int major = 3;
-	int minor = 0;
-	int revision = 15;
-
-	return (major << 28) + (minor << 16) + revision;
+	return (VERSION_MAJOR << 28) + (VERSION_MINOR << 16) + VERSION_REVISION;
 }
 
 #ifdef __cplusplus

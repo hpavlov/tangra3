@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Tangra.Config.SettingPannels;
+using Tangra.Helpers;
 using Tangra.Model.Config;
 
 namespace Tangra.Config
@@ -27,7 +28,7 @@ namespace Tangra.Config
 
 			InitAllPropertyPages();
 
-			TangraConfig.Load();
+            TangraConfig.Load(ApplicationSettingsSerializer.Instance);
 
 			m_AdvPopupCustomizer = advPopupCustomizer;
 
@@ -147,7 +148,7 @@ namespace Tangra.Config
 					return;
 			}
 
-			TangraConfig.Settings.Save();
+            TangraConfig.Settings.Save();
 
 			foreach (SettingsPannel panel in m_PropertyPages.Values)
 			{

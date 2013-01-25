@@ -1,0 +1,8 @@
+Package: tangra
+Version: 3.0.17.1
+Section: non-free/science
+Priority: optional
+Depends: mono-runtime (>= 2.10.8.1), libmono-winforms2.0-cli (>= 2.10.8.1)
+Maintainer: Hristo Pavlov <hristo_dpavlov@yahoo.com>
+Architecture: i386
+Description: Tangra5 blah blah blah

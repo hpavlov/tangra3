@@ -104,6 +104,7 @@
       <DependentUpon>ucTracking.cs</DependentUpon>
     </Compile>
     <Compile Include="Controller\VideoController.cs" />
+    <Compile Include="Controller\VideoOperationController.cs" />
     <Compile Include="Controls\ucColorPicker.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -134,12 +135,66 @@
     <Compile Include="frmSplashScreen.Designer.cs">
       <DependentUpon>frmSplashScreen.cs</DependentUpon>
     </Compile>
+    <Compile Include="frmSystemInfo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmSystemInfo.Designer.cs">
+      <DependentUpon>frmSystemInfo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmTargetPSFViewerForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmTargetPSFViewerForm.Designer.cs">
+      <DependentUpon>frmTargetPSFViewerForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Helpers\ApplicationSettingsSerializer.cs" />
     <Compile Include="Helpers\Extensions.cs" />
     <Compile Include="Helpers\NotificationManager.cs" />
+    <Compile Include="Helpers\TangraEnvironment.cs" />
+    <Compile Include="ImageTools\ArrowTool.cs" />
     <Compile Include="PInvoke\TangraCore.cs" />
     <Compile Include="PInvoke\TangraVideo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VideoOperations\LightCurves\DisplayBitmapConverter.cs" />
+    <Compile Include="VideoOperations\LightCurves\frmAddOrEditSingleTarget.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\frmAddOrEditSingleTarget.Designer.cs">
+      <DependentUpon>frmAddOrEditSingleTarget.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\frmSelectReductionType.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\frmSelectReductionType.Designer.cs">
+      <DependentUpon>frmSelectReductionType.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\LCStateMachine.cs" />
+    <Compile Include="VideoOperations\LightCurves\LCStateReadyToRun.cs" />
+    <Compile Include="VideoOperations\LightCurves\LCStateRunning.cs" />
+    <Compile Include="VideoOperations\LightCurves\LCStateSelectMeasuringStars.cs" />
+    <Compile Include="VideoOperations\LightCurves\LCStateViewingLightCurve.cs" />
+    <Compile Include="VideoOperations\LightCurves\LightCurveReductionContext.cs" />
+    <Compile Include="VideoOperations\LightCurves\ReduceLightCurveOperation.cs" />
+    <Compile Include="VideoOperations\LightCurves\Tracking\OccultationTracker.cs" />
+    <Compile Include="VideoOperations\LightCurves\Tracking\OneStarTracker.cs" />
+    <Compile Include="VideoOperations\LightCurves\Tracking\TrackedObject.cs" />
+    <Compile Include="VideoOperations\LightCurves\Tracking\TrackedObjectConfig.cs" />
+    <Compile Include="VideoOperations\LightCurves\Tracking\Tracker.cs" />
+    <Compile Include="VideoOperations\LightCurves\Tracking\TrackerFactory.cs" />
+    <Compile Include="VideoOperations\LightCurves\Tracking\UntrackedTracker.cs" />
+    <Compile Include="VideoOperations\LightCurves\ucLightCurves.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\ucLightCurves.Designer.cs">
+      <DependentUpon>ucLightCurves.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\ucPreProcessing.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\ucPreProcessing.Designer.cs">
+      <DependentUpon>ucPreProcessing.cs</DependentUpon>
+    </Compile>
     <Compile Include="Video\AstroDigitalVideoStream.cs" />
     <Compile Include="Video\AstroDigitalVideo\AdvFile.cs" />
     <Compile Include="Video\AstroDigitalVideo\AdvFramesIndex.cs" />
@@ -172,9 +227,9 @@
     <Compile Include="Video\AstroDigitalVideo\Interfaces.cs" />
     <Compile Include="Video\AstroDigitalVideo\UI\AdvTagValuePair.cs" />
     <Compile Include="Video\FramePlayer.cs" />
-    <Compile Include="Video\IFramePlayer.cs" />
     <Compile Include="Video\VideoStream.cs" />
     <Compile Include="View\VideoFileView.cs" />
+    <Compile Include="View\ZoomedImageView.cs" />
     <EmbeddedResource Include="Config\frmTangraSettings.resx">
       <DependentUpon>frmTangraSettings.cs</DependentUpon>
     </EmbeddedResource>
@@ -214,6 +269,12 @@
     <EmbeddedResource Include="frmSplashScreen.resx">
       <DependentUpon>frmSplashScreen.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="frmSystemInfo.resx">
+      <DependentUpon>frmSystemInfo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmTargetPSFViewerForm.resx">
+      <DependentUpon>frmTargetPSFViewerForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -224,6 +285,18 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="VideoOperations\LightCurves\frmAddOrEditSingleTarget.resx">
+      <DependentUpon>frmAddOrEditSingleTarget.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\frmSelectReductionType.resx">
+      <DependentUpon>frmSelectReductionType.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\ucLightCurves.resx">
+      <DependentUpon>ucLightCurves.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\ucPreProcessing.resx">
+      <DependentUpon>ucPreProcessing.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Video\AstroDigitalVideo\frmAdvIndexRebuilder.resx">
       <DependentUpon>frmAdvIndexRebuilder.cs</DependentUpon>
     </EmbeddedResource>
@@ -233,6 +306,7 @@
     <EmbeddedResource Include="Video\AstroDigitalVideo\frmAdvViewer.resx">
       <DependentUpon>frmAdvViewer.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="app.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -251,6 +325,9 @@
     <Folder Include="Task\" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="img\aboutbox2.bmp" />
+    <None Include="img\aboutbox3.bmp" />
+    <None Include="img\aboutbox4.bmp" />
     <Content Include="WindowsFiles\TangraCore.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

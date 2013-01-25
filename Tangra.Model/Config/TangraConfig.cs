@@ -23,6 +23,15 @@ namespace Tangra.Model.Config
 		void RefreshState();
 	}
 
+    public interface ISettingsSerializer
+    {
+        string LoadSettings();
+        void SaveSettings(string settings);
+
+        string LoadRecentFiles();
+        void SaveRecentFiles(string settings);
+    }
+
 	public enum RecentFileType
 	{
 		Video,
@@ -88,46 +97,16 @@ namespace Tangra.Model.Config
 			return output.ToString();
 		}
 
-		public void Save()
+		public string GetContentToSave()
 		{
-			string contentString = GetRecentFilesList();
-			try
-			{
-				using (IsolatedStorageFile fs = IsolatedStorageFile.GetMachineStoreForAssembly())
-				using (IsolatedStorageFileStream isolatedStorageFileStream = new IsolatedStorageFileStream("TangraRecentFiles.lst", FileMode.Create, fs))
-				{
-					using (TextWriter wrt = new StreamWriter(isolatedStorageFileStream))
-					{
-						wrt.Write(contentString);
-						isolatedStorageFileStream.Flush(true);
-					}
-				}
-			}
-			catch (UnauthorizedAccessException)
-			{
-				// TODO: We may have already deleted the previous settings. Think of a better way to save the settings
-			}
-			catch (IOException ex)
-			{
-				Trace.WriteLine(ex.ToString());
-			}			
+			return GetRecentFilesList();
 		}
-		
-		public void Load()
+
+        public void Load(string savedContent)
 		{
 			try
 			{
-				using (IsolatedStorageFile fs = IsolatedStorageFile.GetMachineStoreForAssembly())
-				using (IsolatedStorageFileStream isolatedStorageFileStream = new IsolatedStorageFileStream("TangraRecentFiles.lst", FileMode.OpenOrCreate, fs))
-				{
-					string savedContent;
-					using (TextReader rdr = new StreamReader(isolatedStorageFileStream))
-					{
-						savedContent = rdr.ReadToEnd();
-					}
-
-					LoadRecentFiles(savedContent);
-				}
+                LoadRecentFiles(savedContent);
 			}
 			catch (Exception ex)
 			{
@@ -142,17 +121,21 @@ namespace Tangra.Model.Config
 
 	public class TangraConfig
 	{
-		public static TangraConfig Settings = new TangraConfig(false);
-		public static RecentFilesConfig RecentFiles = new RecentFilesConfig();
+		public static TangraConfig Settings;
 
-		public TangraConfig()
-			: this(true)
-		{ }
+        [XmlIgnore]
+        public RecentFilesConfig RecentFiles = new RecentFilesConfig();
 
-		public TangraConfig(bool readOnly)
+        public TangraConfig()
+        { }
+
+		private TangraConfig(ISettingsSerializer serializer, bool readOnly)
 		{
 			m_IsReadOnly = readOnly;
+		    m_Serializer = serializer;
 		}
+
+	    private ISettingsSerializer m_Serializer;
 
 		private bool m_IsReadOnly = true;
 		public bool IsReadOnly
@@ -162,22 +145,16 @@ namespace Tangra.Model.Config
 
 		public AdvsSettings ADVS = new AdvsSettings();
 
-		private static void LoadXml(string xmlString)
+        private static void LoadXml(string xmlString, string recentFiles)
 		{
-			XmlSerializer ser = new XmlSerializer(typeof(TangraConfig));
+			var ser = new XmlSerializer(typeof(TangraConfig));
 			using (TextReader rdr = new StringReader(xmlString))
 			{
-				try
-				{
-					Settings = (TangraConfig)ser.Deserialize(rdr);
-					Settings.m_IsReadOnly = false;
-				}
-				catch (Exception ex)
-				{
-					Trace.WriteLine(ex);
-					Settings = new TangraConfig(false);
-				}
+				Settings = (TangraConfig)ser.Deserialize(rdr);
+				Settings.m_IsReadOnly = false;
 			}
+
+            Settings.RecentFiles.Load(recentFiles);
 
 			//if (Settings.DefaultsConfigurationVersion < TangraDefaults.Current.Version)
 			//{
@@ -185,52 +162,42 @@ namespace Tangra.Model.Config
 			//}
 		}
 
-		public static void Load()
+
+        public static void Load(ISettingsSerializer serializer)
 		{
 			try
 			{
-				using (IsolatedStorageFile fs = IsolatedStorageFile.GetMachineStoreForAssembly())
-				using (IsolatedStorageFileStream isolatedStorageFileStream = new IsolatedStorageFileStream("TangraUserSettings.xml", FileMode.OpenOrCreate, fs))
-				{
-					string xmlContent;
-					using (TextReader rdr = new StreamReader(isolatedStorageFileStream))
-					{
-						xmlContent = rdr.ReadToEnd();
-					}
+                string xmlContent = serializer.LoadSettings();
+                string recentFiles = serializer.LoadRecentFiles();
+                LoadXml(xmlContent, recentFiles);
 
-					LoadXml(xmlContent);
-				}
+			    Settings.m_Serializer = serializer;
 			}
 			catch (Exception ex)
 			{
 				Trace.WriteLine(ex);
-				Settings = new TangraConfig(false);				
+                Settings = new TangraConfig(serializer, false);				
 			}			
 		}
 
-		public void Save()
+        public void Save()
 		{
 			if (!m_IsReadOnly)
 			{
-				XmlSerializer ser = new XmlSerializer(typeof(TangraConfig));
-				StringBuilder strData = new StringBuilder();
+				var ser = new XmlSerializer(typeof(TangraConfig));
+				var strData = new StringBuilder();
 				using (TextWriter rdr = new StringWriter(strData))
 				{
 					ser.Serialize(rdr, this);
 					rdr.Flush();
 				}
 				string xmlString = strData.ToString();
+			    string recentFiles = RecentFiles.GetContentToSave();
+
 				try
 				{
-					using (IsolatedStorageFile fs = IsolatedStorageFile.GetMachineStoreForAssembly())
-					using (IsolatedStorageFileStream isolatedStorageFileStream = new IsolatedStorageFileStream("TangraUserSettings.xml", FileMode.Create, fs))
-					{
-						using (TextWriter wrt = new StreamWriter(isolatedStorageFileStream))
-						{
-							wrt.Write(xmlString);
-							isolatedStorageFileStream.Flush(true);
-						}
-					}
+				    m_Serializer.SaveSettings(xmlString);
+                    m_Serializer.SaveRecentFiles(recentFiles);
 				}
 				catch (UnauthorizedAccessException)
 				{
@@ -248,6 +215,8 @@ namespace Tangra.Model.Config
 		public Colors Color = new Colors();
 		public GenericSettings Generic = new GenericSettings();
 		public SpecialSettings Special = new SpecialSettings();
+
+	    public LastUsedSettings LastUsed = new LastUsedSettings();
 
 		public class SaturationSettings
 		{
@@ -289,6 +258,13 @@ namespace Tangra.Model.Config
 			PsfPhotometryAnalytical,
 			OptimalExtraction
 		}
+
+        public enum PreProcessingFilter
+        {
+            NoFilter,
+            LowPassFilter,
+            LowPassDifferenceFilter
+        }
 
 		public enum SignalApertureUnit
 		{
@@ -388,6 +364,39 @@ namespace Tangra.Model.Config
 			public int AboveMedianThreasholdForGuiding = 50;
 			public float SignalNoiseForGuiding = 4.5f;
 			public uint StarFinderAboveNoiseLevel = 25;
+            public float TimesStdDevsForBackgroundNoise = 3.0f;
+            public float TimesStdDevsForBackgroundNoiseLP = 1.0f;
+            public float TimesStdDevsForBackgroundNoiseLPD = 1.0f;
+            public float AboveMedianCoeffLP = 0.8f;
+            public float AboveMedianCoeffLPD = 0.2f;
+
+            public float BrightnessFluctoationCoefficientHighFlickering = 1.75f;
+            public float BrightnessFluctoationCoefficientNoFlickering = 1.5f;
+
+            public double StarFinderMinFWHM = 2.2;
+            public double StarFinderMaxFWHM = 6.5;
+            public double StarFinderMinSeparation = 3.5;
+            public double StarFinderMinDistanceOfPeakPixelFromCenter = 4.25;
+            public int StarFinderFitArea = 7;
+            public double MinDistanceForPhotometricGroupingInFWHM = 4.0;
+            public int StarFinderMaxNumberOfPotentialStars = 500;
+            public float RejectionBackgroundPixelsStdDev = 6.0f;
+
+            public int DefaultComparisonStarPsfFitMatrixSize = 11;
+            public int DefaultOccultedStarPsfFitMatrixSize = 15;
+
+            public int AddStarImageFramesToIntegrate = 4;
+
+            public double ToleranceFWHMCoeff = 0.33;
+            public double ToleranceTwoBadnessCoeff = 6.67;
+            public double ToleranceOneBadnessCoeff = 5.0;
+            public double ToleranceMaxValue = 3.5;
+            public double ToleranceMinValueFullDisappearance = 1.0;
+            public double ToleranceMinValue = 2.0;
+
+            public float MaxAllowedTimestampShiftInMs = 5.0f;
+            public float TimesHigherPositionToleranceForFullyOccultedStars = 2.0f;
+            public float PalNtscFrameRateDifference = 0.0025f;
 
 			#region Lost Tracking Configuration
 			public float LostTrackingMinDistance = 4f;
@@ -447,8 +456,14 @@ namespace Tangra.Model.Config
 			public int PreferredRenderingEngineIndex = 0;
 
 			public bool AcceptBetaUpdates = false;
-
 		}
+
+        public class LastUsedSettings
+        {
+            public bool AdvancedLightCurveSettings = false;
+            public PhotometryReductionMethod ReductionType = PhotometryReductionMethod.AperturePhotometry;
+            public int MeasuringZoomImageMode = 0;
+        }
 
 		public class Colors
 		{

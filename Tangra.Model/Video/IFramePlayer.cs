@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using Tangra.Model.Image;
 using Tangra.Model.Video;
 
-namespace Tangra.Video
+namespace Tangra.Model.Video
 {
 	public delegate void RenderFrameCallback(
 		int currentFrameIndex,
@@ -56,6 +56,7 @@ namespace Tangra.Video
 		void StepBackward(int seconds);
 		void MoveToFrame(int frameNo);
 		Pixelmap GetFrame(int frameNo, bool noIntegrate);
+        Pixelmap GetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging);
 		void DisposeResources();
 		void OpenVideo(IFrameStream frameStream);
 		void CloseVideo();
