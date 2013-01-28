@@ -50,6 +50,7 @@
     <Compile Include="Astro\StarFinder.cs" />
     <Compile Include="Astro\PSFFit.cs" />
     <Compile Include="Config\AdvsSettings.cs" />
+    <Compile Include="Config\OCRConfigEntry.cs" />
     <Compile Include="Config\TangraConfig.cs" />
     <Compile Include="Context\ApplicationContext.cs" />
     <Compile Include="Context\RenderFrameContext.cs" />
@@ -70,6 +71,8 @@
     <Compile Include="Helpers\AngleUtility.cs" />
     <Compile Include="Helpers\AstroConvert.cs" />
     <Compile Include="Helpers\Extensions.cs" />
+    <Compile Include="Helpers\PositionMemento.cs" />
+    <Compile Include="Helpers\ThreadingHelper.cs" />
     <Compile Include="ImageTools\ImageTool.cs" />
     <Compile Include="ImageTools\ObjectClickEventArgs.cs" />
     <Compile Include="Image\Convolution.cs" />
@@ -84,6 +87,7 @@
     <Compile Include="Astro\frmPSFViewer.Designer.cs">
       <DependentUpon>frmPSFViewer.cs</DependentUpon>
     </Compile>
+    <Compile Include="Numerical\GaussianFit.cs" />
     <Compile Include="Numerical\Integration.cs" />
     <Compile Include="Numerical\LinearRegression.cs" />
     <Compile Include="Numerical\SafeMatrix.cs" />
