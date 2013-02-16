@@ -76,7 +76,7 @@ namespace Tangra.VideoOperations.LightCurves
     	public bool HasEmbeddedTimeStamps { get; set; }
 
     	public uint MaxPixelValue = 256;
-    	public IDisplayBitmapConverter DisplayBitmapConverterImpl;
+    	public IDisplayBitmapConverter DisplayBitmapConverterImpl = new DisplayBitmapConverter.DefaultDisplayBitmapConverter();
 
         public Rectangle OSDFrame;
 

@@ -109,8 +109,10 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 		    m_SelectedMeasurements = null;
 		}
 
-		private void HandleNewSelectedFrame()
+		internal void HandleNewSelectedFrame(LCMeasurement[] selectedMeasurements)
 		{
+			m_SelectedMeasurements = selectedMeasurements;
+
             for (int i = 0; i < m_TargetBoxes.Length; i++)
             {
                 infoProvider.SetError(m_TargetBoxes[i], null);

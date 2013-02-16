@@ -118,7 +118,7 @@
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
+			this.BackColor = System.Drawing.SystemColors.Control;
 			this.Controls.Add(this.dtpDate);
 			this.Controls.Add(this.tbxHours);
 			this.Controls.Add(this.tbxMinutes);

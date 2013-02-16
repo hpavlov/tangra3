@@ -44,8 +44,8 @@ namespace Tangra.VideoOperations.LightCurves
             this.btnLightCurve = new System.Windows.Forms.Button();
             this.btnStop = new System.Windows.Forms.Button();
             this.pnlMeasureZoomOptions = new System.Windows.Forms.Panel();
-            this.cbxDisplayPixels = new System.Windows.Forms.CheckBox();
-            this.cbxDisplayBrightness = new System.Windows.Forms.CheckBox();
+			this.rbDisplayPixels = new System.Windows.Forms.RadioButton();
+			this.rbDisplayBrightness = new System.Windows.Forms.RadioButton();
             this.label3 = new System.Windows.Forms.Label();
             this.lblElapsedTime = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
@@ -220,8 +220,8 @@ namespace Tangra.VideoOperations.LightCurves
             // 
             // pnlMeasureZoomOptions
             // 
-            this.pnlMeasureZoomOptions.Controls.Add(this.cbxDisplayPixels);
-            this.pnlMeasureZoomOptions.Controls.Add(this.cbxDisplayBrightness);
+            this.pnlMeasureZoomOptions.Controls.Add(this.rbDisplayPixels);
+            this.pnlMeasureZoomOptions.Controls.Add(this.rbDisplayBrightness);
             this.pnlMeasureZoomOptions.Controls.Add(this.label3);
             this.pnlMeasureZoomOptions.Location = new System.Drawing.Point(3, 2);
             this.pnlMeasureZoomOptions.Name = "pnlMeasureZoomOptions";
@@ -229,23 +229,23 @@ namespace Tangra.VideoOperations.LightCurves
             this.pnlMeasureZoomOptions.TabIndex = 39;
             this.pnlMeasureZoomOptions.Visible = false;
             // 
-            // cbxDisplayPixels
+            // rbDisplayPixels
             // 
-            this.cbxDisplayPixels.Location = new System.Drawing.Point(131, 2);
-            this.cbxDisplayPixels.Name = "cbxDisplayPixels";
-            this.cbxDisplayPixels.Size = new System.Drawing.Size(75, 19);
-            this.cbxDisplayPixels.TabIndex = 41;
-            this.cbxDisplayPixels.TabStop = false;
-            this.cbxDisplayPixels.Text = "Pixels";
+            this.rbDisplayPixels.Location = new System.Drawing.Point(131, 2);
+            this.rbDisplayPixels.Name = "cbxDisplayPixels";
+            this.rbDisplayPixels.Size = new System.Drawing.Size(75, 19);
+            this.rbDisplayPixels.TabIndex = 41;
+            this.rbDisplayPixels.TabStop = false;
+            this.rbDisplayPixels.Text = "Pixels";
             // 
-            // cbxDisplayBrightness
+            // rbDisplayBrightness
             // 
-            this.cbxDisplayBrightness.Location = new System.Drawing.Point(49, 2);
-            this.cbxDisplayBrightness.Name = "cbxDisplayBrightness";
-            this.cbxDisplayBrightness.Size = new System.Drawing.Size(75, 19);
-            this.cbxDisplayBrightness.TabIndex = 40;
-            this.cbxDisplayBrightness.Text = "Brightness";
-            this.cbxDisplayBrightness.CheckedChanged += new System.EventHandler(this.cbxDisplayBrightness_CheckedChanged);
+            this.rbDisplayBrightness.Location = new System.Drawing.Point(49, 2);
+            this.rbDisplayBrightness.Name = "cbxDisplayBrightness";
+            this.rbDisplayBrightness.Size = new System.Drawing.Size(75, 19);
+            this.rbDisplayBrightness.TabIndex = 40;
+            this.rbDisplayBrightness.Text = "Brightness";
+            this.rbDisplayBrightness.CheckedChanged += new System.EventHandler(this.cbxDisplayBrightness_CheckedChanged);
             // 
             // label3
             // 
@@ -666,8 +666,8 @@ namespace Tangra.VideoOperations.LightCurves
         private System.Windows.Forms.Button btnContinueWithNoTimes;
         private System.Windows.Forms.Button btnLightCurve;
         private System.Windows.Forms.Button btnStop;
-        private System.Windows.Forms.CheckBox cbxDisplayPixels;
-        private System.Windows.Forms.CheckBox cbxDisplayBrightness;
+		private System.Windows.Forms.RadioButton rbDisplayPixels;
+		private System.Windows.Forms.RadioButton rbDisplayBrightness;
 
     }
 }

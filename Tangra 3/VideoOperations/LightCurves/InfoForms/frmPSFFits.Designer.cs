@@ -19,14 +19,12 @@
 			this.picTarget3PSF = new System.Windows.Forms.PictureBox();
 			this.picTarget2PSF = new System.Windows.Forms.PictureBox();
 			this.picTarget1PSF = new System.Windows.Forms.PictureBox();
-            this.rbPreProcessedData = new System.Windows.Forms.RadioButton();
-            this.rbRawData = new System.Windows.Forms.RadioButton();
+			this.rbPreProcessedData = new System.Windows.Forms.RadioButton();
+			this.rbRawData = new System.Windows.Forms.RadioButton();
 			((System.ComponentModel.ISupportInitialize)(this.picTarget4PSF)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.picTarget3PSF)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.picTarget2PSF)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.picTarget1PSF)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.rbPreProcessedData)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.rbRawData)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// picTarget4PSF
@@ -71,20 +69,22 @@
 			// 
 			// rbPreProcessedData
 			// 
+			this.rbPreProcessedData.Checked = true;
 			this.rbPreProcessedData.Location = new System.Drawing.Point(3, 375);
 			this.rbPreProcessedData.Name = "rbPreProcessedData";
-			this.rbPreProcessedData.Text = "Pre-Processed Data";
 			this.rbPreProcessedData.Size = new System.Drawing.Size(122, 19);
 			this.rbPreProcessedData.TabIndex = 47;
+			this.rbPreProcessedData.TabStop = true;
+			this.rbPreProcessedData.Text = "Pre-Processed Data";
 			this.rbPreProcessedData.CheckedChanged += new System.EventHandler(this.rbPreProcessedData_CheckedChanged);
 			// 
 			// rbRawData
 			// 
 			this.rbRawData.Location = new System.Drawing.Point(126, 376);
 			this.rbRawData.Name = "rbRawData";
-            this.rbRawData.Text = "Raw Data";
 			this.rbRawData.Size = new System.Drawing.Size(122, 19);
 			this.rbRawData.TabIndex = 48;
+			this.rbRawData.Text = "Raw Data";
 			this.rbRawData.CheckedChanged += new System.EventHandler(this.rbPreProcessedData_CheckedChanged);
 			// 
 			// frmPSFFits
@@ -105,8 +105,6 @@
 			((System.ComponentModel.ISupportInitialize)(this.picTarget3PSF)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.picTarget2PSF)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.picTarget1PSF)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.rbPreProcessedData)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.rbRawData)).EndInit();
 			this.ResumeLayout(false);
 
 		}

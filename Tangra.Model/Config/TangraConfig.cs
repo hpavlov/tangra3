@@ -366,7 +366,7 @@ namespace Tangra.Model.Config
 			public int AboveMedianThreasholdForGuiding = 50;
 			public float SignalNoiseForGuiding = 4.5f;
 			public uint StarFinderAboveNoiseLevel = 25;
-            public float TimesStdDevsForBackgroundNoise = 3.0f;
+            public float TimesStdDevsForBackgroundNoise = 1.0f;
             public float TimesStdDevsForBackgroundNoiseLP = 1.0f;
             public float TimesStdDevsForBackgroundNoiseLPD = 1.0f;
             public float AboveMedianCoeffLP = 0.8f;

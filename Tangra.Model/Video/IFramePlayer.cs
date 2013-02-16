@@ -64,6 +64,7 @@ namespace Tangra.Model.Video
 		IFrameStream Video { get; }
 		int FrameStep { get; }
 		void RefreshCurrentFrame();
+		void SetupFrameIntegration(int framesToIntegrate, FrameIntegratingMode frameMode, PixelIntegrationType pixelIntegrationType);        
 	}
 
 	public class PlayerContext

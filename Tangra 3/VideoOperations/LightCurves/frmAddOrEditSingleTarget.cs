@@ -141,7 +141,8 @@ namespace Tangra.VideoOperations.LightCurves
 
             nudFitMatrixSize.Maximum = matirxSize;
 
-		    SetHeightAndType();
+			if (SelectedObjectType != TrackingType.OccultedStar)
+				SetHeightAndType();
 		}
 
         private void Initialize()
@@ -834,10 +835,9 @@ namespace Tangra.VideoOperations.LightCurves
             // TODO: Compute the noise as the average noise from 4 frames 
 
             // To compute the 'noise' we get the (TimesStdDevsForBackgroundNoise) * sigma background fluctuation excluding 1FWHM area around the center
-            byte threeSigmaBg = 0;
+            byte oneSigmaBg = 0;
             int from = 0;
             int to = m_ProcessingPixels.GetLength(0);
-            double timesStdDevsForBackgroundNoise;
             double aboveMedianLevelRequired;
             if (LightCurveReductionContext.Instance.DigitalFilter != TangraConfig.PreProcessingFilter.NoFilter)
             {
@@ -847,15 +847,12 @@ namespace Tangra.VideoOperations.LightCurves
             switch(LightCurveReductionContext.Instance.DigitalFilter)
             {
                 case TangraConfig.PreProcessingFilter.LowPassFilter:
-                    timesStdDevsForBackgroundNoise = TangraConfig.Settings.Special.TimesStdDevsForBackgroundNoiseLP;
                     aboveMedianLevelRequired = TangraConfig.Settings.Special.AboveMedianThreasholdForGuiding * TangraConfig.Settings.Special.AboveMedianCoeffLP;
                     break;
                 case TangraConfig.PreProcessingFilter.LowPassDifferenceFilter:
-                    timesStdDevsForBackgroundNoise = TangraConfig.Settings.Special.TimesStdDevsForBackgroundNoiseLPD;
                     aboveMedianLevelRequired = TangraConfig.Settings.Special.AboveMedianThreasholdForGuiding * TangraConfig.Settings.Special.AboveMedianCoeffLPD;
                     break;
                 default:
-                    timesStdDevsForBackgroundNoise = TangraConfig.Settings.Special.TimesStdDevsForBackgroundNoise;
                     aboveMedianLevelRequired = TangraConfig.Settings.Special.AboveMedianThreasholdForGuiding;
                     break;
             }
@@ -876,10 +873,10 @@ namespace Tangra.VideoOperations.LightCurves
                               : ((bgBytes[bgBytes.Count / 2] + bgBytes[(bgBytes.Count / 2) - 1]) / 2);
             double var = 0;
             bgBytes.ForEach(b => var += (median - b) * (median - b));
-            threeSigmaBg = (byte)Math.Round(timesStdDevsForBackgroundNoise * Math.Sqrt(var / Math.Max(1, bgBytes.Count - 1)));
+			oneSigmaBg = (byte)Math.Round(Math.Sqrt(var / Math.Max(1, bgBytes.Count - 1)));
 
             signal = m_Gaussian.IMax - median;
-            sn = signal / threeSigmaBg;
+			sn = signal / oneSigmaBg;
 
             Trace.WriteLine(string.Format("Signal = {0}, S/N = {1}", signal.ToString("0.00"), sn.ToString("0.00")));
 

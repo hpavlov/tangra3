@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
 using Tangra.Model.Video;
@@ -32,10 +33,30 @@ namespace Tangra.View
 
 		public void Update()
 		{
-			if (TangraContext.Current.HasVideoLoaded)
-				m_MainForm.Text = string.Format("Tangra v3.0 [Beta Version] - {0}, {1}", TangraContext.Current.FileName, TangraContext.Current.FileFormat);
+			if (TangraContext.Current.HasAnyFileLoaded)
+			{
+				m_MainForm.Text = string.Format("Tangra v3.0 [Beta Version] - {0}, {1}", TangraContext.Current.FileName,
+				                                TangraContext.Current.FileFormat);
+			}
 			else
+			{
 				m_MainForm.Text = "Tangra v3.0 [Beta Version]";
+
+				if (m_MainForm.pictureBox.Image != null)
+				{
+					using (Graphics g = Graphics.FromImage(m_MainForm.pictureBox.Image))
+					{
+						g.Clear(SystemColors.ControlDark);
+						g.Save();
+					}
+
+					m_MainForm.pictureBox.Refresh();
+					m_MainForm.pictureBox.Image = null;
+				}
+
+				m_MainForm.ssFPS.Text = string.Empty;
+			}
+
 #if PRODUCTION
                 m_MainForm.miViewTrackingDebug.Visible = false;
                 m_MainForm.miOpenFailedCalibration.Visible = false;
@@ -45,7 +66,7 @@ namespace Tangra.View
 
 			m_MainForm.miExportToFits.Enabled = TangraContext.Current.HasAnyFileLoaded;
 			m_MainForm.miExportToBMP.Enabled = TangraContext.Current.HasAnyFileLoaded;
-			//m_MainForm.miExportToCSV.Enabled = HasAnyFileLoaded;
+			m_MainForm.miExportToCSV.Enabled = TangraContext.Current.HasAnyFileLoaded;
 
 			//m_MainForm.miLoadDark.Enabled = HasAnyFileLoaded && (!(m_MainForm.m_CurrentOperation is MakeDarkFlatField) || CanLoadDarkFrame);
 			//m_MainForm.miLoadFlat.Enabled = HasAnyFileLoaded && !(m_MainForm.m_CurrentOperation is MakeDarkFlatField);
@@ -178,6 +199,71 @@ namespace Tangra.View
         {
             m_MainForm.ssStatus.Text = displayName;
         }
-        
+
+		#region File Progress Bar
+		private void OnFileProgressStart(int maxValue)
+		{
+			
+			m_MainForm.tsProgessBar.Minimum = 0;
+			m_MainForm.tsProgessBar.Maximum = maxValue;
+			m_MainForm.tsProgessBar.Value = 0;
+			m_MainForm.tsProgessBar.Visible = true;
+			m_MainForm.Cursor = Cursors.WaitCursor;
+			m_MainForm.statusStrip.Update();			
+		}
+
+		private void OnFileProgressEnd()
+		{
+			m_MainForm.tsProgessBar.Value = m_MainForm.tsProgessBar.Maximum;
+			m_MainForm.tsProgessBar.Visible = false;
+			m_MainForm.Cursor = Cursors.Default;
+			m_MainForm.statusStrip.Update();
+		}
+
+		private void OnFileProgress(int currentValue)
+		{
+			m_MainForm.tsProgessBar.Value = Math.Min(currentValue, m_MainForm.tsProgessBar.Maximum);
+			m_MainForm.statusStrip.Update();
+		}
+
+		private void HandleFileProgress(int currentValue, int maxValue)
+		{
+			if (currentValue < 0)
+			{
+				if (maxValue > 0)
+					OnFileProgressStart(maxValue);
+				else
+					OnFileProgressEnd();
+			}
+			else
+				OnFileProgress(currentValue);				
+		}
+
+		internal delegate void OnFileProgressCallback(int currentValue, int maxValue);
+
+		internal void OnFileProgress(int currentValue, int maxValue)
+		{
+			m_MainForm.Invoke(new OnFileProgressCallback(HandleFileProgress), currentValue, maxValue);		
+		}
+
+
+		internal delegate void OnLongOperationCallback(bool begin);
+
+		internal void OnLongOperation(bool begin)
+		{
+			m_MainForm.Cursor = begin ? Cursors.WaitCursor : Cursors.Default;
+			m_MainForm.Update();
+		}
+
+		internal void BeginLongOperation()
+		{
+			m_MainForm.Invoke(new OnLongOperationCallback(OnLongOperation), true);	
+		}
+
+		internal void EndLongOperation()
+		{
+			m_MainForm.Invoke(new OnLongOperationCallback(OnLongOperation), false);
+		}
+		#endregion
 	}
 }

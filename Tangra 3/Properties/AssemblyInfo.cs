@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyTitle("Tangra 3")]
 [assembly: AssemblyDescription(
-	"Tangra 3 - software package for astronomical video data reduction is developed and maintained by Hristo Pavlov.\r\n\r\n" + 
+	"Tangra 3 - software package for astronomical video data reduction is maintained by Hristo Pavlov.\r\n\r\n" + 
 	"Tangra 3 uses a number of open source and/or free components which may have their respective copyright owners.\r\n\r\n" +
 	"CCharpFITS is a C# port of Tom McGlynn's nom.tam.fits Java package, initially ported by  Samuel Carliles. " +
     "nom.tam.fits is Copyright by Thomas McGlynn 1997-2007; " +
@@ -38,4 +38,4 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("3.0.0.0")]
-[assembly: AssemblyFileVersion("3.0.19")]
+[assembly: AssemblyFileVersion("3.0.21")]

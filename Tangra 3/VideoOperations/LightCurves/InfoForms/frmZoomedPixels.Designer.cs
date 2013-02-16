@@ -16,29 +16,26 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 		/// </summary>
 		private void InitializeComponent()
 		{
+			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmZoomedPixels));
-            this.picTarget4Pixels = new System.Windows.Forms.PictureBox();
-            this.picTarget3Pixels = new System.Windows.Forms.PictureBox();
-            this.picTarget2Pixels = new System.Windows.Forms.PictureBox();
-            this.picTarget1Pixels = new System.Windows.Forms.PictureBox();
+			this.picTarget4Pixels = new System.Windows.Forms.PictureBox();
+			this.picTarget3Pixels = new System.Windows.Forms.PictureBox();
+			this.picTarget2Pixels = new System.Windows.Forms.PictureBox();
+			this.picTarget1Pixels = new System.Windows.Forms.PictureBox();
 			this.lblDisplayBandTitle = new System.Windows.Forms.Label();
 			this.lblDisplayedBand = new System.Windows.Forms.Label();
-			this.warningProvider = new System.Windows.Forms.ErrorProvider();
-			this.infoProvider = new System.Windows.Forms.ErrorProvider();
-            this.cbxDrawApertures = new System.Windows.Forms.CheckBox();
-            this.rbRawData = new System.Windows.Forms.RadioButton();
-            this.rbPreProcessedData = new System.Windows.Forms.RadioButton();
-            this.tbIntensity = new System.Windows.Forms.TrackBar();
+			this.warningProvider = new System.Windows.Forms.ErrorProvider(this.components);
+			this.infoProvider = new System.Windows.Forms.ErrorProvider(this.components);
+			this.cbxDrawApertures = new System.Windows.Forms.CheckBox();
+			this.rbRawData = new System.Windows.Forms.RadioButton();
+			this.rbPreProcessedData = new System.Windows.Forms.RadioButton();
+			this.tbIntensity = new System.Windows.Forms.TrackBar();
 			((System.ComponentModel.ISupportInitialize)(this.picTarget4Pixels)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.picTarget3Pixels)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.picTarget2Pixels)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.picTarget1Pixels)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.warningProvider)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.infoProvider)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.cbxDrawApertures)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.rbRawData)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.rbPreProcessedData)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.tbIntensity)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.tbIntensity)).BeginInit();
 			this.SuspendLayout();
 			// 
@@ -96,7 +93,7 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 			this.lblDisplayedBand.AutoSize = true;
 			this.lblDisplayedBand.Location = new System.Drawing.Point(227, 300);
 			this.lblDisplayedBand.Name = "lblDisplayedBand";
-			this.lblDisplayedBand.Size = new System.Drawing.Size(55, 13);
+			this.lblDisplayedBand.Size = new System.Drawing.Size(56, 13);
 			this.lblDisplayedBand.TabIndex = 44;
 			this.lblDisplayedBand.Text = "GrayScale";
 			// 
@@ -114,42 +111,46 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 			// 
 			// cbxDrawApertures
 			// 
+			this.cbxDrawApertures.Checked = true;
+			this.cbxDrawApertures.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.cbxDrawApertures.Location = new System.Drawing.Point(3, 297);
 			this.cbxDrawApertures.Name = "cbxDrawApertures";
-			this.cbxDrawApertures.Text = "Tracking Details";
 			this.cbxDrawApertures.Size = new System.Drawing.Size(109, 19);
 			this.cbxDrawApertures.TabIndex = 49;
+			this.cbxDrawApertures.Text = "Tracking Details";
 			this.cbxDrawApertures.CheckedChanged += new System.EventHandler(this.cbxDrawApertures_CheckedChanged);
 			// 
 			// rbRawData
 			// 
 			this.rbRawData.Location = new System.Drawing.Point(131, 316);
 			this.rbRawData.Name = "rbRawData";
-			this.rbRawData.Text = "Raw Data";
 			this.rbRawData.Size = new System.Drawing.Size(88, 19);
 			this.rbRawData.TabIndex = 50;
+			this.rbRawData.Text = "Raw Data";
 			// 
 			// rbPreProcessedData
 			// 
+			this.rbPreProcessedData.Checked = true;
 			this.rbPreProcessedData.Location = new System.Drawing.Point(3, 316);
 			this.rbPreProcessedData.Name = "rbPreProcessedData";
-			this.rbPreProcessedData.Text = "Pre-Processed Data";
 			this.rbPreProcessedData.Size = new System.Drawing.Size(122, 19);
 			this.rbPreProcessedData.TabIndex = 51;
+			this.rbPreProcessedData.TabStop = true;
+			this.rbPreProcessedData.Text = "Pre-Processed Data";
 			this.rbPreProcessedData.CheckedChanged += new System.EventHandler(this.rbPreProcessedData_CheckedChanged);
 			// 
 			// tbIntensity
 			// 
-			this.tbIntensity.Location = new System.Drawing.Point(284, 1);
-			this.tbIntensity.Name = "tbIntensity";
 			this.tbIntensity.LargeChange = 10;
+			this.tbIntensity.Location = new System.Drawing.Point(294, 1);
 			this.tbIntensity.Maximum = 100;
+			this.tbIntensity.Name = "tbIntensity";
 			this.tbIntensity.Orientation = System.Windows.Forms.Orientation.Vertical;
+			this.tbIntensity.Size = new System.Drawing.Size(42, 299);
 			this.tbIntensity.SmallChange = 5;
+			this.tbIntensity.TabIndex = 52;
 			this.tbIntensity.TickFrequency = 5;
 			this.tbIntensity.TickStyle = System.Windows.Forms.TickStyle.TopLeft;
-			this.tbIntensity.Size = new System.Drawing.Size(42, 299);
-			this.tbIntensity.TabIndex = 52;
 			this.tbIntensity.ValueChanged += new System.EventHandler(this.tbIntensity_ValueChanged);
 			// 
 			// frmZoomedPixels
@@ -179,10 +180,6 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 			((System.ComponentModel.ISupportInitialize)(this.picTarget1Pixels)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.warningProvider)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.infoProvider)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.cbxDrawApertures)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.rbRawData)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.rbPreProcessedData)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.tbIntensity)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.tbIntensity)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();

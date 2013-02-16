@@ -65,7 +65,8 @@ namespace Tangra.VideoOperations.LightCurves
 
                                     for (int i = 0; i < itemsInGroup; i++)
                                     {
-										if (frameTiming != null)
+										if (frameTiming != null && 
+											header.TimingType != MeasurementTimingType.UserEnteredFrameReferences)
 										{
 											LCFrameTiming timingEntry = frameTiming[i];
 											timingEntry.WriteTo(writer);
@@ -137,7 +138,7 @@ namespace Tangra.VideoOperations.LightCurves
                         requiredVersion = "1.4";
 
                     MessageBox.Show(
-                        string.Format("This light curve is old and is not supported in this version of Tangra.\r\n\r\n You will need Tangra v{0} to open it.", requiredVersion), 
+                        string.Format("This light curve is old and is not supported by this version of Tangra.\r\n\r\n You will need Tangra v{0} to open this file.", requiredVersion), 
                         "Tangra", 
                         MessageBoxButtons.OK, 
                         MessageBoxIcon.Error);
@@ -146,12 +147,13 @@ namespace Tangra.VideoOperations.LightCurves
                 }
 
 
-                var lcFile = new LCFile();
-            	lcFile.LcFileFormatVersion = version;
+                var lcFile = new LCFile
+	            {
+		            LcFileFormatVersion = version, 
+					Header = new LCMeasurementHeader(reader)
+	            };
 
-                lcFile.Header = new LCMeasurementHeader(reader);
-
-                byte totalObjects = reader.ReadByte();
+	            byte totalObjects = reader.ReadByte();
 
 #if !PRODUCTION
                 Trace.Assert(lcFile.Header.ObjectCount == totalObjects);
@@ -164,7 +166,7 @@ namespace Tangra.VideoOperations.LightCurves
                 {
                     int itemsInGroup = reader.ReadInt32();
 
-                    bool showProgress = (totalObjects * itemsInGroup) / 100 > 100;
+	                bool showProgress = true; //(totalObjects * itemsInGroup) / 100 > 100;
                     bool notSupported = false;
 
                     ThreadingHelper.RunTaskWaitAndDoEvents(
@@ -185,7 +187,8 @@ namespace Tangra.VideoOperations.LightCurves
 
                                 for (int j = 0; j < itemsInGroup; j++)
                                 {
-									if (version > 2)
+									if (version > 2 &&
+										lcFile.Header.TimingType != MeasurementTimingType.UserEnteredFrameReferences)
 									{
 										var frameTiming = new LCFrameTiming(reader);
 										lcFile.FrameTiming.Add(frameTiming);
@@ -306,51 +309,60 @@ namespace Tangra.VideoOperations.LightCurves
         {
 			if (s_OnTheFlyFile != null)
 			{
-				s_OnTheFlyWriter.Flush();
-				s_OnTheFlyFile.Seek(0, SeekOrigin.Begin);
+				NotificationManager.Instance.NotifyBeginLongOperation();
+
+				try
+				{
+					s_OnTheFlyWriter.Flush();
+					s_OnTheFlyFile.Seek(0, SeekOrigin.Begin);
 
 #if !PRODUCTION
-				if (header.ObjectCount > 1) Trace.Assert(s_NumMeasurements[0] == s_NumMeasurements[1]);
-				if (header.ObjectCount > 2) Trace.Assert(s_NumMeasurements[0] == s_NumMeasurements[2]);
-				if (header.ObjectCount > 3) Trace.Assert(s_NumMeasurements[0] == s_NumMeasurements[3]);
+					if (header.ObjectCount > 1) Trace.Assert(s_NumMeasurements[0] == s_NumMeasurements[1]);
+					if (header.ObjectCount > 2) Trace.Assert(s_NumMeasurements[0] == s_NumMeasurements[2]);
+					if (header.ObjectCount > 3) Trace.Assert(s_NumMeasurements[0] == s_NumMeasurements[3]);
 #endif
 
-				s_OnTheFlyWriter.Write(LC_FILE_VERSION);
-				header.WriteTo(s_OnTheFlyWriter);
-				s_OnTheFlyWriter.Write(header.ObjectCount);
-				s_OnTheFlyWriter.Write(s_NumMeasurements[0]);
+					s_OnTheFlyWriter.Write(LC_FILE_VERSION);
+					header.WriteTo(s_OnTheFlyWriter);
+					s_OnTheFlyWriter.Write(header.ObjectCount);
+					s_OnTheFlyWriter.Write(s_NumMeasurements[0]);
 
-				s_OnTheFlyFile.Seek(0, SeekOrigin.End);
-				footer.WriteTo(s_OnTheFlyWriter);
+					s_OnTheFlyFile.Seek(0, SeekOrigin.End);
+					footer.WriteTo(s_OnTheFlyWriter);
 
-				s_OnTheFlyWriter.Flush();
+					s_OnTheFlyWriter.Flush();
 
-				s_OnTheFlyFile.Close();
-				s_OnTheFlyFile = null;
+					s_OnTheFlyFile.Close();
+					s_OnTheFlyFile = null;
 
-				using (FileStream inFile = new FileStream(s_OnTheFlyFileName, FileMode.Open, FileAccess.Read))
-				using (FileStream outFile = new FileStream(s_OnTheFlyZippedFileName, FileMode.Create, FileAccess.Write))
-				{
-					inFile.Seek(0, SeekOrigin.Begin);
-
-					int BUFFER_SIZE = 1024;
-					byte[] inputReadBuffer = new byte[BUFFER_SIZE];
-
-					using (DeflateStream deflateStream = new DeflateStream(outFile, CompressionMode.Compress, true))
+					using (FileStream inFile = new FileStream(s_OnTheFlyFileName, FileMode.Open, FileAccess.Read))
+					using (FileStream outFile = new FileStream(s_OnTheFlyZippedFileName, FileMode.Create, FileAccess.Write))
 					{
-						int bytesRead = 0;
-						do
+						inFile.Seek(0, SeekOrigin.Begin);
+
+						int BUFFER_SIZE = 1024;
+						byte[] inputReadBuffer = new byte[BUFFER_SIZE];
+
+						using (DeflateStream deflateStream = new DeflateStream(outFile, CompressionMode.Compress, true))
 						{
-							bytesRead = inFile.Read(inputReadBuffer, 0, inputReadBuffer.Length);
-							deflateStream.Write(inputReadBuffer, 0, inputReadBuffer.Length);
+							int bytesRead = 0;
+							do
+							{
+								bytesRead = inFile.Read(inputReadBuffer, 0, inputReadBuffer.Length);
+								deflateStream.Write(inputReadBuffer, 0, inputReadBuffer.Length);
+							}
+							while (bytesRead == BUFFER_SIZE);
+
+							deflateStream.Flush();
 						}
-						while (bytesRead == BUFFER_SIZE);
-
-						deflateStream.Flush();
 					}
-				}
 
-				File.Delete(s_OnTheFlyFileName);				
+					File.Delete(s_OnTheFlyFileName);
+				}
+				finally
+				{
+					NotificationManager.Instance.NotifyEndLongOperation();
+				}
 			}
 
             return LCFile.Load(s_OnTheFlyZippedFileName);
@@ -1450,12 +1462,6 @@ namespace Tangra.VideoOperations.LightCurves
 
     public class FileProgressManager
     {
-        public static byte MSG_BEGIN_PROGRESS = 1;
-        public static byte MSG_INCREASE_PROGRESS = 2;
-        public static byte MSG_END_PROGRESS = 3;
-
-        private static FileProgressManager s_Instance = new FileProgressManager();
-
         public static void BeginFileOperation(int maxSteps)
         {
             NotificationManager.Instance.NotifyFileProgressManagerBeginFileOperation(maxSteps);

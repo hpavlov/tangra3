@@ -12,7 +12,7 @@ PGETFRAME g_pGetFrame = NULL;
 
 HRESULT TangraVideoEnumVideoEngines(char* videoEngines)
 {
-	strcpy(videoEngines, "AviFile;DirectShow");
+	strcpy(videoEngines, "VideoForWindows;DirectShow");
 	
 	return S_OK;
 }
@@ -77,6 +77,12 @@ HRESULT OpenAviFile(const char* fileName, VideoFileInfo* fileInfo)
 				fileInfo->Height = lpFormat.biHeight;
 				fileInfo->BitmapImageSize= lpFormat.biSizeImage;
 				fileInfo->FrameRate = (float)streamInfo.dwRate / (float)streamInfo.dwScale;
+				strncpy(fileInfo->EngineBuffer, "VWF\0", 4);
+				fileInfo->VideoFileTypeBuffer[0] = (lpFormat.biCompression >> 24) & 0xFF;
+				fileInfo->VideoFileTypeBuffer[1] = (lpFormat.biCompression >> 16) & 0xFF;
+				fileInfo->VideoFileTypeBuffer[2] = (lpFormat.biCompression >> 8) & 0xFF;
+				fileInfo->VideoFileTypeBuffer[3] = lpFormat.biCompression & 0xFF;
+				fileInfo->VideoFileTypeBuffer[4] = 0;
 
 				rv = S_OK;
 			}

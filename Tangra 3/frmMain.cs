@@ -4,8 +4,10 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -17,11 +19,14 @@ using Tangra.Model.Config;
 using Tangra.Model.Context;
 using Tangra.Model.Image;
 using Tangra.Model.Video;
+using Tangra.Model.VideoOperations;
 using Tangra.PInvoke;
 using Tangra.Video;
 using Tangra.Video.AstroDigitalVideo;
 using Tangra.VideoOperations.LightCurves;
 using Tangra.View;
+using nom.tam.fits;
+using nom.tam.util;
 
 namespace Tangra
 {
@@ -44,6 +49,10 @@ namespace Tangra
 
             m_VideoController = new VideoController(this, m_VideoFileView, m_ZoomedImageView, pnlControlerPanel);
             m_LightCurveController = new LightCurveController(this, m_VideoController);
+
+			NotificationManager.Instance.SetVideoController(m_VideoController);
+
+			m_VideoController.SetLightCurveController(m_LightCurveController);
 
 			BuildRecentFilesMenu();
 		}
@@ -397,18 +406,52 @@ namespace Tangra
 			ConfigureImageScrollbars();
 		}
 
+		public bool SelectVideoOperation()
+        {
+            if (TangraConfig.Settings.Generic.OnOpenOperation == TangraConfig.OnOpenOperation.StartLightCurveReduction)
+            {
+				if (m_VideoController.ActivateOperation<ReduceLightCurveOperation>(m_LightCurveController))
+				{
+					m_VideoController.RefreshCurrentFrame();
+					return true;
+				}
+            }
+
+            return false;
+        }
+
 		public void OpenTangraFile(string fileName)
 		{
+			m_VideoController.CloseOpenedVideoFile();
+
 			string fileExt = Path.GetExtension(fileName);
 
 			if (fileExt == ".lc")
-			{
-				// TODO: Load a light curve file
+			{				
+				m_LightCurveController.OpenLcFile(fileName);
 			}
 			else
 			{
-				if (m_VideoController.OpenVideoFile(fileName))
-					RegisterRecentFile(RecentFileType.Video, fileName);
+				try
+				{
+					if (m_VideoController.OpenVideoFile(fileName))
+					{
+						if (!SelectVideoOperation())
+						{
+							// NOTE: If not operation is selected, then set the default Arrow tool
+							m_VideoController.SelectImageTool<ArrowTool>();
+						}
+					}
+				}
+				catch (InvalidVideoFileException ex)
+				{
+					MessageBox.Show(
+						this,
+						"Tangra is unable to open this file. Make sure that it is a valid video file and that you have all necessary codecs installed.\r\n\r\n" + ex.Message,
+						"Error",
+						MessageBoxButtons.OK,
+						MessageBoxIcon.Error);
+				}
 			}
 		}
 
@@ -573,7 +616,7 @@ namespace Tangra
 			m_VideoController.NotifyMainFormMoved();
 		}
 
-        private void BuildRecentFilesMenu()
+        internal void BuildRecentFilesMenu()
         {
             miRecentVideos.DropDownItems.Clear();
 
@@ -602,15 +645,7 @@ namespace Tangra
 			}
 
 			miRecentLightCurves.Enabled = miRecentLightCurves.DropDownItems.Count > 0;
-        }
-
-		internal void RegisterRecentFile(RecentFileType type, string fileName)
-        {
-			TangraConfig.Settings.RecentFiles.NewRecentFile(type, fileName);
-            TangraConfig.Settings.Save();
-
-            BuildRecentFilesMenu();
-        }
+        }		
 
 		private void miRecentFileMenuItemClick(object sender, EventArgs e)
 		{
@@ -670,7 +705,7 @@ namespace Tangra
 
         private void miReduceLightCurve_Click(object sender, EventArgs e)
         {
-            m_VideoController.ActivateOperation<ReduceLightCurveOperation>();
+			m_VideoController.ActivateOperation<ReduceLightCurveOperation>(m_LightCurveController);
         }
 
 		private void miFSTSFileViewer_Click(object sender, EventArgs e)
@@ -690,5 +725,120 @@ namespace Tangra
         {
             m_LightCurveController.LoadLightCurve();
         }
+
+		private void miExportToBMP_Click(object sender, EventArgs e)
+		{
+			if (m_VideoContext.Pixelmap != null)
+			{
+				saveFrameDialog.Filter = "BMP Image (*.bmp)|*.bmp";
+				saveFrameDialog.DefaultExt = "bmp";
+
+				if (saveFrameDialog.ShowDialog(this) == DialogResult.OK)
+				{
+					m_VideoContext.Pixelmap.CreateNewDisplayBitmap().Save(saveFrameDialog.FileName, ImageFormat.Bmp);
+				}
+			}
+		}
+
+		private void miExportToCSV_Click(object sender, EventArgs e)
+		{
+			if (m_VideoContext.Pixelmap != null)
+			{
+				saveFrameDialog.Filter = "Comma separated values (*.csv)|*.csv";
+				saveFrameDialog.DefaultExt = "csv";
+
+				if (saveFrameDialog.ShowDialog(this) == DialogResult.OK)
+				{
+					StringBuilder output = new StringBuilder();
+
+					for (int y = 0; y < m_VideoContext.Pixelmap.Height; y++)
+					{
+						for (int x = 0; x < m_VideoContext.Pixelmap.Width; x++)
+						{
+							output.Append(m_VideoContext.Pixelmap[x, y]);
+							if (x != m_VideoContext.Pixelmap.Width - 1) output.Append(",");
+						}
+
+						if (y != m_VideoContext.Pixelmap.Height - 1) output.Append("\r\n");
+					}
+
+					File.WriteAllText(saveFrameDialog.FileName, output.ToString());
+				}
+			}
+		}
+
+		internal delegate T SetFITSDataDelegate<T>(uint clr);
+
+		private T[][] SaveImageData<T>(SetFITSDataDelegate<T> setValue)
+		{
+			T[][] bimg = new T[m_VideoContext.Pixelmap.Height][];
+
+			for (int y = 0; y < m_VideoContext.Pixelmap.Height; y++)
+			{
+				bimg[y] = new T[m_VideoContext.Pixelmap.Width];
+
+				for (int x = 0; x < m_VideoContext.Pixelmap.Width; x++)
+				{
+					bimg[y][x] = setValue(m_VideoContext.Pixelmap[x, y]);
+				}
+			}
+
+			return bimg;
+		}
+
+		private void miExportToFits_Click(object sender, EventArgs e)
+		{
+			if (m_VideoContext.Pixelmap != null)
+			{
+				saveFrameDialog.Filter = "FITS Image 16 bit (*.fit)|*.fit|FITS Image 8 bit (*.fit)|*.fit|FITS Image 32 bit (*.fit)|*.fit";
+				saveFrameDialog.DefaultExt = "fit";
+
+				if (saveFrameDialog.ShowDialog(this) == DialogResult.OK)
+				{
+					Fits f = new Fits();
+
+					object data = null;
+					int bitDepth = 32;
+					if (saveFrameDialog.Filter.IndexOf("16") != -1)
+					{
+						data = SaveImageData<short>(delegate(uint val) { return (short)(val * 128); });
+						bitDepth = 32;
+					}
+					else if (saveFrameDialog.Filter.IndexOf("8") != -1)
+					{
+						data = SaveImageData<byte>(delegate(uint val) { return (byte)val; });
+						bitDepth = 8;
+					}
+					else if (saveFrameDialog.Filter.IndexOf("32") != -1)
+					{
+						data = SaveImageData<uint>(delegate(uint val) { return val; });
+						bitDepth = 32;
+					}
+
+					BasicHDU imageHDU = Fits.MakeHDU(data);
+
+					nom.tam.fits.Header hdr = imageHDU.Header;
+					hdr.AddValue("SIMPLE", "T", null);
+
+					// Options include unsigned 8-bit (8), signed 16 bit (16), signed 32 bit (32), 32-bit IEEE float (-32), and 64-bit IEEE float (-64). The standard format is 16
+					hdr.AddValue("BITPIX", bitDepth, null);
+					hdr.AddValue("NAXIS", 2, null);
+					hdr.AddValue("NAXIS1", m_VideoContext.Pixelmap.Width, null);
+					hdr.AddValue("NAXIS2", m_VideoContext.Pixelmap.Height, null);
+
+					frmFITSHeader hrdForm = new frmFITSHeader(hdr);
+					if (hrdForm.ShowDialog() == DialogResult.Cancel) return;
+
+					f.AddHDU(imageHDU);
+
+					// Write a FITS file.
+					using (BufferedFile bf = new BufferedFile(saveFrameDialog.FileName, FileAccess.ReadWrite, FileShare.ReadWrite))
+					{
+						f.Write(bf);
+						bf.Flush();
+					}
+				}
+			}
+		}
 	}
 }

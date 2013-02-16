@@ -19,18 +19,34 @@ namespace Tangra.PInvoke
 		public float FrameRate;
 		public int CountFrames;
 		public int FirstFrame;
-		public int BitmapImageSize;		
+		public int BitmapImageSize;
+
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
 		public byte[] EngineBuffer = new byte[16];
+
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
 		public byte[] VideoFileTypeBuffer = new byte[32];
 
 		public string Engine
 		{
-			get { return Encoding.ASCII.GetString(EngineBuffer).Trim('\0'); }
+			get
+			{
+				if (EngineBuffer[0] == 0)
+					return "UnknownVideoEngine";
+				else
+					return Encoding.ASCII.GetString(EngineBuffer).Trim('\0');
+			}
 		}
 
 		public string VideoFileType
 		{
-			get { return Encoding.ASCII.GetString(VideoFileTypeBuffer).Trim('\0'); }
+			get
+			{
+				if (VideoFileTypeBuffer[0] == 0)
+					return "UnknownFileType";
+				else
+					return Encoding.ASCII.GetString(VideoFileTypeBuffer).Trim('\0');
+			}
 		}
 	}
 
@@ -91,6 +107,13 @@ namespace Tangra.PInvoke
 
 			TangraVideoOpenFile(fileName, fileInfo);
 
+			if (fileInfo.CountFrames == 0)
+			{
+				// TODO: Get an error message from TangraVideo
+				throw new Exception();
+			}
+				
+
 			s_fileInfo = new VideoFileInfo()
 			{
 				Width = fileInfo.Width,
@@ -98,7 +121,9 @@ namespace Tangra.PInvoke
 				FrameRate = fileInfo.FrameRate,
 				CountFrames = fileInfo.CountFrames,
 				FirstFrame = fileInfo.FirstFrame,
-				BitmapImageSize = fileInfo.BitmapImageSize
+				BitmapImageSize = fileInfo.BitmapImageSize,
+				VideoFileTypeBuffer = fileInfo.VideoFileTypeBuffer,
+				EngineBuffer = fileInfo.EngineBuffer
 			};
 
 			return fileInfo;
@@ -133,12 +158,37 @@ namespace Tangra.PInvoke
 
 		public static void GetFramePixels(int frameNo, out uint[] pixels)
 		{
-			throw new NotImplementedException();
+			if (s_fileInfo != null)
+			{
+				pixels = new uint[s_fileInfo.Width * s_fileInfo.Height];
+
+				TangraVideoGetFramePixels(frameNo, pixels);
+			}
+			else
+			{
+				throw new InvalidOperationException();
+			}	
 		}
 
-		public static void GetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, out uint[] pixels, out byte[] bitmapPixels, out byte[] bitmapBytes)
+		public static void GetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, out uint[] pixels, out Bitmap bitmap, out byte[] bitmapBytes)
 		{
-			throw new NotImplementedException();
+			if (s_fileInfo != null)
+			{
+				pixels = new uint[s_fileInfo.Width * s_fileInfo.Height];
+				byte[] bitmapPixels = new byte[s_fileInfo.BitmapImageSize + 40 + 14 + 1];
+				bitmapBytes = new byte[s_fileInfo.Width * s_fileInfo.Height];
+
+				TangraVideoGetIntegratedFrame(startFrameNo, framesToIntegrate, isSlidingIntegration, isMedianAveraging, pixels, bitmapPixels, bitmapBytes);
+
+				using (MemoryStream memStr = new MemoryStream(bitmapPixels))
+				{
+					bitmap = (Bitmap)Bitmap.FromStream(memStr);
+				}
+			}
+			else
+			{
+				throw new InvalidOperationException();
+			}
 		}
 
 		public static string GetVideoEngineVersion()

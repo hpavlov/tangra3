@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -7,6 +8,9 @@ using System.Windows.Forms;
 using Tangra.ImageTools;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
+using Tangra.Model.Video;
+using Tangra.Video;
+using Tangra.Video.AstroDigitalVideo;
 using Tangra.VideoOperations.LightCurves;
 
 namespace Tangra.Controller
@@ -30,7 +34,7 @@ namespace Tangra.Controller
 
         public void MoveToFrameNoIntegrate(int selectedFrameNo)
         {
-            throw new NotImplementedException();
+			m_VideoController.MoveToFrame(selectedFrameNo);
         }
 
         public void LoadLightCurve()
@@ -83,7 +87,7 @@ namespace Tangra.Controller
             return true;
         }
 
-        private void OpenLcFile(string fileName)
+        public void OpenLcFile(string fileName)
         {
             m_MainFormView.Cursor = Cursors.WaitCursor;
             LCFile lcFile = null;
@@ -94,77 +98,42 @@ namespace Tangra.Controller
                 lcFile = LCFile.Load(fileName);
                 if (lcFile != null)
                 {
+					ReduceLightCurveOperation operation = (ReduceLightCurveOperation)m_VideoController.SetOperation<ReduceLightCurveOperation>(this);
+
                     string videoFile = GetVideoFileMatchingLcFile(lcFile, fileName);
-                    if (!string.IsNullOrEmpty(videoFile))
+                    if (!string.IsNullOrEmpty(videoFile) &&
+						File.Exists(videoFile))
                     {
-                        //NOTE: File found - open it!
+						if (m_VideoController.OpenVideoFile(videoFile))
+						{							
+							//LightCurves glcOp = new LightCurves();
+							//glcOp.EnterViewLightCurveMode(this, lcFile);
+							//m_CurrentOperation = glcOp;
+							//m_FramePreprocessor.Clear();
+							//ActivateImageTool<ArrowTool>();
 
-                        //OpenAviFile(videoFile, false, false, dontUseWinAVI);
-
-                        //LightCurves glcOp = new LightCurves();
-                        //glcOp.EnterViewLightCurveMode(this, lcFile);
-                        //m_CurrentOperation = glcOp;
-                        //m_FramePreprocessor.Clear();
-                        //ActivateImageTool<ArrowTool>();
-
-                        //ApplicationState.Current.CanPlayVideo = false;
-                        //ApplicationState.Current.UpdateControlsState();
+							TangraContext.Current.CanPlayVideo = false;
+							m_VideoController.UpdateViews();							
+						}
                     }
                     else
                     {
                         // NOTE: No video file found, just show the saved averaged frame
-                        //ApplicationState.Current.Reset();
-                        //if (m_CurrentOperation != null)
-                        //    m_CurrentOperation.FinalizeOperation();
-                        //m_CurrentOperation = null;
-                        //m_DefaultArrowImageTool = null;
-                        //m_FramePreprocessor.Clear();
-                        //pictureBox.Image = null;
-                        //VideoContext.Current.Reset();
+						TangraContext.Current.Reset();
 
-                        //if (lcFile.Footer.AveragedFrameBytes != null)
-                        //{
-                        //    IFrameStream videoStream = new SingleBitmapFileFrameStream(lcFile);
-                        //    m_FramePlayer.OpenVideo(fileName, videoStream);
-                        //    m_TangraApplicationImpl.SetOpenVideo(new TangraOpenVideoImpl(videoStream));
-
-                        //    int width = Math.Max(800, m_FramePlayer.Video.Width + m_ExtraWidth);
-                        //    int height = Math.Max(600, m_FramePlayer.Video.Height + m_ExtraHeight);
-                        //    this.Width = width;
-                        //    this.Height = height;
-
-                        //    SetScrollBarArea();
-
-                        //    VideoContext.Current.FirstFrameIndex = m_FramePlayer.Video.FirstFrame;
-                        //    VideoContext.Current.VideoStream = m_FramePlayer.Video;
-
-                        //    if (m_FramePlayer.IsAstroDigitalVideo)
-                        //    {
-                        //        m_AdvStatusForm = new frmAdvStatusPopup(TangraConfig.Settings.ADVS);
-                        //        m_AdvStatusForm.Show(this);
-                        //        PositionAdvstatusForm();
-                        //    }
-
-                        //    m_FramePlayer.StepForward();
-
-                        //    SetMainFormTitle(m_FramePlayer.FileName, m_FramePlayer.Video.SourceInfo);
-
-                        //    VideoContext.Current.OSDRectToExclude = Rectangle.Empty;
-
-                        //    ApplicationState.Current.HasVideoLoaded = true;
-
-                        //    // Display the saved averaged frame with the targets
-                        //    ActivateOperation<MissingVideoViewer>(lcFile);
-                        //    ActivateImageTool<ArrowTool>();
-                        //}
+						if (lcFile.Footer.AveragedFrameBytes != null)
+						{
+							if (m_VideoController.SingleBitmapFile(lcFile))
+							{							
+								TangraContext.Current.CanPlayVideo = false;
+								m_VideoController.UpdateViews();
+							}
+						}
 
                         TangraContext.Current.CanPlayVideo = false;
                         TangraContext.Current.CanScrollFrames = false;
                         m_VideoController.UpdateViews();
                     }
-
-                    // Move to the first frame in the light curve
-                    m_VideoController.MoveToFrame((int)lcFile.Header.MinFrame);
 
                     m_lcFileLoaded = true;
 
@@ -173,7 +142,17 @@ namespace Tangra.Controller
                     m_LightCurveForm.Show(m_MainFormView);
                     m_LightCurveForm.Update();
 
+					// TODO: Review the VideoController-LightCurveController-ReduceLightCurveOperation relation and how they are initialized
+					// TODO: Provide a clean way of initializing the controller/operation state when opening an .lc file!
+					operation.EnterViewLightCurveMode(lcFile, m_VideoController, m_VideoController.m_pnlControlerPanel);
+
                     RegisterRecentFile(RecentFileType.LightCurve, fileName);
+
+					if (!string.IsNullOrEmpty(m_VideoController.CurrentVideoFileType))
+					{
+						// Move to the first frame in the light curve
+						m_VideoController.MoveToFrame((int)lcFile.Header.MinFrame);
+					}
                 }
             }
             finally
@@ -182,17 +161,62 @@ namespace Tangra.Controller
             }
         }
 
+		public void OnLightCurveClosed()
+		{
+			m_VideoController.CloseOpenedVideoFile();
+		}
+
         public void RegisterRecentFile(RecentFileType recentFileType, string fileName)
         {
-            throw new NotImplementedException();
-            //(m_Host as frmMain).RegisterRecentFile(frmMain.RecentFileType.LightCurve, saveFileDialog.FileName);
+			m_VideoController.RegisterRecentFile(RecentFileType.LightCurve, fileName);
         }
 
         public DialogResult ShowMessageBox(string message, string title, MessageBoxButtons buttons, MessageBoxIcon icon)
         {
-            throw new NotImplementedException();
-
-            // NOTE: Use method in a shared location
+			// TODO: Use a shared implementation
+			return m_VideoController.ShowMessageBox(message, title, buttons, icon);
         }
+
+		internal void SetLcFile(LCFile lcFile)
+		{
+			m_LightCurveForm.SetNewLcFile(lcFile);						
+		}
+
+		public void EnsureLightCurveFormClosed()
+		{
+			try
+			{
+				if (m_LightCurveForm != null &&
+					m_LightCurveForm.Visible)
+				{
+					// TODO: Ask if the user wants to save it /* Yes/No options only. No 'Cancel' option*/
+					// TODO: This should be moved to a different place and should be tested from all: (1) Closing Tangra's main form, (2) Closing LightCurve form, (3) Switching to a different operation
+					m_LightCurveForm.CloseFormDontSendMessage();
+				}
+			}
+			finally
+			{
+				m_LightCurveForm = null;
+			}            
+		}
+
+		internal void EnsureLightCurveForm()
+		{
+			// TODO: Made this part of SetLcFile() :??
+
+			m_LightCurveForm = new frmLightCurve(this);
+
+			m_LightCurveForm.Show(m_MainFormView);
+			m_LightCurveForm.Update();
+		}
+
+		internal void OnNewSelectedMeasurements(LCMeasurement[] selectedMeasurements)
+		{
+			if (selectedMeasurements != null &&
+				selectedMeasurements.Length > 0)
+			{
+				m_LightCurveForm.OnNewSelectedMeasurements(selectedMeasurements);	
+			}
+		}
     }
 }

@@ -70,8 +70,10 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 
         //#endregion
 
-		private void HandleNewSelectedFrame()
+		internal void HandleNewSelectedFrame(LCMeasurement[] selectedMeasurements)
 		{
+			m_SelectedMeasurements = selectedMeasurements;
+
 			if (m_SelectedMeasurements != null)
 			{
 				for (int i = 0; i < m_SelectedMeasurements.Length; i++)
@@ -147,7 +149,7 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 
 		private void rbPreProcessedData_CheckedChanged(object sender, EventArgs e)
 		{
-			HandleNewSelectedFrame();
+			//HandleNewSelectedFrame();
 		}
 
 		private uint[,] GetPixelData(uint[,] sourcePixels)

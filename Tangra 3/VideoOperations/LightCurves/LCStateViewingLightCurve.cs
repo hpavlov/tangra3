@@ -10,5 +10,12 @@ namespace Tangra.VideoOperations.LightCurves
         internal LCStateViewingLightCurve(LCStateMachine context)
             : base(context)
         { }
+
+		public override void Initialize()
+		{
+			base.Initialize();
+
+			Context.SetCanPlayVideo(false);
+		}
     }
 }

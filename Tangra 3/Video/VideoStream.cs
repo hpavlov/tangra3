@@ -11,6 +11,13 @@ using Tangra.PInvoke;
 
 namespace Tangra.Video
 {
+	public class InvalidVideoFileException : Exception
+	{
+		public InvalidVideoFileException(string message)
+			: base(message)
+		{ }
+	}
+
 	public class VideoStream : IFrameStream, IDisposable
 	{
 		public static VideoStream OpenFile(string fileName)
@@ -25,8 +32,7 @@ namespace Tangra.Video
 			}
 			catch (Exception ex)
 			{
-				Trace.WriteLine(ex);
-				return null;
+				throw new InvalidVideoFileException(ex.Message);
 			}
 		}
 
@@ -109,7 +115,16 @@ namespace Tangra.Video
 
 		public Pixelmap GetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging)
 		{
-			throw new NotImplementedException();
+			if (startFrameNo < FirstFrame) startFrameNo = FirstFrame;
+			if (startFrameNo > LastFrame) startFrameNo = LastFrame;
+
+			uint[] pixels;
+			Bitmap videoFrame;
+			byte[] bitmapBytes;
+
+			TangraVideo.GetIntegratedFrame(startFrameNo, framesToIntegrate, isSlidingIntegration, isMedianAveraging, out pixels, out videoFrame, out bitmapBytes);
+
+			return new Pixelmap(Width, Height, 8, pixels, videoFrame, bitmapBytes);
 		}
 
 		public string Engine

@@ -338,6 +338,16 @@ namespace Tangra.Model.Astro
             // Assuming BGR (bt0 = B; bt1 = G; bt2 = R)
             return (byte)(.299 * bt2_r + .587 * bt1_g + .114 * bt0_b);
         }
+
+		public byte GetDisplayPixel(int x, int y)
+		{
+			if (x >= 0 && x < m_Pixelmap.Width && y >= 0 && y < m_Pixelmap.Height)
+			{
+				return m_Pixelmap.DisplayBitmapPixels[x + m_Pixelmap.Width * y];
+			}
+			else
+				return 0;
+		}
     }
 }
 

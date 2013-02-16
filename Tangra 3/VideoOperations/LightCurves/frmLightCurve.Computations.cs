@@ -11,6 +11,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Tangra.Config;
 using Tangra.Model.Config;
+using Tangra.Model.Image;
 using Tangra.Model.Numerical;
 using Tangra.Model.Video;
 using Tangra.Model.VideoOperations;
@@ -1493,13 +1494,11 @@ namespace Tangra.VideoOperations.LightCurves
 				{
                     if (Filter == FilterType.LowPass)
                     {
-                        throw new NotImplementedException();
-                        //newData = BitmapFilter.LowPassFilter(newData);
+                        newData = BitmapFilter.LowPassFilter(newData);
                     }
                     else if (Filter == FilterType.LowPassDifference)
                     {
-                        throw new NotImplementedException();
-                        //newData = BitmapFilter.LowPassDifferenceFilter(newData);
+                        newData = BitmapFilter.LowPassDifferenceFilter(newData);
                     }
 				}
 

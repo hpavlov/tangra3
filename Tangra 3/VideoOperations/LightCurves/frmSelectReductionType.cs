@@ -10,9 +10,11 @@ using System.Text;
 using System.Windows.Forms;
 using Tangra;
 using Tangra.Config;
+using Tangra.Controller;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
 using Tangra.Model.Video;
+using Tangra.Model.VideoOperations;
 using Tangra.Video;
 using Tangra.VideoOperations.LightCurves;
 
@@ -23,10 +25,13 @@ namespace Tangra.VideoOperations.LightCurves
         //[DllImport("kernel32", CharSet = CharSet.Auto)]
         //static extern int GetDiskFreeSpaceEx(string lpDirectoryName, out ulong lpFreeBytesAvailable, out ulong lpTotalNumberOfBytes, out ulong lpTotalNumberOfFreeBytes);
 
-        public frmSelectReductionType(IFramePlayer framePlayer)
+	    private VideoController m_VideoContoller;
+
+		public frmSelectReductionType(VideoController videoContoller, IFramePlayer framePlayer)
         {
             InitializeComponent();
 
+			m_VideoContoller = videoContoller;
             rbAsteroidal.Checked = true;
 
             ucStretching.Initialize(framePlayer.Video);
@@ -43,9 +48,9 @@ namespace Tangra.VideoOperations.LightCurves
             cbxBackgroundMethod.Items.RemoveAt(2);
             #endregion
 
-            //FrameAdjustmentsPreview.Instance.ParentForm = this;
-            //FrameAdjustmentsPreview.Instance.FramePlayer = framePlayer;
-            //FrameAdjustmentsPreview.Instance.Reset(VideoContext.Current.FirstFrameIndex);
+			FrameAdjustmentsPreview.Instance.ParentForm = this;
+			FrameAdjustmentsPreview.Instance.FramePlayer = framePlayer;
+			FrameAdjustmentsPreview.Instance.Reset(m_VideoContoller);
         }
 
         public TangraConfig.PhotometryReductionMethod ComboboxIndexToPhotometryReductionMethod()
@@ -124,78 +129,79 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void btnOK_Click(object sender, EventArgs e)
         {
-            //LightCurveReductionContext.Instance.DigitalFilter = (PreProcessingFilter)cbxDigitalFilter.SelectedIndex;
-            //LightCurveReductionContext.Instance.NoiseMethod = ComboboxIndexToBackgroundMethod();
-            //LightCurveReductionContext.Instance.ReductionMethod = ComboboxIndexToPhotometryReductionMethod();
-            //LightCurveReductionContext.Instance.FullDisappearance = cbxFullDisappearance.Checked;
-            //LightCurveReductionContext.Instance.HighFlickering = cbxFlickering.Checked;
-            //LightCurveReductionContext.Instance.WindOrShaking = cbxShaking.Checked;
-            //LightCurveReductionContext.Instance.StopOnLostTracking = cbxShaking.Checked && cbxStopOnLostTracking.Checked;
-            //LightCurveReductionContext.Instance.UseMinimumRefiningFrames = cbsMinimumRefiningFrames.Checked;
-            //LightCurveReductionContext.Instance.FieldRotation = cbxFieldRotation.Checked;
-            //LightCurveReductionContext.Instance.IsDriftThrough = cbxDriftTrough.Checked;
+			LightCurveReductionContext.Instance.DigitalFilter = (TangraConfig.PreProcessingFilter)cbxDigitalFilter.SelectedIndex;
+			LightCurveReductionContext.Instance.NoiseMethod = ComboboxIndexToBackgroundMethod();
+			LightCurveReductionContext.Instance.ReductionMethod = ComboboxIndexToPhotometryReductionMethod();
+			LightCurveReductionContext.Instance.FullDisappearance = cbxFullDisappearance.Checked;
+			LightCurveReductionContext.Instance.HighFlickering = cbxFlickering.Checked;
+			LightCurveReductionContext.Instance.WindOrShaking = cbxShaking.Checked;
+			LightCurveReductionContext.Instance.StopOnLostTracking = cbxShaking.Checked && cbxStopOnLostTracking.Checked;
+			//LightCurveReductionContext.Instance.UseMinimumRefiningFrames = cbsMinimumRefiningFrames.Checked;
+			LightCurveReductionContext.Instance.FieldRotation = cbxFieldRotation.Checked;
+			LightCurveReductionContext.Instance.IsDriftThrough = cbxDriftTrough.Checked;
 
-            //if (rbAsteroidal.Checked)
-            //    LightCurveReductionContext.Instance.LightCurveReductionType = LightCurveReductionType.Asteroidal;
-            //else if (rbMutualEvent.Checked)
-            //    LightCurveReductionContext.Instance.LightCurveReductionType = LightCurveReductionType.MutualEvent;
-            ////else if (rbTotalLunarEvent.Checked)
-            ////    LightCurveReductionContext.Instance.LightCurveReductionType = LightCurveReductionType.TotalLunarDisappearance;
-            //else
-            //    LightCurveReductionContext.Instance.LightCurveReductionType = LightCurveReductionType.UntrackedMeasurement;
+			if (rbAsteroidal.Checked)
+				LightCurveReductionContext.Instance.LightCurveReductionType = LightCurveReductionType.Asteroidal;
+			else if (rbMutualEvent.Checked)
+				LightCurveReductionContext.Instance.LightCurveReductionType = LightCurveReductionType.MutualEvent;
+			//else if (rbTotalLunarEvent.Checked)
+			//    LightCurveReductionContext.Instance.LightCurveReductionType = LightCurveReductionType.TotalLunarDisappearance;
+			else
+				LightCurveReductionContext.Instance.LightCurveReductionType = LightCurveReductionType.UntrackedMeasurement;
 
-            //if (rbRunningAverage.Checked)
-            //    LightCurveReductionContext.Instance.FrameIntegratingMode = FrameIntegratingMode.SlidingAverage;
-            //else if (rbBinning.Checked)
-            //    LightCurveReductionContext.Instance.FrameIntegratingMode = FrameIntegratingMode.SteppedAverage;
-            //else
-            //    LightCurveReductionContext.Instance.FrameIntegratingMode = FrameIntegratingMode.NoIntegration;
+			if (rbRunningAverage.Checked)
+				LightCurveReductionContext.Instance.FrameIntegratingMode = FrameIntegratingMode.SlidingAverage;
+			else if (rbBinning.Checked)
+				LightCurveReductionContext.Instance.FrameIntegratingMode = FrameIntegratingMode.SteppedAverage;
+			else
+				LightCurveReductionContext.Instance.FrameIntegratingMode = FrameIntegratingMode.NoIntegration;
 
-            //if (rbMedian.Checked)
-            //    LightCurveReductionContext.Instance.PixelIntegrationType = PixelIntegrationType.Median;
-            //else
-            //    LightCurveReductionContext.Instance.PixelIntegrationType = PixelIntegrationType.Mean;
+			if (rbMedian.Checked)
+				LightCurveReductionContext.Instance.PixelIntegrationType = PixelIntegrationType.Median;
+			else
+				LightCurveReductionContext.Instance.PixelIntegrationType = PixelIntegrationType.Mean;
 
-            //LightCurveReductionContext.Instance.NumberFramesToIntegrate = (int)nudIntegrateFrames.Value;
+			LightCurveReductionContext.Instance.NumberFramesToIntegrate = (int)nudIntegrateFrames.Value;
 
-            //if (LightCurveReductionContext.Instance.FullDisappearance &&
-            //    LightCurveReductionContext.Instance.ReductionMethod != TangraConfig.PhotometryReductionMethod.AperturePhotometry)
-            //{
-            //    DialogResult result = MessageBox.Show(
-            //        "Your selected photometry method does not work well with full disappearances. It is recommended to use Aperture Photometry instead. Do you want to use Aperture Photometry for this reduction?",
-            //        "Warning",
-            //        MessageBoxButtons.YesNoCancel,
-            //        MessageBoxIcon.Warning,
-            //        MessageBoxDefaultButton.Button1);
+			if (LightCurveReductionContext.Instance.FullDisappearance &&
+				LightCurveReductionContext.Instance.ReductionMethod != TangraConfig.PhotometryReductionMethod.AperturePhotometry)
+			{
+				DialogResult result = MessageBox.Show(
+					"Your selected photometry method does not work well with full disappearances. It is recommended to use Aperture Photometry instead. Do you want to use Aperture Photometry for this reduction?",
+					"Warning",
+					MessageBoxButtons.YesNoCancel,
+					MessageBoxIcon.Warning,
+					MessageBoxDefaultButton.Button1);
 
-            //    if (result == DialogResult.Cancel)
-            //        return;
-            //    else if (result == DialogResult.Yes)
-            //        LightCurveReductionContext.Instance.ReductionMethod = TangraConfig.PhotometryReductionMethod.AperturePhotometry;
-            //}
+				if (result == DialogResult.Cancel)
+					return;
+				else if (result == DialogResult.Yes)
+					LightCurveReductionContext.Instance.ReductionMethod = TangraConfig.PhotometryReductionMethod.AperturePhotometry;
+			}
 
-            //LightCurveReductionContext.Instance.SaveTrackingSession = false;
-            ////LightCurveReductionContext.Instance.SaveTrackingSession = cbxSaveSessionFile.Checked;
-            ////if (cbxSaveSessionFile.Checked)
-            ////    LightCurveReductionContext.Instance.EnsureTrackingSession();
+			LightCurveReductionContext.Instance.SaveTrackingSession = false;
+			//LightCurveReductionContext.Instance.SaveTrackingSession = cbxSaveSessionFile.Checked;
+			//if (cbxSaveSessionFile.Checked)
+			//    LightCurveReductionContext.Instance.EnsureTrackingSession();
 
-            //RegistryConfig.Instance.ReductionType = cbxReductionType.SelectedIndex;
-            //RegistryConfig.Instance.AdvancedLightCurveSettings = m_MoreEnabled;
-            //RegistryConfig.Instance.Save();
+			TangraConfig.Settings.LastUsed.ReductionType = (TangraConfig.PhotometryReductionMethod)cbxReductionType.SelectedIndex;
+			TangraConfig.Settings.LastUsed.AdvancedLightCurveSettings = m_MoreEnabled;
+			TangraConfig.Settings.Save();
 
-            //frmMain.ApplicationState.Current.UsingIntegration =
-            //    LightCurveReductionContext.Instance.FrameIntegratingMode != FrameIntegratingMode.NoIntegration;
-            //frmMain.ApplicationState.Current.NumberFramesToIntegrate =
-            //    LightCurveReductionContext.Instance.NumberFramesToIntegrate;
-            //frmMain.ApplicationState.Current.UpdateControlsState();
+			TangraContext.Current.UsingIntegration = LightCurveReductionContext.Instance.FrameIntegratingMode != FrameIntegratingMode.NoIntegration;
+			TangraContext.Current.NumberFramesToIntegrate = LightCurveReductionContext.Instance.NumberFramesToIntegrate;
+			m_VideoContoller.UpdateViews();
 
-            //LightCurveReductionContext.Instance.UseStretching = ucStretching.rbStretching.Checked;
-            //LightCurveReductionContext.Instance.UseClipping = ucStretching.rbClipping.Checked;
-            //LightCurveReductionContext.Instance.UseBrightnessContrast = ucStretching.rbBrightnessContrast.Checked;
-            //LightCurveReductionContext.Instance.FromByte = ucStretching.FromByte;
-            //LightCurveReductionContext.Instance.ToByte = ucStretching.ToByte;
-            //LightCurveReductionContext.Instance.Brightness = ucStretching.Brightness;
-            //LightCurveReductionContext.Instance.Contrast = ucStretching.Contrast;
+			LightCurveReductionContext.Instance.UseStretching = ucStretching.rbStretching.Checked;
+			LightCurveReductionContext.Instance.UseClipping = ucStretching.rbClipping.Checked;
+			LightCurveReductionContext.Instance.UseBrightnessContrast = ucStretching.rbBrightnessContrast.Checked;
+			LightCurveReductionContext.Instance.FromByte = ucStretching.FromByte;
+			LightCurveReductionContext.Instance.ToByte = ucStretching.ToByte;
+			LightCurveReductionContext.Instance.Brightness = ucStretching.Brightness;
+			LightCurveReductionContext.Instance.Contrast = ucStretching.Contrast;
+
+	        LightCurveReductionContext.Instance.BitPix = m_VideoContoller.VideoBitPix;
+	        LightCurveReductionContext.Instance.MaxPixelValue = (uint)1 << m_VideoContoller.VideoBitPix;
 
             DialogResult = DialogResult.OK;
             Close();
@@ -203,13 +209,13 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void rbNoIntegration_CheckedChanged(object sender, EventArgs e)
         {
-            //gbxPixelIntegration.Enabled = !rbNoIntegration.Checked;
-            //pnlFrameCount.Enabled = !rbNoIntegration.Checked;
+			gbxPixelIntegration.Enabled = !rbNoIntegration.Checked;
+			pnlFrameCount.Enabled = !rbNoIntegration.Checked;
 
-            //if (rbNoIntegration.Checked)
-            //    FrameAdjustmentsPreview.Instance.NoIntegration();
-            //else
-            //    SetupIntegrationPreView();
+			if (rbNoIntegration.Checked)
+				FrameAdjustmentsPreview.Instance.NoIntegration();
+			else
+				SetupIntegrationPreView();
         }
 
         private bool m_MoreEnabled = false;
@@ -318,16 +324,16 @@ namespace Tangra.VideoOperations.LightCurves
 
 		private void SetupIntegrationPreView()
 		{
-            //FrameAdjustmentsPreview.Instance.Integration(
-            //    (int)nudIntegrateFrames.Value,
-            //    rbBinning.Checked 
-            //        ? FrameIntegratingMode.SteppedAverage 
-            //        : (rbRunningAverage.Checked 
-            //                ? FrameIntegratingMode.SlidingAverage 
-            //                : FrameIntegratingMode.NoIntegration),
-            //    rbMedian.Checked 
-            //        ? PixelIntegrationType.Median 
-            //        : PixelIntegrationType.Mean);			
+			FrameAdjustmentsPreview.Instance.Integration(
+				(int)nudIntegrateFrames.Value,
+				rbBinning.Checked
+					? FrameIntegratingMode.SteppedAverage
+					: (rbRunningAverage.Checked
+							? FrameIntegratingMode.SlidingAverage
+							: FrameIntegratingMode.NoIntegration),
+				rbMedian.Checked
+					? PixelIntegrationType.Median
+					: PixelIntegrationType.Mean);			
 		}
 
 		private void nudIntegrateFrames_ValueChanged(object sender, EventArgs e)
@@ -342,15 +348,15 @@ namespace Tangra.VideoOperations.LightCurves
 
 		private void frmSelectReductionType_Move(object sender, EventArgs e)
 		{
-			//FrameAdjustmentsPreview.Instance.MoveForm(this.Right, this.Top);
+			FrameAdjustmentsPreview.Instance.MoveForm(this.Right, this.Top);
 		}
 
 		private void cbxDigitalFilter_SelectedIndexChanged(object sender, EventArgs e)
 		{
-            //if (cbxDigitalFilter.SelectedIndex == 0)
-            //    FrameAdjustmentsPreview.Instance.NoDigitalFilters();
-            //else
-            //    FrameAdjustmentsPreview.Instance.DigitalFilters((PreProcessingFilter)cbxDigitalFilter.SelectedIndex);
+			if (cbxDigitalFilter.SelectedIndex == 0)
+				FrameAdjustmentsPreview.Instance.NoDigitalFilters();
+			else
+				FrameAdjustmentsPreview.Instance.DigitalFilters((TangraConfig.PreProcessingFilter)cbxDigitalFilter.SelectedIndex);
 		}
 
 		private void cbxDriftTrough_CheckedChanged(object sender, EventArgs e)

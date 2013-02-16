@@ -403,24 +403,22 @@ namespace Tangra.VideoOperations.LightCurves
             int areaSize = Context.Filter == frmLightCurve.LightCurveContext.FilterType.NoFilter
                    ? 17
                    : 19;
+            
+			uint[,] data = BitmapFilter.CutArrayEdges(clonedValue.PixelData, (35 - areaSize) / 2);
 
-            throw new NotImplementedException("Code below was commented out!");
-
-            //uint[,] data = BitmapFilter.CutArrayEdges(clonedValue.PixelData, (35 - areaSize) / 2);
-
-            //LightCurves.MeasureObject(
-            //    center,
-            //    data,
-            //    clonedValue.PixelData,
-            //    measurer,
-            //    (TangraConfig.PreProcessingFilter)((int)Context.Filter),
-            //    false,
-            //    Context.SignalMethod,
-            //    newSignalAperture,
-            //    objConfig.RefinedFWHM,
-            //    Footer.RefinedAverageFWHM,
-            //    clonedValue,
-            //    Footer.ReductionContext.FullDisappearance);
+			ReduceLightCurveOperation.MeasureObject(
+				center,
+				data,
+				clonedValue.PixelData,
+				measurer,
+				(TangraConfig.PreProcessingFilter)((int)Context.Filter),
+				false,
+				Context.SignalMethod,
+				newSignalAperture,
+				objConfig.RefinedFWHM,
+				Footer.RefinedAverageFWHM,
+				clonedValue,
+				Footer.ReductionContext.FullDisappearance);
 
             clonedValue.TotalReading = (uint)measurer.TotalReading;
             clonedValue.TotalBackground = (uint)measurer.TotalBackground;

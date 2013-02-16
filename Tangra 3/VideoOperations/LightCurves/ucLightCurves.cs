@@ -174,8 +174,8 @@ namespace Tangra.VideoOperations.LightCurves
                     // If there is a selected object and it is an existing star
                     m_StateMachine.SelectedObject != null && m_StateMachine.SelectedMeasuringStar != -1;
 
-                cbxDisplayBrightness.Checked = TangraConfig.Settings.LastUsed.MeasuringZoomImageMode != 1;
-                cbxDisplayPixels.Checked = TangraConfig.Settings.LastUsed.MeasuringZoomImageMode == 1;
+                rbDisplayBrightness.Checked = TangraConfig.Settings.LastUsed.MeasuringZoomImageMode != 1;
+                rbDisplayPixels.Checked = TangraConfig.Settings.LastUsed.MeasuringZoomImageMode == 1;
             }
             else
             {
@@ -202,13 +202,13 @@ namespace Tangra.VideoOperations.LightCurves
             UpdateLCData();            
         }
 
-        //internal void SetupLCFileInfo(LCFile lcFile)
-        //{
-        //    pnlViewLightCurve.Controls.Clear();
-        //    ucLCFileInfo info = new ucLCFileInfo(lcFile, m_Host);
-        //    pnlViewLightCurve.Controls.Add(info);
-        //    info.Dock = DockStyle.Fill;
-        //}
+		internal void SetupLCFileInfo(LCFile lcFile)
+		{
+			pnlViewLightCurve.Controls.Clear();
+			var info = new ucLCFileInfo(lcFile, m_VideoController);
+			pnlViewLightCurve.Controls.Add(info);
+			info.Dock = DockStyle.Fill;
+		}
 
         public void UpdateProcessedFrames(int processedFramed, int unsuccessfulFrames, int elapsedTime)
         {
@@ -421,6 +421,8 @@ namespace Tangra.VideoOperations.LightCurves
                 }
 
                 m_StateMachine.ObjectEdited(frmAddSingleTarget.ObjectToAdd);
+
+				m_VideoController.RefreshCurrentFrame();
             }
         }
 
@@ -437,84 +439,88 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void btnStart_Click(object sender, EventArgs e)
         {
-        //    bool ctrlHolded = 0 > Convert.ToInt32(GetAsyncKeyState(Keys.ControlKey));
+			bool ctrlHeld = 
+				Control.ModifierKeys == Keys.Control || 
+				Control.ModifierKeys == Keys.ControlKey;
 
-        //    LightCurveReductionContext.Instance.DebugTracking = ctrlHolded;
+			LightCurveReductionContext.Instance.DebugTracking = ctrlHeld;
 
-        //    TrackedObjectConfig occultedStar = m_State.MeasuringStars.Find(t => t.TrackingType == TrackingType.OccultedStar);
-        //    if (occultedStar == null)
-        //    {
-        //        MessageBox.Show(m_State.Host.MainFormWindow, "No 'Occulted Star' is selected", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        //        return;
-        //    }
+			TrackedObjectConfig occultedStar = m_StateMachine.MeasuringStars.Find(t => t.TrackingType == TrackingType.OccultedStar);
+			if (occultedStar == null)
+			{
+				m_VideoController.ShowMessageBox(
+					"No 'Occulted Star' is selected", "Error", 
+					MessageBoxButtons.OK, 
+					MessageBoxIcon.Error);
+				return;
+			}
 
-        //    if (HasObjectsWithAutoAperutreCloserThan8PixelsApart())
-        //    {
-        //        MessageBox.Show(
-        //            m_State.Host.MainFormWindow, 
-        //            "Tangra cannot complete this measurement because two of the objects are too close.\r\n\r\n "+
-        //            "To continue you need to:\r\n\r\n- Use Aperture Photometry \r\n- Use Manually Positioned aperture for one of the two close objects",
-        //            "Error", 
-        //            MessageBoxButtons.OK, 
-        //            MessageBoxIcon.Error);
+			if (HasObjectsWithAutoAperutreCloserThan8PixelsApart())
+			{
+				m_VideoController.ShowMessageBox(
+					"Tangra cannot complete this measurement because two of the objects are too close.\r\n\r\n " +
+					"To continue you need to:\r\n\r\n- Use Aperture Photometry \r\n- Use Manually Positioned aperture for one of the two close objects",
+					"Error",
+					MessageBoxButtons.OK,
+					MessageBoxIcon.Error);
 
-        //        return;
-        //    }
+				return;
+			}
 
-        //    int numberGuidingStars = m_State.MeasuringStars.Count(t => t.TrackingType == TrackingType.GuidingStar);
-        //    int numberComparisonStars = m_State.MeasuringStars.Count(t => t.TrackingType == TrackingType.ComparisonStar);
-        //    bool warnedAboutGuidingStars = false;
+			int numberGuidingStars = m_StateMachine.MeasuringStars.Count(t => t.TrackingType == TrackingType.GuidingStar);
+			int numberComparisonStars = m_StateMachine.MeasuringStars.Count(t => t.TrackingType == TrackingType.ComparisonStar);
+			bool warnedAboutGuidingStars = false;
 
-        //    if (occultedStar.AutoStarsInArea.Count != 1 || 
-        //        occultedStar.IsWeakSignalObject)
-        //    {
-        //        // If this is a user defined position or not the only bright star in the region, we 
-        //        // require at least one guiding star before we can start
-        //        if (numberGuidingStars == 0)
-        //        {
-        //            warnedAboutGuidingStars = true;
-        //            if (MessageBox.Show(m_State.Host.MainFormWindow,
-        //                "It seems that the occulted star is not very bright. For best tracking results it is recommended to select as many 'Guiding Stars' as possible.\r\n\r\nYou should also consider using software integration if there are no bright stars in the video." +
-        //                "\r\n\r\nWould you like to continue anyway without a 'Guiding Star'?",
-        //                "Warning",
-        //                MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.No)
-        //            {
-        //                return;
-        //            }
-        //        }
-        //    }
+			if (occultedStar.AutoStarsInArea.Count != 1 ||
+				occultedStar.IsWeakSignalObject)
+			{
+				// If this is a user defined position or not the only bright star in the region, we 
+				// require at least one guiding star before we can start
+				if (numberGuidingStars == 0)
+				{
+					warnedAboutGuidingStars = true;
+					if (m_VideoController.ShowMessageBox(
+						"It seems that the occulted star is not very bright. For best tracking results it is recommended to select as many 'Guiding Stars' as possible.\r\n\r\nYou may also consider using software integration if there are no bright stars in the video." +
+						"\r\n\r\nWould you like to continue anyway without a 'Guiding Star'?",
+						"Warning",
+						MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.No)
+					{
+						return;
+					}
+				}
+			}
 
-        //    if (!warnedAboutGuidingStars &&
-        //        numberGuidingStars < numberComparisonStars)
-        //    {
-        //        warnedAboutGuidingStars = true;
-        //        if (MessageBox.Show(m_State.Host.MainFormWindow,
-        //                "It seems that you may have too few 'Guiding Stars'. For best results it is recommended to use as many 'Guiding Stars' as possible.\r\n\r\nYou should also consider using software integration if there are no bright stars in the video." +
-        //                "\r\n\r\nWould you like to continue anyway?",
-        //                "Warning",
-        //                MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.No)
-        //        {
-        //            return;
-        //        }
-        //    }
+            if (!warnedAboutGuidingStars &&
+                numberGuidingStars < numberComparisonStars)
+            {
+                warnedAboutGuidingStars = true;
+                if (m_VideoController.ShowMessageBox(
+                        "It seems that you may have too few 'Guiding Stars'. For best results it is recommended to use as many 'Guiding Stars' as possible.\r\n\r\nYou should also consider using software integration if there are no bright stars in the video." +
+                        "\r\n\r\nWould you like to continue anyway?",
+                        "Warning",
+                        MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.No)
+                {
+                    return;
+                }
+            }
 
-        //    //if (m_State.MeasuringStars.Count == 1)
-        //    //{
-        //    //    DialogResult userChoise = MessageBox.Show(m_State.Host.MainFormWindow,
-        //    //                                              "Is this a drift through video?\r\n\r\nIf there are no objects that can be used for guiding and this is a drift through video then press 'Yes'. " +
-        //    //                                              "If there are stars that can be used for guiding then press 'Cancel' to go back and configure at least one guiding star. Otherwise press 'No'.",
-        //    //                                              "Question",
-        //    //                                              MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question,
-        //    //                                              MessageBoxDefaultButton.Button2);
+			//if (m_State.MeasuringStars.Count == 1)
+			//{
+			//    DialogResult userChoise = MessageBox.Show(m_State.Host.MainFormWindow,
+			//                                              "Is this a drift through video?\r\n\r\nIf there are no objects that can be used for guiding and this is a drift through video then press 'Yes'. " +
+			//                                              "If there are stars that can be used for guiding then press 'Cancel' to go back and configure at least one guiding star. Otherwise press 'No'.",
+			//                                              "Question",
+			//                                              MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question,
+			//                                              MessageBoxDefaultButton.Button2);
 
-        //    //    if (userChoise == DialogResult.Cancel)
-        //    //        return;
+			//    if (userChoise == DialogResult.Cancel)
+			//        return;
 
-        //    //    LightCurveReductionContext.Instance.IsDriftThrough = userChoise == DialogResult.Yes;
-        //    //}
+			//    LightCurveReductionContext.Instance.IsDriftThrough = userChoise == DialogResult.Yes;
+			//}
 
-        //    m_StoppedAtFrameNo = -1;
-        //    m_State.VideoOperation.BeginMeasurements();
+			m_StoppedAtFrameNo = -1;
+			m_StateMachine.VideoOperation.BeginMeasurements();
         }
 
         private bool HasObjectsWithAutoAperutreCloserThan8PixelsApart()
@@ -544,25 +550,25 @@ namespace Tangra.VideoOperations.LightCurves
         private int m_StoppedAtFrameNo = -1;
         private void btnStop_Click(object sender, EventArgs e)
         {
-        //    if (m_StoppedAtFrameNo != -1)
-        //    {
-        //        m_State.VideoOperation.ContinueMeasurements(m_StoppedAtFrameNo);
-        //        m_StoppedAtFrameNo = -1;
-        //        btnStop.Text = "Stop";
+			if (m_StoppedAtFrameNo != -1)
+			{
+				m_StateMachine.VideoOperation.ContinueMeasurements(m_StoppedAtFrameNo);
+				m_StoppedAtFrameNo = -1;
+				btnStop.Text = "Stop";
 
-        //        btnLightCurve.Visible = false;
-        //    }
-        //    else
-        //    {
-        //        if (m_State.VideoOperation.IsRefining)
-        //        {
-        //            StopRefining();
-        //        }
-        //        else
-        //        {
-        //            StopMeasurements();
-        //        }
-        //    }
+				btnLightCurve.Visible = false;
+			}
+			else
+			{
+				if (m_StateMachine.VideoOperation.IsRefining)
+				{
+					StopRefining();
+				}
+				else
+				{
+					StopMeasurements();
+				}
+			}
         }
 
         private void btnLightCurve_Click(object sender, EventArgs e)
@@ -574,77 +580,77 @@ namespace Tangra.VideoOperations.LightCurves
         private int m_FirstTimeFrame = -1;
         private int m_LastTimeFrame = -1;
 
-        //private bool IsDuplicatedFrame(int frameId)
-        //{
-        //    DuplicateFrameAvoider avoider = new DuplicateFrameAvoider(m_State.Host.FramePlayer, frameId);
-        //    return avoider.IsDuplicatedFrame();
-        //}
+		private bool IsDuplicatedFrame(int frameId)
+		{
+			var avoider = new DuplicateFrameAvoider((VideoController)m_VideoController, frameId);
+			return avoider.IsDuplicatedFrame();			
+		}
 
-        //private void ShowDuplicatedFrameMessage()
-        //{
-        //    MessageBox.Show(
-        //        "The current frame appears to be duplicate of the previous or the next frame. Because of this the timestamp on this frame " +
-        //        "may not correspond to the actual time for this frame number. Please move to and enter the timestamp of a different video frame.",
-        //        "Problem found", MessageBoxButtons.OK, MessageBoxIcon.Stop);            
-        //}
+		private void ShowDuplicatedFrameMessage()
+		{
+			MessageBox.Show(
+				"The current frame appears to be duplicate of the previous or the next frame. Because of this the timestamp on this frame " +
+				"may not correspond to the actual time for this frame number. Please move to and enter the timestamp of a different video frame.",
+				"Problem found", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+		}
 
         private void btnNextTime_Click(object sender, EventArgs e)
         {
-        //    btnContinueWithNoTimes.Visible = false;
-           
-        //    if (!m_FirstTimeSet)
-        //    {
-        //        if (IsDuplicatedFrame(m_State.VideoOperation.m_CurrFrameNo))
-        //        {
-        //            ShowDuplicatedFrameMessage();
-        //            return;
-        //        }
+			btnContinueWithNoTimes.Visible = false;
 
-        //        m_FirstTimeFrame = m_State.VideoOperation.m_CurrFrameNo;
-        //        m_FirstTimeSet = true;
+			if (!m_FirstTimeSet)
+			{
+				if (IsDuplicatedFrame(m_StateMachine.VideoOperation.m_CurrFrameNo))
+				{
+					ShowDuplicatedFrameMessage();
+					return;
+				}
 
-        //        lblTimesHeader.Text = "Enter the UTC time of the last measured frame:";
-        //        btnNextTime.Text = "Finish";
-        //        ucUtcTime.EnterTimeAtTheSameDate();
-        //        m_State.VideoOperation.SetStartTime(ucUtcTime.DateTimeUtc);
-        //        m_State.VideoOperation.InitGetEndTime();
+				m_FirstTimeFrame = m_StateMachine.VideoOperation.m_CurrFrameNo;
+				m_FirstTimeSet = true;
 
-        //        if (m_ShowingFields) m_State.VideoOperation.ToggleShowFields(true);
-        //    }
-        //    else
-        //    {
-        //        if (IsDuplicatedFrame(m_State.VideoOperation.m_CurrFrameNo))
-        //        {
-        //            ShowDuplicatedFrameMessage();
-        //            return;
-        //        }
+				lblTimesHeader.Text = "Enter the UTC time of the last measured frame:";
+				btnNextTime.Text = "Finish";
+				ucUtcTime.EnterTimeAtTheSameDate();
+				m_StateMachine.VideoOperation.SetStartTime(ucUtcTime.DateTimeUtc);
+				m_StateMachine.VideoOperation.InitGetEndTime();
 
-        //        m_State.VideoOperation.SetEndTime(ucUtcTime.DateTimeUtc);
-        //        m_LastTimeFrame = m_State.VideoOperation.m_CurrFrameNo;
+				if (m_ShowingFields) m_StateMachine.VideoOperation.ToggleShowFields(true);
+			}
+			else
+			{
+				if (IsDuplicatedFrame(m_StateMachine.VideoOperation.m_CurrFrameNo))
+				{
+					ShowDuplicatedFrameMessage();
+					return;
+				}
 
-        //        double frameRate;
-        //        if (m_State.VideoOperation.EnteredTimeIntervalLooksOkay(out frameRate))
-        //            m_State.VideoOperation.ShowLightCurve();
-        //        else
-        //        {
-        //            if (MessageBox.Show(
-        //                string.Format("According to the frame rate ({1}) of the video the entered time is off by more than {0} ms. This may indicate " +
-        //                "incorrectly entered start or end time. Do you want to enter the start and end times again?", 
-        //                (TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMs).ToString("0.00"),
-        //                frameRate.ToString("0.00000000")), 
-        //                "Warning", 
-        //                MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) == 
-        //                DialogResult.Yes)
-        //            {
-        //                PrepareToEnterStarTime();
-        //                return;    
-        //            }
-        //            else
-        //                m_State.VideoOperation.ShowLightCurve();
-        //        }
-        //    }
+				m_StateMachine.VideoOperation.SetEndTime(ucUtcTime.DateTimeUtc);
+				m_LastTimeFrame = m_StateMachine.VideoOperation.m_CurrFrameNo;
 
-        //    UpdateShowingFieldControls();
+				double frameRate;
+				if (m_StateMachine.VideoOperation.EnteredTimeIntervalLooksOkay(out frameRate))
+					m_StateMachine.VideoOperation.ShowLightCurve();
+				else
+				{
+					if (m_VideoController.ShowMessageBox(
+						string.Format("According to the frame rate ({1}) of the video the entered time is off by more than {0} ms. This may indicate " +
+						"incorrectly entered start or end time. Do you want to enter the start and end times again?",
+						(TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMs).ToString("0.00"),
+						frameRate.ToString("0.00000000")),
+						"Warning",
+						MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) ==
+						DialogResult.Yes)
+					{
+						PrepareToEnterStarTime();
+						return;
+					}
+					else
+						m_StateMachine.VideoOperation.ShowLightCurve();
+				}
+			}
+
+			UpdateShowingFieldControls();
         }
 
         private void OnUTCDateTimeInputComplete(object sender, EventArgs e)
@@ -654,17 +660,17 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void btnContinueWithNoTimes_Click(object sender, EventArgs e)
         {
-            //m_State.VideoOperation.ShowLightCurve();
+            m_StateMachine.VideoOperation.ShowLightCurve();
         }
 
         private bool m_ShowingFields = false;
 
         private void btnShowFields_Click(object sender, EventArgs e)
         {
-            //m_State.VideoOperation.ToggleShowFields(!m_ShowingFields);
-            //m_ShowingFields = !m_ShowingFields;
+            m_StateMachine.VideoOperation.ToggleShowFields(!m_ShowingFields);
+            m_ShowingFields = !m_ShowingFields;
 
-            //UpdateShowingFieldControls();
+            UpdateShowingFieldControls();
         }
 
         private void UpdateShowingFieldControls()
@@ -685,18 +691,18 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void btn1FrPlus_Click(object sender, EventArgs e)
         {
-            //m_State.Host.FramePlayer.StepForward();
-            //UpdateShowingFieldControls();
+			m_VideoController.StepForward();
+			UpdateShowingFieldControls();
 
-            //if (m_ShowingFields) m_StateMachine.VideoOperation.ToggleShowFields(true);
+			if (m_ShowingFields) m_StateMachine.VideoOperation.ToggleShowFields(true);
         }
 
         private void btn1FrMinus_Click(object sender, EventArgs e)
         {
-            //m_State.Host.FramePlayer.StepBackward();
-            //UpdateShowingFieldControls();
+			m_VideoController.StepBackward();
+			UpdateShowingFieldControls();
 
-            //if (m_ShowingFields) m_StateMachine.VideoOperation.ToggleShowFields(true);
+			if (m_ShowingFields) m_StateMachine.VideoOperation.ToggleShowFields(true);
         }
 
         //#region INotificationReceiver Members
@@ -721,10 +727,10 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void cbxDisplayBrightness_CheckedChanged(object sender, EventArgs e)
         {
-        //    if (cbxDisplayBrightness.Checked)
-        //        m_State.VideoOperation.SetMeasuringZoomImageType(MeasuringZoomImageType.Stripe);
-        //    else
-        //        m_State.VideoOperation.SetMeasuringZoomImageType(MeasuringZoomImageType.Pixel);
+			if (rbDisplayBrightness.Checked)
+				m_StateMachine.VideoOperation.SetMeasuringZoomImageType(MeasuringZoomImageType.Stripe);
+			else
+				m_StateMachine.VideoOperation.SetMeasuringZoomImageType(MeasuringZoomImageType.Pixel);
         }
     }
 }

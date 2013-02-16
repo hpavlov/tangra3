@@ -96,7 +96,7 @@ namespace Tangra.VideoOperations.LightCurves
                 // -100, 100
                 m_Contrast = (sbyte)Math.Round(100.0 * (tbContrast.Value - (tbContrast.Maximum / 2.0)) / (tbContrast.Maximum / 2.0));
 
-                //FrameAdjustmentsPreview.Instance.BrightnessContrast(m_Brightness, (sbyte)m_Contrast);
+                FrameAdjustmentsPreview.Instance.BrightnessContrast(m_Brightness, (sbyte)m_Contrast);
             }
         }
 
@@ -232,7 +232,7 @@ namespace Tangra.VideoOperations.LightCurves
                     //if (m_CurrFrame != null)
                     //    m_CurrFrame.Dispose();
 
-                    //FrameAdjustmentsPreview.Instance.MoveToFrame(m_HistogramFrameNo);
+                    FrameAdjustmentsPreview.Instance.MoveToFrame(m_HistogramFrameNo);
 
                     m_CurrFrame = m_VideoStream.GetPixelmap(m_HistogramFrameNo).CreateDisplayBitmapDoNotDispose();
 
@@ -349,10 +349,10 @@ namespace Tangra.VideoOperations.LightCurves
                 pixelTo <<= 4;
             }
 
-            //if (rbStretching.Checked)
-            //    FrameAdjustmentsPreview.Instance.Stretching(pixelFrom, pixelTo);
-            //else if (rbClipping.Checked)
-            //    FrameAdjustmentsPreview.Instance.Clipping(pixelFrom, pixelTo);
+			if (rbStretching.Checked)
+				FrameAdjustmentsPreview.Instance.Stretching(pixelFrom, pixelTo);
+			else if (rbClipping.Checked)
+				FrameAdjustmentsPreview.Instance.Clipping(pixelFrom, pixelTo);
         }
 
         private void trackBarWindow_ValueChanged(object sender, EventArgs e)
@@ -439,9 +439,9 @@ namespace Tangra.VideoOperations.LightCurves
             pnlBrightnessContrast.Enabled = enabled;
             pnlClipStretch.Enabled = enabled;
 
-            //if (!enabled)
-            //    FrameAdjustmentsPreview.Instance.NoPreProcessing();
-            //else
+			if (!enabled)
+				FrameAdjustmentsPreview.Instance.NoPreProcessing();
+			else
             {
                 if (rbStretching.Checked || rbClipping.Checked)
                 {

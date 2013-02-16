@@ -32,7 +32,7 @@ namespace Tangra.Model.VideoOperations
         void MouseDoubleClick(Point location);
 
         bool HasCustomZoomImage { get; }
-        void DrawCustomZoomImage(Graphics g, int width, int height);
+        bool DrawCustomZoomImage(Graphics g, int width, int height);
         bool AvoidImageOverlays { get; }
     }
 

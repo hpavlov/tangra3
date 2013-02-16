@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using Tangra.Model.Config;
 
 namespace Tangra.PInvoke
 {
@@ -174,7 +175,7 @@ namespace Tangra.PInvoke
 
 	public static class TangraCore
 	{
-		private const string LIBRARY_TANGRA_CORE = "TangraCore";
+		internal const string LIBRARY_TANGRA_CORE = "TangraCore";
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
 		//HRESULT ADVOpenFile(char* fileName, AdvLib::AdvFileInfo* fileInfo);
@@ -205,6 +206,189 @@ namespace Tangra.PInvoke
 			int revision = ver & 0x000FFFFF;
 
 			return string.Format("{0}.{1}.{2}", major, minor, revision);
-		}		
+		}
+
+		public static class PreProcessors
+		{
+			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+			private static extern int PreProcessingClearAll();
+
+			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+			private static extern int PreProcessingAddStretching(ushort fromValue, ushort toValue);
+
+			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+			private static extern int PreProcessingAddClipping(ushort fromValue, ushort toValue);
+
+			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+			private static extern int PreProcessingAddBrightnessContrast(int brigtness, int contrast);
+
+			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+			private static extern int PreProcessingAddDigitalFilter(int filter);
+
+			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+			private static extern int PreProcessingAddGammaCorrection(float encodingGamma);
+
+			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+			private static extern int PreProcessingAddDarkFrame(uint[] darkFramePixels, ushort pixelsCount);
+
+			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+			private static extern int PreProcessingAddFlatFrame(uint[] flatFramePixels, ushort pixelsCount, uint flatFrameMedian);
+
+			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+			private static extern int PreProcessingUsesPreProcessing([In, Out] ref bool usesPreProcessing);
+
+			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+			private static extern int PreProcessingGetConfig(
+					[In, Out] ref PreProcessingType preProcessingType,
+					[In, Out] ref ushort fromValue,
+					[In, Out] ref ushort toValue,
+					[In, Out] ref int brigtness,
+					[In, Out] ref int contrast,
+					[In, Out] ref TangraConfig.PreProcessingFilter filter,
+					[In, Out] ref float gamma,
+					[In, Out] ref ushort darkPixelsCount,
+					[In, Out] ref ushort flatPixelsCount);
+
+			public static void ClearAll()
+			{
+				PreProcessingClearAll();
+			}
+
+			public static void AddStretching(ushort fromValue, ushort toValue)
+			{
+				PreProcessingAddStretching(fromValue, toValue);
+			}
+
+			public static void AddClipping(ushort fromValue, ushort toValue)
+			{
+				PreProcessingAddClipping(fromValue, toValue);
+			}
+
+			public static void AddBrightnessContrast(int brigtness, int contrast)
+			{
+				PreProcessingAddBrightnessContrast(brigtness, contrast);
+			}
+
+			public static void AddDigitalFilter(TangraConfig.PreProcessingFilter filter)
+			{
+				PreProcessingAddDigitalFilter((int)filter);
+			}
+
+			public static void AddGammaCorrection(float encodingGamma)
+			{
+				PreProcessingAddGammaCorrection(encodingGamma);
+			}
+
+			public static void AddDarkFrame(uint[,] darkFramePixels)
+			{
+				int width = darkFramePixels.GetLength(0);
+				int height = darkFramePixels.GetLength(1);
+
+				ushort pixelsCount = (ushort)(width * height);
+				uint[] darkFrame = new uint[pixelsCount];
+
+				int idx = 0;
+				for (int x = 0; x < width; x++)
+					for (int y = 0; y < height; y++)
+					{
+						darkFrame[idx] = darkFramePixels[x, y];
+					}
+
+				PreProcessingAddDarkFrame(darkFrame, pixelsCount);
+			}
+
+			public static void AddFlatFrame(uint[,] flatFramePixels, uint flatFrameMedian)
+			{
+				int width = flatFramePixels.GetLength(0);
+				int height = flatFramePixels.GetLength(1);
+
+				ushort pixelsCount = (ushort)(width * height);
+				uint[] flatFrame = new uint[pixelsCount];
+
+				int idx = 0;
+				for (int x = 0; x < width; x++)
+					for (int y = 0; y < height; y++)
+					{
+						flatFrame[idx] = flatFramePixels[x, y];
+					}
+
+				PreProcessingAddFlatFrame(flatFrame, pixelsCount, flatFrameMedian);
+			}
+
+			public static void PreProcessingGetConfig(out PreProcessingInfo preProcessingInfo)
+			{
+				preProcessingInfo = new PreProcessingInfo();
+
+				bool usesPreProcessing = false;
+				PreProcessingUsesPreProcessing(ref usesPreProcessing);
+
+				if (usesPreProcessing)
+				{
+					preProcessingInfo.PreProcessing = true;
+
+					PreProcessingType preProcessingType = PreProcessingType.None;
+					ushort fromValue = 0;
+					ushort toValue = 0;
+					int brigtness = 0;
+					int contrast = 0;
+					TangraConfig.PreProcessingFilter filter = 0;
+					float gamma = 0;
+					ushort darkPixelsCount = 0;
+					ushort flatPixelsCount = 0;
+
+					PreProcessingGetConfig(ref preProcessingType, ref fromValue, ref toValue, ref brigtness, ref contrast, ref filter, ref gamma, ref darkPixelsCount, ref flatPixelsCount);
+
+					preProcessingInfo.PreProcessingType = preProcessingType;
+
+					if (preProcessingType == PreProcessingType.BrightnessContrast)
+					{
+						preProcessingInfo.Brigtness = brigtness;
+						preProcessingInfo.Contrast = contrast;
+					}
+					else if (preProcessingType == PreProcessingType.Stretching)
+					{
+						preProcessingInfo.StretchingFrom = fromValue;
+						preProcessingInfo.StretchingTo = toValue;
+					}
+					else if (preProcessingType == PreProcessingType.Clipping)
+					{
+						preProcessingInfo.ClippingFrom = fromValue;
+						preProcessingInfo.ClippingTo = toValue;
+					}
+
+					preProcessingInfo.GammaCorrection = gamma;
+					preProcessingInfo.Filter = filter;
+					preProcessingInfo.DarkFrameBytes = darkPixelsCount;
+					preProcessingInfo.FlatFrameBytes = flatPixelsCount;
+				}
+
+			}
+		}
 	}
+
+	public enum PreProcessingType
+	{
+		None = 0,
+		Stretching = 1,
+		Clipping = 2,
+		BrightnessContrast = 3
+	}
+
+	public class PreProcessingInfo
+	{
+		public bool PreProcessing;
+		public PreProcessingType PreProcessingType;
+		public ushort StretchingFrom;
+		public ushort StretchingTo;
+		public ushort ClippingFrom;
+		public ushort ClippingTo;
+		public int Brigtness;
+		public int Contrast;
+		public float GammaCorrection;
+		public ushort DarkFrameBytes;
+		public ushort FlatFrameBytes;
+		public TangraConfig.PreProcessingFilter Filter;
+	}
+
+	
 }

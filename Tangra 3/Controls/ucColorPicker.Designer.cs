@@ -56,7 +56,7 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoSize = true;
 			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
+			this.BackColor = System.Drawing.SystemColors.Control;
 			this.Controls.Add(this.btnPick);
 			this.Controls.Add(this.pnlColor);
 			this.Name = "ucColorPicker";

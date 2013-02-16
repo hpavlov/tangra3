@@ -121,7 +121,6 @@ HRESULT TangraDirectShow::DirectShowOpenFile(LPCTSTR fileName, VideoFileInfo* fi
 		{
 			VIDEOINFOHEADER *pVih = (VIDEOINFOHEADER*)(mt.pbFormat);
 			
-			
 			fileInfo->Width = pVih->bmiHeader.biWidth;
 			fileInfo->Height = pVih->bmiHeader.biHeight;
 			fileInfo->BitmapImageSize= pVih->bmiHeader.biWidth * pVih->bmiHeader.biHeight * 3; // Will be always working with 24bit BMP
@@ -135,6 +134,13 @@ HRESULT TangraDirectShow::DirectShowOpenFile(LPCTSTR fileName, VideoFileInfo* fi
 				fileInfo->Width *= -1;
 				m_Height *= -1;
 			}
+
+			strncpy(fileInfo->EngineBuffer, "DirectShow\0", 4);
+			fileInfo->VideoFileTypeBuffer[0] = (pVih->bmiHeader.biCompression >> 24) & 0xFF;
+			fileInfo->VideoFileTypeBuffer[1] = (pVih->bmiHeader.biCompression >> 16) & 0xFF;
+			fileInfo->VideoFileTypeBuffer[2] = (pVih->bmiHeader.biCompression >> 8) & 0xFF;
+			fileInfo->VideoFileTypeBuffer[3] = pVih->bmiHeader.biCompression & 0xFF;
+			fileInfo->VideoFileTypeBuffer[4] = 0;
 		}
 		else
 		{

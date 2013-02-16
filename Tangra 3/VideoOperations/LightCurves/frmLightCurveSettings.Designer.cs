@@ -41,21 +41,21 @@
 			this.nudPointSize = new System.Windows.Forms.NumericUpDown();
 			this.label8 = new System.Windows.Forms.Label();
 			this.gbColors = new System.Windows.Forms.GroupBox();
-            this.cpBackground = new Tangra.Model.Controls.ucColorPicker();
-            this.cpGrid = new Tangra.Model.Controls.ucColorPicker();
-            this.cpLabels = new Tangra.Model.Controls.ucColorPicker();
-            this.cpTarget1 = new Tangra.Model.Controls.ucColorPicker();
-            this.cpTarget4 = new Tangra.Model.Controls.ucColorPicker();
-            this.cpTarget2 = new Tangra.Model.Controls.ucColorPicker();
-            this.cpTarget3 = new Tangra.Model.Controls.ucColorPicker();
+			this.cpBackground = new Tangra.Model.Controls.ucColorPicker();
+			this.cpGrid = new Tangra.Model.Controls.ucColorPicker();
+			this.cpLabels = new Tangra.Model.Controls.ucColorPicker();
+			this.cpTarget1 = new Tangra.Model.Controls.ucColorPicker();
+			this.cpTarget4 = new Tangra.Model.Controls.ucColorPicker();
+			this.cpTarget2 = new Tangra.Model.Controls.ucColorPicker();
+			this.cpTarget3 = new Tangra.Model.Controls.ucColorPicker();
 			this.label9 = new System.Windows.Forms.Label();
 			this.label10 = new System.Windows.Forms.Label();
 			this.cbxDrawGrid = new System.Windows.Forms.CheckBox();
 			this.label11 = new System.Windows.Forms.Label();
-            this.cpSelectionCursor = new Tangra.Model.Controls.ucColorPicker();
-            this.cpFocusArea = new Tangra.Model.Controls.ucColorPicker();
-            this.btnCancel = new System.Windows.Forms.Button();
-            this.btnOk = new System.Windows.Forms.Button();
+			this.cpSelectionCursor = new Tangra.Model.Controls.ucColorPicker();
+			this.cpFocusArea = new Tangra.Model.Controls.ucColorPicker();
+			this.btnCancel = new System.Windows.Forms.Button();
+			this.btnOk = new System.Windows.Forms.Button();
 			((System.ComponentModel.ISupportInitialize)(this.nudPointSize)).BeginInit();
 			this.gbColors.SuspendLayout();
 			this.SuspendLayout();
@@ -65,7 +65,7 @@
 			this.label31.AutoSize = true;
 			this.label31.Location = new System.Drawing.Point(68, 46);
 			this.label31.Name = "label31";
-			this.label31.Size = new System.Drawing.Size(63, 13);
+			this.label31.Size = new System.Drawing.Size(65, 13);
 			this.label31.TabIndex = 3;
 			this.label31.Text = "Background";
 			// 
@@ -74,7 +74,7 @@
 			this.label1.AutoSize = true;
 			this.label1.Location = new System.Drawing.Point(68, 80);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(53, 13);
+			this.label1.Size = new System.Drawing.Size(54, 13);
 			this.label1.TabIndex = 5;
 			this.label1.Text = "Grid Lines";
 			// 
@@ -83,7 +83,7 @@
 			this.label2.AutoSize = true;
 			this.label2.Location = new System.Drawing.Point(68, 114);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(37, 13);
+			this.label2.Size = new System.Drawing.Size(38, 13);
 			this.label2.TabIndex = 9;
 			this.label2.Text = "Labels";
 			// 
@@ -92,7 +92,7 @@
 			this.label3.AutoSize = true;
 			this.label3.Location = new System.Drawing.Point(262, 46);
 			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(101, 13);
+			this.label3.Size = new System.Drawing.Size(100, 13);
 			this.label3.TabIndex = 11;
 			this.label3.Text = "Lightcurve Target 1";
 			// 
@@ -101,7 +101,7 @@
 			this.label4.AutoSize = true;
 			this.label4.Location = new System.Drawing.Point(262, 80);
 			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(101, 13);
+			this.label4.Size = new System.Drawing.Size(100, 13);
 			this.label4.TabIndex = 13;
 			this.label4.Text = "Lightcurve Target 2";
 			// 
@@ -110,7 +110,7 @@
 			this.label5.AutoSize = true;
 			this.label5.Location = new System.Drawing.Point(262, 114);
 			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(101, 13);
+			this.label5.Size = new System.Drawing.Size(100, 13);
 			this.label5.TabIndex = 15;
 			this.label5.Text = "Lightcurve Target 3";
 			// 
@@ -119,7 +119,7 @@
 			this.label6.AutoSize = true;
 			this.label6.Location = new System.Drawing.Point(262, 147);
 			this.label6.Name = "label6";
-			this.label6.Size = new System.Drawing.Size(101, 13);
+			this.label6.Size = new System.Drawing.Size(100, 13);
 			this.label6.TabIndex = 17;
 			this.label6.Text = "Lightcurve Target 4";
 			// 
@@ -128,7 +128,7 @@
 			this.cbxTangraTargetColors.AutoSize = true;
 			this.cbxTangraTargetColors.Location = new System.Drawing.Point(206, 17);
 			this.cbxTangraTargetColors.Name = "cbxTangraTargetColors";
-			this.cbxTangraTargetColors.Size = new System.Drawing.Size(162, 17);
+			this.cbxTangraTargetColors.Size = new System.Drawing.Size(161, 17);
 			this.cbxTangraTargetColors.TabIndex = 18;
 			this.cbxTangraTargetColors.Text = "Use Tangra\'s Target Colours";
 			this.cbxTangraTargetColors.UseVisualStyleBackColor = true;
@@ -178,7 +178,7 @@
             0,
             0});
 			this.nudPointSize.Name = "nudPointSize";
-			this.nudPointSize.Size = new System.Drawing.Size(39, 21);
+			this.nudPointSize.Size = new System.Drawing.Size(39, 20);
 			this.nudPointSize.TabIndex = 21;
 			this.nudPointSize.Value = new decimal(new int[] {
             5,
@@ -223,7 +223,7 @@
 			// 
 			this.cpBackground.AutoSize = true;
 			this.cpBackground.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.cpBackground.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
+			this.cpBackground.BackColor = System.Drawing.SystemColors.Control;
 			this.cpBackground.Location = new System.Drawing.Point(6, 40);
 			this.cpBackground.Name = "cpBackground";
 			this.cpBackground.SelectedColor = System.Drawing.Color.Gray;
@@ -235,7 +235,7 @@
 			// 
 			this.cpGrid.AutoSize = true;
 			this.cpGrid.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.cpGrid.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
+			this.cpGrid.BackColor = System.Drawing.SystemColors.Control;
 			this.cpGrid.Location = new System.Drawing.Point(6, 74);
 			this.cpGrid.Name = "cpGrid";
 			this.cpGrid.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
@@ -247,7 +247,7 @@
 			// 
 			this.cpLabels.AutoSize = true;
 			this.cpLabels.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.cpLabels.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
+			this.cpLabels.BackColor = System.Drawing.SystemColors.Control;
 			this.cpLabels.Location = new System.Drawing.Point(6, 108);
 			this.cpLabels.Name = "cpLabels";
 			this.cpLabels.SelectedColor = System.Drawing.Color.White;
@@ -259,7 +259,7 @@
 			// 
 			this.cpTarget1.AutoSize = true;
 			this.cpTarget1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.cpTarget1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
+			this.cpTarget1.BackColor = System.Drawing.SystemColors.Control;
 			this.cpTarget1.Location = new System.Drawing.Point(200, 40);
 			this.cpTarget1.Name = "cpTarget1";
 			this.cpTarget1.SelectedColor = System.Drawing.SystemColors.ControlDark;
@@ -271,7 +271,7 @@
 			// 
 			this.cpTarget4.AutoSize = true;
 			this.cpTarget4.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.cpTarget4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
+			this.cpTarget4.BackColor = System.Drawing.SystemColors.Control;
 			this.cpTarget4.Location = new System.Drawing.Point(200, 141);
 			this.cpTarget4.Name = "cpTarget4";
 			this.cpTarget4.SelectedColor = System.Drawing.SystemColors.ControlDark;
@@ -283,7 +283,7 @@
 			// 
 			this.cpTarget2.AutoSize = true;
 			this.cpTarget2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.cpTarget2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
+			this.cpTarget2.BackColor = System.Drawing.SystemColors.Control;
 			this.cpTarget2.Location = new System.Drawing.Point(200, 74);
 			this.cpTarget2.Name = "cpTarget2";
 			this.cpTarget2.SelectedColor = System.Drawing.SystemColors.ControlDark;
@@ -295,7 +295,7 @@
 			// 
 			this.cpTarget3.AutoSize = true;
 			this.cpTarget3.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.cpTarget3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
+			this.cpTarget3.BackColor = System.Drawing.SystemColors.Control;
 			this.cpTarget3.Location = new System.Drawing.Point(200, 108);
 			this.cpTarget3.Name = "cpTarget3";
 			this.cpTarget3.SelectedColor = System.Drawing.SystemColors.ControlDark;
@@ -308,7 +308,7 @@
 			this.label9.AutoSize = true;
 			this.label9.Location = new System.Drawing.Point(148, 235);
 			this.label9.Name = "label9";
-			this.label9.Size = new System.Drawing.Size(19, 13);
+			this.label9.Size = new System.Drawing.Size(18, 13);
 			this.label9.TabIndex = 24;
 			this.label9.Text = "px";
 			// 
@@ -317,7 +317,7 @@
 			this.label10.AutoSize = true;
 			this.label10.Location = new System.Drawing.Point(283, 235);
 			this.label10.Name = "label10";
-			this.label10.Size = new System.Drawing.Size(120, 13);
+			this.label10.Size = new System.Drawing.Size(121, 13);
 			this.label10.TabIndex = 26;
 			this.label10.Text = "Small Graph Focus Area";
 			// 
@@ -339,7 +339,7 @@
 			this.label11.AutoSize = true;
 			this.label11.Location = new System.Drawing.Point(283, 262);
 			this.label11.Name = "label11";
-			this.label11.Size = new System.Drawing.Size(133, 13);
+			this.label11.Size = new System.Drawing.Size(131, 13);
 			this.label11.TabIndex = 29;
 			this.label11.Text = "Selected Datapoint Cursor";
 			// 
@@ -347,7 +347,7 @@
 			// 
 			this.cpSelectionCursor.AutoSize = true;
 			this.cpSelectionCursor.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.cpSelectionCursor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
+			this.cpSelectionCursor.BackColor = System.Drawing.SystemColors.Control;
 			this.cpSelectionCursor.Location = new System.Drawing.Point(221, 256);
 			this.cpSelectionCursor.Name = "cpSelectionCursor";
 			this.cpSelectionCursor.SelectedColor = System.Drawing.Color.White;
@@ -359,7 +359,7 @@
 			// 
 			this.cpFocusArea.AutoSize = true;
 			this.cpFocusArea.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.cpFocusArea.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
+			this.cpFocusArea.BackColor = System.Drawing.SystemColors.Control;
 			this.cpFocusArea.Location = new System.Drawing.Point(221, 229);
 			this.cpFocusArea.Name = "cpFocusArea";
 			this.cpFocusArea.SelectedColor = System.Drawing.Color.White;

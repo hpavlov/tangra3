@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Tangra.Controller;
 using Tangra.VideoOperations.LightCurves;
 
 namespace Tangra.Helpers
@@ -10,6 +11,13 @@ namespace Tangra.Helpers
 	public class NotificationManager
 	{
 		public static NotificationManager Instance = new NotificationManager();
+
+		private VideoController m_VideoController;
+
+		public void SetVideoController(VideoController videoController)
+		{
+			m_VideoController = videoController;
+		}
 
         public void NotifyCurrentFrameChanged(int currentFrameId)
         {
@@ -37,17 +45,32 @@ namespace Tangra.Helpers
 
         public void NotifyFileProgressManagerBeginFileOperation(int maxSteps)
         {
-            throw new NotImplementedException();
+	        if (m_VideoController != null)
+		        m_VideoController.NotifyFileProgress(-1, maxSteps);
         }
 
         public void NotifyFileProgressManagerFileOperationProgress(int currentProgress)
         {
-            throw new NotImplementedException();
+			if (m_VideoController != null)
+				m_VideoController.NotifyFileProgress(currentProgress, 0);
         }
 
         public void NotifyFileProgressManagerEndFileOperation()
         {
-            throw new NotImplementedException();
-        }
+			if (m_VideoController != null)
+				m_VideoController.NotifyFileProgress(-1, -1);
+		}
+
+		public void NotifyBeginLongOperation()
+		{
+			if (m_VideoController != null)
+				m_VideoController.NotifyBeginLongOperation();
+		}
+
+		public void NotifyEndLongOperation()
+		{
+			if (m_VideoController != null)
+				m_VideoController.NotifyEndLongOperation();
+		}
 	}
 }

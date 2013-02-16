@@ -1019,7 +1019,7 @@ namespace Tangra.Model.Image
         //    }
         //}
 
-        internal void MeasureObject(
+        public void MeasureObject(
             ImagePixel center,
             uint[,] data,
             uint[,] backgroundPixels,

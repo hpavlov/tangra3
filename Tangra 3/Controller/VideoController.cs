@@ -28,7 +28,7 @@ namespace Tangra.Controller
         private ZoomedImageView m_ZoomedImageView;
 
 		private Form m_MainFormView;
-	    private Panel m_pnlControlerPanel;
+	    internal Panel m_pnlControlerPanel;
 
 		private IFramePlayer m_FramePlayer;
 
@@ -46,6 +46,10 @@ namespace Tangra.Controller
         private IVideoOperation m_CurrentOperation;
 
 	    private PSFFit m_TargetPsfFit;
+	    private uint[,] m_TargetBackgroundPixels;
+
+	    private LightCurveController m_LightCurveController;
+	    private frmMain m_MainForm;
 
         public VideoController(Form mainFormView, VideoFileView videoFileView, ZoomedImageView zoomedImageView, Panel pnlControlerPanel)
 		{
@@ -53,16 +57,90 @@ namespace Tangra.Controller
 			m_VideoFileView = videoFileView;
             m_ZoomedImageView = zoomedImageView;
 			m_MainFormView = mainFormView;
+	        m_MainForm = (frmMain) mainFormView;
             m_pnlControlerPanel = pnlControlerPanel;
             videoFileView.SetFramePlayer(m_FramePlayer);
 		}
 
-		public bool OpenVideoFile(string fileName)
+		public void SetLightCurveController(LightCurveController lightCurveController)
 		{
-			IFrameStream frameStream;
+			m_LightCurveController = lightCurveController;
+		}
 
+		public void CloseOpenedVideoFile()
+		{
+			if (m_FramePlayer.Video != null)
+			{
+				TangraContext.Current.Reset();
+				UpdateViews();
+
+				m_FramePlayer.CloseVideo();
+			}
+
+			if (m_CurrentOperation != null)
+			{
+				m_CurrentOperation.FinalizeOperation();
+				m_CurrentOperation = null;
+
+				m_MainForm.pnlControlerPanel.Controls.Clear();
+			}
+
+			if (m_ImageTool != null)
+			{				
+				// Use the standard ArrowTool when no operation is active
+				SelectImageTool<ArrowTool>();
+			}
+
+			//m_MainForm.m_FramePreprocessor.Clear();
+			//m_MainForm.m_DefaultArrowImageTool = null;
+
+			DeselectFeature();
+
+			if (m_ZoomedImageView != null)
+				m_ZoomedImageView.ClearZoomedImage();
+
+			//m_MainForm.m_FramePreprocessor.Clear();
+
+			m_LightCurveController.EnsureLightCurveFormClosed();
+
+			EnsureAllPopupFormsClosed();
+		}
+
+		internal bool SingleBitmapFile(LCFile lcFile)
+		{
+			return OpenVideoFileInternal(
+				null, 
+				() => new SingleBitmapFileFrameStream(lcFile));
+		}
+
+	    public bool OpenVideoFile(string fileName)
+	    {
 			string fileExtension = Path.GetExtension(fileName);
 
+		    return OpenVideoFileInternal(
+				fileName, 
+				() =>
+				{
+					IFrameStream frameStream = null;
+
+					if (fileExtension == ".adv")
+					{
+						AdvEquipmentInfo equipmentInfo;
+						frameStream = AstroDigitalVideoStream.OpenFile(fileName, out equipmentInfo);
+						TangraContext.Current.UsingADV = true;
+						m_OverlayManager.Init(equipmentInfo, frameStream.FirstFrame);
+					}
+					else
+					{
+						frameStream = VideoStream.OpenFile(fileName);
+					}
+
+					return frameStream;
+				});
+	    }
+
+		public bool OpenVideoFileInternal(string fileName, Func<IFrameStream> frameStreamFactoryMethod)
+		{
 			TangraContext.Current.UsingADV = false;
 			TangraContext.Current.UsingDirectShow = false;
 			TangraContext.Current.FileName = null;
@@ -70,26 +148,22 @@ namespace Tangra.Controller
 			TangraContext.Current.HasVideoLoaded = false;
 			m_OverlayManager.Reset();
 
+			TangraCore.PreProcessors.ClearAll();
+			TangraCore.PreProcessors.AddGammaCorrection(TangraConfig.Settings.Photometry.EncodingGamma);
+
 			// TODO: Update the views so they clear the currently displayed frame information
 
-            if (fileExtension == ".adv")
-            {
-                AdvEquipmentInfo equipmentInfo;
-                frameStream = AstroDigitalVideoStream.OpenFile(fileName, out equipmentInfo);
-                TangraContext.Current.UsingADV = true;
-                m_OverlayManager.Init(equipmentInfo, frameStream.FirstFrame);
-            }
-            else
-            {
-                frameStream = VideoStream.OpenFile(fileName);
-            }
+			IFrameStream frameStream = frameStreamFactoryMethod();
 
 		    if (frameStream != null)
 			{
 				m_FramePlayer.OpenVideo(frameStream);
 
-				TangraContext.Current.FileName = Path.GetFileName(fileName);
-				TangraContext.Current.FileFormat = frameStream.VideoFileType;
+				if (!string.IsNullOrEmpty(fileName))
+				{
+					TangraContext.Current.FileName = Path.GetFileName(fileName);
+					TangraContext.Current.FileFormat = frameStream.VideoFileType;					
+				}
 
 				if (!IsAstroDigitalVideo)
 					HideAdvStatusForm();
@@ -111,12 +185,12 @@ namespace Tangra.Controller
 				TangraContext.Current.CanChangeTool = true;
 				TangraContext.Current.CanLoadDarkFrame = true;
 				TangraContext.Current.CanScrollFrames = true;				
-
-				m_FramePlayer.MoveToFrame(frameStream.FirstFrame);
-
+				
 				TangraContext.Current.HasImageLoaded = true;
 
 				m_VideoFileView.UpdateVideoSizeAndLengthControls();
+
+				m_FramePlayer.MoveToFrame(frameStream.FirstFrame);
 
 				m_VideoFileView.Update();
 
@@ -125,11 +199,8 @@ namespace Tangra.Controller
 					ToggleAdvStatusForm(true);
 				}
 
-                if (!SelectVideoOperation())
-                {
-                    // NOTE: If not operation is selected, then set the default Arrow tool
-                    SelectImageTool(new ArrowTool());
-                }
+				if (!string.IsNullOrEmpty(fileName))
+					RegisterRecentFile(RecentFileType.Video, fileName);
 
 				return true;
 			}
@@ -139,6 +210,14 @@ namespace Tangra.Controller
 			}
 
 			return false;
+		}
+
+		internal void RegisterRecentFile(RecentFileType type, string fileName)
+		{
+			TangraConfig.Settings.RecentFiles.NewRecentFile(type, fileName);
+			TangraConfig.Settings.Save();
+
+			m_MainForm.BuildRecentFilesMenu();
 		}
 
         public void SetImage(Pixelmap currentPixelmap, RenderFrameContext frameContext)
@@ -189,6 +268,50 @@ namespace Tangra.Controller
                 return m_FramePlayer.Video.FrameRate;
             }
         }
+
+	    public int VideoCountFrames
+	    {
+		    get { return m_FramePlayer.Video.CountFrames; }
+	    }
+
+		public int VideoFirstFrame
+		{
+			get { return m_FramePlayer.Video.FirstFrame; }
+		}
+
+	    public int VideoLastFrame
+	    {
+			get { return m_FramePlayer.Video.FirstFrame + m_FramePlayer.Video.CountFrames - 1; }
+	    }
+
+		public int VideoBitPix
+		{
+			get
+			{
+				return m_FramePlayer.Video.BitPix;
+			}
+		}
+
+	    public string CurrentVideoFileName
+	    {
+		    get { return m_FramePlayer.Video.FileName; }
+	    }
+
+		public string CurrentVideoFileType
+	    {
+		    get { return m_FramePlayer.Video.VideoFileType; }
+	    }
+
+		public string CurrentVideoFileEngine
+		{
+			get { return m_FramePlayer.Video.Engine; }
+		}
+
+		public void SetupFrameIntegration(int framesToIntegrate, FrameIntegratingMode frameMode, PixelIntegrationType pixelIntegrationType)        
+		{
+			m_FramePlayer.SetupFrameIntegration(framesToIntegrate, frameMode, pixelIntegrationType);
+		}
+
 		public void OverlayStateForFrame(Bitmap displayBitmap, int frameId)
 		{
             if (m_CurrentOperation != null &&
@@ -205,18 +328,34 @@ namespace Tangra.Controller
             if (m_CurrentOperation != null)
                 m_CurrentOperation.PreDraw(g);
 
-            //if (m_CurrentOperation != null &&
-            //   (m_CurrentOperation.Type & OperationTypes.DrawStars) != 0)
-            //{
-            //    foreach (AstroPixel star in stars)
-            //    {
-            //        m_CurrentOperation.DrawStar(g, star);
-            //    }
-            //}
-
             if (m_CurrentOperation != null)
                 m_CurrentOperation.PostDraw(g);            
         }
+
+		public void RedrawCurrentFrame(bool showFields)
+		{			
+			if (showFields)
+			{
+				using (Bitmap image = m_AstroImage.Pixelmap.CreateNewDisplayBitmap())
+				{
+					Bitmap pixelMapWithFields = BitmapFilter.ToVideoFields(image);
+					m_MainForm.pictureBox.Image = pixelMapWithFields;					
+				}
+			}
+			else
+				m_MainForm.pictureBox.Image = m_AstroImage.Pixelmap.DisplayBitmap;
+
+			if (!showFields)
+			{
+				using (Graphics g = Graphics.FromImage(m_MainForm.pictureBox.Image))
+				{
+					CompleteRenderFrame(g);
+					g.Save();
+				}
+			}
+
+			m_MainForm.pictureBox.Refresh();
+		}
 
 		public bool IsRunning
 		{
@@ -329,6 +468,8 @@ namespace Tangra.Controller
             if (integrated)
             {
                 // IntegratedAstroImage.ReadIntegrateImage(m_Host.FramePlayer, m_CurrFrameNo);
+				// TODO: Remove IFramePlayet.GetIntegratedFrame() and replace with a call to IFramePlayet.GeeFrame() plus setting up the integration parameters
+				//       This only seems to be used by AddEditTarget form in a case of no wind and shaking (which is the case most of the times)
                 Pixelmap image = m_FramePlayer.GetIntegratedFrame(m_CurrentFrameContext.CurrentFrameIndex, TangraConfig.Settings.Special.AddStarImageFramesToIntegrate, true /* 'true'so we start from the current frame */, false);
                 
                 // TODO:
@@ -341,6 +482,16 @@ namespace Tangra.Controller
                 // with integration in a case of a good shake
                 return m_AstroImage;          
         }
+
+		internal Pixelmap GetFrame(int frameId)
+		{
+			return m_FramePlayer.GetFrame(frameId, true);
+		}
+
+		public FrameStateData GetCurrentFrameState()
+		{
+			return m_FrameState;
+		}
 
 		void IVideoFrameRenderer.PlayerStarted()
 		{
@@ -452,6 +603,23 @@ namespace Tangra.Controller
 			}
 		}
 
+		private void EnsureAllPopupFormsClosed()
+		{
+			if (m_TargetPSFViewerForm != null &&
+				m_TargetPSFViewerForm.Visible)
+			{
+				m_TargetPSFViewerForm.Close();
+				m_TargetPSFViewerForm = null;
+			}
+
+			if (m_AdvStatusForm != null &&
+				m_AdvStatusForm.Visible)
+			{
+				m_AdvStatusForm.Close();
+				m_AdvStatusForm = null;
+			}
+		}
+
         public void TogglePSFViewerForm()
         {
             TogglePSFViewerForm(false);
@@ -476,7 +644,7 @@ namespace Tangra.Controller
 
                 PositionTargetPSFViewerForm();
 
-                m_TargetPSFViewerForm.ShowTargetPSF(m_TargetPsfFit, m_FramePlayer.Video.BitPix);
+				ShowTargetPSF();
             }
             else
             {
@@ -497,7 +665,7 @@ namespace Tangra.Controller
         private void ShowTargetPSF()
         {
             if (m_TargetPSFViewerForm != null && m_FramePlayer.Video != null)
-                m_TargetPSFViewerForm.ShowTargetPSF(m_TargetPsfFit, m_FramePlayer.Video.BitPix);
+				m_TargetPSFViewerForm.ShowTargetPSF(m_TargetPsfFit, m_FramePlayer.Video.BitPix, m_TargetBackgroundPixels);
         }
 
 		public void ShowFSTSFileViewer()
@@ -546,117 +714,135 @@ namespace Tangra.Controller
             }
 	    }
 
-	    public bool SelectVideoOperation()
-        {
-            if (TangraConfig.Settings.Generic.OnOpenOperation == TangraConfig.OnOpenOperation.StartLightCurveReduction)
-            {
-                ActivateOperation<ReduceLightCurveOperation>(true);
-                RefreshCurrentFrame();
-                return true;    
-            }
-
-            return false;
-        }
-
-        public bool ActivateOperation<TOperation>(params object[] constructorParams) where TOperation : class, IVideoOperation, new()
-        {
-            //m_FramePreprocessor.Clear();
-
-            return ActivateOperation<TOperation>(true, constructorParams);
-        }
-
-        private bool ActivateOperation<TOperation>(
-            bool checkPrevOperationActive, /* We need this because for Astrometry the calibration is chosen earlier and check should be done before this */
-            params object[] constructorParams) where TOperation : class, IVideoOperation, new()
-        {
-            if (checkPrevOperationActive && m_CurrentOperation != null && m_CurrentOperation.GetType() != typeof(ReduceLightCurveOperation))
-            {
-                if (MessageBox.Show(
-                        m_MainFormView, 
-                        "There is another operation active. Continue?", 
-                        "Question", 
-                        MessageBoxButtons.YesNo, 
-                        MessageBoxIcon.Question) == DialogResult.No)
-                {
-                    return false;
-                }
-            }
-
-            IVideoOperation oldOperation = m_CurrentOperation;
-
-            DeselectFeature();
-
-            if (typeof(TOperation) == typeof(ReduceLightCurveOperation))
-            {
-                // Don't close the light curve form, when a light curve viewing operation
-            }
-            else
-                EnsureLightCurveFormClosed();
-
-            try
-            {
-                if (constructorParams != null && constructorParams.Length > 0)
-                {
-                    Type[] types = new Type[constructorParams.Length];
-                    for (int i = 0; i < constructorParams.Length; i++)
-                    {
-                        types[i] = constructorParams[i].GetType();
-                    }
-
-                    ConstructorInfo ci = typeof(TOperation).GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, types, null);
-                    m_CurrentOperation = (TOperation)ci.Invoke(constructorParams);
-                }
-                else
-                    m_CurrentOperation = new TOperation();
-
-                if (!m_CurrentOperation.InitializeOperation(this, m_pnlControlerPanel, m_FramePlayer, m_MainFormView))
-                {
-                    m_CurrentOperation = oldOperation;
-                    return false;
-                }
-                else
-                {
-                    // Redraw the current frame so the pre-processing is included as well
-                    // m_FramePlayer.MoveToFrame(m_CurrentFrameId);
-
-                    return true;
-                }
-            }
-            finally
-            {
-                m_VideoFileView.Update();
-            }
-        }
-
-        private void DeselectFeature()
-        {
-            
-        }
-
-        private void EnsureLightCurveFormClosed()
-        {
-            //try
-            //{
-            //    if (m_LightCurveForm != null)
-            //    {
-            //        // TODO: Ask if the user wants to save it /* Yes/No options only. No 'Cancel' option*/
-            //        m_LightCurveForm.CloseFormDontSendMessage();
-            //    }
-            //}
-            //finally
-            //{
-            //    m_LightCurveForm = null;
-            //}            
-        }
-
-        public void SelectImageTool(ImageTool imageTool)
+		public void SelectImageTool<TImageTool>() where TImageTool : ImageTool, new()
         {
             if (m_ImageTool != null) m_ImageTool.Deactivate();
 
-            m_ImageTool = imageTool;
-
-            ImageTool.SwitchTo<ArrowTool>(m_CurrentOperation, m_ImageTool);
+			ImageTool.SwitchTo<TImageTool>(m_CurrentOperation, m_ImageTool);
         }
+
+		public bool ActivateOperation<TOperation>(params object[] constructorParams) where TOperation : class, IVideoOperation, new()
+		{
+			//m_FramePreprocessor.Clear();
+
+			return ActivateOperation<TOperation>(true, constructorParams);
+		}
+
+		private bool ActivateOperation<TOperation>(
+			bool checkPrevOperationActive, /* We need this because for Astrometry the calibration is chosen earlier and check should be done before this */
+			params object[] constructorParams) where TOperation : class, IVideoOperation, new()
+		{
+			if (checkPrevOperationActive && m_CurrentOperation != null && m_CurrentOperation.GetType() != typeof(ReduceLightCurveOperation))
+			{
+				if (MessageBox.Show(
+						m_MainFormView,
+						"There is another operation active. Continue?",
+						"Question",
+						MessageBoxButtons.YesNo,
+						MessageBoxIcon.Question) == DialogResult.No)
+				{
+					return false;
+				}
+			}
+
+			IVideoOperation oldOperation = m_CurrentOperation;
+
+			DeselectFeature();
+
+			if (typeof (TOperation) == typeof (ReduceLightCurveOperation))
+			{
+				// Don't close the light curve form, when a light curve viewing operation
+			}
+			else
+				m_LightCurveController.EnsureLightCurveFormClosed();
+
+			try
+			{
+				m_CurrentOperation = CreateOperation<TOperation>(constructorParams);
+
+				if (!m_CurrentOperation.InitializeOperation(this, m_pnlControlerPanel, m_FramePlayer, m_MainFormView))
+				{
+					m_CurrentOperation = oldOperation;
+					return false;
+				}
+				else
+				{
+					// Redraw the current frame so the pre-processing is included as well
+					// m_FramePlayer.MoveToFrame(m_CurrentFrameId);
+
+					return true;
+				}
+			}
+			finally
+			{
+				m_VideoFileView.Update();
+			}
+		}
+
+		private IVideoOperation CreateOperation<TOperation>(params object[] constructorParams) where TOperation : class, IVideoOperation, new()
+		{
+			if (constructorParams != null && constructorParams.Length > 0)
+			{
+				Type[] types = new Type[constructorParams.Length];
+				for (int i = 0; i < constructorParams.Length; i++)
+				{
+					types[i] = constructorParams[i].GetType();
+				}
+
+				ConstructorInfo ci = typeof(TOperation).GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, types, null);
+				return (TOperation)ci.Invoke(constructorParams);
+			}
+			else
+				return new TOperation();			
+		}
+
+		internal IVideoOperation SetOperation<TOperation>(params object[] constructorParams) where TOperation : class, IVideoOperation, new()
+		{
+			m_CurrentOperation = CreateOperation<TOperation>(constructorParams);
+			return m_CurrentOperation;
+		}
+
+		private void DeselectFeature()
+		{
+
+		}
+
+		internal void EnsureLightCurveForm()
+		{
+			EnsureAllPopUpFormsClosed();
+			m_LightCurveController.EnsureLightCurveForm();
+		}
+
+		private void EnsureAllPopUpFormsClosed()
+		{
+			m_LightCurveController.EnsureLightCurveFormClosed();
+
+			try
+			{
+				if (m_AdvStatusForm != null)
+				{
+					m_AdvStatusForm.Close();
+				}
+			}
+			finally
+			{
+				m_AdvStatusForm = null;
+			}
+
+			try
+			{
+				if (m_TargetPSFViewerForm != null)
+				{
+					m_TargetPSFViewerForm.Close();
+				}
+			}
+			finally
+			{
+				m_TargetPSFViewerForm = null;
+			}				
+		}
+
+	    public ImagePixel ZoomedCenter = new ImagePixel(-1, -1);
 
         public void MouseClick(Point location)
         {
@@ -684,7 +870,8 @@ namespace Tangra.Controller
                     {
                         pixel = new ImagePixel(m_TargetPsfFit.Brightness, m_TargetPsfFit.XCenter, m_TargetPsfFit.YCenter);
                         //isFit = psfFit.Certainty > 0.25;
-                    }                    
+                    }
+					m_TargetBackgroundPixels = m_AstroImage.GetMeasurableAreaPixels(pixel.X, pixel.Y, 35);     
                 }
             }
 
@@ -692,11 +879,36 @@ namespace Tangra.Controller
                 pixel, m_TargetPsfFit, location,
                 Control.ModifierKeys == Keys.Shift, Control.ModifierKeys == Keys.Control);
 
-            if (m_CurrentOperation != null)
-                m_CurrentOperation.MouseClick(args);
+	        bool drawStandardZoomImade = true;
+			
+			ZoomedCenter = new ImagePixel(pixel);
 
-            if (m_ImageTool != null)
-                m_ImageTool.MouseClick(args);
+	        if (m_CurrentOperation != null)
+	        {
+		        m_CurrentOperation.MouseClick(args);
+
+				if (m_ZoomedImageView != null && m_CurrentOperation.HasCustomZoomImage)
+					drawStandardZoomImade = !m_ZoomedImageView.DrawCustomZoomImage(m_CurrentOperation);
+	        }
+
+	        if (m_ImageTool != null)
+	        {
+		        m_ImageTool.MouseClick(args);
+
+		        if (drawStandardZoomImade)
+			        drawStandardZoomImade = m_ImageTool.ZoomBehaviour == ZoomImageBehaviour.DisplayCentroid;
+	        }
+
+	        if (m_ZoomedImageView != null && drawStandardZoomImade)
+			{
+				if (m_AstroImage != null)
+				{
+					Bitmap zoomedBmp = m_AstroImage.GetZoomImagePixels(pixel.X, pixel.Y, TangraConfig.Settings.Color.Saturation, TangraConfig.Settings.Photometry.Saturation);
+					UpdateZoomedImage(zoomedBmp);
+				}
+				else
+					m_ZoomedImageView.ClearZoomedImage();
+			}
 
             ShowTargetPSF();
         }
@@ -750,6 +962,26 @@ namespace Tangra.Controller
         {
             m_VideoFileView.StatusChanged(displayName);
         }
+
+		internal void NotifyFileProgress(int current, int max)
+		{
+			m_VideoFileView.OnFileProgress(current, max);
+		}
+
+		public void NotifyBeginLongOperation()
+		{
+			m_VideoFileView.BeginLongOperation();
+		}
+
+		public void NotifyEndLongOperation()
+		{
+			m_VideoFileView.EndLongOperation();
+		}
+
+		public DialogResult ShowMessageBox(string message, string title, MessageBoxButtons buttons, MessageBoxIcon icon, MessageBoxDefaultButton defaultButton)
+		{
+			return MessageBox.Show(m_MainFormView, message, title, buttons, icon, defaultButton);
+		}
 
         public DialogResult ShowMessageBox(string message, string title, MessageBoxButtons buttons, MessageBoxIcon icon)
         {

@@ -25,7 +25,7 @@ namespace Tangra.VideoOperations.LightCurves
 	public partial class frmLightCurve : Form, ILightCurveFormCustomizer
     {
         //private IImageHostCallbacks m_Host;
-	    private LightCurveController m_Controller;
+	    private LightCurveController m_LightCurveController;
 
         private int m_NewMinDisplayedFrame = -1;
 
@@ -38,7 +38,7 @@ namespace Tangra.VideoOperations.LightCurves
         {
             InitializeComponent();
 
-            m_Controller = controller;
+            m_LightCurveController = controller;
 
 #if PRODUCTION
             miFullReprocess.Visible = false;
@@ -126,6 +126,8 @@ namespace Tangra.VideoOperations.LightCurves
             }
             m_LCFile = null;
 			//((TangraApplicationImpl)m_Host.TangraApplicationImpl).SetOpenedLightCurve(null, null);
+
+	        m_LightCurveController.OnLightCurveClosed();
         }
 
 		public TangraConfig.LightCurvesDisplaySettings FormDisplaySettings
@@ -207,37 +209,56 @@ namespace Tangra.VideoOperations.LightCurves
 				return string.Format(", Gamma = {0}", m_Context.EncodingGamma.ToString("0.00"));
 		}
 
+		internal void SetNewLcFile(LCFile lcFile)
+		{
+			m_AllReadings = lcFile.Data;
+			m_LCFile = lcFile;
+			m_Header = lcFile.Header;
+			m_Header.LcFile = lcFile;
+			m_Footer = lcFile.Footer;
+			m_FrameTiming = lcFile.FrameTiming;
+
+			//m_LightCurveImpl = new TangraLightCurveImpl((TangraApplicationImpl)m_Host.TangraApplicationImpl, m_LCFile, this);
+			m_Context = new LightCurveContext(lcFile /*, m_LightCurveImpl*/);
+			
+			OnNewLCFile();
+
+			m_IsFirstDraw = true;
+			pnlChart.Invalidate();
+		}
+		
         //#region INotificationReceiver Members
 
-        //public void ReceieveMessage(NotificationMessage message, MessageDeliveryOptions deliveryFlags)
-        //{
-        //    if (message.Sender is LightCurves &&
-        //        message.MessageId == LightCurves.MSG_NEW_READING)
-        //    {
-        //        LCFile lcFile = message.Message as LCFile;
-        //        m_AllReadings = lcFile.Data;
-        //        m_LCFile = lcFile;
-        //        m_Header = lcFile.Header;
-        //        m_Header.LcFile = lcFile;
-        //        m_Footer = lcFile.Footer;
-        //        m_FrameTiming = lcFile.FrameTiming;
+		
+		//public void ReceieveMessage(NotificationMessage message, MessageDeliveryOptions deliveryFlags)
+		//{
+		//    if (message.Sender is LightCurves &&
+		//        message.MessageId == LightCurves.MSG_NEW_READING)
+		//    {
+		//        LCFile lcFile = message.Message as LCFile;
+		//        m_AllReadings = lcFile.Data;
+		//        m_LCFile = lcFile;
+		//        m_Header = lcFile.Header;
+		//        m_Header.LcFile = lcFile;
+		//        m_Footer = lcFile.Footer;
+		//        m_FrameTiming = lcFile.FrameTiming;
 
-        //        m_LightCurveImpl = new TangraLightCurveImpl((TangraApplicationImpl)m_Host.TangraApplicationImpl, m_LCFile, this);
-        //        m_Context = new LightCurveContext(lcFile, m_LightCurveImpl);
+		//        m_LightCurveImpl = new TangraLightCurveImpl((TangraApplicationImpl)m_Host.TangraApplicationImpl, m_LCFile, this);
+		//        m_Context = new LightCurveContext(lcFile, m_LightCurveImpl);
 
-        //        OnNewLCFile();
+		//        OnNewLCFile();
 
-        //        m_IsFirstDraw = true;
-        //        pnlChart.Invalidate();
-        //    }
-        //    else if (
-        //        message.Sender is frmMain &&
-        //        message.MessageId == frmMain.MSG_ID_FRAME_CHANGED)
-        //    {
-        //        int newFrameId = (int) message.Message;
-        //        HandleNewSelectedFrame(newFrameId);
-        //    }
-        //}
+		//        m_IsFirstDraw = true;
+		//        pnlChart.Invalidate();
+		//    }
+		//    else if (
+		//        message.Sender is frmMain &&
+		//        message.MessageId == frmMain.MSG_ID_FRAME_CHANGED)
+		//    {
+		//        int newFrameId = (int)message.Message;
+		//        HandleNewSelectedFrame(newFrameId);
+		//    }
+		//}
 
         //#endregion
 
@@ -450,7 +471,7 @@ namespace Tangra.VideoOperations.LightCurves
                 {
 					LCFile.Save(saveFileDialog.FileName, m_Header, m_AllReadings, m_FrameTiming, m_Footer);
 
-                    m_Controller.RegisterRecentFile(RecentFileType.LightCurve, saveFileDialog.FileName);
+                    m_LightCurveController.RegisterRecentFile(RecentFileType.LightCurve, saveFileDialog.FileName);
                 }
                 finally
                 {
@@ -619,7 +640,7 @@ namespace Tangra.VideoOperations.LightCurves
 				m_Header.TimingType == MeasurementTimingType.EmbeddedTimeForEachFrame &&
 				m_Header.HasNonEqualySpacedDataPoints())
 			{
-                m_Controller.ShowMessageBox(
+                m_LightCurveController.ShowMessageBox(
 					"Binning is not supported for light curves with non equaly spaced datapoints.",
 					"Tangra",
 					MessageBoxButtons.OK,
@@ -1356,7 +1377,7 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void miLoad_Click(object sender, EventArgs e)
         {
-            m_Controller.LoadLightCurve();
+            m_LightCurveController.LoadLightCurve();
         }
 
         private void miSaveAsImage_Click(object sender, EventArgs e)

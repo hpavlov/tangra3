@@ -38,6 +38,23 @@ namespace Tangra.Video
 			Dispose();
 		}
 
+		private FrameIntegratingMode m_FrameIntegration;
+		private PixelIntegrationType m_PixelIntegrationMode;
+		private int m_FramesToIntegrate;
+
+		public PixelIntegrationType PixelIntegrationMode
+		{
+			get { return m_PixelIntegrationMode; }
+			set { m_PixelIntegrationMode = value; }
+		}
+
+		public void SetupFrameIntegration(int framesToIntegrate, FrameIntegratingMode frameMode, PixelIntegrationType pixelIntegrationType)
+		{
+			m_FramesToIntegrate = framesToIntegrate;
+			m_FrameIntegration = frameMode;
+			m_PixelIntegrationMode = pixelIntegrationType;
+		}
+
 		public void SetFrameRenderer(IVideoFrameRenderer frameRenderer)
 		{
 			m_FrameRenderer = frameRenderer;
@@ -54,6 +71,8 @@ namespace Tangra.Video
 
 			m_MillisecondsPerFrame = (int)m_VideoStream.MillisecondsPerFrame;
 			m_CurrentFrameIndex = m_VideoStream.FirstFrame - 1;
+			m_FramesToIntegrate = 0;
+			m_FrameIntegration = FrameIntegratingMode.NoIntegration;
 		}
 
 		public void CloseVideo()
@@ -156,7 +175,10 @@ namespace Tangra.Video
 
 			try
 			{
-				currentBitmap = m_VideoStream.GetPixelmap(frameNo);
+				if (noIntegrate)
+					currentBitmap = m_VideoStream.GetPixelmap(frameNo);
+				else
+					currentBitmap = m_VideoStream.GetIntegratedFrame(frameNo, m_FramesToIntegrate, m_FrameIntegration == FrameIntegratingMode.SlidingAverage, m_PixelIntegrationMode == PixelIntegrationType.Median);
 			}
 			catch (Exception ex)
 			{
@@ -234,8 +256,21 @@ namespace Tangra.Video
 				{
 					if (nextFrameIdToBuffer < m_VideoStream.LastFrame)
 					{
-						BufferNonIntegratedFrame(nextFrameIdToBuffer);
-						nextFrameIdToBuffer += (int)m_Step;
+						if (m_FrameIntegration == FrameIntegratingMode.NoIntegration)
+						{
+							BufferNonIntegratedFrame(nextFrameIdToBuffer);
+							nextFrameIdToBuffer += (int)m_Step;
+						}
+						else if (m_FrameIntegration == FrameIntegratingMode.SlidingAverage)
+						{
+							BufferRunningAverageIntegratedFrame(nextFrameIdToBuffer);
+							nextFrameIdToBuffer += (int)m_Step;
+						}
+						else if (m_FrameIntegration == FrameIntegratingMode.SteppedAverage)
+						{
+							BufferBinningIntegratedFrame(nextFrameIdToBuffer);
+							nextFrameIdToBuffer += m_FramesToIntegrate;
+						}
 					}
 				}
 
@@ -253,6 +288,52 @@ namespace Tangra.Video
 				bufferedFrame.FrameNo = nextFrameIdToBuffer;
 				bufferedFrame.Image = bmp;
 				m_FramesBufferQueue.Enqueue(bufferedFrame);				
+			}
+		}
+
+		private Pixelmap ProduceRunningAverageIntegratedFrame(int firstFrameNoToIntegrate)
+		{
+			return GetIntegratedFrame(firstFrameNoToIntegrate, m_FramesToIntegrate, true, m_PixelIntegrationMode == PixelIntegrationType.Median);
+		}
+
+		private void BufferRunningAverageIntegratedFrame(int nextFrameIdToBuffer)
+		{
+			Pixelmap thisFrame = ProduceRunningAverageIntegratedFrame(nextFrameIdToBuffer);
+
+			// 4) Produce the integrated bitmap
+			lock(m_FrameBitmapLock)
+			{
+				BufferedFrame bufferedFrame = new BufferedFrame()
+				{
+					FrameNo = nextFrameIdToBuffer,
+					Image = thisFrame
+				};
+
+				m_FramesBufferQueue.Enqueue(bufferedFrame);
+			}
+		}
+
+		private Pixelmap ProduceBinningIntegratedFrame(int firstFrameNoToIntegrate)
+		{
+			return GetIntegratedFrame(firstFrameNoToIntegrate, m_FramesToIntegrate, false, m_PixelIntegrationMode == PixelIntegrationType.Median);
+		}
+
+		private void BufferBinningIntegratedFrame(int nextFrameIdToBuffer)
+		{
+			for (int i = 0; i < m_FramesToIntegrate; i++)
+			{
+				Pixelmap thisFrame = ProduceBinningIntegratedFrame(nextFrameIdToBuffer);
+
+				lock (m_FrameBitmapLock)
+				{
+					BufferedFrame bufferedFrame = new BufferedFrame()
+						{
+							FrameNo = nextFrameIdToBuffer + i,
+							Image = thisFrame
+						};
+
+					m_FramesBufferQueue.Enqueue(bufferedFrame);
+				}
 			}
 		}
 

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Tangra.Model.Astro;
+using Tangra.Model.Image;
 
 namespace Tangra
 {
@@ -20,7 +21,7 @@ namespace Tangra
 			InitializeComponent();
 		}
 
-		public void ShowTargetPSF(PSFFit psfFit, int bpp)
+		public void ShowTargetPSF(PSFFit psfFit, int bpp, uint[,] backgroundPixels)
 		{
 			m_PSFFit = psfFit;
 			m_Bpp = bpp;
@@ -75,15 +76,65 @@ namespace Tangra
 				lblX.Text = "N/A";
 			}
 
+			CalculateAndDisplayBackground(backgroundPixels);
+
 			picFIT.Refresh();
 			picPixels.Refresh();
+		}
 
+		private void CalculateAndDisplayBackground(uint[,] backgroundPixels)
+		{
+			if (backgroundPixels != null)
+			{
+				int bgWidth = backgroundPixels.GetLength(0);
+				int bgHeight = backgroundPixels.GetLength(1);
 
+				var bgPixels = new List<uint>();
+
+				for(int x = 0; x < bgWidth; x++)
+				for(int y = 0; y < bgHeight; y++)
+				{
+					if (m_PSFFit == null || !m_PSFFit.IsSolved ||
+						ImagePixel.ComputeDistance(m_PSFFit.XCenter, x + bgWidth - m_PSFFit.MatrixSize, m_PSFFit.YCenter, y + bgHeight - m_PSFFit.MatrixSize) > m_PSFFit.FWHM)
+					{
+						bgPixels.Add(backgroundPixels[x, y]);
+					}
+				}
+
+				bgPixels.Sort();
+				double background = m_Bpp < 12 
+					? bgPixels[bgPixels.Count / 2] // for 8 bit videos Median background works better
+					: bgPixels.Average(x => x); // for 12+bit videos average background works better
+
+				double residualsSquareSum = 0;
+				foreach (uint bgPixel in bgPixels)
+				{
+					residualsSquareSum += (background - bgPixel) * (background - bgPixel);
+				}
+				double noise = Math.Sqrt(residualsSquareSum / (bgPixels.Count - 1));
+				
+				lblBackground.Text = background.ToString("0.0");
+				lblNoise.Text = noise.ToString("0.0");
+
+				if (m_PSFFit != null && noise != 0)
+				{
+					double snr = (m_PSFFit.IMax - m_PSFFit.I0) / noise;
+					lblSNR.Text = snr.ToString("0.0");
+				}
+				else
+					lblSNR.Text = "N/A";				
+			}
+			else
+			{
+				lblBackground.Text = "N/A";
+				lblNoise.Text = "N/A";
+				lblSNR.Text = "N/A";
+			}
 		}
 
 		private void btnCopy_Click(object sender, EventArgs e)
 		{
-			Clipboard.SetText(string.Format("Base={0}  Maximum={1}  Amplitude={2}  X={3}  Y={4}", lblI0.Text, lblIMax.Text, lblIAmp.Text, lblX.Text, lblY.Text));
+			Clipboard.SetText(string.Format("Base={0}  Maximum={1}  Amplitude={2}  X={3}  Y={4}\r\nBackground={5} 1-sigma Noise={6} SNR={7}", lblI0.Text, lblIMax.Text, lblIAmp.Text, lblX.Text, lblY.Text, lblBackground.Text, lblNoise.Text, lblSNR.Text));
 		}
 	}
 }

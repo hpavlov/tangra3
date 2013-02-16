@@ -72,8 +72,7 @@ namespace Tangra.VideoOperations.LightCurves
                     if (m_IsFirstDraw)
                     {
                         m_IsFirstDraw = false;
-                        // TODO: Who is listening to this??
-                        //NotificationManager.PostMessage(this, frmMain.MSG_ID_FRAME_CHANGED, m_SelectedMeasurements, null);
+						m_LightCurveController.OnNewSelectedMeasurements(m_SelectedMeasurements);
                     }
                 }
 
@@ -666,7 +665,7 @@ namespace Tangra.VideoOperations.LightCurves
 					if (movePlayerToFrame &&
                         TangraContext.Current.HasVideoLoaded)
 					{
-                        m_Controller.MoveToFrameNoIntegrate((int)m_Context.SelectedFrameNo);
+                        m_LightCurveController.MoveToFrameNoIntegrate((int)m_Context.SelectedFrameNo);
 					}
 
                     break;
@@ -947,9 +946,29 @@ namespace Tangra.VideoOperations.LightCurves
 
         private SpinLock m_SpinLock = new SpinLock();
 
-        private void HandleNewSelectedFrame(int newFrameId)
-        {
-            //m_SpinLock.Enter();
+		internal void OnNewSelectedMeasurements(LCMeasurement[] selectedMeasurements)
+	    {
+			if (m_frmZoomedPixels != null)
+				m_frmZoomedPixels.HandleNewSelectedFrame(selectedMeasurements);
+
+			if (m_frmPSFFits != null)
+				m_frmPSFFits.HandleNewSelectedFrame(selectedMeasurements);
+
+			if (m_frmBackgroundHistograms != null)
+				m_frmBackgroundHistograms.HandleNewSelectedFrame(selectedMeasurements);
+
+			if (m_SelectedMeasurements == null ||
+			    selectedMeasurements[0].CurrFrameNo != m_SelectedMeasurements[0].CurrFrameNo)
+			{
+				SelectMeasurement((int)(selectedMeasurements[0].CurrFrameNo - m_Header.MinFrame));
+			}			
+	    }
+
+
+	    internal void HandleNewSelectedFrame(int newFrameId)
+	    {
+		    bool lockTaken = false;
+			m_SpinLock.Enter(ref lockTaken);
             try
             {
 				if (newFrameId < m_MinDisplayedFrame ||
@@ -986,7 +1005,8 @@ namespace Tangra.VideoOperations.LightCurves
             }
             finally
             {
-               // m_SpinLock.Exit();
+				if (lockTaken)
+					m_SpinLock.Exit();
             }
         }
 

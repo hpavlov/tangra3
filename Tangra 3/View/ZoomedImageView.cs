@@ -17,16 +17,23 @@ namespace Tangra.View
         {
             m_ZoomedImage = zoomedImage;
             m_OwnerForm = ownerForm;
+
+			m_ZoomedImage.Image = new Bitmap(m_ZoomedImage.Width, m_ZoomedImage.Height);
         }
 
-        public void DrawCustomZoomImage(IVideoOperation videoOperation)
+        public bool DrawCustomZoomImage(IVideoOperation videoOperation)
         {
             using (Graphics g = Graphics.FromImage(m_ZoomedImage.Image))
             {
-                videoOperation.DrawCustomZoomImage(g, m_ZoomedImage.Image.Width, m_ZoomedImage.Image.Height);
-                g.Save();
-                m_ZoomedImage.Invalidate();
-            }            
+                if (videoOperation.DrawCustomZoomImage(g, m_ZoomedImage.Image.Width, m_ZoomedImage.Image.Height))
+                {
+					g.Save();
+					m_ZoomedImage.Invalidate();
+	                return true;
+                }
+            }
+
+	        return false;
         }
 
         public void UpdateImage(Bitmap zoomedBitmap)

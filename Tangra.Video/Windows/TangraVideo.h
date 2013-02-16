@@ -2,7 +2,7 @@
 
 #define VERSION_MAJOR 3
 #define VERSION_MINOR 0
-#define VERSION_REVISION 17
+#define VERSION_REVISION 21
 
 struct VideoFileInfo
 {
@@ -12,6 +12,8 @@ struct VideoFileInfo
 	long CountFrames;
 	long FirstFrame;
 	long BitmapImageSize;
+	char EngineBuffer[16];
+	char VideoFileTypeBuffer[32];
 };
 
 
