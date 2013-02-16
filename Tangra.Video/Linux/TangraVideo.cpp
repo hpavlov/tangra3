@@ -51,11 +51,7 @@ HRESULT TangraVideoGetIntegratedFrame(long startFrameNo, long framesToIntegrate,
 	return E_FAIL;
 }
 
-int GetProductVersion()
+int GetTangraVideoVersion()
 {	
-	int major = 3;
-	int minor = 0;
-	int revision = 10;
-
-	return (major << 28) + (minor << 16) + revision;
+	return (VERSION_MAJOR << 28) + (VERSION_MINOR << 16) + VERSION_REVISION;
 }

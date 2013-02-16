@@ -40,9 +40,8 @@ namespace Tangra.VideoOperations.LightCurves
 
             m_LightCurveController = controller;
 
-#if PRODUCTION
+            // Not implemented yet, may be one day ...
             miFullReprocess.Visible = false;
-#endif
 
             m_DisplaySettings.Load();
             m_DisplaySettings.Initialize();

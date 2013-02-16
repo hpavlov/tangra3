@@ -10,7 +10,7 @@ LIBRARY
 EXPORTS
     ; Explicit exports can go here
 
-	GetProductVersion
+	GetTangraVideoVersion
 	TangraVideoEnumVideoEngines
 	TangraVideoSetVideoEngine
 	TangraVideoOpenFile

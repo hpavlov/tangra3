@@ -17,7 +17,6 @@ struct VideoFileInfo
 };
 
 
-int GetProductVersion();
 
 HRESULT TangraVideoEnumVideoEngines(char* videoEngines);
 

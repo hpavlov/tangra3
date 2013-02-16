@@ -68,7 +68,7 @@
             // lblBackgroundSigma
             // 
             this.lblBackgroundSigma.AutoSize = true;
-            this.lblBackgroundSigma.Location = new System.Drawing.Point(230, 16);
+            this.lblBackgroundSigma.Location = new System.Drawing.Point(421, 25);
             this.lblBackgroundSigma.Name = "lblBackgroundSigma";
             this.lblBackgroundSigma.Size = new System.Drawing.Size(25, 13);
             this.lblBackgroundSigma.TabIndex = 36;
@@ -77,7 +77,7 @@
             // lblMedianBackground
             // 
             this.lblMedianBackground.AutoSize = true;
-            this.lblMedianBackground.Location = new System.Drawing.Point(117, 16);
+            this.lblMedianBackground.Location = new System.Drawing.Point(320, 25);
             this.lblMedianBackground.Name = "lblMedianBackground";
             this.lblMedianBackground.Size = new System.Drawing.Size(25, 13);
             this.lblMedianBackground.TabIndex = 35;
@@ -86,7 +86,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(176, 16);
+            this.label4.Location = new System.Drawing.Point(373, 25);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(48, 13);
             this.label4.TabIndex = 34;
@@ -95,16 +95,16 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(12, 16);
+            this.label3.Location = new System.Drawing.Point(215, 25);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(104, 13);
+            this.label3.Size = new System.Drawing.Size(106, 13);
             this.label3.TabIndex = 33;
             this.label3.Text = "Median Background:";
             // 
             // rbScaleLinear
             // 
             this.rbScaleLinear.AutoSize = true;
-            this.rbScaleLinear.Location = new System.Drawing.Point(130, 12);
+            this.rbScaleLinear.Location = new System.Drawing.Point(130, 15);
             this.rbScaleLinear.Name = "rbScaleLinear";
             this.rbScaleLinear.Size = new System.Drawing.Size(54, 17);
             this.rbScaleLinear.TabIndex = 5;
@@ -116,7 +116,7 @@
             // 
             this.rbScaleLog.AutoSize = true;
             this.rbScaleLog.Checked = true;
-            this.rbScaleLog.Location = new System.Drawing.Point(51, 12);
+            this.rbScaleLog.Location = new System.Drawing.Point(51, 15);
             this.rbScaleLog.Name = "rbScaleLog";
             this.rbScaleLog.Size = new System.Drawing.Size(79, 17);
             this.rbScaleLog.TabIndex = 4;
@@ -127,7 +127,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 14);
+            this.label2.Location = new System.Drawing.Point(12, 17);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(37, 13);
             this.label2.TabIndex = 3;
@@ -137,7 +137,7 @@
             // 
             this.lblPixCount.AutoSize = true;
             this.lblPixCount.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblPixCount.Location = new System.Drawing.Point(321, 15);
+            this.lblPixCount.Location = new System.Drawing.Point(321, 10);
             this.lblPixCount.Name = "lblPixCount";
             this.lblPixCount.Size = new System.Drawing.Size(0, 13);
             this.lblPixCount.TabIndex = 2;
@@ -145,7 +145,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(207, 14);
+            this.label1.Location = new System.Drawing.Point(207, 9);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(114, 13);
             this.label1.TabIndex = 1;
@@ -155,7 +155,7 @@
             // 
             this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnClose.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnClose.Location = new System.Drawing.Point(477, 10);
+            this.btnClose.Location = new System.Drawing.Point(477, 12);
             this.btnClose.Name = "btnClose";
             this.btnClose.Size = new System.Drawing.Size(75, 23);
             this.btnClose.TabIndex = 0;

@@ -44,6 +44,8 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
@@ -157,6 +159,12 @@
     <Compile Include="frmTargetPSFViewerForm.Designer.cs">
       <DependentUpon>frmTargetPSFViewerForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="frmUnhandledException.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmUnhandledException.Designer.cs">
+      <DependentUpon>frmUnhandledException.cs</DependentUpon>
+    </Compile>
     <Compile Include="Helpers\ApplicationSettingsSerializer.cs" />
     <Compile Include="Helpers\DuplicateFrameAvoider.cs" />
     <Compile Include="Helpers\Extensions.cs" />
@@ -169,6 +177,11 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources\CustomCursors.cs" />
+    <Compile Include="Service References\TangraService\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
     <Compile Include="VideoOperations\FrameAdjustmentsPreview.cs" />
     <Compile Include="VideoOperations\frmFullSizePreview.cs">
       <SubType>Form</SubType>
@@ -335,6 +348,12 @@
     <Compile Include="Video\AstroDigitalVideo\Interfaces.cs" />
     <Compile Include="Video\AstroDigitalVideo\UI\AdvTagValuePair.cs" />
     <Compile Include="Video\FramePlayer.cs" />
+    <Compile Include="Video\frmJumpToFrame.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Video\frmJumpToFrame.Designer.cs">
+      <DependentUpon>frmJumpToFrame.cs</DependentUpon>
+    </Compile>
     <Compile Include="Video\SingleBitmapFileFrameStream.cs" />
     <Compile Include="Video\VideoStream.cs" />
     <Compile Include="View\VideoFileView.cs" />
@@ -386,6 +405,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmTargetPSFViewerForm.resx">
       <DependentUpon>frmTargetPSFViewerForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmUnhandledException.resx">
+      <DependentUpon>frmUnhandledException.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -460,7 +482,11 @@
     <EmbeddedResource Include="Video\AstroDigitalVideo\frmAdvViewer.resx">
       <DependentUpon>frmAdvViewer.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Video\frmJumpToFrame.resx">
+      <DependentUpon>frmJumpToFrame.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="app.config" />
+    <None Include="Properties\DataSources\Tangra.VideoOperations.LightCurves.LCFileSeriesEntry.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -470,6 +496,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="Service References\TangraService\ErrorReports.wsdl" />
     <None Include="WindowsFiles\app.config">
       <SubType>Designer</SubType>
     </None>
@@ -485,6 +512,13 @@
     <None Include="Resources\Cursor_11.cur" />
     <None Include="Resources\Cursor_51.cur" />
     <None Include="Resources\Cursor_181.cur" />
+    <None Include="Service References\TangraService\ErrorReports.disco" />
+    <None Include="Service References\TangraService\configuration91.svcinfo" />
+    <None Include="Service References\TangraService\configuration.svcinfo" />
+    <None Include="Service References\TangraService\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
     <Content Include="WindowsFiles\TangraCore.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -504,6 +538,12 @@
       <Project>{70BBC9A7-7DD9-4A4D-B972-6665C65875C6}</Project>
       <Name>Tangra.Model</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="Service References\TangraService\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

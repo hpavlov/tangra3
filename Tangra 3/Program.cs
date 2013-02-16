@@ -21,6 +21,8 @@ namespace Tangra
 		{
 			Trace.WriteLine(string.Format("Starting Tangra v{0}", Assembly.GetExecutingAssembly().GetName().Version));
 
+		    //MessageBox.Show("Attach Debugger Now!");
+
 		    PlatformID platform = Environment.OSVersion.Platform;
             if (platform != PlatformID.MacOSX && platform != PlatformID.Unix && 
                 platform != PlatformID.Win32Windows && platform != PlatformID.Win32NT && platform != PlatformID.Win32S)

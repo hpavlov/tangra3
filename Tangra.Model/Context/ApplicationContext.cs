@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 
 namespace Tangra.Model.Context
 {
@@ -63,6 +65,17 @@ namespace Tangra.Model.Context
 		{
 			return m_RestartRequest;
 		}
+
+        public void RestartApplication()
+        {
+            if (m_RestartRequest)
+                return;
+
+            m_RestartRequest = true;
+
+            Application.Restart();
+            Process.GetCurrentProcess().Kill();
+        }
 
 		public void Reset()
 		{

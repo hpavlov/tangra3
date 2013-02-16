@@ -188,11 +188,11 @@ namespace Tangra
 			{
 				Trace.WriteLine(ex.ToString());
 
-#if PRODUCTION
+//#if PRODUCTION
                 frmUnhandledException.HandleExceptionNoRestart(this, ex);
-#else
-				Debugger.Break();
-#endif
+//#else
+//				Debugger.Break();
+//#endif
 			}
 			finally
 			{
@@ -582,13 +582,13 @@ namespace Tangra
 		{
 			if (!m_VideoController.IsRunning)
 			{
-				//frmJumpToFrame frm = new frmJumpToFrame();
-				//frm.nudFrameToJumpTo.Properties.MinValue = m_VideoController.Video.FirstFrame;
-				//frm.nudFrameToJumpTo.Properties.MaxValue = m_VideoController.Video.LastFrame;
-				//frm.nudFrameToJumpTo.Value = m_CurrentFrameId;
+                var frm = new frmJumpToFrame();
+                frm.nudFrameToJumpTo.Minimum = m_VideoController.VideoFirstFrame;
+                frm.nudFrameToJumpTo.Maximum= m_VideoController.VideoLastFrame;
+                frm.nudFrameToJumpTo.Value = m_CurrentFrameId;
 
-				//if (frm.ShowDialog(this) == DialogResult.OK)
-				//    m_FramePlayer.MoveToFrame((int)frm.nudFrameToJumpTo.Value);
+                if (frm.ShowDialog(this) == DialogResult.OK)
+                    m_VideoController.MoveToFrame((int)frm.nudFrameToJumpTo.Value);
 			}
 		}
 

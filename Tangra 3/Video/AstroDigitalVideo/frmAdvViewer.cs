@@ -219,6 +219,8 @@ namespace Tangra.Video.AstroDigitalVideo
 			string shutter = "";
 			string offset = "";
 			string systemTime = string.Empty;
+            string almanacOffsetStr = "";
+            string almanacStatusStr = "";
 
 			lvFrameStatusData.Items.Clear();
 
@@ -263,6 +265,7 @@ namespace Tangra.Video.AstroDigitalVideo
 				{
 					int almanacStatus = int.Parse(tagValue);
 					tagValue = AdvStatusValuesHelper.TranslateGpsAlmanacStatus(almanacStatus);
+				    almanacStatusStr = tagValue;
 				}
 				else if (statusTag.Name == "GPSAlmanacOffset" && !string.IsNullOrEmpty(tagValue))
 				{
@@ -271,6 +274,7 @@ namespace Tangra.Video.AstroDigitalVideo
 						almanacOffset = (short) (almanacOffset + (0xFF << 8));
 
 					tagValue = AdvStatusValuesHelper.TranslateGpsAlmanacOffset(1, almanacOffset, false);
+                    almanacOffsetStr = tagValue;
 				}
 				else if (statusTag.Name == "GPSFixStatus" && !string.IsNullOrEmpty(tagValue))
 				{
@@ -306,6 +310,8 @@ namespace Tangra.Video.AstroDigitalVideo
 			lblFrameGamma.Text = gamma;
 			lblFrameOffset.Text = offset;
 			lblFrameSystemTime.Text = systemTime;
+            lblFrameAlmanacOffset.Text = almanacOffsetStr;
+            lblFrameAlmanacStatus.Text = almanacStatusStr;
 
 			double fps = 1000.0 / m_CurrentImageData.ExposureMilliseconds;
 			lblFrameExposure.Text = string.Format("{0:0.0} ms ({1} {2})", m_CurrentImageData.ExposureMilliseconds, fps > 0 ? Math.Round(fps) : Math.Round(1 / fps), fps > 0 ? "fps" : "spf");

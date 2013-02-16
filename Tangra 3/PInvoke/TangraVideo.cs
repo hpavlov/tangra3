@@ -84,7 +84,7 @@ namespace Tangra.PInvoke
 
 		[DllImport(LIBRARY_TANGRA_VIDEO, CallingConvention = CallingConvention.Cdecl)]
 		//HRESULT GetVersion();
-		private static extern int GetProductVersion();
+		private static extern int GetTangraVideoVersion();
 
 		private static VideoFileInfo s_fileInfo; 
 
@@ -193,7 +193,7 @@ namespace Tangra.PInvoke
 
 		public static string GetVideoEngineVersion()
 		{
-			int ver = GetProductVersion();
+            int ver = TangraVideo.GetTangraVideoVersion();
 
 			int major = ver >> 28;
 			int minor = ver & 0x0FFFFFFF >> 28;

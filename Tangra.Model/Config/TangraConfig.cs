@@ -332,7 +332,7 @@ namespace Tangra.Model.Config
 			public float DefaultSignalAperture = 1.0f;
 			public SignalApertureUnit DefaultSignalApertureUnit = SignalApertureUnit.FWHM;
 
-			public BackgroundMethod DefaultBackgroundMethod = BackgroundMethod.BackgroundMode;
+			public BackgroundMethod DefaultBackgroundMethod = BackgroundMethod.BackgroundMedian;
 
 			public PsfFittingMethod PsfFittingMethod = PsfFittingMethod.DirectNonLinearFit;
 			public PsfQuadrature PsfQuadrature = PsfQuadrature.NumericalInAperture;
@@ -353,7 +353,7 @@ namespace Tangra.Model.Config
 
 		public class TrackingSettings
 		{
-			public byte RefiningFrames = 16;
+			public byte RefiningFrames = 8;
 			public float DistanceTolerance = 6.0f;
 			public int SearchRadius = 10;
 			public bool WarnOnUnsatisfiedGuidingRequirements = false;

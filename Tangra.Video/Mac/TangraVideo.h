@@ -2,6 +2,9 @@
 
 #include "WindowsTypes.h"
 
+#define VERSION_MAJOR 3
+#define VERSION_MINOR 0
+#define VERSION_REVISION 15
 
 struct VideoFileInfo
 {
@@ -18,7 +21,7 @@ extern "C" {
 #endif
 
 
-int GetProductVersion();
+int GetTangraVideoVersion();
 
 HRESULT TangraVideoEnumVideoEngines(char* videoEngines);
 
