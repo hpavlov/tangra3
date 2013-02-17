@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Model.Context;
 using Tangra.Model.Image;
 using Tangra.Model.Video;
 using Tangra.PInvoke;
@@ -36,7 +37,11 @@ namespace Tangra.Video
 
 			try
 			{
-				return new AstroDigitalVideoStream(fileName, ref equipmentInfo);
+				var rv = new AstroDigitalVideoStream(fileName, ref equipmentInfo);
+
+                TangraContext.Current.RenderingEngine = "AstroDigitalVideo";
+
+			    return rv;
 			}
 			catch(ADVFormatException ex)
 			{

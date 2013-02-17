@@ -23,7 +23,7 @@ namespace Tangra
             InitializeComponent();
         }
 
-        private void frmSystemInfo_Load(object sender, EventArgs e)
+        public static string GetFullVersionInfo()
         {
             OperatingSystem os = Environment.OSVersion;
             PlatformID pid = os.Platform;
@@ -56,14 +56,19 @@ namespace Tangra
 
             string componentVersions = string.Format("Tangra Core v{0}\r\nTangra Video Engine v{1}", TangraEnvironment.TangraCoreVersion, TangraEnvironment.TangraVideoEngineVersion);
 
-            string totalInfo = string.Format("{0}\r\nOS: {1}\r\nPlatform: {2}\r\nRuntime: {3}\r\n{4}",
-                productName, platformName, platformVersion, clrVersion, componentVersions);
+            return string.Format("{0}\r\nOS: {1}\r\nPlatform: {2}\r\nRuntime: {3}\r\n{4}",
+                productName, platformName, platformVersion, clrVersion, componentVersions);            
+        }
+
+        private void frmSystemInfo_Load(object sender, EventArgs e)
+        {
+            string totalInfo = GetFullVersionInfo();
 
             tbxSystemInfo.Text = totalInfo;
             tbxSystemInfo.DeselectAll();            
         }
 
-        public string AssemblyProduct
+        public static string AssemblyProduct
         {
             get
             {
@@ -76,7 +81,7 @@ namespace Tangra
             }
         }
 
-        public string AssemblyVersion
+        public static string AssemblyVersion
         {
             get
             {
@@ -84,7 +89,7 @@ namespace Tangra
             }
         }
 
-        public string AssemblyFileVersion
+        public static string AssemblyFileVersion
         {
             get
             {

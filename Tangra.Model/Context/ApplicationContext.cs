@@ -7,6 +7,11 @@ using System.Windows.Forms;
 
 namespace Tangra.Model.Context
 {
+    public class CrashReportInfo
+    {
+        public string VideoFile { get; set; }
+    }
+
 	public class TangraContext
 	{
 		public static TangraContext Current = new TangraContext();
@@ -34,9 +39,7 @@ namespace Tangra.Model.Context
 		public bool HasConfigurationChosen = false;
 		public bool HasConfigurationSolved = false;
 
-		public bool UsingAviSynth = false;
 		public bool UsingADV = false;
-		public bool UsingDirectShow = false;
 		public bool RecordingDebugSession = false;
 		//internal PreProcessingInfo PreProcessingInfo = null;
 
@@ -59,6 +62,10 @@ namespace Tangra.Model.Context
 
 		public string FileName;
 		public string FileFormat;
+
+        public CrashReportInfo CrashReportInfo;
+
+	    public string RenderingEngine;
 
 		private bool m_RestartRequest = false;
 		public bool HasRestartRequest()
@@ -87,9 +94,7 @@ namespace Tangra.Model.Context
 			CanScrollFrames = false;
 			CanPlayVideo = false;
 
-			UsingAviSynth = false;
 			UsingADV = false;
-			UsingDirectShow = false;
 			RecordingDebugSession = false;
 			UsingIntegration = false;
 
@@ -106,6 +111,10 @@ namespace Tangra.Model.Context
 
 			FileName = null;
 			FileFormat = null;
+
+		    RenderingEngine = null;
+
+		    CrashReportInfo = new CrashReportInfo();
 		}
 	}
 }

@@ -102,7 +102,7 @@ namespace Tangra
 
         private void btnSystemInfo_Click(object sender, EventArgs e)
         {
-            frmSystemInfo frm = new frmSystemInfo();
+            var frm = new frmSystemInfo();
             frm.ShowDialog(this);
         }
     }

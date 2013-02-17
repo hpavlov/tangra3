@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.ServiceModel;
 using System.Text;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 using Tangra.Model.Context;
 using Tangra.TangraService;
 
@@ -36,7 +38,7 @@ namespace Tangra
 
             if (error != null)
             {
-                frmUnhandledException frm = new frmUnhandledException(error);
+                var frm = new frmUnhandledException(error);
                 frm.StartPosition = FormStartPosition.CenterParent;
 
                 frm.ShowDialog(sender as IWin32Window);
@@ -62,7 +64,27 @@ namespace Tangra
         private string GetErrorReport()
         {
             return "Tangra v." + Assembly.GetExecutingAssembly().GetName().Version.ToString() + "\r\n\r\n" +
-                    m_Error.ToString() + "\r\n\r\nUser Comments:\r\n" + tbxUserComments.Text;
+                    m_Error.ToString() + "\r\n\r\nUser Comments:\r\n" + tbxUserComments.Text + "\r\n\r\n" + GetExtendedTangraInfo();
+        }
+
+        private string GetExtendedTangraInfo()
+        {
+            var ser = new XmlSerializer(typeof (CrashReportInfo));
+            var crashReportInfo = new StringBuilder();
+
+            if (TangraContext.Current.CrashReportInfo != null)
+            {
+                using(TextWriter wrt = new StringWriter(crashReportInfo))
+                {
+                    ser.Serialize(wrt, TangraContext.Current.CrashReportInfo);
+                    wrt.Flush();
+                }
+            }
+            
+            return
+                frmSystemInfo.GetFullVersionInfo() + "\r\n" +
+                string.Format("Tangra Install Location: {0}\r\n", AppDomain.CurrentDomain.BaseDirectory) +
+                crashReportInfo.ToString();
         }
 
         private void btnSubmit_Click(object sender, EventArgs e)

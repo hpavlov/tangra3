@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using Tangra.Model.Config;
+using Tangra.Model.Context;
 using Tangra.Model.Image;
 using Tangra.Model.Video;
 using Tangra.PInvoke;
@@ -22,18 +23,37 @@ namespace Tangra.Video
 	{
 		public static VideoStream OpenFile(string fileName)
 		{
-			try
-			{
-                TangraVideo.SetVideoEngine(TangraConfig.Settings.Generic.PreferredRenderingEngineIndex);
+		    List<string> allEngines = TangraVideo.EnumVideoEngines().ToList();
 
-				VideoFileInfo fileInfo = TangraVideo.OpenFile(fileName);
+		    var allEnginesByAttemptOrder = new List<string>(allEngines);
+            allEnginesByAttemptOrder.RemoveAt(TangraConfig.Settings.Generic.PreferredRenderingEngineIndex);
+		    allEnginesByAttemptOrder.Insert(0, allEngines[TangraConfig.Settings.Generic.PreferredRenderingEngineIndex]);
 
-				return new VideoStream(fileInfo, fileName);
-			}
-			catch (Exception ex)
-			{
-				throw new InvalidVideoFileException(ex.Message);
-			}
+            Dictionary<int, string> allEnginesByIndex = allEnginesByAttemptOrder.ToDictionary(x => allEngines.IndexOf(x), x => x);
+
+		    Exception lastError = null;
+
+            foreach (int engineIdx in allEnginesByIndex.Keys)
+		    {
+                try
+                {
+                    TangraVideo.SetVideoEngine(engineIdx);
+
+                    VideoFileInfo fileInfo = TangraVideo.OpenFile(fileName);
+
+                    TangraContext.Current.RenderingEngine = allEnginesByIndex[engineIdx];
+
+                    return new VideoStream(fileInfo, fileName);
+                }
+                catch (Exception ex)
+                {
+                    lastError = ex;
+                }		        
+		    }
+
+            throw new InvalidVideoFileException(lastError != null 
+                ? lastError.Message 
+                : "None of the rendering engines was able to open the file.");
 		}
 
 		private string m_FileName;

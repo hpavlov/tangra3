@@ -142,11 +142,13 @@ namespace Tangra.Controller
 		public bool OpenVideoFileInternal(string fileName, Func<IFrameStream> frameStreamFactoryMethod)
 		{
 			TangraContext.Current.UsingADV = false;
-			TangraContext.Current.UsingDirectShow = false;
+
 			TangraContext.Current.FileName = null;
 			TangraContext.Current.FileFormat = null;
 			TangraContext.Current.HasVideoLoaded = false;
 			m_OverlayManager.Reset();
+
+		    TangraContext.Current.CrashReportInfo.VideoFile = fileName;
 
 			TangraCore.PreProcessors.ClearAll();
 			TangraCore.PreProcessors.AddGammaCorrection(TangraConfig.Settings.Photometry.EncodingGamma);

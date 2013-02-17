@@ -122,15 +122,9 @@ namespace Tangra.View
 			//tslblDarkFrameLoaded.Visible = VideoContext.Current.DarkField != null;
 			//tslblFlatFrameLoaded.Visible = VideoContext.Current.FlatField != null;
 
-			if (TangraContext.Current.UsingDirectShow || TangraContext.Current.UsingAviSynth || TangraContext.Current.UsingADV)
+			if (TangraContext.Current.HasVideoLoaded)
 			{
-				if (TangraContext.Current.UsingAviSynth)
-					m_MainForm.tslblUsingAviSynth.Text = "AviSynth";
-				else if (TangraContext.Current.UsingDirectShow)
-					m_MainForm.tslblUsingAviSynth.Text = "DirectShow";
-				else if (TangraContext.Current.UsingADV)
-					m_MainForm.tslblUsingAviSynth.Text = "ADV";
-
+                m_MainForm.tslblUsingAviSynth.Text = TangraContext.Current.RenderingEngine;
 				m_MainForm.tslblUsingAviSynth.Visible = true;
 			}
 			else
