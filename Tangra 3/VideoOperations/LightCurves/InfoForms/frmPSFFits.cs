@@ -154,10 +154,12 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 
 		private uint[,] GetPixelData(uint[,] sourcePixels)
 		{
-			if (rbPreProcessedData.Checked)
-				return m_Context.ApplyPreProcessing(sourcePixels);
-			else
-				return sourcePixels;
+			return sourcePixels;
+
+			//if (rbPreProcessedData.Checked)
+			//    return m_Context.ApplyPreProcessing(sourcePixels);
+			//else
+			//    return sourcePixels;
 		}
 	}
 }

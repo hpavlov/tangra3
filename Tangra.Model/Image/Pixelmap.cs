@@ -6,6 +6,7 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using Tangra.Model.Config;
+using Tangra.Model.Helpers;
 
 namespace Tangra.Model.Image
 {
@@ -315,6 +316,26 @@ namespace Tangra.Model.Image
 			}
 
 			return new Pixelmap(bmp.Width, bmp.Height, 8, pixels, bmp, displayBitmapPixels);
+		}		
+
+		public void CopyPixelsFrom(uint[,] pixels, int bpp)
+		{
+			if (pixels.GetLength(0) != Width || pixels.GetLength(1) != Height)
+				throw new ArgumentException("Incompatible source image");
+
+			uint maxImagePixelValue = bpp.GetMaxValueForBitPix();
+
+			for (int y = 0; y < Height; y++)
+			{
+				for (int x = 0; x < Width; x++)
+				{
+					if (bpp == BitPixCamera)
+						this[x, y] = (uint)pixels[x, y];
+					else
+						this[x, y] = (uint)(MaxPixelValue * 1.0 * pixels[x, y] / maxImagePixelValue);
+				}
+			}
 		}
+
 	}
 }

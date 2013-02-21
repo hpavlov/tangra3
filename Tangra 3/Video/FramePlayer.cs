@@ -5,6 +5,7 @@ using System.Threading;
 using System.Windows.Forms;
 using Tangra.Model.Image;
 using Tangra.Model.Video;
+using Tangra.PInvoke;
 
 namespace Tangra.Video
 {
@@ -146,9 +147,37 @@ namespace Tangra.Video
 
 		public void StepForward(int secondsForward)
 		{
-			m_CurrentFrameIndex += (int)Math.Round(secondsForward * m_VideoStream.FrameRate);
-			if (m_CurrentFrameIndex >= m_VideoStream.LastFrame) m_CurrentFrameIndex = m_VideoStream.LastFrame;
+			AstroDigitalVideoStream advStream = m_VideoStream as AstroDigitalVideoStream;
+			if (advStream != null)
+			{
+				AdvFrameInfo currStatusChannel = advStream.GetStatusChannel(m_CurrentFrameIndex);
+				if (currStatusChannel.HasTimeStamp)
+				{
+					int targetFrame = m_CurrentFrameIndex + 1;
 
+					while (targetFrame <= m_VideoStream.LastFrame)
+					{
+						AdvFrameInfo statusChannel = advStream.GetStatusChannel(targetFrame);
+						if (statusChannel.HasTimeStamp)
+						{
+							TimeSpan ts =
+								new TimeSpan(statusChannel.MiddleExposureTimeStamp.Ticks - currStatusChannel.MiddleExposureTimeStamp.Ticks);
+							if (ts.TotalSeconds >= secondsForward)
+							{
+								m_CurrentFrameIndex = targetFrame;
+								break;
+							}
+						}
+						targetFrame++;
+					}					
+				}
+			}
+			else
+			{
+				m_CurrentFrameIndex += (int)Math.Round(secondsForward * m_VideoStream.FrameRate);				
+			}
+
+			if (m_CurrentFrameIndex >= m_VideoStream.LastFrame) m_CurrentFrameIndex = m_VideoStream.LastFrame;
 			DisplayCurrentFrame(MovementType.Jump);
 		}
 
@@ -203,7 +232,35 @@ namespace Tangra.Video
 
 		public void StepBackward(int secondsBackward)
 		{
-			m_CurrentFrameIndex -= (int)Math.Round(secondsBackward * m_VideoStream.FrameRate);
+			AstroDigitalVideoStream advStream = m_VideoStream as AstroDigitalVideoStream;
+			if (advStream != null)
+			{
+				AdvFrameInfo currStatusChannel = advStream.GetStatusChannel(m_CurrentFrameIndex);
+				if (currStatusChannel.HasTimeStamp)
+				{
+					int targetFrame = m_CurrentFrameIndex - 1;
+
+					while (targetFrame >= m_VideoStream.FirstFrame)
+					{
+						AdvFrameInfo statusChannel = advStream.GetStatusChannel(targetFrame);
+						if (statusChannel.HasTimeStamp)
+						{
+							TimeSpan ts =
+								new TimeSpan(currStatusChannel.MiddleExposureTimeStamp.Ticks - statusChannel.MiddleExposureTimeStamp.Ticks);
+							if (ts.TotalSeconds >= secondsBackward)
+							{
+								m_CurrentFrameIndex = targetFrame;
+								break;
+							}
+						}
+						targetFrame--;
+					}
+				}
+			}
+			else
+			{
+				m_CurrentFrameIndex -= (int)Math.Round(secondsBackward * m_VideoStream.FrameRate);
+			}			
 
 			if (m_CurrentFrameIndex < m_VideoStream.FirstFrame) m_CurrentFrameIndex = m_VideoStream.FirstFrame;
 

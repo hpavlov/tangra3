@@ -44,11 +44,16 @@ namespace Tangra.View
 
 				if (m_MainForm.pictureBox.Image != null)
 				{
-					using (Graphics g = Graphics.FromImage(m_MainForm.pictureBox.Image))
+					try
 					{
-						g.Clear(SystemColors.ControlDark);
-						g.Save();
+						using (Graphics g = Graphics.FromImage(m_MainForm.pictureBox.Image))
+						{
+							g.Clear(SystemColors.ControlDark);
+							g.Save();
+						}
 					}
+					catch (ArgumentException)
+					{ }
 
 					m_MainForm.pictureBox.Refresh();
 					m_MainForm.pictureBox.Image = null;
@@ -83,7 +88,7 @@ namespace Tangra.View
 
 			m_MainForm.pnlPlayControls.Enabled = TangraContext.Current.HasVideoLoaded;
 			m_MainForm.pnlPlayButtons.Enabled = TangraContext.Current.HasVideoLoaded;
-			m_MainForm.btnJumpTo.Enabled = TangraContext.Current.HasVideoLoaded;
+			m_MainForm.btnJumpTo.Enabled = TangraContext.Current.HasVideoLoaded && TangraContext.Current.CanScrollFrames;
 
 			m_MainForm.btnPlay.Enabled = TangraContext.Current.HasVideoLoaded && TangraContext.Current.CanPlayVideo;
 			m_MainForm.btnStop.Enabled = TangraContext.Current.HasVideoLoaded && TangraContext.Current.CanPlayVideo;
@@ -93,7 +98,7 @@ namespace Tangra.View
 			m_MainForm.btn1FrPlus.Enabled = TangraContext.Current.HasVideoLoaded && TangraContext.Current.CanScrollFrames;
 			m_MainForm.btn1SecMinus.Enabled = TangraContext.Current.HasVideoLoaded && TangraContext.Current.CanScrollFrames;
 			m_MainForm.btn1SecPlus.Enabled = TangraContext.Current.HasVideoLoaded && TangraContext.Current.CanScrollFrames;
-
+			
 			//m_MainForm.miDetectIntegration.Enabled = HasVideoLoaded && CanPlayVideo;
 
 			m_MainForm.miADVStatusData.Enabled = TangraContext.Current.HasVideoLoaded && TangraContext.Current.UsingADV;
@@ -110,7 +115,7 @@ namespace Tangra.View
 			if (!m_FramePlayer.IsRunning)
 				m_MainForm.ssFPS.Text = string.Empty;
 
-            if (TangraConfig.Settings.Photometry.EncodingGamma != 1)
+			if (TangraConfig.Settings.Photometry.EncodingGamma != 1 && TangraContext.Current.HasAnyFileLoaded)
             {
                 m_MainForm.ssGamma.Visible = true;
                 m_MainForm.ssGamma.BackColor = Color.FromArgb(255, 255, 192);

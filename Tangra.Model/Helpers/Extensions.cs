@@ -86,5 +86,17 @@ namespace Tangra.Model.Helpers
                 return rv;
             }
         }
+
+		public static uint GetMaxValueForBitPix(this int bitPix)
+		{
+			if (bitPix == 8)
+				return byte.MaxValue;
+			else if (bitPix == 12)
+				return 4095;
+			else if (bitPix == 16)
+				return ushort.MaxValue;
+			else
+				return uint.MaxValue;
+		}
     }
 }

@@ -149,6 +149,25 @@ namespace Tangra.Video
 			get { return (1000 / m_FrameRate); }
 		}
 
+		public AdvFrameInfo GetStatusChannel(int index)
+		{
+			var frameInfo = new AdvFrameInfoNative();
+
+			byte[] gpsFix = new byte[256 * 16];
+			byte[] userCommand = new byte[256 * 16];
+			byte[] systemError = new byte[256 * 16];
+
+			TangraCore.ADVGetFrameStatusChannel(index, frameInfo, gpsFix, userCommand, systemError);
+
+			var rv = new AdvFrameInfo(frameInfo)
+			{
+				UserCommandString = AdvFrameInfo.GetStringFromBytes(userCommand),
+				SystemErrorString = AdvFrameInfo.GetStringFromBytes(systemError),
+				GPSFixString = AdvFrameInfo.GetStringFromBytes(gpsFix)		
+			};
+
+			return rv;
+		}
 
 		public Pixelmap GetPixelmap(int index)
 		{

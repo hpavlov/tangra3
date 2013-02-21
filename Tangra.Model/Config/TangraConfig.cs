@@ -48,6 +48,17 @@ namespace Tangra.Model.Config
 			Lists.Add(2, new List<string>());
         }
 
+		internal RecentFilesConfig(RecentFilesConfig copyFrom)
+			: this()
+		{
+			if (copyFrom != null)
+			{
+				Lists[0].AddRange(copyFrom.Lists[0]);
+				Lists[1].AddRange(copyFrom.Lists[1]);
+				Lists[2].AddRange(copyFrom.Lists[2]);				
+			}
+		}
+
 		private int MAX_RECENT_FILES = 20;
 
 		public Dictionary<int, List<string>> Lists = new Dictionary<int, List<string>>();
@@ -118,7 +129,8 @@ namespace Tangra.Model.Config
 			}				
 		}	
 	}
-
+	
+	[XmlRoot("Tangra3Config")]
 	public class TangraConfig
 	{
 		public static TangraConfig Settings;
@@ -210,6 +222,13 @@ namespace Tangra.Model.Config
 			}
 		}
 
+		public static void Reset(ISettingsSerializer serializer)
+		{
+			var persistedRecentFiles = new RecentFilesConfig(Settings.RecentFiles);
+			Settings = new TangraConfig(serializer, false);
+			Settings.RecentFiles = persistedRecentFiles;
+		}
+
 		public PhotometrySettings Photometry = new PhotometrySettings();
 		public TrackingSettings Tracking = new TrackingSettings();
 		public Colors Color = new Colors();
@@ -222,6 +241,7 @@ namespace Tangra.Model.Config
 		{
 			public byte Saturation8Bit = 250;
 			public uint Saturation12Bit = 4000;
+			public uint Saturation14Bit = 16000;
 
 			public uint GetSaturationForBpp(int bpp)
 			{
@@ -229,6 +249,8 @@ namespace Tangra.Model.Config
 					return Saturation8Bit;
 				else if (bpp == 12)
 					return Saturation12Bit;
+				else if (bpp == 14)
+					return Saturation14Bit;
 
 				return (uint)((1 << bpp) - 1);
 			}
@@ -294,42 +316,17 @@ namespace Tangra.Model.Config
 			public PhotometrySettings()
 			{
 				Saturation = new SaturationSettings();
-				m_EncodingGamma = 1.0f;
-				for (int i = 0; i < 256; i++)
-					m_DecodingGammaMatrix[i] = (byte)i;
 			}
 
 			public SaturationSettings Saturation;
 
-			private float m_EncodingGamma = 1.0f;
-			private byte[] m_DecodingGammaMatrix = new byte[256];
-			public float EncodingGamma
-			{
-				get
-				{
-					return m_EncodingGamma;
-				}
-				set
-				{
-					if (m_EncodingGamma != value)
-					{
-						m_EncodingGamma = value;
-						float decodingGamma = 1 / m_EncodingGamma;
+			public float RememberedEncodingGammaNotForDirectUse = 1.0f;
 
-						for (int i = 0; i < 256; i++)
-							m_DecodingGammaMatrix[i] = (byte)Math.Max(0, Math.Min(255, Math.Round(256 * Math.Pow(i / 256.0, decodingGamma))));
-					}
-				}
-			}
-
-			public byte[] DecodingGammaMatrix
-			{
-				get { return m_DecodingGammaMatrix; }
-			}
+			public float EncodingGamma = 1.0f;
 
 			public ColourChannel ColourChannel = ColourChannel.Red;
 
-			public float DefaultSignalAperture = 1.0f;
+			public float DefaultSignalAperture = 1.2f;
 			public SignalApertureUnit DefaultSignalApertureUnit = SignalApertureUnit.FWHM;
 
 			public BackgroundMethod DefaultBackgroundMethod = BackgroundMethod.BackgroundMedian;
@@ -454,7 +451,7 @@ namespace Tangra.Model.Config
 			public OnOpenOperation OnOpenOperation = OnOpenOperation.StartLightCurveReduction;
 			public bool ShowProcessingSpeed = false;
 			public PerformanceQuality PerformanceQuality;
-			public bool GammaCorrectFullFrame = false;
+			public bool ReverseGammaCorrection = false;
 			public int PreferredRenderingEngineIndex = 0;
 
 			public bool AcceptBetaUpdates = false;

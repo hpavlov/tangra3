@@ -15,6 +15,7 @@ using Tangra.Model.Image;
 using Tangra.Model.Numerical;
 using Tangra.Model.Video;
 using Tangra.Model.VideoOperations;
+using Tangra.VideoOperations.LightCurves.InfoForms;
 using Tangra.VideoOperations.LightCurves.Tracking;
 
 
@@ -1343,7 +1344,7 @@ namespace Tangra.VideoOperations.LightCurves
 			public int Brightness;
 			public int Contrast;
 
-        	private CompositeFramePreProcessor m_FramePreProcessor = null;
+			private CompositeFramePreProcessor m_FramePreProcessor = null;
 
 			internal void InitFrameBytePreProcessors()
 			{
@@ -1351,22 +1352,19 @@ namespace Tangra.VideoOperations.LightCurves
 
 				if (UseBrightnessContrast)
 				{
-                    throw new NotImplementedException();
-					//IFramePreProcessor bytePreProcessor = new FrameByteBrightnessContrast(Brightness, Contrast, true, BitPix);
-					//m_FramePreProcessor.AddPreProcessor(bytePreProcessor);
+					IFramePreProcessor bytePreProcessor = new FrameByteBrightnessContrast(Brightness, Contrast, true, BitPix);
+					m_FramePreProcessor.AddPreProcessor(bytePreProcessor);
 				}
 				else if (UseStretching)
 				{
-                    throw new NotImplementedException();
-					//IFramePreProcessor bytePreProcessor = new FrameByteStretcher(FromByte, ToByte, true, BitPix);
-					//m_FramePreProcessor.AddPreProcessor(bytePreProcessor);
+					IFramePreProcessor bytePreProcessor = new FrameByteStretcher(FromByte, ToByte, true, BitPix);
+					m_FramePreProcessor.AddPreProcessor(bytePreProcessor);
 				}
 				else if (UseClipping)
 				{
-                    throw new NotImplementedException();
-					//IFramePreProcessor bytePreProcessor = new FrameByteClipper(FromByte, ToByte, true, BitPix);
-					//m_FramePreProcessor.AddPreProcessor(bytePreProcessor);
-				}				
+					IFramePreProcessor bytePreProcessor = new FrameByteClipper(FromByte, ToByte, true, BitPix);
+					m_FramePreProcessor.AddPreProcessor(bytePreProcessor);
+				}
 			}
 
             private TangraConfig.PsfFittingMethod m_PsfFittingMethod = TangraConfig.PsfFittingMethod.DirectNonLinearFit;
@@ -1463,59 +1461,61 @@ namespace Tangra.VideoOperations.LightCurves
                 m_RequiresFullReprocessing = true;
             }
 
-            public uint[,] ApplyPreProcessing(uint[,] sourcePixels)
-            {
-                if (this.EncodingGamma == 1.0 &&
-					this.Filter == FilterType.NoFilter &&
-					!this.UseClipping && !this.UseStretching && !this.UseBrightnessContrast)
-				{
-					return sourcePixels;
-				}
+			// NOTE: No video pre-processing when re-measuring data (for now)
+			// 
+			//public uint[,] ApplyPreProcessing(uint[,] sourcePixels)
+			//{
+			//    if (this.EncodingGamma == 1.0 &&
+			//        this.Filter == FilterType.NoFilter &&
+			//        !this.UseClipping && !this.UseStretching && !this.UseBrightnessContrast)
+			//    {
+			//        return sourcePixels;
+			//    }
 
-				int width = sourcePixels.GetLength(0);
-				int height = sourcePixels.GetLength(0);
+			//    int width = sourcePixels.GetLength(0);
+			//    int height = sourcePixels.GetLength(0);
 
-            	uint[,] newData = new uint[width, height];
-            	for (int x = 0; x < width; x++)
-            	{
-            		for (int y = 0; y < height; y++)
-            		{
-            			newData[x, y] = sourcePixels[x, y];
-            		}
-            	}
+			//    uint[,] newData = new uint[width, height];
+			//    for (int x = 0; x < width; x++)
+			//    {
+			//        for (int y = 0; y < height; y++)
+			//        {
+			//            newData[x, y] = sourcePixels[x, y];
+			//        }
+			//    }
 
-				// gamma, clipping, stretching, brightness / contrast and digital filters
+			//    // gamma, clipping, stretching, brightness / contrast and digital filters
 
-				if (m_FramePreProcessor != null)
-					newData = m_FramePreProcessor.OnPreProcessPixels(newData);
+			//    if (m_FramePreProcessor != null)
+			//        newData = m_FramePreProcessor.OnPreProcessPixels(newData);
 
-				// Apply a pre-processing filter
-				if (Filter != FilterType.NoFilter)
-				{
-                    if (Filter == FilterType.LowPass)
-                    {
-                        newData = BitmapFilter.LowPassFilter(newData);
-                    }
-                    else if (Filter == FilterType.LowPassDifference)
-                    {
-                        newData = BitmapFilter.LowPassDifferenceFilter(newData);
-                    }
-				}
+			//    // Apply a pre-processing filter
+			//    if (Filter != FilterType.NoFilter)
+			//    {
+			//        if (Filter == FilterType.LowPass)
+			//        {
+			//            newData = BitmapFilter.LowPassFilter(newData);
+			//        }
+			//        else if (Filter == FilterType.LowPassDifference)
+			//        {
+			//            newData = BitmapFilter.LowPassDifferenceFilter(newData, false);
+			//        }
+			//    }
 
-				if (this.EncodingGamma != 1.0)
-				{
+			//    if (this.EncodingGamma != 1.0)
+			//    {
 
-					for (int x = 0; x < width; x++)
-					{
-						for (int y = 0; y < height; y++)
-						{
-							newData[x, y] = this.DecodingGammaMatrix[newData[x, y]];
-						}
-					}
-				}
+			//        for (int x = 0; x < width; x++)
+			//        {
+			//            for (int y = 0; y < height; y++)
+			//            {
+			//                newData[x, y] = this.DecodingGammaMatrix[newData[x, y]];
+			//            }
+			//        }
+			//    }
 
-				return newData;
-            }
+			//    return newData;
+			//}
         }
     }
 }

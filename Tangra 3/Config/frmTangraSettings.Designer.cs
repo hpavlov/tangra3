@@ -47,6 +47,7 @@
 			this.pnlPropertyPage = new System.Windows.Forms.Panel();
 			this.btnOK = new System.Windows.Forms.Button();
 			this.btnCancel = new System.Windows.Forms.Button();
+			this.btnResetDefaults = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
 			// tvSettings
@@ -63,7 +64,7 @@
 			treeNode3.Tag = "3";
 			treeNode3.Text = "Astro Digital Video";
 			treeNode4.Name = "Node6";
-			treeNode4.Tag = "2";
+			treeNode4.Tag = "1";
 			treeNode4.Text = "Video";
 			treeNode5.Name = "Node1";
 			treeNode5.Tag = "4";
@@ -126,11 +127,22 @@
 			this.btnCancel.Text = "Cancel";
 			this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
 			// 
+			// btnResetDefaults
+			// 
+			this.btnResetDefaults.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnResetDefaults.Location = new System.Drawing.Point(185, 373);
+			this.btnResetDefaults.Name = "btnResetDefaults";
+			this.btnResetDefaults.Size = new System.Drawing.Size(106, 23);
+			this.btnResetDefaults.TabIndex = 14;
+			this.btnResetDefaults.Text = "Reset Defaults";
+			this.btnResetDefaults.Click += new System.EventHandler(this.btnResetDefaults_Click);
+			// 
 			// frmTangraSettings
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(665, 404);
+			this.Controls.Add(this.btnResetDefaults);
 			this.Controls.Add(this.btnCancel);
 			this.Controls.Add(this.btnOK);
 			this.Controls.Add(this.pnlPropertyPage);
@@ -153,5 +165,6 @@
 		private System.Windows.Forms.Panel pnlPropertyPage;
 		private System.Windows.Forms.Button btnOK;
 		private System.Windows.Forms.Button btnCancel;
+		private System.Windows.Forms.Button btnResetDefaults;
 	}
 }

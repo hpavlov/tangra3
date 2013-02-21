@@ -21,6 +21,7 @@ DLL_PUBLIC HRESULT GetBitmapPixels(long width, long height, unsigned long* pixel
 DLL_PUBLIC HRESULT PreProcessingStretch(unsigned long* pixels, long width, long height, int bpp, int fromValue, int toValue);
 DLL_PUBLIC HRESULT PreProcessingClip(unsigned long* pixels, long width, long height, int bpp, int fromValue, int toValue);
 DLL_PUBLIC HRESULT PreProcessingBrightnessContrast(unsigned long* pixels, long width, long height, int bpp, long brightness, long cotrast);
+DLL_PUBLIC HRESULT PreProcessingGamma(unsigned long* pixels, long width, long height, int bpp, float gamma);
 
 #ifdef __cplusplus
 } // __cplusplus defined.

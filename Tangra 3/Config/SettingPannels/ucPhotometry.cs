@@ -31,6 +31,7 @@ namespace Tangra.Config.SettingPannels
 			cbxPsfFittingMethod.SetCBXIndex((int)TangraConfig.Settings.Photometry.PsfFittingMethod);
 			nudUserSpecifiedFWHM.SetNUDValue((int)TangraConfig.Settings.Photometry.UserSpecifiedFWHM);
             rbSeeingUser.Checked = TangraConfig.Settings.Photometry.UseUserSpecifiedFWHM;
+			nudSNFrameWindow.SetNUDValue(TangraConfig.Settings.Photometry.SNFrameWindow);
         }
 
         public override void SaveSettings()
@@ -44,6 +45,7 @@ namespace Tangra.Config.SettingPannels
 			TangraConfig.Settings.Photometry.PsfFittingMethod = (TangraConfig.PsfFittingMethod)cbxPsfFittingMethod.SelectedIndex;
 			TangraConfig.Settings.Photometry.UserSpecifiedFWHM = (float)nudUserSpecifiedFWHM.Value;
             TangraConfig.Settings.Photometry.UseUserSpecifiedFWHM = rbSeeingUser.Checked;
+			TangraConfig.Settings.Photometry.SNFrameWindow = (int)nudSNFrameWindow.Value;
         }
 
 		public TangraConfig.BackgroundMethod ComboboxIndexToBackgroundMethod()

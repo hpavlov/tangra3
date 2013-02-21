@@ -170,10 +170,10 @@ namespace Tangra.VideoOperations
 		internal void Update()
 		{
 			if (m_UseIntegration ||
-				m_UseClipping ||
-				m_UseStretching ||
-				m_UseBrightnessContrast ||
-				m_UseDigitalFilter)
+			    m_UseClipping ||
+			    m_UseStretching ||
+			    m_UseBrightnessContrast ||
+			    m_UseDigitalFilter)
 			{
 
 
@@ -230,7 +230,11 @@ namespace Tangra.VideoOperations
 				frmFullSizePreview.Update(m_CurrFrame);
 			}
 			else
+			{
+				TangraCore.PreProcessors.ClearAll();
+
 				frmFullSizePreview.EnsureFullPreviewHidden();
+			}
 		}
 
 		public void MoveForm(int left, int top)

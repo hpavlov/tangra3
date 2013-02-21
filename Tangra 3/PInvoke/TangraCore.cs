@@ -126,6 +126,11 @@ namespace Tangra.PInvoke
 			}
 		}
 
+		public bool HasTimeStamp
+		{
+			get { return MidFrameTimeStampMillisecondsHi != 0 && MidFrameTimeStampMillisecondsLo != 0; }
+		}
+
 		public DateTime SystemTime
 		{
 			get
@@ -194,6 +199,10 @@ namespace Tangra.PInvoke
 		public static extern int ADVGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, [Out] uint[] pixels, [Out] byte[] bitmapBytes, [Out] byte[] bitmapDisplayBytes, [In, Out] AdvFrameInfoNative frameInfo);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+		//DLL_PUBLIC HRESULT ADVGetFrameStatusChannel(int frameNo, AdvLib::AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError);
+		public static extern int ADVGetFrameStatusChannel(int frameNo, [In, Out] AdvFrameInfoNative frameInfo, [In, Out] byte[] gpsFix, [In, Out] byte[] userCommand, [In, Out] byte[] systemError);
+
+		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
 		//HRESULT GetVersion();
 		private static extern int GetProductVersion();
 
@@ -248,6 +257,13 @@ namespace Tangra.PInvoke
 					[In, Out] ref float gamma,
 					[In, Out] ref ushort darkPixelsCount,
 					[In, Out] ref ushort flatPixelsCount);
+
+			// Specific Pre-Prcessing functions that can be used for the LightCurve form when displaying pre-processed pixels (that need to be manually pre-processed)
+
+			//DLL_PUBLIC HRESULT PreProcessingStretch(unsigned long* pixels, long width, long height, int bpp, int fromValue, int toValue);
+			//DLL_PUBLIC HRESULT PreProcessingClip(unsigned long* pixels, long width, long height, int bpp, int fromValue, int toValue);
+			//DLL_PUBLIC HRESULT PreProcessingBrightnessContrast(unsigned long* pixels, long width, long height, int bpp, long brightness, long cotrast);
+			//DLL_PUBLIC HRESULT PreProcessingGamma(unsigned long* pixels, long width, long height, int bpp, float gamma);
 
 			public static void ClearAll()
 			{

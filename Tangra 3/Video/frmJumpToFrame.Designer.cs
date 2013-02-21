@@ -40,7 +40,7 @@
 			this.nudFrameToJumpTo.Size = new System.Drawing.Size(96, 20);
 			this.nudFrameToJumpTo.TabIndex = 0;
 			this.nudFrameToJumpTo.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-			this.nudFrameToJumpTo.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.nudFrameToJumpTo_PreviewKeyDown);
+			this.nudFrameToJumpTo.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.nudFrameToJumpTo_KeyPress);
 			// 
 			// button1
 			// 

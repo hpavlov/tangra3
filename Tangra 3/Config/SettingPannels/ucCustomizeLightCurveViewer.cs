@@ -204,6 +204,11 @@ namespace Tangra.Config.SettingPannels
                 Preview();
         }
 
+		public override void Reset()
+		{
+			Preview();
+		}
+
         private void Preview()
         {
             ApplyValuesNoSave();

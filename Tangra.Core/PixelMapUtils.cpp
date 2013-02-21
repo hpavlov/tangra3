@@ -4,6 +4,7 @@
 #include "cross_platform.h"
 #include <stdio.h>
 #include <string.h>
+#include <cmath>
 
 
 void CopyPixelsInTriplets(BYTE* pDIB, BITMAPINFOHEADER bih, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
@@ -366,6 +367,51 @@ void GetMinMaxValuesForBpp(int bpp, int* minValue, int* maxValue)
 		*maxValue = 0xFFFF;
 }
 
+int s_GammaTableBpp = 0;
+float s_GammaTableEncodingGamma = 1.0f;
+unsigned int* s_GammaTable = NULL;
+
+void BuildGammaTableForBpp(int bpp, float gamma)
+{
+	if (s_GammaTableBpp != bpp ||
+		abs(s_GammaTableEncodingGamma - gamma) >= 0.01)
+	{
+		if (NULL != s_GammaTable)
+		{
+			delete s_GammaTable;
+			s_GammaTable = NULL;
+		}
+		
+		int minValue;
+		int maxValue;
+		
+		GetMinMaxValuesForBpp(bpp, &minValue, &maxValue);
+		
+		float decodingGamma = 1.0f / gamma;
+		float gammaPixelConvCoeff = maxValue / pow(maxValue, decodingGamma);
+		
+		s_GammaTable = (unsigned int*)malloc((maxValue + 1) * sizeof(unsigned int));
+		
+		unsigned int* itt = s_GammaTable;
+		
+		for (int idx = 0; idx <= maxValue; idx++)
+		{
+			float conversionValue =  gammaPixelConvCoeff * pow(idx, decodingGamma);
+			if (conversionValue + 0.5 >= maxValue)
+				*itt = maxValue;
+			else if (conversionValue + 0.5 < minValue)
+				*itt = minValue;
+			else
+				*itt = (unsigned int)(conversionValue + 0.5); // rounded to nearest int
+				
+			itt++;
+		}
+		
+		s_GammaTableBpp = bpp;
+		s_GammaTableEncodingGamma = gamma;
+	}
+}
+
 HRESULT PreProcessingStretch(unsigned long* pixels, long width, long height, int bpp, int fromValue, int toValue)
 {
 	int minValue, maxValue;
@@ -464,4 +510,87 @@ HRESULT PreProcessingBrightnessContrast(unsigned long* pixels, long width, long 
 	return S_OK;
 }
 
+HRESULT PreProcessingGamma(unsigned long* pixels, long width, long height, int bpp, float gamma)
+{
+	BuildGammaTableForBpp(bpp, gamma);
+
+	long totalPixels = width * height;
+	unsigned long* pPixels = pixels;
+	
+	while(totalPixels--)
+	{
+		*pPixels = *(s_GammaTable + *pPixels);
+		pPixels++;
+	}
+
+	return S_OK;	
+}
+
+struct ConvMatrix
+{
+	ConvMatrix()
+	{
+		TopLeft = 0;
+		TopMid = 0;
+		TopRight = 0;
+		MidLeft = 0;
+		Pixel = 1;
+		MidRight = 0;
+		BottomLeft = 0;
+		BottomMid = 0;
+		BottomRight = 0;
+		Factor = 1;
+		Offset = 0;		
+	}
+	
+	float TopLeft;
+	float TopMid;
+	float TopRight;
+    float MidLeft;
+	float Pixel;
+	float MidRight;
+    float BottomLeft;
+	float BottomMid;
+	float BottomRight;
+    int Factor;
+    int Offset;
+};
+	
+void Conv3x3(unsigned long* pixels, long width, long height, int bpp, ConvMatrix* m)
+{
+	// Avoid divide by zero errors
+	if (0 == m->Factor)
+		return;
+		
+	int minValue, maxValue;
+	GetMinMaxValuesForBpp(bpp, &minValue, &maxValue);		
+
+	for (int y = 0; y < height - 2; ++y)
+	{
+		for (int x = 0; x < width - 2; ++x)
+		{
+			unsigned long nPixel = (unsigned long)(
+			(
+				(
+					(*(pixels + x + y * width) * m->TopLeft) +
+					(*(pixels + (x + 1) + y * width) * m->TopMid) +
+					(*(pixels + (x + 2) + y * width) * m->TopRight) +
+					(*(pixels + x + (y + 1) * width) * m->MidLeft) +
+					(*(pixels + (x + 1) + (y + 1) * width) * m->Pixel) +
+					(*(pixels + (x + 2) + (y + 1) * width) * m->MidRight) +
+					(*(pixels + x + (y + 2) * width) * m->BottomLeft) +
+					(*(pixels + (x + 1) + (y + 2) * width) * m->BottomMid) +
+					(*(pixels + (x + 2) + (y + 2) * width) * m->BottomRight)
+				) / m->Factor
+			) + m->Offset
+			+ 0.5 /*rounded*/ );
+
+			if (nPixel < 0) nPixel = 0;
+			if (nPixel > maxValue) nPixel = maxValue;
+			if (nPixel < maxValue) nPixel = minValue;
+			
+			*(pixels + (x + 1) + (y  + 1) * width) = nPixel;
+		}
+	}
+}
 

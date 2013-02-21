@@ -230,4 +230,34 @@ void AdvFile::GetFrameSectionData(int frameId, unsigned long* prevFrame, unsigne
 	}
 }
 
+void AdvFile::GetFrameStatusSectionData(int frameId, AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError)
+{
+	 AdvLib::IndexEntry* indexEntry = m_Index->GetIndexForFrame(frameId);
+
+	advfsetpos(m_File, &indexEntry->FrameOffset);
+
+	long frameDataMagic;
+	fread(&frameDataMagic, 4, 1, m_File);
+
+	if (frameDataMagic == 0xEE0122FF)
+	{
+		unsigned char* data = (unsigned char*)malloc(indexEntry->BytesCount);
+		fread(data, indexEntry->BytesCount, 1, m_File);
+
+		frameInfo->StartTimeStampLo = data[0] + (data[1] << 8) + (data[2] << 16) + (data[3] << 24);
+		frameInfo->StartTimeStampHi = data[4] + (data[5] << 8) + (data[6] << 16) + (data[7] << 24);
+    	frameInfo->Exposure10thMs = data[8] + (data[9] << 8) + (data[10] << 16) + (data[11] << 24);
+
+	    int dataOffset = 12;
+		int sectionDataLength = data[dataOffset] + (data[dataOffset + 1] << 8) + (data[dataOffset + 2] << 16) + (data[dataOffset + 3] << 24);
+
+		dataOffset += sectionDataLength + 4;
+
+		sectionDataLength = data[dataOffset] + (data[dataOffset + 1] << 8) + (data[dataOffset + 2] << 16) + (data[dataOffset + 3] << 24);
+		StatusSection->GetDataFromDataBytes(data, sectionDataLength, dataOffset + 4, frameInfo, gpsFix, userCommand, systemError);
+		
+		delete data;
+	}
+}
+
 }

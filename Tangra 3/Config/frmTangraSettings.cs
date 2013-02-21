@@ -48,6 +48,7 @@ namespace Tangra.Config
 		{
 			m_PropertyPages.Add(0, new ucGeneralTangra());
 
+			m_PropertyPages.Add(1, new ucGeneralVideo());
 			m_PropertyPages.Add(2, new ucAnalogueVideo8bit());
 			m_PropertyPages.Add(3, new ucADVSVideo12bit());
 
@@ -171,6 +172,33 @@ namespace Tangra.Config
 
 			DialogResult = DialogResult.Cancel;
 			Close();
+		}
+
+		private void btnResetDefaults_Click(object sender, EventArgs e)
+		{
+			if (MessageBox.Show(
+				this,
+				"You are about to reset all Tangra settings to their default values. All customisations will be lost.\r\n\r\nDo you want to continue?",
+				"Tangra",
+				MessageBoxButtons.YesNo,
+				MessageBoxIcon.Warning,
+				MessageBoxDefaultButton.Button2) == DialogResult.Yes)
+			{
+				TangraConfig.Reset(ApplicationSettingsSerializer.Instance);
+
+				foreach (SettingsPannel panel in m_PropertyPages.Values)
+				{
+					panel.LoadSettings();
+					panel.Reset();
+				}
+
+				MessageBox.Show(
+					this,
+					"Tangra settings have been reset.",
+					"Tangra",
+					MessageBoxButtons.YesNo,
+					MessageBoxIcon.Information);
+			}
 		}
 	}
 }

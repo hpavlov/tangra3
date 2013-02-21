@@ -93,6 +93,12 @@
     <Compile Include="Config\SettingPannels\ucGeneralTangra.Designer.cs">
       <DependentUpon>ucGeneralTangra.cs</DependentUpon>
     </Compile>
+    <Compile Include="Config\SettingPannels\ucGeneralVideo.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucGeneralVideo.Designer.cs">
+      <DependentUpon>ucGeneralVideo.cs</DependentUpon>
+    </Compile>
     <Compile Include="Config\SettingPannels\ucPhotometry.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -171,6 +177,7 @@
     <Compile Include="Helpers\NotificationManager.cs" />
     <Compile Include="Helpers\TangraEnvironment.cs" />
     <Compile Include="ImageTools\ArrowTool.cs" />
+    <Compile Include="ImageTools\CorrectTrackingTool.cs" />
     <Compile Include="OCR\ITimestampOcr.cs" />
     <Compile Include="PInvoke\TangraCore.cs" />
     <Compile Include="PInvoke\TangraVideo.cs" />
@@ -245,6 +252,12 @@
     <Compile Include="VideoOperations\LightCurves\frmSelectReductionType.Designer.cs">
       <DependentUpon>frmSelectReductionType.cs</DependentUpon>
     </Compile>
+    <Compile Include="VideoOperations\LightCurves\InfoForms\FrameByteBrightnessContrast.cs" />
+    <Compile Include="VideoOperations\LightCurves\InfoForms\FrameByteClipper.cs" />
+    <Compile Include="VideoOperations\LightCurves\InfoForms\FrameBytePreProcessor.cs" />
+    <Compile Include="VideoOperations\LightCurves\InfoForms\FrameByteStretcher.cs" />
+    <Compile Include="VideoOperations\LightCurves\InfoForms\FrameDigitalFilter.cs" />
+    <Compile Include="VideoOperations\LightCurves\InfoForms\FrameGammaCorrection.cs" />
     <Compile Include="VideoOperations\LightCurves\InfoForms\frmBackgroundHistograms.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -375,6 +388,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Config\SettingPannels\ucGeneralTangra.resx">
       <DependentUpon>ucGeneralTangra.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Config\SettingPannels\ucGeneralVideo.resx">
+      <DependentUpon>ucGeneralVideo.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Config\SettingPannels\ucPhotometry.resx">
       <DependentUpon>ucPhotometry.cs</DependentUpon>

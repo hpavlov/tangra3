@@ -17,7 +17,6 @@ namespace Tangra.VideoOperations.LightCurves
     {
         private LCFile m_lcFile;
 		protected IVideoController m_VideoController;
-    	private bool m_IsAdvFile;
 	    private bool m_ShowingFields;
 
 		internal ucLCFileInfo(LCFile lcFile, IVideoController videoController)
@@ -28,22 +27,21 @@ namespace Tangra.VideoOperations.LightCurves
 			m_VideoController = videoController;
             DisplayLCFileInfo();
 
-			// TODO: Do we store a more direct info in the LCFile that can be used to determine IsAdvFile?
-			m_IsAdvFile = m_lcFile.Footer.ReductionContext.BitPix > 8;
-
 			// Only 8 bit video (analogue) has fields
-			btnShowFields.Visible = !m_IsAdvFile;
+			btnShowFields.Visible = m_lcFile.Footer.ReductionContext.BitPix == 8;
 			m_ShowingFields = false;
         }
 
         private void DisplayLCFileInfo()
         {
+	        bool isAdvFile = m_lcFile.Footer.ReductionContext.BitPix > 8;
+
             lblFileName.Text = Path.GetFileName(m_lcFile.Header.PathToVideoFile);
             lblSource.Text = m_lcFile.Header.SourceInfo;
             lblTotalFrames.Text = m_lcFile.Header.CountFrames.ToString();
             lblMeasuredFrames.Text = m_lcFile.Header.MeasuredFrames.ToString();
-			lblFPS.Text = m_IsAdvFile ? "N/A" : m_lcFile.Header.FramesPerSecond.ToString("0.000");
-			lblFPSComp.Text = m_IsAdvFile ? "N/A" : m_lcFile.Header.ComputedFramesPerSecond.ToString("0.000");
+			lblFPS.Text = isAdvFile ? "N/A" : m_lcFile.Header.FramesPerSecond.ToString("0.000");
+			lblFPSComp.Text = isAdvFile ? "N/A" : m_lcFile.Header.ComputedFramesPerSecond.ToString("0.000");
 			
             switch(m_lcFile.Header.ReductionType)
             {

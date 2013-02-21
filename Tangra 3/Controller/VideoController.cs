@@ -86,9 +86,9 @@ namespace Tangra.Controller
 			}
 
 			if (m_ImageTool != null)
-			{				
-				// Use the standard ArrowTool when no operation is active
-				SelectImageTool<ArrowTool>();
+			{
+				m_ImageTool.Deactivate();
+				m_ImageTool = null;
 			}
 
 			//m_MainForm.m_FramePreprocessor.Clear();
@@ -104,6 +104,9 @@ namespace Tangra.Controller
 			m_LightCurveController.EnsureLightCurveFormClosed();
 
 			EnsureAllPopupFormsClosed();
+
+			m_AstroImage = null;
+			m_CurrentFrameContext = RenderFrameContext.Empty;
 		}
 
 		internal bool SingleBitmapFile(LCFile lcFile)
@@ -414,14 +417,17 @@ namespace Tangra.Controller
 			m_VideoFileView.Update();
 		}
 
+	    private bool savedCanScrollFramesStateOnVideoStarted = false;
+
 		private void OnVideoPlayerStarted()
 		{
+			savedCanScrollFramesStateOnVideoStarted = TangraContext.Current.CanScrollFrames;
 			TangraContext.Current.CanScrollFrames = false;
 		}
 
 		private void OnVideoPlayerStopped()
 		{
-			TangraContext.Current.CanScrollFrames = true;
+			TangraContext.Current.CanScrollFrames = savedCanScrollFramesStateOnVideoStarted;
 		}
 
 		public void RefreshCurrentFrame()
@@ -453,6 +459,16 @@ namespace Tangra.Controller
 		public void UpdateViews()
 		{
 			m_VideoFileView.Update();
+
+			//if (TangraConfig.Settings.Generic.PerformanceQuality == Tangra.Model.Config.TangraConfig.PerformanceQuality.Responsiveness)
+			//{
+			//    if (m_CurrentFrameContext.CurrentFrameIndex % 12 == 0)
+			//    {
+			//        statusStrip.Invalidate();
+			//        pnlControlerPanel.Invalidate();
+			//    }
+			//    m_ZoomedImageView.Invalidate();
+			//}
 		}
 
         public void UpdateZoomedImage(Bitmap zoomedBitmap)
@@ -464,6 +480,12 @@ namespace Tangra.Controller
         {
             m_ZoomedImageView.ClearZoomedImage();
         }
+
+		internal void SetPictureBoxCursor(Cursor cursor)
+		{
+			if (m_MainForm != null)
+				m_MainForm.pictureBox.Cursor = cursor;
+		}
 
         public AstroImage GetCurrentAstroImage(bool integrated)
         {
@@ -716,11 +738,13 @@ namespace Tangra.Controller
             }
 	    }
 
-		public void SelectImageTool<TImageTool>() where TImageTool : ImageTool, new()
+		public ImageTool SelectImageTool<TImageTool>() where TImageTool : ImageTool, new()
         {
             if (m_ImageTool != null) m_ImageTool.Deactivate();
 
-			ImageTool.SwitchTo<TImageTool>(m_CurrentOperation, m_ImageTool);
+			m_ImageTool = ImageTool.SwitchTo<TImageTool>(m_CurrentOperation, m_ImageTool);
+
+			return m_ImageTool;
         }
 
 		public bool ActivateOperation<TOperation>(params object[] constructorParams) where TOperation : class, IVideoOperation, new()
@@ -765,12 +789,14 @@ namespace Tangra.Controller
 				if (!m_CurrentOperation.InitializeOperation(this, m_pnlControlerPanel, m_FramePlayer, m_MainFormView))
 				{
 					m_CurrentOperation = oldOperation;
+					StatusChanged("Ready");
 					return false;
 				}
 				else
 				{
+					// TODO: Test if this is actually needed to the reprocessing to be applied (then remove code if not needed)
 					// Redraw the current frame so the pre-processing is included as well
-					// m_FramePlayer.MoveToFrame(m_CurrentFrameId);
+					// m_FramePlayer.MoveToFrame(m_CurrentFrameId);					
 
 					return true;
 				}

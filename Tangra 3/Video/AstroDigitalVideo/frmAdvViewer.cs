@@ -184,7 +184,8 @@ namespace Tangra.Video.AstroDigitalVideo
 				prevFrameNo = index;
 
 				// TODO:
-				Pixelmap rv = new Pixelmap((int)m_AdvFile.ImageSection.Width, (int)m_AdvFile.ImageSection.Height, m_AdvFile.ImageSection.BitsPerPixel, null, null, null);
+				Pixelmap rv = m_AdvFile.ImageSection.CreatePixelmap(imageData);
+				//Pixelmap rv = new Pixelmap((int)m_AdvFile.ImageSection.Width, (int)m_AdvFile.ImageSection.Height, m_AdvFile.ImageSection.BitsPerPixel, null, null, null);
 				//rv.Width = (int) m_AdvFile.ImageSection.Width;
 				//rv.Height = (int) m_AdvFile.ImageSection.Height;
 				//rv.BitPixCamera = m_AdvFile.ImageSection.BitsPerPixel;
@@ -192,6 +193,7 @@ namespace Tangra.Video.AstroDigitalVideo
 				//rv.CopyPixelsFrom(imageData.ImageData, imageData.Bpp);
 
 				//displayBitmap = PixelmapFactory.ConstructBitmapFrom12BitPixelmap(rv);
+
 				displayBitmap = rv.DisplayBitmap;
 
 				return rv;

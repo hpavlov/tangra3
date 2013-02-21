@@ -24,6 +24,7 @@ using Tangra.Config;
 using Tangra.ImageTools;
 using Tangra.VideoOperations.LightCurves.Measurements;
 using Tangra.VideoOperations.LightCurves.Tracking;
+using Tangra.Resources;
 
 
 namespace Tangra.VideoOperations.LightCurves
@@ -126,39 +127,14 @@ namespace Tangra.VideoOperations.LightCurves
 			var configForm = new frmSelectReductionType(m_VideoController, framePlayer);
             if (configForm.ShowDialog(topForm) == DialogResult.OK)
             {
-                EnsureControlPanel(controlPanel);
+	            EnsureControlPanel(controlPanel);
 
-				// TODO: This below should now be handled in the unmanaged libraries. Check if the (unmanaged pre-processing) configuration has been set up already 
-                //if (LightCurveReductionContext.Instance.FrameIntegratingMode == FrameIntegratingMode.NoIntegration)
-                //    m_Host.FramePlayer.SetupFrameIntegration(0, FrameIntegratingMode.NoIntegration, PixelIntegrationType.Mean);
-                //else
-                //    m_Host.FramePlayer.SetupFrameIntegration(
-                //        LightCurveReductionContext.Instance.NumberFramesToIntegrate,
-                //        LightCurveReductionContext.Instance.FrameIntegratingMode,
-                //        LightCurveReductionContext.Instance.PixelIntegrationType);
+	            BeginConfiguration();
 
-                //if (LightCurveReductionContext.Instance.UseBrightnessContrast)
-                //{
-                //    m_BytePreProcessor = new FrameByteBrightnessContrast(LightCurveReductionContext.Instance.Brightness, LightCurveReductionContext.Instance.Contrast, true, m_Host.FramePlayer.Video.BitPix);
-                //    m_Host.FramePreProcessor.AddPreProcessor(m_BytePreProcessor);
-                //}
-                //else if (LightCurveReductionContext.Instance.UseStretching)
-                //{
-                //    m_BytePreProcessor = new FrameByteStretcher(LightCurveReductionContext.Instance.FromByte, LightCurveReductionContext.Instance.ToByte, true, m_Host.FramePlayer.Video.BitPix);
-                //    m_Host.FramePreProcessor.AddPreProcessor(m_BytePreProcessor);
-                //}
-                //else if (LightCurveReductionContext.Instance.UseClipping)
-                //{
-                //    m_BytePreProcessor = new FrameByteClipper(LightCurveReductionContext.Instance.FromByte, LightCurveReductionContext.Instance.ToByte, true, m_Host.FramePlayer.Video.BitPix);
-                //    m_Host.FramePreProcessor.AddPreProcessor(m_BytePreProcessor);
-                //}
+	            TangraContext.Current.CanChangeTool = true;
+	            //prevFrameId = -1;
 
-                BeginConfiguration();
-
-                TangraContext.Current.CanChangeTool = true;
-                //prevFrameId = -1;
-
-                return true;
+	            return true;
             }
 
             return false;
@@ -183,7 +159,6 @@ namespace Tangra.VideoOperations.LightCurves
 					TangraConfig.Settings.Photometry.AnulusInnerRadius,
 					TangraConfig.Settings.Photometry.AnulusMinPixels,
 					TangraConfig.PhotometrySettings.REJECTION_BACKGROUND_PIXELS_STD_DEV,
-					TangraConfig.Settings.Photometry.EncodingGamma,
 					(float)m_Tracker.PositionTolerance);
 
 				m_Measurer.GetImagePixelsCallback +=
@@ -429,8 +404,9 @@ namespace Tangra.VideoOperations.LightCurves
                 }
                 else if (m_Measuring)
                 {
-                    m_ControlPanel.FinishWithMeasurements();
+                    //m_ControlPanel.FinishWithMeasurements();
                     m_ControlPanel.StopMeasurements();
+
                     if (TangraConfig.Settings.Tracking.PlaySound)
                         Console.Beep();
 
@@ -1086,7 +1062,6 @@ namespace Tangra.VideoOperations.LightCurves
                     TangraConfig.Settings.Photometry.AnulusInnerRadius,
                     TangraConfig.Settings.Photometry.AnulusMinPixels,
                     TangraConfig.Settings.Special.RejectionBackgroundPixelsStdDev,
-                    TangraConfig.Settings.Photometry.EncodingGamma,
                     4.0f);
 
             measurer.BestMatrixSizeDistanceDifferenceTolerance = bestFindTolerance;
@@ -1313,8 +1288,7 @@ namespace Tangra.VideoOperations.LightCurves
 			m_VideoController.StatusChanged("Measuring");
 
 			// Change back to arrow tool
-			//ArrowTool arrowTool = new ArrowTool();
-			//m_Host.ChangeImageTool(arrowTool);
+			m_VideoController.SelectImageTool<ArrowTool>();
         }
 
         public void StopMeasurements()
@@ -1333,13 +1307,14 @@ namespace Tangra.VideoOperations.LightCurves
 			m_VideoController.UpdateViews();
 
 			// Allow correction of the tracking
-			//CorrectTrackingTool correctTrackingTool = new CorrectTrackingTool(this, m_Tracker);
-			//m_Host.ChangeImageTool(correctTrackingTool);
+			CorrectTrackingTool correctTrackingTool = m_VideoController.SelectImageTool<CorrectTrackingTool>() as CorrectTrackingTool;
+			if (correctTrackingTool != null)
+				correctTrackingTool.Initialize(this, m_Tracker, m_VideoController);
 
 			m_StateMachine.m_HasBeenPaused = true;
 
 			// Do this to draw the correcting apertures once the state has been changed to correcting
-			m_VideoController.RefreshCurrentFrame();
+			// m_VideoController.RefreshCurrentFrame();
         }
 
         public void FinishedWithMeasurements()

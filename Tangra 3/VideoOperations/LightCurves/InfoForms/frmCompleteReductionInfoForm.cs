@@ -24,12 +24,14 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 
 		private void frmCompleteReductionInfoForm_Load(object sender, EventArgs e)
 		{
+			bool isAdvFile = m_lcFile.Footer.ReductionContext.BitPix > 8;
+
 			lblFileName.Text = Path.GetFileName(m_lcFile.Header.PathToVideoFile);
 			lblSource.Text = m_lcFile.Header.SourceInfo;
 			lblTotalFrames.Text = m_lcFile.Header.CountFrames.ToString();
 			lblMeasuredFrames.Text = m_lcFile.Header.MeasuredFrames.ToString();
-			lblFPS.Text = m_lcFile.Header.FramesPerSecond.ToString("0.000");
-			lblFPSComp.Text = m_lcFile.Header.ComputedFramesPerSecond.ToString("0.000");
+			lblFPS.Text = isAdvFile ? "N/A" : m_lcFile.Header.FramesPerSecond.ToString("0.000");
+			lblFPSComp.Text = isAdvFile ? "N/A" : m_lcFile.Header.ComputedFramesPerSecond.ToString("0.000");
 
 		    lblSecondTime.Text = m_lcFile.Header.SecondTimedFrameTime.ToString("HH:mm:ss.fff");
 		    long tmb;

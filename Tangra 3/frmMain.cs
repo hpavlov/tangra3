@@ -275,12 +275,13 @@ namespace Tangra
             bool isNewFrame = m_CurrentFrameId != frameContext.CurrentFrameIndex;
 			m_CurrentFrameId = frameContext.CurrentFrameIndex;
 
-			if (frameContext.MovementType != MovementType.Refresh)
-			{
+			// TODO: The comment below about not setting the AstroImage on MovementType.Refresh doesn't seem valid. In fact it appears quite the oposite of what should be done. Need to test this more thouroughly
+			//if (frameContext.MovementType != MovementType.Refresh)
+			//{
 				// Only set the AstroImage if this is not a Refresh. Otherwise the pre-processing will be lost in 
 				// consequative refreshes and the AstroImage will be wrong even after the first Refresh
                 m_VideoController.SetImage(currentPixelmap, frameContext);
-			}
+			//}
 
 #if PROFILING
                 Profiler.Instance.StopTimer("PAINTING");
@@ -296,21 +297,13 @@ namespace Tangra
 
 			//PreProcessingInfo info;
 			//Core.PreProcessors.PreProcessingGetConfig(out info);
-			//ApplicationState.Current.PreProcessingInfo = info;
-
-			//if (TangraConfig.Settings.Generic.PerformanceQuality == PerformanceQuality.Responsiveness)
-			//{
-			//    if (currentFrameIndex % 12 == 0)
-			//    {
-			//        statusStrip.Invalidate();
-			//        pnlControlerPanel.Invalidate();
-			//    }
-			//    zoomedImage.Invalidate();
-			//}
+			//ApplicationState.Current.PreProcessingInfo = info;			
 
 			CompleteRenderFrame();
 
 			Update();
+
+			m_VideoController.UpdateViews();
 
             if (isNewFrame)
                 NotificationManager.Instance.NotifyCurrentFrameChanged(m_CurrentFrameId);

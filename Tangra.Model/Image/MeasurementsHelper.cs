@@ -46,41 +46,20 @@ namespace Tangra.Model.Image
         private float m_InnerRadiusOfBackgroundApertureInSignalApertures;
         private int m_NumberOfPixelsInBackgroundAperture;
         private float m_RejectionBackgoundPixelsStdDevCoeff;
-        private float m_EncodingGamma;
-        private float m_DecodingGamma;
-        private float m_DecodingNormCoeff;
-        private float[] m_DecodingGammaTable;
-        private uint[] m_DecodingGammaBytes;
         private float m_PositionTolerance;
 
         public void SetCoreProperties(
             float innerRadiusOfBackgroundApertureInSignalApertures,
             int numberOfPixelsInBackgroundAperture,
             float rejectionBackgoundPixelsStdDevCoeff,
-            float encodingGamma,
             float positionTolerance)
         {
             m_InnerRadiusOfBackgroundApertureInSignalApertures = innerRadiusOfBackgroundApertureInSignalApertures;
             m_NumberOfPixelsInBackgroundAperture = numberOfPixelsInBackgroundAperture;
             m_RejectionBackgoundPixelsStdDevCoeff = rejectionBackgoundPixelsStdDevCoeff;
-            m_EncodingGamma = encodingGamma;
-            m_DecodingGamma = 1.0f / encodingGamma;
-            m_DecodingNormCoeff = 1.0f * m_MaxPixelValue / (float)Math.Pow(m_MaxPixelValue, m_DecodingGamma);
 
             if (m_BitPix > 16) throw new NotSupportedException();
 
-            m_DecodingGammaTable = new float[ushort.MaxValue];
-            m_DecodingGammaBytes = new uint[ushort.MaxValue];
-
-            for (int i = 0; i < ushort.MaxValue; i++)
-            {
-                if (encodingGamma == 1)
-                    m_DecodingGammaTable[i] = i;
-                else
-                    m_DecodingGammaTable[i] = (float)(m_DecodingNormCoeff * Math.Pow(i, m_DecodingGamma));
-
-                m_DecodingGammaBytes[i] = (uint)(Math.Round(m_DecodingGammaTable[i]));
-            }
             m_PositionTolerance = positionTolerance;
         }
 
@@ -95,11 +74,6 @@ namespace Tangra.Model.Image
             clone.m_NumberOfPixelsInBackgroundAperture = this.m_NumberOfPixelsInBackgroundAperture;
             clone.m_RejectionBackgoundPixelsStdDevCoeff = this.m_RejectionBackgoundPixelsStdDevCoeff;
 
-            clone.m_EncodingGamma = this.m_EncodingGamma;
-            clone.m_DecodingGamma = this.m_DecodingGamma;
-            clone.m_DecodingNormCoeff = this.m_DecodingNormCoeff;
-            clone.m_DecodingGammaTable = this.m_DecodingGammaTable;
-            clone.m_DecodingGammaBytes = this.m_DecodingGammaBytes;
             clone.m_PositionTolerance = this.m_PositionTolerance;
 
             return clone;
@@ -181,16 +155,10 @@ namespace Tangra.Model.Image
         internal void DoAperturePhotometry(
             IMeasuredObject obj,
             uint[,] matrix, int x0Int, int y0Int, float x0, float y0, float aperture, int matrixSize,
-            uint[,] backgroundArea, bool gammaAlreadyReversed)
+            uint[,] backgroundArea)
         {
             if (matrix.GetLength(0) != 17)
                 throw new ApplicationException("Measurement error. Correlation: AFP-101");
-
-            if (!gammaAlreadyReversed)
-            {
-                matrix = CorrectForGamma(matrix);
-                backgroundArea = CorrectForGamma(backgroundArea);
-            }
 
             m_HasSaturatedPixels = false;
             m_PSFBackground = double.NaN;
@@ -244,15 +212,8 @@ namespace Tangra.Model.Image
             bool isFullyDisappearingOccultedStar,
             uint[,] backgroundArea,
             bool mayBeOcculted /* Some magic based on a pure guess */,
-            bool gammaAlreadyReversed, /* So do not reverse it again */
             double refinedFWHM)
         {
-            if (!gammaAlreadyReversed)
-            {
-                matrix = CorrectForGamma(matrix);
-                backgroundArea = CorrectForGamma(backgroundArea);
-            }
-
             PSFFit fit = new PSFFit(x0Int, y0Int);
             fit.Fit(matrix, matrixSize);
             double distance = ImagePixel.ComputeDistance(fit.XCenter, x0, fit.YCenter, y0);
@@ -288,15 +249,8 @@ namespace Tangra.Model.Image
             float aperture, int matrixSize, bool useNumericalQadrature,
             bool isFullyDisappearingOccultedStar,
             uint[,] backgroundArea,
-            bool mayBeOcculted /* Some magic based on a pure guess */,
-            bool gammaAlreadyReversed /* So do not reverse it again */)
+            bool mayBeOcculted /* Some magic based on a pure guess */)
         {
-            if (!gammaAlreadyReversed)
-            {
-                matrix = CorrectForGamma(matrix);
-                backgroundArea = CorrectForGamma(backgroundArea);
-            }
-
             PSFFit fit = new PSFFit(x0Int, y0Int);
             fit.FittingMethod = PSFFittingMethod.LinearFitOfAveragedModel;
             fit.SetAveragedModelFWHM(modelFWHM);
@@ -378,17 +332,10 @@ namespace Tangra.Model.Image
             float aperture, int matrixSize, bool isFullyDisappearingOccultedStar,
             uint[,] backgroundArea,
             bool mayBeOcculted /* Some magic based on a pure guess */,
-            bool gammaAlreadyReversed /* So do not reverse it again */,
             double refinedFWHM)
         {
             // Proceed as with PSF Non linear, Then find the variance of the PSF fit and use a weight based on the residuals of the PSF fit
             // Signal[x, y] = PSF(x, y) + weight * Residual(x, y)
-
-            if (!gammaAlreadyReversed)
-            {
-                matrix = CorrectForGamma(matrix);
-                backgroundArea = CorrectForGamma(backgroundArea);
-            }
 
             PSFFit fit = new PSFFit(x0Int, y0Int);
             fit.Fit(matrix, matrixSize);
@@ -480,25 +427,6 @@ namespace Tangra.Model.Image
 
                 obj.SetIsMeasured(false, NotMeasuredReasons.NoPixelsToMeasure);
             }
-        }
-
-        private uint[,] CorrectForGamma(uint[,] pixels)
-        {
-            if (m_DecodingGamma == 1)
-                return pixels;
-
-            int size = pixels.GetLength(0);
-            uint[,] result = new uint[size, size];
-
-            for (int x = 0; x < size; x++)
-            {
-                for (int y = 0; y < size; y++)
-                {
-                    result[x, y] = m_DecodingGammaBytes[pixels[x, y]];// (byte)Math.Max(0, Math.Min(255, (int)Math.Round(m_DecodingNormCoeff * Math.Pow(pixels[x, y], m_DecodingGamma))));
-                }
-            }
-
-            return result;
         }
 
         //public void Measure(float x0, float y0, float precomputedAperture, Filter filter, byte[,] matrix, double psfBackground, int matrixSize, bool fixedAperture)
@@ -1009,16 +937,6 @@ namespace Tangra.Model.Image
         //    Trace.WriteLine(output.ToString());
         //}
 
-        //private float GetDecodedPixelValue(float pixelValue)
-        //{
-        //    if (m_DecodingGamma == 1)
-        //        return pixelValue;
-        //    else
-        //    {
-        //        return (float) (m_DecodingNormCoeff*Math.Pow(pixelValue, m_DecodingGamma));
-        //    }
-        //}
-
         public void MeasureObject(
             ImagePixel center,
             uint[,] data,
@@ -1032,8 +950,6 @@ namespace Tangra.Model.Image
             IMeasuredObject measuredObject,
             bool fullDisappearance)
         {
-            bool gammaAlreadyReversed = TangraConfig.Settings.Generic.GammaCorrectFullFrame;
-
             int centerX = (int)Math.Round(center.XDouble);
             int centerY = (int)Math.Round(center.YDouble);
 
@@ -1073,7 +989,7 @@ namespace Tangra.Model.Image
                             : measuredObject.PsfFitMatrixSize,
                         reductionMethod == TangraConfig.PhotometryReductionMethod.PsfPhotometryNumerical,
                         measuredObject.IsOcultedStar && fullDisappearance,
-                        backgroundPixels, mayBeOcculted, gammaAlreadyReversed, refinedFWHM);
+                        backgroundPixels, mayBeOcculted, refinedFWHM);
                 }
                 else if (TangraConfig.Settings.Photometry.PsfFittingMethod == TangraConfig.PsfFittingMethod.LinearFitOfAveragedModel)
                 {
@@ -1092,7 +1008,7 @@ namespace Tangra.Model.Image
                             : measuredObject.PsfFitMatrixSize,
                         reductionMethod == TangraConfig.PhotometryReductionMethod.PsfPhotometryNumerical,
                         measuredObject.IsOcultedStar && fullDisappearance,
-                        backgroundPixels, mayBeOcculted, gammaAlreadyReversed);
+                        backgroundPixels, mayBeOcculted);
                 }
                 else
                     throw new NotImplementedException();
@@ -1106,7 +1022,7 @@ namespace Tangra.Model.Image
                     measuredObject.PSFFit != null
                         ? measuredObject.PSFFit.MatrixSize
                         : measuredObject.PsfFitMatrixSize,
-                    backgroundPixels, gammaAlreadyReversed);
+                    backgroundPixels);
 
                 measuredObject.AppMeaAveragePixel = Math.Min(255, 1.66 * TotalReading / measuredObject.ApertureArea);
             }
@@ -1125,8 +1041,7 @@ namespace Tangra.Model.Image
                         ? measuredObject.PSFFit.MatrixSize
                         : measuredObject.PsfFitMatrixSize,
                     measuredObject.IsOcultedStar && fullDisappearance,
-                    backgroundPixels, mayBeOcculted, gammaAlreadyReversed,
-                    refinedFWHM);
+                    backgroundPixels, mayBeOcculted, refinedFWHM);
             }
         }
     }

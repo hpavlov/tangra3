@@ -868,9 +868,14 @@ namespace Tangra.VideoOperations.LightCurves
                 }
             }
             bgBytes.Sort();
-            uint median = bgBytes.Count % 2 == 1
-                              ? bgBytes[bgBytes.Count / 2]
-                              : ((bgBytes[bgBytes.Count / 2] + bgBytes[(bgBytes.Count / 2) - 1]) / 2);
+            uint median = 0;
+			if (bgBytes.Count > 0)
+			{
+				median = bgBytes.Count % 2 == 1
+								  ? bgBytes[bgBytes.Count / 2]
+								  : ((bgBytes[bgBytes.Count / 2] + bgBytes[(bgBytes.Count / 2) - 1]) / 2);				
+			}
+
             double var = 0;
             bgBytes.ForEach(b => var += (median - b) * (median - b));
 			oneSigmaBg = (byte)Math.Round(Math.Sqrt(var / Math.Max(1, bgBytes.Count - 1)));

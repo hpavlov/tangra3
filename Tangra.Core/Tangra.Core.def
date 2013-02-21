@@ -10,6 +10,7 @@ EXPORTS
 	ADVGetFrame2
 	ADVGetIntegratedFrame
 	ADVGetFramePixels
+	ADVGetFrameStatusChannel
 
 	; Video and Image Config
 	InitTangraCore
@@ -27,6 +28,12 @@ EXPORTS
 	PreProcessingAddFlatFrame
 	PreProcessingUsesPreProcessing
 	PreProcessingGetConfig	
+	
+	; Manual Preprocessing
+	PreProcessingStretch
+	PreProcessingClip
+	PreProcessingBrightnessContrast
+	PreProcessingGamma
 
 
 	; Video Helpers

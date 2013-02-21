@@ -29,7 +29,6 @@
 		private void InitializeComponent()
 		{
 			this.nudPointSize = new System.Windows.Forms.NumericUpDown();
-			this.nudSNFrameWindow = new System.Windows.Forms.NumericUpDown();
 			this.cbxColorScheme = new System.Windows.Forms.ComboBox();
 			this.cbxDrawGrid = new System.Windows.Forms.CheckBox();
 			this.gbColors = new System.Windows.Forms.GroupBox();
@@ -48,7 +47,6 @@
 			this.cpTarget4 = new Tangra.Controls.ucColorPicker();
 			this.label6 = new System.Windows.Forms.Label();
 			this.cpTarget1 = new Tangra.Controls.ucColorPicker();
-			this.label25 = new System.Windows.Forms.Label();
 			this.label11 = new System.Windows.Forms.Label();
 			this.label10 = new System.Windows.Forms.Label();
 			this.label9 = new System.Windows.Forms.Label();
@@ -57,7 +55,6 @@
 			this.cpSelectionCursor = new Tangra.Controls.ucColorPicker();
 			this.cpFocusArea = new Tangra.Controls.ucColorPicker();
 			((System.ComponentModel.ISupportInitialize)(this.nudPointSize)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.nudSNFrameWindow)).BeginInit();
 			this.gbColors.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -68,13 +65,6 @@
 			this.nudPointSize.Size = new System.Drawing.Size(39, 20);
 			this.nudPointSize.TabIndex = 55;
 			this.nudPointSize.ValueChanged += new System.EventHandler(this.nudPointSize_ValueChanged);
-			// 
-			// nudSNFrameWindow
-			// 
-			this.nudSNFrameWindow.Location = new System.Drawing.Point(175, 300);
-			this.nudSNFrameWindow.Name = "nudSNFrameWindow";
-			this.nudSNFrameWindow.Size = new System.Drawing.Size(47, 20);
-			this.nudSNFrameWindow.TabIndex = 54;
 			// 
 			// cbxColorScheme
 			// 
@@ -278,15 +268,6 @@
 			this.cpTarget1.TabIndex = 10;
 			this.cpTarget1.SelectedColorChanged += new System.EventHandler(this.SelectedColorChanged);
 			// 
-			// label25
-			// 
-			this.label25.AutoSize = true;
-			this.label25.Location = new System.Drawing.Point(3, 303);
-			this.label25.Name = "label25";
-			this.label25.Size = new System.Drawing.Size(169, 13);
-			this.label25.TabIndex = 48;
-			this.label25.Text = "Num Frames for S/N Computation:";
-			// 
 			// label11
 			// 
 			this.label11.AutoSize = true;
@@ -362,11 +343,9 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.SystemColors.Control;
 			this.Controls.Add(this.nudPointSize);
-			this.Controls.Add(this.nudSNFrameWindow);
 			this.Controls.Add(this.cbxColorScheme);
 			this.Controls.Add(this.cbxDrawGrid);
 			this.Controls.Add(this.gbColors);
-			this.Controls.Add(this.label25);
 			this.Controls.Add(this.cpSelectionCursor);
 			this.Controls.Add(this.label11);
 			this.Controls.Add(this.cpFocusArea);
@@ -377,7 +356,6 @@
 			this.Name = "ucCustomizeLightCurveViewer";
 			this.Size = new System.Drawing.Size(491, 356);
 			((System.ComponentModel.ISupportInitialize)(this.nudPointSize)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.nudSNFrameWindow)).EndInit();
 			this.gbColors.ResumeLayout(false);
 			this.gbColors.PerformLayout();
 			this.ResumeLayout(false);
@@ -408,12 +386,10 @@
 		private System.Windows.Forms.Label label4;
 		private System.Windows.Forms.Label label8;
 		private System.Windows.Forms.Label label7;
-		private System.Windows.Forms.Label label25;
 		private System.Windows.Forms.GroupBox gbColors;
 		private System.Windows.Forms.CheckBox cbxDrawGrid;
 		private System.Windows.Forms.CheckBox cbxTangraTargetColors;
 		private System.Windows.Forms.ComboBox cbxColorScheme;
-		private System.Windows.Forms.NumericUpDown nudSNFrameWindow;
 		private System.Windows.Forms.NumericUpDown nudPointSize;
 	}
 }

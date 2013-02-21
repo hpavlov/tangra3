@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Tangra.Controller;
+using Tangra.Model.Config;
+using Tangra.PInvoke;
 using Tangra.VideoOperations.LightCurves;
 
 namespace Tangra.Helpers
@@ -40,7 +42,7 @@ namespace Tangra.Helpers
 
 		public void NotifyGammaChanged()
 		{
-            throw new NotImplementedException();
+			TangraCore.PreProcessors.AddGammaCorrection(TangraConfig.Settings.Photometry.EncodingGamma);
 		}
 
         public void NotifyFileProgressManagerBeginFileOperation(int maxSteps)

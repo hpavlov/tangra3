@@ -305,85 +305,86 @@ namespace Tangra.Model.Image
 
 		public static uint[,] LowPassDifferenceFilter(uint[,] b, bool cutEdges)
 		{
-			uint[,] data = LowPassDifferenceFilter(b);
+			uint[,] data = LowPassDifferenceFilter(b, cutEdges);
 			if (cutEdges)
 				return CutArrayEdges(data, 1);
 			else
 				return data;
 		}
-
-		public static uint[,] LowPassDifferenceFilter(uint[,] b)
+		public static bool LowPassDifference(Pixelmap image)
 		{
-			uint[,] lowPassData = Convolution.Conv3x3(b, LOW_PASS_FILTER_MATRIX);
-			uint[,] lowPassDiffData = new uint[lowPassData.GetLength(0), lowPassData.GetLength(1)];
+			uint[,] pixels = GetPixelArray(image);
 
-			int nWidth = lowPassData.GetLength(0);
-			int nHeight = lowPassData.GetLength(1);
+			pixels = LowPassDifferenceFilter(pixels, false);
 
-			List<uint> allValues = new List<uint>();
+			image.CopyPixelsFrom(pixels, image.BitPixCamera);
 
-			for (int y = 0; y < nHeight; ++y)
+			return true;
+		}
+
+		public static bool Brightness(Pixelmap image, int nBrightness)
+		{
+			if (nBrightness < -image.MaxPixelValue || nBrightness > image.MaxPixelValue)
+				return false;
+
+			for (int y = 0; y < image.Height; ++y)
 			{
-				for (int x = 0; x < nWidth; ++x)
+				for (int x = 0; x < image.Width; ++x)
 				{
-					// The median 5x5 value is the median of all values in the 5x5 region around the point
-					allValues.Clear();
+					long nVal = image[x, y] + nBrightness;
 
-					if (x - 2 >= 0)
-					{
-						if (y - 2 >= 0) allValues.Add(lowPassData[x - 2, y - 2]);
-						if (y - 1 >= 0) allValues.Add(lowPassData[x - 2, y - 1]);
-						allValues.Add(lowPassData[x - 2, y]);
-						if (y + 1 < nHeight) allValues.Add(lowPassData[x - 2, y + 1]);
-						if (y + 2 < nHeight) allValues.Add(lowPassData[x - 2, y + 2]);
-					}
+					if (nVal < 0) nVal = 0;
+					if (nVal > image.MaxPixelValue) nVal = image.MaxPixelValue;
 
-					if (x - 1 >= 0)
-					{
-						if (y - 2 >= 0) allValues.Add(lowPassData[x - 1, y - 2]);
-						if (y - 1 >= 0) allValues.Add(lowPassData[x - 1, y - 1]);
-						allValues.Add(lowPassData[x - 1, y]);
-						if (y + 1 < nHeight) allValues.Add(lowPassData[x - 1, y + 1]);
-						if (y + 2 < nHeight) allValues.Add(lowPassData[x - 1, y + 2]);
-					}
-
-					allValues.Add(lowPassData[x, y]);
-
-					if (x + 1 < nWidth)
-					{
-						if (y - 2 >= 0) allValues.Add(lowPassData[x + 1, y - 2]);
-						if (y - 1 >= 0) allValues.Add(lowPassData[x + 1, y - 1]);
-						allValues.Add(lowPassData[x + 1, y]);
-						if (y + 1 < nHeight) allValues.Add(lowPassData[x + 1, y + 1]);
-						if (y + 2 < nHeight) allValues.Add(lowPassData[x + 1, y + 2]);
-					}
-
-					if (x + 2 < nWidth)
-					{
-						if (y - 2 >= 0) allValues.Add(lowPassData[x + 2, y - 2]);
-						if (y - 1 >= 0) allValues.Add(lowPassData[x + 2, y - 1]);
-						allValues.Add(lowPassData[x + 2, y]);
-						if (y + 1 < nHeight) allValues.Add(lowPassData[x + 2, y + 1]);
-						if (y + 2 < nHeight) allValues.Add(lowPassData[x + 2, y + 2]);
-					}
-
-					allValues.Sort();
-					int middleCal = allValues.Count / 2;
-					if (allValues.Count % 2 == 1)
-						lowPassDiffData[x, y] = allValues[middleCal];
-					else if (allValues.Count > 1)
-						lowPassDiffData[x, y] = (uint)((allValues[middleCal] + allValues[middleCal - 1]) / 2);
-					else if (allValues.Count == 1)
-						lowPassDiffData[x, y] = allValues[0];
-
-					if (lowPassDiffData[x, y] > lowPassData[x, y])
-						lowPassDiffData[x, y] = 0;
-					else
-						lowPassDiffData[x, y] = (uint)(lowPassData[x, y] - lowPassDiffData[x, y]);
+					image[x, y] = (uint)nVal;
 				}
 			}
 
-			return lowPassDiffData;
+			return true;
+		}
+
+		public static bool Contrast(Pixelmap image, sbyte nContrast)
+		{
+			if (nContrast < -100) return false;
+			if (nContrast > 100) return false;
+
+			double pixel = 0, contrast = (100.0 + nContrast) / 100.0;
+
+			contrast *= contrast;
+
+			for (int y = 0; y < image.Height; ++y)
+			{
+				for (int x = 0; x < image.Width; ++x)
+				{
+					uint val = image[x, y];
+
+					pixel = val * 1.0 / image.MaxPixelValue;
+					pixel -= 0.5;
+					pixel *= contrast;
+					pixel += 0.5;
+					pixel *= image.MaxPixelValue;
+					if (pixel < 0) pixel = 0;
+					if (pixel > image.MaxPixelValue) pixel = image.MaxPixelValue;
+					image[x, y] = (uint)pixel;
+				}
+			}
+
+			return true;
+		}
+
+		private static uint[,] GetPixelArray(Pixelmap image)
+		{
+			var rv = new uint[image.Width, image.Height];
+
+			for (int y = 0; y < image.Height; ++y)
+			{
+				for (int x = 0; x < image.Width; ++x)
+				{
+					rv[x, y] = image[x, y];
+				}
+			}
+
+			return rv;
 		}
 
 		public static Bitmap ToVideoFields(Bitmap frameBitmap)

@@ -122,20 +122,20 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 			// 
 			// rbRawData
 			// 
+			this.rbRawData.Checked = true;
 			this.rbRawData.Location = new System.Drawing.Point(131, 316);
 			this.rbRawData.Name = "rbRawData";
 			this.rbRawData.Size = new System.Drawing.Size(88, 19);
 			this.rbRawData.TabIndex = 50;
+			this.rbRawData.TabStop = true;
 			this.rbRawData.Text = "Raw Data";
 			// 
 			// rbPreProcessedData
 			// 
-			this.rbPreProcessedData.Checked = true;
 			this.rbPreProcessedData.Location = new System.Drawing.Point(3, 316);
 			this.rbPreProcessedData.Name = "rbPreProcessedData";
 			this.rbPreProcessedData.Size = new System.Drawing.Size(122, 19);
 			this.rbPreProcessedData.TabIndex = 51;
-			this.rbPreProcessedData.TabStop = true;
 			this.rbPreProcessedData.Text = "Pre-Processed Data";
 			this.rbPreProcessedData.CheckedChanged += new System.EventHandler(this.rbPreProcessedData_CheckedChanged);
 			// 
@@ -157,7 +157,7 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(328, 337);
+			this.ClientSize = new System.Drawing.Size(328, 317);
 			this.Controls.Add(this.rbPreProcessedData);
 			this.Controls.Add(this.rbRawData);
 			this.Controls.Add(this.cbxDrawApertures);

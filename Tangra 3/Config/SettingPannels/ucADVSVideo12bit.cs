@@ -20,17 +20,19 @@ namespace Tangra.Config.SettingPannels
 		public ucADVSVideo12bit()
 		{
 			InitializeComponent();
+
+			cbxADVEngine.SelectedIndex = 0;
 		}
 
 		public void SetAdvStatusPopupFormCustomizer(IAdvStatusPopupFormCustomizer advPopupCustomizer)
 		{
-			m_AdvPopupCustomizer = advPopupCustomizer;
+			m_AdvPopupCustomizer = advPopupCustomizer;			
 		}
 
 		public override void LoadSettings()
 		{
 			nudSaturation12bit.SetNUDValue((int)TangraConfig.Settings.Photometry.Saturation.Saturation12Bit);
-			cbxADVEngine.SetCBXIndex((int)TangraConfig.Settings.ADVS.AdvEngine);
+			nudSaturation14bit.SetNUDValue((int)TangraConfig.Settings.Photometry.Saturation.Saturation14Bit);
 
 			cbxAdvsOsdTimeStamp.Checked = TangraConfig.Settings.ADVS.OverlayTimestamp;
 			cbxAdvsOsdGamma.Checked = TangraConfig.Settings.ADVS.OverlayGamma;
@@ -54,7 +56,7 @@ namespace Tangra.Config.SettingPannels
         public override void SaveSettings()
 		{
 			TangraConfig.Settings.Photometry.Saturation.Saturation12Bit = (uint)nudSaturation12bit.Value;
-			TangraConfig.Settings.ADVS.AdvEngine = (AdvEngine)cbxADVEngine.SelectedIndex;
+			TangraConfig.Settings.Photometry.Saturation.Saturation14Bit = (uint)nudSaturation14bit.Value;
 
         	TangraConfig.Settings.ADVS.OverlayTimestamp = cbxAdvsOsdTimeStamp.Checked;
 			TangraConfig.Settings.ADVS.OverlayGamma = cbxAdvsOsdGamma.Checked;
@@ -102,11 +104,21 @@ namespace Tangra.Config.SettingPannels
 
 		private void OnAdvPopupSettingChanged(object sender, EventArgs e)
 		{
+			UpdateAdvPopupCustomizer();
+		}
+
+		public override void Reset()
+		{
+			UpdateAdvPopupCustomizer();
+		}
+
+		private void UpdateAdvPopupCustomizer()
+		{
 			if (m_AdvPopupCustomizer != null)
 			{
 				m_AdvPopupCustomizer.UpdateSettings(BuildCurrentSettings());
 				m_AdvPopupCustomizer.RefreshState();
-			}
+			}			
 		}
 	}
 }

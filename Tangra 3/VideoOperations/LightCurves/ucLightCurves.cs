@@ -17,6 +17,7 @@ using Tangra.Video;
 using Tangra.VideoOperations.LightCurves;
 using Tangra.Config;
 using Tangra.VideoOperations.LightCurves.Tracking;
+using Tangra.ImageTools;
 
 namespace Tangra.VideoOperations.LightCurves
 {
@@ -28,7 +29,7 @@ namespace Tangra.VideoOperations.LightCurves
         //internal static byte MSG_ID_STOPPED_AT_LAST_FRAME = 0x04;
 
         private LCStateMachine m_StateMachine;
-        protected IVideoController m_VideoController;
+        protected VideoController m_VideoController;
 		private TangraConfig.LightCurvesDisplaySettings m_DisplaySettings;
 
 		public ucLightCurves()
@@ -49,7 +50,7 @@ namespace Tangra.VideoOperations.LightCurves
 			m_DisplaySettings.Initialize();
         }
 
-        internal void BeginConfiguration(LCStateMachine stateMachine, IVideoController videoController)
+        internal void BeginConfiguration(LCStateMachine stateMachine, VideoController videoController)
         {
             m_StateMachine = stateMachine;
             m_VideoController = videoController;
@@ -229,10 +230,7 @@ namespace Tangra.VideoOperations.LightCurves
 
         public void StoppedAtLastFrame()
         {
-            // NOTE: This may bave to be called after the last frame has been rendered completely
-
-            FinishWithMeasurements();
-            timerMoveToFirstFrame.Enabled = true;            
+			Invoke(new Action(() => timerMoveToFirstFrame.Enabled = true ));
         }
 
         public void StopRefining()
@@ -256,7 +254,9 @@ namespace Tangra.VideoOperations.LightCurves
                 m_StateMachine.VideoOperation.ShowLightCurve();
         }
 
-        private void PrepareToEnterStarTime()
+	    private delegate void PrepareToEnterStarTimeCallback();
+
+		private void PrepareToEnterStarTime()
         {
             ucUtcTime.DateTimeUtc = DateTime.Now.ToUniversalTime();
             pnlEnterTimes.Visible = true;
@@ -573,6 +573,8 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void btnLightCurve_Click(object sender, EventArgs e)
         {
+	        m_VideoController.SelectImageTool<ArrowTool>();
+
             FinishWithMeasurements();
         }
 
@@ -639,8 +641,7 @@ namespace Tangra.VideoOperations.LightCurves
 						(TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMs).ToString("0.00"),
 						frameRate.ToString("0.00000000")),
 						"Warning",
-						MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) ==
-						DialogResult.Yes)
+						MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
 					{
 						PrepareToEnterStarTime();
 						return;
@@ -721,8 +722,8 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void timerMoveToFirstFrame_Tick(object sender, EventArgs e)
         {
-        //    timerMoveToFirstFrame.Enabled = false;
-        //    FinishWithMeasurements();
+			timerMoveToFirstFrame.Enabled = false;
+			FinishWithMeasurements();
         }
 
         private void cbxDisplayBrightness_CheckedChanged(object sender, EventArgs e)

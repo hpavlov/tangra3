@@ -149,7 +149,6 @@ namespace Tangra.VideoOperations.LightCurves
                 TangraConfig.Settings.Photometry.AnulusInnerRadius,
                 TangraConfig.Settings.Photometry.AnulusMinPixels,
                 TangraConfig.PhotometrySettings.REJECTION_BACKGROUND_PIXELS_STD_DEV,
-                (float)Context.EncodingGamma,
                 Header.PositionTolerance);
 
             m_EllapsedTime.Start();

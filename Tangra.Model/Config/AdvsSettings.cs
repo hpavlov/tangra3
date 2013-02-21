@@ -5,12 +5,6 @@ using System.Text;
 
 namespace Tangra.Model.Config
 {
-	public enum AdvEngine
-	{
-		Native = 0,
-		Managed	= 1
-	}
-
 	public class AdvsSettings
 	{
 		public bool OverlayTimestamp = false;
@@ -32,7 +26,5 @@ namespace Tangra.Model.Config
 		public bool PopupGain = true;
 		public bool PopupGPSFix = true;
 		public bool PopupAlmanac = true;
-
-		public AdvEngine AdvEngine = AdvEngine.Native;
 	}
 }

@@ -74,7 +74,7 @@ long PreProcessingGetConfig(PreProcessingType* preProcessingType, unsigned int* 
 		*flatPixelsCount = g_FlatFramePixelsCount;
 
 		*filter = s_PreProcessingFilter;
-		*gamma = g_EncodingGamma = 1;
+		*gamma = g_EncodingGamma;
 	}
 
 	return S_OK;
@@ -202,6 +202,12 @@ long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height
 	else if (s_PreProcessingFilter == ppfLowPassDifferenceFilter)
 	{
 		// TODO: Apply low pass difference filter
+	}
+	
+	if (g_EncodingGamma != 1)
+	{
+		rv = PreProcessingGamma(pixels, width, height, bpp, g_EncodingGamma);
+		if (rv != S_OK) return rv;
 	}
 
 	return rv;

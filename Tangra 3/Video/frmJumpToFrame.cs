@@ -22,11 +22,11 @@ namespace Tangra.Video
 			nudFrameToJumpTo.Select(0, nudFrameToJumpTo.Text.Length);
 		}
 
-		private void nudFrameToJumpTo_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+		private void nudFrameToJumpTo_KeyPress(object sender, KeyPressEventArgs e)
 		{
-			if (e.KeyCode == Keys.Enter)
+			if (e.KeyChar == '\r')
 			{
-				DialogResult = DialogResult.OK; 
+				DialogResult = DialogResult.OK;
 				Close();
 			}
 		}

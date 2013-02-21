@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using System.Xml.Serialization;
 using Tangra.Model.Context;
 using Tangra.TangraService;
+using System.Diagnostics;
 
 namespace Tangra
 {
@@ -63,7 +64,7 @@ namespace Tangra
 
         private string GetErrorReport()
         {
-            return "Tangra v." + Assembly.GetExecutingAssembly().GetName().Version.ToString() + "\r\n\r\n" +
+            return "Tangra v" + Assembly.GetExecutingAssembly().GetName().Version.ToString() + "\r\n\r\n" +
                     m_Error.ToString() + "\r\n\r\nUser Comments:\r\n" + tbxUserComments.Text + "\r\n\r\n" + GetExtendedTangraInfo();
         }
 
@@ -80,11 +81,18 @@ namespace Tangra
                     wrt.Flush();
                 }
             }
-            
+
+			var moduleInfo = new StringBuilder("\r\n\r\nLoaded modules:\r\n\r\n");
+			foreach (ProcessModule module in Process.GetCurrentProcess().Modules)
+			{
+				moduleInfo.AppendFormat("{0} v{1}, {2}\r\n", module.ModuleName, module.FileVersionInfo.FileVersion, module.FileName);
+			}
+
             return
                 frmSystemInfo.GetFullVersionInfo() + "\r\n" +
                 string.Format("Tangra Install Location: {0}\r\n", AppDomain.CurrentDomain.BaseDirectory) +
-                crashReportInfo.ToString();
+                crashReportInfo.ToString() +
+				moduleInfo.ToString();
         }
 
         private void btnSubmit_Click(object sender, EventArgs e)

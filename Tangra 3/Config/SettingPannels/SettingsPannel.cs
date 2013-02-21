@@ -12,6 +12,7 @@ namespace Tangra.Config.SettingPannels
 		public virtual void LoadSettings() { }
 		public virtual void SaveSettings() { }
 		public virtual void OnPostSaveSettings() { }
+		public virtual void Reset() { }
 		public virtual bool ValidateSettings()
 		{
 			return true;
