@@ -71,9 +71,15 @@ namespace Tangra.Video.AstroDigitalVideo
 			if (m_AdvSettings.PopupVideoCameraFrameId)
 				statusText.AppendLine(string.Format("Camera Frame #: {0}", m_FrameState.VideoCameraFrameId.ToString("###,###,###,##0")));
 			if (m_AdvSettings.PopupTimestamp)
-				statusText.AppendLine(string.Format("Central Exposure Time: {0}", m_FrameState.CentralExposureTime.ToString("dd MMM yyyy HH:mm:ss.fff")));
+				statusText.AppendLine(string.Format("Central Exposure Time: {0}",
+                        m_FrameState.HasValidTimeStamp 
+                            ? m_FrameState.CentralExposureTime.ToString("dd MMM yyyy HH:mm:ss.fff")
+                            : "Timestamp Not Available"));
+
 			if (m_AdvSettings.PopupExposure)
-                 statusText.AppendLine(string.Format("Exposure Duration: {0} ms", m_FrameState.ExposureInMilliseconds.ToString("0")));
+                 statusText.AppendLine(m_FrameState.HasValidTimeStamp 
+                            ? string.Format("Exposure Duration: {0} ms", m_FrameState.ExposureInMilliseconds.ToString("0"))
+                            : "Exposure Duration: Unknown");
 
 			if (m_AdvSettings.PopupTimestamp || m_AdvSettings.PopupExposure || m_AdvSettings.PopupVideoCameraFrameId)
                 statusText.AppendLine();
@@ -87,7 +93,9 @@ namespace Tangra.Video.AstroDigitalVideo
 			if (m_AdvSettings.PopupGamma)
 				statusText.AppendLine(string.Format("Gamma: {0:0.000} {1}", m_FrameState.Gamma, AdvStatusValuesHelper.GetWellKnownGammaForValue(m_FrameState.Gamma)));
 			if (m_AdvSettings.PopupGain)
-				statusText.AppendLine(string.Format("Gain: {0:0} dB", m_FrameState.Gain));
+				statusText.AppendLine(m_FrameState.IsGainKnown 
+                    ? string.Format("Gain: {0:0} dB", m_FrameState.Gain)
+                    : "Gain: Unknown");
 			if (m_AdvSettings.PopupOffset)
 				statusText.AppendLine(string.Format("Offset: {0:0.00} %", m_FrameState.Offset));
 

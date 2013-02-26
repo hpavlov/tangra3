@@ -101,9 +101,7 @@ namespace Tangra.Controller
 
 			//m_MainForm.m_FramePreprocessor.Clear();
 
-			m_LightCurveController.EnsureLightCurveFormClosed();
-
-			EnsureAllPopupFormsClosed();
+			EnsureAllPopUpFormsClosed();
 
 			m_AstroImage = null;
 			m_CurrentFrameContext = RenderFrameContext.Empty;
@@ -182,8 +180,10 @@ namespace Tangra.Controller
                     PSFFit.DataRange = PSFFittingDataRange.DataRange8Bit;
                 else if (m_FramePlayer.Video.BitPix == 12)
                     PSFFit.DataRange = PSFFittingDataRange.DataRange12Bit;
+				else if (m_FramePlayer.Video.BitPix == 14)
+					PSFFit.DataRange = PSFFittingDataRange.DataRange14Bit;
                 else
-                    throw new ApplicationException("PSF fitting only supports 8 and 12 bit data.");
+                    throw new ApplicationException("PSF fitting only supports 8, 12 and 14 bit data.");
 
 				TangraContext.Current.HasVideoLoaded = true;
 				TangraContext.Current.CanPlayVideo = true;
@@ -225,7 +225,7 @@ namespace Tangra.Controller
 			m_MainForm.BuildRecentFilesMenu();
 		}
 
-        public void SetImage(Pixelmap currentPixelmap, RenderFrameContext frameContext)
+        public void SetImage(Pixelmap currentPixelmap, RenderFrameContext frameContext, bool isOldFrameRefreshed)
 		{
             m_AstroImage = new AstroImage(currentPixelmap);
             m_CurrentFrameContext = frameContext;
@@ -234,8 +234,11 @@ namespace Tangra.Controller
 			if (m_AdvStatusForm != null && m_AdvStatusForm.Visible)
 				m_AdvStatusForm.ShowStatus(m_FrameState);
 
+	        if (!isOldFrameRefreshed)
+	        {
             m_TargetPsfFit = null;
             ShowTargetPSF();
+		}
 		}
 
         public void NewFrameDisplayed()
@@ -400,8 +403,6 @@ namespace Tangra.Controller
 		public void PlayVideo()
 		{
 			m_FramePlayer.Start(FramePlaySpeed.Fastest, 1);
-
-			OnVideoPlayerStarted();
 
 			// NOTE: Will this always be called in the UI thread?
 			m_VideoFileView.Update();
@@ -627,22 +628,22 @@ namespace Tangra.Controller
 			}
 		}
 
-		private void EnsureAllPopupFormsClosed()
-		{
-			if (m_TargetPSFViewerForm != null &&
-				m_TargetPSFViewerForm.Visible)
-			{
-				m_TargetPSFViewerForm.Close();
-				m_TargetPSFViewerForm = null;
-			}
+		//private void EnsureAllPopupFormsClosed()
+		//{
+		//    if (m_TargetPSFViewerForm != null &&
+		//        m_TargetPSFViewerForm.Visible)
+		//    {
+		//        m_TargetPSFViewerForm.Close();
+		//        m_TargetPSFViewerForm = null;
+		//    }
 
-			if (m_AdvStatusForm != null &&
-				m_AdvStatusForm.Visible)
-			{
-				m_AdvStatusForm.Close();
-				m_AdvStatusForm = null;
-			}
-		}
+		//    if (m_AdvStatusForm != null &&
+		//        m_AdvStatusForm.Visible)
+		//    {
+		//        m_AdvStatusForm.Close();
+		//        m_AdvStatusForm = null;
+		//    }
+		//}
 
         public void TogglePSFViewerForm()
         {
@@ -694,10 +695,18 @@ namespace Tangra.Controller
 
 		public void ShowFSTSFileViewer()
 		{
-			if (m_FramePlayer.IsAstroDigitalVideo)
+			if (TangraContext.Current.HasVideoLoaded && m_FramePlayer.IsAstroDigitalVideo)
 			{
 				var viewer = new frmAdvViewer(m_FramePlayer.Video.FileName);
 				viewer.Show(m_MainFormView);
+			}
+            else
+			{
+			    if (m_MainForm.openAdvFileDialog.ShowDialog(m_MainFormView) == DialogResult.OK)
+			    {
+                    var viewer = new frmAdvViewer(m_MainForm.openAdvFileDialog.FileName);
+                    viewer.Show(m_MainFormView);			        
+			    }
 			}
 		}
 

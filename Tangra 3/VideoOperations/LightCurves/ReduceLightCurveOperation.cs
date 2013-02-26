@@ -1833,10 +1833,6 @@ namespace Tangra.VideoOperations.LightCurves
 		{   
 			m_LightCurveController.EnsureLightCurveFormClosed();
 			m_VideoController.EnsureLightCurveForm();
-			//frmMain.EnsureLightCurveAndAdvStatusFormClosed();
-			//frmMain.m_LightCurveForm = new frmLightCurve(m_Host);
-
-			//frmMain.m_LightCurveForm.Show();
 
 			TangraContext.Current.HasVideoLoaded = true;
 			TangraContext.Current.CanPlayVideo = false;

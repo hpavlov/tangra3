@@ -95,7 +95,7 @@ namespace Tangra
 				for(int y = 0; y < bgHeight; y++)
 				{
 					if (m_PSFFit == null || !m_PSFFit.IsSolved ||
-						ImagePixel.ComputeDistance(m_PSFFit.XCenter, x + bgWidth - m_PSFFit.MatrixSize, m_PSFFit.YCenter, y + bgHeight - m_PSFFit.MatrixSize) > m_PSFFit.FWHM)
+						ImagePixel.ComputeDistance(m_PSFFit.XCenter, x + bgWidth - m_PSFFit.MatrixSize, m_PSFFit.YCenter, y + bgHeight - m_PSFFit.MatrixSize) > 3 * m_PSFFit.FWHM)
 					{
 						bgPixels.Add(backgroundPixels[x, y]);
 					}

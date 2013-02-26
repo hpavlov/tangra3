@@ -348,6 +348,11 @@ namespace Tangra.VideoOperations.LightCurves
                 pixelFrom <<= 4;
                 pixelTo <<= 4;
             }
+			else if (m_VideoStream != null && m_VideoStream.BitPix == 14)
+			{
+				pixelFrom <<= 6;
+				pixelTo <<= 6;
+			}
 
 			if (rbStretching.Checked)
 				FrameAdjustmentsPreview.Instance.Stretching(pixelFrom, pixelTo);

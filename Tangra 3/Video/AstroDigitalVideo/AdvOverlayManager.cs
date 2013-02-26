@@ -53,7 +53,9 @@ namespace Tangra.Video.AstroDigitalVideo
 
                 if (TangraConfig.Settings.ADVS.OverlayTimestamp)
                 {
-                    string timeStampStr = string.Format("{0}.{1}", state.CentralExposureTime.ToString("dd MMM yyyy HH:mm:ss"), state.CentralExposureTime.Millisecond.ToString().PadLeft(3, '0'));
+                    string timeStampStr = state.HasValidTimeStamp 
+                            ? string.Format("{0}.{1}", state.CentralExposureTime.ToString("dd MMM yyyy HH:mm:ss"), state.CentralExposureTime.Millisecond.ToString().PadLeft(3, '0'))
+                            : "Timestamp Not Available";
                     g.DrawString(timeStampStr, s_TimeStampFont, s_TimeStampBrush, m_XPos, currentImage.Height - m_YPosUpper);
                     g.Save();                    
                 }
@@ -69,7 +71,9 @@ namespace Tangra.Video.AstroDigitalVideo
 
                 if (TangraConfig.Settings.ADVS.OverlayGain)
                 {
-					string gammaStr = string.Format(" Gain: {0} dB", state.Gain.ToString("0"));
+                    string gammaStr = state.IsGainKnown
+                        ? string.Format(" Gain: {0} dB", state.Gain.ToString("0"))
+                        : " Gain: Unknown";
                     g.DrawString(gammaStr, s_PropertiesFont, s_PropertiesGreenBrush, 10, 10 + numTopLines * (s_PropertiesFont.Size + 5));
 					g.Save();
                     numTopLines++;

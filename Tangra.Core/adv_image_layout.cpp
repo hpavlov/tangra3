@@ -337,10 +337,12 @@ void AdvImageLayout::GetDataFromDataBytes(enum GetByteMode mode, unsigned char* 
 
 void AdvImageLayout::GetPixelsFrom16BitByteArrayRawLayout(unsigned char* layoutData, unsigned long* prevFrame, unsigned long* pixelsOut, int* readIndex, bool* crcOkay)
 {
-	if (DataBpp == 12)
+	if (DataBpp == 12 || DataBpp == 14)
 	{		
 		unsigned long* pPixelsOut = pixelsOut;
 		bool isLittleEndian = m_ImageSection->ByteOrder == LittleEndian;
+		bool convertTo12Bit = m_ImageSection->DataBpp == 12;
+		bool convertTo14Bit = m_ImageSection->DataBpp == 14;
 
 		for (int y = 0; y < Height; ++y)
 		{
@@ -355,8 +357,11 @@ void AdvImageLayout::GetPixelsFrom16BitByteArrayRawLayout(unsigned char* layoutD
 						? (unsigned short)(((unsigned short)bt2 << 8) + bt1)
 						: (unsigned short)(((unsigned short)bt1 << 8) + bt2);
 				
-				val = (unsigned short)(val >> 4);
-
+				if (convertTo12Bit)
+					val = (unsigned short)(val >> 4);
+				else if (convertTo14Bit)
+					val = (unsigned short)(val >> 2);
+					
 				*pPixelsOut = val;
 				pPixelsOut++;
 			}
@@ -393,7 +398,7 @@ void AdvImageLayout::GetPixelsFrom12BitByteArray(unsigned char* layoutData, unsi
 	//var rv = new ushort[Width, Height];
 
 	bool isLittleEndian = m_ImageSection->ByteOrder == LittleEndian;
-	bool convertTo12Bit = m_ImageSection->DataBpp == 12;
+	bool convertTo12Bit = m_ImageSection->DataBpp == 12;	
 	bool convertTo16Bit = m_ImageSection->DataBpp == 16;
 
 	//bool isKeyFrame = byteMode == GetByteMode.KeyFrameBytes;

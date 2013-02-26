@@ -179,7 +179,15 @@ namespace Tangra.Video.AstroDigitalVideo
             }
 
 			// ADV Format Specification v1.5, the time stamp is the MIDDLE of the exposure (this changed from spec v1.4 where it was the START) of the exposure
-			((AdvImageData)sectionObjects[0]).MidExposureUtc = ADV_ZERO_DATE_REF.AddMilliseconds(frameTimeMsSince2010);
+			try
+			{
+			    ((AdvImageData)sectionObjects[0]).MidExposureUtc = ADV_ZERO_DATE_REF.AddMilliseconds(frameTimeMsSince2010);
+			}
+            catch(ArgumentOutOfRangeException)
+            {
+                ((AdvImageData) sectionObjects[0]).MidExposureUtc = ADV_ZERO_DATE_REF; 
+            }
+            
 			((AdvImageData)sectionObjects[0]).ExposureMilliseconds = (float)(exposure / 10.0);
 
             return sectionObjects.ToArray();

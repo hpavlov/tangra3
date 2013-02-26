@@ -263,6 +263,7 @@ namespace Tangra.Video.AstroDigitalVideo
 
 			var rv = new ushort[Width, Height];
 			bool convertT012Bit = this.m_ImageSection.BitsPerPixel == 12;
+			bool convertT014Bit = this.m_ImageSection.BitsPerPixel == 14;
 			
 			for (int y = 0; y < Height; ++y)
 			{
@@ -279,7 +280,10 @@ namespace Tangra.Video.AstroDigitalVideo
 					else
 						val = (ushort)(((ushort)bt2 << 8) + bt1);
 
-					if (convertT012Bit) val = (ushort)(val >> 4);
+					if (convertT012Bit) 
+						val = (ushort)(val >> 4);
+					else if (convertT014Bit)
+						val = (ushort)(val >> 2);
 
 					rv[x, y] = (ushort)val;
 				}

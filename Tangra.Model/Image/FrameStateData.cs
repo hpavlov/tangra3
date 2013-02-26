@@ -29,5 +29,21 @@ namespace Tangra.Model.Image
 				Gain == 0 &&
 				Messages == null;
 		}
+
+        public bool HasValidTimeStamp
+        {
+            get
+            {
+                return CentralExposureTime.Ticks != 633979008000000000;        
+            }            
+        }
+
+	    public bool IsGainKnown
+	    {
+	        get
+	        {
+	            return Gain != -100;
+	        }
+	    }
 	}
 }

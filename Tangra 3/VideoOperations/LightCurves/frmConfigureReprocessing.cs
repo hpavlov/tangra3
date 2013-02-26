@@ -205,7 +205,7 @@ namespace Tangra.VideoOperations.LightCurves
                     measurer.Measure(
                         reading.X0, reading.Y0,
                         (float)targetApertures[i].Value, GetCurrentFilter(), reading.PixelData,
-                        double.NaN, ref fitArea, m_Header.FixedApertureFlags[i]);
+						updatedReading.PsfFit.I0, ref fitArea, m_Header.FixedApertureFlags[i]);
 
                     // TODO: (1) The PsfFit should be always non zero, why it is zero? (compare with previous code from ver 1.3)
                     updatedReading.PsfFit = measurer.FoundBestPSFFit;

@@ -127,7 +127,7 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 
 						List<uint> allKeys = histogram.Keys.ToList();
 						foreach (uint key in allKeys)
-							histogram[key] = (int)Math.Round(100 * Math.Log(histogram[key]));
+							histogram[key] = (int)Math.Round(100 * Math.Log(histogram[key] + 1));
 
 						DrawHistogram(m_TargetBoxes[reading.TargetNo], histogram);
 					}

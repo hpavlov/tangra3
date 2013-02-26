@@ -16,7 +16,7 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 
 			double decodingGamma = 1 / m_EncodingGamma;
 
-			if (bitPix == 8 || bitPix == 12 || bitPix == 16)
+			if (bitPix == 8 || bitPix == 12 || bitPix == 14 || bitPix == 16)
 			{
 				for (int i = 0; i <= m_MaxPixelValue; i++)
 					m_MappedBytes[i] = (byte)Math.Max(0, Math.Min(m_MaxPixelValue, Math.Round((m_MaxPixelValue + 1) * Math.Pow(i * 1.0/ (m_MaxPixelValue + 1), decodingGamma))));				

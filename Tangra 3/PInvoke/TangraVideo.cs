@@ -135,6 +135,8 @@ namespace Tangra.PInvoke
 			s_fileInfo = null;
 		}
 
+		private static Font s_ErrorFont = new Font(FontFamily.GenericMonospace, 10, FontStyle.Regular);
+
         public static void GetFrame(int frameNo, out uint[] pixels, out Bitmap videoFrame, out byte[] bitmapBytes)
 		{
 			if (s_fileInfo != null)
@@ -147,7 +149,20 @@ namespace Tangra.PInvoke
 
 				using (MemoryStream memStr = new MemoryStream(bitmapPixels))
 				{
-					videoFrame = (Bitmap)Bitmap.FromStream(memStr);
+					try
+					{
+						videoFrame = (Bitmap) Bitmap.FromStream(memStr);
+					}
+					catch (Exception ex)
+					{
+						videoFrame = new Bitmap(s_fileInfo.Width, s_fileInfo.Height);
+						using (Graphics g = Graphics.FromImage(videoFrame))
+						{
+							g.Clear(Color.White);
+							g.DrawString(ex.Message, s_ErrorFont, Brushes.Red, 10, 10);
+							g.Save();
+						}
+					}
 				}
 			}
 			else

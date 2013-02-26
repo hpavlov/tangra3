@@ -22,7 +22,8 @@ namespace Tangra.Model.Astro
 	public enum PSFFittingDataRange
 	{
 		DataRange8Bit,
-		DataRange12Bit
+		DataRange12Bit,
+		DataRange14Bit
 	}
 
     public interface IPSFFit
@@ -421,10 +422,24 @@ namespace Tangra.Model.Astro
 
                 m_HalfWidth = half_width;
 
-				if (DataRange == PSFFittingDataRange.DataRange8Bit)
-					m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation8Bit;
-				else
-					m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation12Bit;
+				switch (DataRange)
+				{
+					case PSFFittingDataRange.DataRange8Bit:
+						m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation8Bit;
+						break;
+
+					case PSFFittingDataRange.DataRange12Bit:
+						m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation12Bit;
+						break;
+
+					case PSFFittingDataRange.DataRange14Bit:
+						m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation14Bit;
+						break;
+
+					default:
+						m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation8Bit;
+						break;
+				}
 
                 int nonSaturatedPixels = 0;
 
@@ -617,10 +632,24 @@ namespace Tangra.Model.Astro
 
 				m_HalfWidth = half_width;
 
-				if (DataRange == PSFFittingDataRange.DataRange8Bit)
-					m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation8Bit;
-				else
-					m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation12Bit;
+				switch (DataRange)
+				{
+					case PSFFittingDataRange.DataRange8Bit:
+						m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation8Bit;
+						break;
+
+					case PSFFittingDataRange.DataRange12Bit:
+						m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation12Bit;
+						break;
+
+					case PSFFittingDataRange.DataRange14Bit:
+						m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation14Bit;
+						break;
+
+					default:
+						m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation8Bit;
+						break;
+				}
 				
 				int nonSaturatedPixels = 0;
 
@@ -778,7 +807,9 @@ namespace Tangra.Model.Astro
         {
             float margin = 6.0f;
             double maxZ = 256;
-			if (bpp == 12) maxZ = 4096;
+
+			if (bpp == 14) maxZ = 16384;
+			else if (bpp == 12) maxZ = 4096;
 
             int totalSteps = 100;
 
@@ -848,7 +879,9 @@ namespace Tangra.Model.Astro
         {
             float margin = 3.0f;
 			double maxZ = 256.0;
-			if (bpp == 12) maxZ = 4096.0;
+			if (bpp == 14) maxZ = 16384.0;
+			else if (bpp == 12) maxZ = 4096.0;
+			
 			maxZ = Math.Min(maxZ, GetPSFValueInternal(m_X0, m_Y0) + 5);
 
             int totalSteps = 100;
@@ -934,7 +967,10 @@ namespace Tangra.Model.Astro
                     {
                         double z = Math.Round(GetPSFValueInternal(x, y) + m_Residuals[x, y]);
 
-						if (bpp == 12) z = z * 255.0f / 4095;
+						if (bpp == 14)
+							z = z * 255.0f / 16383;
+						else if (bpp == 12) 
+							z = z * 255.0f / 4095;
 
                         byte val = (byte) (Math.Max(0, Math.Min(255, z)));
                         g.FillRectangle(AllGrayBrushes.GrayBrush(val), rect.Left + x*coeff, rect.Top + y*coeff, coeff, coeff);

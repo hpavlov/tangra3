@@ -81,7 +81,7 @@
 			// label2
 			// 
 			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(76, 289);
+			this.label2.Location = new System.Drawing.Point(79, 289);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(63, 13);
 			this.label2.TabIndex = 5;
@@ -126,7 +126,7 @@
 			// lblIMax
 			// 
 			this.lblIMax.AutoSize = true;
-			this.lblIMax.Location = new System.Drawing.Point(136, 289);
+			this.lblIMax.Location = new System.Drawing.Point(138, 289);
 			this.lblIMax.Name = "lblIMax";
 			this.lblIMax.Size = new System.Drawing.Size(22, 13);
 			this.lblIMax.TabIndex = 10;
@@ -200,7 +200,7 @@
 			this.label9.AutoSize = true;
 			this.label9.Location = new System.Drawing.Point(250, 311);
 			this.label9.Name = "label9";
-			this.label9.Size = new System.Drawing.Size(39, 13);
+			this.label9.Size = new System.Drawing.Size(42, 13);
 			this.label9.TabIndex = 22;
 			this.label9.Text = "SNR = ";
 			// 

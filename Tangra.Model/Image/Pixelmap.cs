@@ -69,6 +69,8 @@ namespace Tangra.Model.Image
                 return byte.MaxValue;
             else if (bitPix == 12)
                 return 4095;
+			else if (bitPix == 14)
+				return 16383;
             else if (bitPix == 16)
                 return ushort.MaxValue;
             else

@@ -184,7 +184,12 @@ void AdvFile::GetFrameImageSectionHeader(int frameId, unsigned char* layoutId, e
 
 	if (frameDataMagic == 0xEE0122FF)
 	{
-		fseek(m_File, 16, SEEK_CUR);
+		// Skip 16 bytes forward
+		long ignoredValue;
+		fread(&ignoredValue, 4, 1, m_File);
+		fread(&ignoredValue, 4, 1, m_File);
+		fread(&ignoredValue, 4, 1, m_File);
+		fread(&ignoredValue, 4, 1, m_File);
 
 		fread(layoutId, 1, 1, m_File);
 

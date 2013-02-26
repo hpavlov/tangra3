@@ -132,8 +132,15 @@ namespace Tangra.Model.Astro
         {
             bool excludeAreaDefined = Rectangle.Empty != excludeArea;
 
-            int includsionCheckStep = bpp == 8 ? 10 : 50;
-            int currInclusionLimit = (bpp == 8 ? 255 : 4095) - includsionCheckStep + 1;
+	        int includsionCheckStep = 10;
+			if (bpp == 12) includsionCheckStep = 50;
+			else if (bpp == 14) includsionCheckStep = 60;
+
+	        int maxPixelValue = 255;
+			if (bpp == 12) maxPixelValue = 0xFFF;
+			else if (bpp == 14) maxPixelValue = 0x3FFF;
+
+			int currInclusionLimit = maxPixelValue - includsionCheckStep + 1;
 
             while (currInclusionLimit > aboveNoiseLevelRequired)
             {

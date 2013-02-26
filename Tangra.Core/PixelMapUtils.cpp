@@ -309,7 +309,9 @@ HRESULT GetBitmapPixels(long width, long height, unsigned long* pixels, BYTE* bi
 	int length = width * height;
 	bitmapPixels+=3 * (length + width);
 
-	int shiftVal = bpp == 12 ? 4 : 8;
+	int shiftVal = 0;
+	if (bpp == 12) shiftVal = 4;
+	else if (bpp == 14) shiftVal = 6;
 
 	int total = width * height;
 	while(total--)
@@ -363,8 +365,12 @@ void GetMinMaxValuesForBpp(int bpp, int* minValue, int* maxValue)
 		*maxValue = 0xFF;
 	else if (bpp == 12)
 		*maxValue = 0xFFF;
+	else if (bpp == 14)
+		*maxValue = 0x3FFF;		
 	else if (bpp == 16)
 		*maxValue = 0xFFFF;
+	else 
+		*maxValue = (1 << bpp) - 1;		
 }
 
 int s_GammaTableBpp = 0;
@@ -477,6 +483,7 @@ HRESULT PreProcessingBrightnessContrast(unsigned long* pixels, long width, long 
 
 	double bppBrightness = brightness;
 	if (bpp == 12) bppBrightness *= 0xF;
+	if (bpp == 14) bppBrightness *= 0x3F;
 	if (bpp == 16) bppBrightness *= 0xFF;
 
 	long totalPixels = width * height;

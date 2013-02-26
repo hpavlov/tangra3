@@ -280,7 +280,7 @@ namespace Tangra
 			//{
 				// Only set the AstroImage if this is not a Refresh. Otherwise the pre-processing will be lost in 
 				// consequative refreshes and the AstroImage will be wrong even after the first Refresh
-                m_VideoController.SetImage(currentPixelmap, frameContext);
+				m_VideoController.SetImage(currentPixelmap, frameContext, !isNewFrame && frameContext.MovementType == MovementType.Refresh);
 			//}
 
 #if PROFILING
@@ -708,9 +708,9 @@ namespace Tangra
 
 		private void miRepairAdvFile_Click(object sender, EventArgs e)
 		{
-			if (openCorruptedAdvFileDialog.ShowDialog(this) == DialogResult.OK)
+			if (openAdvFileDialog.ShowDialog(this) == DialogResult.OK)
 			{
-				m_VideoController.RepairAdvFile(openCorruptedAdvFileDialog.FileName);
+				m_VideoController.RepairAdvFile(openAdvFileDialog.FileName);
 			}
 		}
 
