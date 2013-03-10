@@ -43,7 +43,12 @@ namespace Tangra.Video
 
                     TangraContext.Current.RenderingEngine = allEnginesByIndex[engineIdx];
 
-                    return new VideoStream(fileInfo, fileName);
+                    var rv = new VideoStream(fileInfo, fileName);
+
+                    // Try to load the first frame to be sure that it is going to work, before accepting this video engine for rendering
+                    rv.GetPixelmap(fileInfo.FirstFrame);
+
+                    return rv;
                 }
                 catch (Exception ex)
                 {

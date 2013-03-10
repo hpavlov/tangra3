@@ -56,6 +56,11 @@
             this.ssFPS = new System.Windows.Forms.ToolStripStatusLabel();
             this.tslblRecDbg = new System.Windows.Forms.ToolStripStatusLabel();
             this.tslblUsingAviSynth = new System.Windows.Forms.ToolStripStatusLabel();
+			this.tsbtnIntensify = new System.Windows.Forms.ToolStripSplitButton();
+			this.tsmiInverted = new System.Windows.Forms.ToolStripMenuItem();
+			this.tsmiHigh = new System.Windows.Forms.ToolStripMenuItem();
+			this.tsmiLo = new System.Windows.Forms.ToolStripMenuItem();
+			this.tsmiOff = new System.Windows.Forms.ToolStripMenuItem();
             this.tslblDarkFrameLoaded = new System.Windows.Forms.ToolStripStatusLabel();
             this.tslblFlatFrameLoaded = new System.Windows.Forms.ToolStripStatusLabel();
             this.ssMoreInfo = new System.Windows.Forms.ToolStripStatusLabel();
@@ -81,6 +86,7 @@
             this.displayFrameTimer = new System.Windows.Forms.Timer(this.components);
             this.openAdvFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.saveFrameDialog = new System.Windows.Forms.SaveFileDialog();
+			this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.mainMenu.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.panelRight.SuspendLayout();
@@ -318,6 +324,7 @@
             this.ssFPS,
             this.tslblRecDbg,
             this.tslblUsingAviSynth,
+            this.tsbtnIntensify,
             this.tslblDarkFrameLoaded,
             this.tslblFlatFrameLoaded,
             this.ssMoreInfo,
@@ -421,6 +428,53 @@
             this.tslblUsingAviSynth.Text = "AviSynth";
             this.tslblUsingAviSynth.Visible = false;
             // 
+			// tsbtnIntensify
+			// 
+			this.tsbtnIntensify.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+			this.tsbtnIntensify.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsmiInverted,
+            this.toolStripSeparator3,
+            this.tsmiHigh,
+            this.tsmiLo,
+            this.tsmiOff});
+			this.tsbtnIntensify.Image = ((System.Drawing.Image)(resources.GetObject("tsbtnIntensify.Image")));
+			this.tsbtnIntensify.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.tsbtnIntensify.Name = "tsbtnIntensify";
+			this.tsbtnIntensify.Size = new System.Drawing.Size(86, 22);
+			this.tsbtnIntensify.Text = "Display Mode";
+			this.tsbtnIntensify.Visible = false;
+			// 
+			// tsmiInverted
+			// 
+			this.tsmiInverted.CheckOnClick = true;
+			this.tsmiInverted.Name = "tsmiInverted";
+			this.tsmiInverted.Size = new System.Drawing.Size(152, 22);
+			this.tsmiInverted.Text = "Inverted";
+			this.tsmiInverted.Click += new System.EventHandler(this.DisplayInvertedClicked);
+			// 
+			// tsmiHigh
+			// 
+			this.tsmiHigh.Name = "tsmiHigh";
+			this.tsmiHigh.Size = new System.Drawing.Size(152, 22);
+			this.tsmiHigh.Text = "Gamma: High";
+			this.tsmiHigh.Click += new System.EventHandler(this.DisplayIntensifyModeClicked);
+			// 
+			// tsmiLo
+			// 
+			this.tsmiLo.Name = "tsmiLo";
+			this.tsmiLo.Size = new System.Drawing.Size(152, 22);
+			this.tsmiLo.Text = "Gamma: Lo";
+			this.tsmiLo.Click += new System.EventHandler(this.DisplayIntensifyModeClicked);
+			// 
+			// tsmiOff
+			// 
+			this.tsmiOff.Checked = true;
+			this.tsmiOff.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.tsmiOff.Name = "tsmiOff";
+			this.tsmiOff.Size = new System.Drawing.Size(152, 22);
+			this.tsmiOff.Text = "Gamma: Off";
+			this.tsmiOff.Click += new System.EventHandler(this.DisplayIntensifyModeClicked);
+			// 
             // tslblDarkFrameLoaded
             // 
             this.tslblDarkFrameLoaded.BackColor = System.Drawing.Color.MediumAquamarine;
@@ -767,6 +821,12 @@
 		protected internal System.Windows.Forms.ToolStripMenuItem miFSTSFileViewer;
 		protected internal System.Windows.Forms.ToolStripMenuItem miExportToCSV;
 		private System.Windows.Forms.SaveFileDialog saveFrameDialog;
+		protected internal System.Windows.Forms.ToolStripSplitButton tsbtnIntensify;
+		private System.Windows.Forms.ToolStripMenuItem tsmiHigh;
+		private System.Windows.Forms.ToolStripMenuItem tsmiLo;
+		private System.Windows.Forms.ToolStripMenuItem tsmiOff;
+		private System.Windows.Forms.ToolStripMenuItem tsmiInverted;
+		private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         protected internal System.Windows.Forms.OpenFileDialog openAdvFileDialog;
 	}
 }

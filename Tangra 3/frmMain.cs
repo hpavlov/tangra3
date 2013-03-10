@@ -833,5 +833,29 @@ namespace Tangra
 				}
 			}
 		}
+
+		private void DisplayIntensifyModeClicked(object sender, EventArgs e)
+		{
+			var currItem = sender as ToolStripMenuItem;
+			if (currItem != null && !currItem.Checked)
+			{
+				tsmiOff.Checked = false;
+				tsmiLo.Checked = false;
+				tsmiHigh.Checked = false;
+
+				currItem.Checked = true;
+
+				DisplayIntensifyMode newMode = tsmiOff.Checked
+												   ? DisplayIntensifyMode.Off
+												   : (tsmiHigh.Checked ? DisplayIntensifyMode.Hi : DisplayIntensifyMode.Lo);
+
+				m_VideoController.SetDisplayIntensifyMode(newMode);				
+			}
+		}
+
+		private void DisplayInvertedClicked(object sender, EventArgs e)
+		{
+			m_VideoController.SetDisplayInvertMode(tsmiInverted.Checked);
+		}
 	}
 }

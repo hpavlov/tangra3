@@ -4,10 +4,12 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Controller;
 using Tangra.Model.Astro;
 using Tangra.Model.Config;
 using Tangra.Model.Image;
@@ -45,9 +47,13 @@ namespace Tangra.VideoOperations.LightCurves
 	    private bool m_IsEdit;
 		private bool m_AutocenteredApertureAvailable;
 
-        internal frmAddOrEditSingleTarget(int objectId, TrackedObjectConfig selectedObject, LCStateMachine state)
+	    private VideoController m_VideoController;
+
+        internal frmAddOrEditSingleTarget(int objectId, TrackedObjectConfig selectedObject, LCStateMachine state, VideoController videoController)
         {
             InitializeComponent();
+
+            m_VideoController = videoController;
 
 			m_AutocenteredApertureAvailable = true;
 
@@ -104,9 +110,11 @@ namespace Tangra.VideoOperations.LightCurves
         }
 
 
-		internal frmAddOrEditSingleTarget(int objectId, ImagePixel center, PSFFit gaussian, LCStateMachine state)
+        internal frmAddOrEditSingleTarget(int objectId, ImagePixel center, PSFFit gaussian, LCStateMachine state, VideoController videoController)
 		{
 			InitializeComponent();
+
+            m_VideoController = videoController;
 
 			m_AutocenteredApertureAvailable = true;
 
@@ -155,7 +163,7 @@ namespace Tangra.VideoOperations.LightCurves
 #endif
             SelectedFilter = LightCurveReductionContext.Instance.DigitalFilter;
 
-            picTarget1Pixels.Image = new Bitmap(119, 119);
+            picTarget1Pixels.Image = new Bitmap(119, 119, PixelFormat.Format24bppRgb);
             picTarget1PSF.Image = new Bitmap(picTarget1PSF.Width, picTarget1PSF.Height);
 
             if (m_ObjectId == 0)
@@ -451,37 +459,44 @@ namespace Tangra.VideoOperations.LightCurves
 
 				// This copes the pixels to a new array of pixels for displaying. This new array may have slightly different
 				// dimentions (LP) and pixel intensities may be normalized (LPD)
-				for (int x = 0; x < 17; x++)
-					for (int y = 0; y < 17; y++)
-					{
-						byte pixelValue = m_DisplayPixels[x, y];
+                for (int x = 0; x < 17; x++)
+                {
+                    for (int y = 0; y < 17; y++)
+                    {
+                        byte pixelValue = m_DisplayPixels[x, y];
 
-						Color pixelcolor = SystemColors.Control;
+                        Color pixelcolor = SystemColors.Control;
 
-						if (pixelValue < TangraConfig.Settings.Photometry.Saturation.Saturation8Bit)
-						{
-							if (SelectedFilter == TangraConfig.PreProcessingFilter.LowPassDifferenceFilter)
-							{
-								pixelcolor = Color.FromArgb(150 * pixelValue / peak, 150 * pixelValue / peak, 150 * pixelValue / peak);
-							}
+                        if (pixelValue < TangraConfig.Settings.Photometry.Saturation.Saturation8Bit)
+                        {
+                            if (SelectedFilter == TangraConfig.PreProcessingFilter.LowPassDifferenceFilter)
+                            {
+                                pixelcolor = Color.FromArgb(150*pixelValue/peak, 150*pixelValue/peak,
+                                                            150*pixelValue/peak);
+                            }
                             else if (SelectedFilter == TangraConfig.PreProcessingFilter.LowPassFilter)
-							{
-								if (x >= 1 && x < 16 && y >= 1 && y < 16)
-									pixelcolor = Color.FromArgb(pixelValue, pixelValue, pixelValue);
-							}
-							else
-								pixelcolor = Color.FromArgb(pixelValue, pixelValue, pixelValue);
-						}
-						else
-							pixelcolor = TangraConfig.Settings.Color.Saturation;
+                            {
+                                if (x >= 1 && x < 16 && y >= 1 && y < 16)
+                                    pixelcolor = Color.FromArgb(pixelValue, pixelValue, pixelValue);
+                            }
+                            else
+                                pixelcolor = Color.FromArgb(pixelValue, pixelValue, pixelValue);
+                        }
+                        else
+                            pixelcolor = TangraConfig.Settings.Color.Saturation;
 
 
-						for (int dx = 0; dx < 7; dx++)
-							for (int dy = 0; dy < 7; dy++)
-							{
-								bmp.SetPixel(7 * x + dx, 7 * y + dy, pixelcolor);
-							}
-					}
+                        for (int dx = 0; dx < 7; dx++)
+                        {
+                            for (int dy = 0; dy < 7; dy++)
+                            {
+                                bmp.SetPixel(7*x + dx, 7*y + dy, pixelcolor);
+                            }
+                        }
+                    }
+                }
+
+			    m_VideoController.ApplyDisplayModeAdjustments(bmp);
 
 				using (Graphics g = Graphics.FromImage(bmp))
 				{

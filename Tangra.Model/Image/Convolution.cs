@@ -432,5 +432,98 @@ namespace Tangra.Model.Image
 
 			return fieldBitmap;
 		}
+
+		private static float LO_GAMMA = 0.45f;
+		private static float HI_GAMMA = 0.25f;
+
+		private static byte[] LO_GAMMA_TABLE = new byte[256];
+		private static byte[] HI_GAMMA_TABLE= new byte[256];
+
+		static BitmapFilter()
+		{
+			double lowGammaMax = 255.0 / Math.Pow(255, LO_GAMMA);
+			double highGammaMax = 255.0 / Math.Pow(255, HI_GAMMA);
+
+			for (int i = 0; i <= 255; i++)
+			{
+				double lowGammaValue = lowGammaMax * Math.Pow(i, LO_GAMMA);
+				double highGammaValue = highGammaMax * Math.Pow(i, HI_GAMMA);
+
+				LO_GAMMA_TABLE[i] = (byte)Math.Max(0, Math.Min(255, Math.Round(lowGammaValue)));
+				HI_GAMMA_TABLE[i] = (byte)Math.Max(0, Math.Min(255, Math.Round(highGammaValue)));
+			}
+		}
+
+		public static void ApplyGamma(Bitmap bitmap, bool hiGamma, bool invertAfterGamma)
+		{
+			int width = bitmap.Width;
+			int height = bitmap.Height;
+
+            BitmapData bmData = bitmap.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+
+			int stride = bmData.Stride;
+
+			unsafe
+			{
+				byte* p = (byte*)(void*)bmData.Scan0;
+
+				int nOffset = stride - bmData.Width * 3;
+
+				for (int y = 0; y < bmData.Height; ++y)
+				{
+					for (int x = 0; x < bmData.Width; ++x)
+					{
+						p[0] = hiGamma ? HI_GAMMA_TABLE[p[0]] : LO_GAMMA_TABLE[p[0]];
+						p[1] = hiGamma ? HI_GAMMA_TABLE[p[1]] : LO_GAMMA_TABLE[p[1]];
+						p[2] = hiGamma ? HI_GAMMA_TABLE[p[2]] : LO_GAMMA_TABLE[p[2]];
+
+						if (invertAfterGamma)
+						{
+							p[0] = (byte)(255 - p[0]);
+							p[1] = (byte)(255 - p[1]);
+							p[2] = (byte)(255 - p[2]);
+						}
+						p += 3;
+					}
+					p += nOffset;
+				}
+			}
+
+			bitmap.UnlockBits(bmData);
+			
+		}
+
+		public static void Invert(Bitmap bitmap)
+		{
+			int width = bitmap.Width;
+			int height = bitmap.Height;
+
+			BitmapData bmData = bitmap.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+
+			int stride = bmData.Stride;
+
+			unsafe
+			{
+				byte* p = (byte*)(void*)bmData.Scan0;
+
+                int nOffset = stride - bmData.Width * 3;
+
+				for (int y = 0; y < bmData.Height; ++y)
+				{
+					for (int x = 0; x < bmData.Width; ++x)
+					{
+						p[0] = (byte)(255 - p[0]);
+						p[1] = (byte)(255 - p[1]);
+						p[2] = (byte)(255 - p[2]);
+
+                        p += 3;
+					}
+					p += nOffset;
+				}
+			}
+
+			bitmap.UnlockBits(bmData);
+
+		}
 	}
 }

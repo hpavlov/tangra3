@@ -22,6 +22,13 @@ using Tangra.View;
 
 namespace Tangra.Controller
 {
+	public enum DisplayIntensifyMode
+	{
+		Off,
+		Lo,
+		Hi
+	}
+
     public class VideoController : IDisposable, IVideoFrameRenderer, IVideoController
 	{
 		private VideoFileView m_VideoFileView;
@@ -50,6 +57,10 @@ namespace Tangra.Controller
 
 	    private LightCurveController m_LightCurveController;
 	    private frmMain m_MainForm;
+
+		private DisplayIntensifyMode m_DisplayIntensifyMode = DisplayIntensifyMode.Off;
+	    private bool m_DisplayInvertedMode = false;
+
 
         public VideoController(Form mainFormView, VideoFileView videoFileView, ZoomedImageView zoomedImageView, Panel pnlControlerPanel)
 		{
@@ -474,6 +485,8 @@ namespace Tangra.Controller
 
         public void UpdateZoomedImage(Bitmap zoomedBitmap)
         {
+            ApplyDisplayModeAdjustments(zoomedBitmap);
+
             m_ZoomedImageView.UpdateImage(zoomedBitmap);
         }
 
@@ -554,6 +567,9 @@ namespace Tangra.Controller
 		{
 			try
 			{
+				if (currentPixelmap != null)
+                    ApplyDisplayModeAdjustments(currentPixelmap.DisplayBitmap);
+
 				m_WinControl.Invoke(
 					new RenderFrameCallback(m_FrameRenderer.RenderFrame),
 					new object[]
@@ -568,6 +584,42 @@ namespace Tangra.Controller
 			catch (ObjectDisposedException)
 			{ }
 		}
+
+        public void ApplyDisplayModeAdjustments(Bitmap displayBitmap)
+        {
+            if (m_DisplayIntensifyMode != DisplayIntensifyMode.Off || m_DisplayInvertedMode)
+            {
+                // For display purposes only and for 12+ bit videos, we apply display gamma and/or invert when requested by the user
+
+                if (m_DisplayIntensifyMode != DisplayIntensifyMode.Off)
+                    BitmapFilter.ApplyGamma(displayBitmap, m_DisplayIntensifyMode == DisplayIntensifyMode.Hi, m_DisplayInvertedMode);
+                else if (m_DisplayInvertedMode)
+                    BitmapFilter.Invert(displayBitmap);
+            }            
+        }
+
+		public void SetDisplayIntensifyMode(DisplayIntensifyMode newMode)
+		{
+			m_DisplayIntensifyMode = newMode;
+
+			if (!m_FramePlayer.IsRunning &&
+				m_FramePlayer.Video != null)
+			{
+				m_FramePlayer.RefreshCurrentFrame();
+			}
+		}
+
+		public void SetDisplayInvertMode(bool inverted)
+		{
+			m_DisplayInvertedMode = inverted;
+
+			if (!m_FramePlayer.IsRunning &&
+				m_FramePlayer.Video != null)
+			{
+				m_FramePlayer.RefreshCurrentFrame();
+			}			
+		}
+
 
 		public void ToggleAdvStatusForm()
 		{

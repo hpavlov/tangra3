@@ -844,6 +844,8 @@ namespace Tangra.VideoOperations.LightCurves
 
 				using (Bitmap bmpZoom = currentImage.GetZoomImagePixels(m_VideoController.ZoomedCenter.X, m_VideoController.ZoomedCenter.Y, TangraConfig.Settings.Color.Saturation, TangraConfig.Settings.Photometry.Saturation))
 				{
+                    m_VideoController.ApplyDisplayModeAdjustments(bmpZoom);
+
 					gMain.DrawImage(bmpZoom, new PointF(0, 0));
 
 					if (m_Refining)

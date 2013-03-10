@@ -372,7 +372,7 @@ namespace Tangra.VideoOperations.LightCurves
                 {
                     m_StateMachine.VideoOperation.EnsureStackedAstroImage();
 
-                    frmAddOrEditSingleTarget frmAddSingleTarget = new frmAddOrEditSingleTarget(newId, m_StateMachine.SelectedObject, m_StateMachine.SelectedObjectGaussian, m_StateMachine);
+                    frmAddOrEditSingleTarget frmAddSingleTarget = new frmAddOrEditSingleTarget(newId, m_StateMachine.SelectedObject, m_StateMachine.SelectedObjectGaussian, m_StateMachine, m_VideoController);
                     if (frmAddSingleTarget.ShowDialog() == DialogResult.Cancel)
                         return;
 
@@ -405,7 +405,7 @@ namespace Tangra.VideoOperations.LightCurves
 
                 TrackedObjectConfig selectedObject = m_StateMachine.MeasuringStars[m_StateMachine.SelectedMeasuringStar];
                 frmAddOrEditSingleTarget frmAddSingleTarget =
-                    new frmAddOrEditSingleTarget(m_StateMachine.SelectedMeasuringStar, selectedObject, m_StateMachine);
+                    new frmAddOrEditSingleTarget(m_StateMachine.SelectedMeasuringStar, selectedObject, m_StateMachine, m_VideoController);
 
                 DialogResult result = frmAddSingleTarget.ShowDialog();
                 if (result == DialogResult.Cancel)
