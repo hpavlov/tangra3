@@ -326,6 +326,13 @@ void AdvImageLayout::GetDataFromDataBytes(enum GetByteMode mode, unsigned char* 
 		else
 			GetPixelsFrom16BitByteArrayRawLayout(layoutData, prevFrame, pixels, &readIndex, &crcOkay);
 	}
+	else if (Bpp == 8)
+	{
+		if (IsDiffCorrLayout)
+			GetPixelsFrom8BitByteArrayDiffCorrLayout(layoutData, prevFrame, pixels, &readIndex, &crcOkay);
+		else
+			GetPixelsFrom8BitByteArrayRawLayout(layoutData, prevFrame, pixels, &readIndex, &crcOkay);
+	}
 
 	//return new AdvImageData()
 	//{
@@ -333,6 +340,43 @@ void AdvImageLayout::GetDataFromDataBytes(enum GetByteMode mode, unsigned char* 
 	//	CRCOkay = crcOkay,
 	//	Bpp = BitsPerPixel
 	//};
+}
+void AdvImageLayout::GetPixelsFrom8BitByteArrayDiffCorrLayout(unsigned char* layoutData, unsigned long* prevFrame, unsigned long* pixelsOut, int* readIndex, bool* crcOkay)
+{
+    return;
+}
+
+void AdvImageLayout::GetPixelsFrom8BitByteArrayRawLayout(unsigned char* layoutData, unsigned long* prevFrame, unsigned long* pixelsOut, int* readIndex, bool* crcOkay)
+{
+	if (DataBpp == 8)
+	{		
+		unsigned long* pPixelsOut = pixelsOut;
+		for (int y = 0; y < Height; ++y)
+		{
+			for (int x = 0; x < Width; ++x)
+			{
+				unsigned char bt1 = *layoutData;
+				layoutData++;
+					
+				*pPixelsOut = (unsigned short)bt1;
+				pPixelsOut++;
+			}
+		}
+
+		*readIndex += Height * Width;
+	}
+	
+	if (m_ImageSection->UsesCRC)
+	{
+		unsigned int savedFrameCrc = (unsigned int)(*layoutData + (*(layoutData + 1) << 8) + (*(layoutData + 2) << 16) + (*(layoutData + 3) << 24));
+		*readIndex += 4;
+
+		// TODO: Convert the 32bit array to 16bit and pass it for CRC computation
+		//unsigned int crc3 = ComputePixelsCRC32(pixelsOut);
+		//*crcOkay = crc3 == savedFrameCrc;
+	}
+	else
+		*crcOkay = true;
 }
 
 void AdvImageLayout::GetPixelsFrom16BitByteArrayRawLayout(unsigned char* layoutData, unsigned long* prevFrame, unsigned long* pixelsOut, int* readIndex, bool* crcOkay)

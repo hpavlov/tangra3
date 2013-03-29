@@ -51,6 +51,18 @@ HRESULT ADVCloseFile()
 	return S_OK;
 }
 
+HRESULT ADVCropFile(char* newfileName, int firstFrameId, int lastFrameId)
+{
+	if (firstFrameId >= 0 && 
+		lastFrameId <= g_TangraAdvFile->TotalNumberOfFrames && 
+		firstFrameId <= lastFrameId)
+    {
+		g_TangraAdvFile->CropFile(newfileName, firstFrameId, lastFrameId);
+	}
+	
+	return S_OK;
+}
+
 /*
 HRESULT ADVGetFrame(int frameNo, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, AdvLib::AdvFrameInfo* frameInfo)
 {

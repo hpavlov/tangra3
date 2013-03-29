@@ -141,7 +141,7 @@ xcopy "$(ProjectDir)lib\$(Configuration)\TangraCore.dll" "$(SolutionDir)Tangra 3
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>.\lib\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\lib\Release;D:\Program Files\Microsoft SDKs\Windows\v6.0\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Vfw32.lib;Strmiids.lib;TangraCoredll.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>TangraVideo.def</ModuleDefinitionFile>
     </Link>
