@@ -12,6 +12,11 @@ namespace Tangra.Video.AstroDigitalVideo
 		object GetDataFromDataBytes(byte[] bytes, ushort[,] prevImageData, int size, int startIndex);
     }
 
+	public interface IAdvDataSectionWriter
+	{
+		void WriteSectionHeader(BinaryWriter writer);
+	}
+
     public static class Extensions
     {
         public static void WriteAsciiString256(this BinaryWriter writer, string strData)

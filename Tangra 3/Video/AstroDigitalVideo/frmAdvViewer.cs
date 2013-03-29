@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Helpers;
 using Tangra.Model.Image;
 using Tangra.Video.AstroDigitalVideo.UI;
 
@@ -94,6 +95,11 @@ namespace Tangra.Video.AstroDigitalVideo
 			}
 
 			sbFrames.Maximum = (int)m_AdvFile.NumberOfFrames - 1;
+			nudCropFirstFrame.Maximum = (int)m_AdvFile.NumberOfFrames - 1;
+			nudCropFirstFrame.Value = 0;
+			nudCropLastFrame.Maximum = (int)m_AdvFile.NumberOfFrames - 1;
+			nudCropLastFrame.Value = nudCropLastFrame.Maximum;
+
 			LoadFrame(0);
 		}
 
@@ -321,5 +327,26 @@ namespace Tangra.Video.AstroDigitalVideo
 			lblFrameLayout.Text = string.Format("#{0} - {1}", m_CurrentImageData.LayoutId, m_CurrentImageData.ByteMode);
 			lblDataBlockSize.Text = string.Format("{0} bytes", m_CurrentImageData.DataBlocksBytesCount.ToString("#,###,###,###"));
 		}
-	}
+
+		private void btnCropADV_Click(object sender, EventArgs e)
+		{
+			if (nudCropLastFrame.Value < nudCropFirstFrame.Value)
+			{
+				MessageBox.Show(
+					this, 
+					"The last frame cannot be 'before' the first frame.", 
+					"Tangra", 
+					MessageBoxButtons.OK, 
+					MessageBoxIcon.Error);
+
+				nudCropLastFrame.Focus();
+				return;
+			}
+
+			if (saveFileDialog.ShowDialog(this) == DialogResult.OK)
+			{
+				m_AdvFile.CropAdvFile(saveFileDialog.FileName, (int) nudCropFirstFrame.Value, (int) nudCropLastFrame.Value);
+			}
+		}
+	}	
 }

@@ -218,9 +218,11 @@ namespace Tangra.Video.AstroDigitalVideo
 				for (int x = 0; x < Width; x++)
 				{
 					pixels[x + y * Width] = imageData.ImageData[x, y];
-					if (BitsPerPixel == 12)
+                    if (BitsPerPixel == 8)
+                        displayBitmapBytes[x + y * Width] = (byte)((imageData.ImageData[x, y] & 0xFF));
+					else if (BitsPerPixel == 12)
 						displayBitmapBytes[x + y * Width] = (byte)((imageData.ImageData[x, y] >> 4));
-					if (BitsPerPixel == 14)
+					else if (BitsPerPixel == 14)
 						displayBitmapBytes[x + y * Width] = (byte)((imageData.ImageData[x, y] >> 6));
 					else if (BitsPerPixel == 16)
 						displayBitmapBytes[x + y * Width] = (byte)((imageData.ImageData[x, y] >> 8));

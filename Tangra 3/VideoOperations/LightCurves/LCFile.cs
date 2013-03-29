@@ -858,6 +858,8 @@ namespace Tangra.VideoOperations.LightCurves
             return Empty.Equals(compareTo);
         }
 
+	    private static long MISSING_TIMESTAMP_TICKS = 633979008000000000;
+
     	public LCFile LcFile;
 
         internal uint MinFrame;
@@ -960,27 +962,94 @@ namespace Tangra.VideoOperations.LightCurves
             else
                 return FirstTimedFrameTime;
         }
-
-		internal DateTime GetTimeForFrameFromFrameTiming(double frameNo)
+		
+		internal DateTime GetTimeForFrameFromFrameTiming(double frameNo, bool interpolateMissingTimestamps)
 		{
+			DateTime rv;
 			int frameTimingIndex = (int) (frameNo - MinFrame);
 
 			if (LcFile != null && LcFile.FrameTiming != null && LcFile.FrameTiming.Count > 0)
 			{
 				if (frameTimingIndex >= 0 && frameTimingIndex < LcFile.FrameTiming.Count)
-					return LcFile.FrameTiming[frameTimingIndex].FrameMidTime;
+					rv = LcFile.FrameTiming[frameTimingIndex].FrameMidTime;
 				else if (frameTimingIndex < 0)
-					return LcFile.FrameTiming[0].FrameMidTime;
+					rv = LcFile.FrameTiming[0].FrameMidTime;
 				else if (frameTimingIndex < LcFile.FrameTiming.Count)
-					return LcFile.FrameTiming[LcFile.FrameTiming.Count - 1].FrameMidTime;
+					rv = LcFile.FrameTiming[LcFile.FrameTiming.Count - 1].FrameMidTime;
 				else
-					return LcFile.FrameTiming[0].FrameMidTime;
+					rv = LcFile.FrameTiming[0].FrameMidTime;
+
+				if (interpolateMissingTimestamps && rv.Ticks == MISSING_TIMESTAMP_TICKS)
+					rv = GetInterpolatedTimeForFrameFromFrameTiming(frameNo);
 			}
 			else
-				return FirstTimedFrameTime;
+				rv = FirstTimedFrameTime;
+
+			return rv;
 		}
 
-        internal uint GetFrameNumberForFrameTicksFromFrameTiming(long ticks)
+	    private DateTime GetInterpolatedTimeForFrameFromFrameTiming(double frameNo)
+	    {
+			int frameTimingIndex = (int)(frameNo - MinFrame);
+		    long referenceFrameTicks = 0;
+			int referenceFrameNo = 0;
+			long referenceFrameDurationInTicks = 0;
+			long interpolatedTicks = MISSING_TIMESTAMP_TICKS;
+
+			// Look for a frame with a timestamp going forward
+		    int nextFrameWithTimeStamp = frameTimingIndex + 1;
+			while (nextFrameWithTimeStamp <= LcFile.FrameTiming.Count)
+			{
+				long ticks = LcFile.FrameTiming[nextFrameWithTimeStamp].FrameMidTime.Ticks;
+				if (ticks != MISSING_TIMESTAMP_TICKS)
+				{
+					if (referenceFrameTicks == 0)
+					{
+						referenceFrameTicks = ticks;
+						referenceFrameNo = nextFrameWithTimeStamp;
+						referenceFrameDurationInTicks = LcFile.FrameTiming[nextFrameWithTimeStamp].FrameDurationInMilliseconds * 10000;
+						break;
+					}
+				}
+
+				nextFrameWithTimeStamp++;
+			}
+
+			if (referenceFrameTicks != 0)
+			{
+				interpolatedTicks = referenceFrameTicks - (referenceFrameNo - frameTimingIndex) * referenceFrameDurationInTicks;
+			}
+			else
+			{
+				// Try to find a time reference backward
+				nextFrameWithTimeStamp = frameTimingIndex - 1;
+				while (nextFrameWithTimeStamp >= 0)
+				{
+					long ticks = LcFile.FrameTiming[nextFrameWithTimeStamp].FrameMidTime.Ticks;
+					if (ticks != MISSING_TIMESTAMP_TICKS)
+					{
+						if (referenceFrameTicks == 0)
+						{
+							referenceFrameTicks = ticks;
+							referenceFrameNo = nextFrameWithTimeStamp;
+							referenceFrameDurationInTicks = LcFile.FrameTiming[nextFrameWithTimeStamp].FrameDurationInMilliseconds * 10000;
+							break;
+						}
+					}
+
+					nextFrameWithTimeStamp--;
+				}
+
+				if (referenceFrameTicks != 0)
+				{
+					interpolatedTicks = referenceFrameTicks + (frameTimingIndex - referenceFrameNo) * referenceFrameDurationInTicks;	
+				}
+			}
+
+		    return new DateTime(interpolatedTicks);
+	    }
+
+	    internal uint GetFrameNumberForFrameTicksFromFrameTiming(long ticks)
         {
             for (int i = 0; i < LcFile.FrameTiming.Count; i++)
             {
@@ -989,8 +1058,46 @@ namespace Tangra.VideoOperations.LightCurves
 					? LcFile.FrameTiming[i + 1].FrameMidTime.AddMilliseconds(LcFile.FrameTiming[i + 1].FrameDurationInMilliseconds / -2.0).Ticks
 					: LcFile.FrameTiming[i].FrameMidTime.AddMilliseconds(LcFile.FrameTiming[i].FrameDurationInMilliseconds / 2.0).Ticks;
 
-                if (startTicks1 <= ticks && ticks < startTicks2)
-                    return (uint)i + MinFrame;
+	            if (startTicks1 <= ticks && ticks < startTicks2)
+	            {
+					if (startTicks1 == MISSING_TIMESTAMP_TICKS && startTicks2 != MISSING_TIMESTAMP_TICKS && i + 1 != LcFile.FrameTiming.Count)
+					{
+						// If this frame has a missing time, then we may have got the wrong frame
+						int prevTimedFrameId = i;
+						while (prevTimedFrameId > 0 && 
+								(
+									LcFile.FrameTiming[prevTimedFrameId].FrameMidTime.Ticks == MISSING_TIMESTAMP_TICKS || 
+									LcFile.FrameTiming[prevTimedFrameId].FrameMidTime.Ticks > ticks
+								)
+							)
+						{
+							prevTimedFrameId--;
+						}
+
+						int minFrameId = i;
+						long minDiff = long.MaxValue;
+						 
+						int durStart = LcFile.FrameTiming[prevTimedFrameId].FrameDurationInMilliseconds * 10000;
+						long ticksStart = LcFile.FrameTiming[prevTimedFrameId].FrameMidTime.Ticks;
+
+						for (int j = prevTimedFrameId; j <= i + 1; j++)
+						{
+							if (j >= 0 && j + 1 < LcFile.FrameTiming.Count)
+							{
+								long diff = Math.Abs(ticksStart + (j - prevTimedFrameId)*durStart - ticks);
+								if (diff < minDiff)
+								{
+									minDiff = diff;
+									minFrameId = j;
+								}
+							}
+						}
+
+						return (uint)minFrameId + MinFrame;
+					} 
+					
+					return (uint) i + MinFrame;
+	            }
             }
 
 			if (ticks > LcFile.FrameTiming[LcFile.FrameTiming.Count - 1].FrameMidTime.AddMilliseconds(LcFile.FrameTiming[LcFile.FrameTiming.Count - 1].FrameDurationInMilliseconds / -2.0).Ticks)

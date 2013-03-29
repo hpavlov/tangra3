@@ -203,6 +203,10 @@ namespace Tangra.PInvoke
 		public static extern int ADVGetFrameStatusChannel(int frameNo, [In, Out] AdvFrameInfoNative frameInfo, [In, Out] byte[] gpsFix, [In, Out] byte[] userCommand, [In, Out] byte[] systemError);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+		//HRESULT ADVCropFile(char* newfileName, int firstFrameId, int lastFrameId);
+		public static extern int ADVCropFile(string newfileName, int firstFrameId, int lastFrameId);
+
+		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
 		//HRESULT GetVersion();
 		private static extern int GetProductVersion();
 

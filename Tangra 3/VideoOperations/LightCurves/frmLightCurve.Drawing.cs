@@ -126,8 +126,8 @@ namespace Tangra.VideoOperations.LightCurves
 				m_MinDisplayedFrame = Math.Max(m_MinDisplayedFrame, m_Header.MinFrame);
 				m_MaxDisplayedFrame = Math.Min((uint)(m_MinDisplayedFrame + totalWidth / m_ZoomLevel), m_Header.MaxFrame);
 
-				m_MinDisplayedFrameTimestampTicks = m_Header.GetTimeForFrameFromFrameTiming(m_MinDisplayedFrame).Ticks;
-				m_MaxDisplayedFrameTimestampTicks = m_Header.GetTimeForFrameFromFrameTiming(m_MaxDisplayedFrame).Ticks;
+				m_MinDisplayedFrameTimestampTicks = m_Header.GetTimeForFrameFromFrameTiming(m_MinDisplayedFrame, true).Ticks;
+				m_MaxDisplayedFrameTimestampTicks = m_Header.GetTimeForFrameFromFrameTiming(m_MaxDisplayedFrame, true).Ticks;
 
 				//Trace.WriteLine(string.Format("Drawing frames {0} to {1} ({2} frames total)", m_MinDisplayedFrame, m_MaxDisplayedFrame, m_MaxDisplayedFrame - m_MinDisplayedFrame));
 
@@ -235,7 +235,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 								if (drawThisReading && !readingIsOffScreen)
 								{
-									long currFrameTimestampTicks = m_Header.GetTimeForFrameFromFrameTiming((int) reading.CurrFrameNo).Ticks;
+									long currFrameTimestampTicks = m_Header.GetTimeForFrameFromFrameTiming((int) reading.CurrFrameNo, true).Ticks;
 									float x = m_MinX + (currFrameTimestampTicks - m_MinDisplayedFrameTimestampTicks) * m_TimestampScaleX;
 
 									float y = pnlChart.Height - (m_MinY + (adjustedReading - (int)m_Header.MinAdjustedReading) * yScale);
@@ -488,7 +488,7 @@ namespace Tangra.VideoOperations.LightCurves
 					string label = i.ToString();
 					SizeF labelSize = g.MeasureString(label, s_AxisFont);
 
-					long currAxisPosTicks = m_Header.GetTimeForFrameFromFrameTiming(i).Ticks;
+					long currAxisPosTicks = m_Header.GetTimeForFrameFromFrameTiming(i, true).Ticks;
 					float x = m_MinX + (currAxisPosTicks - m_MinDisplayedFrameTimestampTicks) * m_TimestampScaleX;
 					float y = m_MaxY + 5;
 
@@ -736,7 +736,7 @@ namespace Tangra.VideoOperations.LightCurves
                         {
 							if (m_Header.TimingType == MeasurementTimingType.EmbeddedTimeForEachFrame)
 							{
-								long currFrameTimestampTicks = m_Header.GetTimeForFrameFromFrameTiming((int)reading.CurrFrameNo).Ticks;
+								long currFrameTimestampTicks = m_Header.GetTimeForFrameFromFrameTiming((int)reading.CurrFrameNo, true).Ticks;
 								x = m_MinX + (currFrameTimestampTicks - m_MinDisplayedFrameTimestampTicks) * m_TimestampScaleX;
 							}
 							else
@@ -777,7 +777,7 @@ namespace Tangra.VideoOperations.LightCurves
 						
 						if (m_Header.TimingType == MeasurementTimingType.EmbeddedTimeForEachFrame)
 						{
-							long currFrameTimestampTicks = m_Header.GetTimeForFrameFromFrameTiming((int)m_AllReadings[0][id].CurrFrameNo).Ticks;
+							long currFrameTimestampTicks = m_Header.GetTimeForFrameFromFrameTiming((int)m_AllReadings[0][id].CurrFrameNo, true).Ticks;
 							x = m_MinX + (currFrameTimestampTicks - m_MinDisplayedFrameTimestampTicks) * m_TimestampScaleX;
 						}
 						else

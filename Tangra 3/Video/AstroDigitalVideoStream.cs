@@ -27,6 +27,7 @@ namespace Tangra.Video
         public string HtccFirmareVersion;
         public string Camera;
         public string SensorInfo;
+        public string Engine;
     }
 
 	public class AstroDigitalVideoStream : IFrameStream
@@ -39,13 +40,13 @@ namespace Tangra.Video
 			{
 				var rv = new AstroDigitalVideoStream(fileName, ref equipmentInfo);
 
-                TangraContext.Current.RenderingEngine = "AstroDigitalVideo";
+                TangraContext.Current.RenderingEngine = equipmentInfo.Engine == "AAV" ? "AstroAnalogueVideo" : "AstroDigitalVideo";
 
 			    return rv;
 			}
 			catch(ADVFormatException ex)
 			{
-				MessageBox.Show(ex.Message, "Error opening ADV file", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				MessageBox.Show(ex.Message, "Error opening ADV/AAV file", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 
 			return null;
@@ -61,6 +62,7 @@ namespace Tangra.Video
 
 		private int m_BitPix;
 		private bool m_FileOpened;
+	    private string m_Engine;
 
 		private int m_AlmanacOffsetLastFrame;
 		private bool m_AlamanacOffsetLastFrameIsGood;
@@ -100,8 +102,9 @@ namespace Tangra.Video
 				m_AlmanacOffsetLastFrame = 0;
 			}
 
+		    m_Engine = equipmentInfo.Engine;
 
-			m_FileOpened = true;			
+			m_FileOpened = true;
 		}
 
 		public string FileName
@@ -224,7 +227,7 @@ namespace Tangra.Video
 
 		public string VideoFileType
 		{
-			get { return string.Format("ADV.{0}", BitPix); }
+            get { return string.Format("{0}.{1}", m_Engine, BitPix); }
 		}
 
 		private FrameStateData GetCurrentFrameState()
@@ -299,9 +302,11 @@ namespace Tangra.Video
 			}
 		}
 
+	    private string engine = null;
+
 		public string Engine
 		{
-			get { return "ADV"; }
+            get { return engine; }
 		}
 
         private void CheckAdvFileFormat(string fileName, ref AdvEquipmentInfo equipmentInfo)
@@ -311,10 +316,17 @@ namespace Tangra.Video
 			CheckAdvFileFormatInternal(advFile);
 
             equipmentInfo.Recorder = advFile.AdvFileTags["RECORDER"];
-            equipmentInfo.AdvrVersion = advFile.AdvFileTags["ADVR-SOFTWARE-VERSION"];
-            equipmentInfo.HtccFirmareVersion = advFile.AdvFileTags["HTCC-FIRMWARE-VERSION"];
             equipmentInfo.Camera = advFile.AdvFileTags["CAMERA-MODEL"];
-            equipmentInfo.SensorInfo = advFile.AdvFileTags["CAMERA-SENSOR-INFO"];
+            equipmentInfo.Engine = advFile.AdvFileTags["FSTF-TYPE"];
+
+            engine = equipmentInfo.Engine;
+
+            if (engine == "ADV")
+            {
+                equipmentInfo.AdvrVersion = advFile.AdvFileTags["ADVR-SOFTWARE-VERSION"];
+                equipmentInfo.HtccFirmareVersion = advFile.AdvFileTags["HTCC-FIRMWARE-VERSION"];
+                equipmentInfo.SensorInfo = advFile.AdvFileTags["CAMERA-SENSOR-INFO"];
+            }
 		}
 
 		private void CheckAdvFileFormatInternal(AdvFile advFile)
@@ -325,13 +337,13 @@ namespace Tangra.Video
 			DoConsistencyCheck(advFile, ref fileIsCorrupted, ref isADVFormat, ref advFormatVersion);
 
 			if (!isADVFormat)
-				throw new ADVFormatException("The file is not in ADV format.");
+				throw new ADVFormatException("The file is not in ADV/AAV format.");
 
 			if (advFormatVersion > 1)
-				throw new ADVFormatException("The file ADV version is not supported yet.");
+                throw new ADVFormatException("The file ADV/AAV version is not supported yet.");
 
 			if (fileIsCorrupted)
-				throw new ADVFormatException("The ADV file may be corrupted.\r\n\r\nTry to recover it from Tools -> ADV Tools -> Repair ADV File");
+                throw new ADVFormatException("The ADV/AAV file may be corrupted.\r\n\r\nTry to recover it from Tools -> ADV Tools -> Repair ADV File");
 		}
 
 		private void DoConsistencyCheck(AdvFile advFile, ref bool fileIsCorrupted, ref bool isADVFormat, ref int advFormatVersion)
@@ -342,14 +354,26 @@ namespace Tangra.Video
 			if (!advFile.AdvFileTags.TryGetValue("FSTF-TYPE", out fstsTypeStr))
 				isADVFormat = false;
 			else
-				isADVFormat = fstsTypeStr == "ADV";
+                isADVFormat = fstsTypeStr == "ADV" || fstsTypeStr == "AAV";
 
-			string advVersionStr;
-			if (!advFile.AdvFileTags.TryGetValue("ADV-VERSION", out advVersionStr))
-				advFormatVersion = -1;
-			else
-				if (!int.TryParse(advVersionStr, out advFormatVersion))
-					advFormatVersion = -1;
+            if (fstsTypeStr == "ADV")
+            {
+                string advVersionStr;
+                if (!advFile.AdvFileTags.TryGetValue("ADV-VERSION", out advVersionStr))
+                    advFormatVersion = -1;
+                else
+                    if (!int.TryParse(advVersionStr, out advFormatVersion))
+                        advFormatVersion = -1;                
+            }
+            else if (fstsTypeStr == "AAV")
+            {
+                string advVersionStr;
+                if (!advFile.AdvFileTags.TryGetValue("AAV-VERSION", out advVersionStr))
+                    advFormatVersion = -1;
+                else
+                    if (!int.TryParse(advVersionStr, out advFormatVersion))
+                        advFormatVersion = -1;                
+            }
 		}
 	}
 }

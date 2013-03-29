@@ -149,6 +149,13 @@ namespace Tangra.Video.AstroDigitalVideo
 				else
 					imageData = GetPixelsFrom16BitByteArrayDiffCorrLayout(bytes, prevImageData, ref readIndex, out crcOkay);
 			}
+            else if (BitsPerPixel == 8)
+            {
+                if (m_IsRawDataLayout)
+                    imageData = GetPixelsFrom8BitByteArrayRawLayout(bytes, prevImageData, ref readIndex, out crcOkay);
+                else
+                    imageData = GetPixelsFrom8BitByteArrayDiffCorrLayout(bytes, prevImageData, ref readIndex, out crcOkay);
+            }
 			else
 				throw new NotSupportedException();
 
@@ -257,7 +264,44 @@ namespace Tangra.Video.AstroDigitalVideo
 
 		}
 
-		private ushort[,] GetPixelsFrom16BitByteArrayRawLayout(byte[] bytes, ushort[,] prevFramePixels, ref int idx, out bool crcOkay)
+        private ushort[,] GetPixelsFrom8BitByteArrayRawLayout(byte[] bytes, ushort[,] prevFramePixels, ref int idx, out bool crcOkay)
+        {
+			var rv = new ushort[Width, Height];
+
+            if (this.m_ImageSection.BitsPerPixel != 8)
+                throw new InvalidOperationException();
+			
+			for (int y = 0; y < Height; ++y)
+			{
+				for (int x = 0; x < Width; ++x)
+				{
+					byte bt1 = bytes[idx];
+					idx++;
+
+                    rv[x, y] = (ushort)bt1;
+				}
+			}
+
+			if (m_UsesCRC)
+			{
+				uint savedFrameCrc = (uint)(bytes[idx] + (bytes[idx + 1] << 8) + (bytes[idx + 2] << 16) + (bytes[idx + 3] << 24));
+				idx += 4;
+
+				uint crc3 = ComputePixelsCRC(rv);
+				crcOkay = crc3 == savedFrameCrc;
+			}
+			else
+				crcOkay = true;
+
+			return rv;
+        }
+
+        private ushort[,] GetPixelsFrom8BitByteArrayDiffCorrLayout(byte[] bytes, ushort[,] prevFramePixels, ref int idx, out bool crcOkay)
+        {
+            throw new NotImplementedException();
+        }
+
+	    private ushort[,] GetPixelsFrom16BitByteArrayRawLayout(byte[] bytes, ushort[,] prevFramePixels, ref int idx, out bool crcOkay)
 		{
 			bool isLittleEndian = m_ImageSection.ByteOrder == AdvImageSection.ImageByteOrder.LittleEndian;
 

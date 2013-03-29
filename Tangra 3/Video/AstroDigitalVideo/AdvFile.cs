@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
+using Tangra.Helpers;
 
 namespace Tangra.Video.AstroDigitalVideo
 {
@@ -49,7 +50,7 @@ namespace Tangra.Video.AstroDigitalVideo
 				m_DataLayout = propVal;							
 		}
 
-        public static AdvFile OpenFile(string fileName)
+	    public static AdvFile OpenFile(string fileName)
         {
         	FileStream inputFile = new FileStream(fileName, FileMode.Open, FileAccess.Read);
         	BinaryReader fileReader = new BinaryReader(inputFile);
@@ -448,5 +449,11 @@ namespace Tangra.Video.AstroDigitalVideo
 				fs.Flush();
 			}
 		}
+
+	    internal bool CropAdvFile(string fileName, int firstFrame, int lastFrame)
+	    {
+			
+		    return false;
+	    }
     }
 }

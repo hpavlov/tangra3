@@ -135,7 +135,7 @@ namespace Tangra.Controller
 				{
 					IFrameStream frameStream = null;
 
-					if (fileExtension == ".adv")
+                    if (fileExtension == ".adv" || fileExtension == ".aav")
 					{
 						AdvEquipmentInfo equipmentInfo;
 						frameStream = AstroDigitalVideoStream.OpenFile(fileName, out equipmentInfo);
