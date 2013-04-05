@@ -153,203 +153,38 @@ namespace Tangra.VideoOperations.LightCurves
 
             m_EllapsedTime.Start();
 
-            //if (TangraConfig.ProcessorCount > 1)
-            //{
-            //    MeasurementsHelper[] helpers = new MeasurementsHelper[4] { measurer.Clone(), measurer.Clone(), measurer.Clone(), measurer.Clone() };
+            measurer.GetImagePixelsCallback += new MeasurementsHelper.GetImagePixelsDelegate(measurer_GetImagePixelsCallback);
 
-            //    helpers[0].GetImagePixelsCallback += new MeasurementsHelper.GetImagePixelsDelegate(measurer_GetImagePixelsCallback1);
-            //    helpers[1].GetImagePixelsCallback += new MeasurementsHelper.GetImagePixelsDelegate(measurer_GetImagePixelsCallback2);
-            //    helpers[2].GetImagePixelsCallback += new MeasurementsHelper.GetImagePixelsDelegate(measurer_GetImagePixelsCallback3);
-            //    helpers[3].GetImagePixelsCallback += new MeasurementsHelper.GetImagePixelsDelegate(measurer_GetImagePixelsCallback4);
+            int refreshCount = m_RefreshProgressEveryHowManyItems;
 
-            //    // We always used parallel computing if there are more than 1 CPU as this part was proven to work better in parallel
-            //    Parallel.Invoke(
-            //         delegate()
-            //         {
-            //             int processedCount = 0;
-            //             int refreshCount = m_RefreshProgressEveryHowManyItems;
-
-            //             if (Header.ObjectCount > 0)
-            //             {
-            //                 m_MutiCPULock.Enter();
-            //                 List<LCMeasurement> localWorkReadings = workReadings[0];
-            //                 m_MutiCPULock.Exit();
-
-            //                 if (AllReadings[0] != null)
-            //                 {
-            //                     LCMeasurement[] currReadings = AllReadings[0].ToArray();
-
-            //                     foreach (LCMeasurement reading in currReadings)
-            //                     {
-            //                         if (m_CancelExecution)
-            //                             return;
-
-            //                         localWorkReadings.Add(ProcessSingleUnit(
-            //                             reading, useLowPass, useLowPassDiff, Context.ReProcessFitAreas[0],
-            //                             Context.ReProcessApertures[0], Header.FixedApertureFlags[0], helpers[0]));
-            //                         processedCount++;
-
-            //                         if (processedCount % refreshCount == 0)
-            //                         {
-            //                             Invoke(new ProgressDelegate(OnProgress), 0, processedCount);
-            //                         }
-            //                     }
-            //                 }
-
-            //                 m_MutiCPULock.Enter();
-            //                 workReadings[0] = localWorkReadings;
-            //                 m_MutiCPULock.Exit();
-            //             }
-            //         },
-
-            //         delegate()
-            //         {
-            //             int processedCount = 0;
-            //             int refreshCount = m_RefreshProgressEveryHowManyItems;
-
-            //             m_MutiCPULock.Enter();
-            //             List<LCMeasurement> localWorkReadings = workReadings[1];
-            //             m_MutiCPULock.Exit();
-
-            //             if (Header.ObjectCount > 0)
-            //             {
-            //                 if (AllReadings[1] != null)
-            //                 {
-            //                     LCMeasurement[] currReadings = AllReadings[1].ToArray();
-
-            //                     foreach (LCMeasurement reading in currReadings)
-            //                     {
-            //                         if (m_CancelExecution)
-            //                             return;
-
-            //                         localWorkReadings.Add(ProcessSingleUnit(
-            //                             reading, useLowPass, useLowPassDiff, Context.ReProcessFitAreas[1],
-            //                             Context.ReProcessApertures[1], Header.FixedApertureFlags[1], helpers[1]));
-            //                         processedCount++;
-
-            //                         if (processedCount % refreshCount == 0)
-            //                         {
-            //                             Invoke(new ProgressDelegate(OnProgress), 1, processedCount);
-            //                         }
-            //                     }
-            //                 }
-            //             }
-
-            //             m_MutiCPULock.Enter();
-            //             workReadings[1] = localWorkReadings;
-            //             m_MutiCPULock.Exit();
-            //         },
-
-            //         delegate()
-            //         {
-            //             m_MutiCPULock.Enter();
-            //             List<LCMeasurement> localWorkReadings = workReadings[2];
-            //             m_MutiCPULock.Exit();
-
-            //             if (Header.ObjectCount > 0)
-            //             {
-            //                 int processedCount = 0;
-            //                 int refreshCount = m_RefreshProgressEveryHowManyItems;
-            //                 if (AllReadings[2] != null)
-            //                 {
-            //                     LCMeasurement[] currReadings = AllReadings[2].ToArray();
-
-            //                     foreach (LCMeasurement reading in currReadings)
-            //                     {
-            //                         if (m_CancelExecution)
-            //                             return;
-
-            //                         localWorkReadings.Add(ProcessSingleUnit(
-            //                             reading, useLowPass, useLowPassDiff, Context.ReProcessFitAreas[2],
-            //                             Context.ReProcessApertures[2], Header.FixedApertureFlags[2], helpers[2]));
-            //                         processedCount++;
-
-            //                         if (processedCount % refreshCount == 0)
-            //                         {
-            //                             Invoke(new ProgressDelegate(OnProgress), 2, processedCount);
-            //                         }
-            //                     }
-            //                 }
-            //             }
-
-            //             m_MutiCPULock.Enter();
-            //             workReadings[2] = localWorkReadings;
-            //             m_MutiCPULock.Exit();
-            //         },
-
-            //         delegate()
-            //         {
-            //             m_MutiCPULock.Enter();
-            //             List<LCMeasurement> localWorkReadings = workReadings[3];
-            //             m_MutiCPULock.Exit();
-
-            //             if (Header.ObjectCount > 0)
-            //             {
-            //                 int processedCount = 0;
-            //                 int refreshCount = m_RefreshProgressEveryHowManyItems;
-
-            //                 if (AllReadings[3] != null)
-            //                 {
-            //                     LCMeasurement[] currReadings = AllReadings[3].ToArray();
-
-            //                     foreach (LCMeasurement reading in currReadings)
-            //                     {
-            //                         if (m_CancelExecution)
-            //                             return;
-
-            //                         localWorkReadings.Add(ProcessSingleUnit(
-            //                             reading, useLowPass, useLowPassDiff, Context.ReProcessFitAreas[3],
-            //                             Context.ReProcessApertures[3], Header.FixedApertureFlags[3], helpers[3]));
-            //                         processedCount++;
-
-            //                         if (processedCount % refreshCount == 0)
-            //                         {
-            //                             Invoke(new ProgressDelegate(OnProgress), 3, processedCount);
-            //                         }
-            //                     }
-            //                 }
-            //             }
-
-            //             m_MutiCPULock.Enter();
-            //             workReadings[3] = localWorkReadings;
-            //             m_MutiCPULock.Exit();
-            //         });
-            //}
-            //else
-            //{
-                measurer.GetImagePixelsCallback += new MeasurementsHelper.GetImagePixelsDelegate(measurer_GetImagePixelsCallback);
-
-                int refreshCount = m_RefreshProgressEveryHowManyItems;
-
-                for (int i = 0; i < Header.ObjectCount; i++)
+            for (int i = 0; i < Header.ObjectCount; i++)
+            {
+                if (AllReadings[i] != null)
                 {
-                    if (AllReadings[i] != null)
+                    LCMeasurement[] currReadings = AllReadings[i].ToArray();
+                    int processedCount = 0;
+
+                    foreach (LCMeasurement reading in currReadings)
                     {
-                        LCMeasurement[] currReadings = AllReadings[i].ToArray();
-                        int processedCount = 0;
-
-                        foreach (LCMeasurement reading in currReadings)
+                        if (m_CancelExecution)
                         {
-                            if (m_CancelExecution)
-                            {
-                                Invoke(new MethodInvoker(Cancelled));
-                                return;
-                            }
+                            Invoke(new MethodInvoker(Cancelled));
+                            return;
+                        }
 
-                            workReadings[i].Add(ProcessSingleUnit(
-                                reading, useLowPass, useLowPassDiff,
-                                Context.ReProcessFitAreas[i], Context.ReProcessApertures[i], Header.FixedApertureFlags[i],
-                                measurer));
-                            processedCount++;
+                        workReadings[i].Add(ProcessSingleUnit(
+                            reading, useLowPass, useLowPassDiff,
+                            Context.ReProcessFitAreas[i], Context.ReProcessApertures[i], Header.FixedApertureFlags[i],
+                            measurer));
+                        processedCount++;
 
-                            if (processedCount % refreshCount == 0)
-                            {
-                                Invoke(new ProgressDelegate(OnProgress), i, processedCount);
-                            }
+                        if (processedCount % refreshCount == 0)
+                        {
+                            Invoke(new ProgressDelegate(OnProgress), i, processedCount);
                         }
                     }
                 }
-            //}
+            }
 
             AllReadings = new List<List<LCMeasurement>>(workReadings);
 
@@ -357,26 +192,6 @@ namespace Tangra.VideoOperations.LightCurves
         }
 
         uint[,] measurer_GetImagePixelsCallback(int x, int y, int matrixSize)
-        {
-            throw new NotImplementedException();
-        }
-
-        uint[,] measurer_GetImagePixelsCallback1(int x, int y, int matrixSize)
-        {
-            throw new NotImplementedException();
-        }
-
-        uint[,] measurer_GetImagePixelsCallback2(int x, int y, int matrixSize)
-        {
-            throw new NotImplementedException();
-        }
-
-        uint[,] measurer_GetImagePixelsCallback3(int x, int y, int matrixSize)
-        {
-            throw new NotImplementedException();
-        }
-
-        uint[,] measurer_GetImagePixelsCallback4(int x, int y, int matrixSize)
         {
             throw new NotImplementedException();
         }
@@ -434,7 +249,6 @@ namespace Tangra.VideoOperations.LightCurves
                 // Give it 2 seconds to finish
                 if (!m_WorkerThread.Join(2000))
                 {
-                    // And then kill it
                     m_WorkerThread.Abort();
                     m_WorkerThread.Join(1000);
                 }

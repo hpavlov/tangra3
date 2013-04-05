@@ -107,25 +107,9 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 		    int firstLevel = (int) NotMeasuredReasons & 0x7;
             int secondLevel = (((int)NotMeasuredReasons & 0xFF00) >> 8) & 0x7;
 			int thirdLevel = ((((int)NotMeasuredReasons & 0xFF0000) >> 16) & 0x7);
-			if (thirdLevel > 0) thirdLevel -= 1/* We don't save NoPixelsToMeasure, this is why we subtrackt 1 */ ;
+			if (thirdLevel > 0) thirdLevel -= 1 /* We don't save NoPixelsToMeasure, this is why we subtract 1 */;
 
             int flags = firstLevel + (secondLevel << 3) + (thirdLevel << 6);
-
-#if !PRODUCTION
-			//Trace.Assert(flags >= 0 && flags <= 256);
-			
-			//int firstLevel2 = (int)flags & 0x7;
-			//int secondLevel2 = ((int)flags >> 3) & 0x7;
-			//int thirdLevel2 = ((int)flags >> 6) & 0x3;
-			
-			//Trace.Assert(firstLevel == firstLevel2 && secondLevel == secondLevel2 && thirdLevel == thirdLevel2);
-			
-			//NotMeasuredReasons firstFlags = (NotMeasuredReasons)firstLevel2;
-			//NotMeasuredReasons secondFlags = (NotMeasuredReasons)(secondLevel2 << 8);
-			//NotMeasuredReasons thirdFlags = (NotMeasuredReasons)((thirdLevel2 != 0 ? thirdLevel2 + 1 : thirdLevel2) /* We don't save NoPixelsToMeasure, this is why we add 1 */ << 16);
-
-			//Trace.Assert((firstFlags | secondFlags | thirdFlags) == NotMeasuredReasons);
-#endif
 			
 		    return (byte) flags;
 		}
@@ -262,7 +246,6 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             return null;
         }
 
-        //public bool IsOffScreen = false;
         private byte targetNo;
 
         public int LastKnownGoodFrameId;
@@ -496,7 +479,6 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             ThisFrameFit = null;
         	m_IsLocated = false;
         	NotMeasuredReasons = NotMeasuredReasons.UnknownReason;
-            //IsOffScreen = false;
         }
     }
 }

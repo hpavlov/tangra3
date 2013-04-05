@@ -141,15 +141,8 @@ namespace Tangra.Model.Numerical
 
                     for (int i = 2; i < 4; i++)
                     {
-                        //#if 0
                         if (Y[i, 0] > 1.0) Y[i, 0] = 1.0;
                         if (Y[i, 0] < -1.0) Y[i, 0] = -1.0;
-                        //#endif
-                        //if(Math.Abs(Y[i, 0]) > 1.0)
-                        //{
-                        //    m_IsSolved = false;
-                        //    return;
-                        //}
                     }
 
                     m_X0 += Y[2, 0];

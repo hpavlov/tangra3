@@ -62,29 +62,14 @@ namespace Tangra.View
 				m_MainForm.ssFPS.Text = string.Empty;
 			}
 
-#if PRODUCTION
-                m_MainForm.miViewTrackingDebug.Visible = false;
-                m_MainForm.miOpenFailedCalibration.Visible = false;
-				m_MainForm.miOpenFailedPlateSolveFile.Visible = false;
-#endif
 			m_MainForm.pnlPlayControls.Enabled = TangraContext.Current.HasVideoLoaded;
 
 			m_MainForm.miExportToFits.Enabled = TangraContext.Current.HasAnyFileLoaded;
 			m_MainForm.miExportToBMP.Enabled = TangraContext.Current.HasAnyFileLoaded;
 			m_MainForm.miExportToCSV.Enabled = TangraContext.Current.HasAnyFileLoaded;
 
-			//m_MainForm.miLoadDark.Enabled = HasAnyFileLoaded && (!(m_MainForm.m_CurrentOperation is MakeDarkFlatField) || CanLoadDarkFrame);
-			//m_MainForm.miLoadFlat.Enabled = HasAnyFileLoaded && !(m_MainForm.m_CurrentOperation is MakeDarkFlatField);
-			//m_MainForm.miGetLightCurves.Enabled = HasAnyFileLoaded && !(m_MainForm.m_CurrentOperation is LightCurves);
-			//m_MainForm.miProduceDarkOrFlat.Enabled = HasVideoLoaded && !(m_MainForm.m_CurrentOperation is MakeDarkFlatField);
 
 			m_MainForm.miReduceLightCurve.Enabled = TangraContext.Current.HasAnyFileLoaded;
-			//m_MainForm.miAstrometry.Enabled = HasAnyFileLoaded;
-			//m_MainForm.miPixelHistogram.Enabled = HasVideoLoaded;
-
-			//m_MainForm.tbtnArrow.Enabled = CanChangeTool;
-			//m_MainForm.tbtnCross.Enabled = CanChangeTool && HasAnyFileLoaded;
-			//m_MainForm.tbtnFrameSize.Enabled = CanChangeTool && HasAnyFileLoaded && !OSDExcludeToolDisabled;
 
 			m_MainForm.pnlPlayControls.Enabled = TangraContext.Current.HasVideoLoaded;
 			m_MainForm.pnlPlayButtons.Enabled = TangraContext.Current.HasVideoLoaded;
@@ -99,8 +84,6 @@ namespace Tangra.View
 			m_MainForm.btn1SecMinus.Enabled = TangraContext.Current.HasVideoLoaded && TangraContext.Current.CanScrollFrames;
 			m_MainForm.btn1SecPlus.Enabled = TangraContext.Current.HasVideoLoaded && TangraContext.Current.CanScrollFrames;
 			
-			//m_MainForm.miDetectIntegration.Enabled = HasVideoLoaded && CanPlayVideo;
-
 			m_MainForm.miADVStatusData.Enabled = TangraContext.Current.HasVideoLoaded && TangraContext.Current.UsingADV;
 			m_MainForm.tsbtnIntensify.Visible = TangraContext.Current.HasVideoLoaded;
 			m_MainForm.miTargetPSFViewer.Enabled = TangraContext.Current.HasVideoLoaded;
@@ -172,7 +155,6 @@ namespace Tangra.View
 			//    ssPreProcessing.Text = preProcessingInfoStr;
 			//}
 
-			//tslblRecDbg.Visible = RecordingDebugSession;
 			m_MainForm.tslblIntegration.Text = string.Format("Integrating {0} frames", TangraContext.Current.NumberFramesToIntegrate);
 			m_MainForm.tslblIntegration.Visible = TangraContext.Current.UsingIntegration;
 			m_MainForm.ssFrameNo.Visible = TangraContext.Current.HasVideoLoaded;			

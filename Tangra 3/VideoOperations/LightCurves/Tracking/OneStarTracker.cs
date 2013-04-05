@@ -178,29 +178,6 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 								: NotMeasuredReasons.DistanceToleranceTooHighForNonFullDisappearingOccultedStar);
 
 						m_NotCertain = !OccultedStar.IsLocated;
-
-						//if (LightCurveReductionContext.Instance.FullDisappearance)
-						//{
-						//    // Continue doing fits in smaller areas until the position is no further than the tollerance
-						//    FitObjectInLimitedArea(OccultedStar, astroImage, expectedX, expectedY);
-						//    OccultedStar.SetIsLocated(
-						//        OccultedStar.ThisFrameFit != null,
-						//        OccultedStar.ThisFrameFit != null 
-						//            ? NotMeasuredReasons.TrackedSuccessfully
-						//            : NotMeasuredReasons.GuidingStarBrightnessFluctoationTooHigh);
-
-						//    m_NotCertain = !OccultedStar.IsLocated;
-						//}
-						//else
-						//{
-						//    // Only show the warning the second time around
-						//    Trace.WriteLine(
-						//        string.Format(
-						//            "Frame {0}: Target #{1} is suspect because the brightness fluctuation is too big: {2}",
-						//            m_FrameNo, OccultedStar.TargetNo, fluckDiff.ToString("0.00")));
-
-						//    OccultedStar.SetIsLocated(false, NotMeasuredReasons.GuidingStarBrightnessFluctoationTooHigh);
-						//}
                     }
                 }
                 else
@@ -260,12 +237,6 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
             m_LinearFitX.Solve();
             m_LinearFitY.Solve();
-
-            //double movementXPer100Frames = 100 * (m_LinearFitX.ComputeY(m_FrameNo) - m_LinearFitX.ComputeY(firstFrameId)) / (m_FrameNo - firstFrameId);
-            //double movementYPer100Frames = 100 * (m_LinearFitY.ComputeY(m_FrameNo) - m_LinearFitY.ComputeY(firstFrameId)) / (m_FrameNo - firstFrameId);
-
-            //Trace.WriteLine(string.Format("Frame {4}: Tendency: X = {0} (+/- {2}); Y = {1} (+/- {3})", movementXPer100Frames.ToString("0.00"),
-            //                              movementYPer100Frames.ToString("0.00"), m_LinearFitX.StdDev.ToString("0.00"), m_LinearFitY.StdDev.ToString("0.00"), m_FrameNo));
         }
 
         public override bool IsTrackedSuccessfully

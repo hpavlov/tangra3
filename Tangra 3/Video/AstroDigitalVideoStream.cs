@@ -32,13 +32,13 @@ namespace Tangra.Video
 
 	public class AstroDigitalVideoStream : IFrameStream
 	{
-		public static AstroDigitalVideoStream OpenFile(string fileName, out AdvEquipmentInfo equipmentInfo)
+		public static AstroDigitalVideoStream OpenFile(string fileName, out AdvEquipmentInfo equipmentInfo, out GeoLocationInfo geoLocation)
 		{
             equipmentInfo = new AdvEquipmentInfo();
-
+			geoLocation = new GeoLocationInfo();
 			try
 			{
-				var rv = new AstroDigitalVideoStream(fileName, ref equipmentInfo);
+				var rv = new AstroDigitalVideoStream(fileName, ref equipmentInfo, ref geoLocation);
 
                 TangraContext.Current.RenderingEngine = equipmentInfo.Engine == "AAV" ? "AstroAnalogueVideo" : "AstroDigitalVideo";
 
@@ -69,9 +69,9 @@ namespace Tangra.Video
 
 		private AdvFrameInfo m_CurrentFrameInfo;
 
-		private AstroDigitalVideoStream(string fileName, ref AdvEquipmentInfo equipmentInfo)
+		private AstroDigitalVideoStream(string fileName, ref AdvEquipmentInfo equipmentInfo, ref GeoLocationInfo geoLocation)
 		{
-            CheckAdvFileFormat(fileName, ref equipmentInfo);
+			CheckAdvFileFormat(fileName, ref equipmentInfo, ref geoLocation);
 
 			m_FileName = fileName;
 			var fileInfo = new AdvFileInfo();
@@ -193,23 +193,6 @@ namespace Tangra.Video
 			m_CurrentFrameInfo.SystemErrorString = AdvFrameInfo.GetStringFromBytes(systemError);
 			m_CurrentFrameInfo.GPSFixString = AdvFrameInfo.GetStringFromBytes(gpsFix);
 
-			//Trace.WriteLine("RETURNED FROM: ADVGetFrame(" + index + ", pixels, rawBitmapBytes, displayBitmapBytes, frameInfo);");
-
-			//IntPtr hBitmap = Marshal.AllocHGlobal();
-			//Bitmap displayBitmap = (Bitmap)Bitmap.FromHbitmap(hBitmap);
-
-			//return new Pixelmap(m_Width, m_Height, 8, pixels, displayBitmap, displayBitmapBytes);
-
-			//byte[] byteData = File.ReadAllBytes(@"C:\Hristo\Linux\VBox Shared Folder\Flea3 Images\Flea3.0.pix");
-			//uint[] pix = new uint[640*480];
-			//for (int i = 0; i < 640 * 480; i++)
-			//{
-			//    uint number = (uint)((byteData[2 * i] << 8) + byteData[2 * i + 1]);
-			//    pix[i] = number;
-			//}
-			//GenerateBitmapBytes(pixels, rawBitmapBytes);
-
-
 			using (MemoryStream memStr = new MemoryStream(rawBitmapBytes))
 			{
 				Bitmap displayBitmap = (Bitmap)Bitmap.FromStream(memStr);
@@ -309,7 +292,14 @@ namespace Tangra.Video
             get { return engine; }
 		}
 
-        private void CheckAdvFileFormat(string fileName, ref AdvEquipmentInfo equipmentInfo)
+		private GeoLocationInfo geoLocation;
+
+		public GeoLocationInfo GeoLocation
+		{
+			get { return geoLocation; }
+		}
+
+        private void CheckAdvFileFormat(string fileName, ref AdvEquipmentInfo equipmentInfo, ref GeoLocationInfo geoLocation)
 		{
 			AdvFile advFile = AdvFile.OpenFile(fileName);
 
@@ -326,7 +316,22 @@ namespace Tangra.Video
                 equipmentInfo.AdvrVersion = advFile.AdvFileTags["ADVR-SOFTWARE-VERSION"];
                 equipmentInfo.HtccFirmareVersion = advFile.AdvFileTags["HTCC-FIRMWARE-VERSION"];
                 equipmentInfo.SensorInfo = advFile.AdvFileTags["CAMERA-SENSOR-INFO"];
+
+                advFile.AdvFileTags.TryGetValue("LONGITUDE-WGS84", out geoLocation.Longitude);
+                advFile.AdvFileTags.TryGetValue("LATITUDE-WGS84", out geoLocation.Latitude);
+                advFile.AdvFileTags.TryGetValue("ALTITUDE-MSL", out geoLocation.Altitude);
+                advFile.AdvFileTags.TryGetValue("MSL-WGS84-OFFSET", out geoLocation.MslWgs84Offset);
+
+				if (!string.IsNullOrEmpty(geoLocation.MslWgs84Offset) &&
+				    !geoLocation.MslWgs84Offset.StartsWith("-"))
+				{
+					geoLocation.MslWgs84Offset = "+" + geoLocation.MslWgs84Offset;
+				}
+
+                advFile.AdvFileTags.TryGetValue("GPS-HDOP", out geoLocation.GpsHdop);
             }
+
+	        this.geoLocation = new GeoLocationInfo(geoLocation);
 		}
 
 		private void CheckAdvFileFormatInternal(AdvFile advFile)
@@ -343,7 +348,7 @@ namespace Tangra.Video
                 throw new ADVFormatException("The file ADV/AAV version is not supported yet.");
 
 			if (fileIsCorrupted)
-                throw new ADVFormatException("The ADV/AAV file may be corrupted.\r\n\r\nTry to recover it from Tools -> ADV Tools -> Repair ADV File");
+                throw new ADVFormatException("The ADV/AAV file may be corrupted.\r\n\r\nTry to recover it from Tools -> ADV/AAV Tools -> Repair ADV/AAV File");
 		}
 
 		private void DoConsistencyCheck(AdvFile advFile, ref bool fileIsCorrupted, ref bool isADVFormat, ref int advFormatVersion)

@@ -63,7 +63,6 @@ namespace Tangra.Video
 
 		public void OpenVideo(IFrameStream frameStream)
 		{
-
 			EnsureClosed();
 
 			m_VideoStream = frameStream;
@@ -270,8 +269,24 @@ namespace Tangra.Video
 		private void DisplayCurrentFrame(MovementType movementType)
 		{
 			if (m_VideoStream != null)
-			{
-				Pixelmap currentBitmap = m_VideoStream.GetPixelmap(m_CurrentFrameIndex);
+            {
+                Pixelmap currentBitmap = null;
+
+                if (m_FrameIntegration == FrameIntegratingMode.NoIntegration)
+				{
+					currentBitmap = m_VideoStream.GetPixelmap(m_CurrentFrameIndex);
+				}
+				else if (m_FrameIntegration == FrameIntegratingMode.SlidingAverage)
+				{
+                    currentBitmap = ProduceRunningAverageIntegratedFrame(m_CurrentFrameIndex);
+				}
+				else if (m_FrameIntegration == FrameIntegratingMode.SteppedAverage)
+				{
+                    currentBitmap = ProduceBinningIntegratedFrame(m_CurrentFrameIndex);
+				}
+				else
+				    throw new NotSupportedException();
+
 				DisplayCurrentFrameInternal(movementType, currentBitmap);
 			}
 		}
@@ -549,7 +564,20 @@ namespace Tangra.Video
 		{
 			get
 			{
-				return m_VideoStream is AstroDigitalVideoStream;
+				return m_VideoStream is AstroDigitalVideoStream && ((AstroDigitalVideoStream)m_VideoStream).Engine == "ADV";
+			}
+		}
+
+		public GeoLocationInfo GeoLocation
+		{
+			get { return ((AstroDigitalVideoStream) m_VideoStream).GeoLocation; }
+		}
+
+		public bool IsAstroAnalogueVideo
+		{
+			get
+			{
+				return m_VideoStream is AstroDigitalVideoStream && ((AstroDigitalVideoStream)m_VideoStream).Engine == "AAV";
 			}
 		}
 	}

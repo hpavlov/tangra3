@@ -14,10 +14,6 @@ namespace Tangra.VideoOperations.LightCurves
 
 		public AveragedFrame(AstroImage image)
 		{
-#if !PRODUCTION
-			Trace.Assert(image != null && image.Pixelmap != null);
-#endif
-
 			m_Image = image;
 		}
 

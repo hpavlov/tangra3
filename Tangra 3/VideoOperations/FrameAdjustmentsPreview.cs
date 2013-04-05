@@ -41,8 +41,6 @@ namespace Tangra.VideoOperations
 
 		private VideoController m_VideoController;
 
-		//private CompositeFramePreProcessor m_FramePreProcessor = new CompositeFramePreProcessor();
-
 		public static FrameAdjustmentsPreview Instance = new FrameAdjustmentsPreview();
 
 		private void ResetPreprocessingFlags()

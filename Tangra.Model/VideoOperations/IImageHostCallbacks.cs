@@ -18,7 +18,6 @@ namespace Tangra.Model.VideoOperations
         Panel Panel { get; }
         PictureBox DisplayControl { get; }
         IWin32Window MainFormWindow { get; }
-        //IFramePlayer FramePlayer { get; }
         CompositeFramePreProcessor FramePreProcessor { get; }
 
         int CurrentFrameId { get; }
@@ -35,16 +34,11 @@ namespace Tangra.Model.VideoOperations
 
         void ApplyPreProcessing(Pixelmap bmp);
 
-		// TODO: Consolidate ChangeImageTool() and ChangeCurrentTool()
         void ChangeImageTool(ImageTool newTool);
-		//ImageTool ChangeCurrentTool(Func<ImageTool, ImageTool> switchImplementation);
         ImageTool CurrentImageTool { get; }
 
         Rectangle MainFormPosition { get; }
 
     	void ResetDelayedIndicatorForm();
-
-        //ITangraApplication TangraApplicationImpl { get; }
-        //List<ITangraAddin> LoadedAddins { get; }
     }
 }

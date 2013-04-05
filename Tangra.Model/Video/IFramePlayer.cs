@@ -44,11 +44,41 @@ namespace Tangra.Model.Video
 		string FileName { get; }
 	}
 
+	public class GeoLocationInfo
+	{
+		public GeoLocationInfo()
+		{ }
+
+		public GeoLocationInfo(GeoLocationInfo clone)
+		{
+			Longitude = clone.Longitude;
+			Latitude = clone.Latitude;
+
+			Altitude = clone.Altitude;
+			MslWgs84Offset = clone.MslWgs84Offset;
+			GpsHdop = clone.GpsHdop;
+		}
+
+		public string Longitude;
+		public string Latitude;
+
+		public string Altitude;
+		public string MslWgs84Offset;
+		public string GpsHdop;
+
+		public string GetFormattedGeoLocation()
+		{
+			return string.Format("{0} {1} {2}{3}", Longitude, Latitude, Altitude, MslWgs84Offset).Replace("*", "°");
+		}
+	}
+
 	public interface IFramePlayer
 	{
 		void SetFrameRenderer(IVideoFrameRenderer frameRenderer);
 		bool IsRunning { get; }
 		bool IsAstroDigitalVideo { get; }
+		bool IsAstroAnalogueVideo { get; }
+		GeoLocationInfo GeoLocation { get; }
 		void Start(FramePlaySpeed mode, uint step);
 		void Stop();
 		void StepForward();

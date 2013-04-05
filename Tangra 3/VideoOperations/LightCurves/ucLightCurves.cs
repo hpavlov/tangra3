@@ -23,11 +23,6 @@ namespace Tangra.VideoOperations.LightCurves
 {
     public partial class ucLightCurves : UserControl
     {
-        //[DllImport("User32.dll")]
-        //private static extern short GetAsyncKeyState(System.Windows.Forms.Keys vKey); 
-
-        //internal static byte MSG_ID_STOPPED_AT_LAST_FRAME = 0x04;
-
         private LCStateMachine m_StateMachine;
         protected VideoController m_VideoController;
 		private TangraConfig.LightCurvesDisplaySettings m_DisplaySettings;
@@ -194,8 +189,6 @@ namespace Tangra.VideoOperations.LightCurves
                     btnStop.Text = "Stop Measurements";
 
                 btnLightCurve.Visible = false;
-                //tbSignalNoise.Enabled = false;
-                //m_Stopwatch.Stop();
 
                 pnlMeasureZoomOptions.Visible = m_StateMachine.VideoOperation.IsMeasuring;
             }
@@ -323,9 +316,6 @@ namespace Tangra.VideoOperations.LightCurves
             RadioButton[] MRBs = new RadioButton[] { rbM1, rbM2, rbM3, rbM4 };
             Label[] MLBLs = new Label[] { lblM1, lblM2, lblM3, lblM4 };
 
-            //for(int i =0; i < MLBLs.Length; i++)
-            //	MLBLs[i].ForeColor = m_DisplaySettings.TargetColors[i];
-
             if (m_StateMachine == null)
             {
                 foreach (RadioButton rb in MRBs) rb.Visible = false;
@@ -388,9 +378,6 @@ namespace Tangra.VideoOperations.LightCurves
                     m_VideoController.UpdateViews();
 
                     m_StateMachine.m_ConfiguringFrame = m_StateMachine.VideoOperation.m_CurrFrameNo;
-
-                    //if (LightCurveReductionContext.Instance.SaveTrackingSession)
-                    //    LightCurveReductionContext.Instance.SessionFile.LockObjectConfigurationFrame(m_StateMachine.VideoOperation.m_CurrFrameNo, VideoContext.Current.AstroImage);
                 }
 
                 m_VideoController.RefreshCurrentFrame();
@@ -503,21 +490,6 @@ namespace Tangra.VideoOperations.LightCurves
                     return;
                 }
             }
-
-			//if (m_State.MeasuringStars.Count == 1)
-			//{
-			//    DialogResult userChoise = MessageBox.Show(m_State.Host.MainFormWindow,
-			//                                              "Is this a drift through video?\r\n\r\nIf there are no objects that can be used for guiding and this is a drift through video then press 'Yes'. " +
-			//                                              "If there are stars that can be used for guiding then press 'Cancel' to go back and configure at least one guiding star. Otherwise press 'No'.",
-			//                                              "Question",
-			//                                              MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question,
-			//                                              MessageBoxDefaultButton.Button2);
-
-			//    if (userChoise == DialogResult.Cancel)
-			//        return;
-
-			//    LightCurveReductionContext.Instance.IsDriftThrough = userChoise == DialogResult.Yes;
-			//}
 
 			m_StoppedAtFrameNo = -1;
 			m_StateMachine.VideoOperation.BeginMeasurements();
@@ -705,20 +677,6 @@ namespace Tangra.VideoOperations.LightCurves
 
 			if (m_ShowingFields) m_StateMachine.VideoOperation.ToggleShowFields(true);
         }
-
-        //#region INotificationReceiver Members
-
-        //public void ReceieveMessage(NotificationMessage message, MessageDeliveryOptions deliveryFlags)
-        //{
-        //    if (message.Sender is LightCurves &&
-        //        message.MessageId == MSG_ID_STOPPED_AT_LAST_FRAME)
-        //    {
-        //        FinishWithMeasurements();
-        //        timerMoveToFirstFrame.Enabled = true;
-        //    }
-        //}
-
-        //#endregion
 
         private void timerMoveToFirstFrame_Tick(object sender, EventArgs e)
         {

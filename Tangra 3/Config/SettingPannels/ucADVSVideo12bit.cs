@@ -40,6 +40,7 @@ namespace Tangra.Config.SettingPannels
 			cbxAdvsOsdMessages.Checked = TangraConfig.Settings.ADVS.OverlayAllMessages;
             cbxAdvsOsdCameraInfo.Checked = TangraConfig.Settings.ADVS.OverlayCameraInfo;
             cbxAdvsOsdSystemInfo.Checked = TangraConfig.Settings.ADVS.OverlayAdvsInfo;
+			cbxAdvsOsdGeoLocation.Checked = TangraConfig.Settings.ADVS.OverlayGeoLocation;
 
 			cbxAdvsPopupTimeStamp.Checked = TangraConfig.Settings.ADVS.PopupTimestamp;
             cbxAdvsPopupExposure.Checked = TangraConfig.Settings.ADVS.PopupExposure;
@@ -64,6 +65,7 @@ namespace Tangra.Config.SettingPannels
 			TangraConfig.Settings.ADVS.OverlayAllMessages = cbxAdvsOsdMessages.Checked;
             TangraConfig.Settings.ADVS.OverlayCameraInfo = cbxAdvsOsdCameraInfo.Checked;
             TangraConfig.Settings.ADVS.OverlayAdvsInfo = cbxAdvsOsdSystemInfo.Checked;
+			TangraConfig.Settings.ADVS.OverlayGeoLocation = cbxAdvsOsdGeoLocation.Checked;
 
 			TangraConfig.Settings.ADVS.PopupTimestamp = cbxAdvsPopupTimeStamp.Checked;
             TangraConfig.Settings.ADVS.PopupExposure = cbxAdvsPopupExposure.Checked;
@@ -74,7 +76,7 @@ namespace Tangra.Config.SettingPannels
 			TangraConfig.Settings.ADVS.PopupGamma = cbxAdvsPopupGamma.Checked;
 			TangraConfig.Settings.ADVS.PopupGain = cbxAdvsPopupGain.Checked;
 			TangraConfig.Settings.ADVS.PopupGPSFix = cbxAdvsPopupGPSFix.Checked;
-			TangraConfig.Settings.ADVS.PopupAlmanac = cbxAdvsPopupAlmanac.Checked;
+			TangraConfig.Settings.ADVS.PopupAlmanac = cbxAdvsPopupAlmanac.Checked;	        
 
 			if (m_AdvPopupCustomizer != null)
 			{

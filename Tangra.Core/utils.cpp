@@ -119,6 +119,4 @@ long DateTimeToAdvTicks(int year, int month, int day, int hour, int minute, int 
 void AdvTicksToDateTime(long ticks, int *year, int *month, int *day, int *hour, int *minute, int *sec, int *ms)
 {
 	// the miliseconds since 1 Jan 2000, 00:00:00.000 (negative vaslues are before 2000)
-	
-	
 }

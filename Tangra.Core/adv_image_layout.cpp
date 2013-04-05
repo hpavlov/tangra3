@@ -101,7 +101,7 @@ void AdvImageLayout::ResetBuffers()
 
 void AdvImageLayout::StartNewDiffCorrSequence()
 {
-   //TODO: Reset the prev frame buffer (do we need to do anything??)
+   //TODO: Reset the prev frame buffer
 }
 
 void AdvImageLayout::AddOrUpdateTag(const char* tagName, const char* tagValue)
@@ -333,13 +333,6 @@ void AdvImageLayout::GetDataFromDataBytes(enum GetByteMode mode, unsigned char* 
 		else
 			GetPixelsFrom8BitByteArrayRawLayout(layoutData, prevFrame, pixels, &readIndex, &crcOkay);
 	}
-
-	//return new AdvImageData()
-	//{
-	//	ImageData = imageData,
-	//	CRCOkay = crcOkay,
-	//	Bpp = BitsPerPixel
-	//};
 }
 void AdvImageLayout::GetPixelsFrom8BitByteArrayDiffCorrLayout(unsigned char* layoutData, unsigned long* prevFrame, unsigned long* pixelsOut, int* readIndex, bool* crcOkay)
 {
@@ -370,10 +363,6 @@ void AdvImageLayout::GetPixelsFrom8BitByteArrayRawLayout(unsigned char* layoutDa
 	{
 		unsigned int savedFrameCrc = (unsigned int)(*layoutData + (*(layoutData + 1) << 8) + (*(layoutData + 2) << 16) + (*(layoutData + 3) << 24));
 		*readIndex += 4;
-
-		// TODO: Convert the 32bit array to 16bit and pass it for CRC computation
-		//unsigned int crc3 = ComputePixelsCRC32(pixelsOut);
-		//*crcOkay = crc3 == savedFrameCrc;
 	}
 	else
 		*crcOkay = true;
@@ -422,10 +411,6 @@ void AdvImageLayout::GetPixelsFrom16BitByteArrayRawLayout(unsigned char* layoutD
 	{
 		unsigned int savedFrameCrc = (unsigned int)(*layoutData + (*(layoutData + 1) << 8) + (*(layoutData + 2) << 16) + (*(layoutData + 3) << 24));
 		*readIndex += 4;
-
-		// TODO: Convert the 32bit array to 16bit and pass it for CRC computation
-		//unsigned int crc3 = ComputePixelsCRC32(pixelsOut);
-		//*crcOkay = crc3 == savedFrameCrc;
 	}
 	else
 		*crcOkay = true;
@@ -439,14 +424,10 @@ unsigned int AdvImageLayout::ComputePixelsCRC32(unsigned short* pixels)
 
 void AdvImageLayout::GetPixelsFrom12BitByteArray(unsigned char* layoutData, unsigned long* prevFrame, unsigned long* pixelsOut, enum GetByteMode mode, int* readIndex, bool* crcOkay)
 {
-	//var rv = new ushort[Width, Height];
-
 	bool isLittleEndian = m_ImageSection->ByteOrder == LittleEndian;
 	bool convertTo12Bit = m_ImageSection->DataBpp == 12;	
 	bool convertTo16Bit = m_ImageSection->DataBpp == 16;
 
-	//bool isKeyFrame = byteMode == GetByteMode.KeyFrameBytes;
-	//bool keyFrameNotUsed = byteMode == GetByteMode.Normal;
 	bool isDiffCorrFrame = mode == DiffCorrBytes;
 
 	unsigned long* pPrevFrame = prevFrame;
@@ -535,10 +516,6 @@ void AdvImageLayout::GetPixelsFrom12BitByteArray(unsigned char* layoutData, unsi
 	{
 		unsigned int savedFrameCrc = (unsigned int)(*layoutData + (*(layoutData + 1) << 8) + (*(layoutData + 2) << 16) + (*(layoutData + 3) << 24));
 		*readIndex += 4;
-
-		// TODO: Convert the 32bit array to 16bit and pass it for CRC computation
-		//unsigned int crc3 = ComputePixelsCRC32(pixelsOut);
-		//*crcOkay = crc3 == savedFrameCrc;
 	}
 	else
 		*crcOkay = true;

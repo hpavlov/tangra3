@@ -41,7 +41,6 @@ namespace Tangra.Model.Context
 
 		public bool UsingADV = false;
 		public bool RecordingDebugSession = false;
-		//internal PreProcessingInfo PreProcessingInfo = null;
 
 		public bool UsingIntegration = false;
 		public int NumberFramesToIntegrate = 0;

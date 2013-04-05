@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Tangra.Model.Config;
 using Tangra.Model.Image;
+using Tangra.Model.Video;
 
 namespace Tangra.Video.AstroDigitalVideo
 {
@@ -31,15 +32,17 @@ namespace Tangra.Video.AstroDigitalVideo
 	    private string m_LastMessage = null;
 
 	    private AdvEquipmentInfo m_EquipmentInfo;
+		private GeoLocationInfo m_GeoLocation;
 
 		public void Reset()
 		{
             m_EquipmentInfoDisplayed = false;
 		}
 
-        public void Init(AdvEquipmentInfo equipmentInfo, int firstFrameNo)
+		public void Init(AdvEquipmentInfo equipmentInfo, GeoLocationInfo geoLocation, int firstFrameNo)
         {
             m_EquipmentInfo = equipmentInfo;
+			m_GeoLocation = geoLocation;
             m_FirstFrameNo = firstFrameNo;
         }
 
@@ -91,13 +94,14 @@ namespace Tangra.Video.AstroDigitalVideo
 				    m_FramesLeftToDiplayMessage = 10;
 				}
 
-                if ((TangraConfig.Settings.ADVS.OverlayAdvsInfo || TangraConfig.Settings.ADVS.OverlayCameraInfo) &&
+				if ((TangraConfig.Settings.ADVS.OverlayAdvsInfo || TangraConfig.Settings.ADVS.OverlayCameraInfo || TangraConfig.Settings.ADVS.OverlayGeoLocation) &&
                     (!m_EquipmentInfoDisplayed || m_FirstFrameNo == currentFrameNo))
                 {
                     int numLines = 0;
                     int lineNo = 0;
                     if (TangraConfig.Settings.ADVS.OverlayCameraInfo) numLines += 2;
                     if (TangraConfig.Settings.ADVS.OverlayAdvsInfo) numLines += 2;
+					if (TangraConfig.Settings.ADVS.OverlayGeoLocation) numLines += 1;
 
                     float startingY = currentImage.Height - numLines * (s_PropertiesFont.Size + 5) - 10;
                     if (TangraConfig.Settings.ADVS.OverlayTimestamp) startingY -= m_YPosUpper;
@@ -124,6 +128,13 @@ namespace Tangra.Video.AstroDigitalVideo
                             g.DrawString(m_EquipmentInfo.Camera, s_PropertiesFont, s_PropertiesWhiteBrush, 10, startingY + lineNo * (s_PropertiesFont.Size + 5));
                         lineNo++;
                     }
+
+					if (TangraConfig.Settings.ADVS.OverlayGeoLocation)
+					{
+
+						g.DrawString(m_GeoLocation.GetFormattedGeoLocation(), s_PropertiesFont, s_PropertiesWhiteBrush, 10, startingY + lineNo * (s_PropertiesFont.Size + 5));
+						lineNo++;
+					}
 
                     g.Save();
 

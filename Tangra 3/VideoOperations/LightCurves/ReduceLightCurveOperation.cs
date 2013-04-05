@@ -31,12 +31,6 @@ namespace Tangra.VideoOperations.LightCurves
 {
     public class ReduceLightCurveOperation : VideoOperationBase, IVideoOperation
     {
-        //public static float REJECTION_BACKGROUND_PIXELS_STD_DEV = 6.0f;
-        //public static byte MSG_NEW_READING = 14;
-
-        //[DllImport("User32.dll")]
-        //private static extern short GetAsyncKeyState(System.Windows.Forms.Keys vKey); 
-
         private VideoController m_VideoController;
         internal AstroImage m_AstroImage;
 
@@ -69,11 +63,6 @@ namespace Tangra.VideoOperations.LightCurves
 
         private ITimestampOcr m_TimestampOCR;
         private DateTime m_OCRedTimeStamp;
-        //private byte[,] m_OCRedTimestampPixels;
-
-        ////private Dictionary<int, long> m_ThumbPrintDict = new Dictionary<int, long>();
-
-        //internal FrameBytePreProcessor m_BytePreProcessor;
 
         private LCState m_BackedUpSelectMeasuringStarsState = null;
 
@@ -132,7 +121,6 @@ namespace Tangra.VideoOperations.LightCurves
 	            BeginConfiguration();
 
 	            TangraContext.Current.CanChangeTool = true;
-	            //prevFrameId = -1;
 
 	            return true;
             }
@@ -193,41 +181,10 @@ namespace Tangra.VideoOperations.LightCurves
 		public void SaveSessionFile()
 		{
 			// NOTE: Tracking session are not supported yet
-			//if (LightCurveReductionContext.Instance.SessionFile != null)
-			//{
-			//    SaveFileDialog dlg = new SaveFileDialog();
-			//    dlg.Title = "Save tracking session as...";
-			//    dlg.Filter = "Tangra Tacking Session (*.trk)|*.trk";
-			//    dlg.DefaultExt = ".trk";
-			//    dlg.OverwritePrompt = true;
-			//    if (dlg.ShowDialog(m_Host.MainFormWindow) == DialogResult.OK)
-			//    {
-			//        m_VideoController.StatusChanged("Saving...");
-			//        try
-			//        {
-			//            LightCurveReductionContext.Instance.SessionFile.AddStreamInfo(m_Host.FramePlayer.Video);
-			//            LightCurveReductionContext.Instance.SessionFile.SaveAndCloseSessionFile(dlg.FileName);
-			//            LightCurveReductionContext.Instance.SessionFile = null;
-			//        }
-			//        finally
-			//        {
-			//            m_VideoController.StatusChanged("Ready");
-			//        }
-
-			//        TangraContext.Current.RecordingDebugSession = false;
-			//        m_VideoController.UpdateViews();
-			//    }
-			//}
 		}
 
         internal byte FrameBackgroundMode = 0;
         private int m_PrevMeasuredFrame = -1;
-
-#if PROFILING
-        private Stopwatch swTracking = new Stopwatch();
-        private Stopwatch swMeasuring = new Stopwatch();
-        private Stopwatch swSaveMeasurement = new Stopwatch();
-#endif
 
         public void NextFrame(int frameNo, MovementType movementType, bool isLastFrame, AstroImage astroImage)
         {
@@ -276,46 +233,23 @@ namespace Tangra.VideoOperations.LightCurves
                 //                m_OCRedTimeStamp = DateTime.MinValue;
                 //    }
                 //}
-#if PROFILING
-                swTracking.Start();
-#endif
+
                 m_Tracker.NextFrame(frameNo, astroImage);
-#if PROFILING
-                swTracking.Stop();
-#endif
-                //if (LightCurveReductionContext.Instance.SaveTrackingSession)
-                //    LightCurveReductionContext.Instance.SessionFile.AddTrackedFrame(frameNo, VideoContext.Current.AstroImage, m_Tracker);
 
                 if (m_Measuring)
                 {
                     m_ProcessedFrames++;
                     if (!m_Tracker.IsTrackedSuccessfully) m_UnsuccessfulFrames++;
 
-#if !PRODUCTION
-                    Trace.Assert(m_PrevMeasuredFrame != m_CurrFrameNo);
-#endif
-
-#if PROFILING
-                    swMeasuring.Start();
-#endif
                     SaveEmbeddedOrORCedTimeStamp();
 
                     MeasureObjects();
 
-#if PROFILING
-                    swMeasuring.Stop();
-#endif
                     m_PrevMeasuredFrame = m_CurrFrameNo;
 
-#if PROFILING
-                    Profiler.Instance.StartTimer("CONTROL_PANEL_UPDATES");
-#endif
                     m_StopWatch.Stop();
                     m_ControlPanel.UpdateProcessedFrames(m_ProcessedFrames, m_UnsuccessfulFrames, (int)(m_StopWatch.ElapsedMilliseconds / 1000));
                     m_StopWatch.Start();
-#if PROFILING
-                    Profiler.Instance.StopTimer("CONTROL_PANEL_UPDATES");
-#endif
 
                     if (!m_Tracker.IsTrackedSuccessfully &&
                          LightCurveReductionContext.Instance.StopOnLostTracking)
@@ -386,14 +320,8 @@ namespace Tangra.VideoOperations.LightCurves
 				}
 			}
 
-#if PROFILING
-            Profiler.Instance.StartTimer("CONTROL_PANEL_UPDATES");
-#endif
             if (m_ControlPanel != null)
                 m_ControlPanel.UpdateState();
-#if PROFILING
-            Profiler.Instance.StopTimer("CONTROL_PANEL_UPDATES");
-#endif
             if (isLastFrame)
             {
                 if (m_Refining)
@@ -404,7 +332,6 @@ namespace Tangra.VideoOperations.LightCurves
                 }
                 else if (m_Measuring)
                 {
-                    //m_ControlPanel.FinishWithMeasurements();
                     m_ControlPanel.StopMeasurements();
 
                     if (TangraConfig.Settings.Tracking.PlaySound)
@@ -413,20 +340,6 @@ namespace Tangra.VideoOperations.LightCurves
                     m_ControlPanel.StoppedAtLastFrame();
                 }
             }
-
-#if PROFILING
-            if (m_CurrFrameNo % 100 == 0 &&
-                m_Tracker != null &&
-                m_Tracker.TrackedObjects.Count > 0)
-            {
-                Trace.WriteLine(string.Format("Last 100 frames tracking: {0} sec ({1} sec/object)", swTracking.Elapsed.TotalSeconds.ToString("0.00"), (swTracking.Elapsed.TotalSeconds / m_Tracker.TrackedObjects.Count).ToString("0.00")), "PROFILING");
-                Trace.WriteLine(string.Format("Last 100 frames measuring: {0} sec ({1} sec/object)", swMeasuring.Elapsed.TotalSeconds.ToString("0.00"), (swMeasuring.Elapsed.TotalSeconds / m_Tracker.TrackedObjects.Count).ToString("0.00")), "PROFILING");
-                Trace.WriteLine(string.Format("Last 100 frames saving time: {0} sec ({1} sec/object)", swSaveMeasurement.Elapsed.TotalSeconds.ToString("0.00"), (swSaveMeasurement.Elapsed.TotalSeconds / m_Tracker.TrackedObjects.Count).ToString("0.00")), "PROFILING");
-                swTracking.Reset();
-                swMeasuring.Reset();
-                swSaveMeasurement.Reset();
-            }
-#endif
         }
 
         public void ImageToolChanged(ImageTool newTool, ImageTool oldTool)
@@ -450,9 +363,7 @@ namespace Tangra.VideoOperations.LightCurves
         private bool m_Correcting = false;
         private bool m_ViewingLightCurve = false;
 
-#if !PRODUCTION
         private static Font s_FONT = new Font(FontFamily.GenericMonospace, 8);
-#endif
 
         public void PostDraw(Graphics g)
         {
@@ -485,10 +396,8 @@ namespace Tangra.VideoOperations.LightCurves
 							if (!float.IsNaN(delta))
 							{
 								g.DrawEllipse(m_AllPens[i], data.X0 - delta, data.Y0 - delta, 2 * delta, 2 * delta);
-#if !PRODUCTION
 								g.DrawString(string.Format("x={0}; y={1}", data.X0.ToString("0.0"), data.Y0.ToString("0.0")),
 											 s_FONT, m_AllBrushes[i], data.X0, data.Y0 + 2 * delta);
-#endif
 
 							}
 						}
@@ -700,22 +609,6 @@ namespace Tangra.VideoOperations.LightCurves
                 // This is how we tell the VideoOperation that something changed.
                 m_VideoController.RefreshCurrentFrame();
             }
-            else if (
-                m_StateMachine.CurrentState == LightCurvesState.Running ||
-                m_StateMachine.CurrentState == LightCurvesState.Viewing)
-            {
-				// Seems that this is done somewhere else and is not required here
-				//if (HasCustomZoomImage &&
-				//    VideoContext.Current.ZoomedImage.Image != null)
-				//{
-				//    using (Graphics g = Graphics.FromImage(VideoContext.Current.ZoomedImage.Image))
-				//    {
-				//        DrawCustomZoomImage(g, VideoContext.Current.ZoomedImage.Image.Width, VideoContext.Current.ZoomedImage.Image.Height);
-				//        g.Save();
-				//        VideoContext.Current.ZoomedImage.Invalidate();
-				//    }
-				//}
-            }
         }
 
         public bool HasCustomZoomImage
@@ -877,7 +770,6 @@ namespace Tangra.VideoOperations.LightCurves
 			}
         }
 
-        // 248; 124
         private Rectangle[] m_ZoomPixelRects = new Rectangle[]
                                                    {
                                                        new Rectangle(1, 1, 122, 122), 
@@ -928,8 +820,6 @@ namespace Tangra.VideoOperations.LightCurves
 
 		private void DrawZoomStripes(Graphics gMain, int width, int height)
 		{
-			//Trace.WriteLine(string.Format("{0}: {1}", m_CurrFrameNo, m_Tracker.OccultedStar.ThisFrameFit.IMax));
-
 			int objHeight = (height / 4) - 20;
 
 			if (m_CustomZoomBitmap == null) InitCustomZoomBitmap(width, height);
@@ -957,15 +847,7 @@ namespace Tangra.VideoOperations.LightCurves
 					{
 						h = (int)Math.Min(objHeight - 1, objHeight * obj.Aperture / 7);
 						if (h % 2 == 0) h++;
-						//byte z = (byte)obj.AppMeaAveragePixel; // VideoContext.Current.AstroImage.GetPixel((int)Math.Round(obj.ThisFrameX),(int)Math.Round(obj.ThisFrameY));
 						byte z0 = currentImage.GetDisplayPixel((int)Math.Round(obj.ThisFrameX), (int)Math.Round(obj.ThisFrameY));
-						//byte z1 = VideoContext.Current.AstroImage.GetPixel((int)Math.Round(obj.ThisFrameX) - 1, (int)Math.Round(obj.ThisFrameY) - 1);
-						//byte z2 = VideoContext.Current.AstroImage.GetPixel((int)Math.Round(obj.ThisFrameX) - 1, (int)Math.Round(obj.ThisFrameY) + 1);
-						//byte z3 = VideoContext.Current.AstroImage.GetPixel((int)Math.Round(obj.ThisFrameX) + 1, (int)Math.Round(obj.ThisFrameY) + 1);
-						//byte z4 = VideoContext.Current.AstroImage.GetPixel((int)Math.Round(obj.ThisFrameX) + 1, (int)Math.Round(obj.ThisFrameY) - 1);
-
-						//byte z0 = VideoContext.Current.Pixelmap.DisplayBitmapConverter.ToDisplayBitmapByte(z);
-						//byte z = (byte)((z0 + z1 + z2 + z3 + z4) / 5);
 						pen = AllGrayPens.GrayPen(z0);
 					}
 					else if (obj.ThisFrameFit != null)
@@ -1019,11 +901,6 @@ namespace Tangra.VideoOperations.LightCurves
         #region Event Handlers
         public void SelectedTargetChanged(int newSelectedIndex)
         {
-			//m_ControlPanel.UpdateState();
-
-			////// This is how we tell the VideoOperation that something changed.
-			////m_Host.RefreshCurrentFrame();
-			//m_VideoController.RefreshCurrentFrame();
         }
 
         public void MaxStarsReached(bool maximumReached)
@@ -1048,11 +925,6 @@ namespace Tangra.VideoOperations.LightCurves
                 aperture = (float)(matrixFit.FWHM * TangraConfig.Settings.Photometry.DefaultSignalAperture);
             else
                 aperture = (float)(TangraConfig.Settings.Photometry.DefaultSignalAperture);
-
-#if !PRODUCTION
-            Trace.Assert(matrix.GetLength(0) == 17);
-            Trace.Assert(matrix.GetLength(1) == 17);
-#endif
 
             var measurer = new MeasurementsHelper(
                             bitPixCamera,
@@ -1118,9 +990,6 @@ namespace Tangra.VideoOperations.LightCurves
             TangraContext.Current.HasVideoLoaded = true;
             m_VideoController.UpdateViews();
 
-            //if (LightCurveReductionContext.Instance.SaveTrackingSession)
-            //    LightCurveReductionContext.Instance.SessionFile.ResetObjectConfiguration();
-
             m_VideoController.RefreshCurrentFrame();
         }
 
@@ -1180,8 +1049,6 @@ namespace Tangra.VideoOperations.LightCurves
                 m_AveragedFrame = new AveragedFrame(m_StackedAstroImage);
             }
 
-			//m_ThumbPrintDict.Clear();
-
 			m_Tracker.InitializeNewTracking();
 
 			m_ManualTrackingDeltaX = 0;
@@ -1196,9 +1063,6 @@ namespace Tangra.VideoOperations.LightCurves
 			m_VideoController.StatusChanged("Refining");
 
 			m_StateMachine.ChangeState(LightCurvesState.Running);
-
-			//EnableFrameByFrameStepsInNonProductionRelease();
-			//m_StateMachine.Host.FramePlayer.MoveToFrameNoIntegrate(m_CurrFrameNo);
 
 			MeasuringStarted();
 
@@ -1314,9 +1178,6 @@ namespace Tangra.VideoOperations.LightCurves
 				correctTrackingTool.Initialize(this, m_Tracker, m_VideoController);
 
 			m_StateMachine.m_HasBeenPaused = true;
-
-			// Do this to draw the correcting apertures once the state has been changed to correcting
-			// m_VideoController.RefreshCurrentFrame();
         }
 
         public void FinishedWithMeasurements()
@@ -1326,8 +1187,6 @@ namespace Tangra.VideoOperations.LightCurves
 			m_ViewingLightCurve = false;
 			m_Configuring = false;
 			m_Correcting = false;
-
-			//m_Host.ChangeImageTool(new ArrowTool());
 
 			m_VideoController.StatusChanged("Ready");
 
@@ -1464,9 +1323,6 @@ namespace Tangra.VideoOperations.LightCurves
 				int frameDuration = (int)Math.Round(1000.0/m_VideoController.VideoFrameRate /*MillisecondsPerFrame*/);
 				LCFile.SaveOnTheFlyFrameTiming(new LCFrameTiming(m_OCRedTimeStamp, frameDuration));
 			}
-			// NOTE: Do not save frame timing when no embedded/OCRed timestamps are availale as doing otherwise will indicate incorrectly that timestamps are available
-			//else
-			//	LCFile.SaveOnTheFlyFrameTiming(new LCFrameTiming(DateTime.MinValue, 0));
         }
 
         public void MeasureObjects()
@@ -1475,191 +1331,41 @@ namespace Tangra.VideoOperations.LightCurves
             if (m_MaxFrame < m_CurrFrameNo) m_MaxFrame = (uint)m_CurrFrameNo;
             m_TotalFrames++;
 
-			//long thumbPrint = VideoContext.Current.AstroImage.GetThumbprint();
-			//m_ThumbPrintDict.Add(m_CurrFrameNo, thumbPrint);
+			foreach (TrackedObject trackedObject in m_Tracker.TrackedObjects)
+			{
+				ImagePixel center = trackedObject.Center;
 
-            // TODO: Implement Groups in future
-            //if (m_GroupMeasurer != null &&
-            //    m_GroupMeasurer.HasGroups)
-            //{
-            //    m_GroupMeasurer.MeasureObjects(m_Tracker.TrackedObjects);
-            //}
-            //else
-            {
-				foreach (TrackedObject trackedObject in m_Tracker.TrackedObjects)
+				if (center != ImagePixel.Unspecified)
 				{
-					ImagePixel center = trackedObject.Center;
+					MeasureTrackedObject2(trackedObject,
+											m_Measurer,
+											LightCurveReductionContext.Instance.DigitalFilter,
+											false);
+				}
+				else
+				{
+					uint[,] data = m_VideoController.GetCurrentAstroImage(false).GetMeasurableAreaPixels(
+						(int)Math.Round(center.XDouble), (int)Math.Round(center.YDouble), 35);
 
-					if (center != ImagePixel.Unspecified)
-					{
-						MeasureTrackedObject2(trackedObject,
-											 m_Measurer,
-											 LightCurveReductionContext.Instance.DigitalFilter,
-											 false);
-					}
-					else
-					{
-						uint[,] data = m_VideoController.GetCurrentAstroImage(false).GetMeasurableAreaPixels(
-							(int)Math.Round(center.XDouble), (int)Math.Round(center.YDouble), 35);
-
-						uint flags = trackedObject.GetLCMeasurementFlags();
-						// Add unsuccessfull measurement for this object and this frame
-						LCFile.SaveOnTheFlyMeasurement(new LCMeasurement(
-													   (uint)m_CurrFrameNo,
-													   trackedObject.TargetNo,
-													   0,
-													   0,
-													   flags,
-													   0, 0,
-							/* We want to use the real image (X,Y) coordinates here */
-							//(float) aperture,
-													   null,
-							/* but we want to use the actual measurement fit. This only matters for reviewing the light curve when not opened from a file. */
-													   data /* save the original non filtered data */, 0, 0, m_OCRedTimeStamp));
-					}
-				}    
+					uint flags = trackedObject.GetLCMeasurementFlags();
+					// Add unsuccessfull measurement for this object and this frame
+					LCFile.SaveOnTheFlyMeasurement(new LCMeasurement(
+													(uint)m_CurrFrameNo,
+													trackedObject.TargetNo,
+													0,
+													0,
+													flags,
+													0, 0,
+						/* We want to use the real image (X,Y) coordinates here */
+						//(float) aperture,
+													null,
+						/* but we want to use the actual measurement fit. This only matters for reviewing the light curve when not opened from a file. */
+													data /* save the original non filtered data */, 0, 0, m_OCRedTimeStamp));
+				}
             }
         }
 
         private SpinLock m_WriterLock;
-        //private static int PROFILE_FITTING_MATRIX_SIZE = 11;
-
-
-//        private void MeasureTrackedObject1(
-//            TrackedObject trackedObject,
-//            MeasurementsHelper measurer,
-//            PreProcessingFilter filter,
-//            bool synchronise)
-//        {
-//            AstroPixel center = trackedObject.Center;
-//            int areaSize = LightCurveReductionContext.Instance.DigitalFilter == PreProcessingFilter.NoFilter
-//                               ? 17
-//                               : 19;
-
-//            int centerX = (int) Math.Round(center.XDouble);
-//            int centerY = (int) Math.Round(center.YDouble);
-
-//            byte[,] data = VideoContext.Current.AstroImage.GetMeasurableAreaPixels(centerX, centerY, areaSize);
-//            byte[,] pixelsToSave = VideoContext.Current.AstroImage.GetMeasurableAreaPixels(centerX, centerY, 35);
-//            byte[,] pixelsForBackground;
-
-//            switch (LightCurveReductionContext.Instance.DigitalFilter)
-//            {
-//                case PreProcessingFilter.LowPassFilter:
-//                    data = BitmapFilter.LowPassFilter(data, true);
-//                    pixelsForBackground = BitmapFilter.LowPassFilter(pixelsToSave, true);
-//                    break;
-//                case PreProcessingFilter.LowPassDifferenceFilter:
-//                    data = BitmapFilter.LowPassDifferenceFilter(data, true);
-//                    pixelsForBackground = BitmapFilter.LowPassDifferenceFilter(pixelsToSave, true);
-//                    break;
-//                default:
-//                    pixelsForBackground = pixelsToSave;
-//                    break;
-//            }
-
-//            float msrX0 = trackedObject.ThisFrameX;
-//            float msrY0 = trackedObject.ThisFrameY;
-
-//            //bool fixedAperture = trackedObject.OriginalObject.IsWeakSignalObject;
-//            double psfBackground = trackedObject.ThisFrameFit != null ? trackedObject.ThisFrameFit.I0 : double.NaN;
-
-//            if (LightCurveReductionContext.Instance.ReductionMethod == PhotometryReductionMethod.PsfPhotometryAnalytical ||
-//                LightCurveReductionContext.Instance.ReductionMethod == PhotometryReductionMethod.PsfPhotometryNumerical)
-//            {
-//                bool mayBeOcculted =
-//                    trackedObject.IsOcultedStar &&
-//                    trackedObject.ThisFrameFit != null &&
-//                    trackedObject.ThisFrameFit.IMax < 0.75*trackedObject.RefinedOrLastSignalLevel;
-
-//                if (TangraConfig.Settings.Photometry.PsfFittingMethod == PsfFittingMethod.DirectNonLinearFit)
-//                {
-//                    measurer.DoNonLinearProfileFittingPhotometry(
-//                        trackedObject,
-//                        data, centerX, centerY, msrX0, msrY0,
-//                        trackedObject.Aperture, trackedObject.ThisFrameFit != null ? trackedObject.ThisFrameFit.MatrixSize : trackedObject.PsfFitMatrixSize,
-//                        LightCurveReductionContext.Instance.ReductionMethod == PhotometryReductionMethod.PsfPhotometryNumerical,
-//                        trackedObject.IsOcultedStar && LightCurveReductionContext.Instance.FullDisappearance, pixelsToSave,  mayBeOcculted,
-//                        m_Tracker.RefinedFWHM[trackedObject.TargetNo]);
-//                }
-//                else if (TangraConfig.Settings.Photometry.PsfFittingMethod == PsfFittingMethod.LinearFitOfAveragedModel)
-//                {
-//                    float modelFWHM = float.NaN;
-//                    if (TangraConfig.Settings.Photometry.UseUserSpecifiedFWHM)
-//                        modelFWHM = TangraConfig.Settings.Photometry.UserSpecifiedFWHM;
-//                    else
-//                        modelFWHM = m_Tracker.RefinedAverageFWHM;
-
-//                    measurer.DoLinearProfileFittingOfAveragedMoodelPhotometry(
-//                        trackedObject,
-//                        data, centerX, centerY, msrX0, msrY0, modelFWHM,
-//                        trackedObject.Aperture, trackedObject.ThisFrameFit != null ? trackedObject.ThisFrameFit.MatrixSize : trackedObject.PsfFitMatrixSize,
-//                        LightCurveReductionContext.Instance.ReductionMethod == PhotometryReductionMethod.PsfPhotometryNumerical,
-//                        trackedObject.IsOcultedStar && LightCurveReductionContext.Instance.FullDisappearance, pixelsToSave, mayBeOcculted);
-//                }
-//                else
-//                    throw new NotImplementedException();
-//            }
-//            else if (LightCurveReductionContext.Instance.ReductionMethod == PhotometryReductionMethod.AperturePhotometry)
-//            {
-//                measurer.DoAperturePhotometry(
-//                    trackedObject,
-//                    data, centerX, centerY, msrX0, msrY0, 
-//                    trackedObject.Aperture,
-//                    psfBackground, pixelsToSave);
-
-//                trackedObject.AppMeaAveragePixel = Math.Min(255, 1.66 * measurer.TotalReading / trackedObject.ApertureArea);
-//            }
-//            else if (LightCurveReductionContext.Instance.ReductionMethod == PhotometryReductionMethod.OptimalExtraction)
-//            {
-//                bool mayBeOcculted =
-//                    trackedObject.IsOcultedStar &&
-//                    trackedObject.ThisFrameFit != null &&
-//                    trackedObject.ThisFrameFit.IMax < 0.75 * trackedObject.RefinedOrLastSignalLevel;
-
-//                measurer.DoOptimalExtractionPhotometry(
-//                    trackedObject,
-//                    data, centerX, centerY, msrX0, msrY0,
-//                    trackedObject.Aperture, trackedObject.ThisFrameFit != null ? trackedObject.ThisFrameFit.MatrixSize : trackedObject.PsfFitMatrixSize,
-//                    trackedObject.IsOcultedStar && LightCurveReductionContext.Instance.FullDisappearance, pixelsToSave, mayBeOcculted,
-//                    m_Tracker.RefinedFWHM[trackedObject.TargetNo], (float)psfBackground);
-//            }
-
-//#if PROFILING
-//            swSaveMeasurement.Start();
-//#endif
-//            bool lockTaken = false;
-
-//            if (synchronise)
-//                m_WriterLock.ReliableEnter(ref lockTaken);
-
-//            try
-//            {
-//                uint flags = trackedObject.GetLCMeasurementFlags();
-
-//                LCFile.SaveOnTheFlyMeasurement(new LCMeasurement(
-//                                                   (uint)m_CurrFrameNo,
-//                                                   trackedObject.TargetNo,
-//                                                   (uint) Math.Round(measurer.TotalReading),
-//                                                   (uint) Math.Round(measurer.TotalBackground),
-//                                                   flags,
-//                                                   msrX0, msrY0,
-//                    /* We want to use the real image (X,Y) coordinates here */
-//                    //(float) aperture,
-//                                                   trackedObject.ThisFrameFit,
-//                    /* but we want to use the actual measurement fit. This only matters for reviewing the light curve when not opened from a file. */
-//                                                   pixelsToSave /* save the original non filtered data */, centerX, centerY, m_OCRedTimeStamp));
-//            }
-//            finally
-//            {
-//                if (synchronise && lockTaken)
-//                    m_WriterLock.Exit();
-//            }
-//#if PROFILING
-//            swSaveMeasurement.Stop();
-//#endif
-//        }
-
 
 		private void MeasureTrackedObject2(
 			TrackedObject trackedObject,
@@ -1695,18 +1401,11 @@ namespace Tangra.VideoOperations.LightCurves
 				trackedObject,
 				LightCurveReductionContext.Instance.FullDisappearance);
 
-#if !PRODUCTION
-			Trace.Assert(trackedObject.IsOffScreen || (!double.IsNaN(center.XDouble) && !double.IsNaN(center.YDouble)));
-#endif
-
 			uint[,] pixelsToSave = trackedObject.IsOffScreen
 									   ? new uint[35, 35]
 									   // As the background may have been pre-processed for measuring, we need to take another copy for saving in the file
 									   : m_VideoController.GetCurrentAstroImage(false).GetMeasurableAreaPixels(centerX, centerY, 35);
 
-#if PROFILING
-            swSaveMeasurement.Start();
-#endif
 			bool lockTaken = false;
 
 			if (synchronise)
@@ -1734,9 +1433,6 @@ namespace Tangra.VideoOperations.LightCurves
 				if (synchronise && lockTaken)
 					m_WriterLock.Exit();
 			}
-#if PROFILING
-            swSaveMeasurement.Stop();
-#endif
 		}
 
 		internal static void MeasureObject(
@@ -1802,7 +1498,6 @@ namespace Tangra.VideoOperations.LightCurves
 				(byte)m_Tracker.TrackedObjects.Count,
 				LightCurveReductionContext.Instance.LightCurveReductionType,
 				measurementTimingType,
-				/*AppConfig.Instance.PhotometrySettings.SignalTotalFSPFitArea,*/
 				(int)LightCurveReductionContext.Instance.NoiseMethod,
 				(int)LightCurveReductionContext.Instance.DigitalFilter,
 				matrixSizes.ToArray(), apertures.ToArray(), fixedFlags.ToArray(), (float)m_Tracker.PositionTolerance);
@@ -1826,7 +1521,7 @@ namespace Tangra.VideoOperations.LightCurves
 				m_StateMachine.MeasuringStars,
 				m_Tracker,
 				m_TimestampOCR,
-				null /*m_ThumbPrintDict*/);
+				null);
 
 			m_lcFile = LCFile.FlushOnTheFlyOutputFile(finalHeader, footer);
 		}

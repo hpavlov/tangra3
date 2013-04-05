@@ -162,23 +162,5 @@ namespace Tangra.VideoOperations.LightCurves
             m_CurrentStateObject.Initialize();
             return m_CurrentStateObject;
         }
-
-        //public void Next()
-        //{
-        //    LCUIState nextState;
-        //    if (m_CurrentState == LightCurvesState.SelectTrackingStars)
-        //        nextState = ChangeState(LightCurvesState.SelectMeasuringStars);
-        //    else if (m_CurrentState == LightCurvesState.SelectMeasuringStars)
-        //        nextState = ChangeState(LightCurvesState.ReadyToRun);
-
-        //    LCUIState nextState = m_CurrentStateObject.NextState();
-        //    nextState.Initialize();
-        //}
-
-        //public void Previous()
-        //{
-        //    LCUIState nextState = m_CurrentStateObject.PreviousState();
-        //    nextState.Initialize();
-        //}
     }
 }

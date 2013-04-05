@@ -154,16 +154,9 @@ namespace Tangra.Model.Helpers
 
         private static void SaveForm(ControlMemento memento, Form form)
         {
-            //Trace.WriteLineIf(Config.TraceSwitches.UIEvents.TraceVerbose, "Saving " + memento.ControlType, "ControlMemento");
-
             memento.Properties.Clear();
 
             memento.Properties.Add("Version", 1);
-
-            //Trace.WriteLineIf(Config.TraceSwitches.UIEvents.TraceVerbose, "Height = " + form.Height.ToString(), "ControlMemento");
-            //Trace.WriteLineIf(Config.TraceSwitches.UIEvents.TraceVerbose, "Width = " + form.Width.ToString(), "ControlMemento");
-            //Trace.WriteLineIf(Config.TraceSwitches.UIEvents.TraceVerbose, "Top = " + form.Top.ToString(), "ControlMemento");
-            //Trace.WriteLineIf(Config.TraceSwitches.UIEvents.TraceVerbose, "Left = " + form.Left.ToString(), "ControlMemento");
 
             memento.Properties.Add("Height", form.Height);
             memento.Properties.Add("Width", form.Width);
@@ -175,19 +168,12 @@ namespace Tangra.Model.Helpers
         {
             if (memento.IsNew)
             {
-                //Trace.WriteLineIf(Config.TraceSwitches.UIEvents.TraceVerbose, "Using default values for " + memento.ControlType, "ControlMemento");
                 memento.Properties["Height"] = form.Height;
                 memento.Properties["Width"] = form.Width;
                 memento.Properties["Top"] = form.Top;
                 memento.Properties["Left"] = form.Left;
                 memento.IsNew = false;
             }
-
-            //Trace.WriteLineIf(Config.TraceSwitches.UIEvents.TraceVerbose, "Loading " + memento.ControlType, "ControlMemento");
-            //Trace.WriteLineIf(Config.TraceSwitches.UIEvents.TraceVerbose, "Height = " + memento.Properties["Height"].ToString(), "ControlMemento");
-            //Trace.WriteLineIf(Config.TraceSwitches.UIEvents.TraceVerbose, "Width = " + memento.Properties["Width"].ToString(), "ControlMemento");
-            //Trace.WriteLineIf(Config.TraceSwitches.UIEvents.TraceVerbose, "Top = " + memento.Properties["Top"].ToString(), "ControlMemento");
-            //Trace.WriteLineIf(Config.TraceSwitches.UIEvents.TraceVerbose, "Left = " + memento.Properties["Left"].ToString(), "ControlMemento");
 
             form.Height = memento.Properties["Height"];
             form.Width = memento.Properties["Width"];
@@ -209,8 +195,6 @@ namespace Tangra.Model.Helpers
                 string key = string.Format("Width-{0}", idx);
                 int val = column.Width;
 
-                //Trace.WriteLineIf(Config.TraceSwitches.UIEvents.TraceVerbose, key + " = " + val.ToString(), "ControlMemento");
-
                 memento.Properties.Add(key, val);
                 idx++;
             }
@@ -218,23 +202,6 @@ namespace Tangra.Model.Helpers
 
         private static void SaveListView(ControlMemento memento, ListView lv, object argument)
         {
-            //Trace.WriteLineIf(Config.TraceSwitches.UIEvents.TraceVerbose, "Saving " + memento.ControlType, "ControlMemento");
-
-            //if (argument is ColumnWidthChangedEventArgs)
-            //{
-            //    int colIdx = (argument as ColumnWidthChangedEventArgs).ColumnIndex;
-            //    if (lv.Columns[colIdx] != null)
-            //    {
-            //        string key = string.Format("Width-{0}", colIdx);
-            //        int val = lv.Columns[colIdx].Width;
-
-            //        Trace.WriteLineIf(Config.TraceSwitches.UIEvents.TraceVerbose, key + " = " + val.ToString(), "ControlMemento");
-
-            //        memento.Properties.Add(key, val);
-            //    }
-            //}
-            //else
-            //{
             memento.Properties.Clear();
 
             memento.Properties.Add("Version", 1);
@@ -245,12 +212,9 @@ namespace Tangra.Model.Helpers
                 string key = string.Format("Width-{0}", idx);
                 int val = col.Width;
 
-                //Trace.WriteLineIf(Config.TraceSwitches.UIEvents.TraceVerbose, key + " = " + val.ToString(), "ControlMemento");
-
                 memento.Properties.Add(key, val);
                 idx++;
             }
-            //}
         }
 
 
@@ -258,12 +222,9 @@ namespace Tangra.Model.Helpers
         {
             if (memento.IsNew)
             {
-                //Trace.WriteLineIf(Config.TraceSwitches.UIEvents.TraceVerbose, "Using default values for " + memento.ControlType, "ControlMemento");
                 SaveListView(memento, lv, null);
                 memento.IsNew = false;
             }
-
-            //Trace.WriteLineIf(Config.TraceSwitches.UIEvents.TraceVerbose, "Loading " + memento.ControlType, "ControlMemento");
 
             if (memento.Properties.Count <= lv.Columns.Count + 1)
             {
@@ -276,13 +237,9 @@ namespace Tangra.Model.Helpers
                     {
                         int val = memento.Properties[key];
 
-                        //Trace.WriteLineIf(Config.TraceSwitches.UIEvents.TraceVerbose, key + " = " + val.ToString(), "ControlMemento");
-
                         col.Width = val;
                     }
                     else
-                        //Trace.WriteLineIf(Config.TraceSwitches.UIEvents.TraceVerbose, "MISSING: " + key, "ControlMemento");
-
                         idx++;
                 }
 
@@ -290,7 +247,6 @@ namespace Tangra.Model.Helpers
             }
             else
             {
-                //Trace.WriteLineIf(Config.TraceSwitches.UIEvents.TraceVerbose, "FAILED: '" + memento.Properties.Count.ToString() + "' props and '" + lv.Columns.Count.ToString() + "' columns", "ControlMemento");
                 return false;
             }
         }
@@ -300,12 +256,9 @@ namespace Tangra.Model.Helpers
         {
             if (memento.IsNew)
             {
-                //Trace.WriteLineIf(Config.TraceSwitches.UIEvents.TraceVerbose, "Using default values for " + memento.ControlType, "ControlMemento");
                 SaveDataGridView(memento, dgv, null);
                 memento.IsNew = false;
             }
-
-            //Trace.WriteLineIf(Config.TraceSwitches.UIEvents.TraceVerbose, "Loading " + memento.ControlType, "ControlMemento");
 
             if (memento.Properties.Count == dgv.Columns.Count + 1)
             {
@@ -314,8 +267,6 @@ namespace Tangra.Model.Helpers
                 {
                     string key = string.Format("Width-{0}", idx);
                     int val = memento.Properties[key];
-
-                    //Trace.WriteLineIf(Config.TraceSwitches.UIEvents.TraceVerbose, key + " = " + val.ToString(), "ControlMemento");
 
                     column.Width = val;
                     idx++;
@@ -361,8 +312,6 @@ namespace Tangra.Model.Helpers
             m_ControlType = info.GetString("ControlType");
             int count = info.GetInt32("AllItems");
 
-            //Trace.WriteLineIf(Config.TraceSwitches.UIEvents.TraceVerbose, "Deserializing " + m_ControlType, "ControlMemento");
-
             m_Properties.Clear();
 
             for (int i = 0; i < count; i++)
@@ -370,8 +319,6 @@ namespace Tangra.Model.Helpers
                 string key = info.GetString(string.Format("{0}-{1}-0", m_ControlType, i));
                 int val = info.GetInt32(string.Format("{0}-{1}-1", m_ControlType, i));
                 m_Properties.Add(key, val);
-
-                //Trace.WriteLineIf(Config.TraceSwitches.UIEvents.TraceVerbose, key + " = " + val, "ControlMemento");
             }
         }
 
@@ -380,15 +327,11 @@ namespace Tangra.Model.Helpers
             info.AddValue("ControlType", m_ControlType);
             info.AddValue("AllItems", m_Properties.Keys.Count);
 
-            //Trace.WriteLineIf(Config.TraceSwitches.UIEvents.TraceVerbose, "Serializing " + m_ControlType, "ControlMemento");
-
             int i = 0;
             foreach (string key in m_Properties.Keys)
             {
                 info.AddValue(string.Format("{0}-{1}-0", m_ControlType, i), key);
                 info.AddValue(string.Format("{0}-{1}-1", m_ControlType, i), m_Properties[key]);
-
-                //Trace.WriteLineIf(Config.TraceSwitches.UIEvents.TraceVerbose, key + " = " + m_Properties[key], "ControlMemento");
                 i++;
             }
         }

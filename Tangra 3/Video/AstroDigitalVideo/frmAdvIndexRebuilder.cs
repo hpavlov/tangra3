@@ -92,36 +92,41 @@ namespace Tangra.Video.AstroDigitalVideo
 
 		private void InvokeUpdateUI(string process, string status, int percentDone)
 		{
-			Invoke(new UpdateUIDelegate(UpdateUI), new object[] { process, status, percentDone });						
+			try
+			{
+				Invoke(new UpdateUIDelegate(UpdateUI), new object[] { process, status, percentDone });							
+			}
+			catch(InvalidOperationException)
+			{ }
 		}
 
 		private void RepairAdvFile(object state)
 		{
-			InvokeUpdateUI("Searching for ADV frames ...", "", 0);
+			InvokeUpdateUI("Searching for ADV/AAV frames ...", "", 0);
 
 			m_AdvFile.SearchFramesByMagicPhase1(
 				delegate(int percentDone, int framesFound)
 					{
-						string process = "Searching for ADV frames ...";
+						string process = "Searching for ADV/AAV frames ...";
 						string status = string.Format("{0} potential frames found", framesFound);
 
 						InvokeUpdateUI(process, status, percentDone);
 					});
 
-			InvokeUpdateUI("Searching for ADV frames ...", "", 100);
+			InvokeUpdateUI("Searching for ADV/AAV frames ...", "", 100);
 
-			InvokeUpdateUI("Recovering ADV frames ...", "", 0);
+			InvokeUpdateUI("Recovering ADV/AAV frames ...", "", 0);
 
 			m_AdvFile.SearchFramesByMagicPhase2(
 				delegate(int percentDone, int framesRecovered)
 				{
-					string process = "Recovering ADV frames ...";
+					string process = "Recovering ADV/AAV frames ...";
 					string status = string.Format("{0} frames recovered successfully", framesRecovered);
 
 					InvokeUpdateUI(process, status, percentDone);
 				});
 
-			InvokeUpdateUI("Recovering ADV frames ...", "", 100);
+			InvokeUpdateUI("Recovering ADV/AAV frames ...", "", 100);
 			Invoke(new ProcInvoker(SaveRecoveredFile));
 		}
 
@@ -131,7 +136,7 @@ namespace Tangra.Video.AstroDigitalVideo
 		{
 			if (m_AdvFile.Index.Index.Count == 0)
 			{
-				MessageBox.Show(this, "No frames were recovered. Is this a newer/different ADV file format?", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				MessageBox.Show(this, "No frames were recovered. Is this a newer/different ADV/AAV file format?", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 			else
 			{

@@ -21,11 +21,6 @@ namespace Tangra.Helpers
 		{
 			m_VideoController = videoController;
 
-#if !PRODUCTION
-			Trace.Assert(frameId <= m_VideoController.VideoLastFrame);
-			Trace.Assert(frameId >= m_VideoController.VideoFirstFrame);
-#endif
-
 			m_FrameId = frameId;
 		}
 
@@ -79,9 +74,9 @@ namespace Tangra.Helpers
 			}
 			finally
 			{
-				//if (prevFrame != null) prevFrame.Dispose();
-				//if (thisFrame != null) thisFrame.Dispose();
-				//if (nextFrame != null) nextFrame.Dispose();
+				if (prevFrame != null) prevFrame.Dispose();
+				if (thisFrame != null) thisFrame.Dispose();
+				if (nextFrame != null) nextFrame.Dispose();
 			}
 
 			return m_FrameId;
@@ -117,9 +112,9 @@ namespace Tangra.Helpers
 			}
 			finally
 			{
-				//if (prevFrame != null) prevFrame.Dispose();
-				//if (thisFrame != null) thisFrame.Dispose();
-				//if (nextFrame != null) nextFrame.Dispose();
+				if (prevFrame != null) prevFrame.Dispose();
+				if (thisFrame != null) thisFrame.Dispose();
+				if (nextFrame != null) nextFrame.Dispose();
 			}
 
 			return m_FrameId;
@@ -155,50 +150,6 @@ namespace Tangra.Helpers
 						return false;
 				}
 			}
-
-			//BitmapData bmData1 = bmp1.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
-			//BitmapData bmData2 = bmp2.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
-
-			//try
-			//{
-			//    int stride = bmData1.Stride;
-			//    System.IntPtr Scan01 = bmData1.Scan0;
-			//    System.IntPtr Scan02 = bmData2.Scan0;
-
-			//    unsafe
-			//    {
-			//        byte* p1 = (byte*)(void*)Scan01;
-			//        byte* p2 = (byte*)(void*)Scan02;
-
-			//        int nOffset = stride - width * 3;
-
-			//        for (y = 0; y < height; ++y)
-			//        {
-			//            for (x = 0; x < width; ++x)
-			//            {
-			//                if (
-			//                    p1[0] != p2[0] &&  
-			//                    p1[1] != p2[1] &&
-			//                    p1[2] != p2[2])
-			//                {
-			//                    return false;
-			//                }
-
-			//                p1 += 3;
-			//                p2 += 3;
-			//            }
-			//            p1 += nOffset;
-			//            p2 += nOffset;
-			//        }
-			//    }
-
-			//}
-			//finally
-			//{
-			//    bmp1.UnlockBits(bmData1);
-			//    bmp2.UnlockBits(bmData2);
-
-			//}
 
 			return true;
 		}

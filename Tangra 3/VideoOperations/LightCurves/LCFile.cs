@@ -75,7 +75,7 @@ namespace Tangra.VideoOperations.LightCurves
                                         for (int j = 0; j < header.ObjectCount; j++)
                                         {
                                             LCMeasurement measurement = data[j][i];
-                                            //Trace.WriteLine(measurement.TargetNo == j);
+
                                             measurement.WriteTo(writer);
 
                                             if (showProgress)
@@ -155,10 +155,6 @@ namespace Tangra.VideoOperations.LightCurves
 
 	            byte totalObjects = reader.ReadByte();
 
-#if !PRODUCTION
-                Trace.Assert(lcFile.Header.ObjectCount == totalObjects);
-#endif
-
                 lcFile.Data = new List<List<LCMeasurement>>(new List<LCMeasurement>[] { new List<LCMeasurement>(), new List<LCMeasurement>(), new List<LCMeasurement>(), new List<LCMeasurement>() });
             	lcFile.FrameTiming = new List<LCFrameTiming>();
 
@@ -200,10 +196,6 @@ namespace Tangra.VideoOperations.LightCurves
                                     {
                                         measurement = new LCMeasurement(reader, prevMeasurement);
                                         prevMeasurement = measurement;
-
-#if !PRODUCTION
-                                        Trace.Assert(i == measurement.TargetNo);
-#endif
 
                                         if (lastFrameNo != (int)measurement.CurrFrameNo)
                                             lcFile.Data[i].Add(measurement);
@@ -316,12 +308,6 @@ namespace Tangra.VideoOperations.LightCurves
 					s_OnTheFlyWriter.Flush();
 					s_OnTheFlyFile.Seek(0, SeekOrigin.Begin);
 
-#if !PRODUCTION
-					if (header.ObjectCount > 1) Trace.Assert(s_NumMeasurements[0] == s_NumMeasurements[1]);
-					if (header.ObjectCount > 2) Trace.Assert(s_NumMeasurements[0] == s_NumMeasurements[2]);
-					if (header.ObjectCount > 3) Trace.Assert(s_NumMeasurements[0] == s_NumMeasurements[3]);
-#endif
-
 					s_OnTheFlyWriter.Write(LC_FILE_VERSION);
 					header.WriteTo(s_OnTheFlyWriter);
 					s_OnTheFlyWriter.Write(header.ObjectCount);
@@ -401,7 +387,7 @@ namespace Tangra.VideoOperations.LightCurves
 		public int FrameDurationInMilliseconds;
 		public byte[,] OCRedPixels;
 
-		// TOPDO: Add ORC area dimentions to header
+		// TODO: Add ORC area dimentions to header
 		
 		public LCFrameTiming(DateTime frameMidTime, int frameDurationInMilliseconds)
 		{
@@ -469,8 +455,6 @@ namespace Tangra.VideoOperations.LightCurves
     {
         public static LCMeasurement Empty = new LCMeasurement();
 
-        //private object m_PreviousMeasurement;
-
         private static int MATRIX_SIZE = 35;
 
         public static bool IsEmpty(LCMeasurement compareTo)
@@ -489,13 +473,9 @@ namespace Tangra.VideoOperations.LightCurves
 		internal uint FlagsDWORD;
         internal float X0;
         internal float Y0;
-        //internal float XMatrix;
-        //internal float YMatrix;
         internal int PixelDataX0;
         internal int PixelDataY0;
 
-        //internal float Aperture;
-        //internal byte PsfFitMatrixSize;
         internal PSFFit PsfFit;
 
         internal string GetFlagsExplained()
@@ -527,7 +507,6 @@ namespace Tangra.VideoOperations.LightCurves
             clone.Y0 = this.Y0;
             clone.PixelDataX0 = this.PixelDataX0;
             clone.PixelDataY0 = this.PixelDataY0;
-            //clone.Aperture = this.Aperture;
 
             clone.PixelData = new uint[MATRIX_SIZE, MATRIX_SIZE];
             for (int i = 0; i < MATRIX_SIZE; i++)
@@ -535,9 +514,6 @@ namespace Tangra.VideoOperations.LightCurves
                 {
                     clone.PixelData[i, j] = this.PixelData[i, j];
                 }
-
-            //clone.m_PreviousMeasurement = null; // this.m_PreviousMeasurement;
-            //clone.m_PrevSuccessfulReading = null; // this.m_PrevSuccessfulReading;
 
             return clone;
         }
@@ -582,41 +558,9 @@ namespace Tangra.VideoOperations.LightCurves
 			}
 		}
 
-        //internal bool IsSuccessfulPreviousReading
-        //{
-        //    get
-        //    {
-        //        LCMeasurement prevMea = (LCMeasurement) m_PreviousMeasurement;
-        //        if (prevMea.Equals(LCMeasurement.Empty))
-        //            return prevMea.IsSuccessfulReading;
-        //        else
-        //            return true;
-        //    }
-        //}
-
-        //private object m_PrevSuccessfulReading;
-        //internal LCMeasurement PrevSuccessfulReading
-        //{
-        //    get
-        //    {
-        //        if (m_PrevSuccessfulReading == null)
-        //        {
-        //            m_PrevSuccessfulReading = this;
-        //        }
-
-        //        while(!((LCMeasurement)m_PrevSuccessfulReading).IsSuccessfulReading)
-        //        {
-        //            m_PrevSuccessfulReading = ((LCMeasurement)m_PrevSuccessfulReading).m_PreviousMeasurement;
-        //        }
-
-        //        return (LCMeasurement)m_PrevSuccessfulReading;
-        //    }
-        //}
-
         public DateTime OSDTimeStamp;
 
         private static int SERIALIZATION_VERSION = 7;
-		//private static int MINIMAL_DWORD_FLAGS_VERSION = 6;
         private static int MINAMAL_SUPPORTED_VERSION = 3;
     	private static int FIRST_UINT_MATRIX_VERSION = 7;
 
@@ -651,20 +595,6 @@ namespace Tangra.VideoOperations.LightCurves
 
             PsfFit = psfFit;
 
-            //if (psfFit != null)
-            //{
-            //    XMatrix = psfFit.X0_Matrix;
-            //    YMatrix = psfFit.Y0_Matrix;
-            //}
-            //else
-            //{
-            //    XMatrix = 9;
-            //    YMatrix = 9;
-            //}
-
-            //m_PreviousMeasurement = null;
-            //m_PrevSuccessfulReading = null;
-
             OSDTimeStamp = osdTimeStamp;
 
             ReProcessingPsfFitMatrixSize = 11;
@@ -675,8 +605,6 @@ namespace Tangra.VideoOperations.LightCurves
             AdjustedReading = 0;
             AdjustedBackground = 0;
             PsfFit = null;
-            //m_PreviousMeasurement = null;// prevMeasurement;
-            //m_PrevSuccessfulReading = null;
 
             int version = reader.ReadInt32();
             if (version < MINAMAL_SUPPORTED_VERSION)
@@ -722,16 +650,6 @@ namespace Tangra.VideoOperations.LightCurves
 					FlagsDWORD = reader.ReadUInt32();
 				}
             }
-            
-            //XMatrix = reader.ReadSingle();
-            //YMatrix = reader.ReadSingle();
-
-            //Aperture = reader.ReadSingle();
-
-            //PsfFitMatrixSize = reader.ReadByte();
-            //bool hasPsfFit = reader.ReadBoolean();
-            //if (hasPsfFit)
-            //    PsfFit = PSFFit.Load(reader);
 
             ReProcessingPsfFitMatrixSize = 11;
         }
@@ -760,18 +678,6 @@ namespace Tangra.VideoOperations.LightCurves
 
 			// Version 6 Data
 			writer.Write(FlagsDWORD);
-
-            //writer.Write(XMatrix);
-            //writer.Write(YMatrix);
-
-            // NOTE: Saving the PSFs is slow and makes the file HUGE!
-            //writer.Write(Aperture);
-            //writer.Write(PsfFitMatrixSize);
-
-            //writer.Write(false);
-            //writer.Write(PsfFit != null);
-            //if (PsfFit != null)
-            //    PsfFit.Save(writer);
         }
 
         #region IMeasuredObject Members
@@ -875,8 +781,8 @@ namespace Tangra.VideoOperations.LightCurves
 
         internal uint MeasurementInterval;
 
-        internal DateTime FirstTimedFrameTime;// = DateTime.MinValue;
-        internal DateTime SecondTimedFrameTime;// = DateTime.MinValue;
+        internal DateTime FirstTimedFrameTime;
+        internal DateTime SecondTimedFrameTime;
 
         internal int FirstTimedFrameNo;
         internal int LastTimedFrameNo;
@@ -1111,15 +1017,14 @@ namespace Tangra.VideoOperations.LightCurves
         internal int MinAdjustedReading;
         internal int MaxAdjustedReading;
 
-        internal int BackgroundType;// = 0;
-        internal int FilterType;// = 0;
+        internal int BackgroundType;
+        internal int FilterType;
 
         internal float PositionTolerance;
-        //internal int SignalTotalMeasurementArea;// = -1;
 
         internal string SourceInfo;
 
-        private double m_FramesPerSecond;// = 40;
+        private double m_FramesPerSecond;
         internal double FramesPerSecond
         {
             get
@@ -1129,24 +1034,6 @@ namespace Tangra.VideoOperations.LightCurves
             set
             {
                 m_FramesPerSecond = value;
-
-                // NOTE: Is it better to use the actual value, which will be slightly
-                // out of precise 25.0 for example. There are issues with the KIWI OSD timestamp
-                // moving by 1 milisecond because of a similar issue. 
-                // TODO: Research more why the KIWI timestamp is moving by 1 ms ??
-
-                //if (value != 25.0 &&
-                //    Math.Round(value) == 25.0)
-                //{
-                //    m_FramesPerSecond = 25.0;
-                //}
-                //else if (value != 29.97 &&
-                //    Math.Round(100 * value) == 2997)
-                //{
-                //    m_FramesPerSecond = 29.97;
-                //}
-                //else
-                //    m_FramesPerSecond = value;
 
                 m_FrameExposureInMS = 1000.0 / m_FramesPerSecond;
             }
@@ -1200,7 +1087,6 @@ namespace Tangra.VideoOperations.LightCurves
             MinAdjustedReading = 0;
             MaxAdjustedReading = 0;
 
-            //SignalTotalMeasurementArea = -1;
             FirstTimedFrameTime = DateTime.MaxValue;
             SecondTimedFrameTime = DateTime.MinValue;
 
@@ -1218,7 +1104,6 @@ namespace Tangra.VideoOperations.LightCurves
             MeasurementInterval = measurementInterval;
             BackgroundType = backgroundType;
             FilterType = filterType;
-            //SignalTotalMeasurementArea = signalTotalMeasurementArea;
 
             PsfFitMatrixSizes = psfFitMatrixSizes;
             MeasurementApertures = measurementApertures;
@@ -1312,8 +1197,6 @@ namespace Tangra.VideoOperations.LightCurves
 				TimingType = MeasurementTimingType.UserEnteredFrameReferences;
             }
 
-        	//SignalTotalMeasurementArea = reader.ReadInt32();
-
             if (FirstTimedFrameTime != DateTime.MaxValue &&
                 SecondTimedFrameTime != DateTime.MinValue)
             {
@@ -1347,7 +1230,6 @@ namespace Tangra.VideoOperations.LightCurves
             writer.Write(MeasurementInterval);
             writer.Write(BackgroundType);
             writer.Write(FilterType);
-            //writer.Write(SignalTotalMeasurementArea);
 
             for (int i = 0; i < ObjectCount; i++)
             {
@@ -1365,17 +1247,6 @@ namespace Tangra.VideoOperations.LightCurves
 			// VERSION 3 Data
 			writer.Write(((byte)TimingType));
         }
-
-
-        //public static bool operator ==(LCMeasurementHeader h1, LCMeasurementHeader h2)
-        //{
-        //    return (h1.InternalId == h2.InternalId);
-        //}
-
-        //public static bool operator !=(LCMeasurementHeader h1, LCMeasurementHeader h2)
-        //{
-        //    return (h1.InternalId != h2.InternalId);
-        //}
     }
 
     internal struct LCMeasurementFooter
@@ -1430,9 +1301,6 @@ namespace Tangra.VideoOperations.LightCurves
 			int bytesCount = reader.ReadInt32();
 			AveragedFrameBytes = reader.ReadBytes(bytesCount);
 
-			//Bitmap bmp = Pixelmap.BytesToBitmap(data, AveragedFrameWidth, AveragedFrameHeight);
-			//AveragedFrame = PixelmapFactory.ConstructFromBitmap(bmp, ColourChannel.Red);	
-
 			string configString = reader.ReadString();
 			ProcessedWithTangraConfig = configString.FromBase64String<TangraConfig>();
 
@@ -1469,60 +1337,6 @@ namespace Tangra.VideoOperations.LightCurves
 					}
 				}
 			}
-
-			//if (version >= 100)
-			//{
-			//    AveragedFrameWidth = reader.ReadInt32();
-			//    AveragedFrameHeight = reader.ReadInt32();
-			//    AveragedFrameBpp = reader.ReadInt32();
-
-			//    int bytesCount = reader.ReadInt32();
-			//    AveragedFrameBytes = reader.ReadBytes(bytesCount);
-
-			//    // NOTES: When serializing/deserializing the pixels are always stored in the same BPP depth as the camera BPP
-			//    //AveragedFrame = PixelmapFactory.ConstructFromArrayBytes(data, width, height, bitpix, bitpix);
-
-			//    string configString = reader.ReadString();
-			//    ProcessedWithTangraConfig = configString.FromBase64String<TangraConfig>();
-
-			//    ReductionContext = LightCurveReductionContext.Load(reader);
-
-			//    int numObjects = reader.ReadInt32();
-			//    TrackedObjects = new List<TrackedObjectConfig>();
-			//    for (int i = 0; i < numObjects; i++)
-			//    {
-			//        TrackedObjects.Add(TrackedObjectConfig.Load(reader));
-			//    }
-
-			//    RefinedAverageFWHM = float.NaN;
-			//    TimestampOCR = string.Empty;
-			//    ThumbPrintDict = new Dictionary<int, long>();
-
-			//    if (version > 1)
-			//    {
-			//        RefinedAverageFWHM = reader.ReadSingle();
-
-			//        if (version > 2)
-			//        {
-			//            TimestampOCR = reader.ReadString();
-
-			//            if (version > 3)
-			//            {
-			//                int numRecs = reader.ReadInt32();
-			//                for (int i = 0; i < numRecs; i++)
-			//                {
-			//                    int frameNo = reader.ReadInt32();
-			//                    long thumbprint = reader.ReadInt64();
-			//                    ThumbPrintDict.Add(frameNo, thumbprint);
-			//                }
-			//            }
-			//        }
-			//    }				
-			//}
-			//else
-			//{
-
-			//}
         }
 
         internal void WriteTo(BinaryWriter writer)
@@ -1534,7 +1348,6 @@ namespace Tangra.VideoOperations.LightCurves
             writer.Write(AveragedFrameBpp);
 
 			// Saving the display bitmap of the frame
-            //byte[] data = AveragedFrame.GetArrayBytes();
 			writer.Write(AveragedFrameBytes.Length);
 			writer.Write(AveragedFrameBytes);
 

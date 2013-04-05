@@ -28,8 +28,6 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 			m_LCFile = lcFile;
 			m_DisplaySettings = displaySettings;
 
-			//NotificationManager.Subscribe(this, typeof(frmLightCurve));
-
 			picTarget1Hist.Image = new Bitmap(picTarget1Hist.Width, picTarget1Hist.Height);
 			picTarget2Hist.Image = new Bitmap(picTarget2Hist.Width, picTarget2Hist.Height);
 			picTarget3Hist.Image = new Bitmap(picTarget3Hist.Width, picTarget3Hist.Height);
@@ -50,24 +48,9 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
             }
             base.Dispose(disposing);
 
-            //NotificationManager.Unsubscribe(this);
             m_LCFile = null;
             m_SelectedMeasurements = null;
         }
-
-        //#region INotificationReceiver Members
-
-        //public void ReceieveMessage(NotificationMessage message, MessageDeliveryOptions deliveryFlags)
-        //{
-        //    if (message.Sender is frmLightCurve &&
-        //        message.MessageId == frmMain.MSG_ID_FRAME_CHANGED)
-        //    {
-        //        m_SelectedMeasurements = (LCMeasurement[])message.Message;
-        //        HandleNewSelectedFrame();
-        //    }
-        //}
-
-        //#endregion
 
 		internal void HandleNewSelectedFrame(LCMeasurement[] selectedMeasurements)
 		{
@@ -118,12 +101,7 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 						double psfBackground = updatedReading.PsfFit.I0;
 
 						float aperture = m_Context.ReProcessApertures[reading.TargetNo];
-
-						// TODO: Extend the MeasurementsHelper to expose the per-pixel background as properties
-						//       then use the normal photometry measurement methods and get the corresponding
-						//       background values
-						// Photometry.MeasurementsHelper hlp = new MeasurementsHelper();
-						// hlp.DoAperturePhotometry();
+						
 
 						List<uint> allKeys = histogram.Keys.ToList();
 						foreach (uint key in allKeys)

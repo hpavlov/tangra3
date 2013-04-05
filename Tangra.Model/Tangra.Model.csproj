@@ -72,6 +72,7 @@
     <Compile Include="Astro\AstroImage.cs" />
     <Compile Include="Astro\StarFinder.cs" />
     <Compile Include="Astro\PSFFit.cs" />
+    <Compile Include="Config\AavSettings.cs" />
     <Compile Include="Config\AdvsSettings.cs" />
     <Compile Include="Config\OCRConfigEntry.cs" />
     <Compile Include="Config\TangraConfig.cs" />

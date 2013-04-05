@@ -37,7 +37,7 @@ namespace Tangra.Video.AstroDigitalVideo
 			if (m_AdvFile.IsCorrupted)
 				MessageBox.Show(
 					this,
-					"This is not an ADV file or it is corrupted. Try using [Tools] -> [ADV Tools] -> [Repair ADV File] to repair it.",
+					"This is not an ADV/AAV file or it is corrupted. Try using [Tools] -> [ADV/AAV Tools] -> [Repair ADV/AAV File] to repair it.",
 					"Tangra",
 					MessageBoxButtons.OK,
 					MessageBoxIcon.Error);
@@ -189,15 +189,14 @@ namespace Tangra.Video.AstroDigitalVideo
 
 				prevFrameNo = index;
 
-				// TODO:
 				Pixelmap rv = m_AdvFile.ImageSection.CreatePixelmap(imageData);
+
 				//Pixelmap rv = new Pixelmap((int)m_AdvFile.ImageSection.Width, (int)m_AdvFile.ImageSection.Height, m_AdvFile.ImageSection.BitsPerPixel, null, null, null);
 				//rv.Width = (int) m_AdvFile.ImageSection.Width;
 				//rv.Height = (int) m_AdvFile.ImageSection.Height;
 				//rv.BitPixCamera = m_AdvFile.ImageSection.BitsPerPixel;
 				//rv.Array = new uint[Width * Height];
 				//rv.CopyPixelsFrom(imageData.ImageData, imageData.Bpp);
-
 				//displayBitmap = PixelmapFactory.ConstructBitmapFrom12BitPixelmap(rv);
 
 				displayBitmap = rv.DisplayBitmap;

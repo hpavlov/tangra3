@@ -159,21 +159,8 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
                         int y = dic[x];
                         float xx = x0 + (x - minX) * scaleX;
                         float yy = pictureBox.Height - y0 - y * scaleY;
-                        //g.FillEllipse(brush, xx - 2, yy - 2, 5, 5);
 
                         g.FillRectangle(brush, xx - halfBarWidth, yy + 1, 2 * halfBarWidth, pictureBox.Height - y0 - yy);
-
-                        // NOTE: Gaussian 
-                        //float teoY = (float) fit.ValueForX(x);
-                        //if (!float.IsNaN(prevY))
-                        //{
-                        //    g.DrawLine(
-                        //        Pens.WhiteSmoke,
-                        //        x0 + (prevX - minX)*scaleX, pictureBox.Height - y0 - prevY * scaleY,
-                        //        x0 + (x - minX) * scaleX, pictureBox.Height - y0 - teoY * scaleY);
-                        //}
-                        //prevX = x;
-                        //prevY = teoY;
                     }
 
                     g.Save();
@@ -182,10 +169,6 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
             }
             
             pictureBox.Refresh();
-
-            //lblFWHM.Text = fit.Sigma.ToString("0.0");
-            //lblPFSMax.Text = fit.IMax.ToString("0");
-            //lblPSFMiddle.Text = fit.X0.ToString("0.0");
         }
 
         private void TargetChecked(object sender, EventArgs e)

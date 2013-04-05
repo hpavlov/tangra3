@@ -11,7 +11,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
     {
         public static Tracker CreateTracker(LightCurveReductionType lightCurveReductionType, List<TrackedObjectConfig> measuringStars)
         {
-            // TODO: Figure out what tracker to create based on the type of event, number of objects and their intencity
+            // NOTE: Figure out what tracker to create based on the type of event, number of objects and their intencity
 
             if (lightCurveReductionType == LightCurveReductionType.Asteroidal)
             {

@@ -47,7 +47,6 @@ namespace Tangra.VideoOperations.LightCurves
             set
             {
                 m_ColourChannel = value;
-                //ContextManager.SetObject("VideoPlayer.ColourChannel", m_ColourChannel);
             }
         }
 
@@ -88,7 +87,6 @@ namespace Tangra.VideoOperations.LightCurves
             set
             {
                 m_FrameIntegratingMode = value;
-                //ContextManager.SetObject("VideoPlayer.FrameIntegratingMode", m_FrameIntegratingMode);
             }
         }
 
@@ -97,15 +95,7 @@ namespace Tangra.VideoOperations.LightCurves
 
         public bool DebugTracking = false;
 
-        public bool SaveTrackingSession = false;
-        //internal TrackingSessionDebugger SessionFile = null;
-        //public void EnsureTrackingSession()
-        //{
-        //    SessionFile = new TrackingSessionDebugger();
-
-        //    frmMain.ApplicationState.Current.RecordingDebugSession = true;
-        //    frmMain.ApplicationState.Current.UpdateControlsState();
-        //}
+        public bool SaveTrackingSession = false;        
 
         public bool AllowsManuallyPlacedAperture
         {

@@ -22,9 +22,6 @@ namespace Tangra.VideoOperations.LightCurves
 {
     public partial class frmSelectReductionType : Form
     {
-        //[DllImport("kernel32", CharSet = CharSet.Auto)]
-        //static extern int GetDiskFreeSpaceEx(string lpDirectoryName, out ulong lpFreeBytesAvailable, out ulong lpTotalNumberOfBytes, out ulong lpTotalNumberOfFreeBytes);
-
 	    private VideoController m_VideoContoller;
 
 		public frmSelectReductionType(VideoController videoContoller, IFramePlayer framePlayer)
@@ -136,7 +133,6 @@ namespace Tangra.VideoOperations.LightCurves
 			LightCurveReductionContext.Instance.HighFlickering = cbxFlickering.Checked;
 			LightCurveReductionContext.Instance.WindOrShaking = cbxShaking.Checked;
 			LightCurveReductionContext.Instance.StopOnLostTracking = cbxShaking.Checked && cbxStopOnLostTracking.Checked;
-			//LightCurveReductionContext.Instance.UseMinimumRefiningFrames = cbsMinimumRefiningFrames.Checked;
 			LightCurveReductionContext.Instance.FieldRotation = cbxFieldRotation.Checked;
 			LightCurveReductionContext.Instance.IsDriftThrough = cbxDriftTrough.Checked;
 
@@ -144,8 +140,6 @@ namespace Tangra.VideoOperations.LightCurves
 				LightCurveReductionContext.Instance.LightCurveReductionType = LightCurveReductionType.Asteroidal;
 			else if (rbMutualEvent.Checked)
 				LightCurveReductionContext.Instance.LightCurveReductionType = LightCurveReductionType.MutualEvent;
-			//else if (rbTotalLunarEvent.Checked)
-			//    LightCurveReductionContext.Instance.LightCurveReductionType = LightCurveReductionType.TotalLunarDisappearance;
 			else
 				LightCurveReductionContext.Instance.LightCurveReductionType = LightCurveReductionType.UntrackedMeasurement;
 
@@ -179,10 +173,7 @@ namespace Tangra.VideoOperations.LightCurves
 					LightCurveReductionContext.Instance.ReductionMethod = TangraConfig.PhotometryReductionMethod.AperturePhotometry;
 			}
 
-			LightCurveReductionContext.Instance.SaveTrackingSession = false;
-			//LightCurveReductionContext.Instance.SaveTrackingSession = cbxSaveSessionFile.Checked;
-			//if (cbxSaveSessionFile.Checked)
-			//    LightCurveReductionContext.Instance.EnsureTrackingSession();
+			LightCurveReductionContext.Instance.SaveTrackingSession = false;			
 
 			TangraConfig.Settings.LastUsed.ReductionType = (TangraConfig.PhotometryReductionMethod)cbxReductionType.SelectedIndex;
 			TangraConfig.Settings.LastUsed.AdvancedLightCurveSettings = m_MoreEnabled;
@@ -250,22 +241,6 @@ namespace Tangra.VideoOperations.LightCurves
                     tabControl1.TabPages.Add(tabReduction);
                 }
             }
-        }
-
-        private void cbxSaveSessionFile_CheckedChanged(object sender, EventArgs e)
-        {
-            //ulong freeBytes, totalBytes, availableFreeSpace;
-            //GetDiskFreeSpaceEx(Path.GetTempPath(), out freeBytes, out totalBytes, out availableFreeSpace);
-            //if (freeBytes / (1024 * 1024) < 500)
-            //{
-            //    MessageBox.Show(this,
-            //        string.Format("You must free at least 500Mb on drive {0} before saving a tracking session!", Path.GetTempPath().Substring(0, 3)), 
-            //        "Insuficient Space", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-
-            //    //cbxSaveSessionFile.CheckedChanged -= cbxSaveSessionFile_CheckedChanged;
-            //    //cbxSaveSessionFile.Checked = false;
-            //    //cbxSaveSessionFile.CheckedChanged += cbxSaveSessionFile_CheckedChanged;
-            //}
         }
 
         private void cbxShaking_CheckedChanged(object sender, EventArgs e)

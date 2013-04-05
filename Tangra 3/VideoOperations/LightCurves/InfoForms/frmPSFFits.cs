@@ -29,8 +29,6 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 			m_LCFile = lcFile;
 			m_DisplaySettings = displaySettings;
 
-			//NotificationManager.Subscribe(this, typeof(frmLightCurve));
-
 			picTarget1PSF.Image = new Bitmap(picTarget1PSF.Width, picTarget1PSF.Height);
 			picTarget2PSF.Image = new Bitmap(picTarget2PSF.Width, picTarget2PSF.Height);
 			picTarget3PSF.Image = new Bitmap(picTarget3PSF.Width, picTarget3PSF.Height);
@@ -51,24 +49,9 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
             }
             base.Dispose(disposing);
 
-            //NotificationManager.Unsubscribe(this);
             m_LCFile = null;
             m_SelectedMeasurements = null;
         }
-
-        //#region INotificationReceiver Members
-
-        //public void ReceieveMessage(NotificationMessage message, MessageDeliveryOptions deliveryFlags)
-        //{
-        //    if (message.Sender is frmLightCurve &&
-        //        message.MessageId == frmMain.MSG_ID_FRAME_CHANGED)
-        //    {
-        //        m_SelectedMeasurements = (LCMeasurement[])message.Message;
-        //        HandleNewSelectedFrame();
-        //    }
-        //}
-
-        //#endregion
 
 		internal void HandleNewSelectedFrame(LCMeasurement[] selectedMeasurements)
 		{
@@ -149,17 +132,11 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 
 		private void rbPreProcessedData_CheckedChanged(object sender, EventArgs e)
 		{
-			//HandleNewSelectedFrame();
 		}
 
 		private uint[,] GetPixelData(uint[,] sourcePixels)
 		{
 			return sourcePixels;
-
-			//if (rbPreProcessedData.Checked)
-			//    return m_Context.ApplyPreProcessing(sourcePixels);
-			//else
-			//    return sourcePixels;
 		}
 	}
 }

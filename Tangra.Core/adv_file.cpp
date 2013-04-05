@@ -174,7 +174,7 @@ void AdvFile::OpenFile(const char* fileName, AdvFileInfo* fileInfo)
 
 void AdvFile::CropFile(const char* newfileName, int firstFrameId, int lastFrameId)
 {
-	/* TODO: This is not implemented
+	/* TODO: This is not implemented yet
 	 * 
 	FILE* newFile = fopen(newfileName, "wb");
 
@@ -321,8 +321,6 @@ void AdvFile::GetFrameSectionData(int frameId, unsigned long* prevFrame, unsigne
 		fread(data, indexEntry->BytesCount, 1, m_File);
 
 		// Read the timestamp and exposure 
-		// TODO: Doublecheck is this the START or MIDDLE exposure ???
-		// TODO: Update the documentation with the 
 		frameInfo->StartTimeStampLo = data[0] + (data[1] << 8) + (data[2] << 16) + (data[3] << 24);
 		frameInfo->StartTimeStampHi = data[4] + (data[5] << 8) + (data[6] << 16) + (data[7] << 24);
     	frameInfo->Exposure10thMs = data[8] + (data[9] << 8) + (data[10] << 16) + (data[11] << 24);

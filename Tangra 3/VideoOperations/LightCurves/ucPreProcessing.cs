@@ -91,9 +91,7 @@ namespace Tangra.VideoOperations.LightCurves
             if (m_CurrFrame != null &&
                 rbBrightnessContrast.Checked)
             {
-                // -255, 255
                 m_Brightness = (int)Math.Round(255.0 * (tbBrightness.Value - (tbBrightness.Maximum / 2.0)) / (tbBrightness.Maximum / 2.0));
-                // -100, 100
                 m_Contrast = (sbyte)Math.Round(100.0 * (tbContrast.Value - (tbContrast.Maximum / 2.0)) / (tbContrast.Maximum / 2.0));
 
                 FrameAdjustmentsPreview.Instance.BrightnessContrast(m_Brightness, (sbyte)m_Contrast);
@@ -212,26 +210,6 @@ namespace Tangra.VideoOperations.LightCurves
                     for (int i = 0; i < 256; i++)
                         m_HistogramData[i] = 0;
 
-                    //int colourOffset = -1;
-                    //switch(TangraConfig.Settings.Photometry.ColourChannel)
-                    //{
-                    //    case ColourChannel.Red:
-                    //        colourOffset = 2;
-                    //        break;
-                    //    case ColourChannel.Green:
-                    //        colourOffset = 1;
-                    //        break;
-                    //    case ColourChannel.Blue:
-                    //        colourOffset = 0;
-                    //        break;
-                    //    case ColourChannel.GrayScale:
-                    //        colourOffset = -1;
-                    //        break;
-                    //}
-
-                    //if (m_CurrFrame != null)
-                    //    m_CurrFrame.Dispose();
-
                     FrameAdjustmentsPreview.Instance.MoveToFrame(m_HistogramFrameNo);
 
                     m_CurrFrame = m_VideoStream.GetPixelmap(m_HistogramFrameNo).CreateDisplayBitmapDoNotDispose();
@@ -253,10 +231,6 @@ namespace Tangra.VideoOperations.LightCurves
                                 for (int x = 0; x < m_CurrFrame.Width; ++x)
                                 {
                                     byte bt = p[2]; // use RED channel
-                                    //if (colourOffset != -1)
-                                    //    bt = p[2];
-                                    //else
-                                    //    bt = AstroImage.GetGrayScaleReading(p[0], p[1], p[2]);
 
                                     m_HistogramData[bt]++;
 

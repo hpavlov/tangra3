@@ -10,7 +10,7 @@
 void CopyPixelsInTriplets(BYTE* pDIB, BITMAPINFOHEADER bih, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
 {
 	long bytesPerPixel = bih.biBitCount / 8;
-	long length = (bih.biWidth * bih.biHeight); //bih.biSizeImage / bytesPerPixel;
+	long length = (bih.biWidth * bih.biHeight);
 	BYTE* src = pDIB + sizeof(BITMAPINFOHEADER);
 
 	long width = bih.biWidth;
@@ -240,29 +240,6 @@ HRESULT GetPixelMapBitsAndHBitmap(BYTE* pDIB, long* width, long* height, DWORD i
 	memmove(bitmapPixels, &bfh, sizeof(bfh));
 	memmove(bitmapPixels + sizeof(bfh), &memBitmapInfo, sizeof(memBitmapInfo));
 	memmove(bitmapPixels + sizeof(bfh) + sizeof(memBitmapInfo), pDIB + sizeof(BITMAPINFOHEADER), bih.biSizeImage);
-	
-	//BITMAPINFO bmi;
-	//ZeroMemory(&bmi, sizeof(BITMAPINFO));
-	//CopyMemory(&(bmi.bmiHeader), m_bmih, sizeof(BITMAPINFOHEADER));
-
-	//HDC hdcDest = GetDC(0);
-	//HBITMAP hBitmap = CreateDIBitmap(hdcDest, m_bmih, CBM_INIT, m_pRGBData, &bmi, DIB_RGB_COLORS);
-
-	//FILE* fp=fopen("Frame-00.bmp", "wb");
- //   if (fp!=NULL)
- //   {
- //       fwrite(bitmapPixels, bih.biSizeImage + sizeof(bfh) + sizeof(memBitmapInfo), 1, fp);
- //       fclose(fp);
- //   }
-
-    //FILE* fp=fopen("Frame-00.bmp", "wb");
-    //if (fp!=NULL)
-    //{
-    //    fwrite(&bfh, sizeof(bfh), 1, fp);
-    //    fwrite(&memBitmapInfo, sizeof(memBitmapInfo), 1, fp);
-    //    fwrite(pDIB + sizeof(BITMAPINFOHEADER), bih.biSizeImage, 1, fp);
-    //    fclose(fp);
-    //}
 
 	CopyPixelsInTriplets(pDIB, bih, pixels, bitmapPixels, bitmapBytes);
 
@@ -347,11 +324,6 @@ HRESULT GetBitmapPixels(long width, long height, unsigned long* pixels, BYTE* bi
 
 		currLinePos--;
 	}
-
-	//FILE* f = fopen("bmp_test.bmp", "wb");
-	//fwrite(pp, 55 + bih.biSizeImage, 1, f);
-	//fflush(f);
-	//fclose(f);
 
 	return S_OK;
 }

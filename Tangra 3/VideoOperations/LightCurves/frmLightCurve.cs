@@ -24,8 +24,9 @@ namespace Tangra.VideoOperations.LightCurves
 {
 	public partial class frmLightCurve : Form, ILightCurveFormCustomizer
     {
-        //private IImageHostCallbacks m_Host;
 	    private LightCurveController m_LightCurveController;
+
+		private GeoLocationInfo m_GeoLocationInfo;
 
         private int m_NewMinDisplayedFrame = -1;
 
@@ -45,9 +46,6 @@ namespace Tangra.VideoOperations.LightCurves
 
             m_DisplaySettings.Load();
             m_DisplaySettings.Initialize();
-
-            //NotificationManager.Subscribe(this, typeof(LightCurves));
-            //NotificationManager.Subscribe(this, typeof(frmMain));
 
             m_AllReadings[0] = new List<LCMeasurement>();
             m_AllReadings[1] = new List<LCMeasurement>();
@@ -92,9 +90,7 @@ namespace Tangra.VideoOperations.LightCurves
 
             Text = "Light Curves - " + Path.GetFileName(lcFilePath);
 
-            //m_LightCurveImpl = new TangraLightCurveImpl((TangraApplicationImpl)host.TangraApplicationImpl, m_LCFile, this);
-
-            m_Context = new LightCurveContext(lcFile/*, m_LightCurveImpl*/);
+            m_Context = new LightCurveContext(lcFile);
             m_Context.NormMethod = LightCurveContext.NormalisationMethod.Average4Frame;
 
             OnNewLCFile();
@@ -124,7 +120,6 @@ namespace Tangra.VideoOperations.LightCurves
                 Trace.WriteLine(ex);
             }
             m_LCFile = null;
-			//((TangraApplicationImpl)m_Host.TangraApplicationImpl).SetOpenedLightCurve(null, null);
 
 	        m_LightCurveController.OnLightCurveClosed();
         }
@@ -217,50 +212,23 @@ namespace Tangra.VideoOperations.LightCurves
 			m_Footer = lcFile.Footer;
 			m_FrameTiming = lcFile.FrameTiming;
 
-			//m_LightCurveImpl = new TangraLightCurveImpl((TangraApplicationImpl)m_Host.TangraApplicationImpl, m_LCFile, this);
-			m_Context = new LightCurveContext(lcFile /*, m_LightCurveImpl*/);
+			m_Context = new LightCurveContext(lcFile);
 			
 			OnNewLCFile();
 
 			m_IsFirstDraw = true;
 			pnlChart.Invalidate();
 		}
+
+		internal void SetGeoLocation(GeoLocationInfo geoLocationInfo)
+		{
+			m_GeoLocationInfo = geoLocationInfo;
+			pnlGeoLocation.Visible = geoLocationInfo != null;
+
+			if (geoLocationInfo != null)
+				tbxGeoLocation.Text = geoLocationInfo.GetFormattedGeoLocation();
+		}
 		
-        //#region INotificationReceiver Members
-
-		
-		//public void ReceieveMessage(NotificationMessage message, MessageDeliveryOptions deliveryFlags)
-		//{
-		//    if (message.Sender is LightCurves &&
-		//        message.MessageId == LightCurves.MSG_NEW_READING)
-		//    {
-		//        LCFile lcFile = message.Message as LCFile;
-		//        m_AllReadings = lcFile.Data;
-		//        m_LCFile = lcFile;
-		//        m_Header = lcFile.Header;
-		//        m_Header.LcFile = lcFile;
-		//        m_Footer = lcFile.Footer;
-		//        m_FrameTiming = lcFile.FrameTiming;
-
-		//        m_LightCurveImpl = new TangraLightCurveImpl((TangraApplicationImpl)m_Host.TangraApplicationImpl, m_LCFile, this);
-		//        m_Context = new LightCurveContext(lcFile, m_LightCurveImpl);
-
-		//        OnNewLCFile();
-
-		//        m_IsFirstDraw = true;
-		//        pnlChart.Invalidate();
-		//    }
-		//    else if (
-		//        message.Sender is frmMain &&
-		//        message.MessageId == frmMain.MSG_ID_FRAME_CHANGED)
-		//    {
-		//        int newFrameId = (int)message.Message;
-		//        HandleNewSelectedFrame(newFrameId);
-		//    }
-		//}
-
-        //#endregion
-
         private void OnNewLCFile()
         {
             m_Header.MinAdjustedReading = 0;
@@ -463,8 +431,6 @@ namespace Tangra.VideoOperations.LightCurves
             {
                 Update();
 
-                //m_AllReadings = m_InitialNoFilterReadings;
-
                 Cursor = Cursors.WaitCursor;
                 try
                 {
@@ -576,10 +542,7 @@ namespace Tangra.VideoOperations.LightCurves
             if (m_Header.ReductionType == LightCurveReductionType.Asteroidal)
             {
                 miNormalizationSeparator.Visible = true;
-                miNormalizationAllNonOcculted.Visible = true;                
-
-                // TODO: Include the info about all measured objects i.e. guiding stat, occulted star, tolerance, etc.
-                //sdfsdf
+                miNormalizationAllNonOcculted.Visible = true;
             }
             else
             {
@@ -821,61 +784,6 @@ namespace Tangra.VideoOperations.LightCurves
             pnlChart.Invalidate();
         }
 
-
-        //private void FilterMenuItemChecked(object sender, EventArgs e)
-        //{
-        //    m_Context.PrepareForCancelling();
-
-        //    if (sender == miNoFilter)
-        //        m_Context.Filter = LightCurveContext.FilterType.NoFilter;
-        //    else if (sender == miLowPassFilter)
-        //        m_Context.Filter = LightCurveContext.FilterType.LowPass;
-        //    else if (sender == miLowPassDifference)
-        //        m_Context.Filter = LightCurveContext.FilterType.LowPassDifference;
-
-        //    if (!ReprocessAllSeries())
-        //    {
-        //        // Operation cancelled by the user
-        //        m_Context.CancelChanges();
-        //        UpdateContextDisplays();
-        //        return; 
-        //    }
-
-        //    if (sender == miNoFilter)
-        //    {
-        //        miNoFilter.Checked = true;
-        //        miLowPassFilter.Checked = false;
-        //        miMeanFilter.Checked = false;
-        //        miLowPassDifference.Checked = false;
-
-        //        m_Context.Filter = LightCurveContext.FilterType.NoFilter;
-        //        tslblFilter.Text = "No Filter";
-        //    }
-        //    else if (sender == miLowPassFilter)
-        //    {
-        //        miNoFilter.Checked = false;
-        //        miLowPassFilter.Checked = true;
-        //        miMeanFilter.Checked = false;
-        //        miLowPassDifference.Checked = false;
-
-        //        m_Context.Filter = LightCurveContext.FilterType.LowPass;
-        //        tslblFilter.Text = "LP Filter";
-        //    }
-        //    else if (sender == miLowPassDifference)
-        //    {
-        //        miNoFilter.Checked = false;
-        //        miLowPassFilter.Checked = false;
-        //        miMeanFilter.Checked = false;
-        //        miLowPassDifference.Checked = true;
-
-        //        m_Context.Filter = LightCurveContext.FilterType.LowPassDifference;
-        //        tslblFilter.Text = "LPD Filter";
-        //    }
-
-        //    m_Context.MarkDirtyNoFullReprocessing();
-        //    pnlChart.Invalidate();
-        //}
-
         private bool ReprocessAllSeries()
         {
             frmReprocessSeries frm = new frmReprocessSeries();
@@ -945,29 +853,6 @@ namespace Tangra.VideoOperations.LightCurves
             		break;
             }
             #endregion
-
-            //#region Filtering
-            //miNoFilter.Checked = false;
-            //miLowPassFilter.Checked = false;
-            //miLowPassDifference.Checked = false;
-            //switch(m_Context.Filter)
-            //{
-            //    case LightCurveContext.FilterType.NoFilter:
-            //        miNoFilter.Checked = true;
-            //        tslblFilter.Text = "No Filter";
-            //        break;
-
-            //    case LightCurveContext.FilterType.LowPass:
-            //        miLowPassFilter.Checked = true;
-            //        tslblFilter.Text = "LP Filter";
-            //        break;
-
-            //    case LightCurveContext.FilterType.LowPassDifference:
-            //        miLowPassDifference.Checked = true;
-            //        tslblFilter.Text = "LPD Filter";
-            //        break;
-            //}
-            //#endregion
 
             #region Normalisation
             miNoNormalization.Checked = false;
@@ -1253,20 +1138,6 @@ namespace Tangra.VideoOperations.LightCurves
 
         private bool m_TimestampDiscrepencyFlag = false;
 
-        private void hintTimer_Tick(object sender, EventArgs e)
-        {
-            //hintTimer.Enabled = false;
-            //Balloon.ShowBalloon(
-            //    statusStrip1, 
-            //    "To quickly change the parameters of the light curve, use the menu items in the status bar. For full reprocessing of the light curve use the Re-Process menu on the top.", 
-            //    TooltipIcon.Info, 
-            //    BalloonAlignment.BottomLeft,
-            //    false);
-
-            //Config.RegistryConfig.Instance.ShowHintOnceFlags.ViewHintAboutLightCurveFormStatusBarControls_Completed = true;
-            //Config.RegistryConfig.Instance.Save();
-        }
-
 		private void HandleIncludeExcludeObject(object sender, EventArgs e)
 		{
 			ToolStripMenuItem[] allObjMenuItems = new ToolStripMenuItem[] { miIncludeObj1, miIncludeObj2, miIncludeObj3, miIncludeObj4 };
@@ -1360,18 +1231,6 @@ namespace Tangra.VideoOperations.LightCurves
 		{
             if (m_Context != null) m_Context.MarkDirtyNoFullReprocessing();
 		    pnlChart.Invalidate();
-		}
-
-		private void miAddTitle_Click(object sender, EventArgs e)
-		{
-            //frmCustomizeChart frm = new frmCustomizeChart(
-            //    m_Header.TotalObjects, m_Context, m_AllColors);
-
-            //if (frm.ShowDialog(this) == DialogResult.OK)
-            //{
-            //    m_Context.MarkDirtyNoFullReprocessing();
-            //    pnlChart.Invalidate();
-            //}
 		}
 
         private void miLoad_Click(object sender, EventArgs e)
@@ -1569,7 +1428,6 @@ namespace Tangra.VideoOperations.LightCurves
 
             m_Context.MarkFirstZoomedFrameChanged();
             pnlChart.Invalidate();
-            //Trace.WriteLine("Curve:1061");
 
             pnlSmallGraph.Invalidate();
         }
@@ -1579,12 +1437,6 @@ namespace Tangra.VideoOperations.LightCurves
             firstFrameTimer.Enabled = false;
 
             SlideWindowToMiddleFrame((uint)sbZoomStartFrame.Value);
-
-            //m_NewMinDisplayedFrame = -1;
-            //m_MinDisplayedFrame = (uint)sbZoomStartFrame.Value;
-
-            //m_Context.MarkFirstZoomedFrameChanged();
-            //pnlChart.Invalidate();
         }
 
         private void pnlChart_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
@@ -1621,7 +1473,6 @@ namespace Tangra.VideoOperations.LightCurves
             {
                 m_ZoomScrollMode = true;
                 pnlSmallGraph.Invalidate();
-                //Trace.WriteLine("Curve:1096");
             }
         }
 
@@ -1643,7 +1494,6 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void DoDrawSmallGraph(Graphics gPanel)
         {
-            //Trace.WriteLine("DoDrawSmallGraph");
             gPanel.Clear(m_DisplaySettings.BackgroundColor);
  
             int minX = 5;
@@ -2172,32 +2022,6 @@ namespace Tangra.VideoOperations.LightCurves
 		{
 		    miAddins.Visible = false;
 			miAddins.DropDownItems.Clear();
-
-            //foreach(ITangraAddin addin in  m_Host.LoadedAddins)
-            //{
-            //    foreach (ITangraAddinAction action in addin.GetAddinActions())
-            //    {
-            //        if (action.ActionType == AddinActionType.LightCurve)
-            //        {
-            //            ToolStripItem mi = miAddins.DropDownItems.Add(action.DisplayName);
-            //            mi.Tag = new KeyValuePair<ITangraAddin, ITangraAddinAction>(addin, action);
-            //            mi.Image = action.Icon;
-            //            mi.ImageTransparentColor = action.IconTransparentColor;
-            //            mi.Click += new EventHandler(mi_Click);
-
-            //            miAddins.Visible = true;
-            //        }
-            //    }			
-            //}
-		}
-
-		private void mi_Click(object sender, EventArgs e)
-		{
-            //var tag = (KeyValuePair<ITangraAddin, ITangraAddinAction>)((sender as ToolStripItem).Tag);
-            //var addin = tag.Key as ITangraAddin;
-            //var action = tag.Value as ITangraAddinAction;
-
-            //action.Execute();
 		}
 
         private void miAdjustMeasurements_Click(object sender, EventArgs e)

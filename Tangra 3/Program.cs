@@ -34,9 +34,7 @@ namespace Tangra
 			Application.SetCompatibleTextRenderingDefault(false);
 			
 			Application.ThreadException += new System.Threading.ThreadExceptionEventHandler(Application_ThreadException);
-
-			//SetupDllSearchPath();
-
+			
 			bool fatalError = false;
 			try
 			{
@@ -77,20 +75,6 @@ namespace Tangra
 			{
 				int p = (int)Environment.OSVersion.Platform; 
 				return (p == 4) || (p == 6) || (p == 128);
-			}
-		}
-
-		private static void SetupDllSearchPath()
-		{
-			string EVN_VIR_NAME = IsLinux ? "LD_LIBRARY_PATH" : "PATH";
-
-			string currentPath = Environment.GetEnvironmentVariable(EVN_VIR_NAME, EnvironmentVariableTarget.Process);
-			string dllPath = AppDomain.CurrentDomain.BaseDirectory;
-
-			if (currentPath != null &&
-				!currentPath.Contains(dllPath))
-			{
-				Environment.SetEnvironmentVariable(EVN_VIR_NAME, currentPath + Path.PathSeparator + dllPath, EnvironmentVariableTarget.Process);
 			}
 		}
 	}

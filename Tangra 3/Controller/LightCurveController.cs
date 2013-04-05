@@ -106,12 +106,6 @@ namespace Tangra.Controller
                     {
 						if (m_VideoController.OpenVideoFile(videoFile))
 						{							
-							//LightCurves glcOp = new LightCurves();
-							//glcOp.EnterViewLightCurveMode(this, lcFile);
-							//m_CurrentOperation = glcOp;
-							//m_FramePreprocessor.Clear();
-							//ActivateImageTool<ArrowTool>();
-
 							TangraContext.Current.CanPlayVideo = false;
 							m_VideoController.UpdateViews();							
 						}
@@ -138,7 +132,7 @@ namespace Tangra.Controller
                     m_lcFileLoaded = true;
 
                     m_LightCurveForm = new frmLightCurve(this, lcFile, fileName);
-
+					m_LightCurveForm.SetGeoLocation(m_VideoController.GeoLocation);
                     m_LightCurveForm.Show(m_MainFormView);
                     m_LightCurveForm.Update();
 
@@ -173,13 +167,14 @@ namespace Tangra.Controller
 
         public DialogResult ShowMessageBox(string message, string title, MessageBoxButtons buttons, MessageBoxIcon icon)
         {
-			// TODO: Use a shared implementation
 			return m_VideoController.ShowMessageBox(message, title, buttons, icon);
         }
 
 		internal void SetLcFile(LCFile lcFile)
 		{
-			m_LightCurveForm.SetNewLcFile(lcFile);						
+			m_LightCurveForm.SetNewLcFile(lcFile);
+
+			m_LightCurveForm.SetGeoLocation(m_VideoController.GeoLocation);								
 		}
 
 		public void EnsureLightCurveFormClosed()
@@ -202,8 +197,6 @@ namespace Tangra.Controller
 
 		internal void EnsureLightCurveForm()
 		{
-			// TODO: Made this part of SetLcFile() :??
-
 			m_LightCurveForm = new frmLightCurve(this);
 
 			m_LightCurveForm.Show(m_MainFormView);

@@ -41,7 +41,6 @@ namespace Tangra.VideoOperations.LightCurves
                     {
                         SetSmallGraphDirty();
                         pnlSmallGraph.Invalidate();
-                        //Trace.WriteLine("Drawing:45");
                     }
 
                     m_Graph = new Bitmap(pnlChart.Width, pnlChart.Height);
@@ -76,11 +75,8 @@ namespace Tangra.VideoOperations.LightCurves
                     }
                 }
 
-                //using (Graphics g = pnlChart.CreateGraphics())
-                //{
-                    g.DrawImage(m_Graph, 0, 0);
-                    g.Save();
-                //}
+				g.DrawImage(m_Graph, 0, 0);
+				g.Save();
             }
         }
 
@@ -128,8 +124,6 @@ namespace Tangra.VideoOperations.LightCurves
 
 				m_MinDisplayedFrameTimestampTicks = m_Header.GetTimeForFrameFromFrameTiming(m_MinDisplayedFrame, true).Ticks;
 				m_MaxDisplayedFrameTimestampTicks = m_Header.GetTimeForFrameFromFrameTiming(m_MaxDisplayedFrame, true).Ticks;
-
-				//Trace.WriteLine(string.Format("Drawing frames {0} to {1} ({2} frames total)", m_MinDisplayedFrame, m_MaxDisplayedFrame, m_MaxDisplayedFrame - m_MinDisplayedFrame));
 
 				btnZoomOut.Enabled = m_ZoomLevel > 1;
 				sbZoomStartFrame.Visible = btnZoomOut.Enabled;
@@ -301,8 +295,6 @@ namespace Tangra.VideoOperations.LightCurves
 
                 m_MinDisplayedFrame = Math.Max(m_MinDisplayedFrame, m_Header.MinFrame);
                 m_MaxDisplayedFrame = Math.Min((uint)(m_MinDisplayedFrame + totalWidth / m_ZoomLevel), m_Header.MaxFrame);
-
-                //Trace.WriteLine(string.Format("Drawing frames {0} to {1} ({2} frames total)", m_MinDisplayedFrame, m_MaxDisplayedFrame, m_MaxDisplayedFrame - m_MinDisplayedFrame));
 
                 btnZoomOut.Enabled = m_ZoomLevel > 1;
                 sbZoomStartFrame.Visible = btnZoomOut.Enabled;
@@ -623,13 +615,9 @@ namespace Tangra.VideoOperations.LightCurves
         {
             m_ZoomScrollMode = false;
             pnlSmallGraph.Invalidate();
-            //Trace.WriteLine("Drawing:345");
 
             m_Context.SelectedFrameNo = currFrameNo;
             SetSmallGraphDirty();
-
-            //m_LightCurveImpl.LightCurveContextImpl.SelectedFrameNo = (int)m_Context.SelectedFrameNo;
-            //m_LightCurveImpl.FireSelectedFrameChanged();
 
             ReSelectCurrentMeasurement(movePlayerToFrame);
         }
@@ -786,7 +774,8 @@ namespace Tangra.VideoOperations.LightCurves
                         int intX = (int)Math.Round(x) + 1;
                         for (int i = m_MinY; i <= m_MaxY; i++)
                         {
-                            m_OldLineBackup.Add(i, m_Graph.GetPixel(intX, i));
+							if (intX >= 0 && intX <= m_Graph.Width && i >= 0 && i <= m_Graph.Height)
+								m_OldLineBackup.Add(i, m_Graph.GetPixel(intX, i));
                         }
 
 						g.DrawLine(m_DisplaySettings.SelectionCursorColorPen, intX, m_MinY, intX, m_MaxY);
@@ -861,24 +850,14 @@ namespace Tangra.VideoOperations.LightCurves
 
                 using (Graphics g = Graphics.FromImage(bmp))
                 {
-                    float radius = m_Context.ReProcessApertures[reading.TargetNo]*2; // m_Header.MeasurementApertures[reading.TargetNo] * 2;
+                    float radius = m_Context.ReProcessApertures[reading.TargetNo]*2;
 
-                    //if (reading.PsfFit != null)
-                    //{
-                    //    g.DrawEllipse(
-                    //        m_AllPens[reading.TargetNo],
-                    //        (float)(2 * (reading.PsfFit.XCenter - pixelsCenterX) + 17 - radius),
-                    //        (float)(2 * (reading.PsfFit.YCenter - pixelsCenterY) + 17 - radius),
-                    //        2 * radius,
-                    //        2 * radius);
-                    //}
-                    //else
-                        g.DrawEllipse(
-                            m_DisplaySettings.TargetPens[reading.TargetNo],
-                            (float)(2 * (reading.X0 - pixelsCenterX) + 17 - radius),
-                            (float)(2 * (reading.Y0 - pixelsCenterY) + 17 - radius),
-                            2 * radius,
-                            2 * radius);
+					g.DrawEllipse(
+							m_DisplaySettings.TargetPens[reading.TargetNo],
+							(float)(2 * (reading.X0 - pixelsCenterX) + 17 - radius),
+							(float)(2 * (reading.Y0 - pixelsCenterY) + 17 - radius),
+							2 * radius,
+							2 * radius);                        
 
                     g.Save();
                 }
@@ -909,14 +888,14 @@ namespace Tangra.VideoOperations.LightCurves
                         int pixelDataHeight = reading.PixelData.GetLength(1);
                         reading.PsfFit.Fit(
                             reading.PixelData,
-                            m_Context.ReProcessFitAreas[reading.TargetNo], // m_Footer.TrackedObjects[reading.TargetNo].PsfFitMatrixSize,
+                            m_Context.ReProcessFitAreas[reading.TargetNo],
                             x0Int - reading.PixelDataX0 + (pixelDataWidth / 2) + 1,
                             y0Int - reading.PixelDataY0 + (pixelDataHeight / 2) + 1, 
                             false);
                     }
 
                     psfBoxes[reading.TargetNo].Visible = true;
-                    PlotSingleGaussian(psfBoxes[reading.TargetNo], reading, m_Context.ReProcessApertures[i] /*m_Header.MeasurementApertures[i]*/, m_DisplaySettings.TargetBrushes, m_Footer.ReductionContext.BitPix);
+                    PlotSingleGaussian(psfBoxes[reading.TargetNo], reading, m_Context.ReProcessApertures[i], m_DisplaySettings.TargetBrushes, m_Footer.ReductionContext.BitPix);
                 }
             }
         }
@@ -1054,6 +1033,7 @@ namespace Tangra.VideoOperations.LightCurves
 
             	pnlMeasurementDetails.Visible = true;
                 pnlBinInfo.Visible = m_Context.Binning > 0;
+	            pnlGeoLocation.Visible = m_GeoLocationInfo != null;
                 if (m_Context.Binning > 0)
                 {
                     BinnedValue binnedVal = GetBinForFrameNo(0, m_SelectedMeasurements[0].CurrFrameNo);

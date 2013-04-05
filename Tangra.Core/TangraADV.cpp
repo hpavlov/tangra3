@@ -63,74 +63,6 @@ HRESULT ADVCropFile(char* newfileName, int firstFrameId, int lastFrameId)
 	return S_OK;
 }
 
-/*
-HRESULT ADVGetFrame(int frameNo, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, AdvLib::AdvFrameInfo* frameInfo)
-{
-	if (frameNo < g_TangraAdvFile->TotalNumberOfFrames)
-    {
-        unsigned char layoutId;
-        enum GetByteMode byteMode;
-
-        g_TangraAdvFile->GetFrameImageSectionHeader(frameNo, &layoutId, &byteMode);
-
-		AdvLib::AdvImageLayout* layout = g_TangraAdvFile->ImageSection->GetImageLayoutById(layoutId);
-
-		if (layout->IsDiffCorrLayout && byteMode == DiffCorrBytes && prevFrameNo != frameNo - 1)
-		{
-			// Move back and find the nearest previous key frame
-			int keyFrameIdx = frameNo;
-			do
-			{
-				keyFrameIdx--;
-				g_TangraAdvFile->GetFrameImageSectionHeader(keyFrameIdx, &layoutId, &byteMode);
-			}
-			while(keyFrameIdx > 0 && byteMode != KeyFrameBytes);
-
-			unsigned long* keyFrameData = (unsigned long*)malloc(g_MaxFrameBufferSize);
-			AdvLib::AdvFrameInfo prefFrameInfo;
-			
-			g_TangraAdvFile->GetFrameSectionData(keyFrameIdx, NULL, pixels, &prefFrameInfo);
-
-			if (layout->BaseFrameType == DiffCorrPrevFrame)
-			{
-				for (int i = keyFrameIdx + 1; i < frameNo; i++)
-				{
-					g_TangraAdvFile->GetFrameSectionData(keyFrameIdx, prevFramePixels, keyFrameData, frameInfo);
-
-					memcpy(prevFramePixels, keyFrameData, g_MaxFrameBufferSize);
-				}
-			}
-			else
-			{
-				// Copy bytes to the prevFramePixels 
-				memcpy(prevFramePixels, keyFrameData, g_MaxFrameBufferSize);
-			}
-
-			delete keyFrameData;
-		}
-
-        g_TangraAdvFile->GetFrameSectionData(frameNo, prevFramePixels, pixels, frameInfo);
-
-		HRESULT rv = GetBitmapPixels(g_TangraAdvFile->ImageSection->Width, g_TangraAdvFile->ImageSection->Height, pixels, bitmapPixels, bitmapBytes, g_TangraAdvFile->ImageSection->ByteOrder == LittleEndian, g_TangraAdvFile->ImageSection->DataBpp);
-
-		if (rv == S_OK)
-		{
-			if (byteMode != Normal)
-				memcpy(prevFramePixels, pixels, g_TangraAdvFile->ImageSection->Width * g_TangraAdvFile->ImageSection->Height * 4);
-
-			prevFrameNo = frameNo;
-		}
-
-		return rv;
-    }
-    else
-        return E_FAIL; 
-
-	return E_NOTIMPL;
-}
-*/
-
-
 HRESULT ADVGetFramePixels(int frameNo, unsigned long* pixels, AdvLib::AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError)
 {
 	if (frameNo < g_TangraAdvFile->TotalNumberOfFrames)
@@ -247,9 +179,6 @@ HRESULT ADVGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSl
 				return rv;
 			}
 		}
-
-		// TODO: Get the integrated frame AdvFrameInfo:
-		//       Timestamp - middle; Gain,Gamma = middle; messages - aggregate; exposure - average
 
 		IntegrationManagerAddFrameEx(pixels, g_TangraAdvFile->ImageSection->ByteOrder == LittleEndian, g_TangraAdvFile->ImageSection->DataBpp);
 	}

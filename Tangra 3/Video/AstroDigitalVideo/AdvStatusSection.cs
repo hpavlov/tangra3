@@ -223,9 +223,6 @@ namespace Tangra.Video.AstroDigitalVideo
 		{
 			if (status > 0)
 			{
-				//if (string.IsNullOrEmpty(offset))
-				//	return "N/A";
-				//else 
 				string sign = "";
 				if (offset < 0) sign = "-";
 				if (offset > 0) sign = "+";

@@ -59,7 +59,7 @@ namespace Tangra.Helpers
                 for (int y = 0; y < size; y++)
                 {
                     uint val = pixels[x, y];
-                    //Brush brush = val <= saturation ? AllGrayBrushes.GrayBrush(val) : SaturatedBrush;                	
+              	
                 	byte color = pixelToByteConverter.ToDisplayBitmapByte(val);
                     g.FillRectangle(AllGrayBrushes.GrayBrush(color), rect.Left + x * coeff, rect.Top + y * coeff, coeff, coeff);
                 }

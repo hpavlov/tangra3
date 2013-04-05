@@ -1,6 +1,6 @@
 ﻿namespace Tangra.Config.SettingPannels
 {
-	partial class ucADVSVideo12bit
+	partial class ucAAV8bit
 	{
 		/// <summary> 
 		/// Required designer variable.
@@ -28,20 +28,16 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
+			this.components = new System.ComponentModel.Container();
 			this.groupControl1 = new System.Windows.Forms.GroupBox();
-			this.nudSaturation14bit = new System.Windows.Forms.NumericUpDown();
-			this.label3 = new System.Windows.Forms.Label();
 			this.cbxADVEngine = new System.Windows.Forms.ComboBox();
 			this.label2 = new System.Windows.Forms.Label();
-			this.nudSaturation12bit = new System.Windows.Forms.NumericUpDown();
-			this.label1 = new System.Windows.Forms.Label();
+			this.nudSaturation8bit = new System.Windows.Forms.NumericUpDown();
+			this.lblSaturation = new System.Windows.Forms.Label();
 			this.groupControl2 = new System.Windows.Forms.GroupBox();
-			this.cbxAdvsOsdGeoLocation = new System.Windows.Forms.CheckBox();
 			this.cbxAdvsOsdSystemInfo = new System.Windows.Forms.CheckBox();
 			this.cbxAdvsOsdCameraInfo = new System.Windows.Forms.CheckBox();
 			this.cbxAdvsOsdMessages = new System.Windows.Forms.CheckBox();
-			this.cbxAdvsOsdGamma = new System.Windows.Forms.CheckBox();
-			this.cbxAdvsOsdGain = new System.Windows.Forms.CheckBox();
 			this.cbxAdvsOsdTimeStamp = new System.Windows.Forms.CheckBox();
 			this.groupControl3 = new System.Windows.Forms.GroupBox();
 			this.cbxAdvsPopupVideoCameraFrameId = new System.Windows.Forms.CheckBox();
@@ -49,58 +45,27 @@
 			this.cbxAdvsPopupGPSFix = new System.Windows.Forms.CheckBox();
 			this.cbxAdvsPopupAlmanac = new System.Windows.Forms.CheckBox();
 			this.cbxAdvsPopupSatellites = new System.Windows.Forms.CheckBox();
-			this.cbxAdvsPopupOffset = new System.Windows.Forms.CheckBox();
 			this.cbxAdvsPopupSystemTime = new System.Windows.Forms.CheckBox();
-			this.cbxAdvsPopupGamma = new System.Windows.Forms.CheckBox();
-			this.cbxAdvsPopupGain = new System.Windows.Forms.CheckBox();
 			this.cbxAdvsPopupTimeStamp = new System.Windows.Forms.CheckBox();
+			this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
 			this.groupControl1.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.nudSaturation14bit)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.nudSaturation12bit)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudSaturation8bit)).BeginInit();
 			this.groupControl2.SuspendLayout();
 			this.groupControl3.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// groupControl1
 			// 
-			this.groupControl1.Controls.Add(this.nudSaturation14bit);
-			this.groupControl1.Controls.Add(this.label3);
 			this.groupControl1.Controls.Add(this.cbxADVEngine);
 			this.groupControl1.Controls.Add(this.label2);
-			this.groupControl1.Controls.Add(this.nudSaturation12bit);
-			this.groupControl1.Controls.Add(this.label1);
+			this.groupControl1.Controls.Add(this.nudSaturation8bit);
+			this.groupControl1.Controls.Add(this.lblSaturation);
 			this.groupControl1.Location = new System.Drawing.Point(3, 3);
 			this.groupControl1.Name = "groupControl1";
-			this.groupControl1.Size = new System.Drawing.Size(207, 113);
+			this.groupControl1.Size = new System.Drawing.Size(207, 95);
 			this.groupControl1.TabIndex = 41;
 			this.groupControl1.TabStop = false;
-			this.groupControl1.Text = "ADVS";
-			// 
-			// nudSaturation14bit
-			// 
-			this.nudSaturation14bit.Location = new System.Drawing.Point(133, 79);
-			this.nudSaturation14bit.Maximum = new decimal(new int[] {
-            16383,
-            0,
-            0,
-            0});
-			this.nudSaturation14bit.Name = "nudSaturation14bit";
-			this.nudSaturation14bit.Size = new System.Drawing.Size(54, 20);
-			this.nudSaturation14bit.TabIndex = 47;
-			this.nudSaturation14bit.Value = new decimal(new int[] {
-            16000,
-            0,
-            0,
-            0});
-			// 
-			// label3
-			// 
-			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(11, 82);
-			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(116, 13);
-			this.label3.TabIndex = 48;
-			this.label3.Text = "14 bit Saturation Level:";
+			this.groupControl1.Text = "AAVRec";
 			// 
 			// cbxADVEngine
 			// 
@@ -117,63 +82,54 @@
 			this.label2.AutoSize = true;
 			this.label2.Location = new System.Drawing.Point(13, 21);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(68, 13);
+			this.label2.Size = new System.Drawing.Size(67, 13);
 			this.label2.TabIndex = 44;
-			this.label2.Text = "ADV Engine:";
+			this.label2.Text = "AAV Engine:";
 			// 
-			// nudSaturation12bit
+			// nudSaturation8bit
 			// 
-			this.nudSaturation12bit.Location = new System.Drawing.Point(133, 53);
-			this.nudSaturation12bit.Maximum = new decimal(new int[] {
-            4095,
+			this.nudSaturation8bit.Enabled = false;
+			this.nudSaturation8bit.Location = new System.Drawing.Point(133, 53);
+			this.nudSaturation8bit.Maximum = new decimal(new int[] {
+            255,
             0,
             0,
             0});
-			this.nudSaturation12bit.Name = "nudSaturation12bit";
-			this.nudSaturation12bit.Size = new System.Drawing.Size(54, 20);
-			this.nudSaturation12bit.TabIndex = 42;
-			this.nudSaturation12bit.Value = new decimal(new int[] {
-            4000,
+			this.nudSaturation8bit.Name = "nudSaturation8bit";
+			this.nudSaturation8bit.Size = new System.Drawing.Size(54, 20);
+			this.nudSaturation8bit.TabIndex = 42;
+			this.nudSaturation8bit.Value = new decimal(new int[] {
+            250,
             0,
             0,
             0});
 			// 
-			// label1
+			// lblSaturation
 			// 
-			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(11, 56);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(116, 13);
-			this.label1.TabIndex = 43;
-			this.label1.Text = "12 bit Saturation Level:";
+			this.lblSaturation.AutoSize = true;
+			this.lblSaturation.Location = new System.Drawing.Point(11, 56);
+			this.lblSaturation.Name = "lblSaturation";
+			this.lblSaturation.Size = new System.Drawing.Size(110, 13);
+			this.lblSaturation.TabIndex = 43;
+			this.lblSaturation.Text = "8 bit Saturation Level:";
+			this.toolTip1.SetToolTip(this.lblSaturation, "Change this value from the \"Analogue Video\" section");
 			// 
 			// groupControl2
 			// 
-			this.groupControl2.Controls.Add(this.cbxAdvsOsdGeoLocation);
 			this.groupControl2.Controls.Add(this.cbxAdvsOsdSystemInfo);
 			this.groupControl2.Controls.Add(this.cbxAdvsOsdCameraInfo);
 			this.groupControl2.Controls.Add(this.cbxAdvsOsdMessages);
-			this.groupControl2.Controls.Add(this.cbxAdvsOsdGamma);
-			this.groupControl2.Controls.Add(this.cbxAdvsOsdGain);
 			this.groupControl2.Controls.Add(this.cbxAdvsOsdTimeStamp);
-			this.groupControl2.Location = new System.Drawing.Point(3, 122);
+			this.groupControl2.Location = new System.Drawing.Point(3, 104);
 			this.groupControl2.Name = "groupControl2";
-			this.groupControl2.Size = new System.Drawing.Size(207, 195);
+			this.groupControl2.Size = new System.Drawing.Size(207, 154);
 			this.groupControl2.TabIndex = 44;
 			this.groupControl2.TabStop = false;
 			this.groupControl2.Text = "On Screen Display (Overlay)";
 			// 
-			// cbxAdvsOsdGeoLocation
-			// 
-			this.cbxAdvsOsdGeoLocation.Location = new System.Drawing.Point(14, 167);
-			this.cbxAdvsOsdGeoLocation.Name = "cbxAdvsOsdGeoLocation";
-			this.cbxAdvsOsdGeoLocation.Size = new System.Drawing.Size(120, 19);
-			this.cbxAdvsOsdGeoLocation.TabIndex = 50;
-			this.cbxAdvsOsdGeoLocation.Text = "Geo Location";
-			// 
 			// cbxAdvsOsdSystemInfo
 			// 
-			this.cbxAdvsOsdSystemInfo.Location = new System.Drawing.Point(14, 145);
+			this.cbxAdvsOsdSystemInfo.Location = new System.Drawing.Point(14, 98);
 			this.cbxAdvsOsdSystemInfo.Name = "cbxAdvsOsdSystemInfo";
 			this.cbxAdvsOsdSystemInfo.Size = new System.Drawing.Size(120, 19);
 			this.cbxAdvsOsdSystemInfo.TabIndex = 49;
@@ -181,7 +137,7 @@
 			// 
 			// cbxAdvsOsdCameraInfo
 			// 
-			this.cbxAdvsOsdCameraInfo.Location = new System.Drawing.Point(14, 123);
+			this.cbxAdvsOsdCameraInfo.Location = new System.Drawing.Point(14, 76);
 			this.cbxAdvsOsdCameraInfo.Name = "cbxAdvsOsdCameraInfo";
 			this.cbxAdvsOsdCameraInfo.Size = new System.Drawing.Size(120, 19);
 			this.cbxAdvsOsdCameraInfo.TabIndex = 48;
@@ -189,27 +145,11 @@
 			// 
 			// cbxAdvsOsdMessages
 			// 
-			this.cbxAdvsOsdMessages.Location = new System.Drawing.Point(14, 98);
+			this.cbxAdvsOsdMessages.Location = new System.Drawing.Point(14, 51);
 			this.cbxAdvsOsdMessages.Name = "cbxAdvsOsdMessages";
 			this.cbxAdvsOsdMessages.Size = new System.Drawing.Size(120, 19);
 			this.cbxAdvsOsdMessages.TabIndex = 47;
 			this.cbxAdvsOsdMessages.Text = "Messages";
-			// 
-			// cbxAdvsOsdGamma
-			// 
-			this.cbxAdvsOsdGamma.Location = new System.Drawing.Point(14, 74);
-			this.cbxAdvsOsdGamma.Name = "cbxAdvsOsdGamma";
-			this.cbxAdvsOsdGamma.Size = new System.Drawing.Size(120, 19);
-			this.cbxAdvsOsdGamma.TabIndex = 46;
-			this.cbxAdvsOsdGamma.Text = "Gamma";
-			// 
-			// cbxAdvsOsdGain
-			// 
-			this.cbxAdvsOsdGain.Location = new System.Drawing.Point(14, 50);
-			this.cbxAdvsOsdGain.Name = "cbxAdvsOsdGain";
-			this.cbxAdvsOsdGain.Size = new System.Drawing.Size(120, 19);
-			this.cbxAdvsOsdGain.TabIndex = 45;
-			this.cbxAdvsOsdGain.Text = "Gain";
 			// 
 			// cbxAdvsOsdTimeStamp
 			// 
@@ -226,21 +166,18 @@
 			this.groupControl3.Controls.Add(this.cbxAdvsPopupGPSFix);
 			this.groupControl3.Controls.Add(this.cbxAdvsPopupAlmanac);
 			this.groupControl3.Controls.Add(this.cbxAdvsPopupSatellites);
-			this.groupControl3.Controls.Add(this.cbxAdvsPopupOffset);
 			this.groupControl3.Controls.Add(this.cbxAdvsPopupSystemTime);
-			this.groupControl3.Controls.Add(this.cbxAdvsPopupGamma);
-			this.groupControl3.Controls.Add(this.cbxAdvsPopupGain);
 			this.groupControl3.Controls.Add(this.cbxAdvsPopupTimeStamp);
 			this.groupControl3.Location = new System.Drawing.Point(216, 3);
 			this.groupControl3.Name = "groupControl3";
-			this.groupControl3.Size = new System.Drawing.Size(208, 314);
+			this.groupControl3.Size = new System.Drawing.Size(208, 255);
 			this.groupControl3.TabIndex = 45;
 			this.groupControl3.TabStop = false;
 			this.groupControl3.Text = "Frame Details Display (Pop-up)";
 			// 
 			// cbxAdvsPopupVideoCameraFrameId
 			// 
-			this.cbxAdvsPopupVideoCameraFrameId.Location = new System.Drawing.Point(14, 76);
+			this.cbxAdvsPopupVideoCameraFrameId.Location = new System.Drawing.Point(14, 77);
 			this.cbxAdvsPopupVideoCameraFrameId.Name = "cbxAdvsPopupVideoCameraFrameId";
 			this.cbxAdvsPopupVideoCameraFrameId.Size = new System.Drawing.Size(161, 19);
 			this.cbxAdvsPopupVideoCameraFrameId.TabIndex = 53;
@@ -249,7 +186,7 @@
 			// 
 			// cbxAdvsPopupExposure
 			// 
-			this.cbxAdvsPopupExposure.Location = new System.Drawing.Point(14, 56);
+			this.cbxAdvsPopupExposure.Location = new System.Drawing.Point(14, 57);
 			this.cbxAdvsPopupExposure.Name = "cbxAdvsPopupExposure";
 			this.cbxAdvsPopupExposure.Size = new System.Drawing.Size(161, 19);
 			this.cbxAdvsPopupExposure.TabIndex = 52;
@@ -258,7 +195,7 @@
 			// 
 			// cbxAdvsPopupGPSFix
 			// 
-			this.cbxAdvsPopupGPSFix.Location = new System.Drawing.Point(14, 214);
+			this.cbxAdvsPopupGPSFix.Location = new System.Drawing.Point(14, 148);
 			this.cbxAdvsPopupGPSFix.Name = "cbxAdvsPopupGPSFix";
 			this.cbxAdvsPopupGPSFix.Size = new System.Drawing.Size(120, 19);
 			this.cbxAdvsPopupGPSFix.TabIndex = 51;
@@ -267,7 +204,7 @@
 			// 
 			// cbxAdvsPopupAlmanac
 			// 
-			this.cbxAdvsPopupAlmanac.Location = new System.Drawing.Point(14, 191);
+			this.cbxAdvsPopupAlmanac.Location = new System.Drawing.Point(14, 125);
 			this.cbxAdvsPopupAlmanac.Name = "cbxAdvsPopupAlmanac";
 			this.cbxAdvsPopupAlmanac.Size = new System.Drawing.Size(120, 19);
 			this.cbxAdvsPopupAlmanac.TabIndex = 50;
@@ -276,48 +213,21 @@
 			// 
 			// cbxAdvsPopupSatellites
 			// 
-			this.cbxAdvsPopupSatellites.Location = new System.Drawing.Point(14, 168);
+			this.cbxAdvsPopupSatellites.Location = new System.Drawing.Point(14, 102);
 			this.cbxAdvsPopupSatellites.Name = "cbxAdvsPopupSatellites";
 			this.cbxAdvsPopupSatellites.Size = new System.Drawing.Size(120, 19);
 			this.cbxAdvsPopupSatellites.TabIndex = 49;
 			this.cbxAdvsPopupSatellites.Text = "Tracked Satellites";
 			this.cbxAdvsPopupSatellites.CheckedChanged += new System.EventHandler(this.OnAdvPopupSettingChanged);
 			// 
-			// cbxAdvsPopupOffset
-			// 
-			this.cbxAdvsPopupOffset.Location = new System.Drawing.Point(14, 145);
-			this.cbxAdvsPopupOffset.Name = "cbxAdvsPopupOffset";
-			this.cbxAdvsPopupOffset.Size = new System.Drawing.Size(75, 19);
-			this.cbxAdvsPopupOffset.TabIndex = 48;
-			this.cbxAdvsPopupOffset.Text = "Offset";
-			this.cbxAdvsPopupOffset.CheckedChanged += new System.EventHandler(this.OnAdvPopupSettingChanged);
-			// 
 			// cbxAdvsPopupSystemTime
 			// 
-			this.cbxAdvsPopupSystemTime.Location = new System.Drawing.Point(14, 237);
+			this.cbxAdvsPopupSystemTime.Location = new System.Drawing.Point(14, 171);
 			this.cbxAdvsPopupSystemTime.Name = "cbxAdvsPopupSystemTime";
 			this.cbxAdvsPopupSystemTime.Size = new System.Drawing.Size(120, 19);
 			this.cbxAdvsPopupSystemTime.TabIndex = 47;
 			this.cbxAdvsPopupSystemTime.Text = "System Time";
 			this.cbxAdvsPopupSystemTime.CheckedChanged += new System.EventHandler(this.OnAdvPopupSettingChanged);
-			// 
-			// cbxAdvsPopupGamma
-			// 
-			this.cbxAdvsPopupGamma.Location = new System.Drawing.Point(14, 122);
-			this.cbxAdvsPopupGamma.Name = "cbxAdvsPopupGamma";
-			this.cbxAdvsPopupGamma.Size = new System.Drawing.Size(120, 19);
-			this.cbxAdvsPopupGamma.TabIndex = 46;
-			this.cbxAdvsPopupGamma.Text = "Gamma";
-			this.cbxAdvsPopupGamma.CheckedChanged += new System.EventHandler(this.OnAdvPopupSettingChanged);
-			// 
-			// cbxAdvsPopupGain
-			// 
-			this.cbxAdvsPopupGain.Location = new System.Drawing.Point(14, 99);
-			this.cbxAdvsPopupGain.Name = "cbxAdvsPopupGain";
-			this.cbxAdvsPopupGain.Size = new System.Drawing.Size(120, 19);
-			this.cbxAdvsPopupGain.TabIndex = 45;
-			this.cbxAdvsPopupGain.Text = "Gain";
-			this.cbxAdvsPopupGain.CheckedChanged += new System.EventHandler(this.OnAdvPopupSettingChanged);
 			// 
 			// cbxAdvsPopupTimeStamp
 			// 
@@ -328,7 +238,7 @@
 			this.cbxAdvsPopupTimeStamp.Text = "Central Exposure Time";
 			this.cbxAdvsPopupTimeStamp.CheckedChanged += new System.EventHandler(this.OnAdvPopupSettingChanged);
 			// 
-			// ucADVSVideo12bit
+			// ucAAV8bit
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -336,12 +246,11 @@
 			this.Controls.Add(this.groupControl3);
 			this.Controls.Add(this.groupControl2);
 			this.Controls.Add(this.groupControl1);
-			this.Name = "ucADVSVideo12bit";
+			this.Name = "ucAAV8bit";
 			this.Size = new System.Drawing.Size(454, 325);
 			this.groupControl1.ResumeLayout(false);
 			this.groupControl1.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.nudSaturation14bit)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.nudSaturation12bit)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudSaturation8bit)).EndInit();
 			this.groupControl2.ResumeLayout(false);
 			this.groupControl3.ResumeLayout(false);
 			this.ResumeLayout(false);
@@ -351,31 +260,24 @@
 		#endregion
 
 		private System.Windows.Forms.GroupBox groupControl1;
-		private System.Windows.Forms.NumericUpDown nudSaturation12bit;
-		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.NumericUpDown nudSaturation8bit;
+		private System.Windows.Forms.Label lblSaturation;
 		private System.Windows.Forms.GroupBox groupControl2;
-		private System.Windows.Forms.CheckBox cbxAdvsOsdGain;
 		private System.Windows.Forms.CheckBox cbxAdvsOsdTimeStamp;
 		private System.Windows.Forms.CheckBox cbxAdvsOsdMessages;
-		private System.Windows.Forms.CheckBox cbxAdvsOsdGamma;
 		private System.Windows.Forms.GroupBox groupControl3;
 		private System.Windows.Forms.CheckBox cbxAdvsPopupGPSFix;
 		private System.Windows.Forms.CheckBox cbxAdvsPopupAlmanac;
 		private System.Windows.Forms.CheckBox cbxAdvsPopupSatellites;
-		private System.Windows.Forms.CheckBox cbxAdvsPopupOffset;
 		private System.Windows.Forms.CheckBox cbxAdvsPopupSystemTime;
-		private System.Windows.Forms.CheckBox cbxAdvsPopupGamma;
-		private System.Windows.Forms.CheckBox cbxAdvsPopupGain;
 		private System.Windows.Forms.CheckBox cbxAdvsPopupTimeStamp;
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.ComboBox cbxADVEngine;
 		private System.Windows.Forms.CheckBox cbxAdvsPopupExposure;
 		private System.Windows.Forms.CheckBox cbxAdvsPopupVideoCameraFrameId;
         private System.Windows.Forms.CheckBox cbxAdvsOsdCameraInfo;
-        private System.Windows.Forms.CheckBox cbxAdvsOsdSystemInfo;
-		private System.Windows.Forms.NumericUpDown nudSaturation14bit;
-		private System.Windows.Forms.Label label3;
-		private System.Windows.Forms.CheckBox cbxAdvsOsdGeoLocation;
+		private System.Windows.Forms.CheckBox cbxAdvsOsdSystemInfo;
+		private System.Windows.Forms.ToolTip toolTip1;
 
 	}
 }

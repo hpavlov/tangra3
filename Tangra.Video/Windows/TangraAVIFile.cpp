@@ -50,42 +50,6 @@ namespace TangraAviFile
     	return E_FAIL;
 	}
 
-	/*
-	BITMAPINFOHEADER bih;
-    bih.biClrImportant = 0;
-    bih.biClrUsed = 0;
-    bih.biCompression = 0;
-    bih.biPlanes = 1;
-    bih.biSize = sizeof(bih);
-    bih.biXPelsPerMeter = 0;
-    bih.biYPelsPerMeter = 0;
-
-    // Corrections by M. Covington:
-    // If these are pre-set, interlaced video is not handled correctly.
-    // Better to give zeroes and let Windows fill them in.
-    bih.biHeight = 0; // was (Int32)streamInfo.rcFrame.bottom;
-    bih.biWidth = 0; // was (Int32)streamInfo.rcFrame.right;
-
-    bih.biBitCount = 24;
-
-	PGETFRAME pgfFrame;
-
-	if(NULL == (pgfFrame = AVIStreamGetFrameOpen(paviStream, &bih))) 
-	{
-        printf("Opening AVI Stream was unsuccessful\n");
-    	return 0;
-    }
-	
-	if (!bih.biSizeImage)
-		bih.biSizeImage = ((((bih.biWidth * bih.biBitCount) + 31) & ~31) / 8) * bih.biHeight;
-
-	s_AviImageWidth = bih.biWidth;// lpFormat->biWidth;
-	s_AviImageHeight = bih.biHeight;// lpFormat->biHeight;
-	s_AviBitCount = bih.biBitCount; //lpFormat->biBitCount;
-	s_AviImageSize = bih.biSizeImage; // lpFormat->biSizeImage;
-	s_AviCompression = bih.biCompression;// lpFormat->biCompression;
-	*/
-
 	s_AviImageWidth = lpFormat->biWidth;
 	s_AviImageHeight = lpFormat->biHeight;
 	s_AviBitCount = lpFormat->biBitCount;
@@ -97,13 +61,6 @@ namespace TangraAviFile
 
 	s_AviBitCount = 24;
 	s_AviImageSize = ((((s_AviImageWidth * s_AviBitCount) + 31) & ~31) / 8) * s_AviImageHeight;
-	//if (s_AviBitCount != 24)
-	//	// TODO: Add support for files that can be read as 16bpp using AviFile
-	//	throw "BitCount should be 24";
-
-	//if (lpFormat->biCompression != 0)
-	//	// TODO: Add support for files that use compression
-	//	throw "biCompression should be 0";
 
 	return S_OK;
 }

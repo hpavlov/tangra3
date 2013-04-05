@@ -95,7 +95,6 @@ namespace Tangra.VideoOperations.LightCurves
                 {
                     SetNUDSafe(nudAperture1, m_Header.MeasurementApertures[0]);
                     SetNUDSafe(nudFitArea1, m_Header.PsfFitMatrixSizes[0]);
-                    //nudFitArea1.Value = m_Context.ReProcessFitAreas[0];
                     picTarget1Pixels.Image = new Bitmap(68, 68);
                     picTarget1PSF.Image = new Bitmap(68, 68);
                     DrawCollorPanel(pnlColor1, 0);
@@ -105,7 +104,6 @@ namespace Tangra.VideoOperations.LightCurves
                 {
 					SetNUDSafe(nudAperture2, m_Header.MeasurementApertures[1]);
                     SetNUDSafe(nudFitArea2, m_Header.PsfFitMatrixSizes[1]);
-                    //nudFitArea2.Value = m_Context.ReProcessFitAreas[1];
                     picTarget2Pixels.Image = new Bitmap(68, 68);
                     picTarget2PSF.Image = new Bitmap(68, 68);
                     DrawCollorPanel(pnlColor2, 1);
@@ -115,7 +113,6 @@ namespace Tangra.VideoOperations.LightCurves
                 {
 					SetNUDSafe(nudAperture3, m_Header.MeasurementApertures[2]);
                     SetNUDSafe(nudFitArea3, m_Header.PsfFitMatrixSizes[2]);
-                    //nudFitArea3.Value = m_Context.ReProcessFitAreas[2];
                     picTarget3Pixels.Image = new Bitmap(68, 68);
                     picTarget3PSF.Image = new Bitmap(68, 68);
                     DrawCollorPanel(pnlColor3, 2);
@@ -125,7 +122,6 @@ namespace Tangra.VideoOperations.LightCurves
                 {
 					SetNUDSafe(nudAperture4, m_Header.MeasurementApertures[3]);
                     SetNUDSafe(nudFitArea4, m_Header.PsfFitMatrixSizes[3]);
-                    //nudFitArea4.Value = m_Context.ReProcessFitAreas[3];
                     picTarget4Pixels.Image = new Bitmap(68, 68);
                     picTarget4PSF.Image = new Bitmap(68, 68);
                     DrawCollorPanel(pnlColor4, 3);
@@ -207,10 +203,8 @@ namespace Tangra.VideoOperations.LightCurves
                         (float)targetApertures[i].Value, GetCurrentFilter(), reading.PixelData,
 						updatedReading.PsfFit.I0, ref fitArea, m_Header.FixedApertureFlags[i]);
 
-                    // TODO: (1) The PsfFit should be always non zero, why it is zero? (compare with previous code from ver 1.3)
                     updatedReading.PsfFit = measurer.FoundBestPSFFit;
 
-                    // TODO: (2) The PixelData must be 17x17 pixels
                     updatedReading.PixelData = measurer.PixelData;
                     m_SelectedMeasurements[i] = updatedReading;
 
@@ -372,10 +366,6 @@ namespace Tangra.VideoOperations.LightCurves
 
             Bitmap image = new Bitmap(35 * MAGN, 35 * MAGN, PixelFormat.Format24bppRgb);
 
-            //Pixelmap image = pictureBox.PixelMap;
-            //if (image != null)
-            //{
-
             int pixelsCenterX = (int)Math.Round(reading.X0) - 1;
             int pixelsCenterY = (int)Math.Round(reading.Y0) - 1;
 
@@ -394,7 +384,6 @@ namespace Tangra.VideoOperations.LightCurves
                 {
                     // This is what is needed to get a 17x17 area in the middle of the 35x35 pixel data
                     uint pixelValue = reading.PixelData[x + 9, y + 9];
-                    //Color pixelcolor = Color.FromArgb(pixelValue, pixelValue, pixelValue);
 
                     Color pixelcolor = SystemColors.Control;
 
@@ -408,7 +397,7 @@ namespace Tangra.VideoOperations.LightCurves
                         pixelcolor = TangraConfig.Settings.Color.Saturation;
 
 
-                    // TODO: THIS IS SOOO SLOW !!!
+                    // TODO: THIS IS SLOW, but pixels are not too many
                     for (int i = 0; i < MAGN; i++)
                     {
                         for (int j = 0; j < MAGN; j++)
@@ -416,47 +405,6 @@ namespace Tangra.VideoOperations.LightCurves
                             image.SetPixel(MAGN * x + i, MAGN * y + j, pixelcolor);
                         }
                     }
-
-                    //if (pixelValue < TangraConfig.Settings.Photometry.Saturation)
-                    //{
-                    //    if (m_Context.Filter == frmLightCurve.LightCurveContext.FilterType.LowPassDifference)
-                    //    {
-                    //        pixelcolor = Color.FromArgb(150 * pixelValue / peak, 150 * pixelValue / peak, 150 * pixelValue / peak);
-                    //    }
-                    //    else if (m_Context.Filter == frmLightCurve.LightCurveContext.FilterType.LowPass)
-                    //    {
-                    //        if (x >= 1 && x < 16 && y >= 1 && y < 16)
-                    //        {
-                    //            byte modifiedValue = (byte)(pixelValue + Math.Round((255 - pixelValue) * (pixelValue * 1.0 / allObjectsPeak) * tbIntensity.Value / 100.0));
-                    //            pixelcolor = Color.FromArgb(modifiedValue, modifiedValue, modifiedValue);
-                    //        }
-                    //    }
-                    //    else
-                    //    {
-                    //        byte modifiedValue = (byte)(pixelValue + Math.Round((255 - pixelValue) * (pixelValue * 1.0 / allObjectsPeak) * tbIntensity.Value / 100.0));
-                    //        pixelcolor = Color.FromArgb(modifiedValue, modifiedValue, modifiedValue);
-                    //    }
-                    //}
-                    //else
-                    //    pixelcolor = TangraConfig.Settings.Color.Saturation;
-
-
-                    //image[4 * x, 4 * y] = pixelValue;
-                    //image[4 * x + 1, 4 * y] = pixelValue;
-                    //image[4 * x + 2, 4 * y] = pixelValue;
-                    //image[4 * x + 3, 4 * y] = pixelValue;
-                    //image[4 * x, 4 * y + 1] = pixelValue;
-                    //image[4 * x + 1, 4 * y + 1] = pixelValue;
-                    //image[4 * x + 2, 4 * y + 1] = pixelValue;
-                    //image[4 * x + 3, 4 * y + 1] = pixelValue;
-                    //image[4 * x, 4 * y + 2] = pixelValue;
-                    //image[4 * x + 1, 4 * y + 2] = pixelValue;
-                    //image[4 * x + 2, 4 * y + 2] = pixelValue;
-                    //image[4 * x + 3, 4 * y + 2] = pixelValue;
-                    //image[4 * x, 4 * y + 3] = pixelValue;
-                    //image[4 * x + 1, 4 * y + 3] = pixelValue;
-                    //image[4 * x + 2, 4 * y + 3] = pixelValue;
-                    //image[4 * x + 3, 4 * y + 3] = pixelValue;
                 }
 
 
@@ -579,33 +527,6 @@ namespace Tangra.VideoOperations.LightCurves
             DialogResult = DialogResult.OK;
             Close();
         }
-
-		//private void cbxFilter_SelectedIndexChanged(object sender, EventArgs e)
-		//{
-		//    m_Context.Filter = (frmLightCurve.LightCurveContext.FilterType)cbxFilter.SelectedIndex;
-
-		//    uint frameNo = (uint)sbDataFrames.Value;
-		//    for (int i = 0; i < 4; i++)
-		//    {
-		//        m_SelectedMeasurements[i] = LCMeasurement.Empty;
-
-		//        foreach (LCMeasurement reading in m_AllBackedUpReadings[i])
-		//        {
-		//            if (reading.CurrFrameNo == frameNo)
-		//            {
-		//                m_SelectedMeasurements[i] = reading;
-		//                break;
-		//            }
-		//        }
-		//    }
-
-		//    RecomputeData();
-
-		//    PlotCurrentFrameData();
-
-		//    // Only 'intesify' for No Filter and LP Filter
-		//    tbIntensity.Enabled = cbxFilter.SelectedIndex < 2;
-		//}
 
         private void tbIntensity_ValueChanged(object sender, EventArgs e)
         {

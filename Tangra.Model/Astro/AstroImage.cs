@@ -179,12 +179,6 @@ namespace Tangra.Model.Astro
 
         public ImagePixel GetCentroid(int x, int y, int radius, bool doPeakPixelFirst, uint noiseLevel)
         {
-#if PROFILING
-            Profiler.Instance.AppendMetric("AstroImage_GetCentroid_Calls", 1);
-            Profiler.Instance.StartTimer("AstroImage_GetCentroid");
-            try
-            {
-#endif
             uint minimum = m_Pixelmap.MaxPixelValue;
             uint maximum = 0;
             int xMax = x, yMax = y;
@@ -241,13 +235,6 @@ namespace Tangra.Model.Astro
             retVal.SignalNoise = retVal.Brightness * 1.0 / noiseLevel;
 
             return retVal;
-#if PROFILING
-            }
-            finally
-            {
-                Profiler.Instance.StopTimer("AstroImage_GetCentroid");
-            }
-#endif
         }
 
         public float GetAverageFWHM()
@@ -348,6 +335,45 @@ namespace Tangra.Model.Astro
 			else
 				return 0;
 		}
+
+		public static PSFFit GetPSFFitForPeakPixel(
+			uint[,] data,
+			PotentialStarStruct starToTest,
+			float aboveNoiseLevelRequired,
+			double minFWHM,
+			double maxFWHM)
+		{
+
+			int STAR_MATRIX_FIT = TangraConfig.Settings.Special.StarFinderFitArea;
+			double MIN_DISTANCE_OF_PEAK_PIXEL_FROM_CENTER = TangraConfig.Settings.Special.StarFinderMinDistanceOfPeakPixelFromCenter;
+
+
+			PSFFit fit = new PSFFit(starToTest.X, starToTest.Y);
+			int fitMatrix = (int)Math.Min(data.GetLength(0), STAR_MATRIX_FIT + 2);
+
+			// Get a matrix with 1 pixel larger each way and set the border pixels to zero
+			fit.Fit(data, fitMatrix, starToTest.X, starToTest.Y, true);
+
+			if (fit.IsSolved)
+			{
+				double distanceFromCenter = ImagePixel.ComputeDistance(fit.X0_Matrix, fitMatrix / 2, fit.Y0_Matrix, fitMatrix / 2);
+
+				if (fit.Certainty > 0 &&
+					fit.FWHM >= minFWHM &&
+					fit.FWHM <= maxFWHM &&
+					distanceFromCenter < MIN_DISTANCE_OF_PEAK_PIXEL_FROM_CENTER &&
+					fit.IMax > aboveNoiseLevelRequired)
+				{
+					//not good for lost tracking allow higher FWHM
+
+					// This object passes all tests to be furhter considered as a star
+					return fit;
+				}
+			}
+
+			return null;
+		}
+
     }
 }
 

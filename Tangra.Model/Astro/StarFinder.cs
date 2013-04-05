@@ -9,7 +9,7 @@ using Tangra.Model.Image;
 
 namespace Tangra.Model.Astro
 {
-    internal class PotentialStarStruct
+    public class PotentialStarStruct
     {
         public int X;
         public int Y;
@@ -182,9 +182,9 @@ namespace Tangra.Model.Astro
                 allFoundStars, aboveNoiseLevelRequired, minDistanceInPixels, filter == TangraConfig.PreProcessingFilter.LowPassDifferenceFilter, Rectangle.Empty, null);
         }
 
-        internal delegate void FilterPotentialStars(List<PotentialStarStruct> peakPixels);
+        public delegate void FilterPotentialStars(List<PotentialStarStruct> peakPixels);
 
-        internal static List<PSFFit> GetStarsInArea(
+        public static List<PSFFit> GetStarsInArea(
             ref uint[,] data, int bpp, TangraConfig.PreProcessingFilter filter,
             List<PotentialStarStruct> allPotentialStars,
             List<PSFFit> allFoundStars,
@@ -218,8 +218,6 @@ namespace Tangra.Model.Astro
             if (allPotentialStars != null)
                 allPotentialStars.AddRange(potentialStars);
 
-            // TODO: Check whether no filter gives better results than LP filter
-            //byte[,] lpData = BitmapFilter.LowPassFilter(data, false);
             uint[,] lpData = data;
 
             List<PSFFit> foundStars = new List<PSFFit>();
@@ -299,14 +297,6 @@ namespace Tangra.Model.Astro
 
             return foundStars;
         }
-
-        //internal static PSFFit GetPSFFitForPeakPixel(byte[,] data, PotentialStarStruct starToTest, float aboveNoiseLevelRequired)
-        //{
-        //    double minFWHM = TangraConfig.Settings.Special.StarFinderMinFWHM;
-        //    double maxFWHM = TangraConfig.Settings.Special.StarFinderMaxFWHM;
-
-        //    return GetPSFFitForPeakPixel(data, starToTest, aboveNoiseLevelRequired, minFWHM, maxFWHM);
-        //}
 
         internal static PSFFit GetPSFFitForPeakPixel(
             uint[,] data,

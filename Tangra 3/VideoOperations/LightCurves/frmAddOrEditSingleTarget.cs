@@ -124,7 +124,7 @@ namespace Tangra.VideoOperations.LightCurves
             btnDelete.Visible = false;
             m_IsEdit = false;
 
-		    nudFitMatrixSize.Value = 11; // Config.AppConfig.Instance.PhotometrySettings.DefaultFsfFitArea;
+		    nudFitMatrixSize.Value = 11;
 		    nudFitMatrixSize.Maximum = 15;
 
 			m_ObjectId = objectId;
@@ -155,12 +155,9 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void Initialize()
         {
+			//NOTE: Enable for debugging purposes
+			btnExplain.Visible = false;
 
-#if !PRODUCTION
-            btnExplain.Visible = true;
-#else
-            btnExplain.Visible = false;
-#endif
             SelectedFilter = LightCurveReductionContext.Instance.DigitalFilter;
 
             picTarget1Pixels.Image = new Bitmap(119, 119, PixelFormat.Format24bppRgb);
@@ -297,19 +294,16 @@ namespace Tangra.VideoOperations.LightCurves
                 {
                     // There is exactly one good star found. Go and do a fit in a wider area
                     double bestFindTolerance = 3.0;
-                    //LightCurveReductionContext.Instance.VeryCloseObjectsFlag 
-                    //    ? 1.5
-                    //    : 3.0;
 
                     for (int i = 0; i < 2; i++)
                     {
                         MeasurementsHelper measurement = ReduceLightCurveOperation.DoConfiguredMeasurement(m_ProcessingPixels, gaussian, m_AstroImage.Pixelmap.BitPixCamera, bestFindTolerance, ref m_Aperture, ref matirxSize);
                         if (measurement != null && matirxSize != -1)
                         {
-                            if (/*LightCurveReductionContext.Instance.VeryCloseObjectsFlag && */ matirxSize < 5)
+                            if (matirxSize < 5)
                             {
                                 // Do a centroid in the full area, and get another matix centered at the centroid 
-                                ImagePixel centroid = new ImagePixel(m_Center.X, m_Center.Y); //m_AstroImage.GetCentroid(m_Center.X, m_Center.Y, 9));
+                                ImagePixel centroid = new ImagePixel(m_Center.X, m_Center.Y);
 
                                 m_ProcessingPixels = m_AstroImage.GetMeasurableAreaPixels(centroid);
                                 m_DisplayPixels = m_AstroImage.GetMeasurableAreaDisplayBitmapPixels(centroid);
@@ -355,9 +349,6 @@ namespace Tangra.VideoOperations.LightCurves
 
                             break;
                         }
-
-                        //if (i == 0 && LightCurveReductionContext.Instance.VeryCloseObjectsFlag)
-                        //    bestFindTolerance = 3.0;
                     }
                 }
                 else if (m_AutoStarsInArea.Count > 1)
@@ -396,7 +387,6 @@ namespace Tangra.VideoOperations.LightCurves
                     m_FWHM = (float)closestFit.FWHM;
                     m_Gaussian = closestFit;
 
-                    //m_ProcessingPixels = measurement.PixelData;
                     nudFitMatrixSize.Value = m_IsEdit ? ObjectToAdd.PsfFitMatrixSize : closestFit.MatrixSize;
                 }
 
@@ -443,12 +433,6 @@ namespace Tangra.VideoOperations.LightCurves
 			Bitmap bmp = picTarget1Pixels.Image as Bitmap;
             if (bmp != null && m_ProcessingPixels != null)
 			{
-
-				//int pixelsCenterX = (int)Math.Round(m_Gaussian.X0_Matrix);
-				//int pixelsCenterY = (int)Math.Round(m_Gaussian.Y0_Matrix);
-
-				//byte[,] diplayPixels = Pixelmap.PixelsToBitmapBytes(m_ProcessingPixels, VideoContext.Current.Pixelmap.DisplayBitmapConverter);
-
 				byte peak = 0;
 				for (int x = 0; x < 17; x++)
 					for (int y = 0; y < 17; y++)
@@ -532,18 +516,6 @@ namespace Tangra.VideoOperations.LightCurves
                             2 * radius);
                     }
 
-					// TODO: Draw the background annulus
-
-					// TODO: Autostars do not work very well (false positives are returned). Make them work and then enable the code below
-					//if (m_AutoStarsInArea != null &&
-					//    m_AutoStarsInArea.Count > 1)
-					//{
-					//    foreach(PSFFit fit in m_AutoStarsInArea)
-					//    {
-					//        g.DrawLine(m_Pen, 7f * (float)(fit.XCenter + 0.5 - 1), 7f * (float)(fit.YCenter + 0.5), 7f * (float)(fit.XCenter + 0.5 + 1), 7f * (float)(fit.YCenter + 0.5));
-					//        g.DrawLine(m_Pen, 7f * (float)(fit.XCenter + 0.5), 7f * (float)(fit.YCenter + 0.5 - 1), 7f * (float)(fit.XCenter + 0.5), 7f * (float)(fit.YCenter + 0.5 + 1));
-					//    }
-					//}
 					g.Save();
 				}
 
@@ -684,9 +656,6 @@ namespace Tangra.VideoOperations.LightCurves
         {
             CopyObjectToAdd();
 
-            //if (LightCurveReductionContext.Instance.SaveTrackingSession)
-            //    LightCurveReductionContext.Instance.SessionFile.AddOrEditObject(m_AstroImage, ObjectToAdd, m_ObjectId);
-
             DialogResult = DialogResult.OK;
             Close();
         }
@@ -728,9 +697,6 @@ namespace Tangra.VideoOperations.LightCurves
         private void btnDelete_Click(object sender, EventArgs e)
         {
             CopyObjectToAdd();
-
-            //if (LightCurveReductionContext.Instance.SaveTrackingSession)
-            //    LightCurveReductionContext.Instance.SessionFile.DeleteObject(ObjectToAdd);
 
             DialogResult = DialogResult.Abort;
             Close();
@@ -799,11 +765,6 @@ namespace Tangra.VideoOperations.LightCurves
                 PSFFit star = m_AutoStarsInArea.Find(
                     s =>
                     {
-                        //Trace.WriteLine(string.Format("TESTED-STAR({0}, {1}) -> MOUSE:({2}, {3}); RESIDUAL({4};{5})",
-                        //    (s.YCenter + 0.5).ToString("0.0"), (s.XCenter + 0.5).ToString("0.0"),
-                        //    x.ToString("0.0"), y.ToString("0.0"),
-                        //    Math.Abs(s.XCenter - x + 0.5f).ToString("0.0"), Math.Abs(s.YCenter - y + 0.5).ToString("0.0")));
-
                         return Math.Abs(s.XCenter - x + 0.5f) < 2.0f && Math.Abs(s.YCenter - y + 0.5) < 2.0f;
                     }
                     );
@@ -847,9 +808,6 @@ namespace Tangra.VideoOperations.LightCurves
             double signal;
             double sn;
 
-            // TODO: Compute the noise as the average noise from 4 frames 
-
-            // To compute the 'noise' we get the (TimesStdDevsForBackgroundNoise) * sigma background fluctuation excluding 1FWHM area around the center
             byte oneSigmaBg = 0;
             int from = 0;
             int to = m_ProcessingPixels.GetLength(0);
@@ -915,18 +873,7 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void btnExplain_Click(object sender, EventArgs e)
         {
-//#if !PRODUCTION
 
-//            bool ctrlHolded = Control.ModifierKeys == Keys.Control;
-
-//            ObjectFinderStruct str = new ObjectFinderStruct(
-//                m_Center, ctrlHolded 
-//                    ? m_AstroImage.GetMeasurableAreaPixels(m_Center.X, m_Center.Y, 35)
-//                    : m_ProcessingPixels,
-//                m_AstroImage.MedianNoise, LightCurveReductionContext.Instance.DigitalFilter);
-//            frmObjectFinder frm = new frmObjectFinder(str.AsBase64String());
-//            frm.ShowDialog();
-//#endif
         }
 
 		private void rgObjectType_SelectedIndexChanged(object sender, EventArgs e)

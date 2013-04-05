@@ -169,62 +169,62 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
         private void LocateStarsWithStarRecognition(AstroImage astroImage)
         {
-            //EnsureComputedRefinedData();
+			EnsureComputedRefinedData();
 
-            //if (m_MinLocateDistance > 8)
-            //{
-            //    if (!LightCurveReductionContext.Instance.WindOrShaking)
-            //    {
-            //        //TODO: If the wind flag is not set, then use a 3 frame binned integration to locate the stars on       
-            //    }
+			if (m_MinLocateDistance > 8)
+			{
+				if (!LightCurveReductionContext.Instance.WindOrShaking)
+				{
+					//TODO: If the wind flag is not set, then use a 3 frame binned integration to locate the stars on       
+				}
 
-            //    uint[,] pixels = astroImage.Pixelmap.GetPixelsCopy();
+				uint[,] pixels = astroImage.Pixelmap.GetPixelsCopy();
 
-            //    List<AstroImage.PotentialStarStruct> peakPixels = new List<AstroImage.PotentialStarStruct>();
-            //    AutoDiscoveredStars.Clear();
-            //    AutoDiscoveredStars = AstroImage.GetStarsInArea(
-            //        ref pixels, 8, PreProcessingFilter.NoFilter, peakPixels, null,
-            //        (uint)Math.Round(TangraConfig.Settings.Special.LostTrackingMinSignalCoeff * m_MinLocateSignal),
-            //        TangraConfig.Settings.Special.LostTrackingMinDistance, false, 
-            //        LightCurveReductionContext.Instance.OSDFrame, ReducePeakPixels);
+				List<PotentialStarStruct> peakPixels = new List<PotentialStarStruct>();
+				AutoDiscoveredStars.Clear();
+				AutoDiscoveredStars = StarFinder.GetStarsInArea(
+					ref pixels, 8, TangraConfig.PreProcessingFilter.NoFilter, peakPixels, null,
+					(uint)Math.Round(TangraConfig.Settings.Special.LostTrackingMinSignalCoeff * m_MinLocateSignal),
+					TangraConfig.Settings.Special.LostTrackingMinDistance, false,
+					LightCurveReductionContext.Instance.OSDFrame, ReducePeakPixels);
 
-            //    Stopwatch sw = new Stopwatch();
-            //    sw.Start();
-            //    if (m_LocateObjects.Count == 1 &&
-            //        AutoDiscoveredStars.Count == 1)
-            //    {
-            //        LocateSingleStarsWithStarRecognition(AutoDiscoveredStars, astroImage);               
-            //    }
-            //    else if (
-            //        m_LocateObjects.Count == 2 &&
-            //        peakPixels.Count > 1)
-            //    {
-            //        LocateTwoStarsWithStarRecognition(peakPixels, astroImage, pixels);
-            //    }
-            //    else if (
-            //        m_LocateObjects.Count > 2 &&
-            //        peakPixels.Count > 1)
-            //    {
-            //        List<TrackedObject> goodTrackedObjects = TrackedObjects.FindAll(t => t.LastKnownGoodPosition != null);
-            //        if (goodTrackedObjects.Count < 2)
-            //        {
-            //            // We don't have at least one good pair. Fail.
-            //        }
-            //        else if (goodTrackedObjects.Count >= 2)
-            //        {
-            //            goodTrackedObjects.Sort((a, b) =>
-            //                        Math.Min(b.LastKnownGoodPosition.XDouble, b.LastKnownGoodPosition.YDouble).CompareTo(
-            //                        Math.Min(a.LastKnownGoodPosition.XDouble, a.LastKnownGoodPosition.YDouble)));
+				Stopwatch sw = new Stopwatch();
+				sw.Start();
+				if (m_LocateObjects.Count == 1 &&
+					AutoDiscoveredStars.Count == 1)
+				{
+					LocateSingleStarsWithStarRecognition(AutoDiscoveredStars, astroImage);
+				}
+				else if (
+					m_LocateObjects.Count == 2 &&
+					peakPixels.Count > 1)
+				{
+					LocateTwoStarsWithStarRecognition(peakPixels, astroImage, pixels);
+				}
+				else if (
+					m_LocateObjects.Count > 2 &&
+					peakPixels.Count > 1)
+				{
+					List<TrackedObject> goodTrackedObjects = TrackedObjects.FindAll(t => t.LastKnownGoodPosition != null);
+					if (goodTrackedObjects.Count < 2)
+					{
+						// We don't have at least one good pair. Fail.
+					}
+					else if (goodTrackedObjects.Count >= 2)
+					{
+						goodTrackedObjects.Sort((a, b) =>
+									Math.Min(b.LastKnownGoodPosition.XDouble, b.LastKnownGoodPosition.YDouble).CompareTo(
+									Math.Min(a.LastKnownGoodPosition.XDouble, a.LastKnownGoodPosition.YDouble)));
 
-            //            Trace.WriteLine(string.Format("StarRecognitionDistanceBasedLocation: Using objects {0} and {1}", goodTrackedObjects[0].TargetNo, goodTrackedObjects[1].TargetNo));
-            //            // There is only 1 good pair so fallback to using 2 star recognition
-            //            LocateTwoStarsWithStarRecognition(peakPixels, astroImage, pixels, goodTrackedObjects[0], goodTrackedObjects[1]);
-            //        }
-            //    }
-                
-            //    sw.Stop();
-            //    Trace.WriteLine(string.Format("StarRecognitionDistanceBasedLocation: {0} sec", sw.Elapsed.TotalSeconds.ToString("0.00")));
-            //}
+						Trace.WriteLine(string.Format("StarRecognitionDistanceBasedLocation: Using objects {0} and {1}", goodTrackedObjects[0].TargetNo, goodTrackedObjects[1].TargetNo));
+						// There is only 1 good pair so fallback to using 2 star recognition
+						LocateTwoStarsWithStarRecognition(peakPixels, astroImage, pixels, goodTrackedObjects[0], goodTrackedObjects[1]);
+					}
+				}
+
+				sw.Stop();
+				Trace.WriteLine(string.Format("StarRecognitionDistanceBasedLocation: {0} sec", sw.Elapsed.TotalSeconds.ToString("0.00")));
+			}
         }
 
         public override bool IsTrackedSuccessfully
@@ -248,53 +248,53 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             get { return m_RefiningFramesLeft; }
         }
 
-        //private void ReducePeakPixels(List<AstroImage.PotentialStarStruct> potentialStars)
-        //{
-        //    if (m_LocateObjects.Count == 2)
-        //        ReducePeakPixels2Targets(potentialStars);
-        //}
+		private void ReducePeakPixels(List<PotentialStarStruct> potentialStars)
+		{
+			if (m_LocateObjects.Count == 2)
+				ReducePeakPixels2Targets(potentialStars);
+		}
 
-        //private void ReducePeakPixels2Targets(List<AstroImage.PotentialStarStruct> potentialStars)
-        //{
-        //    const double TOLERANCE = 9;
+		private void ReducePeakPixels2Targets(List<PotentialStarStruct> potentialStars)
+		{
+			const double TOLERANCE = 9;
 
-        //    List<int> possibleStarIndexes = new List<int>();
+			List<int> possibleStarIndexes = new List<int>();
 
-        //    TrackedObject trackedObject1 = TrackedObjects.Find(o => o.TargetNo == m_LocateObjects[0]);
-        //    TrackedObject trackedObject2 = TrackedObjects.Find(o => o.TargetNo == m_LocateObjects[1]);
-        //    if (trackedObject1.TargetNo != trackedObject2.TargetNo &&
-        //        trackedObject1.LastKnownGoodPosition != null &&
-        //        trackedObject2.LastKnownGoodPosition != null)
-        //    {
-        //        double deltaX = Math.Abs(trackedObject1.LastKnownGoodPosition.X - trackedObject2.LastKnownGoodPosition.X);
-        //        double deltaY = Math.Abs(trackedObject1.LastKnownGoodPosition.Y - trackedObject2.LastKnownGoodPosition.Y);
+			TrackedObject trackedObject1 = TrackedObjects.Find(o => o.TargetNo == m_LocateObjects[0]);
+			TrackedObject trackedObject2 = TrackedObjects.Find(o => o.TargetNo == m_LocateObjects[1]);
+			if (trackedObject1.TargetNo != trackedObject2.TargetNo &&
+				trackedObject1.LastKnownGoodPosition != null &&
+				trackedObject2.LastKnownGoodPosition != null)
+			{
+				double deltaX = Math.Abs(trackedObject1.LastKnownGoodPosition.X - trackedObject2.LastKnownGoodPosition.X);
+				double deltaY = Math.Abs(trackedObject1.LastKnownGoodPosition.Y - trackedObject2.LastKnownGoodPosition.Y);
 
-        //        for (int i = 0; i < potentialStars.Count; i++)
-        //        {
-        //            for (int j = i + 1; j < potentialStars.Count; j++)
-        //            {
-        //                AstroImage.PotentialStarStruct px1 = potentialStars[i];
-        //                AstroImage.PotentialStarStruct px2 = potentialStars[j];
+				for (int i = 0; i < potentialStars.Count; i++)
+				{
+					for (int j = i + 1; j < potentialStars.Count; j++)
+					{
+						PotentialStarStruct px1 = potentialStars[i];
+						PotentialStarStruct px2 = potentialStars[j];
 
-        //                double distX = Math.Abs(px1.X - px2.X);
-        //                double distY = Math.Abs(px1.Y - px2.Y);
+						double distX = Math.Abs(px1.X - px2.X);
+						double distY = Math.Abs(px1.Y - px2.Y);
 
-        //                if (Math.Abs(distX - deltaX) < TOLERANCE &&
-        //                    Math.Abs(distY - deltaY) < TOLERANCE)
-        //                {
-        //                    possibleStarIndexes.Add(i);
-        //                    possibleStarIndexes.Add(j);
-        //                }
-        //            }
-        //        }
-        //    }
+						if (Math.Abs(distX - deltaX) < TOLERANCE &&
+							Math.Abs(distY - deltaY) < TOLERANCE)
+						{
+							possibleStarIndexes.Add(i);
+							possibleStarIndexes.Add(j);
+						}
+					}
+				}
+			}
 
-        //    for (int i = potentialStars.Count - 1; i >= 0; i--)
-        //    {
-        //        if (possibleStarIndexes.IndexOf(i) == -1)
-        //            potentialStars.RemoveAt(i);
-        //    }
-        //}
+			for (int i = potentialStars.Count - 1; i >= 0; i--)
+			{
+				if (possibleStarIndexes.IndexOf(i) == -1)
+					potentialStars.RemoveAt(i);
+			}
+		}
 
         private void LocateSingleStarsWithStarRecognition(List<PSFFit> stars, AstroImage astroImage)
         {
@@ -322,122 +322,122 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             public TrackedObject Object2;
         }
 
-        //private List<CandidatePair> LocateStarPairsWithStarRecognition(TrackedObject trackedObject1, TrackedObject trackedObject2, List<AstroImage.PotentialStarStruct> stars, uint[,] pixels)
-        //{
-        //    List<CandidatePair> candidates = new List<CandidatePair>();
+		private List<CandidatePair> LocateStarPairsWithStarRecognition(TrackedObject trackedObject1, TrackedObject trackedObject2, List<PotentialStarStruct> stars, uint[,] pixels)
+		{
+			List<CandidatePair> candidates = new List<CandidatePair>();
 
-        //    double minFWHM = (1 - TangraConfig.Settings.Special.LostTrackingFWHMCoeff) * m_AverageFWHM;
-        //    double maxFWHM = (1 + TangraConfig.Settings.Special.LostTrackingFWHMCoeff) * m_AverageFWHM;
+			double minFWHM = (1 - TangraConfig.Settings.Special.LostTrackingFWHMCoeff) * m_AverageFWHM;
+			double maxFWHM = (1 + TangraConfig.Settings.Special.LostTrackingFWHMCoeff) * m_AverageFWHM;
 
-        //    if (trackedObject1.TargetNo != trackedObject2.TargetNo &&
-        //        trackedObject1.LastKnownGoodPosition != null &&
-        //        trackedObject2.LastKnownGoodPosition != null)
-        //    {
-        //        double deltaX = trackedObject1.LastKnownGoodPosition.X - trackedObject2.LastKnownGoodPosition.X;
-        //        double deltaY = trackedObject1.LastKnownGoodPosition.Y - trackedObject2.LastKnownGoodPosition.Y;
+			if (trackedObject1.TargetNo != trackedObject2.TargetNo &&
+				trackedObject1.LastKnownGoodPosition != null &&
+				trackedObject2.LastKnownGoodPosition != null)
+			{
+				double deltaX = trackedObject1.LastKnownGoodPosition.X - trackedObject2.LastKnownGoodPosition.X;
+				double deltaY = trackedObject1.LastKnownGoodPosition.Y - trackedObject2.LastKnownGoodPosition.Y;
 
-        //        // Looking for two stars with the same distance and similar brighness
-        //        for (int i = 0; i < stars.Count; i++)
-        //        {
-        //            for (int j = 0; j < stars.Count; j++)
-        //            {
-        //                if (i == j) continue;
+				// Looking for two stars with the same distance and similar brighness
+				for (int i = 0; i < stars.Count; i++)
+				{
+					for (int j = 0; j < stars.Count; j++)
+					{
+						if (i == j) continue;
 
-        //                double deltaXStars = stars[i].X - stars[j].X;
-        //                double deltaYStars = stars[i].Y - stars[j].Y;
+						double deltaXStars = stars[i].X - stars[j].X;
+						double deltaYStars = stars[i].Y - stars[j].Y;
 
-        //                if (Math.Abs(deltaX - deltaXStars) < TangraConfig.Settings.Special.LostTrackingPositionToleranceCoeff * PositionTolerance &&
-        //                    Math.Abs(deltaY - deltaYStars) < TangraConfig.Settings.Special.LostTrackingPositionToleranceCoeff * PositionTolerance)
-        //                {
-        //                    // Now compute PSFFits from the pixels
-        //                    PSFFit fit1 = AstroImage.GetPSFFitForPeakPixel(pixels, stars[i], m_MinLocateSignal, minFWHM, maxFWHM);
-        //                    PSFFit fit2 = AstroImage.GetPSFFitForPeakPixel(pixels, stars[j], m_MinLocateSignal, minFWHM, maxFWHM);
+						if (Math.Abs(deltaX - deltaXStars) < TangraConfig.Settings.Special.LostTrackingPositionToleranceCoeff * PositionTolerance &&
+							Math.Abs(deltaY - deltaYStars) < TangraConfig.Settings.Special.LostTrackingPositionToleranceCoeff * PositionTolerance)
+						{
+							// Now compute PSFFits from the pixels
+							PSFFit fit1 = AstroImage.GetPSFFitForPeakPixel(pixels, stars[i], m_MinLocateSignal, minFWHM, maxFWHM);
+							PSFFit fit2 = AstroImage.GetPSFFitForPeakPixel(pixels, stars[j], m_MinLocateSignal, minFWHM, maxFWHM);
 
-        //                    if (fit1 != null && fit2 != null)
-        //                    {
-        //                        AutoDiscoveredStars.Add(fit1);
-        //                        AutoDiscoveredStars.Add(fit2);
+							if (fit1 != null && fit2 != null)
+							{
+								AutoDiscoveredStars.Add(fit1);
+								AutoDiscoveredStars.Add(fit2);
 
-        //                        deltaXStars = fit1.XCenter - fit2.XCenter;
-        //                        deltaYStars = fit1.YCenter - fit2.YCenter;
+								deltaXStars = fit1.XCenter - fit2.XCenter;
+								deltaYStars = fit1.YCenter - fit2.YCenter;
 
-        //                        if (Math.Abs(deltaX - deltaXStars) < PositionTolerance &&
-        //                            Math.Abs(deltaY - deltaYStars) < PositionTolerance)
-        //                        {
-        //                            // Compute a certainty and add to the candidates dictionary            
-        //                            CandidatePair pair = new CandidatePair();
-        //                            pair.Star1 = fit1;
-        //                            pair.Star2 = fit2;
-        //                            pair.Object1 = trackedObject1;
-        //                            pair.Object2 = trackedObject2;
+								if (Math.Abs(deltaX - deltaXStars) < PositionTolerance &&
+									Math.Abs(deltaY - deltaYStars) < PositionTolerance)
+								{
+									// Compute a certainty and add to the candidates dictionary            
+									CandidatePair pair = new CandidatePair();
+									pair.Star1 = fit1;
+									pair.Star2 = fit2;
+									pair.Object1 = trackedObject1;
+									pair.Object2 = trackedObject2;
 
-        //                            int[] BRIGTHNESS_MATCH_WEIGTH = new int[] { 0, 0, 0, 0, 0, 1, 1, 1, 2, 3, 3 };
+									int[] BRIGTHNESS_MATCH_WEIGTH = new int[] { 0, 0, 0, 0, 0, 1, 1, 1, 2, 3, 3 };
 
-        //                            int weight = (trackedObject1.IsGuidingStar ? 2 : 0) + (trackedObject2.IsGuidingStar ? 2 : 0);
-        //                            double d1 = pair.Star1.IMax - pair.Star1.I0;
-        //                            double d2 = pair.Star2.IMax - pair.Star2.I0;
+									int weight = (trackedObject1.IsGuidingStar ? 2 : 0) + (trackedObject2.IsGuidingStar ? 2 : 0);
+									double d1 = pair.Star1.IMax - pair.Star1.I0;
+									double d2 = pair.Star2.IMax - pair.Star2.I0;
 
-        //                            d1 = pair.Object1.RefinedOrLastSignalLevel / d1;
-        //                            if (d1 > 1) d1 = 1 / d1;
-        //                            int d1i = Math.Min(10, (int)Math.Round((1 - d1) * 10));
+									d1 = pair.Object1.RefinedOrLastSignalLevel / d1;
+									if (d1 > 1) d1 = 1 / d1;
+									int d1i = Math.Min(10, (int)Math.Round((1 - d1) * 10));
 
-        //                            weight += BRIGTHNESS_MATCH_WEIGTH[d1i];
+									weight += BRIGTHNESS_MATCH_WEIGTH[d1i];
 
-        //                            d2 = pair.Object2.RefinedOrLastSignalLevel / d2;
-        //                            if (d2 > 1) d2 = 1 / d2;
-        //                            int d2i = Math.Min(10, (int)Math.Round((1 - d2) * 10));
+									d2 = pair.Object2.RefinedOrLastSignalLevel / d2;
+									if (d2 > 1) d2 = 1 / d2;
+									int d2i = Math.Min(10, (int)Math.Round((1 - d2) * 10));
 
-        //                            weight += BRIGTHNESS_MATCH_WEIGTH[d2i];
+									weight += BRIGTHNESS_MATCH_WEIGTH[d2i];
 
-        //                            double distanceFromLastKnownGoodPosition = 
-        //                                AstroPixel.ComputeDistance(
-        //                                    pair.Star1.XCenter, pair.Object1.LastKnownGoodPosition.XDouble,
-        //                                    pair.Star1.YCenter, pair.Object1.LastKnownGoodPosition.YDouble);
+									double distanceFromLastKnownGoodPosition =
+										ImagePixel.ComputeDistance(
+											pair.Star1.XCenter, pair.Object1.LastKnownGoodPosition.XDouble,
+											pair.Star1.YCenter, pair.Object1.LastKnownGoodPosition.YDouble);
 
-        //                            int closeToPrevCoeff = LightCurveReductionContext.Instance.WindOrShaking ? 2 : 1;
-        //                            int closeToPrevPosWeighting = 0;
-        //                            if (distanceFromLastKnownGoodPosition < 4 * closeToPrevCoeff)
-        //                                closeToPrevPosWeighting = 3;
-        //                            else if (distanceFromLastKnownGoodPosition < 8 * closeToPrevCoeff)
-        //                                closeToPrevPosWeighting = 2;
-        //                            else if (distanceFromLastKnownGoodPosition < 16 * closeToPrevCoeff)
-        //                                closeToPrevPosWeighting = 1;
-        //                            else if (distanceFromLastKnownGoodPosition > 32 * closeToPrevCoeff)
-        //                                closeToPrevPosWeighting = -1;
+									int closeToPrevCoeff = LightCurveReductionContext.Instance.WindOrShaking ? 2 : 1;
+									int closeToPrevPosWeighting = 0;
+									if (distanceFromLastKnownGoodPosition < 4 * closeToPrevCoeff)
+										closeToPrevPosWeighting = 3;
+									else if (distanceFromLastKnownGoodPosition < 8 * closeToPrevCoeff)
+										closeToPrevPosWeighting = 2;
+									else if (distanceFromLastKnownGoodPosition < 16 * closeToPrevCoeff)
+										closeToPrevPosWeighting = 1;
+									else if (distanceFromLastKnownGoodPosition > 32 * closeToPrevCoeff)
+										closeToPrevPosWeighting = -1;
 
-        //                            weight += closeToPrevPosWeighting;
+									weight += closeToPrevPosWeighting;
 
-        //                            pair.Weight = weight;
-        //                            candidates.Add(pair);
-        //                        }
-        //                        else
-        //                            Trace.WriteLine("Pair with close distances has been rejected.");
-                                   
-        //                    }
-        //                }
-        //            }
-        //        }
-        //    }
+									pair.Weight = weight;
+									candidates.Add(pair);
+								}
+								else
+									Trace.WriteLine("Pair with close distances has been rejected.");
 
-        //    return candidates;
-        //}
+							}
+						}
+					}
+				}
+			}
 
-        //private void LocateTwoStarsWithStarRecognition(List<AstroImage.PotentialStarStruct> stars, AstroImage astroImage, uint[,] pixels)
-        //{
-        //    TrackedObject trackedObject1 = TrackedObjects.Find(o => o.TargetNo == m_LocateObjects[0]);
-        //    TrackedObject trackedObject2 = TrackedObjects.Find(o => o.TargetNo == m_LocateObjects[1]);
+			return candidates;
+		}
 
-        //    LocateTwoStarsWithStarRecognition(stars, astroImage, pixels, trackedObject1, trackedObject2);
-        //}
+		private void LocateTwoStarsWithStarRecognition(List<PotentialStarStruct> stars, AstroImage astroImage, uint[,] pixels)
+		{
+			TrackedObject trackedObject1 = TrackedObjects.Find(o => o.TargetNo == m_LocateObjects[0]);
+			TrackedObject trackedObject2 = TrackedObjects.Find(o => o.TargetNo == m_LocateObjects[1]);
 
-        //private void LocateTwoStarsWithStarRecognition(
-        //    List<AstroImage.PotentialStarStruct> stars, AstroImage astroImage, uint[,] pixels,
-        //    TrackedObject trackedObject1, TrackedObject trackedObject2)
-        //{
-        //    List<CandidatePair> candidates = LocateStarPairsWithStarRecognition(trackedObject1, trackedObject2, stars, pixels);
+			LocateTwoStarsWithStarRecognition(stars, astroImage, pixels, trackedObject1, trackedObject2);
+		}
 
-        //    LocateTwoStarsWithStarRecognition(candidates, astroImage, trackedObject1, trackedObject2);
-        //}
+		private void LocateTwoStarsWithStarRecognition(
+			List<PotentialStarStruct> stars, AstroImage astroImage, uint[,] pixels,
+			TrackedObject trackedObject1, TrackedObject trackedObject2)
+		{
+			List<CandidatePair> candidates = LocateStarPairsWithStarRecognition(trackedObject1, trackedObject2, stars, pixels);
+
+			LocateTwoStarsWithStarRecognition(candidates, astroImage, trackedObject1, trackedObject2);
+		}
 
         private void LocateTwoStarsWithStarRecognition(
             List<CandidatePair> candidates, AstroImage astroImage, 
@@ -490,128 +490,5 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                 get { return Pair1.Weight + Pair2.Weight + Pair3.Weight;  }
             }
         }
-
-        //private void LocateThreeStarsWithStarRecognition(List<TrackedObject> goodTrackedObjects, List<AstroImage.PotentialStarStruct> stars, AstroImage astroImage, uint[,] pixels)
-        //{
-             
-
-        //    // Get the three pairs and find matches for each pair
-        //    List<TrackedObjectPair> pairs = new List<TrackedObjectPair>();
-        //    Dictionary<TrackedObjectPair, List<CandidatePair>> allCandidates = new Dictionary<TrackedObjectPair, List<CandidatePair>>();
-
-        //    for (int i = 0; i < goodTrackedObjects.Count; i++)
-        //    {
-        //        for (int j = i + 1; j < goodTrackedObjects.Count; j++)
-        //        {
-        //            pairs.Add(new TrackedObjectPair()
-        //                          {TrackedObject1 = goodTrackedObjects[i], TrackedObject2 = goodTrackedObjects[j]});  
-        //        }
-        //    }
-
-        //    foreach(TrackedObjectPair pair in pairs)
-        //    {
-        //        List<CandidatePair> candidates = LocateStarPairsWithStarRecognition(pair.TrackedObject1, pair.TrackedObject2, stars, pixels);
-        //        allCandidates.Add(pair, candidates);
-        //    }
-
-        //    // Then find the correct matches
-        //    List<CandidatePair> candidates1 = allCandidates[pairs[0]];
-        //    List<CandidatePair> candidates2 = allCandidates[pairs[1]];
-        //    List<CandidatePair> candidates3 = allCandidates[pairs[2]];
-
-        //    List<CandidateTriangle> candidateTriangles = new List<CandidateTriangle>();
-
-        //    foreach (CandidatePair pair1 in candidates1)
-        //    {
-        //        foreach (CandidatePair pair2 in candidates2)
-        //        {
-        //            if (pair1.Object1.TargetNo == pair2.Object1.TargetNo &&
-        //                pair1.Object2.TargetNo == pair2.Object2.TargetNo) continue;
-
-        //            if (pair1.Object1.TargetNo == pair2.Object2.TargetNo &&
-        //                pair1.Object2.TargetNo == pair2.Object1.TargetNo) continue;
-
-        //            int targetNo1, targetNo2;
-        //            if (pair1.Object1.TargetNo == pair2.Object1.TargetNo)
-        //            {
-        //                targetNo1 = pair1.Object2.TargetNo;
-        //                targetNo2 = pair2.Object2.TargetNo;
-        //            }
-        //            else
-        //            {
-        //                targetNo1 = pair1.Object1.TargetNo;
-        //                targetNo2 = pair2.Object1.TargetNo;
-        //            }
-
-        //            List<CandidatePair> thirdPairs = 
-        //                candidates3.FindAll(c =>
-        //                                (c.Object1.TargetNo == targetNo1 && c.Object2.TargetNo == targetNo2) ||
-        //                                (c.Object2.TargetNo == targetNo1 && c.Object1.TargetNo == targetNo2));
-
-        //            foreach(CandidatePair pair3 in thirdPairs)
-        //            {
-        //                candidateTriangles.Add(
-        //                    new CandidateTriangle() {Pair1 = pair1, Pair2 = pair2, Pair3 = pair3,});
-        //            }
-        //        }
-        //    }
-
-        //    if (candidateTriangles.Count > 0)
-        //    {
-        //        candidateTriangles.Sort((c1, c2) => c2.Weight.CompareTo(c1.Weight));
-        //        CandidateTriangle bestTriangle = candidateTriangles[0];
-
-        //        bestTriangle.Pair1.Object1.ThisFrameFit = bestTriangle.Pair1.Star1;
-        //        bestTriangle.Pair1.Object1.ThisFrameX = (float)bestTriangle.Pair1.Star1.XCenter;
-        //        bestTriangle.Pair1.Object1.ThisFrameY = (float)bestTriangle.Pair1.Star1.YCenter;
-        //        bestTriangle.Pair1.Object1.SetIsLocated(true, NotMeasuredReasons.TrackedSuccessfullyAfterStarRecognition);
-
-        //        bestTriangle.Pair1.Object2.ThisFrameFit = bestTriangle.Pair1.Star2;
-        //        bestTriangle.Pair1.Object2.ThisFrameX = (float)bestTriangle.Pair1.Star2.XCenter;
-        //        bestTriangle.Pair1.Object2.ThisFrameY = (float)bestTriangle.Pair1.Star2.YCenter;
-        //        bestTriangle.Pair1.Object2.SetIsLocated(true, NotMeasuredReasons.TrackedSuccessfullyAfterStarRecognition);
-
-        //        if (bestTriangle.Pair2.Object1.TargetNo == bestTriangle.Pair1.Object1.TargetNo)
-        //        {
-        //            bestTriangle.Pair2.Object2.ThisFrameFit = bestTriangle.Pair2.Star2;
-        //            bestTriangle.Pair2.Object2.ThisFrameX = (float)bestTriangle.Pair2.Star2.XCenter;
-        //            bestTriangle.Pair2.Object2.ThisFrameY = (float)bestTriangle.Pair2.Star2.YCenter;
-        //            bestTriangle.Pair2.Object2.SetIsLocated(true, NotMeasuredReasons.TrackedSuccessfullyAfterStarRecognition);
-        //        }
-        //        else
-        //        {
-        //            bestTriangle.Pair2.Object1.ThisFrameFit = bestTriangle.Pair2.Star1;
-        //            bestTriangle.Pair2.Object1.ThisFrameX = (float)bestTriangle.Pair2.Star1.XCenter;
-        //            bestTriangle.Pair2.Object1.ThisFrameY = (float)bestTriangle.Pair2.Star1.YCenter;
-        //            bestTriangle.Pair2.Object1.SetIsLocated(true, NotMeasuredReasons.TrackedSuccessfullyAfterStarRecognition);
-        //        }
-                
-        //        AutoDiscoveredStars.Clear();
-        //        ReLocateNonGuidingObjects(astroImage);
-        //    }
-        //    else
-        //    {
-        //        List<CandidatePair> candidatesToTest = null;
-        //        if (candidates1.Count > 0)
-        //            candidatesToTest = candidates1;
-        //        else if (candidates2.Count > 0)
-        //            candidatesToTest = candidates2;
-        //        else if (candidates3.Count > 0)
-        //            candidatesToTest = candidates3;
-
-        //        if (candidatesToTest != null && candidatesToTest.Count > 0)
-        //            // Fallback to 2 star recovery
-        //            LocateTwoStarsWithStarRecognition(candidatesToTest, astroImage, candidatesToTest[0].Object1, candidatesToTest[0].Object2);
-        //        else
-        //            goodTrackedObjects.ForEach(o => o.SetIsLocated(false, NotMeasuredReasons.FailedToLocateAfterStarRecognition));
-        //    }
-        //}
-
-        //private void LocateFourStarsWithStarRecognition(List<TrackedObject> goodTrackedObjects, List<AstroImage.PotentialStarStruct> stars, AstroImage astroImage, byte[,] bytes)
-        //{
-        //    // TODO: Get the six pairs and find matches for 1 pair
-        //    // Then based on this try to find the 4-th star by checking each of the returned candidates
-        //    // and looking for a 4-th star
-        //}
     }
 }

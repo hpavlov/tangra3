@@ -80,6 +80,12 @@
     <Compile Include="Config\frmTangraSettings.Designer.cs">
       <DependentUpon>frmTangraSettings.cs</DependentUpon>
     </Compile>
+    <Compile Include="Config\SettingPannels\ucAAV8bit.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucAAV8bit.Designer.cs">
+      <DependentUpon>ucAAV8bit.cs</DependentUpon>
+    </Compile>
     <Compile Include="Config\SettingPannels\SettingsPannel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -166,12 +172,6 @@
     </Compile>
     <Compile Include="frmMain.Designer.cs">
       <DependentUpon>frmMain.cs</DependentUpon>
-    </Compile>
-    <Compile Include="frmSplashScreen.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmSplashScreen.Designer.cs">
-      <DependentUpon>frmSplashScreen.cs</DependentUpon>
     </Compile>
     <Compile Include="frmSystemInfo.cs">
       <SubType>Form</SubType>
@@ -354,12 +354,17 @@
     <Compile Include="Video\AstroDigitalVideo\AdvFramesIndex.cs" />
     <Compile Include="Video\AstroDigitalVideo\AdvImageLayout.cs" />
     <Compile Include="Video\AstroDigitalVideo\AdvImageSection.cs" />
-    <Compile Include="Video\AstroDigitalVideo\AdvLib.cs" />
     <Compile Include="Video\AstroDigitalVideo\AdvOverlayManager.cs" />
     <Compile Include="Video\AstroDigitalVideo\AdvSectionFactory.cs" />
     <Compile Include="Video\AstroDigitalVideo\AdvStatusSection.cs" />
     <Compile Include="Video\AstroDigitalVideo\AdvTags.cs" />
     <Compile Include="Video\AstroDigitalVideo\Compression\QuickLZ.cs" />
+    <Compile Include="Video\AstroDigitalVideo\frmAavStatusPopup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Video\AstroDigitalVideo\frmAavStatusPopup.Designer.cs">
+      <DependentUpon>frmAavStatusPopup.cs</DependentUpon>
+    </Compile>
     <Compile Include="Video\AstroDigitalVideo\frmAdvIndexRebuilder.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -393,6 +398,9 @@
     <Compile Include="View\ZoomedImageView.cs" />
     <EmbeddedResource Include="Config\frmTangraSettings.resx">
       <DependentUpon>frmTangraSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Config\SettingPannels\ucAAV8bit.resx">
+      <DependentUpon>ucAAV8bit.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Config\SettingPannels\ucADVSVideo12bit.resx">
       <DependentUpon>ucADVSVideo12bit.cs</DependentUpon>
@@ -432,9 +440,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmMain.resx">
       <DependentUpon>frmMain.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmSplashScreen.resx">
-      <DependentUpon>frmSplashScreen.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmSystemInfo.resx">
       <DependentUpon>frmSystemInfo.cs</DependentUpon>
@@ -508,6 +513,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\LightCurves\ucPreProcessing.resx">
       <DependentUpon>ucPreProcessing.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Video\AstroDigitalVideo\frmAavStatusPopup.resx">
+      <DependentUpon>frmAavStatusPopup.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Video\AstroDigitalVideo\frmAdvIndexRebuilder.resx">
       <DependentUpon>frmAdvIndexRebuilder.cs</DependentUpon>

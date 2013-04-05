@@ -142,16 +142,6 @@ namespace Tangra.Model.Image
             get { return m_PixelData; }
         }
 
-        //public void DoAperturePhotometry(byte[,] matrix, float aperture, Filter filter)
-        //{
-        //    DoAperturePhotometry(matrix, 8, 8, aperture, filter, double.NaN);
-        //}
-
-        //public void DoAperturePhotometry(byte[,] matrix, float x0, float y0, float aperture, Filter filter)
-        //{
-        //    DoAperturePhotometry(matrix, x0, y0, aperture, filter, double.NaN);
-        //}
-
         internal void DoAperturePhotometry(
             IMeasuredObject obj,
             uint[,] matrix, int x0Int, int y0Int, float x0, float y0, float aperture, int matrixSize,
@@ -230,10 +220,6 @@ namespace Tangra.Model.Image
                 (fit.FWHM < 0.75 * refinedFWHM || fit.FWHM > 1.25 * refinedFWHM) // The FWHM is too small or too large, make the reading invalid
                 )
             {
-                // Leave the measurements anyway. They will be flagged                
-                //m_TotalReading = 0;
-                //m_TotalBackground = 0;
-
                 obj.SetIsMeasured(false,
                     !fit.IsSolved
                         ? NotMeasuredReasons.MeasurementPSFFittingFailed
@@ -269,10 +255,6 @@ namespace Tangra.Model.Image
                 (distance > tolerance && !mayBeOcculted)// If this doesn't look like a full disappearance, then make the reading invalid
                 )
             {
-                // Leave the measurements anyway. They will be flagged
-                //m_TotalReading = 0;
-                //m_TotalBackground = 0;
-
                 obj.SetIsMeasured(false,
                     !fit.IsSolved
                         ? NotMeasuredReasons.MeasurementPSFFittingFailed
@@ -322,7 +304,6 @@ namespace Tangra.Model.Image
 
                 // Artificially add some background
                 m_TotalReading += m_TotalBackground;
-                //m_TotalBackground = 0;
             }
         }
 
@@ -349,10 +330,6 @@ namespace Tangra.Model.Image
                             (fit.FWHM < 0.75 * refinedFWHM || fit.FWHM > 1.25 * refinedFWHM) // The FWHM is too small or too large, make the reading invalid
                             )
             {
-                // Leave the measurements anyway. They will be flagged
-                //m_TotalBackground = 0;
-                //m_TotalReading = 0;
-
                 obj.SetIsMeasured(false,
                     !fit.IsSolved
                         ? NotMeasuredReasons.MeasurementPSFFittingFailed
@@ -429,16 +406,6 @@ namespace Tangra.Model.Image
             }
         }
 
-        //public void Measure(float x0, float y0, float precomputedAperture, Filter filter, byte[,] matrix, double psfBackground, int matrixSize, bool fixedAperture)
-        //{
-        //    Measure(x0, y0, precomputedAperture, filter, matrix, psfBackground, false, ref matrixSize, fixedAperture, false);
-        //}
-
-        //public void Measure(float x0, float y0, float precomputedAperture, Filter filter, byte[,] matrix, double psfBackground, int matrixSize, bool fixedAperture, bool doCentroidFitForFixedAperture)
-        //{
-        //    Measure(x0, y0, precomputedAperture, filter, matrix, psfBackground, false, ref matrixSize, fixedAperture, doCentroidFitForFixedAperture);
-        //}
-
         public void Measure(float x0, float y0, float precomputedAperture, Filter filter, uint[,] matrix, double psfBackground, ref int matrixSize, bool fixedAperture)
         {
             Measure(x0, y0, precomputedAperture, filter, matrix, psfBackground, true, ref matrixSize, fixedAperture, false);
@@ -483,18 +450,7 @@ namespace Tangra.Model.Image
                 {
                     PSFFit fit = new PSFFit(x0i, y0i);
 
-
-#if !PRODUCTION
-                    //if (m_PixelData.GetLength(0) > 17)
-                    //	m_PixelData = BitmapFilter.CutArrayEdges(m_PixelData, (m_PixelData.GetLength(0) - 17) / 2);
-#endif
-
                     #region Copy only the matix around the PFS Fit Area
-
-#if !PRODUCTION
-                    Trace.Assert(matrixSize % 2 == 1);
-#endif
-
                     do
                     {
                         int halfSize = matrixSize / 2;
@@ -568,10 +524,6 @@ namespace Tangra.Model.Image
                     precomputedAperture,
                     m_PixelData, 17, 17,
                     m_XCenter, m_YCenter, null, ref m_TotalPixels);
-
-#if !PRODUCTION
-                Trace.Assert(m_TotalPixels > 0);
-#endif
 
                 if (m_BackgroundMethod == TangraConfig.BackgroundMethod.PSFBackground && !double.IsNaN(psfBackground))
                 {
@@ -759,7 +711,6 @@ namespace Tangra.Model.Image
                     allBgResiduals.Add(residual);
                     sqVariance += residual * residual;
                 }
-                //double stdDev = m_RejectionBackgoundPixelsStdDevCoeff * Math.Sqrt(sqVariance / allBgReadings.Count);
                 double stdDev = Math.Sqrt(sqVariance / allBgReadings.Count);
 
                 // Remove all points beyond RejectionBackgoundPixelsStdDevCoeff * sigma
@@ -847,95 +798,6 @@ namespace Tangra.Model.Image
 
             return average;
         }
-
-        //private double GetBackgroundGradientFit(List<byte> allBgReadings)
-        //{
-        //    // TODO: Use z = A * (x - x0) * (x - x0) + B * (y - y0) * (y - y0)
-        //    //       this is non linear and requires a non linear regression
-
-        //    List<float> allBgResiduals = new List<float>();
-        //    uint sum = 0;
-
-        //    for (int i = 0; i < allBgReadings.Count; i++)
-        //        sum += allBgReadings[i];
-
-        //    int numRemovedPoints = 0;
-        //    double average = 0;
-        //    do
-        //    {
-        //        // Compute the average value
-        //        average = 1.0 * sum / allBgReadings.Count;
-        //        double sqVariance = 0;
-        //        allBgResiduals.Clear();
-        //        // Compute the residuals
-        //        for (int i = 0; i < allBgReadings.Count; i++)
-        //        {
-        //            float residual = (float)(allBgReadings[0] - average);
-        //            allBgResiduals.Add(residual);
-        //            sqVariance += residual * residual;
-        //        }
-        //        sqVariance = Math.Sqrt(sqVariance / (allBgReadings.Count - 1));
-        //        sqVariance = sqVariance * m_RejectionBackgoundPixelsStdDevCoeff;
-
-        //        numRemovedPoints = 0;
-        //        // Remove all points beyond RejectionBackgoundPixelsStdDevCoeff * sigma
-        //        for (int i = allBgReadings.Count - 1; i >= 0; i--)
-        //        {
-        //            if (Math.Abs(allBgResiduals[i]) > sqVariance)
-        //            {
-        //                numRemovedPoints++;
-        //                allBgReadings.RemoveAt(i);
-        //            }
-        //        }
-
-        //        sum = 0;
-        //        if (numRemovedPoints > 0)
-        //        {
-        //            for (int i = 0; i < allBgReadings.Count; i++)
-        //            {
-        //                sum += allBgReadings[i];
-        //            }
-        //        }
-        //    }
-        //    while (numRemovedPoints > 0 && allBgReadings.Count > 0);
-
-        //    return average;                
-        //}
-
-        //private void TraceAll(byte[,] matrix)
-        //{
-        //    StringBuilder output = new StringBuilder();
-        //    for (int y = 0; y < 17; y++)
-        //    {
-        //        for (int x = 0; x < 17; x++)
-        //        {
-        //            byte bt = matrix[x, y];
-        //            output.Append(Convert.ToString(bt, 16));
-        //        }
-
-        //        output.AppendLine();
-        //    }
-
-        //    output.AppendLine();
-
-        //    for (int y = 0; y < 17; y++)
-        //    {
-        //        for (int x = 0; x < 17; x++)
-        //        {
-        //            uint bt = m_PixelData[x, y];
-        //            output.Append(Convert.ToString(bt, 16));
-        //        }
-
-        //        output.AppendLine();
-        //    }
-
-        //    output.AppendLine();
-
-        //    output.AppendLine(string.Format("READING: {0}; {1}", m_TotalReading, m_TotalBackground));
-        //    output.AppendLine(string.Format("PSF: ({0}, {1}); {2}", m_XCenter, m_YCenter, m_PSFBackground));
-
-        //    Trace.WriteLine(output.ToString());
-        //}
 
         public void MeasureObject(
             ImagePixel center,

@@ -31,9 +31,6 @@ namespace Tangra.VideoOperations.LightCurves
         private List<List<LCMeasurement>> m_AllReadings = new List<List<LCMeasurement>>(new List<LCMeasurement>[] { new List<LCMeasurement>(), new List<LCMeasurement>(), new List<LCMeasurement>(), new List<LCMeasurement>() });
         private List<List<LCMeasurement>> m_InitialNoFilterReadings = null;
 
-        // NOTE: This is used by the SDK which will not be released in 
-    	//private TangraLightCurveImpl m_LightCurveImpl;
-
         private List<BinnedValue>[] m_AllBinnedReadings = new List<BinnedValue>[4]
         {
             new List<BinnedValue>(), new List<BinnedValue>(), new List<BinnedValue>(), new List<BinnedValue>()
@@ -52,9 +49,6 @@ namespace Tangra.VideoOperations.LightCurves
 
             for (int i = 0; i < m_Header.ObjectCount; i++)
             {
-                // We may be normalizing on object that is not displayed
-				//if (!m_IncludeObjects[i]) continue;
-
                 for (int j = 0; j < m_AllReadings[i].Count; j++)
                 {
                     LCMeasurement reading = m_AllReadings[i][j];
@@ -116,78 +110,7 @@ namespace Tangra.VideoOperations.LightCurves
                     Cursor = Cursors.Default;
                 }
             }
-
-        	//SetSDKLightCurveData();
         }
-
-        //private void SetSDKLightCurveData()
-        //{
-        //    m_LightCurveImpl.LightCurveContextImpl.DisplayedValueType = (SDK.DisplayedValueType)((int)m_Context.ProcessingType);
-        //    m_LightCurveImpl.LightCurveContextImpl.BinSize = (byte)m_Context.Binning;
-        //    m_LightCurveImpl.LightCurveContextImpl.NormalizationObject = m_Context.Normalisation;
-
-        //    if (m_LightCurveImpl.LightCurveContextImpl.BinSize == 0)
-        //    {
-        //        // No Binning
-        //        for (int i = 0; i < m_Header.ObjectCount; i++)
-        //        {
-        //            List<TangraLightCurveImpl.TangraLightCurveDataPointImpl> data = m_LightCurveImpl.DataPointsImpl[i];
-
-        //            bool insertMode = false;
-        //            if (data.Count != m_AllReadings[i].Count)
-        //            {
-        //                data = new List<TangraLightCurveImpl.TangraLightCurveDataPointImpl>();
-        //                insertMode = true;
-        //            }
-
-        //            for (int j = 0; j < m_AllReadings[i].Count; j++)
-        //            {
-        //                LCMeasurement mea = m_AllReadings[i][j];
-
-        //                if (insertMode)
-        //                    data.Add(new TangraLightCurveImpl.TangraLightCurveDataPointImpl(mea));
-        //                else
-        //                    data[j].Value = mea.AdjustedReading;
-        //            }
-
-        //            if (insertMode)
-        //                m_LightCurveImpl.DataPointsImpl[i] = data;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        // Binning
-        //        for (int i = 0; i < m_Header.ObjectCount; i++)
-        //        {
-        //            List<TangraLightCurveImpl.TangraLightCurveDataPointImpl> data = m_LightCurveImpl.DataPointsImpl[i];
-
-        //            bool insertMode = false;
-        //            if (data.Count != m_AllBinnedReadings[i].Count)
-        //            {
-        //                data = new List<TangraLightCurveImpl.TangraLightCurveDataPointImpl>();
-        //                insertMode = true;
-        //            }
-					
-        //            for (int j = 0; j < m_AllBinnedReadings[i].Count; j++)
-        //            {
-        //                BinnedValue mea = m_AllBinnedReadings[i][j];
-
-        //                if (insertMode)
-        //                    data.Add(new TangraLightCurveImpl.TangraLightCurveDataPointImpl(mea));
-        //                else
-        //                    data[j].Value = (float)mea.AdjustedValue;
-        //            }
-
-        //            if (insertMode)
-        //                m_LightCurveImpl.DataPointsImpl[i] = data;
-        //        }
-        //    }
-
-        //    m_LightCurveImpl.LightCurveContextImpl.MinAdjustedReading = m_Header.MinAdjustedReading;
-        //    m_LightCurveImpl.LightCurveContextImpl.MaxAdjustedReading = m_Header.MaxAdjustedReading;
-
-        //    m_LightCurveImpl.FireDataPointsRecomputed();
-        //}
 
 		private double ComputeSignalToNoiceRatio(int objectId, int middleFrameId, bool useAdjustedReading)
 		{
@@ -222,9 +145,6 @@ namespace Tangra.VideoOperations.LightCurves
 
             for (int i = 0; i < m_Header.ObjectCount; i++)
             {
-                // We may be normalizing on object that is not displayed
-				//if (!m_IncludeObjects[i]) continue;
-
                 m_AllBinnedReadings[i].Clear();
 
                 int idx = 1;
@@ -270,8 +190,6 @@ namespace Tangra.VideoOperations.LightCurves
 
                         if (reading.IsSuccessfulReading)
 							binnedSuccessfulReadings++;
-
-                        //binnedSum += reading.PrevSuccessfulReading.AdjustedReading;
                     }
 
                     idx++;
@@ -547,7 +465,6 @@ namespace Tangra.VideoOperations.LightCurves
 						if (labelSize.Width > betweenMarksInterval - 20)
 						{
 							i++;
-							//return goodIntervals[i + 1];
 						}
 						else
 						{	
@@ -630,7 +547,6 @@ namespace Tangra.VideoOperations.LightCurves
 				for (int i = 0; i < count; i++)
 				{
 					DateTime middleBinTime = m_LCFile.GetTimeForFrame(firstFrameNoInBin + (m_Context.Binning / 2.0));
-                        //FirstFrameTime.AddSeconds((firstFrameNoInBin - m_Header.FirstFrameInVideoFile + (m_Context.Binning / 2.0)) / m_Header.FramesPerSecond);
 
 				    string timeStr;
 					if (isBadTimeString != null)
@@ -691,7 +607,6 @@ namespace Tangra.VideoOperations.LightCurves
 				{
 					uint frameNo = m_AllReadings[0][i].CurrFrameNo;
 					DateTime currFrameTime = m_LCFile.GetTimeForFrame(frameNo);
-                            //FirstFrameTime.AddSeconds((frameNo - m_Header.MinFrame)/m_Header.FramesPerSecond);
 
                     string timeStr;
 					if (isBadTimeString != null)
@@ -795,265 +710,6 @@ namespace Tangra.VideoOperations.LightCurves
             output.AppendLine(); output.AppendLine(); 
         }
 
-        //internal class CSVCommonHeaderInfo
-        //{
-        //    public bool IsTangraExport;
-        //    public bool IsCompatible;
-        //    public string TangraVersion;
-        //    public bool IsBinnedMeasurements;
-        //    public int ObjectCount;
-        //    public LightCurveReductionType ReductionType;
-        //    public bool IsNotAperturePhotometry;
-        //    public bool IsLinearFitOfAveragedModel;
-        //    public string EncodingGamma;
-        //    public bool IsColourVideo;
-        //    public Tangra.Config.ColourChannel ColourChannel;
-        //    public bool IsUsingIntegration;
-        //    public LightCurveContext.FilterType Filter;
-        //    public PhotometryReductionMethod SignalMethod;
-        //    public BackgroundMethod BackgroundMethod;
-        //    public PsfFittingMethod PsfFittingMethod;
-        //    public bool IsManualAverageFWHM;
-        //    public string ManualAverageFWHM;
-        //    public PixelIntegrationType PixelIntegrationType;
-        //    public FrameIntegratingMode FrameIntegratingMode;
-        //    public int NumberFramesToIntegrate;
-        //}
-
-        //private CSVCommonHeaderInfo CSVParseCommonHeader(string[] lines)
-        //{
-        //    var rv = new CSVCommonHeaderInfo();
-
-        //    if (lines != null && lines.Length > 13)
-        //    {
-        //        Regex regexLine1 = new Regex("^Tangra v(\\d+\\.\\d+\\.\\d+\\.\\d+\\.)$");
-        //        Match line1Match = regexLine1.Match(lines[0]);
-        //        if (line1Match.Success)
-        //        {
-        //            rv.TangraVersion = line1Match.Groups[1].Value;
-        //            rv.IsTangraExport = true;
-
-        //            if (lines[1].Contains("Bins of"))
-        //            {
-        //                rv.IsBinnedMeasurements = true;
-        //            }
-        //            else
-        //            {
-        //                Regex regexLine2 = new Regex("^Measurments of (\\d+) objects$");
-
-        //                Match line2Match = regexLine2.Match(lines[1]);
-        //                if (line2Match.Success)
-        //                {
-        //                    rv.ObjectCount = int.Parse(line2Match.Groups[1].Value);
-
-        //                    if (m_Header.ObjectCount == rv.ObjectCount)
-        //                    {
-
-        //                        // lines[2] == m_Header.PathToVideoFile
-
-        //                        Regex regexLine4 = new Regex("^([^\\s]+)\\s([^\\s]+)$");
-
-        //                        Match line4Match = regexLine4.Match(lines[3]);
-        //                        if (line4Match.Success)
-        //                        {
-        //                            rv.ReductionType = (LightCurveReductionType)Enum.Parse(typeof(LightCurveReductionType), line4Match.Groups[1].Value);
-
-        //                            if (lines[6].StartsWith("Reversed Gamma, Colour, Measured Band, Integration, Digital Filter, Signal Method, Background Method"))
-        //                            {
-        //                                if (lines[6].Contains(", PSF Fitting")) rv.IsNotAperturePhotometry = true;
-        //                                if (lines[6].Contains(", Modeled FWHM, Average FWHM")) rv.IsLinearFitOfAveragedModel = true;
-
-        //                                if (rv.IsNotAperturePhotometry ^ m_Context.SignalMethod != PhotometryReductionMethod.AperturePhotometry)
-        //                                {
-        //                                    string[] tokens = lines[7].Split(',');
-        //                                    if (tokens.Length == 7 || tokens.Length == 8 || tokens.Length == 10)
-        //                                    {
-        //                                        rv.EncodingGamma = tokens[0];
-        //                                        rv.IsColourVideo = tokens[1] == "yes";
-        //                                        rv.ColourChannel = (Tangra.Config.ColourChannel)Enum.Parse(typeof(Tangra.Config.ColourChannel), tokens[2]);
-        //                                        rv.IsUsingIntegration = tokens[3] != "no";
-
-        //                                        if (rv.IsUsingIntegration)
-        //                                        {
-        //                                            Regex regexIntegration = new Regex("^([^\\s]+)\\s([^\\s]+)\\sof\\s([^\\s]+)\\sframes$");
-        //                                            Match matchIntegration = regexIntegration.Match(tokens[3]);
-        //                                            if (matchIntegration.Success)
-        //                                            {
-        //                                                rv.PixelIntegrationType = (PixelIntegrationType)Enum.Parse(typeof(PixelIntegrationType), matchIntegration.Groups[1].Value);
-        //                                                rv.FrameIntegratingMode = (FrameIntegratingMode)Enum.Parse(typeof(FrameIntegratingMode), matchIntegration.Groups[2].Value);
-        //                                                rv.NumberFramesToIntegrate  = int.Parse(matchIntegration.Groups[3].Value);
-        //                                            }
-        //                                        }
-        //                                        rv.Filter = (LightCurveContext.FilterType)Enum.Parse(typeof(LightCurveContext.FilterType), tokens[4]);
-        //                                        rv.SignalMethod = (PhotometryReductionMethod)Enum.Parse(typeof(PhotometryReductionMethod), tokens[5]);
-        //                                        rv.BackgroundMethod = (BackgroundMethod)Enum.Parse(typeof(BackgroundMethod), tokens[6]);
-
-        //                                        if (tokens.Length == 8)
-        //                                        {
-        //                                            rv.PsfFittingMethod = (PsfFittingMethod)Enum.Parse(typeof(PsfFittingMethod), tokens[7]);
-        //                                        }
-        //                                        else if (tokens.Length == 10)
-        //                                        {
-        //                                            rv.IsManualAverageFWHM = (tokens[8] == "manual");
-        //                                            rv.ManualAverageFWHM = tokens[9];
-        //                                        }
-
-        //                                        if (m_Context.EncodingGamma.ToString("0.00") == rv.EncodingGamma &&
-        //                                            m_Footer.ReductionContext.IsColourVideo ^ rv.IsColourVideo &&
-        //                                            m_Footer.ReductionContext.ColourChannel == rv.ColourChannel && 
-        //                                            m_Footer.ReductionContext.FrameIntegratingMode != FrameIntegratingMode.NoIntegration ^ rv.IsUsingIntegration &&
-        //                                            m_Context.Filter == rv.Filter &&
-        //                                            m_Context.SignalMethod == rv.SignalMethod &&
-        //                                            m_Context.BackgroundMethod == rv.BackgroundMethod)
-        //                                        {
-        //                                            //if (addPSFReductionDetails) output.AppendFormat(",{0}", m_Context.PsfFittingMethod);
-        //                                            //if (addPSFAverageModelDetails) output.AppendFormat(",{0},{1}", float.IsNaN(m_Context.ManualAverageFWHM) ? "auto" : "manual", !float.IsNaN(m_Context.ManualAverageFWHM) ? m_Context.ManualAverageFWHM.ToString("0.00") : m_Footer.RefinedAverageFWHM.ToString("0.00"));
-        //                                            //
-        //                                            //                                                    addIntegrationInfo
-        //                                            //        ? string.Format("{0} {1} of {2} frames", m_Footer.ReductionContext.PixelIntegrationType, m_Footer.ReductionContext.FrameIntegratingMode, m_Footer.ReductionContext.NumberFramesToIntegrate)
-        //                                            //        : "no",
-
-
-        //                                            if (lines[10] == "Object, Type, Aperture, Tolerance, FWHM, Measured, StartingX, StartingY, Fixed")
-        //                                            {
-
-        //                                                //for (int j = 0; j < m_Header.ObjectCount; j++)
-        //                                                //{
-        //                                                //    TrackedObjectConfig obj = m_Footer.TrackedObjects[j];
-        //                                                //    output.AppendFormat("{0},{1},{2},{3},{4},{5},{6},{7},{8}",
-        //                                                //        j + 1, obj.TrackingType.ToString(), m_Context.ReProcessApertures[j].ToString("0.00"),
-        //                                                //        obj.TrackingType == TrackingType.OccultedStar ? obj.PositionTolerance.ToString("0.00") : "", obj.RefinedFWHM.ToString("0.00"),
-        //                                                //        obj.MeasureThisObject ? "yes" : "no",
-        //                                                //        obj.ApertureStartingX.ToString("0.0"), obj.ApertureStartingY.ToString("0.0"), obj.IsFixedAperture ? "yes" : "no");
-        //                                                //    output.AppendLine();
-        //                                                //}
-        //                                                //output.AppendLine(); output.AppendLine();  
-
-        //                                                rv.IsCompatible = true;
-        //                                            }                                                    
-        //                                        }
-        //                                    }                                                                                               
-        //                                }                                
-        //                            }
-        //                        }                                                                
-        //                    }
-        //                }                        
-        //            }
-        //        }              
-        //    }
-
-        //    return rv;
-        //}
-
-        //internal void UpdateLightCurveFromCSV(string[] csvLines)
-        //{
-        //    StringBuilder output = new StringBuilder();
-        //    CSVExportAddCommonHeader(output, false);
-
-        //    // TODO: To check the compatibility, Verify that lines from 2 to end of header are same as the lines from the file.
-
-
-        //    //CSVCommonHeaderInfo headerInfo = CSVParseCommonHeader(csvLines);
-        //    //if (!headerInfo.IsTangraExport)
-        //    //{
-        //    //    MessageBox.Show(this, "This is not a Tangra Light Curve export file.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        //    //    return;
-        //    //}
-
-        //    //if (!headerInfo.IsCompatible)
-        //    //{
-        //    //    MessageBox.Show(this, "This Tangra Light Curve export file is not compatible with the current light curve.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        //    //    return;
-        //    //}
-
-        //    //// TODO: Set all the header related stuff (measurement methods etc).
-
-        //    bool onlyExportSignalMunusBg = m_Context.SignalMethod == PhotometryReductionMethod.PsfPhotometryAnalytical;
-
-        //    int count = m_AllReadings[0].Count;
-
-        //    output.Append("FrameNo,Time (UT)");
-
-        //    for (int j = 0; j < objCount; j++)
-        //    {
-        //        if (!onlyExportSignalMunusBg)
-        //            output.AppendFormat(",Signal ({0}), Background ({0})", j + 1);
-        //        else
-        //            output.AppendFormat(",SignalMinusBackground ({0})", j + 1);
-        //    }
-        //    if (addXYPairs)
-        //    {
-        //        for (int j = 0; j < objCount; j++)
-        //        {
-        //            output.AppendFormat(",X ({0}),Y ({0})", j + 1);
-        //        }
-        //    }
-
-        //    output.AppendLine();
-
-        //    string isBadTimeString = null;
-        //    if (absoluteTimeError > 5) isBadTimeString = "??:??:??.???";
-        //    string timeFormat = "HH:mm:ss.fff";
-
-        //    for (int i = 0; i < count; i++)
-        //    {
-        //        uint frameNo = m_AllReadings[0][i].CurrFrameNo;
-        //        DateTime currFrameTime = m_Header.GetTimeForFrame(frameNo);
-        //        //FirstFrameTime.AddSeconds((frameNo - m_Header.MinFrame)/m_Header.FramesPerSecond);
-
-        //        string timeStr;
-        //        if (isBadTimeString != null)
-        //        {
-        //            if (currFrameTime == DateTime.MaxValue)
-        //                timeStr = "";
-        //            else if (frameNo == m_Header.FirstTimedFrameNo)
-        //                timeStr = m_Header.FirstTimedFrameTime.ToString(timeFormat);
-        //            else if (frameNo == m_Header.LastTimedFrameNo)
-        //                timeStr = m_Header.SecondTimedFrameTime.ToString(timeFormat);
-        //            else
-        //                timeStr = isBadTimeString;
-        //        }
-        //        else
-        //        {
-        //            if (currFrameTime == DateTime.MaxValue)
-        //                timeStr = "";
-        //            else
-        //                timeStr = currFrameTime.ToString(timeFormat);
-        //        }
-
-        //        output.AppendFormat("{0},{1}", frameNo, timeStr);
-
-        //        for (int j = 0; j < objCount; j++)
-        //        {
-        //            LCMeasurement reading = m_AllReadings[j][i];
-        //            if (reading.IsSuccessfulReading)
-        //            {
-        //                if (!onlyExportSignalMunusBg)
-        //                    output.AppendFormat(",{0},{1}",
-        //                                        reading.TotalReading.ToString(CultureInfo.InvariantCulture),
-        //                                        reading.TotalBackground.ToString(CultureInfo.InvariantCulture));
-        //                else
-        //                    output.AppendFormat(",{0}", reading.TotalReading.ToString(CultureInfo.InvariantCulture));
-        //            }
-        //            else
-        //                output.Append(",,");
-        //        }
-
-
-        //        if (addXYPairs)
-        //        {
-        //            for (int j = 0; j < objCount; j++)
-        //            {
-        //                LCMeasurement reading = m_AllReadings[j][i];
-        //                output.AppendFormat(",{0},{1}", reading.X0.ToString("0.0"), reading.Y0.ToString("0.0"));
-        //            }
-        //        }
-
-        //        output.AppendLine();
-        //    }            
-        //}
-
-
         internal class BinnedValue
         {
             public int TotalSum;
@@ -1066,10 +722,7 @@ namespace Tangra.VideoOperations.LightCurves
 
         internal class LightCurveContext
         {
-            // NOTE: This is used in the SDK
-            //private TangraLightCurveImpl m_LightCurveImpl;
-
-            internal LightCurveContext(LCFile lcFile /*, TangraLightCurveImpl lightCurveImpl*/)
+            internal LightCurveContext(LCFile lcFile)
             {
                 if (lcFile.Header.MeasuredFrames > 0)
                 {
@@ -1082,8 +735,6 @@ namespace Tangra.VideoOperations.LightCurves
 
             	for (int i = 0; i < 4; i++)
             		m_ObjectTitles[i] = string.Format("Object {0}", i);
-
-                //m_LightCurveImpl = lightCurveImpl;
             }
 
             internal enum FilterType
@@ -1127,10 +778,7 @@ namespace Tangra.VideoOperations.LightCurves
                 {
                     if (m_SelectedFrameNo != value)
                     {
-                        m_SelectedFrameNo = value;
-
-                        //m_LightCurveImpl.LightCurveContextImpl.SelectedFrameNo = (int)m_SelectedFrameNo;
-                        //m_LightCurveImpl.FireSelectedFrameChanged();                    
+                        m_SelectedFrameNo = value;             
                     }
                 }
             }
@@ -1460,62 +1108,6 @@ namespace Tangra.VideoOperations.LightCurves
                 m_Dirty = true;
                 m_RequiresFullReprocessing = true;
             }
-
-			// NOTE: No video pre-processing when re-measuring data (for now)
-			// 
-			//public uint[,] ApplyPreProcessing(uint[,] sourcePixels)
-			//{
-			//    if (this.EncodingGamma == 1.0 &&
-			//        this.Filter == FilterType.NoFilter &&
-			//        !this.UseClipping && !this.UseStretching && !this.UseBrightnessContrast)
-			//    {
-			//        return sourcePixels;
-			//    }
-
-			//    int width = sourcePixels.GetLength(0);
-			//    int height = sourcePixels.GetLength(0);
-
-			//    uint[,] newData = new uint[width, height];
-			//    for (int x = 0; x < width; x++)
-			//    {
-			//        for (int y = 0; y < height; y++)
-			//        {
-			//            newData[x, y] = sourcePixels[x, y];
-			//        }
-			//    }
-
-			//    // gamma, clipping, stretching, brightness / contrast and digital filters
-
-			//    if (m_FramePreProcessor != null)
-			//        newData = m_FramePreProcessor.OnPreProcessPixels(newData);
-
-			//    // Apply a pre-processing filter
-			//    if (Filter != FilterType.NoFilter)
-			//    {
-			//        if (Filter == FilterType.LowPass)
-			//        {
-			//            newData = BitmapFilter.LowPassFilter(newData);
-			//        }
-			//        else if (Filter == FilterType.LowPassDifference)
-			//        {
-			//            newData = BitmapFilter.LowPassDifferenceFilter(newData, false);
-			//        }
-			//    }
-
-			//    if (this.EncodingGamma != 1.0)
-			//    {
-
-			//        for (int x = 0; x < width; x++)
-			//        {
-			//            for (int y = 0; y < height; y++)
-			//            {
-			//                newData[x, y] = this.DecodingGammaMatrix[newData[x, y]];
-			//            }
-			//        }
-			//    }
-
-			//    return newData;
-			//}
         }
     }
 }

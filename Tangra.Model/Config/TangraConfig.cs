@@ -23,6 +23,12 @@ namespace Tangra.Model.Config
 		void RefreshState();
 	}
 
+	public interface IAavStatusPopupFormCustomizer
+	{
+		void UpdateSettings(AavSettings advSettings);
+		void RefreshState();
+	}
+
     public interface ISettingsSerializer
     {
         string LoadSettings();
@@ -156,6 +162,7 @@ namespace Tangra.Model.Config
 		}
 
 		public AdvsSettings ADVS = new AdvsSettings();
+		public AavSettings AAV = new AavSettings();
 
         private static void LoadXml(string xmlString, string recentFiles)
 		{

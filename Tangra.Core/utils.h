@@ -9,33 +9,6 @@ void WriteString(FILE* pFile, const char* str);
 
 void DbgPrintBytes(unsigned char *bytes, int maxLen);
 
-//const char *KEY_BITPIX = "BITPIX"; // Bits per pixel 
-//const char *KEY_WIDTH = "WIDTH";
-//const char *KEY_HEIGHT = "HEIGHT";
-
-
-//const char *KEY_DATE = "DATE"; // Date the file was created
-//const char *KEY_DATE_OBS = "DATE-OBS"; // Date of data acquisition
-//const char *KEY_DATETIME_OBS_START = "UT-OBS-BEGING";
-//const char *KEY_DATETIME_OBS_END = "UT-OBS-END";
-
-//char KEY_DATAFRAME_COMPRESSION[] = "DATA-COMPRESSION";
-//char KEY_COMPRESSION_KEY_FRAME_FREQUENCY[] = "COMPRESSION-KEY-FRAME-FREQUENCY";
-
-//const char *KEY_INSTRUMENT = "INSTRUME";
-//const char *KEY_TELESCOPE = "TELESCOPE";
-//const char *KEY_OBSERVER = "OBSERVER";
-//const char *KEY_COMMENT = "COMMENT";
-//const char *KEY_RECORDER = "RECORDER";
-//const char *KEY_LONGITUDE = "LONGITUDE";
-//const char *KEY_LATITUDE = "LATITUDE";
-
-//char SECTION_IMAGE[] = "IMAGE";
-//char SECTION_SYSTEM_STATUS[] = "STATUS";
-//char COMPR_UNCOMPRESSED[] = "UNCOMPRESSED";
-//const char *COMPR_DIFF_CORR_HUFFMAN = "DCHUFFMAN";
-//char COMPR_DIFF_CORR_QUICKLZ[] = "DCQUICKLZ";
-
 enum AdvTagType
 {
 	UInt8 = 0,

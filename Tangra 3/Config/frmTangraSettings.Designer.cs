@@ -29,18 +29,20 @@
 		private void InitializeComponent()
 		{
 			System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("General");
-			System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Analogue Video (8 bit)");
-			System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Astro Digital Video");
-			System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Video", new System.Windows.Forms.TreeNode[] {
+			System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Analogue Video");
+			System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Astro Analogue Video");
+			System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Astro Digital Video");
+			System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("Video", new System.Windows.Forms.TreeNode[] {
             treeNode2,
-            treeNode3});
-			System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("Photometry");
-			System.Windows.Forms.TreeNode treeNode6 = new System.Windows.Forms.TreeNode("Tracking");
-			System.Windows.Forms.TreeNode treeNode7 = new System.Windows.Forms.TreeNode("Light Curves");
-			System.Windows.Forms.TreeNode treeNode8 = new System.Windows.Forms.TreeNode("Light Curve Viewer");
-			System.Windows.Forms.TreeNode treeNode9 = new System.Windows.Forms.TreeNode("Customize", new System.Windows.Forms.TreeNode[] {
-            treeNode7,
-            treeNode8});
+            treeNode3,
+            treeNode4});
+			System.Windows.Forms.TreeNode treeNode6 = new System.Windows.Forms.TreeNode("Photometry");
+			System.Windows.Forms.TreeNode treeNode7 = new System.Windows.Forms.TreeNode("Tracking");
+			System.Windows.Forms.TreeNode treeNode8 = new System.Windows.Forms.TreeNode("Light Curves");
+			System.Windows.Forms.TreeNode treeNode9 = new System.Windows.Forms.TreeNode("Light Curve Viewer");
+			System.Windows.Forms.TreeNode treeNode10 = new System.Windows.Forms.TreeNode("Customize", new System.Windows.Forms.TreeNode[] {
+            treeNode8,
+            treeNode9});
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmTangraSettings));
 			this.tvSettings = new System.Windows.Forms.TreeView();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -57,36 +59,39 @@
 			treeNode1.Name = "ndGeneral";
 			treeNode1.Tag = "0";
 			treeNode1.Text = "General";
-			treeNode2.Name = "Node1";
+			treeNode2.Name = "ndAnalogueVideo";
 			treeNode2.Tag = "2";
-			treeNode2.Text = "Analogue Video (8 bit)";
-			treeNode3.Name = "Node2";
-			treeNode3.Tag = "3";
-			treeNode3.Text = "Astro Digital Video";
-			treeNode4.Name = "Node6";
-			treeNode4.Tag = "1";
-			treeNode4.Text = "Video";
-			treeNode5.Name = "Node1";
-			treeNode5.Tag = "4";
-			treeNode5.Text = "Photometry";
-			treeNode6.Name = "Node3";
-			treeNode6.Tag = "6";
-			treeNode6.Text = "Tracking";
-			treeNode7.Name = "Node5";
-			treeNode7.Tag = "7";
-			treeNode7.Text = "Light Curves";
-			treeNode8.Name = "Node7";
-			treeNode8.Tag = "9";
-			treeNode8.Text = "Light Curve Viewer";
-			treeNode9.Name = "Node4";
-			treeNode9.Tag = "7";
-			treeNode9.Text = "Customize";
+			treeNode2.Text = "Analogue Video";
+			treeNode3.Name = "ndAAV";
+			treeNode3.Tag = "10";
+			treeNode3.Text = "Astro Analogue Video";
+			treeNode4.Name = "ndADV";
+			treeNode4.Tag = "3";
+			treeNode4.Text = "Astro Digital Video";
+			treeNode5.Name = "ndVideo";
+			treeNode5.Tag = "1";
+			treeNode5.Text = "Video";
+			treeNode6.Name = "ndPhotometry";
+			treeNode6.Tag = "4";
+			treeNode6.Text = "Photometry";
+			treeNode7.Name = "ndTracking";
+			treeNode7.Tag = "6";
+			treeNode7.Text = "Tracking";
+			treeNode8.Name = "ndLightCurves";
+			treeNode8.Tag = "7";
+			treeNode8.Text = "Light Curves";
+			treeNode9.Name = "ndCurveViewer";
+			treeNode9.Tag = "9";
+			treeNode9.Text = "Light Curve Viewer";
+			treeNode10.Name = "ndCustomize";
+			treeNode10.Tag = "7";
+			treeNode10.Text = "Customize";
 			this.tvSettings.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
             treeNode1,
-            treeNode4,
             treeNode5,
             treeNode6,
-            treeNode9});
+            treeNode7,
+            treeNode10});
 			this.tvSettings.Size = new System.Drawing.Size(176, 359);
 			this.tvSettings.TabIndex = 7;
 			this.tvSettings.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.tvSettings_BeforeSelect);

@@ -19,10 +19,11 @@ namespace Tangra.Config
 
 		private SettingsPannel m_CurrentPanel = null;
 		private IAdvStatusPopupFormCustomizer m_AdvPopupCustomizer;
+		private IAavStatusPopupFormCustomizer m_AavPopupCustomizer;
 
 		public bool ShowCatalogRequiredHint = false;
 
-		public frmTangraSettings(ILightCurveFormCustomizer lightCurveCustomizer, IAdvStatusPopupFormCustomizer advPopupCustomizer)
+		public frmTangraSettings(ILightCurveFormCustomizer lightCurveCustomizer, IAdvStatusPopupFormCustomizer advPopupCustomizer, IAavStatusPopupFormCustomizer aavPopupCustomizer)
 		{
 			InitializeComponent();
 
@@ -31,6 +32,7 @@ namespace Tangra.Config
             TangraConfig.Load(ApplicationSettingsSerializer.Instance);
 
 			m_AdvPopupCustomizer = advPopupCustomizer;
+			m_AavPopupCustomizer = aavPopupCustomizer;
 
 			ucCustomizeLightCurveViewer lightCurvesColoursPanel = m_PropertyPages.Select(kvp => kvp.Value).FirstOrDefault(x => x is ucCustomizeLightCurveViewer) as ucCustomizeLightCurveViewer;
 			if (lightCurvesColoursPanel != null)
@@ -39,6 +41,10 @@ namespace Tangra.Config
 			ucADVSVideo12bit AdvsVideo12bitPanel = m_PropertyPages.Select(kvp => kvp.Value).FirstOrDefault(x => x is ucADVSVideo12bit) as ucADVSVideo12bit;
 			if (AdvsVideo12bitPanel != null)
 			    AdvsVideo12bitPanel.SetAdvStatusPopupFormCustomizer(advPopupCustomizer);
+
+			ucAAV8bit Aav8bitPanel = m_PropertyPages.Select(kvp => kvp.Value).FirstOrDefault(x => x is ucAAV8bit) as ucAAV8bit;
+			if (Aav8bitPanel != null)
+				Aav8bitPanel.SetAdvStatusPopupFormCustomizer(aavPopupCustomizer);
 
 			foreach(SettingsPannel panel in m_PropertyPages.Values) 
 			    panel.LoadSettings();
@@ -51,6 +57,7 @@ namespace Tangra.Config
 			m_PropertyPages.Add(1, new ucGeneralVideo());
 			m_PropertyPages.Add(2, new ucAnalogueVideo8bit());
 			m_PropertyPages.Add(3, new ucADVSVideo12bit());
+			m_PropertyPages.Add(10, new ucAAV8bit());
 
 			m_PropertyPages.Add(4, new ucPhotometry());
 
@@ -58,7 +65,6 @@ namespace Tangra.Config
 
 			m_PropertyPages.Add(7, new ucCustomizeLightCurves());
 			m_PropertyPages.Add(9, new ucCustomizeLightCurveViewer());
-
 		}
 
 		private void SetFormTitle(TreeNode currentNode)
@@ -163,11 +169,17 @@ namespace Tangra.Config
 
 		private void btnCancel_Click(object sender, EventArgs e)
 		{
+			// Restore the displayed ADV/AAV status settings and they may have been changed by the user during the use of the dialog
 			if (m_AdvPopupCustomizer != null)
-			{
-				// Restore the displayed ADV status settings and they may have been changed by the user during the use of the dialog
+			{				
 				m_AdvPopupCustomizer.UpdateSettings(TangraConfig.Settings.ADVS);
 				m_AdvPopupCustomizer.RefreshState();				
+			}
+
+			if (m_AavPopupCustomizer != null)
+			{
+				m_AavPopupCustomizer.UpdateSettings(TangraConfig.Settings.AAV);
+				m_AavPopupCustomizer.RefreshState();
 			}
 
 			DialogResult = DialogResult.Cancel;

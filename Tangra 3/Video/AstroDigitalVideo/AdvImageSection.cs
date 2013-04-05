@@ -190,7 +190,6 @@ namespace Tangra.Video.AstroDigitalVideo
 				{
 					for (int x = 0; x < b.Width; ++x)
 					{
-						//byte red = (byte)(pixels[x, y] & 0xFF);
 						byte red = (byte)(pixels[x, y] / 0xFF);
 
 						p[0] = red;

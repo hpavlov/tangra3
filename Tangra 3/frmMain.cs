@@ -188,11 +188,11 @@ namespace Tangra
 			{
 				Trace.WriteLine(ex.ToString());
 
-//#if PRODUCTION
+#if !DEBUG
                 frmUnhandledException.HandleExceptionNoRestart(this, ex);
-//#else
-//				Debugger.Break();
-//#endif
+#else
+				Debugger.Break();
+#endif
 			}
 			finally
 			{
@@ -206,13 +206,6 @@ namespace Tangra
 
 		private void DoRenderFrame(Pixelmap currentPixelmap, RenderFrameContext frameContext)
 		{
-#if PROFILING
-            sw.Reset();
-            sw.Start();
-            swRendering.Start();
-            try
-            {
-#endif
 			// NOTE: Disposing the images may happen before they have been rendered and this would cause the following error:
 			// Parameter is not valid.
 			//  at System.Drawing.Image.get_Width()
@@ -228,25 +221,12 @@ namespace Tangra
 			m_VideoContext.RenderFrameContext = frameContext;
 
 			if (currentPixelmap == null)
-				return;
+				return;	
 
-			//VideoContext.Current.DisplayBitmap = currentPixelmap.CreateNewDisplayBitmapDoNotDispose();			
-
-#if !PRODUCTION
-			Trace.Assert(frameContext.CurrentFrameIndex >= scrollBarFrames.Minimum);
-			Trace.Assert(frameContext.CurrentFrameIndex <= scrollBarFrames.Maximum);
-#endif
 			scrollBarFrames.Value = frameContext.CurrentFrameIndex;
 
-			//if (m_VideoContext.FirstPlayedIndex == -1) m_VideoContext.FirstPlayedIndex = frameContext.CurrentFrameIndex;
-
-			//if (TangraConfig.Settings.Generic.ShowProcessingSpeed &&
-			//    m_FramePlayer.IsRunning &&
-			//    VideoContext.Current.PlayStarted != DateTime.MaxValue)
+			if (TangraConfig.Settings.Generic.ShowProcessingSpeed)
 			{
-			    // If the interval between now and the last saved ticks is more than X (1 sec):
-			    //  - Compute and display the new FPS
-			    //  - Save current Ticks and Frame
 			    if (m_FPSLastFrameNo != -1)
 			    {
 			        double totalSec = (new TimeSpan(DateTime.Now.Ticks - m_FPSLastSavedTicks)).TotalSeconds;
@@ -266,38 +246,15 @@ namespace Tangra
 			    }
 			}
 
-			//TODO: The ZoomImage should be another view? or is it part of the current main view? The question is do we allow actions/tools to modify the ZoomImage, and the answer it probably YES
-			//ClearZoomImage();
 
-#if PROFILING
-                Profiler.Instance.StartTimer("PAINTING");
-#endif
             bool isNewFrame = m_CurrentFrameId != frameContext.CurrentFrameIndex;
 			m_CurrentFrameId = frameContext.CurrentFrameIndex;
 
-			// TODO: The comment below about not setting the AstroImage on MovementType.Refresh doesn't seem valid. In fact it appears quite the oposite of what should be done. Need to test this more thouroughly
-			//if (frameContext.MovementType != MovementType.Refresh)
-			//{
-				// Only set the AstroImage if this is not a Refresh. Otherwise the pre-processing will be lost in 
-				// consequative refreshes and the AstroImage will be wrong even after the first Refresh
-				m_VideoController.SetImage(currentPixelmap, frameContext, !isNewFrame && frameContext.MovementType == MovementType.Refresh);
-			//}
-
-#if PROFILING
-                Profiler.Instance.StopTimer("PAINTING");
-#endif
+			m_VideoController.SetImage(currentPixelmap, frameContext, !isNewFrame && frameContext.MovementType == MovementType.Refresh);
 
 			ssFrameNo.Text = string.Format("Frame: {0}", frameContext.CurrentFrameIndex);
 
             m_VideoController.NewFrameDisplayed();
-
-#if PROFILING
-                Profiler.Instance.StartTimer("PAINTING");
-#endif
-
-			//PreProcessingInfo info;
-			//Core.PreProcessors.PreProcessingGetConfig(out info);
-			//ApplicationState.Current.PreProcessingInfo = info;			
 
 			CompleteRenderFrame();
 
@@ -307,30 +264,6 @@ namespace Tangra
 
             if (isNewFrame)
                 NotificationManager.Instance.NotifyCurrentFrameChanged(m_CurrentFrameId);
-
-#if PROFILING
-                Profiler.Instance.StopTimer("PAINTING");
-#endif
-
-#if PROFILING
-            }
-            finally
-            {
-                sw.Stop();
-                Profiler.Instance.AppendMetric("FRAME_RENDER_TIME_SECONDS", sw.ElapsedMilliseconds / 1000.0);
-                swRendering.Stop();
-            }
-
-            if (currentFrameIndex % 1 == 0)
-            {
-                Trace.WriteLine(string.Format("Last 100 frames total: {0} sec", swRendering.Elapsed.TotalSeconds.ToString("0.0")),
-                    "PROFILING");
-                swRendering.Reset();
-
-                Profiler.Instance.PrintMetrics();
-                Profiler.Instance.Reset();
-            }
-#endif
 		}
 
 		private void CompleteRenderFrame()
@@ -340,16 +273,16 @@ namespace Tangra
 			if (m_VideoController.HasAstroImageState)
 			{
 				m_VideoController.OverlayStateForFrame(m_VideoContext.Pixelmap.DisplayBitmap, m_CurrentFrameId);
-			}
+			}						         
 
             using (Graphics g = Graphics.FromImage(m_VideoContext.Pixelmap.DisplayBitmap))
             {
                 m_VideoController.CompleteRenderFrame(g);
 
                 g.Save();
-
-                //m_VideoContext.Pixelmap.DisplayBitmap.Save(@"C:\Tangra-DisplayBitmap.bmp");
             }
+
+			m_VideoController.ApplyDisplayModeAdjustments(m_VideoContext.Pixelmap.DisplayBitmap);	
 		}
 
 		#endregion
@@ -369,7 +302,7 @@ namespace Tangra
             }
             else
             {
-                // On Non-Windows OS currently only ADV files are supported
+                // On Non-Windows OS currently only ADV/AAV files are supported
                 openVideoFileDialog.Filter = "All Supported Files (*.adv;*.aav)|*.adv;*.aav";
                 openVideoFileDialog.DefaultExt = "adv";
             }
@@ -431,7 +364,7 @@ namespace Tangra
 					{
 						if (!SelectVideoOperation())
 						{
-							// NOTE: If not operation is selected, then set the default Arrow tool
+							// NOTE: If no operation is selected, then set the default Arrow tool
 							m_VideoController.SelectImageTool<ArrowTool>();
 						}
 					}
@@ -454,13 +387,11 @@ namespace Tangra
 			{
 				pictureBox.Dock = DockStyle.None;
 				pictureBox.SizeMode = PictureBoxSizeMode.AutoSize;
-				//pnlVideoFrame.AutoScroll = true;
 			}
 			else
 			{
 				pictureBox.Dock = DockStyle.Fill;
 				pictureBox.SizeMode = PictureBoxSizeMode.Normal;
-				//pnlVideoFrame.AutoScroll = false;
 			}
 		}
 
@@ -476,9 +407,7 @@ namespace Tangra
 
 		private void miSettings_Click(object sender, EventArgs e)
 		{
-			// TODO: Pass the LC form
-
-			var frmSettings = new frmTangraSettings(null, m_VideoController.AdvStatusPopupFormCustomizer);
+			var frmSettings = new frmTangraSettings(null, m_VideoController.AdvStatusPopupFormCustomizer, m_VideoController.AavStatusPopupFormCustomizer);
 			frmSettings.StartPosition = FormStartPosition.CenterParent;
 			if (frmSettings.ShowDialog(this) == DialogResult.OK)
 			{
@@ -500,8 +429,6 @@ namespace Tangra
 			}
 			else
 			{
-				//ssFrameNo.Text = "Frame: " + e.NewValue.ToString();
-
 				displayFrameTimer.Tag = e;
 				displayFrameTimer.Enabled = false;
 				displayFrameTimer.Enabled = true;
@@ -587,15 +514,15 @@ namespace Tangra
 
 		private void miTools_DropDownOpening(object sender, EventArgs e)
 		{
-			miADVStatusData.Checked = m_VideoController.IsAdvStatusFormVisible;
+			miADVStatusData.Checked = m_VideoController.IsAdvStatusFormVisible || m_VideoController.IsAavStatusFormVisible;
 		    miTargetPSFViewer.Checked = m_VideoController.IsTargetPSFViewerFormVisible;
 		}
 
 		private void miADVStatusData_Click(object sender, EventArgs e)
 		{
-			if (m_VideoController.IsAstroDigitalVideo)
+			if (m_VideoController.IsAstroDigitalVideo || m_VideoController.IsAstroAnalogueVideo)
 			{
-				m_VideoController.ToggleAdvStatusForm();
+				m_VideoController.ToggleAstroVideoStatusForm();
 			}
 		}
 

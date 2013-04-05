@@ -193,33 +193,6 @@ namespace Tangra.Model.Numerical
         {
             return (1 / x) * A;
         }
-
-        //public static Matrix operator ^(Matrix<T> A, int k)
-        //{
-        //    if (k < 0)
-        //        if (A.IsSquare())
-        //            return A.InverseLeverrier() ^ (-k);
-        //        else throw new InvalidOperationException("Cannot take non-square matrix to the power of zero.");
-        //    else if (k == 0)
-        //        if (A.IsSquare())
-        //            return Matrix.Identity(A.RowCount);
-        //        else throw new InvalidOperationException("Cannot take non-square matrix to the power of zero.");
-        //    else if (k == 1)
-        //        if (A.IsSquare())
-        //            return A;
-        //        else throw new InvalidOperationException("Cannot take non-square matrix to the power of one.");
-        //    else
-        //    {
-        //        Matrix M = A;
-        //        for (int i = 1; i < k; i++)
-        //        {
-        //            M *= A;
-        //        }
-
-        //        return M;
-        //    }
-        //}
-
         #endregion
 
         public bool IsSquare()
@@ -296,36 +269,6 @@ namespace Tangra.Model.Numerical
                 }  
             }
         }
-
-        ///// <summary>
-        ///// Performs LU-decomposition of this instance and saves L and U
-        ///// within, where the diagonal elements belong to U
-        ///// (the ones of L are ones...)
-        ///// </summary>
-        //public void LU()
-        //{
-        //    if (!this.IsSquare())
-        //        throw new InvalidOperationException("Cannot perform LU-decomposition of non-square matrix.");
-
-        //    for (int j = 0; j < m_ColumnCount; j++)
-        //    {
-        //        if (this[j, j] == 0)
-        //            throw new DivideByZeroException("Warning: Matrix badly scaled or close to singular. Try LUSafe() instead. Check if det != 0.");
-
-        //        for (int k = 0; k < j; k++)
-        //        {
-        //            for (int i = k; i < m_ColumnCount; i++)
-        //            {
-        //                this[i, j] = this[i, j] - this[i, k] * this[k, j];
-        //            }
-        //        }
-
-        //        for (int i = j; i < m_ColumnCount; i++)
-        //        {
-        //            this[i, j] = this[i, j] / this[j, j];
-        //        }
-        //    }
-        //}
 
         public double Determinant()
         {

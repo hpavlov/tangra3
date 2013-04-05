@@ -39,8 +39,6 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 
 			m_Saturation = TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(context.BitPix);
 
-			//NotificationManager.Subscribe(this, typeof(frmLightCurve));
-
 			picTarget1Pixels.Image = new Bitmap(picTarget1Pixels.Width, picTarget1Pixels.Height);
 			picTarget2Pixels.Image = new Bitmap(picTarget2Pixels.Width, picTarget2Pixels.Height);
 			picTarget3Pixels.Image = new Bitmap(picTarget3Pixels.Width, picTarget3Pixels.Height);
@@ -102,8 +100,6 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 				components.Dispose();
 			}
 			base.Dispose(disposing);
-
-			//NotificationManager.Unsubscribe(this);
 
             m_LCFile = null;
 		    m_SelectedMeasurements = null;
@@ -208,9 +204,6 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 		{
 			int MAGN = 4;
 
-			// TODO: This is SLOW!!! See what was the old version doing here !!!
-
-			//Pixelmap image = new Pixelmap(35*MAGN, 35*MAGN, m_Context.BitPix);
 			Bitmap image = new Bitmap(35 * MAGN, 35 * MAGN, PixelFormat.Format24bppRgb);
 
 			int pixelsCenterX = (int)Math.Round(reading.X0);
@@ -251,7 +244,7 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 			{
 				if (cbxDrawApertures.Checked)
 				{
-					float radius = m_Context.ReProcessApertures[reading.TargetNo]; //m_LCFile.Header.MeasurementApertures[reading.TargetNo];
+					float radius = m_Context.ReProcessApertures[reading.TargetNo];
 
 					Pen pen = reading.IsSuccessfulReading
 						? m_DisplaySettings.TargetPens[reading.TargetNo]
@@ -278,19 +271,6 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 
 			pictureBox.Refresh();
 		}
-
-        //#region INotificationReceiver Members
-
-        //public void ReceieveMessage(NotificationMessage message, MessageDeliveryOptions deliveryFlags)
-        //{
-        //    if (message.Sender is frmLightCurve &&
-        //        message.MessageId == frmMain.MSG_ID_FRAME_CHANGED)
-        //    {
-        //        m_SelectedMeasurements = (LCMeasurement[])message.Message;
-        //        HandleNewSelectedFrame();
-        //    }
-        //}
-        //#endregion
 
         private void cbxDrawApertures_CheckedChanged(object sender, EventArgs e)
         {
@@ -320,11 +300,6 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 		private uint[,] GetPixelData(uint[,] sourcePixels)
 		{
 			return sourcePixels;
-
-			//if (rbPreProcessedData.Checked)
-			//    return m_Context.ApplyPreProcessing(sourcePixels);
-			//else
-			//    return sourcePixels;
 		}
 
 		private void rbPreProcessedData_CheckedChanged(object sender, EventArgs e)

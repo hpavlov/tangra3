@@ -18,7 +18,6 @@ namespace Tangra.Model.ImageTools
     public abstract class ImageTool
     {
         protected IVideoOperation m_VideoOperation;
-        //protected IImageHostCallbacks m_Host;
 
         public bool TrySwitchTo(IVideoOperation videoOperation, ImageTool oldTool)
         {

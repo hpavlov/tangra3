@@ -19,9 +19,6 @@ namespace Tangra
             InitializeComponent();
 
             Header = hdr;
-
-            //TODO: Load the Scope & Camera from the current configuration 
-            //      Load the observer from the global configuration 
         }
 
         private void btnOK_Click(object sender, EventArgs e)
@@ -29,9 +26,6 @@ namespace Tangra
             if (ValidateHeader())
             {
                 SaveHeader();
-
-                //TODO: Save the Scope & Camera to the current configuration 
-                //      Save the observer to the global configuration 
 
                 DialogResult = DialogResult.OK;
                 Close();

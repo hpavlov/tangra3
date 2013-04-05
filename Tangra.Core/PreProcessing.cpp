@@ -172,12 +172,9 @@ long ApplyPreProcessing(unsigned long* pixels, long width, long height, int bpp,
 
 long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height, int bpp)
 {
-	// TODO: What is the order ??
-	// (1) Dark/Flat
-	// (2) Stretch/Clip/Brightness
-	// (3) Gamma
-
 	long rv = S_OK;
+
+	// TODO: Apply Dark/Flat	
 
 	if (s_PreProcessingType == pptpStretching)
 	{

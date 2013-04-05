@@ -26,23 +26,6 @@ namespace Tangra.Helpers
                 return TangraVideo.GetVideoEngineVersion();
             }
         }
-
-//        public static string Environment
-//        {
-//            get
-//            {
-//                return
-//#if WIN32
-// "Windows";
-//#elif __linux__
-//                    "Linux";
-//#elif __APPLE__
-//                    "Mac OSX";
-//#else
-//                    INVALID BUILD TYPE
-//#endif
-//            }
-//        }
     }
 
     // Code based on http://blez.wordpress.com/2012/09/17/determine-os-with-netmono/

@@ -42,6 +42,7 @@ namespace Tangra.Controller
 		private FrameStateData m_FrameState;
 
 		private frmAdvStatusPopup m_AdvStatusForm;
+	    private frmAavStatusPopup m_AavStatusForm;
 	    private frmTargetPSFViewerForm m_TargetPSFViewerForm;
 
 		private AdvOverlayManager m_OverlayManager = new AdvOverlayManager();
@@ -102,15 +103,10 @@ namespace Tangra.Controller
 				m_ImageTool = null;
 			}
 
-			//m_MainForm.m_FramePreprocessor.Clear();
-			//m_MainForm.m_DefaultArrowImageTool = null;
-
 			DeselectFeature();
 
 			if (m_ZoomedImageView != null)
 				m_ZoomedImageView.ClearZoomedImage();
-
-			//m_MainForm.m_FramePreprocessor.Clear();
 
 			EnsureAllPopUpFormsClosed();
 
@@ -138,9 +134,10 @@ namespace Tangra.Controller
                     if (fileExtension == ".adv" || fileExtension == ".aav")
 					{
 						AdvEquipmentInfo equipmentInfo;
-						frameStream = AstroDigitalVideoStream.OpenFile(fileName, out equipmentInfo);
+						GeoLocationInfo geoLocation;
+						frameStream = AstroDigitalVideoStream.OpenFile(fileName, out equipmentInfo, out geoLocation);
 						TangraContext.Current.UsingADV = true;
-						m_OverlayManager.Init(equipmentInfo, frameStream.FirstFrame);
+						m_OverlayManager.Init(equipmentInfo, geoLocation, frameStream.FirstFrame);
 					}
 					else
 					{
@@ -164,8 +161,6 @@ namespace Tangra.Controller
 
 			TangraCore.PreProcessors.ClearAll();
 			TangraCore.PreProcessors.AddGammaCorrection(TangraConfig.Settings.Photometry.EncodingGamma);
-
-			// TODO: Update the views so they clear the currently displayed frame information
 
 			IFrameStream frameStream = frameStreamFactoryMethod();
 
@@ -210,9 +205,11 @@ namespace Tangra.Controller
 
 				m_VideoFileView.Update();
 
-				if (IsAstroDigitalVideo && !IsAdvStatusFormVisible)
+				if (
+					(IsAstroDigitalVideo && !IsAdvStatusFormVisible) ||
+					(IsAstroAnalogueVideo && !IsAavStatusFormVisible))
 				{
-					ToggleAdvStatusForm(true);
+					ToggleAstroVideoStatusForm(true);
 				}
 
 				if (!string.IsNullOrEmpty(fileName))
@@ -245,11 +242,14 @@ namespace Tangra.Controller
 			if (m_AdvStatusForm != null && m_AdvStatusForm.Visible)
 				m_AdvStatusForm.ShowStatus(m_FrameState);
 
+			if (m_AavStatusForm != null && m_AavStatusForm.Visible)
+				m_AavStatusForm.ShowStatus(m_FrameState);
+
 	        if (!isOldFrameRefreshed)
 	        {
-            m_TargetPsfFit = null;
-            ShowTargetPSF();
-		}
+				m_TargetPsfFit = null;
+				ShowTargetPSF();
+			}
 		}
 
         public void NewFrameDisplayed()
@@ -258,17 +258,11 @@ namespace Tangra.Controller
             {
                 m_CurrentOperation.NextFrame(m_CurrentFrameContext.CurrentFrameIndex, m_CurrentFrameContext.MovementType, m_CurrentFrameContext.IsLastFrame, m_AstroImage);
 
-#if PROFILING
-                Profiler.Instance.StartTimer("PAINTING");
-#endif
                 if (m_CurrentOperation.HasCustomZoomImage &&
                     m_ZoomedImageView != null)
                 {
                     m_ZoomedImageView.DrawCustomZoomImage(m_CurrentOperation);
                 }
-#if PROFILING
-                Profiler.Instance.StopTimer("PAINTING");
-#endif
             }
 
             if (m_ImageTool != null)
@@ -348,7 +342,7 @@ namespace Tangra.Controller
                 m_CurrentOperation.PreDraw(g);
 
             if (m_CurrentOperation != null)
-                m_CurrentOperation.PostDraw(g);            
+                m_CurrentOperation.PostDraw(g);			
         }
 
 		public void RedrawCurrentFrame(bool showFields)
@@ -386,6 +380,19 @@ namespace Tangra.Controller
 			get { return m_FramePlayer.IsAstroDigitalVideo; }
 		}
 
+		public bool IsAstroAnalogueVideo
+		{
+			get { return m_FramePlayer.IsAstroAnalogueVideo; }
+		}
+
+	    public GeoLocationInfo GeoLocation
+	    {
+			get
+			{
+				return m_FramePlayer.IsAstroDigitalVideo ? m_FramePlayer.GeoLocation : null;
+			}
+	    }
+
 		public void MoveToFrame(int frameNo)
 		{
 			m_FramePlayer.MoveToFrame(frameNo);
@@ -415,7 +422,6 @@ namespace Tangra.Controller
 		{
 			m_FramePlayer.Start(FramePlaySpeed.Fastest, 1);
 
-			// NOTE: Will this always be called in the UI thread?
 			m_VideoFileView.Update();
 		}
 
@@ -425,7 +431,6 @@ namespace Tangra.Controller
 
 			OnVideoPlayerStopped();
 
-			// NOTE: Will this always be called in the UI thread?
 			m_VideoFileView.Update();
 		}
 
@@ -505,13 +510,8 @@ namespace Tangra.Controller
         {
             if (integrated)
             {
-                // IntegratedAstroImage.ReadIntegrateImage(m_Host.FramePlayer, m_CurrFrameNo);
-				// TODO: Remove IFramePlayet.GetIntegratedFrame() and replace with a call to IFramePlayet.GeeFrame() plus setting up the integration parameters
-				//       This only seems to be used by AddEditTarget form in a case of no wind and shaking (which is the case most of the times)
+				// NOTE: This only seems to be used by AddEditTarget form in a case of no wind and shaking (which is the case most of the times)
                 Pixelmap image = m_FramePlayer.GetIntegratedFrame(m_CurrentFrameContext.CurrentFrameIndex, TangraConfig.Settings.Special.AddStarImageFramesToIntegrate, true /* 'true'so we start from the current frame */, false);
-                
-                // TODO:
-                // m_Host.ApplyPreProcessing(image);
 
                 return new AstroImage(image);
             }
@@ -535,8 +535,6 @@ namespace Tangra.Controller
 		{
 			OnVideoPlayerStarted();
 
-			// TODO: Notify all views
-
 			try
 			{
 				m_WinControl.Invoke(new FramePlayer.SimpleDelegate(m_FrameRenderer.PlayerStarted));
@@ -550,8 +548,6 @@ namespace Tangra.Controller
 		void IVideoFrameRenderer.PlayerStopped()
 		{
 			OnVideoPlayerStopped();
-
-			// TODO: Notify all views
 
 			try
 			{
@@ -567,9 +563,6 @@ namespace Tangra.Controller
 		{
 			try
 			{
-				if (currentPixelmap != null)
-                    ApplyDisplayModeAdjustments(currentPixelmap.DisplayBitmap);
-
 				m_WinControl.Invoke(
 					new RenderFrameCallback(m_FrameRenderer.RenderFrame),
 					new object[]
@@ -589,7 +582,7 @@ namespace Tangra.Controller
         {
             if (m_DisplayIntensifyMode != DisplayIntensifyMode.Off || m_DisplayInvertedMode)
             {
-                // For display purposes only and for 12+ bit videos, we apply display gamma and/or invert when requested by the user
+                // For display purposes only we apply display gamma and/or invert when requested by the user
 
                 if (m_DisplayIntensifyMode != DisplayIntensifyMode.Off)
                     BitmapFilter.ApplyGamma(displayBitmap, m_DisplayIntensifyMode == DisplayIntensifyMode.Hi, m_DisplayInvertedMode);
@@ -621,9 +614,9 @@ namespace Tangra.Controller
 		}
 
 
-		public void ToggleAdvStatusForm()
+		public void ToggleAstroVideoStatusForm()
 		{
-			ToggleAdvStatusForm(false);
+			ToggleAstroVideoStatusForm(false);
 		}
 
 		private void HideAdvStatusForm()
@@ -632,10 +625,18 @@ namespace Tangra.Controller
 				m_AdvStatusForm.Hide();
 		}
 
-		private void ToggleAdvStatusForm(bool forceShow)
+		private void HideAavStatusForm()
+		{
+			if (m_AavStatusForm != null && m_AavStatusForm.Visible)
+				m_AavStatusForm.Hide();			
+		}
+
+		private void ToggleAstroVideoStatusForm(bool forceShow)
 		{
 			if (IsAstroDigitalVideo)
 			{
+				HideAavStatusForm();
+
 				if (m_AdvStatusForm == null)
 				{
 					m_AdvStatusForm = new frmAdvStatusPopup(TangraConfig.Settings.ADVS);
@@ -668,6 +669,52 @@ namespace Tangra.Controller
 					m_AdvStatusForm.ShowStatus(m_FrameState);
 				}
 			}
+			else if (IsAstroAnalogueVideo)
+			{
+				HideAdvStatusForm();
+
+				if (m_AavStatusForm == null)
+				{
+					m_AavStatusForm = new frmAavStatusPopup(TangraConfig.Settings.AAV);
+					m_AavStatusForm.Show(m_MainFormView);
+					PositionAavStatusForm();
+					m_AavStatusForm.ShowStatus(m_FrameState);
+				}
+				else if (!m_AavStatusForm.Visible)
+				{
+					try
+					{
+						m_AavStatusForm.Show(m_MainFormView);
+					}
+					catch (ObjectDisposedException)
+					{
+						m_AavStatusForm = new frmAavStatusPopup(TangraConfig.Settings.AAV);
+						m_AavStatusForm.Show(m_MainFormView);
+					}
+
+					PositionAdvstatusForm();
+					m_AavStatusForm.ShowStatus(m_FrameState);
+				}
+				else if (!forceShow)
+				{
+					HideAavStatusForm();
+				}
+				else
+				{
+					PositionAavStatusForm();
+					m_AavStatusForm.ShowStatus(m_FrameState);
+				}				
+			}
+		}
+
+		private void PositionAavStatusForm()
+		{
+			if (m_AavStatusForm != null &&
+				m_AavStatusForm.Visible)
+			{
+				m_AavStatusForm.Left = m_MainFormView.Right;
+				m_AavStatusForm.Top = m_MainFormView.Top;
+			}			
 		}
 
 		private void PositionAdvstatusForm()
@@ -679,23 +726,6 @@ namespace Tangra.Controller
 				m_AdvStatusForm.Top = m_MainFormView.Top;
 			}
 		}
-
-		//private void EnsureAllPopupFormsClosed()
-		//{
-		//    if (m_TargetPSFViewerForm != null &&
-		//        m_TargetPSFViewerForm.Visible)
-		//    {
-		//        m_TargetPSFViewerForm.Close();
-		//        m_TargetPSFViewerForm = null;
-		//    }
-
-		//    if (m_AdvStatusForm != null &&
-		//        m_AdvStatusForm.Visible)
-		//    {
-		//        m_AdvStatusForm.Close();
-		//        m_AdvStatusForm = null;
-		//    }
-		//}
 
         public void TogglePSFViewerForm()
         {
@@ -791,6 +821,19 @@ namespace Tangra.Controller
 			get { return m_AdvStatusForm; }
 		}
 
+		public bool IsAavStatusFormVisible
+		{
+			get
+			{
+				return m_AavStatusForm != null && m_AavStatusForm.Visible;
+			}
+		}
+
+		public IAavStatusPopupFormCustomizer AavStatusPopupFormCustomizer
+		{
+			get { return m_AavStatusForm; }
+		}
+
 	    public bool IsTargetPSFViewerFormVisible
 	    {
             get
@@ -810,8 +853,6 @@ namespace Tangra.Controller
 
 		public bool ActivateOperation<TOperation>(params object[] constructorParams) where TOperation : class, IVideoOperation, new()
 		{
-			//m_FramePreprocessor.Clear();
-
 			return ActivateOperation<TOperation>(true, constructorParams);
 		}
 
@@ -854,11 +895,7 @@ namespace Tangra.Controller
 					return false;
 				}
 				else
-				{
-					// TODO: Test if this is actually needed to the reprocessing to be applied (then remove code if not needed)
-					// Redraw the current frame so the pre-processing is included as well
-					// m_FramePlayer.MoveToFrame(m_CurrentFrameId);					
-
+				{					
 					return true;
 				}
 			}
@@ -916,6 +953,18 @@ namespace Tangra.Controller
 			finally
 			{
 				m_AdvStatusForm = null;
+			}
+
+			try
+			{
+				if (m_AavStatusForm != null)
+				{
+					m_AavStatusForm.Close();
+				}
+			}
+			finally
+			{
+				m_AavStatusForm = null;
 			}
 
 			try

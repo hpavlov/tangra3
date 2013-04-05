@@ -112,7 +112,6 @@ namespace Tangra.Model.Astro
 
         public double GetValue(double x, double y)
         {
-            //return GetPSFValueInternal(x - m_xCenter, y - m_yCenter);
             return GetPSFValueInternal(x, y);
         }
 
@@ -308,11 +307,6 @@ namespace Tangra.Model.Astro
         {
             if (newMatrixSize != 17)
             {
-#if !PRODUCTION
-                Trace.Assert(intensity.GetLength(0) == 17);
-                Trace.Assert(intensity.GetLength(1) == 17);
-#endif
-
 				uint[,] newData = new uint[newMatrixSize, newMatrixSize];
                 int halfSize = newMatrixSize / 2;
 
@@ -334,49 +328,8 @@ namespace Tangra.Model.Astro
                 Fit(intensity);
         }
 
-		//private uint[,] ConvertBytes(byte[,] bytes)
-		//{
-		//    int width = bytes.GetLength(0);
-		//    int height = bytes.GetLength(1);
-
-		//    uint[,] conv = new uint[width, height];
-		//    for (int x = 0; x < width; x++)
-		//    {
-		//        for (int y = 0; y < height; y++)
-		//        {
-		//            conv[x, y] = (uint)bytes[x, y];
-		//        }
-		//    }
-
-		//    return conv;
-		//}
-
-		//public void Fit(byte[,] intensity)
-		//{
-		//    Fit(ConvertBytes(intensity));
-		//}
-
-		//public void Fit(byte[,] intensity, int newMatrixSize)
-		//{
-		//    Fit(ConvertBytes(intensity), newMatrixSize);
-		//}
-
-		//public void Fit(byte[,] intensity, int newMatrixSize, int x0, int y0, bool zeroEdge)
-		//{
-		//    Fit(ConvertBytes(intensity), newMatrixSize, x0, y0, zeroEdge);
-		//}
-
-
-#if PROFILING
-        private Stopwatch sw = new Stopwatch();
-#endif
 		public void Fit(uint[,] intensity)
         {
-#if PROFILING
-            sw.Reset();
-            sw.Start();
-            Profiler.Instance.AppendMetric("PSF_FITS_COUNT", 1);
-#endif
             try
             {
 				if (FittingMethod == PSFFittingMethod.NonLinearFit)
@@ -391,11 +344,6 @@ namespace Tangra.Model.Astro
                 // singular matrix, etc
                 m_IsSolved = false;
             }
-
-#if PROFILING
-            sw.Stop();
-            Profiler.Instance.AppendMetric("PSF_FITS_TIME_SECONDS", sw.ElapsedMilliseconds / 1000.0);
-#endif
         }
         
 
@@ -408,17 +356,9 @@ namespace Tangra.Model.Astro
             {
                 int full_width = (int) Math.Round(Math.Sqrt(intensity.Length));
 
-#if !PRODUCTION
-                Trace.Assert(full_width*full_width == intensity.Length);
-#endif
-
                 m_MatrixSize = full_width;
 
                 int half_width = full_width/2;
-
-#if !PRODUCTION
-                Trace.Assert(half_width*2 + 1 == full_width);
-#endif
 
                 m_HalfWidth = half_width;
 
@@ -524,15 +464,8 @@ namespace Tangra.Model.Astro
 
                         for (int i = 2; i < 4; i++)
                         {
-                            //#if 0
                             if (Y[i, 0] > 1.0) Y[i, 0] = 1.0;
                             if (Y[i, 0] < -1.0) Y[i, 0] = -1.0;
-                            //#endif
-                            //if(Math.Abs(Y[i, 0]) > 1.0)
-                            //{
-                            //    m_IsSolved = false;
-                            //    return;
-                            //}
                         }
 
                         found_x += Y[2, 0];
@@ -559,13 +492,10 @@ namespace Tangra.Model.Astro
 
                 m_Residuals = new double[full_width,full_width];
 
-                //Trace.WriteLine(string.Format("I = {0}; A = {1}; X = {2}; Y = {3}; R = {4}", m_IBackground, m_IStarMax, m_X0, m_Y0, m_R0));
-
                 for (int x = 0; x < full_width; x++)
                     for (int y = 0; y < full_width; y++)
                     {
                         m_Residuals[x, y] = intensity[x, y] - GetPSFValueInternal(x, y);
-                        //Trace.WriteLine(string.Format("Residual[{0}, {1}] = {2}", x, y, m_Residuals[x, y]));
                     }
             }
             catch(DivideByZeroException)
@@ -618,17 +548,9 @@ namespace Tangra.Model.Astro
 			{
 				int full_width = (int)Math.Round(Math.Sqrt(intensity.Length));
 
-#if !PRODUCTION
-				Trace.Assert(full_width * full_width == intensity.Length);
-#endif
-
 				m_MatrixSize = full_width;
 
 				int half_width = full_width / 2;
-
-#if !PRODUCTION
-				Trace.Assert(half_width * 2 + 1 == full_width);
-#endif
 
 				m_HalfWidth = half_width;
 
@@ -737,15 +659,8 @@ namespace Tangra.Model.Astro
 
 						for (int i = 2; i < 5; i++)
 						{
-							//#if 0
 							if (Y[i, 0] > 1.0) Y[i, 0] = 1.0;
 							if (Y[i, 0] < -1.0) Y[i, 0] = -1.0;
-							//#endif
-							//if(Math.Abs(Y[i, 0]) > 1.0)
-							//{
-							//    m_IsSolved = false;
-							//    return;
-							//}
 						}
 
 						found_x += Y[2, 0];
@@ -779,13 +694,10 @@ namespace Tangra.Model.Astro
 
 				m_Residuals = new double[full_width, full_width];
 
-				//Trace.WriteLine(string.Format("I = {0}; A = {1}; X = {2}; Y = {3}; RX = {4}; RY = {4}", m_IBackground, m_IStarMax, m_X0, m_Y0, m_RX0, m_RY0));
-
 				for (int x = 0; x < full_width; x++)
 					for (int y = 0; y < full_width; y++)
 					{
 						m_Residuals[x, y] = intensity[x, y] - GetPSFValueInternalAsymetric(x, y);
-						//Trace.WriteLine(string.Format("Residual[{0}, {1}] = {2}", x, y, m_Residuals[x, y]));
 					}
 			}
 			catch (DivideByZeroException)
@@ -925,11 +837,7 @@ namespace Tangra.Model.Astro
                     double d = Math.Sqrt((x - m_X0) * (x - m_X0) + (y - m_Y0) * (y - m_Y0));
 
                     float xVal = (float)(margin + (halfWidth + Math.Sign(x - m_X0) * d) * xScale);
-                    //float yVal0 = rect.Height - margin - (float)(z0 - m_IBackground) * yScale;
                     float yVal = rect.Height - margin - (float)(z - m_IBackground) * yScale;
-
-                    //if (m_IStarMax > 0)
-                    //    g.FillRectangle(Brushes.SkyBlue, xVal - 1, yVal0 - 1, 3, 3);
 
 					g.FillRectangle(
 						d <= aperture ? incldedPinBrush : excludedBrush, 

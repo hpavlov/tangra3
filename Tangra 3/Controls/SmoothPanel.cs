@@ -39,7 +39,6 @@ namespace Tangra.Controls
             if (m_OnPaint != null)
                 m_OnPaint(ManagedBackBuffer.Graphics);
 
-            // now we draw the image into the screen
             ManagedBackBuffer.Render(e.Graphics);
         }
 

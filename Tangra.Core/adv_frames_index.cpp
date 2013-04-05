@@ -11,7 +11,7 @@ AdvFramesIndex::AdvFramesIndex()
 
 AdvFramesIndex::~AdvFramesIndex()
 {
-	// TODO: Need to delete the vector?
+
 }
 
 void AdvFramesIndex::AddFrame(unsigned int frameNo, unsigned int elapedTime, __int64 frameOffset, unsigned int  bytesCount)

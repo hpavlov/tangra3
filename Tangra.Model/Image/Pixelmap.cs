@@ -115,7 +115,6 @@ namespace Tangra.Model.Image
 			}
 		}
 
-		// TODO: This can be removed and infact should not be used !!
         public Bitmap CreateDisplayBitmapDoNotDispose()
         {
             if (m_Bitmap != null && m_Bitmap.PixelFormat == PixelFormat.Format24bppRgb)
@@ -139,9 +138,9 @@ namespace Tangra.Model.Image
 
 		public static Bitmap ConstructBitmapFrom8BitPixelmap(Pixelmap image)
 		{
-			float background = 0; //image.DisplayBitmapBackground;
-			float range = 255; //image.DisplayBitmapRange;
-			bool hasRangeChange = false; //image.DisplayBitmapBackground != 0 || image.DisplayBitmapRange != image.MaxPixelValue;
+			float background = 0;
+			float range = 255;
+			bool hasRangeChange = false;
 
 			var bmp = new Bitmap(image.Width, image.Height, PixelFormat.Format24bppRgb);
 
@@ -235,18 +234,6 @@ namespace Tangra.Model.Image
 
 		public static Pixelmap ConstructForLCFileAveragedFrame(byte[] bytes, int width, int height, int bitpixCamera)
 		{
-			//uint[] data = new uint[bytes.Length / 4];
-			//byte[] bmpPixels = new byte[bytes.Length / 4];
-
-			//for (int i = 0; i < bytes.Length / 4; i++)
-			//{
-			//    uint val = (uint)bytes[4 * i] + ((uint)bytes[4 * i + 1] << 8) + ((uint)bytes[4 * i + 2] << 16) + ((uint)bytes[4 * i + 3] << 24);
-			//    data[i] = val;
-			//    bmpPixels[i] = (byte)val;
-			//}
-
-			//return ConstructForLCFileAveragedFrame(data, width, height, bitpixCamera, bmpPixels);
-
 			return ConstructForLCFileAveragedFrame(new uint[bytes.Length], width, height, bitpixCamera, bytes);
 		}
 
@@ -337,6 +324,21 @@ namespace Tangra.Model.Image
 						this[x, y] = (uint)(MaxPixelValue * 1.0 * pixels[x, y] / maxImagePixelValue);
 				}
 			}
+		}
+
+		public uint[,] GetPixelsCopy()
+		{
+			uint[,] pixels = new uint[Width, Height];
+
+			for (int y = 0; y < Height; y++)
+			{
+				for (int x = 0; x < Width; x++)
+				{
+					pixels[x, y] = this[x, y];
+				}
+			}
+
+			return pixels;
 		}
 
 	}
