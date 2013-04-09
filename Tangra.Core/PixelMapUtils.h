@@ -22,6 +22,16 @@ DLL_PUBLIC HRESULT PreProcessingStretch(unsigned long* pixels, long width, long 
 DLL_PUBLIC HRESULT PreProcessingClip(unsigned long* pixels, long width, long height, int bpp, int fromValue, int toValue);
 DLL_PUBLIC HRESULT PreProcessingBrightnessContrast(unsigned long* pixels, long width, long height, int bpp, long brightness, long cotrast);
 DLL_PUBLIC HRESULT PreProcessingGamma(unsigned long* pixels, long width, long height, int bpp, float gamma);
+DLL_PUBLIC HRESULT PreProcessingApplyDarkFlatFrame(
+	unsigned long* pixels,
+	long width, 
+	long height, 
+	int bpp, 
+	unsigned long* darkPixels, 
+	unsigned long* flatPixels, 
+	unsigned long darkMedian, 
+	bool darkFrameAdjustLevelToMedian, 
+	unsigned long flatMedian);
 
 #ifdef __cplusplus
 } // __cplusplus defined.

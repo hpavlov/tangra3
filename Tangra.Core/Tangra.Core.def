@@ -26,6 +26,7 @@ EXPORTS
 	PreProcessingAddGammaCorrection
 	PreProcessingAddDarkFrame
 	PreProcessingAddFlatFrame
+	PreProcessingDarkFrameAdjustLevelToMedian
 	PreProcessingUsesPreProcessing
 	PreProcessingGetConfig	
 	

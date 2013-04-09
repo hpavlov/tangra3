@@ -12,9 +12,11 @@ long g_PreProcessingContrast;
 float g_EncodingGamma;
 bool g_UsesPreProcessing;
 
-long* g_DarkFramePixelsCopy = NULL;
-long* g_FlatFramePixelsCopy = NULL;
+unsigned long* g_DarkFramePixelsCopy = NULL;
+unsigned long* g_FlatFramePixelsCopy = NULL;
 long g_FlatFrameMedian = 0;
+long g_DarkFrameMedian = 0;
+bool g_DarkFrameAdjustLevelToMedian = false;
 unsigned int g_DarkFramePixelsCount = 0;
 unsigned int g_FlatFramePixelsCount = 0;
 
@@ -50,6 +52,8 @@ long PreProcessingClearAll()
 	}
 
 	g_FlatFrameMedian = 0;
+	g_DarkFrameMedian = 0;
+	g_DarkFrameAdjustLevelToMedian = false;
 
 	return S_OK;
 }
@@ -126,7 +130,14 @@ long PreProcessingAddGammaCorrection(float gamma)
 	return S_OK;
 }
 
-long PreProcessingAddDarkFrame(long* darkFramePixels, unsigned int pixelsCount)
+long PreProcessingDarkFrameAdjustLevelToMedian(bool adjustLevelToMedian)
+{
+	g_DarkFrameAdjustLevelToMedian = adjustLevelToMedian;
+	
+	return S_OK;
+}
+
+long PreProcessingAddDarkFrame(unsigned long* darkFramePixels, unsigned long pixelsCount, unsigned long darkFrameMedian)
 {
 	if (NULL != g_DarkFramePixelsCopy)
 	{
@@ -134,16 +145,19 @@ long PreProcessingAddDarkFrame(long* darkFramePixels, unsigned int pixelsCount)
 		g_DarkFramePixelsCopy = NULL;
 	}
 
-	g_DarkFramePixelsCopy = (long*)malloc(pixelsCount * sizeof(long));
-	memcpy(g_DarkFramePixelsCopy, darkFramePixels, pixelsCount);
+	long bytesCount = pixelsCount * sizeof(unsigned long);
+	
+	g_DarkFramePixelsCopy = (unsigned long*)malloc(bytesCount);
+	memcpy(g_DarkFramePixelsCopy, darkFramePixels, bytesCount);
 	g_DarkFramePixelsCount = pixelsCount;
+	g_DarkFrameMedian = darkFrameMedian;	
 
 	g_UsesPreProcessing = true;
 
 	return S_OK;
 }
 
-long PreProcessingAddFlatFrame(long* flatFramePixels, unsigned int pixelsCount, unsigned long flatFrameMedian)
+long PreProcessingAddFlatFrame(unsigned long* flatFramePixels, unsigned long pixelsCount, unsigned long flatFrameMedian)
 {
 	if (NULL != g_FlatFramePixelsCopy)
 	{
@@ -151,8 +165,10 @@ long PreProcessingAddFlatFrame(long* flatFramePixels, unsigned int pixelsCount, 
 		g_FlatFramePixelsCopy = NULL;
 	}
 
-	g_FlatFramePixelsCopy = (long*)malloc(pixelsCount * sizeof(long));
-	memcpy(g_FlatFramePixelsCopy, flatFramePixels, pixelsCount);
+	long bytesCount = pixelsCount * sizeof(unsigned long);
+
+	g_FlatFramePixelsCopy = (unsigned long*)malloc(bytesCount);
+	memcpy(g_FlatFramePixelsCopy, flatFramePixels, bytesCount);
 	g_FlatFramePixelsCount = pixelsCount;
 	g_FlatFrameMedian = flatFrameMedian;
 
@@ -172,9 +188,18 @@ long ApplyPreProcessing(unsigned long* pixels, long width, long height, int bpp,
 
 long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height, int bpp)
 {
+	// Use the following order when applying pre-processing
+	// (1) Dark/Flat
+	// (2) Stretch/Clip/Brightness
+	// (3) Gamma
+
 	long rv = S_OK;
 
-	// TODO: Apply Dark/Flat	
+	if (NULL != g_DarkFramePixelsCopy)
+	{
+		rv = PreProcessingApplyDarkFlatFrame(pixels, width, height, bpp, g_DarkFramePixelsCopy, g_FlatFramePixelsCopy, g_DarkFrameMedian, g_DarkFrameAdjustLevelToMedian, g_FlatFrameMedian);
+		if (rv != S_OK) return rv;
+	}
 
 	if (s_PreProcessingType == pptpStretching)
 	{

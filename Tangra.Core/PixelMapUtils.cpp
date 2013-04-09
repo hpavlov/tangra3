@@ -505,6 +505,53 @@ HRESULT PreProcessingGamma(unsigned long* pixels, long width, long height, int b
 	return S_OK;	
 }
 
+HRESULT PreProcessingApplyDarkFlatFrame(
+	unsigned long* pixels, long width, long height, int bpp, 
+	unsigned long* darkPixels, unsigned long* flatPixels, unsigned long darkMedian, bool darkFrameAdjustLevelToMedian, unsigned long flatMedian)
+{
+	int minValue, maxValue;
+	GetMinMaxValuesForBpp(bpp, &minValue, &maxValue);
+	
+	long totalPixels = width * height;
+	unsigned long* pPixels = pixels;
+	unsigned long* pDarkPixels = darkPixels;
+	unsigned long* pFlatPixels = flatPixels;
+	
+	while(totalPixels--)
+	{
+		unsigned long pixelValue = *pPixels;
+		
+		if (NULL != darkPixels)
+		{
+			//          original - dark
+			// Final = -------------------- * MEDIAN (flat  - dark)
+			//            flat  - dark
+
+			pixelValue = pixelValue - *pDarkPixels + (darkFrameAdjustLevelToMedian ? darkMedian : 0);
+
+			if (NULL != flatPixels)
+			{
+				pixelValue = (unsigned long)((double)pixelValue * ((double)flatMedian /*- (double)darkMedian*/)) / ((double)*pFlatPixels /* - (double)*pDarkPixels)*/);
+
+				pFlatPixels++;
+			}
+			
+			if ((long)pixelValue > maxValue)
+				pixelValue = maxValue;
+			else if ((long)pixelValue < minValue)
+				pixelValue = minValue;			
+
+			pDarkPixels++;
+		}		
+		
+		*pPixels = pixelValue;
+		
+		pPixels++;
+	}
+
+	return S_OK;
+}
+
 struct ConvMatrix
 {
 	ConvMatrix()
