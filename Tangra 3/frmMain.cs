@@ -24,6 +24,7 @@ using Tangra.PInvoke;
 using Tangra.Video;
 using Tangra.Video.AstroDigitalVideo;
 using Tangra.VideoOperations.LightCurves;
+using Tangra.VideoOperations.MakeDarkFlatField;
 using Tangra.View;
 using nom.tam.fits;
 using nom.tam.util;
@@ -34,7 +35,9 @@ namespace Tangra
 	{
 		private VideoController m_VideoController;
 	    private LightCurveController m_LightCurveController;
+		private DarkFlatFrameController m_MakeDarkFlatController;
 		private VideoFileView m_VideoFileView;
+		private ImageToolView m_ImageToolView;
         private ZoomedImageView m_ZoomedImageView;
 		private bool m_FormLoaded = false;
 
@@ -45,10 +48,12 @@ namespace Tangra
 			TangraConfig.Load(ApplicationSettingsSerializer.Instance);
 
 			m_VideoFileView = new VideoFileView(this);
+			m_ImageToolView = new ImageToolView(this);
 		    m_ZoomedImageView = new ZoomedImageView(zoomedImage, this);
 
-            m_VideoController = new VideoController(this, m_VideoFileView, m_ZoomedImageView, pnlControlerPanel);
+			m_VideoController = new VideoController(this, m_VideoFileView, m_ZoomedImageView, m_ImageToolView, pnlControlerPanel);
             m_LightCurveController = new LightCurveController(this, m_VideoController);
+			m_MakeDarkFlatController = new DarkFlatFrameController(this, m_VideoController);
 
 			NotificationManager.Instance.SetVideoController(m_VideoController);
 
@@ -93,7 +98,8 @@ namespace Tangra
 			Pixelmap currentPixelmap,
 			MovementType movementType,
 			bool isLastFrame,
-			int msToWait)
+			int msToWait,
+            int firstFrameInIntegrationPeriod)
 		{
 			m_LastFrameContext = new RenderFrameContext()
 			{
@@ -101,6 +107,7 @@ namespace Tangra
 				MovementType = movementType,
 				IsLastFrame = isLastFrame,
 				MsToWait = msToWait,
+                FirstFrameInIntegrationPeriod = firstFrameInIntegrationPeriod
 			};
 
 			RenderFrame(m_LastFrameContext, currentPixelmap);
@@ -687,78 +694,10 @@ namespace Tangra
 			}
 		}
 
-		internal delegate T SetFITSDataDelegate<T>(uint clr);
-
-		private T[][] SaveImageData<T>(SetFITSDataDelegate<T> setValue)
-		{
-			T[][] bimg = new T[m_VideoContext.Pixelmap.Height][];
-
-			for (int y = 0; y < m_VideoContext.Pixelmap.Height; y++)
-			{
-				bimg[y] = new T[m_VideoContext.Pixelmap.Width];
-
-				for (int x = 0; x < m_VideoContext.Pixelmap.Width; x++)
-				{
-					bimg[y][x] = setValue(m_VideoContext.Pixelmap[x, y]);
-				}
-			}
-
-			return bimg;
-		}
-
 		private void miExportToFits_Click(object sender, EventArgs e)
 		{
 			if (m_VideoContext.Pixelmap != null)
-			{
-				saveFrameDialog.Filter = "FITS Image 16 bit (*.fit)|*.fit|FITS Image 8 bit (*.fit)|*.fit|FITS Image 32 bit (*.fit)|*.fit";
-				saveFrameDialog.DefaultExt = "fit";
-
-				if (saveFrameDialog.ShowDialog(this) == DialogResult.OK)
-				{
-					Fits f = new Fits();
-
-					object data = null;
-					int bitDepth = 32;
-					if (saveFrameDialog.Filter.IndexOf("16") != -1)
-					{
-						data = SaveImageData<short>(delegate(uint val) { return (short)(val * 128); });
-						bitDepth = 32;
-					}
-					else if (saveFrameDialog.Filter.IndexOf("8") != -1)
-					{
-						data = SaveImageData<byte>(delegate(uint val) { return (byte)val; });
-						bitDepth = 8;
-					}
-					else if (saveFrameDialog.Filter.IndexOf("32") != -1)
-					{
-						data = SaveImageData<uint>(delegate(uint val) { return val; });
-						bitDepth = 32;
-					}
-
-					BasicHDU imageHDU = Fits.MakeHDU(data);
-
-					nom.tam.fits.Header hdr = imageHDU.Header;
-					hdr.AddValue("SIMPLE", "T", null);
-
-					// Options include unsigned 8-bit (8), signed 16 bit (16), signed 32 bit (32), 32-bit IEEE float (-32), and 64-bit IEEE float (-64). The standard format is 16
-					hdr.AddValue("BITPIX", bitDepth, null);
-					hdr.AddValue("NAXIS", 2, null);
-					hdr.AddValue("NAXIS1", m_VideoContext.Pixelmap.Width, null);
-					hdr.AddValue("NAXIS2", m_VideoContext.Pixelmap.Height, null);
-
-					frmFITSHeader hrdForm = new frmFITSHeader(hdr);
-					if (hrdForm.ShowDialog() == DialogResult.Cancel) return;
-
-					f.AddHDU(imageHDU);
-
-					// Write a FITS file.
-					using (BufferedFile bf = new BufferedFile(saveFrameDialog.FileName, FileAccess.ReadWrite, FileShare.ReadWrite))
-					{
-						f.Write(bf);
-						bf.Flush();
-					}
-				}
-			}
+                m_VideoController.ExportToFits(m_VideoContext.Pixelmap);
 		}
 
 		private void DisplayIntensifyModeClicked(object sender, EventArgs e)
@@ -783,6 +722,37 @@ namespace Tangra
 		private void DisplayInvertedClicked(object sender, EventArgs e)
 		{
 			m_VideoController.SetDisplayInvertMode(tsmiInverted.Checked);
+		}
+
+		private void miMakeDarkFlat_Click(object sender, EventArgs e)
+		{
+			m_VideoController.ActivateOperation<MakeDarkFlatOperation>(m_MakeDarkFlatController);
+		}
+
+		private void miLoadDark_Click(object sender, EventArgs e)
+		{
+			Cursor = Cursors.WaitCursor;
+			try
+			{
+				m_MakeDarkFlatController.LoadDarkFrame();
+			}
+			finally
+			{
+				Cursor = Cursors.Default;
+			}			
+		}
+
+		private void miLoadFlat_Click(object sender, EventArgs e)
+		{
+			Cursor = Cursors.WaitCursor;
+			try
+			{
+				m_MakeDarkFlatController.LoadFlatFrame();
+			}
+			finally
+			{
+				Cursor = Cursors.Default;
+			}			
 		}
 	}
 }

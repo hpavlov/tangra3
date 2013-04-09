@@ -47,7 +47,11 @@ namespace Tangra.Model.Context
 
 		public bool OSDExcludeToolDisabled = false;
 
-		public bool CanLoadDarkFrame;
+		public bool CanLoadDarkFrame = false;
+		public bool CanLoadFlatFrame = false;
+
+		public bool DarkFrameLoaded = false;
+		public bool FlatFrameLoaded = false;
 
 		public bool HasAnyFileLoaded
 		{
@@ -110,6 +114,11 @@ namespace Tangra.Model.Context
 
 			FileName = null;
 			FileFormat = null;
+
+			DarkFrameLoaded = false;
+			FlatFrameLoaded = false;
+			CanLoadDarkFrame = false;
+			CanLoadFlatFrame = false;
 
 		    RenderingEngine = null;
 

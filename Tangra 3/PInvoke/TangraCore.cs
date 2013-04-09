@@ -242,10 +242,13 @@ namespace Tangra.PInvoke
 			private static extern int PreProcessingAddGammaCorrection(float encodingGamma);
 
 			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-			private static extern int PreProcessingAddDarkFrame(uint[] darkFramePixels, ushort pixelsCount);
+			private static extern int PreProcessingAddDarkFrame(uint[] darkFramePixels, uint pixelsCount, uint darkFrameMedian);
 
 			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-			private static extern int PreProcessingAddFlatFrame(uint[] flatFramePixels, ushort pixelsCount, uint flatFrameMedian);
+			private static extern int PreProcessingDarkFrameAdjustLevelToMedian(bool adjustLevelToMedian);
+
+			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+			private static extern int PreProcessingAddFlatFrame(uint[] flatFramePixels, uint pixelsCount, uint flatFrameMedian);
 
 			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
 			private static extern int PreProcessingUsesPreProcessing([In, Out] ref bool usesPreProcessing);
@@ -296,25 +299,34 @@ namespace Tangra.PInvoke
 
 			public static void AddGammaCorrection(float encodingGamma)
 			{
-				PreProcessingAddGammaCorrection(encodingGamma);
+                if (Math.Abs(encodingGamma - 1.0f) > 0.01f)
+				    PreProcessingAddGammaCorrection(encodingGamma);
 			}
 
-			public static void AddDarkFrame(uint[,] darkFramePixels)
+			public static void AddDarkFrame(uint[,] darkFramePixels, uint darkFrameMedian)
 			{
 				int width = darkFramePixels.GetLength(0);
 				int height = darkFramePixels.GetLength(1);
 
-				ushort pixelsCount = (ushort)(width * height);
+				uint pixelsCount = (uint)(width * height);
 				uint[] darkFrame = new uint[pixelsCount];
 
 				int idx = 0;
-				for (int x = 0; x < width; x++)
-					for (int y = 0; y < height; y++)
+				
+				for (int y = 0; y < height; y++)
+					for (int x = 0; x < width; x++)
 					{
 						darkFrame[idx] = darkFramePixels[x, y];
+						idx++;
 					}
 
-				PreProcessingAddDarkFrame(darkFrame, pixelsCount);
+				PreProcessingDarkFrameAdjustLevelToMedian(TangraConfig.Settings.Generic.DarkFrameAdjustLevelToMedian);
+				PreProcessingAddDarkFrame(darkFrame, pixelsCount, darkFrameMedian);
+			}
+
+			public static void SetDarkFrameAdjustLevelToMedian()
+			{
+				PreProcessingDarkFrameAdjustLevelToMedian(TangraConfig.Settings.Generic.DarkFrameAdjustLevelToMedian);
 			}
 
 			public static void AddFlatFrame(uint[,] flatFramePixels, uint flatFrameMedian)
@@ -322,14 +334,16 @@ namespace Tangra.PInvoke
 				int width = flatFramePixels.GetLength(0);
 				int height = flatFramePixels.GetLength(1);
 
-				ushort pixelsCount = (ushort)(width * height);
+				uint pixelsCount = (uint)(width * height);
 				uint[] flatFrame = new uint[pixelsCount];
 
 				int idx = 0;
-				for (int x = 0; x < width; x++)
-					for (int y = 0; y < height; y++)
+
+				for (int y = 0; y < height; y++)
+					for (int x = 0; x < width; x++)
 					{
 						flatFrame[idx] = flatFramePixels[x, y];
+						idx++;
 					}
 
 				PreProcessingAddFlatFrame(flatFrame, pixelsCount, flatFrameMedian);
@@ -381,7 +395,14 @@ namespace Tangra.PInvoke
 					preProcessingInfo.DarkFrameBytes = darkPixelsCount;
 					preProcessingInfo.FlatFrameBytes = flatPixelsCount;
 				}
+			}
 
+			public static bool PreProcessingHasDarkFrameSet()
+			{
+				PreProcessingInfo preProcessingInfo;
+				PreProcessingGetConfig(out preProcessingInfo);
+
+				return preProcessingInfo.DarkFrameBytes > 0;
 			}
 		}
 	}

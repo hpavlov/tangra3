@@ -36,13 +36,14 @@
             treeNode2,
             treeNode3,
             treeNode4});
-			System.Windows.Forms.TreeNode treeNode6 = new System.Windows.Forms.TreeNode("Photometry");
-			System.Windows.Forms.TreeNode treeNode7 = new System.Windows.Forms.TreeNode("Tracking");
-			System.Windows.Forms.TreeNode treeNode8 = new System.Windows.Forms.TreeNode("Light Curves");
-			System.Windows.Forms.TreeNode treeNode9 = new System.Windows.Forms.TreeNode("Light Curve Viewer");
-			System.Windows.Forms.TreeNode treeNode10 = new System.Windows.Forms.TreeNode("Customize", new System.Windows.Forms.TreeNode[] {
-            treeNode8,
-            treeNode9});
+			System.Windows.Forms.TreeNode treeNode6 = new System.Windows.Forms.TreeNode("Pre-Processing");
+			System.Windows.Forms.TreeNode treeNode7 = new System.Windows.Forms.TreeNode("Photometry");
+			System.Windows.Forms.TreeNode treeNode8 = new System.Windows.Forms.TreeNode("Tracking");
+			System.Windows.Forms.TreeNode treeNode9 = new System.Windows.Forms.TreeNode("Light Curves");
+			System.Windows.Forms.TreeNode treeNode10 = new System.Windows.Forms.TreeNode("Light Curve Viewer");
+			System.Windows.Forms.TreeNode treeNode11 = new System.Windows.Forms.TreeNode("Customize", new System.Windows.Forms.TreeNode[] {
+            treeNode9,
+            treeNode10});
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmTangraSettings));
 			this.tvSettings = new System.Windows.Forms.TreeView();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -71,27 +72,31 @@
 			treeNode5.Name = "ndVideo";
 			treeNode5.Tag = "1";
 			treeNode5.Text = "Video";
-			treeNode6.Name = "ndPhotometry";
-			treeNode6.Tag = "4";
-			treeNode6.Text = "Photometry";
-			treeNode7.Name = "ndTracking";
-			treeNode7.Tag = "6";
-			treeNode7.Text = "Tracking";
-			treeNode8.Name = "ndLightCurves";
-			treeNode8.Tag = "7";
-			treeNode8.Text = "Light Curves";
-			treeNode9.Name = "ndCurveViewer";
-			treeNode9.Tag = "9";
-			treeNode9.Text = "Light Curve Viewer";
-			treeNode10.Name = "ndCustomize";
-			treeNode10.Tag = "7";
-			treeNode10.Text = "Customize";
+			treeNode6.Name = "ndPreProcessing";
+			treeNode6.Tag = "11";
+			treeNode6.Text = "Pre-Processing";
+			treeNode7.Name = "ndPhotometry";
+			treeNode7.Tag = "4";
+			treeNode7.Text = "Photometry";
+			treeNode8.Name = "ndTracking";
+			treeNode8.Tag = "6";
+			treeNode8.Text = "Tracking";
+			treeNode9.Name = "ndLightCurves";
+			treeNode9.Tag = "7";
+			treeNode9.Text = "Light Curves";
+			treeNode10.Name = "ndCurveViewer";
+			treeNode10.Tag = "9";
+			treeNode10.Text = "Light Curve Viewer";
+			treeNode11.Name = "ndCustomize";
+			treeNode11.Tag = "7";
+			treeNode11.Text = "Customize";
 			this.tvSettings.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
             treeNode1,
             treeNode5,
             treeNode6,
             treeNode7,
-            treeNode10});
+            treeNode8,
+            treeNode11});
 			this.tvSettings.Size = new System.Drawing.Size(176, 359);
 			this.tvSettings.TabIndex = 7;
 			this.tvSettings.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.tvSettings_BeforeSelect);

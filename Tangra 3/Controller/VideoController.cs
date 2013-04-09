@@ -6,6 +6,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
+using nom.tam.fits;
+using nom.tam.util;
 using Tangra.ImageTools;
 using Tangra.Model.Astro;
 using Tangra.Model.Config;
@@ -18,7 +20,9 @@ using Tangra.PInvoke;
 using Tangra.Video;
 using Tangra.Video.AstroDigitalVideo;
 using Tangra.VideoOperations.LightCurves;
+using Tangra.VideoOperations.MakeDarkFlatField;
 using Tangra.View;
+using Cursor = System.Windows.Forms.Cursor;
 
 namespace Tangra.Controller
 {
@@ -33,6 +37,7 @@ namespace Tangra.Controller
 	{
 		private VideoFileView m_VideoFileView;
         private ZoomedImageView m_ZoomedImageView;
+	    private ImageToolView m_ImageToolView;
 
 		private Form m_MainFormView;
 	    internal Panel m_pnlControlerPanel;
@@ -63,15 +68,18 @@ namespace Tangra.Controller
 	    private bool m_DisplayInvertedMode = false;
 
 
-        public VideoController(Form mainFormView, VideoFileView videoFileView, ZoomedImageView zoomedImageView, Panel pnlControlerPanel)
+		public VideoController(Form mainFormView, VideoFileView videoFileView, ZoomedImageView zoomedImageView, ImageToolView imageToolView, Panel pnlControlerPanel)
 		{
 			m_FramePlayer = new FramePlayer();
 			m_VideoFileView = videoFileView;
             m_ZoomedImageView = zoomedImageView;
+			m_ImageToolView = imageToolView;
 			m_MainFormView = mainFormView;
 	        m_MainForm = (frmMain) mainFormView;
             m_pnlControlerPanel = pnlControlerPanel;
             videoFileView.SetFramePlayer(m_FramePlayer);
+
+			CloseOpenedVideoFile();
 		}
 
 		public void SetLightCurveController(LightCurveController lightCurveController)
@@ -84,8 +92,6 @@ namespace Tangra.Controller
 			if (m_FramePlayer.Video != null)
 			{
 				TangraContext.Current.Reset();
-				UpdateViews();
-
 				m_FramePlayer.CloseVideo();
 			}
 
@@ -112,6 +118,10 @@ namespace Tangra.Controller
 
 			m_AstroImage = null;
 			m_CurrentFrameContext = RenderFrameContext.Empty;
+
+            TangraCore.PreProcessors.ClearAll();
+
+			UpdateViews();
 		}
 
 		internal bool SingleBitmapFile(LCFile lcFile)
@@ -195,6 +205,7 @@ namespace Tangra.Controller
 				TangraContext.Current.CanPlayVideo = true;
 				TangraContext.Current.CanChangeTool = true;
 				TangraContext.Current.CanLoadDarkFrame = true;
+				TangraContext.Current.CanLoadFlatFrame = true;
 				TangraContext.Current.CanScrollFrames = true;				
 				
 				TangraContext.Current.HasImageLoaded = true;
@@ -214,6 +225,8 @@ namespace Tangra.Controller
 
 				if (!string.IsNullOrEmpty(fileName))
 					RegisterRecentFile(RecentFileType.Video, fileName);
+
+				m_ImageTool = ImageTool.SwitchTo<ArrowTool>(null, m_ImageToolView, m_ImageTool);
 
 				return true;
 			}
@@ -256,7 +269,12 @@ namespace Tangra.Controller
         {
             if (m_CurrentOperation != null)
             {
-                m_CurrentOperation.NextFrame(m_CurrentFrameContext.CurrentFrameIndex, m_CurrentFrameContext.MovementType, m_CurrentFrameContext.IsLastFrame, m_AstroImage);
+                m_CurrentOperation.NextFrame(
+                    m_CurrentFrameContext.CurrentFrameIndex, 
+                    m_CurrentFrameContext.MovementType, 
+                    m_CurrentFrameContext.IsLastFrame, 
+                    m_AstroImage, 
+                    m_CurrentFrameContext.FirstFrameInIntegrationPeriod);
 
                 if (m_CurrentOperation.HasCustomZoomImage &&
                     m_ZoomedImageView != null)
@@ -324,6 +342,16 @@ namespace Tangra.Controller
 		{
 			m_FramePlayer.SetupFrameIntegration(framesToIntegrate, frameMode, pixelIntegrationType);
 		}
+
+        public bool IsUsingSteppedAveraging
+        {
+            get { return m_FramePlayer.FrameIntegratingMode == FrameIntegratingMode.SteppedAverage; }
+        }
+
+        public int FramesToIntegrate
+        {
+            get { return m_FramePlayer.FramesToIntegrate; }
+        }
 
 		public void OverlayStateForFrame(Bitmap displayBitmap, int frameId)
 		{
@@ -477,6 +505,8 @@ namespace Tangra.Controller
 		{
 			m_VideoFileView.Update();
 
+			m_ImageToolView.Update(m_ImageTool);
+
 			//if (TangraConfig.Settings.Generic.PerformanceQuality == Tangra.Model.Config.TangraConfig.PerformanceQuality.Responsiveness)
 			//{
 			//    if (m_CurrentFrameContext.CurrentFrameIndex % 12 == 0)
@@ -559,7 +589,7 @@ namespace Tangra.Controller
 			UpdateViews();
 		}
 
-		void IVideoFrameRenderer.RenderFrame(int currentFrameIndex, Pixelmap currentPixelmap, MovementType movementType, bool isLastFrame, int msToWait)
+        void IVideoFrameRenderer.RenderFrame(int currentFrameIndex, Pixelmap currentPixelmap, MovementType movementType, bool isLastFrame, int msToWait, int firstFrameInIntegrationPeriod)
 		{
 			try
 			{
@@ -571,7 +601,8 @@ namespace Tangra.Controller
                                 currentPixelmap,
                                 movementType,
                                 isLastFrame,
-                                msToWait
+                                msToWait,
+                                firstFrameInIntegrationPeriod
                             });
 			}
 			catch (ObjectDisposedException)
@@ -759,6 +790,7 @@ namespace Tangra.Controller
             }            
         }
 
+
         private void PositionTargetPSFViewerForm()
         {
             if (m_TargetPSFViewerForm != null &&
@@ -846,7 +878,7 @@ namespace Tangra.Controller
         {
             if (m_ImageTool != null) m_ImageTool.Deactivate();
 
-			m_ImageTool = ImageTool.SwitchTo<TImageTool>(m_CurrentOperation, m_ImageTool);
+			m_ImageTool = ImageTool.SwitchTo<TImageTool>(m_CurrentOperation, m_ImageToolView, m_ImageTool);			
 
 			return m_ImageTool;
         }
@@ -941,7 +973,8 @@ namespace Tangra.Controller
 
 		private void EnsureAllPopUpFormsClosed()
 		{
-			m_LightCurveController.EnsureLightCurveFormClosed();
+			if (m_LightCurveController != null)
+				m_LightCurveController.EnsureLightCurveFormClosed();
 
 			try
 			{
@@ -1124,6 +1157,129 @@ namespace Tangra.Controller
         public DialogResult ShowMessageBox(string message, string title, MessageBoxButtons buttons, MessageBoxIcon icon)
         {
             return MessageBox.Show(m_MainFormView, message, title, buttons, icon);
+        }
+
+		public DialogResult ShowSaveFileDialog(string title, string filter, ref string fileName)
+		{
+			var sfd = new SaveFileDialog()
+			{
+				Title = title,
+				FileName = fileName,
+				Filter = filter				
+			};
+
+			DialogResult rv = sfd.ShowDialog(m_MainFormView);
+
+			fileName = sfd.FileName;
+			return rv;
+		}
+
+		public DialogResult ShowOpenFileDialog(string title, string filter, out string fileName)
+		{
+			var ofd = new OpenFileDialog()
+			{
+				Title = title,
+				Filter = filter
+			};
+
+			DialogResult rv = ofd.ShowDialog(m_MainFormView);
+
+			fileName = ofd.FileName;
+			return rv;
+		}
+
+        internal delegate T SetFITSDataDelegate<T>(uint clr);
+
+        private T[][] SaveImageData<T>(Pixelmap pixelmap, SetFITSDataDelegate<T> setValue)
+        {
+            T[][] bimg = new T[pixelmap.Height][];
+
+            for (int y = 0; y < pixelmap.Height; y++)
+            {
+                bimg[y] = new T[pixelmap.Width];
+
+                for (int x = 0; x < pixelmap.Width; x++)
+                {
+                    bimg[y][x] = setValue(pixelmap[x, y]);
+                }
+            }
+
+            return bimg;
+        }
+
+        public void ExportToFits(Pixelmap pixelmap)
+        {
+            int fitsBitDepth = 8;
+            string filter;
+
+            if (pixelmap.BitPixCamera == 8)
+            {
+                filter = "FITS Image 8 bit (*.fit;*.fits)|*.fit;*.fits";
+                fitsBitDepth = 8;
+            }
+            else if (pixelmap.BitPixCamera <= 16)
+            {
+                filter = "FITS Image 16 bit (*.fit;*.fits)|*.fit;*.fits";
+                fitsBitDepth = 16;
+            }
+            else
+            {
+                filter = "FITS Image 32 bit (*.fit;*.fits)|*.fit;*.fits";
+                fitsBitDepth = 32;
+            }
+
+            string fileName = string.Empty;
+            var sfd = new SaveFileDialog()
+            {
+                Title = "Export video frame as FITS image ...",
+                FileName = fileName,
+                Filter = filter,
+                DefaultExt = "fit"
+            };
+
+            DialogResult rv = sfd.ShowDialog(m_MainFormView);
+
+            if (rv == DialogResult.OK)
+            {
+                Fits f = new Fits();
+
+                object data = null;
+                if (fitsBitDepth == 16)
+                {
+                    data = SaveImageData<short>(pixelmap, delegate(uint val) { return (short)val; });
+                }
+                else if (fitsBitDepth == 8)
+                {
+                    data = SaveImageData<byte>(pixelmap, delegate(uint val) { return (byte)val; });
+                }
+                else if (fitsBitDepth == 32)
+                {
+                    data = SaveImageData<uint>(pixelmap, delegate(uint val) { return val; });
+                }
+
+                BasicHDU imageHDU = Fits.MakeHDU(data);
+
+                nom.tam.fits.Header hdr = imageHDU.Header;
+                hdr.AddValue("SIMPLE", "T", null);
+
+                // Options include unsigned 8-bit (8), signed 16 bit (16), signed 32 bit (32), 32-bit IEEE float (-32), and 64-bit IEEE float (-64). The standard format is 16
+                hdr.AddValue("BITPIX", fitsBitDepth, null);
+                hdr.AddValue("NAXIS", 2, null);
+                hdr.AddValue("NAXIS1", pixelmap.Width, null);
+                hdr.AddValue("NAXIS2", pixelmap.Height, null);
+
+                var hrdForm = new frmFITSHeader(hdr);
+                if (hrdForm.ShowDialog() == DialogResult.Cancel) return;
+
+                f.AddHDU(imageHDU);
+
+                // Write a FITS file.
+                using (BufferedFile bf = new BufferedFile(sfd.FileName, FileAccess.ReadWrite, FileShare.ReadWrite))
+                {
+                    f.Write(bf);
+                    bf.Flush();
+                }
+            }            
         }
     }
 }

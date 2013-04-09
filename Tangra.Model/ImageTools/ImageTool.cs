@@ -18,26 +18,31 @@ namespace Tangra.Model.ImageTools
     public abstract class ImageTool
     {
         protected IVideoOperation m_VideoOperation;
+		protected IImageToolView m_ImageToolView;
 
-        public bool TrySwitchTo(IVideoOperation videoOperation, ImageTool oldTool)
+	    public int MouseX;
+		public int MouseY;
+
+        public bool TrySwitchTo(IVideoOperation videoOperation, IImageToolView imageToolView, ImageTool oldTool)
         {
-            m_VideoOperation = videoOperation;
-
             if (!CanSwitchNow()) return false;
 
             if (oldTool != null)
                 oldTool.Deactivate();
+
+			m_VideoOperation = videoOperation;
+			m_ImageToolView = imageToolView;
 
             Activate();
 
             return true;
         }
 
-        public static ImageTool SwitchTo<T>(IVideoOperation videoOperation, ImageTool oldTool)
+        public static ImageTool SwitchTo<T>(IVideoOperation videoOperation, IImageToolView imageToolView, ImageTool oldTool)
             where T : ImageTool, new()
         {
             ImageTool instance = new T();
-            instance.TrySwitchTo(videoOperation, oldTool);
+			instance.TrySwitchTo(videoOperation, imageToolView, oldTool);
 
             return instance;
         }
@@ -54,11 +59,28 @@ namespace Tangra.Model.ImageTools
 
         public virtual void Deactivate()
         {
-            
+	        MouseX = -1;
+			MouseY = -1;
+
+			m_ImageToolView.Update(this);
         }
 
-        public virtual void MouseLeave() { }
-        public virtual void MouseMove(Point location) { }
+        public virtual void MouseLeave()
+        {
+			MouseX = -1;
+			MouseY = -1;
+
+			m_ImageToolView.Update(this);        
+        }
+        
+		public virtual void MouseMove(Point location)
+		{
+			MouseX = location.X;
+			MouseY = location.Y;
+
+			m_ImageToolView.Update(this);
+		}
+
         public virtual void MouseClick(ObjectClickEventArgs e) { }
         public virtual void MouseDown(Point location) { }
         public virtual void MouseUp(Point location) { }

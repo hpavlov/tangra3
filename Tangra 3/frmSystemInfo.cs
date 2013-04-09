@@ -54,6 +54,10 @@ namespace Tangra
 
             string clrVersion = (isMono ? "Mono CLR " : "Microsoft CLR ") + Assembly.GetExecutingAssembly().ImageRuntimeVersion;
 
+			string monoVersion = GetMonoVersion();
+	        if (monoVersion != null)
+				clrVersion += string.Format("\r\nMono Version {0}", monoVersion);
+
             string componentVersions = string.Format("Tangra Core v{0}\r\nTangra Video Engine v{1}", TangraEnvironment.TangraCoreVersion, TangraEnvironment.TangraVideoEngineVersion);
 
             return string.Format("{0}\r\nOS: {1}\r\nPlatform: {2}\r\nRuntime: {3}\r\n{4}",
@@ -100,5 +104,25 @@ namespace Tangra
                     return AssemblyVersion;
             }
         }
+
+	    private static string GetMonoVersion()
+	    {
+			try
+			{
+				Type type = Type.GetType("Mono.Runtime");
+				if (type != null)
+				{
+					MethodInfo dispalayName = type.GetMethod("GetDisplayName", BindingFlags.NonPublic | BindingFlags.Static);
+					if (dispalayName != null)
+						return (string)dispalayName.Invoke(null, null);
+				}
+			}
+			catch (Exception ex)
+			{
+				Trace.WriteLine(ex);
+			}
+
+			return null;
+	    }
     }
 }

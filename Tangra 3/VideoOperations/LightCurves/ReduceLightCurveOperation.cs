@@ -125,6 +125,9 @@ namespace Tangra.VideoOperations.LightCurves
 	            return true;
             }
 
+			TangraContext.Current.CanLoadDarkFrame = true;
+			TangraContext.Current.CanLoadFlatFrame = true;
+
             return false;
         }
 
@@ -186,7 +189,7 @@ namespace Tangra.VideoOperations.LightCurves
         internal byte FrameBackgroundMode = 0;
         private int m_PrevMeasuredFrame = -1;
 
-        public void NextFrame(int frameNo, MovementType movementType, bool isLastFrame, AstroImage astroImage)
+        public void NextFrame(int frameNo, MovementType movementType, bool isLastFrame, AstroImage astroImage, int firstFrameInIntegrationPeriod)
         {
             m_AstroImage = astroImage;
 
@@ -272,34 +275,50 @@ namespace Tangra.VideoOperations.LightCurves
                 {
                     if (m_Tracker.RefiningPercentageWorkLeft <= 0)
                     {
-                        // Begin measurements
-                        m_Measuring = true;
-                        m_Refining = false;
+                        bool canSwitchFromRefiningToMeasuringNow = true;
 
-                        m_ProcessedFrames = 0;
-                        m_UnsuccessfulFrames = 0;
-                        m_StopWatch.Reset();
-                        m_StopWatch.Start();
+                        if (m_VideoController.IsUsingSteppedAveraging)
+                        {
+                            // When using stepped averaging the measurements should start at the first frame of an integration 'step'
+                            // which means we need to flip the switch from 'Refining' to 'Measuring' one frame before that
+                            if (firstFrameInIntegrationPeriod + m_VideoController.FramesToIntegrate - 1 > frameNo)
+                            {
+                                Trace.WriteLine(string.Format("Skipping frame {0}, waiting for the first frame in the next integration period to start measurments.", frameNo));
+                                canSwitchFromRefiningToMeasuringNow = false;
+                            }
+                        }
 
-                        m_Tracker.BeginMeasurements(astroImage);
+                        if (canSwitchFromRefiningToMeasuringNow)
+                        {
+                            // Begin measurements
+                            m_Measuring = true;
+                            m_Refining = false;
 
-                        // IMPORTANT: The finalHeader must be changed as well if changing this
-						LCFile.NewOnTheFlyOutputFile(
-							m_VideoController.CurrentVideoFileName,
-							string.Format("Video ({0})", m_VideoController.CurrentVideoFileType),
-							(byte)m_Tracker.TrackedObjects.Count, (float)m_Tracker.PositionTolerance);
+                            m_ProcessedFrames = 0;
+                            m_UnsuccessfulFrames = 0;
+                            m_StopWatch.Reset();
+                            m_StopWatch.Start();
 
-                        m_MinFrame = uint.MaxValue;
-                        m_MaxFrame = uint.MinValue;
-                        m_TotalFrames = 0;
-                        m_FirstMeasuredFrame = frameNo;
+                            m_Tracker.BeginMeasurements(astroImage);
 
-                        m_AverageFWHM = astroImage.GetAverageFWHM();
+                            // IMPORTANT: The finalHeader must be changed as well if changing this
+                            LCFile.NewOnTheFlyOutputFile(
+                                m_VideoController.CurrentVideoFileName,
+                                string.Format("Video ({0})", m_VideoController.CurrentVideoFileType),
+                                (byte)m_Tracker.TrackedObjects.Count, (float)m_Tracker.PositionTolerance);
 
-                        if (m_TimestampOCR != null && osdPixels != null)
-                            m_TimestampOCR.PrepareForMeasurements(osdPixels);
+                            m_MinFrame = uint.MaxValue;
+                            m_MaxFrame = uint.MinValue;
+                            m_TotalFrames = 0;
+                            m_FirstMeasuredFrame = frameNo;
 
-                        m_VideoController.StatusChanged("Measuring");
+                            m_AverageFWHM = astroImage.GetAverageFWHM();
+
+                            if (m_TimestampOCR != null && osdPixels != null)
+                                m_TimestampOCR.PrepareForMeasurements(osdPixels);
+
+                            m_VideoController.StatusChanged("Measuring");                            
+                        }
                     }
                 }				
             }
@@ -1232,7 +1251,7 @@ namespace Tangra.VideoOperations.LightCurves
 			var avoider = new DuplicateFrameAvoider(m_VideoController, (int)m_MaxFrame);
 			int lastGoodFrame = avoider.GetLastGoodFrameId();
 
-			m_VideoController.MoveToFrame(lastGoodFrame);
+            m_VideoController.MoveToFrame(lastGoodFrame);
         }
 
         private DateTime m_StartFrameTime;

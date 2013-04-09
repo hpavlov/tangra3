@@ -56,6 +56,22 @@ namespace Tangra.Video
 			m_PixelIntegrationMode = pixelIntegrationType;
 		}
 
+	    public FrameIntegratingMode FrameIntegratingMode
+	    {
+	        get
+	        {
+	            return m_FrameIntegration;
+	        }
+	    }
+
+	    public int FramesToIntegrate
+	    {
+            get
+            {
+                return m_FramesToIntegrate;
+            }	        
+	    }
+
 		public void SetFrameRenderer(IVideoFrameRenderer frameRenderer)
 		{
 			m_FrameRenderer = frameRenderer;
@@ -100,7 +116,10 @@ namespace Tangra.Video
 
 			if (bufferSize < 2)
 			{
-				m_PlayerThread = new Thread(new ThreadStart(Run));
+                if (m_FrameIntegration == FrameIntegratingMode.SteppedAverage)
+			        throw new NotSupportedException("Buffer size must be larger than 2 for stepped averaging software integration to work properly");
+                else
+				    m_PlayerThread = new Thread(new ThreadStart(Run));
 			}
 			else
 			{
@@ -132,6 +151,7 @@ namespace Tangra.Video
 		{
 			public Pixelmap Image;
 			public int FrameNo;
+            public int FirstFrameInIntegrationPeriod;
 		}
 
 		private int m_CurrentFrameIndex = -1;
@@ -185,13 +205,13 @@ namespace Tangra.Video
 			DisplayCurrentFrame(MovementType.Refresh);
 		}
 
-		public void MoveToFrame(int frameId)
+        public void MoveToFrame(int frameId)
 		{
 			m_CurrentFrameIndex = frameId;
 			if (m_CurrentFrameIndex >= m_VideoStream.LastFrame) m_CurrentFrameIndex = m_VideoStream.LastFrame;
 			if (m_CurrentFrameIndex < m_VideoStream.FirstFrame) m_CurrentFrameIndex = m_VideoStream.FirstFrame;
 
-			DisplayCurrentFrame(MovementType.Jump);
+            DisplayCurrentFrame(MovementType.Jump);
 		}
 
 		public Pixelmap GetFrame(int frameNo, bool noIntegrate)
@@ -291,12 +311,22 @@ namespace Tangra.Video
 			}
 		}
 
+        private void DisplayCurrentFrameNoIntegrate(MovementType movementType)
+        {
+            if (m_VideoStream != null)
+            {
+                Pixelmap currentBitmap = m_VideoStream.GetPixelmap(m_CurrentFrameIndex);
+
+                DisplayCurrentFrameInternal(movementType, currentBitmap);
+            }
+        }
+
 		private void DisplayCurrentFrameInternal(MovementType movementType, Pixelmap currentPixelmap)
 		{
 			if (m_CurrentFrameIndex >= m_VideoStream.FirstFrame &&
 				m_CurrentFrameIndex <= m_VideoStream.LastFrame)
 			{
-				m_FrameRenderer.RenderFrame(m_CurrentFrameIndex, currentPixelmap, movementType, false, 0);			
+                m_FrameRenderer.RenderFrame(m_CurrentFrameIndex, currentPixelmap, movementType, false, 0, m_CurrentFrameIndex);			
 			}
 		}
 
@@ -356,9 +386,13 @@ namespace Tangra.Video
 
 			lock (m_FrameBitmapLock)
 			{
-				BufferedFrame bufferedFrame = new BufferedFrame();
-				bufferedFrame.FrameNo = nextFrameIdToBuffer;
-				bufferedFrame.Image = bmp;
+			    var bufferedFrame = new BufferedFrame()
+			    {
+				    FrameNo = nextFrameIdToBuffer,
+                    FirstFrameInIntegrationPeriod = nextFrameIdToBuffer,
+				    Image = bmp
+			    };
+
 				m_FramesBufferQueue.Enqueue(bufferedFrame);				
 			}
 		}
@@ -375,9 +409,10 @@ namespace Tangra.Video
 			// 4) Produce the integrated bitmap
 			lock(m_FrameBitmapLock)
 			{
-				BufferedFrame bufferedFrame = new BufferedFrame()
+				var bufferedFrame = new BufferedFrame()
 				{
 					FrameNo = nextFrameIdToBuffer,
+                    FirstFrameInIntegrationPeriod = nextFrameIdToBuffer,
 					Image = thisFrame
 				};
 
@@ -398,11 +433,12 @@ namespace Tangra.Video
 
 				lock (m_FrameBitmapLock)
 				{
-					BufferedFrame bufferedFrame = new BufferedFrame()
-						{
-							FrameNo = nextFrameIdToBuffer + i,
-							Image = thisFrame
-						};
+					var bufferedFrame = new BufferedFrame()
+					{
+						FrameNo = nextFrameIdToBuffer + i,
+                        FirstFrameInIntegrationPeriod = nextFrameIdToBuffer,
+						Image = thisFrame
+					};
 
 					m_FramesBufferQueue.Enqueue(bufferedFrame);
 				}
@@ -469,8 +505,16 @@ namespace Tangra.Video
 						sw.Reset();
 					}
 
+				    Debug.Assert(currentFrame.FrameNo == m_CurrentFrameIndex);
+
 					//show frame
-					m_FrameRenderer.RenderFrame(m_CurrentFrameIndex, currentPixelmap, MovementType.Step, m_CurrentFrameIndex + m_Step >= m_VideoStream.LastFrame, msToWait);
+					m_FrameRenderer.RenderFrame(
+                        currentFrame.FrameNo, 
+                        currentPixelmap, 
+                        MovementType.Step, 
+                        m_CurrentFrameIndex + m_Step >= m_VideoStream.LastFrame, 
+                        msToWait,
+                        currentFrame.FirstFrameInIntegrationPeriod);
 
 					Thread.Sleep(1);
 				}
@@ -519,7 +563,8 @@ namespace Tangra.Video
 								currentPixelmap, 
 								MovementType.Step,
 								m_CurrentFrameIndex + m_Step >= m_VideoStream.LastFrame,
-								msToWait);
+								msToWait,
+                                m_CurrentFrameIndex);
 				}
 			}
 			catch (ObjectDisposedException)

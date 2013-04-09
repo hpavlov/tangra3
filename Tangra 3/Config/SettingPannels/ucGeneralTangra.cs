@@ -26,6 +26,7 @@ namespace Tangra.Config.SettingPannels
 			cbxRunVideosAtFastest.Checked = TangraConfig.Settings.Generic.RunVideosOnFastestSpeed;
 			cbxOnOpenOperation.SetCBXIndex((int)TangraConfig.Settings.Generic.OnOpenOperation);
 			cbShowProcessingSpeed.Checked = TangraConfig.Settings.Generic.ShowProcessingSpeed;
+			cbxShowCursorPosition.Checked = TangraConfig.Settings.Generic.ShowCursorPosition;
 			cbxBetaUpdates.Checked = TangraConfig.Settings.Generic.AcceptBetaUpdates;
         }
 
@@ -37,6 +38,7 @@ namespace Tangra.Config.SettingPannels
 			TangraConfig.Settings.Generic.RunVideosOnFastestSpeed = cbxRunVideosAtFastest.Checked;
 			TangraConfig.Settings.Generic.OnOpenOperation = (TangraConfig.OnOpenOperation)cbxOnOpenOperation.SelectedIndex;
 			TangraConfig.Settings.Generic.ShowProcessingSpeed = cbShowProcessingSpeed.Checked;
+			TangraConfig.Settings.Generic.ShowCursorPosition = cbxShowCursorPosition.Checked;
         }
 	}
 }

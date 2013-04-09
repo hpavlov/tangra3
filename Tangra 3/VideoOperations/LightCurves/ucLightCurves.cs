@@ -12,6 +12,7 @@ using Tangra.Helpers;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
 using Tangra.Model.Image;
+using Tangra.Model.Video;
 using Tangra.Model.VideoOperations;
 using Tangra.Video;
 using Tangra.VideoOperations.LightCurves;
@@ -236,6 +237,10 @@ namespace Tangra.VideoOperations.LightCurves
 
         public void FinishWithMeasurements()
         {
+            // Once we enter time entering mode we clear any integration
+            m_VideoController.SetupFrameIntegration(1, FrameIntegratingMode.NoIntegration, PixelIntegrationType.Mean);
+            m_VideoController.UpdateViews();
+
             m_StateMachine.VideoOperation.FinishedWithMeasurements();
 
             btnStop.Visible = false;
@@ -672,7 +677,7 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void btn1FrMinus_Click(object sender, EventArgs e)
         {
-			m_VideoController.StepBackward();
+            m_VideoController.StepBackward();
 			UpdateShowingFieldControls();
 
 			if (m_ShowingFields) m_StateMachine.VideoOperation.ToggleShowFields(true);

@@ -59,6 +59,8 @@ namespace Tangra.Config
 			m_PropertyPages.Add(3, new ucADVSVideo12bit());
 			m_PropertyPages.Add(10, new ucAAV8bit());
 
+			m_PropertyPages.Add(11, new ucPreProcessingSettings());
+
 			m_PropertyPages.Add(4, new ucPhotometry());
 
 			m_PropertyPages.Add(6, new ucTracking());

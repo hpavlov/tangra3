@@ -13,6 +13,7 @@ namespace Tangra.Model.Context
 		public MovementType MovementType;
 		public bool IsLastFrame;
 		public int MsToWait;
+	    public int FirstFrameInIntegrationPeriod;
 
 		public RenderFrameContext Clone()
 		{
@@ -22,6 +23,7 @@ namespace Tangra.Model.Context
 			clone.MovementType = this.MovementType;
 			clone.IsLastFrame = this.IsLastFrame;
 			clone.MsToWait = this.MsToWait;
+		    clone.FirstFrameInIntegrationPeriod = this.FirstFrameInIntegrationPeriod;
 
 			return clone;
 		}

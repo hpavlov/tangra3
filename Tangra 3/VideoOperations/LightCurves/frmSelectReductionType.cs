@@ -194,6 +194,8 @@ namespace Tangra.VideoOperations.LightCurves
 	        LightCurveReductionContext.Instance.BitPix = m_VideoContoller.VideoBitPix;
 	        LightCurveReductionContext.Instance.MaxPixelValue = (uint)1 << m_VideoContoller.VideoBitPix;
 
+            m_VideoContoller.RefreshCurrentFrame();
+
             DialogResult = DialogResult.OK;
             Close();
         }

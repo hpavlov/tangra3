@@ -10,7 +10,7 @@ unsigned int  g_PreProcessingToValue;
 long g_PreProcessingBrigtness;
 long g_PreProcessingContrast;
 float g_EncodingGamma;
-bool g_UsesPreProcessing;
+bool g_UsesPreProcessing = false;
 
 unsigned long* g_DarkFramePixelsCopy = NULL;
 unsigned long* g_FlatFramePixelsCopy = NULL;
@@ -125,7 +125,7 @@ long PreProcessingAddDigitalFilter(enum PreProcessingFilter filter)
 long PreProcessingAddGammaCorrection(float gamma)
 {
 	g_EncodingGamma = gamma;
-	g_UsesPreProcessing = true;
+	g_UsesPreProcessing = g_UsesPreProcessing || abs(g_EncodingGamma - 1.0f) > 0.01;
 	
 	return S_OK;
 }
@@ -226,7 +226,7 @@ long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height
 		// TODO: Apply low pass difference filter
 	}
 	
-	if (g_EncodingGamma != 1)
+	if (abs(g_EncodingGamma - 1.0f) > 0.01)
 	{
 		rv = PreProcessingGamma(pixels, width, height, bpp, g_EncodingGamma);
 		if (rv != S_OK) return rv;

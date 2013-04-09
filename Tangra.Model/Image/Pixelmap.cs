@@ -237,6 +237,20 @@ namespace Tangra.Model.Image
 			return ConstructForLCFileAveragedFrame(new uint[bytes.Length], width, height, bitpixCamera, bytes);
 		}
 
+		public static byte GetColourChannelValue(TangraConfig.ColourChannel channel, byte red, byte green, byte blue)
+		{
+			if (channel == TangraConfig.ColourChannel.GrayScale)
+				return (byte)(.299 * red + .587 * green + .114 * blue);
+			else if (channel == TangraConfig.ColourChannel.Red)
+				return red;
+			else if (channel == TangraConfig.ColourChannel.Green)
+				return green;
+			else if (channel == TangraConfig.ColourChannel.Blue)
+				return blue;
+
+			throw new ArgumentOutOfRangeException();
+		}
+
 		public static Pixelmap ConstructFromBitmap(Bitmap bmp, TangraConfig.ColourChannel channel)
 		{
 			uint[] pixels = new uint[bmp.Width * bmp.Height];
@@ -262,15 +276,7 @@ namespace Tangra.Model.Image
 						byte green = p[1];
 						byte red = p[2];
 
-						byte val = 0;
-						if (channel == TangraConfig.ColourChannel.GrayScale)
-							val = (byte)(.299 * red + .587 * green + .114 * blue);
-						else if (channel == TangraConfig.ColourChannel.Red)
-							val = red;
-						else if (channel == TangraConfig.ColourChannel.Green)
-							val = green;
-						else if (channel == TangraConfig.ColourChannel.Blue)
-							val = blue;
+						byte val = GetColourChannelValue(channel, red, green, blue);
 
 						pixels[x + y * bmp.Width] = val;
 						displayBitmapPixels[x + y * bmp.Width] = val;

@@ -14,7 +14,8 @@ namespace Tangra.Model.Video
 		Pixelmap currentPixelmap,
 		MovementType movementType,
 		bool isLastFrame,
-		int milisecondsToWait);
+		int milisecondsToWait,
+        int firstFrameInIntegrationPeriod);
 
 
 
@@ -22,7 +23,7 @@ namespace Tangra.Model.Video
 	{
 		void PlayerStarted();
 		void PlayerStopped();
-		void RenderFrame(int currentFrameIndex, Pixelmap currentPixelmap, MovementType movementType, bool isLastFrame, int msToWait);
+        void RenderFrame(int currentFrameIndex, Pixelmap currentPixelmap, MovementType movementType, bool isLastFrame, int msToWait, int firstFrameInIntegrationPeriod);
 	}
 
 	public interface IFrameStream
@@ -85,7 +86,7 @@ namespace Tangra.Model.Video
 		void StepBackward();
 		void StepForward(int seconds);
 		void StepBackward(int seconds);
-		void MoveToFrame(int frameNo);
+        void MoveToFrame(int frameNo);
 		Pixelmap GetFrame(int frameNo, bool noIntegrate);
         Pixelmap GetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging);
 		void DisposeResources();
@@ -94,7 +95,9 @@ namespace Tangra.Model.Video
 		IFrameStream Video { get; }
 		int FrameStep { get; }
 		void RefreshCurrentFrame();
-		void SetupFrameIntegration(int framesToIntegrate, FrameIntegratingMode frameMode, PixelIntegrationType pixelIntegrationType);        
+		void SetupFrameIntegration(int framesToIntegrate, FrameIntegratingMode frameMode, PixelIntegrationType pixelIntegrationType);
+        FrameIntegratingMode FrameIntegratingMode { get; }
+        int FramesToIntegrate { get; }
 	}
 
 	public class PlayerContext

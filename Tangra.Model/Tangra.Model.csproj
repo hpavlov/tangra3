@@ -118,6 +118,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VideoOperations\CompositeFramePreProcessor.cs" />
     <Compile Include="VideoOperations\IImageHostCallbacks.cs" />
+    <Compile Include="VideoOperations\IImageToolView.cs" />
     <Compile Include="VideoOperations\IMeasuredObject.cs" />
     <Compile Include="VideoOperations\IVideoController.cs" />
     <Compile Include="VideoOperations\IVideoOperation.cs" />

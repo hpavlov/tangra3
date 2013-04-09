@@ -131,6 +131,12 @@
     <Compile Include="Config\SettingPannels\ucPhotometry.Designer.cs">
       <DependentUpon>ucPhotometry.cs</DependentUpon>
     </Compile>
+    <Compile Include="Config\SettingPannels\ucPreProcessingSettings.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucPreProcessingSettings.Designer.cs">
+      <DependentUpon>ucPreProcessingSettings.cs</DependentUpon>
+    </Compile>
     <Compile Include="Config\SettingPannels\ucTracking.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -138,6 +144,7 @@
       <DependentUpon>ucTracking.cs</DependentUpon>
     </Compile>
     <Compile Include="Controller\LightCurveController.cs" />
+    <Compile Include="Controller\DarkFlatFrameController.cs" />
     <Compile Include="Controller\VideoController.cs" />
     <Compile Include="Controller\VideoOperationController.cs" />
     <Compile Include="Controls\SmoothPanel.cs">
@@ -349,6 +356,13 @@
     <Compile Include="VideoOperations\LightCurves\ucPreProcessing.Designer.cs">
       <DependentUpon>ucPreProcessing.cs</DependentUpon>
     </Compile>
+    <Compile Include="VideoOperations\MakeDarkFlatField\MakeDarkFlatOperation.cs" />
+    <Compile Include="VideoOperations\MakeDarkFlatField\ucMakeDarkFlatField.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\MakeDarkFlatField\ucMakeDarkFlatField.Designer.cs">
+      <DependentUpon>ucMakeDarkFlatField.cs</DependentUpon>
+    </Compile>
     <Compile Include="Video\AstroDigitalVideoStream.cs" />
     <Compile Include="Video\AstroDigitalVideo\AdvFile.cs" />
     <Compile Include="Video\AstroDigitalVideo\AdvFramesIndex.cs" />
@@ -394,6 +408,7 @@
     </Compile>
     <Compile Include="Video\SingleBitmapFileFrameStream.cs" />
     <Compile Include="Video\VideoStream.cs" />
+    <Compile Include="View\ImageToolView.cs" />
     <Compile Include="View\VideoFileView.cs" />
     <Compile Include="View\ZoomedImageView.cs" />
     <EmbeddedResource Include="Config\frmTangraSettings.resx">
@@ -422,6 +437,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Config\SettingPannels\ucPhotometry.resx">
       <DependentUpon>ucPhotometry.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Config\SettingPannels\ucPreProcessingSettings.resx">
+      <DependentUpon>ucPreProcessingSettings.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Config\SettingPannels\ucTracking.resx">
       <DependentUpon>ucTracking.cs</DependentUpon>
@@ -513,6 +531,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\LightCurves\ucPreProcessing.resx">
       <DependentUpon>ucPreProcessing.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\MakeDarkFlatField\ucMakeDarkFlatField.resx">
+      <DependentUpon>ucMakeDarkFlatField.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Video\AstroDigitalVideo\frmAavStatusPopup.resx">
       <DependentUpon>frmAavStatusPopup.cs</DependentUpon>

@@ -457,9 +457,11 @@ namespace Tangra.Model.Config
 			public bool UseMutleCPUTasking = true;
 			public OnOpenOperation OnOpenOperation = OnOpenOperation.StartLightCurveReduction;
 			public bool ShowProcessingSpeed = false;
+			public bool ShowCursorPosition = false;
 			public PerformanceQuality PerformanceQuality;
 			public bool ReverseGammaCorrection = false;
 			public int PreferredRenderingEngineIndex = 0;
+			public bool DarkFrameAdjustLevelToMedian = false;
 
 			public bool AcceptBetaUpdates = false;
 		}

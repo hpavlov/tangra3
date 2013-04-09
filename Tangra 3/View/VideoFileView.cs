@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
 using Tangra.Model.Video;
+using Tangra.PInvoke;
 using Tangra.Video;
 
 namespace Tangra.View
@@ -70,6 +71,10 @@ namespace Tangra.View
 
 
 			m_MainForm.miReduceLightCurve.Enabled = TangraContext.Current.HasAnyFileLoaded;
+			m_MainForm.miMakeDarkFlat.Enabled = TangraContext.Current.HasAnyFileLoaded;
+
+			m_MainForm.miLoadDark.Enabled = TangraContext.Current.HasAnyFileLoaded && TangraContext.Current.CanLoadDarkFrame;
+			m_MainForm.miLoadFlat.Enabled = TangraContext.Current.HasAnyFileLoaded && TangraContext.Current.CanLoadFlatFrame;
 
 			m_MainForm.pnlPlayControls.Enabled = TangraContext.Current.HasVideoLoaded;
 			m_MainForm.pnlPlayButtons.Enabled = TangraContext.Current.HasVideoLoaded;
@@ -99,64 +104,73 @@ namespace Tangra.View
 			if (!m_FramePlayer.IsRunning)
 				m_MainForm.ssFPS.Text = string.Empty;
 
-			if (TangraConfig.Settings.Photometry.EncodingGamma != 1 && TangraContext.Current.HasAnyFileLoaded)
-            {
-                m_MainForm.ssGamma.Visible = true;
-                m_MainForm.ssGamma.BackColor = Color.FromArgb(255, 255, 192);
-                m_MainForm.ssGamma.Text = string.Format("Gamma = {0}", TangraConfig.Settings.Photometry.EncodingGamma.ToString("0.00"));
-            }
-            else
-                m_MainForm.ssGamma.Visible = false;
-
-			//tslblDarkFrameLoaded.Visible = VideoContext.Current.DarkField != null;
-			//tslblFlatFrameLoaded.Visible = VideoContext.Current.FlatField != null;
-
 			if (TangraContext.Current.HasVideoLoaded)
 			{
-                m_MainForm.tslblUsingAviSynth.Text = TangraContext.Current.RenderingEngine;
-				m_MainForm.tslblUsingAviSynth.Visible = true;
+                m_MainForm.ssRenderingEngine.Text = TangraContext.Current.RenderingEngine;
+				m_MainForm.ssRenderingEngine.Visible = true;
 			}
 			else
-				m_MainForm.tslblUsingAviSynth.Visible = false;
+				m_MainForm.ssRenderingEngine.Visible = false;
 
-			//ssPreProcessing.Visible = PreProcessingInfo != null &&
-			//                          PreProcessingInfo.PreProcessing;
+			m_MainForm.ssFPS.Visible = TangraConfig.Settings.Generic.ShowProcessingSpeed;
 
-			//if (PreProcessingInfo != null && PreProcessingInfo.PreProcessing)
-			//{
-			//    string preProcessingInfoStr = string.Empty;
-			//    switch (PreProcessingInfo.PreProcessingType)
-			//    {
-			//        case PreProcessingType.BrightnessContrast:
-			//            preProcessingInfoStr += string.Format("B{0}:C{1}", PreProcessingInfo.Brigtness, PreProcessingInfo.Contrast);
-			//            break;
-			//        case PreProcessingType.Clipping:
-			//            preProcessingInfoStr += string.Format("C{0}-{1}", PreProcessingInfo.ClippingFrom, PreProcessingInfo.ClippingTo);
-			//            break;
-			//        case PreProcessingType.Stretching:
-			//            preProcessingInfoStr += string.Format("S{0}-{1}", PreProcessingInfo.StretchingFrom, PreProcessingInfo.StretchingTo);
-			//            break;
-			//        case PreProcessingType.None:
-			//            preProcessingInfoStr += "N";
-			//            break;
-			//    }
-			//    if (PreProcessingInfo.GammaCorrection != 1)
-			//        preProcessingInfoStr += string.Format("|G{0}", PreProcessingInfo.GammaCorrection.ToString("0.000"));
-			//    if (PreProcessingInfo.DarkFrameBytes > 0) preProcessingInfoStr += "|Drk";
-			//    if (PreProcessingInfo.FlatFrameBytes > 0) preProcessingInfoStr += "|Flt";
-			//    if (PreProcessingInfo.Filter != PreProcessingFilter.NoFilter)
-			//    {
-			//        if (PreProcessingInfo.Filter == PreProcessingFilter.LowPassFilter)
-			//            preProcessingInfoStr += "|LPF";
-			//        else if (PreProcessingInfo.Filter == PreProcessingFilter.LowPassDifferenceFilter)
-			//            preProcessingInfoStr += "|LPDF";
-			//    }
+			PreProcessingInfo preProcessingInfo;
+			TangraCore.PreProcessors.PreProcessingGetConfig(out preProcessingInfo);
 
-			//    ssPreProcessing.Text = preProcessingInfoStr;
-			//}
+			if (preProcessingInfo != null && preProcessingInfo.PreProcessing)
+			{
+				string preProcessingInfoStr = string.Empty;
+				string preProcessingInfoTooltip = string.Empty;
+				switch (preProcessingInfo.PreProcessingType)
+				{
+					case PreProcessingType.BrightnessContrast:
+						preProcessingInfoStr += string.Format("B{0}:C{1}", preProcessingInfo.Brigtness, preProcessingInfo.Contrast);
+						preProcessingInfoTooltip += string.Format("Using Brightness of {0} and Contrast of {1}\r\n", preProcessingInfo.Brigtness, preProcessingInfo.Contrast);
+						break;
+					case PreProcessingType.Clipping:
+						preProcessingInfoStr += string.Format("C{0}-{1}", preProcessingInfo.ClippingFrom, preProcessingInfo.ClippingTo);
+						preProcessingInfoTooltip += string.Format("Using Clipping from {0} to {1}\r\n", preProcessingInfo.ClippingFrom, preProcessingInfo.ClippingTo);
+						break;
+					case PreProcessingType.Stretching:
+						preProcessingInfoStr += string.Format("S{0}-{1}", preProcessingInfo.StretchingFrom, preProcessingInfo.StretchingTo);
+						preProcessingInfoTooltip += string.Format("Using Stretching from {0} to {1}\r\n", preProcessingInfo.StretchingFrom, preProcessingInfo.StretchingTo);
+						break;
+				}
 
-			m_MainForm.tslblIntegration.Text = string.Format("Integrating {0} frames", TangraContext.Current.NumberFramesToIntegrate);
-			m_MainForm.tslblIntegration.Visible = TangraContext.Current.UsingIntegration;
+				if (Math.Abs(preProcessingInfo.GammaCorrection - 1) > 0.01)
+				{
+					preProcessingInfoStr += string.Format("|G{0}", preProcessingInfo.GammaCorrection.ToString("0.00"));
+					preProcessingInfoTooltip += string.Format("Reversing encoding Gamma of {0}\r\n", preProcessingInfo.GammaCorrection.ToString("0.00"));
+				}
+
+				if (preProcessingInfo.DarkFrameBytes > 0) preProcessingInfoStr += "|DARK";
+				if (preProcessingInfo.FlatFrameBytes > 0) preProcessingInfoStr += "|FLAT";
+
+				if (preProcessingInfo.Filter != TangraConfig.PreProcessingFilter.NoFilter)
+				{
+					if (preProcessingInfo.Filter == TangraConfig.PreProcessingFilter.LowPassFilter)
+					{
+						preProcessingInfoStr += "|LPF";
+						preProcessingInfoTooltip += "Using Low Pass (LP) filter\r\n";
+					}
+					else if (preProcessingInfo.Filter == TangraConfig.PreProcessingFilter.LowPassDifferenceFilter)
+					{
+						preProcessingInfoStr += "|LPDF";
+						preProcessingInfoTooltip += "Using Low Pass Difference (LPD) filter\r\n";
+					}
+				}
+
+				m_MainForm.ssPreProcessing.Text = preProcessingInfoStr.TrimStart('|');
+				m_MainForm.ssPreProcessing.ToolTipText = preProcessingInfoTooltip;
+				m_MainForm.ssPreProcessing.Visible = true;
+			}
+			else
+			{
+				m_MainForm.ssPreProcessing.Visible = false;
+			}
+
+			m_MainForm.ssSoftwareIntegration.Text = string.Format("Integrating {0} frames", TangraContext.Current.NumberFramesToIntegrate);
+			m_MainForm.ssSoftwareIntegration.Visible = TangraContext.Current.UsingIntegration;
 			m_MainForm.ssFrameNo.Visible = TangraContext.Current.HasVideoLoaded;			
 		}
 

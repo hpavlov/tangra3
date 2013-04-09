@@ -42,8 +42,13 @@ namespace Tangra.PInvoke
 		{
 			get
 			{
-				if (VideoFileTypeBuffer[0] == 0)
-					return "UnknownFileType";
+                if (VideoFileTypeBuffer[0] == 0)
+                {
+                    if (VideoFileTypeBuffer[1] == 0 && VideoFileTypeBuffer[2] == 0 && VideoFileTypeBuffer[3] == 0)
+                        return "BI_RGB"; // FourCC of 0x00000000 is BI_RGB according to the specs
+                    else
+                        return "UnknownFileType";
+                }					
 				else
 					return Encoding.ASCII.GetString(VideoFileTypeBuffer).Trim('\0');
 			}

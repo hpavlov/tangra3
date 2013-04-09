@@ -1041,7 +1041,7 @@ namespace nom.tam.util
     public override void Close()
     {
       _in.Close();
-      _out.Close();
+	  if (_out != null) _out.Close();
       _s.Close();
       _outBuf = new byte[0];
     }

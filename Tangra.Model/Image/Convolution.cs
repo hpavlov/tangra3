@@ -438,5 +438,37 @@ namespace Tangra.Model.Image
 			bitmap.UnlockBits(bmData);
 
 		}
+
+		public delegate void BitmapPixelOperationCallback(int x, int y, byte r, byte g, byte b);
+
+		public static void BitmapPixelOperation(Bitmap bitmap, BitmapPixelOperationCallback operation)
+		{
+			int width = bitmap.Width;
+			int height = bitmap.Height;
+
+			BitmapData bmData = bitmap.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+
+			int stride = bmData.Stride;
+
+			unsafe
+			{
+				byte* p = (byte*)(void*)bmData.Scan0;
+
+				int nOffset = stride - bmData.Width * 3;
+
+				for (int y = 0; y < bmData.Height; ++y)
+				{
+					for (int x = 0; x < bmData.Width; ++x)
+					{
+						operation(x, y, p[2], p[1], p[0]);
+
+						p += 3;
+					}
+					p += nOffset;
+				}
+			}
+
+			bitmap.UnlockBits(bmData);
+		}
 	}
 }
