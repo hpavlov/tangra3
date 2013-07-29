@@ -149,6 +149,14 @@ namespace Tangra.Controller
 						TangraContext.Current.UsingADV = true;
 						m_OverlayManager.Init(equipmentInfo, geoLocation, frameStream.FirstFrame);
 					}
+					else if (fileExtension == ".bmp")
+					{
+						frameStream = SingleBitmapFileFrameStream.OpenFile(fileName);
+					}
+					else if (fileExtension == ".fit" || fileExtension == ".fits")
+					{
+						frameStream = SingleFITSFileFrameStream.OpenFile(fileName);
+					}
 					else
 					{
 						frameStream = VideoStream.OpenFile(fileName);
@@ -412,6 +420,11 @@ namespace Tangra.Controller
 		{
 			get { return m_FramePlayer.IsAstroAnalogueVideo; }
 		}
+
+        public bool AstroAnalogueVideoHasOcrData
+        {
+            get { return m_FramePlayer.AstroAnalogueVideoHasOcrData; }
+        }
 
 	    public GeoLocationInfo GeoLocation
 	    {

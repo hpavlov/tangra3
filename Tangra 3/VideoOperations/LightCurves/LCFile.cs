@@ -791,11 +791,25 @@ namespace Tangra.VideoOperations.LightCurves
 
     	internal MeasurementTimingType TimingType;
 
-        internal double GetAbsoluteTimeDeltaInMilliseconds()
+        internal double GetAbsoluteTimeDeltaInMilliseconds(out string videoSystem)
         {
             TimeSpan totalTimeStapmedTime = new TimeSpan(SecondTimedFrameTime.Ticks - FirstTimedFrameTime.Ticks);
 
-            double videoTimeInSec = (LastTimedFrameNo - FirstTimedFrameNo) / FramesPerSecond;
+            double assumedFrameRate = FramesPerSecond;
+            videoSystem = null;
+
+            if (FramesPerSecond > 24.0 && FramesPerSecond < 26.0)
+            {
+                assumedFrameRate = 25.0;
+                videoSystem = "PAL";
+            }
+            else if (FramesPerSecond > 29.0 && FramesPerSecond < 31.0)
+            {
+                assumedFrameRate = 29.97;
+                videoSystem = "NTSC";
+            }
+
+            double videoTimeInSec = (LastTimedFrameNo - FirstTimedFrameNo) / assumedFrameRate;
             return Math.Abs(videoTimeInSec - totalTimeStapmedTime.TotalSeconds) * 1000;
         }
 

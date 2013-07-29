@@ -406,16 +406,16 @@ namespace Tangra.Model.Image
             }
         }
 
-        public void Measure(float x0, float y0, float precomputedAperture, Filter filter, uint[,] matrix, double psfBackground, ref int matrixSize, bool fixedAperture)
+        public void Measure(float x0, float y0, float precomputedAperture, Filter filter, uint[,] matrix, int bpp, double psfBackground, ref int matrixSize, bool fixedAperture)
         {
-            Measure(x0, y0, precomputedAperture, filter, matrix, psfBackground, true, ref matrixSize, fixedAperture, false);
+            Measure(x0, y0, precomputedAperture, filter, matrix, bpp, psfBackground, true, ref matrixSize, fixedAperture, false);
         }
 
         public double BestMatrixSizeDistanceDifferenceTolerance = 3.0;
 
         private void Measure(
             float x0, float y0, float precomputedAperture,
-            Filter filter, uint[,] matrix, double psfBackground,
+			Filter filter, uint[,] matrix, int bpp, double psfBackground,
             bool findBestMatrixSize, ref int matrixSize,
             bool fixedAperture, bool doCentroidFitForFixedAperture)
         {
@@ -426,11 +426,11 @@ namespace Tangra.Model.Image
 
             if (filter == Filter.LPD)
             {
-                m_PixelData = ImageFilters.LowPassDifferenceFilter(matrix);
+				m_PixelData = ImageFilters.LowPassDifferenceFilter(matrix, bpp);
             }
             else if (filter == Filter.LP)
             {
-                m_PixelData = ImageFilters.LowPassFilter(matrix, false);
+				m_PixelData = ImageFilters.LowPassFilter(matrix, bpp, false);
             }
             else
                 m_PixelData = matrix;
@@ -803,6 +803,7 @@ namespace Tangra.Model.Image
             ImagePixel center,
             uint[,] data,
             uint[,] backgroundPixels,
+			int bpp,
             TangraConfig.PreProcessingFilter filter,
             bool synchronise,
             TangraConfig.PhotometryReductionMethod reductionMethod,
@@ -821,12 +822,12 @@ namespace Tangra.Model.Image
             switch (filter)
             {
                 case TangraConfig.PreProcessingFilter.LowPassFilter:
-                    data = ImageFilters.LowPassFilter(data, true);
-                    backgroundPixels = ImageFilters.LowPassFilter(backgroundPixels, true);
+					data = ImageFilters.LowPassFilter(data, bpp, true);
+					backgroundPixels = ImageFilters.LowPassFilter(backgroundPixels, bpp, true);
                     break;
                 case TangraConfig.PreProcessingFilter.LowPassDifferenceFilter:
-                    data = ImageFilters.LowPassDifferenceFilter(data, true);
-                    backgroundPixels = ImageFilters.LowPassDifferenceFilter(backgroundPixels, true);
+					data = ImageFilters.LowPassDifferenceFilter(data, bpp, true);
+					backgroundPixels = ImageFilters.LowPassDifferenceFilter(backgroundPixels, bpp, true);
                     break;
                 default:
                     break;

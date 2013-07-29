@@ -506,9 +506,10 @@ namespace Tangra.VideoOperations.LightCurves
 		{
 			StringBuilder output = new StringBuilder();
 
-		    double absoluteTimeError = m_TimestampDiscrepencyFlag
-		                                   ? m_Header.GetAbsoluteTimeDeltaInMilliseconds()
-		                                   : 0;
+            string videoSystem;
+            double absoluteTimeError = m_TimestampDiscrepencyFlag
+                                           ? m_Header.GetAbsoluteTimeDeltaInMilliseconds(out videoSystem)
+                                           : 0;
 
 			uint objCount = m_Header.ObjectCount;
 			if (m_Context.Binning > 0)

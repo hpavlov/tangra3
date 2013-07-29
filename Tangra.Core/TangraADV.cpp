@@ -157,12 +157,20 @@ HRESULT ADVGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSl
 	int firstFrameToIntegrate = IntegrationManagerGetFirstFrameToIntegrate(startFrameNo, framesToIntegrate, isSlidingIntegration);
 	IntergationManagerStartNew(g_TangraAdvFile->ImageSection->Width, g_TangraAdvFile->ImageSection->Height, isMedianAveraging);
 
-	AdvLib::AdvFrameInfo singleFrameInfo;
+	AdvLib::AdvFrameInfo firstFrameInfo;
+	AdvLib::AdvFrameInfo lastFrameInfo;
+	long totalExposure10thMs = 0;
+	
+	int idxOfFrameInfo = framesToIntegrate / 2;
 
 	for(int idx = 0; idx < framesToIntegrate; idx++)
 	{
+		AdvLib::AdvFrameInfo* singleFrameInfo = idx == 0 ? &firstFrameInfo : &lastFrameInfo;
 		
-		rv = ADVGetFramePixels(firstFrameToIntegrate + idx, pixels, &singleFrameInfo, NULL, NULL, NULL);	
+		rv = ADVGetFramePixels(firstFrameToIntegrate + idx, pixels, singleFrameInfo, NULL, NULL, NULL);	
+		
+		totalExposure10thMs+= singleFrameInfo->Exposure10thMs;
+		
 		if (!SUCCEEDED(rv))
 		{
 			IntegrationManagerFreeResources();
@@ -185,7 +193,18 @@ HRESULT ADVGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSl
 
 	IntegrationManagerProduceIntegratedFrame(pixels);
 	IntegrationManagerFreeResources();
-
+	
+	frameInfo->Exposure10thMs = totalExposure10thMs;
+	frameInfo->GPSAlmanacOffset = lastFrameInfo.GPSAlmanacOffset;
+	frameInfo->GPSAlmanacStatus = lastFrameInfo.GPSAlmanacStatus;
+	frameInfo->GPSFixStatus = lastFrameInfo.GPSFixStatus;
+	frameInfo->GPSTrackedSattelites = lastFrameInfo.GPSTrackedSattelites;
+	frameInfo->Gain = (firstFrameInfo.Gain + lastFrameInfo.Gain) / 2.0;
+	frameInfo->Gamma = (firstFrameInfo.Gamma + lastFrameInfo.Gamma) / 2.0;
+	frameInfo->Offset = (firstFrameInfo.Offset + lastFrameInfo.Offset) / 2.0;
+	frameInfo->StartTimeStampHi = (firstFrameInfo.StartTimeStampHi + lastFrameInfo.StartTimeStampHi) / 2;
+	frameInfo->StartTimeStampLo = (firstFrameInfo.StartTimeStampLo + lastFrameInfo.StartTimeStampLo) / 2;
+	 
 	return GetBitmapPixels(g_TangraAdvFile->ImageSection->Width, g_TangraAdvFile->ImageSection->Height, pixels, bitmapBytes, bitmapDisplayBytes, false, g_TangraAdvFile->ImageSection->DataBpp);
 }
 

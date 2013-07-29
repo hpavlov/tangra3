@@ -33,9 +33,6 @@ namespace Tangra.VideoOperations
 		private FrameIntegratingMode m_IntegrationMode;
 		private PixelIntegrationType m_IntegrationType;
 
-		private TangraConfig.PreProcessingFilter m_PreProcessingFilter;
-		private bool m_UseDigitalFilter = false;
-
 		public IFramePlayer FramePlayer { get; set; }
 		public Form ParentForm { get; set; }
 
@@ -146,23 +143,6 @@ namespace Tangra.VideoOperations
 			Update();
 		}
 
-		public void DigitalFilters(TangraConfig.PreProcessingFilter preProcessingFilter)
-		{
-			m_PreProcessingFilter = preProcessingFilter;
-			m_UseDigitalFilter = true;
-
-			Update();
-		}
-
-		public void NoDigitalFilters()
-		{
-			if (!m_UseDigitalFilter) return;
-
-			m_UseDigitalFilter = false;
-
-			Update();
-		}
-
 		private Pixelmap m_CurrFrame = null;
 
 		internal void Update()
@@ -170,8 +150,7 @@ namespace Tangra.VideoOperations
 			if (m_UseIntegration ||
 			    m_UseClipping ||
 			    m_UseStretching ||
-			    m_UseBrightnessContrast ||
-			    m_UseDigitalFilter)
+			    m_UseBrightnessContrast)
 			{
 
 
@@ -193,11 +172,6 @@ namespace Tangra.VideoOperations
 				if (m_UseBrightnessContrast)
 				{
 					TangraCore.PreProcessors.AddBrightnessContrast(m_Brightness, m_Contrast);
-				}
-
-				if (m_UseDigitalFilter)
-				{
-					TangraCore.PreProcessors.AddDigitalFilter(m_PreProcessingFilter);
 				}
 
 				if (Math.Abs(TangraConfig.Settings.Photometry.EncodingGamma - 1) > 0.01)

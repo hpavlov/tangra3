@@ -625,5 +625,13 @@ namespace Tangra.Video
 				return m_VideoStream is AstroDigitalVideoStream && ((AstroDigitalVideoStream)m_VideoStream).Engine == "AAV";
 			}
 		}
+
+	    public bool AstroAnalogueVideoHasOcrData
+	    {
+	        get
+	        {
+                return IsAstroAnalogueVideo && ((AstroDigitalVideoStream)m_VideoStream).OcrDataAvailable;
+	        }
+	    }
 	}
 }

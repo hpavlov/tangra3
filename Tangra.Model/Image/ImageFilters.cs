@@ -103,9 +103,9 @@ namespace Tangra.Model.Image
             return Convolution.Conv3x3(b, LOW_PASS_FILTER_MATRIX);
         }
 
-		public static uint[,] LowPassFilter(uint[,] b, bool cutEdges)
+		public static uint[,] LowPassFilter(uint[,] b, int bpp, bool cutEdges)
         {
-			uint[,] data = Convolution.Conv3x3(b, LOW_PASS_FILTER_MATRIX);
+			uint[,] data = Convolution.Conv3x3(b, bpp, LOW_PASS_FILTER_MATRIX);
             if (cutEdges)
                 return CutArrayEdges(data);
             else
@@ -115,18 +115,18 @@ namespace Tangra.Model.Image
             }
         }
 
-        public static uint[,] LowPassDifferenceFilter(uint[,] b, bool cutEdges)
+		public static uint[,] LowPassDifferenceFilter(uint[,] b, int bpp, bool cutEdges)
         {
-            uint[,] data = LowPassDifferenceFilter(b);
+			uint[,] data = LowPassDifferenceFilter(b, bpp);
             if (cutEdges)
                 return CutArrayEdges(data);
             else
                 return data;
         }
 
-        public static uint[,] LowPassDifferenceFilter(uint[,] b)
+        public static uint[,] LowPassDifferenceFilter(uint[,] b, int bpp)
         {
-            uint[,] lowPassData = Convolution.Conv3x3(b, LOW_PASS_FILTER_MATRIX);
+			uint[,] lowPassData = Convolution.Conv3x3(b, bpp, LOW_PASS_FILTER_MATRIX);
             uint[,] lowPassDiffData = new uint[lowPassData.GetLength(0), lowPassData.GetLength(1)];
 
             int nWidth = lowPassData.GetLength(0);

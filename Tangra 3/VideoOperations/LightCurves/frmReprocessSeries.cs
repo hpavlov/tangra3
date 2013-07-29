@@ -224,6 +224,7 @@ namespace Tangra.VideoOperations.LightCurves
 				center,
 				data,
 				clonedValue.PixelData,
+				Context.BitPix,
 				measurer,
 				(TangraConfig.PreProcessingFilter)((int)Context.Filter),
 				false,

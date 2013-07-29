@@ -44,7 +44,7 @@ namespace Tangra.Model.Astro
         {
 
             if (useLPDFilter)
-                lpdData = ImageFilters.LowPassDifferenceFilter(data, false);
+                lpdData = ImageFilters.LowPassDifferenceFilter(data, bpp, false);
             else
                 lpdData = data;
 

@@ -44,7 +44,7 @@ namespace Tangra.Model.Controls
             tbxHours.Text = m_Utc.Hour.ToString();
             tbxMinutes.Text = m_Utc.Minute.ToString();
             tbxSeconds.Text = m_Utc.Second.ToString();
-            tbxMiliseconds.Text = m_Utc.Millisecond.ToString();
+            tbxMiliseconds.Text = m_Utc.Millisecond.ToString("000");
         }
 
         private void SetNewDateTime(TextBox senderTextbox)

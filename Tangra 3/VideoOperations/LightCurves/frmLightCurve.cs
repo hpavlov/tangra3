@@ -326,44 +326,56 @@ namespace Tangra.VideoOperations.LightCurves
             {
 				if (!hasEmbeddedTimeStamps)
 				{
-					double timeDelta = m_Header.GetAbsoluteTimeDeltaInMilliseconds();
-					string videoSystem;
-					double derivedFrameRate;
-					bool isTimeStampDerivedTimeMatchStandardFrameRate = m_Header.DoesTimeStampDerivedTimeMatchStandardFrameRate(out videoSystem, out derivedFrameRate);
+                    string videoSystem;
+                    double timeDelta = m_Header.GetAbsoluteTimeDeltaInMilliseconds(out videoSystem);
+
+					//string videoSystem;
+					//double derivedFrameRate;
+					//bool isTimeStampDerivedTimeMatchStandardFrameRate = m_Header.DoesTimeStampDerivedTimeMatchStandardFrameRate(out videoSystem, out derivedFrameRate);
 					m_TimestampDiscrepencyFlag = timeDelta > TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMs;
 
 					if (m_TimestampDiscrepencyFlag)
 					{
-						if (isTimeStampDerivedTimeMatchStandardFrameRate)
-						{
-							DialogResult result = MessageBox.Show(this,
-								string.Format(
-								"The time derived from the entered timestamps corresponds to the standard {0} system. \r\n\r\n" +
-								"However the frame rate recorded in the video file shows a discrepancy of {1} ms. " +
-								"It is possible that the video grabbing software or hardware used to save this video has reported a wrong frame rate. Do you want to ignore the discrepancy and consider the timestamp derived times to be correct?\r\n\r\n" +
-								"If you are unsure then choose 'Yes'.",
-								videoSystem, timeDelta.ToString("0.0")),
-								"Warning",
-								MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                        //if (isTimeStampDerivedTimeMatchStandardFrameRate)
+                        //{
+                        //    DialogResult result = MessageBox.Show(this,
+                        //        string.Format(
+                        //        "The time derived from the entered timestamps corresponds to the standard {0} system. \r\n\r\n" +
+                        //        "However the frame rate recorded in the video file shows a discrepancy of {1} ms. " +
+                        //        "It is possible that the video grabbing software or hardware used to save this video has reported a wrong frame rate. Do you want to ignore the discrepancy and consider the timestamp derived times to be correct?\r\n\r\n" +
+                        //        "If you are unsure then choose 'Yes'.",
+                        //        videoSystem, timeDelta.ToString("0.0")),
+                        //        "Warning",
+                        //        MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
 
-							if (result == DialogResult.Yes)
-							{
-								m_TimestampDiscrepencyFlag = false;
-							}
-							else
-								lblFrameTime.ForeColor = Color.Red;
-						}
-						else
+                        //    if (result == DialogResult.Yes)
+                        //    {
+                        //        m_TimestampDiscrepencyFlag = false;
+                        //    }
+                        //    else
+                        //        lblFrameTime.ForeColor = Color.Red;
+                        //}
+                        //else
+                        if (videoSystem == null)
 						{
-							MessageBox.Show(this,
-											string.Format(
-												"The time derived from entered frame times and the video frame rate gives an error higher than {0} ms with computed frame rate of {1} fps\r\n\r\nPlease use the timestamps on the corresponding video frames when timing events from this video."
-												, timeDelta.ToString("0.0"), derivedFrameRate.ToString("0.00000000")),
-											"Warning",
-											MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            MessageBox.Show(this,
+                                            "This video has an unusual frame rate.\r\n\r\nPlease use the timestamps on the corresponding video frames when timing events from this video.",
+                                            "Warning",
+                                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
 							lblFrameTime.ForeColor = Color.Red;
 						}
+                        else
+                        {
+                            MessageBox.Show(this,
+                                            string.Format(
+                                                "The time derived from entered frame times in this {1} video shows an error higher than {0} ms.\r\n\r\nPlease use the timestamps on the corresponding video frames when timing events from this video."
+                                                , timeDelta.ToString("0.0"), videoSystem),
+                                            "Warning",
+                                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+                            lblFrameTime.ForeColor = Color.Red;
+                        }
 					}
 					else
 					{

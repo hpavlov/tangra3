@@ -201,6 +201,7 @@
     <Compile Include="Helpers\ApplicationSettingsSerializer.cs" />
     <Compile Include="Helpers\DuplicateFrameAvoider.cs" />
     <Compile Include="Helpers\Extensions.cs" />
+    <Compile Include="Helpers\FITSHelper.cs" />
     <Compile Include="Helpers\NotificationManager.cs" />
     <Compile Include="Helpers\TangraEnvironment.cs" />
     <Compile Include="ImageTools\ArrowTool.cs" />
@@ -399,6 +400,7 @@
     </Compile>
     <Compile Include="Video\AstroDigitalVideo\Interfaces.cs" />
     <Compile Include="Video\AstroDigitalVideo\UI\AdvTagValuePair.cs" />
+    <Compile Include="Video\SingleFITSFileFrameStream.cs" />
     <Compile Include="Video\FramePlayer.cs" />
     <Compile Include="Video\frmJumpToFrame.cs">
       <SubType>Form</SubType>

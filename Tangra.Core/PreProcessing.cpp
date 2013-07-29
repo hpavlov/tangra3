@@ -219,11 +219,13 @@ long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height
 
 	if (s_PreProcessingFilter == ppfLowPassFilter)
 	{
-		// TODO: Apply low pass filter	
+		rv = PreProcessingLowPassFilter(pixels, width, height, bpp);
+		if (rv != S_OK) return rv;
 	}
 	else if (s_PreProcessingFilter == ppfLowPassDifferenceFilter)
 	{
-		// TODO: Apply low pass difference filter
+		rv = PreProcessingLowPassDifferenceFilter(pixels, width, height, bpp);
+		if (rv != S_OK) return rv;
 	}
 	
 	if (abs(g_EncodingGamma - 1.0f) > 0.01)
@@ -234,35 +236,3 @@ long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height
 
 	return rv;
 }
-
-/*
-bool Conv3x3(Pixelmap image, ConvMatrix m)
-{
-    // Avoid divide by zero errors
-    if (0 == m.Factor)
-        return false;
-
-	var result = new Pixelmap(image.Width, image.Height, image.BitPixCamera);
-
-	for (int y = 0; y < image.Height - 2; ++y)
-    {
-		for (int x = 0; x < image.Width - 2; ++x)
-        {
-            ulong nPixel = (ulong) Math.Round((((image[x, y] * m.TopLeft) +
-                                        (image[x + 1, y]*m.TopMid) +
-                                        (image[x + 2, y]*m.TopRight) +
-                                        (image[x, y + 1]*m.MidLeft) +
-                                        (image[x + 1, y + 1]*m.Pixel) +
-                                        (image[x + 2, y + 1]*m.MidRight) +
-                                        (image[x, y + 2]*m.BottomLeft) +
-                                        (image[x, y + 2]*m.BottomMid) +
-                                        (image[x, y + 2]*m.BottomRight))
-                                        /m.Factor) + m.Offset);
-
-            if (nPixel < 0) nPixel = 0;
-            if (nPixel > image.MaxPixelValue) nPixel = image.MaxPixelValue;
-            result[x + 1, y] = (uint) nPixel;
-        }
-    }
-}
-*/

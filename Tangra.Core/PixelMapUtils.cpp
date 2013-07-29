@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <cmath>
-
+#include <algorithm>
 
 void CopyPixelsInTriplets(BYTE* pDIB, BITMAPINFOHEADER bih, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
 {
@@ -581,7 +581,29 @@ struct ConvMatrix
     int Factor;
     int Offset;
 };
-	
+
+bool convMatrixConstantsInitialized = false;
+ConvMatrix LOW_PASS_FILTER_MATRIX;
+
+void EnsureConvMatrixConstantsInitialized()
+{
+	if (!convMatrixConstantsInitialized)
+	{
+		// http://www.echoview.com/WebHelp/Reference/Algorithms/Operators/Convolution_algorithms.htm
+		LOW_PASS_FILTER_MATRIX.TopLeft = 1/16.0f;
+		LOW_PASS_FILTER_MATRIX.TopMid = 1/8.0f;
+		LOW_PASS_FILTER_MATRIX.TopRight = 1/16.0f;
+		LOW_PASS_FILTER_MATRIX.MidLeft = 1/8.0f;
+		LOW_PASS_FILTER_MATRIX.Pixel = 1/4.0f;
+		LOW_PASS_FILTER_MATRIX.MidRight = 1/8.0f;		
+		LOW_PASS_FILTER_MATRIX.BottomLeft = 1/16.0f;
+		LOW_PASS_FILTER_MATRIX.BottomMid = 1/8.0f;
+		LOW_PASS_FILTER_MATRIX.BottomRight = 1/16.0f;
+		
+		convMatrixConstantsInitialized = true;
+	}
+}
+
 void Conv3x3(unsigned long* pixels, long width, long height, int bpp, ConvMatrix* m)
 {
 	// Avoid divide by zero errors
@@ -595,28 +617,156 @@ void Conv3x3(unsigned long* pixels, long width, long height, int bpp, ConvMatrix
 	{
 		for (int x = 0; x < width - 2; ++x)
 		{
-			unsigned long nPixel = (unsigned long)(
+			double dblPixel = (unsigned long)(
 			(
 				(
-					(*(pixels + x + y * width) * m->TopLeft) +
-					(*(pixels + (x + 1) + y * width) * m->TopMid) +
-					(*(pixels + (x + 2) + y * width) * m->TopRight) +
-					(*(pixels + x + (y + 1) * width) * m->MidLeft) +
-					(*(pixels + (x + 1) + (y + 1) * width) * m->Pixel) +
-					(*(pixels + (x + 2) + (y + 1) * width) * m->MidRight) +
-					(*(pixels + x + (y + 2) * width) * m->BottomLeft) +
-					(*(pixels + (x + 1) + (y + 2) * width) * m->BottomMid) +
-					(*(pixels + (x + 2) + (y + 2) * width) * m->BottomRight)
+					((double)*(pixels + x + y * width) * m->TopLeft) +
+					((double)*(pixels + (x + 1) + y * width) * m->TopMid) +
+					((double)*(pixels + (x + 2) + y * width) * m->TopRight) +
+					((double)*(pixels + x + (y + 1) * width) * m->MidLeft) +
+					((double)*(pixels + (x + 1) + (y + 1) * width) * m->Pixel) +
+					((double)*(pixels + (x + 2) + (y + 1) * width) * m->MidRight) +
+					((double)*(pixels + x + (y + 2) * width) * m->BottomLeft) +
+					((double)*(pixels + (x + 1) + (y + 2) * width) * m->BottomMid) +
+					((double)*(pixels + (x + 2) + (y + 2) * width) * m->BottomRight)
 				) / m->Factor
 			) + m->Offset
 			+ 0.5 /*rounded*/ );
 
-			if (nPixel < 0) nPixel = 0;
-			if (nPixel > maxValue) nPixel = maxValue;
-			if (nPixel < maxValue) nPixel = minValue;
+			if (dblPixel < 0) dblPixel = 0;
+			if (dblPixel > maxValue) dblPixel = maxValue;
+			if (dblPixel < minValue) dblPixel = minValue;
 			
-			*(pixels + (x + 1) + (y  + 1) * width) = nPixel;
+			*(pixels + (x + 1) + (y  + 1) * width) = (unsigned long)dblPixel;
 		}
 	}
+}
+
+DLL_PUBLIC HRESULT PreProcessingLowPassFilter(unsigned long* pixels, long width, long height, int bpp)
+{
+	Conv3x3(pixels, width, height, bpp, &LOW_PASS_FILTER_MATRIX);
+	
+	return S_OK;
+}
+
+// TODO: Use STL collection that supports sorting!!!
+unsigned long g_Median5x5ValuesBuffer[25];
+int g_IdxMedian5x5ValuesBuffer = 0;
+unsigned long* g_LowPassDataLPDBuffer = NULL;
+
+long g_LPDBufferWidth = -1;
+long g_LPDBufferHeight = -1;
+
+void InitializeLowPassDifferenceFilter(long width, long height)
+{
+	if (g_LPDBufferWidth != width ||	
+		g_LPDBufferHeight != height)
+	{
+		if (NULL != g_LowPassDataLPDBuffer)
+		{
+			delete g_LowPassDataLPDBuffer;
+			g_LowPassDataLPDBuffer = NULL;
+		}
+		
+		g_LowPassDataLPDBuffer = (unsigned long*)malloc(width * height * sizeof(unsigned long));	
+		
+		g_LPDBufferWidth = width;
+		g_LPDBufferHeight = height;		
+	}	
+}
+
+void AddValueForMedianComp(unsigned long val)
+{
+	g_Median5x5ValuesBuffer[g_IdxMedian5x5ValuesBuffer] = val;
+	g_IdxMedian5x5ValuesBuffer++;
+}
+
+void ClearMedian5x5ValuesBuffer()
+{
+	g_IdxMedian5x5ValuesBuffer = 0;
+}
+
+unsigned long GetMedianValueFromBuffer()
+{
+	unsigned long median = 0;
+	
+	std::sort(g_Median5x5ValuesBuffer, g_Median5x5ValuesBuffer + g_IdxMedian5x5ValuesBuffer + 1);
+	
+	int middleCal = (g_IdxMedian5x5ValuesBuffer + 1) / 2;
+	if ((g_IdxMedian5x5ValuesBuffer + 1) % 2 == 1)
+		median = g_Median5x5ValuesBuffer[middleCal];
+	else if (g_IdxMedian5x5ValuesBuffer > 1)
+		median = (unsigned long)(((float)g_Median5x5ValuesBuffer[middleCal] + (float)g_Median5x5ValuesBuffer[middleCal - 1]) / 2.0);
+	else if (g_IdxMedian5x5ValuesBuffer == 1)
+		median = g_Median5x5ValuesBuffer[0];
+	
+	return median;
+}
+
+DLL_PUBLIC HRESULT PreProcessingLowPassDifferenceFilter(unsigned long* pixels, long width, long height, int bpp)
+{
+	InitializeLowPassDifferenceFilter(width, height);
+	
+	unsigned long* lowPassData = g_LowPassDataLPDBuffer;
+	
+	memcpy(lowPassData, pixels, width * height * sizeof(unsigned long));
+	
+	Conv3x3(lowPassData, width, height, bpp, &LOW_PASS_FILTER_MATRIX);
+		
+	for (int y = 0; y < height; ++y)
+	{
+		for (int x = 0; x < width; ++x)
+		{
+			// The median 5x5 value is the median of all values in the 5x5 region around the point
+			ClearMedian5x5ValuesBuffer();
+
+			if (x - 2 >= 0)
+			{
+				if (y - 2 >= 0) AddValueForMedianComp(lowPassData[x - 2 + (y - 2)*width]);
+				if (y - 1 >= 0) AddValueForMedianComp(lowPassData[x - 2 + (y - 1)*width]);
+				AddValueForMedianComp(lowPassData[x - 2 + y*width]);
+				if (y + 1 < height) AddValueForMedianComp(lowPassData[x - 2 + (y + 1)*width]);
+				if (y + 2 < height) AddValueForMedianComp(lowPassData[x - 2 + (y + 2)*width]);
+			}
+
+			if (x - 1 >= 0)
+			{
+				if (y - 2 >= 0) AddValueForMedianComp(lowPassData[x - 1 + (y - 2)*width]);
+				if (y - 1 >= 0) AddValueForMedianComp(lowPassData[x - 1 + (y - 1)*width]);
+				AddValueForMedianComp(lowPassData[x - 1 + y*width]);
+				if (y + 1 < height) AddValueForMedianComp(lowPassData[x - 1 + (y + 1)*width]);
+				if (y + 2 < height) AddValueForMedianComp(lowPassData[x - 1 + (y + 2)*width]);
+			}
+
+			AddValueForMedianComp(lowPassData[x + y*width]);
+
+			if (x + 1 < width)
+			{
+				if (y - 2 >= 0) AddValueForMedianComp(lowPassData[x + 1 + (y - 2)*width]);
+				if (y - 1 >= 0) AddValueForMedianComp(lowPassData[x + 1 + (y - 1)*width]);
+				AddValueForMedianComp(lowPassData[x + 1 + y*width]);
+				if (y + 1 < height) AddValueForMedianComp(lowPassData[x + 1 + (y + 1)*width]);
+				if (y + 2 < height) AddValueForMedianComp(lowPassData[x + 1 + (y + 2)*width]);
+			}
+
+			if (x + 2 < width)
+			{
+				if (y - 2 >= 0) AddValueForMedianComp(lowPassData[x + 2 + (y - 2)*width]);
+				if (y - 1 >= 0) AddValueForMedianComp(lowPassData[x + 2 + (y - 1)*width]);
+				AddValueForMedianComp(lowPassData[x + 2 + y*width]);
+				if (y + 1 < height) AddValueForMedianComp(lowPassData[x + 2 + (y + 1)*width]);
+				if (y + 2 < height) AddValueForMedianComp(lowPassData[x + 2 + (y + 2)*width]);
+			}
+
+			unsigned long medianValue = GetMedianValueFromBuffer();
+
+			if (medianValue > lowPassData[x + y*width])
+				pixels[x + y*width] = 0;
+			else
+				pixels[x + y*width] = (unsigned long)(lowPassData[x + y*width] - medianValue);
+		}
+	}
+
+	return S_OK;
 }
 

@@ -22,6 +22,12 @@ namespace Tangra.Video
 		private int m_LastFrame;
 		private int m_NumFrames;
 
+		public static SingleBitmapFileFrameStream OpenFile(string fileName)
+		{
+			Bitmap bmp = (Bitmap)Image.FromFile(fileName);
+			return new SingleBitmapFileFrameStream(bmp);
+		}
+
 		public SingleBitmapFileFrameStream(Bitmap bitmap)
 		{
 			m_Pixelmap = Pixelmap.ConstructFromBitmap(bitmap, TangraConfig.ColourChannel.Red);

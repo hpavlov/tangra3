@@ -292,6 +292,13 @@ namespace Tangra.Video
             get { return engine; }
 		}
 
+        public string OcrEngine = null;
+
+        public bool OcrDataAvailable
+        {
+            get { return !string.IsNullOrEmpty(OcrEngine); }
+        }
+
 		private GeoLocationInfo geoLocation;
 
 		public GeoLocationInfo GeoLocation
@@ -330,8 +337,12 @@ namespace Tangra.Video
 
                 advFile.AdvFileTags.TryGetValue("GPS-HDOP", out geoLocation.GpsHdop);
             }
+            else if (engine == "AAV")
+            {
+                advFile.AdvFileTags.TryGetValue("OCR-ENGINE", out OcrEngine);
+            }
 
-	        this.geoLocation = new GeoLocationInfo(geoLocation);
+            this.geoLocation = new GeoLocationInfo(geoLocation);
 		}
 
 		private void CheckAdvFileFormatInternal(AdvFile advFile)

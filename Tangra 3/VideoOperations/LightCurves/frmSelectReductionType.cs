@@ -330,10 +330,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 		private void cbxDigitalFilter_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			if (cbxDigitalFilter.SelectedIndex == 0)
-				FrameAdjustmentsPreview.Instance.NoDigitalFilters();
-			else
-				FrameAdjustmentsPreview.Instance.DigitalFilters((TangraConfig.PreProcessingFilter)cbxDigitalFilter.SelectedIndex);
+			// NOTE: Nothing to do here. Digital filters are set when pressing OK and will be applied at measurement time only (i.e. they are not a pre-processing thing)
 		}
 
 		private void cbxDriftTrough_CheckedChanged(object sender, EventArgs e)

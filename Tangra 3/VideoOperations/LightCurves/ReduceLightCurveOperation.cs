@@ -977,7 +977,7 @@ namespace Tangra.VideoOperations.LightCurves
             }
 
             // This will also find the best PSFFit
-            measurer.Measure(9, 9, aperture, measurementFilter, matrix, double.NaN, ref matrixSize, false);
+			measurer.Measure(9, 9, aperture, measurementFilter, matrix, bitPixCamera, double.NaN, ref matrixSize, false);
 
             return measurer;
         }
@@ -1273,22 +1273,65 @@ namespace Tangra.VideoOperations.LightCurves
             //TODO: Fix the time computations when the entered times are not for the very first and very last frames
         }
 
-        public bool EnteredTimeIntervalLooksOkay(out double derivedFrameRate)
+        public DialogResult EnteredTimeIntervalLooksOkay()
         {
-            TimeSpan ts = new TimeSpan(m_EndFrameTime.Ticks - m_StartFrameTime.Ticks);
-            double videoTimeInSec = (m_EndTimeFrame - m_StartTimeFrame) / m_VideoController.VideoFrameRate;
-
-            derivedFrameRate = (m_EndTimeFrame - m_StartTimeFrame) / ts.TotalSeconds;
-
-            if (videoTimeInSec < 0 ||
-                (Math.Abs((videoTimeInSec - ts.TotalSeconds) * 1000) > TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMs &&
-                !(Math.Round(Math.Abs(derivedFrameRate - 25), 4) <= TangraConfig.Settings.Special.PalNtscFrameRateDifference) && !(Math.Round(Math.Abs(derivedFrameRate - 29.97), 4) <= TangraConfig.Settings.Special.PalNtscFrameRateDifference)))
+            if ((m_VideoController.VideoFrameRate < 24.0 && m_VideoController.VideoFrameRate > 26.0) ||
+                (m_VideoController.VideoFrameRate < 29.0 && m_VideoController.VideoFrameRate > 31.0))
             {
-                // A difference higher than what is considered okay and the derived framerate is not that of a PAL or NTSC system
-                return false;
+                MessageBox.Show(
+                    string.Format("This video has an unusual frame rate of {0}. Tangra cannot run internal checks for the correctness of the entered frame times.", m_VideoController.VideoFrameRate.ToString("0.00")),
+                    "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return DialogResult.Ignore;
             }
 
-            return true;
+            double acceptedVideoFrameRate = m_VideoController.VideoFrameRate > 24.0 && m_VideoController.VideoFrameRate < 26.0
+                                                ? 25.0 /* PAL */
+                                                : 29.97 /* NTSC */;
+            string videoType = m_VideoController.VideoFrameRate > 24.0 && m_VideoController.VideoFrameRate < 26.0
+                                   ? "PAL"
+                                   : "NTSC";
+
+            TimeSpan ts = new TimeSpan(m_EndFrameTime.Ticks - m_StartFrameTime.Ticks);
+            double videoTimeInSec = (m_EndTimeFrame - m_StartTimeFrame) / acceptedVideoFrameRate;
+
+            if (videoTimeInSec < 0 || Math.Abs((videoTimeInSec - ts.TotalSeconds) * 1000) > TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMs)
+            {
+                if (MessageBox.Show(
+                    string.Format("The time computed from the measured number of frames in this {1} video is off by more than {0} ms from the entered time. This may indicate " +
+                    "incorrectly entered start or end time or an almanac update or a leap second event. Do you want to enter the start and end times again?",
+                    (TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMs).ToString("0.00"),
+                    videoType),
+                    "Warning",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
+                {
+                    return DialogResult.Retry;
+                }
+
+                return DialogResult.Ignore;
+            }
+
+            double derivedFrameRate = (m_EndTimeFrame - m_StartTimeFrame) / ts.TotalSeconds;
+
+            // 1) compute 1 ms plus 1ms for each 30 sec up to the max of 4ms. e.g. if this is a PAL video and we have measured 780 frames, this makes 780 / 25fps (PAL) = 31.2 sec. So we take excess = 1 + 1 sec.
+            // 2) max allowed difference = 1.33 * Module[video frame rate - (video frame rate * num frames + excess) / num frames]
+            int allowedExcess = 1 + Math.Min(4, (int)((m_EndTimeFrame - m_StartTimeFrame) / acceptedVideoFrameRate) / 30);
+            double maxAllowedFRDiff = 1.33 * Math.Abs(acceptedVideoFrameRate - ((acceptedVideoFrameRate * (m_EndTimeFrame - m_StartTimeFrame) + allowedExcess) / (m_EndTimeFrame - m_StartTimeFrame)));
+
+            if (Math.Abs(derivedFrameRate - acceptedVideoFrameRate) > maxAllowedFRDiff)
+            {
+                if (MessageBox.Show(
+                    "Based on your entered frame times it appears that there may be dropped frames, incorrectly entered start " +
+                    "or end time, an almanac update or a leap second event. Do you want to enter the start and end times again?",
+                    "Warning",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
+                {
+                    return DialogResult.Retry;
+                }
+
+                return DialogResult.Ignore;
+            }
+
+            return DialogResult.OK;
         }
 
 		internal void EnterViewLightCurveMode(LCFile lcFile, IVideoController videoController, Panel controlPanel)
@@ -1330,12 +1373,20 @@ namespace Tangra.VideoOperations.LightCurves
         {
 			if (m_VideoController.HasAstroImageState)
 			{
-				FrameStateData frameState = m_VideoController.GetCurrentFrameState();
-				Trace.Assert(prevFrameId != frameState.VideoCameraFrameId || frameState.VideoCameraFrameId == 0 /* When VideoCameraFrameId is not supported */);
-				prevFrameId = frameState.VideoCameraFrameId;
+                if (m_VideoController.IsAstroDigitalVideo ||
+                    (m_VideoController.IsAstroAnalogueVideo && m_VideoController.AstroAnalogueVideoHasOcrData))
+                {
+                    FrameStateData frameState = m_VideoController.GetCurrentFrameState();
+                    Trace.Assert(prevFrameId != frameState.VideoCameraFrameId || frameState.VideoCameraFrameId == 0 /* When VideoCameraFrameId is not supported */);
+                    prevFrameId = frameState.VideoCameraFrameId;
 
-				int frameDuration = (int)Math.Round(frameState.ExposureInMilliseconds);
-				LCFile.SaveOnTheFlyFrameTiming(new LCFrameTiming(frameState.CentralExposureTime, frameDuration));
+                    int frameDuration = (int)Math.Round(frameState.ExposureInMilliseconds);
+                    LCFile.SaveOnTheFlyFrameTiming(new LCFrameTiming(frameState.CentralExposureTime, frameDuration));                    
+                }
+                else
+                {
+                    // Nothing to save
+                }
 			}
 			else if (m_TimestampOCR != null)
 			{
@@ -1408,8 +1459,9 @@ namespace Tangra.VideoOperations.LightCurves
 
 			MeasureObject(
 				center,
-				data,
+				data,				
 				backgroundPixels,
+				m_VideoController.VideoBitPix,
 				measurer,
 				filter,
 				synchronise,
@@ -1458,6 +1510,7 @@ namespace Tangra.VideoOperations.LightCurves
 			ImagePixel center,
 			uint[,] data,
 			uint[,] backgroundPixels,
+			int bpp,
 			MeasurementsHelper measurer,
 			TangraConfig.PreProcessingFilter filter,
 			bool synchronise,
@@ -1477,7 +1530,7 @@ namespace Tangra.VideoOperations.LightCurves
 					reductionMethod = TangraConfig.PhotometryReductionMethod.PsfPhotometryAnalytical;
 			}
 
-			measurer.MeasureObject(center, data, backgroundPixels, filter, synchronise, reductionMethod,
+			measurer.MeasureObject(center, data, backgroundPixels, bpp, filter, synchronise, reductionMethod,
 								   aperture, refinedFWHM, refinedAverageFWHM, measuredObject, fullDisappearance);
 	}
 
@@ -1496,10 +1549,11 @@ namespace Tangra.VideoOperations.LightCurves
 					apertures.Add(o.Aperture);
 					fixedFlags.Add(o.OriginalObject.IsWeakSignalObject);
 				}
-				);
+			);
 
 			MeasurementTimingType measurementTimingType = MeasurementTimingType.UserEnteredFrameReferences;
-			if (m_VideoController.IsAstroDigitalVideo)
+			if (m_VideoController.IsAstroDigitalVideo || 
+                (m_VideoController.IsAstroAnalogueVideo && m_VideoController.AstroAnalogueVideoHasOcrData))
 				measurementTimingType = MeasurementTimingType.EmbeddedTimeForEachFrame;
 			else if (m_TimestampOCR != null)
 				measurementTimingType = MeasurementTimingType.OCRedTimeForEachFrame;

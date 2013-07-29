@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Helpers;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
 using Tangra.Model.Image;
@@ -78,30 +79,27 @@ namespace Tangra.Controller
 				}
 				else if (extension == ".fit" || extension == ".fits")
 				{
-					Fits fitsFile = new Fits();
-
-					using (BufferedFile bf = new BufferedFile(fileName, FileAccess.Read, FileShare.ReadWrite))
-					{
-						fitsFile.Read(bf);
-
-						BasicHDU imageHDU = fitsFile.GetHDU(0);
-
-						if (
-							imageHDU.Axes.Count() != 2 ||
-							imageHDU.Axes[0] != TangraContext.Current.FrameHeight ||
-							imageHDU.Axes[1] != TangraContext.Current.FrameWidth ||
-							imageHDU.BitPix != 16)
+					return FITSHelper.Load16BitFitsFile(
+						fileName,
+						out pixels,
+						out medianValue,
+						delegate(BasicHDU imageHDU)
 						{
-							m_VideoController.ShowMessageBox("Selected image is not compatible with the currently loaded video.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
-							return false;
-						}
-						else
-						{
-							pixels = LoadImageData((Array)imageHDU.Data.DataArray, imageHDU.Axes[0], imageHDU.Axes[1], out medianValue);
+							if (
+								imageHDU.Axes.Count() != 2 ||
+								imageHDU.Axes[0] != TangraContext.Current.FrameHeight ||
+								imageHDU.Axes[1] != TangraContext.Current.FrameWidth ||
+								imageHDU.BitPix != 16)
+							{
+								m_VideoController.ShowMessageBox(
+									"Selected image is not compatible with the currently loaded video.", "Tangra",
+									MessageBoxButtons.OK, MessageBoxIcon.Error);
+								return false;
+							}
+
 							return true;
-						}
-
-					}					
+						});
+				
 				}
 				else
 				{
@@ -111,40 +109,6 @@ namespace Tangra.Controller
 			}
 
 			return false;
-		}
-
-		private uint[,] LoadImageData(Array dataArray, int height, int width, out uint medianValue)
-		{
-			var medianCalcList = new List<uint>();
-
-			uint[,] data = new uint[width, height];
-
-			for (int y = 0; y < height; y++)
-			{
-                short[] dataRow = (short[])dataArray.GetValue(y);
-
-				for (int x = 0; x < width; x++)
-				{
-					uint val = (uint) dataRow[x];
-
-					data[x, y] = val;
-					medianCalcList.Add(val);
-				}
-			}
-
-			if (medianCalcList.Count > 0)
-			{
-				medianCalcList.Sort();
-
-				if (medianCalcList.Count % 2 == 1)
-					medianValue = medianCalcList[medianCalcList.Count / 2];
-				else
-					medianValue = (medianCalcList[medianCalcList.Count / 2] + medianCalcList[1 + (medianCalcList.Count / 2)]) / 2;
-			}
-			else
-				medianValue = 0;
-
-			return data;
 		}
 
 		public void LoadDarkFrame()

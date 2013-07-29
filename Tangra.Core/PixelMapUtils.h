@@ -32,6 +32,9 @@ DLL_PUBLIC HRESULT PreProcessingApplyDarkFlatFrame(
 	unsigned long darkMedian, 
 	bool darkFrameAdjustLevelToMedian, 
 	unsigned long flatMedian);
+DLL_PUBLIC HRESULT PreProcessingLowPassFilter(unsigned long* pixels, long width, long height, int bpp);
+DLL_PUBLIC HRESULT PreProcessingLowPassDifferenceFilter(unsigned long* pixels, long width, long height, int bpp);
+
 
 #ifdef __cplusplus
 } // __cplusplus defined.

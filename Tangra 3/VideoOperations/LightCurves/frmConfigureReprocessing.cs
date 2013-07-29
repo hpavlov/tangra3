@@ -200,7 +200,7 @@ namespace Tangra.VideoOperations.LightCurves
                     int fitArea = (int)targetFitAreas[i].Value;
                     measurer.Measure(
                         reading.X0, reading.Y0,
-                        (float)targetApertures[i].Value, GetCurrentFilter(), reading.PixelData,
+                        (float)targetApertures[i].Value, GetCurrentFilter(), reading.PixelData, m_Context.BitPix,
 						updatedReading.PsfFit.I0, ref fitArea, m_Header.FixedApertureFlags[i]);
 
                     updatedReading.PsfFit = measurer.FoundBestPSFFit;

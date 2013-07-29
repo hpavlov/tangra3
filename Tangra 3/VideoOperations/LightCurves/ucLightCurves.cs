@@ -607,25 +607,19 @@ namespace Tangra.VideoOperations.LightCurves
 				m_StateMachine.VideoOperation.SetEndTime(ucUtcTime.DateTimeUtc);
 				m_LastTimeFrame = m_StateMachine.VideoOperation.m_CurrFrameNo;
 
-				double frameRate;
-				if (m_StateMachine.VideoOperation.EnteredTimeIntervalLooksOkay(out frameRate))
-					m_StateMachine.VideoOperation.ShowLightCurve();
-				else
-				{
-					if (m_VideoController.ShowMessageBox(
-						string.Format("According to the frame rate ({1}) of the video the entered time is off by more than {0} ms. This may indicate " +
-						"incorrectly entered start or end time. Do you want to enter the start and end times again?",
-						(TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMs).ToString("0.00"),
-						frameRate.ToString("0.00000000")),
-						"Warning",
-						MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
-					{
-						PrepareToEnterStarTime();
-						return;
-					}
-					else
-						m_StateMachine.VideoOperation.ShowLightCurve();
-				}
+                DialogResult checkResult = m_StateMachine.VideoOperation.EnteredTimeIntervalLooksOkay();
+
+                switch (checkResult)
+                {
+                    case DialogResult.OK:
+                    case DialogResult.Ignore:
+                        m_StateMachine.VideoOperation.ShowLightCurve();
+                        break;
+
+                    case DialogResult.Retry:
+                        PrepareToEnterStarTime();
+                        return;
+                }
 			}
 
 			UpdateShowingFieldControls();

@@ -86,7 +86,7 @@ namespace Tangra.Model.Image
             return true;
         }
 
-        public static uint[,] Conv3x3(uint[,] data, ConvMatrix m)
+        public static uint[,] Conv3x3(uint[,] data, int bpp, ConvMatrix m)
         {
             // Avoid divide by zero errors
             if (0 == m.Factor)
@@ -114,9 +114,14 @@ namespace Tangra.Model.Image
                                                 (data[x + 2, y + 2] * m.BottomRight))
                                                / m.Factor) + m.Offset);
 
-                    if (nPixel < 0) nPixel = 0;
-                    if (nPixel > 255) nPixel = 255;
-                    result[x + 1, y + 1] = (uint)nPixel;
+	                uint maxValue = Pixelmap.GetMaxValueForBitPix(bpp);
+
+                    if (nPixel < 0)
+						result[x + 1, y + 1] = 0;
+					else if (nPixel > maxValue)
+						result[x + 1, y + 1] = maxValue;
+					else
+						result[x + 1, y + 1] = (uint)nPixel;
                 }
             }
 
@@ -199,9 +204,9 @@ namespace Tangra.Model.Image
 			return Convolution.Conv3x3(b, LOW_PASS_FILTER_MATRIX);
 		}
 
-		public static uint[,] LowPassFilter(uint[,] b, bool cutEdges)
+		public static uint[,] LowPassFilter(uint[,] b, int bpp, bool cutEdges)
 		{
-			uint[,] data = Convolution.Conv3x3(b, LOW_PASS_FILTER_MATRIX);
+			uint[,] data = Convolution.Conv3x3(b, bpp, LOW_PASS_FILTER_MATRIX);
 			if (cutEdges)
 				return CutArrayEdges(data, 1);
 			else
@@ -211,14 +216,14 @@ namespace Tangra.Model.Image
 			}
 		}
 
-		public static uint[,] LowPassFilter(uint[,] b)
+		public static uint[,] LowPassFilter(uint[,] b, int bpp)
 		{
-			return Convolution.Conv3x3(b, LOW_PASS_FILTER_MATRIX);
+			return Convolution.Conv3x3(b, bpp, LOW_PASS_FILTER_MATRIX);
 		}
 
-		public static uint[,] LowPassDifferenceFilter(uint[,] b, bool cutEdges)
+		public static uint[,] LowPassDifferenceFilter(uint[,] b, int bpp, bool cutEdges)
 		{
-			uint[,] data = LowPassDifferenceFilter(b, cutEdges);
+			uint[,] data = LowPassDifferenceFilter(b, bpp, cutEdges);
 			if (cutEdges)
 				return CutArrayEdges(data, 1);
 			else
@@ -228,7 +233,7 @@ namespace Tangra.Model.Image
 		{
 			uint[,] pixels = GetPixelArray(image);
 
-			pixels = LowPassDifferenceFilter(pixels, false);
+			pixels = LowPassDifferenceFilter(pixels, image.BitPixCamera, false);
 
 			image.CopyPixelsFrom(pixels, image.BitPixCamera);
 

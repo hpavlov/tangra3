@@ -106,6 +106,9 @@ namespace Tangra.Model.Helpers
         /// <returns></returns>
         public static string ToStringValue(double value, string format)
         {
+            if (double.IsNaN(value))
+                return "NaN";
+
         	format = CheckSpecialFormat(format);
 
             int sign = Math.Sign(value);

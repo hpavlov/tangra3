@@ -79,6 +79,7 @@ namespace Tangra.Model.Video
 		bool IsRunning { get; }
 		bool IsAstroDigitalVideo { get; }
 		bool IsAstroAnalogueVideo { get; }
+        bool AstroAnalogueVideoHasOcrData { get; }
 		GeoLocationInfo GeoLocation { get; }
 		void Start(FramePlaySpeed mode, uint step);
 		void Stop();
