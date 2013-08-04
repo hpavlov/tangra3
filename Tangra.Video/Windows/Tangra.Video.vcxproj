@@ -78,6 +78,7 @@
     <LinkIncremental>false</LinkIncremental>
     <TargetName>TangraVideo</TargetName>
     <OutDir>$(ProjectDir)$(Configuration)\</OutDir>
+    <IncludePath>D:\Program Files\Microsoft SDKs\Windows\v6.0\Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>

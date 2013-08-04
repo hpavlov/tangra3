@@ -685,7 +685,7 @@ namespace Tangra.Controller
 				{
 					m_AdvStatusForm = new frmAdvStatusPopup(TangraConfig.Settings.ADVS);
 					m_AdvStatusForm.Show(m_MainFormView);
-					PositionAdvstatusForm();
+					PositionAdvStatusForm();
 					m_AdvStatusForm.ShowStatus(m_FrameState);
 				}
 				else if (!m_AdvStatusForm.Visible)
@@ -700,7 +700,7 @@ namespace Tangra.Controller
 						m_AdvStatusForm.Show(m_MainFormView);
 					}
 
-					PositionAdvstatusForm();
+					PositionAdvStatusForm();
 					m_AdvStatusForm.ShowStatus(m_FrameState);
 				}
 				else if (!forceShow)
@@ -709,7 +709,7 @@ namespace Tangra.Controller
 				}
 				else
 				{
-					PositionAdvstatusForm();
+					PositionAdvStatusForm();
 					m_AdvStatusForm.ShowStatus(m_FrameState);
 				}
 			}
@@ -736,7 +736,7 @@ namespace Tangra.Controller
 						m_AavStatusForm.Show(m_MainFormView);
 					}
 
-					PositionAdvstatusForm();
+					PositionAdvStatusForm();
 					m_AavStatusForm.ShowStatus(m_FrameState);
 				}
 				else if (!forceShow)
@@ -761,7 +761,7 @@ namespace Tangra.Controller
 			}			
 		}
 
-		private void PositionAdvstatusForm()
+		private void PositionAdvStatusForm()
 		{
 			if (m_AdvStatusForm != null &&
 				m_AdvStatusForm.Visible)
@@ -849,7 +849,8 @@ namespace Tangra.Controller
 
 		public void NotifyMainFormMoved()
 		{
-			PositionAdvstatusForm();
+			PositionAdvStatusForm();
+            PositionAavStatusForm();
 		    PositionTargetPSFViewerForm();
 		}
 

@@ -1,0 +1,43 @@
+/Latest Binaries
+
+/Install
+
+/docs
+
+/Deploy
+
+/_ReSharper.Tangra 3.Windows
+
+/ipch
+
+/Tangra 3.Windows.opensdf
+/Tangra 3.Windows.sdf
+
+/Tangra 3/bin
+/Tangra 3/Model
+/Tangra 3/obj
+
+/Tangra.Core/Release
+/Tangra.Core/.build-debug
+/Tangra.Core/.build-release
+/Tangra.Core/.clang
+/Tangra.Core/Debug
+
+/Tangra.Core/Tangra.Core.Win32_wsp.mk
+/Tangra.Core/TangraCore_Win32.mk
+/Tangra.Core/TangraCore_Win32.txt
+/Tangra.Core/Tangra.Core.Win32.tags
+/Tangra.Core/Tangra.Core.Win32.workspace.hristo
+/Tangra.Core/Tangra.Core.Win32.workspace.session
+
+/Tangra.Model/obj
+/Tangra.Model/bin
+
+/Tangra.Video/Windows/Tangra.Video.vcxproj.user
+/Tangra.Video/Windows/Debug
+/Tangra.Video/Windows/Release
+
+/Tangra 3.Windows.suo
+
+/CSharpFITS/obj
+/CSharpFITS/bin

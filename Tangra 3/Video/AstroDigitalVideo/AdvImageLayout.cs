@@ -72,13 +72,13 @@ namespace Tangra.Video.AstroDigitalVideo
 
 			string dataLayout = ImageSerializationProperties[AdvKeywords.KEY_DATA_LAYOUT];
 
-			Trace.Assert(dataLayout == DataLayouts.FULL_IMAGE_DIFFERENTIAL_CODING || dataLayout == DataLayouts.FULL_IMAGE_RAW);
+            Trace.Assert(dataLayout == DataLayouts.FULL_IMAGE_DIFFERENTIAL_CODING || dataLayout == DataLayouts.FULL_IMAGE_RAW || dataLayout == DataLayouts.FULL_IMAGE_DIFFERENTIAL_CODING_NOSIGNS);
 			if (dataLayout == DataLayouts.FULL_IMAGE_RAW)
 			{
 				m_IsRawDataLayout = true;
 				m_IsDiffCorrLayout = false;
 			}
-			if (dataLayout == DataLayouts.FULL_IMAGE_DIFFERENTIAL_CODING)
+            if (dataLayout == DataLayouts.FULL_IMAGE_DIFFERENTIAL_CODING || dataLayout == DataLayouts.FULL_IMAGE_DIFFERENTIAL_CODING_NOSIGNS)
 			{
 				m_IsRawDataLayout = false;
 				m_IsDiffCorrLayout = true;

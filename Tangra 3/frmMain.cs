@@ -754,5 +754,10 @@ namespace Tangra
 				Cursor = Cursors.Default;
 			}			
 		}
+
+        private void miShowFields_Click(object sender, EventArgs e)
+        {
+            m_VideoController.RedrawCurrentFrame(true);
+        }
 	}
 }

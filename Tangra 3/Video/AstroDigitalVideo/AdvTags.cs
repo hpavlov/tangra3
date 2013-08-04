@@ -36,6 +36,7 @@ namespace Tangra.Video.AstroDigitalVideo
 	{
 		public static string FULL_IMAGE_RAW = "FULL-IMAGE-RAW";
 		public static string FULL_IMAGE_DIFFERENTIAL_CODING = "FULL-IMAGE-DIFFERENTIAL-CODING";
+        public static string FULL_IMAGE_DIFFERENTIAL_CODING_NOSIGNS = "FULL-IMAGE-DIFFERENTIAL-CODING-NOSIGNS";
 	}
 
 	public static class AdvSectionTypes

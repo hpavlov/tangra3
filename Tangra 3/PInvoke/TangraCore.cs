@@ -61,6 +61,7 @@ namespace Tangra.PInvoke
 
 		public AdvFrameInfoNative()
 		{
+#if DEBUG
 			MidFrameTimeStampMillisecondsLo = 675;
 			MidFrameTimeStampMillisecondsHi = 987;
 			Exposure10thMs = 1234;
@@ -73,7 +74,21 @@ namespace Tangra.PInvoke
 			GPSTrackedSattelites = 17;
 			GPSAlmanacStatus = 18;
 			GPSFixStatus = 19;
-		}
+#else
+			MidFrameTimeStampMillisecondsLo = 0;
+			MidFrameTimeStampMillisecondsHi = 0;
+			Exposure10thMs = 0;
+			Gamma = 0f;
+			Gain = 0f;
+			Shutter = 0f;
+			Offset = 0f;
+			SystemTimeLo = 0;
+			SystemTimeHi = 0;
+			GPSTrackedSattelites = 0;
+			GPSAlmanacStatus = 0;
+			GPSFixStatus = 0;
+#endif
+        }
 
 		[FieldOffset(0)]
 		public uint MidFrameTimeStampMillisecondsLo;

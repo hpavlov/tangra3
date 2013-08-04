@@ -30,6 +30,9 @@ namespace Tangra.Video.AstroDigitalVideo
 
 			m_FileName = fileName;
 			m_AdvFile = AdvFile.OpenFile(fileName);
+
+            // Tools page is not ready yet
+		    tabControl.TabPages.Remove(tabTools);
 		}
 
 		private void frmAdvViewer_Load(object sender, EventArgs e)

@@ -53,12 +53,12 @@
             this.tsProgessBar = new System.Windows.Forms.ToolStripProgressBar();
             this.ssStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.ssToolInfo = new System.Windows.Forms.ToolStripStatusLabel();
-            this.ssPreProcessing = new System.Windows.Forms.ToolStripStatusLabel();
             this.ssSoftwareIntegration = new System.Windows.Forms.ToolStripStatusLabel();
             this.ssFrameNo = new System.Windows.Forms.ToolStripStatusLabel();
             this.ssFPS = new System.Windows.Forms.ToolStripStatusLabel();
             this.tslblRecDbg = new System.Windows.Forms.ToolStripStatusLabel();
             this.ssRenderingEngine = new System.Windows.Forms.ToolStripStatusLabel();
+            this.ssPreProcessing = new System.Windows.Forms.ToolStripStatusLabel();
             this.tsbtnIntensify = new System.Windows.Forms.ToolStripSplitButton();
             this.tsmiInverted = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
@@ -88,6 +88,8 @@
             this.displayFrameTimer = new System.Windows.Forms.Timer(this.components);
             this.openAdvFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.saveFrameDialog = new System.Windows.Forms.SaveFileDialog();
+            this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
+            this.miShowFields = new System.Windows.Forms.ToolStripMenuItem();
             this.mainMenu.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.panelRight.SuspendLayout();
@@ -174,7 +176,9 @@
             this.miFrameActions.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.miExportToFits,
             this.miExportToBMP,
-            this.miExportToCSV});
+            this.miExportToCSV,
+            this.toolStripMenuItem4,
+            this.miShowFields});
             this.miFrameActions.Name = "miFrameActions";
             this.miFrameActions.Size = new System.Drawing.Size(87, 20);
             this.miFrameActions.Text = "Frame Actions";
@@ -387,15 +391,6 @@
             this.ssToolInfo.Size = new System.Drawing.Size(4, 19);
             this.ssToolInfo.Visible = false;
             // 
-            // ssPreProcessing
-            // 
-            this.ssPreProcessing.BackColor = System.Drawing.Color.DarkSeaGreen;
-            this.ssPreProcessing.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top)
-                        | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right)
-                        | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
-            this.ssPreProcessing.Name = "ssPreProcessing";
-            this.ssPreProcessing.Size = new System.Drawing.Size(4, 19);
-            // 
             // ssSoftwareIntegration
             // 
             this.ssSoftwareIntegration.BackColor = System.Drawing.Color.DarkSeaGreen;
@@ -448,6 +443,15 @@
             this.ssRenderingEngine.Size = new System.Drawing.Size(54, 19);
             this.ssRenderingEngine.Text = "AviSynth";
             this.ssRenderingEngine.Visible = false;
+            // 
+            // ssPreProcessing
+            // 
+            this.ssPreProcessing.BackColor = System.Drawing.Color.DarkSeaGreen;
+            this.ssPreProcessing.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top)
+                        | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right)
+                        | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
+            this.ssPreProcessing.Name = "ssPreProcessing";
+            this.ssPreProcessing.Size = new System.Drawing.Size(4, 19);
             // 
             // tsbtnIntensify
             // 
@@ -729,6 +733,18 @@
             this.openAdvFileDialog.Filter = "Astro Digital or Analogue Video (*.adv;*.aav)|*.adv;*.aav";
             this.openAdvFileDialog.Title = "Open ADV/AAV file";
             // 
+            // toolStripMenuItem4
+            // 
+            this.toolStripMenuItem4.Name = "toolStripMenuItem4";
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(152, 6);
+            // 
+            // miShowFields
+            // 
+            this.miShowFields.Name = "miShowFields";
+            this.miShowFields.Size = new System.Drawing.Size(155, 22);
+            this.miShowFields.Text = "Show Fie&lds";
+            this.miShowFields.Click += new System.EventHandler(this.miShowFields_Click);
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -835,6 +851,8 @@
 		protected internal System.Windows.Forms.ToolStripMenuItem miMakeDarkFlat;
 		protected internal System.Windows.Forms.ToolStripMenuItem miLoadDark;
 		protected internal System.Windows.Forms.ToolStripMenuItem miLoadFlat;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem4;
+        private System.Windows.Forms.ToolStripMenuItem miShowFields;
 	}
 }
 
