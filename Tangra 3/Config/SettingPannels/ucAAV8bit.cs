@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Data;
 using System.Linq;
@@ -40,7 +41,6 @@ namespace Tangra.Config.SettingPannels
 
 			cbxAdvsPopupTimeStamp.Checked = TangraConfig.Settings.AAV.PopupTimestamp;
             cbxAdvsPopupExposure.Checked = TangraConfig.Settings.AAV.PopupExposure;
-			cbxAdvsPopupVideoCameraFrameId.Checked = TangraConfig.Settings.AAV.PopupVideoCameraFrameId;
 			cbxAdvsPopupSystemTime.Checked = TangraConfig.Settings.AAV.PopupSystemTime;
 			cbxAdvsPopupSatellites.Checked = TangraConfig.Settings.AAV.PopupSatellites;
 			cbxAdvsPopupGPSFix.Checked = TangraConfig.Settings.AAV.PopupGPSFix;
@@ -56,7 +56,6 @@ namespace Tangra.Config.SettingPannels
 
 			TangraConfig.Settings.AAV.PopupTimestamp = cbxAdvsPopupTimeStamp.Checked;
             TangraConfig.Settings.AAV.PopupExposure = cbxAdvsPopupExposure.Checked;
-        	TangraConfig.Settings.AAV.PopupVideoCameraFrameId = cbxAdvsPopupVideoCameraFrameId.Checked;
             TangraConfig.Settings.AAV.PopupSystemTime = cbxAdvsPopupSystemTime.Checked;
 			TangraConfig.Settings.AAV.PopupSatellites = cbxAdvsPopupSatellites.Checked;
 			TangraConfig.Settings.AAV.PopupGPSFix = cbxAdvsPopupGPSFix.Checked;
@@ -75,7 +74,6 @@ namespace Tangra.Config.SettingPannels
 			{
 				PopupTimestamp = cbxAdvsPopupTimeStamp.Checked,
 				PopupExposure = cbxAdvsPopupExposure.Checked,
-				PopupVideoCameraFrameId = cbxAdvsPopupVideoCameraFrameId.Checked,
 				PopupSystemTime = cbxAdvsPopupSystemTime.Checked,
 				PopupSatellites = cbxAdvsPopupSatellites.Checked,
 				PopupGPSFix = cbxAdvsPopupGPSFix.Checked,
@@ -102,6 +100,11 @@ namespace Tangra.Config.SettingPannels
 				m_AavPopupCustomizer.UpdateSettings(BuildCurrentSettings());
 				m_AavPopupCustomizer.RefreshState();
 			}			
+		}
+
+		private void linkLabelAAV_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+		{
+			Process.Start("http://www.hristopavlov.net/OccuRec");
 		}
 	}
 }

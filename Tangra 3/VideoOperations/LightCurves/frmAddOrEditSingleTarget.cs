@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using Tangra.Controller;
+using Tangra.Helpers;
 using Tangra.Model.Astro;
 using Tangra.Model.Config;
 using Tangra.Model.Image;
@@ -71,14 +72,14 @@ namespace Tangra.VideoOperations.LightCurves
             ObjectToAdd = selectedObject;
 
 			if (selectedObject.TrackingType != TrackingType.ComparisonStar)
-                nudFitMatrixSize.Value = selectedObject.PsfFitMatrixSize;
+				nudFitMatrixSize.SetNUDValue(selectedObject.PsfFitMatrixSize);
 
             m_Center = new ImagePixel(
                 selectedObject.OriginalFieldCenterX,
                 selectedObject.OriginalFieldCenterY);
 
             if (ObjectToAdd.PositionTolerance > 0)
-                nudPositionTolerance.Value = (decimal)ObjectToAdd.PositionTolerance;
+                nudPositionTolerance.SetNUDValue((decimal)ObjectToAdd.PositionTolerance);
 
             Initialize();
 
@@ -98,7 +99,7 @@ namespace Tangra.VideoOperations.LightCurves
 
                 PlotSingleTargetPixels();
 
-                nudAperture1.Value = (decimal)Math.Round(ObjectToAdd.ApertureInPixels, 2);
+                nudAperture1.SetNUDValue((decimal)Math.Round(ObjectToAdd.ApertureInPixels, 2));
             }
 
 			SetHeightAndType();
@@ -288,7 +289,7 @@ namespace Tangra.VideoOperations.LightCurves
                     m_FWHM = 6;
                     m_Gaussian = null;
 
-                    nudFitMatrixSize.Value = 11;
+					nudFitMatrixSize.SetNUDValue(11);
                 }
                 else if (m_AutoStarsInArea.Count == 1)
                 {
@@ -313,7 +314,7 @@ namespace Tangra.VideoOperations.LightCurves
                                 m_FWHM = 6;
                                 m_Gaussian = null;
 
-                                nudFitMatrixSize.Value = 11;
+								nudFitMatrixSize.SetNUDValue(11);
                             }
                             else
                             {
@@ -330,7 +331,7 @@ namespace Tangra.VideoOperations.LightCurves
                                     m_Gaussian = null;
                                 }
                                 m_ProcessingPixels = measurement.PixelData;
-                                nudFitMatrixSize.Value = matirxSize;
+								nudFitMatrixSize.SetNUDValue(matirxSize);
                             }
                         }
                         else
@@ -387,7 +388,7 @@ namespace Tangra.VideoOperations.LightCurves
                     m_FWHM = (float)closestFit.FWHM;
                     m_Gaussian = closestFit;
 
-                    nudFitMatrixSize.Value = m_IsEdit ? ObjectToAdd.PsfFitMatrixSize : closestFit.MatrixSize;
+					nudFitMatrixSize.SetNUDValue(m_IsEdit ? ObjectToAdd.PsfFitMatrixSize : closestFit.MatrixSize);
                 }
 
                 decimal appVal = (decimal)m_Aperture;
@@ -398,7 +399,7 @@ namespace Tangra.VideoOperations.LightCurves
                 else
                     appVal = (decimal)preselectedAperture;
 
-                nudAperture1.Value = Math.Round(appVal, 2);
+				nudAperture1.SetNUDValue(Math.Round(appVal, 2));
 
                 PlotSingleTargetPixels();
 
@@ -675,7 +676,7 @@ namespace Tangra.VideoOperations.LightCurves
                 nudFitMatrixSize.ValueChanged -= nudFitMatrixSize_ValueChanged;
                 try
                 {
-                    nudFitMatrixSize.Value = m_MatrixSize;
+					nudFitMatrixSize.SetNUDValue(m_MatrixSize);
                 }
                 finally
                 {
@@ -792,7 +793,7 @@ namespace Tangra.VideoOperations.LightCurves
                 nudFitMatrixSize.ValueChanged -= nudFitMatrixSize_ValueChanged;
                 try
                 {
-                    nudFitMatrixSize.Value = newStar.MatrixSize;
+					nudFitMatrixSize.SetNUDValue(newStar.MatrixSize);
                 }
                 finally
                 {
@@ -916,7 +917,7 @@ namespace Tangra.VideoOperations.LightCurves
 						if (tolerance < TangraConfig.Settings.Special.ToleranceMinValue) tolerance = TangraConfig.Settings.Special.ToleranceMinValue;
 					}
 					if (tolerance > TangraConfig.Settings.Special.ToleranceMaxValue) tolerance = TangraConfig.Settings.Special.ToleranceMaxValue;
-					nudPositionTolerance.Value = (decimal)tolerance;
+					nudPositionTolerance.SetNUDValue((decimal)tolerance);
 				}
 			}
 

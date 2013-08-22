@@ -19,7 +19,9 @@ namespace Tangra.Video.AstroDigitalVideo
 
         public uint NumberOfFrames { get { return (uint)m_Index.Count; } }
 
-        public IList<AdvFramesIndexEntry> Index
+		public long TableOffset { get; private set; }
+
+	    public IList<AdvFramesIndexEntry> Index
         {
             get { return m_Index; }
         }
@@ -39,6 +41,8 @@ namespace Tangra.Video.AstroDigitalVideo
 
         public AdvFramesIndex(BinaryReader reader)
         {
+	        TableOffset = reader.BaseStream.Position;
+
             uint count = reader.ReadUInt32();
 
             for (int i = 0; i < count; i++)

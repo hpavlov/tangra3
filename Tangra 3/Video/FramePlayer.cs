@@ -104,41 +104,44 @@ namespace Tangra.Video
 		/// <summary>Start the video playback</summary>
 		public void Start(FramePlaySpeed mode, uint step)
 		{
-			m_Step = step;
-			m_IsRunning = true;
-
-			int bufferSize = m_VideoStream.RecommendedBufferSize;
-
-			if (mode == FramePlaySpeed.Fastest)
-				m_MillisecondsPerFrame = 0;
-			else if (mode == FramePlaySpeed.Slower)
-				m_MillisecondsPerFrame = m_MillisecondsPerFrame * 2;
-
-			if (bufferSize < 2)
+			if (m_VideoStream != null)
 			{
-                if (m_FrameIntegration == FrameIntegratingMode.SteppedAverage)
-			        throw new NotSupportedException("Buffer size must be larger than 2 for stepped averaging software integration to work properly");
-                else
-				    m_PlayerThread = new Thread(new ThreadStart(Run));
-			}
-			else
-			{
-				m_PlayerThread = new Thread(new ThreadStart(RunBufferred));
-				m_PlayerThread.IsBackground = true;
-				m_PlayerThread.SetApartmentState(ApartmentState.MTA);
+				m_Step = step;
+				m_IsRunning = true;
 
-				m_BufferNextFrameThread = new Thread(new ParameterizedThreadStart(BufferNextFrame));
-				m_BufferNextFrameThread.IsBackground = true;
-				m_BufferNextFrameThread.SetApartmentState(ApartmentState.MTA);
+				int bufferSize = m_VideoStream.RecommendedBufferSize;
 
-				m_BufferNextFrameThread.Start(new FrameBufferContext()
+				if (mode == FramePlaySpeed.Fastest)
+					m_MillisecondsPerFrame = 0;
+				else if (mode == FramePlaySpeed.Slower)
+					m_MillisecondsPerFrame = m_MillisecondsPerFrame * 2;
+
+				if (bufferSize < 2)
 				{
-					BufferSize = bufferSize,
-					FirstFrameNo = m_CurrentFrameIndex
-				});
-			}
+					if (m_FrameIntegration == FrameIntegratingMode.SteppedAverage)
+						throw new NotSupportedException("Buffer size must be larger than 2 for stepped averaging software integration to work properly");
+					else
+						m_PlayerThread = new Thread(new ThreadStart(Run));
+				}
+				else
+				{
+					m_PlayerThread = new Thread(new ThreadStart(RunBufferred));
+					m_PlayerThread.IsBackground = true;
+					m_PlayerThread.SetApartmentState(ApartmentState.MTA);
 
-			m_PlayerThread.Start();
+					m_BufferNextFrameThread = new Thread(new ParameterizedThreadStart(BufferNextFrame));
+					m_BufferNextFrameThread.IsBackground = true;
+					m_BufferNextFrameThread.SetApartmentState(ApartmentState.MTA);
+
+					m_BufferNextFrameThread.Start(new FrameBufferContext()
+					{
+						BufferSize = bufferSize,
+						FirstFrameNo = m_CurrentFrameIndex
+					});
+				}
+
+				m_PlayerThread.Start();
+			}
 		}
 
 		internal class FrameBufferContext
@@ -158,46 +161,52 @@ namespace Tangra.Video
 
 		public void StepForward()
 		{
-			m_CurrentFrameIndex++;
-			if (m_CurrentFrameIndex >= m_VideoStream.LastFrame) m_CurrentFrameIndex = m_VideoStream.LastFrame;
+			if (m_VideoStream != null)
+			{
+				m_CurrentFrameIndex++;
+				if (m_CurrentFrameIndex >= m_VideoStream.LastFrame) m_CurrentFrameIndex = m_VideoStream.LastFrame;
 
-			DisplayCurrentFrame(MovementType.Step);
+				DisplayCurrentFrame(MovementType.Step);
+			}
 		}
 
 		public void StepForward(int secondsForward)
 		{
-			AstroDigitalVideoStream advStream = m_VideoStream as AstroDigitalVideoStream;
-			if (advStream != null)
+			if (m_VideoStream != null)
 			{
-				AdvFrameInfo currStatusChannel = advStream.GetStatusChannel(m_CurrentFrameIndex);
-				if (currStatusChannel.HasTimeStamp)
+				var advStream = m_VideoStream as AstroDigitalVideoStream;
+				if (advStream != null)
 				{
-					int targetFrame = m_CurrentFrameIndex + 1;
-
-					while (targetFrame <= m_VideoStream.LastFrame)
+					AdvFrameInfo currStatusChannel = advStream.GetStatusChannel(m_CurrentFrameIndex);
+					if (currStatusChannel.HasTimeStamp)
 					{
-						AdvFrameInfo statusChannel = advStream.GetStatusChannel(targetFrame);
-						if (statusChannel.HasTimeStamp)
-						{
-							TimeSpan ts =
-								new TimeSpan(statusChannel.MiddleExposureTimeStamp.Ticks - currStatusChannel.MiddleExposureTimeStamp.Ticks);
-							if (ts.TotalSeconds >= secondsForward)
-							{
-								m_CurrentFrameIndex = targetFrame;
-								break;
-							}
-						}
-						targetFrame++;
-					}					
-				}
-			}
-			else
-			{
-				m_CurrentFrameIndex += (int)Math.Round(secondsForward * m_VideoStream.FrameRate);				
-			}
+						int targetFrame = m_CurrentFrameIndex + 1;
 
-			if (m_CurrentFrameIndex >= m_VideoStream.LastFrame) m_CurrentFrameIndex = m_VideoStream.LastFrame;
-			DisplayCurrentFrame(MovementType.Jump);
+						while (targetFrame <= m_VideoStream.LastFrame)
+						{
+							AdvFrameInfo statusChannel = advStream.GetStatusChannel(targetFrame);
+							if (statusChannel.HasTimeStamp)
+							{
+								TimeSpan ts =
+									new TimeSpan(statusChannel.MiddleExposureTimeStamp.Ticks - currStatusChannel.MiddleExposureTimeStamp.Ticks);
+								if (ts.TotalSeconds >= secondsForward)
+								{
+									m_CurrentFrameIndex = targetFrame;
+									break;
+								}
+							}
+							targetFrame++;
+						}
+					}
+				}
+				else
+				{
+					m_CurrentFrameIndex += (int) Math.Round(secondsForward*m_VideoStream.FrameRate);
+				}
+
+				if (m_CurrentFrameIndex >= m_VideoStream.LastFrame) m_CurrentFrameIndex = m_VideoStream.LastFrame;
+				DisplayCurrentFrame(MovementType.Jump);
+			}
 		}
 
 		public void RefreshCurrentFrame()
@@ -208,29 +217,38 @@ namespace Tangra.Video
         public void MoveToFrame(int frameId)
 		{
 			m_CurrentFrameIndex = frameId;
-			if (m_CurrentFrameIndex >= m_VideoStream.LastFrame) m_CurrentFrameIndex = m_VideoStream.LastFrame;
-			if (m_CurrentFrameIndex < m_VideoStream.FirstFrame) m_CurrentFrameIndex = m_VideoStream.FirstFrame;
 
-            DisplayCurrentFrame(MovementType.Jump);
+			if (m_VideoStream != null)
+			{
+				if (m_CurrentFrameIndex >= m_VideoStream.LastFrame) m_CurrentFrameIndex = m_VideoStream.LastFrame;
+				if (m_CurrentFrameIndex < m_VideoStream.FirstFrame) m_CurrentFrameIndex = m_VideoStream.FirstFrame;
+
+				DisplayCurrentFrame(MovementType.Jump);				
+			}
 		}
 
 		public Pixelmap GetFrame(int frameNo, bool noIntegrate)
 		{
-			if (frameNo >= m_VideoStream.LastFrame) frameNo = m_VideoStream.LastFrame;
-			if (frameNo < m_VideoStream.FirstFrame) frameNo = m_VideoStream.FirstFrame;
-
 			Pixelmap currentBitmap = null;
 
-			try
+			if (m_VideoStream != null)
 			{
-				if (noIntegrate)
-					currentBitmap = m_VideoStream.GetPixelmap(frameNo);
-				else
-					currentBitmap = m_VideoStream.GetIntegratedFrame(frameNo, m_FramesToIntegrate, m_FrameIntegration == FrameIntegratingMode.SlidingAverage, m_PixelIntegrationMode == PixelIntegrationType.Median);
-			}
-			catch (Exception ex)
-			{
-				Trace.WriteLine(ex.ToString());
+				if (frameNo >= m_VideoStream.LastFrame) frameNo = m_VideoStream.LastFrame;
+				if (frameNo < m_VideoStream.FirstFrame) frameNo = m_VideoStream.FirstFrame;
+
+				try
+				{
+					if (noIntegrate)
+						currentBitmap = m_VideoStream.GetPixelmap(frameNo);
+					else
+						currentBitmap = m_VideoStream.GetIntegratedFrame(frameNo, m_FramesToIntegrate,
+						                                                 m_FrameIntegration == FrameIntegratingMode.SlidingAverage,
+						                                                 m_PixelIntegrationMode == PixelIntegrationType.Median);
+				}
+				catch (Exception ex)
+				{
+					Trace.WriteLine(ex.ToString());
+				}
 			}
 
 			return currentBitmap;
@@ -238,52 +256,61 @@ namespace Tangra.Video
 
         public Pixelmap GetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging)
         {
-            return m_VideoStream.GetIntegratedFrame(startFrameNo, framesToIntegrate, isSlidingIntegration, isMedianAveraging);
+			return m_VideoStream != null
+				? m_VideoStream.GetIntegratedFrame(startFrameNo, framesToIntegrate, isSlidingIntegration, isMedianAveraging)
+				: null;
         }
 
 	    public void StepBackward()
 		{
-			m_CurrentFrameIndex--;
-			if (m_CurrentFrameIndex < m_VideoStream.FirstFrame) m_CurrentFrameIndex = m_VideoStream.FirstFrame;
+			if (m_VideoStream != null)
+			{
+				m_CurrentFrameIndex--;
 
-			DisplayCurrentFrame(MovementType.StepBackwards);
+				if (m_CurrentFrameIndex < m_VideoStream.FirstFrame) m_CurrentFrameIndex = m_VideoStream.FirstFrame;
+
+				DisplayCurrentFrame(MovementType.StepBackwards);				
+			}
 		}
 
 		public void StepBackward(int secondsBackward)
 		{
-			AstroDigitalVideoStream advStream = m_VideoStream as AstroDigitalVideoStream;
-			if (advStream != null)
+			if (m_VideoStream != null)
 			{
-				AdvFrameInfo currStatusChannel = advStream.GetStatusChannel(m_CurrentFrameIndex);
-				if (currStatusChannel.HasTimeStamp)
+				AstroDigitalVideoStream advStream = m_VideoStream as AstroDigitalVideoStream;
+				if (advStream != null)
 				{
-					int targetFrame = m_CurrentFrameIndex - 1;
-
-					while (targetFrame >= m_VideoStream.FirstFrame)
+					AdvFrameInfo currStatusChannel = advStream.GetStatusChannel(m_CurrentFrameIndex);
+					if (currStatusChannel.HasTimeStamp)
 					{
-						AdvFrameInfo statusChannel = advStream.GetStatusChannel(targetFrame);
-						if (statusChannel.HasTimeStamp)
+						int targetFrame = m_CurrentFrameIndex - 1;
+
+						while (targetFrame >= m_VideoStream.FirstFrame)
 						{
-							TimeSpan ts =
-								new TimeSpan(currStatusChannel.MiddleExposureTimeStamp.Ticks - statusChannel.MiddleExposureTimeStamp.Ticks);
-							if (ts.TotalSeconds >= secondsBackward)
+							AdvFrameInfo statusChannel = advStream.GetStatusChannel(targetFrame);
+							if (statusChannel.HasTimeStamp)
 							{
-								m_CurrentFrameIndex = targetFrame;
-								break;
+								TimeSpan ts =
+									new TimeSpan(currStatusChannel.MiddleExposureTimeStamp.Ticks - statusChannel.MiddleExposureTimeStamp.Ticks);
+								if (ts.TotalSeconds >= secondsBackward)
+								{
+									m_CurrentFrameIndex = targetFrame;
+									break;
+								}
 							}
+							targetFrame--;
 						}
-						targetFrame--;
 					}
 				}
+				else
+				{
+					m_CurrentFrameIndex -= (int)Math.Round(secondsBackward * m_VideoStream.FrameRate);
+				}
+
+				if (m_CurrentFrameIndex < m_VideoStream.FirstFrame) m_CurrentFrameIndex = m_VideoStream.FirstFrame;
+
+				DisplayCurrentFrame(MovementType.Jump);				
 			}
-			else
-			{
-				m_CurrentFrameIndex -= (int)Math.Round(secondsBackward * m_VideoStream.FrameRate);
-			}			
-
-			if (m_CurrentFrameIndex < m_VideoStream.FirstFrame) m_CurrentFrameIndex = m_VideoStream.FirstFrame;
-
-			DisplayCurrentFrame(MovementType.Jump);
 		}
 
 		private void DisplayCurrentFrame(MovementType movementType)
@@ -323,10 +350,13 @@ namespace Tangra.Video
 
 		private void DisplayCurrentFrameInternal(MovementType movementType, Pixelmap currentPixelmap)
 		{
-			if (m_CurrentFrameIndex >= m_VideoStream.FirstFrame &&
-				m_CurrentFrameIndex <= m_VideoStream.LastFrame)
+			if (m_VideoStream != null)
 			{
-                m_FrameRenderer.RenderFrame(m_CurrentFrameIndex, currentPixelmap, movementType, false, 0, m_CurrentFrameIndex);			
+				if (m_CurrentFrameIndex >= m_VideoStream.FirstFrame &&
+				    m_CurrentFrameIndex <= m_VideoStream.LastFrame)
+				{
+					m_FrameRenderer.RenderFrame(m_CurrentFrameIndex, currentPixelmap, movementType, false, 0, m_CurrentFrameIndex);
+				}
 			}
 		}
 
@@ -615,7 +645,12 @@ namespace Tangra.Video
 
 		public GeoLocationInfo GeoLocation
 		{
-			get { return ((AstroDigitalVideoStream) m_VideoStream).GeoLocation; }
+			get
+			{
+				return m_VideoStream != null
+					       ? ((AstroDigitalVideoStream) m_VideoStream).GeoLocation
+					       : null;
+			}
 		}
 
 		public bool IsAstroAnalogueVideo

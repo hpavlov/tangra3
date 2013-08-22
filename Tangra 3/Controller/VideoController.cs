@@ -146,8 +146,11 @@ namespace Tangra.Controller
 						AdvEquipmentInfo equipmentInfo;
 						GeoLocationInfo geoLocation;
 						frameStream = AstroDigitalVideoStream.OpenFile(fileName, out equipmentInfo, out geoLocation);
-						TangraContext.Current.UsingADV = true;
-						m_OverlayManager.Init(equipmentInfo, geoLocation, frameStream.FirstFrame);
+						if (frameStream != null)
+						{
+							TangraContext.Current.UsingADV = true;
+							m_OverlayManager.Init(equipmentInfo, geoLocation, frameStream.FirstFrame);							
+						}
 					}
 					else if (fileExtension == ".bmp")
 					{
@@ -369,7 +372,7 @@ namespace Tangra.Controller
                 // The current operation doesn't want overlays displayed
             }
             else
-			    m_OverlayManager.OverlayStateForFrame(displayBitmap, m_FrameState, frameId);
+				m_OverlayManager.OverlayStateForFrame(displayBitmap, m_FrameState, frameId, IsAstroDigitalVideo, IsAstroAnalogueVideo);
 		}
 
         public void CompleteRenderFrame(Graphics g)

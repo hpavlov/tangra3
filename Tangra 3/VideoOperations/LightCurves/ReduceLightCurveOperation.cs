@@ -1075,9 +1075,13 @@ namespace Tangra.VideoOperations.LightCurves
 
 			InitializeTimestampOCR();
 
-			if (m_TimestampOCR != null || m_VideoController.IsAstroDigitalVideo)
+			if (m_TimestampOCR != null || 
+				m_VideoController.IsAstroDigitalVideo ||
+				(m_VideoController.IsAstroAnalogueVideo && m_VideoController.AstroAnalogueVideoHasOcrData))
 				// We have embedded timestamps for OCR-ed analogue video timestamps or for ADV videos
 				LightCurveReductionContext.Instance.HasEmbeddedTimeStamps = true;
+			else
+				LightCurveReductionContext.Instance.HasEmbeddedTimeStamps = false;
 
 			m_VideoController.StatusChanged("Refining");
 
@@ -1381,6 +1385,8 @@ namespace Tangra.VideoOperations.LightCurves
                     prevFrameId = frameState.VideoCameraFrameId;
 
                     int frameDuration = (int)Math.Round(frameState.ExposureInMilliseconds);
+
+					//TODO: If Instrumental Delay has been selected then apply if for this frameDuration and camera model
                     LCFile.SaveOnTheFlyFrameTiming(new LCFrameTiming(frameState.CentralExposureTime, frameDuration));                    
                 }
                 else

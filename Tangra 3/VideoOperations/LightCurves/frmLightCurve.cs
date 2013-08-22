@@ -8,6 +8,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Media;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 using Tangra.Controller;
@@ -412,6 +413,14 @@ namespace Tangra.VideoOperations.LightCurves
         	m_frmBackgroundHistograms = new frmBackgroundHistograms(m_Context, m_LCFile, m_DisplaySettings);
         	miBackgroundHistograms.Checked = false;
         	HideBackgroundHistograms();
+
+			Regex regexAavSourceInfo = new Regex("^Video \\(AAV\\.\\d+\\)$");
+	        lblInstDelayWarning.SendToBack();
+			lblInstDelayWarning.Visible = 
+				// AAV file with embedded timestamps
+				(m_Header.TimingType == MeasurementTimingType.EmbeddedTimeForEachFrame && regexAavSourceInfo.IsMatch(m_Header.SourceInfo)) ||
+				// or timestamps read off the screen
+				m_Header.TimingType == MeasurementTimingType.OCRedTimeForEachFrame;
         }
 
 		private string ExplainTrackingType(TrackingType type)

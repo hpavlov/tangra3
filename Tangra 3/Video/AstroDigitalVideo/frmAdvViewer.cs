@@ -4,8 +4,10 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 using Tangra.Helpers;
 using Tangra.Model.Image;
@@ -30,9 +32,6 @@ namespace Tangra.Video.AstroDigitalVideo
 
 			m_FileName = fileName;
 			m_AdvFile = AdvFile.OpenFile(fileName);
-
-            // Tools page is not ready yet
-		    tabControl.TabPages.Remove(tabTools);
 		}
 
 		private void frmAdvViewer_Load(object sender, EventArgs e)
@@ -345,10 +344,73 @@ namespace Tangra.Video.AstroDigitalVideo
 				return;
 			}
 
+			if (Path.GetExtension(m_FileName).Equals(".adv", StringComparison.InvariantCultureIgnoreCase))
+				saveFileDialog.Filter = "ADV Files (*.adv)|*.adv";
+			else if (Path.GetExtension(m_FileName).Equals(".aav", StringComparison.InvariantCultureIgnoreCase))
+				saveFileDialog.Filter = "AAV Files (*.aav)|*.aav";
+			else
+				saveFileDialog.Filter = "All Files (*.*)|*.*";
+
 			if (saveFileDialog.ShowDialog(this) == DialogResult.OK)
 			{
-				m_AdvFile.CropAdvFile(saveFileDialog.FileName, (int) nudCropFirstFrame.Value, (int) nudCropLastFrame.Value);
+				ThreadPool.QueueUserWorkItem(new WaitCallback(CropFileWorker), new Tuple<string, int, int>(saveFileDialog.FileName, (int)nudCropFirstFrame.Value, (int)nudCropLastFrame.Value));
 			}
+		}
+
+		private void CropFileWorker(object state)
+		{
+			Tuple<string, int, int> cropFileCfg = (Tuple<string, int, int>) state;
+
+			InvokeUpdateUI(0, true);
+
+			try
+			{
+				m_AdvFile.CropAdvFile(
+					cropFileCfg.Item1,
+					cropFileCfg.Item2,
+					cropFileCfg.Item3,
+					delegate(int percentDone, int framesFound)
+						{
+							InvokeUpdateUI(percentDone, true);
+						});
+			}
+			finally
+			{
+				InvokeUpdateUI(100, false);
+			}
+		}
+
+		private delegate void UpdateUIDelegate(int percent, bool show);
+
+		private void UpdateUI(int percent, bool show)
+		{
+			pbar1.Value = percent;
+
+			if (show && !pbar1.Visible)
+			{
+				pbar1.Visible = true;
+				pnlCropChooseFrames.Enabled = false;
+			}
+			else if (!show && pbar1.Visible)
+			{
+				pbar1.Visible = false;
+				pnlCropChooseFrames.Enabled = true;
+			}
+
+			pbar1.Update();
+
+			Update();
+			Application.DoEvents();
+		}
+
+		private void InvokeUpdateUI(int percentDone, bool show)
+		{
+			try
+			{
+				Invoke(new UpdateUIDelegate(UpdateUI), new object[] { percentDone, show });
+			}
+			catch (InvalidOperationException)
+			{ }
 		}
 	}	
 }

@@ -15,7 +15,6 @@ namespace Tangra.Model.Config
 
 		public bool PopupTimestamp = true;
 		public bool PopupExposure = true;
-		public bool PopupVideoCameraFrameId = false;
 
 		public bool PopupSystemTime;
 		public bool PopupSatellites = true;

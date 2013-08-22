@@ -67,8 +67,6 @@ namespace Tangra.Video.AstroDigitalVideo
 			if (m_AavSettings.PopupSatellites || m_AavSettings.PopupAlmanac || m_AavSettings.PopupGPSFix)
 				statusText.AppendLine();
 
-			if (m_AavSettings.PopupVideoCameraFrameId)
-				statusText.AppendLine(string.Format("Camera Frame #: {0}", m_FrameState.VideoCameraFrameId.ToString("###,###,###,##0")));
 			if (m_AavSettings.PopupTimestamp)
 				statusText.AppendLine(string.Format("Central Exposure Time: {0}",
                         m_FrameState.HasValidTimeStamp 
@@ -80,7 +78,7 @@ namespace Tangra.Video.AstroDigitalVideo
                             ? string.Format("Exposure Duration: {0} ms", m_FrameState.ExposureInMilliseconds.ToString("0"))
                             : "Exposure Duration: Unknown");
 
-			if (m_AavSettings.PopupTimestamp || m_AavSettings.PopupExposure || m_AavSettings.PopupVideoCameraFrameId)
+			if (m_AavSettings.PopupTimestamp || m_AavSettings.PopupExposure)
                 statusText.AppendLine();
 
             if (m_AavSettings.PopupSystemTime)

@@ -31,6 +31,8 @@
 			this.label20 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
 			this.groupControl1 = new System.Windows.Forms.GroupBox();
+			this.cbxOcrEngine = new System.Windows.Forms.ComboBox();
+			this.label3 = new System.Windows.Forms.Label();
 			this.cbxColourChannel = new System.Windows.Forms.ComboBox();
 			this.cbxRenderingEngineAttemptOrder = new System.Windows.Forms.ComboBox();
 			this.nudSaturation8bit = new System.Windows.Forms.NumericUpDown();
@@ -59,6 +61,8 @@
 			// 
 			// groupControl1
 			// 
+			this.groupControl1.Controls.Add(this.cbxOcrEngine);
+			this.groupControl1.Controls.Add(this.label3);
 			this.groupControl1.Controls.Add(this.cbxColourChannel);
 			this.groupControl1.Controls.Add(this.cbxRenderingEngineAttemptOrder);
 			this.groupControl1.Controls.Add(this.nudSaturation8bit);
@@ -67,10 +71,30 @@
 			this.groupControl1.Controls.Add(this.label1);
 			this.groupControl1.Location = new System.Drawing.Point(3, 3);
 			this.groupControl1.Name = "groupControl1";
-			this.groupControl1.Size = new System.Drawing.Size(271, 199);
+			this.groupControl1.Size = new System.Drawing.Size(271, 256);
 			this.groupControl1.TabIndex = 42;
 			this.groupControl1.TabStop = false;
 			this.groupControl1.Text = "Analogue Video (8 bit)";
+			// 
+			// cbxOcrEngine
+			// 
+			this.cbxOcrEngine.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.cbxOcrEngine.Items.AddRange(new object[] {
+            "",
+            "IOTA-VTI: 720x576 PAL"});
+			this.cbxOcrEngine.Location = new System.Drawing.Point(15, 217);
+			this.cbxOcrEngine.Name = "cbxOcrEngine";
+			this.cbxOcrEngine.Size = new System.Drawing.Size(190, 21);
+			this.cbxOcrEngine.TabIndex = 47;
+			// 
+			// label3
+			// 
+			this.label3.AutoSize = true;
+			this.label3.Location = new System.Drawing.Point(12, 201);
+			this.label3.Name = "label3";
+			this.label3.Size = new System.Drawing.Size(135, 13);
+			this.label3.TabIndex = 46;
+			this.label3.Text = "Read OSD timestamp from:";
 			// 
 			// cbxColourChannel
 			// 
@@ -138,5 +162,7 @@
 		private System.Windows.Forms.NumericUpDown nudSaturation8bit;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.ComboBox cbxColourChannel;
+		private System.Windows.Forms.ComboBox cbxOcrEngine;
+		private System.Windows.Forms.Label label3;
 	}
 }

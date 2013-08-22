@@ -1,0 +1,56 @@
+﻿
+Features:
+---------
+
+ - Add instrumental delay computations for the popular integrating video cameras
+ - Add OCR option for AVI videos
+
+Bugs:
+-----
+
+- Fix the out of memory issue when running measurements. Use the memory profiler to find memory leaks
+
+-----
+Tangra v3.0.0.0
+
+System.ArgumentException: Cannot activate invisible or disabled control.
+  at System.Windows.Forms.ContainerControl.set_ActiveControl (System.Windows.Forms.Control value) [0x00000] in <filename unknown>:0 
+  at System.Windows.Forms.Control.Select (System.Windows.Forms.Control control) [0x00000] in <filename unknown>:0 
+  at System.Windows.Forms.Form.SelectActiveControl () [0x00000] in <filename unknown>:0 
+  at (wrapper remoting-invoke-with-check) System.Windows.Forms.Form:SelectActiveControl ()
+  at System.Windows.Forms.Form.WmClose (System.Windows.Forms.Message& m) [0x00000] in <filename unknown>:0 
+  at System.Windows.Forms.Form.WndProc (System.Windows.Forms.Message& m) [0x00000] in <filename unknown>:0 
+  at System.Windows.Forms.Control+ControlWindowTarget.OnMessage (System.Windows.Forms.Message& m) [0x00000] in <filename unknown>:0 
+  at System.Windows.Forms.Control+ControlNativeWindow.WndProc (System.Windows.Forms.Message& m) [0x00000] in <filename unknown>:0 
+  at System.Windows.Forms.NativeWindow.WndProc (IntPtr hWnd, Msg msg, IntPtr wParam, IntPtr lParam) [0x00000] in <filename unknown>:0 
+
+User Comments:
+Closed the lightcurve window.
+
+Tangra v3.0.31
+OS: MacOS X 10.6.8 (32 bit)
+
+-----
+Tangra v3.0.0.0
+
+System.ArgumentException: Parameter is not valid.
+  at System.Drawing.Image.get_Width()
+  at System.Drawing.Image.get_Size()
+  at System.Windows.Forms.PictureBox.ImageRectangleFromSizeMode(PictureBoxSizeMode mode)
+  at System.Windows.Forms.PictureBox.OnPaint(PaintEventArgs pe)
+  at System.Windows.Forms.Control.PaintWithErrorHandling(PaintEventArgs e, Int16 layer)
+  at System.Windows.Forms.Control.WmPaint(Message& m)
+  at System.Windows.Forms.Control.WndProc(Message& m)
+  at System.Windows.Forms.Control.ControlNativeWindow.OnMessage(Message& m)
+  at System.Windows.Forms.Control.ControlNativeWindow.WndProc(Message& m)
+  at System.Windows.Forms.NativeWindow.Callback(IntPtr hWnd, Int32 msg, IntPtr wparam, IntPtr lparam)
+
+User Comments:
+Had just reprocessed some data and clicked on what looked like a possible D in the graph when it crashed.
+
+JT
+
+Tangra v3.0.31
+OS: Windows XP 5.1.2600 Service Pack 3 (32 bit)
+
+-----

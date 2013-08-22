@@ -14,11 +14,9 @@
     <File Name="adv_image_section.cpp"/>
     <File Name="adv_status_section.cpp"/>
     <File Name="IntegrationUtils.cpp"/>
-    <File Name="IotaVtiOcr.cpp"/>
     <File Name="PixelMapUtils.cpp"/>
     <File Name="PreProcessing.cpp"/>
     <File Name="quicklz.cpp"/>
-    <File Name="Tangra.Orc.IotaVti.cpp"/>
     <File Name="Tangra.Pixelmap.cpp"/>
     <File Name="TangraADV.cpp"/>
     <File Name="utils.cpp"/>
@@ -31,11 +29,9 @@
     <File Name="adv_status_section.h"/>
     <File Name="CoreContext.h"/>
     <File Name="IntegrationUtils.h"/>
-    <File Name="IotaVtiOcr.h"/>
     <File Name="PixelMapUtils.h"/>
     <File Name="PreProcessing.h"/>
     <File Name="quicklz.h"/>
-    <File Name="Tangra.Orc.IotaVti.h"/>
     <File Name="utils.h"/>
     <File Name="Tangra.Core.def"/>
     <File Name="TangraADV.h"/>

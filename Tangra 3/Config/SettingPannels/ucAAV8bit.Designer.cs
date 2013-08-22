@@ -40,7 +40,6 @@
 			this.cbxAdvsOsdMessages = new System.Windows.Forms.CheckBox();
 			this.cbxAdvsOsdTimeStamp = new System.Windows.Forms.CheckBox();
 			this.groupControl3 = new System.Windows.Forms.GroupBox();
-			this.cbxAdvsPopupVideoCameraFrameId = new System.Windows.Forms.CheckBox();
 			this.cbxAdvsPopupExposure = new System.Windows.Forms.CheckBox();
 			this.cbxAdvsPopupGPSFix = new System.Windows.Forms.CheckBox();
 			this.cbxAdvsPopupAlmanac = new System.Windows.Forms.CheckBox();
@@ -48,6 +47,7 @@
 			this.cbxAdvsPopupSystemTime = new System.Windows.Forms.CheckBox();
 			this.cbxAdvsPopupTimeStamp = new System.Windows.Forms.CheckBox();
 			this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+			this.linkLabelAAV = new System.Windows.Forms.LinkLabel();
 			this.groupControl1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nudSaturation8bit)).BeginInit();
 			this.groupControl2.SuspendLayout();
@@ -65,7 +65,7 @@
 			this.groupControl1.Size = new System.Drawing.Size(207, 95);
 			this.groupControl1.TabIndex = 41;
 			this.groupControl1.TabStop = false;
-			this.groupControl1.Text = "AAVRec";
+			this.groupControl1.Text = "OccuRec  AAV Format";
 			// 
 			// cbxADVEngine
 			// 
@@ -161,7 +161,6 @@
 			// 
 			// groupControl3
 			// 
-			this.groupControl3.Controls.Add(this.cbxAdvsPopupVideoCameraFrameId);
 			this.groupControl3.Controls.Add(this.cbxAdvsPopupExposure);
 			this.groupControl3.Controls.Add(this.cbxAdvsPopupGPSFix);
 			this.groupControl3.Controls.Add(this.cbxAdvsPopupAlmanac);
@@ -175,15 +174,6 @@
 			this.groupControl3.TabStop = false;
 			this.groupControl3.Text = "Frame Details Display (Pop-up)";
 			// 
-			// cbxAdvsPopupVideoCameraFrameId
-			// 
-			this.cbxAdvsPopupVideoCameraFrameId.Location = new System.Drawing.Point(14, 77);
-			this.cbxAdvsPopupVideoCameraFrameId.Name = "cbxAdvsPopupVideoCameraFrameId";
-			this.cbxAdvsPopupVideoCameraFrameId.Size = new System.Drawing.Size(161, 19);
-			this.cbxAdvsPopupVideoCameraFrameId.TabIndex = 53;
-			this.cbxAdvsPopupVideoCameraFrameId.Text = "Camera Frame #";
-			this.cbxAdvsPopupVideoCameraFrameId.CheckedChanged += new System.EventHandler(this.OnAdvPopupSettingChanged);
-			// 
 			// cbxAdvsPopupExposure
 			// 
 			this.cbxAdvsPopupExposure.Location = new System.Drawing.Point(14, 57);
@@ -195,7 +185,7 @@
 			// 
 			// cbxAdvsPopupGPSFix
 			// 
-			this.cbxAdvsPopupGPSFix.Location = new System.Drawing.Point(14, 148);
+			this.cbxAdvsPopupGPSFix.Location = new System.Drawing.Point(14, 125);
 			this.cbxAdvsPopupGPSFix.Name = "cbxAdvsPopupGPSFix";
 			this.cbxAdvsPopupGPSFix.Size = new System.Drawing.Size(120, 19);
 			this.cbxAdvsPopupGPSFix.TabIndex = 51;
@@ -204,7 +194,7 @@
 			// 
 			// cbxAdvsPopupAlmanac
 			// 
-			this.cbxAdvsPopupAlmanac.Location = new System.Drawing.Point(14, 125);
+			this.cbxAdvsPopupAlmanac.Location = new System.Drawing.Point(14, 102);
 			this.cbxAdvsPopupAlmanac.Name = "cbxAdvsPopupAlmanac";
 			this.cbxAdvsPopupAlmanac.Size = new System.Drawing.Size(120, 19);
 			this.cbxAdvsPopupAlmanac.TabIndex = 50;
@@ -213,7 +203,7 @@
 			// 
 			// cbxAdvsPopupSatellites
 			// 
-			this.cbxAdvsPopupSatellites.Location = new System.Drawing.Point(14, 102);
+			this.cbxAdvsPopupSatellites.Location = new System.Drawing.Point(14, 79);
 			this.cbxAdvsPopupSatellites.Name = "cbxAdvsPopupSatellites";
 			this.cbxAdvsPopupSatellites.Size = new System.Drawing.Size(120, 19);
 			this.cbxAdvsPopupSatellites.TabIndex = 49;
@@ -222,7 +212,7 @@
 			// 
 			// cbxAdvsPopupSystemTime
 			// 
-			this.cbxAdvsPopupSystemTime.Location = new System.Drawing.Point(14, 171);
+			this.cbxAdvsPopupSystemTime.Location = new System.Drawing.Point(14, 148);
 			this.cbxAdvsPopupSystemTime.Name = "cbxAdvsPopupSystemTime";
 			this.cbxAdvsPopupSystemTime.Size = new System.Drawing.Size(120, 19);
 			this.cbxAdvsPopupSystemTime.TabIndex = 47;
@@ -238,11 +228,23 @@
 			this.cbxAdvsPopupTimeStamp.Text = "Central Exposure Time";
 			this.cbxAdvsPopupTimeStamp.CheckedChanged += new System.EventHandler(this.OnAdvPopupSettingChanged);
 			// 
+			// linkLabelAAV
+			// 
+			this.linkLabelAAV.AutoSize = true;
+			this.linkLabelAAV.Location = new System.Drawing.Point(11, 2);
+			this.linkLabelAAV.Name = "linkLabelAAV";
+			this.linkLabelAAV.Size = new System.Drawing.Size(53, 13);
+			this.linkLabelAAV.TabIndex = 46;
+			this.linkLabelAAV.TabStop = true;
+			this.linkLabelAAV.Text = "OccuRec";
+			this.linkLabelAAV.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelAAV_LinkClicked);
+			// 
 			// ucAAV8bit
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.SystemColors.Control;
+			this.Controls.Add(this.linkLabelAAV);
 			this.Controls.Add(this.groupControl3);
 			this.Controls.Add(this.groupControl2);
 			this.Controls.Add(this.groupControl1);
@@ -254,6 +256,7 @@
 			this.groupControl2.ResumeLayout(false);
 			this.groupControl3.ResumeLayout(false);
 			this.ResumeLayout(false);
+			this.PerformLayout();
 
 		}
 
@@ -274,10 +277,10 @@
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.ComboBox cbxADVEngine;
 		private System.Windows.Forms.CheckBox cbxAdvsPopupExposure;
-		private System.Windows.Forms.CheckBox cbxAdvsPopupVideoCameraFrameId;
         private System.Windows.Forms.CheckBox cbxAdvsOsdCameraInfo;
 		private System.Windows.Forms.CheckBox cbxAdvsOsdSystemInfo;
 		private System.Windows.Forms.ToolTip toolTip1;
+		private System.Windows.Forms.LinkLabel linkLabelAAV;
 
 	}
 }

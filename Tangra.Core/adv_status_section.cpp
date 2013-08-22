@@ -35,24 +35,14 @@ void AdvStatusSection::GetDataFromDataBytes(unsigned char* data, int sectionData
 	unsigned char tagsCount = *statusData;
 	statusData++;
 
-	for(int i = 0; i < tagsCount; i ++)
+	for(int i = 0; i < tagsCount; i++)
 	{
 		unsigned char tagId = *statusData;
-
-		int idx = 0;
-		const char* tagName = NULL;
-		vector<string>::iterator curr = m_TagList.begin();
-		while (curr != m_TagList.end())
-		{
-			if (idx == tagId)
-			{
-				tagName = curr->c_str();
-				break;
-			}
-
-			idx++;
-			curr++;
-		}
+		
+		string currById = m_TagList[tagId];
+		const char* tagName = currById.c_str();
+		map<string, AdvTagType>::iterator currDef = m_TagDefinition.find(tagName);
+		AdvTagType type = (AdvTagType)(currDef->second);
 		
 		if (strcmp("SystemTime", tagName) == 0)
 		{
@@ -152,7 +142,7 @@ void AdvStatusSection::GetDataFromDataBytes(unsigned char* data, int sectionData
 			
 			statusData+=5;			
 		}
-		if (strcmp("VideoCameraFrameId", tagName) == 0 || strcmp("HardwareTimerFrameId", tagName) == 0)
+		else if (strcmp("VideoCameraFrameId", tagName) == 0 || strcmp("HardwareTimerFrameId", tagName) == 0)
 		{
 			unsigned char  b1 = *(statusData + 1);
 			unsigned char  b2 = *(statusData + 2);
@@ -211,6 +201,41 @@ void AdvStatusSection::GetDataFromDataBytes(unsigned char* data, int sectionData
 
 				statusData += 1 + len;
 			}			
+		}
+		else
+		{
+			switch(type)
+			{
+				case UInt8:
+					statusData+=2;
+					break;
+				case UInt16:
+					statusData+=3;
+					break;
+				case UInt32:
+					statusData+=5;
+					break;
+				case ULong64:
+					statusData+=9;
+					break;
+				case AnsiString254:
+					{
+						unsigned char strLen = *(statusData + 1);
+						statusData += 2 + strLen;
+					}
+					break;
+				case List16AnsiString254:
+					{
+						unsigned char count = *(statusData + 1);
+						statusData += 2;
+						for (int j = 0; j < count; j++)
+						{
+							unsigned char len = *statusData;
+							statusData += 1 + len;
+						}							
+					}
+					break;
+			}
 		}
 	}
 }

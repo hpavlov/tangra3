@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Data;
 using System.Linq;
@@ -121,6 +122,11 @@ namespace Tangra.Config.SettingPannels
 				m_AdvPopupCustomizer.UpdateSettings(BuildCurrentSettings());
 				m_AdvPopupCustomizer.RefreshState();
 			}			
+		}
+
+		private void linkLabelADVS_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+		{
+			Process.Start("http://astrodigitalvideo.com.au");
 		}
 	}
 }

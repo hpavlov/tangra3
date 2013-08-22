@@ -450,10 +450,245 @@ namespace Tangra.Video.AstroDigitalVideo
 			}
 		}
 
-	    internal bool CropAdvFile(string fileName, int firstFrame, int lastFrame)
+		private void CopyRawBytes(BinaryReader reader, long offset, long length, BinaryWriter writer)
+		{
+			reader.BaseStream.Seek(offset, SeekOrigin.Begin);
+
+			for (int i = 0; i < length; i++)
+			{
+				byte bt = reader.ReadByte();
+				writer.Write(bt);
+			}			
+		}
+
+		internal bool CropAdvFile(string fileName, int firstFrame, int lastFrame, OnSearchProgressDelegate progressCallback)
 	    {
-			
+			using (var fsr = new FileStream(m_FileName, FileMode.Open, FileAccess.Read))
+			using (var reader = new BinaryReader(fsr))
+			using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
+			using (var writer = new BinaryWriter(fs))
+			{
+				AdvFramesIndexEntry firstEntry = m_Index.Index[0];
+
+				CopyRawBytes(reader, 0, firstEntry.Offset, writer);
+
+				progressCallback(5, 0);
+
+				AdvFramesIndexEntry firstEntryToCopy = m_Index.Index[firstFrame];
+				long zeroTicks = firstEntryToCopy.ElapsedTime.Ticks;
+
+				var newIndex = new List<AdvFramesIndexEntry>();
+
+				for (int i = firstFrame; i <= lastFrame; i++)
+				{
+					AdvFramesIndexEntry frameToCopy = m_Index.Index[i];
+
+					var copiedFrame = new AdvFramesIndexEntry()
+					{
+						Offset = writer.BaseStream.Position,
+						Length = frameToCopy.Length
+					};
+
+					long nextFrameStartPos = i == m_Index.NumberOfFrames - 1 ? m_Index.TableOffset : m_Index.Index[i + 1].Offset;
+
+					CopyRawBytes(reader, frameToCopy.Offset, nextFrameStartPos - frameToCopy.Offset, writer);
+
+					copiedFrame.ElapsedTime = new TimeSpan(frameToCopy.ElapsedTime.Ticks - zeroTicks);
+					newIndex.Add(copiedFrame);
+
+					int percDone = (int)Math.Min(90, 90 * (i - firstFrame) * 1.0 / (lastFrame - firstFrame + 1));
+					progressCallback(5 + percDone, 0);
+				}
+
+				long indexTableOffset = writer.BaseStream.Position;
+
+				progressCallback(95, 0);
+
+				writer.Write((uint)newIndex.Count);
+
+				// Save the new INDEX
+				foreach (AdvFramesIndexEntry newIndexEntry in newIndex)
+				{
+					writer.Write((uint)Math.Round(newIndexEntry.ElapsedTime.TotalMilliseconds));
+					writer.Write((long)newIndexEntry.Offset);
+					writer.Write((uint)newIndexEntry.Length);
+				}
+
+				long userMetadataTablePosition = writer.BaseStream.Position;
+				uint numUserEntries = 0;
+				writer.Write(numUserEntries);
+
+
+				writer.BaseStream.Seek(5, SeekOrigin.Begin);
+
+				writer.Write((uint)newIndex.Count);
+				writer.Write(indexTableOffset);
+
+				writer.BaseStream.Seek(8, SeekOrigin.Current);
+
+				writer.Write(userMetadataTablePosition);
+
+				writer.BaseStream.Flush();
+
+				progressCallback(100, 0);
+			}
+
 		    return false;
 	    }
+
+
+	    internal bool FixAavFile18Aug(string fileName, int firstFrame, int lastFrame)
+	    {
+		    fileName = m_FileName;
+			string newFile = Path.ChangeExtension(fileName, ".new.aav");
+			File.Copy(fileName, newFile, true);
+
+			using (FileStream fsr = new FileStream(fileName, FileMode.Open, FileAccess.Read))
+			using (BinaryReader reader = new BinaryReader(fsr))
+			using (FileStream fs = new FileStream(newFile, FileMode.Open, FileAccess.Write))
+			using (BinaryWriter writer = new BinaryWriter(fs))
+			{
+				uint numFrames = m_Index.NumberOfFrames;
+
+				long ZEROTICKS = (new DateTime(2013, 8, 18).Ticks - ADV_ZERO_DATE_REF.Ticks) / 10000;
+
+				for (int i = 0; i < numFrames; i++)
+				{
+					AdvFramesIndexEntry entry = m_Index.Index[i];
+
+					uint elapsedMiliseconds = (uint)entry.ElapsedTime.TotalMilliseconds;
+					long offset = entry.Offset;
+					uint length = entry.Length;
+
+					object[] data = GetFrameSectionData(i, null);
+					AdvImageData imageData = (AdvImageData)data[0];
+					AdvStatusData statusData = (AdvStatusData)data[1];
+
+					AdvTagDefinition startTS = StatusSection.TagDefinitions[3];
+					AdvTagDefinition endTS = StatusSection.TagDefinitions[4];
+					AdvTagDefinition gpsFix = StatusSection.TagDefinitions[7];
+					
+					string startTSString = statusData.TagValues[startTS];
+					string endTSString = statusData.TagValues[endTS];
+					string gpsFixString = statusData.TagValues[gpsFix];
+
+					long ticksStart = FixOSD(ref startTSString, true);
+					long ticksEnd = FixOSD(ref endTSString, false);
+
+					long midTicks = ZEROTICKS + (ticksStart - 20 * 10000 + ticksEnd) / 20000;
+					long exposureMs10 = new TimeSpan(ticksEnd - ticksStart + 20 * 10000).Milliseconds * 10;
+
+					fsr.Seek(12 + (4 + entry.Offset), SeekOrigin.Begin);
+					int bytesToSkip = reader.ReadInt32();
+
+					WriteInt16((short)exposureMs10, 8 + (4 + entry.Offset), writer, reader);
+					WriteInt64(midTicks, (4 + entry.Offset), writer, reader);
+
+					WriteString(startTSString, 16 + (4 + entry.Offset) + bytesToSkip + 0x22, writer, reader);
+					WriteString(endTSString, 16 + (4 + entry.Offset) + bytesToSkip + 0x43, writer, reader);
+
+					int gspFixByte = int.Parse(gpsFixString);
+					if (gspFixByte >= 1) gspFixByte++;
+
+					WriteInt8((byte)gspFixByte, 16 + (4 + entry.Offset) + bytesToSkip + 0x1f, writer, reader);
+					//writer.Write(elapsedMiliseconds);
+					//writer.Write(offset);
+					//writer.Write(length);
+				}
+			
+				fs.Flush();
+			}
+
+		    return false;
+	    }
+
+		private void WriteInt8(byte val, long offset, BinaryWriter wrt, BinaryReader rdr)
+		{
+			wrt.BaseStream.Seek(offset, SeekOrigin.Begin);
+			rdr.BaseStream.Seek(offset, SeekOrigin.Begin);
+
+			byte currVal = rdr.ReadByte();
+			if (currVal != val)
+				wrt.Write(val);
+		}
+
+		private void WriteInt16(short val, long offset, BinaryWriter wrt, BinaryReader rdr)
+		{
+			wrt.BaseStream.Seek(offset, SeekOrigin.Begin);
+			rdr.BaseStream.Seek(offset, SeekOrigin.Begin);
+
+			short currVal = rdr.ReadInt16();
+			if (currVal != val)
+				wrt.Write(val);
+		}
+
+		private void WriteInt64(long val, long offset, BinaryWriter wrt, BinaryReader rdr)
+		{
+			wrt.BaseStream.Seek(offset, SeekOrigin.Begin);
+			rdr.BaseStream.Seek(offset, SeekOrigin.Begin);
+
+			long currVal = rdr.ReadInt64();
+			if (currVal != val)
+				wrt.Write(val);
+		}
+
+		private void WriteString(string str, long offset, BinaryWriter wrt, BinaryReader rdr)
+	    {
+			wrt.BaseStream.Seek(offset, SeekOrigin.Begin);
+			rdr.BaseStream.Seek(offset, SeekOrigin.Begin);
+
+			foreach (char ch in str.ToCharArray())
+			{
+				//char currChr = rdr.ReadChar();
+				wrt.Write(ch);
+			}
+	    }
+
+	    private long FixOSD(ref string osd, bool start)
+	    {
+			//		    1         2         3
+			//0123456789012345678901234567890123456789
+
+			//P7 0 09:38:45 0000xxxx 00000000
+
+		    long ticks = 0;
+
+		    ReplaceChar(ref osd, 3, '0', ' ');
+			ReplaceChar(ref osd, 29, '0', ' ');
+			ReplaceChar(ref osd, 30, '0', ' ');
+
+			int hh = int.Parse("" + osd[5]) * 10 + int.Parse("" + osd[6]);
+			int mm = int.Parse("" + osd[8]) * 10 + int.Parse("" + osd[9]);
+			int ss = int.Parse("" + osd[11]) * 10 + int.Parse("" + osd[12]);
+		    int ms10 = 0;
+
+			if (start)
+			{
+				ReplaceChar(ref osd, 14, '0', ' ');
+				ReplaceChar(ref osd, 15, '0', ' ');
+				ReplaceChar(ref osd, 16, '0', ' ');
+				ReplaceChar(ref osd, 17, '0', ' ');
+
+				ms10 = int.Parse("" + osd[18]) * 1000 + int.Parse("" + osd[19]) * 100 + int.Parse("" + osd[20]) * 10 + int.Parse("" + osd[21]);
+			}
+			else
+			{
+				ReplaceChar(ref osd, 18, '0', ' ');
+				ReplaceChar(ref osd, 19, '0', ' ');
+				ReplaceChar(ref osd, 20, '0', ' ');
+				ReplaceChar(ref osd, 21, '0', ' ');
+
+				ms10 = int.Parse("" + osd[14]) * 1000 + int.Parse("" + osd[15]) * 100 + int.Parse("" + osd[16]) * 10 + int.Parse("" + osd[17]);
+			}
+
+		    var ts = new TimeSpan(0, hh, mm, ss, ms10 / 10);
+		    return ts.Ticks;
+	    }
+
+		private void ReplaceChar(ref string osd, int charId, char old, char newchar)
+		{
+			if (osd[charId] == old) 
+				osd = osd.Substring(0, charId) + newchar + osd.Substring(charId + 1);
+		}
     }
 }

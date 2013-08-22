@@ -54,6 +54,7 @@
 			this.cbxAdvsPopupGamma = new System.Windows.Forms.CheckBox();
 			this.cbxAdvsPopupGain = new System.Windows.Forms.CheckBox();
 			this.cbxAdvsPopupTimeStamp = new System.Windows.Forms.CheckBox();
+			this.linkLabelADVS = new System.Windows.Forms.LinkLabel();
 			this.groupControl1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nudSaturation14bit)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudSaturation12bit)).BeginInit();
@@ -63,6 +64,7 @@
 			// 
 			// groupControl1
 			// 
+			this.groupControl1.Controls.Add(this.linkLabelADVS);
 			this.groupControl1.Controls.Add(this.nudSaturation14bit);
 			this.groupControl1.Controls.Add(this.label3);
 			this.groupControl1.Controls.Add(this.cbxADVEngine);
@@ -328,6 +330,17 @@
 			this.cbxAdvsPopupTimeStamp.Text = "Central Exposure Time";
 			this.cbxAdvsPopupTimeStamp.CheckedChanged += new System.EventHandler(this.OnAdvPopupSettingChanged);
 			// 
+			// linkLabelADVS
+			// 
+			this.linkLabelADVS.AutoSize = true;
+			this.linkLabelADVS.Location = new System.Drawing.Point(8, -1);
+			this.linkLabelADVS.Name = "linkLabelADVS";
+			this.linkLabelADVS.Size = new System.Drawing.Size(36, 13);
+			this.linkLabelADVS.TabIndex = 55;
+			this.linkLabelADVS.TabStop = true;
+			this.linkLabelADVS.Text = "ADVS";
+			this.linkLabelADVS.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelADVS_LinkClicked);
+			// 
 			// ucADVSVideo12bit
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -376,6 +389,7 @@
 		private System.Windows.Forms.NumericUpDown nudSaturation14bit;
 		private System.Windows.Forms.Label label3;
 		private System.Windows.Forms.CheckBox cbxAdvsOsdGeoLocation;
+		private System.Windows.Forms.LinkLabel linkLabelADVS;
 
 	}
 }
