@@ -1267,7 +1267,7 @@ namespace Tangra.VideoOperations.LightCurves
     {
         public static LCMeasurementFooter Empty = new LCMeasurementFooter();
 
-        private static int SERIALIZATION_VERSION = 4;
+        private static int SERIALIZATION_VERSION = 5;
 
         internal byte[] AveragedFrameBytes;
     	internal int AveragedFrameWidth;
@@ -1280,6 +1280,8 @@ namespace Tangra.VideoOperations.LightCurves
         internal float RefinedAverageFWHM;
         internal string TimestampOCR;
         internal Dictionary<int, long> ThumbPrintDict;
+	    internal Dictionary<int, float> InstrumentalDelayConfig;
+		internal string InstrumentalDelayConfigName;
 
         internal LCMeasurementFooter(
 			Pixelmap averagedFrame, 
@@ -1288,7 +1290,9 @@ namespace Tangra.VideoOperations.LightCurves
             List<TrackedObjectConfig> trackedObjectConfigs,
             Tracker tracker,
             ITimestampOcr timestampOCR,
-            Dictionary<int, long> thumbPrintDict)
+            Dictionary<int, long> thumbPrintDict,
+			Dictionary<int, float> instrumentalDelayConfig,
+			string instrumentalDelayConfigName)
         {
 			AveragedFrameBytes = averagedFrame.DisplayBitmapPixels;
         	AveragedFrameWidth = averagedFrame.Width;
@@ -1302,6 +1306,8 @@ namespace Tangra.VideoOperations.LightCurves
             RefinedAverageFWHM = tracker.RefinedAverageFWHM;
             TimestampOCR = timestampOCR != null ? timestampOCR.NameAndVersion() : string.Empty;
             ThumbPrintDict = thumbPrintDict;
+			InstrumentalDelayConfig = instrumentalDelayConfig;
+	        InstrumentalDelayConfigName = instrumentalDelayConfigName ?? string.Empty;
         }
 
         internal LCMeasurementFooter(BinaryReader reader)
@@ -1330,6 +1336,8 @@ namespace Tangra.VideoOperations.LightCurves
 			RefinedAverageFWHM = float.NaN;
 			TimestampOCR = string.Empty;
 			ThumbPrintDict = new Dictionary<int, long>();
+			InstrumentalDelayConfig = new Dictionary<int, float>();
+	        InstrumentalDelayConfigName = string.Empty;
 
 			if (version > 1)
 			{
@@ -1347,6 +1355,19 @@ namespace Tangra.VideoOperations.LightCurves
 							int frameNo = reader.ReadInt32();
 							long thumbprint = reader.ReadInt64();
 							ThumbPrintDict.Add(frameNo, thumbprint);
+						}
+
+						if (version > 4)
+						{
+							numRecs = reader.ReadInt32();
+							for (int i = 0; i < numRecs; i++)
+							{
+								int frameIntegration = reader.ReadInt32();
+								float delayInMilliseconds = reader.ReadSingle();
+								InstrumentalDelayConfig.Add(frameIntegration, delayInMilliseconds);
+							}
+
+							InstrumentalDelayConfigName = reader.ReadString();
 						}
 					}
 				}
@@ -1391,6 +1412,20 @@ namespace Tangra.VideoOperations.LightCurves
 			}
 			else
 				writer.Write((int)0);
+
+			if (InstrumentalDelayConfig != null)
+			{
+				writer.Write(InstrumentalDelayConfig.Count);
+				foreach (int key in InstrumentalDelayConfig.Keys)
+				{
+					writer.Write(key);
+					writer.Write(InstrumentalDelayConfig[key]);
+				}
+			}
+			else
+				writer.Write((int)0);
+
+	        writer.Write(InstrumentalDelayConfigName);
         }
     }
 

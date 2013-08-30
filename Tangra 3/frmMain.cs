@@ -11,6 +11,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using Tangra.Addins;
 using Tangra.Config;
 using Tangra.Controller;
 using Tangra.Helpers;
@@ -21,6 +22,7 @@ using Tangra.Model.Image;
 using Tangra.Model.Video;
 using Tangra.Model.VideoOperations;
 using Tangra.PInvoke;
+using Tangra.SDK;
 using Tangra.Video;
 using Tangra.Video.AstroDigitalVideo;
 using Tangra.VideoOperations.LightCurves;
@@ -31,7 +33,7 @@ using nom.tam.util;
 
 namespace Tangra
 {
-	public partial class frmMain : Form, IVideoFrameRenderer
+	public partial class frmMain : Form, IVideoFrameRenderer, ITangraHost
 	{
 		private VideoController m_VideoController;
 	    private LightCurveController m_LightCurveController;
@@ -39,6 +41,7 @@ namespace Tangra
 		private VideoFileView m_VideoFileView;
 		private ImageToolView m_ImageToolView;
         private ZoomedImageView m_ZoomedImageView;
+		private AddinManager m_AddinManager;
 		private bool m_FormLoaded = false;
 
 		public frmMain()
@@ -60,6 +63,9 @@ namespace Tangra
 			m_VideoController.SetLightCurveController(m_LightCurveController);
 
 			BuildRecentFilesMenu();
+
+			m_AddinManager = new AddinManager();
+			m_AddinManager.LoadAddins(this);
 		}
 
 		/// <summary>
@@ -74,8 +80,9 @@ namespace Tangra
 			}
 
 			base.Dispose(disposing);
-
+			
 			m_VideoController.Dispose();
+			m_AddinManager.Dispose();
 		}
 
 		#region Frame Rendering

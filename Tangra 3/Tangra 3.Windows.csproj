@@ -74,6 +74,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Addins\Addin.cs" />
+    <Compile Include="Addins\AddinManager.cs" />
+    <Compile Include="Config\frmInstDelayConfigChooser.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Config\frmInstDelayConfigChooser.Designer.cs">
+      <DependentUpon>frmInstDelayConfigChooser.cs</DependentUpon>
+    </Compile>
     <Compile Include="Config\frmTangraSettings.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -143,6 +151,7 @@
     <Compile Include="Config\SettingPannels\ucTracking.Designer.cs">
       <DependentUpon>ucTracking.cs</DependentUpon>
     </Compile>
+    <Compile Include="Config\InstrumentalDelayConfigManager.cs" />
     <Compile Include="Controller\LightCurveController.cs" />
     <Compile Include="Controller\DarkFlatFrameController.cs" />
     <Compile Include="Controller\VideoController.cs" />
@@ -413,6 +422,9 @@
     <Compile Include="View\ImageToolView.cs" />
     <Compile Include="View\VideoFileView.cs" />
     <Compile Include="View\ZoomedImageView.cs" />
+    <EmbeddedResource Include="Config\frmInstDelayConfigChooser.resx">
+      <DependentUpon>frmInstDelayConfigChooser.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Config\frmTangraSettings.resx">
       <DependentUpon>frmTangraSettings.cs</DependentUpon>
     </EmbeddedResource>
@@ -605,6 +617,10 @@
     <ProjectReference Include="..\Tangra.Model\Tangra.Model.csproj">
       <Project>{70BBC9A7-7DD9-4A4D-B972-6665C65875C6}</Project>
       <Name>Tangra.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tangra.SDK\Tangra.SDK.csproj">
+      <Project>{bea778ee-f0be-49f3-bee4-0b8ed2d778f9}</Project>
+      <Name>Tangra.SDK</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

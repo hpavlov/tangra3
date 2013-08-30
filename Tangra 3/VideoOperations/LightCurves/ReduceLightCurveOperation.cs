@@ -64,6 +64,9 @@ namespace Tangra.VideoOperations.LightCurves
         private ITimestampOcr m_TimestampOCR;
         private DateTime m_OCRedTimeStamp;
 
+	    private string m_InstumentalDelaySelectedCamera;
+	    private Dictionary<int, float> m_InstumentalDelaySelectedConfig;
+ 
         private LCState m_BackedUpSelectMeasuringStarsState = null;
 
         private MeasuringZoomImageType MeasuringZoomImageType = MeasuringZoomImageType.Stripe;
@@ -1216,8 +1219,27 @@ namespace Tangra.VideoOperations.LightCurves
 			SaveSessionFile();
         }
 
+		private bool CouldUseInstrumentalDelay()
+		{
+			return !m_VideoController.IsAstroDigitalVideo;
+
+		}
         public void ShowLightCurve()
         {
+			if (CouldUseInstrumentalDelay())
+			{
+				List<string> cameras = InstrumentalDelayConfigManager.GetAvailableCameras();
+
+				var frm = new frmInstDelayConfigChooser();
+				frm.SetCameraModels(cameras);
+
+				if (m_VideoController.ShowDialog(frm) == DialogResult.OK)
+				{
+					m_InstumentalDelaySelectedCamera = frm.SelectedCamera;
+					m_InstumentalDelaySelectedConfig = InstrumentalDelayConfigManager.GetConfigurationForCamera(m_InstumentalDelaySelectedCamera);									
+				}
+			}
+
 			FlushLightCurveFile();
 
 			m_Measuring = false;
@@ -1600,7 +1622,9 @@ namespace Tangra.VideoOperations.LightCurves
 				m_StateMachine.MeasuringStars,
 				m_Tracker,
 				m_TimestampOCR,
-				null);
+				null,
+				m_InstumentalDelaySelectedConfig,
+				m_InstumentalDelaySelectedCamera);
 
 			m_lcFile = LCFile.FlushOnTheFlyOutputFile(finalHeader, footer);
 		}
