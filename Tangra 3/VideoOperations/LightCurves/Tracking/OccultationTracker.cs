@@ -39,7 +39,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             {
                 bool notAllStarsLocated = TrackedObjects.Exists(o => !o.IsLocated);
                 bool notAllLocateFirstStarsLocated = LocateFirstObjects.Exists(o => !o.IsLocated);
-                if (notAllLocateFirstStarsLocated)
+                if (notAllLocateFirstStarsLocated && LocateFirstObjects.Count > 1)
                     LocateStarsWithStarRecognition(astroImage);
 
                 // TODO: Use the notAllStarsLocated to troubleshoot the pattern recognition alignment
