@@ -47,3 +47,7 @@
 /Tangra.Core/Tangra.Core.Win32.workspace.hpavlov
 
 /Tangra 3.Windows.v11.suo
+/Tangra.Addins/bin
+/Tangra.Addins/obj
+/Tangra.SDK/obj
+/Tangra.SDK/bin

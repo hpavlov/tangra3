@@ -80,6 +80,8 @@ namespace Tangra.Model.Video
 		bool IsAstroDigitalVideo { get; }
 		bool IsAstroAnalogueVideo { get; }
         bool AstroAnalogueVideoHasOcrData { get; }
+		string AstroVideoCameraModel { get; }
+		string AstroVideoNativeVideoStandard { get; }
 		GeoLocationInfo GeoLocation { get; }
 		void Start(FramePlaySpeed mode, uint step);
 		void Stop();
@@ -90,6 +92,7 @@ namespace Tangra.Model.Video
         void MoveToFrame(int frameNo);
 		Pixelmap GetFrame(int frameNo, bool noIntegrate);
         Pixelmap GetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging);
+		FrameStateData GetFrameStatusChannel(int frameId);
 		void DisposeResources();
 		void OpenVideo(IFrameStream frameStream);
 		void CloseVideo();

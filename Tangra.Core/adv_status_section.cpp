@@ -142,6 +142,17 @@ void AdvStatusSection::GetDataFromDataBytes(unsigned char* data, int sectionData
 			
 			statusData+=5;			
 		}
+		else if (strcmp("IntegratedFrames", tagName) == 0)
+		{
+			unsigned char  b1 = *(statusData + 1);
+			unsigned char  b2 = *(statusData + 2);
+			
+			long shortVal = (long)(((long)b2 << 8) + (long)b1);
+			
+			frameInfo->IntegratedFrames = shortVal;
+			
+			statusData+=3;
+		}
 		else if (strcmp("VideoCameraFrameId", tagName) == 0 || strcmp("HardwareTimerFrameId", tagName) == 0)
 		{
 			unsigned char  b1 = *(statusData + 1);

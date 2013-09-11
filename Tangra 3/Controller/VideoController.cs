@@ -429,6 +429,16 @@ namespace Tangra.Controller
             get { return m_FramePlayer.AstroAnalogueVideoHasOcrData; }
         }
 
+	    public string AstroVideoCameraModel
+	    {
+			get { return m_FramePlayer.AstroVideoCameraModel; }
+	    }
+
+		public string AstroVideoNativeVideoStandard
+		{
+			get { return m_FramePlayer.AstroVideoNativeVideoStandard; }
+		}
+
 	    public GeoLocationInfo GeoLocation
 	    {
 			get
@@ -572,6 +582,10 @@ namespace Tangra.Controller
 			return m_FramePlayer.GetFrame(frameId, true);
 		}
 
+		internal FrameStateData GetFrameStateData(int frameId)
+		{
+			return m_FramePlayer.GetFrameStatusChannel(frameId);
+		}
 		public FrameStateData GetCurrentFrameState()
 		{
 			return m_FrameState;

@@ -4,6 +4,8 @@ Features:
 
  - Add instrumental delay computations for the popular integrating video cameras
  - Add OCR option for AVI videos
+ - Add "Auto Update" functionality. At least for the Windows Version 
+ - Add the Define OSD Area tool and exlude the area during Tracking ?? May be not!
 
 Bugs:
 -----

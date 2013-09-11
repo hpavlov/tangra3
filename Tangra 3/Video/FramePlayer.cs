@@ -261,6 +261,14 @@ namespace Tangra.Video
 				: null;
         }
 
+		public FrameStateData GetFrameStatusChannel(int index)
+		{
+			if (m_VideoStream is AstroDigitalVideoStream)
+				return ((AstroDigitalVideoStream) m_VideoStream).GetFrameStatusChannel(index);
+			else
+				return new FrameStateData();
+		}
+
 	    public void StepBackward()
 		{
 			if (m_VideoStream != null)
@@ -668,5 +676,27 @@ namespace Tangra.Video
                 return IsAstroAnalogueVideo && ((AstroDigitalVideoStream)m_VideoStream).OcrDataAvailable;
 	        }
 	    }
+
+		public string AstroVideoCameraModel
+		{
+			get
+			{
+				if (IsAstroAnalogueVideo || IsAstroDigitalVideo)
+					return ((AstroDigitalVideoStream) m_VideoStream).CameraModel;
+				else
+					return null;
+			}
+		}
+
+		public string AstroVideoNativeVideoStandard
+		{
+			get
+			{
+				if (IsAstroAnalogueVideo)
+					return ((AstroDigitalVideoStream)m_VideoStream).VideoStandard;
+				else
+					return null;
+			}
+		}
 	}
 }

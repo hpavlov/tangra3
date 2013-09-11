@@ -19,6 +19,7 @@ namespace Tangra.Model.Image
 		public string AlmanacStatus;
 		public string AlmanacOffset;
 		public string GPSFixStatus;
+		public int? NumberIntegratedFrames;
 
 		public bool IsEmpty()
 		{

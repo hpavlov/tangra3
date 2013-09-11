@@ -1219,19 +1219,14 @@ namespace Tangra.VideoOperations.LightCurves
 			SaveSessionFile();
         }
 
-		private bool CouldUseInstrumentalDelay()
-		{
-			return !m_VideoController.IsAstroDigitalVideo;
-
-		}
         public void ShowLightCurve()
         {
-			if (CouldUseInstrumentalDelay())
+			if (m_VideoController.IsAstroAnalogueVideo)
 			{
 				List<string> cameras = InstrumentalDelayConfigManager.GetAvailableCameras();
 
 				var frm = new frmInstDelayConfigChooser();
-				frm.SetCameraModels(cameras);
+				frm.SetCameraModels(cameras, m_VideoController.AstroVideoCameraModel, m_VideoController.AstroVideoNativeVideoStandard);
 
 				if (m_VideoController.ShowDialog(frm) == DialogResult.OK)
 				{
@@ -1301,64 +1296,111 @@ namespace Tangra.VideoOperations.LightCurves
 
         public DialogResult EnteredTimeIntervalLooksOkay()
         {
-            if ((m_VideoController.VideoFrameRate < 24.0 && m_VideoController.VideoFrameRate > 26.0) ||
-                (m_VideoController.VideoFrameRate < 29.0 && m_VideoController.VideoFrameRate > 31.0))
-            {
-                MessageBox.Show(
-                    string.Format("This video has an unusual frame rate of {0}. Tangra cannot run internal checks for the correctness of the entered frame times.", m_VideoController.VideoFrameRate.ToString("0.00")),
-                    "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return DialogResult.Ignore;
-            }
-
-            double acceptedVideoFrameRate = m_VideoController.VideoFrameRate > 24.0 && m_VideoController.VideoFrameRate < 26.0
-                                                ? 25.0 /* PAL */
-                                                : 29.97 /* NTSC */;
-            string videoType = m_VideoController.VideoFrameRate > 24.0 && m_VideoController.VideoFrameRate < 26.0
-                                   ? "PAL"
-                                   : "NTSC";
-
-            TimeSpan ts = new TimeSpan(m_EndFrameTime.Ticks - m_StartFrameTime.Ticks);
-            double videoTimeInSec = (m_EndTimeFrame - m_StartTimeFrame) / acceptedVideoFrameRate;
-
-            if (videoTimeInSec < 0 || Math.Abs((videoTimeInSec - ts.TotalSeconds) * 1000) > TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMs)
-            {
-                if (MessageBox.Show(
-                    string.Format("The time computed from the measured number of frames in this {1} video is off by more than {0} ms from the entered time. This may indicate " +
-                    "incorrectly entered start or end time or an almanac update or a leap second event. Do you want to enter the start and end times again?",
-                    (TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMs).ToString("0.00"),
-                    videoType),
-                    "Warning",
-                    MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
-                {
-                    return DialogResult.Retry;
-                }
-
-                return DialogResult.Ignore;
-            }
-
-            double derivedFrameRate = (m_EndTimeFrame - m_StartTimeFrame) / ts.TotalSeconds;
-
-            // 1) compute 1 ms plus 1ms for each 30 sec up to the max of 4ms. e.g. if this is a PAL video and we have measured 780 frames, this makes 780 / 25fps (PAL) = 31.2 sec. So we take excess = 1 + 1 sec.
-            // 2) max allowed difference = 1.33 * Module[video frame rate - (video frame rate * num frames + excess) / num frames]
-            int allowedExcess = 1 + Math.Min(4, (int)((m_EndTimeFrame - m_StartTimeFrame) / acceptedVideoFrameRate) / 30);
-            double maxAllowedFRDiff = 1.33 * Math.Abs(acceptedVideoFrameRate - ((acceptedVideoFrameRate * (m_EndTimeFrame - m_StartTimeFrame) + allowedExcess) / (m_EndTimeFrame - m_StartTimeFrame)));
-
-            if (Math.Abs(derivedFrameRate - acceptedVideoFrameRate) > maxAllowedFRDiff)
-            {
-                if (MessageBox.Show(
-                    "Based on your entered frame times it appears that there may be dropped frames, incorrectly entered start " +
-                    "or end time, an almanac update or a leap second event. Do you want to enter the start and end times again?",
-                    "Warning",
-                    MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
-                {
-                    return DialogResult.Retry;
-                }
-
-                return DialogResult.Ignore;
-            }
-
-            return DialogResult.OK;
+	        if (m_VideoController.IsAstroAnalogueVideo && !m_VideoController.AstroAnalogueVideoHasOcrData)
+		        return CheckAavRate();
+	        else
+		        return CheckPALOrNTSCRate();
         }
+
+		public DialogResult CheckAavRate()
+	    {
+			int totalIntegratedFrames = 0;
+			for (int i = m_StartTimeFrame; i < m_EndTimeFrame; i++)
+			{
+				FrameStateData frameState = m_VideoController.GetFrameStateData(i);
+
+				totalIntegratedFrames += frameState.NumberIntegratedFrames.Value;
+			}
+
+			// The actual integration could even be of PAL or NTSC frames
+
+			TimeSpan ts = new TimeSpan(m_EndFrameTime.Ticks - m_StartFrameTime.Ticks);
+			double videoTimeInSecPAL = totalIntegratedFrames / 25.0;
+			double videoTimeInSecNTSC = totalIntegratedFrames / 29.97;
+
+			bool isTimeOk =
+				(videoTimeInSecPAL > 0 && Math.Abs((videoTimeInSecPAL - ts.TotalSeconds) * 1000) < TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMs) ||
+				(videoTimeInSecNTSC > 0 && Math.Abs((videoTimeInSecNTSC - ts.TotalSeconds) * 1000) < TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMs);
+
+			if (!isTimeOk)
+			{
+				if (MessageBox.Show(
+					string.Format("The time computed from the measured number of frames in this AAV video is off by more than {0} ms from the entered time. This may indicate " +
+					"incorrectly entered start or end time or an almanac update or a leap second event. Do you want to enter the start and end times again?",
+					(TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMs).ToString("0.00")),
+					"Warning",
+					MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
+				{
+					return DialogResult.Retry;
+				}
+
+				return DialogResult.Ignore;
+			}
+
+			return DialogResult.OK;
+	    }
+
+
+	    public DialogResult CheckPALOrNTSCRate()
+		{
+			if ((m_VideoController.VideoFrameRate < 24.0 && m_VideoController.VideoFrameRate > 26.0) ||
+				(m_VideoController.VideoFrameRate < 29.0 && m_VideoController.VideoFrameRate > 31.0))
+			{
+				MessageBox.Show(
+					string.Format("This video has an unusual frame rate of {0}. Tangra cannot run internal checks for the correctness of the entered frame times.", m_VideoController.VideoFrameRate.ToString("0.00")),
+					"Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+				return DialogResult.Ignore;
+			}
+
+			double acceptedVideoFrameRate = m_VideoController.VideoFrameRate > 24.0 && m_VideoController.VideoFrameRate < 26.0
+												? 25.0 /* PAL */
+												: 29.97 /* NTSC */;
+			string videoType = m_VideoController.VideoFrameRate > 24.0 && m_VideoController.VideoFrameRate < 26.0
+								   ? "PAL"
+								   : "NTSC";
+
+			TimeSpan ts = new TimeSpan(m_EndFrameTime.Ticks - m_StartFrameTime.Ticks);
+			double videoTimeInSec = (m_EndTimeFrame - m_StartTimeFrame) / acceptedVideoFrameRate;
+
+			if (videoTimeInSec < 0 || Math.Abs((videoTimeInSec - ts.TotalSeconds) * 1000) > TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMs)
+			{
+				if (MessageBox.Show(
+					string.Format("The time computed from the measured number of frames in this {1} video is off by more than {0} ms from the entered time. This may indicate " +
+					"incorrectly entered start or end time or an almanac update or a leap second event. Do you want to enter the start and end times again?",
+					(TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMs).ToString("0.00"),
+					videoType),
+					"Warning",
+					MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
+				{
+					return DialogResult.Retry;
+				}
+
+				return DialogResult.Ignore;
+			}
+
+			double derivedFrameRate = (m_EndTimeFrame - m_StartTimeFrame) / ts.TotalSeconds;
+
+			// 1) compute 1 ms plus 1ms for each 30 sec up to the max of 4ms. e.g. if this is a PAL video and we have measured 780 frames, this makes 780 / 25fps (PAL) = 31.2 sec. So we take excess = 1 + 1 sec.
+			// 2) max allowed difference = 1.33 * Module[video frame rate - (video frame rate * num frames + excess) / num frames]
+			int allowedExcess = 1 + Math.Min(4, (int)((m_EndTimeFrame - m_StartTimeFrame) / acceptedVideoFrameRate) / 30);
+			double maxAllowedFRDiff = 1.33 * Math.Abs(acceptedVideoFrameRate - ((acceptedVideoFrameRate * (m_EndTimeFrame - m_StartTimeFrame) + allowedExcess) / (m_EndTimeFrame - m_StartTimeFrame)));
+
+			if (Math.Abs(derivedFrameRate - acceptedVideoFrameRate) > maxAllowedFRDiff)
+			{
+				if (MessageBox.Show(
+					"Based on your entered frame times it appears that there may be dropped frames, incorrectly entered start " +
+					"or end time, an almanac update or a leap second event. Do you want to enter the start and end times again?",
+					"Warning",
+					MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
+				{
+					return DialogResult.Retry;
+				}
+
+				return DialogResult.Ignore;
+			}
+
+			return DialogResult.OK;			
+		}
 
 		internal void EnterViewLightCurveMode(LCFile lcFile, IVideoController videoController, Panel controlPanel)
 		{

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -20,13 +21,23 @@ namespace Tangra.Config
 		{
 			get
 			{
-				throw new NotImplementedException();
+				return cbxCameras.SelectedText;
 			}
 		}
 
-		public void SetCameraModels(List<string> cameras)
+		public void SetCameraModels(List<string> cameras, string selectedCamera, string videoStandard)
 		{
-			throw new NotImplementedException();
+			cbxCameras.Items.Clear();
+			cbxCameras.Items.AddRange(cameras.Cast<object>().ToArray());
+
+			string cameraToSelect = cameras.SingleOrDefault(x => x.Replace(" ", "").Contains(selectedCamera.Replace(" ", "")) && x.Contains(videoStandard));
+			if (cameraToSelect != null)
+				cbxCameras.SelectedIndex = cbxCameras.Items.IndexOf(cameraToSelect);
+		}
+
+		private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+		{
+			Process.Start("http://www.dangl.at/ausruest/vid_tim/vid_tim1.htm");
 		}
 	}
 }

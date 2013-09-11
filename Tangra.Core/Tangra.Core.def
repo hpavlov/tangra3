@@ -11,6 +11,7 @@ EXPORTS
 	ADVGetIntegratedFrame
 	ADVGetFramePixels
 	ADVGetFrameStatusChannel
+	ADVGetFileTag
 
 	; Video and Image Config
 	InitTangraCore

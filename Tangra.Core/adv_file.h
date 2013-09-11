@@ -38,7 +38,7 @@ namespace AdvLib
 
 		protected:
 			AdvLib::AdvFramesIndex* m_Index;
-			map<const char*, const char*> m_FileTags;
+			map<string, string> m_FileTags;
 			
 			
 		private:
@@ -60,9 +60,9 @@ namespace AdvLib
 			
 			void GetFrameImageSectionHeader(int frameId, unsigned char* layoutId, enum GetByteMode* mode);
 			void GetFrameSectionData(int frameId, unsigned long* prevFrame, unsigned long* pixels, AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError);
-			void GetFrameStatusSectionData(int frameId, AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError);
+			void GetFrameStatusSectionData(int frameId, AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError);		
 			
-			void CropFile(const char* newfileName, int firstFrameId, int lastFrameId);			
+			void GetFileTag(const char* fileTagName, char* fileTagValue);
 		};
 
 }

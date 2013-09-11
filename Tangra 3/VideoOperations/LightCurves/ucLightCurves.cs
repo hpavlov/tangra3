@@ -265,8 +265,10 @@ namespace Tangra.VideoOperations.LightCurves
 
             ucUtcTime.FocusHourControl();
 
-            m_ShowingFields = false;
+            m_ShowingFields = true;
+			m_StateMachine.VideoOperation.ToggleShowFields(m_ShowingFields);
             UpdateShowingFieldControls();
+
             m_FirstTimeFrame = -1;
             m_LastTimeFrame = -1;
         }

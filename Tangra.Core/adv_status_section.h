@@ -34,6 +34,7 @@ struct AdvFrameInfo
 	long VideoCameraFrameIdHi;
 	long HardwareTimerFrameIdLo;
 	long HardwareTimerFrameIdHi;
+	long IntegratedFrames;
 };
 
 

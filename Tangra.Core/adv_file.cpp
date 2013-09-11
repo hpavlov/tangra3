@@ -87,7 +87,6 @@ void AdvFile::OpenFile(const char* fileName, AdvFileInfo* fileInfo)
 	fread(&metadataSystemTableOffset, 8, 1, m_File);
 	fread(&metadataUserTableOffset, 8, 1, m_File);
 
-
 	if (dataFormatVer >= 1)
     {
         char sectionsCount;
@@ -142,8 +141,8 @@ void AdvFile::OpenFile(const char* fileName, AdvFileInfo* fileInfo)
 			char* tagName = ReadString(m_File);
 			char* tagValue = ReadString(m_File);
 
-			m_FileTags.insert(make_pair(tagName, tagValue));
-
+			m_FileTags.insert(make_pair(string(tagName), string(tagValue)));
+				
 			delete tagName;
 			delete tagValue;
 		}
@@ -158,123 +157,46 @@ void AdvFile::OpenFile(const char* fileName, AdvFileInfo* fileInfo)
 			char* tagName = ReadString(m_File);
 			char* tagValue = ReadString(m_File);
 
-			m_FileTags.insert(make_pair(tagName, tagValue));
+			m_FileTags.insert(make_pair(string(tagName), string(tagValue)));
 
 			delete tagName;
 			delete tagValue;
 		}
     }
-
+			
+	char fileTagValue[256];
+	GetFileTag("FSTF-TYPE", &fileTagValue[0]);
+	bool isAAVFile = strcmp(fileTagValue, "AAV") == 0;	
+	GetFileTag("OCR-ENGINE", &fileTagValue[0]);
+	bool hasAAVEmbeddedTimestamps = strlen(fileTagValue) > 0;
+	GetFileTag("EFFECTIVE-FRAME-RATE", &fileTagValue[0]);
+	float effectiveFrameRate = 0;
+	if (strlen(fileTagValue) > 0)
+	{
+		char* pEnd;
+		effectiveFrameRate = strtod(fileTagValue, &pEnd);
+	}
+			
 	fileInfo->Bpp = ImageSection->DataBpp;
 	fileInfo->CountFrames = TotalNumberOfFrames;
 	fileInfo->Height = ImageSection->Height;
 	fileInfo->Width = ImageSection->Width;
-	fileInfo->FrameRate = 0; // This is variable
+	
+	if (isAAVFile && !hasAAVEmbeddedTimestamps)
+		// For AAV files that don't have embeddd timestamps read the frame rate from the AAV file header	
+		fileInfo->FrameRate = effectiveFrameRate;
+	else
+		// For ADV files and for AAV files that have embedded timestamps, the framerate will be ignored
+		fileInfo->FrameRate = 0; // This is variable
 }
 
-void AdvFile::CropFile(const char* newfileName, int firstFrameId, int lastFrameId)
+void AdvFile::GetFileTag(const char* fileTagName, char* fileTagValue)
 {
-	/* TODO: This is not implemented yet
-	 * 
-	FILE* newFile = fopen(newfileName, "wb");
-
-	unsigned int buffInt = 0x46545346;
-	unsigned char buffChar;
-	
-	fwrite(&buffInt, 4, 1, newFile);
-
-	fwrite(&CURRENT_DATAFORMAT_VERSION, 1, 1, newFile);
-	
-	fwrite(&totalNumberOfFrames, 4, 1, newFile);
-
-    __int64 indexTableOffset = 0;
-	__int64 metadataSystemTableOffset = 0;
-	__int64 metadataUserTableOffset = 0;
-
-	fwrite(&indexTableOffset, 8, 1, newFile);
-	fwrite(&metadataSystemTableOffset, 8, 1, newFile);
-	fwrite(&metadataUserTableOffset, 8, 1, newFile);
-
-	char sectionsCount;
-	fwrite(&sectionsCount, 1, 1, m_File);
-
-	map<__int64, string> sectionDefs;
-
-	for (int i = 0; i < sectionsCount; i++)
+	map<string, string>::iterator itTag = m_FileTags.find(fileTagName);
+	if (itTag != m_FileTags.end())
 	{
-		char* sectionType = ReadString(m_File);
-
-		__int64 sectionHeaderOffset;
-		fread(&sectionHeaderOffset, 8, 1, m_File);
-
-		sectionDefs.insert(make_pair((long long)(sectionHeaderOffset), string(sectionType)));
-
-		delete sectionType;
+		strcpy(&fileTagValue[0], &itTag->second.c_str()[0]);
 	}
-
-	map<__int64, string>::iterator curr = sectionDefs.begin();
-	while (curr != sectionDefs.end()) 
-	{			
-		advfsetpos(m_File, &curr->first);
-		const char* sectionName = curr->second.c_str();
-
-		if (0 == strcmp("IMAGE", sectionName))
-		{
-			ImageSection = new AdvLib::AdvImageSection(m_File);
-			
-		}
-		else if (0 == strcmp("STATUS", sectionName))
-		{
-			StatusSection = new AdvLib::AdvStatusSection(m_File);
-		}
-
-		curr++;
-	}
-
-	advfsetpos(m_File, &indexTableOffset);
-	m_Index = new AdvLib::AdvFramesIndex(m_File);
-
-	// Reads the system metadata table
-	advfsetpos(m_File, &metadataSystemTableOffset);
-
-	unsigned int numTags;
-	fread(&numTags, 4, 1, m_File);
-	
-	m_FileTags.clear();
-	
-	for(int i = 0; i < numTags; i++)
-	{
-		char* tagName = ReadString(m_File);
-		char* tagValue = ReadString(m_File);
-
-		m_FileTags.insert(make_pair(tagName, tagValue));
-
-		delete tagName;
-		delete tagValue;
-	}
-
-	// Reads the user metadata table
-	advfsetpos(m_File, &metadataUserTableOffset);
-
-	fread(&numTags, 4, 1, m_File);
-		
-	for(int i = 0; i < numTags; i++)
-	{
-		char* tagName = ReadString(m_File);
-		char* tagValue = ReadString(m_File);
-
-		m_FileTags.insert(make_pair(tagName, tagValue));
-
-		delete tagName;
-		delete tagValue;
-	}
-
-	fileInfo->Bpp = ImageSection->DataBpp;
-	fileInfo->CountFrames = TotalNumberOfFrames;
-	fileInfo->Height = ImageSection->Height;
-	fileInfo->Width = ImageSection->Width;
-	fileInfo->FrameRate = 0; // This is variable	
-	 */
 }
 
 void AdvFile::GetFrameImageSectionHeader(int frameId, unsigned char* layoutId, enum GetByteMode* mode)

@@ -51,14 +51,9 @@ HRESULT ADVCloseFile()
 	return S_OK;
 }
 
-HRESULT ADVCropFile(char* newfileName, int firstFrameId, int lastFrameId)
+HRESULT ADVGetFileTag(char* fileTagName, char* fileTagValue)
 {
-	if (firstFrameId >= 0 && 
-		lastFrameId <= g_TangraAdvFile->TotalNumberOfFrames && 
-		firstFrameId <= lastFrameId)
-    {
-		g_TangraAdvFile->CropFile(newfileName, firstFrameId, lastFrameId);
-	}
+	g_TangraAdvFile->GetFileTag(fileTagName, fileTagValue);
 	
 	return S_OK;
 }

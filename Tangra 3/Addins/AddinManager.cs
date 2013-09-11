@@ -26,30 +26,35 @@ namespace Tangra.Addins
 
 		private List<string> SearchAddins()
 		{
-			string[] names = Directory.GetFiles(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Addins"), "*.dll");
-
 			var addins = new List<string>();
 
-			foreach (string asm in names)
+			string addinsDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Addins");
+
+			if (Directory.Exists(addinsDir))
 			{
-				try
-				{
-					Assembly loadedAssembly = Assembly.LoadFile(asm);
+				string[] names = Directory.GetFiles(addinsDir, "*.dll");
 
-					List<string> addinTypesFound = loadedAssembly
-						.GetTypes()
-						.Where(t => t.IsClass && t.GetInterface(typeof(ITangraAddin).FullName) != null)
-						.Select(t => string.Concat(t.FullName, ",", loadedAssembly.FullName))
-						.ToList();
-
-					addins.AddRange(addinTypesFound);
-				}
-				catch (Exception ex)
+				foreach (string asm in names)
 				{
-					Trace.WriteLine(ex.FullExceptionInfo());
-				}
+					try
+					{
+						Assembly loadedAssembly = Assembly.LoadFile(asm);
+
+						List<string> addinTypesFound = loadedAssembly
+							.GetTypes()
+							.Where(t => t.IsClass && t.GetInterface(typeof(ITangraAddin).FullName) != null)
+							.Select(t => string.Concat(t.FullName, ",", loadedAssembly.FullName))
+							.ToList();
+
+						addins.AddRange(addinTypesFound);
+					}
+					catch (Exception ex)
+					{
+						Trace.WriteLine(ex.FullExceptionInfo());
+					}
+				}				
 			}
-			
+
 			return addins;
 		}
 

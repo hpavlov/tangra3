@@ -39,6 +39,7 @@ namespace Tangra.PInvoke
 			VideoCameraFrameIdHi = copyFrom.VideoCameraFrameIdHi;
 			HardwareTimerFrameIdLo = copyFrom.HardwareTimerFrameIdLo;
 			HardwareTimerFrameIdHi = copyFrom.HardwareTimerFrameIdHi;
+			IntegratedFrames = copyFrom.IntegratedFrames;
 		}
 
 		public string GPSFixString;
@@ -62,18 +63,19 @@ namespace Tangra.PInvoke
 		public AdvFrameInfoNative()
 		{
 #if DEBUG
-			MidFrameTimeStampMillisecondsLo = 675;
-			MidFrameTimeStampMillisecondsHi = 987;
-			Exposure10thMs = 1234;
-			Gamma = 12.34f;
-			Gain = 23.45f;
-			Shutter = 34.56f;
-			Offset = 45.67f;
-			SystemTimeLo = 100;
-			SystemTimeHi = 234;
-			GPSTrackedSattelites = 17;
-			GPSAlmanacStatus = 18;
-			GPSFixStatus = 19;
+			MidFrameTimeStampMillisecondsLo = 0;
+			MidFrameTimeStampMillisecondsHi = 0;
+			Exposure10thMs = 0;
+			Gamma = 0f;
+			Gain = 0f;
+			Shutter = 0f;
+			Offset = 0f;
+			SystemTimeLo = 0;
+			SystemTimeHi = 0;
+			GPSTrackedSattelites = 0;
+			GPSAlmanacStatus = 0;
+			GPSFixStatus = 0;
+			IntegratedFrames = 0;
 #else
 			MidFrameTimeStampMillisecondsLo = 0;
 			MidFrameTimeStampMillisecondsHi = 0;
@@ -88,7 +90,7 @@ namespace Tangra.PInvoke
 			GPSAlmanacStatus = 0;
 			GPSFixStatus = 0;
 #endif
-        }
+		}
 
 		[FieldOffset(0)]
 		public uint MidFrameTimeStampMillisecondsLo;
@@ -124,6 +126,8 @@ namespace Tangra.PInvoke
 		public uint HardwareTimerFrameIdLo;
 		[FieldOffset(52)]
 		public uint HardwareTimerFrameIdHi;
+		[FieldOffset(56)]
+		public uint IntegratedFrames; 
 
 		public DateTime MiddleExposureTimeStamp
 		{
@@ -218,8 +222,9 @@ namespace Tangra.PInvoke
 		public static extern int ADVGetFrameStatusChannel(int frameNo, [In, Out] AdvFrameInfoNative frameInfo, [In, Out] byte[] gpsFix, [In, Out] byte[] userCommand, [In, Out] byte[] systemError);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-		//HRESULT ADVCropFile(char* newfileName, int firstFrameId, int lastFrameId);
-		public static extern int ADVCropFile(string newfileName, int firstFrameId, int lastFrameId);
+		//HRESULT ADVGetFileTag(char* tagName, char* tagValue);
+		public static extern int ADVGetFileTag(string tagName, [In, Out] byte[] tagValue);
+
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
 		//HRESULT GetBitmapPixels(long width, long height, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, bool isLittleEndian, int bpp);
