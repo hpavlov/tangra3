@@ -1,3 +1,16 @@
+[Oo]bj
+[Bb]in
+*.user
+*.suo
+*.[Cc]ache
+*.bak
+*.ncb
+*.log 
+*.DS_Store
+[Tt]humbs.db 
+_ReSharper.*
+*.resharper
+
 /Latest Binaries
 
 /Install
@@ -51,3 +64,5 @@
 /Tangra.Addins/obj
 /Tangra.SDK/obj
 /Tangra.SDK/bin
+
+/AutoUpdate/SelfUpdate/AutoUpdateSelfUpdate.exe
