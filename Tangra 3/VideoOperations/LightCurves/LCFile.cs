@@ -359,15 +359,83 @@ namespace Tangra.VideoOperations.LightCurves
 			frameTiming.WriteTo(s_OnTheFlyWriter);
 		}
 
-		internal DateTime GetTimeForFrame(double frameNo)
+		internal DateTime GetTimeForFrame(double frameNo, out bool isCorrectedForInstrumentalDelay)
 		{
+			isCorrectedForInstrumentalDelay = false;
+
 			if (FrameTiming != null && FrameTiming.Count > 0)
 			{
-				LCFrameTiming timingEntry = FrameTiming[(int) ((uint)frameNo - Header.MinFrame)];
-				return timingEntry.FrameMidTime;
+				if (Footer.InstrumentalDelayConfig != null)
+				{
+					return GetTimeForFrameWithInstrumentalDelay(frameNo, out isCorrectedForInstrumentalDelay);
+				}
+				else
+				{
+					LCFrameTiming timingEntry = FrameTiming[(int)((uint)frameNo - Header.MinFrame)];
+					return timingEntry.FrameMidTime;
+				}
 			}
 			else
 				return Header.GetTimeForFrameFromManuallyEnteredTimes(frameNo);
+		}
+
+		private DateTime GetTimeForFrameWithInstrumentalDelay(double frameNo, out bool isCorrectedForInstrumentalDelay)
+		{
+			int frameTimingIndex = (int) ((uint) frameNo - Header.MinFrame);
+
+			LCFrameTiming timingEntry = FrameTiming[frameTimingIndex];
+			LCFrameTiming othertimingEntry = timingEntry;
+			
+			DateTime rv = timingEntry.FrameMidTime;
+			isCorrectedForInstrumentalDelay = false;
+
+			if (frameTimingIndex > 0)
+			{
+				// Use the previous frame
+				othertimingEntry = FrameTiming[frameTimingIndex - 1];
+			}
+			else if (frameTimingIndex == 0 && FrameTiming.Count > 1)
+			{
+				// For first frame, use the second frame
+				othertimingEntry = FrameTiming[1];
+			}
+
+			double intervalDuration = Math.Abs(new TimeSpan(othertimingEntry.FrameMidTime.Ticks - timingEntry.FrameMidTime.Ticks).TotalSeconds);
+			if (intervalDuration > 0)
+			{
+				double videoStandardFieldDurationSec = 0;
+				int integratedFields = 0;
+
+				double ntscCountedFrames = intervalDuration * 29.97;
+				double palCountedFrames = intervalDuration * 25.00;
+				for (int i = 0; i < 256; i++)
+				{
+					if (Math.Abs(i - ntscCountedFrames) < 0.01)
+					{
+						integratedFields = 2 * i;
+						videoStandardFieldDurationSec = 0.01668335;
+						break;
+					}
+
+					if (Math.Abs(i - palCountedFrames) < 0.01)
+					{
+						integratedFields = 2 * i;
+						videoStandardFieldDurationSec = 0.02;
+						break;
+					}
+				}
+
+				if (integratedFields > 0 && Footer.InstrumentalDelayConfig.ContainsKey(integratedFields / 2))
+				{
+					// Apply correction: [FRAMETIME - ((1/2 * INTEGRATION PERIOD) - 1 FIELD) * (PAL or NTSC FrameRate) - GERHARD_CORRECTION(INTEGRATION PERIOD)]
+					double corrEndFirstField = -1 * (((integratedFields / 2) - 1) * videoStandardFieldDurationSec); // Half frame back sets us at the begining of the first field, then add 1 field to get to the end of the field
+					double corrInstrumentalDelay = Footer.InstrumentalDelayConfig[integratedFields/2]; // This is already negative
+					rv = rv.AddSeconds(corrEndFirstField + corrInstrumentalDelay);
+					isCorrectedForInstrumentalDelay = true;
+				}
+			}
+
+			return rv;
 		}
 
 		internal bool CanDetermineFrameTimes

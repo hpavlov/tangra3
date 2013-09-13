@@ -45,6 +45,8 @@ namespace Tangra.Config.SettingPannels
 			cbxAdvsPopupSatellites.Checked = TangraConfig.Settings.AAV.PopupSatellites;
 			cbxAdvsPopupGPSFix.Checked = TangraConfig.Settings.AAV.PopupGPSFix;
 			cbxAdvsPopupAlmanac.Checked = TangraConfig.Settings.AAV.PopupAlmanac;
+
+			cbxAavSplitFieldsOSD.Checked = TangraConfig.Settings.AAV.SplitFieldsOSD;
 		}
 
         public override void SaveSettings()
@@ -59,7 +61,9 @@ namespace Tangra.Config.SettingPannels
             TangraConfig.Settings.AAV.PopupSystemTime = cbxAdvsPopupSystemTime.Checked;
 			TangraConfig.Settings.AAV.PopupSatellites = cbxAdvsPopupSatellites.Checked;
 			TangraConfig.Settings.AAV.PopupGPSFix = cbxAdvsPopupGPSFix.Checked;
-			TangraConfig.Settings.AAV.PopupAlmanac = cbxAdvsPopupAlmanac.Checked;	        
+			TangraConfig.Settings.AAV.PopupAlmanac = cbxAdvsPopupAlmanac.Checked;
+
+			TangraConfig.Settings.AAV.SplitFieldsOSD = cbxAavSplitFieldsOSD.Checked;
 
 			if (m_AavPopupCustomizer != null)
 			{
@@ -78,6 +82,7 @@ namespace Tangra.Config.SettingPannels
 				PopupSatellites = cbxAdvsPopupSatellites.Checked,
 				PopupGPSFix = cbxAdvsPopupGPSFix.Checked,
 				PopupAlmanac = cbxAdvsPopupAlmanac.Checked,
+				SplitFieldsOSD = cbxAavSplitFieldsOSD.Checked,
 			};
 
 			return rv;

@@ -20,5 +20,7 @@ namespace Tangra.Model.Config
 		public bool PopupSatellites = true;
 		public bool PopupGPSFix = true;
 		public bool PopupAlmanac = true;
+
+		public bool SplitFieldsOSD = true;
 	}
 }

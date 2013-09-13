@@ -228,8 +228,8 @@ namespace Tangra.VideoOperations.LightCurves
 								}
 
 								if (drawThisReading && !readingIsOffScreen)
-								{
-									long currFrameTimestampTicks = m_Header.GetTimeForFrameFromFrameTiming((int) reading.CurrFrameNo, true).Ticks;
+								{									
+									long currFrameTimestampTicks = m_Header.GetTimeForFrameFromFrameTiming((int)reading.CurrFrameNo, true).Ticks;
 									float x = m_MinX + (currFrameTimestampTicks - m_MinDisplayedFrameTimestampTicks) * m_TimestampScaleX;
 
 									float y = pnlChart.Height - (m_MinY + (adjustedReading - (int)m_Header.MinAdjustedReading) * yScale);
@@ -655,7 +655,7 @@ namespace Tangra.VideoOperations.LightCurves
 					{
                         m_LightCurveController.MoveToFrameNoIntegrate((int)m_Context.SelectedFrameNo);
 					}
-
+					 
                     break;
                 }
             }
@@ -772,7 +772,7 @@ namespace Tangra.VideoOperations.LightCurves
 							x = m_MinX + (m_AllReadings[0][id].CurrFrameNo - m_MinDisplayedFrame) * m_ScaleX;
 
                         int intX = (int)Math.Round(x) + 1;
-                        for (int i = m_MinY; i <= m_MaxY; i++)
+                        for (int   i = m_MinY; i <= m_MaxY; i++)
                         {
 							if (intX >= 0 && intX <= m_Graph.Width && i >= 0 && i <= m_Graph.Height)
 								m_OldLineBackup.Add(i, m_Graph.GetPixel(intX, i));
@@ -996,12 +996,24 @@ namespace Tangra.VideoOperations.LightCurves
                 !LCMeasurement.IsEmpty(m_SelectedMeasurements[0]))
             {
                 lblFrameNo.Text = m_SelectedMeasurements[0].CurrFrameNo.ToString();
+				bool isCorrectedForInstrumentalDelay = false;
                 if (m_LCFile.CanDetermineFrameTimes)
                 {
-                    lblFrameTime.Text = m_LCFile.GetTimeForFrame(m_SelectedMeasurements[0].CurrFrameNo).ToString("HH:mm:ss.fff");
+					lblFrameTime.Text = m_LCFile.GetTimeForFrame(m_SelectedMeasurements[0].CurrFrameNo, out isCorrectedForInstrumentalDelay).ToString("HH:mm:ss.fff");
                 }
                 else
                     lblFrameTime.Text = "N/A";
+
+				if (isCorrectedForInstrumentalDelay)
+				{
+					lblInstDelayWarning.ForeColor = Color.Green;
+					toolTip1.SetToolTip(lblInstDelayWarning, "Instrumental delay has been applied to the times");
+				}
+				else
+				{
+					lblInstDelayWarning.ForeColor = Color.Red;
+					toolTip1.SetToolTip(lblInstDelayWarning, "Instrumental delay has *NOT* been applied to the times");
+				}
 
 				if (m_Header.ObjectCount > 0 &&
 					!LCMeasurement.IsEmpty(m_SelectedMeasurements[0]) /*The object may be deselected*/)

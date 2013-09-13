@@ -42,6 +42,7 @@
 			// cbxCameras
 			// 
 			this.cbxCameras.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.cbxCameras.Enabled = false;
 			this.cbxCameras.FormattingEnabled = true;
 			this.cbxCameras.Location = new System.Drawing.Point(38, 88);
 			this.cbxCameras.Name = "cbxCameras";
@@ -69,9 +70,11 @@
 			this.rbCorrect.TabIndex = 2;
 			this.rbCorrect.Text = "Apply corrections for ";
 			this.rbCorrect.UseVisualStyleBackColor = true;
+			this.rbCorrect.CheckedChanged += new System.EventHandler(this.rbCorrect_CheckedChanged);
 			// 
 			// btnOK
 			// 
+			this.btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
 			this.btnOK.Location = new System.Drawing.Point(158, 163);
 			this.btnOK.Name = "btnOK";
 			this.btnOK.Size = new System.Drawing.Size(75, 23);
@@ -81,6 +84,7 @@
 			// 
 			// btnCancel
 			// 
+			this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
 			this.btnCancel.Location = new System.Drawing.Point(239, 163);
 			this.btnCancel.Name = "btnCancel";
 			this.btnCancel.Size = new System.Drawing.Size(75, 23);

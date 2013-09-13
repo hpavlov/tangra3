@@ -1231,7 +1231,10 @@ namespace Tangra.VideoOperations.LightCurves
 				if (m_VideoController.ShowDialog(frm) == DialogResult.OK)
 				{
 					m_InstumentalDelaySelectedCamera = frm.SelectedCamera;
-					m_InstumentalDelaySelectedConfig = InstrumentalDelayConfigManager.GetConfigurationForCamera(m_InstumentalDelaySelectedCamera);									
+					if (m_InstumentalDelaySelectedCamera != null)
+						m_InstumentalDelaySelectedConfig = InstrumentalDelayConfigManager.GetConfigurationForCamera(m_InstumentalDelaySelectedCamera);
+					else
+						m_InstumentalDelaySelectedConfig = null;
 				}
 			}
 

@@ -3,6 +3,7 @@ Features:
 ---------
 
  - Add instrumental delay computations for the popular integrating video cameras
+ - Add the instrumental delay for AAV files with no OCR-ed timestamps
  - Add OCR option for AVI videos
  - Add "Auto Update" functionality. At least for the Windows Version 
  - Add the Define OSD Area tool and exlude the area during Tracking ?? May be not!

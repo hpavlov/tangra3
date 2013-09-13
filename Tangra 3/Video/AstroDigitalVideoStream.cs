@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Model.Config;
 using Tangra.Model.Context;
 using Tangra.Model.Image;
 using Tangra.Model.Video;
@@ -66,6 +67,8 @@ namespace Tangra.Video
 		private string m_CameraModel;
 		private string m_VideoStandard;
 		private double m_NativeFrameRate;
+		private int m_OsdFirstLine = 0;
+		private int m_OsdLastLine = 0;
 
 		private int m_AlmanacOffsetLastFrame;
 		private bool m_AlamanacOffsetLastFrameIsGood;
@@ -113,7 +116,15 @@ namespace Tangra.Video
 			{
 				m_VideoStandard = GetFileTag("NATIVE-VIDEO-STANDARD");
 				double.TryParse(GetFileTag("NATIVE-FRAME-RATE"), out m_NativeFrameRate);
-			}			
+
+				int.TryParse(GetFileTag("OSD-FIRST-LINE"), out m_OsdFirstLine);
+				int.TryParse(GetFileTag("OSD-LAST-LINE"), out m_OsdLastLine);
+			}
+			else
+			{
+				m_OsdFirstLine = 0;
+				m_OsdLastLine = 0;
+			}
 
 			m_FileOpened = true;
 		}
@@ -213,6 +224,11 @@ namespace Tangra.Video
 			m_CurrentFrameInfo.UserCommandString = AdvFrameInfo.GetStringFromBytes(userCommand);
 			m_CurrentFrameInfo.SystemErrorString = AdvFrameInfo.GetStringFromBytes(systemError);
 			m_CurrentFrameInfo.GPSFixString = AdvFrameInfo.GetStringFromBytes(gpsFix);
+
+			if (m_Engine == "AAV" && m_CurrentFrameInfo.IntegratedFrames > 0 && TangraConfig.Settings.AAV.SplitFieldsOSD && m_OsdFirstLine * m_OsdLastLine != 0)
+			{
+				TangraCore.BitmapSplitFieldsOSD(rawBitmapBytes, m_Width, m_Height, m_OsdFirstLine, m_OsdLastLine);
+			}
 
 			using (MemoryStream memStr = new MemoryStream(rawBitmapBytes))
 			{

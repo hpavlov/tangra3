@@ -328,6 +328,77 @@ HRESULT GetBitmapPixels(long width, long height, unsigned long* pixels, BYTE* bi
 	return S_OK;
 }
 
+long GetNewLinePosition(long line, long firstOsdLine, long lastOsdLine)
+{
+	if (line < firstOsdLine || line > lastOsdLine)
+		return -1;
+	else	
+		return firstOsdLine + ((line - firstOsdLine) / 2) + ((line + firstOsdLine) % 2) * (1 + (lastOsdLine - firstOsdLine) / 2);
+}
+
+HRESULT BitmapSplitFieldsOSD(BYTE* bitmapPixels, long width, long height, long firstOsdLine, long lastOsdLine)
+{
+	if (firstOsdLine >= lastOsdLine)
+		return E_FAIL;
+		
+	int stride = 3 * width;
+	
+	int moveFrom = firstOsdLine;
+	int moveTo = -1;
+	int buffedLine = -1;
+	
+	BYTE* buffer1 = (BYTE*)malloc(stride);
+	BYTE* buffer2 = (BYTE*)malloc(stride);
+	
+	bool* movedLines = (bool*)malloc(lastOsdLine - firstOsdLine);
+	
+	for (int i = 0; i <= lastOsdLine - firstOsdLine; i++) movedLines[i] = false;
+		
+	BYTE* ppFirstBitmapPixel = bitmapPixels + 55;
+				
+	for (int counter = firstOsdLine; counter <= lastOsdLine; counter++)
+	{
+		if (movedLines[counter - firstOsdLine])
+			continue;
+		
+		moveFrom = counter;
+		memmove(buffer1, ppFirstBitmapPixel + (lastOsdLine - moveFrom) * stride, stride);
+		
+		do
+		{
+			moveTo = GetNewLinePosition(moveFrom, firstOsdLine, lastOsdLine);
+			
+			if (moveTo != -1)
+			{
+				if (moveFrom != moveTo && !movedLines[moveTo - firstOsdLine])
+				{
+					memmove(buffer2, ppFirstBitmapPixel + (lastOsdLine - moveTo) * stride, stride);
+					buffedLine = moveTo;
+					
+					memmove(ppFirstBitmapPixel + (lastOsdLine - moveTo) * stride, buffer1, stride);
+					memmove(buffer1, buffer2, stride);
+					
+					movedLines[moveTo - firstOsdLine] = true;
+				}
+				else
+				{
+					movedLines[moveTo - firstOsdLine] = true;
+					break;
+				}
+			}
+			
+			moveFrom = moveTo;
+		}
+		while(true);
+	};
+	
+	delete buffer1;
+	delete buffer2;
+	delete movedLines;
+	
+	return S_OK;
+}
+
 void GetMinMaxValuesForBpp(int bpp, int* minValue, int* maxValue)
 {
 	*minValue = 0;

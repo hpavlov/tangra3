@@ -48,10 +48,13 @@
 			this.cbxAdvsPopupTimeStamp = new System.Windows.Forms.CheckBox();
 			this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
 			this.linkLabelAAV = new System.Windows.Forms.LinkLabel();
+			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.cbxAavSplitFieldsOSD = new System.Windows.Forms.CheckBox();
 			this.groupControl1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nudSaturation8bit)).BeginInit();
 			this.groupControl2.SuspendLayout();
 			this.groupControl3.SuspendLayout();
+			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// groupControl1
@@ -169,7 +172,7 @@
 			this.groupControl3.Controls.Add(this.cbxAdvsPopupTimeStamp);
 			this.groupControl3.Location = new System.Drawing.Point(216, 3);
 			this.groupControl3.Name = "groupControl3";
-			this.groupControl3.Size = new System.Drawing.Size(208, 255);
+			this.groupControl3.Size = new System.Drawing.Size(208, 180);
 			this.groupControl3.TabIndex = 45;
 			this.groupControl3.TabStop = false;
 			this.groupControl3.Text = "Frame Details Display (Pop-up)";
@@ -239,11 +242,30 @@
 			this.linkLabelAAV.Text = "OccuRec";
 			this.linkLabelAAV.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelAAV_LinkClicked);
 			// 
+			// groupBox1
+			// 
+			this.groupBox1.Controls.Add(this.cbxAavSplitFieldsOSD);
+			this.groupBox1.Location = new System.Drawing.Point(216, 189);
+			this.groupBox1.Name = "groupBox1";
+			this.groupBox1.Size = new System.Drawing.Size(207, 69);
+			this.groupBox1.TabIndex = 49;
+			this.groupBox1.TabStop = false;
+			this.groupBox1.Text = "Analogue Video Fields";
+			// 
+			// cbxAavSplitFieldsOSD
+			// 
+			this.cbxAavSplitFieldsOSD.Location = new System.Drawing.Point(14, 29);
+			this.cbxAavSplitFieldsOSD.Name = "cbxAavSplitFieldsOSD";
+			this.cbxAavSplitFieldsOSD.Size = new System.Drawing.Size(120, 19);
+			this.cbxAavSplitFieldsOSD.TabIndex = 44;
+			this.cbxAavSplitFieldsOSD.Text = "Split Field OSD";
+			// 
 			// ucAAV8bit
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.SystemColors.Control;
+			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.linkLabelAAV);
 			this.Controls.Add(this.groupControl3);
 			this.Controls.Add(this.groupControl2);
@@ -255,6 +277,7 @@
 			((System.ComponentModel.ISupportInitialize)(this.nudSaturation8bit)).EndInit();
 			this.groupControl2.ResumeLayout(false);
 			this.groupControl3.ResumeLayout(false);
+			this.groupBox1.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -281,6 +304,8 @@
 		private System.Windows.Forms.CheckBox cbxAdvsOsdSystemInfo;
 		private System.Windows.Forms.ToolTip toolTip1;
 		private System.Windows.Forms.LinkLabel linkLabelAAV;
+		private System.Windows.Forms.GroupBox groupBox1;
+		private System.Windows.Forms.CheckBox cbxAavSplitFieldsOSD;
 
 	}
 }

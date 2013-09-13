@@ -47,6 +47,7 @@ EXPORTS
 	GetBitmapPixels
 	GetPixelMapBits
 	GetPixelMapPixelsOnly
+	BitmapSplitFieldsOSD
 	ApplyPreProcessing
 	ApplyPreProcessingPixelsOnly
 	UsesPreProcessing
