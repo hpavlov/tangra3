@@ -6,12 +6,11 @@ Features:
  - Add the instrumental delay for AAV files with no OCR-ed timestamps
  - Add OCR option for AVI videos
  - Add "Auto Update" functionality. At least for the Windows Version 
- - Add the Define OSD Area tool and exlude the area during Tracking ?? May be not!
 
 Bugs:
 -----
 
-- Fix the out of memory issue when running measurements. Use the memory profiler to find memory leaks
+NONE REPORTED CURRENTLY
 
 -----
 Tangra v3.0.0.0
