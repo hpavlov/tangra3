@@ -7,10 +7,12 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using System.Xml;
 using Tangra.Addins;
 using Tangra.Config;
 using Tangra.Controller;
@@ -22,6 +24,7 @@ using Tangra.Model.Image;
 using Tangra.Model.Video;
 using Tangra.Model.VideoOperations;
 using Tangra.PInvoke;
+using Tangra.Properties;
 using Tangra.SDK;
 using Tangra.Video;
 using Tangra.Video.AstroDigitalVideo;
@@ -38,6 +41,8 @@ namespace Tangra
 		private VideoController m_VideoController;
 	    private LightCurveController m_LightCurveController;
 		private DarkFlatFrameController m_MakeDarkFlatController;
+		private AutoUpdatesController m_AutoUpdatesController;
+
 		private VideoFileView m_VideoFileView;
 		private ImageToolView m_ImageToolView;
         private ZoomedImageView m_ZoomedImageView;
@@ -57,6 +62,7 @@ namespace Tangra
 			m_VideoController = new VideoController(this, m_VideoFileView, m_ZoomedImageView, m_ImageToolView, pnlControlerPanel);
             m_LightCurveController = new LightCurveController(this, m_VideoController);
 			m_MakeDarkFlatController = new DarkFlatFrameController(this, m_VideoController);
+			m_AutoUpdatesController = new AutoUpdatesController(this);
 
 			NotificationManager.Instance.SetVideoController(m_VideoController);
 
@@ -766,5 +772,10 @@ namespace Tangra
         {
             m_VideoController.RedrawCurrentFrame(true);
         }
+
+		private void miCheckForUpdates_Click(object sender, EventArgs e)
+		{
+			m_AutoUpdatesController.CheckForUpdates(true);
+		}
 	}
 }
