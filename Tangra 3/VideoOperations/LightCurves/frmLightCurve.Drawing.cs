@@ -1000,20 +1000,20 @@ namespace Tangra.VideoOperations.LightCurves
                 if (m_LCFile.CanDetermineFrameTimes)
                 {
 					lblFrameTime.Text = m_LCFile.GetTimeForFrame(m_SelectedMeasurements[0].CurrFrameNo, out correctedForInstrumentalDelayMessage).ToString("HH:mm:ss.fff");
+
+                    if (correctedForInstrumentalDelayMessage != null)
+                    {
+                        lblInstDelayWarning.ForeColor = Color.Green;
+                        toolTip1.SetToolTip(lblInstDelayWarning, correctedForInstrumentalDelayMessage);
+                    }
+                    else
+                    {
+                        lblInstDelayWarning.ForeColor = Color.Red;
+                        toolTip1.SetToolTip(lblInstDelayWarning, "Instrumental delay has *NOT* been applied to the times");
+                    }
                 }
                 else
                     lblFrameTime.Text = "N/A";
-
-				if (correctedForInstrumentalDelayMessage != null)
-				{
-					lblInstDelayWarning.ForeColor = Color.Green;
-					toolTip1.SetToolTip(lblInstDelayWarning, correctedForInstrumentalDelayMessage);
-				}
-				else
-				{
-					lblInstDelayWarning.ForeColor = Color.Red;
-					toolTip1.SetToolTip(lblInstDelayWarning, "Instrumental delay has *NOT* been applied to the times");
-				}
 
 				if (m_Header.ObjectCount > 0 &&
 					!LCMeasurement.IsEmpty(m_SelectedMeasurements[0]) /*The object may be deselected*/)

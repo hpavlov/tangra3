@@ -417,13 +417,17 @@ namespace Tangra.VideoOperations.LightCurves
 			Regex regexAavSourceInfo = new Regex("^Video \\(AAV\\.\\d+\\)$");
 
 	        lblInstDelayWarning.SendToBack();
-			lblInstDelayWarning.Visible = 
-				// AAV file with embedded timestamps (The given time is a central exposure time)
-				(m_Header.TimingType == MeasurementTimingType.EmbeddedTimeForEachFrame && regexAavSourceInfo.IsMatch(m_Header.SourceInfo)) ||
-				// or timestamps read off the screen
-				m_Header.TimingType == MeasurementTimingType.OCRedTimeForEachFrame ||
-				// or user entered star/end times from the VTI OSD
-				m_Header.TimingType == MeasurementTimingType.UserEnteredFrameReferences;
+            lblInstDelayWarning.Visible = 
+                // Can determine the frame times
+                m_LCFile.CanDetermineFrameTimes &&
+                (
+				    // AAV file with embedded timestamps (The given time is a central exposure time)
+				    (m_Header.TimingType == MeasurementTimingType.EmbeddedTimeForEachFrame && regexAavSourceInfo.IsMatch(m_Header.SourceInfo)) ||
+				    // or timestamps read off the screen
+				    m_Header.TimingType == MeasurementTimingType.OCRedTimeForEachFrame ||
+				    // or user entered star/end times from the VTI OSD
+				    m_Header.TimingType == MeasurementTimingType.UserEnteredFrameReferences
+                );
         }
 
 		private string ExplainTrackingType(TrackingType type)

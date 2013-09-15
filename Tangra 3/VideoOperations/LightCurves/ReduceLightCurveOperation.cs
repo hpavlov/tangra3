@@ -29,6 +29,13 @@ using Tangra.Resources;
 
 namespace Tangra.VideoOperations.LightCurves
 {
+    public enum UsedTimeBase
+    {
+        NoTimesBaseAvailable,
+        UserEnterred,
+        EmbeddedTimeStamp
+    }
+
     public class ReduceLightCurveOperation : VideoOperationBase, IVideoOperation
     {
         private VideoController m_VideoController;
@@ -1219,9 +1226,9 @@ namespace Tangra.VideoOperations.LightCurves
 			SaveSessionFile();
         }
 
-        public void ShowLightCurve()
+        public void ShowLightCurve(UsedTimeBase timebase)
         {
-			if (m_VideoController.IsAstroAnalogueVideo)
+            if (m_VideoController.IsAstroAnalogueVideo && timebase != UsedTimeBase.NoTimesBaseAvailable)
 			{
 				List<string> cameras = InstrumentalDelayConfigManager.GetAvailableCameras();
 

@@ -249,7 +249,7 @@ namespace Tangra.VideoOperations.LightCurves
             if (!LightCurveReductionContext.Instance.HasEmbeddedTimeStamps)
                 PrepareToEnterStarTime();
             else
-                m_StateMachine.VideoOperation.ShowLightCurve();
+                m_StateMachine.VideoOperation.ShowLightCurve(UsedTimeBase.EmbeddedTimeStamp);
         }
 
 	    private delegate void PrepareToEnterStarTimeCallback();
@@ -615,7 +615,7 @@ namespace Tangra.VideoOperations.LightCurves
                 {
                     case DialogResult.OK:
                     case DialogResult.Ignore:
-                        m_StateMachine.VideoOperation.ShowLightCurve();
+                        m_StateMachine.VideoOperation.ShowLightCurve(UsedTimeBase.UserEnterred);
                         break;
 
                     case DialogResult.Retry:
@@ -634,7 +634,7 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void btnContinueWithNoTimes_Click(object sender, EventArgs e)
         {
-            m_StateMachine.VideoOperation.ShowLightCurve();
+            m_StateMachine.VideoOperation.ShowLightCurve(UsedTimeBase.NoTimesBaseAvailable);
         }
 
         private bool m_ShowingFields = false;
