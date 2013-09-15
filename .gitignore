@@ -35,13 +35,14 @@ _ReSharper.*
 /Tangra.Core/.build-release
 /Tangra.Core/.clang
 /Tangra.Core/Debug
+/Tangra.Core/Makefile
+
 
 /Tangra.Core/Tangra.Core.Win32_wsp.mk
 /Tangra.Core/TangraCore_Win32.mk
 /Tangra.Core/TangraCore_Win32.txt
 /Tangra.Core/Tangra.Core.Win32.tags
-/Tangra.Core/Tangra.Core.Win32.workspace.hristo
-/Tangra.Core/Tangra.Core.Win32.workspace.session
+/Tangra.Core/Tangra.Core.Win32.workspace.*
 
 /Tangra.Model/obj
 /Tangra.Model/bin
