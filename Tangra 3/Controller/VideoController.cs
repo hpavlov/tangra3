@@ -384,6 +384,14 @@ namespace Tangra.Controller
                 m_CurrentOperation.PostDraw(g);			
         }
 
+        public bool m_ShowFields;
+
+        public void ToggleShowFieldsMode(bool showFields)
+        {
+            m_ShowFields = showFields;
+            RedrawCurrentFrame(m_ShowFields);
+        }
+
 		public void RedrawCurrentFrame(bool showFields)
 		{			
 			if (showFields)
@@ -450,6 +458,9 @@ namespace Tangra.Controller
 		public void MoveToFrame(int frameNo)
 		{
 			m_FramePlayer.MoveToFrame(frameNo);
+
+            if (m_ShowFields)
+                RedrawCurrentFrame(true);
 		}
 
 		public void StepBackward()

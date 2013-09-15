@@ -93,6 +93,7 @@ namespace Tangra.VideoOperations.LightCurves
 		private void btnShowFields_Click(object sender, EventArgs e)
 		{
 			m_ShowingFields = !m_ShowingFields;
+            m_VideoController.ToggleShowFieldsMode(m_ShowingFields);
 			m_VideoController.RedrawCurrentFrame(m_ShowingFields);
 
 			if (m_ShowingFields)

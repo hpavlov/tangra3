@@ -22,6 +22,7 @@ namespace Tangra.Model.VideoOperations
         
 		void RefreshCurrentFrame();
 	    void RedrawCurrentFrame(bool showFields);
+        void ToggleShowFieldsMode(bool showFields);
 
 		void UpdateZoomedImage(Bitmap zoomedBitmap);
         void ClearZoomedImage();
