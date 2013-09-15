@@ -24,7 +24,9 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 
 		private void frmCompleteReductionInfoForm_Load(object sender, EventArgs e)
 		{
-			bool isAdvFile = m_lcFile.Footer.ReductionContext.BitPix > 8;
+			bool isAdvFile =
+				m_lcFile.Footer.ReductionContext.BitPix > 8 ||
+				m_lcFile.Header.SourceInfo.Contains("(AAV.8)");
 
 			lblFileName.Text = Path.GetFileName(m_lcFile.Header.PathToVideoFile);
 			lblSource.Text = m_lcFile.Header.SourceInfo;

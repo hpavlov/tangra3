@@ -273,11 +273,11 @@ namespace Tangra.Model.Config
 
 		public enum BackgroundMethod
 		{
-			AverageBackground,
-			BackgroundMode,
-			BackgroundGradientFit,
-			PSFBackground,
-			BackgroundMedian
+			AverageBackground = 0,
+			BackgroundMode = 1,
+			BackgroundGradientFit = 2,
+			PSFBackground = 3,
+			BackgroundMedian = 4
 		}
 
 		public enum PhotometryReductionMethod
@@ -334,9 +334,9 @@ namespace Tangra.Model.Config
 			public ColourChannel ColourChannel = ColourChannel.Red;
 
 			public float DefaultSignalAperture = 1.2f;
-			public SignalApertureUnit DefaultSignalApertureUnit = SignalApertureUnit.FWHM;
+			public SignalApertureUnit SignalApertureUnitDefault = SignalApertureUnit.FWHM;
 
-			public BackgroundMethod DefaultBackgroundMethod = BackgroundMethod.BackgroundMedian;
+			public BackgroundMethod BackgroundMethodDefault = BackgroundMethod.BackgroundMedian;
 
 			public PsfFittingMethod PsfFittingMethod = PsfFittingMethod.DirectNonLinearFit;
 			public PsfQuadrature PsfQuadrature = PsfQuadrature.NumericalInAperture;

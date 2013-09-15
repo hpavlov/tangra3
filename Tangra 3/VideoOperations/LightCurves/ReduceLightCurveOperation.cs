@@ -943,14 +943,14 @@ namespace Tangra.VideoOperations.LightCurves
 
         public static MeasurementsHelper DoConfiguredMeasurement(uint[,] matrix, PSFFit matrixFit, int bitPixCamera, double bestFindTolerance, ref float aperture, ref int matrixSize)
         {
-            if (matrixFit != null && TangraConfig.Settings.Photometry.DefaultSignalApertureUnit == TangraConfig.SignalApertureUnit.FWHM)
+			if (matrixFit != null && TangraConfig.Settings.Photometry.SignalApertureUnitDefault == TangraConfig.SignalApertureUnit.FWHM)
                 aperture = (float)(matrixFit.FWHM * TangraConfig.Settings.Photometry.DefaultSignalAperture);
             else
                 aperture = (float)(TangraConfig.Settings.Photometry.DefaultSignalAperture);
 
             var measurer = new MeasurementsHelper(
                             bitPixCamera,
-                            TangraConfig.Settings.Photometry.DefaultBackgroundMethod,
+							TangraConfig.Settings.Photometry.BackgroundMethodDefault,
                             true,
                             TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(bitPixCamera));
 

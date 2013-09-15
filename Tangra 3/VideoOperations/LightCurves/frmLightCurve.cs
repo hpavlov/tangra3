@@ -1312,7 +1312,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 				uint interval = GetXAxisInterval(g);
 				uint firstMark = interval * (1 + m_MinDisplayedFrame / interval);
-				bool isCorrectedForInstrumentalDelay;
+				string isCorrectedForInstrumentalDelay;
 				DateTime firstTime = m_LCFile.GetTimeForFrame(firstMark, out isCorrectedForInstrumentalDelay);
 				double frameDuration = m_LCFile.Header.SecondsPerFrameComputed();
 				string frameDurStr = string.Empty;

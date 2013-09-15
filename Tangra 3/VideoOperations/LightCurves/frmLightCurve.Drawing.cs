@@ -996,18 +996,18 @@ namespace Tangra.VideoOperations.LightCurves
                 !LCMeasurement.IsEmpty(m_SelectedMeasurements[0]))
             {
                 lblFrameNo.Text = m_SelectedMeasurements[0].CurrFrameNo.ToString();
-				bool isCorrectedForInstrumentalDelay = false;
+				string correctedForInstrumentalDelayMessage = null;
                 if (m_LCFile.CanDetermineFrameTimes)
                 {
-					lblFrameTime.Text = m_LCFile.GetTimeForFrame(m_SelectedMeasurements[0].CurrFrameNo, out isCorrectedForInstrumentalDelay).ToString("HH:mm:ss.fff");
+					lblFrameTime.Text = m_LCFile.GetTimeForFrame(m_SelectedMeasurements[0].CurrFrameNo, out correctedForInstrumentalDelayMessage).ToString("HH:mm:ss.fff");
                 }
                 else
                     lblFrameTime.Text = "N/A";
 
-				if (isCorrectedForInstrumentalDelay)
+				if (correctedForInstrumentalDelayMessage != null)
 				{
 					lblInstDelayWarning.ForeColor = Color.Green;
-					toolTip1.SetToolTip(lblInstDelayWarning, "Instrumental delay has been applied to the times");
+					toolTip1.SetToolTip(lblInstDelayWarning, correctedForInstrumentalDelayMessage);
 				}
 				else
 				{

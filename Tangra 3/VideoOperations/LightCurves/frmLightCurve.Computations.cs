@@ -547,7 +547,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 				for (int i = 0; i < count; i++)
 				{
-					bool isCorrectedForInstrumentalDelay;
+					string isCorrectedForInstrumentalDelay;
 					DateTime middleBinTime = m_LCFile.GetTimeForFrame(firstFrameNoInBin + (m_Context.Binning / 2.0), out isCorrectedForInstrumentalDelay);
 
 				    string timeStr;
@@ -608,7 +608,7 @@ namespace Tangra.VideoOperations.LightCurves
 				for (int i = 0; i < count; i++)
 				{
 					uint frameNo = m_AllReadings[0][i].CurrFrameNo;
-					bool isCorrectedForInstrumentalDelay;
+					string isCorrectedForInstrumentalDelay;
 					DateTime currFrameTime = m_LCFile.GetTimeForFrame(frameNo, out isCorrectedForInstrumentalDelay);
 
                     string timeStr;

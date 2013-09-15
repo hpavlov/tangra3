@@ -62,7 +62,7 @@ namespace Tangra
 			m_VideoController = new VideoController(this, m_VideoFileView, m_ZoomedImageView, m_ImageToolView, pnlControlerPanel);
             m_LightCurveController = new LightCurveController(this, m_VideoController);
 			m_MakeDarkFlatController = new DarkFlatFrameController(this, m_VideoController);
-			m_AutoUpdatesController = new AutoUpdatesController(this);
+			m_AutoUpdatesController = new AutoUpdatesController(this, m_VideoController);
 
 			NotificationManager.Instance.SetVideoController(m_VideoController);
 
@@ -72,6 +72,8 @@ namespace Tangra
 
 			m_AddinManager = new AddinManager();
 			m_AddinManager.LoadAddins(this);
+
+			m_AutoUpdatesController.CheckForUpdates(false);
 		}
 
 		/// <summary>
@@ -776,6 +778,25 @@ namespace Tangra
 		private void miCheckForUpdates_Click(object sender, EventArgs e)
 		{
 			m_AutoUpdatesController.CheckForUpdates(true);
+		}
+
+		private void pnlNewVersionAvailable_Click(object sender, EventArgs e)
+		{
+			PlatformID platform = Environment.OSVersion.Platform;
+			if (platform == PlatformID.Win32Windows || platform == PlatformID.Win32NT || platform == PlatformID.Win32S)
+			{				
+				pnlNewVersionAvailable.Enabled = false;
+				pnlNewVersionAvailable.IsLink = false;
+				pnlNewVersionAvailable.Tag = pnlNewVersionAvailable.Text;
+				pnlNewVersionAvailable.Text = "Update started ...";
+				statusStrip.Update();
+
+				m_AutoUpdatesController.RunTangra3UpdaterForWindows();
+
+				Close();
+			}
+			else
+				Process.Start("http://www.hristopavlov.net/Tangra3");
 		}
 	}
 }

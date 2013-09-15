@@ -359,15 +359,15 @@ namespace Tangra.VideoOperations.LightCurves
 			frameTiming.WriteTo(s_OnTheFlyWriter);
 		}
 
-		internal DateTime GetTimeForFrame(double frameNo, out bool isCorrectedForInstrumentalDelay)
+		internal DateTime GetTimeForFrame(double frameNo, out string correctedForInstrumentalDelayMessage)
 		{
-			isCorrectedForInstrumentalDelay = false;
+			correctedForInstrumentalDelayMessage = null;
 
 			if (FrameTiming != null && FrameTiming.Count > 0)
 			{
 				if (Footer.InstrumentalDelayConfig != null)
 				{
-					return GetTimeForFrameWithInstrumentalDelay(frameNo, out isCorrectedForInstrumentalDelay);
+					return GetTimeForFrameWithInstrumentalDelay(frameNo, out correctedForInstrumentalDelayMessage);
 				}
 				else
 				{
@@ -379,7 +379,7 @@ namespace Tangra.VideoOperations.LightCurves
 				return Header.GetTimeForFrameFromManuallyEnteredTimes(frameNo);
 		}
 
-		private DateTime GetTimeForFrameWithInstrumentalDelay(double frameNo, out bool isCorrectedForInstrumentalDelay)
+		private DateTime GetTimeForFrameWithInstrumentalDelay(double frameNo, out string correctedForInstrumentalDelayMessage)
 		{
 			int frameTimingIndex = (int) ((uint) frameNo - Header.MinFrame);
 
@@ -387,7 +387,7 @@ namespace Tangra.VideoOperations.LightCurves
 			LCFrameTiming othertimingEntry = timingEntry;
 			
 			DateTime rv = timingEntry.FrameMidTime;
-			isCorrectedForInstrumentalDelay = false;
+			correctedForInstrumentalDelayMessage = null;
 
 			if (frameTimingIndex > 0)
 			{
@@ -430,8 +430,12 @@ namespace Tangra.VideoOperations.LightCurves
 					// Apply correction: [FRAMETIME - ((1/2 * INTEGRATION PERIOD) - 1 FIELD) * (PAL or NTSC FrameRate) - GERHARD_CORRECTION(INTEGRATION PERIOD)]
 					double corrEndFirstField = -1 * (((integratedFields / 2) - 1) * videoStandardFieldDurationSec); // Half frame back sets us at the begining of the first field, then add 1 field to get to the end of the field
 					double corrInstrumentalDelay = Footer.InstrumentalDelayConfig[integratedFields/2]; // This is already negative
+					
+					DateTime endOfFirstField = rv.AddSeconds(corrEndFirstField);
 					rv = rv.AddSeconds(corrEndFirstField + corrInstrumentalDelay);
-					isCorrectedForInstrumentalDelay = true;
+
+					correctedForInstrumentalDelayMessage = string.Format(
+						"Instrumental delay has been applied to the times\r\n\r\nEnd of first field OSD timestamp: {0}", endOfFirstField.ToString("HH:mm:ss.fff"));
 				}
 			}
 

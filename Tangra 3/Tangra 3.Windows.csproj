@@ -214,6 +214,7 @@
     <Compile Include="Helpers\FITSHelper.cs" />
     <Compile Include="Helpers\NotificationManager.cs" />
     <Compile Include="Helpers\TangraEnvironment.cs" />
+    <Compile Include="Helpers\ZipUnzip.cs" />
     <Compile Include="ImageTools\ArrowTool.cs" />
     <Compile Include="ImageTools\CorrectTrackingTool.cs" />
     <Compile Include="OCR\ITimestampOcr.cs" />

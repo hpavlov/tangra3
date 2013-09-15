@@ -535,6 +535,7 @@
 			this.pnlNewVersionAvailable.Size = new System.Drawing.Size(304, 19);
 			this.pnlNewVersionAvailable.Text = "New version of Tangra is available. Click here to upgrade.";
 			this.pnlNewVersionAvailable.Visible = false;
+			this.pnlNewVersionAvailable.Click += new System.EventHandler(this.pnlNewVersionAvailable_Click);
 			// 
 			// panelRight
 			// 

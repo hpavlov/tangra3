@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
+using Tangra.Helpers;
 using Tangra.Model.Config;
 using Tangra.Properties;
 
@@ -17,10 +18,12 @@ namespace Tangra.Controller
 	public class AutoUpdatesController
 	{
 		private frmMain m_MainFrom;
+		private VideoController m_VideoController;
 
-		public AutoUpdatesController(frmMain mainFrom)
+		public AutoUpdatesController(frmMain mainFrom, VideoController videoController)
 		{
 			m_MainFrom = mainFrom;
+			m_VideoController = videoController;
 		}
 
 		internal delegate void OnUpdateEventDelegate(int eventCode);
@@ -94,6 +97,135 @@ namespace Tangra.Controller
 			catch (Exception ex)
 			{
 				Trace.WriteLine(ex, "Update");
+			}
+		}
+
+		public void RunTangra3UpdaterForWindows()
+		{
+			try
+			{
+				string currentPath = AppDomain.CurrentDomain.BaseDirectory;
+				string updaterFileName = Path.GetFullPath(currentPath + "\\Tangra3Update.zip");
+
+				int currUpdVer = CurrentlyInstalledOccuRecUpdateVersion();
+				int servUpdVer = int.Parse(occuRecUpdateServerVersion);
+				if (!File.Exists(Path.GetFullPath(currentPath + "\\Tangra3Update.exe")) || /* If there is no Tangra3Update.exe*/
+					(
+						m_MainFrom.statusStrip.Tag != null &&  /* Or it is an older version ... */
+						servUpdVer > currUpdVer)
+					)
+				{
+					if (servUpdVer > currUpdVer)
+						Trace.WriteLine(string.Format("Update required for 'Tangra3Update.exe': local version: {0}; server version: {1}", currUpdVer, servUpdVer));
+
+					Uri updateUri = new Uri(UpdateLocation + "/Tangra3Update.zip");
+
+					HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(updateUri);
+					httpRequest.Method = "GET";
+					httpRequest.Timeout = 1200000; //1200 sec = 20 min
+
+					HttpWebResponse response = null;
+
+					try
+					{
+						response = (HttpWebResponse)httpRequest.GetResponse();
+
+						Stream streamResponse = response.GetResponseStream();
+
+						try
+						{
+							try
+							{
+								if (File.Exists(updaterFileName))
+									File.Delete(updaterFileName);
+
+								using (BinaryReader reader = new BinaryReader(streamResponse))
+								using (BinaryWriter writer = new BinaryWriter(new FileStream(updaterFileName, FileMode.Create)))
+								{
+									byte[] chunk = null;
+									do
+									{
+										chunk = reader.ReadBytes(1024);
+										writer.Write(chunk);
+									}
+									while (chunk != null && chunk.Length == 1024);
+
+									writer.Flush();
+								}
+							}
+							catch (UnauthorizedAccessException uex)
+							{
+								m_VideoController.ShowMessageBox(
+									uex.Message + "\r\n\r\nYou may need to run Tangra3 as administrator to complete the update.", 
+									"Error", 
+									MessageBoxButtons.OK, 
+									MessageBoxIcon.Exclamation);
+							}
+							catch (Exception ex)
+							{
+								Trace.WriteLine(ex);
+							}
+
+							if (File.Exists(updaterFileName))
+							{
+								string tempOutputDir = Path.ChangeExtension(Path.GetTempFileName(), "");
+								Directory.CreateDirectory(tempOutputDir);
+								try
+								{
+									string zippedFileName = updaterFileName;
+									ZipUnzip.UnZip(updaterFileName, tempOutputDir, true);
+									string[] files = Directory.GetFiles(tempOutputDir);
+									updaterFileName = Path.ChangeExtension(updaterFileName, ".exe");
+									System.IO.File.Copy(files[0], updaterFileName, true);
+									System.IO.File.Delete(zippedFileName);
+								}
+								finally
+								{
+									Directory.Delete(tempOutputDir, true);
+								}
+							}
+						}
+						finally
+						{
+							streamResponse.Close();
+						}
+					}
+					catch (WebException)
+					{
+						MessageBox.Show("There was an error trying to download the OccuRecUpdate program. Please ensure that you have an active internet connection and try again later.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					}
+					finally
+					{
+						// Close response
+						if (response != null)
+							response.Close();
+					}
+				}
+
+				// Make sure after the update is completed a new check is done. 
+				// This will check for Add-in updates 
+				Settings.Default.LastCheckedForUpdates = DateTime.Now.AddDays(-15);
+				Settings.Default.Save();
+
+				updaterFileName = Path.GetFullPath(currentPath + "\\Tangra3Update.exe");
+
+				if (File.Exists(updaterFileName))
+				{
+					var processInfo = new ProcessStartInfo();
+
+					if (System.Environment.OSVersion.Version.Major > 5)
+						// UAC Elevate as Administrator for Windows Vista, Win7 and later
+						processInfo.Verb = "runas";
+
+					processInfo.FileName = updaterFileName;
+					processInfo.Arguments = string.Format("{0}", TangraConfig.Settings.Generic.AcceptBetaUpdates ? "beta" : "full");
+					Process.Start(processInfo);
+				}
+			}
+			catch (Exception ex)
+			{
+				Trace.WriteLine(ex, "Update");
+				m_MainFrom.pnlNewVersionAvailable.Enabled = true;
 			}
 		}
 
@@ -223,6 +355,28 @@ namespace Tangra.Controller
 			}
 			catch
 			{ }
+
+			return 0;
+		}
+
+		public static int CurrentlyInstalledOccuRecUpdateVersion()
+		{
+			try
+			{
+				string woupdatePath = Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory + "\\Tangra3Update.exe");
+				if (File.Exists(woupdatePath))
+				{
+					AssemblyName an = AssemblyName.GetAssemblyName(woupdatePath);
+					Version owVer = an.Version;
+					return 10000 * owVer.Major + 1000 * owVer.Minor + 100 * owVer.Build + owVer.Revision;
+				}
+				else
+					return 0;
+			}
+			catch (Exception ex)
+			{
+				Trace.WriteLine(ex.ToString());
+			}
 
 			return 0;
 		}

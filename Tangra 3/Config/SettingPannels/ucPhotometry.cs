@@ -23,8 +23,14 @@ namespace Tangra.Config.SettingPannels
         public override void LoadSettings()
         {
 			nudPhotoAperture.SetNUDValue((decimal)TangraConfig.Settings.Photometry.DefaultSignalAperture);
-			cbxPhotoSignalApertureType.SetCBXIndex((int)TangraConfig.Settings.Photometry.DefaultSignalApertureUnit);
-			SetComboboxIndexFromBackgroundMethod(TangraConfig.Settings.Photometry.DefaultBackgroundMethod);
+			cbxPhotoSignalApertureType.SetCBXIndex((int)TangraConfig.Settings.Photometry.SignalApertureUnitDefault);
+
+			#region Configure the Reduction Settings. The same must be done in the frmConfigureReprocessing and frmSelectReductionType
+			// Removes the Background Gradient
+			cbxBackgroundMethod.Items.RemoveAt(2);
+			#endregion
+
+			SetComboboxIndexFromBackgroundMethod(TangraConfig.Settings.Photometry.BackgroundMethodDefault);
 			nudInnerAnulusInApertures.SetNUDValue((decimal)TangraConfig.Settings.Photometry.AnulusInnerRadius);
 			nudMinimumAnulusPixels.SetNUDValue((int)TangraConfig.Settings.Photometry.AnulusMinPixels);
 			cbxPsfQuadrature.SetCBXIndex((int)TangraConfig.Settings.Photometry.PsfQuadrature);
@@ -37,8 +43,8 @@ namespace Tangra.Config.SettingPannels
         public override void SaveSettings()
         {
 			TangraConfig.Settings.Photometry.DefaultSignalAperture = (float)nudPhotoAperture.Value;
-			TangraConfig.Settings.Photometry.DefaultSignalApertureUnit = (TangraConfig.SignalApertureUnit)cbxPhotoSignalApertureType.SelectedIndex;
-			TangraConfig.Settings.Photometry.DefaultBackgroundMethod = ComboboxIndexToBackgroundMethod();
+			TangraConfig.Settings.Photometry.SignalApertureUnitDefault = (TangraConfig.SignalApertureUnit)cbxPhotoSignalApertureType.SelectedIndex;
+			TangraConfig.Settings.Photometry.BackgroundMethodDefault = ComboboxIndexToBackgroundMethod();
 			TangraConfig.Settings.Photometry.AnulusInnerRadius = (float)nudInnerAnulusInApertures.Value;
 			TangraConfig.Settings.Photometry.AnulusMinPixels = (int)nudMinimumAnulusPixels.Value;
             TangraConfig.Settings.Photometry.PsfQuadrature = (TangraConfig.PsfQuadrature)cbxPsfQuadrature.SelectedIndex;

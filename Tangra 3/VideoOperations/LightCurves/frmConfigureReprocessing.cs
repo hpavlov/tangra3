@@ -46,15 +46,15 @@ namespace Tangra.VideoOperations.LightCurves
             m_AllBrushes = allBrushes;
             m_AllPens = allPens;
 
+			#region Configure the Reduction Settings. The same must be done in the frmSelectReductionType and ucPhotometry
+			// Removes the Background Gradient
+			cbxBackgroundMethod.Items.RemoveAt(2);
+			#endregion
+
         	SetComboboxIndexFromBackgroundMethod(m_Context.BackgroundMethod);
 			SetComboboxIndexFromPhotometryReductionMethod(m_Context.SignalMethod);
         	cbxDigitalFilter.SelectedIndex = (int)m_Context.Filter;
         	nudGamma.Value = (decimal)m_Context.EncodingGamma;
-
-			#region Configure the Reduction Settings. The same must be done in the frmSelectReductionType and frmRunMultiFrameMeasurements
-            // Removes the Background Gradient
-            cbxBackgroundMethod.Items.RemoveAt(2);
-            #endregion
 
 			int maxApertureSize = m_Footer.ReductionContext.GetMaxApertureSize();
 
