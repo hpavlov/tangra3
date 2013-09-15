@@ -371,12 +371,59 @@ namespace Tangra.VideoOperations.LightCurves
 				}
 				else
 				{
-					LCFrameTiming timingEntry = FrameTiming[(int)((uint)frameNo - Header.MinFrame)];
+					LCFrameTiming timingEntry = FrameTiming[(int) ((uint) frameNo - Header.MinFrame)];
 					return timingEntry.FrameMidTime;
 				}
 			}
 			else
-				return Header.GetTimeForFrameFromManuallyEnteredTimes(frameNo);
+			{
+				if (Footer.InstrumentalDelayConfig != null)
+				{
+					return GetTimeForFrameFromManuallyEnteredTimesWithInstrumentalDelay(frameNo, out correctedForInstrumentalDelayMessage);
+				}
+				else
+				{
+					return Header.GetTimeForFrameFromManuallyEnteredTimes(frameNo);
+				}
+			}
+		}
+
+		private DateTime GetTimeForFrameFromManuallyEnteredTimesWithInstrumentalDelay(double frameNo, out string correctedForInstrumentalDelayMessage)
+		{
+			DateTime headerComputedTime = Header.GetTimeForFrameFromManuallyEnteredTimes(frameNo);
+			DateTime rv = headerComputedTime;
+
+			correctedForInstrumentalDelayMessage = null;
+
+			int integratedFields = 0;
+			double ntscCountedFrames = 29.97 / Header.ComputedFramesPerSecond;
+			double palCountedFrames = 25.00 / Header.ComputedFramesPerSecond;
+			for (int i = 0; i < 256; i++)
+			{
+				if (Math.Abs(i - ntscCountedFrames) < 0.01)
+				{
+					integratedFields = 2 * i;
+					break;
+				}
+
+				if (Math.Abs(i - palCountedFrames) < 0.01)
+				{
+					integratedFields = 2 * i;
+					break;
+				}
+			}
+
+			if (integratedFields > 0 && Footer.InstrumentalDelayConfig.ContainsKey(integratedFields / 2))
+			{
+				double corrInstrumentalDelay = Footer.InstrumentalDelayConfig[integratedFields / 2]; // This is already negative
+
+				rv = rv.AddSeconds(corrInstrumentalDelay);
+
+				correctedForInstrumentalDelayMessage = string.Format(
+					"Instrumental delay has been applied to the times\r\n\r\nEnd of first field OSD timestamp: {0}", headerComputedTime.ToString("HH:mm:ss.fff"));
+			}
+
+			return rv;
 		}
 
 		private DateTime GetTimeForFrameWithInstrumentalDelay(double frameNo, out string correctedForInstrumentalDelayMessage)
@@ -870,13 +917,18 @@ namespace Tangra.VideoOperations.LightCurves
             double assumedFrameRate = FramesPerSecond;
             videoSystem = null;
 
-            if (FramesPerSecond > 24.0 && FramesPerSecond < 26.0)
+			if (SourceInfo.Contains("(AAV.8)"))
+			{
+				assumedFrameRate  = ComputedFramesPerSecond;
+				videoSystem = "AAV";
+			}
+            else if (FramesPerSecond > 24.0 && FramesPerSecond < 26.0)
             {
                 assumedFrameRate = 25.0;
                 videoSystem = "PAL";
             }
             else if (FramesPerSecond > 29.0 && FramesPerSecond < 31.0)
-            {
+            { 
                 assumedFrameRate = 29.97;
                 videoSystem = "NTSC";
             }

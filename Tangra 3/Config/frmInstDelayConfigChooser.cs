@@ -40,7 +40,13 @@ namespace Tangra.Config
 			if (cbxCameras.Items.Count == 0)
 				cbxCameras.Items.AddRange(cameras.Cast<object>().ToArray());
 
-			string cameraToSelect = cameras.SingleOrDefault(x => x.Replace(" ", "").Contains(selectedCamera.Replace(" ", "")) && x.Contains(videoStandardNameChunk));
+			// First look for exact match
+			string cameraToSelect = cameras.FirstOrDefault(x => x.Replace(" ", "").Equals(selectedCamera.Replace(" ", ""), StringComparison.InvariantCultureIgnoreCase) && x.Contains(videoStandardNameChunk));
+
+			if (cameraToSelect == null) 
+				// Then do a 'starts with' search
+				cameraToSelect = cameras.FirstOrDefault(x => x.Replace(" ", "").Contains(selectedCamera.Replace(" ", "")) && x.Contains(videoStandardNameChunk));
+
 			if (cameraToSelect != null)
 			{
 				cbxCameras.SelectedIndex = cbxCameras.Items.IndexOf(cameraToSelect);

@@ -379,6 +379,8 @@ HRESULT BitmapSplitFieldsOSD(BYTE* bitmapPixels, long width, long height, long f
 					memmove(buffer1, buffer2, stride);
 					
 					movedLines[moveTo - firstOsdLine] = true;
+					
+					printf("OSD Split: %d -> %d\r\n", moveFrom, moveTo);
 				}
 				else
 				{
