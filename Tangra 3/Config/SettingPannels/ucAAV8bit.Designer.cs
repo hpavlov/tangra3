@@ -50,6 +50,7 @@
 			this.linkLabelAAV = new System.Windows.Forms.LinkLabel();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.cbxAavSplitFieldsOSD = new System.Windows.Forms.CheckBox();
+			this.cbxSplitOSDParity = new System.Windows.Forms.ComboBox();
 			this.groupControl1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nudSaturation8bit)).BeginInit();
 			this.groupControl2.SuspendLayout();
@@ -244,6 +245,7 @@
 			// 
 			// groupBox1
 			// 
+			this.groupBox1.Controls.Add(this.cbxSplitOSDParity);
 			this.groupBox1.Controls.Add(this.cbxAavSplitFieldsOSD);
 			this.groupBox1.Location = new System.Drawing.Point(216, 189);
 			this.groupBox1.Name = "groupBox1";
@@ -259,6 +261,18 @@
 			this.cbxAavSplitFieldsOSD.Size = new System.Drawing.Size(120, 19);
 			this.cbxAavSplitFieldsOSD.TabIndex = 44;
 			this.cbxAavSplitFieldsOSD.Text = "Split Field OSD";
+			// 
+			// cbxSplitOSDParity
+			// 
+			this.cbxSplitOSDParity.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.cbxSplitOSDParity.FormattingEnabled = true;
+			this.cbxSplitOSDParity.Items.AddRange(new object[] {
+            "Even",
+            "Odd"});
+			this.cbxSplitOSDParity.Location = new System.Drawing.Point(130, 28);
+			this.cbxSplitOSDParity.Name = "cbxSplitOSDParity";
+			this.cbxSplitOSDParity.Size = new System.Drawing.Size(71, 21);
+			this.cbxSplitOSDParity.TabIndex = 45;
 			// 
 			// ucAAV8bit
 			// 
@@ -306,6 +320,7 @@
 		private System.Windows.Forms.LinkLabel linkLabelAAV;
 		private System.Windows.Forms.GroupBox groupBox1;
 		private System.Windows.Forms.CheckBox cbxAavSplitFieldsOSD;
+		private System.Windows.Forms.ComboBox cbxSplitOSDParity;
 
 	}
 }

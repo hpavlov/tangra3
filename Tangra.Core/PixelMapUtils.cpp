@@ -328,20 +328,25 @@ HRESULT GetBitmapPixels(long width, long height, unsigned long* pixels, BYTE* bi
 	return S_OK;
 }
 
-long GetNewLinePosition(long line, long firstOsdLine, long lastOsdLine)
+long GetNewLinePosition(long line, long firstOsdLine, long lastOsdLine, long parity)
 {
 	if (line < firstOsdLine || line > lastOsdLine)
 		return -1;
 	else	
-		return firstOsdLine + ((line - firstOsdLine) / 2) + ((line + firstOsdLine) % 2) * (1 + (lastOsdLine - firstOsdLine) / 2);
+		return firstOsdLine + ((line - firstOsdLine) / 2) + ((line + firstOsdLine - parity) % 2) * ((lastOsdLine - firstOsdLine) / 2);
 }
 
-HRESULT BitmapSplitFieldsOSD(BYTE* bitmapPixels, long width, long height, long firstOsdLine, long lastOsdLine)
+HRESULT BitmapSplitFieldsOSD(BYTE* bitmapPixels, long firstOsdLine, long lastOsdLine, long parity)
 {
 	if (firstOsdLine >= lastOsdLine)
 		return E_FAIL;
 		
-	int stride = 3 * width;
+	parity = parity % 2;
+		
+	BITMAPINFOHEADER bih;
+	memmove(&bih, bitmapPixels + sizeof(BITMAPFILEHEADER), sizeof(bih));
+
+	int stride = bih.biWidth * (bih.biBitCount / 8);
 	
 	int moveFrom = firstOsdLine;
 	int moveTo = -1;
@@ -349,6 +354,9 @@ HRESULT BitmapSplitFieldsOSD(BYTE* bitmapPixels, long width, long height, long f
 	
 	BYTE* buffer1 = (BYTE*)malloc(stride);
 	BYTE* buffer2 = (BYTE*)malloc(stride);
+	
+	long a = bih.biHeight;
+	long b = -1;
 	
 	bool* movedLines = (bool*)malloc(lastOsdLine - firstOsdLine);
 	
@@ -362,20 +370,20 @@ HRESULT BitmapSplitFieldsOSD(BYTE* bitmapPixels, long width, long height, long f
 			continue;
 		
 		moveFrom = counter;
-		memmove(buffer1, ppFirstBitmapPixel + (lastOsdLine - moveFrom) * stride, stride);
+		memmove(buffer1, ppFirstBitmapPixel + (a + b * moveFrom) * stride, stride);
 		
 		do
 		{
-			moveTo = GetNewLinePosition(moveFrom, firstOsdLine, lastOsdLine);
+			moveTo = GetNewLinePosition(moveFrom, firstOsdLine, lastOsdLine, parity);
 			
 			if (moveTo != -1)
 			{
 				if (moveFrom != moveTo && !movedLines[moveTo - firstOsdLine])
 				{
-					memmove(buffer2, ppFirstBitmapPixel + (lastOsdLine - moveTo) * stride, stride);
+					memmove(buffer2, ppFirstBitmapPixel + (a + b * moveTo) * stride, stride);
 					buffedLine = moveTo;
 					
-					memmove(ppFirstBitmapPixel + (lastOsdLine - moveTo) * stride, buffer1, stride);
+					memmove(ppFirstBitmapPixel + (a + b * moveTo) * stride, buffer1, stride);
 					memmove(buffer1, buffer2, stride);
 					
 					movedLines[moveTo - firstOsdLine] = true;

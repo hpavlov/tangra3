@@ -15,7 +15,7 @@ DLL_PUBLIC HRESULT GetPixelMapBitsAndHBitmap(BYTE* pDIB, long* width, long* heig
 // Only returns the pixelmap pixels, does not create the bitmap structures
 DLL_PUBLIC HRESULT GetPixelMapPixelsOnly(BYTE* pDIB, long width, long height, unsigned long* pixels);
 DLL_PUBLIC HRESULT GetBitmapPixels(long width, long height, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, bool isLittleEndian, int bpp);
-DLL_PUBLIC HRESULT BitmapSplitFieldsOSD(BYTE* bitmapPixels, long width, long height, long firstOsdLine, long lastOsdLine);
+DLL_PUBLIC HRESULT BitmapSplitFieldsOSD(BYTE* bitmapPixels, long firstOsdLine, long lastOsdLine, long parity);
 
 
 // Pre-Processing 

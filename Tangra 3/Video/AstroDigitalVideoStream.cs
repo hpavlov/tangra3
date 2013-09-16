@@ -227,7 +227,7 @@ namespace Tangra.Video
 
 			if (m_Engine == "AAV" && m_CurrentFrameInfo.IntegratedFrames > 0 && TangraConfig.Settings.AAV.SplitFieldsOSD && m_OsdFirstLine * m_OsdLastLine != 0)
 			{
-				TangraCore.BitmapSplitFieldsOSD(rawBitmapBytes, m_Width, m_Height, m_OsdFirstLine, m_OsdLastLine);
+				TangraCore.BitmapSplitFieldsOSD(rawBitmapBytes, m_OsdFirstLine, m_OsdLastLine, TangraConfig.Settings.AAV.SplitFieldsOSDParity);
 			}
 
 			using (MemoryStream memStr = new MemoryStream(rawBitmapBytes))
