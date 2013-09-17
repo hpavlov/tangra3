@@ -328,20 +328,18 @@ HRESULT GetBitmapPixels(long width, long height, unsigned long* pixels, BYTE* bi
 	return S_OK;
 }
 
-long GetNewLinePosition(long line, long firstOsdLine, long lastOsdLine, long parity)
+long GetNewLinePosition(long line, long firstOsdLine, long lastOsdLine)
 {
 	if (line < firstOsdLine || line > lastOsdLine)
 		return -1;
 	else	
-		return firstOsdLine + ((line - firstOsdLine) / 2) + ((line + firstOsdLine - parity) % 2) * ((lastOsdLine - firstOsdLine) / 2);
+		return firstOsdLine + ((line - firstOsdLine) / 2) + ((line - 1) % 2) * ((lastOsdLine - firstOsdLine) / 2);
 }
 
-HRESULT BitmapSplitFieldsOSD(BYTE* bitmapPixels, long firstOsdLine, long lastOsdLine, long parity)
+HRESULT BitmapSplitFieldsOSD(BYTE* bitmapPixels, long firstOsdLine, long lastOsdLine)
 {
 	if (firstOsdLine >= lastOsdLine)
 		return E_FAIL;
-		
-	parity = parity % 2;
 		
 	BITMAPINFOHEADER bih;
 	memmove(&bih, bitmapPixels + sizeof(BITMAPFILEHEADER), sizeof(bih));
@@ -374,7 +372,7 @@ HRESULT BitmapSplitFieldsOSD(BYTE* bitmapPixels, long firstOsdLine, long lastOsd
 		
 		do
 		{
-			moveTo = GetNewLinePosition(moveFrom, firstOsdLine, lastOsdLine, parity);
+			moveTo = GetNewLinePosition(moveFrom, firstOsdLine, lastOsdLine);
 			
 			if (moveTo != -1)
 			{

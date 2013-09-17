@@ -232,7 +232,7 @@ namespace Tangra.PInvoke
 		
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
 		//DLL_PUBLIC HRESULT GetBitmapPixels(BYTE* bitmapPixels, long firstOsdLine, long lastOsdLine);
-		public static extern int BitmapSplitFieldsOSD([In, Out] byte[] bitmapBytes, int firstOsdLine, int lastOsdLine, int parity);
+		public static extern int BitmapSplitFieldsOSD([In, Out] byte[] bitmapBytes, int firstOsdLine, int lastOsdLine);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
 		//HRESULT GetVersion();

@@ -47,7 +47,6 @@ namespace Tangra.Config.SettingPannels
 			cbxAdvsPopupAlmanac.Checked = TangraConfig.Settings.AAV.PopupAlmanac;
 
 			cbxAavSplitFieldsOSD.Checked = TangraConfig.Settings.AAV.SplitFieldsOSD;
-			cbxSplitOSDParity.SelectedIndex = TangraConfig.Settings.AAV.SplitFieldsOSDParity % 2;
 		}
 
         public override void SaveSettings()
@@ -65,7 +64,6 @@ namespace Tangra.Config.SettingPannels
 			TangraConfig.Settings.AAV.PopupAlmanac = cbxAdvsPopupAlmanac.Checked;
 
 			TangraConfig.Settings.AAV.SplitFieldsOSD = cbxAavSplitFieldsOSD.Checked;
-	        TangraConfig.Settings.AAV.SplitFieldsOSDParity = cbxSplitOSDParity.SelectedIndex;
 
 			if (m_AavPopupCustomizer != null)
 			{

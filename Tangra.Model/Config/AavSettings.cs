@@ -22,6 +22,5 @@ namespace Tangra.Model.Config
 		public bool PopupAlmanac = true;
 
 		public bool SplitFieldsOSD = true;
-		public int SplitFieldsOSDParity = 1;
 	}
 }
