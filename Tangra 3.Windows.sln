@@ -110,7 +110,6 @@ Global
 		{A1F10749-934F-4AE1-BFDB-66A23D8C1393}.Production|x86.Build.0 = Release|Win32
 		{A1F10749-934F-4AE1-BFDB-66A23D8C1393}.Release|Any CPU.ActiveCfg = Release|Win32
 		{A1F10749-934F-4AE1-BFDB-66A23D8C1393}.Release|Mixed Platforms.ActiveCfg = Release|Win32
-		{A1F10749-934F-4AE1-BFDB-66A23D8C1393}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{A1F10749-934F-4AE1-BFDB-66A23D8C1393}.Release|x64.ActiveCfg = Release|x64
 		{A1F10749-934F-4AE1-BFDB-66A23D8C1393}.Release|x64.Build.0 = Release|x64
 		{A1F10749-934F-4AE1-BFDB-66A23D8C1393}.Release|x86.ActiveCfg = Release|Win32

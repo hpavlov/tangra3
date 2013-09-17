@@ -27,16 +27,16 @@ namespace AutoUpdate.Schema
                 ArchivedPath = node.Attributes["ArchivedPath"].Value;
         }
 
-        public override bool NewUpdatesAvailable(string occuRecPath)
+        public override bool NewUpdatesAvailable(string tangra3Path)
         {
-            Assembly asm = GetLocalOccuRecUpdateAssembly();
+            Assembly asm = GetLocalTangra3UpdateAssembly();
             if (asm != null)
             {
                 object[] atts = asm.GetCustomAttributes(typeof(AssemblyFileVersionAttribute), true);
                 if (atts.Length == 1)
                 {
                     string currVersionString = ((AssemblyFileVersionAttribute)atts[0]).Version;
-                    int currVersionAsInt = Config.Instance.OccuRecUpdateVersionStringToVersion(currVersionString);
+                    int currVersionAsInt = Config.Instance.Tangra3UpdateVersionStringToVersion(currVersionString);
 
                     if (base.Version > currVersionAsInt)
                     {
@@ -49,7 +49,7 @@ namespace AutoUpdate.Schema
             return false;
         }
         
-        private Assembly GetLocalOccuRecUpdateAssembly()
+        private Assembly GetLocalTangra3UpdateAssembly()
         {
 			if (Assembly.GetExecutingAssembly().GetName().Name == SharedUpdateConstants.UPDATER_PROGRAM_NAME)
                 return Assembly.GetExecutingAssembly();
@@ -61,14 +61,14 @@ namespace AutoUpdate.Schema
             return null;
         }
 
-        public override void Update(Updater updater, string occuRecPath, bool acceptBetaUpdates, IProgressUpdate progress)
+        public override void Update(Updater updater, string tangra3Path, bool acceptBetaUpdates, IProgressUpdate progress)
         {
 			string newVerFileLocalFileName = System.IO.Path.GetFullPath(System.IO.Path.GetTempPath() + "\\" + SharedUpdateConstants.MAIN_UPDATER_EXECUTABLE_NAME);
 
             if (System.IO.File.Exists(newVerFileLocalFileName))
                 System.IO.File.Delete(newVerFileLocalFileName);
 
-            // Download the new OccuRecUpdate version under newVerFileLocalFileName
+            // Download the new AutoUpdate version under newVerFileLocalFileName
             string fileLocation = null;
             if (string.IsNullOrEmpty(ArchivedPath))
                 fileLocation = Path;
@@ -87,7 +87,7 @@ namespace AutoUpdate.Schema
                 return;
             }
 
-            string selfUpdaterExecutable = Config.Instance.PrepareOccuRecSelfUpdateTempFile(occuRecPath, acceptBetaUpdates, newVerFileLocalFileName);
+            string selfUpdaterExecutable = Config.Instance.PrepareTangra3SelfUpdateTempFile(tangra3Path, acceptBetaUpdates, newVerFileLocalFileName);
 
 			using (Stream selfUpdater = Shared.AssemblyHelper.GetEmbededResourceStreamThatClientMustDispose("AutoUpdate.SelfUpdate", "AutoUpdateSelfUpdate.bin"))
             {

@@ -26,12 +26,12 @@ namespace AutoUpdate
 
     internal class Updater
     {
-	    private string occuRecPath;
+	    private string tangra3Path;
 	    private bool acceptBetaUpdates;
 
-		public Updater(string occuRecPath, bool acceptBetaUpdates)
+		public Updater(string tangra3Path, bool acceptBetaUpdates)
 		{
-			this.occuRecPath = occuRecPath;
+			this.tangra3Path = tangra3Path;
 			this.acceptBetaUpdates = acceptBetaUpdates;
 		}
 
@@ -72,7 +72,7 @@ namespace AutoUpdate
 
                     UpdateSchema updateSchema = new UpdateSchema(xmlDoc);
 
-                    if (updateSchema.NewUpdatesAvailable(occuRecPath))
+                    if (updateSchema.NewUpdatesAvailable(tangra3Path))
                         return updateSchema;
                 }
             }
@@ -106,7 +106,7 @@ namespace AutoUpdate
             }
             while (pids != null && pids.Count > 0);
 
-			string updaterPath = Path.GetFullPath(occuRecPath + @"/" + SharedUpdateConstants.MAIN_UPDATER_EXECUTABLE_NAME);
+			string updaterPath = Path.GetFullPath(tangra3Path + @"/" + SharedUpdateConstants.MAIN_UPDATER_EXECUTABLE_NAME);
             if (!System.IO.File.Exists(updaterPath))
             {
                 try
@@ -127,7 +127,7 @@ namespace AutoUpdate
         {
             string localFile =
                 localFileNameExplicit == null
-				? Path.GetFullPath(occuRecPath + "//" + (string.IsNullOrEmpty(fileNode.LocalPath) ? Path.GetFileName(fileNode.Path) : fileNode.LocalPath))
+				? Path.GetFullPath(tangra3Path + "//" + (string.IsNullOrEmpty(fileNode.LocalPath) ? Path.GetFileName(fileNode.Path) : fileNode.LocalPath))
                 : localFileNameExplicit;
 
             return UpdateFile(fileNode.Path, localFile, fileNode.Archived, progress);

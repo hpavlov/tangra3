@@ -10,8 +10,8 @@ namespace AutoUpdate.Schema
     {
         internal List<UpdateObject> AllUpdateObjects = new List<UpdateObject>();
 
-        internal Schema.SoftwareUpdate OccuRecUpdate;
-        internal Schema.SoftwareMainUpdate OccuRec;
+        internal Schema.SoftwareUpdate AutoUpdate;
+        internal Schema.SoftwareMainUpdate Tangra3;
 
         public UpdateSchema(XmlDocument xml)
         {
@@ -19,23 +19,23 @@ namespace AutoUpdate.Schema
             {
 				if (SharedUpdateConstants.UPDATER_PROGRAM_XML_ELEMENT.Equals(el.Name))
                 {
-                    OccuRecUpdate = new Schema.SoftwareUpdate(el as XmlElement);
-                    AllUpdateObjects.Add(OccuRecUpdate);
+                    AutoUpdate = new Schema.SoftwareUpdate(el as XmlElement);
+                    AllUpdateObjects.Add(AutoUpdate);
                 }
                 else if ("Update".Equals(el.Name))
                 {
-                    OccuRec = new Schema.SoftwareMainUpdate(el as XmlElement);
-                    AllUpdateObjects.Add(OccuRec);
+                    Tangra3 = new Schema.SoftwareMainUpdate(el as XmlElement);
+                    AllUpdateObjects.Add(Tangra3);
                 }
                 else if ("ModuleUpdate".Equals(el.Name))
                     AllUpdateObjects.Add(new Schema.ModuleUpdate(el as XmlElement));
             }
         }
 
-        public bool NewUpdatesAvailable(string occuRecPath)
+        public bool NewUpdatesAvailable(string tangra3Path)
         {
             foreach (UpdateObject obj in AllUpdateObjects)
-				if (obj.NewUpdatesAvailable(occuRecPath)) return true;
+				if (obj.NewUpdatesAvailable(tangra3Path)) return true;
 
             return false;
         }

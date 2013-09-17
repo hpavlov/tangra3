@@ -30,12 +30,12 @@ namespace Tangra.Controller
 
 		internal void OnUpdateEvent(int eventCode)
 		{
-			if (eventCode == MSG_ID_NEW_OCCUREC_UPDATE_AVAILABLE)
+			if (eventCode == MSG_ID_NEW_TANGRA3_UPDATE_AVAILABLE)
 			{
 				m_MainFrom.pnlNewVersionAvailable.Visible = true;
 				m_ShowNegativeResultMessage = false;
 			}
-			else if (eventCode == MSG_ID_NO_OCCUREC_UPDATES_AVAILABLE)
+			else if (eventCode == MSG_ID_NO_TANGRA3_UPDATES_AVAILABLE)
 			{
 				if (m_ShowNegativeResultMessage)
 				{
@@ -54,8 +54,8 @@ namespace Tangra.Controller
 		private DateTime m_LastUpdateTime;
 		private Thread m_CheckForUpdatesThread;
 
-		private byte MSG_ID_NEW_OCCUREC_UPDATE_AVAILABLE = 13;
-		private byte MSG_ID_NO_OCCUREC_UPDATES_AVAILABLE = 14;
+		private byte MSG_ID_NEW_TANGRA3_UPDATE_AVAILABLE = 13;
+		private byte MSG_ID_NO_TANGRA3_UPDATES_AVAILABLE = 14;
 
 		public void CheckForUpdates(bool manualCheck)
 		{
@@ -83,12 +83,12 @@ namespace Tangra.Controller
 				if (NewUpdatesAvailable(out serverConfigVersion) != null)
 				{
 					Trace.WriteLine("There is a new update.", "Update");
-					m_MainFrom.Invoke(new OnUpdateEventDelegate(OnUpdateEvent), MSG_ID_NEW_OCCUREC_UPDATE_AVAILABLE);
+					m_MainFrom.Invoke(new OnUpdateEventDelegate(OnUpdateEvent), MSG_ID_NEW_TANGRA3_UPDATE_AVAILABLE);
 				}
 				else
 				{
 					Trace.WriteLine(string.Format("There are no new {0}updates.", TangraConfig.Settings.Generic.AcceptBetaUpdates ? "beta " : ""), "Update");
-					m_MainFrom.Invoke(new OnUpdateEventDelegate(OnUpdateEvent), MSG_ID_NO_OCCUREC_UPDATES_AVAILABLE);
+					m_MainFrom.Invoke(new OnUpdateEventDelegate(OnUpdateEvent), MSG_ID_NO_TANGRA3_UPDATES_AVAILABLE);
 				}
 
 				Settings.Default.LastCheckedForUpdates = m_LastUpdateTime;
@@ -107,8 +107,8 @@ namespace Tangra.Controller
 				string currentPath = AppDomain.CurrentDomain.BaseDirectory;
 				string updaterFileName = Path.GetFullPath(currentPath + "\\Tangra3Update.zip");
 
-				int currUpdVer = CurrentlyInstalledOccuRecUpdateVersion();
-				int servUpdVer = int.Parse(occuRecUpdateServerVersion);
+				int currUpdVer = CurrentlyInstalledTangra3UpdateVersion();
+				int servUpdVer = int.Parse(tangra3UpdateServerVersion);
 				if (!File.Exists(Path.GetFullPath(currentPath + "\\Tangra3Update.exe")) || /* If there is no Tangra3Update.exe*/
 					(
 						m_MainFrom.statusStrip.Tag != null &&  /* Or it is an older version ... */
@@ -192,7 +192,7 @@ namespace Tangra.Controller
 					}
 					catch (WebException)
 					{
-						MessageBox.Show("There was an error trying to download the OccuRecUpdate program. Please ensure that you have an active internet connection and try again later.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+						MessageBox.Show("There was an error trying to download the Tangra3Update program. Please ensure that you have an active internet connection and try again later.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 					}
 					finally
 					{
@@ -229,7 +229,7 @@ namespace Tangra.Controller
 			}
 		}
 
-		private string occuRecUpdateServerVersion;
+		private string tangra3UpdateServerVersion;
 
 		public XmlNode NewUpdatesAvailable(out int configUpdateVersion)
 		{
@@ -279,14 +279,14 @@ namespace Tangra.Controller
 							Trace.WriteLine("Current version: " + latestVersion.ToString());
 							Trace.WriteLine("New version: " + Version.ToString());
 
-							XmlNode occuRecUpdateNode = xmlDoc.SelectSingleNode("/Tangra3/AutoUpdate");
-							if (occuRecUpdateNode != null)
+							XmlNode tangra3UpdateNode = xmlDoc.SelectSingleNode("/Tangra3/AutoUpdate");
+							if (tangra3UpdateNode != null)
 							{
-								occuRecUpdateServerVersion = occuRecUpdateNode.Attributes["Version"].Value;
-								Trace.WriteLine("OccuRecUpdate new version: " + occuRecUpdateServerVersion);
+								tangra3UpdateServerVersion = tangra3UpdateNode.Attributes["Version"].Value;
+								Trace.WriteLine("Tangra3Update new version: " + tangra3UpdateServerVersion);
 							}
 							else
-								occuRecUpdateServerVersion = null;
+								tangra3UpdateServerVersion = null;
 
 							latestVersion = Version;
 							latestVersionNode = updateNode;
@@ -307,14 +307,14 @@ namespace Tangra.Controller
 							Trace.WriteLine("Current version: " + latestVersion.ToString());
 							Trace.WriteLine("New version: " + Version.ToString());
 
-							XmlNode occuRecUpdateNode = xmlDoc.SelectSingleNode("/Tangra3/AutoUpdate");
-							if (occuRecUpdateNode != null)
+							XmlNode tangra3UpdateNode = xmlDoc.SelectSingleNode("/Tangra3/AutoUpdate");
+							if (tangra3UpdateNode != null)
 							{
-								occuRecUpdateServerVersion = occuRecUpdateNode.Attributes["Version"].Value;
-								Trace.WriteLine("Tangra3Update new version: " + occuRecUpdateServerVersion);
+								tangra3UpdateServerVersion = tangra3UpdateNode.Attributes["Version"].Value;
+								Trace.WriteLine("Tangra3Update new version: " + tangra3UpdateServerVersion);
 							}
 							else
-								occuRecUpdateServerVersion = null;
+								tangra3UpdateServerVersion = null;
 
 							latestVersion = Version;
 							latestVersionNode = updateNode;
@@ -359,7 +359,7 @@ namespace Tangra.Controller
 			return 0;
 		}
 
-		public static int CurrentlyInstalledOccuRecUpdateVersion()
+		public static int CurrentlyInstalledTangra3UpdateVersion()
 		{
 			try
 			{

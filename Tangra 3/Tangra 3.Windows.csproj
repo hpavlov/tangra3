@@ -600,6 +600,9 @@
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
+    <Content Include="license.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="TODO-List.txt" />
     <Content Include="WindowsFiles\TangraCore.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

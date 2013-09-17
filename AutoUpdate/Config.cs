@@ -30,7 +30,7 @@ namespace AutoUpdate
 
         public bool IsFirtsTimeRun = false;
 
-        public void Load(string occuRecPath, bool acceptBetaUpdates)
+        public void Load(string tangra3Path, bool acceptBetaUpdates)
         {
 			UpdateLocation = SharedUpdateConstants.UPDATE_URL_LOCATION;
             UpdatesXmlFileName = acceptBetaUpdates ? "/Beta.xml" : "/Updates.xml";
@@ -60,7 +60,7 @@ namespace AutoUpdate
                 }
             }
 
-			IsFirtsTimeRun = !File.Exists(OccuRecExePath(occuRecPath));
+			IsFirtsTimeRun = !File.Exists(Tangra3ExePath(tangra3Path));
 
             try
             {
@@ -76,12 +76,12 @@ namespace AutoUpdate
             catch { }
         }
 
-        public string OccuRecExePath(string occuRecLocation)
+        public string Tangra3ExePath(string tangra3Location)
         {
-			return Path.GetFullPath(occuRecLocation + @"/" + SharedUpdateConstants.MAIN_EXECUTABLE_NAME);
+            return Path.GetFullPath(tangra3Location + @"/" + SharedUpdateConstants.MAIN_EXECUTABLE_NAME);
         }
 
-        public string PrepareOccuRecSelfUpdateTempFile(string occuRecLocation, bool acceptBetaUpdates, string newVersionLocation)
+        public string PrepareTangra3SelfUpdateTempFile(string tangra3Location, bool acceptBetaUpdates, string newVersionLocation)
         {
             RegistryKey key = null;
 
@@ -102,7 +102,7 @@ namespace AutoUpdate
 					key.SetValue(SharedUpdateConstants.REG_ENTRY_SELFUPDATE_TEMP_FILE, tempFileName);
 					key.SetValue(SharedUpdateConstants.REG_ENTRY_COPY_FROM_FULL_FILE_NAME, newVersionLocation);
 					key.SetValue(SharedUpdateConstants.REG_ENTRY_COPY_TO_DIRECTORY_NAME, AppDomain.CurrentDomain.BaseDirectory);
-					key.SetValue(SharedUpdateConstants.REG_ENTRY_UPDATE_LOCATION, occuRecLocation);
+					key.SetValue(SharedUpdateConstants.REG_ENTRY_UPDATE_LOCATION, tangra3Location);
 					key.SetValue(SharedUpdateConstants.REG_ENTRY_ACCEPT_BETA_VERSION, acceptBetaUpdates);
                 }
                 catch { }
@@ -147,11 +147,11 @@ namespace AutoUpdate
             }
         }
 
-        public int CurrentlyInstalledFileVersion(string occuRecLocation, string relativeFilePath)
+        public int CurrentlyInstalledFileVersion(string tangra3Location, string relativeFilePath)
         {
-			if (Directory.Exists(occuRecLocation))
+			if (Directory.Exists(tangra3Location))
             {
-				string owExeFilePath = Path.GetFullPath(occuRecLocation + "/" + relativeFilePath);
+				string owExeFilePath = Path.GetFullPath(tangra3Location + "/" + relativeFilePath);
                 if (File.Exists(owExeFilePath))
                 {
                     try
@@ -168,22 +168,22 @@ namespace AutoUpdate
             }
             else
             {
-				Directory.CreateDirectory(occuRecLocation);
+				Directory.CreateDirectory(tangra3Location);
             }
 
             return 0;
         }
 
-		public int CurrentlyInstalledOccuRecVersion(string occuRecLocation)
+		public int CurrentlyInstalledTangra3Version(string tangra3Location)
         {
-			if (Directory.Exists(occuRecLocation))
+			if (Directory.Exists(tangra3Location))
             {
-				string owExeFilePath = Path.GetFullPath(occuRecLocation + "/" + SharedUpdateConstants.MAIN_EXECUTABLE_NAME);
-                if (File.Exists(owExeFilePath))
+				string tangraExeFilePath = Path.GetFullPath(tangra3Location + "/" + SharedUpdateConstants.MAIN_EXECUTABLE_NAME);
+                if (File.Exists(tangraExeFilePath))
                 {
                     try
                     {
-                        AssemblyName an = AssemblyName.GetAssemblyName(owExeFilePath);
+                        AssemblyName an = AssemblyName.GetAssemblyName(tangraExeFilePath);
                         Version owVer = an.Version;
                         return 10000 * owVer.Major + 1000 * owVer.Minor + 100 * owVer.Build + owVer.Revision;
                     }
@@ -193,7 +193,7 @@ namespace AutoUpdate
             }
             else
             {
-				Directory.CreateDirectory(occuRecLocation);
+				Directory.CreateDirectory(tangra3Location);
             }
 
             return 0;
@@ -228,7 +228,7 @@ namespace AutoUpdate
             return version;
         }
 
-        public int OccuRecUpdateVersionStringToVersion(string versionString)
+        public int Tangra3UpdateVersionStringToVersion(string versionString)
         {
             string[] tokens = versionString.Split('.');
             int version = 

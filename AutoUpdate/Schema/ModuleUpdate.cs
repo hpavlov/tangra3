@@ -37,6 +37,11 @@ namespace AutoUpdate.Schema
             m_ReleaseDate = node.Attributes["ReleaseDate"].Value;
             m_ModuleName = node.Attributes["ModuleName"].Value;
 
+            if (node.Attributes["NativeFileLength"] != null)
+                m_NativeFileLength = Convert.ToInt64(node.Attributes["NativeFileLength"].Value, CultureInfo.InvariantCulture);
+            else
+                m_NativeFileLength = -1;
+
             if (node.Attributes["MustExist"] != null)
                 m_MustExist = Convert.ToBoolean(node.Attributes["MustExist"].Value, CultureInfo.InvariantCulture);
             else
@@ -51,12 +56,12 @@ namespace AutoUpdate.Schema
                 m_VersionStr = node.Attributes["VersionStr"].Value;
         }
 
-        public override bool NewUpdatesAvailable(string occuRecPath)
+        public override bool NewUpdatesAvailable(string tangra3Path)
         {
             if (VerReq > 1 &&
                 !string.IsNullOrEmpty(m_Created))
             {
-				string fullLocalFileName = System.IO.Path.GetFullPath(occuRecPath + "\\" + this.File);
+				string fullLocalFileName = System.IO.Path.GetFullPath(tangra3Path + "\\" + this.File);
                 if (!System.IO.File.Exists(fullLocalFileName) &&
                     !m_MustExist)
                 {
@@ -80,7 +85,7 @@ namespace AutoUpdate.Schema
                 }
             }
             else
-                return base.NewUpdatesAvailable(occuRecPath);
+                return base.NewUpdatesAvailable(tangra3Path);
         }
 
         protected override void OnFileUpdated(Schema.File file, string localFilePath)

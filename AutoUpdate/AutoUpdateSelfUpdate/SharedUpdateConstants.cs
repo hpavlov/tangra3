@@ -14,7 +14,7 @@ namespace AutoUpdateSelfUpdate
 		public static string REG_ENTRY_UPDATE_LOCATION = "Tangra3UpdateTangra3Location";
 		public static string REG_ENTRY_ACCEPT_BETA_VERSION = "Tangra3UpdateAcceptBeta";
 
-		public static string MAIN_EXECUTABLE_NAME = "Tangra3.exe";
+		public static string MAIN_EXECUTABLE_NAME = "Tangra.exe";
 		public static string MAIN_UPDATER_EXECUTABLE_NAME = "Tangra3Update.exe";
 		public static string MAIN_PROGRAM_NAME = "Tangra3";
 		public static string UPDATER_PROGRAM_NAME = "Tangra3 Update";

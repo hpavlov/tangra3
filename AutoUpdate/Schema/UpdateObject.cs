@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Xml;
 using System.Reflection;
@@ -18,6 +19,7 @@ namespace AutoUpdate.Schema
         protected string m_ModuleName = null;
         protected string m_ReleaseDate = null;
         protected bool m_MustExist = true;
+        protected long m_NativeFileLength = -1;
 
         internal int Version
         {
@@ -42,6 +44,11 @@ namespace AutoUpdate.Schema
         internal string ReleaseDate
         {
             get { return m_ReleaseDate; }
+        }
+
+        internal long NativeFileLength
+        {
+            get { return m_NativeFileLength; }
         }
 
         public string VersionString
@@ -71,7 +78,7 @@ namespace AutoUpdate.Schema
         protected virtual void OnFileUpdated(Schema.File file, string localFileName)
         { }
 
-		public virtual void Update(Updater updater, string occuRecPath, bool acceptBetaUpdates, IProgressUpdate progress)
+		public virtual void Update(Updater updater, string tangra3Path, bool acceptBetaUpdates, IProgressUpdate progress)
         {
             foreach (Schema.File fileToUpdate in AllFiles)
             {
@@ -101,29 +108,38 @@ namespace AutoUpdate.Schema
             }
         }
 
-        public virtual bool NewUpdatesAvailable(string occuRecPath)
+        public virtual bool NewUpdatesAvailable(string tangra3Path)
         {
             Assembly asm = null;
-			string fullLocalFileName = System.IO.Path.GetFullPath(occuRecPath + "\\" + this.File);
+			string fullLocalFileName = System.IO.Path.GetFullPath(tangra3Path + "\\" + this.File);
             if (System.IO.File.Exists(fullLocalFileName))
             {
-                byte[] asmBytes = System.IO.File.ReadAllBytes(fullLocalFileName);
-
-                try
+                if (NativeFileLength > -1)
                 {
-                    asm = Assembly.Load(asmBytes);
+                    // A non-managed file or file versioning controlled by file size only
+                    FileInfo fi = new FileInfo(fullLocalFileName);
+                    return fi.Length != NativeFileLength;
                 }
-                catch(BadImageFormatException)
+                else
                 {
-                    asm = null;
+                    byte[] asmBytes = System.IO.File.ReadAllBytes(fullLocalFileName);
+
                     try
                     {
-                        System.IO.File.Delete(fullLocalFileName);
+                        asm = Assembly.Load(asmBytes);
                     }
-                    catch
-                    { }
+                    catch (BadImageFormatException)
+                    {
+                        asm = null;
+                        try
+                        {
+                            System.IO.File.Delete(fullLocalFileName);
+                        }
+                        catch
+                        { }
 
-                    return true;
+                        return true;
+                    }
                 }
             }
             else

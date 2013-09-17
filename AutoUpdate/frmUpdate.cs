@@ -19,7 +19,7 @@ namespace AutoUpdate
         private int m_allFilesToUpdate = 0;
         internal static Exception s_Error = null;
 
-	    private string occuRecPath;
+	    private string tangra3Path;
 	    private bool acceptBetaUpdates;
 	    private Updater updater;
 
@@ -29,7 +29,7 @@ namespace AutoUpdate
 
 	        string[] args = Environment.GetCommandLineArgs();
 
-            occuRecPath = AppDomain.CurrentDomain.BaseDirectory;
+            tangra3Path = AppDomain.CurrentDomain.BaseDirectory;
 
             if (args.Length == 1)
             {
@@ -42,8 +42,8 @@ namespace AutoUpdate
 
 			Trace.WriteLine(string.Format("Accept Beta Updates: {0}", acceptBetaUpdates), SharedUpdateConstants.UPDATER_PROGRAM_NAME);
 
-            updater = new Updater(occuRecPath, acceptBetaUpdates);
-			Config.Instance.Load(occuRecPath, acceptBetaUpdates);
+            updater = new Updater(tangra3Path, acceptBetaUpdates);
+			Config.Instance.Load(tangra3Path, acceptBetaUpdates);
 
             SetMiniLayout();
         }
@@ -70,7 +70,7 @@ namespace AutoUpdate
                     #region Get all modules to update and refresh the information in the UI about thse updates
                     foreach (UpdateObject module in schema.AllUpdateObjects)
                     {
-                        if (!module.NewUpdatesAvailable(occuRecPath))
+                        if (!module.NewUpdatesAvailable(tangra3Path))
                             continue;
 
                         if (!(module is Schema.SoftwareUpdate))
@@ -94,13 +94,13 @@ namespace AutoUpdate
                     }
                     #endregion
 
-                    if (schema.OccuRecUpdate != null &&
-                        schema.OccuRecUpdate.NewUpdatesAvailable(occuRecPath))
+                    if (schema.AutoUpdate != null &&
+                        schema.AutoUpdate.NewUpdatesAvailable(tangra3Path))
                     {
-                        // Update the OccuRecUpdate. Will need to start another process to finish this
+                        // Update the AutoUpdate. Will need to start another process to finish this
                         // and store the assembly for this other process as a resource
 
-                        schema.OccuRecUpdate.Update(updater, occuRecPath, acceptBetaUpdates, this);
+                        schema.AutoUpdate.Update(updater, tangra3Path, acceptBetaUpdates, this);
                         if (m_Abort) return;
                     }
 
@@ -109,7 +109,7 @@ namespace AutoUpdate
                     m_CurrentFileIndex = 0;
                     foreach (UpdateObject module in modulesToUpdate)
                     {
-                        if (module.NewUpdatesAvailable(occuRecPath))
+                        if (module.NewUpdatesAvailable(tangra3Path))
                             m_allFilesToUpdate += module.AllFiles.Count;
                     }
 
@@ -118,7 +118,7 @@ namespace AutoUpdate
                     pbUpdate.Style = ProgressBarStyle.Continuous;
                     #endregion
 
-                    #region Prepare: Kill running instances of OccuRec
+                    #region Prepare: Kill running instances of Tangra3
                     lblStatus.Text = "Preparing to update ...";
                     pbUpdate.Update();
                     lblStatus.Update();
@@ -151,7 +151,7 @@ namespace AutoUpdate
 
                     foreach (UpdateObject module in modulesToUpdate)
                     {
-                        if (module.NewUpdatesAvailable(occuRecPath))
+                        if (module.NewUpdatesAvailable(tangra3Path))
                         {
                             lblInfo.Text = string.Format("Updating {0} to {3}version {1} released on {2}", module.ModuleName, module.VersionString, module.ReleaseDate, acceptBetaUpdates ? "beta " : "");
                             lblInfo.Update();
@@ -178,8 +178,8 @@ namespace AutoUpdate
 
                     System.Threading.Thread.Sleep(1000);
 
-                    if (System.IO.File.Exists(Config.Instance.OccuRecExePath(occuRecPath)))
-						Process.Start(Config.Instance.OccuRecExePath(occuRecPath));
+                    if (System.IO.File.Exists(Config.Instance.Tangra3ExePath(tangra3Path)))
+						Process.Start(Config.Instance.Tangra3ExePath(tangra3Path));
 
                     this.Close();
                     Application.Exit();
@@ -188,7 +188,7 @@ namespace AutoUpdate
                 {
                     // No new updates
                     lblStatus.Text = string.Format("There are no new {0}updates available", acceptBetaUpdates ? "beta " : "");
-                    int currVer = Config.Instance.CurrentlyInstalledOccuRecVersion(occuRecPath);
+                    int currVer = Config.Instance.CurrentlyInstalledTangra3Version(tangra3Path);
                     lblInfo.Text = string.Format("Your version {0} is the latest", Config.Instance.VersionToVersionString(currVer));
                     pbUpdate.Maximum = 10;
                     pbUpdate.Value = 10;
@@ -211,7 +211,7 @@ namespace AutoUpdate
 
             try
             {
-				module.Update(updater, occuRecPath, acceptBetaUpdates, ipu);
+				module.Update(updater, tangra3Path, acceptBetaUpdates, ipu);
             }
             catch (Exception ex)
             {

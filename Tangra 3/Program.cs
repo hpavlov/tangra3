@@ -19,7 +19,7 @@ namespace Tangra
 		[STAThread]
 		static void Main()
 		{
-			Trace.WriteLine(string.Format("Starting Tangra v{0}", Assembly.GetExecutingAssembly().GetName().Version));
+            Trace.WriteLine(string.Format("Starting Tangra v{0}", ((AssemblyFileVersionAttribute)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyFileVersionAttribute), true)[0]).Version));
 
 		    //MessageBox.Show("Attach Debugger Now!");
 
