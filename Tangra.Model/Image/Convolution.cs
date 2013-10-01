@@ -357,10 +357,16 @@ namespace Tangra.Model.Image
 		private static byte[] LO_GAMMA_TABLE = new byte[256];
 		private static byte[] HI_GAMMA_TABLE= new byte[256];
 
+        private static byte[] HUE_INTENCITY_RED = new byte[256];
+        private static byte[] HUE_INTENCITY_GREEN = new byte[256];
+        private static byte[] HUE_INTENCITY_BLUE = new byte[256];
+
 		static BitmapFilter()
 		{
 			double lowGammaMax = 255.0 / Math.Pow(255, LO_GAMMA);
 			double highGammaMax = 255.0 / Math.Pow(255, HI_GAMMA);
+
+            Color hueColor = Color.Black;
 
 			for (int i = 0; i <= 255; i++)
 			{
@@ -369,8 +375,101 @@ namespace Tangra.Model.Image
 
 				LO_GAMMA_TABLE[i] = (byte)Math.Max(0, Math.Min(255, Math.Round(lowGammaValue)));
 				HI_GAMMA_TABLE[i] = (byte)Math.Max(0, Math.Min(255, Math.Round(highGammaValue)));
+
+
+                // HUE Table 1
+                //if (i <= 47)
+                //{
+                //    hueColor = ColorFromAhsb(0, 160, 240, 73 + i);
+                //}
+                //else 
+                //if (i <= 208)
+                //{
+                //    hueColor = ColorFromAhsb(0, 160 - (i - 48), 240, 120);
+                //}
+                //else
+                //{
+                //    hueColor = ColorFromAhsb(0, 0, 240, 120 - (i - 209));
+                //}
+
+                // HUE Table 2
+                if (i <= 160)
+                {
+                    hueColor = ColorFromAhsb(0, 160 - i, 240, 120);
+                }
+                else
+                {
+                    hueColor = ColorFromAhsb(0, 0, 240, 120 - (i - 160));
+                }
+
+                HUE_INTENCITY_RED[i] = hueColor.R;
+                HUE_INTENCITY_GREEN[i] = hueColor.G;
+                HUE_INTENCITY_BLUE[i] = hueColor.B;
 			}
 		}
+
+        public static Color ColorFromAhsb(int a, float h, float s, float b)
+        {
+            h = 360 * h / 240;
+            s = s / 240;
+            b = b / 240;
+
+            if (0 == s)
+            {
+                return Color.FromArgb(a, Convert.ToInt32(b * 255),
+                  Convert.ToInt32(b * 255), Convert.ToInt32(b * 255));
+            }
+
+            float fMax, fMid, fMin;
+            int iSextant, iMax, iMid, iMin;
+
+            if (0.5 < b)
+            {
+                fMax = b - (b * s) + s;
+                fMin = b + (b * s) - s;
+            }
+            else
+            {
+                fMax = b + (b * s);
+                fMin = b - (b * s);
+            }
+
+            iSextant = (int)Math.Floor(h / 60f);
+            if (300f <= h)
+            {
+                h -= 360f;
+            }
+            h /= 60f;
+            h -= 2f * (float)Math.Floor(((iSextant + 1f) % 6f) / 2f);
+            if (0 == iSextant % 2)
+            {
+                fMid = h * (fMax - fMin) + fMin;
+            }
+            else
+            {
+                fMid = fMin - h * (fMax - fMin);
+            }
+
+            iMax = Convert.ToInt32(fMax * 255);
+            iMid = Convert.ToInt32(fMid * 255);
+            iMin = Convert.ToInt32(fMin * 255);
+
+            switch (iSextant)
+            {
+                case 1:
+                    return Color.FromArgb(a, iMid, iMax, iMin);
+                case 2:
+                    return Color.FromArgb(a, iMin, iMax, iMid);
+                case 3:
+                    return Color.FromArgb(a, iMin, iMid, iMax);
+                case 4:
+                    return Color.FromArgb(a, iMid, iMin, iMax);
+                case 5:
+                    return Color.FromArgb(a, iMax, iMin, iMid);
+                default:
+                    return Color.FromArgb(a, iMax, iMid, iMin);
+            }
+        }
 
 		public static void ApplyGamma(Bitmap bitmap, bool hiGamma, bool invertAfterGamma)
 		{
@@ -411,7 +510,7 @@ namespace Tangra.Model.Image
 			
 		}
 
-		public static void Invert(Bitmap bitmap)
+		public static void ProcessInvertAndHueIntensity(Bitmap bitmap, bool invert, bool hueIntensity)
 		{
 			int width = bitmap.Width;
 			int height = bitmap.Height;
@@ -419,6 +518,38 @@ namespace Tangra.Model.Image
 			BitmapData bmData = bitmap.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
 
 			int stride = bmData.Stride;
+
+		    byte minVal = 255;
+		    double sum = 0;
+		    int sumCount = 0;
+		    if (hueIntensity)
+		    {
+		        unsafe
+		        {
+		            byte* p = (byte*) (void*) bmData.Scan0;
+
+		            int nOffset = stride - bmData.Width*3;
+
+		            for (int y = 0; y < bmData.Height; ++y)
+		            {
+		                for (int x = 0; x < bmData.Width; ++x)
+		                {
+		                    if (p[0] < minVal)
+		                        minVal = p[0];
+
+		                    sum += p[0];
+		                    sumCount++;
+
+		                    p += 3;
+		                }
+		                p += nOffset;
+		            }
+		        }
+
+                minVal = (byte)(sum / sumCount);
+		    }
+		    else
+		        minVal = 0;
 
 			unsafe
 			{
@@ -430,9 +561,28 @@ namespace Tangra.Model.Image
 				{
 					for (int x = 0; x < bmData.Width; ++x)
 					{
-						p[0] = (byte)(255 - p[0]);
-						p[1] = (byte)(255 - p[1]);
-						p[2] = (byte)(255 - p[2]);
+                        if (invert)
+                        {
+                            p[0] = (byte)(Math.Min(255, 255 - p[0]));
+                            p[1] = (byte)(Math.Min(255, 255 - p[1]));
+                            p[2] = (byte)(Math.Min(255, 255 - p[2]));
+                        }
+                        
+                        if (hueIntensity)
+                        {
+                            if (invert)
+                            {
+                                p[2] = HUE_INTENCITY_RED[Math.Min(255, p[2] + minVal)];
+                                p[1] = HUE_INTENCITY_GREEN[Math.Min(255, p[1] + minVal)];
+                                p[0] = HUE_INTENCITY_BLUE[Math.Min(255, p[0] + minVal)];
+                            }
+                            else
+                            {
+                                p[2] = HUE_INTENCITY_RED[Math.Max(0, p[2] - minVal)];
+                                p[1] = HUE_INTENCITY_GREEN[Math.Max(0, p[1] - minVal)];
+                                p[0] = HUE_INTENCITY_BLUE[Math.Max(0, p[0] - minVal)];
+                            }
+                        }
 
                         p += 3;
 					}

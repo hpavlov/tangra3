@@ -66,6 +66,7 @@ namespace Tangra.Controller
 
 		private DisplayIntensifyMode m_DisplayIntensifyMode = DisplayIntensifyMode.Off;
 	    private bool m_DisplayInvertedMode = false;
+        private bool m_DisplayHueIntensityMode = false;
 
 
 		public VideoController(Form mainFormView, VideoFileView videoFileView, ZoomedImageView zoomedImageView, ImageToolView imageToolView, Panel pnlControlerPanel)
@@ -652,14 +653,14 @@ namespace Tangra.Controller
 
         public void ApplyDisplayModeAdjustments(Bitmap displayBitmap)
         {
-            if (m_DisplayIntensifyMode != DisplayIntensifyMode.Off || m_DisplayInvertedMode)
+            if (m_DisplayIntensifyMode != DisplayIntensifyMode.Off || m_DisplayInvertedMode || m_DisplayHueIntensityMode)
             {
                 // For display purposes only we apply display gamma and/or invert when requested by the user
 
                 if (m_DisplayIntensifyMode != DisplayIntensifyMode.Off)
                     BitmapFilter.ApplyGamma(displayBitmap, m_DisplayIntensifyMode == DisplayIntensifyMode.Hi, m_DisplayInvertedMode);
-                else if (m_DisplayInvertedMode)
-                    BitmapFilter.Invert(displayBitmap);
+                else if (m_DisplayInvertedMode || m_DisplayHueIntensityMode)
+                    BitmapFilter.ProcessInvertAndHueIntensity(displayBitmap, m_DisplayInvertedMode, m_DisplayHueIntensityMode);
             }            
         }
 
@@ -682,8 +683,19 @@ namespace Tangra.Controller
 				m_FramePlayer.Video != null)
 			{
 				m_FramePlayer.RefreshCurrentFrame();
-			}			
+			}
 		}
+
+        public void SetDisplayHueMode(bool hueSelected)
+        {
+            m_DisplayHueIntensityMode = hueSelected;
+
+            if (!m_FramePlayer.IsRunning &&
+                m_FramePlayer.Video != null)
+            {
+                m_FramePlayer.RefreshCurrentFrame();
+            }
+        }
 
 
 		public void ToggleAstroVideoStatusForm()

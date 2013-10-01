@@ -325,21 +325,6 @@ namespace Tangra.Model.Image
                 ? m_TimesHigherPositionToleranceForFullyOccultedStars * m_PositionTolerance
                 : m_PositionTolerance;
 
-            if (!fit.IsSolved || // The PSF solution failed, mark the reading invalid
-                            (distance > tolerance && !mayBeOcculted) || // If this doesn't look like a full disappearance, then make the reading invalid
-                            (fit.FWHM < 0.75 * refinedFWHM || fit.FWHM > 1.25 * refinedFWHM) // The FWHM is too small or too large, make the reading invalid
-                            )
-            {
-                obj.SetIsMeasured(false,
-                    !fit.IsSolved
-                        ? NotMeasuredReasons.MeasurementPSFFittingFailed
-                        : (distance > tolerance && !mayBeOcculted)
-                            ? NotMeasuredReasons.DistanceToleranceTooHighForNonFullDisappearingOccultedStar
-                            : NotMeasuredReasons.FWHMOutOfRange);
-
-                return;
-            }
-
             float psfBackground = (float)fit.I0;
 
             // almost like aperture            
@@ -394,6 +379,19 @@ namespace Tangra.Model.Image
                 else
                 {
                     throw new ApplicationException("Measurement error. Correlation: AFP-102B");
+                }
+
+                if (!fit.IsSolved || // The PSF solution failed, mark the reading invalid
+                                (distance > tolerance && !mayBeOcculted) || // If this doesn't look like a full disappearance, then make the reading invalid
+                                (fit.FWHM < 0.75 * refinedFWHM || fit.FWHM > 1.25 * refinedFWHM) // The FWHM is too small or too large, make the reading invalid
+                                )
+                {
+                    obj.SetIsMeasured(false,
+                        !fit.IsSolved
+                            ? NotMeasuredReasons.MeasurementPSFFittingFailed
+                            : (distance > tolerance && !mayBeOcculted)
+                                ? NotMeasuredReasons.DistanceToleranceTooHighForNonFullDisappearingOccultedStar
+                                : NotMeasuredReasons.FWHMOutOfRange);
                 }
             }
             else

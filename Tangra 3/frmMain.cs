@@ -739,6 +739,11 @@ namespace Tangra
 			m_VideoController.SetDisplayInvertMode(tsmiInverted.Checked);
 		}
 
+        private void tsmiHueIntensity_Click(object sender, EventArgs e)
+        {
+            m_VideoController.SetDisplayHueMode(tsmiHueIntensity.Checked);
+        }
+
 		private void miMakeDarkFlat_Click(object sender, EventArgs e)
 		{
 			m_VideoController.ActivateOperation<MakeDarkFlatOperation>(m_MakeDarkFlatController);
@@ -797,6 +802,6 @@ namespace Tangra
 			}
 			else
 				Process.Start("http://www.hristopavlov.net/Tangra3");
-		}
+        }
 	}
 }
