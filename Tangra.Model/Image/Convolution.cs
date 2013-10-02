@@ -392,15 +392,29 @@ namespace Tangra.Model.Image
                 //    hueColor = ColorFromAhsb(0, 0, 240, 120 - (i - 209));
                 //}
 
-                // HUE Table 2
-                if (i <= 160)
-                {
-                    hueColor = ColorFromAhsb(0, 160 - i, 240, 120);
-                }
-                else
-                {
-                    hueColor = ColorFromAhsb(0, 0, 240, 120 - (i - 160));
-                }
+				// HUE Table 2
+				//if (i <= 16)
+				//{
+				//	hueColor = ColorFromAhsb(0, 160, 240, 104 + i);
+				//}
+				//else if (i <= 160 + 17)
+				//{
+				//	hueColor = ColorFromAhsb(0, 160 - (i - 17), 240, 120);
+				//}
+				//else
+				//{
+				//	hueColor = ColorFromAhsb(0, 0, 240, 120 - (i - 160 - 18));
+				//}
+
+                // HUE Table 3
+				if (i <= 180)
+				{
+					hueColor = ColorFromAhsb(0, 160 - i, 240, 120);
+				}
+				else
+				{
+					hueColor = ColorFromAhsb(0, 0, 240, 120 - (i - 160));
+				}
 
                 HUE_INTENCITY_RED[i] = hueColor.R;
                 HUE_INTENCITY_GREEN[i] = hueColor.G;
@@ -471,7 +485,7 @@ namespace Tangra.Model.Image
             }
         }
 
-		public static void ApplyGamma(Bitmap bitmap, bool hiGamma, bool invertAfterGamma)
+		public static void ApplyGamma(Bitmap bitmap, bool hiGamma, bool invertAfterGamma, bool hueIntensity)
 		{
 			int width = bitmap.Width;
 			int height = bitmap.Height;
@@ -479,6 +493,40 @@ namespace Tangra.Model.Image
             BitmapData bmData = bitmap.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
 
 			int stride = bmData.Stride;
+
+			byte minVal = 255;
+			double sum = 0;
+			int sumCount = 0;
+			if (hueIntensity)
+			{
+				unsafe
+				{
+					byte* p = (byte*)(void*)bmData.Scan0;
+
+					int nOffset = stride - bmData.Width * 3;
+
+					for (int y = 0; y < bmData.Height; ++y)
+					{
+						for (int x = 0; x < bmData.Width; ++x)
+						{
+							if (p[0] < minVal)
+								minVal = p[0];
+
+							sum += p[0];
+							sumCount++;
+
+							p += 3;
+						}
+						p += nOffset;
+					}
+				}
+
+				minVal = (byte)(sum / sumCount);
+			}
+			else
+				minVal = 0;
+
+			minVal = hiGamma ? HI_GAMMA_TABLE[minVal] : LO_GAMMA_TABLE[minVal];
 
 			unsafe
 			{
@@ -496,9 +544,25 @@ namespace Tangra.Model.Image
 
 						if (invertAfterGamma)
 						{
-							p[0] = (byte)(255 - p[0]);
-							p[1] = (byte)(255 - p[1]);
-							p[2] = (byte)(255 - p[2]);
+							p[0] = (byte)(Math.Min(255, 255 - p[0]));
+							p[1] = (byte)(Math.Min(255, 255 - p[1]));
+							p[2] = (byte)(Math.Min(255, 255 - p[2]));
+						}
+
+						if (hueIntensity)
+						{
+							if (invertAfterGamma)
+							{
+								p[2] = HUE_INTENCITY_RED[Math.Min(255, p[2] + minVal)];
+								p[1] = HUE_INTENCITY_GREEN[Math.Min(255, p[1] + minVal)];
+								p[0] = HUE_INTENCITY_BLUE[Math.Min(255, p[0] + minVal)];
+							}
+							else
+							{
+								p[2] = HUE_INTENCITY_RED[Math.Max(0, p[2] - minVal)];
+								p[1] = HUE_INTENCITY_GREEN[Math.Max(0, p[1] - minVal)];
+								p[0] = HUE_INTENCITY_BLUE[Math.Max(0, p[0] - minVal)];
+							}
 						}
 						p += 3;
 					}

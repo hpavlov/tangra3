@@ -182,8 +182,8 @@ void AdvFile::OpenFile(const char* fileName, AdvFileInfo* fileInfo)
 	fileInfo->Height = ImageSection->Height;
 	fileInfo->Width = ImageSection->Width;
 	
-	if (isAAVFile && !hasAAVEmbeddedTimestamps)
-		// For AAV files that don't have embeddd timestamps read the frame rate from the AAV file header	
+	if (isAAVFile)
+		// For AAV files read the frame rate from the AAV file header	
 		fileInfo->FrameRate = effectiveFrameRate;
 	else
 		// For ADV files and for AAV files that have embedded timestamps, the framerate will be ignored

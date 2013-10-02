@@ -195,9 +195,21 @@ namespace Tangra.Video
 									break;
 								}
 							}
+							else if (targetFrame == m_VideoStream.LastFrame)
+							{
+								// We have reached the end of the video
+								m_CurrentFrameIndex = targetFrame;
+								break;
+							}
 							targetFrame++;
 						}
 					}
+					else if (advStream.FrameRate > 0)
+					{
+						m_CurrentFrameIndex += (int) Math.Round(secondsForward*advStream.FrameRate);
+					}
+					else
+						m_CurrentFrameIndex++;
 				}
 				else
 				{
@@ -306,9 +318,21 @@ namespace Tangra.Video
 									break;
 								}
 							}
+							else if (targetFrame == m_VideoStream.FirstFrame)
+							{
+								// We have reached the beginning of the video
+								m_CurrentFrameIndex = targetFrame;
+								break;
+							}
 							targetFrame--;
 						}
 					}
+					else if (advStream.FrameRate > 0)
+					{
+						m_CurrentFrameIndex -= (int) Math.Round(secondsBackward*advStream.FrameRate);
+					}
+					else
+						m_CurrentFrameIndex--;
 				}
 				else
 				{

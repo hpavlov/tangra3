@@ -2,17 +2,17 @@
 Features:
 ---------
 
- - Add instrumental delay computations for the popular integrating video cameras
- - Add the instrumental delay for AAV files with no OCR-ed timestamps
  - Add OCR option for AVI videos
- - Add "Auto Update" functionality. At least for the Windows Version 
+ - Build an Add-in for AOTA
 
 Bugs:
 -----
 
 NONE REPORTED CURRENTLY
 
------
+Crash Reports:
+--------------
+
 Tangra v3.0.0.0
 
 System.ArgumentException: Cannot activate invisible or disabled control.

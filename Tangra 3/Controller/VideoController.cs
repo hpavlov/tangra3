@@ -658,7 +658,7 @@ namespace Tangra.Controller
                 // For display purposes only we apply display gamma and/or invert when requested by the user
 
                 if (m_DisplayIntensifyMode != DisplayIntensifyMode.Off)
-                    BitmapFilter.ApplyGamma(displayBitmap, m_DisplayIntensifyMode == DisplayIntensifyMode.Hi, m_DisplayInvertedMode);
+					BitmapFilter.ApplyGamma(displayBitmap, m_DisplayIntensifyMode == DisplayIntensifyMode.Hi, m_DisplayInvertedMode, m_DisplayHueIntensityMode);
                 else if (m_DisplayInvertedMode || m_DisplayHueIntensityMode)
                     BitmapFilter.ProcessInvertAndHueIntensity(displayBitmap, m_DisplayInvertedMode, m_DisplayHueIntensityMode);
             }            
