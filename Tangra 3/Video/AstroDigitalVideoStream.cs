@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -7,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
+using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.Model.Video;
 using Tangra.PInvoke;
@@ -127,6 +129,7 @@ namespace Tangra.Video
 			}
 
 			m_FileOpened = true;
+		    m_OcrDataAvailable = null;
 		}
 
 		public string FileName
@@ -232,7 +235,16 @@ namespace Tangra.Video
 
 			using (MemoryStream memStr = new MemoryStream(rawBitmapBytes))
 			{
-				Bitmap displayBitmap = (Bitmap)Bitmap.FromStream(memStr);
+			    Bitmap displayBitmap;
+                try
+                {
+                    displayBitmap = (Bitmap) Bitmap.FromStream(memStr);
+                }
+                catch (Exception ex)
+                {
+                    Trace.WriteLine(ex.FullExceptionInfo());
+                    displayBitmap = new Bitmap(m_Width, m_Height);
+                }
 
                 var rv = new Pixelmap(m_Width, m_Height, m_BitPix, pixels, displayBitmap, displayBitmapBytes);
 				rv.FrameState = GetCurrentFrameState();
@@ -416,13 +428,35 @@ namespace Tangra.Video
             get { return engine; }
 		}
 
+        public static long MISSING_TIMESTAMP_TICKS = 633979008000000000;
+
         public string OcrEngine = null;
+	    public bool? m_OcrDataAvailable = null;
 
         public bool OcrDataAvailable
         {
 			get
 			{
-				return !string.IsNullOrEmpty(OcrEngine); 
+			    if (string.IsNullOrEmpty(OcrEngine))
+			        return false;
+                
+                if (!m_OcrDataAvailable.HasValue)
+                {
+                    m_OcrDataAvailable = false;
+
+                    for (int i = m_FirstFrame; i < m_FirstFrame + m_CountFrames; i++)
+                    {
+                        FrameStateData stateChannel = GetFrameStatusChannel(i);
+                        if (stateChannel.CentralExposureTime.Ticks != MISSING_TIMESTAMP_TICKS)
+                        {
+                            m_OcrDataAvailable = true;
+                            break;
+                        }
+                    }
+                   
+                }
+
+			    return m_OcrDataAvailable.Value;
 			}
         }
 

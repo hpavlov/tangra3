@@ -1042,7 +1042,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 			// Look for a frame with a timestamp going forward
 		    int nextFrameWithTimeStamp = frameTimingIndex + 1;
-			while (nextFrameWithTimeStamp <= LcFile.FrameTiming.Count)
+			while (nextFrameWithTimeStamp < LcFile.FrameTiming.Count)
 			{
 				long ticks = LcFile.FrameTiming[nextFrameWithTimeStamp].FrameMidTime.Ticks;
 				if (ticks != MISSING_TIMESTAMP_TICKS)

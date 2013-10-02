@@ -338,12 +338,12 @@ long GetNewLinePosition(long line, long firstOsdLine, long lastOsdLine)
 
 HRESULT BitmapSplitFieldsOSD(BYTE* bitmapPixels, long firstOsdLine, long lastOsdLine)
 {
-	if (firstOsdLine >= lastOsdLine)
-		return E_FAIL;
-		
 	BITMAPINFOHEADER bih;
 	memmove(&bih, bitmapPixels + sizeof(BITMAPFILEHEADER), sizeof(bih));
 
+	if (firstOsdLine >= lastOsdLine || firstOsdLine < 0 || lastOsdLine > bih.biHeight)
+		return E_FAIL;
+		
 	int stride = bih.biWidth * (bih.biBitCount / 8);
 	
 	int moveFrom = firstOsdLine;
