@@ -131,21 +131,20 @@ namespace Tangra.VideoOperations.LightCurves
                     return null;
                 }
 
-                if (version < LC_LAST_SUPPORTED_FILE_VERSION)
-                {
-                    string requiredVersion = "1.0";
-                    if (version >= 2 && version <= 3)
-                        requiredVersion = "1.4";
+				//if (version < LC_LAST_SUPPORTED_FILE_VERSION)
+				//{
+				//	string requiredVersion = "1.0";
+				//	if (version >= 2 && version <= 3)
+				//		requiredVersion = "1.4";
 
-                    MessageBox.Show(
-                        string.Format("This light curve is old and is not supported by this version of Tangra.\r\n\r\n You will need Tangra v{0} to open this file.", requiredVersion), 
-                        "Tangra", 
-                        MessageBoxButtons.OK, 
-                        MessageBoxIcon.Error);
+				//	MessageBox.Show(
+				//		string.Format("This light curve is old and is not supported by this version of Tangra.\r\n\r\n You will need Tangra v{0} to open this file.", requiredVersion), 
+				//		"Tangra", 
+				//		MessageBoxButtons.OK, 
+				//		MessageBoxIcon.Error);
 
-                    return null;
-                }
-
+				//	return null;
+				//}
 
                 var lcFile = new LCFile
 	            {
@@ -1446,7 +1445,15 @@ namespace Tangra.VideoOperations.LightCurves
 			AveragedFrameBytes = reader.ReadBytes(bytesCount);
 
 			string configString = reader.ReadString();
-			ProcessedWithTangraConfig = configString.FromBase64String<TangraConfig>();
+			try
+			{
+				ProcessedWithTangraConfig = configString.FromBase64String<TangraConfig>();
+			}
+			catch
+			{
+				ProcessedWithTangraConfig = new TangraConfig();
+			}
+			
 
 			ReductionContext = LightCurveReductionContext.Load(reader);
 
