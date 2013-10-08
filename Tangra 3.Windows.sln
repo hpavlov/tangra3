@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoUpdate", "AutoUpdate\Au
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoUpdateSelfUpdate", "AutoUpdate\AutoUpdateSelfUpdate\AutoUpdateSelfUpdate.csproj", "{16959003-A7F6-424A-BB62-7E6914240F9B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangra.OccultTools", "Tangra.OccultTools\Tangra.OccultTools.csproj", "{ACB1F3E9-CCD9-4DD5-9ADC-A261B2BE6409}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -265,6 +267,31 @@ Global
 		{16959003-A7F6-424A-BB62-7E6914240F9B}.UnitTests|x64.Build.0 = UnitTests|x64
 		{16959003-A7F6-424A-BB62-7E6914240F9B}.UnitTests|x86.ActiveCfg = UnitTests|x86
 		{16959003-A7F6-424A-BB62-7E6914240F9B}.UnitTests|x86.Build.0 = UnitTests|x86
+		{ACB1F3E9-CCD9-4DD5-9ADC-A261B2BE6409}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACB1F3E9-CCD9-4DD5-9ADC-A261B2BE6409}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACB1F3E9-CCD9-4DD5-9ADC-A261B2BE6409}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{ACB1F3E9-CCD9-4DD5-9ADC-A261B2BE6409}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{ACB1F3E9-CCD9-4DD5-9ADC-A261B2BE6409}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{ACB1F3E9-CCD9-4DD5-9ADC-A261B2BE6409}.Debug|x86.ActiveCfg = Debug|x86
+		{ACB1F3E9-CCD9-4DD5-9ADC-A261B2BE6409}.Debug|x86.Build.0 = Debug|x86
+		{ACB1F3E9-CCD9-4DD5-9ADC-A261B2BE6409}.Production|Any CPU.ActiveCfg = Release|Any CPU
+		{ACB1F3E9-CCD9-4DD5-9ADC-A261B2BE6409}.Production|Any CPU.Build.0 = Release|Any CPU
+		{ACB1F3E9-CCD9-4DD5-9ADC-A261B2BE6409}.Production|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{ACB1F3E9-CCD9-4DD5-9ADC-A261B2BE6409}.Production|Mixed Platforms.Build.0 = Release|Any CPU
+		{ACB1F3E9-CCD9-4DD5-9ADC-A261B2BE6409}.Production|x64.ActiveCfg = Release|Any CPU
+		{ACB1F3E9-CCD9-4DD5-9ADC-A261B2BE6409}.Production|x86.ActiveCfg = Release|Any CPU
+		{ACB1F3E9-CCD9-4DD5-9ADC-A261B2BE6409}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACB1F3E9-CCD9-4DD5-9ADC-A261B2BE6409}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACB1F3E9-CCD9-4DD5-9ADC-A261B2BE6409}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{ACB1F3E9-CCD9-4DD5-9ADC-A261B2BE6409}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{ACB1F3E9-CCD9-4DD5-9ADC-A261B2BE6409}.Release|x64.ActiveCfg = Release|Any CPU
+		{ACB1F3E9-CCD9-4DD5-9ADC-A261B2BE6409}.Release|x86.ActiveCfg = Release|Any CPU
+		{ACB1F3E9-CCD9-4DD5-9ADC-A261B2BE6409}.UnitTests|Any CPU.ActiveCfg = Release|Any CPU
+		{ACB1F3E9-CCD9-4DD5-9ADC-A261B2BE6409}.UnitTests|Any CPU.Build.0 = Release|Any CPU
+		{ACB1F3E9-CCD9-4DD5-9ADC-A261B2BE6409}.UnitTests|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{ACB1F3E9-CCD9-4DD5-9ADC-A261B2BE6409}.UnitTests|Mixed Platforms.Build.0 = Release|Any CPU
+		{ACB1F3E9-CCD9-4DD5-9ADC-A261B2BE6409}.UnitTests|x64.ActiveCfg = Release|Any CPU
+		{ACB1F3E9-CCD9-4DD5-9ADC-A261B2BE6409}.UnitTests|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

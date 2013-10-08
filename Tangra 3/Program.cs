@@ -30,6 +30,19 @@ namespace Tangra
                 // NOTE: Show a warning message that this may be unsupported or untested platform
             }
 
+			#region Make sure the settings are not forgotten between application version updates
+			System.Reflection.Assembly a = System.Reflection.Assembly.GetExecutingAssembly();
+			Version appVersion = a.GetName().Version;
+			string appVersionString = appVersion.ToString();
+
+			if (Properties.Settings.Default.ApplicationVersion != appVersion.ToString())
+			{
+				Properties.Settings.Default.Upgrade();
+				Properties.Settings.Default.ApplicationVersion = appVersionString;
+				Properties.Settings.Default.Save();
+			}
+			#endregion
+
 		    Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 			

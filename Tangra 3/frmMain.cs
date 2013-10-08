@@ -36,17 +36,17 @@ using nom.tam.util;
 
 namespace Tangra
 {
-	public partial class frmMain : Form, IVideoFrameRenderer, ITangraHost
+	public partial class frmMain : Form, IVideoFrameRenderer
 	{
 		private VideoController m_VideoController;
 	    private LightCurveController m_LightCurveController;
 		private DarkFlatFrameController m_MakeDarkFlatController;
 		private AutoUpdatesController m_AutoUpdatesController;
+		private AddinsController m_AddinsController;
 
 		private VideoFileView m_VideoFileView;
 		private ImageToolView m_ImageToolView;
         private ZoomedImageView m_ZoomedImageView;
-		private AddinManager m_AddinManager;
 		private bool m_FormLoaded = false;
 
 		public frmMain()
@@ -60,7 +60,9 @@ namespace Tangra
 		    m_ZoomedImageView = new ZoomedImageView(zoomedImage, this);
 
 			m_VideoController = new VideoController(this, m_VideoFileView, m_ZoomedImageView, m_ImageToolView, pnlControlerPanel);
-            m_LightCurveController = new LightCurveController(this, m_VideoController);
+			m_AddinsController = new AddinsController(this, m_VideoController);
+
+			m_LightCurveController = new LightCurveController(this, m_VideoController, m_AddinsController);
 			m_MakeDarkFlatController = new DarkFlatFrameController(this, m_VideoController);
 			m_AutoUpdatesController = new AutoUpdatesController(this, m_VideoController);
 
@@ -70,8 +72,7 @@ namespace Tangra
 
 			BuildRecentFilesMenu();
 
-			m_AddinManager = new AddinManager();
-			m_AddinManager.LoadAddins(this);
+			m_AddinsController.LoadAddins();
 
 			m_AutoUpdatesController.CheckForUpdates(false);
 		}
@@ -90,7 +91,7 @@ namespace Tangra
 			base.Dispose(disposing);
 			
 			m_VideoController.Dispose();
-			m_AddinManager.Dispose();
+			m_AddinsController.Dispose();			
 		}
 
 		#region Frame Rendering
@@ -803,5 +804,10 @@ namespace Tangra
 			else
 				Process.Start("http://www.hristopavlov.net/Tangra3");
         }
+
+		private void miLoadedAddins_Click(object sender, EventArgs e)
+		{
+			m_AddinsController.ShowLoadedAddins();
+		}
 	}
 }

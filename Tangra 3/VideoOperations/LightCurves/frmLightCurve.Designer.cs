@@ -20,11 +20,12 @@
 			this.pnlLegend = new System.Windows.Forms.Panel();
 			this.pnlSmallGraph = new Tangra.Controls.SmoothPanel();
 			this.pnlMeasurementDetails = new System.Windows.Forms.Panel();
-			this.lblInstDelayWarning = new System.Windows.Forms.Label();
+			this.label2 = new System.Windows.Forms.Label();
 			this.pnlGeoLocation = new System.Windows.Forms.Panel();
 			this.tbxGeoLocation = new System.Windows.Forms.TextBox();
 			this.label4 = new System.Windows.Forms.Label();
 			this.label5 = new System.Windows.Forms.Label();
+			this.lblInstDelayWarning = new System.Windows.Forms.Label();
 			this.lblSN4 = new System.Windows.Forms.Label();
 			this.lblSN3 = new System.Windows.Forms.Label();
 			this.lblSN2 = new System.Windows.Forms.Label();
@@ -47,7 +48,6 @@
 			this.lblMeasurement4 = new System.Windows.Forms.Label();
 			this.picTarget4Pixels = new System.Windows.Forms.PictureBox();
 			this.pb3 = new System.Windows.Forms.PictureBox();
-			this.label2 = new System.Windows.Forms.Label();
 			this.picTarget3PSF = new System.Windows.Forms.PictureBox();
 			this.picTarget1Pixels = new System.Windows.Forms.PictureBox();
 			this.pb2 = new System.Windows.Forms.PictureBox();
@@ -221,18 +221,14 @@
 			this.pnlMeasurementDetails.Size = new System.Drawing.Size(698, 64);
 			this.pnlMeasurementDetails.TabIndex = 30;
 			// 
-			// lblInstDelayWarning
+			// label2
 			// 
-			this.lblInstDelayWarning.AutoSize = true;
-			this.lblInstDelayWarning.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-			this.lblInstDelayWarning.ForeColor = System.Drawing.Color.Red;
-			this.lblInstDelayWarning.Location = new System.Drawing.Point(12, 26);
-			this.lblInstDelayWarning.Name = "lblInstDelayWarning";
-			this.lblInstDelayWarning.Size = new System.Drawing.Size(20, 25);
-			this.lblInstDelayWarning.TabIndex = 39;
-			this.lblInstDelayWarning.Text = "*";
-			this.toolTip1.SetToolTip(this.lblInstDelayWarning, "Instrumental delay has not been applied to the times");
-			this.lblInstDelayWarning.Visible = false;
+			this.label2.AutoSize = true;
+			this.label2.Location = new System.Drawing.Point(26, 27);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(33, 13);
+			this.label2.TabIndex = 17;
+			this.label2.Text = "Time:";
 			// 
 			// pnlGeoLocation
 			// 
@@ -270,6 +266,19 @@
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(0, 13);
 			this.label5.TabIndex = 28;
+			// 
+			// lblInstDelayWarning
+			// 
+			this.lblInstDelayWarning.AutoSize = true;
+			this.lblInstDelayWarning.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+			this.lblInstDelayWarning.ForeColor = System.Drawing.Color.Red;
+			this.lblInstDelayWarning.Location = new System.Drawing.Point(12, 26);
+			this.lblInstDelayWarning.Name = "lblInstDelayWarning";
+			this.lblInstDelayWarning.Size = new System.Drawing.Size(20, 25);
+			this.lblInstDelayWarning.TabIndex = 39;
+			this.lblInstDelayWarning.Text = "*";
+			this.toolTip1.SetToolTip(this.lblInstDelayWarning, "Instrumental delay has not been applied to the times");
+			this.lblInstDelayWarning.Visible = false;
 			// 
 			// lblSN4
 			// 
@@ -485,15 +494,6 @@
 			this.pb3.Size = new System.Drawing.Size(10, 11);
 			this.pb3.TabIndex = 14;
 			this.pb3.TabStop = false;
-			// 
-			// label2
-			// 
-			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(26, 27);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(33, 13);
-			this.label2.TabIndex = 17;
-			this.label2.Text = "Time:";
 			// 
 			// picTarget3PSF
 			// 
@@ -1210,6 +1210,7 @@
 			this.Text = "Light Curves";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmLightCurve_FormClosing);
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.frmLightCurve_FormClosed);
+			this.Load += new System.EventHandler(this.frmLightCurve_Load);
 			this.Move += new System.EventHandler(this.frmLightCurve_Move);
 			this.Resize += new System.EventHandler(this.frmLightCurve_Resize);
 			this.pnlLegend.ResumeLayout(false);

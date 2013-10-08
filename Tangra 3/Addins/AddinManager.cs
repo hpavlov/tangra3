@@ -5,22 +5,49 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Windows.Forms;
 using Tangra.SDK;
 using Tangra.Model.Helpers;
 
 namespace Tangra.Addins
 {
-	[Serializable]
-	public class AddinManager : IDisposable
+	public interface IAddinManager
 	{
-		private List<Addin> m_Addins = new List<Addin>();
+		IWin32Window ParentWindow { get; }
+		ILightCurveDataProvider LightCurveDataProvider { get; }
+	}
 
-		public void LoadAddins(ITangraHost host)
+	[Serializable]
+	public class AddinManager : IDisposable, IAddinManager
+	{
+		public readonly List<Addin> Addins = new List<Addin>();
+
+		private frmMain m_MainForm;
+		private ILightCurveDataProvider m_lcDataProvider;
+
+		public AddinManager(frmMain mainForm)
+		{
+			m_MainForm = mainForm;
+		}
+
+		public void LoadAddins()
 		{
 			List<string> candiates = SearchAddins();
 			foreach (string candiate in candiates)
 			{
-				m_Addins.Add(new Addin(candiate, host));
+				Addin instance;
+				try
+				{
+					instance = new Addin(candiate, this);
+				}
+				catch (Exception ex)
+				{
+					Trace.WriteLine(ex.FullExceptionInfo());
+					instance = null;
+				}
+
+				if (instance != null)
+					Addins.Add(instance);
 			}
 		}
 
@@ -60,7 +87,7 @@ namespace Tangra.Addins
 
 		public void Dispose()
 		{
-			foreach (Addin addin in m_Addins)
+			foreach (Addin addin in Addins)
 			{
 				try
 				{
@@ -73,5 +100,19 @@ namespace Tangra.Addins
 			}
 		}
 
+		internal void SetLightCurveDataProvider(ILightCurveDataProvider provider)
+		{
+			m_lcDataProvider = provider;
+		}
+
+		IWin32Window IAddinManager.ParentWindow
+		{
+			get { return m_MainForm; }
+		}
+
+		ILightCurveDataProvider IAddinManager.LightCurveDataProvider
+		{
+			get { return m_lcDataProvider; }
+		}
 	}
 }

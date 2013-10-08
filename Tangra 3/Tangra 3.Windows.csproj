@@ -24,6 +24,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -76,6 +77,10 @@
   <ItemGroup>
     <Compile Include="Addins\Addin.cs" />
     <Compile Include="Addins\AddinManager.cs" />
+    <Compile Include="Addins\MarshalByRefLightCurveDataProvider.cs" />
+    <Compile Include="Addins\SettingsStorageProvider.cs" />
+    <Compile Include="Addins\SingleMeasurement.cs" />
+    <Compile Include="Addins\TangraHostDelegate.cs" />
     <Compile Include="Config\frmInstDelayConfigChooser.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -157,6 +162,7 @@
     <Compile Include="Controller\DarkFlatFrameController.cs" />
     <Compile Include="Controller\VideoController.cs" />
     <Compile Include="Controller\VideoOperationController.cs" />
+    <Compile Include="Controller\AddinsController.cs" />
     <Compile Include="Controls\SmoothPanel.cs">
       <SubType>Component</SubType>
     </Compile>

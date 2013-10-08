@@ -185,6 +185,45 @@ namespace Tangra.Model.Image
 			return bmp;
 		}
 
+		public static Bitmap ConstructBitmapFrom32bppArgbBitmapPixels(byte[] pixels, int width, int height)
+		{
+			var bmp = new Bitmap(width, height, PixelFormat.Format24bppRgb);
+
+			// GDI+ still lies to us - the return format is BGR, NOT RGB.
+			BitmapData bmData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+
+			int stride = bmData.Stride;
+			System.IntPtr Scan0 = bmData.Scan0;
+
+			unsafe
+			{
+				byte* p = (byte*)(void*)Scan0;
+
+				int nOffset = stride - bmp.Width * 3;
+
+				for (int y = 0; y < bmp.Height; ++y)
+				{
+					for (int x = 0; x < bmp.Width; ++x)
+					{
+						byte color;
+						int index = 4 * x + y * 4 * width;
+						color = (byte)(pixels[index]);
+
+						p[0] = color;
+						p[1] = color;
+						p[2] = color;
+
+						p += 3;
+					}
+					p += nOffset;
+				}
+			}
+
+			bmp.UnlockBits(bmData);
+
+			return bmp;			
+		}
+
 		public static Bitmap ConstructBitmapFromBitmapPixels(byte[] pixels, int width, int height)
 		{
 			var bmp = new Bitmap(width, height, PixelFormat.Format24bppRgb);
@@ -235,6 +274,13 @@ namespace Tangra.Model.Image
 		public static Pixelmap ConstructForLCFileAveragedFrame(byte[] bytes, int width, int height, int bitpixCamera)
 		{
 			return ConstructForLCFileAveragedFrame(new uint[bytes.Length], width, height, bitpixCamera, bytes);
+		}
+
+		public static Pixelmap ConstructForLCFile32bppArgbAveragedFrame(byte[] bytes, int width, int height, int bitpixCamera)
+		{
+			Bitmap bmp = ConstructBitmapFrom32bppArgbBitmapPixels(bytes, width, height);
+			Pixelmap rv = new Pixelmap(width, height, bitpixCamera, new uint[bytes.Length], bmp, bytes);
+			return rv;
 		}
 
 		public static byte GetColourChannelValue(TangraConfig.ColourChannel channel, byte red, byte green, byte blue)

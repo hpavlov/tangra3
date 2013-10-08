@@ -17,15 +17,17 @@ using Tangra.Model.Config;
 using Tangra.Model.Helpers;
 using Tangra.Model.Video;
 using Tangra.Resources;
+using Tangra.SDK;
 using Tangra.VideoOperations.LightCurves.InfoForms;
 using Tangra.VideoOperations.LightCurves.Tracking;
 
 
 namespace Tangra.VideoOperations.LightCurves
 {
-	public partial class frmLightCurve : Form, ILightCurveFormCustomizer
+	public partial class frmLightCurve : Form, ILightCurveFormCustomizer, ILightCurveDataProvider
     {
 	    private LightCurveController m_LightCurveController;
+		private AddinsController m_AddinsController;
 
 		private GeoLocationInfo m_GeoLocationInfo;
 
@@ -36,11 +38,12 @@ namespace Tangra.VideoOperations.LightCurves
 
         private TangraConfig.LightCurvesDisplaySettings m_DisplaySettings = new TangraConfig.LightCurvesDisplaySettings();
 
-        public frmLightCurve(LightCurveController controller)
+		public frmLightCurve(LightCurveController controller, AddinsController addinsController)
         {
             InitializeComponent();
 
             m_LightCurveController = controller;
+			m_AddinsController = addinsController;
 
             // Not implemented yet, may be one day ...
             miFullReprocess.Visible = false;
@@ -76,8 +79,8 @@ namespace Tangra.VideoOperations.LightCurves
         	LoadAddins();
         }
 
-        internal frmLightCurve(LightCurveController controller, LCFile lcFile, string lcFilePath)
-            : this(controller)
+		internal frmLightCurve(LightCurveController controller, AddinsController addinsController, LCFile lcFile, string lcFilePath)
+			: this(controller, addinsController)
         {
 			m_LCFile = lcFile;
         	m_LCFilePath = lcFilePath;
@@ -428,6 +431,8 @@ namespace Tangra.VideoOperations.LightCurves
 				    // or user entered star/end times from the VTI OSD
 				    m_Header.TimingType == MeasurementTimingType.UserEnteredFrameReferences
                 );
+
+			m_AddinsController.SetLightCurveDataProvider(this);
         }
 
 		private string ExplainTrackingType(TrackingType type)
@@ -2088,5 +2093,10 @@ namespace Tangra.VideoOperations.LightCurves
             }
 
         }
-    }
+
+		private void frmLightCurve_Load(object sender, EventArgs e)
+		{
+			m_AddinsController.BuildLightCurveMenuAddins(miAddins);
+		}
+	}
 }

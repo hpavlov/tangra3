@@ -85,7 +85,12 @@ namespace Tangra
 			var moduleInfo = new StringBuilder("\r\n\r\nLoaded modules:\r\n\r\n");
 			foreach (ProcessModule module in Process.GetCurrentProcess().Modules)
 			{
-				moduleInfo.AppendFormat("{0} v{1}, {2}\r\n", module.ModuleName, module.FileVersionInfo.FileVersion, module.FileName);
+				try
+				{
+					moduleInfo.AppendFormat("{0} v{1}, {2}\r\n", module.ModuleName, module.FileVersionInfo.FileVersion, module.FileName);	
+				}
+				catch
+				{ }				
 			}
 
             return

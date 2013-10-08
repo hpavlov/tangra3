@@ -21,12 +21,14 @@ namespace Tangra.Controller
         private VideoController m_VideoController;
 
         private frmLightCurve m_LightCurveForm;
+	    private AddinsController m_AddinsController;
         private bool m_lcFileLoaded;
 
-        public LightCurveController(Form mainFormView, VideoController videoController)
+		public LightCurveController(Form mainFormView, VideoController videoController, AddinsController addinsController)
         {
             m_MainFormView = mainFormView;
             m_VideoController = videoController;
+			m_AddinsController = addinsController;
 
             m_lcFileLoaded = false;
             m_LightCurveForm = null;
@@ -131,7 +133,7 @@ namespace Tangra.Controller
 
                     m_lcFileLoaded = true;
 
-                    m_LightCurveForm = new frmLightCurve(this, lcFile, fileName);
+					m_LightCurveForm = new frmLightCurve(this, m_AddinsController, lcFile, fileName);
 					m_LightCurveForm.SetGeoLocation(m_VideoController.GeoLocation);
                     m_LightCurveForm.Show(m_MainFormView);
                     m_LightCurveForm.Update();
@@ -197,7 +199,7 @@ namespace Tangra.Controller
 
 		internal void EnsureLightCurveForm()
 		{
-			m_LightCurveForm = new frmLightCurve(this);
+			m_LightCurveForm = new frmLightCurve(this, m_AddinsController);
 
 			m_LightCurveForm.Show(m_MainFormView);
 			m_LightCurveForm.Update();

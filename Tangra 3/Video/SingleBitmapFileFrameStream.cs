@@ -41,7 +41,10 @@ namespace Tangra.Video
 		{
 			m_lcFile = lightCurveFile;
 
-			m_Pixelmap = Pixelmap.ConstructForLCFileAveragedFrame(m_lcFile.Footer.AveragedFrameBytes, m_lcFile.Footer.AveragedFrameWidth, m_lcFile.Footer.AveragedFrameHeight, m_lcFile.Footer.AveragedFrameBpp);
+			if (lightCurveFile.LcFileFormatVersion < 4 && m_lcFile.Footer.AveragedFrameBytes.Length == 4 * m_lcFile.Footer.AveragedFrameWidth * m_lcFile.Footer.AveragedFrameHeight)
+				m_Pixelmap = Pixelmap.ConstructForLCFile32bppArgbAveragedFrame(m_lcFile.Footer.AveragedFrameBytes, m_lcFile.Footer.AveragedFrameWidth, m_lcFile.Footer.AveragedFrameHeight, m_lcFile.Footer.AveragedFrameBpp);
+			else
+				m_Pixelmap = Pixelmap.ConstructForLCFileAveragedFrame(m_lcFile.Footer.AveragedFrameBytes, m_lcFile.Footer.AveragedFrameWidth, m_lcFile.Footer.AveragedFrameHeight, m_lcFile.Footer.AveragedFrameBpp);
 
 			m_FirstFrame = (int)m_lcFile.Header.MinFrame;
 			m_LastFrame = (int)m_lcFile.Header.MaxFrame;

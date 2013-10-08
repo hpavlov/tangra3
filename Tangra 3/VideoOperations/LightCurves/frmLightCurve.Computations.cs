@@ -9,12 +9,14 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using Tangra.Addins;
 using Tangra.Config;
 using Tangra.Model.Config;
 using Tangra.Model.Image;
 using Tangra.Model.Numerical;
 using Tangra.Model.Video;
 using Tangra.Model.VideoOperations;
+using Tangra.SDK;
 using Tangra.VideoOperations.LightCurves.InfoForms;
 using Tangra.VideoOperations.LightCurves.Tracking;
 
@@ -1112,5 +1114,27 @@ namespace Tangra.VideoOperations.LightCurves
                 m_RequiresFullReprocessing = true;
             }
         }
+
+		string ILightCurveDataProvider.FileName
+		{
+			get { return m_LCFile.Header.PathToVideoFile; }
+		}
+
+		int ILightCurveDataProvider.NumberOfMeasuredComparisonObjects
+		{
+			get { return m_LCFile.Header.ObjectCount - 1; }
+		}
+
+		ISingleMeasurement[] ILightCurveDataProvider.GetTargetMeasurements()
+		{
+			int targetStarIndex = 0;
+			return m_AllReadings[targetStarIndex].Select(x => new SingleMeasurement(x)).ToArray();
+		}
+
+		ISingleMeasurement[] ILightCurveDataProvider.GetComparisonObjectMeasurements(int comparisonObjectId)
+		{
+			return null;
+		}
+
     }
 }
