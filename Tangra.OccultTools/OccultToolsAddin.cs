@@ -81,11 +81,6 @@ namespace Tangra.OccultTools
 			};
 		}
 
-		public override object InitializeLifetimeService()
-		{
-			return null;
-		}
-
 		public void Finalise()
 		{
 			RemotingServices.Disconnect(this);

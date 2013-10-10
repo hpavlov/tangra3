@@ -14,6 +14,8 @@ namespace Tangra.Addins
 		private ISingleMeasurement[] m_Comp1Measurements;
 		private ISingleMeasurement[] m_Comp2Measurements;
 		private ISingleMeasurement[] m_Comp3Measurements;
+		private int m_IntegrationRate;
+		private int m_FirstIntegratingFrame;
 
 		internal MarshalByRefLightCurveDataProvider(ILightCurveDataProvider localProvider)
 		{
@@ -26,6 +28,7 @@ namespace Tangra.Addins
 				m_Comp1Measurements = localProvider.GetComparisonObjectMeasurements(1);
 			if (NumberOfMeasuredComparisonObjects > 2)
 				m_Comp1Measurements = localProvider.GetComparisonObjectMeasurements(2);
+			localProvider.GetIntegrationRateAndFirstFrame(out m_IntegrationRate, out m_FirstIntegratingFrame);
 		}
 
 		public string FileName { get; private set; }
@@ -50,6 +53,12 @@ namespace Tangra.Addins
 			}
 
 			throw new IndexOutOfRangeException();
+		}
+
+		public void GetIntegrationRateAndFirstFrame(out int integrationRate, out int firstIntegratingFrame)
+		{
+			integrationRate = m_IntegrationRate;
+			firstIntegratingFrame = m_FirstIntegratingFrame;
 		}
 	}
 }

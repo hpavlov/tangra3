@@ -1179,7 +1179,10 @@ namespace Tangra.VideoOperations.LightCurves
 
 			GetAOTAStarIndexes(out occultedStarIndex, out comp1Index, out comp2Index, out comp3Index);
 
-			return m_AllReadings[occultedStarIndex].Select(x => new SingleMeasurement(x)).ToArray();
+			if (m_Context.Binning > 0)
+				return m_AllBinnedReadings[occultedStarIndex].Select(x => new SingleMeasurement(x, occultedStarIndex)).ToArray();
+			else
+				return m_AllReadings[occultedStarIndex].Select(x => new SingleMeasurement(x)).ToArray();
 		}
 
 		ISingleMeasurement[] ILightCurveDataProvider.GetComparisonObjectMeasurements(int comparisonObjectId)
@@ -1190,15 +1193,33 @@ namespace Tangra.VideoOperations.LightCurves
 			int comp3Index;
 
 			GetAOTAStarIndexes(out occultedStarIndex, out comp1Index, out comp2Index, out comp3Index);
-
-			if (comparisonObjectId == 1 && comp1Index > -1)
-				return m_AllReadings[comp1Index].Select(x => new SingleMeasurement(x)).ToArray();
-			else if (comparisonObjectId == 2 && comp2Index > -1)
-				return m_AllReadings[comp2Index].Select(x => new SingleMeasurement(x)).ToArray();
-			else if (comparisonObjectId == 3 && comp3Index > -1)
-				return m_AllReadings[comp3Index].Select(x => new SingleMeasurement(x)).ToArray();
+			if (m_Context.Binning > 0)
+			{
+				if (comparisonObjectId == 1 && comp1Index > -1)
+					return m_AllBinnedReadings[comp1Index].Select(x => new SingleMeasurement(x, comp1Index)).ToArray();
+				else if (comparisonObjectId == 2 && comp2Index > -1)
+					return m_AllBinnedReadings[comp2Index].Select(x => new SingleMeasurement(x, comp2Index)).ToArray();
+				else if (comparisonObjectId == 3 && comp3Index > -1)
+					return m_AllBinnedReadings[comp3Index].Select(x => new SingleMeasurement(x, comp3Index)).ToArray();
+			}
+			else
+			{
+				if (comparisonObjectId == 1 && comp1Index > -1)
+					return m_AllReadings[comp1Index].Select(x => new SingleMeasurement(x)).ToArray();
+				else if (comparisonObjectId == 2 && comp2Index > -1)
+					return m_AllReadings[comp2Index].Select(x => new SingleMeasurement(x)).ToArray();
+				else if (comparisonObjectId == 3 && comp3Index > -1)
+					return m_AllReadings[comp3Index].Select(x => new SingleMeasurement(x)).ToArray();				
+			}
 
 			return null;
+		}
+
+		void ILightCurveDataProvider.GetIntegrationRateAndFirstFrame(out int integrationRate, out int firstIntegratingFrame)
+		{
+			// TODO: Ask the user to confirm
+			integrationRate = 1;
+			firstIntegratingFrame = 0;
 		}
 
     }

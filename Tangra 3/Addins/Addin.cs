@@ -56,6 +56,17 @@ namespace Tangra.Addins
 
 			m_Instance = (ITangraAddin)obj;
 			m_Instance.Initialise(new TangraHostDelegate(fullTypeName, addinManager));
+
+			foreach (object actionInstance in m_Instance.GetAddinActions())
+			{
+				var mbrObj = actionInstance as MarshalByRefObject;
+				if (mbrObj != null)
+				{
+					lease = (ILease)mbrObj.GetLifetimeService();
+					if (lease != null)
+						lease.Register(addinManager.RemotingClientSponsor);									
+				}
+			}
 		}
 
 		public XmlSerializer CreateXmlSettingsSerializer(Type settingsType)

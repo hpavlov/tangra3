@@ -20,6 +20,7 @@ namespace Tangra.SDK
 		int NumberOfMeasuredComparisonObjects { get; }
 		ISingleMeasurement[] GetTargetMeasurements();
 		ISingleMeasurement[] GetComparisonObjectMeasurements(int comparisonObjectId);
+		void GetIntegrationRateAndFirstFrame(out int integrationRate, out int firstIntegratingFrame);
 	}
 
 	public interface ITangraHost

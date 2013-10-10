@@ -77,6 +77,12 @@
   <ItemGroup>
     <Compile Include="Addins\Addin.cs" />
     <Compile Include="Addins\AddinManager.cs" />
+    <Compile Include="Addins\frmConfirmIntegrationRate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Addins\frmConfirmIntegrationRate.Designer.cs">
+      <DependentUpon>frmConfirmIntegrationRate.cs</DependentUpon>
+    </Compile>
     <Compile Include="Addins\MarshalByRefLightCurveDataProvider.cs" />
     <Compile Include="Addins\SettingsStorageProvider.cs" />
     <Compile Include="Addins\SingleMeasurement.cs" />
@@ -430,6 +436,9 @@
     <Compile Include="View\ImageToolView.cs" />
     <Compile Include="View\VideoFileView.cs" />
     <Compile Include="View\ZoomedImageView.cs" />
+    <EmbeddedResource Include="Addins\frmConfirmIntegrationRate.resx">
+      <DependentUpon>frmConfirmIntegrationRate.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Config\frmInstDelayConfigChooser.resx">
       <DependentUpon>frmInstDelayConfigChooser.cs</DependentUpon>
     </EmbeddedResource>
