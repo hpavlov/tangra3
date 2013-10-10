@@ -1125,14 +1125,79 @@ namespace Tangra.VideoOperations.LightCurves
 			get { return m_LCFile.Header.ObjectCount - 1; }
 		}
 
+		private void GetAOTAStarIndexes(out int occultedStarIndex, out int comp1Index, out int comp2Index, out int comp3Index)
+		{
+			comp1Index = -1;
+			comp2Index = -1;
+			comp3Index = -1;
+
+			TrackedObjectConfig occultedTrackedObject = m_LCFile.Footer.TrackedObjects.SingleOrDefault(x => x.TrackingType == TrackingType.OccultedStar);
+			occultedStarIndex = occultedTrackedObject != null ? m_LCFile.Footer.TrackedObjects.IndexOf(occultedTrackedObject) : 0;
+
+			if (!m_IncludeObjects[occultedStarIndex])
+			{
+				// If the occulted star is not currently displayed, then select the first visible object to be the occulted one
+				if (m_IncludeObjects[0])
+					occultedStarIndex = 0;
+				else if (m_IncludeObjects[1])
+					occultedStarIndex = 1;
+				else if (m_IncludeObjects[2])
+					occultedStarIndex = 2;
+				else if (m_IncludeObjects[3])
+					occultedStarIndex = 4;
+			}
+
+			int nextCompStarIndex = 0;
+			for (int i = 0; i < m_LCFile.Header.ObjectCount; i++)
+			{
+				if (m_IncludeObjects[i] && i != occultedStarIndex)
+				{
+					nextCompStarIndex++;
+
+					switch (nextCompStarIndex)
+					{
+						case 1:
+							comp1Index = i;
+							break;
+						case 2:
+							comp2Index = i;
+							break;
+						case 3:
+							comp3Index = i;
+							break;
+					}
+				}
+			}
+		}
+
 		ISingleMeasurement[] ILightCurveDataProvider.GetTargetMeasurements()
 		{
-			int targetStarIndex = 0;
-			return m_AllReadings[targetStarIndex].Select(x => new SingleMeasurement(x)).ToArray();
+			int occultedStarIndex;
+			int comp1Index;
+			int comp2Index;
+			int comp3Index;
+
+			GetAOTAStarIndexes(out occultedStarIndex, out comp1Index, out comp2Index, out comp3Index);
+
+			return m_AllReadings[occultedStarIndex].Select(x => new SingleMeasurement(x)).ToArray();
 		}
 
 		ISingleMeasurement[] ILightCurveDataProvider.GetComparisonObjectMeasurements(int comparisonObjectId)
 		{
+			int occultedStarIndex;
+			int comp1Index;
+			int comp2Index;
+			int comp3Index;
+
+			GetAOTAStarIndexes(out occultedStarIndex, out comp1Index, out comp2Index, out comp3Index);
+
+			if (comparisonObjectId == 1 && comp1Index > -1)
+				return m_AllReadings[comp1Index].Select(x => new SingleMeasurement(x)).ToArray();
+			else if (comparisonObjectId == 2 && comp2Index > -1)
+				return m_AllReadings[comp2Index].Select(x => new SingleMeasurement(x)).ToArray();
+			else if (comparisonObjectId == 3 && comp3Index > -1)
+				return m_AllReadings[comp3Index].Select(x => new SingleMeasurement(x)).ToArray();
+
 			return null;
 		}
 

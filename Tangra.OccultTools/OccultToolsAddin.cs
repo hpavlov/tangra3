@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Remoting;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -80,9 +81,14 @@ namespace Tangra.OccultTools
 			};
 		}
 
+		public override object InitializeLifetimeService()
+		{
+			return null;
+		}
+
 		public void Finalise()
 		{
-
+			RemotingServices.Disconnect(this);
 		}
 
 		public void Configure()

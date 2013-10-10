@@ -28,6 +28,7 @@ namespace Tangra.OccultTools
         /// </summary>
         private void InitializeComponent()
         {
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmConfig));
 			this.btnOK = new System.Windows.Forms.Button();
 			this.butLocateExec = new System.Windows.Forms.Button();
 			this.tbxOccultPath = new System.Windows.Forms.TextBox();
@@ -105,6 +106,7 @@ namespace Tangra.OccultTools
 			this.Controls.Add(this.lblC2awPath);
 			this.Controls.Add(this.btnOK);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
 			this.Name = "frmConfig";

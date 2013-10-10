@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Remoting.Lifetime;
 using System.Text;
 using System.Windows.Forms;
 using Tangra.SDK;
@@ -17,6 +18,16 @@ namespace Tangra.Addins
 		ILightCurveDataProvider LightCurveDataProvider { get; }
 	}
 
+	internal class RemotingClientSponsor : MarshalByRefObject, ISponsor
+	{
+		public TimeSpan Renewal(ILease lease)
+		{
+			TimeSpan tsLease = TimeSpan.FromMinutes(5);
+			lease.Renew(tsLease);
+			return tsLease;
+		}
+	}
+
 	[Serializable]
 	public class AddinManager : IDisposable, IAddinManager
 	{
@@ -24,6 +35,8 @@ namespace Tangra.Addins
 
 		private frmMain m_MainForm;
 		private ILightCurveDataProvider m_lcDataProvider;
+
+		internal RemotingClientSponsor RemotingClientSponsor = new RemotingClientSponsor();
 
 		public AddinManager(frmMain mainForm)
 		{

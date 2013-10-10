@@ -45,8 +45,8 @@ namespace Tangra.SDK
 	{
 		string DisplayName { get; }
 		AddinActionType ActionType { get; }
-		Bitmap Icon { get; }
-		Color IconTransparentColor { get; }
+		IntPtr Icon { get; }
+		int IconTransparentColorARGB { get; }
 
 		void Execute();
 	}

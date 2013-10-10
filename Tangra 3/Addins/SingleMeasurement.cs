@@ -14,7 +14,7 @@ namespace Tangra.Addins
 		{
 			CurrFrameNo = (int)lcMeasurement.CurrFrameNo;
 			TargetNo = lcMeasurement.TargetNo;
-			Measurement = lcMeasurement.TotalReading - lcMeasurement.TotalBackground;
+			Measurement = 1.0f * lcMeasurement.TotalReading - 1.0f * lcMeasurement.TotalBackground;
 		}
 
 		public int CurrFrameNo { get; private set; }

@@ -2,11 +2,12 @@
 Features:
 ---------
 
- - Add OCR option for AVI videos
- - Build an Add-in for AOTA
-
+  - Build an Add-in for AOTA
+  - Add integration detection on the LightCurve form with option of binning it
+  - Add OCR option for AVI videos
 Bugs:
 -----
+  - Check the normalization algorithm. It appears that before the normalization algorithm is set (4-average or 16-average for example) no aparent normalization has been done!
 
 NONE REPORTED CURRENTLY
 

@@ -83,7 +83,7 @@ namespace Tangra.Controller
 
 			if (m_AddinManager.Addins.Count > 0)
 			{
-				m_MainForm.miConfigureAddin.DropDownItems.Clear();
+				topMenuItem.DropDownItems.Clear();
 
 				foreach (Addin addin in m_AddinManager.Addins)
 				{
@@ -95,8 +95,8 @@ namespace Tangra.Controller
 							item.Click += ItemOnClick;
 							if (action.Icon != null)
 							{
-								//item.Image = (Bitmap)action.Icon.Clone();
-								//item.ImageTransparentColor = action.IconTransparentColor;								
+								item.Image = (Bitmap)Bitmap.FromHbitmap(action.Icon).Clone();
+								item.ImageTransparentColor = Color.FromArgb(action.IconTransparentColorARGB);								
 							}
 							item.Tag = action;
 

@@ -25,14 +25,14 @@ namespace Tangra.OccultTools
 			get { return AddinActionType.LightCurve; }
 		}
 
-		public System.Drawing.Bitmap Icon
+		public IntPtr Icon
 		{
-			get { return Properties.Resource.Occult.ToBitmap(); }
+			get { return Properties.Resource.Occult.ToBitmap().GetHbitmap(); }
 		}
 
-		public System.Drawing.Color IconTransparentColor
+		public int IconTransparentColorARGB
 		{
-			get { return System.Drawing.Color.Transparent; }
+			get { return System.Drawing.Color.Transparent.ToArgb(); }
 		}
 
 		public void Execute()

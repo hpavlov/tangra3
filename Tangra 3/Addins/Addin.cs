@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Remoting;
+using System.Runtime.Remoting.Lifetime;
 using System.Security;
 using System.Security.Policy;
 using System.Text;
@@ -22,7 +23,7 @@ namespace Tangra.Addins
 		private AssemblyName m_AssemblyName;
 		private ITangraAddin m_Instance;
 
-		internal Addin(string fullTypeName, IAddinManager addinManager)
+		internal Addin(string fullTypeName, AddinManager addinManager)
 		{
 
 			string[] tokens = fullTypeName.Split(new char[] { ',' }, 2);
@@ -48,6 +49,10 @@ namespace Tangra.Addins
 			m_HostDomain.UnhandledException += m_HostDomain_UnhandledException;
 
 			object obj = m_HostDomain.CreateInstanceAndUnwrap(tokens[1], tokens[0]);
+
+			ILease lease = (ILease)(obj as MarshalByRefObject).GetLifetimeService();
+			if (lease != null)
+				lease.Register(addinManager.RemotingClientSponsor);
 
 			m_Instance = (ITangraAddin)obj;
 			m_Instance.Initialise(new TangraHostDelegate(fullTypeName, addinManager));
