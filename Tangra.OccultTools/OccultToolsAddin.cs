@@ -77,8 +77,11 @@ namespace Tangra.OccultTools
 
 			m_SupportedAddinActions = new ITangraAddinAction[]
 			{
-				new AotaAction(m_Settings, host)
+				new AotaAction(m_Settings, host, this)
 			};
+
+			RemotingConfiguration.RegisterWellKnownServiceType(typeof(OccultToolsAddin), "OccultToolsAddin", WellKnownObjectMode.Singleton);
+			RemotingConfiguration.RegisterWellKnownServiceType(typeof(AotaAction), "AotaAction", WellKnownObjectMode.Singleton);
 		}
 
 		public void Finalise()

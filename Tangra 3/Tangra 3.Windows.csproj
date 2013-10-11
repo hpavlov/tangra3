@@ -77,6 +77,7 @@
   <ItemGroup>
     <Compile Include="Addins\Addin.cs" />
     <Compile Include="Addins\AddinManager.cs" />
+    <Compile Include="Addins\AddinTrackingHandler.cs" />
     <Compile Include="Addins\frmConfirmIntegrationRate.cs">
       <SubType>Form</SubType>
     </Compile>

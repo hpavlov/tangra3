@@ -17,7 +17,12 @@ namespace Tangra.Addins
 		{
 			m_AddinTypeName = addinTypeName;
 			m_AddinManager = addinManager;
-;
+		}
+
+		public override object InitializeLifetimeService()
+		{
+			// The lifetime of the object is managed by Tangra
+			return null;
 		}
 
 		public ISettingsStorageProvider GetSettingsProvider()

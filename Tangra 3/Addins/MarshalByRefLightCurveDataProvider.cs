@@ -8,7 +8,7 @@ using Tangra.VideoOperations.LightCurves;
 namespace Tangra.Addins
 {
 	[Serializable]
-	public class MarshalByRefLightCurveDataProvider : MarshalByRefObject, ILightCurveDataProvider
+	public class MarshalByRefLightCurveDataProvider : ILightCurveDataProvider
 	{
 		private ISingleMeasurement[] m_TargetMeasurements;
 		private ISingleMeasurement[] m_Comp1Measurements;

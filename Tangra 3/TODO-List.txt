@@ -4,7 +4,11 @@ Features:
 
   - Build an Add-in for AOTA
   - Add integration detection on the LightCurve form with option of binning it
+  - Make it possible to select 2 to locations (the D and R datapoint) 
+  - Make it possible to display both the D and R frame number and times on the LightCurve form  
+  - Add Äddins"advanced config page. Put extra tracing/debugging info there. Put other options ??
   - Add OCR option for AVI videos
+
 Bugs:
 -----
   - Check the normalization algorithm. It appears that before the normalization algorithm is set (4-average or 16-average for example) no aparent normalization has been done!

@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Remoting.Lifetime;
+using System.Runtime.Remoting.Services;
 using System.Text;
 using System.Windows.Forms;
 using Tangra.SDK;
@@ -26,6 +27,11 @@ namespace Tangra.Addins
 			lease.Renew(tsLease);
 			return tsLease;
 		}
+
+		public override object InitializeLifetimeService()
+		{
+			return null;
+		}
 	}
 
 	[Serializable]
@@ -41,6 +47,9 @@ namespace Tangra.Addins
 		public AddinManager(frmMain mainForm)
 		{
 			m_MainForm = mainForm;
+
+			TrackingServices.RegisterTrackingHandler(new AddinTrackingHandler());
+
 		}
 
 		public void LoadAddins()

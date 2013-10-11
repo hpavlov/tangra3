@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using Tangra.SDK;
 
 namespace Tangra.OccultTools
@@ -26,6 +27,7 @@ namespace Tangra.OccultTools
 		private static MethodInfo AOTA_Set_Comp3Data_InclBg;
 		private static MethodInfo AOTA_Set_TimeBase;
 		private static MethodInfo AOTA_RunAOTA;
+		private static MethodInfo AOTA_InitialiseAOTA;
 
 		private static BindingFlags OccultBindingFlags;
 
@@ -89,12 +91,16 @@ namespace Tangra.OccultTools
 				AOTA_Set_TimeBase = TYPE_AOTA_ExternalAccess.GetMethod("Set_TimeBase", new Type[] { typeof(float[]) });
 				//public bool RunAOTA(IWin32Window parentWindow)
 				AOTA_RunAOTA = TYPE_AOTA_ExternalAccess.GetMethod("RunAOTA");
+				//public void InitialiseAOTA()
+				AOTA_InitialiseAOTA = TYPE_AOTA_ExternalAccess.GetMethod("InitialiseAOTA");
 			}
 		}
 
-		internal static void RunAOTA(ILightCurveDataProvider dataProvider)
+		internal static void RunAOTA(ILightCurveDataProvider dataProvider, IWin32Window parentWindow)
 		{
 			object aotaInstance = Activator.CreateInstance(TYPE_AOTA_ExternalAccess);
+
+			AOTA_InitialiseAOTA.Invoke(aotaInstance, new object[] { });
 
 			ISingleMeasurement[] measurements = dataProvider.GetTargetMeasurements();
 
@@ -103,7 +109,7 @@ namespace Tangra.OccultTools
 
 			AOTA_Set_TargetData.Invoke(aotaInstance, new object[] { data });
 			AOTA_Set_FrameID.Invoke(aotaInstance, new object[] { frameIds });
-			AOTA_RunAOTA.Invoke(aotaInstance, new object[] { null });
+			AOTA_RunAOTA.Invoke(aotaInstance, new object[] { parentWindow });
 		}
 	}
 }
