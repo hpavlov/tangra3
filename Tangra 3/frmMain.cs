@@ -91,7 +91,7 @@ namespace Tangra
 			base.Dispose(disposing);
 			
 			m_VideoController.Dispose();
-			m_AddinsController.Dispose();			
+			m_AddinsController.Dispose();
 		}
 
 		#region Frame Rendering
@@ -809,5 +809,10 @@ namespace Tangra
 		{
 			m_AddinsController.ShowLoadedAddins();
 		}
+
+        private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            m_AddinsController.FinaliseAddins();
+        }
 	}
 }

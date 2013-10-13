@@ -27,6 +27,7 @@ namespace Tangra.OccultTools
 		private static MethodInfo AOTA_Set_Comp3Data_InclBg;
 		private static MethodInfo AOTA_Set_TimeBase;
 		private static MethodInfo AOTA_RunAOTA;
+	    private static MethodInfo AOTA_RunAOTAEx;
 		private static MethodInfo AOTA_InitialiseAOTA;
 
 		private static BindingFlags OccultBindingFlags;
@@ -90,7 +91,9 @@ namespace Tangra.OccultTools
 				//public void Set_TimeBase(float[] data)
 				AOTA_Set_TimeBase = TYPE_AOTA_ExternalAccess.GetMethod("Set_TimeBase", new Type[] { typeof(float[]) });
 				//public bool RunAOTA(IWin32Window parentWindow)
-				AOTA_RunAOTA = TYPE_AOTA_ExternalAccess.GetMethod("RunAOTA");
+                AOTA_RunAOTA = TYPE_AOTA_ExternalAccess.GetMethod("RunAOTA", new Type[] { typeof(IWin32Window) });
+                //public bool RunAOTA(IWin32Window parentWindow, int FirstFrame, int FramesInIntegration)    
+                AOTA_RunAOTAEx = TYPE_AOTA_ExternalAccess.GetMethod("RunAOTA", new Type[] { typeof(IWin32Window), typeof(int), typeof(int) });
 				//public void InitialiseAOTA()
 				AOTA_InitialiseAOTA = TYPE_AOTA_ExternalAccess.GetMethod("InitialiseAOTA");
 			}
@@ -109,7 +112,12 @@ namespace Tangra.OccultTools
 
 			AOTA_Set_TargetData.Invoke(aotaInstance, new object[] { data });
 			AOTA_Set_FrameID.Invoke(aotaInstance, new object[] { frameIds });
-			AOTA_RunAOTA.Invoke(aotaInstance, new object[] { parentWindow });
+			AOTA_RunAOTAEx.Invoke(aotaInstance, new object[] { null /*parentWindow*/, 0, 1 });
 		}
+
+        internal static void EnsureAOTAClosed()
+        {
+            
+        }
 	}
 }
