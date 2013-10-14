@@ -24,12 +24,12 @@ namespace Tangra.ImageTools
 
 		private ReduceLightCurveOperation m_LightCurvesVideoOperation;
 		private VideoController m_VideoController;
-		private Tracker m_Tracker;
+		private ITracker m_Tracker;
 
 		private int m_X0;
 		private int m_Y0;
 
-		internal void Initialize(ReduceLightCurveOperation videoOperation, Tracker tracker, VideoController videoController)
+		internal void Initialize(ReduceLightCurveOperation videoOperation, ITracker tracker, VideoController videoController)
 		{
 			m_LightCurvesVideoOperation = videoOperation;
 			m_VideoController = videoController;

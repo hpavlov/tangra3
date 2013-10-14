@@ -356,6 +356,7 @@
     <Compile Include="VideoOperations\LightCurves\LightCurveReductionContext.cs" />
     <Compile Include="VideoOperations\LightCurves\Measurements\GroupMeasurer.cs" />
     <Compile Include="VideoOperations\LightCurves\ReduceLightCurveOperation.cs" />
+    <Compile Include="VideoOperations\LightCurves\Tracking\ITracker.cs" />
     <Compile Include="VideoOperations\LightCurves\Tracking\OccultationTracker.cs" />
     <Compile Include="VideoOperations\LightCurves\Tracking\OneStarTracker.cs" />
     <Compile Include="VideoOperations\LightCurves\Tracking\TrackedObject.cs" />

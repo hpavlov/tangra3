@@ -47,7 +47,7 @@ namespace Tangra.VideoOperations.LightCurves
         private object m_SyncRoot = new object();
 
         private LCStateMachine m_StateMachine;
-        private Tracker m_Tracker;
+		private ITracker m_Tracker;
         private AveragedFrame m_AveragedFrame;
 
         private MeasurementsHelper m_Measurer;
@@ -446,8 +446,8 @@ namespace Tangra.VideoOperations.LightCurves
                         {
                             for (int i = 0; i < iTo; i++)
                             {
-                                ImagePixel center = m_Tracker.TrackedObjects[i].Center;
-                                float app = m_Tracker.TrackedObjects[i].Aperture;
+                                IImagePixel center = m_Tracker.TrackedObjects[i].Center;
+                                float app = m_Tracker.TrackedObjects[i].OriginalObject.ApertureInPixels;
 
                                 if (!float.IsNaN(app))
                                 {
@@ -462,8 +462,8 @@ namespace Tangra.VideoOperations.LightCurves
                         // position as a reference rather than the latest position
                         for (int i = 0; i < iTo; i++)
                         {
-                            ImagePixel center = m_Tracker.TrackedObjects[i].LastKnownGoodPosition;
-                            float app = m_Tracker.TrackedObjects[i].Aperture;
+                            IImagePixel center = m_Tracker.TrackedObjects[i].LastKnownGoodPosition;
+							float app = m_Tracker.TrackedObjects[i].OriginalObject.ApertureInPixels;
                             if (float.IsNaN(app)) app = 4.0f;
 
                             if (center != null)
@@ -472,15 +472,19 @@ namespace Tangra.VideoOperations.LightCurves
                             }
                         }
 
-                        if (m_Tracker.AutoDiscoveredStars != null &&
-                            m_Tracker.AutoDiscoveredStars.Count > 0)
-                        {
-                            float app = 4;
-                            foreach (PSFFit fit in m_Tracker.AutoDiscoveredStars)
-                            {
-                                g.DrawEllipse(Pens.Yellow, (float)fit.XCenter - app, (float)fit.YCenter + m_ManualTrackingDeltaY - app, 2 * app, 2 * app);
-                            }
-                        }
+						Tracker trk = m_Tracker as Tracker;
+						if (trk != null)
+						{
+							if (trk.AutoDiscoveredStars != null &&
+								trk.AutoDiscoveredStars.Count > 0)
+							{
+								float app = 4;
+								foreach (PSFFit fit in trk.AutoDiscoveredStars)
+								{
+									g.DrawEllipse(Pens.Yellow, (float)fit.XCenter - app, (float)fit.YCenter + m_ManualTrackingDeltaY - app, 2 * app, 2 * app);
+								}
+							}							
+						}
                     }
                 }
                 else if (m_Refining)
@@ -488,7 +492,7 @@ namespace Tangra.VideoOperations.LightCurves
                     int iTo = Math.Min(4, m_Tracker.TrackedObjects.Count);
                     for (int i = 0; i < iTo; i++)
                     {
-                        ImagePixel center = m_Tracker.TrackedObjects[i].Center;
+                        IImagePixel center = m_Tracker.TrackedObjects[i].Center;
                         float delta = ((float)Math.Min(1, m_Tracker.RefiningPercentageWorkLeft) * 3 + 1) * m_StateMachine.MeasuringApertures[i];
 
                         if (m_Tracker.TrackedObjects[i].IsLocated)
@@ -824,7 +828,7 @@ namespace Tangra.VideoOperations.LightCurves
 			{
 				if (obj.ThisFrameFit != null)
 				{
-					obj.ThisFrameFit.DrawDataPixels(g, m_ZoomPixelRects[obj.TargetNo], obj.Aperture, m_AllPens[obj.TargetNo], m_VideoController.VideoBitPix);
+					obj.ThisFrameFit.DrawDataPixels(g, m_ZoomPixelRects[obj.TargetNo], obj.OriginalObject.ApertureInPixels, m_AllPens[obj.TargetNo], m_VideoController.VideoBitPix);
 				}
 				else if (obj.IsLocated)
 				{
@@ -838,7 +842,7 @@ namespace Tangra.VideoOperations.LightCurves
 							m_ZoomPixelRects[obj.TargetNo],
 							new DisplayBitmapConverter.DefaultDisplayBitmapConverter(),
 							obj.ThisFrameX - x0 + 8, obj.ThisFrameY - y0 + 8,
-							obj.Aperture, m_AllPens[obj.TargetNo]);						
+							obj.OriginalObject.ApertureInPixels, m_AllPens[obj.TargetNo]);						
 					}
 				}
 			}
@@ -874,7 +878,7 @@ namespace Tangra.VideoOperations.LightCurves
 						!float.IsNaN(obj.ThisFrameX) &&
 						!float.IsNaN(obj.ThisFrameY))
 					{
-						h = (int)Math.Min(objHeight - 1, objHeight * obj.Aperture / 7);
+						h = (int)Math.Min(objHeight - 1, objHeight * obj.OriginalObject.ApertureInPixels / 7);
 						if (h % 2 == 0) h++;
 						byte z0 = currentImage.GetDisplayPixel((int)Math.Round(obj.ThisFrameX), (int)Math.Round(obj.ThisFrameY));
 						pen = AllGrayPens.GrayPen(z0);
@@ -1483,7 +1487,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 			foreach (TrackedObject trackedObject in m_Tracker.TrackedObjects)
 			{
-				ImagePixel center = trackedObject.Center;
+				IImagePixel center = trackedObject.Center;
 
 				if (center != ImagePixel.Unspecified)
 				{
@@ -1523,7 +1527,7 @@ namespace Tangra.VideoOperations.LightCurves
 			TangraConfig.PreProcessingFilter filter,
 			bool synchronise)
 		{
-			ImagePixel center = trackedObject.Center;
+			IImagePixel center = trackedObject.Center;
 			int areaSize = LightCurveReductionContext.Instance.DigitalFilter == TangraConfig.PreProcessingFilter.NoFilter
 							   ? 17
 							   : 19;
@@ -1546,7 +1550,7 @@ namespace Tangra.VideoOperations.LightCurves
 				filter,
 				synchronise,
 				LightCurveReductionContext.Instance.ReductionMethod,
-				trackedObject.Aperture,
+				trackedObject.OriginalObject.ApertureInPixels,
 				m_Tracker.RefinedFWHM[trackedObject.TargetNo],
 				m_Tracker.RefinedAverageFWHM,
 				trackedObject,
@@ -1587,7 +1591,7 @@ namespace Tangra.VideoOperations.LightCurves
 		}
 
 		internal static void MeasureObject(
-			ImagePixel center,
+			IImagePixel center,
 			uint[,] data,
 			uint[,] backgroundPixels,
 			int bpp,
@@ -1623,10 +1627,10 @@ namespace Tangra.VideoOperations.LightCurves
 			List<bool> fixedFlags = new List<bool>();
 
 			m_Tracker.TrackedObjects.ForEach(
-				delegate(TrackedObject o)
+				delegate(ITrackedObject o)
 				{
-					matrixSizes.Add(o.PsfFitMatrixSize);
-					apertures.Add(o.Aperture);
+					matrixSizes.Add(o.OriginalObject.PsfFitMatrixSize);
+					apertures.Add(o.OriginalObject.ApertureInPixels);
 					fixedFlags.Add(o.OriginalObject.IsWeakSignalObject);
 				}
 			);

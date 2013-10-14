@@ -5,12 +5,22 @@ using System.Text;
 
 namespace Tangra.Model.Image
 {
-    public class ImagePixel
+	public interface IImagePixel
+	{
+		int X { get; }
+		int Y { get; }
+		double XDouble { get; }
+		double YDouble { get; }
+		bool IsSpecified { get; }
+	}
+
+    public class ImagePixel : IImagePixel
     {
-        public readonly int X;
-        public readonly int Y;
-        public readonly double XDouble;
-        public readonly double YDouble;
+		public int X { get; private set; }
+		public int Y { get; private set; }
+		public double XDouble { get; private set; }
+		public double YDouble { get; private set; }
+
         public uint Brightness;
 
         /// <summary>

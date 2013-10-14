@@ -1411,7 +1411,7 @@ namespace Tangra.VideoOperations.LightCurves
             TangraConfig config, 
             LightCurveReductionContext reductionContext, 
             List<TrackedObjectConfig> trackedObjectConfigs,
-            Tracker tracker,
+            ITracker tracker,
             ITimestampOcr timestampOCR,
             Dictionary<int, long> thumbPrintDict,
 			Dictionary<int, float> instrumentalDelayConfig,

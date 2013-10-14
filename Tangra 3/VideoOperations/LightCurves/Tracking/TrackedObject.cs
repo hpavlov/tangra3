@@ -16,11 +16,11 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
         public double DeltaYToAdd;
     }
 
-    internal class TrackedObject : IMeasuredObject
+	internal class TrackedObject : IMeasuredObject, ITrackedObject
     {
-        public readonly TrackedObjectConfig OriginalObject;
+		public ITrackedObjectConfig OriginalObject { get; private set; }
 
-        private List<ImagePixel> RefiningPositions = new List<ImagePixel>();
+        private List<IImagePixel> RefiningPositions = new List<IImagePixel>();
         private List<float> RefiningSignalLevels = new List<float>();
         private List<double> RefiningFWHMs = new List<double>();
 
@@ -249,7 +249,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
         private byte targetNo;
 
         public int LastKnownGoodFrameId;
-        public ImagePixel LastKnownGoodPosition;
+		public IImagePixel LastKnownGoodPosition { get; set; }
 
         // Used for stripes display only
         private double m_appMeaAveragePixel;
@@ -273,12 +273,12 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             get { return RefiningPositions.Count > 0; }
         }
 
-        public ImagePixel LastRefinedPosition
+        public IImagePixel LastRefinedPosition
         {
             get { return RefiningPositions[RefiningPositions.Count - 1]; }
         }
 
-        public void RegisterRefinedPosition(ImagePixel position, float signalLevel, double fwhm)
+        public void RegisterRefinedPosition(IImagePixel position, float signalLevel, double fwhm)
         {
             RefiningPositions.Add(position);
 
@@ -301,8 +301,8 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
         public void GetPositionShift(out double deltaX, out double deltaY)
         {
             int refinedPositions = RefiningPositions.Count;
-            ImagePixel lastCenter = RefiningPositions[refinedPositions - 1];
-            ImagePixel prevCenter;
+            IImagePixel lastCenter = RefiningPositions[refinedPositions - 1];
+            IImagePixel prevCenter;
             if (refinedPositions > 1)
                 prevCenter = RefiningPositions[refinedPositions - 2];
             else
@@ -370,8 +370,8 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
             for (int k = 0; k < RefiningPositions.Count; k++)
             {
-                ImagePixel pos1 = RefiningPositions[k];
-                ImagePixel pos2 = obj2.RefiningPositions[k];
+                IImagePixel pos1 = RefiningPositions[k];
+                IImagePixel pos2 = obj2.RefiningPositions[k];
 
                 if (pos1.IsSpecified &&
                     pos2.IsSpecified)
@@ -434,7 +434,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             get { return OriginalObject.TrackingType == TrackingType.OccultedStar; }
         }
 
-        public ImagePixel Center
+        public IImagePixel Center
         {
             get
             {
@@ -442,14 +442,6 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                     return OriginalObject.AsImagePixel;
                 else
                     return new ImagePixel(ThisFrameX, ThisFrameY);
-            }
-        }
-
-        public float Aperture
-        {
-            get
-            {
-                return OriginalObject.ApertureInPixels;
             }
         }
 

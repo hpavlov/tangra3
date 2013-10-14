@@ -798,7 +798,7 @@ namespace Tangra.Model.Image
         }
 
         public void MeasureObject(
-            ImagePixel center,
+            IImagePixel center,
             uint[,] data,
             uint[,] backgroundPixels,
 			int bpp,

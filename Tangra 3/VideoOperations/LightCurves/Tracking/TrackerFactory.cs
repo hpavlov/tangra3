@@ -9,7 +9,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 {
     internal static class TrackerFactory
     {
-        public static Tracker CreateTracker(LightCurveReductionType lightCurveReductionType, List<TrackedObjectConfig> measuringStars)
+		public static ITracker CreateTracker(LightCurveReductionType lightCurveReductionType, List<TrackedObjectConfig> measuringStars)
         {
             // NOTE: Figure out what tracker to create based on the type of event, number of objects and their intencity
 

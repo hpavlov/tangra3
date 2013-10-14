@@ -9,41 +9,46 @@ using Tangra.Model.Image;
 
 namespace Tangra.VideoOperations.LightCurves.Tracking
 {
-    internal enum TrackingType
+    public enum TrackingType
     {
         GuidingStar,
         ComparisonStar,
         OccultedStar
     }
 
-    internal class TrackedObjectConfig
+	internal class TrackedObjectConfig : ITrackedObjectConfig
     {
-        public TrackingType TrackingType;
-        public bool MeasureThisObject;
-        public float ApertureInPixels;
-        public int PsfFitMatrixSize;
-        
-        public float ApertureStartingX;
-        public float ApertureStartingY;
+		public TrackingType TrackingType { get; set; }
+		public bool MeasureThisObject;
+		public float ApertureInPixels { get; set; }
+		public int PsfFitMatrixSize { get; set; }
+
+		public float ApertureStartingX { get; set; }
+		public float ApertureStartingY { get; set; }
 
         public int OriginalFieldCenterX;
         public int OriginalFieldCenterY;
         
         public PSFFit Gaussian;
 
-        public float PositionTolerance;
-        public bool IsWeakSignalObject;
-        public bool IsFixedAperture;
+		public float PositionTolerance { get; set; }
+		public bool IsWeakSignalObject { get; set; }
+		public bool IsFixedAperture { get; set; }
 
         public float ApertureMatrixX0;
         public float ApertureMatrixY0;
         public float ApertureDX;
         public float ApertureDY;
 
-        public float RefinedFWHM = float.NaN;
+        public float RefinedFWHM  { get; set; }
 
         public List<PSFFit> AutoStarsInArea = new List<PSFFit>();
  
+		public bool IsCloseToOtherStars
+		{
+			get { return AutoStarsInArea.Count > 1; }
+		}
+
         public ImagePixel AsImagePixel
         {
             get
@@ -66,6 +71,10 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             }
         }
 
+		public TrackedObjectConfig()
+		{
+			RefinedFWHM = float.NaN;
+		}
 
         private static byte VERSION = 3;
 

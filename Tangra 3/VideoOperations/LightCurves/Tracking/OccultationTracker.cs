@@ -29,7 +29,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             m_RefiningFramesLeft = TangraConfig.Settings.Tracking.RefiningFrames;
         }
 
-        public override void NextFrame(int frameNo, AstroImage astroImage)
+        public override void NextFrame(int frameNo, IAstroImage astroImage)
         {
             base.NextFrame(frameNo, astroImage);
 
@@ -72,13 +72,13 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             {
                 for (int i = 0; i < TrackedObjects.Count; i++)
                 {
-                    TrackedObject obj1 = TrackedObjects[i];
+					TrackedObject obj1 = TrackedObjects[i] as TrackedObject;
 
                     for (int j = 0; j < TrackedObjects.Count; j++)
                     {
                         if (i == j) continue;
 
-                        TrackedObject obj2 = TrackedObjects[j];
+						TrackedObject obj2 = TrackedObjects[j] as TrackedObject;
 
                         long pairId = (((long)obj1.TargetNo) << 32) + (long)obj2.TargetNo;
 
@@ -122,19 +122,19 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 				for (int i = 0; i < TrackedObjects.Count; i++)
 				{
 					if (
-						(!TrackedObjects[i].IsOcultedStar || !LightCurveReductionContext.Instance.FullDisappearance) &&
+						(!(TrackedObjects[i] as TrackedObject).IsOcultedStar || !LightCurveReductionContext.Instance.FullDisappearance) &&
 						!TrackedObjects[i].IsOffScreen &&
-						!float.IsNaN(TrackedObjects[i].LastFrameX)
+						!float.IsNaN((TrackedObjects[i] as TrackedObject).LastFrameX)
 						)
 					{
 						// Don't include targets offscreen, or targets that were not found during the last tracking (could have been off screen)
-						m_LocateObjects.Add(TrackedObjects[i].TargetNo);
+						m_LocateObjects.Add((TrackedObjects[i] as TrackedObject).TargetNo);
 					}
 				}
 				return;
 			}
 
-            m_MinLocateSignal = TrackedObjects.Min(o => o.RefinedOrLastSignalLevel == 0 ? 255f : o.RefinedOrLastSignalLevel);
+            m_MinLocateSignal = TrackedObjects.Cast<TrackedObject>().Min(o => o.RefinedOrLastSignalLevel == 0 ? 255f : o.RefinedOrLastSignalLevel);
 
             // Locate all peak pixels with signal higher than (minSignal + medianNoise) / 2
             m_MinLocateSignal = (m_MedianValue + m_MinLocateSignal) / 2f;
@@ -143,10 +143,10 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
             for (int i = 0; i < TrackedObjects.Count; i++)
             {
-                if ((!TrackedObjects[i].IsOcultedStar && !TrackedObjects[i].IsOffScreen) ||
+				if ((!(TrackedObjects[i] as TrackedObject).IsOcultedStar && !TrackedObjects[i].IsOffScreen) ||
                     !LightCurveReductionContext.Instance.FullDisappearance)
                 {
-                    m_LocateObjects.Add(TrackedObjects[i].TargetNo);
+					m_LocateObjects.Add((TrackedObjects[i] as TrackedObject).TargetNo);
                 }
 
                 for (int j = 0; j < TrackedObjects.Count; j++)
@@ -167,7 +167,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             m_MinLocateDistance = minDistance / 2.0;
         }
 
-        private void LocateStarsWithStarRecognition(AstroImage astroImage)
+        private void LocateStarsWithStarRecognition(IAstroImage astroImage)
         {
 			EnsureComputedRefinedData();
 
@@ -178,7 +178,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 					//TODO: If the wind flag is not set, then use a 3 frame binned integration to locate the stars on       
 				}
 
-				uint[,] pixels = astroImage.Pixelmap.GetPixelsCopy();
+				uint[,] pixels = astroImage.GetPixelsCopy();
 
 				List<PotentialStarStruct> peakPixels = new List<PotentialStarStruct>();
 				AutoDiscoveredStars.Clear();
@@ -205,7 +205,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 					m_LocateObjects.Count > 2 &&
 					peakPixels.Count > 1)
 				{
-					List<TrackedObject> goodTrackedObjects = TrackedObjects.FindAll(t => t.LastKnownGoodPosition != null);
+					List<TrackedObject> goodTrackedObjects = TrackedObjects.Cast<TrackedObject>().ToList().FindAll(t => t.LastKnownGoodPosition != null);
 					if (goodTrackedObjects.Count < 2)
 					{
 						// We don't have at least one good pair. Fail.
@@ -260,8 +260,8 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 			List<int> possibleStarIndexes = new List<int>();
 
-			TrackedObject trackedObject1 = TrackedObjects.Find(o => o.TargetNo == m_LocateObjects[0]);
-			TrackedObject trackedObject2 = TrackedObjects.Find(o => o.TargetNo == m_LocateObjects[1]);
+			TrackedObject trackedObject1 = TrackedObjects.Cast<TrackedObject>().ToList().Find(o => o.TargetNo == m_LocateObjects[0]) as TrackedObject;
+			TrackedObject trackedObject2 = TrackedObjects.Cast<TrackedObject>().ToList().Find(o => o.TargetNo == m_LocateObjects[1]) as TrackedObject;
 			if (trackedObject1.TargetNo != trackedObject2.TargetNo &&
 				trackedObject1.LastKnownGoodPosition != null &&
 				trackedObject2.LastKnownGoodPosition != null)
@@ -296,9 +296,9 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			}
 		}
 
-        private void LocateSingleStarsWithStarRecognition(List<PSFFit> stars, AstroImage astroImage)
+        private void LocateSingleStarsWithStarRecognition(List<PSFFit> stars, IAstroImage astroImage)
         {
-            TrackedObject trackedObject = TrackedObjects.Find(o => o.TargetNo == m_LocateObjects[0]);
+			TrackedObject trackedObject = TrackedObjects.Cast<TrackedObject>().ToList().Find(o => o.TargetNo == m_LocateObjects[0]);
             trackedObject.ThisFrameX = (float)stars[0].XCenter;
             trackedObject.ThisFrameY = (float)stars[0].YCenter;
             trackedObject.ThisFrameFit = stars[0];
@@ -422,16 +422,16 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			return candidates;
 		}
 
-		private void LocateTwoStarsWithStarRecognition(List<PotentialStarStruct> stars, AstroImage astroImage, uint[,] pixels)
+		private void LocateTwoStarsWithStarRecognition(List<PotentialStarStruct> stars, IAstroImage astroImage, uint[,] pixels)
 		{
-			TrackedObject trackedObject1 = TrackedObjects.Find(o => o.TargetNo == m_LocateObjects[0]);
-			TrackedObject trackedObject2 = TrackedObjects.Find(o => o.TargetNo == m_LocateObjects[1]);
+			TrackedObject trackedObject1 = TrackedObjects.Cast<TrackedObject>().ToList().Find(o => o.TargetNo == m_LocateObjects[0]);
+			TrackedObject trackedObject2 = TrackedObjects.Cast<TrackedObject>().ToList().Find(o => o.TargetNo == m_LocateObjects[1]);
 
 			LocateTwoStarsWithStarRecognition(stars, astroImage, pixels, trackedObject1, trackedObject2);
 		}
 
 		private void LocateTwoStarsWithStarRecognition(
-			List<PotentialStarStruct> stars, AstroImage astroImage, uint[,] pixels,
+			List<PotentialStarStruct> stars, IAstroImage astroImage, uint[,] pixels,
 			TrackedObject trackedObject1, TrackedObject trackedObject2)
 		{
 			List<CandidatePair> candidates = LocateStarPairsWithStarRecognition(trackedObject1, trackedObject2, stars, pixels);
@@ -440,7 +440,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 		}
 
         private void LocateTwoStarsWithStarRecognition(
-            List<CandidatePair> candidates, AstroImage astroImage, 
+            List<CandidatePair> candidates, IAstroImage astroImage, 
             TrackedObject trackedObject1, TrackedObject trackedObject2)
         {
             try

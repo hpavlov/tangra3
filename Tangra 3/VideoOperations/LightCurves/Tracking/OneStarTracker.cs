@@ -41,7 +41,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             m_RefiningFramesLeft = TangraConfig.Settings.Tracking.RefiningFrames;
         }
 
-        public override void NextFrame(int frameNo, AstroImage astroImage)
+        public override void NextFrame(int frameNo, IAstroImage astroImage)
         {
             m_FrameNo = frameNo;
         	
@@ -92,7 +92,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			}
 		}
 
-        private void TrackSingleStar(int frameNo, AstroImage astroImage)
+        private void TrackSingleStar(int frameNo, IAstroImage astroImage)
         {
             OccultedStar.NewFrame();
             m_NotCertain = false;
@@ -101,13 +101,13 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
         	GetExpectedXY(out expectedX, out expectedY);
 
-            uint[,] pixels = astroImage.GetMeasurableAreaPixels((int)expectedX, (int)expectedY);
+            uint[,] pixels = astroImage.GetPixelsArea((int)expectedX, (int)expectedY, 17);
 
             // There is only one object in the area, just do a wide fit followed by a fit with the selected matrix size
             PSFFit gaussian = new PSFFit((int)expectedX, (int)expectedY);
             gaussian.Fit(pixels, 17);
 
-            ImagePixel firstCenter =
+            IImagePixel firstCenter =
                 gaussian.IsSolved
                     ? new ImagePixel((int)gaussian.XCenter, (int)gaussian.YCenter)
                     : astroImage.GetCentroid((int)expectedX, (int)expectedY, 17, m_MedianValue);
@@ -115,7 +115,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             if (firstCenter != null)
             {
                 // Do a second fit 
-                pixels = astroImage.GetMeasurableAreaPixels(firstCenter.X, firstCenter.Y);
+                pixels = astroImage.GetPixelsArea(firstCenter.X, firstCenter.Y, 17);
                 gaussian = new PSFFit(firstCenter.X, firstCenter.Y);
                 gaussian.Fit(pixels, OccultedStar.PsfFitMatrixSize);
                 if (gaussian.IsSolved)
@@ -135,8 +135,8 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                         // If the located object is not similar brightness as expected, then search for our object in a wider area
                         try
                         {
-                            ImagePixel centroid = astroImage.GetCentroid((int)expectedX, (int)expectedY, 14, m_MedianValue);
-                            pixels = astroImage.GetMeasurableAreaPixels(centroid.X, centroid.Y);
+                            IImagePixel centroid = astroImage.GetCentroid((int)expectedX, (int)expectedY, 14, m_MedianValue);
+                            pixels = astroImage.GetPixelsArea(centroid.X, centroid.Y, 17);
                             gaussian = new PSFFit(centroid.X, centroid.Y);
                             gaussian.Fit(pixels, OccultedStar.PsfFitMatrixSize);
 
@@ -260,7 +260,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             get { return m_RefiningFramesLeft; }
         }
 
-        internal override void DoManualFrameCorrection(int deltaX, int deltaY)
+        public override void DoManualFrameCorrection(int deltaX, int deltaY)
         {
             int firstFrameId = m_PreviousPositionFrameIds[0];
             float expectedX = (float)m_LinearFitX.ComputeY(m_FrameNo - firstFrameId);

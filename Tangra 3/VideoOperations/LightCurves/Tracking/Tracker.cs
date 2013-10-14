@@ -12,12 +12,12 @@ using Tangra.VideoOperations.LightCurves;
 
 namespace Tangra.VideoOperations.LightCurves.Tracking
 {
-    internal class Tracker
+	internal class Tracker : ITracker
     {
-        public List<TrackedObject> TrackedObjects = new List<TrackedObject>();
-        
+		public List<ITrackedObject> TrackedObjects { get; private set; }
 
-        public List<TrackedObject> LocateFirstObjects = new List<TrackedObject>();
+
+		public List<TrackedObject> LocateFirstObjects = new List<TrackedObject>();
         public List<TrackedObject> LocateSecondObjects = new List<TrackedObject>();
 
         public List<PSFFit> AutoDiscoveredStars = new List<PSFFit>();
@@ -31,13 +31,15 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
         protected Dictionary<int, double> m_RefinedFWHM = new Dictionary<int, double>();
         protected double m_AverageFWHM;
 
-        public double[] RefinedFWHM;
+		public float[] RefinedFWHM { get; private set; }
 
         protected bool m_Refining = false;
     	private bool m_AllGuidingStarsFailed = false;
 
         public Tracker(List<TrackedObjectConfig> trackedObjects)
         {
+			TrackedObjects = new List<ITrackedObject>();
+
             int i = -1;
             foreach(TrackedObjectConfig originalObject in trackedObjects)
             {
@@ -63,7 +65,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             //       also fit objects with fixed aperture. Also not allow fixed apertures to be added
             //       when the object is faint and there is no good fit.  Test with first guiding and second faint occulted.
 
-            RefinedFWHM = new double[trackedObjects.Count];
+            RefinedFWHM = new float[trackedObjects.Count];
         }
 
         public virtual void InitializeNewTracking()
@@ -90,7 +92,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             return false;
         }
 
-        public double PositionTolerance
+        public float PositionTolerance
         {
             get
             {
@@ -104,17 +106,17 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
         private int m_FrameNo;
 
-        internal uint MedianValue
+        public uint MedianValue
         {
             get { return m_MedianValue; }
         }
 
-        internal float RefinedAverageFWHM
+        public float RefinedAverageFWHM
         {
             get { return (float)m_AverageFWHM; }
         }
 
-        public virtual void NextFrame(int frameNo, AstroImage astroImage)
+		public virtual void NextFrame(int frameNo, IAstroImage astroImage)
         {
             m_FrameNo = frameNo;
 
@@ -164,7 +166,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 				LocateSecondObjects.ForEach((o) => o.SetIsLocated(false, NotMeasuredReasons.FitSuspectAsNoGuidingStarsAreLocated));
         }
 
-        protected void ReLocateNonGuidingObjects(AstroImage astroImage)
+        protected void ReLocateNonGuidingObjects(IAstroImage astroImage)
         {
             CheckAndCorrectGuidingStarPositions(astroImage, false);
             ComputeFrameShift();
@@ -173,7 +175,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                 LocateNonGuidingObject(astroImage, trackedObject); 
         }
 
-        public virtual void BeginMeasurements(AstroImage astroImage)
+        public virtual void BeginMeasurements(IAstroImage astroImage)
         {
             m_Refining = false;
 
@@ -182,7 +184,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             FinalizeRefining();
         }
 
-        private void LocateObjectAsGuidingStar(AstroImage astroImage, TrackedObject trackedObject, bool useLowPassFilter)
+        private void LocateObjectAsGuidingStar(IAstroImage astroImage, TrackedObject trackedObject, bool useLowPassFilter)
         {
             trackedObject.SetIsLocated(false, NotMeasuredReasons.UnknownReason);
 
@@ -190,19 +192,19 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             uint[,] pixels;
             if (useLowPassFilter)
             {
-                pixels = astroImage.GetMeasurableAreaPixels((int)trackedObject.LastFrameX, (int)trackedObject.LastFrameY, 19);
+				pixels = astroImage.GetPixelsArea((int)trackedObject.LastFrameX, (int)trackedObject.LastFrameY, 19);
                 pixels = EnhanceByteAreaForSearch(pixels);
             }
             else
             {
-                pixels = astroImage.GetMeasurableAreaPixels((int)trackedObject.LastFrameX, (int)trackedObject.LastFrameY);
+				pixels = astroImage.GetPixelsArea((int)trackedObject.LastFrameX, (int)trackedObject.LastFrameY, 17);
             }
 
             // There is only one object in the area, just do a wide fit followed by a fit with the selected matrix size
             PSFFit gaussian = new PSFFit((int)trackedObject.LastFrameX, (int)trackedObject.LastFrameY);
             gaussian.Fit(pixels, 17);
 
-            ImagePixel firstCenter = 
+            IImagePixel firstCenter = 
                 gaussian.IsSolved
                     ? new ImagePixel((int)gaussian.XCenter, (int)gaussian.YCenter)
                     : astroImage.GetCentroid((int)trackedObject.LastFrameX, (int)trackedObject.LastFrameY, 17, m_MedianValue);
@@ -210,7 +212,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             if (firstCenter != null)
             {
                 // Do a second fit 
-                pixels = astroImage.GetMeasurableAreaPixels(firstCenter.X, firstCenter.Y);
+                pixels = astroImage.GetPixelsArea(firstCenter.X, firstCenter.Y, 17);
 
                 int secondFitAreaSize = Math.Max(trackedObject.PsfFitMatrixSize, (int)Math.Round(gaussian.FWHM * 2));
                 if (secondFitAreaSize % 2 == 0) secondFitAreaSize++;
@@ -235,8 +237,8 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                         // If the located object is not similar brightness as expected, then search for our object in a wider area
                         try
                         {
-                            ImagePixel centroid = astroImage.GetCentroid((int)trackedObject.LastFrameX, (int)trackedObject.LastFrameY, 14, m_MedianValueStart);
-                            pixels = astroImage.GetMeasurableAreaPixels(centroid.X, centroid.Y);
+                            IImagePixel centroid = astroImage.GetCentroid((int)trackedObject.LastFrameX, (int)trackedObject.LastFrameY, 14, m_MedianValueStart);
+                            pixels = astroImage.GetPixelsArea(centroid.X, centroid.Y, 17);
                             gaussian = new PSFFit(centroid.X, centroid.Y);
                             gaussian.Fit(pixels, trackedObject.PsfFitMatrixSize);
 
@@ -383,15 +385,15 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             }
         }
 
-        private void LocateNonGuidingObject(AstroImage astroImage, TrackedObject trackedObject)
+        private void LocateNonGuidingObject(IAstroImage astroImage, TrackedObject trackedObject)
         {
-            ImagePixel prevPos = trackedObject.HasRefinedPositions
+            IImagePixel prevPos = trackedObject.HasRefinedPositions
                                      ? trackedObject.LastRefinedPosition
                                      : trackedObject.LastKnownGoodPosition != null
                                          ? trackedObject.LastKnownGoodPosition
                                          : trackedObject.OriginalObject.AsImagePixel;
 
-            ImagePixel newStaringPos = 
+            IImagePixel newStaringPos = 
 				m_AllGuidingStarsFailed
 					? prevPos
                     : new ImagePixel(prevPos.XDouble + m_LastFrameDeltaX, prevPos.YDouble + m_LastFrameDeltaY);
@@ -407,7 +409,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             else if (
                 trackedObject.OriginalObject.TrackingType == TrackingType.OccultedStar &&
                 LightCurveReductionContext.Instance.FullDisappearance &&
-                trackedObject.OriginalObject.AutoStarsInArea.Count == 1)
+                !trackedObject.OriginalObject.IsCloseToOtherStars)
             {
                 LocateFullDisappearingObject(astroImage, trackedObject, newStaringPos);
             }
@@ -417,7 +419,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             }
         }
 
-        private void GetAverageObjectPositionsFromGuidingStars(TrackedObject trackedObject, ImagePixel newStaringPos, out double averageX, out double averageY)
+        private void GetAverageObjectPositionsFromGuidingStars(TrackedObject trackedObject, IImagePixel newStaringPos, out double averageX, out double averageY)
         {
             List<TrackedObject> resolvedGuidingStars = LocateFirstObjects.FindAll(o => o.IsLocated);
             if (resolvedGuidingStars.Count == 0)
@@ -454,7 +456,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
         }
 
 
-        private void LocateNonGuidingObject(AstroImage astroImage, TrackedObject trackedObject, ImagePixel newStaringPos)
+        private void LocateNonGuidingObject(IAstroImage astroImage, TrackedObject trackedObject, IImagePixel newStaringPos)
         {
 			trackedObject.SetIsLocated(false, NotMeasuredReasons.UnknownReason);
 
@@ -486,7 +488,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             }            
         }
 
-        private void LocateFixedApertureObject(AstroImage astroImage, TrackedObject trackedObject, ImagePixel newStaringPos)
+        private void LocateFixedApertureObject(IAstroImage astroImage, TrackedObject trackedObject, IImagePixel newStaringPos)
         {
             double averageX = 0;
             double averageY = 0;
@@ -500,13 +502,13 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             trackedObject.ThisSignalLevel = float.NaN;
         }
 
-        protected void FitObjectInLimitedArea(TrackedObject trackedObject, AstroImage astroImage, float startingX, float startingY)
+        protected void FitObjectInLimitedArea(TrackedObject trackedObject, IAstroImage astroImage, float startingX, float startingY)
         {
-            int smallestMatrixSize = (int)Math.Round(trackedObject.Aperture * 2);
+            int smallestMatrixSize = (int)Math.Round(trackedObject.OriginalObject.ApertureInPixels * 2);
             if (smallestMatrixSize % 2 == 0) smallestMatrixSize++;
 
             // If this is not an aperture photometry we still derive a PSF 
-            uint[,] pixels = astroImage.GetMeasurableAreaPixels((int)Math.Round(startingX), (int)Math.Round(startingY));
+            uint[,] pixels = astroImage.GetPixelsArea((int)Math.Round(startingX), (int)Math.Round(startingY), 17);
 
         	bool isFSPSolved = false;
         	bool isTooFar = true;
@@ -562,7 +564,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 						: NotMeasuredReasons.UnknownReason);
         }
 
-        private void LocateFullDisappearingObject(AstroImage astroImage, TrackedObject trackedObject, ImagePixel newStaringPos)
+        private void LocateFullDisappearingObject(IAstroImage astroImage, TrackedObject trackedObject, IImagePixel newStaringPos)
         {
             if (m_Refining)
                 // Full disapearance is not expected during refining
@@ -583,11 +585,11 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 				trackedObject.SetIsLocated(false, NotMeasuredReasons.UnknownReason);
                 PSFFit gaussian = null;
 
-                int smallestMatrixSize = (int)Math.Round(trackedObject.Aperture * 2);
+                int smallestMatrixSize = (int)Math.Round(trackedObject.OriginalObject.ApertureInPixels * 2);
                 if (smallestMatrixSize % 2 == 0) smallestMatrixSize++;
 
                 // If this is not an aperture photometry we still derive a PSF 
-                uint[,] pixels = astroImage.GetMeasurableAreaPixels(x0, y0);
+                uint[,] pixels = astroImage.GetPixelsArea(x0, y0, 17);
 
                 for (int i = trackedObject.PsfFitMatrixSize; i >= smallestMatrixSize; i -= 2)
                 {
@@ -640,13 +642,13 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             }
         }
 
-        private void LocateSingleNonGuidingObject(AstroImage astroImage, TrackedObject trackedObject, ImagePixel newStaringPos)
+        private void LocateSingleNonGuidingObject(IAstroImage astroImage, TrackedObject trackedObject, IImagePixel newStaringPos)
         {
             LocateNonGuidingObject(astroImage, trackedObject, newStaringPos);            
         }
 
 
-        private void CheckAndCorrectGuidingStarPositions(AstroImage astroImage, bool retryWithLPFilterIfSuspectObjects)
+        private void CheckAndCorrectGuidingStarPositions(IAstroImage astroImage, bool retryWithLPFilterIfSuspectObjects)
         {
             List<int> goodObjects = new List<int>();
             List<int> suspectObjects = new List<int>();
@@ -766,7 +768,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                                 continue;
                             }
 
-                            uint[,] pixels = astroImage.GetMeasurableAreaPixels((int)Math.Round(expectedX), (int)Math.Round(expectedY), 19);
+                            uint[,] pixels = astroImage.GetPixelsArea((int)Math.Round(expectedX), (int)Math.Round(expectedY), 19);
                             pixels = EnhanceByteAreaForSearch(pixels);
 
                             PSFFit gaussian = new PSFFit((int)Math.Round(expectedX), (int)Math.Round(expectedY));
@@ -817,7 +819,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                             expectedX /= goodObjectIds.Count;
                             expectedY /= goodObjectIds.Count;
 
-                            uint[,] pixels = astroImage.GetMeasurableAreaPixels((int)Math.Round(expectedX), (int)Math.Round(expectedY), 19);
+                            uint[,] pixels = astroImage.GetPixelsArea((int)Math.Round(expectedX), (int)Math.Round(expectedY), 19);
                             pixels = EnhanceByteAreaForSearch(pixels);
 
                             PSFFit gaussian = new PSFFit((int)Math.Round(expectedX), (int)Math.Round(expectedY));
@@ -861,13 +863,13 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                 for (int i = 0; i < coeff * obj1.PsfFitMatrixSize; i++)
                 {
                     int searchRadius = obj1.PsfFitMatrixSize + i;
-                    ImagePixel centroid = astroImage.GetCentroid(
+                    IImagePixel centroid = astroImage.GetCentroid(
                         (int) Math.Round(obj1.LastFrameX), (int) Math.Round(obj1.LastFrameY),
                         searchRadius, m_MedianValue);
 
                     if (centroid != null)
                     {
-                        uint[,] pixels = astroImage.GetMeasurableAreaPixels(centroid.X, centroid.Y);
+                        uint[,] pixels = astroImage.GetPixelsArea(centroid.X, centroid.Y, 19);
                         PSFFit gaussian = new PSFFit(centroid.X, centroid.Y);
                         gaussian.Fit(pixels, obj1.PsfFitMatrixSize);
                         if (gaussian.IsSolved)
@@ -923,7 +925,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             PSFFit bestGaussian = null;
 
 
-            if (guidingStar.OriginalObject.AutoStarsInArea.Count == 1)
+			if (!guidingStar.OriginalObject.IsCloseToOtherStars)
             {
                 // There is only one object in the area, just do a whide fit followed by a fit with the selected matrix size
                 PSFFit gaussian = new PSFFit((int) guidingStar.LastFrameX, (int) guidingStar.LastFrameY);
@@ -1031,14 +1033,14 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
         {
             for (int i = 0; i < TrackedObjects.Count; i++)
             {
-                TrackedObject obj1 = TrackedObjects[i];
+				TrackedObject obj1 = TrackedObjects[i] as TrackedObject;
                 obj1.OtherGuidingStarsLocationVectors = new Dictionary<int, LocationVector>();
 
                 for (int j = 0; j < TrackedObjects.Count; j++)
                 {    
                     if (i == j) continue;
 
-                    TrackedObject obj2 = TrackedObjects[j];
+					TrackedObject obj2 = TrackedObjects[j] as TrackedObject;
 
                     double xVector, yVector;
                     double refinedDistance = obj1.ComputeRefinedDistances(obj2, out xVector, out yVector);
@@ -1069,7 +1071,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                     m_AverageFWHM += fwhm;
                     numDataPoints++;
 
-                    RefinedFWHM[trackedObject.TargetNo] = fwhm;
+					RefinedFWHM[trackedObject.TargetNo] = (float)fwhm;
                     trackedObject.OriginalObject.RefinedFWHM = (float)fwhm;
                 }
             }
@@ -1082,11 +1084,11 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
             for (int i = 0; i < RefinedFWHM.Count(); i++)
             {
-                if (RefinedFWHM[i] == 0) RefinedFWHM[i] = m_AverageFWHM;
+				if (RefinedFWHM[i] == 0) RefinedFWHM[i] = (float)m_AverageFWHM;
             }
         }
 
-        internal virtual void DoManualFrameCorrection(int deltaX, int deltaY)
+        public virtual void DoManualFrameCorrection(int deltaX, int deltaY)
         {
             foreach (TrackedObject trackedObject in TrackedObjects)
             {

@@ -83,26 +83,30 @@ namespace Tangra.VideoOperations.LightCurves
 
             Initialize();
 
-            if (!selectedObject.IsWeakSignalObject && !selectedObject.IsFixedAperture)
-                GetFitInMatrix(selectedObject.Gaussian, ref selectedObject.PsfFitMatrixSize, selectedObject.ApertureInPixels);
-            else
-            {
-                m_ProcessingPixels = m_AstroImage.GetMeasurableAreaPixels(m_Center);
-				m_DisplayPixels = m_AstroImage.GetMeasurableAreaDisplayBitmapPixels(m_Center);
+	        if (!selectedObject.IsWeakSignalObject && !selectedObject.IsFixedAperture)
+	        {
+		        int matrixSize = selectedObject.PsfFitMatrixSize;
+		        GetFitInMatrix(selectedObject.Gaussian, ref matrixSize, selectedObject.ApertureInPixels);
+				selectedObject.PsfFitMatrixSize = matrixSize; 
+	        }
+	        else
+	        {
+		        m_ProcessingPixels = m_AstroImage.GetMeasurableAreaPixels(m_Center);
+		        m_DisplayPixels = m_AstroImage.GetMeasurableAreaDisplayBitmapPixels(m_Center);
 
-                m_FWHM = 6;
-                m_Gaussian = null;
-                m_X0 = selectedObject.ApertureMatrixX0;
-                m_Y0 = selectedObject.ApertureMatrixY0;
-                dx = selectedObject.ApertureDX;
-                dy = selectedObject.ApertureDY;
+		        m_FWHM = 6;
+		        m_Gaussian = null;
+		        m_X0 = selectedObject.ApertureMatrixX0;
+		        m_Y0 = selectedObject.ApertureMatrixY0;
+		        dx = selectedObject.ApertureDX;
+		        dy = selectedObject.ApertureDY;
 
-                PlotSingleTargetPixels();
+		        PlotSingleTargetPixels();
 
-                nudAperture1.SetNUDValue((decimal)Math.Round(ObjectToAdd.ApertureInPixels, 2));
-            }
+		        nudAperture1.SetNUDValue((decimal) Math.Round(ObjectToAdd.ApertureInPixels, 2));
+	        }
 
-			SetHeightAndType();
+	        SetHeightAndType();
 
 			if (selectedObject.TrackingType == TrackingType.GuidingStar)
 				SelectedObjectType = TrackingType.GuidingStar;

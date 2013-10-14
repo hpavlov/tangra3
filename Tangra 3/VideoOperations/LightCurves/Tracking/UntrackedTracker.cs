@@ -11,7 +11,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             : base(measuringStars)
         { }
 
-        public override void NextFrame(int frameNo, AstroImage astroImage)
+        public override void NextFrame(int frameNo, IAstroImage astroImage)
         {
             // All objects are 'fixed' so always return the same positions
             foreach (TrackedObject trackedObject in TrackedObjects)

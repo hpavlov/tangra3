@@ -10,7 +10,17 @@ using Tangra.Model.Image;
 
 namespace Tangra.Model.Astro
 {
-    public class AstroImage
+	public interface IAstroImage
+	{
+		uint[,] GetPixelsCopy();
+		uint[,] GetPixelsArea(int xCenter, int yCenter, int matrixSize);
+		IImagePixel GetCentroid(int x, int y, int radius, uint noiseLevel);
+		uint MedianNoise { get; }
+		int Width { get; }
+		int Height { get; }
+	}
+
+	public class AstroImage : IAstroImage
     {
         protected Pixelmap m_Pixelmap;
 
@@ -52,6 +62,11 @@ namespace Tangra.Model.Astro
         {
             get { return m_Pixelmap; }
         }
+
+		public uint[,] GetPixelsCopy()
+		{
+			return m_Pixelmap.GetPixelsCopy();
+		}
 
         private uint m_MedianNoise = UInt32.MaxValue;
         public uint MedianNoise
@@ -120,6 +135,11 @@ namespace Tangra.Model.Astro
             return pixels;
         }
 
+		public uint[,] GetPixelsArea(int xCenter, int yCenter, int matrixSize)
+		{
+			return GetMeasurableAreaPixels(xCenter, yCenter, matrixSize);
+		}
+
         public byte[,] GetMeasurableAreaDisplayBitmapPixels(ImagePixel center)
         {
             return GetMeasurableAreaDisplayBitmapPixels(center.X, center.Y);
@@ -172,7 +192,7 @@ namespace Tangra.Model.Astro
                 }
         }
 
-        public ImagePixel GetCentroid(int x, int y, int radius, uint noiseLevel)
+        public IImagePixel GetCentroid(int x, int y, int radius, uint noiseLevel)
         {
             return GetCentroid(x, y, radius, true, noiseLevel);
         }
