@@ -29,10 +29,13 @@ namespace Tangra.OccultTools
 		private static MethodInfo AOTA_RunAOTA;
 	    private static MethodInfo AOTA_RunAOTAEx;
 		private static MethodInfo AOTA_InitialiseAOTA;
+	    private static MethodInfo AOTA_CloseAOTA;
 
 		private static BindingFlags OccultBindingFlags;
 
 		private static bool? s_IsOccultSupported = null;
+
+	    private static object m_AotaInstance = null;
 
 		public static bool HasSupportedVersionOfOccult(string occultLocation)
 		{
@@ -96,27 +99,35 @@ namespace Tangra.OccultTools
                 AOTA_RunAOTAEx = TYPE_AOTA_ExternalAccess.GetMethod("RunAOTA", new Type[] { typeof(IWin32Window), typeof(int), typeof(int) });
 				//public void InitialiseAOTA()
 				AOTA_InitialiseAOTA = TYPE_AOTA_ExternalAccess.GetMethod("InitialiseAOTA");
+                //public void CloseAOTA()
+                AOTA_CloseAOTA = TYPE_AOTA_ExternalAccess.GetMethod("CloseAOTA");
 			}
 		}
 
 		internal static void RunAOTA(ILightCurveDataProvider dataProvider, IWin32Window parentWindow)
 		{
-			object aotaInstance = Activator.CreateInstance(TYPE_AOTA_ExternalAccess);
+            if (m_AotaInstance == null)
+                m_AotaInstance = Activator.CreateInstance(TYPE_AOTA_ExternalAccess);
 
-			AOTA_InitialiseAOTA.Invoke(aotaInstance, new object[] { });
+            AOTA_InitialiseAOTA.Invoke(m_AotaInstance, new object[] { });
 
 			ISingleMeasurement[] measurements = dataProvider.GetTargetMeasurements();
 
 			float[] data = measurements.Select(x => x.Measurement).ToArray();
 			float[] frameIds = measurements.Select(x => (float)x.CurrFrameNo).ToArray();
 
-			AOTA_Set_TargetData.Invoke(aotaInstance, new object[] { data });
-			AOTA_Set_FrameID.Invoke(aotaInstance, new object[] { frameIds });
-			AOTA_RunAOTAEx.Invoke(aotaInstance, new object[] { null /*parentWindow*/, 0, 1 });
+            AOTA_Set_TargetData.Invoke(m_AotaInstance, new object[] { data });
+            AOTA_Set_FrameID.Invoke(m_AotaInstance, new object[] { frameIds });
+            AOTA_RunAOTAEx.Invoke(m_AotaInstance, new object[] { null /*parentWindow*/, 0, 1 });
 		}
 
         internal static void EnsureAOTAClosed()
         {
+            if (m_AotaInstance != null)
+            {
+                AOTA_CloseAOTA.Invoke(m_AotaInstance, new object[] { });
+                m_AotaInstance = null;
+            }
             
         }
 	}
