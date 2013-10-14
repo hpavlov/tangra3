@@ -115,9 +115,14 @@ namespace Tangra.OccultTools
 
 			float[] data = measurements.Select(x => x.Measurement).ToArray();
 			float[] frameIds = measurements.Select(x => (float)x.CurrFrameNo).ToArray();
+            DateTime[] timestamps = measurements.Select(x => x.Timestamp).ToArray();
+
+		    long startFrameStartDayTicks = timestamps[0].Date.Ticks;
+            float[] secondsFromUTMidnight = timestamps.Select(x => (float)(Math.Truncate(new TimeSpan(x.Ticks - startFrameStartDayTicks).TotalSeconds * 100) / 100.0)).ToArray();
 
             AOTA_Set_TargetData.Invoke(m_AotaInstance, new object[] { data });
             AOTA_Set_FrameID.Invoke(m_AotaInstance, new object[] { frameIds });
+            AOTA_Set_TimeBase.Invoke(m_AotaInstance, new object[] { secondsFromUTMidnight });
             AOTA_RunAOTAEx.Invoke(m_AotaInstance, new object[] { null /*parentWindow*/, 0, 1 });
 		}
 
