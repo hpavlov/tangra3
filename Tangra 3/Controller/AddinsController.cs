@@ -96,7 +96,7 @@ namespace Tangra.Controller
 							if (action.Icon != null)
 							{
 								item.Image = (Bitmap)Bitmap.FromHbitmap(action.Icon).Clone();
-								item.ImageTransparentColor = Color.FromArgb(action.IconTransparentColorARGB);								
+								item.ImageTransparentColor = Color.FromArgb(action.IconTransparentColorARGB);
 							}
 							item.Tag = action;
 
@@ -129,5 +129,23 @@ namespace Tangra.Controller
 		{
 			m_LocalLightCurveDataProvider = provider;
 		}
+
+        public void FinaliseAddins()
+        {
+            if (m_AddinManager.Addins.Count > 0)
+            {
+                foreach (Addin addin in m_AddinManager.Addins)
+                {
+                    foreach (ITangraAddinAction action in addin.Instance.GetAddinActions())
+                    {
+                        action.Finalise();
+                    }
+
+                    addin.Instance.Finalise();
+                }
+
+                m_AddinManager.Addins.Clear();
+            }
+        }
     }
 }

@@ -49,5 +49,6 @@ namespace Tangra.SDK
 		int IconTransparentColorARGB { get; }
 
 		void Execute();
+	    void Finalise();
 	}
 }

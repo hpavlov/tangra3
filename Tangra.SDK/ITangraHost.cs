@@ -36,5 +36,7 @@ namespace Tangra.SDK
 		byte TargetNo { get; }
 
 		float Measurement { get; }
+        DateTime Timestamp { get; }
+        bool IsCorrectedForInstrumentalDelay { get; }
 	}
 }
