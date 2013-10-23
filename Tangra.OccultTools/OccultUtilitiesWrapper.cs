@@ -92,7 +92,7 @@ namespace Tangra.OccultTools
 				//public void Set_Comp3Data(float[] foreground, float[] background)
 				AOTA_Set_Comp3Data_InclBg = TYPE_AOTA_ExternalAccess.GetMethod("Set_Comp2Data", new Type[] { typeof(float[]), typeof(float[]) });
 				//public void Set_TimeBase(float[] data)
-				AOTA_Set_TimeBase = TYPE_AOTA_ExternalAccess.GetMethod("Set_TimeBase", new Type[] { typeof(float[]) });
+				AOTA_Set_TimeBase = TYPE_AOTA_ExternalAccess.GetMethod("Set_TimeBase", new Type[] { typeof(double[]) });
 				//public bool RunAOTA(IWin32Window parentWindow)
                 AOTA_RunAOTA = TYPE_AOTA_ExternalAccess.GetMethod("RunAOTA", new Type[] { typeof(IWin32Window) });
                 //public bool RunAOTA(IWin32Window parentWindow, int FirstFrame, int FramesInIntegration)    
@@ -118,7 +118,7 @@ namespace Tangra.OccultTools
             DateTime[] timestamps = measurements.Select(x => x.Timestamp).ToArray();
 
 		    long startFrameStartDayTicks = timestamps[0].Date.Ticks;
-            float[] secondsFromUTMidnight = timestamps.Select(x => (float)(Math.Truncate(new TimeSpan(x.Ticks - startFrameStartDayTicks).TotalSeconds * 100) / 100.0)).ToArray();
+            double[] secondsFromUTMidnight = timestamps.Select(x => (Math.Truncate(new TimeSpan(x.Ticks - startFrameStartDayTicks).TotalSeconds * 10000) / 10000.0)).ToArray();
 
             AOTA_Set_TargetData.Invoke(m_AotaInstance, new object[] { data });
             AOTA_Set_FrameID.Invoke(m_AotaInstance, new object[] { frameIds });
