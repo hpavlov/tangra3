@@ -84,14 +84,14 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
                         double oldDistance = m_RefinedDistances[pairId];
                         double newDistance = ImagePixel.ComputeDistance(
-                            obj1.ThisFrameX, obj2.ThisFrameX,
-                            obj1.ThisFrameY, obj2.ThisFrameY);
+                            obj1.Center.XDouble, obj2.Center.XDouble,
+							obj1.Center.YDouble, obj2.Center.YDouble);
 
                         m_RefinedDistances[pairId] = (oldDistance + newDistance) / 2.0;
 
                         LocationVector vector = obj1.OtherGuidingStarsLocationVectors[obj2.TargetNo];
-                        vector.DeltaXToAdd = (vector.DeltaXToAdd + obj2.ThisFrameX - obj1.ThisFrameX) / 2;
-                        vector.DeltaYToAdd = (vector.DeltaYToAdd + obj2.ThisFrameY- obj1.ThisFrameY) / 2;
+						vector.DeltaXToAdd = (vector.DeltaXToAdd + obj2.Center.XDouble - obj1.Center.XDouble) / 2;
+						vector.DeltaYToAdd = (vector.DeltaYToAdd + obj2.Center.YDouble - obj1.Center.YDouble) / 2;
                     }
                 }
             }
@@ -102,7 +102,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                 // If the tracking has failed, then some objects may be offscreen and have NaN position
                 // So inherit the IsOffScreen flag from the previous position
                 foreach (TrackedObject obj in TrackedObjects)
-                    if (m_IsOffScreenPrev[obj.TargetNo] && float.IsNaN(obj.ThisFrameX))
+					if (m_IsOffScreenPrev[obj.TargetNo] && double.IsNaN(obj.Center.XDouble))
                         obj.SetIsLocated(false, NotMeasuredReasons.ObjectExpectedPositionIsOffScreen);
             }
             else
@@ -301,7 +301,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			TrackedObject trackedObject = TrackedObjects.Cast<TrackedObject>().ToList().Find(o => o.TargetNo == m_LocateObjects[0]);
             trackedObject.ThisFrameX = (float)stars[0].XCenter;
             trackedObject.ThisFrameY = (float)stars[0].YCenter;
-            trackedObject.ThisFrameFit = stars[0];
+			trackedObject.PSFFit = stars[0];
             trackedObject.SetIsLocated(true, NotMeasuredReasons.TrackedSuccessfullyAfterStarRecognition);
             AutoDiscoveredStars.Clear();
 
@@ -450,12 +450,12 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                     candidates.Sort((c1, c2) => c2.Weight.CompareTo(c1.Weight));
                     CandidatePair bestPair = candidates[0];
 
-                    bestPair.Object1.ThisFrameFit = bestPair.Star1;
+					bestPair.Object1.PSFFit = bestPair.Star1;
                     bestPair.Object1.ThisFrameX = (float)bestPair.Star1.XCenter;
                     bestPair.Object1.ThisFrameY = (float)bestPair.Star1.YCenter;
 					bestPair.Object1.SetIsLocated(true, NotMeasuredReasons.TrackedSuccessfullyAfterStarRecognition);
 
-                    bestPair.Object2.ThisFrameFit = bestPair.Star2;
+					bestPair.Object2.PSFFit = bestPair.Star2;
                     bestPair.Object2.ThisFrameX = (float)bestPair.Star2.XCenter;
                     bestPair.Object2.ThisFrameY = (float)bestPair.Star2.YCenter;
 					bestPair.Object2.SetIsLocated(true, NotMeasuredReasons.TrackedSuccessfullyAfterStarRecognition);

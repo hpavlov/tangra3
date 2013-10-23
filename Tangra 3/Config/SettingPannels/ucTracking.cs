@@ -32,6 +32,7 @@ namespace Tangra.Config.SettingPannels
 			cbxPlaySound.Checked = TangraConfig.Settings.Tracking.PlaySound;
 
 			nudMinAboveMedian.SetNUDValue((double)TangraConfig.Settings.Special.StarFinderAboveNoiseLevel);
+	        cbxTrackingEngine.SelectedIndex = (int)TangraConfig.Settings.Tracking.SelectedEngine;
         }
 
         public override void SaveSettings()
@@ -44,6 +45,7 @@ namespace Tangra.Config.SettingPannels
 			TangraConfig.Settings.Tracking.RecoverFromLostTracking = cbxRecoverFromLostTracking.Checked;
 			TangraConfig.Settings.Tracking.PlaySound = cbxPlaySound.Checked;
 			TangraConfig.Settings.Special.StarFinderAboveNoiseLevel = (uint)nudMinAboveMedian.Value;
+			TangraConfig.Settings.Tracking.SelectedEngine = (TangraConfig.TrackingEngine)cbxTrackingEngine.SelectedIndex;
         }
 
 		private void cbxRecoverFromLostTracking_CheckedChanged(object sender, EventArgs e)

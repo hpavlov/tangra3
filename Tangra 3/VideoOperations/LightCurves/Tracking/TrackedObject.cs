@@ -16,142 +16,12 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
         public double DeltaYToAdd;
     }
 
-	internal class TrackedObject : IMeasuredObject, ITrackedObject
-    {
-		public ITrackedObjectConfig OriginalObject { get; private set; }
+	internal class TrackedObjectBase : IMeasuredObject, ITrackedObject
+	{
+		public NotMeasuredReasons NotMeasuredReasons;
 
-        private List<IImagePixel> RefiningPositions = new List<IImagePixel>();
-        private List<float> RefiningSignalLevels = new List<float>();
-        private List<double> RefiningFWHMs = new List<double>();
+		protected static uint FLAG_OFFSCREEN = 0x00000100;
 
-        public PSFFit ThisFrameFit = null;
-        public float ThisFrameX = float.NaN;
-        public float ThisFrameY = float.NaN;
-        public float ThisSignalLevel = 0;
-        public float LastFrameX;
-        public float LastFrameY;
-        public float LastSignalLevel = 1;
-
-        public PSFFit PSFFit
-        {
-            get { return ThisFrameFit; }
-        }
-
-    	public NotMeasuredReasons NotMeasuredReasons;
-
-    	private bool m_IsLocated = false;
-    	public bool IsLocated
-    	{
-			get { return m_IsLocated; }
-    	}
-
-		public bool IsOffScreen
-		{
-			get
-			{
-				return (NotMeasuredReasons & NotMeasuredReasons.ObjectExpectedPositionIsOffScreen) != 0;
-			}
-			
-		}
-
-		public void SetIsLocated(bool isLocated, NotMeasuredReasons reason)
-		{
-			m_IsLocated = isLocated;
-
-			// Overwrite only the same level reason and keep the other level so we can have 2 reasons
-			if (reason <=  NotMeasuredReasons.LAST_FIRST_LEVEL_REASON)
-				NotMeasuredReasons = (NotMeasuredReasons)((int)NotMeasuredReasons & 0xFF00) | reason;
-			else
-				NotMeasuredReasons = (NotMeasuredReasons)((int)NotMeasuredReasons & 0xFF00FF) | reason;
-		}
-
-		public void SetIsMeasured(bool isMeasured, NotMeasuredReasons reason)
-		{
-			m_IsLocated = isMeasured;
-			NotMeasuredReasons = (NotMeasuredReasons)((int)NotMeasuredReasons & 0x00FFFF) | reason;
-		}
-
-		public byte GetLCMeasurementByteFlags()
-		{
-            // 11111111
-
-            // NOT RECORDED REASONS:
-            // NoPixelsToMeasure = 128 + 0,
-            // ObjectExpectedPositionIsOffScreen = 8
-
-            // xxx [0][1][2] MASK = 0x7
-            // UnknownReason = 0
-		    // TrackedSuccessfully = 1
-		    // FixedObject = 2
-		    // GuidingStarBrightnessFluctoationTooHigh = 3
-		    // PSFFittingFailed = 4
-		    // FoundObjectNotWithInExpectedPositionTolerance = 5
-		    // FullyDisappearingStarMarkedTrackedWithoutBeingFound = 6
-		    // FitSuspectAsNoGuidingStarsAreLocated = 7
-
-            // xxx [3][4][5] MASK = 0x7
-            // No Second Level Reason = 0
-		    // TrackedSuccessfullyAfterDistanceCheck = 1     /* Flag = 9  | 8 + 1 | 8 + 6 = 14*/
-			// TrackedSuccessfullyAfterWiderAreaSearch = 2   /* Flag = 17 | 16 + 1 | 16 + 6 = 22*/
-			// TrackedSuccessfullyAfterStarRecognition = 3   /* Flag = 25 | 24 + 1 | 24 + 6 = 30*/
-            // FailedToLocateAfterDistanceCheck = 4
-            // FailedToLocateAfterWiderAreaSearch = 5
-            // FailedToLocateAfterStarRecognition = 6
-
-            // xx [6][7] MASK = 0x3
-            // No Third Level Reason = 0
-            // MeasurementPSFFittingFailed = 1
-		    // DistanceToleranceTooHighForNonFullDisappearingOccultedStar = 2
-		    // FWHMOutOfRange = 3
-
-		    int firstLevel = (int) NotMeasuredReasons & 0x7;
-            int secondLevel = (((int)NotMeasuredReasons & 0xFF00) >> 8) & 0x7;
-			int thirdLevel = ((((int)NotMeasuredReasons & 0xFF0000) >> 16) & 0x7);
-			if (thirdLevel > 0) thirdLevel -= 1 /* We don't save NoPixelsToMeasure, this is why we subtract 1 */;
-
-            int flags = firstLevel + (secondLevel << 3) + (thirdLevel << 6);
-			
-		    return (byte) flags;
-		}
-
-		private static void DecodeByteFlags(
-			byte flags, 
-			out NotMeasuredReasons firstFlags,
-			out NotMeasuredReasons secondFlags,
-			out NotMeasuredReasons thirdFlags)
-		{
-			int firstLevel = (int)flags & 0x7;
-			int secondLevel = ((int)flags >> 3) & 0x7;
-			int thirdLevel = ((int)flags >> 6) & 0x3;
-
-			firstFlags = (NotMeasuredReasons)firstLevel;
-			secondFlags = (NotMeasuredReasons)(secondLevel << 8);
-			thirdFlags = (NotMeasuredReasons)((thirdLevel != 0 ? thirdLevel + 1 : thirdLevel) /* We don't save NoPixelsToMeasure, this is why we add 1 */ << 16);
-		}
-
-        public static string GetByteFlagsExplained(byte flags)
-        {
-			NotMeasuredReasons firstFlags, secondFlags, thirdFlags;
-        	DecodeByteFlags(flags, out firstFlags, out secondFlags, out thirdFlags);
-        	return TranslateFlags(firstFlags, secondFlags, thirdFlags);
-        }
-
-		private static string TranslateFlags(NotMeasuredReasons firstFlags, NotMeasuredReasons secondFlags, NotMeasuredReasons thirdFlags)
-		{
-			StringBuilder output = new StringBuilder();
-
-			output.AppendLine(GetNotMeasuredReasonsDisplayValue(firstFlags));
-
-			if (secondFlags != 0)
-				output.AppendLine(GetNotMeasuredReasonsDisplayValue(secondFlags));
-
-			if (thirdFlags != 0)
-				output.AppendLine(GetNotMeasuredReasonsDisplayValue(thirdFlags));
-
-			return output.ToString();			
-		}
-
-    	private static uint FLAG_OFFSCREEN = 0x00000100;
 		public uint GetLCMeasurementFlags()
 		{
 			uint flags = 0;
@@ -170,6 +40,86 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			return flags;
 		}
 
+		public byte GetLCMeasurementByteFlags()
+		{
+			// 11111111
+
+			// NOT RECORDED REASONS:
+			// NoPixelsToMeasure = 128 + 0,
+			// ObjectExpectedPositionIsOffScreen = 8
+
+			// xxx [0][1][2] MASK = 0x7
+			// UnknownReason = 0
+			// TrackedSuccessfully = 1
+			// FixedObject = 2
+			// GuidingStarBrightnessFluctoationTooHigh = 3
+			// PSFFittingFailed = 4
+			// FoundObjectNotWithInExpectedPositionTolerance = 5
+			// FullyDisappearingStarMarkedTrackedWithoutBeingFound = 6
+			// FitSuspectAsNoGuidingStarsAreLocated = 7
+
+			// xxx [3][4][5] MASK = 0x7
+			// No Second Level Reason = 0
+			// TrackedSuccessfullyAfterDistanceCheck = 1     /* Flag = 9  | 8 + 1 | 8 + 6 = 14*/
+			// TrackedSuccessfullyAfterWiderAreaSearch = 2   /* Flag = 17 | 16 + 1 | 16 + 6 = 22*/
+			// TrackedSuccessfullyAfterStarRecognition = 3   /* Flag = 25 | 24 + 1 | 24 + 6 = 30*/
+			// FailedToLocateAfterDistanceCheck = 4
+			// FailedToLocateAfterWiderAreaSearch = 5
+			// FailedToLocateAfterStarRecognition = 6
+
+			// xx [6][7] MASK = 0x3
+			// No Third Level Reason = 0
+			// MeasurementPSFFittingFailed = 1
+			// DistanceToleranceTooHighForNonFullDisappearingOccultedStar = 2
+			// FWHMOutOfRange = 3
+
+			int firstLevel = (int)NotMeasuredReasons & 0x7;
+			int secondLevel = (((int)NotMeasuredReasons & 0xFF00) >> 8) & 0x7;
+			int thirdLevel = ((((int)NotMeasuredReasons & 0xFF0000) >> 16) & 0x7);
+			if (thirdLevel > 0) thirdLevel -= 1 /* We don't save NoPixelsToMeasure, this is why we subtract 1 */;
+
+			int flags = firstLevel + (secondLevel << 3) + (thirdLevel << 6);
+
+			return (byte)flags;
+		}
+
+		protected static void DecodeByteFlags(
+			byte flags,
+			out NotMeasuredReasons firstFlags,
+			out NotMeasuredReasons secondFlags,
+			out NotMeasuredReasons thirdFlags)
+		{
+			int firstLevel = (int)flags & 0x7;
+			int secondLevel = ((int)flags >> 3) & 0x7;
+			int thirdLevel = ((int)flags >> 6) & 0x3;
+
+			firstFlags = (NotMeasuredReasons)firstLevel;
+			secondFlags = (NotMeasuredReasons)(secondLevel << 8);
+			thirdFlags = (NotMeasuredReasons)((thirdLevel != 0 ? thirdLevel + 1 : thirdLevel) /* We don't save NoPixelsToMeasure, this is why we add 1 */ << 16);
+		}
+
+		public static string GetByteFlagsExplained(byte flags)
+		{
+			NotMeasuredReasons firstFlags, secondFlags, thirdFlags;
+			DecodeByteFlags(flags, out firstFlags, out secondFlags, out thirdFlags);
+			return TranslateFlags(firstFlags, secondFlags, thirdFlags);
+		}
+
+		private static string TranslateFlags(NotMeasuredReasons firstFlags, NotMeasuredReasons secondFlags, NotMeasuredReasons thirdFlags)
+		{
+			StringBuilder output = new StringBuilder();
+
+			output.AppendLine(GetNotMeasuredReasonsDisplayValue(firstFlags));
+
+			if (secondFlags != 0)
+				output.AppendLine(GetNotMeasuredReasonsDisplayValue(secondFlags));
+
+			if (thirdFlags != 0)
+				output.AppendLine(GetNotMeasuredReasonsDisplayValue(thirdFlags));
+
+			return output.ToString();
+		}
+
 		public static string GetDWORDFlagsExplained(uint flags)
 		{
 			NotMeasuredReasons firstFlags, secondFlags, thirdFlags;
@@ -181,91 +131,150 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			return TranslateFlags(firstFlags, secondFlags, thirdFlags);
 		}
 
-        private static string GetNotMeasuredReasonsDisplayValue(NotMeasuredReasons reason)
-        {
-            switch(reason)
-            {
-                case NotMeasuredReasons.UnknownReason:
-            		return null; //"Tracking has failed for unknown reason";
+		protected static string GetNotMeasuredReasonsDisplayValue(NotMeasuredReasons reason)
+		{
+			switch (reason)
+			{
+				case NotMeasuredReasons.UnknownReason:
+					return null; //"Tracking has failed for unknown reason";
 
-                case NotMeasuredReasons.TrackedSuccessfully:
-            		return null;
+				case NotMeasuredReasons.TrackedSuccessfully:
+					return null;
 
-                case NotMeasuredReasons.FixedObject:
+				case NotMeasuredReasons.FixedObject:
 					return "W:Tracking:Object with fixed manually positioned aperture";
 
-                case NotMeasuredReasons.GuidingStarBrightnessFluctoationTooHigh:
-                    return "W:Tracking:Tracking was unsuccessful because the brightness fluctoation was out of the expected range";
+				case NotMeasuredReasons.GuidingStarBrightnessFluctoationTooHigh:
+					return "W:Tracking:Tracking was unsuccessful because the brightness fluctoation was out of the expected range";
 
-                case NotMeasuredReasons.PSFFittingFailed:
-                    return "W:Tracking:Tracking was unsuccessful because the a PSF could not be fitted";
+				case NotMeasuredReasons.PSFFittingFailed:
+					return "W:Tracking:Tracking was unsuccessful because the a PSF could not be fitted";
 
-                case NotMeasuredReasons.FoundObjectNotWithInExpectedPositionTolerance:
-                    return "W:Tracking:Tracking was unsuccessful because the center of the PSF fit was too far from the expected location";
+				case NotMeasuredReasons.FoundObjectNotWithInExpectedPositionTolerance:
+					return "W:Tracking:Tracking was unsuccessful because the center of the PSF fit was too far from the expected location";
 
-                case NotMeasuredReasons.FullyDisappearingStarMarkedTrackedWithoutBeingFound:
-                    return "I:Tracking:A fully disappearing object was marked tracked without being detected (assuming it has disappeared)";
+				case NotMeasuredReasons.FullyDisappearingStarMarkedTrackedWithoutBeingFound:
+					return "I:Tracking:A fully disappearing object was marked tracked without being detected (assuming it has disappeared)";
 
-                case NotMeasuredReasons.FitSuspectAsNoGuidingStarsAreLocated:
-                    return "W:Tracking:No guiding stars have been reliably located, all objects are marked as suspect";
+				case NotMeasuredReasons.FitSuspectAsNoGuidingStarsAreLocated:
+					return "W:Tracking:No guiding stars have been reliably located, all objects are marked as suspect";
 
-                case NotMeasuredReasons.ObjectExpectedPositionIsOffScreen:
-                    return "W:Tracking:The expected object position is outside the FOV";
+				case NotMeasuredReasons.ObjectExpectedPositionIsOffScreen:
+					return "W:Tracking:The expected object position is outside the FOV";
 
-                case NotMeasuredReasons.TrackedSuccessfullyAfterDistanceCheck:
-                    return "I:Recovering:The object was recovered after a distance alignment";
+				case NotMeasuredReasons.TrackedSuccessfullyAfterDistanceCheck:
+					return "I:Recovering:The object was recovered after a distance alignment";
 
-                case NotMeasuredReasons.TrackedSuccessfullyAfterWiderAreaSearch:
-                    return "I:Recovering:The object was recovered after searching in a wider area";
+				case NotMeasuredReasons.TrackedSuccessfullyAfterWiderAreaSearch:
+					return "I:Recovering:The object was recovered after searching in a wider area";
 
-                case NotMeasuredReasons.TrackedSuccessfullyAfterStarRecognition:
-                    return "I:Recovering:The object was recovered after using pattern recognition";
+				case NotMeasuredReasons.TrackedSuccessfullyAfterStarRecognition:
+					return "I:Recovering:The object was recovered after using pattern recognition";
 
-                case NotMeasuredReasons.FailedToLocateAfterDistanceCheck:
-                    return "W:Recovering:Failed to recover the object after a distance alignment";
+				case NotMeasuredReasons.FailedToLocateAfterDistanceCheck:
+					return "W:Recovering:Failed to recover the object after a distance alignment";
 
-                case NotMeasuredReasons.FailedToLocateAfterWiderAreaSearch:
-                    return "W:Recovering:Failed to recover the object after searching in a wider area";
+				case NotMeasuredReasons.FailedToLocateAfterWiderAreaSearch:
+					return "W:Recovering:Failed to recover the object after searching in a wider area";
 
-                case NotMeasuredReasons.FailedToLocateAfterStarRecognition:
-                    return "W:Recovering:Failed to recover the object after using pattern recognition";
+				case NotMeasuredReasons.FailedToLocateAfterStarRecognition:
+					return "W:Recovering:Failed to recover the object after using pattern recognition";
 
-                case NotMeasuredReasons.NoPixelsToMeasure:
-                    return "W:Measuring:Aperture contains no pixels";
+				case NotMeasuredReasons.NoPixelsToMeasure:
+					return "W:Measuring:Aperture contains no pixels";
 
-                case NotMeasuredReasons.MeasurementPSFFittingFailed:
-                    return "W:Measuring:The PSF fitting failed";
+				case NotMeasuredReasons.MeasurementPSFFittingFailed:
+					return "W:Measuring:The PSF fitting failed";
 
-                case NotMeasuredReasons.DistanceToleranceTooHighForNonFullDisappearingOccultedStar:
-                    return "W:Measuring:The object apeared too far from the expected position";
+				case NotMeasuredReasons.DistanceToleranceTooHighForNonFullDisappearingOccultedStar:
+					return "W:Measuring:The object apeared too far from the expected position";
 
-                case NotMeasuredReasons.FWHMOutOfRange:
-                    return "W:Measuring:The FWHM of the PSF fit was out of the expected range";
-            }
+				case NotMeasuredReasons.FWHMOutOfRange:
+					return "W:Measuring:The FWHM of the PSF fit was out of the expected range";
+			}
 
-            return null;
-        }
+			return null;
+		}
 
-        private byte targetNo;
 
-        public int LastKnownGoodFrameId;
+		public virtual IImagePixel Center { get; protected set; }
+
 		public IImagePixel LastKnownGoodPosition { get; set; }
 
-        // Used for stripes display only
-        private double m_appMeaAveragePixel;
-        [XmlIgnore]
-        public double AppMeaAveragePixel
-        {
-            get { return m_appMeaAveragePixel; }
-            set { m_appMeaAveragePixel = value; }
-        }
+		public bool IsLocated { get; protected set; }
 
-        private double m_ApertureArea;
-        public double ApertureArea
-        {
-            get { return m_ApertureArea; }
-            set { m_ApertureArea = value; }
-        }
+		public bool IsOffScreen
+		{
+			get
+			{
+				return (NotMeasuredReasons & NotMeasuredReasons.ObjectExpectedPositionIsOffScreen) != 0;
+			}
+
+		}
+
+		public ITrackedObjectConfig OriginalObject { get; protected set; }
+
+		public int TargetNo { get; protected set; }
+
+		public virtual void SetIsMeasured(bool isMeasured, NotMeasuredReasons reason)
+		{
+			IsLocated = isMeasured;
+			NotMeasuredReasons = (NotMeasuredReasons)((int)NotMeasuredReasons & 0x00FFFF) | reason;
+		}
+
+		public bool IsOcultedStar { get; protected set; }
+
+		public int PsfFitMatrixSize { get; protected set; }
+
+		[XmlIgnore]
+		public double AppMeaAveragePixel { get; set; }
+
+		public double ApertureArea { get; set; }
+
+		public virtual float RefinedOrLastSignalLevel { get; protected set; }
+
+		public PSFFit PSFFit { get; set; }
+	}
+
+	internal class TrackedObject : TrackedObjectBase
+    {
+		public TrackedObject(byte targetNo, TrackedObjectConfig originalObject)
+		{
+			TargetNo = targetNo;
+			OriginalObject = originalObject;
+
+			ThisFrameX = originalObject.ApertureStartingX;
+			ThisFrameY = originalObject.ApertureStartingY;
+
+			ApertureArea = Math.PI * originalObject.ApertureInPixels * originalObject.ApertureInPixels;
+			IsOcultedStar = OriginalObject.TrackingType == TrackingType.OccultedStar;
+			PsfFitMatrixSize = OriginalObject.PsfFitMatrixSize;
+		}
+
+        private List<IImagePixel> RefiningPositions = new List<IImagePixel>();
+        private List<float> RefiningSignalLevels = new List<float>();
+        private List<double> RefiningFWHMs = new List<double>();
+
+		public float ThisFrameX = float.NaN;
+		public float ThisFrameY = float.NaN;
+        public float ThisSignalLevel = 0;
+        public float LastFrameX;
+        public float LastFrameY;
+        public float LastSignalLevel = 1;
+
+		public void SetIsLocated(bool isLocated, NotMeasuredReasons reason)
+		{
+			IsLocated = isLocated;
+
+			// Overwrite only the same level reason and keep the other level so we can have 2 reasons
+			if (reason <=  NotMeasuredReasons.LAST_FIRST_LEVEL_REASON)
+				NotMeasuredReasons = (NotMeasuredReasons)((int)NotMeasuredReasons & 0xFF00) | reason;
+			else
+				NotMeasuredReasons = (NotMeasuredReasons)((int)NotMeasuredReasons & 0xFF00FF) | reason;
+		}
+
+
+        public int LastKnownGoodFrameId;
 
         #region Refined Position and Flickering
         public bool HasRefinedPositions
@@ -287,7 +296,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
         }
 
         private float RefinedSignalLevel = float.NaN;
-        public float RefinedOrLastSignalLevel
+        public override float RefinedOrLastSignalLevel
         {
             get
             {
@@ -413,28 +422,12 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
         public Dictionary<int, LocationVector> OtherGuidingStarsLocationVectors;
 
-        public TrackedObject(byte targetNo, TrackedObjectConfig originalObject)
-        {
-            this.targetNo = targetNo;
-            OriginalObject = originalObject;
-
-            ThisFrameX = originalObject.ApertureStartingX;
-            ThisFrameY = originalObject.ApertureStartingY;
-
-			ApertureArea = Math.PI * originalObject.ApertureInPixels * originalObject.ApertureInPixels;
-        }
-
         public bool IsGuidingStar
         {
             get { return OriginalObject.TrackingType == TrackingType.GuidingStar; }
         }
 
-        public bool IsOcultedStar
-        {
-            get { return OriginalObject.TrackingType == TrackingType.OccultedStar; }
-        }
-
-        public IImagePixel Center
+        public override IImagePixel Center
         {
             get
             {
@@ -442,19 +435,6 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                     return OriginalObject.AsImagePixel;
                 else
                     return new ImagePixel(ThisFrameX, ThisFrameY);
-            }
-        }
-
-        public byte TargetNo
-        {
-            get { return targetNo; }
-        }
-
-        public int PsfFitMatrixSize
-        {
-            get
-            {
-                return OriginalObject.PsfFitMatrixSize;
             }
         }
 
@@ -468,8 +448,8 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             ThisFrameY = 0;
 
             ThisSignalLevel = 1;
-            ThisFrameFit = null;
-        	m_IsLocated = false;
+			PSFFit = null;
+        	IsLocated = false;
         	NotMeasuredReasons = NotMeasuredReasons.UnknownReason;
         }
     }

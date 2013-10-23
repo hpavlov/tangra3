@@ -30,6 +30,10 @@ namespace Tangra.Model.Image
 
         public static ImagePixel Unspecified = new ImagePixel(uint.MinValue, double.NaN, double.NaN);
 
+		public ImagePixel(IImagePixel clone)
+			: this(uint.MinValue, clone.XDouble, clone.YDouble)
+		{ }
+
     	public ImagePixel(ImagePixel clone)
             : this(clone.Brightness, clone.XDouble, clone.YDouble)
 		{ }

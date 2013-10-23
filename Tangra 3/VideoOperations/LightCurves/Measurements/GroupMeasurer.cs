@@ -100,11 +100,5 @@ namespace Tangra.VideoOperations.LightCurves.Measurements
 				return m_MeasurementGroups.Count < m_TrackedObjects.Count;
 			}
 		}
-
-		public void MeasureObjects(List<TrackedObject> trackedObjects)
-		{
-			// TODO:
-			throw new NotImplementedException();
-		}
 	}
 }

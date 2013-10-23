@@ -29,7 +29,9 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 		IImagePixel LastKnownGoodPosition { get; set; }
 		bool IsLocated { get; }
 		bool IsOffScreen { get; }
-		ITrackedObjectConfig OriginalObject { get; }	
+		ITrackedObjectConfig OriginalObject { get; }
+		int TargetNo { get; }
+		PSFFit PSFFit { get; }
 	}
 
 	public interface ITrackedObjectConfig
@@ -45,7 +47,6 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 		ImagePixel AsImagePixel { get; }
 		float PositionTolerance { get; }
 		bool IsCloseToOtherStars { get; }
-		//int TargetNo { get; }
 	}
 
 	public static class TrackerExtensions

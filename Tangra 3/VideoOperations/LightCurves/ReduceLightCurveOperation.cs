@@ -697,7 +697,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 				int objHeight = (height / 4) - 20;
 
-				foreach (TrackedObject obj in m_Tracker.TrackedObjects)
+				foreach (ITrackedObject obj in m_Tracker.TrackedObjects)
 				{
 					int beg = obj.TargetNo * (objHeight) + obj.TargetNo * 20 + 10;
 					g.FillRectangle(m_AllBrushes[obj.TargetNo], 1, beg, 4, objHeight);
@@ -776,12 +776,12 @@ namespace Tangra.VideoOperations.LightCurves
 
 					if (m_Refining)
 					{
-						foreach (TrackedObject obj in m_Tracker.TrackedObjects)
+						foreach (ITrackedObject obj in m_Tracker.TrackedObjects)
 						{
-							if (zommedArea.Contains((int)obj.ThisFrameX, (int)obj.ThisFrameY))
+							if (zommedArea.Contains(obj.Center.X, obj.Center.Y))
 							{
-								float xx = (int)obj.ThisFrameX - (m_VideoController.ZoomedCenter.X - 15);
-								float yy = (int)obj.ThisFrameY - (m_VideoController.ZoomedCenter.Y - 16);
+								float xx = obj.Center.X - (m_VideoController.ZoomedCenter.X - 15);
+								float yy = obj.Center.Y - (m_VideoController.ZoomedCenter.Y - 16);
 
 								xx = xx * 8 + 0.5f;
 								yy = yy * 8 + 0.5f;
@@ -824,30 +824,30 @@ namespace Tangra.VideoOperations.LightCurves
 			g.Clear(Color.Gray);
 
 			// IDs are 0, 1, 2 and 3
-			foreach (TrackedObject obj in m_Tracker.TrackedObjects)
+			foreach (ITrackedObject obj in m_Tracker.TrackedObjects)
 			{
-				if (obj.ThisFrameFit != null)
+				if (obj.PSFFit != null)
 				{
-					obj.ThisFrameFit.DrawDataPixels(g, m_ZoomPixelRects[obj.TargetNo], obj.OriginalObject.ApertureInPixels, m_AllPens[obj.TargetNo], m_VideoController.VideoBitPix);
+					obj.PSFFit.DrawDataPixels(g, m_ZoomPixelRects[obj.TargetNo], obj.OriginalObject.ApertureInPixels, m_AllPens[obj.TargetNo], m_VideoController.VideoBitPix);
 				}
 				else if (obj.IsLocated)
 				{
 					AstroImage currentImage = m_VideoController.GetCurrentAstroImage(false);
 					if (currentImage != null)
 					{
-						int x0 = (int)Math.Round(obj.ThisFrameX);
-						int y0 = (int)Math.Round(obj.ThisFrameY);
+						int x0 = (int)Math.Round(obj.Center.XDouble);
+						int y0 = (int)Math.Round(obj.Center.YDouble);
 						uint[,] pix = currentImage.GetMeasurableAreaPixels(x0, y0);
 						pix.DrawDataPixels(g,
 							m_ZoomPixelRects[obj.TargetNo],
 							new DisplayBitmapConverter.DefaultDisplayBitmapConverter(),
-							obj.ThisFrameX - x0 + 8, obj.ThisFrameY - y0 + 8,
+							(float)obj.Center.XDouble - x0 + 8, (float)obj.Center.YDouble - y0 + 8,
 							obj.OriginalObject.ApertureInPixels, m_AllPens[obj.TargetNo]);						
 					}
 				}
 			}
 
-			foreach (TrackedObject obj in m_Tracker.TrackedObjects)
+			foreach (ITrackedObject obj in m_Tracker.TrackedObjects)
 				g.DrawRectangle(Pens.WhiteSmoke, m_BorderRects[obj.TargetNo]);
 		}
 
@@ -862,7 +862,7 @@ namespace Tangra.VideoOperations.LightCurves
 				bool isAperturePhotometry = LightCurveReductionContext.Instance.ReductionMethod == TangraConfig.PhotometryReductionMethod.AperturePhotometry;
 				AstroImage currentImage = m_VideoController.GetCurrentAstroImage(false);
 
-				foreach (TrackedObject obj in m_Tracker.TrackedObjects)
+				foreach (ITrackedObject obj in m_Tracker.TrackedObjects)
 				{
 					int beg = obj.TargetNo * (objHeight) + obj.TargetNo * 20 + 10;
 
@@ -875,19 +875,19 @@ namespace Tangra.VideoOperations.LightCurves
 						pen = m_AllPens[obj.TargetNo];
 					}
 					else if (isAperturePhotometry &&
-						!float.IsNaN(obj.ThisFrameX) &&
-						!float.IsNaN(obj.ThisFrameY))
+						!double.IsNaN(obj.Center.XDouble) &&
+						!double.IsNaN(obj.Center.YDouble))
 					{
 						h = (int)Math.Min(objHeight - 1, objHeight * obj.OriginalObject.ApertureInPixels / 7);
 						if (h % 2 == 0) h++;
-						byte z0 = currentImage.GetDisplayPixel((int)Math.Round(obj.ThisFrameX), (int)Math.Round(obj.ThisFrameY));
+						byte z0 = currentImage.GetDisplayPixel((int)Math.Round(obj.Center.XDouble), (int)Math.Round(obj.Center.YDouble));
 						pen = AllGrayPens.GrayPen(z0);
 					}
-					else if (obj.ThisFrameFit != null)
+					else if (obj.PSFFit != null)
 					{
-						h = (int)Math.Min(objHeight - 1, objHeight * obj.ThisFrameFit.FWHM / 7);
+						h = (int)Math.Min(objHeight - 1, objHeight * obj.PSFFit.FWHM / 7);
 						if (h % 2 == 0) h++;
-						byte z = (byte)Math.Max(0, Math.Min(255, obj.ThisFrameFit.IMax));
+						byte z = (byte)Math.Max(0, Math.Min(255, obj.PSFFit.IMax));
 
 						pen = AllGrayPens.GrayPen(z);
 					}
@@ -1485,7 +1485,7 @@ namespace Tangra.VideoOperations.LightCurves
             if (m_MaxFrame < m_CurrFrameNo) m_MaxFrame = (uint)m_CurrFrameNo;
             m_TotalFrames++;
 
-			foreach (TrackedObject trackedObject in m_Tracker.TrackedObjects)
+			foreach (TrackedObjectBase trackedObject in m_Tracker.TrackedObjects)
 			{
 				IImagePixel center = trackedObject.Center;
 
@@ -1505,7 +1505,7 @@ namespace Tangra.VideoOperations.LightCurves
 					// Add unsuccessfull measurement for this object and this frame
 					LCFile.SaveOnTheFlyMeasurement(new LCMeasurement(
 													(uint)m_CurrFrameNo,
-													trackedObject.TargetNo,
+													(byte)trackedObject.TargetNo,
 													0,
 													0,
 													flags,
@@ -1522,7 +1522,7 @@ namespace Tangra.VideoOperations.LightCurves
         private SpinLock m_WriterLock;
 
 		private void MeasureTrackedObject2(
-			TrackedObject trackedObject,
+			TrackedObjectBase trackedObject,
 			MeasurementsHelper measurer,
 			TangraConfig.PreProcessingFilter filter,
 			bool synchronise)
@@ -1538,8 +1538,8 @@ namespace Tangra.VideoOperations.LightCurves
 			uint[,] data = m_VideoController.GetCurrentAstroImage(false).GetMeasurableAreaPixels(centerX, centerY, areaSize);
 			uint[,] backgroundPixels = m_VideoController.GetCurrentAstroImage(false).GetMeasurableAreaPixels(centerX, centerY, 35);
 
-			float msrX0 = trackedObject.ThisFrameX;
-			float msrY0 = trackedObject.ThisFrameY;
+			float msrX0 = (float)trackedObject.Center.XDouble;
+			float msrY0 = (float)trackedObject.Center.YDouble;
 
 			MeasureObject(
 				center,
@@ -1572,14 +1572,14 @@ namespace Tangra.VideoOperations.LightCurves
 
 				LCFile.SaveOnTheFlyMeasurement(new LCMeasurement(
 												   (uint)m_CurrFrameNo,
-												   trackedObject.TargetNo,
+												   (byte)trackedObject.TargetNo,
 												   (uint)Math.Round(measurer.TotalReading),
 												   (uint)Math.Round(measurer.TotalBackground),
 												   flags,
 												   msrX0, msrY0,
 					/* We want to use the real image (X,Y) coordinates here */
 					//(float) aperture,
-												   trackedObject.ThisFrameFit,
+												   trackedObject.PSFFit,
 					/* but we want to use the actual measurement fit. This only matters for reviewing the light curve when not opened from a file. */
 												   pixelsToSave /* save the original non filtered data */, centerX, centerY, m_OCRedTimeStamp));
 			}

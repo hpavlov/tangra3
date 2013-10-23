@@ -355,6 +355,12 @@ namespace Tangra.Model.Config
 		    public static float REJECTION_BACKGROUND_PIXELS_STD_DEV = 6.0f;
 		}
 
+		public enum TrackingEngine
+		{
+			TrackingWithRefining,
+			AdHocTracking
+		}
+
 		public class TrackingSettings
 		{
 			public byte RefiningFrames = 8;
@@ -363,6 +369,7 @@ namespace Tangra.Model.Config
 			public bool WarnOnUnsatisfiedGuidingRequirements = false;
 			public bool RecoverFromLostTracking = true;
 			public bool PlaySound = true;
+			public TrackingEngine SelectedEngine;
 		}
 
 		public class SpecialSettings

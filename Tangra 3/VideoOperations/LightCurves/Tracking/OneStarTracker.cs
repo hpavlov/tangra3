@@ -71,7 +71,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 			if (OccultedStar.IsLocated)
 			{
-                OccultedStar.LastKnownGoodPosition = new ImagePixel(OccultedStar.ThisFrameX, OccultedStar.ThisFrameY);	
+				OccultedStar.LastKnownGoodPosition = new ImagePixel(OccultedStar.Center);	
 			}
         }
 
@@ -159,7 +159,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
                     if (fluckDiff < 1)
                     {
-                        OccultedStar.ThisFrameFit = gaussian;
+                        OccultedStar.PSFFit = gaussian;
                         OccultedStar.ThisFrameX = (float)gaussian.XCenter;
                         OccultedStar.ThisFrameY = (float)gaussian.YCenter;
                         OccultedStar.ThisSignalLevel = (float)(gaussian.IMax - gaussian.I0);
@@ -172,8 +172,8 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 						// This is the Occulted Star, so no brightness fluctoations can be used as excuses!
 						FitObjectInLimitedArea(OccultedStar, astroImage, expectedX, expectedY);
 						OccultedStar.SetIsLocated(
-							LightCurveReductionContext.Instance.FullDisappearance || OccultedStar.ThisFrameFit != null,
-							LightCurveReductionContext.Instance.FullDisappearance || OccultedStar.ThisFrameFit != null
+							LightCurveReductionContext.Instance.FullDisappearance || OccultedStar.PSFFit != null,
+							LightCurveReductionContext.Instance.FullDisappearance || OccultedStar.PSFFit != null
 								? NotMeasuredReasons.TrackedSuccessfully
 								: NotMeasuredReasons.DistanceToleranceTooHighForNonFullDisappearingOccultedStar);
 
@@ -209,7 +209,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
             if (OccultedStar.IsLocated)
             {
-                m_PreviousPositions.Add(new ImagePixel(OccultedStar.ThisFrameX, OccultedStar.ThisFrameY));
+                m_PreviousPositions.Add(new ImagePixel(OccultedStar.Center));
                 m_PreviousPositionFrameIds.Add(m_FrameNo);
             }
 

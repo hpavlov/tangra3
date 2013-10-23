@@ -12,6 +12,7 @@ Features:
      - Abstract the tracking as set of interfaces. Make it possible this abstraction to be used by OccuRec too
 	 - Make it possible to switch between different implementations
 	 - Do a second implementation from scratch, tune it and use it.
+  - Make it possible to measure in video fields
   - Add OCR option for AVI videos
 
 Bugs:

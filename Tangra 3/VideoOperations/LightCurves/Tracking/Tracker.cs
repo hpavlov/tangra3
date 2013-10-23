@@ -261,7 +261,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
                     if (!trackedObject.HasRefinedPositions || fluckDiff < 1)
                     {
-                        trackedObject.ThisFrameFit = gaussian;
+                        trackedObject.PSFFit = gaussian;
                         trackedObject.ThisFrameX = (float)gaussian.XCenter;
                         trackedObject.ThisFrameY = (float)gaussian.YCenter;
                         trackedObject.ThisSignalLevel = (float)(gaussian.IMax - gaussian.I0);
@@ -467,7 +467,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
             trackedObject.ThisFrameX = (float)averageX;
             trackedObject.ThisFrameY = (float)averageY;
-            trackedObject.ThisFrameFit = null;
+            trackedObject.PSFFit = null;
             trackedObject.ThisSignalLevel = float.NaN;
 
             List<TrackedObject> resolvedGuidingStars = LocateFirstObjects.FindAll(o => o.IsLocated);
@@ -484,7 +484,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                     trackedObject.RegisterRefinedPosition(
                         new ImagePixel(trackedObject.ThisFrameX, trackedObject.ThisFrameY), 
                         trackedObject.ThisSignalLevel,
-                        trackedObject.ThisFrameFit != null ? trackedObject.ThisFrameFit.FWHM : double.NaN);
+						trackedObject.PSFFit != null ? trackedObject.PSFFit.FWHM : double.NaN);
             }            
         }
 
@@ -498,7 +498,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			trackedObject.SetIsLocated(true, NotMeasuredReasons.FixedObject);
             trackedObject.ThisFrameX = (float)averageX;
             trackedObject.ThisFrameY = (float)averageY;
-            trackedObject.ThisFrameFit = null;
+			trackedObject.PSFFit = null;
             trackedObject.ThisSignalLevel = float.NaN;
         }
 
@@ -543,7 +543,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                     if (dist <= PositionTolerance)
                     {
 						isTooFar = false;
-                        trackedObject.ThisFrameFit = gaussian;
+						trackedObject.PSFFit = gaussian;
                         trackedObject.ThisFrameX = (float)gaussian.XCenter;
                         trackedObject.ThisFrameY = (float)gaussian.YCenter;
                         trackedObject.ThisSignalLevel = (float)(gaussian.IMax - gaussian.I0);
@@ -553,7 +553,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                 }
             }
 
-            trackedObject.ThisFrameFit = null;
+			trackedObject.PSFFit = null;
             trackedObject.ThisFrameX = startingX;
             trackedObject.ThisFrameY = startingY;
 			trackedObject.SetIsLocated(false, 
@@ -576,7 +576,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
                 trackedObject.ThisFrameX = (float)averageX + 0.5f;
                 trackedObject.ThisFrameY = (float)averageY + 0.5f;
-                trackedObject.ThisFrameFit = null;
+				trackedObject.PSFFit = null;
                 trackedObject.ThisSignalLevel = float.NaN;
 
                 int x0 = (int) Math.Round(averageX);
@@ -633,7 +633,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 					if (!trackedObject.IsLocated)
 						trackedObject.SetIsLocated(true, NotMeasuredReasons.FullyDisappearingStarMarkedTrackedWithoutBeingFound);
 
-                    trackedObject.ThisFrameFit = gaussian;
+					trackedObject.PSFFit = gaussian;
                     trackedObject.ThisSignalLevel = (float)(gaussian.IMax - gaussian.I0);
                     
                     trackedObject.ThisFrameX = (float)gaussian.XCenter;
@@ -732,7 +732,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
                             foreach(TrackedObject obj in LocateFirstObjects)
                             {
-                                obj.ThisFrameFit = null;
+								obj.PSFFit = null;
                                 obj.ThisFrameX = obj.LastFrameX;
                                 obj.ThisFrameY = obj.LastFrameY;
 								obj.SetIsLocated(false, NotMeasuredReasons.FitSuspectAsNoGuidingStarsAreLocated);
@@ -761,7 +761,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                                 expectedY < RefinedAverageFWHM || expectedY > astroImage.Height - RefinedAverageFWHM)
                             {
                                 // The expected position in Off Screen.     
-                                obj.ThisFrameFit = null;
+								obj.PSFFit = null;
                                 obj.ThisFrameX = float.NaN;
                                 obj.ThisFrameY = float.NaN;
                                 obj.SetIsLocated(false, NotMeasuredReasons.ObjectExpectedPositionIsOffScreen);
@@ -779,7 +779,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                                 if (distance <= 2 * PositionTolerance)
                                 {
                                     // Object successfully located
-                                    obj.ThisFrameFit = gaussian;
+									obj.PSFFit = gaussian;
                                     obj.ThisFrameX = (float)gaussian.XCenter;
                                     obj.ThisFrameY = (float)gaussian.YCenter;
 									obj.SetIsLocated(true, NotMeasuredReasons.TrackedSuccessfullyAfterDistanceCheck);
@@ -787,7 +787,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                                 }
                                 else
                                 {
-                                    obj.ThisFrameFit = null;
+									obj.PSFFit = null;
                                     obj.ThisFrameX = (float)expectedX;
                                     obj.ThisFrameY = (float)expectedY;
 									obj.SetIsLocated(false, NotMeasuredReasons.FailedToLocateAfterDistanceCheck);
@@ -830,7 +830,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                                 if (distance <= 2 * PositionTolerance)
                                 {
                                     // Object successfully located
-                                    badObject.ThisFrameFit = gaussian;
+									badObject.PSFFit = gaussian;
                                     badObject.ThisFrameX = (float)gaussian.XCenter;
                                     badObject.ThisFrameY = (float)gaussian.YCenter;
 									badObject.SetIsLocated(true, NotMeasuredReasons.TrackedSuccessfullyAfterDistanceCheck);
@@ -838,7 +838,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                                 }
                                 else
                                 {
-                                    badObject.ThisFrameFit = null;
+									badObject.PSFFit = null;
                                     badObject.ThisFrameX = (float)expectedX;
                                     badObject.ThisFrameY = (float)expectedY;
 									badObject.SetIsLocated(false, NotMeasuredReasons.FailedToLocateAfterDistanceCheck);
@@ -879,7 +879,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
                             if (fluckDiff < 1)
                             {
-                                obj1.ThisFrameFit = gaussian;
+								obj1.PSFFit = gaussian;
                                 obj1.ThisFrameX = (float) gaussian.XCenter;
                                 obj1.ThisFrameY = (float) gaussian.YCenter;
                                 obj1.ThisSignalLevel = (float) (gaussian.IMax - gaussian.I0);
@@ -901,7 +901,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
                 if (!obj1.IsLocated)
                 {
-                    obj1.ThisFrameFit = null;
+					obj1.PSFFit = null;
                     obj1.ThisFrameX = obj1.LastFrameX;
                     obj1.ThisFrameY = obj1.LastFrameY;
                     obj1.ThisSignalLevel = obj1.LastSignalLevel;

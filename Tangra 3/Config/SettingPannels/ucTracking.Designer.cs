@@ -44,19 +44,26 @@
 			this.label4 = new System.Windows.Forms.Label();
 			this.label11 = new System.Windows.Forms.Label();
 			this.groupControl1 = new System.Windows.Forms.GroupBox();
-			this.nudMinAboveMedian = new System.Windows.Forms.NumericUpDown();
+			this.cbxTrackingEngine = new System.Windows.Forms.ComboBox();
+			this.label2 = new System.Windows.Forms.Label();
+			this.tabControl1 = new System.Windows.Forms.TabControl();
+			this.tabPage1 = new System.Windows.Forms.TabPage();
 			this.nudRefiningFrames = new System.Windows.Forms.NumericUpDown();
+			this.cbxRecoverFromLostTracking = new System.Windows.Forms.CheckBox();
+			this.cbxPlaySound = new System.Windows.Forms.CheckBox();
+			this.tabPage2 = new System.Windows.Forms.TabPage();
+			this.nudMinAboveMedian = new System.Windows.Forms.NumericUpDown();
 			this.nudMinSNRatio = new System.Windows.Forms.NumericUpDown();
 			this.cbWarnOnUnsatisfiedGuidingRequirements = new System.Windows.Forms.CheckBox();
-			this.cbxPlaySound = new System.Windows.Forms.CheckBox();
-			this.cbxRecoverFromLostTracking = new System.Windows.Forms.CheckBox();
 			this.pnlRecoverySettings.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.tbRecoveryTolerance)).BeginInit();
 			this.groupBox2.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nudInterlacedCorrection)).BeginInit();
 			this.groupControl1.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.nudMinAboveMedian)).BeginInit();
+			this.tabControl1.SuspendLayout();
+			this.tabPage1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nudRefiningFrames)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudMinAboveMedian)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudMinSNRatio)).BeginInit();
 			this.SuspendLayout();
 			// 
@@ -66,7 +73,7 @@
 			this.pnlRecoverySettings.Controls.Add(this.label10);
 			this.pnlRecoverySettings.Controls.Add(this.label23);
 			this.pnlRecoverySettings.Controls.Add(this.tbRecoveryTolerance);
-			this.pnlRecoverySettings.Location = new System.Drawing.Point(250, 30);
+			this.pnlRecoverySettings.Location = new System.Drawing.Point(31, 31);
 			this.pnlRecoverySettings.Name = "pnlRecoverySettings";
 			this.pnlRecoverySettings.Size = new System.Drawing.Size(201, 80);
 			this.pnlRecoverySettings.TabIndex = 39;
@@ -116,7 +123,7 @@
 			this.groupBox2.Controls.Add(this.label15);
 			this.groupBox2.Controls.Add(this.nudInterlacedCorrection);
 			this.groupBox2.Controls.Add(this.label16);
-			this.groupBox2.Location = new System.Drawing.Point(373, 169);
+			this.groupBox2.Location = new System.Drawing.Point(373, 265);
 			this.groupBox2.Name = "groupBox2";
 			this.groupBox2.Size = new System.Drawing.Size(358, 54);
 			this.groupBox2.TabIndex = 33;
@@ -185,7 +192,7 @@
 			// label18
 			// 
 			this.label18.AutoSize = true;
-			this.label18.Location = new System.Drawing.Point(90, 197);
+			this.label18.Location = new System.Drawing.Point(90, 294);
 			this.label18.Name = "label18";
 			this.label18.Size = new System.Drawing.Size(134, 13);
 			this.label18.TabIndex = 31;
@@ -195,7 +202,7 @@
 			// 
 			this.label5.AutoSize = true;
 			this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-			this.label5.Location = new System.Drawing.Point(24, 149);
+			this.label5.Location = new System.Drawing.Point(7, 246);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(168, 13);
 			this.label5.TabIndex = 25;
@@ -204,7 +211,7 @@
 			// label4
 			// 
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(24, 47);
+			this.label4.Location = new System.Drawing.Point(276, 30);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(86, 13);
 			this.label4.TabIndex = 21;
@@ -213,7 +220,7 @@
 			// label11
 			// 
 			this.label11.AutoSize = true;
-			this.label11.Location = new System.Drawing.Point(24, 171);
+			this.label11.Location = new System.Drawing.Point(24, 268);
 			this.label11.Name = "label11";
 			this.label11.Size = new System.Drawing.Size(200, 13);
 			this.label11.TabIndex = 23;
@@ -221,35 +228,71 @@
 			// 
 			// groupControl1
 			// 
+			this.groupControl1.Controls.Add(this.cbxTrackingEngine);
+			this.groupControl1.Controls.Add(this.label2);
+			this.groupControl1.Controls.Add(this.tabControl1);
 			this.groupControl1.Controls.Add(this.nudMinAboveMedian);
-			this.groupControl1.Controls.Add(this.nudRefiningFrames);
 			this.groupControl1.Controls.Add(this.nudMinSNRatio);
 			this.groupControl1.Controls.Add(this.cbWarnOnUnsatisfiedGuidingRequirements);
-			this.groupControl1.Controls.Add(this.cbxPlaySound);
-			this.groupControl1.Controls.Add(this.cbxRecoverFromLostTracking);
-			this.groupControl1.Controls.Add(this.pnlRecoverySettings);
-			this.groupControl1.Controls.Add(this.label4);
 			this.groupControl1.Controls.Add(this.label11);
 			this.groupControl1.Controls.Add(this.groupBox2);
 			this.groupControl1.Controls.Add(this.label5);
 			this.groupControl1.Controls.Add(this.label18);
 			this.groupControl1.Location = new System.Drawing.Point(3, 3);
 			this.groupControl1.Name = "groupControl1";
-			this.groupControl1.Size = new System.Drawing.Size(464, 308);
+			this.groupControl1.Size = new System.Drawing.Size(464, 348);
 			this.groupControl1.TabIndex = 5;
 			this.groupControl1.TabStop = false;
 			this.groupControl1.Text = "Object Tracking";
 			// 
-			// nudMinAboveMedian
+			// cbxTrackingEngine
 			// 
-			this.nudMinAboveMedian.Location = new System.Drawing.Point(229, 168);
-			this.nudMinAboveMedian.Name = "nudMinAboveMedian";
-			this.nudMinAboveMedian.Size = new System.Drawing.Size(47, 20);
-			this.nudMinAboveMedian.TabIndex = 44;
+			this.cbxTrackingEngine.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.cbxTrackingEngine.Items.AddRange(new object[] {
+            "Tracking with Refining",
+            "Ad-hoc Tracking"});
+			this.cbxTrackingEngine.Location = new System.Drawing.Point(102, 18);
+			this.cbxTrackingEngine.Name = "cbxTrackingEngine";
+			this.cbxTrackingEngine.Size = new System.Drawing.Size(152, 21);
+			this.cbxTrackingEngine.TabIndex = 48;
+			// 
+			// label2
+			// 
+			this.label2.AutoSize = true;
+			this.label2.Location = new System.Drawing.Point(11, 22);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(88, 13);
+			this.label2.TabIndex = 47;
+			this.label2.Text = "Tracking Engine:";
+			// 
+			// tabControl1
+			// 
+			this.tabControl1.Controls.Add(this.tabPage1);
+			this.tabControl1.Controls.Add(this.tabPage2);
+			this.tabControl1.Location = new System.Drawing.Point(6, 54);
+			this.tabControl1.Name = "tabControl1";
+			this.tabControl1.SelectedIndex = 0;
+			this.tabControl1.Size = new System.Drawing.Size(451, 178);
+			this.tabControl1.TabIndex = 6;
+			// 
+			// tabPage1
+			// 
+			this.tabPage1.Controls.Add(this.label4);
+			this.tabPage1.Controls.Add(this.nudRefiningFrames);
+			this.tabPage1.Controls.Add(this.pnlRecoverySettings);
+			this.tabPage1.Controls.Add(this.cbxRecoverFromLostTracking);
+			this.tabPage1.Controls.Add(this.cbxPlaySound);
+			this.tabPage1.Location = new System.Drawing.Point(4, 22);
+			this.tabPage1.Name = "tabPage1";
+			this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+			this.tabPage1.Size = new System.Drawing.Size(443, 152);
+			this.tabPage1.TabIndex = 0;
+			this.tabPage1.Text = "Tracking with Refining";
+			this.tabPage1.UseVisualStyleBackColor = true;
 			// 
 			// nudRefiningFrames
 			// 
-			this.nudRefiningFrames.Location = new System.Drawing.Point(116, 44);
+			this.nudRefiningFrames.Location = new System.Drawing.Point(368, 27);
 			this.nudRefiningFrames.Maximum = new decimal(new int[] {
             64,
             0,
@@ -269,38 +312,55 @@
             0,
             0});
 			// 
+			// cbxRecoverFromLostTracking
+			// 
+			this.cbxRecoverFromLostTracking.Location = new System.Drawing.Point(6, 6);
+			this.cbxRecoverFromLostTracking.Name = "cbxRecoverFromLostTracking";
+			this.cbxRecoverFromLostTracking.Size = new System.Drawing.Size(226, 19);
+			this.cbxRecoverFromLostTracking.TabIndex = 6;
+			this.cbxRecoverFromLostTracking.Text = "Try automatic recovery from lost tracking";
+			this.cbxRecoverFromLostTracking.CheckedChanged += new System.EventHandler(this.cbxRecoverFromLostTracking_CheckedChanged);
+			// 
+			// cbxPlaySound
+			// 
+			this.cbxPlaySound.Location = new System.Drawing.Point(6, 121);
+			this.cbxPlaySound.Name = "cbxPlaySound";
+			this.cbxPlaySound.Size = new System.Drawing.Size(282, 19);
+			this.cbxPlaySound.TabIndex = 40;
+			this.cbxPlaySound.Text = "Play sound on lost tracking and end of measurement";
+			// 
+			// tabPage2
+			// 
+			this.tabPage2.Location = new System.Drawing.Point(4, 22);
+			this.tabPage2.Name = "tabPage2";
+			this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+			this.tabPage2.Size = new System.Drawing.Size(443, 152);
+			this.tabPage2.TabIndex = 1;
+			this.tabPage2.Text = "Ad-hoc Tracking";
+			this.tabPage2.UseVisualStyleBackColor = true;
+			// 
+			// nudMinAboveMedian
+			// 
+			this.nudMinAboveMedian.Location = new System.Drawing.Point(229, 265);
+			this.nudMinAboveMedian.Name = "nudMinAboveMedian";
+			this.nudMinAboveMedian.Size = new System.Drawing.Size(47, 20);
+			this.nudMinAboveMedian.TabIndex = 44;
+			// 
 			// nudMinSNRatio
 			// 
 			this.nudMinSNRatio.DecimalPlaces = 1;
-			this.nudMinSNRatio.Location = new System.Drawing.Point(229, 194);
+			this.nudMinSNRatio.Location = new System.Drawing.Point(229, 291);
 			this.nudMinSNRatio.Name = "nudMinSNRatio";
 			this.nudMinSNRatio.Size = new System.Drawing.Size(47, 20);
 			this.nudMinSNRatio.TabIndex = 42;
 			// 
 			// cbWarnOnUnsatisfiedGuidingRequirements
 			// 
-			this.cbWarnOnUnsatisfiedGuidingRequirements.Location = new System.Drawing.Point(25, 221);
+			this.cbWarnOnUnsatisfiedGuidingRequirements.Location = new System.Drawing.Point(25, 318);
 			this.cbWarnOnUnsatisfiedGuidingRequirements.Name = "cbWarnOnUnsatisfiedGuidingRequirements";
 			this.cbWarnOnUnsatisfiedGuidingRequirements.Size = new System.Drawing.Size(282, 19);
 			this.cbWarnOnUnsatisfiedGuidingRequirements.TabIndex = 41;
 			this.cbWarnOnUnsatisfiedGuidingRequirements.Text = "Warn on unsatisfied guiding star requirements";
-			// 
-			// cbxPlaySound
-			// 
-			this.cbxPlaySound.Location = new System.Drawing.Point(25, 116);
-			this.cbxPlaySound.Name = "cbxPlaySound";
-			this.cbxPlaySound.Size = new System.Drawing.Size(282, 19);
-			this.cbxPlaySound.TabIndex = 40;
-			this.cbxPlaySound.Text = "Play sound on lost tracking and end of measurement";
-			// 
-			// cbxRecoverFromLostTracking
-			// 
-			this.cbxRecoverFromLostTracking.Location = new System.Drawing.Point(25, 84);
-			this.cbxRecoverFromLostTracking.Name = "cbxRecoverFromLostTracking";
-			this.cbxRecoverFromLostTracking.Size = new System.Drawing.Size(226, 19);
-			this.cbxRecoverFromLostTracking.TabIndex = 6;
-			this.cbxRecoverFromLostTracking.Text = "Try automatic recovery from lost tracking";
-			this.cbxRecoverFromLostTracking.CheckedChanged += new System.EventHandler(this.cbxRecoverFromLostTracking_CheckedChanged);
 			// 
 			// ucTracking
 			// 
@@ -309,7 +369,7 @@
 			this.BackColor = System.Drawing.SystemColors.Control;
 			this.Controls.Add(this.groupControl1);
 			this.Name = "ucTracking";
-			this.Size = new System.Drawing.Size(949, 366);
+			this.Size = new System.Drawing.Size(473, 366);
 			this.pnlRecoverySettings.ResumeLayout(false);
 			this.pnlRecoverySettings.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.tbRecoveryTolerance)).EndInit();
@@ -318,8 +378,11 @@
 			((System.ComponentModel.ISupportInitialize)(this.nudInterlacedCorrection)).EndInit();
 			this.groupControl1.ResumeLayout(false);
 			this.groupControl1.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.nudMinAboveMedian)).EndInit();
+			this.tabControl1.ResumeLayout(false);
+			this.tabPage1.ResumeLayout(false);
+			this.tabPage1.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nudRefiningFrames)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudMinAboveMedian)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudMinSNRatio)).EndInit();
 			this.ResumeLayout(false);
 
@@ -349,5 +412,10 @@
 		private System.Windows.Forms.NumericUpDown nudRefiningFrames;
 		private System.Windows.Forms.NumericUpDown nudMinAboveMedian;
 		private System.Windows.Forms.TrackBar tbRecoveryTolerance;
+		private System.Windows.Forms.TabControl tabControl1;
+		private System.Windows.Forms.TabPage tabPage1;
+		private System.Windows.Forms.TabPage tabPage2;
+		private System.Windows.Forms.ComboBox cbxTrackingEngine;
+		private System.Windows.Forms.Label label2;
 	}
 }
