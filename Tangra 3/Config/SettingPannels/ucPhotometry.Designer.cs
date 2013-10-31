@@ -54,6 +54,8 @@
 			this.label1 = new System.Windows.Forms.Label();
 			this.nudSNFrameWindow = new System.Windows.Forms.NumericUpDown();
 			this.label25 = new System.Windows.Forms.Label();
+			this.label2 = new System.Windows.Forms.Label();
+			this.cbxPsfOptimization = new System.Windows.Forms.ComboBox();
 			this.groupControl2.SuspendLayout();
 			this.pnlSeeingSettings.SuspendLayout();
 			this.pnlUserSeeing.SuspendLayout();
@@ -68,6 +70,8 @@
 			// 
 			// groupControl2
 			// 
+			this.groupControl2.Controls.Add(this.cbxPsfOptimization);
+			this.groupControl2.Controls.Add(this.label2);
 			this.groupControl2.Controls.Add(this.cbxPsfQuadrature);
 			this.groupControl2.Controls.Add(this.cbxPsfFittingMethod);
 			this.groupControl2.Controls.Add(this.pnlSeeingSettings);
@@ -327,6 +331,27 @@
 			this.label25.TabIndex = 57;
 			this.label25.Text = "Num Frames for S/N Computation:";
 			// 
+			// label2
+			// 
+			this.label2.AutoSize = true;
+			this.label2.Location = new System.Drawing.Point(13, 226);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(67, 13);
+			this.label2.TabIndex = 40;
+			this.label2.Text = "Optimization:";
+			// 
+			// cbxPsfOptimization
+			// 
+			this.cbxPsfOptimization.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.cbxPsfOptimization.Items.AddRange(new object[] {
+            "Fully Managed",
+            "Mixed",
+            "Fully Native"});
+			this.cbxPsfOptimization.Location = new System.Drawing.Point(16, 242);
+			this.cbxPsfOptimization.Name = "cbxPsfOptimization";
+			this.cbxPsfOptimization.Size = new System.Drawing.Size(185, 21);
+			this.cbxPsfOptimization.TabIndex = 41;
+			// 
 			// ucPhotometry
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -386,5 +411,7 @@
         private System.Windows.Forms.RadioButton rbSeeingUser;
 		private System.Windows.Forms.NumericUpDown nudSNFrameWindow;
 		private System.Windows.Forms.Label label25;
+		private System.Windows.Forms.ComboBox cbxPsfOptimization;
+		private System.Windows.Forms.Label label2;
 	}
 }

@@ -81,6 +81,17 @@ namespace Tangra.Controller
             videoFileView.SetFramePlayer(m_FramePlayer);
 
 			CloseOpenedVideoFile();
+
+			InitialisePersistedSettings();
+		}
+
+		private void InitialisePersistedSettings()
+		{
+			m_DisplayHueIntensityMode = TangraConfig.Settings.Generic.UseHueIntensityDisplayMode;
+			m_MainForm.tsmiHueIntensity.Checked = TangraConfig.Settings.Generic.UseHueIntensityDisplayMode;
+
+			m_DisplayInvertedMode = TangraConfig.Settings.Generic.UseInvertedDisplayMode;
+			m_MainForm.tsmiInverted.Checked = TangraConfig.Settings.Generic.UseInvertedDisplayMode;
 		}
 
 		public void SetLightCurveController(LightCurveController lightCurveController)
@@ -679,6 +690,9 @@ namespace Tangra.Controller
 		{
 			m_DisplayInvertedMode = inverted;
 
+			TangraConfig.Settings.Generic.UseInvertedDisplayMode = inverted;
+			TangraConfig.Settings.Save();
+
 			if (!m_FramePlayer.IsRunning &&
 				m_FramePlayer.Video != null)
 			{
@@ -689,6 +703,9 @@ namespace Tangra.Controller
         public void SetDisplayHueMode(bool hueSelected)
         {
             m_DisplayHueIntensityMode = hueSelected;
+
+			TangraConfig.Settings.Generic.UseHueIntensityDisplayMode = hueSelected;
+	        TangraConfig.Settings.Save();
 
             if (!m_FramePlayer.IsRunning &&
                 m_FramePlayer.Video != null)

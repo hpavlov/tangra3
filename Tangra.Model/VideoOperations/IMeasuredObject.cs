@@ -34,7 +34,12 @@ namespace Tangra.Model.VideoOperations
         NoPixelsToMeasure = 1 << 16,
         MeasurementPSFFittingFailed = 2 << 16,
         DistanceToleranceTooHighForNonFullDisappearingOccultedStar = 3 << 16,
-        FWHMOutOfRange = 4 << 16
+        FWHMOutOfRange = 4 << 16,
+
+
+		/* Light Tracker Reasons */
+		ObjectTooElongated = 1 << 24,
+		ObjectCertaintyTooSmall = 2 << 24,
     }
 
     public interface IMeasuredObject

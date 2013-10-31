@@ -2,30 +2,68 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Tangra.Model.Astro;
+using Tangra.Model.Image;
+using Tangra.Model.VideoOperations;
 
 namespace Tangra.VideoOperations.LightCurves.Tracking
 {
-	public class TrackedObjectLight : ITrackedObject
+	internal class TrackedObjectLight : TrackedObjectBase
 	{
-		public Model.Image.IImagePixel Center { get; private set; }
+		public float RefinedFWHM;
+		public float RefinedIMAX;
 
-		public Model.Image.IImagePixel LastKnownGoodPosition { get; set; }
+		public List<double> m_RecentFWHMs = new List<double>();
+		public List<double> m_RecentIMAXs = new List<double>();
+ 
+		public TrackedObjectLight(byte targetNo, TrackedObjectConfig originalObject)
+			: base(targetNo, originalObject)
+		{ }
 
-		public bool IsLocated { get; private set; }
-
-		public bool IsOffScreen { get; private set; }
-
-		public ITrackedObjectConfig OriginalObject { get; private set; }
-
-		public TrackedObjectLight(ITrackedObjectConfig objectConfig)
+		public void InitializeNewTracking()
 		{
-			OriginalObject = objectConfig;
+			RefinedFWHM = float.NaN;
+			m_RecentFWHMs.Clear();
+			m_RecentIMAXs.Clear();
+
+			LastKnownGoodPosition = OriginalObject.AsImagePixel;
+			IsLocated = false;
 		}
 
+		public void NewMatchEvaluation()
+		{
+			IsLocated = false;
+			NotMeasuredReasons = NotMeasuredReasons.UnknownReason;
+		}
 
-		public int TargetNo { get; private set; }
+		public void NextFrame()
+		{
+			if (IsLocated)
+			{
+				if (m_RecentFWHMs.Count > 25) m_RecentFWHMs.RemoveAt(0);
+				m_RecentFWHMs.Add(PSFFit.FWHM);
+				RefinedFWHM = (float)m_RecentFWHMs.Average();
 
+				if (OriginalObject.TrackingType != TrackingType.OccultedStar)
+				{
+					if (m_RecentIMAXs.Count > 25) m_RecentIMAXs.RemoveAt(0);
+					m_RecentIMAXs.Add(PSFFit.IMax);
+					RefinedIMAX = (float)m_RecentIMAXs.Average();					
+				}
+			}
 
-		public Model.Astro.PSFFit PSFFit { get; private set; }
+			IsLocated = false;
+		}
+
+		public void SetTrackedObjectMatch(PSFFit psfFitMatched)
+		{
+			if (PSFFit != null && PSFFit.IsSolved)
+				LastKnownGoodPosition = new ImagePixel(Center);
+
+			PSFFit = psfFitMatched;
+			Center = new ImagePixel((uint)psfFitMatched.IMax, psfFitMatched.XCenter, psfFitMatched.YCenter);
+			IsLocated = true;
+			NotMeasuredReasons = NotMeasuredReasons.TrackedSuccessfully;
+		}
 	}
 }

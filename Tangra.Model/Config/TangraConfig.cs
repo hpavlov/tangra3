@@ -244,6 +244,8 @@ namespace Tangra.Model.Config
 
 	    public LastUsedSettings LastUsed = new LastUsedSettings();
 
+		public TuningSettings Tuning = new TuningSettings();
+
 		public class SaturationSettings
 		{
 			public byte Saturation8Bit = 250;
@@ -357,6 +359,7 @@ namespace Tangra.Model.Config
 
 		public enum TrackingEngine
 		{
+			LetTangraChoose,
 			TrackingWithRefining,
 			AdHocTracking
 		}
@@ -370,6 +373,24 @@ namespace Tangra.Model.Config
 			public bool RecoverFromLostTracking = true;
 			public bool PlaySound = true;
 			public TrackingEngine SelectedEngine;
+			public float AdHokMinCloseDistance = 1.41f;
+			public float AdHokMaxCloseDistance = 3;
+			public float AdHokMaxElongation = 150.0f; // 150%
+			public float AdHokMinCertainty = 0.1f;
+			public float AdHokMinFWHM = 1.5f;
+			public float AdHokMaxFWHM = 12.0f;
+		}
+
+		public enum PSFFittingMode
+		{
+			FullyManaged,
+			NativeMatrixManagedFitting,
+			FullyNative
+		}
+
+		public class TuningSettings
+		{
+			public PSFFittingMode PsfMode = PSFFittingMode.FullyNative;
 		}
 
 		public class SpecialSettings
@@ -471,6 +492,9 @@ namespace Tangra.Model.Config
 			public bool DarkFrameAdjustLevelToMedian = false;
 
 			public bool AcceptBetaUpdates = false;
+
+			public bool UseHueIntensityDisplayMode = false;
+			public bool UseInvertedDisplayMode = false;
 		}
 
         public class LastUsedSettings

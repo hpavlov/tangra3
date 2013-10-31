@@ -14,9 +14,22 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
         {
             // NOTE: Figure out what tracker to create based on the type of event, number of objects and their intensity
 
+			bool createRefiningTracker = TangraConfig.Settings.Tracking.SelectedEngine == TangraConfig.TrackingEngine.TrackingWithRefining;
+
+			if (TangraConfig.Settings.Tracking.SelectedEngine == TangraConfig.TrackingEngine.LetTangraChoose)
+			{
+				if (LightCurveReductionContext.Instance.WindOrShaking ||
+				    LightCurveReductionContext.Instance.StopOnLostTracking ||
+				    LightCurveReductionContext.Instance.IsDriftThrough ||
+				    LightCurveReductionContext.Instance.HighFlickering)
+				{
+					createRefiningTracker = true;
+				}
+			}
+
             if (lightCurveReductionType == LightCurveReductionType.Asteroidal)
             {
-				if (TangraConfig.Settings.Tracking.SelectedEngine == TangraConfig.TrackingEngine.TrackingWithRefining)
+				if (createRefiningTracker)
 				{
 					if (measuringStars.Count == 1)
 						return new OneStarTracker(measuringStars);

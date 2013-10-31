@@ -22,7 +22,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 		protected static uint FLAG_OFFSCREEN = 0x00000100;
 
-		public uint GetLCMeasurementFlags()
+		public virtual uint GetLCMeasurementFlags()
 		{
 			uint flags = 0;
 
@@ -89,7 +89,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			out NotMeasuredReasons secondFlags,
 			out NotMeasuredReasons thirdFlags)
 		{
-			int firstLevel = (int)flags & 0x7;
+			int firstLevel = (int)flags & 0x7;			
 			int secondLevel = ((int)flags >> 3) & 0x7;
 			int thirdLevel = ((int)flags >> 6) & 0x3;
 
@@ -127,6 +127,10 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 			if ((flags & FLAG_OFFSCREEN) != 0)
 				firstFlags = NotMeasuredReasons.ObjectExpectedPositionIsOffScreen;
+			else if ((flags & (int)NotMeasuredReasons.ObjectCertaintyTooSmall) != 0)
+				firstFlags = NotMeasuredReasons.ObjectCertaintyTooSmall;
+			else if ((flags & (int)NotMeasuredReasons.ObjectTooElongated) != 0)
+				firstFlags = NotMeasuredReasons.ObjectTooElongated;
 
 			return TranslateFlags(firstFlags, secondFlags, thirdFlags);
 		}
@@ -191,6 +195,12 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 				case NotMeasuredReasons.FWHMOutOfRange:
 					return "W:Measuring:The FWHM of the PSF fit was out of the expected range";
+
+				case NotMeasuredReasons.ObjectCertaintyTooSmall:
+					return "W:Measuring:The certainty of the located object is too small";
+
+				case NotMeasuredReasons.ObjectTooElongated:
+					return "W:Measuring:The object was rejected as being too elongated";
 			}
 
 			return null;
@@ -222,6 +232,22 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			NotMeasuredReasons = (NotMeasuredReasons)((int)NotMeasuredReasons & 0x00FFFF) | reason;
 		}
 
+		public virtual void SetIsTracked(bool isMeasured, NotMeasuredReasons reason, PSFFit currentlyEstimatedfit)
+		{
+			IsLocated = isMeasured;
+			if (isMeasured)
+				NotMeasuredReasons = NotMeasuredReasons.TrackedSuccessfully;
+			else
+			{
+				// Remove the Tracked Successfully flag if set
+				NotMeasuredReasons = (NotMeasuredReasons)((int)NotMeasuredReasons & ~(int)NotMeasuredReasons.TrackedSuccessfully);
+
+				NotMeasuredReasons = (NotMeasuredReasons) ((int) NotMeasuredReasons & 0x00FFFF) | reason;
+				if (currentlyEstimatedfit != null)
+					PSFFit = currentlyEstimatedfit;
+			}
+		}
+
 		public bool IsOcultedStar { get; protected set; }
 
 		public int PsfFitMatrixSize { get; protected set; }
@@ -234,21 +260,25 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 		public virtual float RefinedOrLastSignalLevel { get; protected set; }
 
 		public PSFFit PSFFit { get; set; }
+
+		public TrackedObjectBase(byte targetNo, TrackedObjectConfig originalObject)
+		{
+			TargetNo = targetNo;
+			OriginalObject = originalObject;
+
+			ApertureArea = Math.PI * originalObject.ApertureInPixels * originalObject.ApertureInPixels;
+			IsOcultedStar = OriginalObject.TrackingType == TrackingType.OccultedStar;
+			PsfFitMatrixSize = OriginalObject.PsfFitMatrixSize;
+		}
 	}
 
 	internal class TrackedObject : TrackedObjectBase
     {
 		public TrackedObject(byte targetNo, TrackedObjectConfig originalObject)
+			: base(targetNo, originalObject)
 		{
-			TargetNo = targetNo;
-			OriginalObject = originalObject;
-
 			ThisFrameX = originalObject.ApertureStartingX;
 			ThisFrameY = originalObject.ApertureStartingY;
-
-			ApertureArea = Math.PI * originalObject.ApertureInPixels * originalObject.ApertureInPixels;
-			IsOcultedStar = OriginalObject.TrackingType == TrackingType.OccultedStar;
-			PsfFitMatrixSize = OriginalObject.PsfFitMatrixSize;
 		}
 
         private List<IImagePixel> RefiningPositions = new List<IImagePixel>();

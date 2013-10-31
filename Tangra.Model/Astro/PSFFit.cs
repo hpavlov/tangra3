@@ -332,12 +332,17 @@ namespace Tangra.Model.Astro
         {
             try
             {
-				if (FittingMethod == PSFFittingMethod.NonLinearFit)
-					NonLinearFit(intensity);
-				else if (FittingMethod == PSFFittingMethod.NonLinearAsymetricFit)
-					NonLinearAsymetricFit(intensity);
-				else if (FittingMethod == PSFFittingMethod.LinearFitOfAveragedModel)
-					LinearFitOfAveragedModel(intensity);
+	            if (FittingMethod == PSFFittingMethod.NonLinearFit)
+	            {
+					if (TangraConfig.Settings.Tuning.PsfMode == TangraConfig.PSFFittingMode.FullyNative)
+						NonLinearFitNative(intensity);
+					else
+						NonLinearFit(intensity, TangraConfig.Settings.Tuning.PsfMode == TangraConfig.PSFFittingMode.NativeMatrixManagedFitting);
+	            }
+	            else if (FittingMethod == PSFFittingMethod.NonLinearAsymetricFit)
+		            NonLinearAsymetricFit(intensity);
+	            else if (FittingMethod == PSFFittingMethod.LinearFitOfAveragedModel)
+		            LinearFitOfAveragedModel(intensity);
             }
             catch(Exception)
             {
@@ -346,10 +351,70 @@ namespace Tangra.Model.Astro
             }
         }
         
+		private void NonLinearFitNative(uint[,] intensity)
+		{
+			int full_width = (int)Math.Round(Math.Sqrt(intensity.Length));
+			m_MatrixSize = full_width;
+			m_HalfWidth = full_width / 2;
+
+			switch (DataRange)
+			{
+				case PSFFittingDataRange.DataRange8Bit:
+					m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation8Bit;
+					break;
+
+				case PSFFittingDataRange.DataRange12Bit:
+					m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation12Bit;
+					break;
+
+				case PSFFittingDataRange.DataRange14Bit:
+					m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation14Bit;
+					break;
+
+				default:
+					m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation8Bit;
+					break;
+			}
+
+			bool isSolved = false;
+			double iBackground = double.NaN;
+			double iStarMax = double.NaN;
+			double x0 = double.NaN;
+			double y0 = double.NaN;
+			double r0 = double.NaN;
+			double[] residuals = new double[m_MatrixSize * m_MatrixSize];
+			m_Residuals = new double[m_MatrixSize, m_MatrixSize];
+			uint[] intensityLine = new uint[intensity.Length];
+			for (int y = 0; y < intensity.GetLength(1); y++)
+			{
+				for (int x = 0; x < intensity.GetLength(0); x++)
+				{
+					intensityLine[x + y*intensity.GetLength(1)] = intensity[x, y];
+				}
+			}
+
+			TangraModelCore.EnsureBuffers(m_MatrixSize, 5);
+			TangraModelCore.DoNonLinearPfsFit(intensityLine, m_MatrixSize, (int)m_Saturation, ref isSolved, ref iBackground, ref iStarMax, ref x0, ref y0, ref r0, residuals);
+
+			m_IsSolved = isSolved;
+			m_IBackground = iBackground;
+			m_IStarMax = iStarMax;
+			m_X0 = x0;
+			m_Y0 = y0;
+			m_R0 = r0;
+
+			for (int y = 0; y < intensity.GetLength(1); y++)
+			{
+				for (int x = 0; x < intensity.GetLength(0); x++)
+				{
+					m_Residuals[x, y] = residuals[x + y * intensity.GetLength(1)];
+				}
+			}
+		}
 
         // I(x, y) = IBackground + IStarMax * Exp ( -((x - X0)*(x - X0) + (y - Y0)*(y - Y0)) / (r0 * r0))
-		private void NonLinearFit(uint[,] intensity)
-        {
+		private void NonLinearFit(uint[,] intensity, bool useNativeMatrix)
+		{
             m_IsSolved = false;
 
             try
@@ -451,10 +516,19 @@ namespace Tangra.Model.Astro
                         }
                     }
 
-                    SafeMatrix a_T = A.Transpose();
-                    SafeMatrix aa = a_T*A;
-                    SafeMatrix aa_inv = aa.Inverse();
-                    SafeMatrix Y = (aa_inv*a_T)*X;
+					SafeMatrix Y;
+
+					if (useNativeMatrix)
+					{
+						Y = TangraModelCore.SolveLinearSystemFast(A, X);
+					}
+					else
+					{
+						SafeMatrix a_T = A.Transpose();
+						SafeMatrix aa = a_T * A;
+						SafeMatrix aa_inv = aa.Inverse();
+						Y = (aa_inv * a_T) * X;						
+					}
 
                     /* we need at least 6 unsaturated pixels to solve 5 params */
                     if (nonSaturatedPixels > 6) /* Request all pixels to be good! */
@@ -506,7 +580,7 @@ namespace Tangra.Model.Astro
 		private void LinearFitOfAveragedModel(uint[,] intensity)
         {
             // First do a non linear fit to find X0 and Y0
-            NonLinearFit(intensity);
+            NonLinearFit(intensity, false);
 
             if (m_IsSolved)
             {

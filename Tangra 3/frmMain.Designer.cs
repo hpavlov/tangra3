@@ -891,7 +891,7 @@
 		private System.Windows.Forms.ToolStripMenuItem tsmiHigh;
 		private System.Windows.Forms.ToolStripMenuItem tsmiLo;
 		private System.Windows.Forms.ToolStripMenuItem tsmiOff;
-		private System.Windows.Forms.ToolStripMenuItem tsmiInverted;
+		protected internal System.Windows.Forms.ToolStripMenuItem tsmiInverted;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
 		protected internal System.Windows.Forms.OpenFileDialog openAdvFileDialog;
 		private System.Windows.Forms.ToolStripSeparator toolStripMenuItem3;
@@ -900,7 +900,7 @@
 		protected internal System.Windows.Forms.ToolStripMenuItem miLoadFlat;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem4;
         private System.Windows.Forms.ToolStripMenuItem miShowFields;
-		private System.Windows.Forms.ToolStripMenuItem tsmiHueIntensity;
+		protected internal System.Windows.Forms.ToolStripMenuItem tsmiHueIntensity;
 		protected internal System.Windows.Forms.ToolStripMenuItem miAddins;
 		private System.Windows.Forms.ToolStripMenuItem miLoadedAddins;
 		private System.Windows.Forms.ToolStripSeparator toolStripMenuItem5;

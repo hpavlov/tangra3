@@ -96,6 +96,7 @@
     <Compile Include="Helpers\AstroConvert.cs" />
     <Compile Include="Helpers\Extensions.cs" />
     <Compile Include="Helpers\PositionMemento.cs" />
+    <Compile Include="Helpers\TangraCore.cs" />
     <Compile Include="Helpers\ThreadingHelper.cs" />
     <Compile Include="ImageTools\ImageTool.cs" />
     <Compile Include="ImageTools\ObjectClickEventArgs.cs" />

@@ -20,6 +20,9 @@
     <File Name="Tangra.Pixelmap.cpp"/>
     <File Name="TangraADV.cpp"/>
     <File Name="utils.cpp"/>
+    <File Name="psf_fit.cpp"/>
+    <File Name="safe_matrix.cpp"/>
+    <File Name="Tangra.Math.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="include">
     <File Name="adv_file.h"/>
@@ -37,6 +40,9 @@
     <File Name="TangraADV.h"/>
     <File Name="cross_platform.h"/>
     <File Name="version.h"/>
+    <File Name="psf_fit.h"/>
+    <File Name="safe_matrix.h"/>
+    <File Name="Tangra.Math.h"/>
   </VirtualDirectory>
   <Settings Type="Dynamic Library">
     <GlobalSettings>

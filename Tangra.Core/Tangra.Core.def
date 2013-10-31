@@ -65,3 +65,9 @@ EXPORTS
 	;IOTAVTIOCR_SetLocationCoefficients
 	;IOTAVTIOCR_SetScaleCoefficients
 	;IOTAVTIOCR_GetCalibrationCoefficients
+	
+	; PSFFitting
+	SolveLinearSystem
+	SolveLinearSystemFast
+	LinearSystemFastInitialiseSolution
+	DoNonLinearPfsFit

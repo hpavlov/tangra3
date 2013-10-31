@@ -249,11 +249,12 @@
 			// 
 			this.cbxTrackingEngine.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.cbxTrackingEngine.Items.AddRange(new object[] {
-            "Tracking with Refining",
-            "Ad-hoc Tracking"});
+            "Let Tangra choose automatically",
+            "Tracker with automatic recovery",
+            "Basic Tracker"});
 			this.cbxTrackingEngine.Location = new System.Drawing.Point(102, 18);
 			this.cbxTrackingEngine.Name = "cbxTrackingEngine";
-			this.cbxTrackingEngine.Size = new System.Drawing.Size(152, 21);
+			this.cbxTrackingEngine.Size = new System.Drawing.Size(233, 21);
 			this.cbxTrackingEngine.TabIndex = 48;
 			// 
 			// label2
@@ -287,7 +288,7 @@
 			this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
 			this.tabPage1.Size = new System.Drawing.Size(443, 152);
 			this.tabPage1.TabIndex = 0;
-			this.tabPage1.Text = "Tracking with Refining";
+			this.tabPage1.Text = "Tracker with automatic recovery";
 			this.tabPage1.UseVisualStyleBackColor = true;
 			// 
 			// nudRefiningFrames
@@ -336,7 +337,7 @@
 			this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
 			this.tabPage2.Size = new System.Drawing.Size(443, 152);
 			this.tabPage2.TabIndex = 1;
-			this.tabPage2.Text = "Ad-hoc Tracking";
+			this.tabPage2.Text = "Simple Tracker";
 			this.tabPage2.UseVisualStyleBackColor = true;
 			// 
 			// nudMinAboveMedian

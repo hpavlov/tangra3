@@ -12,6 +12,17 @@ namespace Tangra.Model.Numerical
         private readonly int m_ColumnCount;
         private readonly int m_MatrixSize;
 
+		internal double[] GetElements()
+		{
+			return m_Elements;
+		}
+
+		internal void SetElements(double[] elements)
+		{
+			m_Elements = new double[elements.Length];
+			Array.Copy(elements, m_Elements, elements.Length);
+		}
+
         /// <summary>
         /// Number of rows of the matrix.
         /// </summary>

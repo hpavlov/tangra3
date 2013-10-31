@@ -12,6 +12,7 @@ namespace Tangra.Model.Image
 		double XDouble { get; }
 		double YDouble { get; }
 		bool IsSpecified { get; }
+		uint Brightness { get; }
 	}
 
     public class ImagePixel : IImagePixel
@@ -21,7 +22,7 @@ namespace Tangra.Model.Image
 		public double XDouble { get; private set; }
 		public double YDouble { get; private set; }
 
-        public uint Brightness;
+		public uint Brightness { get; private set; }
 
         /// <summary>
         /// This needs to be set by the code that created the ImagePixel
