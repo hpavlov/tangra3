@@ -232,6 +232,22 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			NotMeasuredReasons = (NotMeasuredReasons)((int)NotMeasuredReasons & 0x00FFFF) | reason;
 		}
 
+		public virtual void SetIsTracked(bool isMeasured, NotMeasuredReasons reason, ImagePixel estimatedCenter)
+		{
+			IsLocated = isMeasured;
+			if (isMeasured)
+				NotMeasuredReasons = NotMeasuredReasons.TrackedSuccessfully;
+			else
+			{
+				// Remove the Tracked Successfully flag if set
+				NotMeasuredReasons = (NotMeasuredReasons)((int)NotMeasuredReasons & ~(int)NotMeasuredReasons.TrackedSuccessfully);
+
+				NotMeasuredReasons = (NotMeasuredReasons)((int)NotMeasuredReasons & 0x00FFFF) | reason;
+				if (estimatedCenter != null)
+					Center = estimatedCenter;
+			}			
+		}
+
 		public virtual void SetIsTracked(bool isMeasured, NotMeasuredReasons reason, PSFFit currentlyEstimatedfit)
 		{
 			IsLocated = isMeasured;

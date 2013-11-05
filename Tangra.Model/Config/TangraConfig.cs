@@ -376,6 +376,7 @@ namespace Tangra.Model.Config
 			public float AdHokMinCloseDistance = 1.41f;
 			public float AdHokMaxCloseDistance = 3;
 			public float AdHokMaxElongation = 150.0f; // 150%
+			public bool CheckElongation = false;
 			public float AdHokMinCertainty = 0.1f;
 			public float AdHokMinFWHM = 1.5f;
 			public float AdHokMaxFWHM = 12.0f;

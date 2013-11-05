@@ -46,12 +46,22 @@
 			this.groupControl1 = new System.Windows.Forms.GroupBox();
 			this.cbxTrackingEngine = new System.Windows.Forms.ComboBox();
 			this.label2 = new System.Windows.Forms.Label();
-			this.tabControl1 = new System.Windows.Forms.TabControl();
+			this.tabRecoveryTracker = new System.Windows.Forms.TabControl();
 			this.tabPage1 = new System.Windows.Forms.TabPage();
 			this.nudRefiningFrames = new System.Windows.Forms.NumericUpDown();
 			this.cbxRecoverFromLostTracking = new System.Windows.Forms.CheckBox();
 			this.cbxPlaySound = new System.Windows.Forms.CheckBox();
-			this.tabPage2 = new System.Windows.Forms.TabPage();
+			this.tabSimplifiedTracker = new System.Windows.Forms.TabPage();
+			this.label8 = new System.Windows.Forms.Label();
+			this.nudDetectionCertainty = new System.Windows.Forms.NumericUpDown();
+			this.label7 = new System.Windows.Forms.Label();
+			this.cbxTestPSFElongation = new System.Windows.Forms.CheckBox();
+			this.label6 = new System.Windows.Forms.Label();
+			this.nudMaxElongation = new System.Windows.Forms.NumericUpDown();
+			this.label3 = new System.Windows.Forms.Label();
+			this.nudMaxFWHM = new System.Windows.Forms.NumericUpDown();
+			this.label1 = new System.Windows.Forms.Label();
+			this.nudMinFWHM = new System.Windows.Forms.NumericUpDown();
 			this.nudMinAboveMedian = new System.Windows.Forms.NumericUpDown();
 			this.nudMinSNRatio = new System.Windows.Forms.NumericUpDown();
 			this.cbWarnOnUnsatisfiedGuidingRequirements = new System.Windows.Forms.CheckBox();
@@ -60,9 +70,14 @@
 			this.groupBox2.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nudInterlacedCorrection)).BeginInit();
 			this.groupControl1.SuspendLayout();
-			this.tabControl1.SuspendLayout();
+			this.tabRecoveryTracker.SuspendLayout();
 			this.tabPage1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nudRefiningFrames)).BeginInit();
+			this.tabSimplifiedTracker.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.nudDetectionCertainty)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudMaxElongation)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudMaxFWHM)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudMinFWHM)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudMinAboveMedian)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudMinSNRatio)).BeginInit();
 			this.SuspendLayout();
@@ -230,7 +245,7 @@
 			// 
 			this.groupControl1.Controls.Add(this.cbxTrackingEngine);
 			this.groupControl1.Controls.Add(this.label2);
-			this.groupControl1.Controls.Add(this.tabControl1);
+			this.groupControl1.Controls.Add(this.tabRecoveryTracker);
 			this.groupControl1.Controls.Add(this.nudMinAboveMedian);
 			this.groupControl1.Controls.Add(this.nudMinSNRatio);
 			this.groupControl1.Controls.Add(this.cbWarnOnUnsatisfiedGuidingRequirements);
@@ -251,7 +266,7 @@
 			this.cbxTrackingEngine.Items.AddRange(new object[] {
             "Let Tangra choose automatically",
             "Tracker with automatic recovery",
-            "Basic Tracker"});
+            "Simplified tracker"});
 			this.cbxTrackingEngine.Location = new System.Drawing.Point(102, 18);
 			this.cbxTrackingEngine.Name = "cbxTrackingEngine";
 			this.cbxTrackingEngine.Size = new System.Drawing.Size(233, 21);
@@ -266,15 +281,15 @@
 			this.label2.TabIndex = 47;
 			this.label2.Text = "Tracking Engine:";
 			// 
-			// tabControl1
+			// tabRecoveryTracker
 			// 
-			this.tabControl1.Controls.Add(this.tabPage1);
-			this.tabControl1.Controls.Add(this.tabPage2);
-			this.tabControl1.Location = new System.Drawing.Point(6, 54);
-			this.tabControl1.Name = "tabControl1";
-			this.tabControl1.SelectedIndex = 0;
-			this.tabControl1.Size = new System.Drawing.Size(451, 178);
-			this.tabControl1.TabIndex = 6;
+			this.tabRecoveryTracker.Controls.Add(this.tabPage1);
+			this.tabRecoveryTracker.Controls.Add(this.tabSimplifiedTracker);
+			this.tabRecoveryTracker.Location = new System.Drawing.Point(6, 54);
+			this.tabRecoveryTracker.Name = "tabRecoveryTracker";
+			this.tabRecoveryTracker.SelectedIndex = 0;
+			this.tabRecoveryTracker.Size = new System.Drawing.Size(451, 178);
+			this.tabRecoveryTracker.TabIndex = 6;
 			// 
 			// tabPage1
 			// 
@@ -330,15 +345,170 @@
 			this.cbxPlaySound.TabIndex = 40;
 			this.cbxPlaySound.Text = "Play sound on lost tracking and end of measurement";
 			// 
-			// tabPage2
+			// tabSimplifiedTracker
 			// 
-			this.tabPage2.Location = new System.Drawing.Point(4, 22);
-			this.tabPage2.Name = "tabPage2";
-			this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPage2.Size = new System.Drawing.Size(443, 152);
-			this.tabPage2.TabIndex = 1;
-			this.tabPage2.Text = "Simple Tracker";
-			this.tabPage2.UseVisualStyleBackColor = true;
+			this.tabSimplifiedTracker.Controls.Add(this.label8);
+			this.tabSimplifiedTracker.Controls.Add(this.nudDetectionCertainty);
+			this.tabSimplifiedTracker.Controls.Add(this.label7);
+			this.tabSimplifiedTracker.Controls.Add(this.cbxTestPSFElongation);
+			this.tabSimplifiedTracker.Controls.Add(this.label6);
+			this.tabSimplifiedTracker.Controls.Add(this.nudMaxElongation);
+			this.tabSimplifiedTracker.Controls.Add(this.label3);
+			this.tabSimplifiedTracker.Controls.Add(this.nudMaxFWHM);
+			this.tabSimplifiedTracker.Controls.Add(this.label1);
+			this.tabSimplifiedTracker.Controls.Add(this.nudMinFWHM);
+			this.tabSimplifiedTracker.Location = new System.Drawing.Point(4, 22);
+			this.tabSimplifiedTracker.Name = "tabSimplifiedTracker";
+			this.tabSimplifiedTracker.Padding = new System.Windows.Forms.Padding(3);
+			this.tabSimplifiedTracker.Size = new System.Drawing.Size(443, 152);
+			this.tabSimplifiedTracker.TabIndex = 1;
+			this.tabSimplifiedTracker.Text = "Simplified tracker";
+			this.tabSimplifiedTracker.UseVisualStyleBackColor = true;
+			// 
+			// label8
+			// 
+			this.label8.AutoSize = true;
+			this.label8.Location = new System.Drawing.Point(220, 21);
+			this.label8.Name = "label8";
+			this.label8.Size = new System.Drawing.Size(144, 13);
+			this.label8.TabIndex = 52;
+			this.label8.Text = "Minimum Detection Certainty:";
+			// 
+			// nudDetectionCertainty
+			// 
+			this.nudDetectionCertainty.DecimalPlaces = 1;
+			this.nudDetectionCertainty.Location = new System.Drawing.Point(374, 18);
+			this.nudDetectionCertainty.Maximum = new decimal(new int[] {
+            3,
+            0,
+            0,
+            0});
+			this.nudDetectionCertainty.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+			this.nudDetectionCertainty.Name = "nudDetectionCertainty";
+			this.nudDetectionCertainty.Size = new System.Drawing.Size(51, 20);
+			this.nudDetectionCertainty.TabIndex = 53;
+			this.nudDetectionCertainty.Value = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+			// 
+			// label7
+			// 
+			this.label7.AutoSize = true;
+			this.label7.Location = new System.Drawing.Point(186, 117);
+			this.label7.Name = "label7";
+			this.label7.Size = new System.Drawing.Size(15, 13);
+			this.label7.TabIndex = 51;
+			this.label7.Text = "%";
+			// 
+			// cbxTestPSFElongation
+			// 
+			this.cbxTestPSFElongation.Location = new System.Drawing.Point(6, 89);
+			this.cbxTestPSFElongation.Name = "cbxTestPSFElongation";
+			this.cbxTestPSFElongation.Size = new System.Drawing.Size(187, 19);
+			this.cbxTestPSFElongation.TabIndex = 50;
+			this.cbxTestPSFElongation.Text = "Test PSF elongation";
+			this.cbxTestPSFElongation.CheckedChanged += new System.EventHandler(this.cbxTestPSFElongation_CheckedChanged);
+			// 
+			// label6
+			// 
+			this.label6.AutoSize = true;
+			this.label6.Location = new System.Drawing.Point(18, 116);
+			this.label6.Name = "label6";
+			this.label6.Size = new System.Drawing.Size(83, 13);
+			this.label6.TabIndex = 48;
+			this.label6.Text = "Max Elongation:";
+			// 
+			// nudMaxElongation
+			// 
+			this.nudMaxElongation.Location = new System.Drawing.Point(125, 114);
+			this.nudMaxElongation.Maximum = new decimal(new int[] {
+            300,
+            0,
+            0,
+            0});
+			this.nudMaxElongation.Minimum = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
+			this.nudMaxElongation.Name = "nudMaxElongation";
+			this.nudMaxElongation.Size = new System.Drawing.Size(57, 20);
+			this.nudMaxElongation.TabIndex = 49;
+			this.nudMaxElongation.Value = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
+			// 
+			// label3
+			// 
+			this.label3.AutoSize = true;
+			this.label3.Location = new System.Drawing.Point(18, 46);
+			this.label3.Name = "label3";
+			this.label3.Size = new System.Drawing.Size(91, 13);
+			this.label3.TabIndex = 46;
+			this.label3.Text = "Maximum FWHM:";
+			// 
+			// nudMaxFWHM
+			// 
+			this.nudMaxFWHM.DecimalPlaces = 1;
+			this.nudMaxFWHM.Location = new System.Drawing.Point(125, 44);
+			this.nudMaxFWHM.Maximum = new decimal(new int[] {
+            64,
+            0,
+            0,
+            0});
+			this.nudMaxFWHM.Minimum = new decimal(new int[] {
+            3,
+            0,
+            0,
+            0});
+			this.nudMaxFWHM.Name = "nudMaxFWHM";
+			this.nudMaxFWHM.Size = new System.Drawing.Size(57, 20);
+			this.nudMaxFWHM.TabIndex = 47;
+			this.nudMaxFWHM.Value = new decimal(new int[] {
+            3,
+            0,
+            0,
+            0});
+			// 
+			// label1
+			// 
+			this.label1.AutoSize = true;
+			this.label1.Location = new System.Drawing.Point(18, 20);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(88, 13);
+			this.label1.TabIndex = 44;
+			this.label1.Text = "Minimum FWHM:";
+			// 
+			// nudMinFWHM
+			// 
+			this.nudMinFWHM.DecimalPlaces = 1;
+			this.nudMinFWHM.Location = new System.Drawing.Point(125, 18);
+			this.nudMinFWHM.Maximum = new decimal(new int[] {
+            3,
+            0,
+            0,
+            0});
+			this.nudMinFWHM.Minimum = new decimal(new int[] {
+            2,
+            0,
+            0,
+            65536});
+			this.nudMinFWHM.Name = "nudMinFWHM";
+			this.nudMinFWHM.Size = new System.Drawing.Size(57, 20);
+			this.nudMinFWHM.TabIndex = 45;
+			this.nudMinFWHM.Value = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
 			// 
 			// nudMinAboveMedian
 			// 
@@ -379,10 +549,16 @@
 			((System.ComponentModel.ISupportInitialize)(this.nudInterlacedCorrection)).EndInit();
 			this.groupControl1.ResumeLayout(false);
 			this.groupControl1.PerformLayout();
-			this.tabControl1.ResumeLayout(false);
+			this.tabRecoveryTracker.ResumeLayout(false);
 			this.tabPage1.ResumeLayout(false);
 			this.tabPage1.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nudRefiningFrames)).EndInit();
+			this.tabSimplifiedTracker.ResumeLayout(false);
+			this.tabSimplifiedTracker.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.nudDetectionCertainty)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudMaxElongation)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudMaxFWHM)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudMinFWHM)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudMinAboveMedian)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudMinSNRatio)).EndInit();
 			this.ResumeLayout(false);
@@ -413,10 +589,20 @@
 		private System.Windows.Forms.NumericUpDown nudRefiningFrames;
 		private System.Windows.Forms.NumericUpDown nudMinAboveMedian;
 		private System.Windows.Forms.TrackBar tbRecoveryTolerance;
-		private System.Windows.Forms.TabControl tabControl1;
+		private System.Windows.Forms.TabControl tabRecoveryTracker;
 		private System.Windows.Forms.TabPage tabPage1;
-		private System.Windows.Forms.TabPage tabPage2;
+		private System.Windows.Forms.TabPage tabSimplifiedTracker;
 		private System.Windows.Forms.ComboBox cbxTrackingEngine;
 		private System.Windows.Forms.Label label2;
+		private System.Windows.Forms.Label label3;
+		private System.Windows.Forms.NumericUpDown nudMaxFWHM;
+		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.NumericUpDown nudMinFWHM;
+		private System.Windows.Forms.Label label8;
+		private System.Windows.Forms.NumericUpDown nudDetectionCertainty;
+		private System.Windows.Forms.Label label7;
+		private System.Windows.Forms.CheckBox cbxTestPSFElongation;
+		private System.Windows.Forms.Label label6;
+		private System.Windows.Forms.NumericUpDown nudMaxElongation;
 	}
 }

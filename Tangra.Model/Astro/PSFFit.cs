@@ -340,7 +340,7 @@ namespace Tangra.Model.Astro
 						NonLinearFit(intensity, TangraConfig.Settings.Tuning.PsfMode == TangraConfig.PSFFittingMode.NativeMatrixManagedFitting);
 	            }
 	            else if (FittingMethod == PSFFittingMethod.NonLinearAsymetricFit)
-		            NonLinearAsymetricFit(intensity);
+					NonLinearAsymetricFit(intensity, TangraConfig.Settings.Tuning.PsfMode == TangraConfig.PSFFittingMode.NativeMatrixManagedFitting);
 	            else if (FittingMethod == PSFFittingMethod.LinearFitOfAveragedModel)
 		            LinearFitOfAveragedModel(intensity);
             }
@@ -614,7 +614,7 @@ namespace Tangra.Model.Astro
         }
 
 		// I(x, y) = IBackground + IStarMax * Exp ( -(x - X0)*(x - X0)/ (rx0 * rx0) + (y - Y0)*(y - Y0) / (ry0 * ry0))
-		private void NonLinearAsymetricFit(uint[,] intensity)
+		private void NonLinearAsymetricFit(uint[,] intensity, bool useNativeMatrix)
 		{
 			m_IsSolved = false;
 
@@ -720,10 +720,19 @@ namespace Tangra.Model.Astro
 						}
 					}
 
-					SafeMatrix a_T = A.Transpose();
-					SafeMatrix aa = a_T * A;
-					SafeMatrix aa_inv = aa.Inverse();
-					SafeMatrix Y = (aa_inv * a_T) * X;
+					SafeMatrix Y;
+
+					if (useNativeMatrix)
+					{
+						Y = TangraModelCore.SolveLinearSystemFast(A, X);
+					}
+					else
+					{
+						SafeMatrix a_T = A.Transpose();
+						SafeMatrix aa = a_T * A;
+						SafeMatrix aa_inv = aa.Inverse();
+						Y = (aa_inv * a_T) * X;
+					}
 
 					/* we need at least 7 unsaturated pixels to solve 6 params */
 					if (nonSaturatedPixels > 7) /* Request all pixels to be good! */

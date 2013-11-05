@@ -18,7 +18,9 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
  
 		public TrackedObjectLight(byte targetNo, TrackedObjectConfig originalObject)
 			: base(targetNo, originalObject)
-		{ }
+		{
+			Center = new ImagePixel(originalObject.OriginalFieldCenterX, originalObject.OriginalFieldCenterY);
+		}
 
 		public void InitializeNewTracking()
 		{
@@ -38,7 +40,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 		public void NextFrame()
 		{
-			if (IsLocated)
+			if (IsLocated && PSFFit != null)
 			{
 				if (m_RecentFWHMs.Count > 25) m_RecentFWHMs.RemoveAt(0);
 				m_RecentFWHMs.Add(PSFFit.FWHM);

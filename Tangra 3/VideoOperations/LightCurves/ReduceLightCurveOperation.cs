@@ -1141,7 +1141,7 @@ namespace Tangra.VideoOperations.LightCurves
                 m_ControlPanel.Cursor = Cursors.WaitCursor;
                 try
                 {
-                    m_StackedAstroImage = m_VideoController.GetCurrentAstroImage(!LightCurveReductionContext.Instance.WindOrShaking);
+					m_StackedAstroImage = m_VideoController.GetCurrentAstroImage(false /*!LightCurveReductionContext.Instance.WindOrShaking*/);
                 }
                 finally
                 {

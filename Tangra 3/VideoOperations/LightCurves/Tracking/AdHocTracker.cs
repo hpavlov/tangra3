@@ -11,18 +11,8 @@ using Tangra.Model.VideoOperations;
 
 namespace Tangra.VideoOperations.LightCurves.Tracking
 {
-	internal class AdHocTracker : ITracker
+	internal class AdHocTracker : BaseTracker
 	{
-		private List<TrackedObjectConfig> m_TrackedObjectsConfig;
-		private List<ITrackedObject> m_TrackedObjects = new List<ITrackedObject>();
-
-		private Dictionary<int, List<List<double>>> m_PastMeasuredRelativeDistances = new Dictionary<int, List<List<double>>>();
-		private Dictionary<int, List<double>> m_PastAverageRelativeDistances = new Dictionary<int, List<double>>();
-
-		private ITrackedObject m_OccultedStar;
-		private bool m_IsFullDisappearance;
-		private bool m_IsFieldRotation;
-
 		private float MIN_SAME_STAR_DISTANCE;
 		private float MAX_AUTO_ASSUME_DUPLICATE_STAR_DISTANCE;
 		private float STELLAR_OBJECT_MAX_ELONGATION;
@@ -31,24 +21,8 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 		private float STELLAR_OBJECT_MIN_CERTAINTY;
 
 		internal AdHocTracker(List<TrackedObjectConfig> measuringStars)
+			: base(measuringStars)
 		{
-			if (measuringStars.Count > 4)
-				throw new NotSupportedException("Only up to 4 tracked objects are supported by this Tracker.");
-
-			m_TrackedObjectsConfig = measuringStars;
-
-			for (int i = 0; i < m_TrackedObjectsConfig.Count; i++)
-			{
-				var trackedObject = new TrackedObjectLight((byte) i, m_TrackedObjectsConfig[i]);
-				m_TrackedObjects.Add(trackedObject);
-
-				if (m_TrackedObjectsConfig[i].TrackingType == TrackingType.OccultedStar)
-					m_OccultedStar = trackedObject;
-			}
-
-			m_IsFullDisappearance = LightCurveReductionContext.Instance.FullDisappearance;
-			m_IsFieldRotation = LightCurveReductionContext.Instance.FieldRotation;
-
 			MIN_SAME_STAR_DISTANCE = TangraConfig.Settings.Tracking.AdHokMaxCloseDistance;
 			MAX_AUTO_ASSUME_DUPLICATE_STAR_DISTANCE = TangraConfig.Settings.Tracking.AdHokMinCloseDistance;
 			STELLAR_OBJECT_MAX_ELONGATION = TangraConfig.Settings.Tracking.AdHokMaxElongation;
@@ -57,77 +31,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			STELLAR_OBJECT_MIN_CERTAINTY = TangraConfig.Settings.Tracking.AdHokMinCertainty;
 		}
 
-		public bool IsTrackedSuccessfully { get; private set; }
-
-		public float[] RefinedFWHM
-		{
-			get
-			{
-				return m_TrackedObjects
-					.Cast<TrackedObjectLight>()
-					.Select(x => x.RefinedFWHM)
-					.ToArray();
-			}
-		}
-
-		public void InitializeNewTracking()
-		{
-			RefinedAverageFWHM = float.NaN;
-			MedianValue = uint.MinValue;
-			m_PastMeasuredRelativeDistances.Clear();
-			m_PastAverageRelativeDistances.Clear();
-
-			for (int i = 0; i < m_TrackedObjects.Count; i++)
-			{
-				((TrackedObjectLight)m_TrackedObjects[i]).InitializeNewTracking();
-
-				var averlist = new List<double>();
-				var meaList = new List<List<double>>();
-				for (int j = 0; j < m_TrackedObjects.Count; j++)
-				{
-					meaList.Add(new List<double>());
-					averlist.Add(double.NaN);
-				}
-				m_PastMeasuredRelativeDistances.Add(i, meaList);
-				m_PastAverageRelativeDistances.Add(i, averlist);
-			}
-
-			// No preliminary refining used by the AdHockTracker
-			RefiningPercentageWorkLeft = 0;
-		}
-
-		public List<ITrackedObject> TrackedObjects
-		{
-			get { return m_TrackedObjects; }
-		}
-
-		public float RefinedAverageFWHM { get; private set; }
-
-		public float PositionTolerance
-		{
-			get
-			{
-				return !float.IsNaN(RefinedAverageFWHM) 
-					? 2 * RefinedAverageFWHM
-					: m_OccultedStar.OriginalObject.PositionTolerance;
-			}
-		}
-
-		public uint MedianValue { get; private set; }
-
-		public float RefiningPercentageWorkLeft { get; private set; }
-
-		public void DoManualFrameCorrection(int manualTrackingDeltaX, int manualTrackingDeltaY)
-		{
-			throw new NotImplementedException();
-		}
-
-		public void BeginMeasurements(IAstroImage astroImage)
-		{
-			// Nothing special to do as there is no premilinary refining used by the AdHocTracker
-		}
-
-		public void NextFrame(int frameNo, IAstroImage astroImage)
+		public override void NextFrame(int frameNo, IAstroImage astroImage)
 		{
 			IsTrackedSuccessfully = false;
 

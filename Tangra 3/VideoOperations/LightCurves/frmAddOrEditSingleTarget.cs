@@ -395,6 +395,15 @@ namespace Tangra.VideoOperations.LightCurves
 					nudFitMatrixSize.SetNUDValue(m_IsEdit ? ObjectToAdd.PsfFitMatrixSize : closestFit.MatrixSize);
                 }
 
+				//if (m_Gaussian == null && gaussian.Certainty > 0.1 && ImagePixel.ComputeDistance(gaussian.X0_Matrix, 8, gaussian.Y0_Matrix, 8) < 3)
+				//{
+				//	// Id we failed to locate a bright enough autostar, but the default Gaussian is still certain enough and close enought to the center, we present it as a starting point
+				//	m_X0 = (float)gaussian.X0_Matrix;
+				//	m_Y0 = (float)gaussian.Y0_Matrix;
+				//	m_FWHM = (float)gaussian.FWHM;
+				//	m_Gaussian = gaussian;
+				//}
+
                 decimal appVal = (decimal)m_Aperture;
                 if (float.IsNaN(preselectedAperture))
                 {

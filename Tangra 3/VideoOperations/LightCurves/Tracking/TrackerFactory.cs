@@ -37,7 +37,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 						return new OccultationTracker(measuringStars);					
 				}
 				else
-					return new AdHocTracker(measuringStars);
+					return new SimplifiedTracker(measuringStars);
 
             }
             else if (lightCurveReductionType == LightCurveReductionType.UntrackedMeasurement)
