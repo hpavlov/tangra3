@@ -24,7 +24,7 @@ namespace Tangra.VideoOperations.LightCurves
 
     public class LightCurveReductionContext
     {
-        private static byte VERSION = 6;
+        private static byte VERSION = 7;
 
         public static LightCurveReductionContext Instance = new LightCurveReductionContext();
 
@@ -102,7 +102,9 @@ namespace Tangra.VideoOperations.LightCurves
             get { return ReductionMethod == TangraConfig.PhotometryReductionMethod.AperturePhotometry; }
         }
 
-        internal string ValidateObjects(List<TrackedObjectConfig> selectedObjects)
+	    public string UsedTracker = null;
+
+	    internal string ValidateObjects(List<TrackedObjectConfig> selectedObjects)
         {
             if (LightCurveReductionType == LightCurveReductionType.MutualEvent)
             {
@@ -197,6 +199,9 @@ namespace Tangra.VideoOperations.LightCurves
 
 			// Version 6 Data
 			fileWriter.Write(HasEmbeddedTimeStamps);
+
+			// Version 7 Data
+			fileWriter.Write(UsedTracker ?? string.Empty);			
         }
 
         internal static LightCurveReductionContext Load(BinaryReader reader)
@@ -224,6 +229,7 @@ namespace Tangra.VideoOperations.LightCurves
 				instance.MaxPixelValue = 255;
 				instance.DisplayBitmapConverterImpl = DisplayBitmapConverter.Default;
 				instance.HasEmbeddedTimeStamps = false;
+	            instance.UsedTracker = null;
 				#endregion 
 
                 if (version > 1)
@@ -260,6 +266,11 @@ namespace Tangra.VideoOperations.LightCurves
 								if (version > 5)
 								{
 									instance.HasEmbeddedTimeStamps = reader.ReadBoolean();
+
+									if (version > 6)
+									{
+										instance.UsedTracker = reader.ReadString();
+									}
 								}
 							}
 						}

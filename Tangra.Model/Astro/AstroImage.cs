@@ -18,6 +18,7 @@ namespace Tangra.Model.Astro
 		uint MedianNoise { get; }
 		int Width { get; }
 		int Height { get; }
+		uint[] GetPixelmapPixels();
 	}
 
 	public class AstroImage : IAstroImage
@@ -66,6 +67,11 @@ namespace Tangra.Model.Astro
 		public uint[,] GetPixelsCopy()
 		{
 			return m_Pixelmap.GetPixelsCopy();
+		}
+
+		public uint[] GetPixelmapPixels()
+		{
+			return m_Pixelmap.Pixels;
 		}
 
         private uint m_MedianNoise = UInt32.MaxValue;

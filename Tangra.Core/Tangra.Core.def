@@ -71,3 +71,9 @@ EXPORTS
 	SolveLinearSystemFast
 	LinearSystemFastInitialiseSolution
 	DoNonLinearPfsFit
+	
+	;Simplified Tracker
+	TrackerSettings
+	TrackerNewConfiguration
+	TrackerNextFrame
+	TrackerGetTargetPsf

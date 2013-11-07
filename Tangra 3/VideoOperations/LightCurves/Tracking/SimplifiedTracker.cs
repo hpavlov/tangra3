@@ -70,6 +70,8 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 				}					
 			}
 
+			bool atLeastOneObjectLocated = false;
+
 			for (int i = 0; i < m_TrackedObjects.Count; i++)
 			{
 				TrackedObjectLight trackedObject = (TrackedObjectLight) m_TrackedObjects[i];
@@ -77,6 +79,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 				double totalX = 0;
 				double totalY = 0;
 				int numReferences = 0;
+				
 				for (int j = 0; j < m_TrackedObjects.Count; j++)
 				{
 					TrackedObjectLight referenceObject = (TrackedObjectLight)m_TrackedObjects[j];
@@ -85,6 +88,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 						totalX += (trackedObject.OriginalObject.ApertureStartingX - referenceObject.OriginalObject.ApertureStartingX) + referenceObject.Center.XDouble;
 						totalY += (trackedObject.OriginalObject.ApertureStartingY - referenceObject.OriginalObject.ApertureStartingY) + referenceObject.Center.YDouble;
 						numReferences++;
+						atLeastOneObjectLocated = true;
 					}
 				}
 
@@ -94,12 +98,12 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 				}
 				else
 				{
-					double x_double = Math.Round(totalX / numReferences);
-					double y_double = Math.Round(totalY / numReferences);
+					double x_double = totalX / numReferences;
+					double y_double = totalY / numReferences;
 
 					if (trackedObject.OriginalObject.IsFixedAperture)
 					{
-						trackedObject.SetIsTracked(false, NotMeasuredReasons.TrackedSuccessfully | NotMeasuredReasons.FixedObject, new ImagePixel(x_double, y_double));
+						trackedObject.SetIsTracked(true, NotMeasuredReasons.FixedObject, new ImagePixel(x_double, y_double));
 					}
 					else if (trackedObject.OriginalObject.IsOcultedStar() && m_IsFullDisappearance)
 					{
@@ -128,6 +132,8 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 					}
 				}
 			}
+
+			IsTrackedSuccessfully = atLeastOneObjectLocated;
 		}
 	}
 }

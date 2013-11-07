@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using Tangra.Model.Astro;
@@ -23,6 +24,8 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 		void BeginMeasurements(IAstroImage astroImage);
 	}
 		
+	
+
 	public interface ITrackedObject
 	{
 		IImagePixel Center { get; }
@@ -31,7 +34,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 		bool IsOffScreen { get; }
 		ITrackedObjectConfig OriginalObject { get; }
 		int TargetNo { get; }
-		PSFFit PSFFit { get; }
+		ITrackedObjectPsfFit PSFFit { get; }
 	}
 
 	public interface ITrackedObjectConfig

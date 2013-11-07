@@ -235,17 +235,13 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 		public virtual void SetIsTracked(bool isMeasured, NotMeasuredReasons reason, ImagePixel estimatedCenter)
 		{
 			IsLocated = isMeasured;
-			if (isMeasured)
-				NotMeasuredReasons = NotMeasuredReasons.TrackedSuccessfully;
-			else
-			{
-				// Remove the Tracked Successfully flag if set
-				NotMeasuredReasons = (NotMeasuredReasons)((int)NotMeasuredReasons & ~(int)NotMeasuredReasons.TrackedSuccessfully);
 
-				NotMeasuredReasons = (NotMeasuredReasons)((int)NotMeasuredReasons & 0x00FFFF) | reason;
-				if (estimatedCenter != null)
-					Center = estimatedCenter;
-			}			
+			// Remove the Tracked Successfully flag if set
+			NotMeasuredReasons = (NotMeasuredReasons)((int)NotMeasuredReasons & ~(int)NotMeasuredReasons.TrackedSuccessfully);
+
+			NotMeasuredReasons = (NotMeasuredReasons)((int)NotMeasuredReasons & 0x00FFFF) | reason;
+			if (estimatedCenter != null)
+				Center = estimatedCenter;
 		}
 
 		public virtual void SetIsTracked(bool isMeasured, NotMeasuredReasons reason, PSFFit currentlyEstimatedfit)
@@ -285,6 +281,11 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			ApertureArea = Math.PI * originalObject.ApertureInPixels * originalObject.ApertureInPixels;
 			IsOcultedStar = OriginalObject.TrackingType == TrackingType.OccultedStar;
 			PsfFitMatrixSize = OriginalObject.PsfFitMatrixSize;
+		}
+
+		ITrackedObjectPsfFit ITrackedObject.PSFFit
+		{
+			get { return PSFFit; }
 		}
 	}
 

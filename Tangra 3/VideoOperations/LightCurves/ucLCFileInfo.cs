@@ -82,6 +82,18 @@ namespace Tangra.VideoOperations.LightCurves
         	                     m_lcFile.Footer.ReductionContext.UseClipping ||
         	                     m_lcFile.Footer.ReductionContext.UseBrightnessContrast;
         	lblPreProcessing.Text = preProcessing ? "Yes" : "No";
+
+			if (!string.IsNullOrEmpty(m_lcFile.Footer.ReductionContext.UsedTracker))
+			{
+				lblTrackerLabel.Visible = true;
+				lblTracker.Visible = true;
+				lblTracker.Text = m_lcFile.Footer.ReductionContext.UsedTracker;
+			}
+			else
+			{
+				lblTrackerLabel.Visible = false;
+				lblTracker.Visible = false;				
+			}
         }
 
 		private void btnCompleteInfo_Click(object sender, EventArgs e)

@@ -23,6 +23,7 @@
     <File Name="psf_fit.cpp"/>
     <File Name="safe_matrix.cpp"/>
     <File Name="Tangra.Math.cpp"/>
+    <File Name="simplified_tracker.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="include">
     <File Name="adv_file.h"/>
@@ -43,6 +44,7 @@
     <File Name="psf_fit.h"/>
     <File Name="safe_matrix.h"/>
     <File Name="Tangra.Math.h"/>
+    <File Name="simplified_tracker.h"/>
   </VirtualDirectory>
   <Settings Type="Dynamic Library">
     <GlobalSettings>

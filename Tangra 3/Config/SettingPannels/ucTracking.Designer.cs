@@ -65,6 +65,7 @@
 			this.nudMinAboveMedian = new System.Windows.Forms.NumericUpDown();
 			this.nudMinSNRatio = new System.Windows.Forms.NumericUpDown();
 			this.cbWarnOnUnsatisfiedGuidingRequirements = new System.Windows.Forms.CheckBox();
+			this.cbxNativeTracker = new System.Windows.Forms.CheckBox();
 			this.pnlRecoverySettings.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.tbRecoveryTolerance)).BeginInit();
 			this.groupBox2.SuspendLayout();
@@ -265,8 +266,8 @@
 			this.cbxTrackingEngine.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.cbxTrackingEngine.Items.AddRange(new object[] {
             "Let Tangra choose automatically",
-            "Tracker with automatic recovery",
-            "Simplified tracker"});
+            "Tracking with automatic recovery",
+            "Simplified tracking"});
 			this.cbxTrackingEngine.Location = new System.Drawing.Point(102, 18);
 			this.cbxTrackingEngine.Name = "cbxTrackingEngine";
 			this.cbxTrackingEngine.Size = new System.Drawing.Size(233, 21);
@@ -303,7 +304,7 @@
 			this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
 			this.tabPage1.Size = new System.Drawing.Size(443, 152);
 			this.tabPage1.TabIndex = 0;
-			this.tabPage1.Text = "Tracker with automatic recovery";
+			this.tabPage1.Text = "Tracking with automatic recovery";
 			this.tabPage1.UseVisualStyleBackColor = true;
 			// 
 			// nudRefiningFrames
@@ -347,6 +348,7 @@
 			// 
 			// tabSimplifiedTracker
 			// 
+			this.tabSimplifiedTracker.Controls.Add(this.cbxNativeTracker);
 			this.tabSimplifiedTracker.Controls.Add(this.label8);
 			this.tabSimplifiedTracker.Controls.Add(this.nudDetectionCertainty);
 			this.tabSimplifiedTracker.Controls.Add(this.label7);
@@ -362,7 +364,7 @@
 			this.tabSimplifiedTracker.Padding = new System.Windows.Forms.Padding(3);
 			this.tabSimplifiedTracker.Size = new System.Drawing.Size(443, 152);
 			this.tabSimplifiedTracker.TabIndex = 1;
-			this.tabSimplifiedTracker.Text = "Simplified tracker";
+			this.tabSimplifiedTracker.Text = "Simplified tracking";
 			this.tabSimplifiedTracker.UseVisualStyleBackColor = true;
 			// 
 			// label8
@@ -533,6 +535,14 @@
 			this.cbWarnOnUnsatisfiedGuidingRequirements.TabIndex = 41;
 			this.cbWarnOnUnsatisfiedGuidingRequirements.Text = "Warn on unsatisfied guiding star requirements";
 			// 
+			// cbxNativeTracker
+			// 
+			this.cbxNativeTracker.Location = new System.Drawing.Point(238, 89);
+			this.cbxNativeTracker.Name = "cbxNativeTracker";
+			this.cbxNativeTracker.Size = new System.Drawing.Size(187, 19);
+			this.cbxNativeTracker.TabIndex = 54;
+			this.cbxNativeTracker.Text = "Native";
+			// 
 			// ucTracking
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -604,5 +614,6 @@
 		private System.Windows.Forms.CheckBox cbxTestPSFElongation;
 		private System.Windows.Forms.Label label6;
 		private System.Windows.Forms.NumericUpDown nudMaxElongation;
+		private System.Windows.Forms.CheckBox cbxNativeTracker;
 	}
 }

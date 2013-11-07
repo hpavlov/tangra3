@@ -50,6 +50,8 @@
 			this.label8 = new System.Windows.Forms.Label();
 			this.btnCompleteInfo = new System.Windows.Forms.Button();
 			this.btnShowFields = new System.Windows.Forms.Button();
+			this.lblTracker = new System.Windows.Forms.Label();
+			this.lblTrackerLabel = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -250,11 +252,30 @@
 			this.btnShowFields.Text = "Show Fields";
 			this.btnShowFields.Click += new System.EventHandler(this.btnShowFields_Click);
 			// 
+			// lblTracker
+			// 
+			this.lblTracker.AutoSize = true;
+			this.lblTracker.Location = new System.Drawing.Point(130, 207);
+			this.lblTracker.Name = "lblTracker";
+			this.lblTracker.Size = new System.Drawing.Size(0, 13);
+			this.lblTracker.TabIndex = 43;
+			// 
+			// lblTrackerLabel
+			// 
+			this.lblTrackerLabel.AutoSize = true;
+			this.lblTrackerLabel.Location = new System.Drawing.Point(69, 207);
+			this.lblTrackerLabel.Name = "lblTrackerLabel";
+			this.lblTrackerLabel.Size = new System.Drawing.Size(55, 13);
+			this.lblTrackerLabel.TabIndex = 42;
+			this.lblTrackerLabel.Text = "Tracking: ";
+			// 
 			// ucLCFileInfo
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-	        this.BackColor = System.Drawing.SystemColors.Control;
+			this.BackColor = System.Drawing.SystemColors.Control;
+			this.Controls.Add(this.lblTracker);
+			this.Controls.Add(this.lblTrackerLabel);
 			this.Controls.Add(this.btnShowFields);
 			this.Controls.Add(this.btnCompleteInfo);
 			this.Controls.Add(this.lblPreProcessing);
@@ -308,5 +329,7 @@
 		private System.Windows.Forms.Label label8;
 		private System.Windows.Forms.Button btnCompleteInfo;
 		private System.Windows.Forms.Button btnShowFields;
+		private System.Windows.Forms.Label lblTracker;
+		private System.Windows.Forms.Label lblTrackerLabel;
     }
 }

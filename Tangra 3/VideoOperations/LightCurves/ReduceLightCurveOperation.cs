@@ -1072,15 +1072,23 @@ namespace Tangra.VideoOperations.LightCurves
 			m_Configuring = false;
 			m_Correcting = false;
 
-			m_Tracker = TrackerFactory.CreateTracker(
-				LightCurveReductionContext.Instance.LightCurveReductionType,
-				m_StateMachine.MeasuringStars);
-
-            if (m_StackedAstroImage == null)
+			if (m_StackedAstroImage == null)
             {
                 EnsureStackedAstroImage();
                 m_AveragedFrame = new AveragedFrame(m_StackedAstroImage);
             }
+
+	        string usedTrackerType;
+			m_Tracker = TrackerFactory.CreateTracker(
+				m_StackedAstroImage.Width,
+				m_StackedAstroImage.Height,
+				LightCurveReductionContext.Instance.LightCurveReductionType,
+				m_StateMachine.MeasuringStars,
+				out usedTrackerType);
+
+			LightCurveReductionContext.Instance.UsedTracker = usedTrackerType;
+
+           
 
 			m_Tracker.InitializeNewTracking();
 

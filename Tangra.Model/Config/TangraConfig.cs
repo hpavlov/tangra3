@@ -380,6 +380,7 @@ namespace Tangra.Model.Config
 			public float AdHokMinCertainty = 0.1f;
 			public float AdHokMinFWHM = 1.5f;
 			public float AdHokMaxFWHM = 12.0f;
+			public bool UseNativeTracker = false;
 		}
 
 		public enum PSFFittingMode

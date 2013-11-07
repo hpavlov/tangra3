@@ -82,6 +82,8 @@ namespace Tangra.VideoOperations.LightCurves
 			this.lblInfo = new System.Windows.Forms.Label();
 			this.pnlViewLightCurve = new System.Windows.Forms.Panel();
 			this.timerMoveToFirstFrame = new System.Windows.Forms.Timer(this.components);
+			this.lblUsedTracker = new System.Windows.Forms.Label();
+			this.lblUsedTrackerLabel = new System.Windows.Forms.Label();
 			this.pnlProcessing.SuspendLayout();
 			this.pnlEnterTimes.SuspendLayout();
 			this.pnlMeasureZoomOptions.SuspendLayout();
@@ -93,6 +95,7 @@ namespace Tangra.VideoOperations.LightCurves
 			// 
 			// pnlProcessing
 			// 
+			this.pnlProcessing.Controls.Add(this.lblUsedTracker);
 			this.pnlProcessing.Controls.Add(this.pnlEnterTimes);
 			this.pnlProcessing.Controls.Add(this.btnLightCurve);
 			this.pnlProcessing.Controls.Add(this.btnStop);
@@ -103,6 +106,7 @@ namespace Tangra.VideoOperations.LightCurves
 			this.pnlProcessing.Controls.Add(this.lblProcessedFrames);
 			this.pnlProcessing.Controls.Add(this.label2);
 			this.pnlProcessing.Controls.Add(this.label1);
+			this.pnlProcessing.Controls.Add(this.lblUsedTrackerLabel);
 			this.pnlProcessing.Location = new System.Drawing.Point(3, 3);
 			this.pnlProcessing.Name = "pnlProcessing";
 			this.pnlProcessing.Size = new System.Drawing.Size(261, 304);
@@ -276,7 +280,7 @@ namespace Tangra.VideoOperations.LightCurves
 			// lblSkippedFrames
 			// 
 			this.lblSkippedFrames.AutoSize = true;
-			this.lblSkippedFrames.Location = new System.Drawing.Point(116, 63);
+			this.lblSkippedFrames.Location = new System.Drawing.Point(116, 70);
 			this.lblSkippedFrames.Name = "lblSkippedFrames";
 			this.lblSkippedFrames.Size = new System.Drawing.Size(13, 13);
 			this.lblSkippedFrames.TabIndex = 4;
@@ -285,7 +289,7 @@ namespace Tangra.VideoOperations.LightCurves
 			// lblProcessedFrames
 			// 
 			this.lblProcessedFrames.AutoSize = true;
-			this.lblProcessedFrames.Location = new System.Drawing.Point(116, 45);
+			this.lblProcessedFrames.Location = new System.Drawing.Point(116, 54);
 			this.lblProcessedFrames.Name = "lblProcessedFrames";
 			this.lblProcessedFrames.Size = new System.Drawing.Size(13, 13);
 			this.lblProcessedFrames.TabIndex = 3;
@@ -294,7 +298,7 @@ namespace Tangra.VideoOperations.LightCurves
 			// label2
 			// 
 			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(32, 63);
+			this.label2.Location = new System.Drawing.Point(32, 70);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(74, 13);
 			this.label2.TabIndex = 1;
@@ -303,7 +307,7 @@ namespace Tangra.VideoOperations.LightCurves
 			// label1
 			// 
 			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(10, 45);
+			this.label1.Location = new System.Drawing.Point(10, 54);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(97, 13);
 			this.label1.TabIndex = 0;
@@ -587,6 +591,25 @@ namespace Tangra.VideoOperations.LightCurves
 			this.timerMoveToFirstFrame.Interval = 500;
 			this.timerMoveToFirstFrame.Tick += new System.EventHandler(this.timerMoveToFirstFrame_Tick);
 			// 
+			// lblUsedTracker
+			// 
+			this.lblUsedTracker.AutoSize = true;
+			this.lblUsedTracker.Location = new System.Drawing.Point(116, 38);
+			this.lblUsedTracker.Name = "lblUsedTracker";
+			this.lblUsedTracker.Size = new System.Drawing.Size(0, 13);
+			this.lblUsedTracker.TabIndex = 44;
+			this.lblUsedTracker.Visible = false;
+			// 
+			// lblUsedTrackerLabel
+			// 
+			this.lblUsedTrackerLabel.AutoSize = true;
+			this.lblUsedTrackerLabel.Location = new System.Drawing.Point(55, 38);
+			this.lblUsedTrackerLabel.Name = "lblUsedTrackerLabel";
+			this.lblUsedTrackerLabel.Size = new System.Drawing.Size(52, 13);
+			this.lblUsedTrackerLabel.TabIndex = 43;
+			this.lblUsedTrackerLabel.Text = "Tracking:";
+			this.lblUsedTrackerLabel.Visible = false;
+			// 
 			// ucLightCurves
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -668,6 +691,8 @@ namespace Tangra.VideoOperations.LightCurves
         private System.Windows.Forms.Button btnStop;
 		private System.Windows.Forms.RadioButton rbDisplayPixels;
 		private System.Windows.Forms.RadioButton rbDisplayBrightness;
+		private System.Windows.Forms.Label lblUsedTracker;
+		private System.Windows.Forms.Label lblUsedTrackerLabel;
 
     }
 }

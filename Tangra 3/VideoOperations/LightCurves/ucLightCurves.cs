@@ -210,6 +210,12 @@ namespace Tangra.VideoOperations.LightCurves
             lblProcessedFrames.Text = processedFramed.ToString();
             lblSkippedFrames.Text = unsuccessfulFrames.ToString();
             lblElapsedTime.Text = string.Format("{0}:{1}", elapsedTime / 60, (elapsedTime % 60).ToString("00"));
+			if (!lblUsedTracker.Visible)
+			{
+				lblUsedTracker.Text = LightCurveReductionContext.Instance.UsedTracker;
+				lblUsedTracker.Visible = true;
+				lblUsedTrackerLabel.Visible = true;
+			}
         }
 
         public void StopMeasurements()

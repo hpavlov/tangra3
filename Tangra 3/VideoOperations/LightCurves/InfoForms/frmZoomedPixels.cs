@@ -15,6 +15,7 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 	public partial class frmZoomedPixels : Form
 	{
 		private static Font s_TitleFont = new Font(FontFamily.GenericSerif, 8);
+		private static Font s_CoordsFont = new Font(FontFamily.GenericSerif, 6);
 
 		private frmLightCurve.LightCurveContext m_Context;
 		private LCFile m_LCFile;
@@ -257,13 +258,18 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 						2 * radius * MAGN,
 						2 * radius * MAGN);
 
-					// TODO: This is slow. Stick the title and size in the Tag and then draw directly
 					string title = m_ObjectTitles[reading.TargetNo];
 					SizeF fntSize = g.MeasureString(title, s_TitleFont);
 					g.DrawString(
 						title, s_TitleFont, m_DisplaySettings.TargetBrushes[reading.TargetNo],
 						pictureBox.Width - fntSize.Width - 5,
 						pictureBox.Height - fntSize.Height - 5);
+
+					string coords = string.Format("{0}, {1}", reading.X0.ToString("0.0"), reading.Y0.ToString("0.0"));
+					fntSize = g.MeasureString(coords, s_CoordsFont);
+
+					g.DrawString(
+						coords, s_CoordsFont, m_DisplaySettings.TargetBrushes[reading.TargetNo], pictureBox.Width - fntSize.Width - 2, 2);
 				}
 
 				g.Save();
