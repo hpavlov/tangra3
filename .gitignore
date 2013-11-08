@@ -34,6 +34,7 @@ _ReSharper.*
 /Tangra.Core/.build-debug
 /Tangra.Core/.build-release
 /Tangra.Core/.clang
+/Tangra.Core/.codelite
 /Tangra.Core/Debug
 /Tangra.Core/Makefile
 
