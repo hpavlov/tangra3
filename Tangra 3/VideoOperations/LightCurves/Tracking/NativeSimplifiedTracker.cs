@@ -14,13 +14,9 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 		internal NativeSimplifiedTracker(int width, int height, List<TrackedObjectConfig> measuringStars)
 		{
-			NativeTracking.TrackerSettings(
-				TangraConfig.Settings.Tracking.CheckElongation ? TangraConfig.Settings.Tracking.AdHokMaxElongation : 0,
-				TangraConfig.Settings.Tracking.AdHokMinFWHM,
-				TangraConfig.Settings.Tracking.AdHokMaxFWHM,
-				TangraConfig.Settings.Tracking.AdHokMinCertainty);
-
-			NativeTracking.TrackerNewConfiguration(
+			NativeTracking.ConfigureNativeTracker();
+				
+			NativeTracking.InitNewTracker(
 				width, 
 				height, 
 				measuringStars.Count, 

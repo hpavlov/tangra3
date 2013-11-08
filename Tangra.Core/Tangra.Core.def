@@ -71,9 +71,10 @@ EXPORTS
 	SolveLinearSystemFast
 	LinearSystemFastInitialiseSolution
 	DoNonLinearPfsFit
+	ConfigureSaturationLevels
 	
 	;Simplified Tracker
 	TrackerSettings
 	TrackerNewConfiguration
 	TrackerNextFrame
-	TrackerGetTargetPsf
+	TrackerGetTargetState

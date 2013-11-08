@@ -1,5 +1,6 @@
 #include "simplified_tracker.h"
 #include "stdio.h"
+#include "psf_fit.h"
 
 static double MAX_ELONGATION;
 static double MIN_FWHM;
@@ -15,23 +16,29 @@ TrackedObject::TrackedObject(long objectId, bool isFixedAperture, bool isOcculte
 	StartingX = startingX;
 	StartingY = startingY;
 	ApertureInPixels = apertureInPixels;
+	CurrentPsfFit = new PsfFit(DataRange8Bit);
+	CurrentPsfFit->FittingMethod = MAX_ELONGATION == 0 ? NonLinearFit : NonLinearAsymetricFit;
 }
 
 TrackedObject::~TrackedObject()
 {
-	
+	if (NULL != CurrentPsfFit)
+	{
+		delete CurrentPsfFit;
+		CurrentPsfFit = NULL;
+	}	
 }
 
 void TrackedObject::NextFrame()
 {
-	// TODO
+	// TODO: Do we copy the current center to last known position here?
+	
+	TrackingFlags = 0;
+	IsLocated = false;
+	IsOffScreen = false;	
 }
 
-void TrackedObject::SetTrackedObjectMatch(PsfFit* psf)
-{
-	// TODO
-}
-
+/*
 void TrackedObject::SetIsMeasured(bool isLocated, NotMeasuredReasons reason)
 {
 	// TODO: Combine SetIsMeasured() and SetIsTracked() into one
@@ -41,10 +48,20 @@ void TrackedObject::SetIsTracked(bool isLocated, NotMeasuredReasons reason, PsfF
 {
 	// TODO: Combine SetIsMeasured() and SetIsTracked() into one
 }
+ * */
 
 void TrackedObject::SetIsTracked(bool isLocated, NotMeasuredReasons reason, double x, double y)
 {
-	// TODO: Combine SetIsMeasured() and SetIsTracked() into one
+	if (isLocated)
+	{
+		LastKnownGoodPositionXDouble = CenterX;
+		LastKnownGoodPositionYDouble = CenterY;
+		CenterX = x;
+		CenterY = y;
+	}
+
+	IsLocated = isLocated;
+	TrackingFlags = (unsigned int)reason;
 }
 
 SimplifiedTracker::SimplifiedTracker(long width, long height, long numTrackedObjects, bool isFullDisappearance)
@@ -56,7 +73,9 @@ SimplifiedTracker::SimplifiedTracker(long width, long height, long numTrackedObj
 	
 	m_TrackedObjects = (TrackedObject**)malloc(numTrackedObjects * sizeof(TrackedObject*));
 	for(int i = 0; i < numTrackedObjects; i ++)
-		m_TrackedObjects[i] = NULL;
+		m_TrackedObjects[i] = NULL;	
+		
+	m_AreaPixels = (unsigned long*)malloc(sizeof(unsigned long) * MAX_MATRIX_SIZE * MAX_MATRIX_SIZE);		
 }
 
 SimplifiedTracker::~SimplifiedTracker()
@@ -72,6 +91,12 @@ SimplifiedTracker::~SimplifiedTracker()
 			}
 		}		
 	}
+	
+	if (NULL != m_AreaPixels)
+	{
+		delete m_AreaPixels;
+		m_AreaPixels = NULL;
+	}	
 }
 
 void SimplifiedTracker::ConfigureObject(long objectId, bool isFixedAperture, bool isOccultedStar, double startingX, double startingY, double apertureInPixels)
@@ -80,9 +105,26 @@ void SimplifiedTracker::ConfigureObject(long objectId, bool isFixedAperture, boo
 		m_TrackedObjects[objectId] = new TrackedObject(objectId, isFixedAperture, isOccultedStar, startingX, startingY, apertureInPixels);
 }
 
+void SimplifiedTracker::UpdatePsfFittingMethod()
+{
+	for (int i = 0; i < m_NumTrackedObjects; i++)
+		m_TrackedObjects[i]->CurrentPsfFit->FittingMethod = MAX_ELONGATION == 0 ? NonLinearFit : NonLinearAsymetricFit;
+}
+
+bool SimplifiedTracker::IsTrackedSuccessfully()
+{
+	return this->m_IsTrackedSuccessfully;
+}
+
 unsigned long* SimplifiedTracker::GetPixelsArea(unsigned long* pixels, long centerX, long centerY, long squareWidth)
 {
-	// TODO
+	long halfWidth = squareWidth / 2;
+	int areaLine = 0;
+	for (int y = centerY - halfWidth; y <centerY + halfWidth; y++, areaLine++)
+	{
+		memcpy(m_AreaPixels + areaLine * squareWidth, pixels + y * m_Width + centerX - halfWidth, squareWidth);
+	}
+	return m_AreaPixels;
 }
 
 void SimplifiedTracker::NextFrame(int frameNo, unsigned long* pixels)
@@ -103,28 +145,28 @@ void SimplifiedTracker::NextFrame(int frameNo, unsigned long* pixels)
 		else
 		{
 			unsigned long* areaPixels = GetPixelsArea(pixels, trackedObject->CenterX, trackedObject->CenterY, 17);
-			PsfFit* fit = new PsfFit(trackedObject->CenterX, trackedObject->CenterY);
-			fit->FittingMethod = MAX_ELONGATION == 0 ? NonLinearFit : NonLinearAsymetricFit;
-			fit->Fit(areaPixels, 17);
+			
+			trackedObject->UseCurrentPsfFit = false;
+			trackedObject->CurrentPsfFit->Fit(trackedObject->CenterX, trackedObject->CenterY, areaPixels, 17);
 
-			if (fit->IsSolved())
+			if (trackedObject->CurrentPsfFit->IsSolved())
 			{
-				if (fit->Certainty() < MIN_CERTAINTY)
+				if (trackedObject->CurrentPsfFit->Certainty() < MIN_CERTAINTY)
 				{
-					trackedObject->SetIsMeasured(false, ObjectCertaintyTooSmall);
+					trackedObject->SetIsTracked(false, ObjectCertaintyTooSmall, 0, 0);
 				}
-				else if (fit->FWHM() < MIN_FWHM || fit->FWHM() > MAX_FWHM)
+				else if (trackedObject->CurrentPsfFit->FWHM() < MIN_FWHM || trackedObject->CurrentPsfFit->FWHM() > MAX_FWHM)
 				{
-					trackedObject->SetIsMeasured(false, FWHMOutOfRange);
+					trackedObject->SetIsTracked(false, FWHMOutOfRange, 0, 0);
 				}
-				else if (MAX_ELONGATION > 0 && fit->ElongationPercentage() > MAX_ELONGATION)
+				else if (MAX_ELONGATION > 0 && trackedObject->CurrentPsfFit->ElongationPercentage() > MAX_ELONGATION)
 				{
-					trackedObject->SetIsMeasured(false, ObjectTooElongated);
+					trackedObject->SetIsTracked(false, ObjectTooElongated, 0, 0);
 				}
 				else
 				{
-					trackedObject->SetTrackedObjectMatch(fit);
-					trackedObject->SetIsMeasured(true, TrackedSuccessfully);
+					trackedObject->UseCurrentPsfFit = true;
+					trackedObject->SetIsTracked(true, TrackedSuccessfully, trackedObject->CurrentPsfFit->XCenter(), trackedObject->CurrentPsfFit->YCenter());
 				}
 			}
 		}					
@@ -155,7 +197,7 @@ void SimplifiedTracker::NextFrame(int frameNo, unsigned long* pixels)
 
 		if (numReferences == 0)
 		{
-			trackedObject->SetIsTracked(false, FitSuspectAsNoGuidingStarsAreLocated, NULL);
+			trackedObject->SetIsTracked(false, FitSuspectAsNoGuidingStarsAreLocated, 0, 0);
 		}
 		else
 		{
@@ -177,24 +219,57 @@ void SimplifiedTracker::NextFrame(int frameNo, unsigned long* pixels)
 
 				unsigned long* areaPixels = GetPixelsArea(pixels, x, y, matrixSize);
 
-
-				PsfFit* fit = new PsfFit(x, y);
+				trackedObject->UseCurrentPsfFit = false;
 				
-				fit->Fit(areaPixels, matrixSize);
+				trackedObject->CurrentPsfFit->Fit(x, y, areaPixels, matrixSize);
 
-
-				if (fit->IsSolved() && fit->Certainty() > MIN_CERTAINTY)
+				if (trackedObject->CurrentPsfFit->IsSolved() && trackedObject->CurrentPsfFit->Certainty() > MIN_CERTAINTY)
 				{
-					trackedObject->SetIsTracked(true, TrackedSuccessfully, fit);
-					trackedObject->SetTrackedObjectMatch(fit);
+					trackedObject->SetIsTracked(true, TrackedSuccessfully, trackedObject->CurrentPsfFit->XCenter(), trackedObject->CurrentPsfFit->YCenter());
+					trackedObject->UseCurrentPsfFit = true;
 				}
 				else
-					trackedObject->SetIsTracked(false, FullyDisappearingStarMarkedTrackedWithoutBeingFound, NULL);
+					trackedObject->SetIsTracked(false, FullyDisappearingStarMarkedTrackedWithoutBeingFound, 0, 0);
 			}
 		}
 	}
 
 	m_IsTrackedSuccessfully = atLeastOneObjectLocated;
+}
+
+long SimplifiedTracker::TrackerGetTargetState(long objectId, NativeTrackedObjectInfo* trackingInfo, NativePsfFitInfo* psfInfo, double* residuals)
+{
+	if (objectId < 0 || objectId >= m_NumTrackedObjects)
+		return E_FAIL;
+	
+	TrackedObject* obj = m_TrackedObjects[objectId];
+	
+	trackingInfo->CenterXDouble = obj->CenterXDouble;
+	trackingInfo->CenterYDouble = obj->CenterYDouble;
+	trackingInfo->LastKnownGoodPositionXDouble = obj->LastKnownGoodPositionXDouble;
+	trackingInfo->LastKnownGoodPositionYDouble = obj->LastKnownGoodPositionYDouble;
+	trackingInfo->IsLocated = obj->IsLocated ? 1 : 0;
+	trackingInfo->IsOffScreen = obj->IsOffScreen ? 1 : 0;
+	trackingInfo->TrackingFlags = obj->TrackingFlags;
+	
+	PsfFit* psfFit = obj->CurrentPsfFit;
+	if (obj->UseCurrentPsfFit)
+	{
+		psfInfo->FWHM = psfFit->FWHM();
+		psfInfo->I0 = psfFit->I0();
+		psfInfo->IMax = psfFit->IMax();
+		psfInfo->IsAsymmetric = psfFit->FittingMethod == NonLinearAsymetricFit;
+		psfInfo->IsSolved = psfFit->IsSolved();
+		psfInfo->MatrixSize = psfFit->MatrixSize();
+		psfInfo->R0 = psfInfo->IsAsymmetric ? psfFit->RX0 : psfFit->R0;
+		psfInfo->R02 = psfInfo->IsAsymmetric ? psfFit->RY0 : 0;
+		psfInfo->X0 = psfFit->X0();
+		psfInfo->Y0 = psfFit->Y0();
+		psfInfo->XCenter = psfFit->XCenter();
+		psfInfo->YCenter = psfFit->YCenter();
+		
+		psfFit->CopyResiduals(residuals, psfInfo->MatrixSize);
+	}
 }
 
 
@@ -206,6 +281,11 @@ long TrackerSettings(double maxElongation, double minFWHM, double maxFWHM, doubl
 	MIN_FWHM = minFWHM;
 	MAX_FWHM = maxFWHM;
 	MIN_CERTAINTY = minCertainty;
+	
+	if (NULL != s_Tracker)
+		s_Tracker->UpdatePsfFittingMethod();
+	
+	return S_OK;
 }
 
 long TrackerNewConfiguration(long width, long height, long numTrackedObjects, bool isFullDisappearance)
@@ -217,6 +297,8 @@ long TrackerNewConfiguration(long width, long height, long numTrackedObjects, bo
 	}
 	
 	s_Tracker = new SimplifiedTracker(width, height, numTrackedObjects, isFullDisappearance);
+	
+	return S_OK;
 }
 
 long TrackerConfigureObject(long objectId, bool isFixedAperture, bool isOccultedStar, double startingX, double startingY, double apertureInPixels)
@@ -224,16 +306,29 @@ long TrackerConfigureObject(long objectId, bool isFixedAperture, bool isOcculted
 	if (NULL != s_Tracker)
 	{
 		s_Tracker->ConfigureObject(objectId, isFixedAperture, isOccultedStar, startingX, startingY, apertureInPixels);
+		return S_OK;
 	}
+	
+	return E_POINTER;
 }
 
 long TrackerNextFrame(long frameId, unsigned long* pixels)
 {
 	if (NULL != s_Tracker)
+	{
 		s_Tracker->NextFrame(frameId, pixels);
+		return s_Tracker->IsTrackedSuccessfully() ? 0 : -1;
+	}
+	
+	return -2;
 }
 
-long TrackerGetTargetPsf(long objectId, NativePsfFitInfo* psfInfo, double* residuals)
+long TrackerGetTargetState(long objectId, NativeTrackedObjectInfo* trackingInfo, NativePsfFitInfo* psfInfo, double* residuals)
 {
-	// TODO:
+	if (NULL != s_Tracker)
+	{
+		return s_Tracker->TrackerGetTargetState(objectId, trackingInfo, psfInfo, residuals);
+	}
+	
+	return E_POINTER;
 }

@@ -22,6 +22,17 @@ struct NativePsfFitInfo
 	float R02;	
 };
 
+struct NativeTrackedObjectInfo
+{
+	float CenterXDouble;
+	float CenterYDouble;
+	float LastKnownGoodPositionXDouble;
+	float LastKnownGoodPositionYDouble;
+	unsigned char IsOffScreen;	
+	unsigned char IsLocated;
+	unsigned int TrackingFlags;	
+};
+
 enum NotMeasuredReasons
 {	
 	TrackedSuccessfully,
@@ -48,16 +59,22 @@ public:
 	double CenterXDouble;
 	double CenterYDouble;
 	bool IsLocated;
+	double LastKnownGoodPositionXDouble;
+	double LastKnownGoodPositionYDouble;
+	bool IsOffScreen;
+	unsigned int TrackingFlags;
+	
+	PsfFit* CurrentPsfFit;
+	bool UseCurrentPsfFit;
 	
 	TrackedObject(long objectId, bool isFixedAperture, bool isOccultedStar, double startingX, double startingY, double apertureInPixels);
 	~TrackedObject();
 	
 	void NextFrame();
-	void SetTrackedObjectMatch(PsfFit* psf);
 	
-	void SetIsMeasured(bool isLocated, NotMeasuredReasons reason);
-	void SetIsTracked(bool isLocated, NotMeasuredReasons reason, PsfFit* fit);
-	void SetIsTracked(bool isLocated, NotMeasuredReasons reason, double x, double y);
+	//void SetIsMeasured(bool isLocated, NotMeasuredReasons reason);
+	//void SetIsTracked(bool isLocated, NotMeasuredReasons reason, PsfFit* fit);
+	void SetIsTracked(bool isLocated, NotMeasuredReasons reason, double x, double y);	
 };
 
 class SimplifiedTracker
@@ -70,6 +87,7 @@ private:
 	
 	bool m_IsTrackedSuccessfully;
 	TrackedObject** m_TrackedObjects;
+	unsigned long* m_AreaPixels;
 	
 	unsigned long* GetPixelsArea(unsigned long* pixels, long centerX, long centerY, long squareWidth);
 	
@@ -78,7 +96,10 @@ public:
 	~SimplifiedTracker();
 	
 	void ConfigureObject(long objectId, bool isFixedAperture, bool isOccultedStar, double startingX, double startingY, double apertureInPixels);
+	void UpdatePsfFittingMethod();
 	void NextFrame(int frameNo, unsigned long* pixels);
+	long TrackerGetTargetState(long objectId, NativeTrackedObjectInfo* trackingInfo, NativePsfFitInfo* psfInfo, double* residuals);
+	bool IsTrackedSuccessfully();
 };
 
 /* Make sure functions are exported with C linkage under C++ compilers. */
@@ -91,7 +112,7 @@ DLL_PUBLIC long TrackerSettings(double maxElongation, double minFWHM, double max
 DLL_PUBLIC long TrackerNewConfiguration(long width, long height, long numTrackedObjects, bool isFullDisappearance);
 DLL_PUBLIC long TrackerConfigureObject(long objectId, bool isFixedAperture, bool isOccultedStar, double startingX, double startingY, double apertureInPixels);
 DLL_PUBLIC long TrackerNextFrame(long frameId, unsigned long* pixels);
-DLL_PUBLIC long TrackerGetTargetPsf(long objectId, NativePsfFitInfo* psfInfo, double* residuals);
+DLL_PUBLIC long TrackerGetTargetState(long objectId, NativeTrackedObjectInfo* trackingInfo, NativePsfFitInfo* psfInfo, double* residuals);
 
 #ifdef __cplusplus
 } // __cplusplus defined.

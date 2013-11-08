@@ -9,6 +9,25 @@ using Tangra.VideoOperations.LightCurves.Tracking;
 
 namespace Tangra.PInvoke
 {
+	[StructLayout(LayoutKind.Explicit)]	
+	internal class NativeTrackedObjectInfo
+	{
+		[FieldOffset(0)]
+		public float CenterX;
+		[FieldOffset(4)]
+		public float CenterY;
+		[FieldOffset(8)]
+		public float LastGoodPositionX;
+		[FieldOffset(12)]
+		public float LastGoodPositionY;
+		[FieldOffset(16)]
+		public byte IsLocated;
+		[FieldOffset(17)]
+		public byte IsOffScreen;
+		[FieldOffset(18)]
+		public ushort TrackingFlags;
+	}
+
 	[StructLayout(LayoutKind.Explicit)]
 	internal class NativePsfFitInfo
 	{
@@ -150,11 +169,11 @@ namespace Tangra.PInvoke
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
 		// DLL_PUBLIC long TrackerSettings(double maxElongation, double minFWHM, double maxFWHM, double minCertainty);
-		internal static extern int TrackerSettings(double maxElongation, double minFWHM, double maxFWHM, double minCertainty);
+		private static extern int TrackerSettings(double maxElongation, double minFWHM, double maxFWHM, double minCertainty);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
 		// DLL_PUBLIC long TrackerNewConfiguration(long width, long height, long numTrackedObjects, bool isFullDisappearance);
-		internal static extern int TrackerNewConfiguration(int width, int height, int numTrackedObjects, bool isFullDisappearance);
+		private static extern int TrackerNewConfiguration(int width, int height, int numTrackedObjects, bool isFullDisappearance);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
 		// DLL_PUBLIC long TrackerNextFrame(long frameId, unsigned long* pixels);
@@ -165,7 +184,39 @@ namespace Tangra.PInvoke
 		private static extern int TrackerConfigureObject(int objectId, bool isFixedAperture, bool isOccultedStar, double startingX, double startingY, double apertureInPixels);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-		private static extern int TrackerGetTargetPsf(int objectId, [In, Out] NativePsfFitInfo psfInfo, [In, Out] double[] residuals);
+		// DLL_PUBLIC long TrackerGetTargetState(long objectId, NativeTrackedObjectInfo* trackingInfo, NativePsfFitInfo* psfInfo, double* residuals);
+		private static extern int TrackerGetTargetState(int objectId, [In, Out] NativeTrackedObjectInfo trackingInfo, [In, Out] NativePsfFitInfo psfInfo, [In, Out] double[] residuals);
+
+		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+		//DLL_PUBLIC void ConfigureSaturationLevels(unsigned long saturation8Bit, unsigned long saturation12Bit, unsigned long saturation14Bit);
+		private static extern int ConfigureSaturationLevels(ulong saturation8Bit, ulong saturation12Bit, ulong saturation14Bit);
+
+		internal static void ConfigureNativeTracker()
+		{
+			TrackerSettings(
+				TangraConfig.Settings.Tracking.CheckElongation ? TangraConfig.Settings.Tracking.AdHokMaxElongation : 0,
+				TangraConfig.Settings.Tracking.AdHokMinFWHM,
+				TangraConfig.Settings.Tracking.AdHokMaxFWHM,
+				TangraConfig.Settings.Tracking.AdHokMinCertainty);
+
+			ConfigureSaturationLevels(
+				TangraConfig.Settings.Photometry.Saturation.Saturation8Bit,
+				TangraConfig.Settings.Photometry.Saturation.Saturation12Bit,
+				TangraConfig.Settings.Photometry.Saturation.Saturation14Bit);
+
+		}
+
+		private static int s_NumTrackedObjects;
+
+		internal static void InitNewTracker(int width, int height, int numTrackedObjects, bool isFullDisappearance)
+		{
+			int rv = TrackerNewConfiguration(width, height, numTrackedObjects, isFullDisappearance);
+
+			if (rv == 0)
+			{
+				s_NumTrackedObjects = numTrackedObjects;
+			}
+		}
 
 		internal static void ConfigureTrackedObject(int objectId, TrackedObjectConfig obj)
 		{
@@ -178,9 +229,19 @@ namespace Tangra.PInvoke
 				obj.ApertureInPixels);
 		}
 
-		internal static bool TrackNextFrame(int frameId, [In, Out] uint[] pixels)
+		internal static bool TrackNextFrame(int frameId, uint[] pixels)
 		{
 			int rv = TrackerNextFrame(frameId, pixels);
+
+			for (int i = 0; i < s_NumTrackedObjects; i++)
+			{
+				var trackingInfo = new NativeTrackedObjectInfo();
+				var psfInfo = new NativePsfFitInfo();
+				var residuals = new double[35 * 35];
+
+				TrackerGetTargetState(i, trackingInfo, psfInfo, residuals);	
+			}
+			
 			return rv == 0;
 		}
 	}

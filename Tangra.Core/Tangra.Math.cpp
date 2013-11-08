@@ -6,6 +6,10 @@
 #include <string.h>
 #include <cmath>
 
+unsigned long SATURATION_8BIT = 250;
+unsigned long SATURATION_12BIT = 4000;
+unsigned long SATURATION_14BIT = 16000;
+
 static double DotBuffer(double* bufferV, const int vRow, double* bufferW, const int wCol, const long vColsCount, const long wRowsCount, const long wColsCount)
 {
 	if (vColsCount != wRowsCount)
@@ -379,4 +383,12 @@ void DoNonLinearPfsFit(
 			residuals[x + full_width * y] = intensity[x + full_width * y] - (*iBackground + *iStarMax * exp(-((x - *x0) * (x - *x0) + (y - *y0) * (y - *y0)) / (*r0 * *r0)));
 		}
 	}
+}
+
+
+void ConfigureSaturationLevels(unsigned long saturation8Bit, unsigned long saturation12Bit, unsigned long saturation14Bit)
+{
+	SATURATION_8BIT = saturation8Bit;
+	SATURATION_12BIT = saturation12Bit;
+	SATURATION_14BIT = saturation14Bit;
 }
