@@ -1390,7 +1390,7 @@ namespace Tangra.VideoOperations.LightCurves
     {
         public static LCMeasurementFooter Empty = new LCMeasurementFooter();
 
-        private static int SERIALIZATION_VERSION = 5;
+        private static int SERIALIZATION_VERSION = 6;
 
         internal byte[] AveragedFrameBytes;
     	internal int AveragedFrameWidth;
@@ -1406,6 +1406,9 @@ namespace Tangra.VideoOperations.LightCurves
 	    internal Dictionary<int, float> InstrumentalDelayConfig;
 		internal string InstrumentalDelayConfigName;
 
+        internal string CameraName;
+        internal int AAVFrameIntegration; 
+
         internal LCMeasurementFooter(
 			Pixelmap averagedFrame, 
             TangraConfig config, 
@@ -1415,7 +1418,9 @@ namespace Tangra.VideoOperations.LightCurves
             ITimestampOcr timestampOCR,
             Dictionary<int, long> thumbPrintDict,
 			Dictionary<int, float> instrumentalDelayConfig,
-			string instrumentalDelayConfigName)
+			string instrumentalDelayConfigName,
+            string cameraName,
+            int aavFrameIntegration)
         {
 			AveragedFrameBytes = averagedFrame.DisplayBitmapPixels;
         	AveragedFrameWidth = averagedFrame.Width;
@@ -1431,6 +1436,8 @@ namespace Tangra.VideoOperations.LightCurves
             ThumbPrintDict = thumbPrintDict;
 			InstrumentalDelayConfig = instrumentalDelayConfig;
 	        InstrumentalDelayConfigName = instrumentalDelayConfigName ?? string.Empty;
+            CameraName = cameraName ?? string.Empty;
+            AAVFrameIntegration = aavFrameIntegration;
         }
 
         internal LCMeasurementFooter(BinaryReader reader)
@@ -1469,6 +1476,8 @@ namespace Tangra.VideoOperations.LightCurves
 			ThumbPrintDict = new Dictionary<int, long>();
 			InstrumentalDelayConfig = new Dictionary<int, float>();
 	        InstrumentalDelayConfigName = string.Empty;
+            CameraName = string.Empty;
+            AAVFrameIntegration = -1;
 
 			if (version > 1)
 			{
@@ -1499,6 +1508,12 @@ namespace Tangra.VideoOperations.LightCurves
 							}
 
 							InstrumentalDelayConfigName = reader.ReadString();
+
+                            if (version > 5)
+                            {
+                                CameraName = reader.ReadString();
+                                AAVFrameIntegration = reader.ReadInt32();
+                            }
 						}
 					}
 				}
@@ -1557,6 +1572,9 @@ namespace Tangra.VideoOperations.LightCurves
 				writer.Write((int)0);
 
 	        writer.Write(InstrumentalDelayConfigName);
+
+            writer.Write(CameraName);
+            writer.Write(AAVFrameIntegration);
         }
     }
 

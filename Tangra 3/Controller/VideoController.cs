@@ -449,6 +449,11 @@ namespace Tangra.Controller
             get { return m_FramePlayer.AstroAnalogueVideoHasOcrData; }
         }
 
+        public int AstroAnalogueVideoIntegratedAAVFrames
+        {
+            get { return m_FramePlayer.AstroAnalogueVideoIntegratedAAVFrames; }
+        }
+
 	    public string AstroVideoCameraModel
 	    {
 			get { return m_FramePlayer.AstroVideoCameraModel; }

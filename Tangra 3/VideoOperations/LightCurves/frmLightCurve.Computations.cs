@@ -685,18 +685,32 @@ namespace Tangra.VideoOperations.LightCurves
             bool addPSFAverageModelDetails = addPSFReductionDetails && m_Context.PsfFittingMethod == TangraConfig.PsfFittingMethod.LinearFitOfAveragedModel;
             bool addIntegrationInfo = m_Footer.ReductionContext.FrameIntegratingMode != FrameIntegratingMode.NoIntegration;
 
-            output.Append("Reversed Gamma, Colour, Measured Band, Integration, Digital Filter, Signal Method, Background Method");
+            string instrumentalDelayStatus = "Not Applied";
+            if (m_Context.TimingType == MeasurementTimingType.EmbeddedTimeForEachFrame && m_Context.BitPix > 8)
+                instrumentalDelayStatus = "Not Required";
+            else if (!string.IsNullOrEmpty(m_Context.InstrumentalDelayConfigName))
+                instrumentalDelayStatus = "Applied";
+
+            output.Append("Reversed Gamma, Colour, Measured Band, Integration, Digital Filter, Signal Method, Background Method, Instrumental Delay Corrections, Camera, AAV Integration, First Frame, Last Frame");
             if (addPSFReductionDetails) output.Append(", PSF Fitting");
             if (addPSFAverageModelDetails) output.Append(", Modeled FWHM, Average FWHM"); 
             output.AppendLine();
-            output.AppendFormat("{0},{1},{2},{3},{4},{5},{6}", 
+            output.AppendFormat("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11}", 
                 m_Context.EncodingGamma.ToString("0.00"),
-                m_Footer.ReductionContext.IsColourVideo ? "yes" : "no", m_Footer.ReductionContext.ColourChannel,
+                m_Footer.ReductionContext.IsColourVideo ? "yes" : "no", 
+                m_Footer.ReductionContext.ColourChannel,
                 addIntegrationInfo
                     ? string.Format("{0} {1} of {2} frames", m_Footer.ReductionContext.PixelIntegrationType, m_Footer.ReductionContext.FrameIntegratingMode, m_Footer.ReductionContext.NumberFramesToIntegrate) 
                     : "no",
+                m_Context.Filter, 
+                m_Context.SignalMethod,
+                m_Context.BackgroundMethod,
+                instrumentalDelayStatus,
+                !string.IsNullOrEmpty(m_Context.CameraName) ?  m_Context.CameraName : m_Context.InstrumentalDelayConfigName,
+                m_Context.AAVFrameIntegration == -1 ? "" : m_Context.AAVFrameIntegration.ToString(),
+                m_Context.MinFrame,
+                m_Context.MaxFrame);
 
-            m_Context.Filter, m_Context.SignalMethod, m_Context.BackgroundMethod);
             if (addPSFReductionDetails) output.AppendFormat(",{0}", m_Context.PsfFittingMethod);
             if (addPSFAverageModelDetails) output.AppendFormat(",{0},{1}", float.IsNaN(m_Context.ManualAverageFWHM) ? "auto" : "manual", !float.IsNaN(m_Context.ManualAverageFWHM) ? m_Context.ManualAverageFWHM.ToString("0.00") : m_Footer.RefinedAverageFWHM.ToString("0.00"));
 
@@ -773,6 +787,13 @@ namespace Tangra.VideoOperations.LightCurves
             private NormalisationMethod m_NormMethod = NormalisationMethod.LinearFit;
             private float[] m_ReProcessApertures = new float[4];
             private int[] m_ReProcessFitAreas = new int[4];
+
+            public string InstrumentalDelayConfigName;
+            public MeasurementTimingType TimingType;
+            public string CameraName;
+            public int AAVFrameIntegration;
+            public uint MinFrame;
+            public uint MaxFrame;
 
             public uint m_SelectedFrameNo = 0;
 

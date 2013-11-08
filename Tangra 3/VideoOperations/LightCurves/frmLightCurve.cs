@@ -281,6 +281,13 @@ namespace Tangra.VideoOperations.LightCurves
             else if (m_Header.FilterType == 2)
                 m_Context.Filter = LightCurveContext.FilterType.LowPassDifference;
 
+            m_Context.InstrumentalDelayConfigName = m_Footer.InstrumentalDelayConfigName;
+            m_Context.CameraName = m_Footer.CameraName;
+            m_Context.AAVFrameIntegration = m_Footer.AAVFrameIntegration;
+            m_Context.TimingType = m_Header.TimingType;
+            m_Context.MinFrame = m_Header.MinFrame;
+            m_Context.MaxFrame = m_Header.MaxFrame;
+
 			ToolStripMenuItem[] allObjMenuItems = new ToolStripMenuItem[] { miIncludeObj1, miIncludeObj2, miIncludeObj3, miIncludeObj4 };
 
 			for (int i = 0; i < 4; i++)

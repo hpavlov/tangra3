@@ -117,6 +117,8 @@ namespace Tangra.OccultTools
 			float[] frameIds = measurements.Select(x => (float)x.CurrFrameNo).ToArray();
             DateTime[] timestamps = measurements.Select(x => x.Timestamp).ToArray();
 
+            // TODO: If the entered timestamps are unreliable (time difference is too big) then pass double.NaN or 0 timestamps
+
 		    long startFrameStartDayTicks = timestamps[0].Date.Ticks;
             double[] secondsFromUTMidnight = timestamps.Select(x => (Math.Truncate(new TimeSpan(x.Ticks - startFrameStartDayTicks).TotalSeconds * 10000) / 10000.0)).ToArray();
 

@@ -69,6 +69,8 @@ namespace Tangra.Video
 		private string m_CameraModel;
 		private string m_VideoStandard;
 		private double m_NativeFrameRate;
+	    private double m_EffectiveFrameRate;
+	    private int m_IntegratedAAVFrames;
 		private int m_OsdFirstLine = 0;
 		private int m_OsdLastLine = 0;
 
@@ -121,6 +123,16 @@ namespace Tangra.Video
 
 				int.TryParse(GetFileTag("OSD-FIRST-LINE"), out m_OsdFirstLine);
 				int.TryParse(GetFileTag("OSD-LAST-LINE"), out m_OsdLastLine);
+
+			    if (m_OsdLastLine > m_Height) m_OsdLastLine = m_Height;
+                if (m_OsdFirstLine < 0) m_OsdFirstLine = 0;
+
+			    m_IntegratedAAVFrames = -1;
+
+                if (double.TryParse(GetFileTag("EFFECTIVE-FRAME-RATE"), out m_EffectiveFrameRate) && m_NativeFrameRate != 0)
+                {
+                    m_IntegratedAAVFrames = (int)Math.Round(m_EffectiveFrameRate / m_NativeFrameRate);
+                }
 			}
 			else
 			{
@@ -175,6 +187,11 @@ namespace Tangra.Video
 		public double NativeFrameRate
 		{
 			get { return m_NativeFrameRate; }
+		}
+
+        public int IntegratedAAVFrames
+		{
+            get { return m_IntegratedAAVFrames; }
 		}
 
 		public string VideoStandard

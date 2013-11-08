@@ -701,6 +701,14 @@ namespace Tangra.Video
 	        }
 	    }
 
+        public int AstroAnalogueVideoIntegratedAAVFrames
+	    {
+	        get
+	        {
+                return IsAstroAnalogueVideo ? ((AstroDigitalVideoStream)m_VideoStream).IntegratedAAVFrames : -1;
+	        }
+	    }
+
 		public string AstroVideoCameraModel
 		{
 			get
