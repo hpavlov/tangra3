@@ -11,6 +11,8 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 	public class NativeSimplifiedTracker : ITracker
 	{
 		private TrackedObjectConfig m_OccultedStarConfig;
+	    private List<ITrackedObject> m_TrackedObjects = new List<ITrackedObject>();
+        private List<NativeTrackedObject> m_NativeTrackedObject = new List<NativeTrackedObject>();
 
 		internal NativeSimplifiedTracker(int width, int height, List<TrackedObjectConfig> measuringStars)
 		{
@@ -26,6 +28,9 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			{
 				TrackedObjectConfig obj = measuringStars[i];
 				NativeTracking.ConfigureTrackedObject(i, obj);
+			    var nativeObj = new NativeTrackedObject(i, obj);
+                m_NativeTrackedObject.Add(nativeObj);
+                m_TrackedObjects.Add(nativeObj);
 			}
 
 			m_OccultedStarConfig = measuringStars.Single(x => x.TrackingType == TrackingType.OccultedStar);
@@ -35,23 +40,31 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 		public void InitializeNewTracking()
 		{
-			throw new NotImplementedException();
+		    NativeTracking.InitialiseNewTracking();
+
+            RefinedAverageFWHM = float.NaN;
+            MedianValue = uint.MinValue;
+
+		    m_NativeTrackedObject.ForEach(x => x.InitializeNewTracking());
 		}
 
 		public List<ITrackedObject> TrackedObjects
 		{
-			get { throw new NotImplementedException(); }
+            get { return m_TrackedObjects; }
 		}
 
-		public float RefinedAverageFWHM
-		{
-			get { throw new NotImplementedException(); }
-		}
+        public float RefinedAverageFWHM { get; protected set; }
 
-		public float[] RefinedFWHM
-		{
-			get { throw new NotImplementedException(); }
-		}
+        public float[] RefinedFWHM
+        {
+            get
+            {
+                return m_TrackedObjects
+                    .Cast<TrackedObjectLight>()
+                    .Select(x => x.RefinedFWHM)
+                    .ToArray();
+            }
+        }
 
 		public float PositionTolerance
 		{
@@ -63,10 +76,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			}
 		}
 
-		public uint MedianValue
-		{
-			get { throw new NotImplementedException(); }
-		}
+        public uint MedianValue { get; protected set; }
 
 		public float RefiningPercentageWorkLeft
 		{
@@ -80,9 +90,9 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 		public void NextFrame(int frameNo, IAstroImage astroImage)
 		{
-			IsTrackedSuccessfully = NativeTracking.TrackNextFrame(frameNo, astroImage.GetPixelmapPixels());
+            m_NativeTrackedObject.ForEach(x => x.NextFrame());
 
-			// TODO: 
+            IsTrackedSuccessfully = NativeTracking.TrackNextFrame(frameNo, astroImage.GetPixelmapPixels(), m_NativeTrackedObject);
 		}
 
 		public void BeginMeasurements(IAstroImage astroImage)

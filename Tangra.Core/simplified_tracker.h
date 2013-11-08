@@ -72,8 +72,7 @@ public:
 	
 	void NextFrame();
 	
-	//void SetIsMeasured(bool isLocated, NotMeasuredReasons reason);
-	//void SetIsTracked(bool isLocated, NotMeasuredReasons reason, PsfFit* fit);
+	void InitialiseNewTracking();
 	void SetIsTracked(bool isLocated, NotMeasuredReasons reason, double x, double y);	
 };
 
@@ -97,6 +96,7 @@ public:
 	
 	void ConfigureObject(long objectId, bool isFixedAperture, bool isOccultedStar, double startingX, double startingY, double apertureInPixels);
 	void UpdatePsfFittingMethod();
+	void InitialiseNewTracking();
 	void NextFrame(int frameNo, unsigned long* pixels);
 	long TrackerGetTargetState(long objectId, NativeTrackedObjectInfo* trackingInfo, NativePsfFitInfo* psfInfo, double* residuals);
 	bool IsTrackedSuccessfully();
@@ -113,6 +113,7 @@ DLL_PUBLIC long TrackerNewConfiguration(long width, long height, long numTracked
 DLL_PUBLIC long TrackerConfigureObject(long objectId, bool isFixedAperture, bool isOccultedStar, double startingX, double startingY, double apertureInPixels);
 DLL_PUBLIC long TrackerNextFrame(long frameId, unsigned long* pixels);
 DLL_PUBLIC long TrackerGetTargetState(long objectId, NativeTrackedObjectInfo* trackingInfo, NativePsfFitInfo* psfInfo, double* residuals);
+DLL_PUBLIC long TrackerInitialiseNewTracking();
 
 #ifdef __cplusplus
 } // __cplusplus defined.

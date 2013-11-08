@@ -76,5 +76,7 @@ EXPORTS
 	;Simplified Tracker
 	TrackerSettings
 	TrackerNewConfiguration
+	TrackerInitialiseNewTracking
 	TrackerNextFrame
+	TrackerConfigureObject
 	TrackerGetTargetState

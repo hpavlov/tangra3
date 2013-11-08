@@ -38,26 +38,28 @@ void TrackedObject::NextFrame()
 	IsOffScreen = false;	
 }
 
-/*
-void TrackedObject::SetIsMeasured(bool isLocated, NotMeasuredReasons reason)
+void TrackedObject::InitialiseNewTracking()
 {
-	// TODO: Combine SetIsMeasured() and SetIsTracked() into one
+	CenterXDouble = StartingX;
+	CenterYDouble = StartingY;
+	CenterX = (long)(StartingX + 0.5); // rounding
+	CenterY = (long)(StartingY + 0.5); // rounding
+	
+	LastKnownGoodPositionXDouble = CenterXDouble;
+	LastKnownGoodPositionYDouble = CenterYDouble;
 }
 
-void TrackedObject::SetIsTracked(bool isLocated, NotMeasuredReasons reason, PsfFit* fit)
-{
-	// TODO: Combine SetIsMeasured() and SetIsTracked() into one
-}
- * */
 
 void TrackedObject::SetIsTracked(bool isLocated, NotMeasuredReasons reason, double x, double y)
 {
 	if (isLocated)
 	{
-		LastKnownGoodPositionXDouble = CenterX;
-		LastKnownGoodPositionYDouble = CenterY;
-		CenterX = x;
-		CenterY = y;
+		LastKnownGoodPositionXDouble = CenterXDouble;
+		LastKnownGoodPositionYDouble = CenterYDouble;
+		CenterXDouble = x;
+		CenterYDouble = y;
+		CenterX = (long)(x + 0.5); // rounding
+		CenterY = (long)(y + 0.5); // rounding
 	}
 
 	IsLocated = isLocated;
@@ -109,6 +111,12 @@ void SimplifiedTracker::UpdatePsfFittingMethod()
 {
 	for (int i = 0; i < m_NumTrackedObjects; i++)
 		m_TrackedObjects[i]->CurrentPsfFit->FittingMethod = MAX_ELONGATION == 0 ? NonLinearFit : NonLinearAsymetricFit;
+}
+
+void SimplifiedTracker::InitialiseNewTracking()
+{
+	for (int i = 0; i < m_NumTrackedObjects; i++)
+		m_TrackedObjects[i]->InitialiseNewTracking();
 }
 
 bool SimplifiedTracker::IsTrackedSuccessfully()
@@ -310,6 +318,17 @@ long TrackerConfigureObject(long objectId, bool isFixedAperture, bool isOcculted
 	}
 	
 	return E_POINTER;
+}
+
+long TrackerInitialiseNewTracking()
+{
+	if (NULL != s_Tracker)
+	{
+		s_Tracker->InitialiseNewTracking();
+		return 0;
+	}
+	
+	return -2;	
 }
 
 long TrackerNextFrame(long frameId, unsigned long* pixels)

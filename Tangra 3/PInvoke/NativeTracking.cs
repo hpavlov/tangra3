@@ -71,7 +71,29 @@ namespace Tangra.PInvoke
 
 		private double[] m_Residuals;
 
-		public NativeTrackedObjectPsfFit(NativePsfFitInfo psfInfo, double[] residuals, int bpp)
+	    public NativeTrackedObjectPsfFit(int bpp)
+	    {
+            switch (bpp)
+            {
+                case 8:
+                    m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation8Bit;
+                    break;
+
+                case 12:
+                    m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation12Bit;
+                    break;
+
+                case 14:
+                    m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation14Bit;
+                    break;
+
+                default:
+                    m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation8Bit;
+                    break;
+            }
+	    }
+
+        public void LoadFromNativePsfFitInfo(NativePsfFitInfo psfInfo, double[] residuals)
 		{
 			XCenter = psfInfo.XCenter;
 			YCenter = psfInfo.YCenter;
@@ -91,25 +113,6 @@ namespace Tangra.PInvoke
 			m_IStarMax = psfInfo.IMax - psfInfo.I0;
 
 			m_Residuals = residuals;
-
-			switch (bpp)
-			{
-				case 8:
-					m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation8Bit;
-					break;
-
-				case 12:
-					m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation12Bit;
-					break;
-
-				case 14:
-					m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation14Bit;
-					break;
-
-				default:
-					m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation8Bit;
-					break;
-			}
 		}
 
 		public double XCenter { get; private set; }
@@ -191,6 +194,10 @@ namespace Tangra.PInvoke
 		//DLL_PUBLIC void ConfigureSaturationLevels(unsigned long saturation8Bit, unsigned long saturation12Bit, unsigned long saturation14Bit);
 		private static extern int ConfigureSaturationLevels(ulong saturation8Bit, ulong saturation12Bit, ulong saturation14Bit);
 
+	    [DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+	    //DLL_PUBLIC long TrackerInitialiseNewTracking();
+	    private static extern int TrackerInitialiseNewTracking();
+
 		internal static void ConfigureNativeTracker()
 		{
 			TrackerSettings(
@@ -218,6 +225,11 @@ namespace Tangra.PInvoke
 			}
 		}
 
+        internal static void InitialiseNewTracking()
+        {
+            TrackerInitialiseNewTracking();
+        }
+
 		internal static void ConfigureTrackedObject(int objectId, TrackedObjectConfig obj)
 		{
 			TrackerConfigureObject(
@@ -229,7 +241,7 @@ namespace Tangra.PInvoke
 				obj.ApertureInPixels);
 		}
 
-		internal static bool TrackNextFrame(int frameId, uint[] pixels)
+		internal static bool TrackNextFrame(int frameId, uint[] pixels, List<NativeTrackedObject> managedTrackedObjects)
 		{
 			int rv = TrackerNextFrame(frameId, pixels);
 
@@ -239,7 +251,9 @@ namespace Tangra.PInvoke
 				var psfInfo = new NativePsfFitInfo();
 				var residuals = new double[35 * 35];
 
-				TrackerGetTargetState(i, trackingInfo, psfInfo, residuals);	
+				TrackerGetTargetState(i, trackingInfo, psfInfo, residuals);
+
+                managedTrackedObjects[i].LoadFromNativeData(trackingInfo, psfInfo, residuals);
 			}
 			
 			return rv == 0;
