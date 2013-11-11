@@ -23,8 +23,6 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 		void NextFrame(int frameNo, IAstroImage astroImage);
 		void BeginMeasurements(IAstroImage astroImage);
 	}
-		
-	
 
 	public interface ITrackedObject
 	{

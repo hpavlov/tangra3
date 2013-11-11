@@ -28,9 +28,9 @@ struct NativeTrackedObjectInfo
 	float CenterYDouble;
 	float LastKnownGoodPositionXDouble;
 	float LastKnownGoodPositionYDouble;
-	unsigned char IsOffScreen;	
 	unsigned char IsLocated;
-	unsigned int TrackingFlags;	
+	unsigned char IsOffScreen;	
+	unsigned int TrackingFlags;
 };
 
 enum NotMeasuredReasons

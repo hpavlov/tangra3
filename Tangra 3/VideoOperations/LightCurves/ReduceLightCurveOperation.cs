@@ -1499,7 +1499,8 @@ namespace Tangra.VideoOperations.LightCurves
             if (m_MaxFrame < m_CurrFrameNo) m_MaxFrame = (uint)m_CurrFrameNo;
             m_TotalFrames++;
 
-			foreach (TrackedObjectBase trackedObject in m_Tracker.TrackedObjects)
+			// TODO: Separate the ITrackedObject from IMeasuredObject
+			foreach (TrackedObjectLight trackedObject in m_Tracker.TrackedObjects)
 			{
 				IImagePixel center = trackedObject.Center;
 

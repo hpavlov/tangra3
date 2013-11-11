@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Tangra.Model.Astro;
@@ -92,7 +93,9 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 		{
             m_NativeTrackedObject.ForEach(x => x.NextFrame());
 
-            IsTrackedSuccessfully = NativeTracking.TrackNextFrame(frameNo, astroImage.GetPixelmapPixels(), m_NativeTrackedObject);
+			uint[] pixels = astroImage.GetPixelmapPixels();
+
+            IsTrackedSuccessfully = NativeTracking.TrackNextFrame(frameNo, pixels, m_NativeTrackedObject);
 		}
 
 		public void BeginMeasurements(IAstroImage astroImage)

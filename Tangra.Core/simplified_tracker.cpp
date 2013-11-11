@@ -126,14 +126,49 @@ bool SimplifiedTracker::IsTrackedSuccessfully()
 
 unsigned long* SimplifiedTracker::GetPixelsArea(unsigned long* pixels, long centerX, long centerY, long squareWidth)
 {
+	long x0 = centerX;
+	long y0 = centerY;
+
+	long halfWidth = squareWidth / 2;
+
+	for (long x = x0 - halfWidth; x <= x0 + halfWidth; x++)
+		for (long y = y0 - halfWidth; y <= y0 + halfWidth; y++)
+		{
+			unsigned long pixelVal = 0;
+
+			if (x >= 0 && x < m_Width && y >= 0 & y < m_Height)
+			{
+				pixelVal = *(pixels + x + y * m_Width);
+			}
+
+			*(m_AreaPixels + x - x0 + halfWidth + (y - y0 + halfWidth) * squareWidth) = pixelVal;
+		}
+
+	return m_AreaPixels;
+}
+
+/*
+unsigned long* SimplifiedTracker::GetPixelsArea(unsigned long* pixels, long centerX, long centerY, long squareWidth)
+{
 	long halfWidth = squareWidth / 2;
 	int areaLine = 0;
 	for (int y = centerY - halfWidth; y <centerY + halfWidth; y++, areaLine++)
 	{
-		memcpy(m_AreaPixels + areaLine * squareWidth, pixels + y * m_Width + centerX - halfWidth, squareWidth);
+		memcpy(m_AreaPixels + (areaLine * squareWidth), pixels + (y * m_Width + centerX - halfWidth), squareWidth);
 	}
+	
+	for (int y = 0 ; y < squareWidth; y++)
+	{
+		for (int x = 0; x < squareWidth; x++)
+		{
+			int val = *(m_AreaPixels + y * squareWidth + x) / 256;
+			printf("%d", val);
+		}
+		printf("\n\r");
+	}
+	
 	return m_AreaPixels;
-}
+}*/
 
 void SimplifiedTracker::NextFrame(int frameNo, unsigned long* pixels)
 {
@@ -163,7 +198,8 @@ void SimplifiedTracker::NextFrame(int frameNo, unsigned long* pixels)
 				{
 					trackedObject->SetIsTracked(false, ObjectCertaintyTooSmall, 0, 0);
 				}
-				else if (trackedObject->CurrentPsfFit->FWHM() < MIN_FWHM || trackedObject->CurrentPsfFit->FWHM() > MAX_FWHM)
+				else 
+				if (trackedObject->CurrentPsfFit->FWHM() < MIN_FWHM || trackedObject->CurrentPsfFit->FWHM() > MAX_FWHM)
 				{
 					trackedObject->SetIsTracked(false, FWHMOutOfRange, 0, 0);
 				}
@@ -186,6 +222,14 @@ void SimplifiedTracker::NextFrame(int frameNo, unsigned long* pixels)
 	{
 		TrackedObject* trackedObject = m_TrackedObjects[i];
 
+		bool needsRelativePositioning = trackedObject->IsFixedAperture || (trackedObject->IsOccultedStar && m_IsFullDisappearance);
+		
+		if (!needsRelativePositioning && trackedObject->IsLocated)
+			atLeastOneObjectLocated = true;
+			
+		if (!needsRelativePositioning) 
+			continue;
+		
 		double totalX = 0;
 		double totalY = 0;
 		int numReferences = 0;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -237,7 +238,7 @@ namespace Tangra.PInvoke
 				obj.IsFixedAperture, 
 				obj.TrackingType == TrackingType.OccultedStar, 
 				obj.ApertureStartingX, 
-				obj.ApertureStartingX,
+				obj.ApertureStartingY,
 				obj.ApertureInPixels);
 		}
 
