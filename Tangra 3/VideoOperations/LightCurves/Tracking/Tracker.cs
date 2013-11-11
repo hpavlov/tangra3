@@ -56,7 +56,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                 else
                     LocateSecondObjects.Add(trackedObject);
 
-                if (trackedObject.IsOcultedStar) OccultedStar = trackedObject;
+                if (trackedObject.IsOccultedStar) OccultedStar = trackedObject;
              }
 
             m_AllowedSignalFluctoation = LightCurveReductionContext.Instance.HighFlickering ? 1.90f : 1.30f;
@@ -723,7 +723,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                 {
                     if (goodObjects.Count == 0)
                     {
-                        List<TrackedObject> okayObjects = LocateFirstObjects.FindAll(o => !o.IsOcultedStar && o.IsLocated);
+                        List<TrackedObject> okayObjects = LocateFirstObjects.FindAll(o => !o.IsOccultedStar && o.IsLocated);
 
                         if (okayObjects.Count == 0)
                         {
@@ -938,7 +938,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             else
             {
                 // There is more than one object in the area. We need a smarter way to find the one we need.
-                if (guidingStar.IsOcultedStar)
+                if (guidingStar.IsOccultedStar)
                 {
                     for (int matSize = 5; matSize < 15; matSize += 2)
                     {

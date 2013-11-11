@@ -33,6 +33,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 		ITrackedObjectConfig OriginalObject { get; }
 		int TargetNo { get; }
 		ITrackedObjectPsfFit PSFFit { get; }
+		uint GetTrackingFlags();
 	}
 
 	public interface ITrackedObjectConfig

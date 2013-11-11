@@ -16,13 +16,13 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
         public double DeltaYToAdd;
     }
 
-	internal class TrackedObjectBase : IMeasuredObject, ITrackedObject
+	internal class TrackedObjectBase : ITrackedObject, IMeasurableObject
 	{
 		public NotMeasuredReasons NotMeasuredReasons;
 
 		protected static uint FLAG_OFFSCREEN = 0x00000100;
 
-		public virtual uint GetLCMeasurementFlags()
+		public virtual uint GetTrackingFlags()
 		{
 			uint flags = 0;
 
@@ -260,7 +260,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			}
 		}
 
-		public bool IsOcultedStar { get; protected set; }
+		public bool IsOccultedStar { get; protected set; }
 
 		public int PsfFitMatrixSize { get; protected set; }
 
@@ -279,13 +279,41 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			OriginalObject = originalObject;
 
 			ApertureArea = Math.PI * originalObject.ApertureInPixels * originalObject.ApertureInPixels;
-			IsOcultedStar = OriginalObject.TrackingType == TrackingType.OccultedStar;
+			IsOccultedStar = OriginalObject.TrackingType == TrackingType.OccultedStar;
 			PsfFitMatrixSize = OriginalObject.PsfFitMatrixSize;
 		}
 
 		ITrackedObjectPsfFit ITrackedObject.PSFFit
 		{
 			get { return PSFFit; }
+		}
+
+		bool IMeasurableObject.IsOccultedStar
+		{
+			get { return IsOccultedStar; }
+		}
+
+		bool IMeasurableObject.MayHaveDisappeared
+		{
+			get
+			{
+				bool mayBeOcculted =
+					IsOccultedStar &&
+					PSFFit != null &&
+					PSFFit.IMax < 0.75 * RefinedOrLastSignalLevel;
+
+				return mayBeOcculted;
+			}
+		}
+
+		int IMeasurableObject.PsfFittingMatrixSize
+		{
+			get
+			{
+				return PSFFit != null 
+					? PSFFit.MatrixSize 
+					: OriginalObject.PsfFitMatrixSize;
+			}
 		}
 	}
 

@@ -94,7 +94,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 					{
 						// TODO: Locate manually positioned objects
 					}
-					else if (trackedObject.IsOcultedStar && m_IsFullDisappearance)
+					else if (trackedObject.IsOccultedStar && m_IsFullDisappearance)
 					{
 						// Ignore the state of fully disappearing occulted stars when determining the "TrackedSuccessfully" state
 					}

@@ -51,20 +51,20 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 					{
 						if (fit.Certainty < STELLAR_OBJECT_MIN_CERTAINTY)
 						{
-							trackedObject.SetIsMeasured(false, NotMeasuredReasons.ObjectCertaintyTooSmall);
+							trackedObject.SetIsTracked(false, NotMeasuredReasons.ObjectCertaintyTooSmall, (PSFFit)null);
 						}
 						else if (fit.FWHM < STELLAR_OBJECT_MIN_FWHM || fit.FWHM > STELLAR_OBJECT_MAX_FWHM)
 						{
-							trackedObject.SetIsMeasured(false, NotMeasuredReasons.FWHMOutOfRange);
+							trackedObject.SetIsTracked(false, NotMeasuredReasons.FWHMOutOfRange, (PSFFit)null);
 						}
 						else if (TangraConfig.Settings.Tracking.CheckElongation && fit.ElongationPercentage > STELLAR_OBJECT_MAX_ELONGATION)
 						{
-							trackedObject.SetIsMeasured(false, NotMeasuredReasons.ObjectTooElongated);
+							trackedObject.SetIsTracked(false, NotMeasuredReasons.ObjectTooElongated, (PSFFit)null);
 						}
 						else
 						{
 							trackedObject.SetTrackedObjectMatch(fit);
-							trackedObject.SetIsMeasured(true, NotMeasuredReasons.TrackedSuccessfully);
+							trackedObject.SetIsTracked(true, NotMeasuredReasons.TrackedSuccessfully, fit);
 						}
 					}
 				}					

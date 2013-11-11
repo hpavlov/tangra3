@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Tangra.Model.Config;
 using Tangra.Model.Image;
+using Tangra.Model.VideoOperations;
 using Tangra.VideoOperations.LightCurves.Tracking;
 
 namespace Tangra.VideoOperations.LightCurves
@@ -220,7 +221,7 @@ namespace Tangra.VideoOperations.LightCurves
             
 			uint[,] data = BitmapFilter.CutArrayEdges(clonedValue.PixelData, (35 - areaSize) / 2);
 
-			ReduceLightCurveOperation.MeasureObject(
+			NotMeasuredReasons rv = ReduceLightCurveOperation.MeasureObject(
 				center,
 				data,
 				clonedValue.PixelData,
@@ -235,6 +236,7 @@ namespace Tangra.VideoOperations.LightCurves
 				clonedValue,
 				Footer.ReductionContext.FullDisappearance);
 
+			clonedValue.SetIsMeasured(rv);
             clonedValue.TotalReading = (uint)measurer.TotalReading;
             clonedValue.TotalBackground = (uint)measurer.TotalBackground;
 

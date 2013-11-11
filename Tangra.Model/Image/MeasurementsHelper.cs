@@ -142,8 +142,7 @@ namespace Tangra.Model.Image
             get { return m_PixelData; }
         }
 
-        internal void DoAperturePhotometry(
-            IMeasuredObject obj,
+		internal NotMeasuredReasons DoAperturePhotometry(
             uint[,] matrix, int x0Int, int y0Int, float x0, float y0, float aperture, int matrixSize,
             uint[,] backgroundArea)
         {
@@ -186,17 +185,18 @@ namespace Tangra.Model.Image
                 {
                     throw new ApplicationException("Measurement error. Correlation: AFP-102");
                 }
+
+				return NotMeasuredReasons.MeasuredSuccessfully;
             }
             else
             {
                 m_TotalBackground = 0;
                 m_TotalReading = 0;
-                obj.SetIsMeasured(false, NotMeasuredReasons.NoPixelsToMeasure);
+	            return NotMeasuredReasons.NoPixelsToMeasure;
             }
         }
 
-        internal void DoNonLinearProfileFittingPhotometry(
-            IMeasuredObject obj,
+		internal NotMeasuredReasons DoNonLinearProfileFittingPhotometry(
             uint[,] matrix, int x0Int, int y0Int, float x0, float y0,
             float aperture, int matrixSize, bool useNumericalQadrature,
             bool isFullyDisappearingOccultedStar,
@@ -220,17 +220,17 @@ namespace Tangra.Model.Image
                 (fit.FWHM < 0.75 * refinedFWHM || fit.FWHM > 1.25 * refinedFWHM) // The FWHM is too small or too large, make the reading invalid
                 )
             {
-                obj.SetIsMeasured(false,
-                    !fit.IsSolved
+                return !fit.IsSolved
                         ? NotMeasuredReasons.MeasurementPSFFittingFailed
                         : (distance > tolerance && !mayBeOcculted)
                             ? NotMeasuredReasons.DistanceToleranceTooHighForNonFullDisappearingOccultedStar
-                            : NotMeasuredReasons.FWHMOutOfRange);
+                            : NotMeasuredReasons.FWHMOutOfRange;
             }
+			else
+				return NotMeasuredReasons.MeasuredSuccessfully;
         }
 
-        internal void DoLinearProfileFittingOfAveragedMoodelPhotometry(
-            IMeasuredObject obj,
+		internal NotMeasuredReasons DoLinearProfileFittingOfAveragedMoodelPhotometry(
             uint[,] matrix, int x0Int, int y0Int, float x0, float y0, float modelFWHM,
             float aperture, int matrixSize, bool useNumericalQadrature,
             bool isFullyDisappearingOccultedStar,
@@ -251,15 +251,16 @@ namespace Tangra.Model.Image
             if (fit.IsSolved)
                 SetPsfFitReading(fit, aperture, useNumericalQadrature, backgroundArea);
 
-            if (!fit.IsSolved || // The PSF solution failed, mark the reading invalid
-                (distance > tolerance && !mayBeOcculted)// If this doesn't look like a full disappearance, then make the reading invalid
-                )
-            {
-                obj.SetIsMeasured(false,
-                    !fit.IsSolved
-                        ? NotMeasuredReasons.MeasurementPSFFittingFailed
-                        : NotMeasuredReasons.DistanceToleranceTooHighForNonFullDisappearingOccultedStar);
-            }
+			if (!fit.IsSolved || // The PSF solution failed, mark the reading invalid
+				(distance > tolerance && !mayBeOcculted)// If this doesn't look like a full disappearance, then make the reading invalid
+				)
+			{
+				return !fit.IsSolved
+						? NotMeasuredReasons.MeasurementPSFFittingFailed
+						: NotMeasuredReasons.DistanceToleranceTooHighForNonFullDisappearingOccultedStar;
+			}
+			else
+				return NotMeasuredReasons.MeasuredSuccessfully;
         }
 
         private void SetPsfFitReading(PSFFit fit, float aperture, bool useNumericalQadrature, uint[,] backgroundArea)
@@ -307,8 +308,7 @@ namespace Tangra.Model.Image
             }
         }
 
-        internal void DoOptimalExtractionPhotometry(
-            IMeasuredObject obj,
+		internal NotMeasuredReasons DoOptimalExtractionPhotometry(
             uint[,] matrix, int x0Int, int y0Int, float x0, float y0,
             float aperture, int matrixSize, bool isFullyDisappearingOccultedStar,
             uint[,] backgroundArea,
@@ -386,12 +386,11 @@ namespace Tangra.Model.Image
                                 (fit.FWHM < 0.75 * refinedFWHM || fit.FWHM > 1.25 * refinedFWHM) // The FWHM is too small or too large, make the reading invalid
                                 )
                 {
-                    obj.SetIsMeasured(false,
-                        !fit.IsSolved
+                    return !fit.IsSolved
                             ? NotMeasuredReasons.MeasurementPSFFittingFailed
                             : (distance > tolerance && !mayBeOcculted)
                                 ? NotMeasuredReasons.DistanceToleranceTooHighForNonFullDisappearingOccultedStar
-                                : NotMeasuredReasons.FWHMOutOfRange);
+                                : NotMeasuredReasons.FWHMOutOfRange;
                 }
             }
             else
@@ -400,8 +399,10 @@ namespace Tangra.Model.Image
                 m_TotalBackground = 0;
                 m_TotalReading = 0;
 
-                obj.SetIsMeasured(false, NotMeasuredReasons.NoPixelsToMeasure);
+                return NotMeasuredReasons.NoPixelsToMeasure;
             }
+
+			return NotMeasuredReasons.MeasuredSuccessfully;
         }
 
         public void Measure(float x0, float y0, float precomputedAperture, Filter filter, uint[,] matrix, int bpp, double psfBackground, ref int matrixSize, bool fixedAperture)
@@ -797,7 +798,7 @@ namespace Tangra.Model.Image
             return average;
         }
 
-        public void MeasureObject(
+		public NotMeasuredReasons MeasureObject(
             IImagePixel center,
             uint[,] data,
             uint[,] backgroundPixels,
@@ -808,7 +809,7 @@ namespace Tangra.Model.Image
             float aperture,
             double refinedFWHM,
             float refinedAverageFWHM,
-            IMeasuredObject measuredObject,
+			IMeasurableObject measurableObject,
             bool fullDisappearance)
         {
             int centerX = (int)Math.Round(center.XDouble);
@@ -831,79 +832,62 @@ namespace Tangra.Model.Image
                     break;
             }
 
-            if (reductionMethod == TangraConfig.PhotometryReductionMethod.PsfPhotometryAnalytical ||
-                reductionMethod == TangraConfig.PhotometryReductionMethod.PsfPhotometryNumerical)
-            {
-                bool mayBeOcculted =
-                    measuredObject.IsOcultedStar &&
-                    measuredObject.PSFFit != null &&
-                    measuredObject.PSFFit.IMax < 0.75 * measuredObject.RefinedOrLastSignalLevel;
+			if (reductionMethod == TangraConfig.PhotometryReductionMethod.PsfPhotometryAnalytical ||
+				reductionMethod == TangraConfig.PhotometryReductionMethod.PsfPhotometryNumerical)
+			{
+				if (TangraConfig.Settings.Photometry.PsfFittingMethod == TangraConfig.PsfFittingMethod.DirectNonLinearFit)
+				{
+					return DoNonLinearProfileFittingPhotometry(
+						data, centerX, centerY, msrX0, msrY0,
+						aperture,
+						measurableObject.PsfFittingMatrixSize,
+						reductionMethod == TangraConfig.PhotometryReductionMethod.PsfPhotometryNumerical,
+						measurableObject.IsOccultedStar && fullDisappearance,
+						backgroundPixels,
+						measurableObject.MayHaveDisappeared, 
+						refinedFWHM);
+				}
+				else if (TangraConfig.Settings.Photometry.PsfFittingMethod == TangraConfig.PsfFittingMethod.LinearFitOfAveragedModel)
+				{
+					float modelFWHM = float.NaN;
+					if (TangraConfig.Settings.Photometry.UseUserSpecifiedFWHM)
+						modelFWHM = TangraConfig.Settings.Photometry.UserSpecifiedFWHM;
+					else
+						modelFWHM = refinedAverageFWHM;
 
-                if (TangraConfig.Settings.Photometry.PsfFittingMethod == TangraConfig.PsfFittingMethod.DirectNonLinearFit)
-                {
-                    DoNonLinearProfileFittingPhotometry(
-                        measuredObject,
-                        data, centerX, centerY, msrX0, msrY0,
-                        aperture,
-                        measuredObject.PSFFit != null
-                            ? measuredObject.PSFFit.MatrixSize
-                            : measuredObject.PsfFitMatrixSize,
-                        reductionMethod == TangraConfig.PhotometryReductionMethod.PsfPhotometryNumerical,
-                        measuredObject.IsOcultedStar && fullDisappearance,
-                        backgroundPixels, mayBeOcculted, refinedFWHM);
-                }
-                else if (TangraConfig.Settings.Photometry.PsfFittingMethod == TangraConfig.PsfFittingMethod.LinearFitOfAveragedModel)
-                {
-                    float modelFWHM = float.NaN;
-                    if (TangraConfig.Settings.Photometry.UseUserSpecifiedFWHM)
-                        modelFWHM = TangraConfig.Settings.Photometry.UserSpecifiedFWHM;
-                    else
-                        modelFWHM = refinedAverageFWHM;
-
-                    DoLinearProfileFittingOfAveragedMoodelPhotometry(
-                        measuredObject,
-                        data, centerX, centerY, msrX0, msrY0, modelFWHM,
-                        aperture,
-                        measuredObject.PSFFit != null
-                            ? measuredObject.PSFFit.MatrixSize
-                            : measuredObject.PsfFitMatrixSize,
-                        reductionMethod == TangraConfig.PhotometryReductionMethod.PsfPhotometryNumerical,
-                        measuredObject.IsOcultedStar && fullDisappearance,
-                        backgroundPixels, mayBeOcculted);
-                }
-                else
-                    throw new NotImplementedException();
-            }
-            else if (reductionMethod == TangraConfig.PhotometryReductionMethod.AperturePhotometry)
-            {
-                DoAperturePhotometry(
-                    measuredObject,
-                    data, centerX, centerY, msrX0, msrY0,
-                    aperture,
-                    measuredObject.PSFFit != null
-                        ? measuredObject.PSFFit.MatrixSize
-                        : measuredObject.PsfFitMatrixSize,
-                    backgroundPixels);
-
-                measuredObject.AppMeaAveragePixel = Math.Min(255, 1.66 * TotalReading / measuredObject.ApertureArea);
-            }
-            else if (reductionMethod == TangraConfig.PhotometryReductionMethod.OptimalExtraction)
-            {
-                bool mayBeOcculted =
-                    measuredObject.IsOcultedStar &&
-                    measuredObject.PSFFit != null &&
-                    measuredObject.PSFFit.IMax < 0.75 * measuredObject.RefinedOrLastSignalLevel;
-
-                DoOptimalExtractionPhotometry(
-                    measuredObject,
-                    data, centerX, centerY, msrX0, msrY0,
-                    aperture,
-                    measuredObject.PSFFit != null
-                        ? measuredObject.PSFFit.MatrixSize
-                        : measuredObject.PsfFitMatrixSize,
-                    measuredObject.IsOcultedStar && fullDisappearance,
-                    backgroundPixels, mayBeOcculted, refinedFWHM);
-            }
+					return DoLinearProfileFittingOfAveragedMoodelPhotometry(
+						data, centerX, centerY, msrX0, msrY0, modelFWHM,
+						aperture,
+						measurableObject.PsfFittingMatrixSize,
+						reductionMethod == TangraConfig.PhotometryReductionMethod.PsfPhotometryNumerical,
+						measurableObject.IsOccultedStar && fullDisappearance,
+						backgroundPixels,
+						measurableObject.MayHaveDisappeared);
+				}
+				else
+					throw new NotImplementedException();
+			}
+			else if (reductionMethod == TangraConfig.PhotometryReductionMethod.AperturePhotometry)
+			{
+				return DoAperturePhotometry(
+					data, centerX, centerY, msrX0, msrY0,
+					aperture,
+					measurableObject.PsfFittingMatrixSize,
+					backgroundPixels);
+			}
+			else if (reductionMethod == TangraConfig.PhotometryReductionMethod.OptimalExtraction)
+			{
+				return DoOptimalExtractionPhotometry(
+					data, centerX, centerY, msrX0, msrY0,
+					aperture,
+					measurableObject.PsfFittingMatrixSize,
+					measurableObject.IsOccultedStar && fullDisappearance,
+					backgroundPixels,
+					measurableObject.MayHaveDisappeared, 
+					refinedFWHM);
+			}
+			else
+				throw new ArgumentOutOfRangeException("reductionMethod");
         }
     }
 }

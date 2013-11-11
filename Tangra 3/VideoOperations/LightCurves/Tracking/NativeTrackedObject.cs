@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using Tangra.Model.Astro;
 using Tangra.Model.Image;
+using Tangra.Model.VideoOperations;
 using Tangra.PInvoke;
 
 namespace Tangra.VideoOperations.LightCurves.Tracking
 {
-    public class NativeTrackedObject : ITrackedObject
+	public class NativeTrackedObject : ITrackedObject, IMeasurableObject
     {
         private NativeTrackedObjectPsfFit m_NativePsfFit;
 
@@ -17,13 +18,18 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
         public float RefinedFWHM;
         public float RefinedIMAX;
 
+		private bool m_IsOccultedStar;
+		private bool m_IsFullDisappearance;
+
         public List<double> m_RecentFWHMs = new List<double>();
         public List<double> m_RecentIMAXs = new List<double>();
 
-        public NativeTrackedObject(int trackedObjectId, ITrackedObjectConfig originalObject)
+        public NativeTrackedObject(int trackedObjectId, ITrackedObjectConfig originalObject, bool isFullDisappearance)
         {
             TargetNo = trackedObjectId;
             OriginalObject = originalObject;
+	        m_IsOccultedStar = OriginalObject.TrackingType == TrackingType.OccultedStar;
+	        m_IsFullDisappearance = isFullDisappearance;
             m_NativePsfFit = new NativeTrackedObjectPsfFit(8);
         }
 
@@ -55,6 +61,11 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             get { return m_NativePsfFit; }
         }
 
+		public uint GetTrackingFlags()
+		{
+			return m_TrackingFlags;
+		}
+
         public void InitializeNewTracking()
         {
             RefinedFWHM = float.NaN;
@@ -83,6 +94,21 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
             IsLocated = false;
         }
-    }
+
+		bool IMeasurableObject.IsOccultedStar
+		{
+			get { return m_IsOccultedStar; }
+		}
+
+		bool IMeasurableObject.MayHaveDisappeared
+		{
+			get { return m_IsOccultedStar && m_IsFullDisappearance; }
+		}
+
+		int IMeasurableObject.PsfFittingMatrixSize
+		{
+			get { return PSFFit != null ? PSFFit.MatrixSize : OriginalObject.PsfFitMatrixSize; }
+		}
+	}
 
 }

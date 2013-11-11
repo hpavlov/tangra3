@@ -569,7 +569,7 @@ namespace Tangra.VideoOperations.LightCurves
 		SignalDividedByNoise
     }
 
-    internal struct LCMeasurement : IMeasuredObject
+    internal struct LCMeasurement : IMeasurableObject
     {
         public static LCMeasurement Empty = new LCMeasurement();
 
@@ -664,6 +664,12 @@ namespace Tangra.VideoOperations.LightCurves
 					return GOOD_FLAGS.IndexOf(Flags) != -1;
             }
         }
+
+		public void SetIsMeasured(NotMeasuredReasons reasons)
+		{
+			if (reasons != NotMeasuredReasons.MeasuredSuccessfully)
+				FlagsDWORD += (uint)reasons;
+		}
 
 		internal bool IsOffScreen
 		{
@@ -798,73 +804,31 @@ namespace Tangra.VideoOperations.LightCurves
 			writer.Write(FlagsDWORD);
         }
 
-        #region IMeasuredObject Members
+		internal int ReProcessingPsfFitMatrixSize;
 
-        void IMeasuredObject.SetIsMeasured(bool isMeasured, NotMeasuredReasons reason)
-        {
-           // TODO:
-        }
+		bool IMeasurableObject.IsOccultedStar
+		{
+			get
+			{
+				// We don't know this (don't have a guess) when re-processing data
+				return false;
+			}
+		}
 
-        bool IMeasuredObject.IsOcultedStar
-        {
-            get
-            {
-                //TODO:
-                return false;
-            }
-        }
+		bool IMeasurableObject.MayHaveDisappeared
+		{
+			get
+			{
+				// We don't know this (don't have a guess) when re-processing data
+				return false;
+			}
+		}
 
-        internal int ReProcessingPsfFitMatrixSize;
-
-        int IMeasuredObject.PsfFitMatrixSize
-        {
-            get
-            {
-                return ReProcessingPsfFitMatrixSize;
-            }
-        }
-
-        double IMeasuredObject.AppMeaAveragePixel
-        {
-            get
-            {
-                return double.NaN;
-            }
-            set
-            { }
-        }
-
-        double IMeasuredObject.ApertureArea
-        {
-            get
-            {
-                // TODO:
-                return double.NaN;
-            }
-            set
-            { }
-        }
-
-        float IMeasuredObject.RefinedOrLastSignalLevel
-        {
-            get 
-            {
-                // TODO:
-                return float.NaN;
-            }
-        }
-
-        PSFFit IMeasuredObject.PSFFit
-        {
-            get
-            {
-                // TODO:
-                return null;
-            }
-        }
-
-        #endregion
-    }
+		int IMeasurableObject.PsfFittingMatrixSize
+		{
+			get { return ReProcessingPsfFitMatrixSize; }
+		}
+	}
 
 	public enum MeasurementTimingType
 	{

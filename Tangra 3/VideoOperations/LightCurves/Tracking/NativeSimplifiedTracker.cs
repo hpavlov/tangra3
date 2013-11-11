@@ -15,7 +15,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 	    private List<ITrackedObject> m_TrackedObjects = new List<ITrackedObject>();
         private List<NativeTrackedObject> m_NativeTrackedObject = new List<NativeTrackedObject>();
 
-		internal NativeSimplifiedTracker(int width, int height, List<TrackedObjectConfig> measuringStars)
+		internal NativeSimplifiedTracker(int width, int height, List<TrackedObjectConfig> measuringStars, bool isFullDisappearance)
 		{
 			NativeTracking.ConfigureNativeTracker();
 				
@@ -29,7 +29,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			{
 				TrackedObjectConfig obj = measuringStars[i];
 				NativeTracking.ConfigureTrackedObject(i, obj);
-			    var nativeObj = new NativeTrackedObject(i, obj);
+				var nativeObj = new NativeTrackedObject(i, obj, isFullDisappearance);
                 m_NativeTrackedObject.Add(nativeObj);
                 m_TrackedObjects.Add(nativeObj);
 			}
@@ -61,7 +61,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             get
             {
                 return m_TrackedObjects
-                    .Cast<TrackedObjectLight>()
+					.Cast<NativeTrackedObject>()
                     .Select(x => x.RefinedFWHM)
                     .ToArray();
             }

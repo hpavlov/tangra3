@@ -1499,8 +1499,7 @@ namespace Tangra.VideoOperations.LightCurves
             if (m_MaxFrame < m_CurrFrameNo) m_MaxFrame = (uint)m_CurrFrameNo;
             m_TotalFrames++;
 
-			// TODO: Separate the ITrackedObject from IMeasuredObject
-			foreach (TrackedObjectLight trackedObject in m_Tracker.TrackedObjects)
+			foreach (ITrackedObject trackedObject in m_Tracker.TrackedObjects)
 			{
 				IImagePixel center = trackedObject.Center;
 
@@ -1516,7 +1515,7 @@ namespace Tangra.VideoOperations.LightCurves
 					uint[,] data = m_VideoController.GetCurrentAstroImage(false).GetMeasurableAreaPixels(
 						(int)Math.Round(center.XDouble), (int)Math.Round(center.YDouble), 35);
 
-					uint flags = trackedObject.GetLCMeasurementFlags();
+					uint flags = trackedObject.GetTrackingFlags();
 					// Add unsuccessfull measurement for this object and this frame
 					LCFile.SaveOnTheFlyMeasurement(new LCMeasurement(
 													(uint)m_CurrFrameNo,
@@ -1537,7 +1536,7 @@ namespace Tangra.VideoOperations.LightCurves
         private SpinLock m_WriterLock;
 
 		private void MeasureTrackedObject2(
-			TrackedObjectBase trackedObject,
+			ITrackedObject trackedObject,
 			MeasurementsHelper measurer,
 			TangraConfig.PreProcessingFilter filter,
 			bool synchronise)
@@ -1556,7 +1555,21 @@ namespace Tangra.VideoOperations.LightCurves
 			float msrX0 = (float)trackedObject.Center.XDouble;
 			float msrY0 = (float)trackedObject.Center.YDouble;
 
-			MeasureObject(
+			var measuredObject = new LCMeasurement()
+			{
+				CurrFrameNo = (uint) m_CurrFrameNo,
+				TargetNo = (byte) trackedObject.TargetNo,
+				X0 = msrX0,
+				Y0 = msrY0,
+				PixelDataX0 = centerX,
+				PixelDataY0 = centerY,
+				OSDTimeStamp = m_OCRedTimeStamp,
+				FlagsDWORD = trackedObject.GetTrackingFlags()
+			};
+
+			IMeasurableObject measurableObject = (IMeasurableObject)trackedObject;
+
+			NotMeasuredReasons rv = MeasureObject(
 				center,
 				data,				
 				backgroundPixels,
@@ -1568,13 +1581,17 @@ namespace Tangra.VideoOperations.LightCurves
 				trackedObject.OriginalObject.ApertureInPixels,
 				m_Tracker.RefinedFWHM[trackedObject.TargetNo],
 				m_Tracker.RefinedAverageFWHM,
-				trackedObject,
+				measurableObject,
 				LightCurveReductionContext.Instance.FullDisappearance);
+
+			measuredObject.SetIsMeasured(rv);
 
 			uint[,] pixelsToSave = trackedObject.IsOffScreen
 									   ? new uint[35, 35]
 									   // As the background may have been pre-processed for measuring, we need to take another copy for saving in the file
 									   : m_VideoController.GetCurrentAstroImage(false).GetMeasurableAreaPixels(centerX, centerY, 35);
+
+
 
 			bool lockTaken = false;
 
@@ -1583,20 +1600,14 @@ namespace Tangra.VideoOperations.LightCurves
 
 			try
 			{
-				uint flags = trackedObject.GetLCMeasurementFlags();
+				uint flags = trackedObject.GetTrackingFlags();
 
-				LCFile.SaveOnTheFlyMeasurement(new LCMeasurement(
-												   (uint)m_CurrFrameNo,
-												   (byte)trackedObject.TargetNo,
-												   (uint)Math.Round(measurer.TotalReading),
-												   (uint)Math.Round(measurer.TotalBackground),
-												   flags,
-												   msrX0, msrY0,
-					/* We want to use the real image (X,Y) coordinates here */
-					//(float) aperture,
-												   trackedObject.PSFFit,
-					/* but we want to use the actual measurement fit. This only matters for reviewing the light curve when not opened from a file. */
-												   pixelsToSave /* save the original non filtered data */, centerX, centerY, m_OCRedTimeStamp));
+				measuredObject.TotalReading = (uint)Math.Round(measurer.TotalReading);
+				measuredObject.TotalBackground = (uint)Math.Round(measurer.TotalBackground);
+				measuredObject.PixelData = pixelsToSave; /* save the original non filtered data */
+				measuredObject.FlagsDWORD |= flags;
+
+				LCFile.SaveOnTheFlyMeasurement(measuredObject);
 			}
 			finally
 			{
@@ -1605,7 +1616,7 @@ namespace Tangra.VideoOperations.LightCurves
 			}
 		}
 
-		internal static void MeasureObject(
+		internal static NotMeasuredReasons MeasureObject(
 			IImagePixel center,
 			uint[,] data,
 			uint[,] backgroundPixels,
@@ -1617,7 +1628,7 @@ namespace Tangra.VideoOperations.LightCurves
 			float aperture,
 			double refinedFWHM,
 			float refinedAverageFWHM,
-			IMeasuredObject measuredObject,
+			IMeasurableObject measurableObject,
 			bool fullDisappearance
 			)
 		{
@@ -1629,8 +1640,8 @@ namespace Tangra.VideoOperations.LightCurves
 					reductionMethod = TangraConfig.PhotometryReductionMethod.PsfPhotometryAnalytical;
 			}
 
-			measurer.MeasureObject(center, data, backgroundPixels, bpp, filter, synchronise, reductionMethod,
-								   aperture, refinedFWHM, refinedAverageFWHM, measuredObject, fullDisappearance);
+			return measurer.MeasureObject(center, data, backgroundPixels, bpp, filter, synchronise, reductionMethod,
+								   aperture, refinedFWHM, refinedAverageFWHM, measurableObject, fullDisappearance);
 	}
 
 		private LCFile m_lcFile = null;

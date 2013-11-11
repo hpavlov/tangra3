@@ -12,6 +12,7 @@ namespace Tangra.Model.VideoOperations
         /* First Level Reasons */
         UnknownReason = 0,
         TrackedSuccessfully = 1,
+		MeasuredSuccessfully = 1,
         FixedObject = 2,
         GuidingStarBrightnessFluctoationTooHigh = 3,
         PSFFittingFailed = 4,
@@ -42,14 +43,10 @@ namespace Tangra.Model.VideoOperations
 		ObjectCertaintyTooSmall = 2 << 24,
     }
 
-    public interface IMeasuredObject
-    {
-        void SetIsMeasured(bool isMeasured, NotMeasuredReasons reason);
-        bool IsOcultedStar { get; }
-        int PsfFitMatrixSize { get; }
-        double AppMeaAveragePixel { get; set; }
-        double ApertureArea { get; set; }
-        float RefinedOrLastSignalLevel { get; }
-        PSFFit PSFFit { get; }
-    }
+	public interface IMeasurableObject
+	{
+		bool IsOccultedStar { get; }
+		bool MayHaveDisappeared { get; }
+		int PsfFittingMatrixSize { get; }
+	}
 }

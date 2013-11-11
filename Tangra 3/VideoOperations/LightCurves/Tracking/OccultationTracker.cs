@@ -122,7 +122,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 				for (int i = 0; i < TrackedObjects.Count; i++)
 				{
 					if (
-						(!(TrackedObjects[i] as TrackedObject).IsOcultedStar || !LightCurveReductionContext.Instance.FullDisappearance) &&
+						(!(TrackedObjects[i] as TrackedObject).IsOccultedStar || !LightCurveReductionContext.Instance.FullDisappearance) &&
 						!TrackedObjects[i].IsOffScreen &&
 						!float.IsNaN((TrackedObjects[i] as TrackedObject).LastFrameX)
 						)
@@ -143,7 +143,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
             for (int i = 0; i < TrackedObjects.Count; i++)
             {
-				if ((!(TrackedObjects[i] as TrackedObject).IsOcultedStar && !TrackedObjects[i].IsOffScreen) ||
+				if ((!(TrackedObjects[i] as TrackedObject).IsOccultedStar && !TrackedObjects[i].IsOffScreen) ||
                     !LightCurveReductionContext.Instance.FullDisappearance)
                 {
 					m_LocateObjects.Add((TrackedObjects[i] as TrackedObject).TargetNo);
