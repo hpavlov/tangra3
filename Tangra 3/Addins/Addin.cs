@@ -10,6 +10,7 @@ using System.Security;
 using System.Security.Policy;
 using System.Text;
 using System.Xml.Serialization;
+using Tangra.Model.Config;
 using Tangra.SDK;
 using Tangra.Model.Helpers;
 
@@ -25,49 +26,66 @@ namespace Tangra.Addins
 
 		internal Addin(string fullTypeName, AddinManager addinManager)
 		{
+            string[] tokens = fullTypeName.Split(new char[] { ',' }, 2);
+            m_AssemblyName = new AssemblyName(tokens[1]);
 
-			string[] tokens = fullTypeName.Split(new char[] { ',' }, 2);
-
-			var appSetup = new AppDomainSetup()
-			{
-				ApplicationName = "Tangra 3",
-				ApplicationBase = AppDomain.CurrentDomain.BaseDirectory,
-				ConfigurationFile = AppDomain.CurrentDomain.SetupInformation.ConfigurationFile,
-				PrivateBinPath = @"Addins",
-			};
-
-			m_AssemblyName = new AssemblyName(tokens[1]);
-			m_DomainName = string.Format("Tangra.Addins.{0}.v{1}", m_AssemblyName.Name, m_AssemblyName.Version.ToString());
-
-			var e = new Evidence();
-			e.AddHostEvidence(new Zone(SecurityZone.MyComputer));
-			PermissionSet pset = SecurityManager.GetStandardSandbox(e);
-
-			m_HostDomain = AppDomain.CreateDomain(m_DomainName, AppDomain.CurrentDomain.Evidence, appSetup, pset, null);
-			m_HostDomain.AssemblyResolve += m_HostDomain_AssemblyResolve;
-			m_HostDomain.ReflectionOnlyAssemblyResolve += m_HostDomain_AssemblyResolve;
-			m_HostDomain.UnhandledException += m_HostDomain_UnhandledException;
-
-			object obj = m_HostDomain.CreateInstanceAndUnwrap(tokens[1], tokens[0]);
-
-			ILease lease = (ILease)(obj as MarshalByRefObject).GetLifetimeService();
-			if (lease != null)
-				lease.Register(addinManager.RemotingClientSponsor);
-
-			m_Instance = (ITangraAddin)obj;
-			m_Instance.Initialise(new TangraHostDelegate(fullTypeName, addinManager));
-
-			foreach (object actionInstance in m_Instance.GetAddinActions())
-			{
-				var mbrObj = actionInstance as MarshalByRefObject;
-				if (mbrObj != null)
-				{
-					lease = (ILease)mbrObj.GetLifetimeService();
-					if (lease != null)
-						lease.Register(addinManager.RemotingClientSponsor);									
-				}
-			}
+            if (TangraConfig.Settings.Generic.AddinIsolationLevel == TangraConfig.IsolationLevel.AppDomain)
+            {
+                LoadAddinInAppDomain(tokens[1], tokens[0], addinManager);
+            }
+            else
+            {
+                m_HostDomain = null;
+                string fullName = string.Format("{0}//{1}.dll", AddinManager.ADDINS_DIRECTORY, m_AssemblyName.Name);
+                // TODO: This doesn't work
+                Assembly asm = Assembly.Load(fullName);
+                Type type = asm.GetType(tokens[0]);
+                m_Instance = (ITangraAddin) Activator.CreateInstance(type, new object[] {});
+            }
 		}
+
+        private void LoadAddinInAppDomain(string assemblyName, string typeName, AddinManager addinManager)
+        {
+            var appSetup = new AppDomainSetup()
+            {
+                ApplicationName = "Tangra 3",
+                ApplicationBase = AppDomain.CurrentDomain.BaseDirectory,
+                ConfigurationFile = AppDomain.CurrentDomain.SetupInformation.ConfigurationFile,
+                PrivateBinPath = @"Addins",
+            };
+
+            
+            m_DomainName = string.Format("Tangra.Addins.{0}.v{1}", m_AssemblyName.Name, m_AssemblyName.Version.ToString());
+
+            var e = new Evidence();
+            e.AddHostEvidence(new Zone(SecurityZone.MyComputer));
+            PermissionSet pset = SecurityManager.GetStandardSandbox(e);
+
+            m_HostDomain = AppDomain.CreateDomain(m_DomainName, AppDomain.CurrentDomain.Evidence, appSetup, pset, null);
+            m_HostDomain.AssemblyResolve += m_HostDomain_AssemblyResolve;
+            m_HostDomain.ReflectionOnlyAssemblyResolve += m_HostDomain_AssemblyResolve;
+            m_HostDomain.UnhandledException += m_HostDomain_UnhandledException;
+
+            object obj = m_HostDomain.CreateInstanceAndUnwrap(assemblyName, typeName);
+
+            ILease lease = (ILease)(obj as MarshalByRefObject).GetLifetimeService();
+            if (lease != null)
+                lease.Register(addinManager.RemotingClientSponsor);
+
+            m_Instance = (ITangraAddin)obj;
+            m_Instance.Initialise(new TangraHostDelegate(typeName, addinManager));
+
+            foreach (object actionInstance in m_Instance.GetAddinActions())
+            {
+                var mbrObj = actionInstance as MarshalByRefObject;
+                if (mbrObj != null)
+                {
+                    lease = (ILease)mbrObj.GetLifetimeService();
+                    if (lease != null)
+                        lease.Register(addinManager.RemotingClientSponsor);
+                }
+            }
+        }
 
 		public XmlSerializer CreateXmlSettingsSerializer(Type settingsType)
 		{
@@ -116,5 +134,10 @@ namespace Tangra.Addins
 		{
 			get { return m_Instance; }
 		}
+
+        public override string ToString()
+        {
+            return m_Instance != null ? m_Instance.DisplayName : "";
+        }
 	}
 }

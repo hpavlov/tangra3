@@ -100,6 +100,18 @@
     <Compile Include="Config\frmTangraSettings.Designer.cs">
       <DependentUpon>frmTangraSettings.cs</DependentUpon>
     </Compile>
+    <Compile Include="Config\SettingPannels\ucAddins.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucAddins.Designer.cs">
+      <DependentUpon>ucAddins.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucCompatibility.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucCompatibility.Designer.cs">
+      <DependentUpon>ucCompatibility.cs</DependentUpon>
+    </Compile>
     <Compile Include="Config\SettingPannels\ucAAV8bit.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -454,6 +466,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Config\frmTangraSettings.resx">
       <DependentUpon>frmTangraSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Config\SettingPannels\ucAddins.resx">
+      <DependentUpon>ucAddins.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Config\SettingPannels\ucCompatibility.resx">
+      <DependentUpon>ucCompatibility.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Config\SettingPannels\ucAAV8bit.resx">
       <DependentUpon>ucAAV8bit.cs</DependentUpon>

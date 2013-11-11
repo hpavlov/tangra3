@@ -472,7 +472,7 @@ namespace Tangra.Model.Config
 		public enum OnOpenOperation
 		{
 			DoNothing = 0,
-			StartLightCurveReduction = 1			
+			StartLightCurveReduction = 1
 		}
 
 		public enum PerformanceQuality
@@ -480,6 +480,12 @@ namespace Tangra.Model.Config
 			Responsiveness,
 			Speed
 		}
+
+        public enum IsolationLevel
+        {
+            AppDomain,
+            None
+        }
 
 		public class GenericSettings
 		{
@@ -495,8 +501,10 @@ namespace Tangra.Model.Config
 
 			public bool AcceptBetaUpdates = false;
 
-			public bool UseHueIntensityDisplayMode = false;
+			public bool UseHueIntensityDisplayMode = true;
 			public bool UseInvertedDisplayMode = false;
+
+            public IsolationLevel AddinIsolationLevel = IsolationLevel.AppDomain;
 		}
 
         public class LastUsedSettings

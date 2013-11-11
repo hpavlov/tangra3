@@ -39,6 +39,8 @@ namespace Tangra.Addins
 	{
 		public readonly List<Addin> Addins = new List<Addin>();
 
+        public readonly static string ADDINS_DIRECTORY = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Addins");
+
 		private frmMain m_MainForm;
 		private ILightCurveDataProvider m_lcDataProvider;
 
@@ -49,7 +51,6 @@ namespace Tangra.Addins
 			m_MainForm = mainForm;
 
 			TrackingServices.RegisterTrackingHandler(new AddinTrackingHandler());
-
 		}
 
 		public void LoadAddins()
@@ -77,11 +78,9 @@ namespace Tangra.Addins
 		{
 			var addins = new List<string>();
 
-			string addinsDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Addins");
-
-			if (Directory.Exists(addinsDir))
+            if (Directory.Exists(ADDINS_DIRECTORY))
 			{
-				string[] names = Directory.GetFiles(addinsDir, "*.dll");
+                string[] names = Directory.GetFiles(ADDINS_DIRECTORY, "*.dll");
 
 				foreach (string asm in names)
 				{

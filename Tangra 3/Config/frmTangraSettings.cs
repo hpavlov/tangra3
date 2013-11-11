@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Tangra.Config.SettingPannels;
+using Tangra.Controller;
 using Tangra.Helpers;
 using Tangra.Model.Config;
 
@@ -20,12 +21,19 @@ namespace Tangra.Config
 		private SettingsPannel m_CurrentPanel = null;
 		private IAdvStatusPopupFormCustomizer m_AdvPopupCustomizer;
 		private IAavStatusPopupFormCustomizer m_AavPopupCustomizer;
+	    private AddinsController m_AddinsController;
 
 		public bool ShowCatalogRequiredHint = false;
 
-		public frmTangraSettings(ILightCurveFormCustomizer lightCurveCustomizer, IAdvStatusPopupFormCustomizer advPopupCustomizer, IAavStatusPopupFormCustomizer aavPopupCustomizer)
+		public frmTangraSettings(
+            ILightCurveFormCustomizer lightCurveCustomizer, 
+            IAdvStatusPopupFormCustomizer advPopupCustomizer, 
+            IAavStatusPopupFormCustomizer aavPopupCustomizer,
+            AddinsController addinsController)
 		{
 			InitializeComponent();
+
+		    m_AddinsController = addinsController;
 
 			InitAllPropertyPages();
 
@@ -64,6 +72,9 @@ namespace Tangra.Config
 			m_PropertyPages.Add(4, new ucPhotometry());
 
 			m_PropertyPages.Add(6, new ucTracking());
+            m_PropertyPages.Add(8, new ucCompatibility());
+
+            m_PropertyPages.Add(12, new ucAddins(m_AddinsController));
 
 			m_PropertyPages.Add(7, new ucCustomizeLightCurves());
 			m_PropertyPages.Add(9, new ucCustomizeLightCurveViewer());

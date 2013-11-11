@@ -51,10 +51,6 @@
             this.miCheckForUpdates = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this.miAbout = new System.Windows.Forms.ToolStripMenuItem();
-            this.miAddins = new System.Windows.Forms.ToolStripMenuItem();
-            this.miLoadedAddins = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripSeparator();
-            this.miConfigureAddin = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.tsProgessBar = new System.Windows.Forms.ToolStripProgressBar();
             this.ssStatus = new System.Windows.Forms.ToolStripStatusLabel();
@@ -113,7 +109,6 @@
             this.miTasks,
             this.miTools,
             this.miSettings,
-            this.miAddins,
             this.miHelp});
             this.mainMenu.Location = new System.Drawing.Point(0, 0);
             this.mainMenu.Name = "mainMenu";
@@ -364,35 +359,6 @@
             this.miAbout.Size = new System.Drawing.Size(171, 22);
             this.miAbout.Text = "&About";
             this.miAbout.Click += new System.EventHandler(this.miAbout_Click);
-            // 
-            // miAddins
-            // 
-            this.miAddins.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.miLoadedAddins,
-            this.toolStripMenuItem5,
-            this.miConfigureAddin});
-            this.miAddins.Name = "miAddins";
-            this.miAddins.Size = new System.Drawing.Size(56, 20);
-            this.miAddins.Text = "&Addins";
-            this.miAddins.Visible = false;
-            // 
-            // miLoadedAddins
-            // 
-            this.miLoadedAddins.Name = "miLoadedAddins";
-            this.miLoadedAddins.Size = new System.Drawing.Size(162, 22);
-            this.miLoadedAddins.Text = "&Loaded Addins";
-            this.miLoadedAddins.Click += new System.EventHandler(this.miLoadedAddins_Click);
-            // 
-            // toolStripMenuItem5
-            // 
-            this.toolStripMenuItem5.Name = "toolStripMenuItem5";
-            this.toolStripMenuItem5.Size = new System.Drawing.Size(159, 6);
-            // 
-            // miConfigureAddin
-            // 
-            this.miConfigureAddin.Name = "miConfigureAddin";
-            this.miConfigureAddin.Size = new System.Drawing.Size(162, 22);
-            this.miConfigureAddin.Text = "&Configure Addin";
             // 
             // statusStrip
             // 
@@ -900,11 +866,7 @@
 		protected internal System.Windows.Forms.ToolStripMenuItem miLoadFlat;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem4;
         private System.Windows.Forms.ToolStripMenuItem miShowFields;
-		protected internal System.Windows.Forms.ToolStripMenuItem tsmiHueIntensity;
-		protected internal System.Windows.Forms.ToolStripMenuItem miAddins;
-		private System.Windows.Forms.ToolStripMenuItem miLoadedAddins;
-		private System.Windows.Forms.ToolStripSeparator toolStripMenuItem5;
-		protected internal System.Windows.Forms.ToolStripMenuItem miConfigureAddin;
+        protected internal System.Windows.Forms.ToolStripMenuItem tsmiHueIntensity;
 	}
 }
 

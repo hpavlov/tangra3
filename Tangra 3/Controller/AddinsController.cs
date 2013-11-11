@@ -29,52 +29,36 @@ namespace Tangra.Controller
 		public void LoadAddins()
 		{
 			m_AddinManager.LoadAddins();
-
-			BuildMainFormAddinsMenu();			
 		}
 
-		public void Dispose()
+        public void ReloadAddins()
+        {
+            UnloadAddins(); 
+            m_AddinManager.LoadAddins();
+        }
+
+        public void UnloadAddins()
+        {
+            if (m_AddinManager != null)
+                m_AddinManager.Dispose();
+            m_AddinManager = null;
+
+            m_AddinManager = new AddinManager(m_MainForm); 
+        }
+
+        public void Dispose()
 		{
-			m_MainForm.miConfigureAddin.DropDownItems.Clear();
 			m_AddinManager.Dispose();
 		}
 
-		private void BuildMainFormAddinsMenu()
+		public void ShowLoadedAddins(ListBox listBox)
 		{
-			if (m_AddinManager.Addins.Count > 0)
-			{
-				m_MainForm.miConfigureAddin.DropDownItems.Clear();
+            listBox.Items.Clear();
 
-				foreach (Addin addin in m_AddinManager.Addins)
-				{
-					ToolStripMenuItem item = new ToolStripMenuItem(addin.Instance.DisplayName);
-					item.Click += ConfigureAddinItem_Click;
-					item.Tag = addin;
-
-					m_MainForm.miConfigureAddin.DropDownItems.Add(item);
-				}
-
-				m_MainForm.miAddins.Visible = true;
-			}
-			else
-				m_MainForm.miAddins.Visible = false;
-		}
-
-		void ConfigureAddinItem_Click(object sender, EventArgs e)
-		{
-			ToolStripDropDownItem item = sender as ToolStripDropDownItem;
-
-			if (item != null &&
-				item.Tag != null &&
-				item.Tag is Addin)
-			{
-				((Addin)item.Tag).Instance.Configure();
-			}
-		}
-
-		public void ShowLoadedAddins()
-		{
-			
+		    foreach (Addin addin in m_AddinManager.Addins)
+		    {
+		        listBox.Items.Add(addin);
+		    }
 		}
 
 		public void BuildLightCurveMenuAddins(ToolStripMenuItem topMenuItem)
@@ -121,7 +105,14 @@ namespace Tangra.Controller
 				item.Tag is ITangraAddinAction)
 			{
 				m_AddinManager.SetLightCurveDataProvider(new MarshalByRefLightCurveDataProvider(m_LocalLightCurveDataProvider));
-				((ITangraAddinAction)item.Tag).Execute();
+                try
+                {
+                    ((ITangraAddinAction)item.Tag).Execute();
+                }
+                catch(AppDomainUnloadedException)
+                { }
+                catch (ObjectDisposedException)
+                { }
 			}
 	    }
 

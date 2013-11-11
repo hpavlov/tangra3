@@ -430,7 +430,11 @@ namespace Tangra
 
 		private void miSettings_Click(object sender, EventArgs e)
 		{
-			var frmSettings = new frmTangraSettings(null, m_VideoController.AdvStatusPopupFormCustomizer, m_VideoController.AavStatusPopupFormCustomizer);
+			var frmSettings = new frmTangraSettings(
+                null, 
+                m_VideoController.AdvStatusPopupFormCustomizer, 
+                m_VideoController.AavStatusPopupFormCustomizer,
+                m_AddinsController);
 			frmSettings.StartPosition = FormStartPosition.CenterParent;
 			if (frmSettings.ShowDialog(this) == DialogResult.OK)
 			{
@@ -807,7 +811,7 @@ namespace Tangra
 
 		private void miLoadedAddins_Click(object sender, EventArgs e)
 		{
-			m_AddinsController.ShowLoadedAddins();
+			
 		}
 
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)

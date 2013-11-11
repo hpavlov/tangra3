@@ -41,7 +41,6 @@ namespace Tangra.Config.SettingPannels
 			nudMinFWHM.SetNUDValue((double)TangraConfig.Settings.Tracking.AdHokMinFWHM);
 			nudMaxFWHM.SetNUDValue((double)TangraConfig.Settings.Tracking.AdHokMaxFWHM);
 			nudDetectionCertainty.SetNUDValue((double)TangraConfig.Settings.Tracking.AdHokMinCertainty);
-			cbxNativeTracker.Checked = TangraConfig.Settings.Tracking.UseNativeTracker;
         }
 
         public override void SaveSettings()
@@ -63,7 +62,6 @@ namespace Tangra.Config.SettingPannels
 			TangraConfig.Settings.Tracking.AdHokMinFWHM = (float)nudMinFWHM.Value;
 			TangraConfig.Settings.Tracking.AdHokMaxFWHM = (float)nudMaxFWHM.Value;
 			TangraConfig.Settings.Tracking.AdHokMinCertainty = (float)nudDetectionCertainty.Value;
-			TangraConfig.Settings.Tracking.UseNativeTracker = cbxNativeTracker.Checked;
         }
 
 		private void cbxRecoverFromLostTracking_CheckedChanged(object sender, EventArgs e)
