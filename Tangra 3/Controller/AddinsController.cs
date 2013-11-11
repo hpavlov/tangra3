@@ -37,7 +37,21 @@ namespace Tangra.Controller
             m_AddinManager.LoadAddins();
         }
 
-        public void UnloadAddins()
+	    public bool CanUnloadAddins()
+	    {
+		    return
+			    m_AddinManager != null &&
+			    m_AddinManager.IsAppDomainIsoltion;
+	    }
+
+		public bool CanReloadAddins()
+		{
+			return
+				m_AddinManager != null &&
+				(m_AddinManager.Addins.Count == 0 || m_AddinManager.IsAppDomainIsoltion);
+		}
+
+	    public void UnloadAddins()
         {
             if (m_AddinManager != null)
                 m_AddinManager.Dispose();

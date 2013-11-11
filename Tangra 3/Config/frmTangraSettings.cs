@@ -21,6 +21,7 @@ namespace Tangra.Config
 		private SettingsPannel m_CurrentPanel = null;
 		private IAdvStatusPopupFormCustomizer m_AdvPopupCustomizer;
 		private IAavStatusPopupFormCustomizer m_AavPopupCustomizer;
+		private IAddinContainer[] m_AddinContainers;
 	    private AddinsController m_AddinsController;
 
 		public bool ShowCatalogRequiredHint = false;
@@ -29,18 +30,19 @@ namespace Tangra.Config
             ILightCurveFormCustomizer lightCurveCustomizer, 
             IAdvStatusPopupFormCustomizer advPopupCustomizer, 
             IAavStatusPopupFormCustomizer aavPopupCustomizer,
-            AddinsController addinsController)
+            AddinsController addinsController,
+			IAddinContainer[] addinContainers)
 		{
 			InitializeComponent();
 
 		    m_AddinsController = addinsController;
+			m_AdvPopupCustomizer = advPopupCustomizer;
+			m_AavPopupCustomizer = aavPopupCustomizer;
+			m_AddinContainers = addinContainers;
 
 			InitAllPropertyPages();
 
             TangraConfig.Load(ApplicationSettingsSerializer.Instance);
-
-			m_AdvPopupCustomizer = advPopupCustomizer;
-			m_AavPopupCustomizer = aavPopupCustomizer;
 
 			ucCustomizeLightCurveViewer lightCurvesColoursPanel = m_PropertyPages.Select(kvp => kvp.Value).FirstOrDefault(x => x is ucCustomizeLightCurveViewer) as ucCustomizeLightCurveViewer;
 			if (lightCurvesColoursPanel != null)
@@ -74,7 +76,7 @@ namespace Tangra.Config
 			m_PropertyPages.Add(6, new ucTracking());
             m_PropertyPages.Add(8, new ucCompatibility());
 
-            m_PropertyPages.Add(12, new ucAddins(m_AddinsController));
+            m_PropertyPages.Add(12, new ucAddins(m_AddinsController, m_AddinContainers));
 
 			m_PropertyPages.Add(7, new ucCustomizeLightCurves());
 			m_PropertyPages.Add(9, new ucCustomizeLightCurveViewer());

@@ -20,12 +20,14 @@ namespace Tangra.Config.SettingPannels
     public partial class ucAddins : SettingsPannel
     {
         private AddinsController m_AddinsController;
+	    private List<IAddinContainer> m_AddinContainers = new List<IAddinContainer>();
 
-        public ucAddins(AddinsController addinsController)
+		public ucAddins(AddinsController addinsController, IAddinContainer[] addinContainers)
 		{
 			InitializeComponent();
 
             m_AddinsController = addinsController;
+			m_AddinContainers.AddRange(addinContainers);
 		}
 
         public override void LoadSettings()
@@ -37,6 +39,8 @@ namespace Tangra.Config.SettingPannels
             lbxLoadedAddins.SelectedIndex = -1;
             pnlAddinInfo.Visible = false;
             btnConfigure.Enabled = false;
+			btnReloadAddins.Visible = m_AddinsController.CanReloadAddins();
+	        btnUnloadAddins.Visible = m_AddinsController.CanUnloadAddins();
         }
 
         public override void SaveSettings()
@@ -83,7 +87,9 @@ namespace Tangra.Config.SettingPannels
             try
             {
                 TangraConfig.Settings.Generic.AddinIsolationLevel = (TangraConfig.IsolationLevel)cbxIsolationLevel.SelectedIndex;
+
                 m_AddinsController.ReloadAddins();
+	            m_AddinContainers.ForEach(x => x.ReloadAddins());
             }
             finally
             {
@@ -117,5 +123,10 @@ namespace Tangra.Config.SettingPannels
                 LoadSettings();
             }
         }
+
+		private void btnNavigateTo_Click(object sender, EventArgs e)
+		{
+			Process.Start(tbxAddinsDirectory.Text);
+		}
 	}
 }

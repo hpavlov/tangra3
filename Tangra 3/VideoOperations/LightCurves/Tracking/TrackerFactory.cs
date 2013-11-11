@@ -23,7 +23,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 						LightCurveReductionContext.Instance.StopOnLostTracking ||
 						LightCurveReductionContext.Instance.IsDriftThrough ||
 						LightCurveReductionContext.Instance.HighFlickering ||
-						(measuringStars.Count == 1 && LightCurveReductionContext.Instance.FullDisappearance))
+						LightCurveReductionContext.Instance.FullDisappearance)
 					{
 						createRefiningTracker = true;
 					}

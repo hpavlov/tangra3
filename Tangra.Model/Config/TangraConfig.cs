@@ -29,6 +29,11 @@ namespace Tangra.Model.Config
 		void RefreshState();
 	}
 
+	public interface IAddinContainer
+	{
+		void ReloadAddins();
+	}
+
     public interface ISettingsSerializer
     {
         string LoadSettings();

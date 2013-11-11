@@ -38,7 +38,6 @@ namespace Tangra.VideoOperations.LightCurves
 			this.label3 = new System.Windows.Forms.Label();
 			this.cbxBackgroundMethod = new System.Windows.Forms.ComboBox();
 			this.label2 = new System.Windows.Forms.Label();
-			this.ucStretching = new Tangra.VideoOperations.LightCurves.ucPreProcessing();
 			this.cbxDigitalFilter = new System.Windows.Forms.ComboBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.btnCancel = new System.Windows.Forms.Button();
@@ -46,7 +45,6 @@ namespace Tangra.VideoOperations.LightCurves
 			this.btnMoreOrLess = new System.Windows.Forms.Button();
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.tabGeneral = new System.Windows.Forms.TabPage();
-			this.cbsMinimumRefiningFrames = new System.Windows.Forms.CheckBox();
 			this.cbxDriftTrough = new System.Windows.Forms.CheckBox();
 			this.cbxFieldRotation = new System.Windows.Forms.CheckBox();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
@@ -66,6 +64,8 @@ namespace Tangra.VideoOperations.LightCurves
 			this.tabStretching = new System.Windows.Forms.TabPage();
 			this.tabReduction = new System.Windows.Forms.TabPage();
 			this.pnlBackground = new System.Windows.Forms.Panel();
+			this.rbLunarOccultation = new System.Windows.Forms.RadioButton();
+			this.ucStretching = new Tangra.VideoOperations.LightCurves.ucPreProcessing();
 			this.tabControl1.SuspendLayout();
 			this.tabGeneral.SuspendLayout();
 			this.groupBox2.SuspendLayout();
@@ -92,7 +92,7 @@ namespace Tangra.VideoOperations.LightCurves
 			// cbxShaking
 			// 
 			this.cbxShaking.AutoSize = true;
-			this.cbxShaking.Location = new System.Drawing.Point(19, 139);
+			this.cbxShaking.Location = new System.Drawing.Point(19, 161);
 			this.cbxShaking.Name = "cbxShaking";
 			this.cbxShaking.Size = new System.Drawing.Size(158, 17);
 			this.cbxShaking.TabIndex = 9;
@@ -103,7 +103,7 @@ namespace Tangra.VideoOperations.LightCurves
 			// cbxFlickering
 			// 
 			this.cbxFlickering.AutoSize = true;
-			this.cbxFlickering.Location = new System.Drawing.Point(19, 162);
+			this.cbxFlickering.Location = new System.Drawing.Point(19, 184);
 			this.cbxFlickering.Name = "cbxFlickering";
 			this.cbxFlickering.Size = new System.Drawing.Size(102, 17);
 			this.cbxFlickering.TabIndex = 8;
@@ -113,7 +113,7 @@ namespace Tangra.VideoOperations.LightCurves
 			// cbxFullDisappearance
 			// 
 			this.cbxFullDisappearance.AutoSize = true;
-			this.cbxFullDisappearance.Location = new System.Drawing.Point(19, 116);
+			this.cbxFullDisappearance.Location = new System.Drawing.Point(19, 138);
 			this.cbxFullDisappearance.Name = "cbxFullDisappearance";
 			this.cbxFullDisappearance.Size = new System.Drawing.Size(176, 17);
 			this.cbxFullDisappearance.TabIndex = 7;
@@ -123,7 +123,6 @@ namespace Tangra.VideoOperations.LightCurves
 			// rbMutualEvent
 			// 
 			this.rbMutualEvent.AutoSize = true;
-			this.rbMutualEvent.Enabled = false;
 			this.rbMutualEvent.Location = new System.Drawing.Point(13, 42);
 			this.rbMutualEvent.Name = "rbMutualEvent";
 			this.rbMutualEvent.Size = new System.Drawing.Size(171, 17);
@@ -178,13 +177,6 @@ namespace Tangra.VideoOperations.LightCurves
 			this.label2.Size = new System.Drawing.Size(91, 13);
 			this.label2.TabIndex = 2;
 			this.label2.Text = "Background from:";
-			// 
-			// ucStretching
-			// 
-			this.ucStretching.Location = new System.Drawing.Point(0, 0);
-			this.ucStretching.Name = "ucStretching";
-			this.ucStretching.Size = new System.Drawing.Size(370, 221);
-			this.ucStretching.TabIndex = 0;
 			// 
 			// cbxDigitalFilter
 			// 
@@ -254,7 +246,6 @@ namespace Tangra.VideoOperations.LightCurves
 			// tabGeneral
 			// 
 			this.tabGeneral.BackColor = System.Drawing.Color.Transparent;
-			this.tabGeneral.Controls.Add(this.cbsMinimumRefiningFrames);
 			this.tabGeneral.Controls.Add(this.cbxDriftTrough);
 			this.tabGeneral.Controls.Add(this.cbxFieldRotation);
 			this.tabGeneral.Controls.Add(this.groupBox2);
@@ -270,32 +261,20 @@ namespace Tangra.VideoOperations.LightCurves
 			this.tabGeneral.Text = "General";
 			this.tabGeneral.UseVisualStyleBackColor = true;
 			// 
-			// cbsMinimumRefiningFrames
-			// 
-			this.cbsMinimumRefiningFrames.AutoSize = true;
-			this.cbsMinimumRefiningFrames.Location = new System.Drawing.Point(201, 196);
-			this.cbsMinimumRefiningFrames.Name = "cbsMinimumRefiningFrames";
-			this.cbsMinimumRefiningFrames.Size = new System.Drawing.Size(159, 17);
-			this.cbsMinimumRefiningFrames.TabIndex = 17;
-			this.cbsMinimumRefiningFrames.Text = "Use minimum refining frames";
-			this.cbsMinimumRefiningFrames.UseVisualStyleBackColor = true;
-			this.cbsMinimumRefiningFrames.Visible = false;
-			// 
 			// cbxDriftTrough
 			// 
 			this.cbxDriftTrough.AutoSize = true;
-			this.cbxDriftTrough.Location = new System.Drawing.Point(201, 162);
+			this.cbxDriftTrough.Location = new System.Drawing.Point(207, 161);
 			this.cbxDriftTrough.Name = "cbxDriftTrough";
 			this.cbxDriftTrough.Size = new System.Drawing.Size(84, 17);
 			this.cbxDriftTrough.TabIndex = 16;
 			this.cbxDriftTrough.Text = "Drift through";
 			this.cbxDriftTrough.UseVisualStyleBackColor = true;
-			this.cbxDriftTrough.CheckedChanged += new System.EventHandler(this.cbxDriftTrough_CheckedChanged);
 			// 
 			// cbxFieldRotation
 			// 
 			this.cbxFieldRotation.AutoSize = true;
-			this.cbxFieldRotation.Location = new System.Drawing.Point(201, 139);
+			this.cbxFieldRotation.Location = new System.Drawing.Point(207, 138);
 			this.cbxFieldRotation.Name = "cbxFieldRotation";
 			this.cbxFieldRotation.Size = new System.Drawing.Size(86, 17);
 			this.cbxFieldRotation.TabIndex = 15;
@@ -304,12 +283,13 @@ namespace Tangra.VideoOperations.LightCurves
 			// 
 			// groupBox2
 			// 
+			this.groupBox2.Controls.Add(this.rbLunarOccultation);
 			this.groupBox2.Controls.Add(this.rbAsteroidal);
 			this.groupBox2.Controls.Add(this.rbUntrackedMeasurement);
 			this.groupBox2.Controls.Add(this.rbMutualEvent);
 			this.groupBox2.Location = new System.Drawing.Point(6, 6);
 			this.groupBox2.Name = "groupBox2";
-			this.groupBox2.Size = new System.Drawing.Size(339, 94);
+			this.groupBox2.Size = new System.Drawing.Size(352, 114);
 			this.groupBox2.TabIndex = 14;
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "Measurement Type";
@@ -317,7 +297,7 @@ namespace Tangra.VideoOperations.LightCurves
 			// rbUntrackedMeasurement
 			// 
 			this.rbUntrackedMeasurement.AutoSize = true;
-			this.rbUntrackedMeasurement.Location = new System.Drawing.Point(13, 65);
+			this.rbUntrackedMeasurement.Location = new System.Drawing.Point(13, 88);
 			this.rbUntrackedMeasurement.Name = "rbUntrackedMeasurement";
 			this.rbUntrackedMeasurement.Size = new System.Drawing.Size(142, 17);
 			this.rbUntrackedMeasurement.TabIndex = 13;
@@ -328,12 +308,13 @@ namespace Tangra.VideoOperations.LightCurves
 			// cbxStopOnLostTracking
 			// 
 			this.cbxStopOnLostTracking.AutoSize = true;
-			this.cbxStopOnLostTracking.Location = new System.Drawing.Point(19, 196);
+			this.cbxStopOnLostTracking.Location = new System.Drawing.Point(207, 184);
 			this.cbxStopOnLostTracking.Name = "cbxStopOnLostTracking";
 			this.cbxStopOnLostTracking.Size = new System.Drawing.Size(123, 17);
 			this.cbxStopOnLostTracking.TabIndex = 12;
 			this.cbxStopOnLostTracking.Text = "Stop on lost tracking";
 			this.cbxStopOnLostTracking.UseVisualStyleBackColor = true;
+			this.cbxStopOnLostTracking.Visible = false;
 			// 
 			// tabIntegration
 			// 
@@ -510,6 +491,24 @@ namespace Tangra.VideoOperations.LightCurves
 			this.pnlBackground.Size = new System.Drawing.Size(291, 53);
 			this.pnlBackground.TabIndex = 6;
 			// 
+			// rbLunarOccultation
+			// 
+			this.rbLunarOccultation.AutoSize = true;
+			this.rbLunarOccultation.Enabled = false;
+			this.rbLunarOccultation.Location = new System.Drawing.Point(13, 65);
+			this.rbLunarOccultation.Name = "rbLunarOccultation";
+			this.rbLunarOccultation.Size = new System.Drawing.Size(136, 17);
+			this.rbLunarOccultation.TabIndex = 14;
+			this.rbLunarOccultation.Text = "Total Lunar Occultation";
+			this.rbLunarOccultation.UseVisualStyleBackColor = true;
+			// 
+			// ucStretching
+			// 
+			this.ucStretching.Location = new System.Drawing.Point(0, 0);
+			this.ucStretching.Name = "ucStretching";
+			this.ucStretching.Size = new System.Drawing.Size(370, 221);
+			this.ucStretching.TabIndex = 0;
+			// 
 			// frmSelectReductionType
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -586,7 +585,7 @@ namespace Tangra.VideoOperations.LightCurves
         private System.Windows.Forms.Panel pnlBackground;
         private ucPreProcessing ucStretching;
         private System.Windows.Forms.CheckBox cbxFieldRotation;
-        private System.Windows.Forms.CheckBox cbxDriftTrough;
-        private System.Windows.Forms.CheckBox cbsMinimumRefiningFrames;
+		private System.Windows.Forms.CheckBox cbxDriftTrough;
+		private System.Windows.Forms.RadioButton rbLunarOccultation;
     }
 }

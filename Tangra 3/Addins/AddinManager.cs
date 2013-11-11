@@ -8,6 +8,7 @@ using System.Runtime.Remoting.Lifetime;
 using System.Runtime.Remoting.Services;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Model.Config;
 using Tangra.SDK;
 using Tangra.Model.Helpers;
 
@@ -37,6 +38,8 @@ namespace Tangra.Addins
 	[Serializable]
 	public class AddinManager : IDisposable, IAddinManager
 	{
+		private bool m_IsAppDomainIsoltion;
+
 		public readonly List<Addin> Addins = new List<Addin>();
 
         public readonly static string ADDINS_DIRECTORY = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Addins");
@@ -55,6 +58,8 @@ namespace Tangra.Addins
 
 		public void LoadAddins()
 		{
+			m_IsAppDomainIsoltion = TangraConfig.Settings.Generic.AddinIsolationLevel == TangraConfig.IsolationLevel.AppDomain;
+
 			List<string> candiates = SearchAddins();
 			foreach (string candiate in candiates)
 			{
@@ -118,6 +123,14 @@ namespace Tangra.Addins
 				{
 					Trace.WriteLine(ex.FullExceptionInfo());
 				}
+			}
+		}
+
+		internal bool IsAppDomainIsoltion
+		{
+			get
+			{
+				return Addins.Count > 0 && m_IsAppDomainIsoltion;
 			}
 		}
 

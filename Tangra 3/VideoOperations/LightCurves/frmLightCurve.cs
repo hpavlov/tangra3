@@ -24,7 +24,7 @@ using Tangra.VideoOperations.LightCurves.Tracking;
 
 namespace Tangra.VideoOperations.LightCurves
 {
-	public partial class frmLightCurve : Form, ILightCurveFormCustomizer, ILightCurveDataProvider
+	public partial class frmLightCurve : Form, ILightCurveFormCustomizer, ILightCurveDataProvider, IAddinContainer
     {
 	    private LightCurveController m_LightCurveController;
 		private AddinsController m_AddinsController;
@@ -76,7 +76,9 @@ namespace Tangra.VideoOperations.LightCurves
             Top = 100; Left = 100; // Default values for the very first time
 
             PositionMemento.LoadControlPosition(this);
-        	LoadAddins();
+
+			miAddins.Visible = false;
+			miAddins.DropDownItems.Clear();
         }
 
 		internal frmLightCurve(LightCurveController controller, AddinsController addinsController, LCFile lcFile, string lcFilePath)
@@ -2059,12 +2061,6 @@ namespace Tangra.VideoOperations.LightCurves
             }
         }
 
-		private void LoadAddins()
-		{
-		    miAddins.Visible = false;
-			miAddins.DropDownItems.Clear();
-		}
-
         private void miAdjustMeasurements_Click(object sender, EventArgs e)
         {
             List<LCFileSeriesEntry> dataList = new List<LCFileSeriesEntry>();
@@ -2102,6 +2098,11 @@ namespace Tangra.VideoOperations.LightCurves
         }
 
 		private void frmLightCurve_Load(object sender, EventArgs e)
+		{
+			ReloadAddins();
+		}
+
+		public void ReloadAddins()
 		{
 			m_AddinsController.BuildLightCurveMenuAddins(miAddins);
 		}

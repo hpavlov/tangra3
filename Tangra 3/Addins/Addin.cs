@@ -37,10 +37,11 @@ namespace Tangra.Addins
             {
                 m_HostDomain = null;
                 string fullName = string.Format("{0}//{1}.dll", AddinManager.ADDINS_DIRECTORY, m_AssemblyName.Name);
-                // TODO: This doesn't work
-                Assembly asm = Assembly.Load(fullName);
+	            AppDomain.CurrentDomain.AssemblyResolve += m_HostDomain_AssemblyResolve; 
+                Assembly asm = Assembly.LoadFrom(fullName);
                 Type type = asm.GetType(tokens[0]);
                 m_Instance = (ITangraAddin) Activator.CreateInstance(type, new object[] {});
+				m_Instance.Initialise(new TangraHostDelegate(tokens[0], addinManager));
             }
 		}
 

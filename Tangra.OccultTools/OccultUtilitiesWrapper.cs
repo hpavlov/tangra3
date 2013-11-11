@@ -69,7 +69,7 @@ namespace Tangra.OccultTools
 			if (AssemblyOccultUtilities == null)
 			{
 				string path = Path.Combine(occultLocation, "OccultUtilities.dll");
-				AssemblyOccultUtilities = Assembly.LoadFile(path);
+				AssemblyOccultUtilities = Assembly.UnsafeLoadFrom(path);
 
 				TYPE_AOTA_ExternalAccess = AssemblyOccultUtilities.GetType("AOTA.AOTA_ExternalAccess");
 

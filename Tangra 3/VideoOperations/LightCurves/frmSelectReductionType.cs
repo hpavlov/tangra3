@@ -126,6 +126,12 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void btnOK_Click(object sender, EventArgs e)
         {
+			if (rbLunarOccultation.Checked)
+			{
+				MessageBox.Show("Lunar Occultations will be supported soon.");
+				return;
+			}
+
 			LightCurveReductionContext.Instance.DigitalFilter = (TangraConfig.PreProcessingFilter)cbxDigitalFilter.SelectedIndex;
 			LightCurveReductionContext.Instance.NoiseMethod = ComboboxIndexToBackgroundMethod();
 			LightCurveReductionContext.Instance.ReductionMethod = ComboboxIndexToPhotometryReductionMethod();
@@ -331,13 +337,6 @@ namespace Tangra.VideoOperations.LightCurves
 		private void cbxDigitalFilter_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			// NOTE: Nothing to do here. Digital filters are set when pressing OK and will be applied at measurement time only (i.e. they are not a pre-processing thing)
-		}
-
-		private void cbxDriftTrough_CheckedChanged(object sender, EventArgs e)
-		{
-			if (cbxDriftTrough.Checked != cbsMinimumRefiningFrames.Checked)
-				cbsMinimumRefiningFrames.Checked = cbxDriftTrough.Checked;
-
 		}
     }
 }

@@ -430,11 +430,18 @@ namespace Tangra
 
 		private void miSettings_Click(object sender, EventArgs e)
 		{
+			IAddinContainer lightCurveAddinContainer = m_LightCurveController.LightCurveFormAddinContainer;
+			IAddinContainer[] addinContainers = lightCurveAddinContainer != null
+				    ? new IAddinContainer[] {lightCurveAddinContainer}
+				    : new IAddinContainer[] {};
+
 			var frmSettings = new frmTangraSettings(
                 null, 
                 m_VideoController.AdvStatusPopupFormCustomizer, 
                 m_VideoController.AavStatusPopupFormCustomizer,
-                m_AddinsController);
+                m_AddinsController,
+				addinContainers);
+
 			frmSettings.StartPosition = FormStartPosition.CenterParent;
 			if (frmSettings.ShowDialog(this) == DialogResult.OK)
 			{

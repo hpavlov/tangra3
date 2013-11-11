@@ -213,5 +213,10 @@ namespace Tangra.Controller
 				m_LightCurveForm.OnNewSelectedMeasurements(selectedMeasurements);	
 			}
 		}
+
+	    internal IAddinContainer LightCurveFormAddinContainer
+	    {
+		    get { return m_LightCurveForm != null ? m_LightCurveForm as IAddinContainer : null; }
+	    }
     }
 }

@@ -19,7 +19,8 @@ namespace Tangra.VideoOperations.LightCurves
         UntrackedMeasurement,
         MutualEvent,
         Asteroidal,
-        TotalLunarDisappearance
+        TotalLunarDisappearance,
+		TotalLunarReppearance
     }
 
     public class LightCurveReductionContext
