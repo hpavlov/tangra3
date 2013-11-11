@@ -202,6 +202,8 @@ void PsfFit::DoNonLinearFit(unsigned long* intensity, long width)
 	m_MatrixSize = width;
 	m_HalfWidth = width / 2;
 	
+	EnsureLinearSystemSolutionBuffers(5);
+	
 	DoNonLinearPfsFit(intensity, width, m_Saturation, &isSolved, &iBackground, &iStarMax, &x0, &y0, &r0, m_Residuals);
 	
 	m_IsSolved = isSolved;

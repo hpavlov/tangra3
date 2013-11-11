@@ -875,7 +875,7 @@ namespace Tangra.Model.Astro
 				for (int y = 0; y < trackedPsf.MatrixSize; y++)
                 {
 					double z0 = trackedPsf.GetPSFValueAt(x, y);
-					double z = z0 + trackedPsf.GetPSFValueAt(x, y);
+					double z = z0 + trackedPsf.GetResidualAt(x, y);
 					double d = Math.Sqrt((x - trackedPsf.X0) * (x - trackedPsf.X0) + (y - trackedPsf.Y0) * (y - trackedPsf.Y0));
 
 					int sign = Math.Sign(x - trackedPsf.X0); if (sign == 0) sign = 1;

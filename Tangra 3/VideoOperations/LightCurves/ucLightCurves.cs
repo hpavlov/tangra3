@@ -691,12 +691,15 @@ namespace Tangra.VideoOperations.LightCurves
 			FinishWithMeasurements();
         }
 
-        private void cbxDisplayBrightness_CheckedChanged(object sender, EventArgs e)
+        private void TargetDisplayModeChanged(object sender, EventArgs e)
         {
-			if (rbDisplayBrightness.Checked)
-				m_StateMachine.VideoOperation.SetMeasuringZoomImageType(MeasuringZoomImageType.Stripe);
-			else
-				m_StateMachine.VideoOperation.SetMeasuringZoomImageType(MeasuringZoomImageType.Pixel);
+            if (rbDisplayBrightness.Checked)
+                m_StateMachine.VideoOperation.SetMeasuringZoomImageType(MeasuringZoomImageType.Stripe);
+            else if (rbDisplayPixels.Checked)
+                m_StateMachine.VideoOperation.SetMeasuringZoomImageType(MeasuringZoomImageType.Pixel);
+            else if (rbDisplayPSFs.Checked)
+                m_StateMachine.VideoOperation.SetMeasuringZoomImageType(MeasuringZoomImageType.PSF);
         }
+
     }
 }

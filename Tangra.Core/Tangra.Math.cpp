@@ -173,6 +173,14 @@ long s_MaxEquations;
 long s_FullWidth;
 
 
+void EnsureLinearSystemSolutionBuffers(long numVariables)
+{
+	if (numVariables == s_NumVariables && NULL != s_TransponseBuffer)
+		return;
+		
+	LinearSystemFastInitialiseSolution(numVariables, 35 * 35);
+}
+		
 void LinearSystemFastInitialiseSolution(long numVariables, long maxEquations)
 {
 	s_NumVariables = numVariables;
@@ -281,7 +289,7 @@ void DoNonLinearPfsFit(
 
 	double found_x = half_width;
 	double found_y = half_width;
-
+	
 	for (long iter = NUMBER_ITERATIONS; iter > 0; iter--)
 	{
 		if (iter == NUMBER_ITERATIONS)

@@ -11,6 +11,8 @@ extern double* s_TransponseBuffer;
 extern long s_NumVariables;
 extern long s_MaxEquations;
 
+void EnsureLinearSystemSolutionBuffers(long numVariables);
+
 /* Make sure functions are exported with C linkage under C++ compilers. */
 #ifdef __cplusplus
 extern "C"

@@ -237,18 +237,19 @@ void SimplifiedTracker::NextFrame(int frameNo, unsigned long* pixels)
 		for (int j = 0; j < m_NumTrackedObjects; j++)
 		{
 			TrackedObject* referenceObject = m_TrackedObjects[j];
-			
-			if (referenceObject->IsLocated)
+			bool relativeReference = referenceObject->IsFixedAperture || (referenceObject->IsOccultedStar && m_IsFullDisappearance);
+		
+			if (referenceObject->IsLocated && !relativeReference)
 			{
 				totalX += (trackedObject->StartingX - referenceObject->StartingX) + referenceObject->CenterXDouble;
 				totalY += (trackedObject->StartingY - referenceObject->StartingY) + referenceObject->CenterYDouble;
 				numReferences++;
-				atLeastOneObjectLocated = true;
 			}
 		}
 
 		if (numReferences == 0)
 		{
+			trackedObject->UseCurrentPsfFit = false;
 			trackedObject->SetIsTracked(false, FitSuspectAsNoGuidingStarsAreLocated, 0, 0);
 		}
 		else
@@ -258,6 +259,7 @@ void SimplifiedTracker::NextFrame(int frameNo, unsigned long* pixels)
 
 			if (trackedObject->IsFixedAperture)
 			{
+				trackedObject->UseCurrentPsfFit = false;
 				trackedObject->SetIsTracked(true, FixedObject, x_double, y_double);
 			}
 			else if (trackedObject->IsOccultedStar && m_IsFullDisappearance)

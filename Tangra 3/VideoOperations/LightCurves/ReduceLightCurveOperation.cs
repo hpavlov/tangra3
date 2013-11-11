@@ -735,6 +735,11 @@ namespace Tangra.VideoOperations.LightCurves
 							DrawZoomPixels(gMain, width, height);
 							return true;
 						}
+                        else if (this.MeasuringZoomImageType == MeasuringZoomImageType.PSF)
+                        {
+                            DrawZoomPSFs(gMain, width, height);
+                            return true;
+                        }
 						else
 						{
 							gMain.Clear(Color.Gray);
@@ -854,7 +859,21 @@ namespace Tangra.VideoOperations.LightCurves
 				g.DrawRectangle(Pens.WhiteSmoke, m_BorderRects[obj.TargetNo]);
 		}
 
-		private void DrawZoomStripes(Graphics gMain, int width, int height)
+        private void DrawZoomPSFs(Graphics g, int width, int height)
+        {
+            g.Clear(Color.Gray);
+
+            // IDs are 0, 1, 2 and 3
+            foreach (ITrackedObject obj in m_Tracker.TrackedObjects)
+            {
+                if (obj.PSFFit != null && obj.PSFFit.IsSolved)
+                {
+                    obj.PSFFit.DrawGraph(g, m_ZoomPixelRects[obj.TargetNo], m_VideoController.VideoBitPix);
+                }
+            }
+        }
+
+        private void DrawZoomStripes(Graphics gMain, int width, int height)
 		{
 			int objHeight = (height / 4) - 20;
 
@@ -1731,6 +1750,7 @@ namespace Tangra.VideoOperations.LightCurves
     {
         Stripe,
         Pixel,
+        PSF,
         None
     }
 
