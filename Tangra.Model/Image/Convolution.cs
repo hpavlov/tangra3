@@ -128,6 +128,196 @@ namespace Tangra.Model.Image
             return result;
         }
 
+	    public static uint[] Conv3x3(uint[] data, int bpp, int width, int height, ConvMatrix m)
+	    {
+			uint average = 0;
+			return Conv3x3(data, bpp, width, height, m, ref average, false, false);
+	    }
+
+	    public static uint[] Conv3x3(uint[] data, int bpp, int width, int height, ConvMatrix m, ref uint average, bool calculateAverage, bool cutEdges)
+		{
+			// Avoid divide by zero errors
+			if (0 == m.Factor)
+				return data;
+
+			if (width * height != data.Length)
+				throw new ArgumentException();
+
+			uint[] result = new uint[cutEdges ? (width - 1) * (height - 1) : data.Length];
+
+			uint maxValue = Pixelmap.GetMaxValueForBitPix(bpp);
+
+			int nPixel;
+		    double sum = 0;
+			const double FOUR_PIXEL_FACTOR = 9.0 / 4.0;
+			const double SIX_PIXEL_FACTOR = 9.0 / 6.0;
+
+			for (int y = 0; y < height; ++y)
+			{
+				for (int x = 0; x < width; ++x)
+				{
+
+					if (cutEdges && (x == 0 || y == 0 || x == width - 1 || y == height - 1))
+						continue;
+
+					if (y == 0 && x == 0)
+					{
+						// . . .
+ 						// . # #
+						// . # #
+						nPixel = (int)Math.Round((
+													(data[0] * m.Pixel) +
+													(data[1] * m.MidRight) +
+													(data[width] * m.BottomMid) +
+													(data[width + 1] * m.BottomRight)
+													) * FOUR_PIXEL_FACTOR);
+					}
+					else if (y == height - 1 && x == 0)
+					{
+						// . # #
+						// . # #
+						// . . .
+						nPixel = (int)Math.Round((
+													(data[width * (height - 2)] * m.TopMid) +
+													(data[width * (height - 2) + 1] * m.TopRight) +
+													(data[width * (height - 1)] * m.Pixel) +
+													(data[width * (height - 1) + 1] * m.MidRight)
+													) * FOUR_PIXEL_FACTOR);
+					}
+					else if (y == 0 && x == width - 1)
+					{
+						// . . .
+						// # # .
+						// # # .
+						nPixel = (int)Math.Round((
+													(data[width - 2] * m.MidLeft) +													
+													(data[width - 1] * m.Pixel) +
+													(data[2 * width - 2] * m.BottomLeft) +
+													(data[2 * width - 1] * m.BottomMid)
+												   ) * FOUR_PIXEL_FACTOR);
+					}
+					else if (y == height - 1 && x == width - 1)
+					{
+						// # # .
+						// # # .
+						// . . .
+						nPixel = (int)Math.Round((
+													(data[width * height - width - 1] * m.TopLeft) +
+													(data[width * height - width - 2] * m.TopMid) +
+													(data[width * height - 2] * m.MidLeft) +
+													(data[width * height - 1] * m.Pixel)
+													) * FOUR_PIXEL_FACTOR);
+
+					}
+					else if (y == 0)
+					{
+						// . . .
+						// # # #
+						// # # #
+						nPixel = (int)Math.Round((
+													(data[x - 1 + y * width] * m.MidLeft) +
+													(data[x + y * width] * m.Pixel) +
+													(data[x + 1 + y * width] * m.MidRight) +
+													(data[x - 1 + (y + 1) * width] * m.BottomLeft) +
+													(data[x + (y + 1) * width] * m.BottomMid) +
+													(data[x + 1 + (y + 1) * width] * m.BottomRight)
+													) * SIX_PIXEL_FACTOR);
+					}
+					else if (x == 0)
+					{
+						// . # #
+						// . # #
+						// . # #
+						nPixel = (int)Math.Round((
+													(data[x + (y - 1) * width] * m.TopMid) +
+													(data[x + 1 + (y - 1) * width] * m.TopRight) +
+													(data[x + y * width] * m.Pixel) +
+													(data[x + 1 + y * width] * m.MidRight) +
+													(data[x + (y + 1) * width] * m.BottomMid) +
+													(data[x + 1 + (y + 1) * width] * m.BottomRight)
+													) * SIX_PIXEL_FACTOR);
+					}
+					else if (y == height - 1)
+					{
+						// # # #
+						// # # #
+						// . . .
+						nPixel = (int)Math.Round((  
+													(data[x - 1 + (y - 1) * width] * m.TopLeft) +
+													(data[x + (y - 1) * width] * m.TopMid) +
+													(data[x + 1 + (y - 1) * width] * m.TopRight) +
+													(data[x - 1 + y * width] * m.MidLeft) +
+													(data[x + y * width] * m.Pixel) +
+													(data[x + 1 + y * width] * m.MidRight)
+													) * SIX_PIXEL_FACTOR);
+					}
+					else if (x == width - 1)
+					{
+						// # # .
+						// # # .
+						// # # .
+						nPixel = (int)Math.Round((
+													(data[x - 1 + (y - 1) * width] * m.TopLeft) +
+													(data[x + (y - 1) * width] * m.TopMid) +
+													(data[x - 1 + y * width] * m.MidLeft) +
+													(data[x + y * width] * m.Pixel) +
+													(data[x - 1 + (y + 1) * width] * m.BottomLeft) +
+													(data[x + (y + 1) * width] * m.BottomMid)
+													) * SIX_PIXEL_FACTOR);
+					}
+					else
+					{
+						// # # #
+						// # # #
+						// # # #
+						nPixel = (int)Math.Round(
+													(data[x - 1 + (y - 1) * width] * m.TopLeft) +
+													(data[x + (y - 1) * width] * m.TopMid) +
+													(data[x + 1 + (y - 1) * width] * m.TopRight) +
+													(data[x - 1 + y * width] * m.MidLeft) +
+													(data[x + y * width] * m.Pixel) +
+													(data[x + 1 + y * width] * m.MidRight) +
+													(data[x - 1 + (y + 1) * width] * m.BottomLeft) +
+													(data[x + (y + 1) * width] * m.BottomMid) +
+													(data[x + 1 + (y + 1) * width] * m.BottomRight));						
+					}
+
+					if (cutEdges)
+					{
+						if (nPixel < 0)
+							result[(x - 1) + (y - 1) * width] = 0;
+						else if (nPixel > maxValue)
+							result[(x - 1) + (y - 1) * width] = maxValue;
+						else
+							result[(x - 1) + (y - 1) * width] = (uint)nPixel;
+
+						if (calculateAverage)
+							sum += result[(x - 1) + (y - 1) * width];
+					}
+					else
+					{
+						//if (x == 0 || y == 0 || x == width - 1 || y == height - 1)
+						//	nPixel = (int)data[x + y * width];
+
+						if (nPixel < 0)
+							result[x + y * width] = 0;
+						else if (nPixel > maxValue)
+							result[x + y * width] = maxValue;
+						else
+							result[x + y * width] = (uint)nPixel;
+
+						if (calculateAverage)
+							sum += result[x + y * width];						
+					}
+				}
+			}
+
+			if (calculateAverage)
+				average = (uint)Math.Round(sum / (width * height));
+
+			return result;
+		}
+
 
         public static bool Conv5x5(Pixelmap image, ConvMatrix5x5 m)
         {
@@ -146,6 +336,22 @@ namespace Tangra.Model.Image
                 { 1 / 16.0f, 1 / 8.0f, 1 / 16.0f }
             });
 
+		private static ConvMatrix SHARPEN_MATRIX =
+			new ConvMatrix(new float[,]
+            {
+                { -1f, -1f, -1f }, 
+                { -1f,  9f, -1f }, 
+                { -1f, -1f, -1f }
+            });
+
+		private static ConvMatrix DENOISE_MATRIX =
+			new ConvMatrix(new float[,]
+            {
+                { 1/9f, 1/9f, 1/9f }, 
+                { 1/9f, 1/9f, 1/9f }, 
+                { 1/9f, 1/9f, 1/9f }
+            });
+
 		private static ConvMatrix MEAN_FILTER_MATRIX =
 			new ConvMatrix(new float[,]
             {
@@ -162,6 +368,22 @@ namespace Tangra.Model.Image
                 { 1 / 9.0f, 1 / 9.0f, 1 / 9.0f }
             });
 
+		public static uint[] GaussianBlur(uint[] pixels, int bpp, int width, int height)
+		{
+			return Convolution.Conv3x3(pixels, bpp, width, height, LOW_PASS_FILTER_MATRIX);
+		}
+
+		public static uint[] Sharpen(uint[] pixels, int bpp, int width, int height, out uint average)
+		{
+			average = 0;
+			return Convolution.Conv3x3(pixels, bpp, width, height, SHARPEN_MATRIX, ref average, true, false);
+		}
+
+		public static uint[] Denoise(uint[] pixels, int bpp, int width, int height, out uint average, bool cutEdges)
+		{
+			average = 0;
+			return Convolution.Conv3x3(pixels, bpp, width, height, DENOISE_MATRIX, ref average, true, cutEdges);
+		}
 
 		private static uint[,] SetArrayEdgesToZero(uint[,] data)
 		{

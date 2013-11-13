@@ -242,7 +242,9 @@
     <Compile Include="Helpers\ZipUnzip.cs" />
     <Compile Include="ImageTools\ArrowTool.cs" />
     <Compile Include="ImageTools\CorrectTrackingTool.cs" />
+    <Compile Include="OCR\IotaVtiOrcManaged.cs" />
     <Compile Include="OCR\ITimestampOcr.cs" />
+    <Compile Include="OCR\OcrExtensionManager.cs" />
     <Compile Include="PInvoke\NativeTracking.cs" />
     <Compile Include="PInvoke\TangraCore.cs" />
     <Compile Include="PInvoke\TangraVideo.cs" />

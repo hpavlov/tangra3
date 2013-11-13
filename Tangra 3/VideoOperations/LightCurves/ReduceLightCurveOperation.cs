@@ -220,35 +220,35 @@ namespace Tangra.VideoOperations.LightCurves
             uint[] osdPixels = null;
             if (m_Refining || m_Measuring)
             {
-                //if (m_TimestampOCR != null)
-                //{
-                //    osdPixels = VideoContext.Current.AstroImage.GetOSDBytes();
+				if (m_TimestampOCR != null)
+				{
+					osdPixels = m_AstroImage.GetPixelmapPixels();
 
-                //    if (m_TimestampOCR.RequiresConfiguring)
-                //        m_TimestampOCR.TryToAutoConfigure(osdPixels);
+					if (m_TimestampOCR.RequiresConfiguring)
+						m_TimestampOCR.TryToAutoConfigure(osdPixels);
 
-                //    if (m_TimestampOCR.RequiresCalibration)
-                //    {
-                //        frmOCRCalibrating frmCalibrating = new frmOCRCalibrating();
-                //        frmCalibrating.ConfigureCalibration(m_Host.FramePlayer, m_TimestampOCR, frameNo);
-                //        if (frmCalibrating.ShowDialog(m_Host.MainFormWindow) == DialogResult.Abort)
-                //        {
-                //            // Couldn't do it. Cancel the OCR-ing
-                //            m_TimestampOCR = null;
-                //        }
-                //        OCRConfigEntry calibratedConfig = frmCalibrating.GetCalibConfig();
-                //        m_TimestampOCR.AddConfiguration(osdPixels, calibratedConfig);
-                //    }
+					//if (m_TimestampOCR.RequiresCalibration)
+					//{
+					//	//frmOCRCalibrating frmCalibrating = new frmOCRCalibrating();
+					//	//frmCalibrating.ConfigureCalibration(m_Host.FramePlayer, m_TimestampOCR, frameNo);
+					//	//if (frmCalibrating.ShowDialog(m_Host.MainFormWindow) == DialogResult.Abort)
+					//	//{
+					//	//	// Couldn't do it. Cancel the OCR-ing
+					//	//	m_TimestampOCR = null;
+					//	//}
+					//	//OCRConfigEntry calibratedConfig = frmCalibrating.GetCalibConfig();
+					//	//m_TimestampOCR.AddConfiguration(osdPixels, calibratedConfig);
+					//}
 
-                //    if (!m_TimestampOCR.RequiresConfiguring)
-                //    {
-                //        if (m_Refining)
-                //            m_TimestampOCR.RefiningFrame(osdPixels, m_Tracker.RefiningFramesRemaining);
-                //        else
-                //            if (!m_TimestampOCR.ExtractTime(osdPixels, out m_OCRedTimeStamp, out m_OCRedTimestampPixels))
-                //                m_OCRedTimeStamp = DateTime.MinValue;
-                //    }
-                //}
+					if (!m_TimestampOCR.RequiresConfiguring)
+					{
+						if (m_Refining)
+							m_TimestampOCR.RefiningFrame(osdPixels, m_Tracker.RefiningPercentageWorkLeft);
+						else
+							if (!m_TimestampOCR.ExtractTime(frameNo, osdPixels, out m_OCRedTimeStamp))
+								m_OCRedTimeStamp = DateTime.MinValue;
+					}
+				}
 
                 m_Tracker.NextFrame(frameNo, astroImage);
 
@@ -1149,22 +1149,21 @@ namespace Tangra.VideoOperations.LightCurves
 		{
 			m_TimestampOCR = null;
 
-			// NOTE: Timestamp OCR not supported yet
-			//m_TimestampOCR = OcrExtensionManager.GetCurrentOCR();
+			m_TimestampOCR = OcrExtensionManager.GetCurrentOCR();
 
-			//if (m_TimestampOCR != null)
-			//{
-			//    TimestampOCRData data = new TimestampOCRData();
-			//    data.FrameWidth = m_Host.FramePlayer.Video.Width;
-			//    data.FrameHeight = m_Host.FramePlayer.Video.Height;
-			//    data.OSDFrame = LightCurveReductionContext.Instance.OSDFrame;
-			//    data.VideoFrameRate = (float)m_Host.FramePlayer.Video.FrameRate;
-			//    // NOTE: This is taking too long to calculate and is not used for OCR
-			//    //data.MedianBrightness = VideoContext.Current.AstroImage.MedianNoise;
-			//    data.SourceInfo = m_Host.FramePlayer.Video.SourceInfo;
+			if (m_TimestampOCR != null)
+			{
+				var data = new TimestampOCRData();
+				data.FrameWidth = TangraContext.Current.FrameWidth;
+				data.FrameHeight = TangraContext.Current.FrameHeight;
+				data.OSDFrame = LightCurveReductionContext.Instance.OSDFrame;
+				data.VideoFrameRate = (float)m_VideoController.VideoFrameRate;
+				// NOTE: This is taking too long to calculate and is not used for OCR
+				//data.MedianBrightness = VideoContext.Current.AstroImage.MedianNoise;
+				//data.SourceInfo = m_VideoController.VideoS m_Host.FramePlayer.Video.SourceInfo;
 
-			//    m_TimestampOCR.Initialize(data);
-			//}
+				m_TimestampOCR.Initialize(data);
+			}
 		}
 
         public void EnsureStackedAstroImage()

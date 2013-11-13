@@ -21,9 +21,9 @@ namespace Tangra.OCR
         string NameAndVersion();
         string OSDType();
         void Initialize(TimestampOCRData initializationData);
-        void RefiningFrame(uint[] data, int refiningFramesRemaining);
+        void RefiningFrame(uint[] data, float refiningPercentageLeft);
         void PrepareForMeasurements(uint[] data);
-        bool ExtractTime(uint[] data, out DateTime time, out byte[,] timestampPixels);
+        bool ExtractTime(int frameNo, uint[] data, out DateTime time);
 
         bool RequiresConfiguring { get; }
         bool RequiresCalibration { get; }

@@ -509,6 +509,7 @@ namespace Tangra.Model.Config
 			public bool UseHueIntensityDisplayMode = true;
 			public bool UseInvertedDisplayMode = false;
 
+			public string OcrEngine;
             public IsolationLevel AddinIsolationLevel = IsolationLevel.AppDomain;
 		}
 

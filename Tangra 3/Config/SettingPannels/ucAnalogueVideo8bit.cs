@@ -35,6 +35,10 @@ namespace Tangra.Config.SettingPannels
 				cbxRenderingEngineAttemptOrder.SelectedIndex = 0;
 
 			cbxColourChannel.SetCBXIndex((int)TangraConfig.Settings.Photometry.ColourChannel);
+			if (!string.IsNullOrEmpty(TangraConfig.Settings.Generic.OcrEngine))
+				cbxOcrEngine.SelectedIndex = cbxOcrEngine.Items.IndexOf(TangraConfig.Settings.Generic.OcrEngine);
+			else
+				cbxOcrEngine.SelectedIndex = -1;
 		}
 
 		public override void SaveSettings()
@@ -42,6 +46,7 @@ namespace Tangra.Config.SettingPannels
 			TangraConfig.Settings.Photometry.Saturation.Saturation8Bit = (byte)nudSaturation8bit.Value;
 			TangraConfig.Settings.Generic.PreferredRenderingEngineIndex = cbxRenderingEngineAttemptOrder.SelectedIndex;
 			TangraConfig.Settings.Photometry.ColourChannel = (TangraConfig.ColourChannel)cbxColourChannel.SelectedIndex;
+			TangraConfig.Settings.Generic.OcrEngine = cbxOcrEngine.Text;
 		}
 
 	}

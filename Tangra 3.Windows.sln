@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoUpdateSelfUpdate", "Aut
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangra.OccultTools", "Tangra.OccultTools\Tangra.OccultTools.csproj", "{ACB1F3E9-CCD9-4DD5-9ADC-A261B2BE6409}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OcrTester", "OcrTester\OcrTester.csproj", "{184E33B1-B750-4181-B4E8-3A937106213F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -292,6 +294,30 @@ Global
 		{ACB1F3E9-CCD9-4DD5-9ADC-A261B2BE6409}.UnitTests|Mixed Platforms.Build.0 = Release|Any CPU
 		{ACB1F3E9-CCD9-4DD5-9ADC-A261B2BE6409}.UnitTests|x64.ActiveCfg = Release|Any CPU
 		{ACB1F3E9-CCD9-4DD5-9ADC-A261B2BE6409}.UnitTests|x86.ActiveCfg = Release|Any CPU
+		{184E33B1-B750-4181-B4E8-3A937106213F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{184E33B1-B750-4181-B4E8-3A937106213F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{184E33B1-B750-4181-B4E8-3A937106213F}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{184E33B1-B750-4181-B4E8-3A937106213F}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{184E33B1-B750-4181-B4E8-3A937106213F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{184E33B1-B750-4181-B4E8-3A937106213F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{184E33B1-B750-4181-B4E8-3A937106213F}.Production|Any CPU.ActiveCfg = Release|Any CPU
+		{184E33B1-B750-4181-B4E8-3A937106213F}.Production|Any CPU.Build.0 = Release|Any CPU
+		{184E33B1-B750-4181-B4E8-3A937106213F}.Production|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{184E33B1-B750-4181-B4E8-3A937106213F}.Production|Mixed Platforms.Build.0 = Release|Any CPU
+		{184E33B1-B750-4181-B4E8-3A937106213F}.Production|x64.ActiveCfg = Release|Any CPU
+		{184E33B1-B750-4181-B4E8-3A937106213F}.Production|x86.ActiveCfg = Release|Any CPU
+		{184E33B1-B750-4181-B4E8-3A937106213F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{184E33B1-B750-4181-B4E8-3A937106213F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{184E33B1-B750-4181-B4E8-3A937106213F}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{184E33B1-B750-4181-B4E8-3A937106213F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{184E33B1-B750-4181-B4E8-3A937106213F}.Release|x64.ActiveCfg = Release|Any CPU
+		{184E33B1-B750-4181-B4E8-3A937106213F}.Release|x86.ActiveCfg = Release|Any CPU
+		{184E33B1-B750-4181-B4E8-3A937106213F}.UnitTests|Any CPU.ActiveCfg = Release|Any CPU
+		{184E33B1-B750-4181-B4E8-3A937106213F}.UnitTests|Any CPU.Build.0 = Release|Any CPU
+		{184E33B1-B750-4181-B4E8-3A937106213F}.UnitTests|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{184E33B1-B750-4181-B4E8-3A937106213F}.UnitTests|Mixed Platforms.Build.0 = Release|Any CPU
+		{184E33B1-B750-4181-B4E8-3A937106213F}.UnitTests|x64.ActiveCfg = Release|Any CPU
+		{184E33B1-B750-4181-B4E8-3A937106213F}.UnitTests|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

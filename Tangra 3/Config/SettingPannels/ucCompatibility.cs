@@ -24,6 +24,7 @@ namespace Tangra.Config.SettingPannels
         {
             cbxPsfOptimization.SetCBXIndex((int)TangraConfig.Settings.Tuning.PsfMode);
             rbSimplifiedTrackerNative.Checked = TangraConfig.Settings.Tracking.UseNativeTracker;
+			rbSimplifiedTrackerManaged.Checked = !TangraConfig.Settings.Tracking.UseNativeTracker;
         }
 
         public override void SaveSettings()
