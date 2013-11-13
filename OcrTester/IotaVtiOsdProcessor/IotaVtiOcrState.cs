@@ -18,6 +18,35 @@ namespace OcrTester.IotaVtiOsdProcessor
         protected int m_MinBlockHeight;
         protected int m_MaxBlockHeight;
 
+        public abstract void InitialiseState(IotaVtiOcrProcessor stateManager);
+        public abstract void FinaliseState(IotaVtiOcrProcessor stateManager);
         public abstract void Process(IotaVtiOcrProcessor stateManager, Graphics g);
+
+        protected int GetDiffSignature(uint[] probe, uint[] etalon)
+        {
+            int rv = 0;
+
+            for (int i = 0; i < probe.Length; i++)
+            {
+                if (etalon[i] != probe[i])
+                    rv++;
+            }
+
+            return rv;
+        }
+    }
+
+    public static class Extensions
+    {
+        public static T Median<T>(this IList<T> list)
+        {
+            if (list.Count == 0)
+                return default(T);
+
+            T[] arrayList = list.ToArray();
+            Array.Sort(arrayList);
+
+            return arrayList[list.Count / 2];
+        }
     }
 }

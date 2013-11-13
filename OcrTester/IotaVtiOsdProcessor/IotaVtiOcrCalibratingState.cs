@@ -27,7 +27,7 @@ namespace OcrTester.IotaVtiOsdProcessor
             {
                 uint[] pixels = stateManager.GetBlockAtPosition(Image, i);
                 int nuberSignalPixels = pixels.Count(x => x < 127);
-                if (10 * nuberSignalPixels < stateManager.BlockWidth * stateManager.BlockHeight)
+                if (stateManager.IsMatchingSignature(nuberSignalPixels) /* Matches to blank block */)
                     return i;
             }
 
@@ -152,6 +152,15 @@ namespace OcrTester.IotaVtiOsdProcessor
             m_CalibratedPositons.Clear();
         }
 
+        public override void InitialiseState(IotaVtiOcrProcessor stateManager)
+        {
+            m_Width = 0;
+            m_Height = 0;
+        }
+
+        public override void FinaliseState(IotaVtiOcrProcessor stateManager)
+        { }
+
         public override void Process(IotaVtiOcrProcessor stateManager, Graphics g)
         {
             if (m_Width != stateManager.CurrentImage.Width || m_Height != stateManager.CurrentImage.Height)
@@ -164,8 +173,9 @@ namespace OcrTester.IotaVtiOsdProcessor
                 if (CheckBlockPositions(stateManager) &&
                     DigitPatternsRecognized(stateManager))
                 {
-                    // TODO: Change the state to calibrated or working
-                    m_CalibratedPositons.RemoveAt(0);
+                    stateManager.ChangeState<IotaVtiOcrCalibratedState>();
+                    stateManager.Process(stateManager.CurrentImage, g);
+                    return;
                 }
                 else
                     m_CalibratedPositons.RemoveAt(0);
@@ -213,19 +223,6 @@ namespace OcrTester.IotaVtiOsdProcessor
             }
             else
                 return false;
-        }
-
-        private int GetDiffSignature(uint[] probe, uint[] etalon)
-        {
-            int rv = 0;
-
-            for (int i = 0; i < probe.Length; i++)
-            {
-                if (etalon[i] != probe[i])
-                    rv++;
-            }
-
-            return rv;
         }
 
         private void BinirizeDiffArray(List<int> diffs)

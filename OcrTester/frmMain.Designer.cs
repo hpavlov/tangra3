@@ -65,6 +65,7 @@
             this.label15 = new System.Windows.Forms.Label();
             this.cbxReverseEvenOdd = new System.Windows.Forms.CheckBox();
             this.lblDisplayedFile = new System.Windows.Forms.Label();
+            this.lblOcredText = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.picField)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picBlock)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picZero)).BeginInit();
@@ -221,7 +222,7 @@
             // picZero
             // 
             this.picZero.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.picZero.Location = new System.Drawing.Point(243, 239);
+            this.picZero.Location = new System.Drawing.Point(153, 259);
             this.picZero.Name = "picZero";
             this.picZero.Size = new System.Drawing.Size(26, 29);
             this.picZero.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -231,7 +232,7 @@
             // picOne
             // 
             this.picOne.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.picOne.Location = new System.Drawing.Point(275, 239);
+            this.picOne.Location = new System.Drawing.Point(185, 259);
             this.picOne.Name = "picOne";
             this.picOne.Size = new System.Drawing.Size(26, 29);
             this.picOne.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -241,7 +242,7 @@
             // picTwo
             // 
             this.picTwo.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.picTwo.Location = new System.Drawing.Point(308, 239);
+            this.picTwo.Location = new System.Drawing.Point(218, 259);
             this.picTwo.Name = "picTwo";
             this.picTwo.Size = new System.Drawing.Size(26, 29);
             this.picTwo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -251,7 +252,7 @@
             // picThree
             // 
             this.picThree.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.picThree.Location = new System.Drawing.Point(340, 239);
+            this.picThree.Location = new System.Drawing.Point(250, 259);
             this.picThree.Name = "picThree";
             this.picThree.Size = new System.Drawing.Size(26, 29);
             this.picThree.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -261,7 +262,7 @@
             // picFour
             // 
             this.picFour.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.picFour.Location = new System.Drawing.Point(372, 239);
+            this.picFour.Location = new System.Drawing.Point(282, 259);
             this.picFour.Name = "picFour";
             this.picFour.Size = new System.Drawing.Size(26, 29);
             this.picFour.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -271,7 +272,7 @@
             // picFive
             // 
             this.picFive.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.picFive.Location = new System.Drawing.Point(404, 239);
+            this.picFive.Location = new System.Drawing.Point(314, 259);
             this.picFive.Name = "picFive";
             this.picFive.Size = new System.Drawing.Size(26, 29);
             this.picFive.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -281,7 +282,7 @@
             // picSix
             // 
             this.picSix.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.picSix.Location = new System.Drawing.Point(436, 239);
+            this.picSix.Location = new System.Drawing.Point(346, 259);
             this.picSix.Name = "picSix";
             this.picSix.Size = new System.Drawing.Size(26, 29);
             this.picSix.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -291,7 +292,7 @@
             // picSeven
             // 
             this.picSeven.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.picSeven.Location = new System.Drawing.Point(468, 239);
+            this.picSeven.Location = new System.Drawing.Point(378, 259);
             this.picSeven.Name = "picSeven";
             this.picSeven.Size = new System.Drawing.Size(26, 29);
             this.picSeven.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -301,7 +302,7 @@
             // picEight
             // 
             this.picEight.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.picEight.Location = new System.Drawing.Point(500, 239);
+            this.picEight.Location = new System.Drawing.Point(410, 259);
             this.picEight.Name = "picEight";
             this.picEight.Size = new System.Drawing.Size(26, 29);
             this.picEight.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -311,7 +312,7 @@
             // picNine
             // 
             this.picNine.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.picNine.Location = new System.Drawing.Point(532, 239);
+            this.picNine.Location = new System.Drawing.Point(442, 259);
             this.picNine.Name = "picNine";
             this.picNine.Size = new System.Drawing.Size(26, 29);
             this.picNine.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -321,7 +322,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(248, 220);
+            this.label6.Location = new System.Drawing.Point(158, 240);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(13, 13);
             this.label6.TabIndex = 25;
@@ -330,7 +331,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(281, 220);
+            this.label7.Location = new System.Drawing.Point(191, 240);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(13, 13);
             this.label7.TabIndex = 26;
@@ -339,7 +340,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(314, 220);
+            this.label8.Location = new System.Drawing.Point(224, 240);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(13, 13);
             this.label8.TabIndex = 27;
@@ -348,7 +349,7 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(411, 220);
+            this.label9.Location = new System.Drawing.Point(321, 240);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(13, 13);
             this.label9.TabIndex = 30;
@@ -357,7 +358,7 @@
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(378, 220);
+            this.label10.Location = new System.Drawing.Point(288, 240);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(13, 13);
             this.label10.TabIndex = 29;
@@ -366,7 +367,7 @@
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(345, 220);
+            this.label11.Location = new System.Drawing.Point(255, 240);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(13, 13);
             this.label11.TabIndex = 28;
@@ -375,7 +376,7 @@
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(507, 220);
+            this.label12.Location = new System.Drawing.Point(417, 240);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(13, 13);
             this.label12.TabIndex = 33;
@@ -384,7 +385,7 @@
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(474, 220);
+            this.label13.Location = new System.Drawing.Point(384, 240);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(13, 13);
             this.label13.TabIndex = 32;
@@ -393,7 +394,7 @@
             // label14
             // 
             this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(441, 220);
+            this.label14.Location = new System.Drawing.Point(351, 240);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(13, 13);
             this.label14.TabIndex = 31;
@@ -402,7 +403,7 @@
             // label15
             // 
             this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(537, 220);
+            this.label15.Location = new System.Drawing.Point(447, 240);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(13, 13);
             this.label15.TabIndex = 34;
@@ -426,11 +427,23 @@
             this.lblDisplayedFile.Size = new System.Drawing.Size(0, 13);
             this.lblDisplayedFile.TabIndex = 36;
             // 
+            // lblOcredText
+            // 
+            this.lblOcredText.AutoSize = true;
+            this.lblOcredText.Font = new System.Drawing.Font("Courier New", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblOcredText.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
+            this.lblOcredText.Location = new System.Drawing.Point(155, 317);
+            this.lblOcredText.Name = "lblOcredText";
+            this.lblOcredText.Size = new System.Drawing.Size(462, 31);
+            this.lblOcredText.TabIndex = 37;
+            this.lblOcredText.Text = "HH:MM:SS FFFF FFFF | FFFFFFF";
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(765, 372);
+            this.Controls.Add(this.lblOcredText);
             this.Controls.Add(this.lblDisplayedFile);
             this.Controls.Add(this.cbxReverseEvenOdd);
             this.Controls.Add(this.label15);
@@ -526,6 +539,7 @@
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.CheckBox cbxReverseEvenOdd;
         private System.Windows.Forms.Label lblDisplayedFile;
+        private System.Windows.Forms.Label lblOcredText;
 	}
 }
 

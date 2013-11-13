@@ -86,6 +86,11 @@ namespace OcrTester
                 lblBlockYOffs.Text = m_Processor.BlockOffsetY.ToString();
 
 			    PlotDigitPatterns();
+
+			    if (string.IsNullOrEmpty(m_Processor.CurrentOcredString))
+			        lblOcredText.Text = "";
+                else
+                    lblOcredText.Text = m_Processor.CurrentOcredString;
 			}
 		}
 

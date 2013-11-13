@@ -36,11 +36,13 @@ namespace OcrTester.IotaVtiOsdProcessor
 
         public int BlockOffsetY { get; set; }
 
+        public string CurrentOcredString { get; set; }
+
         public int LastFrameNoDigitPosition { get; set; }
 
         public IotaVtiOcrProcessor()
         {
-            m_CurrentSate = new IotaVtiOcrCalibratingState();
+            ChangeState<IotaVtiOcrCalibratingState>();
         }
 
         public void Process(Pixelmap image, Graphics g)
@@ -48,6 +50,15 @@ namespace OcrTester.IotaVtiOsdProcessor
             CurrentImage = image;
 
             m_CurrentSate.Process(this, g);
+        }
+
+        public void ChangeState<T>() where T : IotaVtiOcrState, new()
+        {
+            if (m_CurrentSate != null)
+                m_CurrentSate.FinaliseState(this);
+
+            m_CurrentSate = new T();
+            m_CurrentSate.InitialiseState(this);
         }
 
         public uint[] GetBlockAt(int x0, int y0)
@@ -69,6 +80,16 @@ namespace OcrTester.IotaVtiOsdProcessor
             }
 
             return null;
+        }
+
+        public bool IsMatchingSignature(int nuberMarkedPixels)
+        {
+            return 10 * nuberMarkedPixels < BlockWidth * BlockHeight;
+        }
+
+        public uint[] GetBlockAtPosition(int positionIndex)
+        {
+            return GetBlockAtPosition(CurrentImage, positionIndex);
         }
 
         public uint[] GetBlockAtPosition(Pixelmap pixelmap, int positionIndex)
@@ -107,6 +128,11 @@ namespace OcrTester.IotaVtiOsdProcessor
                 EightDigitPattern = pattern;
             else if (digit == 9)
                 NineDigitPattern = pattern;
+        }
+
+        public void SetOcredString(string ocredValue)
+        {
+            CurrentOcredString = ocredValue;
         }
     }
 }

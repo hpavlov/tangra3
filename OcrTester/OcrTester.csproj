@@ -44,13 +44,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Extensions.cs" />
     <Compile Include="frmMain.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmMain.Designer.cs">
       <DependentUpon>frmMain.cs</DependentUpon>
     </Compile>
+    <Compile Include="IotaVtiOsdProcessor\IotaVtiOcrCalibratedState.cs" />
     <Compile Include="IotaVtiOsdProcessor\IotaVtiOcrCalibratingState.cs" />
     <Compile Include="IotaVtiOsdProcessor\IotaVtiOcrState.cs" />
     <Compile Include="IotaVtiOsdProcessor\IotaVtiOcrProcessor.cs" />
