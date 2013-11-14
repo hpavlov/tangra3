@@ -5,8 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Tangra.Model.Image;
+using Tangra.OCR.IotaVtiOsdProcessor;
 
-namespace OcrTester.IotaVtiOsdProcessor
+namespace Tangra.OCR.IotaVtiOsdProcessor
 {
     public class IotaVtiOcrProcessor
     {
@@ -28,9 +29,9 @@ namespace OcrTester.IotaVtiOsdProcessor
 
         internal uint[] CurrentImage;
 
-        public int CurrentImageWidth { get; set; }
+        public int CurrentImageWidth { get; private set; }
 
-        public int CurrentImageHeight { get; set; }
+        public int CurrentImageHeight { get; private set; }
 
         public int BlockWidth { get; set; }
 
@@ -44,18 +45,23 @@ namespace OcrTester.IotaVtiOsdProcessor
 
         public int LastFrameNoDigitPosition { get; set; }
 
+        public bool IsCalibrated
+        {
+            get { return m_CurrentSate is IotaVtiOcrCalibratedState; }
+        }
+
         public IotaVtiOcrProcessor()
         {
             ChangeState<IotaVtiOcrCalibratingState>();
         }
 
-        public void Process(uint[] pixels, int width, int height, Graphics g)
+        public void Process(uint[] pixels, int width, int height, Graphics g, int frameNo, bool isOddField)
         {
             CurrentImage = pixels;
             CurrentImageWidth = width;
             CurrentImageHeight = height;
 
-            m_CurrentSate.Process(this, g);
+            m_CurrentSate.Process(this, g, frameNo, isOddField);
         }
 
         public void ChangeState<T>() where T : IotaVtiOcrState, new()

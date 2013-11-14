@@ -392,7 +392,22 @@ namespace Tangra.Video
 			}
 		}
 
-		private Thread m_BufferNextFrameThread;
+	    public int CurrentFrameIndex
+	    {
+	        get
+	        {
+	            if (!m_IsRunning &&
+                    m_CurrentFrameIndex >= m_VideoStream.FirstFrame &&
+	                m_CurrentFrameIndex <= m_VideoStream.LastFrame)
+	            {
+	                return m_CurrentFrameIndex;
+	            }
+
+	            return -1;
+	        }
+	    }
+
+	    private Thread m_BufferNextFrameThread;
 		private object m_FrameBitmapLock = new object();
 		private Queue<BufferedFrame> m_FramesBufferQueue = new Queue<BufferedFrame>();
 

@@ -73,7 +73,7 @@ namespace OcrTester
 
 				using (Graphics g = Graphics.FromImage(m_CurrentImage))
 				{
-					m_Processor.Process(m_Pixelmap, g);
+                    m_Processor.Process(m_Pixelmap.Pixels, m_Pixelmap.Width, m_Pixelmap.Height, g);
 					g.Flush();
 				}
 

@@ -86,7 +86,7 @@
             this.tbxInputFolder.Name = "tbxInputFolder";
             this.tbxInputFolder.Size = new System.Drawing.Size(352, 20);
             this.tbxInputFolder.TabIndex = 0;
-            this.tbxInputFolder.Text = "D:\\Work\\tangra3\\TestFiles\\OcrTestImages";
+            this.tbxInputFolder.Text = "D:\\Work\\tangra3\\TestFiles\\FailedCalibration";
             // 
             // label1
             // 

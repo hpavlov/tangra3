@@ -261,5 +261,13 @@ namespace Tangra.View
 			m_MainForm.Invoke(new OnLongOperationCallback(OnLongOperation), false);
 		}
 		#endregion
+
+        internal void PrintOcrTimeStamps(string oddFieldOSD, string evenFieldOSD)
+        {
+            m_MainForm.lblOCRTimeStampOdd.Text = oddFieldOSD;
+            m_MainForm.lblOCRTimeStampEven.Text = evenFieldOSD;
+            m_MainForm.lblOCRTimeStampOdd.Visible = true;
+            m_MainForm.lblOCRTimeStampEven.Visible = true;
+        }
 	}
 }

@@ -1117,7 +1117,7 @@ namespace Tangra.VideoOperations.LightCurves
 			m_ManualTrackingDeltaX = 0;
 			m_ManualTrackingDeltaY = 0;
 
-			InitializeTimestampOCR();
+            InitializeTimestampOCR();
 
 			if (m_TimestampOCR != null || 
 				m_VideoController.IsAstroDigitalVideo ||
@@ -1145,7 +1145,7 @@ namespace Tangra.VideoOperations.LightCurves
 				m_VideoController.PlayVideo();
         }
 
-		private void InitializeTimestampOCR()
+        private void InitializeTimestampOCR()
 		{
 			m_TimestampOCR = null;
 
@@ -1158,11 +1158,36 @@ namespace Tangra.VideoOperations.LightCurves
 				data.FrameHeight = TangraContext.Current.FrameHeight;
 				data.OSDFrame = LightCurveReductionContext.Instance.OSDFrame;
 				data.VideoFrameRate = (float)m_VideoController.VideoFrameRate;
-				// NOTE: This is taking too long to calculate and is not used for OCR
-				//data.MedianBrightness = VideoContext.Current.AstroImage.MedianNoise;
-				//data.SourceInfo = m_VideoController.VideoS m_Host.FramePlayer.Video.SourceInfo;
 
-				m_TimestampOCR.Initialize(data);
+				m_TimestampOCR.Initialize(data, m_VideoController);
+
+                if (m_TimestampOCR.RequiresCalibration)
+                {
+                    int calibrationFramesProcessed = 0;
+                    bool isCalibrated = false;
+                    m_VideoController.NotifyBeginLongOperation();
+                    for (int i = m_VideoController.CurrentFrameIndex; i < m_VideoController.VideoLastFrame; i++)
+                    {
+                        Pixelmap frame = m_VideoController.GetFrame(i);
+                        isCalibrated = m_TimestampOCR.ProcessCalibrationFrame(i, frame.Pixels);
+                        calibrationFramesProcessed++;
+
+                        m_VideoController.NotifyFileProgress(calibrationFramesProcessed, 100);
+
+                        if (isCalibrated)
+                            break;
+
+                        if (calibrationFramesProcessed > 100)
+                            break;
+                    }
+                    m_VideoController.NotifyEndLongOperation();
+
+                    if (!isCalibrated)
+                    {
+                        // TODO: Offer to save all aligned images and send them as a report (should be about 300Kb zip file)
+                        m_TimestampOCR = null;
+                    }
+                }
 			}
 		}
 

@@ -81,7 +81,8 @@ namespace Tangra.Model.Video
 		bool IsAstroAnalogueVideo { get; }
         bool AstroAnalogueVideoHasOcrData { get; }
         int AstroAnalogueVideoIntegratedAAVFrames { get; }
-		string AstroVideoCameraModel { get; }
+        int CurrentFrameIndex { get; }
+	    string AstroVideoCameraModel { get; }
 		string AstroVideoNativeVideoStandard { get; }
 		GeoLocationInfo GeoLocation { get; }
 		void Start(FramePlaySpeed mode, uint step);

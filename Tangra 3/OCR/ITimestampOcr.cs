@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using Tangra.Controller;
 using Tangra.Model.Config;
 
 namespace Tangra.OCR
@@ -20,7 +21,7 @@ namespace Tangra.OCR
     {
         string NameAndVersion();
         string OSDType();
-        void Initialize(TimestampOCRData initializationData);
+        void Initialize(TimestampOCRData initializationData, VideoController videoController);
         void RefiningFrame(uint[] data, float refiningPercentageLeft);
         void PrepareForMeasurements(uint[] data);
         bool ExtractTime(int frameNo, uint[] data, out DateTime time);
@@ -29,7 +30,7 @@ namespace Tangra.OCR
         bool RequiresCalibration { get; }
         void TryToAutoConfigure(uint[] data);
 
-        OCRConfigEntry TryCalibrate(uint[] data);
+        bool ProcessCalibrationFrame(int frameNo, uint[] data);
         void AddConfiguration(uint[] data, OCRConfigEntry config);
     }
 }

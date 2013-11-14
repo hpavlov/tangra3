@@ -138,7 +138,15 @@ namespace Tangra.Addins
 
         public override string ToString()
         {
-            return m_Instance != null ? m_Instance.DisplayName : "";
+            try
+            {
+                return m_Instance != null ? m_Instance.DisplayName : "";
+            }
+            catch (RemotingException)
+            {
+                return "";
+            }
+            
         }
 	}
 }

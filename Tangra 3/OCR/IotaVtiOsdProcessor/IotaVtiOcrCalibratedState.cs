@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tangra.OCR.IotaVtiOsdProcessor;
 
-namespace OcrTester.IotaVtiOsdProcessor
+namespace Tangra.OCR.IotaVtiOsdProcessor
 {
     public class IotaVtiOcrCalibratedState : IotaVtiOcrState
     {
@@ -17,7 +18,7 @@ namespace OcrTester.IotaVtiOsdProcessor
         public override void FinaliseState(IotaVtiOcrProcessor stateManager)
         { }
 
-        public override void Process(IotaVtiOcrProcessor stateManager, System.Drawing.Graphics g)
+        public override void Process(IotaVtiOcrProcessor stateManager, System.Drawing.Graphics g, int frameNo, bool isOddField)
         {
             if (m_Width != stateManager.CurrentImageWidth || m_Height != stateManager.CurrentImageHeight)
             {
@@ -25,6 +26,7 @@ namespace OcrTester.IotaVtiOsdProcessor
                 return;
             }
 
+            char char1 = OcrBlock(stateManager, 1);
             char char3 = OcrBlock(stateManager, 3);
             char char4 = OcrBlock(stateManager, 4);
             char char6 = OcrBlock(stateManager, 6);
@@ -50,7 +52,8 @@ namespace OcrTester.IotaVtiOsdProcessor
             char char27 = OcrBlock(stateManager, 27);
             char char28 = OcrBlock(stateManager, 28);
 
-            stateManager.SetOcredString(string.Format("{0}{1}:{2}{3}:{4}{5} {6}{7}{8}{9} {10}{11}{12}{13} | {14}{15}{16}{17}{18}{19}{20}",
+            stateManager.SetOcredString(string.Format("{0}|{1}{2}:{3}{4}:{5}{6}|{7}{8}{9}{10} {11}{12}{13}{14}|{15}{16}{17}{18}{19}{20}{21}",
+                char1, 
                 char3, char4, char6, char7, char9, char10, 
                 char12,char13,char14,char15, 
                 char17, char18, char19,char20, 

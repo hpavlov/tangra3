@@ -507,6 +507,11 @@ namespace Tangra.Controller
 			m_VideoFileView.Update();
 		}
 
+        public int CurrentFrameIndex
+        {
+            get { return m_FramePlayer.CurrentFrameIndex; }
+        }
+
 		public void StopVideo()
 		{
 			m_FramePlayer.Stop();
@@ -1208,6 +1213,11 @@ namespace Tangra.Controller
         public void StatusChanged(string displayName)
         {
             m_VideoFileView.StatusChanged(displayName);
+        }
+
+        internal void PrintOcrTimeStamps(string oddFieldOSD, string evenFieldOSD)
+        {
+            m_VideoFileView.PrintOcrTimeStamps(oddFieldOSD, evenFieldOSD);
         }
 
 		internal void NotifyFileProgress(int current, int max)

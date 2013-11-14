@@ -10,7 +10,7 @@ namespace Tangra.OCR
 	{
 		public static ITimestampOcr GetCurrentOCR()
 		{
-			if (TangraConfig.Settings.Generic.OcrEngine == "IOTA-VTI: 720x576 PAL")
+			if (TangraConfig.Settings.Generic.OcrEngine == "IOTA-VTI")
 				return new IotaVtiOrcManaged();
 
 			return null;

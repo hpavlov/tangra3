@@ -6,11 +6,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Tangra.Model.Image;
+using Tangra.OCR.IotaVtiOsdProcessor;
 
-namespace OcrTester.IotaVtiOsdProcessor
+namespace Tangra.OCR.IotaVtiOsdProcessor
 {
     public class CalibratedBlockPosition
     {
+        public CalibratedBlockPosition(uint[] image)
+        {
+            Image = new uint[image.Length];
+            Array.Copy(image, Image, image.Length);
+        }
+
+        public int FrameNo;
+        public bool IsOddField;
+
         public int BlockWidth;
         public int BlockHeight;
         public int BlockOffsetX;
@@ -81,7 +91,7 @@ namespace OcrTester.IotaVtiOsdProcessor
             return rv;
         }
 
-        private void CalibrateBlockPositons(IotaVtiOcrProcessor stateManager)
+        private void CalibrateBlockPositons(IotaVtiOcrProcessor stateManager, int frameNo, bool isOddField)
         {
             int count = 0;
             int maxRating = -1;
@@ -129,13 +139,14 @@ namespace OcrTester.IotaVtiOsdProcessor
             stateManager.BlockOffsetY = bestYOffs;
 
             m_CalibratedPositons.Add(
-                new CalibratedBlockPosition()
+                new CalibratedBlockPosition(stateManager.CurrentImage)
                 {
                     BlockWidth = bestWidth,
                     BlockHeight = bestHeight,
                     BlockOffsetX = bestXOffs,
                     BlockOffsetY = bestYOffs,
-                    Image = stateManager.CurrentImage
+                    FrameNo = frameNo,
+                    IsOddField = isOddField
                 });
         }
 
@@ -161,7 +172,7 @@ namespace OcrTester.IotaVtiOsdProcessor
         public override void FinaliseState(IotaVtiOcrProcessor stateManager)
         { }
 
-        public override void Process(IotaVtiOcrProcessor stateManager, Graphics graphics)
+        public override void Process(IotaVtiOcrProcessor stateManager, Graphics graphics, int frameNo, bool isOddField)
         {
             if (m_Width != stateManager.CurrentImageWidth || m_Height != stateManager.CurrentImageHeight)
             {
@@ -174,14 +185,14 @@ namespace OcrTester.IotaVtiOsdProcessor
                     DigitPatternsRecognized(stateManager))
                 {
                     stateManager.ChangeState<IotaVtiOcrCalibratedState>();
-                    stateManager.Process(stateManager.CurrentImage, stateManager.CurrentImageWidth, stateManager.CurrentImageHeight, graphics);
+                    stateManager.Process(stateManager.CurrentImage, stateManager.CurrentImageWidth, stateManager.CurrentImageHeight, graphics, frameNo, isOddField);
                     return;
                 }
                 else
                     m_CalibratedPositons.RemoveAt(0);
             }
 
-            CalibrateBlockPositons(stateManager);
+            CalibrateBlockPositons(stateManager, frameNo, isOddField);
 
             if (graphics != null)
             {

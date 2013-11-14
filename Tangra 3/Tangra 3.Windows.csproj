@@ -243,6 +243,10 @@
     <Compile Include="ImageTools\ArrowTool.cs" />
     <Compile Include="ImageTools\CorrectTrackingTool.cs" />
     <Compile Include="OCR\IotaVtiOrcManaged.cs" />
+    <Compile Include="OCR\IotaVtiOsdProcessor\IotaVtiOcrCalibratedState.cs" />
+    <Compile Include="OCR\IotaVtiOsdProcessor\IotaVtiOcrCalibratingState.cs" />
+    <Compile Include="OCR\IotaVtiOsdProcessor\IotaVtiOcrProcessor.cs" />
+    <Compile Include="OCR\IotaVtiOsdProcessor\IotaVtiOcrState.cs" />
     <Compile Include="OCR\ITimestampOcr.cs" />
     <Compile Include="OCR\OcrExtensionManager.cs" />
     <Compile Include="PInvoke\NativeTracking.cs" />
