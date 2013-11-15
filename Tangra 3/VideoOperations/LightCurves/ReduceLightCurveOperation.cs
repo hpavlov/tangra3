@@ -1149,45 +1149,80 @@ namespace Tangra.VideoOperations.LightCurves
 		{
 			m_TimestampOCR = null;
 
-			m_TimestampOCR = OcrExtensionManager.GetCurrentOCR();
-
-			if (m_TimestampOCR != null)
+			if (TangraConfig.Settings.Generic.OsdOcrEnabled && m_VideoController.IsPlainAviVideo)
 			{
-				var data = new TimestampOCRData();
-				data.FrameWidth = TangraContext.Current.FrameWidth;
-				data.FrameHeight = TangraContext.Current.FrameHeight;
-				data.OSDFrame = LightCurveReductionContext.Instance.OSDFrame;
-				data.VideoFrameRate = (float)m_VideoController.VideoFrameRate;
+				bool chooseOsdEngine = TangraConfig.Settings.Generic.OsdOcrChooseEngineEveryTime;
 
-				m_TimestampOCR.Initialize(data, m_VideoController);
+				while (true)
+				{
+					if (chooseOsdEngine)
+					{
+						var frmOcrChooser = new frmChooseOcrEngine();
+						frmOcrChooser.StartPosition = FormStartPosition.CenterParent;
+						if (m_VideoController.ShowDialog(frmOcrChooser) == DialogResult.Cancel)
+							return;
+					}
 
-                if (m_TimestampOCR.RequiresCalibration)
-                {
-                    int calibrationFramesProcessed = 0;
-                    bool isCalibrated = false;
-                    m_VideoController.NotifyBeginLongOperation();
-                    for (int i = m_VideoController.CurrentFrameIndex; i < m_VideoController.VideoLastFrame; i++)
-                    {
-                        Pixelmap frame = m_VideoController.GetFrame(i);
-                        isCalibrated = m_TimestampOCR.ProcessCalibrationFrame(i, frame.Pixels);
-                        calibrationFramesProcessed++;
+					m_TimestampOCR = OcrExtensionManager.GetCurrentOCR();
 
-                        m_VideoController.NotifyFileProgress(calibrationFramesProcessed, 100);
+					if (m_TimestampOCR != null)
+					{
+						var data = new TimestampOCRData();
+						data.FrameWidth = TangraContext.Current.FrameWidth;
+						data.FrameHeight = TangraContext.Current.FrameHeight;
+						data.OSDFrame = LightCurveReductionContext.Instance.OSDFrame;
+						data.VideoFrameRate = (float) m_VideoController.VideoFrameRate;
 
-                        if (isCalibrated)
-                            break;
+						m_TimestampOCR.Initialize(data, m_VideoController);
+						int maxCalibrationFieldsToAttempt = TangraConfig.Settings.Generic.MaxCalibrationFieldsToAttempt;
 
-                        if (calibrationFramesProcessed > 100)
-                            break;
-                    }
-                    m_VideoController.NotifyEndLongOperation();
+						if (m_TimestampOCR.RequiresCalibration)
+						{
+							int calibrationFramesProcessed = 0;
+							bool isCalibrated = false;
+							m_VideoController.StatusChanged("Calibrating OCR");
+							FileProgressManager.BeginFileOperation(maxCalibrationFieldsToAttempt);
+							for (int i = m_VideoController.CurrentFrameIndex; i < m_VideoController.VideoLastFrame; i++)
+							{
+								Pixelmap frame = m_VideoController.GetFrame(i);
+								isCalibrated = m_TimestampOCR.ProcessCalibrationFrame(i, frame.Pixels);
+								calibrationFramesProcessed++;
 
-                    if (!isCalibrated)
-                    {
-                        // TODO: Offer to save all aligned images and send them as a report (should be about 300Kb zip file)
-                        m_TimestampOCR = null;
-                    }
-                }
+								FileProgressManager.FileOperationProgress(calibrationFramesProcessed);
+
+								if (isCalibrated)
+									break;
+
+								if (calibrationFramesProcessed > maxCalibrationFieldsToAttempt)
+									break;
+							}
+							FileProgressManager.EndFileOperation();
+
+							if (!isCalibrated)
+							{
+								var frmReport = new frmOsdOcrCalibrationFailure();
+								frmReport.StartPosition = FormStartPosition.CenterParent;
+								frmReport.TimestampOCR = m_TimestampOCR;
+
+								DialogResult userChoice = DialogResult.OK;
+								if (frmReport.CanSendReport())
+								{
+									userChoice = m_VideoController.ShowDialog(frmReport);
+								}
+
+								m_TimestampOCR = null;
+
+								if (userChoice == DialogResult.Retry)
+								{
+									chooseOsdEngine = true;
+									continue;
+								}
+							}
+						}
+					}
+
+					break;
+				}
 			}
 		}
 

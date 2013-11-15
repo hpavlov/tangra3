@@ -35,10 +35,15 @@ namespace Tangra.Config.SettingPannels
 				cbxRenderingEngineAttemptOrder.SelectedIndex = 0;
 
 			cbxColourChannel.SetCBXIndex((int)TangraConfig.Settings.Photometry.ColourChannel);
+
+			cbxEnableOsdOcr.Checked = TangraConfig.Settings.Generic.OsdOcrEnabled;
 			if (!string.IsNullOrEmpty(TangraConfig.Settings.Generic.OcrEngine))
 				cbxOcrEngine.SelectedIndex = cbxOcrEngine.Items.IndexOf(TangraConfig.Settings.Generic.OcrEngine);
-			else
-				cbxOcrEngine.SelectedIndex = -1;
+
+			if (cbxOcrEngine.SelectedIndex == -1)
+				cbxOcrEngine.SelectedIndex = 0;
+			cbxAskMeEveryTime.Checked = TangraConfig.Settings.Generic.OsdOcrChooseEngineEveryTime;
+			pnlOsdOcr.Enabled = cbxEnableOsdOcr.Checked;
 		}
 
 		public override void SaveSettings()
@@ -46,7 +51,14 @@ namespace Tangra.Config.SettingPannels
 			TangraConfig.Settings.Photometry.Saturation.Saturation8Bit = (byte)nudSaturation8bit.Value;
 			TangraConfig.Settings.Generic.PreferredRenderingEngineIndex = cbxRenderingEngineAttemptOrder.SelectedIndex;
 			TangraConfig.Settings.Photometry.ColourChannel = (TangraConfig.ColourChannel)cbxColourChannel.SelectedIndex;
+			TangraConfig.Settings.Generic.OsdOcrEnabled = cbxEnableOsdOcr.Checked;
+			TangraConfig.Settings.Generic.OsdOcrChooseEngineEveryTime = cbxAskMeEveryTime.Checked;
 			TangraConfig.Settings.Generic.OcrEngine = cbxOcrEngine.Text;
+		}
+
+		private void cbxEnableOsdOcr_CheckedChanged(object sender, EventArgs e)
+		{
+			pnlOsdOcr.Enabled = cbxEnableOsdOcr.Checked;
 		}
 
 	}

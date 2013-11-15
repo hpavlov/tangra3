@@ -509,7 +509,11 @@ namespace Tangra.Model.Config
 			public bool UseHueIntensityDisplayMode = true;
 			public bool UseInvertedDisplayMode = false;
 
-			public string OcrEngine;
+			public bool OsdOcrEnabled = true;
+			public bool OsdOcrChooseEngineEveryTime = false;
+			public string OcrEngine = "IOTA-VTI Non TV-Safe";
+			public int MaxCalibrationFieldsToAttempt = 25;
+
             public IsolationLevel AddinIsolationLevel = IsolationLevel.AppDomain;
 		}
 

@@ -529,11 +529,12 @@ namespace Tangra.Video
 			try
 			{
 				m_FrameRenderer.PlayerStarted();
+				int lastFrame = m_VideoStream.LastFrame;
 
 				Stopwatch sw = new Stopwatch();
-				for (; (m_CurrentFrameIndex < m_VideoStream.LastFrame) && m_IsRunning; m_CurrentFrameIndex += (int)m_Step)
+				for (; (m_CurrentFrameIndex < lastFrame) && m_IsRunning; m_CurrentFrameIndex += (int)m_Step)
 				{
-					if (m_CurrentFrameIndex >= m_VideoStream.LastFrame)
+					if (m_CurrentFrameIndex >= lastFrame)
 						break;
 
 					if (m_MillisecondsPerFrame != 0)
@@ -588,8 +589,8 @@ namespace Tangra.Video
 					m_FrameRenderer.RenderFrame(
                         currentFrame.FrameNo, 
                         currentPixelmap, 
-                        MovementType.Step, 
-                        m_CurrentFrameIndex + m_Step >= m_VideoStream.LastFrame, 
+                        MovementType.Step,
+						m_CurrentFrameIndex + m_Step >= lastFrame, 
                         msToWait,
                         currentFrame.FirstFrameInIntegrationPeriod);
 
@@ -614,17 +615,18 @@ namespace Tangra.Video
 			try
 			{
 				m_FrameRenderer.PlayerStarted();
+				int lastFrame = m_VideoStream.LastFrame;
 
 				Stopwatch sw = new Stopwatch();
-				for (; (m_CurrentFrameIndex < m_VideoStream.LastFrame) && m_IsRunning; m_CurrentFrameIndex += (int)m_Step)
+				for (; (m_CurrentFrameIndex < lastFrame) && m_IsRunning; m_CurrentFrameIndex += (int)m_Step)
 				{
-					if (m_CurrentFrameIndex >= m_VideoStream.LastFrame)
+					if (m_CurrentFrameIndex >= lastFrame)
 						break;
 
 					if (m_MillisecondsPerFrame != 0)
 						sw.Start();
 
-					Pixelmap currentPixelmap = m_VideoStream.GetPixelmap(m_CurrentFrameIndex);
+					Pixelmap currentPixelmap = m_VideoStream != null ? m_VideoStream.GetPixelmap(m_CurrentFrameIndex) : null;
 
 					int msToWait = -1;
 					if (m_MillisecondsPerFrame != 0)
@@ -639,7 +641,7 @@ namespace Tangra.Video
 								m_CurrentFrameIndex, 
 								currentPixelmap, 
 								MovementType.Step,
-								m_CurrentFrameIndex + m_Step >= m_VideoStream.LastFrame,
+								m_CurrentFrameIndex + m_Step >= lastFrame,
 								msToWait,
                                 m_CurrentFrameIndex);
 				}

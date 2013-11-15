@@ -261,11 +261,23 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
     <Compile Include="VideoOperations\FrameAdjustmentsPreview.cs" />
+    <Compile Include="VideoOperations\frmChooseOcrEngine.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\frmChooseOcrEngine.Designer.cs">
+      <DependentUpon>frmChooseOcrEngine.cs</DependentUpon>
+    </Compile>
     <Compile Include="VideoOperations\frmFullSizePreview.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="VideoOperations\frmFullSizePreview.Designer.cs">
       <DependentUpon>frmFullSizePreview.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\frmOsdOcrCalibrationFailure.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\frmOsdOcrCalibrationFailure.Designer.cs">
+      <DependentUpon>frmOsdOcrCalibrationFailure.cs</DependentUpon>
     </Compile>
     <Compile Include="VideoOperations\LightCurves\AveragedFrame.cs" />
     <Compile Include="VideoOperations\LightCurves\DisplayBitmapConverter.cs" />
@@ -543,8 +555,14 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="VideoOperations\frmChooseOcrEngine.resx">
+      <DependentUpon>frmChooseOcrEngine.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\frmFullSizePreview.resx">
       <DependentUpon>frmFullSizePreview.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\frmOsdOcrCalibrationFailure.resx">
+      <DependentUpon>frmOsdOcrCalibrationFailure.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\LightCurves\frmAddOrEditSingleTarget.resx">
       <DependentUpon>frmAddOrEditSingleTarget.cs</DependentUpon>

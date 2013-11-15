@@ -444,6 +444,17 @@ namespace Tangra.Controller
 			get { return m_FramePlayer.IsAstroAnalogueVideo; }
 		}
 
+		public bool IsPlainAviVideo
+		{
+			get
+			{
+				return 
+					!m_FramePlayer.IsAstroDigitalVideo && 
+					!m_FramePlayer.IsAstroAnalogueVideo && 
+					m_FramePlayer.Video.FileName.EndsWith(".AVI", StringComparison.InvariantCultureIgnoreCase);
+			}
+		}
+
         public bool AstroAnalogueVideoHasOcrData
         {
             get { return m_FramePlayer.AstroAnalogueVideoHasOcrData; }
@@ -634,6 +645,8 @@ namespace Tangra.Controller
 			}
 			catch (ObjectDisposedException)
 			{ }
+			catch (InvalidOperationException)
+			{ }
 
 			UpdateViews();
 		}
@@ -647,6 +660,8 @@ namespace Tangra.Controller
 				m_WinControl.Invoke(new FramePlayer.SimpleDelegate(m_FrameRenderer.PlayerStopped));
 			}
 			catch (ObjectDisposedException)
+			{ }
+			catch (InvalidOperationException)
 			{ }
 
 			UpdateViews();
@@ -669,6 +684,8 @@ namespace Tangra.Controller
                             });
 			}
 			catch (ObjectDisposedException)
+			{ }
+			catch (InvalidOperationException)
 			{ }
 		}
 

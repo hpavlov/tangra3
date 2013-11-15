@@ -24,7 +24,15 @@ namespace Tangra.OCR
 		private int m_FieldAreaHeight;
 		private int m_FieldAreaWidth;
 
+		private bool m_TVSafeMode;
         private IotaVtiOcrProcessor m_Processor = new IotaVtiOcrProcessor();
+
+		private Dictionary<string, uint[]> m_CalibrationImages = new Dictionary<string, uint[]>();
+
+		public IotaVtiOrcManaged(bool tvSafeMode)
+		{
+			m_TVSafeMode = tvSafeMode;
+		}
 
 		public string NameAndVersion()
 		{
@@ -33,7 +41,7 @@ namespace Tangra.OCR
 
 		public string OSDType()
 		{
-			return "IOTA-VTI";
+			return "IOTA-VTI " + (m_TVSafeMode ? "TV-Safe" : "Non TV-Safe");
 		}
 
 		public void Initialize(TimestampOCRData initializationData, VideoController videoController)
@@ -54,7 +62,15 @@ namespace Tangra.OCR
             m_OddFieldPixelsPreProcessed = new uint[initializationData.FrameWidth * m_FieldAreaHeight];
             m_EvenFieldPixelsPreProcessed = new uint[initializationData.FrameWidth * m_FieldAreaHeight];
 
+			m_InitializationData.OSDFrame.Width = m_FieldAreaWidth;
+			m_InitializationData.OSDFrame.Height = m_FieldAreaHeight;
+
             m_Processor = new IotaVtiOcrProcessor();
+		}
+
+		public TimestampOCRData InitializationData
+		{
+			get { return m_InitializationData; }
 		}
 
 		public void RefiningFrame(uint[] data, float refiningPercentageLeft)
@@ -164,16 +180,23 @@ namespace Tangra.OCR
             if (!m_Processor.IsCalibrated)
                 m_Processor.Process(m_EvenFieldPixelsPreProcessed, m_FieldAreaWidth, m_FieldAreaHeight, null, frameNo, false);
 
-            //if (!m_Processor.IsCalibrated)
-            //{
-            //    Bitmap img = Pixelmap.ConstructBitmapFromBitmapPixels(m_EvenFieldPixelsPreProcessed, m_InitializationData.FrameWidth, m_FieldAreaHeight);
-            //    img.Save(string.Format(@"D:\Work\tangra3\TestFiles\FailedCalibration\{0}-even.bmp", frameNo.ToString("0000")));
+            if (!m_Processor.IsCalibrated)
+            {
+				uint[] pixelsEven = new uint[m_FieldAreaWidth * m_FieldAreaHeight];
+				Array.Copy(m_EvenFieldPixelsPreProcessed, pixelsEven, m_EvenFieldPixelsPreProcessed.Length);
+				m_CalibrationImages.Add(string.Format(@"{0}-even.bmp", frameNo.ToString("0000000")), pixelsEven);
 
-            //    img = Pixelmap.ConstructBitmapFromBitmapPixels(m_OddFieldPixelsPreProcessed, m_InitializationData.FrameWidth, m_FieldAreaHeight);
-            //    img.Save(string.Format(@"D:\Work\tangra3\TestFiles\FailedCalibration\{0}-odd.bmp", frameNo.ToString("0000")));
-            //}
+				uint[] pixelsOdd = new uint[m_FieldAreaWidth * m_FieldAreaHeight];
+				Array.Copy(m_OddFieldPixelsPreProcessed, pixelsOdd, m_OddFieldPixelsPreProcessed.Length);
+				m_CalibrationImages.Add(string.Format(@"{0}-odd.bmp", frameNo.ToString("0000000")), pixelsOdd);
+            }
 
 		    return m_Processor.IsCalibrated;
+		}
+
+		public Dictionary<string, uint[]> GetCalibrationReportImages()
+		{
+			return m_CalibrationImages;
 		}
 
 		public void AddConfiguration(uint[] data, OCRConfigEntry config)
