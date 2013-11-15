@@ -124,7 +124,7 @@
 			this.MinimizeBox = false;
 			this.Name = "frmOsdOcrCalibrationFailure";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-			this.Text = "OSD Reader Calibration Error";
+			this.Text = "OSD Reader Error";
 			this.Load += new System.EventHandler(this.frmOsdOcrCalibrationFailure_Load);
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
 			this.ResumeLayout(false);

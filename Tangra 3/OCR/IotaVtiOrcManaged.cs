@@ -101,6 +101,14 @@ namespace Tangra.OCR
 
             // TODO: Move the Covariance operations into C++ land
 
+	        uint median = m_OddFieldPixels.Median();
+			for (int i = 0; i < m_OddFieldPixels.Length; i++)
+			{
+				int darkCorrectedValue = (int) m_OddFieldPixels[i] - (int) median;
+				if (darkCorrectedValue < 0) darkCorrectedValue = 0;
+				m_OddFieldPixels[i] = (uint) darkCorrectedValue;
+			}
+
             uint[] blurResult = BitmapFilter.GaussianBlur(m_OddFieldPixels, 8, m_InitializationData.FrameWidth, m_FieldAreaHeight);
             uint average = 128;
             uint[] sharpenResult = BitmapFilter.Sharpen(blurResult, 8, m_InitializationData.FrameWidth, m_FieldAreaHeight, out average);
@@ -117,6 +125,13 @@ namespace Tangra.OCR
                 m_OddFieldPixelsPreProcessed[i] = denoised[i] < 127 ? (uint)0 : (uint)255;
             }
 
+			median = m_EvenFieldPixels.Median();
+			for (int i = 0; i < m_EvenFieldPixels.Length; i++)
+			{
+				int darkCorrectedValue = (int)m_EvenFieldPixels[i] - (int)median;
+				if (darkCorrectedValue < 0) darkCorrectedValue = 0;
+				m_EvenFieldPixels[i] = (uint)darkCorrectedValue;
+			}
             blurResult = BitmapFilter.GaussianBlur(m_EvenFieldPixels, 8, m_InitializationData.FrameWidth, m_FieldAreaHeight);
             average = 128;
             sharpenResult = BitmapFilter.Sharpen(blurResult, 8, m_InitializationData.FrameWidth, m_FieldAreaHeight, out average);
