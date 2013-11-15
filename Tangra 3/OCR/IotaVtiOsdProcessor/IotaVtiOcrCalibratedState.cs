@@ -18,51 +18,65 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
         public override void FinaliseState(IotaVtiOcrProcessor stateManager)
         { }
 
-        public override void Process(IotaVtiOcrProcessor stateManager, System.Drawing.Graphics g, int frameNo, bool isOddField)
+
+	    public override void Process(IotaVtiOcrProcessor stateManager, System.Drawing.Graphics g, int frameNo, bool isOddField)
+	    {
+		    if (m_Width != stateManager.CurrentImageWidth || m_Height != stateManager.CurrentImageHeight)
+		    {
+			    stateManager.ChangeState<IotaVtiOcrCalibratingState>();
+			    return;
+		    }
+
+		    uint[] pixels = stateManager.CurrentImage;
+			IotaVtiTimeStampStrings ocredValue = OcrField(pixels, stateManager);
+			stateManager.SetOcredString(string.Format("{0}|{1}:{2}:{3}|{4} {5}|{6}", ocredValue.NumSat, ocredValue.HH, ocredValue.MM, ocredValue.SS, ocredValue.FFFF1, ocredValue.FFFF2, ocredValue.FRAMENO));
+	    }
+
+		internal static IotaVtiTimeStampStrings OcrField(uint[] pixels, IotaVtiOcrProcessor stateManager)
+		{
+		    char char1 = OcrBlock(pixels, stateManager, 1);
+			char char3 = OcrBlock(pixels, stateManager, 3);
+			char char4 = OcrBlock(pixels, stateManager, 4);
+			char char6 = OcrBlock(pixels, stateManager, 6);
+			char char7 = OcrBlock(pixels, stateManager, 7);
+			char char9 = OcrBlock(pixels, stateManager, 9);
+			char char10 = OcrBlock(pixels, stateManager, 10);
+
+			char char12 = OcrBlock(pixels, stateManager, 12);
+			char char13 = OcrBlock(pixels, stateManager, 13);
+			char char14 = OcrBlock(pixels, stateManager, 14);
+			char char15 = OcrBlock(pixels, stateManager, 15);
+
+			char char17 = OcrBlock(pixels, stateManager, 17);
+			char char18 = OcrBlock(pixels, stateManager, 18);
+			char char19 = OcrBlock(pixels, stateManager, 19);
+			char char20 = OcrBlock(pixels, stateManager, 20);
+
+			char char22 = OcrBlock(pixels, stateManager, 22);
+			char char23 = OcrBlock(pixels, stateManager, 23);
+			char char24 = OcrBlock(pixels, stateManager, 24);
+			char char25 = OcrBlock(pixels, stateManager, 25);
+			char char26 = OcrBlock(pixels, stateManager, 26);
+			char char27 = OcrBlock(pixels, stateManager, 27);
+			char char28 = OcrBlock(pixels, stateManager, 28);
+
+			var rv = new IotaVtiTimeStampStrings()
+			{
+				NumSat = char1,
+				HH = string.Format("{0}{1}", char3, char4).TrimEnd(),
+				MM = string.Format("{0}{1}", char6, char7).TrimEnd(),
+				SS = string.Format("{0}{1}", char9, char10).TrimEnd(),
+				FFFF1 = string.Format("{0}{1}{2}{3}", char12, char13, char14, char15).TrimEnd(),
+				FFFF2 = string.Format("{0}{1}{2}{3}", char17, char18, char19, char20).TrimEnd(),
+				FRAMENO = string.Format("{0}{1}{2}{3}{4}{5}{6}", char22, char23, char24, char25, char26, char27, char28).TrimEnd()
+			};
+
+			return rv;
+		}
+
+        private static char OcrBlock(uint[] fieldPixels, IotaVtiOcrProcessor stateManager, int blockIndex)
         {
-            if (m_Width != stateManager.CurrentImageWidth || m_Height != stateManager.CurrentImageHeight)
-            {
-                stateManager.ChangeState<IotaVtiOcrCalibratingState>();
-                return;
-            }
-
-            char char1 = OcrBlock(stateManager, 1);
-            char char3 = OcrBlock(stateManager, 3);
-            char char4 = OcrBlock(stateManager, 4);
-            char char6 = OcrBlock(stateManager, 6);
-            char char7 = OcrBlock(stateManager, 7);
-            char char9 = OcrBlock(stateManager, 9);
-            char char10 = OcrBlock(stateManager, 10);
-            
-            char char12 = OcrBlock(stateManager, 12);
-            char char13 = OcrBlock(stateManager, 13);
-            char char14 = OcrBlock(stateManager, 14);
-            char char15 = OcrBlock(stateManager, 15);
-
-            char char17 = OcrBlock(stateManager, 17);
-            char char18 = OcrBlock(stateManager, 18);
-            char char19 = OcrBlock(stateManager, 19);
-            char char20 = OcrBlock(stateManager, 20);
-
-            char char22 = OcrBlock(stateManager, 22);
-            char char23 = OcrBlock(stateManager, 23);
-            char char24 = OcrBlock(stateManager, 24);
-            char char25 = OcrBlock(stateManager, 25);
-            char char26 = OcrBlock(stateManager, 26);
-            char char27 = OcrBlock(stateManager, 27);
-            char char28 = OcrBlock(stateManager, 28);
-
-            stateManager.SetOcredString(string.Format("{0}|{1}{2}:{3}{4}:{5}{6}|{7}{8}{9}{10} {11}{12}{13}{14}|{15}{16}{17}{18}{19}{20}{21}",
-                char1, 
-                char3, char4, char6, char7, char9, char10, 
-                char12,char13,char14,char15, 
-                char17, char18, char19,char20, 
-                char22,char23,char24,char25,char26,char27,char28));
-        }
-
-        private char OcrBlock(IotaVtiOcrProcessor stateManager, int blockIndex)
-        {
-            uint[] block = stateManager.GetBlockAtPosition(blockIndex);
+			uint[] block = stateManager.GetBlockAtPosition(fieldPixels, blockIndex);
 
             int[] diffSignatures = new int[10];
             int[] diffDigits = new int[10];

@@ -184,15 +184,20 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 
             if (m_CalibratedPositons.Count >= 10)
             {
-                if (CheckBlockPositions(stateManager) &&
-                    DigitPatternsRecognized(stateManager))
+                if (CheckBlockPositions(stateManager))
                 {
-                    stateManager.ChangeState<IotaVtiOcrCalibratedState>();
-                    stateManager.Process(stateManager.CurrentImage, stateManager.CurrentImageWidth, stateManager.CurrentImageHeight, graphics, frameNo, isOddField);
-                    return;
+					if (DigitPatternsRecognized(stateManager))
+					{
+						if (RecognizedTimestampsConsistent(stateManager))
+						{
+							stateManager.ChangeState<IotaVtiOcrCalibratedState>();
+							stateManager.Process(stateManager.CurrentImage, stateManager.CurrentImageWidth, stateManager.CurrentImageHeight, graphics, frameNo, isOddField);
+							return;							
+						}
+					}
                 }
-                else
-                    m_CalibratedPositons.RemoveAt(0);
+
+                m_CalibratedPositons.RemoveAt(0);
             }
 
             CalibrateBlockPositons(stateManager, frameNo, isOddField);
@@ -323,6 +328,8 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
                     if (walkForwardIndex < 10) stateManager.LearnDigitPattern(m_CalibratedPositons[walkForwardIndex].LastFrameNoDigit, 6);
                     walkForwardIndex++;
                     if (walkForwardIndex < 10) stateManager.LearnDigitPattern(m_CalibratedPositons[walkForwardIndex].LastFrameNoDigit, 9);
+
+					stateManager.SwapFieldsOrder = true;
                 }
                 else if (signalPixelsNext < signalChange && signalPixelsNext < signalPixelsPrev)
                 {
@@ -337,12 +344,83 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
                         nextDigitIndex++;
                         if (nextDigitIndex > 9) nextDigitIndex -= 10;
                     }
-                }
+
+					stateManager.SwapFieldsOrder = false;
+				}
 
                 return true;
             }
 
             return false;
         }
+
+		private bool RecognizedTimestampsConsistent(IotaVtiOcrProcessor stateManager)
+		{
+			var allTimeStamps = new List<IotaVtiTimeStamp>();
+			int index = 0;
+			int totalTimestamps = m_CalibratedPositons.Count;
+
+			for (;;)
+			{
+				if (index == 0 && m_CalibratedPositons[0].FrameNo != m_CalibratedPositons[1].FrameNo)
+				{
+					index++;
+					continue;
+				}
+
+				if (index == totalTimestamps - 1)
+					break;
+				
+				IotaVtiTimeStampStrings timeStampStrings = IotaVtiOcrCalibratedState.OcrField(m_CalibratedPositons[index].Image, stateManager);
+				if (!timeStampStrings.AllCharsPresent())
+					return false;
+
+				var timeStamp = new IotaVtiTimeStamp(timeStampStrings);
+
+				if (stateManager.SwapFieldsOrder)
+				{
+					if (index + 1 == totalTimestamps - 1)
+						break;
+
+					IotaVtiTimeStampStrings timeStampStrings2 = IotaVtiOcrCalibratedState.OcrField(m_CalibratedPositons[index + 1].Image, stateManager);
+					if (!timeStampStrings2.AllCharsPresent())
+						return false;
+					
+					var timeStamp2 = new IotaVtiTimeStamp(timeStampStrings2);
+					allTimeStamps.Add(timeStamp2);
+
+					index++;
+				}
+
+				allTimeStamps.Add(timeStamp);
+
+				index++;
+			}
+
+			float fieldDurationMS = 0;
+
+			for (int i = 0; i < allTimeStamps.Count - 1; i++)
+			{
+				if (allTimeStamps[i].FrameNumber != allTimeStamps[i + 1].FrameNumber - 1)
+					return false;
+
+				int totalMillisecondsThis = (allTimeStamps[i].Hours * 3600 + allTimeStamps[i].Minutes * 60 + allTimeStamps[i].Seconds) * 10000 + allTimeStamps[i].Milliseconds10;
+				int totalMillisecondsNext = (allTimeStamps[i + 1].Hours * 3600 + allTimeStamps[i + 1].Minutes * 60 + allTimeStamps[i + 1].Seconds) * 10000 + allTimeStamps[i + 1].Milliseconds10;
+
+				fieldDurationMS = (totalMillisecondsNext - totalMillisecondsThis) / 10f;
+
+				if (Math.Abs(fieldDurationMS - IotaVtiOcrProcessor.FIELD_DURATION_PAL) > 0.1 && Math.Abs(fieldDurationMS - IotaVtiOcrProcessor.FIELD_DURATION_NTSC) > 0.1)
+					return false;
+			}
+
+			if (Math.Abs(fieldDurationMS - IotaVtiOcrProcessor.FIELD_DURATION_PAL) > 0.1)
+				stateManager.VideoFormat = VideoFormat.PAL;
+			else if (Math.Abs(fieldDurationMS - IotaVtiOcrProcessor.FIELD_DURATION_NTSC) > 0.1)
+				stateManager.VideoFormat = VideoFormat.NTSC;
+			else
+				stateManager.VideoFormat = null;
+
+			return true;
+		}
     }
 }

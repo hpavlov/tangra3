@@ -13,6 +13,8 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
     {
         internal const int MAX_POSITIONS = 29;
         internal const int FIRST_FRAME_NO_DIGIT_POSITIONS = 22;
+	    internal const float FIELD_DURATION_PAL = 20.00f;
+		internal const float FIELD_DURATION_NTSC = 16.68f;
 
         public uint[] ZeroDigitPattern;
         public uint[] OneDigitPattern;
@@ -117,8 +119,12 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
             }
             return blockPixels;
         }
-        
-        public void LearnDigitPattern(uint[] pattern, int digit)
+
+		public bool SwapFieldsOrder { get; set; }
+
+		public VideoFormat? VideoFormat { get; set; }
+
+	    public void LearnDigitPattern(uint[] pattern, int digit)
         {
             if (digit == 0)
                 ZeroDigitPattern = pattern;

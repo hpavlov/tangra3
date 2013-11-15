@@ -49,8 +49,17 @@ namespace Tangra.OCR
 			m_InitializationData = initializationData;
 		    m_VideoController = videoController;
 
-			m_FromLine = (int)Math.Round(530.0 * initializationData.FrameHeight / 567.0);
-			m_ToLine = initializationData.FrameHeight;
+			if (m_TVSafeMode)
+			{
+				m_FromLine = (int)Math.Round(500.0 * initializationData.FrameHeight / 576.0);
+				m_ToLine = (int)Math.Round(540.0 * initializationData.FrameHeight / 576.0);
+			}
+			else
+			{
+				m_FromLine = (int)Math.Round(530.0 * initializationData.FrameHeight / 576.0);
+				m_ToLine = initializationData.FrameHeight;				
+			}
+
 
 			if ((m_ToLine - m_FromLine) % 2 == 1) 
 				m_FromLine--;
@@ -204,6 +213,14 @@ namespace Tangra.OCR
 				uint[] pixelsOdd = new uint[m_FieldAreaWidth * m_FieldAreaHeight];
 				Array.Copy(m_OddFieldPixelsPreProcessed, pixelsOdd, m_OddFieldPixelsPreProcessed.Length);
 				m_CalibrationImages.Add(string.Format(@"{0}-odd.bmp", frameNo.ToString("0000000")), pixelsOdd);
+
+				uint[] pixelsEvenOrg = new uint[m_FieldAreaWidth * m_FieldAreaHeight];
+				Array.Copy(m_EvenFieldPixels, pixelsEvenOrg, m_EvenFieldPixels.Length);
+				m_CalibrationImages.Add(string.Format(@"ORG-{0}-even.bmp", frameNo.ToString("0000000")), pixelsEvenOrg);
+
+				uint[] pixelsOddOrg = new uint[m_FieldAreaWidth * m_FieldAreaHeight];
+				Array.Copy(m_OddFieldPixels, pixelsOddOrg, m_OddFieldPixelsPreProcessed.Length);
+				m_CalibrationImages.Add(string.Format(@"ORG-{0}-odd.bmp", frameNo.ToString("0000000")), pixelsOddOrg);
             }
 
 		    return m_Processor.IsCalibrated;
