@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using Tangra.Addins;
@@ -119,14 +120,27 @@ namespace Tangra.Controller
 				item.Tag is ITangraAddinAction)
 			{
 				m_AddinManager.SetLightCurveDataProvider(new MarshalByRefLightCurveDataProvider(m_LocalLightCurveDataProvider));
+			    string addinActonName = string.Empty;
                 try
                 {
-                    ((ITangraAddinAction)item.Tag).Execute();
+                    addinActonName = ((ITangraAddinAction) item.Tag).DisplayName;
+                    ((ITangraAddinAction) item.Tag).Execute();
                 }
-                catch(AppDomainUnloadedException)
+                catch (AppDomainUnloadedException)
                 { }
                 catch (ObjectDisposedException)
                 { }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(
+                        string.Format("{0}:\r\n\r\n{1} ({2})", 
+                            addinActonName, 
+                            ex is TargetInvocationException ? ex.InnerException.Message : ex.Message,
+                            ex is TargetInvocationException ? ex.InnerException.GetType().Name : ex.GetType().Name), 
+                        "Error running add-in",
+                        MessageBoxButtons.OK, 
+                        MessageBoxIcon.Error);
+                }
 			}
 	    }
 

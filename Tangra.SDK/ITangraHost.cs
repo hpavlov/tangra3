@@ -18,6 +18,8 @@ namespace Tangra.SDK
 	{
 		string FileName { get; }
 		int NumberOfMeasuredComparisonObjects { get; }
+        bool CameraCorrectionsHaveBeenApplied { get; }
+        bool HasReliableTimeBase { get; }
 		ISingleMeasurement[] GetTargetMeasurements();
 		ISingleMeasurement[] GetComparisonObjectMeasurements(int comparisonObjectId);
 		void GetIntegrationRateAndFirstFrame(out int integrationRate, out int firstIntegratingFrame);

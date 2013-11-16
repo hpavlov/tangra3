@@ -29,7 +29,7 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 
 		    uint[] pixels = stateManager.CurrentImage;
 			IotaVtiTimeStampStrings ocredValue = OcrField(pixels, stateManager);
-			stateManager.SetOcredString(string.Format("{0}|{1}:{2}:{3}|{4} {5}|{6}", ocredValue.NumSat, ocredValue.HH, ocredValue.MM, ocredValue.SS, ocredValue.FFFF1, ocredValue.FFFF2, ocredValue.FRAMENO));
+			stateManager.SetOcredString(ocredValue);
 	    }
 
 		internal static IotaVtiTimeStampStrings OcrField(uint[] pixels, IotaVtiOcrProcessor stateManager)

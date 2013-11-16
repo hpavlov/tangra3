@@ -72,7 +72,7 @@ namespace Tangra.VideoOperations
 				var address = new EndpointAddress("http://208.106.227.157/CGI-BIN/TangraErrors/ErrorReports.asmx");
 				var client = new TangraErrorSinkSoapClient(binding, address);
 				client.ReportErrorWithAttachment(
-					"OSD OCR Calibration Error\r\n\r\nOCR OSD Engine: " + m_TimestampOCR.NameAndVersion() + "\r\nOSD Type: " + m_TimestampOCR.OSDType(), "CalibrationFrames.zip",
+					"OSD OCR Calibration Error\r\n\r\nOCR OSD Engine: " + m_TimestampOCR.NameAndVersion() + "\r\nOSD Type: " + m_TimestampOCR.OSDType(), string.Format("CalibrationFrames-{0}.zip", Guid.NewGuid().ToString()),
 					attachment);
 			}
 			catch (Exception ex)

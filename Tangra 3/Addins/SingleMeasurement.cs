@@ -10,23 +10,40 @@ namespace Tangra.Addins
 	[Serializable]
 	public class SingleMeasurement : ISingleMeasurement
 	{
-        internal SingleMeasurement(LCMeasurement lcMeasurement, double frameNo, LCFile lcFile)
+        internal SingleMeasurement(LCMeasurement lcMeasurement, double frameNo, LCFile lcFile, bool dontIncludeTimes)
 		{
 			CurrFrameNo = (int)lcMeasurement.CurrFrameNo;
 			TargetNo = lcMeasurement.TargetNo;
 			Measurement = 1.0f * lcMeasurement.AdjustedReading;
             string isCorrectedForInstrumentalDelay;
-            Timestamp = lcFile.GetTimeForFrame(frameNo, out isCorrectedForInstrumentalDelay);
+            if (dontIncludeTimes)
+            {
+                Timestamp = DateTime.MinValue;
+                isCorrectedForInstrumentalDelay = null;
+            }
+            else
+            {
+                Timestamp =lcFile.GetTimeForFrame(frameNo, out isCorrectedForInstrumentalDelay);
+            }
+            
             IsCorrectedForInstrumentalDelay = !string.IsNullOrEmpty(isCorrectedForInstrumentalDelay);
 		}
 
-        internal SingleMeasurement(frmLightCurve.BinnedValue binnedMeasurement, int targetNo, double binMiddleFrameNo, LCFile lcFile)
+        internal SingleMeasurement(frmLightCurve.BinnedValue binnedMeasurement, int targetNo, double binMiddleFrameNo, LCFile lcFile, bool dontIncludeTimes)
 		{
 			CurrFrameNo = (int)binnedMeasurement.BinNo;
 			TargetNo = (byte)targetNo;
 			Measurement = (float)binnedMeasurement.AdjustedValue;
             string isCorrectedForInstrumentalDelay;
-            Timestamp = lcFile.GetTimeForFrame(binMiddleFrameNo, out isCorrectedForInstrumentalDelay);
+            if (dontIncludeTimes)
+            {
+                Timestamp = DateTime.MinValue;
+                isCorrectedForInstrumentalDelay = null;
+            }
+            else
+            {
+                Timestamp = lcFile.GetTimeForFrame(binMiddleFrameNo, out isCorrectedForInstrumentalDelay);
+            }
             IsCorrectedForInstrumentalDelay = !string.IsNullOrEmpty(isCorrectedForInstrumentalDelay);
 		}
 

@@ -335,6 +335,10 @@ namespace Tangra.VideoOperations.LightCurves
 
 			bool hasEmbeddedTimeStamps = m_Footer.ReductionContext.HasEmbeddedTimeStamps;
 
+            m_CameraCorrectionsHaveBeenAppliedFlag =
+                (hasEmbeddedTimeStamps && !string.IsNullOrEmpty(m_Context.InstrumentalDelayConfigName)) ||
+                (m_Context.TimingType == MeasurementTimingType.EmbeddedTimeForEachFrame && m_Context.BitPix > 8);
+
 			if (m_Header.SecondTimedFrameTime != DateTime.MinValue || hasEmbeddedTimeStamps)
             {
 				if (!hasEmbeddedTimeStamps)
@@ -342,33 +346,10 @@ namespace Tangra.VideoOperations.LightCurves
                     string videoSystem;
                     double timeDelta = m_Header.GetAbsoluteTimeDeltaInMilliseconds(out videoSystem);
 
-					//string videoSystem;
-					//double derivedFrameRate;
-					//bool isTimeStampDerivedTimeMatchStandardFrameRate = m_Header.DoesTimeStampDerivedTimeMatchStandardFrameRate(out videoSystem, out derivedFrameRate);
 					m_TimestampDiscrepencyFlag = timeDelta > TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMs;
 
 					if (m_TimestampDiscrepencyFlag)
 					{
-                        //if (isTimeStampDerivedTimeMatchStandardFrameRate)
-                        //{
-                        //    DialogResult result = MessageBox.Show(this,
-                        //        string.Format(
-                        //        "The time derived from the entered timestamps corresponds to the standard {0} system. \r\n\r\n" +
-                        //        "However the frame rate recorded in the video file shows a discrepancy of {1} ms. " +
-                        //        "It is possible that the video grabbing software or hardware used to save this video has reported a wrong frame rate. Do you want to ignore the discrepancy and consider the timestamp derived times to be correct?\r\n\r\n" +
-                        //        "If you are unsure then choose 'Yes'.",
-                        //        videoSystem, timeDelta.ToString("0.0")),
-                        //        "Warning",
-                        //        MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-
-                        //    if (result == DialogResult.Yes)
-                        //    {
-                        //        m_TimestampDiscrepencyFlag = false;
-                        //    }
-                        //    else
-                        //        lblFrameTime.ForeColor = Color.Red;
-                        //}
-                        //else
                         if (videoSystem == null)
 						{
                             MessageBox.Show(this,
@@ -1179,6 +1160,8 @@ namespace Tangra.VideoOperations.LightCurves
         }
 
         private bool m_TimestampDiscrepencyFlag = false;
+
+	    private bool m_CameraCorrectionsHaveBeenAppliedFlag = false;
 
 		private void HandleIncludeExcludeObject(object sender, EventArgs e)
 		{

@@ -163,13 +163,15 @@ namespace Tangra.OCR
 		{
             if (m_Processor.IsCalibrated)
             {
+                m_VideoController.RegisterExtractingOcrTimestamps();
+
                 PrepareOsdVideoFields(data);
 
                 m_Processor.Process(m_OddFieldPixelsPreProcessed, m_FieldAreaWidth, m_FieldAreaHeight, null, frameNo, true);
-                string oddFieldOSD = m_Processor.CurrentOcredString;
+                IotaVtiTimeStamp oddFieldOSD = m_Processor.CurrentOcredTimeStamp;
 
                 m_Processor.Process(m_EvenFieldPixelsPreProcessed, m_FieldAreaWidth, m_FieldAreaHeight, null, frameNo, false);
-                string evenFieldOSD = m_Processor.CurrentOcredString;
+                IotaVtiTimeStamp evenFieldOSD = m_Processor.CurrentOcredTimeStamp;
 
                 time = ExtractDateTime(frameNo, oddFieldOSD, evenFieldOSD);
             }
@@ -234,10 +236,72 @@ namespace Tangra.OCR
 		public void AddConfiguration(uint[] data, OCRConfigEntry config)
 		{ }
 
-        private DateTime ExtractDateTime(int frameNo, string oddFieldOSD, string evenFieldOSD)
+	    private int m_LastVideoFrameNo = -1;
+	    private int m_LatestOsdFrameNo = -1;
+	    private long m_LastFieldLargerTimestampTicks = -1;
+
+        private DateTime ExtractDateTime(int frameNo, IotaVtiTimeStamp oddFieldOSD, IotaVtiTimeStamp evenFieldOSD)
         {
-            m_VideoController.PrintOcrTimeStamps(oddFieldOSD, evenFieldOSD);
-            return DateTime.MinValue;
+            bool failedValidation = false;
+            if (m_LastVideoFrameNo + 1 == frameNo && m_LatestOsdFrameNo > -1)
+            {
+                if (m_LatestOsdFrameNo + 1 != Math.Min(oddFieldOSD.FrameNumber, evenFieldOSD.FrameNumber))
+                    // Video fields are not consequtive (from previous frame)
+                    failedValidation = true;
+            }
+            m_LatestOsdFrameNo = Math.Max(oddFieldOSD.FrameNumber, evenFieldOSD.FrameNumber);
+            m_LastVideoFrameNo = frameNo;
+
+            if (oddFieldOSD.FrameNumber != evenFieldOSD.FrameNumber - 1 &&
+                oddFieldOSD.FrameNumber != evenFieldOSD.FrameNumber + 1)
+            {
+                // Video fields are not consequtive
+                failedValidation = true;
+            }
+
+            DateTime oddFieldTimestamp = new DateTime(1, 1, 1, oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds, (int)Math.Round(oddFieldOSD.Milliseconds10 / 10.0f));
+            DateTime evenFieldTimestamp = new DateTime(1, 1, 1, evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds, (int)Math.Round(evenFieldOSD.Milliseconds10 / 10.0f));
+
+            double fieldDuration = Math.Abs(new TimeSpan(oddFieldTimestamp.Ticks - evenFieldTimestamp.Ticks).TotalMilliseconds);
+            double fieldDurationFromLastFrame = double.NaN;
+
+            if (m_LastFieldLargerTimestampTicks > -1)
+                fieldDurationFromLastFrame = Math.Abs(new TimeSpan(Math.Min(oddFieldTimestamp.Ticks, evenFieldTimestamp.Ticks) - m_LastFieldLargerTimestampTicks).TotalMilliseconds);
+
+            if (m_Processor.VideoFormat.Value == VideoFormat.PAL &&
+                (Math.Abs(fieldDuration - IotaVtiOcrProcessor.FIELD_DURATION_PAL) > 1.0 ||
+                (!double.IsNaN(fieldDurationFromLastFrame) && Math.Abs(fieldDurationFromLastFrame - IotaVtiOcrProcessor.FIELD_DURATION_PAL) > 1.0)))
+            {
+                // PAL field is not 20ms
+                failedValidation = true;
+            }
+
+            if (m_Processor.VideoFormat.Value == VideoFormat.NTSC &&
+                (Math.Abs(fieldDuration - IotaVtiOcrProcessor.FIELD_DURATION_NTSC) > 1.0 ||
+                (!double.IsNaN(fieldDurationFromLastFrame) && Math.Abs(fieldDurationFromLastFrame - IotaVtiOcrProcessor.FIELD_DURATION_NTSC) > 1.0)))
+            {
+                // NTSC field is not 20ms
+                failedValidation = true;
+            }
+
+            if (failedValidation)
+            {
+                m_VideoController.RegisterOcrError();
+                return DateTime.MinValue;
+            }
+            else
+            {
+                if (oddFieldOSD.FrameNumber == evenFieldOSD.FrameNumber - 1)
+                {
+                    m_LastFieldLargerTimestampTicks = evenFieldTimestamp.Ticks;
+                    return oddFieldTimestamp;
+                }
+                else
+                {
+                    m_LastFieldLargerTimestampTicks = oddFieldTimestamp.Ticks;
+                    return evenFieldTimestamp;
+                }
+            }
         }
 	}
 }

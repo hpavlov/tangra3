@@ -150,25 +150,25 @@ namespace Tangra.PInvoke
 				byte[] bitmapPixels = new byte[s_fileInfo.BitmapImageSize + 40 + 14 + 1];
 				bitmapBytes = new byte[s_fileInfo.Width * s_fileInfo.Height];
 
-				TangraVideoGetFrame(frameNo, pixels, bitmapPixels, bitmapBytes);
+                try
+                {
+                    TangraVideoGetFrame(frameNo, pixels, bitmapPixels, bitmapBytes);
 
-				using (MemoryStream memStr = new MemoryStream(bitmapPixels))
-				{
-					try
-					{
-						videoFrame = (Bitmap) Bitmap.FromStream(memStr);
-					}
-					catch (Exception ex)
-					{
-						videoFrame = new Bitmap(s_fileInfo.Width, s_fileInfo.Height);
-						using (Graphics g = Graphics.FromImage(videoFrame))
-						{
-							g.Clear(Color.White);
-							g.DrawString(ex.Message, s_ErrorFont, Brushes.Red, 10, 10);
-							g.Save();
-						}
-					}
-				}
+                    using (MemoryStream memStr = new MemoryStream(bitmapPixels))
+                    {
+                        videoFrame = (Bitmap)Bitmap.FromStream(memStr);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    videoFrame = new Bitmap(s_fileInfo.Width, s_fileInfo.Height);
+                    using (Graphics g = Graphics.FromImage(videoFrame))
+                    {
+                        g.Clear(Color.White);
+                        g.DrawString(ex.Message, s_ErrorFont, Brushes.Red, 10, 10);
+                        g.Save();
+                    }
+                }
 			}
 			else
 			{

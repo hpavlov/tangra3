@@ -58,6 +58,7 @@
             this.ssSoftwareIntegration = new System.Windows.Forms.ToolStripStatusLabel();
             this.ssFrameNo = new System.Windows.Forms.ToolStripStatusLabel();
             this.ssFPS = new System.Windows.Forms.ToolStripStatusLabel();
+            this.ssOCR = new System.Windows.Forms.ToolStripStatusLabel();
             this.tslblRecDbg = new System.Windows.Forms.ToolStripStatusLabel();
             this.ssRenderingEngine = new System.Windows.Forms.ToolStripStatusLabel();
             this.ssPreProcessing = new System.Windows.Forms.ToolStripStatusLabel();
@@ -91,8 +92,6 @@
             this.displayFrameTimer = new System.Windows.Forms.Timer(this.components);
             this.openAdvFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.saveFrameDialog = new System.Windows.Forms.SaveFileDialog();
-            this.lblOCRTimeStampOdd = new System.Windows.Forms.Label();
-            this.lblOCRTimeStampEven = new System.Windows.Forms.Label();
             this.mainMenu.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.panelRight.SuspendLayout();
@@ -371,6 +370,7 @@
             this.ssSoftwareIntegration,
             this.ssFrameNo,
             this.ssFPS,
+            this.ssOCR,
             this.tslblRecDbg,
             this.ssRenderingEngine,
             this.ssPreProcessing,
@@ -436,6 +436,18 @@
             this.ssFPS.Name = "ssFPS";
             this.ssFPS.Size = new System.Drawing.Size(60, 19);
             this.ssFPS.Visible = false;
+            // 
+            // ssOCR
+            // 
+            this.ssOCR.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
+            this.ssOCR.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            this.ssOCR.ForeColor = System.Drawing.Color.Green;
+            this.ssOCR.Name = "ssOCR";
+            this.ssOCR.Size = new System.Drawing.Size(35, 19);
+            this.ssOCR.Text = "OCR";
+            this.ssOCR.Visible = false;
             // 
             // tslblRecDbg
             // 
@@ -583,8 +595,6 @@
             // 
             // panelVideo
             // 
-            this.panelVideo.Controls.Add(this.lblOCRTimeStampEven);
-            this.panelVideo.Controls.Add(this.lblOCRTimeStampOdd);
             this.panelVideo.Controls.Add(this.pictureBox);
             this.panelVideo.Controls.Add(this.pnlPlayControls);
             this.panelVideo.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -761,30 +771,6 @@
             this.openAdvFileDialog.Filter = "Astro Digital or Analogue Video (*.adv;*.aav)|*.adv;*.aav";
             this.openAdvFileDialog.Title = "Open ADV/AAV file";
             // 
-            // lblOCRTimeStampOdd
-            // 
-            this.lblOCRTimeStampOdd.AutoSize = true;
-            this.lblOCRTimeStampOdd.BackColor = System.Drawing.Color.Black;
-            this.lblOCRTimeStampOdd.ForeColor = System.Drawing.Color.Lime;
-            this.lblOCRTimeStampOdd.Location = new System.Drawing.Point(13, 13);
-            this.lblOCRTimeStampOdd.Name = "lblOCRTimeStampOdd";
-            this.lblOCRTimeStampOdd.Size = new System.Drawing.Size(35, 13);
-            this.lblOCRTimeStampOdd.TabIndex = 2;
-            this.lblOCRTimeStampOdd.Text = "label1";
-            this.lblOCRTimeStampOdd.Visible = false;
-            // 
-            // lblOCRTimeStampEven
-            // 
-            this.lblOCRTimeStampEven.AutoSize = true;
-            this.lblOCRTimeStampEven.BackColor = System.Drawing.Color.Black;
-            this.lblOCRTimeStampEven.ForeColor = System.Drawing.Color.Lime;
-            this.lblOCRTimeStampEven.Location = new System.Drawing.Point(13, 30);
-            this.lblOCRTimeStampEven.Name = "lblOCRTimeStampEven";
-            this.lblOCRTimeStampEven.Size = new System.Drawing.Size(35, 13);
-            this.lblOCRTimeStampEven.TabIndex = 3;
-            this.lblOCRTimeStampEven.Text = "label1";
-            this.lblOCRTimeStampEven.Visible = false;
-            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -811,7 +797,6 @@
             this.panelRight.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.zoomedImage)).EndInit();
             this.panelVideo.ResumeLayout(false);
-            this.panelVideo.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).EndInit();
             this.pnlPlayControls.ResumeLayout(false);
             this.pnlPlayButtons.ResumeLayout(false);
@@ -896,8 +881,7 @@
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem4;
         private System.Windows.Forms.ToolStripMenuItem miShowFields;
         protected internal System.Windows.Forms.ToolStripMenuItem tsmiHueIntensity;
-        protected internal System.Windows.Forms.Label lblOCRTimeStampEven;
-        protected internal System.Windows.Forms.Label lblOCRTimeStampOdd;
+        protected internal System.Windows.Forms.ToolStripStatusLabel ssOCR;
 	}
 }
 

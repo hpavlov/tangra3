@@ -21,6 +21,8 @@ namespace Tangra.Addins
 		{
 			FileName = localProvider.FileName;
 			NumberOfMeasuredComparisonObjects = localProvider.NumberOfMeasuredComparisonObjects;
+            CameraCorrectionsHaveBeenApplied = localProvider.CameraCorrectionsHaveBeenApplied;
+            HasReliableTimeBase = localProvider.HasReliableTimeBase;
 			m_TargetMeasurements = localProvider.GetTargetMeasurements();
 			if (NumberOfMeasuredComparisonObjects > 0)
 				m_Comp1Measurements = localProvider.GetComparisonObjectMeasurements(0);
@@ -34,6 +36,10 @@ namespace Tangra.Addins
 		public string FileName { get; private set; }
 
 		public int NumberOfMeasuredComparisonObjects { get; private set; }
+
+        public bool CameraCorrectionsHaveBeenApplied { get; private set; }
+
+        public bool HasReliableTimeBase { get; private set; }
 
 		public ISingleMeasurement[] GetTargetMeasurements()
 		{

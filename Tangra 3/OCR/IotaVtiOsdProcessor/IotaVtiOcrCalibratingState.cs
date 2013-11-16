@@ -106,7 +106,7 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 
             for (int xOffs = -4; xOffs < 8; xOffs++)
             {
-                for (int yOffs = -2; yOffs < 6; yOffs++)
+                for (int yOffs = -5; yOffs < 5; yOffs++)
                 {
                     for (int x = m_MinBlockWidth; x <= m_MaxBlockWidth; x++)
                     {
@@ -186,9 +186,10 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
             {
                 if (CheckBlockPositions(stateManager))
                 {
-					if (DigitPatternsRecognized(stateManager))
+                    var normalizedPositions = new List<CalibratedBlockPosition>();
+                    if (DigitPatternsRecognized(stateManager, out normalizedPositions))
 					{
-						if (RecognizedTimestampsConsistent(stateManager))
+                        if (RecognizedTimestampsConsistent(stateManager, normalizedPositions))
 						{
 							stateManager.ChangeState<IotaVtiOcrCalibratedState>();
 							stateManager.Process(stateManager.CurrentImage, stateManager.CurrentImageWidth, stateManager.CurrentImageHeight, graphics, frameNo, isOddField);
@@ -197,6 +198,8 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 					}
                 }
 
+                // Make sure we always remove the whole frame, so swapped fields create less issues when learning the characters
+                m_CalibratedPositons.RemoveAt(0);
                 m_CalibratedPositons.RemoveAt(0);
             }
 
@@ -256,8 +259,9 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
             }
         }
 
-        private bool DigitPatternsRecognized(IotaVtiOcrProcessor stateManager)
+        private bool DigitPatternsRecognized(IotaVtiOcrProcessor stateManager, out List<CalibratedBlockPosition> normalizedPositions)
         {
+            normalizedPositions = new List<CalibratedBlockPosition>();
             Trace.Assert(m_CalibratedPositons.Count == 10);
 
             foreach (CalibratedBlockPosition blockPosition in m_CalibratedPositons)
@@ -277,15 +281,53 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
             int forwardChangeIndex = forwardDiffs.FindIndex(x => x == 1);
             int backwardChangeIndex = backwardDiffs.FindIndex(x=> x == 0);
 
-            if (forwardChangeIndex == backwardChangeIndex &&
-                forwardDiffs.FindIndex(forwardChangeIndex, x => x == 0) == -1 &&
-                backwardDiffs.FindIndex(backwardChangeIndex, x => x == 1) == -1)
+            bool swapped = false;
+            bool isMatch = forwardChangeIndex == backwardChangeIndex &&
+                           forwardDiffs.FindIndex(forwardChangeIndex, x => x == 0) == -1 &&
+                           backwardDiffs.FindIndex(backwardChangeIndex, x => x == 1) == -1;
+
+            if (!isMatch)
             {
+                 // Try with swapped fields
+                for (int i = 0; i < forwardDiffs.Count / 2; i++)
+                {
+                    int tmp = forwardDiffs[2 * i];
+                    forwardDiffs[2 * i] =  forwardDiffs[2 * i + 1];
+                    forwardDiffs[2 * i + 1] = tmp;
+
+                    tmp = backwardDiffs[2 * i];
+                    backwardDiffs[2 * i] = backwardDiffs[2 * i + 1];
+                    backwardDiffs[2 * i + 1] = tmp;
+                }
+
+                forwardChangeIndex = forwardDiffs.FindIndex(x => x == 1);
+                backwardChangeIndex = backwardDiffs.FindIndex(x => x == 0);
+
+                isMatch = forwardChangeIndex == backwardChangeIndex &&
+                           forwardDiffs.FindIndex(forwardChangeIndex, x => x == 0) == -1 &&
+                           backwardDiffs.FindIndex(backwardChangeIndex, x => x == 1) == -1;
+                swapped = true;
+            }
+
+            if (isMatch)
+            {
+                
+                if (swapped)
+                {
+                    for (int i = 0; i < m_CalibratedPositons.Count / 2; i++)
+                    {
+                        normalizedPositions.Add(m_CalibratedPositons[2 * i + 1]);
+                        normalizedPositions.Add(m_CalibratedPositons[2 * i]);
+                    }
+                }
+                else
+                    normalizedPositions.AddRange(m_CalibratedPositons);
+
                 int indexPixelPrev = forwardChangeIndex > 0 ? forwardChangeIndex - 1 : 9;
-                int indexPixelNext = forwardChangeIndex < m_CalibratedPositons.Count - 1 ? forwardChangeIndex + 1 : forwardChangeIndex - 9;
-                int signalChange = m_CalibratedPositons[forwardChangeIndex].LastFrameNoDigit.Count(x => x < 127);
-                int signalPixelsPrev = m_CalibratedPositons[indexPixelPrev].LastFrameNoDigit.Count(x => x < 127);
-                int signalPixelsNext = m_CalibratedPositons[indexPixelNext].LastFrameNoDigit.Count(x => x < 127);
+                int indexPixelNext = forwardChangeIndex < normalizedPositions.Count - 1 ? forwardChangeIndex + 1 : forwardChangeIndex - 9;
+                int signalChange = normalizedPositions[forwardChangeIndex].LastFrameNoDigit.Count(x => x < 127);
+                int signalPixelsPrev = normalizedPositions[indexPixelPrev].LastFrameNoDigit.Count(x => x < 127);
+                int signalPixelsNext = normalizedPositions[indexPixelNext].LastFrameNoDigit.Count(x => x < 127);
 
                 // OneAfterZero: 9 - 0 - 1
                 // ZeroAfterOne: 8 - 1 - 0
@@ -293,85 +335,90 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
                 if (signalChange < signalPixelsPrev && signalChange < signalPixelsNext)
                 {
                     // One before Zero
-                    stateManager.LearnDigitPattern(m_CalibratedPositons[indexPixelNext].LastFrameNoDigit, 0);
-                    stateManager.LearnDigitPattern(m_CalibratedPositons[forwardChangeIndex].LastFrameNoDigit, 1);
-                    stateManager.LearnDigitPattern(m_CalibratedPositons[indexPixelPrev].LastFrameNoDigit, 8);
+                    stateManager.LearnDigitPattern(normalizedPositions[indexPixelNext].LastFrameNoDigit, 0);
+                    stateManager.LearnDigitPattern(normalizedPositions[forwardChangeIndex].LastFrameNoDigit, 1);
+                    stateManager.LearnDigitPattern(normalizedPositions[indexPixelPrev].LastFrameNoDigit, 8);
 
                     // 3 - 2 - 5 - 4 - 7 - 6 - 9 - (8 - 1 - 0) - 3 - 2 - 5 - 4 - 7 - 6  - 9 - 8
 
                     int walkBackIndex = indexPixelPrev - 1;
-                    if (walkBackIndex >= 0) stateManager.LearnDigitPattern(m_CalibratedPositons[walkBackIndex].LastFrameNoDigit, 9);
+                    if (walkBackIndex >= 0) stateManager.LearnDigitPattern(normalizedPositions[walkBackIndex].LastFrameNoDigit, 9);
                     walkBackIndex--;
-                    if (walkBackIndex >= 0) stateManager.LearnDigitPattern(m_CalibratedPositons[walkBackIndex].LastFrameNoDigit, 6);
+                    if (walkBackIndex >= 0) stateManager.LearnDigitPattern(normalizedPositions[walkBackIndex].LastFrameNoDigit, 6);
                     walkBackIndex--;
-                    if (walkBackIndex >= 0) stateManager.LearnDigitPattern(m_CalibratedPositons[walkBackIndex].LastFrameNoDigit, 7);
+                    if (walkBackIndex >= 0) stateManager.LearnDigitPattern(normalizedPositions[walkBackIndex].LastFrameNoDigit, 7);
                     walkBackIndex--;
-                    if (walkBackIndex >= 0) stateManager.LearnDigitPattern(m_CalibratedPositons[walkBackIndex].LastFrameNoDigit, 4);
+                    if (walkBackIndex >= 0) stateManager.LearnDigitPattern(normalizedPositions[walkBackIndex].LastFrameNoDigit, 4);
                     walkBackIndex--;
-                    if (walkBackIndex >= 0) stateManager.LearnDigitPattern(m_CalibratedPositons[walkBackIndex].LastFrameNoDigit, 5);
+                    if (walkBackIndex >= 0) stateManager.LearnDigitPattern(normalizedPositions[walkBackIndex].LastFrameNoDigit, 5);
                     walkBackIndex--;
-                    if (walkBackIndex >= 0) stateManager.LearnDigitPattern(m_CalibratedPositons[walkBackIndex].LastFrameNoDigit, 2);
+                    if (walkBackIndex >= 0) stateManager.LearnDigitPattern(normalizedPositions[walkBackIndex].LastFrameNoDigit, 2);
                     walkBackIndex--;
-                    if (walkBackIndex >= 0) stateManager.LearnDigitPattern(m_CalibratedPositons[walkBackIndex].LastFrameNoDigit, 3);
+                    if (walkBackIndex >= 0) stateManager.LearnDigitPattern(normalizedPositions[walkBackIndex].LastFrameNoDigit, 3);
 
                     int walkForwardIndex = indexPixelNext + 1;
-                    if (walkForwardIndex < 10) stateManager.LearnDigitPattern(m_CalibratedPositons[walkForwardIndex].LastFrameNoDigit, 3);
+                    if (walkForwardIndex < 10) stateManager.LearnDigitPattern(normalizedPositions[walkForwardIndex].LastFrameNoDigit, 3);
                     walkForwardIndex++;
-                    if (walkForwardIndex < 10) stateManager.LearnDigitPattern(m_CalibratedPositons[walkForwardIndex].LastFrameNoDigit, 2);
+                    if (walkForwardIndex < 10) stateManager.LearnDigitPattern(normalizedPositions[walkForwardIndex].LastFrameNoDigit, 2);
                     walkForwardIndex++;
-                    if (walkForwardIndex < 10) stateManager.LearnDigitPattern(m_CalibratedPositons[walkForwardIndex].LastFrameNoDigit, 5);
+                    if (walkForwardIndex < 10) stateManager.LearnDigitPattern(normalizedPositions[walkForwardIndex].LastFrameNoDigit, 5);
                     walkForwardIndex++;
-                    if (walkForwardIndex < 10) stateManager.LearnDigitPattern(m_CalibratedPositons[walkForwardIndex].LastFrameNoDigit, 4);
+                    if (walkForwardIndex < 10) stateManager.LearnDigitPattern(normalizedPositions[walkForwardIndex].LastFrameNoDigit, 4);
                     walkForwardIndex++;
-                    if (walkForwardIndex < 10) stateManager.LearnDigitPattern(m_CalibratedPositons[walkForwardIndex].LastFrameNoDigit, 7);
+                    if (walkForwardIndex < 10) stateManager.LearnDigitPattern(normalizedPositions[walkForwardIndex].LastFrameNoDigit, 7);
                     walkForwardIndex++;
-                    if (walkForwardIndex < 10) stateManager.LearnDigitPattern(m_CalibratedPositons[walkForwardIndex].LastFrameNoDigit, 6);
+                    if (walkForwardIndex < 10) stateManager.LearnDigitPattern(normalizedPositions[walkForwardIndex].LastFrameNoDigit, 6);
                     walkForwardIndex++;
-                    if (walkForwardIndex < 10) stateManager.LearnDigitPattern(m_CalibratedPositons[walkForwardIndex].LastFrameNoDigit, 9);
+                    if (walkForwardIndex < 10) stateManager.LearnDigitPattern(normalizedPositions[walkForwardIndex].LastFrameNoDigit, 9);
 
 					stateManager.SwapFieldsOrder = true;
+
+                    return true;
                 }
                 else if (signalPixelsNext < signalChange && signalPixelsNext < signalPixelsPrev)
                 {
-                    stateManager.LearnDigitPattern(m_CalibratedPositons[forwardChangeIndex].LastFrameNoDigit, 0);
+                    stateManager.LearnDigitPattern(normalizedPositions[forwardChangeIndex].LastFrameNoDigit, 0);
 
                     // One after Zero
                     int nextDigitIndex = indexPixelNext;
                     for (int i = 0; i < 9; i++)
                     {
-                        stateManager.LearnDigitPattern(m_CalibratedPositons[nextDigitIndex].LastFrameNoDigit, 1 + i);
+                        stateManager.LearnDigitPattern(normalizedPositions[nextDigitIndex].LastFrameNoDigit, 1 + i);
 
                         nextDigitIndex++;
                         if (nextDigitIndex > 9) nextDigitIndex -= 10;
                     }
 
 					stateManager.SwapFieldsOrder = false;
-				}
 
-                return true;
+                    return true;
+				}
+                else
+                    return false;
             }
 
             return false;
         }
 
-		private bool RecognizedTimestampsConsistent(IotaVtiOcrProcessor stateManager)
+        private bool RecognizedTimestampsConsistent(IotaVtiOcrProcessor stateManager, List<CalibratedBlockPosition> normalizedPositions)
 		{
 			var allTimeStamps = new List<IotaVtiTimeStamp>();
 			int index = 0;
-			int totalTimestamps = m_CalibratedPositons.Count;
+            int totalTimestamps = normalizedPositions.Count;
 
 			for (;;)
 			{
-				if (index == 0 && m_CalibratedPositons[0].FrameNo != m_CalibratedPositons[1].FrameNo)
-				{
+                if (index == 0 && normalizedPositions[0].FrameNo != normalizedPositions[1].FrameNo)
+                {
+                    Trace.Assert(false);
 					index++;
 					continue;
 				}
 
 				if (index == totalTimestamps - 1)
 					break;
-				
-				IotaVtiTimeStampStrings timeStampStrings = IotaVtiOcrCalibratedState.OcrField(m_CalibratedPositons[index].Image, stateManager);
+
+                IotaVtiTimeStampStrings timeStampStrings = IotaVtiOcrCalibratedState.OcrField(normalizedPositions[index].Image, stateManager);
 				if (!timeStampStrings.AllCharsPresent())
 					return false;
 
@@ -382,7 +429,7 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 					if (index + 1 == totalTimestamps - 1)
 						break;
 
-					IotaVtiTimeStampStrings timeStampStrings2 = IotaVtiOcrCalibratedState.OcrField(m_CalibratedPositons[index + 1].Image, stateManager);
+                    IotaVtiTimeStampStrings timeStampStrings2 = IotaVtiOcrCalibratedState.OcrField(normalizedPositions[index + 1].Image, stateManager);
 					if (!timeStampStrings2.AllCharsPresent())
 						return false;
 					
@@ -401,21 +448,22 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 
 			for (int i = 0; i < allTimeStamps.Count - 1; i++)
 			{
-				if (allTimeStamps[i].FrameNumber != allTimeStamps[i + 1].FrameNumber - 1)
+				if (allTimeStamps[i].FrameNumber != allTimeStamps[i + 1].FrameNumber - 1 &&
+                    allTimeStamps[i].FrameNumber != allTimeStamps[i + 1].FrameNumber + 1)
 					return false;
 
 				int totalMillisecondsThis = (allTimeStamps[i].Hours * 3600 + allTimeStamps[i].Minutes * 60 + allTimeStamps[i].Seconds) * 10000 + allTimeStamps[i].Milliseconds10;
 				int totalMillisecondsNext = (allTimeStamps[i + 1].Hours * 3600 + allTimeStamps[i + 1].Minutes * 60 + allTimeStamps[i + 1].Seconds) * 10000 + allTimeStamps[i + 1].Milliseconds10;
 
-				fieldDurationMS = (totalMillisecondsNext - totalMillisecondsThis) / 10f;
+				fieldDurationMS = Math.Abs((totalMillisecondsNext - totalMillisecondsThis) / 10f);
 
 				if (Math.Abs(fieldDurationMS - IotaVtiOcrProcessor.FIELD_DURATION_PAL) > 0.1 && Math.Abs(fieldDurationMS - IotaVtiOcrProcessor.FIELD_DURATION_NTSC) > 0.1)
 					return false;
 			}
 
-			if (Math.Abs(fieldDurationMS - IotaVtiOcrProcessor.FIELD_DURATION_PAL) > 0.1)
+			if (Math.Abs(fieldDurationMS - IotaVtiOcrProcessor.FIELD_DURATION_PAL) < 0.1)
 				stateManager.VideoFormat = VideoFormat.PAL;
-			else if (Math.Abs(fieldDurationMS - IotaVtiOcrProcessor.FIELD_DURATION_NTSC) > 0.1)
+			else if (Math.Abs(fieldDurationMS - IotaVtiOcrProcessor.FIELD_DURATION_NTSC) < 0.1)
 				stateManager.VideoFormat = VideoFormat.NTSC;
 			else
 				stateManager.VideoFormat = null;

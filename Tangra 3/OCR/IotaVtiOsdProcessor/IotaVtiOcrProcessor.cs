@@ -45,6 +45,8 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 
         public string CurrentOcredString { get; set; }
 
+        public IotaVtiTimeStamp CurrentOcredTimeStamp { get; set; }
+
         public int LastFrameNoDigitPosition { get; set; }
 
         public bool IsCalibrated
@@ -148,9 +150,14 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
                 NineDigitPattern = pattern;
         }
 
-        public void SetOcredString(string ocredValue)
+        public void SetOcredString(IotaVtiTimeStampStrings ocredValue)
         {
-            CurrentOcredString = ocredValue;
+            CurrentOcredString = string.Format("{0}|{1}:{2}:{3}|{4} {5}|{6}", ocredValue.NumSat, ocredValue.HH, ocredValue.MM, ocredValue.SS, ocredValue.FFFF1, ocredValue.FFFF2, ocredValue.FRAMENO);
+
+            if (ocredValue.AllCharsPresent())
+                CurrentOcredTimeStamp = new IotaVtiTimeStamp(ocredValue);
+            else
+                CurrentOcredTimeStamp = null;
         }
     }
 }

@@ -66,6 +66,9 @@ namespace Tangra.Model.Context
 		public string FileName;
 		public string FileFormat;
 
+	    public int OcrErrors = 0;
+        public bool OcrExtractingTimestamps = false;
+
         public CrashReportInfo CrashReportInfo;
 
 	    public string RenderingEngine;
@@ -121,6 +124,9 @@ namespace Tangra.Model.Context
 			CanLoadFlatFrame = false;
 
 		    RenderingEngine = null;
+
+	        OcrErrors = 0;
+            OcrExtractingTimestamps = false;
 
 		    CrashReportInfo = new CrashReportInfo();
 		}

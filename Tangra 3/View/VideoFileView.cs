@@ -171,7 +171,19 @@ namespace Tangra.View
 
 			m_MainForm.ssSoftwareIntegration.Text = string.Format("Integrating {0} frames", TangraContext.Current.NumberFramesToIntegrate);
 			m_MainForm.ssSoftwareIntegration.Visible = TangraContext.Current.UsingIntegration;
-			m_MainForm.ssFrameNo.Visible = TangraContext.Current.HasVideoLoaded;			
+			m_MainForm.ssFrameNo.Visible = TangraContext.Current.HasVideoLoaded;
+
+            m_MainForm.ssOCR.Visible = TangraContext.Current.OcrExtractingTimestamps;
+            if (TangraContext.Current.OcrErrors > 0)
+            {
+                m_MainForm.ssOCR.ForeColor = Color.Red;
+                m_MainForm.ssOCR.Text = string.Format("OCR ERR {0}", TangraContext.Current.OcrErrors);
+            }
+            else
+            {
+                m_MainForm.ssOCR.ForeColor = Color.Green;
+                m_MainForm.ssOCR.Text = "OCR";
+            }
 		}
 
 		public void UpdateVideoSizeAndLengthControls()
@@ -261,13 +273,5 @@ namespace Tangra.View
 			m_MainForm.Invoke(new OnLongOperationCallback(OnLongOperation), false);
 		}
 		#endregion
-
-        internal void PrintOcrTimeStamps(string oddFieldOSD, string evenFieldOSD)
-        {
-            m_MainForm.lblOCRTimeStampOdd.Text = oddFieldOSD;
-            m_MainForm.lblOCRTimeStampEven.Text = evenFieldOSD;
-            m_MainForm.lblOCRTimeStampOdd.Visible = true;
-            m_MainForm.lblOCRTimeStampEven.Visible = true;
-        }
 	}
 }

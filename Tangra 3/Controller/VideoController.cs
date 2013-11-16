@@ -1232,11 +1232,6 @@ namespace Tangra.Controller
             m_VideoFileView.StatusChanged(displayName);
         }
 
-        internal void PrintOcrTimeStamps(string oddFieldOSD, string evenFieldOSD)
-        {
-            m_VideoFileView.PrintOcrTimeStamps(oddFieldOSD, evenFieldOSD);
-        }
-
 		internal void NotifyFileProgress(int current, int max)
 		{
 			m_VideoFileView.OnFileProgress(current, max);
@@ -1388,6 +1383,22 @@ namespace Tangra.Controller
                     bf.Flush();
                 }
             }            
+        }
+
+        public void RegisterOcrError()
+        {
+            TangraContext.Current.OcrErrors++;
+            m_VideoFileView.Update();
+        }
+
+        public void RegisterExtractingOcrTimestamps()
+        {
+            if (!TangraContext.Current.OcrExtractingTimestamps)
+            {
+                TangraContext.Current.OcrErrors = 0;
+                TangraContext.Current.OcrExtractingTimestamps = true;
+                m_VideoFileView.Update();
+            }
         }
     }
 }

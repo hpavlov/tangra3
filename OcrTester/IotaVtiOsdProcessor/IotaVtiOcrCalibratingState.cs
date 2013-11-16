@@ -50,7 +50,7 @@ namespace OcrTester.IotaVtiOsdProcessor
         {
             int rv = 0;
             bool leftOk = (block.Left - 1) > 0 && (block.Left - 1) < imageWidth;
-            bool left2Ok = block.Left < imageWidth;
+            bool left2Ok = block.Left > 0 && block.Left < imageWidth;
             bool bottomOk = (block.Bottom - 1) < imageHeight;
             bool bottom2Ok = block.Bottom < imageHeight;
             bool topOk = block.Top - 1 >= 0;
@@ -58,7 +58,8 @@ namespace OcrTester.IotaVtiOsdProcessor
             int totalWhiteWhite = 0;
             for (int y = block.Top; y < block.Bottom; y++)
             {
-                if (y >= imageHeight) continue;
+                if (y >= imageHeight || y < 0) continue;
+
                 if (leftOk && left2Ok)
                 {
                     if (pixels[block.Left - 1 + imageWidth * y] > 127 && pixels[block.Left + imageWidth * y] < 127) rv += 2;
@@ -71,7 +72,9 @@ namespace OcrTester.IotaVtiOsdProcessor
 
             for (int x = block.Left; x < block.Right; x++)
             {
-                if (x >= imageWidth) continue;
+                if (x >= imageWidth || x < 0) continue;
+                if (block.Top < 0) continue;
+
                 if (bottomOk && pixels[x + imageWidth * (block.Bottom - 1)] < 127) rv++;
                 if (bottom2Ok && pixels[x + imageWidth * block.Bottom] > 127) rv++;
                 if (topOk && pixels[x + imageWidth * (block.Top - 1)] > 127) rv++;
@@ -91,9 +94,9 @@ namespace OcrTester.IotaVtiOsdProcessor
             int bestWidth = -1;
             int bestHeight = -1;
 
-            for (int xOffs = 0; xOffs < 8; xOffs++)
+            for (int xOffs = -2; xOffs < 8; xOffs ++)
             {
-                for (int yOffs = 0; yOffs < 4; yOffs++)
+                for (int yOffs = -10; yOffs < 10; yOffs++)
                 {
                     for (int x = m_MinBlockWidth; x <= m_MaxBlockWidth; x++)
                     {
