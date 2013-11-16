@@ -70,3 +70,5 @@ _ReSharper.*
 /AutoUpdate/SelfUpdate/AutoUpdateSelfUpdate.exe
 /Test Data
 /AutoUpdate/SelfUpdate/AutoUpdateSelfUpdate.bin
+
+/TestFiles/
