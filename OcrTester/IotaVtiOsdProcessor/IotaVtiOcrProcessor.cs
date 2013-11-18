@@ -38,11 +38,19 @@ namespace OcrTester.IotaVtiOsdProcessor
 
         public int BlockOffsetX { get; set; }
 
+		public int[] BlockOffsetsX { get; set; }
+
+        public int LastBlockOffsetsX { get; set; }
+
+        public int SecondLastBlockOffsetsX { get; set; }
+
         public int BlockOffsetY { get; set; }
 
         public string CurrentOcredString { get; set; }
 
         public int LastFrameNoDigitPosition { get; set; }
+
+        public bool SwapFieldsOrder { get; set; }
 
         public IotaVtiOcrProcessor()
         {
@@ -76,11 +84,11 @@ namespace OcrTester.IotaVtiOsdProcessor
         {
             if (y0 >= BlockOffsetY && y0 <= BlockOffsetY + BlockHeight)
             {
-                for (int i = 0; i < MAX_POSITIONS; i++)
+                for (int i = 0; i < MAX_POSITIONS - 1; i++)
                 {
-                    if (x0 >= BlockOffsetX + i * BlockWidth && x0 < BlockOffsetX + (i + 1) * BlockWidth)
+                    if (x0 >= BlockOffsetsX[i] && x0 < BlockOffsetsX[i + 1])
                     {
-                        return GetBlockAtPosition(pixelmap, i);
+                        return GetBlockAtXOffset(pixelmap, BlockOffsetsX[i]);
                     }
                 }
             }
@@ -100,13 +108,18 @@ namespace OcrTester.IotaVtiOsdProcessor
 
         public uint[] GetBlockAtPosition(uint[] pixelmap, int positionIndex)
         {
+            return GetBlockAtXOffset(pixelmap, BlockOffsetX + positionIndex * BlockWidth);
+        }
+
+        public uint[] GetBlockAtXOffset(uint[] pixelmap, int xOffset)
+        {
             uint[] blockPixels = new uint[BlockWidth * BlockHeight];
 
             for (int y = 0; y < BlockHeight; y++)
             {
                 for (int x = 0; x < BlockWidth; x++)
                 {
-                    blockPixels[x + y * BlockWidth] = pixelmap[BlockOffsetX + positionIndex * BlockWidth + x + (BlockOffsetY + y) * CurrentImageWidth];
+                    blockPixels[x + y * BlockWidth] = pixelmap[xOffset + x + (BlockOffsetY + y) * CurrentImageWidth];
                 }
             }
             return blockPixels;

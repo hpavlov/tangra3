@@ -137,6 +137,13 @@
         RU5ErkJggg==
 </value>
   </data>
+  <data name="label2.Text" xml:space="preserve">
+    <value>You  could help to make the OSD reader better if you submit an error report using the button below.
+
+Please know that Tangra will not be able to read your timestamp in all conditions. Nearby stars or bright or diverse background can be a reason for the timestamp recognition to fail. 
+
+If there has been an aspect change (i.e. your video is not in 720x576 (PAL) or 720x480 (NTSC) resolution) or if your capture card or software had made any image adjustments then all of this will certainly be a factor.</value>
+  </data>
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAABAAIAEBAQAAAABAAoAQAAJgAAACAgEAAAAAQA6AIAAE4BAAAoAAAAEAAAACAAAAABAAQAAAAAAIAA

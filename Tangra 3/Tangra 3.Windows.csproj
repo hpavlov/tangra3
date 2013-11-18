@@ -242,12 +242,6 @@
     <Compile Include="Helpers\ZipUnzip.cs" />
     <Compile Include="ImageTools\ArrowTool.cs" />
     <Compile Include="ImageTools\CorrectTrackingTool.cs" />
-    <Compile Include="OCR\IotaVtiOrcManaged.cs" />
-    <Compile Include="OCR\IotaVtiOsdProcessor\IotaVtiOcrCalibratedState.cs" />
-    <Compile Include="OCR\IotaVtiOsdProcessor\IotaVtiOcrCalibratingState.cs" />
-    <Compile Include="OCR\IotaVtiOsdProcessor\IotaVtiOcrProcessor.cs" />
-    <Compile Include="OCR\IotaVtiOsdProcessor\IotaVtiOcrState.cs" />
-    <Compile Include="OCR\ITimestampOcr.cs" />
     <Compile Include="OCR\OcrExtensionManager.cs" />
     <Compile Include="PInvoke\NativeTracking.cs" />
     <Compile Include="PInvoke\TangraCore.cs" />
@@ -689,6 +683,10 @@
     <ProjectReference Include="..\Tangra.Model\Tangra.Model.csproj">
       <Project>{70BBC9A7-7DD9-4A4D-B972-6665C65875C6}</Project>
       <Name>Tangra.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tangra.OCR\Tangra.OCR.csproj">
+      <Project>{06024bc0-0061-4902-8c50-4eab7913c8aa}</Project>
+      <Name>Tangra.OCR</Name>
     </ProjectReference>
     <ProjectReference Include="..\Tangra.SDK\Tangra.SDK.csproj">
       <Project>{bea778ee-f0be-49f3-bee4-0b8ed2d778f9}</Project>

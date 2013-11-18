@@ -86,7 +86,7 @@
             this.tbxInputFolder.Name = "tbxInputFolder";
             this.tbxInputFolder.Size = new System.Drawing.Size(352, 20);
             this.tbxInputFolder.TabIndex = 0;
-            this.tbxInputFolder.Text = "D:\\Work\\tangra3\\TestFiles\\FailedCalibration";
+            this.tbxInputFolder.Text = "D:\\Work\\tangra3\\TestFiles\\NTSC";
             // 
             // label1
             // 
@@ -119,6 +119,7 @@
             // 
             // picField
             // 
+            this.picField.BackColor = System.Drawing.SystemColors.ControlDark;
             this.picField.Cursor = System.Windows.Forms.Cursors.Hand;
             this.picField.Location = new System.Drawing.Point(16, 113);
             this.picField.Name = "picField";
@@ -139,6 +140,7 @@
             // 
             // picBlock
             // 
+            this.picBlock.BackColor = System.Drawing.SystemColors.ControlDark;
             this.picBlock.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.picBlock.Location = new System.Drawing.Point(16, 239);
             this.picBlock.Name = "picBlock";
@@ -221,6 +223,7 @@
             // 
             // picZero
             // 
+            this.picZero.BackColor = System.Drawing.SystemColors.ControlDark;
             this.picZero.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.picZero.Location = new System.Drawing.Point(153, 259);
             this.picZero.Name = "picZero";
@@ -231,6 +234,7 @@
             // 
             // picOne
             // 
+            this.picOne.BackColor = System.Drawing.SystemColors.ControlDark;
             this.picOne.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.picOne.Location = new System.Drawing.Point(185, 259);
             this.picOne.Name = "picOne";
@@ -241,6 +245,7 @@
             // 
             // picTwo
             // 
+            this.picTwo.BackColor = System.Drawing.SystemColors.ControlDark;
             this.picTwo.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.picTwo.Location = new System.Drawing.Point(218, 259);
             this.picTwo.Name = "picTwo";
@@ -251,6 +256,7 @@
             // 
             // picThree
             // 
+            this.picThree.BackColor = System.Drawing.SystemColors.ControlDark;
             this.picThree.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.picThree.Location = new System.Drawing.Point(250, 259);
             this.picThree.Name = "picThree";
@@ -261,6 +267,7 @@
             // 
             // picFour
             // 
+            this.picFour.BackColor = System.Drawing.SystemColors.ControlDark;
             this.picFour.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.picFour.Location = new System.Drawing.Point(282, 259);
             this.picFour.Name = "picFour";
@@ -271,6 +278,7 @@
             // 
             // picFive
             // 
+            this.picFive.BackColor = System.Drawing.SystemColors.ControlDark;
             this.picFive.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.picFive.Location = new System.Drawing.Point(314, 259);
             this.picFive.Name = "picFive";
@@ -281,6 +289,7 @@
             // 
             // picSix
             // 
+            this.picSix.BackColor = System.Drawing.SystemColors.ControlDark;
             this.picSix.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.picSix.Location = new System.Drawing.Point(346, 259);
             this.picSix.Name = "picSix";
@@ -291,6 +300,7 @@
             // 
             // picSeven
             // 
+            this.picSeven.BackColor = System.Drawing.SystemColors.ControlDark;
             this.picSeven.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.picSeven.Location = new System.Drawing.Point(378, 259);
             this.picSeven.Name = "picSeven";
@@ -301,6 +311,7 @@
             // 
             // picEight
             // 
+            this.picEight.BackColor = System.Drawing.SystemColors.ControlDark;
             this.picEight.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.picEight.Location = new System.Drawing.Point(410, 259);
             this.picEight.Name = "picEight";
@@ -311,6 +322,7 @@
             // 
             // picNine
             // 
+            this.picNine.BackColor = System.Drawing.SystemColors.ControlDark;
             this.picNine.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.picNine.Location = new System.Drawing.Point(442, 259);
             this.picNine.Name = "picNine";
@@ -483,6 +495,7 @@
             this.Controls.Add(this.tbxInputFolder);
             this.Name = "frmMain";
             this.Text = "OCR Tester";
+            this.Load += new System.EventHandler(this.frmMain_Load);
             ((System.ComponentModel.ISupportInitialize)(this.picField)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.picBlock)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.picZero)).EndInit();

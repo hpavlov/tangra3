@@ -20,6 +20,8 @@ namespace Tangra.VideoOperations
 	{
 		private Dictionary<string, uint[]> Images;
 
+        private uint[] LastUnmodifiedImage;
+
 		private ITimestampOcr m_TimestampOCR;
 
 		public ITimestampOcr TimestampOCR
@@ -29,6 +31,7 @@ namespace Tangra.VideoOperations
 			{
 				m_TimestampOCR = value;
 				Images = m_TimestampOCR.GetCalibrationReportImages();
+			    LastUnmodifiedImage = m_TimestampOCR.GetLastUnmodifiedImage();
 			}
 		}
 
@@ -47,11 +50,19 @@ namespace Tangra.VideoOperations
 			lblOsdReaderType.Text = m_TimestampOCR.OSDType();
 		}
 
+        private void EnableDisableFormControls(bool enable)
+        {
+            btnIgnore.Enabled = enable;
+            btnRetry.Enabled = enable;
+            btnSendReport.Enabled = enable;
+        }
+
 		private void btnSendReport_Click(object sender, EventArgs e)
 		{
 			Cursor = Cursors.WaitCursor;
 			string tempDir = Path.GetFullPath(Path.GetTempPath() + @"\" + Guid.NewGuid().ToString());
 			string tempFile = Path.GetTempFileName();
+            EnableDisableFormControls(false);
 			try
 			{
 				Directory.CreateDirectory(tempDir);
@@ -64,6 +75,9 @@ namespace Tangra.VideoOperations
 					Bitmap img = Pixelmap.ConstructBitmapFromBitmapPixels(Images[key], fieldAreaWidth, fieldAreaHeight);
 					img.Save(Path.GetFullPath(string.Format(@"{0}\{1}", tempDir, key)), ImageFormat.Bmp);
 				}
+
+                Bitmap fullFrame = Pixelmap.ConstructBitmapFromBitmapPixels(LastUnmodifiedImage, m_TimestampOCR.InitializationData.FrameWidth, m_TimestampOCR.InitializationData.FrameHeight);
+                fullFrame.Save(Path.GetFullPath(string.Format(@"{0}\full-frame.bmp", tempDir)), ImageFormat.Bmp);
 
 				ZipUnzip.Zip(tempDir, tempFile, false);
 				byte[] attachment = File.ReadAllBytes(tempFile);
@@ -100,6 +114,11 @@ namespace Tangra.VideoOperations
 				}
 
 				Cursor = Cursors.Default;
+
+                EnableDisableFormControls(true);
+
+			    MessageBox.Show("The error report was submitted successfully.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
 				DialogResult = DialogResult.OK;
 				Close();
 			}

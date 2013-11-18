@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using OcrTester.IotaVtiOsdProcessor;
@@ -31,6 +32,8 @@ namespace OcrTester
             m_Processor = new IotaVtiOcrProcessor();
 		}
 
+	    private static Regex FILE_MASK_REGEX = new Regex("(\\d+)\\-(even|odd)\\.bmp");
+
 		private void btnReload_Click(object sender, EventArgs e)
 		{
 			m_CurrentIndex = -1;
@@ -41,8 +44,11 @@ namespace OcrTester
                     string fnX = Path.GetFileName(x);
                     string fnY = Path.GetFileName(y);
 
-                    int xNum = int.Parse(fnX.Substring(0, 2));
-                    int yNum = int.Parse(fnY.Substring(0, 2));
+                    Match matchX = FILE_MASK_REGEX.Match(fnX);
+                    Match matchY = FILE_MASK_REGEX.Match(fnY);
+
+                    int xNum = int.Parse(matchX.Groups[1].Value);
+                    int yNum = int.Parse(matchY.Groups[1].Value);
 
                     if (xNum == yNum)
                     {
@@ -50,7 +56,7 @@ namespace OcrTester
                             return 0;
 
                         if (cbxReverseEvenOdd.Checked)
-                            return fnX[3] == 'o' ? -1 : 1;
+                            return matchX.Groups[2].Value == "odd" ? -1 : 1;
                         else
                             return x.CompareTo(y);
                     }
@@ -191,6 +197,11 @@ namespace OcrTester
 		    Bitmap bmpBlock = Pixelmap.ConstructBitmapFromBitmapPixels(blockPixels, m_Processor.BlockWidth, m_Processor.BlockHeight);
 		    picBlock.Image = bmpBlock;
 		    picBlock.Update();
+		}
+
+		private void frmMain_Load(object sender, EventArgs e)
+		{
+
 		}
 	}
 }
