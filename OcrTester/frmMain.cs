@@ -38,7 +38,7 @@ namespace OcrTester
 		{
 			m_CurrentIndex = -1;
 			m_InputFiles.Clear();
-			m_InputFiles.AddRange(Directory.GetFiles(tbxInputFolder.Text, "*.bmp"));
+			m_InputFiles.AddRange(Directory.GetFiles(Path.GetFullPath(tbxInputFolder.Text), "*.bmp"));
             m_InputFiles.Sort((x, y) =>
                 {
                     string fnX = Path.GetFileName(x);

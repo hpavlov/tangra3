@@ -146,9 +146,11 @@ namespace Tangra.PInvoke
 		{
 			if (s_fileInfo != null)
 			{
-				pixels = new uint[s_fileInfo.Width * s_fileInfo.Height];
+				int width = s_fileInfo.Width;
+				int height = s_fileInfo.Height;
+				pixels = new uint[width * height];
 				byte[] bitmapPixels = new byte[s_fileInfo.BitmapImageSize + 40 + 14 + 1];
-				bitmapBytes = new byte[s_fileInfo.Width * s_fileInfo.Height];
+				bitmapBytes = new byte[width * height];
 
                 try
                 {
@@ -161,7 +163,7 @@ namespace Tangra.PInvoke
                 }
                 catch (Exception ex)
                 {
-                    videoFrame = new Bitmap(s_fileInfo.Width, s_fileInfo.Height);
+                    videoFrame = new Bitmap(width, height);
                     using (Graphics g = Graphics.FromImage(videoFrame))
                     {
                         g.Clear(Color.White);

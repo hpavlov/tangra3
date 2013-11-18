@@ -25,7 +25,7 @@ namespace Tangra.OCR
 		private int m_FieldAreaWidth;
 
 		private bool m_TVSafeMode;
-        private IotaVtiOcrProcessor m_Processor = new IotaVtiOcrProcessor();
+        private IotaVtiOcrProcessor m_Processor;
 
 		private Dictionary<string, uint[]> m_CalibrationImages = new Dictionary<string, uint[]>();
 	    private uint[] m_LatestFrameImage;
@@ -33,6 +33,7 @@ namespace Tangra.OCR
 		public IotaVtiOrcManaged(bool tvSafeMode)
 		{
 			m_TVSafeMode = tvSafeMode;
+			m_Processor = new IotaVtiOcrProcessor(tvSafeMode);
 		}
 
 		public string NameAndVersion()
@@ -52,12 +53,12 @@ namespace Tangra.OCR
 
 			if (m_TVSafeMode)
 			{
-				m_FromLine = (int)Math.Round(500.0 * initializationData.FrameHeight / 576.0);
-				m_ToLine = (int)Math.Round(540.0 * initializationData.FrameHeight / 576.0);
+				m_FromLine = (int)Math.Round(490.0 * initializationData.FrameHeight / 576.0);
+				m_ToLine = (int)Math.Round(550.0 * initializationData.FrameHeight / 576.0);
 			}
 			else
 			{
-				m_FromLine = (int)Math.Round(530.0 * initializationData.FrameHeight / 576.0);
+				m_FromLine = (int)Math.Round(510.0 * initializationData.FrameHeight / 576.0);
 				m_ToLine = initializationData.FrameHeight;				
 			}
 
@@ -75,7 +76,7 @@ namespace Tangra.OCR
 			m_InitializationData.OSDFrame.Width = m_FieldAreaWidth;
 			m_InitializationData.OSDFrame.Height = m_FieldAreaHeight;
 
-            m_Processor = new IotaVtiOcrProcessor();
+            m_Processor = new IotaVtiOcrProcessor(m_TVSafeMode);
 		}
 
 		public TimestampOCRData InitializationData
