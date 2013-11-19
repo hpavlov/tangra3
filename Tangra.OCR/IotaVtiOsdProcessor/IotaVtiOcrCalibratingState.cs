@@ -10,7 +10,7 @@ using Tangra.OCR.IotaVtiOsdProcessor;
 
 namespace Tangra.OCR.IotaVtiOsdProcessor
 {
-    public class CalibratedBlockPosition
+    internal class CalibratedBlockPosition
     {
         public CalibratedBlockPosition(uint[] image)
         {
@@ -59,8 +59,7 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
         }
     }
 
-
-    public class IotaVtiOcrCalibratingState : IotaVtiOcrState
+    internal class IotaVtiOcrCalibratingState : IotaVtiOcrState
     {
         private List<CalibratedBlockPosition> m_CalibratedPositons = new List<CalibratedBlockPosition>();
 
@@ -225,14 +224,13 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 			if (m_CalibratedPositons.Count == 10)
 			{
 				var normalizedPositions = new List<CalibratedBlockPosition>();
-				if (CalibrateFrameNumberBlockPositions(stateManager, out normalizedPositions))
+
+				if (CalibrateFrameNumberBlockPositions(stateManager, out normalizedPositions) &&
+                    RecognizedTimestampsConsistent(stateManager, normalizedPositions))
 				{
-					if (RecognizedTimestampsConsistent(stateManager, normalizedPositions))
-					{
-						stateManager.ChangeState<IotaVtiOcrCalibratedState>();
-						stateManager.Process(stateManager.CurrentImage, stateManager.CurrentImageWidth, stateManager.CurrentImageHeight, graphics, frameNo, isOddField);
-						return;
-					}
+					stateManager.ChangeState<IotaVtiOcrCalibratedState>();
+					stateManager.Process(stateManager.CurrentImage, stateManager.CurrentImageWidth, stateManager.CurrentImageHeight, graphics, frameNo, isOddField);
+					return;
 				}
 				else
 				{
@@ -273,99 +271,73 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 			}
         }
 
+        private int GetLastFrameNoDigitStartPosition(IotaVtiOcrProcessor stateManager)
+        {
+            uint[] result = new uint[m_CalibratedPositons[0].Image.Length];
+            for (int i = 0; i < m_CalibratedPositons.Count - 2; i++)
+            {
+                uint[] prev = m_CalibratedPositons[i].Image;
+                uint[] next = m_CalibratedPositons[i + 1].Image;
+
+                for (int j = 0; j < result.Length; j++)
+                {
+                    int x = j % stateManager.CurrentImageWidth;
+                    if (x > ROUTH_START_FRAME_NUMBER_BLOCKS && prev[j] != next[j])
+                        result[j]++;
+                }
+            }
+
+            int bestRating = -1;
+            int bestStartPosition = -1;
+
+            for (int x = ROUTH_START_FRAME_NUMBER_BLOCKS; x < stateManager.CurrentImageWidth - stateManager.BlockWidth; x++)
+            {
+                int currentRating = 0;
+
+                for (int y = 0; y < stateManager.BlockHeight; y++)
+                {
+                    for (int k = 0; k < stateManager.BlockWidth; k++)
+                    {
+                        if (result[x + k + (stateManager.BlockOffsetY + y) * stateManager.CurrentImageWidth] > 0)
+                            currentRating++;
+                    }
+                }
+
+                if (currentRating > bestRating)
+                {
+                    bestStartPosition = x;
+                    bestRating = currentRating;
+                }
+            }
+
+            return bestStartPosition;
+        }
+
 		private bool CalibrateFrameNumberBlockPositions(IotaVtiOcrProcessor stateManager, out List<CalibratedBlockPosition> normalizedPositions)
 		{
-			List<int> bestStartPositions = new List<int>();
-			normalizedPositions = new List<CalibratedBlockPosition>();
+            int last = GetLastFrameNoDigitStartPosition(stateManager);
 
-			foreach (CalibratedBlockPosition blockPosition in m_CalibratedPositons)
-				bestStartPositions.AddRange(blockPosition.BestStartingPositions.Where(x => x >= ROUTH_START_FRAME_NUMBER_BLOCKS));
+		    if (last > -1)
+		    {
+		        int secondLast = last - stateManager.BlockWidth;
 
-			List<int> uniqueStartingPositionsList = bestStartPositions.Distinct().ToList();
-			List<int> occurancesList = new List<int>(new int[uniqueStartingPositionsList.Count]);
+		        // We now know the position of the two digits. We can now 'learn' the digits from '0' to '9' finding the change of the second last digit
+		        // and then infering the values from '0' to '9' of the last digit
 
-			#region Populate the occurances, merging at the same time all starting positions that differ by one
-			uniqueStartingPositionsList.Sort();
-			int index = uniqueStartingPositionsList.Count - 1;
+		        foreach (CalibratedBlockPosition blockPosition in m_CalibratedPositons)
+		            blockPosition.PrepareLastTwoDigitsFromTheFrameNumber(stateManager, last, secondLast);
 
-			while (index >= 0)
-			{
-				if (index > 0 &&
-					uniqueStartingPositionsList[index] - 1 == uniqueStartingPositionsList[index - 1])
-				{
-					// Two sequential starting positions. Merge them (assume the smaller as the correct one)
-					occurancesList[index] =
-						bestStartPositions.Count(x => x == uniqueStartingPositionsList[index]) +
-						bestStartPositions.Count(x => x == uniqueStartingPositionsList[index - 1]);
+		        if (DigitPatternsRecognized(stateManager, out normalizedPositions))
+		        {
+		            stateManager.LastBlockOffsetsX = last;
+		            stateManager.SecondLastBlockOffsetsX = secondLast;
 
-					occurancesList.RemoveAt(index - 1);
-					uniqueStartingPositionsList.RemoveAt(index); // We leave the smaller of the two as the accepted starting position
-					index--;
-				}
-				else
-					occurancesList[index] = bestStartPositions.Count(x => x == uniqueStartingPositionsList[index]);
-
-				index--;
-			}
-			#endregion
-
-			int[] occurances = occurancesList.ToArray();
-			int[] uniqueStartingPositions = uniqueStartingPositionsList.ToArray();
-
-			#region Remove all starting positions that are less than full width from each side of the best position guesses
-			var blockStartingPositions = new List<int>();
-			for (int i = uniqueStartingPositions.Length - 1; i >= 0; i--)
-			{
-				int suggestedPos = uniqueStartingPositions[i];
-				if (occurances[i] > 30.0 * stateManager.BlockHeight / 14.0)
-					blockStartingPositions.Add(suggestedPos);
-			}
-
-			for (int i = uniqueStartingPositions.Length - 1; i >= 0; i--)
-			{
-				bool removeCandidate = false;
-				if (occurances[i] < 10)
-					removeCandidate = true;
-				else if (blockStartingPositions.Any(x => x != uniqueStartingPositions[i] && Math.Abs(x - uniqueStartingPositions[i]) < stateManager.BlockWidth))
-					removeCandidate = true;
-
-				if (removeCandidate)
-					occurances[i] = -1;
-			}
-			#endregion
-
-			Array.Sort(occurances, uniqueStartingPositions);
-
-			blockStartingPositions.Clear();
-			for (int i = uniqueStartingPositions.Length - 1; i >= 0; i--)
-			{
-				int suggestedPos = uniqueStartingPositions[i];
-				if (occurances[i] > 0)
-					blockStartingPositions.Add(suggestedPos);
-			}
-
-			if (blockStartingPositions.Count > 1)
-			{
-				// Group those that are within 3 pixels
-				blockStartingPositions.Sort();
-				int last = blockStartingPositions[blockStartingPositions.Count - 1];
-				int secondLast = last - stateManager.BlockWidth; // blockStartingPositions[blockStartingPositions.Count - 2];
-
-				// We now know the position of the two digits. We can now 'learn' the digits from '0' to '9' finding the change of the second last digit
-				// and then infering the values from '0' to '9' of the last digit
-
-				foreach (CalibratedBlockPosition blockPosition in m_CalibratedPositons)
-					blockPosition.PrepareLastTwoDigitsFromTheFrameNumber(stateManager, last, secondLast);
-
-				if (DigitPatternsRecognized(stateManager, out normalizedPositions))
-				{
-					stateManager.LastBlockOffsetsX = last;
-					stateManager.SecondLastBlockOffsetsX = secondLast;
-
-					// Now go and determine the positions of the remaining blocks by matching their value to the 'learned' digits
-					return LocateRemainingBlockPositions(stateManager);
-				}
-			}
+		            // Now go and determine the positions of the remaining blocks by matching their value to the 'learned' digits
+		            return LocateRemainingBlockPositions(stateManager);
+		        }
+		    }
+		    else
+		        normalizedPositions = new List<CalibratedBlockPosition>();
 
 			return false;
 		}
@@ -444,6 +416,8 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 
 							prevMatchLocation = i;
 						}
+
+                        Trace.WriteLine(string.Format("IOTA-VTI OCR: Recognized '{0}' at position {1} with score {2}.", ch, i, rating));
 					}
 					else
 					{
@@ -467,8 +441,8 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 				stateManager.BlockOffsetsX[i] = -1;
 
 			int[] CHAR_INDEXES = stateManager.IsTvSafeMode
-				? new int[] { 1, 3, 4, 6, 7, 9, 10, 12, 13, 14, 15, 17, 18, 19, 20, 22, 23, 24, 25, 26, 27, 28 }
-				: new int[] { 3, 4, 6, 7, 9, 10, 12, 13, 14, 15, 17, 18, 19, 20, 22, 23, 24, 25, 26, 27, 28 };
+				? new int[] { 3, 4, 6, 7, 9, 10, 12, 13, 14, 15, 17, 18, 19, 20, 22, 23, 24, 25, 26, 27, 28 }
+                : new int[] { 1, 3, 4, 6, 7, 9, 10, 12, 13, 14, 15, 17, 18, 19, 20, 22, 23, 24, 25, 26, 27, 28 };
 
 			while (distinctPositions.Count > 0)
 			{

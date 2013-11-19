@@ -50,14 +50,24 @@
     <Compile Include="frmMain.Designer.cs">
       <DependentUpon>frmMain.cs</DependentUpon>
     </Compile>
+    <Compile Include="frmRunTestCases.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmRunTestCases.Designer.cs">
+      <DependentUpon>frmRunTestCases.cs</DependentUpon>
+    </Compile>
     <Compile Include="IotaVtiOsdProcessor\IotaVtiOcrCalibratedState.cs" />
     <Compile Include="IotaVtiOsdProcessor\IotaVtiOcrCalibratingState.cs" />
     <Compile Include="IotaVtiOsdProcessor\IotaVtiOcrState.cs" />
     <Compile Include="IotaVtiOsdProcessor\IotaVtiOcrProcessor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestCaseHelper.cs" />
     <EmbeddedResource Include="frmMain.resx">
       <DependentUpon>frmMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmRunTestCases.resx">
+      <DependentUpon>frmRunTestCases.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -85,6 +95,10 @@
     <ProjectReference Include="..\Tangra.Model\Tangra.Model.csproj">
       <Project>{70bbc9a7-7dd9-4a4d-b972-6665c65875c6}</Project>
       <Name>Tangra.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tangra.OCR\Tangra.OCR.csproj">
+      <Project>{06024bc0-0061-4902-8c50-4eab7913c8aa}</Project>
+      <Name>Tangra.OCR</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

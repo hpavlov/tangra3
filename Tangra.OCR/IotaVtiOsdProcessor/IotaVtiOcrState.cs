@@ -8,7 +8,7 @@ using Tangra.Model.Image;
 
 namespace Tangra.OCR.IotaVtiOsdProcessor
 {
-    public abstract class IotaVtiOcrState
+    internal abstract class IotaVtiOcrState
     {
         protected int m_Width;
         protected int m_Height;
@@ -36,7 +36,7 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
         }
     }
 
-	public class IotaVtiTimeStampStrings
+    internal class IotaVtiTimeStampStrings
 	{
 		public char NumSat;
 		public string HH;
@@ -58,7 +58,7 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 		}
 	}
 
-	public class IotaVtiTimeStamp
+    internal class IotaVtiTimeStamp
 	{
 		public IotaVtiTimeStamp(IotaVtiTimeStampStrings timeStampStrings)
 		{
@@ -78,13 +78,13 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 		public int FrameNumber;
 	}
 
-	public enum VideoFormat
+    internal enum VideoFormat
 	{
 		PAL,
 		NTSC
 	}
 
-	public static class Extensions
+    internal static class Extensions
     {
         public static T Median<T>(this IList<T> list)
         {

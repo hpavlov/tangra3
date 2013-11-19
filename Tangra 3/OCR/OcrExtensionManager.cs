@@ -13,13 +13,15 @@ namespace Tangra.OCR
 			if (TangraConfig.Settings.Generic.OcrEngine != null &&
 				TangraConfig.Settings.Generic.OcrEngine.StartsWith("IOTA-VTI"))
 			{
-				if (TangraConfig.Settings.Generic.OcrEngine == "IOTA-VTI Non TV-Safe" ||
-				    TangraConfig.Settings.Generic.OcrEngine == "IOTA-VTI TV-Safe")
-				{
-					return new IotaVtiOrcManaged(TangraConfig.Settings.Generic.OcrEngine == "IOTA-VTI TV-Safe");	
-				}				
+                return new IotaVtiOrcManaged();
+
+                //if (TangraConfig.Settings.Generic.OcrEngine == "IOTA-VTI Non TV-Safe" ||
+                //    TangraConfig.Settings.Generic.OcrEngine == "IOTA-VTI TV-Safe")
+                //{
+                //    return new IotaVtiOrcManaged(TangraConfig.Settings.Generic.OcrEngine == "IOTA-VTI TV-Safe");	
+                //}
+
 			}
-				
 
 			return null;
 		}

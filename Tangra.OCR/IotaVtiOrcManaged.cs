@@ -30,12 +30,6 @@ namespace Tangra.OCR
 		private Dictionary<string, uint[]> m_CalibrationImages = new Dictionary<string, uint[]>();
 	    private uint[] m_LatestFrameImage;
 
-		public IotaVtiOrcManaged(bool tvSafeMode)
-		{
-			m_TVSafeMode = tvSafeMode;
-			m_Processor = new IotaVtiOcrProcessor(tvSafeMode);
-		}
-
 		public string NameAndVersion()
 		{
 			return "Generic IOTA-VTI OCR v1.0";
@@ -43,40 +37,14 @@ namespace Tangra.OCR
 
 		public string OSDType()
 		{
-			return "IOTA-VTI " + (m_TVSafeMode ? "TV-Safe" : "Non TV-Safe");
+			return "IOTA-VTI";
 		}
 
 		public void Initialize(TimestampOCRData initializationData, IVideoController videoController)
 		{
 			m_InitializationData = initializationData;
 		    m_VideoController = videoController;
-
-			if (m_TVSafeMode)
-			{
-				m_FromLine = (int)Math.Round(490.0 * initializationData.FrameHeight / 576.0);
-				m_ToLine = (int)Math.Round(550.0 * initializationData.FrameHeight / 576.0);
-			}
-			else
-			{
-				m_FromLine = (int)Math.Round(510.0 * initializationData.FrameHeight / 576.0);
-				m_ToLine = initializationData.FrameHeight;				
-			}
-
-
-			if ((m_ToLine - m_FromLine) % 2 == 1) 
-				m_FromLine--;
-
-			m_FieldAreaHeight = (m_ToLine - m_FromLine) / 2;
-			m_FieldAreaWidth = m_InitializationData.FrameWidth;
-			m_OddFieldPixels = new uint[initializationData.FrameWidth * m_FieldAreaHeight];
-			m_EvenFieldPixels = new uint[initializationData.FrameWidth * m_FieldAreaHeight];
-            m_OddFieldPixelsPreProcessed = new uint[initializationData.FrameWidth * m_FieldAreaHeight];
-            m_EvenFieldPixelsPreProcessed = new uint[initializationData.FrameWidth * m_FieldAreaHeight];
-
-			m_InitializationData.OSDFrame.Width = m_FieldAreaWidth;
-			m_InitializationData.OSDFrame.Height = m_FieldAreaHeight;
-
-            m_Processor = new IotaVtiOcrProcessor(m_TVSafeMode);
+            m_Processor = null;
 		}
 
 		public TimestampOCRData InitializationData
@@ -167,7 +135,8 @@ namespace Tangra.OCR
 		{
             if (m_Processor.IsCalibrated)
             {
-                m_VideoController.RegisterExtractingOcrTimestamps();
+                if (m_VideoController != null)
+                    m_VideoController.RegisterExtractingOcrTimestamps();
 
                 PrepareOsdVideoFields(data);
 
@@ -185,7 +154,25 @@ namespace Tangra.OCR
             return time != DateTime.MinValue;
 		}
 
-		public bool RequiresConfiguring
+        public bool ExtractTime(int frameNo, uint[] oddPixels, uint[] evenPixels, int width, int height, out DateTime time)
+	    {
+            if (m_Processor.IsCalibrated)
+            {
+                m_Processor.Process(oddPixels, width, height, null, frameNo, true);
+                IotaVtiTimeStamp oddFieldOSD = m_Processor.CurrentOcredTimeStamp;
+
+                m_Processor.Process(evenPixels, width, height, null, frameNo, false);
+                IotaVtiTimeStamp evenFieldOSD = m_Processor.CurrentOcredTimeStamp;
+
+                time = ExtractDateTime(frameNo, oddFieldOSD, evenFieldOSD);
+            }
+            else
+                time = DateTime.MinValue;
+
+            return time != DateTime.MinValue;
+	    }
+
+	    public bool RequiresConfiguring
 		{
 			get { return false; }
 		}
@@ -199,8 +186,117 @@ namespace Tangra.OCR
 		{
 		}
 
+        private void LocateTimestampPosition(uint[] data)
+        {
+            int bestTopPosition = -1;
+            int bestTopScope = -1;
+            int bestBottomPosition = -1;
+            int bestBottomScope = -1;
+
+            int imageWidth = m_InitializationData.FrameWidth;
+
+            uint[] preProcessedPixels = new uint[data.Length];
+            Array.Copy(data, preProcessedPixels, data.Length);
+
+            // Process the image
+            uint median = preProcessedPixels.Median();
+            for (int i = 0; i < preProcessedPixels.Length; i++)
+            {
+                int darkCorrectedValue = (int)preProcessedPixels[i] - (int)median;
+                if (darkCorrectedValue < 0) darkCorrectedValue = 0;
+                preProcessedPixels[i] = (uint)darkCorrectedValue;
+            }
+
+            uint[] blurResult = BitmapFilter.GaussianBlur(preProcessedPixels, 8, m_InitializationData.FrameWidth, m_InitializationData.FrameHeight);
+            uint average = 128;
+            uint[] sharpenResult = BitmapFilter.Sharpen(blurResult, 8, m_InitializationData.FrameWidth, m_InitializationData.FrameHeight, out average);
+
+            // Binerize and Inverse
+            for (int i = 0; i < sharpenResult.Length; i++)
+            {
+                sharpenResult[i] = sharpenResult[i] > average ? (uint)0 : (uint)255;
+            }
+            uint[] denoised = BitmapFilter.Denoise(sharpenResult, 8, m_InitializationData.FrameWidth, m_InitializationData.FrameHeight, out average, false);
+
+            for (int i = 0; i < denoised.Length; i++)
+            {
+                preProcessedPixels[i] = denoised[i] < 127 ? (uint)0 : (uint)255;
+            }
+
+            for (int y = m_InitializationData.FrameHeight / 2 + 1; y < m_InitializationData.FrameHeight - 1; y++)
+            {
+                int topScore = 0;
+                int bottomScore = 0;
+
+                for (int x = 0; x < m_InitializationData.FrameWidth; x++)
+                {
+                    if (preProcessedPixels[x + imageWidth * (y + 1)] < 127 && preProcessedPixels[x + imageWidth * y] > 127)
+                    {
+                        topScore++;
+                    }
+
+                    if (preProcessedPixels[x + imageWidth * (y - 1)] < 127 && preProcessedPixels[x + imageWidth * y] > 127)
+                    {
+                        bottomScore++;
+                    }
+                }
+
+                if (topScore > bestTopScope)
+                {
+                    bestTopScope = topScore;
+                    bestTopPosition = y;
+                }
+
+                if (bottomScore > bestBottomScope)
+                {
+                    bestBottomScope = bottomScore;
+                    bestBottomPosition = y;
+                }
+            }
+
+            m_FromLine = bestTopPosition - 10;
+            m_ToLine = bestBottomPosition + 10;
+            if (m_ToLine > m_InitializationData.FrameHeight)
+                m_ToLine = m_InitializationData.FrameHeight - 2;
+
+            // NOTE: This is MAGIC!! It ensures that the TOP and BOTTOM position of the OSD in each even and odd field will be the same
+            // TODO: This should be ensured by finding the TOP and BOTTOM position of the fields
+            if ((m_ToLine - m_FromLine) %2 == 1)
+            {
+                if (m_FromLine % 2 == 1)
+                    m_FromLine--;
+                else
+                    m_ToLine++;
+            }
+
+            m_TVSafeMode = m_ToLine + (m_ToLine - m_FromLine) / 2 < m_InitializationData.FrameHeight;
+        }
+
+        private void EnsureProcessorInitialized(uint[] data)
+        {
+            if (m_Processor == null)
+            {
+                LocateTimestampPosition(data);
+
+                m_FieldAreaHeight = (m_ToLine - m_FromLine) / 2;
+                m_FieldAreaWidth = m_InitializationData.FrameWidth;
+                m_OddFieldPixels = new uint[m_InitializationData.FrameWidth * m_FieldAreaHeight];
+                m_EvenFieldPixels = new uint[m_InitializationData.FrameWidth * m_FieldAreaHeight];
+                m_OddFieldPixelsPreProcessed = new uint[m_InitializationData.FrameWidth * m_FieldAreaHeight];
+                m_EvenFieldPixelsPreProcessed = new uint[m_InitializationData.FrameWidth * m_FieldAreaHeight];
+
+                m_InitializationData.OSDFrame.Width = m_FieldAreaWidth;
+                m_InitializationData.OSDFrame.Height = m_FieldAreaHeight;
+
+                m_Processor = new IotaVtiOcrProcessor(m_TVSafeMode);
+            }
+        }
+
 		public bool ProcessCalibrationFrame(int frameNo, uint[] data)
 		{
+            if (m_Processor == null)
+		        EnsureProcessorInitialized(data);
+
 		    if (!m_Processor.IsCalibrated)
 		        PrepareOsdVideoFields(data);
 
@@ -232,7 +328,18 @@ namespace Tangra.OCR
 		    return m_Processor.IsCalibrated;
 		}
 
-		public Dictionary<string, uint[]> GetCalibrationReportImages()
+	    public bool ProcessCalibrationFrame(int frameNo, uint[] oddPixels, uint[] evenPixels, int width, int height)
+	    {
+            if (!m_Processor.IsCalibrated)
+                m_Processor.Process(oddPixels, width, height, null, frameNo, true);
+
+            if (!m_Processor.IsCalibrated)
+                m_Processor.Process(evenPixels, width, height, null, frameNo, false);
+
+            return m_Processor.IsCalibrated;
+	    }
+
+	    public Dictionary<string, uint[]> GetCalibrationReportImages()
 		{
 			return m_CalibrationImages;
 		}
@@ -295,7 +402,9 @@ namespace Tangra.OCR
 
             if (failedValidation)
             {
-                m_VideoController.RegisterOcrError();
+                if (m_VideoController != null)
+                    m_VideoController.RegisterOcrError();
+
                 return DateTime.MinValue;
             }
             else

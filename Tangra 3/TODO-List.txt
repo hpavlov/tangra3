@@ -13,7 +13,12 @@ Features:
 	 - Make it possible to switch between different implementations
 	 - Do a second implementation from scratch, tune it and use it.
   - Make it possible to measure in video fields
+
   - Add OCR option for AVI videos
+    - NED's NTSC video has dropped frames, extracting times from those is problematic. May be relax the requirements and only check the two fields ?
+	- Need to determine the maximum FieldNumber with the number of recognized digits, so when this limit is reached, then the next digit position is located
+	  or think of other ways to determine those digit positions
+	- Will need special handling of recognizing 6, 8 and 9 (possibly 3 as well).
 
 Bugs:
 -----

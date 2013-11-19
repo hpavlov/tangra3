@@ -9,7 +9,7 @@ using Tangra.OCR.IotaVtiOsdProcessor;
 
 namespace Tangra.OCR.IotaVtiOsdProcessor
 {
-    public class IotaVtiOcrProcessor
+    internal class IotaVtiOcrProcessor
     {
         internal const int MAX_POSITIONS = 29;
         internal const int FIRST_FRAME_NO_DIGIT_POSITIONS = 22;
@@ -78,7 +78,7 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
             m_CurrentSate.Process(this, g, frameNo, isOddField);
         }
 
-        public void ChangeState<T>() where T : IotaVtiOcrState, new()
+        internal void ChangeState<T>() where T : IotaVtiOcrState, new()
         {
             if (m_CurrentSate != null)
                 m_CurrentSate.FinaliseState(this);

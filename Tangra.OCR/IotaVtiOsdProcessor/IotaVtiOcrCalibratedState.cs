@@ -7,7 +7,7 @@ using Tangra.OCR.IotaVtiOsdProcessor;
 
 namespace Tangra.OCR.IotaVtiOsdProcessor
 {
-    public class IotaVtiOcrCalibratedState : IotaVtiOcrState
+    internal class IotaVtiOcrCalibratedState : IotaVtiOcrState
     {
         public override void InitialiseState(IotaVtiOcrProcessor stateManager)
         {

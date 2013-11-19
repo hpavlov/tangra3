@@ -32,37 +32,13 @@ namespace OcrTester
             m_Processor = new IotaVtiOcrProcessor();
 		}
 
-	    private static Regex FILE_MASK_REGEX = new Regex("(\\d+)\\-(even|odd)\\.bmp");
+	    
 
 		private void btnReload_Click(object sender, EventArgs e)
 		{
 			m_CurrentIndex = -1;
 			m_InputFiles.Clear();
-			m_InputFiles.AddRange(Directory.GetFiles(Path.GetFullPath(tbxInputFolder.Text), "*.bmp"));
-            m_InputFiles.Sort((x, y) =>
-                {
-                    string fnX = Path.GetFileName(x);
-                    string fnY = Path.GetFileName(y);
-
-                    Match matchX = FILE_MASK_REGEX.Match(fnX);
-                    Match matchY = FILE_MASK_REGEX.Match(fnY);
-
-                    int xNum = int.Parse(matchX.Groups[1].Value);
-                    int yNum = int.Parse(matchY.Groups[1].Value);
-
-                    if (xNum == yNum)
-                    {
-                        if (fnX.CompareTo(fnY) == 0)
-                            return 0;
-
-                        if (cbxReverseEvenOdd.Checked)
-                            return matchX.Groups[2].Value == "odd" ? -1 : 1;
-                        else
-                            return x.CompareTo(y);
-                    }
-                    else
-                        return xNum.CompareTo(yNum);
-                });
+            m_InputFiles.AddRange(TestCaseHelper.LoadTestImages(tbxInputFolder.Text, cbxReverseEvenOdd.Checked));
 
 			if (m_InputFiles.Count > 0) m_CurrentIndex = 0;
 			ProcessCurrentImage();
@@ -203,5 +179,11 @@ namespace OcrTester
 		{
 
 		}
+
+        private void btnAutomatedTests_Click(object sender, EventArgs e)
+        {
+            var frm = new frmRunTestCases();
+            frm.ShowDialog(this);
+        }
 	}
 }

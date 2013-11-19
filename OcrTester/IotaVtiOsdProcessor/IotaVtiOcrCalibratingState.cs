@@ -150,7 +150,7 @@ namespace OcrTester.IotaVtiOsdProcessor
                                 stateManager.CurrentImage[x + width + imageWidth*y] > 127 &&
                                 stateManager.CurrentImage[x + width + 1 + imageWidth*y] > 127)
                             {
-								startingPositions.Add(x);
+                                startingPositions.Add(x);
                                 totalRating++;
                             }
                         }
@@ -268,6 +268,65 @@ namespace OcrTester.IotaVtiOsdProcessor
             foreach (CalibratedBlockPosition blockPosition in m_CalibratedPositons)
                 bestStartPositions.AddRange(blockPosition.BestStartingPositions.Where(x => x >= ROUTH_START_FRAME_NUMBER_BLOCKS));
 
+		    uint[] result = new uint[m_CalibratedPositons[0].Image.Length];
+            for (int i = 0; i < m_CalibratedPositons.Count - 2; i++)
+            {
+                uint[] prev = m_CalibratedPositons[i].Image;
+                uint[] next = m_CalibratedPositons[i + 1].Image;
+
+                for (int j = 0; j < result.Length; j++)
+                {
+                    int x = j % stateManager.CurrentImageWidth;
+                    if (x > ROUTH_START_FRAME_NUMBER_BLOCKS && prev[j] != next[j])
+                        result[j]++;
+                }
+            }
+
+		    int bestRating = -1;
+		    int bestStartPosition = -1;
+
+            for (int x = ROUTH_START_FRAME_NUMBER_BLOCKS; x < stateManager.CurrentImageWidth - stateManager.BlockWidth; x++)
+            {
+                int currentRating = 0;
+
+                for (int y = 0; y < stateManager.BlockHeight; y++)
+		        {
+		            for (int k = 0; k < stateManager.BlockWidth; k++)
+		            {
+		                if (result[x + k + (stateManager.BlockOffsetY + y)*stateManager.CurrentImageWidth] > 0)
+		                    currentRating++;
+		            }
+		        }
+
+                if (currentRating > bestRating)
+                {
+                    bestStartPosition = x;
+                    bestRating = currentRating;
+                }
+		    }
+
+            int last = bestStartPosition;
+            int secondLast = bestStartPosition - stateManager.BlockWidth;// blockStartingPositions[blockStartingPositions.Count - 2];
+
+            // We now know the position of the two digits. We can now 'learn' the digits from '0' to '9' finding the change of the second last digit
+            // and then infering the values from '0' to '9' of the last digit
+
+            foreach (CalibratedBlockPosition blockPosition in m_CalibratedPositons)
+                blockPosition.PrepareLastTwoDigitsFromTheFrameNumber(stateManager, last, secondLast);
+
+            if (DigitPatternsRecognized(stateManager))
+            {
+                stateManager.LastBlockOffsetsX = last;
+                stateManager.SecondLastBlockOffsetsX = secondLast;
+                // Now go and determine the positions of the remaining blocks by matching their value to the 'learned' digits
+                return LocateRemainingBlockPositions(stateManager);
+            }
+
+		    return false;
+            /*
+		    // Bitmap bmp = Pixelmap.ConstructBitmapFromBitmapPixels(result, stateManager.CurrentImageWidth, stateManager.BlockHeight);
+            //bmp.Save(@"D:\Work\tangra3\OcrTester\AutomatedTestingImages\movement.bmp");
+
             List<int> uniqueStartingPositionsList = bestStartPositions.Distinct().ToList();
             List<int> occurancesList = new List<int>(new int[uniqueStartingPositionsList.Count]);
 
@@ -355,6 +414,7 @@ namespace OcrTester.IotaVtiOsdProcessor
 			}
 
             return false;
+             * */
 		}
 
 
