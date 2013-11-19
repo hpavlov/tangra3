@@ -82,11 +82,10 @@ namespace OcrTester.IotaVtiOsdProcessor
                         if (top < 0) continue;
                         if (bottom >= stateManager.CurrentImageHeight) continue;
 
-                        if (bottomOk && stateManager.CurrentImage[x + imageWidth * (bottom - 1)] < 127) totalRating++;
-                        if (bottom2Ok && stateManager.CurrentImage[x + imageWidth * bottom] > 127) totalRating++;
-
-						if (stateManager.CurrentImage[x + imageWidth * (top + 1)] < 127) totalRating++;
-						if (stateManager.CurrentImage[x + imageWidth * top] > 127) totalRating++;
+                        if (bottomOk && stateManager.CurrentImage[x + imageWidth * (bottom - 1)] < 127 &&
+							bottom2Ok && stateManager.CurrentImage[x + imageWidth * bottom] > 127 &&
+							stateManager.CurrentImage[x + imageWidth * (top + 1)] < 127 &&
+						    stateManager.CurrentImage[x + imageWidth * top] > 127) totalRating++;
                     }
 
                     if (totalRating > maxRating)
@@ -144,14 +143,14 @@ namespace OcrTester.IotaVtiOsdProcessor
                         if (//stateManager.CurrentImage[x - 1 + imageWidth*y] > 127 &&
                             //stateManager.CurrentImage[x + imageWidth*y] > 127 &&
                             stateManager.CurrentImage[x + 1 + imageWidth*y] < 127)
-                        {
-	                        startingPositions.Add(x);
+                        {	                        
                             totalRating++;
 
                             if (stateManager.CurrentImage[x + width - 1 + imageWidth*y] < 127 &&
                                 stateManager.CurrentImage[x + width + imageWidth*y] > 127 &&
                                 stateManager.CurrentImage[x + width + 1 + imageWidth*y] > 127)
                             {
+								startingPositions.Add(x);
                                 totalRating++;
                             }
                         }
@@ -188,7 +187,7 @@ namespace OcrTester.IotaVtiOsdProcessor
 
             m_MaxBlockWidth = m_Width / 27;
             m_MinBlockWidth = (m_Width / 30) - 2;
-            m_MinBlockHeight = (int)Math.Round(0.66 * m_Height);
+			m_MinBlockHeight = Math.Min(10, m_Height - 15);
             m_MaxBlockHeight = m_Height - 2;
 
             m_CalibratedPositons.Clear();
@@ -300,6 +299,7 @@ namespace OcrTester.IotaVtiOsdProcessor
 		    int[] occurances = occurancesList.ToArray();
 		    int[] uniqueStartingPositions = uniqueStartingPositionsList.ToArray();
 
+		
             #region Remove all starting positions that are less than full width from each side of the best position guesses
             var blockStartingPositions = new List<int>();
             for (int i = uniqueStartingPositions.Length - 1; i >= 0; i--)
@@ -322,9 +322,9 @@ namespace OcrTester.IotaVtiOsdProcessor
             }
             #endregion
 
-            Array.Sort(occurances, uniqueStartingPositions);
+			Array.Sort(occurances, uniqueStartingPositions);
 
-            blockStartingPositions.Clear();
+			blockStartingPositions.Clear();
 			for (int i = uniqueStartingPositions.Length - 1; i >= 0; i--)
 			{
 				int suggestedPos = uniqueStartingPositions[i];
@@ -337,7 +337,7 @@ namespace OcrTester.IotaVtiOsdProcessor
 				// Group those that are within 3 pixels
 				blockStartingPositions.Sort();
 				int last = blockStartingPositions[blockStartingPositions.Count - 1];
-				int secondLast = blockStartingPositions[blockStartingPositions.Count - 2];
+				int secondLast = last - stateManager.BlockWidth;// blockStartingPositions[blockStartingPositions.Count - 2];
 
 				// We now know the position of the two digits. We can now 'learn' the digits from '0' to '9' finding the change of the second last digit
                 // and then infering the values from '0' to '9' of the last digit
