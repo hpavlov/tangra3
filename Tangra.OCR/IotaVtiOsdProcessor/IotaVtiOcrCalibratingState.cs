@@ -444,6 +444,10 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 				? new int[] { 3, 4, 6, 7, 9, 10, 12, 13, 14, 15, 17, 18, 19, 20, 22, 23, 24, 25, 26, 27, 28 }
                 : new int[] { 1, 3, 4, 6, 7, 9, 10, 12, 13, 14, 15, 17, 18, 19, 20, 22, 23, 24, 25, 26, 27, 28 };
 
+			if (!stateManager.IsTvSafeMode)
+				// In Non TV-Safe mode, make sure we are not trying to recognize the GPS Fix character, where 'P' can be mistaken for an '8'
+				distinctPositions.RemoveAll(x => x < stateManager.BlockWidth);
+
 			while (distinctPositions.Count > 0)
 			{
 				int nextPos = distinctPositions[0];
@@ -634,7 +638,10 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 
                 IotaVtiTimeStampStrings timeStampStrings = IotaVtiOcrCalibratedState.OcrField(normalizedPositions[index].Image, stateManager);
 				if (!timeStampStrings.AllCharsPresent())
+				{
+					SaveErrorReportImage(stateManager, timeStampStrings, normalizedPositions[index].Image);
 					return false;
+				}
 
 				var timeStamp = new IotaVtiTimeStamp(timeStampStrings);
 
@@ -645,8 +652,10 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 
                     IotaVtiTimeStampStrings timeStampStrings2 = IotaVtiOcrCalibratedState.OcrField(normalizedPositions[index + 1].Image, stateManager);
 					if (!timeStampStrings2.AllCharsPresent())
+					{
+						SaveErrorReportImage(stateManager, timeStampStrings2, normalizedPositions[index + 1].Image);
 						return false;
-					
+					}
 					var timeStamp2 = new IotaVtiTimeStamp(timeStampStrings2);
 					allTimeStamps.Add(timeStamp2);
 
@@ -683,6 +692,40 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 				stateManager.VideoFormat = null;
 
 			return true;
+		}
+
+		private void SaveErrorReportImage(IotaVtiOcrProcessor stateManager, IotaVtiTimeStampStrings timeStampStrings, uint[] pixels)
+		{
+			// TODO: Prepare are useful image as a report
+
+			//Bitmap bmp = Pixelmap.ConstructBitmapFromBitmapPixels(pixels, stateManager.CurrentImageWidth, stateManager.CurrentImageHeight);
+			//bmp.Save(@"D:\Hristo\Tangra3\Test Data\ErrorReports\frame.bmp");
+
+			//uint[] block1 = stateManager.GetBlockAtPosition(pixels, 1);
+			//uint[] block3 = stateManager.GetBlockAtPosition(pixels, 3);
+			//uint[] block4 = stateManager.GetBlockAtPosition(pixels, 4);
+			//uint[] block6 = stateManager.GetBlockAtPosition(pixels, 6);
+			//uint[] block7 = stateManager.GetBlockAtPosition(pixels, 7);
+			//uint[] block9 = stateManager.GetBlockAtPosition(pixels, 9);
+			//uint[] block10 = stateManager.GetBlockAtPosition(pixels, 10);
+
+			//uint[] block12 = stateManager.GetBlockAtPosition(pixels, 12);
+			//uint[] block13 = stateManager.GetBlockAtPosition(pixels, 13);
+			//uint[] block14 = stateManager.GetBlockAtPosition(pixels, 14);
+			//uint[] block15 = stateManager.GetBlockAtPosition(pixels, 15);
+
+			//uint[] block17 = stateManager.GetBlockAtPosition(pixels, 17);
+			//uint[] block18 = stateManager.GetBlockAtPosition(pixels, 18);
+			//uint[] block19 = stateManager.GetBlockAtPosition(pixels, 19);
+			//uint[] block20 = stateManager.GetBlockAtPosition(pixels, 20);
+
+			//uint[] block22 = stateManager.GetBlockAtPosition(pixels, 22);
+			//uint[] block23 = stateManager.GetBlockAtPosition(pixels, 23);
+			//uint[] block24 = stateManager.GetBlockAtPosition(pixels, 24);
+			//uint[] block25 = stateManager.GetBlockAtPosition(pixels, 25);
+			//uint[] block26 = stateManager.GetBlockAtPosition(pixels, 26);
+			//uint[] block27 = stateManager.GetBlockAtPosition(pixels, 27);
+			//uint[] block28 = stateManager.GetBlockAtPosition(pixels, 28);
 		}
     }
 }

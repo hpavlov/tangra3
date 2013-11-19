@@ -186,15 +186,48 @@ namespace Tangra.OCR
 		{
 		}
 
-        private void LocateTimestampPosition(uint[] data)
+		private void LocateTopAndBottomLineOfTimestamp(uint[] preProcessedPixels, int imageWidth, int fromHeight, int toHeight, out int bestTopPosition, out int bestBottomPosition)
+		{
+			int bestTopScope = -1;
+			bestBottomPosition = -1;
+			bestTopPosition = -1;			
+			int bestBottomScope = -1;
+
+
+			for (int y = fromHeight + 1; y < toHeight - 1; y++)
+			{
+				int topScore = 0;
+				int bottomScore = 0;
+
+				for (int x = 0; x < imageWidth; x++)
+				{
+					if (preProcessedPixels[x + imageWidth * (y + 1)] < 127 && preProcessedPixels[x + imageWidth * y] > 127)
+					{
+						topScore++;
+					}
+
+					if (preProcessedPixels[x + imageWidth * (y - 1)] < 127 && preProcessedPixels[x + imageWidth * y] > 127)
+					{
+						bottomScore++;
+					}
+				}
+
+				if (topScore > bestTopScope)
+				{
+					bestTopScope = topScore;
+					bestTopPosition = y;
+				}
+
+				if (bottomScore > bestBottomScope)
+				{
+					bestBottomScope = bottomScore;
+					bestBottomPosition = y;
+				}
+			}			
+		}
+
+        private bool LocateTimestampPosition(uint[] data)
         {
-            int bestTopPosition = -1;
-            int bestTopScope = -1;
-            int bestBottomPosition = -1;
-            int bestBottomScope = -1;
-
-            int imageWidth = m_InitializationData.FrameWidth;
-
             uint[] preProcessedPixels = new uint[data.Length];
             Array.Copy(data, preProcessedPixels, data.Length);
 
@@ -223,44 +256,21 @@ namespace Tangra.OCR
                 preProcessedPixels[i] = denoised[i] < 127 ? (uint)0 : (uint)255;
             }
 
-            for (int y = m_InitializationData.FrameHeight / 2 + 1; y < m_InitializationData.FrameHeight - 1; y++)
-            {
-                int topScore = 0;
-                int bottomScore = 0;
-
-                for (int x = 0; x < m_InitializationData.FrameWidth; x++)
-                {
-                    if (preProcessedPixels[x + imageWidth * (y + 1)] < 127 && preProcessedPixels[x + imageWidth * y] > 127)
-                    {
-                        topScore++;
-                    }
-
-                    if (preProcessedPixels[x + imageWidth * (y - 1)] < 127 && preProcessedPixels[x + imageWidth * y] > 127)
-                    {
-                        bottomScore++;
-                    }
-                }
-
-                if (topScore > bestTopScope)
-                {
-                    bestTopScope = topScore;
-                    bestTopPosition = y;
-                }
-
-                if (bottomScore > bestBottomScope)
-                {
-                    bestBottomScope = bottomScore;
-                    bestBottomPosition = y;
-                }
-            }
+			int bestBottomPosition = -1;
+			int bestTopPosition = -1;
+			LocateTopAndBottomLineOfTimestamp(
+				preProcessedPixels, 
+				m_InitializationData.FrameWidth,  
+				m_InitializationData.FrameHeight / 2 + 1, 
+				m_InitializationData.FrameHeight, 
+				out bestTopPosition, 
+				out bestBottomPosition);
 
             m_FromLine = bestTopPosition - 10;
             m_ToLine = bestBottomPosition + 10;
             if (m_ToLine > m_InitializationData.FrameHeight)
                 m_ToLine = m_InitializationData.FrameHeight - 2;
 
-            // NOTE: This is MAGIC!! It ensures that the TOP and BOTTOM position of the OSD in each even and odd field will be the same
-            // TODO: This should be ensured by finding the TOP and BOTTOM position of the fields
             if ((m_ToLine - m_FromLine) %2 == 1)
             {
                 if (m_FromLine % 2 == 1)
@@ -269,7 +279,58 @@ namespace Tangra.OCR
                     m_ToLine++;
             }
 
-            m_TVSafeMode = m_ToLine + (m_ToLine - m_FromLine) / 2 < m_InitializationData.FrameHeight;
+			#region We need to make sure that the two fields have the same top and bottom lines
+
+			// Create temporary arrays so the top/bottom position per field can be further refined
+			m_FieldAreaHeight = (m_ToLine - m_FromLine) / 2;
+			m_FieldAreaWidth = m_InitializationData.FrameWidth;
+			m_OddFieldPixels = new uint[m_InitializationData.FrameWidth * m_FieldAreaHeight];
+			m_EvenFieldPixels = new uint[m_InitializationData.FrameWidth * m_FieldAreaHeight];
+			m_OddFieldPixelsPreProcessed = new uint[m_InitializationData.FrameWidth * m_FieldAreaHeight];
+			m_EvenFieldPixelsPreProcessed = new uint[m_InitializationData.FrameWidth * m_FieldAreaHeight];
+
+			int[] DELTAS = new int[] { 0, -1, 1 };
+	        int fromLineBase = m_FromLine;
+			int toLineBase = m_ToLine;
+	        bool matchFound = false;
+
+	        for (int deltaIdx = 0; deltaIdx <= DELTAS.Length; deltaIdx++)
+	        {
+		        m_FromLine = fromLineBase + DELTAS[deltaIdx];
+				m_ToLine = toLineBase + DELTAS[deltaIdx];
+
+				PrepareOsdVideoFields(data);
+				
+				int bestBottomPositionOdd = -1;
+				int bestTopPositionOdd = -1;
+				int bestBottomPositionEven = -1;
+				int bestTopPositionEven = -1;
+
+				LocateTopAndBottomLineOfTimestamp(
+					m_OddFieldPixelsPreProcessed,
+					m_FieldAreaWidth, 1, m_FieldAreaHeight - 1, 
+					out bestTopPositionOdd, out bestBottomPositionOdd);
+
+				LocateTopAndBottomLineOfTimestamp(
+					m_EvenFieldPixelsPreProcessed,
+					m_FieldAreaWidth, 1, m_FieldAreaHeight - 1, 
+					out bestTopPositionEven, out bestBottomPositionEven);
+
+				if (bestBottomPositionOdd == bestBottomPositionEven &&
+				    bestTopPositionOdd == bestTopPositionEven)
+				{
+					matchFound = true;
+					m_FromLine = fromLineBase;
+					m_ToLine = toLineBase;
+
+					break;
+				}
+			}
+			#endregion
+
+			m_TVSafeMode = m_ToLine + (m_ToLine - m_FromLine) / 2 < m_InitializationData.FrameHeight;
+
+	        return matchFound;
         }
 
         private void EnsureProcessorInitialized(uint[] data)
