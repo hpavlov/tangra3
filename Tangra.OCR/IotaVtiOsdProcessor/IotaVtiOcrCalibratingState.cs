@@ -241,34 +241,7 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 			}
 
 			if (graphics != null)
-			{
-				if (stateManager.BlockOffsetsX != null &&
-					stateManager.BlockOffsetsX.Length == IotaVtiOcrProcessor.MAX_POSITIONS &&
-					stateManager.BlockOffsetsX[1] > 0)
-				{
-					for (int i = 0; i < IotaVtiOcrProcessor.MAX_POSITIONS; i++)
-					{
-						if (stateManager.BlockOffsetsX[i] > 0)
-						{
-							graphics.DrawRectangle(
-								Pens.Chartreuse,
-								stateManager.BlockOffsetsX[i],
-								stateManager.BlockOffsetY,
-								stateManager.BlockWidth,
-								stateManager.BlockHeight);
-						}
-					}
-				}
-				else
-				{
-					graphics.DrawRectangle(
-							Pens.Chartreuse,
-							0,
-							stateManager.BlockOffsetY,
-							m_Width,
-							stateManager.BlockHeight);
-				}
-			}
+				base.PlotImage(graphics, stateManager);
         }
 
         private int GetLastFrameNoDigitStartPosition(IotaVtiOcrProcessor stateManager)
@@ -629,11 +602,11 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 
 			for (int i = 0; i < pattern1.Length; i++)
 			{
-				if (pattern1[i] < 127 && pattern1[2] < 127)
+				if (pattern1[i] < 127 && pattern2[i] < 127)
 				{
 					rv[i] = 255;
 				}
-				else if (pattern1[i] > 127 && pattern1[2] > 127)
+				else if (pattern1[i] > 127 && pattern2[i] > 127)
 				{
 					rv[i] = 255;
 				}

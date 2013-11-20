@@ -28,8 +28,6 @@ namespace OcrTester
 		public frmMain()
 		{
 			InitializeComponent();
-
-            m_Processor = new IotaVtiOcrProcessor();
 		}
 
 	    
@@ -39,6 +37,8 @@ namespace OcrTester
 			m_CurrentIndex = -1;
 			m_InputFiles.Clear();
             m_InputFiles.AddRange(TestCaseHelper.LoadTestImages(tbxInputFolder.Text, cbxReverseEvenOdd.Checked));
+
+			m_Processor = new IotaVtiOcrProcessor(cbxIsTvSafe.Checked);
 
 			if (m_InputFiles.Count > 0) m_CurrentIndex = 0;
 			ProcessCurrentImage();
@@ -55,7 +55,7 @@ namespace OcrTester
 
 				using (Graphics g = Graphics.FromImage(m_CurrentImage))
 				{
-                    m_Processor.Process(m_Pixelmap.Pixels, m_Pixelmap.Width, m_Pixelmap.Height, g);
+					m_Processor.Process(m_Pixelmap.Pixels, m_Pixelmap.Width, m_Pixelmap.Height, g, m_CurrentIndex, m_CurrentIndex % 2 == 0);
 					g.Flush();
 				}
 
@@ -147,6 +147,27 @@ namespace OcrTester
                 picNine.Image = bmpNine;
                 picNine.Update();
             }
+
+			if (m_Processor.SixEightXorPattern != null && m_Processor.SixEightXorPattern.Length > 0)
+			{
+				Bitmap bmp68 = Pixelmap.ConstructBitmapFromBitmapPixels(m_Processor.SixEightXorPattern, m_Processor.BlockWidth, m_Processor.BlockHeight);
+				pic86.Image = bmp68;
+				pic86.Update();
+			}
+
+			if (m_Processor.NineEightXorPattern != null && m_Processor.NineEightXorPattern.Length > 0)
+			{
+				Bitmap bmp98 = Pixelmap.ConstructBitmapFromBitmapPixels(m_Processor.NineEightXorPattern, m_Processor.BlockWidth, m_Processor.BlockHeight);
+				pic89.Image = bmp98;
+				pic89.Update();
+			}
+
+			if (m_Processor.ThreeEightXorPattern != null && m_Processor.ThreeEightXorPattern.Length > 0)
+			{
+				Bitmap bmp38 = Pixelmap.ConstructBitmapFromBitmapPixels(m_Processor.ThreeEightXorPattern, m_Processor.BlockWidth, m_Processor.BlockHeight);
+				pic83.Image = bmp38;
+				pic83.Update();
+			}
         }
 
 		private void btnNext_Click(object sender, EventArgs e)

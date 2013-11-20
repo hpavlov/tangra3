@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,7 +20,7 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
         { }
 
 
-	    public override void Process(IotaVtiOcrProcessor stateManager, System.Drawing.Graphics g, int frameNo, bool isOddField)
+		public override void Process(IotaVtiOcrProcessor stateManager, Graphics graphics, int frameNo, bool isOddField)
 	    {
 		    if (m_Width != stateManager.CurrentImageWidth || m_Height != stateManager.CurrentImageHeight)
 		    {
@@ -30,6 +31,9 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 		    uint[] pixels = stateManager.CurrentImage;
 			IotaVtiTimeStampStrings ocredValue = OcrField(pixels, stateManager);
 			stateManager.SetOcredString(ocredValue);
+
+			if (graphics != null)
+				base.PlotImage(graphics, stateManager);
 	    }
 
 		internal static IotaVtiTimeStampStrings OcrField(uint[] pixels, IotaVtiOcrProcessor stateManager)

@@ -34,6 +34,36 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 
             return rv;
         }
+
+		protected void PlotImage(Graphics graphics, IotaVtiOcrProcessor stateManager)
+		{
+			if (stateManager.BlockOffsetsX != null &&
+								stateManager.BlockOffsetsX.Length == IotaVtiOcrProcessor.MAX_POSITIONS &&
+								stateManager.BlockOffsetsX[1] > 0)
+			{
+				for (int i = 0; i < IotaVtiOcrProcessor.MAX_POSITIONS; i++)
+				{
+					if (stateManager.BlockOffsetsX[i] > 0)
+					{
+						graphics.DrawRectangle(
+							Pens.Chartreuse,
+							stateManager.BlockOffsetsX[i],
+							stateManager.BlockOffsetY,
+							stateManager.BlockWidth,
+							stateManager.BlockHeight);
+					}
+				}
+			}
+			else
+			{
+				graphics.DrawRectangle(
+						Pens.Chartreuse,
+						0,
+						stateManager.BlockOffsetY,
+						m_Width,
+						stateManager.BlockHeight);
+			}
+		}
     }
 
     internal class IotaVtiTimeStampStrings
