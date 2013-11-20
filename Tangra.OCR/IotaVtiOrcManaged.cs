@@ -172,6 +172,59 @@ namespace Tangra.OCR
             return time != DateTime.MinValue;
 	    }
 
+        public List<uint[]> GetLearntDigitPatterns()
+        {
+            var rv = new List<uint[]>();
+
+            if (m_Processor != null && 
+                m_Processor.IsCalibrated)
+            {
+                rv.Add(m_Processor.ZeroDigitPattern);
+                rv.Add(m_Processor.OneDigitPattern);
+                rv.Add(m_Processor.TwoDigitPattern);
+                rv.Add(m_Processor.ThreeDigitPattern);
+                rv.Add(m_Processor.FourDigitPattern);
+                rv.Add(m_Processor.FiveDigitPattern);
+                rv.Add(m_Processor.SixDigitPattern);
+                rv.Add(m_Processor.SevenDigitPattern);
+                rv.Add(m_Processor.EightDigitPattern);
+                rv.Add(m_Processor.NineDigitPattern);
+                rv.Add(m_Processor.ThreeEightXorPattern);
+                rv.Add(m_Processor.SixEightXorPattern);
+                rv.Add(m_Processor.NineEightXorPattern);
+            }
+
+            return rv;
+        }
+
+	    public int BlockWidth
+	    {
+            get
+            {
+                if (m_Processor != null &&
+                    m_Processor.IsCalibrated)
+                {
+                    return m_Processor.BlockWidth;
+                }
+
+                return -1;
+            }
+    	}
+
+        public int BlockHeight
+        {
+            get
+            {
+                if (m_Processor != null &&
+                    m_Processor.IsCalibrated)
+                {
+                    return m_Processor.BlockHeight;
+                }
+
+                return -1;
+            }
+        }
+
 	    public bool RequiresConfiguring
 		{
 			get { return false; }
@@ -294,7 +347,7 @@ namespace Tangra.OCR
 			int toLineBase = m_ToLine;
 	        bool matchFound = false;
 
-	        for (int deltaIdx = 0; deltaIdx <= DELTAS.Length; deltaIdx++)
+	        for (int deltaIdx = 0; deltaIdx < DELTAS.Length; deltaIdx++)
 	        {
 		        m_FromLine = fromLineBase + DELTAS[deltaIdx];
 				m_ToLine = toLineBase + DELTAS[deltaIdx];

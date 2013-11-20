@@ -48,6 +48,7 @@ namespace OcrTester
 					var ocrEngine = new IotaVtiOrcManaged();
 					bool isSuccess = false;
 					bool calibrated = false;
+                    bool digitsPlotted = false;
 
                     for (int i = 0; i < testFiles.Count; i++)
                     {
@@ -63,6 +64,12 @@ namespace OcrTester
 
                         if (calibrated)
                         {
+                            if (!digitsPlotted)
+                            {
+                                PlotDigitPatterns(ocrEngine);
+                                digitsPlotted = true;
+                            }
+
                             DateTime dt;
                             isSuccess = ocrEngine.ExtractTime(i / 2, pixelmapOdd.Pixels, pixelmapEven.Pixels, bmpOdd.Width, bmpOdd.Height, out dt);
                             if (!isSuccess)
@@ -90,77 +97,65 @@ namespace OcrTester
             lvlTestCaseDescription.Text = "";
         }
 
-        //private void PlotDigitPatterns()
-        //{
-        //    if (m_Processor.ZeroDigitPattern != null && m_Processor.ZeroDigitPattern.Length > 0)
-        //    {
-        //        Bitmap bmpZero = Pixelmap.ConstructBitmapFromBitmapPixels(m_Processor.ZeroDigitPattern, m_Processor.BlockWidth, m_Processor.BlockHeight);
-        //        picZero.Image = bmpZero;
-        //        picZero.Update();
-        //    }
+        private void PlotDigitPatterns(IotaVtiOrcManaged ocrEngine)
+        {
+            List<uint[]> patterns = ocrEngine.GetLearntDigitPatterns();
 
-        //    if (m_Processor.OneDigitPattern != null && m_Processor.OneDigitPattern.Length > 0)
-        //    {
-        //        Bitmap bmpOne = Pixelmap.ConstructBitmapFromBitmapPixels(m_Processor.OneDigitPattern, m_Processor.BlockWidth, m_Processor.BlockHeight);
-        //        picOne.Image = bmpOne;
-        //        picOne.Update();
-        //    }
+            if (patterns.Count > 12)
+            {
+                Bitmap bmpZero = Pixelmap.ConstructBitmapFromBitmapPixels(patterns[0], ocrEngine.BlockWidth, ocrEngine.BlockHeight);
+                picZero.Image = bmpZero;
+                picZero.Update();
 
-        //    if (m_Processor.TwoDigitPattern != null && m_Processor.TwoDigitPattern.Length > 0)
-        //    {
-        //        Bitmap bmpTwo = Pixelmap.ConstructBitmapFromBitmapPixels(m_Processor.TwoDigitPattern, m_Processor.BlockWidth, m_Processor.BlockHeight);
-        //        picTwo.Image = bmpTwo;
-        //        picTwo.Update();
-        //    }
+                Bitmap bmpOne = Pixelmap.ConstructBitmapFromBitmapPixels(patterns[1], ocrEngine.BlockWidth, ocrEngine.BlockHeight);
+                picOne.Image = bmpOne;
+                picOne.Update();
 
-        //    if (m_Processor.ThreeDigitPattern != null && m_Processor.ThreeDigitPattern.Length > 0)
-        //    {
-        //        Bitmap bmpThree = Pixelmap.ConstructBitmapFromBitmapPixels(m_Processor.ThreeDigitPattern, m_Processor.BlockWidth, m_Processor.BlockHeight);
-        //        picThree.Image = bmpThree;
-        //        picThree.Update();
-        //    }
+                Bitmap bmpTwo = Pixelmap.ConstructBitmapFromBitmapPixels(patterns[2], ocrEngine.BlockWidth, ocrEngine.BlockHeight);
+                picTwo.Image = bmpTwo;
+                picTwo.Update();
 
-        //    if (m_Processor.FourDigitPattern != null && m_Processor.FourDigitPattern.Length > 0)
-        //    {
-        //        Bitmap bmpFour = Pixelmap.ConstructBitmapFromBitmapPixels(m_Processor.FourDigitPattern, m_Processor.BlockWidth, m_Processor.BlockHeight);
-        //        picFour.Image = bmpFour;
-        //        picFour.Update();
-        //    }
+                Bitmap bmpThree = Pixelmap.ConstructBitmapFromBitmapPixels(patterns[3], ocrEngine.BlockWidth, ocrEngine.BlockHeight);
+                picThree.Image = bmpThree;
+                picThree.Update();
 
-        //    if (m_Processor.FiveDigitPattern != null && m_Processor.FiveDigitPattern.Length > 0)
-        //    {
-        //        Bitmap bmpFive = Pixelmap.ConstructBitmapFromBitmapPixels(m_Processor.FiveDigitPattern, m_Processor.BlockWidth, m_Processor.BlockHeight);
-        //        picFive.Image = bmpFive;
-        //        picFive.Update();
-        //    }
+                Bitmap bmpFour = Pixelmap.ConstructBitmapFromBitmapPixels(patterns[4], ocrEngine.BlockWidth, ocrEngine.BlockHeight);
+                picFour.Image = bmpFour;
+                picFour.Update();
 
-        //    if (m_Processor.SixDigitPattern != null && m_Processor.SixDigitPattern.Length > 0)
-        //    {
-        //        Bitmap bmpSix = Pixelmap.ConstructBitmapFromBitmapPixels(m_Processor.SixDigitPattern, m_Processor.BlockWidth, m_Processor.BlockHeight);
-        //        picSix.Image = bmpSix;
-        //        picSix.Update();
-        //    }
+                Bitmap bmpFive = Pixelmap.ConstructBitmapFromBitmapPixels(patterns[5], ocrEngine.BlockWidth, ocrEngine.BlockHeight);
+                picFive.Image = bmpFive;
+                picFive.Update();
 
-        //    if (m_Processor.SevenDigitPattern != null && m_Processor.SevenDigitPattern.Length > 0)
-        //    {
-        //        Bitmap bmpSeven = Pixelmap.ConstructBitmapFromBitmapPixels(m_Processor.SevenDigitPattern, m_Processor.BlockWidth, m_Processor.BlockHeight);
-        //        picSeven.Image = bmpSeven;
-        //        picSeven.Update();
-        //    }
+                Bitmap bmpSix = Pixelmap.ConstructBitmapFromBitmapPixels(patterns[6], ocrEngine.BlockWidth, ocrEngine.BlockHeight);
+                picSix.Image = bmpSix;
+                picSix.Update();
 
-        //    if (m_Processor.EightDigitPattern != null && m_Processor.EightDigitPattern.Length > 0)
-        //    {
-        //        Bitmap bmpEight = Pixelmap.ConstructBitmapFromBitmapPixels(m_Processor.EightDigitPattern, m_Processor.BlockWidth, m_Processor.BlockHeight);
-        //        picEight.Image = bmpEight;
-        //        picEight.Update();
-        //    }
+                Bitmap bmpSeven = Pixelmap.ConstructBitmapFromBitmapPixels(patterns[7], ocrEngine.BlockWidth, ocrEngine.BlockHeight);
+                picSeven.Image = bmpSeven;
+                picSeven.Update();
 
-        //    if (m_Processor.NineDigitPattern != null && m_Processor.NineDigitPattern.Length > 0)
-        //    {
-        //        Bitmap bmpNine = Pixelmap.ConstructBitmapFromBitmapPixels(m_Processor.NineDigitPattern, m_Processor.BlockWidth, m_Processor.BlockHeight);
-        //        picNine.Image = bmpNine;
-        //        picNine.Update();
-        //    }
-        //}
+                Bitmap bmpEight = Pixelmap.ConstructBitmapFromBitmapPixels(patterns[8], ocrEngine.BlockWidth, ocrEngine.BlockHeight);
+                picEight.Image = bmpEight;
+                picEight.Update();
+
+                Bitmap bmpNine = Pixelmap.ConstructBitmapFromBitmapPixels(patterns[9], ocrEngine.BlockWidth, ocrEngine.BlockHeight);
+                picNine.Image = bmpNine;
+                picNine.Update();
+
+                Bitmap bmp83 = Pixelmap.ConstructBitmapFromBitmapPixels(patterns[10], ocrEngine.BlockWidth, ocrEngine.BlockHeight);
+                pic83.Image = bmp83;
+                pic83.Update();
+
+                Bitmap bmp86 = Pixelmap.ConstructBitmapFromBitmapPixels(patterns[11], ocrEngine.BlockWidth, ocrEngine.BlockHeight);
+                pic86.Image = bmp86;
+                pic86.Update();
+
+                Bitmap bmp89 = Pixelmap.ConstructBitmapFromBitmapPixels(patterns[12], ocrEngine.BlockWidth, ocrEngine.BlockHeight);
+                pic89.Image = bmp89;
+                pic89.Update();
+
+            }
+        }
     }
 }

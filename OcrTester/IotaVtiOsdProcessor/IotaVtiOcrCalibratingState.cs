@@ -83,17 +83,24 @@ namespace OcrTester.IotaVtiOsdProcessor
 
 					bool bottomOk = (bottom - 1) < imageHeight;
 					bool bottom2Ok = bottom < imageHeight;
+                    bool bottom3Ok = (bottom + 1) < imageHeight;
 
 					for (int x = 0; x < stateManager.CurrentImageWidth; x++)
 					{
 						if (x >= stateManager.CurrentImageWidth || x < 0) continue;
 						if (top < 0) continue;
-						if (bottom >= stateManager.CurrentImageHeight) continue;
+						if (bottom - 1 >= stateManager.CurrentImageHeight) continue;
 
 						if (bottomOk && stateManager.CurrentImage[x + imageWidth * (bottom - 1)] < 127 &&
-						   bottom2Ok && stateManager.CurrentImage[x + imageWidth * bottom] > 127 &&
-						   stateManager.CurrentImage[x + imageWidth * (top + 1)] < 127 &&
-						   stateManager.CurrentImage[x + imageWidth * top] > 127) totalRating++;
+                           ((bottom2Ok && stateManager.CurrentImage[x + imageWidth * bottom] > 127) || bottom == imageHeight) &&
+                           ((bottom3Ok && stateManager.CurrentImage[x + imageWidth * (bottom + 1)] > 127) || bottom >= imageHeight - 1))
+                            totalRating++;
+
+
+                        if (stateManager.CurrentImage[x + imageWidth * (top + 1)] < 127 &&
+						   stateManager.CurrentImage[x + imageWidth * top] > 127 &&
+                           (top == 0 || stateManager.CurrentImage[x + imageWidth * (top - 1)] > 127)) 
+                            totalRating++;
 					}
 
 					if (totalRating > maxRating)
@@ -136,6 +143,8 @@ namespace OcrTester.IotaVtiOsdProcessor
 
 					for (int y = bestYOffs; y < bestYOffs + bestHeight + 1; y++)
 					{
+					    if (y >= stateManager.CurrentImageHeight) continue;
+
 						if (stateManager.CurrentImage[x - 1 + imageWidth * y] < 127 || stateManager.CurrentImage[x + imageWidth * y] < 127)
 						{
 							prevTwoVerticalsAreWhite = false;
@@ -148,6 +157,8 @@ namespace OcrTester.IotaVtiOsdProcessor
 
 					for (int y = bestYOffs; y < bestYOffs + bestHeight + 1; y++)
 					{
+                        if (y >= stateManager.CurrentImageHeight) continue;
+
 						if (stateManager.CurrentImage[x + 1 + imageWidth * y] < 127)
 						{
 							totalRating++;
@@ -192,7 +203,7 @@ namespace OcrTester.IotaVtiOsdProcessor
 
 			m_MaxBlockWidth = m_Width / 27;
 			m_MinBlockWidth = (m_Width / 30) - 2;
-			m_MinBlockHeight = Math.Min(10, m_Height - 15);
+			m_MinBlockHeight = Math.Min(10, 2 * m_Height / 3);
 			m_MaxBlockHeight = m_Height - 2;
 
 			m_CalibratedPositons.Clear();

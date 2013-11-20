@@ -84,17 +84,24 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 
                     bool bottomOk = (bottom - 1) < imageHeight;
                     bool bottom2Ok = bottom < imageHeight;
+                    bool bottom3Ok = (bottom + 1) < imageHeight;
 
                     for (int x = 0; x < stateManager.CurrentImageWidth; x++)
                     {
                         if (x >= stateManager.CurrentImageWidth || x < 0) continue;
                         if (top < 0) continue;
-                        if (bottom >= stateManager.CurrentImageHeight) continue;
+                        if (bottom - 1 >= stateManager.CurrentImageHeight) continue;
 
-						if (bottomOk && stateManager.CurrentImage[x + imageWidth * (bottom - 1)] < 127 &&
-						   bottom2Ok && stateManager.CurrentImage[x + imageWidth * bottom] > 127 &&
-						   stateManager.CurrentImage[x + imageWidth * (top + 1)] < 127 &&
-						   stateManager.CurrentImage[x + imageWidth * top] > 127) totalRating++;
+                        if (bottomOk && stateManager.CurrentImage[x + imageWidth * (bottom - 1)] < 127 &&
+                           ((bottom2Ok && stateManager.CurrentImage[x + imageWidth * bottom] > 127) || bottom == imageHeight) &&
+                           ((bottom3Ok && stateManager.CurrentImage[x + imageWidth * (bottom + 1)] > 127) || bottom >= imageHeight - 1))
+                            totalRating++;
+
+
+                        if (stateManager.CurrentImage[x + imageWidth * (top + 1)] < 127 &&
+                           stateManager.CurrentImage[x + imageWidth * top] > 127 &&
+                           (top == 0 || stateManager.CurrentImage[x + imageWidth * (top - 1)] > 127))
+                            totalRating++;
                     }
 
                     if (totalRating > maxRating)
@@ -117,19 +124,19 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
             int maxRating = -1;
 
             int bestWidth = -1;
-			var bestStartingPositions = new List<int>();
+            var bestStartingPositions = new List<int>();
 
             // Determined previously
             int bestHeight = stateManager.BlockHeight;
             int bestYOffs = stateManager.BlockOffsetY;
 
             int imageWidth = stateManager.CurrentImageWidth;
-	        var startingPositions = new List<int>();
+            var startingPositions = new List<int>();
 
             for (int width = m_MinBlockWidth; width <= m_MaxBlockWidth; width++)
             {
                 int totalRating = 0;
-	            startingPositions.Clear();
+                startingPositions.Clear();
 
                 for (int x = 1; x < stateManager.CurrentImageWidth - width - 1; x++)
                 {
@@ -137,6 +144,8 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 
                     for (int y = bestYOffs; y < bestYOffs + bestHeight + 1; y++)
                     {
+                        if (y >= stateManager.CurrentImageHeight) continue;
+
                         if (stateManager.CurrentImage[x - 1 + imageWidth * y] < 127 || stateManager.CurrentImage[x + imageWidth * y] < 127)
                         {
                             prevTwoVerticalsAreWhite = false;
@@ -149,15 +158,17 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 
                     for (int y = bestYOffs; y < bestYOffs + bestHeight + 1; y++)
                     {
-                        if (stateManager.CurrentImage[x + 1 + imageWidth*y] < 127)
-                        {	                        
+                        if (y >= stateManager.CurrentImageHeight) continue;
+
+                        if (stateManager.CurrentImage[x + 1 + imageWidth * y] < 127)
+                        {
                             totalRating++;
 
-                            if (stateManager.CurrentImage[x + width - 1 + imageWidth*y] < 127 &&
-                                stateManager.CurrentImage[x + width + imageWidth*y] > 127 &&
-                                stateManager.CurrentImage[x + width + 1 + imageWidth*y] > 127)
+                            if (stateManager.CurrentImage[x + width - 1 + imageWidth * y] < 127 &&
+                                stateManager.CurrentImage[x + width + imageWidth * y] > 127 &&
+                                stateManager.CurrentImage[x + width + 1 + imageWidth * y] > 127)
                             {
-								startingPositions.Add(x);
+                                startingPositions.Add(x);
                                 totalRating++;
                             }
                         }
@@ -166,24 +177,24 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 
                 if (totalRating > maxRating)
                 {
-					// Collect stats about the starting positions ??
+                    // Collect stats about the starting positions ??
                     maxRating = totalRating;
                     bestWidth = width;
-	                bestStartingPositions.Clear();
-	                bestStartingPositions.AddRange(startingPositions);
+                    bestStartingPositions.Clear();
+                    bestStartingPositions.AddRange(startingPositions);
                 }
             }
 
             stateManager.BlockWidth = bestWidth;
 
-			var calibrationBlock = new CalibratedBlockPosition(stateManager.CurrentImage)
-			{
-				BlockWidth = bestWidth,
-				BlockHeight = bestHeight,
-				BlockOffsetY = bestYOffs,
+            var calibrationBlock = new CalibratedBlockPosition(stateManager.CurrentImage)
+            {
+                BlockWidth = bestWidth,
+                BlockHeight = bestHeight,
+                BlockOffsetY = bestYOffs,
                 BestStartingPositions = bestStartingPositions.ToArray()
-			};
-			m_CalibratedPositons.Add(calibrationBlock);
+            };
+            m_CalibratedPositons.Add(calibrationBlock);
         }
 
         private void Reinitialise(int width, int height)
@@ -193,7 +204,7 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 
             m_MaxBlockWidth = m_Width / 27;
             m_MinBlockWidth = (m_Width / 30) - 2;
-			m_MinBlockHeight = Math.Min(10, m_Height - 15);
+            m_MinBlockHeight = Math.Min(10, 2 * m_Height / 3);
 			m_MaxBlockHeight = m_Height - 2;
 
             m_CalibratedPositons.Clear();
@@ -389,8 +400,6 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 
 							prevMatchLocation = i;
 						}
-
-                        Trace.WriteLine(string.Format("IOTA-VTI OCR: Recognized '{0}' at position {1} with score {2}.", ch, i, rating));
 					}
 					else
 					{
@@ -439,7 +448,10 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 				distinctPositions.RemoveAt(0);
 			}
 
-			stateManager.BlockOffsetsX[CHAR_INDEXES[posIdx]] = stateManager.LastBlockOffsetsX;
+		    if (posIdx < CHAR_INDEXES.Length)
+		        stateManager.BlockOffsetsX[CHAR_INDEXES[posIdx]] = stateManager.LastBlockOffsetsX;
+		    else
+		        return false;
 
 			return true;
 		}
@@ -595,24 +607,24 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
             return false;
         }
 
-		private uint[] XorPatterns(uint[] pattern1, uint[] pattern2, out int numDifferentPixels)
+		private uint[] XorPatterns(uint[] basePattern, uint[] pdifferentPattern, out int numDifferentPixels)
 		{
-			uint[] rv = new uint[pattern1.Length];
+            uint[] rv = new uint[basePattern.Length];
 			numDifferentPixels = 0;
 
-			for (int i = 0; i < pattern1.Length; i++)
+            for (int i = 0; i < basePattern.Length; i++)
 			{
-				if (pattern1[i] < 127 && pattern2[i] < 127)
+                if (basePattern[i] < 127 && pdifferentPattern[i] < 127)
 				{
-					rv[i] = 255;
+					rv[i] = 127;
 				}
-				else if (pattern1[i] > 127 && pattern2[i] > 127)
+                else if (basePattern[i] > 127 && pdifferentPattern[i] > 127)
 				{
-					rv[i] = 255;
+					rv[i] = 127;
 				}
 				else
 				{
-					rv[i] = 0;
+                    rv[i] = pdifferentPattern[i];
 					numDifferentPixels++;
 				}
 			}

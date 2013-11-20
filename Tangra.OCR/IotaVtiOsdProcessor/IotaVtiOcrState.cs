@@ -82,7 +82,7 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 				HH.Length == 2 &&
 				MM.Length == 2 &&
 				SS.Length == 2 &&
-				(FFFF1.Length == 4 || FFFF2.Length == 4) &&
+                ((FFFF1.Length == 4 && FFFF1.IndexOf(' ') == -1) || (FFFF2.Length == 4 && FFFF2.IndexOf(' ') == -1)) &&
 				FRAMENO.Length > 0 &&
 				FRAMENO.IndexOf(' ') == -1;
 		}
