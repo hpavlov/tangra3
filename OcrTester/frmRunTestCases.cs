@@ -49,7 +49,7 @@ namespace OcrTester
 					bool isSuccess = false;
 					bool calibrated = false;
 
-                    for (int i = 0; i < testFiles.Count / 2; i++)
+                    for (int i = 0; i < testFiles.Count; i++)
                     {
                         Bitmap bmpOdd = (Bitmap)Bitmap.FromFile(testFiles[i]);
                         i++;

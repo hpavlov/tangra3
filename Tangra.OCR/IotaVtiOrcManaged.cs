@@ -424,22 +424,13 @@ namespace Tangra.OCR
 
 		public void AddConfiguration(uint[] data, OCRConfigEntry config)
 		{ }
-
-	    private int m_LastVideoFrameNo = -1;
-	    private int m_LatestOsdFrameNo = -1;
-	    private long m_LastFieldLargerTimestampTicks = -1;
-
+	    
         private DateTime ExtractDateTime(int frameNo, IotaVtiTimeStamp oddFieldOSD, IotaVtiTimeStamp evenFieldOSD)
         {
             bool failedValidation = false;
-            if (m_LastVideoFrameNo + 1 == frameNo && m_LatestOsdFrameNo > -1)
-            {
-                if (m_LatestOsdFrameNo + 1 != Math.Min(oddFieldOSD.FrameNumber, evenFieldOSD.FrameNumber))
-                    // Video fields are not consequtive (from previous frame)
-                    failedValidation = true;
-            }
-            m_LatestOsdFrameNo = Math.Max(oddFieldOSD.FrameNumber, evenFieldOSD.FrameNumber);
-            m_LastVideoFrameNo = frameNo;
+
+	        if (oddFieldOSD == null || evenFieldOSD == null)
+		        return DateTime.MinValue;
 
             if (oddFieldOSD.FrameNumber != evenFieldOSD.FrameNumber - 1 &&
                 oddFieldOSD.FrameNumber != evenFieldOSD.FrameNumber + 1)
@@ -452,22 +443,16 @@ namespace Tangra.OCR
             DateTime evenFieldTimestamp = new DateTime(1, 1, 1, evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds, (int)Math.Round(evenFieldOSD.Milliseconds10 / 10.0f));
 
             double fieldDuration = Math.Abs(new TimeSpan(oddFieldTimestamp.Ticks - evenFieldTimestamp.Ticks).TotalMilliseconds);
-            double fieldDurationFromLastFrame = double.NaN;
-
-            if (m_LastFieldLargerTimestampTicks > -1)
-                fieldDurationFromLastFrame = Math.Abs(new TimeSpan(Math.Min(oddFieldTimestamp.Ticks, evenFieldTimestamp.Ticks) - m_LastFieldLargerTimestampTicks).TotalMilliseconds);
-
+            
             if (m_Processor.VideoFormat.Value == VideoFormat.PAL &&
-                (Math.Abs(fieldDuration - IotaVtiOcrProcessor.FIELD_DURATION_PAL) > 1.0 ||
-                (!double.IsNaN(fieldDurationFromLastFrame) && Math.Abs(fieldDurationFromLastFrame - IotaVtiOcrProcessor.FIELD_DURATION_PAL) > 1.0)))
+                (Math.Abs(fieldDuration - IotaVtiOcrProcessor.FIELD_DURATION_PAL) > 1.0))
             {
                 // PAL field is not 20ms
                 failedValidation = true;
             }
 
             if (m_Processor.VideoFormat.Value == VideoFormat.NTSC &&
-                (Math.Abs(fieldDuration - IotaVtiOcrProcessor.FIELD_DURATION_NTSC) > 1.0 ||
-                (!double.IsNaN(fieldDurationFromLastFrame) && Math.Abs(fieldDurationFromLastFrame - IotaVtiOcrProcessor.FIELD_DURATION_NTSC) > 1.0)))
+                (Math.Abs(fieldDuration - IotaVtiOcrProcessor.FIELD_DURATION_NTSC) > 1.0))
             {
                 // NTSC field is not 20ms
                 failedValidation = true;
@@ -482,12 +467,10 @@ namespace Tangra.OCR
             
             if (oddFieldOSD.FrameNumber == evenFieldOSD.FrameNumber - 1)
             {
-                m_LastFieldLargerTimestampTicks = evenFieldTimestamp.Ticks;
 				return failedValidation ? DateTime.MinValue : oddFieldTimestamp;
             }
             else
             {
-                m_LastFieldLargerTimestampTicks = oddFieldTimestamp.Ticks;
 				return failedValidation ? DateTime.MinValue : evenFieldTimestamp;
             }
         }

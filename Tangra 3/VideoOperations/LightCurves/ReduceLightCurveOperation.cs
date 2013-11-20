@@ -1151,77 +1151,53 @@ namespace Tangra.VideoOperations.LightCurves
 
 			if (TangraConfig.Settings.Generic.OsdOcrEnabled && m_VideoController.IsPlainAviVideo)
 			{
-				bool chooseOsdEngine = TangraConfig.Settings.Generic.OsdOcrChooseEngineEveryTime;
+				m_TimestampOCR = OcrExtensionManager.GetCurrentOCR();
 
-				while (true)
+				if (m_TimestampOCR != null)
 				{
-					if (chooseOsdEngine)
+					var data = new TimestampOCRData();
+					data.FrameWidth = TangraContext.Current.FrameWidth;
+					data.FrameHeight = TangraContext.Current.FrameHeight;
+					data.OSDFrame = LightCurveReductionContext.Instance.OSDFrame;
+					data.VideoFrameRate = (float)m_VideoController.VideoFrameRate;
+
+					m_TimestampOCR.Initialize(data, m_VideoController);
+					int maxCalibrationFieldsToAttempt = TangraConfig.Settings.Generic.MaxCalibrationFieldsToAttempt;
+
+					if (m_TimestampOCR.RequiresCalibration)
 					{
-						var frmOcrChooser = new frmChooseOcrEngine();
-						frmOcrChooser.StartPosition = FormStartPosition.CenterParent;
-						if (m_VideoController.ShowDialog(frmOcrChooser) == DialogResult.Cancel)
-							return;
-					}
-
-					m_TimestampOCR = OcrExtensionManager.GetCurrentOCR();
-
-					if (m_TimestampOCR != null)
-					{
-						var data = new TimestampOCRData();
-						data.FrameWidth = TangraContext.Current.FrameWidth;
-						data.FrameHeight = TangraContext.Current.FrameHeight;
-						data.OSDFrame = LightCurveReductionContext.Instance.OSDFrame;
-						data.VideoFrameRate = (float) m_VideoController.VideoFrameRate;
-
-						m_TimestampOCR.Initialize(data, m_VideoController);
-						int maxCalibrationFieldsToAttempt = TangraConfig.Settings.Generic.MaxCalibrationFieldsToAttempt;
-
-						if (m_TimestampOCR.RequiresCalibration)
+						int calibrationFramesProcessed = 0;
+						bool isCalibrated = false;
+						m_VideoController.StatusChanged("Calibrating OCR");
+						FileProgressManager.BeginFileOperation(maxCalibrationFieldsToAttempt);
+						for (int i = m_VideoController.CurrentFrameIndex; i < m_VideoController.VideoLastFrame; i++)
 						{
-							int calibrationFramesProcessed = 0;
-							bool isCalibrated = false;
-							m_VideoController.StatusChanged("Calibrating OCR");
-							FileProgressManager.BeginFileOperation(maxCalibrationFieldsToAttempt);
-							for (int i = m_VideoController.CurrentFrameIndex; i < m_VideoController.VideoLastFrame; i++)
-							{
-								Pixelmap frame = m_VideoController.GetFrame(i);
-								isCalibrated = m_TimestampOCR.ProcessCalibrationFrame(i, frame.Pixels);
-								calibrationFramesProcessed++;
+							Pixelmap frame = m_VideoController.GetFrame(i);
+							isCalibrated = m_TimestampOCR.ProcessCalibrationFrame(i, frame.Pixels);
+							calibrationFramesProcessed++;
 
-								FileProgressManager.FileOperationProgress(calibrationFramesProcessed);
+							FileProgressManager.FileOperationProgress(calibrationFramesProcessed);
 
-								if (isCalibrated)
-									break;
+							if (isCalibrated)
+								break;
 
-								if (calibrationFramesProcessed > maxCalibrationFieldsToAttempt)
-									break;
-							}
-							FileProgressManager.EndFileOperation();
+							if (calibrationFramesProcessed > maxCalibrationFieldsToAttempt)
+								break;
+						}
+						FileProgressManager.EndFileOperation();
 
-							if (!isCalibrated)
-							{
-								var frmReport = new frmOsdOcrCalibrationFailure();
-								frmReport.StartPosition = FormStartPosition.CenterParent;
-								frmReport.TimestampOCR = m_TimestampOCR;
+						if (!isCalibrated)
+						{
+							var frmReport = new frmOsdOcrCalibrationFailure();
+							frmReport.StartPosition = FormStartPosition.CenterParent;
+							frmReport.TimestampOCR = m_TimestampOCR;
 
-								DialogResult userChoice = DialogResult.OK;
-								if (frmReport.CanSendReport())
-								{
-									userChoice = m_VideoController.ShowDialog(frmReport);
-								}
+							if (frmReport.CanSendReport())
+								m_VideoController.ShowDialog(frmReport);
 
-								m_TimestampOCR = null;
-
-								if (userChoice == DialogResult.Retry)
-								{
-									chooseOsdEngine = true;
-									continue;
-								}
-							}
+							m_TimestampOCR = null;
 						}
 					}
-
-					break;
 				}
 			}
 		}

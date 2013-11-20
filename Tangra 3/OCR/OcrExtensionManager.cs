@@ -14,13 +14,6 @@ namespace Tangra.OCR
 				TangraConfig.Settings.Generic.OcrEngine.StartsWith("IOTA-VTI"))
 			{
                 return new IotaVtiOrcManaged();
-
-                //if (TangraConfig.Settings.Generic.OcrEngine == "IOTA-VTI Non TV-Safe" ||
-                //    TangraConfig.Settings.Generic.OcrEngine == "IOTA-VTI TV-Safe")
-                //{
-                //    return new IotaVtiOrcManaged(TangraConfig.Settings.Generic.OcrEngine == "IOTA-VTI TV-Safe");	
-                //}
-
 			}
 
 			return null;

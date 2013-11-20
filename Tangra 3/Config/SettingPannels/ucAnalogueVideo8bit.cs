@@ -42,7 +42,7 @@ namespace Tangra.Config.SettingPannels
 
 			if (cbxOcrEngine.SelectedIndex == -1)
 				cbxOcrEngine.SelectedIndex = 0;
-			cbxAskMeEveryTime.Checked = TangraConfig.Settings.Generic.OsdOcrChooseEngineEveryTime;
+
 			pnlOsdOcr.Enabled = cbxEnableOsdOcr.Checked;
 		}
 
@@ -52,7 +52,6 @@ namespace Tangra.Config.SettingPannels
 			TangraConfig.Settings.Generic.PreferredRenderingEngineIndex = cbxRenderingEngineAttemptOrder.SelectedIndex;
 			TangraConfig.Settings.Photometry.ColourChannel = (TangraConfig.ColourChannel)cbxColourChannel.SelectedIndex;
 			TangraConfig.Settings.Generic.OsdOcrEnabled = cbxEnableOsdOcr.Checked;
-			TangraConfig.Settings.Generic.OsdOcrChooseEngineEveryTime = cbxAskMeEveryTime.Checked;
 			TangraConfig.Settings.Generic.OcrEngine = cbxOcrEngine.Text;
 		}
 

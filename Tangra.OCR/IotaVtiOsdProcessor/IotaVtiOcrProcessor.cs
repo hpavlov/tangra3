@@ -117,8 +117,13 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 
         public bool IsMatchingSignature(int nuberMarkedPixels)
         {
-            return 10 * nuberMarkedPixels < BlockWidth * BlockHeight;
+			return 8 * nuberMarkedPixels < BlockWidth * BlockHeight;
         }
+
+		public bool IsStrictlyMatchingSignature(int nuberMarkedPixels)
+		{
+			return 12 * nuberMarkedPixels < BlockWidth * BlockHeight;
+		}
 
         public uint[] GetBlockAtPosition(int positionIndex)
         {

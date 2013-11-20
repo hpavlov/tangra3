@@ -31,17 +31,16 @@
 			this.label20 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
 			this.groupControl1 = new System.Windows.Forms.GroupBox();
+			this.pnlOsdOcr = new System.Windows.Forms.Panel();
+			this.cbxOcrEngine = new System.Windows.Forms.ComboBox();
 			this.cbxEnableOsdOcr = new System.Windows.Forms.CheckBox();
 			this.cbxColourChannel = new System.Windows.Forms.ComboBox();
 			this.cbxRenderingEngineAttemptOrder = new System.Windows.Forms.ComboBox();
 			this.nudSaturation8bit = new System.Windows.Forms.NumericUpDown();
 			this.label1 = new System.Windows.Forms.Label();
-			this.cbxOcrEngine = new System.Windows.Forms.ComboBox();
-			this.pnlOsdOcr = new System.Windows.Forms.Panel();
-			this.cbxAskMeEveryTime = new System.Windows.Forms.CheckBox();
 			this.groupControl1.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.nudSaturation8bit)).BeginInit();
 			this.pnlOsdOcr.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.nudSaturation8bit)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// label20
@@ -78,6 +77,24 @@
 			this.groupControl1.TabIndex = 42;
 			this.groupControl1.TabStop = false;
 			this.groupControl1.Text = "Analogue Video (8 bit)";
+			// 
+			// pnlOsdOcr
+			// 
+			this.pnlOsdOcr.Controls.Add(this.cbxOcrEngine);
+			this.pnlOsdOcr.Location = new System.Drawing.Point(6, 210);
+			this.pnlOsdOcr.Name = "pnlOsdOcr";
+			this.pnlOsdOcr.Size = new System.Drawing.Size(229, 52);
+			this.pnlOsdOcr.TabIndex = 52;
+			// 
+			// cbxOcrEngine
+			// 
+			this.cbxOcrEngine.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.cbxOcrEngine.Items.AddRange(new object[] {
+            "IOTA-VTI"});
+			this.cbxOcrEngine.Location = new System.Drawing.Point(27, 16);
+			this.cbxOcrEngine.Name = "cbxOcrEngine";
+			this.cbxOcrEngine.Size = new System.Drawing.Size(173, 21);
+			this.cbxOcrEngine.TabIndex = 51;
 			// 
 			// cbxEnableOsdOcr
 			// 
@@ -132,36 +149,6 @@
 			this.label1.TabIndex = 43;
 			this.label1.Text = "Saturation Level:";
 			// 
-			// cbxOcrEngine
-			// 
-			this.cbxOcrEngine.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.cbxOcrEngine.Items.AddRange(new object[] {
-            "IOTA-VTI Non TV-Safe",
-            "IOTA-VTI TV-Safe"});
-			this.cbxOcrEngine.Location = new System.Drawing.Point(27, 16);
-			this.cbxOcrEngine.Name = "cbxOcrEngine";
-			this.cbxOcrEngine.Size = new System.Drawing.Size(190, 21);
-			this.cbxOcrEngine.TabIndex = 51;
-			// 
-			// pnlOsdOcr
-			// 
-			this.pnlOsdOcr.Controls.Add(this.cbxAskMeEveryTime);
-			this.pnlOsdOcr.Controls.Add(this.cbxOcrEngine);
-			this.pnlOsdOcr.Location = new System.Drawing.Point(6, 210);
-			this.pnlOsdOcr.Name = "pnlOsdOcr";
-			this.pnlOsdOcr.Size = new System.Drawing.Size(229, 79);
-			this.pnlOsdOcr.TabIndex = 52;
-			// 
-			// cbxAskMeEveryTime
-			// 
-			this.cbxAskMeEveryTime.AutoSize = true;
-			this.cbxAskMeEveryTime.Location = new System.Drawing.Point(27, 48);
-			this.cbxAskMeEveryTime.Name = "cbxAskMeEveryTime";
-			this.cbxAskMeEveryTime.Size = new System.Drawing.Size(167, 17);
-			this.cbxAskMeEveryTime.TabIndex = 52;
-			this.cbxAskMeEveryTime.Text = "Let me choose for each video";
-			this.cbxAskMeEveryTime.UseVisualStyleBackColor = true;
-			// 
 			// ucAnalogueVideo8bit
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -172,9 +159,8 @@
 			this.Size = new System.Drawing.Size(471, 349);
 			this.groupControl1.ResumeLayout(false);
 			this.groupControl1.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.nudSaturation8bit)).EndInit();
 			this.pnlOsdOcr.ResumeLayout(false);
-			this.pnlOsdOcr.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.nudSaturation8bit)).EndInit();
 			this.ResumeLayout(false);
 
 		}
@@ -190,7 +176,6 @@
 		private System.Windows.Forms.ComboBox cbxColourChannel;
 		private System.Windows.Forms.CheckBox cbxEnableOsdOcr;
 		private System.Windows.Forms.Panel pnlOsdOcr;
-		private System.Windows.Forms.CheckBox cbxAskMeEveryTime;
 		private System.Windows.Forms.ComboBox cbxOcrEngine;
 	}
 }

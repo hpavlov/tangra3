@@ -107,17 +107,44 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 
             Array.Sort(diffSignatures, diffDigits);
 
-            if (stateManager.IsMatchingSignature(diffSignatures[0]))
+			if (stateManager.IsStrictlyMatchingSignature(diffSignatures[0]))
+			{
+				return diffDigits[0].ToString()[0];
+			}
+            else if (stateManager.IsMatchingSignature(diffSignatures[0]))
             {
-                if (diffDigits[0] == 8 || diffDigits[0] == 6 || diffDigits[0] == 9)
-                {
-                    // If we matched to a 6, 8 or 9, then do additional check as those three characters are too similar
-                }
+				if (stateManager.IsMatchingSignature(diffSignatures[1]))
+				{
+					if (diffDigits[0] == 8 || diffDigits[1] == 8)
+					{
+						return DistinguishEightFromSimilarChars(block, stateManager);
+					}
+					else
+					{
+						return ' ';
+					}
+				}
 
                 return diffDigits[0].ToString()[0];
             }
 
             return ' ';
         }
+
+		private static char DistinguishEightFromSimilarChars(uint[] block, IotaVtiOcrProcessor stateManager)
+		{
+
+			// NOTE: This is not ready yet. Need to implement GetXorDiffSignature();
+			int[] diffSignatures = new int[3];
+			int[] diffDigits = new int[3];
+			diffSignatures[0] = GetDiffSignature(block, stateManager.SixEightXorPattern);
+			diffDigits[0] = 6;
+			diffSignatures[1] = GetDiffSignature(block, stateManager.NineEightXorPattern);
+			diffDigits[1] = 9;
+			diffSignatures[2] = GetDiffSignature(block, stateManager.ThreeEightXorPattern);
+			diffDigits[2] = 3;
+
+			return ' ';
+		}
     }
 }
