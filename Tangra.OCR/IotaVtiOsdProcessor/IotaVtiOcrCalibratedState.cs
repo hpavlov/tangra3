@@ -173,31 +173,26 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
             int chanceToBeNine = couldBeNine ? GetPercentSimilarities(block, stateManager.NineEightXorPattern, stateManager.NineEightXorPatternFactor) : 0;
             int chanceToBeThree = couldBeThree ? GetPercentSimilarities(block, stateManager.ThreeEightXorPattern, stateManager.ThreeEightXorPatternFactor) : 0;
 
-            if (couldBeEight)
-            {
-                if (chanceToBeSix > 66)
-                    return '6';
-                else if (chanceToBeNine > 66)
-                    return '9';
-                else if (chanceToBeThree > 66)
-                    return '3';
+			int minRequiredChance = couldBeEight ? 50 : 0;
 
-                return '8';
-            }
-            else if (chanceToBeThree > 0 && chanceToBeThree > chanceToBeSix && chanceToBeThree > chanceToBeNine)
-            {
-                return '3';
-            }
-            else if (chanceToBeSix > 0 && chanceToBeSix > chanceToBeNine && chanceToBeSix > chanceToBeThree)
-            {
-                return '6';
-            }
-            else if (chanceToBeNine > 0 && chanceToBeNine > chanceToBeSix && chanceToBeNine > chanceToBeThree)
-            {
-                return '9';
-            }
+			if (chanceToBeThree > minRequiredChance && chanceToBeThree > chanceToBeSix && chanceToBeThree > chanceToBeNine)
+			{
+				return '3';
+			}
+			else if (chanceToBeSix > minRequiredChance && chanceToBeSix > chanceToBeNine && chanceToBeSix > chanceToBeThree)
+			{
+				return '6';
+			}
+			else if (chanceToBeNine > minRequiredChance && chanceToBeNine > chanceToBeSix && chanceToBeNine > chanceToBeThree)
+			{
+				return '9';
+			}
+			else if (couldBeEight)
+			{
+				return '8';
+			}
 
-            return ' ';
+	        return ' ';
 		}
 
         private static int GetPercentSimilarities(uint[] probe, uint[] xorEtalon, int totalSimilarities)

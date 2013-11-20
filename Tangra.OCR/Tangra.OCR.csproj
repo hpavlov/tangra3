@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IotaVtiOcrCorrector.cs" />
     <Compile Include="IotaVtiOrcManaged.cs" />
     <Compile Include="IotaVtiOsdProcessor\IotaVtiOcrCalibratedState.cs" />
     <Compile Include="IotaVtiOsdProcessor\IotaVtiOcrCalibratingState.cs" />

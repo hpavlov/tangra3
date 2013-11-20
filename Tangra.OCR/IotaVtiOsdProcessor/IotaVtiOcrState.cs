@@ -100,6 +100,16 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 			FrameNumber = int.Parse(timeStampStrings.FRAMENO);
 		}
 
+		public IotaVtiTimeStamp(IotaVtiTimeStamp clone)
+		{
+			NumSat = clone.NumSat;
+			Hours = clone.Hours;
+			Minutes = clone.Minutes;
+			Seconds = clone.Seconds;
+			Milliseconds10 = clone.Milliseconds10;
+			FrameNumber = clone.FrameNumber;
+		}
+
 		public int NumSat;
 		public int Hours;
 		public int Minutes;

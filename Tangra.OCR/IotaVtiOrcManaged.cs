@@ -30,6 +30,8 @@ namespace Tangra.OCR
 		private Dictionary<string, uint[]> m_CalibrationImages = new Dictionary<string, uint[]>();
 	    private uint[] m_LatestFrameImage;
 
+		private IotaVtiOcrCorrector m_Corrector = new IotaVtiOcrCorrector();
+
 		public string NameAndVersion()
 		{
 			return "Generic IOTA-VTI OCR v1.0";
@@ -407,9 +409,11 @@ namespace Tangra.OCR
         }
 
 		public bool ProcessCalibrationFrame(int frameNo, uint[] data)
-		{
+		{			
             if (m_Processor == null)
 		        EnsureProcessorInitialized(data);
+
+			bool wasCalibrated = m_Processor.IsCalibrated;
 
 		    if (!m_Processor.IsCalibrated)
 		        PrepareOsdVideoFields(data);
@@ -439,6 +443,9 @@ namespace Tangra.OCR
 				m_CalibrationImages.Add(string.Format(@"ORG-{0}-odd.bmp", frameNo.ToString("0000000")), pixelsOddOrg);
             }
 
+			if (!wasCalibrated && m_Processor.IsCalibrated)
+				m_Corrector.Reset(m_Processor.VideoFormat);
+
 		    return m_Processor.IsCalibrated;
 		}
 
@@ -456,11 +463,16 @@ namespace Tangra.OCR
 				m_Processor = new IotaVtiOcrProcessor(isTVSafeMode);
 			}
 
+			bool wasCalibrated = m_Processor.IsCalibrated;
+
             if (!m_Processor.IsCalibrated)
                 m_Processor.Process(oddPixels, width, height, null, frameNo, true);
 
             if (!m_Processor.IsCalibrated)
                 m_Processor.Process(evenPixels, width, height, null, frameNo, false);
+
+			if (!wasCalibrated && m_Processor.IsCalibrated)
+				m_Corrector.Reset(m_Processor.VideoFormat);
 
             return m_Processor.IsCalibrated;
 	    }
@@ -511,12 +523,16 @@ namespace Tangra.OCR
                 failedValidation = true;
             }
 
+			if (failedValidation)
+				failedValidation = m_Corrector.TryToCorrect(frameNo, oddFieldOSD, evenFieldOSD, ref oddFieldTimestamp, ref evenFieldTimestamp);
+
             if (failedValidation)
-            {
+            {	            
                 if (m_VideoController != null)
                     m_VideoController.RegisterOcrError();
             }
-
+	        else
+				m_Corrector.RegisterSuccessfulTimestamp(frameNo, oddFieldOSD, evenFieldOSD, oddFieldTimestamp, evenFieldTimestamp);
             
             if (oddFieldOSD.FrameNumber == evenFieldOSD.FrameNumber - 1)
             {
