@@ -28,6 +28,13 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
         public uint[] EightDigitPattern;
         public uint[] NineDigitPattern;
 
+	    public uint[] SixEightXorPattern;
+		public uint[] NineEightXorPattern;
+		public uint[] ThreeEightXorPattern;
+		public int SixEightXorPatternFactor;
+		public int NineEightXorPatternFactor;
+		public int ThreeEightXorPatternFactor;
+
         private IotaVtiOcrState m_CurrentSate;
 
         internal uint[] CurrentImage;

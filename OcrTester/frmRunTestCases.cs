@@ -30,23 +30,26 @@ namespace OcrTester
             pbar.Maximum = pbarSuccess.Maximum = pbarError.Maximum =  testCases.Length * 2;
             pbar.Minimum = pbarSuccess.Minimum = pbarError.Minimum = 0;
             pbar.Value = pbarSuccess.Value = pbarError.Value = 0;
+	        lbErrors.Items.Clear();
 
             foreach (string folder in testCases)
             {
+	            string folderNameOnly = Path.GetFileName(folder);
+	            bool isTvSafe = folderNameOnly.EndsWith("_tvsafe");
                 bool[] REVERSE_OPTIONS = new bool[] { false, true };
-
-                bool isSuccess = false;
-                bool calibrated = false;
-                var ocrEngine = new IotaVtiOrcManaged(false);
 
                 for (int option = 0; option <= 1; option++)
                 {
-                    lvlTestCaseDescription.Text = string.Format("Test case {0} {1}", Path.GetFileName(folder), (option == 0 ? "" : " (Reversed)"));
+                    lvlTestCaseDescription.Text = string.Format("Test case {0} {1}", folderNameOnly, (option == 0 ? "" : " (Reversed)"));
                     lvlTestCaseDescription.Update();
 
                     List<string> testFiles = TestCaseHelper.LoadTestImages(folder, REVERSE_OPTIONS[option]);
 
-                    for (int i = 0; i < testFiles.Count; i++)
+					var ocrEngine = new IotaVtiOrcManaged();
+					bool isSuccess = false;
+					bool calibrated = false;
+
+                    for (int i = 0; i < testFiles.Count / 2; i++)
                     {
                         Bitmap bmpOdd = (Bitmap)Bitmap.FromFile(testFiles[i]);
                         i++;
@@ -56,7 +59,7 @@ namespace OcrTester
                         Pixelmap pixelmapEven = Pixelmap.ConstructFromBitmap(bmpEven, TangraConfig.ColourChannel.Red);
 
                         if (!calibrated)
-                            calibrated = ocrEngine.ProcessCalibrationFrame(i / 2, pixelmapOdd.Pixels, pixelmapEven.Pixels, bmpOdd.Width, bmpOdd.Height);
+							calibrated = ocrEngine.ProcessCalibrationFrame(i / 2, pixelmapOdd.Pixels, pixelmapEven.Pixels, bmpOdd.Width, bmpOdd.Height, isTvSafe);
 
                         if (calibrated)
                         {
@@ -69,12 +72,18 @@ namespace OcrTester
 
                     pbar.Value++;
 
-                    if (isSuccess)
-                        pbarSuccess.Value++;
-                    else
-                        pbarError.Value++;
+	                if (isSuccess)
+		                pbarSuccess.Value++;
+	                else
+	                {
+		                pbarError.Value++;
+						lbErrors.Items.Add(string.Format("{0}{1} - {2}", folderNameOnly, (option == 0 ? "" : " (Reversed)"), calibrated ? "Error extracting times" : " Failed to calibrate"));
+	                }
 
-                    Application.DoEvents();
+	                lblError.Text = string.Format("Errored {0}/{1}", pbarError.Value, pbar.Value);
+					lblSuccessful.Text = string.Format("Successful {0}/{1}", pbarSuccess.Value, pbar.Value);
+
+	                Application.DoEvents();
                 }
             }
 

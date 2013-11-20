@@ -389,8 +389,20 @@ namespace Tangra.OCR
 		    return m_Processor.IsCalibrated;
 		}
 
-	    public bool ProcessCalibrationFrame(int frameNo, uint[] oddPixels, uint[] evenPixels, int width, int height)
+	    public bool ProcessCalibrationFrame(int frameNo, uint[] oddPixels, uint[] evenPixels, int width, int height, bool isTVSafeMode)
 	    {
+			if (m_Processor == null)
+			{
+				m_FieldAreaHeight = height;
+				m_FieldAreaWidth = width;
+				m_OddFieldPixels = new uint[m_FieldAreaWidth * m_FieldAreaHeight];
+				m_EvenFieldPixels = new uint[m_FieldAreaWidth * m_FieldAreaHeight];
+				m_OddFieldPixelsPreProcessed = new uint[m_FieldAreaWidth * m_FieldAreaHeight];
+				m_EvenFieldPixelsPreProcessed = new uint[m_FieldAreaWidth * m_FieldAreaHeight];
+
+				m_Processor = new IotaVtiOcrProcessor(isTVSafeMode);
+			}
+
             if (!m_Processor.IsCalibrated)
                 m_Processor.Process(oddPixels, width, height, null, frameNo, true);
 
@@ -465,21 +477,18 @@ namespace Tangra.OCR
             {
                 if (m_VideoController != null)
                     m_VideoController.RegisterOcrError();
+            }
 
-                return DateTime.MinValue;
+            
+            if (oddFieldOSD.FrameNumber == evenFieldOSD.FrameNumber - 1)
+            {
+                m_LastFieldLargerTimestampTicks = evenFieldTimestamp.Ticks;
+				return failedValidation ? DateTime.MinValue : oddFieldTimestamp;
             }
             else
             {
-                if (oddFieldOSD.FrameNumber == evenFieldOSD.FrameNumber - 1)
-                {
-                    m_LastFieldLargerTimestampTicks = evenFieldTimestamp.Ticks;
-                    return oddFieldTimestamp;
-                }
-                else
-                {
-                    m_LastFieldLargerTimestampTicks = oddFieldTimestamp.Ticks;
-                    return evenFieldTimestamp;
-                }
+                m_LastFieldLargerTimestampTicks = oddFieldTimestamp.Ticks;
+				return failedValidation ? DateTime.MinValue : evenFieldTimestamp;
             }
         }
 	}

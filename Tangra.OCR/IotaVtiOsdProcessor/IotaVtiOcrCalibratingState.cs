@@ -589,6 +589,8 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
                     walkForwardIndex++;
                     if (walkForwardIndex < 10) stateManager.LearnDigitPattern(normalizedPositions[walkForwardIndex].LastFrameNoDigit, 9);
 
+					SetupSixEightNineThreeDiffs(stateManager);
+
 					stateManager.SwapFieldsOrder = true;
 
                     return true;
@@ -609,6 +611,8 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 
 					stateManager.SwapFieldsOrder = false;
 
+	                SetupSixEightNineThreeDiffs(stateManager);
+
                     return true;
 				}
                 else
@@ -617,6 +621,52 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 
             return false;
         }
+
+		private uint[] XorPatterns(uint[] pattern1, uint[] pattern2, out int numDifferentPixels)
+		{
+			uint[] rv = new uint[pattern1.Length];
+			numDifferentPixels = 0;
+
+			for (int i = 0; i < pattern1.Length; i++)
+			{
+				if (pattern1[i] < 127 && pattern1[2] < 127)
+				{
+					rv[i] = 255;
+				}
+				else if (pattern1[i] > 127 && pattern1[2] > 127)
+				{
+					rv[i] = 255;
+				}
+				else
+				{
+					rv[i] = 0;
+					numDifferentPixels++;
+				}
+			}
+
+			return rv;
+		}
+		private void SetupSixEightNineThreeDiffs(IotaVtiOcrProcessor stateManager)
+		{
+			uint[] eightPattern = stateManager.EightDigitPattern;
+			int numDifferentPixels;
+			uint[] xoredPattern;
+
+			uint[] sixPattern = stateManager.SixDigitPattern;
+			xoredPattern = XorPatterns(eightPattern, sixPattern, out numDifferentPixels);
+			stateManager.SixEightXorPattern = xoredPattern;
+			stateManager.SixEightXorPatternFactor = numDifferentPixels;
+
+			uint[] ninePattern = stateManager.NineDigitPattern;
+			xoredPattern = XorPatterns(eightPattern, ninePattern, out numDifferentPixels);
+			stateManager.NineEightXorPattern = xoredPattern;
+			stateManager.NineEightXorPatternFactor = numDifferentPixels;
+
+			uint[] threePattern = stateManager.ThreeDigitPattern;
+			xoredPattern = XorPatterns(eightPattern, threePattern, out numDifferentPixels);
+			stateManager.ThreeEightXorPattern = xoredPattern;
+			stateManager.ThreeEightXorPatternFactor = numDifferentPixels;
+		}
 
         private bool RecognizedTimestampsConsistent(IotaVtiOcrProcessor stateManager, List<CalibratedBlockPosition> normalizedPositions)
 		{
