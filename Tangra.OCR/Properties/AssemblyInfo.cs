@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Tangra.OCR")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Hristo Pavlov")]
 [assembly: AssemblyProduct("Tangra.OCR")]
-[assembly: AssemblyCopyright("Copyright ©  2013")]
+[assembly: AssemblyCopyright("Copyright © 2013 Hristo Pavlov")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

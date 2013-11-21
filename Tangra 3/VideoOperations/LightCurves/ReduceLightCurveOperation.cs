@@ -1172,25 +1172,49 @@ namespace Tangra.VideoOperations.LightCurves
 
 					if (m_TimestampOCR.RequiresCalibration)
 					{
+                        Pixelmap frame = m_VideoController.GetFrame(m_VideoController.CurrentFrameIndex);
+                        m_TimestampOCR.ProcessCalibrationFrame(m_VideoController.CurrentFrameIndex, frame.Pixels);
+
+                        if (m_TimestampOCR.InitiazliationError)
+                        {
+                            // This doesn't like like what the OCR engine is expecting. Abort ....
+                            m_TimestampOCR = null;
+                            return;
+                        }
+
 						int calibrationFramesProcessed = 0;
 						bool isCalibrated = false;
 						m_VideoController.StatusChanged("Calibrating OCR");
 						FileProgressManager.BeginFileOperation(maxCalibrationFieldsToAttempt);
-						for (int i = m_VideoController.CurrentFrameIndex; i < m_VideoController.VideoLastFrame; i++)
-						{
-							Pixelmap frame = m_VideoController.GetFrame(i);
-							isCalibrated = m_TimestampOCR.ProcessCalibrationFrame(i, frame.Pixels);
-							calibrationFramesProcessed++;
+                        try
+                        {
+                            for (int i = m_VideoController.CurrentFrameIndex + 1; i < m_VideoController.VideoLastFrame; i++)
+                            {
+                                frame = m_VideoController.GetFrame(i);
+                                isCalibrated = m_TimestampOCR.ProcessCalibrationFrame(i, frame.Pixels);
 
-							FileProgressManager.FileOperationProgress(calibrationFramesProcessed);
+                                if (m_TimestampOCR.InitiazliationError)
+                                {
+                                    // This doesn't like like what the OCR engine is expecting. Abort ....
+                                    m_TimestampOCR = null;
+                                    return;
+                                }
 
-							if (isCalibrated)
-								break;
+                                calibrationFramesProcessed++;
 
-							if (calibrationFramesProcessed > maxCalibrationFieldsToAttempt)
-								break;
-						}
-						FileProgressManager.EndFileOperation();
+                                FileProgressManager.FileOperationProgress(calibrationFramesProcessed);
+
+                                if (isCalibrated)
+                                    break;
+
+                                if (calibrationFramesProcessed > maxCalibrationFieldsToAttempt)
+                                    break;
+                            }
+                        }
+                        finally
+                        {
+                            FileProgressManager.EndFileOperation();
+                        }
 
 						if (!isCalibrated)
 						{

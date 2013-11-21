@@ -53,7 +53,6 @@ namespace Tangra.VideoOperations
         private void EnableDisableFormControls(bool enable)
         {
             btnIgnore.Enabled = enable;
-            btnRetry.Enabled = enable;
             btnSendReport.Enabled = enable;
         }
 

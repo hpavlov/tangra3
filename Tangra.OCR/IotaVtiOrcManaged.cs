@@ -321,6 +321,9 @@ namespace Tangra.OCR
 				out bestTopPosition, 
 				out bestBottomPosition);
 
+            if (bestBottomPosition - bestTopPosition < 10 || bestBottomPosition - bestTopPosition > 60)
+                return false;
+
             m_FromLine = bestTopPosition - 10;
             m_ToLine = bestBottomPosition + 10;
             if (m_ToLine > m_InitializationData.FrameHeight)
@@ -385,33 +388,42 @@ namespace Tangra.OCR
 
 			m_TVSafeMode = m_ToLine + (m_ToLine - m_FromLine) / 2 < m_InitializationData.FrameHeight;
 
-	        return matchFound;
+            return true; // matchFound;
         }
 
-        private void EnsureProcessorInitialized(uint[] data)
+        private void TryInitializeProcessor(uint[] data)
         {
             if (m_Processor == null)
             {
-                LocateTimestampPosition(data);
+                if (LocateTimestampPosition(data))
+                {
+                    m_FieldAreaHeight = (m_ToLine - m_FromLine) / 2;
+                    m_FieldAreaWidth = m_InitializationData.FrameWidth;
+                    m_OddFieldPixels = new uint[m_InitializationData.FrameWidth * m_FieldAreaHeight];
+                    m_EvenFieldPixels = new uint[m_InitializationData.FrameWidth * m_FieldAreaHeight];
+                    m_OddFieldPixelsPreProcessed = new uint[m_InitializationData.FrameWidth * m_FieldAreaHeight];
+                    m_EvenFieldPixelsPreProcessed = new uint[m_InitializationData.FrameWidth * m_FieldAreaHeight];
 
-                m_FieldAreaHeight = (m_ToLine - m_FromLine) / 2;
-                m_FieldAreaWidth = m_InitializationData.FrameWidth;
-                m_OddFieldPixels = new uint[m_InitializationData.FrameWidth * m_FieldAreaHeight];
-                m_EvenFieldPixels = new uint[m_InitializationData.FrameWidth * m_FieldAreaHeight];
-                m_OddFieldPixelsPreProcessed = new uint[m_InitializationData.FrameWidth * m_FieldAreaHeight];
-                m_EvenFieldPixelsPreProcessed = new uint[m_InitializationData.FrameWidth * m_FieldAreaHeight];
+                    m_InitializationData.OSDFrame.Width = m_FieldAreaWidth;
+                    m_InitializationData.OSDFrame.Height = m_FieldAreaHeight;
 
-                m_InitializationData.OSDFrame.Width = m_FieldAreaWidth;
-                m_InitializationData.OSDFrame.Height = m_FieldAreaHeight;
-
-                m_Processor = new IotaVtiOcrProcessor(m_TVSafeMode);
+                    m_Processor = new IotaVtiOcrProcessor(m_TVSafeMode);
+                }
             }
         }
+
+	    public bool InitiazliationError
+	    {
+            get { return m_Processor == null; }
+	    }
 
 		public bool ProcessCalibrationFrame(int frameNo, uint[] data)
 		{			
             if (m_Processor == null)
-		        EnsureProcessorInitialized(data);
+		        TryInitializeProcessor(data);
+
+		    if (m_Processor == null)
+		        return false;
 
 			bool wasCalibrated = m_Processor.IsCalibrated;
 

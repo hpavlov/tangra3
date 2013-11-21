@@ -230,25 +230,29 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
             }
 
 			CalibrateBlockPositonsTop(stateManager);
-			CalibrateBlockPositonsWidth(stateManager);
+
+            if (stateManager.BlockHeight != -1)
+                // Only look for block width if we have identified the height
+			    CalibrateBlockPositonsWidth(stateManager);
 
 			if (m_CalibratedPositons.Count == 10)
 			{
-				var normalizedPositions = new List<CalibratedBlockPosition>();
+                    var normalizedPositions = new List<CalibratedBlockPosition>();
 
-				if (CalibrateFrameNumberBlockPositions(stateManager, out normalizedPositions) &&
+                if (stateManager.BlockHeight > -1 &&
+                    CalibrateFrameNumberBlockPositions(stateManager, out normalizedPositions) &&
                     RecognizedTimestampsConsistent(stateManager, normalizedPositions))
-				{
-					stateManager.ChangeState<IotaVtiOcrCalibratedState>();
-					stateManager.Process(stateManager.CurrentImage, stateManager.CurrentImageWidth, stateManager.CurrentImageHeight, graphics, frameNo, isOddField);
-					return;
-				}
-				else
-				{
-					// Make sure we always remove the whole frame, so swapped fields create less issues when learning the characters
-					m_CalibratedPositons.RemoveAt(0);
-					m_CalibratedPositons.RemoveAt(0);
-				}
+                {
+                    stateManager.ChangeState<IotaVtiOcrCalibratedState>();
+                    stateManager.Process(stateManager.CurrentImage, stateManager.CurrentImageWidth, stateManager.CurrentImageHeight, graphics, frameNo, isOddField);
+                    return;
+                }
+                else
+                {
+                    // Make sure we always remove the whole frame, so swapped fields create less issues when learning the characters
+                    m_CalibratedPositons.RemoveAt(0);
+                    m_CalibratedPositons.RemoveAt(0);
+                }
 			}
 
 			if (graphics != null)

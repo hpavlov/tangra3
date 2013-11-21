@@ -36,5 +36,7 @@ namespace Tangra.OCR
         uint[] GetLastUnmodifiedImage();
 		TimestampOCRData InitializationData { get; }
 	    void DrawLegend(Graphics graphics);
+
+        bool InitiazliationError { get; }
     }
 }
