@@ -489,6 +489,12 @@ namespace Tangra.VideoOperations.LightCurves
 							}							
 						}
                     }
+
+					if (m_TimestampOCR != null)
+					{
+						// Plot the positions of the timestamp blocks
+						m_TimestampOCR.DrawLegend(g);
+					}
                 }
                 else if (m_Refining)
                 {

@@ -504,10 +504,17 @@ namespace Tangra.OCR
                 failedValidation = true;
             }
 
-            DateTime oddFieldTimestamp = new DateTime(1, 1, 1, oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds, (int)Math.Round(oddFieldOSD.Milliseconds10 / 10.0f));
-            DateTime evenFieldTimestamp = new DateTime(1, 1, 1, evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds, (int)Math.Round(evenFieldOSD.Milliseconds10 / 10.0f));
+			int oddMs = (int)Math.Round(oddFieldOSD.Milliseconds10 / 10.0f);
+			if (oddMs >= 1000) oddMs = 999;
 
-            double fieldDuration = Math.Abs(new TimeSpan(oddFieldTimestamp.Ticks - evenFieldTimestamp.Ticks).TotalMilliseconds);
+			DateTime oddFieldTimestamp = new DateTime(1, 1, 1, oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds, oddMs);
+
+			int evenMs = (int)Math.Round(evenFieldOSD.Milliseconds10 / 10.0f);
+			if (evenMs >= 1000) evenMs = 999;
+
+			DateTime evenFieldTimestamp = new DateTime(1, 1, 1, evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds, evenMs); 
+			
+			double fieldDuration = Math.Abs(new TimeSpan(oddFieldTimestamp.Ticks - evenFieldTimestamp.Ticks).TotalMilliseconds);
             
             if (m_Processor.VideoFormat.Value == VideoFormat.PAL &&
                 (Math.Abs(fieldDuration - IotaVtiOcrProcessor.FIELD_DURATION_PAL) > 1.0))
@@ -543,5 +550,37 @@ namespace Tangra.OCR
 				return failedValidation ? DateTime.MinValue : evenFieldTimestamp;
             }
         }
+
+		public void DrawLegend(Graphics graphics)
+		{
+			if (m_Processor != null &&
+			    m_Processor.IsCalibrated)
+			{
+				int blockWidth = m_Processor.BlockWidth;
+				int blockHeight = 2 * m_Processor.BlockHeight;
+				int yTop = m_FromLine + 2 * m_Processor.BlockOffsetY;
+
+				int[] blockIdsToDraw = new int[] { 3, 4, 6, 7, 9, 10, 12, 13, 14, 15, 17, 18, 19, 20 };
+
+				for (int i = 0; i < blockIdsToDraw.Length; i++)
+				{
+					int xLeft = m_Processor.BlockOffsetsX[blockIdsToDraw[i]];
+
+					if (xLeft > 0)
+						graphics.DrawRectangle(Pens.LightSlateGray, xLeft, yTop, blockWidth, blockHeight);
+				}
+
+				blockIdsToDraw = new int[] { 1, 22, 23, 24, 25, 26, 27, 28 };
+
+				for (int i = 0; i < blockIdsToDraw.Length; i++)
+				{
+					int xLeft = m_Processor.BlockOffsetsX[blockIdsToDraw[i]];
+
+					if (xLeft > 0)
+						graphics.DrawRectangle(Pens.LightSlateGray, xLeft, yTop, blockWidth, blockHeight);
+				}
+				
+			}
+		}
 	}
 }

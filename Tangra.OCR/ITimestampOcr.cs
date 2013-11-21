@@ -35,5 +35,6 @@ namespace Tangra.OCR
 		Dictionary<string, uint[]> GetCalibrationReportImages();
         uint[] GetLastUnmodifiedImage();
 		TimestampOCRData InitializationData { get; }
+	    void DrawLegend(Graphics graphics);
     }
 }
