@@ -524,7 +524,7 @@ namespace Tangra.OCR
             }
 
 			if (failedValidation)
-				failedValidation = m_Corrector.TryToCorrect(frameNo, oddFieldOSD, evenFieldOSD, ref oddFieldTimestamp, ref evenFieldTimestamp);
+				failedValidation = !m_Corrector.TryToCorrect(frameNo, oddFieldOSD, evenFieldOSD, ref oddFieldTimestamp, ref evenFieldTimestamp);
 
             if (failedValidation)
             {	            

@@ -17,10 +17,10 @@ Features:
 
   - Add OCR option for AVI videos
     V) NED's NTSC video has dropped frames, extracting times from those is problematic. May be relax the requirements and only check the two fields ?
-	- Need to determine the maximum FieldNumber with the number of recognized digits, so when this limit is reached, then the next digit position is located
-	  or think of other ways to determine those digit positions
+	X) Need to determine the maximum FieldNumber with the number of recognized digits, so when this limit is reached, then the next digit position is located or think of other ways to determine those digit positions
+	   NOTE: No need to do this as the field numbers are currently ignored!
 	V) Will need special handling of recognizing 6, 8 and 9 (possibly 3 as well).
-	- Implement recovery from single incorrectly recognized digits
+	V) Implement recovery from single incorrectly recognized digits
 
 Bugs:
 -----
