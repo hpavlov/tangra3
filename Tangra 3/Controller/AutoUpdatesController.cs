@@ -110,9 +110,7 @@ namespace Tangra.Controller
 				int currUpdVer = CurrentlyInstalledTangra3UpdateVersion();
 				int servUpdVer = int.Parse(tangra3UpdateServerVersion);
 				if (!File.Exists(Path.GetFullPath(currentPath + "\\Tangra3Update.exe")) || /* If there is no Tangra3Update.exe*/
-					(
-						m_MainFrom.statusStrip.Tag != null &&  /* Or it is an older version ... */
-						servUpdVer > currUpdVer)
+					servUpdVer > currUpdVer/* Or it is an older version ... */
 					)
 				{
 					if (servUpdVer > currUpdVer)

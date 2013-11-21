@@ -48,6 +48,7 @@ namespace Tangra.VideoOperations.LightCurves
 			this.cbxDriftTrough = new System.Windows.Forms.CheckBox();
 			this.cbxFieldRotation = new System.Windows.Forms.CheckBox();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
+			this.rbLunarOccultation = new System.Windows.Forms.RadioButton();
 			this.rbUntrackedMeasurement = new System.Windows.Forms.RadioButton();
 			this.cbxStopOnLostTracking = new System.Windows.Forms.CheckBox();
 			this.tabIntegration = new System.Windows.Forms.TabPage();
@@ -62,10 +63,9 @@ namespace Tangra.VideoOperations.LightCurves
 			this.rbBinning = new System.Windows.Forms.RadioButton();
 			this.rbRunningAverage = new System.Windows.Forms.RadioButton();
 			this.tabStretching = new System.Windows.Forms.TabPage();
+			this.ucStretching = new Tangra.VideoOperations.LightCurves.ucPreProcessing();
 			this.tabReduction = new System.Windows.Forms.TabPage();
 			this.pnlBackground = new System.Windows.Forms.Panel();
-			this.rbLunarOccultation = new System.Windows.Forms.RadioButton();
-			this.ucStretching = new Tangra.VideoOperations.LightCurves.ucPreProcessing();
 			this.tabControl1.SuspendLayout();
 			this.tabGeneral.SuspendLayout();
 			this.groupBox2.SuspendLayout();
@@ -123,6 +123,7 @@ namespace Tangra.VideoOperations.LightCurves
 			// rbMutualEvent
 			// 
 			this.rbMutualEvent.AutoSize = true;
+			this.rbMutualEvent.Enabled = false;
 			this.rbMutualEvent.Location = new System.Drawing.Point(13, 42);
 			this.rbMutualEvent.Name = "rbMutualEvent";
 			this.rbMutualEvent.Size = new System.Drawing.Size(171, 17);
@@ -293,6 +294,17 @@ namespace Tangra.VideoOperations.LightCurves
 			this.groupBox2.TabIndex = 14;
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "Measurement Type";
+			// 
+			// rbLunarOccultation
+			// 
+			this.rbLunarOccultation.AutoSize = true;
+			this.rbLunarOccultation.Enabled = false;
+			this.rbLunarOccultation.Location = new System.Drawing.Point(13, 65);
+			this.rbLunarOccultation.Name = "rbLunarOccultation";
+			this.rbLunarOccultation.Size = new System.Drawing.Size(136, 17);
+			this.rbLunarOccultation.TabIndex = 14;
+			this.rbLunarOccultation.Text = "Total Lunar Occultation";
+			this.rbLunarOccultation.UseVisualStyleBackColor = true;
 			// 
 			// rbUntrackedMeasurement
 			// 
@@ -466,6 +478,13 @@ namespace Tangra.VideoOperations.LightCurves
 			this.tabStretching.Text = "Pre-Processing";
 			this.tabStretching.UseVisualStyleBackColor = true;
 			// 
+			// ucStretching
+			// 
+			this.ucStretching.Location = new System.Drawing.Point(0, 0);
+			this.ucStretching.Name = "ucStretching";
+			this.ucStretching.Size = new System.Drawing.Size(370, 221);
+			this.ucStretching.TabIndex = 0;
+			// 
 			// tabReduction
 			// 
 			this.tabReduction.BackColor = System.Drawing.Color.Transparent;
@@ -490,24 +509,6 @@ namespace Tangra.VideoOperations.LightCurves
 			this.pnlBackground.Name = "pnlBackground";
 			this.pnlBackground.Size = new System.Drawing.Size(291, 53);
 			this.pnlBackground.TabIndex = 6;
-			// 
-			// rbLunarOccultation
-			// 
-			this.rbLunarOccultation.AutoSize = true;
-			this.rbLunarOccultation.Enabled = false;
-			this.rbLunarOccultation.Location = new System.Drawing.Point(13, 65);
-			this.rbLunarOccultation.Name = "rbLunarOccultation";
-			this.rbLunarOccultation.Size = new System.Drawing.Size(136, 17);
-			this.rbLunarOccultation.TabIndex = 14;
-			this.rbLunarOccultation.Text = "Total Lunar Occultation";
-			this.rbLunarOccultation.UseVisualStyleBackColor = true;
-			// 
-			// ucStretching
-			// 
-			this.ucStretching.Location = new System.Drawing.Point(0, 0);
-			this.ucStretching.Name = "ucStretching";
-			this.ucStretching.Size = new System.Drawing.Size(370, 221);
-			this.ucStretching.TabIndex = 0;
 			// 
 			// frmSelectReductionType
 			// 

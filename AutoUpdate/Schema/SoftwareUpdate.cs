@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Xml;
 using System.Globalization;
@@ -18,6 +19,9 @@ namespace AutoUpdate.Schema
         internal readonly string Path = null;
         internal readonly string ArchivedPath = null;
 
+	    private bool? m_NewUpdateRequired = null;
+
+
         public SoftwareUpdate(XmlElement node)
             : base(node)
         {
@@ -29,16 +33,20 @@ namespace AutoUpdate.Schema
 
         public override bool NewUpdatesAvailable(string tangra3Path)
         {
+	        if (m_NewUpdateRequired.HasValue)
+		        return m_NewUpdateRequired.Value;
+
             Assembly asm = GetLocalTangra3UpdateAssembly();
             if (asm != null)
             {
-                object[] atts = asm.GetCustomAttributes(typeof(AssemblyFileVersionAttribute), true);
+	            CustomAttributeData[] atts = asm.GetCustomAttributesData().Where(x=>x.Constructor.DeclaringType == typeof(AssemblyFileVersionAttribute)).ToArray();
                 if (atts.Length == 1)
                 {
-                    string currVersionString = ((AssemblyFileVersionAttribute)atts[0]).Version;
+                    string currVersionString = (atts[0]).ConstructorArguments[0].Value.ToString();
                     int currVersionAsInt = Config.Instance.Tangra3UpdateVersionStringToVersion(currVersionString);
 
-                    if (base.Version > currVersionAsInt)
+	                m_NewUpdateRequired = base.Version > currVersionAsInt;
+					if (m_NewUpdateRequired.Value)
                     {
 						Trace.WriteLine(string.Format("Update required for '{0}': local version: {1}; server version: {2}", SharedUpdateConstants.MAIN_UPDATER_EXECUTABLE_NAME, currVersionAsInt, Version));
                         return true;

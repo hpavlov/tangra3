@@ -2,6 +2,10 @@
 Features:
 ---------
 
+  - Add support for Mutual Events
+  - Run integration detection while the video is being measured. At the end before the light curve is shown, if the integration is consistent then:
+     - Ask if the user wants to 'merge'all measurements for the same integration periods
+	 - Ask for the camera model to apply instrumental delays (if the user has answered 'Ýes' to the above question)
   v) Build an Add-in for AOTA
      - Display the returned times/frames for D and R
   - Add integration detection on the LightCurve form with option of binning it

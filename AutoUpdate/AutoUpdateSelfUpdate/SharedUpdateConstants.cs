@@ -18,7 +18,7 @@ namespace AutoUpdateSelfUpdate
 		public static string MAIN_UPDATER_EXECUTABLE_NAME = "Tangra3Update.exe";
 		public static string MAIN_PROGRAM_NAME = "Tangra3";
 		public static string UPDATER_PROGRAM_NAME = "Tangra3 Update";
-		public static string UPDATER_PROGRAM_XML_ELEMENT = "Tangra3Update";
+		public static string UPDATER_PROGRAM_XML_ELEMENT = "AutoUpdate";
 		public static string UPDATE_URL_LOCATION = "http://www.hristopavlov.net/Tangra3/";
 	}
 }
