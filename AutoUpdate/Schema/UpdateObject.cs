@@ -118,6 +118,7 @@ namespace AutoUpdate.Schema
                 {
                     // A non-managed file or file versioning controlled by file size only
                     FileInfo fi = new FileInfo(fullLocalFileName);
+					Trace.WriteLine(string.Format("Checking native file length for '{0}'. Existing file: {1}, Online file: {2}", this.File, fi.Length, NativeFileLength));
                     return fi.Length != NativeFileLength;
                 }
                 else
@@ -131,6 +132,7 @@ namespace AutoUpdate.Schema
                     catch (BadImageFormatException)
                     {
                         asm = null;
+						Trace.WriteLine(string.Format("Loading '{0}' as assembly failed. BadImageFormatException has occured.", this.File));
                         try
                         {
                             System.IO.File.Delete(fullLocalFileName);

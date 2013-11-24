@@ -223,7 +223,7 @@ namespace AutoUpdate
             int version =
                 10000 * int.Parse(tokens[0]) +
                 1000 * int.Parse(tokens[1]) +
-                (tokens.Length > 2 ? 100 * int.Parse(tokens[2]) : 0) + 
+                (tokens.Length > 2 ? (tokens.Length > 3 ? 100 : 1) * int.Parse(tokens[2]) : 0) + 
                 (tokens.Length > 3 ? int.Parse(tokens[3]) : 0);
             return version;
         }
@@ -234,7 +234,7 @@ namespace AutoUpdate
             int version = 
                 10000 * int.Parse(tokens[0]) + 
                 1000 * int.Parse(tokens[1]) +
-                (tokens.Length > 2 ? 100 * int.Parse(tokens[2]) : 0) + 
+				(tokens.Length > 2 ? (tokens.Length > 3 ? 100 : 1) * int.Parse(tokens[2]) : 0) + 
                 (tokens.Length > 2 ? int.Parse(tokens[3]) : 0);
 
             return version;

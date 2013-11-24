@@ -39,49 +39,58 @@ namespace AutoUpdate
         {
             Uri updateUri = new Uri(Config.Instance.UpdateLocation + Config.Instance.UpdatesXmlFileName);
 
-            HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(updateUri);
-            httpRequest.Method = "GET";
-            httpRequest.Timeout = 30000; //30 sec
+			string updateXml = null;
 
-            HttpWebResponse response = null;
+			if (updateUri.IsFile)
+			{
+				updateXml = System.IO.File.ReadAllText(updateUri.LocalPath);
+			}
+			else
+			{
+				HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(updateUri);
+				httpRequest.Method = "GET";
+				httpRequest.Timeout = 30000; //30 sec
 
-            try
-            {
-                response = (HttpWebResponse)httpRequest.GetResponse();
+				HttpWebResponse response = null;
 
-                string updateXml = null;
+				try
+				{
+					response = (HttpWebResponse)httpRequest.GetResponse();
 
-                Stream streamResponse = response.GetResponseStream();
 
-                try
-                {
-                    using (TextReader reader = new StreamReader(streamResponse))
-                    {
-                        updateXml = reader.ReadToEnd();
-                    }
-                }
-                finally
-                {
-                    streamResponse.Close();
-                }
+					Stream streamResponse = response.GetResponseStream();
 
-                if (updateXml != null)
-                {
-                    XmlDocument xmlDoc = new XmlDocument();
-                    xmlDoc.LoadXml(updateXml);
+					try
+					{
+						using (TextReader reader = new StreamReader(streamResponse))
+						{
+							updateXml = reader.ReadToEnd();
+						}
+					}
+					finally
+					{
+						streamResponse.Close();
+					}
+				}
+				finally
+				{
+					// Close response
+					if (response != null)
+						response.Close();
+				}				
+			}
 
-                    UpdateSchema updateSchema = new UpdateSchema(xmlDoc);
+			if (updateXml != null)
+			{
+				XmlDocument xmlDoc = new XmlDocument();
+				xmlDoc.LoadXml(updateXml);
 
-                    if (updateSchema.NewUpdatesAvailable(tangra3Path))
-                        return updateSchema;
-                }
-            }
-            finally
-            {
-                // Close response
-                if (response != null)
-                    response.Close();
-            }
+				UpdateSchema updateSchema = new UpdateSchema(xmlDoc);
+
+				if (updateSchema.NewUpdatesAvailable(tangra3Path))
+					return updateSchema;
+			}
+
 
             return null;
         }
@@ -139,110 +148,119 @@ namespace AutoUpdate
 
             progress.UpdateProgress(string.Format("Downloading {0} ...", Path.GetFileName(localFile)), -1);
 
-            HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(fileUri);
-            httpRequest.Method = "GET";
-            httpRequest.Timeout = 600000; //600 sec = 10 min
+			bool allGood = false;
+			int attempts = 0;
+			Exception fileDelException = null;
+			do
+			{
+				try
+				{
+					if (System.IO.File.Exists(localFile))
+						// throws access denied: -2147024891
+						System.IO.File.Delete(localFile);
 
-            HttpWebResponse response = null;
+					allGood = true;
+					fileDelException = null;
+				}
+				catch (Exception ex)
+				{
+					fileDelException = ex;
+					System.Threading.Thread.Sleep(500);
+				}
 
-            try
-            {
-                response = (HttpWebResponse)httpRequest.GetResponse();
+				attempts++;
+			}
+			while (!allGood && attempts < 10);
 
-                Stream streamResponse = response.GetResponseStream();
-                long totalBytes = response.ContentLength;
+			if (fileDelException != null)
+			{
+				System.Windows.Forms.MessageBox.Show(
+					"There was a problem upgrading " + SharedUpdateConstants.MAIN_PROGRAM_NAME + "\r\n\r\n" + fileDelException.GetType().ToString() + " : " + fileDelException.Message +
+					"\r\n\r\nPlease note that the update process needs to be run by an administrator. Stop all running copies of " + SharedUpdateConstants.MAIN_PROGRAM_NAME + " and then manually run:\r\n\r\n" +
+					Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory + "\\" + SharedUpdateConstants.MAIN_UPDATER_EXECUTABLE_NAME) +
+					"\r\n\r\nYou can also use Right-Click and then use 'Run as ...' and specify a user with administrative previlegies.",
+					"Error Upgrading",
+					System.Windows.Forms.MessageBoxButtons.OK,
+					System.Windows.Forms.MessageBoxIcon.Error);
 
-                try
-                {
-                    bool allGood = false;
-                    int attempts = 0;
-                    Exception fileDelException = null;
-                    do
-                    {
-                        try
-                        {
-                            if (System.IO.File.Exists(localFile))
-                                // throws access denied: -2147024891
-                                System.IO.File.Delete(localFile);
+				Process.GetCurrentProcess().Kill();
+			}
 
-                            allGood = true;
-                            fileDelException = null;
-                        }
-                        catch (Exception ex)
-                        {
-                            fileDelException = ex;
-                            System.Threading.Thread.Sleep(500);
-                        }
+			if (!Directory.Exists(Path.GetDirectoryName(localFile)))
+				Directory.CreateDirectory(Path.GetDirectoryName(localFile));
 
-                        attempts++;
-                    }
-                    while (!allGood && attempts < 10);
 
-                    if (fileDelException != null)
-                    {
-                        System.Windows.Forms.MessageBox.Show(
-							"There was a problem upgrading " + SharedUpdateConstants.MAIN_PROGRAM_NAME + "\r\n\r\n" + fileDelException.GetType().ToString() + " : " + fileDelException.Message +
-							"\r\n\r\nPlease note that the update process needs to be run by an administrator. Stop all running copies of " + SharedUpdateConstants.MAIN_PROGRAM_NAME + " and then manually run:\r\n\r\n" +
-							Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory + "\\" + SharedUpdateConstants.MAIN_UPDATER_EXECUTABLE_NAME) +
-                            "\r\n\r\nYou can also use Right-Click and then use 'Run as ...' and specify a user with administrative previlegies.",
-                            "Error Upgrading",
-                            System.Windows.Forms.MessageBoxButtons.OK,
-                            System.Windows.Forms.MessageBoxIcon.Error);
+			if (fileUri.IsFile)
+			{
+				System.IO.File.Copy(fileUri.LocalPath, localFile);
+			}
+			else
+			{
+				HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(fileUri);
+				httpRequest.Method = "GET";
+				httpRequest.Timeout = 600000; //600 sec = 10 min
 
-                        Process.GetCurrentProcess().Kill();
-                    }
+				HttpWebResponse response = null;
 
-                    if (!Directory.Exists(Path.GetDirectoryName(localFile)))
-                        Directory.CreateDirectory(Path.GetDirectoryName(localFile));
+				try
+				{
+					response = (HttpWebResponse)httpRequest.GetResponse();
 
-                    using (BinaryReader reader = new BinaryReader(streamResponse))
-                    using (BinaryWriter writer = new BinaryWriter(new FileStream(localFile, FileMode.Create)))
-                    {
-                        byte[] chunk = null;
-                        do
-                        {
-                            chunk = reader.ReadBytes(1024);
-                            //TODO: Send back info on the download progress with the bytes read and total bytes
-                            writer.Write(chunk);
-                        }
-                        while (chunk != null && chunk.Length == 1024);
+					Stream streamResponse = response.GetResponseStream();
+					long totalBytes = response.ContentLength;
 
-                        writer.Flush();
-                    }
+					try
+					{
+						using (BinaryReader reader = new BinaryReader(streamResponse))
+						using (BinaryWriter writer = new BinaryWriter(new FileStream(localFile, FileMode.Create)))
+						{
+							byte[] chunk = null;
+							do
+							{
+								chunk = reader.ReadBytes(1024);
+								//TODO: Send back info on the download progress with the bytes read and total bytes
+								writer.Write(chunk);
+							}
+							while (chunk != null && chunk.Length == 1024);
 
-                    //TODO: Set the full content downloaded, hide the byte download progress label
+							writer.Flush();
+						}
+					}
+					finally
+					{
+						streamResponse.Close();
+					}
 
-                    if (shouldUnzip)
-                    {
-                        string tempOutputDir = Path.ChangeExtension(Path.GetTempFileName(), "");
-                        Directory.CreateDirectory(tempOutputDir);
-                        try
-                        {
-							ZipUnzip.UnZip(localFile, tempOutputDir, true);
-                            string[] files = Directory.GetFiles(tempOutputDir);
-                            System.IO.File.Copy(files[0], localFile, true);
-                            System.IO.File.Delete(files[0]);
-                        }
-                        finally
-                        {
-                            Directory.Delete(tempOutputDir, true);
-                        }
-                    }
-                }
-                finally
-                {
-                    streamResponse.Close();
-                }
+				}
+				finally
+				{
+					// Close response
+					if (response != null)
+						response.Close();
+				}				
+			}
 
-                return localFile;
+			//TODO: Set the full content downloaded, hide the byte download progress label
 
-            }
-            finally
-            {
-                // Close response
-                if (response != null)
-                    response.Close();
-            }
+			if (shouldUnzip)
+			{
+				string tempOutputDir = Path.ChangeExtension(Path.GetTempFileName(), "");
+				Directory.CreateDirectory(tempOutputDir);
+				try
+				{
+					ZipUnzip.UnZip(localFile, tempOutputDir, true);
+					string[] files = Directory.GetFiles(tempOutputDir);
+					System.IO.File.Copy(files[0], localFile, true);
+					System.IO.File.Delete(files[0]);
+				}
+				finally
+				{
+					Directory.Delete(tempOutputDir, true);
+				}
+			}
+
+			return localFile;
         }
+
     }
 }
