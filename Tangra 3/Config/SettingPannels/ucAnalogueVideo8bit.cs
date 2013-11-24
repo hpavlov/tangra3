@@ -30,7 +30,7 @@ namespace Tangra.Config.SettingPannels
 		{
 			nudSaturation8bit.SetNUDValue(TangraConfig.Settings.Photometry.Saturation.Saturation8Bit);
 
-			cbxRenderingEngineAttemptOrder.SetCBXIndex(TangraConfig.Settings.Generic.PreferredRenderingEngineIndex);
+            cbxRenderingEngineAttemptOrder.SetCBXIndex(TangraConfig.Settings.Generic.AviRenderingEngineIndex);
 			if (cbxRenderingEngineAttemptOrder.SelectedIndex == -1 && cbxRenderingEngineAttemptOrder.Items.Count > 0)
 				cbxRenderingEngineAttemptOrder.SelectedIndex = 0;
 
@@ -49,7 +49,7 @@ namespace Tangra.Config.SettingPannels
 		public override void SaveSettings()
 		{
 			TangraConfig.Settings.Photometry.Saturation.Saturation8Bit = (byte)nudSaturation8bit.Value;
-			TangraConfig.Settings.Generic.PreferredRenderingEngineIndex = cbxRenderingEngineAttemptOrder.SelectedIndex;
+            TangraConfig.Settings.Generic.AviRenderingEngineIndex = cbxRenderingEngineAttemptOrder.SelectedIndex;
 			TangraConfig.Settings.Photometry.ColourChannel = (TangraConfig.ColourChannel)cbxColourChannel.SelectedIndex;
 			TangraConfig.Settings.Generic.OsdOcrEnabled = cbxEnableOsdOcr.Checked;
 			TangraConfig.Settings.Generic.OcrEngine = cbxOcrEngine.Text;

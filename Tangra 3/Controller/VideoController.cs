@@ -560,7 +560,7 @@ namespace Tangra.Controller
 
 			m_FramePlayer.SetFrameRenderer(this);
 
-            TangraVideo.SetVideoEngine(TangraConfig.Settings.Generic.PreferredRenderingEngineIndex);
+            TangraVideo.SetVideoEngine(TangraConfig.Settings.Generic.AviRenderingEngineIndex);
 
 			m_VideoFileView.Reset();
 		}

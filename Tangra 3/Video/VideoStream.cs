@@ -26,8 +26,8 @@ namespace Tangra.Video
 		    List<string> allEngines = TangraVideo.EnumVideoEngines().ToList();
 
 		    var allEnginesByAttemptOrder = new List<string>(allEngines);
-            allEnginesByAttemptOrder.RemoveAt(TangraConfig.Settings.Generic.PreferredRenderingEngineIndex);
-		    allEnginesByAttemptOrder.Insert(0, allEngines[TangraConfig.Settings.Generic.PreferredRenderingEngineIndex]);
+            allEnginesByAttemptOrder.RemoveAt(TangraConfig.Settings.Generic.AviRenderingEngineIndex);
+            allEnginesByAttemptOrder.Insert(0, allEngines[TangraConfig.Settings.Generic.AviRenderingEngineIndex]);
 
             Dictionary<int, string> allEnginesByIndex = allEnginesByAttemptOrder.ToDictionary(x => allEngines.IndexOf(x), x => x);
 

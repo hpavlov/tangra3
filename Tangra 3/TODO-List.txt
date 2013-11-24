@@ -9,18 +9,11 @@ Features:
   - Make it possible to display both the D and R frame number and times on the LightCurve form  
   V) Add Äddins"advanced config page. Put extra tracing/debugging info there. Put other options ??
   v) Rewrite the Tracking algorithm. Also make it possible to use the algorithm in OccuRec for example. 
-  - Remove many of the warning and informatioon flags from the Tracking, review them and only leave ones that make sense to the end user
-     - Abstract the tracking as set of interfaces. Make it possible this abstraction to be used by OccuRec too
-	 - Make it possible to switch between different implementations
-	 - Do a second implementation from scratch, tune it and use it.
-  - Make it possible to measure in video fields
-
-  - Add OCR option for AVI videos
-    V) NED's NTSC video has dropped frames, extracting times from those is problematic. May be relax the requirements and only check the two fields ?
-	X) Need to determine the maximum FieldNumber with the number of recognized digits, so when this limit is reached, then the next digit position is located or think of other ways to determine those digit positions
-	   NOTE: No need to do this as the field numbers are currently ignored!
-	V) Will need special handling of recognizing 6, 8 and 9 (possibly 3 as well).
-	V) Implement recovery from single incorrectly recognized digits
+     V) Abstract the tracking as set of interfaces. Make it possible this abstraction to be used by OccuRec too
+	 V) Make it possible to switch between different implementations
+	 V) Do a second implementation from scratch, tune it and use it.
+     - Remove many of the warning and informatioon flags from the Tracking, review them and only leave ones that make sense to the end user  
+  ?) Make it possible to measure in video fields
 
 Bugs:
 -----

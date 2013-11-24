@@ -385,7 +385,7 @@ namespace Tangra.Model.Config
 			public float AdHokMinCertainty = 0.1f;
 			public float AdHokMinFWHM = 1.5f;
 			public float AdHokMaxFWHM = 12.0f;
-			public bool UseNativeTracker = false;
+			public bool UseNativeTracker = true;
 		}
 
 		public enum PSFFittingMode
@@ -397,7 +397,7 @@ namespace Tangra.Model.Config
 
 		public class TuningSettings
 		{
-			public PSFFittingMode PsfMode = PSFFittingMode.FullyNative;
+			public PSFFittingMode PsfMode = PSFFittingMode.NativeMatrixManagedFitting;
 		}
 
 		public class SpecialSettings
@@ -501,12 +501,12 @@ namespace Tangra.Model.Config
 			public bool ShowCursorPosition = false;
 			public PerformanceQuality PerformanceQuality;
 			public bool ReverseGammaCorrection = false;
-			public int PreferredRenderingEngineIndex = 0;
+			public int AviRenderingEngineIndex = 1;
 			public bool DarkFrameAdjustLevelToMedian = false;
 
 			public bool AcceptBetaUpdates = false;
 
-			public bool UseHueIntensityDisplayMode = true;
+			public bool UseHueIntensityDisplayMode = false;
 			public bool UseInvertedDisplayMode = false;
 
 			public bool OsdOcrEnabled = true;
