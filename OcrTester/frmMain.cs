@@ -65,7 +65,11 @@ namespace OcrTester
 			    lblBlockWidth.Text = m_Processor.BlockWidth.ToString();
                 lblBlockHeight.Text = m_Processor.BlockHeight.ToString();
                 lblBlockXOffs.Text = m_Processor.BlockOffsetX.ToString();
-                lblBlockYOffs.Text = m_Processor.BlockOffsetY.ToString();
+
+				if (m_Processor.BlockOffsetYOdd != m_Processor.BlockOffsetYEven)
+					lblBlockYOffs.Text = string.Format("o:{0} e:{1}", m_Processor.BlockOffsetYOdd, m_Processor.BlockOffsetYEven);
+				else
+					lblBlockYOffs.Text = m_Processor.BlockOffsetYOdd.ToString();
 
 			    PlotDigitPatterns();
 
@@ -190,7 +194,7 @@ namespace OcrTester
 
 		private void picField_MouseDown(object sender, MouseEventArgs e)
 		{
-		    uint[] blockPixels = m_Processor.GetBlockAt(e.X, e.Y);
+			uint[] blockPixels = m_Processor.GetBlockAt(e.X, e.Y, m_CurrentIndex % 2 == 1);
 		    Bitmap bmpBlock = Pixelmap.ConstructBitmapFromBitmapPixels(blockPixels, m_Processor.BlockWidth, m_Processor.BlockHeight);
 		    picBlock.Image = bmpBlock;
 		    picBlock.Update();

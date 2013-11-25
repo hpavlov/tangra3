@@ -2,40 +2,41 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using Tangra.Model.Image;
 
 namespace Tangra.OCR.IotaVtiOsdProcessor
 {
-    internal abstract class IotaVtiOcrState
-    {
-        protected int m_Width;
-        protected int m_Height;
+	internal abstract class IotaVtiOcrState
+	{
+		protected int m_Width;
+		protected int m_Height;
 
-        protected int m_MinBlockWidth;
-        protected int m_MaxBlockWidth;
-        protected int m_MinBlockHeight;
-        protected int m_MaxBlockHeight;
+		protected int m_MinBlockWidth;
+		protected int m_MaxBlockWidth;
+		protected int m_MinBlockHeight;
+		protected int m_MaxBlockHeight;
 
-        public abstract void InitialiseState(IotaVtiOcrProcessor stateManager);
-        public abstract void FinaliseState(IotaVtiOcrProcessor stateManager);
-        public abstract void Process(IotaVtiOcrProcessor stateManager, Graphics g, int frameNo, bool isOddField);
+		public abstract void InitialiseState(IotaVtiOcrProcessor stateManager);
+		public abstract void FinaliseState(IotaVtiOcrProcessor stateManager);
+		public abstract void Process(IotaVtiOcrProcessor stateManager, Graphics g, int frameNo, bool isOddField);
 
-        protected static int GetDiffSignature(uint[] probe, uint[] etalon)
-        {
-            int rv = 0;
+		protected static int GetDiffSignature(uint[] probe, uint[] etalon)
+		{
+			int rv = 0;
 
-            for (int i = 0; i < probe.Length; i++)
-            {
-                if (etalon[i] != probe[i])
-                    rv++;
-            }
+			for (int i = 0; i < probe.Length; i++)
+			{
+				if (etalon[i] != probe[i])
+					rv++;
+			}
 
-            return rv;
-        }
+			return rv;
+		}
 
-		protected void PlotImage(Graphics graphics, IotaVtiOcrProcessor stateManager)
+		protected void PlotImage(Graphics graphics, IotaVtiOcrProcessor stateManager, bool isOddField)
 		{
 			if (stateManager.BlockOffsetsX != null &&
 								stateManager.BlockOffsetsX.Length == IotaVtiOcrProcessor.MAX_POSITIONS &&
@@ -48,7 +49,7 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 						graphics.DrawRectangle(
 							Pens.Chartreuse,
 							stateManager.BlockOffsetsX[i],
-							stateManager.BlockOffsetY,
+							stateManager.BlockOffsetY(isOddField),
 							stateManager.BlockWidth,
 							stateManager.BlockHeight);
 					}
@@ -59,14 +60,14 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 				graphics.DrawRectangle(
 						Pens.Chartreuse,
 						0,
-						stateManager.BlockOffsetY,
+						stateManager.BlockOffsetY(isOddField),
 						m_Width,
 						stateManager.BlockHeight);
 			}
 		}
-    }
+	}
 
-    internal class IotaVtiTimeStampStrings
+	internal class IotaVtiTimeStampStrings
 	{
 		public char NumSat;
 		public string HH;
@@ -82,13 +83,13 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 				HH.Length == 2 &&
 				MM.Length == 2 &&
 				SS.Length == 2 &&
-                ((FFFF1.Length == 4 && FFFF1.IndexOf(' ') == -1) || (FFFF2.Length == 4 && FFFF2.IndexOf(' ') == -1)) &&
+				(FFFF1.Length == 4 || FFFF2.Length == 4) &&
 				FRAMENO.Length > 0 &&
 				FRAMENO.IndexOf(' ') == -1;
 		}
 	}
 
-    internal class IotaVtiTimeStamp
+	internal class IotaVtiTimeStamp
 	{
 		public IotaVtiTimeStamp(IotaVtiTimeStampStrings timeStampStrings)
 		{
@@ -100,14 +101,13 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 			FrameNumber = int.Parse(timeStampStrings.FRAMENO);
 		}
 
-		public IotaVtiTimeStamp(IotaVtiTimeStamp clone)
+		public IotaVtiTimeStamp(IotaVtiTimeStamp timeStamp)
 		{
-			NumSat = clone.NumSat;
-			Hours = clone.Hours;
-			Minutes = clone.Minutes;
-			Seconds = clone.Seconds;
-			Milliseconds10 = clone.Milliseconds10;
-			FrameNumber = clone.FrameNumber;
+			Hours = timeStamp.Hours;
+			Minutes = timeStamp.Minutes;
+			Seconds = timeStamp.Seconds;
+			Milliseconds10 = timeStamp.Milliseconds10;
+			FrameNumber = timeStamp.FrameNumber;
 		}
 
 		public int NumSat;
@@ -118,23 +118,47 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 		public int FrameNumber;
 	}
 
-    internal enum VideoFormat
+	internal enum VideoFormat
 	{
 		PAL,
 		NTSC
 	}
 
-    internal static class Extensions
-    {
-        public static T Median<T>(this IList<T> list)
-        {
-            if (list.Count == 0)
-                return default(T);
+	internal static class Extensions
+	{
+		public static T Median<T>(this IList<T> list)
+		{
+			if (list.Count == 0)
+				return default(T);
 
-            T[] arrayList = list.ToArray();
-            Array.Sort(arrayList);
+			T[] arrayList = list.ToArray();
+			Array.Sort(arrayList);
 
-            return arrayList[list.Count / 2];
-        }
-    }
+			return arrayList[list.Count / 2];
+		}
+
+		public static IValueType MostCommonValue<TModel, IValueType>(this IEnumerable<TModel> list, Expression<Func<TModel, IValueType>> expression)
+		{
+			var dict = new Dictionary<IValueType, int>();
+
+			foreach (TModel model in list)
+			{
+				var selectedValue = expression.Compile().Invoke(model);
+				if (!dict.ContainsKey(selectedValue))
+					dict.Add(selectedValue, 0);
+				else
+					dict[selectedValue]++;
+			}
+
+			if (dict.Count == 0)
+				return default(IValueType);
+
+			IValueType[] keys = dict.Keys.ToArray();
+			int[] occurrences = dict.Values.ToArray();
+
+			Array.Sort(occurrences, keys);
+
+			return keys[keys.Length - 1];
+		}
+	}
 }

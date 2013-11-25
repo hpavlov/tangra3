@@ -28,40 +28,40 @@ namespace OcrTester.IotaVtiOsdProcessor
 			}
 
 			uint[] pixels = stateManager.CurrentImage;
-			IotaVtiTimeStampStrings ocredValue = OcrField(pixels, stateManager);
+			IotaVtiTimeStampStrings ocredValue = OcrField(pixels, stateManager, isOddField);
 			stateManager.SetOcredString(ocredValue);
 
 			if (graphics != null)
-				base.PlotImage(graphics, stateManager);
+				base.PlotImage(graphics, stateManager, isOddField);
 		}
 
-		internal static IotaVtiTimeStampStrings OcrField(uint[] pixels, IotaVtiOcrProcessor stateManager)
+		internal static IotaVtiTimeStampStrings OcrField(uint[] pixels, IotaVtiOcrProcessor stateManager, bool isOddField)
 		{
-			char char1 = OcrBlock(pixels, stateManager, 1);
-			char char3 = OcrBlock(pixels, stateManager, 3);
-			char char4 = OcrBlock(pixels, stateManager, 4);
-			char char6 = OcrBlock(pixels, stateManager, 6);
-			char char7 = OcrBlock(pixels, stateManager, 7);
-			char char9 = OcrBlock(pixels, stateManager, 9);
-			char char10 = OcrBlock(pixels, stateManager, 10);
+			char char1 = OcrBlock(pixels, stateManager, 1, isOddField);
+			char char3 = OcrBlock(pixels, stateManager, 3, isOddField);
+			char char4 = OcrBlock(pixels, stateManager, 4, isOddField);
+			char char6 = OcrBlock(pixels, stateManager, 6, isOddField);
+			char char7 = OcrBlock(pixels, stateManager, 7, isOddField);
+			char char9 = OcrBlock(pixels, stateManager, 9, isOddField);
+			char char10 = OcrBlock(pixels, stateManager, 10, isOddField);
 
-			char char12 = OcrBlock(pixels, stateManager, 12);
-			char char13 = OcrBlock(pixels, stateManager, 13);
-			char char14 = OcrBlock(pixels, stateManager, 14);
-			char char15 = OcrBlock(pixels, stateManager, 15);
+			char char12 = OcrBlock(pixels, stateManager, 12, isOddField);
+			char char13 = OcrBlock(pixels, stateManager, 13, isOddField);
+			char char14 = OcrBlock(pixels, stateManager, 14, isOddField);
+			char char15 = OcrBlock(pixels, stateManager, 15, isOddField);
 
-			char char17 = OcrBlock(pixels, stateManager, 17);
-			char char18 = OcrBlock(pixels, stateManager, 18);
-			char char19 = OcrBlock(pixels, stateManager, 19);
-			char char20 = OcrBlock(pixels, stateManager, 20);
+			char char17 = OcrBlock(pixels, stateManager, 17, isOddField);
+			char char18 = OcrBlock(pixels, stateManager, 18, isOddField);
+			char char19 = OcrBlock(pixels, stateManager, 19, isOddField);
+			char char20 = OcrBlock(pixels, stateManager, 20, isOddField);
 
-			char char22 = OcrBlock(pixels, stateManager, 22);
-			char char23 = OcrBlock(pixels, stateManager, 23);
-			char char24 = OcrBlock(pixels, stateManager, 24);
-			char char25 = OcrBlock(pixels, stateManager, 25);
-			char char26 = OcrBlock(pixels, stateManager, 26);
-			char char27 = OcrBlock(pixels, stateManager, 27);
-			char char28 = OcrBlock(pixels, stateManager, 28);
+			char char22 = OcrBlock(pixels, stateManager, 22, isOddField);
+			char char23 = OcrBlock(pixels, stateManager, 23, isOddField);
+			char char24 = OcrBlock(pixels, stateManager, 24, isOddField);
+			char char25 = OcrBlock(pixels, stateManager, 25, isOddField);
+			char char26 = OcrBlock(pixels, stateManager, 26, isOddField);
+			char char27 = OcrBlock(pixels, stateManager, 27, isOddField);
+			char char28 = OcrBlock(pixels, stateManager, 28, isOddField);
 
 			var rv = new IotaVtiTimeStampStrings()
 			{
@@ -77,9 +77,9 @@ namespace OcrTester.IotaVtiOsdProcessor
 			return rv;
 		}
 
-		private static char OcrBlock(uint[] fieldPixels, IotaVtiOcrProcessor stateManager, int blockIndex)
+		private static char OcrBlock(uint[] fieldPixels, IotaVtiOcrProcessor stateManager, int blockIndex, bool isOddField)
 		{
-			uint[] block = stateManager.GetBlockAtPosition(fieldPixels, blockIndex);
+			uint[] block = stateManager.GetBlockAtPosition(fieldPixels, blockIndex, isOddField);
 
 			int[] diffSignatures = new int[10];
 			int[] diffDigits = new int[10];
