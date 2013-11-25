@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Tangra.Model.Image;
+using OcrTester.IotaVtiOsdProcessor;
 
 namespace OcrTester.IotaVtiOsdProcessor
 {
@@ -36,7 +37,7 @@ namespace OcrTester.IotaVtiOsdProcessor
 		{
 			for (int i = IotaVtiOcrProcessor.FIRST_FRAME_NO_DIGIT_POSITIONS; i <= IotaVtiOcrProcessor.MAX_POSITIONS; i++)
 			{
-				uint[] pixels = stateManager.GetBlockAtPosition(Image, i);
+				uint[] pixels = stateManager.GetBlockAtPosition(Image, i, IsOddField);
 				int nuberSignalPixels = pixels.Count(x => x < 127);
 				if (stateManager.IsMatchingSignature(nuberSignalPixels) /* Matches to blank block */)
 					return i;
@@ -47,14 +48,14 @@ namespace OcrTester.IotaVtiOsdProcessor
 
 		public void PrepareLastTwoDigitsFromTheFrameNumber(IotaVtiOcrProcessor stateManager)
 		{
-			LastFrameNoDigit = stateManager.GetBlockAtPosition(Image, stateManager.LastFrameNoDigitPosition);
-			SecondLastFrameNoDigit = stateManager.GetBlockAtPosition(Image, stateManager.LastFrameNoDigitPosition - 1);
+			LastFrameNoDigit = stateManager.GetBlockAtPosition(Image, stateManager.LastFrameNoDigitPosition, IsOddField);
+			SecondLastFrameNoDigit = stateManager.GetBlockAtPosition(Image, stateManager.LastFrameNoDigitPosition - 1, IsOddField);
 		}
 
 		public void PrepareLastTwoDigitsFromTheFrameNumber(IotaVtiOcrProcessor stateManager, int lastBlockX, int secondLastBlockX)
 		{
-			LastFrameNoDigit = stateManager.GetBlockAtXOffset(Image, lastBlockX);
-			SecondLastFrameNoDigit = stateManager.GetBlockAtXOffset(Image, secondLastBlockX);
+			LastFrameNoDigit = stateManager.GetBlockAtXOffset(Image, lastBlockX, IsOddField);
+			SecondLastFrameNoDigit = stateManager.GetBlockAtXOffset(Image, secondLastBlockX, IsOddField);
 		}
 	}
 
@@ -62,7 +63,7 @@ namespace OcrTester.IotaVtiOsdProcessor
 	{
 		private List<CalibratedBlockPosition> m_CalibratedPositons = new List<CalibratedBlockPosition>();
 
-		private void CalibrateBlockPositonsTop(IotaVtiOcrProcessor stateManager)
+		private void CalibrateBlockPositonsTop(IotaVtiOcrProcessor stateManager, bool isOddField)
 		{
 			int count = 0;
 			int maxRating = -1;
@@ -115,10 +116,13 @@ namespace OcrTester.IotaVtiOsdProcessor
 			}
 
 			stateManager.BlockHeight = bestHeight;
-			stateManager.BlockOffsetY = bestYOffs;
+			if (isOddField)
+				stateManager.BlockOffsetYOdd = bestYOffs;
+			else
+				stateManager.BlockOffsetYEven = bestYOffs;
 		}
 
-		private void CalibrateBlockPositonsWidth(IotaVtiOcrProcessor stateManager)
+		private void CalibrateBlockPositonsWidth(IotaVtiOcrProcessor stateManager, bool isOddField)
 		{
 			int maxRating = -1;
 
@@ -127,7 +131,7 @@ namespace OcrTester.IotaVtiOsdProcessor
 
 			// Determined previously
 			int bestHeight = stateManager.BlockHeight;
-			int bestYOffs = stateManager.BlockOffsetY;
+			int bestYOffs = stateManager.BlockOffsetY(isOddField);
 
 			int imageWidth = stateManager.CurrentImageWidth;
 			var startingPositions = new List<int>();
@@ -191,7 +195,8 @@ namespace OcrTester.IotaVtiOsdProcessor
 				BlockWidth = bestWidth,
 				BlockHeight = bestHeight,
 				BlockOffsetY = bestYOffs,
-				BestStartingPositions = bestStartingPositions.ToArray()
+				BestStartingPositions = bestStartingPositions.ToArray(),
+				IsOddField = isOddField
 			};
 			m_CalibratedPositons.Add(calibrationBlock);
 		}
@@ -228,11 +233,14 @@ namespace OcrTester.IotaVtiOsdProcessor
 				ROUTH_START_FRAME_NUMBER_BLOCKS = (int)Math.Round(IotaVtiOcrProcessor.COEFF_FIRST_FRAME_NO_DIGIT_POSITION * stateManager.CurrentImageWidth);
 			}
 
-			CalibrateBlockPositonsTop(stateManager);
-			CalibrateBlockPositonsWidth(stateManager);
+			CalibrateBlockPositonsTop(stateManager, isOddField);
+			CalibrateBlockPositonsWidth(stateManager, isOddField);
 
 			if (m_CalibratedPositons.Count == 10)
-			{
+			{				
+				stateManager.BlockOffsetYOdd = m_CalibratedPositons.Where(x => x.IsOddField).MostCommonValue(x => x.BlockOffsetY);				
+				stateManager.BlockOffsetYEven = m_CalibratedPositons.Where(x => !x.IsOddField).MostCommonValue(x => x.BlockOffsetY);
+
 				var normalizedPositions = new List<CalibratedBlockPosition>();
 
 				if (CalibrateFrameNumberBlockPositions(stateManager, out normalizedPositions) &&
@@ -251,7 +259,7 @@ namespace OcrTester.IotaVtiOsdProcessor
 			}
 
 			if (graphics != null)
-				base.PlotImage(graphics, stateManager);
+				base.PlotImage(graphics, stateManager, isOddField);
 		}
 
 		private int GetLastFrameNoDigitStartPosition(IotaVtiOcrProcessor stateManager)
@@ -272,6 +280,7 @@ namespace OcrTester.IotaVtiOsdProcessor
 
 			int bestRating = -1;
 			int bestStartPosition = -1;
+			int oneOfEvenOrOddY = stateManager.BlockOffsetY(false);
 
 			for (int x = ROUTH_START_FRAME_NUMBER_BLOCKS; x < stateManager.CurrentImageWidth - stateManager.BlockWidth; x++)
 			{
@@ -281,7 +290,7 @@ namespace OcrTester.IotaVtiOsdProcessor
 				{
 					for (int k = 0; k < stateManager.BlockWidth; k++)
 					{
-						if (result[x + k + (stateManager.BlockOffsetY + y) * stateManager.CurrentImageWidth] > 0)
+						if (result[x + k + (oneOfEvenOrOddY + y) * stateManager.CurrentImageWidth] > 0)
 							currentRating++;
 					}
 				}
@@ -326,9 +335,9 @@ namespace OcrTester.IotaVtiOsdProcessor
 		}
 
 
-		private char OcrBlock(IotaVtiOcrProcessor stateManager, uint[] image, int startingPosition, out int rating)
+		private char OcrBlock(IotaVtiOcrProcessor stateManager, uint[] image, int startingPosition, bool isOddField, out int rating)
 		{
-			uint[] block = stateManager.GetBlockAtXOffset(image, startingPosition);
+			uint[] block = stateManager.GetBlockAtXOffset(image, startingPosition, isOddField);
 
 			int[] diffSignatures = new int[10];
 			int[] diffDigits = new int[10];
@@ -384,7 +393,7 @@ namespace OcrTester.IotaVtiOsdProcessor
 				{
 					// Try to match each learned digit to every position 
 					int rating = 0;
-					char ch = OcrBlock(stateManager, blockPosition.Image, i, out rating);
+					char ch = OcrBlock(stateManager, blockPosition.Image, i, blockPosition.IsOddField, out rating);
 					if (ch != ' ')
 					{
 						if (prevMatchLocation == -1 ||
@@ -669,7 +678,7 @@ namespace OcrTester.IotaVtiOsdProcessor
 				if (index == totalTimestamps - 1)
 					break;
 
-				IotaVtiTimeStampStrings timeStampStrings = IotaVtiOcrCalibratedState.OcrField(normalizedPositions[index].Image, stateManager);
+				IotaVtiTimeStampStrings timeStampStrings = IotaVtiOcrCalibratedState.OcrField(normalizedPositions[index].Image, stateManager, normalizedPositions[index].IsOddField);
 				if (!timeStampStrings.AllCharsPresent())
 				{
 					return false;
@@ -682,7 +691,7 @@ namespace OcrTester.IotaVtiOsdProcessor
 					if (index + 1 == totalTimestamps - 1)
 						break;
 
-					IotaVtiTimeStampStrings timeStampStrings2 = IotaVtiOcrCalibratedState.OcrField(normalizedPositions[index + 1].Image, stateManager);
+					IotaVtiTimeStampStrings timeStampStrings2 = IotaVtiOcrCalibratedState.OcrField(normalizedPositions[index + 1].Image, stateManager, normalizedPositions[index + 1].IsOddField);
 					if (!timeStampStrings2.AllCharsPresent())
 					{
 						return false;
