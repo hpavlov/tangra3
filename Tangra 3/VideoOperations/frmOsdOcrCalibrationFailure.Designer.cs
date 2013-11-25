@@ -81,7 +81,7 @@
             // 
             this.label2.Location = new System.Drawing.Point(18, 78);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(400, 117);
+            this.label2.Size = new System.Drawing.Size(400, 135);
             this.label2.TabIndex = 4;
             this.label2.Text = resources.GetString("label2.Text");
             // 
