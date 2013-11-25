@@ -54,7 +54,14 @@ namespace OcrTester.IotaVtiOsdProcessor
 
 		public int SecondLastBlockOffsetsX { get; set; }
 
-		public int BlockOffsetY { get; set; }
+		public int BlockOffsetYOdd { get; set; }
+
+		public int BlockOffsetYEven { get; set; }
+
+		public int BlockOffsetY(bool isOddField)
+		{
+			return isOddField ? BlockOffsetYOdd : BlockOffsetYEven;
+		}
 
 		public string CurrentOcredString { get; set; }
 
@@ -93,20 +100,22 @@ namespace OcrTester.IotaVtiOsdProcessor
 			m_CurrentSate.InitialiseState(this);
 		}
 
-		public uint[] GetBlockAt(int x0, int y0)
+		public uint[] GetBlockAt(int x0, int y0, bool isOddField)
 		{
-			return GetBlockAt(CurrentImage, x0, y0);
+			return GetBlockAt(CurrentImage, x0, y0, isOddField);
 		}
 
-		public uint[] GetBlockAt(uint[] pixelmap, int x0, int y0)
+		public uint[] GetBlockAt(uint[] pixelmap, int x0, int y0, bool isOddField)
 		{
-			if (y0 >= BlockOffsetY && y0 <= BlockOffsetY + BlockHeight)
+			int blockOffsetY = isOddField ? BlockOffsetYOdd : BlockOffsetYEven;
+
+			if (y0 >= blockOffsetY && y0 <= blockOffsetY + BlockHeight)
 			{
 				for (int i = 0; i < MAX_POSITIONS - 1; i++)
 				{
 					if (x0 >= BlockOffsetsX[i] && x0 < BlockOffsetsX[i + 1])
 					{
-						return GetBlockAtXOffset(pixelmap, BlockOffsetsX[i]);
+						return GetBlockAtXOffset(pixelmap, BlockOffsetsX[i], isOddField);
 					}
 				}
 			}
@@ -119,25 +128,26 @@ namespace OcrTester.IotaVtiOsdProcessor
 			return 10 * nuberMarkedPixels < BlockWidth * BlockHeight;
 		}
 
-		public uint[] GetBlockAtPosition(int positionIndex)
+		public uint[] GetBlockAtPosition(int positionIndex, bool isOddField)
 		{
-			return GetBlockAtPosition(CurrentImage, positionIndex);
+			return GetBlockAtPosition(CurrentImage, positionIndex, isOddField);
 		}
 
-		public uint[] GetBlockAtPosition(uint[] pixelmap, int positionIndex)
+		public uint[] GetBlockAtPosition(uint[] pixelmap, int positionIndex, bool isOddField)
 		{
-			return GetBlockAtXOffset(pixelmap, BlockOffsetsX[positionIndex]);
+			return GetBlockAtXOffset(pixelmap, BlockOffsetsX[positionIndex], isOddField);
 		}
 
-		public uint[] GetBlockAtXOffset(uint[] pixelmap, int xOffset)
+		public uint[] GetBlockAtXOffset(uint[] pixelmap, int xOffset, bool isOddField)
 		{
 			uint[] blockPixels = new uint[BlockWidth * BlockHeight];
+			int blockOffsetY = isOddField ? BlockOffsetYOdd : BlockOffsetYEven;
 
 			for (int y = 0; y < BlockHeight; y++)
 			{
 				for (int x = 0; x < BlockWidth; x++)
 				{
-					blockPixels[x + y * BlockWidth] = pixelmap[xOffset + x + (BlockOffsetY + y) * CurrentImageWidth];
+					blockPixels[x + y * BlockWidth] = pixelmap[xOffset + x + (blockOffsetY + y) * CurrentImageWidth];
 				}
 			}
 			return blockPixels;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using Tangra.Model.Image;
@@ -35,7 +36,7 @@ namespace OcrTester.IotaVtiOsdProcessor
 			return rv;
 		}
 
-		protected void PlotImage(Graphics graphics, IotaVtiOcrProcessor stateManager)
+		protected void PlotImage(Graphics graphics, IotaVtiOcrProcessor stateManager, bool isOddField)
 		{
 			if (stateManager.BlockOffsetsX != null &&
 								stateManager.BlockOffsetsX.Length == IotaVtiOcrProcessor.MAX_POSITIONS &&
@@ -48,7 +49,7 @@ namespace OcrTester.IotaVtiOsdProcessor
 						graphics.DrawRectangle(
 							Pens.Chartreuse,
 							stateManager.BlockOffsetsX[i],
-							stateManager.BlockOffsetY,
+							stateManager.BlockOffsetY(isOddField),
 							stateManager.BlockWidth,
 							stateManager.BlockHeight);
 					}
@@ -59,7 +60,7 @@ namespace OcrTester.IotaVtiOsdProcessor
 				graphics.DrawRectangle(
 						Pens.Chartreuse,
 						0,
-						stateManager.BlockOffsetY,
+						stateManager.BlockOffsetY(isOddField),
 						m_Width,
 						stateManager.BlockHeight);
 			}			
@@ -100,6 +101,15 @@ namespace OcrTester.IotaVtiOsdProcessor
 			FrameNumber = int.Parse(timeStampStrings.FRAMENO);
 		}
 
+		public IotaVtiTimeStamp(IotaVtiTimeStamp timeStamp)
+		{
+			Hours = timeStamp.Hours;
+			Minutes = timeStamp.Minutes;
+			Seconds = timeStamp.Seconds;
+			Milliseconds10 = timeStamp.Milliseconds10;
+			FrameNumber = timeStamp.FrameNumber;
+		}
+
 		public int NumSat;
 		public int Hours;
 		public int Minutes;
@@ -125,6 +135,30 @@ namespace OcrTester.IotaVtiOsdProcessor
 			Array.Sort(arrayList);
 
 			return arrayList[list.Count / 2];
+		}
+
+		public static IValueType MostCommonValue<TModel, IValueType>(this IEnumerable<TModel> list, Expression<Func<TModel, IValueType>> expression)
+		{
+			var dict = new Dictionary<IValueType, int>();
+
+			foreach (TModel model in list)
+			{
+				var selectedValue = expression.Compile().Invoke(model);
+				if (!dict.ContainsKey(selectedValue))
+					dict.Add(selectedValue, 0);
+				else
+					dict[selectedValue]++;
+			}
+
+			if (dict.Count == 0)
+				return default(IValueType);
+
+			IValueType[] keys = dict.Keys.ToArray();
+			int[] occurrences = dict.Values.ToArray();
+
+			Array.Sort(occurrences, keys);
+
+			return keys[keys.Length - 1];
 		}
 	}
 }

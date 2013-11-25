@@ -570,7 +570,7 @@ namespace Tangra.OCR
 			{
 				int blockWidth = m_Processor.BlockWidth;
 				int blockHeight = 2 * m_Processor.BlockHeight;
-				int yTop = m_FromLine + 2 * m_Processor.BlockOffsetY;
+				int yTop = m_FromLine + 2 * m_Processor.BlockOffsetY(false /* It doesn't matter which one we use here even or odd */ );
 
 				int[] blockIdsToDraw = new int[] { 3, 4, 6, 7, 9, 10, 12, 13, 14, 15, 17, 18, 19, 20 };
 
