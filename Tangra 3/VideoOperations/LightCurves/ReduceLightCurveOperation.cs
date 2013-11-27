@@ -1167,7 +1167,7 @@ namespace Tangra.VideoOperations.LightCurves
 					data.OSDFrame = LightCurveReductionContext.Instance.OSDFrame;
 					data.VideoFrameRate = (float)m_VideoController.VideoFrameRate;
 
-					m_TimestampOCR.Initialize(data, m_VideoController);
+					m_TimestampOCR.Initialize(data, m_VideoController, (int)TangraConfig.Settings.Tuning.OcrMode);
 					int maxCalibrationFieldsToAttempt = TangraConfig.Settings.Generic.MaxCalibrationFieldsToAttempt;
 
 					if (m_TimestampOCR.RequiresCalibration)

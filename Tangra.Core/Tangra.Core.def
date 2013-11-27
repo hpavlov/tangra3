@@ -53,19 +53,6 @@ EXPORTS
 	UsesPreProcessing
 	GetProductVersion
 	
-	; IOTA-VTI OCR
-	;IOTAVTIOCR_Initialise
-	;IOTAVTIOCR_SetCharacterConfiguration
-	;IOTAVTIOCR_CalibratePixelMap
-	;IOTAVTIOCR_ExtractTimeStamp
-
-		
-	;IOTAVTIOCR_CalibratePixelMapField
-	;IOTAVTIOCR_ExtractFieldTimeStamp
-	;IOTAVTIOCR_SetLocationCoefficients
-	;IOTAVTIOCR_SetScaleCoefficients
-	;IOTAVTIOCR_GetCalibrationCoefficients
-	
 	; PSFFitting
 	SolveLinearSystem
 	SolveLinearSystemFast
@@ -80,3 +67,8 @@ EXPORTS
 	TrackerNextFrame
 	TrackerConfigureObject
 	TrackerGetTargetState
+	
+	;Image Processing
+	Convolution
+	PrepareImageForOCR
+	PrepareImageForOCRSingleStep

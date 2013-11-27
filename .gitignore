@@ -72,3 +72,6 @@ _ReSharper.*
 /AutoUpdate/SelfUpdate/AutoUpdateSelfUpdate.bin
 
 /TestFiles/
+
+/Tangra.Core/cppcheck.list
+/Tangra.Core/cscope_file.list

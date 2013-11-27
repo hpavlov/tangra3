@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -7,6 +8,7 @@ using Tangra.Model.Config;
 using Tangra.Model.Image;
 using Tangra.Model.VideoOperations;
 using Tangra.OCR.IotaVtiOsdProcessor;
+using Tangra.PInvoke;
 
 namespace Tangra.OCR
 {
@@ -29,6 +31,7 @@ namespace Tangra.OCR
 
 		private Dictionary<string, uint[]> m_CalibrationImages = new Dictionary<string, uint[]>();
 	    private uint[] m_LatestFrameImage;
+		private bool m_UseNativePreProcessing;
 
 		private IotaVtiOcrCorrector m_Corrector = new IotaVtiOcrCorrector();
 
@@ -42,11 +45,12 @@ namespace Tangra.OCR
 			return "IOTA-VTI";
 		}
 
-		public void Initialize(TimestampOCRData initializationData, IVideoController videoController)
+		public void Initialize(TimestampOCRData initializationData, IVideoController videoController, int performanceMode)
 		{
 			m_InitializationData = initializationData;
 		    m_VideoController = videoController;
             m_Processor = null;
+			m_UseNativePreProcessing = performanceMode > 0;
 		}
 
 		public TimestampOCRData InitializationData
@@ -79,55 +83,63 @@ namespace Tangra.OCR
             // 2) Sharpen BitmapFilter.SHARPEN_MATRIX
             // 3) Binarize - get Average, all below change to 0, all above change to Max (256)
             // 4) De-noise BitmapFilter.DENOISE_MATRIX
-
-            // TODO: Move the Covariance operations into C++ land
-
-	        uint median = m_OddFieldPixels.Median();
-			for (int i = 0; i < m_OddFieldPixels.Length; i++)
+           
+			if (m_UseNativePreProcessing)
 			{
-				int darkCorrectedValue = (int) m_OddFieldPixels[i] - (int) median;
-				if (darkCorrectedValue < 0) darkCorrectedValue = 0;
-				m_OddFieldPixels[i] = (uint) darkCorrectedValue;
+				TangraCore.PrepareImageForOCR(m_OddFieldPixels, m_OddFieldPixelsPreProcessed, m_InitializationData.FrameWidth, m_FieldAreaHeight);
+				TangraCore.PrepareImageForOCR(m_EvenFieldPixels, m_EvenFieldPixelsPreProcessed, m_InitializationData.FrameWidth, m_FieldAreaHeight);
 			}
-
-            uint[] blurResult = BitmapFilter.GaussianBlur(m_OddFieldPixels, 8, m_InitializationData.FrameWidth, m_FieldAreaHeight);
-            uint average = 128;
-            uint[] sharpenResult = BitmapFilter.Sharpen(blurResult, 8, m_InitializationData.FrameWidth, m_FieldAreaHeight, out average);
-
-            // Binerize and Inverse
-            for (int i = 0; i < sharpenResult.Length; i++)
-            {
-                sharpenResult[i] = sharpenResult[i] > average ? (uint)0 : (uint)255;
-            }
-            uint[] denoised = BitmapFilter.Denoise(sharpenResult, 8, m_InitializationData.FrameWidth, m_FieldAreaHeight, out average, false);
-
-            for (int i = 0; i < denoised.Length; i++)
-            {
-                m_OddFieldPixelsPreProcessed[i] = denoised[i] < 127 ? (uint)0 : (uint)255;
-            }
-
-			median = m_EvenFieldPixels.Median();
-			for (int i = 0; i < m_EvenFieldPixels.Length; i++)
+			else
 			{
-				int darkCorrectedValue = (int)m_EvenFieldPixels[i] - (int)median;
-				if (darkCorrectedValue < 0) darkCorrectedValue = 0;
-				m_EvenFieldPixels[i] = (uint)darkCorrectedValue;
+				uint median = m_OddFieldPixels.Median();
+				for (int i = 0; i < m_OddFieldPixels.Length; i++)
+				{
+					int darkCorrectedValue = (int)m_OddFieldPixels[i] - (int)median;
+					if (darkCorrectedValue < 0) darkCorrectedValue = 0;
+					m_OddFieldPixels[i] = (uint)darkCorrectedValue;
+				}
+
+				uint[] blurResult = BitmapFilter.GaussianBlur(m_OddFieldPixels, 8, m_InitializationData.FrameWidth, m_FieldAreaHeight);
+
+				uint average = 128;
+				uint[] sharpenResult = BitmapFilter.Sharpen(blurResult, 8, m_InitializationData.FrameWidth, m_FieldAreaHeight, out average);
+
+				// Binerize and Inverse
+				for (int i = 0; i < sharpenResult.Length; i++)
+				{
+					sharpenResult[i] = sharpenResult[i] > average ? (uint)0 : (uint)255;
+				}
+
+				uint[] denoised = BitmapFilter.Denoise(sharpenResult, 8, m_InitializationData.FrameWidth, m_FieldAreaHeight, out average, false);
+
+				for (int i = 0; i < denoised.Length; i++)
+				{
+					m_OddFieldPixelsPreProcessed[i] = denoised[i] < 127 ? (uint)0 : (uint)255;
+				}
+
+				median = m_EvenFieldPixels.Median();
+				for (int i = 0; i < m_EvenFieldPixels.Length; i++)
+				{
+					int darkCorrectedValue = (int)m_EvenFieldPixels[i] - (int)median;
+					if (darkCorrectedValue < 0) darkCorrectedValue = 0;
+					m_EvenFieldPixels[i] = (uint)darkCorrectedValue;
+				}
+				blurResult = BitmapFilter.GaussianBlur(m_EvenFieldPixels, 8, m_InitializationData.FrameWidth, m_FieldAreaHeight);
+				average = 128;
+				sharpenResult = BitmapFilter.Sharpen(blurResult, 8, m_InitializationData.FrameWidth, m_FieldAreaHeight, out average);
+
+				// Binerize and Inverse
+				for (int i = 0; i < sharpenResult.Length; i++)
+				{
+					sharpenResult[i] = sharpenResult[i] > average ? (uint)0 : (uint)255;
+				}
+				denoised = BitmapFilter.Denoise(sharpenResult, 8, m_InitializationData.FrameWidth, m_FieldAreaHeight, out average, false);
+
+				for (int i = 0; i < denoised.Length; i++)
+				{
+					m_EvenFieldPixelsPreProcessed[i] = denoised[i] < 127 ? (uint)0 : (uint)255;
+				}
 			}
-            blurResult = BitmapFilter.GaussianBlur(m_EvenFieldPixels, 8, m_InitializationData.FrameWidth, m_FieldAreaHeight);
-            average = 128;
-            sharpenResult = BitmapFilter.Sharpen(blurResult, 8, m_InitializationData.FrameWidth, m_FieldAreaHeight, out average);
-
-            // Binerize and Inverse
-            for (int i = 0; i < sharpenResult.Length; i++)
-            {
-                sharpenResult[i] = sharpenResult[i] > average ? (uint)0 : (uint)255;
-            }
-            denoised = BitmapFilter.Denoise(sharpenResult, 8, m_InitializationData.FrameWidth, m_FieldAreaHeight, out average, false);
-
-            for (int i = 0; i < denoised.Length; i++)
-            {
-                m_EvenFieldPixelsPreProcessed[i] = denoised[i] < 127 ? (uint)0 : (uint)255;
-            }
 
             m_LatestFrameImage = data;
         }
@@ -501,7 +513,7 @@ namespace Tangra.OCR
 
 		public void AddConfiguration(uint[] data, OCRConfigEntry config)
 		{ }
-	    
+	     
         private DateTime ExtractDateTime(int frameNo, IotaVtiTimeStamp oddFieldOSD, IotaVtiTimeStamp evenFieldOSD)
         {
             bool failedValidation = false;

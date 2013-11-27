@@ -25,12 +25,18 @@ namespace Tangra.Config.SettingPannels
             cbxPsfOptimization.SetCBXIndex((int)TangraConfig.Settings.Tuning.PsfMode);
             rbSimplifiedTrackerNative.Checked = TangraConfig.Settings.Tracking.UseNativeTracker;
 			rbSimplifiedTrackerManaged.Checked = !TangraConfig.Settings.Tracking.UseNativeTracker;
+			rbOcrMixedMode.Checked = TangraConfig.Settings.Tuning.OcrMode == TangraConfig.OCRMode.Mixed;
+			rbOcrManagedMode.Checked = TangraConfig.Settings.Tuning.OcrMode == TangraConfig.OCRMode.FullyManaged;
         }
 
         public override void SaveSettings()
         {
             TangraConfig.Settings.Tuning.PsfMode = (TangraConfig.PSFFittingMode)cbxPsfOptimization.SelectedIndex;
             TangraConfig.Settings.Tracking.UseNativeTracker = rbSimplifiedTrackerNative.Checked;
+			if (rbOcrMixedMode.Checked)
+				TangraConfig.Settings.Tuning.OcrMode = TangraConfig.OCRMode.Mixed;
+			if (rbOcrManagedMode.Checked)
+				TangraConfig.Settings.Tuning.OcrMode = TangraConfig.OCRMode.FullyManaged;
         }
 	}
 }

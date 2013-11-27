@@ -143,12 +143,14 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 		{
 			uint[] blockPixels = new uint[BlockWidth * BlockHeight];
 			int blockOffsetY = isOddField ? BlockOffsetYOdd : BlockOffsetYEven;
-
+			int MAX_INDEX = pixelmap.Length - 1;
 			for (int y = 0; y < BlockHeight; y++)
 			{
 				for (int x = 0; x < BlockWidth; x++)
 				{
-					blockPixels[x + y * BlockWidth] = pixelmap[xOffset + x + (blockOffsetY + y) * CurrentImageWidth];
+					int pixelMapIndex = xOffset + x + (blockOffsetY + y) * CurrentImageWidth;
+					if (pixelMapIndex <= MAX_INDEX)
+						blockPixels[x + y * BlockWidth] = pixelmap[pixelMapIndex];
 				}
 			}
 			return blockPixels;

@@ -49,6 +49,7 @@
     <Compile Include="IotaVtiOsdProcessor\IotaVtiOcrState.cs" />
     <Compile Include="ITimestampOcr.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TangraCore.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tangra.Model\Tangra.Model.csproj">

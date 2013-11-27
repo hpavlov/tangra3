@@ -21,7 +21,7 @@ namespace Tangra.OCR
     {
         string NameAndVersion();
         string OSDType();
-        void Initialize(TimestampOCRData initializationData, IVideoController videoController);
+        void Initialize(TimestampOCRData initializationData, IVideoController videoController, int performanceMode);
         void RefiningFrame(uint[] data, float refiningPercentageLeft);
         void PrepareForMeasurements(uint[] data);
         bool ExtractTime(int frameNo, uint[] data, out DateTime time);

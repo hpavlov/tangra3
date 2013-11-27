@@ -281,6 +281,7 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 			int bestRating = -1;
 			int bestStartPosition = -1;
 			int oneOfEvenOrOddY = stateManager.BlockOffsetY(false);
+			int TOTAL_PIXELS = result.Length;
 
 			for (int x = ROUTH_START_FRAME_NUMBER_BLOCKS; x < stateManager.CurrentImageWidth - stateManager.BlockWidth; x++)
 			{
@@ -290,7 +291,8 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 				{
 					for (int k = 0; k < stateManager.BlockWidth; k++)
 					{
-						if (result[x + k + (oneOfEvenOrOddY + y) * stateManager.CurrentImageWidth] > 0)
+						int idx = x + k + (oneOfEvenOrOddY + y)*stateManager.CurrentImageWidth;
+						if (idx < TOTAL_PIXELS && result[idx] > 0)
 							currentRating++;
 					}
 				}
@@ -614,30 +616,31 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 			return false;
 		}
 
-		private uint[] XorPatterns(uint[] pattern1, uint[] pattern2, out int numDifferentPixels)
+		private uint[] XorPatterns(uint[] basePattern, uint[] pdifferentPattern, out int numDifferentPixels)
 		{
-			uint[] rv = new uint[pattern1.Length];
+			uint[] rv = new uint[basePattern.Length];
 			numDifferentPixels = 0;
 
-			for (int i = 0; i < pattern1.Length; i++)
+			for (int i = 0; i < basePattern.Length; i++)
 			{
-				if (pattern1[i] < 127 && pattern2[i] < 127)
+				if (basePattern[i] < 127 && pdifferentPattern[i] < 127)
 				{
-					rv[i] = 255;
+					rv[i] = 127;
 				}
-				else if (pattern1[i] > 127 && pattern2[i] > 127)
+				else if (basePattern[i] > 127 && pdifferentPattern[i] > 127)
 				{
-					rv[i] = 255;
+					rv[i] = 127;
 				}
 				else
 				{
-					rv[i] = 0;
+					rv[i] = pdifferentPattern[i];
 					numDifferentPixels++;
 				}
 			}
 
 			return rv;
 		}
+
 		private void SetupSixEightNineThreeDiffs(IotaVtiOcrProcessor stateManager)
 		{
 			uint[] eightPattern = stateManager.EightDigitPattern;

@@ -140,6 +140,8 @@
   <data name="label2.Text" xml:space="preserve">
     <value>Please know that Tangra will not be able to read your timestamp in all conditions. Nearby stars, bright or diverse background or partially hidden timestamp can all be legitimate reasons for the timestamp recognition to fail. 
 
+If only one of the two video fields is grabbed or not all video frames are present in the video the timestamp reading will not work.
+
 If you think that your timestamp looks allright and you would like Tangra to be able to read it then please submit an error report using the button below.
 
 If you would like me to contact you about this error then send me an email as well.</value>

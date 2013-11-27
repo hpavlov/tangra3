@@ -30,4 +30,4 @@ DLL_PUBLIC void ConfigureSaturationLevels(unsigned long saturation8Bit, unsigned
 } // __cplusplus defined.
 #endif
 
-#endif // SAFEMATRIX_H
+#endif // TANGRAMATH_H

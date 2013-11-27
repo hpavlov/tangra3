@@ -395,8 +395,15 @@ namespace Tangra.Model.Config
 			FullyNative
 		}
 
+		public enum OCRMode
+		{
+			FullyManaged,
+			Mixed
+		}
+
 		public class TuningSettings
 		{
+			public OCRMode OcrMode = OCRMode.FullyManaged;
 			public PSFFittingMode PsfMode = PSFFittingMode.NativeMatrixManagedFitting;
 		}
 
