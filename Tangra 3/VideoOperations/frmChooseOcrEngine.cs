@@ -27,17 +27,26 @@ namespace Tangra.VideoOperations
 			if (cbxOcrEngine.SelectedIndex == -1)
 				cbxOcrEngine.SelectedIndex = 0;
 
-			//cbxDontAsk.Checked = !TangraConfig.Settings.Generic.OsdOcrAskMeToConfirmEveryTime;
+			cbxEnableOsdOcr.Checked = TangraConfig.Settings.Generic.OsdOcrEnabled;
+			cbxOcrAskEveryTime.Checked = TangraConfig.Settings.Generic.OcrAskEveryTime;
+			pnlOsdOcr.Enabled = cbxEnableOsdOcr.Checked;
 		}
 
 		private void btnOK_Click(object sender, EventArgs e)
 		{
+			TangraConfig.Settings.Generic.OsdOcrEnabled = cbxEnableOsdOcr.Checked;
 			TangraConfig.Settings.Generic.OcrEngine = cbxOcrEngine.Text;
-			//TangraConfig.Settings.Generic.OsdOcrAskMeToConfirmEveryTime = !cbxDontAsk.Checked;
+			TangraConfig.Settings.Generic.OcrAskEveryTime = cbxOcrAskEveryTime.Checked;
+			
 			TangraConfig.Settings.Save();
 
 			DialogResult = DialogResult.OK;
 			Close();
+		}
+
+		private void cbxEnableOsdOcr_CheckedChanged(object sender, EventArgs e)
+		{
+			pnlOsdOcr.Enabled = cbxEnableOsdOcr.Checked;
 		}
 
 	}

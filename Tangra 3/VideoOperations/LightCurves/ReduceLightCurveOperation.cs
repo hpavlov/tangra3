@@ -135,6 +135,13 @@ namespace Tangra.VideoOperations.LightCurves
 
 	            TangraContext.Current.CanChangeTool = true;
 
+				if (m_VideoController.IsPlainAviVideo &&
+					!TangraConfig.Settings.Generic.OcrInitialSetupCompleted)
+				{
+					var frm = new frmChooseFirstTimeOcrSettings();
+					frm.ShowDialog(topForm);
+				}
+
 	            return true;
             }
 
@@ -1155,8 +1162,18 @@ namespace Tangra.VideoOperations.LightCurves
 		{
 			m_TimestampOCR = null;
 
-			if (TangraConfig.Settings.Generic.OsdOcrEnabled && m_VideoController.IsPlainAviVideo)
+			if (m_VideoController.IsPlainAviVideo &&
+				(TangraConfig.Settings.Generic.OsdOcrEnabled || TangraConfig.Settings.Generic.OcrAskEveryTime))
 			{
+				if (TangraConfig.Settings.Generic.OcrAskEveryTime)
+				{
+					var frm = new frmChooseOcrEngine();
+					frm.StartPosition = FormStartPosition.CenterParent;
+					if (m_VideoController.ShowDialog(frm) == DialogResult.Cancel ||
+						!TangraConfig.Settings.Generic.OsdOcrEnabled)
+						return;
+				}
+
 				m_TimestampOCR = OcrExtensionManager.GetCurrentOCR();
 
 				if (m_TimestampOCR != null)

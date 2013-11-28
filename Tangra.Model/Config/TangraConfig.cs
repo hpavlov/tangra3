@@ -518,6 +518,9 @@ namespace Tangra.Model.Config
 
 			public bool OsdOcrEnabled = true;
 			public string OcrEngine = "IOTA-VTI";
+			public bool OcrAskEveryTime = false;
+			public bool OcrInitialSetupCompleted = false;
+
 			public int MaxCalibrationFieldsToAttempt = 25;
 
             public IsolationLevel AddinIsolationLevel = IsolationLevel.AppDomain;

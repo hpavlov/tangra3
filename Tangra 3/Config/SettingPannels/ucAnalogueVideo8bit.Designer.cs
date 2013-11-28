@@ -38,6 +38,7 @@
 			this.cbxRenderingEngineAttemptOrder = new System.Windows.Forms.ComboBox();
 			this.nudSaturation8bit = new System.Windows.Forms.NumericUpDown();
 			this.label1 = new System.Windows.Forms.Label();
+			this.cbxOcrAskEveryTime = new System.Windows.Forms.CheckBox();
 			this.groupControl1.SuspendLayout();
 			this.pnlOsdOcr.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nudSaturation8bit)).BeginInit();
@@ -80,10 +81,11 @@
 			// 
 			// pnlOsdOcr
 			// 
+			this.pnlOsdOcr.Controls.Add(this.cbxOcrAskEveryTime);
 			this.pnlOsdOcr.Controls.Add(this.cbxOcrEngine);
 			this.pnlOsdOcr.Location = new System.Drawing.Point(6, 210);
 			this.pnlOsdOcr.Name = "pnlOsdOcr";
-			this.pnlOsdOcr.Size = new System.Drawing.Size(229, 52);
+			this.pnlOsdOcr.Size = new System.Drawing.Size(229, 79);
 			this.pnlOsdOcr.TabIndex = 52;
 			// 
 			// cbxOcrEngine
@@ -149,6 +151,16 @@
 			this.label1.TabIndex = 43;
 			this.label1.Text = "Saturation Level:";
 			// 
+			// cbxOcrAskEveryTime
+			// 
+			this.cbxOcrAskEveryTime.AutoSize = true;
+			this.cbxOcrAskEveryTime.Location = new System.Drawing.Point(27, 53);
+			this.cbxOcrAskEveryTime.Name = "cbxOcrAskEveryTime";
+			this.cbxOcrAskEveryTime.Size = new System.Drawing.Size(196, 17);
+			this.cbxOcrAskEveryTime.TabIndex = 44;
+			this.cbxOcrAskEveryTime.Text = "Ask me every time I process a video";
+			this.cbxOcrAskEveryTime.UseVisualStyleBackColor = true;
+			// 
 			// ucAnalogueVideo8bit
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -160,6 +172,7 @@
 			this.groupControl1.ResumeLayout(false);
 			this.groupControl1.PerformLayout();
 			this.pnlOsdOcr.ResumeLayout(false);
+			this.pnlOsdOcr.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nudSaturation8bit)).EndInit();
 			this.ResumeLayout(false);
 
@@ -177,5 +190,6 @@
 		private System.Windows.Forms.CheckBox cbxEnableOsdOcr;
 		private System.Windows.Forms.Panel pnlOsdOcr;
 		private System.Windows.Forms.ComboBox cbxOcrEngine;
+		private System.Windows.Forms.CheckBox cbxOcrAskEveryTime;
 	}
 }

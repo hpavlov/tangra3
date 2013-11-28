@@ -88,6 +88,12 @@
     <Compile Include="Addins\SettingsStorageProvider.cs" />
     <Compile Include="Addins\SingleMeasurement.cs" />
     <Compile Include="Addins\TangraHostDelegate.cs" />
+    <Compile Include="Config\frmChooseFirstTimeOcrSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Config\frmChooseFirstTimeOcrSettings.Designer.cs">
+      <DependentUpon>frmChooseFirstTimeOcrSettings.cs</DependentUpon>
+    </Compile>
     <Compile Include="Config\frmInstDelayConfigChooser.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -472,6 +478,9 @@
     <Compile Include="View\ZoomedImageView.cs" />
     <EmbeddedResource Include="Addins\frmConfirmIntegrationRate.resx">
       <DependentUpon>frmConfirmIntegrationRate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Config\frmChooseFirstTimeOcrSettings.resx">
+      <DependentUpon>frmChooseFirstTimeOcrSettings.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Config\frmInstDelayConfigChooser.resx">
       <DependentUpon>frmInstDelayConfigChooser.cs</DependentUpon>
