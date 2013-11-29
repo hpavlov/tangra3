@@ -142,6 +142,13 @@ namespace Tangra.OCR
 			}
 
             m_LatestFrameImage = data;
+
+			// TODO: Determine the max noise chink part to be removed as 60% of the pixels in "1".
+			//       This will likely be emperical value derived from the block width/height
+	        int maxNoiseChunkPixels = 15;
+
+			LargeChunkDenoiser.Process(m_OddFieldPixelsPreProcessed, m_InitializationData.FrameWidth, m_FieldAreaHeight, 0, 255, maxNoiseChunkPixels);
+			LargeChunkDenoiser.Process(m_EvenFieldPixelsPreProcessed, m_InitializationData.FrameWidth, m_FieldAreaHeight, 0, 255, maxNoiseChunkPixels);
         }
 
 

@@ -31,6 +31,15 @@ namespace Tangra.OccultTools
 	    private static MethodInfo AOTA_RunAOTAEx;
 		private static MethodInfo AOTA_InitialiseAOTA;
 	    private static MethodInfo AOTA_CloseAOTA;
+		private static PropertyInfo AOTA_ResultsCamera;
+		private static PropertyInfo AOTA_ResultsForEvent1;
+		private static PropertyInfo AOTA_ResultsForEvent2;
+		private static PropertyInfo AOTA_ResultsForEvent3;
+		private static PropertyInfo AOTA_ResultsForEvent4;
+		private static PropertyInfo AOTA_ResultsForEvent5;
+		private static PropertyInfo AOTA_ResultsReport;
+		private static PropertyInfo AOTA_IsMiss;
+		private static PropertyInfo AOTA_ResultsAreAvailable;
 
 		private static BindingFlags OccultBindingFlags;
 
@@ -101,20 +110,30 @@ namespace Tangra.OccultTools
                 //public bool RunAOTA(IWin32Window parentWindow, int FirstFrame, int FramesInIntegration)    
                 AOTA_RunAOTAEx = TYPE_AOTA_ExternalAccess.GetMethod("RunAOTA", new Type[] { typeof(IWin32Window), typeof(int), typeof(int) });
 				//public void InitialiseAOTA()
-				AOTA_InitialiseAOTA = TYPE_AOTA_ExternalAccess.GetMethod("InitialiseAOTA");
+				AOTA_InitialiseAOTA = TYPE_AOTA_ExternalAccess.GetMethod("InitialiseAOTA", new Type[] { typeof(string)});
                 //public void CloseAOTA()
                 AOTA_CloseAOTA = TYPE_AOTA_ExternalAccess.GetMethod("CloseAOTA");
+
+				AOTA_ResultsCamera = TYPE_AOTA_ExternalAccess.GetProperty("Results_Camera");
+				AOTA_ResultsForEvent1 = TYPE_AOTA_ExternalAccess.GetProperty("ResultsForEvent1");
+				AOTA_ResultsForEvent2 = TYPE_AOTA_ExternalAccess.GetProperty("ResultsForEvent2");
+				AOTA_ResultsForEvent3 = TYPE_AOTA_ExternalAccess.GetProperty("ResultsForEvent3");
+				AOTA_ResultsForEvent4 = TYPE_AOTA_ExternalAccess.GetProperty("ResultsForEvent4");
+				AOTA_ResultsForEvent5 = TYPE_AOTA_ExternalAccess.GetProperty("ResultsForEvent5");
+				AOTA_ResultsReport = TYPE_AOTA_ExternalAccess.GetProperty("ResultsReport");
+				AOTA_IsMiss = TYPE_AOTA_ExternalAccess.GetProperty("IsMiss");
+				AOTA_ResultsAreAvailable = TYPE_AOTA_ExternalAccess.GetProperty("ResultsAreAvailable");
 			}
 		}
 
-		internal static void RunAOTA(ILightCurveDataProvider dataProvider, IWin32Window parentWindow)
+		internal static AotaReturnValue RunAOTA(ILightCurveDataProvider dataProvider, IWin32Window parentWindow)
 		{
             try
             {
                 if (m_AotaInstance == null)
                     m_AotaInstance = Activator.CreateInstance(TYPE_AOTA_ExternalAccess);
 
-                AOTA_InitialiseAOTA.Invoke(m_AotaInstance, new object[] { });
+				AOTA_InitialiseAOTA.Invoke(m_AotaInstance, new object[] { dataProvider.FileName });
 
                 ISingleMeasurement[] measurements = dataProvider.GetTargetMeasurements();
 
@@ -147,12 +166,20 @@ namespace Tangra.OccultTools
                 }
 
                 AOTA_RunAOTAEx.Invoke(m_AotaInstance, new object[] { null /*parentWindow*/, 0, 1 });
+
+	            AotaReturnValue result = ReadAOTAResult();
+				result.IsMiss = (bool)AOTA_IsMiss.GetValue(m_AotaInstance, new object[] {} );
+				result.AreResultsAvailable = (bool)AOTA_ResultsAreAvailable.GetValue(m_AotaInstance, new object[] { });
+
+	            return result;
             }
             catch (Exception ex)
             {
                 Trace.WriteLine(ex.ToString());
                 MessageBox.Show(ex is TargetInvocationException ? ex.InnerException.Message : ex.Message, "AOTA Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+
+			return null;
 		}
 
         internal static void EnsureAOTAClosed()
@@ -161,8 +188,108 @@ namespace Tangra.OccultTools
             {
                 AOTA_CloseAOTA.Invoke(m_AotaInstance, new object[] { });
                 m_AotaInstance = null;
-            }
-            
+            }            
         }
+
+		public struct EventResults
+		{
+			public bool IsNonEvent;
+			public float D_Frame;
+			public float R_Frame;
+			public float D_FrameUncertPlus;
+			public float D_FrameUncertMinus;
+			public float R_FrameUncertPlus;
+			public float R_FrameUncertMinus;
+			public string D_UTC;
+			public string R_UTC;
+			public float D_DurationFrames;
+			public float R_DurationFrames;
+		}
+
+		public struct Camera
+		{
+			public string CameraType;
+			public string MeasuringTool;
+			public string VideoSystem;
+			public int FramesIntegrated;
+			public int MeasurementsBinned;
+			public bool MeasuredAtFieldLevel;
+			public bool TimeScaleFromMeasuringTool;
+		}
+
+		public class AotaReturnValue
+		{
+			public bool IsMiss;
+			public bool AreResultsAvailable;
+			public Camera CameraResult;
+			public EventResults[] EventResults;
+		}
+
+		internal static AotaReturnValue ReadAOTAResult()
+		{
+			var rv = new AotaReturnValue();
+
+			if (m_AotaInstance != null)
+			{
+				object cameraObj = AOTA_ResultsCamera.GetValue(m_AotaInstance, new object[] { });
+				object event1Obj = AOTA_ResultsForEvent1.GetValue(m_AotaInstance, new object[] { });
+				object event2Obj = AOTA_ResultsForEvent2.GetValue(m_AotaInstance, new object[] { });
+				object event3Obj = AOTA_ResultsForEvent3.GetValue(m_AotaInstance, new object[] { });
+				object event4Obj = AOTA_ResultsForEvent4.GetValue(m_AotaInstance, new object[] { });
+				object event5Obj = AOTA_ResultsForEvent5.GetValue(m_AotaInstance, new object[] { });
+
+				if (cameraObj != null)
+					ReflectionCopy(cameraObj, ref rv.CameraResult);
+
+				rv.EventResults = new EventResults[5];
+
+				if (event1Obj != null) ReflectionCopy(event1Obj, ref rv.EventResults[0]);
+				if (event2Obj != null) ReflectionCopy(event2Obj, ref rv.EventResults[1]);
+				if (event3Obj != null) ReflectionCopy(event3Obj, ref rv.EventResults[2]);
+				if (event4Obj != null) ReflectionCopy(event4Obj, ref rv.EventResults[3]);
+				if (event5Obj != null) ReflectionCopy(event5Obj, ref rv.EventResults[4]);
+			}
+
+			return rv;
+		}
+
+		private static void ReflectionCopy(object source, ref EventResults destination)
+		{
+			Type sourceType = source.GetType();
+
+			destination.IsNonEvent = (bool)GetReflectedFieldValue(sourceType, source, "IsNonEvent", false);
+			destination.D_Frame = (float)GetReflectedFieldValue(sourceType, source, "D_Frame", float.NaN);
+			destination.R_Frame = (float)GetReflectedFieldValue(sourceType, source, "R_Frame", float.NaN);
+			destination.D_FrameUncertPlus = (float)GetReflectedFieldValue(sourceType, source, "D_FrameUncertPlus", float.NaN);
+			destination.D_FrameUncertMinus = (float)GetReflectedFieldValue(sourceType, source, "D_FrameUncertMinus", float.NaN);
+			destination.R_FrameUncertPlus = (float)GetReflectedFieldValue(sourceType, source, "R_FrameUncertPlus", float.NaN);
+			destination.R_FrameUncertMinus = (float)GetReflectedFieldValue(sourceType, source, "R_FrameUncertMinus", float.NaN);
+			destination.D_UTC = (string)GetReflectedFieldValue(sourceType, source, "D_UTC", null);
+			destination.R_UTC = (string)GetReflectedFieldValue(sourceType, source, "R_UTC", null);
+			destination.D_DurationFrames = (float)GetReflectedFieldValue(sourceType, source, "D_DurationFrames", float.NaN);
+			destination.R_DurationFrames = (float)GetReflectedFieldValue(sourceType, source, "R_DurationFrames", float.NaN);
+		}
+
+		private static void ReflectionCopy(object source, ref Camera destination)
+		{
+			Type sourceType = source.GetType();
+
+			destination.CameraType = (string)GetReflectedFieldValue(sourceType, source, "CameraType", null);
+			destination.MeasuringTool = (string)GetReflectedFieldValue(sourceType, source, "MeasuringTool", null);
+			destination.VideoSystem = (string)GetReflectedFieldValue(sourceType, source, "VideoSystem", null);
+			destination.FramesIntegrated = (int)GetReflectedFieldValue(sourceType, source, "FramesIntegrated", 0);
+			destination.MeasurementsBinned = (int)GetReflectedFieldValue(sourceType, source, "MeasurementsBinned", 0);
+			destination.MeasuredAtFieldLevel = (bool)GetReflectedFieldValue(sourceType, source, "MeasuredAtFieldLevel", false);
+			destination.TimeScaleFromMeasuringTool = (bool)GetReflectedFieldValue(sourceType, source, "TimeScaleFromMeasuringTool", false);
+		}
+
+		private static object GetReflectedFieldValue(Type sourceType, object source, string fieldName, object defaultValue)
+		{
+			FieldInfo srcField = sourceType.GetField(fieldName);
+			if (srcField != null)
+				return srcField.GetValue(source);
+			else
+				return defaultValue;
+		}
 	}
 }

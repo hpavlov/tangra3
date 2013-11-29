@@ -1138,7 +1138,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 		string ILightCurveDataProvider.FileName
 		{
-			get { return m_LCFile.Header.PathToVideoFile; }
+			get { return File.Exists(m_LCFilePath) ? m_LCFilePath : m_LCFile.Header.PathToVideoFile; }
 		}
 
 		int ILightCurveDataProvider.NumberOfMeasuredComparisonObjects
@@ -1155,6 +1155,12 @@ namespace Tangra.VideoOperations.LightCurves
         {
             get { return m_CameraCorrectionsHaveBeenAppliedFlag; }
         }
+
+		void ILightCurveDataProvider.SetFoundOccultationEvent(int eventId, float dFrame, float rFrame, float dFrameErrorMinus, float dFrameErrorPlus, float rFrameErrorMinus, float rFrameErrorPlus)
+		{
+
+		}
+
 
 		private void GetAOTAStarIndexes(out int occultedStarIndex, out int comp1Index, out int comp2Index, out int comp3Index)
 		{

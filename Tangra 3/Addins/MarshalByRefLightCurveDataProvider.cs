@@ -17,8 +17,12 @@ namespace Tangra.Addins
 		private int m_IntegrationRate;
 		private int m_FirstIntegratingFrame;
 
+		private ILightCurveDataProvider m_DelegatedLocalProvider;
+
 		internal MarshalByRefLightCurveDataProvider(ILightCurveDataProvider localProvider)
 		{
+			m_DelegatedLocalProvider = localProvider;
+
 			FileName = localProvider.FileName;
 			NumberOfMeasuredComparisonObjects = localProvider.NumberOfMeasuredComparisonObjects;
             CameraCorrectionsHaveBeenApplied = localProvider.CameraCorrectionsHaveBeenApplied;
@@ -65,6 +69,18 @@ namespace Tangra.Addins
 		{
 			integrationRate = m_IntegrationRate;
 			firstIntegratingFrame = m_FirstIntegratingFrame;
+		}
+
+		public void SetFoundOccultationEvent(int eventId, float dFrame, float rFrame, float dFrameErrorMinus, float dFrameErrorPlus, float rFrameErrorMinus, float rFrameErrorPlus)
+		{
+			try
+			{
+				m_DelegatedLocalProvider.SetFoundOccultationEvent(eventId, dFrame, rFrame, dFrameErrorMinus, dFrameErrorPlus, rFrameErrorMinus, rFrameErrorPlus);
+			}
+			catch
+			{
+				
+			}
 		}
 	}
 }

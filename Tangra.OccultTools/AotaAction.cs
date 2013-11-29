@@ -54,10 +54,30 @@ namespace Tangra.OccultTools
 
 	        if (dataProvider != null)
 	        {
-	            if (OccultUtilitiesWrapper.HasSupportedVersionOfOccult(m_Settings.OccultLocation))
-	                OccultUtilitiesWrapper.RunAOTA(dataProvider, m_TangraHost.ParentWindow);
-	            else
-	                ShowIncompatibleOccultVersionErrorMessage();
+		        if (OccultUtilitiesWrapper.HasSupportedVersionOfOccult(m_Settings.OccultLocation))
+		        {
+					OccultUtilitiesWrapper.AotaReturnValue result = OccultUtilitiesWrapper.RunAOTA(dataProvider, m_TangraHost.ParentWindow);
+
+					if (result != null)
+					{
+						for (int i = 0; i < 5; i++)
+						{
+							if (!result.EventResults[i].IsNonEvent)
+							{
+								dataProvider.SetFoundOccultationEvent(
+									i,
+									result.EventResults[i].D_Frame,
+									result.EventResults[i].R_Frame,
+									result.EventResults[i].D_FrameUncertMinus,
+									result.EventResults[i].D_FrameUncertPlus,
+									result.EventResults[i].R_FrameUncertMinus,
+									result.EventResults[i].R_FrameUncertPlus);	
+							}
+						}
+					}			        
+		        }
+		        else
+			        ShowIncompatibleOccultVersionErrorMessage();
 	        }
 	    }
 

@@ -450,23 +450,37 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void miSave_Click(object sender, EventArgs e)
         {
-            if (saveFileDialog.ShowDialog(this) == DialogResult.OK)
-            {
-                Update();
-
-                Cursor = Cursors.WaitCursor;
-                try
-                {
-					LCFile.Save(saveFileDialog.FileName, m_Header, m_AllReadings, m_FrameTiming, m_Footer);
-
-                    m_LightCurveController.RegisterRecentFile(RecentFileType.LightCurve, saveFileDialog.FileName);
-                }
-                finally
-                {
-                    Cursor = Cursors.Default;    
-                }
-            }
+	        SaveLCFile();
         }
+
+		public bool EnsureLCFileSaved()
+		{
+			if (string.IsNullOrEmpty(m_LCFilePath) || !File.Exists(m_LCFilePath))
+				SaveLCFile();
+
+			return 
+				!string.IsNullOrEmpty(m_LCFilePath) && File.Exists(m_LCFilePath);
+		}
+
+		private void SaveLCFile()
+		{
+			if (saveFileDialog.ShowDialog(this) == DialogResult.OK)
+			{
+				Update();
+
+				Cursor = Cursors.WaitCursor;
+				try
+				{
+					LCFile.Save(saveFileDialog.FileName, m_Header, m_AllReadings, m_FrameTiming, m_Footer);
+					m_LCFilePath = saveFileDialog.FileName;
+					m_LightCurveController.RegisterRecentFile(RecentFileType.LightCurve, saveFileDialog.FileName);
+				}
+				finally
+				{
+					Cursor = Cursors.Default;
+				}
+			}			
+		}
 
         private void pnlChart_MouseClick(object sender, MouseEventArgs e)
         {

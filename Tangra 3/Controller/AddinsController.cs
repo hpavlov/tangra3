@@ -124,7 +124,17 @@ namespace Tangra.Controller
                 try
                 {
                     addinActonName = ((ITangraAddinAction) item.Tag).DisplayName;
-                    ((ITangraAddinAction) item.Tag).Execute();
+	                bool canExecuteAction = false;
+
+	                if (((ITangraAddinAction) item.Tag).ActionType == AddinActionType.LightCurve)
+	                {
+		                canExecuteAction = (m_LocalLightCurveDataProvider as frmLightCurve).EnsureLCFileSaved();
+	                }
+	                else
+		                canExecuteAction = true;
+
+					if (canExecuteAction)
+						((ITangraAddinAction) item.Tag).Execute();
                 }
                 catch (AppDomainUnloadedException)
                 { }

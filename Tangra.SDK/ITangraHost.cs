@@ -23,6 +23,7 @@ namespace Tangra.SDK
 		ISingleMeasurement[] GetTargetMeasurements();
 		ISingleMeasurement[] GetComparisonObjectMeasurements(int comparisonObjectId);
 		void GetIntegrationRateAndFirstFrame(out int integrationRate, out int firstIntegratingFrame);
+		void SetFoundOccultationEvent(int eventId, float dFrame, float rFrame, float dFrameErrorMinus, float dFrameErrorPlus, float rFrameErrorMinus, float rFrameErrorPlus);
 	}
 
 	public interface ITangraHost

@@ -48,6 +48,7 @@
     <Compile Include="IotaVtiOsdProcessor\IotaVtiOcrProcessor.cs" />
     <Compile Include="IotaVtiOsdProcessor\IotaVtiOcrState.cs" />
     <Compile Include="ITimestampOcr.cs" />
+    <Compile Include="LargeChunkDenoiser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TangraCore.cs" />
   </ItemGroup>
