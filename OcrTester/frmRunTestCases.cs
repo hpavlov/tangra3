@@ -123,7 +123,9 @@ namespace OcrTester
 
                 Pixelmap pix = Pixelmap.ConstructFromBitmap((Bitmap)Bitmap.FromFile(file), TangraConfig.ColourChannel.Red);
 
-                LargeChunkDenoiser.Process(pix.Pixels, pix.Width, pix.Height, 0, 255);
+                uint[] pixels = pix.Pixels;
+
+                LargeChunkDenoiser.Process(true, pixels, pix.Width, pix.Height);
 
                 Pixelmap pixExpected = Pixelmap.ConstructFromBitmap((Bitmap)Bitmap.FromFile(expectedResult), TangraConfig.ColourChannel.Red);
 

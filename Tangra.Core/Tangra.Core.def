@@ -72,3 +72,4 @@ EXPORTS
 	Convolution
 	PrepareImageForOCR
 	PrepareImageForOCRSingleStep
+	LargeChunkDenoise

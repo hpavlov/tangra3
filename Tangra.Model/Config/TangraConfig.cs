@@ -403,7 +403,7 @@ namespace Tangra.Model.Config
 
 		public class TuningSettings
 		{
-			public OCRMode OcrMode = OCRMode.FullyManaged;
+			public OCRMode OcrMode = OCRMode.Mixed;
 			public PSFFittingMode PsfMode = PSFFittingMode.NativeMatrixManagedFitting;
 		}
 

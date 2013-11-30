@@ -35,6 +35,7 @@ extern "C"
 DLL_PUBLIC HRESULT Convolution(unsigned long* data, long bpp, long width, long height, const double* convMatrix, bool cutEdges, bool calculateAverage, unsigned long* average);
 DLL_PUBLIC HRESULT PrepareImageForOCR(unsigned long* pixels, long bpp, long width, long height);
 DLL_PUBLIC HRESULT PrepareImageForOCRSingleStep(unsigned long* pixels, long bpp, long width, long height, long stepNo, unsigned long* average);
+DLL_PUBLIC HRESULT LargeChunkDenoise(unsigned long* pixels, long width, long height, unsigned long onColour, unsigned long offColour);
 
 #ifdef __cplusplus
 } // __cplusplus defined.

@@ -19,6 +19,9 @@ namespace Tangra.PInvoke
 		//HRESULT PrepareImageForOCRSingleStep(unsigned long* pixels, long bpp, long width, long height, long stepNo, unsigned long* average);
 		private static extern int PrepareImageForOCRSingleStep([In, Out] uint[] pixels, int bpp, int width, int height, int stepNo, [In, Out] ref uint average);
 
+        [DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+        //HRESULT LargeChunkDenoise(unsigned long* pixels, long width, long height, unsigned long onColour, unsigned long offColour);
+        private static extern int LargeChunkDenoise([In, Out] uint[] pixels, int width, int height, uint onColour, uint offColour);
 
 		public static void PrepareImageForOCR(uint[] pixelsIn, uint[] pixelsOut, int width, int height)
 		{
@@ -33,7 +36,11 @@ namespace Tangra.PInvoke
 
 			PrepareImageForOCRSingleStep(pixelsOut, 8, width, height, stepNo, ref average);
 		}
-	
+
+        public static void LargeChunkDenoise(uint[] pixels, int width, int height)
+        {
+            LargeChunkDenoise(pixels, width, height, 0, 255);
+        }
 	}
 
 }

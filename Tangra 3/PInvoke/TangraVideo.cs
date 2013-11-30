@@ -174,8 +174,16 @@ namespace Tangra.PInvoke
 			}
 			else
 			{
-				throw new InvalidOperationException();
-			}			
+                videoFrame = new Bitmap(100, 100);
+                using (Graphics g = Graphics.FromImage(videoFrame))
+                {
+                    g.Clear(Color.White);
+                    g.DrawString("Invalid file.", s_ErrorFont, Brushes.Red, 10, 10);
+                    g.Save();
+                }
+                bitmapBytes = new byte[100 * 100];
+                pixels = new uint[100 * 100];
+			}
 		}
 
 		public static void GetFramePixels(int frameNo, out uint[] pixels)
@@ -188,7 +196,7 @@ namespace Tangra.PInvoke
 			}
 			else
 			{
-				throw new InvalidOperationException();
+                pixels = new uint[100 * 100];
 			}	
 		}
 
@@ -209,7 +217,16 @@ namespace Tangra.PInvoke
 			}
 			else
 			{
-				throw new InvalidOperationException();
+                bitmap = new Bitmap(100, 100);
+                using (Graphics g = Graphics.FromImage(bitmap))
+                {
+                    g.Clear(Color.White);
+                    g.DrawString("Invalid file.", s_ErrorFont, Brushes.Red, 10, 10);
+                    g.Save();
+                }
+
+                bitmapBytes = new byte[100 * 100];
+                pixels = new uint[100 * 100];
 			}
 		}
 

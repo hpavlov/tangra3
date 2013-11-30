@@ -139,12 +139,12 @@ namespace Tangra.OCR
 				{
 					m_EvenFieldPixelsPreProcessed[i] = denoised[i] < 127 ? (uint)0 : (uint)255;
 				}
+
+                LargeChunkDenoiser.Process(false, m_OddFieldPixelsPreProcessed, m_InitializationData.FrameWidth, m_FieldAreaHeight);
+                LargeChunkDenoiser.Process(false, m_EvenFieldPixelsPreProcessed, m_InitializationData.FrameWidth, m_FieldAreaHeight);
 			}
 
             m_LatestFrameImage = data;
-
-			LargeChunkDenoiser.Process(m_OddFieldPixelsPreProcessed, m_InitializationData.FrameWidth, m_FieldAreaHeight, 0, 255);
-			LargeChunkDenoiser.Process(m_EvenFieldPixelsPreProcessed, m_InitializationData.FrameWidth, m_FieldAreaHeight, 0, 255);
         }
 
 

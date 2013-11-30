@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Tangra.PInvoke;
 
 namespace Tangra.OCR
 {
@@ -28,7 +29,15 @@ namespace Tangra.OCR
 			public Stack<int> ObjectPixelsPath;
 		}
 
-		public static void Process(uint[] pixels, int width, int height, uint onColour, uint offColour)
+        public static void Process(bool useNative, uint[] pixels, int width, int height)
+        {
+            if (useNative)
+                TangraCore.LargeChunkDenoise(pixels, width, height);
+            else
+                ProcessManaged(pixels, width, height, 0, 255);
+        }
+
+		private static void ProcessManaged(uint[] pixels, int width, int height, uint onColour, uint offColour)
 		{
             // The max noise chink part to be removed is 50% of the pixels in "1".
             // This value is determined experimentally and varied based on the area hight
