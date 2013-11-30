@@ -28,8 +28,13 @@ namespace Tangra.OCR
 			public Stack<int> ObjectPixelsPath;
 		}
 
-		public static void Process(uint[] pixels, int width, int height, uint onColour, uint offColour, int maxNoiseChunkPixels)
+		public static void Process(uint[] pixels, int width, int height, uint onColour, uint offColour)
 		{
+            // The max noise chink part to be removed is 50% of the pixels in "1".
+            // This value is determined experimentally and varied based on the area hight
+            // Block(22x16), AreaHeight(20) -> '1' is 70 pixels (50% = 35 pixels)
+            int maxNoiseChunkPixels = (int)Math.Round(35.0 * height / 20);
+
 			var context = new Context()
 			{
 				Pixels = pixels,
@@ -76,11 +81,14 @@ namespace Tangra.OCR
 
 		private static void CheckAndRemoveNoiseObjectAsNecessary(Context context, int firstPixel, int maxNoiseChunkPixels, uint offColour)
 		{
-			context.ObjectPixelsCount = -1;
+			context.ObjectPixelsCount = 0;
 			context.ObjectPixelsPath.Clear();
 			context.ObjectPixelsPath.Push(firstPixel);
 
 			int currPixel = firstPixel;
+
+            context.ObjectPixelsIndex[context.ObjectPixelsCount] = firstPixel;
+            context.ObjectPixelsCount++;
 
 			while (ProcessNoiseObjectPixel(context, ref currPixel))
 			{ }
@@ -109,15 +117,18 @@ namespace Tangra.OCR
 
 				if (y > 0)
 				{
-					if (context.CheckedPixels[nextPixel] == UNCHECKED && context.Pixels[nextPixel] == context.ColorOn)
+					if (context.CheckedPixels[nextPixel] == UNCHECKED)
 					{
-						context.ObjectPixelsPath.Push(nextPixel);
-						pixel = nextPixel;
-						context.ObjectPixelsCount++;
-						context.ObjectPixelsIndex[context.ObjectPixelsCount] = nextPixel;
+					    if (context.Pixels[nextPixel] == context.ColorOn)
+					    {
+					        context.ObjectPixelsPath.Push(nextPixel);
+					        pixel = nextPixel;
+					        context.ObjectPixelsIndex[context.ObjectPixelsCount] = nextPixel;
+					        context.ObjectPixelsCount++;
+					    }
+					    else
+					        context.CheckedPixels[nextPixel] = CHECKED;
 					}
-					else
-						context.CheckedPixels[nextPixel] = CHECKED;
 				}
 				
 				return true;
@@ -130,15 +141,18 @@ namespace Tangra.OCR
 
 				if (x > 0)
 				{
-					if (context.CheckedPixels[nextPixel] == UNCHECKED && context.Pixels[nextPixel] == context.ColorOn)
+					if (context.CheckedPixels[nextPixel] == UNCHECKED)
 					{
-						context.ObjectPixelsPath.Push(nextPixel);
-						pixel = nextPixel;
-						context.ObjectPixelsCount++;
-						context.ObjectPixelsIndex[context.ObjectPixelsCount] = nextPixel;				
+					    if (context.Pixels[nextPixel] == context.ColorOn)
+					    {
+					        context.ObjectPixelsPath.Push(nextPixel);
+					        pixel = nextPixel;
+					        context.ObjectPixelsIndex[context.ObjectPixelsCount] = nextPixel;
+					        context.ObjectPixelsCount++;
+					    }
+					    else
+					        context.CheckedPixels[nextPixel] = CHECKED;
 					}
-					else
-						context.CheckedPixels[nextPixel] = CHECKED;
 				}
 				
 				return true;
@@ -151,15 +165,18 @@ namespace Tangra.OCR
 
 				if (x < context.Width - 1)
 				{
-					if (context.CheckedPixels[nextPixel] == UNCHECKED && context.Pixels[nextPixel] == context.ColorOn)
+					if (context.CheckedPixels[nextPixel] == UNCHECKED)
 					{
-						context.ObjectPixelsPath.Push(nextPixel);
-						pixel = nextPixel;
-						context.ObjectPixelsCount++;
-						context.ObjectPixelsIndex[context.ObjectPixelsCount] = nextPixel;		
+					    if (context.Pixels[nextPixel] == context.ColorOn)
+					    {
+						    context.ObjectPixelsPath.Push(nextPixel);
+						    pixel = nextPixel;
+						    context.ObjectPixelsIndex[context.ObjectPixelsCount] = nextPixel;
+                            context.ObjectPixelsCount++;
+					    }
+					    else
+						    context.CheckedPixels[nextPixel] = CHECKED;
 					}
-					else
-						context.CheckedPixels[nextPixel] = CHECKED;
 				}
 			
 				return true;
@@ -172,15 +189,18 @@ namespace Tangra.OCR
 
 				if (y < context.Height - 1)
 				{
-					if (context.CheckedPixels[nextPixel] == UNCHECKED && context.Pixels[nextPixel] == context.ColorOn)
-					{
-						context.ObjectPixelsPath.Push(nextPixel);
-						pixel = nextPixel;
-						context.ObjectPixelsCount++;
-						context.ObjectPixelsIndex[context.ObjectPixelsCount] = nextPixel;				
-					}
-					else
-						context.CheckedPixels[nextPixel] = CHECKED;
+					if (context.CheckedPixels[nextPixel] == UNCHECKED)
+                    {
+                        if (context.Pixels[nextPixel] == context.ColorOn)
+                        {
+                            context.ObjectPixelsPath.Push(nextPixel);
+                            pixel = nextPixel;
+                            context.ObjectPixelsIndex[context.ObjectPixelsCount] = nextPixel;
+                            context.ObjectPixelsCount++;
+                        }
+                        else
+                            context.CheckedPixels[nextPixel] = CHECKED;
+                    }
 				}
 
 				return true;
@@ -192,10 +212,13 @@ namespace Tangra.OCR
 
 				context.CheckedPixels[pixel] = CHECKED;
 
-				nextPixel = context.ObjectPixelsPath.Pop();
+                nextPixel = context.ObjectPixelsPath.Pop();
+
+                if (pixel == nextPixel && context.ObjectPixelsPath.Count > 0)
+				    nextPixel = context.ObjectPixelsPath.Pop();
 
 				pixel = nextPixel;
-				return context.ObjectPixelsPath.Count > 0;
+				return true;
 			}
 			else
 				return false;

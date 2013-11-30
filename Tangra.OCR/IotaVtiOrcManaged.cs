@@ -121,7 +121,7 @@ namespace Tangra.OCR
 				for (int i = 0; i < m_EvenFieldPixels.Length; i++)
 				{
 					int darkCorrectedValue = (int)m_EvenFieldPixels[i] - (int)median;
-					if (darkCorrectedValue < 0) darkCorrectedValue = 0;
+				    if (darkCorrectedValue < 0) darkCorrectedValue = 0;
 					m_EvenFieldPixels[i] = (uint)darkCorrectedValue;
 				}
 				blurResult = BitmapFilter.GaussianBlur(m_EvenFieldPixels, 8, m_InitializationData.FrameWidth, m_FieldAreaHeight);
@@ -143,12 +143,8 @@ namespace Tangra.OCR
 
             m_LatestFrameImage = data;
 
-			// TODO: Determine the max noise chink part to be removed as 60% of the pixels in "1".
-			//       This will likely be emperical value derived from the block width/height
-	        int maxNoiseChunkPixels = 15;
-
-			LargeChunkDenoiser.Process(m_OddFieldPixelsPreProcessed, m_InitializationData.FrameWidth, m_FieldAreaHeight, 0, 255, maxNoiseChunkPixels);
-			LargeChunkDenoiser.Process(m_EvenFieldPixelsPreProcessed, m_InitializationData.FrameWidth, m_FieldAreaHeight, 0, 255, maxNoiseChunkPixels);
+			LargeChunkDenoiser.Process(m_OddFieldPixelsPreProcessed, m_InitializationData.FrameWidth, m_FieldAreaHeight, 0, 255);
+			LargeChunkDenoiser.Process(m_EvenFieldPixelsPreProcessed, m_InitializationData.FrameWidth, m_FieldAreaHeight, 0, 255);
         }
 
 

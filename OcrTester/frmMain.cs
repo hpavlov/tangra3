@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using OcrTester.IotaVtiOsdProcessor;
 using Tangra.Model.Config;
 using Tangra.Model.Image;
+using Tangra.OCR;
 
 namespace OcrTester
 {

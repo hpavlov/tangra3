@@ -440,7 +440,8 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 
 			if (!stateManager.IsTvSafeMode)
 				// In Non TV-Safe mode, make sure we are not trying to recognize the GPS Fix character, where 'P' can be mistaken for an '8'
-				distinctPositions.RemoveAll(x => x < stateManager.BlockWidth);
+                // to also allow for the GPS character to be slightly off screen we remove all chars that are with offset less than half a block
+				distinctPositions.RemoveAll(x => x < 0.5 * stateManager.BlockWidth);
 
 			while (distinctPositions.Count > 0)
 			{

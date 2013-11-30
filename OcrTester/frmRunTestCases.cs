@@ -25,17 +25,30 @@ namespace OcrTester
 
         private void frmRunTestCases_Shown(object sender, EventArgs e)
         {
-            string[] testCases = Directory.GetDirectories(Path.GetFullPath(@"..\..\AutomatedTestingImages"));
+            string noiseTestSource = Path.GetFullPath(@"..\..\AutomatedTestingImages\NoiseChunksRemoval\Source");
+            string noiseTestResults = Path.GetFullPath(@"..\..\AutomatedTestingImages\NoiseChunksRemoval\ExpectedResult");
+            bool hasNoiseTests = Directory.Exists(noiseTestSource) && Directory.Exists(noiseTestResults);
 
-            pbar.Maximum = pbarSuccess.Maximum = pbarError.Maximum =  testCases.Length * 2;
+            string[] testCases = Directory.GetDirectories(Path.GetFullPath(@"..\..\AutomatedTestingImages"), "0*");
+
+            pbar.Maximum = pbarSuccess.Maximum = pbarError.Maximum = testCases.Length * 2 + (hasNoiseTests ? 1 : 0);
             pbar.Minimum = pbarSuccess.Minimum = pbarError.Minimum = 0;
             pbar.Value = pbarSuccess.Value = pbarError.Value = 0;
-	        lbErrors.Items.Clear();
+
+            RunOCRTestCases(testCases);
+
+            if (hasNoiseTests)
+                RunNoiseChunkRemovalTestCases(noiseTestSource, noiseTestResults);
+        }
+
+        private void RunOCRTestCases(string[] testCases)
+        {
+            lbErrors.Items.Clear();
 
             foreach (string folder in testCases)
             {
-	            string folderNameOnly = Path.GetFileName(folder);
-	            bool isTvSafe = folderNameOnly.EndsWith("_tvsafe");
+                string folderNameOnly = Path.GetFileName(folder);
+                bool isTvSafe = folderNameOnly.EndsWith("_tvsafe");
                 bool[] REVERSE_OPTIONS = new bool[] { false, true };
 
                 for (int option = 0; option <= 1; option++)
@@ -45,9 +58,9 @@ namespace OcrTester
 
                     List<string> testFiles = TestCaseHelper.LoadTestImages(folder, REVERSE_OPTIONS[option]);
 
-					var ocrEngine = new IotaVtiOrcManaged();
-					bool isSuccess = false;
-					bool calibrated = false;
+                    var ocrEngine = new IotaVtiOrcManaged();
+                    bool isSuccess = false;
+                    bool calibrated = false;
                     bool digitsPlotted = false;
 
                     for (int i = 0; i < testFiles.Count; i++)
@@ -60,7 +73,7 @@ namespace OcrTester
                         Pixelmap pixelmapEven = Pixelmap.ConstructFromBitmap(bmpEven, TangraConfig.ColourChannel.Red);
 
                         if (!calibrated)
-							calibrated = ocrEngine.ProcessCalibrationFrame(i / 2, pixelmapOdd.Pixels, pixelmapEven.Pixels, bmpOdd.Width, bmpOdd.Height, isTvSafe);
+                            calibrated = ocrEngine.ProcessCalibrationFrame(i / 2, pixelmapOdd.Pixels, pixelmapEven.Pixels, bmpOdd.Width, bmpOdd.Height, isTvSafe);
 
                         if (calibrated)
                         {
@@ -79,22 +92,63 @@ namespace OcrTester
 
                     pbar.Value++;
 
-	                if (isSuccess)
-		                pbarSuccess.Value++;
-	                else
-	                {
-		                pbarError.Value++;
-						lbErrors.Items.Add(string.Format("{0}{1} - {2}", folderNameOnly, (option == 0 ? "" : " (Reversed)"), calibrated ? "Error extracting times" : " Failed to calibrate"));
-	                }
+                    if (isSuccess)
+                        pbarSuccess.Value++;
+                    else
+                    {
+                        pbarError.Value++;
+                        lbErrors.Items.Add(string.Format("{0}{1} - {2}", folderNameOnly, (option == 0 ? "" : " (Reversed)"), calibrated ? "Error extracting times" : " Failed to calibrate"));
+                    }
 
-	                lblError.Text = string.Format("Errored {0}/{1}", pbarError.Value, pbar.Value);
-					lblSuccessful.Text = string.Format("Successful {0}/{1}", pbarSuccess.Value, pbar.Value);
+                    lblError.Text = string.Format("Errored {0}/{1}", pbarError.Value, pbar.Value);
+                    lblSuccessful.Text = string.Format("Successful {0}/{1}", pbarSuccess.Value, pbar.Value);
 
-	                Application.DoEvents();
+                    Application.DoEvents();
                 }
             }
 
             lvlTestCaseDescription.Text = "";
+        }
+
+        public void RunNoiseChunkRemovalTestCases(string noiseTestSource, string noiseTestResults)
+        {
+            string[] testCases = Directory.GetFiles(noiseTestSource, "*.bmp");
+            bool hasErrors = false;
+            foreach (string file in testCases)
+            {
+                string expectedResult = Path.GetFullPath(noiseTestResults + "\\" + Path.GetFileName(file));
+
+                lvlTestCaseDescription.Text = string.Format("Test case NoiseChunksRemoval\\{0}", Path.GetFileName(file));
+                lvlTestCaseDescription.Update();
+
+                Pixelmap pix = Pixelmap.ConstructFromBitmap((Bitmap)Bitmap.FromFile(file), TangraConfig.ColourChannel.Red);
+
+                LargeChunkDenoiser.Process(pix.Pixels, pix.Width, pix.Height, 0, 255);
+
+                Pixelmap pixExpected = Pixelmap.ConstructFromBitmap((Bitmap)Bitmap.FromFile(expectedResult), TangraConfig.ColourChannel.Red);
+
+                for (int i = 0; i < pix.Pixels.Length; i++)
+                {
+                    if (pix.Pixels[i] != pixExpected.Pixels[i])
+                    {
+                        lbErrors.Items.Add(string.Format("NoiseChunk Removal Failed for {0}", Path.GetFileName(file)));
+                        hasErrors = true;
+                        break;
+                    }
+                }
+            }
+
+            pbar.Value++;
+
+            if (!hasErrors)
+                pbarSuccess.Value++;
+            else
+                pbarError.Value++;
+
+            lblError.Text = string.Format("Errored {0}/{1}", pbarError.Value, pbar.Value);
+            lblSuccessful.Text = string.Format("Successful {0}/{1}", pbarSuccess.Value, pbar.Value);
+
+            Application.DoEvents();
         }
 
         private void PlotDigitPatterns(IotaVtiOrcManaged ocrEngine)

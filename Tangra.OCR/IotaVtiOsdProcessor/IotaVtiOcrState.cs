@@ -94,11 +94,11 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 		public IotaVtiTimeStamp(IotaVtiTimeStampStrings timeStampStrings)
 		{
 			int.TryParse(timeStampStrings.NumSat + "", out NumSat);
-			Hours = int.Parse(timeStampStrings.HH);
-			Minutes = int.Parse(timeStampStrings.MM);
-			Seconds = int.Parse(timeStampStrings.SS);
-			Milliseconds10 = int.Parse(timeStampStrings.FFFF1.Length == 4 ? timeStampStrings.FFFF1 : timeStampStrings.FFFF2);
-			FrameNumber = int.Parse(timeStampStrings.FRAMENO);
+            int.TryParse(timeStampStrings.HH, out Hours);
+            int.TryParse(timeStampStrings.MM, out Minutes);
+            int.TryParse(timeStampStrings.SS, out Seconds);
+            int.TryParse(timeStampStrings.FFFF1.Length == 4 ? timeStampStrings.FFFF1 : timeStampStrings.FFFF2, out Milliseconds10);
+            int.TryParse(timeStampStrings.FRAMENO, out FrameNumber);
 		}
 
 		public IotaVtiTimeStamp(IotaVtiTimeStamp timeStamp)
