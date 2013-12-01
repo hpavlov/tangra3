@@ -926,6 +926,11 @@ namespace Tangra.VideoOperations.LightCurves
                     DrawColoredRectangle(tslblNormalisation, 3, true);
                     break;
             }
+
+            miNormalisation16DataPoints.Enabled = m_Context.Normalisation >= 0;
+            miNormalisation4DataPoints.Enabled = m_Context.Normalisation >= 0;
+            miNormalisation1DataPoints.Enabled = m_Context.Normalisation >= 0;
+            miNormalisationLinearFit.Enabled = m_Context.Normalisation >= 0;
             #endregion
 
             #region Binning
