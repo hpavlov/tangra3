@@ -59,9 +59,9 @@
 			this.rbOther.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
 			this.rbOther.Location = new System.Drawing.Point(43, 127);
 			this.rbOther.Name = "rbOther";
-			this.rbOther.Size = new System.Drawing.Size(286, 17);
+			this.rbOther.Size = new System.Drawing.Size(292, 17);
 			this.rbOther.TabIndex = 1;
-			this.rbOther.Text = "My video mostly use other video time inserters";
+			this.rbOther.Text = "My videos mostly use other video time inserters";
 			this.rbOther.UseVisualStyleBackColor = true;
 			// 
 			// rbMany

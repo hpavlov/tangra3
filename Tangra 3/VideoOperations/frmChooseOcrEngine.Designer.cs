@@ -35,12 +35,13 @@
 			this.cbxOcrAskEveryTime = new System.Windows.Forms.CheckBox();
 			this.cbxOcrEngine = new System.Windows.Forms.ComboBox();
 			this.cbxEnableOsdOcr = new System.Windows.Forms.CheckBox();
+			this.cbxForceErrorReport = new System.Windows.Forms.CheckBox();
 			this.pnlOsdOcr.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// btnOK
 			// 
-			this.btnOK.Location = new System.Drawing.Point(38, 141);
+			this.btnOK.Location = new System.Drawing.Point(29, 118);
 			this.btnOK.Name = "btnOK";
 			this.btnOK.Size = new System.Drawing.Size(75, 23);
 			this.btnOK.TabIndex = 50;
@@ -51,7 +52,7 @@
 			// btnCancel
 			// 
 			this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.btnCancel.Location = new System.Drawing.Point(127, 141);
+			this.btnCancel.Location = new System.Drawing.Point(127, 118);
 			this.btnCancel.Name = "btnCancel";
 			this.btnCancel.Size = new System.Drawing.Size(75, 23);
 			this.btnCancel.TabIndex = 51;
@@ -64,13 +65,13 @@
 			this.pnlOsdOcr.Controls.Add(this.cbxOcrEngine);
 			this.pnlOsdOcr.Location = new System.Drawing.Point(2, 35);
 			this.pnlOsdOcr.Name = "pnlOsdOcr";
-			this.pnlOsdOcr.Size = new System.Drawing.Size(229, 79);
+			this.pnlOsdOcr.Size = new System.Drawing.Size(229, 81);
 			this.pnlOsdOcr.TabIndex = 54;
 			// 
 			// cbxOcrAskEveryTime
 			// 
 			this.cbxOcrAskEveryTime.AutoSize = true;
-			this.cbxOcrAskEveryTime.Location = new System.Drawing.Point(27, 53);
+			this.cbxOcrAskEveryTime.Location = new System.Drawing.Point(27, 41);
 			this.cbxOcrAskEveryTime.Name = "cbxOcrAskEveryTime";
 			this.cbxOcrAskEveryTime.Size = new System.Drawing.Size(196, 17);
 			this.cbxOcrAskEveryTime.TabIndex = 44;
@@ -82,7 +83,7 @@
 			this.cbxOcrEngine.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.cbxOcrEngine.Items.AddRange(new object[] {
             "IOTA-VTI"});
-			this.cbxOcrEngine.Location = new System.Drawing.Point(27, 16);
+			this.cbxOcrEngine.Location = new System.Drawing.Point(27, 8);
 			this.cbxOcrEngine.Name = "cbxOcrEngine";
 			this.cbxOcrEngine.Size = new System.Drawing.Size(173, 21);
 			this.cbxOcrEngine.TabIndex = 51;
@@ -98,11 +99,22 @@
 			this.cbxEnableOsdOcr.UseVisualStyleBackColor = true;
 			this.cbxEnableOsdOcr.CheckedChanged += new System.EventHandler(this.cbxEnableOsdOcr_CheckedChanged);
 			// 
+			// cbxForceErrorReport
+			// 
+			this.cbxForceErrorReport.AutoSize = true;
+			this.cbxForceErrorReport.Location = new System.Drawing.Point(29, 95);
+			this.cbxForceErrorReport.Name = "cbxForceErrorReport";
+			this.cbxForceErrorReport.Size = new System.Drawing.Size(175, 17);
+			this.cbxForceErrorReport.TabIndex = 56;
+			this.cbxForceErrorReport.Text = "Force produce OCR error report";
+			this.cbxForceErrorReport.UseVisualStyleBackColor = true;
+			// 
 			// frmChooseOcrEngine
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(245, 179);
+			this.ClientSize = new System.Drawing.Size(245, 154);
+			this.Controls.Add(this.cbxForceErrorReport);
 			this.Controls.Add(this.pnlOsdOcr);
 			this.Controls.Add(this.cbxEnableOsdOcr);
 			this.Controls.Add(this.btnCancel);
@@ -113,6 +125,7 @@
 			this.MinimizeBox = false;
 			this.Name = "frmChooseOcrEngine";
 			this.Text = "OSD Timestamp Reader";
+			this.Load += new System.EventHandler(this.frmChooseOcrEngine_Load);
 			this.pnlOsdOcr.ResumeLayout(false);
 			this.pnlOsdOcr.PerformLayout();
 			this.ResumeLayout(false);
@@ -128,5 +141,6 @@
 		private System.Windows.Forms.CheckBox cbxOcrAskEveryTime;
 		private System.Windows.Forms.ComboBox cbxOcrEngine;
 		private System.Windows.Forms.CheckBox cbxEnableOsdOcr;
+		private System.Windows.Forms.CheckBox cbxForceErrorReport;
 	}
 }

@@ -25,7 +25,7 @@ namespace Tangra.OccultTools
 
 		public AddinActionType ActionType
 		{
-			get { return AddinActionType.LightCurve; }
+			get { return AddinActionType.LightCurveEventTimeExtractor; }
 		}
 
 		public IntPtr Icon
@@ -71,7 +71,9 @@ namespace Tangra.OccultTools
 									result.EventResults[i].D_FrameUncertMinus,
 									result.EventResults[i].D_FrameUncertPlus,
 									result.EventResults[i].R_FrameUncertMinus,
-									result.EventResults[i].R_FrameUncertPlus);	
+									result.EventResults[i].R_FrameUncertPlus,
+									result.EventResults[i].D_UTC,
+									result.EventResults[i].R_UTC);	
 							}
 						}
 					}			        

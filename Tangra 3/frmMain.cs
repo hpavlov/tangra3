@@ -359,7 +359,8 @@ namespace Tangra
         {
             if (TangraConfig.Settings.Generic.OnOpenOperation == TangraConfig.OnOpenOperation.StartLightCurveReduction)
             {
-				if (m_VideoController.ActivateOperation<ReduceLightCurveOperation>(m_LightCurveController))
+				
+				if (m_VideoController.ActivateOperation<ReduceLightCurveOperation>(m_LightCurveController, false))
 				{
 					m_VideoController.RefreshCurrentFrame();
 					return true;
@@ -657,11 +658,6 @@ namespace Tangra
         }
         #endregion
 
-        private void miReduceLightCurve_Click(object sender, EventArgs e)
-        {
-			m_VideoController.ActivateOperation<ReduceLightCurveOperation>(m_LightCurveController);
-        }
-
 		private void miFSTSFileViewer_Click(object sender, EventArgs e)
 		{
 			m_VideoController.ShowFSTSFileViewer();
@@ -825,5 +821,16 @@ namespace Tangra
         {
             m_AddinsController.FinaliseAddins();
         }
+
+		private void miReduceLightCurve_Click(object sender, EventArgs e)
+		{
+			// Done by MouseDown
+		}
+
+		private void miReduceLightCurve_MouseDown(object sender, MouseEventArgs e)
+		{
+			bool debugMode = e.Button == MouseButtons.Middle;
+			m_VideoController.ActivateOperation<ReduceLightCurveOperation>(m_LightCurveController, debugMode);
+		}
 	}
 }

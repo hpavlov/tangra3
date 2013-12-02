@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Text;
@@ -64,5 +65,10 @@ namespace Tangra.OccultTools
             DialogResult = DialogResult.OK;
             Close();
         }
+
+		private void llOccult4_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+		{
+			Process.Start("http://www.lunar-occultations.com/iota/occult4.htm");
+		}
     }
 }

@@ -146,6 +146,25 @@ If you think that your timestamp looks allright and you would like Tangra to be 
 
 If you would like me to contact you about this error then send me an email as well.</value>
   </data>
+  <data name="pictureBox2.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABgAAAAXCAYAAAARIY8tAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAs1JREFUSEvtlMtP
+        E1EYxUfDxgQVjURXPlkQYuKGkBgXrvFfMEY3mhg36gZD0EQMGkVNDNGFtpUKEbGlUCm25VWZ0te0dTp9
+        1xiE8pAokQIW+rAev8IsINMHJrow8SQnmZl7zvxm7sy9DP6y/gOK6rcAkcgHqFRqeAWveKW4Ng2YmfkM
+        09AwNGotdDojopNRcaSwNg0QfEGw+k7Mh9rBjyphsbmQTqfF0fzaFGAyGoUQHMeYQ45ly3Esj92DjQsj
+        GAqKifwqCkgmkzCZRiDYTQiZbuN1cyU+Ou7Dx7vQpzcgkUiIydwqCgiHI3C5fIjxj3Ht7DEwW/ag4cop
+        xGd6MGpxQhB8YjK3CgJSqRRYswV+txmZwF3UnakCs3Uv6i9WAvH7CHgdMBgGsLKyIjakKgjgeQ/8gQhm
+        nS1YGqxF3bmjYJhS1F8iwOJpJOc66O0EjLxjxYZUeQHZuX2rNyLs47DovomM+RAaLpTTGxxAc/0R4Mt2
+        gpxHOGiHWtWDeDwuNjcqL4BlzXDYbPjqbsH3IXpifwnuXN6J3fuqIXtYAcSoGitHYrEJVqsNRuOA2Nyo
+        nICFhQX09w/iE69Dyl6LlIliAoNxtoTWQhmmA9uAJbqWyNZPYiLah95ePebnY2s3WKecAKNxEO95P5aF
+        RqSHSwEHxUIMhl/uQuP1ajhG9gPpbJXGUEXT+QhulwfdGu1qf70kgKmpKahfdWCC76V5r0HKQBGOPM7g
+        1tUdOFxRA42qjJLZ6kHyCfINTE9zaH/RjujExi1EAtDp+hDwuGmeaJXOPqWP2UTH5B9N8Dmf0FMq8G3u
+        ASVbyJ1kPZnymEOYVnZ3VzcyPzN0viYJoK2tDZouNdhRO1irl0x7kIVsDoJz+uDhvbDaAvQT+MkCmSc7
+        YWateKPVQvZMVhjAcRyUSuVqUCFX5LbiucRymRytra2wWqzindYkAfxp/esA4BfeN/JhMWwHrgAAAABJ
+        RU5ErkJggg==
+</value>
+  </data>
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAABAAIAEBAQAAAABAAoAQAAJgAAACAgEAAAAAQA6AIAAE4BAAAoAAAAEAAAACAAAAABAAQAAAAAAIAA

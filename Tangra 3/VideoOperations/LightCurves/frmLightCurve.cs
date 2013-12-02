@@ -19,6 +19,7 @@ using Tangra.Model.Video;
 using Tangra.Resources;
 using Tangra.SDK;
 using Tangra.VideoOperations.LightCurves.InfoForms;
+using Tangra.VideoOperations.LightCurves.Report;
 using Tangra.VideoOperations.LightCurves.Tracking;
 
 
@@ -460,6 +461,45 @@ namespace Tangra.VideoOperations.LightCurves
 
 			return 
 				!string.IsNullOrEmpty(m_LCFilePath) && File.Exists(m_LCFilePath);
+		}
+
+		EventTimesReport m_EventTimesReport;
+
+		public bool PrepareForLightCurveEventTimeExtraction(string addinName)
+		{
+			m_EventTimesReport = null;
+
+			bool lcFileSaved = EnsureLCFileSaved();
+			if (lcFileSaved)
+			{
+				m_EventTimesReport = new EventTimesReport()
+				{
+					LcFilePath = m_LCFilePath,
+					VideoFilePath = m_LCFile.Header.PathToVideoFile,
+					SourceInfo = m_LCFile.Header.SourceInfo,
+					Provider = addinName,
+					TimingType = m_LCFile.Header.TimingType.ToString(),
+					HasEmbeddedTimeStamps = m_LCFile.Footer.ReductionContext.HasEmbeddedTimeStamps,
+					ReductionMethod = m_LCFile.Footer.ReductionContext.ReductionMethod.ToString(),
+					NoiseMethod = m_LCFile.Footer.ReductionContext.NoiseMethod.ToString(),
+					BitPix = m_LCFile.Footer.ReductionContext.BitPix,
+					CameraName = m_LCFile.Footer.CameraName,
+					AveragedFrameHeight = m_LCFile.Footer.AveragedFrameHeight,
+					AveragedFrameWidth = m_LCFile.Footer.AveragedFrameWidth
+				};
+			}
+
+			return lcFileSaved;
+		}
+
+		public void FinishedLightCurveEventTimeExtraction()
+		{
+			if (m_EventTimesReport != null)
+			{
+				m_EventTimesReport.SaveReport();
+				// TODO: Show a message 
+				m_EventTimesReport = null;
+			}
 		}
 
 		private void SaveLCFile()

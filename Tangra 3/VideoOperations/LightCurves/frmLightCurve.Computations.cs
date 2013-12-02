@@ -18,6 +18,7 @@ using Tangra.Model.Video;
 using Tangra.Model.VideoOperations;
 using Tangra.SDK;
 using Tangra.VideoOperations.LightCurves.InfoForms;
+using Tangra.VideoOperations.LightCurves.Report;
 using Tangra.VideoOperations.LightCurves.Tracking;
 
 
@@ -1156,11 +1157,45 @@ namespace Tangra.VideoOperations.LightCurves
             get { return m_CameraCorrectionsHaveBeenAppliedFlag; }
         }
 
-		void ILightCurveDataProvider.SetFoundOccultationEvent(int eventId, float dFrame, float rFrame, float dFrameErrorMinus, float dFrameErrorPlus, float rFrameErrorMinus, float rFrameErrorPlus)
+		void ILightCurveDataProvider.SetFoundOccultationEvent(int eventId, float dFrame, float rFrame, float dFrameErrorMinus, float dFrameErrorPlus, float rFrameErrorMinus, float rFrameErrorPlus, string dTime, string rTime)
 		{
+			if (m_EventTimesReport != null)
+			{
+				var evt = new OccultationEventInfo()
+				{
+					EventId = eventId,
+					DFrame = dFrame,
+					RFrame = rFrame,
+					DFrameErrorMinus = dFrameErrorMinus,
+					DFrameErrorPlus = dFrameErrorPlus,
+					RFrameErrorMinus = rFrameErrorMinus,
+					RFrameErrorPlus = rFrameErrorPlus,
+					DTimeString = dTime,
+					RTimeString = rTime
+				};
 
+				if (m_LCFile != null && m_LCFile.FrameTiming != null && m_LCFile.FrameTiming.Count > 0)
+				{
+					m_LCFile.Header.LcFile = m_LCFile;
+					DateTime DTimeFrom = m_LCFile.Header.GetTimeForFrameFromFrameTiming(dFrame + dFrameErrorMinus, true);
+					DateTime DTimeTo = m_LCFile.Header.GetTimeForFrameFromFrameTiming(dFrame + dFrameErrorPlus, true);
+
+					evt.DTime = new DateTime((DTimeFrom.Ticks + DTimeTo.Ticks) / 2);
+					evt.DTimeErrorMS = (int)Math.Round(new TimeSpan(DTimeTo.Ticks - DTimeFrom.Ticks).TotalMilliseconds / 2);
+
+					DateTime RTimeFrom = m_LCFile.Header.GetTimeForFrameFromFrameTiming(rFrame + rFrameErrorMinus, true);
+					DateTime RTimeTo = m_LCFile.Header.GetTimeForFrameFromFrameTiming(rFrame + rFrameErrorPlus, true);
+
+					evt.RTime = new DateTime((RTimeFrom.Ticks + RTimeTo.Ticks) / 2);
+					evt.RTimeErrorMS = (int)Math.Round(new TimeSpan(RTimeTo.Ticks - RTimeFrom.Ticks).TotalMilliseconds / 2);
+
+					evt.DTimeMostProbable = m_LCFile.Header.GetTimeForFrameFromFrameTiming(dFrame, true);
+					evt.RTimeMostProbable = m_LCFile.Header.GetTimeForFrameFromFrameTiming(rFrame, true);
+				}
+
+				m_EventTimesReport.Events.Add(evt);
+			}
 		}
-
 
 		private void GetAOTAStarIndexes(out int occultedStarIndex, out int comp1Index, out int comp2Index, out int comp3Index)
 		{

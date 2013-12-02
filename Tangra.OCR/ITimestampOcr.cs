@@ -15,6 +15,7 @@ namespace Tangra.OCR
         public Rectangle OSDFrame;
         public float VideoFrameRate;
         public string SourceInfo;
+	    public bool ForceErrorReport;
     }
 
     public interface ITimestampOcr
@@ -37,6 +38,6 @@ namespace Tangra.OCR
 		TimestampOCRData InitializationData { get; }
 	    void DrawLegend(Graphics graphics);
 
-        bool InitiazliationError { get; }
+        string InitiazliationError { get; }
     }
 }

@@ -35,6 +35,8 @@ namespace Tangra.VideoOperations
 			}
 		}
 
+		internal bool ForcedErrorReport;
+
 		public bool CanSendReport()
 		{
 			return Images != null && Images.Count > 0;
@@ -47,7 +49,28 @@ namespace Tangra.VideoOperations
 
 		private void frmOsdOcrCalibrationFailure_Load(object sender, EventArgs e)
 		{
-			lblOsdReaderType.Text = m_TimestampOCR.OSDType();
+			if (ForcedErrorReport)
+			{
+				pnlForcedReport.Top = 3;
+				pnlForcedReport.Left = 3;
+				pnlForcedReport.Visible = true;
+				pnlForcedReport.BringToFront();
+				pnlGenuineReport.Visible = false;
+				pnlGenuineReport.SendToBack();
+
+				lblOsdReaderType2.Text = m_TimestampOCR.OSDType();
+			}
+			else
+			{
+				pnlGenuineReport.Top = 3;
+				pnlGenuineReport.Left = 3;
+				pnlGenuineReport.Visible = true;
+				pnlGenuineReport.BringToFront();
+				pnlForcedReport.Visible = false;
+				pnlForcedReport.SendToBack();
+
+				lblOsdReaderType.Text = m_TimestampOCR.OSDType();
+			}
 		}
 
         private void EnableDisableFormControls(bool enable)
@@ -68,15 +91,27 @@ namespace Tangra.VideoOperations
 
 				int fieldAreaWidth = m_TimestampOCR.InitializationData.OSDFrame.Width;
 				int fieldAreaHeight = m_TimestampOCR.InitializationData.OSDFrame.Height;
+				int frameWidth = m_TimestampOCR.InitializationData.FrameWidth;
+				int frameHeight = m_TimestampOCR.InitializationData.FrameHeight;
 
 				foreach (string key in Images.Keys)
 				{
-					Bitmap img = Pixelmap.ConstructBitmapFromBitmapPixels(Images[key], fieldAreaWidth, fieldAreaHeight);
-					img.Save(Path.GetFullPath(string.Format(@"{0}\{1}", tempDir, key)), ImageFormat.Bmp);
+					uint[] pixels = Images[key];
+					Bitmap img = null;
+					if (pixels.Length == fieldAreaWidth*fieldAreaHeight)
+						img = Pixelmap.ConstructBitmapFromBitmapPixels(pixels, fieldAreaWidth, fieldAreaHeight);
+					else if (pixels.Length == frameWidth * frameHeight)
+						img = Pixelmap.ConstructBitmapFromBitmapPixels(pixels, frameWidth, frameHeight);
+
+					if (img != null)
+						img.Save(Path.GetFullPath(string.Format(@"{0}\{1}", tempDir, key)), ImageFormat.Bmp);						
 				}
 
-                Bitmap fullFrame = Pixelmap.ConstructBitmapFromBitmapPixels(LastUnmodifiedImage, m_TimestampOCR.InitializationData.FrameWidth, m_TimestampOCR.InitializationData.FrameHeight);
-                fullFrame.Save(Path.GetFullPath(string.Format(@"{0}\full-frame.bmp", tempDir)), ImageFormat.Bmp);
+				if (LastUnmodifiedImage != null)
+				{
+					Bitmap fullFrame = Pixelmap.ConstructBitmapFromBitmapPixels(LastUnmodifiedImage, frameWidth, frameHeight);
+					fullFrame.Save(Path.GetFullPath(string.Format(@"{0}\full-frame.bmp", tempDir)), ImageFormat.Bmp);					
+				}
 
 				ZipUnzip.Zip(tempDir, tempFile, false);
 				byte[] attachment = File.ReadAllBytes(tempFile);

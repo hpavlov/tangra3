@@ -17,6 +17,13 @@ namespace Tangra.VideoOperations
 {
 	public partial class frmChooseOcrEngine : Form
 	{
+		internal bool ShowForceErrorReportOption;
+
+		internal bool ForceErrorReport
+		{
+			get { return cbxForceErrorReport.Checked; }
+		}
+
 		public frmChooseOcrEngine()
 		{
 			InitializeComponent();
@@ -49,5 +56,10 @@ namespace Tangra.VideoOperations
 			pnlOsdOcr.Enabled = cbxEnableOsdOcr.Checked;
 		}
 
+		private void frmChooseOcrEngine_Load(object sender, EventArgs e)
+		{
+			cbxForceErrorReport.Visible = ShowForceErrorReportOption;
+			cbxForceErrorReport.Checked = ShowForceErrorReportOption;
+		}
 	}
 }

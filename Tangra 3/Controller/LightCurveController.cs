@@ -100,7 +100,7 @@ namespace Tangra.Controller
                 lcFile = LCFile.Load(fileName);
                 if (lcFile != null)
                 {
-					ReduceLightCurveOperation operation = (ReduceLightCurveOperation)m_VideoController.SetOperation<ReduceLightCurveOperation>(this);
+					ReduceLightCurveOperation operation = (ReduceLightCurveOperation)m_VideoController.SetOperation<ReduceLightCurveOperation>(this, false);
 
                     string videoFile = GetVideoFileMatchingLcFile(lcFile, fileName);
                     if (!string.IsNullOrEmpty(videoFile) &&

@@ -37,6 +37,7 @@ namespace Tangra.SDK
 	public enum AddinActionType
 	{
 		LightCurve,
+		LightCurveEventTimeExtractor,
 		Astrometry,
 		Generic
 	}

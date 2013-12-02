@@ -76,7 +76,8 @@ namespace Tangra.VideoOperations.LightCurves
 
         private string m_CameraName;
         private int m_AavFrameIntegration;
- 
+		private bool m_DebugMode;
+
         private LCState m_BackedUpSelectMeasuringStarsState = null;
 
         private MeasuringZoomImageType MeasuringZoomImageType = MeasuringZoomImageType.Stripe;
@@ -87,9 +88,10 @@ namespace Tangra.VideoOperations.LightCurves
 			Debug.Assert(false, "This constructor should not be called.");
 		}
 
-		public ReduceLightCurveOperation(LightCurveController lightCurveController)
+		public ReduceLightCurveOperation(LightCurveController lightCurveController, bool debugMode)
 		{
 			m_LightCurveController = lightCurveController;
+			m_DebugMode = debugMode;
 
             m_AllPens[0] = new Pen(TangraConfig.Settings.Color.Target1);
             m_AllPens[1] = new Pen(TangraConfig.Settings.Color.Target2);
@@ -1165,13 +1167,18 @@ namespace Tangra.VideoOperations.LightCurves
 			if (m_VideoController.IsPlainAviVideo &&
 				(TangraConfig.Settings.Generic.OsdOcrEnabled || TangraConfig.Settings.Generic.OcrAskEveryTime))
 			{
+				bool forceSaveErrorReport = false;
+
 				if (TangraConfig.Settings.Generic.OcrAskEveryTime)
 				{
 					var frm = new frmChooseOcrEngine();
 					frm.StartPosition = FormStartPosition.CenterParent;
+					frm.ShowForceErrorReportOption = m_DebugMode;
 					if (m_VideoController.ShowDialog(frm) == DialogResult.Cancel ||
 						!TangraConfig.Settings.Generic.OsdOcrEnabled)
 						return;
+
+					forceSaveErrorReport = frm.ForceErrorReport;
 				}
 
 				m_TimestampOCR = OcrExtensionManager.GetCurrentOCR();
@@ -1183,6 +1190,7 @@ namespace Tangra.VideoOperations.LightCurves
 					data.FrameHeight = TangraContext.Current.FrameHeight;
 					data.OSDFrame = LightCurveReductionContext.Instance.OSDFrame;
 					data.VideoFrameRate = (float)m_VideoController.VideoFrameRate;
+					data.ForceErrorReport = forceSaveErrorReport;
 
 					m_TimestampOCR.Initialize(data, m_VideoController, (int)TangraConfig.Settings.Tuning.OcrMode);
 					int maxCalibrationFieldsToAttempt = TangraConfig.Settings.Generic.MaxCalibrationFieldsToAttempt;
@@ -1192,57 +1200,64 @@ namespace Tangra.VideoOperations.LightCurves
                         Pixelmap frame = m_VideoController.GetFrame(m_VideoController.CurrentFrameIndex);
                         m_TimestampOCR.ProcessCalibrationFrame(m_VideoController.CurrentFrameIndex, frame.Pixels);
 
-                        if (m_TimestampOCR.InitiazliationError)
-                        {
-                            // This doesn't like like what the OCR engine is expecting. Abort ....
-                            m_TimestampOCR = null;
-                            return;
-                        }
+						bool isCalibrated = true;
 
-						int calibrationFramesProcessed = 0;
-						bool isCalibrated = false;
-						m_VideoController.StatusChanged("Calibrating OCR");
-						FileProgressManager.BeginFileOperation(maxCalibrationFieldsToAttempt);
-                        try
-                        {
-                            for (int i = m_VideoController.CurrentFrameIndex + 1; i < m_VideoController.VideoLastFrame; i++)
-                            {
-                                frame = m_VideoController.GetFrame(i);
-                                isCalibrated = m_TimestampOCR.ProcessCalibrationFrame(i, frame.Pixels);
+						if (m_TimestampOCR.InitiazliationError == null)
+						{
+							int calibrationFramesProcessed = 0;
+							m_VideoController.StatusChanged("Calibrating OCR");
+							FileProgressManager.BeginFileOperation(maxCalibrationFieldsToAttempt);
+							try
+							{
+								for (int i = m_VideoController.CurrentFrameIndex + 1; i < m_VideoController.VideoLastFrame; i++)
+								{
+									frame = m_VideoController.GetFrame(i);
+									isCalibrated = m_TimestampOCR.ProcessCalibrationFrame(i, frame.Pixels);
 
-                                if (m_TimestampOCR.InitiazliationError)
-                                {
-                                    // This doesn't like like what the OCR engine is expecting. Abort ....
-                                    m_TimestampOCR = null;
-                                    return;
-                                }
+									if (m_TimestampOCR.InitiazliationError != null)
+									{
+										// This doesn't like like what the OCR engine is expecting. Abort ....
+										m_TimestampOCR = null;
+										return;
+									}
 
-                                calibrationFramesProcessed++;
+									calibrationFramesProcessed++;
 
-                                FileProgressManager.FileOperationProgress(calibrationFramesProcessed);
+									FileProgressManager.FileOperationProgress(calibrationFramesProcessed);
 
-                                if (isCalibrated)
-                                    break;
+									if (isCalibrated)
+										break;
 
-                                if (calibrationFramesProcessed > maxCalibrationFieldsToAttempt)
-                                    break;
-                            }
-                        }
-                        finally
-                        {
-                            FileProgressManager.EndFileOperation();
-                        }
+									if (calibrationFramesProcessed > maxCalibrationFieldsToAttempt)
+										break;
+								}
+							}
+							finally
+							{
+								FileProgressManager.EndFileOperation();
+							}							
+						}
 
-						if (!isCalibrated)
+						if (forceSaveErrorReport || !isCalibrated)
 						{
 							var frmReport = new frmOsdOcrCalibrationFailure();
 							frmReport.StartPosition = FormStartPosition.CenterParent;
 							frmReport.TimestampOCR = m_TimestampOCR;
+							frmReport.ForcedErrorReport = forceSaveErrorReport;
 
 							if (frmReport.CanSendReport())
 								m_VideoController.ShowDialog(frmReport);
 
 							m_TimestampOCR = null;
+						}
+						else if (m_TimestampOCR.InitiazliationError != null)
+						{
+							if (m_TimestampOCR.InitiazliationError != null)
+								m_VideoController.ShowMessageBox(
+									m_TimestampOCR.InitiazliationError,
+									"Error reading OSD timestamp",
+									MessageBoxButtons.OK,
+									MessageBoxIcon.Error);
 						}
 					}
 				}
