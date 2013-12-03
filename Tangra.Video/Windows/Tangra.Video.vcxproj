@@ -28,7 +28,7 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -41,7 +41,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -70,7 +70,7 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(ProjectDir)$(Configuration)\</OutDir>
     <TargetName>TangraVideo</TargetName>
-    <IncludePath>D:\Program Files\Microsoft SDKs\Windows\v6.0\Include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Program Files\Microsoft SDKs\Windows\v6.0\Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -82,7 +82,7 @@
     <LinkIncremental>false</LinkIncremental>
     <TargetName>TangraVideo</TargetName>
     <OutDir>$(ProjectDir)$(Configuration)\</OutDir>
-    <IncludePath>D:\Program Files\Microsoft SDKs\Windows\v6.0\Include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Program Files\Microsoft SDKs\Windows\v6.0\Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -103,11 +103,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>Vfw32.lib;Strmiids.lib;TangraCoredll.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>TangraVideo.def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>.\lib\Debug;D:\Program Files\Microsoft SDKs\Windows\v6.0\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\lib\Debug;C:\Program Files\Microsoft SDKs\Windows\v6.0\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(TargetDir)TangraVideo.dll" "$(SolutionDir)Tangra 3\WindowsFiles" /y
-xcopy "$(ProjectDir)lib\$(Configuration)\TangraCore.dll" "$(SolutionDir)Tangra 3\WindowsFiles" /y</Command>
+      <Command>xcopy "$(TargetDir)TangraVideo.dll" "$(TargetDir)..\..\..\Tangra 3\WindowsFiles\$(Configuration)\" /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -140,19 +139,19 @@ xcopy "$(ProjectDir)lib\$(Configuration)\TangraCore.dll" "$(SolutionDir)Tangra 3
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;TANGRAVIDEO_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>./include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>.\lib\Release;D:\Program Files\Microsoft SDKs\Windows\v6.0\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <OptimizeReferences>false</OptimizeReferences>
+      <AdditionalLibraryDirectories>.\lib\Release;C:\Program Files\Microsoft SDKs\Windows\v6.0\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Vfw32.lib;Strmiids.lib;TangraCoredll.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>TangraVideo.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(TargetDir)TangraVideo.dll" "$(SolutionDir)Tangra 3\WindowsFiles" /y
-xcopy "$(ProjectDir)lib\$(Configuration)\TangraCore.dll" "$(SolutionDir)Tangra 3\WindowsFiles" /y</Command>
+      <Command>xcopy "$(TargetDir)TangraVideo.dll" "$(TargetDir)..\..\..\Tangra 3\WindowsFiles\$(Configuration)\" /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

@@ -5,11 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpFITS", "CSharpFITS\CS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangra 3.Windows", "Tangra 3\Tangra 3.Windows.csproj", "{A5DB96B1-35BE-47F8-AA30-FB223E637E35}"
 	ProjectSection(ProjectDependencies) = postProject
-		{A1F10749-934F-4AE1-BFDB-66A23D8C1393} = {A1F10749-934F-4AE1-BFDB-66A23D8C1393}
 		{93C93A99-D18F-495E-8AC9-6B6F6F7F273E} = {93C93A99-D18F-495E-8AC9-6B6F6F7F273E}
 	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tangra.Video", "Tangra.Video\Windows\Tangra.Video.vcxproj", "{A1F10749-934F-4AE1-BFDB-66A23D8C1393}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangra.Model", "Tangra.Model\Tangra.Model.csproj", "{70BBC9A7-7DD9-4A4D-B972-6665C65875C6}"
 EndProject
@@ -103,29 +100,6 @@ Global
 		{A5DB96B1-35BE-47F8-AA30-FB223E637E35}.UnitTests|x64.Build.0 = Release|x64
 		{A5DB96B1-35BE-47F8-AA30-FB223E637E35}.UnitTests|x86.ActiveCfg = Release|x86
 		{A5DB96B1-35BE-47F8-AA30-FB223E637E35}.UnitTests|x86.Build.0 = Release|x86
-		{A1F10749-934F-4AE1-BFDB-66A23D8C1393}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{A1F10749-934F-4AE1-BFDB-66A23D8C1393}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
-		{A1F10749-934F-4AE1-BFDB-66A23D8C1393}.Debug|x64.ActiveCfg = Debug|x64
-		{A1F10749-934F-4AE1-BFDB-66A23D8C1393}.Debug|x86.ActiveCfg = Debug|Win32
-		{A1F10749-934F-4AE1-BFDB-66A23D8C1393}.Production|Any CPU.ActiveCfg = Release|Win32
-		{A1F10749-934F-4AE1-BFDB-66A23D8C1393}.Production|Mixed Platforms.ActiveCfg = Release|Win32
-		{A1F10749-934F-4AE1-BFDB-66A23D8C1393}.Production|Mixed Platforms.Build.0 = Release|Win32
-		{A1F10749-934F-4AE1-BFDB-66A23D8C1393}.Production|x64.ActiveCfg = Release|x64
-		{A1F10749-934F-4AE1-BFDB-66A23D8C1393}.Production|x64.Build.0 = Release|x64
-		{A1F10749-934F-4AE1-BFDB-66A23D8C1393}.Production|x86.ActiveCfg = Release|Win32
-		{A1F10749-934F-4AE1-BFDB-66A23D8C1393}.Production|x86.Build.0 = Release|Win32
-		{A1F10749-934F-4AE1-BFDB-66A23D8C1393}.Release|Any CPU.ActiveCfg = Release|Win32
-		{A1F10749-934F-4AE1-BFDB-66A23D8C1393}.Release|Mixed Platforms.ActiveCfg = Release|Win32
-		{A1F10749-934F-4AE1-BFDB-66A23D8C1393}.Release|x64.ActiveCfg = Release|x64
-		{A1F10749-934F-4AE1-BFDB-66A23D8C1393}.Release|x64.Build.0 = Release|x64
-		{A1F10749-934F-4AE1-BFDB-66A23D8C1393}.Release|x86.ActiveCfg = Release|Win32
-		{A1F10749-934F-4AE1-BFDB-66A23D8C1393}.UnitTests|Any CPU.ActiveCfg = Release|Win32
-		{A1F10749-934F-4AE1-BFDB-66A23D8C1393}.UnitTests|Mixed Platforms.ActiveCfg = Release|Win32
-		{A1F10749-934F-4AE1-BFDB-66A23D8C1393}.UnitTests|Mixed Platforms.Build.0 = Release|Win32
-		{A1F10749-934F-4AE1-BFDB-66A23D8C1393}.UnitTests|x64.ActiveCfg = Release|x64
-		{A1F10749-934F-4AE1-BFDB-66A23D8C1393}.UnitTests|x64.Build.0 = Release|x64
-		{A1F10749-934F-4AE1-BFDB-66A23D8C1393}.UnitTests|x86.ActiveCfg = Release|Win32
-		{A1F10749-934F-4AE1-BFDB-66A23D8C1393}.UnitTests|x86.Build.0 = Release|Win32
 		{70BBC9A7-7DD9-4A4D-B972-6665C65875C6}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{70BBC9A7-7DD9-4A4D-B972-6665C65875C6}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
 		{70BBC9A7-7DD9-4A4D-B972-6665C65875C6}.Debug|Mixed Platforms.Build.0 = Debug|x86
