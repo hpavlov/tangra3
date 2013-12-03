@@ -49,6 +49,7 @@ _ReSharper.*
 /Tangra.Model/bin
 
 /Tangra.Video/Windows/Tangra.Video.vcxproj.user
+/Tangra.Video/Windows/Tangra.Video.sdf
 /Tangra.Video/Windows/Debug
 /Tangra.Video/Windows/Release
 
