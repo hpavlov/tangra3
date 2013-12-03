@@ -58,7 +58,8 @@ namespace Tangra.OccultTools
 		        {
 					OccultUtilitiesWrapper.AotaReturnValue result = OccultUtilitiesWrapper.RunAOTA(dataProvider, m_TangraHost.ParentWindow);
 
-					if (result != null)
+					if (result != null &&
+                        result.AreResultsAvailable)
 					{
 						for (int i = 0; i < 5; i++)
 						{
@@ -76,7 +77,7 @@ namespace Tangra.OccultTools
 									result.EventResults[i].R_UTC);	
 							}
 						}
-					}			        
+					}
 		        }
 		        else
 			        ShowIncompatibleOccultVersionErrorMessage();

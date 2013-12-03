@@ -1176,21 +1176,24 @@ namespace Tangra.VideoOperations.LightCurves
 
 				if (m_LCFile != null && m_LCFile.FrameTiming != null && m_LCFile.FrameTiming.Count > 0)
 				{
+                    // NOTE: For AOTA xx.0 is the beginning of the frame and xx.5 is the middle of the frame. 
+                    //       Tangra associates all frame times with the middle of the frame so we adjust the AOTA frames to Tangra frames by subtracting 0.5 below
+
 					m_LCFile.Header.LcFile = m_LCFile;
-					DateTime DTimeFrom = m_LCFile.Header.GetTimeForFrameFromFrameTiming(dFrame + dFrameErrorMinus, true);
-					DateTime DTimeTo = m_LCFile.Header.GetTimeForFrameFromFrameTiming(dFrame + dFrameErrorPlus, true);
+					DateTime DTimeFrom = m_LCFile.Header.GetTimeForFrameFromFrameTiming(dFrame - 0.5 + dFrameErrorMinus, true);
+                    DateTime DTimeTo = m_LCFile.Header.GetTimeForFrameFromFrameTiming(dFrame - 0.5 + dFrameErrorPlus, true);
 
 					evt.DTime = new DateTime((DTimeFrom.Ticks + DTimeTo.Ticks) / 2);
 					evt.DTimeErrorMS = (int)Math.Round(new TimeSpan(DTimeTo.Ticks - DTimeFrom.Ticks).TotalMilliseconds / 2);
 
-					DateTime RTimeFrom = m_LCFile.Header.GetTimeForFrameFromFrameTiming(rFrame + rFrameErrorMinus, true);
-					DateTime RTimeTo = m_LCFile.Header.GetTimeForFrameFromFrameTiming(rFrame + rFrameErrorPlus, true);
+                    DateTime RTimeFrom = m_LCFile.Header.GetTimeForFrameFromFrameTiming(rFrame - 0.5 + rFrameErrorMinus, true);
+                    DateTime RTimeTo = m_LCFile.Header.GetTimeForFrameFromFrameTiming(rFrame - 0.5 + rFrameErrorPlus, true);
 
 					evt.RTime = new DateTime((RTimeFrom.Ticks + RTimeTo.Ticks) / 2);
 					evt.RTimeErrorMS = (int)Math.Round(new TimeSpan(RTimeTo.Ticks - RTimeFrom.Ticks).TotalMilliseconds / 2);
 
-					evt.DTimeMostProbable = m_LCFile.Header.GetTimeForFrameFromFrameTiming(dFrame, true);
-					evt.RTimeMostProbable = m_LCFile.Header.GetTimeForFrameFromFrameTiming(rFrame, true);
+                    evt.DTimeMostProbable = m_LCFile.Header.GetTimeForFrameFromFrameTiming(dFrame - 0.5, true);
+                    evt.RTimeMostProbable = m_LCFile.Header.GetTimeForFrameFromFrameTiming(rFrame - 0.5, true);
 				}
 
 				m_EventTimesReport.Events.Add(evt);

@@ -969,8 +969,24 @@ namespace Tangra.VideoOperations.LightCurves
             else
                 return FirstTimedFrameTime;
         }
-		
-		internal DateTime GetTimeForFrameFromFrameTiming(double frameNo, bool interpolateMissingTimestamps)
+
+        internal DateTime GetTimeForFrameFromFrameTiming(double frameNo, bool interpolateMissingTimestamps)
+        {
+            if (Math.Abs((int) frameNo - frameNo) < 0.01)
+                return GetTimeForFrameFromFrameTiming((int)frameNo, interpolateMissingTimestamps);
+            else
+            {
+                int prev = (int)Math.Floor(frameNo);
+                int next = (int)Math.Ceiling(frameNo);
+
+                long prevTicks = GetTimeForFrameFromFrameTiming(prev, interpolateMissingTimestamps).Ticks;
+                long nextTicks = GetTimeForFrameFromFrameTiming(next, interpolateMissingTimestamps).Ticks;
+
+                return new DateTime(prevTicks + (long)Math.Round((frameNo - prev) * (nextTicks - prevTicks)));
+            }
+        }
+
+        internal DateTime GetTimeForFrameFromFrameTiming(int frameNo, bool interpolateMissingTimestamps)
 		{
 			DateTime rv;
 			int frameTimingIndex = (int) (frameNo - MinFrame);
