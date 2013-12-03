@@ -504,6 +504,8 @@ namespace Tangra.VideoOperations.LightCurves
 
 		private void SaveLCFile()
 		{
+		    m_LightCurveController.ConfigureSaveLcFileDialog(saveFileDialog);
+
 			if (saveFileDialog.ShowDialog(this) == DialogResult.OK)
 			{
 				Update();
@@ -1413,6 +1415,12 @@ namespace Tangra.VideoOperations.LightCurves
 
 		private void miExportTangraCSV_Click(object sender, EventArgs e)
 		{
+            if (!string.IsNullOrEmpty(m_LCFilePath) && File.Exists(m_LCFilePath))
+            {
+                saveCSVDialog.InitialDirectory = Path.GetDirectoryName(m_LCFilePath);
+                saveCSVDialog.FileName = Path.ChangeExtension(Path.GetFileName(m_LCFilePath), ".csv");
+            }
+
 			if (saveCSVDialog.ShowDialog() == DialogResult.OK)
 			{
 				if (ExportToCSV(saveCSVDialog.FileName))

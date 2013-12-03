@@ -1250,14 +1250,18 @@ namespace Tangra.VideoOperations.LightCurves
 
 							m_TimestampOCR = null;
 						}
-						else if (m_TimestampOCR.InitiazliationError != null)
+						else if (m_TimestampOCR != null)
 						{
-							if (m_TimestampOCR.InitiazliationError != null)
-								m_VideoController.ShowMessageBox(
-									m_TimestampOCR.InitiazliationError,
-									"Error reading OSD timestamp",
-									MessageBoxButtons.OK,
-									MessageBoxIcon.Error);
+						    if (m_TimestampOCR.InitiazliationError != null)
+						    {
+						        m_VideoController.ShowMessageBox(
+						            m_TimestampOCR.InitiazliationError,
+						            "Error reading OSD timestamp",
+						            MessageBoxButtons.OK,
+						            MessageBoxIcon.Error);
+
+                                m_TimestampOCR = null;
+						    }
 						}
 					}
 				}

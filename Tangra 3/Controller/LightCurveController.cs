@@ -218,5 +218,11 @@ namespace Tangra.Controller
 	    {
 		    get { return m_LightCurveForm != null ? m_LightCurveForm as IAddinContainer : null; }
 	    }
+
+        internal void ConfigureSaveLcFileDialog(SaveFileDialog saveFileDialog)
+        {
+            saveFileDialog.InitialDirectory = Path.GetDirectoryName(m_VideoController.CurrentVideoFileName);
+            saveFileDialog.FileName = Path.ChangeExtension(Path.GetFileName(m_VideoController.CurrentVideoFileName), ".lc");
+        }
     }
 }
