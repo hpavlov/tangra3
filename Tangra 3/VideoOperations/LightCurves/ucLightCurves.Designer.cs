@@ -56,6 +56,9 @@ namespace Tangra.VideoOperations.LightCurves
 			this.label1 = new System.Windows.Forms.Label();
 			this.lblUsedTrackerLabel = new System.Windows.Forms.Label();
 			this.pnlUserAction = new System.Windows.Forms.Panel();
+			this.btnAdjustApertures = new System.Windows.Forms.Button();
+			this.lblMeasurementType = new System.Windows.Forms.Label();
+			this.label10 = new System.Windows.Forms.Label();
 			this.btnAddObject = new System.Windows.Forms.Button();
 			this.btnEditObject = new System.Windows.Forms.Button();
 			this.btnStartOver = new System.Windows.Forms.Button();
@@ -85,8 +88,6 @@ namespace Tangra.VideoOperations.LightCurves
 			this.pnlViewLightCurve = new System.Windows.Forms.Panel();
 			this.timerMoveToFirstFrame = new System.Windows.Forms.Timer(this.components);
 			this.ucUtcTime = new Tangra.Model.Controls.ucUtcTimePicker();
-			this.lblMeasurementType = new System.Windows.Forms.Label();
-			this.label10 = new System.Windows.Forms.Label();
 			this.pnlProcessing.SuspendLayout();
 			this.pnlEnterTimes.SuspendLayout();
 			this.pnlMeasureZoomOptions.SuspendLayout();
@@ -338,6 +339,7 @@ namespace Tangra.VideoOperations.LightCurves
 			// 
 			// pnlUserAction
 			// 
+			this.pnlUserAction.Controls.Add(this.btnAdjustApertures);
 			this.pnlUserAction.Controls.Add(this.lblMeasurementType);
 			this.pnlUserAction.Controls.Add(this.label10);
 			this.pnlUserAction.Controls.Add(this.btnAddObject);
@@ -357,6 +359,32 @@ namespace Tangra.VideoOperations.LightCurves
 			this.pnlUserAction.Size = new System.Drawing.Size(249, 289);
 			this.pnlUserAction.TabIndex = 5;
 			this.pnlUserAction.Tag = "4,3";
+			// 
+			// btnAdjustApertures
+			// 
+			this.btnAdjustApertures.Location = new System.Drawing.Point(5, 136);
+			this.btnAdjustApertures.Name = "btnAdjustApertures";
+			this.btnAdjustApertures.Size = new System.Drawing.Size(171, 23);
+			this.btnAdjustApertures.TabIndex = 45;
+			this.btnAdjustApertures.Text = "Adjust Apertures";
+			this.btnAdjustApertures.Click += new System.EventHandler(this.btnAdjustApertures_Click);
+			// 
+			// lblMeasurementType
+			// 
+			this.lblMeasurementType.AutoSize = true;
+			this.lblMeasurementType.Location = new System.Drawing.Point(110, 237);
+			this.lblMeasurementType.Name = "lblMeasurementType";
+			this.lblMeasurementType.Size = new System.Drawing.Size(0, 13);
+			this.lblMeasurementType.TabIndex = 44;
+			// 
+			// label10
+			// 
+			this.label10.AutoSize = true;
+			this.label10.Location = new System.Drawing.Point(74, 237);
+			this.label10.Name = "label10";
+			this.label10.Size = new System.Drawing.Size(34, 13);
+			this.label10.TabIndex = 43;
+			this.label10.Text = "Type:";
 			// 
 			// btnAddObject
 			// 
@@ -626,23 +654,6 @@ namespace Tangra.VideoOperations.LightCurves
 			this.ucUtcTime.Size = new System.Drawing.Size(239, 26);
 			this.ucUtcTime.TabIndex = 30;
 			// 
-			// lblMeasurementType
-			// 
-			this.lblMeasurementType.AutoSize = true;
-			this.lblMeasurementType.Location = new System.Drawing.Point(110, 237);
-			this.lblMeasurementType.Name = "lblMeasurementType";
-			this.lblMeasurementType.Size = new System.Drawing.Size(0, 13);
-			this.lblMeasurementType.TabIndex = 44;
-			// 
-			// label10
-			// 
-			this.label10.AutoSize = true;
-			this.label10.Location = new System.Drawing.Point(74, 237);
-			this.label10.Name = "label10";
-			this.label10.Size = new System.Drawing.Size(34, 13);
-			this.label10.TabIndex = 43;
-			this.label10.Text = "Type:";
-			// 
 			// ucLightCurves
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -729,6 +740,7 @@ namespace Tangra.VideoOperations.LightCurves
         private System.Windows.Forms.RadioButton rbDisplayPSFs;
 		private System.Windows.Forms.Label lblMeasurementType;
 		private System.Windows.Forms.Label label10;
+		private System.Windows.Forms.Button btnAdjustApertures;
 
     }
 }

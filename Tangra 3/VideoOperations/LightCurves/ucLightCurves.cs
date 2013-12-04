@@ -17,6 +17,7 @@ using Tangra.Model.VideoOperations;
 using Tangra.Video;
 using Tangra.VideoOperations.LightCurves;
 using Tangra.Config;
+using Tangra.VideoOperations.LightCurves.AdjustApertures;
 using Tangra.VideoOperations.LightCurves.Tracking;
 using Tangra.ImageTools;
 
@@ -163,10 +164,14 @@ namespace Tangra.VideoOperations.LightCurves
                 if (m_StateMachine.MeasuringStars.Count == 0)
                 {
                     btnStart.Enabled = false;
+	                btnAdjustApertures.Visible = false;
+
                     lblInfo.Text =
                         "- Move to the first frame you want to measure\r\n" +
                         "- Select your first target\r\n" +
                         "- Press the 'Add Object' button";
+
+					lblInfo.BringToFront();
 
                     lblSignalMethod.Text = GetReductionMethodDisplayName(LightCurveReductionContext.Instance.ReductionMethod);
                     lblBackgroundMethod.Text = GetNoiseMethodDisplayName(LightCurveReductionContext.Instance.NoiseMethod);
@@ -181,6 +186,14 @@ namespace Tangra.VideoOperations.LightCurves
                     // We need an occulted star before we can start
                     btnStart.Enabled = m_StateMachine.MeasuringStars.Find(m => m.TrackingType == TrackingType.OccultedStar) != null;
                     TangraContext.Current.CanScrollFrames = false;
+
+					if (m_StateMachine.MeasuringStars.Count > 1)
+					{
+						btnAdjustApertures.Visible = true;
+						btnAdjustApertures.BringToFront();
+					}
+					else
+						btnAdjustApertures.Visible = false;					
                 }
 
                 btnAddObject.Visible =
@@ -720,6 +733,12 @@ namespace Tangra.VideoOperations.LightCurves
             else if (rbDisplayPSFs.Checked)
                 m_StateMachine.VideoOperation.SetMeasuringZoomImageType(MeasuringZoomImageType.PSF);
         }
+
+		private void btnAdjustApertures_Click(object sender, EventArgs e)
+		{
+			var controller = new AdjustAperturesController();
+			controller.AdjustApertures(this.ParentForm, m_DisplaySettings, m_StateMachine, m_VideoController);
+		}
 
     }
 }

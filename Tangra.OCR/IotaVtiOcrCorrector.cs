@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Tangra.Model.Config;
 using Tangra.OCR.IotaVtiOsdProcessor;
 
 namespace Tangra.OCR
@@ -121,7 +122,7 @@ namespace Tangra.OCR
 			string difference = XorStrings(expectedTimestampString, actualTimestampString);
 			long numberDifferences = difference.ToCharArray().Count(c => c != '\0');
 
-			if (numberDifferences == 1)
+			if (numberDifferences <= TangraConfig.Settings.Generic.OcrMaxNumberErrorsToAutoCorrect)
 			{
 				// We can correct the single offending character
 
@@ -132,7 +133,7 @@ namespace Tangra.OCR
 
 				return true;
 			}
-			else if (numberDifferences > 1)
+			else
 			{
 				// Cannot correct more than one differences. Why not??
 				return false;

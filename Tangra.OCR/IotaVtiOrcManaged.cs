@@ -69,8 +69,86 @@ namespace Tangra.OCR
 			
 		}
 
+		private void DebugPrepareOsdArea(uint[] dataIn, uint[] dataOut, int width, int height)
+		{
+			// NOTE: Because of different rounding in C++ and C# there may be a difference of "1" between pixels
+
+			uint[] nativeIn = new uint[dataIn.Length];
+			uint[] nativeOut = new uint[dataOut.Length];
+			uint nativeAverage = 0;
+
+			for (int i = 0; i < dataIn.Length; i++) nativeIn[i] = dataIn[i];
+
+			uint median = dataIn.Median();
+			for (int i = 0; i < dataIn.Length; i++)
+			{
+				int darkCorrectedValue = (int)dataIn[i] - (int)median;
+				if (darkCorrectedValue < 0) darkCorrectedValue = 0;
+				dataIn[i] = (uint)darkCorrectedValue;
+			}
+
+			TangraCore.PrepareImageForOCRSingleStep(nativeIn, nativeOut, width, height, 0, ref nativeAverage);
+			Trace.Assert(Math.Abs(median - nativeAverage) <= 1);
+			for (int i = 0; i < nativeOut.Length; i++) Trace.Assert(Math.Abs(nativeOut[i] - dataIn[i]) <= 1);
+
+			for (int i = 0; i < dataIn.Length; i++) nativeIn[i] = dataIn[i];
+
+			uint[] blurResult = BitmapFilter.GaussianBlur(dataIn, 8, width, height);
+
+			TangraCore.PrepareImageForOCRSingleStep(nativeIn, nativeOut, width, height, 1, ref nativeAverage);
+			for (int i = 0; i < nativeOut.Length; i++) Trace.Assert(Math.Abs(nativeOut[i] - blurResult[i]) <= 1);
+
+			for (int i = 0; i < blurResult.Length; i++) nativeIn[i] = blurResult[i];
+
+			uint average = 128;
+			uint[] sharpenResult = BitmapFilter.Sharpen(blurResult, 8, width, height, out average);
+
+			TangraCore.PrepareImageForOCRSingleStep(nativeIn, nativeOut, width, height, 2, ref nativeAverage);
+			Trace.Assert(Math.Abs(average - nativeAverage) <= 1);			
+			for (int i = 0; i < nativeOut.Length; i++) Trace.Assert(Math.Abs(nativeOut[i] - sharpenResult[i]) <= 1);
+
+
+			for (int i = 0; i < sharpenResult.Length; i++) nativeIn[i] = sharpenResult[i];
+			TangraCore.PrepareImageForOCRSingleStep(nativeIn, nativeOut, width, height, 3, ref nativeAverage);
+
+			// Binerize and Inverse
+			for (int i = 0; i < sharpenResult.Length; i++)
+			{
+				sharpenResult[i] = sharpenResult[i] > average ? (uint)0 : (uint)255;
+			}
+
+			for (int i = 0; i < nativeOut.Length; i++) Trace.Assert(Math.Abs(nativeOut[i] - sharpenResult[i]) <= 1);
+
+			for (int i = 0; i < sharpenResult.Length; i++) nativeIn[i] = sharpenResult[i];
+			TangraCore.PrepareImageForOCRSingleStep(nativeIn, nativeOut, width, height, 4, ref nativeAverage);
+			
+			uint[] denoised = BitmapFilter.Denoise(sharpenResult, 8, width, height, out average, false);
+
+			for (int i = 0; i < denoised.Length; i++) Trace.Assert(Math.Abs(nativeOut[i] - denoised[i]) <= 1);
+
+			for (int i = 0; i < denoised.Length; i++) nativeIn[i] = denoised[i];
+			TangraCore.PrepareImageForOCRSingleStep(nativeIn, nativeOut, width, height, 5, ref nativeAverage);
+			
+			for (int i = 0; i < denoised.Length; i++)
+			{
+				dataOut[i] = denoised[i] < 127 ? (uint)0 : (uint)255;
+			}
+
+			for (int i = 0; i < denoised.Length; i++) Trace.Assert(Math.Abs(nativeOut[i] - dataOut[i]) <= 1);
+
+
+			LargeChunkDenoiser.Process(false, dataOut, width, height);
+			LargeChunkDenoiser.Process(true, nativeOut, width, height);
+
+			for (int i = 0; i < dataOut.Length; i++) Trace.Assert(Math.Abs(nativeOut[i] - dataOut[i]) <= 1);
+			for (int i = 0; i < nativeOut.Length; i++) dataOut[i] = nativeOut[i];
+		}
+
 		private void PrepareOsdArea(uint[] dataIn, uint[] dataOut, int width, int height)
 		{
+			//DebugPrepareOsdArea(dataIn, dataOut, width, height);
+			//return;
+
 			// Split into fields only in the region where IOTA-VTI could be, Then threat as two separate images, and for each of them do:
 			// 1) Gaussian blur (small) BitmapFilter.LOW_PASS_FILTER_MATRIX
 			// 2) Sharpen BitmapFilter.SHARPEN_MATRIX

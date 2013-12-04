@@ -520,6 +520,7 @@ namespace Tangra.Model.Config
 			public string OcrEngine = "IOTA-VTI";
 			public bool OcrAskEveryTime = false;
 			public bool OcrInitialSetupCompleted = false;
+			public int OcrMaxNumberErrorsToAutoCorrect = 2;
 
 			public int MaxCalibrationFieldsToAttempt = 25;
 

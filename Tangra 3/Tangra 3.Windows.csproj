@@ -279,6 +279,8 @@
     <Compile Include="VideoOperations\frmOsdOcrCalibrationFailure.Designer.cs">
       <DependentUpon>frmOsdOcrCalibrationFailure.cs</DependentUpon>
     </Compile>
+    <Compile Include="VideoOperations\LightCurves\AdjustApertures\AdjustAperturesController.cs" />
+    <Compile Include="VideoOperations\LightCurves\AdjustApertures\AdjustAperturesViewModel.cs" />
     <Compile Include="VideoOperations\LightCurves\AveragedFrame.cs" />
     <Compile Include="VideoOperations\LightCurves\DisplayBitmapConverter.cs" />
     <Compile Include="VideoOperations\LightCurves\frmAddOrEditSingleTarget.cs">
@@ -286,6 +288,12 @@
     </Compile>
     <Compile Include="VideoOperations\LightCurves\frmAddOrEditSingleTarget.Designer.cs">
       <DependentUpon>frmAddOrEditSingleTarget.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\AdjustApertures\frmAdjustApertures.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\AdjustApertures\frmAdjustApertures.Designer.cs">
+      <DependentUpon>frmAdjustApertures.cs</DependentUpon>
     </Compile>
     <Compile Include="VideoOperations\LightCurves\frmConfigureReprocessing.cs">
       <SubType>Form</SubType>
@@ -570,6 +578,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\LightCurves\frmAddOrEditSingleTarget.resx">
       <DependentUpon>frmAddOrEditSingleTarget.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\AdjustApertures\frmAdjustApertures.resx">
+      <DependentUpon>frmAdjustApertures.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\LightCurves\frmConfigureReprocessing.resx">
       <DependentUpon>frmConfigureReprocessing.cs</DependentUpon>
