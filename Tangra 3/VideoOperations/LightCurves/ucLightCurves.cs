@@ -187,13 +187,13 @@ namespace Tangra.VideoOperations.LightCurves
                     btnStart.Enabled = m_StateMachine.MeasuringStars.Find(m => m.TrackingType == TrackingType.OccultedStar) != null;
                     TangraContext.Current.CanScrollFrames = false;
 
-					if (m_StateMachine.MeasuringStars.Count > 1)
+                    if (m_StateMachine.MeasuringStars.Count > 1 && !btnAdjustApertures.Visible)
 					{
 						btnAdjustApertures.Visible = true;
 						btnAdjustApertures.BringToFront();
 					}
-					else
-						btnAdjustApertures.Visible = false;					
+                    else if (m_StateMachine.MeasuringStars.Count < 2 && btnAdjustApertures.Visible)
+						btnAdjustApertures.Visible = false;
                 }
 
                 btnAddObject.Visible =
@@ -737,7 +737,10 @@ namespace Tangra.VideoOperations.LightCurves
 		private void btnAdjustApertures_Click(object sender, EventArgs e)
 		{
 			var controller = new AdjustAperturesController();
-			controller.AdjustApertures(this.ParentForm, m_DisplaySettings, m_StateMachine, m_VideoController);
+			if (controller.AdjustApertures(this.ParentForm, m_DisplaySettings, m_StateMachine, m_VideoController))
+			{
+			    m_VideoController.RedrawCurrentFrame(false);
+			}
 		}
 
     }

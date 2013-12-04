@@ -532,6 +532,34 @@ namespace Tangra.Model.Config
             public bool AdvancedLightCurveSettings = false;
             public PhotometryReductionMethod ReductionType = PhotometryReductionMethod.AperturePhotometry;
             public int MeasuringZoomImageMode = 0;
+
+            public List<SameSizeApertureConfig> SameSizeApertures = new List<SameSizeApertureConfig>();
+        }
+
+        public class SameSizeApertureConfig
+        {
+            public float Value;
+            public int ValueMode;
+            public int FwhmMode;
+
+            public override string ToString()
+            {
+                if (ValueMode == 0)
+                    return string.Format("{0} pixels", Value.ToString("0.0"));
+                else if (ValueMode == 1)
+                {
+                    if (FwhmMode == 0)
+                    {
+                        return string.Format("{0} FWHM of Largest Star", Value.ToString("0.0"));
+                    }
+                    else if (FwhmMode == 1)
+                    {
+                        return string.Format("{0} FWHM of Average Star", Value.ToString("0.0"));
+                    }
+                }
+
+                return "Invalid";
+            }
         }
 
 		public class Colors

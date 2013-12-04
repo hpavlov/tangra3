@@ -237,6 +237,11 @@
             // nudMinimumAnulusPixels
             // 
             this.nudMinimumAnulusPixels.Location = new System.Drawing.Point(169, 223);
+            this.nudMinimumAnulusPixels.Maximum = new decimal(new int[] {
+            500,
+            0,
+            0,
+            0});
             this.nudMinimumAnulusPixels.Name = "nudMinimumAnulusPixels";
             this.nudMinimumAnulusPixels.Size = new System.Drawing.Size(47, 20);
             this.nudMinimumAnulusPixels.TabIndex = 34;
