@@ -27,7 +27,8 @@ namespace Tangra.Config.SettingPannels
 
 			#region Configure the Reduction Settings. The same must be done in the frmConfigureReprocessing and frmSelectReductionType
 			// Removes the Background Gradient
-			cbxBackgroundMethod.Items.RemoveAt(2);
+			if (cbxBackgroundMethod.Items.Count == 5)
+				cbxBackgroundMethod.Items.RemoveAt(2);
 			#endregion
 
 			SetComboboxIndexFromBackgroundMethod(TangraConfig.Settings.Photometry.BackgroundMethodDefault);

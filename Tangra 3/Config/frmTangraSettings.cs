@@ -223,7 +223,7 @@ namespace Tangra.Config
 					this,
 					"Tangra settings have been reset.",
 					"Tangra",
-					MessageBoxButtons.YesNo,
+					MessageBoxButtons.OK,
 					MessageBoxIcon.Information);
 			}
 		}
