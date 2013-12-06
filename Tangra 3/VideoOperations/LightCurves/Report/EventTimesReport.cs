@@ -20,10 +20,61 @@ namespace Tangra.VideoOperations.LightCurves.Report
 		public string ReductionMethod { get; set; }
 		public string NoiseMethod { get; set; }
 		public int BitPix { get; set; }
+
+		/// <summary>
+		/// Flea3-03S1 with ADVS
+		/// Flea3-03S3 with ADVS
+		/// Flea3-28S4M with ADVS
+		/// Grasshopper Express with ADVS
+		/// G-Star
+		/// WAT120N
+		/// WAT120N+
+		/// WAT910HX
+		/// WAT910BD
+		/// Mintron 12V1C-EX
+		/// Samsung SCB-2000
+		/// PC165-DNR
+		/// LN-300-11673
+		/// KPC-350BH
+		/// PC164C
+		/// WAT902H
+		/// </summary>
 		public string CameraName { get; set; }
+
 		public int AveragedFrameHeight { get; set; }
 		public int AveragedFrameWidth { get; set; }
+		public bool IsThisAMiss { get; set; }
+		public DateTime? RecordedFromUT { get; set; }
+		public DateTime? RecordedToUT { get; set; }
+		public DateTime? AnalysedFromUT { get; set; }
+		public DateTime? AnalysedToUT { get; set; }
+		/// <summary>
+		/// ADV|AAV|AVI
+		/// </summary>
+		public string VideoFileFormat { get; set; }
+
+		/// <summary>
+		/// NTSC/EIA
+		/// PAL/CCIR
+		/// ADVS
+		/// AAV-NTSC
+		/// AAV-PAL
+		/// </summary>
+		public string VideoFormat { get; set; }
+
+		public double ExposureDuration { get; set; }
+		
+		/// <summary>
+		/// Fields
+		/// Frames
+		/// Seconds
+		/// </summary>
+		public string ExposureUnit { get; set; }
+		
+		public string InstrumentalDelaysApplied { get; set; }
 		public DateTime ReportTime { get; set; }
+
+
 
 		[XmlArrayItem("Event")]
 		public List<OccultationEventInfo> Events = new List<OccultationEventInfo>();

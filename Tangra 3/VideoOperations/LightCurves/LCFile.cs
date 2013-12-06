@@ -7,6 +7,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 using Tangra.Helpers;
@@ -961,6 +962,163 @@ namespace Tangra.VideoOperations.LightCurves
             return double.NaN;
         }
 
+	    private static Regex s_RegexSourceToFileFormat = new Regex("^.+\\((?<format>(ADV|AAV|AVI))\\..+\\).*$");
+		/// <summary>
+		/// AVI|AAV|ADV
+		/// </summary>
+		/// <returns></returns>
+		internal string GetVideoFileFormat()
+		{
+			if (SourceInfo != null)
+			{
+				Match match = s_RegexSourceToFileFormat.Match(SourceInfo);
+				if (match.Success &&
+					match.Groups["format"] != null &&
+					match.Groups["format"].Success)
+				{
+					return match.Groups["format"].Value;
+				}
+			}
+			return "";
+		}
+
+		/// <summary>
+		/// PAL|NTSC|Digital
+		/// </summary>
+		/// <returns></returns>
+		internal string GetVideoFormat(string videoFileFormat)
+		{
+			if (videoFileFormat == "ADV")
+				return "Digital";
+			if (videoFileFormat == "AAV" && LcFile != null)
+				return LcFile.Footer.AAVNativeVideoFormat;
+			else if (!double.IsNaN(ComputedFramesPerSecond))
+			{
+				if (Math.Abs(25 - ComputedFramesPerSecond) < 1)
+					return "PAL";
+				else if (Math.Abs(29.97 - ComputedFramesPerSecond) < 1)
+					return "NTSC";
+			}
+
+			return "";
+		}
+
+		public string GetInstrumentalDelaysApplied(string videoFileFormat)
+		{
+			if (videoFileFormat == "ADV")
+				return "NotRequired";
+			else if (videoFileFormat == "AAV")
+			{
+				if (LcFile != null && !string.IsNullOrEmpty(LcFile.Footer.InstrumentalDelayConfigName))
+					return "Yes";
+			}
+			
+			return "No";
+		}
+
+		internal void GetExposureModeAndDuration(string videoFileFormat, out double duration, out string mode)
+		{
+			duration = 0;
+			mode = null;
+
+			if (videoFileFormat == "ADV")
+			{
+				if (LcFile != null && LcFile.FrameTiming != null && LcFile.FrameTiming.Count > 1)
+				{
+					double exposureSec = LcFile.FrameTiming[1].FrameDurationInMilliseconds / 1000.0;
+					double fps = 1.0 / exposureSec;
+					double[] validFPS = new double[] { 30, 15, 7.5, 3.75, 1.875 };
+					for (int i = 0; i < validFPS.Length; i++)
+					{
+						if (Math.Abs(fps - validFPS[i]) < 0.1)
+						{
+							duration = validFPS[i];
+							mode = "FPS";
+							return;
+						}
+					}
+
+					double[] validSPF = new double[] { 1, 2, 3, 4, 6, 8 };
+					for (int i = 0; i < validSPF.Length; i++)
+					{
+						if (Math.Abs(exposureSec - validSPF[i]) < 0.1)
+						{
+							duration = validSPF[i];
+							mode = "Seconds";
+							return;
+						}
+					}
+				}
+			}
+			else if (videoFileFormat == "AAV")
+			{
+				if (LcFile != null)
+				{
+					duration = LcFile.Footer.AAVFrameIntegration;
+					mode = "Frames";
+				}
+			}
+			else
+			{
+				duration = 1;
+				mode = "Frames";
+			}
+		}
+
+		internal DateTime? GetVideoRecordStartTimeUT()
+		{
+			int frameId = FirstFrameInVideoFile;
+			return GetFrameTime(frameId);
+		}
+
+		internal DateTime? GetVideoRecordEndTimeUT()
+		{
+			int frameId = FirstFrameInVideoFile + CountFrames;
+			return GetFrameTime(frameId);
+		}
+
+		internal DateTime? GetFirstAnalysedFrameTimeUT()
+		{
+			return GetFrameTime(MinFrame);
+		}
+
+		internal DateTime? GetLastAnalysedFrameTimeUT()
+		{
+			return GetFrameTime(MaxFrame);
+		}
+
+		internal DateTime? GetFrameTime(double frameNo)
+		{
+			bool manuallyEnteredTimes = FirstTimedFrameTime != DateTime.MaxValue && FirstTimedFrameTime != DateTime.MinValue;
+			bool embeddedTimes = LcFile != null && LcFile.FrameTiming != null && LcFile.FrameTiming.Count > 1 /* need 2 frames to find the duration */;
+
+			int frameTimingIndex = (int)(frameNo - MinFrame);
+
+			if (embeddedTimes)
+			{				
+				long firstFrameTicks = LcFile.FrameTiming[(int) MinFrame].FrameMidTime.Ticks;
+				long secondFrameTicks = LcFile.FrameTiming[1 + (int)MinFrame].FrameMidTime.Ticks;
+				long frameDurationTicks = (secondFrameTicks - firstFrameTicks);
+
+				if (frameTimingIndex < 0)
+					return LcFile.FrameTiming[0].FrameMidTime.AddTicks(frameTimingIndex * frameDurationTicks);
+				else if (frameNo > MaxFrame)
+					return LcFile.FrameTiming[(int)MaxFrame - (int)MinFrame].FrameMidTime.AddTicks((int)(frameNo - MaxFrame) * frameDurationTicks);
+				else
+					return GetTimeForFrameFromFrameTiming(frameNo, true);
+			}
+			else if (manuallyEnteredTimes)
+			{
+				if (frameNo < FirstTimedFrameNo)
+					return FirstTimedFrameTime.AddMilliseconds((frameNo - FirstTimedFrameNo) * TotalTimeStapmedTime.TotalMilliseconds / (TimedFrames - 1));
+				else if (frameNo > LastTimedFrameNo)
+					return SecondTimedFrameTime.AddMilliseconds((frameNo - LastTimedFrameNo) * TotalTimeStapmedTime.TotalMilliseconds / (TimedFrames - 1));
+				else
+					return GetTimeForFrameFromManuallyEnteredTimes(frameNo);
+			}			
+			return null;
+		}
+
         internal DateTime GetTimeForFrameFromManuallyEnteredTimes(double frameNo)
         {
             if (TimedFrames > 1)
@@ -1246,7 +1404,7 @@ namespace Tangra.VideoOperations.LightCurves
 			TimingType = timingType;
 			LcFile = null;
 
-            FramesPerSecond = framesPerSecond;        	
+            FramesPerSecond = framesPerSecond;
         }
 
         internal LCMeasurementHeader(BinaryReader reader)
@@ -1292,6 +1450,7 @@ namespace Tangra.VideoOperations.LightCurves
 
             FirstTimedFrameNo = (int)MinFrame;
             LastTimedFrameNo = (int)MaxFrame;
+	        
             if (version > 1)
             {
                 FirstTimedFrameNo = reader.ReadInt32();
@@ -1370,7 +1529,7 @@ namespace Tangra.VideoOperations.LightCurves
     {
         public static LCMeasurementFooter Empty = new LCMeasurementFooter();
 
-        private static int SERIALIZATION_VERSION = 6;
+        private static int SERIALIZATION_VERSION = 7;
 
         internal byte[] AveragedFrameBytes;
     	internal int AveragedFrameWidth;
@@ -1387,7 +1546,8 @@ namespace Tangra.VideoOperations.LightCurves
 		internal string InstrumentalDelayConfigName;
 
         internal string CameraName;
-        internal int AAVFrameIntegration; 
+        internal int AAVFrameIntegration;
+		internal string AAVNativeVideoFormat; 
 
         internal LCMeasurementFooter(
 			Pixelmap averagedFrame, 
@@ -1400,6 +1560,7 @@ namespace Tangra.VideoOperations.LightCurves
 			Dictionary<int, float> instrumentalDelayConfig,
 			string instrumentalDelayConfigName,
             string cameraName,
+			string aavNativeVideoFormat,
             int aavFrameIntegration)
         {
 			AveragedFrameBytes = averagedFrame.DisplayBitmapPixels;
@@ -1418,6 +1579,7 @@ namespace Tangra.VideoOperations.LightCurves
 	        InstrumentalDelayConfigName = instrumentalDelayConfigName ?? string.Empty;
             CameraName = cameraName ?? string.Empty;
             AAVFrameIntegration = aavFrameIntegration;
+	        AAVNativeVideoFormat = aavNativeVideoFormat;
         }
 
         internal LCMeasurementFooter(BinaryReader reader)
@@ -1458,6 +1620,7 @@ namespace Tangra.VideoOperations.LightCurves
 	        InstrumentalDelayConfigName = string.Empty;
             CameraName = string.Empty;
             AAVFrameIntegration = -1;
+	        AAVNativeVideoFormat = string.Empty;
 
 			if (version > 1)
 			{
@@ -1493,6 +1656,11 @@ namespace Tangra.VideoOperations.LightCurves
                             {
                                 CameraName = reader.ReadString();
                                 AAVFrameIntegration = reader.ReadInt32();
+
+								if (version > 6)
+								{
+									AAVNativeVideoFormat = reader.ReadString();
+								}
                             }
 						}
 					}
@@ -1555,6 +1723,7 @@ namespace Tangra.VideoOperations.LightCurves
 
             writer.Write(CameraName);
             writer.Write(AAVFrameIntegration);
+	        writer.Write(AAVNativeVideoFormat);
         }
     }
 

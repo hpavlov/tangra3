@@ -131,7 +131,7 @@ namespace Tangra.Video
 
                 if (double.TryParse(GetFileTag("EFFECTIVE-FRAME-RATE"), out m_EffectiveFrameRate) && m_NativeFrameRate != 0)
                 {
-                    m_IntegratedAAVFrames = (int)Math.Round(m_EffectiveFrameRate / m_NativeFrameRate);
+					m_IntegratedAAVFrames = (int)Math.Round(m_NativeFrameRate / m_EffectiveFrameRate);
                 }
 			}
 			else

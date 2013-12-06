@@ -451,6 +451,7 @@ namespace Tangra.Controller
 				return 
 					!m_FramePlayer.IsAstroDigitalVideo && 
 					!m_FramePlayer.IsAstroAnalogueVideo && 
+					m_FramePlayer.Video.FileName != null &&
 					m_FramePlayer.Video.FileName.EndsWith(".AVI", StringComparison.InvariantCultureIgnoreCase);
 			}
 		}

@@ -1157,10 +1157,20 @@ namespace Tangra.VideoOperations.LightCurves
             get { return m_CameraCorrectionsHaveBeenAppliedFlag; }
         }
 
+		void ILightCurveDataProvider.SetNoOccultationEvents()
+		{
+			if (m_EventTimesReport != null)
+			{
+				m_EventTimesReport.IsThisAMiss = true;
+			}
+		}
+
 		void ILightCurveDataProvider.SetFoundOccultationEvent(int eventId, float dFrame, float rFrame, float dFrameErrorMinus, float dFrameErrorPlus, float rFrameErrorMinus, float rFrameErrorPlus, string dTime, string rTime)
 		{
 			if (m_EventTimesReport != null)
 			{
+				m_EventTimesReport.IsThisAMiss = false;
+
 				var evt = new OccultationEventInfo()
 				{
 					EventId = eventId,

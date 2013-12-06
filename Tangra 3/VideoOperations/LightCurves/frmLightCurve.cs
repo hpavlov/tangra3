@@ -472,6 +472,8 @@ namespace Tangra.VideoOperations.LightCurves
 			bool lcFileSaved = EnsureLCFileSaved();
 			if (lcFileSaved)
 			{
+				m_LCFile.Header.LcFile = m_LCFile;
+
 				m_EventTimesReport = new EventTimesReport()
 				{
 					LcFilePath = m_LCFilePath,
@@ -482,11 +484,30 @@ namespace Tangra.VideoOperations.LightCurves
 					HasEmbeddedTimeStamps = m_LCFile.Footer.ReductionContext.HasEmbeddedTimeStamps,
 					ReductionMethod = m_LCFile.Footer.ReductionContext.ReductionMethod.ToString(),
 					NoiseMethod = m_LCFile.Footer.ReductionContext.NoiseMethod.ToString(),
-					BitPix = m_LCFile.Footer.ReductionContext.BitPix,
-					CameraName = m_LCFile.Footer.CameraName,
+					BitPix = m_LCFile.Footer.ReductionContext.BitPix,					
 					AveragedFrameHeight = m_LCFile.Footer.AveragedFrameHeight,
-					AveragedFrameWidth = m_LCFile.Footer.AveragedFrameWidth
+					AveragedFrameWidth = m_LCFile.Footer.AveragedFrameWidth,
 				};
+
+				m_EventTimesReport.CameraName = m_LCFile.Footer.CameraName;
+				if (string.IsNullOrEmpty(m_EventTimesReport.CameraName))
+					m_EventTimesReport.CameraName = m_LCFile.Footer.InstrumentalDelayConfigName;
+
+				m_EventTimesReport.RecordedFromUT = m_LCFile.Header.GetVideoRecordStartTimeUT();
+				m_EventTimesReport.RecordedToUT = m_LCFile.Header.GetVideoRecordEndTimeUT();
+				m_EventTimesReport.AnalysedFromUT = m_LCFile.Header.GetFirstAnalysedFrameTimeUT();
+				m_EventTimesReport.AnalysedToUT = m_LCFile.Header.GetLastAnalysedFrameTimeUT();
+				
+				m_EventTimesReport.VideoFileFormat = m_LCFile.Header.GetVideoFileFormat();
+				m_EventTimesReport.VideoFormat = m_LCFile.Header.GetVideoFormat(m_EventTimesReport.VideoFileFormat);
+
+				double duration;
+				string mode;
+				m_LCFile.Header.GetExposureModeAndDuration(m_EventTimesReport.VideoFileFormat, out duration, out mode);
+				m_EventTimesReport.ExposureDuration = duration;
+				m_EventTimesReport.ExposureUnit = mode;
+
+				m_EventTimesReport.InstrumentalDelaysApplied = m_LCFile.Header.GetInstrumentalDelaysApplied(m_EventTimesReport.VideoFileFormat);
 			}
 
 			return lcFileSaved;

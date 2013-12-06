@@ -82,5 +82,17 @@ namespace Tangra.Addins
 				
 			}
 		}
+
+		public void SetNoOccultationEvents()
+		{
+			try
+			{
+				m_DelegatedLocalProvider.SetNoOccultationEvents();
+			}
+			catch
+			{
+
+			}			
+		}
 	}
 }

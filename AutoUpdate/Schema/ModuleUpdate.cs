@@ -69,20 +69,21 @@ namespace AutoUpdate.Schema
                     // this is why it must be downloaded i.e. a newer version is available
                     Trace.WriteLine(string.Format("Update required for '{0}': The file is not found locally", File));
                     return true;
-                }
-                else
-                {
-                    DateTime localModifiedDate = System.IO.File.GetLastWriteTime(fullLocalFileName);
-                    DateTime serverModifiedUTCDate = DateTime.Parse(m_Created, CultureInfo.InvariantCulture);
+                }				
+				else
+				{
+					DateTime localModifiedDate = System.IO.File.GetLastWriteTime(fullLocalFileName);
+					DateTime serverModifiedUTCDate = DateTime.Parse(m_Created, CultureInfo.InvariantCulture);
 
-                    if (localModifiedDate.ToUniversalTime().CompareTo(serverModifiedUTCDate) < 0)
-                    {
-                        Trace.WriteLine(string.Format("Update required for '{0}': local last modified: {1}; server last modified: {2}", File, localModifiedDate.ToUniversalTime(), serverModifiedUTCDate));
-                        return true;
-                    }
-                    else
-                        return false;
-                }
+					if (localModifiedDate.ToUniversalTime().CompareTo(serverModifiedUTCDate) < 0)
+					{
+						Trace.WriteLine(string.Format("Update required for '{0}': local last modified: {1}; server last modified: {2}",
+						                              File, localModifiedDate.ToUniversalTime(), serverModifiedUTCDate));
+						return true;
+					}
+					else
+						return false;
+				}
             }
             else
                 return base.NewUpdatesAvailable(tangra3Path);

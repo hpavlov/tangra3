@@ -287,12 +287,25 @@ namespace Tangra.VideoOperations.LightCurves
                 {
                     rbGuidingStar.Text = "Guiding Star";
 
-                    // There are no stars that are bright enough. Simply let the user do what they want
-                    m_X0 = 8;
-                    m_Y0 = 8;
-                    m_FWHM = 6;
-                    m_Gaussian = null;
+                    // There are no stars that are bright enough. Simply let the user do what they want, but still try to default to a sensible aperture size
+					MeasurementsHelper measurement = ReduceLightCurveOperation.DoConfiguredMeasurement(m_ProcessingPixels, gaussian, m_AstroImage.Pixelmap.BitPixCamera, 3.0, ref m_Aperture, ref matirxSize);
 
+	                if (measurement.FoundBestPSFFit != null &&
+	                    measurement.FoundBestPSFFit.IsSolved &&
+	                    measurement.FoundBestPSFFit.Certainty > 0.1)
+	                {
+		                m_X0 = measurement.XCenter;
+		                m_Y0 = measurement.YCenter;
+		                m_FWHM = (float) measurement.FoundBestPSFFit.FWHM;
+	                }
+	                else
+	                {
+		                m_X0 = 8;
+		                m_Y0 = 8;
+		                m_FWHM = 6;
+	                }
+
+	                m_Gaussian = null;
 					nudFitMatrixSize.SetNUDValue(11);
                 }
                 else if (m_AutoStarsInArea.Count == 1)

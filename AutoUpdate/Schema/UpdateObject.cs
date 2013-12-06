@@ -84,7 +84,26 @@ namespace AutoUpdate.Schema
             {
                 try
                 {
-                    string localFilePath = updater.UpdateFile(fileToUpdate, progress);
+	                string localFilePath;
+
+					if (fileToUpdate.Action == "DeleteIfExists")
+					{
+						localFilePath = updater.GetLocalFileName(fileToUpdate);
+						if (System.IO.File.Exists(localFilePath))
+						{
+							try
+							{
+								System.IO.File.Delete(localFilePath);
+							}
+							catch (Exception ex)
+							{
+								Trace.WriteLine(ex);
+							}
+						}
+						return;
+					}
+
+                    localFilePath = updater.UpdateFile(fileToUpdate, progress);
 
                     OnFileUpdated(fileToUpdate, localFilePath);
 

@@ -76,6 +76,7 @@ namespace Tangra.VideoOperations.LightCurves
 
         private string m_CameraName;
         private int m_AavFrameIntegration;
+	    private string m_AavNativeVideoFormat;
 		private bool m_DebugMode;
 
         private LCState m_BackedUpSelectMeasuringStarsState = null;
@@ -235,19 +236,6 @@ namespace Tangra.VideoOperations.LightCurves
 
 					if (m_TimestampOCR.RequiresConfiguring)
 						m_TimestampOCR.TryToAutoConfigure(osdPixels);
-
-					//if (m_TimestampOCR.RequiresCalibration)
-					//{
-					//	//frmOCRCalibrating frmCalibrating = new frmOCRCalibrating();
-					//	//frmCalibrating.ConfigureCalibration(m_Host.FramePlayer, m_TimestampOCR, frameNo);
-					//	//if (frmCalibrating.ShowDialog(m_Host.MainFormWindow) == DialogResult.Abort)
-					//	//{
-					//	//	// Couldn't do it. Cancel the OCR-ing
-					//	//	m_TimestampOCR = null;
-					//	//}
-					//	//OCRConfigEntry calibratedConfig = frmCalibrating.GetCalibConfig();
-					//	//m_TimestampOCR.AddConfiguration(osdPixels, calibratedConfig);
-					//}
 
 					if (!m_TimestampOCR.RequiresConfiguring)
 					{
@@ -1148,8 +1136,9 @@ namespace Tangra.VideoOperations.LightCurves
 
 			MeasuringStarted();
 
-            m_CameraName = m_VideoController.IsAstroDigitalVideo ? m_VideoController.AstroVideoCameraModel : string.Empty;
+			m_CameraName = m_VideoController.IsAstroDigitalVideo || m_VideoController.IsAstroAnalogueVideo ? m_VideoController.AstroVideoCameraModel : string.Empty;
             m_AavFrameIntegration = m_VideoController.IsAstroAnalogueVideo ? m_VideoController.AstroAnalogueVideoIntegratedAAVFrames : -1;
+			m_AavNativeVideoFormat = m_VideoController.IsAstroAnalogueVideo ? m_VideoController.AstroVideoNativeVideoStandard : string.Empty;
 
 			if (LightCurveReductionContext.Instance.DebugTracking)
 			{
@@ -1828,6 +1817,7 @@ namespace Tangra.VideoOperations.LightCurves
 				m_InstumentalDelaySelectedConfig,
 				m_InstumentalDelaySelectedCamera,
                 m_CameraName,
+				m_AavNativeVideoFormat,
                 m_AavFrameIntegration);
 
 			m_lcFile = LCFile.FlushOnTheFlyOutputFile(finalHeader, footer);

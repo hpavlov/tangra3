@@ -61,21 +61,28 @@ namespace Tangra.OccultTools
 					if (result != null &&
                         result.AreResultsAvailable)
 					{
-						for (int i = 0; i < 5; i++)
+						if (result.IsMiss)
 						{
-							if (!result.EventResults[i].IsNonEvent)
+							dataProvider.SetNoOccultationEvents();
+						}
+						else
+						{
+							for (int i = 0; i < 5; i++)
 							{
-								dataProvider.SetFoundOccultationEvent(
-									i,
-									result.EventResults[i].D_Frame,
-									result.EventResults[i].R_Frame,
-									result.EventResults[i].D_FrameUncertMinus,
-									result.EventResults[i].D_FrameUncertPlus,
-									result.EventResults[i].R_FrameUncertMinus,
-									result.EventResults[i].R_FrameUncertPlus,
-									result.EventResults[i].D_UTC,
-									result.EventResults[i].R_UTC);	
-							}
+								if (!result.EventResults[i].IsNonEvent)
+								{
+									dataProvider.SetFoundOccultationEvent(
+										i,
+										result.EventResults[i].D_Frame,
+										result.EventResults[i].R_Frame,
+										result.EventResults[i].D_FrameUncertMinus,
+										result.EventResults[i].D_FrameUncertPlus,
+										result.EventResults[i].R_FrameUncertMinus,
+										result.EventResults[i].R_FrameUncertPlus,
+										result.EventResults[i].D_UTC,
+										result.EventResults[i].R_UTC);
+								}
+							}							
 						}
 					}
 		        }
