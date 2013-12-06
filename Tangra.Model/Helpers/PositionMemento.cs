@@ -387,7 +387,7 @@ namespace Tangra.Model.Helpers
                     }
                     catch (Exception ex)
                     {
-                        Trace.WriteLine(ex.FullExceptionInfo());
+                        Trace.WriteLine(ex.GetFullStackTrace());
                         m_CacheReset = true;
                     }
                 }
@@ -419,7 +419,7 @@ namespace Tangra.Model.Helpers
                 }
                 catch (Exception ex)
                 {
-                    Trace.WriteLine(ex.FullExceptionInfo());
+                    Trace.WriteLine(ex.GetFullStackTrace());
 
                     if (File.Exists(cacheFile))
                         File.Delete(cacheFile);

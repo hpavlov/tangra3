@@ -259,7 +259,7 @@ namespace Tangra.Video
                 }
                 catch (Exception ex)
                 {
-                    Trace.WriteLine(ex.FullExceptionInfo());
+                    Trace.WriteLine(ex.GetFullStackTrace());
                     displayBitmap = new Bitmap(m_Width, m_Height);
                 }
 

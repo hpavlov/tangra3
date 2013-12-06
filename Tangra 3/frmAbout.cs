@@ -14,7 +14,7 @@ namespace Tangra
     {
         public frmAbout()
         {
-            InitializeComponent();        
+            InitializeComponent();
 
             this.Text = String.Format("About {0}", AssemblyTitle);			
 	        this.textBoxDescription.Text = AssemblyDescription;
@@ -40,7 +40,7 @@ namespace Tangra
             }
         }
 
-        public string AssemblyVersion
+        public static string AssemblyVersion
         {
             get
             {
@@ -48,7 +48,7 @@ namespace Tangra
             }
         }
 
-        public string AssemblyFileVersion
+        public static string AssemblyFileVersion
         {
             get
             {

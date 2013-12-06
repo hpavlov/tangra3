@@ -39,6 +39,7 @@ namespace Tangra.OccultTools
 		private static PropertyInfo AOTA_ResultsForEvent5;
 		private static PropertyInfo AOTA_ResultsReport;
 		private static PropertyInfo AOTA_IsMiss;
+        private static PropertyInfo AOTA_Version;
 		private static PropertyInfo AOTA_ResultsAreAvailable;
 
 		private static BindingFlags OccultBindingFlags;
@@ -122,6 +123,7 @@ namespace Tangra.OccultTools
 				AOTA_ResultsForEvent5 = TYPE_AOTA_ExternalAccess.GetProperty("ResultsForEvent5");
 				AOTA_ResultsReport = TYPE_AOTA_ExternalAccess.GetProperty("ResultsReport");
 				AOTA_IsMiss = TYPE_AOTA_ExternalAccess.GetProperty("IsMiss");
+                AOTA_Version = TYPE_AOTA_ExternalAccess.GetProperty("AOTA_Version");
 				AOTA_ResultsAreAvailable = TYPE_AOTA_ExternalAccess.GetProperty("ResultsAreAvailable");
 			}
 		}
@@ -170,6 +172,7 @@ namespace Tangra.OccultTools
 	            AotaReturnValue result = ReadAOTAResult();
 				result.IsMiss = (bool)AOTA_IsMiss.GetValue(m_AotaInstance, new object[] {} );
 				result.AreResultsAvailable = (bool)AOTA_ResultsAreAvailable.GetValue(m_AotaInstance, new object[] { });
+                result.AOTAVersion = (string) AOTA_Version.GetValue(m_AotaInstance, new object[] {});
 
 	            return result;
             }
@@ -221,6 +224,7 @@ namespace Tangra.OccultTools
 		{
 			public bool IsMiss;
 			public bool AreResultsAvailable;
+		    public string AOTAVersion;
 			public Camera CameraResult;
 			public EventResults[] EventResults;
 		}

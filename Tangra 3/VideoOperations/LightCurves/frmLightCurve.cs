@@ -476,10 +476,11 @@ namespace Tangra.VideoOperations.LightCurves
 
 				m_EventTimesReport = new EventTimesReport()
 				{
+                    TangraVersion = string.Format("Tangra v{0}", frmAbout.AssemblyFileVersion),
+                    AddinAction = addinName,
 					LcFilePath = m_LCFilePath,
 					VideoFilePath = m_LCFile.Header.PathToVideoFile,
 					SourceInfo = m_LCFile.Header.SourceInfo,
-					Provider = addinName,
 					TimingType = m_LCFile.Header.TimingType.ToString(),
 					HasEmbeddedTimeStamps = m_LCFile.Footer.ReductionContext.HasEmbeddedTimeStamps,
 					ReductionMethod = m_LCFile.Footer.ReductionContext.ReductionMethod.ToString(),
@@ -518,8 +519,11 @@ namespace Tangra.VideoOperations.LightCurves
 			if (m_EventTimesReport != null)
 			{
 				m_EventTimesReport.SaveReport();
-				// TODO: Show a message 
-				m_EventTimesReport = null;
+				
+#if WIN32
+                OccultWatcherHelper.NotifyOccultWatcherIfInstalled(m_EventTimesReport, this);
+#endif
+                m_EventTimesReport = null;
 			}
 		}
 

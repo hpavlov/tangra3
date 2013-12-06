@@ -97,7 +97,7 @@ namespace Tangra.Addins
 		{
 			if (e.ExceptionObject is Exception)
 			{
-				Trace.WriteLine(((Exception) e.ExceptionObject).FullExceptionInfo());
+				Trace.WriteLine(((Exception) e.ExceptionObject).GetFullStackTrace());
 			}
 		}
 
@@ -113,7 +113,7 @@ namespace Tangra.Addins
 			}
 			catch (Exception ex)
 			{
-				Trace.WriteLine(ex.FullExceptionInfo());
+				Trace.WriteLine(ex.GetFullStackTrace());
 			}
 
 

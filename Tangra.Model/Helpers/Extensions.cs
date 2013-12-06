@@ -9,7 +9,7 @@ namespace Tangra.Model.Helpers
 {
     public static class Extensions
     {
-        public static string FullExceptionInfo(this Exception ex)
+        public static string GetFullStackTrace(this Exception ex)
         {
             var output = new StringBuilder();
             Exception currEx = ex;

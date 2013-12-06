@@ -11,10 +11,14 @@ namespace Tangra.VideoOperations.LightCurves.Report
 {
 	public class EventTimesReport
 	{
+        public string TangraVersion { get; set; }
+        public string Provider { get; set; }
+        public string AddinAction { get; set; }
+        
 		public string LcFilePath { get; set; }
 		public string VideoFilePath { get; set; }
 		public string SourceInfo { get; set; }
-		public string Provider { get; set; }
+
 		public string TimingType { get; set; }
 		public bool HasEmbeddedTimeStamps { get; set; }
 		public string ReductionMethod { get; set; }
@@ -74,26 +78,30 @@ namespace Tangra.VideoOperations.LightCurves.Report
 		public string InstrumentalDelaysApplied { get; set; }
 		public DateTime ReportTime { get; set; }
 
+        [XmlIgnore]
+        public string ReportFileName { get; private set; }
 
+        [XmlIgnore]
+        public bool ReportFileSaved { get; private set; }
 
-		[XmlArrayItem("Event")]
+	    [XmlArrayItem("Event")]
 		public List<OccultationEventInfo> Events = new List<OccultationEventInfo>();
 
 		public void SaveReport()
 		{
 			ReportTime = DateTime.Now;
-			bool reportSaved = false;
+            ReportFileSaved = false;
 			
 			string directory = Path.GetDirectoryName(LcFilePath);
-			string reportFileName = Path.ChangeExtension(LcFilePath, ".trep.xml");
-			string fileNameOnly = Path.GetFileName(reportFileName);
+            ReportFileName = Path.ChangeExtension(LcFilePath, ".trep.xml");
+            string fileNameOnly = Path.GetFileName(ReportFileName);
 
 			if (directory != null && Directory.Exists(directory))
 			{
-				reportSaved = TrySaveReport(reportFileName);
+                ReportFileSaved = TrySaveReport(ReportFileName);
 			}
 
-			if (!reportSaved)
+            if (!ReportFileSaved)
 			{
 				directory = Path.GetFullPath(string.Format("{0}\\Tangra3\\Reports", Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)));
 				if (!Directory.Exists(directory))
@@ -104,22 +112,15 @@ namespace Tangra.VideoOperations.LightCurves.Report
 					}
 					catch (Exception ex)
 					{
-						Trace.WriteLine(ex.FullExceptionInfo());
+						Trace.WriteLine(ex.GetFullStackTrace());
 					}
 				}
 
 				if (Directory.Exists(directory))
 				{
-					reportFileName = Path.GetFullPath(string.Format("{0}\\{1}", directory, fileNameOnly));
-					reportSaved = TrySaveReport(reportFileName);
+                    ReportFileName = Path.GetFullPath(string.Format("{0}\\{1}", directory, fileNameOnly));
+                    ReportFileSaved = TrySaveReport(ReportFileName);
 				}
-			}
-			
-
-			if (reportSaved)
-			{
-				// TODO: Update the registry settings for Windows only and only if OW is present on the system and if the ReportingAddin is installed
-				// TODO: Modify OW Reporting Addin to save something in the Registry (and maintain its Registry Key) where Tangra will save data
 			}
 		}
 
@@ -137,7 +138,7 @@ namespace Tangra.VideoOperations.LightCurves.Report
 			}
 			catch (Exception ex)
 			{
-				Trace.WriteLine(ex.FullExceptionInfo());
+				Trace.WriteLine(ex.GetFullStackTrace());
 			}
 
 			return false;

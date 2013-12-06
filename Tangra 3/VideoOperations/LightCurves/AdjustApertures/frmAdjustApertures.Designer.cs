@@ -440,7 +440,7 @@
             // 
             this.label2.Location = new System.Drawing.Point(11, 14);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(407, 46);
+            this.label2.Size = new System.Drawing.Size(424, 46);
             this.label2.TabIndex = 25;
             this.label2.Text = resources.GetString("label2.Text");
             // 
@@ -504,29 +504,28 @@
             // 
             this.label3.Location = new System.Drawing.Point(44, 96);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(374, 34);
+            this.label3.Size = new System.Drawing.Size(391, 34);
             this.label3.TabIndex = 31;
             this.label3.Text = "    This is the default option in Tangra. It provides higher SNR for occultation " +
-    "detection and when measuring a single video file.";
+    "detection and should be preferred when measuring a single occultation video file" +
+    ".";
             // 
             // label4
             // 
             this.label4.Location = new System.Drawing.Point(45, 193);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(362, 47);
+            this.label4.Size = new System.Drawing.Size(390, 47);
             this.label4.TabIndex = 32;
-            this.label4.Text = "    Use this option when doing measurements of the same objects across multiple f" +
-    "iles or when requiring higher precision for quantative photometry of bright obje" +
-    "cts using aperture photometry.";
+            this.label4.Text = resources.GetString("label4.Text");
             // 
             // label5
             // 
             this.label5.AutoSize = true;
             this.label5.Location = new System.Drawing.Point(56, 309);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(258, 13);
+            this.label5.Size = new System.Drawing.Size(279, 13);
             this.label5.TabIndex = 33;
-            this.label5.Text = "Quckly change the apertures of all measured objects.";
+            this.label5.Text = "Quckly change the aperture sizes of all measured objects.";
             // 
             // pnlSeparator
             // 

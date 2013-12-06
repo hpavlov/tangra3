@@ -38,7 +38,7 @@ namespace Tangra.Addins
 			}
 			catch (Exception ex)
 			{
-				Trace.WriteLine(ex.FullExceptionInfo());
+				Trace.WriteLine(ex.GetFullStackTrace());
 
 				return new AllAddinSettings();
 			}
@@ -56,7 +56,7 @@ namespace Tangra.Addins
 			}
 			catch (Exception ex)
 			{
-				Trace.WriteLine(ex.FullExceptionInfo());
+				Trace.WriteLine(ex.GetFullStackTrace());
 			}
 
 			return string.Empty;
@@ -72,7 +72,7 @@ namespace Tangra.Addins
 			}
 			catch (Exception ex)
 			{
-				Trace.WriteLine(ex.FullExceptionInfo());
+				Trace.WriteLine(ex.GetFullStackTrace());
 			}
 
 			if (addinSettings == null)

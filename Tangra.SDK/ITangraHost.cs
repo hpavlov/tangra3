@@ -25,6 +25,7 @@ namespace Tangra.SDK
 		void GetIntegrationRateAndFirstFrame(out int integrationRate, out int firstIntegratingFrame);
 		void SetFoundOccultationEvent(int eventId, float dFrame, float rFrame, float dFrameErrorMinus, float dFrameErrorPlus, float rFrameErrorMinus, float rFrameErrorPlus, string dTime, string rTime);
 		void SetNoOccultationEvents();
+        void SetTimeExtractionEngine(string engineAndVersion);
 	}
 
 	public interface ITangraHost

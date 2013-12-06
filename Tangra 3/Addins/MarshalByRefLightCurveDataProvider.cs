@@ -92,7 +92,19 @@ namespace Tangra.Addins
 			catch
 			{
 
-			}			
+			}
 		}
+
+        public void SetTimeExtractionEngine(string engineAndVersion)
+        {
+            try
+            {
+                m_DelegatedLocalProvider.SetTimeExtractionEngine(engineAndVersion);
+            }
+            catch
+            {
+
+            }
+        }
 	}
 }

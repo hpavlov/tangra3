@@ -44,9 +44,17 @@ namespace Tangra.OccultTools
 
 	        if (!Directory.Exists(m_Settings.OccultLocation))
 	        {
-	            m_Addin.Configure();
+	            string locationFromOW = OccultWatcherHelper.GetConfiguredOccultLocation();
+                if (Directory.Exists(locationFromOW))
+	            {
+	                m_Settings.OccultLocation = locationFromOW;
+	                m_Settings.Save();
+	            }
+                else
+	                m_Addin.Configure();
 	        }
-	        else if (!OccultUtilitiesWrapper.HasSupportedVersionOfOccult(m_Settings.OccultLocation))
+
+            if (!OccultUtilitiesWrapper.HasSupportedVersionOfOccult(m_Settings.OccultLocation))
 	        {
 	            ShowIncompatibleOccultVersionErrorMessage();
 	            m_Addin.Configure();
@@ -61,6 +69,8 @@ namespace Tangra.OccultTools
 					if (result != null &&
                         result.AreResultsAvailable)
 					{
+                        dataProvider.SetTimeExtractionEngine(result.AOTAVersion);
+
 						if (result.IsMiss)
 						{
 							dataProvider.SetNoOccultationEvents();
