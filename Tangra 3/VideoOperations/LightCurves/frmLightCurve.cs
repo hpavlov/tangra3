@@ -516,15 +516,17 @@ namespace Tangra.VideoOperations.LightCurves
 
 		public void FinishedLightCurveEventTimeExtraction()
 		{
-			if (m_EventTimesReport != null)
+			if (m_EventTimesReport != null &&
+                !string.IsNullOrEmpty(m_EventTimesReport.Provider))
 			{
 				m_EventTimesReport.SaveReport();
 				
 #if WIN32
                 OccultWatcherHelper.NotifyOccultWatcherIfInstalled(m_EventTimesReport, this);
 #endif
-                m_EventTimesReport = null;
 			}
+
+            m_EventTimesReport = null;
 		}
 
 		private void SaveLCFile()
