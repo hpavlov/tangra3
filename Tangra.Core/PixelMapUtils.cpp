@@ -15,54 +15,60 @@ void CopyPixelsFromFormat16BPP(BYTE* pDIB, BITMAPINFOHEADER bih, unsigned long* 
 
 	unsigned int lineWidth = ((bih.biWidth * 16 / 8) + 3) & ~3;
 	
-	for (long y = 0; y < bih.biWidth; y++)
+	for (long y = bih.biHeight - 1; y >= 0; y--)
 	{
-		BYTE val;
-		unsigned char red;
-		unsigned char green;
-		unsigned char blue;
-		
-		if (bih.biCompression == 0)
-		{
-			unsigned short color = *((unsigned short*) src);
-			red = (unsigned char)(((color >> 10) & 0x1f) << 3);
-			green = (unsigned char)(((color >> 5) & 0x1f) << 3);
-			blue = (unsigned char)((color & 0x1f) << 3);
+		unsigned long* rowPixels = pixels + y * bih.biWidth;
+		BYTE* rowBitmapPixels = bitmapBytes + y * bih.biWidth;
 			
-			src += 2;		
-		}
-		else if (bih.biCompression == 1) 
-		{ 
-			// RLE 8. Not supported in 16 bit mode
-		}
-		else if (bih.biCompression == 2) 
-		{ 
-			// RLE 4. Not supported in 16 bit mode
-		}
-		else if (bih.biCompression == 3) 
+		for(long x = 0; x < bih.biWidth; x++)
 		{
-			// BITFIELDS. Not supported in 16 bit mode
-		};
-		
-		if (s_COLOR_CHANNEL == Blue)
-		{
-			val = blue;
+			BYTE val;
+			unsigned char red;
+			unsigned char green;
+			unsigned char blue;
+			
+			if (bih.biCompression == 0)
+			{
+				unsigned short color = *((unsigned short*) src);
+				red = (unsigned char)(((color >> 10) & 0x1f) << 3);
+				green = (unsigned char)(((color >> 5) & 0x1f) << 3);
+				blue = (unsigned char)((color & 0x1f) << 3);
+				
+				src += 2;		
+			}
+			else if (bih.biCompression == 1) 
+			{ 
+				// RLE 8. Not supported in 16 bit mode
+			}
+			else if (bih.biCompression == 2) 
+			{ 
+				// RLE 4. Not supported in 16 bit mode
+			}
+			else if (bih.biCompression == 3) 
+			{
+				// BITFIELDS. Not supported in 16 bit mode
+			};
+			
+			if (s_COLOR_CHANNEL == Blue)
+			{
+				val = blue;
+			}
+			else if (s_COLOR_CHANNEL == Green)
+			{
+				val = green;
+			}
+			else if (s_COLOR_CHANNEL == Red)
+			{
+				val = red;
+			}
+			else if (s_COLOR_CHANNEL == GrayScale)
+			{
+				val = (unsigned char)(.299 * red + .587 * green + .114 * blue); 
+			}
+			
+			*rowPixels++= (unsigned long)val;
+			*rowBitmapPixels++=val;
 		}
-		else if (s_COLOR_CHANNEL == Green)
-		{
-			val = green;
-		}
-		else if (s_COLOR_CHANNEL == Red)
-		{
-			val = red;
-		}
-		else if (s_COLOR_CHANNEL == GrayScale)
-		{
-			val = (unsigned char)(.299 * red + .587 * green + .114 * blue); 
-		}
-		
-		*pixels++= (unsigned long)val;
-		*bitmapBytes++=val;
 	}
 }
 
