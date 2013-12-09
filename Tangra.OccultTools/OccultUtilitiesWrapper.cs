@@ -154,20 +154,39 @@ namespace Tangra.OccultTools
                     timestamps[measurements.Length - 1].Date != DateTime.MinValue &&
                     timestamps[0].Date.Ticks < timestamps[measurements.Length - 1].Ticks;
 
-                if (hasReliableTimeBase)
-                {
-                    long startFrameStartDayTicks = timestamps[0].Date.Ticks;
-                    double[] secondsFromUTMidnight = timestamps.Select(x => (Math.Truncate(new TimeSpan(x.Ticks - startFrameStartDayTicks).TotalSeconds * 10000) / 10000.0)).ToArray();
+	            double[] secondsFromUTMidnight;
+	            long startFrameStartDayTicks;
 
-                    bool cameraCorrectionsHaveBeenApplied = dataProvider.CameraCorrectionsHaveBeenApplied;
+				if (hasReliableTimeBase)
+				{
+					startFrameStartDayTicks = timestamps[0].Date.Ticks;
+					secondsFromUTMidnight = timestamps.Select(x => (Math.Truncate(new TimeSpan(x.Ticks - startFrameStartDayTicks).TotalSeconds * 10000) / 10000.0)).ToArray();					
+				}
+				else
+				{
+					startFrameStartDayTicks = timestamps.FirstOrDefault(x => x != DateTime.MinValue).Date.Ticks;
+					secondsFromUTMidnight = new double[timestamps.Length];
+					for (int i = 0; i < timestamps.Length; i++)
+					{
+						if (timestamps[i] != DateTime.MinValue)
+							secondsFromUTMidnight[i] = Math.Truncate(new TimeSpan(timestamps[i].Ticks - startFrameStartDayTicks).TotalSeconds * 10000) / 10000.0;
+						else 
+							secondsFromUTMidnight[i] = 0;
+					}					
+				}
 
-                    if (AOTA_Set_TimeBaseEx != null)
-                        AOTA_Set_TimeBaseEx.Invoke(m_AotaInstance, new object[] { secondsFromUTMidnight, cameraCorrectionsHaveBeenApplied });
-                    else if (AOTA_Set_TimeBase != null)
-                        AOTA_Set_TimeBase.Invoke(m_AotaInstance, new object[] { secondsFromUTMidnight });
-                }
+				bool cameraCorrectionsHaveBeenApplied = dataProvider.CameraCorrectionsHaveBeenApplied;
 
-                AOTA_RunAOTAEx.Invoke(m_AotaInstance, new object[] { null /*parentWindow*/, 0, 1 });
+				if (AOTA_Set_TimeBaseEx != null)
+					AOTA_Set_TimeBaseEx.Invoke(m_AotaInstance, new object[] { secondsFromUTMidnight, cameraCorrectionsHaveBeenApplied });
+				else if (AOTA_Set_TimeBase != null)
+					AOTA_Set_TimeBase.Invoke(m_AotaInstance, new object[] { secondsFromUTMidnight });
+
+
+				int firstFrame = (int)frameIds[0];
+	            int framesInIntegration = 1;
+
+				AOTA_RunAOTAEx.Invoke(m_AotaInstance, new object[] { null /*parentWindow*/, firstFrame, framesInIntegration });
 
 	            AotaReturnValue result = ReadAOTAResult();
 				result.IsMiss = (bool)AOTA_IsMiss.GetValue(m_AotaInstance, new object[] {} );

@@ -20,6 +20,11 @@ namespace Tangra.Addins
             {
                 Timestamp = DateTime.MinValue;
                 isCorrectedForInstrumentalDelay = null;
+
+				if ((int)frameNo == lcFile.Header.FirstTimedFrameNo)
+					Timestamp = lcFile.Header.FirstTimedFrameTime;
+				else if ((int)frameNo == lcFile.Header.LastTimedFrameNo)
+					Timestamp = lcFile.Header.SecondTimedFrameTime;
             }
             else
             {
