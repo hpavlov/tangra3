@@ -64,8 +64,34 @@ HRESULT OpenAviFile(const char* fileName, VideoFileInfo* fileInfo)
 			bih.biWidth = 0; 
 			bih.biSizeImage = 0;
 
-			// Always ask for a 24bit frames
-			bih.biBitCount = 24;
+			// Corrections by M. Covington:
+			// Validate the bit count, because some AVI files give a bit count
+			// that is not one of the allowed values in a BitmapInfoHeader.
+			// Here 0 means for Windows to figure it out from other information.
+			if (bih.biBitCount > 24)
+			{
+				bih.biBitCount = 32;
+			}
+			else if (bih.biBitCount > 16)
+			{
+				bih.biBitCount = 24;
+			}
+			else if (bih.biBitCount > 8)
+			{
+				bih.biBitCount = 16;
+			}
+			else if (bih.biBitCount > 4)
+			{
+				bih.biBitCount = 8;
+			}
+			else if (bih.biBitCount > 0)
+			{
+				bih.biBitCount = 4;
+			}
+
+			// In a case of 32 bit images, we ask for 24 bit bitmaps
+			if (bih.biBitCount == 32)
+				bih.biBitCount = 24;
 
 			g_pGetFrame = TangraAviFile::AviFileGetFrameOpen(g_paviStream, &bih);
 

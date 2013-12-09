@@ -14,22 +14,22 @@ DWORD s_AviCompression;
 namespace TangraAviFile
 {
 
-	HRESULT AviFileOpenFile(LPCTSTR szFileName, PAVISTREAM* paviStream)
-	{
-		AVIFileInit();
+HRESULT AviFileOpenFile(LPCTSTR szFileName, PAVISTREAM* paviStream)
+{
+	AVIFileInit();
     
-		HRESULT hr = AVIStreamOpenFromFile(paviStream, szFileName, streamtypeVIDEO, 0, OF_READ, NULL);
+	HRESULT hr = AVIStreamOpenFromFile(paviStream, szFileName, streamtypeVIDEO, 0, OF_READ, NULL);
 
-		if(FAILED(hr))
-		{
-			printf("Could not locate AVI file <%s>.\n", szFileName);
-			return E_FAIL;
-		}
-
-		return S_OK;
+	if(FAILED(hr))
+	{
+		printf("Could not locate AVI file <%s>.\n", szFileName);
+		return E_FAIL;
 	}
 
-																																																																		HRESULT AviFileGetStreamInfo(PAVISTREAM paviStream, AVISTREAMINFO* streamInfo, BITMAPINFOHEADER *lpFormat, long* firstFrame, long* countFrames)
+	return S_OK;
+}
+
+HRESULT AviFileGetStreamInfo(PAVISTREAM paviStream, AVISTREAMINFO* streamInfo, BITMAPINFOHEADER *lpFormat, long* firstFrame, long* countFrames)
 {
 	HRESULT hr = AVIStreamInfo(paviStream, streamInfo, sizeof(AVISTREAMINFO));
 
@@ -59,9 +59,6 @@ namespace TangraAviFile
 	*firstFrame = AVIStreamStart(paviStream);
     *countFrames = AVIStreamLength(paviStream);
 
-	s_AviBitCount = 24;
-	s_AviImageSize = ((((s_AviImageWidth * s_AviBitCount) + 31) & ~31) / 8) * s_AviImageHeight;
-
 	return S_OK;
 }
 
@@ -74,6 +71,9 @@ namespace TangraAviFile
 			printf("Opening AVI Stream was unsuccessful\n");
     		return 0;
 		}
+
+		s_AviBitCount = bih->biBitCount;
+		s_AviImageSize = ((((s_AviImageWidth * s_AviBitCount) + 31) & ~31) / 8) * s_AviImageHeight;
 
 	   return pgfFrame;
 	}
@@ -96,6 +96,7 @@ namespace TangraAviFile
 
 		long width = 0;
 		long height = 0;
+
 
 		HRESULT rv = TangraCore::GetPixelMapBits(pDIB, &width, &height, s_AviImageSize, pixels, bitmapPixels, bitmapBytes);
 	

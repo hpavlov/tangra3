@@ -7,6 +7,81 @@
 #include <cmath>
 #include <algorithm>
 
+
+void CopyPixelsFromFormat16BPP(BYTE* pDIB, BITMAPINFOHEADER bih, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
+{
+	long length = (bih.biWidth * bih.biHeight);
+	BYTE* src = pDIB + sizeof(BITMAPINFOHEADER);
+
+	unsigned int lineWidth = ((bih.biWidth * 16 / 8) + 3) & ~3;
+	
+	for (long y = 0; y < bih.biWidth; y++)
+	{
+		BYTE val;
+		unsigned char red;
+		unsigned char green;
+		unsigned char blue;
+		
+		if (bih.biCompression == 0)
+		{
+			unsigned short color = *((unsigned short*) src);
+			red = (unsigned char)(((color >> 10) & 0x1f) << 3);
+			green = (unsigned char)(((color >> 5) & 0x1f) << 3);
+			blue = (unsigned char)((color & 0x1f) << 3);
+			
+			src += 2;		
+		}
+		else if (bih.biCompression == 1) 
+		{ 
+			// RLE 8. Not supported in 16 bit mode
+		}
+		else if (bih.biCompression == 2) 
+		{ 
+			// RLE 4. Not supported in 16 bit mode
+		}
+		else if (bih.biCompression == 3) 
+		{
+			// BITFIELDS. Not supported in 16 bit mode
+		};
+		
+		if (s_COLOR_CHANNEL == Blue)
+		{
+			val = blue;
+		}
+		else if (s_COLOR_CHANNEL == Green)
+		{
+			val = green;
+		}
+		else if (s_COLOR_CHANNEL == Red)
+		{
+			val = red;
+		}
+		else if (s_COLOR_CHANNEL == GrayScale)
+		{
+			val = (unsigned char)(.299 * red + .587 * green + .114 * blue); 
+		}
+		
+		*pixels++= (unsigned long)val;
+		*bitmapBytes++=val;
+	}
+}
+
+void CopyPixelsFromFormat8BPP(BYTE* pDIB, BITMAPINFOHEADER bih, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
+{
+	//PixelFormat.Format8bppIndexed
+
+	long length = (bih.biWidth * bih.biHeight);
+	BYTE* src = pDIB + sizeof(BITMAPINFOHEADER);
+}
+
+void CopyPixelsFromFormat4BPP(BYTE* pDIB, BITMAPINFOHEADER bih, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
+{
+	//PixelFormat.Format4bppIndexed	
+	
+	long length = (bih.biWidth * bih.biHeight);
+	BYTE* src = pDIB + sizeof(BITMAPINFOHEADER);
+}
+
 void CopyPixelsInTriplets(BYTE* pDIB, BITMAPINFOHEADER bih, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
 {
 	long bytesPerPixel = bih.biBitCount / 8;
@@ -241,8 +316,16 @@ HRESULT GetPixelMapBitsAndHBitmap(BYTE* pDIB, long* width, long* height, DWORD i
 	memmove(bitmapPixels + sizeof(bfh), &memBitmapInfo, sizeof(memBitmapInfo));
 	memmove(bitmapPixels + sizeof(bfh) + sizeof(memBitmapInfo), pDIB + sizeof(BITMAPINFOHEADER), bih.biSizeImage);
 
-	CopyPixelsInTriplets(pDIB, bih, pixels, bitmapPixels, bitmapBytes);
-
+    // See http://www.kalytta.com/bitmap.h for handling different bitmap formats
+	if (bih.biBitCount == 24)
+		CopyPixelsInTriplets(pDIB, bih, pixels, bitmapPixels, bitmapBytes);
+	else if (bih.biBitCount == 16)
+		CopyPixelsFromFormat16BPP(pDIB, bih, pixels, bitmapPixels, bitmapBytes);
+	//else if (bih.biBitCount == 8)
+	//	CopyPixelsFromFormat8BPP(pDIB, bih, pixels, bitmapPixels, bitmapBytes);
+	//else if (bih.biBitCount == 4)
+	//	CopyPixelsFromFormat4BPP(pDIB, bih, pixels, bitmapPixels, bitmapBytes);
+            
 	return S_OK;
 }
 
