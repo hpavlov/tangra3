@@ -52,6 +52,7 @@ _ReSharper.*
 /Tangra.Video/Windows/Tangra.Video.sdf
 /Tangra.Video/Windows/Debug
 /Tangra.Video/Windows/Release
+/Tangra.Video/Windows/ipch
 
 /Tangra 3.Windows.suo
 
