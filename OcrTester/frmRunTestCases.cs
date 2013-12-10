@@ -114,31 +114,36 @@ namespace OcrTester
         {
             string[] testCases = Directory.GetFiles(noiseTestSource, "*.bmp");
             bool hasErrors = false;
-            foreach (string file in testCases)
-            {
-                string expectedResult = Path.GetFullPath(noiseTestResults + "\\" + Path.GetFileName(file));
+	        bool[] options = new bool[] {false, true};
+	        string[] optionNames = new string[] { "Managed", "Native"};
+			for (int j = 0; j < options.Length; j++)
+	        {
+				foreach (string file in testCases)
+				{
+					string expectedResult = Path.GetFullPath(noiseTestResults + "\\" + Path.GetFileName(file));
 
-                lvlTestCaseDescription.Text = string.Format("Test case NoiseChunksRemoval\\{0}", Path.GetFileName(file));
-                lvlTestCaseDescription.Update();
+					lvlTestCaseDescription.Text = string.Format("Test case NoiseChunksRemoval\\{0} ({1})", Path.GetFileName(file), optionNames[j]);
+					lvlTestCaseDescription.Update();
 
-                Pixelmap pix = Pixelmap.ConstructFromBitmap((Bitmap)Bitmap.FromFile(file), TangraConfig.ColourChannel.Red);
+					Pixelmap pix = Pixelmap.ConstructFromBitmap((Bitmap)Bitmap.FromFile(file), TangraConfig.ColourChannel.Red);
 
-                uint[] pixels = pix.Pixels;
+					uint[] pixels = pix.Pixels;
 
-                LargeChunkDenoiser.Process(true, pixels, pix.Width, pix.Height);
+					LargeChunkDenoiser.Process(options[j], pixels, pix.Width, pix.Height);
 
-                Pixelmap pixExpected = Pixelmap.ConstructFromBitmap((Bitmap)Bitmap.FromFile(expectedResult), TangraConfig.ColourChannel.Red);
+					Pixelmap pixExpected = Pixelmap.ConstructFromBitmap((Bitmap)Bitmap.FromFile(expectedResult), TangraConfig.ColourChannel.Red);
 
-                for (int i = 0; i < pix.Pixels.Length; i++)
-                {
-                    if (pix.Pixels[i] != pixExpected.Pixels[i])
-                    {
-                        lbErrors.Items.Add(string.Format("NoiseChunk Removal Failed for {0}", Path.GetFileName(file)));
-                        hasErrors = true;
-                        break;
-                    }
-                }
-            }
+					for (int i = 0; i < pix.Pixels.Length; i++)
+					{
+						if (pix.Pixels[i] != pixExpected.Pixels[i])
+						{
+							lbErrors.Items.Add(string.Format("NoiseChunk Removal Failed for {0} ({1})", Path.GetFileName(file), optionNames[j]));
+							hasErrors = true;
+							break;
+						}
+					}
+				}		        
+	        }
 
             pbar.Value++;
 

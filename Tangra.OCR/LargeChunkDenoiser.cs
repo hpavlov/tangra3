@@ -26,7 +26,16 @@ namespace Tangra.OCR
 			public uint ColorOn;
 			public int[] ObjectPixelsIndex;
 			public int ObjectPixelsCount;
+			public int ObjectPixelsYFrom;
+			public int ObjectPixelsYTo;
+			public int ObjectPixelsXFrom;
+			public int ObjectPixelsXTo;
 			public Stack<int> ObjectPixelsPath;
+
+			public int MaxLowerBoundNoiseChunkPixels;
+			public int MinUpperBoundNoiseChunkPixels;
+			public int MinLowerBoundNoiseChunkHeight;
+			public int MaxUpperBoundNoiseChunkWidth;
 		}
 
         public static void Process(bool useNative, uint[] pixels, int width, int height)
@@ -39,17 +48,16 @@ namespace Tangra.OCR
 
 		private static void ProcessManaged(uint[] pixels, int width, int height, uint onColour, uint offColour)
 		{
-            // The max noise chink part to be removed is 50% of the pixels in "1".
-            // This value is determined experimentally and varied based on the area hight
-            // Block(22x16), AreaHeight(20) -> '1' is 70 pixels (50% = 35 pixels)
-            int maxNoiseChunkPixels = (int)Math.Round(35.0 * height / 20);
-
 			var context = new Context()
 			{
 				Pixels = pixels,
 				CheckedPixels = new int[width * height],
 				ObjectPixelsIndex = new int[width * height],
 				ObjectPixelsCount = -1,
+				ObjectPixelsYFrom = int.MaxValue,
+				ObjectPixelsYTo = int.MinValue,
+				ObjectPixelsXFrom = int.MaxValue,
+				ObjectPixelsXTo = int.MinValue,
 				Index = -1,
 				Width = width,
 				Height = height,
@@ -58,12 +66,17 @@ namespace Tangra.OCR
 				ObjectPixelsPath = new Stack<int>()
 			};
 
+			context.MaxLowerBoundNoiseChunkPixels = (int)Math.Round(35.0 * height / 20);
+			context.MinUpperBoundNoiseChunkPixels = 6 * context.MaxLowerBoundNoiseChunkPixels;			
+			context.MinLowerBoundNoiseChunkHeight = (int)Math.Round(0.5 *(height - 4));
+			context.MaxUpperBoundNoiseChunkWidth = height;
+
 			do
 			{
 				int nextObjectPixelId = FindNextObjectPixel(context);
 
 				if (nextObjectPixelId != -1)
-					CheckAndRemoveNoiseObjectAsNecessary(context, nextObjectPixelId, maxNoiseChunkPixels, offColour);
+					CheckAndRemoveNoiseObjectAsNecessary(context, nextObjectPixelId, offColour);
 				else
 					break;
 
@@ -88,9 +101,32 @@ namespace Tangra.OCR
 			return -1;
 		}
 
-		private static void CheckAndRemoveNoiseObjectAsNecessary(Context context, int firstPixel, int maxNoiseChunkPixels, uint offColour)
+		private static bool CurrentObjectChunkIsNoise(Context context)
+		{
+			return
+				context.ObjectPixelsCount < context.MaxLowerBoundNoiseChunkPixels ||
+				context.ObjectPixelsCount > context.MinUpperBoundNoiseChunkPixels ||
+				(context.ObjectPixelsYTo - context.ObjectPixelsYFrom) < context.MinLowerBoundNoiseChunkHeight ||
+				(context.ObjectPixelsXTo - context.ObjectPixelsXFrom) > context.MaxUpperBoundNoiseChunkWidth;
+		}
+
+		private static void SetObjectPixelStats(Context context, int pixelIndex)
+		{
+			int x = pixelIndex % context.Width;
+			int y = pixelIndex / context.Width;
+			if (context.ObjectPixelsYFrom > y) context.ObjectPixelsYFrom = y;
+			if (context.ObjectPixelsYTo < y) context.ObjectPixelsYTo = y;
+			if (context.ObjectPixelsXFrom > x) context.ObjectPixelsXFrom = x;
+			if (context.ObjectPixelsXTo < x) context.ObjectPixelsXTo = x;
+		}
+
+		private static void CheckAndRemoveNoiseObjectAsNecessary(Context context, int firstPixel, uint offColour)
 		{
 			context.ObjectPixelsCount = 0;
+			context.ObjectPixelsYFrom = int.MaxValue;
+			context.ObjectPixelsYTo = int.MinValue;
+			context.ObjectPixelsXFrom = int.MaxValue;
+			context.ObjectPixelsXTo = int.MinValue;
 			context.ObjectPixelsPath.Clear();
 			context.ObjectPixelsPath.Push(firstPixel);
 
@@ -98,11 +134,12 @@ namespace Tangra.OCR
 
             context.ObjectPixelsIndex[context.ObjectPixelsCount] = firstPixel;
             context.ObjectPixelsCount++;
+			SetObjectPixelStats(context, firstPixel);
 
 			while (ProcessNoiseObjectPixel(context, ref currPixel))
 			{ }
 	
-			if (context.ObjectPixelsCount < maxNoiseChunkPixels)
+			if (CurrentObjectChunkIsNoise(context))
 			{
 				for (int i = 0; i < context.ObjectPixelsCount; i++)
 				{
@@ -134,6 +171,7 @@ namespace Tangra.OCR
 					        pixel = nextPixel;
 					        context.ObjectPixelsIndex[context.ObjectPixelsCount] = nextPixel;
 					        context.ObjectPixelsCount++;
+							SetObjectPixelStats(context, pixel);
 					    }
 					    else
 					        context.CheckedPixels[nextPixel] = CHECKED;
@@ -158,6 +196,7 @@ namespace Tangra.OCR
 					        pixel = nextPixel;
 					        context.ObjectPixelsIndex[context.ObjectPixelsCount] = nextPixel;
 					        context.ObjectPixelsCount++;
+							SetObjectPixelStats(context, pixel);
 					    }
 					    else
 					        context.CheckedPixels[nextPixel] = CHECKED;
@@ -182,6 +221,7 @@ namespace Tangra.OCR
 						    pixel = nextPixel;
 						    context.ObjectPixelsIndex[context.ObjectPixelsCount] = nextPixel;
                             context.ObjectPixelsCount++;
+							SetObjectPixelStats(context, pixel);
 					    }
 					    else
 						    context.CheckedPixels[nextPixel] = CHECKED;
@@ -206,6 +246,7 @@ namespace Tangra.OCR
                             pixel = nextPixel;
                             context.ObjectPixelsIndex[context.ObjectPixelsCount] = nextPixel;
                             context.ObjectPixelsCount++;
+							SetObjectPixelStats(context, pixel);
                         }
                         else
                             context.CheckedPixels[nextPixel] = CHECKED;

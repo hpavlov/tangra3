@@ -235,8 +235,26 @@ long s_ChunkDenoiseHeight;
 long s_ChunkDenoiseMaxIndex;
 long* s_ObjectPixelsIndex = NULL;
 long s_ObjectPixelsCount;
-long s_MaxNoiseChunkPixels;
+long s_ObjectPixelsXFrom;
+long s_ObjectPixelsXTo;
+long s_ObjectPixelsYFrom;
+long s_ObjectPixelsYTo;
+long s_MaxLowerBoundNoiseChunkPixels;
+long s_MinUpperBoundNoiseChunkPixels;
+long s_MinLowerBoundNoiseChunkHeight;
+long s_MaxUpperBoundNoiseChunkWidth;
 std::stack<long> s_ObjectPixelsPath;
+
+void SetObjectPixelsXFromTo(long pixelIndex)
+{
+	long width = pixelIndex % s_ChunkDenoiseWidth;
+	long height = pixelIndex / s_ChunkDenoiseWidth;
+	
+	if (s_ObjectPixelsXFrom > width) s_ObjectPixelsXFrom = width;
+	if (s_ObjectPixelsXTo < width) s_ObjectPixelsXTo = width;
+	if (s_ObjectPixelsYFrom > height) s_ObjectPixelsYFrom = height;
+	if (s_ObjectPixelsYTo < height) s_ObjectPixelsYTo = height;	
+}
 			
 void EnsureChunkDenoiseBuffers(long width, long height)
 {
@@ -263,7 +281,11 @@ void EnsureChunkDenoiseBuffers(long width, long height)
 		// The max noise chink part to be removed is 50% of the pixels in "1".
 		// This value is determined experimentally and varied based on the area hight
        // Block(22x16), AreaHeight(20) -> '1' is 70 pixels (50% = 35 pixels)
-		s_MaxNoiseChunkPixels = (long)round(35.0 * height / 20);
+		s_MaxLowerBoundNoiseChunkPixels = (long)round(35.0 * height / 20);
+		// The min noise chunk is 80% of a fully black square
+		s_MinUpperBoundNoiseChunkPixels = (long)round(0.8 * width * height);
+		s_MinLowerBoundNoiseChunkHeight = (long)round(0.5 * (height - 4));
+		s_MaxUpperBoundNoiseChunkWidth = height;
 	}
 }
 
@@ -315,6 +337,7 @@ bool ProcessNoiseObjectPixel(unsigned long* pixels, long* pixelRef, unsigned lon
 					*pixelRef = nextPixel;
 					s_ObjectPixelsIndex[s_ObjectPixelsCount] = nextPixel;
 					s_ObjectPixelsCount++;
+					SetObjectPixelsXFromTo(nextPixel);
 				}
 				else
 					s_CheckedPixels[nextPixel] = CHECKED;
@@ -339,6 +362,7 @@ bool ProcessNoiseObjectPixel(unsigned long* pixels, long* pixelRef, unsigned lon
 					*pixelRef = nextPixel;
 					s_ObjectPixelsIndex[s_ObjectPixelsCount] = nextPixel;
 					s_ObjectPixelsCount++;
+					SetObjectPixelsXFromTo(nextPixel);
 				}
 				else
 					s_CheckedPixels[nextPixel] = CHECKED;
@@ -363,6 +387,7 @@ bool ProcessNoiseObjectPixel(unsigned long* pixels, long* pixelRef, unsigned lon
 					*pixelRef = nextPixel;
 					s_ObjectPixelsIndex[s_ObjectPixelsCount] = nextPixel;
 					s_ObjectPixelsCount++;
+					SetObjectPixelsXFromTo(nextPixel);
 				}
 				else
 					s_CheckedPixels[nextPixel] = CHECKED;
@@ -387,6 +412,7 @@ bool ProcessNoiseObjectPixel(unsigned long* pixels, long* pixelRef, unsigned lon
 					*pixelRef = nextPixel;
 					s_ObjectPixelsIndex[s_ObjectPixelsCount] = nextPixel;
 					s_ObjectPixelsCount++;
+					SetObjectPixelsXFromTo(nextPixel);
 				}
 				else
 					s_CheckedPixels[nextPixel] = CHECKED;
@@ -418,9 +444,22 @@ bool ProcessNoiseObjectPixel(unsigned long* pixels, long* pixelRef, unsigned lon
 		return false;	
 }
 
+bool CurrentObjectChunkIsNoise()
+{
+	return 
+		s_ObjectPixelsCount < s_MaxLowerBoundNoiseChunkPixels ||
+		s_ObjectPixelsCount > s_MinUpperBoundNoiseChunkPixels ||
+		(s_ObjectPixelsYTo - s_ObjectPixelsYFrom) < s_MinLowerBoundNoiseChunkHeight ||
+		(s_ObjectPixelsXTo - s_ObjectPixelsXFrom) > s_MaxUpperBoundNoiseChunkWidth;
+}
+
 long CheckAndRemoveNoiseObjectAsNecessary(unsigned long* pixels, long firstPixel, unsigned long onColour, unsigned long offColour)
 {
 	s_ObjectPixelsCount = 0;
+	s_ObjectPixelsXFrom = 0xFFFF;
+	s_ObjectPixelsXTo = 0;
+	s_ObjectPixelsYFrom = 0xFFFF;
+	s_ObjectPixelsYTo = 0;
 	while(!s_ObjectPixelsPath.empty()) s_ObjectPixelsPath.pop();
 	s_ObjectPixelsPath.push(firstPixel);
 
@@ -428,11 +467,12 @@ long CheckAndRemoveNoiseObjectAsNecessary(unsigned long* pixels, long firstPixel
 
 	s_ObjectPixelsIndex[s_ObjectPixelsCount] = firstPixel;
 	s_ObjectPixelsCount++;
+	SetObjectPixelsXFromTo(firstPixel);
 
 	while (ProcessNoiseObjectPixel(pixels, &currPixel, onColour))
 	{ }
 
-	if (s_ObjectPixelsCount < s_MaxNoiseChunkPixels)
+	if (CurrentObjectChunkIsNoise())
 	{
 		for (int i = 0; i < s_ObjectPixelsCount; i++)
 		{
