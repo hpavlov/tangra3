@@ -357,6 +357,7 @@ namespace Tangra.Model.Astro
                 Fit(intensity);
         }
 
+#if WIN32
 		public void Fit(uint[,] intensity)
         {
             try
@@ -379,8 +380,32 @@ namespace Tangra.Model.Astro
                 m_IsSolved = false;
             }
         }
-        
-		private void NonLinearFitNative(uint[,] intensity)
+#else
+        // NOTE: Native PSF Fitting for now is not supported on non Windows Platforms
+
+        public void Fit(uint[,] intensity)
+        {
+            try
+            {
+                if (FittingMethod == PSFFittingMethod.NonLinearFit)
+                {
+                    NonLinearFit(intensity, false);
+                }
+                else if (FittingMethod == PSFFittingMethod.NonLinearAsymetricFit)
+                    NonLinearAsymetricFit(intensity, false);
+                else if (FittingMethod == PSFFittingMethod.LinearFitOfAveragedModel)
+                    LinearFitOfAveragedModel(intensity);
+            }
+            catch (Exception)
+            {
+                // singular matrix, etc
+                m_IsSolved = false;
+            }
+        }
+
+#endif
+
+        private void NonLinearFitNative(uint[,] intensity)
 		{
 			int full_width = (int)Math.Round(Math.Sqrt(intensity.Length));
 			m_MatrixSize = full_width;

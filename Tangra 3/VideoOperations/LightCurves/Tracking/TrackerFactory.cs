@@ -44,15 +44,17 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 	            }
 	            else
 	            {
+#if WIN32
 					if (TangraConfig.Settings.Tracking.UseNativeTracker)
 					{
 						usedTrackerType = "Simplified Native";
 						return new NativeSimplifiedTracker(imageWidth, imageHeight, measuringStars, LightCurveReductionContext.Instance.FullDisappearance);
 					}
 					else
-					{
+#endif
+                    {
 						usedTrackerType = "Simplified";
-						return new SimplifiedTracker(measuringStars);						
+						return new SimplifiedTracker(measuringStars);
 					}					
 	            }
             }

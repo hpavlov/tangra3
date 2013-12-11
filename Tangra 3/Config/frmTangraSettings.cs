@@ -74,7 +74,12 @@ namespace Tangra.Config
 			m_PropertyPages.Add(4, new ucPhotometry());
 
 			m_PropertyPages.Add(6, new ucTracking());
+
+#if WIN32
             m_PropertyPages.Add(8, new ucCompatibility());
+#else
+            tvSettings.Nodes.RemoveAt(5);
+#endif
 
             m_PropertyPages.Add(12, new ucAddins(m_AddinsController, m_AddinContainers));
 

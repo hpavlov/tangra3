@@ -15,6 +15,7 @@ namespace Tangra.Helpers
 {
     public class OccultWatcherHelper
     {
+#if WIN32
         [Conditional("WIN32")]
         public static void NotifyOccultWatcherIfInstalled(EventTimesReport report, IWin32Window parentForm)
         {
@@ -71,6 +72,7 @@ namespace Tangra.Helpers
             }
         }
 
+
         [Conditional("WIN32")]
         public static void GetConfiguredOccultLocation(ref string location)
         {
@@ -82,5 +84,6 @@ namespace Tangra.Helpers
                 location = Convert.ToString(registryKey.GetValue("OccultSetupDir", null));
             }
         }
+#endif
     }
 }

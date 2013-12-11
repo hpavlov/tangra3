@@ -3,7 +3,7 @@
   <Project Name="TangraCore_OSX" Path="TangraCore_OSX.project" Active="Yes"/>
   <Project Name="TangraVideo_OSX" Path="../Tangra.Video/Mac/TangraVideo_OSX.project"/>
   <BuildMatrix>
-    <WorkspaceConfiguration Name="Debug" Selected="yes">
+    <WorkspaceConfiguration Name="Debug" Selected="no">
       <Project Name="TangraVideo_OSX" ConfigName="Debug"/>
       <Project Name="TangraCore_OSX" ConfigName="Debug"/>
       <Project Name="TangraVideo_OSX" ConfigName="Debug"/>

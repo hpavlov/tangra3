@@ -6,12 +6,14 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
 using Tangra.Helpers;
 using Tangra.Model.Config;
 using Tangra.Properties;
+using Tangra.Model.Helpers;
 
 namespace Tangra.Controller
 {
@@ -273,24 +275,33 @@ namespace Tangra.Controller
 						int Version = int.Parse(updateNode.Attributes["Version"].Value);
 						if (latestVersion < Version)
 						{
+#if WIN32
 							Trace.WriteLine("Update location: " + updateUri.ToString());
-							Trace.WriteLine("Current version: " + latestVersion.ToString());
-							Trace.WriteLine("New version: " + Version.ToString());
+                            Trace.WriteLine("Current version: " + latestVersion.ToString());
+                            Trace.WriteLine("New version: " + Version.ToString());
+#else
+                            Console.WriteLine("Update location: " + updateUri.ToString());
+                            Console.WriteLine("Current version: " + latestVersion.ToString());
+                            Console.WriteLine("New version: " + Version.ToString());
+#endif
 
+#if WIN32
 							XmlNode tangra3UpdateNode = xmlDoc.SelectSingleNode("/Tangra3/AutoUpdate");
 							if (tangra3UpdateNode != null)
 							{
 								tangra3UpdateServerVersion = tangra3UpdateNode.Attributes["Version"].Value;
-								Trace.WriteLine("Tangra3Update new version: " + tangra3UpdateServerVersion);
+                                Trace.WriteLine("Tangra3Update new version: " + tangra3UpdateServerVersion);
 							}
 							else
 								tangra3UpdateServerVersion = null;
 
 							latestVersion = Version;
 							latestVersionNode = updateNode;
-						}
+#endif
+                        }
 					}
 
+#if WIN32
 					foreach (XmlNode updateNode in xmlDoc.SelectNodes("/Tangra3/ModuleUpdate[@MustExist = 'false']"))
 					{
 						if (updateNode.Attributes["Version"] == null) continue;
@@ -300,16 +311,16 @@ namespace Tangra.Controller
 
 						if (latestVersion < Version)
 						{
-							Trace.WriteLine("Update location: " + updateUri.ToString());
-							Trace.WriteLine("Module: " + updateNode.Attributes["File"].Value);
-							Trace.WriteLine("Current version: " + latestVersion.ToString());
-							Trace.WriteLine("New version: " + Version.ToString());
+                            Trace.WriteLine("Update location: " + updateUri.ToString());
+                            Trace.WriteLine("Module: " + updateNode.Attributes["File"].Value);
+                            Trace.WriteLine("Current version: " + latestVersion.ToString());
+                            Trace.WriteLine("New version: " + Version.ToString());
 
 							XmlNode tangra3UpdateNode = xmlDoc.SelectSingleNode("/Tangra3/AutoUpdate");
 							if (tangra3UpdateNode != null)
 							{
 								tangra3UpdateServerVersion = tangra3UpdateNode.Attributes["Version"].Value;
-								Trace.WriteLine("Tangra3Update new version: " + tangra3UpdateServerVersion);
+                                Trace.WriteLine("Tangra3Update new version: " + tangra3UpdateServerVersion);
 							}
 							else
 								tangra3UpdateServerVersion = null;
@@ -328,9 +339,9 @@ namespace Tangra.Controller
 							configUpdateVersion = int.Parse(cfgUpdVer.InnerText);
 						}
 					}
+#endif
 
-
-					return latestVersionNode;
+                    return latestVersionNode;
 				}
 			}
 			finally
@@ -347,12 +358,24 @@ namespace Tangra.Controller
 		{
 			try
 			{
-				Assembly asm = Assembly.GetExecutingAssembly();
-				Version owVer = asm.GetName().Version;
-				return 10000 * owVer.Major + 1000 * owVer.Minor + 100 * owVer.Build + owVer.Revision;
+			    Assembly asm = Assembly.GetExecutingAssembly();
+			    object[] attr = asm.GetCustomAttributes(typeof (AssemblyFileVersionAttribute), true);
+                if (attr.Length == 1)
+                {
+                    Regex fvregex = new Regex("^(\\d+)\\.(\\d+)\\.(\\d+)$");
+                    Match match = fvregex.Match(((AssemblyFileVersionAttribute) attr[0]).Version);
+                    return 10000 * int.Parse(match.Groups[1].Value) + 1000 * int.Parse(match.Groups[2].Value) + int.Parse(match.Groups[3].Value);
+                }
+                else
+                {
+                    Version owVer = asm.GetName().Version;
+                    return 10000 * owVer.Major + 1000 * owVer.Minor + 100 * owVer.Build + owVer.Revision;
+                }
 			}
-			catch
-			{ }
+			catch (Exception ex)
+			{
+			    Console.WriteLine(ex.GetFullStackTrace());
+			}
 
 			return 0;
 		}

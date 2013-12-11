@@ -1181,7 +1181,14 @@ namespace Tangra.VideoOperations.LightCurves
 					data.VideoFrameRate = (float)m_VideoController.VideoFrameRate;
 					data.ForceErrorReport = forceSaveErrorReport;
 
-					m_TimestampOCR.Initialize(data, m_VideoController, (int)TangraConfig.Settings.Tuning.OcrMode);
+					m_TimestampOCR.Initialize(data, m_VideoController, 
+#if WIN32
+                        (int)TangraConfig.Settings.Tuning.OcrMode
+#else
+                        (int)TangraConfig.OCRMode.FullyManaged
+#endif
+                        );
+
 					int maxCalibrationFieldsToAttempt = TangraConfig.Settings.Generic.MaxCalibrationFieldsToAttempt;
 
 					if (m_TimestampOCR.RequiresCalibration)
