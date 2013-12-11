@@ -163,6 +163,10 @@ namespace Tangra.Video
 		{
 			if (m_VideoStream != null)
 			{
+				if (m_IsRunning)
+					// No single frame movement or refresh when the video is 'playing'
+					return;
+
 				m_CurrentFrameIndex++;
 				if (m_CurrentFrameIndex >= m_VideoStream.LastFrame) m_CurrentFrameIndex = m_VideoStream.LastFrame;
 
@@ -174,6 +178,10 @@ namespace Tangra.Video
 		{
 			if (m_VideoStream != null)
 			{
+				if (m_IsRunning)
+					// No single frame movement or refresh when the video is 'playing'
+					return;
+
 				var advStream = m_VideoStream as AstroDigitalVideoStream;
 				if (advStream != null)
 				{
@@ -223,11 +231,19 @@ namespace Tangra.Video
 
 		public void RefreshCurrentFrame()
 		{
+			if (m_IsRunning)
+				// No single frame movement or refresh when the video is 'playing'
+				return;
+
 			DisplayCurrentFrame(MovementType.Refresh);
 		}
 
         public void MoveToFrame(int frameId)
-		{
+        {
+	        if (m_IsRunning)
+		        // No single frame movement or refresh when the video is 'playing'
+		        return;
+
 			m_CurrentFrameIndex = frameId;
 
 			if (m_VideoStream != null)
@@ -285,6 +301,10 @@ namespace Tangra.Video
 		{
 			if (m_VideoStream != null)
 			{
+				if (m_IsRunning)
+					// No single frame movement or refresh when the video is 'playing'
+					return;
+
 				m_CurrentFrameIndex--;
 
 				if (m_CurrentFrameIndex < m_VideoStream.FirstFrame) m_CurrentFrameIndex = m_VideoStream.FirstFrame;
@@ -297,6 +317,10 @@ namespace Tangra.Video
 		{
 			if (m_VideoStream != null)
 			{
+				if (m_IsRunning)
+					// No single frame movement or refresh when the video is 'playing'
+					return;
+
 				AstroDigitalVideoStream advStream = m_VideoStream as AstroDigitalVideoStream;
 				if (advStream != null)
 				{

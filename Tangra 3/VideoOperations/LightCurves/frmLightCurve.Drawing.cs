@@ -754,6 +754,9 @@ namespace Tangra.VideoOperations.LightCurves
                 else
                     m_SelectedMeasurements = new LCMeasurement[m_Header.ObjectCount];
 
+	            if (id < 0) id = 0;
+				if (id >= m_AllReadings[0].Count) id = m_AllReadings[0].Count - 1;
+
                 if (id >= 0)
                 {
                     m_OldLineBackup.Clear();
