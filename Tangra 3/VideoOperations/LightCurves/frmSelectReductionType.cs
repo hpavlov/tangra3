@@ -31,7 +31,7 @@ namespace Tangra.VideoOperations.LightCurves
 			m_VideoContoller = videoContoller;
             rbAsteroidal.Checked = true;
 
-            ucStretching.Initialize(framePlayer.Video);
+            ucStretching.Initialize(framePlayer.Video, framePlayer.CurrentFrameIndex);
 
 			#region Configure the Reduction Settings. The same must be done in the frmConfigureReprocessing and ucPhotometry
 			// Removes the Background Gradient
@@ -47,7 +47,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 			FrameAdjustmentsPreview.Instance.ParentForm = this;
 			FrameAdjustmentsPreview.Instance.FramePlayer = framePlayer;
-			FrameAdjustmentsPreview.Instance.Reset(m_VideoContoller);
+			FrameAdjustmentsPreview.Instance.Reset(m_VideoContoller, framePlayer.CurrentFrameIndex);
         }
 
         public TangraConfig.PhotometryReductionMethod ComboboxIndexToPhotometryReductionMethod()

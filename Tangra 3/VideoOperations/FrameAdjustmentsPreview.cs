@@ -47,12 +47,12 @@ namespace Tangra.VideoOperations
 			m_UseStretching = false;
 		}
 
-		public void Reset(VideoController videoController)
+		public void Reset(VideoController videoController, int startingFrameNo)
 		{
 			m_UseIntegration = false;
 			ResetPreprocessingFlags();
 			m_VideoController = videoController;
-			m_CurrFrameNo = m_VideoController.VideoFirstFrame;
+			m_CurrFrameNo = startingFrameNo;
 			m_CurrFrame = null;
 
 			frmFullSizePreview.EnsureFullPreviewHidden();
@@ -198,8 +198,11 @@ namespace Tangra.VideoOperations
 
 				m_CurrFrame = FramePlayer.GetFrame(m_CurrFrameNo, !m_UseIntegration);
 
-				frmFullSizePreview.EnsureFullPreviewVisible(m_CurrFrame, ParentForm);
-				frmFullSizePreview.Update(m_CurrFrame);
+				if (m_CurrFrame != null)
+				{
+					frmFullSizePreview.EnsureFullPreviewVisible(m_CurrFrame, ParentForm);
+					frmFullSizePreview.Update(m_CurrFrame);					
+				}
 			}
 			else
 			{

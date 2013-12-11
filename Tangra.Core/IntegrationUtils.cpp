@@ -3,9 +3,10 @@
 #include <strings.h>
 #include <cstring>
 #include "IntegrationUtils.h"
+#include <algorithm>
 
 double* s_IntegratedValues = NULL;
-std::vector<long>* s_MedianPixelLists = NULL;
+std::vector< std::vector<unsigned long>* > s_MedianPixelLists;
 
 bool s_IsMedianAveraging;
 int s_Width;
@@ -37,13 +38,10 @@ void IntergationManagerStartNew(int width, int height, bool isMedianAveraging)
 
 	if (isMedianAveraging)
 	{
-		// TODO: Which STL collection implements a fast sort method to produce the medians??
-
-		std::vector<long>* pMedianPixelLists = s_MedianPixelLists;
+		s_MedianPixelLists.clear();
 		for(int i = 0; i < width * height; i++)
 		{
-			//*pMedianPixelLists = new std::vector<long>();
-			//pMedianPixelLists++;
+			s_MedianPixelLists.push_back(new std::vector<unsigned long>());
 		}
 	}
 }
@@ -63,7 +61,12 @@ void IntegrationManagerAddFrame(unsigned long* framePixels)
 	}
 	else
 	{
-		// Copy the individual pixels into lists of long for each byte
+		int idx = -1;
+		for(int x = 0; x < s_Width; x++)
+		for(int y = 0; y < s_Height; y++)
+		{
+			s_MedianPixelLists[++idx]->push_back(*pPixels++);
+		}		
 	}
 
 	s_FrameCount++;
@@ -100,6 +103,35 @@ void IntegrationManagerAddFrameEx(unsigned long* framePixels, bool isLittleEndia
 			}			
 		}
 	}
+	else
+	{
+		int idx = -1;
+		for(int x = 0; x < s_Width; x++)
+		for(int y = 0; y < s_Height; y++)
+		{
+			unsigned long pixelValue;
+			if (isLittleEndian)
+			{
+				unsigned long littleEndianValue = *pPixels++;
+				unsigned long bigEndianValue = 0;
+				if (bpp == 16)
+				{
+					bigEndianValue = ((littleEndianValue & 0xFF) << 8) + ((littleEndianValue & 0xFF00) >> 8);
+
+					pixelValue = bigEndianValue;
+				}
+				else
+					pixelValue = littleEndianValue;
+				
+			}
+			else
+			{
+				pixelValue = *pPixels++;
+			}
+			
+			s_MedianPixelLists[++idx]->push_back(pixelValue);
+		}
+	}	
 
 	s_FrameCount++;
 }
@@ -119,7 +151,24 @@ void IntegrationManagerProduceIntegratedFrame(unsigned long* framePixels)
 				*pPixels++ = (unsigned long)(*pIntegrated++ / s_FrameCount);
 			}
 		}
-	}	
+	}
+	else
+	{
+		if (s_FrameCount > 0)
+		{
+			long idx = -1;
+			for(int x = 0; x < s_Width; x++)
+			for(int y = 0; y < s_Height; y++)
+			{
+				idx++;
+				std::vector<unsigned long>* pixelsVec = s_MedianPixelLists[idx];
+				size_t n = pixelsVec->size() / 2;
+				std::nth_element(pixelsVec->begin(), pixelsVec->begin() + n, pixelsVec->end());
+				unsigned long median = (*pixelsVec)[n];				
+				*pPixels++ = median;
+			}
+		}			
+	}
 }
 
 void IntegrationManagerFreeResources()
@@ -128,4 +177,12 @@ void IntegrationManagerFreeResources()
 		delete s_IntegratedValues;
 
 	s_IntegratedValues = NULL;
+	
+	for(int i = 0; i < s_MedianPixelLists.size(); i++)
+	{
+		delete s_MedianPixelLists[i];
+		s_MedianPixelLists[i] = NULL;
+	}
+	
+	s_MedianPixelLists.clear();
 }

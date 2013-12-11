@@ -46,7 +46,7 @@ namespace Tangra.VideoOperations.LightCurves
             InitializeComponent();
         }
 
-        public void Initialize(IFrameStream videoStream)
+        public void Initialize(IFrameStream videoStream, int currentFrameNo)
         {
             m_VideoStream = videoStream;
 
@@ -57,7 +57,7 @@ namespace Tangra.VideoOperations.LightCurves
             {
                 nudFrameNo.Minimum = m_VideoStream.FirstFrame;
                 nudFrameNo.Maximum = m_VideoStream.LastFrame;
-                nudFrameNo.Value = nudFrameNo.Minimum;
+				nudFrameNo.Value = currentFrameNo;
             }
 
             picHistogram.Image = new Bitmap(picHistogram.Width, picHistogram.Height);

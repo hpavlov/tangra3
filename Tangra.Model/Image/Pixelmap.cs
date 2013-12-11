@@ -26,9 +26,27 @@ namespace Tangra.Model.Image
 		    Width = width;
 			Height = height;
 			m_BitPix = bitPix;
-			m_Pixels = pixels;
-			m_Bitmap = bmp;
-            m_DisplayBitmapPixels = displayBitmapBytes;
+			m_Pixels = pixels;			
+            m_DisplayBitmapPixels = displayBitmapBytes;			
+			if (bmp != null && bmp.PixelFormat != PixelFormat.Format24bppRgb)
+			{
+				if (m_DisplayBitmapPixels != null && m_DisplayBitmapPixels.Length == Width * Height)
+				{
+					m_Bitmap = Pixelmap.ConstructBitmapFromBitmapPixels(m_DisplayBitmapPixels, Width, Height);
+				}
+				else if (Width * Height > 0)
+				{
+					m_Bitmap = new Bitmap(Width, Height, PixelFormat.Format24bppRgb);
+					using (Graphics g = Graphics.FromImage(m_Bitmap))
+					{
+						g.DrawImage(bmp, 0, 0);
+					}
+				}
+				else
+					m_Bitmap = null;
+			}
+			else
+				m_Bitmap = bmp;
 		}
 
 		public Pixelmap(Pixelmap cloneFrom)

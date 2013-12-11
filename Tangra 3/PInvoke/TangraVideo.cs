@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using Tangra.Model.Helpers;
+using Tangra.Model.Image;
 
 namespace Tangra.PInvoke
 {
@@ -20,7 +23,7 @@ namespace Tangra.PInvoke
 		public float FrameRate;
 		public int CountFrames;
 		public int FirstFrame;
-		public int BitmapImageSize;
+		public int VideoEncodedBitmapImageSize;
 
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
 		public byte[] EngineBuffer = new byte[16];
@@ -127,7 +130,7 @@ namespace Tangra.PInvoke
 				FrameRate = fileInfo.FrameRate,
 				CountFrames = fileInfo.CountFrames,
 				FirstFrame = fileInfo.FirstFrame,
-				BitmapImageSize = fileInfo.BitmapImageSize,
+				VideoEncodedBitmapImageSize = fileInfo.VideoEncodedBitmapImageSize,
 				VideoFileTypeBuffer = fileInfo.VideoFileTypeBuffer,
 				EngineBuffer = fileInfo.EngineBuffer
 			};
@@ -150,20 +153,38 @@ namespace Tangra.PInvoke
 				int width = s_fileInfo.Width;
 				int height = s_fileInfo.Height;
 				pixels = new uint[width * height];
-				byte[] bitmapPixels = new byte[s_fileInfo.BitmapImageSize + 40 + 14 + 1];
+				byte[] bitmapPixels = new byte[width * height * 3 + 40 + 14 + 1];
 				bitmapBytes = new byte[width * height];
-
+				int rv = -1;
                 try
                 {
-                    TangraVideoGetFrame(frameNo, pixels, bitmapPixels, bitmapBytes);
+                    rv = TangraVideoGetFrame(frameNo, pixels, bitmapPixels, bitmapBytes);
 
-                    using (MemoryStream memStr = new MemoryStream(bitmapPixels))
-                    {
-                        videoFrame = (Bitmap)Bitmap.FromStream(memStr);
-                    }
+					if (rv == 0)
+					{
+						using (MemoryStream memStr = new MemoryStream(bitmapPixels))
+						{
+							videoFrame = (Bitmap)Bitmap.FromStream(memStr);
+						}						
+					}
+					else
+						throw new InvalidOperationException("The core returned an error when trying to get a frame. Error code: " + rv.ToString());
                 }
                 catch (Exception ex)
                 {
+					if (rv == 0)
+					{
+						try
+						{
+							videoFrame = Pixelmap.ConstructBitmapFromBitmapPixels(bitmapBytes, width, height);
+							return;
+						}
+						catch (Exception ex2)
+						{
+							Trace.WriteLine(ex2.GetFullStackTrace());
+						}
+					}
+
                     videoFrame = new Bitmap(width, height);
                     using (Graphics g = Graphics.FromImage(videoFrame))
                     {
@@ -206,7 +227,7 @@ namespace Tangra.PInvoke
 			if (s_fileInfo != null)
 			{
 				pixels = new uint[s_fileInfo.Width * s_fileInfo.Height];
-				byte[] bitmapPixels = new byte[s_fileInfo.BitmapImageSize + 40 + 14 + 1];
+				byte[] bitmapPixels = new byte[s_fileInfo.Width * s_fileInfo.Height * 3 + 40 + 14 + 1];
 				bitmapBytes = new byte[s_fileInfo.Width * s_fileInfo.Height];
 
 				TangraVideoGetIntegratedFrame(startFrameNo, framesToIntegrate, isSlidingIntegration, isMedianAveraging, pixels, bitmapPixels, bitmapBytes);

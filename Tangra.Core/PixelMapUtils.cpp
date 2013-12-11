@@ -8,7 +8,7 @@
 #include <algorithm>
 
 
-void CopyPixelsFromFormat16BPP(BYTE* pDIB, BITMAPINFOHEADER bih, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
+void CopyPixelsFromFormat16BPP(BYTE* pDIB, BITMAPINFOHEADER bih, long compression, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
 {
 	long length = (bih.biWidth * bih.biHeight);
 	BYTE* src = pDIB + sizeof(BITMAPINFOHEADER);
@@ -27,7 +27,7 @@ void CopyPixelsFromFormat16BPP(BYTE* pDIB, BITMAPINFOHEADER bih, unsigned long* 
 			unsigned char green;
 			unsigned char blue;
 			
-			if (bih.biCompression == 0)
+			if (compression == 0)
 			{
 				unsigned short color = *((unsigned short*) src);
 				red = (unsigned char)(((color >> 10) & 0x1f) << 3);
@@ -36,15 +36,15 @@ void CopyPixelsFromFormat16BPP(BYTE* pDIB, BITMAPINFOHEADER bih, unsigned long* 
 				
 				src += 2;		
 			}
-			else if (bih.biCompression == 1) 
+			else if (compression == 1) 
 			{ 
 				// RLE 8. Not supported in 16 bit mode
 			}
-			else if (bih.biCompression == 2) 
+			else if (compression == 2) 
 			{ 
 				// RLE 4. Not supported in 16 bit mode
 			}
-			else if (bih.biCompression == 3) 
+			else if (compression == 3) 
 			{
 				// BITFIELDS. Not supported in 16 bit mode
 			};
@@ -68,6 +68,72 @@ void CopyPixelsFromFormat16BPP(BYTE* pDIB, BITMAPINFOHEADER bih, unsigned long* 
 			
 			*rowPixels++= (unsigned long)val;
 			*rowBitmapPixels++=val;
+			
+			*bitmapPixels++=val;
+			*bitmapPixels++=val;
+			*bitmapPixels++=val;
+		}
+	}
+}
+
+void CopyPixelsFromFormat16BPP(BYTE* pDIB, long width, long height, long compression, unsigned long* pixels)
+{
+	long length = width * height;
+	BYTE* src = pDIB + sizeof(BITMAPINFOHEADER);
+
+	unsigned int lineWidth = ((width * 16 / 8) + 3) & ~3;
+	
+	for (long y = height - 1; y >= 0; y--)
+	{
+		unsigned long* rowPixels = pixels + y * width;
+			
+		for(long x = 0; x < width; x++)
+		{
+			BYTE val;
+			unsigned char red;
+			unsigned char green;
+			unsigned char blue;
+			
+			if (compression == 0)
+			{
+				unsigned short color = *((unsigned short*) src);
+				red = (unsigned char)(((color >> 10) & 0x1f) << 3);
+				green = (unsigned char)(((color >> 5) & 0x1f) << 3);
+				blue = (unsigned char)((color & 0x1f) << 3);
+				
+				src += 2;		
+			}
+			else if (compression == 1) 
+			{ 
+				// RLE 8. Not supported in 16 bit mode
+			}
+			else if (compression == 2) 
+			{ 
+				// RLE 4. Not supported in 16 bit mode
+			}
+			else if (compression == 3) 
+			{
+				// BITFIELDS. Not supported in 16 bit mode
+			};
+			
+			if (s_COLOR_CHANNEL == Blue)
+			{
+				val = blue;
+			}
+			else if (s_COLOR_CHANNEL == Green)
+			{
+				val = green;
+			}
+			else if (s_COLOR_CHANNEL == Red)
+			{
+				val = red;
+			}
+			else if (s_COLOR_CHANNEL == GrayScale)
+			{
+				val = (unsigned char)(.299 * red + .587 * green + .114 * blue); 
+			}
+			
+			*rowPixels++= (unsigned long)val;
 		}
 	}
 }
@@ -151,6 +217,9 @@ void CopyPixelsInTriplets(BYTE* pDIB, BITMAPINFOHEADER bih, unsigned long* pixel
 
 		*pixels++=val1;
 		*bitmapBytes++=val1;
+		*bitmapPixels++=val1;
+		*bitmapPixels++=val1;
+		*bitmapPixels++=val1;
 		currLinePos--;
 
 		if (currLinePos == 0) 
@@ -162,6 +231,9 @@ void CopyPixelsInTriplets(BYTE* pDIB, BITMAPINFOHEADER bih, unsigned long* pixel
 
 		*pixels++=val2;
 		*bitmapBytes++=val2;
+		*bitmapPixels++=val2;
+		*bitmapPixels++=val2;
+		*bitmapPixels++=val2;		
 		currLinePos--;
 
 		if (currLinePos == 0) 
@@ -173,6 +245,9 @@ void CopyPixelsInTriplets(BYTE* pDIB, BITMAPINFOHEADER bih, unsigned long* pixel
 		
 		*pixels++=val3;
 		*bitmapBytes++=val3;
+		*bitmapPixels++=val3;
+		*bitmapPixels++=val3;
+		*bitmapPixels++=val3;		
 		currLinePos--;
 
 		if (currLinePos == 0) 
@@ -184,6 +259,9 @@ void CopyPixelsInTriplets(BYTE* pDIB, BITMAPINFOHEADER bih, unsigned long* pixel
 
 		*pixels++=val4;
 		*bitmapBytes++=val4;
+		*bitmapPixels++=val4;
+		*bitmapPixels++=val4;
+		*bitmapPixels++=val4;		
 		currLinePos--;
 	}
 }
@@ -281,7 +359,14 @@ void CopyPixelsInTriplets(BYTE* pDIB, long width, long height, unsigned long* pi
 
 HRESULT GetPixelMapPixelsOnly(BYTE* pDIB, long width, long height, unsigned long* pixels)
 {
-	CopyPixelsInTriplets(pDIB, width, height, pixels);
+	BITMAPINFOHEADER bih;
+	memmove(&bih.biSize, pDIB, sizeof(BITMAPINFOHEADER));
+	
+	if (bih.biBitCount == 24)
+		CopyPixelsInTriplets(pDIB, width, height, pixels);
+	else if (bih.biBitCount == 16)
+		CopyPixelsFromFormat16BPP(pDIB, width, height, bih.biCompression, pixels);
+		
 	return S_OK;
 }
 
@@ -294,19 +379,29 @@ HRESULT GetPixelMapBits(BYTE* pDIB, long* width, long* height, DWORD imageSize, 
 HRESULT GetPixelMapBitsAndHBitmap(BYTE* pDIB, long* width, long* height, DWORD imageSize, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, HBITMAP hBitmap)
 {
 	//OutputDebugString("GetPixelMapBitsAndHBitmap.214");
+	
 	BITMAPINFOHEADER bih;
 	memmove(&bih.biSize, pDIB, sizeof(BITMAPINFOHEADER));
 
+	int originalBitCount = bih.biBitCount;
+	int originalCompression = bih.biCompression;
+	
 	if (*width == 0) *width = bih.biWidth;
 	if (*height == 0) *height = bih.biHeight;
 
-	if (!bih.biSizeImage)
-		bih.biSizeImage = ((((*width * bih.biBitCount) + 31) & ~31) / 8) * *height;
+	bih.biSize = sizeof(BITMAPINFOHEADER); 
+	bih.biPlanes = 1; 
+	bih.biBitCount = 24;                          // 24-bit 
+	bih.biCompression = BI_RGB;                   // no compression 
+	bih.biSizeImage = *width * abs(*height) * 3;    // width * height * (RGB bytes) 
+	bih.biXPelsPerMeter = 0; 
+	bih.biYPelsPerMeter = 0; 
+	bih.biClrUsed = 0; 
+	bih.biClrImportant = 0; 
+	bih.biWidth = *width;                          // bitmap width 
+	bih.biHeight = *height;                        // bitmap height 
 
-	if (imageSize != 0 && bih.biSizeImage != imageSize)
-		bih.biSizeImage = imageSize;
-
-	////and BitmapInfo variable-length UDT
+	// and BitmapInfo variable-length UDT
 	BYTE memBitmapInfo[40];
 	memmove(memBitmapInfo, &bih, sizeof(bih));
 
@@ -320,13 +415,14 @@ HRESULT GetPixelMapBitsAndHBitmap(BYTE* pDIB, long* width, long* height, DWORD i
 	// Copy the display bitmap including the header
 	memmove(bitmapPixels, &bfh, sizeof(bfh));
 	memmove(bitmapPixels + sizeof(bfh), &memBitmapInfo, sizeof(memBitmapInfo));
-	memmove(bitmapPixels + sizeof(bfh) + sizeof(memBitmapInfo), pDIB + sizeof(BITMAPINFOHEADER), bih.biSizeImage);
+	
+	bitmapPixels = bitmapPixels + sizeof(bfh) + sizeof(memBitmapInfo);
 
     // See http://www.kalytta.com/bitmap.h for handling different bitmap formats
-	if (bih.biBitCount == 24)
+	if (originalBitCount == 24)
 		CopyPixelsInTriplets(pDIB, bih, pixels, bitmapPixels, bitmapBytes);
-	else if (bih.biBitCount == 16)
-		CopyPixelsFromFormat16BPP(pDIB, bih, pixels, bitmapPixels, bitmapBytes);
+	else if (originalBitCount == 16)
+		CopyPixelsFromFormat16BPP(pDIB, bih, originalCompression, pixels, bitmapPixels, bitmapBytes);
 	//else if (bih.biBitCount == 8)
 	//	CopyPixelsFromFormat8BPP(pDIB, bih, pixels, bitmapPixels, bitmapBytes);
 	//else if (bih.biBitCount == 4)
