@@ -1288,20 +1288,20 @@ namespace Tangra.VideoOperations.LightCurves
 			GetAOTAStarIndexes(out occultedStarIndex, out comp1Index, out comp2Index, out comp3Index);
 			if (m_Context.Binning > 0)
 			{
-				if (comparisonObjectId == 1 && comp1Index > -1)
+				if (comparisonObjectId == 0 && comp1Index > -1)
                     return m_AllBinnedReadings[comp1Index].Select(x => new SingleMeasurement(x, comp1Index, x.BinNo + (m_Context.Binning / 2.0), m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
-				else if (comparisonObjectId == 2 && comp2Index > -1)
+				else if (comparisonObjectId == 1 && comp2Index > -1)
                     return m_AllBinnedReadings[comp2Index].Select(x => new SingleMeasurement(x, comp2Index, x.BinNo + (m_Context.Binning / 2.0), m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
-				else if (comparisonObjectId == 3 && comp3Index > -1)
+				else if (comparisonObjectId == 2 && comp3Index > -1)
                     return m_AllBinnedReadings[comp3Index].Select(x => new SingleMeasurement(x, comp3Index, x.BinNo + (m_Context.Binning / 2.0), m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
 			}
 			else
 			{
-				if (comparisonObjectId == 1 && comp1Index > -1)
+				if (comparisonObjectId == 0 && comp1Index > -1)
                     return m_AllReadings[comp1Index].Select(x => new SingleMeasurement(x, x.CurrFrameNo, m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
-				else if (comparisonObjectId == 2 && comp2Index > -1)
+				else if (comparisonObjectId == 1 && comp2Index > -1)
                     return m_AllReadings[comp2Index].Select(x => new SingleMeasurement(x, x.CurrFrameNo, m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
-				else if (comparisonObjectId == 3 && comp3Index > -1)
+				else if (comparisonObjectId == 2 && comp3Index > -1)
                     return m_AllReadings[comp3Index].Select(x => new SingleMeasurement(x, x.CurrFrameNo, m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
 			}
 

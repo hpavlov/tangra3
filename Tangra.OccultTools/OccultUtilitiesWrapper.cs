@@ -182,7 +182,24 @@ namespace Tangra.OccultTools
 				else if (AOTA_Set_TimeBase != null)
 					AOTA_Set_TimeBase.Invoke(m_AotaInstance, new object[] { secondsFromUTMidnight });
 
+				// Now go and set any comparison stars
+	            for (int i = 0; i < dataProvider.NumberOfMeasuredComparisonObjects; i++)
+	            {
+					ISingleMeasurement[] compMeasurements = dataProvider.GetComparisonObjectMeasurements(i);
 
+					if (compMeasurements != null)
+					{
+						float[] compData = compMeasurements.Select(x => x.Measurement).ToArray();
+
+						if (i == 0)
+							AOTA_Set_Comp1Data.Invoke(m_AotaInstance, new object[] { compData });
+						else if (i == 1)
+							AOTA_Set_Comp2Data.Invoke(m_AotaInstance, new object[] { compData });
+						else if (i == 2)
+							AOTA_Set_Comp3Data.Invoke(m_AotaInstance, new object[] { compData });						
+					}
+	            }
+	            
 				int firstFrame = (int)frameIds[0];
 	            int framesInIntegration = 1;
 

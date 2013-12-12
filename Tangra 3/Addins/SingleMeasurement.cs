@@ -28,7 +28,7 @@ namespace Tangra.Addins
             }
             else
             {
-                Timestamp =lcFile.GetTimeForFrame(frameNo, out isCorrectedForInstrumentalDelay);
+                Timestamp = lcFile.GetTimeForFrame(frameNo, out isCorrectedForInstrumentalDelay);
             }
             
             IsCorrectedForInstrumentalDelay = !string.IsNullOrEmpty(isCorrectedForInstrumentalDelay);

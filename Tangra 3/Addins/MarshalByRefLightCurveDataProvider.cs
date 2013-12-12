@@ -31,9 +31,9 @@ namespace Tangra.Addins
 			if (NumberOfMeasuredComparisonObjects > 0)
 				m_Comp1Measurements = localProvider.GetComparisonObjectMeasurements(0);
 			if (NumberOfMeasuredComparisonObjects > 1)
-				m_Comp1Measurements = localProvider.GetComparisonObjectMeasurements(1);
+				m_Comp2Measurements = localProvider.GetComparisonObjectMeasurements(1);
 			if (NumberOfMeasuredComparisonObjects > 2)
-				m_Comp1Measurements = localProvider.GetComparisonObjectMeasurements(2);
+				m_Comp3Measurements = localProvider.GetComparisonObjectMeasurements(2);
 			localProvider.GetIntegrationRateAndFirstFrame(out m_IntegrationRate, out m_FirstIntegratingFrame);
 		}
 
