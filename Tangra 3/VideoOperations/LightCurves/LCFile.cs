@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -1065,26 +1066,39 @@ namespace Tangra.VideoOperations.LightCurves
 			}
 		}
 
-		internal DateTime? GetVideoRecordStartTimeUT()
+		private string FormatDate(DateTime? dtime)
+		{
+			if (dtime != null && dtime.Value.Date.Year != 1)
+				return dtime.Value.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture);
+			else if (dtime != null && dtime.Value.Date.Year == 1)
+				return dtime.Value.ToString("HH:mm:ss.fff", CultureInfo.InvariantCulture);
+			else return string.Empty;			
+		}
+
+		internal string GetVideoRecordStartTimeUT()
 		{
 			int frameId = FirstFrameInVideoFile;
-			return GetFrameTime(frameId);
+			DateTime? dtime = GetFrameTime(frameId);
+			return FormatDate(dtime);
 		}
 
-		internal DateTime? GetVideoRecordEndTimeUT()
+		internal string GetVideoRecordEndTimeUT()
 		{
 			int frameId = FirstFrameInVideoFile + CountFrames;
-			return GetFrameTime(frameId);
+			DateTime? dtime = GetFrameTime(frameId);
+			return FormatDate(dtime);
 		}
 
-		internal DateTime? GetFirstAnalysedFrameTimeUT()
+		internal string GetFirstAnalysedFrameTimeUT()
 		{
-			return GetFrameTime(MinFrame);
+			DateTime? dtime = GetFrameTime(MinFrame);
+			return FormatDate(dtime);
 		}
 
-		internal DateTime? GetLastAnalysedFrameTimeUT()
+		internal string GetLastAnalysedFrameTimeUT()
 		{
-			return GetFrameTime(MaxFrame);
+			DateTime? dtime = GetFrameTime(MaxFrame);
+			return FormatDate(dtime);
 		}
 
 		internal DateTime? GetFrameTime(double frameNo)

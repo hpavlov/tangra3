@@ -943,6 +943,7 @@ namespace Tangra.VideoOperations.LightCurves
 			    selectedMeasurements[0].CurrFrameNo != m_SelectedMeasurements[0].CurrFrameNo)
 			{
 				SelectMeasurement((int)(selectedMeasurements[0].CurrFrameNo - m_Header.MinFrame));
+				DisplayCurrentMeasurements();
 			}			
 	    }
 

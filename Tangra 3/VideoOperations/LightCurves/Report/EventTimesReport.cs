@@ -48,10 +48,10 @@ namespace Tangra.VideoOperations.LightCurves.Report
 		public int AveragedFrameHeight { get; set; }
 		public int AveragedFrameWidth { get; set; }
 		public bool IsThisAMiss { get; set; }
-		public DateTime? RecordedFromUT { get; set; }
-		public DateTime? RecordedToUT { get; set; }
-		public DateTime? AnalysedFromUT { get; set; }
-		public DateTime? AnalysedToUT { get; set; }
+		public string RecordedFromUT { get; set; }
+		public string RecordedToUT { get; set; }
+		public string AnalysedFromUT { get; set; }
+		public string AnalysedToUT { get; set; }
 		/// <summary>
 		/// ADV|AAV|AVI
 		/// </summary>
