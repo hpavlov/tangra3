@@ -92,7 +92,7 @@ namespace Tangra.OccultTools
 										result.EventResults[i].D_UTC,
 										result.EventResults[i].R_UTC);
 								}
-							}							
+							}
 						}
 					}
 		        }

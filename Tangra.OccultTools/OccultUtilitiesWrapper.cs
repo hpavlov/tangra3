@@ -18,6 +18,7 @@ namespace Tangra.OccultTools
 
 		private static MethodInfo AOTA_Set_TargetData;
 		private static MethodInfo AOTA_Set_TargetData_InclBg;
+		private static MethodInfo AOTA_Set_TargetData_BackgroundAlreadySubtracted;
 		private static MethodInfo AOTA_Set_FrameID;
 		private static MethodInfo AOTA_Set_Comp1Data;
 		private static MethodInfo AOTA_Set_Comp1Data_InclBg;
@@ -88,6 +89,8 @@ namespace Tangra.OccultTools
 				AOTA_Set_TargetData = TYPE_AOTA_ExternalAccess.GetMethod("Set_TargetData", new Type[] { typeof(float[]) });
 				//public void Set_TargetData(float[] foreground, float[] background)
 				AOTA_Set_TargetData_InclBg = TYPE_AOTA_ExternalAccess.GetMethod("Set_TargetData", new Type[] { typeof(float[]), typeof(float[]) });
+				//public void Set_TargetData_BackgroundAlreadySubtracted(float[] foreground, float[] background)
+				AOTA_Set_TargetData_BackgroundAlreadySubtracted = TYPE_AOTA_ExternalAccess.GetMethod("Set_TargetData_BackgroundAlreadySubtracted", new Type[] { typeof(float[]), typeof(float[]) });
 				//public void Set_FrameID(float[] data)
 				AOTA_Set_FrameID = TYPE_AOTA_ExternalAccess.GetMethod("Set_FrameID", new Type[] { typeof(float[]) });
 				//public void Set_Comp1Data(float[] data)
@@ -144,7 +147,14 @@ namespace Tangra.OccultTools
                 float[] data = measurements.Select(x => x.Measurement).ToArray();
                 float[] frameIds = measurements.Select(x => (float)x.CurrFrameNo).ToArray();
 
-                AOTA_Set_TargetData.Invoke(m_AotaInstance, new object[] { data });
+				if (AOTA_Set_TargetData_BackgroundAlreadySubtracted != null)
+				{
+					float[] dataBg = measurements.Select(x => x.Background).ToArray();
+					AOTA_Set_TargetData_BackgroundAlreadySubtracted.Invoke(m_AotaInstance, new object[] {data, dataBg});
+				}
+				else
+					AOTA_Set_TargetData.Invoke(m_AotaInstance, new object[] { data });
+
                 AOTA_Set_FrameID.Invoke(m_AotaInstance, new object[] { frameIds });
 
                 DateTime[] timestamps = measurements.Select(x => x.Timestamp).ToArray();

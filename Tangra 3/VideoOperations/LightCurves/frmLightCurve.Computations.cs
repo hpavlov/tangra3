@@ -152,6 +152,7 @@ namespace Tangra.VideoOperations.LightCurves
 
                 int idx = 1;
                 int binnedSum = 0;
+	            int binnedBackgroundSum = 0;
                 int binnedSuccessfulReadings = 0;
                 int binNo = 1;
                 BinnedValue binnedValue = new BinnedValue();
@@ -163,7 +164,9 @@ namespace Tangra.VideoOperations.LightCurves
                     if (idx % m_Context.Binning == 0)
                     {
                         binnedValue.TotalSum = binnedSum;
+	                    binnedValue.TotalBackgroundSum = binnedBackgroundSum;
                     	binnedValue.AdjustedValue = binnedSum * 1.0 / m_Context.Binning;
+						binnedValue.BackgroundValue = binnedBackgroundSum * 1.0 / m_Context.Binning;
 						binnedValue.IsSuccessfulReading = binnedSuccessfulReadings == m_Context.Binning; // Average out the non binned values due to unsuccessful readings
 
                         binnedValue.ReadingIndexTo = idx - 1;
@@ -179,6 +182,7 @@ namespace Tangra.VideoOperations.LightCurves
                         binnedSuccessfulReadings = 0;
 
 						binnedSum = reading.AdjustedReading;
+	                    binnedBackgroundSum = (int)reading.TotalBackground;
 
                         if (reading.IsSuccessfulReading)
 							binnedSuccessfulReadings++;
@@ -190,6 +194,7 @@ namespace Tangra.VideoOperations.LightCurves
                     else
                     {
 						binnedSum += reading.AdjustedReading;
+						binnedBackgroundSum += (int)reading.TotalBackground;
 
                         if (reading.IsSuccessfulReading)
 							binnedSuccessfulReadings++;
@@ -733,7 +738,9 @@ namespace Tangra.VideoOperations.LightCurves
         internal class BinnedValue
         {
             public int TotalSum;
+	        public int TotalBackgroundSum;
             public double AdjustedValue;
+			public double BackgroundValue;
             public int ReadingIndexFrom;
             public int ReadingIndexTo;
             public int BinNo;
