@@ -806,6 +806,7 @@ namespace Tangra.Model.Image
             TangraConfig.PreProcessingFilter filter,
             bool synchronise,
             TangraConfig.PhotometryReductionMethod reductionMethod,
+			TangraConfig.PsfQuadrature psfQuadrature,
             float aperture,
             double refinedFWHM,
             float refinedAverageFWHM,
@@ -832,8 +833,7 @@ namespace Tangra.Model.Image
                     break;
             }
 
-			if (reductionMethod == TangraConfig.PhotometryReductionMethod.PsfPhotometryAnalytical ||
-				reductionMethod == TangraConfig.PhotometryReductionMethod.PsfPhotometryNumerical)
+			if (reductionMethod == TangraConfig.PhotometryReductionMethod.PsfPhotometry)
 			{
 				if (TangraConfig.Settings.Photometry.PsfFittingMethod == TangraConfig.PsfFittingMethod.DirectNonLinearFit)
 				{
@@ -841,7 +841,7 @@ namespace Tangra.Model.Image
 						data, centerX, centerY, msrX0, msrY0,
 						aperture,
 						measurableObject.PsfFittingMatrixSize,
-						reductionMethod == TangraConfig.PhotometryReductionMethod.PsfPhotometryNumerical,
+						psfQuadrature == TangraConfig.PsfQuadrature.NumericalInAperture,
 						measurableObject.IsOccultedStar && fullDisappearance,
 						backgroundPixels,
 						measurableObject.MayHaveDisappeared, 
@@ -859,7 +859,7 @@ namespace Tangra.Model.Image
 						data, centerX, centerY, msrX0, msrY0, modelFWHM,
 						aperture,
 						measurableObject.PsfFittingMatrixSize,
-						reductionMethod == TangraConfig.PhotometryReductionMethod.PsfPhotometryNumerical,
+						psfQuadrature == TangraConfig.PsfQuadrature.NumericalInAperture,
 						measurableObject.IsOccultedStar && fullDisappearance,
 						backgroundPixels,
 						measurableObject.MayHaveDisappeared);

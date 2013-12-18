@@ -16,6 +16,9 @@ namespace Tangra.Helpers
     public class OccultWatcherHelper
     {
 #if WIN32
+		private const string REGKEY_INCOMING_EVENTS = @"Software\OccultWatcherReporting\IncomingEventReports";
+		private const string REGKEY_USED_EVENTS = @"Software\OccultWatcherReporting\UsedEventReports";
+
         [Conditional("WIN32")]
         public static void NotifyOccultWatcherIfInstalled(EventTimesReport report, IWin32Window parentForm)
         {
@@ -25,7 +28,7 @@ namespace Tangra.Helpers
                 return;
             try
             {
-                RegistryKey registryKey = Registry.CurrentUser.OpenSubKey(@"Software\OccultWatcher\IncomingEventReports", true);
+				RegistryKey registryKey = Registry.CurrentUser.OpenSubKey(REGKEY_INCOMING_EVENTS, true);
                 if (registryKey != null)
                 {
 
@@ -64,7 +67,7 @@ namespace Tangra.Helpers
                 {
                     MessageBox.Show(
                         parentForm,
-                        "The event information has been saved and made available for the OccultWatcher Reporting Add-in.\r\n\r\nRight click in OccultWatcher on the corresponding event and choose 'Report Observation' to pre-populate your report with the information made available by Tangra.",
+                        "The light curve analysis results have been saved and made available for the OccultWatcher IOTA Reporting Add-in.\r\n\r\nRight click in OccultWatcher on the corresponding event and choose 'Report Observation'. Once you have submitted your report press 'Prefill Report File' to pre-populate your report with the information made available by Tangra.",
                         "Tangra3 - " + report.AddinAction,
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Information);

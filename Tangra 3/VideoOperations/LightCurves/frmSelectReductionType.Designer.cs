@@ -63,9 +63,10 @@ namespace Tangra.VideoOperations.LightCurves
 			this.rbBinning = new System.Windows.Forms.RadioButton();
 			this.rbRunningAverage = new System.Windows.Forms.RadioButton();
 			this.tabStretching = new System.Windows.Forms.TabPage();
-			this.ucStretching = new Tangra.VideoOperations.LightCurves.ucPreProcessing();
 			this.tabReduction = new System.Windows.Forms.TabPage();
 			this.pnlBackground = new System.Windows.Forms.Panel();
+			this.ucStretching = new Tangra.VideoOperations.LightCurves.ucPreProcessing();
+			this.lblAnalyticalPsfInfo = new System.Windows.Forms.Label();
 			this.tabControl1.SuspendLayout();
 			this.tabGeneral.SuspendLayout();
 			this.groupBox2.SuspendLayout();
@@ -478,16 +479,10 @@ namespace Tangra.VideoOperations.LightCurves
 			this.tabStretching.Text = "Pre-Processing";
 			this.tabStretching.UseVisualStyleBackColor = true;
 			// 
-			// ucStretching
-			// 
-			this.ucStretching.Location = new System.Drawing.Point(0, 0);
-			this.ucStretching.Name = "ucStretching";
-			this.ucStretching.Size = new System.Drawing.Size(370, 221);
-			this.ucStretching.TabIndex = 0;
-			// 
 			// tabReduction
 			// 
 			this.tabReduction.BackColor = System.Drawing.Color.Transparent;
+			this.tabReduction.Controls.Add(this.lblAnalyticalPsfInfo);
 			this.tabReduction.Controls.Add(this.pnlBackground);
 			this.tabReduction.Controls.Add(this.label3);
 			this.tabReduction.Controls.Add(this.cbxReductionType);
@@ -507,8 +502,26 @@ namespace Tangra.VideoOperations.LightCurves
 			this.pnlBackground.Controls.Add(this.cbxBackgroundMethod);
 			this.pnlBackground.Location = new System.Drawing.Point(6, 124);
 			this.pnlBackground.Name = "pnlBackground";
-			this.pnlBackground.Size = new System.Drawing.Size(291, 53);
+			this.pnlBackground.Size = new System.Drawing.Size(291, 40);
 			this.pnlBackground.TabIndex = 6;
+			// 
+			// ucStretching
+			// 
+			this.ucStretching.Location = new System.Drawing.Point(0, 0);
+			this.ucStretching.Name = "ucStretching";
+			this.ucStretching.Size = new System.Drawing.Size(370, 221);
+			this.ucStretching.TabIndex = 0;
+			// 
+			// lblAnalyticalPsfInfo
+			// 
+			this.lblAnalyticalPsfInfo.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+			this.lblAnalyticalPsfInfo.Location = new System.Drawing.Point(12, 167);
+			this.lblAnalyticalPsfInfo.Name = "lblAnalyticalPsfInfo";
+			this.lblAnalyticalPsfInfo.Size = new System.Drawing.Size(285, 35);
+			this.lblAnalyticalPsfInfo.TabIndex = 7;
+			this.lblAnalyticalPsfInfo.Text = "The background method is fixed to PSFBackground when PSF Photometry with analytic" +
+    "al quadrature is used.";
+			this.lblAnalyticalPsfInfo.Visible = false;
 			// 
 			// frmSelectReductionType
 			// 
@@ -588,5 +601,6 @@ namespace Tangra.VideoOperations.LightCurves
         private System.Windows.Forms.CheckBox cbxFieldRotation;
 		private System.Windows.Forms.CheckBox cbxDriftTrough;
 		private System.Windows.Forms.RadioButton rbLunarOccultation;
+		private System.Windows.Forms.Label lblAnalyticalPsfInfo;
     }
 }

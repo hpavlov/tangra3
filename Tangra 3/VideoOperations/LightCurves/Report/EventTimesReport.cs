@@ -9,6 +9,7 @@ using Tangra.Model.Helpers;
 
 namespace Tangra.VideoOperations.LightCurves.Report
 {
+	[XmlRoot(Namespace = "http://www.hristopavlov.net/Tangra3/2013")]
 	public class EventTimesReport
 	{
         public string TangraVersion { get; set; }

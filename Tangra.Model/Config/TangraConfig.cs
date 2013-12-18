@@ -182,7 +182,7 @@ namespace Tangra.Model.Config
 
 			//if (Settings.DefaultsConfigurationVersion < TangraDefaults.Current.Version)
 			//{
-			//    TangraDefaults.Current.UpdateDefaultValues(Settings);
+			//	TangraDefaults.Current.UpdateDefaultValues(Settings);
 			//}
 		}
 
@@ -290,8 +290,7 @@ namespace Tangra.Model.Config
 		public enum PhotometryReductionMethod
 		{
 			AperturePhotometry,
-			PsfPhotometryNumerical,
-			PsfPhotometryAnalytical,
+			PsfPhotometry,
 			OptimalExtraction
 		}
 
@@ -499,6 +498,13 @@ namespace Tangra.Model.Config
             None
         }
 
+		public enum OWExportMode
+		{
+			AlwaysExportEventTimes,
+			AskBeforeExportingEventTimes,
+			DontExportEventTimes
+		}
+
 		public class GenericSettings
 		{
 			public bool RunVideosOnFastestSpeed = true;
@@ -525,6 +531,7 @@ namespace Tangra.Model.Config
 			public int MaxCalibrationFieldsToAttempt = 25;
 
             public IsolationLevel AddinIsolationLevel = IsolationLevel.AppDomain;
+			public OWExportMode OWEventTimesExportMode = OWExportMode.AlwaysExportEventTimes;
 		}
 
         public class LastUsedSettings

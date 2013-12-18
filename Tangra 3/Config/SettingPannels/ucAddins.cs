@@ -28,12 +28,17 @@ namespace Tangra.Config.SettingPannels
 
             m_AddinsController = addinsController;
 			m_AddinContainers.AddRange(addinContainers);
+
+#if !WIN32
+			pnlOccultWatcherSettings.Visible = false;
+#endif
 		}
 
         public override void LoadSettings()
         {
             cbxIsolationLevel.SelectedIndex = (int) TangraConfig.Settings.Generic.AddinIsolationLevel;
             tbxAddinsDirectory.Text = AddinManager.ADDINS_DIRECTORY;
+			cbxOwEventTimesExport.SelectedIndex = (int) TangraConfig.Settings.Generic.OWEventTimesExportMode;
 
             m_AddinsController.ShowLoadedAddins(lbxLoadedAddins);
             lbxLoadedAddins.SelectedIndex = -1;
@@ -46,6 +51,7 @@ namespace Tangra.Config.SettingPannels
         public override void SaveSettings()
         {
             TangraConfig.Settings.Generic.AddinIsolationLevel = (TangraConfig.IsolationLevel) cbxIsolationLevel.SelectedIndex;
+			TangraConfig.Settings.Generic.OWEventTimesExportMode = (TangraConfig.OWExportMode) cbxOwEventTimesExport.SelectedIndex;
         }
 
         private void lbxLoadedAddins_SelectedIndexChanged(object sender, EventArgs e)
@@ -127,6 +133,11 @@ namespace Tangra.Config.SettingPannels
 		private void btnNavigateTo_Click(object sender, EventArgs e)
 		{
 			Process.Start(tbxAddinsDirectory.Text);
+		}
+
+		private void linkLblOW_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+		{
+			Process.Start("http://www.hristopavlov.net/OccultWatcher/");
 		}
 	}
 }

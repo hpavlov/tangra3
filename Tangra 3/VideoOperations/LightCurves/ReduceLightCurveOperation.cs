@@ -1694,6 +1694,7 @@ namespace Tangra.VideoOperations.LightCurves
 				filter,
 				synchronise,
 				LightCurveReductionContext.Instance.ReductionMethod,
+				LightCurveReductionContext.Instance.PsfQuadratureMethod,
 				trackedObject.OriginalObject.ApertureInPixels,
 				m_Tracker.RefinedFWHM[trackedObject.TargetNo],
 				m_Tracker.RefinedAverageFWHM,
@@ -1741,6 +1742,7 @@ namespace Tangra.VideoOperations.LightCurves
 			TangraConfig.PreProcessingFilter filter,
 			bool synchronise,
 			TangraConfig.PhotometryReductionMethod reductionMethod,
+			TangraConfig.PsfQuadrature psfQuadrature,
 			float aperture,
 			double refinedFWHM,
 			float refinedAverageFWHM,
@@ -1748,16 +1750,9 @@ namespace Tangra.VideoOperations.LightCurves
 			bool fullDisappearance
 			)
 		{
-			if (reductionMethod == TangraConfig.PhotometryReductionMethod.PsfPhotometryAnalytical || reductionMethod == TangraConfig.PhotometryReductionMethod.PsfPhotometryNumerical)
-			{
-				if (TangraConfig.Settings.Photometry.PsfQuadrature == TangraConfig.PsfQuadrature.NumericalInAperture)
-					reductionMethod = TangraConfig.PhotometryReductionMethod.PsfPhotometryNumerical;
-				else if (TangraConfig.Settings.Photometry.PsfQuadrature == TangraConfig.PsfQuadrature.Analytical)
-					reductionMethod = TangraConfig.PhotometryReductionMethod.PsfPhotometryAnalytical;
-			}
-
-			return measurer.MeasureObject(center, data, backgroundPixels, bpp, filter, synchronise, reductionMethod,
-								   aperture, refinedFWHM, refinedAverageFWHM, measurableObject, fullDisappearance);
+			return measurer.MeasureObject(
+				center, data, backgroundPixels, bpp, filter, synchronise, reductionMethod, psfQuadrature,
+				aperture, refinedFWHM, refinedAverageFWHM, measurableObject, fullDisappearance);
 	}
 
 		private LCFile m_lcFile = null;

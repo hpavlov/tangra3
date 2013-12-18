@@ -63,9 +63,7 @@ namespace Tangra.VideoOperations.LightCurves
                     return "Aperture Photometry";
                 case TangraConfig.PhotometryReductionMethod.OptimalExtraction:
                     return "Optimal Extraction";
-                case TangraConfig.PhotometryReductionMethod.PsfPhotometryAnalytical:
-                    return "Analytical Psf Photometry";
-                case TangraConfig.PhotometryReductionMethod.PsfPhotometryNumerical:
+                case TangraConfig.PhotometryReductionMethod.PsfPhotometry:
                     return "Numerical Psf Photometry";
             }
 

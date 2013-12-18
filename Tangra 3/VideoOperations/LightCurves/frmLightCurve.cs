@@ -151,8 +151,7 @@ namespace Tangra.VideoOperations.LightCurves
 				case TangraConfig.PhotometryReductionMethod.AperturePhotometry:
 					return "Aperture Photometry";
 
-				case TangraConfig.PhotometryReductionMethod.PsfPhotometryAnalytical:
-				case TangraConfig.PhotometryReductionMethod.PsfPhotometryNumerical:
+				case TangraConfig.PhotometryReductionMethod.PsfPhotometry:
 					return "PSF Photometry";
 
 				case TangraConfig.PhotometryReductionMethod.OptimalExtraction:
@@ -261,6 +260,7 @@ namespace Tangra.VideoOperations.LightCurves
             m_Context.BackgroundMethod = (TangraConfig.BackgroundMethod)m_Header.BackgroundType;
             m_Context.SignalMethod = m_Footer.ReductionContext.ReductionMethod;
             m_Context.PsfFittingMethod = m_Footer.ProcessedWithTangraConfig.Photometry.PsfFittingMethod;
+	        m_Context.PsfQuadratureMethod = m_Footer.ProcessedWithTangraConfig.Photometry.PsfQuadrature;
             m_Context.ManualAverageFWHM = m_Footer.ProcessedWithTangraConfig.Photometry.UseUserSpecifiedFWHM
                                               ? m_Footer.ProcessedWithTangraConfig.Photometry.UserSpecifiedFWHM
                                               : float.NaN;
@@ -522,7 +522,21 @@ namespace Tangra.VideoOperations.LightCurves
 				m_EventTimesReport.SaveReport();
 				
 #if WIN32
-                OccultWatcherHelper.NotifyOccultWatcherIfInstalled(m_EventTimesReport, this);
+				if (TangraConfig.Settings.Generic.OWEventTimesExportMode != TangraConfig.OWExportMode.DontExportEventTimes)
+				{
+					bool export = true;
+					if (TangraConfig.Settings.Generic.OWEventTimesExportMode == TangraConfig.OWExportMode.AskBeforeExportingEventTimes)
+					{
+						export = MessageBox.Show(
+							string.Format("Would you like to make the results provided by {0} available for Occult Watcher's IOTA Reporting Add-in?", m_EventTimesReport.Provider),
+							"Tangra3 - " + m_EventTimesReport.AddinAction, 
+							MessageBoxButtons.YesNo, 
+							MessageBoxIcon.Question, 
+							MessageBoxDefaultButton.Button1) == DialogResult.Yes;	
+					}
+
+					OccultWatcherHelper.NotifyOccultWatcherIfInstalled(m_EventTimesReport, this);	
+				}                
 #endif
 			}
 
@@ -915,7 +929,8 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void UpdateContextDisplays()
         {
-            if (m_Context.SignalMethod == TangraConfig.PhotometryReductionMethod.PsfPhotometryAnalytical)
+            if (m_Context.SignalMethod == TangraConfig.PhotometryReductionMethod.PsfPhotometry && 
+				m_Context.PsfQuadratureMethod == TangraConfig.PsfQuadrature.Analytical)
             {
                 m_Context.ProcessingType = ProcessingType.SignalMinusBackground;
                 miSignalOnly.Visible = false;

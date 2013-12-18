@@ -53,6 +53,7 @@ namespace Tangra.VideoOperations.LightCurves
 
         	SetComboboxIndexFromBackgroundMethod(m_Context.BackgroundMethod);
 			SetComboboxIndexFromPhotometryReductionMethod(m_Context.SignalMethod);
+	        SetComboboxIndexFromPsfQuadratureMethod(m_Context.PsfQuadratureMethod);
         	cbxDigitalFilter.SelectedIndex = (int)m_Context.Filter;
         	nudGamma.Value = (decimal)m_Context.EncodingGamma;
 
@@ -521,6 +522,7 @@ namespace Tangra.VideoOperations.LightCurves
         {
 			m_Context.BackgroundMethod = ComboboxIndexToBackgroundMethod();
 			m_Context.SignalMethod = ComboboxIndexToPhotometryReductionMethod();
+			m_Context.PsfQuadratureMethod = ComboboxIndexToPsfQuadratureMethod();
 			m_Context.Filter = (frmLightCurve.LightCurveContext.FilterType)cbxDigitalFilter.SelectedIndex;
 			m_Context.EncodingGamma = (double)nudGamma.Value;
 
@@ -538,7 +540,7 @@ namespace Tangra.VideoOperations.LightCurves
 			if (cbxReductionType.SelectedIndex == 0)
                 return TangraConfig.PhotometryReductionMethod.AperturePhotometry;
 			else if (cbxReductionType.SelectedIndex == 1)
-                return TangraConfig.PhotometryReductionMethod.PsfPhotometryNumerical;
+                return TangraConfig.PhotometryReductionMethod.PsfPhotometry;
 			else if (cbxReductionType.SelectedIndex == 2)
                 return TangraConfig.PhotometryReductionMethod.OptimalExtraction;
 			else
@@ -553,16 +555,16 @@ namespace Tangra.VideoOperations.LightCurves
 					cbxReductionType.SelectedIndex = 0;
 					break;
 
-                case TangraConfig.PhotometryReductionMethod.PsfPhotometryNumerical:
+                case TangraConfig.PhotometryReductionMethod.PsfPhotometry:
 					cbxReductionType.SelectedIndex = 1;
-					break;
-
-                case TangraConfig.PhotometryReductionMethod.PsfPhotometryAnalytical:
-					cbxReductionType.SelectedIndex = -1;
 					break;
 
                 case TangraConfig.PhotometryReductionMethod.OptimalExtraction:
 					cbxReductionType.SelectedIndex = 2;
+					break;
+
+				default:
+					cbxReductionType.SelectedIndex = 0;
 					break;
 			}
 		}
@@ -607,9 +609,47 @@ namespace Tangra.VideoOperations.LightCurves
 			}
 		}
 
+		public TangraConfig.PsfQuadrature ComboboxIndexToPsfQuadratureMethod()
+		{
+			if (cbxPsfQuadrature.SelectedIndex == 0)
+				return TangraConfig.PsfQuadrature.NumericalInAperture;
+			else if (cbxPsfQuadrature.SelectedIndex == 1)
+				return TangraConfig.PsfQuadrature.Analytical;
+			else
+				return TangraConfig.PsfQuadrature.NumericalInAperture;
+		}
+
+		public void SetComboboxIndexFromPsfQuadratureMethod(TangraConfig.PsfQuadrature method)
+		{
+			switch (method)
+			{
+				case TangraConfig.PsfQuadrature.NumericalInAperture:
+					cbxPsfQuadrature.SelectedIndex = 0;
+					break;
+
+				case TangraConfig.PsfQuadrature.Analytical:
+					cbxPsfQuadrature.SelectedIndex = 1;
+					break;
+
+				default:
+					cbxPsfQuadrature.SelectedIndex = 0;
+					break;
+			}
+		}
+
 		private void cbxReductionType_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			pnlBackground.Visible = ComboboxIndexToPhotometryReductionMethod() != TangraConfig.PhotometryReductionMethod.PsfPhotometryAnalytical;
+			if (ComboboxIndexToPhotometryReductionMethod() == TangraConfig.PhotometryReductionMethod.PsfPhotometry)
+			{
+				pnlPsfQuadrature.Visible = true;
+				if (cbxPsfQuadrature.SelectedIndex == -1) cbxPsfQuadrature.SelectedIndex = 0;
+
+				EnsurePsfBackgroundControlsStatus();
+			}
+			else
+			{
+				pnlPsfQuadrature.Visible = false;
+			}			
 
 			if (m_Footer.ReductionContext.LightCurveReductionType == LightCurveReductionType.UntrackedMeasurement)
 			{
@@ -622,6 +662,25 @@ namespace Tangra.VideoOperations.LightCurves
 					cbxReductionType.SelectedIndex = 0;
 				}
 			}
+		}
+
+		private void cbxPsfQuadrature_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			EnsurePsfBackgroundControlsStatus();
+		}
+
+		private void EnsurePsfBackgroundControlsStatus()
+		{
+			if (ComboboxIndexToPhotometryReductionMethod() == TangraConfig.PhotometryReductionMethod.PsfPhotometry &&
+				ComboboxIndexToPsfQuadratureMethod() == TangraConfig.PsfQuadrature.Analytical)
+			{
+				SetComboboxIndexFromBackgroundMethod(TangraConfig.BackgroundMethod.PSFBackground);
+				cbxBackgroundMethod.Enabled = false;
+			}
+			else
+			{
+				cbxBackgroundMethod.Enabled = true;
+			}			
 		}
 
 		private void cbxBackgroundMethod_SelectedIndexChanged(object sender, EventArgs e)

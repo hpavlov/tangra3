@@ -68,6 +68,9 @@
 			this.cbxDigitalFilter = new System.Windows.Forms.ComboBox();
 			this.label28 = new System.Windows.Forms.Label();
 			this.nudGamma = new System.Windows.Forms.NumericUpDown();
+			this.pnlPsfQuadrature = new System.Windows.Forms.Panel();
+			this.cbxPsfQuadrature = new System.Windows.Forms.ComboBox();
+			this.label6 = new System.Windows.Forms.Label();
 			this.groupBox1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nudFitArea4)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudFitArea3)).BeginInit();
@@ -92,6 +95,7 @@
 			((System.ComponentModel.ISupportInitialize)(this.tbIntensity)).BeginInit();
 			this.pnlBackground.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nudGamma)).BeginInit();
+			this.pnlPsfQuadrature.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// groupBox1
@@ -555,7 +559,7 @@
 			// 
 			this.pnlBackground.Controls.Add(this.label2);
 			this.pnlBackground.Controls.Add(this.cbxBackgroundMethod);
-			this.pnlBackground.Location = new System.Drawing.Point(3, 127);
+			this.pnlBackground.Location = new System.Drawing.Point(3, 162);
 			this.pnlBackground.Name = "pnlBackground";
 			this.pnlBackground.Size = new System.Drawing.Size(222, 53);
 			this.pnlBackground.TabIndex = 38;
@@ -611,7 +615,7 @@
 			// label4
 			// 
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(9, 73);
+			this.label4.Location = new System.Drawing.Point(9, 108);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(61, 13);
 			this.label4.TabIndex = 34;
@@ -625,7 +629,7 @@
             "No Filter",
             "Low Pass Filter (LP)",
             "Low Pass Difference Filter (LPD)"});
-			this.cbxDigitalFilter.Location = new System.Drawing.Point(12, 89);
+			this.cbxDigitalFilter.Location = new System.Drawing.Point(12, 124);
 			this.cbxDigitalFilter.Name = "cbxDigitalFilter";
 			this.cbxDigitalFilter.Size = new System.Drawing.Size(205, 21);
 			this.cbxDigitalFilter.TabIndex = 35;
@@ -633,7 +637,7 @@
 			// label28
 			// 
 			this.label28.AutoSize = true;
-			this.label28.Location = new System.Drawing.Point(9, 219);
+			this.label28.Location = new System.Drawing.Point(9, 231);
 			this.label28.Name = "label28";
 			this.label28.Size = new System.Drawing.Size(94, 13);
 			this.label28.TabIndex = 39;
@@ -648,7 +652,7 @@
             0,
             0,
             131072});
-			this.nudGamma.Location = new System.Drawing.Point(109, 217);
+			this.nudGamma.Location = new System.Drawing.Point(109, 229);
 			this.nudGamma.Maximum = new decimal(new int[] {
             10,
             0,
@@ -669,11 +673,42 @@
             131072});
 			this.nudGamma.Visible = false;
 			// 
+			// pnlPsfQuadrature
+			// 
+			this.pnlPsfQuadrature.Controls.Add(this.cbxPsfQuadrature);
+			this.pnlPsfQuadrature.Controls.Add(this.label6);
+			this.pnlPsfQuadrature.Location = new System.Drawing.Point(1, 57);
+			this.pnlPsfQuadrature.Name = "pnlPsfQuadrature";
+			this.pnlPsfQuadrature.Size = new System.Drawing.Size(222, 48);
+			this.pnlPsfQuadrature.TabIndex = 41;
+			// 
+			// cbxPsfQuadrature
+			// 
+			this.cbxPsfQuadrature.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.cbxPsfQuadrature.Items.AddRange(new object[] {
+            "Numerical Quadrature in Aperture",
+            "Full Analytical Quadrature"});
+			this.cbxPsfQuadrature.Location = new System.Drawing.Point(11, 17);
+			this.cbxPsfQuadrature.Name = "cbxPsfQuadrature";
+			this.cbxPsfQuadrature.Size = new System.Drawing.Size(205, 21);
+			this.cbxPsfQuadrature.TabIndex = 41;
+			this.cbxPsfQuadrature.SelectedIndexChanged += new System.EventHandler(this.cbxPsfQuadrature_SelectedIndexChanged);
+			// 
+			// label6
+			// 
+			this.label6.AutoSize = true;
+			this.label6.Location = new System.Drawing.Point(8, 1);
+			this.label6.Name = "label6";
+			this.label6.Size = new System.Drawing.Size(86, 13);
+			this.label6.TabIndex = 40;
+			this.label6.Text = "PSF Quadrature:";
+			// 
 			// frmConfigureReprocessing
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(608, 331);
+			this.Controls.Add(this.pnlPsfQuadrature);
 			this.Controls.Add(this.label28);
 			this.Controls.Add(this.nudGamma);
 			this.Controls.Add(this.pnlBackground);
@@ -718,6 +753,8 @@
 			this.pnlBackground.ResumeLayout(false);
 			this.pnlBackground.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nudGamma)).EndInit();
+			this.pnlPsfQuadrature.ResumeLayout(false);
+			this.pnlPsfQuadrature.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -764,5 +801,8 @@
 		private System.Windows.Forms.ComboBox cbxDigitalFilter;
 		private System.Windows.Forms.Label label28;
 		private System.Windows.Forms.NumericUpDown nudGamma;
+		private System.Windows.Forms.Panel pnlPsfQuadrature;
+		private System.Windows.Forms.ComboBox cbxPsfQuadrature;
+		private System.Windows.Forms.Label label6;
     }
 }

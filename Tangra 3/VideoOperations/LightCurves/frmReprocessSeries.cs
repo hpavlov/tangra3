@@ -230,6 +230,7 @@ namespace Tangra.VideoOperations.LightCurves
 				(TangraConfig.PreProcessingFilter)((int)Context.Filter),
 				false,
 				Context.SignalMethod,
+				Context.PsfQuadratureMethod,
 				newSignalAperture,
 				objConfig.RefinedFWHM,
 				Footer.RefinedAverageFWHM,

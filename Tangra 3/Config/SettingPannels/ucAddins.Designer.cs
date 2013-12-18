@@ -46,8 +46,13 @@ namespace Tangra.Config.SettingPannels
 			this.cbxIsolationLevel = new System.Windows.Forms.ComboBox();
 			this.btnUnloadAddins = new System.Windows.Forms.Button();
 			this.btnNavigateTo = new System.Windows.Forms.Button();
+			this.cbxOwEventTimesExport = new System.Windows.Forms.ComboBox();
+			this.label4 = new System.Windows.Forms.Label();
+			this.linkLblOW = new System.Windows.Forms.LinkLabel();
+			this.pnlOccultWatcherSettings = new System.Windows.Forms.Panel();
 			this.gbxLoadedAddins.SuspendLayout();
 			this.pnlAddinInfo.SuspendLayout();
+			this.pnlOccultWatcherSettings.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// gbxLoadedAddins
@@ -213,11 +218,55 @@ namespace Tangra.Config.SettingPannels
 			this.btnNavigateTo.UseVisualStyleBackColor = true;
 			this.btnNavigateTo.Click += new System.EventHandler(this.btnNavigateTo_Click);
 			// 
+			// cbxOwEventTimesExport
+			// 
+			this.cbxOwEventTimesExport.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.cbxOwEventTimesExport.FormattingEnabled = true;
+			this.cbxOwEventTimesExport.Items.AddRange(new object[] {
+            "Always Export Event Times",
+            "Ask before Exporting Event Times",
+            "Don\'t Export Event Times"});
+			this.cbxOwEventTimesExport.Location = new System.Drawing.Point(193, 4);
+			this.cbxOwEventTimesExport.Name = "cbxOwEventTimesExport";
+			this.cbxOwEventTimesExport.Size = new System.Drawing.Size(202, 21);
+			this.cbxOwEventTimesExport.TabIndex = 9;
+			// 
+			// label4
+			// 
+			this.label4.AutoSize = true;
+			this.label4.Location = new System.Drawing.Point(0, 8);
+			this.label4.Name = "label4";
+			this.label4.Size = new System.Drawing.Size(187, 13);
+			this.label4.TabIndex = 8;
+			this.label4.Text = "Occult Watcher Reporting Integration:";
+			// 
+			// linkLblOW
+			// 
+			this.linkLblOW.AutoSize = true;
+			this.linkLblOW.Location = new System.Drawing.Point(0, 7);
+			this.linkLblOW.Name = "linkLblOW";
+			this.linkLblOW.Size = new System.Drawing.Size(82, 13);
+			this.linkLblOW.TabIndex = 10;
+			this.linkLblOW.TabStop = true;
+			this.linkLblOW.Text = "Occult Watcher";
+			this.linkLblOW.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLblOW_LinkClicked);
+			// 
+			// pnlOccultWatcherSettings
+			// 
+			this.pnlOccultWatcherSettings.Controls.Add(this.linkLblOW);
+			this.pnlOccultWatcherSettings.Controls.Add(this.label4);
+			this.pnlOccultWatcherSettings.Controls.Add(this.cbxOwEventTimesExport);
+			this.pnlOccultWatcherSettings.Location = new System.Drawing.Point(1, 303);
+			this.pnlOccultWatcherSettings.Name = "pnlOccultWatcherSettings";
+			this.pnlOccultWatcherSettings.Size = new System.Drawing.Size(463, 29);
+			this.pnlOccultWatcherSettings.TabIndex = 11;
+			// 
 			// ucAddins
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.SystemColors.Control;
+			this.Controls.Add(this.pnlOccultWatcherSettings);
 			this.Controls.Add(this.btnNavigateTo);
 			this.Controls.Add(this.btnUnloadAddins);
 			this.Controls.Add(this.cbxIsolationLevel);
@@ -231,6 +280,8 @@ namespace Tangra.Config.SettingPannels
 			this.gbxLoadedAddins.ResumeLayout(false);
 			this.pnlAddinInfo.ResumeLayout(false);
 			this.pnlAddinInfo.PerformLayout();
+			this.pnlOccultWatcherSettings.ResumeLayout(false);
+			this.pnlOccultWatcherSettings.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -254,6 +305,10 @@ namespace Tangra.Config.SettingPannels
         private ComboBox cbxIsolationLevel;
         private Button btnUnloadAddins;
 		private Button btnNavigateTo;
+		private ComboBox cbxOwEventTimesExport;
+		private Label label4;
+		private LinkLabel linkLblOW;
+		private Panel pnlOccultWatcherSettings;
 
 
     }

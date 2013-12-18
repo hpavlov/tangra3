@@ -594,7 +594,9 @@ namespace Tangra.VideoOperations.LightCurves
 			{
                 CSVExportAddCommonHeader(output, false);
 
-                bool onlyExportSignalMunusBg = m_Context.SignalMethod == TangraConfig.PhotometryReductionMethod.PsfPhotometryAnalytical;
+				bool onlyExportSignalMunusBg =
+					m_Context.SignalMethod == TangraConfig.PhotometryReductionMethod.PsfPhotometry &&
+					m_Context.PsfQuadratureMethod == TangraConfig.PsfQuadrature.Analytical;
 
 				int count = m_AllReadings[0].Count;
 
@@ -989,6 +991,23 @@ namespace Tangra.VideoOperations.LightCurves
                     }
                 }
             }
+
+			private TangraConfig.PsfQuadrature m_PsfQuadratureMethod = TangraConfig.PsfQuadrature.NumericalInAperture;
+
+			public TangraConfig.PsfQuadrature PsfQuadratureMethod
+			{
+				get { return m_PsfQuadratureMethod; }
+				set
+				{
+					if (m_PsfQuadratureMethod != value)
+					{
+						m_PsfQuadratureMethod = value;
+						m_Dirty = true;
+
+						m_RequiresFullReprocessing = true;
+					}
+				}
+			}
 
         	private byte[] m_DecodingGammaMatrix = new byte[256];
 			public byte[] DecodingGammaMatrix
