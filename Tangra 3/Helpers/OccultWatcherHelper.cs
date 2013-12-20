@@ -77,10 +77,13 @@ namespace Tangra.Helpers
 						}
                     }
 
-	                if (!owNotified)
-						availableList.Add(report.ReportFileName);
+                    if (!owNotified)
+                    {
+                        availableList.Add(report.ReportFileName);
+                        owNotified = true;
+                    }
 
-					for (int i = 0; i < allValueNames.Length; i++)
+                    for (int i = 0; i < allValueNames.Length; i++)
 					{
 						registryKey.DeleteValue(allValueNames[0], false);
 					}

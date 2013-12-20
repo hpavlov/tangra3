@@ -1218,27 +1218,66 @@ namespace Tangra.VideoOperations.LightCurves
 					RTimeString = rTime
 				};
 
-				if (m_LCFile != null && m_LCFile.FrameTiming != null && m_LCFile.FrameTiming.Count > 0)
-				{
+                if (m_LCFile != null)
+                {
+                    m_LCFile.Header.LcFile = m_LCFile;
+
                     // NOTE: For AOTA xx.0 is the beginning of the frame and xx.5 is the middle of the frame. 
                     //       Tangra associates all frame times with the middle of the frame so we adjust the AOTA frames to Tangra frames by subtracting 0.5 below
+                    bool gotTimes = false;
 
-					m_LCFile.Header.LcFile = m_LCFile;
-					DateTime DTimeFrom = m_LCFile.Header.GetTimeForFrameFromFrameTiming(dFrame - 0.5 + dFrameErrorMinus, true);
-                    DateTime DTimeTo = m_LCFile.Header.GetTimeForFrameFromFrameTiming(dFrame - 0.5 + dFrameErrorPlus, true);
+                    if (m_LCFile.FrameTiming != null && m_LCFile.FrameTiming.Count > 0)
+                    {
+                        DateTime DTimeFrom = m_LCFile.Header.GetTimeForFrameFromFrameTiming(dFrame - 0.5 + dFrameErrorMinus, true);
+                        DateTime DTimeTo = m_LCFile.Header.GetTimeForFrameFromFrameTiming(dFrame - 0.5 + dFrameErrorPlus, true);
 
-					evt.DTime = new DateTime((DTimeFrom.Ticks + DTimeTo.Ticks) / 2);
-					evt.DTimeErrorMS = (int)Math.Round(new TimeSpan(DTimeTo.Ticks - DTimeFrom.Ticks).TotalMilliseconds / 2);
+                        evt.DTime = new DateTime((DTimeFrom.Ticks + DTimeTo.Ticks) / 2);
+                        evt.DTimeErrorMS = (int)Math.Round(new TimeSpan(DTimeTo.Ticks - DTimeFrom.Ticks).TotalMilliseconds / 2);
 
-                    DateTime RTimeFrom = m_LCFile.Header.GetTimeForFrameFromFrameTiming(rFrame - 0.5 + rFrameErrorMinus, true);
-                    DateTime RTimeTo = m_LCFile.Header.GetTimeForFrameFromFrameTiming(rFrame - 0.5 + rFrameErrorPlus, true);
+                        DateTime RTimeFrom = m_LCFile.Header.GetTimeForFrameFromFrameTiming(rFrame - 0.5 + rFrameErrorMinus, true);
+                        DateTime RTimeTo = m_LCFile.Header.GetTimeForFrameFromFrameTiming(rFrame - 0.5 + rFrameErrorPlus, true);
 
-					evt.RTime = new DateTime((RTimeFrom.Ticks + RTimeTo.Ticks) / 2);
-					evt.RTimeErrorMS = (int)Math.Round(new TimeSpan(RTimeTo.Ticks - RTimeFrom.Ticks).TotalMilliseconds / 2);
+                        evt.RTime = new DateTime((RTimeFrom.Ticks + RTimeTo.Ticks) / 2);
+                        evt.RTimeErrorMS = (int)Math.Round(new TimeSpan(RTimeTo.Ticks - RTimeFrom.Ticks).TotalMilliseconds / 2);
 
-                    evt.DTimeMostProbable = m_LCFile.Header.GetTimeForFrameFromFrameTiming(dFrame - 0.5, true);
-                    evt.RTimeMostProbable = m_LCFile.Header.GetTimeForFrameFromFrameTiming(rFrame - 0.5, true);
-				}
+                        evt.DTimeMostProbable = m_LCFile.Header.GetTimeForFrameFromFrameTiming(dFrame - 0.5, true);
+                        evt.RTimeMostProbable = m_LCFile.Header.GetTimeForFrameFromFrameTiming(rFrame - 0.5, true);
+
+                        gotTimes = true;
+                    }
+                    else if (m_LCFile.Header.TimingType == MeasurementTimingType.UserEnteredFrameReferences && m_LCFile.Header.FirstTimedFrameNo != m_LCFile.Header.LastTimedFrameNo)
+                    {
+                        DateTime DTimeFrom = m_LCFile.Header.GetTimeForFrameFromManuallyEnteredTimes(dFrame - 0.5 + dFrameErrorMinus);
+                        DateTime DTimeTo = m_LCFile.Header.GetTimeForFrameFromManuallyEnteredTimes(dFrame - 0.5 + dFrameErrorPlus);
+
+                        evt.DTime = new DateTime((DTimeFrom.Ticks + DTimeTo.Ticks) / 2);
+                        evt.DTimeErrorMS = (int)Math.Round(new TimeSpan(DTimeTo.Ticks - DTimeFrom.Ticks).TotalMilliseconds / 2);
+
+                        DateTime RTimeFrom = m_LCFile.Header.GetTimeForFrameFromManuallyEnteredTimes(rFrame - 0.5 + rFrameErrorMinus);
+                        DateTime RTimeTo = m_LCFile.Header.GetTimeForFrameFromManuallyEnteredTimes(rFrame - 0.5 + rFrameErrorPlus);
+
+                        evt.RTime = new DateTime((RTimeFrom.Ticks + RTimeTo.Ticks) / 2);
+                        evt.RTimeErrorMS = (int)Math.Round(new TimeSpan(RTimeTo.Ticks - RTimeFrom.Ticks).TotalMilliseconds / 2);
+
+                        evt.DTimeMostProbable = m_LCFile.Header.GetTimeForFrameFromManuallyEnteredTimes(dFrame - 0.5);
+                        evt.RTimeMostProbable = m_LCFile.Header.GetTimeForFrameFromManuallyEnteredTimes(rFrame - 0.5);
+
+                        gotTimes = true;
+                    }
+                    else
+                    {
+                        // TODO: Use the times from AOTA??
+                    }
+
+                    if (gotTimes && m_EventTimesReport.InstrumentalDelaysApplied == InstrumentalDelayStatus.Yes)
+                    {
+                        double instrDelay = m_LCFile.GetInstrumentalDelayAtFrameInSeconds(dFrame - 0.5);
+                        evt.DTime = evt.DTime.AddSeconds(instrDelay);
+                        evt.RTime = evt.RTime.AddSeconds(instrDelay);
+                        evt.DTimeMostProbable = evt.DTimeMostProbable.AddSeconds(instrDelay);
+                        evt.RTimeMostProbable = evt.RTimeMostProbable.AddSeconds(instrDelay);
+                    }
+                }
 
 				m_EventTimesReport.Events.Add(evt);
 			}

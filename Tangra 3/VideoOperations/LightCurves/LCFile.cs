@@ -18,6 +18,7 @@ using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.Model.VideoOperations;
 using Tangra.OCR;
+using Tangra.VideoOperations.LightCurves.Report;
 using Tangra.VideoOperations.LightCurves.Tracking;
 
 namespace Tangra.VideoOperations.LightCurves
@@ -360,6 +361,17 @@ namespace Tangra.VideoOperations.LightCurves
 			frameTiming.WriteTo(s_OnTheFlyWriter);
 		}
 
+        internal DateTime GetTimeForFrame(double frameNo)
+        {
+            if (FrameTiming != null && FrameTiming.Count > 0)
+            {
+                LCFrameTiming timingEntry = FrameTiming[(int)((uint)frameNo - Header.MinFrame)];
+                return timingEntry.FrameMidTime;
+            }
+            else
+                return Header.GetTimeForFrameFromManuallyEnteredTimes(frameNo);
+        }
+
 		internal DateTime GetTimeForFrame(double frameNo, out string correctedForInstrumentalDelayMessage)
 		{
 			correctedForInstrumentalDelayMessage = null;
@@ -427,65 +439,95 @@ namespace Tangra.VideoOperations.LightCurves
 			return rv;
 		}
 
+        internal double GetInstrumentalDelayAtFrameInSeconds(double frameNo)
+        {
+            double corrEndFirstField;
+            double corrInstrumentalDelay;
+            if (GetInstrumentalDelayAtFrame(frameNo, out corrEndFirstField, out corrInstrumentalDelay))
+            {
+                return corrInstrumentalDelay;
+            }
+
+            return 0;
+        }
+
+        private bool GetInstrumentalDelayAtFrame(double frameNo, out double corrEndFirstField, out double corrInstrumentalDelay)
+        {
+            corrEndFirstField = 0;
+            corrInstrumentalDelay = 0;
+
+            int frameTimingIndex = (int)((uint)frameNo - Header.MinFrame);
+
+            DateTime frameTime = GetTimeForFrame(frameNo);
+            DateTime otherframeTime = frameTime;
+
+            if (frameTimingIndex > 0)
+            {
+                // Use the previous frame
+                otherframeTime = GetTimeForFrame(frameNo - 1);
+            }
+            else if (frameTimingIndex == 0 && FrameTiming.Count > 1)
+            {
+                // For first frame, use the second frame
+                otherframeTime = GetTimeForFrame(Header.MinFrame);
+            }
+
+            double intervalDuration = Math.Abs(new TimeSpan(otherframeTime.Ticks - frameTime.Ticks).TotalSeconds);
+            if (intervalDuration > 0)
+            {
+                double videoStandardFieldDurationSec = 0;
+                int integratedFields = 0;
+
+                double ntscCountedFrames = intervalDuration*29.97;
+                double palCountedFrames = intervalDuration*25.00;
+                for (int i = 0; i < 256; i++)
+                {
+                    if (Math.Abs(i - ntscCountedFrames) < 0.01)
+                    {
+                        integratedFields = 2*i;
+                        videoStandardFieldDurationSec = 0.01668335;
+                        break;
+                    }
+
+                    if (Math.Abs(i - palCountedFrames) < 0.01)
+                    {
+                        integratedFields = 2*i;
+                        videoStandardFieldDurationSec = 0.02;
+                        break;
+                    }
+                }
+
+                if (integratedFields > 0 && Footer.InstrumentalDelayConfig.ContainsKey(integratedFields / 2))
+                {
+                    // Apply correction: [FRAMETIME - ((1/2 * INTEGRATION PERIOD) - 1 FIELD) * (PAL or NTSC FrameRate) - GERHARD_CORRECTION(INTEGRATION PERIOD)]
+                    corrEndFirstField = -1 * (((integratedFields / 2) - 1) * videoStandardFieldDurationSec); // Half frame back sets us at the begining of the first field, then add 1 field to get to the end of the field
+                    corrInstrumentalDelay = Footer.InstrumentalDelayConfig[integratedFields / 2]; // This is already negative
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
 		private DateTime GetTimeForFrameWithInstrumentalDelay(double frameNo, out string correctedForInstrumentalDelayMessage)
 		{
 			int frameTimingIndex = (int) ((uint) frameNo - Header.MinFrame);
 
 			LCFrameTiming timingEntry = FrameTiming[frameTimingIndex];
-			LCFrameTiming othertimingEntry = timingEntry;
 			
 			DateTime rv = timingEntry.FrameMidTime;
 			correctedForInstrumentalDelayMessage = null;
 
-			if (frameTimingIndex > 0)
-			{
-				// Use the previous frame
-				othertimingEntry = FrameTiming[frameTimingIndex - 1];
-			}
-			else if (frameTimingIndex == 0 && FrameTiming.Count > 1)
-			{
-				// For first frame, use the second frame
-				othertimingEntry = FrameTiming[1];
-			}
+            double corrEndFirstField;
+            double corrInstrumentalDelay;
+            if (GetInstrumentalDelayAtFrame(frameNo, out corrEndFirstField, out corrInstrumentalDelay))
+            {
+                DateTime endOfFirstField = rv.AddSeconds(corrEndFirstField);
+                rv = rv.AddSeconds(corrEndFirstField + corrInstrumentalDelay);
 
-			double intervalDuration = Math.Abs(new TimeSpan(othertimingEntry.FrameMidTime.Ticks - timingEntry.FrameMidTime.Ticks).TotalSeconds);
-			if (intervalDuration > 0)
-			{
-				double videoStandardFieldDurationSec = 0;
-				int integratedFields = 0;
-
-				double ntscCountedFrames = intervalDuration * 29.97;
-				double palCountedFrames = intervalDuration * 25.00;
-				for (int i = 0; i < 256; i++)
-				{
-					if (Math.Abs(i - ntscCountedFrames) < 0.01)
-					{
-						integratedFields = 2 * i;
-						videoStandardFieldDurationSec = 0.01668335;
-						break;
-					}
-
-					if (Math.Abs(i - palCountedFrames) < 0.01)
-					{
-						integratedFields = 2 * i;
-						videoStandardFieldDurationSec = 0.02;
-						break;
-					}
-				}
-
-				if (integratedFields > 0 && Footer.InstrumentalDelayConfig.ContainsKey(integratedFields / 2))
-				{
-					// Apply correction: [FRAMETIME - ((1/2 * INTEGRATION PERIOD) - 1 FIELD) * (PAL or NTSC FrameRate) - GERHARD_CORRECTION(INTEGRATION PERIOD)]
-					double corrEndFirstField = -1 * (((integratedFields / 2) - 1) * videoStandardFieldDurationSec); // Half frame back sets us at the begining of the first field, then add 1 field to get to the end of the field
-					double corrInstrumentalDelay = Footer.InstrumentalDelayConfig[integratedFields/2]; // This is already negative
-					
-					DateTime endOfFirstField = rv.AddSeconds(corrEndFirstField);
-					rv = rv.AddSeconds(corrEndFirstField + corrInstrumentalDelay);
-
-					correctedForInstrumentalDelayMessage = string.Format(
-						"Instrumental delay has been applied to the times\r\n\r\nEnd of first field OSD timestamp: {0}", endOfFirstField.ToString("HH:mm:ss.fff"));
-				}
-			}
+                correctedForInstrumentalDelayMessage = string.Format(
+                    "Instrumental delay has been applied to the times\r\n\r\nEnd of first field OSD timestamp: {0}", endOfFirstField.ToString("HH:mm:ss.fff"));
+            }
 
 			return rv;
 		}
@@ -1004,17 +1046,17 @@ namespace Tangra.VideoOperations.LightCurves
 			return "";
 		}
 
-		public string GetInstrumentalDelaysApplied(string videoFileFormat)
+        public InstrumentalDelayStatus GetInstrumentalDelaysApplied(string videoFileFormat)
 		{
 			if (videoFileFormat == "ADV")
-				return "NotRequired";
+				return InstrumentalDelayStatus.NotRequired;
 			else if (videoFileFormat == "AAV")
 			{
 				if (LcFile != null && !string.IsNullOrEmpty(LcFile.Footer.InstrumentalDelayConfigName))
-					return "Yes";
+                    return InstrumentalDelayStatus.Yes;
 			}
-			
-			return "No";
+
+            return InstrumentalDelayStatus.No;
 		}
 
 		internal void GetExposureModeAndDuration(string videoFileFormat, out double duration, out string mode)
@@ -1106,18 +1148,16 @@ namespace Tangra.VideoOperations.LightCurves
 			bool manuallyEnteredTimes = FirstTimedFrameTime != DateTime.MaxValue && FirstTimedFrameTime != DateTime.MinValue;
 			bool embeddedTimes = LcFile != null && LcFile.FrameTiming != null && LcFile.FrameTiming.Count > 1 /* need 2 frames to find the duration */;
 
-			int frameTimingIndex = (int)(frameNo - MinFrame);
-
 			if (embeddedTimes)
 			{				
-				long firstFrameTicks = LcFile.FrameTiming[(int) MinFrame].FrameMidTime.Ticks;
-				long secondFrameTicks = LcFile.FrameTiming[1 + (int)MinFrame].FrameMidTime.Ticks;
-				long frameDurationTicks = (secondFrameTicks - firstFrameTicks);
+				long firstFrameTicks = LcFile.FrameTiming[0].FrameMidTime.Ticks;
+                long secondFrameTicks = LcFile.FrameTiming[LcFile.FrameTiming.Count - 1].FrameMidTime.Ticks;
+                long frameDurationTicks = (secondFrameTicks - firstFrameTicks) / (LcFile.FrameTiming.Count);
 
-				if (frameTimingIndex < 0)
-					return LcFile.FrameTiming[0].FrameMidTime.AddTicks(frameTimingIndex * frameDurationTicks);
+                if (frameNo < MinFrame)
+                    return LcFile.FrameTiming[0].FrameMidTime.AddTicks((int)(frameNo - MinFrame) * frameDurationTicks);
 				else if (frameNo > MaxFrame)
-					return LcFile.FrameTiming[(int)MaxFrame - (int)MinFrame].FrameMidTime.AddTicks((int)(frameNo - MaxFrame) * frameDurationTicks);
+                    return LcFile.FrameTiming[LcFile.FrameTiming.Count - 1].FrameMidTime.AddTicks((int)(frameNo - MaxFrame) * frameDurationTicks);
 				else
 					return GetTimeForFrameFromFrameTiming(frameNo, true);
 			}

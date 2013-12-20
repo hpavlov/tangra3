@@ -9,6 +9,13 @@ using Tangra.Model.Helpers;
 
 namespace Tangra.VideoOperations.LightCurves.Report
 {
+    public enum InstrumentalDelayStatus
+    {
+        Yes,
+        No,
+        NotRequired
+    }
+
 	[XmlRoot(Namespace = "http://www.hristopavlov.net/Tangra3/2013")]
 	public class EventTimesReport
 	{
@@ -27,7 +34,8 @@ namespace Tangra.VideoOperations.LightCurves.Report
 		public int BitPix { get; set; }
 
 		public bool NoTimeBaseAvailable { get; set; }
-		public bool HasNonEquallySpacedDataPoints { get; set; }
+        public bool TimestampDiscrepencyFlag { get; set; }
+	    public bool HasNonEquallySpacedDataPoints { get; set; }
 
 		/// <summary>
 		/// Flea3-03S1 with ADVS
@@ -76,8 +84,8 @@ namespace Tangra.VideoOperations.LightCurves.Report
 		/// FPS
 		/// </summary>
 		public string ExposureUnit { get; set; }
-		
-		public string InstrumentalDelaysApplied { get; set; }
+
+        public InstrumentalDelayStatus InstrumentalDelaysApplied { get; set; }
 		public DateTime ReportTime { get; set; }
 
         [XmlIgnore]

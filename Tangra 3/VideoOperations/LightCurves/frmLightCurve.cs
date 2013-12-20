@@ -337,7 +337,7 @@ namespace Tangra.VideoOperations.LightCurves
 			bool hasEmbeddedTimeStamps = m_Footer.ReductionContext.HasEmbeddedTimeStamps;
 
             m_CameraCorrectionsHaveBeenAppliedFlag =
-                (hasEmbeddedTimeStamps && !string.IsNullOrEmpty(m_Context.InstrumentalDelayConfigName)) ||
+                (!string.IsNullOrEmpty(m_Context.InstrumentalDelayConfigName)) ||
                 (m_Context.TimingType == MeasurementTimingType.EmbeddedTimeForEachFrame && m_Context.BitPix > 8);
 
 			if (m_Header.SecondTimedFrameTime != DateTime.MinValue || hasEmbeddedTimeStamps)
@@ -509,6 +509,8 @@ namespace Tangra.VideoOperations.LightCurves
 					m_EventTimesReport.NoTimeBaseAvailable = true;
 				}
 
+			    m_EventTimesReport.TimestampDiscrepencyFlag = m_TimestampDiscrepencyFlag;
+
 				m_EventTimesReport.CameraName = m_LCFile.Footer.CameraName;
 				if (string.IsNullOrEmpty(m_EventTimesReport.CameraName))
 					m_EventTimesReport.CameraName = m_LCFile.Footer.InstrumentalDelayConfigName;
@@ -552,6 +554,15 @@ namespace Tangra.VideoOperations.LightCurves
 							MessageBoxButtons.OK,
 							MessageBoxIcon.Error);
 					}
+                    else if (m_EventTimesReport.TimestampDiscrepencyFlag)
+                    {
+                        MessageBox.Show(
+                            this,
+                            "The results cannot be provided to OccultWatcher because the time base is not reliable.",
+                            "Tangra3",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error);
+                    }
 					else
 					{
 						bool export = true;
@@ -566,9 +577,9 @@ namespace Tangra.VideoOperations.LightCurves
 						}
 
 
-						OccultWatcherHelper.NotifyOccultWatcherIfInstalled(m_EventTimesReport, this);							
+						OccultWatcherHelper.NotifyOccultWatcherIfInstalled(m_EventTimesReport, this);
 					}
-				}                
+				}
 #endif
 			}
 

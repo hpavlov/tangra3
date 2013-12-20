@@ -206,14 +206,14 @@ namespace Tangra.OccultTools
 						else if (i == 1)
 							AOTA_Set_Comp2Data.Invoke(m_AotaInstance, new object[] { compData });
 						else if (i == 2)
-							AOTA_Set_Comp3Data.Invoke(m_AotaInstance, new object[] { compData });						
+							AOTA_Set_Comp3Data.Invoke(m_AotaInstance, new object[] { compData });
 					}
 	            }
-	            
-				int firstFrame = (int)frameIds[0];
+
+                int firstFrameIndex = 0;// (int)frameIds[0];
 	            int framesInIntegration = 1;
 
-				AOTA_RunAOTAEx.Invoke(m_AotaInstance, new object[] { null /*parentWindow*/, firstFrame, framesInIntegration });
+                AOTA_RunAOTAEx.Invoke(m_AotaInstance, new object[] { null /*parentWindow*/, firstFrameIndex, framesInIntegration });
 
 	            AotaReturnValue result = ReadAOTAResult();
 				result.IsMiss = (bool)AOTA_IsMiss.GetValue(m_AotaInstance, new object[] {} );

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using Tangra.Addins;
+using Tangra.Model.Helpers;
 using Tangra.SDK;
 using Tangra.Video;
 using Tangra.VideoOperations.LightCurves;
@@ -149,6 +151,8 @@ namespace Tangra.Controller
 				{ }
 				catch (Exception ex)
 				{
+                    Trace.WriteLine(ex.GetFullStackTrace());
+
 					MessageBox.Show(
 						string.Format("{0}:\r\n\r\n{1} ({2})",
 							addinActonName,
