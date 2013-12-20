@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Diagnostics;
@@ -26,35 +27,68 @@ namespace Tangra.Helpers
 
             if (!report.ReportFileSaved || report.ReportFileName == null)
                 return;
+
+	        var usedReports = new List<string>();
+
+			try
+			{
+				RegistryKey registryKey = Registry.CurrentUser.OpenSubKey(REGKEY_USED_EVENTS, true);
+				if (registryKey != null)
+				{
+					string[] allValueNames = registryKey.GetValueNames();
+					foreach (string valName in allValueNames)
+					{
+						string savedReportLocation = Convert.ToString(registryKey.GetValue(valName));
+						if (File.Exists(savedReportLocation))
+							usedReports.Add(savedReportLocation);
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Trace.WriteLine(ex);
+			}
+			
+
             try
             {
 				RegistryKey registryKey = Registry.CurrentUser.OpenSubKey(REGKEY_INCOMING_EVENTS, true);
                 if (registryKey != null)
                 {
-
-                    int maxValId = 0;
+	                var availableList = new List<string>();
                     string[] allValueNames = registryKey.GetValueNames();
                     foreach (string valName in allValueNames)
                     {
                         string savedReportLocation = Convert.ToString(registryKey.GetValue(valName));
-                        if (report.ReportFileName.Equals(savedReportLocation, StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            // File has been saved already and hasn't been used yet. Nothing to do.
-                            owNotified = true;
-                            return;
-                        }
+						if (usedReports.IndexOf(savedReportLocation) > -1)
+						{
+							// File already used. We need to delete the value from the incoming events
+							registryKey.DeleteValue(valName);
+						}
+						else
+						{
+							availableList.Add(savedReportLocation);
 
-                        int valId;
-                        if (int.TryParse(valName, out valId))
-                        {
-                            if (valId > maxValId)
-                                maxValId = valId;
-                        }
+							if (report.ReportFileName.Equals(savedReportLocation, StringComparison.InvariantCultureIgnoreCase))
+							{
+								// File has been saved already and hasn't been used yet. Nothing to do.
+								owNotified = true;
+							}
+						}
                     }
 
-                    maxValId++;
-                    registryKey.SetValue(maxValId.ToString(), report.ReportFileName);
-                    owNotified = true;
+	                if (!owNotified)
+						availableList.Add(report.ReportFileName);
+
+					for (int i = 0; i < allValueNames.Length; i++)
+					{
+						registryKey.DeleteValue(allValueNames[0], false);
+					}
+
+					for (int i = 0; i < availableList.Count; i++)
+	                {
+						registryKey.SetValue(i.ToString(), availableList[i]);    
+	                }
                 }
             }
             catch (Exception ex)

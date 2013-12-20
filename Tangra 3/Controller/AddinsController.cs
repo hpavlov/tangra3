@@ -91,7 +91,7 @@ namespace Tangra.Controller
 						if (action.ActionType == AddinActionType.LightCurve || action.ActionType == AddinActionType.LightCurveEventTimeExtractor)
 						{
 							ToolStripMenuItem item = new ToolStripMenuItem(action.DisplayName);
-							item.Click += ItemOnClick;
+							item.Click += OnLightCurveAddinItemClick;
 							if (action.Icon != null)
 							{
 								item.Image = (Bitmap)Bitmap.FromHbitmap(action.Icon).Clone();
@@ -111,7 +111,7 @@ namespace Tangra.Controller
 			
 		}
 
-	    private void ItemOnClick(object sender, EventArgs eventArgs)
+	    private void OnLightCurveAddinItemClick(object sender, EventArgs eventArgs)
 	    {
 			ToolStripDropDownItem item = sender as ToolStripDropDownItem;
 

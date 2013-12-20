@@ -474,6 +474,18 @@ namespace Tangra.VideoOperations.LightCurves
 			{
 				m_LCFile.Header.LcFile = m_LCFile;
 
+				if (m_LCFile.Header.HasNonEqualySpacedDataPoints())
+				{
+					MessageBox.Show(
+						this, 
+						"Cannot extract event times when the processed light curve has non equally spaced data points.", 
+						"Tangra3 - " + addinName, 
+						MessageBoxButtons.OK, 
+						MessageBoxIcon.Error);
+
+					return false;
+				}
+
 				m_EventTimesReport = new EventTimesReport()
 				{
                     TangraVersion = string.Format("Tangra v{0}", frmAbout.AssemblyFileVersion),
@@ -489,6 +501,13 @@ namespace Tangra.VideoOperations.LightCurves
 					AveragedFrameHeight = m_LCFile.Footer.AveragedFrameHeight,
 					AveragedFrameWidth = m_LCFile.Footer.AveragedFrameWidth,
 				};
+
+				if (m_LCFile.Header.FirstTimedFrameNo == 0 &&
+					m_LCFile.Header.LastTimedFrameNo == 0 &&
+					m_LCFile.Header.TimingType == MeasurementTimingType.UserEnteredFrameReferences)
+				{
+					m_EventTimesReport.NoTimeBaseAvailable = true;
+				}
 
 				m_EventTimesReport.CameraName = m_LCFile.Footer.CameraName;
 				if (string.IsNullOrEmpty(m_EventTimesReport.CameraName))
@@ -524,18 +543,31 @@ namespace Tangra.VideoOperations.LightCurves
 #if WIN32
 				if (TangraConfig.Settings.Generic.OWEventTimesExportMode != TangraConfig.OWExportMode.DontExportEventTimes)
 				{
-					bool export = true;
-					if (TangraConfig.Settings.Generic.OWEventTimesExportMode == TangraConfig.OWExportMode.AskBeforeExportingEventTimes)
+					if (m_EventTimesReport.NoTimeBaseAvailable)
 					{
-						export = MessageBox.Show(
-							string.Format("Would you like to make the results provided by {0} available for Occult Watcher's IOTA Reporting Add-in?", m_EventTimesReport.Provider),
-							"Tangra3 - " + m_EventTimesReport.AddinAction, 
-							MessageBoxButtons.YesNo, 
-							MessageBoxIcon.Question, 
-							MessageBoxDefaultButton.Button1) == DialogResult.Yes;	
+						MessageBox.Show(
+							this,
+							"The results cannot be provided to OccultWatcher because a time base is not available for this light curve and event times cannot be determined.",
+							"Tangra3",
+							MessageBoxButtons.OK,
+							MessageBoxIcon.Error);
 					}
+					else
+					{
+						bool export = true;
+						if (TangraConfig.Settings.Generic.OWEventTimesExportMode == TangraConfig.OWExportMode.AskBeforeExportingEventTimes)
+						{
+							export = MessageBox.Show(
+								string.Format("Would you like to make the results provided by {0} available for Occult Watcher's IOTA Reporting Add-in?", m_EventTimesReport.Provider),
+								"Tangra3 - " + m_EventTimesReport.AddinAction,
+								MessageBoxButtons.YesNo,
+								MessageBoxIcon.Question,
+								MessageBoxDefaultButton.Button1) == DialogResult.Yes;
+						}
 
-					OccultWatcherHelper.NotifyOccultWatcherIfInstalled(m_EventTimesReport, this);	
+
+						OccultWatcherHelper.NotifyOccultWatcherIfInstalled(m_EventTimesReport, this);							
+					}
 				}                
 #endif
 			}

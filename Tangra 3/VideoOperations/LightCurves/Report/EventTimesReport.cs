@@ -26,6 +26,9 @@ namespace Tangra.VideoOperations.LightCurves.Report
 		public string NoiseMethod { get; set; }
 		public int BitPix { get; set; }
 
+		public bool NoTimeBaseAvailable { get; set; }
+		public bool HasNonEquallySpacedDataPoints { get; set; }
+
 		/// <summary>
 		/// Flea3-03S1 with ADVS
 		/// Flea3-03S3 with ADVS
@@ -53,17 +56,14 @@ namespace Tangra.VideoOperations.LightCurves.Report
 		public string RecordedToUT { get; set; }
 		public string AnalysedFromUT { get; set; }
 		public string AnalysedToUT { get; set; }
+
 		/// <summary>
 		/// ADV|AAV|AVI
 		/// </summary>
 		public string VideoFileFormat { get; set; }
 
 		/// <summary>
-		/// NTSC/EIA
-		/// PAL/CCIR
-		/// ADVS
-		/// AAV-NTSC
-		/// AAV-PAL
+		/// PAL|NTSC|Digital
 		/// </summary>
 		public string VideoFormat { get; set; }
 
@@ -73,6 +73,7 @@ namespace Tangra.VideoOperations.LightCurves.Report
 		/// Fields
 		/// Frames
 		/// Seconds
+		/// FPS
 		/// </summary>
 		public string ExposureUnit { get; set; }
 		
