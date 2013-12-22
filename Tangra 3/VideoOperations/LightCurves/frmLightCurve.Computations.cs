@@ -170,6 +170,7 @@ namespace Tangra.VideoOperations.LightCurves
 						binnedValue.IsSuccessfulReading = binnedSuccessfulReadings == m_Context.Binning; // Average out the non binned values due to unsuccessful readings
 
                         binnedValue.ReadingIndexTo = idx - 1;
+	                    binnedValue.BinMiddleFrameNo = (int)(m_AllReadings[i][binnedValue.ReadingIndexFrom].CurrFrameNo + m_AllReadings[i][binnedValue.ReadingIndexTo].CurrFrameNo)/2;
                         m_AllBinnedReadings[i].Add(binnedValue);
 
                         if (m_IncludeObjects[i])
@@ -746,6 +747,7 @@ namespace Tangra.VideoOperations.LightCurves
             public int ReadingIndexFrom;
             public int ReadingIndexTo;
             public int BinNo;
+			public int BinMiddleFrameNo;
         	public bool IsSuccessfulReading;
         }
 
@@ -1338,7 +1340,7 @@ namespace Tangra.VideoOperations.LightCurves
 			GetAOTAStarIndexes(out occultedStarIndex, out comp1Index, out comp2Index, out comp3Index);
 
 			if (m_Context.Binning > 0)
-                return m_AllBinnedReadings[occultedStarIndex].Select(x => new SingleMeasurement(x, occultedStarIndex, x.BinNo + (m_Context.Binning / 2.0), m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
+				return m_AllBinnedReadings[occultedStarIndex].Select(x => new SingleMeasurement(x, occultedStarIndex, x.BinMiddleFrameNo + (m_Context.Binning / 2.0), m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
 			else
                 return m_AllReadings[occultedStarIndex].Select(x => new SingleMeasurement(x, x.CurrFrameNo, m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
 		}
@@ -1354,11 +1356,11 @@ namespace Tangra.VideoOperations.LightCurves
 			if (m_Context.Binning > 0)
 			{
 				if (comparisonObjectId == 0 && comp1Index > -1)
-                    return m_AllBinnedReadings[comp1Index].Select(x => new SingleMeasurement(x, comp1Index, x.BinNo + (m_Context.Binning / 2.0), m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
+					return m_AllBinnedReadings[comp1Index].Select(x => new SingleMeasurement(x, comp1Index, x.BinMiddleFrameNo + (m_Context.Binning / 2.0), m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
 				else if (comparisonObjectId == 1 && comp2Index > -1)
-                    return m_AllBinnedReadings[comp2Index].Select(x => new SingleMeasurement(x, comp2Index, x.BinNo + (m_Context.Binning / 2.0), m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
+					return m_AllBinnedReadings[comp2Index].Select(x => new SingleMeasurement(x, comp2Index, x.BinMiddleFrameNo + (m_Context.Binning / 2.0), m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
 				else if (comparisonObjectId == 2 && comp3Index > -1)
-                    return m_AllBinnedReadings[comp3Index].Select(x => new SingleMeasurement(x, comp3Index, x.BinNo + (m_Context.Binning / 2.0), m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
+					return m_AllBinnedReadings[comp3Index].Select(x => new SingleMeasurement(x, comp3Index, x.BinMiddleFrameNo + (m_Context.Binning / 2.0), m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
 			}
 			else
 			{

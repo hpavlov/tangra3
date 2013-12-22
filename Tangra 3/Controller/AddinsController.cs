@@ -109,8 +109,12 @@ namespace Tangra.Controller
 			}
 
 
-			topMenuItem.Visible = lightCurveAddinsAdded;
-			
+			topMenuItem.Visible = lightCurveAddinsAdded;			
+		}
+
+		public bool OccultToolsAddinIsLoaded()
+		{
+			return m_AddinManager.Addins.FirstOrDefault(x => x.Instance.DisplayName == "Occult Tools for Tangra") != null;
 		}
 
 	    private void OnLightCurveAddinItemClick(object sender, EventArgs eventArgs)

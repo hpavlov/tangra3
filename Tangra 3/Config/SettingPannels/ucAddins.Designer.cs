@@ -50,6 +50,7 @@ namespace Tangra.Config.SettingPannels
 			this.label4 = new System.Windows.Forms.Label();
 			this.linkLblOW = new System.Windows.Forms.LinkLabel();
 			this.pnlOccultWatcherSettings = new System.Windows.Forms.Panel();
+			this.lblOWIntegrationError = new System.Windows.Forms.Label();
 			this.gbxLoadedAddins.SuspendLayout();
 			this.pnlAddinInfo.SuspendLayout();
 			this.pnlOccultWatcherSettings.SuspendLayout();
@@ -253,13 +254,24 @@ namespace Tangra.Config.SettingPannels
 			// 
 			// pnlOccultWatcherSettings
 			// 
+			this.pnlOccultWatcherSettings.Controls.Add(this.lblOWIntegrationError);
 			this.pnlOccultWatcherSettings.Controls.Add(this.linkLblOW);
 			this.pnlOccultWatcherSettings.Controls.Add(this.label4);
 			this.pnlOccultWatcherSettings.Controls.Add(this.cbxOwEventTimesExport);
 			this.pnlOccultWatcherSettings.Location = new System.Drawing.Point(1, 303);
 			this.pnlOccultWatcherSettings.Name = "pnlOccultWatcherSettings";
-			this.pnlOccultWatcherSettings.Size = new System.Drawing.Size(463, 29);
+			this.pnlOccultWatcherSettings.Size = new System.Drawing.Size(498, 29);
 			this.pnlOccultWatcherSettings.TabIndex = 11;
+			// 
+			// lblOWIntegrationError
+			// 
+			this.lblOWIntegrationError.AutoSize = true;
+			this.lblOWIntegrationError.ForeColor = System.Drawing.Color.Red;
+			this.lblOWIntegrationError.Location = new System.Drawing.Point(190, 8);
+			this.lblOWIntegrationError.Name = "lblOWIntegrationError";
+			this.lblOWIntegrationError.Size = new System.Drawing.Size(278, 13);
+			this.lblOWIntegrationError.TabIndex = 11;
+			this.lblOWIntegrationError.Text = "OW IOTA Reporting add-in ver 1.8 or later is not installed.";
 			// 
 			// ucAddins
 			// 
@@ -309,6 +321,7 @@ namespace Tangra.Config.SettingPannels
 		private Label label4;
 		private LinkLabel linkLblOW;
 		private Panel pnlOccultWatcherSettings;
+		private Label lblOWIntegrationError;
 
 
     }

@@ -29,9 +29,35 @@ namespace Tangra.Config.SettingPannels
             m_AddinsController = addinsController;
 			m_AddinContainers.AddRange(addinContainers);
 
+
 #if !WIN32
 			pnlOccultWatcherSettings.Visible = false;
+#else
+			CheckOWIntegrationStatus();
 #endif
+		}
+
+		private void CheckOWIntegrationStatus()
+		{
+			string owIntegrationError = null;
+			if (!OccultWatcherHelper.IsOccultWatcherFound())
+				owIntegrationError = "OccultWatcher us not installed.";
+			else if (!OccultWatcherHelper.IsOccultWatcherReportingAddinFound())
+				owIntegrationError = "OW IOTA Reporting add-in ver 1.8 or later is not installed.";
+			else if (!m_AddinsController.OccultToolsAddinIsLoaded())
+				owIntegrationError = "Occult Tools for Tangra is not loaded.";
+
+			if (!string.IsNullOrEmpty(owIntegrationError))
+			{
+				cbxOwEventTimesExport.Visible = false;
+				lblOWIntegrationError.Visible = true;
+				lblOWIntegrationError.Text = owIntegrationError;
+			}
+			else
+			{
+				cbxOwEventTimesExport.Visible = true;
+				lblOWIntegrationError.Visible = false;				
+			}
 		}
 
         public override void LoadSettings()

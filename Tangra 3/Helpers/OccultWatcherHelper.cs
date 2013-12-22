@@ -124,6 +124,18 @@ namespace Tangra.Helpers
                 location = Convert.ToString(registryKey.GetValue("OccultSetupDir", null));
             }
         }
+
+		public static bool IsOccultWatcherFound()
+		{
+			RegistryKey registryKey = Registry.CurrentUser.OpenSubKey(@"Software\OccultWatcher");
+			return registryKey != null;
+		}
+
+		public static bool IsOccultWatcherReportingAddinFound()
+		{
+			RegistryKey registryKey = Registry.CurrentUser.OpenSubKey(REGKEY_INCOMING_EVENTS);
+			return registryKey != null;
+		}
 #endif
     }
 }
