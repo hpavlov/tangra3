@@ -1691,7 +1691,7 @@ namespace Tangra.VideoOperations.LightCurves
 						{
 							int frameNo = reader.ReadInt32();
 							long thumbprint = reader.ReadInt64();
-							ThumbPrintDict.Add(frameNo, thumbprint);
+							ThumbPrintDict[frameNo] = thumbprint;
 						}
 
 						if (version > 4)
@@ -1701,7 +1701,7 @@ namespace Tangra.VideoOperations.LightCurves
 							{
 								int frameIntegration = reader.ReadInt32();
 								float delayInMilliseconds = reader.ReadSingle();
-								InstrumentalDelayConfig.Add(frameIntegration, delayInMilliseconds);
+								InstrumentalDelayConfig[frameIntegration] = delayInMilliseconds;
 							}
 
 							InstrumentalDelayConfigName = reader.ReadString();

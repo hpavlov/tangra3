@@ -38,6 +38,9 @@
     <ClInclude Include="TangraDirectShow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Avi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -53,6 +56,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TangraDirectShow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Avi.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

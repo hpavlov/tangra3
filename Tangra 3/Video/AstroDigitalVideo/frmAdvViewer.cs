@@ -23,6 +23,7 @@ namespace Tangra.Video.AstroDigitalVideo
 		private AdvImageData m_CurrentImageData;
 		private Pixelmap m_CurrentPixelmap;
 		private AdvStatusData m_CurrentStatusData;
+	    private bool m_IsAavFile = false;
 
 		public frmAdvViewer(string fileName)
 		{
@@ -51,6 +52,7 @@ namespace Tangra.Video.AstroDigitalVideo
 		{
 			lblFileName.Text = m_FileName;
 			lblNumberFrames.Text = m_AdvFile.NumberOfFrames.ToString();
+		    m_IsAavFile = m_AdvFile.AdvFileTags["FSTF-TYPE"] == "AAV";
 			
 			var bindingList = new List<AdvTagValuePair>();
 			foreach(string key in m_AdvFile.AdvFileTags.Keys)
@@ -102,7 +104,24 @@ namespace Tangra.Video.AstroDigitalVideo
 			nudCropLastFrame.Maximum = (int)m_AdvFile.NumberOfFrames - 1;
 			nudCropLastFrame.Value = nudCropLastFrame.Maximum;
 
+            nudAviFirstFrame.Maximum = (int)m_AdvFile.NumberOfFrames - 1;
+            nudAviFirstFrame.Value = 0;
+            nudAviLastFrame.Maximum = (int)m_AdvFile.NumberOfFrames - 1;
+            nudAviLastFrame.Value = nudCropLastFrame.Maximum;
+
 			LoadFrame(0);
+
+            gbxAdvSplit.Text = m_IsAavFile ? "AAV Crop" : "ADV Crop";
+            gbxConvertToAVI.Text = m_IsAavFile ? "AAV to AVI" : "ADV to AVI";
+		    btnCropADV.Text = m_IsAavFile ? "Save AAV chunk as ..." : "Save ADV chunk as ...";
+
+		    cbxTryCodec.Checked = false;
+            cbxFrameRate.SelectedIndex = 0;
+		    cbxAddedGamma.SelectedIndex = 0;
+
+#if !WIN32
+		    gbxConvertToAVI.Visible = false;
+#endif
 		}
 
 		private void lvImageLayouts_SelectedIndexChanged(object sender, EventArgs e)
@@ -133,92 +152,11 @@ namespace Tangra.Video.AstroDigitalVideo
 
 		}
 
-		private ushort[,] prevFramePixels;
-		private int prevFrameNo = -1;
-
-		internal Pixelmap GetFrameData(int index, out AdvImageData imageData, out AdvStatusData statusData,  out Bitmap displayBitmap)
-		{
-			imageData = null;
-
-			if (index < m_AdvFile.NumberOfFrames)
-			{
-				byte layoutId;
-				AdvImageLayout.GetByteMode byteMode;
-
-				m_AdvFile.GetFrameImageSectionHeader(index, out layoutId, out byteMode);
-
-				AdvImageLayout layout = m_AdvFile.ImageSection.GetImageLayoutFromLayoutId(layoutId);
-
-				if (layout.IsDiffCorrLayout && byteMode == AdvImageLayout.GetByteMode.DiffCorrBytes && prevFrameNo != index - 1)
-				{
-					// Move back and find the nearest previous key frame
-					int keyFrameIdx = index;
-					do
-					{
-						keyFrameIdx--;
-						m_AdvFile.GetFrameImageSectionHeader(keyFrameIdx, out layoutId, out byteMode);
-					}
-					while (keyFrameIdx > 0 && byteMode != AdvImageLayout.GetByteMode.KeyFrameBytes);
-
-					object[] keyFrameData = m_AdvFile.GetFrameSectionData(keyFrameIdx, null);
-					prevFramePixels = ((AdvImageData)keyFrameData[0]).ImageData;
-
-					if (layout.DiffCorrFrame == DiffCorrFrameMode.PrevFrame)
-					{
-						for (int i = keyFrameIdx + 1; i < index; i++)
-						{
-							object[] frameData = m_AdvFile.GetFrameSectionData(i, prevFramePixels);
-
-							prevFramePixels = ((AdvImageData)frameData[0]).ImageData;
-						}
-					}
-				}
-
-				object[] data;
-
-				data = m_AdvFile.GetFrameSectionData(index, prevFramePixels);
-
-				imageData = (AdvImageData)data[0];
-				statusData = (AdvStatusData)data[1];
-
-				if (prevFramePixels == null)
-					prevFramePixels = new ushort[m_AdvFile.ImageSection.Width, m_AdvFile.ImageSection.Height];
-				for (int x = 0; x < m_AdvFile.ImageSection.Width; x++)
-					for (int y = 0; y < m_AdvFile.ImageSection.Height; y++)
-					{
-						prevFramePixels[x, y] = imageData.ImageData[x, y];
-					}
-
-				prevFrameNo = index;
-
-				Pixelmap rv = m_AdvFile.ImageSection.CreatePixelmap(imageData);
-
-				//Pixelmap rv = new Pixelmap((int)m_AdvFile.ImageSection.Width, (int)m_AdvFile.ImageSection.Height, m_AdvFile.ImageSection.BitsPerPixel, null, null, null);
-				//rv.Width = (int) m_AdvFile.ImageSection.Width;
-				//rv.Height = (int) m_AdvFile.ImageSection.Height;
-				//rv.BitPixCamera = m_AdvFile.ImageSection.BitsPerPixel;
-				//rv.Array = new uint[Width * Height];
-				//rv.CopyPixelsFrom(imageData.ImageData, imageData.Bpp);
-				//displayBitmap = PixelmapFactory.ConstructBitmapFrom12BitPixelmap(rv);
-
-				displayBitmap = rv.DisplayBitmap;
-
-				return rv;
-
-			}
-			else
-			{
-				displayBitmap = null;
-				statusData = null;
-				return null;
-			}
-		}
-
 		private void LoadFrame(int frameId)
 		{
 			Bitmap displayBitmap;
 
-			m_CurrentPixelmap = GetFrameData(frameId, out m_CurrentImageData, out m_CurrentStatusData, out displayBitmap);
+			m_CurrentPixelmap = m_AdvFile.GetFrameData(frameId, out m_CurrentImageData, out m_CurrentStatusData, out displayBitmap);
 
 			picSmallImage.Image = displayBitmap;
 
@@ -361,7 +299,7 @@ namespace Tangra.Video.AstroDigitalVideo
 		{
 			Tuple<string, int, int> cropFileCfg = (Tuple<string, int, int>) state;
 
-			InvokeUpdateUI(0, true);
+			InvokeUpdateUI(1, 0, true);
 
 			try
 			{
@@ -371,46 +309,117 @@ namespace Tangra.Video.AstroDigitalVideo
 					cropFileCfg.Item3,
 					delegate(int percentDone, int framesFound)
 						{
-							InvokeUpdateUI(percentDone, true);
+                            InvokeUpdateUI(1, percentDone, true);
 						});
 			}
 			finally
 			{
-				InvokeUpdateUI(100, false);
+                InvokeUpdateUI(1, 100, false);
 			}
 		}
 
-		private delegate void UpdateUIDelegate(int percent, bool show);
+        private void SaveAsAviFileWorker(object state)
+        {
+            Tuple<string, int, int, bool, double, double> cropFileCfg = (Tuple<string, int, int, bool, double, double>)state;
 
-		private void UpdateUI(int percent, bool show)
+            InvokeUpdateUI(2, 0, true);
+
+            try
+            {
+                m_AdvFile.SaveAsAviFile(
+                    cropFileCfg.Item1,
+                    cropFileCfg.Item2,
+                    cropFileCfg.Item3,
+                    cropFileCfg.Item4,
+                    cropFileCfg.Item5,
+                    cropFileCfg.Item6,
+                    delegate(int percentDone, int framesFound)
+                    {
+                        InvokeUpdateUI(2, percentDone, true);
+                    });
+            }
+            finally
+            {
+                InvokeUpdateUI(2, 100, false);
+            }
+        }
+
+        private delegate void UpdateUIDelegate(int pbarId, int percent, bool show);
+
+		private void UpdateUI(int pbarId, int percent, bool show)
 		{
-			pbar1.Value = percent;
+		    ProgressBar pbar = pbarId == 1 ? pbar1 : pbar2;
+            
+            pbar.Value = percent;
 
-			if (show && !pbar1.Visible)
+            if (show && !pbar.Visible)
 			{
-				pbar1.Visible = true;
+                pbar.Visible = true;
 				pnlCropChooseFrames.Enabled = false;
+                pnlToAviConfig.Enabled = false;
 			}
-			else if (!show && pbar1.Visible)
+            else if (!show && pbar.Visible)
 			{
-				pbar1.Visible = false;
+                pbar.Visible = false;
 				pnlCropChooseFrames.Enabled = true;
+                pnlToAviConfig.Enabled = true;
 			}
 
-			pbar1.Update();
+            pbar.Update();
 
 			Update();
 			Application.DoEvents();
 		}
 
-		private void InvokeUpdateUI(int percentDone, bool show)
+		private void InvokeUpdateUI(int pbarId, int percentDone, bool show)
 		{
 			try
 			{
-				Invoke(new UpdateUIDelegate(UpdateUI), new object[] { percentDone, show });
+				Invoke(new UpdateUIDelegate(UpdateUI), new object[] { pbarId, percentDone, show });
 			}
 			catch (InvalidOperationException)
 			{ }
 		}
+
+        private void btnSaveAsAVI_Click(object sender, EventArgs e)
+        {
+            if (nudCropLastFrame.Value < nudCropFirstFrame.Value)
+            {
+                MessageBox.Show(
+                    this,
+                    "The last frame cannot be 'before' the first frame.",
+                    "Tangra",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+
+                nudCropLastFrame.Focus();
+                return;
+            }
+
+            if (saveAviFileDialog.ShowDialog(this) == DialogResult.OK)
+            {
+                bool tryCodec = cbxTryCodec.Checked;
+                double msPerFrame = cbxFrameRate.SelectedIndex == 0 ? 40 : 33.37;
+                double addedGamma = 1;
+                if (cbxAddedGamma.SelectedIndex == 1)
+                    addedGamma = 0.45;
+                else if (cbxAddedGamma.SelectedIndex == 2)
+                    addedGamma = 0.35;
+                else if (cbxAddedGamma.SelectedIndex == 3)
+                    addedGamma = 1 / 0.45;
+                else if (cbxAddedGamma.SelectedIndex == 4)
+                    addedGamma = 1 / 0.35;
+
+                ThreadPool.QueueUserWorkItem(
+                    new WaitCallback(SaveAsAviFileWorker), 
+                    new Tuple<string, int, int, bool, double, double>(
+                        saveAviFileDialog.FileName, 
+                        (int)nudAviFirstFrame.Value, 
+                        (int)nudAviLastFrame.Value,
+                        tryCodec,
+                        msPerFrame,
+                        addedGamma));
+            }
+        }
 	}	
 }

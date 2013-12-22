@@ -91,6 +91,19 @@ namespace Tangra.PInvoke
 		//HRESULT TangraVideoGetIntegratedFrame(long startFrameNo, long framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, unsigned char* bitmapPixels, unsigned char* bitmapBytes);
 		private static extern int TangraVideoGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, uint[] pixels, byte[] bitmapPixels, byte[] bitmapBytes);
 
+        [DllImport(LIBRARY_TANGRA_VIDEO, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int TangraCreateNewAviFile([MarshalAs(UnmanagedType.LPStr)]string fileName, int width, int height, int bpp, double fps, bool showCompressionDialog);
+
+        [DllImport(LIBRARY_TANGRA_VIDEO, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int TangraAviFileAddFrame([In, MarshalAs(UnmanagedType.LPArray)] int[,] pixels);
+
+        [DllImport(LIBRARY_TANGRA_VIDEO, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int TangraAviFileClose();
+
+        [DllImport(LIBRARY_TANGRA_VIDEO, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int TangraGetLastAviFileError(IntPtr errorMessage);
+
+
 		[DllImport(LIBRARY_TANGRA_VIDEO, CallingConvention = CallingConvention.Cdecl)]
 		//HRESULT GetVersion();
 		private static extern int GetTangraVideoVersion();
@@ -262,5 +275,98 @@ namespace Tangra.PInvoke
 
 			return string.Format("{0}.{1}.{2}", major, minor, revision);
 		}
+
+        public static string GetLastAviErrorMessage()
+        {
+            string error = null;
+            IntPtr buffer = IntPtr.Zero;
+
+            try
+            {
+                byte[] errorMessage = new byte[200];
+                buffer = Marshal.AllocHGlobal(errorMessage.Length + 1);
+                Marshal.Copy(errorMessage, 0, buffer, errorMessage.Length);
+                Marshal.WriteByte(buffer + errorMessage.Length, 0); // terminating null
+
+                TangraGetLastAviFileError(buffer);
+
+                error = Marshal.PtrToStringAnsi(buffer);
+
+                if (error != null)
+                    error = error.Trim();
+            }
+            finally
+            {
+                if (buffer != IntPtr.Zero)
+                {
+                    Marshal.FreeHGlobal(buffer);
+                }
+            }
+
+            return error;
+        }
+
+        private static void TraceLastNativeError()
+        {
+            string error = GetLastAviErrorMessage();
+
+            Trace.WriteLine(error, "VideoNativeException");
+        }
+
+        public static void StartNewAviFile(string fileName, int width, int height, int bpp, double fps, bool showCompressionDialog)
+        {
+            if (TangraCreateNewAviFile(fileName, width, height, bpp, fps, showCompressionDialog) != 0)
+            {
+                TraceLastNativeError();
+            }
+        }
+
+	    private static double s_GammaTableGammaVal = double.MaxValue;
+        private static int[] s_GammaTable = new int[ushort.MaxValue];
+
+        public static void AddAviVideoFrame(Pixelmap pixmap, double addedGamma)
+        {
+            int[,] pixels = new int[pixmap.Height, pixmap.Width];
+
+            if (Math.Abs(s_GammaTableGammaVal - addedGamma) > 0.01)
+            {
+                double maxVal = pixmap.BitPixCamera.GetMaxValueForBitPix();
+                bool usesGamma = Math.Abs(addedGamma - 1) > 0.01;
+                double gammaFactor = usesGamma ? (255.0 / Math.Pow(255.0, addedGamma)) : 0;
+
+                for (int i = 0; i < maxVal; i++)
+                {
+                    double convVal = 255.0 * i / maxVal;
+
+                    if (usesGamma)
+                        convVal = gammaFactor * Math.Pow(i, addedGamma);
+
+                    s_GammaTable[i] = Math.Max(0, Math.Min(255, (int) Math.Round(convVal)));
+                }
+
+                s_GammaTableGammaVal = addedGamma;
+            }
+
+            for (int x = 0; x < pixmap.Width; x++) 
+            {
+                for (int y = 0; y < pixmap.Height; y++)
+                {
+                    pixels[y, x] = s_GammaTable[pixmap.Pixels[x + y * pixmap.Width]];
+                }
+            }
+
+            if (TangraAviFileAddFrame(pixels) != 0)
+            {
+                TraceLastNativeError();
+            }
+        }
+
+        public static void CloseAviFile()
+        {
+            if (TangraAviFileClose() != 0)
+            {
+                TraceLastNativeError();
+            }
+        }
 	}
 }

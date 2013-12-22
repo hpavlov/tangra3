@@ -4,6 +4,9 @@
 #include "TangraDirectShow.h"
 #include "include/TangraCore.h"
 
+#include "Avi.h"
+#include "Gdiplus.h"
+
 int g_SelectedEngine = -1;
 
 PAVISTREAM g_paviStream = NULL;
@@ -234,4 +237,219 @@ HRESULT TangraVideoGetIntegratedFrame(long startFrameNo, long framesToIntegrate,
 int GetTangraVideoVersion()
 {	
 	return (VERSION_MAJOR << 28) + (VERSION_MINOR << 16) + VERSION_REVISION;
+}
+
+Avi* s_AviFile = NULL;
+IStream* s_pStream = NULL;
+
+#define ERROR_BUFFER_SIZE 200
+char s_LastAviErrorMessage[ERROR_BUFFER_SIZE];
+
+long s_AviFrameNo = 0;
+long s_AviFrameWidth = 0;
+long s_AviFrameHeight = 0;
+long s_AviFrameBpp = 8;
+bool s_ShowCompressionDialog = false;
+unsigned long s_UsedCompression = 0;
+long s_AddedFrames;
+
+void EnsureAviFileClosed()
+{
+	if (NULL != s_pStream)
+	{
+		s_pStream->Release();
+		s_pStream = NULL;
+	}
+
+	if (NULL != s_AviFile)
+	{
+		s_AviFile->Close();
+		delete s_AviFile;
+		s_AviFile = NULL;
+	}
+}
+
+unsigned long GetUsedAviCompression()
+{
+	return s_UsedCompression;
+}
+
+HRESULT TangraCreateNewAviFile(LPCTSTR szFileName, long width, long height, long bpp, double fps, bool showCompressionDialog)
+{
+	HRESULT rv = S_OK;
+
+	EnsureAviFileClosed();
+	
+	s_AviFile = new Avi(szFileName, static_cast<int>(1000.0/fps), 0);
+
+	s_AviFrameNo = 0;
+	s_AviFrameWidth = width;
+	s_AviFrameHeight = height;
+	s_AviFrameBpp = bpp;
+	s_ShowCompressionDialog = showCompressionDialog;
+	s_UsedCompression = 0;
+
+	::CreateStreamOnHGlobal(NULL, TRUE, &s_pStream);
+
+	s_AddedFrames = 0;
+
+	return rv;
+}
+
+HRESULT SetAviFileCompression(HBITMAP* bmp)
+{
+	AVICOMPRESSOPTIONS opts; 
+	ZeroMemory(&opts,sizeof(opts));
+	// Use uncompressed by default
+	opts.fccHandler= mmioFOURCC('D','I','B',' '); //0x20424944
+	opts.dwFlags = AVICOMPRESSF_VALID;
+
+	HRESULT rv = s_AviFile->compression(*bmp, &opts, s_ShowCompressionDialog, 0);
+	
+	if (rv != S_OK) 
+	{
+		rv = s_AviFile->compression(*bmp, 0, false, 0);
+		s_UsedCompression = 0;
+	}
+	else
+	{
+		s_UsedCompression = opts.fccHandler;
+	}
+
+	if (rv != S_OK) 
+		FormatAviMessage(rv, s_LastAviErrorMessage, ERROR_BUFFER_SIZE);
+
+	return rv;
+}
+
+HRESULT TangraGetLastAviFileError(char* szErrorMessage)
+{
+	strncpy(szErrorMessage, s_LastAviErrorMessage, ERROR_BUFFER_SIZE);
+
+	return S_OK;
+}
+
+
+BYTE* BuildBitmap(long width, long height, long bpp, long* pixels)
+{
+	BYTE* bitmapPixels = (BYTE*)malloc(sizeof(BYTE) * ((width * height * 3) + 40 + 14 + 1));
+	BYTE* bitmapPixelsStartPtr = bitmapPixels;
+
+	// define the bitmap information header 
+	BITMAPINFOHEADER bih;
+	bih.biSize = sizeof(BITMAPINFOHEADER); 
+	bih.biPlanes = 1; 
+	bih.biBitCount = 24;                          // 24-bit 
+	bih.biCompression = BI_RGB;                   // no compression 
+	bih.biSizeImage = width * abs(height) * 3;    // width * height * (RGB bytes) 
+	bih.biXPelsPerMeter = 0; 
+	bih.biYPelsPerMeter = 0; 
+	bih.biClrUsed = 0; 
+	bih.biClrImportant = 0; 
+	bih.biWidth = width;                          // bitmap width 
+	bih.biHeight = height;                        // bitmap height 
+
+	// and BitmapInfo variable-length UDT
+	BYTE memBitmapInfo[40];
+	RtlMoveMemory(memBitmapInfo, &bih, sizeof(bih));
+
+	BITMAPFILEHEADER bfh;
+	bfh.bfType=19778;    //BM header
+	bfh.bfSize=55 + bih.biSizeImage;
+	bfh.bfReserved1=0;
+	bfh.bfReserved2=0;
+	bfh.bfOffBits=sizeof(BITMAPINFOHEADER) + sizeof(BITMAPFILEHEADER); //54
+
+	// Copy the display bitmap including the header
+	RtlMoveMemory(bitmapPixels, &bfh, sizeof(bfh));
+	RtlMoveMemory(bitmapPixels + sizeof(bfh), &memBitmapInfo, sizeof(memBitmapInfo));
+
+	bitmapPixels = bitmapPixels + sizeof(bfh) + sizeof(memBitmapInfo);
+
+	long currLinePos = 0;
+	int length = width * height;
+	bitmapPixels+=3 * (length + width);
+
+	int shiftVal = bpp == 12 ? 4 : 8;
+
+	int total = width * height;
+	while(total--)
+	{
+		if (currLinePos == 0) 
+		{
+			currLinePos = width;
+			bitmapPixels-=6*width;
+		};
+
+		unsigned int val = *pixels;
+		pixels++;
+
+		unsigned int dblVal;
+		if (bpp == 8)
+		{
+			dblVal = val;
+		}
+		else
+		{
+			dblVal = val >> shiftVal;
+		}
+		 
+
+		BYTE btVal = (BYTE)(dblVal & 0xFF);
+		
+		*bitmapPixels = btVal;
+		*(bitmapPixels + 1) = btVal;
+		*(bitmapPixels + 2) = btVal;
+		bitmapPixels+=3;
+
+		currLinePos--;
+	}
+
+	return bitmapPixelsStartPtr;
+}
+
+HRESULT TangraAviFileAddFrame(long* pixels)
+{
+	HRESULT rv = S_OK;
+
+	BYTE* bitmapPixels = BuildBitmap(s_AviFrameWidth, s_AviFrameHeight, s_AviFrameBpp, pixels);
+	
+	if(s_pStream)
+	{
+		s_pStream->Revert();
+
+		rv = s_pStream->Write(&bitmapPixels[0], ULONG(sizeof(BYTE) * ((s_AviFrameWidth * s_AviFrameHeight * 3) + 40 + 14 + 1)), NULL);
+		if(rv == S_OK)
+		{
+			HBITMAP hbmp = NULL;
+			Gdiplus::Bitmap* pBitmap = Gdiplus::Bitmap::FromStream(s_pStream);
+			if (pBitmap->GetHBITMAP(Gdiplus::Color(255, 0, 0, 0), &hbmp) == Gdiplus::Ok)
+			{
+				if (s_ShowCompressionDialog && s_AddedFrames == 0) SetAviFileCompression(&hbmp);
+
+				rv = s_AviFile->add_frame(hbmp);
+
+				s_AddedFrames++;
+
+				if (rv != S_OK)
+				  FormatAviMessage(rv, s_LastAviErrorMessage, ERROR_BUFFER_SIZE);
+
+				::DeleteObject(pBitmap);
+			}
+
+			::DeleteObject(hbmp);
+		}
+	}
+
+	::DeleteObject(bitmapPixels);
+
+	return rv;
+}
+
+
+HRESULT TangraAviFileClose()
+{
+	EnsureAviFileClosed();
+
+	return S_OK;
 }

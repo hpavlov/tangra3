@@ -18,3 +18,8 @@ EXPORTS
 	TangraVideoGetFrame
 	TangraVideoGetFramePixels
 	TangraVideoGetIntegratedFrame
+
+	TangraCreateNewAviFile
+	TangraAviFileAddFrame
+	TangraGetLastAviFileError
+	TangraAviFileClose

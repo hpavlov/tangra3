@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using Tangra.Helpers;
+using Tangra.Model.Image;
+using Tangra.PInvoke;
 
 namespace Tangra.Video.AstroDigitalVideo
 {
@@ -246,6 +249,87 @@ namespace Tangra.Video.AstroDigitalVideo
             m_InputFile.Close();
         }
 
+        private ushort[,] prevFramePixels;
+        private int prevFrameNo = -1;
+
+        internal Pixelmap GetFrameData(int index, out AdvImageData imageData, out AdvStatusData statusData, out Bitmap displayBitmap)
+        {
+            imageData = null;
+
+            if (index < NumberOfFrames)
+            {
+                byte layoutId;
+                AdvImageLayout.GetByteMode byteMode;
+
+                GetFrameImageSectionHeader(index, out layoutId, out byteMode);
+
+                AdvImageLayout layout = ImageSection.GetImageLayoutFromLayoutId(layoutId);
+
+                if (layout.IsDiffCorrLayout && byteMode == AdvImageLayout.GetByteMode.DiffCorrBytes && prevFrameNo != index - 1)
+                {
+                    // Move back and find the nearest previous key frame
+                    int keyFrameIdx = index;
+                    do
+                    {
+                        keyFrameIdx--;
+                        GetFrameImageSectionHeader(keyFrameIdx, out layoutId, out byteMode);
+                    }
+                    while (keyFrameIdx > 0 && byteMode != AdvImageLayout.GetByteMode.KeyFrameBytes);
+
+                    object[] keyFrameData = GetFrameSectionData(keyFrameIdx, null);
+                    prevFramePixels = ((AdvImageData)keyFrameData[0]).ImageData;
+
+                    if (layout.DiffCorrFrame == DiffCorrFrameMode.PrevFrame)
+                    {
+                        for (int i = keyFrameIdx + 1; i < index; i++)
+                        {
+                            object[] frameData = GetFrameSectionData(i, prevFramePixels);
+
+                            prevFramePixels = ((AdvImageData)frameData[0]).ImageData;
+                        }
+                    }
+                }
+
+                object[] data;
+
+                data = GetFrameSectionData(index, prevFramePixels);
+
+                imageData = (AdvImageData)data[0];
+                statusData = (AdvStatusData)data[1];
+
+                if (prevFramePixels == null)
+                    prevFramePixels = new ushort[ImageSection.Width, ImageSection.Height];
+                for (int x = 0; x < ImageSection.Width; x++)
+                    for (int y = 0; y < ImageSection.Height; y++)
+                    {
+                        prevFramePixels[x, y] = imageData.ImageData[x, y];
+                    }
+
+                prevFrameNo = index;
+
+                Pixelmap rv = ImageSection.CreatePixelmap(imageData);
+
+                //Pixelmap rv = new Pixelmap((int)m_AdvFile.ImageSection.Width, (int)m_AdvFile.ImageSection.Height, m_AdvFile.ImageSection.BitsPerPixel, null, null, null);
+                //rv.Width = (int) m_AdvFile.ImageSection.Width;
+                //rv.Height = (int) m_AdvFile.ImageSection.Height;
+                //rv.BitPixCamera = m_AdvFile.ImageSection.BitsPerPixel;
+                //rv.Array = new uint[Width * Height];
+                //rv.CopyPixelsFrom(imageData.ImageData, imageData.Bpp);
+                //displayBitmap = PixelmapFactory.ConstructBitmapFrom12BitPixelmap(rv);
+
+                displayBitmap = rv.DisplayBitmap;
+
+                return rv;
+
+            }
+            else
+            {
+                displayBitmap = null;
+                statusData = null;
+                return null;
+            }
+        }
+
 		private class RecoveredFrameHeader
 		{
 			public long Position;
@@ -460,8 +544,55 @@ namespace Tangra.Video.AstroDigitalVideo
 				writer.Write(bt);
 			}			
 		}
+        
+        internal bool SaveAsAviFile(string fileName, int firstFrame, int lastFrame, bool tryCodec, double msPerFrame, double addedGamma, OnSearchProgressDelegate progressCallback)
+        {
+            TangraVideo.CloseAviFile();
+            TangraVideo.StartNewAviFile(fileName, (int)ImageSection.Width, (int)ImageSection.Height, 8, 25, tryCodec);
+			try
+			{
+			    int aviFrameNo = 0;
+                AdvFramesIndexEntry firstFrameIdx = m_Index.Index[firstFrame];
+			    double startingTimeMilliseconds = firstFrameIdx.ElapsedTime.TotalMilliseconds;
 
-		internal bool CropAdvFile(string fileName, int firstFrame, int lastFrame, OnSearchProgressDelegate progressCallback)
+                progressCallback(5, 0);
+
+			    for (int i = firstFrame; i <= lastFrame; i++)
+			    {
+			        AdvFramesIndexEntry frame = m_Index.Index[i];
+
+                    AdvImageData currentImageData;
+		            AdvStatusData currentStatusData;
+			        Bitmap currentBitmap;
+
+			        using (Pixelmap pixmap = GetFrameData(i, out currentImageData, out currentStatusData, out currentBitmap))
+			        {
+                        int lastRepeatedAviFrameNo = (int)Math.Round((frame.ElapsedTime.TotalMilliseconds - startingTimeMilliseconds) / msPerFrame);
+                        while (aviFrameNo < lastRepeatedAviFrameNo)
+                        {
+                            TangraVideo.AddAviVideoFrame(pixmap, addedGamma);
+                            aviFrameNo++;
+                        }
+
+                        if (currentBitmap != null)
+                            currentBitmap.Dispose();
+			        }
+
+                    int percDone = (int)Math.Min(90, 90 * (i - firstFrame) * 1.0 / (lastFrame - firstFrame + 1));
+                    progressCallback(5 + percDone, 0);
+			    }
+			}
+            finally
+            {   
+                TangraVideo.CloseAviFile();
+            }
+
+            progressCallback(100, 0);
+
+            return false;
+        }
+
+        internal bool CropAdvFile(string fileName, int firstFrame, int lastFrame, OnSearchProgressDelegate progressCallback)
 	    {
 			using (var fsr = new FileStream(m_FileName, FileMode.Open, FileAccess.Read))
 			using (var reader = new BinaryReader(fsr))

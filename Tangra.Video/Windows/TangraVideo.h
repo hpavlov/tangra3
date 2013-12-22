@@ -2,7 +2,7 @@
 
 #define VERSION_MAJOR 3
 #define VERSION_MINOR 0
-#define VERSION_REVISION 22
+#define VERSION_REVISION 23
 
 struct VideoFileInfo
 {
@@ -31,3 +31,11 @@ HRESULT TangraVideoGetFrame(long frameNo, unsigned long* pixels, unsigned char* 
 HRESULT TangraVideoGetFramePixels(long frameNo, unsigned long* pixels);
 
 HRESULT TangraVideoGetIntegratedFrame(long startFrameNo, long framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, unsigned char* bitmapPixels, unsigned char* bitmapBytes);
+
+HRESULT TangraCreateNewAviFile(LPCTSTR szFileName, long width, long height, int bpp, double fps);
+
+HRESULT TangraAviFileAddFrame(long* pixels);
+
+HRESULT TangraGetLastAviFileError(LPCTSTR szErrorMessage);
+
+HRESULT TangraAviFileClose();

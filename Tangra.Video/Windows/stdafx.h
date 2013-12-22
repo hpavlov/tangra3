@@ -19,5 +19,12 @@
 
 
 
-
 // TODO: reference additional headers your program requires here
+#include <vfw.h>
+#include <string>
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+#include <math.h>
+#include <iostream>
+#include <assert.h>
