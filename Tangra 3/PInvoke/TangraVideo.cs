@@ -321,25 +321,38 @@ namespace Tangra.PInvoke
             }
         }
 
-	    private static double s_GammaTableGammaVal = double.MaxValue;
-        private static int[] s_GammaTable = new int[ushort.MaxValue];
+		private static int s_BitPixTableBitPixVal = 0;
+        private static int[] s_BitPixTable = new int[ushort.MaxValue];
+		private static double s_GammaTableGammaVal = double.MaxValue;
+		private static int[] s_GammaTable = new int[256];
 
         public static void AddAviVideoFrame(Pixelmap pixmap, double addedGamma)
         {
             int[,] pixels = new int[pixmap.Height, pixmap.Width];
+			bool usesGamma = Math.Abs(addedGamma - 1) > 0.01;
+			bool needsBitPixConversion = pixmap.BitPixCamera > 8;
 
-            if (Math.Abs(s_GammaTableGammaVal - addedGamma) > 0.01)
+			if (Math.Abs(s_BitPixTableBitPixVal - pixmap.BitPixCamera) > 0.01)
+			{
+				double maxVal = pixmap.BitPixCamera.GetMaxValueForBitPix();
+
+				for (int i = 0; i < maxVal; i++)
+				{
+					double convVal = 255.0 * i / maxVal;
+
+					s_BitPixTable[i] = Math.Max(0, Math.Min(255, (int)Math.Round(convVal)));
+				}
+
+				s_BitPixTableBitPixVal = pixmap.BitPixCamera;
+			}
+
+	        if (Math.Abs(s_GammaTableGammaVal - addedGamma) > 0.01)
             {
-                double maxVal = pixmap.BitPixCamera.GetMaxValueForBitPix();
-                bool usesGamma = Math.Abs(addedGamma - 1) > 0.01;
-                double gammaFactor = usesGamma ? (255.0 / Math.Pow(255.0, addedGamma)) : 0;
+				double gammaFactor = usesGamma ? (255.0 / Math.Pow(255.0, addedGamma)) : 0;
 
-                for (int i = 0; i < maxVal; i++)
+                for (int i = 0; i < 256; i++)
                 {
-                    double convVal = 255.0 * i / maxVal;
-
-                    if (usesGamma)
-                        convVal = gammaFactor * Math.Pow(i, addedGamma);
+                    double convVal = gammaFactor * Math.Pow(i, addedGamma);
 
                     s_GammaTable[i] = Math.Max(0, Math.Min(255, (int) Math.Round(convVal)));
                 }
@@ -351,7 +364,14 @@ namespace Tangra.PInvoke
             {
                 for (int y = 0; y < pixmap.Height; y++)
                 {
-                    pixels[y, x] = s_GammaTable[pixmap.Pixels[x + y * pixmap.Width]];
+	                uint conv8BitVal = pixmap.Pixels[x + y*pixmap.Width];
+	                if (needsBitPixConversion)
+		                conv8BitVal = (uint)s_BitPixTable[conv8BitVal];
+
+					if (usesGamma)
+						pixels[y, x] = s_GammaTable[conv8BitVal];
+					else
+						pixels[y, x] =  Math.Max(0, Math.Min(255, (int)conv8BitVal));
                 }
             }
 

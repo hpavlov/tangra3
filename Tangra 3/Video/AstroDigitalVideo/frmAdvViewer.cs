@@ -115,7 +115,6 @@ namespace Tangra.Video.AstroDigitalVideo
             gbxConvertToAVI.Text = m_IsAavFile ? "AAV to AVI" : "ADV to AVI";
 		    btnCropADV.Text = m_IsAavFile ? "Save AAV chunk as ..." : "Save ADV chunk as ...";
 
-		    cbxTryCodec.Checked = false;
             cbxFrameRate.SelectedIndex = 0;
 		    cbxAddedGamma.SelectedIndex = 0;
 
@@ -398,7 +397,6 @@ namespace Tangra.Video.AstroDigitalVideo
 
             if (saveAviFileDialog.ShowDialog(this) == DialogResult.OK)
             {
-                bool tryCodec = cbxTryCodec.Checked;
                 double msPerFrame = cbxFrameRate.SelectedIndex == 0 ? 40 : 33.37;
                 double addedGamma = 1;
                 if (cbxAddedGamma.SelectedIndex == 1)
@@ -416,7 +414,7 @@ namespace Tangra.Video.AstroDigitalVideo
                         saveAviFileDialog.FileName, 
                         (int)nudAviFirstFrame.Value, 
                         (int)nudAviLastFrame.Value,
-                        tryCodec,
+                        false,
                         msPerFrame,
                         addedGamma));
             }

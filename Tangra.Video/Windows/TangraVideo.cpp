@@ -441,7 +441,7 @@ HRESULT TangraAviFileAddFrame(long* pixels)
 		}
 	}
 
-	::DeleteObject(bitmapPixels);
+	delete bitmapPixels;
 
 	return rv;
 }

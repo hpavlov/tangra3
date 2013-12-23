@@ -6,6 +6,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 using Tangra.Helpers;
 using Tangra.Model.Image;
 using Tangra.PInvoke;
@@ -554,40 +555,83 @@ namespace Tangra.Video.AstroDigitalVideo
 			    int aviFrameNo = 0;
                 AdvFramesIndexEntry firstFrameIdx = m_Index.Index[firstFrame];
 			    double startingTimeMilliseconds = firstFrameIdx.ElapsedTime.TotalMilliseconds;
+				bool isAavFile = AdvFileTags["FSTF-TYPE"] == "AAV";
 
-                progressCallback(5, 0);
+				double effFrameDuration = double.NaN;
+				try
+				{
+					effFrameDuration = 1000 / double.Parse(AdvFileTags["EFFECTIVE-FRAME-RATE"]);
+				}
+				catch
+				{ }
 
-			    for (int i = firstFrame; i <= lastFrame; i++)
-			    {
-			        AdvFramesIndexEntry frame = m_Index.Index[i];
+				if (isAavFile && m_Index.Index[lastFrame].ElapsedTime.Ticks == 0 && double.IsNaN(effFrameDuration))
+				{
+					MessageBox.Show(
+						"This AAV video format is too old and cannot be converted to AVI", 
+						"Tangra 3", 
+						MessageBoxButtons.OK, 
+						MessageBoxIcon.Error);
 
-                    AdvImageData currentImageData;
-		            AdvStatusData currentStatusData;
-			        Bitmap currentBitmap;
+					return false;
+				}
 
-			        using (Pixelmap pixmap = GetFrameData(i, out currentImageData, out currentStatusData, out currentBitmap))
-			        {
-                        int lastRepeatedAviFrameNo = (int)Math.Round((frame.ElapsedTime.TotalMilliseconds - startingTimeMilliseconds) / msPerFrame);
-                        while (aviFrameNo < lastRepeatedAviFrameNo)
-                        {
-                            TangraVideo.AddAviVideoFrame(pixmap, addedGamma);
-                            aviFrameNo++;
-                        }
+				if ((isAavFile && !double.IsNaN(effFrameDuration)) ||
+				    !isAavFile && m_Index.Index[lastFrame].ElapsedTime.Ticks != 0)
+				{
+					// Sampling can be done as we have sufficient timing information
+				}
+				else
+				{
+					MessageBox.Show(
+						"There is insufficient timing information in this file to convert it to AVI. This could be caused by an old file format.",
+						"Tangra 3",
+						MessageBoxButtons.OK,
+						MessageBoxIcon.Error);
 
-                        if (currentBitmap != null)
-                            currentBitmap.Dispose();
-			        }
+					return false;
+				}
 
-                    int percDone = (int)Math.Min(90, 90 * (i - firstFrame) * 1.0 / (lastFrame - firstFrame + 1));
-                    progressCallback(5 + percDone, 0);
-			    }
+				progressCallback(5, 0);
+
+				for (int i = firstFrame; i <= lastFrame; i++)
+				{
+					AdvFramesIndexEntry frame = m_Index.Index[i];
+
+					AdvImageData currentImageData;
+					AdvStatusData currentStatusData;
+					Bitmap currentBitmap;
+
+					using (Pixelmap pixmap = GetFrameData(i, out currentImageData, out currentStatusData, out currentBitmap))
+					{
+						int lastRepeatedAviFrameNo = 0;
+
+						if (isAavFile && !double.IsNaN(effFrameDuration))
+						{
+							lastRepeatedAviFrameNo = (int)Math.Round(((i - firstFrame) * effFrameDuration) / msPerFrame);
+						}
+						else if (!isAavFile && frame.ElapsedTime.Ticks != 0)
+							lastRepeatedAviFrameNo = (int)Math.Round((frame.ElapsedTime.TotalMilliseconds - startingTimeMilliseconds) / msPerFrame);
+
+						while (aviFrameNo < lastRepeatedAviFrameNo)
+						{
+							TangraVideo.AddAviVideoFrame(pixmap, addedGamma);
+							aviFrameNo++;
+						}
+
+						if (currentBitmap != null)
+							currentBitmap.Dispose();
+					}
+
+					int percDone = (int)Math.Min(90, 90 * (i - firstFrame) * 1.0 / (lastFrame - firstFrame + 1));
+					progressCallback(5 + percDone, 0);
+				}	
 			}
             finally
             {   
                 TangraVideo.CloseAviFile();
+				progressCallback(100, 0);
             }
-
-            progressCallback(100, 0);
 
             return false;
         }
