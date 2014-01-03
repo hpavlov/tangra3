@@ -775,7 +775,7 @@ namespace Tangra.Model.Config
 			public int LightcurvesColorScheme = 0;
 			public float DatapointSize = 5.0f;
 			public bool DrawGrid = true;
-			public bool DrawInvalidDataPoints = true;
+			public bool DrawInvalidDataPoints = false;
 		}
 
 		public enum LightCurvesColorScheme

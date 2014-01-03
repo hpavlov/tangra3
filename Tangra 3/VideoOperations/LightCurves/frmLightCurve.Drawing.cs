@@ -194,8 +194,6 @@ namespace Tangra.VideoOperations.LightCurves
 								readingIdx++;
 								bool drawThisReading = (reading.CurrFrameNo >= m_MinDisplayedFrame) && (reading.CurrFrameNo <= m_MaxDisplayedFrame);
 
-								if (!m_DisplaySettings.DrawInvalidDataPoints && !reading.IsSuccessfulReading) drawThisReading = false;								
-
 								bool readingIsOffScreen = true;
 								float adjustedReading = -1;
 								if (m_Context.Binning > 0)
@@ -223,11 +221,14 @@ namespace Tangra.VideoOperations.LightCurves
 									}
 									else
 										drawThisReading = false;
+
+                                    if (!m_DisplaySettings.DrawInvalidDataPoints && currBin != null && !currBin.IsSuccessfulReading) drawThisReading = false;
 								}
 								else
 								{
 									adjustedReading = reading.AdjustedReading;
 									readingIsOffScreen = reading.IsOffScreen;
+                                    if (!m_DisplaySettings.DrawInvalidDataPoints && !reading.IsSuccessfulReading) drawThisReading = false;
 								}
 
 								if (drawThisReading && !readingIsOffScreen)
@@ -368,8 +369,6 @@ namespace Tangra.VideoOperations.LightCurves
                                 readingIdx++;
                                 bool drawThisReading = (reading.CurrFrameNo >= m_MinDisplayedFrame) && (reading.CurrFrameNo <= m_MaxDisplayedFrame);
 								
-								if (!m_DisplaySettings.DrawInvalidDataPoints && !reading.IsSuccessfulReading) drawThisReading = false;
-
                                 bool readingIsOffScreen = true;
                                 float adjustedReading = -1;
                                 if (m_Context.Binning > 0)
@@ -397,11 +396,14 @@ namespace Tangra.VideoOperations.LightCurves
                                     }
                                     else
                                         drawThisReading = false;
+
+                                    if (!m_DisplaySettings.DrawInvalidDataPoints && currBin != null && !currBin.IsSuccessfulReading) drawThisReading = false;
                                 }
                                 else
                                 {
                                     adjustedReading = reading.AdjustedReading;
 									readingIsOffScreen = reading.IsOffScreen;
+                                    if (!m_DisplaySettings.DrawInvalidDataPoints && !reading.IsSuccessfulReading) drawThisReading = false;
                                 }
 
                                 if (drawThisReading && !readingIsOffScreen)
@@ -741,9 +743,12 @@ namespace Tangra.VideoOperations.LightCurves
                                 // Only draw the points if there is no binning
                                 float y = pnlChart.Height - (m_MinY + (reading.AdjustedReading - m_Header.MinAdjustedReading) * m_ScaleY);
 
-                                Brush brush = GetBrushForTarget(i, reading.IsSuccessfulReading);
-
-                                g.FillEllipse(brush, x - datapointFrom, y - datapointFrom, datapointSize, datapointSize);                                
+                                bool restoreThisReading = m_DisplaySettings.DrawInvalidDataPoints || reading.IsSuccessfulReading;
+                                if (restoreThisReading)
+                                {
+                                    Brush brush = GetBrushForTarget(i, reading.IsSuccessfulReading);
+                                    g.FillEllipse(brush, x - datapointFrom, y - datapointFrom, datapointSize, datapointSize);
+                                }
                             }
                         }
                     }
@@ -754,7 +759,7 @@ namespace Tangra.VideoOperations.LightCurves
                         foreach (int y in m_OldLineBackup.Keys)
                         {
                             m_Graph.SetPixel(intX, y, m_OldLineBackup[y]);
-                        }                        
+                        }
                     }
                 }
                 else
@@ -795,14 +800,16 @@ namespace Tangra.VideoOperations.LightCurves
 
                             LCMeasurement reading = m_AllReadings[i][id];
 
-							if (m_Context.Binning == 0 && !reading.IsOffScreen)
+                            bool drawThisReading = m_DisplaySettings.DrawInvalidDataPoints || reading.IsSuccessfulReading;
+
+                            if (m_Context.Binning == 0 && !reading.IsOffScreen && drawThisReading)
                             {
                                 float y = pnlChart.Height - (m_MinY + (reading.AdjustedReading - m_Header.MinAdjustedReading) * m_ScaleY);
 								g.FillEllipse(m_DisplaySettings.SelectionCursorColorBrush, x - datapointFrom, y - datapointFrom, datapointSize, datapointSize);
                             }
 
                             m_SelectedMeasurements[i] = reading;
-                        }                        
+                        }
                     }
                 }
 

@@ -297,7 +297,8 @@ namespace Tangra.VideoOperations.LightCurves
 
             foreach (BinnedValue binnedValue in m_AllBinnedReadings[m_Context.Normalisation])
             {
-                linearRegression.AddDataPoint(binnedValue.BinNo, binnedValue.AdjustedValue);
+                if (binnedValue.IsSuccessfulReading)
+                    linearRegression.AddDataPoint(binnedValue.BinNo, binnedValue.AdjustedValue);
             }
 
             linearRegression.Solve();
@@ -316,7 +317,8 @@ namespace Tangra.VideoOperations.LightCurves
 
             foreach (LCMeasurement reading in m_AllReadings[m_Context.Normalisation])
             {
-                linearRegression.AddDataPoint(reading.CurrFrameNo, reading.AdjustedReading);
+                if (reading.IsSuccessfulReading)
+                    linearRegression.AddDataPoint(reading.CurrFrameNo, reading.AdjustedReading);
             }
 
             linearRegression.Solve();
@@ -338,7 +340,10 @@ namespace Tangra.VideoOperations.LightCurves
             {
                 if (numFrames == 1)
                 {
-                    averages.Add(m_AllReadings[m_Context.Normalisation][i].AdjustedReading);
+                    if (m_AllReadings[m_Context.Normalisation][i].IsSuccessfulReading)
+                        averages.Add(m_AllReadings[m_Context.Normalisation][i].AdjustedReading);
+                    else
+                        averages.Add(double.NaN);
                 }
                 else
                 {
@@ -349,24 +354,34 @@ namespace Tangra.VideoOperations.LightCurves
                         int idx = i + j;
                         if (idx >= 0 && idx < maxIdx)
                         {
-                            sum += m_AllReadings[m_Context.Normalisation][idx].AdjustedReading;
-                            readings++;
+                            if (m_AllReadings[m_Context.Normalisation][idx].IsSuccessfulReading)
+                            {
+                                sum += m_AllReadings[m_Context.Normalisation][idx].AdjustedReading;
+                                readings++;
+                            }
                         }
                     }
 
                     if (readings == 0)
-                        averages.Add(0);
+                        averages.Add(double.NaN);
                     else
-                        averages.Add((1.0 * sum / readings));                    
+                        averages.Add((1.0 * sum / readings));
                 }
             }
 
-            double firstValue = averages[0];
+            double firstValue = averages.FirstOrDefault(x => !double.IsNaN(x));
+            if (double.IsNaN(firstValue) || firstValue == 0)
+            {
+                for (int i = 0; i < maxIdx; i++) normalIndexes.Add(1);
+            }
 
             for (int i = 0; i < maxIdx; i++)
             {
-                normalIndexes.Add(firstValue / averages[i]);
-            }         
+                if (double.IsNaN(averages[i]))
+                    normalIndexes.Add(1);
+                else
+                    normalIndexes.Add(firstValue / averages[i]);
+            }
         }
 
 
@@ -384,23 +399,32 @@ namespace Tangra.VideoOperations.LightCurves
                     int idx = i + j;
                     if (idx >= 0 && idx < maxIdx)
                     {
-                        sum += m_AllBinnedReadings[m_Context.Normalisation][idx].AdjustedValue;
-                        readings++;
+                        if (m_AllReadings[m_Context.Normalisation][idx].IsSuccessfulReading)
+                        {
+                            sum += m_AllBinnedReadings[m_Context.Normalisation][idx].AdjustedValue;
+                            readings++;
+                        }
                     }
                 }
 
                 if (readings == 0)
-                    averages.Add(0);
+                    averages.Add(double.NaN);
                 else
                     averages.Add((1.0 * sum / readings));
             }
-
-            double firstValue = averages[0];
+            double firstValue = averages.FirstOrDefault(x => !double.IsNaN(x));
+            if (double.IsNaN(firstValue) || firstValue == 0)
+            {
+                for (int i = 0; i < maxIdx; i++) normalIndexes.Add(1);
+            }
 
             for (int i = 0; i < maxIdx; i++)
             {
-                normalIndexes.Add(firstValue / averages[i]);
-            }   
+                if (double.IsNaN(averages[i]))
+                    normalIndexes.Add(1);
+                else
+                    normalIndexes.Add(firstValue / averages[i]);
+            }
         }
 
         private BinnedValue GetBinForFrameNo(int objNo, uint frameNo)
