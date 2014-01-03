@@ -320,7 +320,7 @@ namespace Tangra
 		{
             if (CurrentOS.IsWindows)
             {
-                openVideoFileDialog.Filter = "All Supported Files (*.avi;*.avs;*.adv;*.aav)|*.avi;*.avs;*.adv;*.aav";
+                openVideoFileDialog.Filter = "All Supported Files (*.avi;*.adv;*.aav)|*.avi;*.adv;*.aav";
                 openVideoFileDialog.DefaultExt = "avi";
             }
             else
