@@ -26,6 +26,7 @@ namespace Tangra.Addins
 			FileName = localProvider.FileName;
 			NumberOfMeasuredComparisonObjects = localProvider.NumberOfMeasuredComparisonObjects;
             CameraCorrectionsHaveBeenApplied = localProvider.CameraCorrectionsHaveBeenApplied;
+			VideoCameraName = localProvider.VideoCameraName;
             HasReliableTimeBase = localProvider.HasReliableTimeBase;
 			m_TargetMeasurements = localProvider.GetTargetMeasurements();
 			if (NumberOfMeasuredComparisonObjects > 0)
@@ -42,6 +43,8 @@ namespace Tangra.Addins
 		public int NumberOfMeasuredComparisonObjects { get; private set; }
 
         public bool CameraCorrectionsHaveBeenApplied { get; private set; }
+
+		public string VideoCameraName { get; private set; }
 
         public bool HasReliableTimeBase { get; private set; }
 

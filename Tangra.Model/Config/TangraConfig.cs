@@ -775,6 +775,7 @@ namespace Tangra.Model.Config
 			public int LightcurvesColorScheme = 0;
 			public float DatapointSize = 5.0f;
 			public bool DrawGrid = true;
+			public bool DrawInvalidDataPoints = true;
 		}
 
 		public enum LightCurvesColorScheme
@@ -917,6 +918,7 @@ namespace Tangra.Model.Config
 			public Brush Target4Brush;
 
 			public bool DrawGrid;
+			public bool DrawInvalidDataPoints;
 
 			public static Font LabelsFont = new Font(FontFamily.GenericMonospace, 9);
 
@@ -935,6 +937,7 @@ namespace Tangra.Model.Config
 				ColorScheme = (LightCurvesColorScheme)TangraConfig.Settings.Color.LightcurvesColorScheme;
 				DatapointSize = TangraConfig.Settings.Color.DatapointSize;
 				DrawGrid = TangraConfig.Settings.Color.DrawGrid;
+				DrawInvalidDataPoints = TangraConfig.Settings.Color.DrawInvalidDataPoints;
 
 				SmallGraphFocusBackgroundBrushColor = TangraConfig.Settings.Color.SmallGraphFocusBackground;
 				SelectionCursorColor = TangraConfig.Settings.Color.SelectionCursorColor;
@@ -956,6 +959,7 @@ namespace Tangra.Model.Config
 
 				TangraConfig.Settings.Color.DatapointSize = DatapointSize;
 				TangraConfig.Settings.Color.DrawGrid = DrawGrid;
+				TangraConfig.Settings.Color.DrawInvalidDataPoints = DrawInvalidDataPoints;
 
 				TangraConfig.Settings.Color.SmallGraphFocusBackground = SmallGraphFocusBackgroundBrushColor;
 				TangraConfig.Settings.Color.SelectionCursorColor = SelectionCursorColor;

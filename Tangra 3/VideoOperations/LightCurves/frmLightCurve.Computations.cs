@@ -1185,6 +1185,11 @@ namespace Tangra.VideoOperations.LightCurves
             get { return m_CameraCorrectionsHaveBeenAppliedFlag; }
         }
 
+	    string ILightCurveDataProvider.VideoCameraName
+	    {
+			get { return m_Context.CameraName; }
+	    }
+
 		void ILightCurveDataProvider.SetNoOccultationEvents()
 		{
 			if (m_EventTimesReport != null)

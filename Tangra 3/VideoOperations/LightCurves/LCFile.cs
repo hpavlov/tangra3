@@ -976,7 +976,10 @@ namespace Tangra.VideoOperations.LightCurves
 				for (int i = 0; i < timings.Count - 1; i++)
 				{
 					double interval = new TimeSpan(timings[i + 1].FrameMidTime.Ticks - timings[i].FrameMidTime.Ticks).TotalMilliseconds;
-					allFrameIntervals.Add(interval);
+
+					if (timings[i + 1].FrameMidTime.Ticks > 0 && timings[i].FrameMidTime.Ticks > 0)
+						// When the two sequential frames both have valid (non zero) timestamps
+						allFrameIntervals.Add(interval);
 				}
 
 				double maxDifference = (allFrameIntervals.Max() - allFrameIntervals.Min()) / 2.0;

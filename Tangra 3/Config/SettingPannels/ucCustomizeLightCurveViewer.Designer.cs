@@ -54,6 +54,7 @@
 			this.label7 = new System.Windows.Forms.Label();
 			this.cpSelectionCursor = new Tangra.Controls.ucColorPicker();
 			this.cpFocusArea = new Tangra.Controls.ucColorPicker();
+			this.cbxDrawInvalidDatapoints = new System.Windows.Forms.CheckBox();
 			((System.ComponentModel.ISupportInitialize)(this.nudPointSize)).BeginInit();
 			this.gbColors.SuspendLayout();
 			this.SuspendLayout();
@@ -337,11 +338,21 @@
 			this.cpFocusArea.TabIndex = 36;
 			this.cpFocusArea.SelectedColorChanged += new System.EventHandler(this.SelectedColorChanged);
 			// 
+			// cbxDrawInvalidDatapoints
+			// 
+			this.cbxDrawInvalidDatapoints.Location = new System.Drawing.Point(3, 268);
+			this.cbxDrawInvalidDatapoints.Name = "cbxDrawInvalidDatapoints";
+			this.cbxDrawInvalidDatapoints.Size = new System.Drawing.Size(156, 19);
+			this.cbxDrawInvalidDatapoints.TabIndex = 56;
+			this.cbxDrawInvalidDatapoints.Text = "Draw Invalid Datapoints";
+			this.cbxDrawInvalidDatapoints.CheckedChanged += new System.EventHandler(this.cbxDrawInvalidDatapoints_CheckedChanged);
+			// 
 			// ucCustomizeLightCurveViewer
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.SystemColors.Control;
+			this.Controls.Add(this.cbxDrawInvalidDatapoints);
 			this.Controls.Add(this.nudPointSize);
 			this.Controls.Add(this.cbxColorScheme);
 			this.Controls.Add(this.cbxDrawGrid);
@@ -391,5 +402,6 @@
 		private System.Windows.Forms.CheckBox cbxTangraTargetColors;
 		private System.Windows.Forms.ComboBox cbxColorScheme;
 		private System.Windows.Forms.NumericUpDown nudPointSize;
+		private System.Windows.Forms.CheckBox cbxDrawInvalidDatapoints;
 	}
 }

@@ -193,6 +193,9 @@ namespace Tangra.VideoOperations.LightCurves
 								idx++;
 								readingIdx++;
 								bool drawThisReading = (reading.CurrFrameNo >= m_MinDisplayedFrame) && (reading.CurrFrameNo <= m_MaxDisplayedFrame);
+
+								if (!m_DisplaySettings.DrawInvalidDataPoints && !reading.IsSuccessfulReading) drawThisReading = false;								
+
 								bool readingIsOffScreen = true;
 								float adjustedReading = -1;
 								if (m_Context.Binning > 0)
@@ -364,6 +367,9 @@ namespace Tangra.VideoOperations.LightCurves
                                 idx++;
                                 readingIdx++;
                                 bool drawThisReading = (reading.CurrFrameNo >= m_MinDisplayedFrame) && (reading.CurrFrameNo <= m_MaxDisplayedFrame);
+								
+								if (!m_DisplaySettings.DrawInvalidDataPoints && !reading.IsSuccessfulReading) drawThisReading = false;
+
                                 bool readingIsOffScreen = true;
                                 float adjustedReading = -1;
                                 if (m_Context.Binning > 0)

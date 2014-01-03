@@ -26,6 +26,7 @@ namespace Tangra.SDK
 		void SetFoundOccultationEvent(int eventId, float dFrame, float rFrame, float dFrameErrorMinus, float dFrameErrorPlus, float rFrameErrorMinus, float rFrameErrorPlus, string dTime, string rTime);
 		void SetNoOccultationEvents();
         void SetTimeExtractionEngine(string engineAndVersion);
+		string VideoCameraName { get; }
 	}
 
 	public interface ITangraHost

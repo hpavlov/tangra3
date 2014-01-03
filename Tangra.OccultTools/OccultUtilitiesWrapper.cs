@@ -28,6 +28,7 @@ namespace Tangra.OccultTools
 		private static MethodInfo AOTA_Set_Comp3Data_InclBg;
 		private static MethodInfo AOTA_Set_TimeBase;
         private static MethodInfo AOTA_Set_TimeBaseEx;
+		private static MethodInfo AOTA_Set_VideoCamera;
 		private static MethodInfo AOTA_RunAOTA;
 	    private static MethodInfo AOTA_RunAOTAEx;
 		private static MethodInfo AOTA_InitialiseAOTA;
@@ -109,6 +110,8 @@ namespace Tangra.OccultTools
 				AOTA_Set_TimeBase = TYPE_AOTA_ExternalAccess.GetMethod("Set_TimeBase", new Type[] { typeof(double[]) });
                 //public void Set_TimeBase(double[] data, bool CameraCorrectionsHaveBeenApplied)
                 AOTA_Set_TimeBaseEx = TYPE_AOTA_ExternalAccess.GetMethod("Set_TimeBase", new Type[] { typeof(double[]), typeof(bool) });
+				//public void Set_VideoCamera(string VideoCamera)
+				AOTA_Set_VideoCamera = TYPE_AOTA_ExternalAccess.GetMethod("Set_VideoCamera", new Type[] { typeof(string) });
 				//public bool RunAOTA(IWin32Window parentWindow)
                 AOTA_RunAOTA = TYPE_AOTA_ExternalAccess.GetMethod("RunAOTA", new Type[] { typeof(IWin32Window) });
                 //public bool RunAOTA(IWin32Window parentWindow, int FirstFrame, int FramesInIntegration)    
@@ -170,7 +173,7 @@ namespace Tangra.OccultTools
 				if (hasReliableTimeBase)
 				{
 					startFrameStartDayTicks = timestamps[0].Date.Ticks;
-					secondsFromUTMidnight = timestamps.Select(x => (Math.Truncate(new TimeSpan(x.Ticks - startFrameStartDayTicks).TotalSeconds * 10000) / 10000.0)).ToArray();					
+					secondsFromUTMidnight = timestamps.Select(x => (Math.Truncate(new TimeSpan(x.Ticks - startFrameStartDayTicks).TotalSeconds * 10000) / 10000.0)).ToArray();
 				}
 				else
 				{
@@ -191,6 +194,13 @@ namespace Tangra.OccultTools
 					AOTA_Set_TimeBaseEx.Invoke(m_AotaInstance, new object[] { secondsFromUTMidnight, cameraCorrectionsHaveBeenApplied });
 				else if (AOTA_Set_TimeBase != null)
 					AOTA_Set_TimeBase.Invoke(m_AotaInstance, new object[] { secondsFromUTMidnight });
+
+				if (cameraCorrectionsHaveBeenApplied)
+				{
+					string cameraName = dataProvider.VideoCameraName;
+					if (!string.IsNullOrEmpty(cameraName))
+						AOTA_Set_VideoCamera.Invoke(m_AotaInstance, new object[] { cameraName });
+				}
 
 				// Now go and set any comparison stars
 	            for (int i = 0; i < dataProvider.NumberOfMeasuredComparisonObjects; i++)

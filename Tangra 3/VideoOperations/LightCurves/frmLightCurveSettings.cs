@@ -34,6 +34,7 @@ namespace Tangra.VideoOperations.LightCurves
                 cbxTangraTargetColors.Checked = m_DisplaySettings.UseTangraTargetColors;
                 nudPointSize.Value = (decimal)m_DisplaySettings.DatapointSize;
             	cbxDrawGrid.Checked = m_DisplaySettings.DrawGrid;
+				cbxDrawInvalidDatapoints.Checked = m_DisplaySettings.DrawInvalidDataPoints;
 
                 cpFocusArea.SelectedColor = m_DisplaySettings.SmallGraphFocusBackgroundBrushColor;
 				cpSelectionCursor.SelectedColor = m_DisplaySettings.SelectionCursorColor;
@@ -57,6 +58,7 @@ namespace Tangra.VideoOperations.LightCurves
             m_DisplaySettings.UseTangraTargetColors = cbxTangraTargetColors.Checked;
             m_DisplaySettings.DatapointSize = (float)nudPointSize.Value;
         	m_DisplaySettings.DrawGrid = cbxDrawGrid.Checked;
+	        m_DisplaySettings.DrawInvalidDataPoints = cbxDrawInvalidDatapoints.Checked;
 
             m_DisplaySettings.SmallGraphFocusBackgroundBrushColor = cpFocusArea.SelectedColor;
         	m_DisplaySettings.SelectionCursorColor = cpSelectionCursor.SelectedColor;
@@ -219,6 +221,12 @@ namespace Tangra.VideoOperations.LightCurves
 		{
             if (!m_DontApplySettingsBack)
                 Preview();
+		}
+
+		private void cbxDrawInvalidDatapoints_CheckedChanged(object sender, EventArgs e)
+		{
+			if (!m_DontApplySettingsBack)
+				Preview();
 		}
     }
 }
