@@ -195,6 +195,8 @@ namespace Tangra.View
 
 			m_MainForm.scrollBarFrames.Minimum = TangraContext.Current.FirstFrame;
 			m_MainForm.scrollBarFrames.Maximum = TangraContext.Current.LastFrame;
+		    m_MainForm.scrollBarFrames.SmallChange = 1;
+            m_MainForm.scrollBarFrames.LargeChange = 1;
 		}
 
 		public void Reset()

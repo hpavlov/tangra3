@@ -20,7 +20,7 @@ IMediaDet* m_MediaDet = NULL;
 long m_Width;
 long m_Height;
 long m_FrameDataSize;
-UINT m_FrameRateMS;
+double m_FrameRateMS;
 double m_ClipLength;
 
 
@@ -78,13 +78,13 @@ HRESULT TangraDirectShow::DirectShowOpenFile(LPCTSTR fileName, VideoFileInfo* fi
 		return hr;
 	}
 
-	hr = m_MediaDet->get_OutputStreams(&lStreams);    
+	hr = m_MediaDet->get_OutputStreams(&lStreams);
 	if (FAILED(hr))
 	{
-		return hr;    
+		return hr;
 	}    
 	
-	for (long i = 0; i < lStreams; i++)    
+	for (long i = 0; i < lStreams; i++)
 	{ 
 		GUID major_type;
 		hr = m_MediaDet->put_CurrentStream(i);
@@ -135,7 +135,7 @@ HRESULT TangraDirectShow::DirectShowOpenFile(LPCTSTR fileName, VideoFileInfo* fi
 				m_Height *= -1;
 			}
 
-			strncpy(fileInfo->EngineBuffer, "DirectShow\0", 4);
+			strncpy(fileInfo->EngineBuffer, "DirectShow\0", 11);
 			fileInfo->VideoFileTypeBuffer[0] = (pVih->bmiHeader.biCompression >> 24) & 0xFF;
 			fileInfo->VideoFileTypeBuffer[1] = (pVih->bmiHeader.biCompression >> 16) & 0xFF;
 			fileInfo->VideoFileTypeBuffer[2] = (pVih->bmiHeader.biCompression >> 8) & 0xFF;
@@ -155,12 +155,10 @@ HRESULT TangraDirectShow::DirectShowOpenFile(LPCTSTR fileName, VideoFileInfo* fi
 		return hr;
 	}
 
-	//Initialise all other stuff: could go in OnInitialUpdaet?
-	//mFrameRate = (UINT)GetFrameRate(); // Assume 25 fps
 	double frameRate;
 	m_MediaDet->get_FrameRate(&frameRate);
 	
-	m_FrameRateMS = (UINT)(1000 / frameRate); // 40 milliseconds per frame
+	m_FrameRateMS = 1000.0 / frameRate;
 	m_MediaDet->get_StreamLength(&m_ClipLength);
 
 	fileInfo->FrameRate = frameRate;
