@@ -49,6 +49,9 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Occult.SDK">
+      <HintPath>lib\Occult.SDK.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -70,6 +73,10 @@
     </Compile>
     <Compile Include="OccultUtilitiesWrapper.cs" />
     <Compile Include="OccultWatcherHelper.cs" />
+    <Compile Include="OccultWrappers\IOccultWrapper.cs" />
+    <Compile Include="OccultWrappers\OccultReflectionWrapper.cs" />
+    <Compile Include="OccultWrappers\OccultSDKWrapper.cs" />
+    <Compile Include="OccultWrappers\OccultWrapperFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resource.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -101,7 +108,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(TargetPath)" "$(SolutionDir)Tangra 3\bin\$(ConfigurationName)\Addins\" /Y</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(TargetPath)" "$(SolutionDir)Tangra 3\bin\$(ConfigurationName)\Addins\" /Y
+xcopy "$(TargetDir)Occult.SDK.dll" "$(SolutionDir)Tangra 3\bin\$(ConfigurationName)\Addins\" /Y</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

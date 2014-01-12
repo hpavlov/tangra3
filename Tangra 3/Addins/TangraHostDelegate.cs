@@ -40,5 +40,11 @@ namespace Tangra.Addins
 		{
 			return m_AddinManager.LightCurveDataProvider;
 		}
+
+        public void PositionToFrame(int frameNo)
+        {
+            m_AddinManager.PositionToFrame(frameNo);
+        }
+        
 	}
 }

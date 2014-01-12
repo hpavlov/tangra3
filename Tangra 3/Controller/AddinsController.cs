@@ -26,7 +26,7 @@ namespace Tangra.Controller
 			m_VideoController = videoController;
 			m_MainForm = mainFormView;
 
-			m_AddinManager = new AddinManager(mainFormView);
+            m_AddinManager = new AddinManager(mainFormView, videoController);
 		}
 
 		public void LoadAddins()
@@ -60,7 +60,7 @@ namespace Tangra.Controller
                 m_AddinManager.Dispose();
             m_AddinManager = null;
 
-            m_AddinManager = new AddinManager(m_MainForm); 
+            m_AddinManager = new AddinManager(m_MainForm, m_VideoController); 
         }
 
         public void Dispose()

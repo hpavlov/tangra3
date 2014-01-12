@@ -7,21 +7,24 @@ using System.Drawing;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.OccultTools.OccultWrappers;
 
 namespace Tangra.OccultTools	
 {
     public partial class frmConfig : Form
     {
 	    private OccultToolsAddinSettings m_Settings;
+        private IOccultWrapper m_OccultWrapper;
 
         public frmConfig()
         {
             InitializeComponent();
         }
 
-		internal void SetSettings(OccultToolsAddinSettings settings)
+        internal void SetSettings(OccultToolsAddinSettings settings, IOccultWrapper occultWrapper)
 		{
 			m_Settings = settings;
+            m_OccultWrapper = occultWrapper;
 			tbxOccultPath.Text = m_Settings.OccultLocation;
 		}
 
@@ -53,7 +56,7 @@ namespace Tangra.OccultTools
 
 			m_Settings.OccultLocation = tbxOccultPath.Text;
 
-			if (!OccultUtilitiesWrapper.HasSupportedVersionOfOccult(m_Settings.OccultLocation))
+            if (!m_OccultWrapper.HasSupportedVersionOfOccult(m_Settings.OccultLocation))
             {
 				MessageBox.Show("This addin requires Occult version 4.1.0.12 or later");
                 tbxOccultPath.SelectAll();

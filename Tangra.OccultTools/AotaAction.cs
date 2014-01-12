@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Tangra.OccultTools.OccultWrappers;
 using Tangra.SDK;
 
 namespace Tangra.OccultTools
@@ -15,12 +16,14 @@ namespace Tangra.OccultTools
 		private ITangraHost m_TangraHost;
 		private OccultToolsAddinSettings m_Settings;
 		private OccultToolsAddin m_Addin;
+	    private IOccultWrapper m_OccultWrapper;
 
-		public AotaAction(OccultToolsAddinSettings settings, ITangraHost tangraHost, OccultToolsAddin addin)
+		internal AotaAction(OccultToolsAddinSettings settings, ITangraHost tangraHost, IOccultWrapper occultWrapper, OccultToolsAddin addin)
 		{
 			m_Addin = addin;
 			m_Settings = settings;
 			m_TangraHost = tangraHost;
+		    m_OccultWrapper = occultWrapper;
 		}
 
 		public AddinActionType ActionType
@@ -54,7 +57,7 @@ namespace Tangra.OccultTools
 	                m_Addin.Configure();
 	        }
 
-            if (!OccultUtilitiesWrapper.HasSupportedVersionOfOccult(m_Settings.OccultLocation))
+            if (!m_OccultWrapper.HasSupportedVersionOfOccult(m_Settings.OccultLocation))
 	        {
 	            ShowIncompatibleOccultVersionErrorMessage();
 	            m_Addin.Configure();
@@ -62,9 +65,9 @@ namespace Tangra.OccultTools
 
 	        if (dataProvider != null)
 	        {
-		        if (OccultUtilitiesWrapper.HasSupportedVersionOfOccult(m_Settings.OccultLocation))
+                if (m_OccultWrapper.HasSupportedVersionOfOccult(m_Settings.OccultLocation))
 		        {
-					OccultUtilitiesWrapper.AotaReturnValue result = OccultUtilitiesWrapper.RunAOTA(dataProvider, m_TangraHost.ParentWindow);
+                    AotaReturnValue result = m_OccultWrapper.RunAOTA(dataProvider, m_TangraHost.ParentWindow);
 
 					if (result != null &&
                         result.AreResultsAvailable)
@@ -103,7 +106,7 @@ namespace Tangra.OccultTools
 
         public void Finalise()
         {
-            OccultUtilitiesWrapper.EnsureAOTAClosed();
+            m_OccultWrapper.EnsureAOTAClosed();
         }
 
 	    private void ShowIncompatibleOccultVersionErrorMessage()

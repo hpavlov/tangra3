@@ -8,6 +8,7 @@ using System.Runtime.Remoting.Lifetime;
 using System.Runtime.Remoting.Services;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Controller;
 using Tangra.Model.Config;
 using Tangra.SDK;
 using Tangra.Model.Helpers;
@@ -18,6 +19,7 @@ namespace Tangra.Addins
 	{
 		IWin32Window ParentWindow { get; }
 		ILightCurveDataProvider LightCurveDataProvider { get; }
+	    void PositionToFrame(int frameNo);
 	}
 
 	internal class RemotingClientSponsor : MarshalByRefObject, ISponsor
@@ -45,13 +47,15 @@ namespace Tangra.Addins
         public readonly static string ADDINS_DIRECTORY = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Addins");
 
 		private frmMain m_MainForm;
+        private VideoController m_VideoController;
 		private ILightCurveDataProvider m_lcDataProvider;
 
 		internal RemotingClientSponsor RemotingClientSponsor = new RemotingClientSponsor();
 
-		public AddinManager(frmMain mainForm)
+        public AddinManager(frmMain mainForm, VideoController videoController)
 		{
 			m_MainForm = mainForm;
+            m_VideoController = videoController;
 
 			TrackingServices.RegisterTrackingHandler(new AddinTrackingHandler());
 		}
@@ -148,5 +152,10 @@ namespace Tangra.Addins
 		{
 			get { return m_lcDataProvider; }
 		}
+
+        void IAddinManager.PositionToFrame(int frameNo)
+        {
+            m_VideoController.MoveToFrame(frameNo);
+        }
 	}
 }

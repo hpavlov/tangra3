@@ -34,6 +34,7 @@ namespace Tangra.SDK
 		ISettingsStorageProvider GetSettingsProvider();
 		ILightCurveDataProvider GetLightCurveDataProvider();
 		IWin32Window ParentWindow { get; }
+	    void PositionToFrame(int frameNo);
 	}
  
 	public interface ISingleMeasurement
