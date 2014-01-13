@@ -15,7 +15,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Hristo Pavlov")]
 [assembly: AssemblyProduct("Tangra")]
-[assembly: AssemblyCopyright("Tangra is developed in 2012-2013 by Hristo Pavlov")]
+[assembly: AssemblyCopyright("Tangra is developed in 2012-2014 by Hristo Pavlov")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -37,5 +37,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("3.0.0.69")]
-[assembly: AssemblyFileVersion("3.0.69")]
+[assembly: AssemblyVersion("3.0.0.70")]
+[assembly: AssemblyFileVersion("3.0.70")]

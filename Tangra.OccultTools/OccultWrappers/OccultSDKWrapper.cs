@@ -89,7 +89,7 @@ namespace Tangra.OccultTools.OccultWrappers
                     if (m_AotaInstance == null)
                         m_AotaInstance = Activator.CreateInstance(TYPE_AOTA_ExternalAccess) as Occult.SDK.IAOTAExternalAccess;
 
-                    m_AotaInstance.InitialiseAOTA(dataProvider.FileName, clientCallbacks);
+                    ShieldedCall(() => m_AotaInstance.InitialiseAOTA(dataProvider.FileName, clientCallbacks));
 
                     ISingleMeasurement[] measurements = dataProvider.GetTargetMeasurements();
 
@@ -99,9 +99,9 @@ namespace Tangra.OccultTools.OccultWrappers
                     float[] frameIds = measurements.Select(x => (float)x.CurrFrameNo).ToArray();
 
                     float[] dataBg = measurements.Select(x => x.Background).ToArray();
-                    m_AotaInstance.Set_TargetData_BackgroundAlreadySubtracted(data, dataBg);
+                    ShieldedCall(() => m_AotaInstance.Set_TargetData_BackgroundAlreadySubtracted(data, dataBg));
 
-                    m_AotaInstance.Set_FrameID(frameIds);
+                    ShieldedCall(() => m_AotaInstance.Set_FrameID(frameIds));
 
                     DateTime[] timestamps = measurements.Select(x => x.Timestamp).ToArray();
 
@@ -133,13 +133,13 @@ namespace Tangra.OccultTools.OccultWrappers
 
                     bool cameraCorrectionsHaveBeenApplied = dataProvider.CameraCorrectionsHaveBeenApplied;
 
-                    m_AotaInstance.Set_TimeBase(secondsFromUTMidnight, cameraCorrectionsHaveBeenApplied);
+                    ShieldedCall(() => m_AotaInstance.Set_TimeBase(secondsFromUTMidnight, cameraCorrectionsHaveBeenApplied));
 
                     if (cameraCorrectionsHaveBeenApplied)
                     {
                         string cameraName = dataProvider.VideoCameraName;
                         if (!string.IsNullOrEmpty(cameraName))
-                            m_AotaInstance.Set_VideoCamera(cameraName);
+                            ShieldedCall(() => m_AotaInstance.Set_VideoCamera(cameraName));
                     }
 
                     // Now go and set any comparison stars
@@ -152,33 +152,47 @@ namespace Tangra.OccultTools.OccultWrappers
                             float[] compData = compMeasurements.Select(x => x.Measurement).ToArray();
 
                             if (i == 0)
-                                m_AotaInstance.Set_Comp1Data(compData);
+                                ShieldedCall(() => m_AotaInstance.Set_Comp1Data(compData));
                             else if (i == 1)
-                                m_AotaInstance.Set_Comp2Data(compData);
+                                ShieldedCall(() => m_AotaInstance.Set_Comp2Data(compData));
                             else if (i == 2)
-                                m_AotaInstance.Set_Comp3Data(compData);
+                                ShieldedCall(() => m_AotaInstance.Set_Comp3Data(compData));
                         }
                     }
 
                     int firstFrameIndex = 0;// (int)frameIds[0];
                     int framesInIntegration = 1;
 
-                    m_AotaInstance.RunAOTA(null, firstFrameIndex, framesInIntegration);
+                    ShieldedCall(() => m_AotaInstance.RunAOTA(null, firstFrameIndex, framesInIntegration));
 
-                    AotaReturnValue result = ReadAOTAResult();
-                    result.IsMiss = m_AotaInstance.IsMiss;
-                    result.AreResultsAvailable = m_AotaInstance.ResultsAreAvailable;
-                    result.AOTAVersion = m_AotaInstance.AOTA_Version;
+                    AotaReturnValue result = null;
+                    ShieldedCall(() => result = ReadAOTAResult());
+                    ShieldedCall(() => result.IsMiss = m_AotaInstance.IsMiss);
+                    ShieldedCall(() => result.AreResultsAvailable = m_AotaInstance.ResultsAreAvailable);
+                    ShieldedCall(() => result.AOTAVersion = m_AotaInstance.AOTA_Version);
 
                     return result;
                 }
                 catch (Exception ex)
                 {
                     Trace.WriteLine(ex.ToString());
-                    MessageBox.Show(ex is TargetInvocationException ? ex.InnerException.Message : ex.Message, "AOTA Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(ex is TargetInvocationException ? ex.InnerException.Message : ex.Message, "AOTA Add-in Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
 
                 return null;
+            }
+
+            private static void ShieldedCall(Action methodcall)
+            {
+                try
+                {
+                    methodcall();
+                }
+                catch (Exception ex)
+                {
+                    Trace.WriteLine(ex.ToString());
+                    MessageBox.Show(ex is TargetInvocationException ? ex.InnerException.Message : ex.Message, "AOTA Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
 
             internal static void EnsureAOTAClosed()
