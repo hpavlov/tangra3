@@ -108,8 +108,8 @@ namespace Tangra
             try
             {
                 var binding = new BasicHttpBinding();
-                var address = new EndpointAddress("http://208.106.227.157/CGI-BIN/TangraErrors/ErrorReports.asmx");
-                var client = new TangraErrorSinkSoapClient(binding, address);
+                var address = new EndpointAddress("http://www.tangra-observatory.org/TangraErrors/ErrorReports.asmx");
+                var client = new TangraService.ServiceSoapClient(binding, address);
                 client.ReportError(errorReport);
                 if (MessageBox.Show(
                     "The error report was sent successfully. Press 'Retry' to try to continue or 'Cancel' to restart Tangra.", 

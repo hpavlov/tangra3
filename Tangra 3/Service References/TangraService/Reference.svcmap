@@ -18,11 +18,11 @@
     <ServiceContractMappings />
   </ClientOptions>
   <MetadataSources>
-    <MetadataSource Address="http://208.106.227.157/CGI-BIN/TangraErrors/ErrorReports.asmx" Protocol="http" SourceId="1" />
+    <MetadataSource Address="http://www.tangra-observatory.org/TangraErrors/ErrorReports.asmx" Protocol="http" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="ErrorReports.disco" MetadataType="Disco" ID="d893410b-4dcd-4567-8d0a-f98669a49185" SourceId="1" SourceUrl="http://208.106.227.157/CGI-BIN/TangraErrors/ErrorReports.asmx?disco" />
-    <MetadataFile FileName="ErrorReports.wsdl" MetadataType="Wsdl" ID="62e32737-c255-49ee-a5e1-b00840cdf6a6" SourceId="1" SourceUrl="http://208.106.227.157/CGI-BIN/TangraErrors/ErrorReports.asmx?wsdl" />
+    <MetadataFile FileName="ErrorReports1.wsdl" MetadataType="Wsdl" ID="5cfb38e2-631a-483f-8dd5-a4f062bf7cc2" SourceId="1" SourceUrl="http://www.tangra-observatory.org/TangraErrors/ErrorReports.asmx?wsdl" />
+    <MetadataFile FileName="ErrorReports1.disco" MetadataType="Disco" ID="c5cdc187-0734-4e47-9cae-f953a6106bc2" SourceId="1" SourceUrl="http://www.tangra-observatory.org/TangraErrors/ErrorReports.asmx?disco" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />

@@ -650,7 +650,9 @@
     <EmbeddedResource Include="Video\frmJumpToFrame.resx">
       <DependentUpon>frmJumpToFrame.cs</DependentUpon>
     </EmbeddedResource>
-    <None Include="app.config" />
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Properties\DataSources\Tangra.VideoOperations.LightCurves.LCFileSeriesEntry.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -661,7 +663,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="Service References\TangraService\ErrorReports.wsdl" />
+    <None Include="Service References\TangraService\ErrorReports1.wsdl" />
     <None Include="WindowsFiles\app.config">
       <SubType>Designer</SubType>
     </None>
@@ -677,7 +679,6 @@
     <None Include="Resources\Cursor_11.cur" />
     <None Include="Resources\Cursor_51.cur" />
     <None Include="Resources\Cursor_181.cur" />
-    <None Include="Service References\TangraService\ErrorReports.disco" />
     <None Include="Service References\TangraService\configuration91.svcinfo" />
     <None Include="Service References\TangraService\configuration.svcinfo" />
     <None Include="Service References\TangraService\Reference.svcmap">
@@ -687,6 +688,7 @@
     <Content Include="license.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Service References\TangraService\ErrorReports1.disco" />
     <Content Include="TODO-List.txt" />
     <Content Include="WindowsFiles\TangraCore.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -85,6 +85,7 @@ namespace Tangra.VideoOperations
 			string tempDir = Path.GetFullPath(Path.GetTempPath() + @"\" + Guid.NewGuid().ToString());
 			string tempFile = Path.GetTempFileName();
             EnableDisableFormControls(false);
+		    bool reportSendingErrored = false;
 			try
 			{
 				Directory.CreateDirectory(tempDir);
@@ -117,8 +118,8 @@ namespace Tangra.VideoOperations
 				byte[] attachment = File.ReadAllBytes(tempFile);
 
 				var binding = new BasicHttpBinding();
-				var address = new EndpointAddress("http://208.106.227.157/CGI-BIN/TangraErrors/ErrorReports.asmx");
-				var client = new TangraErrorSinkSoapClient(binding, address);
+				var address = new EndpointAddress("http://www.tangra-observatory.org/TangraErrors/ErrorReports.asmx");
+				var client = new TangraService.ServiceSoapClient(binding, address);
 				client.ReportErrorWithAttachment(
 					"OSD OCR Calibration Error\r\n\r\nOCR OSD Engine: " + m_TimestampOCR.NameAndVersion() + "\r\nOSD Type: " + m_TimestampOCR.OSDType(), string.Format("CalibrationFrames-{0}.zip", Guid.NewGuid().ToString()),
 					attachment);
@@ -126,6 +127,7 @@ namespace Tangra.VideoOperations
 			catch (Exception ex)
 			{
 				MessageBox.Show(this, "Error sending the report.\r\n\r\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+			    reportSendingErrored = true;
 			}
 			finally
 			{
@@ -151,7 +153,8 @@ namespace Tangra.VideoOperations
 
                 EnableDisableFormControls(true);
 
-			    MessageBox.Show("The error report was submitted successfully.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                if (!reportSendingErrored)
+			        MessageBox.Show("The error report was submitted successfully.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
 				DialogResult = DialogResult.OK;
 				Close();

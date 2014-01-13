@@ -75,9 +75,8 @@ namespace Tangra.OccultTools.OccultWrappers
 
             public void EnsureAOTAClosed()
             {
-                EnsureDelegate();
-
-                m_Delegate.EnsureAOTAClosed();
+                if (m_Delegate != null)
+                    m_Delegate.EnsureAOTAClosed();
             }
         }
 
