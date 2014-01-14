@@ -474,7 +474,8 @@ namespace Tangra.VideoOperations.LightCurves
 			{
 				m_LCFile.Header.LcFile = m_LCFile;
 
-				if (m_LCFile.Header.HasNonEqualySpacedDataPoints())
+                if (m_Header.TimingType == MeasurementTimingType.EmbeddedTimeForEachFrame &&
+                    m_LCFile.Header.HasNonEqualySpacedDataPoints())
 				{
 					MessageBox.Show(
 						this, 

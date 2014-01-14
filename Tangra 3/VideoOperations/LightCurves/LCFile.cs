@@ -975,10 +975,9 @@ namespace Tangra.VideoOperations.LightCurves
 
 				for (int i = 0; i < timings.Count - 1; i++)
 				{
-					double interval = new TimeSpan(timings[i + 1].FrameMidTime.Ticks - timings[i].FrameMidTime.Ticks).TotalMilliseconds;
+				    double interval = timings[i + 1].FrameDurationInMilliseconds;
 
-					if (timings[i + 1].FrameMidTime.Ticks > 0 && timings[i].FrameMidTime.Ticks > 0)
-						// When the two sequential frames both have valid (non zero) timestamps
+                    if (!double.IsNaN(interval) && interval > 0)
 						allFrameIntervals.Add(interval);
 				}
 

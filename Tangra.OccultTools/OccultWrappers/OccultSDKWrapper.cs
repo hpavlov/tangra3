@@ -78,7 +78,10 @@ namespace Tangra.OccultTools.OccultWrappers
                     string path = Path.Combine(occultLocation, "OccultUtilities.dll");
                     AssemblyOccultUtilities = Assembly.UnsafeLoadFrom(path);
 
-                    TYPE_AOTA_ExternalAccess = AssemblyOccultUtilities.GetType("AOTA.AOTA_ExternalAccess");
+                    Type probledType = AssemblyOccultUtilities.GetType("AOTA.AOTA_ExternalAccess");
+
+                    if (probledType.GetInterfaces().Contains(typeof(IAOTAExternalAccess)))
+                        TYPE_AOTA_ExternalAccess = probledType;
                 }
             }
 
