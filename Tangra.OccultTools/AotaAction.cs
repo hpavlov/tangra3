@@ -123,7 +123,6 @@ namespace Tangra.OccultTools
                     }
                 }
 
-                m_OccultWrapper.EnsureAOTAClosed();
                 m_AOTAFormVisible = false;
             }
         }
