@@ -14,6 +14,9 @@ namespace Tangra.OccultTools.OccultWrappers
             private IAOTAClientCallbacks m_Callbacks;
             private IOccultWrapper m_Delegate;
 
+            private string m_IncompatibleVersionsErrorMessage = null;
+
+
             public DelayedCreationOccultWrapper(OccultToolsAddinSettings settings, IAOTAClientCallbacks callbacks)
             {
                 m_Settings = settings;
@@ -36,7 +39,8 @@ namespace Tangra.OccultTools.OccultWrappers
                 try
                 {
                     m_Delegate = new OccultSDKWrapper(m_Callbacks);
-                    if (m_Delegate.HasSupportedVersionOfOccult(occultLocation))
+                    m_IncompatibleVersionsErrorMessage = m_Delegate.HasSupportedVersionOfOccult(occultLocation);
+                    if (m_IncompatibleVersionsErrorMessage == null)
                         return true;
                 }
                 catch
@@ -44,39 +48,43 @@ namespace Tangra.OccultTools.OccultWrappers
                     m_Delegate = null;
                 }
 
-
-                try
-                {
-                    m_Delegate = new OccultReflectionWrapper();
-                    if (m_Delegate.HasSupportedVersionOfOccult(occultLocation))
-                        return true;
-                }
-                catch
-                { }
-
                 m_Delegate = null;
                 return false;
             }
 
-            public bool HasSupportedVersionOfOccult(string occultLocation)
+            public string HasSupportedVersionOfOccult(string occultLocation)
             {
                 if (!EnsureDelegate(occultLocation))
-                    return false;
+                    return m_IncompatibleVersionsErrorMessage;
 
                 return m_Delegate.HasSupportedVersionOfOccult(occultLocation);
             }
 
-            public AotaReturnValue RunAOTA(SDK.ILightCurveDataProvider dataProvider, System.Windows.Forms.IWin32Window parentWindow)
+            public bool RunAOTA(SDK.ILightCurveDataProvider dataProvider, System.Windows.Forms.IWin32Window parentWindow)
             {
                 EnsureDelegate();
 
                 return m_Delegate.RunAOTA(dataProvider, parentWindow);
             }
 
+            public AotaReturnValue GetAOTAResult()
+            {
+                if (m_Delegate != null)
+                    return m_Delegate.GetAOTAResult();
+                else
+                    return null;
+            }
+
             public void EnsureAOTAClosed()
             {
                 if (m_Delegate != null)
                     m_Delegate.EnsureAOTAClosed();
+            }
+
+            public void NotifyAOTAOfCurrentFrameChanged(int currFrameId)
+            {
+                if (m_Delegate != null)
+                    m_Delegate.NotifyAOTAOfCurrentFrameChanged(currFrameId);
             }
         }
 

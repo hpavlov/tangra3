@@ -69,6 +69,7 @@ namespace Tangra.OccultTools
         private IOccultWrapper m_OccultWrapper;
 
 		private OccultToolsAddinSettings m_Settings;
+	    private AotaAction m_AotaAction;
 
 		public void Initialise(ITangraHost host)
 		{
@@ -80,10 +81,9 @@ namespace Tangra.OccultTools
 
             m_OccultWrapper = OccultWrapperFactory.CreateOccultWrapper(m_Settings, this);
 
-			m_SupportedAddinActions = new ITangraAddinAction[]
-			{
-				new AotaAction(m_Settings, host, m_OccultWrapper, this)
-			};
+		    m_AotaAction = new AotaAction(m_Settings, host, m_OccultWrapper, this);
+
+			m_SupportedAddinActions = new ITangraAddinAction[] { m_AotaAction };
 
 			RemotingConfiguration.RegisterWellKnownServiceType(typeof(OccultToolsAddin), "OccultToolsAddin", WellKnownObjectMode.Singleton);
 			RemotingConfiguration.RegisterWellKnownServiceType(typeof(AotaAction), "AotaAction", WellKnownObjectMode.Singleton);
@@ -134,13 +134,20 @@ namespace Tangra.OccultTools
 
 		public void OnEventNotification(AddinFiredEventType eventType)
 		{
-			
+			if (eventType == AddinFiredEventType.LightCurveSelectedFrameChanged)
+			{
+			    m_AotaAction.OnLightCurveSelectedFrameChanged();
+			}
 		}
-
 
         public void PositionToFrame(int frameNo)
         {
             m_Host.PositionToFrame(frameNo);
+        }
+
+        public void OnAOTAFormClosing()
+        {
+            m_AotaAction.OnAOTAFormClosing();
         }
     }
 }

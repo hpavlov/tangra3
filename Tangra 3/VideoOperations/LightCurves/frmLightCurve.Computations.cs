@@ -575,8 +575,10 @@ namespace Tangra.VideoOperations.LightCurves
                     timeFormat = "HH:mm:ss.f";
                     if (absoluteTimeError > 50) isBadTimeString = "??:??:??.?";
                 }
-                else
-                    if (absoluteTimeError > 500) isBadTimeString = "??:??:??";
+                else if (absoluteTimeError > 500) 
+                    isBadTimeString = "??:??:??";
+                else if (!m_LCFile.Footer.ReductionContext.HasEmbeddedTimeStamps /* If the times are entered by the user, only include the times for the frames enterred by the user*/)
+                    isBadTimeString = "??:??:??";
 
 				for (int i = 0; i < count; i++)
 				{
@@ -637,7 +639,11 @@ namespace Tangra.VideoOperations.LightCurves
 				output.AppendLine();
 
 			    string isBadTimeString = null;
-                if (absoluteTimeError > 5) isBadTimeString = "??:??:??.???";
+                if (absoluteTimeError > 5) 
+                    isBadTimeString = "??:??:??.???";
+                else if (!m_LCFile.Footer.ReductionContext.HasEmbeddedTimeStamps /* If the times are entered by the user, only include the times for the frames enterred by the user*/)
+                    isBadTimeString = "??:??:??";
+
                 string timeFormat = "HH:mm:ss.fff";
 
 				for (int i = 0; i < count; i++)
@@ -1213,6 +1219,12 @@ namespace Tangra.VideoOperations.LightCurves
 	    {
 			get { return m_Context.CameraName; }
 	    }
+
+
+        int ILightCurveDataProvider.CurrentlySelectedFrameNumber
+        {
+            get { return (int)m_Context.SelectedFrameNo; }
+        }
 
 		void ILightCurveDataProvider.SetNoOccultationEvents()
 		{

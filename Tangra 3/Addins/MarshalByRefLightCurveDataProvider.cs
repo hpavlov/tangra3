@@ -26,7 +26,8 @@ namespace Tangra.Addins
 			FileName = localProvider.FileName;
 			NumberOfMeasuredComparisonObjects = localProvider.NumberOfMeasuredComparisonObjects;
             CameraCorrectionsHaveBeenApplied = localProvider.CameraCorrectionsHaveBeenApplied;
-			VideoCameraName = localProvider.VideoCameraName;
+            VideoCameraName = localProvider.VideoCameraName;
+            CurrentlySelectedFrameNumber = localProvider.CurrentlySelectedFrameNumber;
             HasReliableTimeBase = localProvider.HasReliableTimeBase;
 			m_TargetMeasurements = localProvider.GetTargetMeasurements();
 			if (NumberOfMeasuredComparisonObjects > 0)
@@ -38,6 +39,11 @@ namespace Tangra.Addins
 			localProvider.GetIntegrationRateAndFirstFrame(out m_IntegrationRate, out m_FirstIntegratingFrame);
 		}
 
+        public void CurrentlySelectedFrameNumberChanged(int frameNo)
+        {
+            CurrentlySelectedFrameNumber = frameNo;
+        }
+
 		public string FileName { get; private set; }
 
 		public int NumberOfMeasuredComparisonObjects { get; private set; }
@@ -45,6 +51,8 @@ namespace Tangra.Addins
         public bool CameraCorrectionsHaveBeenApplied { get; private set; }
 
 		public string VideoCameraName { get; private set; }
+
+        public int CurrentlySelectedFrameNumber { get; private set; }
 
         public bool HasReliableTimeBase { get; private set; }
 

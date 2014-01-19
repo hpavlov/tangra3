@@ -27,6 +27,7 @@ namespace Tangra.SDK
 		void SetNoOccultationEvents();
         void SetTimeExtractionEngine(string engineAndVersion);
 		string VideoCameraName { get; }
+        int CurrentlySelectedFrameNumber { get; }
 	}
 
 	public interface ITangraHost

@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Occult.SDK;
 using Tangra.SDK;
@@ -13,6 +14,9 @@ namespace Tangra.OccultTools.OccultWrappers
 {
     public class OccultSDKWrapper : IOccultWrapper
     {
+        private const string MIN_VERSION_OCCULT_REQUIRED = "4.1.0.22";
+        private const string MIN_VERSION_TANGRA_REQUIRED = "3.0.73";
+
         private IAOTAClientCallbacks m_ClientCallbacks;
 
         public OccultSDKWrapper(IAOTAClientCallbacks clientCallbacks)
@@ -20,19 +24,29 @@ namespace Tangra.OccultTools.OccultWrappers
             m_ClientCallbacks = clientCallbacks;
         }
 
-        public bool HasSupportedVersionOfOccult(string occultLocation)
+        public string HasSupportedVersionOfOccult(string occultLocation)
         {
             return OccultUtilitiesSDKWrapper.HasSupportedVersionOfOccult(occultLocation);
         }
 
-        public AotaReturnValue RunAOTA(SDK.ILightCurveDataProvider dataProvider, System.Windows.Forms.IWin32Window parentWindow)
+        public bool RunAOTA(SDK.ILightCurveDataProvider dataProvider, System.Windows.Forms.IWin32Window parentWindow)
         {
             return OccultUtilitiesSDKWrapper.RunAOTA(dataProvider, parentWindow, m_ClientCallbacks);
+        }
+
+        public AotaReturnValue GetAOTAResult()
+        {
+            return OccultUtilitiesSDKWrapper.GetAOTAResult();
         }
 
         public void EnsureAOTAClosed()
         {
             OccultUtilitiesSDKWrapper.EnsureAOTAClosed();
+        }
+
+        public void NotifyAOTAOfCurrentFrameChanged(int currFrameId)
+        {
+            OccultUtilitiesSDKWrapper.NotifyAOTAOfCurrentFrameChanged(currFrameId);
         }
 
         private static class OccultUtilitiesSDKWrapper
@@ -44,48 +58,129 @@ namespace Tangra.OccultTools.OccultWrappers
 
             private static Occult.SDK.IAOTAExternalAccess m_AotaInstance = null;
 
-            public static bool HasSupportedVersionOfOccult(string occultLocation)
+            private static string s_IncompatibleVersionOfOccultErrorMessage = null;
+
+            public static string HasSupportedVersionOfOccult(string occultLocation)
             {
                 try
                 {
                     if (s_IsOccultSupported == null)
                     {
-                        LoadOccultUtilitiesAssembly(occultLocation);
+                        LoadOccultUtilitiesAssemblyAndSetIncompatibleVersionOfOccultErrorMessage(occultLocation);
 
                         if (TYPE_AOTA_ExternalAccess != null)
                         {
                             s_IsOccultSupported = true;
-                            return true;
+                            s_IncompatibleVersionOfOccultErrorMessage = null;
+                            return null;
                         }
 
                         s_IsOccultSupported = false;
+                        return s_IncompatibleVersionOfOccultErrorMessage;
                     }
                     else
-                        return s_IsOccultSupported.Value;
+                        return s_IncompatibleVersionOfOccultErrorMessage;
                 }
                 catch (Exception ex)
                 {
                     Trace.WriteLine(ex);
                 }
 
-                return false;
+                return "There was an error determining the required version of Occult. Probably your version of Occult and Tangra3 are not compatible.";
             }
 
-            private static void LoadOccultUtilitiesAssembly(string occultLocation)
+            private static void LoadOccultUtilitiesAssemblyAndSetIncompatibleVersionOfOccultErrorMessage(string occultLocation)
             {
                 if (AssemblyOccultUtilities == null)
                 {
                     string path = Path.Combine(occultLocation, "OccultUtilities.dll");
+                    if (!File.Exists(path))
+                    {
+                        s_IncompatibleVersionOfOccultErrorMessage = "Cannot find Occult at the specified location.";
+                        return;
+                    }
+
                     AssemblyOccultUtilities = Assembly.UnsafeLoadFrom(path);
+
+                    try
+                    {
+                        AssemblyOccultUtilities.GetTypes();
+                    }
+                    catch (ReflectionTypeLoadException tlex)
+                    {
+                        var fileNotFoundExceptions = tlex.LoaderExceptions.Where(x => x is FileNotFoundException).ToList();
+                        if (fileNotFoundExceptions.Count > 0)
+                        {
+                            string notFoundFileNames = fileNotFoundExceptions.Select(x => ((FileNotFoundException) x).FileName)
+                                                  .Where(x => x.Contains("Occult.SDK, Version="))
+                                                  .FirstOrDefault();
+
+                            if (!string.IsNullOrEmpty(notFoundFileNames))
+                            {
+                                // The version of Occult uses a different version of Occult.SDK
+                                Regex verRegex = new Regex("^Occult\\.SDK, Version=(?<Mj>[0-9]+)\\.(?<MjR>[0-9]+)\\.(?<Mn>[0-9]+)\\.(?<MnR>[0-9]+), Culture=neutral, PublicKeyToken=7216253074b08f24$");
+                                Match match = verRegex.Match(notFoundFileNames);
+                                int requiredMajor = int.Parse(match.Groups["Mj"].Value);
+                                int requiredMajorRevision = int.Parse(match.Groups["MjR"].Value);
+                                int requiredMinor = int.Parse(match.Groups["Mn"].Value);
+                                int requiredMinorRevision = int.Parse(match.Groups["MnR"].Value);
+                                long requiredVersion = requiredMajor*0x1000000000000 +
+                                                       requiredMajorRevision * 0x100000000 +
+                                                       requiredMinor * 0x10000 + 
+                                                       requiredMinorRevision;
+
+                                int currentMajor = typeof (IAOTAExternalAccess).Assembly.GetName().Version.Major;
+                                int currentMajorRevision = typeof(IAOTAExternalAccess).Assembly.GetName().Version.MajorRevision;
+                                int currentMinor = typeof(IAOTAExternalAccess).Assembly.GetName().Version.Minor;
+                                int currentMinorRevision = typeof(IAOTAExternalAccess).Assembly.GetName().Version.MinorRevision;
+
+                                long currentVersion = currentMajor * 0x1000000000000 +
+                                                       currentMajorRevision * 0x100000000 +
+                                                       currentMinor * 0x10000 +
+                                                       currentMinorRevision;
+
+                                if (requiredVersion > currentVersion)
+                                {
+                                    s_IncompatibleVersionOfOccultErrorMessage = "Your version of Occult is newer than the version supported by Tangra3. Please update Tangra3 to use AOTA.";
+                                    return;
+                                }
+                                else if (requiredVersion < currentVersion)
+                                {
+                                    s_IncompatibleVersionOfOccultErrorMessage = "You need Occult version " + MIN_VERSION_OCCULT_REQUIRED + " or newer to use AOTA from Tangra. Please update Occult.";
+                                    return;
+                                } 
+                            }
+                        }
+
+                        Trace.WriteLine(tlex.Message);
+                    }
 
                     Type probledType = AssemblyOccultUtilities.GetType("AOTA.AOTA_ExternalAccess");
 
-                    if (probledType.GetInterfaces().Contains(typeof(IAOTAExternalAccess)))
+                    if (probledType != null && probledType.GetInterfaces().Contains(typeof (IAOTAExternalAccess)))
+                    {
                         TYPE_AOTA_ExternalAccess = probledType;
+                        s_IncompatibleVersionOfOccultErrorMessage = null;
+                    }
+                    else
+                        s_IncompatibleVersionOfOccultErrorMessage = "You need Occult version " + MIN_VERSION_OCCULT_REQUIRED + " or newer to use AOTA from Tangra. Please update Occult.";
+
                 }
             }
 
-            internal static AotaReturnValue RunAOTA(ILightCurveDataProvider dataProvider, IWin32Window parentWindow, IAOTAClientCallbacks clientCallbacks)
+            internal static AotaReturnValue GetAOTAResult()
+            {
+                AotaReturnValue result = null;
+                ShieldedCall(() => result = ReadAOTAResult());
+                ShieldedCall(() => result.IsMiss = m_AotaInstance.IsMiss);
+                ShieldedCall(() => result.AreResultsAvailable = m_AotaInstance.ResultsAreAvailable);
+                ShieldedCall(() => result.AOTAVersion = m_AotaInstance.AOTA_Version);
+
+                return result;
+            }
+
+
+            internal static bool RunAOTA(ILightCurveDataProvider dataProvider, IWin32Window parentWindow, IAOTAClientCallbacks clientCallbacks)
             {
                 try
                 {
@@ -166,15 +261,9 @@ namespace Tangra.OccultTools.OccultWrappers
                     int firstFrameIndex = 0;// (int)frameIds[0];
                     int framesInIntegration = 1;
 
-                    ShieldedCall(() => m_AotaInstance.RunAOTA(null, firstFrameIndex, framesInIntegration));
+                    ShieldedCall(() => m_AotaInstance.RunAOTA(null, firstFrameIndex, framesInIntegration, false));
 
-                    AotaReturnValue result = null;
-                    ShieldedCall(() => result = ReadAOTAResult());
-                    ShieldedCall(() => result.IsMiss = m_AotaInstance.IsMiss);
-                    ShieldedCall(() => result.AreResultsAvailable = m_AotaInstance.ResultsAreAvailable);
-                    ShieldedCall(() => result.AOTAVersion = m_AotaInstance.AOTA_Version);
-
-                    return result;
+                    return true;
                 }
                 catch (Exception ex)
                 {
@@ -182,7 +271,7 @@ namespace Tangra.OccultTools.OccultWrappers
                     MessageBox.Show(ex is TargetInvocationException ? ex.InnerException.Message : ex.Message, "AOTA Add-in Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
 
-                return null;
+                return false;
             }
 
             private static void ShieldedCall(Action methodcall)
@@ -204,6 +293,14 @@ namespace Tangra.OccultTools.OccultWrappers
                 {
                     m_AotaInstance.CloseAOTA();
                     m_AotaInstance = null;
+                }
+            }
+
+            internal static void NotifyAOTAOfCurrentFrameChanged(int currFrameId)
+            {
+                if (m_AotaInstance != null)
+                {
+                    m_AotaInstance.Set_AOTA_DisplayLocation(currFrameId);
                 }
             }
 

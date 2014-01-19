@@ -1075,7 +1075,7 @@ namespace Tangra.VideoOperations.LightCurves
 					double[] validFPS = new double[] { 30, 15, 7.5, 3.75, 1.875 };
 					for (int i = 0; i < validFPS.Length; i++)
 					{
-						if (Math.Abs(fps - validFPS[i]) < 0.1)
+                        if (Math.Abs(fps - validFPS[i]) < 0.05 * fps /* 5% tolerance */)
 						{
 							duration = validFPS[i];
 							mode = "FPS";
@@ -1086,7 +1086,7 @@ namespace Tangra.VideoOperations.LightCurves
 					double[] validSPF = new double[] { 1, 2, 3, 4, 6, 8 };
 					for (int i = 0; i < validSPF.Length; i++)
 					{
-						if (Math.Abs(exposureSec - validSPF[i]) < 0.1)
+                        if (Math.Abs(exposureSec - validSPF[i]) < 0.05 * exposureSec /* 5% tolerance */)
 						{
 							duration = validSPF[i];
 							mode = "Seconds";

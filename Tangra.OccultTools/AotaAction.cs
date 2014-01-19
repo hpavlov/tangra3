@@ -17,6 +17,7 @@ namespace Tangra.OccultTools
 		private OccultToolsAddinSettings m_Settings;
 		private OccultToolsAddin m_Addin;
 	    private IOccultWrapper m_OccultWrapper;
+	    private bool m_AOTAFormVisible = false;
 
 		internal AotaAction(OccultToolsAddinSettings settings, ITangraHost tangraHost, IOccultWrapper occultWrapper, OccultToolsAddin addin)
 		{
@@ -24,6 +25,7 @@ namespace Tangra.OccultTools
 			m_Settings = settings;
 			m_TangraHost = tangraHost;
 		    m_OccultWrapper = occultWrapper;
+		    m_AOTAFormVisible = false;
 		}
 
 		public AddinActionType ActionType
@@ -43,6 +45,12 @@ namespace Tangra.OccultTools
 
 	    public void Execute()
 	    {
+            if (m_AOTAFormVisible)
+            {
+                ShowErrorMessage("AOTA is already running.");
+                return;
+            }
+
 	        ILightCurveDataProvider dataProvider = m_TangraHost.GetLightCurveDataProvider();
 
 	        if (!Directory.Exists(m_Settings.OccultLocation))
@@ -57,63 +65,90 @@ namespace Tangra.OccultTools
 	                m_Addin.Configure();
 	        }
 
-            if (!m_OccultWrapper.HasSupportedVersionOfOccult(m_Settings.OccultLocation))
+	        string errorMessage = m_OccultWrapper.HasSupportedVersionOfOccult(m_Settings.OccultLocation);
+            if (errorMessage != null)
 	        {
-	            ShowIncompatibleOccultVersionErrorMessage();
+                ShowErrorMessage(errorMessage);
 	            m_Addin.Configure();
 	        }
 
 	        if (dataProvider != null)
 	        {
-                if (m_OccultWrapper.HasSupportedVersionOfOccult(m_Settings.OccultLocation))
-		        {
-                    AotaReturnValue result = m_OccultWrapper.RunAOTA(dataProvider, m_TangraHost.ParentWindow);
-
-					if (result != null &&
-                        result.AreResultsAvailable)
-					{
-                        dataProvider.SetTimeExtractionEngine(result.AOTAVersion);
-
-						if (result.IsMiss)
-						{
-							dataProvider.SetNoOccultationEvents();
-						}
-						else
-						{
-							for (int i = 0; i < 5; i++)
-							{
-								if (!result.EventResults[i].IsNonEvent)
-								{
-									dataProvider.SetFoundOccultationEvent(
-										i,
-										result.EventResults[i].D_Frame,
-										result.EventResults[i].R_Frame,
-										result.EventResults[i].D_FrameUncertMinus,
-										result.EventResults[i].D_FrameUncertPlus,
-										result.EventResults[i].R_FrameUncertMinus,
-										result.EventResults[i].R_FrameUncertPlus,
-										result.EventResults[i].D_UTC,
-										result.EventResults[i].R_UTC);
-								}
-							}
-						}
-					}
-		        }
+	            errorMessage = m_OccultWrapper.HasSupportedVersionOfOccult(m_Settings.OccultLocation);
+                if (errorMessage == null)
+                {
+                    if (m_OccultWrapper.RunAOTA(dataProvider, m_TangraHost.ParentWindow))
+                        m_AOTAFormVisible = true;
+                }
 		        else
-			        ShowIncompatibleOccultVersionErrorMessage();
+                    ShowErrorMessage(errorMessage);
 	        }
 	    }
+
+        public void OnAOTAFormClosing()
+        {
+            if (m_AOTAFormVisible)
+            {
+                ILightCurveDataProvider dataProvider = m_TangraHost.GetLightCurveDataProvider();
+
+                AotaReturnValue result = m_OccultWrapper.GetAOTAResult();
+
+                if (result != null &&
+                    result.AreResultsAvailable)
+                {
+                    dataProvider.SetTimeExtractionEngine(result.AOTAVersion);
+
+                    if (result.IsMiss)
+                    {
+                        dataProvider.SetNoOccultationEvents();
+                    }
+                    else
+                    {
+                        for (int i = 0; i < 5; i++)
+                        {
+                            if (!result.EventResults[i].IsNonEvent)
+                            {
+                                dataProvider.SetFoundOccultationEvent(
+                                    i,
+                                    result.EventResults[i].D_Frame,
+                                    result.EventResults[i].R_Frame,
+                                    result.EventResults[i].D_FrameUncertMinus,
+                                    result.EventResults[i].D_FrameUncertPlus,
+                                    result.EventResults[i].R_FrameUncertMinus,
+                                    result.EventResults[i].R_FrameUncertPlus,
+                                    result.EventResults[i].D_UTC,
+                                    result.EventResults[i].R_UTC);
+                            }
+                        }
+                    }
+                }
+
+                m_OccultWrapper.EnsureAOTAClosed();
+                m_AOTAFormVisible = false;
+            }
+        }
+
+        public void OnLightCurveSelectedFrameChanged()
+        {
+            if (m_AOTAFormVisible)
+            {
+                ILightCurveDataProvider dataProvider = m_TangraHost.GetLightCurveDataProvider();
+                int currFrameId = dataProvider.CurrentlySelectedFrameNumber;
+                m_OccultWrapper.NotifyAOTAOfCurrentFrameChanged(currFrameId);
+            }
+        }
 
         public void Finalise()
         {
             m_OccultWrapper.EnsureAOTAClosed();
+            m_AOTAFormVisible = false;
         }
 
-	    private void ShowIncompatibleOccultVersionErrorMessage()
+	    private void ShowErrorMessage(string errorMessage)
 		{
 			MessageBox.Show(
 				m_TangraHost.ParentWindow,
-				"Cannot find a compatible version of Occult in the configured location. Occult version 4.1.0.12 or later is required.",
+                errorMessage,
 				"Occult Tools for Tangra",
 				MessageBoxButtons.OK,
 				MessageBoxIcon.Error);			

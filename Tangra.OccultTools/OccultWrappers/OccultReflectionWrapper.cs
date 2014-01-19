@@ -10,9 +10,10 @@ using Tangra.SDK;
 
 namespace Tangra.OccultTools.OccultWrappers
 {
-    public class OccultReflectionWrapper : IOccultWrapper
+    [Obsolete]
+    public class OccultReflectionWrapper
     {
-        public bool HasSupportedVersionOfOccult(string occultLocation)
+        public string HasSupportedVersionOfOccult(string occultLocation)
         {
             return OccultUtilitiesWrapper.HasSupportedVersionOfOccult(occultLocation);
         }
@@ -46,7 +47,7 @@ namespace Tangra.OccultTools.OccultWrappers
             private static MethodInfo AOTA_Set_TimeBaseEx;
             private static MethodInfo AOTA_Set_VideoCamera;
             private static MethodInfo AOTA_RunAOTA;
-            private static MethodInfo AOTA_RunAOTAEx;
+            private static MethodInfo AOTA_RunAOTAEx2;
             private static MethodInfo AOTA_InitialiseAOTA;
             private static MethodInfo AOTA_CloseAOTA;
             private static PropertyInfo AOTA_ResultsCamera;
@@ -66,7 +67,9 @@ namespace Tangra.OccultTools.OccultWrappers
 
             private static object m_AotaInstance = null;
 
-            public static bool HasSupportedVersionOfOccult(string occultLocation)
+            private static string s_IncompatibleVersionOfOccultErrorMessage = null;
+
+            public static string HasSupportedVersionOfOccult(string occultLocation)
             {
                 try
                 {
@@ -77,20 +80,23 @@ namespace Tangra.OccultTools.OccultWrappers
                         if (TYPE_AOTA_ExternalAccess != null)
                         {
                             s_IsOccultSupported = true;
-                            return true;
+                            s_IncompatibleVersionOfOccultErrorMessage = null;
+                            return null;
                         }
 
                         s_IsOccultSupported = false;
+                        s_IncompatibleVersionOfOccultErrorMessage = "Occult version 4.1.0.12 or later is required";
+                        return s_IncompatibleVersionOfOccultErrorMessage;
                     }
                     else
-                        return s_IsOccultSupported.Value;
+                        return s_IncompatibleVersionOfOccultErrorMessage;
                 }
                 catch (Exception ex)
                 {
                     Trace.WriteLine(ex);
                 }
 
-                return false;
+                return s_IncompatibleVersionOfOccultErrorMessage;
             }
 
             private static void LoadOccultUtilitiesAssembly(string occultLocation)
@@ -131,7 +137,7 @@ namespace Tangra.OccultTools.OccultWrappers
                     //public bool RunAOTA(IWin32Window parentWindow)
                     AOTA_RunAOTA = TYPE_AOTA_ExternalAccess.GetMethod("RunAOTA", new Type[] { typeof(IWin32Window) });
                     //public bool RunAOTA(IWin32Window parentWindow, int FirstFrame, int FramesInIntegration)    
-                    AOTA_RunAOTAEx = TYPE_AOTA_ExternalAccess.GetMethod("RunAOTA", new Type[] { typeof(IWin32Window), typeof(int), typeof(int) });
+                    AOTA_RunAOTAEx2 = TYPE_AOTA_ExternalAccess.GetMethod("RunAOTA", new Type[] { typeof(IWin32Window), typeof(int), typeof(int), typeof(bool) });
                     //public void InitialiseAOTA()
                     AOTA_InitialiseAOTA = TYPE_AOTA_ExternalAccess.GetMethod("InitialiseAOTA", new Type[] { typeof(string) });
                     //public void CloseAOTA()
@@ -239,7 +245,7 @@ namespace Tangra.OccultTools.OccultWrappers
                     int firstFrameIndex = 0;// (int)frameIds[0];
                     int framesInIntegration = 1;
 
-                    AOTA_RunAOTAEx.Invoke(m_AotaInstance, new object[] { null /*parentWindow*/, firstFrameIndex, framesInIntegration });
+                    AOTA_RunAOTAEx2.Invoke(m_AotaInstance, new object[] { null /*parentWindow*/, firstFrameIndex, framesInIntegration });
 
                     AotaReturnValue result = ReadAOTAResult();
                     result.IsMiss = (bool)AOTA_IsMiss.GetValue(m_AotaInstance, new object[] { });

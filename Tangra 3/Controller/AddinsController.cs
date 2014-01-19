@@ -20,6 +20,7 @@ namespace Tangra.Controller
 		private frmMain m_MainForm;
 		private AddinManager m_AddinManager;
 	    private ILightCurveDataProvider m_LocalLightCurveDataProvider;
+        private MarshalByRefLightCurveDataProvider m_DelegatedLightCurveDataProvider;
 
 		public AddinsController(frmMain mainFormView, VideoController videoController)
 		{
@@ -125,7 +126,8 @@ namespace Tangra.Controller
 				item.Tag != null &&
 				item.Tag is ITangraAddinAction)
 			{
-				m_AddinManager.SetLightCurveDataProvider(new MarshalByRefLightCurveDataProvider(m_LocalLightCurveDataProvider));
+                m_DelegatedLightCurveDataProvider = new MarshalByRefLightCurveDataProvider(m_LocalLightCurveDataProvider);
+                m_AddinManager.SetLightCurveDataProvider(m_DelegatedLightCurveDataProvider);
 			    string addinActonName = string.Empty;
 
 				item.GetCurrentParent().Cursor = Cursors.WaitCursor;
@@ -173,9 +175,33 @@ namespace Tangra.Controller
 			}
 	    }
 
+        public void OnLightCurveCurrentFrameChanged(int frameNo)
+        {
+            if (m_DelegatedLightCurveDataProvider != null)
+            {
+                m_DelegatedLightCurveDataProvider.CurrentlySelectedFrameNumberChanged(frameNo);
+
+                if (m_AddinManager.Addins.Count > 0)
+                {
+                    foreach (Addin addin in m_AddinManager.Addins)
+                    {
+                        try
+                        {
+                            addin.OnEventNotification(AddinFiredEventType.LightCurveSelectedFrameChanged);
+                        }
+                        catch (Exception ex)
+                        {
+                            Trace.WriteLine(ex.GetFullStackTrace());
+                        }
+                    }
+                }
+            }
+        }
+            
 		internal void SetLightCurveDataProvider(ILightCurveDataProvider provider)
 		{
 			m_LocalLightCurveDataProvider = provider;
+		    m_DelegatedLightCurveDataProvider = null;
 		}
 
         public void FinaliseAddins()

@@ -625,6 +625,7 @@ namespace Tangra.VideoOperations.LightCurves
             pnlSmallGraph.Invalidate();
 
             m_Context.SelectedFrameNo = currFrameNo;
+            m_AddinsController.OnLightCurveCurrentFrameChanged((int)currFrameNo);
             SetSmallGraphDirty();
 
             ReSelectCurrentMeasurement(movePlayerToFrame);

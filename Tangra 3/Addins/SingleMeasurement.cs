@@ -22,7 +22,9 @@ namespace Tangra.Addins
 				? 1.0f * (int)lcMeasurement.TotalBackground 
 				: INVALID_MEASUREMENT_VALUE;
             string isCorrectedForInstrumentalDelay;
-            if (dontIncludeTimes)
+
+            if (dontIncludeTimes || 
+                !lcFile.Footer.ReductionContext.HasEmbeddedTimeStamps /* If the times are entered by the user, only include the times for the frames enterred by the user*/)
             {
                 Timestamp = DateTime.MinValue;
                 isCorrectedForInstrumentalDelay = null;
@@ -47,7 +49,8 @@ namespace Tangra.Addins
 			Measurement = binnedMeasurement.IsSuccessfulReading ? (float)binnedMeasurement.AdjustedValue : INVALID_MEASUREMENT_VALUE;
 			Background = binnedMeasurement.IsSuccessfulReading ? (float)binnedMeasurement.BackgroundValue : INVALID_MEASUREMENT_VALUE;
             string isCorrectedForInstrumentalDelay;
-            if (dontIncludeTimes)
+            if (dontIncludeTimes || 
+                !lcFile.Footer.ReductionContext.HasEmbeddedTimeStamps /* If the times are entered by the user, only include the times for the frames enterred by the user*/)
             {
                 Timestamp = DateTime.MinValue;
                 isCorrectedForInstrumentalDelay = null;

@@ -56,9 +56,10 @@ namespace Tangra.OccultTools
 
 			m_Settings.OccultLocation = tbxOccultPath.Text;
 
-            if (!m_OccultWrapper.HasSupportedVersionOfOccult(m_Settings.OccultLocation))
+            string errorMessage = m_OccultWrapper.HasSupportedVersionOfOccult(m_Settings.OccultLocation);
+            if (errorMessage != null)
             {
-				MessageBox.Show("This addin requires Occult version 4.1.0.12 or later");
+                MessageBox.Show(errorMessage);
                 tbxOccultPath.SelectAll();
                 tbxOccultPath.Focus();
                 return; 

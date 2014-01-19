@@ -44,8 +44,10 @@ namespace Tangra.OccultTools.OccultWrappers
 
     interface IOccultWrapper
     {
-        bool HasSupportedVersionOfOccult(string occultLocation);
-        AotaReturnValue RunAOTA(ILightCurveDataProvider dataProvider, IWin32Window parentWindow);
+        string HasSupportedVersionOfOccult(string occultLocation);
+        bool RunAOTA(ILightCurveDataProvider dataProvider, IWin32Window parentWindow);
+        AotaReturnValue GetAOTAResult();
         void EnsureAOTAClosed();
+        void NotifyAOTAOfCurrentFrameChanged(int currFrameId);
     }
 }

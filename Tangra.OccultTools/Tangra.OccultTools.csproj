@@ -71,7 +71,6 @@
     <Compile Include="frmConfig.Designer.cs">
       <DependentUpon>frmConfig.cs</DependentUpon>
     </Compile>
-    <Compile Include="OccultUtilitiesWrapper.cs" />
     <Compile Include="OccultWatcherHelper.cs" />
     <Compile Include="OccultWrappers\IOccultWrapper.cs" />
     <Compile Include="OccultWrappers\OccultReflectionWrapper.cs" />

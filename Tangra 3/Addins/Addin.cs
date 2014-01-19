@@ -136,6 +136,12 @@ namespace Tangra.Addins
 			get { return m_Instance; }
 		}
 
+        public void OnEventNotification(AddinFiredEventType eventType)
+        {
+            if (m_Instance != null)
+                m_Instance.OnEventNotification(eventType);
+        }
+
         public override string ToString()
         {
             try
