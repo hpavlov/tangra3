@@ -37,8 +37,9 @@ namespace Tangra.VideoOperations.LightCurves
 
         public static void Save(string fileName, LCMeasurementHeader header, List<List<LCMeasurement>> data, List<LCFrameTiming> frameTiming, LCMeasurementFooter footer)
         {
-            using (MemoryStream memStr = new MemoryStream())
-            using (BinaryWriter writer = new BinaryWriter(memStr))
+			using (FileStream fileStr = new FileStream(fileName, FileMode.Create, FileAccess.Write))
+			using (DeflateStream deflateStream = new DeflateStream(fileStr, CompressionMode.Compress, true))
+			using (BinaryWriter writer = new BinaryWriter(deflateStream))
             {
                 writer.Write(LC_FILE_VERSION);
 
@@ -96,28 +97,13 @@ namespace Tangra.VideoOperations.LightCurves
                                         FileProgressManager.EndFileOperation();
                                 }
                             },
-                            150); ;
+                            150);
                 }
 
                 footer.WriteTo(writer);
 
                 writer.Flush();
-
-
-                using (FileStream outFile = new FileStream(fileName, FileMode.Create, FileAccess.Write))
-                {
-                    memStr.Seek(0, SeekOrigin.Begin);
-
-                    byte[] inputReadBuffer = memStr.ToArray();
-
-                    using (DeflateStream deflateStream = new DeflateStream(outFile, CompressionMode.Compress, true))
-                    {
-                        memStr.Read(inputReadBuffer, 0, inputReadBuffer.Length);
-
-                        deflateStream.Write(inputReadBuffer, 0, inputReadBuffer.Length);
-                        deflateStream.Flush();
-                    }
-                }
+				deflateStream.Flush();
             }
         }
 
