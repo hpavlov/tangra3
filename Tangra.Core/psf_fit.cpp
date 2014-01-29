@@ -141,9 +141,9 @@ unsigned long PsfFit::Brightness()
 double PsfFit::FWHM()
 {	
 	if (FittingMethod == NonLinearAsymetricFit)
-		return 2 * sqrt(-0.5 * log10(0.5) * RX0 * RY0);
+		return 2 * sqrt(-0.5 * log(0.5) * RX0 * RY0);
 	else
-		return 2 * sqrt(log10(2)) * R0;
+		return 2 * sqrt(log(2)) * R0;
 }
 
 double PsfFit::Certainty()
