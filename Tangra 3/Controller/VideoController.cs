@@ -405,17 +405,21 @@ namespace Tangra.Controller
         }
 
 		public void RedrawCurrentFrame(bool showFields)
-		{			
-			if (showFields)
-			{
-				using (Bitmap image = m_AstroImage.Pixelmap.CreateNewDisplayBitmap())
-				{
-					Bitmap pixelMapWithFields = BitmapFilter.ToVideoFields(image);
-					m_MainForm.pictureBox.Image = pixelMapWithFields;					
-				}
-			}
-			else
-				m_MainForm.pictureBox.Image = m_AstroImage.Pixelmap.DisplayBitmap;
+		{
+            if (m_AstroImage != null &&
+                m_AstroImage.Pixelmap != null)
+            {
+                if (showFields)
+                {
+                    using (Bitmap image = m_AstroImage.Pixelmap.CreateNewDisplayBitmap())
+                    {
+                        Bitmap pixelMapWithFields = BitmapFilter.ToVideoFields(image);
+                        m_MainForm.pictureBox.Image = pixelMapWithFields;
+                    }
+                }
+                else
+                    m_MainForm.pictureBox.Image = m_AstroImage.Pixelmap.DisplayBitmap;
+            }
 
 			if (!showFields)
 			{
@@ -431,7 +435,7 @@ namespace Tangra.Controller
 
 		public bool IsRunning
 		{
-			get { return m_FramePlayer.IsRunning; }			
+			get { return m_FramePlayer.IsRunning; }
 		}
 
 		public bool IsAstroDigitalVideo

@@ -124,6 +124,8 @@ namespace Tangra.OccultTools
                 }
 
                 m_AOTAFormVisible = false;
+
+                dataProvider.FinishedLightCurveEventTimeExtraction();
             }
         }
 

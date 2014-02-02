@@ -146,9 +146,6 @@ namespace Tangra.Controller
 					if (canExecuteAction)
 					{
 						((ITangraAddinAction) item.Tag).Execute();
-
-						if (isEventTimeExtrator)
-							(m_LocalLightCurveDataProvider as frmLightCurve).FinishedLightCurveEventTimeExtraction();
 					}
 				}
 				catch (AppDomainUnloadedException)

@@ -87,12 +87,19 @@ namespace Tangra.Config.SettingPannels
             btnConfigure.Enabled = addin != null;
             if (addin != null)
             {
-                btnConfigure.Tag = addin.Instance;
-                lblDisplayName.Text = addin.Instance.DisplayName;
-                lblVersion.Text = addin.Instance.Version;
-                lblDescription.Text = addin.Instance.Description;
-                lblUrl.Text = addin.Instance.Url;
-
+                Cursor = Cursors.WaitCursor;
+                try
+                {
+                    btnConfigure.Tag = addin.Instance;
+                    lblDisplayName.Text = addin.Instance.DisplayName;
+                    lblVersion.Text = addin.Instance.Version;
+                    lblDescription.Text = addin.Instance.Description;
+                    lblUrl.Text = addin.Instance.Url;
+                }
+                finally
+                {
+                    Cursor = Cursors.Default;
+                }
             }
         }
 

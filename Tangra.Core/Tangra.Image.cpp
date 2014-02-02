@@ -285,7 +285,7 @@ void EnsureChunkDenoiseBuffers(long width, long height)
 		// The min noise chunk is 80% of a fully black square
 		s_MinUpperBoundNoiseChunkPixels = (long)round(0.8 * width * height);
 		s_MinLowerBoundNoiseChunkHeight = (long)round(0.5 * (height - 4));
-		s_MaxUpperBoundNoiseChunkWidth = height;
+		s_MaxUpperBoundNoiseChunkWidth = height + 4;
 	}
 }
 

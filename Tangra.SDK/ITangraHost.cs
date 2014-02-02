@@ -28,6 +28,7 @@ namespace Tangra.SDK
         void SetTimeExtractionEngine(string engineAndVersion);
 		string VideoCameraName { get; }
         int CurrentlySelectedFrameNumber { get; }
+	    void FinishedLightCurveEventTimeExtraction();
 	}
 
 	public interface ITangraHost

@@ -119,7 +119,26 @@ namespace Tangra.OccultTools
 
 		public string Description
 		{
-			get { return "This addin provides utilities from Occult, including the Asteroid Occultation Timing Analyser (AOTA)"; }
+			get
+			{
+			    string occultStatus;
+
+			    if (string.IsNullOrEmpty(m_Settings.OccultLocation))
+			        occultStatus = "Occult location hasn't been configured.";
+			    else
+			    {
+			        occultStatus = m_OccultWrapper.HasSupportedVersionOfOccult(m_Settings.OccultLocation);
+                    if (occultStatus == null)
+                    {
+                        occultStatus = m_OccultWrapper.GetOccultCurrentOccultVersion(m_Settings.OccultLocation);
+                    }
+			    }
+                
+
+                string descr = string.Format("This addin provides utilities from Occult, including the Asteroid Occultation Timing Analyser (AOTA).\r\n\r\n{0}", occultStatus);
+
+			    return descr;
+			}
 		}
 
 		public string Url

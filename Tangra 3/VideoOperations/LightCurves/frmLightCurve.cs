@@ -577,8 +577,8 @@ namespace Tangra.VideoOperations.LightCurves
 								MessageBoxDefaultButton.Button1) == DialogResult.Yes;
 						}
 
-
-						OccultWatcherHelper.NotifyOccultWatcherIfInstalled(m_EventTimesReport, this);
+                        if (export)
+						    OccultWatcherHelper.NotifyOccultWatcherIfInstalled(m_EventTimesReport, this);
 					}
 				}
 #endif

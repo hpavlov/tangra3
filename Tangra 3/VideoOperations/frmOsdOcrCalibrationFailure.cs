@@ -105,13 +105,13 @@ namespace Tangra.VideoOperations
 						img = Pixelmap.ConstructBitmapFromBitmapPixels(pixels, frameWidth, frameHeight);
 
 					if (img != null)
-						img.Save(Path.GetFullPath(string.Format(@"{0}\{1}", tempDir, key)), ImageFormat.Bmp);						
+						img.Save(Path.GetFullPath(string.Format(@"{0}\{1}", tempDir, key)), ImageFormat.Bmp);
 				}
 
 				if (LastUnmodifiedImage != null)
 				{
 					Bitmap fullFrame = Pixelmap.ConstructBitmapFromBitmapPixels(LastUnmodifiedImage, frameWidth, frameHeight);
-					fullFrame.Save(Path.GetFullPath(string.Format(@"{0}\full-frame.bmp", tempDir)), ImageFormat.Bmp);					
+					fullFrame.Save(Path.GetFullPath(string.Format(@"{0}\full-frame.bmp", tempDir)), ImageFormat.Bmp);
 				}
 
 				ZipUnzip.Zip(tempDir, tempFile, false);
@@ -121,7 +121,11 @@ namespace Tangra.VideoOperations
 				var address = new EndpointAddress("http://www.tangra-observatory.org/TangraErrors/ErrorReports.asmx");
 				var client = new TangraService.ServiceSoapClient(binding, address);
 				client.ReportErrorWithAttachment(
-					"OSD OCR Calibration Error\r\n\r\nOCR OSD Engine: " + m_TimestampOCR.NameAndVersion() + "\r\nOSD Type: " + m_TimestampOCR.OSDType(), string.Format("CalibrationFrames-{0}.zip", Guid.NewGuid().ToString()),
+					"OSD OCR Calibration Error\r\n\r\n" + 
+                    "OCR OSD Engine: " + m_TimestampOCR.NameAndVersion() + "\r\n" +
+                    "OSD Type: " + m_TimestampOCR.OSDType() + "\r\n\r\n" +
+                    frmSystemInfo.GetFullVersionInfo(), 
+                    string.Format("CalibrationFrames-{0}.zip", Guid.NewGuid().ToString()),
 					attachment);
 			}
 			catch (Exception ex)

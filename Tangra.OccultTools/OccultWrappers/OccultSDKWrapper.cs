@@ -29,6 +29,11 @@ namespace Tangra.OccultTools.OccultWrappers
             return OccultUtilitiesSDKWrapper.HasSupportedVersionOfOccult(occultLocation);
         }
 
+        public string GetOccultCurrentOccultVersion(string occultLocation)
+        {
+            return OccultUtilitiesSDKWrapper.GetOccultCurrentOccultVersion(occultLocation);
+        }
+
         public bool RunAOTA(SDK.ILightCurveDataProvider dataProvider, System.Windows.Forms.IWin32Window parentWindow)
         {
             return OccultUtilitiesSDKWrapper.RunAOTA(dataProvider, parentWindow, m_ClientCallbacks);
@@ -87,6 +92,15 @@ namespace Tangra.OccultTools.OccultWrappers
                 }
 
                 return "There was an error determining the required version of Occult. Probably your version of Occult and Tangra3 are not compatible.";
+            }
+
+            public static string GetOccultCurrentOccultVersion(string occultLocation)
+            {
+                string error = HasSupportedVersionOfOccult(occultLocation);
+                if (error == null && AssemblyOccultUtilities != null)
+                    return "Using Occult v" + AssemblyOccultUtilities.GetName().Version.ToString() + ".";
+
+                return error;
             }
 
             private static void LoadOccultUtilitiesAssemblyAndSetIncompatibleVersionOfOccultErrorMessage(string occultLocation)

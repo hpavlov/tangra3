@@ -117,5 +117,18 @@ namespace Tangra.Addins
 
             }
         }
-	}
+
+
+        public void FinishedLightCurveEventTimeExtraction()
+        {
+            try
+            {
+                m_DelegatedLocalProvider.FinishedLightCurveEventTimeExtraction();
+            }
+            catch
+            {
+
+            }
+        }
+    }
 }

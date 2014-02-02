@@ -138,6 +138,8 @@ namespace OcrTester
 						if (pix.Pixels[i] != pixExpected.Pixels[i])
 						{
 							lbErrors.Items.Add(string.Format("NoiseChunk Removal Failed for {0} ({1})", Path.GetFileName(file), optionNames[j]));
+						    //Bitmap bmp = Pixelmap.ConstructBitmapFromBitmapPixels(pixels, pix.Width, pix.Height);
+						    //bmp.Save(Path.ChangeExtension(expectedResult, ".errbmp"));
 							hasErrors = true;
 							break;
 						}

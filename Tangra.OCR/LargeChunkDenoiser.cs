@@ -67,9 +67,9 @@ namespace Tangra.OCR
 			};
 
 			context.MaxLowerBoundNoiseChunkPixels = (int)Math.Round(35.0 * height / 20);
-			context.MinUpperBoundNoiseChunkPixels = 6 * context.MaxLowerBoundNoiseChunkPixels;			
+			context.MinUpperBoundNoiseChunkPixels = 6 * context.MaxLowerBoundNoiseChunkPixels;
 			context.MinLowerBoundNoiseChunkHeight = (int)Math.Round(0.5 *(height - 4));
-			context.MaxUpperBoundNoiseChunkWidth = height;
+			context.MaxUpperBoundNoiseChunkWidth = height + 4;
 
 			do
 			{

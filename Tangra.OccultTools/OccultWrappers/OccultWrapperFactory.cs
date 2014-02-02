@@ -60,6 +60,14 @@ namespace Tangra.OccultTools.OccultWrappers
                 return m_Delegate.HasSupportedVersionOfOccult(occultLocation);
             }
 
+            public string GetOccultCurrentOccultVersion(string occultLocation)
+            {
+                if (!EnsureDelegate(occultLocation))
+                    return m_IncompatibleVersionsErrorMessage;
+
+                return m_Delegate.GetOccultCurrentOccultVersion(occultLocation);
+            }
+
             public bool RunAOTA(SDK.ILightCurveDataProvider dataProvider, System.Windows.Forms.IWin32Window parentWindow)
             {
                 EnsureDelegate();

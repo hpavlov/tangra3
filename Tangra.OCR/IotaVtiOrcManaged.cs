@@ -23,6 +23,8 @@ namespace Tangra.OCR
 		private uint[] m_EvenFieldPixels;
         private uint[] m_OddFieldPixelsPreProcessed;
         private uint[] m_EvenFieldPixelsPreProcessed;
+	    private uint[] m_OddFieldPixelsDebugNoLChD;
+        private uint[] m_EvenFieldPixelsDebugNoLChD;
 		private int m_FieldAreaHeight;
 		private int m_FieldAreaWidth;
 
@@ -144,7 +146,7 @@ namespace Tangra.OCR
 			for (int i = 0; i < nativeOut.Length; i++) dataOut[i] = nativeOut[i];
 		}
 
-		private void PrepareOsdArea(uint[] dataIn, uint[] dataOut, int width, int height)
+        private void PrepareOsdArea(uint[] dataIn, uint[] dataOut, uint[] dataDebugNoLChD, int width, int height)
 		{
 			//DebugPrepareOsdArea(dataIn, dataOut, width, height);
 			//return;
@@ -187,8 +189,10 @@ namespace Tangra.OCR
 					dataOut[i] = denoised[i] < 127 ? (uint)0 : (uint)255;
 				}
 
+                Array.Copy(dataOut, dataDebugNoLChD, dataOut.Length);
+
 				LargeChunkDenoiser.Process(false, dataOut, width, height);
-			}			
+			}
 		}
 
         private void PrepareOsdVideoFields(uint[] data)
@@ -203,8 +207,8 @@ namespace Tangra.OCR
                     Array.Copy(data, y * m_FieldAreaWidth, m_EvenFieldPixels, lineNo * m_FieldAreaWidth, m_FieldAreaWidth);
             }
 
-			PrepareOsdArea(m_OddFieldPixels, m_OddFieldPixelsPreProcessed, m_InitializationData.FrameWidth, m_FieldAreaHeight);
-			PrepareOsdArea(m_EvenFieldPixels, m_EvenFieldPixelsPreProcessed, m_InitializationData.FrameWidth, m_FieldAreaHeight);
+            PrepareOsdArea(m_OddFieldPixels, m_OddFieldPixelsPreProcessed, m_OddFieldPixelsDebugNoLChD, m_InitializationData.FrameWidth, m_FieldAreaHeight);
+            PrepareOsdArea(m_EvenFieldPixels, m_EvenFieldPixelsPreProcessed, m_EvenFieldPixelsDebugNoLChD, m_InitializationData.FrameWidth, m_FieldAreaHeight);
 
             m_LatestFrameImage = data;
         }
@@ -447,6 +451,8 @@ namespace Tangra.OCR
 			m_EvenFieldPixels = new uint[m_InitializationData.FrameWidth * m_FieldAreaHeight];
 			m_OddFieldPixelsPreProcessed = new uint[m_InitializationData.FrameWidth * m_FieldAreaHeight];
 			m_EvenFieldPixelsPreProcessed = new uint[m_InitializationData.FrameWidth * m_FieldAreaHeight];
+            m_OddFieldPixelsDebugNoLChD = new uint[m_InitializationData.FrameWidth * m_FieldAreaHeight];
+            m_EvenFieldPixelsDebugNoLChD = new uint[m_InitializationData.FrameWidth * m_FieldAreaHeight];
 
 			int[] DELTAS = new int[] { 0, -1, 1 };
 	        int fromLineBase = m_FromLine;
@@ -506,6 +512,8 @@ namespace Tangra.OCR
                     m_EvenFieldPixels = new uint[m_InitializationData.FrameWidth * m_FieldAreaHeight];
                     m_OddFieldPixelsPreProcessed = new uint[m_InitializationData.FrameWidth * m_FieldAreaHeight];
                     m_EvenFieldPixelsPreProcessed = new uint[m_InitializationData.FrameWidth * m_FieldAreaHeight];
+                    m_OddFieldPixelsDebugNoLChD = new uint[m_InitializationData.FrameWidth * m_FieldAreaHeight];
+                    m_EvenFieldPixelsDebugNoLChD = new uint[m_InitializationData.FrameWidth * m_FieldAreaHeight];
 
                     m_InitializationData.OSDFrame.Width = m_FieldAreaWidth;
                     m_InitializationData.OSDFrame.Height = m_FieldAreaHeight;
@@ -553,6 +561,14 @@ namespace Tangra.OCR
 				uint[] pixelsOddOrg = new uint[m_FieldAreaWidth * m_FieldAreaHeight];
 				Array.Copy(m_OddFieldPixels, pixelsOddOrg, m_OddFieldPixelsPreProcessed.Length);
 				m_CalibrationImages.Add(string.Format(@"ORG-{0}-odd.bmp", frameNo.ToString("0000000")), pixelsOddOrg);
+
+                uint[] pixelsEvenNoLChD = new uint[m_FieldAreaWidth * m_FieldAreaHeight];
+                Array.Copy(m_EvenFieldPixelsDebugNoLChD, pixelsEvenNoLChD, m_EvenFieldPixels.Length);
+                m_CalibrationImages.Add(string.Format(@"NLChD-{0}-even.bmp", frameNo.ToString("0000000")), pixelsEvenNoLChD);
+
+                uint[] pixelsOddNoLChD = new uint[m_FieldAreaWidth * m_FieldAreaHeight];
+                Array.Copy(m_OddFieldPixelsDebugNoLChD, pixelsOddNoLChD, m_OddFieldPixelsPreProcessed.Length);
+                m_CalibrationImages.Add(string.Format(@"NLChD-{0}-odd.bmp", frameNo.ToString("0000000")), pixelsOddNoLChD);
             }
 
 			if (!wasCalibrated && m_Processor.IsCalibrated)
