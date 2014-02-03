@@ -41,7 +41,7 @@ namespace Tangra.Config.SettingPannels
 		{
 			string owIntegrationError = null;
 			if (!OccultWatcherHelper.IsOccultWatcherFound())
-				owIntegrationError = "OccultWatcher us not installed.";
+				owIntegrationError = "OccultWatcher is not installed.";
 			else if (!OccultWatcherHelper.IsOccultWatcherReportingAddinFound())
 				owIntegrationError = "OW IOTA Reporting add-in ver 1.8 or later is not installed.";
 			else if (!m_AddinsController.OccultToolsAddinIsLoaded())
