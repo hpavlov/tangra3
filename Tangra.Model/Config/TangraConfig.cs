@@ -382,6 +382,7 @@ namespace Tangra.Model.Config
 			public float AdHokMaxElongation = 150.0f; // 150%
 			public bool CheckElongation = false;
 			public float AdHokMinCertainty = 0.1f;
+			public float AdHokGuidingStarMinCertainty = 0.4f;
 			public float AdHokMinFWHM = 1.5f;
 			public float AdHokMaxFWHM = 12.0f;
 			public bool UseNativeTracker = true;

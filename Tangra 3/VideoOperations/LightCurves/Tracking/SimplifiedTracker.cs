@@ -15,6 +15,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 		private float STELLAR_OBJECT_MIN_FWHM;
 		private float STELLAR_OBJECT_MAX_FWHM;
 		private float STELLAR_OBJECT_MIN_CERTAINTY;
+		private float GUIDING_STAR_MIN_CERTAINTY;
 
 		internal SimplifiedTracker(List<TrackedObjectConfig> measuringStars)
 			: base(measuringStars)
@@ -23,6 +24,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			STELLAR_OBJECT_MIN_FWHM = TangraConfig.Settings.Tracking.AdHokMinFWHM;
 			STELLAR_OBJECT_MAX_FWHM = TangraConfig.Settings.Tracking.AdHokMaxFWHM;
 			STELLAR_OBJECT_MIN_CERTAINTY = TangraConfig.Settings.Tracking.AdHokMinCertainty;
+			GUIDING_STAR_MIN_CERTAINTY = TangraConfig.Settings.Tracking.AdHokGuidingStarMinCertainty;
 		}
 
 		public override void NextFrame(int frameNo, IAstroImage astroImage)
@@ -35,8 +37,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 				TrackedObjectLight trackedObject = (TrackedObjectLight)m_TrackedObjects[i];
 				trackedObject.NextFrame();
 
-				if (trackedObject.OriginalObject.IsFixedAperture ||
-				    (trackedObject.OriginalObject.TrackingType == TrackingType.OccultedStar && m_IsFullDisappearance))
+				if (trackedObject.OriginalObject.IsFixedAperture || trackedObject.OriginalObject.TrackingType == TrackingType.OccultedStar)
 				{
 					// Star position will be determined after the rest of the stars are found 
 				}
@@ -49,7 +50,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 					if (fit.IsSolved)
 					{
-						if (fit.Certainty < STELLAR_OBJECT_MIN_CERTAINTY)
+						if (fit.Certainty < GUIDING_STAR_MIN_CERTAINTY)
 						{
 							trackedObject.SetIsTracked(false, NotMeasuredReasons.ObjectCertaintyTooSmall, (PSFFit)null);
 						}
@@ -105,7 +106,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 					{
 						trackedObject.SetIsTracked(true, NotMeasuredReasons.FixedObject, new ImagePixel(x_double, y_double));
 					}
-					else if (trackedObject.OriginalObject.IsOcultedStar() && m_IsFullDisappearance)
+					else if (trackedObject.OriginalObject.IsOcultedStar())
 					{
 						int x = (int)(Math.Round(totalX / numReferences));
 						int y = (int)(Math.Round(totalY / numReferences));
@@ -122,13 +123,15 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 						fit.Fit(pixels);
 
 
-						if (fit.IsSolved && fit.Certainty > 0.1)
+						if (fit.IsSolved && fit.Certainty > STELLAR_OBJECT_MIN_CERTAINTY)
 						{
 							trackedObject.SetIsTracked(true, NotMeasuredReasons.TrackedSuccessfully, fit);
 							trackedObject.SetTrackedObjectMatch(fit);
 						}
-						else
+						else if (m_IsFullDisappearance)
 							trackedObject.SetIsTracked(false, NotMeasuredReasons.FullyDisappearingStarMarkedTrackedWithoutBeingFound, (PSFFit)null);
+						else
+							trackedObject.SetIsTracked(false, NotMeasuredReasons.ObjectCertaintyTooSmall, (PSFFit)null);
 					}
 				}
 			}
