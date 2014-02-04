@@ -711,6 +711,120 @@ namespace Tangra.Video.AstroDigitalVideo
 		    return false;
 	    }
 
+		internal void ExportStatusSectionToCSV(string fileName, int firstFrame, int lastFrame, OnSearchProgressDelegate progressCallback)
+		{
+			var output = new StringBuilder();
+
+			progressCallback(5, 0);
+
+			bool headerAppended = false;
+
+			for (int i = firstFrame; i <= lastFrame; i++)
+			{
+				AdvImageData imageData;
+				AdvStatusData statusData;
+				Bitmap bmp;
+				GetFrameData(i, out imageData, out statusData, out bmp);
+
+				string headerRow;
+				string nextRow = StatusDataToCsvRow(statusData, i, out headerRow);
+				if (!headerAppended)
+				{
+					output.AppendLine(headerRow);
+					headerAppended = true;
+				}
+				output.AppendLine(nextRow);
+
+				if (bmp != null) bmp.Dispose();
+
+				int percDone = (int)Math.Min(90, 90 * (i - firstFrame) * 1.0 / (lastFrame - firstFrame + 1));
+				progressCallback(5 + percDone, 0);
+			}
+
+			progressCallback(95, 0);	
+			File.WriteAllText(fileName, output.ToString());
+		}
+
+		private string StatusDataToCsvRow(AdvStatusData statusData, int frameNo, out string headerRow)
+		{
+			var output = new StringBuilder();
+			output.AppendFormat("\"{0}\"", frameNo);
+
+			var header = new StringBuilder();
+			header.Append("FrameNo");
+
+			foreach (AdvTagDefinition statusTag in statusData.TagValues.Keys)
+			{
+				string tagValue = statusData.TagValues[statusTag];
+				if ((statusTag.Name == "SystemTime" || statusTag.Name == "NTPStartTimestamp" || statusTag.Name == "NTPEndTimestamp") &&
+					!string.IsNullOrEmpty(tagValue))
+				{
+					tagValue = AdvFile.ADV_ZERO_DATE_REF.AddMilliseconds(long.Parse(tagValue)).ToString("dd-MMM-yyyy HH:mm:ss.fff");
+				}
+				else if (statusTag.Name == "GPSTrackedSatellites" && !string.IsNullOrEmpty(tagValue))
+				{
+					tagValue = int.Parse(tagValue).ToString();
+				}
+				else if (statusTag.Name == "Gamma" && !string.IsNullOrEmpty(tagValue))
+				{
+					tagValue = string.Format("{0:0.000}", float.Parse(tagValue));
+				}
+				else if (statusTag.Name == "Gain" && !string.IsNullOrEmpty(tagValue))
+				{
+					tagValue = string.Format("{0:0} dB", float.Parse(tagValue));
+				}
+				else if (statusTag.Name == "Shutter" && !string.IsNullOrEmpty(tagValue))
+				{
+					tagValue = string.Format("{0:0.000} sec", float.Parse(tagValue));
+				}
+				else if (statusTag.Name == "Offset" && !string.IsNullOrEmpty(tagValue))
+				{
+					tagValue = string.Format("{0:0.00} %", float.Parse(tagValue));
+				}
+				else if ((statusTag.Name == "VideoCameraFrameId" || statusTag.Name == "HardwareTimerFrameId") &&
+				         !string.IsNullOrEmpty(tagValue))
+				{
+					tagValue = int.Parse(tagValue).ToString("#,###,###,###,###");
+				}
+				else if (statusTag.Name == "GPSAlmanacStatus" && !string.IsNullOrEmpty(tagValue))
+				{
+					int almanacStatus = int.Parse(tagValue);
+					tagValue = AdvStatusValuesHelper.TranslateGpsAlmanacStatus(almanacStatus);
+				}
+				else if (statusTag.Name == "GPSAlmanacOffset" && !string.IsNullOrEmpty(tagValue))
+				{
+					int almanacOffset = int.Parse(tagValue);
+					if ((almanacOffset & 0x80) == 0x80)
+						almanacOffset = (short) (almanacOffset + (0xFF << 8));
+
+					tagValue = AdvStatusValuesHelper.TranslateGpsAlmanacOffset(1, almanacOffset, false);
+				}
+				else if (statusTag.Name == "GPSFixStatus" && !string.IsNullOrEmpty(tagValue))
+				{
+					int fixStatus = int.Parse(tagValue);
+					tagValue = AdvStatusValuesHelper.TranslateGpsFixStatus(fixStatus);
+				}
+
+				if (!string.IsNullOrEmpty(tagValue) && (statusTag.Name == "UserCommand" || statusTag.Name == "SystemError" || statusTag.Name == "GPSFix"))
+				{
+					string[] tokens = tagValue.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+					tagValue = string.Empty;
+					for (int i = 0; i < tokens.Length; i++)
+					{
+						tagValue += string.Format("{0}[{1}];", statusTag.Name, i + 1);
+					}
+				}
+
+				if (tagValue == null) tagValue = string.Empty;
+
+				output.AppendFormat(",\"{0}\"", tagValue.Replace("\"", "\"\""));
+				header.AppendFormat(",{0}", statusTag.Name);
+			}
+
+			headerRow = header.ToString();
+			return output.ToString();
+		}
+
 
 	    internal bool FixAavFile18Aug(string fileName, int firstFrame, int lastFrame)
 	    {
