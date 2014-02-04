@@ -107,12 +107,18 @@ namespace Tangra.Video.AstroDigitalVideo
             nudAviFirstFrame.Maximum = (int)m_AdvFile.NumberOfFrames - 1;
             nudAviFirstFrame.Value = 0;
             nudAviLastFrame.Maximum = (int)m_AdvFile.NumberOfFrames - 1;
-            nudAviLastFrame.Value = nudCropLastFrame.Maximum;
+			nudAviLastFrame.Value = nudAviFirstFrame.Maximum;
+
+			nudCsvFirstFrame.Maximum = (int)m_AdvFile.NumberOfFrames - 1;
+            nudCsvFirstFrame.Value = 0;
+			nudCsvLastFrame.Maximum = (int)m_AdvFile.NumberOfFrames - 1;
+			nudCsvLastFrame.Value = nudCsvFirstFrame.Maximum;
 
 			LoadFrame(0);
 
             gbxAdvSplit.Text = m_IsAavFile ? "AAV Crop" : "ADV Crop";
             gbxConvertToAVI.Text = m_IsAavFile ? "AAV to AVI" : "ADV to AVI";
+			gbxConvertToCSV.Text = m_IsAavFile ? "AAV to CSV (No video frames exported)" : "ADV to CSV (No video frames exported)";
 		    btnCropADV.Text = m_IsAavFile ? "Save AAV chunk as ..." : "Save ADV chunk as ...";
 
             cbxFrameRate.SelectedIndex = 0;
@@ -344,11 +350,38 @@ namespace Tangra.Video.AstroDigitalVideo
             }
         }
 
+		private void ExportToCSVWorker(object state)
+		{
+			Tuple<string, int, int> cropFileCfg = (Tuple<string, int, int>)state;
+
+			InvokeUpdateUI(3, 0, true);
+
+			try
+			{
+				m_AdvFile.ExportStatusSectionToCSV(
+					cropFileCfg.Item1,
+					cropFileCfg.Item2,
+					cropFileCfg.Item3,
+					delegate(int percentDone, int framesFound)
+					{
+						InvokeUpdateUI(3, percentDone, true);
+					});
+			}
+			finally
+			{
+				InvokeUpdateUI(3, 100, false);
+			}			
+		}
+
         private delegate void UpdateUIDelegate(int pbarId, int percent, bool show);
 
 		private void UpdateUI(int pbarId, int percent, bool show)
 		{
-		    ProgressBar pbar = pbarId == 1 ? pbar1 : pbar2;
+			ProgressBar pbar;
+			if (pbarId == 1) pbar = pbar1;
+			else if (pbarId == 2) pbar = pbar2;
+			else if (pbarId == 3) pbar = pbar3;
+			else pbar = pbar1;
             
             pbar.Value = percent;
 
@@ -420,5 +453,29 @@ namespace Tangra.Video.AstroDigitalVideo
                         addedGamma));
             }
         }
+
+		private void btnSaveAsCSV_Click(object sender, EventArgs e)
+		{
+			if (nudCropLastFrame.Value < nudCropFirstFrame.Value)
+			{
+				MessageBox.Show(
+					this,
+					"The last frame cannot be 'before' the first frame.",
+					"Tangra",
+					MessageBoxButtons.OK,
+					MessageBoxIcon.Error);
+
+				nudCropLastFrame.Focus();
+				return;
+			}
+
+			saveFileDialog.Filter = "CSV Files (*.csv)|*.csv|All Files (*.*)|*.*";
+			saveFileDialog.FileName = Path.ChangeExtension(m_FileName, "csv");
+
+			if (saveFileDialog.ShowDialog(this) == DialogResult.OK)
+			{
+				ThreadPool.QueueUserWorkItem(new WaitCallback(ExportToCSVWorker), new Tuple<string, int, int>(saveFileDialog.FileName, (int)nudCropFirstFrame.Value, (int)nudCropLastFrame.Value));
+			}
+		}
 	}	
 }

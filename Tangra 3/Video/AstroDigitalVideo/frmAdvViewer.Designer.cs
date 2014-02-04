@@ -89,6 +89,14 @@
 			this.sbFrames = new System.Windows.Forms.HScrollBar();
 			this.picSmallImage = new System.Windows.Forms.PictureBox();
 			this.tabTools = new System.Windows.Forms.TabPage();
+			this.gbxConvertToCSV = new System.Windows.Forms.GroupBox();
+			this.pbar3 = new System.Windows.Forms.ProgressBar();
+			this.panel1 = new System.Windows.Forms.Panel();
+			this.btnSaveAsCSV = new System.Windows.Forms.Button();
+			this.nudCsvFirstFrame = new System.Windows.Forms.NumericUpDown();
+			this.label26 = new System.Windows.Forms.Label();
+			this.nudCsvLastFrame = new System.Windows.Forms.NumericUpDown();
+			this.label27 = new System.Windows.Forms.Label();
 			this.gbxConvertToAVI = new System.Windows.Forms.GroupBox();
 			this.pbar2 = new System.Windows.Forms.ProgressBar();
 			this.pnlToAviConfig = new System.Windows.Forms.Panel();
@@ -131,6 +139,10 @@
 			this.tpFrames.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.picSmallImage)).BeginInit();
 			this.tabTools.SuspendLayout();
+			this.gbxConvertToCSV.SuspendLayout();
+			this.panel1.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.nudCsvFirstFrame)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudCsvLastFrame)).BeginInit();
 			this.gbxConvertToAVI.SuspendLayout();
 			this.pnlToAviConfig.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nudAviFirstFrame)).BeginInit();
@@ -742,6 +754,7 @@
 			// 
 			// tabTools
 			// 
+			this.tabTools.Controls.Add(this.gbxConvertToCSV);
 			this.tabTools.Controls.Add(this.gbxConvertToAVI);
 			this.tabTools.Controls.Add(this.gbxAdvSplit);
 			this.tabTools.Location = new System.Drawing.Point(4, 22);
@@ -751,6 +764,80 @@
 			this.tabTools.TabIndex = 4;
 			this.tabTools.Text = "Tools";
 			this.tabTools.UseVisualStyleBackColor = true;
+			// 
+			// gbxConvertToCSV
+			// 
+			this.gbxConvertToCSV.Controls.Add(this.pbar3);
+			this.gbxConvertToCSV.Controls.Add(this.panel1);
+			this.gbxConvertToCSV.Location = new System.Drawing.Point(6, 280);
+			this.gbxConvertToCSV.Name = "gbxConvertToCSV";
+			this.gbxConvertToCSV.Size = new System.Drawing.Size(666, 128);
+			this.gbxConvertToCSV.TabIndex = 2;
+			this.gbxConvertToCSV.TabStop = false;
+			this.gbxConvertToCSV.Text = "AAV/ADV Status Stream to CSV (No video frames exported)";
+			// 
+			// pbar3
+			// 
+			this.pbar3.Location = new System.Drawing.Point(89, 89);
+			this.pbar3.Name = "pbar3";
+			this.pbar3.Size = new System.Drawing.Size(466, 23);
+			this.pbar3.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+			this.pbar3.TabIndex = 8;
+			this.pbar3.Visible = false;
+			// 
+			// panel1
+			// 
+			this.panel1.Controls.Add(this.btnSaveAsCSV);
+			this.panel1.Controls.Add(this.nudCsvFirstFrame);
+			this.panel1.Controls.Add(this.label26);
+			this.panel1.Controls.Add(this.nudCsvLastFrame);
+			this.panel1.Controls.Add(this.label27);
+			this.panel1.Location = new System.Drawing.Point(6, 19);
+			this.panel1.Name = "panel1";
+			this.panel1.Size = new System.Drawing.Size(613, 64);
+			this.panel1.TabIndex = 7;
+			// 
+			// btnSaveAsCSV
+			// 
+			this.btnSaveAsCSV.Location = new System.Drawing.Point(371, 14);
+			this.btnSaveAsCSV.Name = "btnSaveAsCSV";
+			this.btnSaveAsCSV.Size = new System.Drawing.Size(178, 23);
+			this.btnSaveAsCSV.TabIndex = 6;
+			this.btnSaveAsCSV.Text = "Save as CSV file ...";
+			this.btnSaveAsCSV.UseVisualStyleBackColor = true;
+			this.btnSaveAsCSV.Click += new System.EventHandler(this.btnSaveAsCSV_Click);
+			// 
+			// nudCsvFirstFrame
+			// 
+			this.nudCsvFirstFrame.Location = new System.Drawing.Point(83, 17);
+			this.nudCsvFirstFrame.Name = "nudCsvFirstFrame";
+			this.nudCsvFirstFrame.Size = new System.Drawing.Size(58, 20);
+			this.nudCsvFirstFrame.TabIndex = 0;
+			// 
+			// label26
+			// 
+			this.label26.AutoSize = true;
+			this.label26.Location = new System.Drawing.Point(178, 19);
+			this.label26.Name = "label26";
+			this.label26.Size = new System.Drawing.Size(59, 13);
+			this.label26.TabIndex = 3;
+			this.label26.Text = "Last Frame";
+			// 
+			// nudCsvLastFrame
+			// 
+			this.nudCsvLastFrame.Location = new System.Drawing.Point(243, 17);
+			this.nudCsvLastFrame.Name = "nudCsvLastFrame";
+			this.nudCsvLastFrame.Size = new System.Drawing.Size(58, 20);
+			this.nudCsvLastFrame.TabIndex = 1;
+			// 
+			// label27
+			// 
+			this.label27.AutoSize = true;
+			this.label27.Location = new System.Drawing.Point(16, 19);
+			this.label27.Name = "label27";
+			this.label27.Size = new System.Drawing.Size(58, 13);
+			this.label27.TabIndex = 2;
+			this.label27.Text = "First Frame";
 			// 
 			// gbxConvertToAVI
 			// 
@@ -1053,6 +1140,11 @@
 			this.tpFrames.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.picSmallImage)).EndInit();
 			this.tabTools.ResumeLayout(false);
+			this.gbxConvertToCSV.ResumeLayout(false);
+			this.panel1.ResumeLayout(false);
+			this.panel1.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.nudCsvFirstFrame)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudCsvLastFrame)).EndInit();
 			this.gbxConvertToAVI.ResumeLayout(false);
 			this.pnlToAviConfig.ResumeLayout(false);
 			this.pnlToAviConfig.PerformLayout();
@@ -1159,5 +1251,13 @@
         private System.Windows.Forms.Label label23;
         private System.Windows.Forms.Label label22;
 		private System.Windows.Forms.ComboBox cbxFrameRate;
+		private System.Windows.Forms.GroupBox gbxConvertToCSV;
+		private System.Windows.Forms.ProgressBar pbar3;
+		private System.Windows.Forms.Panel panel1;
+		private System.Windows.Forms.Button btnSaveAsCSV;
+		private System.Windows.Forms.NumericUpDown nudCsvFirstFrame;
+		private System.Windows.Forms.Label label26;
+		private System.Windows.Forms.NumericUpDown nudCsvLastFrame;
+		private System.Windows.Forms.Label label27;
 	}
 }
