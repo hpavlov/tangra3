@@ -180,7 +180,7 @@ namespace Tangra.Video.AstroDigitalVideo
 			{
 				
 				string tagValue = m_CurrentStatusData.TagValues[statusTag];
-                if ((statusTag.Name == "SystemTime" || statusTag.Name == "NTPStartTimestamp" || statusTag.Name == "NTPEndTimestamp") && 
+				if ((statusTag.Name == "SystemTime" || statusTag.Name == "NTPStartTimestamp" || statusTag.Name == "NTPEndTimestamp" || statusTag.Name == "StartTimestampSecondary" || statusTag.Name == "EndTimestampSecondary") && 
                     !string.IsNullOrEmpty(tagValue))
 				{
 					systemTime = AdvFile.ADV_ZERO_DATE_REF.AddMilliseconds(long.Parse(tagValue)).ToString("dd-MMM-yyyy HH:mm:ss.fff");

@@ -174,6 +174,11 @@ namespace Tangra.OCR
 			m_PrevEvenFieldOSD = new IotaVtiTimeStamp(evenFieldOSD);
 		}
 
+		public int GetOddEvenFieldDirection()
+		{
+			return m_PrevOddTicks - m_PrevEvenTicks < 0 ? -1 : 1;
+		}
+
 		private bool IsFieldDurationOkay(double fieldDuration)
 		{
 			if (m_VideoFormat == VideoFormat.PAL &&

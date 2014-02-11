@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Tangra.OccultTools")]
-[assembly: AssemblyCopyright("Copyright © 2013 Hristo Pavlov")]
+[assembly: AssemblyCopyright("Copyright © Hristo Pavlov 2013-2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

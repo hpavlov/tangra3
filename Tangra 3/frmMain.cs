@@ -89,9 +89,20 @@ namespace Tangra
 			}
 
 			base.Dispose(disposing);
-			
-			m_VideoController.Dispose();
-			m_AddinsController.Dispose();
+
+			try
+			{
+				m_VideoController.Dispose();
+			}
+			catch (InvalidOperationException)
+			{ }
+
+			try
+			{
+				m_AddinsController.Dispose();
+			}
+			catch (InvalidOperationException)
+			{ }			
 		}
 
 		#region Frame Rendering

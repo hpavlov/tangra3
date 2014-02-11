@@ -643,20 +643,27 @@ namespace Tangra.OCR
 			DateTime evenFieldTimestamp = new DateTime(1, 1, 1, evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds, evenMs); 
 			
 			double fieldDuration = Math.Abs(new TimeSpan(oddFieldTimestamp.Ticks - evenFieldTimestamp.Ticks).TotalMilliseconds);
-            
+			
             if (m_Processor.VideoFormat.Value == VideoFormat.PAL &&
                 (Math.Abs(fieldDuration - IotaVtiOcrProcessor.FIELD_DURATION_PAL) > 1.0))
             {
-                // PAL field is not 20ms
+                // PAL field is not 20 ms
                 failedValidation = true;
             }
 
             if (m_Processor.VideoFormat.Value == VideoFormat.NTSC &&
                 (Math.Abs(fieldDuration - IotaVtiOcrProcessor.FIELD_DURATION_NTSC) > 1.0))
             {
-                // NTSC field is not 20ms
+				// NTSC field is not 16.68 ms
                 failedValidation = true;
             }
+
+			int oddEvenFieldDirection = oddFieldTimestamp.Ticks - evenFieldTimestamp.Ticks < 0 ? -1 : 1;
+			if (oddEvenFieldDirection != m_Corrector.GetOddEvenFieldDirection())
+			{
+				// Field timestamps are wonrg have changed order (did they swap)?
+				failedValidation = true;				
+			}
 
 			if (failedValidation)
 				failedValidation = !m_Corrector.TryToCorrect(frameNo, oddFieldOSD, evenFieldOSD, ref oddFieldTimestamp, ref evenFieldTimestamp);
