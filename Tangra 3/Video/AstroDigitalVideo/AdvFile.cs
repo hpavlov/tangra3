@@ -727,7 +727,7 @@ namespace Tangra.Video.AstroDigitalVideo
 				GetFrameData(i, out imageData, out statusData, out bmp);
 
 				string headerRow;
-				string nextRow = StatusDataToCsvRow(statusData, i, out headerRow);
+                string nextRow = StatusDataToCsvRow(imageData, statusData, i, out headerRow);
 				if (!headerAppended)
 				{
 					output.AppendLine(headerRow);
@@ -745,18 +745,20 @@ namespace Tangra.Video.AstroDigitalVideo
 			File.WriteAllText(fileName, output.ToString());
 		}
 
-		private string StatusDataToCsvRow(AdvStatusData statusData, int frameNo, out string headerRow)
+		private string StatusDataToCsvRow(AdvImageData imageData, AdvStatusData statusData, int frameNo, out string headerRow)
 		{
 			var output = new StringBuilder();
 			output.AppendFormat("\"{0}\"", frameNo);
+            output.AppendFormat(",\"{0}\"", imageData.MidExposureUtc.AddMilliseconds( - 1 * imageData.ExposureMilliseconds / 2.0).ToString("dd-MMM-yyyy HH:mm:ss.fff"));
+            output.AppendFormat(",\"{0}\"", imageData.MidExposureUtc.AddMilliseconds(imageData.ExposureMilliseconds / 2.0).ToString("dd-MMM-yyyy HH:mm:ss.fff"));
 
 			var header = new StringBuilder();
-			header.Append("FrameNo");
+            header.Append("FrameNo,OCRStartTimestamp,OCREndTimestamp");
 
 			foreach (AdvTagDefinition statusTag in statusData.TagValues.Keys)
 			{
 				string tagValue = statusData.TagValues[statusTag];
-				if ((statusTag.Name == "SystemTime" || statusTag.Name == "NTPStartTimestamp" || statusTag.Name == "NTPEndTimestamp") &&
+                if ((statusTag.Name == "SystemTime" || statusTag.Name == "NTPStartTimestamp" || statusTag.Name == "NTPEndTimestamp" || statusTag.Name == "StartTimestampSecondary" || statusTag.Name == "EndTimestampSecondary") &&
 					!string.IsNullOrEmpty(tagValue))
 				{
 					tagValue = AdvFile.ADV_ZERO_DATE_REF.AddMilliseconds(long.Parse(tagValue)).ToString("dd-MMM-yyyy HH:mm:ss.fff");
