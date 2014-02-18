@@ -40,6 +40,8 @@ namespace Tangra.PInvoke
 			HardwareTimerFrameIdLo = copyFrom.HardwareTimerFrameIdLo;
 			HardwareTimerFrameIdHi = copyFrom.HardwareTimerFrameIdHi;
 			IntegratedFrames = copyFrom.IntegratedFrames;
+			EndFrameNtpTimeStampMillisecondsLo = copyFrom.EndFrameNtpTimeStampMillisecondsLo;
+			EndFrameNtpTimeStampMillisecondsHi = copyFrom.EndFrameNtpTimeStampMillisecondsHi;
 		}
 
 		public string GPSFixString;
@@ -76,6 +78,8 @@ namespace Tangra.PInvoke
 			GPSAlmanacStatus = 0;
 			GPSFixStatus = 0;
 			IntegratedFrames = 0;
+			EndFrameNtpTimeStampMillisecondsLo = 0;
+			EndFrameNtpTimeStampMillisecondsHi = 0;
 #else
 			MidFrameTimeStampMillisecondsLo = 0;
 			MidFrameTimeStampMillisecondsHi = 0;
@@ -89,6 +93,8 @@ namespace Tangra.PInvoke
 			GPSTrackedSattelites = 0;
 			GPSAlmanacStatus = 0;
 			GPSFixStatus = 0;
+			EndFrameNtpTimeStampMillisecondsLo = 0;
+			EndFrameNtpTimeStampMillisecondsHi = 0;
 #endif
 		}
 
@@ -128,6 +134,10 @@ namespace Tangra.PInvoke
 		public uint HardwareTimerFrameIdHi;
 		[FieldOffset(56)]
 		public uint IntegratedFrames; 
+		[FieldOffset(60)]
+		public uint EndFrameNtpTimeStampMillisecondsLo;
+		[FieldOffset(64)]
+		public uint EndFrameNtpTimeStampMillisecondsHi;
 
 		public DateTime MiddleExposureTimeStamp
 		{
@@ -163,6 +173,22 @@ namespace Tangra.PInvoke
                 {
                     return REFERENCE_DATETIME;
                 }
+			}
+		}
+
+		public DateTime EndExposureNtpTimeStamp
+		{
+			get
+			{
+				long millisecondsElapsed = (((long)EndFrameNtpTimeStampMillisecondsHi) << 32) + (long)EndFrameNtpTimeStampMillisecondsLo;
+				try
+				{
+					return REFERENCE_DATETIME.AddMilliseconds(millisecondsElapsed);
+				}
+				catch (ArgumentOutOfRangeException)
+				{
+					return REFERENCE_DATETIME;
+				}
 			}
 		}
 

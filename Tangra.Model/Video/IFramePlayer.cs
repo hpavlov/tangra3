@@ -80,6 +80,7 @@ namespace Tangra.Model.Video
 		bool IsAstroDigitalVideo { get; }
 		bool IsAstroAnalogueVideo { get; }
         bool AstroAnalogueVideoHasOcrData { get; }
+		bool AstroAnalogueVideoHasNtpData { get; }
         int AstroAnalogueVideoIntegratedAAVFrames { get; }
         int CurrentFrameIndex { get; }
 	    string AstroVideoCameraModel { get; }

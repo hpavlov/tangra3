@@ -322,6 +322,7 @@ namespace Tangra.Video
 				rv.VideoCameraFrameId = m_CurrentFrameInfo.VideoCameraFrameId;
 				rv.CentralExposureTime = m_CurrentFrameInfo.MiddleExposureTimeStamp;
 				rv.SystemTime = m_CurrentFrameInfo.SystemTime;
+				rv.EndFrameNtpTime = m_CurrentFrameInfo.EndExposureNtpTimeStamp;
 				rv.ExposureInMilliseconds = m_CurrentFrameInfo.Exposure10thMs / 10.0f;
 
 				rv.NumberIntegratedFrames = (int)m_CurrentFrameInfo.IntegratedFrames;
@@ -372,6 +373,7 @@ namespace Tangra.Video
 				rv.VideoCameraFrameId = frameInfo.VideoCameraFrameId;
 				rv.CentralExposureTime = frameInfo.MiddleExposureTimeStamp;
 				rv.SystemTime = frameInfo.SystemTime;
+				rv.EndFrameNtpTime = frameInfo.EndExposureNtpTimeStamp;
 				rv.ExposureInMilliseconds = frameInfo.Exposure10thMs / 10.0f;
 
 				rv.NumberIntegratedFrames = (int)frameInfo.IntegratedFrames;
@@ -476,6 +478,33 @@ namespace Tangra.Video
 			    return m_OcrDataAvailable.Value;
 			}
         }
+
+		public bool? m_NtpDataAvailable = null;
+
+		public bool NtpDataAvailable
+		{
+			get
+			{
+				if (!m_NtpDataAvailable.HasValue)
+				{
+					m_NtpDataAvailable = false;
+
+					for (int i = m_FirstFrame; i < m_FirstFrame + m_CountFrames; i++)
+					{
+						FrameStateData stateChannel = GetFrameStatusChannel(i);
+						if (stateChannel.HasValidNtpTimeStamp)
+						{
+							m_NtpDataAvailable = true;
+							break;
+						}
+					}
+
+				}
+
+				return m_NtpDataAvailable.Value;			
+			}
+		}
+
 
 		private GeoLocationInfo geoLocation;
 

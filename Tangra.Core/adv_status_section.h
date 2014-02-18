@@ -35,6 +35,8 @@ struct AdvFrameInfo
 	long HardwareTimerFrameIdLo;
 	long HardwareTimerFrameIdHi;
 	long IntegratedFrames;
+	long EndNtpTimeStampLo;
+	long EndNtpTimeStampHi;
 };
 
 

@@ -77,3 +77,6 @@ _ReSharper.*
 
 /Tangra.Core/cppcheck.list
 /Tangra.Core/cscope_file.list
+/Tangra.Video/Windows/Tangra.Video.opensdf
+/Work/AviDemo
+/Work/AviFile

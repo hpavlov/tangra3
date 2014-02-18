@@ -323,6 +323,7 @@ namespace Tangra
 
 		private void miAbout_Click(object sender, EventArgs e)
 		{
+			bool hasNtpTime = m_VideoController.IsAstroAnalogueVideo && !m_VideoController.AstroAnalogueVideoHasOcrOrNtpData;
 			var frmAbout = new frmAbout();
 			frmAbout.ShowDialog(this);
 		}

@@ -10,6 +10,7 @@ namespace Tangra.Model.Image
 		public long VideoCameraFrameId;
 		public DateTime CentralExposureTime;
 		public DateTime SystemTime;
+		public DateTime EndFrameNtpTime;
 		public float ExposureInMilliseconds;
 		public float Gamma;
 		public float Gain;
@@ -38,6 +39,14 @@ namespace Tangra.Model.Image
                 return CentralExposureTime.Ticks != 633979008000000000;        
             }            
         }
+
+		public bool HasValidNtpTimeStamp
+		{
+			get
+			{
+				return EndFrameNtpTime.Ticks != 633979008000000000;
+			}
+		}
 
 	    public bool IsGainKnown
 	    {

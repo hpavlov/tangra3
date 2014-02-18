@@ -1124,7 +1124,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 			if (m_TimestampOCR != null || 
 				m_VideoController.IsAstroDigitalVideo ||
-				(m_VideoController.IsAstroAnalogueVideo && m_VideoController.AstroAnalogueVideoHasOcrData))
+				(m_VideoController.IsAstroAnalogueVideo && m_VideoController.AstroAnalogueVideoHasOcrOrNtpData))
 				// We have embedded timestamps for OCR-ed analogue video timestamps or for ADV videos
 				LightCurveReductionContext.Instance.HasEmbeddedTimeStamps = true;
 			else
@@ -1440,7 +1440,7 @@ namespace Tangra.VideoOperations.LightCurves
 
         public DialogResult EnteredTimeIntervalLooksOkay()
         {
-	        if (m_VideoController.IsAstroAnalogueVideo && !m_VideoController.AstroAnalogueVideoHasOcrData)
+			if (m_VideoController.IsAstroAnalogueVideo && !m_VideoController.AstroAnalogueVideoHasOcrOrNtpData)
 		        return CheckAavRate();
 	        else
 		        return CheckPALOrNTSCRate();
@@ -1586,7 +1586,7 @@ namespace Tangra.VideoOperations.LightCurves
 			if (m_VideoController.HasAstroImageState)
 			{
                 if (m_VideoController.IsAstroDigitalVideo ||
-                    (m_VideoController.IsAstroAnalogueVideo && m_VideoController.AstroAnalogueVideoHasOcrData))
+                    (m_VideoController.IsAstroAnalogueVideo && m_VideoController.AstroAnalogueVideoHasOcrOrNtpData))
                 {
                     FrameStateData frameState = m_VideoController.GetCurrentFrameState();
                     Trace.Assert(prevFrameId != frameState.VideoCameraFrameId || frameState.VideoCameraFrameId == 0 /* When VideoCameraFrameId is not supported */);
@@ -1773,8 +1773,8 @@ namespace Tangra.VideoOperations.LightCurves
 			);
 
 			MeasurementTimingType measurementTimingType = MeasurementTimingType.UserEnteredFrameReferences;
-			if (m_VideoController.IsAstroDigitalVideo || 
-                (m_VideoController.IsAstroAnalogueVideo && m_VideoController.AstroAnalogueVideoHasOcrData))
+			if (m_VideoController.IsAstroDigitalVideo ||
+				(m_VideoController.IsAstroAnalogueVideo && m_VideoController.AstroAnalogueVideoHasOcrOrNtpData))
 				measurementTimingType = MeasurementTimingType.EmbeddedTimeForEachFrame;
 			else if (m_TimestampOCR != null)
 				measurementTimingType = MeasurementTimingType.OCRedTimeForEachFrame;

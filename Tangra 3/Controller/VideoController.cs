@@ -460,9 +460,9 @@ namespace Tangra.Controller
 			}
 		}
 
-        public bool AstroAnalogueVideoHasOcrData
+        public bool AstroAnalogueVideoHasOcrOrNtpData
         {
-            get { return m_FramePlayer.AstroAnalogueVideoHasOcrData; }
+			get { return m_FramePlayer.AstroAnalogueVideoHasOcrData || m_FramePlayer.AstroAnalogueVideoHasNtpData; }
         }
 
         public int AstroAnalogueVideoIntegratedAAVFrames
