@@ -50,6 +50,7 @@
 			this.linkLabelAAV = new System.Windows.Forms.LinkLabel();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.cbxAavSplitFieldsOSD = new System.Windows.Forms.CheckBox();
+			this.cbxNtpDebugFlag = new System.Windows.Forms.CheckBox();
 			this.groupControl1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nudSaturation8bit)).BeginInit();
 			this.groupControl2.SuspendLayout();
@@ -260,11 +261,20 @@
 			this.cbxAavSplitFieldsOSD.TabIndex = 44;
 			this.cbxAavSplitFieldsOSD.Text = "Split Field OSD";
 			// 
+			// cbxNtpDebugFlag
+			// 
+			this.cbxNtpDebugFlag.Location = new System.Drawing.Point(14, 264);
+			this.cbxNtpDebugFlag.Name = "cbxNtpDebugFlag";
+			this.cbxNtpDebugFlag.Size = new System.Drawing.Size(256, 19);
+			this.cbxNtpDebugFlag.TabIndex = 50;
+			this.cbxNtpDebugFlag.Text = "Prefer NTP over OCR Timestamps (Debug Only)";
+			// 
 			// ucAAV8bit
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.SystemColors.Control;
+			this.Controls.Add(this.cbxNtpDebugFlag);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.linkLabelAAV);
 			this.Controls.Add(this.groupControl3);
@@ -306,6 +316,7 @@
 		private System.Windows.Forms.LinkLabel linkLabelAAV;
 		private System.Windows.Forms.GroupBox groupBox1;
 		private System.Windows.Forms.CheckBox cbxAavSplitFieldsOSD;
+		private System.Windows.Forms.CheckBox cbxNtpDebugFlag;
 
 	}
 }

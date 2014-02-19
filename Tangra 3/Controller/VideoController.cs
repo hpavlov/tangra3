@@ -469,7 +469,36 @@ namespace Tangra.Controller
 		{
 			if (m_FramePlayer.IsAstroAnalogueVideo && m_FramePlayer.AstroAnalogueVideoHasNtpData && !m_FramePlayer.AstroAnalogueVideoHasOcrData)
 			{
-				m_FramePlayer.AstroAnalogueVideoNormaliseNtpDataIfNeeded();
+				var frm = new frmBuildingNtpTimebase();
+				try
+				{
+					frm.StartPosition = FormStartPosition.CenterParent;
+
+					m_FramePlayer.AstroAnalogueVideoNormaliseNtpDataIfNeeded((percDone) =>
+						{
+							if (percDone == 0)
+							{
+								frm.Show(m_MainForm);								
+							}
+
+							if (percDone == 100)
+							{
+								frm.Close();
+							}
+							else
+							{
+								frm.SetProgress(percDone);
+								frm.Update();
+								Application.DoEvents();								
+							}
+						});
+				}
+				finally
+				{
+					if (frm.Visible)
+						frm.Close();
+				}
+				
 			}
 		}
 

@@ -5,6 +5,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
@@ -361,7 +362,10 @@ namespace Tangra.Video
 					rv.Messages = string.Concat(rv.Messages, m_CurrentFrameInfo.GPSFixString, "\r\n");
 
 				if (m_UseNtpTimeAsCentralExposureTime)
+				{
 					rv.CentralExposureTime = ComputeCentralExposureTimeFromNtpTime(frameNo);
+					rv.ExposureInMilliseconds = (float)(1000 / m_FrameRate);
+				}
 
 				return rv;
 			}
@@ -415,7 +419,10 @@ namespace Tangra.Video
 					rv.Messages = string.Concat(rv.Messages, frameInfo.GPSFixString, "\r\n");
 
 				if (m_UseNtpTimeAsCentralExposureTime)
+				{
 					rv.CentralExposureTime = ComputeCentralExposureTimeFromNtpTime(frameIndex);
+					rv.ExposureInMilliseconds = (float)(1000 / m_FrameRate);
+				}
 
 				return rv;
 			}
@@ -465,7 +472,10 @@ namespace Tangra.Video
 			{
 			    if (string.IsNullOrEmpty(OcrEngine))
 			        return false;
-                
+
+				if (TangraConfig.Settings.AAV.NtpDebugFlag)
+					return false;
+
                 if (!m_OcrDataAvailable.HasValue)
                 {
                     m_OcrDataAvailable = false;
@@ -516,9 +526,9 @@ namespace Tangra.Video
 		private long m_CalibratedNtpTimeZeroPoint;
 		private LinearRegression m_CalibratedNtpTimeSource;
 
-		public void AstroAnalogueVideoNormaliseNtpDataIfNeeded()
+		public void AstroAnalogueVideoNormaliseNtpDataIfNeeded(Action<int> progressCallback)
 		{
-			if (NtpDataAvailable && !OcrDataAvailable && m_UseNtpTimeAsCentralExposureTime)
+			if (NtpDataAvailable && !OcrDataAvailable && !m_UseNtpTimeAsCentralExposureTime)
 			{
 				if (m_CountFrames > 1 /* No Timestamp for first frame */ + 1 /* No Timestamp for last frame*/ + 3 /* Minimum timestamped frames for a FIT */)
 				{
@@ -529,6 +539,10 @@ namespace Tangra.Video
 
 						long zeroPointTicks = -1;
 
+						int percentDone = 0;
+						int percentDoneCalled = 0;						
+						if (progressCallback != null) progressCallback(percentDone);
+
 						for (int i = m_FirstFrame; i < m_FirstFrame + m_CountFrames; i++)
 						{
 							FrameStateData stateChannel = GetFrameStatusChannel(i);
@@ -538,6 +552,13 @@ namespace Tangra.Video
 								if (zeroPointTicks == -1)
 									zeroPointTicks = centralTicks;
 								lr.AddDataPoint(i, new TimeSpan(centralTicks - zeroPointTicks).TotalMilliseconds);
+							}
+
+							percentDone = 100 * (i - m_FirstFrame) / m_CountFrames;
+							if (progressCallback != null && percentDone - percentDoneCalled> 5)
+							{
+								progressCallback(percentDone);
+								percentDoneCalled = percentDone;
 							}
 						}
 
@@ -551,6 +572,8 @@ namespace Tangra.Video
 
 							Trace.WriteLine(string.Format("NTP Timebase Established. 1-Sigma = {0} ms", lr.StdDev.ToString("0.00")));
 						}
+
+						progressCallback(100);
 					}
 					catch (Exception ex)
 					{
