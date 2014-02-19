@@ -57,6 +57,11 @@ namespace Tangra.Model.Numerical
             m_B = bx[1, 0];            
         }
 
+		public int NumberOfDataPoints
+		{
+			get { return m_YValues.Count; }
+		}
+
         public double A
         {
             get { return m_A; }

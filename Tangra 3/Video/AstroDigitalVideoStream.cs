@@ -10,6 +10,7 @@ using Tangra.Model.Config;
 using Tangra.Model.Context;
 using Tangra.Model.Helpers;
 using Tangra.Model.Image;
+using Tangra.Model.Numerical;
 using Tangra.Model.Video;
 using Tangra.PInvoke;
 using Tangra.Video.AstroDigitalVideo;
@@ -264,7 +265,7 @@ namespace Tangra.Video
                 }
 
                 var rv = new Pixelmap(m_Width, m_Height, m_BitPix, pixels, displayBitmap, displayBitmapBytes);
-				rv.FrameState = GetCurrentFrameState();
+				rv.FrameState = GetCurrentFrameState(index);
 				return rv;
 			}
 		}
@@ -296,7 +297,7 @@ namespace Tangra.Video
 			frameStatusChannel.SystemErrorString = AdvFrameInfo.GetStringFromBytes(systemError);
 			frameStatusChannel.GPSFixString = AdvFrameInfo.GetStringFromBytes(gpsFix);
 
-			return AdvFrameInfoToFrameStateData(frameStatusChannel);
+			return AdvFrameInfoToFrameStateData(frameStatusChannel, index);
 		}
 
 		public int RecommendedBufferSize
@@ -314,7 +315,7 @@ namespace Tangra.Video
 			get { return m_CameraModel; }
 		}
 
-		private FrameStateData GetCurrentFrameState()
+		private FrameStateData GetCurrentFrameState(int frameNo)
 		{
 			if (m_CurrentFrameInfo != null)
 			{
@@ -359,13 +360,16 @@ namespace Tangra.Video
 				if (m_CurrentFrameInfo.GPSFixString != null)
 					rv.Messages = string.Concat(rv.Messages, m_CurrentFrameInfo.GPSFixString, "\r\n");
 
+				if (m_UseNtpTimeAsCentralExposureTime)
+					rv.CentralExposureTime = ComputeCentralExposureTimeFromNtpTime(frameNo);
+
 				return rv;
 			}
 			else
 				return new FrameStateData();
 		}
 
-		private static FrameStateData AdvFrameInfoToFrameStateData(AdvFrameInfo frameInfo)
+		private FrameStateData AdvFrameInfoToFrameStateData(AdvFrameInfo frameInfo, int frameIndex)
 		{
 			if (frameInfo != null)
 			{
@@ -409,6 +413,9 @@ namespace Tangra.Video
 					rv.Messages = string.Concat(rv.Messages, frameInfo.UserCommandString, "\r\n");
 				if (frameInfo.GPSFixString != null)
 					rv.Messages = string.Concat(rv.Messages, frameInfo.GPSFixString, "\r\n");
+
+				if (m_UseNtpTimeAsCentralExposureTime)
+					rv.CentralExposureTime = ComputeCentralExposureTimeFromNtpTime(frameIndex);
 
 				return rv;
 			}
@@ -505,6 +512,58 @@ namespace Tangra.Video
 			}
 		}
 
+		private bool m_UseNtpTimeAsCentralExposureTime = false;
+		private long m_CalibratedNtpTimeZeroPoint;
+		private LinearRegression m_CalibratedNtpTimeSource;
+
+		public void AstroAnalogueVideoNormaliseNtpDataIfNeeded()
+		{
+			if (NtpDataAvailable && !OcrDataAvailable && m_UseNtpTimeAsCentralExposureTime)
+			{
+				if (m_CountFrames > 1 /* No Timestamp for first frame */ + 1 /* No Timestamp for last frame*/ + 3 /* Minimum timestamped frames for a FIT */)
+				{
+					try
+					{
+						double frameDurationMilliseconds = 1000 / m_FrameRate;
+						var lr = new LinearRegression();
+
+						long zeroPointTicks = -1;
+
+						for (int i = m_FirstFrame; i < m_FirstFrame + m_CountFrames; i++)
+						{
+							FrameStateData stateChannel = GetFrameStatusChannel(i);
+							if (stateChannel.HasValidNtpTimeStamp)
+							{
+								long centralTicks = stateChannel.EndFrameNtpTime.AddMilliseconds(-0.5 * frameDurationMilliseconds).Ticks;
+								if (zeroPointTicks == -1)
+									zeroPointTicks = centralTicks;
+								lr.AddDataPoint(i, new TimeSpan(centralTicks - zeroPointTicks).TotalMilliseconds);
+							}
+						}
+
+						if (lr.NumberOfDataPoints > 3)
+						{
+							lr.Solve();
+
+							m_CalibratedNtpTimeZeroPoint = zeroPointTicks;
+							m_CalibratedNtpTimeSource = lr;
+							m_UseNtpTimeAsCentralExposureTime = true;
+
+							Trace.WriteLine(string.Format("NTP Timebase Established. 1-Sigma = {0} ms", lr.StdDev.ToString("0.00")));
+						}
+					}
+					catch (Exception ex)
+					{
+						Trace.WriteLine(ex.GetFullStackTrace());
+					}
+				}
+			}			
+		}
+
+		private DateTime ComputeCentralExposureTimeFromNtpTime(int frameNo)
+		{
+			return new DateTime(m_CalibratedNtpTimeZeroPoint).AddMilliseconds(m_CalibratedNtpTimeSource.ComputeY(frameNo));
+		}
 
 		private GeoLocationInfo geoLocation;
 

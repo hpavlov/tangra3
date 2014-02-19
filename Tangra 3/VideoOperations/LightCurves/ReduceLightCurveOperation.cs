@@ -300,6 +300,8 @@ namespace Tangra.VideoOperations.LightCurves
 
                         if (canSwitchFromRefiningToMeasuringNow)
                         {
+							m_VideoController.AstroAnalogueVideoNormaliseNtpDataIfNeeded();
+
                             // Begin measurements
                             m_Measuring = true;
                             m_Refining = false;
@@ -1595,6 +1597,7 @@ namespace Tangra.VideoOperations.LightCurves
                     int frameDuration = (int)Math.Round(frameState.ExposureInMilliseconds);
 
 					//TODO: If Instrumental Delay has been selected then apply if for this frameDuration and camera model
+
                     LCFile.SaveOnTheFlyFrameTiming(new LCFrameTiming(frameState.CentralExposureTime, frameDuration));                    
                 }
                 else

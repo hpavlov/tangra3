@@ -465,6 +465,14 @@ namespace Tangra.Controller
 			get { return m_FramePlayer.AstroAnalogueVideoHasOcrData || m_FramePlayer.AstroAnalogueVideoHasNtpData; }
         }
 
+		public void AstroAnalogueVideoNormaliseNtpDataIfNeeded()
+		{
+			if (m_FramePlayer.IsAstroAnalogueVideo && m_FramePlayer.AstroAnalogueVideoHasNtpData && !m_FramePlayer.AstroAnalogueVideoHasOcrData)
+			{
+				m_FramePlayer.AstroAnalogueVideoNormaliseNtpDataIfNeeded();
+			}
+		}
+
         public int AstroAnalogueVideoIntegratedAAVFrames
         {
             get { return m_FramePlayer.AstroAnalogueVideoIntegratedAAVFrames; }
