@@ -300,6 +300,7 @@ namespace Tangra.Video.AstroDigitalVideo
 
                 if (prevFramePixels == null)
                     prevFramePixels = new ushort[ImageSection.Width, ImageSection.Height];
+
                 for (int x = 0; x < ImageSection.Width; x++)
                     for (int y = 0; y < ImageSection.Height; y++)
                     {

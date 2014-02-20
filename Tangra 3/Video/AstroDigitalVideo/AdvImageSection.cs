@@ -87,7 +87,12 @@ namespace Tangra.Video.AstroDigitalVideo
 			startIndex+=2;
 			size-=2;
 
-			AdvImageData rv = (AdvImageData)ImageLayouts[layoutId].GetDataFromDataBytes(bytes, prevImageData, (AdvImageLayout.GetByteMode)byteMode, size, startIndex);
+			AdvImageLayout imageLayout = ImageLayouts[layoutId];
+
+			AdvImageData rv = imageLayout.IsNoImageLayout
+					? new AdvImageData() { Bpp = 8, ImageData = new ushort[imageLayout.Width, imageLayout.Height], LayoutId = layoutId, ByteMode = AdvImageLayout.GetByteMode.Normal }
+				    : (AdvImageData) imageLayout.GetDataFromDataBytes(bytes, prevImageData, (AdvImageLayout.GetByteMode) byteMode, size, startIndex);
+
 			rv.LayoutId = layoutId;
 			rv.ByteMode = (AdvImageLayout.GetByteMode)byteMode;
 			rv.DataBlocksBytesCount = size;

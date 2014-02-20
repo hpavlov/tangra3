@@ -19,6 +19,7 @@ namespace Tangra.Video.AstroDigitalVideo
 		private int m_KeyFrame;
 		private bool m_IsRawDataLayout;
 		private bool m_IsDiffCorrLayout;
+		private bool m_IsNoImageLayout;
 		private DiffCorrFrameMode m_DiffCorrFrame;
 		private string m_Compression;
 		private bool m_UsesCompression;
@@ -36,6 +37,11 @@ namespace Tangra.Video.AstroDigitalVideo
 		public bool IsDiffCorrLayout
 		{
 			get { return m_IsDiffCorrLayout; }
+		}
+
+		public bool IsNoImageLayout
+		{
+			get { return m_IsNoImageLayout; }
 		}
 
 		public AdvImageLayout(AdvImageSection imageSection, byte layoutId, uint width, uint height, BinaryReader reader)
@@ -72,16 +78,24 @@ namespace Tangra.Video.AstroDigitalVideo
 
 			string dataLayout = ImageSerializationProperties[AdvKeywords.KEY_DATA_LAYOUT];
 
-            Trace.Assert(dataLayout == DataLayouts.FULL_IMAGE_DIFFERENTIAL_CODING || dataLayout == DataLayouts.FULL_IMAGE_RAW || dataLayout == DataLayouts.FULL_IMAGE_DIFFERENTIAL_CODING_NOSIGNS);
+			Trace.Assert(dataLayout == DataLayouts.FULL_IMAGE_DIFFERENTIAL_CODING || dataLayout == DataLayouts.FULL_IMAGE_RAW || dataLayout == DataLayouts.FULL_IMAGE_DIFFERENTIAL_CODING_NOSIGNS || dataLayout == DataLayouts.STATUS_CHANNEL_ONLY);
 			if (dataLayout == DataLayouts.FULL_IMAGE_RAW)
 			{
 				m_IsRawDataLayout = true;
 				m_IsDiffCorrLayout = false;
+				m_IsNoImageLayout = false;
 			}
             if (dataLayout == DataLayouts.FULL_IMAGE_DIFFERENTIAL_CODING || dataLayout == DataLayouts.FULL_IMAGE_DIFFERENTIAL_CODING_NOSIGNS)
 			{
 				m_IsRawDataLayout = false;
 				m_IsDiffCorrLayout = true;
+				m_IsNoImageLayout = false;
+			}
+			if (dataLayout == DataLayouts.STATUS_CHANNEL_ONLY)
+			{
+				m_IsRawDataLayout = false;
+				m_IsDiffCorrLayout = false;
+				m_IsNoImageLayout = true;				
 			}
 
 
