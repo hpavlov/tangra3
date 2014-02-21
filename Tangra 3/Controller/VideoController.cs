@@ -460,6 +460,33 @@ namespace Tangra.Controller
 			}
 		}
 
+		public bool IsAstroAnalogueVideoWithNtpTimestampsInNtpDebugMode
+		{
+			get
+			{
+				// We make it possible to OCR the timestamps in NTP debug mode, so NTP timestamps can be compared to the IOTA-VTI OSD timestamps
+				// This is for testing purposes only and is not intended for production use!
+				return
+					m_FramePlayer.IsAstroAnalogueVideo &&
+					m_FramePlayer.AstroAnalogueVideoHasNtpData &&
+					!m_FramePlayer.AstroAnalogueVideoHasOcrData &&
+					TangraConfig.Settings.AAV.NtpDebugFlag &&
+					m_FramePlayer.AstroAnalogueVideoIntegratedAAVFrames == 1;
+			}
+		}
+
+		public void GetAdditionalAAVTimes(int frameNo, ref DateTime? frameMidTimeNTPRaw, ref DateTime? frameMidTimeNTPTangra, ref DateTime? frameMidTimeWindowsRaw)
+		{
+			FrameStateData stateData = m_FramePlayer.GetFrameStatusChannel(frameNo);
+
+			if (stateData.AdditionalProperties != null)
+			{
+				frameMidTimeNTPRaw = (DateTime)stateData.AdditionalProperties["MidTimeNTPRaw"];
+				frameMidTimeNTPTangra = (DateTime)stateData.AdditionalProperties["MidTimeNTPFitted"];
+				frameMidTimeWindowsRaw = (DateTime)stateData.AdditionalProperties["MidTimeWindowsRaw"];
+			}
+		}
+
         public bool AstroAnalogueVideoHasOcrOrNtpData
         {
 			get { return m_FramePlayer.AstroAnalogueVideoHasOcrData || m_FramePlayer.AstroAnalogueVideoHasNtpData; }

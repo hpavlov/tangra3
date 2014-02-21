@@ -535,6 +535,10 @@ namespace Tangra.VideoOperations.LightCurves
 		public int FrameDurationInMilliseconds;
 		public byte[,] OCRedPixels;
 
+		public DateTime? FrameMidTimeNTPRaw;
+		public DateTime? FrameMidTimeWindowsRaw;
+		public DateTime? FrameMidTimeNTPTangra;
+
 		// TODO: Add ORC area dimentions to header
 		
 		public LCFrameTiming(DateTime frameMidTime, int frameDurationInMilliseconds)
@@ -543,9 +547,12 @@ namespace Tangra.VideoOperations.LightCurves
 			FrameDurationInMilliseconds = frameDurationInMilliseconds;
 			// NOTE: Not saving OSD pixels at this stage
 			OCRedPixels = new byte[0,0];
+			FrameMidTimeNTPRaw = null;
+			FrameMidTimeWindowsRaw = null;
+			FrameMidTimeNTPTangra = null;
 		}
 
-		private static int SERIALIZATION_VERSION = 1;
+		private static int SERIALIZATION_VERSION = 2;
 
 		internal LCFrameTiming(BinaryReader reader)
 		{
@@ -563,6 +570,21 @@ namespace Tangra.VideoOperations.LightCurves
 				for (int x = 0; x < width; x++)
 				{
 					OCRedPixels[x, y] = reader.ReadByte();
+				}
+			}
+
+			FrameMidTimeNTPRaw = null;
+			FrameMidTimeWindowsRaw = null;
+			FrameMidTimeNTPTangra = null;
+
+			if (version > 1)
+			{
+				bool hasExtraTimes = reader.ReadBoolean();
+				if (hasExtraTimes)
+				{
+					FrameMidTimeNTPRaw = new DateTime(reader.ReadInt64());
+					FrameMidTimeWindowsRaw = new DateTime(reader.ReadInt64());
+					FrameMidTimeNTPTangra = new DateTime(reader.ReadInt64());
 				}
 			}
 		}
@@ -586,6 +608,16 @@ namespace Tangra.VideoOperations.LightCurves
 				{
 					writer.Write(OCRedPixels[x, y]);
 				}
+			}
+
+			// Version 2 values
+			bool hasExtraTimes = FrameMidTimeNTPRaw.HasValue && FrameMidTimeWindowsRaw.HasValue && FrameMidTimeNTPTangra.HasValue;
+			writer.Write(hasExtraTimes);
+			if (hasExtraTimes)
+			{
+				writer.Write(FrameMidTimeNTPRaw.Value.Ticks);
+				writer.Write(FrameMidTimeWindowsRaw.Value.Ticks);
+				writer.Write(FrameMidTimeNTPTangra.Value.Ticks);
 			}
 		}
 	}

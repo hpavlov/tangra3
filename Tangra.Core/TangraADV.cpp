@@ -201,7 +201,9 @@ HRESULT ADVGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSl
 	frameInfo->StartTimeStampLo = (firstFrameInfo.StartTimeStampLo + lastFrameInfo.StartTimeStampLo) / 2;
 	frameInfo->EndNtpTimeStampHi = (firstFrameInfo.EndNtpTimeStampHi + lastFrameInfo.EndNtpTimeStampHi) / 2;
 	frameInfo->EndNtpTimeStampLo = (firstFrameInfo.EndNtpTimeStampLo + lastFrameInfo.EndNtpTimeStampLo) / 2;
-	 
+	frameInfo->EndSecondaryTimeStampHi = (firstFrameInfo.EndSecondaryTimeStampHi + lastFrameInfo.EndSecondaryTimeStampHi) / 2;
+	frameInfo->EndSecondaryTimeStampLo = (firstFrameInfo.EndSecondaryTimeStampLo + lastFrameInfo.EndSecondaryTimeStampLo) / 2;
+	
 	return GetBitmapPixels(g_TangraAdvFile->ImageSection->Width, g_TangraAdvFile->ImageSection->Height, pixels, bitmapBytes, bitmapDisplayBytes, false, g_TangraAdvFile->ImageSection->DataBpp);
 }
 

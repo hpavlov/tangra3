@@ -44,7 +44,7 @@ void AdvStatusSection::GetDataFromDataBytes(unsigned char* data, int sectionData
 		map<string, AdvTagType>::iterator currDef = m_TagDefinition.find(tagName);
 		AdvTagType type = (AdvTagType)(currDef->second);
 		
-		if (strcmp("SystemTime", tagName) == 0 || strcmp("NTPEndTimestamp", tagName) == 0)
+		if (strcmp("SystemTime", tagName) == 0 || strcmp("NTPEndTimestamp", tagName) == 0|| strcmp("EndTimestampSecondary", tagName) == 0)
 		{
 			unsigned char  b1 = *(statusData + 1);
 			unsigned char  b2 = *(statusData + 2);
@@ -63,10 +63,15 @@ void AdvStatusSection::GetDataFromDataBytes(unsigned char* data, int sectionData
 				frameInfo->SystemTimeLo = valLo;
 				frameInfo->SystemTimeHi = valHi;
 			}
-			else
+			else if (strcmp("NTPEndTimestamp", tagName) == 0)
 			{
 				frameInfo->EndNtpTimeStampLo = valLo;
 				frameInfo->EndNtpTimeStampHi = valHi;
+			}
+			else
+			{
+				frameInfo->EndSecondaryTimeStampHi = valLo;
+				frameInfo->EndSecondaryTimeStampLo = valHi;
 			}
 			
 			statusData+=9;

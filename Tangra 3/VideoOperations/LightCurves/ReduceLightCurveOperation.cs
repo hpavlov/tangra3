@@ -254,7 +254,7 @@ namespace Tangra.VideoOperations.LightCurves
                     m_ProcessedFrames++;
                     if (!m_Tracker.IsTrackedSuccessfully) m_UnsuccessfulFrames++;
 
-                    SaveEmbeddedOrORCedTimeStamp();
+                    SaveEmbeddedOrORCedTimeStamp(frameNo);
 
                     MeasureObjects();
 
@@ -1155,7 +1155,7 @@ namespace Tangra.VideoOperations.LightCurves
 		{
 			m_TimestampOCR = null;
 
-			if (m_VideoController.IsPlainAviVideo &&
+			if ((m_VideoController.IsPlainAviVideo || m_VideoController.IsAstroAnalogueVideoWithNtpTimestampsInNtpDebugMode) &&
 				(TangraConfig.Settings.Generic.OsdOcrEnabled || TangraConfig.Settings.Generic.OcrAskEveryTime))
 			{
 				bool forceSaveErrorReport = false;
@@ -1583,7 +1583,7 @@ namespace Tangra.VideoOperations.LightCurves
         }
 
         private long prevFrameId;
-        public void SaveEmbeddedOrORCedTimeStamp()
+        public void SaveEmbeddedOrORCedTimeStamp(int frameNo)
         {
 			if (m_VideoController.HasAstroImageState)
 			{
@@ -1608,7 +1608,12 @@ namespace Tangra.VideoOperations.LightCurves
 			else if (m_TimestampOCR != null)
 			{
 				int frameDuration = (int)Math.Round(1000.0/m_VideoController.VideoFrameRate /*MillisecondsPerFrame*/);
-				LCFile.SaveOnTheFlyFrameTiming(new LCFrameTiming(m_OCRedTimeStamp, frameDuration));
+				var frameTime = new LCFrameTiming(m_OCRedTimeStamp, frameDuration);
+
+				if (m_VideoController.IsAstroAnalogueVideoWithNtpTimestampsInNtpDebugMode)
+					m_VideoController.GetAdditionalAAVTimes(frameNo, ref frameTime.FrameMidTimeNTPRaw, ref frameTime.FrameMidTimeNTPTangra, ref frameTime.FrameMidTimeWindowsRaw);
+
+				LCFile.SaveOnTheFlyFrameTiming(frameTime);
 			}
         }
 

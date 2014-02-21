@@ -37,6 +37,9 @@ struct AdvFrameInfo
 	long IntegratedFrames;
 	long EndNtpTimeStampLo;
 	long EndNtpTimeStampHi;
+	long EndSecondaryTimeStampHi;
+	long EndSecondaryTimeStampLo;
+
 };
 
 

@@ -42,6 +42,9 @@ namespace Tangra.PInvoke
 			IntegratedFrames = copyFrom.IntegratedFrames;
 			EndFrameNtpTimeStampMillisecondsLo = copyFrom.EndFrameNtpTimeStampMillisecondsLo;
 			EndFrameNtpTimeStampMillisecondsHi = copyFrom.EndFrameNtpTimeStampMillisecondsHi;
+			EndFrameSecondaryTimeStampMillisecondsLo = copyFrom.EndFrameSecondaryTimeStampMillisecondsLo;
+			EndFrameSecondaryTimeStampMillisecondsHi = copyFrom.EndFrameSecondaryTimeStampMillisecondsHi;
+			
 		}
 
 		public string GPSFixString;
@@ -80,6 +83,8 @@ namespace Tangra.PInvoke
 			IntegratedFrames = 0;
 			EndFrameNtpTimeStampMillisecondsLo = 0;
 			EndFrameNtpTimeStampMillisecondsHi = 0;
+			EndFrameSecondaryTimeStampMillisecondsLo = 0;
+			EndFrameSecondaryTimeStampMillisecondsHi = 0;
 #else
 			MidFrameTimeStampMillisecondsLo = 0;
 			MidFrameTimeStampMillisecondsHi = 0;
@@ -95,6 +100,8 @@ namespace Tangra.PInvoke
 			GPSFixStatus = 0;
 			EndFrameNtpTimeStampMillisecondsLo = 0;
 			EndFrameNtpTimeStampMillisecondsHi = 0;
+			EndFrameSecondaryTimeStampMillisecondsLo = 0;
+			EndFrameSecondaryTimeStampMillisecondsHi = 0;
 #endif
 		}
 
@@ -138,6 +145,10 @@ namespace Tangra.PInvoke
 		public uint EndFrameNtpTimeStampMillisecondsLo;
 		[FieldOffset(64)]
 		public uint EndFrameNtpTimeStampMillisecondsHi;
+		[FieldOffset(68)]
+		public uint EndFrameSecondaryTimeStampMillisecondsLo;
+		[FieldOffset(72)]
+		public uint EndFrameSecondaryTimeStampMillisecondsHi;
 
 		public DateTime MiddleExposureTimeStamp
 		{
@@ -181,6 +192,22 @@ namespace Tangra.PInvoke
 			get
 			{
 				long millisecondsElapsed = (((long)EndFrameNtpTimeStampMillisecondsHi) << 32) + (long)EndFrameNtpTimeStampMillisecondsLo;
+				try
+				{
+					return REFERENCE_DATETIME.AddMilliseconds(millisecondsElapsed);
+				}
+				catch (ArgumentOutOfRangeException)
+				{
+					return REFERENCE_DATETIME;
+				}
+			}
+		}
+
+		public DateTime EndExposureSecondaryTimeStamp
+		{
+			get
+			{
+				long millisecondsElapsed = (((long)EndFrameSecondaryTimeStampMillisecondsHi) << 32) + (long)EndFrameSecondaryTimeStampMillisecondsLo;
 				try
 				{
 					return REFERENCE_DATETIME.AddMilliseconds(millisecondsElapsed);

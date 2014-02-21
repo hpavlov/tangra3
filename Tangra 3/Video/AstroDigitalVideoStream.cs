@@ -316,6 +316,16 @@ namespace Tangra.Video
 			get { return m_CameraModel; }
 		}
 
+		private void AddExtraNtpDebugTimes(FrameStateData stateData, AdvFrameInfo frameInfo)
+		{
+			if (stateData.AdditionalProperties == null)
+				stateData.AdditionalProperties = new SafeDictionary<string, object>();
+
+			stateData.AdditionalProperties.Add("MidTimeNTPRaw", stateData.EndFrameNtpTime.AddMilliseconds(-0.5 * stateData.ExposureInMilliseconds));
+			stateData.AdditionalProperties.Add("MidTimeNTPFitted", stateData.CentralExposureTime);
+			stateData.AdditionalProperties.Add("MidTimeWindowsRaw", frameInfo.EndExposureSecondaryTimeStamp.AddMilliseconds(-0.5 * stateData.ExposureInMilliseconds));
+		}
+
 		private FrameStateData GetCurrentFrameState(int frameNo)
 		{
 			if (m_CurrentFrameInfo != null)
@@ -366,6 +376,9 @@ namespace Tangra.Video
 					rv.CentralExposureTime = ComputeCentralExposureTimeFromNtpTime(frameNo);
 					rv.ExposureInMilliseconds = (float)(1000 / m_FrameRate);
 				}
+
+				if (NtpDataAvailable && !OcrDataAvailable && m_UseNtpTimeAsCentralExposureTime)
+					AddExtraNtpDebugTimes(rv, m_CurrentFrameInfo);
 
 				return rv;
 			}
@@ -423,6 +436,9 @@ namespace Tangra.Video
 					rv.CentralExposureTime = ComputeCentralExposureTimeFromNtpTime(frameIndex);
 					rv.ExposureInMilliseconds = (float)(1000 / m_FrameRate);
 				}
+
+				if (NtpDataAvailable && !OcrDataAvailable && m_UseNtpTimeAsCentralExposureTime)
+					AddExtraNtpDebugTimes(rv, frameInfo);
 
 				return rv;
 			}

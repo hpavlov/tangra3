@@ -22,6 +22,8 @@ namespace Tangra.Model.Image
 		public string GPSFixStatus;
 		public int? NumberIntegratedFrames;
 
+		public Dictionary<string, object> AdditionalProperties;
+
 		public bool IsEmpty()
 		{
 			return
