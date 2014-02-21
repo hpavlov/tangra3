@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Media;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -15,6 +16,7 @@ using Tangra.Controller;
 using Tangra.Helpers;
 using Tangra.Model.Config;
 using Tangra.Model.Helpers;
+using Tangra.Model.Numerical;
 using Tangra.Model.Video;
 using Tangra.Resources;
 using Tangra.SDK;
@@ -424,6 +426,12 @@ namespace Tangra.VideoOperations.LightCurves
                 );
 
 			m_AddinsController.SetLightCurveDataProvider(this);
+
+			// If the current .LC file has NTP timestamps then make the menu for exporting them visible
+			// NOTE: This is for debugging purposes only!
+	        miExportNTPDebugData.Visible =
+		        m_LCFile.FrameTiming.Count > 0 &&
+		        m_LCFile.FrameTiming[0].FrameMidTimeNTPRaw.HasValue;
         }
 
 		private string ExplainTrackingType(TrackingType type)
@@ -2241,6 +2249,70 @@ namespace Tangra.VideoOperations.LightCurves
 		public void ReloadAddins()
 		{
 			m_AddinsController.BuildLightCurveMenuAddins(miAddins);
+		}
+
+		private void miExportNTPDebugData_Click(object sender, EventArgs e)
+		{
+			if (m_LCFile != null && m_LCFile.FrameTiming != null && m_LCFile.FrameTiming.Count > 0)
+			{
+				var output = new StringBuilder();
+
+				var ntpList = new List<double>();
+				var ntpFittedList = new List<double>();
+				var windowsList = new List<double>();
+
+				output.AppendFormat("\"OCR Time\",\"NTP Raw Time\",\"NTP Fitted Time\",\"Windows Raw Time\",\"OCR-NTPRaw\",\"OCR-NTPFitted\",\"OCR-WindowsRaw\"\r\n");
+				foreach (LCFrameTiming entry in m_LCFile.FrameTiming)
+				{
+					double diffNTP = new TimeSpan(entry.FrameMidTime.Ticks - entry.FrameMidTimeNTPRaw.Value.Ticks).TotalMilliseconds;
+					double diffNTPTangra = new TimeSpan(entry.FrameMidTime.Ticks - entry.FrameMidTimeNTPTangra.Value.Ticks).TotalMilliseconds;
+					double diffWindows = new TimeSpan(entry.FrameMidTime.Ticks - entry.FrameMidTimeWindowsRaw.Value.Ticks).TotalMilliseconds;
+
+					output.AppendFormat("\"{0}\",\"{1}\",\"{2}\",\"{3}\",\"{4}\",\"{5}\",\"{6}\"\r\n",
+					    entry.FrameMidTime.ToString("HH:mm:ss.fff"),
+						entry.FrameMidTimeNTPRaw.Value.ToString("HH:mm:ss.fff"),
+						entry.FrameMidTimeNTPTangra.Value.ToString("HH:mm:ss.fff"),
+						entry.FrameMidTimeWindowsRaw.Value.ToString("HH:mm:ss.fff"),
+						diffNTP.ToString("0.000"),
+						diffNTPTangra.ToString("0.000"),
+						diffWindows.ToString("0.000"));
+
+					ntpList.Add(Math.Abs(diffNTP));
+					ntpFittedList.Add(Math.Abs(diffNTPTangra));
+					windowsList.Add(Math.Abs(diffWindows));
+				}
+
+				double averageNtpDiff = ntpList.Average();
+				double averageNtpFittedDiff = ntpFittedList.Average();
+				double averageWindowsDiff = windowsList.Average();
+
+				double ntpOneSigma = Math.Sqrt(ntpList.Sum(x => (averageNtpDiff - x) * (averageNtpDiff - x)) / (ntpList.Count - 1));
+				double ntpFittedOneSigma = Math.Sqrt(ntpFittedList.Sum(x => (averageNtpFittedDiff - x) * (averageNtpFittedDiff - x)) / (ntpFittedList.Count - 1));
+				double windowsOneSigma = Math.Sqrt(windowsList.Sum(x => (averageWindowsDiff - x) * (averageWindowsDiff - x)) / (windowsList.Count - 1));
+
+				double maxNtpDiff = ntpList.Max((x) => Math.Abs(x));
+				double maxNtpFittedDiff = ntpFittedList.Max((x) => Math.Abs(x));
+				double maxWindowsDiff = windowsList.Max((x) => Math.Abs(x));
+
+				if (MessageBox.Show(
+					this, 
+					"Tangra",
+					string.Format(@" Results for differnces between OCR-ed time and NTP time:\r\n\r\n 
+									    OCR-NTPRaw: Average = {0:0.0} ms, 1-Sigma = {1:0.00} ms, Max = {2:0.0} ms\r\n 
+									 OCR-NTPFitted: Average = {3:0.0} ms, 1-Sigma = {4:0.00} ms, Max = {5:0.0} ms\r\n 
+									OCR-WindowsRaw: Average = {6:0.0} ms, 1-Sigma = {7:0.00} ms, Max = {8:0.0} ms\r\n\r\n\r\n
+								  Would you like to save all the used data in a CSV format?", 
+
+						averageNtpDiff, ntpOneSigma, maxNtpDiff,
+						averageNtpFittedDiff, ntpFittedOneSigma, maxNtpFittedDiff,
+						averageWindowsDiff, windowsOneSigma, maxWindowsDiff),
+					MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
+				{
+					string tempFile = Path.ChangeExtension(Path.GetTempFileName(), ".csv");
+					File.WriteAllText(tempFile, output.ToString());
+					Process.Start(tempFile);
+				}
+			}
 		}
 	}
 }

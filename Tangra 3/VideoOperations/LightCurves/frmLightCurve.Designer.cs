@@ -18,44 +18,6 @@
 			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmLightCurve));
 			this.pnlLegend = new System.Windows.Forms.Panel();
-			this.pnlSmallGraph = new Tangra.Controls.SmoothPanel();
-			this.pnlMeasurementDetails = new System.Windows.Forms.Panel();
-			this.label2 = new System.Windows.Forms.Label();
-			this.pnlGeoLocation = new System.Windows.Forms.Panel();
-			this.tbxGeoLocation = new System.Windows.Forms.TextBox();
-			this.label4 = new System.Windows.Forms.Label();
-			this.label5 = new System.Windows.Forms.Label();
-			this.lblInstDelayWarning = new System.Windows.Forms.Label();
-			this.lblSN4 = new System.Windows.Forms.Label();
-			this.lblSN3 = new System.Windows.Forms.Label();
-			this.lblSN2 = new System.Windows.Forms.Label();
-			this.lblSN1 = new System.Windows.Forms.Label();
-			this.lblSNLBL4 = new System.Windows.Forms.Label();
-			this.lblSNLBL3 = new System.Windows.Forms.Label();
-			this.lblSNLBL2 = new System.Windows.Forms.Label();
-			this.lblSNLBL1 = new System.Windows.Forms.Label();
-			this.lblFrameNo = new System.Windows.Forms.Label();
-			this.lblMeasurement1 = new System.Windows.Forms.Label();
-			this.picTarget4PSF = new System.Windows.Forms.PictureBox();
-			this.lblMeasurement2 = new System.Windows.Forms.Label();
-			this.label1 = new System.Windows.Forms.Label();
-			this.lblMeasurement3 = new System.Windows.Forms.Label();
-			this.pnlBinInfo = new System.Windows.Forms.Panel();
-			this.label3 = new System.Windows.Forms.Label();
-			this.lblBinNo = new System.Windows.Forms.Label();
-			this.lblFrameTime = new System.Windows.Forms.Label();
-			this.pb4 = new System.Windows.Forms.PictureBox();
-			this.lblMeasurement4 = new System.Windows.Forms.Label();
-			this.picTarget4Pixels = new System.Windows.Forms.PictureBox();
-			this.pb3 = new System.Windows.Forms.PictureBox();
-			this.picTarget3PSF = new System.Windows.Forms.PictureBox();
-			this.picTarget1Pixels = new System.Windows.Forms.PictureBox();
-			this.pb2 = new System.Windows.Forms.PictureBox();
-			this.picTarget3Pixels = new System.Windows.Forms.PictureBox();
-			this.picTarget1PSF = new System.Windows.Forms.PictureBox();
-			this.picTarget2Pixels = new System.Windows.Forms.PictureBox();
-			this.picTarget2PSF = new System.Windows.Forms.PictureBox();
-			this.pb1 = new System.Windows.Forms.PictureBox();
 			this.panel2 = new System.Windows.Forms.Panel();
 			this.sbZoomStartFrame = new System.Windows.Forms.HScrollBar();
 			this.imageList1 = new System.Windows.Forms.ImageList(this.components);
@@ -123,15 +85,60 @@
 			this.miIncludeObj1 = new System.Windows.Forms.ToolStripMenuItem();
 			this.pnlMain = new System.Windows.Forms.Panel();
 			this.panel1 = new System.Windows.Forms.Panel();
-			this.pnlChart = new Tangra.Controls.SmoothPanel();
-			this.btnZoomIn = new System.Windows.Forms.Button();
-			this.btnZoomOut = new System.Windows.Forms.Button();
 			this.hintTimer = new System.Windows.Forms.Timer(this.components);
 			this.saveImageDialog = new System.Windows.Forms.SaveFileDialog();
 			this.saveCSVDialog = new System.Windows.Forms.SaveFileDialog();
 			this.firstFrameTimer = new System.Windows.Forms.Timer(this.components);
 			this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+			this.pnlChart = new Tangra.Controls.SmoothPanel();
+			this.btnZoomIn = new System.Windows.Forms.Button();
+			this.btnZoomOut = new System.Windows.Forms.Button();
+			this.pnlSmallGraph = new Tangra.Controls.SmoothPanel();
+			this.pnlMeasurementDetails = new System.Windows.Forms.Panel();
+			this.label2 = new System.Windows.Forms.Label();
+			this.pnlGeoLocation = new System.Windows.Forms.Panel();
+			this.tbxGeoLocation = new System.Windows.Forms.TextBox();
+			this.label4 = new System.Windows.Forms.Label();
+			this.label5 = new System.Windows.Forms.Label();
+			this.lblInstDelayWarning = new System.Windows.Forms.Label();
+			this.lblSN4 = new System.Windows.Forms.Label();
+			this.lblSN3 = new System.Windows.Forms.Label();
+			this.lblSN2 = new System.Windows.Forms.Label();
+			this.lblSN1 = new System.Windows.Forms.Label();
+			this.lblSNLBL4 = new System.Windows.Forms.Label();
+			this.lblSNLBL3 = new System.Windows.Forms.Label();
+			this.lblSNLBL2 = new System.Windows.Forms.Label();
+			this.lblSNLBL1 = new System.Windows.Forms.Label();
+			this.lblFrameNo = new System.Windows.Forms.Label();
+			this.lblMeasurement1 = new System.Windows.Forms.Label();
+			this.picTarget4PSF = new System.Windows.Forms.PictureBox();
+			this.lblMeasurement2 = new System.Windows.Forms.Label();
+			this.label1 = new System.Windows.Forms.Label();
+			this.lblMeasurement3 = new System.Windows.Forms.Label();
+			this.pnlBinInfo = new System.Windows.Forms.Panel();
+			this.label3 = new System.Windows.Forms.Label();
+			this.lblBinNo = new System.Windows.Forms.Label();
+			this.lblFrameTime = new System.Windows.Forms.Label();
+			this.pb4 = new System.Windows.Forms.PictureBox();
+			this.lblMeasurement4 = new System.Windows.Forms.Label();
+			this.picTarget4Pixels = new System.Windows.Forms.PictureBox();
+			this.pb3 = new System.Windows.Forms.PictureBox();
+			this.picTarget3PSF = new System.Windows.Forms.PictureBox();
+			this.picTarget1Pixels = new System.Windows.Forms.PictureBox();
+			this.pb2 = new System.Windows.Forms.PictureBox();
+			this.picTarget3Pixels = new System.Windows.Forms.PictureBox();
+			this.picTarget1PSF = new System.Windows.Forms.PictureBox();
+			this.picTarget2Pixels = new System.Windows.Forms.PictureBox();
+			this.picTarget2PSF = new System.Windows.Forms.PictureBox();
+			this.pb1 = new System.Windows.Forms.PictureBox();
+			this.miExportNTPDebugData = new System.Windows.Forms.ToolStripMenuItem();
 			this.pnlLegend.SuspendLayout();
+			this.panel2.SuspendLayout();
+			this.menuStrip1.SuspendLayout();
+			this.statusStrip1.SuspendLayout();
+			this.pnlMain.SuspendLayout();
+			this.panel1.SuspendLayout();
+			this.pnlChart.SuspendLayout();
 			this.pnlSmallGraph.SuspendLayout();
 			this.pnlMeasurementDetails.SuspendLayout();
 			this.pnlGeoLocation.SuspendLayout();
@@ -148,12 +155,6 @@
 			((System.ComponentModel.ISupportInitialize)(this.picTarget2Pixels)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.picTarget2PSF)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.pb1)).BeginInit();
-			this.panel2.SuspendLayout();
-			this.menuStrip1.SuspendLayout();
-			this.statusStrip1.SuspendLayout();
-			this.pnlMain.SuspendLayout();
-			this.panel1.SuspendLayout();
-			this.pnlChart.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// pnlLegend
@@ -165,429 +166,6 @@
 			this.pnlLegend.Name = "pnlLegend";
 			this.pnlLegend.Size = new System.Drawing.Size(704, 87);
 			this.pnlLegend.TabIndex = 1;
-			// 
-			// pnlSmallGraph
-			// 
-			this.pnlSmallGraph.Controls.Add(this.pnlMeasurementDetails);
-			this.pnlSmallGraph.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.pnlSmallGraph.Location = new System.Drawing.Point(0, 19);
-			this.pnlSmallGraph.Name = "pnlSmallGraph";
-			this.pnlSmallGraph.Size = new System.Drawing.Size(704, 68);
-			this.pnlSmallGraph.TabIndex = 4;
-			this.pnlSmallGraph.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pnlSmallGraph_MouseDown);
-			this.pnlSmallGraph.MouseLeave += new System.EventHandler(this.pnlSmallGraph_MouseLeave);
-			this.pnlSmallGraph.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pnlSmallGraph_MouseMove);
-			this.pnlSmallGraph.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pnlSmallGraph_MouseUp);
-			this.pnlSmallGraph.Resize += new System.EventHandler(this.pnlSmallGraph_Resize);
-			// 
-			// pnlMeasurementDetails
-			// 
-			this.pnlMeasurementDetails.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.pnlMeasurementDetails.Controls.Add(this.label2);
-			this.pnlMeasurementDetails.Controls.Add(this.pnlGeoLocation);
-			this.pnlMeasurementDetails.Controls.Add(this.lblInstDelayWarning);
-			this.pnlMeasurementDetails.Controls.Add(this.lblSN4);
-			this.pnlMeasurementDetails.Controls.Add(this.lblSN3);
-			this.pnlMeasurementDetails.Controls.Add(this.lblSN2);
-			this.pnlMeasurementDetails.Controls.Add(this.lblSN1);
-			this.pnlMeasurementDetails.Controls.Add(this.lblSNLBL4);
-			this.pnlMeasurementDetails.Controls.Add(this.lblSNLBL3);
-			this.pnlMeasurementDetails.Controls.Add(this.lblSNLBL2);
-			this.pnlMeasurementDetails.Controls.Add(this.lblSNLBL1);
-			this.pnlMeasurementDetails.Controls.Add(this.lblFrameNo);
-			this.pnlMeasurementDetails.Controls.Add(this.lblMeasurement1);
-			this.pnlMeasurementDetails.Controls.Add(this.picTarget4PSF);
-			this.pnlMeasurementDetails.Controls.Add(this.lblMeasurement2);
-			this.pnlMeasurementDetails.Controls.Add(this.label1);
-			this.pnlMeasurementDetails.Controls.Add(this.lblMeasurement3);
-			this.pnlMeasurementDetails.Controls.Add(this.pnlBinInfo);
-			this.pnlMeasurementDetails.Controls.Add(this.lblFrameTime);
-			this.pnlMeasurementDetails.Controls.Add(this.pb4);
-			this.pnlMeasurementDetails.Controls.Add(this.lblMeasurement4);
-			this.pnlMeasurementDetails.Controls.Add(this.picTarget4Pixels);
-			this.pnlMeasurementDetails.Controls.Add(this.pb3);
-			this.pnlMeasurementDetails.Controls.Add(this.picTarget3PSF);
-			this.pnlMeasurementDetails.Controls.Add(this.picTarget1Pixels);
-			this.pnlMeasurementDetails.Controls.Add(this.pb2);
-			this.pnlMeasurementDetails.Controls.Add(this.picTarget3Pixels);
-			this.pnlMeasurementDetails.Controls.Add(this.picTarget1PSF);
-			this.pnlMeasurementDetails.Controls.Add(this.picTarget2Pixels);
-			this.pnlMeasurementDetails.Controls.Add(this.picTarget2PSF);
-			this.pnlMeasurementDetails.Controls.Add(this.pb1);
-			this.pnlMeasurementDetails.Location = new System.Drawing.Point(3, 3);
-			this.pnlMeasurementDetails.Name = "pnlMeasurementDetails";
-			this.pnlMeasurementDetails.Size = new System.Drawing.Size(698, 64);
-			this.pnlMeasurementDetails.TabIndex = 30;
-			// 
-			// label2
-			// 
-			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(26, 27);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(33, 13);
-			this.label2.TabIndex = 17;
-			this.label2.Text = "Time:";
-			// 
-			// pnlGeoLocation
-			// 
-			this.pnlGeoLocation.Controls.Add(this.tbxGeoLocation);
-			this.pnlGeoLocation.Controls.Add(this.label4);
-			this.pnlGeoLocation.Controls.Add(this.label5);
-			this.pnlGeoLocation.Location = new System.Drawing.Point(8, 38);
-			this.pnlGeoLocation.Name = "pnlGeoLocation";
-			this.pnlGeoLocation.Size = new System.Drawing.Size(352, 21);
-			this.pnlGeoLocation.TabIndex = 38;
-			// 
-			// tbxGeoLocation
-			// 
-			this.tbxGeoLocation.BackColor = System.Drawing.SystemColors.Control;
-			this.tbxGeoLocation.BorderStyle = System.Windows.Forms.BorderStyle.None;
-			this.tbxGeoLocation.ForeColor = System.Drawing.SystemColors.ActiveCaption;
-			this.tbxGeoLocation.Location = new System.Drawing.Point(60, 5);
-			this.tbxGeoLocation.Name = "tbxGeoLocation";
-			this.tbxGeoLocation.Size = new System.Drawing.Size(290, 13);
-			this.tbxGeoLocation.TabIndex = 29;
-			// 
-			// label4
-			// 
-			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(1, 5);
-			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(51, 13);
-			this.label4.TabIndex = 27;
-			this.label4.Text = "Location:";
-			// 
-			// label5
-			// 
-			this.label5.AutoSize = true;
-			this.label5.Location = new System.Drawing.Point(48, 5);
-			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(0, 13);
-			this.label5.TabIndex = 28;
-			// 
-			// lblInstDelayWarning
-			// 
-			this.lblInstDelayWarning.AutoSize = true;
-			this.lblInstDelayWarning.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-			this.lblInstDelayWarning.ForeColor = System.Drawing.Color.Red;
-			this.lblInstDelayWarning.Location = new System.Drawing.Point(12, 26);
-			this.lblInstDelayWarning.Name = "lblInstDelayWarning";
-			this.lblInstDelayWarning.Size = new System.Drawing.Size(20, 25);
-			this.lblInstDelayWarning.TabIndex = 39;
-			this.lblInstDelayWarning.Text = "*";
-			this.toolTip1.SetToolTip(this.lblInstDelayWarning, "Instrumental delay has not been applied to the times");
-			this.lblInstDelayWarning.Visible = false;
-			// 
-			// lblSN4
-			// 
-			this.lblSN4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.lblSN4.AutoSize = true;
-			this.lblSN4.Location = new System.Drawing.Point(659, 50);
-			this.lblSN4.Name = "lblSN4";
-			this.lblSN4.Size = new System.Drawing.Size(34, 13);
-			this.lblSN4.TabIndex = 37;
-			this.lblSN4.Text = "12.56";
-			// 
-			// lblSN3
-			// 
-			this.lblSN3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.lblSN3.AutoSize = true;
-			this.lblSN3.Location = new System.Drawing.Point(575, 50);
-			this.lblSN3.Name = "lblSN3";
-			this.lblSN3.Size = new System.Drawing.Size(34, 13);
-			this.lblSN3.TabIndex = 36;
-			this.lblSN3.Text = "12.56";
-			// 
-			// lblSN2
-			// 
-			this.lblSN2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.lblSN2.AutoSize = true;
-			this.lblSN2.Location = new System.Drawing.Point(488, 50);
-			this.lblSN2.Name = "lblSN2";
-			this.lblSN2.Size = new System.Drawing.Size(34, 13);
-			this.lblSN2.TabIndex = 35;
-			this.lblSN2.Text = "12.56";
-			// 
-			// lblSN1
-			// 
-			this.lblSN1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.lblSN1.AutoSize = true;
-			this.lblSN1.Location = new System.Drawing.Point(401, 50);
-			this.lblSN1.Name = "lblSN1";
-			this.lblSN1.Size = new System.Drawing.Size(34, 13);
-			this.lblSN1.TabIndex = 34;
-			this.lblSN1.Text = "12.56";
-			// 
-			// lblSNLBL4
-			// 
-			this.lblSNLBL4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.lblSNLBL4.AutoSize = true;
-			this.lblSNLBL4.Location = new System.Drawing.Point(623, 50);
-			this.lblSNLBL4.Name = "lblSNLBL4";
-			this.lblSNLBL4.Size = new System.Drawing.Size(39, 13);
-			this.lblSNLBL4.TabIndex = 33;
-			this.lblSNLBL4.Text = "S/N = ";
-			// 
-			// lblSNLBL3
-			// 
-			this.lblSNLBL3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.lblSNLBL3.AutoSize = true;
-			this.lblSNLBL3.Location = new System.Drawing.Point(539, 50);
-			this.lblSNLBL3.Name = "lblSNLBL3";
-			this.lblSNLBL3.Size = new System.Drawing.Size(39, 13);
-			this.lblSNLBL3.TabIndex = 32;
-			this.lblSNLBL3.Text = "S/N = ";
-			// 
-			// lblSNLBL2
-			// 
-			this.lblSNLBL2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.lblSNLBL2.AutoSize = true;
-			this.lblSNLBL2.Location = new System.Drawing.Point(452, 50);
-			this.lblSNLBL2.Name = "lblSNLBL2";
-			this.lblSNLBL2.Size = new System.Drawing.Size(39, 13);
-			this.lblSNLBL2.TabIndex = 31;
-			this.lblSNLBL2.Text = "S/N = ";
-			// 
-			// lblSNLBL1
-			// 
-			this.lblSNLBL1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.lblSNLBL1.AutoSize = true;
-			this.lblSNLBL1.Location = new System.Drawing.Point(366, 50);
-			this.lblSNLBL1.Name = "lblSNLBL1";
-			this.lblSNLBL1.Size = new System.Drawing.Size(39, 13);
-			this.lblSNLBL1.TabIndex = 30;
-			this.lblSNLBL1.Text = "S/N = ";
-			// 
-			// lblFrameNo
-			// 
-			this.lblFrameNo.AutoSize = true;
-			this.lblFrameNo.Location = new System.Drawing.Point(65, 11);
-			this.lblFrameNo.Name = "lblFrameNo";
-			this.lblFrameNo.Size = new System.Drawing.Size(35, 13);
-			this.lblFrameNo.TabIndex = 1;
-			this.lblFrameNo.Text = "sdfsdf";
-			// 
-			// lblMeasurement1
-			// 
-			this.lblMeasurement1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.lblMeasurement1.AutoSize = true;
-			this.lblMeasurement1.Location = new System.Drawing.Point(385, -1);
-			this.lblMeasurement1.Name = "lblMeasurement1";
-			this.lblMeasurement1.Size = new System.Drawing.Size(0, 13);
-			this.lblMeasurement1.TabIndex = 3;
-			// 
-			// picTarget4PSF
-			// 
-			this.picTarget4PSF.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.picTarget4PSF.BackColor = System.Drawing.Color.White;
-			this.picTarget4PSF.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.picTarget4PSF.Location = new System.Drawing.Point(662, 15);
-			this.picTarget4PSF.Name = "picTarget4PSF";
-			this.picTarget4PSF.Size = new System.Drawing.Size(34, 34);
-			this.picTarget4PSF.TabIndex = 26;
-			this.picTarget4PSF.TabStop = false;
-			this.picTarget4PSF.Visible = false;
-			// 
-			// lblMeasurement2
-			// 
-			this.lblMeasurement2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.lblMeasurement2.AutoSize = true;
-			this.lblMeasurement2.Location = new System.Drawing.Point(470, -1);
-			this.lblMeasurement2.Name = "lblMeasurement2";
-			this.lblMeasurement2.Size = new System.Drawing.Size(0, 13);
-			this.lblMeasurement2.TabIndex = 11;
-			// 
-			// label1
-			// 
-			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(3, 11);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(56, 13);
-			this.label1.TabIndex = 0;
-			this.label1.Text = "Frame No:";
-			// 
-			// lblMeasurement3
-			// 
-			this.lblMeasurement3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.lblMeasurement3.AutoSize = true;
-			this.lblMeasurement3.Location = new System.Drawing.Point(557, -1);
-			this.lblMeasurement3.Name = "lblMeasurement3";
-			this.lblMeasurement3.Size = new System.Drawing.Size(0, 13);
-			this.lblMeasurement3.TabIndex = 13;
-			// 
-			// pnlBinInfo
-			// 
-			this.pnlBinInfo.Controls.Add(this.label3);
-			this.pnlBinInfo.Controls.Add(this.lblBinNo);
-			this.pnlBinInfo.Location = new System.Drawing.Point(141, 6);
-			this.pnlBinInfo.Name = "pnlBinInfo";
-			this.pnlBinInfo.Size = new System.Drawing.Size(219, 21);
-			this.pnlBinInfo.TabIndex = 29;
-			this.pnlBinInfo.Visible = false;
-			// 
-			// label3
-			// 
-			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(1, 5);
-			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(42, 13);
-			this.label3.TabIndex = 27;
-			this.label3.Text = "Bin No:";
-			// 
-			// lblBinNo
-			// 
-			this.lblBinNo.AutoSize = true;
-			this.lblBinNo.Location = new System.Drawing.Point(48, 5);
-			this.lblBinNo.Name = "lblBinNo";
-			this.lblBinNo.Size = new System.Drawing.Size(0, 13);
-			this.lblBinNo.TabIndex = 28;
-			// 
-			// lblFrameTime
-			// 
-			this.lblFrameTime.AutoSize = true;
-			this.lblFrameTime.Location = new System.Drawing.Point(65, 27);
-			this.lblFrameTime.Name = "lblFrameTime";
-			this.lblFrameTime.Size = new System.Drawing.Size(0, 13);
-			this.lblFrameTime.TabIndex = 18;
-			// 
-			// pb4
-			// 
-			this.pb4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.pb4.BackColor = System.Drawing.Color.Maroon;
-			this.pb4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.pb4.Location = new System.Drawing.Point(626, 0);
-			this.pb4.Name = "pb4";
-			this.pb4.Size = new System.Drawing.Size(10, 11);
-			this.pb4.TabIndex = 16;
-			this.pb4.TabStop = false;
-			// 
-			// lblMeasurement4
-			// 
-			this.lblMeasurement4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.lblMeasurement4.AutoSize = true;
-			this.lblMeasurement4.Location = new System.Drawing.Point(641, -1);
-			this.lblMeasurement4.Name = "lblMeasurement4";
-			this.lblMeasurement4.Size = new System.Drawing.Size(0, 13);
-			this.lblMeasurement4.TabIndex = 15;
-			// 
-			// picTarget4Pixels
-			// 
-			this.picTarget4Pixels.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.picTarget4Pixels.BackColor = System.Drawing.Color.White;
-			this.picTarget4Pixels.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.picTarget4Pixels.Location = new System.Drawing.Point(626, 15);
-			this.picTarget4Pixels.Name = "picTarget4Pixels";
-			this.picTarget4Pixels.Size = new System.Drawing.Size(34, 34);
-			this.picTarget4Pixels.TabIndex = 25;
-			this.picTarget4Pixels.TabStop = false;
-			this.picTarget4Pixels.Visible = false;
-			// 
-			// pb3
-			// 
-			this.pb3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.pb3.BackColor = System.Drawing.Color.Maroon;
-			this.pb3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.pb3.Location = new System.Drawing.Point(542, 0);
-			this.pb3.Name = "pb3";
-			this.pb3.Size = new System.Drawing.Size(10, 11);
-			this.pb3.TabIndex = 14;
-			this.pb3.TabStop = false;
-			// 
-			// picTarget3PSF
-			// 
-			this.picTarget3PSF.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.picTarget3PSF.BackColor = System.Drawing.Color.White;
-			this.picTarget3PSF.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.picTarget3PSF.Location = new System.Drawing.Point(578, 15);
-			this.picTarget3PSF.Name = "picTarget3PSF";
-			this.picTarget3PSF.Size = new System.Drawing.Size(34, 34);
-			this.picTarget3PSF.TabIndex = 24;
-			this.picTarget3PSF.TabStop = false;
-			this.picTarget3PSF.Visible = false;
-			// 
-			// picTarget1Pixels
-			// 
-			this.picTarget1Pixels.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.picTarget1Pixels.BackColor = System.Drawing.Color.White;
-			this.picTarget1Pixels.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.picTarget1Pixels.Location = new System.Drawing.Point(369, 15);
-			this.picTarget1Pixels.Name = "picTarget1Pixels";
-			this.picTarget1Pixels.Size = new System.Drawing.Size(34, 34);
-			this.picTarget1Pixels.TabIndex = 19;
-			this.picTarget1Pixels.TabStop = false;
-			this.picTarget1Pixels.Visible = false;
-			// 
-			// pb2
-			// 
-			this.pb2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.pb2.BackColor = System.Drawing.Color.Maroon;
-			this.pb2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.pb2.Location = new System.Drawing.Point(455, 0);
-			this.pb2.Name = "pb2";
-			this.pb2.Size = new System.Drawing.Size(10, 11);
-			this.pb2.TabIndex = 12;
-			this.pb2.TabStop = false;
-			// 
-			// picTarget3Pixels
-			// 
-			this.picTarget3Pixels.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.picTarget3Pixels.BackColor = System.Drawing.Color.White;
-			this.picTarget3Pixels.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.picTarget3Pixels.Location = new System.Drawing.Point(542, 15);
-			this.picTarget3Pixels.Name = "picTarget3Pixels";
-			this.picTarget3Pixels.Size = new System.Drawing.Size(34, 34);
-			this.picTarget3Pixels.TabIndex = 23;
-			this.picTarget3Pixels.TabStop = false;
-			this.picTarget3Pixels.Visible = false;
-			// 
-			// picTarget1PSF
-			// 
-			this.picTarget1PSF.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.picTarget1PSF.BackColor = System.Drawing.Color.White;
-			this.picTarget1PSF.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.picTarget1PSF.Location = new System.Drawing.Point(405, 15);
-			this.picTarget1PSF.Name = "picTarget1PSF";
-			this.picTarget1PSF.Size = new System.Drawing.Size(34, 34);
-			this.picTarget1PSF.TabIndex = 20;
-			this.picTarget1PSF.TabStop = false;
-			this.picTarget1PSF.Visible = false;
-			// 
-			// picTarget2Pixels
-			// 
-			this.picTarget2Pixels.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.picTarget2Pixels.BackColor = System.Drawing.Color.White;
-			this.picTarget2Pixels.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.picTarget2Pixels.Location = new System.Drawing.Point(455, 15);
-			this.picTarget2Pixels.Name = "picTarget2Pixels";
-			this.picTarget2Pixels.Size = new System.Drawing.Size(34, 34);
-			this.picTarget2Pixels.TabIndex = 21;
-			this.picTarget2Pixels.TabStop = false;
-			this.picTarget2Pixels.Visible = false;
-			// 
-			// picTarget2PSF
-			// 
-			this.picTarget2PSF.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.picTarget2PSF.BackColor = System.Drawing.Color.White;
-			this.picTarget2PSF.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.picTarget2PSF.Location = new System.Drawing.Point(491, 15);
-			this.picTarget2PSF.Name = "picTarget2PSF";
-			this.picTarget2PSF.Size = new System.Drawing.Size(34, 34);
-			this.picTarget2PSF.TabIndex = 22;
-			this.picTarget2PSF.TabStop = false;
-			this.picTarget2PSF.Visible = false;
-			// 
-			// pb1
-			// 
-			this.pb1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.pb1.BackColor = System.Drawing.Color.Maroon;
-			this.pb1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.pb1.Location = new System.Drawing.Point(370, 0);
-			this.pb1.Name = "pb1";
-			this.pb1.Size = new System.Drawing.Size(10, 11);
-			this.pb1.TabIndex = 10;
-			this.pb1.TabStop = false;
 			// 
 			// panel2
 			// 
@@ -701,7 +279,8 @@
             this.miAdjustMeasurements,
             this.toolStripSeparator2,
             this.miNoiseDistribution,
-            this.miPixelDistribution});
+            this.miPixelDistribution,
+            this.miExportNTPDebugData});
 			this.miData.Name = "miData";
 			this.miData.Size = new System.Drawing.Size(42, 20);
 			this.miData.Text = "&Data";
@@ -1129,6 +708,25 @@
 			this.panel1.Size = new System.Drawing.Size(704, 381);
 			this.panel1.TabIndex = 3;
 			// 
+			// hintTimer
+			// 
+			this.hintTimer.Interval = 3000;
+			// 
+			// saveImageDialog
+			// 
+			this.saveImageDialog.DefaultExt = "png";
+			this.saveImageDialog.Filter = "Bitmap (*.bmp)|*.bmp|JPEG Image (*.jpg)|*.jpg|PNG Image (*.png)|*.png";
+			// 
+			// saveCSVDialog
+			// 
+			this.saveCSVDialog.DefaultExt = "csv";
+			this.saveCSVDialog.Filter = "Comma Separated Values (*.csv)|*.csv";
+			// 
+			// firstFrameTimer
+			// 
+			this.firstFrameTimer.Interval = 250;
+			this.firstFrameTimer.Tick += new System.EventHandler(this.firstFrameTimer_Tick);
+			// 
 			// pnlChart
 			// 
 			this.pnlChart.BackColor = System.Drawing.Color.White;
@@ -1172,24 +770,436 @@
 			this.btnZoomOut.UseVisualStyleBackColor = false;
 			this.btnZoomOut.Click += new System.EventHandler(this.btnZoomOut_Click);
 			// 
-			// hintTimer
+			// pnlSmallGraph
 			// 
-			this.hintTimer.Interval = 3000;
+			this.pnlSmallGraph.Controls.Add(this.pnlMeasurementDetails);
+			this.pnlSmallGraph.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.pnlSmallGraph.Location = new System.Drawing.Point(0, 19);
+			this.pnlSmallGraph.Name = "pnlSmallGraph";
+			this.pnlSmallGraph.Size = new System.Drawing.Size(704, 68);
+			this.pnlSmallGraph.TabIndex = 4;
+			this.pnlSmallGraph.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pnlSmallGraph_MouseDown);
+			this.pnlSmallGraph.MouseLeave += new System.EventHandler(this.pnlSmallGraph_MouseLeave);
+			this.pnlSmallGraph.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pnlSmallGraph_MouseMove);
+			this.pnlSmallGraph.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pnlSmallGraph_MouseUp);
+			this.pnlSmallGraph.Resize += new System.EventHandler(this.pnlSmallGraph_Resize);
 			// 
-			// saveImageDialog
+			// pnlMeasurementDetails
 			// 
-			this.saveImageDialog.DefaultExt = "png";
-			this.saveImageDialog.Filter = "Bitmap (*.bmp)|*.bmp|JPEG Image (*.jpg)|*.jpg|PNG Image (*.png)|*.png";
+			this.pnlMeasurementDetails.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.pnlMeasurementDetails.Controls.Add(this.label2);
+			this.pnlMeasurementDetails.Controls.Add(this.pnlGeoLocation);
+			this.pnlMeasurementDetails.Controls.Add(this.lblInstDelayWarning);
+			this.pnlMeasurementDetails.Controls.Add(this.lblSN4);
+			this.pnlMeasurementDetails.Controls.Add(this.lblSN3);
+			this.pnlMeasurementDetails.Controls.Add(this.lblSN2);
+			this.pnlMeasurementDetails.Controls.Add(this.lblSN1);
+			this.pnlMeasurementDetails.Controls.Add(this.lblSNLBL4);
+			this.pnlMeasurementDetails.Controls.Add(this.lblSNLBL3);
+			this.pnlMeasurementDetails.Controls.Add(this.lblSNLBL2);
+			this.pnlMeasurementDetails.Controls.Add(this.lblSNLBL1);
+			this.pnlMeasurementDetails.Controls.Add(this.lblFrameNo);
+			this.pnlMeasurementDetails.Controls.Add(this.lblMeasurement1);
+			this.pnlMeasurementDetails.Controls.Add(this.picTarget4PSF);
+			this.pnlMeasurementDetails.Controls.Add(this.lblMeasurement2);
+			this.pnlMeasurementDetails.Controls.Add(this.label1);
+			this.pnlMeasurementDetails.Controls.Add(this.lblMeasurement3);
+			this.pnlMeasurementDetails.Controls.Add(this.pnlBinInfo);
+			this.pnlMeasurementDetails.Controls.Add(this.lblFrameTime);
+			this.pnlMeasurementDetails.Controls.Add(this.pb4);
+			this.pnlMeasurementDetails.Controls.Add(this.lblMeasurement4);
+			this.pnlMeasurementDetails.Controls.Add(this.picTarget4Pixels);
+			this.pnlMeasurementDetails.Controls.Add(this.pb3);
+			this.pnlMeasurementDetails.Controls.Add(this.picTarget3PSF);
+			this.pnlMeasurementDetails.Controls.Add(this.picTarget1Pixels);
+			this.pnlMeasurementDetails.Controls.Add(this.pb2);
+			this.pnlMeasurementDetails.Controls.Add(this.picTarget3Pixels);
+			this.pnlMeasurementDetails.Controls.Add(this.picTarget1PSF);
+			this.pnlMeasurementDetails.Controls.Add(this.picTarget2Pixels);
+			this.pnlMeasurementDetails.Controls.Add(this.picTarget2PSF);
+			this.pnlMeasurementDetails.Controls.Add(this.pb1);
+			this.pnlMeasurementDetails.Location = new System.Drawing.Point(3, 3);
+			this.pnlMeasurementDetails.Name = "pnlMeasurementDetails";
+			this.pnlMeasurementDetails.Size = new System.Drawing.Size(698, 64);
+			this.pnlMeasurementDetails.TabIndex = 30;
 			// 
-			// saveCSVDialog
+			// label2
 			// 
-			this.saveCSVDialog.DefaultExt = "csv";
-			this.saveCSVDialog.Filter = "Comma Separated Values (*.csv)|*.csv";
+			this.label2.AutoSize = true;
+			this.label2.Location = new System.Drawing.Point(26, 27);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(33, 13);
+			this.label2.TabIndex = 17;
+			this.label2.Text = "Time:";
 			// 
-			// firstFrameTimer
+			// pnlGeoLocation
 			// 
-			this.firstFrameTimer.Interval = 250;
-			this.firstFrameTimer.Tick += new System.EventHandler(this.firstFrameTimer_Tick);
+			this.pnlGeoLocation.Controls.Add(this.tbxGeoLocation);
+			this.pnlGeoLocation.Controls.Add(this.label4);
+			this.pnlGeoLocation.Controls.Add(this.label5);
+			this.pnlGeoLocation.Location = new System.Drawing.Point(8, 38);
+			this.pnlGeoLocation.Name = "pnlGeoLocation";
+			this.pnlGeoLocation.Size = new System.Drawing.Size(352, 21);
+			this.pnlGeoLocation.TabIndex = 38;
+			// 
+			// tbxGeoLocation
+			// 
+			this.tbxGeoLocation.BackColor = System.Drawing.SystemColors.Control;
+			this.tbxGeoLocation.BorderStyle = System.Windows.Forms.BorderStyle.None;
+			this.tbxGeoLocation.ForeColor = System.Drawing.SystemColors.ActiveCaption;
+			this.tbxGeoLocation.Location = new System.Drawing.Point(60, 5);
+			this.tbxGeoLocation.Name = "tbxGeoLocation";
+			this.tbxGeoLocation.Size = new System.Drawing.Size(290, 13);
+			this.tbxGeoLocation.TabIndex = 29;
+			// 
+			// label4
+			// 
+			this.label4.AutoSize = true;
+			this.label4.Location = new System.Drawing.Point(1, 5);
+			this.label4.Name = "label4";
+			this.label4.Size = new System.Drawing.Size(51, 13);
+			this.label4.TabIndex = 27;
+			this.label4.Text = "Location:";
+			// 
+			// label5
+			// 
+			this.label5.AutoSize = true;
+			this.label5.Location = new System.Drawing.Point(48, 5);
+			this.label5.Name = "label5";
+			this.label5.Size = new System.Drawing.Size(0, 13);
+			this.label5.TabIndex = 28;
+			// 
+			// lblInstDelayWarning
+			// 
+			this.lblInstDelayWarning.AutoSize = true;
+			this.lblInstDelayWarning.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+			this.lblInstDelayWarning.ForeColor = System.Drawing.Color.Red;
+			this.lblInstDelayWarning.Location = new System.Drawing.Point(12, 26);
+			this.lblInstDelayWarning.Name = "lblInstDelayWarning";
+			this.lblInstDelayWarning.Size = new System.Drawing.Size(20, 25);
+			this.lblInstDelayWarning.TabIndex = 39;
+			this.lblInstDelayWarning.Text = "*";
+			this.toolTip1.SetToolTip(this.lblInstDelayWarning, "Instrumental delay has not been applied to the times");
+			this.lblInstDelayWarning.Visible = false;
+			// 
+			// lblSN4
+			// 
+			this.lblSN4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.lblSN4.AutoSize = true;
+			this.lblSN4.Location = new System.Drawing.Point(659, 50);
+			this.lblSN4.Name = "lblSN4";
+			this.lblSN4.Size = new System.Drawing.Size(34, 13);
+			this.lblSN4.TabIndex = 37;
+			this.lblSN4.Text = "12.56";
+			// 
+			// lblSN3
+			// 
+			this.lblSN3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.lblSN3.AutoSize = true;
+			this.lblSN3.Location = new System.Drawing.Point(575, 50);
+			this.lblSN3.Name = "lblSN3";
+			this.lblSN3.Size = new System.Drawing.Size(34, 13);
+			this.lblSN3.TabIndex = 36;
+			this.lblSN3.Text = "12.56";
+			// 
+			// lblSN2
+			// 
+			this.lblSN2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.lblSN2.AutoSize = true;
+			this.lblSN2.Location = new System.Drawing.Point(488, 50);
+			this.lblSN2.Name = "lblSN2";
+			this.lblSN2.Size = new System.Drawing.Size(34, 13);
+			this.lblSN2.TabIndex = 35;
+			this.lblSN2.Text = "12.56";
+			// 
+			// lblSN1
+			// 
+			this.lblSN1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.lblSN1.AutoSize = true;
+			this.lblSN1.Location = new System.Drawing.Point(401, 50);
+			this.lblSN1.Name = "lblSN1";
+			this.lblSN1.Size = new System.Drawing.Size(34, 13);
+			this.lblSN1.TabIndex = 34;
+			this.lblSN1.Text = "12.56";
+			// 
+			// lblSNLBL4
+			// 
+			this.lblSNLBL4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.lblSNLBL4.AutoSize = true;
+			this.lblSNLBL4.Location = new System.Drawing.Point(623, 50);
+			this.lblSNLBL4.Name = "lblSNLBL4";
+			this.lblSNLBL4.Size = new System.Drawing.Size(39, 13);
+			this.lblSNLBL4.TabIndex = 33;
+			this.lblSNLBL4.Text = "S/N = ";
+			// 
+			// lblSNLBL3
+			// 
+			this.lblSNLBL3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.lblSNLBL3.AutoSize = true;
+			this.lblSNLBL3.Location = new System.Drawing.Point(539, 50);
+			this.lblSNLBL3.Name = "lblSNLBL3";
+			this.lblSNLBL3.Size = new System.Drawing.Size(39, 13);
+			this.lblSNLBL3.TabIndex = 32;
+			this.lblSNLBL3.Text = "S/N = ";
+			// 
+			// lblSNLBL2
+			// 
+			this.lblSNLBL2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.lblSNLBL2.AutoSize = true;
+			this.lblSNLBL2.Location = new System.Drawing.Point(452, 50);
+			this.lblSNLBL2.Name = "lblSNLBL2";
+			this.lblSNLBL2.Size = new System.Drawing.Size(39, 13);
+			this.lblSNLBL2.TabIndex = 31;
+			this.lblSNLBL2.Text = "S/N = ";
+			// 
+			// lblSNLBL1
+			// 
+			this.lblSNLBL1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.lblSNLBL1.AutoSize = true;
+			this.lblSNLBL1.Location = new System.Drawing.Point(366, 50);
+			this.lblSNLBL1.Name = "lblSNLBL1";
+			this.lblSNLBL1.Size = new System.Drawing.Size(39, 13);
+			this.lblSNLBL1.TabIndex = 30;
+			this.lblSNLBL1.Text = "S/N = ";
+			// 
+			// lblFrameNo
+			// 
+			this.lblFrameNo.AutoSize = true;
+			this.lblFrameNo.Location = new System.Drawing.Point(65, 11);
+			this.lblFrameNo.Name = "lblFrameNo";
+			this.lblFrameNo.Size = new System.Drawing.Size(35, 13);
+			this.lblFrameNo.TabIndex = 1;
+			this.lblFrameNo.Text = "sdfsdf";
+			// 
+			// lblMeasurement1
+			// 
+			this.lblMeasurement1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.lblMeasurement1.AutoSize = true;
+			this.lblMeasurement1.Location = new System.Drawing.Point(385, -1);
+			this.lblMeasurement1.Name = "lblMeasurement1";
+			this.lblMeasurement1.Size = new System.Drawing.Size(0, 13);
+			this.lblMeasurement1.TabIndex = 3;
+			// 
+			// picTarget4PSF
+			// 
+			this.picTarget4PSF.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.picTarget4PSF.BackColor = System.Drawing.Color.White;
+			this.picTarget4PSF.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.picTarget4PSF.Location = new System.Drawing.Point(662, 15);
+			this.picTarget4PSF.Name = "picTarget4PSF";
+			this.picTarget4PSF.Size = new System.Drawing.Size(34, 34);
+			this.picTarget4PSF.TabIndex = 26;
+			this.picTarget4PSF.TabStop = false;
+			this.picTarget4PSF.Visible = false;
+			// 
+			// lblMeasurement2
+			// 
+			this.lblMeasurement2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.lblMeasurement2.AutoSize = true;
+			this.lblMeasurement2.Location = new System.Drawing.Point(470, -1);
+			this.lblMeasurement2.Name = "lblMeasurement2";
+			this.lblMeasurement2.Size = new System.Drawing.Size(0, 13);
+			this.lblMeasurement2.TabIndex = 11;
+			// 
+			// label1
+			// 
+			this.label1.AutoSize = true;
+			this.label1.Location = new System.Drawing.Point(3, 11);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(56, 13);
+			this.label1.TabIndex = 0;
+			this.label1.Text = "Frame No:";
+			// 
+			// lblMeasurement3
+			// 
+			this.lblMeasurement3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.lblMeasurement3.AutoSize = true;
+			this.lblMeasurement3.Location = new System.Drawing.Point(557, -1);
+			this.lblMeasurement3.Name = "lblMeasurement3";
+			this.lblMeasurement3.Size = new System.Drawing.Size(0, 13);
+			this.lblMeasurement3.TabIndex = 13;
+			// 
+			// pnlBinInfo
+			// 
+			this.pnlBinInfo.Controls.Add(this.label3);
+			this.pnlBinInfo.Controls.Add(this.lblBinNo);
+			this.pnlBinInfo.Location = new System.Drawing.Point(141, 6);
+			this.pnlBinInfo.Name = "pnlBinInfo";
+			this.pnlBinInfo.Size = new System.Drawing.Size(219, 21);
+			this.pnlBinInfo.TabIndex = 29;
+			this.pnlBinInfo.Visible = false;
+			// 
+			// label3
+			// 
+			this.label3.AutoSize = true;
+			this.label3.Location = new System.Drawing.Point(1, 5);
+			this.label3.Name = "label3";
+			this.label3.Size = new System.Drawing.Size(42, 13);
+			this.label3.TabIndex = 27;
+			this.label3.Text = "Bin No:";
+			// 
+			// lblBinNo
+			// 
+			this.lblBinNo.AutoSize = true;
+			this.lblBinNo.Location = new System.Drawing.Point(48, 5);
+			this.lblBinNo.Name = "lblBinNo";
+			this.lblBinNo.Size = new System.Drawing.Size(0, 13);
+			this.lblBinNo.TabIndex = 28;
+			// 
+			// lblFrameTime
+			// 
+			this.lblFrameTime.AutoSize = true;
+			this.lblFrameTime.Location = new System.Drawing.Point(65, 27);
+			this.lblFrameTime.Name = "lblFrameTime";
+			this.lblFrameTime.Size = new System.Drawing.Size(0, 13);
+			this.lblFrameTime.TabIndex = 18;
+			// 
+			// pb4
+			// 
+			this.pb4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.pb4.BackColor = System.Drawing.Color.Maroon;
+			this.pb4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.pb4.Location = new System.Drawing.Point(626, 0);
+			this.pb4.Name = "pb4";
+			this.pb4.Size = new System.Drawing.Size(10, 11);
+			this.pb4.TabIndex = 16;
+			this.pb4.TabStop = false;
+			// 
+			// lblMeasurement4
+			// 
+			this.lblMeasurement4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.lblMeasurement4.AutoSize = true;
+			this.lblMeasurement4.Location = new System.Drawing.Point(641, -1);
+			this.lblMeasurement4.Name = "lblMeasurement4";
+			this.lblMeasurement4.Size = new System.Drawing.Size(0, 13);
+			this.lblMeasurement4.TabIndex = 15;
+			// 
+			// picTarget4Pixels
+			// 
+			this.picTarget4Pixels.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.picTarget4Pixels.BackColor = System.Drawing.Color.White;
+			this.picTarget4Pixels.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.picTarget4Pixels.Location = new System.Drawing.Point(626, 15);
+			this.picTarget4Pixels.Name = "picTarget4Pixels";
+			this.picTarget4Pixels.Size = new System.Drawing.Size(34, 34);
+			this.picTarget4Pixels.TabIndex = 25;
+			this.picTarget4Pixels.TabStop = false;
+			this.picTarget4Pixels.Visible = false;
+			// 
+			// pb3
+			// 
+			this.pb3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.pb3.BackColor = System.Drawing.Color.Maroon;
+			this.pb3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.pb3.Location = new System.Drawing.Point(542, 0);
+			this.pb3.Name = "pb3";
+			this.pb3.Size = new System.Drawing.Size(10, 11);
+			this.pb3.TabIndex = 14;
+			this.pb3.TabStop = false;
+			// 
+			// picTarget3PSF
+			// 
+			this.picTarget3PSF.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.picTarget3PSF.BackColor = System.Drawing.Color.White;
+			this.picTarget3PSF.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.picTarget3PSF.Location = new System.Drawing.Point(578, 15);
+			this.picTarget3PSF.Name = "picTarget3PSF";
+			this.picTarget3PSF.Size = new System.Drawing.Size(34, 34);
+			this.picTarget3PSF.TabIndex = 24;
+			this.picTarget3PSF.TabStop = false;
+			this.picTarget3PSF.Visible = false;
+			// 
+			// picTarget1Pixels
+			// 
+			this.picTarget1Pixels.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.picTarget1Pixels.BackColor = System.Drawing.Color.White;
+			this.picTarget1Pixels.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.picTarget1Pixels.Location = new System.Drawing.Point(369, 15);
+			this.picTarget1Pixels.Name = "picTarget1Pixels";
+			this.picTarget1Pixels.Size = new System.Drawing.Size(34, 34);
+			this.picTarget1Pixels.TabIndex = 19;
+			this.picTarget1Pixels.TabStop = false;
+			this.picTarget1Pixels.Visible = false;
+			// 
+			// pb2
+			// 
+			this.pb2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.pb2.BackColor = System.Drawing.Color.Maroon;
+			this.pb2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.pb2.Location = new System.Drawing.Point(455, 0);
+			this.pb2.Name = "pb2";
+			this.pb2.Size = new System.Drawing.Size(10, 11);
+			this.pb2.TabIndex = 12;
+			this.pb2.TabStop = false;
+			// 
+			// picTarget3Pixels
+			// 
+			this.picTarget3Pixels.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.picTarget3Pixels.BackColor = System.Drawing.Color.White;
+			this.picTarget3Pixels.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.picTarget3Pixels.Location = new System.Drawing.Point(542, 15);
+			this.picTarget3Pixels.Name = "picTarget3Pixels";
+			this.picTarget3Pixels.Size = new System.Drawing.Size(34, 34);
+			this.picTarget3Pixels.TabIndex = 23;
+			this.picTarget3Pixels.TabStop = false;
+			this.picTarget3Pixels.Visible = false;
+			// 
+			// picTarget1PSF
+			// 
+			this.picTarget1PSF.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.picTarget1PSF.BackColor = System.Drawing.Color.White;
+			this.picTarget1PSF.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.picTarget1PSF.Location = new System.Drawing.Point(405, 15);
+			this.picTarget1PSF.Name = "picTarget1PSF";
+			this.picTarget1PSF.Size = new System.Drawing.Size(34, 34);
+			this.picTarget1PSF.TabIndex = 20;
+			this.picTarget1PSF.TabStop = false;
+			this.picTarget1PSF.Visible = false;
+			// 
+			// picTarget2Pixels
+			// 
+			this.picTarget2Pixels.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.picTarget2Pixels.BackColor = System.Drawing.Color.White;
+			this.picTarget2Pixels.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.picTarget2Pixels.Location = new System.Drawing.Point(455, 15);
+			this.picTarget2Pixels.Name = "picTarget2Pixels";
+			this.picTarget2Pixels.Size = new System.Drawing.Size(34, 34);
+			this.picTarget2Pixels.TabIndex = 21;
+			this.picTarget2Pixels.TabStop = false;
+			this.picTarget2Pixels.Visible = false;
+			// 
+			// picTarget2PSF
+			// 
+			this.picTarget2PSF.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.picTarget2PSF.BackColor = System.Drawing.Color.White;
+			this.picTarget2PSF.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.picTarget2PSF.Location = new System.Drawing.Point(491, 15);
+			this.picTarget2PSF.Name = "picTarget2PSF";
+			this.picTarget2PSF.Size = new System.Drawing.Size(34, 34);
+			this.picTarget2PSF.TabIndex = 22;
+			this.picTarget2PSF.TabStop = false;
+			this.picTarget2PSF.Visible = false;
+			// 
+			// pb1
+			// 
+			this.pb1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.pb1.BackColor = System.Drawing.Color.Maroon;
+			this.pb1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.pb1.Location = new System.Drawing.Point(370, 0);
+			this.pb1.Name = "pb1";
+			this.pb1.Size = new System.Drawing.Size(10, 11);
+			this.pb1.TabIndex = 10;
+			this.pb1.TabStop = false;
+			// 
+			// miExportNTPDebugData
+			// 
+			this.miExportNTPDebugData.Name = "miExportNTPDebugData";
+			this.miExportNTPDebugData.Size = new System.Drawing.Size(215, 22);
+			this.miExportNTPDebugData.Text = "Export NTP vs OCR-ed Times";
+			this.miExportNTPDebugData.Visible = false;
+			this.miExportNTPDebugData.Click += new System.EventHandler(this.miExportNTPDebugData_Click);
 			// 
 			// frmLightCurve
 			// 
@@ -1214,6 +1224,14 @@
 			this.Move += new System.EventHandler(this.frmLightCurve_Move);
 			this.Resize += new System.EventHandler(this.frmLightCurve_Resize);
 			this.pnlLegend.ResumeLayout(false);
+			this.panel2.ResumeLayout(false);
+			this.menuStrip1.ResumeLayout(false);
+			this.menuStrip1.PerformLayout();
+			this.statusStrip1.ResumeLayout(false);
+			this.statusStrip1.PerformLayout();
+			this.pnlMain.ResumeLayout(false);
+			this.panel1.ResumeLayout(false);
+			this.pnlChart.ResumeLayout(false);
 			this.pnlSmallGraph.ResumeLayout(false);
 			this.pnlMeasurementDetails.ResumeLayout(false);
 			this.pnlMeasurementDetails.PerformLayout();
@@ -1233,14 +1251,6 @@
 			((System.ComponentModel.ISupportInitialize)(this.picTarget2Pixels)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.picTarget2PSF)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.pb1)).EndInit();
-			this.panel2.ResumeLayout(false);
-			this.menuStrip1.ResumeLayout(false);
-			this.menuStrip1.PerformLayout();
-			this.statusStrip1.ResumeLayout(false);
-			this.statusStrip1.PerformLayout();
-			this.pnlMain.ResumeLayout(false);
-			this.panel1.ResumeLayout(false);
-			this.pnlChart.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -1362,5 +1372,6 @@
 		private System.Windows.Forms.TextBox tbxGeoLocation;
 		private System.Windows.Forms.Label lblInstDelayWarning;
 		private System.Windows.Forms.ToolTip toolTip1;
+		private System.Windows.Forms.ToolStripMenuItem miExportNTPDebugData;
     }
 }
