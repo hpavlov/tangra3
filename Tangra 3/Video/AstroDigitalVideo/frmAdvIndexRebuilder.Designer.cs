@@ -42,8 +42,8 @@
 			// 
 			this.pbar1.Location = new System.Drawing.Point(21, 31);
 			this.pbar1.Name = "pbar1";
-			this.pbar1.Step = 1;
 			this.pbar1.Size = new System.Drawing.Size(274, 18);
+			this.pbar1.Step = 1;
 			this.pbar1.TabIndex = 18;
 			// 
 			// btnCancel
@@ -60,7 +60,7 @@
 			this.lblProcess.AutoSize = true;
 			this.lblProcess.Location = new System.Drawing.Point(21, 12);
 			this.lblProcess.Name = "lblProcess";
-			this.lblProcess.Size = new System.Drawing.Size(145, 13);
+			this.lblProcess.Size = new System.Drawing.Size(141, 13);
 			this.lblProcess.TabIndex = 19;
 			this.lblProcess.Text = "Searching for ADV frames ...";
 			// 
@@ -69,7 +69,7 @@
 			this.lblStatus.AutoSize = true;
 			this.lblStatus.Location = new System.Drawing.Point(21, 55);
 			this.lblStatus.Name = "lblStatus";
-			this.lblStatus.Size = new System.Drawing.Size(125, 13);
+			this.lblStatus.Size = new System.Drawing.Size(120, 13);
 			this.lblStatus.TabIndex = 20;
 			this.lblStatus.Text = "0 potential frames found";
 			// 
@@ -99,7 +99,7 @@
 			this.MinimizeBox = false;
 			this.Name = "frmAdvIndexRebuilder";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-			this.Text = "Repair ADV File";
+			this.Text = "Repair ADV/AAV File";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmAdvIndexRebuilder_FormClosing);
 			this.Load += new System.EventHandler(this.frmAdvIndexRebuilder_Load);
 			this.ResumeLayout(false);

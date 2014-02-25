@@ -18,13 +18,17 @@ namespace Tangra.Video.AstroDigitalVideo
 
 		private Thread m_CalcThread;
 		internal string NewFileName;
+		private bool m_IsAAV = false;
 
 		public frmAdvIndexRebuilder(string fileName)
 		{
 			InitializeComponent();
 
 			m_FileName = fileName;
+			m_IsAAV = fileName != null && fileName.EndsWith(".aav", StringComparison.InvariantCultureIgnoreCase);
 
+			Text = string.Format("Repair {0} File", m_IsAAV ? "AAV" : "ADV");
+ 
 			pbar1.Maximum = 100;
 			pbar1.Minimum = 0;
 			pbar1.Value = 0;
@@ -107,26 +111,26 @@ namespace Tangra.Video.AstroDigitalVideo
 			m_AdvFile.SearchFramesByMagicPhase1(
 				delegate(int percentDone, int framesFound)
 					{
-						string process = "Searching for ADV/AAV frames ...";
+						string process = string.Format("Searching for {0} frames ...", m_IsAAV ? "AAV" : "ADV");
 						string status = string.Format("{0} potential frames found", framesFound);
 
 						InvokeUpdateUI(process, status, percentDone);
 					});
 
-			InvokeUpdateUI("Searching for ADV/AAV frames ...", "", 100);
+			InvokeUpdateUI(string.Format("Searching for {0} frames ...", m_IsAAV ? "AAV" : "ADV"), "", 100);
 
-			InvokeUpdateUI("Recovering ADV/AAV frames ...", "", 0);
+			InvokeUpdateUI(string.Format("Recovering {0} frames ...", m_IsAAV ? "AAV" : "ADV"), "", 0);
 
 			m_AdvFile.SearchFramesByMagicPhase2(
 				delegate(int percentDone, int framesRecovered)
 				{
-					string process = "Recovering ADV/AAV frames ...";
+					string process = string.Format("Recovering {0} frames ...", m_IsAAV ? "AAV" : "ADV");
 					string status = string.Format("{0} frames recovered successfully", framesRecovered);
 
 					InvokeUpdateUI(process, status, percentDone);
 				});
 
-			InvokeUpdateUI("Recovering ADV/AAV frames ...", "", 100);
+			InvokeUpdateUI(string.Format("Recovering {0} frames ...", m_IsAAV ? "AAV" : "ADV"), "", 100);
 			Invoke(new ProcInvoker(SaveRecoveredFile));
 		}
 
@@ -136,11 +140,12 @@ namespace Tangra.Video.AstroDigitalVideo
 		{
 			if (m_AdvFile.Index.Index.Count == 0)
 			{
-				MessageBox.Show(this, "No frames were recovered. Is this a newer/different ADV/AAV file format?", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				MessageBox.Show(this, string.Format("No frames were recovered. Is this a newer/different {0} file format?", m_IsAAV ? "AAV" : "ADV"), "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 			else
 			{
-				saveFileDialog.Title = string.Format("Save {0} recovered ADV frames as ...", m_AdvFile.Index.Index.Count);
+				saveFileDialog.Title = string.Format("Save {0} recovered {1} frames as ...", m_AdvFile.Index.Index.Count, m_IsAAV ? "AAV" : "ADV");
+				saveFileDialog.Filter = m_IsAAV ? "Astro Analogue Video (*.aav)|*.aav" : "Astro Digital Video (*.adv)|*.adv";
 				if (saveFileDialog.ShowDialog() == DialogResult.OK)
 				{
 					NewFileName = saveFileDialog.FileName;

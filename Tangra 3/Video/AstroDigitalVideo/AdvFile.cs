@@ -376,7 +376,7 @@ namespace Tangra.Video.AstroDigitalVideo
 
 						if (startExposure.Year < 2010 || startExposure.Year > 2100)
 							continue;
-						if (exposureMS < 1 || exposureMS > 60 * 1000)
+						if (exposureMS < 0 || exposureMS > 60 * 1000)
 							continue;
 
 						m_CandidateFrameOffsets.Add(new RecoveredFrameHeader()
