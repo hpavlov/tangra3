@@ -541,7 +541,13 @@ namespace Tangra.VideoOperations.LightCurves
 				m_EventTimesReport.InstrumentalDelaysApplied = m_LCFile.Header.GetInstrumentalDelaysApplied(m_EventTimesReport.VideoFileFormat);
 			}
 
-			return lcFileSaved;
+            if (m_Context.Binning > 1)
+            {
+                MessageBox.Show(this, "This add-in cannot run when binning is in use.", "Tangra3", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+            else
+			    return lcFileSaved;
 		}
 
 		public void FinishedLightCurveEventTimeExtraction()

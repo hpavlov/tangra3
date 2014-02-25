@@ -14,8 +14,8 @@ namespace Tangra.OccultTools.OccultWrappers
 {
     public class OccultSDKWrapper : IOccultWrapper
     {
-        private const string MIN_VERSION_OCCULT_REQUIRED = "4.1.0.22";
-        private const string MIN_VERSION_TANGRA_REQUIRED = "3.0.73";
+        private const string MIN_VERSION_OCCULT_REQUIRED = "4.1.0.24";
+        private const string MIN_VERSION_TANGRA_REQUIRED = "3.0.81";
 
         private IAOTAClientCallbacks m_ClientCallbacks;
 
@@ -272,6 +272,13 @@ namespace Tangra.OccultTools.OccultWrappers
                         }
                     }
 
+                     ShieldedCall(() => m_AotaInstance.Camera = new Occult.SDK.Camera()
+                        {
+                            CameraType = dataProvider.VideoCameraName,
+                            VideoSystem = dataProvider.VideoSystem,
+                            FramesIntegrated = dataProvider.NumberIntegratedFrames
+                        });
+
                     int firstFrameIndex = 0;// (int)frameIds[0];
                     int framesInIntegration = 1;
 
@@ -324,7 +331,7 @@ namespace Tangra.OccultTools.OccultWrappers
 
                 if (m_AotaInstance != null)
                 {
-                    object cameraObj = m_AotaInstance.Results_Camera;
+                    object cameraObj = m_AotaInstance.Camera;
                     object event1Obj = m_AotaInstance.ResultsForEvent1;
                     object event2Obj = m_AotaInstance.ResultsForEvent2;
                     object event3Obj = m_AotaInstance.ResultsForEvent3;

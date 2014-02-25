@@ -27,6 +27,8 @@ namespace Tangra.Addins
 			NumberOfMeasuredComparisonObjects = localProvider.NumberOfMeasuredComparisonObjects;
             CameraCorrectionsHaveBeenApplied = localProvider.CameraCorrectionsHaveBeenApplied;
             VideoCameraName = localProvider.VideoCameraName;
+            VideoSystem = localProvider.VideoSystem;
+            NumberIntegratedFrames = localProvider.NumberIntegratedFrames;
             CurrentlySelectedFrameNumber = localProvider.CurrentlySelectedFrameNumber;
             HasReliableTimeBase = localProvider.HasReliableTimeBase;
 			m_TargetMeasurements = localProvider.GetTargetMeasurements();
@@ -51,6 +53,10 @@ namespace Tangra.Addins
         public bool CameraCorrectionsHaveBeenApplied { get; private set; }
 
 		public string VideoCameraName { get; private set; }
+
+        public string VideoSystem { get; private set; }
+
+        public int NumberIntegratedFrames { get; private set; }
 
         public int CurrentlySelectedFrameNumber { get; private set; }
 

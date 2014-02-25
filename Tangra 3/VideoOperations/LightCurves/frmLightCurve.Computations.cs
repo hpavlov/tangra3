@@ -1220,6 +1220,43 @@ namespace Tangra.VideoOperations.LightCurves
 			get { return m_Context.CameraName; }
 	    }
 
+        string ILightCurveDataProvider.VideoSystem
+        {
+            get
+            {
+                // AVI|AAV|ADV
+                string videoSystem = m_LCFile.Header.GetVideoFileFormat();
+                // PAL|NTSC|Digital
+                string videoFormat = m_LCFile.Header.GetVideoFormat(videoSystem);
+
+                if (string.IsNullOrEmpty(videoFormat) &&
+                    (m_LCFile.Header.TimingType == MeasurementTimingType.OCRedTimeForEachFrame || m_LCFile.Header.TimingType == MeasurementTimingType.EmbeddedTimeForEachFrame) &&
+                    m_LCFile.FrameTiming != null && m_LCFile.FrameTiming.Count > 1)
+                {
+                    if (Math.Abs(1000.0 / 25 - m_LCFile.FrameTiming[1].FrameDurationInMilliseconds) < 1)
+                        videoFormat = "PAL";
+                    else if (Math.Abs(1000.0 / 29.97 - m_LCFile.FrameTiming[1].FrameDurationInMilliseconds) < 1)
+                        videoFormat = "NTSC";
+                }
+
+                if (videoSystem == "ADV")
+                    return "ADVS";
+                else if (videoSystem == "AAV")
+                {
+                    if (videoFormat == "PAL" || videoFormat == "NTSC")
+                        return string.Format("{0}-{1}", videoSystem, videoFormat);
+                    else
+                        return "AAV";
+                }
+                else
+                    return videoFormat;
+            }
+        }
+
+        int ILightCurveDataProvider.NumberIntegratedFrames
+        {
+            get { return m_LCFile.Footer.AAVFrameIntegration > 0 ? m_LCFile.Footer.AAVFrameIntegration : 0; }
+        }
 
         int ILightCurveDataProvider.CurrentlySelectedFrameNumber
         {
