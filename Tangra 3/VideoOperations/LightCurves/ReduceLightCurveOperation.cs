@@ -1585,7 +1585,7 @@ namespace Tangra.VideoOperations.LightCurves
         private long prevFrameId;
         public void SaveEmbeddedOrORCedTimeStamp(int frameNo)
         {
-			if (m_VideoController.HasAstroImageState)
+            if (m_VideoController.HasAstroImageState && !m_VideoController.IsAstroAnalogueVideoWithNtpTimestampsInNtpDebugMode)
 			{
                 if (m_VideoController.IsAstroDigitalVideo ||
                     (m_VideoController.IsAstroAnalogueVideo && m_VideoController.AstroAnalogueVideoHasOcrOrNtpData))
@@ -1610,8 +1610,15 @@ namespace Tangra.VideoOperations.LightCurves
 				int frameDuration = (int)Math.Round(1000.0/m_VideoController.VideoFrameRate /*MillisecondsPerFrame*/);
 				var frameTime = new LCFrameTiming(m_OCRedTimeStamp, frameDuration);
 
-				if (m_VideoController.IsAstroAnalogueVideoWithNtpTimestampsInNtpDebugMode)
-					m_VideoController.GetAdditionalAAVTimes(frameNo, ref frameTime.FrameMidTimeNTPRaw, ref frameTime.FrameMidTimeNTPTangra, ref frameTime.FrameMidTimeWindowsRaw);
+                if (m_VideoController.IsAstroAnalogueVideoWithNtpTimestampsInNtpDebugMode)
+                {
+                    m_VideoController.GetAdditionalAAVTimes(frameNo, ref frameTime.FrameMidTimeNTPRaw, ref frameTime.FrameMidTimeNTPTangra, ref frameTime.FrameMidTimeWindowsRaw);
+                    frameTime.FrameMidTime = new DateTime(
+                        frameTime.FrameMidTimeNTPRaw.Value.Year, frameTime.FrameMidTimeNTPRaw.Value.Month,
+                        frameTime.FrameMidTimeNTPRaw.Value.Day,
+                        frameTime.FrameMidTime.Hour, frameTime.FrameMidTime.Minute, frameTime.FrameMidTime.Second,
+                        frameTime.FrameMidTime.Millisecond);
+                }
 
 				LCFile.SaveOnTheFlyFrameTiming(frameTime);
 			}

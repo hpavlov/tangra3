@@ -316,7 +316,7 @@ namespace Tangra.Video
 			get { return m_CameraModel; }
 		}
 
-		private void AddExtraNtpDebugTimes(FrameStateData stateData, AdvFrameInfo frameInfo)
+		private void AddExtraNtpDebugTimes(ref FrameStateData stateData, AdvFrameInfo frameInfo)
 		{
 			if (stateData.AdditionalProperties == null)
 				stateData.AdditionalProperties = new SafeDictionary<string, object>();
@@ -378,7 +378,7 @@ namespace Tangra.Video
 				}
 
 				if (NtpDataAvailable && !OcrDataAvailable && m_UseNtpTimeAsCentralExposureTime)
-					AddExtraNtpDebugTimes(rv, m_CurrentFrameInfo);
+					AddExtraNtpDebugTimes(ref rv, m_CurrentFrameInfo);
 
 				return rv;
 			}
@@ -438,7 +438,7 @@ namespace Tangra.Video
 				}
 
 				if (NtpDataAvailable && !OcrDataAvailable && m_UseNtpTimeAsCentralExposureTime)
-					AddExtraNtpDebugTimes(rv, frameInfo);
+					AddExtraNtpDebugTimes(ref rv, frameInfo);
 
 				return rv;
 			}

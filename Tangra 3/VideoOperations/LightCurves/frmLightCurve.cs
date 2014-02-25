@@ -2296,16 +2296,11 @@ namespace Tangra.VideoOperations.LightCurves
 
 				if (MessageBox.Show(
 					this, 
-					"Tangra",
-					string.Format(@" Results for differnces between OCR-ed time and NTP time:\r\n\r\n 
-									    OCR-NTPRaw: Average = {0:0.0} ms, 1-Sigma = {1:0.00} ms, Max = {2:0.0} ms\r\n 
-									 OCR-NTPFitted: Average = {3:0.0} ms, 1-Sigma = {4:0.00} ms, Max = {5:0.0} ms\r\n 
-									OCR-WindowsRaw: Average = {6:0.0} ms, 1-Sigma = {7:0.00} ms, Max = {8:0.0} ms\r\n\r\n\r\n
-								  Would you like to save all the used data in a CSV format?", 
-
+					string.Format("Results for differnces between OCR-ed time and NTP time:\r\n\r\nOCR-NTPRaw: Average = {0:0.0} ms, 1-Sigma = {1:0.00} ms, Max = {2:0.0} ms\r\nOCR-NTPFitted: Average = {3:0.0} ms, 1-Sigma = {4:0.00} ms, Max = {5:0.0} ms\r\n OCR-WindowsRaw: Average = {6:0.0} ms, 1-Sigma = {7:0.00} ms, Max = {8:0.0} ms\r\n\r\n\r\nWould you like to save all the used data in a CSV format?", 
 						averageNtpDiff, ntpOneSigma, maxNtpDiff,
 						averageNtpFittedDiff, ntpFittedOneSigma, maxNtpFittedDiff,
 						averageWindowsDiff, windowsOneSigma, maxWindowsDiff),
+                    "Tangra",
 					MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
 				{
 					string tempFile = Path.ChangeExtension(Path.GetTempFileName(), ".csv");
