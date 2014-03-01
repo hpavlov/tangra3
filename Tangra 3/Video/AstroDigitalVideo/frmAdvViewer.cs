@@ -474,7 +474,7 @@ namespace Tangra.Video.AstroDigitalVideo
 
 			if (saveFileDialog.ShowDialog(this) == DialogResult.OK)
 			{
-				ThreadPool.QueueUserWorkItem(new WaitCallback(ExportToCSVWorker), new Tuple<string, int, int>(saveFileDialog.FileName, (int)nudCropFirstFrame.Value, (int)nudCropLastFrame.Value));
+                ThreadPool.QueueUserWorkItem(new WaitCallback(ExportToCSVWorker), new Tuple<string, int, int>(saveFileDialog.FileName, (int)nudCsvFirstFrame.Value, (int)nudCsvLastFrame.Value));
 			}
 		}
 	}	

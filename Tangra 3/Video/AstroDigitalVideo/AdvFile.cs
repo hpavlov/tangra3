@@ -716,36 +716,37 @@ namespace Tangra.Video.AstroDigitalVideo
 
 		internal void ExportStatusSectionToCSV(string fileName, int firstFrame, int lastFrame, OnSearchProgressDelegate progressCallback)
 		{
-			var output = new StringBuilder();
-
 			progressCallback(5, 0);
 
 			bool headerAppended = false;
 
-			for (int i = firstFrame; i <= lastFrame; i++)
-			{
-				Bitmap bmp;
-			    object[] data = GetFrameSectionData(i, null);
-                AdvImageData imageData = (AdvImageData)data[0];
-                AdvStatusData statusData = (AdvStatusData)data[1];
-
-				//GetFrameData(i, out imageData, out statusData, out bmp);
-
-				string headerRow;
-                string nextRow = StatusDataToCsvRow(imageData, statusData, i, out headerRow);
-                if (!headerAppended)
+            using (FileStream fsOutput = new FileStream(fileName, FileMode.CreateNew, FileAccess.Write))
+            using(TextWriter writer = new StreamWriter(fsOutput))
+            {
+                for (int i = firstFrame; i <= lastFrame; i++)
                 {
-                    output.AppendLine(headerRow);
-                    headerAppended = true;
+                    object[] data = GetFrameSectionData(i, null);
+                    AdvImageData imageData = (AdvImageData)data[0];
+                    AdvStatusData statusData = (AdvStatusData)data[1];
+
+                    string headerRow;
+                    string nextRow = StatusDataToCsvRow(imageData, statusData, i, out headerRow);
+                    if (!headerAppended)
+                    {
+                        writer.WriteLine(headerRow);
+                        headerAppended = true;
+                    }
+                    writer.WriteLine(nextRow);
+
+                    int percDone = (int)Math.Min(90, 90 * (i - firstFrame) * 1.0 / (lastFrame - firstFrame + 1));
+                    progressCallback(5 + percDone, 0);
                 }
-                output.AppendLine(nextRow);
 
-				int percDone = (int)Math.Min(90, 90 * (i - firstFrame) * 1.0 / (lastFrame - firstFrame + 1));
-				progressCallback(5 + percDone, 0);
-			}
+                progressCallback(95, 0);
 
-			progressCallback(95, 0);	
-			File.WriteAllText(fileName, output.ToString());
+                writer.Flush();
+            }
+
 		}
 
 		private string StatusDataToCsvRow(AdvImageData imageData, AdvStatusData statusData, int frameNo, out string headerRow)
