@@ -48,7 +48,7 @@ namespace Tangra.Config.SettingPannels
 
 			cbxAavSplitFieldsOSD.Checked = TangraConfig.Settings.AAV.SplitFieldsOSD;
 
-			cbxNtpDebugFlag.Checked = TangraConfig.Settings.AAV.NtpDebugFlag;
+			cbxNtpDebugFlag.Checked = TangraConfig.Settings.AAV.NtpTimeDebugFlag;
 		}
 
         public override void SaveSettings()
@@ -67,7 +67,7 @@ namespace Tangra.Config.SettingPannels
 
 			TangraConfig.Settings.AAV.SplitFieldsOSD = cbxAavSplitFieldsOSD.Checked;
 
-			TangraConfig.Settings.AAV.NtpDebugFlag = cbxNtpDebugFlag.Checked;
+			TangraConfig.Settings.AAV.NtpTimeDebugFlag = cbxNtpDebugFlag.Checked;
 
 			if (m_AavPopupCustomizer != null)
 			{
