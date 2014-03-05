@@ -26,7 +26,9 @@ namespace Tangra.Video.AstroDigitalVideo
 
     	internal Dictionary<string, string> ImageSerializationProperties = new Dictionary<string, string>();
     	internal Dictionary<byte, AdvImageLayout> ImageLayouts = new Dictionary<byte, AdvImageLayout>();
-		
+
+		internal int? Adv16NormalisationValue = null;
+
         public AdvImageSection(ushort width, ushort height, byte bpp)
         {
             Width = width;
@@ -229,9 +231,14 @@ namespace Tangra.Video.AstroDigitalVideo
 					else if (BitsPerPixel == 14)
 						displayBitmapBytes[x + y * Width] = (byte)((imageData.ImageData[x, y] >> 6));
 					else if (BitsPerPixel == 16)
-						displayBitmapBytes[x + y * Width] = (byte)((imageData.ImageData[x, y] >> 8));
+					{
+						if (Adv16NormalisationValue.HasValue)
+							displayBitmapBytes[x + y * Width] = (byte)(( 255.0 * imageData.ImageData[x, y] / Adv16NormalisationValue.Value));
+						else
+							displayBitmapBytes[x + y * Width] = (byte)((imageData.ImageData[x, y] >> 8));
+					}
 					else
-						displayBitmapBytes[x + y * Width] = (byte)((imageData.ImageData[x, y] >> (BitsPerPixel - 8)));
+						displayBitmapBytes[x + y*Width] = (byte) ((imageData.ImageData[x, y] >> (BitsPerPixel - 8)));
 				}	
 			}
 

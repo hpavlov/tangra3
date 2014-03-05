@@ -91,6 +91,11 @@ namespace Tangra.Video
 			get { return 8; }
 		}
 
+		public uint GetAav16NormVal()
+		{
+			return 255;
+		}
+
 		public int FirstFrame
 		{
 			get { return m_OpenedFileInfo.FirstFrame; }

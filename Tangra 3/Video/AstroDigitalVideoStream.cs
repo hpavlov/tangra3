@@ -66,6 +66,7 @@ namespace Tangra.Video
 		private int m_CountFrames;
 
 		private int m_BitPix;
+		private uint m_Aav16NormVal;
 		private bool m_FileOpened;
 	    private string m_Engine;
 		private string m_CameraModel;
@@ -96,6 +97,7 @@ namespace Tangra.Video
 			m_BitPix = fileInfo.Bpp;
 			m_Width = fileInfo.Width;
 			m_Height = fileInfo.Height;
+			m_Aav16NormVal = fileInfo.Aav16NormVal;
 
 			m_FrameRate = fileInfo.FrameRate;
 			
@@ -164,6 +166,11 @@ namespace Tangra.Video
 		public int BitPix
 		{
 			get { return m_BitPix; }
+		}
+
+		public uint GetAav16NormVal()
+		{
+			return m_Aav16NormVal;
 		}
 
 		public int FirstFrame

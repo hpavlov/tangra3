@@ -178,12 +178,12 @@ long PreProcessingAddFlatFrame(unsigned long* flatFramePixels, unsigned long pix
 }
 
 
-long ApplyPreProcessing(unsigned long* pixels, long width, long height, int bpp, BYTE* bitmapPixels, BYTE* bitmapBytes)
+long ApplyPreProcessing(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal, BYTE* bitmapPixels, BYTE* bitmapBytes)
 {
 	long rv = ApplyPreProcessingPixelsOnly(pixels, width, height, bpp);
 	if (!SUCCEEDED(rv)) return rv;
 
-	return GetBitmapPixels(width, height, pixels, bitmapPixels, bitmapBytes, false, bpp);
+	return GetBitmapPixels(width, height, pixels, bitmapPixels, bitmapBytes, false, bpp, normVal);
 }
 
 long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height, int bpp)

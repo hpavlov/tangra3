@@ -221,8 +221,13 @@ namespace Tangra.Controller
                     PSFFit.DataRange = PSFFittingDataRange.DataRange12Bit;
 				else if (m_FramePlayer.Video.BitPix == 14)
 					PSFFit.DataRange = PSFFittingDataRange.DataRange14Bit;
-                else
-                    throw new ApplicationException("PSF fitting only supports 8, 12 and 14 bit data.");
+				else if (m_FramePlayer.Video.BitPix == 16)
+				{
+					PSFFit.DataRange = PSFFittingDataRange.DataRange16Bit;
+					PSFFit.NormVal = m_FramePlayer.Video.GetAav16NormVal();
+				}
+				else
+					throw new ApplicationException("PSF fitting only supports 8, 12, 14 and 16 bit data.");
 
 				TangraContext.Current.HasVideoLoaded = true;
 				TangraContext.Current.CanPlayVideo = true;

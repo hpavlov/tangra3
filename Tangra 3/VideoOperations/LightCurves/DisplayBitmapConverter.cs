@@ -75,6 +75,23 @@ namespace Tangra.VideoOperations.LightCurves
             { }
         }
 
+		internal class SixteenBitDisplayBitmapConverter : IDisplayBitmapConverter
+		{
+
+			public byte ToDisplayBitmapByte(uint pixel)
+			{
+				return (byte)Math.Max(0, Math.Min(255, Math.Round(0xFF * (pixel * 1.0f / 0x3FFF))));
+			}
+
+			public string GetConfig()
+			{
+				return string.Empty;
+			}
+
+			public void SetConfig(string config)
+			{ }
+		}
+
         public string GetConfig()
         {
             throw new NotImplementedException();
@@ -95,6 +112,8 @@ namespace Tangra.VideoOperations.LightCurves
                     return new TwelveBitDisplayBitmapConverter();
 				else if (bitPix == 14)
 					return new FourteenBitDisplayBitmapConverter();
+				else if (bitPix == 16)
+					return new SixteenBitDisplayBitmapConverter();				
             }
 
             throw new NotImplementedException();

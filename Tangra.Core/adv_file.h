@@ -25,6 +25,7 @@ namespace AdvLib
 		float FrameRate;
 		long CountFrames;
 		long Bpp;
+		unsigned long Aav16NormVal;
 	};
 	
 

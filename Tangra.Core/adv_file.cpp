@@ -175,9 +175,18 @@ void AdvFile::OpenFile(const char* fileName, AdvFileInfo* fileInfo)
 	{
 		char* pEnd;
 		effectiveFrameRate = strtod(fileTagValue, &pEnd);
+	}	
+	GetFileTag("AAV16-NORMVAL", &fileTagValue[0]);
+	if (strlen(fileTagValue) > 0)
+	{
+		char* pEnd;
+		ImageSection->NormalisationValue = strtod(fileTagValue, &pEnd);
 	}
+	else
+		ImageSection->NormalisationValue = 0;	
 			
 	fileInfo->Bpp = ImageSection->DataBpp;
+	fileInfo->Aav16NormVal = ImageSection->NormalisationValue;
 	fileInfo->CountFrames = TotalNumberOfFrames;
 	fileInfo->Height = ImageSection->Height;
 	fileInfo->Width = ImageSection->Width;

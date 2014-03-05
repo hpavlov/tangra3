@@ -370,7 +370,7 @@ void AdvImageLayout::GetPixelsFrom8BitByteArrayRawLayout(unsigned char* layoutDa
 
 void AdvImageLayout::GetPixelsFrom16BitByteArrayRawLayout(unsigned char* layoutData, unsigned long* prevFrame, unsigned long* pixelsOut, int* readIndex, bool* crcOkay)
 {
-	if (DataBpp == 12 || DataBpp == 14)
+	if (DataBpp == 12 || DataBpp == 14 || DataBpp == 16)
 	{		
 		unsigned long* pPixelsOut = pixelsOut;
 		bool isLittleEndian = m_ImageSection->ByteOrder == LittleEndian;
@@ -401,10 +401,6 @@ void AdvImageLayout::GetPixelsFrom16BitByteArrayRawLayout(unsigned char* layoutD
 		}
 
 		*readIndex += Height * Width * 2;
-	}
-	else if (DataBpp == 16)
-	{
-		// TODO: Direct copy from the buffer
 	}
 
 	if (m_ImageSection->UsesCRC)

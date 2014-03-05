@@ -43,6 +43,8 @@ namespace Tangra.Model.Video
 		Pixelmap GetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging);
 		string Engine { get; }
 		string FileName { get; }
+
+		uint GetAav16NormVal();
 	}
 
 	public class GeoLocationInfo

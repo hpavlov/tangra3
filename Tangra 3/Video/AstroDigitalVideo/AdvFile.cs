@@ -51,7 +51,10 @@ namespace Tangra.Video.AstroDigitalVideo
 				m_Compression = propVal;
 
 			if (AdvFileTags.TryGetValue(AdvKeywords.KEY_DATA_LAYOUT, out propVal))
-				m_DataLayout = propVal;							
+				m_DataLayout = propVal;
+
+			if (AdvFileTags.TryGetValue(AdvKeywords.KEY_ADV16_NORMVAL, out propVal))
+				ImageSection.Adv16NormalisationValue = int.Parse(propVal);			
 		}
 
 	    public static AdvFile OpenFile(string fileName)
@@ -134,7 +137,19 @@ namespace Tangra.Video.AstroDigitalVideo
 				rv.m_IsCorrupted = true;
 				return rv;
 			}
-			
+
+			fileReader.BaseStream.Seek(metadataUserTableOffset, SeekOrigin.Begin);
+			#region read metadata
+
+			uint count = fileReader.ReadUInt32();
+			for (int i = 0; i < count; i++)
+			{
+				string propName = fileReader.ReadAsciiString256();
+				string propValue = fileReader.ReadAsciiString256();
+				rv.AdvFileTags[propName] = propValue;
+			}
+			#endregion
+
 			rv.InitialisePropertiesFromTags();
 
 			return rv;            	

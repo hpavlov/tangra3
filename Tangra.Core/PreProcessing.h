@@ -48,7 +48,7 @@ DLL_PUBLIC long PreProcessingGetConfig(
 	unsigned int* flatPixelsCount);
 
 DLL_PUBLIC long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height, int bpp);
-DLL_PUBLIC long ApplyPreProcessing(unsigned long* pixels, long width, long height, int bpp, BYTE* bitmapPixels, BYTE* bitmapBytes);
+DLL_PUBLIC long ApplyPreProcessing(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal, BYTE* bitmapPixels, BYTE* bitmapBytes);
 
 #ifdef __cplusplus
 } // __cplusplus defined.

@@ -69,6 +69,11 @@ namespace Tangra.Video
 			get { return m_Bpp; }
 		}
 
+		public uint GetAav16NormVal()
+		{
+			return 1;
+		}
+
 		public int FirstFrame
 		{
 			get { return m_FirstFrame; }
@@ -110,7 +115,7 @@ namespace Tangra.Video
 
 			TangraCore.PreProcessors.ApplyPreProcessingPixelsOnly(flatPixelsCopy, m_Width, m_Height, m_Bpp);
 
-			TangraCore.GetBitmapPixels(m_Width, m_Height, flatPixelsCopy, rawBitmapBytes, displayBitmapBytes, true, m_Bpp);
+			TangraCore.GetBitmapPixels(m_Width, m_Height, flatPixelsCopy, rawBitmapBytes, displayBitmapBytes, true, m_Bpp, 0);
 
 			Bitmap displayBitmap = Pixelmap.ConstructBitmapFromBitmapPixels(displayBitmapBytes, m_Width, m_Height);
 

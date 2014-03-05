@@ -23,7 +23,8 @@ namespace Tangra.Model.Astro
 	{
 		DataRange8Bit,
 		DataRange12Bit,
-		DataRange14Bit
+		DataRange14Bit,
+		DataRange16Bit
 	}
 
 	public interface ITrackedObjectPsfFit
@@ -83,6 +84,8 @@ namespace Tangra.Model.Astro
         private float m_ModelFWHM;
 
 		public static PSFFittingDataRange DataRange = PSFFittingDataRange.DataRange8Bit;
+
+		public static uint NormVal = 255;
 
         public void SetAveragedModelFWHM(float modelFWHM)
         {
@@ -425,6 +428,10 @@ namespace Tangra.Model.Astro
 					m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation14Bit;
 					break;
 
+				case PSFFittingDataRange.DataRange16Bit:
+					m_Saturation = (uint)(TangraConfig.Settings.Photometry.Saturation.Saturation8Bit * 255.0 / NormVal);
+					break;
+
 				default:
 					m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation8Bit;
 					break;
@@ -493,6 +500,10 @@ namespace Tangra.Model.Astro
 
 					case PSFFittingDataRange.DataRange14Bit:
 						m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation14Bit;
+						break;
+
+					case PSFFittingDataRange.DataRange16Bit:
+						m_Saturation = (uint)(TangraConfig.Settings.Photometry.Saturation.Saturation8Bit * 255.0 / NormVal);
 						break;
 
 					default:
@@ -694,6 +705,10 @@ namespace Tangra.Model.Astro
 
 					case PSFFittingDataRange.DataRange14Bit:
 						m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation14Bit;
+						break;
+
+					case PSFFittingDataRange.DataRange16Bit:
+						m_Saturation = (uint)(TangraConfig.Settings.Photometry.Saturation.Saturation8Bit * 255.0 / NormVal);
 						break;
 
 					default:
