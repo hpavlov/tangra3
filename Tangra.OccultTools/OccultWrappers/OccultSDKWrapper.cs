@@ -14,8 +14,8 @@ namespace Tangra.OccultTools.OccultWrappers
 {
     public class OccultSDKWrapper : IOccultWrapper
     {
-        private const string MIN_VERSION_OCCULT_REQUIRED = "4.1.0.24";
-        private const string MIN_VERSION_TANGRA_REQUIRED = "3.0.81";
+        private const string MIN_VERSION_OCCULT_REQUIRED = "4.1.0.25";
+        private const string MIN_VERSION_TANGRA_REQUIRED = "3.0.84";
 
         private IAOTAClientCallbacks m_ClientCallbacks;
 
@@ -225,22 +225,14 @@ namespace Tangra.OccultTools.OccultWrappers
                     double[] secondsFromUTMidnight;
                     long startFrameStartDayTicks;
 
-                    if (hasReliableTimeBase)
+                    startFrameStartDayTicks = hasReliableTimeBase ? timestamps[0].Date.Ticks : timestamps.FirstOrDefault(x => x != DateTime.MinValue).Date.Ticks;
+                    secondsFromUTMidnight = new double[timestamps.Length];
+                    for (int i = 0; i < timestamps.Length; i++)
                     {
-                        startFrameStartDayTicks = timestamps[0].Date.Ticks;
-                        secondsFromUTMidnight = timestamps.Select(x => (Math.Truncate(new TimeSpan(x.Ticks - startFrameStartDayTicks).TotalSeconds * 10000) / 10000.0)).ToArray();
-                    }
-                    else
-                    {
-                        startFrameStartDayTicks = timestamps.FirstOrDefault(x => x != DateTime.MinValue).Date.Ticks;
-                        secondsFromUTMidnight = new double[timestamps.Length];
-                        for (int i = 0; i < timestamps.Length; i++)
-                        {
-                            if (timestamps[i] != DateTime.MinValue)
-                                secondsFromUTMidnight[i] = Math.Truncate(new TimeSpan(timestamps[i].Ticks - startFrameStartDayTicks).TotalSeconds * 10000) / 10000.0;
-                            else
-                                secondsFromUTMidnight[i] = 0;
-                        }
+                        if (timestamps[i] != DateTime.MinValue)
+                            secondsFromUTMidnight[i] = Math.Truncate(new TimeSpan(timestamps[i].Ticks - startFrameStartDayTicks).TotalSeconds * 10000) / 10000.0;
+                        else
+                            secondsFromUTMidnight[i] = 0;
                     }
 
                     bool cameraCorrectionsHaveBeenApplied = dataProvider.CameraCorrectionsHaveBeenApplied;

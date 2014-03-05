@@ -1062,6 +1062,17 @@ namespace Tangra.VideoOperations.LightCurves
 				else if (Math.Abs(29.97 - ComputedFramesPerSecond) < 1)
 					return "NTSC";
 			}
+            else if (
+                LcFile != null && 
+                (LcFile.Header.TimingType == MeasurementTimingType.OCRedTimeForEachFrame || LcFile.Header.TimingType == MeasurementTimingType.EmbeddedTimeForEachFrame) &&
+                LcFile.FrameTiming != null && LcFile.FrameTiming.Count > 3)
+            {
+                double frameMilliseconds = new TimeSpan(LcFile.FrameTiming[1].FrameMidTime.Ticks - LcFile.FrameTiming[0].FrameMidTime.Ticks).TotalMilliseconds;
+                if (Math.Abs(25 - 1000.0 / frameMilliseconds) < 1)
+                    return "PAL";
+                else if (Math.Abs(29.97 - 1000.0 / frameMilliseconds) < 1)
+                    return "NTSC";
+            }
 
 			return "";
 		}

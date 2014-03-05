@@ -496,7 +496,7 @@ namespace Tangra.Video
 			    if (string.IsNullOrEmpty(OcrEngine))
 			        return false;
 
-				if (TangraConfig.Settings.AAV.NtpDebugFlag)
+				if (TangraConfig.Settings.AAV.NtpTimeDebugFlag)
 					return false;
 
                 if (!m_OcrDataAvailable.HasValue)

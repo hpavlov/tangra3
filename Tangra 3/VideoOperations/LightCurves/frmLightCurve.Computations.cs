@@ -1224,6 +1224,8 @@ namespace Tangra.VideoOperations.LightCurves
         {
             get
             {
+                m_LCFile.Header.LcFile = m_LCFile;
+
                 // AVI|AAV|ADV
                 string videoSystem = m_LCFile.Header.GetVideoFileFormat();
                 // PAL|NTSC|Digital

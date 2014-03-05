@@ -475,7 +475,7 @@ namespace Tangra.Controller
 					m_FramePlayer.IsAstroAnalogueVideo &&
 					m_FramePlayer.AstroAnalogueVideoHasNtpData &&
 					!m_FramePlayer.AstroAnalogueVideoHasOcrData &&
-					TangraConfig.Settings.AAV.NtpDebugFlag &&
+					TangraConfig.Settings.AAV.NtpTimeDebugFlag &&
 					m_FramePlayer.AstroAnalogueVideoIntegratedAAVFrames == 1;
 			}
 		}
