@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using Tangra.Model.Config;
+using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.Model.VideoOperations;
 using Tangra.OCR.IotaVtiOsdProcessor;
@@ -635,54 +636,63 @@ namespace Tangra.OCR
 			int oddMs = (int)Math.Round(oddFieldOSD.Milliseconds10 / 10.0f);
 			if (oddMs >= 1000) oddMs = 999;
 
-			DateTime oddFieldTimestamp = new DateTime(1, 1, 1, oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds, oddMs);
-
-			int evenMs = (int)Math.Round(evenFieldOSD.Milliseconds10 / 10.0f);
-			if (evenMs >= 1000) evenMs = 999;
-
-			DateTime evenFieldTimestamp = new DateTime(1, 1, 1, evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds, evenMs); 
-			
-			double fieldDuration = Math.Abs(new TimeSpan(oddFieldTimestamp.Ticks - evenFieldTimestamp.Ticks).TotalMilliseconds);
-			
-            if (m_Processor.VideoFormat.Value == VideoFormat.PAL &&
-                (Math.Abs(fieldDuration - IotaVtiOcrProcessor.FIELD_DURATION_PAL) > 1.0))
+            try
             {
-                // PAL field is not 20 ms
-                failedValidation = true;
-            }
+                DateTime oddFieldTimestamp = new DateTime(1, 1, 1, oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds, oddMs);
 
-            if (m_Processor.VideoFormat.Value == VideoFormat.NTSC &&
-                (Math.Abs(fieldDuration - IotaVtiOcrProcessor.FIELD_DURATION_NTSC) > 1.0))
+                int evenMs = (int)Math.Round(evenFieldOSD.Milliseconds10 / 10.0f);
+                if (evenMs >= 1000) evenMs = 999;
+
+                DateTime evenFieldTimestamp = new DateTime(1, 1, 1, evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds, evenMs);
+
+                double fieldDuration = Math.Abs(new TimeSpan(oddFieldTimestamp.Ticks - evenFieldTimestamp.Ticks).TotalMilliseconds);
+
+                if (m_Processor.VideoFormat.Value == VideoFormat.PAL &&
+                    (Math.Abs(fieldDuration - IotaVtiOcrProcessor.FIELD_DURATION_PAL) > 1.0))
+                {
+                    // PAL field is not 20 ms
+                    failedValidation = true;
+                }
+
+                if (m_Processor.VideoFormat.Value == VideoFormat.NTSC &&
+                    (Math.Abs(fieldDuration - IotaVtiOcrProcessor.FIELD_DURATION_NTSC) > 1.0))
+                {
+                    // NTSC field is not 16.68 ms
+                    failedValidation = true;
+                }
+
+                int oddEvenFieldDirection = oddFieldTimestamp.Ticks - evenFieldTimestamp.Ticks < 0 ? -1 : 1;
+                if (oddEvenFieldDirection != m_Corrector.GetOddEvenFieldDirection())
+                {
+                    // Field timestamps are wonrg have changed order (did they swap)?
+                    failedValidation = true;
+                }
+
+                if (failedValidation)
+                    failedValidation = !m_Corrector.TryToCorrect(frameNo, oddFieldOSD, evenFieldOSD, ref oddFieldTimestamp, ref evenFieldTimestamp);
+
+                if (failedValidation)
+                {
+                    if (m_VideoController != null)
+                        m_VideoController.RegisterOcrError();
+                }
+                else
+                    m_Corrector.RegisterSuccessfulTimestamp(frameNo, oddFieldOSD, evenFieldOSD, oddFieldTimestamp, evenFieldTimestamp);
+
+                if (oddFieldOSD.FrameNumber == evenFieldOSD.FrameNumber - 1)
+                {
+                    return failedValidation ? DateTime.MinValue : oddFieldTimestamp;
+                }
+                else
+                {
+                    return failedValidation ? DateTime.MinValue : evenFieldTimestamp;
+                }
+            }
+            catch(Exception ex)
             {
-				// NTSC field is not 16.68 ms
-                failedValidation = true;
-            }
+                Trace.WriteLine(ex.GetFullStackTrace());
 
-			int oddEvenFieldDirection = oddFieldTimestamp.Ticks - evenFieldTimestamp.Ticks < 0 ? -1 : 1;
-			if (oddEvenFieldDirection != m_Corrector.GetOddEvenFieldDirection())
-			{
-				// Field timestamps are wonrg have changed order (did they swap)?
-				failedValidation = true;				
-			}
-
-			if (failedValidation)
-				failedValidation = !m_Corrector.TryToCorrect(frameNo, oddFieldOSD, evenFieldOSD, ref oddFieldTimestamp, ref evenFieldTimestamp);
-
-            if (failedValidation)
-            {	            
-                if (m_VideoController != null)
-                    m_VideoController.RegisterOcrError();
-            }
-	        else
-				m_Corrector.RegisterSuccessfulTimestamp(frameNo, oddFieldOSD, evenFieldOSD, oddFieldTimestamp, evenFieldTimestamp);
-            
-            if (oddFieldOSD.FrameNumber == evenFieldOSD.FrameNumber - 1)
-            {
-				return failedValidation ? DateTime.MinValue : oddFieldTimestamp;
-            }
-            else
-            {
-				return failedValidation ? DateTime.MinValue : evenFieldTimestamp;
+                return DateTime.MinValue;
             }
         }
 
