@@ -1,0 +1,22 @@
+LIBRARY
+
+EXPORTS
+    ; Explicit exports can go here
+
+	AdvGetCurrentFilePath
+	AdvNewFile
+	AdvDefineImageSection
+	AdvDefineImageLayout
+	AdvDefineStatusSectionTag
+	AdvAddFileTag
+	AdvAddOrUpdateImageSectionTag
+	AdvEndFile
+	AdvBeginFrame
+	AdvFrameAddImage
+	AdvFrameAddStatusTag
+	AdvFrameAddStatusTagMessage
+	AdvFrameAddStatusTagUInt8
+	AdvFrameAddStatusTag16
+	AdvFrameAddStatusTagReal
+	AdvFrameAddStatusTag64
+	AdvEndFrame

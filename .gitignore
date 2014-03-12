@@ -80,3 +80,7 @@ _ReSharper.*
 /Tangra.Video/Windows/Tangra.Video.opensdf
 /Work/AviDemo
 /Work/AviFile
+/AdvLib.Core/*.filters
+/AdvLib.Core/Debug/AdvLib.Core.Build.CppClean.log
+/AdvLib.Core/Debug
+/Debug
