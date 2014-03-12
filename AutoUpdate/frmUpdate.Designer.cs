@@ -92,7 +92,7 @@ namespace AutoUpdate
             this.MinimizeBox = false;
             this.Name = "frmUpdate";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Tangra3 Updater, ver. 2.4";
+            this.Text = "Tangra3 Updater, ver. 2.5";
             this.Load += new System.EventHandler(this.frmUpdate_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
