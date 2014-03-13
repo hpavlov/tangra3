@@ -63,6 +63,7 @@ void AdvStatusSection::BeginFrame()
 	m_FrameStatusTagsUInt8.clear();
 	m_FrameStatusTagsUInt16.clear();
 	m_FrameStatusTagsUInt64.clear();
+	m_FrameStatusTagsUInt32.clear();
 	m_FrameStatusTagsReal.clear();
 	
 	m_FrameStatusTagsMessages.clear();
@@ -99,6 +100,11 @@ void AdvStatusSection::AddFrameStatusTagUInt16(unsigned int tagIndex, unsigned s
 void AdvStatusSection::AddFrameStatusTagReal(unsigned int tagIndex, float tagValue)
 {
 	m_FrameStatusTagsReal.insert(make_pair(tagIndex, tagValue));
+}
+
+void AdvStatusSection::AddFrameStatusTagUInt32(unsigned int tagIndex, unsigned int tagValue)
+{
+	m_FrameStatusTagsUInt32.insert(make_pair(tagIndex, tagValue));
 }
 
 void AdvStatusSection::AddFrameStatusTagUInt64(unsigned int tagIndex, long long tagValue)
@@ -156,6 +162,8 @@ unsigned char* AdvStatusSection::GetDataBytes(unsigned int *bytesCount)
 	numTagEntries+=m_FrameStatusTagsUInt16.size();
 	arrayLength+=m_FrameStatusTagsUInt64.size() * (8 /*sizeof(long long)*/ + 1 /* TagId*/ );
 	numTagEntries+=m_FrameStatusTagsUInt64.size();
+	arrayLength+=m_FrameStatusTagsUInt32.size() * (4 /*sizeof(unsinged int)*/ + 1 /* TagId*/ );
+	numTagEntries+=m_FrameStatusTagsUInt32.size();
 	arrayLength+=m_FrameStatusTagsReal.size() * (4 /*sizeof(float)*/ + 1 /* TagId*/ );
 	numTagEntries+=m_FrameStatusTagsReal.size();
 	
@@ -185,6 +193,23 @@ unsigned char* AdvStatusSection::GetDataBytes(unsigned int *bytesCount)
 			statusData[dataPos + 8] = (unsigned char)((tagValue >> 56) & 0xFF);			
 	
 			dataPos+=9;
+			
+			currUInt64++;
+		}
+
+		map<unsigned int, unsigned int>::iterator currUInt32 = m_FrameStatusTagsUInt32.begin();
+		while (currUInt32 != m_FrameStatusTagsUInt32.end()) 
+		{
+			unsigned char tagId = (unsigned char)(currUInt32->first & 0xFF);
+			statusData[dataPos] = tagId;
+
+			unsigned int tagValue = (long long)(currUInt32->second);
+			statusData[dataPos + 1] = (unsigned char)(tagValue & 0xFF);
+			statusData[dataPos + 2] = (unsigned char)((tagValue >> 8) & 0xFF);
+			statusData[dataPos + 3] = (unsigned char)((tagValue >> 16) & 0xFF);
+			statusData[dataPos + 4] = (unsigned char)((tagValue >> 24) & 0xFF);		
+	
+			dataPos+=5;
 			
 			currUInt64++;
 		}

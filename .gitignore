@@ -84,3 +84,5 @@ _ReSharper.*
 /AdvLib.Core/Debug/AdvLib.Core.Build.CppClean.log
 /AdvLib.Core/Debug
 /Debug
+/AdvLib.Core/x64/Debug
+/x64/Debug

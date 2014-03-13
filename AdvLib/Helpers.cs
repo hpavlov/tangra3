@@ -60,6 +60,18 @@ public class AdvStatusSectionConfig
 	public bool RecordVideoCameraFrameId { get; set; }
 	public bool RecordUserCommands { get; set; }
 	public bool RecordSystemErrors { get; set; }
+
+	internal Dictionary<string, AdvTagType> AdditionalStatusTags = new Dictionary<string, AdvTagType>(); 
+
+	public int AddDefineTag(string tagName, AdvTagType tagType)
+	{
+		if (AdditionalStatusTags.ContainsKey(tagName))
+			throw new ArgumentException("This tag name as been already added.");
+
+		AdditionalStatusTags.Add(tagName, tagType);
+
+		return AdditionalStatusTags.Count - 1;
+	}
 }
 
 public class AdvStatusEntry
@@ -112,7 +124,7 @@ public class AdvStatusEntry
 	/// <summary>
 	/// The id of the frame as labeled by the camera frame counter
 	/// </summary>
-	public long VideoCameraFrameId { get; set; }
+	public ulong VideoCameraFrameId { get; set; }
 
 	/// <summary>
 	/// The user commands executed since the last recorded frame. Up to 16 lines, each line up to 255 characters.
@@ -123,4 +135,10 @@ public class AdvStatusEntry
 	/// System errors detected since the last recorded frame. Up to 16 lines, each line up to 255 characters.
 	/// </summary>
 	public string[] SystemErrors { get; set; }
+
+	/// <summary>
+	/// The values of the additional tags. The value types must correspond to the defined tag type. Only the following
+	/// .NET types are supported: byte, ushort, uint, ulong, float, string and string[]
+	/// </summary>
+	public object[] AdditionalStatusTags;
 }

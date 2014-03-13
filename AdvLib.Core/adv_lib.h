@@ -18,11 +18,13 @@ void AdvAddOrUpdateImageSectionTag(const char* tagName, const char* tagValue);
 void AdvEndFile();
 bool AdvBeginFrame(long long timeStamp, unsigned int elapsedTime, unsigned int exposure);
 void AdvFrameAddImage(unsigned char layoutId, unsigned short* pixels, unsigned char pixelsBpp);
+void AdvFrameAddImageBytes(unsigned char layoutId, unsigned char* pixels, unsigned char pixelsBpp);
 void AdvFrameAddStatusTag(unsigned int tagIndex, const char* tagValue);
 void AdvFrameAddStatusTagMessage(unsigned int tagIndex, const char* tagValue);
 void AdvFrameAddStatusTagUInt8(unsigned int tagIndex, unsigned char tagValue);
 void AdvFrameAddStatusTag16(unsigned int tagIndex, unsigned short tagValue);
 void AdvFrameAddStatusTagReal(unsigned int tagIndex, float tagValue);
+void AdvFrameAddStatusTag32(unsigned int tagIndex, unsigned long tagValue);
 void AdvFrameAddStatusTag64(unsigned int tagIndex, long long tagValue);
 void AdvEndFrame();
 

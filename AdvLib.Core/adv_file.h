@@ -24,7 +24,7 @@ namespace AdvLib
 			
 		protected:
 			AdvLib::AdvFramesIndex* m_Index;
-			map<const char*, string> m_FileTags;			
+			map<string, string> m_FileTags;			
 			
 		private:
 			AdvLib::AdvImageLayout* m_CurrentImageLayout;
@@ -35,7 +35,7 @@ namespace AdvLib
 			unsigned int m_FrameBufferIndex; 
 			unsigned int m_ElapedTime;
 						
-			map<const char*, string> m_UserMetadataTags;
+			map<string, string> m_UserMetadataTags;
 
 			void InitFileState();
 		public:
@@ -55,6 +55,7 @@ namespace AdvLib
 			void AddFrameStatusTagMessage(unsigned int tagIndex, const char* tagValue);
 			void AddFrameStatusTagUInt8(unsigned int tagIndex, unsigned char tagValue);
 			void AddFrameStatusTagUInt16(unsigned int tagIndex, unsigned short tagValue);			
+			void AddFrameStatusTagUInt32(unsigned int tagIndex, unsigned int tagValue);
 			void AddFrameStatusTagUInt64(unsigned int tagIndex, long long tagValue);
 			void AddFrameStatusTagReal(unsigned int tagIndex, float tagValue);
 			void AddFrameImage(unsigned char layoutId, unsigned short* pixels, unsigned char pixelsBpp);

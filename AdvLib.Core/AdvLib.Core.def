@@ -13,10 +13,12 @@ EXPORTS
 	AdvEndFile
 	AdvBeginFrame
 	AdvFrameAddImage
+	AdvFrameAddImageBytes
 	AdvFrameAddStatusTag
 	AdvFrameAddStatusTagMessage
 	AdvFrameAddStatusTagUInt8
 	AdvFrameAddStatusTag16
 	AdvFrameAddStatusTagReal
+	AdvFrameAddStatusTag32
 	AdvFrameAddStatusTag64
 	AdvEndFrame

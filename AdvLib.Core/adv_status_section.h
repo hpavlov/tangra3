@@ -22,6 +22,7 @@ class AdvStatusSection {
 		map<unsigned int, string> m_FrameStatusTags;
 		map<unsigned int, unsigned char> m_FrameStatusTagsUInt8;
 		map<unsigned int, unsigned short> m_FrameStatusTagsUInt16;
+		map<unsigned int, unsigned int> m_FrameStatusTagsUInt32;
 		map<unsigned int, long long> m_FrameStatusTagsUInt64;
 		map<unsigned int, float> m_FrameStatusTagsReal;
 		map<unsigned int, list<string> > m_FrameStatusTagsMessages;
@@ -40,6 +41,7 @@ class AdvStatusSection {
 		void AddFrameStatusTagUInt8(unsigned int tagIndex, unsigned char tagValue);
 		void AddFrameStatusTagUInt16(unsigned int tagIndex, unsigned short tagValue);
 		void AddFrameStatusTagReal(unsigned int tagIndex, float tagValue);
+		void AddFrameStatusTagUInt32(unsigned int tagIndex, unsigned int tagValue);
 		void AddFrameStatusTagUInt64(unsigned int tagIndex, long long tagValue);
 		unsigned char* GetDataBytes(unsigned int *bytesCount);
 		void BeginFrame();

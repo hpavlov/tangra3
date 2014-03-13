@@ -118,10 +118,10 @@ bool AdvFile::BeginFile(const char* fileName)
 	unsigned int fileTagsCount = m_FileTags.size();
 	advfwrite(&fileTagsCount, 4, 1, m_File);
 	
-	map<const char*, string>::iterator curr = m_FileTags.begin();
+	map<string, string>::iterator curr = m_FileTags.begin();
 	while (curr != m_FileTags.end()) 
 	{
-		char* tagName = const_cast<char*>(curr->first);	
+		char* tagName = const_cast<char*>(curr->first.c_str());	
 		WriteString(m_File, tagName);
 		
 		char* tagValue = const_cast<char*>(curr->second.c_str());	
@@ -168,10 +168,10 @@ void AdvFile::EndFile()
 	unsigned int userTagsCount = m_UserMetadataTags.size();
 	advfwrite(&userTagsCount, 4, 1, m_File);
 	
-	map<const char*, string>::iterator curr = m_UserMetadataTags.begin();
+	map<string, string>::iterator curr = m_UserMetadataTags.begin();
 	while (curr != m_UserMetadataTags.end()) 
 	{
-		char* userTagName = const_cast<char*>(curr->first);	
+		char* userTagName = const_cast<char*>(curr->first.c_str());	
 		WriteString(m_File, userTagName);
 		
 		char* userTagValue = const_cast<char*>(curr->second.c_str());	
@@ -193,25 +193,25 @@ void AdvFile::AddImageSection(AdvLib::AdvImageSection* section)
 
 	char convStr [10];
 	snprintf(convStr, 10, "%d", section->Width);
-	m_FileTags.insert(make_pair("WIDTH", string(convStr)));
+	m_FileTags.insert(make_pair(string("WIDTH"), string(convStr)));
 	
 	snprintf(convStr, 10, "%d", section->Height);
-	m_FileTags.insert(make_pair("HEIGHT", string(convStr)));
+	m_FileTags.insert(make_pair(string("HEIGHT"), string(convStr)));
 	
 	snprintf(convStr, 10, "%d", section->DataBpp);
-	m_FileTags.insert(make_pair("BITPIX", string(convStr)));
+	m_FileTags.insert(make_pair(string("BITPIX"), string(convStr)));
 }
 
 int AdvFile::AddFileTag(const char* tagName, const char* tagValue)
 {	
-	m_FileTags.insert((make_pair(tagName, string(tagValue == NULL ? "" : tagValue))));
+	m_FileTags.insert((make_pair(string(tagName == NULL ? "" : tagName), string(tagValue == NULL ? "" : tagValue))));
 	
 	return m_FileTags.size();	
 }
 
 int AdvFile::AddUserTag(const char* tagName, const char* tagValue)
 {
-	m_UserMetadataTags.insert((make_pair(tagName, string(tagValue == NULL ? "" : tagValue))));
+	m_UserMetadataTags.insert((make_pair(string(tagName == NULL ? "" : tagName), string(tagValue == NULL ? "" : tagValue))));
 	
 	return m_UserMetadataTags.size();	
 }
@@ -287,6 +287,11 @@ void AdvFile::AddFrameStatusTagReal(unsigned int tagIndex, float tagValue)
 void AdvFile::AddFrameStatusTagUInt8(unsigned int tagIndex, unsigned char tagValue)
 {
 	StatusSection->AddFrameStatusTagUInt8(tagIndex, tagValue);
+}
+
+void AdvFile::AddFrameStatusTagUInt32(unsigned int tagIndex, unsigned int tagValue)
+{
+	StatusSection->AddFrameStatusTagUInt32(tagIndex, tagValue);
 }
 
 void AdvFile::AddFrameStatusTagUInt64(unsigned int tagIndex, long long tagValue)

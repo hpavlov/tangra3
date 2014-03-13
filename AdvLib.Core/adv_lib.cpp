@@ -133,6 +133,13 @@ bool AdvBeginFrame(long long timeStamp, unsigned int elapsedTime, unsigned int e
 	return true;
 }
 
+void AdvFrameAddImageBytes(unsigned char layoutId,  unsigned char* pixels, unsigned char pixelsBpp)
+{
+	AdvProfiling_StartProcessing();
+	g_AdvFile->AddFrameImage(layoutId, (unsigned short*)pixels, pixelsBpp);
+	AdvProfiling_EndProcessing();
+}
+
 void AdvFrameAddImage(unsigned char layoutId,  unsigned short* pixels, unsigned char pixelsBpp)
 {
 	AdvProfiling_StartProcessing();
@@ -159,6 +166,13 @@ void AdvFrameAddStatusTagUInt8(unsigned int tagIndex, unsigned char tagValue)
 	AdvProfiling_StartProcessing();
 	g_AdvFile->AddFrameStatusTagUInt8(tagIndex, tagValue);
 	AdvProfiling_EndProcessing();	
+}
+
+void AdvFrameAddStatusTag32(unsigned int tagIndex, unsigned long tagValue)
+{
+	AdvProfiling_StartProcessing();
+	g_AdvFile->AddFrameStatusTagUInt32(tagIndex, tagValue);
+	AdvProfiling_EndProcessing();
 }
 
 void AdvFrameAddStatusTag64(unsigned int tagIndex, long long tagValue)
