@@ -320,8 +320,8 @@ namespace Tangra.Video.AstroDigitalVideo
 			bool isLittleEndian = m_ImageSection.ByteOrder == AdvImageSection.ImageByteOrder.LittleEndian;
 
 			var rv = new ushort[Width, Height];
-			bool convertT012Bit = this.m_ImageSection.BitsPerPixel == 12;
-			bool convertT014Bit = this.m_ImageSection.BitsPerPixel == 14;
+            bool convertT012Bit = this.m_ImageSection.DynaBits == 16 && this.m_ImageSection.BitsPerPixel == 12;
+            bool convertT014Bit = this.m_ImageSection.DynaBits == 16 && this.m_ImageSection.BitsPerPixel == 14;
 			
 			for (int y = 0; y < Height; ++y)
 			{

@@ -22,6 +22,7 @@ namespace Tangra.Video.AstroDigitalVideo
 		public static string KEY_DIFFCORR_KEY_FRAME_FREQUENCY = "DIFFCODE-KEY-FRAME-FREQUENCY";
 		public static string KEY_DATA_LAYOUT = "DATA-LAYOUT";
 		public static string KEY_IMAGE_BYTE_ORDER = "IMAGE-BYTE-ORDER";
+        public static string KEY_IMAGE_DYNABITS = "IMAGE-DYNABITS";
 		public static string KEY_ADV16_NORMVAL = "AAV16-NORMVAL";
 
 		public static string KEY_INSTRUMENT = "INSTRUME";

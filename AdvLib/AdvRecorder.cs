@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -39,14 +40,23 @@ public class AdvImageConfig
 {
 	public ushort ImageWidth { get; private set; }
 	public ushort ImageHeight { get; private set; }
-	public byte ImageBitsPerPixel { get; private set; }
+	public byte CameraBitsPerPixel { get; private set; }
+    public byte ImageBitsPerPixel { get; private set; }
 	public bool ImageBigEndian { get; set; }
 
-	public void SetImageParameters(ushort width, ushort height, byte bpp)
+    /// <summary>
+    /// Sets the image configuration
+    /// </summary>
+    /// <param name="width">The width of the image in pixels.</param>
+    /// <param name="height">The height of the image in pixels.</param>
+    /// <param name="cameraBitDepth">The native camera bith depth.</param>
+    /// <param name="imageDynamicBitDepth">The bit depth of the dynamic range of the saved images.</param>
+    public void SetImageParameters(ushort width, ushort height, byte cameraBitDepth, byte imageDynamicBitDepth)
 	{
 		ImageWidth = width;
 		ImageHeight = height;
-		ImageBitsPerPixel = bpp;
+        CameraBitsPerPixel = cameraBitDepth;
+        ImageBitsPerPixel = imageDynamicBitDepth;
 	}	
 }
 
@@ -136,8 +146,9 @@ public class AdvRecorder
 			AdvLib.AdvAddFileTag(EnsureStringLength(key), EnsureStringLength(FileMetaData.UserMetaData[key]));				
 		}
 
-		AdvLib.AdvDefineImageSection(ImageConfig.ImageWidth, ImageConfig.ImageHeight, ImageConfig.ImageBitsPerPixel);
+        AdvLib.AdvDefineImageSection(ImageConfig.ImageWidth, ImageConfig.ImageHeight, ImageConfig.CameraBitsPerPixel);
 		AdvLib.AdvAddOrUpdateImageSectionTag("IMAGE-BYTE-ORDER", ImageConfig.ImageBigEndian ? "BIG-ENDIAN" : "LITTLE-ENDIAN");
+	    AdvLib.AdvAddOrUpdateImageSectionTag("IMAGE-DYNABITS", ImageConfig.ImageBitsPerPixel.ToString(CultureInfo.InvariantCulture));
 
 		AdvLib.AdvDefineImageLayout(CFG_ADV_LAYOUT_1_UNCOMPRESSED, "FULL-IMAGE-RAW", "UNCOMPRESSED", 16, 0, null);
 		AdvLib.AdvDefineImageLayout(CFG_ADV_LAYOUT_2_COMPRESSED, "FULL-IMAGE-DIFFERENTIAL-CODING", "QUICKLZ", 12, 32, "PREV-FRAME");

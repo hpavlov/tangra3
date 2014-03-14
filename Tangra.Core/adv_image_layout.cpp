@@ -374,8 +374,8 @@ void AdvImageLayout::GetPixelsFrom16BitByteArrayRawLayout(unsigned char* layoutD
 	{		
 		unsigned long* pPixelsOut = pixelsOut;
 		bool isLittleEndian = m_ImageSection->ByteOrder == LittleEndian;
-		bool convertTo12Bit = m_ImageSection->DataBpp == 12;
-		bool convertTo14Bit = m_ImageSection->DataBpp == 14;
+		bool convertTo12Bit = m_ImageSection->DynaBits == 16 && m_ImageSection->DataBpp == 12;
+		bool convertTo14Bit = m_ImageSection->DynaBits == 16 &&m_ImageSection->DataBpp == 14;
 
 		for (int y = 0; y < Height; ++y)
 		{

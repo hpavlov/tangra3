@@ -70,6 +70,13 @@ void AdvImageSection::AddOrUpdateTag(const char* tagName, const char* tagValue)
 		if (0 == strcmp("LITTLE-ENDIAN", tagValue)) ByteOrder = LittleEndian;
 	}
 
+	if (0 == strcmp("IMAGE-DYNABITS", tagName))
+	{
+		if (0 == strcmp("12", tagValue)) DynaBits = 12;
+		if (0 == strcmp("14", tagValue)) DynaBits = 14;
+		if (0 == strcmp("16", tagValue)) DynaBits = 16;
+	}
+	
 	if (0 == strcmp("SECTION-DATA-REDUNDANCY-CHECK", tagName))
 	{
 		UsesCRC = false;
@@ -103,6 +110,8 @@ AdvImageSection::AdvImageSection(FILE* pFile)
 		fread(&Width, 4, 1, pFile);
 		fread(&Height, 4, 1, pFile);
 		fread(&DataBpp, 1, 1, pFile);	
+
+		DynaBits = 16; // Default value for old ADV files
 
 		unsigned char numLayouts;
 		fread(&numLayouts, 1, 1, pFile);

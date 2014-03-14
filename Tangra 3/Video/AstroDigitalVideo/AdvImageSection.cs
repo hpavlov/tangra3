@@ -23,6 +23,7 @@ namespace Tangra.Video.AstroDigitalVideo
         public readonly byte BitsPerPixel;
 
     	public ImageByteOrder ByteOrder;
+        public int DynaBits;
 
     	internal Dictionary<string, string> ImageSerializationProperties = new Dictionary<string, string>();
     	internal Dictionary<byte, AdvImageLayout> ImageLayouts = new Dictionary<byte, AdvImageLayout>();
@@ -80,6 +81,10 @@ namespace Tangra.Video.AstroDigitalVideo
 			{
 				if (propVal == "BIG-ENDIAN") ByteOrder = ImageByteOrder.BigEndian;
 			}
+		    if (ImageSerializationProperties.TryGetValue(AdvKeywords.KEY_IMAGE_DYNABITS, out propVal))
+		        DynaBits = int.Parse(propVal);
+		    else
+		        DynaBits = 16;
 		}
 
 		public object GetDataFromDataBytes(byte[] bytes, ushort[,] prevImageData, int size, int startIndex)

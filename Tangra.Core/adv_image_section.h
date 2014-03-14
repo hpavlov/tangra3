@@ -27,6 +27,7 @@ class AdvImageSection {
 		unsigned int Width;
 		unsigned int Height;
 		unsigned char DataBpp;
+		unsigned char DynaBits;
 		unsigned long NormalisationValue;
 		ImageByteOrder ByteOrder;
 		bool UsesCRC;

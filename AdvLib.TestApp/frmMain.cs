@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -51,7 +52,9 @@ namespace AdvLibTestApp
 			// recorder.LocationData.GpsHdop = "0.7";
 
 			// Define the image size and bit depth
-			recorder.ImageConfig.SetImageParameters(640, 480, 12);
+            // NOTE: Change this to 16 if the image pixels have been stretched to 16 bits before saving
+		    byte dynaBits = 12;
+            recorder.ImageConfig.SetImageParameters(640, 480, 12, dynaBits);
 
 			// By default no status section values will be recorded. The user must enable the ones they need recorded and 
 			// can also define additional status parameters to be recorded with each video frame
@@ -59,7 +62,8 @@ namespace AdvLibTestApp
 			recorder.StatusSectionConfig.RecordGamma = true;
 			int customTagId = recorder.StatusSectionConfig.AddDefineTag("EXAMPLE-MESSAGES", AdvTagType.List16OfAnsiString255);
 
-			recorder.StartRecordingNewFile(@"C:\Filename.adv");
+		    string fileName = Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory + @"\Filename.adv");
+            recorder.StartRecordingNewFile(fileName);
 
 			AdvStatusEntry status = new AdvStatusEntry();
 			status.AdditionalStatusTags = new object[1];
@@ -75,8 +79,10 @@ namespace AdvLibTestApp
 				status.Gamma = GetCurrentImageGamma(i);
 				status.AdditionalStatusTags[customTagId] = GetCurrentExampleMassages(i);
 
-				byte[] imageBytes = GetCurrentImageBytes(i);
-				ushort[] imagePixels = GetCurrentImageBytesIn16(i);
+                byte[] imageBytes = GetCurrentImageBytes(i, dynaBits);
+                ushort[] imagePixels = GetCurrentImageBytesIn16(i, dynaBits);
+
+                // NOTE: The image can be added using both byte[] and ushort[] arrays. This example used the byte[] 
 
 				recorder.AddVideoFrame(
 					imageBytes,
@@ -91,6 +97,8 @@ namespace AdvLibTestApp
 			}
 
 			recorder.StopRecording();
+
+            MessageBox.Show(string.Format("'{0}' has been created.", fileName));
 		}
 
 		private int GetTotalImages()
@@ -129,20 +137,26 @@ namespace AdvLibTestApp
 			return new string[] { "Message 1", "Message 2", "Message 3" }; ;
 		}
 
-		private ushort[] GetCurrentImageBytesIn16(int frameId)
+        private ushort[] GetCurrentImageBytesIn16(int frameId, byte dynaBits)
 		{
 			ushort[] pixels = new ushort[640 * 480];
 
 			// Background values are all half way 0x0FFF / 2 = 0x07FF
 			for (int i = 0; i < pixels.Length; i++)
 			{
-				pixels[i] = 0x7FF0;
+                if (dynaBits == 16)
+				    pixels[i] = 0x7FF0;
+                else if (dynaBits == 12)
+                    pixels[i] = 0x07FF;
 			}
 
 			// There is a pixel wide line from top left - down and right with full intensity (0x0FFF)
 			for (int x = 0; x < 480; x++)
 			{
-				pixels[(x * 640 + x)] = 0xFFF0;
+                if (dynaBits == 16)
+				    pixels[(x * 640 + x)] = 0xFFF0;
+                else if (dynaBits == 12)
+                    pixels[(x * 640 + x)] = 0x0FFF;
 			}
 
 			// There is a pixel wide line from top right - down and left with zero intensity (0x0000)
@@ -154,7 +168,7 @@ namespace AdvLibTestApp
 			return pixels;
 		}
 
-		private byte[] GetCurrentImageBytes(int frameId)
+        private byte[] GetCurrentImageBytes(int frameId, byte dynaBits)
 		{
 			// NOTE: In this TEST example we mock up 12 bit pixels (640, 480), where 
 			
@@ -163,15 +177,31 @@ namespace AdvLibTestApp
 			// Background values are all half way 0x0FFF / 2 = 0x07FF. This "scaled" to 16 bit is 0x7FF0
 			for (int i = 0; i < pixels.Length / 2; i++)
 			{
-				pixels[2 * i] = 0xF0;
-				pixels[2 * i + 1] = 0x7F;
+                if (dynaBits == 16)
+                {
+                    pixels[2 * i] = 0xF0;
+                    pixels[2 * i + 1] = 0x7F;
+                }
+                else if (dynaBits == 12)
+                {
+                    pixels[2 * i] = 0xFF;
+                    pixels[2 * i + 1] = 0x07;
+                }
 			}
 
 			// There is a pixel wide line from top left - down and right with full intensity (0x0FFF). This "scaled" to 16 bit is 0xFFF0
 			for (int x = 0; x < 480; x++)
 			{
-				pixels[2 * (x * 640 + x)] = 0xF0;
-				pixels[2 * (x * 640 + x) + 1] = 0xFF;
+			    if (dynaBits == 16)
+			    {
+			        pixels[2*(x*640 + x)] = 0xF0;
+			        pixels[2*(x*640 + x) + 1] = 0xFF;
+			    }
+                else if (dynaBits == 12)
+                {
+                    pixels[2 * (x * 640 + x)] = 0xFF;
+                    pixels[2 * (x * 640 + x) + 1] = 0x0F;
+                }
 			}
 
 			// There is a pixel wide line from top right - down and left with zero intensity (0x0000)
