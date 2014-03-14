@@ -632,8 +632,11 @@ namespace Tangra.Video
 
             if (engine == "ADV")
             {
-                equipmentInfo.AdvrVersion = advFile.AdvFileTags["ADVR-SOFTWARE-VERSION"];
-                equipmentInfo.HtccFirmareVersion = advFile.AdvFileTags["HTCC-FIRMWARE-VERSION"];
+				advFile.AdvFileTags.TryGetValue("ADVR-SOFTWARE-VERSION", out equipmentInfo.AdvrVersion);
+				if (string.IsNullOrWhiteSpace(equipmentInfo.AdvrVersion))
+					advFile.AdvFileTags.TryGetValue("RECORDER-SOFTWARE-VERSION", out equipmentInfo.AdvrVersion);
+
+				advFile.AdvFileTags.TryGetValue("HTCC-FIRMWARE-VERSION", out equipmentInfo.HtccFirmareVersion);
                 equipmentInfo.SensorInfo = advFile.AdvFileTags["CAMERA-SENSOR-INFO"];
 
                 advFile.AdvFileTags.TryGetValue("LONGITUDE-WGS84", out geoLocation.Longitude);

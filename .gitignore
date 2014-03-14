@@ -86,3 +86,7 @@ _ReSharper.*
 /Debug
 /AdvLib.Core/x64/Debug
 /x64/Debug
+/AdvLib.Core/Release
+/AdvLib.Core/x64/Release
+/Release
+/x64/Release

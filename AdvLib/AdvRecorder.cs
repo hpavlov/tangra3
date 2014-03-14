@@ -26,6 +26,15 @@ public class AdvFileMetaData
 	}
 }
 
+public class AdvLocationData
+{
+	public string LongitudeWgs84 { get; set; }
+	public string LatitudeWgs84 { get; set; }
+	public string AltitudeMsl { get; set; }
+	public string MslWgs84Offset { get; set; }
+	public string GpsHdop { get; set; }
+}
+
 public class AdvImageConfig
 {
 	public ushort ImageWidth { get; private set; }
@@ -78,6 +87,8 @@ public class AdvRecorder
 
 	public AdvImageConfig ImageConfig = new AdvImageConfig();
 
+	public AdvLocationData LocationData = new AdvLocationData();
+
 	private string EnsureStringLength(string input)
 	{
 		if (input == null)
@@ -92,6 +103,11 @@ public class AdvRecorder
 	{
 		AdvLib.AdvNewFile(fileName);
 
+		if (string.IsNullOrEmpty(FileMetaData.RecorderName)) throw new ArgumentException("FileMetaData.RecorderName must be specified.");
+		if (string.IsNullOrEmpty(FileMetaData.RecorderVersion)) throw new ArgumentException("FileMetaData.RecorderVersion must be specified.");
+		if (string.IsNullOrEmpty(FileMetaData.CameraModel)) throw new ArgumentException("FileMetaData.CameraModel must be specified.");
+		if (string.IsNullOrEmpty(FileMetaData.CameraSensorInfo)) throw new ArgumentException("FileMetaData.CameraSensorInfo must be specified.");
+
 		AdvLib.AdvAddFileTag("RECORDER-SOFTWARE-VERSION", EnsureStringLength(FileMetaData.RecorderVersion));
 		AdvLib.AdvAddFileTag("TIMER-FIRMWARE-VERSION", EnsureStringLength(FileMetaData.RecorderTimerFirmwareVersion));
 		AdvLib.AdvAddFileTag("ADVLIB-VERSION", "1.0");
@@ -100,11 +116,11 @@ public class AdvRecorder
 		AdvLib.AdvAddFileTag("FSTF-TYPE", "ADV");
 		AdvLib.AdvAddFileTag("ADV-VERSION", "1");
 
-		//AdvLib.AdvAddFileTag("LONGITUDE-WGS84", &SYS_GPS_LONGITUDE[0]);
-		//AdvLib.AdvAddFileTag("LATITUDE-WGS84", &SYS_GPS_LATITUDE[0]);
-		//AdvLib.AdvAddFileTag("ALTITUDE-MSL", &SYS_GPS_ALTITUDE[0]);
-		//AdvLib.AdvAddFileTag("MSL-WGS84-OFFSET", &SYS_GPS_WSG84[0]);
-		//AdvLib.AdvAddFileTag("GPS-HDOP", &SYS_GPS_HDOP[0]);
+		if (!string.IsNullOrEmpty(LocationData.LongitudeWgs84)) AdvLib.AdvAddFileTag("LONGITUDE-WGS84", LocationData.LongitudeWgs84);
+		if (!string.IsNullOrEmpty(LocationData.LatitudeWgs84)) AdvLib.AdvAddFileTag("LATITUDE-WGS84", LocationData.LatitudeWgs84);
+		if (!string.IsNullOrEmpty(LocationData.AltitudeMsl)) AdvLib.AdvAddFileTag("ALTITUDE-MSL", LocationData.AltitudeMsl);
+		if (!string.IsNullOrEmpty(LocationData.MslWgs84Offset)) AdvLib.AdvAddFileTag("MSL-WGS84-OFFSET", LocationData.MslWgs84Offset);
+		if (!string.IsNullOrEmpty(LocationData.GpsHdop)) AdvLib.AdvAddFileTag("GPS-HDOP", LocationData.GpsHdop);
 
 		AdvLib.AdvAddFileTag("CAMERA-MODEL", EnsureStringLength(FileMetaData.CameraModel));
 		AdvLib.AdvAddFileTag("CAMERA-SERIAL-NO", EnsureStringLength(FileMetaData.CameraSerialNumber));

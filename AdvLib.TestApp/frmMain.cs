@@ -42,6 +42,14 @@ namespace AdvLibTestApp
 			recorder.FileMetaData.AddUserTag("CAMERA-HDR-RESPONSE", "yyy");
 			recorder.FileMetaData.AddUserTag("CAMERA-OPTICAL-RESOLUTION", "zzz");
 
+			// NOTE: If position data is available then set the recorder.LocationData properties, such as:		
+			// NOTE: The values are strings and don't have a fixed format but ADVS uses the format below
+			// recorder.LocationData.LongitudeWgs84 = "150*38'27.7\"";
+			// recorder.LocationData.LatitudeWgs84 = "-33*39'49.3\"";
+			// recorder.LocationData.AltitudeMsl = "284.4M";
+			// recorder.LocationData.MslWgs84Offset = "22.4M";
+			// recorder.LocationData.GpsHdop = "0.7";
+
 			// Define the image size and bit depth
 			recorder.ImageConfig.SetImageParameters(640, 480, 12);
 
@@ -68,12 +76,13 @@ namespace AdvLibTestApp
 				status.AdditionalStatusTags[customTagId] = GetCurrentExampleMassages(i);
 
 				byte[] imageBytes = GetCurrentImageBytes(i);
+				ushort[] imagePixels = GetCurrentImageBytesIn16(i);
 
 				recorder.AddVideoFrame(
 					imageBytes,
 
 					// NOTE: Use with caution! Using compression is slower and may not work at high frame rates 
-					// i.e. it may take longer to compress that data than for the next image to arrive on the buffer
+					// i.e. it may take longer to compress the data than for the next image to arrive on the buffer
 					true, 
 
 					AdvTimeStamp.FromDateTime(timestamp),
@@ -119,7 +128,31 @@ namespace AdvLibTestApp
 			// TODO: Get the image custom defined "EXAMPLE-MESSAGES" value.
 			return new string[] { "Message 1", "Message 2", "Message 3" }; ;
 		}
-		
+
+		private ushort[] GetCurrentImageBytesIn16(int frameId)
+		{
+			ushort[] pixels = new ushort[640 * 480];
+
+			// Background values are all half way 0x0FFF / 2 = 0x07FF
+			for (int i = 0; i < pixels.Length; i++)
+			{
+				pixels[i] = 0x7FF0;
+			}
+
+			// There is a pixel wide line from top left - down and right with full intensity (0x0FFF)
+			for (int x = 0; x < 480; x++)
+			{
+				pixels[(x * 640 + x)] = 0xFFF0;
+			}
+
+			// There is a pixel wide line from top right - down and left with zero intensity (0x0000)
+			for (int x = 0; x < 480; x++)
+			{
+				pixels[(x + 1) * 640 - x - 1] = 0x0000;
+			}
+
+			return pixels;
+		}
 
 		private byte[] GetCurrentImageBytes(int frameId)
 		{
@@ -127,18 +160,18 @@ namespace AdvLibTestApp
 			
 			byte[] pixels = new byte[640 * 480 * 2];
 
-			// Background values are all half way 0x0FFF / 2 = 0x07FF
+			// Background values are all half way 0x0FFF / 2 = 0x07FF. This "scaled" to 16 bit is 0x7FF0
 			for (int i = 0; i < pixels.Length / 2; i++)
 			{
-				pixels[2 * i] = 0xFF;
-				pixels[2 * i + 1] = 0x07;
+				pixels[2 * i] = 0xF0;
+				pixels[2 * i + 1] = 0x7F;
 			}
 
-			// There is a pixel wide line from top left - down and right with full intensity (0x0FFF)
+			// There is a pixel wide line from top left - down and right with full intensity (0x0FFF). This "scaled" to 16 bit is 0xFFF0
 			for (int x = 0; x < 480; x++)
 			{
-				pixels[2 * (x * 640 + x)] = 0xFF;
-				pixels[2 * (x * 640 + x) + 1] = 0x0F;				
+				pixels[2 * (x * 640 + x)] = 0xF0;
+				pixels[2 * (x * 640 + x) + 1] = 0xFF;
 			}
 
 			// There is a pixel wide line from top right - down and left with zero intensity (0x0000)
