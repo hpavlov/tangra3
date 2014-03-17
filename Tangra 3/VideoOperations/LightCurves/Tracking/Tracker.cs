@@ -1087,6 +1087,11 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 				if (RefinedFWHM[i] == 0) RefinedFWHM[i] = (float)m_AverageFWHM;
             }
         }
+		
+		public bool SupportsManualCorrections
+		{
+			get { return true; }
+		}
 
         public virtual void DoManualFrameCorrection(int deltaX, int deltaY)
         {

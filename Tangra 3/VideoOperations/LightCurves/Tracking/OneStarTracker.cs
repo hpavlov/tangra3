@@ -260,6 +260,11 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             get { return m_RefiningFramesLeft; }
         }
 
+		public bool SupportsManualCorrections
+		{
+			get { return true; }
+		}
+
         public override void DoManualFrameCorrection(int deltaX, int deltaY)
         {
             int firstFrameId = m_PreviousPositionFrameIds[0];

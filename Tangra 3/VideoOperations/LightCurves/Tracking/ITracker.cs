@@ -19,6 +19,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 		uint MedianValue { get; }
 		float RefiningPercentageWorkLeft { get; }
 
+		bool SupportsManualCorrections { get; }
 		void DoManualFrameCorrection(int manualTrackingDeltaX, int manualTrackingDeltaY);
 		void NextFrame(int frameNo, IAstroImage astroImage);
 		void BeginMeasurements(IAstroImage astroImage);

@@ -1312,7 +1312,7 @@ namespace Tangra.VideoOperations.LightCurves
 			m_ViewingLightCurve = false;
 			m_Configuring = false;
 
-			if (m_ManualTrackingDeltaX != 0 || m_ManualTrackingDeltaY != 0)
+			if (m_Tracker.SupportsManualCorrections && (m_ManualTrackingDeltaX != 0 || m_ManualTrackingDeltaY != 0))
 				m_Tracker.DoManualFrameCorrection(m_ManualTrackingDeltaX, m_ManualTrackingDeltaY);
 
 			m_ManualTrackingDeltaX = 0;

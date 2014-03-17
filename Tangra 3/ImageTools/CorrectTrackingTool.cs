@@ -35,7 +35,9 @@ namespace Tangra.ImageTools
 			m_VideoController = videoController;
 			m_Tracker = tracker;
 
-			m_VideoController.SetPictureBoxCursor(CustomCursors.PanCursor);
+			if (m_Tracker.SupportsManualCorrections)
+				m_VideoController.SetPictureBoxCursor(CustomCursors.PanCursor);
+
 			m_State = CorrectTrackingState.Normal;
 			m_LightCurvesVideoOperation.SetManualTrackingCorrection(0, 0);
 		}
@@ -55,7 +57,7 @@ namespace Tangra.ImageTools
 
 		public override void MouseDown(Point location)
 		{
-			if (m_State == CorrectTrackingState.Normal)
+			if (m_Tracker.SupportsManualCorrections && m_State == CorrectTrackingState.Normal)
 			{
 				m_State = CorrectTrackingState.Correcting;
 				m_VideoController.SetPictureBoxCursor(CustomCursors.PanEnabledCursor);
@@ -67,16 +69,12 @@ namespace Tangra.ImageTools
 
 		public override void MouseMove(Point location)
 		{
-			if (m_State == CorrectTrackingState.Correcting)
+			if (m_Tracker.SupportsManualCorrections && m_State == CorrectTrackingState.Correcting)
 			{
 				int deltaX = location.X - m_X0;
 				int deltaY = location.Y - m_Y0;
+
 				// If correcting see if there is a location in a radius of a few pixels which fits very well with the current targets
-
-				//foreach(TrackedObject obj in m_Tracker.TrackedObjects)
-				//{
-
-				//}
 
 				m_LightCurvesVideoOperation.SetManualTrackingCorrection(deltaX, deltaY);
 				m_VideoController.RefreshCurrentFrame();
@@ -85,13 +83,17 @@ namespace Tangra.ImageTools
 
 		public override void MouseUp(Point location)
 		{
-			m_VideoController.SetPictureBoxCursor(CustomCursors.PanCursor);
+			if (m_Tracker.SupportsManualCorrections)
+				m_VideoController.SetPictureBoxCursor(CustomCursors.PanCursor);
+
 			m_State = CorrectTrackingState.Normal;
 		}
 
 		public override void MouseLeave()
 		{
-			m_VideoController.SetPictureBoxCursor(CustomCursors.PanCursor);
+			if (m_Tracker.SupportsManualCorrections)
+				m_VideoController.SetPictureBoxCursor(CustomCursors.PanCursor);
+
 			m_State = CorrectTrackingState.Normal;
 		}
 

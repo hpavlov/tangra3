@@ -131,7 +131,7 @@ HRESULT ADVGetFrame(int frameNo, unsigned long* pixels, BYTE* bitmapPixels, BYTE
 	if (SUCCEEDED(rv))
 	{
 		if (g_UsesPreProcessing) 
-			return ApplyPreProcessing(pixels, g_TangraAdvFile->ImageSection->Width, g_TangraAdvFile->ImageSection->Height, g_TangraAdvFile->ImageSection->DataBpp, g_TangraAdvFile->ImageSection->NormalisationValue, bitmapPixels, bitmapBytes);
+			return ApplyPreProcessingWithNormalValue(pixels, g_TangraAdvFile->ImageSection->Width, g_TangraAdvFile->ImageSection->Height, g_TangraAdvFile->ImageSection->DataBpp, g_TangraAdvFile->ImageSection->NormalisationValue, bitmapPixels, bitmapBytes);
 		else
 			return GetBitmapPixels(g_TangraAdvFile->ImageSection->Width, g_TangraAdvFile->ImageSection->Height, pixels, bitmapPixels, bitmapBytes, g_TangraAdvFile->ImageSection->ByteOrder == LittleEndian, g_TangraAdvFile->ImageSection->DataBpp, g_TangraAdvFile->ImageSection->NormalisationValue);
 	}

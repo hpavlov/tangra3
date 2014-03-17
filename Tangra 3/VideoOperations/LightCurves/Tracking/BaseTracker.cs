@@ -100,6 +100,11 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 		public float RefiningPercentageWorkLeft { get; protected set; }
 
+		public bool SupportsManualCorrections
+		{
+			get { return false; }
+		}
+
 		public void DoManualFrameCorrection(int manualTrackingDeltaX, int manualTrackingDeltaY)
 		{
 			throw new NotImplementedException();

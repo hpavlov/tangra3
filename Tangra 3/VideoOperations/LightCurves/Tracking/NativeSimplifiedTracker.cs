@@ -84,7 +84,12 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			get { return 0; }
 		}
 
-		public void DoManualFrameCorrection(int manualTrackingDeltaX, int manualTrackingDeltaY)
+		public bool SupportsManualCorrections
+		{
+			get { return false; }
+		}
+
+		public void DoManualFrameCorrection(int deltaX, int deltaY)
 		{
 			throw new NotImplementedException();
 		}
