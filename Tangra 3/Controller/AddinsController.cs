@@ -123,51 +123,58 @@ namespace Tangra.Controller
 			ToolStripDropDownItem item = sender as ToolStripDropDownItem;
 
 			if (item != null &&
-				item.Tag != null &&
-				item.Tag is ITangraAddinAction)
+				item.Tag != null)
 			{
-                m_DelegatedLightCurveDataProvider = new MarshalByRefLightCurveDataProvider(m_LocalLightCurveDataProvider);
-                m_AddinManager.SetLightCurveDataProvider(m_DelegatedLightCurveDataProvider);
-			    string addinActonName = string.Empty;
+				ITangraAddinAction addinAction = item.Tag as ITangraAddinAction;
 
-				item.GetCurrentParent().Cursor = Cursors.WaitCursor;
-
-				try
+				if (addinAction != null && m_AddinManager != null)
 				{
-					addinActonName = ((ITangraAddinAction)item.Tag).DisplayName;
-					bool isEventTimeExtrator = ((ITangraAddinAction)item.Tag).ActionType == AddinActionType.LightCurveEventTimeExtractor;
-					bool canExecuteAction = false;
+					Control waitCursorCtl = item.GetCurrentParent();
 
-					if (isEventTimeExtrator)
-						canExecuteAction = (m_LocalLightCurveDataProvider as frmLightCurve).PrepareForLightCurveEventTimeExtraction(((ITangraAddinAction)item.Tag).DisplayName);
-					else
-						canExecuteAction = true;
+					m_DelegatedLightCurveDataProvider = new MarshalByRefLightCurveDataProvider(m_LocalLightCurveDataProvider);
+					m_AddinManager.SetLightCurveDataProvider(m_DelegatedLightCurveDataProvider);
+					string addinActonName = string.Empty;
 
-					if (canExecuteAction)
+					if (waitCursorCtl != null) waitCursorCtl.Cursor = Cursors.WaitCursor;
+
+					try
 					{
-						((ITangraAddinAction) item.Tag).Execute();
-					}
-				}
-				catch (AppDomainUnloadedException)
-				{ }
-				catch (ObjectDisposedException)
-				{ }
-				catch (Exception ex)
-				{
-                    Trace.WriteLine(ex.GetFullStackTrace());
+						addinActonName = addinAction.DisplayName;
+						bool isEventTimeExtrator = addinAction.ActionType == AddinActionType.LightCurveEventTimeExtractor;
+						bool canExecuteAction = false;
 
-					MessageBox.Show(
-						string.Format("{0}:\r\n\r\n{1} ({2})",
-							addinActonName,
-							ex is TargetInvocationException ? ex.InnerException.Message : ex.Message,
-							ex is TargetInvocationException ? ex.InnerException.GetType().Name : ex.GetType().Name),
-						"Error running add-in",
-						MessageBoxButtons.OK,
-						MessageBoxIcon.Error);
-				}
-				finally
-				{
-					item.GetCurrentParent().Cursor = Cursors.WaitCursor; 
+						if (isEventTimeExtrator)
+							canExecuteAction = (m_LocalLightCurveDataProvider as frmLightCurve).PrepareForLightCurveEventTimeExtraction(addinActonName);
+						else
+							canExecuteAction = true;
+
+						if (canExecuteAction)
+						{
+							addinAction.Execute();
+						}
+					}
+					catch (AppDomainUnloadedException)
+					{ }
+					catch (ObjectDisposedException)
+					{ }
+					catch (Exception ex)
+					{
+						Trace.WriteLine(ex.GetFullStackTrace());
+
+						MessageBox.Show(
+							string.Format("{0}:\r\n\r\n{1} ({2})",
+								addinActonName,
+								ex is TargetInvocationException ? ex.InnerException.Message : ex.Message,
+								ex is TargetInvocationException ? ex.InnerException.GetType().Name : ex.GetType().Name),
+							"Error running add-in",
+							MessageBoxButtons.OK,
+							MessageBoxIcon.Error);
+					}
+					finally
+					{
+						if (waitCursorCtl != null) waitCursorCtl.Cursor = Cursors.Default;
+					}
+					
 				}
 			}
 	    }
