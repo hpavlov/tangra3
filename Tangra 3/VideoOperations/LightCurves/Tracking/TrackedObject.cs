@@ -152,7 +152,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 					return "W:Tracking:Tracking was unsuccessful because the brightness fluctoation was out of the expected range";
 
 				case NotMeasuredReasons.PSFFittingFailed:
-					return "W:Tracking:Tracking was unsuccessful because the a PSF could not be fitted";
+					return "W:Tracking:Tracking was unsuccessful because a PSF could not be fitted";
 
 				case NotMeasuredReasons.FoundObjectNotWithInExpectedPositionTolerance:
 					return "W:Tracking:Tracking was unsuccessful because the center of the PSF fit was too far from the expected location";
