@@ -65,7 +65,7 @@ namespace Tangra.Helpers
 				PGID_LC_FILE, string.Format("\"{0}\" \"%L\"", 
 				Process.GetCurrentProcess().Modules[0].FileName), 
 				PGID_LC_FILE_EXT,
-				new ProgramIcon(string.Format("\"{0}\"", Process.GetCurrentProcess().Modules[0].FileName), 40001));
+				new ProgramIcon(string.Format("\"{0}\"", Process.GetCurrentProcess().Modules[0].FileName), 1));
 
 			m_AssociationManager.Associate(
 				PGID_AAV_FILE, string.Format("\"{0}\" \"%L\"",

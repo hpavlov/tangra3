@@ -476,7 +476,7 @@ namespace BrendanGrant.Helpers.FileAssociation
 
          if (icon != ProgramIcon.None)
          {
-            registryWrapper.Write(this.progId, "DefaultIcon", icon.ToString());
+			 registryWrapper.Write(this.progId + "\\DefaultIcon", "", icon.ToString());
 
             ShellNotification.NotifyOfChange();
          }
