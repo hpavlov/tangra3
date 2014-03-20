@@ -21,7 +21,7 @@ namespace Tangra
 		{
             Trace.WriteLine(string.Format("Starting Tangra v{0}", ((AssemblyFileVersionAttribute)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyFileVersionAttribute), true)[0]).Version));
 
-		    //MessageBox.Show("Attach Debugger Now!");
+			//Debugger.Launch();
 
 		    PlatformID platform = Environment.OSVersion.Platform;
             if (platform != PlatformID.MacOSX && platform != PlatformID.Unix && 
@@ -35,11 +35,18 @@ namespace Tangra
 			Version appVersion = a.GetName().Version;
 			string appVersionString = appVersion.ToString();
 
-			if (Properties.Settings.Default.ApplicationVersion != appVersion.ToString())
+			try
 			{
-				Properties.Settings.Default.Upgrade();
-				Properties.Settings.Default.ApplicationVersion = appVersionString;
-				Properties.Settings.Default.Save();
+				if (Properties.Settings.Default.ApplicationVersion != appVersion.ToString())
+				{
+					Properties.Settings.Default.Upgrade();
+					Properties.Settings.Default.ApplicationVersion = appVersionString;
+					Properties.Settings.Default.Save();
+				}
+			}
+			catch (Exception ex)
+			{
+				Trace.WriteLine(ex);
 			}
 			#endregion
 

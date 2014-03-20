@@ -76,6 +76,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="3rdParty\FileAssociation\AssociationManager.cs" />
+    <Compile Include="3rdParty\FileAssociation\FileAssociationInfo.cs" />
+    <Compile Include="3rdParty\FileAssociation\ProgramAssociationInfo.cs" />
+    <Compile Include="3rdParty\FileAssociation\ProgramIcon.cs" />
+    <Compile Include="3rdParty\FileAssociation\ProgramVerb.cs" />
+    <Compile Include="3rdParty\FileAssociation\RegistryException.cs" />
+    <Compile Include="3rdParty\FileAssociation\RegistryWrapper.cs" />
+    <Compile Include="3rdParty\FileAssociation\ShellNotification.cs" />
     <Compile Include="Addins\Addin.cs" />
     <Compile Include="Addins\AddinManager.cs" />
     <Compile Include="Addins\AddinTrackingHandler.cs" />
@@ -244,6 +252,8 @@
     <Compile Include="Helpers\DuplicateFrameAvoider.cs" />
     <Compile Include="Helpers\Extensions.cs" />
     <Compile Include="Helpers\FITSHelper.cs" />
+    <Compile Include="Helpers\TangraFileAssociations.cs" />
+    <Compile Include="Helpers\WindowsHelpers.cs" />
     <Compile Include="Video\AstroDigitalVideo\frmBuildingNtpTimebase.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -737,6 +747,9 @@
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>"$(SolutionDir)Resources\InsertIcons.exe" "$(TargetPath)" "$(ProjectDir)img\lc_logo.ico"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

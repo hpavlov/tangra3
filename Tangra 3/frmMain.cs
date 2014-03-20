@@ -353,6 +353,29 @@ namespace Tangra
 			m_VideoController.InitVideoSystem(new PlayerContext(this));
 
 			m_FormLoaded = true;
+
+			if (Environment.GetCommandLineArgs().Length > 1)
+			{
+				string fileName = Environment.GetCommandLineArgs()[1];
+				if (File.Exists(fileName))
+				{
+					timerCommandArgs.Tag = fileName;
+					timerCommandArgs.Enabled = true;
+				}
+			}
+		}
+
+		private void timerCommandArgs_Tick(object sender, EventArgs e)
+		{
+			timerCommandArgs.Enabled = false;
+			string fileName = timerCommandArgs.Tag as string;
+			if (fileName != null && File.Exists(fileName))
+			{
+				if (Path.GetExtension(fileName).ToLower() == ".lc")
+					m_LightCurveController.OpenLcFile(fileName);
+				else
+					OpenTangraFile(fileName);
+			}
 		}
 
 		private void frmMain_Resize(object sender, EventArgs e)

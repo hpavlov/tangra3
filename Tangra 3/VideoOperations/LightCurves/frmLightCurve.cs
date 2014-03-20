@@ -308,7 +308,7 @@ namespace Tangra.VideoOperations.LightCurves
 				allObjMenuItems[i].Checked = true;
 				allObjMenuItems[i].Visible = true;
 				m_IncludeObjects[i] = true;
-				allObjMenuItems[i].Text = string.Format("Obejct {0} ({1})", i + 1, ExplainTrackingType(m_Footer.TrackedObjects[i].TrackingType));
+				allObjMenuItems[i].Text = string.Format("Object {0} ({1})", i + 1, ExplainTrackingType(m_Footer.TrackedObjects[i].TrackingType));
 			}
 
             if (m_Header.ReductionType == LightCurveReductionType.MutualEvent)

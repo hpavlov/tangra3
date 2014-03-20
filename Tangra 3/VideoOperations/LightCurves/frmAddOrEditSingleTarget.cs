@@ -674,6 +674,10 @@ namespace Tangra.VideoOperations.LightCurves
             {
                 ObjectToAdd.TrackingType = TrackingType.OccultedStar;
                 ObjectToAdd.PositionTolerance = (float)nudPositionTolerance.Value;
+	            if (ObjectToAdd.Gaussian != null) 
+					// Correction for really large stars
+					ObjectToAdd.PositionTolerance += (float)(ObjectToAdd.Gaussian.FWHM/4);
+
                 ObjectToAdd.PsfFitMatrixSize = TangraConfig.Settings.Special.DefaultOccultedStarPsfFitMatrixSize;
             	ObjectToAdd.IsWeakSignalObject = rbAutoCenteredAperture.Checked;
             }

@@ -513,7 +513,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
         	bool isFSPSolved = false;
         	bool isTooFar = true;
 
-            for (int i = trackedObject.PsfFitMatrixSize; i >= smallestMatrixSize; i -= 2)
+			for (int i = Math.Max(trackedObject.PsfFitMatrixSize, smallestMatrixSize); i >= smallestMatrixSize; i -= 2)
             {
                 int borderZeroes = (trackedObject.PsfFitMatrixSize - i) / 2;
                 for (int x = 0; x < pixels.GetLength(0); x++)

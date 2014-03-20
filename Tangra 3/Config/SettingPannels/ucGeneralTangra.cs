@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Data;
 using System.Linq;
@@ -14,7 +15,7 @@ using Tangra.Model.Config;
 namespace Tangra.Config.SettingPannels
 {
     public partial class ucGeneralTangra : SettingsPannel
-	{
+    {
 		public ucGeneralTangra()
 		{
 			InitializeComponent();
@@ -28,6 +29,8 @@ namespace Tangra.Config.SettingPannels
 			cbShowProcessingSpeed.Checked = TangraConfig.Settings.Generic.ShowProcessingSpeed;
 			cbxShowCursorPosition.Checked = TangraConfig.Settings.Generic.ShowCursorPosition;
 			cbxBetaUpdates.Checked = TangraConfig.Settings.Generic.AcceptBetaUpdates;
+
+	        UpdateFileAssociationsButtonState();
         }
 
         public override void SaveSettings()
@@ -40,5 +43,71 @@ namespace Tangra.Config.SettingPannels
 			TangraConfig.Settings.Generic.ShowProcessingSpeed = cbShowProcessingSpeed.Checked;
 			TangraConfig.Settings.Generic.ShowCursorPosition = cbxShowCursorPosition.Checked;
         }
+
+		private void UpdateFileAssociationsButtonState()
+		{
+			if (CurrentOS.IsWindows)
+			{
+				btnAssociateFiles.Visible = true;
+				var fileAssociation = new TangraFileAssociations();
+
+				if (fileAssociation.Registered)
+				{
+					btnAssociateFiles.Enabled = false;
+				}
+				else
+				{
+					btnAssociateFiles.Enabled = true;
+
+					if (!fileAssociation.CanRegisterWithoutElevation)
+					{
+						btnAssociateFiles.FlatStyle = FlatStyle.System;
+						WindowsHelpers.SendMessage(btnAssociateFiles.Handle, WindowsHelpers.BCM_SETSHIELD, 0, (IntPtr)1);
+					}
+					else
+						btnAssociateFiles.Tag = fileAssociation;
+				}
+			}
+			else
+				btnAssociateFiles.Visible = false;			
+		}
+
+		private void btnAssociateFiles_Click(object sender, EventArgs e)
+		{
+			TangraFileAssociations fileAssocHelper = btnAssociateFiles.Tag as TangraFileAssociations;
+			if (fileAssocHelper != null)
+			{
+				fileAssocHelper.Associate();
+				UpdateFileAssociationsButtonState();
+			}
+			else
+			{
+				// Launch itself as administrator passing the right parameter the do the job
+				var proc = new ProcessStartInfo();
+				proc.UseShellExecute = true;
+				proc.WorkingDirectory = Environment.CurrentDirectory;
+				proc.FileName = Application.ExecutablePath;
+				proc.Arguments = "tangra-file-assoc";
+				proc.Verb = "runas";
+
+				btnAssociateFiles.Enabled = false;
+				try
+				{
+					Process newProcess = new Process() { StartInfo = proc };
+					newProcess.Start();
+					newProcess.WaitForExit();
+				}
+				catch
+				{
+					// The user refused to allow privileges elevation.
+					// Do nothing and return directly ...
+					return;
+				}
+				finally
+				{
+					UpdateFileAssociationsButtonState();
+				}				
+			}
+		}
 	}
 }

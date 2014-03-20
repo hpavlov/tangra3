@@ -30,6 +30,7 @@ namespace Tangra.Config.SettingPannels
 		/// </summary>
 		private void InitializeComponent()
 		{
+			this.components = new System.ComponentModel.Container();
 			this.label12 = new System.Windows.Forms.Label();
 			this.label22 = new System.Windows.Forms.Label();
 			this.cbShowProcessingSpeed = new System.Windows.Forms.CheckBox();
@@ -38,6 +39,8 @@ namespace Tangra.Config.SettingPannels
 			this.cbPerformanceQuality = new System.Windows.Forms.ComboBox();
 			this.cbxOnOpenOperation = new System.Windows.Forms.ComboBox();
 			this.cbxShowCursorPosition = new System.Windows.Forms.CheckBox();
+			this.btnAssociateFiles = new System.Windows.Forms.Button();
+			this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
 			this.SuspendLayout();
 			// 
 			// label12
@@ -112,11 +115,23 @@ namespace Tangra.Config.SettingPannels
 			this.cbxShowCursorPosition.TabIndex = 53;
 			this.cbxShowCursorPosition.Text = "Show cursor coordinates in the statusbar";
 			// 
+			// btnAssociateFiles
+			// 
+			this.btnAssociateFiles.Location = new System.Drawing.Point(258, 124);
+			this.btnAssociateFiles.Name = "btnAssociateFiles";
+			this.btnAssociateFiles.Size = new System.Drawing.Size(177, 23);
+			this.btnAssociateFiles.TabIndex = 54;
+			this.btnAssociateFiles.Text = "Associate files with Tangra";
+			this.toolTip1.SetToolTip(this.btnAssociateFiles, "Associate .lc, .aav and .adv files with Tangra ");
+			this.btnAssociateFiles.UseVisualStyleBackColor = true;
+			this.btnAssociateFiles.Click += new System.EventHandler(this.btnAssociateFiles_Click);
+			// 
 			// ucGeneralTangra
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.SystemColors.Control;
+			this.Controls.Add(this.btnAssociateFiles);
 			this.Controls.Add(this.cbxShowCursorPosition);
 			this.Controls.Add(this.cbxOnOpenOperation);
 			this.Controls.Add(this.cbPerformanceQuality);
@@ -142,5 +157,7 @@ namespace Tangra.Config.SettingPannels
 		private System.Windows.Forms.ComboBox cbPerformanceQuality;
 		private System.Windows.Forms.ComboBox cbxOnOpenOperation;
 		private CheckBox cbxShowCursorPosition;
+		private Button btnAssociateFiles;
+		private ToolTip toolTip1;
 	}
 }
