@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using Tangra.Helpers;
+using Tangra.Model.Helpers;
 using Tangra.PInvoke;
 using Tangra.Properties;
 
@@ -72,7 +73,36 @@ namespace Tangra
 			}
 
 			if (!fatalError)
-				Application.Run(new frmMain());
+			{
+				if (!ExecuteNonUICommandLineActions())
+					Application.Run(new frmMain());
+				else
+					Application.Exit();
+			}
+		}
+
+		static bool ExecuteNonUICommandLineActions()
+		{
+			string action = Environment.GetCommandLineArgs().Length > 1 ? Environment.GetCommandLineArgs()[1].Trim('"') : null;
+
+			bool isRegisterAssociationsCommand = TangraFileAssociations.COMMAND_LINE_ASSOCIATE.Equals(action, StringComparison.InvariantCultureIgnoreCase);
+
+			try
+			{
+				var fileAssociation = new TangraFileAssociations();
+				if (!fileAssociation.Registered || isRegisterAssociationsCommand)
+				{
+					fileAssociation.Associate();
+				}
+			}
+			catch (Exception ex)
+			{
+				if (isRegisterAssociationsCommand)
+					Trace.WriteLine(ex.GetFullStackTrace());
+			}
+
+
+			return isRegisterAssociationsCommand;
 		}
 
 		static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)

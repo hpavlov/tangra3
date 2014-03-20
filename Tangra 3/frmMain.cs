@@ -371,10 +371,7 @@ namespace Tangra
 			string fileName = timerCommandArgs.Tag as string;
 			if (fileName != null && File.Exists(fileName))
 			{
-				if (Path.GetExtension(fileName).ToLower() == ".lc")
-					m_LightCurveController.OpenLcFile(fileName);
-				else
-					OpenTangraFile(fileName);
+				OpenTangraFile(fileName, false);
 			}
 		}
 
@@ -405,7 +402,7 @@ namespace Tangra
             return false;
         }
 
-		public void OpenTangraFile(string fileName)
+		public void OpenTangraFile(string fileName, bool runDefaultAction = true)
 		{
 			m_VideoController.CloseOpenedVideoFile();
 
@@ -421,7 +418,7 @@ namespace Tangra
 				{
 					if (m_VideoController.OpenVideoFile(fileName))
 					{
-						if (!SelectVideoOperation())
+						if (runDefaultAction && !SelectVideoOperation())
 						{
 							// NOTE: If no operation is selected, then set the default Arrow tool
 							m_VideoController.SelectImageTool<ArrowTool>();
@@ -866,6 +863,53 @@ namespace Tangra
 		{
 			bool debugMode = e.Button == MouseButtons.Middle;
 			m_VideoController.ActivateOperation<ReduceLightCurveOperation>(m_LightCurveController, debugMode);
+		}
+
+		private void frmMain_DragEnter(object sender, DragEventArgs e)
+		{
+			if (e.Data.GetDataPresent(DataFormats.FileDrop))
+				e.Effect = DragDropEffects.Copy;
+			else
+				e.Effect = DragDropEffects.None;
+		}
+
+		private void frmMain_DragDrop(object sender, DragEventArgs e)
+		{
+			//try
+			//{
+			//	Array a = (Array)e.Data.GetData(DataFormats.FileDrop);
+
+			//	if (a != null)
+			//	{
+			//		// Extract string from first array element
+			//		// (ignore all files except first if number of files are dropped).
+			//		string s = a.GetValue(0).ToString();
+
+			//		// Call OpenFile asynchronously.
+			//		// Explorer instance from which file is dropped is not responding
+			//		// all the time when DragDrop handler is active, so we need to return
+			//		// immidiately (especially if OpenFile shows MessageBox).
+
+			//		//this.BeginInvoke(m_DelegateOpenFile, new Object[] { s });
+
+			//		// in the case Explorer overlaps this form
+			//		this.Activate();					
+			//	}
+			//}
+			//catch (Exception ex)
+			//{
+			//	Trace.WriteLine("Error in DragDrop function: " + ex.Message);
+
+			//	// don't show MessageBox here - Explorer is waiting !
+			//}
+		}
+
+		private void pictureBox_DragEnter(object sender, DragEventArgs e)
+		{
+			if (e.Data.GetDataPresent(DataFormats.FileDrop))
+				e.Effect = DragDropEffects.Copy;
+			else
+				e.Effect = DragDropEffects.None;
 		}
 	}
 }

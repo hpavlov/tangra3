@@ -614,6 +614,7 @@
 			this.pictureBox.Size = new System.Drawing.Size(607, 503);
 			this.pictureBox.TabIndex = 1;
 			this.pictureBox.TabStop = false;
+			this.pictureBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.pictureBox_DragEnter);
 			this.pictureBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseClick);
 			this.pictureBox.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDoubleClick);
 			this.pictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDown);
@@ -780,6 +781,7 @@
 			// 
 			// frmMain
 			// 
+			this.AllowDrop = true;
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.SystemColors.Control;
@@ -795,6 +797,8 @@
 			this.Text = "Tangra v3.0";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmMain_FormClosing);
 			this.Load += new System.EventHandler(this.frmMain_Load);
+			this.DragDrop += new System.Windows.Forms.DragEventHandler(this.frmMain_DragDrop);
+			this.DragEnter += new System.Windows.Forms.DragEventHandler(this.frmMain_DragEnter);
 			this.Move += new System.EventHandler(this.frmMain_Move);
 			this.Resize += new System.EventHandler(this.frmMain_Resize);
 			this.mainMenu.ResumeLayout(false);

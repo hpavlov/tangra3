@@ -49,24 +49,26 @@ namespace Tangra.Config.SettingPannels
 			if (CurrentOS.IsWindows)
 			{
 				btnAssociateFiles.Visible = true;
+				btnAssociateFiles.Enabled = true;
 				var fileAssociation = new TangraFileAssociations();
 
 				if (fileAssociation.Registered)
 				{
-					btnAssociateFiles.Enabled = false;
+					btnAssociateFiles.Text = "Re-Associate files with Tangra";
 				}
 				else
 				{
-					btnAssociateFiles.Enabled = true;
+					btnAssociateFiles.Text = "Associate files with Tangra";
 
 					if (!fileAssociation.CanRegisterWithoutElevation)
 					{
 						btnAssociateFiles.FlatStyle = FlatStyle.System;
 						WindowsHelpers.SendMessage(btnAssociateFiles.Handle, WindowsHelpers.BCM_SETSHIELD, 0, (IntPtr)1);
 					}
-					else
-						btnAssociateFiles.Tag = fileAssociation;
 				}
+
+				if (fileAssociation.CanRegisterWithoutElevation)
+					btnAssociateFiles.Tag = fileAssociation;
 			}
 			else
 				btnAssociateFiles.Visible = false;			
@@ -87,7 +89,7 @@ namespace Tangra.Config.SettingPannels
 				proc.UseShellExecute = true;
 				proc.WorkingDirectory = Environment.CurrentDirectory;
 				proc.FileName = Application.ExecutablePath;
-				proc.Arguments = "tangra-file-assoc";
+				proc.Arguments = TangraFileAssociations.COMMAND_LINE_ASSOCIATE;
 				proc.Verb = "runas";
 
 				btnAssociateFiles.Enabled = false;
