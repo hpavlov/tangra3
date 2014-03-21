@@ -720,12 +720,10 @@ namespace Tangra.VideoOperations.LightCurves
             if (m_Header.ReductionType == LightCurveReductionType.Asteroidal)
             {
                 miNormalizationSeparator.Visible = true;
-                miNormalizationAllNonOcculted.Visible = true;
             }
             else
             {
                 miNormalizationSeparator.Visible = false;
-                miNormalizationAllNonOcculted.Visible = false;
             }
         }
 
