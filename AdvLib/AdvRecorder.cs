@@ -82,6 +82,8 @@ public class AdvRecorder
 	private const byte CFG_ADV_LAYOUT_1_UNCOMPRESSED = 1;
 	private const byte CFG_ADV_LAYOUT_2_COMPRESSED = 2;
 	private const byte CFG_ADV_LAYOUT_3_COMPRESSED = 3;
+	private const byte CFG_ADV_LAYOUT_4_UNCOMPRESSED = 4;
+	private const byte CFG_ADV_LAYOUT_5_COMPRESSED = 5;
 
 	private Dictionary<string, uint> m_AdditionalStatusSectionTagIds = new Dictionary<string, uint>();
 
@@ -153,6 +155,8 @@ public class AdvRecorder
 		AdvLib.AdvDefineImageLayout(CFG_ADV_LAYOUT_1_UNCOMPRESSED, "FULL-IMAGE-RAW", "UNCOMPRESSED", 16, 0, null);
 		AdvLib.AdvDefineImageLayout(CFG_ADV_LAYOUT_2_COMPRESSED, "FULL-IMAGE-DIFFERENTIAL-CODING", "QUICKLZ", 12, 32, "PREV-FRAME");
 		AdvLib.AdvDefineImageLayout(CFG_ADV_LAYOUT_3_COMPRESSED, "FULL-IMAGE-RAW", "QUICKLZ", 16, 0, null);
+		AdvLib.AdvDefineImageLayout(CFG_ADV_LAYOUT_4_UNCOMPRESSED, "FULL-IMAGE-RAW", "UNCOMPRESSED", 8, 0, null);
+		AdvLib.AdvDefineImageLayout(CFG_ADV_LAYOUT_5_COMPRESSED, "FULL-IMAGE-RAW", "QUICKLZ", 8, 0, null);
 
 		if (StatusSectionConfig.RecordSystemTime) m_TAGID_SystemTime = AdvLib.AdvDefineStatusSectionTag("SystemTime", AdvTagType.ULong64);
 

@@ -43,18 +43,28 @@ namespace AdvLibTestApp
 			recorder.FileMetaData.AddUserTag("CAMERA-HDR-RESPONSE", "yyy");
 			recorder.FileMetaData.AddUserTag("CAMERA-OPTICAL-RESOLUTION", "zzz");
 
-			// NOTE: If position data is available then set the recorder.LocationData properties, such as:		
-			// NOTE: The values are strings and don't have a fixed format but ADVS uses the format below
-			// recorder.LocationData.LongitudeWgs84 = "150*38'27.7\"";
-			// recorder.LocationData.LatitudeWgs84 = "-33*39'49.3\"";
-			// recorder.LocationData.AltitudeMsl = "284.4M";
-			// recorder.LocationData.MslWgs84Offset = "22.4M";
-			// recorder.LocationData.GpsHdop = "0.7";
+			if (cbxLocationData.Checked)
+			{
+				recorder.LocationData.LongitudeWgs84 = "150*38'27.7\"";
+				recorder.LocationData.LatitudeWgs84 = "-33*39'49.3\"";
+				recorder.LocationData.AltitudeMsl = "284.4M";
+				recorder.LocationData.MslWgs84Offset = "22.4M";
+				recorder.LocationData.GpsHdop = "0.7";				
+			}
 
 			// Define the image size and bit depth
             // NOTE: Change this to 16 if the image pixels have been stretched to 16 bits before saving
-		    byte dynaBits = 12;
-            recorder.ImageConfig.SetImageParameters(640, 480, 12, dynaBits);
+			byte dynaBits = 16;
+			if (rbPixel16.Checked) dynaBits = 16;
+			else if (rbPixel12.Checked) dynaBits = 12;
+			else if (rbPixel8.Checked) dynaBits = 8;
+
+			byte cameraDepth = 16;
+			if (rbCamera16.Checked) cameraDepth = 16;
+			else if (rbCamera12.Checked) cameraDepth = 12;
+			else if (rbCamera8.Checked) cameraDepth = 8;
+
+			recorder.ImageConfig.SetImageParameters(640, 480, cameraDepth, dynaBits);
 
 			// By default no status section values will be recorded. The user must enable the ones they need recorded and 
 			// can also define additional status parameters to be recorded with each video frame
@@ -69,6 +79,7 @@ namespace AdvLibTestApp
 			status.AdditionalStatusTags = new object[1];
 
 			int imagesCount = GetTotalImages();
+			bool useCompression = cbxCompress.Checked;
 
 			for (int i = 0; i < imagesCount; i++)
 			{
@@ -79,21 +90,51 @@ namespace AdvLibTestApp
 				status.Gamma = GetCurrentImageGamma(i);
 				status.AdditionalStatusTags[customTagId] = GetCurrentExampleMassages(i);
 
-                byte[] imageBytes = GetCurrentImageBytes(i, dynaBits);
-                ushort[] imagePixels = GetCurrentImageBytesIn16(i, dynaBits);
+				if (rb16BitUShort.Checked)
+				{
+					ushort[] imagePixels = GetCurrentImageBytesIn16(i, dynaBits);
 
-                // NOTE: The image can be added using both byte[] and ushort[] arrays. This example used the byte[] 
+					recorder.AddVideoFrame(
+						imagePixels,
 
-				recorder.AddVideoFrame(
-					imageBytes,
+						// NOTE: Use with caution! Using compression is slower and may not work at high frame rates 
+						// i.e. it may take longer to compress the data than for the next image to arrive on the buffer
+						useCompression,
 
-					// NOTE: Use with caution! Using compression is slower and may not work at high frame rates 
-					// i.e. it may take longer to compress the data than for the next image to arrive on the buffer
-					true, 
+						AdvTimeStamp.FromDateTime(timestamp),
+						exposure,
+						status);
+				}
+				else if (rb16BitByte.Checked)
+				{
+					byte[] imageBytes = GetCurrentImageBytes(i, dynaBits);
 
-					AdvTimeStamp.FromDateTime(timestamp),
-					exposure, 
-					status);
+					recorder.AddVideoFrame(
+						imageBytes,
+
+						// NOTE: Use with caution! Using compression is slower and may not work at high frame rates 
+						// i.e. it may take longer to compress the data than for the next image to arrive on the buffer
+						useCompression,
+
+						AdvTimeStamp.FromDateTime(timestamp),
+						exposure,
+						status);
+				}
+				else if (rb8BitByte.Checked)
+				{
+					byte[] imageBytes = GetCurrentImageBytes(i, dynaBits);
+
+					recorder.AddVideoFrame(
+						imageBytes,
+
+						// NOTE: Use with caution! Using compression is slower and may not work at high frame rates 
+						// i.e. it may take longer to compress the data than for the next image to arrive on the buffer
+						useCompression,
+
+						AdvTimeStamp.FromDateTime(timestamp),
+						exposure,
+						status);
+				}
 			}
 
 			recorder.StopRecording();
@@ -172,46 +213,96 @@ namespace AdvLibTestApp
 		{
 			// NOTE: In this TEST example we mock up 12 bit pixels (640, 480), where 
 			
-			byte[] pixels = new byte[640 * 480 * 2];
+			byte[] pixels;
 
-			// Background values are all half way 0x0FFF / 2 = 0x07FF. This "scaled" to 16 bit is 0x7FF0
-			for (int i = 0; i < pixels.Length / 2; i++)
+	        if (dynaBits == 12 || dynaBits == 16)
 			{
-                if (dynaBits == 16)
-                {
-                    pixels[2 * i] = 0xF0;
-                    pixels[2 * i + 1] = 0x7F;
-                }
-                else if (dynaBits == 12)
-                {
-                    pixels[2 * i] = 0xFF;
-                    pixels[2 * i + 1] = 0x07;
-                }
+				pixels = new byte[640 * 480 * 2];
+
+				// Background values are all half way 0x0FFF / 2 = 0x07FF. This "scaled" to 16 bit is 0x7FF0
+				for (int i = 0; i < pixels.Length / 2; i++)
+				{
+					if (dynaBits == 16)
+					{
+						pixels[2 * i] = 0xF0;
+						pixels[2 * i + 1] = 0x7F;
+					}
+					else if (dynaBits == 12)
+					{
+						pixels[2 * i] = 0xFF;
+						pixels[2 * i + 1] = 0x07;
+					}
+				}
+
+				// There is a pixel wide line from top left - down and right with full intensity (0x0FFF). This "scaled" to 16 bit is 0xFFF0
+				for (int x = 0; x < 480; x++)
+				{
+					if (dynaBits == 16)
+					{
+						pixels[2 * (x * 640 + x)] = 0xF0;
+						pixels[2 * (x * 640 + x) + 1] = 0xFF;
+					}
+					else if (dynaBits == 12)
+					{
+						pixels[2 * (x * 640 + x)] = 0xFF;
+						pixels[2 * (x * 640 + x) + 1] = 0x0F;
+					}
+				}
+
+				// There is a pixel wide line from top right - down and left with zero intensity (0x0000)
+				for (int x = 0; x < 480; x++)
+				{
+					pixels[2 * ((x + 1) * 640 - x - 1)] = 0x00;
+					pixels[2 * ((x + 1) * 640 - x - 1) + 1] = 0x00;
+				}				
+			}
+			else
+			{
+				pixels = new byte[640 * 480];
+
+				for (int i = 0; i < pixels.Length; i++)
+				{
+					pixels[i] = 0x7F;
+				}
+
+				for (int x = 0; x < 480; x++)
+				{
+					pixels[x * 640 + x + 1] = 0xFF;
+				}
+
+				for (int x = 0; x < 480; x++)
+				{
+					pixels[(x + 1) * 640 - x - 1] = 0x00;
+				}
 			}
 
-			// There is a pixel wide line from top left - down and right with full intensity (0x0FFF). This "scaled" to 16 bit is 0xFFF0
-			for (int x = 0; x < 480; x++)
-			{
-			    if (dynaBits == 16)
-			    {
-			        pixels[2*(x*640 + x)] = 0xF0;
-			        pixels[2*(x*640 + x) + 1] = 0xFF;
-			    }
-                else if (dynaBits == 12)
-                {
-                    pixels[2 * (x * 640 + x)] = 0xFF;
-                    pixels[2 * (x * 640 + x) + 1] = 0x0F;
-                }
-			}
+	        return pixels;
+		}
 
-			// There is a pixel wide line from top right - down and left with zero intensity (0x0000)
-			for (int x = 0; x < 480; x++)
+		private void OnImageFormatChanged(object sender, EventArgs e)
+		{
+			if (rb16BitUShort.Checked || rb16BitByte.Checked)
 			{
-				pixels[2* ((x + 1) * 640 - x - 1)] = 0x00;
-				pixels[2 * ((x + 1) * 640 - x - 1) + 1] = 0x00;
+				rbPixel16.Checked = true;
+				rbPixel16.Enabled = true;
+				rbPixel12.Enabled = true;
+				rbPixel8.Enabled = false;
+				rbCamera16.Checked = true;
+				rbCamera16.Enabled = true;
+				rbCamera12.Enabled = true;
+				rbCamera8.Enabled = false;
 			}
-
-			return pixels;
+			else
+			{
+				rbPixel8.Checked = true;
+				rbPixel16.Enabled = false;
+				rbPixel12.Enabled = false;
+				rbPixel8.Enabled = true;
+				rbCamera8.Checked = true;
+				rbCamera16.Enabled = false;
+				rbCamera12.Enabled = false;
+				rbCamera8.Enabled = true;
+			}
 		}
 	}
 }
