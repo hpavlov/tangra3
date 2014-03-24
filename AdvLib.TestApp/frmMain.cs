@@ -115,7 +115,7 @@ namespace AdvLibTestApp
 						// NOTE: Use with caution! Using compression is slower and may not work at high frame rates 
 						// i.e. it may take longer to compress the data than for the next image to arrive on the buffer
 						useCompression,
-
+						AdvImageData.PixelDepth16Bit,
 						AdvTimeStamp.FromDateTime(timestamp),
 						exposure,
 						status);
@@ -130,7 +130,7 @@ namespace AdvLibTestApp
 						// NOTE: Use with caution! Using compression is slower and may not work at high frame rates 
 						// i.e. it may take longer to compress the data than for the next image to arrive on the buffer
 						useCompression,
-
+						AdvImageData.PixelDepth8Bit,
 						AdvTimeStamp.FromDateTime(timestamp),
 						exposure,
 						status);
@@ -302,6 +302,19 @@ namespace AdvLibTestApp
 				rbCamera16.Enabled = false;
 				rbCamera12.Enabled = false;
 				rbCamera8.Enabled = true;
+			}
+		}
+
+		private void OnPixelFormatChanged(object sender, EventArgs e)
+		{			
+			if (rbPixel12.Checked)
+			{
+				rbCamera16.Enabled = false;
+				rbCamera12.Checked = true;
+			}
+			else
+			{
+				rbCamera16.Enabled = true;
 			}
 		}
 	}

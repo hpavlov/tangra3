@@ -329,10 +329,18 @@ unsigned char* AdvImageLayout::GetDataBytes(unsigned short* currFramePixels, enu
 
 unsigned char* AdvImageLayout::GetFullImageRawDataBytes(unsigned short* currFramePixels, unsigned int *bytesCount, unsigned char dataPixelsBpp)
 {
-	int buffLen = Width * Height * 2;
+	int buffLen = 0;
 	if (dataPixelsBpp == 16)
+	{
+		buffLen = Width * Height * 2;
+		memcpy(&m_PixelArrayBuffer[0], &currFramePixels[0], buffLen);		
+	}
+	else if (dataPixelsBpp == 8)
+	{
+		buffLen = Width * Height;
 		memcpy(&m_PixelArrayBuffer[0], &currFramePixels[0], buffLen);
-	else 
+	}
+	else
 		throw "12Bpp not supported in Raw layout";
 	
 	*bytesCount = buffLen;

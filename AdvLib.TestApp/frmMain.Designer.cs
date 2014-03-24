@@ -137,6 +137,7 @@
 			this.rbPixel8.TabIndex = 2;
 			this.rbPixel8.Text = "8-bit (Saved as 8-bit)";
 			this.rbPixel8.UseVisualStyleBackColor = true;
+			this.rbPixel8.CheckedChanged += new System.EventHandler(this.OnPixelFormatChanged);
 			// 
 			// rbPixel12
 			// 
@@ -147,6 +148,7 @@
 			this.rbPixel12.TabIndex = 1;
 			this.rbPixel12.Text = "12-bit (Saved as 16-bit)";
 			this.rbPixel12.UseVisualStyleBackColor = true;
+			this.rbPixel12.CheckedChanged += new System.EventHandler(this.OnPixelFormatChanged);
 			// 
 			// rbPixel16
 			// 
@@ -159,6 +161,7 @@
 			this.rbPixel16.TabStop = true;
 			this.rbPixel16.Text = "16-bit (Saved as 16-bit)";
 			this.rbPixel16.UseVisualStyleBackColor = true;
+			this.rbPixel16.CheckedChanged += new System.EventHandler(this.OnPixelFormatChanged);
 			// 
 			// groupBox3
 			// 

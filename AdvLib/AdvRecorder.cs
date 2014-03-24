@@ -193,13 +193,20 @@ public class AdvRecorder
 		AdvLib.AdvEndFile();
 	}
 
-	public void AddVideoFrame(byte[] pixels, bool compress, AdvTimeStamp timeStamp, uint exposureIn10thMilliseconds, AdvStatusEntry metadata)
+	public void AddVideoFrame(byte[] pixels, bool compress, AdvImageData imageData, AdvTimeStamp timeStamp, uint exposureIn10thMilliseconds, AdvStatusEntry metadata)
 	{
 		BeginVideoFrame(timeStamp, exposureIn10thMilliseconds, metadata);
 
-		byte layoutIdForCurrentFramerate = compress ? CFG_ADV_LAYOUT_3_COMPRESSED : CFG_ADV_LAYOUT_1_UNCOMPRESSED;
-
-		AdvLib.AdvFrameAddImageBytes(layoutIdForCurrentFramerate, pixels, 16);
+		if (imageData == AdvImageData.PixelDepth16Bit)
+		{
+			byte layoutIdForCurrentFramerate = compress ? CFG_ADV_LAYOUT_3_COMPRESSED : CFG_ADV_LAYOUT_1_UNCOMPRESSED;
+			AdvLib.AdvFrameAddImageBytes(layoutIdForCurrentFramerate, pixels, 16);	
+		}
+		else if (imageData == AdvImageData.PixelDepth8Bit)
+		{
+			byte layoutIdForCurrentFramerate = compress ? CFG_ADV_LAYOUT_5_COMPRESSED : CFG_ADV_LAYOUT_4_UNCOMPRESSED;
+			AdvLib.AdvFrameAddImageBytes(layoutIdForCurrentFramerate, pixels, 8);
+		}
 
 		AdvLib.AdvEndFrame();	
 	}

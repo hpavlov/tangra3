@@ -18,6 +18,12 @@ public enum FixStatus
 	PFix = 3
 }
 
+public enum AdvImageData
+{
+	PixelDepth16Bit,
+	PixelDepth8Bit
+}
+
 /// <summary>
 /// Represents the ADV system time which is the number of milliseconds elapsed since: 1 Jan 2010, 00:00:00 GMT
 /// </summary>
