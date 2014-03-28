@@ -53,7 +53,6 @@ namespace AdvLibTestApp
 			}
 
 			// Define the image size and bit depth
-            // NOTE: Change this to 16 if the image pixels have been stretched to 16 bits before saving
 			byte dynaBits = 16;
 			if (rbPixel16.Checked) dynaBits = 16;
 			else if (rbPixel12.Checked) dynaBits = 12;

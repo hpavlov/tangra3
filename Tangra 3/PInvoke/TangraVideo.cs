@@ -12,9 +12,15 @@ using Tangra.Model.Image;
 
 namespace Tangra.PInvoke
 {
+	public class TangraVideoException : Exception
+	{
+		public TangraVideoException(string message)
+			: base(message)
+		{ }
+	}
+
 	// http://www.mono-project.com/Interop_with_Native_Libraries
 	// http://docs.go-mono.com/index.aspx?link=T%3ASystem.Runtime.InteropServices.MarshalAsAttribute
-
 	[StructLayout(LayoutKind.Sequential)]
 	public class VideoFileInfo
 	{
@@ -125,6 +131,13 @@ namespace Tangra.PInvoke
 
 		public static VideoFileInfo OpenFile(string fileName)
 		{
+			string fileExtension = Path.GetExtension(fileName).ToLower().Trim('.');
+
+			if (fileExtension != "avi" && fileExtension != "avs")
+			{
+				throw new TangraVideoException(string.Format("'.{0}' video files are not supported.", fileExtension));
+			}
+
 			VideoFileInfo fileInfo = new VideoFileInfo();
 
 			TangraVideoOpenFile(fileName, fileInfo);
@@ -132,7 +145,7 @@ namespace Tangra.PInvoke
 			if (fileInfo.CountFrames == 0)
 			{
 				// TODO: Get an error message from TangraVideo
-				throw new Exception();
+				throw new TangraVideoException("Tangra was unable to load this file. Check file format and integrity.");
 			}
 				
 

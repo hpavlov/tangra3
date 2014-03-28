@@ -188,6 +188,7 @@ long ApplyPreProcessingWithNormalValue(unsigned long* pixels, long width, long h
 
 long ApplyPreProcessing(unsigned long* pixels, long width, long height, int bpp, BYTE* bitmapPixels, BYTE* bitmapBytes)
 {
+	// NOTE: Does't seem that as of 28 Mar 2014 this method is used in Tangra3
 	long rv = ApplyPreProcessingPixelsOnly(pixels, width, height, bpp);
 	if (!SUCCEEDED(rv)) return rv;
 

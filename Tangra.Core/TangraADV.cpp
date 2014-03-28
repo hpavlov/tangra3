@@ -133,7 +133,7 @@ HRESULT ADVGetFrame(int frameNo, unsigned long* pixels, BYTE* bitmapPixels, BYTE
 		if (g_UsesPreProcessing) 
 			return ApplyPreProcessingWithNormalValue(pixels, g_TangraAdvFile->ImageSection->Width, g_TangraAdvFile->ImageSection->Height, g_TangraAdvFile->ImageSection->DataBpp, g_TangraAdvFile->ImageSection->NormalisationValue, bitmapPixels, bitmapBytes);
 		else
-			return GetBitmapPixels(g_TangraAdvFile->ImageSection->Width, g_TangraAdvFile->ImageSection->Height, pixels, bitmapPixels, bitmapBytes, g_TangraAdvFile->ImageSection->ByteOrder == LittleEndian, g_TangraAdvFile->ImageSection->DataBpp, g_TangraAdvFile->ImageSection->NormalisationValue);
+			return GetBitmapPixels(g_TangraAdvFile->ImageSection->Width, g_TangraAdvFile->ImageSection->Height, pixels, bitmapPixels, bitmapBytes, g_TangraAdvFile->ImageSection->ByteOrder == LittleEndian, g_TangraAdvFile->ImageSection->DynaBits, g_TangraAdvFile->ImageSection->NormalisationValue);
 	}
 	
 	return rv;
@@ -204,7 +204,7 @@ HRESULT ADVGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSl
 	frameInfo->EndSecondaryTimeStampHi = (firstFrameInfo.EndSecondaryTimeStampHi + lastFrameInfo.EndSecondaryTimeStampHi) / 2;
 	frameInfo->EndSecondaryTimeStampLo = (firstFrameInfo.EndSecondaryTimeStampLo + lastFrameInfo.EndSecondaryTimeStampLo) / 2;
 	
-	return GetBitmapPixels(g_TangraAdvFile->ImageSection->Width, g_TangraAdvFile->ImageSection->Height, pixels, bitmapBytes, bitmapDisplayBytes, false, g_TangraAdvFile->ImageSection->DataBpp, g_TangraAdvFile->ImageSection->NormalisationValue);
+	return GetBitmapPixels(g_TangraAdvFile->ImageSection->Width, g_TangraAdvFile->ImageSection->Height, pixels, bitmapBytes, bitmapDisplayBytes, false, g_TangraAdvFile->ImageSection->DynaBits, g_TangraAdvFile->ImageSection->NormalisationValue);
 }
 
 HRESULT ADVGetFrame2(int frameNo, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
