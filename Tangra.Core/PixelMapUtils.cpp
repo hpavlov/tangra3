@@ -432,7 +432,7 @@ HRESULT GetPixelMapBitsAndHBitmap(BYTE* pDIB, long* width, long* height, DWORD i
 }
 
 
-HRESULT GetBitmapPixels(long width, long height, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, bool isLittleEndian, int dataBpp, unsigned long normVal)
+HRESULT GetBitmapPixels(long width, long height, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, bool isLittleEndian, int bpp, unsigned long normVal)
 {
 	BYTE* pp = bitmapPixels;
 
@@ -472,8 +472,8 @@ HRESULT GetBitmapPixels(long width, long height, unsigned long* pixels, BYTE* bi
 	bitmapPixels+=3 * (length + width);
 
 	int shiftVal = 0;
-	if (dataBpp == 12) shiftVal = 4;
-	else if (dataBpp == 14) shiftVal = 6;
+	if (bpp == 12) shiftVal = 4;
+	else if (bpp == 14) shiftVal = 6;
 
 	int total = width * height;
 	while(total--)
@@ -488,7 +488,7 @@ HRESULT GetBitmapPixels(long width, long height, unsigned long* pixels, BYTE* bi
 		pixels++;
 
 		unsigned int dblVal;
-		if (dataBpp == 8)
+		if (bpp == 8)
 		{
 			dblVal = val;
 		}
