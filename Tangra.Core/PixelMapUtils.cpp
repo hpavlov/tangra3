@@ -472,8 +472,15 @@ HRESULT GetBitmapPixels(long width, long height, unsigned long* pixels, BYTE* bi
 	bitmapPixels+=3 * (length + width);
 
 	int shiftVal = 0;
-	if (bpp == 12) shiftVal = 4;
+	if (bpp == 8) shiftVal = 0;
+	else if (bpp == 9) shiftVal = 1;
+	else if (bpp == 10) shiftVal = 2;
+	else if (bpp == 11) shiftVal = 3;
+	else if (bpp == 12) shiftVal = 4;
+	else if (bpp == 13) shiftVal = 5;
 	else if (bpp == 14) shiftVal = 6;
+	else if (bpp == 15) shiftVal = 7;
+	else if (bpp == 16) shiftVal = 8;
 
 	int total = width * height;
 	while(total--)
