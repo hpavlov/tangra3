@@ -211,7 +211,7 @@ unsigned char* AdvStatusSection::GetDataBytes(unsigned int *bytesCount)
 	
 			dataPos+=5;
 			
-			currUInt64++;
+			currUInt32++;
 		}
 		
 		map<unsigned int, unsigned short>::iterator currUInt16 = m_FrameStatusTagsUInt16.begin();

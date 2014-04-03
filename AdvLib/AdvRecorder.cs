@@ -1,8 +1,24 @@
-﻿using System;
+﻿/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
+
+public class AdvLibException : Exception
+{
+	public AdvLibException(string message)
+		: base(message)
+	{ }
+
+	public AdvLibException(string message, Exception innerException)
+		: base(message, innerException)
+	{ }
+}
 
 public class AdvFileMetaData
 {
@@ -52,12 +68,15 @@ public class AdvImageConfig
     /// <param name="cameraBitDepth">The native camera bith depth.</param>
     /// <param name="imageDynamicBitDepth">The bit depth of the dynamic range of the saved images.</param>
     public void SetImageParameters(ushort width, ushort height, byte cameraBitDepth, byte imageDynamicBitDepth)
-	{
+    {
+	    if (cameraBitDepth > imageDynamicBitDepth)
+			throw new AdvLibException("imageDynamicBitDepth must be greater or equal to cameraBitDepth");
+
 		ImageWidth = width;
 		ImageHeight = height;
         CameraBitsPerPixel = cameraBitDepth;
         ImageBitsPerPixel = imageDynamicBitDepth;
-	}	
+	}
 }
 
 public class AdvRecorder
@@ -79,6 +98,11 @@ public class AdvRecorder
 	private int m_NumberDroppedFrames = 0;
 	private long m_FirstRecordedFrameTimestamp = 0;
 
+	public int NumberDroppedFrames
+	{
+		get { return m_NumberDroppedFrames; }
+	}
+
 	private const byte CFG_ADV_LAYOUT_1_UNCOMPRESSED = 1;
 	private const byte CFG_ADV_LAYOUT_2_COMPRESSED = 2;
 	private const byte CFG_ADV_LAYOUT_3_COMPRESSED = 3;
@@ -87,18 +111,24 @@ public class AdvRecorder
 
 	private Dictionary<string, uint> m_AdditionalStatusSectionTagIds = new Dictionary<string, uint>();
 
-
+	/// <summary>
+	/// The status section configuration to be used for the ADV file when StartRecordingNewFile() is called.
+	/// </summary>
 	public AdvStatusSectionConfig StatusSectionConfig = new AdvStatusSectionConfig();
- 
-	public AdvRecorder()
-	{
-			
-	}
 
+	/// <summary>
+	/// The file metadata to be saved in the file when StartRecordingNewFile() is called.
+	/// </summary>
 	public AdvFileMetaData FileMetaData = new AdvFileMetaData();
 
+	/// <summary>
+	/// The image configuration to be used for the ADV file when StartRecordingNewFile() is called.
+	/// </summary>
 	public AdvImageConfig ImageConfig = new AdvImageConfig();
 
+	/// <summary>
+	/// The location data to be saved in the file when StartRecordingNewFile() is called.
+	/// </summary>
 	public AdvLocationData LocationData = new AdvLocationData();
 
 	private string EnsureStringLength(string input)
@@ -111,6 +141,10 @@ public class AdvRecorder
 			return input;
 	}
 
+	/// <summary>
+	/// Creates new ADV file and gets it ready for recording 
+	/// </summary>
+	/// <param name="fileName"></param>
 	public void StartRecordingNewFile(string fileName)
 	{
 		AdvLib.AdvNewFile(fileName);
@@ -188,11 +222,23 @@ public class AdvRecorder
 		m_FirstRecordedFrameTimestamp = 0;
 	}
 
+	/// <summary>
+	/// Closes the AVD file and stops any recording to it.
+	/// </summary>
 	public void StopRecording()
 	{
 		AdvLib.AdvEndFile();
 	}
 
+	/// <summary>
+	/// Adds a new video frame from a byte array.
+	/// </summary>
+	/// <param name="pixels">The pixels to be saved. The row-major array is of size Width * Height in 8-bit mode and 2 * Width * Height in little-endian 16-bit mode.</param>
+	/// <param name="compress">True if the frame is to be compressed. Please note that compression is CPU and I/O intensive and may not work at high frame rates. Use wisely.</param>
+	/// <param name="imageData">The format of the pixels - 8 bit or 16 bit.</param>
+	/// <param name="timeStamp">The high accuracy timestamp for the middle of the frame. If the timestamp is not with an accuracy of 1ms then set it as zero. A lower accuracy timestamp can be specified in the SystemTime status value.</param>
+	/// <param name="exposureIn10thMilliseconds">The duration of the frame in whole 0.1 ms as determined by the high accuracy timestamping. If high accuracy timestamp is not available then set this to zero. Note that the Shutter status value should be derived from the camera settings rather than from the timestamps.</param>
+	/// <param name="metadata">The status metadata to be saved with the video frame.</param>
 	public void AddVideoFrame(byte[] pixels, bool compress, AdvImageData imageData, AdvTimeStamp timeStamp, uint exposureIn10thMilliseconds, AdvStatusEntry metadata)
 	{
 		BeginVideoFrame(timeStamp, exposureIn10thMilliseconds, metadata);
@@ -211,6 +257,14 @@ public class AdvRecorder
 		AdvLib.AdvEndFrame();	
 	}
 
+	/// <summary>
+	/// Adds a new video frame from an ushort array.
+	/// </summary>
+	/// <param name="pixels">The pixels to be saved. The row-major array is of size 2 * Width * Height. This only works in little-endian 16-bit mode.</param>
+	/// <param name="compress">True if the frame is to be compressed. Please note that compression is CPU and I/O intensive and may not work at high frame rates. Use wisely.</param>
+	/// <param name="timeStamp">The high accuracy timestamp for the middle of the frame. If the timestamp is not with an accuracy of 1ms then set it as zero. A lower accuracy timestamp can be specified in the SystemTime status value.</param>
+	/// <param name="exposureIn10thMilliseconds">The duration of the frame in whole 0.1 ms as determined by the high accuracy timestamping. If high accuracy timestamp is not available then set this to zero. Note that the Shutter status value should be derived from the camera settings rather than from the timestamps.</param>
+	/// <param name="metadata">The status metadata to be saved with the video frame.</param>
 	public void AddVideoFrame(ushort[] pixels, bool compress, AdvTimeStamp timeStamp, uint exposureIn10thMilliseconds, AdvStatusEntry metadata)
 	{
 		BeginVideoFrame(timeStamp, exposureIn10thMilliseconds, metadata);
@@ -331,5 +385,17 @@ public class AdvRecorder
 					break;
 			}
 		}
+	}
+
+	[DllImport("kernel32.dll", SetLastError = false)]
+	private static extern bool SetDllDirectory(string lpPathName);
+
+	/// <summary>
+	/// Adds a directory to the search path for AdvLib.Core32.dll and AdvLib.Core64.dll
+	/// </summary>
+	/// <param name="path">The full path to AdvLib.Core32.dll and AdvLib.Core64.dll</param>
+	public void SetNativeDllDirectory(string path)
+	{
+		SetDllDirectory(path);
 	}
 }

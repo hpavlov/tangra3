@@ -1,4 +1,28 @@
-﻿using System;
+﻿#region
+// The MIT License (MIT)
+//
+// Copyright (c) 2014 Hristo Pavlov
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+#endregion
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -69,13 +93,14 @@ namespace AdvLibTestApp
 			// can also define additional status parameters to be recorded with each video frame
 			recorder.StatusSectionConfig.RecordGain = true;
 			recorder.StatusSectionConfig.RecordGamma = true;
-			int customTagId = recorder.StatusSectionConfig.AddDefineTag("EXAMPLE-MESSAGES", AdvTagType.List16OfAnsiString255);
-
+			int customTagIdCustomGain = recorder.StatusSectionConfig.AddDefineTag("EXAMPLE-GAIN", AdvTagType.UInt32);
+			int customTagIdMessages = recorder.StatusSectionConfig.AddDefineTag("EXAMPLE-MESSAGES", AdvTagType.List16OfAnsiString255);
+			
 		    string fileName = Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory + @"\Filename.adv");
             recorder.StartRecordingNewFile(fileName);
 
 			AdvStatusEntry status = new AdvStatusEntry();
-			status.AdditionalStatusTags = new object[1];
+			status.AdditionalStatusTags = new object[2];
 
 			int imagesCount = GetTotalImages();
 			bool useCompression = cbxCompress.Checked;
@@ -87,7 +112,8 @@ namespace AdvLibTestApp
 				DateTime timestamp = GetCurrentImageTimeStamp(i);
 				status.Gain = GetCurrentImageGain(i);
 				status.Gamma = GetCurrentImageGamma(i);
-				status.AdditionalStatusTags[customTagId] = GetCurrentExampleMassages(i);
+				status.AdditionalStatusTags[customTagIdMessages] = GetCurrentExampleMassages(i);
+				status.AdditionalStatusTags[customTagIdCustomGain] = GetCurrentExampleCustomGain(i);
 
 				if (rb16BitUShort.Checked)
 				{
@@ -175,6 +201,12 @@ namespace AdvLibTestApp
 		{
 			// TODO: Get the image custom defined "EXAMPLE-MESSAGES" value.
 			return new string[] { "Message 1", "Message 2", "Message 3" }; ;
+		}
+
+		private uint GetCurrentExampleCustomGain(int frameId)
+		{
+			// TODO: e.g. return an integer gain value reported by the camera which cannot be converted to dB
+			return 0x293;
 		}
 
         private ushort[] GetCurrentImageBytesIn16(int frameId, byte dynaBits)

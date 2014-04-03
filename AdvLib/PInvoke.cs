@@ -1,4 +1,8 @@
-﻿using System;
+﻿/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -17,6 +21,14 @@ public enum AdvTagType
 
 public static class AdvLib
 {
+	[DllImport("kernel32.dll", SetLastError = false)]
+	private static extern bool SetDllDirectory(string lpPathName);
+
+	static AdvLib()
+	{
+		SetDllDirectory(AppDomain.CurrentDomain.BaseDirectory);
+	}
+
 	internal const string LIBRARY_ADVLIB_CORE32 = "AdvLib.Core32.dll";
 	internal const string LIBRARY_ADVLIB_CORE64 = "AdvLib.Core64.dll";
 
@@ -162,7 +174,7 @@ public static class AdvLib
 	//void AdvFrameAddStatusTagReal(unsigned int tagIndex, float tagValue);
 	private static extern void AdvFrameAddStatusTagReal64(uint tagIndex, float tagValue);
 
-	[DllImport(LIBRARY_ADVLIB_CORE32, CallingConvention = CallingConvention.Cdecl, EntryPoint = "AdvFrameAddStatusTag32")]
+	[DllImport(LIBRARY_ADVLIB_CORE64, CallingConvention = CallingConvention.Cdecl, EntryPoint = "AdvFrameAddStatusTag32")]
 	//void AdvFrameAddStatusTag32(unsigned int tagIndex, unsigned long tagValue);
 	private static extern void AdvFrameAddStatusTag3264(uint tagIndex, uint tagValue);
 
