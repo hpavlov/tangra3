@@ -42,14 +42,14 @@ namespace Tangra.Model.Astro
 		double GetPSFValueAt(double x, double y);
 		double GetResidualAt(int x, int y);
 
-		void DrawDataPixels(Graphics g, Rectangle rect, float aperture, Pen aperturePen, int bpp);
-		void DrawGraph(Graphics g, Rectangle rect, int bpp);
+		void DrawDataPixels(Graphics g, Rectangle rect, float aperture, Pen aperturePen, int bpp, uint normVal);
+		void DrawGraph(Graphics g, Rectangle rect, int bpp, uint normVal);
 	}
 
     public interface IPSFFit
     {
-		void DrawGraph(Graphics g, Rectangle rect, int bpp);
-		void DrawDataPixels(Graphics g, Rectangle rect, int bpp);
+		void DrawGraph(Graphics g, Rectangle rect, int bpp, uint normVal);
+		void DrawDataPixels(Graphics g, Rectangle rect, int bpp, uint normVal);
         int MatrixSize { get; }
     }
 
@@ -429,7 +429,7 @@ namespace Tangra.Model.Astro
 					break;
 
 				case PSFFittingDataRange.DataRange16Bit:
-					m_Saturation = (uint)(TangraConfig.Settings.Photometry.Saturation.Saturation8Bit * 255.0 / NormVal);
+					m_Saturation = (uint)(TangraConfig.Settings.Photometry.Saturation.Saturation8Bit * NormVal / 255.0);
 					break;
 
 				default:
@@ -503,7 +503,7 @@ namespace Tangra.Model.Astro
 						break;
 
 					case PSFFittingDataRange.DataRange16Bit:
-						m_Saturation = (uint)(TangraConfig.Settings.Photometry.Saturation.Saturation8Bit * 255.0 / NormVal);
+						m_Saturation = (uint)(TangraConfig.Settings.Photometry.Saturation.Saturation8Bit * NormVal / 255.0);
 						break;
 
 					default:
@@ -708,7 +708,7 @@ namespace Tangra.Model.Astro
 						break;
 
 					case PSFFittingDataRange.DataRange16Bit:
-						m_Saturation = (uint)(TangraConfig.Settings.Photometry.Saturation.Saturation8Bit * 255.0 / NormVal);
+						m_Saturation = (uint)(TangraConfig.Settings.Photometry.Saturation.Saturation8Bit * NormVal / 255.0);
 						break;
 
 					default:
@@ -878,18 +878,19 @@ namespace Tangra.Model.Astro
 		}
 
 
-		public void DrawGraph(Graphics g, Rectangle rect, int bpp)
+		public void DrawGraph(Graphics g, Rectangle rect, int bpp, uint normVal)
 		{
-			DrawGraph(g, rect, bpp, this, m_Saturation);
+			DrawGraph(g, rect, bpp, normVal, this, m_Saturation);
 		}
 
-		public static void DrawGraph(Graphics g, Rectangle rect, int bpp, ITrackedObjectPsfFit trackedPsf, uint saturation)
+		public static void DrawGraph(Graphics g, Rectangle rect, int bpp, uint normVal, ITrackedObjectPsfFit trackedPsf, uint saturation)
         {
             float margin = 6.0f;
             double maxZ = 256;
 
 			if (bpp == 14) maxZ = 16384;
 			else if (bpp == 12) maxZ = 4096;
+			else if (bpp == 16) maxZ = normVal;
 
             int totalSteps = 100;
 
@@ -961,6 +962,7 @@ namespace Tangra.Model.Astro
 			double maxZ = 256.0;
 			if (bpp == 14) maxZ = 16384.0;
 			else if (bpp == 12) maxZ = 4096.0;
+			else if (bpp == 16) maxZ = NormVal;
 			
 			maxZ = Math.Min(maxZ, GetPSFValueInternal(m_X0, m_Y0) + 5);
 
@@ -1021,17 +1023,17 @@ namespace Tangra.Model.Astro
             //    rect.Height - margin - ((float)m_IStarMax - (float)m_IBackground) * yScale / 2);
         }
 
-		public void DrawDataPixels(Graphics g, Rectangle rect, int bpp)
+		public void DrawDataPixels(Graphics g, Rectangle rect, int bpp, uint normVal)
         {
-			DrawDataPixels(g, rect, 1, Pens.Yellow, bpp);
+			DrawDataPixels(g, rect, 1, Pens.Yellow, bpp, normVal);
         }
 
-		public void DrawDataPixels(Graphics g, Rectangle rect, float aperture, Pen aperturePen, int bpp)
+		public void DrawDataPixels(Graphics g, Rectangle rect, float aperture, Pen aperturePen, int bpp, uint normVal)
 		{
-			DrawDataPixels(g, rect, aperture, aperturePen, bpp, this);
+			DrawDataPixels(g, rect, aperture, aperturePen, bpp, normVal, this);
 		}
 
-		public static void DrawDataPixels(Graphics g, Rectangle rect, float aperture, Pen aperturePen, int bpp, ITrackedObjectPsfFit trackedPsf)
+		public static void DrawDataPixels(Graphics g, Rectangle rect, float aperture, Pen aperturePen, int bpp, uint normVal, ITrackedObjectPsfFit trackedPsf)
         {
             try
             {
@@ -1052,6 +1054,8 @@ namespace Tangra.Model.Astro
 							z = z * 255.0f / 16383;
 						else if (bpp == 12) 
 							z = z * 255.0f / 4095;
+						else if (bpp == 16)
+							z = z * 255.0f / normVal;
 
                         byte val = (byte) (Math.Max(0, Math.Min(255, z)));
                         g.FillRectangle(AllGrayBrushes.GrayBrush(val), rect.Left + x*coeff, rect.Top + y*coeff, coeff, coeff);
@@ -1232,25 +1236,25 @@ namespace Tangra.Model.Astro
 
 		public void Show()
 		{
-			frmPSFViewer frm = new frmPSFViewer(this, 8);
+			frmPSFViewer frm = new frmPSFViewer(this, 8, 0);
 			frm.Show();
 		}
 
 		public void Show(int bpp)
 		{
-			frmPSFViewer frm = new frmPSFViewer(this, bpp);
+			frmPSFViewer frm = new frmPSFViewer(this, bpp, NormVal);
 			frm.Show();
 		}
 
 		public void ShowDialog()
 		{
-			frmPSFViewer frm = new frmPSFViewer(this, 8);
+			frmPSFViewer frm = new frmPSFViewer(this, 8, 0);
 			frm.ShowDialog();
 		}
 
 		public void ShowDialog(int bpp)
 		{
-			frmPSFViewer frm = new frmPSFViewer(this, bpp);
+			frmPSFViewer frm = new frmPSFViewer(this, bpp, NormVal);
 			frm.ShowDialog();
 		}
     }

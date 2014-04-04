@@ -351,6 +351,11 @@ namespace Tangra.Controller
 			}
 		}
 
+	    public uint VideoAav16NormVal
+	    {
+		    get { return m_FramePlayer.Video.GetAav16NormVal(); }
+	    }
+
 	    public string CurrentVideoFileName
 	    {
 		    get { return m_FramePlayer.Video.FileName; }
@@ -975,12 +980,12 @@ namespace Tangra.Controller
         private void ShowTargetPSF()
         {
             if (m_TargetPSFViewerForm != null && m_FramePlayer.Video != null)
-				m_TargetPSFViewerForm.ShowTargetPSF(m_TargetPsfFit, m_FramePlayer.Video.BitPix, m_TargetBackgroundPixels);
+				m_TargetPSFViewerForm.ShowTargetPSF(m_TargetPsfFit, m_FramePlayer.Video.BitPix, m_FramePlayer.Video.GetAav16NormVal(), m_TargetBackgroundPixels);
         }
 
 		public void ShowFSTSFileViewer()
 		{
-			if (TangraContext.Current.HasVideoLoaded && m_FramePlayer.IsAstroDigitalVideo)
+			if (TangraContext.Current.HasVideoLoaded && (m_FramePlayer.IsAstroDigitalVideo || m_FramePlayer.IsAstroAnalogueVideo))
 			{
 				var viewer = new frmAdvViewer(m_FramePlayer.Video.FileName);
 				viewer.Show(m_MainFormView);

@@ -156,14 +156,14 @@ namespace Tangra.PInvoke
 			return m_Residuals[y * MatrixSize + x];
 		}
 
-		public void DrawDataPixels(System.Drawing.Graphics g, System.Drawing.Rectangle rect, float aperture, System.Drawing.Pen aperturePen, int bpp)
+		public void DrawDataPixels(System.Drawing.Graphics g, System.Drawing.Rectangle rect, float aperture, System.Drawing.Pen aperturePen, int bpp, uint normVal)
 		{
-			PSFFit.DrawDataPixels(g, rect, aperture, aperturePen, bpp, this);
+			PSFFit.DrawDataPixels(g, rect, aperture, aperturePen, bpp, normVal, this);
 		}
 
-		public void DrawGraph(System.Drawing.Graphics g, System.Drawing.Rectangle rect, int bpp)
+		public void DrawGraph(System.Drawing.Graphics g, System.Drawing.Rectangle rect, int bpp, uint normVal)
 		{
-			PSFFit.DrawGraph(g, rect, bpp, this, m_Saturation);
+			PSFFit.DrawGraph(g, rect, bpp, normVal, this, m_Saturation);
 		}
 	}
 

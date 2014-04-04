@@ -14,13 +14,15 @@ namespace Tangra.Model.Astro
 	{
         private IPSFFit m_PSFFit;
 		private int m_Bpp;
+		private uint m_NormVal;
 
-		public frmPSFViewer(IPSFFit psfFit, int bpp)
+		public frmPSFViewer(IPSFFit psfFit, int bpp, uint normVal)
 		{
 			InitializeComponent();
 
 			m_PSFFit = psfFit;
 			m_Bpp = bpp;
+			m_NormVal = normVal;
 		}
 
 		private void frmPSFViewer_Load(object sender, EventArgs e)
@@ -28,7 +30,7 @@ namespace Tangra.Model.Astro
 			picFIT.Image = new Bitmap(picFIT.Width, picFIT.Height);
 			using (Graphics g = Graphics.FromImage(picFIT.Image))
 			{
-				m_PSFFit.DrawGraph(g, new Rectangle(0, 0, picFIT.Image.Width, picFIT.Image.Height), m_Bpp);
+				m_PSFFit.DrawGraph(g, new Rectangle(0, 0, picFIT.Image.Width, picFIT.Image.Height), m_Bpp, m_NormVal);
 				g.Save();
 			}
 
@@ -38,7 +40,7 @@ namespace Tangra.Model.Astro
             picPixels.Image = new Bitmap(side, side);
             using (Graphics g = Graphics.FromImage(picPixels.Image))
             {
-				m_PSFFit.DrawDataPixels(g, new Rectangle(0, 0, picPixels.Width, picPixels.Height), m_Bpp);
+				m_PSFFit.DrawDataPixels(g, new Rectangle(0, 0, picPixels.Width, picPixels.Height), m_Bpp, m_NormVal);
                 g.Save();
             }
 

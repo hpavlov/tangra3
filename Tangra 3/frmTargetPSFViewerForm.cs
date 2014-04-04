@@ -15,17 +15,18 @@ namespace Tangra
 	{
 		private PSFFit m_PSFFit;
 		private int m_Bpp;
+		private uint m_NormVal;
 
 		public frmTargetPSFViewerForm()
 		{
 			InitializeComponent();
 		}
 
-		public void ShowTargetPSF(PSFFit psfFit, int bpp, uint[,] backgroundPixels)
+		public void ShowTargetPSF(PSFFit psfFit, int bpp, uint aav16Normval, uint[,] backgroundPixels)
 		{
 			m_PSFFit = psfFit;
 			m_Bpp = bpp;
-
+			m_NormVal = bpp == 16 ? aav16Normval : 0;
 
 			picFIT.Image = new Bitmap(picFIT.Width, picFIT.Height);
 
@@ -33,7 +34,7 @@ namespace Tangra
 			{
 				using (Graphics g = Graphics.FromImage(picFIT.Image))
 				{
-					m_PSFFit.DrawGraph(g, new Rectangle(0, 0, picFIT.Image.Width, picFIT.Image.Height), m_Bpp);
+					m_PSFFit.DrawGraph(g, new Rectangle(0, 0, picFIT.Image.Width, picFIT.Image.Height), m_Bpp, m_NormVal);
 					g.Save();
 				}
 
@@ -43,7 +44,7 @@ namespace Tangra
 				picPixels.Image = new Bitmap(side, side);
 				using (Graphics g = Graphics.FromImage(picPixels.Image))
 				{
-					m_PSFFit.DrawDataPixels(g, new Rectangle(0, 0, picPixels.Width, picPixels.Height), -1, Pens.Lime, m_Bpp);
+					m_PSFFit.DrawDataPixels(g, new Rectangle(0, 0, picPixels.Width, picPixels.Height), -1, Pens.Lime, m_Bpp, m_NormVal);
 					g.Save();
 				}
 

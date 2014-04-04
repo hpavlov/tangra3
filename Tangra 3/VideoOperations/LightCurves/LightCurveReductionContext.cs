@@ -70,13 +70,13 @@ namespace Tangra.VideoOperations.LightCurves
     		set
     		{
     			m_BitPix = value;
-				DisplayBitmapConverterImpl = DisplayBitmapConverter.ConstructConverter(m_BitPix, null);
 			}
     	}
 
     	public bool HasEmbeddedTimeStamps { get; set; }
 
-    	public uint MaxPixelValue = 256;
+	    public uint MaxPixelValue;
+
     	public IDisplayBitmapConverter DisplayBitmapConverterImpl = new DisplayBitmapConverter.DefaultDisplayBitmapConverter();
 
         public Rectangle OSDFrame;
@@ -267,7 +267,7 @@ namespace Tangra.VideoOperations.LightCurves
 								instance.BitPix = reader.ReadInt32();
 								instance.MaxPixelValue = reader.ReadUInt32();
 								string config = reader.ReadString();
-								instance.DisplayBitmapConverterImpl = DisplayBitmapConverter.ConstructConverter(instance.BitPix, config);
+								instance.DisplayBitmapConverterImpl = DisplayBitmapConverter.ConstructConverter(instance.BitPix, instance.MaxPixelValue, config);
 
 								if (version > 5)
 								{

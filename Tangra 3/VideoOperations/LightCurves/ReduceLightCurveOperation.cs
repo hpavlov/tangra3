@@ -841,7 +841,7 @@ namespace Tangra.VideoOperations.LightCurves
 			{
 				if (obj.PSFFit != null)
 				{
-					obj.PSFFit.DrawDataPixels(g, m_ZoomPixelRects[obj.TargetNo], obj.OriginalObject.ApertureInPixels, m_AllPens[obj.TargetNo], m_VideoController.VideoBitPix);
+					obj.PSFFit.DrawDataPixels(g, m_ZoomPixelRects[obj.TargetNo], obj.OriginalObject.ApertureInPixels, m_AllPens[obj.TargetNo], m_VideoController.VideoBitPix, m_VideoController.VideoAav16NormVal);
 				}
 				else if (obj.IsLocated)
 				{
@@ -873,7 +873,7 @@ namespace Tangra.VideoOperations.LightCurves
             {
                 if (obj.PSFFit != null && obj.PSFFit.IsSolved)
                 {
-                    obj.PSFFit.DrawGraph(g, m_ZoomPixelRects[obj.TargetNo], m_VideoController.VideoBitPix);
+					obj.PSFFit.DrawGraph(g, m_ZoomPixelRects[obj.TargetNo], m_VideoController.VideoBitPix, m_VideoController.VideoAav16NormVal);
                 }
             }
         }

@@ -120,8 +120,8 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			{
 				for (int i = 0; i < m_TrackedObjects.Count; i++)
 				{
-					m_TrackedObjects[i].PSFFit.DrawDataPixels(g, new Rectangle(i * 200 + 15, 15, 170, 170), m_TrackedObjects[i].OriginalObject.ApertureInPixels, Pens.Yellow, 8);
-					m_TrackedObjects[i].PSFFit.DrawGraph(g, new Rectangle(i * 200 + 2, 200, 180, 180), 8);
+					m_TrackedObjects[i].PSFFit.DrawDataPixels(g, new Rectangle(i * 200 + 15, 15, 170, 170), m_TrackedObjects[i].OriginalObject.ApertureInPixels, Pens.Yellow, 8, 0);
+					m_TrackedObjects[i].PSFFit.DrawGraph(g, new Rectangle(i * 200 + 2, 200, 180, 180), 8, 0);
 
 					foreach (IImagePixel candidateStar in candidateCenters[i])
 					{
