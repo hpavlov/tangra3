@@ -393,7 +393,7 @@ HRESULT GetPixelMapBitsAndHBitmap(BYTE* pDIB, long* width, long* height, DWORD i
 	bih.biPlanes = 1; 
 	bih.biBitCount = 24;                          // 24-bit 
 	bih.biCompression = BI_RGB;                   // no compression 
-	bih.biSizeImage = *width * abs(*height) * 3;    // width * height * (RGB bytes) 
+	bih.biSizeImage = *width * ABS(*height) * 3;    // width * height * (RGB bytes) 
 	bih.biXPelsPerMeter = 0; 
 	bih.biYPelsPerMeter = 0; 
 	bih.biClrUsed = 0; 
@@ -442,7 +442,7 @@ HRESULT GetBitmapPixels(long width, long height, unsigned long* pixels, BYTE* bi
 	bih.biPlanes = 1; 
 	bih.biBitCount = 24;                          // 24-bit 
 	bih.biCompression = BI_RGB;                   // no compression 
-	bih.biSizeImage = width * abs(height) * 3;    // width * height * (RGB bytes) 
+	bih.biSizeImage = width * ABS(height) * 3;    // width * height * (RGB bytes) 
 	bih.biXPelsPerMeter = 0; 
 	bih.biYPelsPerMeter = 0; 
 	bih.biClrUsed = 0; 
@@ -625,7 +625,7 @@ unsigned int* s_GammaTable = NULL;
 void BuildGammaTableForBpp(int bpp, float gamma)
 {
 	if (s_GammaTableBpp != bpp ||
-		abs(s_GammaTableEncodingGamma - gamma) >= 0.01)
+		ABS(s_GammaTableEncodingGamma - gamma) >= 0.01)
 	{
 		if (NULL != s_GammaTable)
 		{

@@ -91,4 +91,6 @@ int advfsetpos(FILE* file, const __int64* pos);
   #endif
 #endif
 
+float ABS(float x);
+
 #endif // CROSSPLATFORM_H

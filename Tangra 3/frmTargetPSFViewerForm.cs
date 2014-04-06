@@ -123,7 +123,14 @@ namespace Tangra
 					lblSNR.Text = snr.ToString("0.0");
 				}
 				else
-					lblSNR.Text = "N/A";				
+					lblSNR.Text = "N/A";	
+			
+				if (m_PSFFit != null)
+				{
+					lblFitVariance.Text = m_PSFFit.GetVariance().ToString("0.0");
+				}
+				else
+					lblFitVariance.Text = "N/A";
 			}
 			else
 			{

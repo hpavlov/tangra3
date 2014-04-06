@@ -49,6 +49,9 @@
 			this.label10 = new System.Windows.Forms.Label();
 			this.label11 = new System.Windows.Forms.Label();
 			this.label12 = new System.Windows.Forms.Label();
+			this.label6 = new System.Windows.Forms.Label();
+			this.lblFitVariance = new System.Windows.Forms.Label();
+			this.label8 = new System.Windows.Forms.Label();
 			((System.ComponentModel.ISupportInitialize)(this.picPixels)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.picFIT)).BeginInit();
 			this.SuspendLayout();
@@ -232,11 +235,42 @@
 			this.label12.TabIndex = 26;
 			this.label12.Text = "1-s";
 			// 
+			// label6
+			// 
+			this.label6.AutoSize = true;
+			this.label6.Font = new System.Drawing.Font("Symbol", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(2)));
+			this.label6.Location = new System.Drawing.Point(339, 311);
+			this.label6.Name = "label6";
+			this.label6.Size = new System.Drawing.Size(25, 13);
+			this.label6.TabIndex = 29;
+			this.label6.Text = "1-s";
+			// 
+			// lblFitVariance
+			// 
+			this.lblFitVariance.AutoSize = true;
+			this.lblFitVariance.Location = new System.Drawing.Point(411, 311);
+			this.lblFitVariance.Name = "lblFitVariance";
+			this.lblFitVariance.Size = new System.Drawing.Size(22, 13);
+			this.lblFitVariance.TabIndex = 28;
+			this.lblFitVariance.Text = "0.0";
+			// 
+			// label8
+			// 
+			this.label8.AutoSize = true;
+			this.label8.Location = new System.Drawing.Point(363, 311);
+			this.label8.Name = "label8";
+			this.label8.Size = new System.Drawing.Size(53, 13);
+			this.label8.TabIndex = 27;
+			this.label8.Text = "PSF Fit = ";
+			// 
 			// frmTargetPSFViewerForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(501, 331);
+			this.Controls.Add(this.label6);
+			this.Controls.Add(this.lblFitVariance);
+			this.Controls.Add(this.label8);
 			this.Controls.Add(this.label12);
 			this.Controls.Add(this.lblSNR);
 			this.Controls.Add(this.lblNoise);
@@ -290,5 +324,8 @@
 		private System.Windows.Forms.Label label10;
 		private System.Windows.Forms.Label label11;
 		private System.Windows.Forms.Label label12;
+		private System.Windows.Forms.Label label6;
+		private System.Windows.Forms.Label lblFitVariance;
+		private System.Windows.Forms.Label label8;
 	}
 }

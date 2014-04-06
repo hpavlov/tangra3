@@ -377,8 +377,7 @@ namespace Tangra.PInvoke
 
 			public static void AddGammaCorrection(float encodingGamma)
 			{
-                if (Math.Abs(encodingGamma - 1.0f) > 0.01f)
-				    PreProcessingAddGammaCorrection(encodingGamma);
+                PreProcessingAddGammaCorrection(encodingGamma);
 			}
 
 			public static void AddDarkFrame(uint[,] darkFramePixels, uint darkFrameMedian)

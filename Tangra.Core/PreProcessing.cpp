@@ -20,6 +20,13 @@ bool g_DarkFrameAdjustLevelToMedian = false;
 unsigned int g_DarkFramePixelsCount = 0;
 unsigned int g_FlatFramePixelsCount = 0;
 
+float ABS(float x)
+{
+	if (x < 0)
+		return -x;
+	return x;
+}
+
 bool UsesPreProcessing()
 {
 	return g_UsesPreProcessing;
@@ -125,7 +132,7 @@ long PreProcessingAddDigitalFilter(enum PreProcessingFilter filter)
 long PreProcessingAddGammaCorrection(float gamma)
 {
 	g_EncodingGamma = gamma;
-	g_UsesPreProcessing = g_UsesPreProcessing || abs(g_EncodingGamma - 1.0f) > 0.01;
+	g_UsesPreProcessing = g_UsesPreProcessing || ABS(g_EncodingGamma - 1.0f) > 0.01;
 	
 	return S_OK;
 }
@@ -236,7 +243,7 @@ long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height
 		if (rv != S_OK) return rv;
 	}
 	
-	if (abs(g_EncodingGamma - 1.0f) > 0.01)
+	if (ABS(g_EncodingGamma - 1.0f) > 0.01)
 	{
 		rv = PreProcessingGamma(pixels, width, height, bpp, g_EncodingGamma);
 		if (rv != S_OK) return rv;
