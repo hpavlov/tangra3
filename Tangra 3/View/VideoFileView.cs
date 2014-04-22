@@ -23,8 +23,8 @@ namespace Tangra.View
 		{
 			m_MainForm = mainForm;
 
-			m_ExtraWidth = m_MainForm.Width - m_MainForm.pictureBox.Width;
-			m_ExtraHeight = m_MainForm.Height - m_MainForm.pictureBox.Height;
+			m_ExtraWidth = m_MainForm.Width - m_MainForm.pictureBox.Width + 1;
+			m_ExtraHeight = m_MainForm.Height - m_MainForm.pictureBox.Height + 1;
 		}
 
 		internal void SetFramePlayer(IFramePlayer framePlayer)

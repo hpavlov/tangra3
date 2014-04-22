@@ -206,6 +206,12 @@
     <Compile Include="Controls\ucColorPicker.Designer.cs">
       <DependentUpon>ucColorPicker.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\ucImagePanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\ucImagePanel.Designer.cs">
+      <DependentUpon>ucImagePanel.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\ucUtcTimePicker.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -553,6 +559,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\ucColorPicker.resx">
       <DependentUpon>ucColorPicker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\ucImagePanel.resx">
+      <DependentUpon>ucImagePanel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\ucUtcTimePicker.resx">
       <DependentUpon>ucUtcTimePicker.cs</DependentUpon>

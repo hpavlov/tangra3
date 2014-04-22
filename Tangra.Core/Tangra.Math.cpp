@@ -9,6 +9,7 @@
 unsigned long SATURATION_8BIT = 250;
 unsigned long SATURATION_12BIT = 4000;
 unsigned long SATURATION_14BIT = 16000;
+unsigned long SATURATION_16BIT = 65000;
 
 static double DotBuffer(double* bufferV, const int vRow, double* bufferW, const int wCol, const long vColsCount, const long wRowsCount, const long wColsCount)
 {

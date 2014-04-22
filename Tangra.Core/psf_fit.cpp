@@ -52,6 +52,10 @@ void PsfFit::SetDataRange(PSFFittingDataRange dataRange)
 			m_Saturation = SATURATION_14BIT;
 			break;
 
+		case DataRange16Bit:
+			m_Saturation = SATURATION_16BIT;
+			break;
+			
 		default:
 			m_Saturation = SATURATION_8BIT;
 			break;

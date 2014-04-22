@@ -8,7 +8,7 @@ static double MAX_FWHM;
 static double MIN_CERTAINTY;
 
 
-TrackedObject::TrackedObject(long objectId, bool isFixedAperture, bool isOccultedStar, double startingX, double startingY, double apertureInPixels)
+TrackedObject::TrackedObject(long objectId, bool isFixedAperture, bool isOccultedStar, double startingX, double startingY, double apertureInPixels, PSFFittingDataRange dataRange)
 {
 	ObjectId = objectId;
 	IsFixedAperture = isFixedAperture;
@@ -16,7 +16,7 @@ TrackedObject::TrackedObject(long objectId, bool isFixedAperture, bool isOcculte
 	StartingX = startingX;
 	StartingY = startingY;
 	ApertureInPixels = apertureInPixels;
-	CurrentPsfFit = new PsfFit(DataRange8Bit);
+	CurrentPsfFit = new PsfFit(dataRange);
 	CurrentPsfFit->FittingMethod = MAX_ELONGATION == 0 ? NonLinearFit : NonLinearAsymetricFit;
 }
 
@@ -66,12 +66,13 @@ void TrackedObject::SetIsTracked(bool isLocated, NotMeasuredReasons reason, doub
 	TrackingFlags = (unsigned int)reason;
 }
 
-SimplifiedTracker::SimplifiedTracker(long width, long height, long numTrackedObjects, bool isFullDisappearance)
+SimplifiedTracker::SimplifiedTracker(long width, long height, long numTrackedObjects, bool isFullDisappearance, PSFFittingDataRange dataRange)
 {
 	m_Width = width;
 	m_Height = height;
 	m_NumTrackedObjects = numTrackedObjects;
 	m_IsFullDisappearance = isFullDisappearance;
+	m_DataRange = dataRange;
 	
 	m_TrackedObjects = (TrackedObject**)malloc(numTrackedObjects * sizeof(TrackedObject*));
 	for(int i = 0; i < numTrackedObjects; i ++)
@@ -104,7 +105,7 @@ SimplifiedTracker::~SimplifiedTracker()
 void SimplifiedTracker::ConfigureObject(long objectId, bool isFixedAperture, bool isOccultedStar, double startingX, double startingY, double apertureInPixels)
 {
 	if (objectId >=0 && objectId < m_NumTrackedObjects)
-		m_TrackedObjects[objectId] = new TrackedObject(objectId, isFixedAperture, isOccultedStar, startingX, startingY, apertureInPixels);
+		m_TrackedObjects[objectId] = new TrackedObject(objectId, isFixedAperture, isOccultedStar, startingX, startingY, apertureInPixels, m_DataRange);
 }
 
 void SimplifiedTracker::UpdatePsfFittingMethod()
@@ -342,7 +343,7 @@ long TrackerSettings(double maxElongation, double minFWHM, double maxFWHM, doubl
 	return S_OK;
 }
 
-long TrackerNewConfiguration(long width, long height, long numTrackedObjects, bool isFullDisappearance)
+long TrackerNewConfiguration(long width, long height, long numTrackedObjects, bool isFullDisappearance, PSFFittingDataRange dataRange)
 {
 	if (NULL != s_Tracker)
 	{
@@ -350,7 +351,7 @@ long TrackerNewConfiguration(long width, long height, long numTrackedObjects, bo
 		s_Tracker = NULL;
 	}
 	
-	s_Tracker = new SimplifiedTracker(width, height, numTrackedObjects, isFullDisappearance);
+	s_Tracker = new SimplifiedTracker(width, height, numTrackedObjects, isFullDisappearance, dataRange);
 	
 	return S_OK;
 }

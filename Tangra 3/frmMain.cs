@@ -384,7 +384,7 @@ namespace Tangra
 				//PositionMemento.SaveControlPosition(this);
 			}
 
-			ConfigureImageScrollbars();
+			//ConfigureImageScrollbars();
 		}
 
 		public bool SelectVideoOperation()
@@ -437,19 +437,19 @@ namespace Tangra
 			}
 		}
 
-		private void ConfigureImageScrollbars()
-		{
-			if (FormWindowState.Maximized == WindowState)
-			{
-				pictureBox.Dock = DockStyle.None;
-				pictureBox.SizeMode = PictureBoxSizeMode.AutoSize;
-			}
-			else
-			{
-				pictureBox.Dock = DockStyle.Fill;
-				pictureBox.SizeMode = PictureBoxSizeMode.Normal;
-			}
-		}
+		//private void ConfigureImageScrollbars()
+		//{
+		//	if (FormWindowState.Maximized == WindowState)
+		//	{
+		//		pictureBox.Dock = DockStyle.None;
+		//		pictureBox.SizeMode = PictureBoxSizeMode.AutoSize;
+		//	}
+		//	else
+		//	{
+		//		pictureBox.Dock = DockStyle.Fill;
+		//		pictureBox.SizeMode = PictureBoxSizeMode.Normal;
+		//	}
+		//}
 
 		private void btnPlay_Click(object sender, EventArgs e)
 		{
@@ -661,17 +661,20 @@ namespace Tangra
         #region Picture Box Events
         private void pictureBox_MouseClick(object sender, MouseEventArgs e)
         {
-            m_VideoController.MouseClick(e.Location);
+	        Point loc = pictureBox.GetImageLocation(e.Location);
+			m_VideoController.MouseClick(loc);
         }
 
         private void pictureBox_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            m_VideoController.MouseDoubleClick(e.Location);
+			Point loc = pictureBox.GetImageLocation(e.Location);
+			m_VideoController.MouseDoubleClick(loc);
         }
 
         private void pictureBox_MouseDown(object sender, MouseEventArgs e)
         {
-            m_VideoController.MouseDown(e.Location);
+			Point loc = pictureBox.GetImageLocation(e.Location);
+			m_VideoController.MouseDown(loc);
         }
 
         private void pictureBox_MouseLeave(object sender, EventArgs e)
@@ -681,12 +684,14 @@ namespace Tangra
 
         private void pictureBox_MouseMove(object sender, MouseEventArgs e)
         {
-            m_VideoController.MouseMove(e.Location);
+			Point loc = pictureBox.GetImageLocation(e.Location);
+			m_VideoController.MouseMove(loc);
         }
 
         private void pictureBox_MouseUp(object sender, MouseEventArgs e)
         {
-            m_VideoController.MouseUp(e.Location);
+			Point loc = pictureBox.GetImageLocation(e.Location);
+			m_VideoController.MouseUp(loc);
         }
         #endregion
 

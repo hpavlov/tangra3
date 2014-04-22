@@ -18,12 +18,38 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 		internal NativeSimplifiedTracker(int width, int height, List<TrackedObjectConfig> measuringStars, bool isFullDisappearance)
 		{
 			NativeTracking.ConfigureNativeTracker();
-				
+
+			var dataRange = PSFFittingDataRange.DataRange8Bit;
+
+			switch (LightCurveReductionContext.Instance.BitPix)
+			{
+				case 8:
+					dataRange = PSFFittingDataRange.DataRange8Bit;
+					break;
+
+				case 12:
+					dataRange = PSFFittingDataRange.DataRange12Bit;
+					break;
+
+				case 14:
+					dataRange = PSFFittingDataRange.DataRange14Bit;
+					break;
+
+				case 16:
+					dataRange = PSFFittingDataRange.DataRange16Bit;
+					break;
+
+				default:
+					dataRange = PSFFittingDataRange.DataRange16Bit;
+					break;
+			}
+
 			NativeTracking.InitNewTracker(
 				width, 
 				height, 
 				measuringStars.Count, 
-				LightCurveReductionContext.Instance.FullDisappearance);
+				LightCurveReductionContext.Instance.FullDisappearance,
+				dataRange);
 
 			for (int i = 0; i < measuringStars.Count; i++)
 			{

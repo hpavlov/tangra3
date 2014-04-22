@@ -6,6 +6,7 @@
 extern unsigned long SATURATION_8BIT;
 extern unsigned long SATURATION_12BIT;
 extern unsigned long SATURATION_14BIT;
+extern unsigned long SATURATION_16BIT;
 	
 extern double* s_TransponseBuffer;
 extern long s_NumVariables;

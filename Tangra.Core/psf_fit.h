@@ -13,7 +13,8 @@ enum PSFFittingMethod {
 enum PSFFittingDataRange {
     DataRange8Bit = 0,
     DataRange12Bit = 1,
-    DataRange14Bit = 2
+    DataRange14Bit = 2,
+	DataRange16Bit = 3
 };
 
 class PsfFit
