@@ -26,13 +26,6 @@ using Cursor = System.Windows.Forms.Cursor;
 
 namespace Tangra.Controller
 {
-	public enum DisplayIntensifyMode
-	{
-		Off,
-		Lo,
-		Hi
-	}
-
     public class VideoController : IDisposable, IVideoFrameRenderer, IVideoController
 	{
 		private VideoFileView m_VideoFileView;
@@ -92,6 +85,11 @@ namespace Tangra.Controller
 
 			m_DisplayInvertedMode = TangraConfig.Settings.Generic.UseInvertedDisplayMode;
 			m_MainForm.tsmiInverted.Checked = TangraConfig.Settings.Generic.UseInvertedDisplayMode;
+
+			m_DisplayIntensifyMode = TangraConfig.Settings.Generic.UseDisplayIntensifyMode;
+			m_MainForm.tsmiOff.Checked = m_DisplayIntensifyMode == DisplayIntensifyMode.Off;
+			m_MainForm.tsmiLo.Checked = m_DisplayIntensifyMode == DisplayIntensifyMode.Lo;
+			m_MainForm.tsmiHigh.Checked = m_DisplayIntensifyMode == DisplayIntensifyMode.Hi;
 		}
 
 		public void SetLightCurveController(LightCurveController lightCurveController)
@@ -784,6 +782,9 @@ namespace Tangra.Controller
 		public void SetDisplayIntensifyMode(DisplayIntensifyMode newMode)
 		{
 			m_DisplayIntensifyMode = newMode;
+
+			TangraConfig.Settings.Generic.UseDisplayIntensifyMode = newMode;
+			TangraConfig.Settings.Save();
 
 			if (!m_FramePlayer.IsRunning &&
 				m_FramePlayer.Video != null)

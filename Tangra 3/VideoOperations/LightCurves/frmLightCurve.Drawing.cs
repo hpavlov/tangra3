@@ -261,7 +261,12 @@ namespace Tangra.VideoOperations.LightCurves
 									prevPoint.Y = y;
 
 
-									g.FillEllipse(brush, x - datapointFrom, y - datapointFrom, datapointSize, datapointSize);
+									try
+									{
+										g.FillEllipse(brush, x - datapointFrom, y - datapointFrom, datapointSize, datapointSize);
+									}
+									catch (OverflowException)
+									{ }									
 								}
 								prevReadingIsOffScreen = readingIsOffScreen;
 
@@ -433,8 +438,12 @@ namespace Tangra.VideoOperations.LightCurves
                                     prevPoint.X = x;
                                     prevPoint.Y = y;
 
-
-                                    g.FillEllipse(brush, x - datapointFrom, y - datapointFrom, datapointSize, datapointSize);
+									try
+									{
+										g.FillEllipse(brush, x - datapointFrom, y - datapointFrom, datapointSize, datapointSize);
+									}
+									catch (OverflowException)
+									{ }                                    
                                 }
 								prevReadingIsOffScreen = readingIsOffScreen;
 
@@ -748,7 +757,12 @@ namespace Tangra.VideoOperations.LightCurves
                                 if (restoreThisReading)
                                 {
                                     Brush brush = GetBrushForTarget(i, reading.IsSuccessfulReading);
-                                    g.FillEllipse(brush, x - datapointFrom, y - datapointFrom, datapointSize, datapointSize);
+									try
+									{
+										g.FillEllipse(brush, x - datapointFrom, y - datapointFrom, datapointSize, datapointSize);
+									}
+									catch (OverflowException)
+									{ }                                    
                                 }
                             }
                         }
@@ -806,7 +820,12 @@ namespace Tangra.VideoOperations.LightCurves
                             if (m_Context.Binning == 0 && !reading.IsOffScreen && drawThisReading)
                             {
                                 float y = pnlChart.Height - (m_MinY + (reading.AdjustedReading - m_Header.MinAdjustedReading) * m_ScaleY);
-								g.FillEllipse(m_DisplaySettings.SelectionCursorColorBrush, x - datapointFrom, y - datapointFrom, datapointSize, datapointSize);
+								try
+								{
+									g.FillEllipse(m_DisplaySettings.SelectionCursorColorBrush, x - datapointFrom, y - datapointFrom, datapointSize, datapointSize);
+								}
+								catch (OverflowException)
+								{ }   								
                             }
 
                             m_SelectedMeasurements[i] = reading;

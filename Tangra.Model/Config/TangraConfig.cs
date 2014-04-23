@@ -140,6 +140,13 @@ namespace Tangra.Model.Config
 			}				
 		}	
 	}
+
+	public enum DisplayIntensifyMode
+	{
+		Off,
+		Lo,
+		Hi
+	}
 	
 	[XmlRoot("Tangra3Config")]
 	public class TangraConfig
@@ -522,6 +529,7 @@ namespace Tangra.Model.Config
 
 			public bool UseHueIntensityDisplayMode = false;
 			public bool UseInvertedDisplayMode = false;
+			public DisplayIntensifyMode UseDisplayIntensifyMode = DisplayIntensifyMode.Off;
 
 			public bool OsdOcrEnabled = true;
 			public string OcrEngine = "IOTA-VTI";
