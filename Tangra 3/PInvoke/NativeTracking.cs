@@ -193,7 +193,7 @@ namespace Tangra.PInvoke
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
 		//DLL_PUBLIC void ConfigureSaturationLevels(unsigned long saturation8Bit, unsigned long saturation12Bit, unsigned long saturation14Bit);
-		private static extern int ConfigureSaturationLevels(ulong saturation8Bit, ulong saturation12Bit, ulong saturation14Bit);
+        private static extern int ConfigureSaturationLevels(uint saturation8Bit, uint saturation12Bit, uint saturation14Bit);
 
 	    [DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
 	    //DLL_PUBLIC long TrackerInitialiseNewTracking();
