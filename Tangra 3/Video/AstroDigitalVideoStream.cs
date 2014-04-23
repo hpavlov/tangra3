@@ -227,7 +227,7 @@ namespace Tangra.Video
 			{
 				UserCommandString = AdvFrameInfo.GetStringFromBytes(userCommand),
 				SystemErrorString = AdvFrameInfo.GetStringFromBytes(systemError),
-				GPSFixString = AdvFrameInfo.GetStringFromBytes(gpsFix)		
+				GPSFixString = AdvFrameInfo.GetStringFromBytes(gpsFix)
 			};
 
 			return rv;
@@ -262,15 +262,24 @@ namespace Tangra.Video
 			using (MemoryStream memStr = new MemoryStream(rawBitmapBytes))
 			{
 			    Bitmap displayBitmap;
-                try
-                {
-                    displayBitmap = (Bitmap) Bitmap.FromStream(memStr);
-                }
-                catch (Exception ex)
-                {
-                    Trace.WriteLine(ex.GetFullStackTrace());
-                    displayBitmap = new Bitmap(m_Width, m_Height);
-                }
+
+				if (m_Engine == "AAV" && m_CurrentFrameInfo.IntegratedFrames == 0)
+				{
+					// This is a VTI Split reference frame. Put some mark on it to mark it as such??
+					displayBitmap = Pixelmap.ConstructBitmapFromBitmapPixels(pixels, m_Width, m_Height);
+				}
+				else
+				{
+					try
+					{
+						displayBitmap = (Bitmap)Bitmap.FromStream(memStr);
+					}
+					catch (Exception ex)
+					{
+						Trace.WriteLine(ex.GetFullStackTrace());
+						displayBitmap = new Bitmap(m_Width, m_Height);
+					}					
+				}
 
                 var rv = new Pixelmap(m_Width, m_Height, m_BitPix, pixels, displayBitmap, displayBitmapBytes);
 				rv.FrameState = GetCurrentFrameState(index);
