@@ -68,11 +68,18 @@
 *.css    text
 *.js     text
 *.sql    text
-*.c text
-*.h text
+*.c      text
+*.h      text
+*.resx   text
+*.config text
+*.xml    text
+*.def    text
+
 
 *.csproj text merge=union
 *.sln    text merge=union eol=crlf
+*.vcxproj    text  merge=union
+*.vcxproj.filters    text  merge=union
 
 *.docx   diff=astextplain
 *.DOCX   diff=astextplain
