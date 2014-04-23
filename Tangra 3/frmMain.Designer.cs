@@ -104,6 +104,7 @@
 			// 
 			// mainMenu
 			// 
+			this.mainMenu.AllowDrop = true;
 			this.mainMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.miFile,
             this.miFrameActions,
@@ -115,6 +116,8 @@
 			this.mainMenu.Name = "mainMenu";
 			this.mainMenu.Size = new System.Drawing.Size(861, 24);
 			this.mainMenu.TabIndex = 0;
+			this.mainMenu.DragDrop += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragDrop);
+			this.mainMenu.DragEnter += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragEnter);
 			// 
 			// miFile
 			// 
@@ -502,7 +505,7 @@
 			// 
 			this.tsmiInverted.CheckOnClick = true;
 			this.tsmiInverted.Name = "tsmiInverted";
-			this.tsmiInverted.Size = new System.Drawing.Size(152, 22);
+			this.tsmiInverted.Size = new System.Drawing.Size(148, 22);
 			this.tsmiInverted.Text = "Inverted";
 			this.tsmiInverted.Click += new System.EventHandler(this.DisplayInvertedClicked);
 			// 
@@ -510,26 +513,26 @@
 			// 
 			this.tsmiHueIntensity.CheckOnClick = true;
 			this.tsmiHueIntensity.Name = "tsmiHueIntensity";
-			this.tsmiHueIntensity.Size = new System.Drawing.Size(152, 22);
+			this.tsmiHueIntensity.Size = new System.Drawing.Size(148, 22);
 			this.tsmiHueIntensity.Text = "Hue Intensity";
 			this.tsmiHueIntensity.Click += new System.EventHandler(this.tsmiHueIntensity_Click);
 			// 
 			// toolStripSeparator3
 			// 
 			this.toolStripSeparator3.Name = "toolStripSeparator3";
-			this.toolStripSeparator3.Size = new System.Drawing.Size(149, 6);
+			this.toolStripSeparator3.Size = new System.Drawing.Size(145, 6);
 			// 
 			// tsmiHigh
 			// 
 			this.tsmiHigh.Name = "tsmiHigh";
-			this.tsmiHigh.Size = new System.Drawing.Size(152, 22);
+			this.tsmiHigh.Size = new System.Drawing.Size(148, 22);
 			this.tsmiHigh.Text = "Gamma: High";
 			this.tsmiHigh.Click += new System.EventHandler(this.DisplayIntensifyModeClicked);
 			// 
 			// tsmiLo
 			// 
 			this.tsmiLo.Name = "tsmiLo";
-			this.tsmiLo.Size = new System.Drawing.Size(152, 22);
+			this.tsmiLo.Size = new System.Drawing.Size(148, 22);
 			this.tsmiLo.Text = "Gamma: Lo";
 			this.tsmiLo.Click += new System.EventHandler(this.DisplayIntensifyModeClicked);
 			// 
@@ -538,7 +541,7 @@
 			this.tsmiOff.Checked = true;
 			this.tsmiOff.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.tsmiOff.Name = "tsmiOff";
-			this.tsmiOff.Size = new System.Drawing.Size(152, 22);
+			this.tsmiOff.Size = new System.Drawing.Size(148, 22);
 			this.tsmiOff.Text = "Gamma: Off";
 			this.tsmiOff.Click += new System.EventHandler(this.DisplayIntensifyModeClicked);
 			// 
@@ -763,6 +766,7 @@
 			// 
 			// pictureBox
 			// 
+			this.pictureBox.AllowDrop = true;
 			this.pictureBox.BackColor = System.Drawing.SystemColors.ControlDark;
 			this.pictureBox.CanvasSize = new System.Drawing.Size(60, 40);
 			this.pictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -772,6 +776,8 @@
 			this.pictureBox.Name = "pictureBox";
 			this.pictureBox.Size = new System.Drawing.Size(607, 503);
 			this.pictureBox.TabIndex = 2;
+			this.pictureBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragDrop);
+			this.pictureBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragEnter);
 			this.pictureBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseClick);
 			this.pictureBox.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDoubleClick);
 			this.pictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDown);
@@ -781,6 +787,7 @@
 			// 
 			// frmMain
 			// 
+			this.AllowDrop = true;
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.SystemColors.Control;
@@ -796,6 +803,8 @@
 			this.Text = "Tangra v3.0";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmMain_FormClosing);
 			this.Load += new System.EventHandler(this.frmMain_Load);
+			this.DragDrop += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragDrop);
+			this.DragEnter += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragEnter);
 			this.Move += new System.EventHandler(this.frmMain_Move);
 			this.Resize += new System.EventHandler(this.frmMain_Resize);
 			this.mainMenu.ResumeLayout(false);

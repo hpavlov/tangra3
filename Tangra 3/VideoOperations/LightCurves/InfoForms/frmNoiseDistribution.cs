@@ -73,11 +73,14 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
         }
         private void DisplayDistributionForObject(int objectIndex)
         {
-            List<double> data = m_AllReadings[objectIndex]
-                .Where(mea => mea.TotalReading != 0 && mea.TotalBackground != 0)
-                .Select(d => (double)d.AdjustedReading).ToList();
+			if (m_AllReadings[objectIndex] != null)
+			{
+				List<double> data = m_AllReadings[objectIndex]
+					.Where(mea => mea.TotalReading != 0 && mea.TotalBackground != 0)
+					.Select(d => (double)d.AdjustedReading).ToList();
 
-            DisplayDistributionFullProcess(data, m_AllBrushes[objectIndex]);
+				DisplayDistributionFullProcess(data, m_AllBrushes[objectIndex]);				
+			}
         }
 
         private void DisplayDistributionFullProcess(List<double> data, Brush brush)

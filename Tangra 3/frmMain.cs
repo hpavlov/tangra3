@@ -20,6 +20,7 @@ using Tangra.Helpers;
 using Tangra.ImageTools;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
+using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.Model.Video;
 using Tangra.Model.VideoOperations;
@@ -868,6 +869,33 @@ namespace Tangra
 		{
 			bool debugMode = e.Button == MouseButtons.Middle;
 			m_VideoController.ActivateOperation<ReduceLightCurveOperation>(m_LightCurveController, debugMode);
+		}
+
+		private void FileSystemFileDragDrop(object sender, DragEventArgs e)
+		{
+			try
+			{
+				var filedata = e.Data.GetData(DataFormats.FileDrop, false) as string[];
+				if (filedata != null)
+				{
+					var filename = filedata.FirstOrDefault();
+					if (filename != null)
+					{
+						// MessageBox.Show(filename);
+						// TODO: Make the drag-drop of files to work
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Trace.WriteLine(ex.GetFullStackTrace());
+			}
+		}
+
+		private void FileSystemFileDragEnter(object sender, DragEventArgs e)
+		{
+			if (e.Data.GetDataPresent(DataFormats.FileDrop))
+				e.Effect = DragDropEffects.Copy;
 		}
 	}
 }

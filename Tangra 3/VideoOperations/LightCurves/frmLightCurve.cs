@@ -2115,11 +2115,16 @@ namespace Tangra.VideoOperations.LightCurves
 
 		private void ShowBackgroundHistograms()
 		{
-			if (!m_frmBackgroundHistograms.Visible)
+			if (m_frmBackgroundHistograms != null && !m_frmBackgroundHistograms.Visible)
 			{
-				m_frmBackgroundHistograms.Show(this);
-				m_frmBackgroundHistograms.Left = this.Right;
-				m_frmBackgroundHistograms.Top = this.Top;
+				try
+				{
+					m_frmBackgroundHistograms.Show(this);
+					m_frmBackgroundHistograms.Left = this.Right;
+					m_frmBackgroundHistograms.Top = this.Top;					
+				}
+				catch(ObjectDisposedException)
+				{ }
 			}
 		}
 
