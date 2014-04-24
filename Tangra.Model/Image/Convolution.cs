@@ -796,6 +796,119 @@ namespace Tangra.Model.Image
 			
 		}
 
+		public static void ProcessHueBackgroundMode(Bitmap bitmap, int tX1, int tY1, int tX2, int tY2, int tX3, int tY3)
+		{
+			if (tX1 == 0 && tX2 == 0 && tX3 == 0) return;
+
+			int width = bitmap.Width;
+			int height = bitmap.Height;
+
+			BitmapData bmData = bitmap.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+
+			try
+			{
+				int BG_RADIUS = 40;
+
+				int stride = bmData.Stride;
+				var medianPixels1 = new List<int>();
+				var medianPixels2 = new List<int>();
+				var medianPixels3 = new List<int>();
+				unsafe
+				{
+					byte* p = (byte*)(void*)bmData.Scan0;
+
+					int nOffset = stride - bmData.Width * 3;
+
+					for (int y = 0; y < bmData.Height; ++y)
+					{
+						for (int x = 0; x < bmData.Width; ++x)
+						{
+							if (x >= tX1 - BG_RADIUS && x <= tX1 + BG_RADIUS &&
+								y >= tY1 - BG_RADIUS && y <= tY1 + BG_RADIUS)
+							{
+								medianPixels1.Add(p[0]);
+							}
+
+							if (tX2 > 0 && x >= tX2 - BG_RADIUS && x <= tX2 + BG_RADIUS &&
+								y >= tY2 - BG_RADIUS && y <= tY2 + BG_RADIUS)
+							{
+								medianPixels2.Add(p[0]);
+							}
+
+							if (tX3 > 0 && x >= tX3 - BG_RADIUS && x <= tX3 + BG_RADIUS &&
+								y >= tY3 - BG_RADIUS && y <= tY3 + BG_RADIUS)
+							{
+								medianPixels3.Add(p[0]);
+							}
+
+							p += 3;
+						}
+						p += nOffset;
+					}
+				}
+
+				int median1 = 0;
+				int median2 = 0;
+				int median3 = 0;
+
+				if (medianPixels1.Count > 0)
+				{
+					medianPixels1.Sort();
+					median1 = medianPixels1[medianPixels1.Count / 2];					
+				}
+				if (medianPixels2.Count > 0)
+				{
+					medianPixels2.Sort();
+					median2 = medianPixels2[medianPixels2.Count / 2];
+				}
+				if (medianPixels3.Count > 0)
+				{
+					medianPixels3.Sort();
+					median3 = medianPixels3[medianPixels3.Count / 2];
+				}
+
+				unsafe
+				{
+					byte* p = (byte*)(void*)bmData.Scan0;
+
+					int nOffset = stride - bmData.Width * 3;
+
+					for (int y = 0; y < bmData.Height; ++y)
+					{
+						for (int x = 0; x < bmData.Width; ++x)
+						{
+							if (x >= tX1 - BG_RADIUS && x <= tX1 + BG_RADIUS &&
+								y >= tY1 - BG_RADIUS && y <= tY1 + BG_RADIUS &&
+								p[0] >= median1 - 20 && p[0] <= median1 + 20)
+							{
+								int dist = (int)Math.Round(Math.Sqrt((x - tX1) * (x - tX1) + (y - tY1) * (y - tY1)));
+								if (dist == BG_RADIUS)
+								{
+									p[2] = HUE_INTENCITY_RED[HUE_INTENCITY_RED.Length - 1];
+									p[1] = HUE_INTENCITY_GREEN[HUE_INTENCITY_GREEN.Length - 1];
+									p[0] = HUE_INTENCITY_BLUE[HUE_INTENCITY_BLUE.Length - 1];
+								}
+								else if (dist < BG_RADIUS)
+								{
+									p[2] = HUE_INTENCITY_RED[Math.Max(0, 3 * (25 + p[2] - median1))];
+									p[1] = HUE_INTENCITY_GREEN[Math.Max(0, 3 * (25 + p[1] - median1))];
+									p[0] = HUE_INTENCITY_BLUE[Math.Max(0, 3 * (25 + p[0] - median1))];
+								}
+							}
+
+							p += 3;
+						}
+						p += nOffset;
+					}
+				}
+			}
+			finally
+			{
+				bitmap.UnlockBits(bmData);	
+			}
+		}
+
+
 		public static void ProcessInvertAndHueIntensity(Bitmap bitmap, bool invert, bool hueIntensity)
 		{
 			int width = bitmap.Width;

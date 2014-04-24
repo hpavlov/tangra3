@@ -249,6 +249,8 @@ namespace Tangra.VideoOperations.LightCurves
 
                 m_Tracker.NextFrame(frameNo, astroImage);
 
+				m_VideoController.SetDisplayHueBackgroundModeTargets(m_Tracker.TrackedObjects);
+
                 if (m_Measuring)
                 {
                     m_ProcessedFrames++;
@@ -961,6 +963,7 @@ namespace Tangra.VideoOperations.LightCurves
         #region Event Handlers
         public void SelectedTargetChanged(int newSelectedIndex)
         {
+			m_VideoController.SetDisplayHueBackgroundModeTargets(m_StateMachine.MeasuringStars);	
         }
 
         public void MaxStarsReached(bool maximumReached)

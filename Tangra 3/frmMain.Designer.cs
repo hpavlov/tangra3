@@ -64,6 +64,7 @@
 			this.ssPreProcessing = new System.Windows.Forms.ToolStripStatusLabel();
 			this.tsbtnIntensify = new System.Windows.Forms.ToolStripSplitButton();
 			this.tsmiInverted = new System.Windows.Forms.ToolStripMenuItem();
+			this.miJupiterGlow = new System.Windows.Forms.ToolStripMenuItem();
 			this.tsmiHueIntensity = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
 			this.tsmiHigh = new System.Windows.Forms.ToolStripMenuItem();
@@ -75,6 +76,7 @@
 			this.pnlControlerPanel = new System.Windows.Forms.Panel();
 			this.zoomedImage = new System.Windows.Forms.PictureBox();
 			this.panelVideo = new System.Windows.Forms.Panel();
+			this.pictureBox = new Tangra.Controls.ImagePanel();
 			this.pnlPlayControls = new System.Windows.Forms.Panel();
 			this.pnlPlayButtons = new System.Windows.Forms.Panel();
 			this.btnJumpTo = new System.Windows.Forms.Button();
@@ -92,7 +94,6 @@
 			this.openAdvFileDialog = new System.Windows.Forms.OpenFileDialog();
 			this.saveFrameDialog = new System.Windows.Forms.SaveFileDialog();
 			this.timerCommandArgs = new System.Windows.Forms.Timer(this.components);
-			this.pictureBox = new Tangra.Controls.ImagePanel();
 			this.mainMenu.SuspendLayout();
 			this.statusStrip.SuspendLayout();
 			this.panelRight.SuspendLayout();
@@ -490,6 +491,7 @@
 			this.tsbtnIntensify.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
 			this.tsbtnIntensify.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsmiInverted,
+            this.miJupiterGlow,
             this.tsmiHueIntensity,
             this.toolStripSeparator3,
             this.tsmiHigh,
@@ -505,34 +507,42 @@
 			// 
 			this.tsmiInverted.CheckOnClick = true;
 			this.tsmiInverted.Name = "tsmiInverted";
-			this.tsmiInverted.Size = new System.Drawing.Size(148, 22);
+			this.tsmiInverted.Size = new System.Drawing.Size(168, 22);
 			this.tsmiInverted.Text = "Inverted";
 			this.tsmiInverted.Click += new System.EventHandler(this.DisplayInvertedClicked);
+			// 
+			// miJupiterGlow
+			// 
+			this.miJupiterGlow.CheckOnClick = true;
+			this.miJupiterGlow.Name = "miJupiterGlow";
+			this.miJupiterGlow.Size = new System.Drawing.Size(168, 22);
+			this.miJupiterGlow.Text = "Background Glow";
+			this.miJupiterGlow.Click += new System.EventHandler(this.miJupiterGlow_Click);
 			// 
 			// tsmiHueIntensity
 			// 
 			this.tsmiHueIntensity.CheckOnClick = true;
 			this.tsmiHueIntensity.Name = "tsmiHueIntensity";
-			this.tsmiHueIntensity.Size = new System.Drawing.Size(148, 22);
+			this.tsmiHueIntensity.Size = new System.Drawing.Size(168, 22);
 			this.tsmiHueIntensity.Text = "Hue Intensity";
 			this.tsmiHueIntensity.Click += new System.EventHandler(this.tsmiHueIntensity_Click);
 			// 
 			// toolStripSeparator3
 			// 
 			this.toolStripSeparator3.Name = "toolStripSeparator3";
-			this.toolStripSeparator3.Size = new System.Drawing.Size(145, 6);
+			this.toolStripSeparator3.Size = new System.Drawing.Size(165, 6);
 			// 
 			// tsmiHigh
 			// 
 			this.tsmiHigh.Name = "tsmiHigh";
-			this.tsmiHigh.Size = new System.Drawing.Size(148, 22);
+			this.tsmiHigh.Size = new System.Drawing.Size(168, 22);
 			this.tsmiHigh.Text = "Gamma: High";
 			this.tsmiHigh.Click += new System.EventHandler(this.DisplayIntensifyModeClicked);
 			// 
 			// tsmiLo
 			// 
 			this.tsmiLo.Name = "tsmiLo";
-			this.tsmiLo.Size = new System.Drawing.Size(148, 22);
+			this.tsmiLo.Size = new System.Drawing.Size(168, 22);
 			this.tsmiLo.Text = "Gamma: Lo";
 			this.tsmiLo.Click += new System.EventHandler(this.DisplayIntensifyModeClicked);
 			// 
@@ -541,7 +551,7 @@
 			this.tsmiOff.Checked = true;
 			this.tsmiOff.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.tsmiOff.Name = "tsmiOff";
-			this.tsmiOff.Size = new System.Drawing.Size(148, 22);
+			this.tsmiOff.Size = new System.Drawing.Size(168, 22);
 			this.tsmiOff.Text = "Gamma: Off";
 			this.tsmiOff.Click += new System.EventHandler(this.DisplayIntensifyModeClicked);
 			// 
@@ -606,6 +616,27 @@
 			this.panelVideo.Name = "panelVideo";
 			this.panelVideo.Size = new System.Drawing.Size(607, 570);
 			this.panelVideo.TabIndex = 4;
+			// 
+			// pictureBox
+			// 
+			this.pictureBox.AllowDrop = true;
+			this.pictureBox.BackColor = System.Drawing.SystemColors.ControlDark;
+			this.pictureBox.CanvasSize = new System.Drawing.Size(60, 40);
+			this.pictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.pictureBox.Image = null;
+			this.pictureBox.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
+			this.pictureBox.Location = new System.Drawing.Point(0, 0);
+			this.pictureBox.Name = "pictureBox";
+			this.pictureBox.Size = new System.Drawing.Size(607, 503);
+			this.pictureBox.TabIndex = 2;
+			this.pictureBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragDrop);
+			this.pictureBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragEnter);
+			this.pictureBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseClick);
+			this.pictureBox.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDoubleClick);
+			this.pictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDown);
+			this.pictureBox.MouseLeave += new System.EventHandler(this.pictureBox_MouseLeave);
+			this.pictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseMove);
+			this.pictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseUp);
 			// 
 			// pnlPlayControls
 			// 
@@ -764,27 +795,6 @@
 			// 
 			this.timerCommandArgs.Tick += new System.EventHandler(this.timerCommandArgs_Tick);
 			// 
-			// pictureBox
-			// 
-			this.pictureBox.AllowDrop = true;
-			this.pictureBox.BackColor = System.Drawing.SystemColors.ControlDark;
-			this.pictureBox.CanvasSize = new System.Drawing.Size(60, 40);
-			this.pictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.pictureBox.Image = null;
-			this.pictureBox.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
-			this.pictureBox.Location = new System.Drawing.Point(0, 0);
-			this.pictureBox.Name = "pictureBox";
-			this.pictureBox.Size = new System.Drawing.Size(607, 503);
-			this.pictureBox.TabIndex = 2;
-			this.pictureBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragDrop);
-			this.pictureBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragEnter);
-			this.pictureBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseClick);
-			this.pictureBox.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDoubleClick);
-			this.pictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDown);
-			this.pictureBox.MouseLeave += new System.EventHandler(this.pictureBox_MouseLeave);
-			this.pictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseMove);
-			this.pictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseUp);
-			// 
 			// frmMain
 			// 
 			this.AllowDrop = true;
@@ -899,6 +909,7 @@
 		protected internal System.Windows.Forms.ToolStripMenuItem tsmiHigh;
 		protected internal System.Windows.Forms.ToolStripMenuItem tsmiLo;
 		protected internal System.Windows.Forms.ToolStripMenuItem tsmiOff;
+		protected internal System.Windows.Forms.ToolStripMenuItem miJupiterGlow;
 	}
 }
 

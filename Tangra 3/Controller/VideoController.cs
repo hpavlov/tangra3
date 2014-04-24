@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.VideoOperations.LightCurves.Tracking;
 using nom.tam.fits;
 using nom.tam.util;
 using Tangra.ImageTools;
@@ -60,7 +62,13 @@ namespace Tangra.Controller
 		private DisplayIntensifyMode m_DisplayIntensifyMode = DisplayIntensifyMode.Off;
 	    private bool m_DisplayInvertedMode = false;
         private bool m_DisplayHueIntensityMode = false;
-
+	    private bool m_DisplayHueBackgroundMode = false;
+	    private int m_HBMTarget1X = 0;
+		private int m_HBMTarget1Y = 0;
+		private int m_HBMTarget2X = 0;
+		private int m_HBMTarget2Y = 0;
+		private int m_HBMTarget3X = 0;
+		private int m_HBMTarget3Y = 0;
 
 		public VideoController(Form mainFormView, VideoFileView videoFileView, ZoomedImageView zoomedImageView, ImageToolView imageToolView, Panel pnlControlerPanel)
 		{
@@ -766,18 +774,23 @@ namespace Tangra.Controller
 			{ }
 		}
 
-        public void ApplyDisplayModeAdjustments(Bitmap displayBitmap)
+        public void ApplyDisplayModeAdjustments(Bitmap displayBitmap, bool enableBackgroundGlow = false)
         {
-            if (m_DisplayIntensifyMode != DisplayIntensifyMode.Off || m_DisplayInvertedMode || m_DisplayHueIntensityMode)
+			if (m_DisplayIntensifyMode != DisplayIntensifyMode.Off || m_DisplayInvertedMode || m_DisplayHueIntensityMode || m_DisplayHueBackgroundMode)
             {
                 // For display purposes only we apply display gamma and/or invert when requested by the user
 
-                if (m_DisplayIntensifyMode != DisplayIntensifyMode.Off)
+				if (enableBackgroundGlow && m_DisplayHueBackgroundMode)
+				{
+					BitmapFilter.ProcessHueBackgroundMode(displayBitmap, m_HBMTarget1X, m_HBMTarget1Y, m_HBMTarget2X, m_HBMTarget2Y, m_HBMTarget3X, m_HBMTarget3Y);
+				}
+				else if (m_DisplayIntensifyMode != DisplayIntensifyMode.Off)
 					BitmapFilter.ApplyGamma(displayBitmap, m_DisplayIntensifyMode == DisplayIntensifyMode.Hi, m_DisplayInvertedMode, m_DisplayHueIntensityMode);
                 else if (m_DisplayInvertedMode || m_DisplayHueIntensityMode)
                     BitmapFilter.ProcessInvertAndHueIntensity(displayBitmap, m_DisplayInvertedMode, m_DisplayHueIntensityMode);
             }            
         }
+
 
 		public void SetDisplayIntensifyMode(DisplayIntensifyMode newMode)
 		{
@@ -796,6 +809,8 @@ namespace Tangra.Controller
 		public void SetDisplayInvertMode(bool inverted)
 		{
 			m_DisplayInvertedMode = inverted;
+			if (inverted)
+				m_DisplayHueBackgroundMode = false;
 
 			TangraConfig.Settings.Generic.UseInvertedDisplayMode = inverted;
 			TangraConfig.Settings.Save();
@@ -811,6 +826,9 @@ namespace Tangra.Controller
         {
             m_DisplayHueIntensityMode = hueSelected;
 
+	        if (hueSelected)
+		        m_DisplayHueBackgroundMode = false;
+
 			TangraConfig.Settings.Generic.UseHueIntensityDisplayMode = hueSelected;
 	        TangraConfig.Settings.Save();
 
@@ -821,6 +839,80 @@ namespace Tangra.Controller
             }
         }
 
+		public void SetDisplayHueBackgroundMode(bool hueBackgroundMode)
+		{
+			m_DisplayHueBackgroundMode = hueBackgroundMode;
+
+			if (m_DisplayHueBackgroundMode)			
+			{
+				// When the Hue Background Mode is turned ON we turn off everything else
+				m_DisplayHueIntensityMode = false;
+				m_DisplayInvertedMode = false;
+				m_DisplayIntensifyMode = DisplayIntensifyMode.Off;
+
+				TangraConfig.Settings.Generic.UseHueIntensityDisplayMode = false;
+				TangraConfig.Settings.Generic.UseInvertedDisplayMode = false;
+				TangraConfig.Settings.Generic.UseDisplayIntensifyMode = DisplayIntensifyMode.Off;
+				TangraConfig.Settings.Save();
+			}
+
+			if (!m_FramePlayer.IsRunning &&
+				m_FramePlayer.Video != null)
+			{
+				m_FramePlayer.RefreshCurrentFrame();
+			}			
+		}
+
+		internal void SetDisplayHueBackgroundModeTargets(List<TrackedObjectConfig> trackedObjects)
+	    {
+			if (trackedObjects.Count > 0)
+			{
+				m_HBMTarget1X = trackedObjects[0].OriginalFieldCenterX;
+				m_HBMTarget1Y = trackedObjects[0].OriginalFieldCenterY;
+			}
+			if (trackedObjects.Count > 1)
+			{
+				m_HBMTarget2X = trackedObjects[1].OriginalFieldCenterX;
+				m_HBMTarget2Y = trackedObjects[1].OriginalFieldCenterY;
+			}
+			if (trackedObjects.Count > 2)
+			{
+				m_HBMTarget3X = trackedObjects[2].OriginalFieldCenterX;
+				m_HBMTarget3Y = trackedObjects[2].OriginalFieldCenterY;
+			}
+
+			if (!m_FramePlayer.IsRunning &&
+				m_FramePlayer.Video != null)
+			{
+				m_FramePlayer.RefreshCurrentFrame();
+			}
+	    }
+	    
+
+		public void SetDisplayHueBackgroundModeTargets(List<ITrackedObject> trackedObjectsPositions)
+		{
+			if (trackedObjectsPositions.Count > 0)
+			{
+				m_HBMTarget1X = trackedObjectsPositions[0].Center.X;
+				m_HBMTarget1Y = trackedObjectsPositions[0].Center.Y;				
+			}
+			if (trackedObjectsPositions.Count > 1)
+			{
+				m_HBMTarget2X = trackedObjectsPositions[1].Center.X;
+				m_HBMTarget2Y = trackedObjectsPositions[1].Center.Y;
+			}
+			if (trackedObjectsPositions.Count > 2)
+			{
+				m_HBMTarget3X = trackedObjectsPositions[2].Center.X;
+				m_HBMTarget3Y = trackedObjectsPositions[2].Center.Y;
+			}
+
+			if (!m_FramePlayer.IsRunning &&
+				m_FramePlayer.Video != null)
+			{
+				m_FramePlayer.RefreshCurrentFrame();
+			}
+		}
 
 		public void ToggleAstroVideoStatusForm()
 		{

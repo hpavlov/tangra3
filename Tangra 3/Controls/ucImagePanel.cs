@@ -110,7 +110,17 @@ namespace Tangra.Controls
             viewRectWidth = this.Width;
             viewRectHeight = this.Height;
 
-            if (image != null) canvasSize = image.Size;
+            if (image != null)
+            {
+	            try
+	            {
+		            canvasSize = image.Size;
+	            }
+	            catch (ArgumentException)
+	            {
+		            return;
+	            }	            
+            }
 
             // If the zoomed image is wider than view window, show the HScrollBar and adjust the view window
             if (viewRectWidth > canvasSize.Width)

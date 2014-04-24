@@ -317,7 +317,7 @@ namespace Tangra
                 g.Save();
             }
 
-			m_VideoController.ApplyDisplayModeAdjustments(m_VideoContext.Pixelmap.DisplayBitmap);	
+			m_VideoController.ApplyDisplayModeAdjustments(m_VideoContext.Pixelmap.DisplayBitmap, true);	
 		}
 
 		#endregion
@@ -790,6 +790,12 @@ namespace Tangra
             m_VideoController.SetDisplayHueMode(tsmiHueIntensity.Checked);
         }
 
+
+		private void miJupiterGlow_Click(object sender, EventArgs e)
+		{
+			m_VideoController.SetDisplayHueBackgroundMode(miJupiterGlow.Checked);
+		}
+
 		private void miMakeDarkFlat_Click(object sender, EventArgs e)
 		{
 			m_VideoController.ActivateOperation<MakeDarkFlatOperation>(m_MakeDarkFlatController);
@@ -897,5 +903,6 @@ namespace Tangra
 			if (e.Data.GetDataPresent(DataFormats.FileDrop))
 				e.Effect = DragDropEffects.Copy;
 		}
+
 	}
 }

@@ -452,7 +452,7 @@ namespace Tangra.Video
 
 			int nextFrameIdToBuffer = context.FirstFrameNo;
 
-			while (m_IsRunning)
+			while (m_IsRunning && m_VideoStream != null)
 			{
 				if (nextFrameIdToBuffer > -1 &&
 					m_FramesBufferQueue.Count < context.BufferSize)
