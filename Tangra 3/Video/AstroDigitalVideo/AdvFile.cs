@@ -32,6 +32,7 @@ namespace Tangra.Video.AstroDigitalVideo
         private uint m_NumberOfFrames = 0;
         private uint m_Magic;
     	private long m_RecoveryOffset = 0;
+        private long m_UserMetadataTableOffset = 0;
 
     	private bool m_IsCorrupted;
 
@@ -139,6 +140,7 @@ namespace Tangra.Video.AstroDigitalVideo
 			}
 
 			fileReader.BaseStream.Seek(metadataUserTableOffset, SeekOrigin.Begin);
+	        rv.m_UserMetadataTableOffset = metadataUserTableOffset;
 			#region read metadata
 
 			uint count = fileReader.ReadUInt32();
@@ -708,11 +710,13 @@ namespace Tangra.Video.AstroDigitalVideo
 				}
 
 				long userMetadataTablePosition = writer.BaseStream.Position;
-				uint numUserEntries = 0;
-				writer.Write(numUserEntries);
 
+                if (fsr.Length > m_UserMetadataTableOffset)
+			    {
+                    CopyRawBytes(reader, m_UserMetadataTableOffset, fsr.Length - m_UserMetadataTableOffset, writer);
+			    }
 
-				writer.BaseStream.Seek(5, SeekOrigin.Begin);
+			    writer.BaseStream.Seek(5, SeekOrigin.Begin);
 
 				writer.Write((uint)newIndex.Count);
 				writer.Write(indexTableOffset);
