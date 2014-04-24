@@ -823,20 +823,21 @@ namespace Tangra.Model.Image
 					{
 						for (int x = 0; x < bmData.Width; ++x)
 						{
-							if (x >= tX1 - BG_RADIUS && x <= tX1 + BG_RADIUS &&
-								y >= tY1 - BG_RADIUS && y <= tY1 + BG_RADIUS)
+                            double d1 = Math.Sqrt((x - tX1) * (x - tX1) + (y - tY1) * (y - tY1));
+                            double d2 = tX2 > 0 ? Math.Sqrt((x - tX2) * (x - tX2) + (y - tY2) * (y - tY2)) : double.MaxValue;
+                            double d3 = tX2 > 0 ? Math.Sqrt((x - tX3) * (x - tX3) + (y - tY3) * (y - tY3)) : double.MaxValue;
+
+                            if (d1 <= BG_RADIUS)
 							{
 								medianPixels1.Add(p[0]);
 							}
 
-							if (tX2 > 0 && x >= tX2 - BG_RADIUS && x <= tX2 + BG_RADIUS &&
-								y >= tY2 - BG_RADIUS && y <= tY2 + BG_RADIUS)
+                            if (d2 <= BG_RADIUS)
 							{
 								medianPixels2.Add(p[0]);
 							}
 
-							if (tX3 > 0 && x >= tX3 - BG_RADIUS && x <= tX3 + BG_RADIUS &&
-								y >= tY3 - BG_RADIUS && y <= tY3 + BG_RADIUS)
+                            if (d3 <= BG_RADIUS)
 							{
 								medianPixels3.Add(p[0]);
 							}
@@ -854,7 +855,7 @@ namespace Tangra.Model.Image
 				if (medianPixels1.Count > 0)
 				{
 					medianPixels1.Sort();
-					median1 = medianPixels1[medianPixels1.Count / 2];					
+					median1 = medianPixels1[medianPixels1.Count / 2];
 				}
 				if (medianPixels2.Count > 0)
 				{
@@ -877,22 +878,33 @@ namespace Tangra.Model.Image
 					{
 						for (int x = 0; x < bmData.Width; ++x)
 						{
-							if (x >= tX1 - BG_RADIUS && x <= tX1 + BG_RADIUS &&
-								y >= tY1 - BG_RADIUS && y <= tY1 + BG_RADIUS &&
-								p[0] >= median1 - 20 && p[0] <= median1 + 20)
+                            int d1 = (int)Math.Round(Math.Sqrt((x - tX1) * (x - tX1) + (y - tY1) * (y - tY1)));
+                            int d2 = tX2 > 0 ? (int)Math.Round(Math.Sqrt((x - tX2) * (x - tX2) + (y - tY2) * (y - tY2))) : int.MaxValue;
+                            int d3 = tX3 > 0 ? (int)Math.Round(Math.Sqrt((x - tX3) * (x - tX3) + (y - tY3) * (y - tY3))) : int.MaxValue;
+
+                            if (
+                                (d1 <= BG_RADIUS && d1 < d2 && d1 < d3 && p[0] >= median1 - 20 && p[0] <= median1 + 20) || 
+                                (d2 <= BG_RADIUS && d2 < d1 && d2 < d3 && p[0] >= median2 - 20 && p[0] <= median2 + 20) || 
+                                (d3 <= BG_RADIUS && d3 < d2 && d3 < d1 && p[0] >= median3 - 20 && p[0] <= median3 + 20)
+                                )
 							{
-								int dist = (int)Math.Round(Math.Sqrt((x - tX1) * (x - tX1) + (y - tY1) * (y - tY1)));
-								if (dist == BG_RADIUS)
+                                int median = 0;
+							    int d = 0;
+                                if (d1 < d2 && d1 < d3) { median = median1; d = d1; }
+                                else if (d2 < d1 && d2 < d3) { median = median2; d = d2;}
+                                else if (d3 < d2 && d3 < d1) { median = median3; d = d3; }
+
+                                if (d == BG_RADIUS)
 								{
 									p[2] = HUE_INTENCITY_RED[HUE_INTENCITY_RED.Length - 1];
 									p[1] = HUE_INTENCITY_GREEN[HUE_INTENCITY_GREEN.Length - 1];
 									p[0] = HUE_INTENCITY_BLUE[HUE_INTENCITY_BLUE.Length - 1];
 								}
-								else if (dist < BG_RADIUS)
-								{
-									p[2] = HUE_INTENCITY_RED[Math.Max(0, 3 * (25 + p[2] - median1))];
-									p[1] = HUE_INTENCITY_GREEN[Math.Max(0, 3 * (25 + p[1] - median1))];
-									p[0] = HUE_INTENCITY_BLUE[Math.Max(0, 3 * (25 + p[0] - median1))];
+                                else if (d < BG_RADIUS)
+                                {
+                                    p[2] = HUE_INTENCITY_RED[Math.Min(Math.Max(0, 3 * (25 + p[2] - median)), HUE_INTENCITY_RED.Length - 1)];
+                                    p[1] = HUE_INTENCITY_GREEN[Math.Min(Math.Max(0, 3 * (25 + p[1] - median)), HUE_INTENCITY_RED.Length - 1)];
+                                    p[0] = HUE_INTENCITY_BLUE[Math.Min(Math.Max(0, 3 * (25 + p[0] - median)), HUE_INTENCITY_RED.Length - 1)];
 								}
 							}
 
