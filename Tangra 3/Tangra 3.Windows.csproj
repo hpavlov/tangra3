@@ -260,6 +260,12 @@
     <Compile Include="Helpers\FITSHelper.cs" />
     <Compile Include="Helpers\TangraFileAssociations.cs" />
     <Compile Include="Helpers\WindowsHelpers.cs" />
+    <Compile Include="VideoOperations\LightCurves\MutualEvents\frmAddOrEditMutualEventsTarget.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\MutualEvents\frmAddOrEditMutualEventsTarget.Designer.cs">
+      <DependentUpon>frmAddOrEditMutualEventsTarget.cs</DependentUpon>
+    </Compile>
     <Compile Include="Video\AstroDigitalVideo\frmBuildingNtpTimebase.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -583,6 +589,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmUnhandledException.resx">
       <DependentUpon>frmUnhandledException.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\MutualEvents\frmAddOrEditMutualEventsTarget.resx">
+      <DependentUpon>frmAddOrEditMutualEventsTarget.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Video\AstroDigitalVideo\frmBuildingNtpTimebase.resx">
       <DependentUpon>frmBuildingNtpTimebase.cs</DependentUpon>

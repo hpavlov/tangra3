@@ -23,6 +23,7 @@ using Tangra.VideoOperations.LightCurves;
 using Tangra.Config;
 using Tangra.ImageTools;
 using Tangra.VideoOperations.LightCurves.Measurements;
+using Tangra.VideoOperations.LightCurves.MutualEvents;
 using Tangra.VideoOperations.LightCurves.Tracking;
 using Tangra.Resources;
 
@@ -1853,8 +1854,58 @@ namespace Tangra.VideoOperations.LightCurves
 			m_VideoController.UpdateViews();
 
 			m_LightCurveController.SetLcFile(m_lcFile);
-			m_VideoController.MoveToFrame((int)m_lcFile.Header.MinFrame);			
+			m_VideoController.MoveToFrame((int)m_lcFile.Header.MinFrame);
 		}
+
+        internal bool ConfirmNewObject(int objectId)
+        {
+            TrackedObjectConfig objectToAdd = null;
+
+            if (LightCurveReductionContext.Instance.LightCurveReductionType == LightCurveReductionType.MutualEvent)
+            {
+                var frmAddMutualTarget = new frmAddOrEditMutualEventsTarget(objectId, m_StateMachine.SelectedObject, m_StateMachine.SelectedObjectGaussian, m_StateMachine, m_VideoController);
+                if (frmAddMutualTarget.ShowDialog() == DialogResult.Cancel)
+                    return false;
+
+                objectToAdd = frmAddMutualTarget.ObjectToAdd;
+            }
+            else
+            {
+                var frmAddSingleTarget = new frmAddOrEditSingleTarget(objectId, m_StateMachine.SelectedObject, m_StateMachine.SelectedObjectGaussian, m_StateMachine, m_VideoController);
+                if (frmAddSingleTarget.ShowDialog() == DialogResult.Cancel)
+                    return false;
+
+                objectToAdd = frmAddSingleTarget.ObjectToAdd;
+            }
+
+            m_StateMachine.ObjectSelected(objectToAdd, false, false);
+
+            return true;
+        }
+
+        internal bool EditCurrentObject()
+        {
+            TrackedObjectConfig selectedObject = m_StateMachine.MeasuringStars[m_StateMachine.SelectedMeasuringStar];
+            frmAddOrEditSingleTarget frmAddSingleTarget =
+                new frmAddOrEditSingleTarget(m_StateMachine.SelectedMeasuringStar, selectedObject, m_StateMachine, m_VideoController);
+
+            DialogResult result = frmAddSingleTarget.ShowDialog();
+            if (result == DialogResult.Cancel)
+                return false;
+
+            if (result == DialogResult.Abort)
+            {
+                m_StateMachine.ObjectSelected(frmAddSingleTarget.ObjectToAdd, false, true /* Ctrl = 'DELETE' */);
+                m_StateMachine.SelectedMeasuringStar = -1;
+                m_VideoController.RefreshCurrentFrame();
+
+                return false;
+            }
+
+            m_StateMachine.ObjectEdited(frmAddSingleTarget.ObjectToAdd);
+
+            return true;
+        }
     }
 
     internal enum MeasuringZoomImageType

@@ -406,11 +406,8 @@ namespace Tangra.VideoOperations.LightCurves
                 {
                     m_StateMachine.VideoOperation.EnsureStackedAstroImage();
 
-                    frmAddOrEditSingleTarget frmAddSingleTarget = new frmAddOrEditSingleTarget(newId, m_StateMachine.SelectedObject, m_StateMachine.SelectedObjectGaussian, m_StateMachine, m_VideoController);
-                    if (frmAddSingleTarget.ShowDialog() == DialogResult.Cancel)
+                    if (!m_StateMachine.VideoOperation.ConfirmNewObject(newId))
                         return;
-
-                    m_StateMachine.ObjectSelected(frmAddSingleTarget.ObjectToAdd, false, false);
                 }
 
                 if (m_StateMachine.MeasuringStars.Count > 0 &&
@@ -434,24 +431,9 @@ namespace Tangra.VideoOperations.LightCurves
             {
                 m_StateMachine.VideoOperation.EnsureStackedAstroImage();
 
-                TrackedObjectConfig selectedObject = m_StateMachine.MeasuringStars[m_StateMachine.SelectedMeasuringStar];
-                frmAddOrEditSingleTarget frmAddSingleTarget =
-                    new frmAddOrEditSingleTarget(m_StateMachine.SelectedMeasuringStar, selectedObject, m_StateMachine, m_VideoController);
 
-                DialogResult result = frmAddSingleTarget.ShowDialog();
-                if (result == DialogResult.Cancel)
+                if (!m_StateMachine.VideoOperation.EditCurrentObject())
                     return;
-
-                if (result == DialogResult.Abort)
-                {
-                    m_StateMachine.ObjectSelected(frmAddSingleTarget.ObjectToAdd, false, true /* Ctrl = 'DELETE' */);
-                    m_StateMachine.SelectedMeasuringStar = -1;
-                    m_VideoController.RefreshCurrentFrame();
-
-                    return;
-                }
-
-                m_StateMachine.ObjectEdited(frmAddSingleTarget.ObjectToAdd);
 
 				m_VideoController.RefreshCurrentFrame();
             }
