@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using Tangra.Model.Config;
@@ -30,7 +32,23 @@ namespace Tangra.Video
 
 		public SingleBitmapFileFrameStream(Bitmap bitmap)
 		{
-			m_Pixelmap = Pixelmap.ConstructFromBitmap(bitmap, TangraConfig.ColourChannel.Red);
+            try
+            {
+                m_Pixelmap = Pixelmap.ConstructFromBitmap(bitmap, TangraConfig.ColourChannel.Red);
+            }
+            catch (ArgumentException ex)
+            {
+                // If there is something wrong with the Bitmap, then create a blank(black) frame
+                Trace.WriteLine(ex);
+                m_Pixelmap = new Pixelmap(
+                    bitmap.Width, 
+                    bitmap.Height, 
+                    8, 
+                    new uint[bitmap.Width*bitmap.Height], 
+                    new Bitmap(bitmap.Width, bitmap.Height, PixelFormat.Format24bppRgb), 
+                    new byte[3 * bitmap.Width * bitmap.Height]);
+            }
+			
 
 			m_FirstFrame = 0;
 			m_LastFrame = 0;
