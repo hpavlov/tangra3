@@ -635,7 +635,7 @@ namespace Tangra.Video.AstroDigitalVideo
 
 						while (aviFrameNo < lastRepeatedAviFrameNo)
 						{
-							TangraVideo.AddAviVideoFrame(pixmap, addedGamma);
+                            TangraVideo.AddAviVideoFrame(pixmap, addedGamma, ImageSection.Adv16NormalisationValue);
 							aviFrameNo++;
 						}
 

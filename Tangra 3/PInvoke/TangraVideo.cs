@@ -339,17 +339,19 @@ namespace Tangra.PInvoke
 		private static double s_GammaTableGammaVal = double.MaxValue;
 		private static int[] s_GammaTable = new int[256];
 
-        public static void AddAviVideoFrame(Pixelmap pixmap, double addedGamma)
+        public static void AddAviVideoFrame(Pixelmap pixmap, double addedGamma, int? adv16NormalisationValue)
         {
             int[,] pixels = new int[pixmap.Height, pixmap.Width];
 			bool usesGamma = Math.Abs(addedGamma - 1) > 0.01;
-			bool needsBitPixConversion = pixmap.BitPixCamera > 8;
+            bool needsBitPixConversion = pixmap.BitPixCamera > 8 || (adv16NormalisationValue != null && adv16NormalisationValue.Value > 0);
 
 			if (Math.Abs(s_BitPixTableBitPixVal - pixmap.BitPixCamera) > 0.01)
 			{
 				double maxVal = pixmap.BitPixCamera.GetMaxValueForBitPix();
+			    if (adv16NormalisationValue != null && adv16NormalisationValue.Value > 0)
+			        maxVal = adv16NormalisationValue.Value;
 
-				for (int i = 0; i < maxVal; i++)
+				for (int i = 0; i <= maxVal; i++)
 				{
 					double convVal = 255.0 * i / maxVal;
 
