@@ -103,9 +103,13 @@ namespace Tangra
 				}
 
 				bgPixels.Sort();
-				double background = m_Bpp < 12 
-					? bgPixels[bgPixels.Count / 2] // for 8 bit videos Median background works better
-					: bgPixels.Average(x => x); // for 12+bit videos average background works better
+				double background = 0;
+				if (bgPixels.Count > 1)
+				{
+					background = m_Bpp < 12
+						? bgPixels[bgPixels.Count / 2] // for 8 bit videos Median background works better
+						: bgPixels.Average(x => x); // for 12+bit videos average background works better					
+				}
 
 				double residualsSquareSum = 0;
 				foreach (uint bgPixel in bgPixels)
@@ -123,14 +127,18 @@ namespace Tangra
 					lblSNR.Text = snr.ToString("0.0");
 				}
 				else
-					lblSNR.Text = "N/A";	
-			
+					lblSNR.Text = "N/A";
+
 				if (m_PSFFit != null)
 				{
 					lblFitVariance.Text = m_PSFFit.GetVariance().ToString("0.0");
+					lblFWHM.Text = m_PSFFit.FWHM.ToString("0.0");
 				}
 				else
+				{
 					lblFitVariance.Text = "N/A";
+					lblFWHM.Text = "N/A";
+				}
 			}
 			else
 			{

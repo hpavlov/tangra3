@@ -52,6 +52,8 @@
 			this.label6 = new System.Windows.Forms.Label();
 			this.lblFitVariance = new System.Windows.Forms.Label();
 			this.label8 = new System.Windows.Forms.Label();
+			this.lblFWHM = new System.Windows.Forms.Label();
+			this.label13 = new System.Windows.Forms.Label();
 			((System.ComponentModel.ISupportInitialize)(this.picPixels)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.picFIT)).BeginInit();
 			this.SuspendLayout();
@@ -93,7 +95,8 @@
 			// label3
 			// 
 			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(299, 289);
+			this.label3.ForeColor = System.Drawing.SystemColors.ControlText;
+			this.label3.Location = new System.Drawing.Point(292, 289);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(26, 13);
 			this.label3.TabIndex = 6;
@@ -102,7 +105,8 @@
 			// label4
 			// 
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(356, 289);
+			this.label4.ForeColor = System.Drawing.SystemColors.ControlText;
+			this.label4.Location = new System.Drawing.Point(349, 289);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(26, 13);
 			this.label4.TabIndex = 7;
@@ -147,7 +151,8 @@
 			// lblX
 			// 
 			this.lblX.AutoSize = true;
-			this.lblX.Location = new System.Drawing.Point(322, 289);
+			this.lblX.ForeColor = System.Drawing.SystemColors.ControlText;
+			this.lblX.Location = new System.Drawing.Point(315, 289);
 			this.lblX.Name = "lblX";
 			this.lblX.Size = new System.Drawing.Size(22, 13);
 			this.lblX.TabIndex = 12;
@@ -156,7 +161,8 @@
 			// lblY
 			// 
 			this.lblY.AutoSize = true;
-			this.lblY.Location = new System.Drawing.Point(379, 289);
+			this.lblY.ForeColor = System.Drawing.SystemColors.ControlText;
+			this.lblY.Location = new System.Drawing.Point(372, 289);
 			this.lblY.Name = "lblY";
 			this.lblY.Size = new System.Drawing.Size(22, 13);
 			this.lblY.TabIndex = 13;
@@ -174,7 +180,7 @@
 			// lblSNR
 			// 
 			this.lblSNR.AutoSize = true;
-			this.lblSNR.Location = new System.Drawing.Point(285, 311);
+			this.lblSNR.Location = new System.Drawing.Point(265, 311);
 			this.lblSNR.Name = "lblSNR";
 			this.lblSNR.Size = new System.Drawing.Size(22, 13);
 			this.lblSNR.TabIndex = 25;
@@ -201,7 +207,7 @@
 			// label9
 			// 
 			this.label9.AutoSize = true;
-			this.label9.Location = new System.Drawing.Point(250, 311);
+			this.label9.Location = new System.Drawing.Point(230, 311);
 			this.label9.Name = "label9";
 			this.label9.Size = new System.Drawing.Size(42, 13);
 			this.label9.TabIndex = 22;
@@ -239,7 +245,7 @@
 			// 
 			this.label6.AutoSize = true;
 			this.label6.Font = new System.Drawing.Font("Symbol", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(2)));
-			this.label6.Location = new System.Drawing.Point(339, 311);
+			this.label6.Location = new System.Drawing.Point(382, 311);
 			this.label6.Name = "label6";
 			this.label6.Size = new System.Drawing.Size(25, 13);
 			this.label6.TabIndex = 29;
@@ -248,7 +254,7 @@
 			// lblFitVariance
 			// 
 			this.lblFitVariance.AutoSize = true;
-			this.lblFitVariance.Location = new System.Drawing.Point(411, 311);
+			this.lblFitVariance.Location = new System.Drawing.Point(454, 311);
 			this.lblFitVariance.Name = "lblFitVariance";
 			this.lblFitVariance.Size = new System.Drawing.Size(22, 13);
 			this.lblFitVariance.TabIndex = 28;
@@ -257,17 +263,37 @@
 			// label8
 			// 
 			this.label8.AutoSize = true;
-			this.label8.Location = new System.Drawing.Point(363, 311);
+			this.label8.Location = new System.Drawing.Point(406, 311);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(53, 13);
 			this.label8.TabIndex = 27;
 			this.label8.Text = "PSF Fit = ";
+			// 
+			// lblFWHM
+			// 
+			this.lblFWHM.AutoSize = true;
+			this.lblFWHM.Location = new System.Drawing.Point(349, 311);
+			this.lblFWHM.Name = "lblFWHM";
+			this.lblFWHM.Size = new System.Drawing.Size(22, 13);
+			this.lblFWHM.TabIndex = 31;
+			this.lblFWHM.Text = "0.0";
+			// 
+			// label13
+			// 
+			this.label13.AutoSize = true;
+			this.label13.Location = new System.Drawing.Point(302, 311);
+			this.label13.Name = "label13";
+			this.label13.Size = new System.Drawing.Size(53, 13);
+			this.label13.TabIndex = 30;
+			this.label13.Text = "FWHM = ";
 			// 
 			// frmTargetPSFViewerForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(501, 331);
+			this.Controls.Add(this.lblFWHM);
+			this.Controls.Add(this.label13);
 			this.Controls.Add(this.label6);
 			this.Controls.Add(this.lblFitVariance);
 			this.Controls.Add(this.label8);
@@ -327,5 +353,7 @@
 		private System.Windows.Forms.Label label6;
 		private System.Windows.Forms.Label lblFitVariance;
 		private System.Windows.Forms.Label label8;
+		private System.Windows.Forms.Label lblFWHM;
+		private System.Windows.Forms.Label label13;
 	}
 }

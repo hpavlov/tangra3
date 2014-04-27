@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -10,7 +10,7 @@ using Tangra.VideoOperations.LightCurves.Tracking;
 
 namespace Tangra.PInvoke
 {
-	[StructLayout(LayoutKind.Explicit)]	
+	[StructLayout(LayoutKind.Explicit)]
 	internal class NativeTrackedObjectInfo
 	{
 		[FieldOffset(0)]
@@ -51,7 +51,7 @@ namespace Tangra.PInvoke
 		[FieldOffset(29)]
 		public byte IsSolved;
 
-		[FieldOffset(30)] 
+		[FieldOffset(30)]
 		public byte IsAsymmetric;
 		[FieldOffset(31)]
 		public byte Reserved;
@@ -72,29 +72,29 @@ namespace Tangra.PInvoke
 
 		private double[] m_Residuals;
 
-	    public NativeTrackedObjectPsfFit(int bpp)
-	    {
-            switch (bpp)
-            {
-                case 8:
-                    m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation8Bit;
-                    break;
+		public NativeTrackedObjectPsfFit(int bpp)
+		{
+			switch (bpp)
+			{
+				case 8:
+					m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation8Bit;
+					break;
 
-                case 12:
-                    m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation12Bit;
-                    break;
+				case 12:
+					m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation12Bit;
+					break;
 
-                case 14:
-                    m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation14Bit;
-                    break;
+				case 14:
+					m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation14Bit;
+					break;
 
-                default:
-                    m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation8Bit;
-                    break;
-            }
-	    }
+				default:
+					m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation8Bit;
+					break;
+			}
+		}
 
-        public void LoadFromNativePsfFitInfo(NativePsfFitInfo psfInfo, double[] residuals)
+		public void LoadFromNativePsfFitInfo(NativePsfFitInfo psfInfo, double[] residuals)
 		{
 			XCenter = psfInfo.XCenter;
 			YCenter = psfInfo.YCenter;
@@ -146,8 +146,8 @@ namespace Tangra.PInvoke
 
 		public double GetPSFValueAt(double x, double y)
 		{
-			return m_IsAsymmetric 
-				? GetPSFValueInternalAsymetric(x, y) 
+			return m_IsAsymmetric
+				? GetPSFValueInternalAsymetric(x, y)
 				: GetPSFValueInternal(x, y);
 		}
 
@@ -193,11 +193,11 @@ namespace Tangra.PInvoke
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
 		//DLL_PUBLIC void ConfigureSaturationLevels(unsigned long saturation8Bit, unsigned long saturation12Bit, unsigned long saturation14Bit);
-        private static extern int ConfigureSaturationLevels(uint saturation8Bit, uint saturation12Bit, uint saturation14Bit);
+		private static extern int ConfigureSaturationLevels(uint saturation8Bit, uint saturation12Bit, uint saturation14Bit);
 
-	    [DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-	    //DLL_PUBLIC long TrackerInitialiseNewTracking();
-	    private static extern int TrackerInitialiseNewTracking();
+		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+		//DLL_PUBLIC long TrackerInitialiseNewTracking();
+		private static extern int TrackerInitialiseNewTracking();
 
 		internal static void ConfigureNativeTracker()
 		{
@@ -226,18 +226,18 @@ namespace Tangra.PInvoke
 			}
 		}
 
-        internal static void InitialiseNewTracking()
-        {
-            TrackerInitialiseNewTracking();
-        }
+		internal static void InitialiseNewTracking()
+		{
+			TrackerInitialiseNewTracking();
+		}
 
 		internal static void ConfigureTrackedObject(int objectId, TrackedObjectConfig obj)
 		{
 			TrackerConfigureObject(
 				objectId,
-				obj.IsFixedAperture, 
-				obj.TrackingType == TrackingType.OccultedStar, 
-				obj.ApertureStartingX, 
+				obj.IsFixedAperture,
+				obj.TrackingType == TrackingType.OccultedStar,
+				obj.ApertureStartingX,
 				obj.ApertureStartingY,
 				obj.ApertureInPixels);
 		}
@@ -254,9 +254,9 @@ namespace Tangra.PInvoke
 
 				TrackerGetTargetState(i, trackingInfo, psfInfo, residuals);
 
-                managedTrackedObjects[i].LoadFromNativeData(trackingInfo, psfInfo, residuals);
+				managedTrackedObjects[i].LoadFromNativeData(trackingInfo, psfInfo, residuals);
 			}
-			
+
 			return rv == 0;
 		}
 	}
