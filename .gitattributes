@@ -63,6 +63,7 @@
 #*.RTF   diff=astextplain
 
 *.cs     text diff=csharp
+*.Designer.cs     text diff=csharp
 *.java   text diff=java
 *.html   text diff=html
 *.css    text
@@ -72,6 +73,7 @@
 *.h      text
 *.resx   text
 *.config text
+*.settings text
 *.xml    text
 *.def    text
 
@@ -80,6 +82,7 @@
 *.sln    text merge=union eol=crlf
 *.vcxproj    text  merge=union
 *.vcxproj.filters    text  merge=union
+*.workspace text merge=union
 
 *.docx   diff=astextplain
 *.DOCX   diff=astextplain
