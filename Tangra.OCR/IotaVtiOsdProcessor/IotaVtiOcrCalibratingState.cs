@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.OCR.IotaVtiOsdProcessor;
 
@@ -309,30 +310,36 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 
 		private bool CalibrateFrameNumberBlockPositions(IotaVtiOcrProcessor stateManager, out List<CalibratedBlockPosition> normalizedPositions)
 		{
-			int last = GetLastFrameNoDigitStartPosition(stateManager);
-
-			if (last > -1)
+			try
 			{
-				int secondLast = last - stateManager.BlockWidth;
+				int last = GetLastFrameNoDigitStartPosition(stateManager);
 
-				// We now know the position of the two digits. We can now 'learn' the digits from '0' to '9' finding the change of the second last digit
-				// and then infering the values from '0' to '9' of the last digit
-
-				foreach (CalibratedBlockPosition blockPosition in m_CalibratedPositons)
-					blockPosition.PrepareLastTwoDigitsFromTheFrameNumber(stateManager, last, secondLast);
-
-				if (DigitPatternsRecognized(stateManager, out normalizedPositions))
+				if (last > -1)
 				{
-					stateManager.LastBlockOffsetsX = last;
-					stateManager.SecondLastBlockOffsetsX = secondLast;
+					int secondLast = last - stateManager.BlockWidth;
 
-					// Now go and determine the positions of the remaining blocks by matching their value to the 'learned' digits
-					return LocateRemainingBlockPositions(stateManager);
+					// We now know the position of the two digits. We can now 'learn' the digits from '0' to '9' finding the change of the second last digit
+					// and then infering the values from '0' to '9' of the last digit
+
+					foreach (CalibratedBlockPosition blockPosition in m_CalibratedPositons)
+						blockPosition.PrepareLastTwoDigitsFromTheFrameNumber(stateManager, last, secondLast);
+
+					if (DigitPatternsRecognized(stateManager, out normalizedPositions))
+					{
+						stateManager.LastBlockOffsetsX = last;
+						stateManager.SecondLastBlockOffsetsX = secondLast;
+
+						// Now go and determine the positions of the remaining blocks by matching their value to the 'learned' digits
+						return LocateRemainingBlockPositions(stateManager);
+					}
 				}
 			}
-			else
-				normalizedPositions = new List<CalibratedBlockPosition>();
+			catch (Exception ex)
+			{
+				Trace.WriteLine(ex.GetFullStackTrace());
+			}
 
+			normalizedPositions = new List<CalibratedBlockPosition>();
 			return false;
 		}
 
