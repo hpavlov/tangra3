@@ -37,6 +37,7 @@ namespace Tangra.Config.SettingPannels
 #endif
 		}
 
+#if WIN32
 		private void CheckOWIntegrationStatus()
 		{
 			string owIntegrationError = null;
@@ -59,8 +60,9 @@ namespace Tangra.Config.SettingPannels
 				lblOWIntegrationError.Visible = false;				
 			}
 		}
+#endif
 
-        public override void LoadSettings()
+		public override void LoadSettings()
         {
             cbxIsolationLevel.SelectedIndex = (int) TangraConfig.Settings.Generic.AddinIsolationLevel;
             tbxAddinsDirectory.Text = AddinManager.ADDINS_DIRECTORY;
