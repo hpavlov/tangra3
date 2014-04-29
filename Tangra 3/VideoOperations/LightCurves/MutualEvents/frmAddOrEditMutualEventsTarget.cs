@@ -136,6 +136,8 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 			m_Aperture1 = null;
 			m_Aperture2 = null;
 
+			UpdateStateControls();
+
 			DrawCollorPanel();
 			DrawCollorPanel2();
 
@@ -541,6 +543,8 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 			ObjectToAdd.ApertureStartingX = m_X0Center;
 			ObjectToAdd.ApertureStartingY = m_Y0Center;
 
+			ObjectToAdd.ProcessInGroup = false;
+
 			if (rbOcculted.Checked)
 			{
 				ObjectToAdd.TrackingType = TrackingType.OccultedStar;
@@ -583,6 +587,8 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 			ObjectToAdd.ApertureStartingX = m_X1Center;
 			ObjectToAdd.ApertureStartingY = m_Y1Center;
 
+		    ObjectToAdd.ProcessInGroup = true;
+
 			if (rbOcculted.Checked && rbOccElc1.Checked)
 			{
 				ObjectToAdd.TrackingType = TrackingType.OccultedStar;
@@ -613,6 +619,8 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 
 			ObjectToAdd2.OriginalFieldCenterX = m_Center.X;
 			ObjectToAdd2.OriginalFieldCenterY = m_Center.Y;
+
+			ObjectToAdd2.ProcessInGroup = true;
 
 			ObjectToAdd2.IsWeakSignalObject = false;
 
@@ -667,6 +675,7 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 			bool twoObjects = rbTwoObjects.Checked;
 
 			pbox2.Visible = twoObjects;
+			pbox2a.Visible = twoObjects;
 			nudAperture2.Visible = twoObjects;
 			lblAperture2.Visible = twoObjects;
 			lblFWHM2.Visible = twoObjects;

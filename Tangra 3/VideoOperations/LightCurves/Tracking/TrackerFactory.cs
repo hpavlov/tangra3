@@ -58,13 +58,31 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 					}					
 	            }
             }
+			else if (lightCurveReductionType == LightCurveReductionType.MutualEvent)
+			{
+				if (measuringStars.Any(x => x.ProcessInGroup))
+				{
+					usedTrackerType = "Mutual Event (Multi)";
+					return new MutualEventTracker(measuringStars, LightCurveReductionContext.Instance.FullDisappearance);
+				}
+				else
+				{
+					usedTrackerType = "Mutual Event (Single)";
+#if WIN32
+					if (TangraConfig.Settings.Tracking.UseNativeTracker)
+						return new NativeSimplifiedTracker(imageWidth, imageHeight, measuringStars, LightCurveReductionContext.Instance.FullDisappearance);
+					else
+#endif
+						return new SimplifiedTracker(measuringStars);
+				}
+			}
             else if (lightCurveReductionType == LightCurveReductionType.UntrackedMeasurement)
             {
 	            usedTrackerType = "Untracked";
                 return new UntrackedTracker(measuringStars);
-            }
+            }			
 
-            throw new NotSupportedException();
+			throw new NotSupportedException();
         }
     }
 }

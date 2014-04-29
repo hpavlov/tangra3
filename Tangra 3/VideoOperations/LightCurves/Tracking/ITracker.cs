@@ -50,6 +50,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 		ImagePixel AsImagePixel { get; }
 		float PositionTolerance { get; }
 		bool IsCloseToOtherStars { get; }
+		bool ProcessInGroup { get; }
 	}
 
 	public static class TrackerExtensions
