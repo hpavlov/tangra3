@@ -983,13 +983,8 @@ namespace Tangra.VideoOperations.LightCurves
             get { return m_Refining; }
         }
 
-        public static MeasurementsHelper DoConfiguredMeasurement(uint[,] matrix, PSFFit matrixFit, int bitPixCamera, double bestFindTolerance, ref float aperture, ref int matrixSize)
+		public static MeasurementsHelper DoConfiguredMeasurement(uint[,] matrix, float aperture, int bitPixCamera, double bestFindTolerance, ref int matrixSize)
         {
-			if (matrixFit != null && TangraConfig.Settings.Photometry.SignalApertureUnitDefault == TangraConfig.SignalApertureUnit.FWHM)
-                aperture = (float)(matrixFit.FWHM * TangraConfig.Settings.Photometry.DefaultSignalAperture);
-            else
-                aperture = (float)(TangraConfig.Settings.Photometry.DefaultSignalAperture);
-
             var measurer = new MeasurementsHelper(
                             bitPixCamera,
 							TangraConfig.Settings.Photometry.BackgroundMethodDefault,
@@ -1859,15 +1854,16 @@ namespace Tangra.VideoOperations.LightCurves
 
         internal bool ConfirmNewObject(int objectId)
         {
-            TrackedObjectConfig objectToAdd = null;
-
             if (LightCurveReductionContext.Instance.LightCurveReductionType == LightCurveReductionType.MutualEvent)
             {
                 var frmAddMutualTarget = new frmAddOrEditMutualEventsTarget(objectId, m_StateMachine.SelectedObject, m_StateMachine.SelectedObjectGaussian, m_StateMachine, m_VideoController);
                 if (frmAddMutualTarget.ShowDialog() == DialogResult.Cancel)
                     return false;
 
-                objectToAdd = frmAddMutualTarget.ObjectToAdd;
+				m_StateMachine.ObjectSelected(frmAddMutualTarget.ObjectToAdd, false, false);
+
+				if (frmAddMutualTarget.ObjectToAdd2 != null)
+					m_StateMachine.ObjectSelected(frmAddMutualTarget.ObjectToAdd2, false, false);
             }
             else
             {
@@ -1875,10 +1871,8 @@ namespace Tangra.VideoOperations.LightCurves
                 if (frmAddSingleTarget.ShowDialog() == DialogResult.Cancel)
                     return false;
 
-                objectToAdd = frmAddSingleTarget.ObjectToAdd;
+				m_StateMachine.ObjectSelected(frmAddSingleTarget.ObjectToAdd, false, false);
             }
-
-            m_StateMachine.ObjectSelected(objectToAdd, false, false);
 
             return true;
         }

@@ -70,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Astro\AstroImage.cs" />
+    <Compile Include="Astro\DoublePSFFit.cs" />
     <Compile Include="Astro\StarFinder.cs" />
     <Compile Include="Astro\PSFFit.cs" />
     <Compile Include="Config\AavSettings.cs" />

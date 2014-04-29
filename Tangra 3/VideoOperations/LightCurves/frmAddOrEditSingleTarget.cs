@@ -245,15 +245,20 @@ namespace Tangra.VideoOperations.LightCurves
             PlotSingleTargetPixels(); // Because the number of radio buttons may have changed
         }
 
-        private bool GetFitInMatrix(PSFFit gaussian, ref int matirxSize)
+		private bool GetFitInMatrix(ITrackedObjectPsfFit gaussian, ref int matirxSize)
         {
             return GetFitInMatrix(gaussian, ref matirxSize, float.NaN);
         }
 
-        private bool GetFitInMatrix(PSFFit gaussian, ref int matirxSize, float preselectedAperture)
+		private bool GetFitInMatrix(ITrackedObjectPsfFit gaussian, ref int matirxSize, float preselectedAperture)
         {
             rbGuidingStar.Text = "Guiding Star";
             m_IsBrightEnoughForAutoGuidingStar = false;
+
+			if (gaussian != null && TangraConfig.Settings.Photometry.SignalApertureUnitDefault == TangraConfig.SignalApertureUnit.FWHM)
+				m_Aperture = (float)(gaussian.FWHM * TangraConfig.Settings.Photometry.DefaultSignalAperture);
+			else
+				m_Aperture = (float)(TangraConfig.Settings.Photometry.DefaultSignalAperture);
 
             nudFitMatrixSize.ValueChanged -= nudFitMatrixSize_ValueChanged;
             try
@@ -288,7 +293,7 @@ namespace Tangra.VideoOperations.LightCurves
                     rbGuidingStar.Text = "Guiding Star";
 
                     // There are no stars that are bright enough. Simply let the user do what they want, but still try to default to a sensible aperture size
-					MeasurementsHelper measurement = ReduceLightCurveOperation.DoConfiguredMeasurement(m_ProcessingPixels, gaussian, m_AstroImage.Pixelmap.BitPixCamera, 3.0, ref m_Aperture, ref matirxSize);
+					MeasurementsHelper measurement = ReduceLightCurveOperation.DoConfiguredMeasurement(m_ProcessingPixels, m_Aperture, m_AstroImage.Pixelmap.BitPixCamera, 3.0, ref matirxSize);
 
 	                if (measurement.FoundBestPSFFit != null &&
 	                    measurement.FoundBestPSFFit.IsSolved &&
@@ -315,7 +320,7 @@ namespace Tangra.VideoOperations.LightCurves
 
                     for (int i = 0; i < 2; i++)
                     {
-                        MeasurementsHelper measurement = ReduceLightCurveOperation.DoConfiguredMeasurement(m_ProcessingPixels, gaussian, m_AstroImage.Pixelmap.BitPixCamera, bestFindTolerance, ref m_Aperture, ref matirxSize);
+						MeasurementsHelper measurement = ReduceLightCurveOperation.DoConfiguredMeasurement(m_ProcessingPixels, m_Aperture, m_AstroImage.Pixelmap.BitPixCamera, bestFindTolerance, ref matirxSize);
                         if (measurement != null && matirxSize != -1)
                         {
                             if (matirxSize < 5)

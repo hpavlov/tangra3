@@ -53,7 +53,15 @@ namespace Tangra.Model.Astro
         int MatrixSize { get; }
     }
 
-	public class PSFFit : IPSFFit, ITrackedObjectPsfFit
+	public abstract class PSFFitBase
+	{
+		public abstract void DrawInternalPoints(Graphics g, Rectangle rect, float aperture, Brush incldedPinBrush, int bpp);
+		public abstract double FWHM { get; }
+		public abstract float X0_Matrix { get; }
+		public abstract float Y0_Matrix { get; }
+	}
+
+	public class PSFFit : PSFFitBase, IPSFFit, ITrackedObjectPsfFit
     {
         private static double CERTAINTY_CONST = 0.5 / 0.03;
 
@@ -187,12 +195,12 @@ namespace Tangra.Model.Astro
 			get { return m_Y0; }
 		}
 
-    	public float X0_Matrix
+    	public override float X0_Matrix
     	{
 			get { return (float)m_X0; }
     	}
 
-        public float Y0_Matrix
+        public override float Y0_Matrix
 		{
 			get { return (float)m_Y0; }
 		}
@@ -233,7 +241,7 @@ namespace Tangra.Model.Astro
     		}
     	}
 
-    	public double FWHM
+    	public override double FWHM
     	{
     		get
     		{
@@ -949,7 +957,7 @@ namespace Tangra.Model.Astro
             }
         }
 
-		public void DrawInternalPoints(Graphics g, Rectangle rect, float aperture, Brush incldedPinBrush, int bpp)
+		public override void DrawInternalPoints(Graphics g, Rectangle rect, float aperture, Brush incldedPinBrush, int bpp)
 		{
 			DrawInternalPoints(g, rect, aperture, incldedPinBrush, Brushes.Gray, Pens.GreenYellow, bpp);
 		}

@@ -28,12 +28,13 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
         public int OriginalFieldCenterX;
         public int OriginalFieldCenterY;
-        
-        public PSFFit Gaussian;
+
+		public PSFFit Gaussian;
 
 		public float PositionTolerance { get; set; }
 		public bool IsWeakSignalObject { get; set; }
 		public bool IsFixedAperture { get; set; }
+		public bool ProcessInGroup { get; set; }
 
         public float ApertureMatrixX0;
         public float ApertureMatrixY0;
@@ -76,7 +77,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			RefinedFWHM = float.NaN;
 		}
 
-        private static byte VERSION = 3;
+        private static byte VERSION = 4;
 
         internal void Save(BinaryWriter fileWriter)
         {
@@ -109,6 +110,9 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 			// Save Version 3 data
 			fileWriter.Write(IsFixedAperture);
+
+			// Save Version 4 data
+			fileWriter.Write(ProcessInGroup);			
         }
 
         internal static TrackedObjectConfig Load(BinaryReader reader)
@@ -153,6 +157,11 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 					if (version > 2)
 					{
 						instance.IsFixedAperture = reader.ReadBoolean();
+
+						if (version > 3)
+						{
+							instance.ProcessInGroup = reader.ReadBoolean();
+						}						
 					}
                 }
             }

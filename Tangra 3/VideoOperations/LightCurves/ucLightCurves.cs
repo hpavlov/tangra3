@@ -468,11 +468,14 @@ namespace Tangra.VideoOperations.LightCurves
 				return;
 			}
 
-			if (HasObjectsWithAutoAperutreCloserThan8PixelsApart())
+			if (LightCurveReductionContext.Instance.LightCurveReductionType == LightCurveReductionType.Asteroidal &&
+				HasObjectsWithAutoAperutreCloserThan8PixelsApart())
 			{
+				// TODO: We should allow the measurement of close objects in Asteroidals too provided that PSF photometry is used and the objects are in a group
+
 				m_VideoController.ShowMessageBox(
 					"Tangra cannot complete this measurement because two of the objects are too close.\r\n\r\n " +
-					"To continue you need to:\r\n\r\n- Use Aperture Photometry \r\n- Use Manually Positioned aperture for one of the two close objects",
+					"To continue you need to:\r\n\r\n1) Use Aperture Photometry \r\n2) Use Manually Positioned aperture for one of the two close objects",
 					"Error",
 					MessageBoxButtons.OK,
 					MessageBoxIcon.Error);
@@ -538,7 +541,7 @@ namespace Tangra.VideoOperations.LightCurves
 
                     double minDist = 8 + (obj1.ApertureInPixels + obj2.ApertureInPixels) / 2;
 
-                    if (dist <= minDist) return true;
+					if (dist <= minDist && !obj1.ProcessInGroup && !obj2.ProcessInGroup) return true;
                 }
             }
 
