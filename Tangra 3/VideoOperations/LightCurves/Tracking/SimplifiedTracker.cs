@@ -77,6 +77,14 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			{
 				TrackedObjectLight trackedObject = (TrackedObjectLight) m_TrackedObjects[i];
 
+				bool needsRelativePositioning = trackedObject.OriginalObject.IsFixedAperture || (trackedObject.OriginalObject.IsOcultedStar() && m_IsFullDisappearance);
+
+				if (!needsRelativePositioning && trackedObject.IsLocated)
+					atLeastOneObjectLocated = true;
+
+				if (!needsRelativePositioning)
+					continue;
+
 				double totalX = 0;
 				double totalY = 0;
 				int numReferences = 0;
