@@ -211,10 +211,17 @@ namespace Tangra.Controls
 
 		public Point GetImageLocation(Point mousePoint)
 		{
-			int x = mousePoint.X + (hScrollBar1.Visible ? hScrollBar1.Value : (this.Image != null && !vScrollBar1.Visible ? (this.Image.Width - viewRectWidth) / 2 : 0));
-			int y = mousePoint.Y + (vScrollBar1.Visible ? vScrollBar1.Value : (this.Image != null && !hScrollBar1.Visible ? (this.Image.Height - viewRectHeight) / 2 : 0));
+			try
+			{
+				int x = mousePoint.X + (hScrollBar1.Visible ? hScrollBar1.Value : (this.Image != null && !vScrollBar1.Visible ? (this.Image.Width - viewRectWidth) / 2 : 0));
+				int y = mousePoint.Y + (vScrollBar1.Visible ? vScrollBar1.Value : (this.Image != null && !hScrollBar1.Visible ? (this.Image.Height - viewRectHeight) / 2 : 0));
 
-			return new Point(x, y);
+				return new Point(x, y);
+			}
+			catch (ArgumentException)
+			{
+				return new Point(mousePoint.X, mousePoint.Y);
+			}
 		}
 
         private void vScrollBar1_Scroll(object sender, ScrollEventArgs e)

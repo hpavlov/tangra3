@@ -29,7 +29,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
         public int OriginalFieldCenterX;
         public int OriginalFieldCenterY;
 
-		public PSFFit Gaussian;
+		public PSFFit Gaussian { get; set; }
 
 		public float PositionTolerance { get; set; }
 		public bool IsWeakSignalObject { get; set; }

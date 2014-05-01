@@ -132,6 +132,22 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 			m_ProcessingPixels = m_AstroImage.GetMeasurableAreaPixels(m_Center.X, m_Center.Y, 35);
 			m_DisplayPixels = m_AstroImage.GetMeasurableAreaDisplayBitmapPixels(m_Center.X, m_Center.Y, 35);
 
+			bool occultedStartAlreadyPicked = m_State.MeasuringStars.Any(x => x.IsOcultedStar());
+
+			if (occultedStartAlreadyPicked)
+			{
+				rbOcculted.Enabled = false;
+				rbReference.Checked = true;
+			}
+			else
+			{
+				rbOcculted.Enabled = true;
+				rbOcculted.Checked = true;
+			}
+
+			if (!TryAutoLocateDoubleObject())
+				rbOneObject.Checked = true;
+
 			m_Aperture = null;
 			m_Aperture1 = null;
 			m_Aperture2 = null;
@@ -142,6 +158,89 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 			DrawCollorPanel2();
 
 			CalculatePSF();
+		}
+
+		private bool TryAutoLocateDoubleObject()
+		{
+			var pixelsFlatList = new List<Tuple<int, int, uint>>();
+
+			for (int x = 0; x < 35; x++)
+			{
+				for (int y = 0; y < 35; y++)
+				{
+					uint pixel = m_ProcessingPixels[x, y];
+					pixelsFlatList.Add(new Tuple<int, int, uint>(x, y, pixel));
+				}
+			}
+
+			// Sort by brghtness (brigher at the top)
+			pixelsFlatList.Sort((x, y) => y.Item3.CompareTo(x.Item3));
+
+			Tuple<int, int, uint> brightProbe1 = pixelsFlatList[0];
+			Tuple<int, int, uint> brightProbe2 = pixelsFlatList[1];
+			Tuple<int, int, uint> secondPeakProbe1 = null;
+			Tuple<int, int, uint> secondPeakProbe2 = null;
+
+			for (int i = 0; i < pixelsFlatList.Count; i++)
+			{
+				if (secondPeakProbe1 == null &&
+				    ImagePixel.ComputeDistance(brightProbe1.Item1, pixelsFlatList[i].Item1, brightProbe1.Item2, pixelsFlatList[i].Item2) > 3)
+				{
+					secondPeakProbe1 = pixelsFlatList[i];
+				}
+
+				if (secondPeakProbe2 == null &&
+					ImagePixel.ComputeDistance(brightProbe2.Item1, pixelsFlatList[i].Item1, brightProbe2.Item2, pixelsFlatList[i].Item2) > 3)
+				{
+					secondPeakProbe2 = pixelsFlatList[i];
+				}
+
+				if (secondPeakProbe1 != null && secondPeakProbe2 != null)
+					break;
+			}
+
+			if (secondPeakProbe1 != null &&
+				IsGoodDoubleObjectFit(brightProbe1, secondPeakProbe1))
+			{
+				return true;
+			}
+
+			if (secondPeakProbe2 != null &&
+				IsGoodDoubleObjectFit(brightProbe2, secondPeakProbe2))
+			{
+				return true;
+			}
+
+			return false;
+		}
+
+		private bool IsGoodDoubleObjectFit(Tuple<int, int, uint> object1, Tuple<int, int, uint> object2)
+		{
+			var doubleFit = new DoublePSFFit(100, 100);
+			doubleFit.Fit(m_ProcessingPixels, object1.Item1, object1.Item2, object2.Item1, object2.Item2, false);
+	
+			if (doubleFit.IsSolved &&
+			    Math.Abs(doubleFit.FWHM1 - doubleFit.FWHM2) < Math.Max(1, Math.Min(doubleFit.FWHM1, doubleFit.FWHM2)*0.25) &&
+				doubleFit.IAmplitude1 > 0 && doubleFit.IAmplitude2 > 0)
+			{
+				double imaxRatio = doubleFit.IAmplitude1 / doubleFit.IAmplitude2;
+				if (imaxRatio > 1) imaxRatio = 1 / imaxRatio;
+
+				if (imaxRatio >= 0.25)
+				{
+					// We require at least 1:4 ratio in the maximums for the auto-detection to accept that it has found correctly two objects
+					m_X1Start = object1.Item1;
+					m_Y1Start = object1.Item2;
+					m_X2Start = object2.Item1;
+					m_Y2Start = object2.Item2;
+
+					return true;
+				}
+				else
+					return false;
+			}
+
+			return false;
 		}
 
 		private void UpdateViews()
@@ -682,6 +781,10 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 
 			rbOccElc1.Visible = rbOcculted.Checked;
 			rbOccElc2.Visible = twoObjects && rbOcculted.Checked;
+
+			gbxGroupType.Text = twoObjects ? "The Group Contains ..." : "The Object Is ...";			
+			rbOcculted.Text = twoObjects ? "The Occulted / Eclipsed Star" : "Occulted / Eclipsed Star";
+			rbReference.Text = twoObjects ? "Reference Stars Only" : "Reference Stars";
 		}
 
 		private void rbOcculted_CheckedChanged(object sender, EventArgs e)

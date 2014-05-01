@@ -62,12 +62,12 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			{
 				if (measuringStars.Any(x => x.ProcessInGroup))
 				{
-					usedTrackerType = "Mutual Event (Multi)";
+					usedTrackerType = "Mutual Event M";
 					return new MutualEventTracker(measuringStars, LightCurveReductionContext.Instance.FullDisappearance);
 				}
 				else
 				{
-					usedTrackerType = "Mutual Event (Single)";
+					usedTrackerType = "Mutual Event S";
 #if WIN32
 					if (TangraConfig.Settings.Tracking.UseNativeTracker)
 						return new NativeSimplifiedTracker(imageWidth, imageHeight, measuringStars, LightCurveReductionContext.Instance.FullDisappearance);

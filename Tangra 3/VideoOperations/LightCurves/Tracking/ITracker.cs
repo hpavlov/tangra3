@@ -51,6 +51,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 		float PositionTolerance { get; }
 		bool IsCloseToOtherStars { get; }
 		bool ProcessInGroup { get; }
+		PSFFit Gaussian { get; }
 	}
 
 	public static class TrackerExtensions

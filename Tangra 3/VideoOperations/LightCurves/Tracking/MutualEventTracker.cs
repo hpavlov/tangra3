@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using Tangra.Model.Astro;
@@ -20,15 +21,18 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 	{
 		private List<ITrackedObject> m_ObjectGroup = new List<ITrackedObject>();
 
-		public TrackedObjectGroup(ITrackedObject[] group)
+		private bool m_IsFullDisappearance;
+
+		public TrackedObjectGroup(ITrackedObject[] group, bool isFullDisappearance)
 		{
+			m_IsFullDisappearance = isFullDisappearance;
 			m_ObjectGroup.AddRange(group);
 
-			TrackLater = 
+			TrackLater =
+				m_IsFullDisappearance &&
 				m_ObjectGroup.Count == 1 && 
-				m_ObjectGroup.Any(x => x.OriginalObject.IsFixedAperture || x.OriginalObject.TrackingType == TrackingType.OccultedStar);
-
-			Center = m_ObjectGroup[0].Center;
+				m_ObjectGroup[0].OriginalObject.IsOcultedStar();
+			
 			IsSingleObject = m_ObjectGroup.Count == 1;
 			if (IsSingleObject)
 			{
@@ -38,17 +42,17 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			}
 			else
 			{
-				LastKnownCenter1 = m_ObjectGroup[0].LastKnownGoodPosition;
-				LastKnownCenter2 = m_ObjectGroup[1].LastKnownGoodPosition;
-
-				if (m_ObjectGroup[0].OriginalObject.IsOcultedStar())
-					BrigherOriginalObject = m_ObjectGroup[1].OriginalObject;
+				if (m_ObjectGroup[0].OriginalObject.Gaussian.IMax > m_ObjectGroup[1].OriginalObject.Gaussian.IMax)
+				{
+					BrigherOriginalObject = m_ObjectGroup[0].OriginalObject;
+					m_BrighterObjectIndex = 0;
+					m_NonOccultedObjectIndex = m_ObjectGroup[0].OriginalObject.IsOcultedStar() ? 1 : 0;
+				}
 				else
 				{
-					if (m_ObjectGroup[0].PSFFit.IMax > m_ObjectGroup[1].PSFFit.IMax)
-						BrigherOriginalObject = m_ObjectGroup[0].OriginalObject;
-					else
-						BrigherOriginalObject = m_ObjectGroup[1].OriginalObject;
+					BrigherOriginalObject = m_ObjectGroup[1].OriginalObject;
+					m_BrighterObjectIndex = 1;
+					m_NonOccultedObjectIndex = m_ObjectGroup[1].OriginalObject.IsOcultedStar() ? 0 : 1;
 				}
 
 				ContainsOcultedStar = 
@@ -63,11 +67,33 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 		internal readonly bool TrackLater;
 
-		internal readonly IImagePixel Center;
+		private readonly int m_BrighterObjectIndex = -1;
+		private readonly int m_NonOccultedObjectIndex = -1;
 
-		internal readonly IImagePixel LastKnownCenter1;
+		internal IImagePixel SingleObjectLastCenter
+		{
+			get { return m_ObjectGroup[0].LastKnownGoodPosition; }
+		}
 
-		internal readonly IImagePixel LastKnownCenter2;
+		internal IImagePixel BrigherObjectLastCenter
+		{
+			get { return m_ObjectGroup[m_BrighterObjectIndex].LastKnownGoodPosition; }
+		}
+
+		internal IImagePixel NonOccultedObjectLastCenter
+		{
+			get { return m_ObjectGroup[m_NonOccultedObjectIndex].LastKnownGoodPosition; }
+		}
+
+		internal IImagePixel LastCenterObject1
+		{
+			get { return m_ObjectGroup[0].LastKnownGoodPosition; }
+		}
+
+		internal IImagePixel LastCenterObject2
+		{
+			get { return m_ObjectGroup[1].LastKnownGoodPosition; }
+		}
 
 		internal readonly bool IsSingleObject;
 
@@ -103,29 +129,46 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 		internal bool ContainsOcultedStar { get; private set; }
 
-		internal void IdentifyObjects(PSFFit fit1, PSFFit fit2, out TrackedObjectLight obj1, out TrackedObjectLight obj2)
+		internal bool IdentifyObjects(PSFFit fit1, PSFFit fit2, out TrackedObjectLight obj1, out TrackedObjectLight obj2)
 		{
-			double d11 = ImagePixel.ComputeDistance(fit1.XCenter, LastKnownCenter1.XDouble, fit1.YCenter, LastKnownCenter1.YDouble);
-			double d22 = ImagePixel.ComputeDistance(fit2.XCenter, LastKnownCenter2.XDouble, fit2.YCenter, LastKnownCenter2.YDouble);
-			double d12 = ImagePixel.ComputeDistance(fit1.XCenter, LastKnownCenter2.XDouble, fit1.YCenter, LastKnownCenter2.YDouble);
-			double d21 = ImagePixel.ComputeDistance(fit2.XCenter, LastKnownCenter1.XDouble, fit2.YCenter, LastKnownCenter1.YDouble);
+			double d11 = ImagePixel.ComputeDistance(fit1.XCenter, LastCenterObject1.XDouble, fit1.YCenter, LastCenterObject1.YDouble);
+			double d22 = ImagePixel.ComputeDistance(fit2.XCenter, LastCenterObject2.XDouble, fit2.YCenter, LastCenterObject2.YDouble);
+			double d12 = ImagePixel.ComputeDistance(fit1.XCenter, LastCenterObject2.XDouble, fit1.YCenter, LastCenterObject2.YDouble);
+			double d21 = ImagePixel.ComputeDistance(fit2.XCenter, LastCenterObject1.XDouble, fit2.YCenter, LastCenterObject1.YDouble);
 
 			if (d11 < d12 && d22 < d21)
 			{
 				// 1 = 1; 2 = 2
 				obj1 = (TrackedObjectLight)m_ObjectGroup[0];
 				obj2 = (TrackedObjectLight)m_ObjectGroup[1];
+				return true;
 			}
 			else if (d11 > d12 && d22 > d21)
 			{
 				// 1 = 2; 2 = 1
 				obj1 = (TrackedObjectLight) m_ObjectGroup[1];
 				obj2 = (TrackedObjectLight) m_ObjectGroup[0];
+				return true;
+			}
+			else if (Math.Max(d11, d22) > Math.Max(d21, d12) && Math.Min(d11, d22) < Math.Min(d21, d12))
+			{
+				// 1 = 2; 2 = 1
+				obj1 = (TrackedObjectLight)m_ObjectGroup[1];
+				obj2 = (TrackedObjectLight)m_ObjectGroup[0];
+				return true;
+			}
+			else if (Math.Max(d11, d22) < Math.Max(d21, d12) && Math.Min(d11, d22) > Math.Min(d21, d12))
+			{
+				// 1 = 1; 2 = 2
+				obj1 = (TrackedObjectLight)m_ObjectGroup[0];
+				obj2 = (TrackedObjectLight)m_ObjectGroup[1];
+				return true;
 			}
 			else
 			{
-				// inconclusive ?? 
-				throw new Exception();
+				obj1 = null;
+				obj2 = null;
+				return false;
 			}
 		}
 	}
@@ -158,7 +201,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 			foreach (ITrackedObject nonGroupedObject in m_TrackedObjects.Where(x => !x.OriginalObject.ProcessInGroup))
 			{
-				m_TrackedObjectGroups.Add(new TrackedObjectGroup(new ITrackedObject[] { nonGroupedObject }));
+				m_TrackedObjectGroups.Add(new TrackedObjectGroup(new ITrackedObject[] { nonGroupedObject }, isFullDisappearance));
 			}
 
 			List<ITrackedObject> groupedObjects = m_TrackedObjects.Where(x => x.OriginalObject.ProcessInGroup).ToList();
@@ -186,7 +229,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 					}
 				}
 
-				m_TrackedObjectGroups.Add(new TrackedObjectGroup(new ITrackedObject[] { obj1, obj2 }));
+				m_TrackedObjectGroups.Add(new TrackedObjectGroup(new ITrackedObject[] { obj1, obj2 }, isFullDisappearance));
 				groupedObjects.Remove(obj1);
 				groupedObjects.Remove(obj2);
 			}
@@ -216,8 +259,8 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 					if (objectGroup.IsSingleObject)
 					{
 						TrackedObjectLight trackedObject = (TrackedObjectLight) objectGroup.SingleObject;
-						uint[,] pixels = astroImage.GetPixelsArea(objectGroup.Center.X, objectGroup.Center.Y, 17);
-						var fit = new PSFFit(objectGroup.Center.X, objectGroup.Center.Y);
+						uint[,] pixels = astroImage.GetPixelsArea(objectGroup.SingleObjectLastCenter.X, objectGroup.SingleObjectLastCenter.Y, 17);
+						var fit = new PSFFit(objectGroup.SingleObjectLastCenter.X, objectGroup.SingleObjectLastCenter.Y);
 						fit.FittingMethod = PSFFittingMethod.NonLinearFit;
 						fit.Fit(pixels);
 
@@ -244,13 +287,16 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 					}
 					else
 					{
-						uint[,] pixels = astroImage.GetPixelsArea(objectGroup.Center.X, objectGroup.Center.Y, 35);
-						var doubleFit = new DoublePSFFit(objectGroup.Center.X, objectGroup.Center.Y);
+						int areaCenterX = objectGroup.BrigherObjectLastCenter.X;
+						int areaCenterY = objectGroup.BrigherObjectLastCenter.Y;
 
-						int x1 = objectGroup.LastKnownCenter1.X - objectGroup.Center.X + 17;
-						int y1 = objectGroup.LastKnownCenter1.Y - objectGroup.Center.Y + 17;
-						int x2 = objectGroup.LastKnownCenter2.X - objectGroup.Center.X + 17;
-						int y2 = objectGroup.LastKnownCenter2.Y - objectGroup.Center.Y + 17;
+						uint[,] pixels = astroImage.GetPixelsArea(areaCenterX, areaCenterY, 35);
+						var doubleFit = new DoublePSFFit(areaCenterX, areaCenterY);
+
+						int x1 = objectGroup.LastCenterObject1.X - areaCenterX + 17;
+						int y1 = objectGroup.LastCenterObject1.Y - areaCenterY + 17;
+						int x2 = objectGroup.LastCenterObject2.X - areaCenterX + 17;
+						int y2 = objectGroup.LastCenterObject2.Y - areaCenterY + 17;
 
 						doubleFit.Fit(pixels, x1, y1, x2, y2, false);
 
@@ -262,32 +308,45 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 							TrackedObjectLight trackedObject1;
 							TrackedObjectLight trackedObject2;
 
-							objectGroup.IdentifyObjects(fit1, fit2, out trackedObject1, out trackedObject2);
-
-							PSFFit[] fits = new PSFFit[] {fit1, fit2};
-							TrackedObjectLight[] trackedObjects = new TrackedObjectLight[] { trackedObject1, trackedObject2 };
-
-							for (int j = 0; j < 2; j++)
+							bool groupIdentified = objectGroup.IdentifyObjects(fit1, fit2, out trackedObject1, out trackedObject2);
+							if (!groupIdentified)
 							{
-								PSFFit fit = fits[j];
-								TrackedObjectLight trackedObject = trackedObjects[j];
+								objectGroup.SetIsTracked(false, NotMeasuredReasons.PSFFittingFailed, null);
+								//Bitmap bmp = new Bitmap(100, 200);
+								//using (Graphics g = Graphics.FromImage(bmp))
+								//{
+								//	doubleFit.DrawInternalPoints(g, new Rectangle(0,0, 100, 200), 5, 5, Brushes.Lime, Brushes.Yellow, 8);
+								//	g.Save();
+								//}
+								//bmp.Save(@"D:\Hristo\mutual_double_fit.bmp");
+							}
+							else
+							{
+								PSFFit[] fits = new PSFFit[] { fit1, fit2 };
+								TrackedObjectLight[] trackedObjects = new TrackedObjectLight[] { trackedObject1, trackedObject2 };
 
-								if (fit.Certainty < GUIDING_STAR_MIN_CERTAINTY)
+								for (int j = 0; j < 2; j++)
 								{
-									trackedObject.SetIsTracked(false, NotMeasuredReasons.ObjectCertaintyTooSmall, (PSFFit)null);
-								}
-								else if (fit.FWHM < STELLAR_OBJECT_MIN_FWHM || fit.FWHM > STELLAR_OBJECT_MAX_FWHM)
-								{
-									trackedObject.SetIsTracked(false, NotMeasuredReasons.FWHMOutOfRange, (PSFFit)null);
-								}
-								else if (TangraConfig.Settings.Tracking.CheckElongation && fit.ElongationPercentage > STELLAR_OBJECT_MAX_ELONGATION)
-								{
-									trackedObject.SetIsTracked(false, NotMeasuredReasons.ObjectTooElongated, (PSFFit)null);
-								}
-								else
-								{
-									trackedObject.SetTrackedObjectMatch(fit);
-									trackedObject.SetIsTracked(true, NotMeasuredReasons.TrackedSuccessfully, fit);
+									PSFFit fit = fits[j];
+									TrackedObjectLight trackedObject = trackedObjects[j];
+
+									if (fit.Certainty < GUIDING_STAR_MIN_CERTAINTY)
+									{
+										trackedObject.SetIsTracked(false, NotMeasuredReasons.ObjectCertaintyTooSmall, (PSFFit)null);
+									}
+									else if (fit.FWHM < STELLAR_OBJECT_MIN_FWHM || fit.FWHM > STELLAR_OBJECT_MAX_FWHM)
+									{
+										trackedObject.SetIsTracked(false, NotMeasuredReasons.FWHMOutOfRange, (PSFFit)null);
+									}
+									else if (TangraConfig.Settings.Tracking.CheckElongation && fit.ElongationPercentage > STELLAR_OBJECT_MAX_ELONGATION)
+									{
+										trackedObject.SetIsTracked(false, NotMeasuredReasons.ObjectTooElongated, (PSFFit)null);
+									}
+									else
+									{
+										trackedObject.SetTrackedObjectMatch(fit);
+										trackedObject.SetIsTracked(true, NotMeasuredReasons.TrackedSuccessfully, fit);
+									}
 								}								
 							}
 						}
@@ -310,12 +369,11 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 				if (!containsFullyDisappearingTarget)
 					continue;
 
-				bool needsRelativePositioning = trackedGroup.IsSingleObject && m_IsFullDisappearance;
 				int numReferences = 0;
 				double x_double;
 				double y_double;	
 
-				if (needsRelativePositioning)
+				if (trackedGroup.IsSingleObject && m_IsFullDisappearance)
 				{
 					// This is the case for single fully disappearing targets
 					double totalX = 0;
@@ -327,8 +385,8 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 						TrackedObjectGroup referenceGroup = (TrackedObjectGroup)m_TrackedObjectGroups[j];
 						if (referenceGroup.IsLocated)
 						{
-							totalX += (trackedGroup.BrigherOriginalObject.ApertureStartingX - referenceGroup.BrigherOriginalObject.ApertureStartingX) + referenceGroup.Center.XDouble;
-							totalY += (trackedGroup.BrigherOriginalObject.ApertureStartingY - referenceGroup.BrigherOriginalObject.ApertureStartingY) + referenceGroup.Center.YDouble;
+							totalX += (trackedGroup.BrigherOriginalObject.ApertureStartingX - referenceGroup.BrigherOriginalObject.ApertureStartingX) + referenceGroup.BrigherObjectLastCenter.XDouble;
+							totalY += (trackedGroup.BrigherOriginalObject.ApertureStartingY - referenceGroup.BrigherOriginalObject.ApertureStartingY) + referenceGroup.BrigherObjectLastCenter.YDouble;
 							numReferences++;
 							atLeastOneGroupLocated = true;
 						}
@@ -339,10 +397,10 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 				}
 				else
 				{
-					// The fully disappearing target is in a group. The other target whould have been located. We use the last known position of one of the two close targets
+					// The fully disappearing target is in a group. The other target would have been located. We use the last known position of the other targets
 					numReferences = 1;
-					x_double = trackedGroup.LastKnownCenter1.XDouble;
-					y_double = trackedGroup.LastKnownCenter1.YDouble;	
+					x_double = trackedGroup.NonOccultedObjectLastCenter.XDouble;
+					y_double = trackedGroup.NonOccultedObjectLastCenter.YDouble;	
 				}
 
 
@@ -352,7 +410,6 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 				}
 				else
 				{
-					// THIS SHOIUKD BE THE ONY CASE (Oculted group0
 					int x = (int)(Math.Round(x_double));
 					int y = (int)(Math.Round(y_double));
 
@@ -378,10 +435,10 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 					{
 						DoublePSFFit doubleFit = new DoublePSFFit(x, y);
 
-						int x1 = trackedGroup.LastKnownCenter1.X - trackedGroup.Center.X + 17;
-						int y1 = trackedGroup.LastKnownCenter1.Y - trackedGroup.Center.Y + 17;
-						int x2 = trackedGroup.LastKnownCenter2.X - trackedGroup.Center.X + 17;
-						int y2 = trackedGroup.LastKnownCenter2.Y - trackedGroup.Center.Y + 17;
+						int x1 = trackedGroup.LastCenterObject1.X - x + 17;
+						int y1 = trackedGroup.LastCenterObject1.Y - y + 17;
+						int x2 = trackedGroup.LastCenterObject2.X - x + 17;
+						int y2 = trackedGroup.LastCenterObject2.Y - y + 17;
 
 						doubleFit.Fit(pixels, x1, y1, x2, y2, false);
 
@@ -393,28 +450,33 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 							TrackedObjectLight trackedObject1;
 							TrackedObjectLight trackedObject2;
 
-							trackedGroup.IdentifyObjects(fit1, fit2, out trackedObject1, out trackedObject2);
-
-							PSFFit[] fits = new PSFFit[] {fit1, fit2};
-							TrackedObjectLight[] trackedObjects = new TrackedObjectLight[] {trackedObject1, trackedObject2};
-
-							for (int j = 0; j < 2; j++)
+							bool groupIdentified = trackedGroup.IdentifyObjects(fit1, fit2, out trackedObject1, out trackedObject2);
+							if (!groupIdentified)
 							{
-								PSFFit fit = fits[j];
-								TrackedObjectLight trackedObject = trackedObjects[j];
+								trackedGroup.SetIsTracked(false, NotMeasuredReasons.PSFFittingFailed, null);
+							}
+							else
+							{
+								PSFFit[] fits = new PSFFit[] { fit1, fit2 };
+								TrackedObjectLight[] trackedObjects = new TrackedObjectLight[] { trackedObject1, trackedObject2 };
 
-								if (fit.IsSolved && fit.Certainty > STELLAR_OBJECT_MIN_CERTAINTY)
+								for (int j = 0; j < 2; j++)
 								{
-									trackedObject.SetIsTracked(true, NotMeasuredReasons.TrackedSuccessfully, fit);
-									trackedObject.SetTrackedObjectMatch(fit);
-								}
-								else if (m_IsFullDisappearance)
-									trackedObject.SetIsTracked(false, NotMeasuredReasons.FullyDisappearingStarMarkedTrackedWithoutBeingFound, (PSFFit)null);
-								else
-									trackedObject.SetIsTracked(false, NotMeasuredReasons.ObjectCertaintyTooSmall, (PSFFit)null);
+									PSFFit fit = fits[j];
+									TrackedObjectLight trackedObject = trackedObjects[j];
+
+									if (fit.IsSolved && fit.Certainty > STELLAR_OBJECT_MIN_CERTAINTY)
+									{
+										trackedObject.SetIsTracked(true, NotMeasuredReasons.TrackedSuccessfully, fit);
+										trackedObject.SetTrackedObjectMatch(fit);
+									}
+									else if (m_IsFullDisappearance)
+										trackedObject.SetIsTracked(false, NotMeasuredReasons.FullyDisappearingStarMarkedTrackedWithoutBeingFound, (PSFFit)null);
+									else
+										trackedObject.SetIsTracked(false, NotMeasuredReasons.ObjectCertaintyTooSmall, (PSFFit)null);
+								}								
 							}
 						}
-
 					}
 				}
 			}

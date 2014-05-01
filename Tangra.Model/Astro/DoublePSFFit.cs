@@ -327,6 +327,16 @@ namespace Tangra.Model.Astro
 			get { return m_IBackground + m_IStarMax; }
 		}
 
+		public double IAmplitude1
+		{
+			get { return m_IStarMax1; }
+		}
+
+		public double IAmplitude2
+		{
+			get { return m_IStarMax2; }
+		}
+
 		public double I0
 		{
 			get { return m_IBackground; }

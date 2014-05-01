@@ -43,7 +43,7 @@
 			this.gbAperture = new System.Windows.Forms.GroupBox();
 			this.rbTwoObjects = new System.Windows.Forms.RadioButton();
 			this.rbOneObject = new System.Windows.Forms.RadioButton();
-			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.gbxGroupType = new System.Windows.Forms.GroupBox();
 			this.rbReference = new System.Windows.Forms.RadioButton();
 			this.rbOcculted = new System.Windows.Forms.RadioButton();
 			this.lblFWHM2 = new System.Windows.Forms.Label();
@@ -54,22 +54,16 @@
 			this.pbox2a = new System.Windows.Forms.PictureBox();
 			this.rbOccElc1 = new System.Windows.Forms.RadioButton();
 			this.rbOccElc2 = new System.Windows.Forms.RadioButton();
-			this.groupBox2 = new System.Windows.Forms.GroupBox();
-			this.label1 = new System.Windows.Forms.Label();
-			this.cbxBgFirstOrder = new System.Windows.Forms.CheckBox();
-			this.cbxBgThirdOrder = new System.Windows.Forms.CheckBox();
-			this.cbxBgSecondOrder = new System.Windows.Forms.CheckBox();
 			((System.ComponentModel.ISupportInitialize)(this.pbox1)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.picTarget1Pixels)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudAperture1)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.picTarget1PSF)).BeginInit();
 			this.gbAperture.SuspendLayout();
-			this.groupBox1.SuspendLayout();
+			this.gbxGroupType.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.pbox2)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudAperture2)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.pbox1a)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.pbox2a)).BeginInit();
-			this.groupBox2.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// btnExplain
@@ -139,9 +133,8 @@
 			this.lblFWHM1.AutoSize = true;
 			this.lblFWHM1.Location = new System.Drawing.Point(32, 337);
 			this.lblFWHM1.Name = "lblFWHM1";
-			this.lblFWHM1.Size = new System.Drawing.Size(35, 13);
+			this.lblFWHM1.Size = new System.Drawing.Size(0, 13);
 			this.lblFWHM1.TabIndex = 87;
-			this.lblFWHM1.Text = "sdfsdf";
 			// 
 			// picTarget1Pixels
 			// 
@@ -212,7 +205,7 @@
 			this.gbAperture.Controls.Add(this.rbOneObject);
 			this.gbAperture.Location = new System.Drawing.Point(15, 12);
 			this.gbAperture.Name = "gbAperture";
-			this.gbAperture.Size = new System.Drawing.Size(85, 74);
+			this.gbAperture.Size = new System.Drawing.Size(205, 74);
 			this.gbAperture.TabIndex = 90;
 			this.gbAperture.TabStop = false;
 			this.gbAperture.Text = "Objects";
@@ -220,10 +213,12 @@
 			// rbTwoObjects
 			// 
 			this.rbTwoObjects.AutoSize = true;
-			this.rbTwoObjects.Location = new System.Drawing.Point(13, 43);
+			this.rbTwoObjects.Checked = true;
+			this.rbTwoObjects.Location = new System.Drawing.Point(119, 30);
 			this.rbTwoObjects.Name = "rbTwoObjects";
 			this.rbTwoObjects.Size = new System.Drawing.Size(46, 17);
 			this.rbTwoObjects.TabIndex = 4;
+			this.rbTwoObjects.TabStop = true;
 			this.rbTwoObjects.Text = "Two";
 			this.rbTwoObjects.UseVisualStyleBackColor = true;
 			this.rbTwoObjects.CheckedChanged += new System.EventHandler(this.rbTwoObjects_CheckedChanged);
@@ -231,25 +226,23 @@
 			// rbOneObject
 			// 
 			this.rbOneObject.AutoSize = true;
-			this.rbOneObject.Checked = true;
-			this.rbOneObject.Location = new System.Drawing.Point(14, 20);
+			this.rbOneObject.Location = new System.Drawing.Point(19, 30);
 			this.rbOneObject.Name = "rbOneObject";
 			this.rbOneObject.Size = new System.Drawing.Size(45, 17);
 			this.rbOneObject.TabIndex = 3;
-			this.rbOneObject.TabStop = true;
 			this.rbOneObject.Text = "One";
 			this.rbOneObject.UseVisualStyleBackColor = true;
 			// 
-			// groupBox1
+			// gbxGroupType
 			// 
-			this.groupBox1.Controls.Add(this.rbReference);
-			this.groupBox1.Controls.Add(this.rbOcculted);
-			this.groupBox1.Location = new System.Drawing.Point(106, 12);
-			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(190, 74);
-			this.groupBox1.TabIndex = 91;
-			this.groupBox1.TabStop = false;
-			this.groupBox1.Text = "The group contains ...";
+			this.gbxGroupType.Controls.Add(this.rbReference);
+			this.gbxGroupType.Controls.Add(this.rbOcculted);
+			this.gbxGroupType.Location = new System.Drawing.Point(232, 12);
+			this.gbxGroupType.Name = "gbxGroupType";
+			this.gbxGroupType.Size = new System.Drawing.Size(244, 74);
+			this.gbxGroupType.TabIndex = 91;
+			this.gbxGroupType.TabStop = false;
+			this.gbxGroupType.Text = "The group contains ...";
 			// 
 			// rbReference
 			// 
@@ -267,10 +260,10 @@
 			this.rbOcculted.Checked = true;
 			this.rbOcculted.Location = new System.Drawing.Point(14, 20);
 			this.rbOcculted.Name = "rbOcculted";
-			this.rbOcculted.Size = new System.Drawing.Size(155, 17);
+			this.rbOcculted.Size = new System.Drawing.Size(157, 17);
 			this.rbOcculted.TabIndex = 3;
 			this.rbOcculted.TabStop = true;
-			this.rbOcculted.Text = "The Occulted/Eclipsed star";
+			this.rbOcculted.Text = "The Occulted/Eclipsed Star";
 			this.rbOcculted.UseVisualStyleBackColor = true;
 			this.rbOcculted.CheckedChanged += new System.EventHandler(this.rbOcculted_CheckedChanged);
 			// 
@@ -280,9 +273,8 @@
 			this.lblFWHM2.AutoSize = true;
 			this.lblFWHM2.Location = new System.Drawing.Point(31, 356);
 			this.lblFWHM2.Name = "lblFWHM2";
-			this.lblFWHM2.Size = new System.Drawing.Size(35, 13);
+			this.lblFWHM2.Size = new System.Drawing.Size(0, 13);
 			this.lblFWHM2.TabIndex = 92;
-			this.lblFWHM2.Text = "sdfsdf";
 			// 
 			// pbox2
 			// 
@@ -375,70 +367,11 @@
 			this.rbOccElc2.Text = "Occ/Ecl";
 			this.rbOccElc2.UseVisualStyleBackColor = true;
 			// 
-			// groupBox2
-			// 
-			this.groupBox2.Controls.Add(this.label1);
-			this.groupBox2.Controls.Add(this.cbxBgFirstOrder);
-			this.groupBox2.Controls.Add(this.cbxBgThirdOrder);
-			this.groupBox2.Controls.Add(this.cbxBgSecondOrder);
-			this.groupBox2.Location = new System.Drawing.Point(303, 12);
-			this.groupBox2.Name = "groupBox2";
-			this.groupBox2.Size = new System.Drawing.Size(174, 74);
-			this.groupBox2.TabIndex = 100;
-			this.groupBox2.TabStop = false;
-			this.groupBox2.Text = "Background 3D-polynomial fit";
-			// 
-			// label1
-			// 
-			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(15, 22);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(104, 13);
-			this.label1.TabIndex = 3;
-			this.label1.Text = "Use the best fit from:";
-			// 
-			// cbxBgFirstOrder
-			// 
-			this.cbxBgFirstOrder.AutoSize = true;
-			this.cbxBgFirstOrder.Checked = true;
-			this.cbxBgFirstOrder.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.cbxBgFirstOrder.Location = new System.Drawing.Point(18, 43);
-			this.cbxBgFirstOrder.Name = "cbxBgFirstOrder";
-			this.cbxBgFirstOrder.Size = new System.Drawing.Size(43, 17);
-			this.cbxBgFirstOrder.TabIndex = 2;
-			this.cbxBgFirstOrder.Text = "1-st";
-			this.cbxBgFirstOrder.UseVisualStyleBackColor = true;
-			// 
-			// cbxBgThirdOrder
-			// 
-			this.cbxBgThirdOrder.AutoSize = true;
-			this.cbxBgThirdOrder.Checked = true;
-			this.cbxBgThirdOrder.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.cbxBgThirdOrder.Location = new System.Drawing.Point(118, 44);
-			this.cbxBgThirdOrder.Name = "cbxBgThirdOrder";
-			this.cbxBgThirdOrder.Size = new System.Drawing.Size(44, 17);
-			this.cbxBgThirdOrder.TabIndex = 1;
-			this.cbxBgThirdOrder.Text = "3-rd";
-			this.cbxBgThirdOrder.UseVisualStyleBackColor = true;
-			// 
-			// cbxBgSecondOrder
-			// 
-			this.cbxBgSecondOrder.AutoSize = true;
-			this.cbxBgSecondOrder.Checked = true;
-			this.cbxBgSecondOrder.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.cbxBgSecondOrder.Location = new System.Drawing.Point(67, 44);
-			this.cbxBgSecondOrder.Name = "cbxBgSecondOrder";
-			this.cbxBgSecondOrder.Size = new System.Drawing.Size(47, 17);
-			this.cbxBgSecondOrder.TabIndex = 0;
-			this.cbxBgSecondOrder.Text = "2-nd";
-			this.cbxBgSecondOrder.UseVisualStyleBackColor = true;
-			// 
 			// frmAddOrEditMutualEventsTarget
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(488, 424);
-			this.Controls.Add(this.groupBox2);
 			this.Controls.Add(this.rbOccElc2);
 			this.Controls.Add(this.rbOccElc1);
 			this.Controls.Add(this.pbox2a);
@@ -447,7 +380,7 @@
 			this.Controls.Add(this.lblAperture2);
 			this.Controls.Add(this.nudAperture2);
 			this.Controls.Add(this.lblFWHM2);
-			this.Controls.Add(this.groupBox1);
+			this.Controls.Add(this.gbxGroupType);
 			this.Controls.Add(this.gbAperture);
 			this.Controls.Add(this.pbox1);
 			this.Controls.Add(this.lblFWHM1);
@@ -473,14 +406,12 @@
 			((System.ComponentModel.ISupportInitialize)(this.picTarget1PSF)).EndInit();
 			this.gbAperture.ResumeLayout(false);
 			this.gbAperture.PerformLayout();
-			this.groupBox1.ResumeLayout(false);
-			this.groupBox1.PerformLayout();
+			this.gbxGroupType.ResumeLayout(false);
+			this.gbxGroupType.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.pbox2)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudAperture2)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.pbox1a)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.pbox2a)).EndInit();
-			this.groupBox2.ResumeLayout(false);
-			this.groupBox2.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -502,7 +433,7 @@
         private System.Windows.Forms.GroupBox gbAperture;
         private System.Windows.Forms.RadioButton rbTwoObjects;
         private System.Windows.Forms.RadioButton rbOneObject;
-        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.GroupBox gbxGroupType;
         private System.Windows.Forms.RadioButton rbReference;
         private System.Windows.Forms.RadioButton rbOcculted;
 		private System.Windows.Forms.Label lblFWHM2;
@@ -513,10 +444,5 @@
 		private System.Windows.Forms.PictureBox pbox2a;
 		private System.Windows.Forms.RadioButton rbOccElc1;
 		private System.Windows.Forms.RadioButton rbOccElc2;
-		private System.Windows.Forms.GroupBox groupBox2;
-		private System.Windows.Forms.CheckBox cbxBgFirstOrder;
-		private System.Windows.Forms.CheckBox cbxBgThirdOrder;
-		private System.Windows.Forms.CheckBox cbxBgSecondOrder;
-		private System.Windows.Forms.Label label1;
     }
 }
