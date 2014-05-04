@@ -1879,24 +1879,52 @@ namespace Tangra.VideoOperations.LightCurves
 
         internal bool EditCurrentObject()
         {
-            TrackedObjectConfig selectedObject = m_StateMachine.MeasuringStars[m_StateMachine.SelectedMeasuringStar];
-            frmAddOrEditSingleTarget frmAddSingleTarget =
-                new frmAddOrEditSingleTarget(m_StateMachine.SelectedMeasuringStar, selectedObject, m_StateMachine, m_VideoController);
+			TrackedObjectConfig selectedObject = m_StateMachine.MeasuringStars[m_StateMachine.SelectedMeasuringStar];
 
-            DialogResult result = frmAddSingleTarget.ShowDialog();
-            if (result == DialogResult.Cancel)
-                return false;
+			if (LightCurveReductionContext.Instance.LightCurveReductionType == LightCurveReductionType.MutualEvent)
+			{
+				var frmAddMutualTarget = new frmAddOrEditMutualEventsTarget(m_StateMachine.SelectedMeasuringStar, selectedObject, m_StateMachine, m_VideoController);
+				DialogResult result = frmAddMutualTarget.ShowDialog();
+				if (result == DialogResult.Cancel)
+					return false;
 
-            if (result == DialogResult.Abort)
-            {
-                m_StateMachine.ObjectSelected(frmAddSingleTarget.ObjectToAdd, false, true /* Ctrl = 'DELETE' */);
-                m_StateMachine.SelectedMeasuringStar = -1;
-                m_VideoController.RefreshCurrentFrame();
+				if (result == DialogResult.Abort)
+				{
+					m_StateMachine.ObjectSelected(frmAddMutualTarget.ObjectToAdd, false, true /* Ctrl = 'DELETE' */);
+					if (frmAddMutualTarget.ObjectToAdd2 != null)
+						m_StateMachine.ObjectSelected(frmAddMutualTarget.ObjectToAdd2, false, true /* Ctrl = 'DELETE' */);
 
-                return false;
-            }
+					m_StateMachine.SelectedMeasuringStar = -1;
+					m_VideoController.RefreshCurrentFrame();
 
-            m_StateMachine.ObjectEdited(frmAddSingleTarget.ObjectToAdd);
+					return false;
+				}
+
+				m_StateMachine.ObjectEdited(frmAddMutualTarget.ObjectToAdd);
+
+				if (frmAddMutualTarget.ObjectToAdd2 != null)
+					m_StateMachine.ObjectEdited(frmAddMutualTarget.ObjectToAdd2);
+			}
+			else
+			{				
+				frmAddOrEditSingleTarget frmAddSingleTarget =
+					new frmAddOrEditSingleTarget(m_StateMachine.SelectedMeasuringStar, selectedObject, m_StateMachine, m_VideoController);
+
+				DialogResult result = frmAddSingleTarget.ShowDialog();
+				if (result == DialogResult.Cancel)
+					return false;
+
+				if (result == DialogResult.Abort)
+				{
+					m_StateMachine.ObjectSelected(frmAddSingleTarget.ObjectToAdd, false, true /* Ctrl = 'DELETE' */);
+					m_StateMachine.SelectedMeasuringStar = -1;
+					m_VideoController.RefreshCurrentFrame();
+
+					return false;
+				}
+
+				m_StateMachine.ObjectEdited(frmAddSingleTarget.ObjectToAdd);
+			}
 
             return true;
         }

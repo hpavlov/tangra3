@@ -49,8 +49,13 @@ namespace Tangra.Model.Astro
 			m_yCenter = y0;
 		}
 
+		public void Fit(uint[,] intensity, int x1start, int y1start, int x2start, int y2start)
+		{
+			Fit(intensity, x1start, y1start, x2start, y2start, TangraConfig.Settings.Tuning.PsfMode == TangraConfig.PSFFittingMode.NativeMatrixManagedFitting);
+		}
+
 		// I(x, y) = IBackground + IStarMax1 * Exp ( -((x - X1)*(x - X1) + (y - Y1)*(y - Y1)) / (r1 * r1)) + IStarMax2 * Exp ( -((x - X2)*(x - X2) + (y - Y2)*(y - Y2)) / (r2 * r2))
-		public void Fit(uint[,] intensity, int x1start, int y1start, int x2start, int y2start, bool useNativeMatrix)
+		private void Fit(uint[,] intensity, int x1start, int y1start, int x2start, int y2start, bool useNativeMatrix)
 		{
 			m_IsSolved = false;
 

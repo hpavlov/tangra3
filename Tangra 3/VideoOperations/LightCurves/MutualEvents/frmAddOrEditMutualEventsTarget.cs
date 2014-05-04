@@ -20,6 +20,7 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
     {
         private ImagePixel m_Center;
         private int m_ObjectId;
+		private int m_ObjectId2;
         private float m_X0;
         private float m_Y0;
 	    private float? m_Aperture = null;
@@ -69,6 +70,8 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 		private const int MAGN_FACTOR = 6;
 		private const int AREA_SIDE = 35;
 
+	    private Color[] m_AllTargetColors;
+
         public frmAddOrEditMutualEventsTarget()
         {
             InitializeComponent();
@@ -76,7 +79,7 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 
         internal frmAddOrEditMutualEventsTarget(int objectId, ImagePixel center, PSFFit gaussian, LCStateMachine state, VideoController videoController)
         {
-            InitializeComponent();
+			InitializeComponent();
 
             m_VideoController = videoController;
 
@@ -98,30 +101,67 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 	        Initialise();
         }
 
+		internal frmAddOrEditMutualEventsTarget(int objectId, TrackedObjectConfig selectedObject, LCStateMachine state, VideoController videoController)
+		{
+			InitializeComponent();
+
+			m_VideoController = videoController;
+
+			Text = "Edit 'Mutual Event' Target";
+			btnAdd.Text = "Save";
+			btnDontAdd.Text = "Cancel";
+			btnDelete.Visible = true;
+			m_IsEdit = true;
+
+			m_ObjectId = objectId;
+			m_State = state;
+			m_AstroImage = m_VideoController.GetCurrentAstroImage(false);
+
+			ObjectToAdd = selectedObject;
+
+			m_Center = new ImagePixel(selectedObject.ApertureStartingX, selectedObject.ApertureStartingY);
+
+			if (selectedObject.ProcessInGroup)
+			{
+				List<TrackedObjectConfig> otherGroupedObjects = state.m_MeasuringStars.Where(x => x.ProcessInGroup && x != selectedObject).ToList();
+				if (otherGroupedObjects.Count == 1)
+				{
+					ObjectToAdd2 = otherGroupedObjects[0];
+					m_ObjectId2 = state.m_MeasuringStars.IndexOf(ObjectToAdd2);
+				}
+			}
+			else ObjectToAdd2 = null;
+
+			Initialise();
+		}
+
 		private void Initialise()
 		{
 			picTarget1Pixels.Image = new Bitmap(AREA_SIDE * MAGN_FACTOR, AREA_SIDE * MAGN_FACTOR, PixelFormat.Format24bppRgb);
 			picTarget1PSF.Image = new Bitmap(picTarget1PSF.Width, picTarget1PSF.Height);
 
-			if (m_ObjectId == 0)
+			m_AllTargetColors = new Color[]
+		    {
+			    TangraConfig.Settings.Color.Target1,
+			    TangraConfig.Settings.Color.Target2,
+			    TangraConfig.Settings.Color.Target3,
+			    TangraConfig.Settings.Color.Target4
+		    };
+
+			m_Color = m_AllTargetColors[m_ObjectId];
+			if (m_ObjectId < 3 && !m_IsEdit)
+				m_Color2 = m_AllTargetColors[m_ObjectId + 1];
+
+			bool doubleModeDisabled = false;
+
+			if (m_IsEdit)
 			{
-				m_Color = TangraConfig.Settings.Color.Target1;
-				m_Color2 = TangraConfig.Settings.Color.Target2;
-			}
-			else if (m_ObjectId == 1)
-			{
-				m_Color = TangraConfig.Settings.Color.Target2;
-				m_Color2 = TangraConfig.Settings.Color.Target3;
-			}
-			else if (m_ObjectId == 2)
-			{
-				m_Color = TangraConfig.Settings.Color.Target3;
-				m_Color2 = TangraConfig.Settings.Color.Target4;
+				m_Color2 = m_AllTargetColors[m_ObjectId2];
 			}
 			else if (m_ObjectId == 3)
 			{
-				m_Color = TangraConfig.Settings.Color.Target4;
-				m_Color2 = TangraConfig.Settings.Color.Target4;
+				doubleModeDisabled = true;
+				rbTwoObjects.Enabled = false;
 			}
 
 			m_Pen = new Pen(m_Color);
@@ -145,7 +185,7 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 				rbOcculted.Checked = true;
 			}
 
-			if (!TryAutoLocateDoubleObject())
+			if (doubleModeDisabled || !TryAutoLocateDoubleObject())
 				rbOneObject.Checked = true;
 
 			m_Aperture = null;
@@ -217,7 +257,7 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 		private bool IsGoodDoubleObjectFit(Tuple<int, int, uint> object1, Tuple<int, int, uint> object2)
 		{
 			var doubleFit = new DoublePSFFit(100, 100);
-			doubleFit.Fit(m_ProcessingPixels, object1.Item1, object1.Item2, object2.Item1, object2.Item2, false);
+			doubleFit.Fit(m_ProcessingPixels, object1.Item1, object1.Item2, object2.Item1, object2.Item2);
 	
 			if (doubleFit.IsSolved &&
 			    Math.Abs(doubleFit.FWHM1 - doubleFit.FWHM2) < Math.Max(1, Math.Min(doubleFit.FWHM1, doubleFit.FWHM2)*0.25) &&
@@ -229,15 +269,22 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 				if (imaxRatio >= 0.25)
 				{
 					// We require at least 1:4 ratio in the maximums for the auto-detection to accept that it has found correctly two objects
-					m_X1Start = object1.Item1;
-					m_Y1Start = object1.Item2;
-					m_X2Start = object2.Item1;
-					m_Y2Start = object2.Item2;
 
-					return true;
+					double distance = ImagePixel.ComputeDistance(object1.Item1, object2.Item1, object1.Item2, object2.Item2);
+
+					if (distance > doubleFit.FWHM1 && distance > doubleFit.FWHM2)
+					{
+						// We also require at least a FWHM distance between centers for automatic detection
+						m_X1Start = object1.Item1;
+						m_Y1Start = object1.Item2;
+						m_X2Start = object2.Item1;
+						m_Y2Start = object2.Item2;
+
+						return true;
+					}
 				}
-				else
-					return false;
+
+				return false;
 			}
 
 			return false;
@@ -518,7 +565,7 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 			}
 
 			var psfFit = new DoublePSFFit(m_Center.X, m_Center.Y);
-			psfFit.Fit(m_ProcessingPixels, m_X1Start, m_Y1Start, m_X2Start, m_Y2Start, false);
+			psfFit.Fit(m_ProcessingPixels, m_X1Start, m_Y1Start, m_X2Start, m_Y2Start);
 
 			if (psfFit.IsSolved)
 			{
@@ -784,7 +831,7 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 
 			gbxGroupType.Text = twoObjects ? "The Group Contains ..." : "The Object Is ...";			
 			rbOcculted.Text = twoObjects ? "The Occulted / Eclipsed Star" : "Occulted / Eclipsed Star";
-			rbReference.Text = twoObjects ? "Reference Stars Only" : "Reference Stars";
+			rbReference.Text = twoObjects ? "Reference Stars Only" : "Reference Star";
 		}
 
 		private void rbOcculted_CheckedChanged(object sender, EventArgs e)
