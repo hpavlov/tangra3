@@ -267,6 +267,7 @@ namespace Tangra.Video
 				{
 					// This is a VTI Split reference frame. Put some mark on it to mark it as such??
 					displayBitmap = Pixelmap.ConstructBitmapFromBitmapPixels(pixels, m_Width, m_Height);
+					for (int i = 0; i < pixels.Length; i++) displayBitmapBytes[i] = (byte) pixels[i];
 				}
 				else
 				{
