@@ -176,17 +176,21 @@ namespace Tangra.Model.Image
                     else
                         m_TotalBackground = (uint)Math.Round(m_TotalPixels * (float)fit.I0);
                 }
-                else if (m_BackgroundMethod != TangraConfig.BackgroundMethod.PSFBackground)
-                {
-                    double bgFromAnnulus = GetBackground(backgroundArea, aperture, 17, 17);
-                    m_TotalBackground = (uint)Math.Round(m_TotalPixels * (float)bgFromAnnulus);
-                }
-                else
-                {
-                    throw new ApplicationException("Measurement error. Correlation: AFP-102");
-                }
+				else if (m_BackgroundMethod == TangraConfig.BackgroundMethod.Background3DPolynomial)
+				{
+					throw new NotImplementedException();
+				}
+	            else if (m_BackgroundMethod != TangraConfig.BackgroundMethod.PSFBackground)
+	            {
+		            double bgFromAnnulus = GetBackground(backgroundArea, aperture, 17, 17);
+		            m_TotalBackground = (uint) Math.Round(m_TotalPixels*(float) bgFromAnnulus);
+	            }
+	            else
+	            {
+		            throw new ApplicationException("Measurement error. Correlation: AFP-102");
+	            }
 
-				return NotMeasuredReasons.MeasuredSuccessfully;
+	            return NotMeasuredReasons.MeasuredSuccessfully;
             }
             else
             {
@@ -280,6 +284,10 @@ namespace Tangra.Model.Image
                 {
                     m_TotalBackground = Math.PI * aperture * aperture * fit.I0;
                 }
+				else if (m_BackgroundMethod == TangraConfig.BackgroundMethod.Background3DPolynomial)
+				{
+					throw new NotImplementedException();
+				}
                 else
                 {
                     double bgFromAnnulus = GetBackground(backgroundArea, aperture, 17, 17);
@@ -371,6 +379,10 @@ namespace Tangra.Model.Image
                     else
                         m_TotalBackground = (uint)Math.Round(m_TotalPixels * psfBackground);
                 }
+				else if (m_BackgroundMethod == TangraConfig.BackgroundMethod.Background3DPolynomial)
+				{
+					throw new NotImplementedException();
+				}
                 else if (m_BackgroundMethod != TangraConfig.BackgroundMethod.PSFBackground)
                 {
                     double bgFromAnnulus = GetBackground(backgroundArea, aperture, 17, 17);
@@ -618,10 +630,8 @@ namespace Tangra.Model.Image
             float innerRadius = (float)(m_InnerRadiusOfBackgroundApertureInSignalApertures * signalApertureRadius);
             float outernRadius = (float)Math.Sqrt(m_NumberOfPixelsInBackgroundAperture / Math.PI + innerRadius * innerRadius);
 
-            if (m_BackgroundMethod == TangraConfig.BackgroundMethod.BackgroundGradientFit)
-            {
-                throw new NotImplementedException();
-            }
+			if (m_BackgroundMethod == TangraConfig.BackgroundMethod.Background3DPolynomial || m_BackgroundMethod == TangraConfig.BackgroundMethod.PSFBackground)
+                throw new InvalidOperationException("Bad code path");
 
             // We want the annular background aperture to contain between 50 and 250 pixels.
             List<uint> allBgReadings = new List<uint>();

@@ -57,6 +57,7 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 		internal TrackedObjectConfig ObjectToAdd2 { get; private set; }
 	    private AstroImage m_AstroImage;
         private bool m_IsEdit;
+	    private int m_GroupId;
 
 		private Pen m_Pen;
 		private Pen m_Pen2;
@@ -90,6 +91,7 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
             m_IsEdit = false;
 
             m_ObjectId = objectId;
+			m_GroupId = objectId; // For Group Id we use the next object id
             m_State = state;
 			m_AstroImage = m_VideoController.GetCurrentAstroImage(false);
 
@@ -121,16 +123,22 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 
 			m_Center = new ImagePixel(selectedObject.ApertureStartingX, selectedObject.ApertureStartingY);
 
-			if (selectedObject.ProcessInGroup)
+			if (selectedObject.ProcessInPsfGroup)
 			{
-				List<TrackedObjectConfig> otherGroupedObjects = state.m_MeasuringStars.Where(x => x.ProcessInGroup && x != selectedObject).ToList();
+				m_GroupId = selectedObject.GroupId;
+
+				List<TrackedObjectConfig> otherGroupedObjects = state.m_MeasuringStars.Where(x => x.GroupId == m_GroupId && x != selectedObject).ToList();
 				if (otherGroupedObjects.Count == 1)
 				{
 					ObjectToAdd2 = otherGroupedObjects[0];
 					m_ObjectId2 = state.m_MeasuringStars.IndexOf(ObjectToAdd2);
-				}
+				}				
 			}
-			else ObjectToAdd2 = null;
+			else 
+			{ 
+				ObjectToAdd2 = null;
+				m_GroupId = objectId;
+			}
 
 			Initialise();
 		}
@@ -689,7 +697,7 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 			ObjectToAdd.ApertureStartingX = m_X0Center;
 			ObjectToAdd.ApertureStartingY = m_Y0Center;
 
-			ObjectToAdd.ProcessInGroup = false;
+			ObjectToAdd.GroupId = -1;
 
 			if (rbOcculted.Checked)
 			{
@@ -733,7 +741,7 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 			ObjectToAdd.ApertureStartingX = m_X1Center;
 			ObjectToAdd.ApertureStartingY = m_Y1Center;
 
-		    ObjectToAdd.ProcessInGroup = true;
+		    ObjectToAdd.GroupId = m_GroupId;
 
 			if (rbOcculted.Checked && rbOccElc1.Checked)
 			{
@@ -766,7 +774,7 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 			ObjectToAdd2.OriginalFieldCenterX = m_Center.X;
 			ObjectToAdd2.OriginalFieldCenterY = m_Center.Y;
 
-			ObjectToAdd2.ProcessInGroup = true;
+			ObjectToAdd2.GroupId = m_GroupId;
 
 			ObjectToAdd2.IsWeakSignalObject = false;
 

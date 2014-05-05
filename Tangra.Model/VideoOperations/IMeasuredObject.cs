@@ -48,5 +48,6 @@ namespace Tangra.Model.VideoOperations
 		bool IsOccultedStar { get; }
 		bool MayHaveDisappeared { get; }
 		int PsfFittingMatrixSize { get; }
+		int PsfGroupId { get; }
 	}
 }

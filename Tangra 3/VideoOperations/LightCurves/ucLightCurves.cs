@@ -80,8 +80,8 @@ namespace Tangra.VideoOperations.LightCurves
                     return "Background Mode";
                 case TangraConfig.BackgroundMethod.PSFBackground:
                     return "PSF Background";
-                case TangraConfig.BackgroundMethod.BackgroundGradientFit:
-                    return "Background Gradient Fit";
+                case TangraConfig.BackgroundMethod.Background3DPolynomial:
+                    return "3D-Polynomial Fit";
             }
 
             return "N/A";
@@ -541,7 +541,7 @@ namespace Tangra.VideoOperations.LightCurves
 
                     double minDist = 8 + (obj1.ApertureInPixels + obj2.ApertureInPixels) / 2;
 
-					if (dist <= minDist && !obj1.ProcessInGroup && !obj2.ProcessInGroup) return true;
+					if (dist <= minDist && !obj1.ProcessInPsfGroup && !obj2.ProcessInPsfGroup) return true;
                 }
             }
 

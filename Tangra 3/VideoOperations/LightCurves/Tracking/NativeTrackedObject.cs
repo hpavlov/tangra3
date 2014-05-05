@@ -19,6 +19,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
         public float RefinedIMAX;
 
 		private bool m_IsOccultedStar;
+		private int m_PsfGroupId;
 		private bool m_IsFullDisappearance;
 
         public List<double> m_RecentFWHMs = new List<double>();
@@ -29,6 +30,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             TargetNo = trackedObjectId;
             OriginalObject = originalObject;
 	        m_IsOccultedStar = OriginalObject.TrackingType == TrackingType.OccultedStar;
+			m_PsfGroupId = OriginalObject.GroupId;
 	        m_IsFullDisappearance = isFullDisappearance;
             m_NativePsfFit = new NativeTrackedObjectPsfFit(8);
         }
@@ -98,6 +100,11 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 		bool IMeasurableObject.IsOccultedStar
 		{
 			get { return m_IsOccultedStar; }
+		}
+
+		int IMeasurableObject.PsfGroupId
+		{
+			get { return m_PsfGroupId; }
 		}
 
 		bool IMeasurableObject.MayHaveDisappeared

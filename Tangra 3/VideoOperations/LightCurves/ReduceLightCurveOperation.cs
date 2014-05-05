@@ -1658,7 +1658,8 @@ namespace Tangra.VideoOperations.LightCurves
 						//(float) aperture,
 													null,
 						/* but we want to use the actual measurement fit. This only matters for reviewing the light curve when not opened from a file. */
-													data /* save the original non filtered data */, 0, 0, m_OCRedTimeStamp));
+													data /* save the original non filtered data */, 0, 0, m_OCRedTimeStamp,
+													trackedObject.OriginalObject.GroupId));
 				}
             }
         }
@@ -1773,9 +1774,10 @@ namespace Tangra.VideoOperations.LightCurves
 
 		internal void FlushLightCurveFile()
 		{
-			List<int> matrixSizes = new List<int>();
-			List<float> apertures = new List<float>();
-			List<bool> fixedFlags = new List<bool>();
+			var matrixSizes = new List<int>();
+			var apertures = new List<float>();
+			var fixedFlags = new List<bool>();
+			var psfGroupIds = new List<int>();
 
 			m_Tracker.TrackedObjects.ForEach(
 				delegate(ITrackedObject o)
@@ -1783,6 +1785,7 @@ namespace Tangra.VideoOperations.LightCurves
 					matrixSizes.Add(o.OriginalObject.PsfFitMatrixSize);
 					apertures.Add(o.OriginalObject.ApertureInPixels);
 					fixedFlags.Add(o.OriginalObject.IsWeakSignalObject);
+					psfGroupIds.Add(o.OriginalObject.GroupId);
 				}
 			);
 
@@ -1808,7 +1811,7 @@ namespace Tangra.VideoOperations.LightCurves
 				measurementTimingType,
 				(int)LightCurveReductionContext.Instance.NoiseMethod,
 				(int)LightCurveReductionContext.Instance.DigitalFilter,
-				matrixSizes.ToArray(), apertures.ToArray(), fixedFlags.ToArray(), (float)m_Tracker.PositionTolerance);
+				matrixSizes.ToArray(), apertures.ToArray(), fixedFlags.ToArray(), psfGroupIds.ToArray(), (float)m_Tracker.PositionTolerance);
 
 			finalHeader.FirstTimedFrameTime = m_StartFrameTime;
 			finalHeader.SecondTimedFrameTime = m_EndFrameTime;

@@ -60,7 +60,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             }
 			else if (lightCurveReductionType == LightCurveReductionType.MutualEvent)
 			{
-				if (measuringStars.Any(x => x.ProcessInGroup))
+				if (measuringStars.Any(x => x.ProcessInPsfGroup))
 				{
 					usedTrackerType = "Mutual Event M";
 					return new MutualEventTracker(measuringStars, LightCurveReductionContext.Instance.FullDisappearance);

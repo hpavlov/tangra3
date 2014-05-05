@@ -33,11 +33,6 @@ namespace Tangra.VideoOperations.LightCurves
 
             ucStretching.Initialize(framePlayer.Video, framePlayer.CurrentFrameIndex);
 
-			#region Configure the Reduction Settings. The same must be done in the frmConfigureReprocessing and ucPhotometry
-			// Removes the Background Gradient
-			cbxBackgroundMethod.Items.RemoveAt(2);
-			#endregion
-
             SetComboboxIndexFromPhotometryReductionMethod(TangraConfig.Settings.LastUsed.ReductionType);
             cbxDigitalFilter.SelectedIndex = 0;
 			SetComboboxIndexFromBackgroundMethod(TangraConfig.Settings.Photometry.BackgroundMethodDefault);
@@ -84,15 +79,17 @@ namespace Tangra.VideoOperations.LightCurves
             }
         }
 
-        public TangraConfig.BackgroundMethod ComboboxIndexToBackgroundMethod()
+		public TangraConfig.BackgroundMethod ComboboxIndexToBackgroundMethod()
         {
             if (cbxBackgroundMethod.SelectedIndex == 0)
                 return TangraConfig.BackgroundMethod.AverageBackground;
             else if (cbxBackgroundMethod.SelectedIndex == 1)
                 return TangraConfig.BackgroundMethod.BackgroundMode;
             else if (cbxBackgroundMethod.SelectedIndex == 2)
-                return TangraConfig.BackgroundMethod.PSFBackground;
+                return TangraConfig.BackgroundMethod.Background3DPolynomial;
 			else if (cbxBackgroundMethod.SelectedIndex == 3)
+				return TangraConfig.BackgroundMethod.PSFBackground;
+			else if (cbxBackgroundMethod.SelectedIndex == 4)
 				return TangraConfig.BackgroundMethod.BackgroundMedian;
             else
                 return TangraConfig.BackgroundMethod.AverageBackground;
@@ -110,16 +107,16 @@ namespace Tangra.VideoOperations.LightCurves
 					cbxBackgroundMethod.SelectedIndex = 1;
 					break;
 
-				case TangraConfig.BackgroundMethod.BackgroundGradientFit:
-					cbxBackgroundMethod.SelectedIndex = -1;
-					break;
-
-				case TangraConfig.BackgroundMethod.PSFBackground:
+				case TangraConfig.BackgroundMethod.Background3DPolynomial:
 					cbxBackgroundMethod.SelectedIndex = 2;
 					break;
 
-				case TangraConfig.BackgroundMethod.BackgroundMedian:
+				case TangraConfig.BackgroundMethod.PSFBackground:
 					cbxBackgroundMethod.SelectedIndex = 3;
+					break;
+
+				case TangraConfig.BackgroundMethod.BackgroundMedian:
+					cbxBackgroundMethod.SelectedIndex = 4;
 		            break;
             }
         }
@@ -179,6 +176,43 @@ namespace Tangra.VideoOperations.LightCurves
 				else if (result == DialogResult.Yes)
 					LightCurveReductionContext.Instance.ReductionMethod = TangraConfig.PhotometryReductionMethod.AperturePhotometry;
 			}
+
+			// Analytical PSF quadrature limitations
+			if (ComboboxIndexToPhotometryReductionMethod() == TangraConfig.PhotometryReductionMethod.PsfPhotometry &&
+				TangraConfig.Settings.Photometry.PsfQuadrature == TangraConfig.PsfQuadrature.Analytical)
+			{
+				if (LightCurveReductionContext.Instance.NoiseMethod != TangraConfig.BackgroundMethod.PSFBackground &&
+				    LightCurveReductionContext.Instance.NoiseMethod != TangraConfig.BackgroundMethod.Background3DPolynomial)
+				{
+					DialogResult result = MessageBox.Show(
+						"Only 'PSF Background' and '3D-Polynomial Fit' can be used as background method when PSF photometry with analytical quadrature is used. Please choose one of those two background methods.",
+						"Error",
+						MessageBoxButtons.OK,
+						MessageBoxIcon.Error,
+						MessageBoxDefaultButton.Button1);
+
+					return;
+				}				
+			}
+
+			// TODO: Do a check for Mutual Events - if PSF Photometry + LP Filter is used
+			//
+			//if (LightCurveReductionContext.Instance.LightCurveReductionType == LightCurveReductionType.MutualEvent &&
+			//	LightCurveReductionContext.Instance.ReductionMethod != TangraConfig.PhotometryReductionMethod.AperturePhotometry)
+			//{
+			//	DialogResult result = MessageBox.Show(
+			//		"Your selected photometry method does not work well with full disappearances. It is recommended to use Aperture Photometry instead. Do you want to use Aperture Photometry for this reduction?",
+			//		"Warning",
+			//		MessageBoxButtons.YesNoCancel,
+			//		MessageBoxIcon.Warning,
+			//		MessageBoxDefaultButton.Button1);
+
+			//	if (result == DialogResult.Cancel)
+			//		return;
+			//	else if (result == DialogResult.Yes)
+			//		LightCurveReductionContext.Instance.ReductionMethod = TangraConfig.PhotometryReductionMethod.AperturePhotometry;
+			//}
+
 
 			LightCurveReductionContext.Instance.SaveTrackingSession = false;			
 
@@ -293,22 +327,6 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void cbxReductionType_SelectedIndexChanged(object sender, EventArgs e)
         {
-			// No background selection when doing Analytical PSF quadrature
-	        if (ComboboxIndexToPhotometryReductionMethod() == TangraConfig.PhotometryReductionMethod.PsfPhotometry &&
-	            TangraConfig.Settings.Photometry.PsfQuadrature == TangraConfig.PsfQuadrature.Analytical)
-	        {
-		        // Forcing a PSF Background when Analytical Psf Quadrature is used
-		        SetComboboxIndexFromBackgroundMethod(TangraConfig.BackgroundMethod.PSFBackground);
-		        cbxBackgroundMethod.Enabled = false;
-		        lblAnalyticalPsfInfo.Visible = true;
-	        }
-	        else
-	        {
-		        cbxBackgroundMethod.Enabled = true;
-				lblAnalyticalPsfInfo.Visible = false;
-	        }
-
-
 	        if (rbUntrackedMeasurement.Checked)
             {
                 if (cbxReductionType.SelectedIndex != 0)

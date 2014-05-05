@@ -199,39 +199,25 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			foreach (ITrackedObject obj in m_TrackedObjects)
 				obj.LastKnownGoodPosition = new ImagePixel(obj.OriginalObject.ApertureStartingX, obj.OriginalObject.ApertureStartingY);
 
-			foreach (ITrackedObject nonGroupedObject in m_TrackedObjects.Where(x => !x.OriginalObject.ProcessInGroup))
+			foreach (ITrackedObject nonGroupedObject in m_TrackedObjects.Where(x => !x.OriginalObject.ProcessInPsfGroup))
 			{
 				m_TrackedObjectGroups.Add(new TrackedObjectGroup(new ITrackedObject[] { nonGroupedObject }, isFullDisappearance));
 			}
 
-			List<ITrackedObject> groupedObjects = m_TrackedObjects.Where(x => x.OriginalObject.ProcessInGroup).ToList();
+			List<ITrackedObject> groupedObjects = m_TrackedObjects.Where(x => x.OriginalObject.ProcessInPsfGroup).ToList();
 
 			if (groupedObjects.Count%2 != 0) 
 				throw new MutualEventTrackerException("Odd number of grouped objects is not currently supported.");
 
-			for (int i = groupedObjects.Count - 1; i >= 0; i-=2)
+			int[] groupIds = groupedObjects
+				.Select(x => x.OriginalObject.GroupId)
+				.Distinct()
+				.ToArray();
+
+			foreach (int groupId in groupIds)
 			{
-				ITrackedObject obj1 = groupedObjects[i];
-				ITrackedObject obj2 = null;
-				double minDist = double.MaxValue;
-
-				for (int j = groupedObjects.Count - 2; j >= 0; j--)
-				{
-					ITrackedObject obj = groupedObjects[j];
-					double dist = ImagePixel.ComputeDistance(
-						obj1.OriginalObject.ApertureStartingX, obj.OriginalObject.ApertureStartingX,
-						obj1.OriginalObject.ApertureStartingY, obj.OriginalObject.ApertureStartingY);
-					
-					if (minDist > dist)
-					{
-						obj2 = obj;
-						minDist = dist;
-					}
-				}
-
-				m_TrackedObjectGroups.Add(new TrackedObjectGroup(new ITrackedObject[] { obj1, obj2 }, isFullDisappearance));
-				groupedObjects.Remove(obj1);
-				groupedObjects.Remove(obj2);
+				ITrackedObject[] objectsInGroup = groupedObjects.Where(x => x.OriginalObject.GroupId == groupId).ToArray();
+				m_TrackedObjectGroups.Add(new TrackedObjectGroup(objectsInGroup, isFullDisappearance));
 			}
 
 			// TODO: Also pass the settings for background 3D-Polynomial fitting

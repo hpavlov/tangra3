@@ -34,9 +34,15 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 		public float PositionTolerance { get; set; }
 		public bool IsWeakSignalObject { get; set; }
 		public bool IsFixedAperture { get; set; }
-		public bool ProcessInGroup { get; set; }
 
-        public float ApertureMatrixX0;
+		public bool ProcessInPsfGroup
+		{
+			get { return GroupId > -1; }
+		}
+
+		public int GroupId { get; set; }
+
+		public float ApertureMatrixX0;
         public float ApertureMatrixY0;
         public float ApertureDX;
         public float ApertureDY;
@@ -75,6 +81,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 		public TrackedObjectConfig()
 		{
 			RefinedFWHM = float.NaN;
+			GroupId = -1;
 		}
 
         private static byte VERSION = 4;
@@ -112,8 +119,8 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			fileWriter.Write(IsFixedAperture);
 
 			// Save Version 4 data
-			fileWriter.Write(ProcessInGroup);			
-        }
+			fileWriter.Write(GroupId);
+		}
 
         internal static TrackedObjectConfig Load(BinaryReader reader)
         {
@@ -160,7 +167,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 						if (version > 3)
 						{
-							instance.ProcessInGroup = reader.ReadBoolean();
+							instance.GroupId = reader.ReadInt32();
 						}						
 					}
                 }

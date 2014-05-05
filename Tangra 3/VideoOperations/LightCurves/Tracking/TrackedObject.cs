@@ -262,6 +262,8 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 		public bool IsOccultedStar { get; protected set; }
 
+		public int PsfGroupId { get; protected set; }
+
 		public int PsfFitMatrixSize { get; protected set; }
 
 		[XmlIgnore]
@@ -280,6 +282,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 			ApertureArea = Math.PI * originalObject.ApertureInPixels * originalObject.ApertureInPixels;
 			IsOccultedStar = OriginalObject.TrackingType == TrackingType.OccultedStar;
+			PsfGroupId = OriginalObject.GroupId;
 			PsfFitMatrixSize = OriginalObject.PsfFitMatrixSize;
 		}
 
@@ -291,6 +294,11 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 		bool IMeasurableObject.IsOccultedStar
 		{
 			get { return IsOccultedStar; }
+		}
+
+		int IMeasurableObject.PsfGroupId
+		{
+			get { return PsfGroupId; }
 		}
 
 		bool IMeasurableObject.MayHaveDisappeared

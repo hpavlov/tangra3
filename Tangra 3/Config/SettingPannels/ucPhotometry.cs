@@ -25,12 +25,6 @@ namespace Tangra.Config.SettingPannels
 			nudPhotoAperture.SetNUDValue((decimal)TangraConfig.Settings.Photometry.DefaultSignalAperture);
 			cbxPhotoSignalApertureType.SetCBXIndex((int)TangraConfig.Settings.Photometry.SignalApertureUnitDefault);
 
-			#region Configure the Reduction Settings. The same must be done in the frmConfigureReprocessing and frmSelectReductionType
-			// Removes the Background Gradient
-			if (cbxBackgroundMethod.Items.Count == 5)
-				cbxBackgroundMethod.Items.RemoveAt(2);
-			#endregion
-
 			SetComboboxIndexFromBackgroundMethod(TangraConfig.Settings.Photometry.BackgroundMethodDefault);
 			nudInnerAnulusInApertures.SetNUDValue((decimal)TangraConfig.Settings.Photometry.AnulusInnerRadius);
 			nudMinimumAnulusPixels.SetNUDValue((int)TangraConfig.Settings.Photometry.AnulusMinPixels);
@@ -62,8 +56,10 @@ namespace Tangra.Config.SettingPannels
 			else if (cbxBackgroundMethod.SelectedIndex == 1)
 				return TangraConfig.BackgroundMethod.BackgroundMode;
 			else if (cbxBackgroundMethod.SelectedIndex == 2)
-				return TangraConfig.BackgroundMethod.PSFBackground;
+				return TangraConfig.BackgroundMethod.Background3DPolynomial;
 			else if (cbxBackgroundMethod.SelectedIndex == 3)
+				return TangraConfig.BackgroundMethod.PSFBackground;
+			else if (cbxBackgroundMethod.SelectedIndex == 4)
 				return TangraConfig.BackgroundMethod.BackgroundMedian;
 			else
 				return TangraConfig.BackgroundMethod.AverageBackground;
@@ -81,16 +77,16 @@ namespace Tangra.Config.SettingPannels
 					cbxBackgroundMethod.SelectedIndex = 1;
 					break;
 
-				case TangraConfig.BackgroundMethod.BackgroundGradientFit:
-					cbxBackgroundMethod.SelectedIndex = -1;
-					break;
-
-				case TangraConfig.BackgroundMethod.PSFBackground:
+				case TangraConfig.BackgroundMethod.Background3DPolynomial:
 					cbxBackgroundMethod.SelectedIndex = 2;
 					break;
 
-				case TangraConfig.BackgroundMethod.BackgroundMedian:
+				case TangraConfig.BackgroundMethod.PSFBackground:
 					cbxBackgroundMethod.SelectedIndex = 3;
+					break;
+
+				case TangraConfig.BackgroundMethod.BackgroundMedian:
+					cbxBackgroundMethod.SelectedIndex = 4;
 					break;
 			}
 		}

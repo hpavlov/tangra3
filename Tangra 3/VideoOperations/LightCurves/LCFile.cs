@@ -182,7 +182,8 @@ namespace Tangra.VideoOperations.LightCurves
 
                                     for (int i = 0; i < totalObjects; i++)
                                     {
-                                        measurement = new LCMeasurement(reader, prevMeasurement);
+	                                    ;
+										measurement = new LCMeasurement(reader, prevMeasurement, lcFile.Header.PsfGroupIds[i]);
                                         prevMeasurement = measurement;
 
                                         if (lastFrameNo != (int)measurement.CurrFrameNo)
@@ -260,7 +261,7 @@ namespace Tangra.VideoOperations.LightCurves
 
             LCMeasurementHeader header = new LCMeasurementHeader(
                 pathToVideoFile, sourceInfo , - 1, 0, 0, 0, 0, 0, 0, numberOfTargets, LightCurveReductionType.UntrackedMeasurement, MeasurementTimingType.UserEnteredFrameReferences,   0, 0,
-                EmptyArray<int>(numberOfTargets), EmptyArray<float>(numberOfTargets), EmptyArray<bool>(numberOfTargets), positionTolerance);
+                EmptyArray<int>(numberOfTargets), EmptyArray<float>(numberOfTargets), EmptyArray<bool>(numberOfTargets), EmptyArray<int>(numberOfTargets), positionTolerance);
 
             s_NumMeasurements[0] = 0; s_NumMeasurements[1] = 0; s_NumMeasurements[2] = 0; s_NumMeasurements[3] = 0;
 
@@ -750,6 +751,8 @@ namespace Tangra.VideoOperations.LightCurves
         private static int MINAMAL_SUPPORTED_VERSION = 3;
     	private static int FIRST_UINT_MATRIX_VERSION = 7;
 
+		public int PsfGroupId;
+
         internal LCMeasurement(
             uint currFrameNo,
             byte targetNo,
@@ -760,7 +763,8 @@ namespace Tangra.VideoOperations.LightCurves
             PSFFit psfFit,
             uint[,] pixelData,
             int pixelDataX0, int pixelDataY0,
-            DateTime osdTimeStamp)
+            DateTime osdTimeStamp,
+			int groupId)
         {
             AdjustedReading = 0;
             AdjustedBackground = 0;
@@ -784,9 +788,10 @@ namespace Tangra.VideoOperations.LightCurves
             OSDTimeStamp = osdTimeStamp;
 
             ReProcessingPsfFitMatrixSize = 11;
+			PsfGroupId = groupId;
         }
 
-        internal LCMeasurement(BinaryReader reader, LCMeasurement prevMeasurement)
+		internal LCMeasurement(BinaryReader reader, LCMeasurement prevMeasurement, int groupId)
         {
             AdjustedReading = 0;
             AdjustedBackground = 0;
@@ -838,6 +843,7 @@ namespace Tangra.VideoOperations.LightCurves
             }
 
             ReProcessingPsfFitMatrixSize = 11;
+			PsfGroupId = groupId;
         }
 
         internal void WriteTo(BinaryWriter writer)
@@ -872,9 +878,14 @@ namespace Tangra.VideoOperations.LightCurves
 		{
 			get
 			{
-				// We don't know this (don't have a guess) when re-processing data
+				// We don't know this (don't need to know it) when re-processing data
 				return false;
 			}
+		}
+
+		int IMeasurableObject.PsfGroupId
+		{
+			get { return PsfGroupId; }
 		}
 
 		bool IMeasurableObject.MayHaveDisappeared
@@ -1428,10 +1439,11 @@ namespace Tangra.VideoOperations.LightCurves
         internal int[] PsfFitMatrixSizes;
         internal float[] MeasurementApertures;
         internal bool[] FixedApertureFlags;
+	    internal int[] PsfGroupIds;
 
         internal LightCurveReductionType ReductionType;
 
-        private static int SERIALIZATION_VERSION = 3;
+        private static int SERIALIZATION_VERSION = 4;
 
         internal LCMeasurementHeader(
             string pathToVideoFile, string sourceInfo,
@@ -1439,7 +1451,7 @@ namespace Tangra.VideoOperations.LightCurves
             uint minFrame, uint maxFrame,
             uint measuredFrames, uint measurementInterval, byte objectCount,
 			LightCurveReductionType reductionType, MeasurementTimingType timingType, int backgroundType, int filterType,
-            int[] psfFitMatrixSizes, float[] measurementApertures, bool[] fixedApertureFlags, float positionTolerance)
+            int[] psfFitMatrixSizes, float[] measurementApertures, bool[] fixedApertureFlags, int[] psfGroupIds, float positionTolerance)
         {
             m_FramesPerSecond = 25;
             m_FrameExposureInMS = 40;
@@ -1489,6 +1501,8 @@ namespace Tangra.VideoOperations.LightCurves
 			TimingType = timingType;
 			LcFile = null;
 
+			PsfGroupIds = psfGroupIds;
+
             FramesPerSecond = framesPerSecond;
         }
 
@@ -1523,6 +1537,7 @@ namespace Tangra.VideoOperations.LightCurves
             PsfFitMatrixSizes = new int[ObjectCount];
             MeasurementApertures = new float[ObjectCount];
             FixedApertureFlags = new bool[ObjectCount];
+			PsfGroupIds = new int[ObjectCount];
 
             for (int i = 0; i < ObjectCount; i++)
             {
@@ -1546,6 +1561,13 @@ namespace Tangra.VideoOperations.LightCurves
 				{
 					TimingType = (MeasurementTimingType)reader.ReadByte();
 
+					if (version > 3)
+					{
+						for (int i = 0; i < ObjectCount; i++)
+						{
+							PsfGroupIds[i] = reader.ReadInt32();
+						}
+					}
 				}
 				else
 				{
@@ -1607,6 +1629,12 @@ namespace Tangra.VideoOperations.LightCurves
 
 			// VERSION 3 Data
 			writer.Write(((byte)TimingType));
+
+			// VERSION 4 Data
+	        for (int i = 0; i < ObjectCount; i++)
+	        {
+				writer.Write(PsfGroupIds[i]);
+	        }
         }
     }
 

@@ -289,7 +289,7 @@ namespace Tangra.Model.Config
 		{
 			AverageBackground = 0,
 			BackgroundMode = 1,
-			BackgroundGradientFit = 2,
+			Background3DPolynomial = 2,
 			PSFBackground = 3,
 			BackgroundMedian = 4
 		}

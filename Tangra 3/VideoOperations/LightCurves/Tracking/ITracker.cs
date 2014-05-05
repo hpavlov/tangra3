@@ -50,7 +50,8 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 		ImagePixel AsImagePixel { get; }
 		float PositionTolerance { get; }
 		bool IsCloseToOtherStars { get; }
-		bool ProcessInGroup { get; }
+		bool ProcessInPsfGroup { get; }
+		int GroupId { get; }
 		PSFFit Gaussian { get; }
 	}
 

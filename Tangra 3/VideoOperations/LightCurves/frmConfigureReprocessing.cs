@@ -46,11 +46,6 @@ namespace Tangra.VideoOperations.LightCurves
             m_AllBrushes = allBrushes;
             m_AllPens = allPens;
 
-			#region Configure the Reduction Settings. The same must be done in the frmSelectReductionType and ucPhotometry
-			// Removes the Background Gradient
-			cbxBackgroundMethod.Items.RemoveAt(2);
-			#endregion
-
         	SetComboboxIndexFromBackgroundMethod(m_Context.BackgroundMethod);
 			SetComboboxIndexFromPhotometryReductionMethod(m_Context.SignalMethod);
 	        SetComboboxIndexFromPsfQuadratureMethod(m_Context.PsfQuadratureMethod);
@@ -574,13 +569,15 @@ namespace Tangra.VideoOperations.LightCurves
 			if (cbxBackgroundMethod.SelectedIndex == 0)
 				return TangraConfig.BackgroundMethod.AverageBackground;
 			else if (cbxBackgroundMethod.SelectedIndex == 1)
-                return TangraConfig.BackgroundMethod.BackgroundMode;
+				return TangraConfig.BackgroundMethod.BackgroundMode;
 			else if (cbxBackgroundMethod.SelectedIndex == 2)
-                return TangraConfig.BackgroundMethod.PSFBackground;
+				return TangraConfig.BackgroundMethod.Background3DPolynomial;
 			else if (cbxBackgroundMethod.SelectedIndex == 3)
-                return TangraConfig.BackgroundMethod.BackgroundMedian;
+				return TangraConfig.BackgroundMethod.PSFBackground;
+			else if (cbxBackgroundMethod.SelectedIndex == 4)
+				return TangraConfig.BackgroundMethod.BackgroundMedian;
 			else
-                return TangraConfig.BackgroundMethod.AverageBackground;
+				return TangraConfig.BackgroundMethod.AverageBackground;
 		}
 
 		public void SetComboboxIndexFromBackgroundMethod(TangraConfig.BackgroundMethod method)
@@ -595,16 +592,16 @@ namespace Tangra.VideoOperations.LightCurves
 					cbxBackgroundMethod.SelectedIndex = 1;
 					break;
 
-                case TangraConfig.BackgroundMethod.BackgroundGradientFit:
-					cbxBackgroundMethod.SelectedIndex = -1;
-					break;
-
-                case TangraConfig.BackgroundMethod.PSFBackground:
+                case TangraConfig.BackgroundMethod.Background3DPolynomial:
 					cbxBackgroundMethod.SelectedIndex = 2;
 					break;
 
-                case TangraConfig.BackgroundMethod.BackgroundMedian:
+                case TangraConfig.BackgroundMethod.PSFBackground:
 					cbxBackgroundMethod.SelectedIndex = 3;
+					break;
+
+                case TangraConfig.BackgroundMethod.BackgroundMedian:
+					cbxBackgroundMethod.SelectedIndex = 4;
 					break;
 			}
 		}
