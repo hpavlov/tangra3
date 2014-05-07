@@ -65,7 +65,10 @@ namespace Tangra
         private string GetErrorReport()
         {
             return "Tangra 3 Error Report\r\n\r\n" +
-                    m_Error.ToString() + "\r\n\r\nUser Comments:\r\n" + tbxUserComments.Text + "\r\n\r\n" + GetExtendedTangraInfo();
+                    m_Error.ToString() + "\r\n\r\nUser Comments:\r\n" +
+					"User Email: " + (tbxEmailAddress.Text.Trim().Length == 0 ? "[UNSPECIFIED]" : tbxEmailAddress.Text) + "\r\n\r\n" + 
+					tbxUserComments.Text + "\r\n\r\n" + 
+					GetExtendedTangraInfo();
         }
 
         private string GetExtendedTangraInfo()
