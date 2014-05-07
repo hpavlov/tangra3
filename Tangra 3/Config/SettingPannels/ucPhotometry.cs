@@ -33,6 +33,10 @@ namespace Tangra.Config.SettingPannels
 			nudUserSpecifiedFWHM.SetNUDValue((int)TangraConfig.Settings.Photometry.UserSpecifiedFWHM);
             rbSeeingUser.Checked = TangraConfig.Settings.Photometry.UseUserSpecifiedFWHM;
 			nudSNFrameWindow.SetNUDValue(TangraConfig.Settings.Photometry.SNFrameWindow);
+
+			cbxBgFirstOrder.Checked = TangraConfig.Settings.Photometry.Background3DPoly.Try1stOrder;
+			cbxBgSecondOrder.Checked = TangraConfig.Settings.Photometry.Background3DPoly.Try2ndOrder;
+			cbxBgThirdOrder.Checked = TangraConfig.Settings.Photometry.Background3DPoly.Try3rdOrder;
         }
 
         public override void SaveSettings()
@@ -47,7 +51,30 @@ namespace Tangra.Config.SettingPannels
 			TangraConfig.Settings.Photometry.UserSpecifiedFWHM = (float)nudUserSpecifiedFWHM.Value;
             TangraConfig.Settings.Photometry.UseUserSpecifiedFWHM = rbSeeingUser.Checked;
 			TangraConfig.Settings.Photometry.SNFrameWindow = (int)nudSNFrameWindow.Value;
+
+			TangraConfig.Settings.Photometry.Background3DPoly.Try1stOrder = cbxBgFirstOrder.Checked;
+			TangraConfig.Settings.Photometry.Background3DPoly.Try2ndOrder = cbxBgSecondOrder.Checked;
+			TangraConfig.Settings.Photometry.Background3DPoly.Try3rdOrder = cbxBgThirdOrder.Checked;
         }
+
+		public override bool ValidateSettings()
+		{
+			if (!cbxBgFirstOrder.Checked &&
+			    !cbxBgSecondOrder.Checked &&
+			    !cbxBgThirdOrder.Checked)
+			{
+				MessageBox.Show(
+					this.ParentForm, 
+					"At least one of the 3D Polynomial fitting options should be selected.", 
+					"Validation Error", 
+					MessageBoxButtons.OK, 
+					MessageBoxIcon.Error);
+
+				return false;
+			}
+
+			return true;
+		}
 
 		public TangraConfig.BackgroundMethod ComboboxIndexToBackgroundMethod()
 		{
@@ -95,5 +122,10 @@ namespace Tangra.Config.SettingPannels
         {
             pnlUserSeeing.Enabled = rbSeeingUser.Checked;
         }
+
+		private void cbxPsfFittingMethod_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			pnlSeeingSettings.Visible = cbxPsfFittingMethod.SelectedIndex == (int)TangraConfig.PsfFittingMethod.LinearFitOfAveragedModel;
+		}
 	}
 }

@@ -91,6 +91,8 @@ namespace Tangra.Model.Astro
 
         private float m_ModelFWHM;
 
+		private IBackgroundModelProvider m_BackgroundModel;
+
 		public static PSFFittingDataRange DataRange = PSFFittingDataRange.DataRange8Bit;
 
 		public static uint NormVal = 255;
@@ -155,6 +157,10 @@ namespace Tangra.Model.Astro
             get { return m_yCenter + m_Y0 - m_HalfWidth; }
         }
 
+		public bool UsesBackgroundModel
+		{
+			get { return m_BackgroundModel != null; }
+		}
 
         public int MatrixSize
         {
@@ -342,9 +348,15 @@ namespace Tangra.Model.Astro
             }
         }
 
-
 		public void Fit(uint[,] intensity, int newMatrixSize)
-        {
+		{
+			Fit(intensity, null, newMatrixSize);
+		}
+
+		public void Fit(uint[,] intensity, IBackgroundModelProvider backgroundModel, int newMatrixSize)
+		{
+			m_BackgroundModel = backgroundModel;
+
             if (newMatrixSize != 17)
             {
 				uint[,] newData = new uint[newMatrixSize, newMatrixSize];
@@ -366,7 +378,7 @@ namespace Tangra.Model.Astro
             }
             else
                 Fit(intensity);
-        }
+		}
 
 #if WIN32
 		public void Fit(uint[,] intensity)
@@ -458,7 +470,10 @@ namespace Tangra.Model.Astro
 			{
 				for (int x = 0; x < intensity.GetLength(0); x++)
 				{
-					intensityLine[x + y*intensity.GetLength(1)] = intensity[x, y];
+					if (m_BackgroundModel != null)
+						intensityLine[x + y*intensity.GetLength(1)] = (uint)Math.Round(intensity[x, y] - m_BackgroundModel.ComputeValue(x, y));
+					else
+						intensityLine[x + y*intensity.GetLength(1)] = intensity[x, y];
 				}
 			}
 
@@ -569,7 +584,8 @@ namespace Tangra.Model.Astro
                     {
                         for (int j = 0; j < full_width; j++)
                         {
-							uint zval = intensity[i, j];
+							double zval = intensity[i, j];
+							if (m_BackgroundModel != null) zval -= m_BackgroundModel.ComputeValue(i, j);
 
                             if (zval < m_Saturation)
                             {
@@ -577,7 +593,7 @@ namespace Tangra.Model.Astro
 
                                 double exp_val = fx[i]*fy[j];
 
-                                double residual = IBackground + IStarMax*exp_val - (double) zval;
+                                double residual = IBackground + IStarMax*exp_val - zval;
                                 X[index, 0] = -residual;
 
                                 A[index, 0] = 1.0; /* slope in i0 */
@@ -776,7 +792,8 @@ namespace Tangra.Model.Astro
 					{
 						for (int j = 0; j < full_width; j++)
 						{
-							uint zval = intensity[i, j];
+							double zval = intensity[i, j];
+							if (m_BackgroundModel != null) zval -= m_BackgroundModel.ComputeValue(i, j);
 
 							if (zval < m_Saturation)
 							{

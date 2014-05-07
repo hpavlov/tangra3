@@ -235,6 +235,7 @@ namespace Tangra.VideoOperations.LightCurves
 				objConfig.RefinedFWHM,
 				Footer.RefinedAverageFWHM,
 				clonedValue,
+				null,
 				Footer.ReductionContext.FullDisappearance);
 
 			clonedValue.SetIsMeasured(rv);

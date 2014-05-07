@@ -43,6 +43,17 @@ namespace Tangra.Model.Astro
 
 		private double[,] m_Residuals;
 
+		public PSFFittingMethod FittingMethod;
+
+		private float m_ModelFWHM;
+
+		private IBackgroundModelProvider m_BackgroundModel;
+
+		public void SetAveragedModelFWHM(float modelFWHM)
+		{
+			m_ModelFWHM = modelFWHM;
+		}
+
 		public DoublePSFFit(int x0, int y0)
 		{
 			m_xCenter = x0;
@@ -51,11 +62,30 @@ namespace Tangra.Model.Astro
 
 		public void Fit(uint[,] intensity, int x1start, int y1start, int x2start, int y2start)
 		{
-			Fit(intensity, x1start, y1start, x2start, y2start, TangraConfig.Settings.Tuning.PsfMode == TangraConfig.PSFFittingMode.NativeMatrixManagedFitting);
+			Fit(intensity, null, x1start, y1start, x2start, y2start);
+		}
+
+		public void Fit(uint[,] intensity, IBackgroundModelProvider backgroundModel, int x1start, int y1start, int x2start, int y2start)
+		{
+			m_BackgroundModel = backgroundModel;
+			try
+			{
+				if (FittingMethod == PSFFittingMethod.NonLinearFit)
+					NonLinearFit(intensity, x1start, y1start, x2start, y2start, TangraConfig.Settings.Tuning.PsfMode == TangraConfig.PSFFittingMode.NativeMatrixManagedFitting);
+				else if (FittingMethod == PSFFittingMethod.NonLinearAsymetricFit)
+					throw new NotSupportedException();
+				else if (FittingMethod == PSFFittingMethod.LinearFitOfAveragedModel)
+					LinearFitOfAveragedModel(intensity, x1start, y1start, x2start, y2start, TangraConfig.Settings.Tuning.PsfMode == TangraConfig.PSFFittingMode.NativeMatrixManagedFitting);
+			}
+			catch (Exception)
+			{
+				// singular matrix, etc
+				m_IsSolved = false;
+			}	
 		}
 
 		// I(x, y) = IBackground + IStarMax1 * Exp ( -((x - X1)*(x - X1) + (y - Y1)*(y - Y1)) / (r1 * r1)) + IStarMax2 * Exp ( -((x - X2)*(x - X2) + (y - Y2)*(y - Y2)) / (r2 * r2))
-		private void Fit(uint[,] intensity, int x1start, int y1start, int x2start, int y2start, bool useNativeMatrix)
+		private void NonLinearFit(uint[,] intensity, int x1start, int y1start, int x2start, int y2start, bool useNativeMatrix)
 		{
 			m_IsSolved = false;
 
@@ -156,7 +186,9 @@ namespace Tangra.Model.Astro
 					{
 						for (int j = 0; j < full_width; j++)
 						{
-							uint zval = intensity[i, j];
+							double zval = intensity[i, j];
+
+							if (m_BackgroundModel != null) zval -= m_BackgroundModel.ComputeValue(i, j);
 
 							if (zval < m_Saturation)
 							{
@@ -165,7 +197,7 @@ namespace Tangra.Model.Astro
 								double exp_val1 = fx1[i] * fy1[j];
 								double exp_val2 = fx2[i] * fy2[j];
 
-								double residual = IBackground + IStarMax1 * exp_val1 + IStarMax2 * exp_val2 - (double)zval;
+								double residual = IBackground + IStarMax1 * exp_val1 + IStarMax2 * exp_val2 - zval;
 								X[index, 0] = -residual;
 
 								A[index, 0] = 1.0; /* slope in i0 */
@@ -218,8 +250,8 @@ namespace Tangra.Model.Astro
 
 						r1 += Y[7, 0];
 
-						if (Y[8, 0] > r1 / 10.0) Y[8, 0] = r1 / 10.0;
-						if (Y[8, 0] < -r1 / 10.0) Y[8, 0] = -r1 / 10.0;
+						if (Y[8, 0] > r2 / 10.0) Y[8, 0] = r2 / 10.0;
+						if (Y[8, 0] < -r2 / 10.0) Y[8, 0] = -r2 / 10.0;
 
 						r2 += Y[8, 0];
 					}
@@ -269,6 +301,216 @@ namespace Tangra.Model.Astro
 			{ }
 		}
 
+		// I(x, y) = IBackground + IStarMax1 * Exp ( -((x - X1)*(x - X1) + (y - Y1)*(y - Y1)) / (r * r)) + IStarMax2 * Exp ( -((x - X2)*(x - X2) + (y - Y2)*(y - Y2)) / (r * r))
+		private void LinearFitOfAveragedModel(uint[,] intensity, int x1start, int y1start, int x2start, int y2start, bool useNativeMatrix)
+		{
+			m_IsSolved = false;
+
+			try
+			{
+				int full_width = (int)Math.Round(Math.Sqrt(intensity.Length));
+
+				m_MatrixSize = full_width;
+
+				int half_width = full_width / 2;
+
+				m_HalfWidth = half_width;
+
+				switch (PSFFit.DataRange)
+				{
+					case PSFFittingDataRange.DataRange8Bit:
+						m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation8Bit;
+						break;
+
+					case PSFFittingDataRange.DataRange12Bit:
+						m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation12Bit;
+						break;
+
+					case PSFFittingDataRange.DataRange14Bit:
+						m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation14Bit;
+						break;
+
+					case PSFFittingDataRange.DataRange16Bit:
+						m_Saturation = (uint)(TangraConfig.Settings.Photometry.Saturation.Saturation8Bit * PSFFit.NormVal / 255.0);
+						break;
+
+					default:
+						m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation8Bit;
+						break;
+				}
+
+				int nonSaturatedPixels = 0;
+
+				double IBackground = 0;
+				double r = 4.0;
+				double IStarMax1 = 0;
+				double IStarMax2 = 0;
+
+				double found_x1 = x1start;
+				double found_y1 = y1start;
+				double found_x2 = x2start;
+				double found_y2 = y2start;
+
+				for (int iter = NumberIterations; iter > 0; iter--)
+				{
+					if (iter == NumberIterations)
+					{
+						uint zval = 0;
+
+						IBackground = 0.0; /* assume no backgnd intensity at first... */
+						for (int i = 0; i < full_width; i++)
+						{
+							for (int j = 0; j < full_width; j++)
+							{
+								if (intensity[i, j] > zval) zval = intensity[i, j];
+								if (intensity[i, j] < m_Saturation) nonSaturatedPixels++;
+							}
+						}
+						IStarMax1 = (double)zval - IBackground;
+						IStarMax2 = IStarMax1;
+					}
+
+					double[] dx1 = new double[full_width];
+					double[] dy1 = new double[full_width];
+					double[] fx1 = new double[full_width];
+					double[] fy1 = new double[full_width];
+					double[] dx2 = new double[full_width];
+					double[] dy2 = new double[full_width];
+					double[] fx2 = new double[full_width];
+					double[] fy2 = new double[full_width];
+
+					double r_squared = r * r;
+
+					for (int i = 0; i < full_width; i++)
+					{
+						dx1[i] = (double)i - found_x1;
+						fx1[i] = Math.Exp(-dx1[i] * dx1[i] / r_squared);
+						dy1[i] = (double)i - found_y1;
+						fy1[i] = Math.Exp(-dy1[i] * dy1[i] / r_squared);
+						dx2[i] = (double)i - found_x2;
+						fx2[i] = Math.Exp(-dx2[i] * dx2[i] / r_squared);
+						dy2[i] = (double)i - found_y2;
+						fy2[i] = Math.Exp(-dy2[i] * dy2[i] / r_squared);
+					}
+
+					SafeMatrix A = new SafeMatrix(nonSaturatedPixels, 8);
+					SafeMatrix X = new SafeMatrix(nonSaturatedPixels, 1);
+
+					int index = -1;
+					for (int i = 0; i < full_width; i++)
+					{
+						for (int j = 0; j < full_width; j++)
+						{
+							double zval = intensity[i, j];
+
+							if (m_BackgroundModel != null) zval -= m_BackgroundModel.ComputeValue(i, j);
+
+							if (zval < m_Saturation)
+							{
+								index++;
+
+								double exp_val1 = fx1[i] * fy1[j];
+								double exp_val2 = fx2[i] * fy2[j];
+
+								double residual = IBackground + IStarMax1 * exp_val1 + IStarMax2 * exp_val2 - zval;
+								X[index, 0] = -residual;
+
+								A[index, 0] = 1.0; /* slope in i0 */
+								A[index, 1] = exp_val1;
+								A[index, 2] = exp_val2;
+								A[index, 3] = 2.0 * IStarMax1 * dx1[i] * exp_val1 / r_squared;
+								A[index, 4] = 2.0 * IStarMax1 * dy1[j] * exp_val1 / r_squared;
+								A[index, 5] = 2.0 * IStarMax2 * dx2[i] * exp_val2 / r_squared;
+								A[index, 6] = 2.0 * IStarMax2 * dy2[j] * exp_val2 / r_squared;
+								A[index, 7] = 2.0 * IStarMax1 * (dx1[i] * dx1[i] + dy1[j] * dy1[j]) * exp_val1 / (r * r_squared) +
+											  2.0 * IStarMax2 * (dx2[i] * dx2[i] + dy2[j] * dy2[j]) * exp_val2 / (r * r_squared);
+							}
+						}
+					}
+
+					SafeMatrix Y;
+
+					if (useNativeMatrix)
+					{
+						Y = TangraModelCore.SolveLinearSystemFast(A, X);
+					}
+					else
+					{
+						SafeMatrix a_T = A.Transpose();
+						SafeMatrix aa = a_T * A;
+						SafeMatrix aa_inv = aa.Inverse();
+						Y = (aa_inv * a_T) * X;
+					}
+
+					/* we need at least 9 unsaturated pixels to solve 8 params */
+					if (nonSaturatedPixels > 9) /* Request all pixels to be good! */
+					{
+						IBackground += Y[0, 0];
+						IStarMax1 += Y[1, 0];
+						IStarMax2 += Y[2, 0];
+
+						for (int i = 3; i < 7; i++)
+						{
+							if (Y[i, 0] > 1.0) Y[i, 0] = 1.0;
+							if (Y[i, 0] < -1.0) Y[i, 0] = -1.0;
+						}
+
+						found_x1 += Y[3, 0];
+						found_y1 += Y[4, 0];
+						found_x2 += Y[5, 0];
+						found_y2 += Y[6, 0];
+
+						if (Y[7, 0] > r / 10.0) Y[7, 0] = r / 10.0;
+						if (Y[7, 0] < -r / 10.0) Y[7, 0] = -r / 10.0;
+
+						r += Y[7, 0];
+					}
+					else
+					{
+						m_IsSolved = false;
+						return;
+					}
+				}
+
+				m_IsSolved = true;
+				m_IBackground = IBackground;
+				m_IStarMax1 = IStarMax1;
+				m_IStarMax2 = IStarMax2;
+				m_X1 = found_x1;
+				m_Y1 = found_y1;
+				m_R1 = r;
+				m_X2 = found_x2;
+				m_Y2 = found_y2;
+				m_R2 = r;
+
+				// NOTE: The brighter object becomes the object to be tracked/returned as main object
+				if (m_IStarMax1 > m_IStarMax2)
+				{
+					m_IStarMax = IStarMax1;
+					m_X0 = found_x1;
+					m_Y0 = found_y1;
+					m_R0 = r;
+				}
+				else
+				{
+					m_IStarMax = IStarMax2;
+					m_X0 = found_x2;
+					m_Y0 = found_y2;
+					m_R0 = r;
+				}
+
+				m_Residuals = new double[full_width, full_width];
+
+				for (int x = 0; x < full_width; x++)
+					for (int y = 0; y < full_width; y++)
+					{
+						m_Residuals[x, y] = intensity[x, y] - GetPSFValueInternal(x, y);
+					}
+			}
+			catch (DivideByZeroException)
+			{ }
+		}
+
 		private double GetPSFValueInternal(double x, double y)
 		{
 			// I(x, y) = IBackground + IStarMax1 * Exp ( -((x - X1)*(x - X1) + (y - Y1)*(y - Y1)) / (r1 * r1)) + IStarMax2 * Exp ( -((x - X2)*(x - X2) + (y - Y2)*(y - Y2)) / (r2 * r2))
@@ -285,6 +527,11 @@ namespace Tangra.Model.Astro
 		public void DrawDataPixels(System.Drawing.Graphics g, System.Drawing.Rectangle rect, int bpp, uint normVal)
 		{
 			throw new NotImplementedException();
+		}
+
+		public bool UsesBackgroundModel
+		{
+			get { return m_BackgroundModel != null; }
 		}
 
 		public int MatrixSize

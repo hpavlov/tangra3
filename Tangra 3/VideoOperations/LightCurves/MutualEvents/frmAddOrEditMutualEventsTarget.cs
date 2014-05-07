@@ -265,6 +265,8 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 		private bool IsGoodDoubleObjectFit(Tuple<int, int, uint> object1, Tuple<int, int, uint> object2)
 		{
 			var doubleFit = new DoublePSFFit(100, 100);
+			if (TangraConfig.Settings.Photometry.PsfFittingMethod == TangraConfig.PsfFittingMethod.LinearFitOfAveragedModel)
+				doubleFit.FittingMethod = PSFFittingMethod.LinearFitOfAveragedModel;
 			doubleFit.Fit(m_ProcessingPixels, object1.Item1, object1.Item2, object2.Item1, object2.Item2);
 	
 			if (doubleFit.IsSolved &&
@@ -573,6 +575,8 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 			}
 
 			var psfFit = new DoublePSFFit(m_Center.X, m_Center.Y);
+			if (TangraConfig.Settings.Photometry.PsfFittingMethod == TangraConfig.PsfFittingMethod.LinearFitOfAveragedModel)
+				psfFit.FittingMethod = PSFFittingMethod.LinearFitOfAveragedModel;
 			psfFit.Fit(m_ProcessingPixels, m_X1Start, m_Y1Start, m_X2Start, m_Y2Start);
 
 			if (psfFit.IsSolved)

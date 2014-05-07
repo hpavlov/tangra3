@@ -331,14 +331,24 @@ namespace Tangra.Model.Config
 			Analytical
 		}
 
+		public class Background3DPolynomialSettings
+		{
+			public bool Try1stOrder = true;
+			public bool Try2ndOrder = true;
+			public bool Try3rdOrder = true;
+		}
+
 		public class PhotometrySettings
 		{
 			public PhotometrySettings()
 			{
 				Saturation = new SaturationSettings();
+				Background3DPoly = new Background3DPolynomialSettings();
 			}
 
 			public SaturationSettings Saturation;
+
+			public Background3DPolynomialSettings Background3DPoly;
 
 			public float RememberedEncodingGammaNotForDirectUse = 1.0f;
 
@@ -351,6 +361,7 @@ namespace Tangra.Model.Config
 
 			public BackgroundMethod BackgroundMethodDefault = BackgroundMethod.BackgroundMedian;
 
+			
 			public PsfFittingMethod PsfFittingMethod = PsfFittingMethod.DirectNonLinearFit;
 			public PsfQuadrature PsfQuadrature = PsfQuadrature.NumericalInAperture;
 			public PsfFunction PsfFunction = PsfFunction.Gaussian;

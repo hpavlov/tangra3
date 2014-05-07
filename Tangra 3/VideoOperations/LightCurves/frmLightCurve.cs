@@ -180,6 +180,9 @@ namespace Tangra.VideoOperations.LightCurves
                 case TangraConfig.BackgroundMethod.BackgroundMedian:
                     return "Background Median";
 
+				case TangraConfig.BackgroundMethod.Background3DPolynomial:
+					return "3D-Poly Fit Background";
+
 				default:
 					return "???";
 			}

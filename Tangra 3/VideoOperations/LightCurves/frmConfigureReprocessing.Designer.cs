@@ -580,7 +580,7 @@
 			this.cbxBackgroundMethod.Items.AddRange(new object[] {
             "Average Background",
             "Background Mode",
-            "Background Gradient Fit",
+            "3D Polynomial Fit",
             "PSF-Fitting Background",
             "Median Background"});
 			this.cbxBackgroundMethod.Location = new System.Drawing.Point(9, 16);

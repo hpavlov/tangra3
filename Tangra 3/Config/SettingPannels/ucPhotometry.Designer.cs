@@ -105,6 +105,7 @@
 			this.cbxPsfFittingMethod.Name = "cbxPsfFittingMethod";
 			this.cbxPsfFittingMethod.Size = new System.Drawing.Size(185, 21);
 			this.cbxPsfFittingMethod.TabIndex = 38;
+			this.cbxPsfFittingMethod.SelectedIndexChanged += new System.EventHandler(this.cbxPsfFittingMethod_SelectedIndexChanged);
 			// 
 			// pnlSeeingSettings
 			// 
@@ -121,9 +122,9 @@
 			this.label13.AutoSize = true;
 			this.label13.Location = new System.Drawing.Point(5, 3);
 			this.label13.Name = "label13";
-			this.label13.Size = new System.Drawing.Size(43, 13);
+			this.label13.Size = new System.Drawing.Size(119, 13);
 			this.label13.TabIndex = 33;
-			this.label13.Text = "Seeing:";
+			this.label13.Text = "Averged Model FWHM:";
 			// 
 			// pnlUserSeeing
 			// 
@@ -316,7 +317,7 @@
 			this.cbxBackgroundMethod.Items.AddRange(new object[] {
             "Average Background",
             "Background Mode",
-            "Background Gradient Fit",
+            "3D Polynomial Fit",
             "PSF-Fitting Background",
             "Median Background"});
 			this.cbxBackgroundMethod.Location = new System.Drawing.Point(25, 103);

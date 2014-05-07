@@ -901,6 +901,11 @@ namespace Tangra.VideoOperations.LightCurves
 		{
 			get { return ReProcessingPsfFitMatrixSize; }
 		}
+
+	    IImagePixel IMeasurableObject.Center
+	    {
+			get { return new ImagePixel(X0, Y0); }
+	    }
 	}
 
 	public enum MeasurementTimingType

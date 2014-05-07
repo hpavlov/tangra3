@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Tangra.Model.Astro;
+using Tangra.Model.Image;
 
 namespace Tangra.Model.VideoOperations
 {
@@ -49,5 +50,6 @@ namespace Tangra.Model.VideoOperations
 		bool MayHaveDisappeared { get; }
 		int PsfFittingMatrixSize { get; }
 		int PsfGroupId { get; }
+		IImagePixel Center { get; }
 	}
 }

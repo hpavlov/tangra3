@@ -284,6 +284,8 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 						int x2 = objectGroup.LastCenterObject2.X - areaCenterX + 17;
 						int y2 = objectGroup.LastCenterObject2.Y - areaCenterY + 17;
 
+						if (TangraConfig.Settings.Photometry.PsfFittingMethod == TangraConfig.PsfFittingMethod.LinearFitOfAveragedModel)
+							doubleFit.FittingMethod = PSFFittingMethod.LinearFitOfAveragedModel;
 						doubleFit.Fit(pixels, x1, y1, x2, y2);
 
 						if (doubleFit.IsSolved)
@@ -425,6 +427,9 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 						int y1 = trackedGroup.LastCenterObject1.Y - y + 17;
 						int x2 = trackedGroup.LastCenterObject2.X - x + 17;
 						int y2 = trackedGroup.LastCenterObject2.Y - y + 17;
+
+						if (TangraConfig.Settings.Photometry.PsfFittingMethod == TangraConfig.PsfFittingMethod.LinearFitOfAveragedModel)
+							doubleFit.FittingMethod = PSFFittingMethod.LinearFitOfAveragedModel;
 
 						doubleFit.Fit(pixels, x1, y1, x2, y2);
 

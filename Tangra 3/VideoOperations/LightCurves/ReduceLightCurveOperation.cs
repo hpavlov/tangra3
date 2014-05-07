@@ -987,7 +987,7 @@ namespace Tangra.VideoOperations.LightCurves
         {
             var measurer = new MeasurementsHelper(
                             bitPixCamera,
-							TangraConfig.Settings.Photometry.BackgroundMethodDefault,
+							TangraConfig.BackgroundMethod.BackgroundMedian /* We always use Background Median for configuration measurements. */,
                             true,
                             TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(bitPixCamera));
 
@@ -1633,12 +1633,17 @@ namespace Tangra.VideoOperations.LightCurves
 			{
 				IImagePixel center = trackedObject.Center;
 
+				List<ITrackedObject> objectsInGroup = null;
+				if (trackedObject.OriginalObject.GroupId > -1)
+					objectsInGroup = m_Tracker.TrackedObjects.Where(x => x.OriginalObject.GroupId == trackedObject.OriginalObject.GroupId).ToList();
+
 				if (center != ImagePixel.Unspecified)
 				{
 					MeasureTrackedObject2(trackedObject,
 											m_Measurer,
 											LightCurveReductionContext.Instance.DigitalFilter,
-											false);
+											false,
+											objectsInGroup);
 				}
 				else
 				{
@@ -1670,18 +1675,24 @@ namespace Tangra.VideoOperations.LightCurves
 			ITrackedObject trackedObject,
 			MeasurementsHelper measurer,
 			TangraConfig.PreProcessingFilter filter,
-			bool synchronise)
+			bool synchronise,
+			List<ITrackedObject> objectsInGroup)
 		{
 			IImagePixel center = trackedObject.Center;
-			int areaSize = LightCurveReductionContext.Instance.DigitalFilter == TangraConfig.PreProcessingFilter.NoFilter
-							   ? 17
-							   : 19;
+			int areaSize = 17;
+			if ((objectsInGroup != null && objectsInGroup.Count > 1) || LightCurveReductionContext.Instance.NoiseMethod == TangraConfig.BackgroundMethod.Background3DPolynomial)
+				// for double PSF fits and/or 3d polynomial background fits we need the largest area
+				areaSize = 35;
 
+			int areaDigitalFilterEdge = 0;
+			if (LightCurveReductionContext.Instance.DigitalFilter != TangraConfig.PreProcessingFilter.NoFilter)
+				areaDigitalFilterEdge = 2; // The extra 2 pixels will be cut after the filter is applied before the measurement
+			
 			int centerX = (int)Math.Round(center.XDouble);
 			int centerY = (int)Math.Round(center.YDouble);
 
-			uint[,] data = m_VideoController.GetCurrentAstroImage(false).GetMeasurableAreaPixels(centerX, centerY, areaSize);
-			uint[,] backgroundPixels = m_VideoController.GetCurrentAstroImage(false).GetMeasurableAreaPixels(centerX, centerY, 35);
+			uint[,] data = m_VideoController.GetCurrentAstroImage(false).GetMeasurableAreaPixels(centerX, centerY, areaSize + areaDigitalFilterEdge);
+			uint[,] backgroundPixels = m_VideoController.GetCurrentAstroImage(false).GetMeasurableAreaPixels(centerX, centerY, 35 + areaDigitalFilterEdge);
 
 			float msrX0 = (float)trackedObject.Center.XDouble;
 			float msrY0 = (float)trackedObject.Center.YDouble;
@@ -1714,6 +1725,7 @@ namespace Tangra.VideoOperations.LightCurves
 				m_Tracker.RefinedFWHM[trackedObject.TargetNo],
 				m_Tracker.RefinedAverageFWHM,
 				measurableObject,
+				objectsInGroup,
 				LightCurveReductionContext.Instance.FullDisappearance);
 
 			measuredObject.SetIsMeasured(rv);
@@ -1762,12 +1774,24 @@ namespace Tangra.VideoOperations.LightCurves
 			double refinedFWHM,
 			float refinedAverageFWHM,
 			IMeasurableObject measurableObject,
+			List<ITrackedObject> objectsInGroup,
 			bool fullDisappearance
 			)
 		{
+			IImagePixel[] groupCenters = new IImagePixel[0];
+
+			if (objectsInGroup != null && objectsInGroup.Count > 1)
+			{
+				groupCenters = new IImagePixel[objectsInGroup.Count];
+				for (int i = 0; i < objectsInGroup.Count; i++)
+				{
+					groupCenters[i] = objectsInGroup[i].Center;
+				}
+			}
+
 			return measurer.MeasureObject(
 				center, data, backgroundPixels, bpp, filter, synchronise, reductionMethod, psfQuadrature,
-				aperture, refinedFWHM, refinedAverageFWHM, measurableObject, fullDisappearance);
+				aperture, refinedFWHM, refinedAverageFWHM, measurableObject, groupCenters, fullDisappearance);
 	}
 
 		private LCFile m_lcFile = null;
