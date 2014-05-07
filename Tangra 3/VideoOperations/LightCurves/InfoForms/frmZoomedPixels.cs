@@ -27,6 +27,7 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 
         private PictureBox[] m_TargetBoxes;
 		private Dictionary<int, string> m_ObjectTitles = new Dictionary<int, string>();
+		private bool[] m_ObjectinGroup = new bool[4];
 		private uint m_Saturation;
 
 		internal frmZoomedPixels(frmLightCurve.LightCurveContext context, LCFile lcFile, TangraConfig.LightCurvesDisplaySettings displaySettings)
@@ -72,6 +73,8 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 			for (int i = 0; i < m_LCFile.Footer.TrackedObjects.Count; i++)
 			{
 				TrackedObjectConfig cfg = m_LCFile.Footer.TrackedObjects[i];
+
+				m_ObjectinGroup[i] = m_LCFile.Footer.TrackedObjects.Count(x => x.GroupId == cfg.GroupId) > 1;
 
 				switch(cfg.TrackingType)
 				{
@@ -264,6 +267,10 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 						title, s_TitleFont, m_DisplaySettings.TargetBrushes[reading.TargetNo],
 						pictureBox.Width - fntSize.Width - 5,
 						pictureBox.Height - fntSize.Height - 5);
+
+					bool isInGroup = m_ObjectinGroup[reading.TargetNo];
+					if (isInGroup)
+						g.DrawString("Grouped", s_TitleFont, m_DisplaySettings.TargetBrushes[reading.TargetNo], 2, pictureBox.Height - fntSize.Height - 5);
 
 					string coords = string.Format("{0}, {1}", reading.X0.ToString("0.0"), reading.Y0.ToString("0.0"));
 					fntSize = g.MeasureString(coords, s_CoordsFont);

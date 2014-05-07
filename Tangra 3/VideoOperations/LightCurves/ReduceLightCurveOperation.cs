@@ -1017,7 +1017,7 @@ namespace Tangra.VideoOperations.LightCurves
             }
 
             // This will also find the best PSFFit
-			measurer.Measure(9, 9, aperture, measurementFilter, matrix, bitPixCamera, double.NaN, ref matrixSize, false);
+			measurer.FindBestFit(9, 9, measurementFilter, matrix, bitPixCamera, ref matrixSize, false);
 
             return measurer;
         }
@@ -1684,6 +1684,17 @@ namespace Tangra.VideoOperations.LightCurves
 				// for double PSF fits and/or 3d polynomial background fits we need the largest area
 				areaSize = 35;
 
+			IImagePixel[] groupCenters = new IImagePixel[0];
+
+			if (objectsInGroup != null && objectsInGroup.Count > 1)
+			{
+				groupCenters = new IImagePixel[objectsInGroup.Count];
+				for (int i = 0; i < objectsInGroup.Count; i++)
+				{
+					groupCenters[i] = objectsInGroup[i].Center;
+				}
+			}
+
 			int areaDigitalFilterEdge = 0;
 			if (LightCurveReductionContext.Instance.DigitalFilter != TangraConfig.PreProcessingFilter.NoFilter)
 				areaDigitalFilterEdge = 2; // The extra 2 pixels will be cut after the filter is applied before the measurement
@@ -1725,7 +1736,7 @@ namespace Tangra.VideoOperations.LightCurves
 				m_Tracker.RefinedFWHM[trackedObject.TargetNo],
 				m_Tracker.RefinedAverageFWHM,
 				measurableObject,
-				objectsInGroup,
+				groupCenters,
 				LightCurveReductionContext.Instance.FullDisappearance);
 
 			measuredObject.SetIsMeasured(rv);
@@ -1774,25 +1785,14 @@ namespace Tangra.VideoOperations.LightCurves
 			double refinedFWHM,
 			float refinedAverageFWHM,
 			IMeasurableObject measurableObject,
-			List<ITrackedObject> objectsInGroup,
+			IImagePixel[] groupCenters,
 			bool fullDisappearance
 			)
 		{
-			IImagePixel[] groupCenters = new IImagePixel[0];
-
-			if (objectsInGroup != null && objectsInGroup.Count > 1)
-			{
-				groupCenters = new IImagePixel[objectsInGroup.Count];
-				for (int i = 0; i < objectsInGroup.Count; i++)
-				{
-					groupCenters[i] = objectsInGroup[i].Center;
-				}
-			}
-
 			return measurer.MeasureObject(
 				center, data, backgroundPixels, bpp, filter, synchronise, reductionMethod, psfQuadrature,
 				aperture, refinedFWHM, refinedAverageFWHM, measurableObject, groupCenters, fullDisappearance);
-	}
+		}
 
 		private LCFile m_lcFile = null;
 

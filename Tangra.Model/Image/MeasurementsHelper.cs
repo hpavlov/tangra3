@@ -425,16 +425,16 @@ namespace Tangra.Model.Image
 			return NotMeasuredReasons.MeasuredSuccessfully;
         }
 
-        public void Measure(float x0, float y0, float precomputedAperture, Filter filter, uint[,] matrix, int bpp, double psfBackground, ref int matrixSize, bool fixedAperture)
+		public void FindBestFit(float x0, float y0, Filter filter, uint[,] matrix, int bpp, ref int matrixSize, bool fixedAperture)
         {
-            Measure(x0, y0, precomputedAperture, filter, matrix, bpp, psfBackground, true, ref matrixSize, fixedAperture, false);
+			FindBestFit(x0, y0, filter, matrix, bpp, true, ref matrixSize, fixedAperture, false);
         }
 
         public double BestMatrixSizeDistanceDifferenceTolerance = 3.0;
 
-        private void Measure(
-            float x0, float y0, float precomputedAperture,
-			Filter filter, uint[,] matrix, int bpp, double psfBackground,
+        private void FindBestFit(
+            float x0, float y0,
+			Filter filter, uint[,] matrix, int bpp,
             bool findBestMatrixSize, ref int matrixSize,
             bool fixedAperture, bool doCentroidFitForFixedAperture)
         {
@@ -506,7 +506,6 @@ namespace Tangra.Model.Image
                     if (isSolved)
                     {
                         m_FoundBestPSFFit = fit;
-                        m_PSFBackground = fit.I0;
                     }
                 }
                 else
@@ -519,59 +518,19 @@ namespace Tangra.Model.Image
 
                     m_XCenter = halfDataSize - 1;
                     m_YCenter = halfDataSize - 1;
-
-                    m_PSFBackground = psfBackground;
-                    // Fixed apertures are always considered solved
-                    isSolved = true;
                 }
             }
             else
             {
-                isSolved = true;
-
                 m_XCenter = halfDataSize - 1;
                 m_YCenter = halfDataSize - 1;
-                m_PSFBackground = psfBackground;
             }
 
-
-            if (isSolved)
-            {
-                m_TotalPixels = 0;
-
-                m_TotalReading = GetReading(
-                    precomputedAperture,
-                    m_PixelData, 17, 17,
-                    m_XCenter, m_YCenter, null, ref m_TotalPixels);
-
-                if (m_BackgroundMethod == TangraConfig.BackgroundMethod.PSFBackground && !double.IsNaN(psfBackground))
-                {
-                    m_TotalBackground = (uint)Math.Round(m_TotalPixels * psfBackground);
-                }
-				else if (m_BackgroundMethod == TangraConfig.BackgroundMethod.Background3DPolynomial)
-				{
-					throw new ApplicationException("Measurement error. Correlation CME-107");
-				}
-                else
-                {
-                    uint[,] biggerArea;
-
-                    if (GetImagePixelsCallback == null)
-                        biggerArea = m_PixelData;
-                    else
-                        biggerArea = GetImagePixelsCallback((int)Math.Round(x0), (int)Math.Round(y0), 35);
-
-                    double bgFromAnnulus = GetBackground(biggerArea, precomputedAperture, 17, 17);
-                    m_TotalBackground = (uint)Math.Round(m_TotalPixels * bgFromAnnulus);
-                }
-            }
-            else
-            {
-                m_TotalReading = 0;
-                m_TotalBackground = 0;
-                m_XCenter = 0;
-                m_YCenter = 0;
-            }
+			m_TotalReading = 0;
+			m_TotalBackground = 0;
+	        m_PSFBackground = 0;
+			m_XCenter = 0;
+			m_YCenter = 0;
         }
 
         private delegate double GetPixelMeasurementCallback(int x, int y);
