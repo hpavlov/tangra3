@@ -369,8 +369,8 @@ namespace Tangra.Model.Config
 			public bool UseUserSpecifiedFWHM;
 			public float UserSpecifiedFWHM = 3.2f;
 
-			public float AnulusInnerRadius = 2.0f;
-			public int AnulusMinPixels = 350;
+			public float AnnulusInnerRadius = 2.0f;
+			public int AnnulusMinPixels = 350;
 
 			public int SNFrameWindow = 64;
 

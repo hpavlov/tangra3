@@ -47,8 +47,8 @@
 			this.cbxBgThirdOrder = new System.Windows.Forms.CheckBox();
 			this.nudPhotoAperture = new System.Windows.Forms.NumericUpDown();
 			this.cbxBgSecondOrder = new System.Windows.Forms.CheckBox();
-			this.nudInnerAnulusInApertures = new System.Windows.Forms.NumericUpDown();
-			this.nudMinimumAnulusPixels = new System.Windows.Forms.NumericUpDown();
+			this.nudInnerAnnulusInApertures = new System.Windows.Forms.NumericUpDown();
+			this.nudMinimumAnnulusPixels = new System.Windows.Forms.NumericUpDown();
 			this.cbxPhotoSignalApertureType = new System.Windows.Forms.ComboBox();
 			this.cbxBackgroundMethod = new System.Windows.Forms.ComboBox();
 			this.label9 = new System.Windows.Forms.Label();
@@ -65,8 +65,8 @@
 			this.rgSeeing.SuspendLayout();
 			this.groupControl1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nudPhotoAperture)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.nudInnerAnulusInApertures)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.nudMinimumAnulusPixels)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudInnerAnnulusInApertures)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudMinimumAnnulusPixels)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudSNFrameWindow)).BeginInit();
 			this.SuspendLayout();
 			// 
@@ -211,8 +211,8 @@
 			this.groupControl1.Controls.Add(this.cbxBgThirdOrder);
 			this.groupControl1.Controls.Add(this.nudPhotoAperture);
 			this.groupControl1.Controls.Add(this.cbxBgSecondOrder);
-			this.groupControl1.Controls.Add(this.nudInnerAnulusInApertures);
-			this.groupControl1.Controls.Add(this.nudMinimumAnulusPixels);
+			this.groupControl1.Controls.Add(this.nudInnerAnnulusInApertures);
+			this.groupControl1.Controls.Add(this.nudMinimumAnnulusPixels);
 			this.groupControl1.Controls.Add(this.cbxPhotoSignalApertureType);
 			this.groupControl1.Controls.Add(this.cbxBackgroundMethod);
 			this.groupControl1.Controls.Add(this.label9);
@@ -280,25 +280,25 @@
 			this.cbxBgSecondOrder.Text = "2-nd order";
 			this.cbxBgSecondOrder.UseVisualStyleBackColor = true;
 			// 
-			// nudInnerAnulusInApertures
+			// nudInnerAnnulusInApertures
 			// 
-			this.nudInnerAnulusInApertures.DecimalPlaces = 1;
-			this.nudInnerAnulusInApertures.Location = new System.Drawing.Point(54, 164);
-			this.nudInnerAnulusInApertures.Name = "nudInnerAnulusInApertures";
-			this.nudInnerAnulusInApertures.Size = new System.Drawing.Size(47, 20);
-			this.nudInnerAnulusInApertures.TabIndex = 35;
+			this.nudInnerAnnulusInApertures.DecimalPlaces = 1;
+			this.nudInnerAnnulusInApertures.Location = new System.Drawing.Point(54, 164);
+			this.nudInnerAnnulusInApertures.Name = "nudInnerAnnulusInApertures";
+			this.nudInnerAnnulusInApertures.Size = new System.Drawing.Size(47, 20);
+			this.nudInnerAnnulusInApertures.TabIndex = 35;
 			// 
-			// nudMinimumAnulusPixels
+			// nudMinimumAnnulusPixels
 			// 
-			this.nudMinimumAnulusPixels.Location = new System.Drawing.Point(169, 201);
-			this.nudMinimumAnulusPixels.Maximum = new decimal(new int[] {
+			this.nudMinimumAnnulusPixels.Location = new System.Drawing.Point(169, 201);
+			this.nudMinimumAnnulusPixels.Maximum = new decimal(new int[] {
             500,
             0,
             0,
             0});
-			this.nudMinimumAnulusPixels.Name = "nudMinimumAnulusPixels";
-			this.nudMinimumAnulusPixels.Size = new System.Drawing.Size(47, 20);
-			this.nudMinimumAnulusPixels.TabIndex = 34;
+			this.nudMinimumAnnulusPixels.Name = "nudMinimumAnnulusPixels";
+			this.nudMinimumAnnulusPixels.Size = new System.Drawing.Size(47, 20);
+			this.nudMinimumAnnulusPixels.TabIndex = 34;
 			// 
 			// cbxPhotoSignalApertureType
 			// 
@@ -332,7 +332,7 @@
 			this.label9.Name = "label9";
 			this.label9.Size = new System.Drawing.Size(144, 13);
 			this.label9.TabIndex = 30;
-			this.label9.Text = "Pixels in Background Anulus:";
+			this.label9.Text = "Pixels in Background Annulus:";
 			// 
 			// label17
 			// 
@@ -359,7 +359,7 @@
 			this.label7.Name = "label7";
 			this.label7.Size = new System.Drawing.Size(178, 13);
 			this.label7.TabIndex = 28;
-			this.label7.Text = "Inner Radius of Background Anulus:";
+			this.label7.Text = "Inner Radius of Background Annulus:";
 			// 
 			// label1
 			// 
@@ -409,8 +409,8 @@
 			this.groupControl1.ResumeLayout(false);
 			this.groupControl1.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nudPhotoAperture)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.nudInnerAnulusInApertures)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.nudMinimumAnulusPixels)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudInnerAnnulusInApertures)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudMinimumAnnulusPixels)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudSNFrameWindow)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
@@ -435,8 +435,8 @@
 		private System.Windows.Forms.ComboBox cbxBackgroundMethod;
 		private System.Windows.Forms.ComboBox cbxPhotoSignalApertureType;
 		private System.Windows.Forms.ComboBox cbxPsfFittingMethod;
-		private System.Windows.Forms.NumericUpDown nudMinimumAnulusPixels;
-		private System.Windows.Forms.NumericUpDown nudInnerAnulusInApertures;
+		private System.Windows.Forms.NumericUpDown nudMinimumAnnulusPixels;
+		private System.Windows.Forms.NumericUpDown nudInnerAnnulusInApertures;
 		private System.Windows.Forms.NumericUpDown nudPhotoAperture;
 		private System.Windows.Forms.NumericUpDown nudUserSpecifiedFWHM;
 		private System.Windows.Forms.GroupBox rgSeeing;

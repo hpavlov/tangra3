@@ -26,8 +26,8 @@ namespace Tangra.Config.SettingPannels
 			cbxPhotoSignalApertureType.SetCBXIndex((int)TangraConfig.Settings.Photometry.SignalApertureUnitDefault);
 
 			SetComboboxIndexFromBackgroundMethod(TangraConfig.Settings.Photometry.BackgroundMethodDefault);
-			nudInnerAnulusInApertures.SetNUDValue((decimal)TangraConfig.Settings.Photometry.AnulusInnerRadius);
-			nudMinimumAnulusPixels.SetNUDValue((int)TangraConfig.Settings.Photometry.AnulusMinPixels);
+			nudInnerAnnulusInApertures.SetNUDValue((decimal)TangraConfig.Settings.Photometry.AnnulusInnerRadius);
+			nudMinimumAnnulusPixels.SetNUDValue((int)TangraConfig.Settings.Photometry.AnnulusMinPixels);
 			cbxPsfQuadrature.SetCBXIndex((int)TangraConfig.Settings.Photometry.PsfQuadrature);
 			cbxPsfFittingMethod.SetCBXIndex((int)TangraConfig.Settings.Photometry.PsfFittingMethod);
 			nudUserSpecifiedFWHM.SetNUDValue((int)TangraConfig.Settings.Photometry.UserSpecifiedFWHM);
@@ -44,8 +44,8 @@ namespace Tangra.Config.SettingPannels
 			TangraConfig.Settings.Photometry.DefaultSignalAperture = (float)nudPhotoAperture.Value;
 			TangraConfig.Settings.Photometry.SignalApertureUnitDefault = (TangraConfig.SignalApertureUnit)cbxPhotoSignalApertureType.SelectedIndex;
 			TangraConfig.Settings.Photometry.BackgroundMethodDefault = ComboboxIndexToBackgroundMethod();
-			TangraConfig.Settings.Photometry.AnulusInnerRadius = (float)nudInnerAnulusInApertures.Value;
-			TangraConfig.Settings.Photometry.AnulusMinPixels = (int)nudMinimumAnulusPixels.Value;
+			TangraConfig.Settings.Photometry.AnnulusInnerRadius = (float)nudInnerAnnulusInApertures.Value;
+			TangraConfig.Settings.Photometry.AnnulusMinPixels = (int)nudMinimumAnnulusPixels.Value;
             TangraConfig.Settings.Photometry.PsfQuadrature = (TangraConfig.PsfQuadrature)cbxPsfQuadrature.SelectedIndex;
 			TangraConfig.Settings.Photometry.PsfFittingMethod = (TangraConfig.PsfFittingMethod)cbxPsfFittingMethod.SelectedIndex;
 			TangraConfig.Settings.Photometry.UserSpecifiedFWHM = (float)nudUserSpecifiedFWHM.Value;

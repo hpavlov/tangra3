@@ -206,14 +206,14 @@ namespace Tangra.VideoOperations.LightCurves.AdjustApertures
                 float apertureSize = 4 * apertureInPixels;
 				g.DrawEllipse(Controller.DisplaySettings.TargetPens[targetId], apRectX, apRectY, apertureSize, apertureSize);
 
-                float innerRadius = apertureInPixels * TangraConfig.Settings.Photometry.AnulusInnerRadius;
+                float innerRadius = apertureInPixels * TangraConfig.Settings.Photometry.AnnulusInnerRadius;
                 g.DrawEllipse(
                     Controller.DisplaySettings.TargetPens[targetId],
                     2 * (apX - innerRadius),
                     2 * (apY - innerRadius),
                     4 * innerRadius, 4 * innerRadius);
 
-                float outerRadius = (float)Math.Sqrt(TangraConfig.Settings.Photometry.AnulusMinPixels / Math.PI + innerRadius * innerRadius);
+                float outerRadius = (float)Math.Sqrt(TangraConfig.Settings.Photometry.AnnulusMinPixels / Math.PI + innerRadius * innerRadius);
                 g.DrawEllipse(
                     Controller.DisplaySettings.TargetPens[targetId],
                     2 * (apX - outerRadius),

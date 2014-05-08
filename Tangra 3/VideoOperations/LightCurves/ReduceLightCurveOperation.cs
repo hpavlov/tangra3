@@ -171,8 +171,8 @@ namespace Tangra.VideoOperations.LightCurves
 					TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(m_VideoController.VideoBitPix));
 
 				m_Measurer.SetCoreProperties(
-					TangraConfig.Settings.Photometry.AnulusInnerRadius,
-					TangraConfig.Settings.Photometry.AnulusMinPixels,
+					TangraConfig.Settings.Photometry.AnnulusInnerRadius,
+					TangraConfig.Settings.Photometry.AnnulusMinPixels,
 					TangraConfig.PhotometrySettings.REJECTION_BACKGROUND_PIXELS_STD_DEV,
 					(float)m_Tracker.PositionTolerance);
 
@@ -595,8 +595,8 @@ namespace Tangra.VideoOperations.LightCurves
                             if (isMeasuringStar)
                             {
                                 // Draw background annulus
-                                float innerRadius = aperture * TangraConfig.Settings.Photometry.AnulusInnerRadius;
-                                float outerRadius = (float)Math.Sqrt(TangraConfig.Settings.Photometry.AnulusMinPixels / Math.PI + innerRadius * innerRadius);
+                                float innerRadius = aperture * TangraConfig.Settings.Photometry.AnnulusInnerRadius;
+                                float outerRadius = (float)Math.Sqrt(TangraConfig.Settings.Photometry.AnnulusMinPixels / Math.PI + innerRadius * innerRadius);
 
                                 innerRadius *= 8.0f;
                                 outerRadius *= 8.0f;
@@ -992,8 +992,8 @@ namespace Tangra.VideoOperations.LightCurves
                             TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(bitPixCamera));
 
             measurer.SetCoreProperties(
-                    TangraConfig.Settings.Photometry.AnulusInnerRadius,
-                    TangraConfig.Settings.Photometry.AnulusMinPixels,
+                    TangraConfig.Settings.Photometry.AnnulusInnerRadius,
+                    TangraConfig.Settings.Photometry.AnnulusMinPixels,
                     TangraConfig.Settings.Special.RejectionBackgroundPixelsStdDev,
                     4.0f);
 
