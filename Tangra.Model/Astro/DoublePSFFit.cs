@@ -787,7 +787,7 @@ namespace Tangra.Model.Astro
 
 		private void BinarySerialize1(BinaryWriter writer)
 		{
-			const byte STREAM_VERSION = 3;
+			const byte STREAM_VERSION = 4;
 
 			writer.Write(STREAM_VERSION);
 
@@ -813,12 +813,14 @@ namespace Tangra.Model.Astro
 			writer.Write((int)0);
 
 			writer.Write(double.NaN);
-			writer.Write(double.NaN);			
+			writer.Write(double.NaN);
+
+			writer.Write(m_BackgroundModel != null);
 		}
 
 		private void BinarySerialize2(BinaryWriter writer)
 		{
-			const byte STREAM_VERSION = 3;
+			const byte STREAM_VERSION = 4;
 
 			writer.Write(STREAM_VERSION);
 
@@ -845,6 +847,8 @@ namespace Tangra.Model.Astro
 
 			writer.Write(double.NaN);
 			writer.Write(double.NaN);
+
+			writer.Write(m_BackgroundModel != null);
 		}
 	}
 }

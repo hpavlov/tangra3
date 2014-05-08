@@ -473,6 +473,9 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			}
 
 			IsTrackedSuccessfully = atLeastOneGroupLocated;
+
+			if (IsTrackedSuccessfully)
+				RefinedAverageFWHM = m_TrackedObjects.Cast<TrackedObjectLight>().Average(x => x.RefinedFWHM);
 		}
 	}
 }

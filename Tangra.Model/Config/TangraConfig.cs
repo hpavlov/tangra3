@@ -557,7 +557,11 @@ namespace Tangra.Model.Config
         public class LastUsedSettings
         {
             public bool AdvancedLightCurveSettings = false;
-            public PhotometryReductionMethod ReductionType = PhotometryReductionMethod.AperturePhotometry;
+            public PhotometryReductionMethod AsteroidalReductionType = PhotometryReductionMethod.AperturePhotometry;
+			public BackgroundMethod AsteroidalBackgroundMethod = BackgroundMethod.BackgroundMedian;
+			public PhotometryReductionMethod MutualReductionType = PhotometryReductionMethod.PsfPhotometry;
+			public BackgroundMethod MutualBackgroundMethod = BackgroundMethod.Background3DPolynomial;
+			public PreProcessingFilter MutualDigitalFilter = PreProcessingFilter.LowPassFilter;
             public int MeasuringZoomImageMode = 0;
 
             public List<SameSizeApertureConfig> SameSizeApertures = new List<SameSizeApertureConfig>();

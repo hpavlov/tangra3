@@ -32,17 +32,19 @@ namespace Tangra.VideoOperations.LightCurves
             rbAsteroidal.Checked = true;
 
             ucStretching.Initialize(framePlayer.Video, framePlayer.CurrentFrameIndex);
-
-            SetComboboxIndexFromPhotometryReductionMethod(TangraConfig.Settings.LastUsed.ReductionType);
-            cbxDigitalFilter.SelectedIndex = 0;
-			SetComboboxIndexFromBackgroundMethod(TangraConfig.Settings.Photometry.BackgroundMethodDefault);
-
+		
+			SetComboboxIndexFromPhotometryReductionMethod(TangraConfig.Settings.LastUsed.AsteroidalReductionType);
+			cbxDigitalFilter.SelectedIndex = 0;
+			SetComboboxIndexFromBackgroundMethod(TangraConfig.Settings.LastUsed.AsteroidalBackgroundMethod);				
+		
             m_MoreEnabled = TangraConfig.Settings.LastUsed.AdvancedLightCurveSettings;
             SetMoreLessOptions();
 
 			FrameAdjustmentsPreview.Instance.ParentForm = this;
 			FrameAdjustmentsPreview.Instance.FramePlayer = framePlayer;
 			FrameAdjustmentsPreview.Instance.Reset(m_VideoContoller, framePlayer.CurrentFrameIndex);
+
+			m_DefaultReductionSettingsModified = false;
         }
 
         public TangraConfig.PhotometryReductionMethod ComboboxIndexToPhotometryReductionMethod()
@@ -214,9 +216,19 @@ namespace Tangra.VideoOperations.LightCurves
 			//}
 
 
-			LightCurveReductionContext.Instance.SaveTrackingSession = false;			
+			LightCurveReductionContext.Instance.SaveTrackingSession = false;
 
-			TangraConfig.Settings.LastUsed.ReductionType = (TangraConfig.PhotometryReductionMethod)cbxReductionType.SelectedIndex;
+			if (rbMutualEvent.Checked)
+	        {
+				TangraConfig.Settings.LastUsed.MutualReductionType = ComboboxIndexToPhotometryReductionMethod();
+				TangraConfig.Settings.LastUsed.MutualBackgroundMethod = ComboboxIndexToBackgroundMethod();
+		        TangraConfig.Settings.LastUsed.MutualDigitalFilter = (TangraConfig.PreProcessingFilter)cbxDigitalFilter.SelectedIndex;
+	        }
+	        else
+	        {
+				TangraConfig.Settings.LastUsed.AsteroidalReductionType = ComboboxIndexToPhotometryReductionMethod();
+				TangraConfig.Settings.LastUsed.AsteroidalBackgroundMethod = ComboboxIndexToBackgroundMethod();		        
+	        }
 			TangraConfig.Settings.LastUsed.AdvancedLightCurveSettings = m_MoreEnabled;
 			TangraConfig.Settings.Save();
 
@@ -323,6 +335,7 @@ namespace Tangra.VideoOperations.LightCurves
                     cbxBackgroundMethod.SelectedIndex = 0;
                 }
             }
+			m_DefaultReductionSettingsModified = true;
         }
 
         private void cbxReductionType_SelectedIndexChanged(object sender, EventArgs e)
@@ -338,6 +351,7 @@ namespace Tangra.VideoOperations.LightCurves
                     cbxReductionType.SelectedIndex = 0;
                 }
             }
+	        m_DefaultReductionSettingsModified = true;
         }
 
 		private void SetupIntegrationPreView()
@@ -372,6 +386,30 @@ namespace Tangra.VideoOperations.LightCurves
 		private void cbxDigitalFilter_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			// NOTE: Nothing to do here. Digital filters are set when pressing OK and will be applied at measurement time only (i.e. they are not a pre-processing thing)
+			m_DefaultReductionSettingsModified = true;
+		}
+
+	    private bool m_DefaultReductionSettingsModified = false;
+
+		private void rbMutualEvent_CheckedChanged(object sender, EventArgs e)
+		{
+			if (!m_DefaultReductionSettingsModified)
+			{
+				if (rbMutualEvent.Checked)
+				{
+					SetComboboxIndexFromPhotometryReductionMethod(TangraConfig.Settings.LastUsed.MutualReductionType);
+					cbxDigitalFilter.SelectedIndex = (int)TangraConfig.Settings.LastUsed.MutualDigitalFilter;
+					SetComboboxIndexFromBackgroundMethod(TangraConfig.Settings.LastUsed.MutualBackgroundMethod);
+				}
+				else
+				{
+					SetComboboxIndexFromPhotometryReductionMethod(TangraConfig.Settings.LastUsed.AsteroidalReductionType);
+					cbxDigitalFilter.SelectedIndex = 0;
+					SetComboboxIndexFromBackgroundMethod(TangraConfig.Settings.LastUsed.AsteroidalBackgroundMethod);
+				}
+
+				m_DefaultReductionSettingsModified = false;
+			}
 		}
     }
 }

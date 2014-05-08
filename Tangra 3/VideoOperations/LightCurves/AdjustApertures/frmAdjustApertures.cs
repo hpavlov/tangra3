@@ -55,7 +55,7 @@ namespace Tangra.VideoOperations.LightCurves.AdjustApertures
                 if (!rbSameApertures.Checked)
                 {
                     // Set the default settings for "same size apertures" (use a diameter of 4 * FWHM as default (radius of 2 * FWHM))
-                    nudCommonAperture.SetNUDValue(2);
+                    nudCommonAperture.SetNUDValue(1.5);
                     cbxCommonUnit.SelectedIndex = 1;
                 }
             }
@@ -199,8 +199,9 @@ namespace Tangra.VideoOperations.LightCurves.AdjustApertures
 				}
 
 			    float apertureInPixels = Model.Apertures[targetId];
-				float apX = 9 + target.ApertureMatrixX0;
-				float apY = 9 + target.ApertureMatrixY0;
+				int appOffs = target.Gaussian != null ? (35 - target.Gaussian.MatrixSize) / 2 : 9;
+				float apX = appOffs + target.ApertureMatrixX0;
+				float apY = appOffs + target.ApertureMatrixY0;
                 float apRectX = 2 * (apX - apertureInPixels);
                 float apRectY = 2 * (apY - apertureInPixels);
                 float apertureSize = 4 * apertureInPixels;
@@ -272,7 +273,7 @@ namespace Tangra.VideoOperations.LightCurves.AdjustApertures
                         {
                             commonValue = (float)nudCommonAperture.Value * Model.FWHMs.Max();
                         }
-                        else if (cbxCommonFWHMType.SelectedIndex == 0)
+                        else if (cbxCommonFWHMType.SelectedIndex == 1)
                         {
                             commonValue = (float)nudCommonAperture.Value * Model.FWHMs.Average();
                         }

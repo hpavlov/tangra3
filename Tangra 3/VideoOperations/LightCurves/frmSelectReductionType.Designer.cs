@@ -63,9 +63,9 @@ namespace Tangra.VideoOperations.LightCurves
 			this.rbBinning = new System.Windows.Forms.RadioButton();
 			this.rbRunningAverage = new System.Windows.Forms.RadioButton();
 			this.tabStretching = new System.Windows.Forms.TabPage();
+			this.ucStretching = new Tangra.VideoOperations.LightCurves.ucPreProcessing();
 			this.tabReduction = new System.Windows.Forms.TabPage();
 			this.pnlBackground = new System.Windows.Forms.Panel();
-			this.ucStretching = new Tangra.VideoOperations.LightCurves.ucPreProcessing();
 			this.tabControl1.SuspendLayout();
 			this.tabGeneral.SuspendLayout();
 			this.groupBox2.SuspendLayout();
@@ -131,6 +131,7 @@ namespace Tangra.VideoOperations.LightCurves
 			this.rbMutualEvent.TabStop = true;
 			this.rbMutualEvent.Text = "Tracked Mutual Satellite Event";
 			this.rbMutualEvent.UseVisualStyleBackColor = true;
+			this.rbMutualEvent.CheckedChanged += new System.EventHandler(this.rbMutualEvent_CheckedChanged);
 			// 
 			// cbxReductionType
 			// 
@@ -479,6 +480,13 @@ namespace Tangra.VideoOperations.LightCurves
 			this.tabStretching.Text = "Pre-Processing";
 			this.tabStretching.UseVisualStyleBackColor = true;
 			// 
+			// ucStretching
+			// 
+			this.ucStretching.Location = new System.Drawing.Point(0, 0);
+			this.ucStretching.Name = "ucStretching";
+			this.ucStretching.Size = new System.Drawing.Size(370, 221);
+			this.ucStretching.TabIndex = 0;
+			// 
 			// tabReduction
 			// 
 			this.tabReduction.BackColor = System.Drawing.Color.Transparent;
@@ -503,13 +511,6 @@ namespace Tangra.VideoOperations.LightCurves
 			this.pnlBackground.Name = "pnlBackground";
 			this.pnlBackground.Size = new System.Drawing.Size(291, 40);
 			this.pnlBackground.TabIndex = 6;
-			// 
-			// ucStretching
-			// 
-			this.ucStretching.Location = new System.Drawing.Point(0, 0);
-			this.ucStretching.Name = "ucStretching";
-			this.ucStretching.Size = new System.Drawing.Size(370, 221);
-			this.ucStretching.TabIndex = 0;
 			// 
 			// frmSelectReductionType
 			// 

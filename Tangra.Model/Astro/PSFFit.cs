@@ -92,6 +92,7 @@ namespace Tangra.Model.Astro
         private float m_ModelFWHM;
 
 		private IBackgroundModelProvider m_BackgroundModel;
+		private bool m_UsesBackgroundModel = false;
 
 		public static PSFFittingDataRange DataRange = PSFFittingDataRange.DataRange8Bit;
 
@@ -159,7 +160,7 @@ namespace Tangra.Model.Astro
 
 		public bool UsesBackgroundModel
 		{
-			get { return m_BackgroundModel != null; }
+			get { return m_UsesBackgroundModel; }
 		}
 
         public int MatrixSize
@@ -356,6 +357,7 @@ namespace Tangra.Model.Astro
 		public void Fit(uint[,] intensity, IBackgroundModelProvider backgroundModel, int newMatrixSize)
 		{
 			m_BackgroundModel = backgroundModel;
+			m_UsesBackgroundModel = m_BackgroundModel != null;
 
             if (newMatrixSize != 17)
             {
@@ -1144,7 +1146,7 @@ namespace Tangra.Model.Astro
 
 
         #region Serialization
-        private static byte STREAM_VERSION = 3;
+        private static byte STREAM_VERSION = 4;
 
         public void Save(BinaryWriter writer)
         {
@@ -1173,6 +1175,8 @@ namespace Tangra.Model.Astro
 
 			writer.Write(m_RX0);
 			writer.Write(m_RY0);
+
+	        writer.Write(m_UsesBackgroundModel);
         }
 
         public static PSFFit Load(BinaryReader reader)
@@ -1218,6 +1222,11 @@ namespace Tangra.Model.Astro
 					{
 						loadedFit.m_RX0 = reader.ReadDouble();
 						loadedFit.m_RY0 = reader.ReadDouble();
+
+						if (version > 3)
+						{
+							loadedFit.m_UsesBackgroundModel = reader.ReadBoolean();
+						}						
 					}
                 }
                 return loadedFit;
