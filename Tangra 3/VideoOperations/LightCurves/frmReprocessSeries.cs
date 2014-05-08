@@ -266,7 +266,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 		    if (Context.Filter != frmLightCurve.LightCurveContext.FilterType.NoFilter) areaSize += 2;
             
-			uint[,] data = BitmapFilter.CutArrayEdges(clonedValue.PixelData, Math.Max(0, (35 - areaSize) / 2));
+			uint[,] data = BitmapFilter.CutArrayEdges(clonedValue.PixelData, (35 - areaSize) / 2);
 
 			NotMeasuredReasons rv = ReduceLightCurveOperation.MeasureObject(
 				center,

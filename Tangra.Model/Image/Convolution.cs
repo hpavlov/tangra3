@@ -415,7 +415,9 @@ namespace Tangra.Model.Image
 			for (int i = linesToCut; i < nWidth - linesToCut; i++)
 				for (int j = linesToCut; j < nHeight - linesToCut; j++)
 				{
-					cutData[i - linesToCut, j - linesToCut] = data[i, j];
+					int x = Math.Min(nWidth - 1, Math.Max(0, i));
+					int y = Math.Min(nHeight - 1, Math.Max(0, j));
+					cutData[i - linesToCut, j - linesToCut] = data[x, y];
 				}
 
 			return cutData;

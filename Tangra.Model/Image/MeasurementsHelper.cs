@@ -181,7 +181,7 @@ namespace Tangra.Model.Image
                 }
 				else if (m_BackgroundMethod == TangraConfig.BackgroundMethod.Background3DPolynomial)
 				{
-					m_TotalBackground = Get3DPolynomialBackground(backgroundArea, aperture, side);
+					m_TotalBackground = Get3DPolynomialBackground(backgroundArea, aperture);
 				}
 	            else if (m_BackgroundMethod != TangraConfig.BackgroundMethod.PSFBackground)
 	            {
@@ -593,8 +593,9 @@ namespace Tangra.Model.Image
             return (uint)Math.Round(total);
         }
 
-		private double Get3DPolynomialBackground(uint[,] backgroundArea, float aperture, int side)
+		private double Get3DPolynomialBackground(uint[,] backgroundArea, float aperture)
 		{
+			int side = backgroundArea.GetLength(0);
 			var bg3dFit = new Background3DPolynomialFit();
 			bg3dFit.Fit(backgroundArea, m_XCenter, m_YCenter, 2 * aperture);
 
