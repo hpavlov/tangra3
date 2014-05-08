@@ -7,19 +7,19 @@ namespace Tangra.Model.Config
 {
 	public class AavSettings
 	{
-		public bool OverlayTimestamp = false;
+		public bool Overlay_Timestamp = false;
 
-		public bool OverlayAllMessages = true;
-		public bool OverlayCameraInfo = true;
-		public bool OverlayAdvsInfo = false;
+		public bool Overlay_AllMessages = true;
+		public bool Overlay_CameraInfo = true;
+		public bool Overlay_AdvsInfo = true;
 
-		public bool PopupTimestamp = true;
-		public bool PopupExposure = true;
+		public bool Popup_Timestamp = false;
+		public bool Popup_Exposure = false;
 
-		public bool PopupSystemTime;
-		public bool PopupSatellites = true;
-		public bool PopupGPSFix = true;
-		public bool PopupAlmanac = true;
+		public bool Popup_SystemTime = true;
+		public bool Popup_Satellites = false;
+		public bool Popup_GPSFix = false;
+		public bool Popup_Almanac = false;
 
 		public bool SplitFieldsOSD = true;
 

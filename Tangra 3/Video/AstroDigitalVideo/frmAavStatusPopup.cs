@@ -44,15 +44,15 @@ namespace Tangra.Video.AstroDigitalVideo
 
 			var statusText = new StringBuilder();
 
-			if (m_AavSettings.PopupSatellites)
+			if (m_AavSettings.Popup_Satellites)
 				statusText.AppendLine(string.Format("Tracked Satellites: {0}", m_FrameState.NumberSatellites));
 			
-			if (m_AavSettings.PopupAlmanac)
+			if (m_AavSettings.Popup_Almanac)
 			{
 				statusText.AppendLine(string.Format("Almanac Status: {0}", m_FrameState.AlmanacStatus));
 			}
 
-			if (m_AavSettings.PopupGPSFix)
+			if (m_AavSettings.Popup_GPSFix)
 			{
 				int intStatus;
 				string strStatus;
@@ -64,27 +64,27 @@ namespace Tangra.Video.AstroDigitalVideo
 				statusText.AppendLine(string.Format("GPS Fix: {0}", strStatus));
 			}
 
-			if (m_AavSettings.PopupSatellites || m_AavSettings.PopupAlmanac || m_AavSettings.PopupGPSFix)
+			if (m_AavSettings.Popup_Satellites || m_AavSettings.Popup_Almanac || m_AavSettings.Popup_GPSFix)
 				statusText.AppendLine();
 
-			if (m_AavSettings.PopupTimestamp)
+			if (m_AavSettings.Popup_Timestamp)
 				statusText.AppendLine(string.Format("Central Exposure Time: {0}",
                         m_FrameState.HasValidTimeStamp 
                             ? m_FrameState.CentralExposureTime.ToString("dd MMM yyyy HH:mm:ss.fff")
                             : "Timestamp Not Available"));
 
-			if (m_AavSettings.PopupExposure)
+			if (m_AavSettings.Popup_Exposure)
                  statusText.AppendLine(m_FrameState.HasValidTimeStamp 
                             ? string.Format("Exposure Duration: {0} ms", m_FrameState.ExposureInMilliseconds.ToString("0"))
                             : "Exposure Duration: Unknown");
 
-			if (m_AavSettings.PopupTimestamp || m_AavSettings.PopupExposure)
+			if (m_AavSettings.Popup_Timestamp || m_AavSettings.Popup_Exposure)
                 statusText.AppendLine();
 
-            if (m_AavSettings.PopupSystemTime)
+            if (m_AavSettings.Popup_SystemTime)
 				statusText.AppendLine(string.Format("System Time: {0}", m_FrameState.SystemTime.ToString("dd MMM yyyy HH:mm:ss.fff")));
 
-			if (m_AavSettings.PopupSystemTime)
+			if (m_AavSettings.Popup_SystemTime)
 				statusText.AppendLine();
 
 			lblStatusCombined.Text = statusText.ToString();

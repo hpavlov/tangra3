@@ -166,7 +166,7 @@ namespace Tangra.Video.AstroDigitalVideo
 
 		private void OverlayAAVState(Graphics g, Bitmap currentImage, FrameStateData state, int currentFrameNo)
 		{
-			if (TangraConfig.Settings.AAV.OverlayTimestamp)
+			if (TangraConfig.Settings.AAV.Overlay_Timestamp)
 			{
 				string timeStampStr = state.HasValidTimeStamp
 						? string.Format("{0}.{1}", state.CentralExposureTime.ToString("dd MMM yyyy HH:mm:ss"), state.CentralExposureTime.Millisecond.ToString().PadLeft(3, '0'))
@@ -181,7 +181,7 @@ namespace Tangra.Video.AstroDigitalVideo
 				// When frames jump we stop displaying the message
 				m_FramesLeftToDiplayMessage = 0;
 
-			if (TangraConfig.Settings.AAV.OverlayAllMessages &&
+			if (TangraConfig.Settings.AAV.Overlay_AllMessages &&
 				!string.IsNullOrEmpty(state.Messages) &&
 				state.Messages.Trim().Length > 0)
 			{
@@ -189,24 +189,24 @@ namespace Tangra.Video.AstroDigitalVideo
 				m_FramesLeftToDiplayMessage = 10;
 			}
 
-			if ((TangraConfig.Settings.AAV.OverlayAdvsInfo || TangraConfig.Settings.AAV.OverlayCameraInfo) &&
+			if ((TangraConfig.Settings.AAV.Overlay_AdvsInfo || TangraConfig.Settings.AAV.Overlay_CameraInfo) &&
 				(!m_EquipmentInfoDisplayed || m_FirstFrameNo == currentFrameNo))
 			{
 				int numLines = 0;
 				int lineNo = 0;
-				if (TangraConfig.Settings.AAV.OverlayCameraInfo) numLines += 1;
-				if (TangraConfig.Settings.AAV.OverlayAdvsInfo) numLines += 1;
+				if (TangraConfig.Settings.AAV.Overlay_CameraInfo) numLines += 1;
+				if (TangraConfig.Settings.AAV.Overlay_AdvsInfo) numLines += 1;
 
 				float startingY = currentImage.Height - numLines * (s_PropertiesFont.Size + 5) - 35;
-				if (TangraConfig.Settings.AAV.OverlayTimestamp) startingY -= m_YPosUpper;
+				if (TangraConfig.Settings.AAV.Overlay_Timestamp) startingY -= m_YPosUpper;
 
-				if (TangraConfig.Settings.AAV.OverlayAdvsInfo)
+				if (TangraConfig.Settings.AAV.Overlay_AdvsInfo)
 				{
 					g.DrawString(m_EquipmentInfo.Recorder, s_PropertiesFont, s_PropertiesWhiteBrush, 10, startingY + lineNo * (s_PropertiesFont.Size + 5));
 					lineNo++;
 				}
 
-				if (TangraConfig.Settings.AAV.OverlayCameraInfo)
+				if (TangraConfig.Settings.AAV.Overlay_CameraInfo)
 				{
 					if (!string.IsNullOrEmpty(m_EquipmentInfo.Camera))
 						g.DrawString(m_EquipmentInfo.Camera, s_PropertiesFont, s_PropertiesWhiteBrush, 10, startingY + lineNo * (s_PropertiesFont.Size + 5));

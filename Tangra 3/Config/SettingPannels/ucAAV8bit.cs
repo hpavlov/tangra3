@@ -34,17 +34,17 @@ namespace Tangra.Config.SettingPannels
 		{
 			nudSaturation8bit.SetNUDValue((int)TangraConfig.Settings.Photometry.Saturation.Saturation8Bit);
 
-			cbxAdvsOsdTimeStamp.Checked = TangraConfig.Settings.AAV.OverlayTimestamp;
-			cbxAdvsOsdMessages.Checked = TangraConfig.Settings.AAV.OverlayAllMessages;
-            cbxAdvsOsdCameraInfo.Checked = TangraConfig.Settings.AAV.OverlayCameraInfo;
-            cbxAdvsOsdSystemInfo.Checked = TangraConfig.Settings.AAV.OverlayAdvsInfo;
+			cbxAdvsOsdTimeStamp.Checked = TangraConfig.Settings.AAV.Overlay_Timestamp;
+			cbxAdvsOsdMessages.Checked = TangraConfig.Settings.AAV.Overlay_AllMessages;
+            cbxAdvsOsdCameraInfo.Checked = TangraConfig.Settings.AAV.Overlay_CameraInfo;
+            cbxAdvsOsdSystemInfo.Checked = TangraConfig.Settings.AAV.Overlay_AdvsInfo;
 
-			cbxAdvsPopupTimeStamp.Checked = TangraConfig.Settings.AAV.PopupTimestamp;
-            cbxAdvsPopupExposure.Checked = TangraConfig.Settings.AAV.PopupExposure;
-			cbxAdvsPopupSystemTime.Checked = TangraConfig.Settings.AAV.PopupSystemTime;
-			cbxAdvsPopupSatellites.Checked = TangraConfig.Settings.AAV.PopupSatellites;
-			cbxAdvsPopupGPSFix.Checked = TangraConfig.Settings.AAV.PopupGPSFix;
-			cbxAdvsPopupAlmanac.Checked = TangraConfig.Settings.AAV.PopupAlmanac;
+			cbxAdvsPopupTimeStamp.Checked = TangraConfig.Settings.AAV.Popup_Timestamp;
+            cbxAdvsPopupExposure.Checked = TangraConfig.Settings.AAV.Popup_Exposure;
+			cbxAdvsPopupSystemTime.Checked = TangraConfig.Settings.AAV.Popup_SystemTime;
+			cbxAdvsPopupSatellites.Checked = TangraConfig.Settings.AAV.Popup_Satellites;
+			cbxAdvsPopupGPSFix.Checked = TangraConfig.Settings.AAV.Popup_GPSFix;
+			cbxAdvsPopupAlmanac.Checked = TangraConfig.Settings.AAV.Popup_Almanac;
 
 			cbxAavSplitFieldsOSD.Checked = TangraConfig.Settings.AAV.SplitFieldsOSD;
 
@@ -53,17 +53,17 @@ namespace Tangra.Config.SettingPannels
 
         public override void SaveSettings()
 		{			
-        	TangraConfig.Settings.AAV.OverlayTimestamp = cbxAdvsOsdTimeStamp.Checked;
-			TangraConfig.Settings.AAV.OverlayAllMessages = cbxAdvsOsdMessages.Checked;
-            TangraConfig.Settings.AAV.OverlayCameraInfo = cbxAdvsOsdCameraInfo.Checked;
-            TangraConfig.Settings.AAV.OverlayAdvsInfo = cbxAdvsOsdSystemInfo.Checked;
+        	TangraConfig.Settings.AAV.Overlay_Timestamp = cbxAdvsOsdTimeStamp.Checked;
+			TangraConfig.Settings.AAV.Overlay_AllMessages = cbxAdvsOsdMessages.Checked;
+            TangraConfig.Settings.AAV.Overlay_CameraInfo = cbxAdvsOsdCameraInfo.Checked;
+            TangraConfig.Settings.AAV.Overlay_AdvsInfo = cbxAdvsOsdSystemInfo.Checked;
 
-			TangraConfig.Settings.AAV.PopupTimestamp = cbxAdvsPopupTimeStamp.Checked;
-            TangraConfig.Settings.AAV.PopupExposure = cbxAdvsPopupExposure.Checked;
-            TangraConfig.Settings.AAV.PopupSystemTime = cbxAdvsPopupSystemTime.Checked;
-			TangraConfig.Settings.AAV.PopupSatellites = cbxAdvsPopupSatellites.Checked;
-			TangraConfig.Settings.AAV.PopupGPSFix = cbxAdvsPopupGPSFix.Checked;
-			TangraConfig.Settings.AAV.PopupAlmanac = cbxAdvsPopupAlmanac.Checked;
+			TangraConfig.Settings.AAV.Popup_Timestamp = cbxAdvsPopupTimeStamp.Checked;
+            TangraConfig.Settings.AAV.Popup_Exposure = cbxAdvsPopupExposure.Checked;
+            TangraConfig.Settings.AAV.Popup_SystemTime = cbxAdvsPopupSystemTime.Checked;
+			TangraConfig.Settings.AAV.Popup_Satellites = cbxAdvsPopupSatellites.Checked;
+			TangraConfig.Settings.AAV.Popup_GPSFix = cbxAdvsPopupGPSFix.Checked;
+			TangraConfig.Settings.AAV.Popup_Almanac = cbxAdvsPopupAlmanac.Checked;
 
 			TangraConfig.Settings.AAV.SplitFieldsOSD = cbxAavSplitFieldsOSD.Checked;
 
@@ -80,12 +80,12 @@ namespace Tangra.Config.SettingPannels
 		{
 			var rv = new AavSettings()
 			{
-				PopupTimestamp = cbxAdvsPopupTimeStamp.Checked,
-				PopupExposure = cbxAdvsPopupExposure.Checked,
-				PopupSystemTime = cbxAdvsPopupSystemTime.Checked,
-				PopupSatellites = cbxAdvsPopupSatellites.Checked,
-				PopupGPSFix = cbxAdvsPopupGPSFix.Checked,
-				PopupAlmanac = cbxAdvsPopupAlmanac.Checked,
+				Popup_Timestamp = cbxAdvsPopupTimeStamp.Checked,
+				Popup_Exposure = cbxAdvsPopupExposure.Checked,
+				Popup_SystemTime = cbxAdvsPopupSystemTime.Checked,
+				Popup_Satellites = cbxAdvsPopupSatellites.Checked,
+				Popup_GPSFix = cbxAdvsPopupGPSFix.Checked,
+				Popup_Almanac = cbxAdvsPopupAlmanac.Checked,
 				SplitFieldsOSD = cbxAavSplitFieldsOSD.Checked,
 			};
 
