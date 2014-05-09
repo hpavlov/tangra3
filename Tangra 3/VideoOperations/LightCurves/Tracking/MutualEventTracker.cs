@@ -150,7 +150,32 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 				obj2 = (TrackedObjectLight) m_ObjectGroup[0];
 				return true;
 			}
-			else if (Math.Max(d11, d22) > Math.Max(d21, d12) && Math.Min(d11, d22) < Math.Min(d21, d12))
+
+			double x11 = fit1.XCenter - LastCenterObject1.XDouble;
+			double x22 = fit2.XCenter - LastCenterObject2.XDouble;
+			double x12 = fit1.XCenter - LastCenterObject2.XDouble;
+			double x21 = fit2.XCenter - LastCenterObject1.XDouble;
+			int sign11 = Math.Sign(x11);
+			int sign22 = Math.Sign(x22);
+			int sign12 = Math.Sign(x12);
+			int sign21 = Math.Sign(x21);
+			
+			if (sign11 == sign22 && sign12 != sign21 && Math.Abs(x11 - x22) < Math.Abs(x12 - x21))
+			{
+				// 1 = 1; 2 = 2
+				obj1 = (TrackedObjectLight)m_ObjectGroup[0];
+				obj2 = (TrackedObjectLight)m_ObjectGroup[1];
+				return true;
+			}
+			else if (sign12 == sign21 && sign11 != sign22 && Math.Abs(x11 - x22) > Math.Abs(x12 - x21))
+			{
+				// 1 = 2; 2 = 1
+				obj1 = (TrackedObjectLight)m_ObjectGroup[1];
+				obj2 = (TrackedObjectLight)m_ObjectGroup[0];
+				return true;
+			}
+
+			if (Math.Max(d11, d22) > Math.Max(d21, d12) && Math.Min(d11, d22) < Math.Min(d21, d12))
 			{
 				// 1 = 2; 2 = 1
 				obj1 = (TrackedObjectLight)m_ObjectGroup[1];

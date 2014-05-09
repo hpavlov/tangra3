@@ -286,6 +286,8 @@ namespace Tangra.Model.Image
 				{
 					if (!fit.UsesBackgroundModel)
 						throw new InvalidOperationException("3D-Polynomial was not applied correctly.");
+
+					m_TotalBackground = Math.PI * aperture * aperture * fit.I0;
 				}
                 else
                 {
@@ -307,6 +309,9 @@ namespace Tangra.Model.Image
 				{
 					if (!fit.UsesBackgroundModel)
 						throw new InvalidOperationException("3D-Polynomial was not applied correctly.");
+
+					m_TotalReading = (fit.IMax - fit.I0) * fit.R0 * fit.R0 * Math.PI;
+					m_TotalBackground = Math.PI * apertureForBackground * apertureForBackground * (float)fit.I0;
 				}
                 else
                 {
@@ -319,6 +324,13 @@ namespace Tangra.Model.Image
                 m_TotalReading += m_TotalBackground;
             }
         }
+
+		// TODO: Run test for: PSF Photometry (analytical, average model)
+		//		               PSF Photometry (quandrature, average model)
+		//		               PSF Photometry (analytical, non linear fit)
+		//		               PSF Photometry (quandrature, non linear fit)
+		//
+		// TODO: Make sure all return numbers. Check why only 'signal-minus background' was available in some cases. Is this the right thing to do??
 
 		internal NotMeasuredReasons DoOptimalExtractionPhotometry(
 			PSFFit fit,
@@ -390,6 +402,11 @@ namespace Tangra.Model.Image
 				{
 					if (!fit.UsesBackgroundModel)
 						throw new InvalidOperationException("3D-Polynomial was not applied correctly.");
+
+					if (float.IsNaN(psfBackground))
+						m_TotalBackground = 0;
+					else
+						m_TotalBackground = (uint)Math.Round(m_TotalPixels * psfBackground);
 				}
                 else if (m_BackgroundMethod != TangraConfig.BackgroundMethod.PSFBackground)
                 {
@@ -529,8 +546,6 @@ namespace Tangra.Model.Image
 			m_TotalReading = 0;
 			m_TotalBackground = 0;
 	        m_PSFBackground = 0;
-			m_XCenter = 0;
-			m_YCenter = 0;
         }
 
         private delegate double GetPixelMeasurementCallback(int x, int y);
