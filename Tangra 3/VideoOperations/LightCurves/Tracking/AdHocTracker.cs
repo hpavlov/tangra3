@@ -255,7 +255,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 							if (brightestPixel == null)
 							{
 								// This is the first candidate or no candidates are close enough to be part of the same star
-								rv.Add(new ImagePixel(centerPixel, x + topXOffset, y + topYOffset));
+								rv.Add(new ImagePixel((int)centerPixel, x + topXOffset, y + topYOffset));
 							}
 							else
 							{
@@ -267,7 +267,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 								{
 									// The new candidate is brighter so replace the existing candidate
 									rv.Remove(closestPixel);
-									rv.Add(new ImagePixel(centerPixel, x + topXOffset, y + topYOffset));
+                                    rv.Add(new ImagePixel((int)centerPixel, x + topXOffset, y + topYOffset));
 								}
 							}
 
@@ -277,7 +277,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 							if (closestPixel == null || closestDistance > MIN_SAME_STAR_DISTANCE)
 							{
 								// This is the first candidate or no candidates are close enough to be part of the same star
-								rv.Add(new ImagePixel(centerPixel, x + topXOffset, y + topYOffset));
+                                rv.Add(new ImagePixel((int)centerPixel, x + topXOffset, y + topYOffset));
 							}
 							else if (closestDistance < MIN_SAME_STAR_DISTANCE && closestDistance > MAX_AUTO_ASSUME_DUPLICATE_STAR_DISTANCE)
 							{
@@ -289,7 +289,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 								{
 									// The new candidate is brighter so replace the existing candidate
 									rv.Remove(closestPixel);
-									rv.Add(new ImagePixel(centerPixel, x + topXOffset, y + topYOffset));
+                                    rv.Add(new ImagePixel((int)centerPixel, x + topXOffset, y + topYOffset));
 								}
 							}							
 						}

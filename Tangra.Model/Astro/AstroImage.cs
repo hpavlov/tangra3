@@ -256,7 +256,7 @@ namespace Tangra.Model.Astro
             if (double.IsNaN(xx) || double.IsNaN(yy))
                 return null;
 
-            ImagePixel retVal = new ImagePixel(m_Pixelmap[(int)Math.Round(xx), (int)Math.Round(yy)], xx, yy);
+            ImagePixel retVal = new ImagePixel(xx, yy);
 
             retVal.SignalNoise = retVal.Brightness * 1.0 / noiseLevel;
 

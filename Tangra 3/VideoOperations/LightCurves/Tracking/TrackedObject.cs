@@ -517,7 +517,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                 if (ThisFrameX + ThisFrameY == 0)
                     return OriginalObject.AsImagePixel;
                 else
-                    return new ImagePixel(ThisFrameX, ThisFrameY);
+                    return new ImagePixel((int)ThisSignalLevel, ThisFrameX, ThisFrameY);
             }
         }
 

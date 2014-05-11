@@ -60,10 +60,10 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 		public void SetTrackedObjectMatch(PSFFit psfFitMatched)
 		{
 			if (PSFFit != null && PSFFit.IsSolved)
-				LastKnownGoodPosition = new ImagePixel(Center);
+                LastKnownGoodPosition = new ImagePixel(psfFitMatched.Brightness, Center.XDouble, Center.YDouble);
 
 			PSFFit = psfFitMatched;
-			Center = new ImagePixel((uint)psfFitMatched.IMax, psfFitMatched.XCenter, psfFitMatched.YCenter);
+			Center = new ImagePixel((int)psfFitMatched.IMax, psfFitMatched.XCenter, psfFitMatched.YCenter);
 			IsLocated = true;
 			NotMeasuredReasons = NotMeasuredReasons.TrackedSuccessfully;
 		}

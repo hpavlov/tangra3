@@ -74,7 +74,7 @@ namespace Tangra.Model.Astro
 
 		public void Fit(uint[,] pixels, float starX0, float starY0, float startMinDistance)
 		{
-			m_Star1Center = new ImagePixel(starX0, starY0);
+			m_Star1Center = new ImagePixel(-1, starX0, starY0);
 			m_Star1MinDistance = startMinDistance;
 			m_Star2Center = null;
 
@@ -83,12 +83,12 @@ namespace Tangra.Model.Astro
 
 		public void Fit(uint[,] pixels, PSFFit star1, PSFFit star2)
 		{
-			m_Star1Center = new ImagePixel(star1.X0_Matrix, star1.Y0_Matrix);
+            m_Star1Center = new ImagePixel(star1.Brightness, star1.X0_Matrix, star1.Y0_Matrix);
 			m_Star1MinDistance = star1.FWHM * 2.0;
 
 			if (star2 != null)
 			{
-				m_Star2Center = new ImagePixel(star2.X0_Matrix, star2.Y0_Matrix);
+                m_Star2Center = new ImagePixel(star2.Brightness, star2.X0_Matrix, star2.Y0_Matrix);
 				m_Star2MinDistance = star2.FWHM * 2.0;
 			}
 			else

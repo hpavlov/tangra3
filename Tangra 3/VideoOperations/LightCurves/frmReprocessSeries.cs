@@ -259,7 +259,7 @@ namespace Tangra.VideoOperations.LightCurves
             LCMeasurement clonedValue = reading.Clone();
             clonedValue.ReProcessingPsfFitMatrixSize = newFitMatrixSize;
 
-            TrackedObjectConfig objConfig = Footer.TrackedObjects[clonedValue.TargetNo];			
+            TrackedObjectConfig objConfig = Footer.TrackedObjects[clonedValue.TargetNo];
             ImagePixel center = new ImagePixel(clonedValue.X0, clonedValue.Y0);
 
 		    int areaSize = groupCenters != null && groupCenters.Length > 1 ? 35 : 17;

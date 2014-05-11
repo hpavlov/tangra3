@@ -12,7 +12,7 @@ namespace Tangra.Model.Image
 		double XDouble { get; }
 		double YDouble { get; }
 		bool IsSpecified { get; }
-		uint Brightness { get; }
+		int Brightness { get; }
 	}
 
     public class ImagePixel : IImagePixel
@@ -22,17 +22,17 @@ namespace Tangra.Model.Image
 		public double XDouble { get; private set; }
 		public double YDouble { get; private set; }
 
-		public uint Brightness { get; private set; }
+		public int Brightness { get; private set; }
 
         /// <summary>
         /// This needs to be set by the code that created the ImagePixel
         /// </summary>
         public double SignalNoise;
 
-        public static ImagePixel Unspecified = new ImagePixel(uint.MinValue, double.NaN, double.NaN);
+        public static ImagePixel Unspecified = new ImagePixel(int.MinValue, double.NaN, double.NaN);
 
 		public ImagePixel(IImagePixel clone)
-			: this(uint.MinValue, clone.XDouble, clone.YDouble)
+            : this(clone.Brightness, clone.XDouble, clone.YDouble)
 		{ }
 
     	public ImagePixel(ImagePixel clone)
@@ -40,10 +40,10 @@ namespace Tangra.Model.Image
 		{ }
 
         public ImagePixel(double x, double y)
-            : this(uint.MinValue, x, y)
+            : this(int.MinValue, x, y)
         { }
 
-        public ImagePixel(uint brightness, double x, double y)
+        public ImagePixel(int brightness, double x, double y)
         {
             XDouble = x;
             YDouble = y;

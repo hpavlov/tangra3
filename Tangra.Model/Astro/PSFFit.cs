@@ -240,11 +240,11 @@ namespace Tangra.Model.Astro
             get { return m_IBackground + m_IStarMax; }
         }
 
-    	public uint Brightness
+    	public int Brightness
     	{
     		get
     		{
-				return (uint)Math.Round(IMax - I0);
+				return (int)Math.Round(IMax - I0);
     		}
     	}
 

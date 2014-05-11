@@ -131,7 +131,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                     foreach (TrackedObject trackedObject in TrackedObjects)
                     {
                         trackedObject.LastKnownGoodFrameId = frameNo - 1;
-                        trackedObject.LastKnownGoodPosition = new ImagePixel(trackedObject.ThisFrameX, trackedObject.ThisFrameY);
+                        trackedObject.LastKnownGoodPosition = new ImagePixel((int)trackedObject.ThisSignalLevel, trackedObject.ThisFrameX, trackedObject.ThisFrameY);
                     }
                 }   
             }
@@ -206,7 +206,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
             IImagePixel firstCenter = 
                 gaussian.IsSolved
-                    ? new ImagePixel((int)gaussian.XCenter, (int)gaussian.YCenter)
+                    ? new ImagePixel(gaussian.Brightness, (int)gaussian.XCenter, (int)gaussian.YCenter)
                     : astroImage.GetCentroid((int)trackedObject.LastFrameX, (int)trackedObject.LastFrameY, 17, m_MedianValue);
 
             if (firstCenter != null)
@@ -396,7 +396,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             IImagePixel newStaringPos = 
 				m_AllGuidingStarsFailed
 					? prevPos
-                    : new ImagePixel(prevPos.XDouble + m_LastFrameDeltaX, prevPos.YDouble + m_LastFrameDeltaY);
+                    : new ImagePixel(prevPos.Brightness, prevPos.XDouble + m_LastFrameDeltaX, prevPos.YDouble + m_LastFrameDeltaY);
 
             if (trackedObject.OriginalObject.IsWeakSignalObject)
             {
@@ -482,7 +482,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
                 if (m_Refining)
                     trackedObject.RegisterRefinedPosition(
-                        new ImagePixel(trackedObject.ThisFrameX, trackedObject.ThisFrameY), 
+                        new ImagePixel((int)trackedObject.ThisSignalLevel, trackedObject.ThisFrameX, trackedObject.ThisFrameY), 
                         trackedObject.ThisSignalLevel,
 						trackedObject.PSFFit != null ? trackedObject.PSFFit.FWHM : double.NaN);
             }            
