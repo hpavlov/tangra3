@@ -900,7 +900,7 @@ namespace Tangra.VideoOperations.LightCurves
 					Pen pen = Pens.Black;
 					int h = objHeight - 1;
 
-					if (!m_Tracker.IsTrackedSuccessfully && (!obj.IsLocated || obj.IsOffScreen))
+					if ((!m_Tracker.IsTrackedSuccessfully || obj.OriginalObject.ProcessInPsfGroup) && (!obj.IsLocated || obj.IsOffScreen))
 					{
 						pen = m_AllPens[obj.TargetNo];
 					}

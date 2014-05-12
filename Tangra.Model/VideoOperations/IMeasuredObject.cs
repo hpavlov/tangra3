@@ -42,6 +42,8 @@ namespace Tangra.Model.VideoOperations
 		/* Light Tracker Reasons */
 		ObjectTooElongated = 1 << 24,
 		ObjectCertaintyTooSmall = 2 << 24,
+
+		OutlierMeasurement = 4 << 24
     }
 
 	public interface IMeasurableObject

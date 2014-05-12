@@ -91,6 +91,8 @@ namespace Tangra.Controller
 
         public void OpenLcFile(string fileName)
         {
+			// TODO: Check .lc file size and available RAM show RAM warning!!!
+
             m_MainFormView.Cursor = Cursors.WaitCursor;
             LCFile lcFile = null;
             try

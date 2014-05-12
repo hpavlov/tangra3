@@ -128,6 +128,27 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 		internal bool ContainsOcultedStar { get; private set; }
 
+		private bool NoMatch(out TrackedObjectLight obj1, out TrackedObjectLight obj2)
+		{
+			obj1 = null;
+			obj2 = null;
+			return false;
+		}
+
+		private bool Match1122(out TrackedObjectLight obj1, out TrackedObjectLight obj2)
+		{
+			obj1 = (TrackedObjectLight)m_ObjectGroup[0];
+			obj2 = (TrackedObjectLight)m_ObjectGroup[1];
+			return true;
+		}
+
+		private bool Match1212(out TrackedObjectLight obj1, out TrackedObjectLight obj2)
+		{
+			obj1 = (TrackedObjectLight)m_ObjectGroup[1];
+			obj2 = (TrackedObjectLight)m_ObjectGroup[0];
+			return true;
+		}
+
 		internal bool IdentifyObjects(PSFFit fit1, PSFFit fit2, float minGuidingStarCertainty, out TrackedObjectLight obj1, out TrackedObjectLight obj2)
 		{
             // Make sure the two are not too far away and are also not too close
@@ -136,11 +157,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             double diffDistRatio = centDiff / oldCentDiff;
 
             if (diffDistRatio < 0.5 || diffDistRatio > 2)
-            {
-                obj1 = null;
-                obj2 = null;
-                return false;
-            }
+				return NoMatch(out obj1, out obj2);
 
             bool fit1Brighter = fit1.Brightness > fit2.Brightness;
             bool fit1Certain = fit1.Certainty > minGuidingStarCertainty;
@@ -148,55 +165,35 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             bool brighterFitCertain = fit1Brighter ? fit1Certain : fit2Certain;
 
             if (!brighterFitCertain)
-            {
-                obj1 = null;
-                obj2 = null;
-                return false;
-            }
+				return NoMatch(out obj1, out obj2);
+
+			double prevX1X2 = LastCenterObject1.XDouble - LastCenterObject2.XDouble;
+			double prevY1Y2 = LastCenterObject1.YDouble - LastCenterObject2.YDouble;
+			double thisX1X2 = fit1.XCenter - fit2.XCenter;
+			double thisY1Y2 = fit1.YCenter - fit2.YCenter;
+			double delta1122 = Math.Abs(prevX1X2 - thisX1X2) + Math.Abs(prevY1Y2 - thisY1Y2);
+			double delta1212 = Math.Abs(prevX1X2 + thisX1X2) + Math.Abs(prevY1Y2 + thisY1Y2);
+
+			if (delta1122 < 1 && delta1212 > 4)
+				return Match1122(out obj1, out obj2);
+			else if (delta1212 < 1 && delta1122 > 4)
+				return Match1212(out obj1, out obj2);
+
+			bool match1122Ok = (Math.Abs(prevX1X2 - thisX1X2) < Math.Abs(prevX1X2 + thisX1X2)) && (Math.Abs(prevY1Y2 - thisY1Y2) < Math.Abs(prevY1Y2 + thisY1Y2));
+			bool match1212Ok = (Math.Abs(prevX1X2 + thisX1X2) < Math.Abs(prevX1X2 - thisX1X2)) && (Math.Abs(prevY1Y2 + thisY1Y2) < Math.Abs(prevY1Y2 - thisY1Y2));
+
+			if ((!match1122Ok && !match1212Ok) || (match1122Ok && match1212Ok))
+				return NoMatch(out obj1, out obj2);
 
 			double d11 = ImagePixel.ComputeDistance(fit1.XCenter, LastCenterObject1.XDouble, fit1.YCenter, LastCenterObject1.YDouble);
 			double d22 = ImagePixel.ComputeDistance(fit2.XCenter, LastCenterObject2.XDouble, fit2.YCenter, LastCenterObject2.YDouble);
 			double d12 = ImagePixel.ComputeDistance(fit1.XCenter, LastCenterObject2.XDouble, fit1.YCenter, LastCenterObject2.YDouble);
 			double d21 = ImagePixel.ComputeDistance(fit2.XCenter, LastCenterObject1.XDouble, fit2.YCenter, LastCenterObject1.YDouble);
 
-			if (d11 < d12 && d22 < d21)
-			{
-				// 1 = 1; 2 = 2
-				obj1 = (TrackedObjectLight)m_ObjectGroup[0];
-				obj2 = (TrackedObjectLight)m_ObjectGroup[1];
-				return true;
-			}
-			else if (d11 > d12 && d22 > d21)
-			{
-				// 1 = 2; 2 = 1
-				obj1 = (TrackedObjectLight) m_ObjectGroup[1];
-				obj2 = (TrackedObjectLight) m_ObjectGroup[0];
-				return true;
-			}
-
-			double x11 = fit1.XCenter - LastCenterObject1.XDouble;
-			double x22 = fit2.XCenter - LastCenterObject2.XDouble;
-			double x12 = fit1.XCenter - LastCenterObject2.XDouble;
-			double x21 = fit2.XCenter - LastCenterObject1.XDouble;
-			int sign11 = Math.Sign(x11);
-			int sign22 = Math.Sign(x22);
-			int sign12 = Math.Sign(x12);
-			int sign21 = Math.Sign(x21);
-			
-			if (sign11 == sign22 && sign12 != sign21 && Math.Abs(x11 - x22) < Math.Abs(x12 - x21))
-			{
-				// 1 = 1; 2 = 2
-				obj1 = (TrackedObjectLight)m_ObjectGroup[0];
-				obj2 = (TrackedObjectLight)m_ObjectGroup[1];
-				return true;
-			}
-			else if (sign12 == sign21 && sign11 != sign22 && Math.Abs(x11 - x22) > Math.Abs(x12 - x21))
-			{
-				// 1 = 2; 2 = 1
-				obj1 = (TrackedObjectLight)m_ObjectGroup[1];
-				obj2 = (TrackedObjectLight)m_ObjectGroup[0];
-				return true;
-			}
+			if (d11 < d12 && d22 < d21 && match1122Ok)
+				return Match1122(out obj1, out obj2);
+			else if (d11 > d12 && d22 > d21 && match1212Ok)
+				return Match1212(out obj1, out obj2);
 
 		    double bDiff = Math.Abs(fit1.Brightness - fit2.Brightness);
             double bRatio = bDiff / Math.Max((double)fit1.Brightness, (double)fit2.Brightness);
@@ -209,42 +206,13 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                 double b12 = Math.Abs(fit1.Brightness - LastCenterObject2.Brightness);
                 double b21 = Math.Abs(fit2.Brightness - LastCenterObject1.Brightness);
 
-                if ((fit1Brighter && b12 > b11 && fit1Certain) || (!fit1Brighter && b21 > b22 && fit2Certain))
-                {
-                    // fit1 = last object 1
-                    obj1 = (TrackedObjectLight)m_ObjectGroup[0];
-                    obj2 = (TrackedObjectLight)m_ObjectGroup[1];
-                    return true;
-                }
-                else if ((fit1Brighter && b12 < b11 && fit1Certain) || (!fit1Brighter && b21 < b22 && fit2Certain))
-                {
-                    // fit1 = last object 1
-                    obj1 = (TrackedObjectLight)m_ObjectGroup[1];
-                    obj2 = (TrackedObjectLight)m_ObjectGroup[0];
-                    return true;
-                }
+				if (((fit1Brighter && b12 > b11 && fit1Certain) || (!fit1Brighter && b21 > b22 && fit2Certain)) && match1122Ok)
+					return Match1122(out obj1, out obj2);
+				else if (((fit1Brighter && b12 < b11 && fit1Certain) || (!fit1Brighter && b21 < b22 && fit2Certain)) == match1212Ok)
+					return Match1212(out obj1, out obj2);
             }
 
-//			if (Math.Max(d11, d22) > Math.Max(d21, d12) && Math.Min(d11, d22) < Math.Min(d21, d12))
-//			{
-//				// 1 = 2; 2 = 1
-//				obj1 = (TrackedObjectLight)m_ObjectGroup[1];
-//				obj2 = (TrackedObjectLight)m_ObjectGroup[0];
-//				return true;
-//			}
-//			else if (Math.Max(d11, d22) < Math.Max(d21, d12) && Math.Min(d11, d22) > Math.Min(d21, d12))
-//			{
-//				// 1 = 1; 2 = 2
-//				obj1 = (TrackedObjectLight)m_ObjectGroup[0];
-//				obj2 = (TrackedObjectLight)m_ObjectGroup[1];
-//				return true;
-//			}
-//			else
-			{
-				obj1 = null;
-				obj2 = null;
-				return false;
-			}
+			return NoMatch(out obj1, out obj2);
 		}
 	}
 
@@ -375,10 +343,11 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 							if (!groupIdentified)
 							{
 								objectGroup.SetIsTracked(false, NotMeasuredReasons.PSFFittingFailed, null);
+
 								//Bitmap bmp = new Bitmap(100, 200);
 								//using (Graphics g = Graphics.FromImage(bmp))
 								//{
-								//	doubleFit.DrawInternalPoints(g, new Rectangle(0,0, 100, 200), 5, 5, Brushes.Lime, Brushes.Yellow, 8);
+								//	doubleFit.DrawInternalPoints(g, new Rectangle(0, 0, 100, 200), 5, 5, Brushes.Lime, Brushes.Yellow, 8);
 								//	g.Save();
 								//}
 								//bmp.Save(@"D:\Hristo\mutual_double_fit.bmp");

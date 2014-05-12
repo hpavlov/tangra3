@@ -52,6 +52,8 @@ namespace Tangra.VideoOperations.LightCurves
 
             for (int i = 0; i < m_Header.ObjectCount; i++)
             {
+	            int[] last10Values = new int[10];
+
                 for (int j = 0; j < m_AllReadings[i].Count; j++)
                 {
                     LCMeasurement reading = m_AllReadings[i][j];
@@ -84,8 +86,23 @@ namespace Tangra.VideoOperations.LightCurves
 
                     if (m_IncludeObjects[i])
                     {
+						if (j > 10)
+						{
+							long average = (
+								(long)last10Values[0] + (long)last10Values[1] + (long)last10Values[2] + (long)last10Values[3] + (long)last10Values[4] +
+								(long)last10Values[5] + (long)last10Values[6] + (long)last10Values[7] + (long)last10Values[8] + (long)last10Values[9]) / 10;
+
+							if (adjustedValue > 2*average || adjustedValue < -2*average)
+							{
+								adjustedValue = last10Values[(j - 1)%10];
+								reading.SetIsMeasured(NotMeasuredReasons.OutlierMeasurement); 
+							}
+						}
+
                         if (minValue > adjustedValue) minValue = adjustedValue;
-                        if (maxValue < adjustedValue) maxValue = adjustedValue;                        
+                        if (maxValue < adjustedValue) maxValue = adjustedValue;
+
+	                    last10Values[j % 10] = adjustedValue;
                     }
 
                     reading.AdjustedReading = adjustedValue;

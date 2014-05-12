@@ -56,6 +56,7 @@ namespace Tangra.Model.Astro
 		private double m_FirstVariance;
 		private double m_SecondVariance;
 		private double m_ThirdVariance;
+		private double m_MedianValue;
 
 		private int m_Width;
 		private int m_Height;
@@ -220,7 +221,20 @@ namespace Tangra.Model.Astro
 				m_BestFit = 3;
 			}
 			else
-				throw new InvalidOperationException();
+			{
+				// Act as a median filter
+				m_BestFit = 0;
+
+				try
+				{
+					m_ZValues.Sort();
+					m_MedianValue = m_ZValues[m_ZValues.Count / 2];
+				}
+				catch
+				{
+					m_MedianValue = 0;
+				}
+			}
 		}
 
 		// First Order (3 params): Z = A * x + B * y + C
@@ -381,7 +395,7 @@ namespace Tangra.Model.Astro
 			else if (m_BestFit == 3)
 				return ComputeThirdOrderValue(x, y);
 
-			throw new ArgumentOutOfRangeException();
+			return m_MedianValue;
 		}
 
 		public uint[,] GetFittedPixels()

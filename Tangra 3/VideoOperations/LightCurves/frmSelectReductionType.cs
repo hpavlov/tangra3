@@ -249,6 +249,7 @@ namespace Tangra.VideoOperations.LightCurves
 
             m_VideoContoller.RefreshCurrentFrame();
 
+
             DialogResult = DialogResult.OK;
             Close();
         }
