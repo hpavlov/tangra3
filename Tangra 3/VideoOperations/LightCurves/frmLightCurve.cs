@@ -2256,6 +2256,8 @@ namespace Tangra.VideoOperations.LightCurves
 		private void frmLightCurve_Load(object sender, EventArgs e)
 		{
 			ReloadAddins();
+
+			miOutlierRemoval.Checked = true;
 		}
 
 		public void ReloadAddins()
@@ -2320,6 +2322,12 @@ namespace Tangra.VideoOperations.LightCurves
 					Process.Start(tempFile);
 				}
 			}
+		}
+
+		private void miOutlierRemoval_CheckedChanged(object sender, EventArgs e)
+		{
+			m_Context.OutlierRemoval = miOutlierRemoval.Checked;
+			pnlChart.Invalidate();
 		}
 	}
 }

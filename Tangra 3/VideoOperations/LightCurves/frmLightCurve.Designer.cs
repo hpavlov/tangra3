@@ -73,6 +73,8 @@
 			this.miShowPSFFits = new System.Windows.Forms.ToolStripMenuItem();
 			this.miBackgroundHistograms = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+			this.miOutlierRemoval = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
 			this.miReprocess = new System.Windows.Forms.ToolStripMenuItem();
 			this.miFullReprocess = new System.Windows.Forms.ToolStripMenuItem();
 			this.miAdjustMeasurements = new System.Windows.Forms.ToolStripMenuItem();
@@ -696,6 +698,8 @@
             this.miShowPSFFits,
             this.miBackgroundHistograms,
             this.toolStripSeparator3,
+            this.miOutlierRemoval,
+            this.toolStripSeparator5,
             this.miReprocess,
             this.miFullReprocess,
             this.miAdjustMeasurements,
@@ -735,6 +739,21 @@
 			// 
 			this.toolStripSeparator3.Name = "toolStripSeparator3";
 			this.toolStripSeparator3.Size = new System.Drawing.Size(231, 6);
+			// 
+			// miOutlierRemoval
+			// 
+			this.miOutlierRemoval.Checked = true;
+			this.miOutlierRemoval.CheckOnClick = true;
+			this.miOutlierRemoval.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.miOutlierRemoval.Name = "miOutlierRemoval";
+			this.miOutlierRemoval.Size = new System.Drawing.Size(234, 22);
+			this.miOutlierRemoval.Text = "Automatic Outlier Removal";
+			this.miOutlierRemoval.CheckedChanged += new System.EventHandler(this.miOutlierRemoval_CheckedChanged);
+			// 
+			// toolStripSeparator5
+			// 
+			this.toolStripSeparator5.Name = "toolStripSeparator5";
+			this.toolStripSeparator5.Size = new System.Drawing.Size(231, 6);
 			// 
 			// miReprocess
 			// 
@@ -1364,5 +1383,7 @@
 		private System.Windows.Forms.Label lblInstDelayWarning;
 		private System.Windows.Forms.ToolTip toolTip1;
 		private System.Windows.Forms.ToolStripMenuItem miExportNTPDebugData;
+		private System.Windows.Forms.ToolStripMenuItem miOutlierRemoval;
+		private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
     }
 }

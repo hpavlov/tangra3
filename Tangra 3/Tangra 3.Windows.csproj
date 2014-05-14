@@ -86,6 +86,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
@@ -275,6 +276,7 @@
       <DependentUpon>frmUnhandledException.cs</DependentUpon>
     </Compile>
     <Compile Include="Helpers\ApplicationSettingsSerializer.cs" />
+    <Compile Include="Helpers\CrossPlaform.cs" />
     <Compile Include="Helpers\DuplicateFrameAvoider.cs" />
     <Compile Include="Helpers\Extensions.cs" />
     <Compile Include="Helpers\FITSHelper.cs" />

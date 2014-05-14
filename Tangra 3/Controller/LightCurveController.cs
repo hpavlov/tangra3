@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Helpers;
 using Tangra.ImageTools;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
@@ -91,8 +92,24 @@ namespace Tangra.Controller
 
         public void OpenLcFile(string fileName)
         {
-			// TODO: Check .lc file size and available RAM show RAM warning!!!
+	        var fi = new FileInfo(fileName);
+	        double expectedMemoryMbNeeded = 500 /* For Tangra to operate*/ + 20*fi.Length/(1024*1024) /* For the .lc file to be unpacked and loaded in memory */;
 
+			double availableMemoryMb = CrossPlaform.GetAvailableMemoryInMegabytes();
+
+			if (expectedMemoryMbNeeded > availableMemoryMb)
+			{
+				if (MessageBox.Show(
+					m_MainFormView,
+					string.Format("Opening this file will require at least {0}Gb of free memory. Do you wish to continue?", (Math.Ceiling(expectedMemoryMbNeeded/512.0)/2).ToString("0.0")),
+					"Warning",
+					MessageBoxButtons.YesNo,
+					MessageBoxIcon.Warning) == DialogResult.No)
+				{
+					return;
+				}
+			}
+			
             m_MainFormView.Cursor = Cursors.WaitCursor;
             LCFile lcFile = null;
             try

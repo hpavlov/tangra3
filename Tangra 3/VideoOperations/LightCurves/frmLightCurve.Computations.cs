@@ -86,23 +86,32 @@ namespace Tangra.VideoOperations.LightCurves
 
                     if (m_IncludeObjects[i])
                     {
-						if (j > 10)
+	                    bool includeInMinMaxCalcs = true;
+						if (m_Context.OutlierRemoval && j > 10)
 						{
+							// Deal with values that are too large or too small
 							long average = (
 								(long)last10Values[0] + (long)last10Values[1] + (long)last10Values[2] + (long)last10Values[3] + (long)last10Values[4] +
 								(long)last10Values[5] + (long)last10Values[6] + (long)last10Values[7] + (long)last10Values[8] + (long)last10Values[9]) / 10;
 
-							if (adjustedValue > 2*average || adjustedValue < -2*average)
+							if (adjustedValue > 1000 || adjustedValue < -1000)
 							{
-								adjustedValue = last10Values[(j - 1)%10];
-								reading.SetIsMeasured(NotMeasuredReasons.OutlierMeasurement); 
+								if (Math.Abs(adjustedValue) > Math.Abs(2 * average))
+								{
+									adjustedValue = last10Values[(j - 1) % 10];
+									reading.SetIsMeasured(NotMeasuredReasons.OutlierMeasurement);
+									includeInMinMaxCalcs = false;
+								}
 							}
 						}
 
-                        if (minValue > adjustedValue) minValue = adjustedValue;
-                        if (maxValue < adjustedValue) maxValue = adjustedValue;
+						if (includeInMinMaxCalcs)
+						{
+							if (minValue > adjustedValue) minValue = adjustedValue;
+							if (maxValue < adjustedValue) maxValue = adjustedValue;
 
-	                    last10Values[j % 10] = adjustedValue;
+							last10Values[j % 10] = adjustedValue;							
+						}
                     }
 
                     reading.AdjustedReading = adjustedValue;
@@ -874,6 +883,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 			public bool CustomBinning { get; set; }
 
+	        private bool m_OutlierRemoval = true;
         	public string[] m_ObjectTitles = new string[4];
         	public string[] m_ChartTitleLines;
 
@@ -952,6 +962,19 @@ namespace Tangra.VideoOperations.LightCurves
                     }
                 }
             }
+
+	        public bool OutlierRemoval
+	        {
+		        get { return m_OutlierRemoval; }
+		        set
+		        {
+			        if (m_OutlierRemoval != value)
+			        {
+				        m_OutlierRemoval = value;
+				        m_Dirty = true;
+			        }
+		        }
+	        }
 
             public int Binning
             {
