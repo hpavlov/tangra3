@@ -56,6 +56,7 @@ namespace Tangra.VideoOperations.LightCurves
 
         private int m_ProcessedFrames = 0;
         private int m_UnsuccessfulFrames = 0;
+	    private int m_PartiallySuccessfulFrames = 0;
         private Stopwatch m_StopWatch = new Stopwatch();
 
         private readonly Pen[] m_AllPens = new Pen[4];
@@ -256,6 +257,8 @@ namespace Tangra.VideoOperations.LightCurves
                 {
                     m_ProcessedFrames++;
                     if (!m_Tracker.IsTrackedSuccessfully) m_UnsuccessfulFrames++;
+	                if (m_Tracker.IsTrackedSuccessfully && m_Tracker.TrackedObjects.Any(x => !x.IsLocated))
+		                m_PartiallySuccessfulFrames++;
 
                     SaveEmbeddedOrORCedTimeStamp(frameNo);
 
@@ -264,7 +267,7 @@ namespace Tangra.VideoOperations.LightCurves
                     m_PrevMeasuredFrame = m_CurrFrameNo;
 
                     m_StopWatch.Stop();
-                    m_ControlPanel.UpdateProcessedFrames(m_ProcessedFrames, m_UnsuccessfulFrames, (int)(m_StopWatch.ElapsedMilliseconds / 1000));
+                    m_ControlPanel.UpdateProcessedFrames(m_ProcessedFrames, m_UnsuccessfulFrames, m_PartiallySuccessfulFrames, (int)(m_StopWatch.ElapsedMilliseconds / 1000));
                     m_StopWatch.Start();
 
                     if (!m_Tracker.IsTrackedSuccessfully &&
@@ -311,6 +314,7 @@ namespace Tangra.VideoOperations.LightCurves
 
                             m_ProcessedFrames = 0;
                             m_UnsuccessfulFrames = 0;
+	                        m_PartiallySuccessfulFrames = 0;
                             m_StopWatch.Reset();
                             m_StopWatch.Start();
 

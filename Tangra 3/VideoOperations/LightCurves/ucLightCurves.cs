@@ -236,10 +236,11 @@ namespace Tangra.VideoOperations.LightCurves
 			info.Dock = DockStyle.Fill;
 		}
 
-        public void UpdateProcessedFrames(int processedFramed, int unsuccessfulFrames, int elapsedTime)
+        public void UpdateProcessedFrames(int processedFramed, int unsuccessfulFrames, int partiallySuccessfulFrames, int elapsedTime)
         {
             lblProcessedFrames.Text = processedFramed.ToString();
             lblSkippedFrames.Text = unsuccessfulFrames.ToString();
+	        lblPartiallySuccessfulFrames.Text = partiallySuccessfulFrames.ToString();
             lblElapsedTime.Text = string.Format("{0}:{1}", elapsedTime / 60, (elapsedTime % 60).ToString("00"));
 			if (!lblUsedTracker.Visible)
 			{

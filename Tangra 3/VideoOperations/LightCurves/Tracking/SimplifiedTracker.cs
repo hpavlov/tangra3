@@ -52,20 +52,20 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 					{
 						if (fit.Certainty < GUIDING_STAR_MIN_CERTAINTY)
 						{
-							trackedObject.SetIsTracked(false, NotMeasuredReasons.ObjectCertaintyTooSmall, (PSFFit)null);
+							trackedObject.SetIsTracked(false, NotMeasuredReasons.ObjectCertaintyTooSmall);
 						}
 						else if (fit.FWHM < STELLAR_OBJECT_MIN_FWHM || fit.FWHM > STELLAR_OBJECT_MAX_FWHM)
 						{
-							trackedObject.SetIsTracked(false, NotMeasuredReasons.FWHMOutOfRange, (PSFFit)null);
+							trackedObject.SetIsTracked(false, NotMeasuredReasons.FWHMOutOfRange);
 						}
 						else if (TangraConfig.Settings.Tracking.CheckElongation && fit.ElongationPercentage > STELLAR_OBJECT_MAX_ELONGATION)
 						{
-							trackedObject.SetIsTracked(false, NotMeasuredReasons.ObjectTooElongated, (PSFFit)null);
+							trackedObject.SetIsTracked(false, NotMeasuredReasons.ObjectTooElongated);
 						}
 						else
 						{
 							trackedObject.SetTrackedObjectMatch(fit);
-							trackedObject.SetIsTracked(true, NotMeasuredReasons.TrackedSuccessfully, fit);
+							trackedObject.SetIsTracked(true, NotMeasuredReasons.TrackedSuccessfully);
 						}
 					}
 				}					
@@ -103,7 +103,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 				if (numReferences == 0)
 				{
-					trackedObject.SetIsTracked(false, NotMeasuredReasons.FitSuspectAsNoGuidingStarsAreLocated, (PSFFit)null);
+					trackedObject.SetIsTracked(false, NotMeasuredReasons.FitSuspectAsNoGuidingStarsAreLocated);
 				}
 				else
 				{
@@ -133,13 +133,13 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 						if (fit.IsSolved && fit.Certainty > STELLAR_OBJECT_MIN_CERTAINTY)
 						{
-							trackedObject.SetIsTracked(true, NotMeasuredReasons.TrackedSuccessfully, fit);
+							trackedObject.SetIsTracked(true, NotMeasuredReasons.TrackedSuccessfully);
 							trackedObject.SetTrackedObjectMatch(fit);
 						}
 						else if (m_IsFullDisappearance)
-							trackedObject.SetIsTracked(false, NotMeasuredReasons.FullyDisappearingStarMarkedTrackedWithoutBeingFound, (PSFFit)null);
+							trackedObject.SetIsTracked(false, NotMeasuredReasons.FullyDisappearingStarMarkedTrackedWithoutBeingFound);
 						else
-							trackedObject.SetIsTracked(false, NotMeasuredReasons.ObjectCertaintyTooSmall, (PSFFit)null);
+							trackedObject.SetIsTracked(false, NotMeasuredReasons.ObjectCertaintyTooSmall);
 					}
 				}
 			}

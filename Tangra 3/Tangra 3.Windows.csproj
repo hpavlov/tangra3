@@ -447,7 +447,6 @@
     <Compile Include="VideoOperations\LightCurves\ReduceLightCurveOperation.cs" />
     <Compile Include="Helpers\OccultWatcherHelper.cs" />
     <Compile Include="VideoOperations\LightCurves\Report\EventTimesReport.cs" />
-    <Compile Include="VideoOperations\LightCurves\Tracking\AdHocTracker.cs" />
     <Compile Include="VideoOperations\LightCurves\Tracking\BaseTracker.cs" />
     <Compile Include="VideoOperations\LightCurves\Tracking\FailedDistanceLogger.cs" />
     <Compile Include="VideoOperations\LightCurves\Tracking\ITracker.cs" />
