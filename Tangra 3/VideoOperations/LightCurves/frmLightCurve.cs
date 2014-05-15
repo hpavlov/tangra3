@@ -1412,6 +1412,19 @@ namespace Tangra.VideoOperations.LightCurves
 				m_frmBackgroundHistograms.Dispose();
 				m_frmBackgroundHistograms = null;
 			}
+
+	        foreach (List<LCMeasurement> list in m_AllReadings) list.Clear();
+	        foreach(List<BinnedValue> list in m_AllBinnedReadings) list.Clear();
+			foreach (List<LCMeasurement> list in m_InitialNoFilterReadings) list.Clear(); 
+			m_FrameTiming.Clear();
+
+			m_LCFile = null;
+			m_Header = new LCMeasurementHeader();
+	        m_Footer = new LCMeasurementFooter();
+	        m_FrameTiming = null;
+	        m_Context = null;
+
+			GC.Collect();
         }
 
 		private void frmLightCurve_Resize(object sender, EventArgs e)
