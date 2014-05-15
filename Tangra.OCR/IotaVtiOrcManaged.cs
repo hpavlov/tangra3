@@ -662,9 +662,10 @@ namespace Tangra.OCR
                 }
 
                 int oddEvenFieldDirection = oddFieldTimestamp.Ticks - evenFieldTimestamp.Ticks < 0 ? -1 : 1;
-                if (oddEvenFieldDirection != m_Corrector.GetOddEvenFieldDirection())
+				if (m_Corrector.OddEvenFieldDirectionIsKnown() && 
+					oddEvenFieldDirection != m_Corrector.GetOddEvenFieldDirection())
                 {
-                    // Field timestamps are wonrg have changed order (did they swap)?
+                    // Field timestamps are wrong have changed order (did they swap)?
                     failedValidation = true;
                 }
 

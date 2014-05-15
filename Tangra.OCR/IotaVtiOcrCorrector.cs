@@ -174,6 +174,11 @@ namespace Tangra.OCR
 			m_PrevEvenFieldOSD = new IotaVtiTimeStamp(evenFieldOSD);
 		}
 
+		public bool OddEvenFieldDirectionIsKnown()
+		{
+			return m_PrevOddTicks != -1 && m_PrevEvenTicks != -1;
+		}
+
 		public int GetOddEvenFieldDirection()
 		{
 			return m_PrevOddTicks - m_PrevEvenTicks < 0 ? -1 : 1;
