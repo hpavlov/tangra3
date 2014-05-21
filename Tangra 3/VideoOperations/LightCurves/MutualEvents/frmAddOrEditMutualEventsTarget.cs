@@ -72,6 +72,7 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 		private const int AREA_SIDE = 35;
 
 	    private Color[] m_AllTargetColors;
+	    private string strElcOrOcc;
 
         public frmAddOrEditMutualEventsTarget()
         {
@@ -841,9 +842,45 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 			rbOccElc1.Visible = rbOcculted.Checked;
 			rbOccElc2.Visible = twoObjects && rbOcculted.Checked;
 
-			gbxGroupType.Text = twoObjects ? "The Group Contains ..." : "The Object Is ...";			
-			rbOcculted.Text = twoObjects ? "The Occulted / Eclipsed Star" : "Occulted / Eclipsed Star";
-			rbReference.Text = twoObjects ? "Reference Stars Only" : "Reference Star";
+			if (twoObjects)
+			{
+				gbxGroupType.Text = "The Group Contains ...";
+				if (LightCurveReductionContext.Instance.LightCurveReductionSubType == ReductionSubType.Eclipse)
+				{
+					rbOcculted.Text = "The Eclipsed Star";
+					strElcOrOcc = "Eclipsed";
+					if (rbOccElc1.Checked) rbOccElc1.Text = strElcOrOcc;
+					else rbOccElc2.Text = strElcOrOcc;
+				}
+				else if (LightCurveReductionContext.Instance.LightCurveReductionSubType == ReductionSubType.Occultation)
+				{
+					rbOcculted.Text = "The Occulted Star";
+					strElcOrOcc = "Occulted";
+					if (rbOccElc1.Checked) rbOccElc1.Text = strElcOrOcc;
+					else rbOccElc2.Text = strElcOrOcc;
+				} 
+				rbReference.Text = "Reference Stars Only";
+
+			}
+			else
+			{
+				gbxGroupType.Text = "The Object Is ...";
+				if (LightCurveReductionContext.Instance.LightCurveReductionSubType == ReductionSubType.Eclipse)
+				{
+					rbOcculted.Text = "Eclipsed Star";
+					strElcOrOcc = "Eclipsed";
+					rbOccElc1.Text = strElcOrOcc; 
+					rbOccElc1.Checked = true;										
+				}
+				else if (LightCurveReductionContext.Instance.LightCurveReductionSubType == ReductionSubType.Occultation)
+				{
+					rbOcculted.Text = "Occulted Star";
+					strElcOrOcc = "Occulted";
+					rbOccElc1.Text = strElcOrOcc;
+					rbOccElc1.Checked = true;
+				} 
+				rbReference.Text = "Reference Star";				
+			}
 		}
 
 		private void rbOcculted_CheckedChanged(object sender, EventArgs e)
@@ -863,6 +900,20 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 
 			DialogResult = DialogResult.OK;
 			Close();
+		}
+
+		private void rbOccElc1_CheckedChanged(object sender, EventArgs e)
+		{
+			if (rbOccElc1.Checked)
+			{
+				rbOccElc1.Text = strElcOrOcc;
+				rbOccElc2.Text = "            ";
+			}
+			else 
+			{
+				rbOccElc2.Text = strElcOrOcc;
+				rbOccElc1.Text = "            ";
+			}
 		}
     }
 }

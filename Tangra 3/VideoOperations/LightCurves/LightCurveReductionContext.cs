@@ -23,15 +23,23 @@ namespace Tangra.VideoOperations.LightCurves
 		TotalLunarReppearance
     }
 
+	public enum ReductionSubType
+	{
+		Unknown,
+		Occultation,
+		Eclipse
+	}
+
     public class LightCurveReductionContext
     {
-        private static byte VERSION = 8;
+        private static byte VERSION = 9;
 
         public static LightCurveReductionContext Instance = new LightCurveReductionContext();
 
         public TangraConfig.PreProcessingFilter DigitalFilter;
         public TangraConfig.BackgroundMethod  NoiseMethod;
         public LightCurveReductionType LightCurveReductionType;
+	    public ReductionSubType LightCurveReductionSubType;
         public TangraConfig.PhotometryReductionMethod ReductionMethod;
 		public TangraConfig.PsfQuadrature PsfQuadratureMethod;
         public bool FullDisappearance;
@@ -206,7 +214,10 @@ namespace Tangra.VideoOperations.LightCurves
 			fileWriter.Write(UsedTracker ?? string.Empty);
 
 			// Version 8 Data
-			fileWriter.Write((int)PsfQuadratureMethod);			
+			fileWriter.Write((int)PsfQuadratureMethod);
+
+			// Version 9 Data
+			fileWriter.Write((int)LightCurveReductionSubType);
         }
 
         internal static LightCurveReductionContext Load(BinaryReader reader)
@@ -236,6 +247,7 @@ namespace Tangra.VideoOperations.LightCurves
 				instance.HasEmbeddedTimeStamps = false;
 	            instance.UsedTracker = null;
 	            instance.PsfQuadratureMethod = TangraConfig.PsfQuadrature.NumericalInAperture;
+	            instance.LightCurveReductionSubType = ReductionSubType.Unknown;
 				#endregion 
 
                 if (version > 1)
@@ -280,6 +292,11 @@ namespace Tangra.VideoOperations.LightCurves
 										if (version > 7)
 										{
 											instance.PsfQuadratureMethod = (TangraConfig.PsfQuadrature)reader.ReadInt32();
+
+											if (version > 8)
+											{
+												instance.LightCurveReductionSubType = (ReductionSubType)reader.ReadInt32();
+											}
 										}
 									}
 								}

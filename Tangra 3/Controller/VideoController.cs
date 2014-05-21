@@ -810,7 +810,10 @@ namespace Tangra.Controller
 		{
 			m_DisplayInvertedMode = inverted;
 			if (inverted)
+			{
 				m_DisplayHueBackgroundMode = false;
+				m_MainForm.miJupiterGlow.Checked = false;
+			}
 
 			TangraConfig.Settings.Generic.UseInvertedDisplayMode = inverted;
 			TangraConfig.Settings.Save();
@@ -827,9 +830,12 @@ namespace Tangra.Controller
             m_DisplayHueIntensityMode = hueSelected;
 
 	        if (hueSelected)
+	        {
 		        m_DisplayHueBackgroundMode = false;
+		        m_MainForm.miJupiterGlow.Checked = false;
+	        }
 
-			TangraConfig.Settings.Generic.UseHueIntensityDisplayMode = hueSelected;
+	        TangraConfig.Settings.Generic.UseHueIntensityDisplayMode = hueSelected;
 	        TangraConfig.Settings.Save();
 
             if (!m_FramePlayer.IsRunning &&
@@ -847,7 +853,9 @@ namespace Tangra.Controller
 			{
 				// When the Hue Background Mode is turned ON we turn off everything else
 				m_DisplayHueIntensityMode = false;
+				m_MainForm.tsmiHueIntensity.Checked = false;
 				m_DisplayInvertedMode = false;
+				m_MainForm.tsmiInverted.Checked = false;
 				m_DisplayIntensifyMode = DisplayIntensifyMode.Off;
 
 				TangraConfig.Settings.Generic.UseHueIntensityDisplayMode = false;

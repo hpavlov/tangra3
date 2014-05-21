@@ -657,6 +657,10 @@ namespace Tangra.VideoOperations.LightCurves
         internal int PixelDataX0;
         internal int PixelDataY0;
 
+		internal float ApertureX;
+		internal float ApertureY;
+		internal float ApertureSize;
+
         internal PSFFit PsfFit;
 
         internal string GetFlagsExplained()
@@ -747,13 +751,35 @@ namespace Tangra.VideoOperations.LightCurves
 
         public DateTime OSDTimeStamp;
 
-        private static int SERIALIZATION_VERSION = 7;
+        private static int SERIALIZATION_VERSION = 8;
         private static int MINAMAL_SUPPORTED_VERSION = 3;
     	private static int FIRST_UINT_MATRIX_VERSION = 7;
 
 		public int PsfGroupId;
 
-        internal LCMeasurement(
+		internal static LCMeasurement UnsuccessfulMeasurement(
+			uint currFrameNo,
+			byte targetNo,
+			uint flagsDWORD,
+			uint[,] pixelData,
+			DateTime osdTimeStamp,
+			int groupId)
+		{
+			return new LCMeasurement(
+				currFrameNo,
+				targetNo,
+				0,
+				0,
+				flagsDWORD,
+				0, 0,
+				null,
+				pixelData /* save the original non filtered data */,
+				0, 0, osdTimeStamp, 
+				groupId,
+				0, 0, 0);
+		}
+
+        private LCMeasurement(
             uint currFrameNo,
             byte targetNo,
             uint totalReading,
@@ -764,7 +790,10 @@ namespace Tangra.VideoOperations.LightCurves
             uint[,] pixelData,
             int pixelDataX0, int pixelDataY0,
             DateTime osdTimeStamp,
-			int groupId)
+			int groupId,
+			float apertureX,
+			float apertureY,
+			float apertureSize)
         {
             AdjustedReading = 0;
             AdjustedBackground = 0;
@@ -789,6 +818,10 @@ namespace Tangra.VideoOperations.LightCurves
 
             ReProcessingPsfFitMatrixSize = 11;
 			PsfGroupId = groupId;
+
+			ApertureSize = apertureSize;
+			ApertureX = apertureX;
+			ApertureY = apertureY;
         }
 
 		internal LCMeasurement(BinaryReader reader, LCMeasurement prevMeasurement, int groupId)
@@ -820,6 +853,10 @@ namespace Tangra.VideoOperations.LightCurves
             X0 = reader.ReadSingle();
             Y0 = reader.ReadSingle();
 
+			ApertureSize = 0;
+			ApertureX = 0;
+			ApertureY = 0;
+
             PixelDataX0 = reader.ReadInt32();
             PixelDataY0 = reader.ReadInt32();
 
@@ -839,6 +876,15 @@ namespace Tangra.VideoOperations.LightCurves
 				if (version > 5)
 				{
 					FlagsDWORD = reader.ReadUInt32();
+
+					// NOTE: There is no properties in SER VER 7
+
+					if (version > 7)
+					{
+						ApertureX = reader.ReadSingle();
+						ApertureY = reader.ReadSingle();
+						ApertureSize = reader.ReadSingle();
+					}
 				}
             }
 
@@ -870,6 +916,14 @@ namespace Tangra.VideoOperations.LightCurves
 
 			// Version 6 Data
 			writer.Write(FlagsDWORD);
+
+			// Version 7 Data
+			// NOTHING HERE
+
+			// Version 8 Data
+	        writer.Write(ApertureX);
+			writer.Write(ApertureY);
+			writer.Write(ApertureSize);
         }
 
 		internal int ReProcessingPsfFitMatrixSize;

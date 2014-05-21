@@ -131,6 +131,16 @@ namespace Tangra.VideoOperations.LightCurves
 				return;
 			}
 
+			if (rbMutualEvent.Checked)
+			{
+				if (!rbMutualEcl.Checked && !rbMutualOcc.Checked)
+				{
+					MessageBox.Show(this, "Please select if this is an Occultation or Eclipse.", "Question", MessageBoxButtons.OK, MessageBoxIcon.Question);
+					return;
+				}
+
+			}
+
 			LightCurveReductionContext.Instance.DigitalFilter = (TangraConfig.PreProcessingFilter)cbxDigitalFilter.SelectedIndex;
 			LightCurveReductionContext.Instance.NoiseMethod = ComboboxIndexToBackgroundMethod();
 			LightCurveReductionContext.Instance.ReductionMethod = ComboboxIndexToPhotometryReductionMethod();
@@ -141,15 +151,21 @@ namespace Tangra.VideoOperations.LightCurves
 			LightCurveReductionContext.Instance.StopOnLostTracking = cbxShaking.Checked && cbxStopOnLostTracking.Checked;
 			LightCurveReductionContext.Instance.FieldRotation = cbxFieldRotation.Checked;
 			LightCurveReductionContext.Instance.IsDriftThrough = cbxDriftTrough.Checked;
+	        LightCurveReductionContext.Instance.LightCurveReductionSubType = ReductionSubType.Unknown;
 
 			if (rbAsteroidal.Checked)
 				LightCurveReductionContext.Instance.LightCurveReductionType = LightCurveReductionType.Asteroidal;
 			else if (rbMutualEvent.Checked)
+			{
 				LightCurveReductionContext.Instance.LightCurveReductionType = LightCurveReductionType.MutualEvent;
+				LightCurveReductionContext.Instance.LightCurveReductionSubType = rbMutualOcc.Checked
+					                                                                 ? ReductionSubType.Occultation
+					                                                                 : ReductionSubType.Eclipse;
+			}
 			else
 				LightCurveReductionContext.Instance.LightCurveReductionType = LightCurveReductionType.UntrackedMeasurement;
 
-			if (rbRunningAverage.Checked)
+	        if (rbRunningAverage.Checked)
 				LightCurveReductionContext.Instance.FrameIntegratingMode = FrameIntegratingMode.SlidingAverage;
 			else if (rbBinning.Checked)
 				LightCurveReductionContext.Instance.FrameIntegratingMode = FrameIntegratingMode.SteppedAverage;
@@ -394,6 +410,17 @@ namespace Tangra.VideoOperations.LightCurves
 
 		private void rbMutualEvent_CheckedChanged(object sender, EventArgs e)
 		{
+			if (rbMutualEvent.Checked)
+			{
+				rbMutualOcc.Checked = false;
+				rbMutualEcl.Checked = false;
+				pnlMutualType.Visible = true;
+			}
+			else
+			{
+				pnlMutualType.Visible = false;
+			}
+
 			if (!m_DefaultReductionSettingsModified)
 			{
 				if (rbMutualEvent.Checked)

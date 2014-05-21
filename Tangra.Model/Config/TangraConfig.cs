@@ -559,9 +559,9 @@ namespace Tangra.Model.Config
             public bool AdvancedLightCurveSettings = false;
             public PhotometryReductionMethod AsteroidalReductionType = PhotometryReductionMethod.AperturePhotometry;
 			public BackgroundMethod AsteroidalBackgroundMethod = BackgroundMethod.BackgroundMedian;
-			public PhotometryReductionMethod MutualReductionType = PhotometryReductionMethod.PsfPhotometry;
-			public BackgroundMethod MutualBackgroundMethod = BackgroundMethod.Background3DPolynomial;
-			public PreProcessingFilter MutualDigitalFilter = PreProcessingFilter.LowPassFilter;
+			public PhotometryReductionMethod MutualReductionType = PhotometryReductionMethod.AperturePhotometry;
+			public BackgroundMethod MutualBackgroundMethod = BackgroundMethod.BackgroundMedian;
+			public PreProcessingFilter MutualDigitalFilter = PreProcessingFilter.NoFilter;
             public int MeasuringZoomImageMode = 0;
 
             public List<SameSizeApertureConfig> SameSizeApertures = new List<SameSizeApertureConfig>();

@@ -74,7 +74,7 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 			{
 				TrackedObjectConfig cfg = m_LCFile.Footer.TrackedObjects[i];
 
-				m_ObjectinGroup[i] = m_LCFile.Footer.TrackedObjects.Count(x => x.GroupId == cfg.GroupId) > 1;
+				m_ObjectinGroup[i] = cfg.GroupId >=0 && m_LCFile.Footer.TrackedObjects.Count(x => x.GroupId == cfg.GroupId) > 1;
 
 				switch(cfg.TrackingType)
 				{
@@ -254,12 +254,19 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 						? m_DisplaySettings.TargetPens[reading.TargetNo]
 						: Pens.Gray;
 
+					bool isInGroup = m_ObjectinGroup[reading.TargetNo];
+					bool appertureInGroup = isInGroup && m_Context.SignalMethod == TangraConfig.PhotometryReductionMethod.AperturePhotometry;
+
+					float ax = appertureInGroup && reading.ApertureX > 0 ? reading.ApertureX : 17.5f;
+					float ay = appertureInGroup && reading.ApertureY > 0 ? reading.ApertureY : 17.5f;
+					float ap = appertureInGroup && reading.ApertureSize > 0 ? reading.ApertureSize : radius;
+
 					g.DrawEllipse(
 						pen,
-						(float)(MAGN * (reading.X0 - pixelsCenterX + 17 + 0.5 - radius)),
-						(float)(MAGN * (reading.Y0 - pixelsCenterY + 17 + 0.5 - radius)),
-						2 * radius * MAGN,
-						2 * radius * MAGN);
+						(float)(MAGN * (reading.X0 - pixelsCenterX + ax - ap)),
+						(float)(MAGN * (reading.Y0 - pixelsCenterY + ay - ap)),
+						2 * ap * MAGN,
+						2 * ap * MAGN);
 
 					string title = m_ObjectTitles[reading.TargetNo];
 					SizeF fntSize = g.MeasureString(title, s_TitleFont);
@@ -267,8 +274,7 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 						title, s_TitleFont, m_DisplaySettings.TargetBrushes[reading.TargetNo],
 						pictureBox.Width - fntSize.Width - 5,
 						pictureBox.Height - fntSize.Height - 5);
-
-					bool isInGroup = m_ObjectinGroup[reading.TargetNo];
+					
 					if (isInGroup)
 						g.DrawString("Grouped", s_TitleFont, m_DisplaySettings.TargetBrushes[reading.TargetNo], 2, pictureBox.Height - fntSize.Height - 5);
 

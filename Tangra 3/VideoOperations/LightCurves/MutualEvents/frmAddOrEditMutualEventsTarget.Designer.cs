@@ -345,26 +345,29 @@
 			// 
 			// rbOccElc1
 			// 
-			this.rbOccElc1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.rbOccElc1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.rbOccElc1.AutoSize = true;
 			this.rbOccElc1.Checked = true;
-			this.rbOccElc1.Location = new System.Drawing.Point(157, 335);
+			this.rbOccElc1.Location = new System.Drawing.Point(159, 336);
 			this.rbOccElc1.Name = "rbOccElc1";
-			this.rbOccElc1.Size = new System.Drawing.Size(65, 17);
+			this.rbOccElc1.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+			this.rbOccElc1.Size = new System.Drawing.Size(61, 17);
 			this.rbOccElc1.TabIndex = 98;
 			this.rbOccElc1.TabStop = true;
-			this.rbOccElc1.Text = "Occ/Ecl";
+			this.rbOccElc1.Text = "            ";
 			this.rbOccElc1.UseVisualStyleBackColor = true;
+			this.rbOccElc1.CheckedChanged += new System.EventHandler(this.rbOccElc1_CheckedChanged);
 			// 
 			// rbOccElc2
 			// 
-			this.rbOccElc2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.rbOccElc2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.rbOccElc2.AutoSize = true;
-			this.rbOccElc2.Location = new System.Drawing.Point(157, 353);
+			this.rbOccElc2.Location = new System.Drawing.Point(159, 354);
 			this.rbOccElc2.Name = "rbOccElc2";
-			this.rbOccElc2.Size = new System.Drawing.Size(65, 17);
+			this.rbOccElc2.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+			this.rbOccElc2.Size = new System.Drawing.Size(61, 17);
 			this.rbOccElc2.TabIndex = 99;
-			this.rbOccElc2.Text = "Occ/Ecl";
+			this.rbOccElc2.Text = "            ";
 			this.rbOccElc2.UseVisualStyleBackColor = true;
 			// 
 			// frmAddOrEditMutualEventsTarget

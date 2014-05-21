@@ -63,9 +63,12 @@ namespace Tangra.VideoOperations.LightCurves
 			this.rbBinning = new System.Windows.Forms.RadioButton();
 			this.rbRunningAverage = new System.Windows.Forms.RadioButton();
 			this.tabStretching = new System.Windows.Forms.TabPage();
-			this.ucStretching = new Tangra.VideoOperations.LightCurves.ucPreProcessing();
 			this.tabReduction = new System.Windows.Forms.TabPage();
 			this.pnlBackground = new System.Windows.Forms.Panel();
+			this.ucStretching = new Tangra.VideoOperations.LightCurves.ucPreProcessing();
+			this.pnlMutualType = new System.Windows.Forms.Panel();
+			this.rbMutualOcc = new System.Windows.Forms.RadioButton();
+			this.rbMutualEcl = new System.Windows.Forms.RadioButton();
 			this.tabControl1.SuspendLayout();
 			this.tabGeneral.SuspendLayout();
 			this.groupBox2.SuspendLayout();
@@ -77,6 +80,7 @@ namespace Tangra.VideoOperations.LightCurves
 			this.tabStretching.SuspendLayout();
 			this.tabReduction.SuspendLayout();
 			this.pnlBackground.SuspendLayout();
+			this.pnlMutualType.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// rbAsteroidal
@@ -286,6 +290,7 @@ namespace Tangra.VideoOperations.LightCurves
 			// 
 			// groupBox2
 			// 
+			this.groupBox2.Controls.Add(this.pnlMutualType);
 			this.groupBox2.Controls.Add(this.rbLunarOccultation);
 			this.groupBox2.Controls.Add(this.rbAsteroidal);
 			this.groupBox2.Controls.Add(this.rbUntrackedMeasurement);
@@ -480,13 +485,6 @@ namespace Tangra.VideoOperations.LightCurves
 			this.tabStretching.Text = "Pre-Processing";
 			this.tabStretching.UseVisualStyleBackColor = true;
 			// 
-			// ucStretching
-			// 
-			this.ucStretching.Location = new System.Drawing.Point(0, 0);
-			this.ucStretching.Name = "ucStretching";
-			this.ucStretching.Size = new System.Drawing.Size(370, 221);
-			this.ucStretching.TabIndex = 0;
-			// 
 			// tabReduction
 			// 
 			this.tabReduction.BackColor = System.Drawing.Color.Transparent;
@@ -511,6 +509,46 @@ namespace Tangra.VideoOperations.LightCurves
 			this.pnlBackground.Name = "pnlBackground";
 			this.pnlBackground.Size = new System.Drawing.Size(291, 40);
 			this.pnlBackground.TabIndex = 6;
+			// 
+			// ucStretching
+			// 
+			this.ucStretching.Location = new System.Drawing.Point(0, 0);
+			this.ucStretching.Name = "ucStretching";
+			this.ucStretching.Size = new System.Drawing.Size(370, 221);
+			this.ucStretching.TabIndex = 0;
+			// 
+			// pnlMutualType
+			// 
+			this.pnlMutualType.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.pnlMutualType.Controls.Add(this.rbMutualEcl);
+			this.pnlMutualType.Controls.Add(this.rbMutualOcc);
+			this.pnlMutualType.Location = new System.Drawing.Point(191, 36);
+			this.pnlMutualType.Name = "pnlMutualType";
+			this.pnlMutualType.Size = new System.Drawing.Size(155, 31);
+			this.pnlMutualType.TabIndex = 15;
+			this.pnlMutualType.Visible = false;
+			// 
+			// rbMutualOcc
+			// 
+			this.rbMutualOcc.AutoSize = true;
+			this.rbMutualOcc.Location = new System.Drawing.Point(6, 5);
+			this.rbMutualOcc.Name = "rbMutualOcc";
+			this.rbMutualOcc.Size = new System.Drawing.Size(79, 17);
+			this.rbMutualOcc.TabIndex = 0;
+			this.rbMutualOcc.TabStop = true;
+			this.rbMutualOcc.Text = "Occultation";
+			this.rbMutualOcc.UseVisualStyleBackColor = true;
+			// 
+			// rbMutualEcl
+			// 
+			this.rbMutualEcl.AutoSize = true;
+			this.rbMutualEcl.Location = new System.Drawing.Point(88, 5);
+			this.rbMutualEcl.Name = "rbMutualEcl";
+			this.rbMutualEcl.Size = new System.Drawing.Size(59, 17);
+			this.rbMutualEcl.TabIndex = 16;
+			this.rbMutualEcl.TabStop = true;
+			this.rbMutualEcl.Text = "Eclipse";
+			this.rbMutualEcl.UseVisualStyleBackColor = true;
 			// 
 			// frmSelectReductionType
 			// 
@@ -547,6 +585,8 @@ namespace Tangra.VideoOperations.LightCurves
 			this.tabReduction.PerformLayout();
 			this.pnlBackground.ResumeLayout(false);
 			this.pnlBackground.PerformLayout();
+			this.pnlMutualType.ResumeLayout(false);
+			this.pnlMutualType.PerformLayout();
 			this.ResumeLayout(false);
 
         }
@@ -590,5 +630,8 @@ namespace Tangra.VideoOperations.LightCurves
         private System.Windows.Forms.CheckBox cbxFieldRotation;
 		private System.Windows.Forms.CheckBox cbxDriftTrough;
 		private System.Windows.Forms.RadioButton rbLunarOccultation;
+		private System.Windows.Forms.Panel pnlMutualType;
+		private System.Windows.Forms.RadioButton rbMutualEcl;
+		private System.Windows.Forms.RadioButton rbMutualOcc;
     }
 }

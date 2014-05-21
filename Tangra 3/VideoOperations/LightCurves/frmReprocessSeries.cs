@@ -136,6 +136,7 @@ namespace Tangra.VideoOperations.LightCurves
         {
             bool useLowPassDiff = Context.Filter == frmLightCurve.LightCurveContext.FilterType.LowPassDifference;
             bool useLowPass = Context.Filter == frmLightCurve.LightCurveContext.FilterType.LowPass;
+	        bool retainOldValues = !Context.FurtherReprocessingNotPossible;
 
             List<LCMeasurement>[] workReadings = new List<LCMeasurement>[4] { new List<LCMeasurement>(), new List<LCMeasurement>(), new List<LCMeasurement>(), new List<LCMeasurement>() };
 
@@ -179,7 +180,7 @@ namespace Tangra.VideoOperations.LightCurves
                     return;
                 }
 
-				LCMeasurement[] remeasuredUnits = ProcessSingleUnitSet(units, useLowPass, useLowPassDiff, measurer);
+				LCMeasurement[] remeasuredUnits = ProcessSingleUnitSet(units, useLowPass, useLowPassDiff, retainOldValues, measurer);
 
 				workReadings[0].Add(remeasuredUnits[0]);
 				if (Header.ObjectCount > 1) workReadings[1].Add(remeasuredUnits[1]);
@@ -211,6 +212,7 @@ namespace Tangra.VideoOperations.LightCurves
 			LCMeasurement[] units,
 		    bool useLowPass,
 		    bool useLowPassDiff,
+			bool retainOldValues,
 		    MeasurementsHelper measurer)
 	    {
 		    LCMeasurement[] rv = new LCMeasurement[units.Length];
@@ -219,24 +221,27 @@ namespace Tangra.VideoOperations.LightCurves
 		    {
 			    LCMeasurement reading = units[i];
 			    IImagePixel[] groupCenters = new IImagePixel[0];
+			    float[] aperturesInGroup = new float[0];
 
 				TrackedObjectConfig objConfig = Footer.TrackedObjects[reading.TargetNo];
 				List<TrackedObjectConfig> gropedObjects = Footer.TrackedObjects.Where(x => x.GroupId == objConfig.GroupId).ToList();
 				if (gropedObjects.Count > 1)
 				{
 					groupCenters = new IImagePixel[gropedObjects.Count];
+					aperturesInGroup = new float[gropedObjects.Count];
 
 					for (int j = 0; j < gropedObjects.Count; j++)
 					{
 						LCMeasurement mea = units[Footer.TrackedObjects.IndexOf(gropedObjects[j])];
 						groupCenters[j] = new ImagePixel(mea.X0, mea.Y0);
+						aperturesInGroup[j] = gropedObjects[j].ApertureInPixels;
 					}
 				}
 
 				LCMeasurement remeasuredReading = ProcessSingleUnit(
-					reading, useLowPass, useLowPassDiff, 
-					Context.ReProcessFitAreas[i], Context.ReProcessApertures[i], Header.FixedApertureFlags[i], 
-					measurer, groupCenters);
+					reading, useLowPass, useLowPassDiff, retainOldValues,
+					Context.ReProcessFitAreas[i], Context.ReProcessApertures[i], Header.FixedApertureFlags[i],
+					measurer, groupCenters, aperturesInGroup);
 
 			    rv[i] = remeasuredReading;
 		    }
@@ -248,15 +253,15 @@ namespace Tangra.VideoOperations.LightCurves
             LCMeasurement reading,
             bool useLowPass,
             bool useLowPassDiff,
+			bool retainOldValues,
             int newFitMatrixSize,
             float newSignalAperture,
             bool fixedAperture,
             MeasurementsHelper measurer,
-			IImagePixel[] groupCenters)
+			IImagePixel[] groupCenters,
+			float[] aperturesInGroup)
         {
-
-            // TODO: Handle the correct links to the m_PreviousMeasurement and m_PrevSuccessfulReading !!!
-            LCMeasurement clonedValue = reading.Clone();
+			LCMeasurement clonedValue = retainOldValues ? reading.Clone() : reading;
             clonedValue.ReProcessingPsfFitMatrixSize = newFitMatrixSize;
 
             TrackedObjectConfig objConfig = Footer.TrackedObjects[clonedValue.TargetNo];
@@ -268,13 +273,17 @@ namespace Tangra.VideoOperations.LightCurves
             
 			uint[,] data = BitmapFilter.CutArrayEdges(clonedValue.PixelData, (35 - areaSize) / 2);
 
+		    var filter = TangraConfig.PreProcessingFilter.NoFilter;
+			if (useLowPassDiff) filter = TangraConfig.PreProcessingFilter.LowPassDifferenceFilter;
+			else if (useLowPass) filter = TangraConfig.PreProcessingFilter.LowPassFilter;
+
 			NotMeasuredReasons rv = ReduceLightCurveOperation.MeasureObject(
 				center,
 				data,
 				clonedValue.PixelData,
 				Context.BitPix,
 				measurer,
-				(TangraConfig.PreProcessingFilter)((int)Context.Filter),
+				filter,
 				false,
 				Context.SignalMethod,
 				Context.PsfQuadratureMethod,
@@ -283,11 +292,15 @@ namespace Tangra.VideoOperations.LightCurves
 				Footer.RefinedAverageFWHM,
 				clonedValue,
 				groupCenters,
+				aperturesInGroup,
 				Footer.ReductionContext.FullDisappearance);
 
 			clonedValue.SetIsMeasured(rv);
             clonedValue.TotalReading = (uint)measurer.TotalReading;
             clonedValue.TotalBackground = (uint)measurer.TotalBackground;
+		    clonedValue.ApertureX = measurer.XCenter;
+			clonedValue.ApertureY = measurer.YCenter;
+			clonedValue.ApertureSize = measurer.Aperture;
 
             return clonedValue;
         }

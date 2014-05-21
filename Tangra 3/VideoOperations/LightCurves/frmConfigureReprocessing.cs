@@ -520,6 +520,7 @@ namespace Tangra.VideoOperations.LightCurves
 			m_Context.PsfQuadratureMethod = ComboboxIndexToPsfQuadratureMethod();
 			m_Context.Filter = (frmLightCurve.LightCurveContext.FilterType)cbxDigitalFilter.SelectedIndex;
 			m_Context.EncodingGamma = (double)nudGamma.Value;
+			m_Context.FurtherReprocessingNotPossible = !cbxUseClone.Checked;
 
             DialogResult = DialogResult.OK;
             Close();

@@ -606,6 +606,14 @@ namespace Tangra.VideoOperations.LightCurves
 
 		private void SaveLCFile()
 		{
+			if (m_Context.FurtherReprocessingNotPossible)
+			{
+				if (MessageBox.Show(
+					"This light curve has already been re-processed and saving it now will overwrite the original measurements. Do you want to continue?",
+					"Tangra", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
+					return;
+			}
+
 		    m_LightCurveController.ConfigureSaveLcFileDialog(saveFileDialog);
 
 			if (saveFileDialog.ShowDialog(this) == DialogResult.OK)
@@ -976,9 +984,9 @@ namespace Tangra.VideoOperations.LightCurves
             {
                 return false;
             }
-
+			
             m_AllReadings = frm.AllReadings;
-            
+			
             UpdateFormTitle();
 
             return true;
@@ -1245,6 +1253,14 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void miReprocess_Click(object sender, EventArgs e)
 		{
+			if (m_Context.FurtherReprocessingNotPossible)
+			{
+				MessageBox.Show(
+					"This light curve has already been re-processed. You will need to reopen the original file if you want to reprocess it with different settings.",
+					"Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return;
+			}
+
 			#region Integration/Pre-Processing warnings
 			if (m_Footer.ReductionContext.UseBrightnessContrast || 
 				m_Footer.ReductionContext.UseClipping ||
@@ -1413,9 +1429,9 @@ namespace Tangra.VideoOperations.LightCurves
 				m_frmBackgroundHistograms = null;
 			}
 
-	        foreach (List<LCMeasurement> list in m_AllReadings) list.Clear();
+			CleanUpAllReadings(m_AllReadings);
 	        foreach(List<BinnedValue> list in m_AllBinnedReadings) list.Clear();
-			foreach (List<LCMeasurement> list in m_InitialNoFilterReadings) list.Clear(); 
+			CleanUpAllReadings(m_InitialNoFilterReadings);
 			m_FrameTiming.Clear();
 
 			m_LCFile = null;
@@ -1426,6 +1442,11 @@ namespace Tangra.VideoOperations.LightCurves
 
 			GC.Collect();
         }
+
+		private void CleanUpAllReadings(List<List<LCMeasurement>> dataList)
+		{
+			foreach (List<LCMeasurement> list in dataList) list.Clear();        
+		}
 
 		private void frmLightCurve_Resize(object sender, EventArgs e)
 		{

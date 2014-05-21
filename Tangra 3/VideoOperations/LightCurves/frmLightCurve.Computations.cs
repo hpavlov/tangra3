@@ -86,13 +86,23 @@ namespace Tangra.VideoOperations.LightCurves
 
                     if (m_IncludeObjects[i])
                     {
-	                    bool includeInMinMaxCalcs = true;
-						if (m_Context.OutlierRemoval && j > 10)
+						bool includeInMinMaxCalcs = j > 10;
+
+						if (m_Context.OutlierRemoval && j >= 10)
 						{
 							// Deal with values that are too large or too small
 							long average = (
 								(long)last10Values[0] + (long)last10Values[1] + (long)last10Values[2] + (long)last10Values[3] + (long)last10Values[4] +
 								(long)last10Values[5] + (long)last10Values[6] + (long)last10Values[7] + (long)last10Values[8] + (long)last10Values[9]) / 10;
+
+							if (j == 10)
+							{
+								// the first 10 items we don't check, so we take the median and then make all 10 items the same
+								List<int> firstTen = last10Values.ToList();
+								int median = (firstTen[4] + firstTen[5])/2;
+								for (int k = 0; k < 10; k++) last10Values[k] = median;
+								average = median;
+							}
 
 							if (adjustedValue > 1000 || adjustedValue < -1000)
 							{
@@ -108,10 +118,11 @@ namespace Tangra.VideoOperations.LightCurves
 						if (includeInMinMaxCalcs)
 						{
 							if (minValue > adjustedValue) minValue = adjustedValue;
-							if (maxValue < adjustedValue) maxValue = adjustedValue;
-
-							last10Values[j % 10] = adjustedValue;							
+							if (maxValue < adjustedValue) maxValue = adjustedValue;														
 						}
+
+						if (j < 10 || includeInMinMaxCalcs)
+							last10Values[j % 10] = adjustedValue;
                     }
 
                     reading.AdjustedReading = adjustedValue;
@@ -1087,7 +1098,9 @@ namespace Tangra.VideoOperations.LightCurves
 				get { return m_DecodingGammaMatrix; }
 			}
 
-            private double m_EncodingGamma = 1.0;
+			public bool FurtherReprocessingNotPossible { get; set; }
+
+	        private double m_EncodingGamma = 1.0;
             public double EncodingGamma
             {
                 get { return m_EncodingGamma; }

@@ -1655,19 +1655,14 @@ namespace Tangra.VideoOperations.LightCurves
 						(int)Math.Round(center.XDouble), (int)Math.Round(center.YDouble), 35);
 
 					uint flags = trackedObject.GetTrackingFlags();
+
 					// Add unsuccessfull measurement for this object and this frame
-					LCFile.SaveOnTheFlyMeasurement(new LCMeasurement(
+					LCFile.SaveOnTheFlyMeasurement(LCMeasurement.UnsuccessfulMeasurement(
 													(uint)m_CurrFrameNo,
 													(byte)trackedObject.TargetNo,
-													0,
-													0,
 													flags,
-													0, 0,
-						/* We want to use the real image (X,Y) coordinates here */
-						//(float) aperture,
-													null,
 						/* but we want to use the actual measurement fit. This only matters for reviewing the light curve when not opened from a file. */
-													data /* save the original non filtered data */, 0, 0, m_OCRedTimeStamp,
+													data /* save the original non filtered data */, m_OCRedTimeStamp,
 													trackedObject.OriginalObject.GroupId));
 				}
             }
@@ -1689,13 +1684,17 @@ namespace Tangra.VideoOperations.LightCurves
 				areaSize = 35;
 
 			IImagePixel[] groupCenters = new IImagePixel[0];
+			float[] aperturesInGroup = new float[0];
 
 			if (objectsInGroup != null && objectsInGroup.Count > 1)
 			{
 				groupCenters = new IImagePixel[objectsInGroup.Count];
+				aperturesInGroup = new float[objectsInGroup.Count];
+
 				for (int i = 0; i < objectsInGroup.Count; i++)
 				{
 					groupCenters[i] = objectsInGroup[i].Center;
+					aperturesInGroup[i] = objectsInGroup[i].OriginalObject.ApertureInPixels;
 				}
 			}
 
@@ -1741,6 +1740,7 @@ namespace Tangra.VideoOperations.LightCurves
 				m_Tracker.RefinedAverageFWHM,
 				measurableObject,
 				groupCenters,
+				aperturesInGroup,
 				LightCurveReductionContext.Instance.FullDisappearance);
 
 			measuredObject.SetIsMeasured(rv);
@@ -1765,6 +1765,9 @@ namespace Tangra.VideoOperations.LightCurves
 				measuredObject.TotalBackground = (uint)Math.Round(measurer.TotalBackground);
 				measuredObject.PixelData = pixelsToSave; /* save the original non filtered data */
 				measuredObject.FlagsDWORD |= flags;
+				measuredObject.ApertureX = measurer.XCenter;
+				measuredObject.ApertureY = measurer.YCenter;
+				measuredObject.ApertureSize = measurer.Aperture;
 
 				LCFile.SaveOnTheFlyMeasurement(measuredObject);
 			}
@@ -1790,12 +1793,13 @@ namespace Tangra.VideoOperations.LightCurves
 			float refinedAverageFWHM,
 			IMeasurableObject measurableObject,
 			IImagePixel[] groupCenters,
+			float[] aperturesInGroup,
 			bool fullDisappearance
 			)
 		{
 			return measurer.MeasureObject(
 				center, data, backgroundPixels, bpp, filter, synchronise, reductionMethod, psfQuadrature,
-				aperture, refinedFWHM, refinedAverageFWHM, measurableObject, groupCenters, fullDisappearance);
+				aperture, refinedFWHM, refinedAverageFWHM, measurableObject, groupCenters, aperturesInGroup, fullDisappearance);
 		}
 
 		private LCFile m_lcFile = null;

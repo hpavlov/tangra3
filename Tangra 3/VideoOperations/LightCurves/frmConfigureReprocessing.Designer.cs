@@ -71,6 +71,7 @@
 			this.pnlPsfQuadrature = new System.Windows.Forms.Panel();
 			this.cbxPsfQuadrature = new System.Windows.Forms.ComboBox();
 			this.label6 = new System.Windows.Forms.Label();
+			this.cbxUseClone = new System.Windows.Forms.CheckBox();
 			this.groupBox1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nudFitArea4)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudFitArea3)).BeginInit();
@@ -287,7 +288,7 @@
 			// 
 			// sbDataFrames
 			// 
-			this.sbDataFrames.Location = new System.Drawing.Point(10, 265);
+			this.sbDataFrames.Location = new System.Drawing.Point(10, 276);
 			this.sbDataFrames.Name = "sbDataFrames";
 			this.sbDataFrames.Size = new System.Drawing.Size(306, 16);
 			this.sbDataFrames.TabIndex = 3;
@@ -524,7 +525,7 @@
 			// btnCancel
 			// 
 			this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.btnCancel.Location = new System.Drawing.Point(109, 275);
+			this.btnCancel.Location = new System.Drawing.Point(109, 286);
 			this.btnCancel.Name = "btnCancel";
 			this.btnCancel.Size = new System.Drawing.Size(75, 23);
 			this.btnCancel.TabIndex = 3;
@@ -533,7 +534,7 @@
 			// 
 			// btnOK
 			// 
-			this.btnOK.Location = new System.Drawing.Point(28, 275);
+			this.btnOK.Location = new System.Drawing.Point(28, 286);
 			this.btnOK.Name = "btnOK";
 			this.btnOK.Size = new System.Drawing.Size(75, 23);
 			this.btnOK.TabIndex = 4;
@@ -548,7 +549,7 @@
 			this.tbIntensity.Maximum = 100;
 			this.tbIntensity.Name = "tbIntensity";
 			this.tbIntensity.Orientation = System.Windows.Forms.Orientation.Vertical;
-			this.tbIntensity.Size = new System.Drawing.Size(42, 300);
+			this.tbIntensity.Size = new System.Drawing.Size(45, 300);
 			this.tbIntensity.SmallChange = 5;
 			this.tbIntensity.TabIndex = 33;
 			this.tbIntensity.TickFrequency = 5;
@@ -637,7 +638,7 @@
 			// label28
 			// 
 			this.label28.AutoSize = true;
-			this.label28.Location = new System.Drawing.Point(9, 231);
+			this.label28.Location = new System.Drawing.Point(9, 221);
 			this.label28.Name = "label28";
 			this.label28.Size = new System.Drawing.Size(94, 13);
 			this.label28.TabIndex = 39;
@@ -652,7 +653,7 @@
             0,
             0,
             131072});
-			this.nudGamma.Location = new System.Drawing.Point(109, 229);
+			this.nudGamma.Location = new System.Drawing.Point(109, 219);
 			this.nudGamma.Maximum = new decimal(new int[] {
             10,
             0,
@@ -703,11 +704,24 @@
 			this.label6.TabIndex = 40;
 			this.label6.Text = "PSF Quadrature:";
 			// 
+			// cbxUseClone
+			// 
+			this.cbxUseClone.AutoSize = true;
+			this.cbxUseClone.Checked = true;
+			this.cbxUseClone.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.cbxUseClone.Location = new System.Drawing.Point(12, 250);
+			this.cbxUseClone.Name = "cbxUseClone";
+			this.cbxUseClone.Size = new System.Drawing.Size(150, 17);
+			this.cbxUseClone.TabIndex = 42;
+			this.cbxUseClone.Text = "Allow further re-processing";
+			this.cbxUseClone.UseVisualStyleBackColor = true;
+			// 
 			// frmConfigureReprocessing
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(608, 331);
+			this.Controls.Add(this.cbxUseClone);
 			this.Controls.Add(this.pnlPsfQuadrature);
 			this.Controls.Add(this.label28);
 			this.Controls.Add(this.nudGamma);
@@ -804,5 +818,6 @@
 		private System.Windows.Forms.Panel pnlPsfQuadrature;
 		private System.Windows.Forms.ComboBox cbxPsfQuadrature;
 		private System.Windows.Forms.Label label6;
+		private System.Windows.Forms.CheckBox cbxUseClone;
     }
 }

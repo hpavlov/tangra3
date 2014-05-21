@@ -87,6 +87,7 @@ namespace Tangra.Model.Image
         private uint[,] m_PixelData;
         private float m_XCenter;
         private float m_YCenter;
+	    private float m_Aperture;
 
         private bool m_HasSaturatedPixels;
 
@@ -116,6 +117,11 @@ namespace Tangra.Model.Image
             get { return m_YCenter; }
         }
 
+	    public float Aperture
+	    {
+			get { return m_Aperture; }
+	    }
+
         public bool HasSaturatedPixels
         {
             get { return m_HasSaturatedPixels; }
@@ -144,7 +150,7 @@ namespace Tangra.Model.Image
 
 		internal NotMeasuredReasons DoAperturePhotometry(
             uint[,] matrix, int x0Int, int y0Int, float x0, float y0, float aperture, int matrixSize,
-            uint[,] backgroundArea)
+			uint[,] backgroundArea, float bgAnnulusFactor)
         {
             if (matrix.GetLength(0) != 17 && matrix.GetLength(0) != 35)
                 throw new ApplicationException("Measurement error. Correlation: AFP-101");
@@ -157,13 +163,13 @@ namespace Tangra.Model.Image
             m_FoundBestPSFFit = null;
 			m_XCenter = x0 - x0Int + halfSide;
 			m_YCenter = y0 - y0Int + halfSide;
-
+			m_Aperture = aperture;
             m_PixelData = matrix;
 
             m_TotalPixels = 0;
 
             m_TotalReading = GetReading(
-                aperture,
+				m_Aperture,
 				m_PixelData, side, side,
                 m_XCenter, m_YCenter, null, ref m_TotalPixels);
 
@@ -181,11 +187,11 @@ namespace Tangra.Model.Image
                 }
 				else if (m_BackgroundMethod == TangraConfig.BackgroundMethod.Background3DPolynomial)
 				{
-					m_TotalBackground = Get3DPolynomialBackground(backgroundArea, aperture);
+					m_TotalBackground = Get3DPolynomialBackground(backgroundArea, m_Aperture);
 				}
 	            else if (m_BackgroundMethod != TangraConfig.BackgroundMethod.PSFBackground)
 	            {
-					double bgFromAnnulus = GetBackground(backgroundArea, aperture, side, side);
+					double bgFromAnnulus = GetBackground(backgroundArea, m_Aperture, m_XCenter, m_YCenter, bgAnnulusFactor);
 		            m_TotalBackground = (uint) Math.Round(m_TotalPixels*(float) bgFromAnnulus);
 	            }
 	            else
@@ -210,7 +216,7 @@ namespace Tangra.Model.Image
             bool isFullyDisappearingOccultedStar,
             uint[,] backgroundArea,
             bool mayBeOcculted /* Some magic based on a pure guess */,
-            double refinedFWHM)
+            double refinedFWHM, float bgAnnulusFactor)
         {
             double distance = ImagePixel.ComputeDistance(fit.XCenter, x0, fit.YCenter, y0);
             double tolerance = isFullyDisappearingOccultedStar
@@ -219,7 +225,7 @@ namespace Tangra.Model.Image
 
             // We first go and do the measurement anyway
             if (fit.IsSolved)
-                SetPsfFitReading(fit, aperture, useNumericalQadrature, backgroundArea);
+				SetPsfFitReading(fit, aperture, useNumericalQadrature, backgroundArea, bgAnnulusFactor);
 
             if (!fit.IsSolved || // The PSF solution failed, mark the reading invalid
                 (distance > tolerance && !mayBeOcculted) || // If this doesn't look like a full disappearance, then make the reading invalid
@@ -242,7 +248,8 @@ namespace Tangra.Model.Image
             float aperture, int matrixSize, bool useNumericalQadrature,
             bool isFullyDisappearingOccultedStar,
             uint[,] backgroundArea,
-            bool mayBeOcculted /* Some magic based on a pure guess */)
+            bool mayBeOcculted /* Some magic based on a pure guess */,
+			float bgAnnulusFactor)
         {
             double distance = ImagePixel.ComputeDistance(fit.XCenter, x0, fit.YCenter, y0);
             double tolerance = isFullyDisappearingOccultedStar
@@ -251,7 +258,7 @@ namespace Tangra.Model.Image
 
             // We first go and do the measurement anyway
             if (fit.IsSolved)
-                SetPsfFitReading(fit, aperture, useNumericalQadrature, backgroundArea);
+				SetPsfFitReading(fit, aperture, useNumericalQadrature, backgroundArea, bgAnnulusFactor);
 
 			if (!fit.IsSolved || // The PSF solution failed, mark the reading invalid
 				(distance > tolerance && !mayBeOcculted)// If this doesn't look like a full disappearance, then make the reading invalid
@@ -265,8 +272,12 @@ namespace Tangra.Model.Image
 				return NotMeasuredReasons.MeasuredSuccessfully;
         }
 
-        private void SetPsfFitReading(PSFFit fit, float aperture, bool useNumericalQadrature, uint[,] backgroundArea)
+        private void SetPsfFitReading(PSFFit fit, float aperture, bool useNumericalQadrature, uint[,] backgroundArea, float bgAnnulusFactor)
         {
+			m_Aperture = aperture;
+	        m_XCenter = (float)fit.X0_Matrix;
+			m_YCenter = (float)fit.Y0_Matrix;
+
             if (useNumericalQadrature)
             {
                 double r0Square = fit.R0 * fit.R0;
@@ -276,23 +287,23 @@ namespace Tangra.Model.Image
                     {
                         return fit.I0 + (fit.IMax - fit.I0) * Math.Exp((-x * x + -y * y) / r0Square);
                     },
-                    aperture);
+					m_Aperture);
 
                 if (m_BackgroundMethod == TangraConfig.BackgroundMethod.PSFBackground)
                 {
-                    m_TotalBackground = Math.PI * aperture * aperture * fit.I0;
+					m_TotalBackground = Math.PI * m_Aperture * m_Aperture * fit.I0;
                 }
 				else if (m_BackgroundMethod == TangraConfig.BackgroundMethod.Background3DPolynomial)
 				{
 					if (!fit.UsesBackgroundModel)
 						throw new InvalidOperationException("3D-Polynomial was not applied correctly.");
 
-					m_TotalBackground = Math.PI * aperture * aperture * fit.I0;
+					m_TotalBackground = Math.PI * m_Aperture * m_Aperture * fit.I0;
 				}
                 else
                 {
-                    double bgFromAnnulus = GetBackground(backgroundArea, aperture, 17, 17);
-                    m_TotalBackground = Math.PI * aperture * aperture * (float)bgFromAnnulus;
+					double bgFromAnnulus = GetBackground(backgroundArea, m_Aperture, m_XCenter, m_YCenter, bgAnnulusFactor);
+					m_TotalBackground = Math.PI * m_Aperture * m_Aperture * (float)bgFromAnnulus;
                 }
             }
             else
@@ -315,7 +326,7 @@ namespace Tangra.Model.Image
 				}
                 else
                 {
-                    double bgFromAnnulus = GetBackground(backgroundArea, aperture, 17, 17);
+					double bgFromAnnulus = GetBackground(backgroundArea, m_Aperture, m_XCenter, m_YCenter, bgAnnulusFactor);
                     m_TotalReading = (fit.IMax - bgFromAnnulus) * fit.R0 * fit.R0 * Math.PI;
                     m_TotalBackground = Math.PI * apertureForBackground * apertureForBackground * (float)bgFromAnnulus;
                 }
@@ -338,7 +349,7 @@ namespace Tangra.Model.Image
             float aperture, int matrixSize, bool isFullyDisappearingOccultedStar,
             uint[,] backgroundArea,
             bool mayBeOcculted /* Some magic based on a pure guess */,
-            double refinedFWHM)
+			double refinedFWHM, float bgAnnulusFactor)
         {
             // Proceed as with PSF Non linear, Then find the variance of the PSF fit and use a weight based on the residuals of the PSF fit
             // Signal[x, y] = PSF(x, y) + weight * Residual(x, y)
@@ -363,7 +374,7 @@ namespace Tangra.Model.Image
             m_FoundBestPSFFit = null;
 			m_XCenter = x0 - x0Int + halfSide;
 			m_YCenter = y0 - y0Int + halfSide;
-
+			m_Aperture = aperture;
             m_PixelData = matrix;
 
             m_TotalPixels = 0;
@@ -375,7 +386,7 @@ namespace Tangra.Model.Image
             double deltaY = fit.Y0_Matrix - m_YCenter;
 
             m_TotalReading = GetReading(
-                aperture,
+				m_Aperture,
                 m_PixelData, side, side,
                 m_XCenter, m_YCenter,
                 delegate(int x, int y)
@@ -410,7 +421,7 @@ namespace Tangra.Model.Image
 				}
                 else if (m_BackgroundMethod != TangraConfig.BackgroundMethod.PSFBackground)
                 {
-                    double bgFromAnnulus = GetBackground(backgroundArea, aperture, side, side);
+					double bgFromAnnulus = GetBackground(backgroundArea, m_Aperture, m_XCenter, m_YCenter, bgAnnulusFactor);
                     m_TotalBackground = (uint)Math.Round(m_TotalPixels * (float)bgFromAnnulus);
                 }
                 else
@@ -622,12 +633,12 @@ namespace Tangra.Model.Image
 				m_XCenter, m_YCenter, null, ref totalBgPixels);			
 		}
 
-        private double GetBackground(uint[,] pixels, float signalApertureRadius, double x0, double y0)
+		private double GetBackground(uint[,] pixels, float signalApertureRadius, double x0, double y0, float bgAnnulusFactor)
         {
             int nWidth = pixels.GetLength(0);
             int nHeight = pixels.GetLength(1);
 
-            float innerRadius = (float)(m_InnerRadiusOfBackgroundApertureInSignalApertures * signalApertureRadius);
+			float innerRadius = (float)(bgAnnulusFactor * m_InnerRadiusOfBackgroundApertureInSignalApertures * signalApertureRadius);
             float outernRadius = (float)Math.Sqrt(m_NumberOfPixelsInBackgroundAperture / Math.PI + innerRadius * innerRadius);
 
 			if (m_BackgroundMethod == TangraConfig.BackgroundMethod.Background3DPolynomial || m_BackgroundMethod == TangraConfig.BackgroundMethod.PSFBackground)
@@ -825,13 +836,16 @@ namespace Tangra.Model.Image
             float refinedAverageFWHM,
 			IMeasurableObject measurableObject,
 			IImagePixel[] objectsInGroup,
+			float[] aperturesInGroup,
             bool fullDisappearance)
         {
-            int centerX = (int)Math.Round(center.XDouble);
-            int centerY = (int)Math.Round(center.YDouble);
+            int centerX = (int)center.XDouble;
+            int centerY = (int)center.YDouble;
 
             float msrX0 = (float)center.XDouble;
             float msrY0 = (float)center.YDouble;
+
+			float bgAnnulusFactor = 1;
 
             switch (filter)
             {
@@ -893,6 +907,21 @@ namespace Tangra.Model.Image
 				double d2 = ImagePixel.ComputeDistance(measurableObject.Center.XDouble, doublefit.X2Center, measurableObject.Center.YDouble, doublefit.Y2Center);
 				
 				fit = (d1 < d2) ? star1 : star2;
+
+				if (reductionMethod == TangraConfig.PhotometryReductionMethod.AperturePhotometry)
+				{
+					// NOTE: If aperture photometry is used, we measure the double object in a single larger aperture centered at the middle
+					double alpha = Math.Atan((star2.YCenter - star1.YCenter) / (star2.XCenter - star1.XCenter));
+
+					float dx = (float)((star1.FWHM - star2.FWHM) * Math.Cos(alpha));
+					float dy = (float)((star1.FWHM - star2.FWHM) * Math.Sin(alpha));
+
+					msrX0 = (float)(star1.XCenter + star2.XCenter) / 2.0f - dx;
+					msrY0 = (float)(star1.YCenter + star2.YCenter) / 2.0f - dy; 
+					
+					aperture = aperturesInGroup.Sum();
+					bgAnnulusFactor = 0.75f;
+				}
 			}
 			else if (reductionMethod != TangraConfig.PhotometryReductionMethod.AperturePhotometry)
 			{
@@ -928,8 +957,9 @@ namespace Tangra.Model.Image
 						psfQuadrature == TangraConfig.PsfQuadrature.NumericalInAperture,
 						measurableObject.IsOccultedStar && fullDisappearance,
 						backgroundPixels,
-						measurableObject.MayHaveDisappeared, 
-						refinedFWHM);
+						measurableObject.MayHaveDisappeared,
+						refinedFWHM, 
+						bgAnnulusFactor);
 				}
 				else if (TangraConfig.Settings.Photometry.PsfFittingMethod == TangraConfig.PsfFittingMethod.LinearFitOfAveragedModel)
 				{
@@ -941,7 +971,8 @@ namespace Tangra.Model.Image
 						psfQuadrature == TangraConfig.PsfQuadrature.NumericalInAperture,
 						measurableObject.IsOccultedStar && fullDisappearance,
 						backgroundPixels,
-						measurableObject.MayHaveDisappeared);
+						measurableObject.MayHaveDisappeared, 
+						bgAnnulusFactor);
 				}
 				else
 					throw new NotImplementedException();
@@ -952,7 +983,7 @@ namespace Tangra.Model.Image
 					data, centerX, centerY, msrX0, msrY0,
 					aperture,
 					measurableObject.PsfFittingMatrixSize,
-					backgroundPixels);
+					backgroundPixels, bgAnnulusFactor);
 			}
 			else if (reductionMethod == TangraConfig.PhotometryReductionMethod.OptimalExtraction)
 			{
@@ -963,8 +994,8 @@ namespace Tangra.Model.Image
 					measurableObject.PsfFittingMatrixSize,
 					measurableObject.IsOccultedStar && fullDisappearance,
 					backgroundPixels,
-					measurableObject.MayHaveDisappeared, 
-					refinedFWHM);
+					measurableObject.MayHaveDisappeared,
+					refinedFWHM, bgAnnulusFactor);
 			}
 			else
 				throw new ArgumentOutOfRangeException("reductionMethod");
