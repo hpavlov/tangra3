@@ -220,7 +220,7 @@ namespace Tangra.VideoOperations.LightCurves
 			    float[] aperturesInGroup = new float[0];
 
 				TrackedObjectConfig objConfig = Footer.TrackedObjects[reading.TargetNo];
-				List<TrackedObjectConfig> gropedObjects = Footer.TrackedObjects.Where(x => x.GroupId == objConfig.GroupId).ToList();
+				List<TrackedObjectConfig> gropedObjects = Footer.TrackedObjects.Where(x => objConfig.GroupId >= 0 && x.GroupId == objConfig.GroupId).ToList();
 				if (gropedObjects.Count > 1)
 				{
 					groupCenters = new IImagePixel[gropedObjects.Count];

@@ -916,11 +916,11 @@ namespace Tangra.Model.Image
 					float dx = (float)((star1.FWHM - star2.FWHM) * Math.Cos(alpha));
 					float dy = (float)((star1.FWHM - star2.FWHM) * Math.Sin(alpha));
 
-					msrX0 = (float)(star1.XCenter + star2.XCenter) / 2.0f - dx;
-					msrY0 = (float)(star1.YCenter + star2.YCenter) / 2.0f - dy; 
+					msrX0 = (float)(star1.XCenter - star1.FWHM + star2.XCenter + star2.FWHM) / 2.0f - dx;
+					msrY0 = (float)(star1.YCenter - star1.FWHM + star2.YCenter + star2.FWHM) / 2.0f - dy; 
 					
 					aperture = aperturesInGroup.Sum();
-					bgAnnulusFactor = 0.75f;
+					bgAnnulusFactor = 0.67f;
 				}
 			}
 			else if (reductionMethod != TangraConfig.PhotometryReductionMethod.AperturePhotometry)

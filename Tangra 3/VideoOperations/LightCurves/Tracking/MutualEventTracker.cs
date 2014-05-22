@@ -373,7 +373,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 			foreach (int groupId in groupIds)
 			{
-				ITrackedObject[] objectsInGroup = groupedObjects.Where(x => x.OriginalObject.GroupId == groupId).ToArray();
+				ITrackedObject[] objectsInGroup = groupedObjects.Where(x => groupId >= 0 && x.OriginalObject.GroupId == groupId).ToArray();
 				m_TrackedObjectGroups.Add(new TrackedObjectGroup(objectsInGroup, isFullDisappearance));
 			}
 

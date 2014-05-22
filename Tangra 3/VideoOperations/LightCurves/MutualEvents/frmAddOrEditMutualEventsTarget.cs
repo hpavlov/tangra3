@@ -128,7 +128,7 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 			{
 				m_GroupId = selectedObject.GroupId;
 
-				List<TrackedObjectConfig> otherGroupedObjects = state.m_MeasuringStars.Where(x => x.GroupId == m_GroupId && x != selectedObject).ToList();
+				List<TrackedObjectConfig> otherGroupedObjects = state.m_MeasuringStars.Where(x => m_GroupId >= 0 && x.GroupId == m_GroupId && x != selectedObject).ToList();
 				if (otherGroupedObjects.Count == 1)
 				{
 					ObjectToAdd2 = otherGroupedObjects[0];
