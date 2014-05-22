@@ -716,8 +716,11 @@ namespace Tangra.VideoOperations.LightCurves
 
         private LCMeasurement[] m_SelectedMeasurements = null;
         private Dictionary<int, Color> m_OldLineBackup = new Dictionary<int, Color>();
-        private void SelectMeasurement(int id)
+        private void SelectMeasurement(int? nullableId)
         {
+	        bool hasSelection = nullableId.HasValue;
+	        int id = nullableId.HasValue ? nullableId.Value : -1;
+
             if (m_Graph == null) return;
 
 			float datapointFrom = m_DisplaySettings.DatapointSize / 2.0f;
@@ -783,7 +786,7 @@ namespace Tangra.VideoOperations.LightCurves
 	            if (id < 0) id = 0;
 				if (id >= m_LightCurveController.Context.AllReadings[0].Count) id = m_LightCurveController.Context.AllReadings[0].Count - 1;
 
-                if (id >= 0)
+                if (hasSelection)
                 {
                     m_OldLineBackup.Clear();
 
@@ -994,7 +997,7 @@ namespace Tangra.VideoOperations.LightCurves
                     if (newFrameId < m_Header.MinFrame ||
                         newFrameId > m_Header.MaxFrame)
                     {
-                        SelectMeasurement(-1);
+                        SelectMeasurement(null);
                         NotificationManager.Instance.NotifyUserRequestToChangeCurrentFrame(null);
                         return;
                     }

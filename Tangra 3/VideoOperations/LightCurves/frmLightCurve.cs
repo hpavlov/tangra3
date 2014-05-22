@@ -1646,7 +1646,7 @@ namespace Tangra.VideoOperations.LightCurves
 			else if (e.KeyCode == Keys.Escape)
 			{
                 NotificationManager.Instance.NotifyUserRequestToChangeCurrentFrame(null);
-			    SelectMeasurement(-1);
+			    SelectMeasurement(null);
 			}
         }
 
