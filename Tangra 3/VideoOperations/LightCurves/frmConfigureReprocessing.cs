@@ -8,6 +8,7 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Controller;
 using Tangra.Model.Astro;
 using Tangra.Model.Config;
 using Tangra.Model.Image;
@@ -18,8 +19,7 @@ namespace Tangra.VideoOperations.LightCurves
     {
         private LCMeasurementHeader m_Header;
 		private LCMeasurementFooter m_Footer;
-        private frmLightCurve.LightCurveContext m_Context;
-        private List<List<LCMeasurement>> m_AllBackedUpReadings;
+        private LightCurveContext m_Context;
         private Color[] m_AllColors;
         private Brush[] m_AllBrushes;
         private Pen[] m_AllPens;
@@ -30,15 +30,13 @@ namespace Tangra.VideoOperations.LightCurves
         internal frmConfigureReprocessing(
             LCMeasurementHeader header,
 			LCMeasurementFooter footer, 
-            frmLightCurve.LightCurveContext context,
-            List<List<LCMeasurement>> backedUpReadings,
+            LightCurveContext context,
             Color[] allColors,
             Brush[] allBrushes,
             Pen[] allPens)
         {
             InitializeComponent();
 
-            m_AllBackedUpReadings = backedUpReadings;
             m_Context = context;
             m_Header = header;
         	m_Footer = footer;
@@ -145,13 +143,13 @@ namespace Tangra.VideoOperations.LightCurves
         {
             switch(m_Context.Filter)
             {
-                case frmLightCurve.LightCurveContext.FilterType.NoFilter:
+                case LightCurveContext.FilterType.NoFilter:
                     return MeasurementsHelper.Filter.None;
 
-                case frmLightCurve.LightCurveContext.FilterType.LowPass:
+                case LightCurveContext.FilterType.LowPass:
                     return MeasurementsHelper.Filter.LP;
 
-                case frmLightCurve.LightCurveContext.FilterType.LowPassDifference:
+                case LightCurveContext.FilterType.LowPassDifference:
                     return MeasurementsHelper.Filter.LPD;
             }
 
@@ -466,7 +464,7 @@ namespace Tangra.VideoOperations.LightCurves
             {
                 m_SelectedMeasurements[i] = LCMeasurement.Empty;
 
-                foreach (LCMeasurement reading in m_AllBackedUpReadings[i])
+				foreach (LCMeasurement reading in m_Context.AllReadings[i])
                 {
                     if (reading.CurrFrameNo == frameNo)
                     {
@@ -518,9 +516,8 @@ namespace Tangra.VideoOperations.LightCurves
 			m_Context.BackgroundMethod = ComboboxIndexToBackgroundMethod();
 			m_Context.SignalMethod = ComboboxIndexToPhotometryReductionMethod();
 			m_Context.PsfQuadratureMethod = ComboboxIndexToPsfQuadratureMethod();
-			m_Context.Filter = (frmLightCurve.LightCurveContext.FilterType)cbxDigitalFilter.SelectedIndex;
+			m_Context.Filter = (LightCurveContext.FilterType)cbxDigitalFilter.SelectedIndex;
 			m_Context.EncodingGamma = (double)nudGamma.Value;
-			m_Context.FurtherReprocessingNotPossible = !cbxUseClone.Checked;
 
             DialogResult = DialogResult.OK;
             Close();

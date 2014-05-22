@@ -28,7 +28,7 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
     public partial class frmNoiseDistribution : Form
     {
         private LCMeasurementHeader m_Header;
-        private List<List<LCMeasurement>> m_AllReadings;
+		private List<List<LCMeasurement>> m_AllReadings;
         private List<frmLightCurve.BinnedValue>[] m_AllBinnedReadings;
         private Brush[] m_AllBrushes;
         private Color[] m_AllColors;
@@ -50,7 +50,7 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
             InitializeComponent();
 
             m_Header = header;
-            m_AllReadings = allReadings;
+			m_AllReadings = allReadings;
             m_AllBinnedReadings = allBinnedReadings;
             m_AllBrushes = allBrushes;
             m_AllColors = allColors;

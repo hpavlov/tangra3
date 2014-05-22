@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Controller;
 using Tangra.Model.Astro;
 using Tangra.Model.Config;
 
@@ -15,12 +16,12 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 	{
 		private PictureBox[] m_TargetBoxes;
 
-		private frmLightCurve.LightCurveContext m_Context;
+		private LightCurveContext m_Context;
 		private LCFile m_LCFile;
 		private LCMeasurement[] m_SelectedMeasurements;
 		private TangraConfig.LightCurvesDisplaySettings m_DisplaySettings;
 
-		internal frmBackgroundHistograms(frmLightCurve.LightCurveContext context, LCFile lcFile, TangraConfig.LightCurvesDisplaySettings displaySettings)
+		internal frmBackgroundHistograms(LightCurveContext context, LCFile lcFile, TangraConfig.LightCurvesDisplaySettings displaySettings)
 		{
 			InitializeComponent();
 

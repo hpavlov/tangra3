@@ -7,6 +7,7 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Controller;
 using Tangra.Model.Config;
 using Tangra.VideoOperations.LightCurves.Tracking;
 
@@ -17,7 +18,7 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 		private static Font s_TitleFont = new Font(FontFamily.GenericSerif, 8);
 		private static Font s_CoordsFont = new Font(FontFamily.GenericSerif, 6);
 
-		private frmLightCurve.LightCurveContext m_Context;
+		private LightCurveContext m_Context;
 		private LCFile m_LCFile;
 		private LCMeasurement[] m_SelectedMeasurements;
 		private TangraConfig.LightCurvesDisplaySettings m_DisplaySettings;
@@ -30,7 +31,7 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 		private bool[] m_ObjectinGroup = new bool[4];
 		private uint m_Saturation;
 
-		internal frmZoomedPixels(frmLightCurve.LightCurveContext context, LCFile lcFile, TangraConfig.LightCurvesDisplaySettings displaySettings)
+		internal frmZoomedPixels(LightCurveContext context, LCFile lcFile, TangraConfig.LightCurvesDisplaySettings displaySettings)
 		{
 			InitializeComponent();
 

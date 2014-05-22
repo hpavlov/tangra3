@@ -341,17 +341,17 @@ namespace Tangra.VideoOperations.LightCurves
                     }
                 }				
             }
-			else if (m_ViewingLightCurve && m_lcFile != null)
+			else if (m_ViewingLightCurve && m_LightCurveController.LcFile != null)
 			{
-				var currentSelection = new LCMeasurement[m_lcFile.Header.ObjectCount];
+				var currentSelection = new LCMeasurement[m_LightCurveController.LcFile.Header.ObjectCount];
 
-				if (m_lcFile.Header.MinFrame <= m_CurrFrameNo &&
-					m_lcFile.Header.MaxFrame >= m_CurrFrameNo)
+				if (m_LightCurveController.LcFile.Header.MinFrame <= m_CurrFrameNo &&
+					m_LightCurveController.LcFile.Header.MaxFrame >= m_CurrFrameNo)
 				{
-					for (int i = 0; i < m_lcFile.Header.ObjectCount; i++)
+					for (int i = 0; i < m_LightCurveController.LcFile.Header.ObjectCount; i++)
 					{
-						List<LCMeasurement> measurements = m_lcFile.Data[i];
-						currentSelection[i] = measurements[(int)(m_CurrFrameNo - m_lcFile.Header.MinFrame)];
+						List<LCMeasurement> measurements = m_LightCurveController.Context.AllReadings[i];
+						currentSelection[i] = measurements[(int)(m_CurrFrameNo - m_LightCurveController.LcFile.Header.MinFrame)];
 					}
 
 					m_LightCurveController.OnNewSelectedMeasurements(currentSelection.ToArray());
@@ -407,29 +407,29 @@ namespace Tangra.VideoOperations.LightCurves
         {
             try
             {
-				if (m_ViewingLightCurve && m_lcFile != null)
+				if (m_ViewingLightCurve && m_LightCurveController.LcFile != null)
 				{
 					// Display the objects for the current frame
-					if (m_lcFile.Header.MinFrame <= m_CurrFrameNo &&
-						m_lcFile.Header.MaxFrame >= m_CurrFrameNo)
+					if (m_LightCurveController.LcFile.Header.MinFrame <= m_CurrFrameNo &&
+						m_LightCurveController.LcFile.Header.MaxFrame >= m_CurrFrameNo)
 					{
 						int frameToDisplay;
 						if (m_VideoController.CurrentVideoFileEngine == SingleBitmapFileFrameStream.SINGLE_BMP_FILE_ENGINE)
 						{
 							// The original file cannot be found and we are displaying the embedded image in the .lc file.
-							frameToDisplay = (int)m_lcFile.Header.MinFrame;
+							frameToDisplay = (int)m_LightCurveController.LcFile.Header.MinFrame;
 						}
 						else
 						{
 							frameToDisplay = m_CurrFrameNo;
 						}
 
-						for (int i = 0; i < m_lcFile.Header.ObjectCount; i++)
+						for (int i = 0; i < m_LightCurveController.LcFile.Header.ObjectCount; i++)
 						{
-							List<LCMeasurement> measurements = m_lcFile.Data[i];
-							LCMeasurement data = measurements[(int)(frameToDisplay - m_lcFile.Header.MinFrame)];
+							List<LCMeasurement> measurements = m_LightCurveController.Context.AllReadings[i];
+							LCMeasurement data = measurements[(int)(frameToDisplay - m_LightCurveController.LcFile.Header.MinFrame)];
 
-							float delta = m_lcFile.Header.MeasurementApertures[i];
+							float delta = m_LightCurveController.LcFile.Header.MeasurementApertures[i];
 
 							if (!float.IsNaN(delta))
 							{
@@ -1395,7 +1395,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 			DoShowLightCurve();
 
-			m_ControlPanel.SetupLCFileInfo(m_lcFile);
+			m_ControlPanel.SetupLCFileInfo(m_LightCurveController.LcFile);
 			m_ControlPanel.UpdateState();
         }
 
@@ -1558,7 +1558,7 @@ namespace Tangra.VideoOperations.LightCurves
 			m_VideoController = (VideoController)videoController;
 			EnsureControlPanel(controlPanel);
 
-			m_lcFile = lcFile;
+			m_LightCurveController.SetLcFile(lcFile);
 
 			m_Measuring = false;
 			m_Refining = false;
@@ -1575,7 +1575,7 @@ namespace Tangra.VideoOperations.LightCurves
 			m_CurrFrameNo = -1;
 
 			m_ControlPanel.BeginConfiguration(m_StateMachine, m_VideoController);
-			m_ControlPanel.SetupLCFileInfo(m_lcFile);
+			m_ControlPanel.SetupLCFileInfo(m_LightCurveController.LcFile);
 			m_ControlPanel.UpdateState();
 
 		}
@@ -1802,8 +1802,6 @@ namespace Tangra.VideoOperations.LightCurves
 				aperture, refinedFWHM, refinedAverageFWHM, measurableObject, groupCenters, aperturesInGroup, fullDisappearance);
 		}
 
-		private LCFile m_lcFile = null;
-
 		internal void FlushLightCurveFile()
 		{
 			var matrixSizes = new List<int>();
@@ -1871,7 +1869,7 @@ namespace Tangra.VideoOperations.LightCurves
 				m_AavNativeVideoFormat,
                 m_AavFrameIntegration);
 
-			m_lcFile = LCFile.FlushOnTheFlyOutputFile(finalHeader, footer);
+			m_LightCurveController.SetLcFile(LCFile.FlushOnTheFlyOutputFile(finalHeader, footer));
 		}
 
 		internal void DoShowLightCurve()
@@ -1883,8 +1881,8 @@ namespace Tangra.VideoOperations.LightCurves
 			TangraContext.Current.CanPlayVideo = false;
 			m_VideoController.UpdateViews();
 
-			m_LightCurveController.SetLcFile(m_lcFile);
-			m_VideoController.MoveToFrame((int)m_lcFile.Header.MinFrame);
+			//m_LightCurveController.SetLcFile(m_LightCurveController.LcFile);
+			m_VideoController.MoveToFrame((int)m_LightCurveController.LcFile.Header.MinFrame);
 		}
 
         internal bool ConfirmNewObject(int objectId)

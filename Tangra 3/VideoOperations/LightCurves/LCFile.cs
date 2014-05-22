@@ -700,6 +700,10 @@ namespace Tangra.VideoOperations.LightCurves
                     clone.PixelData[i, j] = this.PixelData[i, j];
                 }
 
+	        clone.ApertureX = this.ApertureX;
+			clone.ApertureY = this.ApertureY;
+			clone.ApertureSize = this.ApertureSize;
+
             return clone;
         }
 

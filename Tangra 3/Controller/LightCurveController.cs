@@ -24,6 +24,9 @@ namespace Tangra.Controller
         private frmLightCurve m_LightCurveForm;
 	    private AddinsController m_AddinsController;
         private bool m_lcFileLoaded;
+		private LCFile m_lcFile = null;
+
+		private LightCurveContext m_Context;
 
 		public LightCurveController(Form mainFormView, VideoController videoController, AddinsController addinsController)
         {
@@ -152,6 +155,7 @@ namespace Tangra.Controller
 
                     m_lcFileLoaded = true;
 
+					m_Context = new LightCurveContext(lcFile);
 					m_LightCurveForm = new frmLightCurve(this, m_AddinsController, lcFile, fileName);
 					m_LightCurveForm.SetGeoLocation(m_VideoController.GeoLocation);
                     m_LightCurveForm.Show(m_MainFormView);
@@ -193,6 +197,9 @@ namespace Tangra.Controller
 
 		internal void SetLcFile(LCFile lcFile)
 		{
+			m_lcFile = lcFile;
+			m_Context = new LightCurveContext(lcFile);
+
 			m_LightCurveForm.SetNewLcFile(lcFile);
 
 			m_LightCurveForm.SetGeoLocation(m_VideoController.GeoLocation);								
@@ -243,5 +250,36 @@ namespace Tangra.Controller
             saveFileDialog.InitialDirectory = Path.GetDirectoryName(m_VideoController.CurrentVideoFileName);
             saveFileDialog.FileName = Path.ChangeExtension(Path.GetFileName(m_VideoController.CurrentVideoFileName), ".lc");
         }
+
+	    internal LightCurveContext Context
+	    {
+			get { return m_Context; }
+	    }
+
+	    internal LCFile LcFile
+	    {
+			get { return m_lcFile; }
+	    }
+		
+		internal void ClearContext()
+		{
+			m_Context = null;
+			
+		}
+
+		internal void ReloadAllReadingsFromLcFile()
+		{
+			if (m_lcFile != null)
+			{
+				if (m_lcFile.Header.MeasuredFrames > 0)
+				{
+					for (int i = 0; i < m_lcFile.Header.ObjectCount; i++)
+					{
+						m_Context.AllReadings[i] = m_lcFile.Data[i];
+					}
+				}				
+			}
+		}
+
     }
 }

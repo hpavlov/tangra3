@@ -11,6 +11,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Tangra.Addins;
 using Tangra.Config;
+using Tangra.Controller;
 using Tangra.Model.Config;
 using Tangra.Model.Image;
 using Tangra.Model.Numerical;
@@ -31,19 +32,16 @@ namespace Tangra.VideoOperations.LightCurves
         private LCMeasurementHeader m_Header = LCMeasurementHeader.Empty;
         private LCMeasurementFooter m_Footer = LCMeasurementFooter.Empty;
     	private List<LCFrameTiming> m_FrameTiming = new List<LCFrameTiming>();
-        private List<List<LCMeasurement>> m_AllReadings = new List<List<LCMeasurement>>(new List<LCMeasurement>[] { new List<LCMeasurement>(), new List<LCMeasurement>(), new List<LCMeasurement>(), new List<LCMeasurement>() });
-        private List<List<LCMeasurement>> m_InitialNoFilterReadings = null;
 
-        private List<BinnedValue>[] m_AllBinnedReadings = new List<BinnedValue>[4]
-        {
-            new List<BinnedValue>(), new List<BinnedValue>(), new List<BinnedValue>(), new List<BinnedValue>()
-        };
+		private List<BinnedValue>[] m_AllBinnedReadings = new List<BinnedValue>[4]
+		{
+			new List<BinnedValue>(), new List<BinnedValue>(), new List<BinnedValue>(), new List<BinnedValue>()
+		};
+
 
         private int m_MinX = 45;
         private int m_MinY = 25;
         private int m_MaxY, m_MaxX;
-
-        private LightCurveContext m_Context;
 
         private void ReComputeSignalSeries()
         {
@@ -54,24 +52,24 @@ namespace Tangra.VideoOperations.LightCurves
             {
 	            int[] last10Values = new int[10];
 
-                for (int j = 0; j < m_AllReadings[i].Count; j++)
+                for (int j = 0; j < m_LightCurveController.Context.AllReadings[i].Count; j++)
                 {
-                    LCMeasurement reading = m_AllReadings[i][j];
+                    LCMeasurement reading = m_LightCurveController.Context.AllReadings[i][j];
                     int adjustedValue = 0;
 
-                    if (m_Context.ProcessingType == ProcessingType.SignalOnly)
+                    if (m_LightCurveController.Context.ProcessingType == ProcessingType.SignalOnly)
                     {
                         adjustedValue = (int)reading.TotalReading;
                     }
-                    else if (m_Context.ProcessingType == ProcessingType.SignalMinusBackground)
+                    else if (m_LightCurveController.Context.ProcessingType == ProcessingType.SignalMinusBackground)
                     {
                         adjustedValue = (int)reading.TotalReading - (int)reading.TotalBackground;
                     }
-                    else if (m_Context.ProcessingType == ProcessingType.BackgroundOnly)
+                    else if (m_LightCurveController.Context.ProcessingType == ProcessingType.BackgroundOnly)
                     {
                         adjustedValue = (int)reading.TotalBackground;
                     }
-					else if (m_Context.ProcessingType == ProcessingType.SignalDividedByBackground)
+					else if (m_LightCurveController.Context.ProcessingType == ProcessingType.SignalDividedByBackground)
 					{
 						int intBG = (int) reading.TotalBackground;
 						if (intBG != 0)
@@ -79,7 +77,7 @@ namespace Tangra.VideoOperations.LightCurves
 						else
 							adjustedValue = 100 * (int)reading.TotalReading;
 					}
-					else if (m_Context.ProcessingType == ProcessingType.SignalDividedByNoise)
+					else if (m_LightCurveController.Context.ProcessingType == ProcessingType.SignalDividedByNoise)
 					{
 						adjustedValue = (int)(100 * ComputeSignalToNoiceRatio(i, j, false));
 					}
@@ -88,7 +86,7 @@ namespace Tangra.VideoOperations.LightCurves
                     {
 						bool includeInMinMaxCalcs = j > 10;
 
-						if (m_Context.OutlierRemoval && j >= 10)
+						if (m_LightCurveController.Context.OutlierRemoval && j >= 10)
 						{
 							// Deal with values that are too large or too small
 							long average = (
@@ -126,19 +124,19 @@ namespace Tangra.VideoOperations.LightCurves
                     }
 
                     reading.AdjustedReading = adjustedValue;
-                    m_AllReadings[i][j] = reading;
+                    m_LightCurveController.Context.AllReadings[i][j] = reading;
                 }
             }
 
             m_Header.MinAdjustedReading = minValue;
             m_Header.MaxAdjustedReading = maxValue;
 
-            if (m_Context.Binning > 0)
+            if (m_LightCurveController.Context.Binning > 0)
             {
                 ComputeBinning(); 
             }
 
-            if (m_Context.Normalisation > -1)
+            if (m_LightCurveController.Context.Normalisation > -1)
             {
                 Cursor = Cursors.WaitCursor;
                 try
@@ -157,17 +155,17 @@ namespace Tangra.VideoOperations.LightCurves
 			int halfFrameWindow = TangraConfig.Settings.Photometry.SNFrameWindow / 2;
 
 			int from = Math.Max(0, middleFrameId - halfFrameWindow);
-			int to = Math.Min(m_AllReadings[objectId].Count, from + halfFrameWindow * 2);
+			int to = Math.Min(m_LightCurveController.Context.AllReadings[objectId].Count, from + halfFrameWindow * 2);
 			double sum = 0;
 			for (int k = from; k < to; k++)
 			{
-				sum += useAdjustedReading ? (int)m_AllReadings[objectId][k].AdjustedReading : (int)m_AllReadings[objectId][k].TotalReading;
+				sum += useAdjustedReading ? (int)m_LightCurveController.Context.AllReadings[objectId][k].AdjustedReading : (int)m_LightCurveController.Context.AllReadings[objectId][k].TotalReading;
 			}
 			double avrge = sum / (to - from);
 			sum = 0;
 			for (int k = from; k < to; k++)
 			{
-				double residual = (useAdjustedReading ? (int)m_AllReadings[objectId][k].AdjustedReading : (int)m_AllReadings[objectId][k].TotalReading) - avrge;
+				double residual = (useAdjustedReading ? (int)m_LightCurveController.Context.AllReadings[objectId][k].AdjustedReading : (int)m_LightCurveController.Context.AllReadings[objectId][k].TotalReading) - avrge;
 				sum += residual * residual;
 			}
 			double variance = Math.Sqrt(sum / (to - from - 1));
@@ -196,18 +194,18 @@ namespace Tangra.VideoOperations.LightCurves
                 binnedValue.ReadingIndexFrom = 0;
                 binnedValue.BinNo = binNo;
 
-                foreach (LCMeasurement reading in m_AllReadings[i])
+                foreach (LCMeasurement reading in m_LightCurveController.Context.AllReadings[i])
                 {
-                    if (idx % m_Context.Binning == 0)
+                    if (idx % m_LightCurveController.Context.Binning == 0)
                     {
                         binnedValue.TotalSum = binnedSum;
 	                    binnedValue.TotalBackgroundSum = binnedBackgroundSum;
-                    	binnedValue.AdjustedValue = binnedSum * 1.0 / m_Context.Binning;
-						binnedValue.BackgroundValue = binnedBackgroundSum * 1.0 / m_Context.Binning;
-						binnedValue.IsSuccessfulReading = binnedSuccessfulReadings == m_Context.Binning; // Average out the non binned values due to unsuccessful readings
+                    	binnedValue.AdjustedValue = binnedSum * 1.0 / m_LightCurveController.Context.Binning;
+						binnedValue.BackgroundValue = binnedBackgroundSum * 1.0 / m_LightCurveController.Context.Binning;
+						binnedValue.IsSuccessfulReading = binnedSuccessfulReadings == m_LightCurveController.Context.Binning; // Average out the non binned values due to unsuccessful readings
 
                         binnedValue.ReadingIndexTo = idx - 1;
-	                    binnedValue.BinMiddleFrameNo = (int)(m_AllReadings[i][binnedValue.ReadingIndexFrom].CurrFrameNo + m_AllReadings[i][binnedValue.ReadingIndexTo].CurrFrameNo)/2;
+	                    binnedValue.BinMiddleFrameNo = (int)(m_LightCurveController.Context.AllReadings[i][binnedValue.ReadingIndexFrom].CurrFrameNo + m_LightCurveController.Context.AllReadings[i][binnedValue.ReadingIndexTo].CurrFrameNo)/2;
                         m_AllBinnedReadings[i].Add(binnedValue);
 
                         if (m_IncludeObjects[i])
@@ -250,31 +248,31 @@ namespace Tangra.VideoOperations.LightCurves
         {
             List<double> normalIndexes = new List<double>();
 
-            switch(m_Context.NormMethod)
+            switch(m_LightCurveController.Context.NormMethod)
             {
                 case LightCurveContext.NormalisationMethod.LinearFit:
-                    if (m_Context.Binning > 0)
+                    if (m_LightCurveController.Context.Binning > 0)
                         PerformLinearFitBinnedNormalisation(ref normalIndexes);
                     else
                         PerformLinearFitReadingsNormalisation(ref normalIndexes);
                     break;
 
                 case LightCurveContext.NormalisationMethod.FrameByFrame:
-                    if (m_Context.Binning > 0)
+                    if (m_LightCurveController.Context.Binning > 0)
                         PerformAverageBinnedNormalisation(ref normalIndexes, 1);
                     else
                         PerformAverageReadingsNormalisation(ref normalIndexes, 1);
                     break;
 
                 case LightCurveContext.NormalisationMethod.Average4Frame:
-                    if (m_Context.Binning > 0)
+                    if (m_LightCurveController.Context.Binning > 0)
                         PerformAverageBinnedNormalisation(ref normalIndexes, 4);
                     else
                         PerformAverageReadingsNormalisation(ref normalIndexes, 4);
                     break;
 
                 case LightCurveContext.NormalisationMethod.Average16Frame:
-                    if (m_Context.Binning > 0)
+                    if (m_LightCurveController.Context.Binning > 0)
                         PerformAverageBinnedNormalisation(ref normalIndexes, 16);
                     else
                         PerformAverageReadingsNormalisation(ref normalIndexes, 16);
@@ -285,7 +283,7 @@ namespace Tangra.VideoOperations.LightCurves
             int maxValue = int.MinValue;
 
            
-            if (m_Context.Binning > 0)
+            if (m_LightCurveController.Context.Binning > 0)
             {
                 while (normalIndexes.Count < m_AllBinnedReadings[0].Count) normalIndexes.Add(1);
 
@@ -305,21 +303,21 @@ namespace Tangra.VideoOperations.LightCurves
             }
             else
             {
-                while (normalIndexes.Count < m_AllReadings[0].Count) normalIndexes.Add(1);
+                while (normalIndexes.Count < m_LightCurveController.Context.AllReadings[0].Count) normalIndexes.Add(1);
 
                 for (int i = 0; i < m_Header.ObjectCount; i++)
                 {
 					if (!m_IncludeObjects[i]) continue;
 
-                    int upper = m_AllReadings[i].Count;
+                    int upper = m_LightCurveController.Context.AllReadings[i].Count;
                     for (int j = 0; j < upper; j++)
                     {
-						double normValue = Math.Round(m_AllReadings[i][j].AdjustedReading * normalIndexes[j]);
-						LCMeasurement measurement = m_AllReadings[i][j];
+						double normValue = Math.Round(m_LightCurveController.Context.AllReadings[i][j].AdjustedReading * normalIndexes[j]);
+						LCMeasurement measurement = m_LightCurveController.Context.AllReadings[i][j];
                         measurement.AdjustedReading = (int)normValue;
 						if (minValue > normValue) minValue = (int)normValue;
 						if (maxValue < normValue) maxValue = (int)normValue;
-                        m_AllReadings[i][j] = measurement;
+                        m_LightCurveController.Context.AllReadings[i][j] = measurement;
 					}
                 }
             }
@@ -332,7 +330,7 @@ namespace Tangra.VideoOperations.LightCurves
         {
             var linearRegression = new LinearRegression();
 
-            foreach (BinnedValue binnedValue in m_AllBinnedReadings[m_Context.Normalisation])
+            foreach (BinnedValue binnedValue in m_AllBinnedReadings[m_LightCurveController.Context.Normalisation])
             {
                 if (binnedValue.IsSuccessfulReading)
                     linearRegression.AddDataPoint(binnedValue.BinNo, binnedValue.AdjustedValue);
@@ -340,9 +338,9 @@ namespace Tangra.VideoOperations.LightCurves
 
             linearRegression.Solve();
 
-            double firstValue = linearRegression.ComputeY(m_AllBinnedReadings[m_Context.Normalisation][0].BinNo);
+            double firstValue = linearRegression.ComputeY(m_AllBinnedReadings[m_LightCurveController.Context.Normalisation][0].BinNo);
 
-            foreach (BinnedValue binnedValue in m_AllBinnedReadings[m_Context.Normalisation])
+            foreach (BinnedValue binnedValue in m_AllBinnedReadings[m_LightCurveController.Context.Normalisation])
             {
                 normalIndexes.Add(firstValue / linearRegression.ComputeY(binnedValue.BinNo));
             }
@@ -352,7 +350,7 @@ namespace Tangra.VideoOperations.LightCurves
         {
             var linearRegression = new LinearRegression();
 
-            foreach (LCMeasurement reading in m_AllReadings[m_Context.Normalisation])
+            foreach (LCMeasurement reading in m_LightCurveController.Context.AllReadings[m_LightCurveController.Context.Normalisation])
             {
                 if (reading.IsSuccessfulReading)
                     linearRegression.AddDataPoint(reading.CurrFrameNo, reading.AdjustedReading);
@@ -360,9 +358,9 @@ namespace Tangra.VideoOperations.LightCurves
 
             linearRegression.Solve();
 
-            double firstValue = linearRegression.ComputeY(m_AllReadings[m_Context.Normalisation][0].CurrFrameNo);
+            double firstValue = linearRegression.ComputeY(m_LightCurveController.Context.AllReadings[m_LightCurveController.Context.Normalisation][0].CurrFrameNo);
 
-            foreach (LCMeasurement reading in m_AllReadings[m_Context.Normalisation])
+            foreach (LCMeasurement reading in m_LightCurveController.Context.AllReadings[m_LightCurveController.Context.Normalisation])
             {
                 normalIndexes.Add(firstValue / linearRegression.ComputeY(reading.CurrFrameNo));
             }
@@ -377,8 +375,8 @@ namespace Tangra.VideoOperations.LightCurves
             {
                 if (numFrames == 1)
                 {
-                    if (m_AllReadings[m_Context.Normalisation][i].IsSuccessfulReading)
-                        averages.Add(m_AllReadings[m_Context.Normalisation][i].AdjustedReading);
+                    if (m_LightCurveController.Context.AllReadings[m_LightCurveController.Context.Normalisation][i].IsSuccessfulReading)
+                        averages.Add(m_LightCurveController.Context.AllReadings[m_LightCurveController.Context.Normalisation][i].AdjustedReading);
                     else
                         averages.Add(double.NaN);
                 }
@@ -391,9 +389,9 @@ namespace Tangra.VideoOperations.LightCurves
                         int idx = i + j;
                         if (idx >= 0 && idx < maxIdx)
                         {
-                            if (m_AllReadings[m_Context.Normalisation][idx].IsSuccessfulReading)
+                            if (m_LightCurveController.Context.AllReadings[m_LightCurveController.Context.Normalisation][idx].IsSuccessfulReading)
                             {
-                                sum += m_AllReadings[m_Context.Normalisation][idx].AdjustedReading;
+                                sum += m_LightCurveController.Context.AllReadings[m_LightCurveController.Context.Normalisation][idx].AdjustedReading;
                                 readings++;
                             }
                         }
@@ -426,7 +424,7 @@ namespace Tangra.VideoOperations.LightCurves
         {
             List<double> averages = new List<double>();
 
-            int maxIdx = m_AllBinnedReadings[m_Context.Normalisation].Count;
+            int maxIdx = m_AllBinnedReadings[m_LightCurveController.Context.Normalisation].Count;
             for (int i = 0; i < maxIdx; i++)
             {
                 double sum = 0;
@@ -436,9 +434,9 @@ namespace Tangra.VideoOperations.LightCurves
                     int idx = i + j;
                     if (idx >= 0 && idx < maxIdx)
                     {
-                        if (m_AllReadings[m_Context.Normalisation][idx].IsSuccessfulReading)
+                        if (m_LightCurveController.Context.AllReadings[m_LightCurveController.Context.Normalisation][idx].IsSuccessfulReading)
                         {
-                            sum += m_AllBinnedReadings[m_Context.Normalisation][idx].AdjustedValue;
+                            sum += m_AllBinnedReadings[m_LightCurveController.Context.Normalisation][idx].AdjustedValue;
                             readings++;
                         }
                     }
@@ -582,7 +580,7 @@ namespace Tangra.VideoOperations.LightCurves
                                            : 0;
 
 			uint objCount = m_Header.ObjectCount;
-			if (m_Context.Binning > 0)
+			if (m_LightCurveController.Context.Binning > 0)
 			{
 				// Binned frames
 				int count = m_AllBinnedReadings[0].Count;
@@ -599,7 +597,7 @@ namespace Tangra.VideoOperations.LightCurves
 
                 string isBadTimeString = null;
 
-                double resolutionInSecs = m_Context.Binning / (2.0 * m_Header.FramesPerSecond);
+                double resolutionInSecs = m_LightCurveController.Context.Binning / (2.0 * m_Header.FramesPerSecond);
                 string timeFormat = "HH:mm:ss";
 
                 if (resolutionInSecs < 0.06)
@@ -620,7 +618,7 @@ namespace Tangra.VideoOperations.LightCurves
 				for (int i = 0; i < count; i++)
 				{
 					string isCorrectedForInstrumentalDelay;
-					DateTime middleBinTime = m_LCFile.GetTimeForFrame(firstFrameNoInBin + (m_Context.Binning / 2.0), out isCorrectedForInstrumentalDelay);
+					DateTime middleBinTime = m_LCFile.GetTimeForFrame(firstFrameNoInBin + (m_LightCurveController.Context.Binning / 2.0), out isCorrectedForInstrumentalDelay);
 
 				    string timeStr;
 					if (isBadTimeString != null)
@@ -651,7 +649,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 					output.AppendLine();
 
-					firstFrameNoInBin += m_Context.Binning;
+					firstFrameNoInBin += m_LightCurveController.Context.Binning;
 				}
 			}
 			else
@@ -659,10 +657,10 @@ namespace Tangra.VideoOperations.LightCurves
                 CSVExportAddCommonHeader(output, false);
 
 				bool onlyExportSignalMunusBg =
-					m_Context.SignalMethod == TangraConfig.PhotometryReductionMethod.PsfPhotometry &&
-					m_Context.PsfQuadratureMethod == TangraConfig.PsfQuadrature.Analytical;
+					m_LightCurveController.Context.SignalMethod == TangraConfig.PhotometryReductionMethod.PsfPhotometry &&
+					m_LightCurveController.Context.PsfQuadratureMethod == TangraConfig.PsfQuadrature.Analytical;
 
-				int count = m_AllReadings[0].Count;
+				int count = m_LightCurveController.Context.AllReadings[0].Count;
 
 				output.Append("FrameNo,Time (UT)");
 
@@ -685,7 +683,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 				for (int i = 0; i < count; i++)
 				{
-					uint frameNo = m_AllReadings[0][i].CurrFrameNo;
+					uint frameNo = m_LightCurveController.Context.AllReadings[0][i].CurrFrameNo;
 					string isCorrectedForInstrumentalDelay;
 					DateTime currFrameTime = m_LCFile.GetTimeForFrame(frameNo, out isCorrectedForInstrumentalDelay);
 
@@ -713,7 +711,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 					for (int j = 0; j < objCount; j++)
 					{
-						LCMeasurement reading = m_AllReadings[j][i];
+						LCMeasurement reading = m_LightCurveController.Context.AllReadings[j][i];
                         if (reading.IsSuccessfulReading)
                         {
                             if (!onlyExportSignalMunusBg)
@@ -749,7 +747,7 @@ namespace Tangra.VideoOperations.LightCurves
 
             output.AppendFormat("Tangra v{0}", ver.ToString()); output.AppendLine();
             if (binning)
-                output.AppendFormat("Measurments of {0} objects; Bins of {1} frames; Binned Measurement = {2}", m_Header.ObjectCount, m_Context.Binning, m_Context.ProcessingType);
+                output.AppendFormat("Measurments of {0} objects; Bins of {1} frames; Binned Measurement = {2}", m_Header.ObjectCount, m_LightCurveController.Context.Binning, m_LightCurveController.Context.ProcessingType);
             else
                 output.AppendFormat("Measurments of {0} objects", m_Header.ObjectCount);
 
@@ -757,14 +755,14 @@ namespace Tangra.VideoOperations.LightCurves
             output.Append(m_Header.PathToVideoFile); output.AppendLine();
             output.AppendFormat("{0} {1}", m_Header.ReductionType, m_Header.SourceInfo); output.AppendLine();
             output.AppendLine();output.AppendLine();
-            bool addPSFReductionDetails = m_Context.SignalMethod != TangraConfig.PhotometryReductionMethod.AperturePhotometry;
-            bool addPSFAverageModelDetails = addPSFReductionDetails && m_Context.PsfFittingMethod == TangraConfig.PsfFittingMethod.LinearFitOfAveragedModel;
+            bool addPSFReductionDetails = m_LightCurveController.Context.SignalMethod != TangraConfig.PhotometryReductionMethod.AperturePhotometry;
+            bool addPSFAverageModelDetails = addPSFReductionDetails && m_LightCurveController.Context.PsfFittingMethod == TangraConfig.PsfFittingMethod.LinearFitOfAveragedModel;
             bool addIntegrationInfo = m_Footer.ReductionContext.FrameIntegratingMode != FrameIntegratingMode.NoIntegration;
 
             string instrumentalDelayStatus = "Not Applied";
-            if (m_Context.TimingType == MeasurementTimingType.EmbeddedTimeForEachFrame && m_Context.BitPix > 8)
+            if (m_LightCurveController.Context.TimingType == MeasurementTimingType.EmbeddedTimeForEachFrame && m_LightCurveController.Context.BitPix > 8)
                 instrumentalDelayStatus = "Not Required";
-            else if (!string.IsNullOrEmpty(m_Context.InstrumentalDelayConfigName))
+            else if (!string.IsNullOrEmpty(m_LightCurveController.Context.InstrumentalDelayConfigName))
                 instrumentalDelayStatus = "Applied";
 
             output.Append("Reversed Gamma, Colour, Measured Band, Integration, Digital Filter, Signal Method, Background Method, Instrumental Delay Corrections, Camera, AAV Integration, First Frame, Last Frame");
@@ -772,23 +770,23 @@ namespace Tangra.VideoOperations.LightCurves
             if (addPSFAverageModelDetails) output.Append(", Modeled FWHM, Average FWHM"); 
             output.AppendLine();
             output.AppendFormat("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11}", 
-                m_Context.EncodingGamma.ToString("0.00"),
+                m_LightCurveController.Context.EncodingGamma.ToString("0.00"),
                 m_Footer.ReductionContext.IsColourVideo ? "yes" : "no", 
                 m_Footer.ReductionContext.ColourChannel,
                 addIntegrationInfo
                     ? string.Format("{0} {1} of {2} frames", m_Footer.ReductionContext.PixelIntegrationType, m_Footer.ReductionContext.FrameIntegratingMode, m_Footer.ReductionContext.NumberFramesToIntegrate) 
                     : "no",
-                m_Context.Filter, 
-                m_Context.SignalMethod,
-                m_Context.BackgroundMethod,
+                m_LightCurveController.Context.Filter, 
+                m_LightCurveController.Context.SignalMethod,
+                m_LightCurveController.Context.BackgroundMethod,
                 instrumentalDelayStatus,
-                !string.IsNullOrEmpty(m_Context.CameraName) ?  m_Context.CameraName : m_Context.InstrumentalDelayConfigName,
-                m_Context.AAVFrameIntegration == -1 ? "" : m_Context.AAVFrameIntegration.ToString(),
-                m_Context.MinFrame,
-                m_Context.MaxFrame);
+                !string.IsNullOrEmpty(m_LightCurveController.Context.CameraName) ?  m_LightCurveController.Context.CameraName : m_LightCurveController.Context.InstrumentalDelayConfigName,
+                m_LightCurveController.Context.AAVFrameIntegration == -1 ? "" : m_LightCurveController.Context.AAVFrameIntegration.ToString(),
+                m_LightCurveController.Context.MinFrame,
+                m_LightCurveController.Context.MaxFrame);
 
-            if (addPSFReductionDetails) output.AppendFormat(",{0}", m_Context.PsfFittingMethod);
-            if (addPSFAverageModelDetails) output.AppendFormat(",{0},{1}", float.IsNaN(m_Context.ManualAverageFWHM) ? "auto" : "manual", !float.IsNaN(m_Context.ManualAverageFWHM) ? m_Context.ManualAverageFWHM.ToString("0.00") : m_Footer.RefinedAverageFWHM.ToString("0.00"));
+            if (addPSFReductionDetails) output.AppendFormat(",{0}", m_LightCurveController.Context.PsfFittingMethod);
+            if (addPSFAverageModelDetails) output.AppendFormat(",{0},{1}", float.IsNaN(m_LightCurveController.Context.ManualAverageFWHM) ? "auto" : "manual", !float.IsNaN(m_LightCurveController.Context.ManualAverageFWHM) ? m_LightCurveController.Context.ManualAverageFWHM.ToString("0.00") : m_Footer.RefinedAverageFWHM.ToString("0.00"));
 
             output.AppendLine();output.AppendLine();
             output.Append("Object, Type, Aperture, Tolerance, FWHM, Measured, StartingX, StartingY, Fixed"); output.AppendLine();
@@ -796,7 +794,7 @@ namespace Tangra.VideoOperations.LightCurves
             {
                 TrackedObjectConfig obj = m_Footer.TrackedObjects[j];
                 output.AppendFormat("{0},{1},{2},{3},{4},{5},{6},{7},{8}",
-                    j + 1, obj.TrackingType.ToString(), m_Context.ReProcessApertures[j].ToString("0.00"),
+                    j + 1, obj.TrackingType.ToString(), m_LightCurveController.Context.ReProcessApertures[j].ToString("0.00"),
                     obj.TrackingType == TrackingType.OccultedStar ? obj.PositionTolerance.ToString("0.00") : "", obj.RefinedFWHM.ToString("0.00"),
                     obj.MeasureThisObject ? "yes" : "no",
                     obj.ApertureStartingX.ToString("0.0"), obj.ApertureStartingY.ToString("0.0"), obj.IsFixedAperture ? "yes" : "no");
@@ -816,436 +814,6 @@ namespace Tangra.VideoOperations.LightCurves
             public int BinNo;
 			public int BinMiddleFrameNo;
         	public bool IsSuccessfulReading;
-        }
-
-        internal class LightCurveContext
-        {
-            internal LightCurveContext(LCFile lcFile)
-            {
-                if (lcFile.Header.MeasuredFrames > 0)
-                {
-                    for (int i = 0; i < lcFile.Header.ObjectCount; i++)
-                    {
-                        m_ReProcessApertures[i] = lcFile.Header.MeasurementApertures[i];
-                        m_ReProcessFitAreas[i] = 2 * (lcFile.Header.PsfFitMatrixSizes[i]/ 2) + 1;
-                    }
-                }
-
-            	for (int i = 0; i < 4; i++)
-            		m_ObjectTitles[i] = string.Format("Object {0}", i);
-            }
-
-            internal enum FilterType
-            {
-                NoFilter,
-                LowPass,
-                LowPassDifference
-            }
-
-            internal enum NormalisationMethod
-            {
-                Average4Frame,
-                Average16Frame,
-                LinearFit,
-                FrameByFrame
-            }
-
-            internal enum BackgroundComputationMethod
-            {
-                FromPSFFit,
-                FromBackgroundDistribution
-            }
-
-            private bool m_Dirty = false;
-            private bool m_FirstZoomedFrameChanged = false;
-            private bool m_RequiresFullReprocessing = false;
-            private ProcessingType m_ProcessingType = ProcessingType.SignalMinusBackground;
-            private int m_Binning = 0;
-            private int m_Normalisation = -1;
-            private FilterType m_Filter = FilterType.NoFilter;
-            private NormalisationMethod m_NormMethod = NormalisationMethod.LinearFit;
-            private float[] m_ReProcessApertures = new float[4];
-            private int[] m_ReProcessFitAreas = new int[4];
-
-            public string InstrumentalDelayConfigName;
-            public MeasurementTimingType TimingType;
-            public string CameraName;
-            public int AAVFrameIntegration;
-            public uint MinFrame;
-            public uint MaxFrame;
-
-            public uint m_SelectedFrameNo = 0;
-
-            public uint SelectedFrameNo
-            {
-                get { return m_SelectedFrameNo; }
-                set
-                {
-                    if (m_SelectedFrameNo != value)
-                    {
-                        m_SelectedFrameNo = value;             
-                    }
-                }
-            }
-
-        	public int BitPix;
-        	public uint MaxPixelValue;
-            public IDisplayBitmapConverter DisplayBitmapConverter;
-
-			public bool CustomBinning { get; set; }
-
-	        private bool m_OutlierRemoval = true;
-        	public string[] m_ObjectTitles = new string[4];
-        	public string[] m_ChartTitleLines;
-
-            #region Backed-up settings so they can be restored when CancelChanges() is requested 
-
-            private bool m_bu_Dirty = false;
-            private bool m_bu_RequiresFullReprocessing = false;
-            private ProcessingType m_bu_ProcessingType = ProcessingType.SignalMinusBackground;
-            private int m_bu_Binning = 0;
-            private int m_bu_Normalisation = -1;
-            private FilterType m_bu_Filter = FilterType.NoFilter;
-            private NormalisationMethod mbu__NormMethod = NormalisationMethod.LinearFit;
-            private float[] m_bu_ReProcessApertures = new float[4];
-            private int[] m_bu_ReProcessFitAreas = new int[4];
-            public uint bu_SelectedFrameNo = 0;
-			public string[] m_bu_ObjectTitles = new string[4];
-			public string[] m_bu_ChartTitleLines;
-
-            internal void PrepareForCancelling()
-            {
-                m_bu_Dirty = m_Dirty;
-                m_bu_RequiresFullReprocessing = m_RequiresFullReprocessing;
-                m_bu_ProcessingType = m_ProcessingType;
-                m_bu_Binning = m_Binning;
-                m_bu_Normalisation = m_Normalisation;
-                m_bu_Filter = m_Filter;
-                mbu__NormMethod = m_NormMethod;
-                bu_SelectedFrameNo = SelectedFrameNo;
-
-                for (int i = 0; i < 4; i++)
-                    m_bu_ReProcessApertures[i] = m_ReProcessApertures[i];
-
-                for (int i = 0; i < 4; i++)
-                    m_bu_ReProcessFitAreas[i] = m_ReProcessFitAreas[i];
-
-				for (int i = 0; i < 4; i++)
-					m_bu_ObjectTitles[i] = m_ObjectTitles[i];
-
-            	m_bu_ChartTitleLines = m_ChartTitleLines;
-            }
-
-            internal void CancelChanges()
-            {
-                m_Dirty = m_bu_Dirty;
-                m_RequiresFullReprocessing = m_bu_RequiresFullReprocessing;
-                m_ProcessingType = m_bu_ProcessingType;
-                m_Binning = m_bu_Binning;
-                m_Normalisation = m_bu_Normalisation;
-                m_Filter = m_bu_Filter;
-                m_NormMethod = mbu__NormMethod;
-                SelectedFrameNo = bu_SelectedFrameNo;
-
-                for (int i = 0; i < 4; i++)
-                    m_ReProcessApertures[i] = m_bu_ReProcessApertures[i];
-
-                for (int i = 0; i < 4; i++)
-                    m_ReProcessFitAreas[i] = m_bu_ReProcessFitAreas[i];
-
-				for (int i = 0; i < 4; i++)
-					m_ObjectTitles[i] = m_bu_ObjectTitles[i];
-
-               m_ChartTitleLines = m_bu_ChartTitleLines;
-            }
-
-            #endregion
-
-            public ProcessingType ProcessingType
-            {
-                get { return m_ProcessingType; }
-                set
-                {
-                    if (m_ProcessingType != value)
-                    {
-                        m_ProcessingType = value;
-                        m_Dirty = true;
-                    }
-                }
-            }
-
-	        public bool OutlierRemoval
-	        {
-		        get { return m_OutlierRemoval; }
-		        set
-		        {
-			        if (m_OutlierRemoval != value)
-			        {
-				        m_OutlierRemoval = value;
-				        m_Dirty = true;
-			        }
-		        }
-	        }
-
-            public int Binning
-            {
-                get { return m_Binning; }
-                set
-                {
-                    if (m_Binning != value)
-                    {
-                        m_Binning = value;
-                        m_Dirty = true;
-                    }
-                }
-            }
-
-            public int Normalisation
-            {
-                get { return m_Normalisation; }
-                set
-                {
-                    if (m_Normalisation != value)
-                    {
-                        m_Normalisation = value;
-                        m_Dirty = true;
-                    }
-                }
-            }
-
-            public FilterType Filter
-            {
-                get { return m_Filter; }
-                set
-                {
-                    if (m_Filter != value)
-                    {
-                        m_Filter = value;
-                        m_Dirty = true;
-                        m_RequiresFullReprocessing = true;
-                    }
-                }
-            }
-
-            public NormalisationMethod NormMethod
-            {
-                get { return m_NormMethod; }
-                set
-                {
-                    if (m_NormMethod != value)
-                    {
-                        m_NormMethod = value;
-                        // If the normalization is specified, changing the method will make the data durty
-                        m_Dirty = m_Normalisation > -1;
-                    }
-                }
-            }
-
-            private TangraConfig.BackgroundMethod m_BackgroundMethod = TangraConfig.BackgroundMethod.BackgroundMode;
-
-            public TangraConfig.BackgroundMethod BackgroundMethod
-            {
-                get { return m_BackgroundMethod; }
-                set
-                {
-                    if (m_BackgroundMethod != value)
-                    {
-                        m_BackgroundMethod = value;
-                        m_Dirty = true;
-
-                        m_RequiresFullReprocessing = true;
-                    }
-                }
-            }
-
-            private TangraConfig.PhotometryReductionMethod m_SignalMethod = TangraConfig.PhotometryReductionMethod.AperturePhotometry;
-
-            public TangraConfig.PhotometryReductionMethod SignalMethod
-            {
-                get { return m_SignalMethod; }
-                set
-                {
-                    if (m_SignalMethod != value)
-                    {
-                        m_SignalMethod = value;
-                        m_Dirty = true;
-
-                        m_RequiresFullReprocessing = true;
-                    }
-                }
-            }
-
-			private TangraConfig.PsfQuadrature m_PsfQuadratureMethod = TangraConfig.PsfQuadrature.NumericalInAperture;
-
-			public TangraConfig.PsfQuadrature PsfQuadratureMethod
-			{
-				get { return m_PsfQuadratureMethod; }
-				set
-				{
-					if (m_PsfQuadratureMethod != value)
-					{
-						m_PsfQuadratureMethod = value;
-						m_Dirty = true;
-
-						m_RequiresFullReprocessing = true;
-					}
-				}
-			}
-
-        	private byte[] m_DecodingGammaMatrix = new byte[256];
-			public byte[] DecodingGammaMatrix
-			{
-				get { return m_DecodingGammaMatrix; }
-			}
-
-			public bool FurtherReprocessingNotPossible { get; set; }
-
-	        private double m_EncodingGamma = 1.0;
-            public double EncodingGamma
-            {
-                get { return m_EncodingGamma; }
-                set
-                {
-                    if (m_EncodingGamma != value)
-                    {
-                        m_EncodingGamma = value;
-
-						double decodingGamma = 1 / m_EncodingGamma;
-
-						for (int i = 0; i < 256; i++)
-							m_DecodingGammaMatrix[i] = (byte)Math.Max(0, Math.Min(255, Math.Round(256 * Math.Pow(i / 256.0, decodingGamma))));
-
-                        m_Dirty = true;
-
-                        m_RequiresFullReprocessing = true;
-                    }
-                }
-            }
-
-        	public bool UseClipping;
-        	public bool UseStretching;
-			public bool UseBrightnessContrast;
-			public byte FromByte;
-			public byte ToByte;
-			public int Brightness;
-			public int Contrast;
-
-			private CompositeFramePreProcessor m_FramePreProcessor = null;
-
-			internal void InitFrameBytePreProcessors()
-			{
-				m_FramePreProcessor = new CompositeFramePreProcessor();
-
-				if (UseBrightnessContrast)
-				{
-					IFramePreProcessor bytePreProcessor = new FrameByteBrightnessContrast(Brightness, Contrast, true, BitPix);
-					m_FramePreProcessor.AddPreProcessor(bytePreProcessor);
-				}
-				else if (UseStretching)
-				{
-					IFramePreProcessor bytePreProcessor = new FrameByteStretcher(FromByte, ToByte, true, BitPix);
-					m_FramePreProcessor.AddPreProcessor(bytePreProcessor);
-				}
-				else if (UseClipping)
-				{
-					IFramePreProcessor bytePreProcessor = new FrameByteClipper(FromByte, ToByte, true, BitPix);
-					m_FramePreProcessor.AddPreProcessor(bytePreProcessor);
-				}
-			}
-
-            private TangraConfig.PsfFittingMethod m_PsfFittingMethod = TangraConfig.PsfFittingMethod.DirectNonLinearFit;
-
-            public TangraConfig.PsfFittingMethod PsfFittingMethod
-            {
-                get { return m_PsfFittingMethod; }
-                set
-                {
-                    if (m_PsfFittingMethod != value)
-                    {
-                        m_PsfFittingMethod = value;
-                        m_Dirty = true;
-
-                        m_RequiresFullReprocessing = true;
-                    }
-                }
-            }
-
-            private float m_ManualAverageFWHM = float.NaN;
-
-            public float ManualAverageFWHM
-            {
-                get { return m_ManualAverageFWHM; }
-                set
-                {
-                    if (m_ManualAverageFWHM != value)
-                    {
-                        m_ManualAverageFWHM = value;
-                        m_Dirty = true;
-
-                        m_RequiresFullReprocessing = true;
-                    }
-                }
-            }
-
-            public float[] ReProcessApertures
-            {
-                get { return m_ReProcessApertures; }
-            }
-
-            public int[] ReProcessFitAreas
-            {
-                get { return m_ReProcessFitAreas; }
-            }
-
-
-			public string[] ObjectTitles
-			{
-				get { return m_ObjectTitles; }
-			}
-
-        	public string[] ChartTitleLines
-        	{
-				get { return m_ChartTitleLines; }
-                set { m_ChartTitleLines = value; }
-        	}
-
-            public bool Dirty
-            {
-                get { return m_Dirty; }
-            }
-
-            public bool RequiresFullReprocessing
-            {
-                get { return m_RequiresFullReprocessing; }
-            }
-            
-            public bool FirstZoomedFrameChanged
-            {
-                get { return m_FirstZoomedFrameChanged; }
-            }
-
-            public void MarkClean()
-            {
-                m_Dirty = false;
-                m_RequiresFullReprocessing = false;
-                m_FirstZoomedFrameChanged = false;
-            }
-
-            public void MarkDirtyNoFullReprocessing()
-            {
-                m_Dirty = true;
-            }
-
-            public void MarkFirstZoomedFrameChanged()
-            {
-                m_FirstZoomedFrameChanged = true;
-            }
-
-            public void MarkDirtyWithFullReprocessing()
-            {
-                m_Dirty = true;
-                m_RequiresFullReprocessing = true;
-            }
         }
 
 		string ILightCurveDataProvider.FileName
@@ -1270,7 +838,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 	    string ILightCurveDataProvider.VideoCameraName
 	    {
-			get { return m_Context.CameraName; }
+			get { return m_LightCurveController.Context.CameraName; }
 	    }
 
         string ILightCurveDataProvider.VideoSystem
@@ -1315,7 +883,7 @@ namespace Tangra.VideoOperations.LightCurves
 
         int ILightCurveDataProvider.CurrentlySelectedFrameNumber
         {
-            get { return (int)m_Context.SelectedFrameNo; }
+            get { return (int)m_LightCurveController.Context.SelectedFrameNo; }
         }
 
 		void ILightCurveDataProvider.SetNoOccultationEvents()
@@ -1472,10 +1040,10 @@ namespace Tangra.VideoOperations.LightCurves
 
 			GetAOTAStarIndexes(out occultedStarIndex, out comp1Index, out comp2Index, out comp3Index);
 
-			if (m_Context.Binning > 0)
-				return m_AllBinnedReadings[occultedStarIndex].Select(x => new SingleMeasurement(x, occultedStarIndex, x.BinMiddleFrameNo + (m_Context.Binning / 2.0), m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
+			if (m_LightCurveController.Context.Binning > 0)
+				return m_AllBinnedReadings[occultedStarIndex].Select(x => new SingleMeasurement(x, occultedStarIndex, x.BinMiddleFrameNo + (m_LightCurveController.Context.Binning / 2.0), m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
 			else
-                return m_AllReadings[occultedStarIndex].Select(x => new SingleMeasurement(x, x.CurrFrameNo, m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
+                return m_LightCurveController.Context.AllReadings[occultedStarIndex].Select(x => new SingleMeasurement(x, x.CurrFrameNo, m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
 		}
 
 		ISingleMeasurement[] ILightCurveDataProvider.GetComparisonObjectMeasurements(int comparisonObjectId)
@@ -1486,23 +1054,23 @@ namespace Tangra.VideoOperations.LightCurves
 			int comp3Index;
 
 			GetAOTAStarIndexes(out occultedStarIndex, out comp1Index, out comp2Index, out comp3Index);
-			if (m_Context.Binning > 0)
+			if (m_LightCurveController.Context.Binning > 0)
 			{
 				if (comparisonObjectId == 0 && comp1Index > -1)
-					return m_AllBinnedReadings[comp1Index].Select(x => new SingleMeasurement(x, comp1Index, x.BinMiddleFrameNo + (m_Context.Binning / 2.0), m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
+					return m_AllBinnedReadings[comp1Index].Select(x => new SingleMeasurement(x, comp1Index, x.BinMiddleFrameNo + (m_LightCurveController.Context.Binning / 2.0), m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
 				else if (comparisonObjectId == 1 && comp2Index > -1)
-					return m_AllBinnedReadings[comp2Index].Select(x => new SingleMeasurement(x, comp2Index, x.BinMiddleFrameNo + (m_Context.Binning / 2.0), m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
+					return m_AllBinnedReadings[comp2Index].Select(x => new SingleMeasurement(x, comp2Index, x.BinMiddleFrameNo + (m_LightCurveController.Context.Binning / 2.0), m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
 				else if (comparisonObjectId == 2 && comp3Index > -1)
-					return m_AllBinnedReadings[comp3Index].Select(x => new SingleMeasurement(x, comp3Index, x.BinMiddleFrameNo + (m_Context.Binning / 2.0), m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
+					return m_AllBinnedReadings[comp3Index].Select(x => new SingleMeasurement(x, comp3Index, x.BinMiddleFrameNo + (m_LightCurveController.Context.Binning / 2.0), m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
 			}
 			else
 			{
 				if (comparisonObjectId == 0 && comp1Index > -1)
-                    return m_AllReadings[comp1Index].Select(x => new SingleMeasurement(x, x.CurrFrameNo, m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
+                    return m_LightCurveController.Context.AllReadings[comp1Index].Select(x => new SingleMeasurement(x, x.CurrFrameNo, m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
 				else if (comparisonObjectId == 1 && comp2Index > -1)
-                    return m_AllReadings[comp2Index].Select(x => new SingleMeasurement(x, x.CurrFrameNo, m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
+                    return m_LightCurveController.Context.AllReadings[comp2Index].Select(x => new SingleMeasurement(x, x.CurrFrameNo, m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
 				else if (comparisonObjectId == 2 && comp3Index > -1)
-                    return m_AllReadings[comp3Index].Select(x => new SingleMeasurement(x, x.CurrFrameNo, m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
+                    return m_LightCurveController.Context.AllReadings[comp3Index].Select(x => new SingleMeasurement(x, x.CurrFrameNo, m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
 			}
 
 			return null;

@@ -35,9 +35,9 @@ namespace Tangra.VideoOperations.LightCurves
                 if (
                     m_Graph == null ||
                     (pnlChart.Width != m_Graph.Width || pnlChart.Height != m_Graph.Height) ||
-                    m_Context.Dirty || m_Context.FirstZoomedFrameChanged)
+                    m_LightCurveController.Context.Dirty || m_LightCurveController.Context.FirstZoomedFrameChanged)
                 {
-                    if (m_Context.Dirty)
+                    if (m_LightCurveController.Context.Dirty)
                     {
                         SetSmallGraphDirty();
                         pnlSmallGraph.Invalidate();
@@ -47,9 +47,9 @@ namespace Tangra.VideoOperations.LightCurves
 
                     DrawGraphOnBitmap();
 
-                    if (m_Context.Dirty)
+                    if (m_LightCurveController.Context.Dirty)
                     {
-                        m_Context.MarkClean();
+                        m_LightCurveController.Context.MarkClean();
                         UpdateContextDisplays();
                     }
 
@@ -57,8 +57,8 @@ namespace Tangra.VideoOperations.LightCurves
                     {
                         // This repaint has been done as a result of a zoom in/zoom out operation
                         // In this case we want to keep the selected frame drawn, if there is a selected frame
-                        if (m_Context.SelectedFrameNo >= m_Header.MinFrame &&
-                            m_Context.SelectedFrameNo <= m_Header.MaxFrame)
+                        if (m_LightCurveController.Context.SelectedFrameNo >= m_Header.MinFrame &&
+                            m_LightCurveController.Context.SelectedFrameNo <= m_Header.MaxFrame)
                         {
                             ReSelectCurrentMeasurement(false);
                         }
@@ -106,7 +106,7 @@ namespace Tangra.VideoOperations.LightCurves
 			if (!LCMeasurementHeader.IsEmpty(m_Header))
 			{
 				// i.e. signal, signal - noise, binned signal etc
-				if (m_Context.Dirty)
+				if (m_LightCurveController.Context.Dirty)
 					ReComputeSignalSeries();
 
 				if (m_ZoomLevel < 1) m_ZoomLevel = 1;
@@ -138,7 +138,7 @@ namespace Tangra.VideoOperations.LightCurves
 				using (Graphics g = Graphics.FromImage(m_Graph))
 				{
 					uint axisInterval = GetYAxisInterval(g);
-					if (m_Context.Dirty && axisInterval != 0)
+					if (m_LightCurveController.Context.Dirty && axisInterval != 0)
 					{
 						m_Header.MinAdjustedReading =
 							(int)(axisInterval * ((m_Header.MinAdjustedReading / axisInterval) - (m_Header.MinAdjustedReading > 0 ? 0 : 1)));
@@ -188,7 +188,7 @@ namespace Tangra.VideoOperations.LightCurves
 							int nextPlotIndex = -1;
 							int readingIdx = 0;
 							bool prevReadingIsOffScreen = true;
-							foreach (LCMeasurement reading in m_AllReadings[i])
+							foreach (LCMeasurement reading in m_LightCurveController.Context.AllReadings[i])
 							{
 								idx++;
 								readingIdx++;
@@ -196,7 +196,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 								bool readingIsOffScreen = true;
 								float adjustedReading = -1;
-								if (m_Context.Binning > 0)
+								if (m_LightCurveController.Context.Binning > 0)
 								{
 									if (currBin == null ||
 										currBin.ReadingIndexTo <= readingIdx)
@@ -289,7 +289,7 @@ namespace Tangra.VideoOperations.LightCurves
             if (!LCMeasurementHeader.IsEmpty(m_Header))
             {
                 // i.e. signal, signal - noise, binned signal etc
-                if (m_Context.Dirty)
+                if (m_LightCurveController.Context.Dirty)
                     ReComputeSignalSeries();
 
 				if (m_ZoomLevel < 1) m_ZoomLevel = 1;
@@ -318,7 +318,7 @@ namespace Tangra.VideoOperations.LightCurves
                 using (Graphics g = Graphics.FromImage(m_Graph))
                 {
                     uint axisInterval = GetYAxisInterval(g);
-                    if (m_Context.Dirty && axisInterval != 0)
+                    if (m_LightCurveController.Context.Dirty && axisInterval != 0)
                     {
                         m_Header.MinAdjustedReading =
                             (int)(axisInterval * ((m_Header.MinAdjustedReading/axisInterval) - (m_Header.MinAdjustedReading > 0 ? 0 : 1)));
@@ -368,7 +368,7 @@ namespace Tangra.VideoOperations.LightCurves
                             int nextPlotIndex = -1;
                             int readingIdx = 0;
 							bool prevReadingIsOffScreen = true;
-                            foreach (LCMeasurement reading in m_AllReadings[i])
+                            foreach (LCMeasurement reading in m_LightCurveController.Context.AllReadings[i])
                             {
                                 idx++;
                                 readingIdx++;
@@ -376,7 +376,7 @@ namespace Tangra.VideoOperations.LightCurves
 								
                                 bool readingIsOffScreen = true;
                                 float adjustedReading = -1;
-                                if (m_Context.Binning > 0)
+                                if (m_LightCurveController.Context.Binning > 0)
                                 {
                                     if (currBin == null || 
                                         currBin.ReadingIndexTo <= readingIdx)
@@ -633,7 +633,7 @@ namespace Tangra.VideoOperations.LightCurves
             m_ZoomScrollMode = false;
             pnlSmallGraph.Invalidate();
 
-            m_Context.SelectedFrameNo = currFrameNo;
+            m_LightCurveController.Context.SelectedFrameNo = currFrameNo;
             m_AddinsController.OnLightCurveCurrentFrameChanged((int)currFrameNo);
             SetSmallGraphDirty();
 
@@ -648,10 +648,10 @@ namespace Tangra.VideoOperations.LightCurves
 
             for (int i = 0; i < m_FramesIndex.Count; i++)
             {
-                if (m_FramesIndex[i] < m_Context.SelectedFrameNo)
+                if (m_FramesIndex[i] < m_LightCurveController.Context.SelectedFrameNo)
                     fromId = (int)m_MeasurementsIndex[i];
 
-                if (m_FramesIndex[i] > m_Context.SelectedFrameNo)
+                if (m_FramesIndex[i] > m_LightCurveController.Context.SelectedFrameNo)
                 {
                     toId = (int)m_MeasurementsIndex[i];
                     break;
@@ -660,10 +660,10 @@ namespace Tangra.VideoOperations.LightCurves
 
             for (int i = fromId; i < toId; i++)
             {
-                if (m_Context.SelectedFrameNo >= m_AllReadings[0][i].CurrFrameNo &&
-                    (i + 1 == m_AllReadings[0].Count || m_Context.SelectedFrameNo <= m_AllReadings[0][i + 1].CurrFrameNo))
+                if (m_LightCurveController.Context.SelectedFrameNo >= m_LightCurveController.Context.AllReadings[0][i].CurrFrameNo &&
+                    (i + 1 == m_LightCurveController.Context.AllReadings[0].Count || m_LightCurveController.Context.SelectedFrameNo <= m_LightCurveController.Context.AllReadings[0][i + 1].CurrFrameNo))
                 {
-                    int idx = m_Context.SelectedFrameNo == m_AllReadings[0][i].CurrFrameNo ? i : i + 1;
+                    int idx = m_LightCurveController.Context.SelectedFrameNo == m_LightCurveController.Context.AllReadings[0][i].CurrFrameNo ? i : i + 1;
 
                     SelectMeasurement(idx);
                     DisplayCurrentMeasurements();
@@ -671,7 +671,7 @@ namespace Tangra.VideoOperations.LightCurves
 					if (movePlayerToFrame &&
                         TangraContext.Current.HasVideoLoaded)
 					{
-                        m_LightCurveController.MoveToFrameNoIntegrate((int)m_Context.SelectedFrameNo);
+                        m_LightCurveController.MoveToFrameNoIntegrate((int)m_LightCurveController.Context.SelectedFrameNo);
 					}
 					 
                     break;
@@ -681,18 +681,18 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void ReDrawCurrentSelectedMeasurementLine()
         {
-            if (m_Context.SelectedFrameNo >= m_MinDisplayedFrame &&
-                m_Context.SelectedFrameNo <= m_MaxDisplayedFrame)
+            if (m_LightCurveController.Context.SelectedFrameNo >= m_MinDisplayedFrame &&
+                m_LightCurveController.Context.SelectedFrameNo <= m_MaxDisplayedFrame)
             {
                 int fromId = 0;
                 int toId = (int)m_Header.MeasuredFrames - 1;
 
                 for (int i = 0; i < m_FramesIndex.Count; i++)
                 {
-                    if (m_FramesIndex[i] < m_Context.SelectedFrameNo)
+                    if (m_FramesIndex[i] < m_LightCurveController.Context.SelectedFrameNo)
                         fromId = (int)m_MeasurementsIndex[i];
 
-                    if (m_FramesIndex[i] > m_Context.SelectedFrameNo)
+                    if (m_FramesIndex[i] > m_LightCurveController.Context.SelectedFrameNo)
                     {
                         toId = (int)m_MeasurementsIndex[i];
                         break;
@@ -701,10 +701,10 @@ namespace Tangra.VideoOperations.LightCurves
 
                 for (int i = fromId; i < toId; i++)
                 {
-                    if (m_Context.SelectedFrameNo >= m_AllReadings[0][i].CurrFrameNo &&
-                        (i + 1 == m_AllReadings[0].Count || m_Context.SelectedFrameNo <= m_AllReadings[0][i + 1].CurrFrameNo))
+                    if (m_LightCurveController.Context.SelectedFrameNo >= m_LightCurveController.Context.AllReadings[0][i].CurrFrameNo &&
+                        (i + 1 == m_LightCurveController.Context.AllReadings[0].Count || m_LightCurveController.Context.SelectedFrameNo <= m_LightCurveController.Context.AllReadings[0][i + 1].CurrFrameNo))
                     {
-                        int idx = m_Context.SelectedFrameNo == m_AllReadings[0][i].CurrFrameNo ? i : i + 1;
+                        int idx = m_LightCurveController.Context.SelectedFrameNo == m_LightCurveController.Context.AllReadings[0][i].CurrFrameNo ? i : i + 1;
 
                         SelectMeasurement(idx);
 
@@ -748,7 +748,7 @@ namespace Tangra.VideoOperations.LightCurves
 							else
 								x = m_MinX + (reading.CurrFrameNo - m_MinDisplayedFrame) * m_ScaleX;
 
-                            if (m_Context.Binning == 0)
+                            if (m_LightCurveController.Context.Binning == 0)
                             {
                                 // Only draw the points if there is no binning
                                 float y = pnlChart.Height - (m_MinY + (reading.AdjustedReading - m_Header.MinAdjustedReading) * m_ScaleY);
@@ -781,24 +781,24 @@ namespace Tangra.VideoOperations.LightCurves
                     m_SelectedMeasurements = new LCMeasurement[m_Header.ObjectCount];
 
 	            if (id < 0) id = 0;
-				if (id >= m_AllReadings[0].Count) id = m_AllReadings[0].Count - 1;
+				if (id >= m_LightCurveController.Context.AllReadings[0].Count) id = m_LightCurveController.Context.AllReadings[0].Count - 1;
 
                 if (id >= 0)
                 {
                     m_OldLineBackup.Clear();
 
-                    if (m_AllReadings[0][id].CurrFrameNo <= m_MaxDisplayedFrame &&
-                        m_AllReadings[0][id].CurrFrameNo >= m_MinDisplayedFrame)
+                    if (m_LightCurveController.Context.AllReadings[0][id].CurrFrameNo <= m_MaxDisplayedFrame &&
+                        m_LightCurveController.Context.AllReadings[0][id].CurrFrameNo >= m_MinDisplayedFrame)
                     {
                     	float x;
 						
 						if (m_Header.TimingType == MeasurementTimingType.EmbeddedTimeForEachFrame)
 						{
-							long currFrameTimestampTicks = m_Header.GetTimeForFrameFromFrameTiming((int)m_AllReadings[0][id].CurrFrameNo, true).Ticks;
+							long currFrameTimestampTicks = m_Header.GetTimeForFrameFromFrameTiming((int)m_LightCurveController.Context.AllReadings[0][id].CurrFrameNo, true).Ticks;
 							x = m_MinX + (currFrameTimestampTicks - m_MinDisplayedFrameTimestampTicks) * m_TimestampScaleX;
 						}
 						else
-							x = m_MinX + (m_AllReadings[0][id].CurrFrameNo - m_MinDisplayedFrame) * m_ScaleX;
+							x = m_MinX + (m_LightCurveController.Context.AllReadings[0][id].CurrFrameNo - m_MinDisplayedFrame) * m_ScaleX;
 
                         int intX = (int)Math.Round(x) + 1;
                         for (int   i = m_MinY; i <= m_MaxY; i++)
@@ -813,11 +813,11 @@ namespace Tangra.VideoOperations.LightCurves
                         {
                             if (!m_IncludeObjects[i]) continue;
 
-                            LCMeasurement reading = m_AllReadings[i][id];
+                            LCMeasurement reading = m_LightCurveController.Context.AllReadings[i][id];
 
                             bool drawThisReading = m_DisplaySettings.DrawInvalidDataPoints || reading.IsSuccessfulReading;
 
-                            if (m_Context.Binning == 0 && !reading.IsOffScreen && drawThisReading)
+                            if (m_LightCurveController.Context.Binning == 0 && !reading.IsOffScreen && drawThisReading)
                             {
                                 float y = pnlChart.Height - (m_MinY + (reading.AdjustedReading - m_Header.MinAdjustedReading) * m_ScaleY);
 								try
@@ -876,7 +876,7 @@ namespace Tangra.VideoOperations.LightCurves
                     {
                         // NOTE: Need the +9 to convert from 17x17 coordinates to 35x35
                         uint pixelValue = reading.PixelData[x + 9, y + 9];
-                        byte pixcolor = m_Context.DisplayBitmapConverter.ToDisplayBitmapByte(pixelValue);
+                        byte pixcolor = m_LightCurveController.Context.DisplayBitmapConverter.ToDisplayBitmapByte(pixelValue);
                         Color pixelcolor = Color.FromArgb(pixcolor, pixcolor, pixcolor);
                         bmp.SetPixel(2 * x, 2 * y, pixelcolor);
                         bmp.SetPixel(2 * x + 1, 2 * y, pixelcolor);
@@ -886,7 +886,7 @@ namespace Tangra.VideoOperations.LightCurves
 
                 using (Graphics g = Graphics.FromImage(bmp))
                 {
-                    float radius = m_Context.ReProcessApertures[reading.TargetNo]*2;
+                    float radius = m_LightCurveController.Context.ReProcessApertures[reading.TargetNo]*2;
 
 					g.DrawEllipse(
 							m_DisplaySettings.TargetPens[reading.TargetNo],
@@ -924,14 +924,14 @@ namespace Tangra.VideoOperations.LightCurves
                         int pixelDataHeight = reading.PixelData.GetLength(1);
                         reading.PsfFit.Fit(
                             reading.PixelData,
-                            m_Context.ReProcessFitAreas[reading.TargetNo],
+                            m_LightCurveController.Context.ReProcessFitAreas[reading.TargetNo],
                             x0Int - reading.PixelDataX0 + (pixelDataWidth / 2) + 1,
                             y0Int - reading.PixelDataY0 + (pixelDataHeight / 2) + 1, 
                             false);
                     }
 
                     psfBoxes[reading.TargetNo].Visible = true;
-                    PlotSingleGaussian(psfBoxes[reading.TargetNo], reading, m_Context.ReProcessApertures[i], m_DisplaySettings.TargetBrushes, m_Footer.ReductionContext.BitPix);
+                    PlotSingleGaussian(psfBoxes[reading.TargetNo], reading, m_LightCurveController.Context.ReProcessApertures[i], m_DisplaySettings.TargetBrushes, m_Footer.ReductionContext.BitPix);
                 }
             }
         }
@@ -1081,9 +1081,9 @@ namespace Tangra.VideoOperations.LightCurves
 				}
 
             	pnlMeasurementDetails.Visible = true;
-                pnlBinInfo.Visible = m_Context.Binning > 0;
+                pnlBinInfo.Visible = m_LightCurveController.Context.Binning > 0;
 	            pnlGeoLocation.Visible = m_GeoLocationInfo != null;
-                if (m_Context.Binning > 0)
+                if (m_LightCurveController.Context.Binning > 0)
                 {
                     BinnedValue binnedVal = GetBinForFrameNo(0, m_SelectedMeasurements[0].CurrFrameNo);
                     if (binnedVal != null)

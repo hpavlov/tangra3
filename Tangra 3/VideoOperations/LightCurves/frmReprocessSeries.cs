@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Tangra.Controller;
 using Tangra.Model.Config;
 using Tangra.Model.Image;
 using Tangra.Model.VideoOperations;
@@ -18,11 +19,12 @@ namespace Tangra.VideoOperations.LightCurves
 {
     public partial class frmReprocessSeries : Form
     {
-        internal List<List<LCMeasurement>> AllReadings;
+        //internal List<List<LCMeasurement>> AllReadings;
         internal LCMeasurementHeader Header;
         internal LCMeasurementFooter Footer;
         internal Color[] AllColor;
-        internal frmLightCurve.LightCurveContext Context;
+        internal LightCurveContext Context;
+	    internal LightCurveController LightCurveController;
 
         private bool m_CancelExecution = false;
 
@@ -134,12 +136,10 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void Worker(object state)
         {
-            bool useLowPassDiff = Context.Filter == frmLightCurve.LightCurveContext.FilterType.LowPassDifference;
-            bool useLowPass = Context.Filter == frmLightCurve.LightCurveContext.FilterType.LowPass;
-	        bool retainOldValues = !Context.FurtherReprocessingNotPossible;
+            bool useLowPassDiff = Context.Filter == LightCurveContext.FilterType.LowPassDifference;
+            bool useLowPass = Context.Filter == LightCurveContext.FilterType.LowPass;
 
-            List<LCMeasurement>[] workReadings = new List<LCMeasurement>[4] { new List<LCMeasurement>(), new List<LCMeasurement>(), new List<LCMeasurement>(), new List<LCMeasurement>() };
-
+			LightCurveController.ReloadAllReadingsFromLcFile();
 
             MeasurementsHelper measurer = new MeasurementsHelper(
                  Context.BitPix,
@@ -159,20 +159,21 @@ namespace Tangra.VideoOperations.LightCurves
 
             int refreshCount = m_RefreshProgressEveryHowManyItems;
 
-	        List<LCMeasurement> readings0 = AllReadings[0];
-			List<LCMeasurement> readings1 = Header.ObjectCount > 1 ? AllReadings[1] : null;
-			List<LCMeasurement> readings2 = Header.ObjectCount > 2 ? AllReadings[2] : null;
-			List<LCMeasurement> readings3 = Header.ObjectCount > 3 ? AllReadings[3] : null;
+
+			List<LCMeasurement> readings0 = Context.AllReadings[0];
+			List<LCMeasurement> readings1 = Header.ObjectCount > 1 ? Context.AllReadings[1] : null;
+			List<LCMeasurement> readings2 = Header.ObjectCount > 2 ? Context.AllReadings[2] : null;
+			List<LCMeasurement> readings3 = Header.ObjectCount > 3 ? Context.AllReadings[3] : null;
 
             int processedCount = 0;
 
 			for (int i = 0; i < readings0.Count; i++)
 			{
-				LCMeasurement[] units = new LCMeasurement[Header.ObjectCount];
-				units[0] = readings0[i];
-				if (Header.ObjectCount > 1) units[1] = readings1[i];
-				if (Header.ObjectCount > 2) units[2] = readings2[i];
-				if (Header.ObjectCount > 3) units[3] = readings3[i];
+				List<LCMeasurement> units = new List<LCMeasurement>();
+				units.Add(readings0[i]);
+				if (Header.ObjectCount > 1) units.Add(readings1[i]);
+				if (Header.ObjectCount > 2) units.Add(readings2[i]);
+				if (Header.ObjectCount > 3) units.Add(readings3[i]);
 
                 if (m_CancelExecution)
                 {
@@ -180,12 +181,12 @@ namespace Tangra.VideoOperations.LightCurves
                     return;
                 }
 
-				LCMeasurement[] remeasuredUnits = ProcessSingleUnitSet(units, useLowPass, useLowPassDiff, retainOldValues, measurer);
+				ProcessSingleUnitSet(units, useLowPass, useLowPassDiff, measurer);
 
-				workReadings[0].Add(remeasuredUnits[0]);
-				if (Header.ObjectCount > 1) workReadings[1].Add(remeasuredUnits[1]);
-				if (Header.ObjectCount > 2) workReadings[2].Add(remeasuredUnits[2]);
-				if (Header.ObjectCount > 3) workReadings[3].Add(remeasuredUnits[3]);
+				readings0[i] = units[0];
+				if (Header.ObjectCount > 1) readings1[i] = units[1];
+				if (Header.ObjectCount > 2) readings2[i] = units[2];
+				if (Header.ObjectCount > 3) readings3[i] = units[3];
 
                 processedCount++;
 
@@ -198,8 +199,6 @@ namespace Tangra.VideoOperations.LightCurves
                 }
             }
 
-            AllReadings = new List<List<LCMeasurement>>(workReadings);
-
             Invoke(new MethodInvoker(Done));
         }
 
@@ -208,16 +207,13 @@ namespace Tangra.VideoOperations.LightCurves
             throw new NotImplementedException();
         }
 
-	    private LCMeasurement[] ProcessSingleUnitSet(
-			LCMeasurement[] units,
+	    private void ProcessSingleUnitSet(
+			List<LCMeasurement> units,
 		    bool useLowPass,
 		    bool useLowPassDiff,
-			bool retainOldValues,
 		    MeasurementsHelper measurer)
 	    {
-		    LCMeasurement[] rv = new LCMeasurement[units.Length];
-
-		    for (int i = 0; i < units.Length; i++)
+		    for (int i = 0; i < units.Count; i++)
 		    {
 			    LCMeasurement reading = units[i];
 			    IImagePixel[] groupCenters = new IImagePixel[0];
@@ -238,22 +234,17 @@ namespace Tangra.VideoOperations.LightCurves
 					}
 				}
 
-				LCMeasurement remeasuredReading = ProcessSingleUnit(
-					reading, useLowPass, useLowPassDiff, retainOldValues,
+				units[i] = ProcessSingleUnit(
+					reading, useLowPass, useLowPassDiff,
 					Context.ReProcessFitAreas[i], Context.ReProcessApertures[i], Header.FixedApertureFlags[i],
 					measurer, groupCenters, aperturesInGroup);
-
-			    rv[i] = remeasuredReading;
 		    }
-
-		    return rv;
 	    }
 
-	    private LCMeasurement ProcessSingleUnit(
+		private LCMeasurement ProcessSingleUnit(
             LCMeasurement reading,
             bool useLowPass,
             bool useLowPassDiff,
-			bool retainOldValues,
             int newFitMatrixSize,
             float newSignalAperture,
             bool fixedAperture,
@@ -261,17 +252,16 @@ namespace Tangra.VideoOperations.LightCurves
 			IImagePixel[] groupCenters,
 			float[] aperturesInGroup)
         {
-			LCMeasurement clonedValue = retainOldValues ? reading.Clone() : reading;
-            clonedValue.ReProcessingPsfFitMatrixSize = newFitMatrixSize;
+			reading.ReProcessingPsfFitMatrixSize = newFitMatrixSize;
 
-            TrackedObjectConfig objConfig = Footer.TrackedObjects[clonedValue.TargetNo];
-            ImagePixel center = new ImagePixel(clonedValue.X0, clonedValue.Y0);
+			TrackedObjectConfig objConfig = Footer.TrackedObjects[reading.TargetNo];
+			ImagePixel center = new ImagePixel(reading.X0, reading.Y0);
 
 		    int areaSize = groupCenters != null && groupCenters.Length > 1 ? 35 : 17;
 
-		    if (Context.Filter != frmLightCurve.LightCurveContext.FilterType.NoFilter) areaSize += 2;
-            
-			uint[,] data = BitmapFilter.CutArrayEdges(clonedValue.PixelData, (35 - areaSize) / 2);
+		    if (Context.Filter != LightCurveContext.FilterType.NoFilter) areaSize += 2;
+
+			uint[,] data = BitmapFilter.CutArrayEdges(reading.PixelData, (35 - areaSize) / 2);
 
 		    var filter = TangraConfig.PreProcessingFilter.NoFilter;
 			if (useLowPassDiff) filter = TangraConfig.PreProcessingFilter.LowPassDifferenceFilter;
@@ -280,7 +270,7 @@ namespace Tangra.VideoOperations.LightCurves
 			NotMeasuredReasons rv = ReduceLightCurveOperation.MeasureObject(
 				center,
 				data,
-				clonedValue.PixelData,
+				reading.PixelData,
 				Context.BitPix,
 				measurer,
 				filter,
@@ -290,19 +280,19 @@ namespace Tangra.VideoOperations.LightCurves
 				newSignalAperture,
 				objConfig.RefinedFWHM,
 				Footer.RefinedAverageFWHM,
-				clonedValue,
+				reading,
 				groupCenters,
 				aperturesInGroup,
 				Footer.ReductionContext.FullDisappearance);
 
-			clonedValue.SetIsMeasured(rv);
-            clonedValue.TotalReading = (uint)measurer.TotalReading;
-            clonedValue.TotalBackground = (uint)measurer.TotalBackground;
-		    clonedValue.ApertureX = measurer.XCenter;
-			clonedValue.ApertureY = measurer.YCenter;
-			clonedValue.ApertureSize = measurer.Aperture;
+			reading.SetIsMeasured(rv);
+			reading.TotalReading = (uint)measurer.TotalReading;
+			reading.TotalBackground = (uint)measurer.TotalBackground;
+			reading.ApertureX = measurer.XCenter;
+			reading.ApertureY = measurer.YCenter;
+			reading.ApertureSize = measurer.Aperture;
 
-            return clonedValue;
+			return reading;
         }
 
         private void btnCancel_Click(object sender, EventArgs e)

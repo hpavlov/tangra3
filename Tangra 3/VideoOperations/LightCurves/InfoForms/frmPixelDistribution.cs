@@ -28,7 +28,7 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
         {
             InitializeComponent();
 
-            m_AllReadings = readings;
+			m_AllReadings = readings;
 
         	m_MaxPixelValue = maxPixelValue;
         	m_Bpp = bpp;
@@ -141,9 +141,9 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
                     m_DisplayData.Add(i, 0);
                 }
 
-                for (int i = 0; i < m_AllReadings.Count; i++)
+				for (int i = 0; i < m_AllReadings.Count; i++)
                 {
-                    foreach (LCMeasurement mea in m_AllReadings[i])
+					foreach (LCMeasurement mea in m_AllReadings[i])
                     {
                         int width = mea.PixelData.GetLength(0);
                         int height = mea.PixelData.GetLength(1);
@@ -172,9 +172,9 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 
                 m_BucketFactor = 1.0f*m_MaxBuckets/m_MaxPixelValue;
 
-                for (int i = 0; i < m_AllReadings.Count; i++)
+				for (int i = 0; i < m_AllReadings.Count; i++)
                 {
-                    foreach (LCMeasurement mea in m_AllReadings[i])
+					foreach (LCMeasurement mea in m_AllReadings[i])
                     {
                         int width = mea.PixelData.GetLength(0);
                         int height = mea.PixelData.GetLength(1);

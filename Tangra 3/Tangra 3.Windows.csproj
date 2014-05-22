@@ -213,6 +213,7 @@
     </Compile>
     <Compile Include="Config\InstrumentalDelayConfigManager.cs" />
     <Compile Include="Controller\AutoUpdatesController.cs" />
+    <Compile Include="Controller\LightCurveContext.cs" />
     <Compile Include="Controller\LightCurveController.cs" />
     <Compile Include="Controller\DarkFlatFrameController.cs" />
     <Compile Include="Controller\VideoController.cs" />
