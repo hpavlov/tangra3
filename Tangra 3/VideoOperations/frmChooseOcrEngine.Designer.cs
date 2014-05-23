@@ -52,11 +52,11 @@
 			// btnCancel
 			// 
 			this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.btnCancel.Location = new System.Drawing.Point(127, 118);
+			this.btnCancel.Location = new System.Drawing.Point(110, 118);
 			this.btnCancel.Name = "btnCancel";
-			this.btnCancel.Size = new System.Drawing.Size(75, 23);
+			this.btnCancel.Size = new System.Drawing.Size(94, 23);
 			this.btnCancel.TabIndex = 51;
-			this.btnCancel.Text = "Cancel";
+			this.btnCancel.Text = "Not This Time";
 			this.btnCancel.UseVisualStyleBackColor = true;
 			// 
 			// pnlOsdOcr
