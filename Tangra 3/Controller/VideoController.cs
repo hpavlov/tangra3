@@ -69,6 +69,8 @@ namespace Tangra.Controller
 		private int m_HBMTarget2Y = 0;
 		private int m_HBMTarget3X = 0;
 		private int m_HBMTarget3Y = 0;
+		private int m_HBMTarget4X = 0;
+		private int m_HBMTarget4Y = 0;
 
 		public VideoController(Form mainFormView, VideoFileView videoFileView, ZoomedImageView zoomedImageView, ImageToolView imageToolView, Panel pnlControlerPanel)
 		{
@@ -782,7 +784,7 @@ namespace Tangra.Controller
 
 				if (enableBackgroundGlow && m_DisplayHueBackgroundMode)
 				{
-					BitmapFilter.ProcessHueBackgroundMode(displayBitmap, m_HBMTarget1X, m_HBMTarget1Y, m_HBMTarget2X, m_HBMTarget2Y, m_HBMTarget3X, m_HBMTarget3Y);
+					BitmapFilter.ProcessHueBackgroundMode(displayBitmap, m_HBMTarget1X, m_HBMTarget1Y, m_HBMTarget2X, m_HBMTarget2Y, m_HBMTarget3X, m_HBMTarget3Y, m_HBMTarget4X, m_HBMTarget4Y);
 				}
 				else if (m_DisplayIntensifyMode != DisplayIntensifyMode.Off)
 					BitmapFilter.ApplyGamma(displayBitmap, m_DisplayIntensifyMode == DisplayIntensifyMode.Hi, m_DisplayInvertedMode, m_DisplayHueIntensityMode);
@@ -888,6 +890,11 @@ namespace Tangra.Controller
 				m_HBMTarget3X = trackedObjects[2].OriginalFieldCenterX;
 				m_HBMTarget3Y = trackedObjects[2].OriginalFieldCenterY;
 			}
+			if (trackedObjects.Count > 3)
+			{
+				m_HBMTarget4X = trackedObjects[3].OriginalFieldCenterX;
+				m_HBMTarget4Y = trackedObjects[3].OriginalFieldCenterY;
+			}
 
 			if (!m_FramePlayer.IsRunning &&
 				m_FramePlayer.Video != null)
@@ -913,6 +920,11 @@ namespace Tangra.Controller
 			{
 				m_HBMTarget3X = trackedObjectsPositions[2].Center.X;
 				m_HBMTarget3Y = trackedObjectsPositions[2].Center.Y;
+			}
+			if (trackedObjectsPositions.Count > 3)
+			{
+				m_HBMTarget4X = trackedObjectsPositions[3].Center.X;
+				m_HBMTarget4Y = trackedObjectsPositions[3].Center.Y;
 			}
 
 			if (!m_FramePlayer.IsRunning &&
