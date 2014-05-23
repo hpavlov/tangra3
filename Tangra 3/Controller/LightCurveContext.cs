@@ -27,6 +27,8 @@ namespace Tangra.Controller
 
 			for (int i = 0; i < 4; i++)
 				m_ObjectTitles[i] = string.Format("Object {0}", i);
+
+			NormMethod = NormalisationMethod.Average4Frame;
 		}
 
 		internal enum FilterType
@@ -57,7 +59,7 @@ namespace Tangra.Controller
 		private int m_Binning = 0;
 		private int m_Normalisation = -1;
 		private FilterType m_Filter = FilterType.NoFilter;
-		private NormalisationMethod m_NormMethod = NormalisationMethod.LinearFit;
+		private NormalisationMethod m_NormMethod = NormalisationMethod.Average4Frame;
 		private float[] m_ReProcessApertures = new float[4];
 		private int[] m_ReProcessFitAreas = new int[4];
 
@@ -100,7 +102,7 @@ namespace Tangra.Controller
 		private int m_bu_Binning = 0;
 		private int m_bu_Normalisation = -1;
 		private FilterType m_bu_Filter = FilterType.NoFilter;
-		private NormalisationMethod mbu__NormMethod = NormalisationMethod.LinearFit;
+		private NormalisationMethod mbu__NormMethod = NormalisationMethod.Average4Frame;
 		private float[] m_bu_ReProcessApertures = new float[4];
 		private int[] m_bu_ReProcessFitAreas = new int[4];
 		public uint bu_SelectedFrameNo = 0;

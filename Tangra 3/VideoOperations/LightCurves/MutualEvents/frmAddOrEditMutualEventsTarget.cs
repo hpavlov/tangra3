@@ -915,5 +915,16 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 				rbOccElc1.Text = "            ";
 			}
 		}
+
+		private void btnDelete_Click(object sender, EventArgs e)
+		{
+			if (rbTwoObjects.Checked)
+				CopyDoubleObjectsToAdd();
+			else
+				CopyObjectToAdd();
+
+			DialogResult = DialogResult.Abort;
+			Close();
+		}
     }
 }

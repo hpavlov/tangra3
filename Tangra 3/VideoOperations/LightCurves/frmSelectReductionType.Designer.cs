@@ -48,6 +48,9 @@ namespace Tangra.VideoOperations.LightCurves
 			this.cbxDriftTrough = new System.Windows.Forms.CheckBox();
 			this.cbxFieldRotation = new System.Windows.Forms.CheckBox();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
+			this.pnlMutualType = new System.Windows.Forms.Panel();
+			this.rbMutualEcl = new System.Windows.Forms.RadioButton();
+			this.rbMutualOcc = new System.Windows.Forms.RadioButton();
 			this.rbLunarOccultation = new System.Windows.Forms.RadioButton();
 			this.rbUntrackedMeasurement = new System.Windows.Forms.RadioButton();
 			this.cbxStopOnLostTracking = new System.Windows.Forms.CheckBox();
@@ -63,15 +66,13 @@ namespace Tangra.VideoOperations.LightCurves
 			this.rbBinning = new System.Windows.Forms.RadioButton();
 			this.rbRunningAverage = new System.Windows.Forms.RadioButton();
 			this.tabStretching = new System.Windows.Forms.TabPage();
+			this.ucStretching = new Tangra.VideoOperations.LightCurves.ucPreProcessing();
 			this.tabReduction = new System.Windows.Forms.TabPage();
 			this.pnlBackground = new System.Windows.Forms.Panel();
-			this.ucStretching = new Tangra.VideoOperations.LightCurves.ucPreProcessing();
-			this.pnlMutualType = new System.Windows.Forms.Panel();
-			this.rbMutualOcc = new System.Windows.Forms.RadioButton();
-			this.rbMutualEcl = new System.Windows.Forms.RadioButton();
 			this.tabControl1.SuspendLayout();
 			this.tabGeneral.SuspendLayout();
 			this.groupBox2.SuspendLayout();
+			this.pnlMutualType.SuspendLayout();
 			this.tabIntegration.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.gbxPixelIntegration.SuspendLayout();
@@ -80,7 +81,6 @@ namespace Tangra.VideoOperations.LightCurves
 			this.tabStretching.SuspendLayout();
 			this.tabReduction.SuspendLayout();
 			this.pnlBackground.SuspendLayout();
-			this.pnlMutualType.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// rbAsteroidal
@@ -302,15 +302,48 @@ namespace Tangra.VideoOperations.LightCurves
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "Measurement Type";
 			// 
+			// pnlMutualType
+			// 
+			this.pnlMutualType.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.pnlMutualType.Controls.Add(this.rbMutualEcl);
+			this.pnlMutualType.Controls.Add(this.rbMutualOcc);
+			this.pnlMutualType.Location = new System.Drawing.Point(191, 36);
+			this.pnlMutualType.Name = "pnlMutualType";
+			this.pnlMutualType.Size = new System.Drawing.Size(155, 26);
+			this.pnlMutualType.TabIndex = 15;
+			this.pnlMutualType.Visible = false;
+			// 
+			// rbMutualEcl
+			// 
+			this.rbMutualEcl.AutoSize = true;
+			this.rbMutualEcl.Location = new System.Drawing.Point(88, 5);
+			this.rbMutualEcl.Name = "rbMutualEcl";
+			this.rbMutualEcl.Size = new System.Drawing.Size(59, 17);
+			this.rbMutualEcl.TabIndex = 16;
+			this.rbMutualEcl.TabStop = true;
+			this.rbMutualEcl.Text = "Eclipse";
+			this.rbMutualEcl.UseVisualStyleBackColor = true;
+			// 
+			// rbMutualOcc
+			// 
+			this.rbMutualOcc.AutoSize = true;
+			this.rbMutualOcc.Location = new System.Drawing.Point(6, 5);
+			this.rbMutualOcc.Name = "rbMutualOcc";
+			this.rbMutualOcc.Size = new System.Drawing.Size(79, 17);
+			this.rbMutualOcc.TabIndex = 0;
+			this.rbMutualOcc.TabStop = true;
+			this.rbMutualOcc.Text = "Occultation";
+			this.rbMutualOcc.UseVisualStyleBackColor = true;
+			// 
 			// rbLunarOccultation
 			// 
 			this.rbLunarOccultation.AutoSize = true;
 			this.rbLunarOccultation.Enabled = false;
 			this.rbLunarOccultation.Location = new System.Drawing.Point(13, 65);
 			this.rbLunarOccultation.Name = "rbLunarOccultation";
-			this.rbLunarOccultation.Size = new System.Drawing.Size(136, 17);
+			this.rbLunarOccultation.Size = new System.Drawing.Size(214, 17);
 			this.rbLunarOccultation.TabIndex = 14;
-			this.rbLunarOccultation.Text = "Total Lunar Occultation";
+			this.rbLunarOccultation.Text = "Total Lunar Occultation (Not Supported)";
 			this.rbLunarOccultation.UseVisualStyleBackColor = true;
 			// 
 			// rbUntrackedMeasurement
@@ -485,6 +518,13 @@ namespace Tangra.VideoOperations.LightCurves
 			this.tabStretching.Text = "Pre-Processing";
 			this.tabStretching.UseVisualStyleBackColor = true;
 			// 
+			// ucStretching
+			// 
+			this.ucStretching.Location = new System.Drawing.Point(0, 0);
+			this.ucStretching.Name = "ucStretching";
+			this.ucStretching.Size = new System.Drawing.Size(370, 221);
+			this.ucStretching.TabIndex = 0;
+			// 
 			// tabReduction
 			// 
 			this.tabReduction.BackColor = System.Drawing.Color.Transparent;
@@ -510,46 +550,6 @@ namespace Tangra.VideoOperations.LightCurves
 			this.pnlBackground.Size = new System.Drawing.Size(291, 40);
 			this.pnlBackground.TabIndex = 6;
 			// 
-			// ucStretching
-			// 
-			this.ucStretching.Location = new System.Drawing.Point(0, 0);
-			this.ucStretching.Name = "ucStretching";
-			this.ucStretching.Size = new System.Drawing.Size(370, 221);
-			this.ucStretching.TabIndex = 0;
-			// 
-			// pnlMutualType
-			// 
-			this.pnlMutualType.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.pnlMutualType.Controls.Add(this.rbMutualEcl);
-			this.pnlMutualType.Controls.Add(this.rbMutualOcc);
-			this.pnlMutualType.Location = new System.Drawing.Point(191, 36);
-			this.pnlMutualType.Name = "pnlMutualType";
-			this.pnlMutualType.Size = new System.Drawing.Size(155, 31);
-			this.pnlMutualType.TabIndex = 15;
-			this.pnlMutualType.Visible = false;
-			// 
-			// rbMutualOcc
-			// 
-			this.rbMutualOcc.AutoSize = true;
-			this.rbMutualOcc.Location = new System.Drawing.Point(6, 5);
-			this.rbMutualOcc.Name = "rbMutualOcc";
-			this.rbMutualOcc.Size = new System.Drawing.Size(79, 17);
-			this.rbMutualOcc.TabIndex = 0;
-			this.rbMutualOcc.TabStop = true;
-			this.rbMutualOcc.Text = "Occultation";
-			this.rbMutualOcc.UseVisualStyleBackColor = true;
-			// 
-			// rbMutualEcl
-			// 
-			this.rbMutualEcl.AutoSize = true;
-			this.rbMutualEcl.Location = new System.Drawing.Point(88, 5);
-			this.rbMutualEcl.Name = "rbMutualEcl";
-			this.rbMutualEcl.Size = new System.Drawing.Size(59, 17);
-			this.rbMutualEcl.TabIndex = 16;
-			this.rbMutualEcl.TabStop = true;
-			this.rbMutualEcl.Text = "Eclipse";
-			this.rbMutualEcl.UseVisualStyleBackColor = true;
-			// 
 			// frmSelectReductionType
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -572,6 +572,8 @@ namespace Tangra.VideoOperations.LightCurves
 			this.tabGeneral.PerformLayout();
 			this.groupBox2.ResumeLayout(false);
 			this.groupBox2.PerformLayout();
+			this.pnlMutualType.ResumeLayout(false);
+			this.pnlMutualType.PerformLayout();
 			this.tabIntegration.ResumeLayout(false);
 			this.groupBox1.ResumeLayout(false);
 			this.groupBox1.PerformLayout();
@@ -585,8 +587,6 @@ namespace Tangra.VideoOperations.LightCurves
 			this.tabReduction.PerformLayout();
 			this.pnlBackground.ResumeLayout(false);
 			this.pnlBackground.PerformLayout();
-			this.pnlMutualType.ResumeLayout(false);
-			this.pnlMutualType.PerformLayout();
 			this.ResumeLayout(false);
 
         }

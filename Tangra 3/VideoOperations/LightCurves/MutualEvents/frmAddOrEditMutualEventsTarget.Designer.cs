@@ -75,6 +75,7 @@
 			this.btnExplain.TabIndex = 82;
 			this.btnExplain.Text = "?";
 			this.btnExplain.UseVisualStyleBackColor = true;
+			this.btnExplain.Visible = false;
 			// 
 			// btnDelete
 			// 
@@ -85,6 +86,7 @@
 			this.btnDelete.TabIndex = 81;
 			this.btnDelete.Text = "Delete";
 			this.btnDelete.UseVisualStyleBackColor = true;
+			this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
 			// 
 			// panel3
 			// 

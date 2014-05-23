@@ -89,9 +89,7 @@ namespace Tangra.VideoOperations.LightCurves
             m_Footer = lcFile.Footer;
 			m_FrameTiming = lcFile.FrameTiming;
 
-            Text = "Light Curves - " + Path.GetFileName(lcFilePath);
-
-            m_LightCurveController.Context.NormMethod = LightCurveContext.NormalisationMethod.Average4Frame;
+            Text = "Light Curves - " + Path.GetFileName(lcFilePath);            
 
             OnNewLCFile();
         }
