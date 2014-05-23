@@ -612,8 +612,15 @@ namespace Tangra.VideoOperations.LightCurves
                 }
                 else if (absoluteTimeError > 500) 
                     isBadTimeString = "??:??:??";
-                else if (!m_LCFile.Footer.ReductionContext.HasEmbeddedTimeStamps /* If the times are entered by the user, only include the times for the frames enterred by the user*/)
+				else if (!m_LCFile.Footer.ReductionContext.HasEmbeddedTimeStamps /* If the times are entered by the user, only include the times for the frames enterred by the user*/)
                     isBadTimeString = "??:??:??";
+
+				if (m_LCFile.Footer.ReductionContext.LightCurveReductionType == LightCurveReductionType.MutualEvent &&
+				    absoluteTimeError/500 < resolutionInSecs)
+				{
+					// Force export the time for mutual events where half the resolution is better than the absolute timing error 
+					isBadTimeString = null;
+				}
 
 				for (int i = 0; i < count; i++)
 				{

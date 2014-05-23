@@ -834,6 +834,16 @@ namespace Tangra.VideoOperations.LightCurves
                             m_SelectedMeasurements[i] = reading;
                         }
                     }
+
+					if (!pnlMeasurementDetails.Visible && m_SmallGraph == null)
+						pnlMeasurementDetails.Visible = true;
+                }
+                else
+                {
+					m_OldLineBackup.Clear();
+	                m_SelectedMeasurements = null;
+					if (pnlMeasurementDetails.Visible)
+						pnlMeasurementDetails.Visible = false;
                 }
 
                 g.Save();
@@ -853,16 +863,19 @@ namespace Tangra.VideoOperations.LightCurves
         {
             PictureBox[] targetBoxes = new PictureBox[] { picTarget1Pixels, picTarget2Pixels, picTarget3Pixels, picTarget4Pixels };
 
-            for (int i = 0; i < m_SelectedMeasurements.Length; i++)
-            {
-                LCMeasurement reading = m_SelectedMeasurements[i];
-                if (!LCMeasurement.IsEmpty(reading) &&
-                    reading.TargetNo >= 0 &&
-                    reading.TargetNo <= 3)
-                {
-                    PlotSingleTargetPixels(targetBoxes[reading.TargetNo], reading);
-                }
-            }
+			if (m_SelectedMeasurements != null)
+			{
+				for (int i = 0; i < m_SelectedMeasurements.Length; i++)
+				{
+					LCMeasurement reading = m_SelectedMeasurements[i];
+					if (!LCMeasurement.IsEmpty(reading) &&
+						reading.TargetNo >= 0 &&
+						reading.TargetNo <= 3)
+					{
+						PlotSingleTargetPixels(targetBoxes[reading.TargetNo], reading);
+					}
+				}				
+			}
         }
 
         private void PlotSingleTargetPixels(PictureBox pictureBox, LCMeasurement reading)
@@ -909,34 +922,37 @@ namespace Tangra.VideoOperations.LightCurves
         {
             PictureBox[] psfBoxes = new PictureBox[] { picTarget1PSF, picTarget2PSF, picTarget3PSF, picTarget4PSF };
 
-            for (int i = 0; i < m_SelectedMeasurements.Length; i++)
-            {
-                LCMeasurement reading = m_SelectedMeasurements[i];
-                if (!LCMeasurement.IsEmpty(reading) &&
-                    reading.TargetNo >= 0 &&
-                    reading.TargetNo <= 3)
-                {
-                    if (reading.PsfFit == null)
-                    {
-                        int x0Int = (int) Math.Round(reading.X0);
-                        int y0Int = (int)Math.Round(reading.Y0);
+			if (m_SelectedMeasurements != null)
+			{
+				for (int i = 0; i < m_SelectedMeasurements.Length; i++)
+				{
+					LCMeasurement reading = m_SelectedMeasurements[i];
+					if (!LCMeasurement.IsEmpty(reading) &&
+						reading.TargetNo >= 0 &&
+						reading.TargetNo <= 3)
+					{
+						if (reading.PsfFit == null)
+						{
+							int x0Int = (int)Math.Round(reading.X0);
+							int y0Int = (int)Math.Round(reading.Y0);
 
-                        reading.PsfFit = new PSFFit(x0Int, y0Int);
-                        reading.PsfFit.FittingMethod = PSFFittingMethod.NonLinearFit;
-                        int pixelDataWidth = reading.PixelData.GetLength(0);
-                        int pixelDataHeight = reading.PixelData.GetLength(1);
-                        reading.PsfFit.Fit(
-                            reading.PixelData,
-                            m_LightCurveController.Context.ReProcessFitAreas[reading.TargetNo],
-                            x0Int - reading.PixelDataX0 + (pixelDataWidth / 2) + 1,
-                            y0Int - reading.PixelDataY0 + (pixelDataHeight / 2) + 1, 
-                            false);
-                    }
+							reading.PsfFit = new PSFFit(x0Int, y0Int);
+							reading.PsfFit.FittingMethod = PSFFittingMethod.NonLinearFit;
+							int pixelDataWidth = reading.PixelData.GetLength(0);
+							int pixelDataHeight = reading.PixelData.GetLength(1);
+							reading.PsfFit.Fit(
+								reading.PixelData,
+								m_LightCurveController.Context.ReProcessFitAreas[reading.TargetNo],
+								x0Int - reading.PixelDataX0 + (pixelDataWidth / 2) + 1,
+								y0Int - reading.PixelDataY0 + (pixelDataHeight / 2) + 1,
+								false);
+						}
 
-                    psfBoxes[reading.TargetNo].Visible = true;
-                    PlotSingleGaussian(psfBoxes[reading.TargetNo], reading, m_LightCurveController.Context.ReProcessApertures[i], m_DisplaySettings.TargetBrushes, m_Footer.ReductionContext.BitPix);
-                }
-            }
+						psfBoxes[reading.TargetNo].Visible = true;
+						PlotSingleGaussian(psfBoxes[reading.TargetNo], reading, m_LightCurveController.Context.ReProcessApertures[i], m_DisplaySettings.TargetBrushes, m_Footer.ReductionContext.BitPix);
+					}
+				}				
+			}
         }
 
         internal static void PlotSingleGaussian(
