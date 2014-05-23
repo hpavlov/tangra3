@@ -92,6 +92,9 @@ namespace Tangra.OccultTools
 		public void Finalise()
 		{
 			RemotingServices.Disconnect(this);
+
+			m_AotaAction = null;
+			m_Host = null;
 		}
 
 		public void Configure()
@@ -155,18 +158,44 @@ namespace Tangra.OccultTools
 		{
 			if (eventType == AddinFiredEventType.LightCurveSelectedFrameChanged)
 			{
-			    m_AotaAction.OnLightCurveSelectedFrameChanged();
+				try
+				{
+					if (m_AotaAction != null)
+						m_AotaAction.OnLightCurveSelectedFrameChanged();
+				}
+				catch (Exception ex)
+				{
+					Trace.WriteLine(ex.ToString());
+				} 			    
 			}
 		}
 
-        public void PositionToFrame(int frameNo)
+		#region IAOTAClientCallbacks
+		public void PositionToFrame(int frameNo)
         {
-            m_Host.PositionToFrame(frameNo);
+			try
+			{
+				if (m_Host != null)
+					m_Host.PositionToFrame(frameNo);
+			}
+			catch (Exception ex)
+			{
+				Trace.WriteLine(ex.ToString());
+			}
         }
 
         public void OnAOTAFormClosing()
         {
-            m_AotaAction.OnAOTAFormClosing();
-        }
-    }
+			try
+			{
+				if (m_AotaAction != null)
+					m_AotaAction.OnAOTAFormClosing();
+			}
+			catch (Exception ex)
+			{
+				Trace.WriteLine(ex.ToString());
+			}            
+		}
+		#endregion
+	}
 }
