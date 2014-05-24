@@ -1384,7 +1384,7 @@ namespace Tangra.VideoOperations.LightCurves
 				}
 			}
 
-			FlushLightCurveFile();
+			LCFile file = FlushLightCurveFile();
 
 			m_Measuring = false;
 			m_Refining = false;
@@ -1393,7 +1393,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 			m_StateMachine.ChangeState(LightCurvesState.Viewing);
 
-			DoShowLightCurve();
+			DoShowLightCurve(file);
 
 			m_ControlPanel.SetupLCFileInfo(m_LightCurveController.LcFile);
 			m_ControlPanel.UpdateState();
@@ -1802,7 +1802,7 @@ namespace Tangra.VideoOperations.LightCurves
 				aperture, refinedFWHM, refinedAverageFWHM, measurableObject, groupCenters, aperturesInGroup, fullDisappearance);
 		}
 
-		internal void FlushLightCurveFile()
+		internal LCFile FlushLightCurveFile()
 		{
 			var matrixSizes = new List<int>();
 			var apertures = new List<float>();
@@ -1869,10 +1869,10 @@ namespace Tangra.VideoOperations.LightCurves
 				m_AavNativeVideoFormat,
                 m_AavFrameIntegration);
 
-			m_LightCurveController.SetLcFile(LCFile.FlushOnTheFlyOutputFile(finalHeader, footer));
+			return LCFile.FlushOnTheFlyOutputFile(finalHeader, footer);
 		}
 
-		internal void DoShowLightCurve()
+		internal void DoShowLightCurve(LCFile file)
 		{   
 			m_LightCurveController.EnsureLightCurveFormClosed();
 			m_VideoController.EnsureLightCurveForm();
@@ -1881,7 +1881,7 @@ namespace Tangra.VideoOperations.LightCurves
 			TangraContext.Current.CanPlayVideo = false;
 			m_VideoController.UpdateViews();
 
-			//m_LightCurveController.SetLcFile(m_LightCurveController.LcFile);
+			m_LightCurveController.SetLcFile(file);
 			m_VideoController.MoveToFrame((int)m_LightCurveController.LcFile.Header.MinFrame);
 		}
 

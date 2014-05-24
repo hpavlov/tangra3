@@ -2080,7 +2080,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 		private void ShowZoomedAreas()
 		{
-            if (!m_frmZoomedPixels.Visible)
+			if (m_frmZoomedPixels != null && !m_frmZoomedPixels.Visible)
             {
                 m_frmZoomedPixels.Show(this);
                 m_frmZoomedPixels.Left = this.Right;
@@ -2090,7 +2090,7 @@ namespace Tangra.VideoOperations.LightCurves
 
         internal void HideZoomedAreas()
         {
-            if (m_frmZoomedPixels.Visible) m_frmZoomedPixels.Hide();
+			if (m_frmZoomedPixels != null && m_frmZoomedPixels.Visible) m_frmZoomedPixels.Hide();
             miShowZoomedAreas.Checked = false;
         }
 
@@ -2108,7 +2108,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 		internal void HidePSFFits()
 		{
-			if (m_frmPSFFits.Visible) m_frmPSFFits.Hide();
+			if (m_frmPSFFits != null && m_frmPSFFits.Visible) m_frmPSFFits.Hide();
 			miShowPSFFits.Checked = false;
 		}
 
@@ -2131,7 +2131,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 		internal void HideBackgroundHistograms()
 		{
-			if (m_frmBackgroundHistograms.Visible) m_frmBackgroundHistograms.Hide();
+			if (m_frmBackgroundHistograms != null && m_frmBackgroundHistograms.Visible) m_frmBackgroundHistograms.Hide();
 			miBackgroundHistograms.Checked = false;
 		}
 
