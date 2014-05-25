@@ -20,7 +20,17 @@ namespace Tangra.ImageTools
 			Correcting
 		}
 
+		public enum CorrectTrackingMode
+		{
+			All,
+			Target1,
+			Target2,
+			Target3,
+			Target4
+		}
+
 		private CorrectTrackingState m_State;
+		private CorrectTrackingMode m_Mode;
 
 		private ReduceLightCurveOperation m_LightCurvesVideoOperation;
 		private VideoController m_VideoController;
@@ -28,6 +38,11 @@ namespace Tangra.ImageTools
 
 		private int m_X0;
 		private int m_Y0;
+
+		internal ITracker Tracker
+		{
+			get { return m_Tracker; }
+		}
 
 		internal void Initialize(ReduceLightCurveOperation videoOperation, ITracker tracker, VideoController videoController)
 		{
@@ -39,7 +54,22 @@ namespace Tangra.ImageTools
 				m_VideoController.SetPictureBoxCursor(CustomCursors.PanCursor);
 
 			m_State = CorrectTrackingState.Normal;
-			m_LightCurvesVideoOperation.SetManualTrackingCorrection(0, 0);
+			m_Mode = CorrectTrackingMode.All;
+
+			for (int i = 0; i < tracker.TrackedObjects.Count; i++)
+			{
+				m_LightCurvesVideoOperation.SetManualTrackingCorrection(i, 0, 0);	
+			}			
+		}
+
+		internal bool SupportsManualCorrections
+		{
+			get { return m_Tracker.SupportsManualCorrections; }
+		}
+
+		internal void SetCorrectionMode(CorrectTrackingMode newMode)
+		{
+			m_Mode = newMode;
 		}
 
 		public override void Activate()
@@ -76,7 +106,16 @@ namespace Tangra.ImageTools
 
 				// If correcting see if there is a location in a radius of a few pixels which fits very well with the current targets
 
-				m_LightCurvesVideoOperation.SetManualTrackingCorrection(deltaX, deltaY);
+				if (m_Mode == CorrectTrackingMode.All)
+				{
+					for (int i = 0; i < m_Tracker.TrackedObjects.Count; i++)
+					{
+						m_LightCurvesVideoOperation.SetManualTrackingCorrection(i, deltaX, deltaY);
+					}					
+				}
+				else
+					m_LightCurvesVideoOperation.SetManualTrackingCorrection((int)m_Mode - 1, deltaX, deltaY);
+				
 				m_VideoController.RefreshCurrentFrame();
 			}
 		}

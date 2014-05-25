@@ -765,7 +765,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 			if (m_FailedGroupFits > 10)
 			{
-				Trace.WriteLine("SH*T HAPPENED");
+				Trace.WriteLine("ERR~10+");
 			}
 		}
 	}

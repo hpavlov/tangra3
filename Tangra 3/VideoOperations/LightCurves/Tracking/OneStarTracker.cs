@@ -265,7 +265,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			get { return true; }
 		}
 
-        public override void DoManualFrameCorrection(int deltaX, int deltaY)
+        public override void DoManualFrameCorrection(int targetId, int deltaX, int deltaY)
         {
             int firstFrameId = m_PreviousPositionFrameIds[0];
             float expectedX = (float)m_LinearFitX.ComputeY(m_FrameNo - firstFrameId);

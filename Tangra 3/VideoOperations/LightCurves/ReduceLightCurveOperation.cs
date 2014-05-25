@@ -278,11 +278,12 @@ namespace Tangra.VideoOperations.LightCurves
                         if (TangraConfig.Settings.Tracking.PlaySound)
                             Console.Beep(800, 750);
 
-                        m_VideoController.ShowMessageBox(
-                            "Use the mouse to pan the object apertures back to the object location and press 'Continue' to continue with the measurements.",
-                            "Tracking has been lost",
-                            MessageBoxButtons.OK, 
-                            MessageBoxIcon.Exclamation);
+						if (TangraConfig.Settings.Tracking.PopUpOnLostTracking)
+							m_VideoController.ShowMessageBox(
+								"Use the mouse to pan the object apertures back to the object location and press 'Continue' to continue with the measurements.",
+								"Tracking has been lost",
+								MessageBoxButtons.OK, 
+								MessageBoxIcon.Exclamation);
 
                         return;
                     }
@@ -386,13 +387,13 @@ namespace Tangra.VideoOperations.LightCurves
         public void PreDraw(System.Drawing.Graphics g)
         { }
 
-        private int m_ManualTrackingDeltaX = 0;
-        private int m_ManualTrackingDeltaY = 0;
+        private int[] m_ManualTrackingDeltaX = new int[4];
+		private int[] m_ManualTrackingDeltaY = new int[4];
 
-        internal void SetManualTrackingCorrection(int deltaX, int deltaY)
+        internal void SetManualTrackingCorrection(int targetId, int deltaX, int deltaY)
         {
-            m_ManualTrackingDeltaX = deltaX;
-            m_ManualTrackingDeltaY = deltaY;
+			m_ManualTrackingDeltaX[targetId] = deltaX;
+			m_ManualTrackingDeltaY[targetId] = deltaY;
         }
 
         private bool m_Measuring = false;
@@ -460,7 +461,7 @@ namespace Tangra.VideoOperations.LightCurves
 
                                 if (!float.IsNaN(app))
                                 {
-                                    g.DrawEllipse(m_AllPens[i], (float)center.XDouble + m_ManualTrackingDeltaX - app, (float)center.YDouble + m_ManualTrackingDeltaY - app, 2 * app, 2 * app);
+									g.DrawEllipse(m_AllPens[i], (float)center.XDouble + m_ManualTrackingDeltaX[i] - app, (float)center.YDouble + m_ManualTrackingDeltaY[i] - app, 2 * app, 2 * app);
                                 }
                             }
                         }
@@ -477,7 +478,7 @@ namespace Tangra.VideoOperations.LightCurves
 
                             if (center != null)
                             {
-                                g.DrawEllipse(m_AllPens[i], (float)center.XDouble + m_ManualTrackingDeltaX - app, (float)center.YDouble + m_ManualTrackingDeltaY - app, 2 * app, 2 * app);
+								g.DrawEllipse(m_AllPens[i], (float)center.XDouble + m_ManualTrackingDeltaX[i] - app, (float)center.YDouble + m_ManualTrackingDeltaY[i] - app, 2 * app, 2 * app);
                             }
                         }
 
@@ -490,7 +491,7 @@ namespace Tangra.VideoOperations.LightCurves
 								float app = 4;
 								foreach (PSFFit fit in trk.AutoDiscoveredStars)
 								{
-									g.DrawEllipse(Pens.Yellow, (float)fit.XCenter - app, (float)fit.YCenter + m_ManualTrackingDeltaY - app, 2 * app, 2 * app);
+									g.DrawEllipse(Pens.Yellow, (float)fit.XCenter - app, (float)fit.YCenter - app, 2 * app, 2 * app);
 								}
 							}							
 						}
@@ -528,8 +529,8 @@ namespace Tangra.VideoOperations.LightCurves
                         float aperture = m_StateMachine.MeasuringApertures[i] + 1;
                         Pen pen = m_AllPens[i];
 
-                        float centerX = star.ApertureStartingX + m_ManualTrackingDeltaX;
-                        float centerY = star.ApertureStartingY + m_ManualTrackingDeltaY;
+						float centerX = star.ApertureStartingX + m_ManualTrackingDeltaX[i];
+						float centerY = star.ApertureStartingY + m_ManualTrackingDeltaY[i];
 
                         g.DrawEllipse(pen, centerX - aperture, centerY - aperture, 2 * aperture, 2 * aperture);
 
@@ -1122,8 +1123,11 @@ namespace Tangra.VideoOperations.LightCurves
 
 			m_Tracker.InitializeNewTracking();
 
-			m_ManualTrackingDeltaX = 0;
-			m_ManualTrackingDeltaY = 0;
+	        for (int i = 0; i < 4; i++)
+	        {
+				m_ManualTrackingDeltaX[i] = 0;
+		        m_ManualTrackingDeltaY[i] = 0;
+	        }
 
             InitializeTimestampOCR();
 
@@ -1315,11 +1319,14 @@ namespace Tangra.VideoOperations.LightCurves
 			m_ViewingLightCurve = false;
 			m_Configuring = false;
 
-			if (m_Tracker.SupportsManualCorrections && (m_ManualTrackingDeltaX != 0 || m_ManualTrackingDeltaY != 0))
-				m_Tracker.DoManualFrameCorrection(m_ManualTrackingDeltaX, m_ManualTrackingDeltaY);
+	        for (int i = 0; i < 4; i++)
+	        {
+				if (m_Tracker.SupportsManualCorrections && (m_ManualTrackingDeltaX[i] != 0 || m_ManualTrackingDeltaY[i] != 0))
+					m_Tracker.DoManualFrameCorrection(i, m_ManualTrackingDeltaX[i], m_ManualTrackingDeltaY[i]);
 
-			m_ManualTrackingDeltaX = 0;
-			m_ManualTrackingDeltaY = 0;
+				m_ManualTrackingDeltaX[i] = 0;
+		        m_ManualTrackingDeltaY[i] = 0;
+	        }
 
 			m_VideoController.PlayVideo();
 
@@ -1329,7 +1336,7 @@ namespace Tangra.VideoOperations.LightCurves
 			m_VideoController.SelectImageTool<ArrowTool>();
         }
 
-        public void StopMeasurements()
+		public CorrectTrackingTool StopMeasurements()
         {
 			m_Measuring = true;
 			m_Correcting = true;
@@ -1350,6 +1357,8 @@ namespace Tangra.VideoOperations.LightCurves
 				correctTrackingTool.Initialize(this, m_Tracker, m_VideoController);
 
 			m_StateMachine.m_HasBeenPaused = true;
+
+			return correctTrackingTool;
         }
 
         public void FinishedWithMeasurements()

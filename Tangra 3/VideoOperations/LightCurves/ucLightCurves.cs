@@ -28,11 +28,12 @@ namespace Tangra.VideoOperations.LightCurves
         private LCStateMachine m_StateMachine;
         protected VideoController m_VideoController;
 		private TangraConfig.LightCurvesDisplaySettings m_DisplaySettings;
+	    private CorrectTrackingTool m_CorrectTrackingTool;
 
 		public ucLightCurves()
         {
             InitializeComponent();
-
+			
             #region Positioning the separate sheets for display
             pnlUserAction.Top = 3;
             pnlUserAction.Left = 3;
@@ -134,6 +135,9 @@ namespace Tangra.VideoOperations.LightCurves
             {
                 btnStop.Visible = false;
                 btnLightCurve.Visible = false;
+				gbxCorrections.Visible = false;
+				m_CorrectTrackingTool = null;
+				ucCorrSelection.CorrectTrackingTool = m_CorrectTrackingTool;
 
                 pnlProcessing.Visible = true;
                 pnlProcessing.BringToFront();
@@ -221,6 +225,9 @@ namespace Tangra.VideoOperations.LightCurves
                     btnStop.Text = "Stop Measurements";
 
                 btnLightCurve.Visible = false;
+				gbxCorrections.Visible = false;
+				m_CorrectTrackingTool = null;
+				ucCorrSelection.CorrectTrackingTool = m_CorrectTrackingTool;
 
                 pnlMeasureZoomOptions.Visible = m_StateMachine.VideoOperation.IsMeasuring;
             }
@@ -252,12 +259,19 @@ namespace Tangra.VideoOperations.LightCurves
 
         public void StopMeasurements()
         {
-            m_StateMachine.VideoOperation.StopMeasurements();
+			m_CorrectTrackingTool = m_StateMachine.VideoOperation.StopMeasurements();
             m_StoppedAtFrameNo = m_StateMachine.VideoOperation.m_CurrFrameNo;
 
             btnStop.Text = "Continue Measurements";
 
             btnLightCurve.Visible = true;
+	        
+	        if (m_CorrectTrackingTool.SupportsManualCorrections)
+	        {
+		        gbxCorrections.Visible = true;
+		        ucCorrSelection.CorrectTrackingTool = m_CorrectTrackingTool;
+		        ucCorrSelection.Reset();
+	        }
         }
 
         public void StoppedAtLastFrame()
@@ -283,6 +297,9 @@ namespace Tangra.VideoOperations.LightCurves
 
             btnStop.Visible = false;
             btnLightCurve.Visible = false;
+			gbxCorrections.Visible = false;
+	        m_CorrectTrackingTool = null;
+	        ucCorrSelection.CorrectTrackingTool = m_CorrectTrackingTool;
 
             if (!LightCurveReductionContext.Instance.HasEmbeddedTimeStamps)
                 PrepareToEnterStarTime();
@@ -557,8 +574,11 @@ namespace Tangra.VideoOperations.LightCurves
 				m_StateMachine.VideoOperation.ContinueMeasurements(m_StoppedAtFrameNo);
 				m_StoppedAtFrameNo = -1;
 				btnStop.Text = "Stop";
-
+				
 				btnLightCurve.Visible = false;
+				gbxCorrections.Visible = false;
+				m_CorrectTrackingTool = null;
+				ucCorrSelection.CorrectTrackingTool = m_CorrectTrackingTool;
 			}
 			else
 			{

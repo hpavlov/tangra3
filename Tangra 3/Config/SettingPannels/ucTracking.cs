@@ -30,6 +30,7 @@ namespace Tangra.Config.SettingPannels
 			cbxRecoverFromLostTracking.Checked = TangraConfig.Settings.Tracking.RecoverFromLostTracking;
 			tbRecoveryTolerance.Value = TangraConfig.Settings.Special.LostTrackingToleranceLevel;
 			cbxPlaySound.Checked = TangraConfig.Settings.Tracking.PlaySound;
+			cbxPopUpOnLostTracking.Checked = TangraConfig.Settings.Tracking.PopUpOnLostTracking;
 
 			nudMinAboveMedian.SetNUDValue((double)TangraConfig.Settings.Special.StarFinderAboveNoiseLevel);
 	        cbxTrackingEngine.SelectedIndex = (int)TangraConfig.Settings.Tracking.SelectedEngine;
@@ -52,6 +53,7 @@ namespace Tangra.Config.SettingPannels
 
 			TangraConfig.Settings.Tracking.RecoverFromLostTracking = cbxRecoverFromLostTracking.Checked;
 			TangraConfig.Settings.Tracking.PlaySound = cbxPlaySound.Checked;
+			TangraConfig.Settings.Tracking.PopUpOnLostTracking = cbxPopUpOnLostTracking.Checked;
 			TangraConfig.Settings.Special.StarFinderAboveNoiseLevel = (uint)nudMinAboveMedian.Value;
 			TangraConfig.Settings.Tracking.SelectedEngine = (TangraConfig.TrackingEngine)cbxTrackingEngine.SelectedIndex;
 

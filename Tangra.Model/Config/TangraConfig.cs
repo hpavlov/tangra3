@@ -394,6 +394,7 @@ namespace Tangra.Model.Config
 			public bool WarnOnUnsatisfiedGuidingRequirements = false;
 			public bool RecoverFromLostTracking = true;
 			public bool PlaySound = true;
+			public bool PopUpOnLostTracking = true;
 			public TrackingEngine SelectedEngine;
 			public float AdHokMinCloseDistance = 1.41f;
 			public float AdHokMaxCloseDistance = 3;

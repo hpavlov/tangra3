@@ -290,6 +290,12 @@
       <DependentUpon>frmAddOrEditMutualEventsTarget.cs</DependentUpon>
     </Compile>
     <Compile Include="VideoOperations\LightCurves\Tracking\MutualEventTracker.cs" />
+    <Compile Include="VideoOperations\LightCurves\ucCorrSelection.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\ucCorrSelection.Designer.cs">
+      <DependentUpon>ucCorrSelection.cs</DependentUpon>
+    </Compile>
     <Compile Include="Video\AstroDigitalVideo\frmBuildingNtpTimebase.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -616,6 +622,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\LightCurves\MutualEvents\frmAddOrEditMutualEventsTarget.resx">
       <DependentUpon>frmAddOrEditMutualEventsTarget.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\ucCorrSelection.resx">
+      <DependentUpon>ucCorrSelection.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Video\AstroDigitalVideo\frmBuildingNtpTimebase.resx">
       <DependentUpon>frmBuildingNtpTimebase.cs</DependentUpon>

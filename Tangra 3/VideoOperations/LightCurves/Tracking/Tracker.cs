@@ -1093,12 +1093,16 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			get { return true; }
 		}
 
-        public virtual void DoManualFrameCorrection(int deltaX, int deltaY)
+		public virtual void DoManualFrameCorrection(int targetId, int deltaX, int deltaY)
         {
             foreach (TrackedObject trackedObject in TrackedObjects)
             {
-                trackedObject.ThisFrameX = (float)trackedObject.LastKnownGoodPosition.XDouble + deltaX;
-                trackedObject.ThisFrameY = (float)trackedObject.LastKnownGoodPosition.YDouble + deltaY;
+				if (trackedObject.TargetNo == targetId)
+				{
+					trackedObject.ThisFrameX = (float)trackedObject.LastKnownGoodPosition.XDouble + deltaX;
+					trackedObject.ThisFrameY = (float)trackedObject.LastKnownGoodPosition.YDouble + deltaY;
+					break;
+				}
             }
         }
     }

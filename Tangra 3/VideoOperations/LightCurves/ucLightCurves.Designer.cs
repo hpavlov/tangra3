@@ -32,7 +32,6 @@ namespace Tangra.VideoOperations.LightCurves
         {
 			this.components = new System.ComponentModel.Container();
 			this.pnlProcessing = new System.Windows.Forms.Panel();
-			this.lblUsedTracker = new System.Windows.Forms.Label();
 			this.pnlEnterTimes = new System.Windows.Forms.Panel();
 			this.btn1FrMinus = new System.Windows.Forms.Button();
 			this.btn1FrPlus = new System.Windows.Forms.Button();
@@ -42,6 +41,11 @@ namespace Tangra.VideoOperations.LightCurves
 			this.label4 = new System.Windows.Forms.Label();
 			this.lblTimesHeader = new System.Windows.Forms.Label();
 			this.ucUtcTime = new Tangra.Model.Controls.ucUtcTimePicker();
+			this.gbxCorrections = new System.Windows.Forms.GroupBox();
+			this.ucCorrSelection = new Tangra.VideoOperations.LightCurves.ucCorrSelection();
+			this.lblPartiallySuccessfulFrames = new System.Windows.Forms.Label();
+			this.label11 = new System.Windows.Forms.Label();
+			this.lblUsedTracker = new System.Windows.Forms.Label();
 			this.btnLightCurve = new System.Windows.Forms.Button();
 			this.btnStop = new System.Windows.Forms.Button();
 			this.pnlMeasureZoomOptions = new System.Windows.Forms.Panel();
@@ -88,10 +92,9 @@ namespace Tangra.VideoOperations.LightCurves
 			this.lblInfo = new System.Windows.Forms.Label();
 			this.pnlViewLightCurve = new System.Windows.Forms.Panel();
 			this.timerMoveToFirstFrame = new System.Windows.Forms.Timer(this.components);
-			this.lblPartiallySuccessfulFrames = new System.Windows.Forms.Label();
-			this.label11 = new System.Windows.Forms.Label();
 			this.pnlProcessing.SuspendLayout();
 			this.pnlEnterTimes.SuspendLayout();
+			this.gbxCorrections.SuspendLayout();
 			this.pnlMeasureZoomOptions.SuspendLayout();
 			this.pnlUserAction.SuspendLayout();
 			this.pnlSelectedObject.SuspendLayout();
@@ -101,10 +104,11 @@ namespace Tangra.VideoOperations.LightCurves
 			// 
 			// pnlProcessing
 			// 
+			this.pnlProcessing.Controls.Add(this.pnlEnterTimes);
+			this.pnlProcessing.Controls.Add(this.gbxCorrections);
 			this.pnlProcessing.Controls.Add(this.lblPartiallySuccessfulFrames);
 			this.pnlProcessing.Controls.Add(this.label11);
 			this.pnlProcessing.Controls.Add(this.lblUsedTracker);
-			this.pnlProcessing.Controls.Add(this.pnlEnterTimes);
 			this.pnlProcessing.Controls.Add(this.btnLightCurve);
 			this.pnlProcessing.Controls.Add(this.btnStop);
 			this.pnlProcessing.Controls.Add(this.pnlMeasureZoomOptions);
@@ -121,15 +125,6 @@ namespace Tangra.VideoOperations.LightCurves
 			this.pnlProcessing.TabIndex = 6;
 			this.pnlProcessing.Tag = "";
 			this.pnlProcessing.Visible = false;
-			// 
-			// lblUsedTracker
-			// 
-			this.lblUsedTracker.AutoSize = true;
-			this.lblUsedTracker.Location = new System.Drawing.Point(116, 38);
-			this.lblUsedTracker.Name = "lblUsedTracker";
-			this.lblUsedTracker.Size = new System.Drawing.Size(0, 13);
-			this.lblUsedTracker.TabIndex = 44;
-			this.lblUsedTracker.Visible = false;
 			// 
 			// pnlEnterTimes
 			// 
@@ -220,6 +215,51 @@ namespace Tangra.VideoOperations.LightCurves
 			this.ucUtcTime.Name = "ucUtcTime";
 			this.ucUtcTime.Size = new System.Drawing.Size(239, 26);
 			this.ucUtcTime.TabIndex = 30;
+			// 
+			// gbxCorrections
+			// 
+			this.gbxCorrections.Controls.Add(this.ucCorrSelection);
+			this.gbxCorrections.Location = new System.Drawing.Point(8, 189);
+			this.gbxCorrections.Name = "gbxCorrections";
+			this.gbxCorrections.Size = new System.Drawing.Size(227, 74);
+			this.gbxCorrections.TabIndex = 8;
+			this.gbxCorrections.TabStop = false;
+			this.gbxCorrections.Text = "Manual Corrections";
+			this.gbxCorrections.Visible = false;
+			// 
+			// ucCorrSelection
+			// 
+			this.ucCorrSelection.Location = new System.Drawing.Point(22, 15);
+			this.ucCorrSelection.Name = "ucCorrSelection";
+			this.ucCorrSelection.Size = new System.Drawing.Size(176, 53);
+			this.ucCorrSelection.TabIndex = 0;
+			// 
+			// lblPartiallySuccessfulFrames
+			// 
+			this.lblPartiallySuccessfulFrames.AutoSize = true;
+			this.lblPartiallySuccessfulFrames.Location = new System.Drawing.Point(116, 86);
+			this.lblPartiallySuccessfulFrames.Name = "lblPartiallySuccessfulFrames";
+			this.lblPartiallySuccessfulFrames.Size = new System.Drawing.Size(13, 13);
+			this.lblPartiallySuccessfulFrames.TabIndex = 46;
+			this.lblPartiallySuccessfulFrames.Text = "0";
+			// 
+			// label11
+			// 
+			this.label11.AutoSize = true;
+			this.label11.Location = new System.Drawing.Point(5, 86);
+			this.label11.Name = "label11";
+			this.label11.Size = new System.Drawing.Size(101, 13);
+			this.label11.TabIndex = 45;
+			this.label11.Text = "Partially Successful:";
+			// 
+			// lblUsedTracker
+			// 
+			this.lblUsedTracker.AutoSize = true;
+			this.lblUsedTracker.Location = new System.Drawing.Point(116, 38);
+			this.lblUsedTracker.Name = "lblUsedTracker";
+			this.lblUsedTracker.Size = new System.Drawing.Size(0, 13);
+			this.lblUsedTracker.TabIndex = 44;
+			this.lblUsedTracker.Visible = false;
 			// 
 			// btnLightCurve
 			// 
@@ -659,31 +699,13 @@ namespace Tangra.VideoOperations.LightCurves
 			this.timerMoveToFirstFrame.Interval = 500;
 			this.timerMoveToFirstFrame.Tick += new System.EventHandler(this.timerMoveToFirstFrame_Tick);
 			// 
-			// lblPartiallySuccessfulFrames
-			// 
-			this.lblPartiallySuccessfulFrames.AutoSize = true;
-			this.lblPartiallySuccessfulFrames.Location = new System.Drawing.Point(116, 86);
-			this.lblPartiallySuccessfulFrames.Name = "lblPartiallySuccessfulFrames";
-			this.lblPartiallySuccessfulFrames.Size = new System.Drawing.Size(13, 13);
-			this.lblPartiallySuccessfulFrames.TabIndex = 46;
-			this.lblPartiallySuccessfulFrames.Text = "0";
-			// 
-			// label11
-			// 
-			this.label11.AutoSize = true;
-			this.label11.Location = new System.Drawing.Point(5, 86);
-			this.label11.Name = "label11";
-			this.label11.Size = new System.Drawing.Size(101, 13);
-			this.label11.TabIndex = 45;
-			this.label11.Text = "Partially Successful:";
-			// 
 			// ucLightCurves
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.SystemColors.Control;
-			this.Controls.Add(this.pnlUserAction);
 			this.Controls.Add(this.pnlProcessing);
+			this.Controls.Add(this.pnlUserAction);
 			this.Controls.Add(this.pnlViewLightCurve);
 			this.Name = "ucLightCurves";
 			this.Size = new System.Drawing.Size(891, 312);
@@ -691,6 +713,7 @@ namespace Tangra.VideoOperations.LightCurves
 			this.pnlProcessing.PerformLayout();
 			this.pnlEnterTimes.ResumeLayout(false);
 			this.pnlEnterTimes.PerformLayout();
+			this.gbxCorrections.ResumeLayout(false);
 			this.pnlMeasureZoomOptions.ResumeLayout(false);
 			this.pnlMeasureZoomOptions.PerformLayout();
 			this.pnlUserAction.ResumeLayout(false);
@@ -766,6 +789,8 @@ namespace Tangra.VideoOperations.LightCurves
 		private System.Windows.Forms.Button btnAdjustApertures;
 		private System.Windows.Forms.Label lblPartiallySuccessfulFrames;
 		private System.Windows.Forms.Label label11;
+		private System.Windows.Forms.GroupBox gbxCorrections;
+		private ucCorrSelection ucCorrSelection;
 
     }
 }

@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using Tangra.Model.Astro;
 using Tangra.Model.Config;
+using Tangra.Model.Image;
+using Tangra.Model.VideoOperations;
 using Tangra.PInvoke;
 
 namespace Tangra.VideoOperations.LightCurves.Tracking
@@ -112,12 +114,25 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 		public bool SupportsManualCorrections
 		{
-			get { return false; }
+			get
+			{
+				return true;
+			}
 		}
 
-		public void DoManualFrameCorrection(int deltaX, int deltaY)
+		public void DoManualFrameCorrection(int targetId, int deltaX, int deltaY)
 		{
-			throw new NotImplementedException();
+			foreach (TrackedObjectLight trackedObject in TrackedObjects)
+			{
+				if (trackedObject.TargetNo == targetId)
+				{
+					trackedObject.SetIsTracked(
+						true,
+						NotMeasuredReasons.TrackedSuccessfully,
+						new ImagePixel(trackedObject.Center.Brightness, trackedObject.Center.XDouble + deltaX, trackedObject.Center.YDouble + deltaY));
+					break;
+				}
+			}
 		}
 
 		public void NextFrame(int frameNo, IAstroImage astroImage)
