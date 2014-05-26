@@ -187,6 +187,12 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 			bool autoDoubleObjectLocated = TryAutoLocateDoubleObject(out newCenter);
 			if (autoDoubleObjectLocated)
 			{
+				int deltaX = (int)Math.Round(newCenter.XDouble - 18);
+				int deltaY = (int)Math.Round(newCenter.YDouble - 18);
+				m_X1Start -= deltaX;
+				m_Y1Start -= deltaY;
+				m_X2Start -= deltaX;
+				m_Y2Start -= deltaY;
 				m_Center = new ImagePixel(newCenter.Brightness, m_Center.XDouble + newCenter.XDouble - 18, m_Center.YDouble + newCenter.YDouble - 18);
 				m_ProcessingPixels = m_AstroImage.GetMeasurableAreaPixels(m_Center.X, m_Center.Y, 35);
 				m_DisplayPixels = m_AstroImage.GetMeasurableAreaDisplayBitmapPixels(m_Center.X, m_Center.Y, 35);
@@ -721,10 +727,10 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 			if (rbOcculted.Checked)
 			{
 				ObjectToAdd.TrackingType = TrackingType.OccultedStar;
-				ObjectToAdd.PositionTolerance = 1; /* TODO: Is 1 the best value here? */
+				ObjectToAdd.PositionTolerance = 2;
 				if (ObjectToAdd.Gaussian != null)
 					// Correction for really large stars
-					ObjectToAdd.PositionTolerance += (float)(ObjectToAdd.Gaussian.FWHM / 4);
+					ObjectToAdd.PositionTolerance += (float)(ObjectToAdd.Gaussian.FWHM / 2);
 
 				ObjectToAdd.PsfFitMatrixSize = TangraConfig.Settings.Special.DefaultOccultedStarPsfFitMatrixSize;
 			}
@@ -765,10 +771,10 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 			if (rbOcculted.Checked && rbOccElc1.Checked)
 			{
 				ObjectToAdd.TrackingType = TrackingType.OccultedStar;
-				ObjectToAdd.PositionTolerance = 1; /* TODO: Is 1 the best value here? */
+				ObjectToAdd.PositionTolerance = 2;
 				if (ObjectToAdd.Gaussian != null)
 					// Correction for really large stars
-					ObjectToAdd.PositionTolerance += (float)(ObjectToAdd.Gaussian.FWHM / 4);
+					ObjectToAdd.PositionTolerance += (float)(ObjectToAdd.Gaussian.FWHM / 2);
 
 				ObjectToAdd.PsfFitMatrixSize = TangraConfig.Settings.Special.DefaultOccultedStarPsfFitMatrixSize;
 			}
@@ -804,10 +810,10 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 			if (rbOcculted.Checked && rbOccElc2.Checked)
 			{
 				ObjectToAdd2.TrackingType = TrackingType.OccultedStar;
-				ObjectToAdd2.PositionTolerance = 1; /* TODO: Is 1 the best value here? */
+				ObjectToAdd2.PositionTolerance = 2;
 				if (ObjectToAdd.Gaussian != null)
 					// Correction for really large stars
-					ObjectToAdd2.PositionTolerance += (float)(ObjectToAdd.Gaussian.FWHM / 4);
+					ObjectToAdd2.PositionTolerance += (float)(ObjectToAdd.Gaussian.FWHM / 2);
 
 				ObjectToAdd2.PsfFitMatrixSize = TangraConfig.Settings.Special.DefaultOccultedStarPsfFitMatrixSize;
 			}

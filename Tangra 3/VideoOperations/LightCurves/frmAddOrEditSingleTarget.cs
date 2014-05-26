@@ -681,7 +681,7 @@ namespace Tangra.VideoOperations.LightCurves
                 ObjectToAdd.PositionTolerance = (float)nudPositionTolerance.Value;
 	            if (ObjectToAdd.Gaussian != null) 
 					// Correction for really large stars
-					ObjectToAdd.PositionTolerance += (float)(ObjectToAdd.Gaussian.FWHM/4);
+					ObjectToAdd.PositionTolerance += (float)(ObjectToAdd.Gaussian.FWHM/2);
 
                 ObjectToAdd.PsfFitMatrixSize = TangraConfig.Settings.Special.DefaultOccultedStarPsfFitMatrixSize;
             	ObjectToAdd.IsWeakSignalObject = rbAutoCenteredAperture.Checked;
