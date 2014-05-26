@@ -139,6 +139,8 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 			{ 
 				ObjectToAdd2 = null;
 				m_GroupId = objectId;
+				// If we are to use a second object, it should have the next available Id
+				m_ObjectId2 = state.m_MeasuringStars.Count;
 			}
 
 			Initialise();
@@ -163,11 +165,11 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 
 			bool doubleModeDisabled = false;
 
-			if (m_IsEdit)
+			if (m_IsEdit && m_ObjectId2 <=3)
 			{
 				m_Color2 = m_AllTargetColors[m_ObjectId2];
 			}
-			else if (m_ObjectId == 3)
+			else if (m_ObjectId == 3 || m_ObjectId2 == 4)
 			{
 				doubleModeDisabled = true;
 				rbTwoObjects.Enabled = false;
@@ -180,6 +182,15 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 
 			m_ProcessingPixels = m_AstroImage.GetMeasurableAreaPixels(m_Center.X, m_Center.Y, 35);
 			m_DisplayPixels = m_AstroImage.GetMeasurableAreaDisplayBitmapPixels(m_Center.X, m_Center.Y, 35);
+
+			ImagePixel newCenter;
+			bool autoDoubleObjectLocated = TryAutoLocateDoubleObject(out newCenter);
+			if (autoDoubleObjectLocated)
+			{
+				m_Center = new ImagePixel(newCenter.Brightness, m_Center.XDouble + newCenter.XDouble - 18, m_Center.YDouble + newCenter.YDouble - 18);
+				m_ProcessingPixels = m_AstroImage.GetMeasurableAreaPixels(m_Center.X, m_Center.Y, 35);
+				m_DisplayPixels = m_AstroImage.GetMeasurableAreaDisplayBitmapPixels(m_Center.X, m_Center.Y, 35);
+			}
 
 			bool occultedStartAlreadyPicked = m_State.MeasuringStars.Any(x => x.IsOcultedStar());
 
@@ -194,7 +205,7 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 				rbOcculted.Checked = true;
 			}
 
-			if (doubleModeDisabled || !TryAutoLocateDoubleObject())
+			if (doubleModeDisabled || !autoDoubleObjectLocated)
 				rbOneObject.Checked = true;
 
 			m_Aperture = null;
@@ -209,7 +220,7 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 			CalculatePSF();
 		}
 
-		private bool TryAutoLocateDoubleObject()
+		private bool TryAutoLocateDoubleObject(out ImagePixel newCenter)
 		{
 			var pixelsFlatList = new List<Tuple<int, int, uint>>();
 
@@ -251,15 +262,18 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 			if (secondPeakProbe1 != null &&
 				IsGoodDoubleObjectFit(brightProbe1, secondPeakProbe1))
 			{
+				newCenter = new ImagePixel((int)Math.Max(brightProbe1.Item3, secondPeakProbe1.Item3), (brightProbe1.Item1 + secondPeakProbe1.Item1) / 2.0, (brightProbe1.Item2 + secondPeakProbe1.Item2) / 2.0);
 				return true;
 			}
 
 			if (secondPeakProbe2 != null &&
 				IsGoodDoubleObjectFit(brightProbe2, secondPeakProbe2))
 			{
+				newCenter = new ImagePixel((int)Math.Max(brightProbe2.Item3, secondPeakProbe2.Item3), (brightProbe2.Item1 + secondPeakProbe2.Item1) / 2.0, (brightProbe2.Item2 + secondPeakProbe2.Item2) / 2.0);
 				return true;
 			}
 
+			newCenter = null;
 			return false;
 		}
 

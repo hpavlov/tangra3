@@ -359,27 +359,50 @@ namespace Tangra.Model.Astro
 			m_BackgroundModel = backgroundModel;
 			m_UsesBackgroundModel = m_BackgroundModel != null;
 
-            if (newMatrixSize != 17)
-            {
+			if (newMatrixSize == 17 || newMatrixSize == 35)
+			{
+				Fit(intensity);
+			}
+			else if (newMatrixSize < 17 && intensity.GetLength(0) == 17)
+			{
+				uint[,] newData = new uint[newMatrixSize,newMatrixSize];
+				int halfSize = newMatrixSize/2;
+
+				int xx = 0, yy = 0;
+				for (int y = 9 - halfSize - 1; y <= 9 + halfSize - 1; y++)
+				{
+					xx = 0;
+					for (int x = 9 - halfSize - 1; x <= 9 + halfSize - 1; x++)
+					{
+						newData[xx, yy] = intensity[x, y];
+						xx++;
+					}
+					yy++;
+				}
+
+				Fit(newData);
+			}
+			else if (newMatrixSize < 35 && intensity.GetLength(0) == 35)
+			{
 				uint[,] newData = new uint[newMatrixSize, newMatrixSize];
-                int halfSize = newMatrixSize / 2;
+				int halfSize = newMatrixSize / 2;
 
-                int xx = 0, yy = 0;
-                for (int y = 9 - halfSize - 1; y <= 9 + halfSize - 1; y++)
-                {
-                    xx = 0;
-                    for (int x = 9 - halfSize - 1; x <= 9 + halfSize - 1; x++)
-                    {
-                        newData[xx, yy] = intensity[x, y];
-                        xx++;
-                    }
-                    yy++;
-                }
+				int xx = 0, yy = 0;
+				for (int y = 18 - halfSize - 1; y <= 18 + halfSize - 1; y++)
+				{
+					xx = 0;
+					for (int x = 18 - halfSize - 1; x <= 18 + halfSize - 1; x++)
+					{
+						newData[xx, yy] = intensity[x, y];
+						xx++;
+					}
+					yy++;
+				}
 
-                Fit(newData);
-            }
-            else
-                Fit(intensity);
+				Fit(newData);
+			}
+			else
+				throw new InvalidOperationException("Bad matrix size.");
 		}
 
 #if WIN32
