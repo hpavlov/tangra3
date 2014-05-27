@@ -189,9 +189,13 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			double delta1122 = Math.Abs(prevX1X2 - thisX1X2) + Math.Abs(prevY1Y2 - thisY1Y2);
 			double delta1212 = Math.Abs(prevX1X2 + thisX1X2) + Math.Abs(prevY1Y2 + thisY1Y2);
 
-			if (delta1122 < 1 && delta1212 > 4)
+			double averageFWHM = (fit1.FWHM + fit2.FWHM) / 2;
+			double maxGoodMatchDist = 1 + averageFWHM / 4;
+			double minGoodDismatchDist = 4 + averageFWHM / 4;
+
+			if (delta1122 < maxGoodMatchDist && delta1212 > minGoodDismatchDist)
 				return Match1122(out obj1, out obj2);
-			else if (delta1212 < 1 && delta1122 > 4)
+			else if (delta1212 < maxGoodMatchDist && delta1122 > minGoodDismatchDist)
 				return Match1212(out obj1, out obj2);
 
 			bool match1122Ok = (Math.Abs(prevX1X2 - thisX1X2) < Math.Abs(prevX1X2 + thisX1X2)) && (Math.Abs(prevY1Y2 - thisY1Y2) < Math.Abs(prevY1Y2 + thisY1Y2));
@@ -433,8 +437,8 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 					{
 						string dbg = "";
 
-						int areaCenterX = objectGroup.BrigherObjectLastCenter.X;
-						int areaCenterY = objectGroup.BrigherObjectLastCenter.Y;
+						int areaCenterX = (objectGroup.LastCenterObject1.X + objectGroup.LastCenterObject2.X) / 2;
+						int areaCenterY = (objectGroup.LastCenterObject1.Y + objectGroup.LastCenterObject2.Y) / 2;
 
 						uint[,] pixels = astroImage.GetPixelsArea(areaCenterX, areaCenterY, 35);
 						var doubleFit = new DoublePSFFit(areaCenterX, areaCenterY);

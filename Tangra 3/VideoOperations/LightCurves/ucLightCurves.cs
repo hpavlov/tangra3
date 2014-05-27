@@ -416,6 +416,8 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void btnAddObject_Click(object sender, EventArgs e)
         {
+			bool shiftHeld = Control.ModifierKeys == Keys.Shift;
+
             if (m_StateMachine.SelectedObject != null)
             {
                 int newId = -1;
@@ -424,7 +426,7 @@ namespace Tangra.VideoOperations.LightCurves
                 {
                     m_StateMachine.VideoOperation.EnsureStackedAstroImage();
 
-                    if (!m_StateMachine.VideoOperation.ConfirmNewObject(newId))
+					if (!m_StateMachine.VideoOperation.ConfirmNewObject(newId, !shiftHeld /* SHIFT = don't try auto double fit */))
                         return;
                 }
 

@@ -229,7 +229,7 @@ namespace Tangra.Model.Image
 
             if (!fit.IsSolved || // The PSF solution failed, mark the reading invalid
                 (distance > tolerance && !mayBeOcculted) || // If this doesn't look like a full disappearance, then make the reading invalid
-                (fit.FWHM < 0.75 * refinedFWHM || fit.FWHM > 1.25 * refinedFWHM) // The FWHM is too small or too large, make the reading invalid
+                (fit.FWHM < 0.5 * refinedFWHM || fit.FWHM > 1.5 * refinedFWHM) // The FWHM is too small or too large, make the reading invalid
                 )
             {
                 return !fit.IsSolved

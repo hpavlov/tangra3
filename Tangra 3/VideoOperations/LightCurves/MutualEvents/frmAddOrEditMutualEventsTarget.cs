@@ -19,6 +19,7 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
     public partial class frmAddOrEditMutualEventsTarget : Form
     {
         private ImagePixel m_Center;
+	    private ImagePixel m_OriginalCenter;
         private int m_ObjectId;
 		private int m_ObjectId2;
         private float m_X0;
@@ -48,6 +49,12 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 		private int m_Y2Start;
 	    private bool m_UserPeakMode = false;
 
+	    private ImagePixel m_AutoDoubleCenter = null;
+	    private int m_AutoDoubleX1Start;
+	    private int m_AutoDoubleY1Start;
+	    private int m_AutoDoubleX2Start;
+	    private int m_AutoDoubleY2Start;
+
         private TangraConfig.PreProcessingFilter SelectedFilter;
         private uint[,] m_ProcessingPixels;
         private byte[,] m_DisplayPixels;
@@ -74,16 +81,19 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 	    private Color[] m_AllTargetColors;
 	    private string strElcOrOcc;
 
+	    private bool m_TryAutoDoubleFind;
+
         public frmAddOrEditMutualEventsTarget()
         {
             InitializeComponent();
         }
 
-        internal frmAddOrEditMutualEventsTarget(int objectId, ImagePixel center, PSFFit gaussian, LCStateMachine state, VideoController videoController)
+		internal frmAddOrEditMutualEventsTarget(int objectId, ImagePixel center, PSFFit gaussian, LCStateMachine state, VideoController videoController, bool tryAutoDoubleFind)
         {
 			InitializeComponent();
 
             m_VideoController = videoController;
+			m_TryAutoDoubleFind = tryAutoDoubleFind;
 
             Text = "Add 'Mutual Event' Target";
             btnAdd.Text = "Add";
@@ -100,6 +110,7 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 			ObjectToAdd2 = null;
 
             m_Center = new ImagePixel(center);
+			m_OriginalCenter = new ImagePixel(center);
 
 	        Initialise();
         }
@@ -123,6 +134,7 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 			ObjectToAdd = selectedObject;
 
 			m_Center = new ImagePixel(selectedObject.ApertureStartingX, selectedObject.ApertureStartingY);
+			m_OriginalCenter = new ImagePixel(selectedObject.ApertureStartingX, selectedObject.ApertureStartingY);
 
 			if (selectedObject.ProcessInPsfGroup)
 			{
@@ -183,13 +195,25 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 			m_ProcessingPixels = m_AstroImage.GetMeasurableAreaPixels(m_Center.X, m_Center.Y, 35);
 			m_DisplayPixels = m_AstroImage.GetMeasurableAreaDisplayBitmapPixels(m_Center.X, m_Center.Y, 35);
 
-			ImagePixel newCenter;
-			bool autoDoubleObjectLocated = TryAutoLocateDoubleObject(out newCenter);
+			ImagePixel newCenter = null;
+			bool autoDoubleObjectLocated = m_TryAutoDoubleFind && TryAutoLocateDoubleObject(out newCenter);
 			if (autoDoubleObjectLocated)
 			{
+				int deltaX = (int)Math.Round(newCenter.XDouble - 18);
+				int deltaY = (int)Math.Round(newCenter.YDouble - 18);
+				m_X1Start -= deltaX;
+				m_Y1Start -= deltaY;
+				m_X2Start -= deltaX;
+				m_Y2Start -= deltaY;
 				m_Center = new ImagePixel(newCenter.Brightness, m_Center.XDouble + newCenter.XDouble - 18, m_Center.YDouble + newCenter.YDouble - 18);
 				m_ProcessingPixels = m_AstroImage.GetMeasurableAreaPixels(m_Center.X, m_Center.Y, 35);
 				m_DisplayPixels = m_AstroImage.GetMeasurableAreaDisplayBitmapPixels(m_Center.X, m_Center.Y, 35);
+
+				m_AutoDoubleCenter = new ImagePixel(m_Center);
+				m_AutoDoubleX1Start = m_X1Start;
+				m_AutoDoubleY1Start = m_Y1Start;
+				m_AutoDoubleX2Start = m_X2Start;
+				m_AutoDoubleY2Start = m_Y2Start;
 			}
 
 			bool occultedStartAlreadyPicked = m_State.MeasuringStars.Any(x => x.IsOcultedStar());
@@ -529,7 +553,11 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 
 		private void CalculateSingleObjectPSF()
 		{
-			var psfFit = new PSFFit(m_Center.X, m_Center.Y);
+			m_ProcessingPixels = m_AstroImage.GetMeasurableAreaPixels(m_OriginalCenter.X, m_OriginalCenter.Y, 35);
+			m_DisplayPixels = m_AstroImage.GetMeasurableAreaDisplayBitmapPixels(m_OriginalCenter.X, m_OriginalCenter.Y, 35);
+ 
+			var psfFit = new PSFFit(m_OriginalCenter.X, m_OriginalCenter.Y);
+
 			psfFit.Fit(m_ProcessingPixels);
 
 			if (psfFit.IsSolved)
@@ -559,6 +587,17 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 
 		private void CalculateTwoObjectsPSFs()
 		{
+			if (m_AutoDoubleCenter != null)
+			{
+				m_Center = new ImagePixel(m_AutoDoubleCenter);
+				m_X1Start = m_AutoDoubleX1Start;
+				m_Y1Start = m_AutoDoubleY1Start;
+				m_X2Start = m_AutoDoubleX2Start;
+				m_Y2Start = m_AutoDoubleY2Start;
+				m_ProcessingPixels = m_AstroImage.GetMeasurableAreaPixels(m_Center.X, m_Center.Y, 35);
+				m_DisplayPixels = m_AstroImage.GetMeasurableAreaDisplayBitmapPixels(m_Center.X, m_Center.Y, 35);
+			}
+
 			if (!m_UserPeakMode &&
 				!FirstObjectPeakDefined() && !SecondObjectPeakDefined() && 
 				!LocatePeaks())
@@ -588,6 +627,8 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 					MessageBoxButtons.OK,
 					MessageBoxIcon.Error);				
 			}
+
+			
 
 			var psfFit = new DoublePSFFit(m_Center.X, m_Center.Y);
 			if (TangraConfig.Settings.Photometry.PsfFittingMethod == TangraConfig.PsfFittingMethod.LinearFitOfAveragedModel)
@@ -721,10 +762,10 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 			if (rbOcculted.Checked)
 			{
 				ObjectToAdd.TrackingType = TrackingType.OccultedStar;
-				ObjectToAdd.PositionTolerance = 1; /* TODO: Is 1 the best value here? */
+				ObjectToAdd.PositionTolerance = 2;
 				if (ObjectToAdd.Gaussian != null)
 					// Correction for really large stars
-					ObjectToAdd.PositionTolerance += (float)(ObjectToAdd.Gaussian.FWHM / 4);
+					ObjectToAdd.PositionTolerance += (float)(ObjectToAdd.Gaussian.FWHM / 2);
 
 				ObjectToAdd.PsfFitMatrixSize = TangraConfig.Settings.Special.DefaultOccultedStarPsfFitMatrixSize;
 			}
@@ -765,10 +806,10 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 			if (rbOcculted.Checked && rbOccElc1.Checked)
 			{
 				ObjectToAdd.TrackingType = TrackingType.OccultedStar;
-				ObjectToAdd.PositionTolerance = 1; /* TODO: Is 1 the best value here? */
+				ObjectToAdd.PositionTolerance = 2;
 				if (ObjectToAdd.Gaussian != null)
 					// Correction for really large stars
-					ObjectToAdd.PositionTolerance += (float)(ObjectToAdd.Gaussian.FWHM / 4);
+					ObjectToAdd.PositionTolerance += (float)(ObjectToAdd.Gaussian.FWHM / 2);
 
 				ObjectToAdd.PsfFitMatrixSize = TangraConfig.Settings.Special.DefaultOccultedStarPsfFitMatrixSize;
 			}
@@ -804,10 +845,10 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 			if (rbOcculted.Checked && rbOccElc2.Checked)
 			{
 				ObjectToAdd2.TrackingType = TrackingType.OccultedStar;
-				ObjectToAdd2.PositionTolerance = 1; /* TODO: Is 1 the best value here? */
+				ObjectToAdd2.PositionTolerance = 2;
 				if (ObjectToAdd.Gaussian != null)
 					// Correction for really large stars
-					ObjectToAdd2.PositionTolerance += (float)(ObjectToAdd.Gaussian.FWHM / 4);
+					ObjectToAdd2.PositionTolerance += (float)(ObjectToAdd.Gaussian.FWHM / 2);
 
 				ObjectToAdd2.PsfFitMatrixSize = TangraConfig.Settings.Special.DefaultOccultedStarPsfFitMatrixSize;
 			}

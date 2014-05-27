@@ -266,7 +266,7 @@ namespace Tangra.Model.Astro
 			get
 			{
 				// 0.03 = 0.5
-				return CERTAINTY_CONST * (m_IStarMax / m_Saturation) / FWHM;
+				return CERTAINTY_CONST * (m_IStarMax / (m_Saturation - I0)) / (5 * Math.Log10(FWHM));
 			}
 		}
 

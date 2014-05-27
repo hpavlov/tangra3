@@ -1894,11 +1894,11 @@ namespace Tangra.VideoOperations.LightCurves
 			m_VideoController.MoveToFrame((int)m_LightCurveController.LcFile.Header.MinFrame);
 		}
 
-        internal bool ConfirmNewObject(int objectId)
+		internal bool ConfirmNewObject(int objectId, bool tryAutoDoubleFind)
         {
             if (LightCurveReductionContext.Instance.LightCurveReductionType == LightCurveReductionType.MutualEvent)
             {
-                var frmAddMutualTarget = new frmAddOrEditMutualEventsTarget(objectId, m_StateMachine.SelectedObject, m_StateMachine.SelectedObjectGaussian, m_StateMachine, m_VideoController);
+				var frmAddMutualTarget = new frmAddOrEditMutualEventsTarget(objectId, m_StateMachine.SelectedObject, m_StateMachine.SelectedObjectGaussian, m_StateMachine, m_VideoController, tryAutoDoubleFind);
                 if (frmAddMutualTarget.ShowDialog() == DialogResult.Cancel)
                     return false;
 
