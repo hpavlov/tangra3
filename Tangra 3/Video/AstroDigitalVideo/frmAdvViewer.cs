@@ -3,14 +3,18 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using Tangra.Helpers;
+using Tangra.Model.Config;
 using Tangra.Model.Image;
+using Tangra.PInvoke;
 using Tangra.Video.AstroDigitalVideo.UI;
 
 namespace Tangra.Video.AstroDigitalVideo
@@ -477,5 +481,164 @@ namespace Tangra.Video.AstroDigitalVideo
                 ThreadPool.QueueUserWorkItem(new WaitCallback(ExportToCSVWorker), new Tuple<string, int, int>(saveFileDialog.FileName, (int)nudCsvFirstFrame.Value, (int)nudCsvLastFrame.Value));
 			}
 		}
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            ThreadPool.QueueUserWorkItem(new WaitCallback(GenerateSimulatedVideo), null);
+        }
+
+        private void GenerateSimulatedVideo(object state)
+        {
+            InvokeUpdateUI(2, 0, true);
+
+            try
+            {
+                TangraVideo.CloseAviFile();
+                TangraVideo.StartNewAviFile(@"D:\Tangra3 TestBed\SimulatedVideo\2.avi", 300, 200, 8, 25, false);
+                try
+                {
+
+                    int MAX = 7500; // 5 Min
+                    MAX = 500;
+
+                    for (int i = 0; i <= MAX; i++)
+                    {
+                        using (Pixelmap pixmap = GenerateFrame(i * 1.0 / MAX))
+                        {
+                            TangraVideo.AddAviVideoFrame(pixmap, 1, null);
+                        }
+
+                        InvokeUpdateUI(2, (int)(100.0 * i / MAX), true);
+                    }
+                }
+                finally
+                {
+                    TangraVideo.CloseAviFile();
+                }
+            }
+            finally
+            {
+                InvokeUpdateUI(2, 100, false);
+            }
+        }
+
+        private Pixelmap GenerateFrame(double percentDone)
+        {
+            m_GeneratedNoise = new double[MAX_NOISE_INDEX];
+            for (int i = 0; i < MAX_NOISE_INDEX; i++)
+            {
+                m_GeneratedNoise[i] = Math.Abs(Random(15, 4));
+            }
+
+            using (Bitmap bmp = new Bitmap(300, 200, PixelFormat.Format24bppRgb))
+            {
+                GenerateNoise(bmp);
+                GenerateStar(bmp, 200, 120, 3.5f, 230); // Static
+
+                GenerateStar(bmp, 150, 100, 3.4f, 190);
+                GenerateStar(bmp, 153.5f, (float)(100 - 3 + 6 * percentDone), 3.3f, 130);
+
+                return Pixelmap.ConstructFromBitmap(bmp, TangraConfig.ColourChannel.Red);
+            }
+        }
+
+        private Random rand = new Random();
+	    private RNGCryptoServiceProvider cryptoRand = new RNGCryptoServiceProvider();
+        private const int MAX_NOISE_INDEX = 500000;
+	    private double[] m_GeneratedNoise;
+
+        private double Random(double mean, double stdDev)
+        {
+            byte[] twoBytes = new byte[2];
+            cryptoRand.GetBytes(twoBytes);
+            double u1 = twoBytes[0] * 1.0 / 0xFF; //these are uniform(0,1) random doubles
+            double u2 = twoBytes[1] * 1.0 / 0xFF;
+            double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2); //random normal(0,1)
+            double randNormal = mean + stdDev * randStdNormal; //random normal(mean,stdDev^2)
+            return randNormal;
+        }
+
+	    private void GenerateNoise(Bitmap bmp)
+	    {
+            BitmapData bmData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+
+            int stride = bmData.Stride;
+            System.IntPtr Scan0 = bmData.Scan0;
+            int index = 0;
+            unsafe
+            {
+                byte* p = (byte*)(void*)Scan0;
+
+                int nOffset = stride - bmp.Width * 3;
+
+                for (int y = 0; y < bmp.Height; ++y)
+                {
+                    for (int x = 0; x < bmp.Width; ++x)
+                    {
+                        index++;
+
+                        byte val = (byte)Math.Min(255, Math.Max(0, (int)m_GeneratedNoise[index % MAX_NOISE_INDEX]));
+
+                        p[0] = val;
+                        p[1] = val;
+                        p[2] = val;
+
+                        p += 3;
+                    }
+                    p += nOffset;
+                }
+            }
+
+            bmp.UnlockBits(bmData);
+	    }
+
+	    private void GenerateStar(Bitmap bmp, float x0, float y0, float fwhm, float iMax)
+        {
+            double r0 = fwhm/(2*Math.Sqrt(Math.Log(2)));
+            double background = 5.56;
+
+            // GDI+ still lies to us - the return format is BGR, NOT RGB.
+            BitmapData bmData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+
+            int stride = bmData.Stride;
+            System.IntPtr Scan0 = bmData.Scan0;
+            unsafe
+            {
+                byte* p = (byte*)(void*)Scan0;
+
+                int nOffset = stride - bmp.Width * 3;
+
+                for (int y = 0; y < bmp.Height; ++y) 
+                {
+                    for (int x = 0; x < bmp.Width; ++x) 
+                    {
+                        if (Math.Abs(x - x0) < 15 && Math.Abs(y - y0) < 15)
+                        {
+                            int counter = 0;
+                            double sum = 0;
+                            for (double dx = -0.5; dx < 0.5; dx += 0.1)
+                            {
+                                for (double dy = -0.5; dy < 0.5; dy += 0.1)
+                                {
+                                    sum += iMax * Math.Exp(-((x + dx - x0) * (x + dx - x0) + (y + dy - y0) * (y + dy - y0)) / (r0 * r0));
+                                    counter++;
+                                }
+                            }
+
+                            byte val = (byte)Math.Min(255, Math.Max(0, (int)Math.Round(sum / counter)));
+
+                            p[0] += val;
+                            p[1] += val;
+                            p[2] += val;
+                        }
+
+                        p += 3;
+                    }
+                    p += nOffset;
+                }
+            }
+
+            bmp.UnlockBits(bmData);
+        }
 	}	
 }

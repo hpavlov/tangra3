@@ -359,7 +359,7 @@ namespace Tangra.Model.Astro
 			m_BackgroundModel = backgroundModel;
 			m_UsesBackgroundModel = m_BackgroundModel != null;
 
-			if (newMatrixSize == 17 || newMatrixSize == 35)
+            if (newMatrixSize == 17 || newMatrixSize == 35 || newMatrixSize == 0)
 			{
 				Fit(intensity);
 			}

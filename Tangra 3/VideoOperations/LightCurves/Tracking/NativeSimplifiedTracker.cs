@@ -122,7 +122,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 		public void DoManualFrameCorrection(int targetId, int deltaX, int deltaY)
 		{
-			foreach (TrackedObjectLight trackedObject in TrackedObjects)
+            foreach (ITrackedObject trackedObject in TrackedObjects)
 			{
 				if (trackedObject.TargetNo == targetId)
 				{

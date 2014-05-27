@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Tangra.Model.Astro;
 using Tangra.Model.Image;
+using Tangra.Model.VideoOperations;
 
 namespace Tangra.VideoOperations.LightCurves.Tracking
 {
@@ -35,6 +36,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 		int TargetNo { get; }
 		ITrackedObjectPsfFit PSFFit { get; }
 		uint GetTrackingFlags();
+	    void SetIsTracked(bool isMeasured, NotMeasuredReasons reason, IImagePixel estimatedCenter);
 	}
 
 	public interface ITrackedObjectConfig

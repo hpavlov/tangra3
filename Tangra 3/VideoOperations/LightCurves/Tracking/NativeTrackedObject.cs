@@ -63,6 +63,12 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             get { return m_NativePsfFit; }
         }
 
+        public void SetIsTracked(bool isMeasured, NotMeasuredReasons reason, IImagePixel estimatedCenter)
+        {
+            Center = estimatedCenter;
+            IsLocated = isMeasured;
+        }
+
 		public uint GetTrackingFlags()
 		{
 			return m_TrackingFlags;
