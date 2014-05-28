@@ -13,6 +13,8 @@ namespace Tangra.Controller
 	{
 		internal List<List<LCMeasurement>> AllReadings = new List<List<LCMeasurement>>(new List<LCMeasurement>[] { new List<LCMeasurement>(), new List<LCMeasurement>(), new List<LCMeasurement>(), new List<LCMeasurement>() });
 
+		internal MagnitudeConverter MagnitudeConverter;
+
 		internal LightCurveContext(LCFile lcFile)
 		{
 			if (lcFile.Header.MeasuredFrames > 0)
@@ -24,6 +26,8 @@ namespace Tangra.Controller
 					AllReadings[i] = lcFile.Data[i];
 				}
 			}
+
+			MagnitudeConverter = new MagnitudeConverter(lcFile.Header.ReferenceMagnitudes);
 
 			for (int i = 0; i < 4; i++)
 				m_ObjectTitles[i] = string.Format("Object {0}", i);
@@ -69,6 +73,7 @@ namespace Tangra.Controller
 		public int AAVFrameIntegration;
 		public uint MinFrame;
 		public uint MaxFrame;
+		public int ObjectCount;
 
 		public uint m_SelectedFrameNo = 0;
 

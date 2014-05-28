@@ -38,7 +38,6 @@ namespace Tangra.VideoOperations.LightCurves
 			new List<BinnedValue>(), new List<BinnedValue>(), new List<BinnedValue>(), new List<BinnedValue>()
 		};
 
-
         private int m_MinX = 45;
         private int m_MinY = 25;
         private int m_MaxY, m_MaxX;
@@ -47,6 +46,15 @@ namespace Tangra.VideoOperations.LightCurves
         {
             int minValue = int.MaxValue;
             int maxValue = int.MinValue;
+
+			int totalMinValue = int.MaxValue;
+			int totalMaxValue = int.MinValue;
+
+			if (m_Header.ObjectCount == 0 || m_LightCurveController.Context.AllReadings[0].Count == 0)
+			{
+				totalMinValue = 0;
+				totalMaxValue = 0;
+			}
 
             for (int i = 0; i < m_Header.ObjectCount; i++)
             {
@@ -81,6 +89,9 @@ namespace Tangra.VideoOperations.LightCurves
 					{
 						adjustedValue = (int)(100 * ComputeSignalToNoiceRatio(i, j, false));
 					}
+
+					if (totalMinValue > adjustedValue) totalMinValue = adjustedValue;
+					if (totalMaxValue < adjustedValue) totalMaxValue = adjustedValue;
 
                     if (m_IncludeObjects[i])
                     {
@@ -117,7 +128,7 @@ namespace Tangra.VideoOperations.LightCurves
 						{
 							if (minValue > adjustedValue) minValue = adjustedValue;
 							if (maxValue < adjustedValue) maxValue = adjustedValue;														
-						}
+						}																				
 
 						if (j < 10 || includeInMinMaxCalcs)
 							last10Values[j % 10] = adjustedValue;
@@ -127,6 +138,9 @@ namespace Tangra.VideoOperations.LightCurves
                     m_LightCurveController.Context.AllReadings[i][j] = reading;
                 }
             }
+
+	        if (minValue == int.MaxValue) minValue = totalMinValue;
+			if (maxValue == int.MinValue) maxValue = totalMaxValue;
 
             m_Header.MinAdjustedReading = minValue;
             m_Header.MaxAdjustedReading = maxValue;

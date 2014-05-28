@@ -281,6 +281,7 @@ namespace Tangra.VideoOperations.LightCurves
             m_LightCurveController.Context.TimingType = m_Header.TimingType;
             m_LightCurveController.Context.MinFrame = m_Header.MinFrame;
             m_LightCurveController.Context.MaxFrame = m_Header.MaxFrame;
+			m_LightCurveController.Context.ObjectCount = m_Header.ObjectCount;
 
 			ToolStripMenuItem[] allObjMenuItems = new ToolStripMenuItem[] { miIncludeObj1, miIncludeObj2, miIncludeObj3, miIncludeObj4 };
 
@@ -2326,6 +2327,16 @@ namespace Tangra.VideoOperations.LightCurves
 		{
 			m_LightCurveController.Context.OutlierRemoval = miOutlierRemoval.Checked;
 			pnlChart.Invalidate();
+		}
+
+		private void btnSetMags_Click(object sender, EventArgs e)
+		{
+			var frm = new frmSetReferenceMag();
+			frm.SetCurrentMeasurements(m_SelectedMeasurements, m_LightCurveController.Context);
+			if (frm.ShowDialog(this) == DialogResult.OK)
+			{
+				// TODO: Set the magnitudes and repaint to show display the axis/scale
+			}
 		}
 	}
 }

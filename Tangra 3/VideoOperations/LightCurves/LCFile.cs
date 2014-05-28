@@ -1100,6 +1100,7 @@ namespace Tangra.VideoOperations.LightCurves
         }
 
 	    private static Regex s_RegexSourceToFileFormat = new Regex("^.+\\((?<format>(ADV|AAV|AVI))\\..+\\).*$");
+
 		/// <summary>
 		/// AVI|AAV|ADV
 		/// </summary>
@@ -1506,7 +1507,9 @@ namespace Tangra.VideoOperations.LightCurves
 
         internal LightCurveReductionType ReductionType;
 
-        private static int SERIALIZATION_VERSION = 4;
+		internal double[] ReferenceMagnitudes;
+
+        private static int SERIALIZATION_VERSION = 5;
 
         internal LCMeasurementHeader(
             string pathToVideoFile, string sourceInfo,
@@ -1566,6 +1569,9 @@ namespace Tangra.VideoOperations.LightCurves
 
 			PsfGroupIds = psfGroupIds;
 
+			ReferenceMagnitudes = new double[measurementApertures.Length];
+	        for (int i = 0; i < ReferenceMagnitudes.Length; i++) ReferenceMagnitudes[i] = double.NaN;
+	        
             FramesPerSecond = framesPerSecond;
         }
 
@@ -1613,7 +1619,10 @@ namespace Tangra.VideoOperations.LightCurves
 
             FirstTimedFrameNo = (int)MinFrame;
             LastTimedFrameNo = (int)MaxFrame;
-	        
+
+			ReferenceMagnitudes = new double[ObjectCount];
+			for (int i = 0; i < ReferenceMagnitudes.Length; i++) ReferenceMagnitudes[i] = double.NaN;
+
             if (version > 1)
             {
                 FirstTimedFrameNo = reader.ReadInt32();
@@ -1629,6 +1638,14 @@ namespace Tangra.VideoOperations.LightCurves
 						for (int i = 0; i < ObjectCount; i++)
 						{
 							PsfGroupIds[i] = reader.ReadInt32();
+						}
+
+						if (version > 4)
+						{
+							for (int i = 0; i < ObjectCount; i++)
+							{
+								ReferenceMagnitudes[i] = reader.ReadDouble();
+							}
 						}
 					}
 				}
@@ -1695,10 +1712,12 @@ namespace Tangra.VideoOperations.LightCurves
 
 			// VERSION 4 Data
 	        for (int i = 0; i < ObjectCount; i++)
-	        {
 				writer.Write(PsfGroupIds[i]);
-	        }
-        }
+
+			// VERSION 5 Data
+			for (int i = 0; i < ObjectCount; i++)
+				writer.Write(ReferenceMagnitudes[i]);
+		}
     }
 
     internal struct LCMeasurementFooter
