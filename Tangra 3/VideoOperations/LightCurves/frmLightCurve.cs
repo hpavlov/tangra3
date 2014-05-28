@@ -1313,6 +1313,7 @@ namespace Tangra.VideoOperations.LightCurves
 			PictureBox[] targetBoxes = new PictureBox[] { picTarget1Pixels, picTarget2Pixels, picTarget3Pixels, picTarget4Pixels };
 			PictureBox[] psfBoxes = new PictureBox[] { picTarget1PSF, picTarget2PSF, picTarget3PSF, picTarget4PSF };
 			Label[] msrmntLabels = new Label[] {lblMeasurement1, lblMeasurement2, lblMeasurement3, lblMeasurement4};
+			Label[] magsLabels = new Label[] { lblMagnitude1, lblMagnitude2, lblMagnitude3, lblMagnitude4 };
 			Label[] snlblLabels = new Label[] { lblSNLBL1, lblSNLBL1, lblSNLBL1, lblSNLBL1 };
 			Label[] snLabels = new Label[] { lblSN1, lblSN1, lblSN1, lblSN1 };
 			
@@ -1347,6 +1348,7 @@ namespace Tangra.VideoOperations.LightCurves
 					targetBoxes[i].Visible = m_IncludeObjects[i];
 					psfBoxes[i].Visible = m_IncludeObjects[i];
 					msrmntLabels[i].Visible = m_IncludeObjects[i];
+					magsLabels[i].Visible = m_IncludeObjects[i];
 					snlblLabels[i].Visible = m_IncludeObjects[i];
 					snLabels[i].Visible = m_IncludeObjects[i];
 

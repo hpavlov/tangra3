@@ -33,7 +33,7 @@ namespace Tangra.Controller
 				m_ObjectTitles[i] = string.Format("Object {0}", i);
 
 			NormMethod = NormalisationMethod.Average4Frame;
-		}
+		}		
 
 		internal enum FilterType
 		{

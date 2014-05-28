@@ -565,6 +565,7 @@ namespace Tangra.VideoOperations.LightCurves
         {
             pb1.Visible = false; pb2.Visible = false; pb3.Visible = false; pb4.Visible = false;
             lblMeasurement1.Visible = false; lblMeasurement2.Visible = false; lblMeasurement3.Visible = false; lblMeasurement4.Visible = false;
+			lblMagnitude1.Visible = false; lblMagnitude2.Visible = false; lblMagnitude3.Visible = false; lblMagnitude4.Visible = false;
             picTarget1Pixels.Visible = false; picTarget2Pixels.Visible = false; picTarget3Pixels.Visible = false; picTarget4Pixels.Visible = false;
             picTarget1PSF.Visible = false; picTarget2PSF.Visible = false; picTarget3PSF.Visible = false; picTarget4PSF.Visible = false;
 			lblSNLBL1.Visible = false; lblSNLBL2.Visible = false; lblSNLBL3.Visible = false; lblSNLBL4.Visible = false;
@@ -573,7 +574,7 @@ namespace Tangra.VideoOperations.LightCurves
             if (m_Header.ObjectCount > 0 && m_IncludeObjects[0])
             {
                 pb1.BackColor = m_DisplaySettings.Target1Color;
-				pb1.Visible = true; lblMeasurement1.Visible = true;
+				pb1.Visible = true; lblMeasurement1.Visible = true; lblMagnitude1.Visible = true;
 				lblSNLBL1.Visible = true; lblSN1.Visible = true;
                 picTarget1Pixels.Visible = true; picTarget1PSF.Visible = true;
             }
@@ -581,7 +582,7 @@ namespace Tangra.VideoOperations.LightCurves
 			if (m_Header.ObjectCount > 1 && m_IncludeObjects[1])
             {
                 pb2.BackColor = m_DisplaySettings.Target2Color;
-                pb2.Visible = true; lblMeasurement2.Visible = true;
+				pb2.Visible = true; lblMeasurement2.Visible = true; lblMagnitude2.Visible = true;
 				lblSNLBL2.Visible = true; lblSN2.Visible = true;
                 picTarget2Pixels.Visible = true; picTarget2PSF.Visible = true;
             }
@@ -589,7 +590,7 @@ namespace Tangra.VideoOperations.LightCurves
 			if (m_Header.ObjectCount > 2 && m_IncludeObjects[2])
             {
                 pb3.BackColor = m_DisplaySettings.Target3Color;
-                pb3.Visible = true; lblMeasurement3.Visible = true;
+				pb3.Visible = true; lblMeasurement3.Visible = true; lblMagnitude3.Visible = true;
 				lblSNLBL3.Visible = true; lblSN3.Visible = true;
                 picTarget3Pixels.Visible = true; picTarget3PSF.Visible = true;
             }
@@ -597,7 +598,7 @@ namespace Tangra.VideoOperations.LightCurves
 			if (m_Header.ObjectCount > 3 && m_IncludeObjects[3])
             {
                 pb4.BackColor = m_DisplaySettings.Target4Color;
-                pb4.Visible = true; lblMeasurement4.Visible = true;
+				pb4.Visible = true; lblMeasurement4.Visible = true; lblMagnitude4.Visible = true;
 				lblSNLBL4.Visible = true; lblSN4.Visible = true;
                 picTarget4Pixels.Visible = true; picTarget4PSF.Visible = true;
             }
@@ -1071,10 +1072,14 @@ namespace Tangra.VideoOperations.LightCurves
                 else
                     lblFrameTime.Text = "N/A";
 
+	            bool hasMagnitudes = m_LightCurveController.Context.MagnitudeConverter.CanComputeMagnitudes;
+				double[] magnitudes = m_LightCurveController.Context.MagnitudeConverter.ComputeMagnitudes(m_SelectedMeasurements);
+
 				if (m_Header.ObjectCount > 0 &&
 					!LCMeasurement.IsEmpty(m_SelectedMeasurements[0]) /*The object may be deselected*/)
 				{
 					lblMeasurement1.Text = string.Format("{0}", m_SelectedMeasurements[0].AdjustedReading);
+					lblMagnitude1.Text = hasMagnitudes ? string.Format("{0}", magnitudes[0].ToString("0.0")) : "";
 					lblSN1.Text = string.Format("{0}", ComputeSignalToNoiceRatio(0, (int)(m_SelectedMeasurements[0].CurrFrameNo - m_Header.MinFrame), true).ToString("0.00"));
 				}
 
@@ -1082,6 +1087,7 @@ namespace Tangra.VideoOperations.LightCurves
 					!LCMeasurement.IsEmpty(m_SelectedMeasurements[1]) /*The object may be deselected*/)
 				{
 					lblMeasurement2.Text = string.Format("{0}", m_SelectedMeasurements[1].AdjustedReading);
+					lblMagnitude2.Text = hasMagnitudes ? string.Format("{0}", magnitudes[1].ToString("0.0")) : "";
 					lblSN2.Text = string.Format("{0}", ComputeSignalToNoiceRatio(1, (int)(m_SelectedMeasurements[0].CurrFrameNo - m_Header.MinFrame), true).ToString("0.00"));
 				}
 
@@ -1089,6 +1095,7 @@ namespace Tangra.VideoOperations.LightCurves
 					!LCMeasurement.IsEmpty(m_SelectedMeasurements[2]) /*The object may be deselected*/)
 				{
 					lblMeasurement3.Text = string.Format("{0}", m_SelectedMeasurements[2].AdjustedReading);
+					lblMagnitude3.Text = hasMagnitudes ? string.Format("{0}", magnitudes[2].ToString("0.0")) : "";
 					lblSN3.Text = string.Format("{0}", ComputeSignalToNoiceRatio(2, (int)(m_SelectedMeasurements[0].CurrFrameNo - m_Header.MinFrame), true).ToString("0.00"));
 				}
 
@@ -1096,6 +1103,7 @@ namespace Tangra.VideoOperations.LightCurves
 					!LCMeasurement.IsEmpty(m_SelectedMeasurements[3]) /*The object may be deselected*/)
 				{
 					lblMeasurement4.Text = string.Format("{0}", m_SelectedMeasurements[3].AdjustedReading);
+					lblMagnitude4.Text = hasMagnitudes ? string.Format("{0}", magnitudes[3].ToString("0.0")) : "";
 					lblSN4.Text = string.Format("{0}", ComputeSignalToNoiceRatio(3, (int)(m_SelectedMeasurements[0].CurrFrameNo - m_Header.MinFrame), true).ToString("0.00"));
 				}
 

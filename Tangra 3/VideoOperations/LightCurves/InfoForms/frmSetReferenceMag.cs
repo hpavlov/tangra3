@@ -87,7 +87,127 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 				m_Intensities[3] = m_Measurements[3].AdjustedReading;
 				label4.Text = m_Intensities[3].ToString("0.0");
 			}
+
+			rb1.Checked = false;
+			rb2.Checked = false;
+			rb3.Checked = false;
+			rb4.Checked = false;
 		}
 
+		private void ReferenceStartRadioButtonChanged(object sender, EventArgs e)
+		{
+			RadioButton rb = sender as RadioButton;
+			if (rb == null || !rb.Checked) return;
+
+			if (rb == rb1)
+			{
+				nudMag1.Enabled = true;
+
+				rb2.Checked = false;
+				rb3.Checked = false;
+				rb4.Checked = false;
+				nudMag2.Enabled = false;
+				nudMag3.Enabled = false;
+				nudMag4.Enabled = false;
+			}
+			else if (rb == rb2)
+			{
+				nudMag2.Enabled = true;
+
+				rb1.Checked = false;
+				rb3.Checked = false;
+				rb4.Checked = false;
+				nudMag1.Enabled = false;
+				nudMag3.Enabled = false;
+				nudMag4.Enabled = false;
+			}
+			else if (rb == rb3)
+			{
+				nudMag3.Enabled = true;
+
+				rb1.Checked = false;
+				rb2.Checked = false;
+				rb4.Checked = false;
+				nudMag1.Enabled = false;
+				nudMag2.Enabled = false;
+				nudMag4.Enabled = false;
+			}
+			else if (rb == rb4)
+			{
+				nudMag4.Enabled = true;
+
+				rb1.Checked = false;
+				rb2.Checked = false;
+				rb3.Checked = false;
+				nudMag1.Enabled = false;
+				nudMag2.Enabled = false;
+				nudMag3.Enabled = false;
+			}
+
+			RecalculateMagnitudes();
+		}
+
+		double m_RefMag = 12.0;
+		double m_RefIntensity = 1;
+		int m_RefIndex = 0;
+
+		private void RecalculateMagnitudes()
+		{
+			if (m_Intensities == null || m_Intensities.Length < 2) 
+				return;
+
+			if (nudMag1.Enabled)
+			{
+				m_RefMag = (double)nudMag1.Value;
+				m_RefIntensity = m_Intensities[0];
+				m_RefIndex = 1;
+			}
+			else if (nudMag2.Enabled)
+			{
+				m_RefMag = (double)nudMag2.Value;
+				m_RefIntensity = m_Intensities[1];
+				m_RefIndex = 2;
+			}
+			else if (nudMag3.Enabled)
+			{
+				m_RefMag = (double)nudMag3.Value;
+				m_RefIntensity = m_Intensities[2];
+				m_RefIndex = 3;
+			}
+			else if (nudMag4.Enabled)
+			{
+				m_RefMag = (double)nudMag4.Value;
+				m_RefIntensity = m_Intensities[3];
+				m_RefIndex = 4;
+			}
+
+			if (m_RefIndex != 1)
+				nudMag1.Value = (decimal)(m_RefMag - 2.5 * Math.Log10(m_Intensities[0] / m_RefIntensity));
+			if (m_Intensities.Length > 1 && m_RefIndex != 2)
+				nudMag2.Value = (decimal)(m_RefMag - 2.5 * Math.Log10(m_Intensities[1] / m_RefIntensity));
+			if (m_Intensities.Length > 2 && m_RefIndex != 3)
+				nudMag3.Value = (decimal)(m_RefMag - 2.5 * Math.Log10(m_Intensities[2] / m_RefIntensity));
+			if (m_Intensities.Length > 3 && m_RefIndex != 4)
+				nudMag4.Value = (decimal)(m_RefMag - 2.5 * Math.Log10(m_Intensities[3] / m_RefIntensity));
+		}
+
+		private void ReferenceMagnitudeChanged(object sender, EventArgs e)
+		{
+			NumericUpDown nud = sender as NumericUpDown;
+			if (nud == null || !nud.Enabled)
+				return;
+
+			RecalculateMagnitudes();
+		}
+
+		private void btnOK_Click(object sender, EventArgs e)
+		{
+			if (m_RefIndex > 0)
+			{
+				m_Context.MagnitudeConverter.SetReferenceMagnitude(m_RefIndex, m_RefMag);
+				DialogResult = DialogResult.OK;
+				Close();
+			}
+		}
 	}
 }
