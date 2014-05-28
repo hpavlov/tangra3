@@ -90,7 +90,7 @@ namespace Tangra.Config.SettingPannels
             m_DisplaySettings.SmallGraphFocusBackgroundBrushColor = cpFocusArea.SelectedColor;
         	m_DisplaySettings.SelectionCursorColor = cpSelectionCursor.SelectedColor;
 
-            m_DisplaySettings.Initialize();                
+            m_DisplaySettings.Initialize();
         }
 
         private void btnOk_Click(object sender, EventArgs e)

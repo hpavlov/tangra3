@@ -33,9 +33,14 @@
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tpTags = new System.Windows.Forms.TabPage();
             this.dgvFileTags = new System.Windows.Forms.DataGridView();
+            this.tagDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.valueDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.advTagValuePairBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.tpSummary = new System.Windows.Forms.TabPage();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.dgvImageTags = new System.Windows.Forms.DataGridView();
+            this.dataGridViewTextBoxColumn3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.label7 = new System.Windows.Forms.Label();
             this.lblBpp = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
@@ -49,6 +54,8 @@
             this.columnstType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.dgvLayoutTags = new System.Windows.Forms.DataGridView();
+            this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.lvImageLayouts = new System.Windows.Forms.ListView();
             this.columnId = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnBpp = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -100,6 +107,7 @@
             this.gbxConvertToAVI = new System.Windows.Forms.GroupBox();
             this.pbar2 = new System.Windows.Forms.ProgressBar();
             this.pnlToAviConfig = new System.Windows.Forms.Panel();
+            this.button1 = new System.Windows.Forms.Button();
             this.cbxAddedGamma = new System.Windows.Forms.ComboBox();
             this.label23 = new System.Windows.Forms.Label();
             this.label22 = new System.Windows.Forms.Label();
@@ -120,17 +128,10 @@
             this.timerScrolling = new System.Windows.Forms.Timer(this.components);
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.saveAviFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.tagDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.valueDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.advTagValuePairBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.dataGridViewTextBoxColumn3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.button1 = new System.Windows.Forms.Button();
             this.tabControl.SuspendLayout();
             this.tpTags.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvFileTags)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.advTagValuePairBindingSource)).BeginInit();
             this.tpSummary.SuspendLayout();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvImageTags)).BeginInit();
@@ -152,7 +153,6 @@
             this.pnlCropChooseFrames.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudCropFirstFrame)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudCropLastFrame)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.advTagValuePairBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl
@@ -193,6 +193,28 @@
             this.dgvFileTags.ReadOnly = true;
             this.dgvFileTags.Size = new System.Drawing.Size(666, 485);
             this.dgvFileTags.TabIndex = 8;
+            // 
+            // tagDataGridViewTextBoxColumn
+            // 
+            this.tagDataGridViewTextBoxColumn.DataPropertyName = "Tag";
+            this.tagDataGridViewTextBoxColumn.FillWeight = 250F;
+            this.tagDataGridViewTextBoxColumn.HeaderText = "Tag";
+            this.tagDataGridViewTextBoxColumn.Name = "tagDataGridViewTextBoxColumn";
+            this.tagDataGridViewTextBoxColumn.ReadOnly = true;
+            this.tagDataGridViewTextBoxColumn.Width = 250;
+            // 
+            // valueDataGridViewTextBoxColumn
+            // 
+            this.valueDataGridViewTextBoxColumn.DataPropertyName = "Value";
+            this.valueDataGridViewTextBoxColumn.FillWeight = 350F;
+            this.valueDataGridViewTextBoxColumn.HeaderText = "Value";
+            this.valueDataGridViewTextBoxColumn.Name = "valueDataGridViewTextBoxColumn";
+            this.valueDataGridViewTextBoxColumn.ReadOnly = true;
+            this.valueDataGridViewTextBoxColumn.Width = 350;
+            // 
+            // advTagValuePairBindingSource
+            // 
+            this.advTagValuePairBindingSource.DataSource = typeof(Tangra.Video.AstroDigitalVideo.UI.AdvTagValuePair);
             // 
             // tpSummary
             // 
@@ -242,6 +264,24 @@
             this.dgvImageTags.ReadOnly = true;
             this.dgvImageTags.Size = new System.Drawing.Size(320, 170);
             this.dgvImageTags.TabIndex = 23;
+            // 
+            // dataGridViewTextBoxColumn3
+            // 
+            this.dataGridViewTextBoxColumn3.DataPropertyName = "Tag";
+            this.dataGridViewTextBoxColumn3.FillWeight = 125F;
+            this.dataGridViewTextBoxColumn3.HeaderText = "Tag";
+            this.dataGridViewTextBoxColumn3.Name = "dataGridViewTextBoxColumn3";
+            this.dataGridViewTextBoxColumn3.ReadOnly = true;
+            this.dataGridViewTextBoxColumn3.Width = 125;
+            // 
+            // dataGridViewTextBoxColumn4
+            // 
+            this.dataGridViewTextBoxColumn4.DataPropertyName = "Value";
+            this.dataGridViewTextBoxColumn4.FillWeight = 150F;
+            this.dataGridViewTextBoxColumn4.HeaderText = "Value";
+            this.dataGridViewTextBoxColumn4.Name = "dataGridViewTextBoxColumn4";
+            this.dataGridViewTextBoxColumn4.ReadOnly = true;
+            this.dataGridViewTextBoxColumn4.Width = 150;
             // 
             // label7
             // 
@@ -367,6 +407,24 @@
             this.dgvLayoutTags.ReadOnly = true;
             this.dgvLayoutTags.Size = new System.Drawing.Size(466, 166);
             this.dgvLayoutTags.TabIndex = 9;
+            // 
+            // dataGridViewTextBoxColumn1
+            // 
+            this.dataGridViewTextBoxColumn1.DataPropertyName = "Tag";
+            this.dataGridViewTextBoxColumn1.FillWeight = 150F;
+            this.dataGridViewTextBoxColumn1.HeaderText = "Tag";
+            this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
+            this.dataGridViewTextBoxColumn1.ReadOnly = true;
+            this.dataGridViewTextBoxColumn1.Width = 150;
+            // 
+            // dataGridViewTextBoxColumn2
+            // 
+            this.dataGridViewTextBoxColumn2.DataPropertyName = "Value";
+            this.dataGridViewTextBoxColumn2.FillWeight = 250F;
+            this.dataGridViewTextBoxColumn2.HeaderText = "Value";
+            this.dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
+            this.dataGridViewTextBoxColumn2.ReadOnly = true;
+            this.dataGridViewTextBoxColumn2.Width = 250;
             // 
             // lvImageLayouts
             // 
@@ -877,6 +935,17 @@
             this.pnlToAviConfig.Size = new System.Drawing.Size(613, 64);
             this.pnlToAviConfig.TabIndex = 7;
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(371, 38);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(178, 23);
+            this.button1.TabIndex = 11;
+            this.button1.Text = "Save Simulated Video";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Visible = false;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // cbxAddedGamma
             // 
             this.cbxAddedGamma.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -1055,74 +1124,6 @@
             this.saveAviFileDialog.Filter = "AVI Files (*.avi)|*.avi|All Files (*.*)|*.*";
             this.saveAviFileDialog.Title = "Save file as ...";
             // 
-            // tagDataGridViewTextBoxColumn
-            // 
-            this.tagDataGridViewTextBoxColumn.DataPropertyName = "Tag";
-            this.tagDataGridViewTextBoxColumn.FillWeight = 250F;
-            this.tagDataGridViewTextBoxColumn.HeaderText = "Tag";
-            this.tagDataGridViewTextBoxColumn.Name = "tagDataGridViewTextBoxColumn";
-            this.tagDataGridViewTextBoxColumn.ReadOnly = true;
-            this.tagDataGridViewTextBoxColumn.Width = 250;
-            // 
-            // valueDataGridViewTextBoxColumn
-            // 
-            this.valueDataGridViewTextBoxColumn.DataPropertyName = "Value";
-            this.valueDataGridViewTextBoxColumn.FillWeight = 350F;
-            this.valueDataGridViewTextBoxColumn.HeaderText = "Value";
-            this.valueDataGridViewTextBoxColumn.Name = "valueDataGridViewTextBoxColumn";
-            this.valueDataGridViewTextBoxColumn.ReadOnly = true;
-            this.valueDataGridViewTextBoxColumn.Width = 350;
-            // 
-            // advTagValuePairBindingSource
-            // 
-            this.advTagValuePairBindingSource.DataSource = typeof(Tangra.Video.AstroDigitalVideo.UI.AdvTagValuePair);
-            // 
-            // dataGridViewTextBoxColumn3
-            // 
-            this.dataGridViewTextBoxColumn3.DataPropertyName = "Tag";
-            this.dataGridViewTextBoxColumn3.FillWeight = 125F;
-            this.dataGridViewTextBoxColumn3.HeaderText = "Tag";
-            this.dataGridViewTextBoxColumn3.Name = "dataGridViewTextBoxColumn3";
-            this.dataGridViewTextBoxColumn3.ReadOnly = true;
-            this.dataGridViewTextBoxColumn3.Width = 125;
-            // 
-            // dataGridViewTextBoxColumn4
-            // 
-            this.dataGridViewTextBoxColumn4.DataPropertyName = "Value";
-            this.dataGridViewTextBoxColumn4.FillWeight = 150F;
-            this.dataGridViewTextBoxColumn4.HeaderText = "Value";
-            this.dataGridViewTextBoxColumn4.Name = "dataGridViewTextBoxColumn4";
-            this.dataGridViewTextBoxColumn4.ReadOnly = true;
-            this.dataGridViewTextBoxColumn4.Width = 150;
-            // 
-            // dataGridViewTextBoxColumn1
-            // 
-            this.dataGridViewTextBoxColumn1.DataPropertyName = "Tag";
-            this.dataGridViewTextBoxColumn1.FillWeight = 150F;
-            this.dataGridViewTextBoxColumn1.HeaderText = "Tag";
-            this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
-            this.dataGridViewTextBoxColumn1.ReadOnly = true;
-            this.dataGridViewTextBoxColumn1.Width = 150;
-            // 
-            // dataGridViewTextBoxColumn2
-            // 
-            this.dataGridViewTextBoxColumn2.DataPropertyName = "Value";
-            this.dataGridViewTextBoxColumn2.FillWeight = 250F;
-            this.dataGridViewTextBoxColumn2.HeaderText = "Value";
-            this.dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
-            this.dataGridViewTextBoxColumn2.ReadOnly = true;
-            this.dataGridViewTextBoxColumn2.Width = 250;
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(371, 38);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(178, 23);
-            this.button1.TabIndex = 11;
-            this.button1.Text = "Save Simulated Video";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
             // frmAdvViewer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1140,6 +1141,7 @@
             this.tabControl.ResumeLayout(false);
             this.tpTags.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgvFileTags)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.advTagValuePairBindingSource)).EndInit();
             this.tpSummary.ResumeLayout(false);
             this.tpSummary.PerformLayout();
             this.groupBox3.ResumeLayout(false);
@@ -1167,7 +1169,6 @@
             this.pnlCropChooseFrames.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudCropFirstFrame)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudCropLastFrame)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.advTagValuePairBindingSource)).EndInit();
             this.ResumeLayout(false);
 
 		}

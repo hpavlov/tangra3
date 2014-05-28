@@ -24,6 +24,7 @@ namespace Tangra.Config.SettingPannels
 			cpPhotometryComparison1.SelectedColor = TangraConfig.Settings.Color.Target2;
 			cpPhotometryComparison2.SelectedColor = TangraConfig.Settings.Color.Target3;
 			cpPhotometryComparison3.SelectedColor = TangraConfig.Settings.Color.Target4;
+            cbxAllowMagnitudeDisplay.Checked = TangraConfig.Settings.Special.AllowLCMagnitudeDisplay;
         }
 
         public override void SaveSettings()
@@ -33,6 +34,7 @@ namespace Tangra.Config.SettingPannels
 			TangraConfig.Settings.Color.Target2 = cpPhotometryComparison1.SelectedColor;
 			TangraConfig.Settings.Color.Target3 = cpPhotometryComparison2.SelectedColor;
 			TangraConfig.Settings.Color.Target4 = cpPhotometryComparison3.SelectedColor;
+            TangraConfig.Settings.Special.AllowLCMagnitudeDisplay = cbxAllowMagnitudeDisplay.Checked;
         }
 	}
 }

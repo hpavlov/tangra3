@@ -1412,7 +1412,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 		private void CleanUpAllReadings(List<List<LCMeasurement>> dataList)
 		{
-			foreach (List<LCMeasurement> list in dataList) list.Clear();        
+			foreach (List<LCMeasurement> list in dataList) list.Clear();
 		}
 
 		private void frmLightCurve_Resize(object sender, EventArgs e)
@@ -2259,6 +2259,7 @@ namespace Tangra.VideoOperations.LightCurves
 			ReloadAddins();
 
 			miOutlierRemoval.Checked = true;
+		    btnSetMags.Visible = TangraConfig.Settings.Special.AllowLCMagnitudeDisplay;
 		}
 
 		public void ReloadAddins()

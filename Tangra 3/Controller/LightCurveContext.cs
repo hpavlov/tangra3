@@ -95,7 +95,7 @@ namespace Tangra.Controller
 
 		public bool CustomBinning { get; set; }
 
-		private bool m_OutlierRemoval = true;
+		private bool m_OutlierRemoval = false;
 		public string[] m_ObjectTitles = new string[4];
 		public string[] m_ChartTitleLines;
 

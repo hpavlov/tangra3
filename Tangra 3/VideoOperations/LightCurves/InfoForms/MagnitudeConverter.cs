@@ -21,6 +21,11 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 			get { return m_ReferenceIndex > -1; }
 		}
 
+        public double[] GetReferenceMagnitudes()
+        {
+            return m_ReferenceMagnitudes;
+        }
+
 		internal double[] ComputeMagnitudes(LCMeasurement[] mesurements)
 		{
 			var rv = new double[mesurements.Length];

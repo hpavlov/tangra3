@@ -59,6 +59,14 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 				m_Measurements = measurements;
 
 			m_Intensities = new double[m_Measurements.Length];
+            double[] referenceMags = new double[] { double.NaN, double.NaN, double.NaN, double.NaN };
+		    double[] calculatedMags = new double[] {double.NaN, double.NaN, double.NaN, double.NaN};
+
+            if (m_Context.MagnitudeConverter.CanComputeMagnitudes)
+            {
+                referenceMags = m_Context.MagnitudeConverter.GetReferenceMagnitudes();
+                calculatedMags = m_Context.MagnitudeConverter.ComputeMagnitudes(m_Measurements);
+            }
 
 			if (m_Measurements.Length > 0)
 			{
@@ -92,6 +100,27 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 			rb2.Checked = false;
 			rb3.Checked = false;
 			rb4.Checked = false;
+
+		    if (m_Measurements.Length > 0 && !double.IsNaN(referenceMags[0]))
+		    {
+                nudMag1.Value = (decimal)calculatedMags[0];
+		        rb1.Checked = true;
+		    }
+            if (m_Measurements.Length > 1 && !double.IsNaN(referenceMags[1]))
+            {
+                nudMag2.Value = (decimal)calculatedMags[1];
+                rb2.Checked = true;
+            }
+            if (m_Measurements.Length > 2 && !double.IsNaN(referenceMags[2]))
+            {
+                nudMag3.Value = (decimal)calculatedMags[2];
+                rb3.Checked = true;
+            }
+            if (m_Measurements.Length > 3 && !double.IsNaN(referenceMags[3]))
+            {
+                nudMag4.Value = (decimal)calculatedMags[3];
+                rb4.Checked = true;
+            }
 		}
 
 		private void ReferenceStartRadioButtonChanged(object sender, EventArgs e)

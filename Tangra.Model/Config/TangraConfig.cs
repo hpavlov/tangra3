@@ -497,7 +497,9 @@ namespace Tangra.Model.Config
 					LostTrackingPositionToleranceCoeff = CONST_LostTrackingPositionToleranceCoeff[m_LostTrackingToleranceLevel];
 				}
 			}
-			#endregion			
+			#endregion
+
+		    public bool AllowLCMagnitudeDisplay = false;
 		}
 
 		public enum OnOpenOperation

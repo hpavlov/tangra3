@@ -36,13 +36,19 @@ namespace Tangra.Controls
             }
         }
 
+        private object m_SyncLock = new object();
+
         Bitmap image;
         public Bitmap Image
         {
             get { return image; }
             set 
             {
-                image = value;
+                lock (m_SyncLock)
+                {
+                    image = value;
+                }
+
                 displayScrollbar();
                 setScrollbarValues(); 
                 Invalidate();
@@ -74,33 +80,39 @@ namespace Tangra.Controls
         {
              base.OnPaint(e);
 
-            //draw image
-            if(image!=null)
+            
+            if(image != null)
             {
-                Rectangle srcRect,distRect;
+                lock (m_SyncLock)
+                {
+                    if (image != null)
+                    {
+                        Rectangle srcRect, distRect;
 
-                Point pt=new Point((int)(hScrollBar1.Value),(int)(vScrollBar1.Value));
-	            if (canvasSize.Width < viewRectWidth && canvasSize.Height < viewRectHeight)
-	            {
-		            srcRect = new Rectangle(0, 0, canvasSize.Width, canvasSize.Height); // view all image
-		            if (viewRectWidth == canvasSize.Width + 1 && viewRectHeight == canvasSize.Height + 1)
-		            {
-			            e.Graphics.DrawImage(image, 0, 0);
-			            return;
-		            }
-	            }
-	            else
-		            srcRect = new Rectangle(pt, new Size((int) (viewRectWidth), (int) (viewRectHeight))); // view a portion of image
+                        Point pt = new Point((int)(hScrollBar1.Value), (int)(vScrollBar1.Value));
+                        if (canvasSize.Width < viewRectWidth && canvasSize.Height < viewRectHeight)
+                        {
+                            srcRect = new Rectangle(0, 0, canvasSize.Width, canvasSize.Height); // view all image
+                            if (viewRectWidth == canvasSize.Width + 1 && viewRectHeight == canvasSize.Height + 1)
+                            {
+                                e.Graphics.DrawImage(image, 0, 0);
+                                return;
+                            }
+                        }
+                        else
+                            srcRect = new Rectangle(pt, new Size((int)(viewRectWidth), (int)(viewRectHeight))); // view a portion of image
 
-	            distRect=new Rectangle((int)(-srcRect.Width/2),-srcRect.Height/2,srcRect.Width,srcRect.Height); // the center of apparent image is on origin
- 
-                Matrix mx=new Matrix(); // create an identity matrix
-                mx.Translate(viewRectWidth/2.0f,viewRectHeight/2.0f, MatrixOrder.Append); // move image to view window center
+                        distRect = new Rectangle((int)(-srcRect.Width / 2), -srcRect.Height / 2, srcRect.Width, srcRect.Height); // the center of apparent image is on origin
 
-                Graphics g=e.Graphics;
-                g.InterpolationMode=interMode;
-                g.Transform=mx;
-                g.DrawImage(image,distRect,srcRect, GraphicsUnit.Pixel);
+                        Matrix mx = new Matrix(); // create an identity matrix
+                        mx.Translate(viewRectWidth / 2.0f, viewRectHeight / 2.0f, MatrixOrder.Append); // move image to view window center
+
+                        Graphics g = e.Graphics;
+                        g.InterpolationMode = interMode;
+                        g.Transform = mx;
+                        g.DrawImage(image, distRect, srcRect, GraphicsUnit.Pixel);
+                    }
+                }
             }
 
         }
@@ -112,14 +124,20 @@ namespace Tangra.Controls
 
             if (image != null)
             {
-	            try
-	            {
-		            canvasSize = image.Size;
-	            }
-	            catch (ArgumentException)
-	            {
-		            return;
-	            }	            
+                lock (m_SyncLock)
+                {
+                    if (image != null)
+                    {
+                        try
+                        {
+                            canvasSize = image.Size;
+                        }
+                        catch (ArgumentException)
+                        {
+                            return;
+                        }
+                    }
+                }
             }
 
             // If the zoomed image is wider than view window, show the HScrollBar and adjust the view window
@@ -211,17 +229,26 @@ namespace Tangra.Controls
 
 		public Point GetImageLocation(Point mousePoint)
 		{
-			try
-			{
-				int x = mousePoint.X + (hScrollBar1.Visible ? hScrollBar1.Value : (this.Image != null && !vScrollBar1.Visible ? (this.Image.Width - viewRectWidth) / 2 : 0));
-				int y = mousePoint.Y + (vScrollBar1.Visible ? vScrollBar1.Value : (this.Image != null && !hScrollBar1.Visible ? (this.Image.Height - viewRectHeight) / 2 : 0));
+		    if (image != null)
+		    {
+		        lock (m_SyncLock)
+		        {
+		            if (image != null)
+		            {
+                        try
+                        {
+                            int x = mousePoint.X + (hScrollBar1.Visible ? hScrollBar1.Value : (this.Image != null && !vScrollBar1.Visible ? (this.Image.Width - viewRectWidth) / 2 : 0));
+                            int y = mousePoint.Y + (vScrollBar1.Visible ? vScrollBar1.Value : (this.Image != null && !hScrollBar1.Visible ? (this.Image.Height - viewRectHeight) / 2 : 0));
 
-				return new Point(x, y);
-			}
-			catch (ArgumentException)
-			{
-				return new Point(mousePoint.X, mousePoint.Y);
-			}
+                            return new Point(x, y);
+                        }
+                        catch (ArgumentException)
+                        { }
+		            }
+		        }
+		    }
+
+            return new Point(mousePoint.X, mousePoint.Y);
 		}
 
         private void vScrollBar1_Scroll(object sender, ScrollEventArgs e)
