@@ -83,6 +83,9 @@ namespace Tangra
                     ser.Serialize(wrt, TangraContext.Current.CrashReportInfo);
                     wrt.Flush();
                 }
+
+	            if (TangraContext.Current.CrashReportInfo.ReductionContext != null)
+		            crashReportInfo.Append("\r\n\r\n" + TangraContext.Current.CrashReportInfo.ReductionContext + "\r\n\r\n");
             }
 
 			var moduleInfo = new StringBuilder("\r\n\r\nLoaded modules:\r\n\r\n");

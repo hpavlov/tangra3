@@ -303,6 +303,12 @@
     <Compile Include="VideoOperations\LightCurves\ucCorrSelection.Designer.cs">
       <DependentUpon>ucCorrSelection.cs</DependentUpon>
     </Compile>
+    <Compile Include="VideoTools\frmGenerateVideoModel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoTools\frmGenerateVideoModel.Designer.cs">
+      <DependentUpon>frmGenerateVideoModel.cs</DependentUpon>
+    </Compile>
     <Compile Include="Video\AstroDigitalVideo\frmBuildingNtpTimebase.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -636,6 +642,9 @@
     <EmbeddedResource Include="VideoOperations\LightCurves\ucCorrSelection.resx">
       <DependentUpon>ucCorrSelection.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="VideoTools\frmGenerateVideoModel.resx">
+      <DependentUpon>frmGenerateVideoModel.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Video\AstroDigitalVideo\frmBuildingNtpTimebase.resx">
       <DependentUpon>frmBuildingNtpTimebase.cs</DependentUpon>
     </EmbeddedResource>
@@ -750,7 +759,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Model\" />
-    <Folder Include="Task\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="img\aboutbox4.bmp" />

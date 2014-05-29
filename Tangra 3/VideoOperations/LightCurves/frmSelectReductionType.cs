@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using Tangra;
 using Tangra.Config;
 using Tangra.Controller;
+using Tangra.Helpers;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
 using Tangra.Model.Video;
@@ -265,6 +266,7 @@ namespace Tangra.VideoOperations.LightCurves
 
             m_VideoContoller.RefreshCurrentFrame();
 
+			TangraContext.Current.CrashReportInfo.ReductionContext = LightCurveReductionContext.Instance.XmlSerialize();
 
             DialogResult = DialogResult.OK;
             Close();

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 using Tangra.Model.Helpers;
 using Tangra.VideoOperations.LightCurves;
 
@@ -70,6 +72,23 @@ namespace Tangra.Helpers
                     aperturePen,
                     rect.Left + (x0 - aperture + 0.5f) * coeff, rect.Top + (y0 - aperture + 0.5f) * coeff,
                     aperture * 2 * coeff, aperture * 2 * coeff);
+		}
+
+		public static string XmlSerialize<TType>(this TType instance) where TType: class
+		{
+			var ser = new XmlSerializer(typeof(TType));
+			var xmlSer = new StringBuilder();
+
+			if (instance != null)
+			{
+				using (TextWriter wrt = new StringWriter(xmlSer))
+				{
+					ser.Serialize(wrt, instance);
+					wrt.Flush();
+				}
+			}
+
+			return xmlSer.ToString();
 		}
 	}
 }

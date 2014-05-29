@@ -2257,9 +2257,13 @@ namespace Tangra.VideoOperations.LightCurves
 		private void frmLightCurve_Load(object sender, EventArgs e)
 		{
 			ReloadAddins();
+		}
 
-			miOutlierRemoval.Checked = true;
-		    btnSetMags.Visible = TangraConfig.Settings.Special.AllowLCMagnitudeDisplay;
+
+		private void frmLightCurve_Shown(object sender, EventArgs e)
+		{
+			miOutlierRemoval.Checked = m_LightCurveController.Context.OutlierRemoval;
+			btnSetMags.Visible = TangraConfig.Settings.Special.AllowLCMagnitudeDisplay;
 		}
 
 		public void ReloadAddins()
@@ -2341,5 +2345,6 @@ namespace Tangra.VideoOperations.LightCurves
 				// TODO: Set the magnitudes and repaint to show display the axis/scale
 			}
 		}
+
 	}
 }

@@ -4,7 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
-
+using System.Xml.Serialization;
 using Tangra.Config;
 using Tangra.Model.Config;
 using Tangra.Model.Image;
@@ -85,6 +85,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 	    public uint MaxPixelValue;
 
+		[XmlIgnore]
     	public IDisplayBitmapConverter DisplayBitmapConverterImpl = new DisplayBitmapConverter.DefaultDisplayBitmapConverter();
 
         public Rectangle OSDFrame;

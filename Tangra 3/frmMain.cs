@@ -31,6 +31,7 @@ using Tangra.Video;
 using Tangra.Video.AstroDigitalVideo;
 using Tangra.VideoOperations.LightCurves;
 using Tangra.VideoOperations.MakeDarkFlatField;
+using Tangra.VideoTools;
 using Tangra.View;
 using nom.tam.fits;
 using nom.tam.util;
@@ -75,6 +76,9 @@ namespace Tangra
 
 			m_AddinsController.LoadAddins();
 
+#if !WIN32
+			miVideoModelling.Visible = false;
+#endif
 			m_AutoUpdatesController.CheckForUpdates(false);
 		}
 
@@ -902,6 +906,12 @@ namespace Tangra
 		{
 			if (e.Data.GetDataPresent(DataFormats.FileDrop))
 				e.Effect = DragDropEffects.Copy;
+		}
+
+		private void miVideoModelling_Click(object sender, EventArgs e)
+		{
+			var frm = new frmGenerateVideoModel();
+			frm.ShowDialog(this);
 		}
 
 	}

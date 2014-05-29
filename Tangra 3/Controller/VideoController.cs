@@ -1224,6 +1224,7 @@ namespace Tangra.Controller
 			finally
 			{
 				m_VideoFileView.Update();
+				TangraContext.Current.CrashReportInfo.VideoOperation = m_CurrentOperation != null ? m_CurrentOperation.GetType().Name : null;
 			}
 		}
 

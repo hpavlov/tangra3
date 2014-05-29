@@ -1118,8 +1118,7 @@ namespace Tangra.VideoOperations.LightCurves
 				out usedTrackerType);
 
 			LightCurveReductionContext.Instance.UsedTracker = usedTrackerType;
-
-           
+	        TangraContext.Current.CrashReportInfo.Tracker = usedTrackerType;           
 
 			m_Tracker.InitializeNewTracking();
 
@@ -1882,7 +1881,7 @@ namespace Tangra.VideoOperations.LightCurves
 		}
 
 		internal void DoShowLightCurve(LCFile file)
-		{   
+		{
 			m_LightCurveController.EnsureLightCurveFormClosed();
 			m_VideoController.EnsureLightCurveForm();
 

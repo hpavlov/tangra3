@@ -4,12 +4,17 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 
 namespace Tangra.Model.Context
 {
     public class CrashReportInfo
     {
         public string VideoFile { get; set; }
+		public string VideoOperation { get; set; }		
+		public string Tracker { get; set; }
+		[XmlIgnore]
+		public string ReductionContext { get; set; }
     }
 
 	public class TangraContext
