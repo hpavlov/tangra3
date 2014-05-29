@@ -2332,7 +2332,9 @@ namespace Tangra.VideoOperations.LightCurves
 
 		private void miOutlierRemoval_CheckedChanged(object sender, EventArgs e)
 		{
-			m_LightCurveController.Context.OutlierRemoval = miOutlierRemoval.Checked;
+            if (m_LightCurveController.Context != null)
+			    m_LightCurveController.Context.OutlierRemoval = miOutlierRemoval.Checked;
+
 			pnlChart.Invalidate();
 		}
 
