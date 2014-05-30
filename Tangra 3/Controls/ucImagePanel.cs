@@ -95,7 +95,13 @@ namespace Tangra.Controls
                             srcRect = new Rectangle(0, 0, canvasSize.Width, canvasSize.Height); // view all image
                             if (viewRectWidth == canvasSize.Width + 1 && viewRectHeight == canvasSize.Height + 1)
                             {
-                                e.Graphics.DrawImage(image, 0, 0);
+                                try
+                                {
+                                    e.Graphics.DrawImage(image, 0, 0);
+                                }
+                                catch(ArgumentException)
+                                { }
+
                                 return;
                             }
                         }
@@ -110,7 +116,12 @@ namespace Tangra.Controls
                         Graphics g = e.Graphics;
                         g.InterpolationMode = interMode;
                         g.Transform = mx;
-                        g.DrawImage(image, distRect, srcRect, GraphicsUnit.Pixel);
+                        try
+                        {
+                            g.DrawImage(image, distRect, srcRect, GraphicsUnit.Pixel);
+                        }
+                        catch (ArgumentException)
+                        { }
                     }
                 }
             }

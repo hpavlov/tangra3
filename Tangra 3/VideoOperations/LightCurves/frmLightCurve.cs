@@ -1417,7 +1417,9 @@ namespace Tangra.VideoOperations.LightCurves
 
 		private void frmLightCurve_Resize(object sender, EventArgs e)
 		{
-            if (m_LightCurveController.Context != null) m_LightCurveController.Context.MarkDirtyNoFullReprocessing();
+            if (m_LightCurveController != null && m_LightCurveController.Context != null) 
+                m_LightCurveController.Context.MarkDirtyNoFullReprocessing();
+
 		    pnlChart.Invalidate();
 		}
 
