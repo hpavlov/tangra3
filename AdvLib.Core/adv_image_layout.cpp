@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <assert.h>
 
+#include "adv_cross_platform.h"
 #include "adv_profiling.h"
 
 namespace AdvLib

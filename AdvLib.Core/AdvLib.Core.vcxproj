@@ -221,6 +221,7 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="adv_cross_platform.h" />
     <ClInclude Include="adv_file.h" />
     <ClInclude Include="adv_frames_index.h" />
     <ClInclude Include="adv_image_layout.h" />
@@ -235,6 +236,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AdvLib.Core.cpp" />
+    <ClCompile Include="adv_cross_platform.cpp" />
     <ClCompile Include="adv_file.cpp" />
     <ClCompile Include="adv_frames_index.cpp" />
     <ClCompile Include="adv_image_layout.cpp" />
