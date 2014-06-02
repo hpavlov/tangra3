@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <vector>
 #include "utils.h"
-#include "adv_cross_platform.h"
+#include "cross_platform.h"
 #include "adv_profiling.h"
 
 using namespace std;

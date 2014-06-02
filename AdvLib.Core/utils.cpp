@@ -98,6 +98,7 @@ long long WindowsTicksToAavTicks(__int64 windowsTicks)
 
 void DebugViewPrint(const wchar_t* formatText, ...)
 {
+#ifdef MSVC	
 	wchar_t debug512CharBuffer[512];
     va_list args;
     va_start(args, formatText);
@@ -105,4 +106,5 @@ void DebugViewPrint(const wchar_t* formatText, ...)
     
 	OutputDebugString(debug512CharBuffer);
 	va_end(args);
+#endif	
 }

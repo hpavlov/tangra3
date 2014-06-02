@@ -90,3 +90,11 @@ _ReSharper.*
 /AdvLib.Core/x64/Release
 /Release
 /x64/Release
+/AdvLib.Core/*.tags
+/AdvLib.Core/*.hpavlov
+/AdvLib.Core/*.session
+/AdvLib.Core/AdvLib.Core_wsp.mk
+/AdvLib.Core/AdvLib/AdvLib.mk
+/AdvLib.Core/AdvLib/Debug
+/AdvLib.Core/.build-debug
+/AdvLib.Core/AdvLib/AdvLib.txt
