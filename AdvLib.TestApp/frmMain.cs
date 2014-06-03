@@ -29,6 +29,7 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 
@@ -346,6 +347,34 @@ namespace AdvLibTestApp
 			else
 			{
 				rbCamera16.Enabled = true;
+			}
+		}
+
+		[DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
+		static extern IntPtr LoadLibraryA(string lpFileName);
+
+		[DllImport("kernel32", CharSet = CharSet.Ansi, ExactSpelling = true, SetLastError = true)]
+		static extern IntPtr GetProcAddress(IntPtr hModule, string procName);
+
+		static class NativeMethods
+		{
+			[DllImport("kernel32.dll")]
+			public static extern IntPtr LoadLibrary(string dllToLoad);
+
+			[DllImport("kernel32.dll")]
+			public static extern IntPtr GetProcAddress(IntPtr hModule, string procedureName);
+
+
+			[DllImport("kernel32.dll")]
+			public static extern bool FreeLibrary(IntPtr hModule);
+		}
+
+		private void btnVerifyLibrary_Click(object sender, EventArgs e)
+		{
+			if (openFileDialog1.ShowDialog(this) == DialogResult.OK)
+			{
+
+
 			}
 		}
 	}

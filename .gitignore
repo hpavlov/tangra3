@@ -98,3 +98,11 @@ _ReSharper.*
 /AdvLib.Core/AdvLib/Debug
 /AdvLib.Core/.build-debug
 /AdvLib.Core/AdvLib/AdvLib.txt
+/AdvLib.Core/AdvLib_Win32.txt
+/AdvLib.Core/AdvLic.Core.Win32.tags
+/AdvLib.Core/AdvLic.Core.Win32.workspace.hpavlov
+/AdvLib.Core/AdvLic.Core.Win32.workspace.session
+/AdvLib.Core/AdvLic.Core.Win32_wsp.mk
+/AdvLib.Core/AdvLib.Core.vcxproj.user
+/AdvLib.Core/AdvLib_Win32.mk
+/AdvLib.Core/.build-release

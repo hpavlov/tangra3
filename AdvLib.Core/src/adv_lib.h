@@ -7,7 +7,11 @@ extern char* g_CurrentAdvFile;
 extern AdvLib::AdvFile* g_AdvFile;
 extern bool g_FileStarted;
 
-		
+#ifdef __cplusplus
+extern "C"
+{
+#endif 
+
 DLL_PUBLIC char* AdvGetCurrentFilePath(void);
 DLL_PUBLIC void AdvNewFile(const char* fileName);
 DLL_PUBLIC void AdvDefineImageSection(unsigned short width, unsigned short height, unsigned char dataBpp);
@@ -28,5 +32,9 @@ DLL_PUBLIC void AdvFrameAddStatusTag32(unsigned int tagIndex, unsigned long tagV
 DLL_PUBLIC void AdvFrameAddStatusTag64(unsigned int tagIndex, long long tagValue);
 DLL_PUBLIC void AdvEndFrame();
 
+#ifdef __cplusplus
+}
+#endif
+ 
 #endif
 

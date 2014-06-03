@@ -43,6 +43,8 @@
 			this.rbCamera12 = new System.Windows.Forms.RadioButton();
 			this.rbCamera16 = new System.Windows.Forms.RadioButton();
 			this.cbxCompress = new System.Windows.Forms.CheckBox();
+			this.btnVerifyLibrary = new System.Windows.Forms.Button();
+			this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.groupBox3.SuspendLayout();
@@ -218,11 +220,28 @@
 			this.cbxCompress.Text = "Use Image Compression";
 			this.cbxCompress.UseVisualStyleBackColor = true;
 			// 
+			// btnVerifyLibrary
+			// 
+			this.btnVerifyLibrary.Location = new System.Drawing.Point(380, 189);
+			this.btnVerifyLibrary.Name = "btnVerifyLibrary";
+			this.btnVerifyLibrary.Size = new System.Drawing.Size(132, 23);
+			this.btnVerifyLibrary.TabIndex = 9;
+			this.btnVerifyLibrary.Text = "Verify Library";
+			this.btnVerifyLibrary.UseVisualStyleBackColor = true;
+			this.btnVerifyLibrary.Click += new System.EventHandler(this.btnVerifyLibrary_Click);
+			// 
+			// openFileDialog1
+			// 
+			this.openFileDialog1.DefaultExt = "dll";
+			this.openFileDialog1.FileName = "Open Adv.Core dll";
+			this.openFileDialog1.Filter = "Dynamic Link Libraries (*.dll)|*.dll";
+			// 
 			// frmMain
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(541, 224);
+			this.ClientSize = new System.Drawing.Size(541, 233);
+			this.Controls.Add(this.btnVerifyLibrary);
 			this.Controls.Add(this.cbxCompress);
 			this.Controls.Add(this.groupBox3);
 			this.Controls.Add(this.groupBox2);
@@ -259,6 +278,8 @@
 		private System.Windows.Forms.RadioButton rbCamera12;
 		private System.Windows.Forms.RadioButton rbCamera16;
 		private System.Windows.Forms.CheckBox cbxCompress;
+		private System.Windows.Forms.Button btnVerifyLibrary;
+		private System.Windows.Forms.OpenFileDialog openFileDialog1;
 	}
 }
 
