@@ -1362,24 +1362,25 @@ namespace Tangra.VideoOperations.LightCurves
 
 						TangraContext.Current.CanPlayVideo = false;
 						TangraContext.Current.CanScrollFrames = false;
-						m_VideoController.UpdateViews();
 					}
 
 					m_VideoController.UIThreadInvoke(() =>
-						{
-							m_VideoController.StatusChanged("Stopped");
+					{
+						m_VideoController.UpdateViews();
 
-							// Allow correction of the tracking
-							CorrectTrackingTool correctTrackingTool =
-								m_VideoController.SelectImageTool<CorrectTrackingTool>() as CorrectTrackingTool;
-							if (correctTrackingTool != null)
-								correctTrackingTool.Initialize(this, m_Tracker, m_VideoController);
+						m_VideoController.StatusChanged("Stopped");
 
-							m_StateMachine.m_HasBeenPaused = true;
+						// Allow correction of the tracking
+						CorrectTrackingTool correctTrackingTool =
+							m_VideoController.SelectImageTool<CorrectTrackingTool>() as CorrectTrackingTool;
+						if (correctTrackingTool != null)
+							correctTrackingTool.Initialize(this, m_Tracker, m_VideoController);
 
-							callback(correctTrackingTool);
+						m_StateMachine.m_HasBeenPaused = true;
 
-						});
+						callback(correctTrackingTool);
+
+					});
 				});
         }
 
