@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -71,6 +73,8 @@ namespace Tangra.Controller
 		private int m_HBMTarget3Y = 0;
 		private int m_HBMTarget4X = 0;
 		private int m_HBMTarget4Y = 0;
+
+		private List<Action<int, bool>> m_OnStoppedCallbacks = new List<Action<int, bool>>();
 
 		public VideoController(Form mainFormView, VideoFileView videoFileView, ZoomedImageView zoomedImageView, ImageToolView imageToolView, Panel pnlControlerPanel)
 		{
@@ -598,9 +602,9 @@ namespace Tangra.Controller
 			m_FramePlayer.StepForward(seconds);
 		}
 
-		public void PlayVideo()
+		public void PlayVideo(int? startAtFrame = null)
 		{
-			m_FramePlayer.Start(FramePlaySpeed.Fastest, 1);
+			m_FramePlayer.Start(FramePlaySpeed.Fastest, startAtFrame, 1);
 
 			m_VideoFileView.Update();
 		}
@@ -610,8 +614,11 @@ namespace Tangra.Controller
             get { return m_FramePlayer.CurrentFrameIndex; }
         }
 
-		public void StopVideo()
+		public void StopVideo(Action<int, bool> callback = null)
 		{
+			if (callback != null)
+				m_OnStoppedCallbacks.Add(callback);
+
 			m_FramePlayer.Stop();
 
 			OnVideoPlayerStopped();
@@ -673,6 +680,11 @@ namespace Tangra.Controller
 			//    }
 			//    m_ZoomedImageView.Invalidate();
 			//}
+		}
+
+		public void UIThreadInvoke(Action callback)
+		{
+			m_MainForm.Invoke(new Action(callback));
 		}
 
         public void UpdateZoomedImage(Bitmap zoomedBitmap)
@@ -738,13 +750,28 @@ namespace Tangra.Controller
 			UpdateViews();
 		}
 
-		void IVideoFrameRenderer.PlayerStopped()
+		void IVideoFrameRenderer.PlayerStopped(int lastDisplayedFrame, bool userStopRequest)
 		{
 			OnVideoPlayerStopped();
 
 			try
 			{
-				m_WinControl.Invoke(new FramePlayer.SimpleDelegate(m_FrameRenderer.PlayerStopped));
+				//Trace.WriteLine(string.Format("FramePlayer: Stoped at frame {0}. User requested stop: {1}", lastDisplayedFrame, userStopRequest));
+
+				foreach (Action<int, bool> callback in m_OnStoppedCallbacks)
+				{
+					try
+					{
+						callback(lastDisplayedFrame, userStopRequest);
+					}
+					catch (Exception ex)
+					{
+						Trace.WriteLine(ex);
+					}
+				}
+				m_OnStoppedCallbacks.Clear();
+
+				m_WinControl.Invoke(new Action<int, bool>(m_FrameRenderer.PlayerStopped), new object[] { lastDisplayedFrame, userStopRequest});
 			}
 			catch (ObjectDisposedException)
 			{ }

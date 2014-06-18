@@ -62,6 +62,13 @@ namespace Tangra.VideoOperations.LightCurves
         private readonly Pen[] m_AllPens = new Pen[4];
         private readonly Brush[] m_AllBrushes = new Brush[4];
 
+	    private uint[] m_LastTotalReading = new uint[4];
+	    private uint[] m_LastTotalBackground = new uint[4];
+	    private float[] m_LastApertureX = new float[4];
+		private float[] m_LastApertureY = new float[4];
+		private float[] m_LastApertureSize = new float[4];
+	    private DateTime[] m_LastOCRedTimeStamp = new DateTime[4];
+
         internal int m_CurrFrameNo = -1;
         private int m_FirstMeasuredFrame;
         internal uint m_MinFrame;
@@ -212,11 +219,12 @@ namespace Tangra.VideoOperations.LightCurves
 		}
 
         internal byte FrameBackgroundMode = 0;
-        private int m_PrevMeasuredFrame = -1;
+        internal int m_PrevMeasuredFrame = -1;
 
         public void NextFrame(int frameNo, MovementType movementType, bool isLastFrame, AstroImage astroImage, int firstFrameInIntegrationPeriod)
         {
             m_AstroImage = astroImage;
+			m_CurrFrameNo = frameNo;
 
             if (m_Correcting)
                 // Do not track or process the frame while correcting the tracking
@@ -228,7 +236,6 @@ namespace Tangra.VideoOperations.LightCurves
                 if (frameNo != m_StateMachine.SelectedObjectFrameNo) m_StateMachine.SelectedObject = null;
             }
 
-            m_CurrFrameNo = frameNo;
             uint[] osdPixels = null;
             if (m_Refining || m_Measuring)
             {
@@ -280,7 +287,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 						if (TangraConfig.Settings.Tracking.PopUpOnLostTracking)
 							m_VideoController.ShowMessageBox(
-								"Use the mouse to pan the object apertures back to the object location and press 'Continue' to continue with the measurements.",
+								"Use the mouse to pan the object apertures back to the object location and press 'Continue' to continue with the measurements. You can also do adjustments to the objects individually or skip the frame all together.",
 								"Tracking has been lost",
 								MessageBoxButtons.OK, 
 								MessageBoxIcon.Exclamation);
@@ -396,7 +403,7 @@ namespace Tangra.VideoOperations.LightCurves
 			m_ManualTrackingDeltaY[targetId] = deltaY;
         }
 
-        private bool m_Measuring = false;
+        internal bool m_Measuring = false;
         private bool m_Configuring = false;
         private bool m_Refining = false;
         private bool m_Correcting = false;
@@ -1327,7 +1334,7 @@ namespace Tangra.VideoOperations.LightCurves
 		        m_ManualTrackingDeltaY[i] = 0;
 	        }
 
-			m_VideoController.PlayVideo();
+			m_VideoController.PlayVideo(continueAtFrame);
 
 			m_VideoController.StatusChanged("Measuring");
 
@@ -1335,29 +1342,45 @@ namespace Tangra.VideoOperations.LightCurves
 			m_VideoController.SelectImageTool<ArrowTool>();
         }
 
-		public CorrectTrackingTool StopMeasurements()
-        {
-			m_Measuring = true;
-			m_Correcting = true;
-			m_Refining = false;
-			m_ViewingLightCurve = false;
-			m_Configuring = false;
+	    private bool m_StopMeasurementsRequested = false;
 
-			m_VideoController.StopVideo();
-			m_VideoController.StatusChanged("Stopped");
+		public void StopMeasurements(Action<CorrectTrackingTool> callback)
+		{
+			m_StopMeasurementsRequested = true;
 
-			TangraContext.Current.CanPlayVideo = false;
-			TangraContext.Current.CanScrollFrames = false;
-			m_VideoController.UpdateViews();
+			m_VideoController.StopVideo((lastFrame, userRequest) =>
+				{
+					if (m_StopMeasurementsRequested)
+					{
+						m_StopMeasurementsRequested = false;
 
-			// Allow correction of the tracking
-			CorrectTrackingTool correctTrackingTool = m_VideoController.SelectImageTool<CorrectTrackingTool>() as CorrectTrackingTool;
-			if (correctTrackingTool != null)
-				correctTrackingTool.Initialize(this, m_Tracker, m_VideoController);
+						m_Measuring = true;
+						m_Correcting = true;
+						m_Refining = false;
+						m_ViewingLightCurve = false;
+						m_Configuring = false;
 
-			m_StateMachine.m_HasBeenPaused = true;
+						TangraContext.Current.CanPlayVideo = false;
+						TangraContext.Current.CanScrollFrames = false;
+						m_VideoController.UpdateViews();
+					}
 
-			return correctTrackingTool;
+					m_VideoController.UIThreadInvoke(() =>
+						{
+							m_VideoController.StatusChanged("Stopped");
+
+							// Allow correction of the tracking
+							CorrectTrackingTool correctTrackingTool =
+								m_VideoController.SelectImageTool<CorrectTrackingTool>() as CorrectTrackingTool;
+							if (correctTrackingTool != null)
+								correctTrackingTool.Initialize(this, m_Tracker, m_VideoController);
+
+							m_StateMachine.m_HasBeenPaused = true;
+
+							callback(correctTrackingTool);
+
+						});
+				});
         }
 
         public void FinishedWithMeasurements()
@@ -1777,6 +1800,13 @@ namespace Tangra.VideoOperations.LightCurves
 				measuredObject.ApertureY = measurer.YCenter;
 				measuredObject.ApertureSize = measurer.Aperture;
 
+				m_LastTotalReading[trackedObject.TargetNo] = measuredObject.TotalReading;
+				m_LastTotalBackground[trackedObject.TargetNo] = measuredObject.TotalBackground;
+				m_LastApertureX[trackedObject.TargetNo] = measuredObject.ApertureX;
+				m_LastApertureY[trackedObject.TargetNo] = measuredObject.ApertureY;
+				m_LastApertureSize[trackedObject.TargetNo] = measuredObject.ApertureSize;
+				m_LastOCRedTimeStamp[trackedObject.TargetNo] = measuredObject.OSDTimeStamp;
+
 				LCFile.SaveOnTheFlyMeasurement(measuredObject);
 			}
 			finally
@@ -1983,6 +2013,70 @@ namespace Tangra.VideoOperations.LightCurves
 
             return true;
         }
+
+		internal int SkipCurrentFrame(bool synchronise)
+		{
+			if (m_VideoController.CurrentFrameIndex < m_VideoController.VideoLastFrame)
+			{
+				m_TotalFrames++;
+
+				m_ProcessedFrames++;
+				if (!m_Tracker.IsTrackedSuccessfully) m_UnsuccessfulFrames++;
+				if (m_Tracker.IsTrackedSuccessfully && m_Tracker.TrackedObjects.Any(x => !x.IsLocated))
+					m_PartiallySuccessfulFrames++;
+
+				SaveEmbeddedOrORCedTimeStamp(m_CurrFrameNo);
+
+				m_PrevMeasuredFrame = m_CurrFrameNo;
+
+				foreach (ITrackedObject trackedObject in m_Tracker.TrackedObjects)
+				{
+					IImagePixel center = trackedObject.LastKnownGoodPosition;
+
+					uint[,] data = m_VideoController.GetCurrentAstroImage(false).GetMeasurableAreaPixels((int)Math.Round(center.XDouble), (int)Math.Round(center.YDouble), 35);
+
+					var measuredObject = new LCMeasurement()
+					{
+						CurrFrameNo = (uint)m_CurrFrameNo,
+						TargetNo = (byte)trackedObject.TargetNo,
+						X0 = (float)center.XDouble,
+						Y0 = (float)center.YDouble,
+						PixelDataX0 = center.X,
+						PixelDataY0 = center.Y,
+						OSDTimeStamp = m_OCRedTimeStamp,
+						FlagsDWORD = 7 /* FitSuspectAsNoGuidingStarsAreLocated */,
+						PixelData = data,
+						PsfGroupId = trackedObject.OriginalObject.GroupId
+					};
+
+					bool lockTaken = false;
+					 
+					if (synchronise)
+						m_WriterLock.TryEnter(ref lockTaken);
+
+					try
+					{
+						measuredObject.TotalReading = m_LastTotalReading[trackedObject.TargetNo];
+						measuredObject.TotalBackground = m_LastTotalBackground[trackedObject.TargetNo];
+						measuredObject.ApertureX = m_LastApertureX[trackedObject.TargetNo];
+						measuredObject.ApertureY = m_LastApertureY[trackedObject.TargetNo];
+						measuredObject.ApertureSize = m_LastApertureSize[trackedObject.TargetNo];
+						measuredObject.OSDTimeStamp = m_LastOCRedTimeStamp[trackedObject.TargetNo]; 
+
+						LCFile.SaveOnTheFlyMeasurement(measuredObject);
+					}
+					finally
+					{
+						if (synchronise && lockTaken)
+							m_WriterLock.Exit();
+					}
+				}
+
+				m_VideoController.StepForward();
+			}
+
+			return m_CurrFrameNo;
+		}
     }
 
     internal enum MeasuringZoomImageType

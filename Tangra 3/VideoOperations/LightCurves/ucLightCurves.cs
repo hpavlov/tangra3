@@ -6,6 +6,7 @@ using System.Data;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Tangra.Controller;
 using Tangra.Helpers;
@@ -259,19 +260,24 @@ namespace Tangra.VideoOperations.LightCurves
 
         public void StopMeasurements()
         {
-			m_CorrectTrackingTool = m_StateMachine.VideoOperation.StopMeasurements();
-            m_StoppedAtFrameNo = m_StateMachine.VideoOperation.m_CurrFrameNo;
+			 m_StateMachine.VideoOperation.StopMeasurements((correctTrackingTool) =>
+				{
+					m_CorrectTrackingTool = correctTrackingTool;
+					m_StoppedAtFrameNo = m_StateMachine.VideoOperation.m_CurrFrameNo;
 
-            btnStop.Text = "Continue Measurements";
+					btnStop.Text = "Continue Measurements";
 
-            btnLightCurve.Visible = true;
-	        
-	        if (m_CorrectTrackingTool.SupportsManualCorrections)
-	        {
-		        gbxCorrections.Visible = true;
-		        ucCorrSelection.CorrectTrackingTool = m_CorrectTrackingTool;
-		        ucCorrSelection.Reset();
-	        }
+					btnLightCurve.Visible = true;
+
+					if (m_CorrectTrackingTool.SupportsManualCorrections)
+					{
+						gbxCorrections.Visible = true;
+						ucCorrSelection.CorrectTrackingTool = m_CorrectTrackingTool;
+						ucCorrSelection.Reset();
+					}
+
+					m_VideoController.RefreshCurrentFrame();
+				});
         }
 
         public void StoppedAtLastFrame()
@@ -747,6 +753,11 @@ namespace Tangra.VideoOperations.LightCurves
 			{
 			    m_VideoController.RedrawCurrentFrame(false);
 			}
+		}
+
+		private void btnSkipThisFrame_Click(object sender, EventArgs e)
+		{
+			m_StoppedAtFrameNo = m_StateMachine.VideoOperation.SkipCurrentFrame(false);
 		}
 
     }

@@ -15,6 +15,7 @@ namespace Tangra.Video
 
 		private int m_MillisecondsPerFrame;
 		private bool m_IsRunning;
+		private bool m_StopRequestReceived;
 		private uint m_Step = 1;
 
 		private IVideoFrameRenderer m_FrameRenderer;
@@ -84,6 +85,7 @@ namespace Tangra.Video
 			m_VideoStream = frameStream;
 
 			this.m_IsRunning = false;
+			this.m_StopRequestReceived = false;
 
 			m_MillisecondsPerFrame = (int)m_VideoStream.MillisecondsPerFrame;
 			m_CurrentFrameIndex = m_VideoStream.FirstFrame - 1;
@@ -102,12 +104,13 @@ namespace Tangra.Video
 		}
 
 		/// <summary>Start the video playback</summary>
-		public void Start(FramePlaySpeed mode, uint step)
+		public void Start(FramePlaySpeed mode, int? startAtFrame, uint step)
 		{
 			if (m_VideoStream != null)
 			{
 				m_Step = step;
 				m_IsRunning = true;
+				m_StopRequestReceived = false;
 
 				int bufferSize = m_VideoStream.RecommendedBufferSize;
 
@@ -132,6 +135,11 @@ namespace Tangra.Video
 					m_BufferNextFrameThread = new Thread(new ParameterizedThreadStart(BufferNextFrame));
 					m_BufferNextFrameThread.IsBackground = true;
 					m_BufferNextFrameThread.SetApartmentState(ApartmentState.MTA);
+
+					if (startAtFrame != null)
+						m_CurrentFrameIndex = startAtFrame.Value;
+					else
+						m_CurrentFrameIndex = m_LastDisplayedFrameIndex <= m_VideoStream.FirstFrame ? m_VideoStream.FirstFrame : m_LastDisplayedFrameIndex + 1;
 
 					m_BufferNextFrameThread.Start(new FrameBufferContext()
 					{
@@ -158,6 +166,7 @@ namespace Tangra.Video
 		}
 
 		private int m_CurrentFrameIndex = -1;
+		private int m_LastDisplayedFrameIndex = -1;
 
 		public void StepForward()
 		{
@@ -412,6 +421,7 @@ namespace Tangra.Video
 				    m_CurrentFrameIndex <= m_VideoStream.LastFrame)
 				{
 					m_FrameRenderer.RenderFrame(m_CurrentFrameIndex, currentPixelmap, movementType, false, 0, m_CurrentFrameIndex);
+					m_LastDisplayedFrameIndex = m_CurrentFrameIndex;
 				}
 			}
 		}
@@ -556,7 +566,7 @@ namespace Tangra.Video
 				int lastFrame = m_VideoStream.LastFrame;
 
 				Stopwatch sw = new Stopwatch();
-				for (; (m_CurrentFrameIndex < lastFrame) && m_IsRunning; m_CurrentFrameIndex += (int)m_Step)
+				for (; (m_CurrentFrameIndex < lastFrame) && m_IsRunning && !m_StopRequestReceived; m_CurrentFrameIndex += (int)m_Step)
 				{
 					if (m_CurrentFrameIndex >= lastFrame)
 						break;
@@ -618,6 +628,8 @@ namespace Tangra.Video
                         msToWait,
                         currentFrame.FirstFrameInIntegrationPeriod);
 
+					m_LastDisplayedFrameIndex = currentFrame.FrameNo;
+
 					Thread.Sleep(1);
 				}
 			}
@@ -630,7 +642,9 @@ namespace Tangra.Video
 				m_IsRunning = false;
 			}
 
-			m_FrameRenderer.PlayerStopped();
+			m_FrameRenderer.PlayerStopped(m_LastDisplayedFrameIndex, m_StopRequestReceived);
+
+			m_StopRequestReceived = false;
 		}
 
 		/// <summary>Extract and display the frames</summary>
@@ -642,7 +656,7 @@ namespace Tangra.Video
 				int lastFrame = m_VideoStream.LastFrame;
 
 				Stopwatch sw = new Stopwatch();
-				for (; (m_CurrentFrameIndex < lastFrame) && m_IsRunning; m_CurrentFrameIndex += (int)m_Step)
+				for (; (m_CurrentFrameIndex < lastFrame) && m_IsRunning && !m_StopRequestReceived; m_CurrentFrameIndex += (int)m_Step)
 				{
 					if (m_CurrentFrameIndex >= lastFrame)
 						break;
@@ -668,6 +682,8 @@ namespace Tangra.Video
 								m_CurrentFrameIndex + m_Step >= lastFrame,
 								msToWait,
                                 m_CurrentFrameIndex);
+
+					m_LastDisplayedFrameIndex = m_CurrentFrameIndex;
 				}
 			}
 			catch (ObjectDisposedException)
@@ -683,13 +699,17 @@ namespace Tangra.Video
 				m_IsRunning = false;
 			}
 
-			m_FrameRenderer.PlayerStopped();
+			m_FrameRenderer.PlayerStopped(m_LastDisplayedFrameIndex, m_StopRequestReceived);
+
+			m_StopRequestReceived = false;
 		}
 
 		/// <summary>Stop the video playback</summary>
 		public void Stop()
 		{
-			m_IsRunning = false;
+			m_StopRequestReceived = true;
+
+			//Trace.WriteLine(string.Format("FramePlayer: Stop requested at frame {0}. Last displayed frame: {1}", m_CurrentFrameIndex, m_LastDisplayedFrameIndex));
 		}
 
 		public void Dispose()

@@ -36,8 +36,8 @@ namespace Tangra.Model.VideoOperations
 		int VideoFirstFrame { get; }
 		int VideoLastFrame { get; }
 
-		void PlayVideo();
-	    void StopVideo();
+		void PlayVideo(int? startAtFrame = null);
+	    void StopVideo(Action<int, bool> callback = null);
 	    void MoveToFrame(int frameId);
 	    void StepForward();
 		void StepBackward();

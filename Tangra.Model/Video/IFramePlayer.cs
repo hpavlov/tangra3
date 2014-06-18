@@ -22,7 +22,7 @@ namespace Tangra.Model.Video
 	public interface IVideoFrameRenderer
 	{
 		void PlayerStarted();
-		void PlayerStopped();
+		void PlayerStopped(int lastDisplayedFrame, bool userStopRequest);
         void RenderFrame(int currentFrameIndex, Pixelmap currentPixelmap, MovementType movementType, bool isLastFrame, int msToWait, int firstFrameInIntegrationPeriod);
 	}
 
@@ -89,7 +89,7 @@ namespace Tangra.Model.Video
 	    string AstroVideoCameraModel { get; }
 		string AstroVideoNativeVideoStandard { get; }
 		GeoLocationInfo GeoLocation { get; }
-		void Start(FramePlaySpeed mode, uint step);
+		void Start(FramePlaySpeed mode, int? startAtFrame, uint step);
 		void Stop();
 		void StepForward();
 		void StepBackward();

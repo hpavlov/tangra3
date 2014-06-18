@@ -120,7 +120,7 @@ namespace Tangra
 			m_VideoController.UpdateViews();
 		}
 
-		public void PlayerStopped()
+		public void PlayerStopped(int lastDisplayedFrame, bool userStopRequest)
 		{
 			m_VideoController.UpdateViews();
 		}

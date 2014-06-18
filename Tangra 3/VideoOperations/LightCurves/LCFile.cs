@@ -282,6 +282,8 @@ namespace Tangra.VideoOperations.LightCurves
 
         public static void SaveOnTheFlyMeasurement(LCMeasurement measurement)
         {
+			//Trace.WriteLine(string.Format("LCFile::SaveOnTheFlyMeasurement({1}, {0})", measurement.TargetNo, measurement.CurrFrameNo));
+
             measurement.WriteTo(s_OnTheFlyWriter);
             s_NumMeasurements[measurement.TargetNo]++;
         }
@@ -345,6 +347,8 @@ namespace Tangra.VideoOperations.LightCurves
 
 		public static void SaveOnTheFlyFrameTiming(LCFrameTiming frameTiming)
 		{
+			//Trace.WriteLine(string.Format("LCFile::SaveOnTheFlyFrameTiming({0})", frameTiming.FrameMidTime.ToString("HH:mm:ss.fff")));
+
 			frameTiming.WriteTo(s_OnTheFlyWriter);
 		}
 

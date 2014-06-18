@@ -42,6 +42,7 @@ namespace Tangra.VideoOperations.LightCurves
 			this.lblTimesHeader = new System.Windows.Forms.Label();
 			this.ucUtcTime = new Tangra.Model.Controls.ucUtcTimePicker();
 			this.gbxCorrections = new System.Windows.Forms.GroupBox();
+			this.btnSkipThisFrame = new System.Windows.Forms.Button();
 			this.ucCorrSelection = new Tangra.VideoOperations.LightCurves.ucCorrSelection();
 			this.lblPartiallySuccessfulFrames = new System.Windows.Forms.Label();
 			this.label11 = new System.Windows.Forms.Label();
@@ -218,18 +219,28 @@ namespace Tangra.VideoOperations.LightCurves
 			// 
 			// gbxCorrections
 			// 
+			this.gbxCorrections.Controls.Add(this.btnSkipThisFrame);
 			this.gbxCorrections.Controls.Add(this.ucCorrSelection);
-			this.gbxCorrections.Location = new System.Drawing.Point(8, 189);
+			this.gbxCorrections.Location = new System.Drawing.Point(8, 203);
 			this.gbxCorrections.Name = "gbxCorrections";
-			this.gbxCorrections.Size = new System.Drawing.Size(227, 74);
+			this.gbxCorrections.Size = new System.Drawing.Size(227, 88);
 			this.gbxCorrections.TabIndex = 8;
 			this.gbxCorrections.TabStop = false;
 			this.gbxCorrections.Text = "Manual Corrections";
 			this.gbxCorrections.Visible = false;
 			// 
+			// btnSkipThisFrame
+			// 
+			this.btnSkipThisFrame.Location = new System.Drawing.Point(5, 57);
+			this.btnSkipThisFrame.Name = "btnSkipThisFrame";
+			this.btnSkipThisFrame.Size = new System.Drawing.Size(92, 23);
+			this.btnSkipThisFrame.TabIndex = 47;
+			this.btnSkipThisFrame.Text = "Skip This Frame";
+			this.btnSkipThisFrame.Click += new System.EventHandler(this.btnSkipThisFrame_Click);
+			// 
 			// ucCorrSelection
 			// 
-			this.ucCorrSelection.Location = new System.Drawing.Point(22, 15);
+			this.ucCorrSelection.Location = new System.Drawing.Point(24, 15);
 			this.ucCorrSelection.Name = "ucCorrSelection";
 			this.ucCorrSelection.Size = new System.Drawing.Size(176, 53);
 			this.ucCorrSelection.TabIndex = 0;
@@ -791,6 +802,7 @@ namespace Tangra.VideoOperations.LightCurves
 		private System.Windows.Forms.Label label11;
 		private System.Windows.Forms.GroupBox gbxCorrections;
 		private ucCorrSelection ucCorrSelection;
+		private System.Windows.Forms.Button btnSkipThisFrame;
 
     }
 }

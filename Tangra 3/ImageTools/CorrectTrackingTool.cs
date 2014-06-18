@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Tangra.VideoOperations.LightCurves;
@@ -59,7 +60,9 @@ namespace Tangra.ImageTools
 			for (int i = 0; i < tracker.TrackedObjects.Count; i++)
 			{
 				m_LightCurvesVideoOperation.SetManualTrackingCorrection(i, 0, 0);	
-			}			
+			}
+
+			m_VideoController.RefreshCurrentFrame();
 		}
 
 		internal bool SupportsManualCorrections
@@ -74,7 +77,7 @@ namespace Tangra.ImageTools
 
 		public override void Activate()
 		{
-			// NOTE: The actual activation is done on Initialize()
+			// NOTE: The actual activation is done on Initialize()			
 		}
 
 		public override void Deactivate()
