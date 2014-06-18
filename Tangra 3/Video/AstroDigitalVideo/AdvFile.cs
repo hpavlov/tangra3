@@ -657,7 +657,7 @@ namespace Tangra.Video.AstroDigitalVideo
         }
 
         internal bool CropAdvFile(string fileName, int firstFrame, int lastFrame, OnSearchProgressDelegate progressCallback)
-	    {
+        {
 			using (var fsr = new FileStream(m_FileName, FileMode.Open, FileAccess.Read))
 			using (var reader = new BinaryReader(fsr))
 			using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
@@ -737,6 +737,8 @@ namespace Tangra.Video.AstroDigitalVideo
 		{
 			progressCallback(5, 0);
 
+			//string folder = Path.GetDirectoryName(fileName);
+
 			bool headerAppended = false;
 
             using (FileStream fsOutput = new FileStream(fileName, FileMode.CreateNew, FileAccess.Write))
@@ -748,6 +750,19 @@ namespace Tangra.Video.AstroDigitalVideo
                     AdvImageData imageData = (AdvImageData)data[0];
                     AdvStatusData statusData = (AdvStatusData)data[1];
 
+					//using(FileStream fs = new FileStream(string.Format("{0}\\{1}.pix", folder, i), FileMode.CreateNew, FileAccess.Write))
+					//using (BinaryWriter wrt = new BinaryWriter(fs))
+					//{
+					//	for (int y = 0; y < ImageSection.Height; y++)
+					//	{
+					//		for (int x = 0; x < ImageSection.Width; x++)
+					//		{
+					//			ushort val = imageData.ImageData[x, y];
+					//			wrt.Write(val);
+					//		}
+					//	}
+					//}
+	                
                     string headerRow;
                     string nextRow = StatusDataToCsvRow(imageData, statusData, i, out headerRow);
                     if (!headerAppended)

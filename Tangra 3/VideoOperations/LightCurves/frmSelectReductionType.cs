@@ -319,9 +319,7 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void cbxShaking_CheckedChanged(object sender, EventArgs e)
         {
-			cbxStopOnLostTracking.Visible = 
-				TangraConfig.Settings.Tracking.SelectedEngine != TangraConfig.TrackingEngine.AdHocTracking && 
-				cbxShaking.Checked;
+			cbxStopOnLostTracking.Visible = cbxShaking.Checked;
         }
 
         private void rbUntrackedMeasurement_CheckedChanged(object sender, EventArgs e)

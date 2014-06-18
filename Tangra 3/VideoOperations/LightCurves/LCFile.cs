@@ -1315,7 +1315,7 @@ namespace Tangra.VideoOperations.LightCurves
 					rv = LcFile.FrameTiming[frameTimingIndex].FrameMidTime;
 				else if (frameTimingIndex < 0)
 					rv = LcFile.FrameTiming[0].FrameMidTime;
-				else if (frameTimingIndex < LcFile.FrameTiming.Count)
+				else if (frameTimingIndex >= LcFile.FrameTiming.Count)
 					rv = LcFile.FrameTiming[LcFile.FrameTiming.Count - 1].FrameMidTime;
 				else
 					rv = LcFile.FrameTiming[0].FrameMidTime;
