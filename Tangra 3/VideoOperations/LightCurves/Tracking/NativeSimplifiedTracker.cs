@@ -57,7 +57,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			{
 				TrackedObjectConfig obj = measuringStars[i];
 				NativeTracking.ConfigureTrackedObject(i, obj);
-				var nativeObj = new NativeTrackedObject(i, obj, isFullDisappearance);
+				var nativeObj = new NativeTrackedObject(i, LightCurveReductionContext.Instance.BitPix, obj, isFullDisappearance);
                 m_NativeTrackedObject.Add(nativeObj);
                 m_TrackedObjects.Add(nativeObj);
 			}

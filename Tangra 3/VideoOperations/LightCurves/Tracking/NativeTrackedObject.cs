@@ -25,14 +25,14 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
         public List<double> m_RecentFWHMs = new List<double>();
         public List<double> m_RecentIMAXs = new List<double>();
 
-        public NativeTrackedObject(int trackedObjectId, ITrackedObjectConfig originalObject, bool isFullDisappearance)
+        public NativeTrackedObject(int trackedObjectId, int bitPix, ITrackedObjectConfig originalObject, bool isFullDisappearance)
         {
             TargetNo = trackedObjectId;
             OriginalObject = originalObject;
 	        m_IsOccultedStar = OriginalObject.TrackingType == TrackingType.OccultedStar;
 			m_PsfGroupId = OriginalObject.GroupId;
 	        m_IsFullDisappearance = isFullDisappearance;
-            m_NativePsfFit = new NativeTrackedObjectPsfFit(8);
+            m_NativePsfFit = new NativeTrackedObjectPsfFit(bitPix);
         }
 
         internal void LoadFromNativeData(NativeTrackedObjectInfo trackingInfo, NativePsfFitInfo psfInfo, double[] residuals)

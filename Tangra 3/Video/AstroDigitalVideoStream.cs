@@ -33,6 +33,7 @@ namespace Tangra.Video
         public string Camera;
         public string SensorInfo;
         public string Engine;
+	    public bool HasNTPTimeStamps;
     }
 
 	public class AstroDigitalVideoStream : IFrameStream
@@ -76,6 +77,7 @@ namespace Tangra.Video
 	    private int m_IntegratedAAVFrames;
 		private int m_OsdFirstLine = 0;
 		private int m_OsdLastLine = 0;
+		private bool m_UsesNtpTimestamps;
 
 		private int m_AlmanacOffsetLastFrame;
 		private bool m_AlamanacOffsetLastFrameIsGood;
@@ -119,6 +121,7 @@ namespace Tangra.Video
 
 		    m_Engine = equipmentInfo.Engine;
 			m_CameraModel = equipmentInfo.Camera;
+			m_UsesNtpTimestamps = equipmentInfo.HasNTPTimeStamps;
 
 			if (m_Engine == "AAV")
 			{
@@ -537,21 +540,25 @@ namespace Tangra.Video
 			{
 				if (!m_NtpDataAvailable.HasValue)
 				{
+					
 					m_NtpDataAvailable = false;
 
-					for (int i = m_FirstFrame; i < m_FirstFrame + m_CountFrames; i++)
+					if (m_Engine == "AAV" && m_UsesNtpTimestamps)
 					{
-						FrameStateData stateChannel = GetFrameStatusChannel(i);
-						if (stateChannel.HasValidNtpTimeStamp)
+						for (int i = m_FirstFrame; i < m_FirstFrame + m_CountFrames; i++)
 						{
-							m_NtpDataAvailable = true;
-							break;
+							FrameStateData stateChannel = GetFrameStatusChannel(i);
+							if (stateChannel.HasValidNtpTimeStamp)
+							{
+								m_NtpDataAvailable = true;
+								break;
+							}
 						}
 					}
 
 				}
 
-				return m_NtpDataAvailable.Value;			
+				return m_NtpDataAvailable.Value;
 			}
 		}
 
@@ -665,6 +672,13 @@ namespace Tangra.Video
             else if (engine == "AAV")
             {
                 advFile.AdvFileTags.TryGetValue("OCR-ENGINE", out OcrEngine);
+	            string sCorr;
+	            int iCorr;
+	            if (advFile.AdvFileTags.TryGetValue("CAPHNTP-TIMING-CORRECTION", out sCorr) &&
+	                int.TryParse(sCorr, out iCorr))
+	            {
+					equipmentInfo.HasNTPTimeStamps = true;
+	            }
             }
 
             this.geoLocation = new GeoLocationInfo(geoLocation);
