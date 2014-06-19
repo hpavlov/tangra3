@@ -58,6 +58,9 @@
 			this.label1 = new System.Windows.Forms.Label();
 			this.nudSNFrameWindow = new System.Windows.Forms.NumericUpDown();
 			this.label25 = new System.Windows.Forms.Label();
+			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.label2 = new System.Windows.Forms.Label();
+			this.nudSubPixelSquare = new System.Windows.Forms.NumericUpDown();
 			this.groupControl2.SuspendLayout();
 			this.pnlSeeingSettings.SuspendLayout();
 			this.pnlUserSeeing.SuspendLayout();
@@ -68,6 +71,8 @@
 			((System.ComponentModel.ISupportInitialize)(this.nudInnerAnnulusInApertures)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudMinimumAnnulusPixels)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudSNFrameWindow)).BeginInit();
+			this.groupBox1.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.nudSubPixelSquare)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// groupControl2
@@ -77,9 +82,9 @@
 			this.groupControl2.Controls.Add(this.pnlSeeingSettings);
 			this.groupControl2.Controls.Add(this.label6);
 			this.groupControl2.Controls.Add(this.label3);
-			this.groupControl2.Location = new System.Drawing.Point(3, 6);
+			this.groupControl2.Location = new System.Drawing.Point(3, 119);
 			this.groupControl2.Name = "groupControl2";
-			this.groupControl2.Size = new System.Drawing.Size(233, 299);
+			this.groupControl2.Size = new System.Drawing.Size(233, 193);
 			this.groupControl2.TabIndex = 36;
 			this.groupControl2.TabStop = false;
 			this.groupControl2.Text = "PSF-Fitting Photometry";
@@ -101,7 +106,7 @@
 			this.cbxPsfFittingMethod.Items.AddRange(new object[] {
             "Direct Non-Linear Fit",
             "Linear Fit of Averaged Model"});
-			this.cbxPsfFittingMethod.Location = new System.Drawing.Point(16, 95);
+			this.cbxPsfFittingMethod.Location = new System.Drawing.Point(16, 85);
 			this.cbxPsfFittingMethod.Name = "cbxPsfFittingMethod";
 			this.cbxPsfFittingMethod.Size = new System.Drawing.Size(185, 21);
 			this.cbxPsfFittingMethod.TabIndex = 38;
@@ -112,7 +117,7 @@
 			this.pnlSeeingSettings.Controls.Add(this.label13);
 			this.pnlSeeingSettings.Controls.Add(this.pnlUserSeeing);
 			this.pnlSeeingSettings.Controls.Add(this.rgSeeing);
-			this.pnlSeeingSettings.Location = new System.Drawing.Point(8, 127);
+			this.pnlSeeingSettings.Location = new System.Drawing.Point(8, 117);
 			this.pnlSeeingSettings.Name = "pnlSeeingSettings";
 			this.pnlSeeingSettings.Size = new System.Drawing.Size(203, 69);
 			this.pnlSeeingSettings.TabIndex = 37;
@@ -198,7 +203,7 @@
 			// label3
 			// 
 			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(13, 79);
+			this.label3.Location = new System.Drawing.Point(13, 69);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(77, 13);
 			this.label3.TabIndex = 29;
@@ -206,23 +211,14 @@
 			// 
 			// groupControl1
 			// 
-			this.groupControl1.Controls.Add(this.label4);
-			this.groupControl1.Controls.Add(this.cbxBgFirstOrder);
-			this.groupControl1.Controls.Add(this.cbxBgThirdOrder);
+			this.groupControl1.Controls.Add(this.nudSubPixelSquare);
+			this.groupControl1.Controls.Add(this.label2);
 			this.groupControl1.Controls.Add(this.nudPhotoAperture);
-			this.groupControl1.Controls.Add(this.cbxBgSecondOrder);
-			this.groupControl1.Controls.Add(this.nudInnerAnnulusInApertures);
-			this.groupControl1.Controls.Add(this.nudMinimumAnnulusPixels);
 			this.groupControl1.Controls.Add(this.cbxPhotoSignalApertureType);
-			this.groupControl1.Controls.Add(this.cbxBackgroundMethod);
-			this.groupControl1.Controls.Add(this.label9);
 			this.groupControl1.Controls.Add(this.label17);
-			this.groupControl1.Controls.Add(this.label8);
-			this.groupControl1.Controls.Add(this.label7);
-			this.groupControl1.Controls.Add(this.label1);
-			this.groupControl1.Location = new System.Drawing.Point(240, 6);
+			this.groupControl1.Location = new System.Drawing.Point(3, 3);
 			this.groupControl1.Name = "groupControl1";
-			this.groupControl1.Size = new System.Drawing.Size(230, 299);
+			this.groupControl1.Size = new System.Drawing.Size(233, 110);
 			this.groupControl1.TabIndex = 35;
 			this.groupControl1.TabStop = false;
 			this.groupControl1.Text = "Aperture Photometry";
@@ -230,7 +226,7 @@
 			// label4
 			// 
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(22, 237);
+			this.label4.Location = new System.Drawing.Point(19, 187);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(108, 13);
 			this.label4.TabIndex = 37;
@@ -241,7 +237,7 @@
 			this.cbxBgFirstOrder.AutoSize = true;
 			this.cbxBgFirstOrder.Checked = true;
 			this.cbxBgFirstOrder.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.cbxBgFirstOrder.Location = new System.Drawing.Point(25, 257);
+			this.cbxBgFirstOrder.Location = new System.Drawing.Point(22, 207);
 			this.cbxBgFirstOrder.Name = "cbxBgFirstOrder";
 			this.cbxBgFirstOrder.Size = new System.Drawing.Size(70, 17);
 			this.cbxBgFirstOrder.TabIndex = 2;
@@ -253,7 +249,7 @@
 			this.cbxBgThirdOrder.AutoSize = true;
 			this.cbxBgThirdOrder.Checked = true;
 			this.cbxBgThirdOrder.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.cbxBgThirdOrder.Location = new System.Drawing.Point(25, 273);
+			this.cbxBgThirdOrder.Location = new System.Drawing.Point(22, 223);
 			this.cbxBgThirdOrder.Name = "cbxBgThirdOrder";
 			this.cbxBgThirdOrder.Size = new System.Drawing.Size(71, 17);
 			this.cbxBgThirdOrder.TabIndex = 1;
@@ -273,7 +269,7 @@
 			this.cbxBgSecondOrder.AutoSize = true;
 			this.cbxBgSecondOrder.Checked = true;
 			this.cbxBgSecondOrder.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.cbxBgSecondOrder.Location = new System.Drawing.Point(105, 257);
+			this.cbxBgSecondOrder.Location = new System.Drawing.Point(102, 207);
 			this.cbxBgSecondOrder.Name = "cbxBgSecondOrder";
 			this.cbxBgSecondOrder.Size = new System.Drawing.Size(74, 17);
 			this.cbxBgSecondOrder.TabIndex = 0;
@@ -283,14 +279,14 @@
 			// nudInnerAnnulusInApertures
 			// 
 			this.nudInnerAnnulusInApertures.DecimalPlaces = 1;
-			this.nudInnerAnnulusInApertures.Location = new System.Drawing.Point(54, 164);
+			this.nudInnerAnnulusInApertures.Location = new System.Drawing.Point(51, 106);
 			this.nudInnerAnnulusInApertures.Name = "nudInnerAnnulusInApertures";
 			this.nudInnerAnnulusInApertures.Size = new System.Drawing.Size(47, 20);
 			this.nudInnerAnnulusInApertures.TabIndex = 35;
 			// 
 			// nudMinimumAnnulusPixels
 			// 
-			this.nudMinimumAnnulusPixels.Location = new System.Drawing.Point(169, 201);
+			this.nudMinimumAnnulusPixels.Location = new System.Drawing.Point(166, 143);
 			this.nudMinimumAnnulusPixels.Maximum = new decimal(new int[] {
             500,
             0,
@@ -320,7 +316,7 @@
             "3D Polynomial Fit",
             "PSF-Fitting Background",
             "Median Background"});
-			this.cbxBackgroundMethod.Location = new System.Drawing.Point(25, 103);
+			this.cbxBackgroundMethod.Location = new System.Drawing.Point(22, 45);
 			this.cbxBackgroundMethod.Name = "cbxBackgroundMethod";
 			this.cbxBackgroundMethod.Size = new System.Drawing.Size(191, 21);
 			this.cbxBackgroundMethod.TabIndex = 32;
@@ -328,9 +324,9 @@
 			// label9
 			// 
 			this.label9.AutoSize = true;
-			this.label9.Location = new System.Drawing.Point(19, 204);
+			this.label9.Location = new System.Drawing.Point(16, 146);
 			this.label9.Name = "label9";
-			this.label9.Size = new System.Drawing.Size(144, 13);
+			this.label9.Size = new System.Drawing.Size(150, 13);
 			this.label9.TabIndex = 30;
 			this.label9.Text = "Pixels in Background Annulus:";
 			// 
@@ -346,7 +342,7 @@
 			// label8
 			// 
 			this.label8.AutoSize = true;
-			this.label8.Location = new System.Drawing.Point(110, 167);
+			this.label8.Location = new System.Drawing.Point(107, 109);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(81, 13);
 			this.label8.TabIndex = 29;
@@ -355,16 +351,16 @@
 			// label7
 			// 
 			this.label7.AutoSize = true;
-			this.label7.Location = new System.Drawing.Point(22, 142);
+			this.label7.Location = new System.Drawing.Point(19, 84);
 			this.label7.Name = "label7";
-			this.label7.Size = new System.Drawing.Size(178, 13);
+			this.label7.Size = new System.Drawing.Size(184, 13);
 			this.label7.TabIndex = 28;
 			this.label7.Text = "Inner Radius of Background Annulus:";
 			// 
 			// label1
 			// 
 			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(22, 87);
+			this.label1.Location = new System.Drawing.Point(19, 29);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(144, 13);
 			this.label1.TabIndex = 25;
@@ -386,11 +382,58 @@
 			this.label25.TabIndex = 57;
 			this.label25.Text = "Num Frames for S/N Computation:";
 			// 
+			// groupBox1
+			// 
+			this.groupBox1.Controls.Add(this.label4);
+			this.groupBox1.Controls.Add(this.label1);
+			this.groupBox1.Controls.Add(this.cbxBgFirstOrder);
+			this.groupBox1.Controls.Add(this.label7);
+			this.groupBox1.Controls.Add(this.cbxBgThirdOrder);
+			this.groupBox1.Controls.Add(this.label8);
+			this.groupBox1.Controls.Add(this.label9);
+			this.groupBox1.Controls.Add(this.cbxBgSecondOrder);
+			this.groupBox1.Controls.Add(this.cbxBackgroundMethod);
+			this.groupBox1.Controls.Add(this.nudInnerAnnulusInApertures);
+			this.groupBox1.Controls.Add(this.nudMinimumAnnulusPixels);
+			this.groupBox1.Location = new System.Drawing.Point(242, 6);
+			this.groupBox1.Name = "groupBox1";
+			this.groupBox1.Size = new System.Drawing.Size(230, 306);
+			this.groupBox1.TabIndex = 59;
+			this.groupBox1.TabStop = false;
+			this.groupBox1.Text = "Background Measurements";
+			// 
+			// label2
+			// 
+			this.label2.AutoSize = true;
+			this.label2.Location = new System.Drawing.Point(19, 80);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(88, 13);
+			this.label2.TabIndex = 37;
+			this.label2.Text = "Sub-pixel square:";
+			// 
+			// nudSubPixelSquare
+			// 
+			this.nudSubPixelSquare.Location = new System.Drawing.Point(109, 77);
+			this.nudSubPixelSquare.Maximum = new decimal(new int[] {
+            20,
+            0,
+            0,
+            0});
+			this.nudSubPixelSquare.Name = "nudSubPixelSquare";
+			this.nudSubPixelSquare.Size = new System.Drawing.Size(40, 20);
+			this.nudSubPixelSquare.TabIndex = 38;
+			this.nudSubPixelSquare.Value = new decimal(new int[] {
+            4,
+            0,
+            0,
+            0});
+			// 
 			// ucPhotometry
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.SystemColors.Control;
+			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.nudSNFrameWindow);
 			this.Controls.Add(this.label25);
 			this.Controls.Add(this.groupControl2);
@@ -412,6 +455,9 @@
 			((System.ComponentModel.ISupportInitialize)(this.nudInnerAnnulusInApertures)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudMinimumAnnulusPixels)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudSNFrameWindow)).EndInit();
+			this.groupBox1.ResumeLayout(false);
+			this.groupBox1.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.nudSubPixelSquare)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -449,5 +495,8 @@
 		private System.Windows.Forms.CheckBox cbxBgFirstOrder;
 		private System.Windows.Forms.CheckBox cbxBgThirdOrder;
 		private System.Windows.Forms.CheckBox cbxBgSecondOrder;
+		private System.Windows.Forms.GroupBox groupBox1;
+		private System.Windows.Forms.NumericUpDown nudSubPixelSquare;
+		private System.Windows.Forms.Label label2;
 	}
 }

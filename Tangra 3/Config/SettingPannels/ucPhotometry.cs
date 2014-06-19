@@ -23,6 +23,7 @@ namespace Tangra.Config.SettingPannels
         public override void LoadSettings()
         {
 			nudPhotoAperture.SetNUDValue((decimal)TangraConfig.Settings.Photometry.DefaultSignalAperture);
+			nudSubPixelSquare.SetNUDValue(TangraConfig.Settings.Photometry.SubPixelSquareSize);
 			cbxPhotoSignalApertureType.SetCBXIndex((int)TangraConfig.Settings.Photometry.SignalApertureUnitDefault);
 
 			SetComboboxIndexFromBackgroundMethod(TangraConfig.Settings.Photometry.BackgroundMethodDefault);
@@ -42,6 +43,8 @@ namespace Tangra.Config.SettingPannels
         public override void SaveSettings()
         {
 			TangraConfig.Settings.Photometry.DefaultSignalAperture = (float)nudPhotoAperture.Value;
+			TangraConfig.Settings.Photometry.SubPixelSquareSize = (int)nudSubPixelSquare.Value;
+
 			TangraConfig.Settings.Photometry.SignalApertureUnitDefault = (TangraConfig.SignalApertureUnit)cbxPhotoSignalApertureType.SelectedIndex;
 			TangraConfig.Settings.Photometry.BackgroundMethodDefault = ComboboxIndexToBackgroundMethod();
 			TangraConfig.Settings.Photometry.AnnulusInnerRadius = (float)nudInnerAnnulusInApertures.Value;

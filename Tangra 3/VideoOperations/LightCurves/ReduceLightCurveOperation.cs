@@ -175,7 +175,7 @@ namespace Tangra.VideoOperations.LightCurves
 				m_Measurer = new MeasurementsHelper(
 					m_VideoController.VideoBitPix,
 					LightCurveReductionContext.Instance.NoiseMethod,
-					true,
+					TangraConfig.Settings.Photometry.SubPixelSquareSize,
 					TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(m_VideoController.VideoBitPix));
 
 				m_Measurer.SetCoreProperties(
@@ -1000,7 +1000,7 @@ namespace Tangra.VideoOperations.LightCurves
             var measurer = new MeasurementsHelper(
                             bitPixCamera,
 							TangraConfig.BackgroundMethod.BackgroundMedian /* We always use Background Median for configuration measurements. */,
-                            true,
+							TangraConfig.Settings.Photometry.SubPixelSquareSize,
                             TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(bitPixCamera));
 
             measurer.SetCoreProperties(

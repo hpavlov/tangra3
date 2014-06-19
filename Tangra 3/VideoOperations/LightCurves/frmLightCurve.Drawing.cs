@@ -1049,28 +1049,32 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void DisplayCurrentMeasurements()
         {
-            if (m_SelectedMeasurements != null &&
-                !LCMeasurement.IsEmpty(m_SelectedMeasurements[0]))
+            if (m_SelectedMeasurements != null)
             {
-                lblFrameNo.Text = m_SelectedMeasurements[0].CurrFrameNo.ToString();
-				string correctedForInstrumentalDelayMessage = null;
-                if (m_LCFile.CanDetermineFrameTimes)
-                {
-					lblFrameTime.Text = m_LCFile.GetTimeForFrame(m_SelectedMeasurements[0].CurrFrameNo, out correctedForInstrumentalDelayMessage).ToString("HH:mm:ss.fff");
+	            LCMeasurement firstNonExcludedMeasurement = m_SelectedMeasurements.FirstOrDefault(x => !LCMeasurement.IsEmpty(x));
 
-                    if (correctedForInstrumentalDelayMessage != null)
-                    {
-                        lblInstDelayWarning.ForeColor = Color.Green;
-                        toolTip1.SetToolTip(lblInstDelayWarning, correctedForInstrumentalDelayMessage);
-                    }
-                    else
-                    {
-                        lblInstDelayWarning.ForeColor = Color.Red;
-                        toolTip1.SetToolTip(lblInstDelayWarning, "Instrumental delay has *NOT* been applied to the times");
-                    }
-                }
-                else
-                    lblFrameTime.Text = "N/A";
+				if (!LCMeasurement.IsEmpty(firstNonExcludedMeasurement))
+				{
+					lblFrameNo.Text = firstNonExcludedMeasurement.CurrFrameNo.ToString();
+					string correctedForInstrumentalDelayMessage = null;
+					if (m_LCFile.CanDetermineFrameTimes)
+					{
+						lblFrameTime.Text = m_LCFile.GetTimeForFrame(firstNonExcludedMeasurement.CurrFrameNo, out correctedForInstrumentalDelayMessage).ToString("HH:mm:ss.fff");
+
+						if (correctedForInstrumentalDelayMessage != null)
+						{
+							lblInstDelayWarning.ForeColor = Color.Green;
+							toolTip1.SetToolTip(lblInstDelayWarning, correctedForInstrumentalDelayMessage);
+						}
+						else
+						{
+							lblInstDelayWarning.ForeColor = Color.Red;
+							toolTip1.SetToolTip(lblInstDelayWarning, "Instrumental delay has *NOT* been applied to the times");
+						}
+					}
+					else
+						lblFrameTime.Text = "N/A";
+				}
 
 	            bool hasMagnitudes = m_LightCurveController.Context.MagnitudeConverter.CanComputeMagnitudes;
 				double[] magnitudes = m_LightCurveController.Context.MagnitudeConverter.ComputeMagnitudes(m_SelectedMeasurements);

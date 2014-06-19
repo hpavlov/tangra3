@@ -357,6 +357,7 @@ namespace Tangra.Model.Config
 			public ColourChannel ColourChannel = ColourChannel.Red;
 
 			public float DefaultSignalAperture = 1.2f;
+			public int SubPixelSquareSize = 4;
 			public SignalApertureUnit SignalApertureUnitDefault = SignalApertureUnit.FWHM;
 
 			public BackgroundMethod BackgroundMethodDefault = BackgroundMethod.BackgroundMedian;

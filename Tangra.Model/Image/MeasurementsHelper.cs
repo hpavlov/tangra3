@@ -20,7 +20,7 @@ namespace Tangra.Model.Image
         }
 
         private TangraConfig.BackgroundMethod m_BackgroundMethod;
-        private bool m_UseSubPixels = false;
+	    private int m_SubPixelSquare = 0;
         private uint m_SaturationValue = 255;
         private float m_TimesHigherPositionToleranceForFullyOccultedStars = 2.0f;
         private int m_BitPix = 8;
@@ -29,13 +29,13 @@ namespace Tangra.Model.Image
         public MeasurementsHelper(
             int bitPix,
             TangraConfig.BackgroundMethod backgroundMethod,
-            bool useSubpixelMeasurement,
+            int subPixelSquare,
             uint saturationValue)
         {
             m_BitPix = bitPix;
             m_MaxPixelValue = Pixelmap.GetMaxValueForBitPix(m_BitPix);
             m_BackgroundMethod = backgroundMethod;
-            m_UseSubPixels = useSubpixelMeasurement;
+			m_SubPixelSquare = subPixelSquare;
             m_SaturationValue = saturationValue;
 
             m_TimesHigherPositionToleranceForFullyOccultedStars =
@@ -69,7 +69,7 @@ namespace Tangra.Model.Image
 
         public MeasurementsHelper Clone()
         {
-            MeasurementsHelper clone = new MeasurementsHelper(m_BitPix, m_BackgroundMethod, m_UseSubPixels, m_SaturationValue);
+            MeasurementsHelper clone = new MeasurementsHelper(m_BitPix, m_BackgroundMethod, m_SubPixelSquare, m_SaturationValue);
             clone.m_InnerRadiusOfBackgroundApertureInSignalApertures = this.m_InnerRadiusOfBackgroundApertureInSignalApertures;
             clone.m_NumberOfPixelsInBackgroundAperture = this.m_NumberOfPixelsInBackgroundAperture;
             clone.m_RejectionBackgoundPixelsStdDevCoeff = this.m_RejectionBackgoundPixelsStdDevCoeff;
@@ -589,17 +589,16 @@ namespace Tangra.Model.Image
                     else if (dist - 1.5 <= aperture)
                     {
                         float subpixels = 0;
-                        if (m_UseSubPixels)
+						if (m_SubPixelSquare > 0)
                         {
-                            // Represent the pixels as 5x5 subpixels with 5 times lesses intencity and then add up
-                            for (int dx = -2; dx <= 2; dx++)
-                                for (int dy = -2; dy <= 2; dy++)
+							for (int dx = 0; dx < m_SubPixelSquare; dx++)
+								for (int dy = 0; dy < m_SubPixelSquare; dy++)
                                 {
-                                    double xx = x + dx / 5.0;
-                                    double yy = y + dy / 5.0;
+									double xx = x - 0.5 + dx * 1.0 / m_SubPixelSquare;
+									double yy = y - 0.5 + dy * 1.0 / m_SubPixelSquare;
                                     dist = Math.Sqrt((x0 - xx) * (x0 - xx) + (y0 - yy) * (y0 - yy));
                                     if (dist <= aperture)
-                                        subpixels += 1.0f / 25;
+										subpixels += 1.0f / (m_SubPixelSquare * m_SubPixelSquare);
                                 }
                         }
                         else if (dist <= aperture)

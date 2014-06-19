@@ -144,7 +144,7 @@ namespace Tangra.VideoOperations.LightCurves
             MeasurementsHelper measurer = new MeasurementsHelper(
                  Context.BitPix,
                  Context.BackgroundMethod,
-                 true,
+				 TangraConfig.Settings.Photometry.SubPixelSquareSize,
                  TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(Context.BitPix));
 
             measurer.SetCoreProperties(
