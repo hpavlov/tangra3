@@ -291,6 +291,10 @@ namespace Tangra.PInvoke
 		//HRESULT GetVersion();
 		private static extern int GetProductVersion();
 
+		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+		//DLL_PUBLIC HRESULT Lagarith16Decompress(long width, long height, unsigned char* compressedBytes, unsigned char* decompressedBytes);
+		private static extern int Lagarith16Decompress(int width, int height, [In] byte[] compressedBytes, [In, Out] byte[] decompressedBytes);
+
 		public static string GetTangraCoreVersion()
 		{
 			int ver = GetProductVersion();
@@ -481,6 +485,14 @@ namespace Tangra.PInvoke
 
 				return preProcessingInfo.DarkFrameBytes > 0;
 			}
+		}
+
+		public static byte[] Lagarith16Decompress(uint width, uint height, byte[] compressedBytes)
+		{
+			var rv = new byte[width * height * 2 + 16];
+			Lagarith16Decompress((int) width, (int) height, compressedBytes, rv);
+
+			return rv;
 		}
 	}
 

@@ -16,6 +16,7 @@ DLL_PUBLIC HRESULT ADVGetIntegratedFrame(int startFrameNo, int framesToIntegrate
 DLL_PUBLIC HRESULT ADVGetFramePixels(int frameNo, unsigned long* pixels, AdvLib::AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError);
 DLL_PUBLIC HRESULT ADVGetFrameStatusChannel(int frameNo, AdvLib::AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError);
 DLL_PUBLIC HRESULT ADVGetFileTag(char* fileTagName, char* fileTagValue);
+DLL_PUBLIC HRESULT Lagarith16Decompress(long width, long height, unsigned char* compressedBytes, unsigned char* decompressedBytes);
 
 #ifdef __cplusplus
 } // __cplusplus defined.

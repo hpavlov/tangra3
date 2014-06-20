@@ -11,6 +11,8 @@
 #include "adv_image_section.h"
 #include "cross_platform.h"
 
+#include "Compressor.h"
+
 using namespace std;
 using std::string;
 
@@ -36,6 +38,7 @@ namespace AdvLib
 		unsigned int m_MaxPixelArrayLengthWithoutSigns;
 		char* m_DecompressedPixels;
 		qlz_state_decompress* m_StateDecompress;
+		Compressor* m_Lagarith16Decompressor;
 		bool m_UsesCompression;
 
 		

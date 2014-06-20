@@ -63,11 +63,12 @@ void AdvImageLayout::InitialiseBuffers()
 	m_DecompressedPixels = (char*)malloc(MaxFrameBufferSize);
 	
 	m_StateDecompress = (qlz_state_decompress *)malloc(sizeof(qlz_state_decompress));
+	m_Lagarith16Decompressor = new Compressor(Width, Height);
 }
 
 AdvImageLayout::~AdvImageLayout()
 {
-	ResetBuffers();	
+	ResetBuffers();
 }
 
 void AdvImageLayout::ResetBuffers()
@@ -89,13 +90,17 @@ void AdvImageLayout::ResetBuffers()
 	
 	if (NULL != m_StateDecompress)
 		delete m_StateDecompress;	
-	
+
+	if (NULL != m_Lagarith16Decompressor)
+		delete m_Lagarith16Decompressor;
+		
 	m_PrevFramePixels = NULL;
 	m_PrevFramePixelsTemp = NULL;
 	m_PixelArrayBuffer = NULL;
 	m_SignsBuffer = NULL;
 	m_DecompressedPixels = NULL;	
 	m_StateDecompress = NULL;
+	m_Lagarith16Decompressor = NULL;
 }
 
 
@@ -309,6 +314,11 @@ void AdvImageLayout::GetDataFromDataBytes(enum GetByteMode mode, unsigned char* 
 		size_t size = qlz_size_decompressed((char*)(data + startOffset));
 		// MaxFrameBufferSize
 		qlz_decompress((char*)(data + startOffset), m_DecompressedPixels, m_StateDecompress);		
+		layoutData = (unsigned char*)m_DecompressedPixels;
+	}
+	else  if (0 == strcmp(Compression, "LAGARITH16"))
+	{		
+		long size = m_Lagarith16Decompressor->DecompressData((char*)(data + startOffset), (unsigned short*)m_DecompressedPixels);
 		layoutData = (unsigned char*)m_DecompressedPixels;
 	}
 

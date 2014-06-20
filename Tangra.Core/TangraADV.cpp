@@ -7,10 +7,15 @@
 #include "PreProcessing.h"
 #include "TangraADV.h"
 
+#include "Compressor.h"
+
 AdvLib::AdvFile* g_TangraAdvFile;
 int g_MaxFrameBufferSize;
 int prevFrameNo;
 unsigned long* prevFramePixels;
+Compressor* m_Lagarith16Decompressor = NULL;
+long m_CurrentLagarithWidth = 0;
+long m_CurrentLagaritHeight = 0; 
 
 void EnsureAdvFileClosed()
 {
@@ -213,5 +218,22 @@ HRESULT ADVGetFrame2(int frameNo, unsigned long* pixels, BYTE* bitmapPixels, BYT
 	ADVGetFrame(frameNo, pixels, bitmapPixels, bitmapBytes, frameInfo, NULL, NULL, NULL);
 	delete frameInfo;
 
+	return S_OK;
+}
+
+HRESULT Lagarith16Decompress(long width, long height, unsigned char* compressedBytes, unsigned char* decompressedBytes)
+{
+	if (m_CurrentLagarithWidth != width || m_CurrentLagaritHeight != height)
+	{
+		if (NULL != m_Lagarith16Decompressor)
+			delete m_Lagarith16Decompressor;
+			
+		m_Lagarith16Decompressor = new Compressor(width, height);
+		m_CurrentLagarithWidth = width;
+		m_CurrentLagaritHeight = height;
+	}
+	
+	m_Lagarith16Decompressor->DecompressData(compressedBytes, (unsigned short*)decompressedBytes);
+	
 	return S_OK;
 }

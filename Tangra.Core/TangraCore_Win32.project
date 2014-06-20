@@ -25,6 +25,9 @@
     <File Name="Tangra.Math.cpp"/>
     <File Name="simplified_tracker.cpp"/>
     <File Name="Tangra.Image.cpp"/>
+    <File Name="Compressor.cpp"/>
+    <File Name="ProbabilityCoder.cpp"/>
+    <File Name="RangeCoder.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="include">
     <File Name="adv_file.h"/>
@@ -47,6 +50,9 @@
     <File Name="Tangra.Math.h"/>
     <File Name="simplified_tracker.h"/>
     <File Name="Tangra.Image.h"/>
+    <File Name="Compressor.h"/>
+    <File Name="ProbabilityCoder.h"/>
+    <File Name="RangeCoder.h"/>
   </VirtualDirectory>
   <Settings Type="Dynamic Library">
     <GlobalSettings>

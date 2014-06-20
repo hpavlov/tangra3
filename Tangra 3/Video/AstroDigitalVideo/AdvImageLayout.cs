@@ -6,6 +6,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
+using Tangra.PInvoke;
 
 namespace Tangra.Video.AstroDigitalVideo
 {
@@ -140,18 +141,26 @@ namespace Tangra.Video.AstroDigitalVideo
 				bytes = dataBytes;
 				readIndex = startIndex;
             }
-			else if (m_Compression == AdvCompressionMethods.COMPR_DIFF_CORR_QUICKLZ)
+			else if (m_Compression == AdvCompressionMethods.COMPR_QUICKLZ)
 			{
 				byte[] compressedBytes = new byte[size];
 				Array.Copy(dataBytes, startIndex, compressedBytes, 0, size);
 
 				readIndex = 0;
 				bytes = QuickLZ.decompress(compressedBytes);
-            }			
-            else
-                throw new NotSupportedException(string.Format("Don't know how to apply compression '{0}'", m_Compression));
+			}
+			else if (m_Compression == AdvCompressionMethods.COMPR_LAGARITH16)
+			{
+				byte[] compressedBytes = new byte[size];
+				Array.Copy(dataBytes, startIndex, compressedBytes, 0, size);
 
-				
+				readIndex = 0;
+				bytes = TangraCore.Lagarith16Decompress(Width, Height, compressedBytes);
+			}
+			else
+				throw new NotSupportedException(string.Format("Don't know how to apply compression '{0}'", m_Compression));
+
+
 			ushort[,] imageData;
 			bool crcOkay;
 			if (BitsPerPixel == 12)

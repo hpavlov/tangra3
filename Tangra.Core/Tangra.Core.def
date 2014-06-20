@@ -12,6 +12,7 @@ EXPORTS
 	ADVGetFramePixels
 	ADVGetFrameStatusChannel
 	ADVGetFileTag
+	Lagarith16Decompress
 
 	; Video and Image Config
 	InitTangraCore
@@ -72,4 +73,4 @@ EXPORTS
 	Convolution
 	PrepareImageForOCR
 	PrepareImageForOCRSingleStep
-	LargeChunkDenoise
+	LargeChunkDenoise	

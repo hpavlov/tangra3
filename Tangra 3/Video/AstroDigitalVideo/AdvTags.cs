@@ -51,8 +51,8 @@ namespace Tangra.Video.AstroDigitalVideo
 	public static class AdvCompressionMethods
 	{
 		public static string COMPR_UNCOMPRESSED = "UNCOMPRESSED";
-		public static string COMPR_DIFF_CORR_HUFFMAN = "HUFFMAN";
-		public static string COMPR_DIFF_CORR_QUICKLZ = "QUICKLZ";
+		public static string COMPR_LAGARITH16 = "LAGARITH16";
+		public static string COMPR_QUICKLZ = "QUICKLZ";
 	}
 
 	public static class AdvRedundancyCheck
