@@ -173,8 +173,12 @@ namespace Tangra.Controller
 						if (frameStream != null)
 						{
 							TangraContext.Current.UsingADV = true;
-							m_OverlayManager.Init(equipmentInfo, geoLocation, frameStream.FirstFrame);							
+							m_OverlayManager.Init(equipmentInfo, geoLocation, frameStream.FirstFrame);
 						}
+					}
+					else if (fileExtension == ".ser")
+					{
+						frameStream = SERVideoStream.OpenFile(fileName);
 					}
 					else if (fileExtension == ".bmp")
 					{

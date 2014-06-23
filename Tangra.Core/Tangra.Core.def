@@ -61,7 +61,7 @@ EXPORTS
 	DoNonLinearPfsFit
 	ConfigureSaturationLevels
 	
-	;Simplified Tracker
+	; Simplified Tracker
 	TrackerSettings
 	TrackerNewConfiguration
 	TrackerInitialiseNewTracking
@@ -69,8 +69,13 @@ EXPORTS
 	TrackerConfigureObject
 	TrackerGetTargetState
 	
-	;Image Processing
+	; Image Processing
 	Convolution
 	PrepareImageForOCR
 	PrepareImageForOCRSingleStep
 	LargeChunkDenoise	
+	
+	; SER Files
+	SEROpenFile
+	SERCloseFile
+	SERGetFrame

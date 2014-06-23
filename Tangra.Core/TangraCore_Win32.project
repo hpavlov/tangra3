@@ -28,6 +28,7 @@
     <File Name="Compressor.cpp"/>
     <File Name="ProbabilityCoder.cpp"/>
     <File Name="RangeCoder.cpp"/>
+    <File Name="ser_file.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="include">
     <File Name="adv_file.h"/>
@@ -53,6 +54,7 @@
     <File Name="Compressor.h"/>
     <File Name="ProbabilityCoder.h"/>
     <File Name="RangeCoder.h"/>
+    <File Name="ser_file.h"/>
   </VirtualDirectory>
   <Settings Type="Dynamic Library">
     <GlobalSettings>

@@ -250,6 +250,26 @@ namespace Tangra.PInvoke
 		}
 	}
 
+	[StructLayout(LayoutKind.Sequential)]
+	public struct SerFileInfo
+	{
+		public int CameraId;
+		public int ColourId;
+		public int LittleEndian;
+		public int Width;
+		public int Height;
+		public int PixelDepthPerPlane;
+		public int CountFrames;
+		public long SequenceStartTime;
+		public long SequenceStartTimeUTC;
+	};
+
+	[StructLayout(LayoutKind.Sequential)]
+	public struct SerFrameInfo
+	{
+		public long TimeStamp;
+	};
+
 	public static class TangraCore
 	{
 		internal const string LIBRARY_TANGRA_CORE = "TangraCore";
@@ -294,6 +314,20 @@ namespace Tangra.PInvoke
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
 		//DLL_PUBLIC HRESULT Lagarith16Decompress(long width, long height, unsigned char* compressedBytes, unsigned char* decompressedBytes);
 		private static extern int Lagarith16Decompress(int width, int height, [In] byte[] compressedBytes, [In, Out] byte[] decompressedBytes);
+
+
+		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+		//HRESULT SEROpenFile(char* fileName, AdvLib::AdvFileInfo* fileInfo);
+		public static extern int SEROpenFile(string fileName, [In, Out] ref SerFileInfo fileInfo);
+
+		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+		//HRESULT SERCloseFile();
+		public static extern int SERCloseFile();
+
+		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+		//HRESULT SERGetFrame(int frameNo, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, AdvLib::AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError);
+		public static extern int SERGetFrame(int frameNo, [In, Out] uint[] pixels, [In, Out] byte[] bitmapBytes, [In, Out] byte[] bitmapDisplayBytes, [In, Out] SerFrameInfo frameInfo, [In, Out] byte[] observer, [In, Out] byte[] instrument, [In, Out] byte[] telescope);
+
 
 		public static string GetTangraCoreVersion()
 		{
