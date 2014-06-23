@@ -255,7 +255,7 @@ namespace Tangra.VideoOperations.LightCurves
             rbGuidingStar.Text = "Guiding Star";
             m_IsBrightEnoughForAutoGuidingStar = false;
 
-			if (gaussian != null && TangraConfig.Settings.Photometry.SignalApertureUnitDefault == TangraConfig.SignalApertureUnit.FWHM)
+			if (gaussian != null && !double.IsNaN(gaussian.FWHM) && TangraConfig.Settings.Photometry.SignalApertureUnitDefault == TangraConfig.SignalApertureUnit.FWHM)
 				m_Aperture = (float)(gaussian.FWHM * TangraConfig.Settings.Photometry.DefaultSignalAperture);
 			else
 				m_Aperture = (float)(TangraConfig.Settings.Photometry.DefaultSignalAperture);
@@ -422,10 +422,18 @@ namespace Tangra.VideoOperations.LightCurves
 				//	m_Gaussian = gaussian;
 				//}
 
-                decimal appVal = (decimal)m_Aperture;
+                decimal appVal;
                 if (float.IsNaN(preselectedAperture))
                 {
-                    if (nudAperture1.Maximum < appVal) nudAperture1.Maximum = appVal + 1;
+					if (float.IsNaN(m_Aperture))
+					{
+						appVal = Convert.ToDecimal(TangraConfig.Settings.Photometry.DefaultSignalAperture);
+					}
+					else
+					{
+						appVal = Convert.ToDecimal(m_Aperture);
+						if (nudAperture1.Maximum < appVal) nudAperture1.Maximum = appVal + 1;
+					}
                 }
                 else
                     appVal = (decimal)preselectedAperture;
