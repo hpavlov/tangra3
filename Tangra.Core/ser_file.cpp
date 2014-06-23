@@ -14,7 +14,9 @@ namespace SerLib
 SerFile::SerFile()
 {
 	m_RawFrameBuffer = NULL;
-	NormalisationValue = 0; // No normalisation of videos that are not 8, 12, 14 or 16 bit (these should be the only supported SER bpp)
+	
+	// No normalisation of videos that are 8, 12, 14 or 16 bit. NormalisationValue will be set later if different BBP is used.
+	NormalisationValue = 0; 
 }
 
 SerFile::~SerFile()
@@ -70,6 +72,14 @@ void SerFile::OpenFile(const char* filePath, SerLib::SerFileInfo* fileInfo, char
 	Bpp = buffInt;
 	
 	m_BytesPerPixel = Bpp > 8 ? 2 : 1;
+	
+	if (
+			(m_BytesPerPixel == 2 && Bpp != 12 && Bpp != 14 && Bpp != 16) ||
+			(m_BytesPerPixel == 1 && Bpp < 8)
+		)
+	{
+		NormalisationValue = 1 << Bpp;
+	}
 		
 	fread(&buffInt, 4, 1, m_File);
 	fileInfo->CountFrames = buffInt;
