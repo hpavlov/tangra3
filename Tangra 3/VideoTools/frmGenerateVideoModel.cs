@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
@@ -12,6 +13,7 @@ using System.Threading;
 using System.Windows.Forms;
 using Tangra.Model.Config;
 using Tangra.Model.Image;
+using Tangra.Model.Numerical;
 using Tangra.PInvoke;
 using Tangra.Video.AstroDigitalVideo;
 
@@ -110,6 +112,9 @@ namespace Tangra.VideoTools
 						TangraVideo.AddAviVideoFrame(pixmap, modelConfig.Gamma, null);
 					}
 
+					if (modelConfig.SimulateMovingBackground)
+						GenerateBackgroundModelParameters(modelConfig.PolyBgOrder, modelConfig.PolyBgDepth, 100, 100, 40);
+
 					for (int i = 1; i <= modelConfig.TotalFrames; i++)
 					{
 						using (Pixelmap pixmap = GenerateFrame(i * 1.0 / modelConfig.TotalFrames, modelConfig))
@@ -133,6 +138,152 @@ namespace Tangra.VideoTools
 
 		private static Font s_SmallFont = new Font(FontFamily.GenericSansSerif, 7);
 		private const double FWHM_GAIN_PER_MAG = 0.15;
+
+		private double m_A;
+		private double m_B;
+		private double m_C;
+		private double m_D;
+		private double m_E;
+		private double m_F;
+
+		private int[,] GenerateBackground(int order, int frequency, double shift, double framesDone, int x0, int y0, int side)
+		{
+			int[,] rv = new int[300, 200];
+			double deltaX = -shift;
+			double step = 2 * shift / frequency;
+
+			for (int x = 0; x < framesDone - 1; x++)
+			{
+				if ((x / frequency) % 2 == 0)
+					deltaX += step;
+				else
+					deltaX -= step;
+			}
+			Trace.WriteLine(string.Format("framesDone:{0}, deltaX = {1}", framesDone, deltaX));
+
+			for (int x = 0; x < 300; x++)
+			for (int y = 0; y < 200; y++)
+			{
+				if (x > x0 - side && x < x0 + side && y > y0 - side && y < y0 + side)
+				{
+					if (order == 1)
+					{
+						rv[x, y] = (int)(m_A * (x + deltaX) + m_B * y + m_C);
+					}
+					else if (order == 2)
+					{
+						rv[x, y] = (int)(m_A * (x + deltaX) * (x + deltaX) + m_B * (x + deltaX) * y + m_C * y * y + m_D * (x + deltaX) * m_E * y + m_F);
+					}
+				}
+			}
+
+			return rv;
+		}
+
+		private void GenerateBackgroundModelParameters(int order, double depth, int x0, int y0, int radius)
+		{
+			Random rnd = new Random((int) DateTime.Now.Ticks);
+
+			if (order == 1)
+			{
+				// z = ax + by + c
+
+				int dist = rnd.Next(x0, x0 + (int)(1.2 * radius));
+				int d2 = rnd.Next((int)depth / 2, (int)depth);
+
+				SafeMatrix A = new SafeMatrix(3, 3);
+				SafeMatrix X = new SafeMatrix(3, 1);
+
+				A[0, 0] = x0; A[0, 1] = y0; A[0, 2] = 1; X[0, 0] = depth;
+				A[1, 0] = x0 + dist / 2; A[1, 1] = y0 + dist / 3; A[1, 2] = 1; X[1, 0] = d2;
+				A[2, 0] = x0 + dist; A[2, 1] = y0 + dist / 2; A[2, 2] = 1; X[2, 0] = 0;
+
+				SafeMatrix a_T = A.Transpose();
+				SafeMatrix aa = a_T * A;
+				SafeMatrix aa_inv = aa.Inverse();
+				SafeMatrix bx = (aa_inv * a_T) * X;
+
+				m_A = bx[0, 0];
+				m_B = bx[1, 0];
+				m_C = bx[2, 0];
+			}
+			else if (order == 2)
+			{
+				// z = axx + bxy + cyy + dx + ey + f
+
+				int[] xArr = new int[6];
+				int[] yArr = new int[6];
+				double[] zArr = new double[6];
+
+				xArr[0] = x0; yArr[0] = y0; zArr[0] = depth;
+				xArr[1] = x0 + radius; yArr[1] = y0 + radius / 3; zArr[1] = 0;
+				for (int i = 2; i < 6; i++)
+				{
+					xArr[i] = rnd.Next(x0, x0 + (int)(1.2 * radius));
+					yArr[i] = rnd.Next(y0, y0 + (int)(0.6 * radius));
+					zArr[i] = rnd.Next(0, (int)depth);
+				}
+
+				// Start with an approximation
+				// z = axx +     + cyy +         + f
+
+				SafeMatrix A = new SafeMatrix(3, 3);
+				SafeMatrix X = new SafeMatrix(3, 1);
+
+				for (int i = 0; i < 3; i++)
+				{
+					A[i, 0] = xArr[i] * xArr[i];
+					A[i, 1] = yArr[i] * yArr[i];
+					A[i, 2] = 1;
+					X[i, 0] = zArr[i];
+				}
+
+				SafeMatrix a_T = A.Transpose();
+				SafeMatrix aa = a_T * A;
+				SafeMatrix aa_inv = aa.Inverse();
+				SafeMatrix bx = (aa_inv * a_T) * X;
+
+				m_A = bx[0, 0];
+				m_C = bx[1, 0];
+				m_F = bx[2, 0];
+
+				m_B = 0;
+				m_D = 0;
+				m_E = 0;
+
+				/*
+				A = new SafeMatrix(6, 6);
+				X = new SafeMatrix(6, 1);
+
+				for (int i = 0; i < 6; i++)
+				{
+					A[i, 0] = xArr[i] * xArr[i];
+					A[i, 1] = xArr[i] * yArr[i];
+					A[i, 2] = yArr[i] * yArr[i];
+					A[i, 3] = xArr[i];
+					A[i, 4] = yArr[i]; 
+					A[i, 5] = 1;
+					X[i, 0] = zArr[i];
+				}
+
+				a_T = A.Transpose();
+				aa = a_T * A;
+				aa_inv = aa.Inverse();
+				bx = (aa_inv * a_T) * X;
+
+				m_A = bx[0, 0];
+				m_B = bx[1, 0];
+				m_C = bx[2, 0];
+				m_D = bx[3, 0];
+				m_E = bx[4, 0];
+				m_F = bx[5, 0];
+				 */
+			}
+			else if (order == 3)
+			{
+				// z = axxx + bxxy + cxyy + dyyy + exx + fxy + gyy + hx + iy + j
+			}
+		}
 
 		private Pixelmap GenerateFrame(double percentDone, ModelConfig modelConfig)
 		{
@@ -160,9 +311,22 @@ namespace Tangra.VideoTools
 				I5 = (int)Math.Round(Random(I5, modelConfig.FlickeringStdDev));
 			}
 
+			int[,] simulatedBackground = new int[300,200];
+			for (int x = 0; x < 300; x++)
+			for (int y = 0; y < 200; y++)
+			{
+				simulatedBackground[x, y] = 0;
+			}
+
 			using (Bitmap bmp = new Bitmap(300, 200, PixelFormat.Format24bppRgb))
 			{
-				GenerateNoise(bmp, modelConfig.NoiseMean, modelConfig.NoiseStdDev);
+				
+				if (modelConfig.SimulateMovingBackground)
+				{
+					simulatedBackground = GenerateBackground(modelConfig.PolyBgOrder, modelConfig.PolyBgFreq, modelConfig.PolyBgShift, modelConfig.TotalFrames * percentDone, 110, 100, 35);
+				}
+
+				GenerateNoise(bmp, simulatedBackground, modelConfig.NoiseMean, modelConfig.NoiseStdDev);
 
 				GenerateStar(bmp, 25, 160, (float)fwhm1, I1);
 				if (modelConfig.SimulateStar2) GenerateStar(bmp, 75, 160, (float)fwhm2, I2);
@@ -208,7 +372,7 @@ namespace Tangra.VideoTools
 			return randNormal;
 		}
 
-		private void GenerateNoise(Bitmap bmp, int mean, int stdDev)
+		private void GenerateNoise(Bitmap bmp, int[,] simulatedBackground, int mean, int stdDev)
 		{
 			BitmapData bmData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
 
@@ -224,7 +388,7 @@ namespace Tangra.VideoTools
 				{
 					for (int x = 0; x < bmp.Width; ++x)
 					{
-						byte val = (byte)Math.Min(255, Math.Max(0, (int)Math.Abs(Random(mean, stdDev))));
+						byte val = (byte)Math.Min(255, Math.Max(0, (int)Math.Abs(simulatedBackground[x, y] + Random(mean, stdDev))));
 
 						p[0] = val;
 						p[1] = val;
