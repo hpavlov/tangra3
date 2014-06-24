@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
+using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.Model.Video;
 using Tangra.PInvoke;
@@ -19,10 +23,17 @@ namespace Tangra.Video
 		private SerFileInfo m_FileInfo;
 		private string m_FileName;
 
+		private SerFrameInfo m_CurrentFrameInfo;
+
 		private SERVideoStream(string fileName)
 		{
 			m_FileInfo = new SerFileInfo();
-			TangraCore.SEROpenFile(fileName, ref m_FileInfo);
+
+			byte[] observer = new byte[40];
+			byte[] instrument = new byte[40];
+			byte[] telescope = new byte[40];
+
+			TangraCore.SEROpenFile(fileName, ref m_FileInfo, observer, instrument, telescope);
 
 			m_FileName = fileName;
 		}
@@ -59,17 +70,55 @@ namespace Tangra.Video
 
 		public double FrameRate
 		{
-			get { throw new NotImplementedException(); }
+			get
+			{
+				// TODO: Make it possible to report "Unknown Framerate", which will lead to disabling the +/-1 sec and +/-10 sec buttons
+				return 25;
+			}
 		}
 
 		public double MillisecondsPerFrame
 		{
-			get { throw new NotImplementedException(); }
+			get
+			{
+				// TODO: Make it possible to report "Unknown Exposure", which will lead to disabling the +/-1 sec and +/-10 sec buttons
+				return 40;
+			}
 		}
 
 		public Pixelmap GetPixelmap(int index)
 		{
-			throw new NotImplementedException();
+			if (index < FirstFrame || index > LastFrame)
+				throw new ApplicationException("Invalid frame position: " + index);
+
+			uint[] pixels = new uint[Width * Height];
+			byte[] displayBitmapBytes = new byte[Width * Height];
+			byte[] rawBitmapBytes = new byte[(Width * Height * 3) + 40 + 14 + 1];
+
+			var frameInfo = new SerNativeFrameInfo();
+
+			TangraCore.SERGetFrame(index, pixels, rawBitmapBytes, displayBitmapBytes, ref frameInfo);
+
+			m_CurrentFrameInfo = new SerFrameInfo(frameInfo);
+
+			using (var memStr = new MemoryStream(rawBitmapBytes))
+			{
+				Bitmap displayBitmap;
+
+				try
+				{
+					displayBitmap = (Bitmap)Bitmap.FromStream(memStr);
+				}
+				catch (Exception ex)
+				{
+					Trace.WriteLine(ex.GetFullStackTrace());
+					displayBitmap = new Bitmap(Width, Height);
+				}
+
+				var rv = new Pixelmap(Width, Height, BitPix, pixels, displayBitmap, displayBitmapBytes);
+
+				return rv;
+			}
 		}
 
 		public int RecommendedBufferSize
@@ -84,7 +133,26 @@ namespace Tangra.Video
 
 		public Pixelmap GetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging)
 		{
-			throw new NotImplementedException();
+			if (startFrameNo < FirstFrame || startFrameNo > LastFrame)
+				throw new ApplicationException("Invalid frame position: " + startFrameNo);
+
+			int actualFramesToIntegrate = Math.Min(startFrameNo + framesToIntegrate, LastFrame - 1) - startFrameNo;
+
+			uint[] pixels = new uint[Width * Height];
+			byte[] displayBitmapBytes = new byte[Width * Height];
+			byte[] rawBitmapBytes = new byte[(Width * Height * 3) + 40 + 14 + 1];
+			var frameInfo = new SerNativeFrameInfo();
+
+			TangraCore.SERGetIntegratedFrame(startFrameNo, actualFramesToIntegrate, isSlidingIntegration, isMedianAveraging, pixels, rawBitmapBytes, displayBitmapBytes, ref frameInfo);
+
+			m_CurrentFrameInfo = new SerFrameInfo(frameInfo);
+
+			using (var memStr = new MemoryStream(rawBitmapBytes))
+			{
+				Bitmap displayBitmap = (Bitmap)Bitmap.FromStream(memStr);
+
+				return new Pixelmap(Width, Height, BitPix, pixels, displayBitmap, displayBitmapBytes);
+			}
 		}
 
 		public string Engine
@@ -99,7 +167,7 @@ namespace Tangra.Video
 
 		public uint GetAav16NormVal()
 		{
-			throw new NotImplementedException();
+			return m_FileInfo.NormalisationValue;
 		}
 	}
 }

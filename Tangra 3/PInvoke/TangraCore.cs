@@ -262,13 +262,23 @@ namespace Tangra.PInvoke
 		public int CountFrames;
 		public long SequenceStartTime;
 		public long SequenceStartTimeUTC;
+		public uint NormalisationValue;
 	};
 
 	[StructLayout(LayoutKind.Sequential)]
-	public struct SerFrameInfo
+	public struct SerNativeFrameInfo
 	{
 		public long TimeStamp;
 	};
+
+	public class SerFrameInfo
+	{
+		internal SerFrameInfo(SerNativeFrameInfo nativeInfo)
+		{
+			
+		}
+
+	}
 
 	public static class TangraCore
 	{
@@ -318,15 +328,19 @@ namespace Tangra.PInvoke
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
 		//HRESULT SEROpenFile(char* fileName, AdvLib::AdvFileInfo* fileInfo);
-		public static extern int SEROpenFile(string fileName, [In, Out] ref SerFileInfo fileInfo);
+		public static extern int SEROpenFile(string fileName, [In, Out] ref SerFileInfo fileInfo, [In, Out] byte[] observer, [In, Out] byte[] instrument, [In, Out] byte[] telescope);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
 		//HRESULT SERCloseFile();
 		public static extern int SERCloseFile();
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-		//HRESULT SERGetFrame(int frameNo, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, AdvLib::AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError);
-		public static extern int SERGetFrame(int frameNo, [In, Out] uint[] pixels, [In, Out] byte[] bitmapBytes, [In, Out] byte[] bitmapDisplayBytes, [In, Out] SerFrameInfo frameInfo, [In, Out] byte[] observer, [In, Out] byte[] instrument, [In, Out] byte[] telescope);
+		//HRESULT SERGetFrame(int frameNo, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, SerLib::SerFrameInfo* frameInfo);
+		public static extern int SERGetFrame(int frameNo, [In, Out] uint[] pixels, [In, Out] byte[] bitmapBytes, [In, Out] byte[] bitmapDisplayBytes, [In, Out] ref SerNativeFrameInfo frameInfo);
+
+		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+		//HRESULT SERGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, BYTE* bitmapBytes, BYTE* bitmapDisplayBytes, AdvLib::AdvFrameInfo* frameInfo);
+		public static extern int SERGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, [Out] uint[] pixels, [Out] byte[] bitmapBytes, [Out] byte[] bitmapDisplayBytes, [In, Out] ref SerNativeFrameInfo frameInfo);
 
 
 		public static string GetTangraCoreVersion()

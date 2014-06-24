@@ -337,13 +337,13 @@ namespace Tangra
 		{
             if (CurrentOS.IsWindows)
             {
-                openVideoFileDialog.Filter = "All Supported Files (*.avi;*.adv;*.aav)|*.avi;*.adv;*.aav";
+				openVideoFileDialog.Filter = "All Supported Files (*.avi;*.adv;*.aav;*.ser)|*.avi;*.adv;*.aav;*.ser";
                 openVideoFileDialog.DefaultExt = "avi";
             }
             else
             {
                 // On Non-Windows OS currently only ADV/AAV files are supported
-                openVideoFileDialog.Filter = "All Supported Files (*.adv;*.aav)|*.adv;*.aav";
+				openVideoFileDialog.Filter = "All Supported Files (*.adv;*.aav;*.ser)|*.adv;*.aav;*.ser";
                 openVideoFileDialog.DefaultExt = "adv";
             }
 

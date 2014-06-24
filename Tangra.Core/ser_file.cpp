@@ -5,6 +5,7 @@
 
 #include "PreProcessing.h"
 #include "PixelMapUtils.h"
+#include "IntegrationUtils.h"
 
 using namespace std;
 
@@ -73,12 +74,14 @@ void SerFile::OpenFile(const char* filePath, SerLib::SerFileInfo* fileInfo, char
 	
 	m_BytesPerPixel = Bpp > 8 ? 2 : 1;
 	
+	fileInfo->NormalisationValue = 0;
 	if (
 			(m_BytesPerPixel == 2 && Bpp != 12 && Bpp != 14 && Bpp != 16) ||
 			(m_BytesPerPixel == 1 && Bpp < 8)
 		)
 	{
 		NormalisationValue = 1 << Bpp;
+		fileInfo->NormalisationValue = NormalisationValue;
 	}
 		
 	fread(&buffInt, 4, 1, m_File);
@@ -225,4 +228,50 @@ HRESULT SERGetFrame(int frameNo, unsigned long* pixels, BYTE* bitmapPixels, BYTE
 	}
 	
 	return E_FAIL;
+}
+
+HRESULT SERGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, BYTE* bitmapBytes, BYTE* bitmapDisplayBytes, SerLib::SerFrameInfo* frameInfo)
+{
+	if (NULL != m_SerFile)
+	{
+		HRESULT rv;
+		int firstFrameToIntegrate = IntegrationManagerGetFirstFrameToIntegrate(startFrameNo, framesToIntegrate, isSlidingIntegration);
+		IntergationManagerStartNew(m_SerFile->Width, m_SerFile->Height, isMedianAveraging);
+
+		SerLib::SerFrameInfo firstFrameInfo;
+		SerLib::SerFrameInfo lastFrameInfo;
+
+		for(int idx = 0; idx < framesToIntegrate; idx++)
+		{
+			SerLib::SerFrameInfo* singleFrameInfo = idx == 0 ? &firstFrameInfo : &lastFrameInfo;
+			
+			rv = m_SerFile->GetFrame(firstFrameToIntegrate + idx, pixels, singleFrameInfo);
+			
+			if (!SUCCEEDED(rv))
+			{
+				IntegrationManagerFreeResources();
+				return rv;
+			}
+
+			if (g_UsesPreProcessing)
+			{
+				rv = ApplyPreProcessingPixelsOnly(pixels, m_SerFile->Width, m_SerFile->Height, m_SerFile->Bpp);
+
+				if (!SUCCEEDED(rv))
+				{
+					IntegrationManagerFreeResources();
+					return rv;
+				}
+			}
+
+			IntegrationManagerAddFrameEx(pixels, m_SerFile->LittleEndian, m_SerFile->Bpp);
+		}
+
+		IntegrationManagerProduceIntegratedFrame(pixels);
+		IntegrationManagerFreeResources();
+		
+		frameInfo->TimeStamp = (firstFrameInfo.TimeStamp + lastFrameInfo.TimeStamp) / 2;
+		
+		return GetBitmapPixels(m_SerFile->Width, m_SerFile->Height, pixels, bitmapBytes, bitmapDisplayBytes, false, m_SerFile->Bpp, m_SerFile->NormalisationValue);		
+	}
 }
