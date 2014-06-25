@@ -30,7 +30,7 @@ SerFile::~SerFile()
 }
 
 
-void SerFile::OpenFile(const char* filePath, SerLib::SerFileInfo* fileInfo, char* observer, char* instrument, char* telescope)
+void SerFile::OpenFile(const char* filePath, SerLib::SerFileInfo* fileInfo, char* observer, char* instrument, char* telescope, bool checkMagic)
 {
 	m_File = fopen(filePath, "rb");
 
@@ -41,8 +41,12 @@ void SerFile::OpenFile(const char* filePath, SerLib::SerFileInfo* fileInfo, char
 	fread(&magic[0], 14, 1, m_File);
 	magic[14] = 0;
 	
-	if (strcmp(magic, "LUCAM-RECORDER") != 0)
-		return;
+	if (checkMagic)
+	{
+		if (strcmp(magic, "LUCAM-RECORDER") != 0 && 
+			strcmp(magic, "FireCaptureV24") != 0)
+			return;		
+	}
 		
 	fread(&buffInt, 4, 1, m_File);
 	fileInfo->CameraId = buffInt;
@@ -187,12 +191,12 @@ HRESULT SerFile::ProcessRawFrame(unsigned long* pixels)
 
 SerLib::SerFile* m_SerFile = NULL;
 
-HRESULT SEROpenFile(char* fileName, SerLib::SerFileInfo* fileInfo, char* observer, char* instrument, char* telescope)
+HRESULT SEROpenFile(char* fileName, SerLib::SerFileInfo* fileInfo, char* observer, char* instrument, char* telescope, bool checkMagic)
 {
 	SERCloseFile();
 	
 	m_SerFile = new SerLib::SerFile();
-	m_SerFile->OpenFile(fileName, fileInfo, observer, instrument, telescope);
+	m_SerFile->OpenFile(fileName, fileInfo, observer, instrument, telescope, checkMagic);
 	
 	return S_OK;
 }

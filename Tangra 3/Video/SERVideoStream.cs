@@ -33,7 +33,7 @@ namespace Tangra.Video
 			byte[] instrument = new byte[40];
 			byte[] telescope = new byte[40];
 
-			TangraCore.SEROpenFile(fileName, ref m_FileInfo, observer, instrument, telescope);
+			TangraCore.SEROpenFile(fileName, ref m_FileInfo, observer, instrument, telescope, false);
 
 			m_FileName = fileName;
 		}

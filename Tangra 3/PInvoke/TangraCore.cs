@@ -328,7 +328,7 @@ namespace Tangra.PInvoke
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
 		//HRESULT SEROpenFile(char* fileName, AdvLib::AdvFileInfo* fileInfo);
-		public static extern int SEROpenFile(string fileName, [In, Out] ref SerFileInfo fileInfo, [In, Out] byte[] observer, [In, Out] byte[] instrument, [In, Out] byte[] telescope);
+		public static extern int SEROpenFile(string fileName, [In, Out] ref SerFileInfo fileInfo, [In, Out] byte[] observer, [In, Out] byte[] instrument, [In, Out] byte[] telescope, bool checkMagic);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
 		//HRESULT SERCloseFile();
