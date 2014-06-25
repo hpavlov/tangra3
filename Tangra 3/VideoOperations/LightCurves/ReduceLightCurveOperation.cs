@@ -642,7 +642,7 @@ namespace Tangra.VideoOperations.LightCurves
                 m_StateMachine.CurrentState < LightCurvesState.ReadyToRun)
             {
                 // Keep track on the currently selected object in the state
-                if (e.Gausian != null)
+				if (e.Gausian != null && e.Gausian.IsSolved)
                     m_StateMachine.SelectedObject = new ImagePixel(e.Gausian.Brightness, e.Gausian.XCenter, e.Gausian.YCenter);
                 else
                 {

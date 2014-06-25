@@ -252,7 +252,14 @@ namespace Tangra.Video.AstroDigitalVideo
 
 				s_PropertiesFont.Dispose();
 				s_PropertiesFont = null;
-			}			
+			}
+
+			if (s_TimeStampFont == null)
+			{
+				// Font size could not be determined automatically. Use a default size
+				s_TimeStampFont = new Font(FontFamily.GenericMonospace, 9, FontStyle.Bold);
+				s_PropertiesFont = new Font(FontFamily.GenericMonospace, 4.5f, FontStyle.Bold);
+			}
 
 		}
 	}
