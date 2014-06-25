@@ -34,6 +34,7 @@ namespace Tangra.Config.SettingPannels
 		{
 			nudSaturation12bit.SetNUDValue((int)TangraConfig.Settings.Photometry.Saturation.Saturation12Bit);
 			nudSaturation14bit.SetNUDValue((int)TangraConfig.Settings.Photometry.Saturation.Saturation14Bit);
+			nudSaturation16bit.SetNUDValue((int)TangraConfig.Settings.Photometry.Saturation.Saturation16Bit);
 
 			cbxAdvsOsdTimeStamp.Checked = TangraConfig.Settings.ADVS.OverlayTimestamp;
 			cbxAdvsOsdGamma.Checked = TangraConfig.Settings.ADVS.OverlayGamma;
@@ -59,6 +60,7 @@ namespace Tangra.Config.SettingPannels
 		{
 			TangraConfig.Settings.Photometry.Saturation.Saturation12Bit = (uint)nudSaturation12bit.Value;
 			TangraConfig.Settings.Photometry.Saturation.Saturation14Bit = (uint)nudSaturation14bit.Value;
+			TangraConfig.Settings.Photometry.Saturation.Saturation16Bit = (uint)nudSaturation16bit.Value;
 
         	TangraConfig.Settings.ADVS.OverlayTimestamp = cbxAdvsOsdTimeStamp.Checked;
 			TangraConfig.Settings.ADVS.OverlayGamma = cbxAdvsOsdGamma.Checked;

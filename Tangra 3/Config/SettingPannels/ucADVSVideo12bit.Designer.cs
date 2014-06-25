@@ -29,6 +29,7 @@
 		private void InitializeComponent()
 		{
 			this.groupControl1 = new System.Windows.Forms.GroupBox();
+			this.linkLabelADVS = new System.Windows.Forms.LinkLabel();
 			this.nudSaturation14bit = new System.Windows.Forms.NumericUpDown();
 			this.label3 = new System.Windows.Forms.Label();
 			this.cbxADVEngine = new System.Windows.Forms.ComboBox();
@@ -54,16 +55,20 @@
 			this.cbxAdvsPopupGamma = new System.Windows.Forms.CheckBox();
 			this.cbxAdvsPopupGain = new System.Windows.Forms.CheckBox();
 			this.cbxAdvsPopupTimeStamp = new System.Windows.Forms.CheckBox();
-			this.linkLabelADVS = new System.Windows.Forms.LinkLabel();
+			this.nudSaturation16bit = new System.Windows.Forms.NumericUpDown();
+			this.label4 = new System.Windows.Forms.Label();
 			this.groupControl1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nudSaturation14bit)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudSaturation12bit)).BeginInit();
 			this.groupControl2.SuspendLayout();
 			this.groupControl3.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.nudSaturation16bit)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// groupControl1
 			// 
+			this.groupControl1.Controls.Add(this.nudSaturation16bit);
+			this.groupControl1.Controls.Add(this.label4);
 			this.groupControl1.Controls.Add(this.linkLabelADVS);
 			this.groupControl1.Controls.Add(this.nudSaturation14bit);
 			this.groupControl1.Controls.Add(this.label3);
@@ -73,10 +78,21 @@
 			this.groupControl1.Controls.Add(this.label1);
 			this.groupControl1.Location = new System.Drawing.Point(3, 3);
 			this.groupControl1.Name = "groupControl1";
-			this.groupControl1.Size = new System.Drawing.Size(207, 113);
+			this.groupControl1.Size = new System.Drawing.Size(207, 131);
 			this.groupControl1.TabIndex = 41;
 			this.groupControl1.TabStop = false;
 			this.groupControl1.Text = "ADVS";
+			// 
+			// linkLabelADVS
+			// 
+			this.linkLabelADVS.AutoSize = true;
+			this.linkLabelADVS.Location = new System.Drawing.Point(8, -1);
+			this.linkLabelADVS.Name = "linkLabelADVS";
+			this.linkLabelADVS.Size = new System.Drawing.Size(36, 13);
+			this.linkLabelADVS.TabIndex = 55;
+			this.linkLabelADVS.TabStop = true;
+			this.linkLabelADVS.Text = "ADVS";
+			this.linkLabelADVS.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelADVS_LinkClicked);
 			// 
 			// nudSaturation14bit
 			// 
@@ -158,9 +174,9 @@
 			this.groupControl2.Controls.Add(this.cbxAdvsOsdGamma);
 			this.groupControl2.Controls.Add(this.cbxAdvsOsdGain);
 			this.groupControl2.Controls.Add(this.cbxAdvsOsdTimeStamp);
-			this.groupControl2.Location = new System.Drawing.Point(3, 122);
+			this.groupControl2.Location = new System.Drawing.Point(3, 140);
 			this.groupControl2.Name = "groupControl2";
-			this.groupControl2.Size = new System.Drawing.Size(207, 195);
+			this.groupControl2.Size = new System.Drawing.Size(207, 189);
 			this.groupControl2.TabIndex = 44;
 			this.groupControl2.TabStop = false;
 			this.groupControl2.Text = "On Screen Display (Overlay)";
@@ -235,7 +251,7 @@
 			this.groupControl3.Controls.Add(this.cbxAdvsPopupTimeStamp);
 			this.groupControl3.Location = new System.Drawing.Point(216, 3);
 			this.groupControl3.Name = "groupControl3";
-			this.groupControl3.Size = new System.Drawing.Size(208, 314);
+			this.groupControl3.Size = new System.Drawing.Size(208, 323);
 			this.groupControl3.TabIndex = 45;
 			this.groupControl3.TabStop = false;
 			this.groupControl3.Text = "Frame Details Display (Pop-up)";
@@ -330,16 +346,31 @@
 			this.cbxAdvsPopupTimeStamp.Text = "Central Exposure Time";
 			this.cbxAdvsPopupTimeStamp.CheckedChanged += new System.EventHandler(this.OnAdvPopupSettingChanged);
 			// 
-			// linkLabelADVS
+			// nudSaturation16bit
 			// 
-			this.linkLabelADVS.AutoSize = true;
-			this.linkLabelADVS.Location = new System.Drawing.Point(8, -1);
-			this.linkLabelADVS.Name = "linkLabelADVS";
-			this.linkLabelADVS.Size = new System.Drawing.Size(36, 13);
-			this.linkLabelADVS.TabIndex = 55;
-			this.linkLabelADVS.TabStop = true;
-			this.linkLabelADVS.Text = "ADVS";
-			this.linkLabelADVS.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelADVS_LinkClicked);
+			this.nudSaturation16bit.Location = new System.Drawing.Point(133, 105);
+			this.nudSaturation16bit.Maximum = new decimal(new int[] {
+            65535,
+            0,
+            0,
+            0});
+			this.nudSaturation16bit.Name = "nudSaturation16bit";
+			this.nudSaturation16bit.Size = new System.Drawing.Size(54, 20);
+			this.nudSaturation16bit.TabIndex = 56;
+			this.nudSaturation16bit.Value = new decimal(new int[] {
+            65000,
+            0,
+            0,
+            0});
+			// 
+			// label4
+			// 
+			this.label4.AutoSize = true;
+			this.label4.Location = new System.Drawing.Point(11, 108);
+			this.label4.Name = "label4";
+			this.label4.Size = new System.Drawing.Size(116, 13);
+			this.label4.TabIndex = 57;
+			this.label4.Text = "16 bit Saturation Level:";
 			// 
 			// ucADVSVideo12bit
 			// 
@@ -350,13 +381,14 @@
 			this.Controls.Add(this.groupControl2);
 			this.Controls.Add(this.groupControl1);
 			this.Name = "ucADVSVideo12bit";
-			this.Size = new System.Drawing.Size(454, 325);
+			this.Size = new System.Drawing.Size(454, 343);
 			this.groupControl1.ResumeLayout(false);
 			this.groupControl1.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nudSaturation14bit)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudSaturation12bit)).EndInit();
 			this.groupControl2.ResumeLayout(false);
 			this.groupControl3.ResumeLayout(false);
+			((System.ComponentModel.ISupportInitialize)(this.nudSaturation16bit)).EndInit();
 			this.ResumeLayout(false);
 
 		}
@@ -390,6 +422,8 @@
 		private System.Windows.Forms.Label label3;
 		private System.Windows.Forms.CheckBox cbxAdvsOsdGeoLocation;
 		private System.Windows.Forms.LinkLabel linkLabelADVS;
+		private System.Windows.Forms.NumericUpDown nudSaturation16bit;
+		private System.Windows.Forms.Label label4;
 
 	}
 }

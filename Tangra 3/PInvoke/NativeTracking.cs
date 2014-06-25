@@ -88,6 +88,10 @@ namespace Tangra.PInvoke
 					m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation14Bit;
 					break;
 
+				case 16:
+					m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation16Bit;
+					break;
+
 				default:
 					m_Saturation = TangraConfig.Settings.Photometry.Saturation.Saturation8Bit;
 					break;
@@ -192,8 +196,8 @@ namespace Tangra.PInvoke
 		private static extern int TrackerGetTargetState(int objectId, [In, Out] NativeTrackedObjectInfo trackingInfo, [In, Out] NativePsfFitInfo psfInfo, [In, Out] double[] residuals);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-		//DLL_PUBLIC void ConfigureSaturationLevels(unsigned long saturation8Bit, unsigned long saturation12Bit, unsigned long saturation14Bit);
-		private static extern int ConfigureSaturationLevels(uint saturation8Bit, uint saturation12Bit, uint saturation14Bit);
+		//DLL_PUBLIC void ConfigureSaturationLevels(unsigned long saturation8Bit, unsigned long saturation12Bit, unsigned long saturation14Bit, unsigned long saturation16Bit);
+		private static extern int ConfigureSaturationLevels(uint saturation8Bit, uint saturation12Bit, uint saturation14Bit, uint saturation16Bit);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
 		//DLL_PUBLIC long TrackerInitialiseNewTracking();
@@ -210,8 +214,8 @@ namespace Tangra.PInvoke
 			ConfigureSaturationLevels(
 				TangraConfig.Settings.Photometry.Saturation.Saturation8Bit,
 				TangraConfig.Settings.Photometry.Saturation.Saturation12Bit,
-				TangraConfig.Settings.Photometry.Saturation.Saturation14Bit);
-
+				TangraConfig.Settings.Photometry.Saturation.Saturation14Bit,
+				TangraConfig.Settings.Photometry.Saturation.Saturation16Bit);
 		}
 
 		private static int s_NumTrackedObjects;

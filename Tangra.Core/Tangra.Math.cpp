@@ -395,9 +395,10 @@ void DoNonLinearPfsFit(
 }
 
 
-void ConfigureSaturationLevels(unsigned long saturation8Bit, unsigned long saturation12Bit, unsigned long saturation14Bit)
+void ConfigureSaturationLevels(unsigned long saturation8Bit, unsigned long saturation12Bit, unsigned long saturation14Bit, unsigned long saturation16Bit)
 {
 	SATURATION_8BIT = saturation8Bit;
 	SATURATION_12BIT = saturation12Bit;
 	SATURATION_14BIT = saturation14Bit;
+	SATURATION_16BIT = saturation16Bit;
 }

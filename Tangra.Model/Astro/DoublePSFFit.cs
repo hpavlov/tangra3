@@ -114,7 +114,9 @@ namespace Tangra.Model.Astro
 						break;
 
 					case PSFFittingDataRange.DataRange16Bit:
-						m_Saturation = (uint)(TangraConfig.Settings.Photometry.Saturation.Saturation8Bit * PSFFit.NormVal / 255.0);
+						m_Saturation = PSFFit.NormVal > 0
+								? (uint)(TangraConfig.Settings.Photometry.Saturation.Saturation8Bit * PSFFit.NormVal / 255.0)
+								: TangraConfig.Settings.Photometry.Saturation.Saturation16Bit;
 						break;
 
 					default:
@@ -331,7 +333,9 @@ namespace Tangra.Model.Astro
 						break;
 
 					case PSFFittingDataRange.DataRange16Bit:
-						m_Saturation = (uint)(TangraConfig.Settings.Photometry.Saturation.Saturation8Bit * PSFFit.NormVal / 255.0);
+						m_Saturation = PSFFit.NormVal > 0
+								? (uint)(TangraConfig.Settings.Photometry.Saturation.Saturation8Bit * PSFFit.NormVal / 255.0)
+								: TangraConfig.Settings.Photometry.Saturation.Saturation16Bit;
 						break;
 
 					default:

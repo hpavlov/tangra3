@@ -263,6 +263,7 @@ namespace Tangra.Model.Config
 			public byte Saturation8Bit = 250;
 			public uint Saturation12Bit = 4000;
 			public uint Saturation14Bit = 16000;
+			public uint Saturation16Bit = 65000;
 
 			public uint GetSaturationForBpp(int bpp)
 			{
@@ -272,6 +273,8 @@ namespace Tangra.Model.Config
 					return Saturation12Bit;
 				else if (bpp == 14)
 					return Saturation14Bit;
+				else if (bpp == 16)
+					return Saturation16Bit;
 
 				return (uint)((1 << bpp) - 1);
 			}
