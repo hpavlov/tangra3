@@ -125,7 +125,7 @@ void SerFile::CloseFile()
 	}
 }
 
-HRESULT SerFile::GetFrame(int frameNo, unsigned long* pixels, SerLib::SerFrameInfo* frameInfo)
+HRESULT SerFile::GetFrame(int frameNo, unsigned long* pixels, int cameraBitPix, SerLib::SerFrameInfo* frameInfo)
 {
 	if (frameNo >=0 && frameNo < m_CountFrames)
 	{
@@ -133,7 +133,7 @@ HRESULT SerFile::GetFrame(int frameNo, unsigned long* pixels, SerLib::SerFrameIn
 			
 		advfsetpos(m_File, &imagePosition);
 		fread(m_RawFrameBuffer, m_RawFrameSize, 1, m_File);
-		HRESULT rv = ProcessRawFrame(pixels);
+		HRESULT rv = ProcessRawFrame(pixels, cameraBitPix);
 		
 		if (SUCCEEDED(rv))
 		{
@@ -154,7 +154,7 @@ HRESULT SerFile::GetFrame(int frameNo, unsigned long* pixels, SerLib::SerFrameIn
 	return E_FAIL;
 }
 
-HRESULT SerFile::ProcessRawFrame(unsigned long* pixels)
+HRESULT SerFile::ProcessRawFrame(unsigned long* pixels, int cameraBitPix)
 {
 	if (m_NumPlanes = 1)
 	{
@@ -170,10 +170,13 @@ HRESULT SerFile::ProcessRawFrame(unsigned long* pixels)
 		}
 		else if (m_BytesPerPixel == 2)
 		{
+			int shiftVal = Bpp - cameraBitPix;
+				
 			unsigned short* shortBuff = (unsigned short*)m_RawFrameBuffer;
 			for(int idx = 0; idx < m_PixelsPerFrame; idx++)
 			{
 				*pixels = *shortBuff;
+				if (shiftVal > 0) *pixels = (*pixels >> shiftVal);
 				pixels++;
 				shortBuff++;
 			}			
@@ -214,18 +217,20 @@ HRESULT SERCloseFile()
 	return S_OK;
 }
 
-HRESULT SERGetFrame(int frameNo, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, SerLib::SerFrameInfo* frameInfo)
+HRESULT SERGetFrame(int frameNo, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, int cameraBitPix, SerLib::SerFrameInfo* frameInfo)
 {
 	if (NULL != m_SerFile)
 	{
-		HRESULT rv = m_SerFile->GetFrame(frameNo, pixels, frameInfo);
+		if (cameraBitPix == 0) cameraBitPix = m_SerFile->Bpp;
+		
+		HRESULT rv = m_SerFile->GetFrame(frameNo, pixels, cameraBitPix, frameInfo);
 
 		if (SUCCEEDED(rv))
 		{
 			if (g_UsesPreProcessing) 
-				return ApplyPreProcessingWithNormalValue(pixels, m_SerFile->Width, m_SerFile->Height, m_SerFile->Bpp, m_SerFile->NormalisationValue, bitmapPixels, bitmapBytes);
+				return ApplyPreProcessingWithNormalValue(pixels, m_SerFile->Width, m_SerFile->Height, cameraBitPix, m_SerFile->NormalisationValue, bitmapPixels, bitmapBytes);
 			else
-				return GetBitmapPixels(m_SerFile->Width, m_SerFile->Height, pixels, bitmapPixels, bitmapBytes, m_SerFile->LittleEndian, m_SerFile->Bpp, m_SerFile->NormalisationValue);
+				return GetBitmapPixels(m_SerFile->Width, m_SerFile->Height, pixels, bitmapPixels, bitmapBytes, m_SerFile->LittleEndian, cameraBitPix, m_SerFile->NormalisationValue);
 		}
 	
 		return rv;
@@ -234,7 +239,7 @@ HRESULT SERGetFrame(int frameNo, unsigned long* pixels, BYTE* bitmapPixels, BYTE
 	return E_FAIL;
 }
 
-HRESULT SERGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, BYTE* bitmapBytes, BYTE* bitmapDisplayBytes, SerLib::SerFrameInfo* frameInfo)
+HRESULT SERGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, BYTE* bitmapBytes, BYTE* bitmapDisplayBytes, int cameraBitPix, SerLib::SerFrameInfo* frameInfo)
 {
 	if (NULL != m_SerFile)
 	{
@@ -245,11 +250,13 @@ HRESULT SERGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSl
 		SerLib::SerFrameInfo firstFrameInfo;
 		SerLib::SerFrameInfo lastFrameInfo;
 
+		if (cameraBitPix == 0) cameraBitPix = m_SerFile->Bpp;
+		
 		for(int idx = 0; idx < framesToIntegrate; idx++)
 		{
 			SerLib::SerFrameInfo* singleFrameInfo = idx == 0 ? &firstFrameInfo : &lastFrameInfo;
 			
-			rv = m_SerFile->GetFrame(firstFrameToIntegrate + idx, pixels, singleFrameInfo);
+			rv = m_SerFile->GetFrame(firstFrameToIntegrate + idx, pixels, cameraBitPix, singleFrameInfo);
 			
 			if (!SUCCEEDED(rv))
 			{
@@ -259,7 +266,7 @@ HRESULT SERGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSl
 
 			if (g_UsesPreProcessing)
 			{
-				rv = ApplyPreProcessingPixelsOnly(pixels, m_SerFile->Width, m_SerFile->Height, m_SerFile->Bpp);
+				rv = ApplyPreProcessingPixelsOnly(pixels, m_SerFile->Width, m_SerFile->Height, cameraBitPix);
 
 				if (!SUCCEEDED(rv))
 				{
@@ -268,7 +275,7 @@ HRESULT SERGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSl
 				}
 			}
 
-			IntegrationManagerAddFrameEx(pixels, m_SerFile->LittleEndian, m_SerFile->Bpp);
+			IntegrationManagerAddFrameEx(pixels, m_SerFile->LittleEndian, cameraBitPix);
 		}
 
 		IntegrationManagerProduceIntegratedFrame(pixels);
@@ -276,6 +283,6 @@ HRESULT SERGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSl
 		
 		frameInfo->TimeStamp = (firstFrameInfo.TimeStamp + lastFrameInfo.TimeStamp) / 2;
 		
-		return GetBitmapPixels(m_SerFile->Width, m_SerFile->Height, pixels, bitmapBytes, bitmapDisplayBytes, false, m_SerFile->Bpp, m_SerFile->NormalisationValue);		
+		return GetBitmapPixels(m_SerFile->Width, m_SerFile->Height, pixels, bitmapBytes, bitmapDisplayBytes, false, cameraBitPix, m_SerFile->NormalisationValue);		
 	}
 }
