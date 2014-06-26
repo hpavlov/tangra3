@@ -145,6 +145,10 @@ namespace Tangra.VideoTools
 		private double m_D;
 		private double m_E;
 		private double m_F;
+		private double m_G;
+		private double m_H;
+		private double m_I;
+		private double m_J;
 
 		private int[,] GenerateBackground(int order, int frequency, double shift, double framesDone, int x0, int y0, int side)
 		{
@@ -172,7 +176,16 @@ namespace Tangra.VideoTools
 					}
 					else if (order == 2)
 					{
-						rv[x, y] = (int)(m_A * (x + deltaX) * (x + deltaX) + m_B * (x + deltaX) * y + m_C * y * y + m_D * (x + deltaX) * m_E * y + m_F);
+						rv[x, y] = (int)(m_A * (x + deltaX) * (x + deltaX) + m_B * (x + deltaX) * y + m_C * y * y + m_D * (x + deltaX) + m_E * y + m_F);
+					}
+					else if (order == 3)
+					{
+						rv[x, y] = (int)(
+							m_A * (x + deltaX) * (x + deltaX) * (x + deltaX) +
+							m_B * (x + deltaX) * (x + deltaX) * y +
+							m_C * y * y * (x + deltaX) + 
+							m_D * y * y * y +
+							m_E * (x + deltaX) * (x + deltaX) + m_F * (x + deltaX) * y + m_G * y * y + m_H * (x + deltaX) + m_I * y + m_J);
 					}
 				}
 			}
@@ -282,6 +295,51 @@ namespace Tangra.VideoTools
 			else if (order == 3)
 			{
 				// z = axxx + bxxy + cxyy + dyyy + exx + fxy + gyy + hx + iy + j
+
+				int[] xArr = new int[10];
+				int[] yArr = new int[10];
+				double[] zArr = new double[10];
+
+				xArr[0] = x0; yArr[0] = y0; zArr[0] = depth;
+				xArr[1] = x0 + radius; yArr[1] = y0 + radius / 3; zArr[1] = 0;
+				for (int i = 2; i < 6; i++)
+				{
+					xArr[i] = rnd.Next(x0, x0 + (int)(1.2 * radius));
+					yArr[i] = rnd.Next(y0, y0 + (int)(0.6 * radius));
+					zArr[i] = rnd.Next(0, (int)depth);
+				}
+
+				// Start with an approximation
+				// z = axxx +     + dyyy +   +  fxy +    + j
+
+				SafeMatrix A = new SafeMatrix(4, 4);
+				SafeMatrix X = new SafeMatrix(4, 1);
+
+				for (int i = 0; i < 4; i++)
+				{
+					A[i, 0] = xArr[i] * xArr[i] * xArr[i];
+					A[i, 1] = yArr[i] * yArr[i] * yArr[i];
+					A[i, 2] = xArr[i] * yArr[i];
+					A[i, 3] = 1;
+					X[i, 0] = zArr[i];
+				}
+
+				SafeMatrix a_T = A.Transpose();
+				SafeMatrix aa = a_T * A;
+				SafeMatrix aa_inv = aa.Inverse();
+				SafeMatrix bx = (aa_inv * a_T) * X;
+
+				m_A = bx[0, 0];
+				m_D = bx[1, 0];
+				m_F = bx[2, 0];
+				m_J = bx[3, 0];
+
+				m_B = 0;
+				m_C = 0;
+				m_E = 0;
+				m_G = 0;
+				m_H = 0;
+				m_I = 0;
 			}
 		}
 
@@ -337,7 +395,7 @@ namespace Tangra.VideoTools
 				if (modelConfig.SimulatePassBy)
 				{
 					GenerateStar(bmp, 110, 100, fwhm_pb1, IPB1);
-					GenerateStar(bmp, 110 + (float)modelConfig.PassByDist, (float)(100 - 3 + 6 * percentDone), fwhm_pb2, IPB2);					
+					GenerateStar(bmp, 110 + (float)modelConfig.PassByDist, (float)(100 - 3 + 6 * percentDone), fwhm_pb2, IPB2);
 				}
 
 				AddOnScreenText(bmp, modelConfig);
@@ -366,6 +424,7 @@ namespace Tangra.VideoTools
 			byte[] twoBytes = new byte[2];
 			cryptoRand.GetBytes(twoBytes);
 			double u1 = twoBytes[0] * 1.0 / 0xFF; //these are uniform(0,1) random doubles
+			if (u1 == 0) u1 = 1; // corner case handling to avoid Log(0)
 			double u2 = twoBytes[1] * 1.0 / 0xFF;
 			double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2); //random normal(0,1)
 			double randNormal = mean + stdDev * randStdNormal; //random normal(mean,stdDev^2)
@@ -388,7 +447,7 @@ namespace Tangra.VideoTools
 				{
 					for (int x = 0; x < bmp.Width; ++x)
 					{
-						byte val = (byte)Math.Min(255, Math.Max(0, (int)Math.Abs(simulatedBackground[x, y] + Random(mean, stdDev))));
+						byte val = (byte)Math.Min(255, Math.Max(0, simulatedBackground[x, y] + Math.Abs(Random(mean, stdDev))));
 
 						p[0] = val;
 						p[1] = val;

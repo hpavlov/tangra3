@@ -5,18 +5,35 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.Model.Video;
 using Tangra.PInvoke;
+using Tangra.Video.SER;
 
 namespace Tangra.Video
 {
 	public class SERVideoStream : IFrameStream
 	{
-		public static SERVideoStream OpenFile(string fileName)
+		public static SERVideoStream OpenFile(string fileName, IWin32Window parentForm)
 		{
-			return new SERVideoStream(fileName);
+			var fileInfo = new SerFileInfo();
+
+			byte[] observer = new byte[40];
+			byte[] instrument = new byte[40];
+			byte[] telescope = new byte[40];
+
+			TangraCore.SEROpenFile(fileName, ref fileInfo, observer, instrument, telescope, false);
+
+			var frmInfo = new frmEnterSERFileInfo(fileInfo);
+			if (frmInfo.ShowDialog(parentForm) == DialogResult.OK)
+			{
+				TangraCore.SERCloseFile();
+
+				return new SERVideoStream(fileName, frmInfo.FrameRate, frmInfo.BitPix);
+			}
+			return null;
 		}
 
 
@@ -25,7 +42,7 @@ namespace Tangra.Video
 
 		private SerFrameInfo m_CurrentFrameInfo;
 
-		private SERVideoStream(string fileName)
+		private SERVideoStream(string fileName, double frameRate, int cameraBitPix)
 		{
 			m_FileInfo = new SerFileInfo();
 
@@ -36,6 +53,10 @@ namespace Tangra.Video
 			TangraCore.SEROpenFile(fileName, ref m_FileInfo, observer, instrument, telescope, false);
 
 			m_FileName = fileName;
+
+			BitPix = cameraBitPix;
+			FrameRate = frameRate;
+			MillisecondsPerFrame = 1000 / frameRate;
 		}
 
 		public int Width
@@ -48,10 +69,7 @@ namespace Tangra.Video
 			get { return m_FileInfo.Height; }
 		}
 
-		public int BitPix
-		{
-			get { return m_FileInfo.PixelDepthPerPlane; }
-		}
+		public int BitPix { get; private set; }
 
 		public int FirstFrame
 		{
@@ -68,23 +86,10 @@ namespace Tangra.Video
 			get { return m_FileInfo.CountFrames; }
 		}
 
-		public double FrameRate
-		{
-			get
-			{
-				// TODO: Make it possible to report "Unknown Framerate", which will lead to disabling the +/-1 sec and +/-10 sec buttons
-				return 25;
-			}
-		}
+		public double FrameRate { get; private set; }
 
-		public double MillisecondsPerFrame
-		{
-			get
-			{
-				// TODO: Make it possible to report "Unknown Exposure", which will lead to disabling the +/-1 sec and +/-10 sec buttons
-				return 40;
-			}
-		}
+		public double MillisecondsPerFrame { get; private set; }
+
 
 		public Pixelmap GetPixelmap(int index)
 		{

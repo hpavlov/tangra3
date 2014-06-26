@@ -303,6 +303,12 @@
     <Compile Include="VideoOperations\LightCurves\ucCorrSelection.Designer.cs">
       <DependentUpon>ucCorrSelection.cs</DependentUpon>
     </Compile>
+    <Compile Include="VideoTools\frmGenerate3DPolyBackground.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoTools\frmGenerate3DPolyBackground.Designer.cs">
+      <DependentUpon>frmGenerate3DPolyBackground.cs</DependentUpon>
+    </Compile>
     <Compile Include="VideoTools\frmGenerateVideoModel.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -545,6 +551,12 @@
     <Compile Include="Video\AstroDigitalVideo\Interfaces.cs" />
     <Compile Include="Video\AstroDigitalVideo\UI\AdvTagValuePair.cs" />
     <Compile Include="Video\SERVideoStream.cs" />
+    <Compile Include="Video\SER\frmEnterSERFileInfo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Video\SER\frmEnterSERFileInfo.Designer.cs">
+      <DependentUpon>frmEnterSERFileInfo.cs</DependentUpon>
+    </Compile>
     <Compile Include="Video\SingleFITSFileFrameStream.cs" />
     <Compile Include="Video\FramePlayer.cs" />
     <Compile Include="Video\frmJumpToFrame.cs">
@@ -643,6 +655,9 @@
     <EmbeddedResource Include="VideoOperations\LightCurves\ucCorrSelection.resx">
       <DependentUpon>ucCorrSelection.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="VideoTools\frmGenerate3DPolyBackground.resx">
+      <DependentUpon>frmGenerate3DPolyBackground.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="VideoTools\frmGenerateVideoModel.resx">
       <DependentUpon>frmGenerateVideoModel.cs</DependentUpon>
     </EmbeddedResource>
@@ -739,6 +754,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Video\frmJumpToFrame.resx">
       <DependentUpon>frmJumpToFrame.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Video\SER\frmEnterSERFileInfo.resx">
+      <DependentUpon>frmEnterSERFileInfo.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config">
       <SubType>Designer</SubType>

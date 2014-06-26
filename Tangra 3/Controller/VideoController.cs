@@ -178,7 +178,7 @@ namespace Tangra.Controller
 					}
 					else if (fileExtension == ".ser")
 					{
-						frameStream = SERVideoStream.OpenFile(fileName);
+						frameStream = SERVideoStream.OpenFile(fileName, m_MainForm);
 					}
 					else if (fileExtension == ".bmp")
 					{
@@ -1139,7 +1139,7 @@ namespace Tangra.Controller
 			    if (m_MainForm.openAdvFileDialog.ShowDialog(m_MainFormView) == DialogResult.OK)
 			    {
                     var viewer = new frmAdvViewer(m_MainForm.openAdvFileDialog.FileName);
-                    viewer.Show(m_MainFormView);			        
+                    viewer.Show(m_MainFormView);
 			    }
 			}
 		}

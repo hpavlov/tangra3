@@ -6,22 +6,11 @@ Features:
   - Run integration detection while the video is being measured. At the end before the light curve is shown, if the integration is consistent then:
      - Ask if the user wants to 'merge'all measurements for the same integration periods
 	 - Ask for the camera model to apply instrumental delays (if the user has answered 'Ýes' to the above question)
-  v) Build an Add-in for AOTA
-     - Display the returned times/frames for D and R
   - Add integration detection on the LightCurve form with option of binning it
   - Make it possible to select 2 locations on the light curve (the D and R datapoint) 
   - Make it possible to display both the D and R frame number and times on the LightCurve form  
-  V) Add Äddins"advanced config page. Put extra tracing/debugging info there. Put other options ??
-  v) Rewrite the Tracking algorithm. Also make it possible to use the algorithm in OccuRec for example. 
-     V) Abstract the tracking as set of interfaces. Make it possible this abstraction to be used by OccuRec too
-	 V) Make it possible to switch between different implementations
-	 V) Do a second implementation from scratch, tune it and use it.
-     - Remove many of the warning and informatioon flags from the Tracking, review them and only leave ones that make sense to the end user  
   ?) Make it possible to measure in video fields
 
-Bugs:
------
-  - Check the normalization algorithm. It appears that before the normalization algorithm is set (4-average or 16-average for example) no aparent normalization has been done!
 
 NONE REPORTED CURRENTLY
 

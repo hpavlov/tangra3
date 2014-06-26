@@ -32,6 +32,17 @@
 			this.btnGenerateVideo = new System.Windows.Forms.Button();
 			this.pbar = new System.Windows.Forms.ProgressBar();
 			this.pnlConfig = new System.Windows.Forms.Panel();
+			this.label21 = new System.Windows.Forms.Label();
+			this.nudPolyDepth = new System.Windows.Forms.NumericUpDown();
+			this.label19 = new System.Windows.Forms.Label();
+			this.label20 = new System.Windows.Forms.Label();
+			this.nudPolyShift = new System.Windows.Forms.NumericUpDown();
+			this.label18 = new System.Windows.Forms.Label();
+			this.label17 = new System.Windows.Forms.Label();
+			this.nudPolyFreq = new System.Windows.Forms.NumericUpDown();
+			this.label16 = new System.Windows.Forms.Label();
+			this.nudPolyOrder = new System.Windows.Forms.NumericUpDown();
+			this.cbxPolyBackground = new System.Windows.Forms.CheckBox();
 			this.label15 = new System.Windows.Forms.Label();
 			this.nudGamma = new System.Windows.Forms.NumericUpDown();
 			this.label14 = new System.Windows.Forms.Label();
@@ -68,18 +79,11 @@
 			this.label1 = new System.Windows.Forms.Label();
 			this.nudTotalFrames = new System.Windows.Forms.NumericUpDown();
 			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-			this.cbxPolyBackground = new System.Windows.Forms.CheckBox();
-			this.label16 = new System.Windows.Forms.Label();
-			this.nudPolyOrder = new System.Windows.Forms.NumericUpDown();
-			this.label17 = new System.Windows.Forms.Label();
-			this.nudPolyFreq = new System.Windows.Forms.NumericUpDown();
-			this.label18 = new System.Windows.Forms.Label();
-			this.label19 = new System.Windows.Forms.Label();
-			this.label20 = new System.Windows.Forms.Label();
-			this.nudPolyShift = new System.Windows.Forms.NumericUpDown();
-			this.label21 = new System.Windows.Forms.Label();
-			this.nudPolyDepth = new System.Windows.Forms.NumericUpDown();
 			this.pnlConfig.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.nudPolyDepth)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudPolyShift)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudPolyFreq)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudPolyOrder)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudGamma)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudPassByMag2)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudPassByMag1)).BeginInit();
@@ -95,10 +99,6 @@
 			((System.ComponentModel.ISupportInitialize)(this.nudNoiseStdDev)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudNoiseMean)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudTotalFrames)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.nudPolyOrder)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.nudPolyFreq)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.nudPolyShift)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.nudPolyDepth)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// btnGenerateVideo
@@ -172,6 +172,150 @@
 			this.pnlConfig.Name = "pnlConfig";
 			this.pnlConfig.Size = new System.Drawing.Size(403, 279);
 			this.pnlConfig.TabIndex = 14;
+			// 
+			// label21
+			// 
+			this.label21.AutoSize = true;
+			this.label21.Location = new System.Drawing.Point(298, 114);
+			this.label21.Name = "label21";
+			this.label21.Size = new System.Drawing.Size(36, 13);
+			this.label21.TabIndex = 45;
+			this.label21.Text = "Depth";
+			// 
+			// nudPolyDepth
+			// 
+			this.nudPolyDepth.DecimalPlaces = 1;
+			this.nudPolyDepth.Location = new System.Drawing.Point(340, 111);
+			this.nudPolyDepth.Minimum = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+			this.nudPolyDepth.Name = "nudPolyDepth";
+			this.nudPolyDepth.Size = new System.Drawing.Size(50, 20);
+			this.nudPolyDepth.TabIndex = 44;
+			this.nudPolyDepth.Value = new decimal(new int[] {
+            20,
+            0,
+            0,
+            0});
+			// 
+			// label19
+			// 
+			this.label19.AutoSize = true;
+			this.label19.Location = new System.Drawing.Point(264, 141);
+			this.label19.Name = "label19";
+			this.label19.Size = new System.Drawing.Size(20, 13);
+			this.label19.TabIndex = 43;
+			this.label19.Text = "pix";
+			// 
+			// label20
+			// 
+			this.label20.AutoSize = true;
+			this.label20.Location = new System.Drawing.Point(187, 141);
+			this.label20.Name = "label20";
+			this.label20.Size = new System.Drawing.Size(28, 13);
+			this.label20.TabIndex = 42;
+			this.label20.Text = "Shift";
+			// 
+			// nudPolyShift
+			// 
+			this.nudPolyShift.DecimalPlaces = 1;
+			this.nudPolyShift.Location = new System.Drawing.Point(219, 137);
+			this.nudPolyShift.Maximum = new decimal(new int[] {
+            30,
+            0,
+            0,
+            0});
+			this.nudPolyShift.Name = "nudPolyShift";
+			this.nudPolyShift.Size = new System.Drawing.Size(41, 20);
+			this.nudPolyShift.TabIndex = 41;
+			this.nudPolyShift.Value = new decimal(new int[] {
+            7,
+            0,
+            0,
+            0});
+			// 
+			// label18
+			// 
+			this.label18.AutoSize = true;
+			this.label18.Location = new System.Drawing.Point(142, 141);
+			this.label18.Name = "label18";
+			this.label18.Size = new System.Drawing.Size(38, 13);
+			this.label18.TabIndex = 40;
+			this.label18.Text = "frames";
+			// 
+			// label17
+			// 
+			this.label17.AutoSize = true;
+			this.label17.Location = new System.Drawing.Point(36, 141);
+			this.label17.Name = "label17";
+			this.label17.Size = new System.Drawing.Size(57, 13);
+			this.label17.TabIndex = 39;
+			this.label17.Text = "Frequency";
+			// 
+			// nudPolyFreq
+			// 
+			this.nudPolyFreq.Location = new System.Drawing.Point(95, 138);
+			this.nudPolyFreq.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+			this.nudPolyFreq.Minimum = new decimal(new int[] {
+            20,
+            0,
+            0,
+            0});
+			this.nudPolyFreq.Name = "nudPolyFreq";
+			this.nudPolyFreq.Size = new System.Drawing.Size(41, 20);
+			this.nudPolyFreq.TabIndex = 38;
+			this.nudPolyFreq.Value = new decimal(new int[] {
+            20,
+            0,
+            0,
+            0});
+			// 
+			// label16
+			// 
+			this.label16.AutoSize = true;
+			this.label16.Location = new System.Drawing.Point(212, 115);
+			this.label16.Name = "label16";
+			this.label16.Size = new System.Drawing.Size(33, 13);
+			this.label16.TabIndex = 37;
+			this.label16.Text = "Order";
+			// 
+			// nudPolyOrder
+			// 
+			this.nudPolyOrder.Location = new System.Drawing.Point(251, 111);
+			this.nudPolyOrder.Maximum = new decimal(new int[] {
+            3,
+            0,
+            0,
+            0});
+			this.nudPolyOrder.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+			this.nudPolyOrder.Name = "nudPolyOrder";
+			this.nudPolyOrder.Size = new System.Drawing.Size(34, 20);
+			this.nudPolyOrder.TabIndex = 36;
+			this.nudPolyOrder.Value = new decimal(new int[] {
+            3,
+            0,
+            0,
+            0});
+			// 
+			// cbxPolyBackground
+			// 
+			this.cbxPolyBackground.AutoSize = true;
+			this.cbxPolyBackground.Location = new System.Drawing.Point(15, 115);
+			this.cbxPolyBackground.Name = "cbxPolyBackground";
+			this.cbxPolyBackground.Size = new System.Drawing.Size(192, 17);
+			this.cbxPolyBackground.TabIndex = 35;
+			this.cbxPolyBackground.Text = "Moving 3D-Polynomial Background";
+			this.cbxPolyBackground.UseVisualStyleBackColor = true;
 			// 
 			// label15
 			// 
@@ -693,152 +837,6 @@
 			this.saveFileDialog.DefaultExt = "avi";
 			this.saveFileDialog.Filter = "AVI Files (*.avi)|*.avi";
 			// 
-			// cbxPolyBackground
-			// 
-			this.cbxPolyBackground.AutoSize = true;
-			this.cbxPolyBackground.Checked = true;
-			this.cbxPolyBackground.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.cbxPolyBackground.Location = new System.Drawing.Point(15, 115);
-			this.cbxPolyBackground.Name = "cbxPolyBackground";
-			this.cbxPolyBackground.Size = new System.Drawing.Size(192, 17);
-			this.cbxPolyBackground.TabIndex = 35;
-			this.cbxPolyBackground.Text = "Moving 3D-Polynomial Background";
-			this.cbxPolyBackground.UseVisualStyleBackColor = true;
-			// 
-			// label16
-			// 
-			this.label16.AutoSize = true;
-			this.label16.Location = new System.Drawing.Point(212, 115);
-			this.label16.Name = "label16";
-			this.label16.Size = new System.Drawing.Size(33, 13);
-			this.label16.TabIndex = 37;
-			this.label16.Text = "Order";
-			// 
-			// nudPolyOrder
-			// 
-			this.nudPolyOrder.Location = new System.Drawing.Point(251, 111);
-			this.nudPolyOrder.Maximum = new decimal(new int[] {
-            3,
-            0,
-            0,
-            0});
-			this.nudPolyOrder.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-			this.nudPolyOrder.Name = "nudPolyOrder";
-			this.nudPolyOrder.Size = new System.Drawing.Size(34, 20);
-			this.nudPolyOrder.TabIndex = 36;
-			this.nudPolyOrder.Value = new decimal(new int[] {
-            3,
-            0,
-            0,
-            0});
-			// 
-			// label17
-			// 
-			this.label17.AutoSize = true;
-			this.label17.Location = new System.Drawing.Point(36, 141);
-			this.label17.Name = "label17";
-			this.label17.Size = new System.Drawing.Size(57, 13);
-			this.label17.TabIndex = 39;
-			this.label17.Text = "Frequency";
-			// 
-			// nudPolyFreq
-			// 
-			this.nudPolyFreq.Location = new System.Drawing.Point(95, 138);
-			this.nudPolyFreq.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-			this.nudPolyFreq.Minimum = new decimal(new int[] {
-            20,
-            0,
-            0,
-            0});
-			this.nudPolyFreq.Name = "nudPolyFreq";
-			this.nudPolyFreq.Size = new System.Drawing.Size(41, 20);
-			this.nudPolyFreq.TabIndex = 38;
-			this.nudPolyFreq.Value = new decimal(new int[] {
-            20,
-            0,
-            0,
-            0});
-			// 
-			// label18
-			// 
-			this.label18.AutoSize = true;
-			this.label18.Location = new System.Drawing.Point(142, 141);
-			this.label18.Name = "label18";
-			this.label18.Size = new System.Drawing.Size(38, 13);
-			this.label18.TabIndex = 40;
-			this.label18.Text = "frames";
-			// 
-			// label19
-			// 
-			this.label19.AutoSize = true;
-			this.label19.Location = new System.Drawing.Point(264, 141);
-			this.label19.Name = "label19";
-			this.label19.Size = new System.Drawing.Size(20, 13);
-			this.label19.TabIndex = 43;
-			this.label19.Text = "pix";
-			// 
-			// label20
-			// 
-			this.label20.AutoSize = true;
-			this.label20.Location = new System.Drawing.Point(187, 141);
-			this.label20.Name = "label20";
-			this.label20.Size = new System.Drawing.Size(28, 13);
-			this.label20.TabIndex = 42;
-			this.label20.Text = "Shift";
-			// 
-			// nudPolyShift
-			// 
-			this.nudPolyShift.DecimalPlaces = 1;
-			this.nudPolyShift.Location = new System.Drawing.Point(219, 137);
-			this.nudPolyShift.Maximum = new decimal(new int[] {
-            30,
-            0,
-            0,
-            0});
-			this.nudPolyShift.Name = "nudPolyShift";
-			this.nudPolyShift.Size = new System.Drawing.Size(41, 20);
-			this.nudPolyShift.TabIndex = 41;
-			this.nudPolyShift.Value = new decimal(new int[] {
-            7,
-            0,
-            0,
-            0});
-			// 
-			// label21
-			// 
-			this.label21.AutoSize = true;
-			this.label21.Location = new System.Drawing.Point(298, 141);
-			this.label21.Name = "label21";
-			this.label21.Size = new System.Drawing.Size(36, 13);
-			this.label21.TabIndex = 45;
-			this.label21.Text = "Depth";
-			// 
-			// nudPolyDepth
-			// 
-			this.nudPolyDepth.DecimalPlaces = 1;
-			this.nudPolyDepth.Location = new System.Drawing.Point(340, 138);
-			this.nudPolyDepth.Minimum = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
-			this.nudPolyDepth.Name = "nudPolyDepth";
-			this.nudPolyDepth.Size = new System.Drawing.Size(50, 20);
-			this.nudPolyDepth.TabIndex = 44;
-			this.nudPolyDepth.Value = new decimal(new int[] {
-            20,
-            0,
-            0,
-            0});
-			// 
 			// frmGenerateVideoModel
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -856,6 +854,10 @@
 			this.Text = "Controlled Model Video Generation";
 			this.pnlConfig.ResumeLayout(false);
 			this.pnlConfig.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.nudPolyDepth)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudPolyShift)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudPolyFreq)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudPolyOrder)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudGamma)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudPassByMag2)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudPassByMag1)).EndInit();
@@ -871,10 +873,6 @@
 			((System.ComponentModel.ISupportInitialize)(this.nudNoiseStdDev)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudNoiseMean)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudTotalFrames)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.nudPolyOrder)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.nudPolyFreq)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.nudPolyShift)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.nudPolyDepth)).EndInit();
 			this.ResumeLayout(false);
 
 		}

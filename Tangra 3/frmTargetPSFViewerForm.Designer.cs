@@ -86,7 +86,7 @@
 			// label2
 			// 
 			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(79, 289);
+			this.label2.Location = new System.Drawing.Point(86, 289);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(63, 13);
 			this.label2.TabIndex = 5;
@@ -96,7 +96,7 @@
 			// 
 			this.label3.AutoSize = true;
 			this.label3.ForeColor = System.Drawing.SystemColors.ControlText;
-			this.label3.Location = new System.Drawing.Point(292, 289);
+			this.label3.Location = new System.Drawing.Point(300, 289);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(26, 13);
 			this.label3.TabIndex = 6;
@@ -106,7 +106,7 @@
 			// 
 			this.label4.AutoSize = true;
 			this.label4.ForeColor = System.Drawing.SystemColors.ControlText;
-			this.label4.Location = new System.Drawing.Point(349, 289);
+			this.label4.Location = new System.Drawing.Point(357, 289);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(26, 13);
 			this.label4.TabIndex = 7;
@@ -115,7 +115,7 @@
 			// label5
 			// 
 			this.label5.AutoSize = true;
-			this.label5.Location = new System.Drawing.Point(185, 289);
+			this.label5.Location = new System.Drawing.Point(193, 289);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(65, 13);
 			this.label5.TabIndex = 8;
@@ -133,7 +133,7 @@
 			// lblIMax
 			// 
 			this.lblIMax.AutoSize = true;
-			this.lblIMax.Location = new System.Drawing.Point(138, 289);
+			this.lblIMax.Location = new System.Drawing.Point(145, 289);
 			this.lblIMax.Name = "lblIMax";
 			this.lblIMax.Size = new System.Drawing.Size(22, 13);
 			this.lblIMax.TabIndex = 10;
@@ -142,7 +142,7 @@
 			// lblIAmp
 			// 
 			this.lblIAmp.AutoSize = true;
-			this.lblIAmp.Location = new System.Drawing.Point(250, 289);
+			this.lblIAmp.Location = new System.Drawing.Point(258, 289);
 			this.lblIAmp.Name = "lblIAmp";
 			this.lblIAmp.Size = new System.Drawing.Size(22, 13);
 			this.lblIAmp.TabIndex = 11;
@@ -152,7 +152,7 @@
 			// 
 			this.lblX.AutoSize = true;
 			this.lblX.ForeColor = System.Drawing.SystemColors.ControlText;
-			this.lblX.Location = new System.Drawing.Point(315, 289);
+			this.lblX.Location = new System.Drawing.Point(323, 289);
 			this.lblX.Name = "lblX";
 			this.lblX.Size = new System.Drawing.Size(22, 13);
 			this.lblX.TabIndex = 12;
@@ -162,7 +162,7 @@
 			// 
 			this.lblY.AutoSize = true;
 			this.lblY.ForeColor = System.Drawing.SystemColors.ControlText;
-			this.lblY.Location = new System.Drawing.Point(372, 289);
+			this.lblY.Location = new System.Drawing.Point(380, 289);
 			this.lblY.Name = "lblY";
 			this.lblY.Size = new System.Drawing.Size(22, 13);
 			this.lblY.TabIndex = 13;

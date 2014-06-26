@@ -571,6 +571,9 @@ namespace Tangra.Model.Config
 			public PreProcessingFilter MutualDigitalFilter = PreProcessingFilter.NoFilter;
             public int MeasuringZoomImageMode = 0;
 
+	        public int SerFileLastBitPix = 16;
+			public double SerFileLastFrameRate = 25.0;
+
             public List<SameSizeApertureConfig> SameSizeApertures = new List<SameSizeApertureConfig>();
         }
 
