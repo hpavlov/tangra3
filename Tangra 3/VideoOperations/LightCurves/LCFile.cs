@@ -1103,10 +1103,10 @@ namespace Tangra.VideoOperations.LightCurves
             return double.NaN;
         }
 
-	    private static Regex s_RegexSourceToFileFormat = new Regex("^.+\\((?<format>(ADV|AAV|AVI))\\..+\\).*$");
+	    private static Regex s_RegexSourceToFileFormat = new Regex("^.+\\((?<format>(ADV|AAV|AVI|SER))\\..+\\).*$");
 
 		/// <summary>
-		/// AVI|AAV|ADV
+		/// AVI|AAV|ADV|SER
 		/// </summary>
 		/// <returns></returns>
 		internal string GetVideoFileFormat()
@@ -1130,7 +1130,7 @@ namespace Tangra.VideoOperations.LightCurves
 		/// <returns></returns>
 		internal string GetVideoFormat(string videoFileFormat)
 		{
-			if (videoFileFormat == "ADV")
+			if (videoFileFormat == "ADV" || videoFileFormat == "SER")
 				return "Digital";
 			if (videoFileFormat == "AAV" && LcFile != null)
 				return LcFile.Footer.AAVNativeVideoFormat;

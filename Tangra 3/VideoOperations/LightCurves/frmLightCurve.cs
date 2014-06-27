@@ -352,12 +352,15 @@ namespace Tangra.VideoOperations.LightCurves
 						}
                         else
                         {
-                            MessageBox.Show(this,
-                                            string.Format(
-                                                "The time derived from entered frame times in this {1} video shows an error higher than {0} ms.\r\n\r\nPlease use the timestamps on the corresponding video frames when timing events from this video."
-                                                , timeDelta.ToString("0.0"), videoSystem),
-                                            "Warning",
-                                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+							if (m_LCFile.Header.GetVideoFileFormat() != "SER")
+							{
+								MessageBox.Show(this,
+												string.Format(
+													"The time derived from entered frame times in this {1} video shows an error higher than {0} ms.\r\n\r\nPlease use the timestamps on the corresponding video frames when timing events from this video."
+													, timeDelta.ToString("0.0"), videoSystem),
+												"Warning",
+												MessageBoxButtons.OK, MessageBoxIcon.Warning);
+							}
 
                             lblFrameTime.ForeColor = Color.Red;
                         }

@@ -491,13 +491,21 @@ namespace Tangra.Controller
 			get { return m_FramePlayer.Video.Engine == "SER"; }
 		}
 
+		public bool HasEmbeddedTimeStamps()
+		{
+			return IsAstroDigitalVideo ||
+			       (IsAstroAnalogueVideo && AstroAnalogueVideoHasOcrOrNtpData) ||
+				   (IsSerVideo && ((SERVideoStream)m_FramePlayer.Video).HasUTCTimeStamps);
+		}
+
 		public bool IsPlainAviVideo
 		{
 			get
 			{
 				return 
 					!m_FramePlayer.IsAstroDigitalVideo && 
-					!m_FramePlayer.IsAstroAnalogueVideo && 
+					!m_FramePlayer.IsAstroAnalogueVideo &&
+					m_FramePlayer.Video.Engine != "SER" && 
 					m_FramePlayer.Video.FileName != null &&
 					m_FramePlayer.Video.FileName.EndsWith(".AVI", StringComparison.InvariantCultureIgnoreCase);
 			}

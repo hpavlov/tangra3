@@ -75,6 +75,14 @@ namespace Tangra.Video
 			Observer = Encoding.UTF8.GetString(observer).Trim();
 			Instrument = Encoding.UTF8.GetString(instrument).Trim();
 			Telescope = Encoding.UTF8.GetString(telescope).Trim();
+
+			HasTimeStamps =
+				m_FileInfo.SequenceStartTimeHi != 0 && 
+				m_FileInfo.SequenceStartTimeHi >> 0x1F == 0;
+
+			// There is a lot of details about deriving UTC mid-frame timestamps from the embedded timestamps in a SER file
+			// At this point this hasn't been done. If it is requested then it can be implemented
+			HasUTCTimeStamps = false;
 		}
 
 		public string Observer { get; private set; }
@@ -82,6 +90,10 @@ namespace Tangra.Video
 		public string Instrument { get; private set; }
 
 		public string Telescope { get; private set; }
+
+		public bool HasTimeStamps { get; private set; }
+
+		public bool HasUTCTimeStamps { get; private set; }
 
 		public DateTime SequenceStartTime
 		{

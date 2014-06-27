@@ -1137,10 +1137,7 @@ namespace Tangra.VideoOperations.LightCurves
 
             InitializeTimestampOCR();
 
-			if (m_TimestampOCR != null || 
-				m_VideoController.IsAstroDigitalVideo ||
-				(m_VideoController.IsAstroAnalogueVideo && m_VideoController.AstroAnalogueVideoHasOcrOrNtpData))
-				// We have embedded timestamps for OCR-ed analogue video timestamps or for ADV videos
+			if (m_TimestampOCR != null || m_VideoController.HasEmbeddedTimeStamps())
 				LightCurveReductionContext.Instance.HasEmbeddedTimeStamps = true;
 			else
 				LightCurveReductionContext.Instance.HasEmbeddedTimeStamps = false;
@@ -1543,7 +1540,7 @@ namespace Tangra.VideoOperations.LightCurves
 			TimeSpan ts = new TimeSpan(m_EndFrameTime.Ticks - m_StartFrameTime.Ticks);
 			double videoTimeInSec = (m_EndTimeFrame - m_StartTimeFrame) / acceptedVideoFrameRate;
 
-			if (videoTimeInSec < 0 || Math.Abs((videoTimeInSec - ts.TotalSeconds) * 1000) > TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMs)
+			if (m_VideoController.IsPlainAviVideo && (videoTimeInSec < 0 || Math.Abs((videoTimeInSec - ts.TotalSeconds) * 1000) > TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMs))
 			{
 				if (MessageBox.Show(
 					string.Format("The time computed from the measured number of frames in this {1} video is off by more than {0} ms from the entered time. This may indicate " +
@@ -1566,7 +1563,7 @@ namespace Tangra.VideoOperations.LightCurves
 			int allowedExcess = 1 + Math.Min(4, (int)((m_EndTimeFrame - m_StartTimeFrame) / acceptedVideoFrameRate) / 30);
 			double maxAllowedFRDiff = 1.33 * Math.Abs(acceptedVideoFrameRate - ((acceptedVideoFrameRate * (m_EndTimeFrame - m_StartTimeFrame) + allowedExcess) / (m_EndTimeFrame - m_StartTimeFrame)));
 
-			if (Math.Abs(derivedFrameRate - acceptedVideoFrameRate) > maxAllowedFRDiff)
+			if (m_VideoController.IsPlainAviVideo && Math.Abs(derivedFrameRate - acceptedVideoFrameRate) > maxAllowedFRDiff)
 			{
 				if (MessageBox.Show(
 					"Based on your entered frame times it appears that there may be dropped frames, incorrectly entered start " +
@@ -1622,8 +1619,7 @@ namespace Tangra.VideoOperations.LightCurves
         {
             if (m_VideoController.HasAstroImageState && !m_VideoController.IsAstroAnalogueVideoWithNtpTimestampsInNtpDebugMode)
 			{
-                if (m_VideoController.IsAstroDigitalVideo ||
-                    (m_VideoController.IsAstroAnalogueVideo && m_VideoController.AstroAnalogueVideoHasOcrOrNtpData))
+                if (m_VideoController.HasEmbeddedTimeStamps())
                 {
                     FrameStateData frameState = m_VideoController.GetCurrentFrameState();
                     Trace.Assert(prevFrameId != frameState.VideoCameraFrameId || frameState.VideoCameraFrameId == 0 /* When VideoCameraFrameId is not supported */);
@@ -1631,9 +1627,7 @@ namespace Tangra.VideoOperations.LightCurves
 
                     int frameDuration = (int)Math.Round(frameState.ExposureInMilliseconds);
 
-					//TODO: If Instrumental Delay has been selected then apply if for this frameDuration and camera model
-
-                    LCFile.SaveOnTheFlyFrameTiming(new LCFrameTiming(frameState.CentralExposureTime, frameDuration));                    
+                    LCFile.SaveOnTheFlyFrameTiming(new LCFrameTiming(frameState.CentralExposureTime, frameDuration));
                 }
                 else
                 {
