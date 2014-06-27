@@ -88,7 +88,7 @@ namespace Tangra.View
 			m_MainForm.btn1SecMinus.Enabled = TangraContext.Current.HasVideoLoaded && TangraContext.Current.CanScrollFrames;
 			m_MainForm.btn1SecPlus.Enabled = TangraContext.Current.HasVideoLoaded && TangraContext.Current.CanScrollFrames;
 			
-			m_MainForm.miADVStatusData.Enabled = TangraContext.Current.HasVideoLoaded && TangraContext.Current.UsingADV;
+			m_MainForm.miFrameStatusData.Enabled = TangraContext.Current.HasVideoLoaded && (TangraContext.Current.UsingADV || TangraContext.Current.IsSerFile);
 			m_MainForm.tsbtnIntensify.Visible = TangraContext.Current.HasVideoLoaded;
 			m_MainForm.miTargetPSFViewer.Enabled = TangraContext.Current.HasVideoLoaded;
 

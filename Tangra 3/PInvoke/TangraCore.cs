@@ -260,24 +260,28 @@ namespace Tangra.PInvoke
 		public int Height;
 		public int PixelDepthPerPlane;
 		public int CountFrames;
-		public long SequenceStartTime;
-		public long SequenceStartTimeUTC;
+		public int SequenceStartTimeLo;
+		public int SequenceStartTimeHi;
+		public int SequenceStartTimeUTCLo;
+		public int SequenceStartTimeUTCHi;
 		public uint NormalisationValue;
 	};
 
 	[StructLayout(LayoutKind.Sequential)]
 	public struct SerNativeFrameInfo
 	{
-		public long TimeStamp;
+		public int TimeStampLo;
+		public int TimeStampHi;
 	};
 
 	public class SerFrameInfo
 	{
+		public DateTime TimeStamp { get; private set; }
+
 		internal SerFrameInfo(SerNativeFrameInfo nativeInfo)
 		{
-			
+			TimeStamp = new DateTime((long)nativeInfo.TimeStampLo + ((long)nativeInfo.TimeStampHi << 32));
 		}
-
 	}
 
 	public static class TangraCore

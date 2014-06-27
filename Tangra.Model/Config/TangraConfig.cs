@@ -175,6 +175,7 @@ namespace Tangra.Model.Config
 
 		public AdvsSettings ADVS = new AdvsSettings();
 		public AavSettings AAV = new AavSettings();
+		public SerSettings SER = new SerSettings();
 
         private static void LoadXml(string xmlString, string recentFiles)
 		{

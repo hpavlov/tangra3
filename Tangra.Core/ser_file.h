@@ -33,14 +33,19 @@ namespace SerLib
 		long Height;
 		long PixelDepthPerPlane;
 		long CountFrames;
-		__int64 SequenceStartTime;
-		__int64 SequenceStartTimeUTC;
+		long SequenceStartTimeLo;
+		long SequenceStartTimeHi;
+		long SequenceStartTimeUTCLo;
+		long SequenceStartTimeUTCHi;
 		unsigned long NormalisationValue;
 	};
 	
 	struct SerFrameInfo
 	{
-		__int64 TimeStamp;
+		long TimeStampLo;
+		long TimeStampHi;
+		// NOTE: This is not marshalled back to the .NET structure
+		unsigned __int64 TimeStamp64;
 	};
 	
 	class SerFile {

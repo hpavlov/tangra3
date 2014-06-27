@@ -77,7 +77,7 @@
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(99, 13);
 			this.label1.TabIndex = 2;
-			this.label1.Text = "Camera Bith Depth:";
+			this.label1.Text = "Camera Bit Depth:";
 			// 
 			// label2
 			// 

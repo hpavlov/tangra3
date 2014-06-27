@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Video.SER;
 using Tangra.VideoOperations.LightCurves.Tracking;
 using Tangra.VideoTools;
 using nom.tam.fits;
@@ -46,6 +47,7 @@ namespace Tangra.Controller
 
 		private frmAdvStatusPopup m_AdvStatusForm;
 	    private frmAavStatusPopup m_AavStatusForm;
+	    private frmSerStatusPopup m_SerStatusForm;
 	    private frmTargetPSFViewerForm m_TargetPSFViewerForm;
 
 		private AdvOverlayManager m_OverlayManager = new AdvOverlayManager();
@@ -174,12 +176,18 @@ namespace Tangra.Controller
 						if (frameStream != null)
 						{
 							TangraContext.Current.UsingADV = true;
-							m_OverlayManager.Init(equipmentInfo, geoLocation, frameStream.FirstFrame);
+							m_OverlayManager.InitAdvFile(equipmentInfo, geoLocation, frameStream.FirstFrame);
 						}
 					}
 					else if (fileExtension == ".ser")
 					{
-						frameStream = SERVideoStream.OpenFile(fileName, m_MainForm);
+						SerEquipmentInfo equipmentInfo;
+						frameStream = SERVideoStream.OpenFile(fileName, m_MainForm, out equipmentInfo);
+						if (frameStream != null)
+						{
+							TangraContext.Current.IsSerFile = true;
+							m_OverlayManager.InitSerFile(equipmentInfo, frameStream.FirstFrame);
+						}
 					}
 					else if (fileExtension == ".bmp")
 					{
@@ -201,7 +209,7 @@ namespace Tangra.Controller
 		public bool OpenVideoFileInternal(string fileName, Func<IFrameStream> frameStreamFactoryMethod)
 		{
 			TangraContext.Current.UsingADV = false;
-
+			TangraContext.Current.IsSerFile = false;
 			TangraContext.Current.FileName = null;
 			TangraContext.Current.FileFormat = null;
 			TangraContext.Current.HasVideoLoaded = false;
@@ -302,6 +310,9 @@ namespace Tangra.Controller
 
 			if (m_AavStatusForm != null && m_AavStatusForm.Visible)
 				m_AavStatusForm.ShowStatus(m_FrameState);
+
+			if (m_SerStatusForm != null && m_SerStatusForm.Visible)
+				m_SerStatusForm.ShowStatus(m_FrameState);
 
 	        if (!isOldFrameRefreshed)
 	        {
@@ -473,6 +484,11 @@ namespace Tangra.Controller
 		public bool IsAstroAnalogueVideo
 		{
 			get { return m_FramePlayer.IsAstroAnalogueVideo; }
+		}
+
+		public bool IsSerVideo
+		{
+			get { return m_FramePlayer.Video.Engine == "SER"; }
 		}
 
 		public bool IsPlainAviVideo
@@ -971,6 +987,11 @@ namespace Tangra.Controller
 			ToggleAstroVideoStatusForm(false);
 		}
 
+		public void ToggleSerStatusForm()
+		{
+			ToggleSerStatusForm(false);
+		}
+
 		private void HideAdvStatusForm()
 		{
 			if (m_AdvStatusForm != null && m_AdvStatusForm.Visible)
@@ -981,6 +1002,12 @@ namespace Tangra.Controller
 		{
 			if (m_AavStatusForm != null && m_AavStatusForm.Visible)
 				m_AavStatusForm.Hide();			
+		}
+
+		private void HideSerStatusForm()
+		{
+			if (m_SerStatusForm != null && m_SerStatusForm.Visible)
+				m_SerStatusForm.Hide();
 		}
 
 		private void ToggleAstroVideoStatusForm(bool forceShow)
@@ -1076,6 +1103,53 @@ namespace Tangra.Controller
 			{
 				m_AdvStatusForm.Left = m_MainFormView.Right;
 				m_AdvStatusForm.Top = m_MainFormView.Top;
+			}
+		}
+
+		private void PositionSerStatusForm()
+		{
+			if (m_SerStatusForm != null &&
+				m_SerStatusForm.Visible)
+			{
+				m_SerStatusForm.Left = m_MainFormView.Right;
+				m_SerStatusForm.Top = m_MainFormView.Top;
+			}
+		}
+
+		private void ToggleSerStatusForm(bool forceShow)
+		{
+			HideSerStatusForm();
+
+			if (m_SerStatusForm == null)
+			{
+				m_SerStatusForm = new frmSerStatusPopup(TangraConfig.Settings.SER);
+				m_SerStatusForm.Show(m_MainFormView);
+				PositionSerStatusForm();
+				m_SerStatusForm.ShowStatus(m_FrameState);
+			}
+			else if (!m_SerStatusForm.Visible)
+			{
+				try
+				{
+					m_SerStatusForm.Show(m_MainFormView);
+				}
+				catch (ObjectDisposedException)
+				{
+					m_SerStatusForm = new frmSerStatusPopup(TangraConfig.Settings.SER);
+					m_SerStatusForm.Show(m_MainFormView);
+				}
+
+				PositionSerStatusForm();
+				m_SerStatusForm.ShowStatus(m_FrameState);
+			}
+			else if (!forceShow)
+			{
+				HideSerStatusForm();
+			}
+			else
+			{
+				PositionSerStatusForm();
+				m_SerStatusForm.ShowStatus(m_FrameState);
 			}
 		}
 

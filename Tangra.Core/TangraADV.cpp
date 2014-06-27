@@ -202,13 +202,19 @@ HRESULT ADVGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSl
 	frameInfo->Gain = (firstFrameInfo.Gain + lastFrameInfo.Gain) / 2.0;
 	frameInfo->Gamma = (firstFrameInfo.Gamma + lastFrameInfo.Gamma) / 2.0;
 	frameInfo->Offset = (firstFrameInfo.Offset + lastFrameInfo.Offset) / 2.0;
-	frameInfo->StartTimeStampHi = (firstFrameInfo.StartTimeStampHi + lastFrameInfo.StartTimeStampHi) / 2;
-	frameInfo->StartTimeStampLo = (firstFrameInfo.StartTimeStampLo + lastFrameInfo.StartTimeStampLo) / 2;
-	frameInfo->EndNtpTimeStampHi = (firstFrameInfo.EndNtpTimeStampHi + lastFrameInfo.EndNtpTimeStampHi) / 2;
-	frameInfo->EndNtpTimeStampLo = (firstFrameInfo.EndNtpTimeStampLo + lastFrameInfo.EndNtpTimeStampLo) / 2;
-	frameInfo->EndSecondaryTimeStampHi = (firstFrameInfo.EndSecondaryTimeStampHi + lastFrameInfo.EndSecondaryTimeStampHi) / 2;
-	frameInfo->EndSecondaryTimeStampLo = (firstFrameInfo.EndSecondaryTimeStampLo + lastFrameInfo.EndSecondaryTimeStampLo) / 2;
 	
+	__int64 midTimeStamp = GetUInt64Average(firstFrameInfo.StartTimeStampLo, firstFrameInfo.StartTimeStampHi, lastFrameInfo.StartTimeStampLo, lastFrameInfo.StartTimeStampHi);
+	frameInfo->StartTimeStampHi = midTimeStamp & 0xFFFFFFFF;
+	frameInfo->StartTimeStampLo = midTimeStamp >> 32;
+	
+	midTimeStamp = GetUInt64Average(firstFrameInfo.EndNtpTimeStampLo, firstFrameInfo.EndNtpTimeStampHi, lastFrameInfo.EndNtpTimeStampLo, lastFrameInfo.EndNtpTimeStampHi);
+	frameInfo->EndNtpTimeStampHi = midTimeStamp & 0xFFFFFFFF;
+	frameInfo->EndNtpTimeStampLo = midTimeStamp >> 32;
+	
+	midTimeStamp = GetUInt64Average(firstFrameInfo.EndSecondaryTimeStampLo, firstFrameInfo.EndSecondaryTimeStampHi, lastFrameInfo.EndSecondaryTimeStampLo, lastFrameInfo.EndSecondaryTimeStampHi);
+	frameInfo->EndSecondaryTimeStampHi = midTimeStamp & 0xFFFFFFFF;
+	frameInfo->EndSecondaryTimeStampLo = midTimeStamp >> 32;
+
 	return GetBitmapPixels(g_TangraAdvFile->ImageSection->Width, g_TangraAdvFile->ImageSection->Height, pixels, bitmapBytes, bitmapDisplayBytes, false, g_TangraAdvFile->ImageSection->DataBpp, g_TangraAdvFile->ImageSection->NormalisationValue);
 }
 

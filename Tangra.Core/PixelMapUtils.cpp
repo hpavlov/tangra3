@@ -1043,3 +1043,12 @@ DLL_PUBLIC HRESULT PreProcessingLowPassDifferenceFilter(unsigned long* pixels, l
 	return S_OK;
 }
 
+unsigned __int64 GetUInt64Average(unsigned __int64 a, unsigned __int64 b)
+{
+	return (a >> 1) + (b >> 1) + (a & b & 0x1);
+};
+
+unsigned __int64 GetUInt64Average(unsigned long aLo, unsigned long aHi, unsigned long bLo, unsigned long bHi)
+{
+	return GetUInt64Average(((unsigned __int64)aHi) << 32 + (unsigned __int64)aLo, ((unsigned __int64)bHi) << 32 + (unsigned __int64)bLo);
+};

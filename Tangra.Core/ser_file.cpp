@@ -96,14 +96,16 @@ void SerFile::OpenFile(const char* filePath, SerLib::SerFileInfo* fileInfo, char
 	fread(&instrument[0], 40, 1, m_File);
 	fread(&telescope[0], 40, 1, m_File);
 	
-	__int64 buffInt64;
+	unsigned __int64 buffInt64;
 	fread(&buffInt64, 8, 1, m_File);
-	fileInfo->SequenceStartTime = buffInt;
+	fileInfo->SequenceStartTimeLo = buffInt64 & 0xFFFFFFFF;
+	fileInfo->SequenceStartTimeHi = buffInt64 >> 32;
 	
-	m_HasTimeStamps = ((buffInt64 >> 0x3F) & 0x01) == 0x01;
+	m_HasTimeStamps = ((buffInt64 >> 0x3F) & 0x01) == 0x00;
 	
 	fread(&buffInt64, 8, 1, m_File);
-	fileInfo->SequenceStartTimeUTC = buffInt;
+	fileInfo->SequenceStartTimeUTCLo = buffInt64 & 0xFFFFFFFF;
+	fileInfo->SequenceStartTimeUTCHi = buffInt64 >> 32;
 	
 	m_RawFrameSize = Width * Height * m_NumPlanes * m_BytesPerPixel;
 	m_RawFrameBuffer = (unsigned char*)malloc(m_RawFrameSize + 16);
@@ -142,10 +144,16 @@ HRESULT SerFile::GetFrame(int frameNo, unsigned long* pixels, int cameraBitPix, 
 				__int64 timestampPosition = m_TimeStampStartOffset + frameNo * 8;
 				
 				advfsetpos(m_File, &timestampPosition);
-				fread(&frameInfo->TimeStamp, 4, 1, m_File);
+				
+				fread(&frameInfo->TimeStamp64, 8, 1, m_File);				
+				frameInfo->TimeStampLo = frameInfo->TimeStamp64 & 0xFFFFFFFF;
+				frameInfo->TimeStampHi = frameInfo->TimeStamp64 >> 32;
 			}
 			else 
-				frameInfo->TimeStamp = 0;			
+			{
+				frameInfo->TimeStampLo = 0;			
+				frameInfo->TimeStampHi = 0;
+			}
 		}
 
 		return rv;
@@ -281,7 +289,9 @@ HRESULT SERGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSl
 		IntegrationManagerProduceIntegratedFrame(pixels);
 		IntegrationManagerFreeResources();
 		
-		frameInfo->TimeStamp = (firstFrameInfo.TimeStamp + lastFrameInfo.TimeStamp) / 2;
+		frameInfo->TimeStamp64 = GetUInt64Average(firstFrameInfo.TimeStamp64, lastFrameInfo.TimeStamp64);
+		frameInfo->TimeStampLo = frameInfo->TimeStamp64 & 0xFFFFFFFF;
+		frameInfo->TimeStampHi = frameInfo->TimeStamp64 >> 32;
 		
 		return GetBitmapPixels(m_SerFile->Width, m_SerFile->Height, pixels, bitmapBytes, bitmapDisplayBytes, false, cameraBitPix, m_SerFile->NormalisationValue);		
 	}

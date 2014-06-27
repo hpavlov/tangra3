@@ -564,6 +564,12 @@
     <Compile Include="Video\SER\frmEnterSERFileInfo.Designer.cs">
       <DependentUpon>frmEnterSERFileInfo.cs</DependentUpon>
     </Compile>
+    <Compile Include="Video\SER\frmSerStatusPopup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Video\SER\frmSerStatusPopup.Designer.cs">
+      <DependentUpon>frmSerStatusPopup.cs</DependentUpon>
+    </Compile>
     <Compile Include="Video\SingleFITSFileFrameStream.cs" />
     <Compile Include="Video\FramePlayer.cs" />
     <Compile Include="Video\frmJumpToFrame.cs">
@@ -767,6 +773,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Video\SER\frmEnterSERFileInfo.resx">
       <DependentUpon>frmEnterSERFileInfo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Video\SER\frmSerStatusPopup.resx">
+      <DependentUpon>frmSerStatusPopup.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config">
       <SubType>Designer</SubType>

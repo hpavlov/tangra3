@@ -31,20 +31,27 @@ namespace Tangra.Video.AstroDigitalVideo
         private int m_FramesLeftToDiplayMessage = -1;
 	    private string m_LastMessage = null;
 
-	    private AdvEquipmentInfo m_EquipmentInfo;
+	    private AdvEquipmentInfo m_AdvEquipmentInfo;
 		private GeoLocationInfo m_GeoLocation;
+		private SerEquipmentInfo m_SerEquipmentInfo;
 
 		public void Reset()
 		{
             m_EquipmentInfoDisplayed = false;
 		}
 
-		public void Init(AdvEquipmentInfo equipmentInfo, GeoLocationInfo geoLocation, int firstFrameNo)
+		public void InitAdvFile(AdvEquipmentInfo equipmentInfo, GeoLocationInfo geoLocation, int firstFrameNo)
         {
-            m_EquipmentInfo = equipmentInfo;
+            m_AdvEquipmentInfo = equipmentInfo;
 			m_GeoLocation = geoLocation;
             m_FirstFrameNo = firstFrameNo;
         }
+
+		public void InitSerFile(SerEquipmentInfo equipmentInfo, int firstFrameNo)
+		{
+			m_SerEquipmentInfo = equipmentInfo;
+			m_FirstFrameNo = firstFrameNo;
+		}
 
 
 		public void OverlayStateForFrame(Bitmap currentImage, FrameStateData state, int currentFrameNo, bool isAstroDigitalVideo, bool isAstroAnalogueVideo)
@@ -117,30 +124,30 @@ namespace Tangra.Video.AstroDigitalVideo
 				float startingY = currentImage.Height - numLines * (s_PropertiesFont.Size + 5) - 10;
 				if (TangraConfig.Settings.ADVS.OverlayTimestamp) startingY -= m_YPosUpper;
 
-				if (TangraConfig.Settings.ADVS.OverlayAdvsInfo)
+				if (TangraConfig.Settings.ADVS.OverlayAdvsInfo && m_AdvEquipmentInfo != null)
 				{
-					g.DrawString(m_EquipmentInfo.Recorder, s_PropertiesFont, s_PropertiesWhiteBrush, 10, startingY + lineNo * (s_PropertiesFont.Size + 5));
+					g.DrawString(m_AdvEquipmentInfo.Recorder, s_PropertiesFont, s_PropertiesWhiteBrush, 10, startingY + lineNo * (s_PropertiesFont.Size + 5));
 					lineNo++;
-					if (!string.IsNullOrEmpty(m_EquipmentInfo.AdvrVersion))
+					if (!string.IsNullOrEmpty(m_AdvEquipmentInfo.AdvrVersion))
 					{
 						g.DrawString(
-							string.Format("ADVR v{0} HTCC v{1}", m_EquipmentInfo.AdvrVersion, m_EquipmentInfo.HtccFirmareVersion),
+							string.Format("ADVR v{0} HTCC v{1}", m_AdvEquipmentInfo.AdvrVersion, m_AdvEquipmentInfo.HtccFirmareVersion),
 							s_PropertiesFont, s_PropertiesWhiteBrush, 10, startingY + lineNo * (s_PropertiesFont.Size + 5));
 					}
 					lineNo++;
 				}
 
-				if (TangraConfig.Settings.ADVS.OverlayCameraInfo)
+				if (TangraConfig.Settings.ADVS.OverlayCameraInfo && m_AdvEquipmentInfo != null)
 				{
-					if (!string.IsNullOrEmpty(m_EquipmentInfo.SensorInfo))
-						g.DrawString(m_EquipmentInfo.SensorInfo, s_PropertiesFont, s_PropertiesWhiteBrush, 10, startingY + lineNo * (s_PropertiesFont.Size + 5));
+					if (!string.IsNullOrEmpty(m_AdvEquipmentInfo.SensorInfo))
+						g.DrawString(m_AdvEquipmentInfo.SensorInfo, s_PropertiesFont, s_PropertiesWhiteBrush, 10, startingY + lineNo * (s_PropertiesFont.Size + 5));
 					lineNo++;
-					if (!string.IsNullOrEmpty(m_EquipmentInfo.Camera))
-						g.DrawString(m_EquipmentInfo.Camera, s_PropertiesFont, s_PropertiesWhiteBrush, 10, startingY + lineNo * (s_PropertiesFont.Size + 5));
+					if (!string.IsNullOrEmpty(m_AdvEquipmentInfo.Camera))
+						g.DrawString(m_AdvEquipmentInfo.Camera, s_PropertiesFont, s_PropertiesWhiteBrush, 10, startingY + lineNo * (s_PropertiesFont.Size + 5));
 					lineNo++;
 				}
 
-				if (TangraConfig.Settings.ADVS.OverlayGeoLocation)
+				if (TangraConfig.Settings.ADVS.OverlayGeoLocation && m_GeoLocation != null)
 				{
 
 					g.DrawString(m_GeoLocation.GetFormattedGeoLocation(), s_PropertiesFont, s_PropertiesWhiteBrush, 10, startingY + lineNo * (s_PropertiesFont.Size + 5));
@@ -200,16 +207,16 @@ namespace Tangra.Video.AstroDigitalVideo
 				float startingY = currentImage.Height - numLines * (s_PropertiesFont.Size + 5) - 35;
 				if (TangraConfig.Settings.AAV.Overlay_Timestamp) startingY -= m_YPosUpper;
 
-				if (TangraConfig.Settings.AAV.Overlay_AdvsInfo)
+				if (TangraConfig.Settings.AAV.Overlay_AdvsInfo && m_AdvEquipmentInfo != null)
 				{
-					g.DrawString(m_EquipmentInfo.Recorder, s_PropertiesFont, s_PropertiesWhiteBrush, 10, startingY + lineNo * (s_PropertiesFont.Size + 5));
+					g.DrawString(m_AdvEquipmentInfo.Recorder, s_PropertiesFont, s_PropertiesWhiteBrush, 10, startingY + lineNo * (s_PropertiesFont.Size + 5));
 					lineNo++;
 				}
 
-				if (TangraConfig.Settings.AAV.Overlay_CameraInfo)
+				if (TangraConfig.Settings.AAV.Overlay_CameraInfo && m_AdvEquipmentInfo != null)
 				{
-					if (!string.IsNullOrEmpty(m_EquipmentInfo.Camera))
-						g.DrawString(m_EquipmentInfo.Camera, s_PropertiesFont, s_PropertiesWhiteBrush, 10, startingY + lineNo * (s_PropertiesFont.Size + 5));
+					if (!string.IsNullOrEmpty(m_AdvEquipmentInfo.Camera))
+						g.DrawString(m_AdvEquipmentInfo.Camera, s_PropertiesFont, s_PropertiesWhiteBrush, 10, startingY + lineNo * (s_PropertiesFont.Size + 5));
 					lineNo++;
 				}
 

@@ -41,7 +41,7 @@
 			this.miLoadFlat = new System.Windows.Forms.ToolStripMenuItem();
 			this.miTools = new System.Windows.Forms.ToolStripMenuItem();
 			this.miTargetPSFViewer = new System.Windows.Forms.ToolStripMenuItem();
-			this.miADVStatusData = new System.Windows.Forms.ToolStripMenuItem();
+			this.miFrameStatusData = new System.Windows.Forms.ToolStripMenuItem();
 			this.miVideoModelling = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
 			this.aDVToolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -78,7 +78,6 @@
 			this.pnlControlerPanel = new System.Windows.Forms.Panel();
 			this.zoomedImage = new System.Windows.Forms.PictureBox();
 			this.panelVideo = new System.Windows.Forms.Panel();
-			this.pictureBox = new Tangra.Controls.ImagePanel();
 			this.pnlPlayControls = new System.Windows.Forms.Panel();
 			this.pnlPlayButtons = new System.Windows.Forms.Panel();
 			this.btnJumpTo = new System.Windows.Forms.Button();
@@ -96,6 +95,7 @@
 			this.openAdvFileDialog = new System.Windows.Forms.OpenFileDialog();
 			this.saveFrameDialog = new System.Windows.Forms.SaveFileDialog();
 			this.timerCommandArgs = new System.Windows.Forms.Timer(this.components);
+			this.pictureBox = new Tangra.Controls.ImagePanel();
 			this.mainMenu.SuspendLayout();
 			this.statusStrip.SuspendLayout();
 			this.panelRight.SuspendLayout();
@@ -282,7 +282,7 @@
 			// 
 			this.miTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.miTargetPSFViewer,
-            this.miADVStatusData,
+            this.miFrameStatusData,
             this.miVideoModelling,
             this.toolStripMenuItem2,
             this.aDVToolsToolStripMenuItem});
@@ -294,28 +294,28 @@
 			// miTargetPSFViewer
 			// 
 			this.miTargetPSFViewer.Name = "miTargetPSFViewer";
-			this.miTargetPSFViewer.Size = new System.Drawing.Size(225, 22);
+			this.miTargetPSFViewer.Size = new System.Drawing.Size(172, 22);
 			this.miTargetPSFViewer.Text = "Target PSF Viewer";
 			this.miTargetPSFViewer.Click += new System.EventHandler(this.miTargetPSFViewer_Click);
 			// 
-			// miADVStatusData
+			// miFrameStatusData
 			// 
-			this.miADVStatusData.Name = "miADVStatusData";
-			this.miADVStatusData.Size = new System.Drawing.Size(225, 22);
-			this.miADVStatusData.Text = "ADV/AAV Status Data Viewer";
-			this.miADVStatusData.Click += new System.EventHandler(this.miADVStatusData_Click);
+			this.miFrameStatusData.Name = "miFrameStatusData";
+			this.miFrameStatusData.Size = new System.Drawing.Size(172, 22);
+			this.miFrameStatusData.Text = "Frame Data Viewer";
+			this.miFrameStatusData.Click += new System.EventHandler(this.miADVStatusData_Click);
 			// 
 			// miVideoModelling
 			// 
 			this.miVideoModelling.Name = "miVideoModelling";
-			this.miVideoModelling.Size = new System.Drawing.Size(225, 22);
+			this.miVideoModelling.Size = new System.Drawing.Size(172, 22);
 			this.miVideoModelling.Text = "Video Modelling";
 			this.miVideoModelling.Click += new System.EventHandler(this.miVideoModelling_Click);
 			// 
 			// toolStripMenuItem2
 			// 
 			this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-			this.toolStripMenuItem2.Size = new System.Drawing.Size(222, 6);
+			this.toolStripMenuItem2.Size = new System.Drawing.Size(169, 6);
 			// 
 			// aDVToolsToolStripMenuItem
 			// 
@@ -323,7 +323,7 @@
             this.miFSTSFileViewer,
             this.miRepairAdvFile});
 			this.aDVToolsToolStripMenuItem.Name = "aDVToolsToolStripMenuItem";
-			this.aDVToolsToolStripMenuItem.Size = new System.Drawing.Size(225, 22);
+			this.aDVToolsToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
 			this.aDVToolsToolStripMenuItem.Text = "ADV/AAV Tools";
 			// 
 			// miFSTSFileViewer
@@ -635,27 +635,6 @@
 			this.panelVideo.Size = new System.Drawing.Size(607, 570);
 			this.panelVideo.TabIndex = 4;
 			// 
-			// pictureBox
-			// 
-			this.pictureBox.AllowDrop = true;
-			this.pictureBox.BackColor = System.Drawing.SystemColors.ControlDark;
-			this.pictureBox.CanvasSize = new System.Drawing.Size(60, 40);
-			this.pictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.pictureBox.Image = null;
-			this.pictureBox.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
-			this.pictureBox.Location = new System.Drawing.Point(0, 0);
-			this.pictureBox.Name = "pictureBox";
-			this.pictureBox.Size = new System.Drawing.Size(607, 503);
-			this.pictureBox.TabIndex = 2;
-			this.pictureBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragDrop);
-			this.pictureBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragEnter);
-			this.pictureBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseClick);
-			this.pictureBox.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDoubleClick);
-			this.pictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDown);
-			this.pictureBox.MouseLeave += new System.EventHandler(this.pictureBox_MouseLeave);
-			this.pictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseMove);
-			this.pictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseUp);
-			// 
 			// pnlPlayControls
 			// 
 			this.pnlPlayControls.Controls.Add(this.pnlPlayButtons);
@@ -813,6 +792,27 @@
 			// 
 			this.timerCommandArgs.Tick += new System.EventHandler(this.timerCommandArgs_Tick);
 			// 
+			// pictureBox
+			// 
+			this.pictureBox.AllowDrop = true;
+			this.pictureBox.BackColor = System.Drawing.SystemColors.ControlDark;
+			this.pictureBox.CanvasSize = new System.Drawing.Size(60, 40);
+			this.pictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.pictureBox.Image = null;
+			this.pictureBox.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
+			this.pictureBox.Location = new System.Drawing.Point(0, 0);
+			this.pictureBox.Name = "pictureBox";
+			this.pictureBox.Size = new System.Drawing.Size(607, 503);
+			this.pictureBox.TabIndex = 2;
+			this.pictureBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragDrop);
+			this.pictureBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragEnter);
+			this.pictureBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseClick);
+			this.pictureBox.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDoubleClick);
+			this.pictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDown);
+			this.pictureBox.MouseLeave += new System.EventHandler(this.pictureBox_MouseLeave);
+			this.pictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseMove);
+			this.pictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseUp);
+			// 
 			// frmMain
 			// 
 			this.AllowDrop = true;
@@ -906,7 +906,7 @@
 		private System.Windows.Forms.ToolStripMenuItem aDVToolsToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem miRepairAdvFile;
 		protected internal System.Windows.Forms.ToolStripMenuItem miTargetPSFViewer;
-		protected internal System.Windows.Forms.ToolStripMenuItem miADVStatusData;
+		protected internal System.Windows.Forms.ToolStripMenuItem miFrameStatusData;
 		protected internal System.Windows.Forms.ToolStripMenuItem miFSTSFileViewer;
 		protected internal System.Windows.Forms.ToolStripMenuItem miExportToCSV;
 		private System.Windows.Forms.SaveFileDialog saveFrameDialog;

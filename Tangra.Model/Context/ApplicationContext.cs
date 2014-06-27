@@ -45,6 +45,8 @@ namespace Tangra.Model.Context
 		public bool HasConfigurationSolved = false;
 
 		public bool UsingADV = false;
+		public bool IsSerFile = false;
+
 		public bool RecordingDebugSession = false;
 
 		public bool UsingIntegration = false;
@@ -106,6 +108,7 @@ namespace Tangra.Model.Context
 			CanPlayVideo = false;
 
 			UsingADV = false;
+			IsSerFile = false;
 			RecordingDebugSession = false;
 			UsingIntegration = false;
 

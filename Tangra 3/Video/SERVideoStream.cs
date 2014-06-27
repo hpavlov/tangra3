@@ -14,11 +14,19 @@ using Tangra.Video.SER;
 
 namespace Tangra.Video
 {
+	public class SerEquipmentInfo
+	{
+		public string Observer;
+		public string Instrument; 
+		public string Telescope;
+	}
+
 	public class SERVideoStream : IFrameStream
 	{
-		public static SERVideoStream OpenFile(string fileName, IWin32Window parentForm)
+		public static SERVideoStream OpenFile(string fileName, IWin32Window parentForm, out SerEquipmentInfo equipmentInfo)
 		{
 			var fileInfo = new SerFileInfo();
+			equipmentInfo = new SerEquipmentInfo();
 
 			byte[] observer = new byte[40];
 			byte[] instrument = new byte[40];
@@ -31,7 +39,13 @@ namespace Tangra.Video
 			{
 				TangraCore.SERCloseFile();
 
-				return new SERVideoStream(fileName, frmInfo.FrameRate, frmInfo.BitPix);
+				var rv = new SERVideoStream(fileName, frmInfo.FrameRate, frmInfo.BitPix);
+
+				equipmentInfo.Instrument = rv.Instrument;
+				equipmentInfo.Observer = rv.Observer;
+				equipmentInfo.Telescope = rv.Telescope;
+
+				return rv;
 			}
 			return null;
 		}
@@ -68,6 +82,16 @@ namespace Tangra.Video
 		public string Instrument { get; private set; }
 
 		public string Telescope { get; private set; }
+
+		public DateTime SequenceStartTime
+		{
+			get { return new DateTime((long) m_FileInfo.SequenceStartTimeLo + ((long) m_FileInfo.SequenceStartTimeHi << 32)); }
+		}
+
+		public DateTime SequenceStartTimeUTC
+		{
+			get { return new DateTime((long)m_FileInfo.SequenceStartTimeUTCLo + ((long)m_FileInfo.SequenceStartTimeUTCHi << 32)); }
+		}
 
 		public int Width
 		{
@@ -132,6 +156,11 @@ namespace Tangra.Video
 
 				var rv = new Pixelmap(Width, Height, BitPix, pixels, displayBitmap, displayBitmapBytes);
 
+				rv.FrameState = new FrameStateData()
+				{
+					SystemTime = m_CurrentFrameInfo.TimeStamp
+				};
+
 				return rv;
 			}
 		}
@@ -166,7 +195,14 @@ namespace Tangra.Video
 			{
 				Bitmap displayBitmap = (Bitmap)Bitmap.FromStream(memStr);
 
-				return new Pixelmap(Width, Height, BitPix, pixels, displayBitmap, displayBitmapBytes);
+				var rv = new Pixelmap(Width, Height, BitPix, pixels, displayBitmap, displayBitmapBytes);
+
+				rv.FrameState = new FrameStateData()
+				{
+					SystemTime = m_CurrentFrameInfo.TimeStamp
+				};
+
+				return rv;
 			}
 		}
 

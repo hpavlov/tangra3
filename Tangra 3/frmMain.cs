@@ -586,7 +586,7 @@ namespace Tangra
 
 		private void miTools_DropDownOpening(object sender, EventArgs e)
 		{
-			miADVStatusData.Checked = m_VideoController.IsAdvStatusFormVisible || m_VideoController.IsAavStatusFormVisible;
+			miFrameStatusData.Checked = m_VideoController.IsAdvStatusFormVisible || m_VideoController.IsAavStatusFormVisible;
 		    miTargetPSFViewer.Checked = m_VideoController.IsTargetPSFViewerFormVisible;
 		}
 
@@ -595,6 +595,10 @@ namespace Tangra
 			if (m_VideoController.IsAstroDigitalVideo || m_VideoController.IsAstroAnalogueVideo)
 			{
 				m_VideoController.ToggleAstroVideoStatusForm();
+			}
+			else if (m_VideoController.IsSerVideo)
+			{
+				m_VideoController.ToggleSerStatusForm();
 			}
 		}
 

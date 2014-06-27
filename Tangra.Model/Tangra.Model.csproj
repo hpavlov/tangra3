@@ -97,6 +97,7 @@
     <Compile Include="Config\AavSettings.cs" />
     <Compile Include="Config\AdvsSettings.cs" />
     <Compile Include="Config\OCRConfigEntry.cs" />
+    <Compile Include="Config\SerSettings.cs" />
     <Compile Include="Config\TangraConfig.cs" />
     <Compile Include="Context\ApplicationContext.cs" />
     <Compile Include="Context\RenderFrameContext.cs" />
