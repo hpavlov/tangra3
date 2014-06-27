@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using Tangra.VideoOperations.LightCurves.Tracking;
+using Tangra.VideoTools;
 using nom.tam.fits;
 using nom.tam.util;
 using Tangra.ImageTools;
@@ -1624,5 +1625,15 @@ namespace Tangra.Controller
                 m_VideoFileView.Update();
             }
         }
+
+		public void ShowFileInformation()
+		{
+			if (m_FramePlayer.Video != null)
+			{
+				var frm = new frmFileInformation(m_FramePlayer.Video);
+				frm.StartPosition = FormStartPosition.CenterParent;
+				frm.ShowDialog(m_MainForm);
+			}
+		}
     }
 }

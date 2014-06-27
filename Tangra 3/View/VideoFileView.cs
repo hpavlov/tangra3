@@ -93,6 +93,7 @@ namespace Tangra.View
 			m_MainForm.miTargetPSFViewer.Enabled = TangraContext.Current.HasVideoLoaded;
 
 		    m_MainForm.miFSTSFileViewer.Enabled = true;
+			m_MainForm.miFileInfo.Enabled = TangraContext.Current.HasAnyFileLoaded;
 
 			UpdateConfigurationControls();
 		}

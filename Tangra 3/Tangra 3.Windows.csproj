@@ -303,6 +303,13 @@
     <Compile Include="VideoOperations\LightCurves\ucCorrSelection.Designer.cs">
       <DependentUpon>ucCorrSelection.cs</DependentUpon>
     </Compile>
+    <Compile Include="VideoTools\BackgroundModelGenerator.cs" />
+    <Compile Include="VideoTools\frmFileInformation.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoTools\frmFileInformation.Designer.cs">
+      <DependentUpon>frmFileInformation.cs</DependentUpon>
+    </Compile>
     <Compile Include="VideoTools\frmGenerate3DPolyBackground.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -655,6 +662,9 @@
     <EmbeddedResource Include="VideoOperations\LightCurves\ucCorrSelection.resx">
       <DependentUpon>ucCorrSelection.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="VideoTools\frmFileInformation.resx">
+      <DependentUpon>frmFileInformation.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="VideoTools\frmGenerate3DPolyBackground.resx">
       <DependentUpon>frmGenerate3DPolyBackground.cs</DependentUpon>
     </EmbeddedResource>
@@ -762,6 +772,7 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="Properties\DataSources\Tangra.VideoOperations.LightCurves.LCFileSeriesEntry.datasource" />
+    <None Include="Properties\DataSources\Tangra.VideoTools.TagValuePair.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

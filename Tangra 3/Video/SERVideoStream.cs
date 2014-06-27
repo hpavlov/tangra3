@@ -57,7 +57,17 @@ namespace Tangra.Video
 			BitPix = cameraBitPix;
 			FrameRate = frameRate;
 			MillisecondsPerFrame = 1000 / frameRate;
+
+			Observer = Encoding.UTF8.GetString(observer).Trim();
+			Instrument = Encoding.UTF8.GetString(instrument).Trim();
+			Telescope = Encoding.UTF8.GetString(telescope).Trim();
 		}
+
+		public string Observer { get; private set; }
+
+		public string Instrument { get; private set; }
+
+		public string Telescope { get; private set; }
 
 		public int Width
 		{

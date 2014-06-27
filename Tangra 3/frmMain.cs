@@ -914,5 +914,10 @@ namespace Tangra
 			frm.ShowDialog(this);
 		}
 
+		private void miFileInfo_Click(object sender, EventArgs e)
+		{
+			m_VideoController.ShowFileInformation();
+		}
+
 	}
 }

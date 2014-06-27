@@ -1118,7 +1118,7 @@ namespace Tangra.VideoOperations.LightCurves
                 {
                     BinnedValue binnedVal = GetBinForFrameNo(0, m_SelectedMeasurements[0].CurrFrameNo);
                     if (binnedVal != null)
-                        lblBinNo.Text = string.Format("{0} ({1} - {2})", binnedVal.BinNo, binnedVal.ReadingIndexFrom, binnedVal.ReadingIndexTo);
+						lblBinNo.Text = string.Format("{0} ({1} - {2})", binnedVal.BinNo, m_Header.MinFrame + binnedVal.ReadingIndexFrom, m_Header.MinFrame + binnedVal.ReadingIndexTo);
                     else
                         lblBinNo.Text = string.Empty;
                 }
