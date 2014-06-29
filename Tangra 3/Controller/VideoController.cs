@@ -1237,40 +1237,6 @@ namespace Tangra.Controller
 
 		public void ShowFSTSFileViewer()
 		{
-            for (int i = m_FramePlayer.Video.FirstFrame; i <= m_FramePlayer.Video.LastFrame; i++)
-            {
-                Pixelmap pixmap = m_FramePlayer.GetFrame(i, true);
-                
-                uint[] chunk = new uint[600 * 400];
-                byte[] bmpPixels = new byte[600 * 400];
-
-                int idx = 0;
-                for (int y = 620; y < 1020; y++)
-                for (int x = 520; x < 1120; x++)
-                {
-                    chunk[idx] = pixmap[x, y] & 0xFFFF;
-                    bmpPixels[idx] = (byte)Math.Min(255, Math.Max(0, (255.0 * (pixmap[x, y] & 0xFFFF)) / 0xFFFF));
-                    idx++;
-                }
-
-                Bitmap bmp = Pixelmap.ConstructBitmapFromBitmapPixels(bmpPixels, 600, 400);
-                var pixChunk = new Pixelmap(600, 400, m_FramePlayer.Video.BitPix, chunk, bmp, bmpPixels);
-
-                bmp.Save(@"D:\Tangra3 TestBed\SER PIX\" + i.ToString() + ".bmp");
-
-                using (FileStream fs = new FileStream(@"D:\Tangra3 TestBed\SER PIX\" + i.ToString() + ".pix", FileMode.Create, FileAccess.Write))
-                using (BinaryWriter wrt = new BinaryWriter(fs))
-                {
-                    for (int j = 0; j < pixChunk.Pixels.Length; j++)
-                    {
-                        short pix = (short)pixChunk.Pixels[j];
-                        wrt.Write(pix);
-                    }
-
-                    wrt.Flush();
-                }
-            }
-            
 			if (TangraContext.Current.HasVideoLoaded && (m_FramePlayer.IsAstroDigitalVideo || m_FramePlayer.IsAstroAnalogueVideo))
 			{
 				var viewer = new frmAdvViewer(m_FramePlayer.Video.FileName);
