@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -280,7 +281,15 @@ namespace Tangra.PInvoke
 
 		internal SerFrameInfo(SerNativeFrameInfo nativeInfo)
 		{
-			TimeStamp = new DateTime((long)nativeInfo.TimeStampLo + ((long)nativeInfo.TimeStampHi << 32));
+		    try
+		    {
+                TimeStamp = new DateTime((long)nativeInfo.TimeStampLo + ((long)nativeInfo.TimeStampHi << 32));
+		    }
+            catch (ArgumentOutOfRangeException aex)
+            {
+                Trace.WriteLine(aex);
+                TimeStamp = DateTime.MinValue;
+            }
 		}
 	}
 

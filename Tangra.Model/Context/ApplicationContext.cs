@@ -36,6 +36,7 @@ namespace Tangra.Model.Context
 		public bool HasImageLoaded;
 		public bool CanChangeTool = true;
 		public bool CanPlayVideo = true;
+        public bool UndefinedFrameRate = false;
 
 		public bool CanScrollFrames;
 
@@ -106,6 +107,7 @@ namespace Tangra.Model.Context
 
 			CanScrollFrames = false;
 			CanPlayVideo = false;
+		    UndefinedFrameRate = false;
 
 			UsingADV = false;
 			IsSerFile = false;

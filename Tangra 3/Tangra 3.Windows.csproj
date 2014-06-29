@@ -557,6 +557,7 @@
     </Compile>
     <Compile Include="Video\AstroDigitalVideo\Interfaces.cs" />
     <Compile Include="Video\AstroDigitalVideo\UI\AdvTagValuePair.cs" />
+    <Compile Include="Video\FITSFileSequenceStream.cs" />
     <Compile Include="Video\SERVideoStream.cs" />
     <Compile Include="Video\SER\frmEnterSERFileInfo.cs">
       <SubType>Form</SubType>

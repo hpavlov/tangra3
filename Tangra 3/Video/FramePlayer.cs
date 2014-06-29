@@ -275,7 +275,7 @@ namespace Tangra.Video
 
 				try
 				{
-					if (noIntegrate)
+                    if (noIntegrate || !m_VideoStream.SupportsSoftwareIntegration)
 						currentBitmap = m_VideoStream.GetPixelmap(frameNo);
 					else
 						currentBitmap = m_VideoStream.GetIntegratedFrame(frameNo, m_FramesToIntegrate,
@@ -384,7 +384,7 @@ namespace Tangra.Video
             {
                 Pixelmap currentBitmap = null;
 
-                if (m_FrameIntegration == FrameIntegratingMode.NoIntegration)
+                if (m_FrameIntegration == FrameIntegratingMode.NoIntegration || !m_VideoStream.SupportsSoftwareIntegration)
 				{
 					currentBitmap = m_VideoStream.GetPixelmap(m_CurrentFrameIndex);
 				}

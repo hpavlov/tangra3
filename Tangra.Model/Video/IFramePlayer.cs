@@ -45,6 +45,7 @@ namespace Tangra.Model.Video
 		string FileName { get; }
 
 		uint GetAav16NormVal();
+	    bool SupportsSoftwareIntegration { get; }
 	}
 
 	public class GeoLocationInfo

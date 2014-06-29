@@ -179,8 +179,13 @@ namespace Tangra.Video
 
 		public int RecommendedBufferSize
 		{
-			get { return 8; }
+            get { return Math.Min(8, CountFrames); }
 		}
+
+        public bool SupportsSoftwareIntegration
+        {
+            get { return true; }
+        }
 
 		public string VideoFileType
 		{

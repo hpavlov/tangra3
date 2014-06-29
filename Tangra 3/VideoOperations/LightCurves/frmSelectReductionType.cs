@@ -297,22 +297,22 @@ namespace Tangra.VideoOperations.LightCurves
             {
                 btnMoreOrLess.Text = "More Options";
 
-                if (tabControl1.TabPages.Count == 4)
+                if (tabsOptions.TabPages.Count == 4)
                 {
-                    tabControl1.TabPages.Remove(tabIntegration);
-                    tabControl1.TabPages.Remove(tabReduction);
-                    tabControl1.TabPages.Remove(tabStretching);
+                    tabsOptions.TabPages.Remove(tabIntegration);
+                    tabsOptions.TabPages.Remove(tabReduction);
+                    tabsOptions.TabPages.Remove(tabStretching);
                 }
             }
             else
             {
                 btnMoreOrLess.Text = "Less Options";
 
-                if (tabControl1.TabPages.Count == 1)
+                if (tabsOptions.TabPages.Count == 1)
                 {
-                    tabControl1.TabPages.Add(tabIntegration);
-                    tabControl1.TabPages.Add(tabStretching);
-                    tabControl1.TabPages.Add(tabReduction);
+                    tabsOptions.TabPages.Add(tabIntegration);
+                    tabsOptions.TabPages.Add(tabStretching);
+                    tabsOptions.TabPages.Add(tabReduction);
                 }
             }
         }
@@ -439,5 +439,11 @@ namespace Tangra.VideoOperations.LightCurves
 				m_DefaultReductionSettingsModified = false;
 			}
 		}
+
+        private void frmSelectReductionType_Load(object sender, EventArgs e)
+        {
+            if (!m_VideoContoller.SupportsSoftwareIntegration)
+                tabsOptions.TabPages.Remove(tabIntegration);
+        }
     }
 }

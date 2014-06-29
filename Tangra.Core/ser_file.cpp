@@ -101,7 +101,7 @@ void SerFile::OpenFile(const char* filePath, SerLib::SerFileInfo* fileInfo, char
 	fileInfo->SequenceStartTimeLo = buffInt64 & 0xFFFFFFFF;
 	fileInfo->SequenceStartTimeHi = buffInt64 >> 32;
 	
-	m_HasTimeStamps = ((buffInt64 >> 0x3F) & 0x01) == 0x00;
+	HasTimeStamps = ((buffInt64 >> 0x3F) & 0x01) == 0x00;
 	
 	fread(&buffInt64, 8, 1, m_File);
 	fileInfo->SequenceStartTimeUTCLo = buffInt64 & 0xFFFFFFFF;
@@ -111,7 +111,7 @@ void SerFile::OpenFile(const char* filePath, SerLib::SerFileInfo* fileInfo, char
 	m_RawFrameBuffer = (unsigned char*)malloc(m_RawFrameSize + 16);
 	m_PixelsPerFrame = Width * Height;
 	
-	if (m_HasTimeStamps)
+	if (HasTimeStamps)
 		m_TimeStampStartOffset = 178 + m_CountFrames * m_RawFrameSize;
 	else
 		m_TimeStampStartOffset = -1;
@@ -139,7 +139,7 @@ HRESULT SerFile::GetFrame(int frameNo, unsigned long* pixels, int cameraBitPix, 
 		
 		if (SUCCEEDED(rv))
 		{
-			if (m_HasTimeStamps)
+			if (HasTimeStamps)
 			{
 				__int64 timestampPosition = m_TimeStampStartOffset + frameNo * 8;
 				
@@ -289,9 +289,12 @@ HRESULT SERGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSl
 		IntegrationManagerProduceIntegratedFrame(pixels);
 		IntegrationManagerFreeResources();
 		
-		frameInfo->TimeStamp64 = GetUInt64Average(firstFrameInfo.TimeStamp64, lastFrameInfo.TimeStamp64);
-		frameInfo->TimeStampLo = frameInfo->TimeStamp64 & 0xFFFFFFFF;
-		frameInfo->TimeStampHi = frameInfo->TimeStamp64 >> 32;
+		if (m_SerFile->HasTimeStamps)
+		{
+			frameInfo->TimeStamp64 = GetUInt64Average(firstFrameInfo.TimeStamp64, lastFrameInfo.TimeStamp64);
+			frameInfo->TimeStampLo = frameInfo->TimeStamp64 & 0xFFFFFFFF;
+			frameInfo->TimeStampHi = frameInfo->TimeStamp64 >> 32;			
+		}
 		
 		return GetBitmapPixels(m_SerFile->Width, m_SerFile->Height, pixels, bitmapBytes, bitmapDisplayBytes, false, cameraBitPix, m_SerFile->NormalisationValue);		
 	}

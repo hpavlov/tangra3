@@ -26,6 +26,8 @@ namespace Tangra.VideoTools
 
 			BackgroundModelGenerator = bgModelGenerator;
 
+		    UpdateControlState();
+            DisplayModelParameters();
 		}
 
 		private void btnRandom_Click(object sender, EventArgs e)
@@ -85,42 +87,47 @@ namespace Tangra.VideoTools
 			}
 		}
 
+        private void UpdateControlState()
+        {
+            if (rbOrder1.Checked)
+            {
+                lblPolyEq.Text = "z = A * x + B * x + C";
+                tbxD.Enabled = false;
+                tbxE.Enabled = false;
+                tbxF.Enabled = false;
+                tbxG.Enabled = false;
+                tbxH.Enabled = false;
+                tbxI.Enabled = false;
+                tbxJ.Enabled = false;
+            }
+            else if (rbOrder2.Checked)
+            {
+                lblPolyEq.Text = "z = A * x^2 + B * x * y + C * y^2 + D * x + E * y + F";
+                tbxD.Enabled = true;
+                tbxE.Enabled = true;
+                tbxF.Enabled = true;
+                tbxG.Enabled = false;
+                tbxH.Enabled = false;
+                tbxI.Enabled = false;
+                tbxJ.Enabled = false;
+
+            }
+            else if (rbOrder3.Checked)
+            {
+                lblPolyEq.Text = "z = A * x^3 + B * x^2 * y + C * x * y^2 +  D * y^3 + E * x^2 + F * x * y + G * y^2 + H * x + I * y + J";
+                tbxD.Enabled = true;
+                tbxE.Enabled = true;
+                tbxF.Enabled = true;
+                tbxG.Enabled = true;
+                tbxH.Enabled = true;
+                tbxI.Enabled = true;
+                tbxJ.Enabled = true;
+            }
+        }
+
 		private void PolyOrderChanged(object sender, EventArgs e)
 		{
-			if (rbOrder1.Checked)
-			{
-				lblPolyEq.Text = "z = A * x + B * x + C";
-				tbxD.Enabled = false;
-				tbxE.Enabled = false;
-				tbxF.Enabled = false;
-				tbxG.Enabled = false;
-				tbxH.Enabled = false;
-				tbxI.Enabled = false;
-				tbxJ.Enabled = false;
-			}
-			else if (rbOrder2.Checked)
-			{
-				lblPolyEq.Text = "z = A * x^2 + B * x * y + C * y^2 + D * x + E * y + F";
-				tbxD.Enabled = true;
-				tbxE.Enabled = true;
-				tbxF.Enabled = true;
-				tbxG.Enabled = false;
-				tbxH.Enabled = false;
-				tbxI.Enabled = false;
-				tbxJ.Enabled = false;
-
-			}
-			else if (rbOrder3.Checked)
-			{
-				lblPolyEq.Text = "z = A * x^3 + B * x^2 * y + C * x * y^2 +  D * y^3 + E * x^2 + F * x * y + G * y^2 + H * x + I * y + J";
-				tbxD.Enabled = true;
-				tbxE.Enabled = true;
-				tbxF.Enabled = true;
-				tbxG.Enabled = true;
-				tbxH.Enabled = true;
-				tbxI.Enabled = true;
-				tbxJ.Enabled = true;
-			}
+		    UpdateControlState();
 
 			DisplayModelParameters();
 			BackgroundModelGenerator.PlotBackground(pboxPlot, PolyOrder);

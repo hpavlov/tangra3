@@ -326,7 +326,8 @@ namespace Tangra.VideoOperations.LightCurves
 
             ucUtcTime.FocusHourControl();
 
-            m_ShowingFields = true;
+            // Split the video in fields for interlaced video
+            m_ShowingFields = m_VideoController.IsPlainAviVideo;
 			m_StateMachine.VideoOperation.ToggleShowFields(m_ShowingFields);
             UpdateShowingFieldControls();
 

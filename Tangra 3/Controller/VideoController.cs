@@ -158,6 +158,25 @@ namespace Tangra.Controller
 				() => new SingleBitmapFileFrameStream(lcFile));
 		}
 
+        public bool OpenFitsFileSequence(string folderName)
+        {
+            string[] fitsFiles = Directory.GetFiles(folderName, "*.fit*", SearchOption.TopDirectoryOnly);
+            if (fitsFiles.Length == 0)
+            {
+                ShowMessageBox("No FITS files found inside " + folderName, "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+            else
+            {
+                return OpenVideoFileInternal(
+                    folderName,
+                    () =>
+                    {
+                        return FITSFileSequenceStream.OpenFolder(fitsFiles);
+                    });
+            }
+        }
+
 	    public bool OpenVideoFile(string fileName)
 	    {
 			string fileExtension = Path.GetExtension(fileName);
@@ -229,7 +248,7 @@ namespace Tangra.Controller
 				if (!string.IsNullOrEmpty(fileName))
 				{
 					TangraContext.Current.FileName = Path.GetFileName(fileName);
-					TangraContext.Current.FileFormat = frameStream.VideoFileType;					
+					TangraContext.Current.FileFormat = frameStream.VideoFileType;
 				}
 
 				if (!IsAstroDigitalVideo)
@@ -259,9 +278,10 @@ namespace Tangra.Controller
 				TangraContext.Current.CanChangeTool = true;
 				TangraContext.Current.CanLoadDarkFrame = true;
 				TangraContext.Current.CanLoadFlatFrame = true;
-				TangraContext.Current.CanScrollFrames = true;				
+				TangraContext.Current.CanScrollFrames = true;	
 				
 				TangraContext.Current.HasImageLoaded = true;
+                TangraContext.Current.UndefinedFrameRate = double.IsNaN(m_FramePlayer.Video.FrameRate);
 
 				m_VideoFileView.UpdateVideoSizeAndLengthControls();
 
@@ -490,6 +510,11 @@ namespace Tangra.Controller
 		{
 			get { return m_FramePlayer.Video.Engine == "SER"; }
 		}
+
+        public bool SupportsSoftwareIntegration
+        {
+            get { return m_FramePlayer.Video.SupportsSoftwareIntegration; }
+        }
 
 		public bool HasEmbeddedTimeStamps()
 		{
@@ -736,7 +761,7 @@ namespace Tangra.Controller
 
         public AstroImage GetCurrentAstroImage(bool integrated)
         {
-            if (integrated)
+            if (integrated || !m_FramePlayer.Video.SupportsSoftwareIntegration)
             {
 				// NOTE: This only seems to be used by AddEditTarget form in a case of no wind and shaking (which is the case most of the times)
                 Pixelmap image = m_FramePlayer.GetIntegratedFrame(m_CurrentFrameContext.CurrentFrameIndex, TangraConfig.Settings.Special.AddStarImageFramesToIntegrate, true /* 'true'so we start from the current frame */, false);
@@ -1212,6 +1237,40 @@ namespace Tangra.Controller
 
 		public void ShowFSTSFileViewer()
 		{
+            for (int i = m_FramePlayer.Video.FirstFrame; i <= m_FramePlayer.Video.LastFrame; i++)
+            {
+                Pixelmap pixmap = m_FramePlayer.GetFrame(i, true);
+                
+                uint[] chunk = new uint[600 * 400];
+                byte[] bmpPixels = new byte[600 * 400];
+
+                int idx = 0;
+                for (int y = 620; y < 1020; y++)
+                for (int x = 520; x < 1120; x++)
+                {
+                    chunk[idx] = pixmap[x, y] & 0xFFFF;
+                    bmpPixels[idx] = (byte)Math.Min(255, Math.Max(0, (255.0 * (pixmap[x, y] & 0xFFFF)) / 0xFFFF));
+                    idx++;
+                }
+
+                Bitmap bmp = Pixelmap.ConstructBitmapFromBitmapPixels(bmpPixels, 600, 400);
+                var pixChunk = new Pixelmap(600, 400, m_FramePlayer.Video.BitPix, chunk, bmp, bmpPixels);
+
+                bmp.Save(@"D:\Tangra3 TestBed\SER PIX\" + i.ToString() + ".bmp");
+
+                using (FileStream fs = new FileStream(@"D:\Tangra3 TestBed\SER PIX\" + i.ToString() + ".pix", FileMode.Create, FileAccess.Write))
+                using (BinaryWriter wrt = new BinaryWriter(fs))
+                {
+                    for (int j = 0; j < pixChunk.Pixels.Length; j++)
+                    {
+                        short pix = (short)pixChunk.Pixels[j];
+                        wrt.Write(pix);
+                    }
+
+                    wrt.Flush();
+                }
+            }
+            
 			if (TangraContext.Current.HasVideoLoaded && (m_FramePlayer.IsAstroDigitalVideo || m_FramePlayer.IsAstroAnalogueVideo))
 			{
 				var viewer = new frmAdvViewer(m_FramePlayer.Video.FileName);
@@ -1447,7 +1506,7 @@ namespace Tangra.Controller
                         pixel = new ImagePixel(m_TargetPsfFit.Brightness, m_TargetPsfFit.XCenter, m_TargetPsfFit.YCenter);
                         //isFit = psfFit.Certainty > 0.25;
                     }
-					m_TargetBackgroundPixels = m_AstroImage.GetMeasurableAreaPixels(pixel.X, pixel.Y, 35);     
+					m_TargetBackgroundPixels = m_AstroImage.GetMeasurableAreaPixels(pixel.X, pixel.Y, 35);
                 }
             }
 

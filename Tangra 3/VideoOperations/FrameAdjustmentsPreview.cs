@@ -201,7 +201,7 @@ namespace Tangra.VideoOperations
 				if (m_CurrFrame != null)
 				{
 					frmFullSizePreview.EnsureFullPreviewVisible(m_CurrFrame, ParentForm);
-					frmFullSizePreview.Update(m_CurrFrame);					
+					frmFullSizePreview.Update(m_CurrFrame);
 				}
 			}
 			else

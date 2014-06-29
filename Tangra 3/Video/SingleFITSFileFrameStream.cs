@@ -129,6 +129,11 @@ namespace Tangra.Video
 			get { return 1; }
 		}
 
+        public bool SupportsSoftwareIntegration
+        {
+            get { return false; }
+        }
+
 		public string VideoFileType
 		{
 			get { return "FITS Image"; }

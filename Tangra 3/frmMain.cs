@@ -923,5 +923,13 @@ namespace Tangra
 			m_VideoController.ShowFileInformation();
 		}
 
+        private void miOpenFitsSequence_Click(object sender, EventArgs e)
+        {
+            if (openFitsSequenceDialog.ShowDialog(this) == DialogResult.OK)
+            {
+                m_VideoController.OpenFitsFileSequence(openFitsSequenceDialog.SelectedPath);
+            }
+        }
+
 	}
 }

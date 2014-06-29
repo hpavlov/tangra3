@@ -36,12 +36,11 @@ namespace Tangra.Helpers
 
 				pixels = Load16BitImageData((Array)imageHDU.Data.DataArray, imageHDU.Axes[0], imageHDU.Axes[1], out medianValue);
 				return true;
-			}				
+			}
 		}
 
 		public static void Load16BitFitsFile(string fileName, out uint[] pixelsFlat, out int width, out int height, out int bpp)
 		{
-
 			int pixWidth = 0;
 			int pixHeight = 0;
 			int pixBpp = 0;
@@ -64,16 +63,17 @@ namespace Tangra.Helpers
 			);
 
 			width = pixWidth;
-			height = pixHeight;			
+			height = pixHeight;
 			pixelsFlat = new uint[width * height];
 
 			uint maxPresentPixelValue = 0;
+            uint mask = (uint)(((uint)1 << pixBpp) - 1);
 
 			for (int y = 0; y < height; y++)
 			{
 				for (int x = 0; x < width; x++)
 				{
-					uint val = pixels[x, y];
+                    uint val = pixels[x, y] & mask;
 					pixelsFlat[x + y * width] = val;
 					if (maxPresentPixelValue < val)
 						maxPresentPixelValue = val;
@@ -87,7 +87,7 @@ namespace Tangra.Helpers
 			else if (maxPresentPixelValue < 16384)
 				bpp = 14;
 			else
-				bpp = pixBpp;			
+				bpp = pixBpp;
 		}
 
 		private static uint[,] Load16BitImageData(Array dataArray, int height, int width, out uint medianValue)

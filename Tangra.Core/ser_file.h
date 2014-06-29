@@ -57,7 +57,6 @@ namespace SerLib
 			long m_BytesPerPixel;
 			long m_PixelsPerFrame;
 			long m_CountFrames;
-			bool m_HasTimeStamps;
 			__int64 m_TimeStampStartOffset;
 		
 		private:
@@ -71,6 +70,7 @@ namespace SerLib
 			long Bpp;
 			bool LittleEndian;
 			long NormalisationValue;
+			bool HasTimeStamps;
 		
 		public:
 			SerFile();
