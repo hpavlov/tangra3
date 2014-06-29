@@ -36,6 +36,7 @@ namespace AutoUpdate
             this.updateTimer = new System.Windows.Forms.Timer(this.components);
             this.lblInfo = new System.Windows.Forms.Label();
             this.lbModulesToUpdate = new System.Windows.Forms.ListBox();
+            this.lblVersion = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // pbUpdate
@@ -77,11 +78,22 @@ namespace AutoUpdate
             this.lbModulesToUpdate.Size = new System.Drawing.Size(361, 43);
             this.lbModulesToUpdate.TabIndex = 3;
             // 
+            // lblVersion
+            // 
+            this.lblVersion.AutoSize = true;
+            this.lblVersion.Font = new System.Drawing.Font("Microsoft Sans Serif", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblVersion.Location = new System.Drawing.Point(345, 9);
+            this.lblVersion.Name = "lblVersion";
+            this.lblVersion.Size = new System.Drawing.Size(30, 9);
+            this.lblVersion.TabIndex = 4;
+            this.lblVersion.Text = "ver.X.Y";
+            // 
             // frmUpdate
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(386, 125);
+            this.Controls.Add(this.lblVersion);
             this.Controls.Add(this.lbModulesToUpdate);
             this.Controls.Add(this.lblInfo);
             this.Controls.Add(this.lblStatus);
@@ -92,7 +104,7 @@ namespace AutoUpdate
             this.MinimizeBox = false;
             this.Name = "frmUpdate";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Tangra3 Updater, ver. 2.5";
+            this.Text = "Tangra3 Updater";
             this.Load += new System.EventHandler(this.frmUpdate_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -106,6 +118,7 @@ namespace AutoUpdate
         private System.Windows.Forms.Timer updateTimer;
         private System.Windows.Forms.Label lblInfo;
         private System.Windows.Forms.ListBox lbModulesToUpdate;
+        private System.Windows.Forms.Label lblVersion;
     }
 }
 

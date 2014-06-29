@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Reflection;
 using System.Xml;
 using System.Drawing;
 using System.Text;
@@ -39,6 +40,9 @@ namespace AutoUpdate
             {
                 acceptBetaUpdates = args[1] == "beta";
             }
+
+            Version currVer = Assembly.GetExecutingAssembly().GetName().Version;
+            lblVersion.Text = string.Format("ver.{0}.{1}", currVer.Major, currVer.Minor);
 
 			Trace.WriteLine(string.Format("Accept Beta Updates: {0}", acceptBetaUpdates), SharedUpdateConstants.UPDATER_PROGRAM_NAME);
 
