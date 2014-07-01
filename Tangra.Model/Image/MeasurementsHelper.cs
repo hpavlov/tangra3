@@ -577,7 +577,7 @@ namespace Tangra.Model.Image
 
         private delegate double GetPixelMeasurementCallback(int x, int y);
 
-        private uint GetReading(
+        private double GetReading(
             float aperture, uint[,] data,
             int nWidth, int nHeight,
             float x0, float y0,
@@ -596,9 +596,9 @@ namespace Tangra.Model.Image
                         // then add the readin directly
 
                         if (pixelMeasurementCallback != null)
-                            total += (float)pixelMeasurementCallback(x, y);
+                            total += pixelMeasurementCallback(x, y);
                         else
-                            total += data[x, y];
+                            total += (int)data[x, y];
 
                         totalPixels++;
                     }
@@ -621,9 +621,9 @@ namespace Tangra.Model.Image
                             subpixels = 1.0f;
 
                         if (pixelMeasurementCallback != null)
-                            total += (float)pixelMeasurementCallback(x, y) * subpixels;
+                            total += pixelMeasurementCallback(x, y) * subpixels;
                         else
-                            total += data[x, y] * subpixels;
+                            total += (int)data[x, y] * subpixels;
 
                         totalPixels += subpixels;
                     }
@@ -631,7 +631,7 @@ namespace Tangra.Model.Image
                     if (data[x, y] >= m_SaturationValue) m_HasSaturatedPixels = true;
                 }
 
-            return (uint)Math.Round(total);
+            return Math.Round(total);
         }
 
 		private double Get3DPolynomialBackground(uint[,] backgroundArea, float aperture)
@@ -640,12 +640,12 @@ namespace Tangra.Model.Image
 			var bg3dFit = new Background3DPolynomialFit();
 			bg3dFit.Fit(backgroundArea, m_XCenter, m_YCenter, 2 * aperture);
 
-			uint[,] fittedBgPixels = bg3dFit.GetFittedPixels();
+			int[,] fittedBgPixels = bg3dFit.GetFittedPixels();
 			float totalBgPixels = 0;
 			return GetReading(
 				aperture,
-				fittedBgPixels, side, side,
-				m_XCenter, m_YCenter, null, ref totalBgPixels);			
+				backgroundArea, side, side,
+				m_XCenter, m_YCenter, (x, y) => fittedBgPixels[x, y], ref totalBgPixels);
 		}
 
 		private double GetBackground(uint[,] pixels, float signalApertureRadius, double x0, double y0, float bgAnnulusFactor)

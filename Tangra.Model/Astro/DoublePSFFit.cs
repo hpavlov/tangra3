@@ -713,7 +713,7 @@ namespace Tangra.Model.Astro
 
 			double _a = (yb - ya) / (xb - xa);
 			double _b = (ya - _a * xa + yb - _a * xb) / 2;
-			
+
 			for (float w = 0; w < m_MatrixSize; w += step)
 			{
 				float z = (float)GetPSFValueInternal(w, _a * w + _b);

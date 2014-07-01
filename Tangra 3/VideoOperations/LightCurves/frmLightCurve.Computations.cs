@@ -498,7 +498,7 @@ namespace Tangra.VideoOperations.LightCurves
 			float fullScale = m_Header.MaxAdjustedReading - m_Header.MinAdjustedReading;
             int oneSeventhFullScale = (int)fullScale / 7;
 
-            uint[] preferredIntervals = new uint[] { 50000, 25000, 10000, 5000, 2500, 1000, 500, 250, 100, 50, 25, 10, 5, 1, 1 };
+			uint[] preferredIntervals = new uint[] { 1000000, 500000, 250000, 100000, 50000, 25000, 10000, 5000, 2500, 1000, 500, 250, 100, 50, 25, 10, 5, 1, 1 };
             for (int i = 0; i < preferredIntervals.Length - 1; i++)
             {
                 if (preferredIntervals[i] == oneSeventhFullScale)

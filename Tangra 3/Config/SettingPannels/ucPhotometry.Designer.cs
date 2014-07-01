@@ -42,37 +42,38 @@
 			this.label6 = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
 			this.groupControl1 = new System.Windows.Forms.GroupBox();
-			this.label4 = new System.Windows.Forms.Label();
-			this.cbxBgFirstOrder = new System.Windows.Forms.CheckBox();
-			this.cbxBgThirdOrder = new System.Windows.Forms.CheckBox();
+			this.nudSubPixelSquare = new System.Windows.Forms.NumericUpDown();
+			this.label2 = new System.Windows.Forms.Label();
 			this.nudPhotoAperture = new System.Windows.Forms.NumericUpDown();
-			this.cbxBgSecondOrder = new System.Windows.Forms.CheckBox();
+			this.cbxPhotoSignalApertureType = new System.Windows.Forms.ComboBox();
+			this.label17 = new System.Windows.Forms.Label();
 			this.nudInnerAnnulusInApertures = new System.Windows.Forms.NumericUpDown();
 			this.nudMinimumAnnulusPixels = new System.Windows.Forms.NumericUpDown();
-			this.cbxPhotoSignalApertureType = new System.Windows.Forms.ComboBox();
 			this.cbxBackgroundMethod = new System.Windows.Forms.ComboBox();
 			this.label9 = new System.Windows.Forms.Label();
-			this.label17 = new System.Windows.Forms.Label();
 			this.label8 = new System.Windows.Forms.Label();
 			this.label7 = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
 			this.nudSNFrameWindow = new System.Windows.Forms.NumericUpDown();
 			this.label25 = new System.Windows.Forms.Label();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
-			this.label2 = new System.Windows.Forms.Label();
-			this.nudSubPixelSquare = new System.Windows.Forms.NumericUpDown();
+			this.rb3DFirstOrder = new System.Windows.Forms.RadioButton();
+			this.rb3DSecondOrder = new System.Windows.Forms.RadioButton();
+			this.rb3DThirdOrder = new System.Windows.Forms.RadioButton();
+			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.groupControl2.SuspendLayout();
 			this.pnlSeeingSettings.SuspendLayout();
 			this.pnlUserSeeing.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nudUserSpecifiedFWHM)).BeginInit();
 			this.rgSeeing.SuspendLayout();
 			this.groupControl1.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.nudSubPixelSquare)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudPhotoAperture)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudInnerAnnulusInApertures)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudMinimumAnnulusPixels)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudSNFrameWindow)).BeginInit();
 			this.groupBox1.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.nudSubPixelSquare)).BeginInit();
+			this.groupBox2.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// groupControl2
@@ -223,38 +224,31 @@
 			this.groupControl1.TabStop = false;
 			this.groupControl1.Text = "Aperture Photometry";
 			// 
-			// label4
+			// nudSubPixelSquare
 			// 
-			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(19, 187);
-			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(108, 13);
-			this.label4.TabIndex = 37;
-			this.label4.Text = "3D-Polynomial Fitting:";
+			this.nudSubPixelSquare.Location = new System.Drawing.Point(109, 77);
+			this.nudSubPixelSquare.Maximum = new decimal(new int[] {
+            20,
+            0,
+            0,
+            0});
+			this.nudSubPixelSquare.Name = "nudSubPixelSquare";
+			this.nudSubPixelSquare.Size = new System.Drawing.Size(40, 20);
+			this.nudSubPixelSquare.TabIndex = 38;
+			this.nudSubPixelSquare.Value = new decimal(new int[] {
+            4,
+            0,
+            0,
+            0});
 			// 
-			// cbxBgFirstOrder
+			// label2
 			// 
-			this.cbxBgFirstOrder.AutoSize = true;
-			this.cbxBgFirstOrder.Checked = true;
-			this.cbxBgFirstOrder.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.cbxBgFirstOrder.Location = new System.Drawing.Point(22, 207);
-			this.cbxBgFirstOrder.Name = "cbxBgFirstOrder";
-			this.cbxBgFirstOrder.Size = new System.Drawing.Size(70, 17);
-			this.cbxBgFirstOrder.TabIndex = 2;
-			this.cbxBgFirstOrder.Text = "1-st order";
-			this.cbxBgFirstOrder.UseVisualStyleBackColor = true;
-			// 
-			// cbxBgThirdOrder
-			// 
-			this.cbxBgThirdOrder.AutoSize = true;
-			this.cbxBgThirdOrder.Checked = true;
-			this.cbxBgThirdOrder.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.cbxBgThirdOrder.Location = new System.Drawing.Point(22, 223);
-			this.cbxBgThirdOrder.Name = "cbxBgThirdOrder";
-			this.cbxBgThirdOrder.Size = new System.Drawing.Size(71, 17);
-			this.cbxBgThirdOrder.TabIndex = 1;
-			this.cbxBgThirdOrder.Text = "3-rd order";
-			this.cbxBgThirdOrder.UseVisualStyleBackColor = true;
+			this.label2.AutoSize = true;
+			this.label2.Location = new System.Drawing.Point(19, 80);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(88, 13);
+			this.label2.TabIndex = 37;
+			this.label2.Text = "Sub-pixel square:";
 			// 
 			// nudPhotoAperture
 			// 
@@ -264,17 +258,25 @@
 			this.nudPhotoAperture.Size = new System.Drawing.Size(47, 20);
 			this.nudPhotoAperture.TabIndex = 36;
 			// 
-			// cbxBgSecondOrder
+			// cbxPhotoSignalApertureType
 			// 
-			this.cbxBgSecondOrder.AutoSize = true;
-			this.cbxBgSecondOrder.Checked = true;
-			this.cbxBgSecondOrder.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.cbxBgSecondOrder.Location = new System.Drawing.Point(102, 207);
-			this.cbxBgSecondOrder.Name = "cbxBgSecondOrder";
-			this.cbxBgSecondOrder.Size = new System.Drawing.Size(74, 17);
-			this.cbxBgSecondOrder.TabIndex = 0;
-			this.cbxBgSecondOrder.Text = "2-nd order";
-			this.cbxBgSecondOrder.UseVisualStyleBackColor = true;
+			this.cbxPhotoSignalApertureType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.cbxPhotoSignalApertureType.Items.AddRange(new object[] {
+            "FHWM",
+            "Pixels"});
+			this.cbxPhotoSignalApertureType.Location = new System.Drawing.Point(107, 45);
+			this.cbxPhotoSignalApertureType.Name = "cbxPhotoSignalApertureType";
+			this.cbxPhotoSignalApertureType.Size = new System.Drawing.Size(76, 21);
+			this.cbxPhotoSignalApertureType.TabIndex = 33;
+			// 
+			// label17
+			// 
+			this.label17.AutoSize = true;
+			this.label17.Location = new System.Drawing.Point(19, 26);
+			this.label17.Name = "label17";
+			this.label17.Size = new System.Drawing.Size(119, 13);
+			this.label17.TabIndex = 12;
+			this.label17.Text = "Default Signal Aperture:";
 			// 
 			// nudInnerAnnulusInApertures
 			// 
@@ -295,17 +297,6 @@
 			this.nudMinimumAnnulusPixels.Name = "nudMinimumAnnulusPixels";
 			this.nudMinimumAnnulusPixels.Size = new System.Drawing.Size(47, 20);
 			this.nudMinimumAnnulusPixels.TabIndex = 34;
-			// 
-			// cbxPhotoSignalApertureType
-			// 
-			this.cbxPhotoSignalApertureType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.cbxPhotoSignalApertureType.Items.AddRange(new object[] {
-            "FHWM",
-            "Pixels"});
-			this.cbxPhotoSignalApertureType.Location = new System.Drawing.Point(107, 45);
-			this.cbxPhotoSignalApertureType.Name = "cbxPhotoSignalApertureType";
-			this.cbxPhotoSignalApertureType.Size = new System.Drawing.Size(76, 21);
-			this.cbxPhotoSignalApertureType.TabIndex = 33;
 			// 
 			// cbxBackgroundMethod
 			// 
@@ -329,15 +320,6 @@
 			this.label9.Size = new System.Drawing.Size(150, 13);
 			this.label9.TabIndex = 30;
 			this.label9.Text = "Pixels in Background Annulus:";
-			// 
-			// label17
-			// 
-			this.label17.AutoSize = true;
-			this.label17.Location = new System.Drawing.Point(19, 26);
-			this.label17.Name = "label17";
-			this.label17.Size = new System.Drawing.Size(119, 13);
-			this.label17.TabIndex = 12;
-			this.label17.Text = "Default Signal Aperture:";
 			// 
 			// label8
 			// 
@@ -384,14 +366,11 @@
 			// 
 			// groupBox1
 			// 
-			this.groupBox1.Controls.Add(this.label4);
+			this.groupBox1.Controls.Add(this.groupBox2);
 			this.groupBox1.Controls.Add(this.label1);
-			this.groupBox1.Controls.Add(this.cbxBgFirstOrder);
 			this.groupBox1.Controls.Add(this.label7);
-			this.groupBox1.Controls.Add(this.cbxBgThirdOrder);
 			this.groupBox1.Controls.Add(this.label8);
 			this.groupBox1.Controls.Add(this.label9);
-			this.groupBox1.Controls.Add(this.cbxBgSecondOrder);
 			this.groupBox1.Controls.Add(this.cbxBackgroundMethod);
 			this.groupBox1.Controls.Add(this.nudInnerAnnulusInApertures);
 			this.groupBox1.Controls.Add(this.nudMinimumAnnulusPixels);
@@ -402,31 +381,50 @@
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Background Measurements";
 			// 
-			// label2
+			// rb3DFirstOrder
 			// 
-			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(19, 80);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(88, 13);
-			this.label2.TabIndex = 37;
-			this.label2.Text = "Sub-pixel square:";
+			this.rb3DFirstOrder.AutoSize = true;
+			this.rb3DFirstOrder.Location = new System.Drawing.Point(23, 20);
+			this.rb3DFirstOrder.Name = "rb3DFirstOrder";
+			this.rb3DFirstOrder.Size = new System.Drawing.Size(69, 17);
+			this.rb3DFirstOrder.TabIndex = 38;
+			this.rb3DFirstOrder.TabStop = true;
+			this.rb3DFirstOrder.Text = "1-st order";
+			this.rb3DFirstOrder.UseVisualStyleBackColor = true;
 			// 
-			// nudSubPixelSquare
+			// rb3DSecondOrder
 			// 
-			this.nudSubPixelSquare.Location = new System.Drawing.Point(109, 77);
-			this.nudSubPixelSquare.Maximum = new decimal(new int[] {
-            20,
-            0,
-            0,
-            0});
-			this.nudSubPixelSquare.Name = "nudSubPixelSquare";
-			this.nudSubPixelSquare.Size = new System.Drawing.Size(40, 20);
-			this.nudSubPixelSquare.TabIndex = 38;
-			this.nudSubPixelSquare.Value = new decimal(new int[] {
-            4,
-            0,
-            0,
-            0});
+			this.rb3DSecondOrder.AutoSize = true;
+			this.rb3DSecondOrder.Location = new System.Drawing.Point(23, 42);
+			this.rb3DSecondOrder.Name = "rb3DSecondOrder";
+			this.rb3DSecondOrder.Size = new System.Drawing.Size(73, 17);
+			this.rb3DSecondOrder.TabIndex = 39;
+			this.rb3DSecondOrder.TabStop = true;
+			this.rb3DSecondOrder.Text = "2-nd order";
+			this.rb3DSecondOrder.UseVisualStyleBackColor = true;
+			// 
+			// rb3DThirdOrder
+			// 
+			this.rb3DThirdOrder.AutoSize = true;
+			this.rb3DThirdOrder.Location = new System.Drawing.Point(23, 64);
+			this.rb3DThirdOrder.Name = "rb3DThirdOrder";
+			this.rb3DThirdOrder.Size = new System.Drawing.Size(70, 17);
+			this.rb3DThirdOrder.TabIndex = 40;
+			this.rb3DThirdOrder.TabStop = true;
+			this.rb3DThirdOrder.Text = "3-rd order";
+			this.rb3DThirdOrder.UseVisualStyleBackColor = true;
+			// 
+			// groupBox2
+			// 
+			this.groupBox2.Controls.Add(this.rb3DThirdOrder);
+			this.groupBox2.Controls.Add(this.rb3DFirstOrder);
+			this.groupBox2.Controls.Add(this.rb3DSecondOrder);
+			this.groupBox2.Location = new System.Drawing.Point(19, 185);
+			this.groupBox2.Name = "groupBox2";
+			this.groupBox2.Size = new System.Drawing.Size(194, 88);
+			this.groupBox2.TabIndex = 41;
+			this.groupBox2.TabStop = false;
+			this.groupBox2.Text = "3D-Polynomial Fitting";
 			// 
 			// ucPhotometry
 			// 
@@ -451,13 +449,15 @@
 			this.rgSeeing.PerformLayout();
 			this.groupControl1.ResumeLayout(false);
 			this.groupControl1.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.nudSubPixelSquare)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudPhotoAperture)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudInnerAnnulusInApertures)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudMinimumAnnulusPixels)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudSNFrameWindow)).EndInit();
 			this.groupBox1.ResumeLayout(false);
 			this.groupBox1.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.nudSubPixelSquare)).EndInit();
+			this.groupBox2.ResumeLayout(false);
+			this.groupBox2.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -490,13 +490,13 @@
 		private System.Windows.Forms.RadioButton rbSeeingAuto;
         private System.Windows.Forms.RadioButton rbSeeingUser;
 		private System.Windows.Forms.NumericUpDown nudSNFrameWindow;
-        private System.Windows.Forms.Label label25;
-		private System.Windows.Forms.Label label4;
-		private System.Windows.Forms.CheckBox cbxBgFirstOrder;
-		private System.Windows.Forms.CheckBox cbxBgThirdOrder;
-		private System.Windows.Forms.CheckBox cbxBgSecondOrder;
+		private System.Windows.Forms.Label label25;
 		private System.Windows.Forms.GroupBox groupBox1;
 		private System.Windows.Forms.NumericUpDown nudSubPixelSquare;
 		private System.Windows.Forms.Label label2;
+		private System.Windows.Forms.GroupBox groupBox2;
+		private System.Windows.Forms.RadioButton rb3DThirdOrder;
+		private System.Windows.Forms.RadioButton rb3DFirstOrder;
+		private System.Windows.Forms.RadioButton rb3DSecondOrder;
 	}
 }

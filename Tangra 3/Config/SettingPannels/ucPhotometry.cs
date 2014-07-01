@@ -35,9 +35,9 @@ namespace Tangra.Config.SettingPannels
             rbSeeingUser.Checked = TangraConfig.Settings.Photometry.UseUserSpecifiedFWHM;
 			nudSNFrameWindow.SetNUDValue(TangraConfig.Settings.Photometry.SNFrameWindow);
 
-			cbxBgFirstOrder.Checked = TangraConfig.Settings.Photometry.Background3DPoly.Try1stOrder;
-			cbxBgSecondOrder.Checked = TangraConfig.Settings.Photometry.Background3DPoly.Try2ndOrder;
-			cbxBgThirdOrder.Checked = TangraConfig.Settings.Photometry.Background3DPoly.Try3rdOrder;
+			rb3DFirstOrder.Checked = TangraConfig.Settings.Photometry.Background3DPoly.Order == 1;
+			rb3DSecondOrder.Checked = TangraConfig.Settings.Photometry.Background3DPoly.Order == 2;
+			rb3DThirdOrder.Checked = TangraConfig.Settings.Photometry.Background3DPoly.Order == 3;
         }
 
         public override void SaveSettings()
@@ -55,27 +55,16 @@ namespace Tangra.Config.SettingPannels
             TangraConfig.Settings.Photometry.UseUserSpecifiedFWHM = rbSeeingUser.Checked;
 			TangraConfig.Settings.Photometry.SNFrameWindow = (int)nudSNFrameWindow.Value;
 
-			TangraConfig.Settings.Photometry.Background3DPoly.Try1stOrder = cbxBgFirstOrder.Checked;
-			TangraConfig.Settings.Photometry.Background3DPoly.Try2ndOrder = cbxBgSecondOrder.Checked;
-			TangraConfig.Settings.Photometry.Background3DPoly.Try3rdOrder = cbxBgThirdOrder.Checked;
+			if (rb3DFirstOrder.Checked)
+				TangraConfig.Settings.Photometry.Background3DPoly.Order = 1;
+			else if (rb3DSecondOrder.Checked)
+				TangraConfig.Settings.Photometry.Background3DPoly.Order = 2;
+			else if (rb3DThirdOrder.Checked)
+				TangraConfig.Settings.Photometry.Background3DPoly.Order = 3;
         }
 
 		public override bool ValidateSettings()
 		{
-			if (!cbxBgFirstOrder.Checked &&
-			    !cbxBgSecondOrder.Checked &&
-			    !cbxBgThirdOrder.Checked)
-			{
-				MessageBox.Show(
-					this.ParentForm, 
-					"At least one of the 3D Polynomial fitting options should be selected.", 
-					"Validation Error", 
-					MessageBoxButtons.OK, 
-					MessageBoxIcon.Error);
-
-				return false;
-			}
-
 			return true;
 		}
 

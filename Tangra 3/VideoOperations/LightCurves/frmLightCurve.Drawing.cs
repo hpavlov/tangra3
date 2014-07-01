@@ -525,7 +525,11 @@ namespace Tangra.VideoOperations.LightCurves
             {
                 for (int i = m_Header.MinAdjustedReading; i < m_Header.MaxAdjustedReading; i += (int) interval)
                 {
-                    string label = i.ToString();
+					string label;
+					if (i < 10000) label = i.ToString();
+					else if (i < 10000000) label = string.Format("{0}K", i / 1000);
+					else label = string.Format("{0}M", i / 1000000);
+
                     SizeF labelSize = g.MeasureString(label, s_AxisFont);
                     float x = m_MinX - labelSize.Width;
                     float y = m_MaxY - (i - m_Header.MinAdjustedReading)*m_ScaleY;

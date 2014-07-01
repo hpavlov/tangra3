@@ -337,9 +337,7 @@ namespace Tangra.Model.Config
 
 		public class Background3DPolynomialSettings
 		{
-			public bool Try1stOrder = true;
-			public bool Try2ndOrder = true;
-			public bool Try3rdOrder = true;
+			public int Order = 2;
 		}
 
 		public class PhotometrySettings

@@ -68,9 +68,9 @@ namespace Tangra.Model.Astro
 
 		public Background3DPolynomialFit()
 		{
-			m_TryFirstOrder = TangraConfig.Settings.Photometry.Background3DPoly.Try1stOrder;
-			m_TrySecondOrder = TangraConfig.Settings.Photometry.Background3DPoly.Try2ndOrder;
-			m_TryThirdOrder = TangraConfig.Settings.Photometry.Background3DPoly.Try3rdOrder;
+			m_TryFirstOrder = TangraConfig.Settings.Photometry.Background3DPoly.Order == 1;
+			m_TrySecondOrder = TangraConfig.Settings.Photometry.Background3DPoly.Order == 2;
+			m_TryThirdOrder = TangraConfig.Settings.Photometry.Background3DPoly.Order == 3;
 		}
 
 		public void Fit(uint[,] pixels, float starX0, float starY0, float startMinDistance)
@@ -398,15 +398,15 @@ namespace Tangra.Model.Astro
 			return m_MedianValue;
 		}
 
-		public uint[,] GetFittedPixels()
+		public int[,] GetFittedPixels()
 		{
-			uint[,] pixels = new uint[m_Width, m_Height];
+			int[,] pixels = new int[m_Width, m_Height];
 
 			for (int x = 0; x < m_Width; x++)
 			{
 				for (int y = 0; y < m_Height; y++)
 				{
-					pixels[x, y] = (uint)Math.Round(ComputeValue(x, y));
+					pixels[x, y] = (int)Math.Round(ComputeValue(x, y));
 				}
 			}
 
