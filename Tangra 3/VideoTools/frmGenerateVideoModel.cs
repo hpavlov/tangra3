@@ -221,6 +221,8 @@ namespace Tangra.VideoTools
 
 		private double Random(double mean, double stdDev)
 		{
+			if (Math.Abs(stdDev) < 0.5) return mean;
+
 			byte[] twoBytes = new byte[2];
 			cryptoRand.GetBytes(twoBytes);
 			double u1 = twoBytes[0] * 1.0 / 0xFF; //these are uniform(0,1) random doubles

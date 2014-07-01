@@ -262,7 +262,9 @@ namespace Tangra.VideoOperations.LightCurves
 			LightCurveReductionContext.Instance.Contrast = ucStretching.Contrast;
 
 	        LightCurveReductionContext.Instance.BitPix = m_VideoContoller.VideoBitPix;
-			LightCurveReductionContext.Instance.MaxPixelValue = m_VideoContoller.VideoBitPix != 16 ? (uint)1 << m_VideoContoller.VideoBitPix : m_VideoContoller.VideoAav16NormVal;
+			LightCurveReductionContext.Instance.MaxPixelValue = (m_VideoContoller.VideoBitPix != 16 || m_VideoContoller.VideoAav16NormVal == 0)
+					? (uint)1 << m_VideoContoller.VideoBitPix 
+					: m_VideoContoller.VideoAav16NormVal;
 
             m_VideoContoller.RefreshCurrentFrame();
 

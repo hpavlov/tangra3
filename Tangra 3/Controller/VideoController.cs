@@ -761,7 +761,7 @@ namespace Tangra.Controller
 
         public AstroImage GetCurrentAstroImage(bool integrated)
         {
-            if (integrated || !m_FramePlayer.Video.SupportsSoftwareIntegration)
+            if (integrated && m_FramePlayer.Video.SupportsSoftwareIntegration)
             {
 				// NOTE: This only seems to be used by AddEditTarget form in a case of no wind and shaking (which is the case most of the times)
                 Pixelmap image = m_FramePlayer.GetIntegratedFrame(m_CurrentFrameContext.CurrentFrameIndex, TangraConfig.Settings.Special.AddStarImageFramesToIntegrate, true /* 'true'so we start from the current frame */, false);

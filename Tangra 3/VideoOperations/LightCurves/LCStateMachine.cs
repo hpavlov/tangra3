@@ -33,7 +33,7 @@ namespace Tangra.VideoOperations.LightCurves
         public virtual void Initialize()
         { }
 
-        public virtual void ObjectSelected(TrackedObjectConfig selectedObject, bool shift, bool ctrl)
+        public virtual void ObjectSelected(TrackedObjectConfig selectedObject, bool shift, bool ctrl, int selectedStarId)
         { }
 
         public virtual bool IsNewObject(ImagePixel star, bool shift, bool ctrl, ref int newOrExistingObjectId)
@@ -118,12 +118,12 @@ namespace Tangra.VideoOperations.LightCurves
 
         public void ObjectSelected(TrackedObjectConfig selectedObject, bool shift, bool ctrl)
         {
-            m_CurrentStateObject.ObjectSelected(selectedObject, shift, ctrl);
+            m_CurrentStateObject.ObjectSelected(selectedObject, shift, ctrl, -1);
         }
 
-		public void ObjectEdited(TrackedObjectConfig selectedObject)
+		public void ObjectEdited(int selectedStarId, TrackedObjectConfig selectedObject)
 		{
-			m_CurrentStateObject.ObjectSelected(selectedObject, false, false);
+			m_CurrentStateObject.ObjectSelected(selectedObject, false, false, selectedStarId);
 		}
 
         public bool IsNewObject(ImagePixel star, bool shift, bool ctrl, ref int newOrExistingObjectId)

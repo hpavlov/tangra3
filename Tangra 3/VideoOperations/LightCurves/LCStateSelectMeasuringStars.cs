@@ -88,7 +88,7 @@ namespace Tangra.VideoOperations.LightCurves
             }
         }
 
-        public override void ObjectSelected(TrackedObjectConfig selectedObject, bool shift, bool ctrl)
+        public override void ObjectSelected(TrackedObjectConfig selectedObject, bool shift, bool ctrl, int selectedStarId)
         {
             if (ctrl)
             {
@@ -131,7 +131,7 @@ namespace Tangra.VideoOperations.LightCurves
             else
             {
                 // Add/Update
-                int idx = Context.MeasuringStars.IndexOf(selectedObject);
+				int idx = selectedStarId < 0 ? Context.MeasuringStars.IndexOf(selectedObject) : selectedStarId;
                 if (idx > -1)
                 {
 					Context.MeasuringStars[idx] = selectedObject;

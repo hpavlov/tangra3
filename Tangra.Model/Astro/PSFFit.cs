@@ -614,11 +614,12 @@ namespace Tangra.Model.Astro
                         for (int j = 0; j < full_width; j++)
                         {
 							double zval = intensity[i, j];
-							if (m_BackgroundModel != null) zval -= m_BackgroundModel.ComputeValue(i, j);
 
                             if (zval < m_Saturation)
                             {
                                 index++;
+
+								if (m_BackgroundModel != null) zval -= m_BackgroundModel.ComputeValue(i, j);
 
                                 double exp_val = fx[i]*fy[j];
 
@@ -824,11 +825,12 @@ namespace Tangra.Model.Astro
 						for (int j = 0; j < full_width; j++)
 						{
 							double zval = intensity[i, j];
-							if (m_BackgroundModel != null) zval -= m_BackgroundModel.ComputeValue(i, j);
 
 							if (zval < m_Saturation)
 							{
 								index++;
+
+								if (m_BackgroundModel != null) zval -= m_BackgroundModel.ComputeValue(i, j);
 
 								double exp_val = fx[i] * fy[j];
 
@@ -946,7 +948,8 @@ namespace Tangra.Model.Astro
 
 			if (bpp == 14) maxZ = 16384;
 			else if (bpp == 12) maxZ = 4096;
-			else if (bpp == 16) maxZ = normVal;
+			else if (bpp == 16 && normVal != 0) maxZ = normVal;
+			else if (bpp == 16 && normVal == 0) maxZ = 65535;
 
             int totalSteps = 100;
 
@@ -1018,7 +1021,8 @@ namespace Tangra.Model.Astro
 			double maxZ = 256.0;
 			if (bpp == 14) maxZ = 16384.0;
 			else if (bpp == 12) maxZ = 4096.0;
-			else if (bpp == 16) maxZ = NormVal;
+			else if (bpp == 16 && NormVal > 0) maxZ = NormVal;
+			else if (bpp == 16 && NormVal == 0) maxZ = 65535.0;
 			
 			maxZ = Math.Min(maxZ, GetPSFValueInternal(m_X0, m_Y0) + 5);
 
@@ -1106,11 +1110,13 @@ namespace Tangra.Model.Astro
                     {
 						double z = Math.Round(trackedPsf.GetPSFValueAt(x, y) + trackedPsf.GetResidualAt(x, y));
 
-						if (bpp == 14)
+						if (bpp == 16 && normVal == 0)
+							z = z * 255.0f / 65535;
+						else if (bpp == 14)
 							z = z * 255.0f / 16383;
 						else if (bpp == 12) 
 							z = z * 255.0f / 4095;
-						else if (bpp == 16)
+						else if (bpp == 16 && normVal > 0)
 							z = z * 255.0f / normVal;
 
                         byte val = (byte) (Math.Max(0, Math.Min(255, z)));

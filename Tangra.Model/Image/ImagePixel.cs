@@ -72,7 +72,8 @@ namespace Tangra.Model.Image
                 !(obj is ImagePixel))
                 return false;
 
-            return (obj as ImagePixel).GetHashCode() == this.GetHashCode();
+	        double dist = ComputeDistance((obj as ImagePixel).XDouble, XDouble, (obj as ImagePixel).YDouble, YDouble);
+			return dist <= 1;
         }
 
         public static bool operator ==(ImagePixel a, ImagePixel b)

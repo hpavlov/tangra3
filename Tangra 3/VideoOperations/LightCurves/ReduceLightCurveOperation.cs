@@ -1946,6 +1946,7 @@ namespace Tangra.VideoOperations.LightCurves
         internal bool EditCurrentObject()
         {
 			TrackedObjectConfig selectedObject = m_StateMachine.MeasuringStars[m_StateMachine.SelectedMeasuringStar];
+	        int selectedStarId = m_StateMachine.SelectedMeasuringStar;
 
 			if (LightCurveReductionContext.Instance.LightCurveReductionType == LightCurveReductionType.MutualEvent)
 			{
@@ -1980,10 +1981,10 @@ namespace Tangra.VideoOperations.LightCurves
 						m_StateMachine.ObjectSelected(selectedObject, false, true /* Ctrl = 'DELETE' */);						
 				}
 
-				m_StateMachine.ObjectEdited(frmAddMutualTarget.ObjectToAdd);
+				m_StateMachine.ObjectEdited(selectedStarId, frmAddMutualTarget.ObjectToAdd);
 
 				if (frmAddMutualTarget.ObjectToAdd2 != null)
-					m_StateMachine.ObjectEdited(frmAddMutualTarget.ObjectToAdd2);
+					m_StateMachine.ObjectEdited(selectedStarId, frmAddMutualTarget.ObjectToAdd2);
 			}
 			else
 			{				
@@ -2003,7 +2004,7 @@ namespace Tangra.VideoOperations.LightCurves
 					return false;
 				}
 
-				m_StateMachine.ObjectEdited(frmAddSingleTarget.ObjectToAdd);
+				m_StateMachine.ObjectEdited(selectedStarId, frmAddSingleTarget.ObjectToAdd);
 			}
 
             return true;

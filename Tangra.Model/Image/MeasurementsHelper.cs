@@ -226,6 +226,14 @@ namespace Tangra.Model.Image
             // We first go and do the measurement anyway
             if (fit.IsSolved)
 				SetPsfFitReading(fit, aperture, useNumericalQadrature, backgroundArea, bgAnnulusFactor);
+            else
+            {
+				m_Aperture = aperture;
+				m_XCenter = (float)fit.X0_Matrix;
+				m_YCenter = (float)fit.Y0_Matrix;
+	            m_TotalReading = 0;
+				m_TotalBackground = 0;
+            }
 
             if (!fit.IsSolved || // The PSF solution failed, mark the reading invalid
                 (distance > tolerance && !mayBeOcculted) || // If this doesn't look like a full disappearance, then make the reading invalid
@@ -258,7 +266,15 @@ namespace Tangra.Model.Image
 
             // We first go and do the measurement anyway
             if (fit.IsSolved)
-				SetPsfFitReading(fit, aperture, useNumericalQadrature, backgroundArea, bgAnnulusFactor);
+	            SetPsfFitReading(fit, aperture, useNumericalQadrature, backgroundArea, bgAnnulusFactor);
+            else
+            {
+				m_Aperture = aperture;
+				m_XCenter = (float)fit.X0_Matrix;
+				m_YCenter = (float)fit.Y0_Matrix;
+				m_TotalReading = 0;
+				m_TotalBackground = 0;
+            }
 
 			if (!fit.IsSolved || // The PSF solution failed, mark the reading invalid
 				(distance > tolerance && !mayBeOcculted)// If this doesn't look like a full disappearance, then make the reading invalid

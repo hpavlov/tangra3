@@ -32,6 +32,7 @@
 			this.btnGenerateVideo = new System.Windows.Forms.Button();
 			this.pbar = new System.Windows.Forms.ProgressBar();
 			this.pnlConfig = new System.Windows.Forms.Panel();
+			this.btnConfigureBackground = new System.Windows.Forms.Button();
 			this.label19 = new System.Windows.Forms.Label();
 			this.label20 = new System.Windows.Forms.Label();
 			this.nudPolyShift = new System.Windows.Forms.NumericUpDown();
@@ -75,7 +76,6 @@
 			this.label1 = new System.Windows.Forms.Label();
 			this.nudTotalFrames = new System.Windows.Forms.NumericUpDown();
 			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-			this.btnConfigureBackground = new System.Windows.Forms.Button();
 			this.pnlConfig.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nudPolyShift)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudPolyFreq)).BeginInit();
@@ -164,6 +164,16 @@
 			this.pnlConfig.Name = "pnlConfig";
 			this.pnlConfig.Size = new System.Drawing.Size(403, 279);
 			this.pnlConfig.TabIndex = 14;
+			// 
+			// btnConfigureBackground
+			// 
+			this.btnConfigureBackground.Location = new System.Drawing.Point(203, 111);
+			this.btnConfigureBackground.Name = "btnConfigureBackground";
+			this.btnConfigureBackground.Size = new System.Drawing.Size(73, 23);
+			this.btnConfigureBackground.TabIndex = 44;
+			this.btnConfigureBackground.Text = "Configure";
+			this.btnConfigureBackground.UseVisualStyleBackColor = true;
+			this.btnConfigureBackground.Click += new System.EventHandler(this.btnConfigureBackground_Click);
 			// 
 			// label19
 			// 
@@ -673,11 +683,6 @@
             0,
             0,
             0});
-			this.nudNoiseStdDev.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
 			this.nudNoiseStdDev.Name = "nudNoiseStdDev";
 			this.nudNoiseStdDev.Size = new System.Drawing.Size(41, 20);
 			this.nudNoiseStdDev.TabIndex = 6;
@@ -771,16 +776,6 @@
 			// 
 			this.saveFileDialog.DefaultExt = "avi";
 			this.saveFileDialog.Filter = "AVI Files (*.avi)|*.avi";
-			// 
-			// btnConfigureBackground
-			// 
-			this.btnConfigureBackground.Location = new System.Drawing.Point(203, 111);
-			this.btnConfigureBackground.Name = "btnConfigureBackground";
-			this.btnConfigureBackground.Size = new System.Drawing.Size(73, 23);
-			this.btnConfigureBackground.TabIndex = 44;
-			this.btnConfigureBackground.Text = "Configure";
-			this.btnConfigureBackground.UseVisualStyleBackColor = true;
-			this.btnConfigureBackground.Click += new System.EventHandler(this.btnConfigureBackground_Click);
 			// 
 			// frmGenerateVideoModel
 			// 

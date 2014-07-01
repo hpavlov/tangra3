@@ -65,6 +65,7 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 	    private AstroImage m_AstroImage;
         private bool m_IsEdit;
 	    private int m_GroupId;
+	    private bool m_EditingOccultedStar = false;
 
 		private Pen m_Pen;
 		private Pen m_Pen2;
@@ -112,6 +113,8 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
             m_Center = new ImagePixel(center);
 			m_OriginalCenter = new ImagePixel(center);
 
+			m_EditingOccultedStar = false;
+
 	        Initialise();
         }
 
@@ -154,6 +157,8 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 				// If we are to use a second object, it should have the next available Id
 				m_ObjectId2 = state.m_MeasuringStars.Count;
 			}
+
+			m_EditingOccultedStar = selectedObject.IsOcultedStar();
 
 			Initialise();
 		}
@@ -218,15 +223,24 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 
 			bool occultedStartAlreadyPicked = m_State.MeasuringStars.Any(x => x.IsOcultedStar());
 
-			if (occultedStartAlreadyPicked)
+			if (m_IsEdit)
 			{
-				rbOcculted.Enabled = false;
-				rbReference.Checked = true;
+				rbOcculted.Enabled = m_EditingOccultedStar || !occultedStartAlreadyPicked;
+				rbReference.Checked = !m_EditingOccultedStar;
+				rbOcculted.Checked = m_EditingOccultedStar;
 			}
 			else
 			{
-				rbOcculted.Enabled = true;
-				rbOcculted.Checked = true;
+				if (occultedStartAlreadyPicked)
+				{
+					rbOcculted.Enabled = false;
+					rbReference.Checked = true;
+				}
+				else
+				{
+					rbOcculted.Enabled = true;
+					rbOcculted.Checked = true;
+				}
 			}
 
 			if (doubleModeDisabled || !autoDoubleObjectLocated)
