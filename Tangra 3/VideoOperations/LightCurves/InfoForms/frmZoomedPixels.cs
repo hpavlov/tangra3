@@ -31,14 +31,16 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 		private bool[] m_ObjectinGroup = new bool[4];
 		private uint m_Saturation;
 
-		internal frmZoomedPixels(LightCurveContext context, LCFile lcFile, TangraConfig.LightCurvesDisplaySettings displaySettings)
+		private LightCurveController m_LightcurveController;
+
+		internal frmZoomedPixels(LightCurveContext context, LCFile lcFile, TangraConfig.LightCurvesDisplaySettings displaySettings, LightCurveController lightcurveController)
 		{
 			InitializeComponent();
 
 			m_Context = context;
 			m_LCFile = lcFile;
 			m_DisplaySettings = displaySettings;
-
+			m_LightcurveController = lightcurveController;
 
 			m_Saturation = TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(context.BitPix);
 
@@ -242,6 +244,8 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 						}
 					}
 				}
+
+			m_LightcurveController.ApplyDisplayModeAdjustments(image);
 
 			pictureBox.Image = image;
 

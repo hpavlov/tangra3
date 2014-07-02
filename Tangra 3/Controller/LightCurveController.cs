@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -7,12 +8,15 @@ using System.Text;
 using System.Windows.Forms;
 using Tangra.Helpers;
 using Tangra.ImageTools;
+using Tangra.Model.Astro;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
+using Tangra.Model.Image;
 using Tangra.Model.Video;
 using Tangra.Video;
 using Tangra.Video.AstroDigitalVideo;
 using Tangra.VideoOperations.LightCurves;
+using Tangra.VideoOperations.LightCurves.Tracking;
 
 namespace Tangra.Controller
 {
@@ -276,9 +280,37 @@ namespace Tangra.Controller
 					for (int i = 0; i < m_lcFile.Header.ObjectCount; i++)
 					{
 						m_Context.AllReadings[i] = m_lcFile.Data[i];
+
+						/* This compares the pixel values saved in the .LC file with those from the video file (when the video is present)
+						TrackedObjectConfig cfg = m_lcFile.Footer.TrackedObjects[i];
+						for (uint j = m_lcFile.Header.MinFrame; j <= m_lcFile.Header.MaxFrame; j++)
+						{
+							LCMeasurement mea = m_Context.AllReadings[i][(int)(j - m_lcFile.Header.MinFrame)];
+							Pixelmap frame = m_VideoController.GetFrame((int) j);
+							AstroImage img = new AstroImage(frame);
+
+							uint[,] videoPixels = img.GetMeasurableAreaPixels(mea.PixelDataX0, mea.PixelDataY0, 35);
+
+							for (int x = 0; x < 35; x++)
+							for (int y = 0; y < 35; y++)
+							{
+								uint videoPixel = videoPixels[x, y];
+								uint meaPixel = mea.PixelData[x, y];
+								if (videoPixel != meaPixel)
+								{
+									Trace.Assert(false);
+								}
+							}
+						}
+						*/
 					}
-				}				
+				}
 			}
+		}
+
+		internal void ApplyDisplayModeAdjustments(Bitmap displayBitmap)
+		{
+			m_VideoController.ApplyDisplayModeAdjustments(displayBitmap);
 		}
 
     }

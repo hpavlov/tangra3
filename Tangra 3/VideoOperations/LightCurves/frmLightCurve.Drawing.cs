@@ -474,7 +474,7 @@ namespace Tangra.VideoOperations.LightCurves
 			{
 				for (int i = m_Header.MinAdjustedReading; i < m_Header.MaxAdjustedReading; i += (int)interval)
 				{
-					string label = i.ToString();
+					string label = GetYAxisLabel(i);
 					SizeF labelSize = g.MeasureString(label, s_AxisFont);
 					float x = m_MinX - labelSize.Width;
 					float y = m_MaxY - (i - m_Header.MinAdjustedReading) * m_ScaleY;
@@ -513,6 +513,12 @@ namespace Tangra.VideoOperations.LightCurves
 
 		}
 
+		private string GetYAxisLabel(int axisValue)
+		{
+			if (axisValue < 10000) return axisValue.ToString();
+			else if (axisValue < 10000000) return string.Format("{0}K", axisValue / 1000);
+			else return string.Format("{0}M", axisValue / 1000000);
+		}
 
     	private void DrawAxis(Graphics g, uint interval)
         {
@@ -525,10 +531,7 @@ namespace Tangra.VideoOperations.LightCurves
             {
                 for (int i = m_Header.MinAdjustedReading; i < m_Header.MaxAdjustedReading; i += (int) interval)
                 {
-					string label;
-					if (i < 10000) label = i.ToString();
-					else if (i < 10000000) label = string.Format("{0}K", i / 1000);
-					else label = string.Format("{0}M", i / 1000000);
+					string label = GetYAxisLabel(i);
 
                     SizeF labelSize = g.MeasureString(label, s_AxisFont);
                     float x = m_MinX - labelSize.Width;

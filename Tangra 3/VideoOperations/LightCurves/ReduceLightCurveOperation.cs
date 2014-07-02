@@ -868,9 +868,9 @@ namespace Tangra.VideoOperations.LightCurves
 						uint[,] pix = currentImage.GetMeasurableAreaPixels(x0, y0);
 						pix.DrawDataPixels(g,
 							m_ZoomPixelRects[obj.TargetNo],
-							new DisplayBitmapConverter.DefaultDisplayBitmapConverter(),
+							m_VideoController.VideoBitPix, m_VideoController.VideoAav16NormVal,
 							(float)obj.Center.XDouble - x0 + 8, (float)obj.Center.YDouble - y0 + 8,
-							obj.OriginalObject.ApertureInPixels, m_AllPens[obj.TargetNo]);						
+							obj.OriginalObject.ApertureInPixels, m_AllPens[obj.TargetNo]);
 					}
 				}
 			}

@@ -2,6 +2,8 @@
 Features:
 ---------
 
+  -  The second circle drawn for occulted stars (having the meaning of tolerance) is confusing. Review the 'tolerance' usage and remove the circle
+  -  The PSF Fit area numeric up down is not very useful. Review its usage and make it useful and working or remove it
   -  When the opened video frame size is too large, open it in 'shrinked' mode
   -  Add a Brightness/Contrast display mode. Could be very useful for 16 bit videos
   -  Add integration detection on the LightCurve form when applying binning, so the correct start/and integration period frames are identified

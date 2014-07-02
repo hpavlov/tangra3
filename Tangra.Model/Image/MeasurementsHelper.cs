@@ -605,6 +605,7 @@ namespace Tangra.Model.Image
                     else if (dist - 1.5 <= aperture)
                     {
                         float subpixels = 0;
+	                    bool hasSubpixels = false;
 						if (m_SubPixelSquare > 0)
                         {
 							for (int dx = 0; dx < m_SubPixelSquare; dx++)
@@ -613,19 +614,28 @@ namespace Tangra.Model.Image
 									double xx = x - 0.5 + dx * 1.0 / m_SubPixelSquare;
 									double yy = y - 0.5 + dy * 1.0 / m_SubPixelSquare;
                                     dist = Math.Sqrt((x0 - xx) * (x0 - xx) + (y0 - yy) * (y0 - yy));
-                                    if (dist <= aperture)
-										subpixels += 1.0f / (m_SubPixelSquare * m_SubPixelSquare);
+	                                if (dist <= aperture)
+	                                {
+		                                subpixels += 1.0f/(m_SubPixelSquare*m_SubPixelSquare);
+		                                hasSubpixels = true;
+	                                }
                                 }
                         }
-                        else if (dist <= aperture)
-                            subpixels = 1.0f;
+						else if (dist <= aperture)
+						{
+							subpixels = 1.0f;
+							hasSubpixels = true;
+						}
 
-                        if (pixelMeasurementCallback != null)
-                            total += pixelMeasurementCallback(x, y) * subpixels;
-                        else
-                            total += (int)data[x, y] * subpixels;
+						if (hasSubpixels)
+						{
+							if (pixelMeasurementCallback != null)
+								total += pixelMeasurementCallback(x, y) * subpixels;
+							else
+								total += (int)data[x, y] * subpixels;
 
-                        totalPixels += subpixels;
+							totalPixels += subpixels;
+						}
                     }
 
                     if (data[x, y] >= m_SaturationValue) m_HasSaturatedPixels = true;

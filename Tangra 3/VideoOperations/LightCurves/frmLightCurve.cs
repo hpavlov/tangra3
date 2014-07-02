@@ -388,8 +388,8 @@ namespace Tangra.VideoOperations.LightCurves
 			}
 
 			//TODO: Remember the last shown form: PSF or Zoom
-        	m_frmZoomedPixels = new frmZoomedPixels(m_LightCurveController.Context, m_LCFile, m_DisplaySettings);
-
+        	m_frmZoomedPixels = new frmZoomedPixels(m_LightCurveController.Context, m_LCFile, m_DisplaySettings, m_LightCurveController);
+			
             miShowZoomedAreas.Checked = true;
             ShowZoomedAreas();
 

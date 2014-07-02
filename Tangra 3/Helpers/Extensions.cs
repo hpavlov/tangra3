@@ -42,12 +42,7 @@ namespace Tangra.Helpers
 				cbx.SelectedIndex = -1;
 		}
 
-        public static void DrawDataPixels(this uint[,] pixels, Graphics g, Rectangle rect, IDisplayBitmapConverter pixelToByteConverter)
-        {
-			pixels.DrawDataPixels(g, rect, pixelToByteConverter, -1, -1, 0, null);
-        }
-
-		public static void DrawDataPixels(this uint[,] pixels, Graphics g, Rectangle rect, IDisplayBitmapConverter pixelToByteConverter, float x0, float y0, float aperture, Pen aperturePen)
+		public static void DrawDataPixels(this uint[,] pixels, Graphics g, Rectangle rect, int bpp, uint normVal, float x0, float y0, float aperture, Pen aperturePen)
         {
             if (rect.Width != rect.Height) return;
 
@@ -60,9 +55,19 @@ namespace Tangra.Helpers
             {
                 for (int y = 0; y < size; y++)
                 {
-                    uint val = pixels[x, y];
-              	
-                	byte color = pixelToByteConverter.ToDisplayBitmapByte(val);
+	                double z = pixels[x, y];
+
+					if (bpp == 16 && normVal == 0)
+						z = z * 255.0f / 65535;
+					else if (bpp == 14)
+						z = z * 255.0f / 16383;
+					else if (bpp == 12)
+						z = z * 255.0f / 4095;
+					else if (bpp == 16 && normVal > 0)
+						z = z * 255.0f / normVal;
+
+					byte color = (byte)(Math.Max(0, Math.Min(255, z)));
+
                     g.FillRectangle(AllGrayBrushes.GrayBrush(color), rect.Left + x * coeff, rect.Top + y * coeff, coeff, coeff);
                 }
             }
