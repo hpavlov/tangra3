@@ -720,13 +720,13 @@ namespace OcrTester.IotaVtiOsdProcessor
 
 				fieldDurationMS = Math.Abs((totalMillisecondsNext - totalMillisecondsThis) / 10f);
 
-				if (Math.Abs(fieldDurationMS - IotaVtiOcrProcessor.FIELD_DURATION_PAL) > 0.1 && Math.Abs(fieldDurationMS - IotaVtiOcrProcessor.FIELD_DURATION_NTSC) > 0.1)
+				if (Math.Abs(fieldDurationMS - IotaVtiOcrProcessor.FIELD_DURATION_PAL) > 0.15 && Math.Abs(fieldDurationMS - IotaVtiOcrProcessor.FIELD_DURATION_NTSC) > 0.15)
 					return false;
 			}
 
-			if (Math.Abs(fieldDurationMS - IotaVtiOcrProcessor.FIELD_DURATION_PAL) < 0.1)
+			if (Math.Abs(fieldDurationMS - IotaVtiOcrProcessor.FIELD_DURATION_PAL) < 0.15)
 				stateManager.VideoFormat = VideoFormat.PAL;
-			else if (Math.Abs(fieldDurationMS - IotaVtiOcrProcessor.FIELD_DURATION_NTSC) < 0.1)
+			else if (Math.Abs(fieldDurationMS - IotaVtiOcrProcessor.FIELD_DURATION_NTSC) < 0.15)
 				stateManager.VideoFormat = VideoFormat.NTSC;
 			else
 				stateManager.VideoFormat = null;

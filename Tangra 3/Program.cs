@@ -23,6 +23,7 @@ namespace Tangra
             Trace.WriteLine(string.Format("Starting Tangra v{0}", ((AssemblyFileVersionAttribute)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyFileVersionAttribute), true)[0]).Version));
 
 			//Debugger.Launch();
+			//DebugContext.DebugSubPixelMeasurements = true;
 
 		    PlatformID platform = Environment.OSVersion.Platform;
             if (platform != PlatformID.MacOSX && platform != PlatformID.Unix && 
