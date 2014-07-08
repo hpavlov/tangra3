@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Tangra.Model.Astro;
 using Tangra.Model.Config;
+using Tangra.Model.Helpers;
 using Tangra.Model.Numerical;
 using Tangra.Model.VideoOperations;
 
@@ -150,7 +151,8 @@ namespace Tangra.Model.Image
 
 		internal NotMeasuredReasons DoAperturePhotometry(
             uint[,] matrix, int x0Int, int y0Int, float x0, float y0, float aperture, int matrixSize,
-			uint[,] backgroundArea, float bgAnnulusFactor)
+			uint[,] backgroundArea, float bgAnnulusFactor,
+			int centerX = 0, int centerY = 0)
         {
             if (matrix.GetLength(0) != 17 && matrix.GetLength(0) != 35)
                 throw new ApplicationException("Measurement error. Correlation: AFP-101");
@@ -168,10 +170,10 @@ namespace Tangra.Model.Image
 
             m_TotalPixels = 0;
 
-            m_TotalReading = GetReading(
+			m_TotalReading = GetReading(
 				m_Aperture,
 				m_PixelData, side, side,
-                m_XCenter, m_YCenter, null, ref m_TotalPixels);
+				m_XCenter, m_YCenter, null, ref m_TotalPixels, centerX - 8, centerY - 8);
 
             if (m_TotalPixels > 0)
             {
@@ -582,42 +584,69 @@ namespace Tangra.Model.Image
             int nWidth, int nHeight,
             float x0, float y0,
             GetPixelMeasurementCallback pixelMeasurementCallback,
-            ref float totalPixels)
+            ref float totalPixels,
+			int xCent = 0, int yCent = 0)
         {
-            double total = 0;
+			double total = 0;
             totalPixels = 0;
+
             for (int x = 0; x < nWidth; x++)
                 for (int y = 0; y < nHeight; y++)
                 {
-                    double dist = Math.Sqrt((x0 - x) * (x0 - x) + (y0 - y) * (y0 - y));
+	                DebugContext.SubPixelData subPixelInfo = null;
+					if (DebugContext.DebugSubPixelMeasurements)
+					{
+						subPixelInfo = new DebugContext.SubPixelData();
+						DebugContext.CurrentSubPixels[DebugContext.TargetNo][x + xCent, y + yCent] = subPixelInfo;
+						subPixelInfo.X0 = x0 + xCent;
+						subPixelInfo.Y0 = y0 + yCent;
+					}
+
+					double dist = Math.Sqrt((x0 - x) * (x0 - x) + (y0 - y) * (y0 - y));
                     if (dist + 1.5 <= aperture)
                     {
                         // If the point plus 1 pixel diagonal is still in the aperture
                         // then add the readin directly
 
-                        if (pixelMeasurementCallback != null)
-                            total += pixelMeasurementCallback(x, y);
-                        else
-                            total += (int)data[x, y];
+	                    if (pixelMeasurementCallback != null)
+		                    total += pixelMeasurementCallback(x, y);
+	                    else
+		                    total += (int) data[x, y];
 
-                        totalPixels++;
-                    }
+	                    totalPixels++;
+
+						if (DebugContext.DebugSubPixelMeasurements)
+							subPixelInfo.FullyIncluded = true;
+
+					}
                     else if (dist - 1.5 <= aperture)
                     {
                         float subpixels = 0;
 	                    bool hasSubpixels = false;
+						bool isEvenSide = m_SubPixelSquare % 2 == 0;
 						if (m_SubPixelSquare > 0)
-                        {
+						{
+							if (DebugContext.DebugSubPixelMeasurements)
+								subPixelInfo.Included = new bool[m_SubPixelSquare, m_SubPixelSquare];
+
 							for (int dx = 0; dx < m_SubPixelSquare; dx++)
 								for (int dy = 0; dy < m_SubPixelSquare; dy++)
                                 {
-									double xx = x - 0.5 + dx * 1.0 / m_SubPixelSquare;
-									double yy = y - 0.5 + dy * 1.0 / m_SubPixelSquare;
+									double xx = isEvenSide
+										? x - 1.0 + (2.0 * dx + 1.0) / (2.0 * m_SubPixelSquare)
+										: x - 0.5 + (dx - (m_SubPixelSquare / 2)) * 1.0 / m_SubPixelSquare;
+
+									double yy = isEvenSide
+										? y - 1.0 + (2.0 * dy + 1.0) / (2.0 * m_SubPixelSquare)
+										: y - 0.5 + (dy - (m_SubPixelSquare / 2)) * 1.0 / m_SubPixelSquare;
+
                                     dist = Math.Sqrt((x0 - xx) * (x0 - xx) + (y0 - yy) * (y0 - yy));
 	                                if (dist <= aperture)
 	                                {
 		                                subpixels += 1.0f/(m_SubPixelSquare*m_SubPixelSquare);
 		                                hasSubpixels = true;
+										if (DebugContext.DebugSubPixelMeasurements)
+											subPixelInfo.Included[dx, dy] = true;
 	                                }
                                 }
                         }
@@ -625,20 +654,29 @@ namespace Tangra.Model.Image
 						{
 							subpixels = 1.0f;
 							hasSubpixels = true;
+							if (DebugContext.DebugSubPixelMeasurements)
+								subPixelInfo.FullyIncluded = true;
 						}
 
 						if (hasSubpixels)
 						{
 							if (pixelMeasurementCallback != null)
-								total += pixelMeasurementCallback(x, y) * subpixels;
+								total += pixelMeasurementCallback(x, y)*subpixels;
 							else
-								total += (int)data[x, y] * subpixels;
+								total += (int) data[x, y]*subpixels;
 
 							totalPixels += subpixels;
+						}
+
+						if (DebugContext.DebugSubPixelMeasurements)
+						{
+							subPixelInfo.TotalSubpixels = subpixels;
+							subPixelInfo.TotalReading = total;
 						}
                     }
 
                     if (data[x, y] >= m_SaturationValue) m_HasSaturatedPixels = true;
+	                
                 }
 
             return Math.Round(total);
@@ -864,8 +902,10 @@ namespace Tangra.Model.Image
 			float[] aperturesInGroup,
             bool fullDisappearance)
         {
-            int centerX = (int)center.XDouble;
-            int centerY = (int)center.YDouble;
+			// NOTE: This is how the center of the pixel area passed in data and background arrays is determined
+			// TODO: Pass the center as an argument
+            int centerX = (int)Math.Round(center.XDouble);
+            int centerY = (int)Math.Round(center.YDouble);
 
             float msrX0 = (float)center.XDouble;
             float msrY0 = (float)center.YDouble;
@@ -1008,7 +1048,8 @@ namespace Tangra.Model.Image
 					data, centerX, centerY, msrX0, msrY0,
 					aperture,
 					measurableObject.PsfFittingMatrixSize,
-					backgroundPixels, bgAnnulusFactor);
+					backgroundPixels, bgAnnulusFactor,
+					measurableObject.Center.X, measurableObject.Center.Y);
 			}
 			else if (reductionMethod == TangraConfig.PhotometryReductionMethod.OptimalExtraction)
 			{

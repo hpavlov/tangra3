@@ -93,12 +93,14 @@ namespace Tangra.VideoOperations.LightCurves
         private MeasuringZoomImageType MeasuringZoomImageType = MeasuringZoomImageType.Stripe;
 	    private LightCurveController m_LightCurveController;
 
+	    private LCFile m_LoadedLcFile;
+
 		public ReduceLightCurveOperation()
 		{
 			Debug.Assert(false, "This constructor should not be called.");
 		}
 
-		public ReduceLightCurveOperation(LightCurveController lightCurveController, bool debugMode)
+		internal ReduceLightCurveOperation(LightCurveController lightCurveController, bool debugMode)
 		{
 			m_LightCurveController = lightCurveController;
 			m_DebugMode = debugMode;
@@ -113,6 +115,11 @@ namespace Tangra.VideoOperations.LightCurves
             m_AllBrushes[2] = new SolidBrush(TangraConfig.Settings.Color.Target3);
             m_AllBrushes[3] = new SolidBrush(TangraConfig.Settings.Color.Target4); 
         }
+
+		internal void SetLCFile(LCFile loadedFile)
+		{
+			m_LoadedLcFile = loadedFile;
+		}
 
         #region IVideoOperation Members
 
@@ -172,17 +179,7 @@ namespace Tangra.VideoOperations.LightCurves
 				m_StateMachine.MeasuringStars.Count > 0 &&
 				!m_StateMachine.m_HasBeenPaused)
 			{
-				m_Measurer = new MeasurementsHelper(
-					m_VideoController.VideoBitPix,
-					LightCurveReductionContext.Instance.NoiseMethod,
-					TangraConfig.Settings.Photometry.SubPixelSquareSize,
-					TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(m_VideoController.VideoBitPix));
-
-				m_Measurer.SetCoreProperties(
-					TangraConfig.Settings.Photometry.AnnulusInnerRadius,
-					TangraConfig.Settings.Photometry.AnnulusMinPixels,
-					TangraConfig.PhotometrySettings.REJECTION_BACKGROUND_PIXELS_STD_DEV,
-					(float)m_Tracker.PositionTolerance);
+				EnsureMeasurer((float)m_Tracker.PositionTolerance);
 
 				m_Measurer.GetImagePixelsCallback +=
 					new MeasurementsHelper.GetImagePixelsDelegate(m_Measurer_GetImagePixelsCallback);
@@ -200,6 +197,21 @@ namespace Tangra.VideoOperations.LightCurves
 					m_GroupMeasurer = null;
 			}
         }
+
+		private void EnsureMeasurer(float positionTolerance)
+		{
+			m_Measurer = new MeasurementsHelper(
+								m_VideoController.VideoBitPix,
+								LightCurveReductionContext.Instance.NoiseMethod,
+								TangraConfig.Settings.Photometry.SubPixelSquareSize,
+								TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(m_VideoController.VideoBitPix));
+
+			m_Measurer.SetCoreProperties(
+				TangraConfig.Settings.Photometry.AnnulusInnerRadius,
+				TangraConfig.Settings.Photometry.AnnulusMinPixels,
+				TangraConfig.PhotometrySettings.REJECTION_BACKGROUND_PIXELS_STD_DEV,
+				positionTolerance);
+		}
 
 		uint[,] m_Measurer_GetImagePixelsCallback(int x, int y, int matrixSize)
 		{
@@ -620,7 +632,7 @@ namespace Tangra.VideoOperations.LightCurves
                             gz.Save();
                         }
 
-                        m_VideoController.UpdateZoomedImage(zoomedBmp);
+						m_VideoController.UpdateZoomedImage(zoomedBmp, star);
                     }
                     else
                     {
@@ -784,6 +796,12 @@ namespace Tangra.VideoOperations.LightCurves
 				// Don't overwrite the configuration image
 		        return true;
 
+			if (m_ViewingLightCurve)
+			{
+				DrawZoomArea(gMain);
+				return true;
+			}
+
 	        return false;
         }
 
@@ -827,7 +845,95 @@ namespace Tangra.VideoOperations.LightCurves
 
 						gMain.Save();
 					}
-				}				
+					else if (m_ViewingLightCurve && m_LoadedLcFile != null && m_VideoController.CurrentVideoFileEngine != "BMP.Image")
+					{
+						if (DebugContext.DebugSubPixelMeasurements)
+						{
+							DebugContext.CurrentSubPixels.Clear();
+							DebugContext.Width = m_AstroImage.Width;
+							DebugContext.Height = m_AstroImage.Height;
+						}
+
+						EnsureMeasurer(2.0f);
+ 
+						for (int targNo = 0; targNo < m_LoadedLcFile.Header.ObjectCount; targNo++)
+						{
+							if (DebugContext.DebugSubPixelMeasurements)
+							{
+								DebugContext.TargetNo = targNo;
+								DebugContext.CurrentSubPixels.Add(new DebugContext.SubPixelData[m_AstroImage.Width,m_AstroImage.Height]);
+
+							}
+
+							LCMeasurement mea = m_LoadedLcFile.Data[targNo][m_CurrFrameNo - (int)m_LoadedLcFile.Header.MinFrame];
+							float xx = mea.X0 - (m_VideoController.ZoomedCenter.X - 15);
+							float yy = mea.Y0 - (m_VideoController.ZoomedCenter.Y - 16);
+
+							xx = xx * 8 + 0.5f;
+							yy = yy * 8 + 0.5f;
+
+							float halfAper = m_LoadedLcFile.Header.MeasurementApertures[targNo] * 8;
+
+							gMain.DrawEllipse(m_AllPens[targNo], xx - halfAper, yy - halfAper, 2 * halfAper, 2 * halfAper);
+
+							if (DebugContext.DebugSubPixelMeasurements)
+							{
+								ITrackedObject trcked = mea.GetTrackedLcMeasurement(m_LoadedLcFile);
+								float refinedFWHM = trcked.OriginalObject.RefinedFWHM;
+								float averageFWHM = m_LoadedLcFile.Footer.RefinedAverageFWHM;
+
+								MeasureTrackedObject2(trcked, m_Measurer, TangraConfig.PreProcessingFilter.NoFilter, false, null, refinedFWHM, averageFWHM);
+
+								float xCent = float.NaN;
+								float yCent = float.NaN;
+
+								for (int y = m_VideoController.ZoomedCenter.Y - 16; y < m_VideoController.ZoomedCenter.Y + 16; y++)
+									for (int x = m_VideoController.ZoomedCenter.X - 16; x < m_VideoController.ZoomedCenter.X + 16; x++)
+									{
+										if (x >= 0 && x <= DebugContext.Width && y >= 0 && y <= DebugContext.Height)
+										{
+											DebugContext.SubPixelData debugInfo = DebugContext.CurrentSubPixels[targNo][x, y];
+											if (debugInfo != null)
+											{
+												xCent = debugInfo.X0;
+												yCent = debugInfo.Y0;
+
+												// TODO: Plot the center with a differen colour !!!
+												int xs = 8 * (x - (m_VideoController.ZoomedCenter.X - 15));
+												int ys = 8 * (y - (m_VideoController.ZoomedCenter.Y - 16));
+
+												if (debugInfo.FullyIncluded)
+												{
+													gMain.FillRectangle(Brushes.Lime, xs, ys, 8, 8);
+												}
+												else if (debugInfo.Included != null)
+												{
+													for (int kk = 0; kk < 4; kk++)
+														for (int tt = 0; tt < 4; tt++)
+														{
+															if (debugInfo.Included[kk, tt])
+																gMain.FillRectangle(Brushes.Lime, xs + 2 * kk, ys + 2 * tt, 2, 2);
+														}
+												}
+											}
+										}
+
+									}
+
+								if (!float.IsNaN(xCent) && !float.IsNaN(yCent))
+								{
+									xx = xCent - (m_VideoController.ZoomedCenter.X - 15);
+									yy = yCent - (m_VideoController.ZoomedCenter.Y - 16);
+
+									xx = xx * 8 + 0.5f;
+									yy = yy * 8 + 0.5f;
+
+									gMain.FillRectangle(Brushes.Orange, xx - 1, yy - 1, 3, 3);
+								}
+							}
+						}
+					}
+				}
 			}
         }
 
@@ -1673,7 +1779,9 @@ namespace Tangra.VideoOperations.LightCurves
 											m_Measurer,
 											LightCurveReductionContext.Instance.DigitalFilter,
 											false,
-											objectsInGroup);
+											objectsInGroup,
+											m_Tracker.RefinedFWHM[trackedObject.TargetNo],
+											m_Tracker.RefinedAverageFWHM);
 				}
 				else
 				{
@@ -1701,7 +1809,9 @@ namespace Tangra.VideoOperations.LightCurves
 			MeasurementsHelper measurer,
 			TangraConfig.PreProcessingFilter filter,
 			bool synchronise,
-			List<ITrackedObject> objectsInGroup)
+			List<ITrackedObject> objectsInGroup,
+			float refinedFWHM,
+			float averageFWHM)
 		{
 			IImagePixel center = trackedObject.Center;
 			int areaSize = 17;
@@ -1762,8 +1872,8 @@ namespace Tangra.VideoOperations.LightCurves
 				LightCurveReductionContext.Instance.ReductionMethod,
 				LightCurveReductionContext.Instance.PsfQuadratureMethod,
 				trackedObject.OriginalObject.ApertureInPixels,
-				m_Tracker.RefinedFWHM[trackedObject.TargetNo],
-				m_Tracker.RefinedAverageFWHM,
+				refinedFWHM,
+				averageFWHM,
 				measurableObject,
 				groupCenters,
 				aperturesInGroup,
@@ -1900,7 +2010,9 @@ namespace Tangra.VideoOperations.LightCurves
 				m_InstumentalDelaySelectedCamera,
                 m_CameraName,
 				m_AavNativeVideoFormat,
-                m_AavFrameIntegration);
+                m_AavFrameIntegration,
+				PSFFit.BitPix,
+				PSFFit.NormVal);
 
 			return LCFile.FlushOnTheFlyOutputFile(finalHeader, footer);
 		}

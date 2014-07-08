@@ -283,9 +283,11 @@ namespace Tangra.VideoOperations.LightCurves
         public static void SaveOnTheFlyMeasurement(LCMeasurement measurement)
         {
 			//Trace.WriteLine(string.Format("LCFile::SaveOnTheFlyMeasurement({1}, {0})", measurement.TargetNo, measurement.CurrFrameNo));
-
-            measurement.WriteTo(s_OnTheFlyWriter);
-            s_NumMeasurements[measurement.TargetNo]++;
+			if (s_OnTheFlyWriter != null)
+			{
+				measurement.WriteTo(s_OnTheFlyWriter);
+				s_NumMeasurements[measurement.TargetNo]++;
+			}
         }
 
         public static LCFile FlushOnTheFlyOutputFile(LCMeasurementHeader header, LCMeasurementFooter footer)
@@ -636,6 +638,66 @@ namespace Tangra.VideoOperations.LightCurves
 		SignalDividedByNoise
     }
 
+	internal class TrackedLCMeasurement : ITrackedObject, IMeasurableObject
+	{
+		private IMeasurableObject m_Mea;
+		public TrackedLCMeasurement(LCFile file, LCMeasurement mea)
+		{
+			Center = new ImagePixel(mea.X0, mea.Y0);
+			LastKnownGoodPosition = new ImagePixel(mea.X0, mea.Y0);
+			IsLocated = true;
+			IsOffScreen = mea.IsOffScreen;
+			OriginalObject = file.Footer.TrackedObjects[mea.TargetNo];
+			TargetNo = mea.TargetNo;
+			PSFFit = mea.PsfFit;
+			m_Mea = mea;
+		}
+
+		public IImagePixel Center { get; private set; }
+
+		public IImagePixel LastKnownGoodPosition { get; set; }
+
+		public bool IsLocated { get; private set; }
+
+		public bool IsOffScreen { get; private set; }
+
+		public ITrackedObjectConfig OriginalObject { get; private set; }
+
+		public int TargetNo { get; private set; }
+
+		public ITrackedObjectPsfFit PSFFit { get; private set; }
+
+		public uint GetTrackingFlags()
+		{
+			return 0;
+		}
+
+		public void SetIsTracked(bool isMeasured, NotMeasuredReasons reason, IImagePixel estimatedCenter)
+		{
+			
+		}
+
+		public bool IsOccultedStar
+		{
+			get { return m_Mea.IsOccultedStar; }
+		}
+
+		public bool MayHaveDisappeared
+		{
+			get { return m_Mea.MayHaveDisappeared; }
+		}
+
+		public int PsfFittingMatrixSize
+		{
+			get { return m_Mea.PsfFittingMatrixSize; }
+		}
+
+		public int PsfGroupId
+		{
+			get { return m_Mea.PsfGroupId; }
+		}
+	}
+
     internal struct LCMeasurement : IMeasurableObject
     {
         public static LCMeasurement Empty = new LCMeasurement();
@@ -682,6 +744,11 @@ namespace Tangra.VideoOperations.LightCurves
 			{
 				return FlagsDWORD != 0 && Flags == 0;
 			}
+		}
+
+		public TrackedLCMeasurement GetTrackedLcMeasurement(LCFile file)
+		{
+			return new TrackedLCMeasurement(file, this);
 		}
 
         public LCMeasurement Clone()
@@ -1728,7 +1795,7 @@ namespace Tangra.VideoOperations.LightCurves
     {
         public static LCMeasurementFooter Empty = new LCMeasurementFooter();
 
-        private static int SERIALIZATION_VERSION = 7;
+        private static int SERIALIZATION_VERSION = 8;
 
         internal byte[] AveragedFrameBytes;
     	internal int AveragedFrameWidth;
@@ -1746,7 +1813,10 @@ namespace Tangra.VideoOperations.LightCurves
 
         internal string CameraName;
         internal int AAVFrameIntegration;
-		internal string AAVNativeVideoFormat; 
+		internal string AAVNativeVideoFormat;
+
+	    internal int DataBitPix;
+		internal uint DataAav16NormVal;
 
         internal LCMeasurementFooter(
 			Pixelmap averagedFrame, 
@@ -1760,7 +1830,9 @@ namespace Tangra.VideoOperations.LightCurves
 			string instrumentalDelayConfigName,
             string cameraName,
 			string aavNativeVideoFormat,
-            int aavFrameIntegration)
+            int aavFrameIntegration,
+			int dataBitPix,
+			uint dataAav16NormVal)
         {
 			AveragedFrameBytes = averagedFrame.DisplayBitmapPixels;
         	AveragedFrameWidth = averagedFrame.Width;
@@ -1779,6 +1851,9 @@ namespace Tangra.VideoOperations.LightCurves
             CameraName = cameraName ?? string.Empty;
             AAVFrameIntegration = aavFrameIntegration;
 	        AAVNativeVideoFormat = aavNativeVideoFormat;
+
+	        DataBitPix = dataBitPix;
+	        DataAav16NormVal = dataAav16NormVal;
         }
 
         internal LCMeasurementFooter(BinaryReader reader)
@@ -1821,6 +1896,9 @@ namespace Tangra.VideoOperations.LightCurves
             AAVFrameIntegration = -1;
 	        AAVNativeVideoFormat = string.Empty;
 
+			DataBitPix = 8;
+			DataAav16NormVal = 0;
+
 			if (version > 1)
 			{
 				RefinedAverageFWHM = reader.ReadSingle();
@@ -1859,6 +1937,12 @@ namespace Tangra.VideoOperations.LightCurves
 								if (version > 6)
 								{
 									AAVNativeVideoFormat = reader.ReadString();
+
+									if (version > 7)
+									{
+										DataBitPix = reader.ReadInt32();
+										DataAav16NormVal = reader.ReadUInt32();
+									}
 								}
                             }
 						}
@@ -1922,7 +2006,11 @@ namespace Tangra.VideoOperations.LightCurves
 
             writer.Write(CameraName);
             writer.Write(AAVFrameIntegration);
+
 	        writer.Write(AAVNativeVideoFormat);
+
+			writer.Write(DataBitPix);
+			writer.Write(DataAav16NormVal);
         }
     }
 

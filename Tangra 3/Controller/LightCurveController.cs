@@ -127,6 +127,7 @@ namespace Tangra.Controller
                 if (lcFile != null)
                 {
 					ReduceLightCurveOperation operation = (ReduceLightCurveOperation)m_VideoController.SetOperation<ReduceLightCurveOperation>(this, false);
+	                operation.SetLCFile(lcFile);
 
                     string videoFile = GetVideoFileMatchingLcFile(lcFile, fileName);
                     if (!string.IsNullOrEmpty(videoFile) &&
@@ -149,6 +150,8 @@ namespace Tangra.Controller
 							{							
 								TangraContext.Current.CanPlayVideo = false;
 								m_VideoController.UpdateViews();
+
+								PSFFit.SetDataRange(lcFile.Footer.DataBitPix, lcFile.Footer.DataAav16NormVal);
 							}
 						}
 

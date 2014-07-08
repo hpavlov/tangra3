@@ -94,9 +94,30 @@ namespace Tangra.Model.Astro
 		private IBackgroundModelProvider m_BackgroundModel;
 		private bool m_UsesBackgroundModel = false;
 
+		public static void SetDataRange(int bitPix, uint bitPix16NormVal)
+		{
+			BitPix = bitPix;
+
+			if (bitPix == 8)
+				DataRange = PSFFittingDataRange.DataRange8Bit;
+			else if (bitPix == 12)
+				DataRange = PSFFittingDataRange.DataRange12Bit;
+			else if (bitPix == 14)
+				DataRange = PSFFittingDataRange.DataRange14Bit;
+			else if (bitPix == 16)
+			{
+				DataRange = PSFFittingDataRange.DataRange16Bit;
+				NormVal = bitPix16NormVal;
+			}
+			else
+				throw new ApplicationException("PSF fitting only supports 8, 12, 14 and 16 bit data.");
+		}
+
 		public static PSFFittingDataRange DataRange = PSFFittingDataRange.DataRange8Bit;
 
 		public static uint NormVal = 255;
+
+		public static int BitPix = 8;
 
         public void SetAveragedModelFWHM(float modelFWHM)
         {

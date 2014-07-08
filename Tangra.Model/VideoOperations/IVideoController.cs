@@ -24,7 +24,7 @@ namespace Tangra.Model.VideoOperations
 	    void RedrawCurrentFrame(bool showFields);
         void ToggleShowFieldsMode(bool showFields);
 
-		void UpdateZoomedImage(Bitmap zoomedBitmap);
+		void UpdateZoomedImage(Bitmap zoomedBitmap, ImagePixel center);
         void ClearZoomedImage();
         
 		AstroImage GetCurrentAstroImage(bool integrated);

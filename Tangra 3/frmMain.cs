@@ -931,5 +931,11 @@ namespace Tangra
             }
         }
 
+		private void zoomedImage_MouseMove(object sender, MouseEventArgs e)
+		{
+			Point imagePos = m_VideoController.GetImageCoordinatesFromZoomedImage(e.Location);
+			m_VideoController.DisplayCursorImageCoordinates(imagePos);
+		}
+
 	}
 }

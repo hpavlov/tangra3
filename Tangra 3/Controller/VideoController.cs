@@ -89,7 +89,7 @@ namespace Tangra.Controller
 	        m_MainForm = (frmMain) mainFormView;
             m_pnlControlerPanel = pnlControlerPanel;
             videoFileView.SetFramePlayer(m_FramePlayer);
-
+			m_ImageToolView.SetVideoController(this);
 			CloseOpenedVideoFile();
 
 			InitialisePersistedSettings();
@@ -259,19 +259,7 @@ namespace Tangra.Controller
 				TangraContext.Current.FirstFrame = m_FramePlayer.Video.FirstFrame;
 				TangraContext.Current.LastFrame = m_FramePlayer.Video.LastFrame;
 
-                if (m_FramePlayer.Video.BitPix == 8)
-                    PSFFit.DataRange = PSFFittingDataRange.DataRange8Bit;
-                else if (m_FramePlayer.Video.BitPix == 12)
-                    PSFFit.DataRange = PSFFittingDataRange.DataRange12Bit;
-				else if (m_FramePlayer.Video.BitPix == 14)
-					PSFFit.DataRange = PSFFittingDataRange.DataRange14Bit;
-				else if (m_FramePlayer.Video.BitPix == 16)
-				{
-					PSFFit.DataRange = PSFFittingDataRange.DataRange16Bit;
-					PSFFit.NormVal = m_FramePlayer.Video.GetAav16NormVal();
-				}
-				else
-					throw new ApplicationException("PSF fitting only supports 8, 12, 14 and 16 bit data.");
+				PSFFit.SetDataRange(m_FramePlayer.Video.BitPix, m_FramePlayer.Video.GetAav16NormVal());
 
 				TangraContext.Current.HasVideoLoaded = true;
 				TangraContext.Current.CanPlayVideo = true;
@@ -741,16 +729,19 @@ namespace Tangra.Controller
 			m_MainForm.Invoke(new Action(callback));
 		}
 
-        public void UpdateZoomedImage(Bitmap zoomedBitmap)
+        public void UpdateZoomedImage(Bitmap zoomedBitmap, ImagePixel center)
         {
             ApplyDisplayModeAdjustments(zoomedBitmap);
 
             m_ZoomedImageView.UpdateImage(zoomedBitmap);
+
+			ZoomedCenter = new ImagePixel(center);
         }
 
         public void ClearZoomedImage()
         {
             m_ZoomedImageView.ClearZoomedImage();
+	        ZoomedCenter = null;
         }
 
 		internal void SetPictureBoxCursor(Cursor cursor)
@@ -1307,7 +1298,7 @@ namespace Tangra.Controller
         {
             if (m_ImageTool != null) m_ImageTool.Deactivate();
 
-			m_ImageTool = ImageTool.SwitchTo<TImageTool>(m_CurrentOperation, m_ImageToolView, m_ImageTool);			
+			m_ImageTool = ImageTool.SwitchTo<TImageTool>(m_CurrentOperation, m_ImageToolView, m_ImageTool);
 
 			return m_ImageTool;
         }
@@ -1505,7 +1496,8 @@ namespace Tangra.Controller
 				if (m_AstroImage != null)
 				{
 					Bitmap zoomedBmp = m_AstroImage.GetZoomImagePixels(pixel.X, pixel.Y, TangraConfig.Settings.Color.Saturation, TangraConfig.Settings.Photometry.Saturation);
-					UpdateZoomedImage(zoomedBmp);
+					UpdateZoomedImage(zoomedBmp, pixel);
+
 				}
 				else
 					m_ZoomedImageView.ClearZoomedImage();
@@ -1740,6 +1732,41 @@ namespace Tangra.Controller
 				var frm = new frmFileInformation(m_FramePlayer.Video);
 				frm.StartPosition = FormStartPosition.CenterParent;
 				frm.ShowDialog(m_MainForm);
+			}
+		}
+
+		internal Point GetImageCoordinatesFromZoomedImage(Point zoomedImageMousePos)
+		{
+			if (ZoomedCenter != null)
+			{
+				return new Point(ZoomedCenter.X - 15 + (zoomedImageMousePos.X / 8),
+								 ZoomedCenter.Y - 15 + (zoomedImageMousePos.Y / 8));
+			}
+			return new Point(0, 0);
+		}
+
+		internal void DisplayCursorImageCoordinates(Point imagePos)
+		{
+			if (TangraConfig.Settings.Generic.ShowCursorPosition &&
+				imagePos.X >= 0 &&
+				imagePos.Y >= 0)
+			{
+				if (m_AstroImage != null)
+				{
+					uint pixval = m_AstroImage.GetPixel(imagePos.X, imagePos.Y);
+					m_MainForm.ssMoreInfo.Text = string.Format("({0}, {1})={2}", imagePos.X, imagePos.Y, pixval);
+					m_MainForm.ssMoreInfo.Visible = true;
+				}
+				else
+				{
+					m_MainForm.ssMoreInfo.Text = string.Format("X={0} Y={1}", imagePos.X, imagePos.Y);
+					m_MainForm.ssMoreInfo.Visible = true;
+				}
+				
+			}
+			else
+			{
+				m_MainForm.ssMoreInfo.Visible = false;
 			}
 		}
     }

@@ -362,6 +362,16 @@ namespace Tangra.Model.Astro
 				return 0;
 		}
 
+		public uint GetPixel(int x, int y)
+		{
+			if (x >= 0 && x < m_Pixelmap.Width && y >= 0 && y < m_Pixelmap.Height)
+			{
+				return m_Pixelmap.Pixels[x + m_Pixelmap.Width * y];
+			}
+			else
+				return 0;
+		}
+
 		public static PSFFit GetPSFFitForPeakPixel(
 			uint[,] data,
 			PotentialStarStruct starToTest,
