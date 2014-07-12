@@ -36,11 +36,11 @@ namespace Tangra.View
 		{
 			if (TangraContext.Current.HasAnyFileLoaded)
 			{
-                m_MainForm.Text = string.Format("Tangra v3.1 BETA - {0}, {1}", TangraContext.Current.FileName, TangraContext.Current.FileFormat);
+                m_MainForm.Text = string.Format("Tangra v3.1 RC1 - {0}, {1}", TangraContext.Current.FileName, TangraContext.Current.FileFormat);
 			}
 			else
 			{
-				m_MainForm.Text = "Tangra v3.1 BETA";
+                m_MainForm.Text = "Tangra v3.1 RC1";
 
 				if (m_MainForm.pictureBox.Image != null)
 				{
