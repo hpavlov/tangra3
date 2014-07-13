@@ -10,3 +10,6 @@ typedef long LONG;
 typedef int WORD;
 typedef unsigned char BYTE;
 typedef unsigned long DWORD;
+
+#define DLL_PUBLIC __attribute__ ((visibility ("default")))
+#define DLL_LOCAL  __attribute__ ((visibility ("hidden")))

@@ -41,7 +41,7 @@ DLL_PUBLIC HRESULT PreProcessingLowPassDifferenceFilter(unsigned long* pixels, l
 } // __cplusplus defined.
 #endif
 
-unsigned __int64 GetUInt64Average(unsigned __int64 a, unsigned __int64 b);
-unsigned __int64 GetUInt64Average(unsigned long aLo, unsigned long aHi, unsigned long bLo, unsigned long bHi);
+__uint64 GetUInt64Average(__uint64 a, __uint64 b);
+__uint64 GetUInt64Average(unsigned long aLo, unsigned long aHi, unsigned long bLo, unsigned long bHi);
 
 #endif

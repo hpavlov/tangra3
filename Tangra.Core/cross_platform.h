@@ -52,10 +52,13 @@ typedef struct tagBITMAPFILEHEADER {
 #pragma pack()
 
 typedef long long __int64;
+typedef unsigned long long __uint64;
 
 #else
 
 #include "windows.h"
+
+typedef unsigned __int64 __uint64;
 
 #endif
 
@@ -86,11 +89,12 @@ int advfsetpos(FILE* file, const __int64* pos);
     #define DLL_PUBLIC __attribute__ ((visibility ("default")))
     #define DLL_LOCAL  __attribute__ ((visibility ("hidden")))
   #else
-    #define DLL_PUBLIC
-    #define DLL_LOCAL
+    #define DLL_PUBLIC __attribute__ ((visibility ("default")))
+    #define DLL_LOCAL  __attribute__ ((visibility ("hidden")))
   #endif
 #endif
 
 float ABS(float x);
+
 
 #endif // CROSSPLATFORM_H

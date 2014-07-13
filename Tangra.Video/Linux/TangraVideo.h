@@ -4,7 +4,7 @@
 
 #define VERSION_MAJOR 3
 #define VERSION_MINOR 0
-#define VERSION_REVISION 10
+#define VERSION_REVISION 11
 
 struct VideoFileInfo
 {
@@ -21,21 +21,21 @@ extern "C" {
 #endif
 
 
-int GetTangraVideoVersion();
+DLL_PUBLIC int GetTangraVideoVersion();
 
-HRESULT TangraVideoEnumVideoEngines(char* videoEngines);
+DLL_PUBLIC HRESULT TangraVideoEnumVideoEngines(char* videoEngines);
 
-HRESULT TangraVideoSetVideoEngine(int videoEngine);
+DLL_PUBLIC HRESULT TangraVideoSetVideoEngine(int videoEngine);
 
-HRESULT TangraVideoOpenFile(const char* fileName, VideoFileInfo* fileInfo);
+DLL_PUBLIC HRESULT TangraVideoOpenFile(const char* fileName, VideoFileInfo* fileInfo);
 
-HRESULT TangraVideoCloseFile();
+DLL_PUBLIC HRESULT TangraVideoCloseFile();
 
-HRESULT TangraVideoGetFrame(long frameNo, unsigned long* pixels, unsigned char* bitmapPixels, unsigned char* bitmapBytes);
+DLL_PUBLIC HRESULT TangraVideoGetFrame(long frameNo, unsigned long* pixels, unsigned char* bitmapPixels, unsigned char* bitmapBytes);
 
-HRESULT TangraVideoGetFramePixels(long frameNo, unsigned long* pixels);
+DLL_PUBLIC HRESULT TangraVideoGetFramePixels(long frameNo, unsigned long* pixels);
 
-HRESULT TangraVideoGetIntegratedFrame(long startFrameNo, long framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, unsigned char* bitmapPixels, unsigned char* bitmapBytes);
+DLL_PUBLIC HRESULT TangraVideoGetIntegratedFrame(long startFrameNo, long framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, unsigned char* bitmapPixels, unsigned char* bitmapBytes);
 
 #ifdef  __cplusplus
 }

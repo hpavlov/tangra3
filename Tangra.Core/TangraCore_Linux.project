@@ -20,6 +20,10 @@
     <File Name="Tangra.Pixelmap.cpp"/>
     <File Name="TangraADV.cpp"/>
     <File Name="utils.cpp"/>
+    <File Name="Tangra.Core.def"/>
+    <File Name="Compressor.cpp"/>
+    <File Name="ProbabilityCoder.cpp"/>
+    <File Name="RangeCoder.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="include">
     <File Name="adv_file.h"/>
@@ -35,6 +39,9 @@
     <File Name="utils.h"/>
     <File Name="TangraADV.h"/>
     <File Name="cross_platform.h"/>
+    <File Name="Compressor.h"/>
+    <File Name="ProbabilityCoder.h"/>
+    <File Name="RangeCoder.h"/>
   </VirtualDirectory>
   <Settings Type="Dynamic Library">
     <GlobalSettings>
@@ -88,7 +95,7 @@
       </Completion>
     </Configuration>
     <Configuration Name="Release" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Dynamic Library" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-D_FILE_OFFSET_BITS=64 -fvisibility=hidden -fvisibility-inlines-hidden" C_Options="-D_FILE_OFFSET_BITS=64 -fvisibility=hidden -fvisibility-inlines-hidden" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
+      <Compiler Options="-g -D_FILE_OFFSET_BITS=64 -fvisibility=hidden -fvisibility-inlines-hidden" C_Options="-g -D_FILE_OFFSET_BITS=64 -fvisibility=hidden -fvisibility-inlines-hidden" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
         <IncludePath Value="."/>
       </Compiler>
       <Linker Options="-O2" Required="yes"/>

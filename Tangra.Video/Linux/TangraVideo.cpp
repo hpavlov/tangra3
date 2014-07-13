@@ -53,5 +53,9 @@ HRESULT TangraVideoGetIntegratedFrame(long startFrameNo, long framesToIntegrate,
 
 int GetTangraVideoVersion()
 {	
-	return (VERSION_MAJOR << 28) + (VERSION_MINOR << 16) + VERSION_REVISION;
+	int major = 3;
+	int minor = 0;
+	int revision = 11;
+
+	return (major << 28) + (minor << 16) + revision;
 }
