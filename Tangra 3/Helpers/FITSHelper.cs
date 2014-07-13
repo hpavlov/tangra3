@@ -67,12 +67,13 @@ namespace Tangra.Helpers
 
 					try
 					{
-						//DATEOBS = '2000-10-12'         / UT date of start of exposure (yyyy-mm-dd)      
-						//TIMEOBS = '14:38:30'           / UT start time of exposure (hh:mm:ss)           
-						//RAWTIME =   1.085015625000E+03 / [s] Exposure duration of raw data file         
+						// FITS Card definitions taken from here:
+						// http://www.cyanogen.com/help/maximdl/FITS_File_Header_Definitions.htm
+						// http://www.cv.nrao.edu/fits/documents/standards/year2000.txt
 
-
+						bool isMidPoint = false;
 						HeaderCard exposureCard = imageHDU.Header.FindCard("EXPOSURE");
+						if (exposureCard == null) exposureCard = imageHDU.Header.FindCard("EXPTIME");
 						if (exposureCard == null) exposureCard = imageHDU.Header.FindCard("RAWTIME");
 						if (exposureCard != null && !string.IsNullOrWhiteSpace(exposureCard.Value))
 						{
@@ -90,7 +91,20 @@ namespace Tangra.Helpers
 							else
 							{
 								dateCard = imageHDU.Header.FindCard("DATE-OBS");
-								dateTimeStr = dateCard.Value;
+								timeCard = imageHDU.Header.FindCard("TIME-OBS");
+								if (timeCard != null && dateCard != null)
+									dateTimeStr = string.Format("{0}T{1}", dateCard.Value, timeCard.Value);
+								else if (dateCard != null)
+									dateTimeStr = dateCard.Value;
+								else
+								{
+									timeCard = imageHDU.Header.FindCard("MIDPOINT");
+									if (timeCard != null)
+									{
+										dateTimeStr = timeCard.Value;
+										isMidPoint = true;
+									}
+								}
 							}
 
 							if (!string.IsNullOrWhiteSpace(dateTimeStr))
@@ -98,9 +112,10 @@ namespace Tangra.Helpers
 								Match regexMatch = FITS_DATE_REGEX.Match(dateTimeStr);
 								if (regexMatch.Success)
 								{
-									// DATE-OBS is the start of the observation. See http://www.cv.nrao.edu/fits/documents/standards/year2000.txt
 									DateTime startObs = DateTime.Parse(regexMatch.Groups["DateStr"].Value.Trim(), CultureInfo.InvariantCulture);
-									fitsTimestamp = startObs.AddSeconds(fitsExposure.Value / 2.0);
+									// DATE-OBS is the start of the observation, unless given in "MIDPOINT"
+									if (!isMidPoint)
+										fitsTimestamp = startObs.AddSeconds(fitsExposure.Value / 2.0);
 								}
 							}
 						}
