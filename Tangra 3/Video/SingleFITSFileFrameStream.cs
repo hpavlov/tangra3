@@ -32,8 +32,10 @@ namespace Tangra.Video
 			int width;
 			int height;
 			int bpp;
+			DateTime? timestamp;
+			double? exposure;
 
-			FITSHelper.Load16BitFitsFile(fileName, out pixelsFlat, out width, out height, out bpp);
+			FITSHelper.Load16BitFitsFile(fileName, out pixelsFlat, out width, out height, out bpp, out timestamp, out exposure);
 
 			TangraContext.Current.RenderingEngine = SINGLE_FITS_FILE_ENGINE;
 

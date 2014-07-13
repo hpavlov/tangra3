@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Tangra.Helpers;
@@ -16,7 +17,9 @@ namespace Tangra.Video
  
         public static FITSFileSequenceStream OpenFolder(string[] fitsFiles)
         {
-            return new FITSFileSequenceStream(fitsFiles);
+            var rv =  new FITSFileSequenceStream(fitsFiles);
+	        rv.FileName = Path.GetDirectoryName(fitsFiles[0]);
+	        return rv;
         }
 
         private FITSFileSequenceStream(string[] fitsFiles)
@@ -32,12 +35,16 @@ namespace Tangra.Video
             int width;
             int height;
             int bpp;
+			DateTime? timestamp;
+			double? exposure;
 
-            FITSHelper.Load16BitFitsFile(m_FitsFilesList[0], out pixelsFlat, out width, out height, out bpp);
+			FITSHelper.Load16BitFitsFile(m_FitsFilesList[0], out pixelsFlat, out width, out height, out bpp, out timestamp, out exposure);
 
             Width = width;
             Height = height;
             BitPix = bpp;
+
+	        HasUTCTimeStamps = timestamp.HasValue;
 
             VideoFileType = string.Format("FITS.{0}::SEQ", bpp);
         }
@@ -70,8 +77,10 @@ namespace Tangra.Video
             int width;
             int height;
             int bpp;
+			DateTime? timestamp;
+			double? exposure;
 
-            FITSHelper.Load16BitFitsFile(m_FitsFilesList[index], out pixelsFlat, out width, out height, out bpp);
+			FITSHelper.Load16BitFitsFile(m_FitsFilesList[index], out pixelsFlat, out width, out height, out bpp, out timestamp, out exposure);
 
             byte[] displayBitmapBytes = new byte[Width * Height];
             byte[] rawBitmapBytes = new byte[(Width * Height * 3) + 40 + 14 + 1];
@@ -86,6 +95,15 @@ namespace Tangra.Video
             Bitmap displayBitmap = Pixelmap.ConstructBitmapFromBitmapPixels(displayBitmapBytes, Width, Height);
 
             Pixelmap rv = new Pixelmap(Width, Height, BitPix, flatPixelsCopy, displayBitmap, displayBitmapBytes);
+
+			if (HasUTCTimeStamps)
+			{
+				rv.FrameState = new FrameStateData()
+				{
+					CentralExposureTime = timestamp.HasValue ? timestamp.Value : DateTime.MinValue,
+					ExposureInMilliseconds = exposure.HasValue ? (float)(exposure.Value * 1000.0) : 0
+				};
+			}
 
             return rv;
         }
@@ -123,5 +141,7 @@ namespace Tangra.Video
         {
             
         }
+
+		public bool HasUTCTimeStamps { get; private set; }
     }
 }

@@ -1963,8 +1963,7 @@ namespace Tangra.VideoOperations.LightCurves
 			);
 
 			MeasurementTimingType measurementTimingType = MeasurementTimingType.UserEnteredFrameReferences;
-			if (m_VideoController.IsAstroDigitalVideo ||
-				(m_VideoController.IsAstroAnalogueVideo && m_VideoController.AstroAnalogueVideoHasOcrOrNtpData))
+			if (m_VideoController.HasEmbeddedTimeStamps())
 				measurementTimingType = MeasurementTimingType.EmbeddedTimeForEachFrame;
 			else if (m_TimestampOCR != null)
 				measurementTimingType = MeasurementTimingType.OCRedTimeForEachFrame;

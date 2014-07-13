@@ -499,6 +499,11 @@ namespace Tangra.Controller
 			get { return m_FramePlayer.Video.Engine == "SER"; }
 		}
 
+	    public bool IsFitsSequence
+	    {
+			get { return m_FramePlayer.Video.Engine == "FITS-SEQ"; }
+	    }
+
         public bool SupportsSoftwareIntegration
         {
             get { return m_FramePlayer.Video.SupportsSoftwareIntegration; }
@@ -508,7 +513,8 @@ namespace Tangra.Controller
 		{
 			return IsAstroDigitalVideo ||
 			       (IsAstroAnalogueVideo && AstroAnalogueVideoHasOcrOrNtpData) ||
-				   (IsSerVideo && ((SERVideoStream)m_FramePlayer.Video).HasUTCTimeStamps);
+				   (IsSerVideo && ((SERVideoStream)m_FramePlayer.Video).HasUTCTimeStamps) ||
+				   (IsFitsSequence && ((FITSFileSequenceStream)m_FramePlayer.Video).HasUTCTimeStamps);
 		}
 
 		public bool IsPlainAviVideo

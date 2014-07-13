@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Tangra.Model.Context;
 using Tangra.Model.Image;
@@ -39,7 +42,8 @@ namespace Tangra.Helpers
 			}
 		}
 
-		public static void Load16BitFitsFile(string fileName, out uint[] pixelsFlat, out int width, out int height, out int bpp)
+		private static Regex FITS_DATE_REGEX = new Regex("(?<DateStr>\\d\\d\\d\\d\\-\\d\\d\\-\\d\\dT\\d\\d:\\d\\d:\\d\\d(\\.\\d+)?)");
+		public static void Load16BitFitsFile(string fileName, out uint[] pixelsFlat, out int width, out int height, out int bpp, out DateTime? timestamp, out double? exposure)
 		{
 			int pixWidth = 0;
 			int pixHeight = 0;
@@ -47,6 +51,9 @@ namespace Tangra.Helpers
 
 			uint[,] pixels;
 			uint medianValue;
+
+			DateTime? fitsTimestamp = null;
+			double? fitsExposure = null;
 
 			Load16BitFitsFile(
 				fileName,
@@ -58,6 +65,51 @@ namespace Tangra.Helpers
 					pixHeight = imageHDU.Axes[0];
 					pixBpp = imageHDU.BitPix;
 
+					try
+					{
+						//DATEOBS = '2000-10-12'         / UT date of start of exposure (yyyy-mm-dd)      
+						//TIMEOBS = '14:38:30'           / UT start time of exposure (hh:mm:ss)           
+						//RAWTIME =   1.085015625000E+03 / [s] Exposure duration of raw data file         
+
+
+						HeaderCard exposureCard = imageHDU.Header.FindCard("EXPOSURE");
+						if (exposureCard == null) exposureCard = imageHDU.Header.FindCard("RAWTIME");
+						if (exposureCard != null && !string.IsNullOrWhiteSpace(exposureCard.Value))
+						{
+							fitsExposure = double.Parse(exposureCard.Value.Trim(), CultureInfo.InvariantCulture);
+
+							string dateTimeStr = null;
+							HeaderCard timeCard = imageHDU.Header.FindCard("TIMEOBS");
+							HeaderCard dateCard;
+							if (timeCard != null)
+							{
+								dateCard = imageHDU.Header.FindCard("DATEOBS");
+								if (dateCard != null)
+									dateTimeStr = string.Format("{0}T{1}", dateCard.Value, timeCard.Value);
+							}
+							else
+							{
+								dateCard = imageHDU.Header.FindCard("DATE-OBS");
+								dateTimeStr = dateCard.Value;
+							}
+
+							if (!string.IsNullOrWhiteSpace(dateTimeStr))
+							{
+								Match regexMatch = FITS_DATE_REGEX.Match(dateTimeStr);
+								if (regexMatch.Success)
+								{
+									// DATE-OBS is the start of the observation. See http://www.cv.nrao.edu/fits/documents/standards/year2000.txt
+									DateTime startObs = DateTime.Parse(regexMatch.Groups["DateStr"].Value.Trim(), CultureInfo.InvariantCulture);
+									fitsTimestamp = startObs.AddSeconds(fitsExposure.Value / 2.0);
+								}
+							}
+						}
+					}
+					catch (Exception ex)
+					{
+						Trace.WriteLine(ex.ToString());
+					}
+
 					return true;
 				}
 			);
@@ -65,6 +117,9 @@ namespace Tangra.Helpers
 			width = pixWidth;
 			height = pixHeight;
 			pixelsFlat = new uint[width * height];
+
+			timestamp = fitsTimestamp;
+			exposure = fitsExposure;
 
 			uint maxPresentPixelValue = 0;
             uint mask = (uint)(((uint)1 << pixBpp) - 1);

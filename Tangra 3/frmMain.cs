@@ -925,9 +925,20 @@ namespace Tangra
 
         private void miOpenFitsSequence_Click(object sender, EventArgs e)
         {
-            if (openFitsSequenceDialog.ShowDialog(this) == DialogResult.OK)
+	        var frm = new frmChooseFitsFolder();
+	        frm.tbxFolderPath.Text = TangraConfig.Settings.LastUsed.FitsSeqenceLastFolderLocation;
+			if (frm.ShowDialog(this) == DialogResult.OK)
             {
-                m_VideoController.OpenFitsFileSequence(openFitsSequenceDialog.SelectedPath);
+                if (m_VideoController.OpenFitsFileSequence(frm.tbxFolderPath.Text))
+                {
+					TangraConfig.Settings.LastUsed.FitsSeqenceLastFolderLocation = frm.tbxFolderPath.Text;
+
+					if (!SelectVideoOperation())
+					{
+						// NOTE: If no operation is selected, then set the default Arrow tool
+						m_VideoController.SelectImageTool<ArrowTool>();
+					}
+                }
             }
         }
 

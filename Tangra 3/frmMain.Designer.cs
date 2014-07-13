@@ -97,7 +97,6 @@
 			this.openAdvFileDialog = new System.Windows.Forms.OpenFileDialog();
 			this.saveFrameDialog = new System.Windows.Forms.SaveFileDialog();
 			this.timerCommandArgs = new System.Windows.Forms.Timer(this.components);
-			this.openFitsSequenceDialog = new System.Windows.Forms.FolderBrowserDialog();
 			this.mainMenu.SuspendLayout();
 			this.statusStrip.SuspendLayout();
 			this.panelRight.SuspendLayout();
@@ -824,12 +823,6 @@
 			// 
 			this.timerCommandArgs.Tick += new System.EventHandler(this.timerCommandArgs_Tick);
 			// 
-			// openFitsSequenceDialog
-			// 
-			this.openFitsSequenceDialog.Description = "Choose a directory with alphabetically sorted FITS file sequence";
-			this.openFitsSequenceDialog.RootFolder = System.Environment.SpecialFolder.MyComputer;
-			this.openFitsSequenceDialog.ShowNewFolderButton = false;
-			// 
 			// frmMain
 			// 
 			this.AllowDrop = true;
@@ -947,8 +940,7 @@
 		protected internal System.Windows.Forms.ToolStripMenuItem miJupiterGlow;
 		private System.Windows.Forms.ToolStripMenuItem miVideoModelling;
 		protected internal System.Windows.Forms.ToolStripMenuItem miFileInfo;
-        private System.Windows.Forms.ToolStripMenuItem miOpenFitsSequence;
-        private System.Windows.Forms.FolderBrowserDialog openFitsSequenceDialog;
+		private System.Windows.Forms.ToolStripMenuItem miOpenFitsSequence;
 	}
 }
 

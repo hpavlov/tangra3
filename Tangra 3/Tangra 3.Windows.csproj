@@ -281,6 +281,12 @@
     <Compile Include="Helpers\DuplicateFrameAvoider.cs" />
     <Compile Include="Helpers\Extensions.cs" />
     <Compile Include="Helpers\FITSHelper.cs" />
+    <Compile Include="Helpers\frmChooseFitsFolder.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Helpers\frmChooseFitsFolder.Designer.cs">
+      <DependentUpon>frmChooseFitsFolder.cs</DependentUpon>
+    </Compile>
     <Compile Include="Helpers\TangraFileAssociations.cs" />
     <Compile Include="Helpers\WindowsHelpers.cs" />
     <Compile Include="VideoOperations\LightCurves\InfoForms\frmSetReferenceMag.cs">
@@ -659,6 +665,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmUnhandledException.resx">
       <DependentUpon>frmUnhandledException.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Helpers\frmChooseFitsFolder.resx">
+      <DependentUpon>frmChooseFitsFolder.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\LightCurves\InfoForms\frmSetReferenceMag.resx">
       <DependentUpon>frmSetReferenceMag.cs</DependentUpon>

@@ -574,6 +574,7 @@ namespace Tangra.Model.Config
 			public double SerFileLastFrameRate = 25.0;
 
             public List<SameSizeApertureConfig> SameSizeApertures = new List<SameSizeApertureConfig>();
+	        public string FitsSeqenceLastFolderLocation;
         }
 
         public class SameSizeApertureConfig
