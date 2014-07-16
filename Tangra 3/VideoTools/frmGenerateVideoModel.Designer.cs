@@ -76,6 +76,12 @@
 			this.label1 = new System.Windows.Forms.Label();
 			this.nudTotalFrames = new System.Windows.Forms.NumericUpDown();
 			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
+			this.label16 = new System.Windows.Forms.Label();
+			this.label21 = new System.Windows.Forms.Label();
+			this.nudMaxDist = new System.Windows.Forms.NumericUpDown();
+			this.cbOccultationSimulation = new System.Windows.Forms.CheckBox();
+			this.label22 = new System.Windows.Forms.Label();
+			this.nudNumOccFrames = new System.Windows.Forms.NumericUpDown();
 			this.pnlConfig.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nudPolyShift)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudPolyFreq)).BeginInit();
@@ -94,6 +100,8 @@
 			((System.ComponentModel.ISupportInitialize)(this.nudNoiseStdDev)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudNoiseMean)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudTotalFrames)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudMaxDist)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudNumOccFrames)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// btnGenerateVideo
@@ -117,6 +125,12 @@
 			// 
 			// pnlConfig
 			// 
+			this.pnlConfig.Controls.Add(this.label22);
+			this.pnlConfig.Controls.Add(this.nudNumOccFrames);
+			this.pnlConfig.Controls.Add(this.cbOccultationSimulation);
+			this.pnlConfig.Controls.Add(this.label21);
+			this.pnlConfig.Controls.Add(this.nudMaxDist);
+			this.pnlConfig.Controls.Add(this.label16);
 			this.pnlConfig.Controls.Add(this.btnConfigureBackground);
 			this.pnlConfig.Controls.Add(this.label19);
 			this.pnlConfig.Controls.Add(this.label20);
@@ -297,7 +311,7 @@
 			// label14
 			// 
 			this.label14.AutoSize = true;
-			this.label14.Location = new System.Drawing.Point(239, 258);
+			this.label14.Location = new System.Drawing.Point(300, 257);
 			this.label14.Name = "label14";
 			this.label14.Size = new System.Drawing.Size(37, 13);
 			this.label14.TabIndex = 32;
@@ -306,7 +320,7 @@
 			// nudPassByMag2
 			// 
 			this.nudPassByMag2.DecimalPlaces = 2;
-			this.nudPassByMag2.Location = new System.Drawing.Point(282, 254);
+			this.nudPassByMag2.Location = new System.Drawing.Point(340, 253);
 			this.nudPassByMag2.Maximum = new decimal(new int[] {
             15,
             0,
@@ -329,7 +343,7 @@
 			// label13
 			// 
 			this.label13.AutoSize = true;
-			this.label13.Location = new System.Drawing.Point(239, 232);
+			this.label13.Location = new System.Drawing.Point(201, 258);
 			this.label13.Name = "label13";
 			this.label13.Size = new System.Drawing.Size(37, 13);
 			this.label13.TabIndex = 30;
@@ -338,7 +352,7 @@
 			// nudPassByMag1
 			// 
 			this.nudPassByMag1.DecimalPlaces = 2;
-			this.nudPassByMag1.Location = new System.Drawing.Point(282, 228);
+			this.nudPassByMag1.Location = new System.Drawing.Point(242, 254);
 			this.nudPassByMag1.Maximum = new decimal(new int[] {
             15,
             0,
@@ -361,7 +375,7 @@
 			// label12
 			// 
 			this.label12.AutoSize = true;
-			this.label12.Location = new System.Drawing.Point(327, 206);
+			this.label12.Location = new System.Drawing.Point(376, 206);
 			this.label12.Name = "label12";
 			this.label12.Size = new System.Drawing.Size(20, 13);
 			this.label12.TabIndex = 28;
@@ -370,16 +384,16 @@
 			// label11
 			// 
 			this.label11.AutoSize = true;
-			this.label11.Location = new System.Drawing.Point(216, 205);
+			this.label11.Location = new System.Drawing.Point(177, 206);
 			this.label11.Name = "label11";
-			this.label11.Size = new System.Drawing.Size(62, 13);
+			this.label11.Size = new System.Drawing.Size(49, 13);
 			this.label11.TabIndex = 27;
-			this.label11.Text = "Closest Dist";
+			this.label11.Text = "Distance";
 			// 
 			// nudPassByDist
 			// 
 			this.nudPassByDist.DecimalPlaces = 1;
-			this.nudPassByDist.Location = new System.Drawing.Point(282, 202);
+			this.nudPassByDist.Location = new System.Drawing.Point(331, 202);
 			this.nudPassByDist.Maximum = new decimal(new int[] {
             30,
             0,
@@ -401,9 +415,9 @@
 			this.cbClosePassBySim.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.cbClosePassBySim.Location = new System.Drawing.Point(180, 174);
 			this.cbClosePassBySim.Name = "cbClosePassBySim";
-			this.cbClosePassBySim.Size = new System.Drawing.Size(143, 17);
+			this.cbClosePassBySim.Size = new System.Drawing.Size(203, 17);
 			this.cbClosePassBySim.TabIndex = 25;
-			this.cbClosePassBySim.Text = "Close Pass-by Simulation";
+			this.cbClosePassBySim.Text = "Close Pass-By/Occultation Simulation";
 			this.cbClosePassBySim.UseVisualStyleBackColor = true;
 			// 
 			// label10
@@ -777,6 +791,84 @@
 			this.saveFileDialog.DefaultExt = "avi";
 			this.saveFileDialog.Filter = "AVI Files (*.avi)|*.avi";
 			// 
+			// label16
+			// 
+			this.label16.AutoSize = true;
+			this.label16.Location = new System.Drawing.Point(301, 206);
+			this.label16.Name = "label16";
+			this.label16.Size = new System.Drawing.Size(24, 13);
+			this.label16.TabIndex = 45;
+			this.label16.Text = "Min";
+			// 
+			// label21
+			// 
+			this.label21.AutoSize = true;
+			this.label21.Location = new System.Drawing.Point(225, 206);
+			this.label21.Name = "label21";
+			this.label21.Size = new System.Drawing.Size(27, 13);
+			this.label21.TabIndex = 47;
+			this.label21.Text = "Max";
+			// 
+			// nudMaxDist
+			// 
+			this.nudMaxDist.DecimalPlaces = 1;
+			this.nudMaxDist.Location = new System.Drawing.Point(255, 202);
+			this.nudMaxDist.Maximum = new decimal(new int[] {
+            30,
+            0,
+            0,
+            0});
+			this.nudMaxDist.Minimum = new decimal(new int[] {
+            3,
+            0,
+            0,
+            0});
+			this.nudMaxDist.Name = "nudMaxDist";
+			this.nudMaxDist.Size = new System.Drawing.Size(41, 20);
+			this.nudMaxDist.TabIndex = 46;
+			this.nudMaxDist.Value = new decimal(new int[] {
+            45,
+            0,
+            0,
+            65536});
+			// 
+			// cbOccultationSimulation
+			// 
+			this.cbOccultationSimulation.AutoSize = true;
+			this.cbOccultationSimulation.Location = new System.Drawing.Point(203, 231);
+			this.cbOccultationSimulation.Name = "cbOccultationSimulation";
+			this.cbOccultationSimulation.Size = new System.Drawing.Size(95, 17);
+			this.cbOccultationSimulation.TabIndex = 48;
+			this.cbOccultationSimulation.Text = "Occultation for";
+			this.cbOccultationSimulation.UseVisualStyleBackColor = true;
+			this.cbOccultationSimulation.CheckedChanged += new System.EventHandler(this.cbOccultationSimulation_CheckedChanged);
+			// 
+			// label22
+			// 
+			this.label22.AutoSize = true;
+			this.label22.Location = new System.Drawing.Point(345, 233);
+			this.label22.Name = "label22";
+			this.label22.Size = new System.Drawing.Size(38, 13);
+			this.label22.TabIndex = 50;
+			this.label22.Text = "frames";
+			// 
+			// nudNumOccFrames
+			// 
+			this.nudNumOccFrames.Location = new System.Drawing.Point(300, 229);
+			this.nudNumOccFrames.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+			this.nudNumOccFrames.Name = "nudNumOccFrames";
+			this.nudNumOccFrames.Size = new System.Drawing.Size(41, 20);
+			this.nudNumOccFrames.TabIndex = 49;
+			this.nudNumOccFrames.Value = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+			// 
 			// frmGenerateVideoModel
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -811,6 +903,8 @@
 			((System.ComponentModel.ISupportInitialize)(this.nudNoiseStdDev)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudNoiseMean)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudTotalFrames)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudMaxDist)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudNumOccFrames)).EndInit();
 			this.ResumeLayout(false);
 
 		}
@@ -864,5 +958,11 @@
 		private System.Windows.Forms.Label label17;
 		private System.Windows.Forms.NumericUpDown nudPolyFreq;
 		private System.Windows.Forms.Button btnConfigureBackground;
+		private System.Windows.Forms.Label label22;
+		private System.Windows.Forms.NumericUpDown nudNumOccFrames;
+		private System.Windows.Forms.CheckBox cbOccultationSimulation;
+		private System.Windows.Forms.Label label21;
+		private System.Windows.Forms.NumericUpDown nudMaxDist;
+		private System.Windows.Forms.Label label16;
 	}
 }
