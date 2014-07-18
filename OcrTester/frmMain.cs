@@ -211,5 +211,12 @@ namespace OcrTester
             var frm = new frmRunTestCases();
             frm.ShowDialog(this);
         }
+		
+		private void btnReconstruct_Click(object sender, EventArgs e)
+		{
+			string folder = Path.GetFullPath(tbxInputFolder.Text);
+			if (Directory.Exists(folder))
+				TestCaseHelper.RebuildImageSequence(folder);
+		}
 	}
 }

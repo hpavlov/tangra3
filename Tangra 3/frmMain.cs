@@ -940,7 +940,8 @@ namespace Tangra
 	        frm.tbxFolderPath.Text = TangraConfig.Settings.LastUsed.FitsSeqenceLastFolderLocation;
 			if (frm.ShowDialog(this) == DialogResult.OK)
             {
-                if (m_VideoController.OpenFitsFileSequence(frm.tbxFolderPath.Text))
+                if (m_VideoController.OpenFitsFileSequence(frm.tbxFolderPath.Text) ||
+					(Control.ModifierKeys == Keys.Control && m_VideoController.OpenBitmapFileSequence(frm.tbxFolderPath.Text)))
                 {
 					TangraConfig.Settings.LastUsed.FitsSeqenceLastFolderLocation = frm.tbxFolderPath.Text;
 

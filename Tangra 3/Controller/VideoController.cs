@@ -161,7 +161,7 @@ namespace Tangra.Controller
 				() => new SingleBitmapFileFrameStream(lcFile));
 		}
 
-        public bool OpenFitsFileSequence(string folderName)
+		public bool OpenFitsFileSequence(string folderName)
         {
             string[] fitsFiles = Directory.GetFiles(folderName, "*.fit*", SearchOption.TopDirectoryOnly);
             if (fitsFiles.Length == 0)
@@ -179,6 +179,25 @@ namespace Tangra.Controller
                     });
             }
         }
+
+		public bool OpenBitmapFileSequence(string folderName)
+		{
+			string[] fitsFiles = Directory.GetFiles(folderName, "*.bmp", SearchOption.TopDirectoryOnly);
+			if (fitsFiles.Length == 0)
+			{
+				ShowMessageBox("No BMP files found inside " + folderName, "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return false;
+			}
+			else
+			{
+				return OpenVideoFileInternal(
+					folderName,
+					() =>
+					{
+						return BMPFileSequenceStream.OpenFolder(fitsFiles);
+					});
+			}
+		}
 
 	    public bool OpenVideoFile(string fileName)
 	    {
