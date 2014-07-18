@@ -97,6 +97,7 @@
 			this.openAdvFileDialog = new System.Windows.Forms.OpenFileDialog();
 			this.saveFrameDialog = new System.Windows.Forms.SaveFileDialog();
 			this.timerCommandArgs = new System.Windows.Forms.Timer(this.components);
+			this.tsmiDynamic = new System.Windows.Forms.ToolStripMenuItem();
 			this.mainMenu.SuspendLayout();
 			this.statusStrip.SuspendLayout();
 			this.panelRight.SuspendLayout();
@@ -521,6 +522,7 @@
             this.miJupiterGlow,
             this.tsmiHueIntensity,
             this.toolStripSeparator3,
+            this.tsmiDynamic,
             this.tsmiHigh,
             this.tsmiLo,
             this.tsmiOff});
@@ -534,7 +536,7 @@
 			// 
 			this.tsmiInverted.CheckOnClick = true;
 			this.tsmiInverted.Name = "tsmiInverted";
-			this.tsmiInverted.Size = new System.Drawing.Size(168, 22);
+			this.tsmiInverted.Size = new System.Drawing.Size(202, 22);
 			this.tsmiInverted.Text = "Inverted";
 			this.tsmiInverted.Click += new System.EventHandler(this.DisplayInvertedClicked);
 			// 
@@ -542,7 +544,7 @@
 			// 
 			this.miJupiterGlow.CheckOnClick = true;
 			this.miJupiterGlow.Name = "miJupiterGlow";
-			this.miJupiterGlow.Size = new System.Drawing.Size(168, 22);
+			this.miJupiterGlow.Size = new System.Drawing.Size(202, 22);
 			this.miJupiterGlow.Text = "Background Glow";
 			this.miJupiterGlow.Click += new System.EventHandler(this.miJupiterGlow_Click);
 			// 
@@ -550,26 +552,26 @@
 			// 
 			this.tsmiHueIntensity.CheckOnClick = true;
 			this.tsmiHueIntensity.Name = "tsmiHueIntensity";
-			this.tsmiHueIntensity.Size = new System.Drawing.Size(168, 22);
+			this.tsmiHueIntensity.Size = new System.Drawing.Size(202, 22);
 			this.tsmiHueIntensity.Text = "Hue Intensity";
 			this.tsmiHueIntensity.Click += new System.EventHandler(this.tsmiHueIntensity_Click);
 			// 
 			// toolStripSeparator3
 			// 
 			this.toolStripSeparator3.Name = "toolStripSeparator3";
-			this.toolStripSeparator3.Size = new System.Drawing.Size(165, 6);
+			this.toolStripSeparator3.Size = new System.Drawing.Size(199, 6);
 			// 
 			// tsmiHigh
 			// 
 			this.tsmiHigh.Name = "tsmiHigh";
-			this.tsmiHigh.Size = new System.Drawing.Size(168, 22);
+			this.tsmiHigh.Size = new System.Drawing.Size(202, 22);
 			this.tsmiHigh.Text = "Gamma: High";
 			this.tsmiHigh.Click += new System.EventHandler(this.DisplayIntensifyModeClicked);
 			// 
 			// tsmiLo
 			// 
 			this.tsmiLo.Name = "tsmiLo";
-			this.tsmiLo.Size = new System.Drawing.Size(168, 22);
+			this.tsmiLo.Size = new System.Drawing.Size(202, 22);
 			this.tsmiLo.Text = "Gamma: Lo";
 			this.tsmiLo.Click += new System.EventHandler(this.DisplayIntensifyModeClicked);
 			// 
@@ -578,7 +580,7 @@
 			this.tsmiOff.Checked = true;
 			this.tsmiOff.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.tsmiOff.Name = "tsmiOff";
-			this.tsmiOff.Size = new System.Drawing.Size(168, 22);
+			this.tsmiOff.Size = new System.Drawing.Size(202, 22);
 			this.tsmiOff.Text = "Gamma: Off";
 			this.tsmiOff.Click += new System.EventHandler(this.DisplayIntensifyModeClicked);
 			// 
@@ -823,6 +825,13 @@
 			// 
 			this.timerCommandArgs.Tick += new System.EventHandler(this.timerCommandArgs_Tick);
 			// 
+			// tsmiDynamic
+			// 
+			this.tsmiDynamic.Name = "tsmiDynamic";
+			this.tsmiDynamic.Size = new System.Drawing.Size(202, 22);
+			this.tsmiDynamic.Text = "Custom Dynamic Range";
+			this.tsmiDynamic.Click += new System.EventHandler(this.DisplayIntensifyModeClicked);
+			// 
 			// frmMain
 			// 
 			this.AllowDrop = true;
@@ -941,6 +950,7 @@
 		private System.Windows.Forms.ToolStripMenuItem miVideoModelling;
 		protected internal System.Windows.Forms.ToolStripMenuItem miFileInfo;
 		private System.Windows.Forms.ToolStripMenuItem miOpenFitsSequence;
+		protected internal System.Windows.Forms.ToolStripMenuItem tsmiDynamic;
 	}
 }
 

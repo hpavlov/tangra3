@@ -73,7 +73,7 @@ namespace Tangra.Video
 
 		public uint GetAav16NormVal()
 		{
-			return 1;
+			return 0;
 		}
 
 		public int FirstFrame

@@ -321,7 +321,7 @@ namespace Tangra
                 g.Save();
             }
 
-			m_VideoController.ApplyDisplayModeAdjustments(m_VideoContext.Pixelmap.DisplayBitmap, true);	
+			m_VideoController.ApplyDisplayModeAdjustments(m_VideoContext.Pixelmap.DisplayBitmap, true, m_VideoContext.Pixelmap);	
 		}
 
 		#endregion
@@ -777,14 +777,25 @@ namespace Tangra
 				tsmiOff.Checked = false;
 				tsmiLo.Checked = false;
 				tsmiHigh.Checked = false;
+				tsmiDynamic.Checked = false;
 
 				currItem.Checked = true;
 
-				DisplayIntensifyMode newMode = tsmiOff.Checked
-												   ? DisplayIntensifyMode.Off
-												   : (tsmiHigh.Checked ? DisplayIntensifyMode.Hi : DisplayIntensifyMode.Lo);
+				DisplayIntensifyMode newMode = DisplayIntensifyMode.Off;
+				if (tsmiHigh.Checked)
+					newMode = DisplayIntensifyMode.Hi;
+				else if (tsmiLo.Checked)
+					newMode = DisplayIntensifyMode.Lo;
+				else if (tsmiDynamic.Checked)
+					newMode = DisplayIntensifyMode.Dynamic;
 
-				m_VideoController.SetDisplayIntensifyMode(newMode);				
+				m_VideoController.SetDisplayIntensifyMode(newMode, null, null);
+			}
+
+			if (tsmiDynamic.Checked)
+			{
+				var frm = new frmDefineDisplayDynamicRange(m_VideoController);
+				frm.ShowDialog(this);
 			}
 		}
 

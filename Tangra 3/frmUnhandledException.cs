@@ -10,6 +10,7 @@ using System.ServiceModel;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using Tangra.Model.Config;
 using Tangra.Model.Context;
 using Tangra.TangraService;
 using System.Diagnostics;
@@ -27,6 +28,7 @@ namespace Tangra
             InitializeComponent();
 
             m_Error = error;
+	        tbxEmailAddress.Text = TangraConfig.Settings.LastUsed.EmailAddressForErrorReporting;
         }
 
         internal static void HandleException(object sender, Exception error)
@@ -117,6 +119,10 @@ namespace Tangra
                 var address = new EndpointAddress("http://www.tangra-observatory.org/TangraErrors/ErrorReports.asmx");
                 var client = new TangraService.ServiceSoapClient(binding, address);
                 client.ReportError(errorReport);
+	            
+				TangraConfig.Settings.LastUsed.EmailAddressForErrorReporting = tbxEmailAddress.Text;
+	            TangraConfig.Settings.Save();
+
                 if (MessageBox.Show(
                     "The error report was sent successfully. Press 'Retry' to try to continue or 'Cancel' to restart Tangra.", 
                     "Question", 

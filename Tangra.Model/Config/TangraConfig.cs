@@ -145,7 +145,8 @@ namespace Tangra.Model.Config
 	{
 		Off,
 		Lo,
-		Hi
+		Hi,
+		Dynamic
 	}
 	
 	[XmlRoot("Tangra3Config")]
@@ -575,6 +576,7 @@ namespace Tangra.Model.Config
 
             public List<SameSizeApertureConfig> SameSizeApertures = new List<SameSizeApertureConfig>();
 	        public string FitsSeqenceLastFolderLocation;
+	        public string EmailAddressForErrorReporting;
         }
 
         public class SameSizeApertureConfig

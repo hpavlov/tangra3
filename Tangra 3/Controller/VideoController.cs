@@ -76,6 +76,9 @@ namespace Tangra.Controller
 		private int m_HBMTarget3Y = 0;
 		private int m_HBMTarget4X = 0;
 		private int m_HBMTarget4Y = 0;
+	    private int m_DynamicFromValue = 0;
+		private int m_DynamicToValue = 0;
+		private uint m_DynamicMaxPixelValue = 0;
 
 		private List<Action<int, bool>> m_OnStoppedCallbacks = new List<Action<int, bool>>();
 
@@ -273,6 +276,16 @@ namespace Tangra.Controller
 
 				m_VideoFileView.UpdateVideoSizeAndLengthControls();
 
+				// Turn off the Dynamic Range (if active) when opening a new video 
+				if (m_DisplayIntensifyMode == DisplayIntensifyMode.Dynamic)
+				{
+					m_DisplayIntensifyMode = DisplayIntensifyMode.Off;
+					m_MainForm.tsmiDynamic.Checked = false;
+				}
+				m_DynamicFromValue = 0;
+				m_DynamicToValue = 0;
+				m_DynamicMaxPixelValue = 0;
+
 				m_FramePlayer.MoveToFrame(frameStream.FirstFrame);
 
 				m_VideoFileView.Update();
@@ -288,6 +301,7 @@ namespace Tangra.Controller
 					RegisterRecentFile(RecentFileType.Video, fileName);
 
 				m_ImageTool = ImageTool.SwitchTo<ArrowTool>(null, m_ImageToolView, m_ImageTool);
+
 
 				return true;
 			}
@@ -391,6 +405,27 @@ namespace Tangra.Controller
 	    {
 		    get { return m_FramePlayer.Video.GetAav16NormVal(); }
 	    }
+
+	    public uint EffectiveMaxPixelValue
+	    {
+		    get
+		    {
+			    if (m_FramePlayer.Video.BitPix == 16 && VideoAav16NormVal > 0)
+				    return VideoAav16NormVal;
+			    else
+				    return (uint)((1 << m_FramePlayer.Video.BitPix) - 1);
+		    }
+	    }
+
+	    public int DynamicFromValue
+	    {
+			get { return m_DynamicFromValue; }
+	    }
+
+		public int DynamicToValue
+		{
+			get { return m_DynamicToValue; }
+		}
 
 	    public string CurrentVideoFileName
 	    {
@@ -737,7 +772,7 @@ namespace Tangra.Controller
 
         public void UpdateZoomedImage(Bitmap zoomedBitmap, ImagePixel center)
         {
-            ApplyDisplayModeAdjustments(zoomedBitmap);
+			ApplyDisplayModeAdjustments(zoomedBitmap);
 
             m_ZoomedImageView.UpdateImage(zoomedBitmap);
 
@@ -854,7 +889,7 @@ namespace Tangra.Controller
 			{ }
 		}
 
-        public void ApplyDisplayModeAdjustments(Bitmap displayBitmap, bool enableBackgroundGlow = false)
+		public void ApplyDisplayModeAdjustments(Bitmap displayBitmap, bool enableBackgroundGlow = false, Pixelmap displayPixelmap = null)
         {
 			if (m_DisplayIntensifyMode != DisplayIntensifyMode.Off || m_DisplayInvertedMode || m_DisplayHueIntensityMode || m_DisplayHueBackgroundMode)
             {
@@ -864,6 +899,8 @@ namespace Tangra.Controller
 				{
 					BitmapFilter.ProcessHueBackgroundMode(displayBitmap, m_HBMTarget1X, m_HBMTarget1Y, m_HBMTarget2X, m_HBMTarget2Y, m_HBMTarget3X, m_HBMTarget3Y, m_HBMTarget4X, m_HBMTarget4Y);
 				}
+				else if (m_DisplayIntensifyMode == DisplayIntensifyMode.Dynamic && m_DynamicToValue - m_DynamicFromValue > 0 && displayPixelmap != null)
+					BitmapFilter.ApplyDynamicRange(displayBitmap, displayPixelmap, m_DynamicFromValue, m_DynamicToValue);
 				else if (m_DisplayIntensifyMode != DisplayIntensifyMode.Off)
 					BitmapFilter.ApplyGamma(displayBitmap, m_DisplayIntensifyMode == DisplayIntensifyMode.Hi, m_DisplayInvertedMode, m_DisplayHueIntensityMode);
                 else if (m_DisplayInvertedMode || m_DisplayHueIntensityMode)
@@ -872,12 +909,27 @@ namespace Tangra.Controller
         }
 
 
-		public void SetDisplayIntensifyMode(DisplayIntensifyMode newMode)
+		public void SetDisplayIntensifyMode(DisplayIntensifyMode newMode, int? dynamicFromValue, int?  dynamicToValue)
 		{
 			m_DisplayIntensifyMode = newMode;
+			if (dynamicFromValue.HasValue && dynamicToValue.HasValue)
+			{
+				m_DynamicFromValue = dynamicFromValue.Value;
+				m_DynamicToValue = dynamicToValue.Value;
+				m_DynamicMaxPixelValue = EffectiveMaxPixelValue;
+			}
+			else if (m_DynamicMaxPixelValue != EffectiveMaxPixelValue)
+			{
+				m_DynamicFromValue = 0;
+				m_DynamicToValue = (int)EffectiveMaxPixelValue;
+				m_DynamicMaxPixelValue = EffectiveMaxPixelValue;
+			}
 
-			TangraConfig.Settings.Generic.UseDisplayIntensifyMode = newMode;
-			TangraConfig.Settings.Save();
+			if (newMode != DisplayIntensifyMode.Dynamic)
+			{
+				TangraConfig.Settings.Generic.UseDisplayIntensifyMode = newMode;
+				TangraConfig.Settings.Save();
+			}
 
 			if (!m_FramePlayer.IsRunning &&
 				m_FramePlayer.Video != null)

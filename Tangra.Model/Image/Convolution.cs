@@ -709,6 +709,52 @@ namespace Tangra.Model.Image
             }
         }
 
+		public static void ApplyDynamicRange(Bitmap bitmap, Pixelmap pixelmap, int fromValue, int toValue)
+		{
+			int width = bitmap.Width;
+			int height = bitmap.Height;
+
+			BitmapData bmData = bitmap.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+
+			try
+			{
+				int stride = bmData.Stride;
+				uint maxPixelValue = Pixelmap.GetMaxValueForBitPix(pixelmap.BitPixCamera);
+				unsafe
+				{
+					byte* p = (byte*)(void*)bmData.Scan0;
+
+					int nOffset = stride - bmData.Width * 3;
+
+					int range = Math.Max(16, toValue - fromValue);
+
+					for (int y = 0; y < bmData.Height; ++y)
+					{
+						for (int x = 0; x < bmData.Width; ++x)
+						{
+							uint pixelVal = pixelmap[x, y];
+							uint dynamicVal = (uint)(255 * (Math.Max(pixelVal, fromValue) - fromValue) / range);
+							byte btModified = (byte) (Math.Max(0, Math.Min(255, dynamicVal)));
+							byte btExpected = (byte)(Math.Max(0, Math.Min(255, 255.0 * pixelVal / maxPixelValue)));
+							if (Math.Abs(p[0] - btExpected) <= 1)
+							{
+								p[0] = btModified;
+								p[1] = btModified;
+								p[2] = btModified;
+							}
+
+							p += 3;
+						}
+						p += nOffset;
+					}
+				}
+			}
+			finally
+			{
+				bitmap.UnlockBits(bmData);
+			}
+		}
+
 		public static void ApplyGamma(Bitmap bitmap, bool hiGamma, bool invertAfterGamma, bool hueIntensity)
 		{
 			int width = bitmap.Width;
