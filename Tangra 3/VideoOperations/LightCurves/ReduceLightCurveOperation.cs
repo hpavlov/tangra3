@@ -794,7 +794,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 	        if (m_Configuring)
 				// Don't overwrite the configuration image
-		        return false;
+                return true;
 
 			if (m_ViewingLightCurve)
 			{

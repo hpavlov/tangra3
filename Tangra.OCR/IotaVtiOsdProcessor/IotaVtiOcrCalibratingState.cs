@@ -418,7 +418,7 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 							prevMatchLocation = i;
 						}
 
-						Trace.WriteLine(string.Format("IOTA-VTI OCR: Recognized '{0}' at position {1} with score {2}.", ch, i, rating));
+						//Trace.WriteLine(string.Format("IOTA-VTI OCR: Recognized '{0}' at position {1} with score {2}.", ch, i, rating));
 					}
 					else
 					{
@@ -729,18 +729,20 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 				int totalMillisecondsThis = (allTimeStamps[i].Hours * 3600 + allTimeStamps[i].Minutes * 60 + allTimeStamps[i].Seconds) * 10000 + allTimeStamps[i].Milliseconds10;
 				int totalMillisecondsNext = (allTimeStamps[i + 1].Hours * 3600 + allTimeStamps[i + 1].Minutes * 60 + allTimeStamps[i + 1].Seconds) * 10000 + allTimeStamps[i + 1].Milliseconds10;
 
-				fieldDurationMS = Math.Abs((totalMillisecondsNext - totalMillisecondsThis) / 10f);
+				fieldDurationMS = (totalMillisecondsNext - totalMillisecondsThis) / 10f;
 
-				if (Math.Abs(fieldDurationMS - IotaVtiOcrProcessor.FIELD_DURATION_PAL) > 0.15 && Math.Abs(fieldDurationMS - IotaVtiOcrProcessor.FIELD_DURATION_NTSC) > 0.15)
+				if (Math.Abs(Math.Abs(fieldDurationMS) - IotaVtiOcrProcessor.FIELD_DURATION_PAL) > 0.15 && Math.Abs(Math.Abs(fieldDurationMS) - IotaVtiOcrProcessor.FIELD_DURATION_NTSC) > 0.15)
 					return false;
 			}
 
-			if (Math.Abs(fieldDurationMS - IotaVtiOcrProcessor.FIELD_DURATION_PAL) < 0.15)
+			if (Math.Abs(Math.Abs(fieldDurationMS) - IotaVtiOcrProcessor.FIELD_DURATION_PAL) < 0.15)
 				stateManager.VideoFormat = VideoFormat.PAL;
-			else if (Math.Abs(fieldDurationMS - IotaVtiOcrProcessor.FIELD_DURATION_NTSC) < 0.15)
+			else if (Math.Abs(Math.Abs(fieldDurationMS) - IotaVtiOcrProcessor.FIELD_DURATION_NTSC) < 0.15)
 				stateManager.VideoFormat = VideoFormat.NTSC;
 			else
 				stateManager.VideoFormat = null;
+
+		    stateManager.EvenBeforeOdd = fieldDurationMS > 0;
 
 			return true;
 		}

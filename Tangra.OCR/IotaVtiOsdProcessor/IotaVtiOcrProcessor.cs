@@ -158,6 +158,8 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 
 		public bool SwapFieldsOrder { get; set; }
 
+        public bool EvenBeforeOdd { get; set; }
+
 		public VideoFormat? VideoFormat { get; set; }
 
 		public void LearnDigitPattern(uint[] pattern, int digit)

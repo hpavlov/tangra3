@@ -962,12 +962,24 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 
 		private void btnAdd_Click(object sender, EventArgs e)
 		{
-			if (rbTwoObjects.Checked)
-				CopyDoubleObjectsToAdd();
-			else
-				CopyObjectToAdd();
+		    if (rbTwoObjects.Checked)
+		    {
+		        if (MessageBox.Show(this,
+		                            "Double PSF-Fitting only works if the two objects do not merge and do not get too close to each other. Are the two objects going to get closer than 1 FHWM in this video?",
+		                            "Warning",
+		                            MessageBoxButtons.YesNo,
+		                            MessageBoxIcon.Warning,
+		                            MessageBoxDefaultButton.Button1) == DialogResult.Yes)
+		        {
+		            MessageBox.Show(this, "It is recommended in this case to use one single aperture around both obejcts.", "Tangra3", MessageBoxButtons.OK, MessageBoxIcon.Information);
+		            return;
+		        }
+		        CopyDoubleObjectsToAdd();
+		    }
+		    else
+		        CopyObjectToAdd();
 
-			DialogResult = DialogResult.OK;
+		    DialogResult = DialogResult.OK;
 			Close();
 		}
 

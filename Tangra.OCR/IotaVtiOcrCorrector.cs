@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Tangra.Model.Config;
@@ -32,51 +33,72 @@ namespace Tangra.OCR
 			m_VideoFormat = videoFormat.Value;
 		}
 
-		public bool TryToCorrect(int frameNo, IotaVtiTimeStamp oddFieldOSD, IotaVtiTimeStamp evenFieldOSD, ref DateTime oddFieldTimestamp, ref DateTime evenFieldTimestamp)
+		public bool TryToCorrect(int frameNo, IotaVtiTimeStamp oddFieldOSD, IotaVtiTimeStamp evenFieldOSD, bool evenBeforeOdd, ref DateTime oddFieldTimestamp, ref DateTime evenFieldTimestamp)
 		{
 			if (m_PrevFrameNo == -1 || m_PrevOddTicks == -1 || m_PrevEvenTicks == -1)
 				return false;
 
+            string correctionDebugInfo = string.Format("IOTA-VTI Correction Attempt for Frame {0}. {1:D2}:{2:D2}:{3:D2}.{4:D4} ({5}) - {6:D2}:{7:D2}:{8:D2}.{9:D4} ({10})", 
+                    frameNo, 
+                    oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds, oddFieldOSD.Milliseconds10, oddFieldOSD.FrameNumber,
+                    evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds, evenFieldOSD.Milliseconds10, evenFieldOSD.FrameNumber);
+
 			double fieldDuration;
 
-			if (m_PrevEvenTicks > m_PrevOddTicks)
+			if (!evenBeforeOdd)
 			{
 				fieldDuration = Math.Abs(new TimeSpan(oddFieldTimestamp.Ticks - m_PrevEvenTicks).TotalMilliseconds);
 				
 				if (!IsFieldDurationOkay(fieldDuration))
 				{
-					if (!TryCorrectTimestamp(m_PrevEvenTicks, oddFieldTimestamp, oddFieldOSD))
-						return false;
+				    if (!TryCorrectTimestamp(m_PrevEvenTicks, oddFieldTimestamp, oddFieldOSD))
+				    {
+				        Trace.WriteLine(correctionDebugInfo);
+                        Trace.WriteLine("IOTA-VTI Correction Failed: Cannot correct field duration PrevEven -> CurrOdd.");
+				        return false;
+				    }
 				}
 
 				fieldDuration = Math.Abs(new TimeSpan(oddFieldTimestamp.Ticks - evenFieldTimestamp.Ticks).TotalMilliseconds);
 
 				if (!IsFieldDurationOkay(fieldDuration))
 				{
-					if (!TryCorrectTimestamp(oddFieldTimestamp.Ticks, evenFieldTimestamp, evenFieldOSD))
-						return false;
+				    if (!TryCorrectTimestamp(oddFieldTimestamp.Ticks, evenFieldTimestamp, evenFieldOSD))
+				    {
+                        Trace.WriteLine(correctionDebugInfo);
+                        Trace.WriteLine("IOTA-VTI Correction Failed: Cannot correct field duration CurrOdd -> CurrEven.");
+				        return false;
+				    }
 				}
 			}
-			else if (m_PrevEvenTicks < m_PrevOddTicks)
+			else
 			{
 				fieldDuration = Math.Abs(new TimeSpan(evenFieldTimestamp.Ticks - m_PrevOddTicks).TotalMilliseconds);
 
 				if (!IsFieldDurationOkay(fieldDuration))
 				{
-					if (!TryCorrectTimestamp(m_PrevOddTicks, evenFieldTimestamp, evenFieldOSD))
-						return false;
+				    if (!TryCorrectTimestamp(m_PrevOddTicks, evenFieldTimestamp, evenFieldOSD))
+				    {
+                        Trace.WriteLine(correctionDebugInfo);
+                        Trace.WriteLine("IOTA-VTI Correction Failed: Cannot correct field duration PrevOdd -> CurrEven.");
+				        return false;
+				    }
 				}
 
 				fieldDuration = Math.Abs(new TimeSpan(evenFieldTimestamp.Ticks - oddFieldTimestamp.Ticks).TotalMilliseconds);
 
 				if (!IsFieldDurationOkay(fieldDuration))
 				{
-					if (!TryCorrectTimestamp(evenFieldTimestamp.Ticks, oddFieldTimestamp, oddFieldOSD))
-						return false;
+				    if (!TryCorrectTimestamp(evenFieldTimestamp.Ticks, oddFieldTimestamp, oddFieldOSD))
+				    {
+                        Trace.WriteLine(correctionDebugInfo);
+                        Trace.WriteLine("IOTA-VTI Correction Failed: Cannot correct field duration CurrEven -> CurrOdd.");
+				        return false;
+				    }
 				}
 			}
 
-			if (m_PrevOddFieldNo < m_PrevEvenFieldNo)
+            if (!evenBeforeOdd)
 			{
 				if (m_PrevEvenFieldNo + 1 != oddFieldOSD.FrameNumber)
 				{
@@ -88,7 +110,7 @@ namespace Tangra.OCR
 					// We don't correct Field numbers as they are not used anywhere for now, we just ignore them as no errors
 				}
 			}
-			else if (m_PrevOddFieldNo > m_PrevEvenFieldNo)
+			else
 			{
 				if (m_PrevEvenFieldNo + 1 != oddFieldOSD.FrameNumber)
 				{
@@ -117,10 +139,31 @@ namespace Tangra.OCR
 			//       unactioned, it doesn't create any timing or measurement issues
 			DateTime expectedDateTime = new DateTime(expectedTimestamp);
 			string expectedTimestampString = expectedDateTime.ToString("HH:mm:ss.fff");
+            string expectedTimestampStringM1 = expectedDateTime.AddMilliseconds(-1).ToString("HH:mm:ss.fff");
+            string expectedTimestampStringP1 = expectedDateTime.AddMilliseconds(1).ToString("HH:mm:ss.fff");
 			string actualTimestampString = fieldToCorrectTimestamp.ToString("HH:mm:ss.fff");
 
 			string difference = XorStrings(expectedTimestampString, actualTimestampString);
 			long numberDifferences = difference.ToCharArray().Count(c => c != '\0');
+            string differenceM1 = XorStrings(expectedTimestampStringM1, actualTimestampString);
+            long numberDifferencesM1 = differenceM1.ToCharArray().Count(c => c != '\0');
+            string differenceP1 = XorStrings(expectedTimestampStringP1, actualTimestampString);
+            long numberDifferencesP1 = differenceP1.ToCharArray().Count(c => c != '\0');
+
+            if (numberDifferences < numberDifferencesM1 && numberDifferences < numberDifferencesP1)
+            {
+                // Already correct
+            }
+            else if (numberDifferencesM1 < numberDifferences && numberDifferencesM1 < numberDifferencesP1)
+            {
+                numberDifferences = numberDifferencesM1;
+                expectedDateTime = expectedDateTime.AddMilliseconds(-1);
+            }
+            else if (numberDifferencesP1 < numberDifferences && numberDifferencesP1 < numberDifferencesM1)
+            {
+                numberDifferences = numberDifferencesP1;
+                expectedDateTime = expectedDateTime.AddMilliseconds(1);
+            }
 
 			if (numberDifferences <= TangraConfig.Settings.Generic.OcrMaxNumberErrorsToAutoCorrect)
 			{
@@ -155,7 +198,7 @@ namespace Tangra.OCR
 			else
 				len = a.Length - 1;
 
-			for (int i = 0; i < len; i++)
+			for (int i = 0; i <= len; i++)
 			{
 				result[i] = (char)(charAArray[i] ^ charBArray[i]);
 			}
