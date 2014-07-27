@@ -46,7 +46,7 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
 
 	    private AstroImage m_CurrentAstroImage;
 
-        private uint[,] m_SummedBitmap;
+        private ulong[,] m_SummedBitmap;
 
 	    public MakeDarkFlatOperation()
 	    { }
@@ -96,7 +96,7 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
                 {
 					Pixelmap currPixelmap = astroImage.Pixelmap;
                     if (m_FramesDone == 0)
-                        m_SummedBitmap = new uint[currPixelmap.Width, currPixelmap.Height];
+                        m_SummedBitmap = new ulong[currPixelmap.Width, currPixelmap.Height];
 
                     for (int x = 0; x < currPixelmap.Width; x++)
                         for (int y = 0; y < currPixelmap.Height; y++)
@@ -143,6 +143,13 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
 						}
 						else
 						{
+							// Averaging
+							for (int x = 0; x < currPixelmap.Width; x++)
+							for (int y = 0; y < currPixelmap.Height; y++)
+							{
+								m_SummedBitmap[x, y] = (m_SummedBitmap[x, y] / (ulong)m_FramesDone);
+							}
+
 							m_ControlPanel.SetStopped();
 
 							string fileName = string.Format(
@@ -191,7 +198,7 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
             }
         }
 
-		private short[][] SaveImageData(uint[,] data)
+		private short[][] SaveImageData(ulong[,] data)
 		{
             short[][] bimg = new short[m_CurrentAstroImage.Height][];
 
@@ -201,7 +208,7 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
 
 				for (int x = 0; x < m_CurrentAstroImage.Width; x++)
 				{
-                    bimg[y][x] = (short)data[x, y];
+                    bimg[y][x] = (short)Math.Min(ushort.MaxValue, Math.Max(0, data[x, y]));
 				}
 			}
 
