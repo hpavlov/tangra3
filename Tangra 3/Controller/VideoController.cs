@@ -919,7 +919,7 @@ namespace Tangra.Controller
 					BitmapFilter.ProcessHueBackgroundMode(displayBitmap, m_HBMTarget1X, m_HBMTarget1Y, m_HBMTarget2X, m_HBMTarget2Y, m_HBMTarget3X, m_HBMTarget3Y, m_HBMTarget4X, m_HBMTarget4Y);
 				}
 				else if (m_DisplayIntensifyMode == DisplayIntensifyMode.Dynamic && m_DynamicToValue - m_DynamicFromValue > 0 && displayPixelmap != null)
-					BitmapFilter.ApplyDynamicRange(displayBitmap, displayPixelmap, m_DynamicFromValue, m_DynamicToValue);
+                    BitmapFilter.ApplyDynamicRange(displayBitmap, displayPixelmap, m_DynamicFromValue, m_DynamicToValue, m_DisplayInvertedMode, m_DisplayHueIntensityMode);
 				else if (m_DisplayIntensifyMode != DisplayIntensifyMode.Off)
 					BitmapFilter.ApplyGamma(displayBitmap, m_DisplayIntensifyMode == DisplayIntensifyMode.Hi, m_DisplayInvertedMode, m_DisplayHueIntensityMode);
                 else if (m_DisplayInvertedMode || m_DisplayHueIntensityMode)
@@ -1008,6 +1008,10 @@ namespace Tangra.Controller
 				m_DisplayInvertedMode = false;
 				m_MainForm.tsmiInverted.Checked = false;
 				m_DisplayIntensifyMode = DisplayIntensifyMode.Off;
+                m_MainForm.tsmiOff.Checked = true;
+                m_MainForm.tsmiLo.Checked = false;
+                m_MainForm.tsmiHigh.Checked = false;
+                m_MainForm.tsmiDynamic.Checked = false;
 
 				TangraConfig.Settings.Generic.UseHueIntensityDisplayMode = false;
 				TangraConfig.Settings.Generic.UseInvertedDisplayMode = false;

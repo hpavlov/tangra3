@@ -709,7 +709,7 @@ namespace Tangra.Model.Image
             }
         }
 
-		public static void ApplyDynamicRange(Bitmap bitmap, Pixelmap pixelmap, int fromValue, int toValue)
+        public static void ApplyDynamicRange(Bitmap bitmap, Pixelmap pixelmap, int fromValue, int toValue, bool invert, bool hueIntensity)
 		{
 			int width = bitmap.Width;
 			int height = bitmap.Height;
@@ -720,13 +720,48 @@ namespace Tangra.Model.Image
 			{
 				int stride = bmData.Stride;
 				uint maxPixelValue = Pixelmap.GetMaxValueForBitPix(pixelmap.BitPixCamera);
+
+                byte minVal = 255;
+                double sum = 0;
+                int sumCount = 0;
+                if (hueIntensity)
+                {
+                    unsafe
+                    {
+                        byte* p = (byte*)(void*)bmData.Scan0;
+
+                        int nOffset = stride - bmData.Width * 3;
+
+                        for (int y = 0; y < bmData.Height; ++y)
+                        {
+                            for (int x = 0; x < bmData.Width; ++x)
+                            {
+                                if (p[0] < minVal)
+                                    minVal = p[0];
+
+                                sum += p[0];
+                                sumCount++;
+
+                                p += 3;
+                            }
+                            p += nOffset;
+                        }
+                    }
+
+                    minVal = (byte)(sum / sumCount);
+                }
+                else
+                    minVal = 0;
+
+                int range = Math.Max(16, toValue - fromValue);
+
+                byte dynamicminVal = (byte)(Math.Max(0, Math.Min(255, (uint)(255 * (Math.Max(minVal, fromValue) - fromValue) / range))));
+
 				unsafe
 				{
 					byte* p = (byte*)(void*)bmData.Scan0;
 
 					int nOffset = stride - bmData.Width * 3;
-
-					int range = Math.Max(16, toValue - fromValue);
 
 					for (int y = 0; y < bmData.Height; ++y)
 					{
@@ -736,11 +771,35 @@ namespace Tangra.Model.Image
 							uint dynamicVal = (uint)(255 * (Math.Max(pixelVal, fromValue) - fromValue) / range);
 							byte btModified = (byte) (Math.Max(0, Math.Min(255, dynamicVal)));
 							byte btExpected = (byte)(Math.Max(0, Math.Min(255, 255.0 * pixelVal / maxPixelValue)));
+
 							if (Math.Abs(p[0] - btExpected) <= 1)
 							{
 								p[0] = btModified;
 								p[1] = btModified;
 								p[2] = btModified;
+
+                                if (invert)
+                                {
+                                    p[0] = (byte)(Math.Min(255, 255 - p[0]));
+                                    p[1] = (byte)(Math.Min(255, 255 - p[1]));
+                                    p[2] = (byte)(Math.Min(255, 255 - p[2]));
+                                }
+
+                                if (hueIntensity)
+                                {
+                                    if (invert)
+                                    {
+                                        p[2] = HUE_INTENCITY_RED[Math.Min(255, p[2] + dynamicminVal)];
+                                        p[1] = HUE_INTENCITY_GREEN[Math.Min(255, p[1] + dynamicminVal)];
+                                        p[0] = HUE_INTENCITY_BLUE[Math.Min(255, p[0] + dynamicminVal)];
+                                    }
+                                    else
+                                    {
+                                        p[2] = HUE_INTENCITY_RED[Math.Max(0, p[2] - dynamicminVal)];
+                                        p[1] = HUE_INTENCITY_GREEN[Math.Max(0, p[1] - dynamicminVal)];
+                                        p[0] = HUE_INTENCITY_BLUE[Math.Max(0, p[0] - dynamicminVal)];
+                                    }
+                                }
 							}
 
 							p += 3;
