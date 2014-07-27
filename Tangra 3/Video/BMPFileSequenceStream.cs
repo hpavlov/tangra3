@@ -10,8 +10,10 @@ using Tangra.Model.Video;
 
 namespace Tangra.Video
 {
-	internal class BMPFileSequenceStream : IDisposable, IFrameStream	
+	internal class BMPFileSequenceStream : IDisposable, IFrameStream
 	{
+		public const string ENGINE = "BMP::SEQ";
+
 		private List<string> m_BmpFilesList = new List<string>();
 
 		public static BMPFileSequenceStream OpenFolder(string[] fitsFiles)
@@ -38,7 +40,7 @@ namespace Tangra.Video
 
 	        HasUTCTimeStamps = false;
 
-			VideoFileType = "BMP::SEQ";
+			VideoFileType = ENGINE;
         }
 
 		public int Width { get; private set; }
@@ -88,7 +90,7 @@ namespace Tangra.Video
 
 		public string Engine
 		{
-			get { return "BMP-SEQ"; }
+			get { return ENGINE; }
 		}
 
 		public string FileName { get; private set; }

@@ -106,3 +106,4 @@ _ReSharper.*
 /AdvLib.Core/AdvLib.Core.vcxproj.user
 /AdvLib.Core/AdvLib_Win32.mk
 /AdvLib.Core/.build-release
+/OcrTester/AutomatedTestingImages/testbed

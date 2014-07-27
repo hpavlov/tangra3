@@ -1271,7 +1271,7 @@ namespace Tangra.VideoOperations.LightCurves
 		{
 			m_TimestampOCR = null;
 
-			if ((m_VideoController.IsPlainAviVideo || m_VideoController.IsAstroAnalogueVideoWithNtpTimestampsInNtpDebugMode) &&
+			if (m_VideoController.IsVideoWithVtiOsdTimeStamp &&
 				(TangraConfig.Settings.Generic.OsdOcrEnabled || TangraConfig.Settings.Generic.OcrAskEveryTime))
 			{
 				bool forceSaveErrorReport = false;

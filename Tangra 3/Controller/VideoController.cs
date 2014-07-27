@@ -599,6 +599,17 @@ namespace Tangra.Controller
 			}
 		}
 
+		public bool IsVideoWithVtiOsdTimeStamp
+		{
+			get
+			{
+				return 
+					IsPlainAviVideo || 
+					IsAstroAnalogueVideoWithNtpTimestampsInNtpDebugMode ||
+					m_FramePlayer.Video.Engine == BMPFileSequenceStream.ENGINE;
+			}
+		}
+
 		public void GetAdditionalAAVTimes(int frameNo, ref DateTime? frameMidTimeNTPRaw, ref DateTime? frameMidTimeNTPTangra, ref DateTime? frameMidTimeWindowsRaw)
 		{
 			FrameStateData stateData = m_FramePlayer.GetFrameStatusChannel(frameNo);
