@@ -363,7 +363,7 @@ namespace Tangra.Model.Config
 			public int SubPixelSquareSize = 4;
 			public SignalApertureUnit SignalApertureUnitDefault = SignalApertureUnit.FWHM;
 
-			public BackgroundMethod BackgroundMethodDefault = BackgroundMethod.BackgroundMedian;
+			public BackgroundMethod BackgroundMethodDefault = BackgroundMethod.AverageBackground;
 
 			
 			public PsfFittingMethod PsfFittingMethod = PsfFittingMethod.DirectNonLinearFit;

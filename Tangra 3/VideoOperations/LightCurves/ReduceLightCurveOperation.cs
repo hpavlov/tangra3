@@ -808,8 +808,8 @@ namespace Tangra.VideoOperations.LightCurves
         private void DrawZoomArea(Graphics gMain)
         {
 	        AstroImage currentImage = m_VideoController.GetCurrentAstroImage(false);
-			 
-			if (currentImage != null)
+
+			if (currentImage != null && m_VideoController.ZoomedCenter != null)
 			{
 				Rectangle zommedArea = new Rectangle(m_VideoController.ZoomedCenter.X - 15,
 													 m_VideoController.ZoomedCenter.Y - 16, 32, 32);
