@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 // http://stackoverflow.com/questions/7136450/using-dll-in-visual-studio-2010-c
 // http://www.steptools.com/support/stdev_docs/help/howto_dlls.html
 // http://www.transmissionzero.co.uk/computing/advanced-mingw-dll-topics/
