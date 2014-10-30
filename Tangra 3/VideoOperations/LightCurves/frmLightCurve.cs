@@ -377,6 +377,7 @@ namespace Tangra.VideoOperations.LightCurves
 				else
 				{
 					lblFrameTime.ForeColor = Color.DarkGreen;
+					m_TimestampDiscrepencyFlag = false;
 				}
             }
             else
