@@ -1,4 +1,18 @@
-Subroutine Kwee_van_Woerden ( Number_Obs, Time, Variable_Star_DN, Variable_Sky_DN, Comparison_Star_DN, Comparison_Sky_DN )
+Subroutine Kwee_van_Woerden ( Number_Obs, Time_First, Time, Variable_Star_DN, Variable_Sky_DN, Comparison_Star_DN, Comparison_Sky_DN, Directory_Name )
+!DEC$ ATTRIBUTES ALIAS:'Kwee_van_Woerden' :: Kwee_van_Woerden 
+!DEC$ ATTRIBUTES STDCALL,DLLEXPORT:: Kwee_van_Woerden
+!DEC$ ATTRIBUTES REFERENCE::Number_Obs
+!DEC$ ATTRIBUTES REFERENCE::Time_First
+!DEC$ ATTRIBUTES REFERENCE::Time
+!DEC$ ATTRIBUTES REFERENCE::Variable_Star_DN
+!DEC$ ATTRIBUTES REFERENCE::Variable_Sky_DN
+!DEC$ ATTRIBUTES REFERENCE::Comparison_Star_DN
+!DEC$ ATTRIBUTES REFERENCE::Comparison_Sky_DN
+!DEC$ ATTRIBUTES REFERENCE::Directory_Name
+! The "!DEC$ ..." lines above are used when generating a DLL that Hristo can call from C#
+
+! Following is the command line for generating a DLL with the needed code from libraries
+! ifort kwee_van_woerden_subroutine.f90 /MT /dll
 
 ! Determine the time of minimum light of an occulting binary star
 ! Uses the method of Kwee and van Woerden, B.A.N. Vol 12, Numb 464, Page 327, 1956.
@@ -8,11 +22,13 @@ implicit none
 
 ! Input values
 integer                    Number_Obs                              ! Number of observed data points
+double precision           Time_First                              ! Absolute time for the first observation
 double precision           Time(10000)                             ! Mid-times of each observation
 double precision           Variable_Star_DN(10000)                 ! Pixels values for the variable star brightness (including sky background)
 double precision           Variable_Sky_DN(10000)                  ! Pixels values for the variable star sky background to be subtracted
 double precision           Comparison_Star_DN(10000)               ! Pixels values for the comparison star brightness (including sky background)
 double precision           Comparison_Sky_DN(10000)                ! Pixels values for the comparison star sky background to be subtracted
+character*256              Directory_Name                          ! Location for the output files
 
 ! Constant parameter
 parameter                  Normal_Points = 101                     ! Number of evenly spaced data pairs used in the analysis
@@ -51,13 +67,41 @@ double precision           T0_Uncertainty                          ! Time of sym
 double precision           Time_Of_Minimum                         ! Time of minimum light
 double precision           Time_Of_Minimum_Uncertainty             ! Time of minimum light uncertainty
 
+! Output file names
+character*256              Summary_File                            ! Path and directory name of the summary file
+character*256              Observations_File                       ! Path and directory name of the observations file
+character*256              Normals_File                            ! Path and directory name of the normal point file
+
 ! Loop indices
 integer                    i, j                                    ! Loop indices
+integer                    blank                                   ! Location of blank character in a string
+
+! Build the path and directory strings for the output file names
+blank = index ( Directory_Name, " " )
+Summary_File(1:blank-1)           = Directory_Name(1:blank-1)
+Observations_File(1:blank-1)      = Directory_Name(1:blank-1)
+Normals_File(1:blank-1)           = Directory_Name(1:blank-1)
+Summary_File(blank:blank+27)      = "Time_Of_Minimum_Summary.Txt"
+Observations_File(blank:blank+32) = "Time_Of_Minimum_Observations.Txt"
+Normals_File(blank:blank+27)      = "Time_Of_Minimum_Normals.Txt"
+
+! Diagnostic
+if (.false.) then
+  write (0,*) Directory_Name
+  write (0,*) Summary_File
+  write (0,*) Observations_File
+  write (0,*) Normals_File
+  stop
+endif
 
 ! Open output files
-open (unit=6,file='Time_Of_Minimum_Summary.Txt',action='write')
-open (unit=7,file='Time_Of_Minimum_Observations.Txt',action='write')
-open (unit=8,file='Time_Of_Minimum_Normals.Txt',action='write')
+open (unit=6,file=Summary_File,action='write')
+open (unit=7,file=Observations_File,action='write')
+open (unit=8,file=Normals_File,action='write')
+
+! Write column headers for the observation and normals files
+write (7,"('                Time    Luminosity_Ratio    Variable_Star_DN     Variable_Sky_DN  Comparison_Star_DN   Comparison_Sky_DN')")
+write (8,"('                Time    Luminosity_Ratio')")
 
 ! Determine luminosity ratios
 do i = 1, Number_Obs
@@ -190,16 +234,38 @@ T0 = -B / ( 2.0 * A )
 T0_Uncertainty = Sqrt((4.0 * A * C - B * B) / (4.0 * A * A) / (Normal_Points / 4.0 - 1.0))
 Time_Of_Minimum = Time_Normal(1) + ( ( Sum_Of_Squares_Smallest_Index - 1 ) + ( T0 - 2.0 ) ) * Time_Interval
 Time_Of_Minimum_Uncertainty = T0_Uncertainty * Time_Interval
-write (6,*) '             T0              Uncertainty     Time_Of_Minimum        Uncertainty'
-write (6,99) T0, T0_Uncertainty, Time_Of_Minimum, Time_Of_Minimum_Uncertainty
+write (6,399)
+399 format (/,'      Time_First              Number_Obs')
+write (6,599) Time_First, Number_Obs
+599 format (f20.6, i20)
+write (6,199)
+199 format (/,'               Time of minimum:',//, &
+              '      Bins-Quadratic         Uncertainty')
+write (6, 99) T0, T0_Uncertainty
+write (6,299)
+299 format (/,'      From Time_First        Uncertainty')
+write (6, 99) Time_Of_Minimum, Time_Of_Minimum_Uncertainty
+write (6,499)
+499 format (/,'      Absolute               Uncertainty')
+write (6, 99) Time_First + Time_Of_Minimum, Time_Of_Minimum_Uncertainty
 
 ! Diagnostic
-if (.true.) then
-  write (0,*) '             T0              Uncertainty     Time_Of_Minimum        Uncertainty'
-  write (0,99) T0, T0_Uncertainty, Time_Of_Minimum, Time_Of_Minimum_Uncertainty
-  stop
+if (.false.) then
+  write (0,399)
+  write (0,599) Time_First, Number_Obs
+  write (0,199)
+  write (0, 99) T0, T0_Uncertainty
+  write (0,299)
+  write (0, 99) Time_Of_Minimum, Time_Of_Minimum_Uncertainty
+  write (0,499)
+  write (0, 99) Time_First + Time_Of_Minimum, Time_Of_Minimum_Uncertainty
+  ! stop
 endif
 
+! Close output files
+close (unit=6)
+close (unit=7)
+close (unit=8)
 
 ! Finish
 Return
