@@ -22,7 +22,10 @@ namespace Tangra
 
             this.Text = String.Format("About {0}", AssemblyTitle);			
 	        this.textBoxDescription.Text = AssemblyDescription;
-            this.lblProductName.Text = String.Format("{0} v{1}, Released on {2}", AssemblyProduct, AssemblyFileVersion, AssemblyReleaseDate);
+			if (!string.IsNullOrEmpty(AssemblyReleaseDate))
+				this.lblProductName.Text = String.Format("{0} v{1}, Released on {2}", AssemblyProduct, AssemblyFileVersion, AssemblyReleaseDate);
+			else
+				this.lblProductName.Text = String.Format("{0} v{1}, Unreleased ALPHA Version", AssemblyProduct, AssemblyFileVersion);
         }
 
         #region Assembly Attribute Accessorsw

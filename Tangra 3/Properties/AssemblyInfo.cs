@@ -43,7 +43,7 @@ using Tangra.Helpers;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("3.1.0.11")]
-[assembly: AssemblyFileVersion("3.1.11")]
-[assembly: ReleaseDate("2014-10-20")]
+[assembly: AssemblyVersion("3.1.0.12")]
+[assembly: AssemblyFileVersion("3.1.12")]
+//[assembly: ReleaseDate("2014-10-20")]
 

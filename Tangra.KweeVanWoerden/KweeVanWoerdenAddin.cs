@@ -105,7 +105,7 @@ namespace Tangra.KweeVanWoerden
 
 		public string Description
 		{
-			get { return "Addin for Tangra 3 for determining eclipsing binaries minimum epoch using the K. K. Kwee & H. Van Woerden method (http://adsabs.harvard.edu/abs/1956BAN....12..327K)."; }
+			get { return "Addin for Tangra 3 for determining the epoch of minimum for eclipsing binaries"; }
 		}
 
 		public string Url

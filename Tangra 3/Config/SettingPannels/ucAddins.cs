@@ -99,6 +99,7 @@ namespace Tangra.Config.SettingPannels
                     btnConfigure.Tag = addin.Instance;
                     lblDisplayName.Text = addin.Instance.DisplayName;
                     lblVersion.Text = addin.Instance.Version;
+	                lblAuthor.Text = addin.Instance.Author;
                     lblDescription.Text = addin.Instance.Description;
                     lblUrl.Text = addin.Instance.Url;
                 }
