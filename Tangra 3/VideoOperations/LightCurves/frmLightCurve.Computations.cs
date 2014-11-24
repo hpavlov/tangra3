@@ -616,6 +616,16 @@ namespace Tangra.VideoOperations.LightCurves
                 string isBadTimeString = null;
 
                 double resolutionInSecs = m_LightCurveController.Context.Binning / (2.0 * m_Header.FramesPerSecond);
+
+				if (double.IsInfinity(resolutionInSecs) || double.IsNaN(resolutionInSecs)
+					&& m_Header.LcFile != null && m_Header.LcFile.FrameTiming != null && m_Header.LcFile.FrameTiming.Count > 0)
+				{
+
+					List<int> allExposures = m_Header.LcFile.FrameTiming.Select(x => x.FrameDurationInMilliseconds).ToList();
+					allExposures.Sort();
+					resolutionInSecs = m_LightCurveController.Context.Binning * allExposures[allExposures.Count / 2] / 1000.0;
+				}
+
                 string timeFormat = "HH:mm:ss";
 
                 if (resolutionInSecs < 0.06)
