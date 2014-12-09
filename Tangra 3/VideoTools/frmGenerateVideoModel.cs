@@ -15,6 +15,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using Tangra.Helpers;
 using Tangra.Model.Config;
 using Tangra.Model.Image;
 using Tangra.Model.Numerical;
@@ -338,6 +339,12 @@ namespace Tangra.VideoTools
 		{
 			if (saveFileDialog.ShowDialog(this) == DialogResult.OK)
 			{
+				if (TangraConfig.Settings.Generic.CollectUsageStats)
+				{
+					UsageStats.Instance.ModelVideosGenerated++;
+					UsageStats.Instance.Save();
+				}
+
 				var config = new ModelConfig()
 				{
 					FileName = saveFileDialog.FileName,

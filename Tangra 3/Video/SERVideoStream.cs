@@ -10,6 +10,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Helpers;
+using Tangra.Model.Config;
 using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.Model.Video;
@@ -37,6 +39,12 @@ namespace Tangra.Video
 			byte[] telescope = new byte[40];
 
 			TangraCore.SEROpenFile(fileName, ref fileInfo, observer, instrument, telescope, false);
+
+			if (TangraConfig.Settings.Generic.CollectUsageStats)
+			{
+				UsageStats.Instance.ProcessedSerFiles++;
+				UsageStats.Instance.Save();
+			}
 
 			var frmInfo = new frmEnterSERFileInfo(fileInfo);
 			if (frmInfo.ShowDialog(parentForm) == DialogResult.OK)

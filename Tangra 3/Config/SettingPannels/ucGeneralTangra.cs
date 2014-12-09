@@ -33,6 +33,7 @@ namespace Tangra.Config.SettingPannels
 			cbShowProcessingSpeed.Checked = TangraConfig.Settings.Generic.ShowProcessingSpeed;
 			cbxShowCursorPosition.Checked = TangraConfig.Settings.Generic.ShowCursorPosition;
 			cbxBetaUpdates.Checked = TangraConfig.Settings.Generic.AcceptBetaUpdates;
+			cbxSendStats.Checked = TangraConfig.Settings.Generic.CollectUsageStats;
 
 	        UpdateFileAssociationsButtonState();
         }
@@ -46,6 +47,7 @@ namespace Tangra.Config.SettingPannels
 			TangraConfig.Settings.Generic.OnOpenOperation = (TangraConfig.OnOpenOperation)cbxOnOpenOperation.SelectedIndex;
 			TangraConfig.Settings.Generic.ShowProcessingSpeed = cbShowProcessingSpeed.Checked;
 			TangraConfig.Settings.Generic.ShowCursorPosition = cbxShowCursorPosition.Checked;
+			TangraConfig.Settings.Generic.CollectUsageStats = cbxSendStats.Checked;
         }
 
 		private void UpdateFileAssociationsButtonState()

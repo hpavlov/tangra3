@@ -13,6 +13,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Helpers;
 using Tangra.Video.SER;
 using Tangra.VideoOperations.LightCurves.Tracking;
 using Tangra.VideoTools;
@@ -114,6 +115,17 @@ namespace Tangra.Controller
 			m_MainForm.tsmiOff.Checked = m_DisplayIntensifyMode == DisplayIntensifyMode.Off;
 			m_MainForm.tsmiLo.Checked = m_DisplayIntensifyMode == DisplayIntensifyMode.Lo;
 			m_MainForm.tsmiHigh.Checked = m_DisplayIntensifyMode == DisplayIntensifyMode.Hi;
+
+			if (TangraConfig.Settings.Generic.CollectUsageStats)
+			{
+				if (m_DisplayHueIntensityMode) UsageStats.Instance.HueIntensityModeUsed++;
+				if (m_DisplayInvertedMode) UsageStats.Instance.InvertedModeUsed++;
+				if (m_DisplayIntensifyMode == DisplayIntensifyMode.Hi) UsageStats.Instance.HighGammaModeUsed++;
+				if (m_DisplayIntensifyMode == DisplayIntensifyMode.Lo) UsageStats.Instance.LowGammaModeUsed++;
+				if (m_DisplayIntensifyMode == DisplayIntensifyMode.Off) UsageStats.Instance.NoGammaModeUsed++;
+
+				UsageStats.Instance.Save();
+			}
 		}
 
 		public void SetLightCurveController(LightCurveController lightCurveController)
@@ -965,6 +977,15 @@ namespace Tangra.Controller
 				TangraConfig.Settings.Save();
 			}
 
+			if (TangraConfig.Settings.Generic.CollectUsageStats)
+			{
+				if (newMode == DisplayIntensifyMode.Dynamic) UsageStats.Instance.CustomDynamicRangeUsed++;
+				if (newMode == DisplayIntensifyMode.Hi) UsageStats.Instance.HighGammaModeUsed++;
+				if (newMode == DisplayIntensifyMode.Lo) UsageStats.Instance.LowGammaModeUsed++;
+				if (newMode == DisplayIntensifyMode.Off) UsageStats.Instance.NoGammaModeUsed++;
+				UsageStats.Instance.Save();
+			}
+
 			if (!m_FramePlayer.IsRunning &&
 				m_FramePlayer.Video != null)
 			{
@@ -979,6 +1000,12 @@ namespace Tangra.Controller
 			{
 				m_DisplayHueBackgroundMode = false;
 				m_MainForm.miJupiterGlow.Checked = false;
+
+				if (TangraConfig.Settings.Generic.CollectUsageStats)
+				{
+					UsageStats.Instance.InvertedModeUsed++;
+					UsageStats.Instance.Save();
+				}
 			}
 
 			TangraConfig.Settings.Generic.UseInvertedDisplayMode = inverted;
@@ -999,6 +1026,12 @@ namespace Tangra.Controller
 	        {
 		        m_DisplayHueBackgroundMode = false;
 		        m_MainForm.miJupiterGlow.Checked = false;
+
+				if (TangraConfig.Settings.Generic.CollectUsageStats)
+				{
+					UsageStats.Instance.HueIntensityModeUsed++;
+					UsageStats.Instance.Save();
+				}
 	        }
 
 	        TangraConfig.Settings.Generic.UseHueIntensityDisplayMode = hueSelected;
@@ -1298,6 +1331,12 @@ namespace Tangra.Controller
                 PositionTargetPSFViewerForm();
 
 				ShowTargetPSF();
+
+				if (TangraConfig.Settings.Generic.CollectUsageStats)
+				{
+					UsageStats.Instance.TargetPSFViewerFormShown++;
+					UsageStats.Instance.Save();
+				}
             }
             else
             {
@@ -1324,6 +1363,12 @@ namespace Tangra.Controller
 
 		public void ShowFSTSFileViewer()
 		{
+			if (TangraConfig.Settings.Generic.CollectUsageStats)
+			{
+				UsageStats.Instance.FSTSFileViewerInvoked++;
+				UsageStats.Instance.Save();
+			}
+
 			if (TangraContext.Current.HasVideoLoaded && (m_FramePlayer.IsAstroDigitalVideo || m_FramePlayer.IsAstroAnalogueVideo))
 			{
 				var viewer = new frmAdvViewer(m_FramePlayer.Video.FileName);
@@ -1764,6 +1809,12 @@ namespace Tangra.Controller
 
             if (rv == DialogResult.OK)
             {
+				if (TangraConfig.Settings.Generic.CollectUsageStats)
+				{
+					UsageStats.Instance.ExportToFITSUsed++;
+					UsageStats.Instance.Save();
+				}
+
                 Fits f = new Fits();
 
                 object data = null;
@@ -1825,6 +1876,12 @@ namespace Tangra.Controller
 		{
 			if (m_FramePlayer.Video != null)
 			{
+				if (TangraConfig.Settings.Generic.CollectUsageStats)
+				{
+					UsageStats.Instance.FileInformationMenuUsed++;
+					UsageStats.Instance.Save();
+				}
+
 				var frm = new frmFileInformation(m_FramePlayer.Video);
 				frm.StartPosition = FormStartPosition.CenterParent;
 				frm.ShowDialog(m_MainForm);

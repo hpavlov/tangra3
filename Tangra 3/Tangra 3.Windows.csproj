@@ -252,6 +252,12 @@
     <Compile Include="frmFITSHeader.Designer.cs">
       <DependentUpon>frmFITSHeader.cs</DependentUpon>
     </Compile>
+    <Compile Include="frmContributorsCall.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmContributorsCall.Designer.cs">
+      <DependentUpon>frmContributorsCall.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmMain.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -288,6 +294,7 @@
       <DependentUpon>frmChooseFitsFolder.cs</DependentUpon>
     </Compile>
     <Compile Include="Helpers\TangraFileAssociations.cs" />
+    <Compile Include="Helpers\UsageStats.cs" />
     <Compile Include="Helpers\WindowsHelpers.cs" />
     <Compile Include="VideoOperations\LightCurves\InfoForms\frmSetReferenceMag.cs">
       <SubType>Form</SubType>
@@ -659,6 +666,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmFITSHeader.resx">
       <DependentUpon>frmFITSHeader.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmContributorsCall.resx">
+      <DependentUpon>frmContributorsCall.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmMain.resx">
       <DependentUpon>frmMain.cs</DependentUpon>

@@ -122,6 +122,12 @@ namespace Tangra.Controller
 
 			if (LoadDarkOrFlatFrameInternal("Load dark frame ...", ref pixels, ref medianValue))
 			{
+				if (TangraConfig.Settings.Generic.CollectUsageStats)
+				{
+					UsageStats.Instance.DarkFramesUsed++;
+					UsageStats.Instance.Save();
+				}
+
 				TangraCore.PreProcessors.AddDarkFrame(pixels, medianValue);
 
 				TangraContext.Current.DarkFrameLoaded = true;
@@ -138,6 +144,12 @@ namespace Tangra.Controller
 
 			if (LoadDarkOrFlatFrameInternal("Load flat frame ...", ref pixels, ref medianValue))
 			{
+				if (TangraConfig.Settings.Generic.CollectUsageStats)
+				{
+					UsageStats.Instance.FlatFramesUsed++;
+					UsageStats.Instance.Save();
+				}
+
 				TangraCore.PreProcessors.AddFlatFrame(pixels, medianValue);
 
 				TangraContext.Current.FlatFrameLoaded = true;

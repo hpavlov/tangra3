@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Tangra.Helpers;
+using Tangra.Model.Config;
 using Tangra.Model.Image;
 using Tangra.Model.Video;
 using Tangra.PInvoke;
@@ -21,6 +22,12 @@ namespace Tangra.Video
  
         public static FITSFileSequenceStream OpenFolder(string[] fitsFiles)
         {
+			if (TangraConfig.Settings.Generic.CollectUsageStats)
+			{
+				UsageStats.Instance.ProcessedFitsFolderFiles++;
+				UsageStats.Instance.Save();
+			}
+
             var rv =  new FITSFileSequenceStream(fitsFiles);
 	        rv.FileName = Path.GetDirectoryName(fitsFiles[0]);
 	        return rv;

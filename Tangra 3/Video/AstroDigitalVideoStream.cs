@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using Tangra.Helpers;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
 using Tangra.Model.Helpers;
@@ -51,6 +52,15 @@ namespace Tangra.Video
 				var rv = new AstroDigitalVideoStream(fileName, ref equipmentInfo, ref geoLocation);
 
                 TangraContext.Current.RenderingEngine = equipmentInfo.Engine == "AAV" ? "AstroAnalogueVideo" : "AstroDigitalVideo";
+
+				if (TangraConfig.Settings.Generic.CollectUsageStats)
+				{
+					if (equipmentInfo.Engine == "AAV")
+						UsageStats.Instance.ProcessedAdvFiles++;
+					else
+						UsageStats.Instance.ProcessedAavFiles++;
+					UsageStats.Instance.Save();
+				}
 
 			    return rv;
 			}

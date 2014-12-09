@@ -11,6 +11,8 @@ using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using Tangra.Addins;
+using Tangra.Helpers;
+using Tangra.Model.Config;
 using Tangra.Model.Helpers;
 using Tangra.SDK;
 using Tangra.Video;
@@ -154,6 +156,12 @@ namespace Tangra.Controller
 
 						if (canExecuteAction)
 						{
+							if (TangraConfig.Settings.Generic.CollectUsageStats)
+							{
+								UsageStats.Instance.AddinActionsInvoked++;
+								UsageStats.Instance.Save();
+							}
+
 							addinAction.Execute();
 						}
 					}

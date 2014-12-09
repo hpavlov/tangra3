@@ -9,6 +9,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
+using Tangra.Helpers;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
 using Tangra.Model.Image;
@@ -52,6 +53,18 @@ namespace Tangra.Video
 
                     // Try to load the first frame to be sure that it is going to work, before accepting this video engine for rendering
                     rv.GetPixelmap(fileInfo.FirstFrame);
+
+					if (TangraConfig.Settings.Generic.CollectUsageStats)
+					{
+						UsageStats.Instance.ProcessedAviFiles++;
+
+						if (allEnginesByIndex[engineIdx] == "VideoForWindows")
+							UsageStats.Instance.VideoForWindowsUsed++;
+						else if (allEnginesByIndex[engineIdx] == "DirectShow")
+							UsageStats.Instance.DirectShowUsed++;
+
+						UsageStats.Instance.Save();
+					}
 
                     return rv;
                 }

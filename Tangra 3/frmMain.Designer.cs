@@ -70,6 +70,7 @@
 			this.miJupiterGlow = new System.Windows.Forms.ToolStripMenuItem();
 			this.tsmiHueIntensity = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+			this.tsmiDynamic = new System.Windows.Forms.ToolStripMenuItem();
 			this.tsmiHigh = new System.Windows.Forms.ToolStripMenuItem();
 			this.tsmiLo = new System.Windows.Forms.ToolStripMenuItem();
 			this.tsmiOff = new System.Windows.Forms.ToolStripMenuItem();
@@ -79,7 +80,6 @@
 			this.pnlControlerPanel = new System.Windows.Forms.Panel();
 			this.zoomedImage = new System.Windows.Forms.PictureBox();
 			this.panelVideo = new System.Windows.Forms.Panel();
-			this.pictureBox = new Tangra.Controls.ImagePanel();
 			this.pnlPlayControls = new System.Windows.Forms.Panel();
 			this.pnlPlayButtons = new System.Windows.Forms.Panel();
 			this.btnJumpTo = new System.Windows.Forms.Button();
@@ -97,7 +97,8 @@
 			this.openAdvFileDialog = new System.Windows.Forms.OpenFileDialog();
 			this.saveFrameDialog = new System.Windows.Forms.SaveFileDialog();
 			this.timerCommandArgs = new System.Windows.Forms.Timer(this.components);
-			this.tsmiDynamic = new System.Windows.Forms.ToolStripMenuItem();
+			this.pictureBox = new Tangra.Controls.ImagePanel();
+			this.miCallForContributions = new System.Windows.Forms.ToolStripMenuItem();
 			this.mainMenu.SuspendLayout();
 			this.statusStrip.SuspendLayout();
 			this.panelRight.SuspendLayout();
@@ -363,6 +364,7 @@
             this.miOnlineHelp,
             this.miCheckForUpdates,
             this.toolStripMenuItem1,
+            this.miCallForContributions,
             this.miAbout});
 			this.miHelp.Name = "miHelp";
 			this.miHelp.Size = new System.Drawing.Size(44, 20);
@@ -371,26 +373,26 @@
 			// miOnlineHelp
 			// 
 			this.miOnlineHelp.Name = "miOnlineHelp";
-			this.miOnlineHelp.Size = new System.Drawing.Size(171, 22);
+			this.miOnlineHelp.Size = new System.Drawing.Size(188, 22);
 			this.miOnlineHelp.Text = "&Online Help";
 			this.miOnlineHelp.Click += new System.EventHandler(this.miOnlineHelp_Click);
 			// 
 			// miCheckForUpdates
 			// 
 			this.miCheckForUpdates.Name = "miCheckForUpdates";
-			this.miCheckForUpdates.Size = new System.Drawing.Size(171, 22);
+			this.miCheckForUpdates.Size = new System.Drawing.Size(188, 22);
 			this.miCheckForUpdates.Text = "Check for &Updates";
 			this.miCheckForUpdates.Click += new System.EventHandler(this.miCheckForUpdates_Click);
 			// 
 			// toolStripMenuItem1
 			// 
 			this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-			this.toolStripMenuItem1.Size = new System.Drawing.Size(168, 6);
+			this.toolStripMenuItem1.Size = new System.Drawing.Size(185, 6);
 			// 
 			// miAbout
 			// 
 			this.miAbout.Name = "miAbout";
-			this.miAbout.Size = new System.Drawing.Size(171, 22);
+			this.miAbout.Size = new System.Drawing.Size(188, 22);
 			this.miAbout.Text = "&About";
 			this.miAbout.Click += new System.EventHandler(this.miAbout_Click);
 			// 
@@ -561,6 +563,13 @@
 			this.toolStripSeparator3.Name = "toolStripSeparator3";
 			this.toolStripSeparator3.Size = new System.Drawing.Size(199, 6);
 			// 
+			// tsmiDynamic
+			// 
+			this.tsmiDynamic.Name = "tsmiDynamic";
+			this.tsmiDynamic.Size = new System.Drawing.Size(202, 22);
+			this.tsmiDynamic.Text = "Custom Dynamic Range";
+			this.tsmiDynamic.Click += new System.EventHandler(this.DisplayIntensifyModeClicked);
+			// 
 			// tsmiHigh
 			// 
 			this.tsmiHigh.Name = "tsmiHigh";
@@ -646,27 +655,6 @@
 			this.panelVideo.Name = "panelVideo";
 			this.panelVideo.Size = new System.Drawing.Size(607, 570);
 			this.panelVideo.TabIndex = 4;
-			// 
-			// pictureBox
-			// 
-			this.pictureBox.AllowDrop = true;
-			this.pictureBox.BackColor = System.Drawing.SystemColors.ControlDark;
-			this.pictureBox.CanvasSize = new System.Drawing.Size(60, 40);
-			this.pictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.pictureBox.Image = null;
-			this.pictureBox.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
-			this.pictureBox.Location = new System.Drawing.Point(0, 0);
-			this.pictureBox.Name = "pictureBox";
-			this.pictureBox.Size = new System.Drawing.Size(607, 503);
-			this.pictureBox.TabIndex = 2;
-			this.pictureBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragDrop);
-			this.pictureBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragEnter);
-			this.pictureBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseClick);
-			this.pictureBox.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDoubleClick);
-			this.pictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDown);
-			this.pictureBox.MouseLeave += new System.EventHandler(this.pictureBox_MouseLeave);
-			this.pictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseMove);
-			this.pictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseUp);
 			// 
 			// pnlPlayControls
 			// 
@@ -825,12 +813,33 @@
 			// 
 			this.timerCommandArgs.Tick += new System.EventHandler(this.timerCommandArgs_Tick);
 			// 
-			// tsmiDynamic
+			// pictureBox
 			// 
-			this.tsmiDynamic.Name = "tsmiDynamic";
-			this.tsmiDynamic.Size = new System.Drawing.Size(202, 22);
-			this.tsmiDynamic.Text = "Custom Dynamic Range";
-			this.tsmiDynamic.Click += new System.EventHandler(this.DisplayIntensifyModeClicked);
+			this.pictureBox.AllowDrop = true;
+			this.pictureBox.BackColor = System.Drawing.SystemColors.ControlDark;
+			this.pictureBox.CanvasSize = new System.Drawing.Size(60, 40);
+			this.pictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.pictureBox.Image = null;
+			this.pictureBox.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
+			this.pictureBox.Location = new System.Drawing.Point(0, 0);
+			this.pictureBox.Name = "pictureBox";
+			this.pictureBox.Size = new System.Drawing.Size(607, 503);
+			this.pictureBox.TabIndex = 2;
+			this.pictureBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragDrop);
+			this.pictureBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragEnter);
+			this.pictureBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseClick);
+			this.pictureBox.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDoubleClick);
+			this.pictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDown);
+			this.pictureBox.MouseLeave += new System.EventHandler(this.pictureBox_MouseLeave);
+			this.pictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseMove);
+			this.pictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseUp);
+			// 
+			// miCallForContributions
+			// 
+			this.miCallForContributions.Name = "miCallForContributions";
+			this.miCallForContributions.Size = new System.Drawing.Size(188, 22);
+			this.miCallForContributions.Text = "Call for Contributions";
+			this.miCallForContributions.Click += new System.EventHandler(this.miCallForContributions_Click);
 			// 
 			// frmMain
 			// 
@@ -850,6 +859,7 @@
 			this.Text = "Tangra vX.Y";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmMain_FormClosing);
 			this.Load += new System.EventHandler(this.frmMain_Load);
+			this.Shown += new System.EventHandler(this.frmMain_Shown);
 			this.DragDrop += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragDrop);
 			this.DragEnter += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragEnter);
 			this.Move += new System.EventHandler(this.frmMain_Move);
@@ -951,6 +961,7 @@
 		protected internal System.Windows.Forms.ToolStripMenuItem miFileInfo;
 		private System.Windows.Forms.ToolStripMenuItem miOpenFitsSequence;
 		protected internal System.Windows.Forms.ToolStripMenuItem tsmiDynamic;
+		private System.Windows.Forms.ToolStripMenuItem miCallForContributions;
 	}
 }
 

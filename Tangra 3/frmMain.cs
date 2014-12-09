@@ -668,6 +668,12 @@ namespace Tangra
 
         private void miOnlineHelp_Click(object sender, EventArgs e)
         {
+			if (TangraConfig.Settings.Generic.CollectUsageStats)
+			{
+				UsageStats.Instance.OnlineHelpMenuUsed++;
+				UsageStats.Instance.Save();
+			}
+
             Process.Start("http://www.hristopavlov.net/Tangra3");
         }
 
@@ -735,6 +741,12 @@ namespace Tangra
 
 				if (saveFrameDialog.ShowDialog(this) == DialogResult.OK)
 				{
+					if (TangraConfig.Settings.Generic.CollectUsageStats)
+					{
+						UsageStats.Instance.ExportToBMPUsed++;
+						UsageStats.Instance.Save();
+					}
+
 					m_VideoContext.Pixelmap.CreateNewDisplayBitmap().Save(saveFrameDialog.FileName, ImageFormat.Bmp);
 				}
 			}
@@ -749,6 +761,12 @@ namespace Tangra
 
 				if (saveFrameDialog.ShowDialog(this) == DialogResult.OK)
 				{
+					if (TangraConfig.Settings.Generic.CollectUsageStats)
+					{
+						UsageStats.Instance.ExportToCSVUsed++;
+						UsageStats.Instance.Save();
+					}
+
 					StringBuilder output = new StringBuilder();
 
 					for (int y = 0; y < m_VideoContext.Pixelmap.Height; y++)
@@ -962,6 +980,25 @@ namespace Tangra
 		{
 			Point imagePos = m_VideoController.GetImageCoordinatesFromZoomedImage(e.Location);
 			m_VideoController.DisplayCursorImageCoordinates(imagePos);
+		}
+
+		private void frmMain_Shown(object sender, EventArgs e)
+		{
+			if (!Settings.Default.LicenseDialogAcknowledged && DateTime.Now < new DateTime(2015, 06, 30))
+			{
+				var frm = new frmContributorsCall();
+				frm.StartPosition = FormStartPosition.CenterParent;
+				frm.ShowDialog(this);
+				Settings.Default.LicenseDialogAcknowledged = true;
+				Settings.Default.Save();
+			}
+		}
+
+		private void miCallForContributions_Click(object sender, EventArgs e)
+		{
+			var frm = new frmContributorsCall();
+			frm.StartPosition = FormStartPosition.CenterParent;
+			frm.ShowDialog(this);
 		}
 
 	}

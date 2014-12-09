@@ -12,7 +12,9 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Tangra.Controller;
+using Tangra.Helpers;
 using Tangra.Model.Astro;
+using Tangra.Model.Config;
 using Tangra.Model.Context;
 using Tangra.Model.Image;
 using Tangra.Model.ImageTools;
@@ -196,6 +198,14 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
 
 							m_Running = false;
 							m_VideoController.StopVideo();
+						}
+
+						if (TangraConfig.Settings.Generic.CollectUsageStats)
+						{
+							if (m_FrameType == FrameType.Dark) UsageStats.Instance.DarkFramesProduced++;
+							if (m_FrameType == FrameType.Flat) UsageStats.Instance.FlatFramesProduced++;
+
+							UsageStats.Instance.Save();
 						}
                     }
                 }

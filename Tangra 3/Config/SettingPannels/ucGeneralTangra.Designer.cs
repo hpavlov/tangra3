@@ -31,6 +31,7 @@ namespace Tangra.Config.SettingPannels
 		private void InitializeComponent()
 		{
 			this.components = new System.ComponentModel.Container();
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ucGeneralTangra));
 			this.label12 = new System.Windows.Forms.Label();
 			this.label22 = new System.Windows.Forms.Label();
 			this.cbShowProcessingSpeed = new System.Windows.Forms.CheckBox();
@@ -41,6 +42,7 @@ namespace Tangra.Config.SettingPannels
 			this.cbxShowCursorPosition = new System.Windows.Forms.CheckBox();
 			this.btnAssociateFiles = new System.Windows.Forms.Button();
 			this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+			this.cbxSendStats = new System.Windows.Forms.CheckBox();
 			this.SuspendLayout();
 			// 
 			// label12
@@ -126,11 +128,27 @@ namespace Tangra.Config.SettingPannels
 			this.btnAssociateFiles.UseVisualStyleBackColor = true;
 			this.btnAssociateFiles.Click += new System.EventHandler(this.btnAssociateFiles_Click);
 			// 
+			// toolTip1
+			// 
+			this.toolTip1.AutoPopDelay = 15000;
+			this.toolTip1.InitialDelay = 500;
+			this.toolTip1.ReshowDelay = 100;
+			// 
+			// cbxSendStats
+			// 
+			this.cbxSendStats.Location = new System.Drawing.Point(6, 153);
+			this.cbxSendStats.Name = "cbxSendStats";
+			this.cbxSendStats.Size = new System.Drawing.Size(214, 19);
+			this.cbxSendStats.TabIndex = 55;
+			this.cbxSendStats.Text = "Send anonymous usage statistics";
+			this.toolTip1.SetToolTip(this.cbxSendStats, resources.GetString("cbxSendStats.ToolTip"));
+			// 
 			// ucGeneralTangra
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.SystemColors.Control;
+			this.Controls.Add(this.cbxSendStats);
 			this.Controls.Add(this.btnAssociateFiles);
 			this.Controls.Add(this.cbxShowCursorPosition);
 			this.Controls.Add(this.cbxOnOpenOperation);
@@ -159,5 +177,6 @@ namespace Tangra.Config.SettingPannels
 		private CheckBox cbxShowCursorPosition;
 		private Button btnAssociateFiles;
 		private ToolTip toolTip1;
+		private CheckBox cbxSendStats;
 	}
 }

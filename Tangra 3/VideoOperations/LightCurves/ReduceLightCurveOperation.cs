@@ -99,6 +99,10 @@ namespace Tangra.VideoOperations.LightCurves
 
 	    private LCFile m_LoadedLcFile;
 
+		private int m_NumberFramesWithBadTracking;
+		private int m_NumberOcredVtiOsdFrames;
+		private int m_NumberFailedOcredVtiOsdFrames;
+
 		public ReduceLightCurveOperation()
 		{
 			Debug.Assert(false, "This constructor should not be called.");
@@ -147,6 +151,10 @@ namespace Tangra.VideoOperations.LightCurves
 
         public bool InitializeOperation(IVideoController videoContoller, Panel controlPanel, IFramePlayer framePlayer, Form topForm)
         {
+	        m_NumberFramesWithBadTracking = 0;
+			m_NumberOcredVtiOsdFrames = 0;
+			m_NumberFailedOcredVtiOsdFrames = 0;
+
             m_VideoController = (VideoController)videoContoller;
 
 			var configForm = new frmSelectReductionType(m_VideoController, framePlayer);
@@ -268,11 +276,20 @@ namespace Tangra.VideoOperations.LightCurves
 							m_TimestampOCR.RefiningFrame(osdPixels, m_Tracker.RefiningPercentageWorkLeft);
 						else
 							if (!m_TimestampOCR.ExtractTime(frameNo, osdPixels, out m_OCRedTimeStamp))
+							{
 								m_OCRedTimeStamp = DateTime.MinValue;
+								m_NumberFailedOcredVtiOsdFrames++;
+							}
+							else
+							{
+								m_NumberOcredVtiOsdFrames++;
+							}
 					}
 				}
 
                 m_Tracker.NextFrame(frameNo, astroImage);
+
+	            if (!m_Tracker.IsTrackedSuccessfully) m_NumberFramesWithBadTracking++;
 
 				m_VideoController.SetDisplayHueBackgroundModeTargets(m_Tracker.TrackedObjects);
 
@@ -1336,6 +1353,7 @@ namespace Tangra.VideoOperations.LightCurves
 									{
 										// This doesn't like like what the OCR engine is expecting. Abort ....
 										m_TimestampOCR = null;
+										m_NumberFailedOcredVtiOsdFrames++;
 										return;
 									}
 
@@ -1353,7 +1371,7 @@ namespace Tangra.VideoOperations.LightCurves
 							finally
 							{
 								FileProgressManager.EndFileOperation();
-							}							
+							}
 						}
 
 						if (forceSaveErrorReport || !isCalibrated)
@@ -1372,6 +1390,8 @@ namespace Tangra.VideoOperations.LightCurves
 						{
 						    if (m_TimestampOCR.InitiazliationError != null)
 						    {
+								m_NumberFailedOcredVtiOsdFrames++;
+
 						        m_VideoController.ShowMessageBox(
 						            m_TimestampOCR.InitiazliationError,
 						            "Error reading OSD timestamp",
@@ -1524,6 +1544,55 @@ namespace Tangra.VideoOperations.LightCurves
 			}
 
 			LCFile file = FlushLightCurveFile();
+
+	        if (TangraConfig.Settings.Generic.CollectUsageStats)
+	        {
+		        if (file.Header.ReductionType == LightCurveReductionType.Asteroidal)
+			        UsageStats.Instance.TrackedAsteroidals++;
+		        else if (file.Header.ReductionType == LightCurveReductionType.MutualEvent)
+			        UsageStats.Instance.TrackedMutualEvents++;
+		        else if (file.Header.ReductionType == LightCurveReductionType.UntrackedMeasurement)
+			        UsageStats.Instance.UntrackedMeasurements++;
+		        else if (file.Header.ReductionType == LightCurveReductionType.TotalLunarDisappearance || file.Header.ReductionType == LightCurveReductionType.TotalLunarReppearance)
+					UsageStats.Instance.TotalLunarMeasurements++;
+
+				if (TangraConfig.Settings.Tracking.SelectedEngine == TangraConfig.TrackingEngine.TrackingWithRefining)
+					UsageStats.Instance.TrackingWithRecoverUsed++;
+				else if (TangraConfig.Settings.Tracking.SelectedEngine == TangraConfig.TrackingEngine.AdHocTracking)
+					UsageStats.Instance.SimplifiedTrackingUsed++;
+				else if (TangraConfig.Settings.Tracking.SelectedEngine == TangraConfig.TrackingEngine.LetTangraChoose)
+					UsageStats.Instance.AutomaticTrackingUsed++;
+
+				if (file.Footer.ReductionContext.FullDisappearance) UsageStats.Instance.FullDisappearanceFlag++;
+				if (file.Footer.ReductionContext.WindOrShaking) UsageStats.Instance.WindOrShakingFlag++;
+				if (file.Footer.ReductionContext.HighFlickering) UsageStats.Instance.FlickeringFlag++;
+				if (file.Footer.ReductionContext.FieldRotation) UsageStats.Instance.FieldRotationFlag++;
+				if (file.Footer.ReductionContext.IsDriftThrough) UsageStats.Instance.DriftThroughFlag++;
+				if (file.Footer.ReductionContext.NumberFramesToIntegrate > 1) UsageStats.Instance.SoftwareIntegrationUsed++;
+
+				if (Math.Abs(TangraConfig.Settings.Photometry.EncodingGamma - 1) > 0.01) UsageStats.Instance.ReverseGammaUsed++;
+
+				if (file.Footer.ReductionContext.UseClipping || file.Footer.ReductionContext.UseStretching || file.Footer.ReductionContext.UseBrightnessContrast)
+					UsageStats.Instance.PreProcessingUsed++;
+
+				if (file.Footer.ReductionContext.DigitalFilter != TangraConfig.PreProcessingFilter.NoFilter) UsageStats.Instance.DigitalFilterUsed++;
+				if (file.Footer.ReductionContext.ReductionMethod == TangraConfig.PhotometryReductionMethod.AperturePhotometry) UsageStats.Instance.AperturePhotometry++;
+				if (file.Footer.ReductionContext.ReductionMethod == TangraConfig.PhotometryReductionMethod.PsfPhotometry) UsageStats.Instance.PSFPhotometryUsed++;
+				if (file.Footer.ReductionContext.ReductionMethod == TangraConfig.PhotometryReductionMethod.OptimalExtraction) UsageStats.Instance.OptimalExtractionUsed++;
+				if (file.Footer.ReductionContext.NoiseMethod == TangraConfig.BackgroundMethod.AverageBackground) UsageStats.Instance.AverageBackgroundUsed++;
+				if (file.Footer.ReductionContext.NoiseMethod == TangraConfig.BackgroundMethod.BackgroundMode) UsageStats.Instance.BackgroundModeUsed++;
+				if (file.Footer.ReductionContext.NoiseMethod == TangraConfig.BackgroundMethod.Background3DPolynomial) UsageStats.Instance._3DPolynomialFitUsed++;
+				if (file.Footer.ReductionContext.NoiseMethod == TangraConfig.BackgroundMethod.PSFBackground) UsageStats.Instance.PSFFittingBackgroundUsed++;
+				if (file.Footer.ReductionContext.NoiseMethod == TangraConfig.BackgroundMethod.BackgroundMedian) UsageStats.Instance.MedianBackgroundUsed++;
+		        UsageStats.Instance.TrackedObjects += file.Header.ObjectCount;
+				UsageStats.Instance.TrackedFrames += file.Header.CountFrames;
+
+				UsageStats.Instance.FramesWithBadTracking += m_NumberFramesWithBadTracking;
+				UsageStats.Instance.FramesIOTATimeStampRead += m_NumberOcredVtiOsdFrames;
+				UsageStats.Instance.FramesIOTATimeStampReadingErrored += m_NumberFailedOcredVtiOsdFrames;
+
+				UsageStats.Instance.Save();
+			}
 
 			m_Measuring = false;
 			m_Refining = false;

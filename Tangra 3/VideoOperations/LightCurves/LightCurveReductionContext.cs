@@ -53,7 +53,7 @@ namespace Tangra.VideoOperations.LightCurves
         public bool StopOnLostTracking;
         public bool FieldRotation;
 
-        private TangraConfig.ColourChannel m_ColourChannel;
+		private TangraConfig.ColourChannel m_ColourChannel;
 
         public TangraConfig.ColourChannel ColourChannel
         {

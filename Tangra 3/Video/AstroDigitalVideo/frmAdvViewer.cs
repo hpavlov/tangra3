@@ -305,6 +305,12 @@ namespace Tangra.Video.AstroDigitalVideo
 
 			if (saveFileDialog.ShowDialog(this) == DialogResult.OK)
 			{
+				if (TangraConfig.Settings.Generic.CollectUsageStats)
+				{
+					UsageStats.Instance.FSTFCropInvoked++;
+					UsageStats.Instance.Save();
+				}
+
 				ThreadPool.QueueUserWorkItem(new WaitCallback(CropFileWorker), new Tuple<string, int, int>(saveFileDialog.FileName, (int)nudCropFirstFrame.Value, (int)nudCropLastFrame.Value));
 			}
 		}
@@ -450,6 +456,12 @@ namespace Tangra.Video.AstroDigitalVideo
                 else if (cbxAddedGamma.SelectedIndex == 4)
                     addedGamma = 1 / 0.35;
 
+				if (TangraConfig.Settings.Generic.CollectUsageStats)
+				{
+					UsageStats.Instance.FSTSToAVIInvoked++;
+					UsageStats.Instance.Save();
+				}
+
                 ThreadPool.QueueUserWorkItem(
                     new WaitCallback(SaveAsAviFileWorker), 
                     new Tuple<string, int, int, bool, double, double>(
@@ -482,6 +494,12 @@ namespace Tangra.Video.AstroDigitalVideo
 
 			if (saveFileDialog.ShowDialog(this) == DialogResult.OK)
 			{
+				if (TangraConfig.Settings.Generic.CollectUsageStats)
+				{
+					UsageStats.Instance.FSTSToCSVInvoked++;
+					UsageStats.Instance.Save();
+				}
+
                 ThreadPool.QueueUserWorkItem(new WaitCallback(ExportToCSVWorker), new Tuple<string, int, int>(saveFileDialog.FileName, (int)nudCsvFirstFrame.Value, (int)nudCsvLastFrame.Value));
 			}
 		}
