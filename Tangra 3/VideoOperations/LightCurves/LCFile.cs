@@ -27,6 +27,16 @@ using Tangra.VideoOperations.LightCurves.Tracking;
 
 namespace Tangra.VideoOperations.LightCurves
 {
+	public enum VideoFileFormat
+	{
+		Unknown = 0,
+		ADV,
+		AAV,
+		AVI,
+		SER,
+		FITS
+	}
+
     internal class LCFile
     {
         internal LCMeasurementHeader Header;
@@ -1180,13 +1190,13 @@ namespace Tangra.VideoOperations.LightCurves
             return double.NaN;
         }
 
-	    private static Regex s_RegexSourceToFileFormat = new Regex("^.+\\((?<format>(ADV|AAV|AVI|SER))\\..+\\).*$");
+	    private static Regex s_RegexSourceToFileFormat = new Regex("^.+\\((?<format>(ADV|AAV|AVI|SER|FITS))\\..+\\).*$");
 
 		/// <summary>
-		/// AVI|AAV|ADV|SER
+		/// AVI|AAV|ADV|SER|FITS
 		/// </summary>
 		/// <returns></returns>
-		internal string GetVideoFileFormat()
+		internal VideoFileFormat GetVideoFileFormat()
 		{
 			if (SourceInfo != null)
 			{
@@ -1195,21 +1205,26 @@ namespace Tangra.VideoOperations.LightCurves
 					match.Groups["format"] != null &&
 					match.Groups["format"].Success)
 				{
-					return match.Groups["format"].Value;
+					try
+					{
+						return (VideoFileFormat)Enum.Parse(typeof(VideoFileFormat), match.Groups["format"].Value);
+					}
+					catch (FormatException fex)
+					{ }
 				}
 			}
-			return "";
+			return VideoFileFormat.Unknown;
 		}
 
 		/// <summary>
 		/// PAL|NTSC|Digital
 		/// </summary>
 		/// <returns></returns>
-		internal string GetVideoFormat(string videoFileFormat)
+		internal string GetVideoFormat(VideoFileFormat videoFileFormat)
 		{
-			if (videoFileFormat == "ADV" || videoFileFormat == "SER")
+			if (videoFileFormat == VideoFileFormat.ADV || videoFileFormat == VideoFileFormat.SER)
 				return "Digital";
-			if (videoFileFormat == "AAV" && LcFile != null)
+			if (videoFileFormat == VideoFileFormat.AAV && LcFile != null)
 				return LcFile.Footer.AAVNativeVideoFormat;
 			else if (!double.IsNaN(ComputedFramesPerSecond))
 			{

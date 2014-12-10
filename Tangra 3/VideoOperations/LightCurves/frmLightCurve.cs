@@ -282,6 +282,8 @@ namespace Tangra.VideoOperations.LightCurves
             m_LightCurveController.Context.InstrumentalDelayConfigName = m_Footer.InstrumentalDelayConfigName;
             m_LightCurveController.Context.CameraName = m_Footer.CameraName;
             m_LightCurveController.Context.AAVFrameIntegration = m_Footer.AAVFrameIntegration;
+	        VideoFileFormat format = m_Header.GetVideoFileFormat();
+			m_LightCurveController.Context.InstrumentalDelayCorrectionsNotRequired = format == VideoFileFormat.ADV || format == VideoFileFormat.FITS;
             m_LightCurveController.Context.TimingType = m_Header.TimingType;
             m_LightCurveController.Context.MinFrame = m_Header.MinFrame;
             m_LightCurveController.Context.MaxFrame = m_Header.MaxFrame;
@@ -331,8 +333,7 @@ namespace Tangra.VideoOperations.LightCurves
 			bool hasEmbeddedTimeStamps = m_Footer.ReductionContext.HasEmbeddedTimeStamps;
 
             m_CameraCorrectionsHaveBeenAppliedFlag =
-                (!string.IsNullOrEmpty(m_LightCurveController.Context.InstrumentalDelayConfigName)) ||
-                (m_LightCurveController.Context.TimingType == MeasurementTimingType.EmbeddedTimeForEachFrame && m_LightCurveController.Context.BitPix > 8);
+                !string.IsNullOrEmpty(m_LightCurveController.Context.InstrumentalDelayConfigName) || m_LightCurveController.Context.InstrumentalDelayCorrectionsNotRequired;
 
 			if (m_Header.SecondTimedFrameTime != DateTime.MinValue || hasEmbeddedTimeStamps)
             {
@@ -356,7 +357,7 @@ namespace Tangra.VideoOperations.LightCurves
 						}
                         else
                         {
-							if (m_LCFile.Header.GetVideoFileFormat() != "SER")
+							if (m_LCFile.Header.GetVideoFileFormat() != VideoFileFormat.SER)
 							{
 								MessageBox.Show(this,
 												string.Format(
@@ -524,9 +525,10 @@ namespace Tangra.VideoOperations.LightCurves
 				m_EventTimesReport.RecordedToUT = m_LCFile.Header.GetVideoRecordEndTimeUT();
 				m_EventTimesReport.AnalysedFromUT = m_LCFile.Header.GetFirstAnalysedFrameTimeUT();
 				m_EventTimesReport.AnalysedToUT = m_LCFile.Header.GetLastAnalysedFrameTimeUT();
-				
-				m_EventTimesReport.VideoFileFormat = m_LCFile.Header.GetVideoFileFormat();
-				m_EventTimesReport.VideoFormat = m_LCFile.Header.GetVideoFormat(m_EventTimesReport.VideoFileFormat);
+
+				VideoFileFormat fileFormat = m_LCFile.Header.GetVideoFileFormat();
+				m_EventTimesReport.VideoFileFormat = fileFormat.ToString();
+				m_EventTimesReport.VideoFormat = m_LCFile.Header.GetVideoFormat(fileFormat);
 
 				double duration;
 				string mode;

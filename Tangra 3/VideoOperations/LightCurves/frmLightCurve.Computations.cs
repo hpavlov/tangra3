@@ -883,7 +883,7 @@ namespace Tangra.VideoOperations.LightCurves
                 m_LCFile.Header.LcFile = m_LCFile;
 
                 // AVI|AAV|ADV
-                string videoSystem = m_LCFile.Header.GetVideoFileFormat();
+				VideoFileFormat videoSystem = m_LCFile.Header.GetVideoFileFormat();
                 // PAL|NTSC|Digital
                 string videoFormat = m_LCFile.Header.GetVideoFormat(videoSystem);
 
@@ -897,9 +897,11 @@ namespace Tangra.VideoOperations.LightCurves
                         videoFormat = "NTSC";
                 }
 
-                if (videoSystem == "ADV")
+                if (videoSystem == VideoFileFormat.ADV)
                     return "ADVS";
-                else if (videoSystem == "AAV")
+				else if (videoSystem == VideoFileFormat.SER)
+					return "SER";
+                else if (videoSystem == VideoFileFormat.AAV)
                 {
                     if (videoFormat == "PAL" || videoFormat == "NTSC")
                         return string.Format("{0}-{1}", videoSystem, videoFormat);

@@ -31,8 +31,9 @@ namespace Tangra.VideoOperations.LightCurves
 			m_VideoController = videoController;
             DisplayLCFileInfo();
 
-			// Only 8 bit video (analogue) has fields
-			btnShowFields.Visible = m_lcFile.Footer.ReductionContext.BitPix == 8;
+			// Only analogue video (or derived from it) has fields
+			VideoFileFormat videoFileFormat = m_lcFile.Header.GetVideoFileFormat();
+			btnShowFields.Visible = videoFileFormat == VideoFileFormat.AVI || videoFileFormat == VideoFileFormat.AAV;
 			m_ShowingFields = false;
         }
 

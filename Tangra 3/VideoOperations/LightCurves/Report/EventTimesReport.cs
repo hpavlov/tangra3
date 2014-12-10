@@ -70,7 +70,7 @@ namespace Tangra.VideoOperations.LightCurves.Report
 		public string AnalysedToUT { get; set; }
 
 		/// <summary>
-		/// ADV|AAV|AVI
+		/// ADV|AAV|AVI|SER|FITS
 		/// </summary>
 		public string VideoFileFormat { get; set; }
 
