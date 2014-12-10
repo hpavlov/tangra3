@@ -548,7 +548,7 @@ namespace Tangra.Model.Config
 			public bool DarkFrameAdjustLevelToMedian = false;
 
 			public bool AcceptBetaUpdates = false;
-			public bool CollectUsageStats = true;
+			public bool SubmitUsageStats = true;
 
 			public bool UseHueIntensityDisplayMode = false;
 			public bool UseInvertedDisplayMode = false;

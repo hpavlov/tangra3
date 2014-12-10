@@ -23,5 +23,8 @@
     <Setting Name="UsageStatistics" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="UsageStatsLastSent" Type="System.DateTime" Scope="User">
+      <Value Profile="(Default)">2014-12-01</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

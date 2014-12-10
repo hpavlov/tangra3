@@ -41,11 +41,8 @@ namespace Tangra.VideoOperations.LightCurves
 
         public static void Save(string fileName, LCMeasurementHeader header, List<List<LCMeasurement>> data, List<LCFrameTiming> frameTiming, LCMeasurementFooter footer)
         {
-			if (TangraConfig.Settings.Generic.CollectUsageStats)
-			{
-				UsageStats.Instance.SavedLightCurves++;
-				UsageStats.Instance.Save();
-			}
+			UsageStats.Instance.SavedLightCurves++;
+			UsageStats.Instance.Save();
 
 			using (FileStream fileStr = new FileStream(fileName, FileMode.Create, FileAccess.Write))
 			using (DeflateStream deflateStream = new DeflateStream(fileStr, CompressionMode.Compress, true))
@@ -119,11 +116,8 @@ namespace Tangra.VideoOperations.LightCurves
 
         public static LCFile Load(string fileName)
         {
-			if (TangraConfig.Settings.Generic.CollectUsageStats)
-			{
-				UsageStats.Instance.LightCurvesOpened++;
-				UsageStats.Instance.Save();
-			}
+			UsageStats.Instance.LightCurvesOpened++;
+			UsageStats.Instance.Save();
 
             using (var inFile = new FileStream(fileName, FileMode.Open, FileAccess.Read))
             using (var deflateStream = new DeflateStream(inFile, CompressionMode.Decompress, true))

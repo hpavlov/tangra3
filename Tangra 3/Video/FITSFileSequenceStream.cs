@@ -22,11 +22,8 @@ namespace Tangra.Video
  
         public static FITSFileSequenceStream OpenFolder(string[] fitsFiles)
         {
-			if (TangraConfig.Settings.Generic.CollectUsageStats)
-			{
-				UsageStats.Instance.ProcessedFitsFolderFiles++;
-				UsageStats.Instance.Save();
-			}
+			UsageStats.Instance.ProcessedFitsFolderFiles++;
+			UsageStats.Instance.Save();
 
             var rv =  new FITSFileSequenceStream(fitsFiles);
 	        rv.FileName = Path.GetDirectoryName(fitsFiles[0]);

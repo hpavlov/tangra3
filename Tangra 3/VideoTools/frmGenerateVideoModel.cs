@@ -339,11 +339,8 @@ namespace Tangra.VideoTools
 		{
 			if (saveFileDialog.ShowDialog(this) == DialogResult.OK)
 			{
-				if (TangraConfig.Settings.Generic.CollectUsageStats)
-				{
-					UsageStats.Instance.ModelVideosGenerated++;
-					UsageStats.Instance.Save();
-				}
+				UsageStats.Instance.ModelVideosGenerated++;
+				UsageStats.Instance.Save();
 
 				var config = new ModelConfig()
 				{

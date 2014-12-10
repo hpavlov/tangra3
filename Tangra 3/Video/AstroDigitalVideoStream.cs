@@ -53,14 +53,11 @@ namespace Tangra.Video
 
                 TangraContext.Current.RenderingEngine = equipmentInfo.Engine == "AAV" ? "AstroAnalogueVideo" : "AstroDigitalVideo";
 
-				if (TangraConfig.Settings.Generic.CollectUsageStats)
-				{
-					if (equipmentInfo.Engine == "AAV")
-						UsageStats.Instance.ProcessedAdvFiles++;
-					else
-						UsageStats.Instance.ProcessedAavFiles++;
-					UsageStats.Instance.Save();
-				}
+				if (equipmentInfo.Engine == "AAV")
+					UsageStats.Instance.ProcessedAdvFiles++;
+				else
+					UsageStats.Instance.ProcessedAavFiles++;
+				UsageStats.Instance.Save();
 
 			    return rv;
 			}

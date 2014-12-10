@@ -1293,11 +1293,8 @@ namespace Tangra.VideoOperations.LightCurves
 
             if (frmConfigureReprocessing.ShowDialog(this) == DialogResult.OK)
             {
-				if (TangraConfig.Settings.Generic.CollectUsageStats)
-				{
-					UsageStats.Instance.QuickReprocessInvoked++;
-					UsageStats.Instance.Save();
-				}
+				UsageStats.Instance.QuickReprocessInvoked++;
+				UsageStats.Instance.Save();
 
                 if (m_LightCurveController.Context.RequiresFullReprocessing)
                 {
@@ -1957,11 +1954,8 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void miNoiseDistribution_Click(object sender, EventArgs e)
         {
-			if (TangraConfig.Settings.Generic.CollectUsageStats)
-			{
-				UsageStats.Instance.ReducedDataDistributoinInvoked++;
-				UsageStats.Instance.Save();
-			}
+			UsageStats.Instance.ReducedDataDistributoinInvoked++;
+			UsageStats.Instance.Save();
 
             frmNoiseDistribution frmNoiseDistribution = new frmNoiseDistribution(
 				m_Header, m_LightCurveController.Context.AllReadings, m_AllBinnedReadings, m_DisplaySettings.TargetBrushes, m_DisplaySettings.TargetColors, m_DisplaySettings.BackgroundColor);
@@ -1970,11 +1964,8 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void miPixelDistribution_Click(object sender, EventArgs e)
         {
-			if (TangraConfig.Settings.Generic.CollectUsageStats)
-			{
-				UsageStats.Instance.FramePixelDistributionInvoked++;
-				UsageStats.Instance.Save();
-			}
+			UsageStats.Instance.FramePixelDistributionInvoked++;
+			UsageStats.Instance.Save();
 
             frmPixelDistribution frm;
 
@@ -2368,11 +2359,8 @@ namespace Tangra.VideoOperations.LightCurves
 
 		private void btnSetMags_Click(object sender, EventArgs e)
 		{
-			if (TangraConfig.Settings.Generic.CollectUsageStats)
-			{
-				UsageStats.Instance.QuickReprocessInvoked++;
-				UsageStats.Instance.Save();
-			}
+			UsageStats.Instance.QuickReprocessInvoked++;
+			UsageStats.Instance.Save();
 
 			var frm = new frmSetReferenceMag();
 			frm.SetCurrentMeasurements(m_SelectedMeasurements, m_LightCurveController.Context);

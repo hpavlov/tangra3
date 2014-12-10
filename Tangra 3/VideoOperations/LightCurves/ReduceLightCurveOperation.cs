@@ -1545,54 +1545,51 @@ namespace Tangra.VideoOperations.LightCurves
 
 			LCFile file = FlushLightCurveFile();
 
-	        if (TangraConfig.Settings.Generic.CollectUsageStats)
-	        {
-		        if (file.Header.ReductionType == LightCurveReductionType.Asteroidal)
-			        UsageStats.Instance.TrackedAsteroidals++;
-		        else if (file.Header.ReductionType == LightCurveReductionType.MutualEvent)
-			        UsageStats.Instance.TrackedMutualEvents++;
-		        else if (file.Header.ReductionType == LightCurveReductionType.UntrackedMeasurement)
-			        UsageStats.Instance.UntrackedMeasurements++;
-		        else if (file.Header.ReductionType == LightCurveReductionType.TotalLunarDisappearance || file.Header.ReductionType == LightCurveReductionType.TotalLunarReppearance)
-					UsageStats.Instance.TotalLunarMeasurements++;
+			if (file.Header.ReductionType == LightCurveReductionType.Asteroidal)
+				UsageStats.Instance.TrackedAsteroidals++;
+			else if (file.Header.ReductionType == LightCurveReductionType.MutualEvent)
+				UsageStats.Instance.TrackedMutualEvents++;
+			else if (file.Header.ReductionType == LightCurveReductionType.UntrackedMeasurement)
+				UsageStats.Instance.UntrackedMeasurements++;
+			else if (file.Header.ReductionType == LightCurveReductionType.TotalLunarDisappearance || file.Header.ReductionType == LightCurveReductionType.TotalLunarReppearance)
+				UsageStats.Instance.TotalLunarMeasurements++;
 
-				if (TangraConfig.Settings.Tracking.SelectedEngine == TangraConfig.TrackingEngine.TrackingWithRefining)
-					UsageStats.Instance.TrackingWithRecoverUsed++;
-				else if (TangraConfig.Settings.Tracking.SelectedEngine == TangraConfig.TrackingEngine.AdHocTracking)
-					UsageStats.Instance.SimplifiedTrackingUsed++;
-				else if (TangraConfig.Settings.Tracking.SelectedEngine == TangraConfig.TrackingEngine.LetTangraChoose)
-					UsageStats.Instance.AutomaticTrackingUsed++;
+			if (TangraConfig.Settings.Tracking.SelectedEngine == TangraConfig.TrackingEngine.TrackingWithRefining)
+				UsageStats.Instance.TrackingWithRecoverUsed++;
+			else if (TangraConfig.Settings.Tracking.SelectedEngine == TangraConfig.TrackingEngine.AdHocTracking)
+				UsageStats.Instance.SimplifiedTrackingUsed++;
+			else if (TangraConfig.Settings.Tracking.SelectedEngine == TangraConfig.TrackingEngine.LetTangraChoose)
+				UsageStats.Instance.AutomaticTrackingUsed++;
 
-				if (file.Footer.ReductionContext.FullDisappearance) UsageStats.Instance.FullDisappearanceFlag++;
-				if (file.Footer.ReductionContext.WindOrShaking) UsageStats.Instance.WindOrShakingFlag++;
-				if (file.Footer.ReductionContext.HighFlickering) UsageStats.Instance.FlickeringFlag++;
-				if (file.Footer.ReductionContext.FieldRotation) UsageStats.Instance.FieldRotationFlag++;
-				if (file.Footer.ReductionContext.IsDriftThrough) UsageStats.Instance.DriftThroughFlag++;
-				if (file.Footer.ReductionContext.NumberFramesToIntegrate > 1) UsageStats.Instance.SoftwareIntegrationUsed++;
+			if (file.Footer.ReductionContext.FullDisappearance) UsageStats.Instance.FullDisappearanceFlag++;
+			if (file.Footer.ReductionContext.WindOrShaking) UsageStats.Instance.WindOrShakingFlag++;
+			if (file.Footer.ReductionContext.HighFlickering) UsageStats.Instance.FlickeringFlag++;
+			if (file.Footer.ReductionContext.FieldRotation) UsageStats.Instance.FieldRotationFlag++;
+			if (file.Footer.ReductionContext.IsDriftThrough) UsageStats.Instance.DriftThroughFlag++;
+			if (file.Footer.ReductionContext.NumberFramesToIntegrate > 1) UsageStats.Instance.SoftwareIntegrationUsed++;
 
-				if (Math.Abs(TangraConfig.Settings.Photometry.EncodingGamma - 1) > 0.01) UsageStats.Instance.ReverseGammaUsed++;
+			if (Math.Abs(TangraConfig.Settings.Photometry.EncodingGamma - 1) > 0.01) UsageStats.Instance.ReverseGammaUsed++;
 
-				if (file.Footer.ReductionContext.UseClipping || file.Footer.ReductionContext.UseStretching || file.Footer.ReductionContext.UseBrightnessContrast)
-					UsageStats.Instance.PreProcessingUsed++;
+			if (file.Footer.ReductionContext.UseClipping || file.Footer.ReductionContext.UseStretching || file.Footer.ReductionContext.UseBrightnessContrast)
+				UsageStats.Instance.PreProcessingUsed++;
 
-				if (file.Footer.ReductionContext.DigitalFilter != TangraConfig.PreProcessingFilter.NoFilter) UsageStats.Instance.DigitalFilterUsed++;
-				if (file.Footer.ReductionContext.ReductionMethod == TangraConfig.PhotometryReductionMethod.AperturePhotometry) UsageStats.Instance.AperturePhotometry++;
-				if (file.Footer.ReductionContext.ReductionMethod == TangraConfig.PhotometryReductionMethod.PsfPhotometry) UsageStats.Instance.PSFPhotometryUsed++;
-				if (file.Footer.ReductionContext.ReductionMethod == TangraConfig.PhotometryReductionMethod.OptimalExtraction) UsageStats.Instance.OptimalExtractionUsed++;
-				if (file.Footer.ReductionContext.NoiseMethod == TangraConfig.BackgroundMethod.AverageBackground) UsageStats.Instance.AverageBackgroundUsed++;
-				if (file.Footer.ReductionContext.NoiseMethod == TangraConfig.BackgroundMethod.BackgroundMode) UsageStats.Instance.BackgroundModeUsed++;
-				if (file.Footer.ReductionContext.NoiseMethod == TangraConfig.BackgroundMethod.Background3DPolynomial) UsageStats.Instance._3DPolynomialFitUsed++;
-				if (file.Footer.ReductionContext.NoiseMethod == TangraConfig.BackgroundMethod.PSFBackground) UsageStats.Instance.PSFFittingBackgroundUsed++;
-				if (file.Footer.ReductionContext.NoiseMethod == TangraConfig.BackgroundMethod.BackgroundMedian) UsageStats.Instance.MedianBackgroundUsed++;
-		        UsageStats.Instance.TrackedObjects += file.Header.ObjectCount;
-				UsageStats.Instance.TrackedFrames += file.Header.CountFrames;
+			if (file.Footer.ReductionContext.DigitalFilter != TangraConfig.PreProcessingFilter.NoFilter) UsageStats.Instance.DigitalFilterUsed++;
+			if (file.Footer.ReductionContext.ReductionMethod == TangraConfig.PhotometryReductionMethod.AperturePhotometry) UsageStats.Instance.AperturePhotometry++;
+			if (file.Footer.ReductionContext.ReductionMethod == TangraConfig.PhotometryReductionMethod.PsfPhotometry) UsageStats.Instance.PSFPhotometryUsed++;
+			if (file.Footer.ReductionContext.ReductionMethod == TangraConfig.PhotometryReductionMethod.OptimalExtraction) UsageStats.Instance.OptimalExtractionUsed++;
+			if (file.Footer.ReductionContext.NoiseMethod == TangraConfig.BackgroundMethod.AverageBackground) UsageStats.Instance.AverageBackgroundUsed++;
+			if (file.Footer.ReductionContext.NoiseMethod == TangraConfig.BackgroundMethod.BackgroundMode) UsageStats.Instance.BackgroundModeUsed++;
+			if (file.Footer.ReductionContext.NoiseMethod == TangraConfig.BackgroundMethod.Background3DPolynomial) UsageStats.Instance._3DPolynomialFitUsed++;
+			if (file.Footer.ReductionContext.NoiseMethod == TangraConfig.BackgroundMethod.PSFBackground) UsageStats.Instance.PSFFittingBackgroundUsed++;
+			if (file.Footer.ReductionContext.NoiseMethod == TangraConfig.BackgroundMethod.BackgroundMedian) UsageStats.Instance.MedianBackgroundUsed++;
+			UsageStats.Instance.TrackedObjects += file.Header.ObjectCount;
+			UsageStats.Instance.TrackedFrames += file.Header.CountFrames;
 
-				UsageStats.Instance.FramesWithBadTracking += m_NumberFramesWithBadTracking;
-				UsageStats.Instance.FramesIOTATimeStampRead += m_NumberOcredVtiOsdFrames;
-				UsageStats.Instance.FramesIOTATimeStampReadingErrored += m_NumberFailedOcredVtiOsdFrames;
+			UsageStats.Instance.FramesWithBadTracking += m_NumberFramesWithBadTracking;
+			UsageStats.Instance.FramesIOTATimeStampRead += m_NumberOcredVtiOsdFrames;
+			UsageStats.Instance.FramesIOTATimeStampReadingErrored += m_NumberFailedOcredVtiOsdFrames;
 
-				UsageStats.Instance.Save();
-			}
+			UsageStats.Instance.Save();
 
 			m_Measuring = false;
 			m_Refining = false;

@@ -668,11 +668,8 @@ namespace Tangra
 
         private void miOnlineHelp_Click(object sender, EventArgs e)
         {
-			if (TangraConfig.Settings.Generic.CollectUsageStats)
-			{
-				UsageStats.Instance.OnlineHelpMenuUsed++;
-				UsageStats.Instance.Save();
-			}
+			UsageStats.Instance.OnlineHelpMenuUsed++;
+			UsageStats.Instance.Save();
 
             Process.Start("http://www.hristopavlov.net/Tangra3");
         }
@@ -741,11 +738,8 @@ namespace Tangra
 
 				if (saveFrameDialog.ShowDialog(this) == DialogResult.OK)
 				{
-					if (TangraConfig.Settings.Generic.CollectUsageStats)
-					{
-						UsageStats.Instance.ExportToBMPUsed++;
-						UsageStats.Instance.Save();
-					}
+					UsageStats.Instance.ExportToBMPUsed++;
+					UsageStats.Instance.Save();
 
 					m_VideoContext.Pixelmap.CreateNewDisplayBitmap().Save(saveFrameDialog.FileName, ImageFormat.Bmp);
 				}
@@ -761,11 +755,8 @@ namespace Tangra
 
 				if (saveFrameDialog.ShowDialog(this) == DialogResult.OK)
 				{
-					if (TangraConfig.Settings.Generic.CollectUsageStats)
-					{
-						UsageStats.Instance.ExportToCSVUsed++;
-						UsageStats.Instance.Save();
-					}
+					UsageStats.Instance.ExportToCSVUsed++;
+					UsageStats.Instance.Save();
 
 					StringBuilder output = new StringBuilder();
 

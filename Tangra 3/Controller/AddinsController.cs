@@ -156,11 +156,8 @@ namespace Tangra.Controller
 
 						if (canExecuteAction)
 						{
-							if (TangraConfig.Settings.Generic.CollectUsageStats)
-							{
-								UsageStats.Instance.AddinActionsInvoked++;
-								UsageStats.Instance.Save();
-							}
+							UsageStats.Instance.AddinActionsInvoked++;
+							UsageStats.Instance.Save();
 
 							addinAction.Execute();
 						}

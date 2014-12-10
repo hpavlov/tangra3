@@ -104,6 +104,39 @@ namespace Tangra.Controller
 			{
 				Trace.WriteLine(ex, "Update");
 			}
+
+			try
+			{
+				if (TangraConfig.Settings.Generic.SubmitUsageStats && Settings.Default.UsageStatsLastSent.AddDays(30) < DateTime.Now)
+				{
+					UsageStats.Instance.Save();
+					string usageStats = Settings.Default.UsageStatistics;
+
+					WebRequest req = WebRequest.Create("http://www.occultwatcher.net/CGI-BIN/TangraUsageStats.ashx");
+					
+					req.ContentType = "application/xml";
+					req.Method = "POST";
+					
+					byte[] bytes = Encoding.UTF8.GetBytes(usageStats);
+
+					req.ContentLength = bytes.Length;
+					System.IO.Stream os = req.GetRequestStream();
+					os.Write(bytes, 0, bytes.Length);
+					os.Close();
+
+					HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
+					if (resp.StatusCode == HttpStatusCode.OK)
+					{
+						UsageStats.ClearStats();
+						Settings.Default.UsageStatsLastSent = DateTime.Now;
+						Settings.Default.Save();
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Trace.WriteLine(ex, "UsageStats");
+			}
 		}
 
 		public void RunTangra3UpdaterForWindows()

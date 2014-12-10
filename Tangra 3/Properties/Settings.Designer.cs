@@ -106,5 +106,17 @@ namespace Tangra.Properties {
                 this["UsageStatistics"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2014-12-01")]
+        public global::System.DateTime UsageStatsLastSent {
+            get {
+                return ((global::System.DateTime)(this["UsageStatsLastSent"]));
+            }
+            set {
+                this["UsageStatsLastSent"] = value;
+            }
+        }
     }
 }

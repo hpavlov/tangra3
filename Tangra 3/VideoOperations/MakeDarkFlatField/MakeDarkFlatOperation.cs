@@ -200,13 +200,10 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
 							m_VideoController.StopVideo();
 						}
 
-						if (TangraConfig.Settings.Generic.CollectUsageStats)
-						{
-							if (m_FrameType == FrameType.Dark) UsageStats.Instance.DarkFramesProduced++;
-							if (m_FrameType == FrameType.Flat) UsageStats.Instance.FlatFramesProduced++;
+						if (m_FrameType == FrameType.Dark) UsageStats.Instance.DarkFramesProduced++;
+						if (m_FrameType == FrameType.Flat) UsageStats.Instance.FlatFramesProduced++;
 
-							UsageStats.Instance.Save();
-						}
+						UsageStats.Instance.Save();
                     }
                 }
             }

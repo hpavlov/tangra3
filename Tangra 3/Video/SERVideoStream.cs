@@ -40,11 +40,8 @@ namespace Tangra.Video
 
 			TangraCore.SEROpenFile(fileName, ref fileInfo, observer, instrument, telescope, false);
 
-			if (TangraConfig.Settings.Generic.CollectUsageStats)
-			{
-				UsageStats.Instance.ProcessedSerFiles++;
-				UsageStats.Instance.Save();
-			}
+			UsageStats.Instance.ProcessedSerFiles++;
+			UsageStats.Instance.Save();
 
 			var frmInfo = new frmEnterSERFileInfo(fileInfo);
 			if (frmInfo.ShowDialog(parentForm) == DialogResult.OK)
