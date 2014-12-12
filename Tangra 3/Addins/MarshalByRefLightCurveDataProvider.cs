@@ -30,6 +30,7 @@ namespace Tangra.Addins
 			FileName = localProvider.FileName;
 			NumberOfMeasuredComparisonObjects = localProvider.NumberOfMeasuredComparisonObjects;
             CameraCorrectionsHaveBeenApplied = localProvider.CameraCorrectionsHaveBeenApplied;
+		    HasEmbeddedTimeStamps = localProvider.HasEmbeddedTimeStamps;
             VideoCameraName = localProvider.VideoCameraName;
             VideoSystem = localProvider.VideoSystem;
             NumberIntegratedFrames = localProvider.NumberIntegratedFrames;
@@ -55,6 +56,8 @@ namespace Tangra.Addins
 		public int NumberOfMeasuredComparisonObjects { get; private set; }
 
         public bool CameraCorrectionsHaveBeenApplied { get; private set; }
+
+        public bool HasEmbeddedTimeStamps { get; private set; }
 
 		public string VideoCameraName { get; private set; }
 

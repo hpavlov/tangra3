@@ -214,7 +214,7 @@ namespace Tangra.OccultTools.OccultWrappers
                         }
                     }
 
-                    bool cameraCorrectionsHaveBeenApplied = dataProvider.CameraCorrectionsHaveBeenApplied;
+                    bool cameraCorrectionsHaveBeenApplied = dataProvider.CameraCorrectionsHaveBeenApplied && dataProvider.HasEmbeddedTimeStamps;
 
                     if (AOTA_Set_TimeBaseEx != null)
                         AOTA_Set_TimeBaseEx.Invoke(m_AotaInstance, new object[] { secondsFromUTMidnight, cameraCorrectionsHaveBeenApplied });

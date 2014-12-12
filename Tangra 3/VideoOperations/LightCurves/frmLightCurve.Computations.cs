@@ -722,6 +722,10 @@ namespace Tangra.VideoOperations.LightCurves
 					string isCorrectedForInstrumentalDelay;
 					DateTime currFrameTime = m_LCFile.GetTimeForFrame(frameNo, out isCorrectedForInstrumentalDelay);
 
+				    if (!string.IsNullOrEmpty(m_LightCurveController.Context.InstrumentalDelayConfigName) && isCorrectedForInstrumentalDelay == null)
+                        // Single frames not corrected for instrumental delays, where insrumental delays are known, are considered bad times
+				        currFrameTime = DateTime.MaxValue;
+
                     string timeStr;
 					if (isBadTimeString != null)
 					{
@@ -795,9 +799,9 @@ namespace Tangra.VideoOperations.LightCurves
             bool addIntegrationInfo = m_Footer.ReductionContext.FrameIntegratingMode != FrameIntegratingMode.NoIntegration;
 
             string instrumentalDelayStatus = "Not Applied";
-            if (m_LightCurveController.Context.TimingType == MeasurementTimingType.EmbeddedTimeForEachFrame && m_LightCurveController.Context.BitPix > 8)
+            if (m_LightCurveController.Context.TimingType == MeasurementTimingType.EmbeddedTimeForEachFrame && m_LightCurveController.Context.InstrumentalDelayCorrectionsNotRequired)
                 instrumentalDelayStatus = "Not Required";
-            else if (!string.IsNullOrEmpty(m_LightCurveController.Context.InstrumentalDelayConfigName))
+            else if (!string.IsNullOrEmpty(m_LightCurveController.Context.InstrumentalDelayConfigName) && m_LightCurveController.Context.TimingType != MeasurementTimingType.UserEnteredFrameReferences)
                 instrumentalDelayStatus = "Applied";
 
             output.Append("Reversed Gamma, Colour, Measured Band, Integration, Digital Filter, Signal Method, Background Method, Instrumental Delay Corrections, Camera, AAV Integration, First Frame, Last Frame");
@@ -869,6 +873,11 @@ namespace Tangra.VideoOperations.LightCurves
         bool ILightCurveDataProvider.CameraCorrectionsHaveBeenApplied
         {
             get { return m_CameraCorrectionsHaveBeenAppliedFlag; }
+        }
+
+        bool ILightCurveDataProvider.HasEmbeddedTimeStamps
+        {
+            get { return m_HasEmbeddedTimeStamps; }
         }
 
 	    string ILightCurveDataProvider.VideoCameraName

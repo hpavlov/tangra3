@@ -335,6 +335,8 @@ namespace Tangra.VideoOperations.LightCurves
             m_CameraCorrectionsHaveBeenAppliedFlag =
                 !string.IsNullOrEmpty(m_LightCurveController.Context.InstrumentalDelayConfigName) || m_LightCurveController.Context.InstrumentalDelayCorrectionsNotRequired;
 
+            m_HasEmbeddedTimeStamps = m_Footer.ReductionContext.HasEmbeddedTimeStamps;
+
 			if (m_Header.SecondTimedFrameTime != DateTime.MinValue || hasEmbeddedTimeStamps)
             {
 				if (!hasEmbeddedTimeStamps)
@@ -1319,6 +1321,8 @@ namespace Tangra.VideoOperations.LightCurves
         private bool m_TimestampDiscrepencyFlag = false;
 
 	    private bool m_CameraCorrectionsHaveBeenAppliedFlag = false;
+
+	    private bool m_HasEmbeddedTimeStamps = false;
 
 		private void HandleIncludeExcludeObject(object sender, EventArgs e)
 		{

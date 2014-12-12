@@ -229,17 +229,20 @@ namespace Tangra.OccultTools.OccultWrappers
                     double[] secondsFromUTMidnight;
                     long startFrameStartDayTicks;
 
+                    bool cameraCorrectionsHaveBeenApplied = dataProvider.CameraCorrectionsHaveBeenApplied && dataProvider.HasEmbeddedTimeStamps;
+
                     startFrameStartDayTicks = hasReliableTimeBase ? timestamps[0].Date.Ticks : timestamps.FirstOrDefault(x => x != DateTime.MinValue).Date.Ticks;
                     secondsFromUTMidnight = new double[timestamps.Length];
                     for (int i = 0; i < timestamps.Length; i++)
                     {
-                        if (timestamps[i] != DateTime.MinValue)
+                        if (!measurements[i].IsCorrectedForInstrumentalDelay && cameraCorrectionsHaveBeenApplied)
+                            // Individual frames for which instrumental delays hasn't been applied even that instrumental delay is applied for the file, are marked as blank
+                            secondsFromUTMidnight[i] = 0;
+                        else if (timestamps[i] != DateTime.MinValue)
                             secondsFromUTMidnight[i] = Math.Truncate(new TimeSpan(timestamps[i].Ticks - startFrameStartDayTicks).TotalSeconds * 10000) / 10000.0;
                         else
                             secondsFromUTMidnight[i] = 0;
                     }
-
-                    bool cameraCorrectionsHaveBeenApplied = dataProvider.CameraCorrectionsHaveBeenApplied;
 
                     ShieldedCall(() => m_AotaInstance.Set_TimeBase(secondsFromUTMidnight, cameraCorrectionsHaveBeenApplied));
 

@@ -39,9 +39,7 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void DisplayLCFileInfo()
         {
-			bool isAdvFile = 
-				m_lcFile.Footer.ReductionContext.BitPix > 8 || 
-				m_lcFile.Header.SourceInfo.Contains("(AAV.8)");
+			bool isAdvFile = m_lcFile.Header.GetVideoFileFormat() == VideoFileFormat.ADV;
 
             lblFileName.Text = Path.GetFileName(m_lcFile.Header.PathToVideoFile);
             lblSource.Text = m_lcFile.Header.SourceInfo;
