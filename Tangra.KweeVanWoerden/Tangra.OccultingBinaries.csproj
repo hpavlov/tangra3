@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Tangra.KweeVanWoerden</RootNamespace>
-    <AssemblyName>Tangra.EclipsingBinaries</AssemblyName>
+    <AssemblyName>Tangra.OccultingBinaries</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -47,6 +47,12 @@
     <Compile Include="frmAddinConfig.Designer.cs">
       <DependentUpon>frmAddinConfig.cs</DependentUpon>
     </Compile>
+    <Compile Include="frmResults.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmResults.Designer.cs">
+      <DependentUpon>frmResults.cs</DependentUpon>
+    </Compile>
     <Compile Include="KweeVanWoerdenAddin.cs" />
     <Compile Include="KweeVanWoerdenMinimum.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -66,15 +72,18 @@
     <EmbeddedResource Include="frmAddinConfig.resx">
       <DependentUpon>frmAddinConfig.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="frmResults.resx">
+      <DependentUpon>frmResults.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resource.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resource.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="FortranCode\Kwee_Van_Woerden_Journal_Paper.pdf" />
-    <None Include="FortranCode\Kwee_Van_Woerden_Main_Program.f90" />
-    <None Include="FortranCode\Kwee_Van_Woerden_Subroutine.f90" />
+    <None Include="ReferenceCode\Kwee_Van_Woerden_Journal_Paper.pdf" />
+    <None Include="ReferenceCode\Kwee_Van_Woerden_Main_Program.f90" />
+    <None Include="ReferenceCode\Kwee_Van_Woerden_Subroutine.f90" />
     <None Include="Resources\EclipsingBinaries.ico" />
     <EmbeddedResource Include="Resources\Input_Observations.bin" />
   </ItemGroup>
@@ -83,9 +92,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(TargetPath)" "$(SolutionDir)Tangra 3\bin\$(ConfigurationName)\Addins\" /Y
-xcopy "$(ProjectDir)FortranCode\kwee_van_woerden_subroutine.dll" "$(TargetDir)" /Y
-xcopy "$(ProjectDir)FortranCode\kwee_van_woerden_subroutine.dll" "$(SolutionDir)Tangra 3\bin\$(ConfigurationName)\Addins\" /Y</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(TargetPath)" "$(SolutionDir)Tangra 3\bin\$(ConfigurationName)\Addins\" /Y</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

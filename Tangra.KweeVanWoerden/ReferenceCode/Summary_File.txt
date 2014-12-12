@@ -1,0 +1,11 @@
+      Time_First               Number_Obs
+      2456967.123457                 7999
+
+               Time of minimum: 
+
+      Bins-Quadratic          Uncertainty
+            2.292589             0.106093
+      From Time_First         Uncertainty
+            0.060019             0.000084
+      Absolute                Uncertainty
+      2456967.183475             0.000084

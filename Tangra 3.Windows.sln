@@ -24,7 +24,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OcrTester", "OcrTester\OcrT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangra.OCR", "Tangra.OCR\Tangra.OCR.csproj", "{06024BC0-0061-4902-8C50-4EAB7913C8AA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangra.EclipsingBinaries", "Tangra.KweeVanWoerden\Tangra.EclipsingBinaries.csproj", "{CFC2A6BF-8518-42D1-9707-AF3C3B09C182}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangra.OccultingBinaries", "Tangra.KweeVanWoerden\Tangra.OccultingBinaries.csproj", "{CFC2A6BF-8518-42D1-9707-AF3C3B09C182}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

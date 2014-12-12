@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.Remoting;
 using System.Text;
 using System.Xml.Serialization;
 using Tangra.SDK;
@@ -74,6 +75,9 @@ namespace Tangra.KweeVanWoerden
 			m_KweeCanWoerdenAction = new KweeVanWoerdenMinimum(m_Host, m_Settings);
 
 			m_SupportedAddinActions = new ITangraAddinAction[] { m_KweeCanWoerdenAction };
+
+			RemotingConfiguration.RegisterWellKnownServiceType(typeof(KweeVanWoerdenAddin), "KweeVanWoerdenAddin", WellKnownObjectMode.Singleton);
+			RemotingConfiguration.RegisterWellKnownServiceType(typeof(KweeVanWoerdenMinimum), "KweeVanWoerdenMinimum", WellKnownObjectMode.Singleton);
 		}
 
 		public void Finalise()
@@ -90,7 +94,7 @@ namespace Tangra.KweeVanWoerden
 
 		public string DisplayName
 		{
-			get { return "Eclipsing Binaries for Tangra"; }
+			get { return "Occulting Binaries for Tangra"; }
 		}
 
 		public string Author
@@ -105,7 +109,7 @@ namespace Tangra.KweeVanWoerden
 
 		public string Description
 		{
-			get { return "Addin for Tangra 3 for determining the epoch of minimum for eclipsing binaries"; }
+			get { return "Addin for Tangra 3 for determining the epoch of minimum for occulting binaries"; }
 		}
 
 		public string Url
