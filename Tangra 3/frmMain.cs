@@ -992,5 +992,10 @@ namespace Tangra
 			frm.ShowDialog(this);
 		}
 
+        private void miYahooGroup_Click(object sender, EventArgs e)
+        {
+            Process.Start("https://groups.yahoo.com/neo/groups/Tangra/info");
+        }
+
 	}
 }

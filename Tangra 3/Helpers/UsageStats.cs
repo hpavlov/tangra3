@@ -46,10 +46,7 @@ namespace Tangra.Helpers
 		public void Save()
 		{
 			var serData = new StringBuilder();
-			using (var memStr = new StringWriter(serData))
-			{
-				m_Serializer.Serialize(memStr, this);
-			}
+            m_Serializer.Serialize(XmlWriter.Create(serData, new XmlWriterSettings { OmitXmlDeclaration = true, Indent = true }), this);
 			Properties.Settings.Default.UsageStatistics = serData.ToString();
 			Properties.Settings.Default.Save();
 		}
