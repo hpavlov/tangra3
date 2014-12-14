@@ -42,8 +42,8 @@ namespace Tangra.Addins
             {
                 Timestamp = lcFile.GetTimeForFrame(frameNo, out isCorrectedForInstrumentalDelay);
             }
-            
-            IsCorrectedForInstrumentalDelay = !string.IsNullOrEmpty(isCorrectedForInstrumentalDelay);
+
+            IsCorrectedForInstrumentalDelay = lcFile.Header.InstrumentalDelayCorrectionsNotRequired() || !string.IsNullOrEmpty(isCorrectedForInstrumentalDelay);
 		}
 
         internal SingleMeasurement(frmLightCurve.BinnedValue binnedMeasurement, int targetNo, double binMiddleFrameNo, LCFile lcFile, bool dontIncludeTimes)
@@ -63,7 +63,8 @@ namespace Tangra.Addins
             {
                 Timestamp = lcFile.GetTimeForFrame(binMiddleFrameNo, out isCorrectedForInstrumentalDelay);
             }
-            IsCorrectedForInstrumentalDelay = !string.IsNullOrEmpty(isCorrectedForInstrumentalDelay);
+
+            IsCorrectedForInstrumentalDelay = lcFile.Header.InstrumentalDelayCorrectionsNotRequired() || !string.IsNullOrEmpty(isCorrectedForInstrumentalDelay);
 		}
 
 		public int CurrFrameNo { get; private set; }

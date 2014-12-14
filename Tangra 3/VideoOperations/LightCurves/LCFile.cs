@@ -1190,6 +1190,19 @@ namespace Tangra.VideoOperations.LightCurves
             return double.NaN;
         }
 
+        private bool? m_InstrumentalDelayCorrectionsNotRequired;
+
+        internal bool InstrumentalDelayCorrectionsNotRequired()
+        {
+            if (!m_InstrumentalDelayCorrectionsNotRequired.HasValue)
+            {
+                VideoFileFormat format = GetVideoFileFormat();
+                m_InstrumentalDelayCorrectionsNotRequired = format == VideoFileFormat.ADV || format == VideoFileFormat.FITS;                
+            }
+
+            return m_InstrumentalDelayCorrectionsNotRequired.Value;
+        }
+
 	    private static Regex s_RegexSourceToFileFormat = new Regex("^.+\\((?<format>(ADV|AAV|AVI|SER|FITS))\\..+\\).*$");
 
 		/// <summary>
@@ -1617,6 +1630,8 @@ namespace Tangra.VideoOperations.LightCurves
         {
             m_FramesPerSecond = 25;
             m_FrameExposureInMS = 40;
+            m_InstrumentalDelayCorrectionsNotRequired = null;
+
             ProcessingType = ProcessingType.SignalMinusBackground;
             MinAdjustedReading = 0;
             MaxAdjustedReading = 0;
@@ -1674,6 +1689,7 @@ namespace Tangra.VideoOperations.LightCurves
         internal LCMeasurementHeader(BinaryReader reader)
         {
             m_FrameExposureInMS = 40;
+            m_InstrumentalDelayCorrectionsNotRequired = null;
             ProcessingType = ProcessingType.SignalMinusBackground;
             MinAdjustedReading = 0;
             MaxAdjustedReading = 0;
