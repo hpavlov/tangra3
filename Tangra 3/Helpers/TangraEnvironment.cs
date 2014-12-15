@@ -184,4 +184,43 @@ namespace Tangra.Helpers
             ReleaseDate = DateTime.ParseExact(releaseDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
         }
     }
+
+    [AttributeUsage(AttributeTargets.Assembly)]
+    public class MinimumVersionRequiredAttribute : Attribute
+    {
+        public string MinimumVersionRequired;
+
+        public MinimumVersionRequiredAttribute(string minimumVersionRequired)
+        {
+            MinimumVersionRequired = minimumVersionRequired;
+        }
+
+        internal bool IsReqiredVersion(string currentVersion)
+        {
+            string[] tokensCurr = currentVersion.Split('.');
+            string[] tokensReq = MinimumVersionRequired.Split('.');
+
+            if (int.Parse(tokensCurr[0]) < int.Parse(tokensReq[0])) return false;
+            if (int.Parse(tokensCurr[1]) < int.Parse(tokensReq[1])) return false;
+            if (int.Parse(tokensCurr[2]) < int.Parse(tokensReq[2])) return false;
+
+            return true;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Assembly)]
+    public class TangraCoreVersionRequiredAttribute : MinimumVersionRequiredAttribute
+    {
+        public TangraCoreVersionRequiredAttribute(string minimumVersionRequired) :
+            base(minimumVersionRequired)
+        { }
+    }
+
+    [AttributeUsage(AttributeTargets.Assembly)]
+    public class TangraVideoVersionRequiredAttribute : MinimumVersionRequiredAttribute
+    {
+        public TangraVideoVersionRequiredAttribute(string minimumVersionRequired) :
+            base(minimumVersionRequired)
+        { }
+    }
 }

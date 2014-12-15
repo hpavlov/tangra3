@@ -117,11 +117,23 @@ namespace Tangra
 
 		private static void CheckUnmanagedLibraries()
 		{
+            TangraCoreVersionRequiredAttribute minCoreVersionRequired = ((TangraCoreVersionRequiredAttribute)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(TangraCoreVersionRequiredAttribute), false)[0]);
+            TangraVideoVersionRequiredAttribute minVideoVersionRequired = ((TangraVideoVersionRequiredAttribute)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(TangraVideoVersionRequiredAttribute), false)[0]);
+
 			string engineVersion = TangraCore.GetTangraCoreVersion();
 			Trace.WriteLine(string.Format("Tangra Core v{0}", engineVersion));
+            if (minCoreVersionRequired != null && !minCoreVersionRequired.IsReqiredVersion(engineVersion))
+            {
+                MessageBox.Show("Your installations of Tangra3 desn't have the latest version of TangraCore.dll. Please check for updates.","Tangra 3", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
 
 			engineVersion = TangraVideo.GetVideoEngineVersion();
 			Trace.WriteLine(string.Format("Tangra Video Engine v{0}", engineVersion));
+
+            if (minVideoVersionRequired != null && !minVideoVersionRequired.IsReqiredVersion(engineVersion))
+            {
+                MessageBox.Show("Your installations of Tangra3 desn't have the latest version of TangraVideo.dll. Please check for updates.", "Tangra 3", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
 		}
 
 		public static bool IsLinux
