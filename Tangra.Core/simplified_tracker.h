@@ -32,8 +32,8 @@ struct NativeTrackedObjectInfo
 	float CenterYDouble;
 	float LastKnownGoodPositionXDouble;
 	float LastKnownGoodPositionYDouble;
-	unsigned char IsLocated;
-	unsigned char IsOffScreen;	
+	unsigned int IsLocated;
+	unsigned int IsOffScreen;	
 	unsigned int TrackingFlags;
 };
 

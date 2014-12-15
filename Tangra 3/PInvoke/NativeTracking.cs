@@ -26,11 +26,11 @@ namespace Tangra.PInvoke
 		[FieldOffset(12)]
 		public float LastGoodPositionY;
 		[FieldOffset(16)]
-		public byte IsLocated;
-		[FieldOffset(17)]
-		public byte IsOffScreen;
-		[FieldOffset(18)]
-		public ushort TrackingFlags;
+        public uint IsLocated;
+		[FieldOffset(20)]
+        public uint IsOffScreen;
+		[FieldOffset(24)]
+		public uint TrackingFlags;
 	}
 
 	[StructLayout(LayoutKind.Explicit)]

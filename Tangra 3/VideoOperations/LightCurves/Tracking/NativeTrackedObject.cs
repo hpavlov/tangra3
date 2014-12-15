@@ -13,11 +13,22 @@ using Tangra.PInvoke;
 
 namespace Tangra.VideoOperations.LightCurves.Tracking
 {
+    public enum NativeTrackerNotMeasuredReasons
+    {
+        TrackedSuccessfully = 0,
+        ObjectCertaintyTooSmall,
+        FWHMOutOfRange,
+        ObjectTooElongated,
+        FitSuspectAsNoGuidingStarsAreLocated,
+        FixedObject,
+        FullyDisappearingStarMarkedTrackedWithoutBeingFound
+    };
+
 	public class NativeTrackedObject : ITrackedObject, IMeasurableObject
     {
         private NativeTrackedObjectPsfFit m_NativePsfFit;
 
-        private ushort m_TrackingFlags;
+        private uint m_TrackingFlags;
 
         public float RefinedFWHM;
         public float RefinedIMAX;
@@ -45,9 +56,41 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             LastKnownGoodPosition = new ImagePixel(trackingInfo.LastGoodPositionX, trackingInfo.LastGoodPositionY);
             IsLocated = trackingInfo.IsLocated == 1;
             IsOffScreen = trackingInfo.IsOffScreen == 1;
-            m_TrackingFlags = trackingInfo.TrackingFlags;
+            m_TrackingFlags = TranslateTrackingFlags((NativeTrackerNotMeasuredReasons)trackingInfo.TrackingFlags);
 
             m_NativePsfFit.LoadFromNativePsfFitInfo(psfInfo, residuals);
+        }
+
+        private uint TranslateTrackingFlags(NativeTrackerNotMeasuredReasons nativeTrackerFlag)
+        {
+            switch (nativeTrackerFlag)
+            {
+                case NativeTrackerNotMeasuredReasons.TrackedSuccessfully:
+                    return (uint)NotMeasuredReasons.TrackedSuccessfully;
+
+                case NativeTrackerNotMeasuredReasons.ObjectCertaintyTooSmall:
+                    return (uint)NotMeasuredReasons.ObjectCertaintyTooSmall;
+                    break;
+
+                case NativeTrackerNotMeasuredReasons.FWHMOutOfRange:
+                    return (uint)NotMeasuredReasons.FWHMOutOfRange;
+                    break;
+
+                case NativeTrackerNotMeasuredReasons.ObjectTooElongated:
+                    return (uint)NotMeasuredReasons.ObjectTooElongated;
+
+                case NativeTrackerNotMeasuredReasons.FitSuspectAsNoGuidingStarsAreLocated:
+                    return (uint)NotMeasuredReasons.FitSuspectAsNoGuidingStarsAreLocated;
+
+                case NativeTrackerNotMeasuredReasons.FixedObject:
+                    return (uint)NotMeasuredReasons.FixedObject;
+
+                case NativeTrackerNotMeasuredReasons.FullyDisappearingStarMarkedTrackedWithoutBeingFound:
+                    return (uint)NotMeasuredReasons.FullyDisappearingStarMarkedTrackedWithoutBeingFound;
+            }
+
+
+            return 0;
         }
 
         public IImagePixel Center { get; private set; }
