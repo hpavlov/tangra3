@@ -55,7 +55,8 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 				height, 
 				measuringStars.Count, 
 				LightCurveReductionContext.Instance.FullDisappearance,
-				dataRange);
+				dataRange,
+                LightCurveReductionContext.Instance.MaxPixelValue);
 
 			for (int i = 0; i < measuringStars.Count; i++)
 			{

@@ -71,7 +71,7 @@ public:
 	PsfFit* CurrentPsfFit;
 	bool UseCurrentPsfFit;
 	
-	TrackedObject(long objectId, bool isFixedAperture, bool isOccultedStar, double startingX, double startingY, double apertureInPixels, PSFFittingDataRange dataRange);
+	TrackedObject(long objectId, bool isFixedAperture, bool isOccultedStar, double startingX, double startingY, double apertureInPixels, PSFFittingDataRange dataRange, unsigned int maxPixelValue);
 	~TrackedObject();
 	
 	void NextFrame();
@@ -93,11 +93,12 @@ private:
 	unsigned long* m_AreaPixels;
 	
 	PSFFittingDataRange m_DataRange;
+	unsigned int m_MaxPixelValue;
 	
 	unsigned long* GetPixelsArea(unsigned long* pixels, long centerX, long centerY, long squareWidth);
 	
 public:
-	SimplifiedTracker(long width, long height, long numTrackedObjects, bool isFullDisappearance, PSFFittingDataRange dataRange);
+	SimplifiedTracker(long width, long height, long numTrackedObjects, bool isFullDisappearance, PSFFittingDataRange dataRange, unsigned int maxPixelValue);
 	~SimplifiedTracker();
 	
 	void ConfigureObject(long objectId, bool isFixedAperture, bool isOccultedStar, double startingX, double startingY, double apertureInPixels);
@@ -115,7 +116,7 @@ extern "C"
 #endif
 
 DLL_PUBLIC long TrackerSettings(double maxElongation, double minFWHM, double maxFWHM, double minCertainty);
-DLL_PUBLIC long TrackerNewConfiguration(long width, long height, long numTrackedObjects, bool isFullDisappearance, PSFFittingDataRange dataRange);
+DLL_PUBLIC long TrackerNewConfiguration(long width, long height, long numTrackedObjects, bool isFullDisappearance, PSFFittingDataRange dataRange, unsigned int maxPixelValue);
 DLL_PUBLIC long TrackerConfigureObject(long objectId, bool isFixedAperture, bool isOccultedStar, double startingX, double startingY, double apertureInPixels);
 DLL_PUBLIC long TrackerNextFrame(long frameId, unsigned long* pixels);
 DLL_PUBLIC long TrackerGetTargetState(long objectId, NativeTrackedObjectInfo* trackingInfo, NativePsfFitInfo* psfInfo, double* residuals);

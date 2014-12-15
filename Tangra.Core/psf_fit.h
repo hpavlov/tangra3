@@ -49,11 +49,11 @@ private:
 	void DoNonLinearAsymetricFit(unsigned long* intensity, long width);
 	void DoLinearFitOfAveragedModel(unsigned long* intensity, long width);
 	
-	void SetDataRange(PSFFittingDataRange dataRange);
+	void SetDataRange(PSFFittingDataRange dataRange, unsigned int maxPixelValue);
 
 public:
-	PsfFit(PSFFittingDataRange dataRange);
-	PsfFit(long xCenter, long yCenter, PSFFittingDataRange dataRange);
+	PsfFit(PSFFittingDataRange dataRange, unsigned int maxPixelValue);
+	PsfFit(long xCenter, long yCenter, PSFFittingDataRange dataRange, unsigned int maxPixelValue);
 	~PsfFit();
 
 	PSFFittingMethod FittingMethod;

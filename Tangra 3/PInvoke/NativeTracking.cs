@@ -185,7 +185,7 @@ namespace Tangra.PInvoke
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
 		// DLL_PUBLIC long TrackerNewConfiguration(long width, long height, long numTrackedObjects, bool isFullDisappearance, PSFFittingDataRange dataRange);
-		private static extern int TrackerNewConfiguration(int width, int height, int numTrackedObjects, bool isFullDisappearance, PSFFittingDataRange dataRange);
+		private static extern int TrackerNewConfiguration(int width, int height, int numTrackedObjects, bool isFullDisappearance, PSFFittingDataRange dataRange, uint maxPixelValue);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
 		// DLL_PUBLIC long TrackerNextFrame(long frameId, unsigned long* pixels);
@@ -224,9 +224,9 @@ namespace Tangra.PInvoke
 
 		private static int s_NumTrackedObjects;
 
-		internal static void InitNewTracker(int width, int height, int numTrackedObjects, bool isFullDisappearance, PSFFittingDataRange dataRange)
+		internal static void InitNewTracker(int width, int height, int numTrackedObjects, bool isFullDisappearance, PSFFittingDataRange dataRange, uint maxPixelValue)
 		{
-			int rv = TrackerNewConfiguration(width, height, numTrackedObjects, isFullDisappearance, dataRange);
+            int rv = TrackerNewConfiguration(width, height, numTrackedObjects, isFullDisappearance, dataRange, maxPixelValue);
 
 			if (rv == 0)
 			{

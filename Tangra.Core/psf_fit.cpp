@@ -7,7 +7,7 @@
 #include <cmath>
 #include "Tangra.Math.h"
 
-PsfFit::PsfFit(long xCenter, long yCenter, PSFFittingDataRange dataRange)
+PsfFit::PsfFit(long xCenter, long yCenter, PSFFittingDataRange dataRange, unsigned int maxPixelValue)
 {
 	this->FittingMethod = NonLinearFit;
 	
@@ -15,16 +15,16 @@ PsfFit::PsfFit(long xCenter, long yCenter, PSFFittingDataRange dataRange)
 	m_yCenter = yCenter;
 	m_IsSolved = false;
 	
-	SetDataRange(dataRange);	
+	SetDataRange(dataRange, maxPixelValue);	
 	
 	m_Residuals = (double*)malloc(MAX_MATRIX_SIZE * MAX_MATRIX_SIZE * sizeof(double));
 }
 
-PsfFit::PsfFit(PSFFittingDataRange dataRange)
+PsfFit::PsfFit(PSFFittingDataRange dataRange, unsigned int maxPixelValue)
 {
 	this->FittingMethod = NonLinearFit;
 	
-	SetDataRange(dataRange);	
+	SetDataRange(dataRange, maxPixelValue);	
 	
 	m_Residuals = (double*)malloc(MAX_MATRIX_SIZE * MAX_MATRIX_SIZE * sizeof(double));
 }
@@ -38,7 +38,7 @@ PsfFit::~PsfFit()
 	}
 }
 
-void PsfFit::SetDataRange(PSFFittingDataRange dataRange)
+void PsfFit::SetDataRange(PSFFittingDataRange dataRange, unsigned int maxPixelValue)
 {
 	this->m_DataRange = dataRange;
 	
@@ -57,7 +57,7 @@ void PsfFit::SetDataRange(PSFFittingDataRange dataRange)
 			break;
 
 		case DataRange16Bit:
-			m_Saturation = SATURATION_16BIT;
+			m_Saturation = maxPixelValue > 0 && maxPixelValue < SATURATION_16BIT ? maxPixelValue * SATURATION_16BIT / 0xFFFF : SATURATION_16BIT;
 			break;
 			
 		default:
