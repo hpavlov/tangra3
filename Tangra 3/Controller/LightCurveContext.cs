@@ -247,7 +247,7 @@ namespace Tangra.Controller
 			}
 		}
 
-		private TangraConfig.BackgroundMethod m_BackgroundMethod = TangraConfig.BackgroundMethod.BackgroundMode;
+		private TangraConfig.BackgroundMethod m_BackgroundMethod = TangraConfig.BackgroundMethod.AverageBackground;
 
 		public TangraConfig.BackgroundMethod BackgroundMethod
 		{

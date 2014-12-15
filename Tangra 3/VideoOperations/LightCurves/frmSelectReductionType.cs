@@ -40,7 +40,7 @@ namespace Tangra.VideoOperations.LightCurves
 		
 			SetComboboxIndexFromPhotometryReductionMethod(TangraConfig.Settings.LastUsed.AsteroidalReductionType);
 			cbxDigitalFilter.SelectedIndex = 0;
-			SetComboboxIndexFromBackgroundMethod(TangraConfig.Settings.LastUsed.AsteroidalBackgroundMethod);				
+			SetComboboxIndexFromBackgroundMethod(TangraConfig.Settings.LastUsed.AsteroidalBackgroundReductionMethod);				
 		
             m_MoreEnabled = TangraConfig.Settings.LastUsed.AdvancedLightCurveSettings;
             SetMoreLessOptions();
@@ -242,13 +242,13 @@ namespace Tangra.VideoOperations.LightCurves
 			if (rbMutualEvent.Checked)
 	        {
 				TangraConfig.Settings.LastUsed.MutualReductionType = ComboboxIndexToPhotometryReductionMethod();
-				TangraConfig.Settings.LastUsed.MutualBackgroundMethod = ComboboxIndexToBackgroundMethod();
+				TangraConfig.Settings.LastUsed.MutualBackgroundReductionMethod = ComboboxIndexToBackgroundMethod();
 		        TangraConfig.Settings.LastUsed.MutualDigitalFilter = (TangraConfig.PreProcessingFilter)cbxDigitalFilter.SelectedIndex;
 	        }
 	        else
 	        {
 				TangraConfig.Settings.LastUsed.AsteroidalReductionType = ComboboxIndexToPhotometryReductionMethod();
-				TangraConfig.Settings.LastUsed.AsteroidalBackgroundMethod = ComboboxIndexToBackgroundMethod();		        
+				TangraConfig.Settings.LastUsed.AsteroidalBackgroundReductionMethod = ComboboxIndexToBackgroundMethod();		        
 	        }
 			TangraConfig.Settings.LastUsed.AdvancedLightCurveSettings = m_MoreEnabled;
 			TangraConfig.Settings.Save();
@@ -433,13 +433,13 @@ namespace Tangra.VideoOperations.LightCurves
 				{
 					SetComboboxIndexFromPhotometryReductionMethod(TangraConfig.Settings.LastUsed.MutualReductionType);
 					cbxDigitalFilter.SelectedIndex = (int)TangraConfig.Settings.LastUsed.MutualDigitalFilter;
-					SetComboboxIndexFromBackgroundMethod(TangraConfig.Settings.LastUsed.MutualBackgroundMethod);
+					SetComboboxIndexFromBackgroundMethod(TangraConfig.Settings.LastUsed.MutualBackgroundReductionMethod);
 				}
 				else
 				{
 					SetComboboxIndexFromPhotometryReductionMethod(TangraConfig.Settings.LastUsed.AsteroidalReductionType);
 					cbxDigitalFilter.SelectedIndex = 0;
-					SetComboboxIndexFromBackgroundMethod(TangraConfig.Settings.LastUsed.AsteroidalBackgroundMethod);
+					SetComboboxIndexFromBackgroundMethod(TangraConfig.Settings.LastUsed.AsteroidalBackgroundReductionMethod);
 				}
 
 				m_DefaultReductionSettingsModified = false;

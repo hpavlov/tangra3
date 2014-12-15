@@ -161,7 +161,7 @@ namespace Tangra.OccultTools
 
 		public string DisplayName
 		{
-			get { return "Extract Event Times with AOTA"; }
+			get { return "Asteroidal Occultation Analysis with AOTA"; }
 		}
 	}
 }

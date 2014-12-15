@@ -66,7 +66,7 @@ namespace Tangra.KweeVanWoerden
 
 		public string DisplayName
 		{
-			get { return "Extract Occulting Binary Minimum Time (Kwee-Van Woerden Method)"; }
+			get { return "Occulting Binary Epoch of Minimum"; }
 		}
 
 		public AddinActionType ActionType
@@ -497,6 +497,13 @@ namespace Tangra.KweeVanWoerden
 					}
 				}
 			}
+
+            if (Sum_Of_Squares_Smallest_Index - 2 < 0 ||
+                Sum_Of_Squares_Smallest_Index + 2 > Sum_Of_Squares_Mean.Length - 1)
+            {
+                rv.ErrorMessage = string.Format("Cannot locate the smallest normalized sum of squares (Index = {0})", Sum_Of_Squares_Smallest_Index);
+                return rv;
+            }
 
 			/* Solve the quadratic equation */
 			for (i = 0; i <= 3; i++) {

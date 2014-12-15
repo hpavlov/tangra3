@@ -832,8 +832,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 			if (currentImage != null && m_VideoController.ZoomedCenter != null)
 			{
-				Rectangle zommedArea = new Rectangle(m_VideoController.ZoomedCenter.X - 15,
-													 m_VideoController.ZoomedCenter.Y - 16, 32, 32);
+				Rectangle zommedArea = new Rectangle(m_VideoController.ZoomedCenter.X - 15, m_VideoController.ZoomedCenter.Y - 16, 32, 32);
 
 				using (Bitmap bmpZoom = currentImage.GetZoomImagePixels(m_VideoController.ZoomedCenter.X, m_VideoController.ZoomedCenter.Y, TangraConfig.Settings.Color.Saturation, TangraConfig.Settings.Photometry.Saturation))
 				{
@@ -841,120 +840,128 @@ namespace Tangra.VideoOperations.LightCurves
 
 					gMain.DrawImage(bmpZoom, new PointF(0, 0));
 
-					if (m_Refining)
-					{
-						foreach (ITrackedObject obj in m_Tracker.TrackedObjects)
-						{
-							if (zommedArea.Contains(obj.Center.X, obj.Center.Y))
-							{
-								float xx = obj.Center.X - (m_VideoController.ZoomedCenter.X - 15);
-								float yy = obj.Center.Y - (m_VideoController.ZoomedCenter.Y - 16);
+                    try
+                    {
+                        if (m_Refining)
+                        {
+                            foreach (ITrackedObject obj in m_Tracker.TrackedObjects)
+                            {
+                                if (zommedArea.Contains(obj.Center.X, obj.Center.Y))
+                                {
+                                    float xx = obj.Center.X - (m_VideoController.ZoomedCenter.X - 15);
+                                    float yy = obj.Center.Y - (m_VideoController.ZoomedCenter.Y - 16);
 
-								xx = xx * 8 + 0.5f;
-								yy = yy * 8 + 0.5f;
+                                    xx = xx * 8 + 0.5f;
+                                    yy = yy * 8 + 0.5f;
 
-								gMain.DrawLine(m_AllPens[obj.TargetNo], xx - 16, yy, xx, yy);
-								gMain.DrawLine(m_AllPens[obj.TargetNo], xx - 16, yy + 1, xx, yy + 1);
-								gMain.DrawLine(m_AllPens[obj.TargetNo], xx, yy - 16, xx, yy);
-								gMain.DrawLine(m_AllPens[obj.TargetNo], xx + 1, yy - 16, xx + 1, yy);
-								gMain.DrawLine(m_AllPens[obj.TargetNo], xx + 16, yy, xx, yy);
-								gMain.DrawLine(m_AllPens[obj.TargetNo], xx + 16, yy + 1, xx, yy + 1);
-								gMain.DrawLine(m_AllPens[obj.TargetNo], xx, yy + 16, xx, yy);
-								gMain.DrawLine(m_AllPens[obj.TargetNo], xx + 1, yy + 16, xx + 1, yy);
-							}
-						}
+                                    gMain.DrawLine(m_AllPens[obj.TargetNo], xx - 16, yy, xx, yy);
+                                    gMain.DrawLine(m_AllPens[obj.TargetNo], xx - 16, yy + 1, xx, yy + 1);
+                                    gMain.DrawLine(m_AllPens[obj.TargetNo], xx, yy - 16, xx, yy);
+                                    gMain.DrawLine(m_AllPens[obj.TargetNo], xx + 1, yy - 16, xx + 1, yy);
+                                    gMain.DrawLine(m_AllPens[obj.TargetNo], xx + 16, yy, xx, yy);
+                                    gMain.DrawLine(m_AllPens[obj.TargetNo], xx + 16, yy + 1, xx, yy + 1);
+                                    gMain.DrawLine(m_AllPens[obj.TargetNo], xx, yy + 16, xx, yy);
+                                    gMain.DrawLine(m_AllPens[obj.TargetNo], xx + 1, yy + 16, xx + 1, yy);
+                                }
+                            }
 
-						gMain.Save();
-					}
-					else if (m_ViewingLightCurve && m_LoadedLcFile != null && m_VideoController.CurrentVideoFileEngine != "BMP.Image")
-					{
-						if (DebugContext.DebugSubPixelMeasurements)
-						{
-							DebugContext.CurrentSubPixels.Clear();
-							DebugContext.Width = m_AstroImage.Width;
-							DebugContext.Height = m_AstroImage.Height;
-						}
+                            gMain.Save();
+                        }
+                        else if (m_ViewingLightCurve && m_LoadedLcFile != null && m_VideoController.CurrentVideoFileEngine != "BMP.Image")
+                        {
+                            if (DebugContext.DebugSubPixelMeasurements)
+                            {
+                                DebugContext.CurrentSubPixels.Clear();
+                                DebugContext.Width = m_AstroImage.Width;
+                                DebugContext.Height = m_AstroImage.Height;
+                            }
 
-						EnsureMeasurer(2.0f);
- 
-						for (int targNo = 0; targNo < m_LoadedLcFile.Header.ObjectCount; targNo++)
-						{
-							if (DebugContext.DebugSubPixelMeasurements)
-							{
-								DebugContext.TargetNo = targNo;
-								DebugContext.CurrentSubPixels.Add(new DebugContext.SubPixelData[m_AstroImage.Width,m_AstroImage.Height]);
+                            EnsureMeasurer(2.0f);
 
-							}
+                            for (int targNo = 0; targNo < m_LoadedLcFile.Header.ObjectCount; targNo++)
+                            {
+                                if (DebugContext.DebugSubPixelMeasurements)
+                                {
+                                    DebugContext.TargetNo = targNo;
+                                    DebugContext.CurrentSubPixels.Add(new DebugContext.SubPixelData[m_AstroImage.Width, m_AstroImage.Height]);
 
-							LCMeasurement mea = m_LoadedLcFile.Data[targNo][m_CurrFrameNo - (int)m_LoadedLcFile.Header.MinFrame];
-							float xx = mea.X0 - (m_VideoController.ZoomedCenter.X - 15);
-							float yy = mea.Y0 - (m_VideoController.ZoomedCenter.Y - 16);
+                                }
 
-							xx = xx * 8 + 0.5f;
-							yy = yy * 8 + 0.5f;
+                                LCMeasurement mea = m_LoadedLcFile.Data[targNo][m_CurrFrameNo - (int)m_LoadedLcFile.Header.MinFrame];
+                                float xx = mea.X0 - (m_VideoController.ZoomedCenter.X - 15);
+                                float yy = mea.Y0 - (m_VideoController.ZoomedCenter.Y - 16);
 
-							float halfAper = m_LoadedLcFile.Header.MeasurementApertures[targNo] * 8;
+                                xx = xx * 8 + 0.5f;
+                                yy = yy * 8 + 0.5f;
 
-							gMain.DrawEllipse(m_AllPens[targNo], xx - halfAper, yy - halfAper, 2 * halfAper, 2 * halfAper);
+                                float halfAper = m_LoadedLcFile.Header.MeasurementApertures[targNo] * 8;
 
-							if (DebugContext.DebugSubPixelMeasurements)
-							{
-								ITrackedObject trcked = mea.GetTrackedLcMeasurement(m_LoadedLcFile);
-								float refinedFWHM = trcked.OriginalObject.RefinedFWHM;
-								float averageFWHM = m_LoadedLcFile.Footer.RefinedAverageFWHM;
+                                gMain.DrawEllipse(m_AllPens[targNo], xx - halfAper, yy - halfAper, 2 * halfAper, 2 * halfAper);
 
-								MeasureTrackedObject2(trcked, m_Measurer, TangraConfig.PreProcessingFilter.NoFilter, false, null, refinedFWHM, averageFWHM);
+                                if (DebugContext.DebugSubPixelMeasurements)
+                                {
+                                    ITrackedObject trcked = mea.GetTrackedLcMeasurement(m_LoadedLcFile);
+                                    float refinedFWHM = trcked.OriginalObject.RefinedFWHM;
+                                    float averageFWHM = m_LoadedLcFile.Footer.RefinedAverageFWHM;
 
-								float xCent = float.NaN;
-								float yCent = float.NaN;
+                                    MeasureTrackedObject2(trcked, m_Measurer, TangraConfig.PreProcessingFilter.NoFilter, false, null, refinedFWHM, averageFWHM);
 
-								for (int y = m_VideoController.ZoomedCenter.Y - 16; y < m_VideoController.ZoomedCenter.Y + 16; y++)
-									for (int x = m_VideoController.ZoomedCenter.X - 16; x < m_VideoController.ZoomedCenter.X + 16; x++)
-									{
-										if (x >= 0 && x <= DebugContext.Width && y >= 0 && y <= DebugContext.Height)
-										{
-											DebugContext.SubPixelData debugInfo = DebugContext.CurrentSubPixels[targNo][x, y];
-											if (debugInfo != null)
-											{
-												xCent = debugInfo.X0;
-												yCent = debugInfo.Y0;
+                                    float xCent = float.NaN;
+                                    float yCent = float.NaN;
 
-												// TODO: Plot the center with a differen colour !!!
-												int xs = 8 * (x - (m_VideoController.ZoomedCenter.X - 15));
-												int ys = 8 * (y - (m_VideoController.ZoomedCenter.Y - 16));
+                                    for (int y = m_VideoController.ZoomedCenter.Y - 16; y < m_VideoController.ZoomedCenter.Y + 16; y++)
+                                        for (int x = m_VideoController.ZoomedCenter.X - 16; x < m_VideoController.ZoomedCenter.X + 16; x++)
+                                        {
+                                            if (x >= 0 && x <= DebugContext.Width && y >= 0 && y <= DebugContext.Height)
+                                            {
+                                                DebugContext.SubPixelData debugInfo = DebugContext.CurrentSubPixels[targNo][x, y];
+                                                if (debugInfo != null)
+                                                {
+                                                    xCent = debugInfo.X0;
+                                                    yCent = debugInfo.Y0;
 
-												if (debugInfo.FullyIncluded)
-												{
-													gMain.FillRectangle(Brushes.Lime, xs, ys, 8, 8);
-												}
-												else if (debugInfo.Included != null)
-												{
-													for (int kk = 0; kk < 4; kk++)
-														for (int tt = 0; tt < 4; tt++)
-														{
-															if (debugInfo.Included[kk, tt])
-																gMain.FillRectangle(Brushes.Lime, xs + 2 * kk, ys + 2 * tt, 2, 2);
-														}
-												}
-											}
-										}
+                                                    // TODO: Plot the center with a differen colour !!!
+                                                    int xs = 8 * (x - (m_VideoController.ZoomedCenter.X - 15));
+                                                    int ys = 8 * (y - (m_VideoController.ZoomedCenter.Y - 16));
 
-									}
+                                                    if (debugInfo.FullyIncluded)
+                                                    {
+                                                        gMain.FillRectangle(Brushes.Lime, xs, ys, 8, 8);
+                                                    }
+                                                    else if (debugInfo.Included != null)
+                                                    {
+                                                        for (int kk = 0; kk < 4; kk++)
+                                                            for (int tt = 0; tt < 4; tt++)
+                                                            {
+                                                                if (debugInfo.Included[kk, tt])
+                                                                    gMain.FillRectangle(Brushes.Lime, xs + 2 * kk, ys + 2 * tt, 2, 2);
+                                                            }
+                                                    }
+                                                }
+                                            }
 
-								if (!float.IsNaN(xCent) && !float.IsNaN(yCent))
-								{
-									xx = xCent - (m_VideoController.ZoomedCenter.X - 15);
-									yy = yCent - (m_VideoController.ZoomedCenter.Y - 16);
+                                        }
 
-									xx = xx * 8 + 0.5f;
-									yy = yy * 8 + 0.5f;
+                                    if (!float.IsNaN(xCent) && !float.IsNaN(yCent))
+                                    {
+                                        xx = xCent - (m_VideoController.ZoomedCenter.X - 15);
+                                        yy = yCent - (m_VideoController.ZoomedCenter.Y - 16);
 
-									gMain.FillRectangle(Brushes.Orange, xx - 1, yy - 1, 3, 3);
-								}
-							}
-						}
-					}
-				}
+                                        xx = xx * 8 + 0.5f;
+                                        yy = yy * 8 + 0.5f;
+
+                                        gMain.FillRectangle(Brushes.Orange, xx - 1, yy - 1, 3, 3);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.WriteLine(ex.ToString());
+                    }
+
+                }
 			}
         }
 
