@@ -959,6 +959,8 @@ namespace Tangra.VideoOperations.LightCurves
             pnlChart.Invalidate();
         }
 
+	    private bool m_Reprocessing = false;
+
         private bool ReprocessAllSeries()
         {
             frmReprocessSeries frm = new frmReprocessSeries();
@@ -968,12 +970,22 @@ namespace Tangra.VideoOperations.LightCurves
             frm.Context = m_LightCurveController.Context;
             frm.AllColor = m_DisplaySettings.TargetColors;
 
-            if (frm.ShowDialog(this) == DialogResult.Cancel)
+            try
             {
-                return false;
+                m_Reprocessing = true;
+
+                if (frm.ShowDialog(this) == DialogResult.Cancel)
+                {
+                    return false;
+                }
+
+                UpdateFormTitle();
+
             }
-			
-            UpdateFormTitle();
+            finally
+            {
+                m_Reprocessing = false;
+            }
 
             return true;
         }

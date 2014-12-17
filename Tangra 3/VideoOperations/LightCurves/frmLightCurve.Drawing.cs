@@ -99,10 +99,13 @@ namespace Tangra.VideoOperations.LightCurves
 
 		private void DrawGraphOnBitmap()
 		{
-			if (m_Header.TimingType == MeasurementTimingType.EmbeddedTimeForEachFrame)
-				DrawGraphOnBitmapByTimeStamp();
-			else
-				DrawGraphOnBitmapByFrameNumber();
+            if (!m_Reprocessing)
+            {
+                if (m_Header.TimingType == MeasurementTimingType.EmbeddedTimeForEachFrame)
+                    DrawGraphOnBitmapByTimeStamp();
+                else
+                    DrawGraphOnBitmapByFrameNumber();                
+            }
 		}
 
 		private void DrawGraphOnBitmapByTimeStamp()

@@ -72,7 +72,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
             if (!m_Refining &&
                 (LocateFirstObjects.Count > 0 && allGuidingStarsLocated) &&
-                LightCurveReductionContext.Instance.FieldRotation)
+                (LightCurveReductionContext.Instance.FieldRotation || LightCurveReductionContext.Instance.LightCurveReductionType == LightCurveReductionType.MutualEvent))
             {
                 for (int i = 0; i < TrackedObjects.Count; i++)
                 {
