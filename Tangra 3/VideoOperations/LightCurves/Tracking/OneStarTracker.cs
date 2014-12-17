@@ -132,36 +132,36 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                     //double brightnessFluctoation = (trackedObject.RefinedOrLastSignalLevel - gaussian.IMax + gaussian.I0) / trackedObject.RefinedOrLastSignalLevel;
                     double fluckDiff = Math.Abs(brightnessFluctoation) / m_AllowedSignalFluctoation;
 
-                    if (OccultedStar.LastSignalLevel != 0 &&
-                        fluckDiff > 1 &&
-                        LightCurveReductionContext.Instance.WindOrShaking)
-                    {
-                        // If the located object is not similar brightness as expected, then search for our object in a wider area
-                        try
-                        {
-                            IImagePixel centroid = astroImage.GetCentroid((int)expectedX, (int)expectedY, 14, m_MedianValue);
-                            pixels = astroImage.GetPixelsArea(centroid.X, centroid.Y, 17);
-                            gaussian = new PSFFit(centroid.X, centroid.Y);
-                            gaussian.Fit(pixels, OccultedStar.PsfFitMatrixSize);
+                    //if (OccultedStar.LastSignalLevel != 0 &&
+                    //    fluckDiff > 1 &&
+                    //    LightCurveReductionContext.Instance.WindOrShaking)
+                    //{
+                    //    // If the located object is not similar brightness as expected, then search for our object in a wider area
+                    //    try
+                    //    {
+                    //        IImagePixel centroid = astroImage.GetCentroid((int)expectedX, (int)expectedY, 14, m_MedianValue);
+                    //        pixels = astroImage.GetPixelsArea(centroid.X, centroid.Y, 17);
+                    //        gaussian = new PSFFit(centroid.X, centroid.Y);
+                    //        gaussian.Fit(pixels, OccultedStar.PsfFitMatrixSize);
 
-                            if (gaussian.IsSolved)
-                            {
-                                signal = gaussian.IMax - gaussian.I0; if (signal < 0) signal = 0;
-                                brightnessFluctoation = signal > OccultedStar.RefinedOrLastSignalLevel
-                                                       ? signal / OccultedStar.RefinedOrLastSignalLevel
-                                                       : OccultedStar.RefinedOrLastSignalLevel / signal;
-                                //brightnessFluctoation = (trackedObject.RefinedOrLastSignalLevel - gaussian.IMax + gaussian.I0) / trackedObject.RefinedOrLastSignalLevel;
-                                fluckDiff = Math.Abs(brightnessFluctoation) / m_AllowedSignalFluctoation;
-                            }
-                            else
-                            {
-                                Trace.WriteLine(string.Format("Frame {0}: Cannot confirm target {1} [Guiding.WindOrShaking]. Cannot solve third PSF", m_FrameNo, OccultedStar.TargetNo));
-                            }
-                        }
-                        catch { }
-                    }
+                    //        if (gaussian.IsSolved)
+                    //        {
+                    //            signal = gaussian.IMax - gaussian.I0; if (signal < 0) signal = 0;
+                    //            brightnessFluctoation = signal > OccultedStar.RefinedOrLastSignalLevel
+                    //                                   ? signal / OccultedStar.RefinedOrLastSignalLevel
+                    //                                   : OccultedStar.RefinedOrLastSignalLevel / signal;
+                    //            //brightnessFluctoation = (trackedObject.RefinedOrLastSignalLevel - gaussian.IMax + gaussian.I0) / trackedObject.RefinedOrLastSignalLevel;
+                    //            fluckDiff = Math.Abs(brightnessFluctoation) / m_AllowedSignalFluctoation;
+                    //        }
+                    //        else
+                    //        {
+                    //            Trace.WriteLine(string.Format("Frame {0}: Cannot confirm target {1} [Guiding.WindOrShaking]. Cannot solve third PSF", m_FrameNo, OccultedStar.TargetNo));
+                    //        }
+                    //    }
+                    //    catch { }
+                    //}
 
-                    if (fluckDiff < 1)
+                    if (fluckDiff < 1 || LightCurveReductionContext.Instance.HighFlickering)
                     {
                         OccultedStar.PSFFit = gaussian;
                         OccultedStar.ThisFrameX = (float)gaussian.XCenter;

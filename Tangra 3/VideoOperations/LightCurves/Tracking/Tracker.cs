@@ -234,36 +234,36 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                     //double brightnessFluctoation = (trackedObject.RefinedOrLastSignalLevel - gaussian.IMax + gaussian.I0) / trackedObject.RefinedOrLastSignalLevel;
                     double fluckDiff = Math.Abs(brightnessFluctoation)/m_AllowedSignalFluctoation;
 
-                    if (trackedObject.LastSignalLevel != 0 && 
-                        fluckDiff > 1 && 
-                        LightCurveReductionContext.Instance.WindOrShaking)
-                    {
-                        // If the located object is not similar brightness as expected, then search for our object in a wider area
-                        try
-                        {
-                            IImagePixel centroid = astroImage.GetCentroid((int)trackedObject.LastFrameX, (int)trackedObject.LastFrameY, 14, m_MedianValueStart);
-                            pixels = astroImage.GetPixelsArea(centroid.X, centroid.Y, 17);
-                            gaussian = new PSFFit(centroid.X, centroid.Y);
-                            gaussian.Fit(pixels, trackedObject.PsfFitMatrixSize);
+                    //if (trackedObject.LastSignalLevel != 0 && 
+                    //    fluckDiff > 1 && 
+                    //    LightCurveReductionContext.Instance.WindOrShaking)
+                    //{
+                    //    // If the located object is not similar brightness as expected, then search for our object in a wider area
+                    //    try
+                    //    {
+                    //        IImagePixel centroid = astroImage.GetCentroid((int)trackedObject.LastFrameX, (int)trackedObject.LastFrameY, 14, m_MedianValueStart);
+                    //        pixels = astroImage.GetPixelsArea(centroid.X, centroid.Y, 17);
+                    //        gaussian = new PSFFit(centroid.X, centroid.Y);
+                    //        gaussian.Fit(pixels, trackedObject.PsfFitMatrixSize);
 
-                            if (gaussian.IsSolved)
-                            {
-                                signal = gaussian.IMax - gaussian.I0; if (signal < 0) signal = 0;
-                                brightnessFluctoation = signal > trackedObject.RefinedOrLastSignalLevel
-                                                       ? signal / trackedObject.RefinedOrLastSignalLevel
-                                                       : trackedObject.RefinedOrLastSignalLevel / signal;
-                                //brightnessFluctoation = (trackedObject.RefinedOrLastSignalLevel - gaussian.IMax + gaussian.I0) / trackedObject.RefinedOrLastSignalLevel;
-                                fluckDiff = Math.Abs(brightnessFluctoation) / m_AllowedSignalFluctoation;
-                            }
-                            else
-                            {
-                               Trace.WriteLine(string.Format("Frame {0}: Cannot confirm target {1} [Guiding.WindOrShaking]. Cannot solve third PSF", m_FrameNo, trackedObject.TargetNo));
-                            }
-                        }
-                        catch { }
-                    }
+                    //        if (gaussian.IsSolved)
+                    //        {
+                    //            signal = gaussian.IMax - gaussian.I0; if (signal < 0) signal = 0;
+                    //            brightnessFluctoation = signal > trackedObject.RefinedOrLastSignalLevel
+                    //                                   ? signal / trackedObject.RefinedOrLastSignalLevel
+                    //                                   : trackedObject.RefinedOrLastSignalLevel / signal;
+                    //            //brightnessFluctoation = (trackedObject.RefinedOrLastSignalLevel - gaussian.IMax + gaussian.I0) / trackedObject.RefinedOrLastSignalLevel;
+                    //            fluckDiff = Math.Abs(brightnessFluctoation) / m_AllowedSignalFluctoation;
+                    //        }
+                    //        else
+                    //        {
+                    //           Trace.WriteLine(string.Format("Frame {0}: Cannot confirm target {1} [Guiding.WindOrShaking]. Cannot solve third PSF", m_FrameNo, trackedObject.TargetNo));
+                    //        }
+                    //    }
+                    //    catch { }
+                    //}
 
-                    if (!trackedObject.HasRefinedPositions || fluckDiff < 1)
+                    if (!trackedObject.HasRefinedPositions || fluckDiff < 1 || LightCurveReductionContext.Instance.HighFlickering)
                     {
                         trackedObject.PSFFit = gaussian;
                         trackedObject.ThisFrameX = (float)gaussian.XCenter;
@@ -881,7 +881,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                             double brightnessFluctoation = (obj1.RefinedOrLastSignalLevel - gaussian.IMax + gaussian.I0) / obj1.RefinedOrLastSignalLevel;
                             double fluckDiff = Math.Abs(brightnessFluctoation) / m_AllowedSignalFluctoation;
 
-                            if (fluckDiff < 1)
+                            if (fluckDiff < 1 || LightCurveReductionContext.Instance.HighFlickering)
                             {
 								obj1.PSFFit = gaussian;
                                 obj1.ThisFrameX = (float) gaussian.XCenter;
