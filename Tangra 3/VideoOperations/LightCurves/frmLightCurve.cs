@@ -537,7 +537,7 @@ namespace Tangra.VideoOperations.LightCurves
 				m_EventTimesReport.ExposureDuration = duration;
 				m_EventTimesReport.ExposureUnit = mode;
 
-				m_EventTimesReport.InstrumentalDelaysApplied = m_LCFile.Header.GetInstrumentalDelaysApplied(m_EventTimesReport.VideoFileFormat);
+				m_EventTimesReport.TangraCanApplyInstrumentalDelays = m_LCFile.Header.GetInstrumentalDelaysApplied(m_EventTimesReport.VideoFileFormat);
 			}
 
             if (m_LightCurveController.Context.Binning > 1)

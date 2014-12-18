@@ -1018,7 +1018,11 @@ namespace Tangra.VideoOperations.LightCurves
                         // TODO: Use the times from AOTA??
                     }
 
-                    if (gotTimes && m_EventTimesReport.InstrumentalDelaysApplied == InstrumentalDelayStatus.Yes)
+					// TODO: Parse the +/- part of each time 
+	                DateTime aotaDTime = DateTime.ParseExact(dTime, "", CultureInfo.InvariantCulture);
+					DateTime aotaRTime = DateTime.ParseExact(rTime, "", CultureInfo.InvariantCulture);
+
+                    if (gotTimes && m_EventTimesReport.TangraCanApplyInstrumentalDelays == InstrumentalDelayStatus.Yes)
                     {
                         double instrDelay = m_LCFile.GetInstrumentalDelayAtFrameInSeconds(dFrame - 0.5);
                         evt.DTime = evt.DTime.AddSeconds(instrDelay);
@@ -1026,6 +1030,13 @@ namespace Tangra.VideoOperations.LightCurves
                         evt.DTimeMostProbable = evt.DTimeMostProbable.AddSeconds(instrDelay);
                         evt.RTimeMostProbable = evt.RTimeMostProbable.AddSeconds(instrDelay);
                     }
+
+					if (m_EventTimesReport.VideoFileFormat != "AVI" &&
+					    m_EventTimesReport.TangraCanApplyInstrumentalDelays == InstrumentalDelayStatus.Yes)
+					{
+						// TODO: If the AOTA and Tangra times are different, then ask the use which times they want to use
+						// TODO: Add a flag in the report to indicate which times to be used in OW
+					}
                 }
 
 				m_EventTimesReport.Events.Add(evt);
