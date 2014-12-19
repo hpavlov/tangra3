@@ -186,6 +186,10 @@ namespace Tangra.Helpers
     }
 
     [AttributeUsage(AttributeTargets.Assembly)]
+    public class BetaReleaseAttribute : Attribute
+    { }
+
+    [AttributeUsage(AttributeTargets.Assembly)]
     public class MinimumVersionRequiredAttribute : Attribute
     {
         public string MinimumVersionRequired;

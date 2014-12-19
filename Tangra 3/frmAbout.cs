@@ -22,10 +22,13 @@ namespace Tangra
 
             this.Text = String.Format("About {0}", AssemblyTitle);			
 	        this.textBoxDescription.Text = AssemblyDescription;
-			if (!string.IsNullOrEmpty(AssemblyReleaseDate))
-				this.lblProductName.Text = String.Format("{0} v{1}, Released on {2}", AssemblyProduct, AssemblyFileVersion, AssemblyReleaseDate);
-			else
-				this.lblProductName.Text = String.Format("{0} v{1}, Unreleased ALPHA Version", AssemblyProduct, AssemblyFileVersion);
+            if (!string.IsNullOrEmpty(AssemblyReleaseDate))
+            {
+                this.lblProductName.Text = String.Format("{0} v{1}{2}, Released on {3}", AssemblyProduct, AssemblyFileVersion, IsBetaRelease ? " BETA" : "", AssemblyReleaseDate);
+            }
+            else
+                this.lblProductName.Text = String.Format("{0} v{1}, Unreleased ALPHA Version", AssemblyProduct,
+                                                         AssemblyFileVersion);
         }
 
         #region Assembly Attribute Accessorsw
@@ -103,6 +106,15 @@ namespace Tangra
                     return "";
                 }
                 return ((ReleaseDateAttribute)attributes[0]).ReleaseDate.ToString("dd MMM yyyy");
+            }
+        }
+
+        public bool IsBetaRelease
+        {
+            get
+            {
+                object[] attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(BetaReleaseAttribute), false);
+                return attributes.Length == 1;
             }
         }
 
