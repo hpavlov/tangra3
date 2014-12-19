@@ -135,7 +135,7 @@ HRESULT SerFile::GetFrame(int frameNo, unsigned long* pixels, int cameraBitPix, 
 {
 	if (frameNo >=0 && frameNo < m_CountFrames)
 	{
-		__int64 imagePosition = 178 + frameNo * m_RawFrameSize;
+		__int64 imagePosition = (__int64)178 + (__int64)frameNo * (__int64)m_RawFrameSize;
 			
 		advfsetpos(m_File, &imagePosition);
 		fread(m_RawFrameBuffer, m_RawFrameSize, 1, m_File);
@@ -145,7 +145,7 @@ HRESULT SerFile::GetFrame(int frameNo, unsigned long* pixels, int cameraBitPix, 
 		{
 			if (HasTimeStamps)
 			{
-				__int64 timestampPosition = m_TimeStampStartOffset + frameNo * 8;
+				__int64 timestampPosition = m_TimeStampStartOffset + (__int64)(frameNo * 8);
 				
 				advfsetpos(m_File, &timestampPosition);
 				

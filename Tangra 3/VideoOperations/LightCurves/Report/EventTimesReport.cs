@@ -89,7 +89,7 @@ namespace Tangra.VideoOperations.LightCurves.Report
 		/// </summary>
 		public string ExposureUnit { get; set; }
 
-        public InstrumentalDelayStatus InstrumentalDelaysApplied { get; set; }
+        public InstrumentalDelayStatus TangraCanApplyInstrumentalDelays { get; set; }
 		public DateTime ReportTime { get; set; }
 
         [XmlIgnore]
