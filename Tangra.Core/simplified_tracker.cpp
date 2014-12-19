@@ -51,10 +51,11 @@ void TrackedObject::InitialiseNewTracking()
 	
 	LastKnownGoodPositionXDouble = CenterXDouble;
 	LastKnownGoodPositionYDouble = CenterYDouble;
+	LastKnownGoodPsfCertainty = 0;
 }
 
 
-void TrackedObject::SetIsTracked(bool isLocated, NotMeasuredReasons reason, double x, double y)
+void TrackedObject::SetIsTracked(bool isLocated, NotMeasuredReasons reason, double x, double y, double certainty)
 {
 	if (isLocated)
 	{
@@ -62,6 +63,7 @@ void TrackedObject::SetIsTracked(bool isLocated, NotMeasuredReasons reason, doub
 		LastKnownGoodPositionYDouble = CenterYDouble;
 		CenterXDouble = x;
 		CenterYDouble = y;
+		LastKnownGoodPsfCertainty = certainty;
 		CenterX = (long)(x + 0.5); // rounding
 		CenterY = (long)(y + 0.5); // rounding
 	}
@@ -202,21 +204,21 @@ void SimplifiedTracker::NextFrame(int frameNo, unsigned long* pixels)
 			{
 				if (trackedObject->CurrentPsfFit->Certainty() < MIN_CERTAINTY)
 				{
-					trackedObject->SetIsTracked(false, ObjectCertaintyTooSmall, 0, 0);
+					trackedObject->SetIsTracked(false, ObjectCertaintyTooSmall, 0, 0, 0);
 				}
 				else 
 				if (trackedObject->CurrentPsfFit->FWHM() < MIN_FWHM || trackedObject->CurrentPsfFit->FWHM() > MAX_FWHM)
 				{
-					trackedObject->SetIsTracked(false, FWHMOutOfRange, 0, 0);
+					trackedObject->SetIsTracked(false, FWHMOutOfRange, 0, 0, 0);
 				}
 				else if (MAX_ELONGATION > 0 && trackedObject->CurrentPsfFit->ElongationPercentage() > MAX_ELONGATION)
 				{
-					trackedObject->SetIsTracked(false, ObjectTooElongated, 0, 0);
+					trackedObject->SetIsTracked(false, ObjectTooElongated, 0, 0, 0);
 				}
 				else
 				{
 					trackedObject->UseCurrentPsfFit = true;
-					trackedObject->SetIsTracked(true, TrackedSuccessfully, trackedObject->CurrentPsfFit->XCenter(), trackedObject->CurrentPsfFit->YCenter());
+					trackedObject->SetIsTracked(true, TrackedSuccessfully, trackedObject->CurrentPsfFit->XCenter(), trackedObject->CurrentPsfFit->YCenter(), trackedObject->CurrentPsfFit->Certainty());
 				}
 			}
 		}					
@@ -256,7 +258,7 @@ void SimplifiedTracker::NextFrame(int frameNo, unsigned long* pixels)
 		if (numReferences == 0)
 		{
 			trackedObject->UseCurrentPsfFit = false;
-			trackedObject->SetIsTracked(false, FitSuspectAsNoGuidingStarsAreLocated, 0, 0);
+			trackedObject->SetIsTracked(false, FitSuspectAsNoGuidingStarsAreLocated, 0, 0, 0);
 		}
 		else
 		{
@@ -266,7 +268,7 @@ void SimplifiedTracker::NextFrame(int frameNo, unsigned long* pixels)
 			if (trackedObject->IsFixedAperture)
 			{
 				trackedObject->UseCurrentPsfFit = false;
-				trackedObject->SetIsTracked(true, FixedObject, x_double, y_double);
+				trackedObject->SetIsTracked(true, FixedObject, x_double, y_double, 1);
 			}
 			else if (trackedObject->IsOccultedStar && m_IsFullDisappearance)
 			{
@@ -285,11 +287,11 @@ void SimplifiedTracker::NextFrame(int frameNo, unsigned long* pixels)
 
 				if (trackedObject->CurrentPsfFit->IsSolved() && trackedObject->CurrentPsfFit->Certainty() > MIN_CERTAINTY)
 				{
-					trackedObject->SetIsTracked(true, TrackedSuccessfully, trackedObject->CurrentPsfFit->XCenter(), trackedObject->CurrentPsfFit->YCenter());
+					trackedObject->SetIsTracked(true, TrackedSuccessfully, trackedObject->CurrentPsfFit->XCenter(), trackedObject->CurrentPsfFit->YCenter(), trackedObject->CurrentPsfFit->Certainty());
 					trackedObject->UseCurrentPsfFit = true;
 				}
 				else
-					trackedObject->SetIsTracked(false, FullyDisappearingStarMarkedTrackedWithoutBeingFound, 0, 0);
+					trackedObject->SetIsTracked(false, FullyDisappearingStarMarkedTrackedWithoutBeingFound, 0, 0, 0);
 			}
 		}
 	}
@@ -308,6 +310,7 @@ long SimplifiedTracker::TrackerGetTargetState(long objectId, NativeTrackedObject
 	trackingInfo->CenterYDouble = obj->CenterYDouble;
 	trackingInfo->LastKnownGoodPositionXDouble = obj->LastKnownGoodPositionXDouble;
 	trackingInfo->LastKnownGoodPositionYDouble = obj->LastKnownGoodPositionYDouble;
+	trackingInfo->LastKnownGoodPsfCertainty = obj->LastKnownGoodPsfCertainty;
 	trackingInfo->IsLocated = obj->IsLocated ? 1 : 0;
 	trackingInfo->IsOffScreen = obj->IsOffScreen ? 1 : 0;
 	trackingInfo->TrackingFlags = obj->TrackingFlags;

@@ -33,6 +33,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			m_RecentIMAXs.Clear();
 
 			LastKnownGoodPosition = OriginalObject.AsImagePixel;
+		    LastKnownGoodPsfCertainty = OriginalObject.Gaussian != null ? OriginalObject.Gaussian.Certainty : 0;
 			IsLocated = false;
 		}
 
@@ -68,8 +69,11 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			IsLocated = true;
 			NotMeasuredReasons = NotMeasuredReasons.TrackedSuccessfully;
 
-			if (PSFFit != null && PSFFit.IsSolved)
-				LastKnownGoodPosition = new ImagePixel(Center.Brightness, Center.XDouble, Center.YDouble);
+		    if (PSFFit != null && PSFFit.IsSolved)
+		    {
+		        LastKnownGoodPosition = new ImagePixel(Center.Brightness, Center.XDouble, Center.YDouble);
+		        LastKnownGoodPsfCertainty = PSFFit.Certainty;
+		    }
 		}
 	}
 }

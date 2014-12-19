@@ -23,6 +23,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                 trackedObject.SetIsLocated(true, NotMeasuredReasons.TrackedSuccessfully);
                 trackedObject.ThisFrameX = trackedObject.OriginalObject.ApertureStartingX;
                 trackedObject.ThisFrameY = trackedObject.OriginalObject.ApertureStartingY;
+                trackedObject.ThisFrameCertainty = trackedObject.OriginalObject.Gaussian != null ? (float)trackedObject.OriginalObject.Gaussian.Certainty : 0;
             }
         }
 

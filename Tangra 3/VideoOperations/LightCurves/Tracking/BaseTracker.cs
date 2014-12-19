@@ -122,7 +122,8 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 					trackedObject.SetIsTracked(
 						true,
 						NotMeasuredReasons.TrackedSuccessfully,
-						new ImagePixel(trackedObject.Center.Brightness, trackedObject.Center.XDouble + deltaX, trackedObject.Center.YDouble + deltaY));
+						new ImagePixel(trackedObject.Center.Brightness, trackedObject.Center.XDouble + deltaX, trackedObject.Center.YDouble + deltaY), 
+                        1);
 					break;
 				}
 			}

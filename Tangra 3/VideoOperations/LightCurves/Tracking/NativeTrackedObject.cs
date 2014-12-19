@@ -54,6 +54,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
         {
             Center = new ImagePixel(trackingInfo.CenterX, trackingInfo.CenterY);
             LastKnownGoodPosition = new ImagePixel(trackingInfo.LastGoodPositionX, trackingInfo.LastGoodPositionY);
+            LastKnownGoodPsfCertainty = trackingInfo.LastGoodPsfCertainty;
             IsLocated = trackingInfo.IsLocated == 1;
             IsOffScreen = trackingInfo.IsOffScreen == 1;
             m_TrackingFlags = TranslateTrackingFlags((NativeTrackerNotMeasuredReasons)trackingInfo.TrackingFlags);
@@ -97,7 +98,9 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
         public IImagePixel LastKnownGoodPosition { get; set; }
 
-        public bool IsLocated { get; private set; }
+        public double LastKnownGoodPsfCertainty { get; set; }
+
+	    public bool IsLocated { get; private set; }
 
         public bool IsOffScreen { get; private set; }
 
@@ -110,7 +113,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             get { return m_NativePsfFit; }
         }
 
-        public void SetIsTracked(bool isMeasured, NotMeasuredReasons reason, IImagePixel estimatedCenter)
+        public void SetIsTracked(bool isMeasured, NotMeasuredReasons reason, IImagePixel estimatedCenter, double? certainty)
         {
             Center = estimatedCenter;
             IsLocated = isMeasured;
@@ -128,6 +131,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             m_RecentIMAXs.Clear();
 
             LastKnownGoodPosition = OriginalObject.AsImagePixel;
+            LastKnownGoodPsfCertainty = OriginalObject.Gaussian != null ? OriginalObject.Gaussian.Certainty : 0;
             IsLocated = false;
         }
 

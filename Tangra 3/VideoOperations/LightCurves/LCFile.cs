@@ -671,11 +671,16 @@ namespace Tangra.VideoOperations.LightCurves
 			TargetNo = mea.TargetNo;
 			PSFFit = mea.PsfFit;
 			m_Mea = mea;
+
+		    if (mea.PsfFit != null)
+		        LastKnownGoodPsfCertainty = mea.PsfFit.Certainty;
 		}
 
 		public IImagePixel Center { get; private set; }
 
 		public IImagePixel LastKnownGoodPosition { get; set; }
+
+        public double LastKnownGoodPsfCertainty { get; set; }
 
 		public bool IsLocated { get; private set; }
 
@@ -692,7 +697,7 @@ namespace Tangra.VideoOperations.LightCurves
 			return 0;
 		}
 
-		public void SetIsTracked(bool isMeasured, NotMeasuredReasons reason, IImagePixel estimatedCenter)
+		public void SetIsTracked(bool isMeasured, NotMeasuredReasons reason, IImagePixel estimatedCenter, double? certainty)
 		{
 			
 		}

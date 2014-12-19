@@ -306,6 +306,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             trackedObject.ThisFrameX = (float)stars[0].XCenter;
             trackedObject.ThisFrameY = (float)stars[0].YCenter;
 			trackedObject.PSFFit = stars[0];
+            trackedObject.ThisFrameCertainty = (float)stars[0].Certainty;
             trackedObject.SetIsLocated(true, NotMeasuredReasons.TrackedSuccessfullyAfterStarRecognition);
             AutoDiscoveredStars.Clear();
 
@@ -457,11 +458,13 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 					bestPair.Object1.PSFFit = bestPair.Star1;
                     bestPair.Object1.ThisFrameX = (float)bestPair.Star1.XCenter;
                     bestPair.Object1.ThisFrameY = (float)bestPair.Star1.YCenter;
+                    bestPair.Object1.ThisFrameCertainty = (float) bestPair.Star1.Certainty;
 					bestPair.Object1.SetIsLocated(true, NotMeasuredReasons.TrackedSuccessfullyAfterStarRecognition);
 
 					bestPair.Object2.PSFFit = bestPair.Star2;
                     bestPair.Object2.ThisFrameX = (float)bestPair.Star2.XCenter;
                     bestPair.Object2.ThisFrameY = (float)bestPair.Star2.YCenter;
+                    bestPair.Object2.ThisFrameCertainty = (float)bestPair.Star2.Certainty;
 					bestPair.Object2.SetIsLocated(true, NotMeasuredReasons.TrackedSuccessfullyAfterStarRecognition);
 
                     ReLocateNonGuidingObjects(astroImage);

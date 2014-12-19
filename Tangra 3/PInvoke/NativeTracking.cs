@@ -31,6 +31,8 @@ namespace Tangra.PInvoke
         public uint IsOffScreen;
 		[FieldOffset(24)]
 		public uint TrackingFlags;
+        [FieldOffset(28)]
+        public float LastGoodPsfCertainty;
 	}
 
 	[StructLayout(LayoutKind.Explicit)]

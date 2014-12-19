@@ -361,8 +361,11 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 			m_IsFullDisappearance = isFullDisappearance;
 
-			foreach (ITrackedObject obj in m_TrackedObjects)
+            foreach (ITrackedObject obj in m_TrackedObjects)
+            {
                 obj.LastKnownGoodPosition = new ImagePixel(obj.OriginalObject.Gaussian.Brightness, obj.OriginalObject.ApertureStartingX, obj.OriginalObject.ApertureStartingY);
+                obj.LastKnownGoodPsfCertainty = obj.OriginalObject.Gaussian.Certainty;
+            }
 
 			foreach (ITrackedObject nonGroupedObject in m_TrackedObjects.Where(x => !x.OriginalObject.ProcessInPsfGroup))
 			{
@@ -716,7 +719,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 										{
 											if (resortToBrightness && trackedObject.IsOccultedStar)
 											{
-												trackedObject.SetIsTracked(true, NotMeasuredReasons.FullyDisappearingStarMarkedTrackedWithoutBeingFound, center);
+                                                trackedObject.SetIsTracked(true, NotMeasuredReasons.FullyDisappearingStarMarkedTrackedWithoutBeingFound, center, fit.Certainty);
 												dbg += "OccDi::";
 											}
 											else
@@ -730,12 +733,12 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 										}
 										else if (m_IsFullDisappearance && trackedObject.IsOccultedStar)
 										{
-											trackedObject.SetIsTracked(false, NotMeasuredReasons.FullyDisappearingStarMarkedTrackedWithoutBeingFound, resortToBrightness ? center : null);
+											trackedObject.SetIsTracked(false, NotMeasuredReasons.FullyDisappearingStarMarkedTrackedWithoutBeingFound, resortToBrightness ? center : null, 1);
 											dbg += "BadCerSuc::";
 										}
 										else
 										{
-											trackedObject.SetIsTracked(false, NotMeasuredReasons.ObjectCertaintyTooSmall, resortToBrightness ? center : null);
+                                            trackedObject.SetIsTracked(false, NotMeasuredReasons.ObjectCertaintyTooSmall, resortToBrightness ? center : null, resortToBrightness ? fit.Certainty : (double?)null);
 											dbg += "BadCerNOSuc::";
 										}
 									}

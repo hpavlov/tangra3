@@ -16,23 +16,23 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
     {
 		public static ITracker CreateTracker(int imageWidth, int imageHeight, LightCurveReductionType lightCurveReductionType, List<TrackedObjectConfig> measuringStars, out string usedTrackerType)
         {
+            // NOTE: Figure out what tracker to create based on the type of event, number of objects and their intensity
+            bool createRefiningTracker = TangraConfig.Settings.Tracking.SelectedEngine == TangraConfig.TrackingEngine.TrackingWithRefining;
+
+            if (TangraConfig.Settings.Tracking.SelectedEngine == TangraConfig.TrackingEngine.LetTangraChoose)
+            {
+                if (LightCurveReductionContext.Instance.WindOrShaking ||
+                    LightCurveReductionContext.Instance.StopOnLostTracking ||
+                    LightCurveReductionContext.Instance.IsDriftThrough ||
+                    LightCurveReductionContext.Instance.HighFlickering ||
+                    LightCurveReductionContext.Instance.FullDisappearance)
+                {
+                    createRefiningTracker = true;
+                }
+            }
+
             if (lightCurveReductionType == LightCurveReductionType.Asteroidal)
             {
-				// NOTE: Figure out what tracker to create based on the type of event, number of objects and their intensity
-				bool createRefiningTracker = TangraConfig.Settings.Tracking.SelectedEngine == TangraConfig.TrackingEngine.TrackingWithRefining;
-
-				if (TangraConfig.Settings.Tracking.SelectedEngine == TangraConfig.TrackingEngine.LetTangraChoose)
-				{
-					if (LightCurveReductionContext.Instance.WindOrShaking ||
-						LightCurveReductionContext.Instance.StopOnLostTracking ||
-						LightCurveReductionContext.Instance.IsDriftThrough ||
-						LightCurveReductionContext.Instance.HighFlickering ||
-						LightCurveReductionContext.Instance.FullDisappearance)
-					{
-						createRefiningTracker = true;
-					}
-				}
-
 	            if (createRefiningTracker)
 	            {
 		            if (measuringStars.Count == 1)
@@ -71,7 +71,14 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 				}
 				else
 				{
-					usedTrackerType = "Mutual Event S";
+                    if (createRefiningTracker)
+                    {
+                        usedTrackerType = "Mutual Event O";
+                        return new OccultationTracker(measuringStars);
+                    }
+
+                    usedTrackerType = "Mutual Event S";
+                        
 #if WIN32
 					if (TangraConfig.Settings.Tracking.UseNativeTracker)
 						return new NativeSimplifiedTracker(imageWidth, imageHeight, measuringStars, LightCurveReductionContext.Instance.FullDisappearance);

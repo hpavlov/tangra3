@@ -75,7 +75,8 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 			if (OccultedStar.IsLocated)
 			{
-				OccultedStar.LastKnownGoodPosition = new ImagePixel(OccultedStar.Center);	
+				OccultedStar.LastKnownGoodPosition = new ImagePixel(OccultedStar.Center);
+			    OccultedStar.LastKnownGoodPsfCertainty = OccultedStar.PSFFit != null ? OccultedStar.PSFFit.Certainty : 0;
 			}
         }
 
@@ -167,6 +168,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                         OccultedStar.ThisFrameX = (float)gaussian.XCenter;
                         OccultedStar.ThisFrameY = (float)gaussian.YCenter;
                         OccultedStar.ThisSignalLevel = (float)(gaussian.IMax - gaussian.I0);
+                        OccultedStar.ThisFrameCertainty = (float)gaussian.Certainty;
                         OccultedStar.SetIsLocated(true, NotMeasuredReasons.TrackedSuccessfully);
                     }
                     else
@@ -188,6 +190,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                 {
                     OccultedStar.ThisFrameX = expectedX;
                     OccultedStar.ThisFrameY = expectedY;
+                    OccultedStar.ThisFrameCertainty = (float)gaussian.Certainty;
 
                     Trace.WriteLine(string.Format("Frame {0}: Cannot confirm target {1} [SingleStar]. Cannot solve second PSF", m_FrameNo, OccultedStar.TargetNo));
 					OccultedStar.SetIsLocated(false, NotMeasuredReasons.PSFFittingFailed);
@@ -197,6 +200,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             {
                 OccultedStar.ThisFrameX = expectedX;
                 OccultedStar.ThisFrameY = expectedY;
+                OccultedStar.ThisFrameCertainty = (float)gaussian.Certainty;
 
                 Trace.WriteLine(string.Format("Frame {0}: Cannot confirm target {1} [SingleStar]. Cannot solve first PSF", m_FrameNo, OccultedStar.TargetNo));
 				OccultedStar.SetIsLocated(false, NotMeasuredReasons.PSFFittingFailed);

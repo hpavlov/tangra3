@@ -116,7 +116,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 					if (trackedObject.OriginalObject.IsFixedAperture)
 					{
-						trackedObject.SetIsTracked(true, NotMeasuredReasons.FixedObject, new ImagePixel(x_double, y_double));
+						trackedObject.SetIsTracked(true, NotMeasuredReasons.FixedObject, new ImagePixel(x_double, y_double), 1);
 					}
 					else if (trackedObject.OriginalObject.IsOcultedStar())
 					{

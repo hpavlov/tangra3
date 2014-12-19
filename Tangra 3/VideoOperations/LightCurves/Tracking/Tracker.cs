@@ -84,6 +84,14 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                 return true;
 
             if (objectConfig.TrackingType == TrackingType.OccultedStar &&
+                LightCurveReductionContext.Instance.LightCurveReductionType == LightCurveReductionType.MutualEvent &&
+                !LightCurveReductionContext.Instance.FullDisappearance)
+            {
+                // Occulted star in Mutual events (which is not fully disappearing) will be bright enough for guiding
+                return true;
+            }
+
+            if (objectConfig.TrackingType == TrackingType.OccultedStar &&
                 objectConfig.AutoStarsInArea.Count == 1 &&
                 !objectConfig.IsWeakSignalObject &&
                 !LightCurveReductionContext.Instance.FullDisappearance)
@@ -136,6 +144,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                     {
                         trackedObject.LastKnownGoodFrameId = frameNo - 1;
                         trackedObject.LastKnownGoodPosition = new ImagePixel((int)trackedObject.ThisSignalLevel, trackedObject.ThisFrameX, trackedObject.ThisFrameY);
+                        trackedObject.LastKnownGoodPsfCertainty = trackedObject.ThisFrameCertainty;
                     }
                 }   
             }
@@ -192,33 +201,57 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
         {
             trackedObject.SetIsLocated(false, NotMeasuredReasons.UnknownReason);
 
+            int bestMaxFixAreaSize = !float.IsNaN(trackedObject.OriginalObject.RefinedFWHM) ? (int)(6 * trackedObject.OriginalObject.RefinedFWHM) : 17;
+            if (bestMaxFixAreaSize > 17) bestMaxFixAreaSize = 35; // We only support FSP Fitting of 17 or 35 square matrixes
+            if (bestMaxFixAreaSize < 17) bestMaxFixAreaSize = 17;
+
             // Try all fits from 5 to 15. Find the one with the highest peak, then do a fit around this area with the configured psf matrix size
             uint[,] pixels;
             if (useLowPassFilter)
             {
-				pixels = astroImage.GetPixelsArea((int)trackedObject.LastFrameX, (int)trackedObject.LastFrameY, 19);
+                pixels = astroImage.GetPixelsArea((int)trackedObject.LastFrameX, (int)trackedObject.LastFrameY, bestMaxFixAreaSize + 2);
                 pixels = EnhanceByteAreaForSearch(pixels);
             }
             else
             {
-				pixels = astroImage.GetPixelsArea((int)trackedObject.LastFrameX, (int)trackedObject.LastFrameY, 17);
+                pixels = astroImage.GetPixelsArea((int)trackedObject.LastFrameX, (int)trackedObject.LastFrameY, bestMaxFixAreaSize);
             }
 
             // There is only one object in the area, just do a wide fit followed by a fit with the selected matrix size
             PSFFit gaussian = new PSFFit((int)trackedObject.LastFrameX, (int)trackedObject.LastFrameY);
-            gaussian.Fit(pixels, 17);
+            gaussian.Fit(pixels, bestMaxFixAreaSize);
 
-            IImagePixel firstCenter = 
+            if (gaussian.Certainty < TangraConfig.Settings.Special.MinGuidingStarCertainty && trackedObject.LastKnownGoodPsfCertainty > TangraConfig.Settings.Special.GoodGuidingStarCertainty)
+            {
+                // We have a problem. Try to find the star in the area using other means
+                IImagePixel centroid = astroImage.GetCentroid((int)trackedObject.LastFrameX, (int)trackedObject.LastFrameY, bestMaxFixAreaSize, m_MedianValue);
+
+                double maxAllowedDistance = !float.IsNaN(trackedObject.OriginalObject.RefinedFWHM)
+                                                ? 2 * trackedObject.OriginalObject.RefinedFWHM
+                                                : 3 * TangraConfig.Settings.Special.LostTrackingMinDistance;
+
+                if (centroid.DistanceTo(new ImagePixel((int)trackedObject.LastFrameX, (int)trackedObject.LastFrameY)) < maxAllowedDistance)
+                {
+                    pixels = astroImage.GetPixelsArea(centroid.X, centroid.Y, bestMaxFixAreaSize);
+                    gaussian = new PSFFit(centroid.X, centroid.Y);
+                    gaussian.Fit(pixels, bestMaxFixAreaSize);
+                }
+            }
+
+            IImagePixel firstCenter =
                 gaussian.IsSolved
                     ? new ImagePixel(gaussian.Brightness, (int)gaussian.XCenter, (int)gaussian.YCenter)
-                    : astroImage.GetCentroid((int)trackedObject.LastFrameX, (int)trackedObject.LastFrameY, 17, m_MedianValue);
+                    : astroImage.GetCentroid((int)trackedObject.LastFrameX, (int)trackedObject.LastFrameY, bestMaxFixAreaSize, m_MedianValue);
+
+            if (!gaussian.IsSolved || gaussian.Certainty < TangraConfig.Settings.Special.MinGuidingStarCertainty)
+                firstCenter = null;
 
             if (firstCenter != null)
             {
                 // Do a second fit 
-                pixels = astroImage.GetPixelsArea(firstCenter.X, firstCenter.Y, 17);
+                pixels = astroImage.GetPixelsArea(firstCenter.X, firstCenter.Y, bestMaxFixAreaSize);
 
-                int secondFitAreaSize = Math.Max(trackedObject.PsfFitMatrixSize, (int)Math.Round(gaussian.FWHM * 2));
+                int secondFitAreaSize = Math.Max(trackedObject.PsfFitMatrixSize, (int)Math.Round(gaussian.FWHM * 2.5));
                 if (secondFitAreaSize % 2 == 0) secondFitAreaSize++;
                 secondFitAreaSize = Math.Min(17, secondFitAreaSize);
 
@@ -269,6 +302,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                         trackedObject.ThisFrameX = (float)gaussian.XCenter;
                         trackedObject.ThisFrameY = (float)gaussian.YCenter;
                         trackedObject.ThisSignalLevel = (float)(gaussian.IMax - gaussian.I0);
+                        trackedObject.ThisFrameCertainty = (float) gaussian.Certainty;
                         trackedObject.SetIsLocated(true, NotMeasuredReasons.TrackedSuccessfully);
 
                         if (m_Refining)
@@ -312,6 +346,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                     trackedObject.ThisFrameX = trackedObject.LastFrameX;
                     trackedObject.ThisFrameY = trackedObject.LastFrameY;
                     trackedObject.ThisSignalLevel = trackedObject.LastSignalLevel;
+                    trackedObject.ThisFrameCertainty = (float)trackedObject.LastKnownGoodPsfCertainty;
                     trackedObject.RegisterRefinedPosition(ImagePixel.Unspecified, float.NaN, double.NaN);
                 }
                 else
@@ -320,6 +355,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                     // which will trigger another fitting later on. Eventually the previous position may be still used
                     trackedObject.ThisFrameX = float.NaN;
                     trackedObject.ThisFrameY = float.NaN;
+                    trackedObject.ThisFrameCertainty = float.NaN;
                 }
             }
         }
@@ -473,6 +509,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             trackedObject.ThisFrameY = (float)averageY;
             trackedObject.PSFFit = null;
             trackedObject.ThisSignalLevel = float.NaN;
+            trackedObject.ThisFrameCertainty = float.NaN;
 
             List<TrackedObject> resolvedGuidingStars = LocateFirstObjects.FindAll(o => o.IsLocated);
             if (resolvedGuidingStars.Count == 0)
@@ -504,6 +541,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             trackedObject.ThisFrameY = (float)averageY;
 			trackedObject.PSFFit = null;
             trackedObject.ThisSignalLevel = float.NaN;
+            trackedObject.ThisFrameCertainty = float.NaN;
         }
 
         protected void FitObjectInLimitedArea(TrackedObject trackedObject, IAstroImage astroImage, float startingX, float startingY)
@@ -543,6 +581,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 				isTooFar = true;
                 if (gaussian.IsSolved)
                 {
+                    trackedObject.ThisFrameCertainty = (float)gaussian.Certainty;
                     double dist = ImagePixel.ComputeDistance((float)gaussian.XCenter, (float)startingX, (float)gaussian.YCenter, (float)startingY);
                     if (dist <= PositionTolerance)
                     {
@@ -551,6 +590,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                         trackedObject.ThisFrameX = (float)gaussian.XCenter;
                         trackedObject.ThisFrameY = (float)gaussian.YCenter;
                         trackedObject.ThisSignalLevel = (float)(gaussian.IMax - gaussian.I0);
+                        trackedObject.ThisFrameCertainty = (float)gaussian.Certainty;
                     	trackedObject.SetIsLocated(true, NotMeasuredReasons.TrackedSuccessfully);
                         return;
                     }
@@ -582,6 +622,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                 trackedObject.ThisFrameY = (float)averageY + 0.5f;
 				trackedObject.PSFFit = null;
                 trackedObject.ThisSignalLevel = float.NaN;
+                trackedObject.ThisFrameCertainty = 1;
 
                 int x0 = (int) Math.Round(averageX);
                 int y0 = (int) Math.Round(averageY);
@@ -641,7 +682,8 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                     trackedObject.ThisSignalLevel = (float)(gaussian.IMax - gaussian.I0);
                     
                     trackedObject.ThisFrameX = (float)gaussian.XCenter;
-                    trackedObject.ThisFrameY = (float)gaussian.YCenter;                      
+                    trackedObject.ThisFrameY = (float)gaussian.YCenter;
+                    trackedObject.ThisFrameCertainty = (float)gaussian.Certainty;
                 }
             }
         }
@@ -739,6 +781,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 								obj.PSFFit = null;
                                 obj.ThisFrameX = obj.LastFrameX;
                                 obj.ThisFrameY = obj.LastFrameY;
+                                obj.ThisFrameCertainty = (float)obj.LastKnownGoodPsfCertainty;
 								obj.SetIsLocated(false, NotMeasuredReasons.FitSuspectAsNoGuidingStarsAreLocated);
                             }
 
@@ -768,6 +811,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 								obj.PSFFit = null;
                                 obj.ThisFrameX = float.NaN;
                                 obj.ThisFrameY = float.NaN;
+                                obj.ThisFrameCertainty = float.NaN;
                                 obj.SetIsLocated(false, NotMeasuredReasons.ObjectExpectedPositionIsOffScreen);
                                 continue;
                             }
@@ -786,6 +830,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 									obj.PSFFit = gaussian;
                                     obj.ThisFrameX = (float)gaussian.XCenter;
                                     obj.ThisFrameY = (float)gaussian.YCenter;
+                                    obj.ThisFrameCertainty = (float)gaussian.Certainty;
 									obj.SetIsLocated(true, NotMeasuredReasons.TrackedSuccessfullyAfterDistanceCheck);
                                     Trace.WriteLine(string.Format("Frame {0}: Successfully located object #{1} after a close look up {2}px from the expected position.", m_FrameNo, obj.TargetNo, distance.ToString("0.00")));
                                 }
@@ -794,6 +839,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 									obj.PSFFit = null;
                                     obj.ThisFrameX = (float)expectedX;
                                     obj.ThisFrameY = (float)expectedY;
+                                    obj.ThisFrameCertainty = 0;
 									obj.SetIsLocated(false, NotMeasuredReasons.FailedToLocateAfterDistanceCheck);
                                     Trace.WriteLine(string.Format("Frame {0}: Cannot locate object #{1}. A close look up found it {2}px from the expected position.", m_FrameNo, obj.TargetNo, distance.ToString("0.00")));
                                 }
@@ -837,6 +883,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 									badObject.PSFFit = gaussian;
                                     badObject.ThisFrameX = (float)gaussian.XCenter;
                                     badObject.ThisFrameY = (float)gaussian.YCenter;
+                                    badObject.ThisFrameCertainty = (float)gaussian.Certainty;
 									badObject.SetIsLocated(true, NotMeasuredReasons.TrackedSuccessfullyAfterDistanceCheck);
                                     Trace.WriteLine(string.Format("Frame {0}: Successfully located object #{1} after a close look up {2}px from the expected position.", m_FrameNo, badObjectId, distance.ToString("0.00")));
                                 }
@@ -845,6 +892,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 									badObject.PSFFit = null;
                                     badObject.ThisFrameX = (float)expectedX;
                                     badObject.ThisFrameY = (float)expectedY;
+                                    badObject.ThisFrameCertainty = 0;
 									badObject.SetIsLocated(false, NotMeasuredReasons.FailedToLocateAfterDistanceCheck);
                                     Trace.WriteLine(string.Format("Frame {0}: Cannot locate object #{1}. A close look up found it {2}px from the expected position.", m_FrameNo, badObjectId, distance.ToString("0.00")));
                                 }
@@ -887,6 +935,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                                 obj1.ThisFrameX = (float) gaussian.XCenter;
                                 obj1.ThisFrameY = (float) gaussian.YCenter;
                                 obj1.ThisSignalLevel = (float) (gaussian.IMax - gaussian.I0);
+                                obj1.ThisFrameCertainty = (float)gaussian.Certainty;
                                 obj1.SetIsLocated(true, NotMeasuredReasons.TrackedSuccessfullyAfterWiderAreaSearch);
                                 Trace.WriteLine(
                                     string.Format(
@@ -909,6 +958,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                     obj1.ThisFrameX = obj1.LastFrameX;
                     obj1.ThisFrameY = obj1.LastFrameY;
                     obj1.ThisSignalLevel = obj1.LastSignalLevel;
+                    obj1.ThisFrameCertainty = (float) obj1.LastKnownGoodPsfCertainty;
 					obj1.SetIsLocated(false, NotMeasuredReasons.TrackedSuccessfullyAfterWiderAreaSearch);
                     Trace.WriteLine(string.Format("Frame {0}: Cannot locate object #{1} after a wider search in {2}px region. Best fluct diff: {3}",
                         m_FrameNo, obj1.TargetNo, obj1.PsfFitMatrixSize * 2, bestFluctDiff.ToString("0.00")));
@@ -1105,6 +1155,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 				{
 					trackedObject.ThisFrameX = (float)trackedObject.LastKnownGoodPosition.XDouble + deltaX;
 					trackedObject.ThisFrameY = (float)trackedObject.LastKnownGoodPosition.YDouble + deltaY;
+                    trackedObject.ThisFrameCertainty = 1;
 					break;
 				}
             }

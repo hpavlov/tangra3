@@ -997,13 +997,13 @@ namespace Tangra.VideoOperations.LightCurves
 
 		internal void OnNewSelectedMeasurements(LCMeasurement[] selectedMeasurements)
 	    {
-			if (m_frmZoomedPixels != null)
+            if (m_frmZoomedPixels != null && m_frmZoomedPixels.Visible)
 				m_frmZoomedPixels.HandleNewSelectedFrame(selectedMeasurements);
 
-			if (m_frmPSFFits != null)
+            if (m_frmPSFFits != null && m_frmPSFFits.Visible)
 				m_frmPSFFits.HandleNewSelectedFrame(selectedMeasurements);
 
-			if (m_frmBackgroundHistograms != null)
+            if (m_frmBackgroundHistograms != null && m_frmBackgroundHistograms.Visible)
 				m_frmBackgroundHistograms.HandleNewSelectedFrame(selectedMeasurements);
 
 			if (m_SelectedMeasurements == null ||

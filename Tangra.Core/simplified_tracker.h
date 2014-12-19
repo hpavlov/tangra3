@@ -35,6 +35,7 @@ struct NativeTrackedObjectInfo
 	unsigned int IsLocated;
 	unsigned int IsOffScreen;	
 	unsigned int TrackingFlags;
+	float LastKnownGoodPsfCertainty;
 };
 
 enum NotMeasuredReasons
@@ -65,6 +66,7 @@ public:
 	bool IsLocated;
 	double LastKnownGoodPositionXDouble;
 	double LastKnownGoodPositionYDouble;
+	double LastKnownGoodPsfCertainty;
 	bool IsOffScreen;
 	unsigned int TrackingFlags;
 	
@@ -77,7 +79,7 @@ public:
 	void NextFrame();
 	
 	void InitialiseNewTracking();
-	void SetIsTracked(bool isLocated, NotMeasuredReasons reason, double x, double y);	
+	void SetIsTracked(bool isLocated, NotMeasuredReasons reason, double x, double y, double certainty);	
 };
 
 class SimplifiedTracker

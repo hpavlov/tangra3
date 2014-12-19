@@ -215,7 +215,9 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 		public IImagePixel LastKnownGoodPosition { get; set; }
 
-		public bool IsLocated { get; protected set; }
+        public double LastKnownGoodPsfCertainty { get; set; }
+
+	    public bool IsLocated { get; protected set; }
 
 		public bool IsOffScreen
 		{
@@ -236,7 +238,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			NotMeasuredReasons = (NotMeasuredReasons)((int)NotMeasuredReasons & 0x00FFFF) | reason;
 		}
 
-		public virtual void SetIsTracked(bool isMeasured, NotMeasuredReasons reason, IImagePixel estimatedCenter)
+		public virtual void SetIsTracked(bool isMeasured, NotMeasuredReasons reason, IImagePixel estimatedCenter, double? psfCertainty)
 		{
 			IsLocated = isMeasured;
 
@@ -249,6 +251,9 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 				Center = estimatedCenter;
 				LastKnownGoodPosition = estimatedCenter;
 			}
+
+		    if (psfCertainty != null)
+		        LastKnownGoodPsfCertainty = psfCertainty.Value;
 		}
 
 		public virtual void SetIsTracked(bool isMeasured, NotMeasuredReasons reason)
@@ -336,6 +341,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 		{
 			ThisFrameX = originalObject.ApertureStartingX;
 			ThisFrameY = originalObject.ApertureStartingY;
+		    ThisFrameCertainty = originalObject.Gaussian != null ? (float)originalObject.Gaussian.Certainty : 0;
 		}
 
         private List<IImagePixel> RefiningPositions = new List<IImagePixel>();
@@ -344,6 +350,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 		public float ThisFrameX = float.NaN;
 		public float ThisFrameY = float.NaN;
+        public float ThisFrameCertainty = float.NaN;
         public float ThisSignalLevel = 0;
         public float LastFrameX;
         public float LastFrameY;
@@ -533,6 +540,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
             ThisFrameX = 0;
             ThisFrameY = 0;
+            ThisFrameCertainty = 0;
 
             ThisSignalLevel = 1;
 			PSFFit = null;

@@ -34,13 +34,14 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 	{
 		IImagePixel Center { get; }
 		IImagePixel LastKnownGoodPosition { get; set; }
+        double LastKnownGoodPsfCertainty { get; set; }
 		bool IsLocated { get; }
 		bool IsOffScreen { get; }
 		ITrackedObjectConfig OriginalObject { get; }
 		int TargetNo { get; }
 		ITrackedObjectPsfFit PSFFit { get; }
 		uint GetTrackingFlags();
-	    void SetIsTracked(bool isMeasured, NotMeasuredReasons reason, IImagePixel estimatedCenter);
+	    void SetIsTracked(bool isMeasured, NotMeasuredReasons reason, IImagePixel estimatedCenter, double? certainty);
 	}
 
 	public interface ITrackedObjectConfig

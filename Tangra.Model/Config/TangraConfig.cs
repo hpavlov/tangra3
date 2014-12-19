@@ -473,6 +473,9 @@ namespace Tangra.Model.Config
             public float TimesHigherPositionToleranceForFullyOccultedStars = 2.0f;
             public float PalNtscFrameRateDifference = 0.0025f;
 
+		    public float MinGuidingStarCertainty = 0.1f;
+            public float GoodGuidingStarCertainty = 0.5f;
+
 			#region Lost Tracking Configuration
 			public float LostTrackingMinDistance = 4f;
 			public float LostTrackingMinSignalCoeff = 0.38f;
