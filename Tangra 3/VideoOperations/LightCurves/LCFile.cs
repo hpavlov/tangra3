@@ -482,7 +482,7 @@ namespace Tangra.VideoOperations.LightCurves
             else if (frameTimingIndex == 0 && FrameTiming.Count > 1)
             {
                 // For first frame, use the second frame
-                otherframeTime = GetTimeForFrame(Header.MinFrame);
+                otherframeTime = GetTimeForFrame(Header.MinFrame + 1);
             }
 
             double intervalDuration = Math.Abs(new TimeSpan(otherframeTime.Ticks - frameTime.Ticks).TotalSeconds);
@@ -495,14 +495,14 @@ namespace Tangra.VideoOperations.LightCurves
                 double palCountedFrames = intervalDuration*25.00;
                 for (int i = 0; i < 256; i++)
                 {
-                    if (Math.Abs(i - ntscCountedFrames) < 0.01)
+                    if (Math.Abs(i - ntscCountedFrames) < (0.001 + 29.97 / 1000) /* 1ms error */)
                     {
                         integratedFields = 2*i;
                         videoStandardFieldDurationSec = 0.01668335;
                         break;
                     }
 
-                    if (Math.Abs(i - palCountedFrames) < 0.01)
+                    if (Math.Abs(i - palCountedFrames) < (0.001 + 25.00 / 1000) /* 1ms error */)
                     {
                         integratedFields = 2*i;
                         videoStandardFieldDurationSec = 0.02;

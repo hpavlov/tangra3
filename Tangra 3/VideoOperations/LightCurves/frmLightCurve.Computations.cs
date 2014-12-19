@@ -628,12 +628,17 @@ namespace Tangra.VideoOperations.LightCurves
 
                 string timeFormat = "HH:mm:ss";
 
-                if (resolutionInSecs < 0.06)
+                if (resolutionInSecs < 0.1)
+                {
+                    timeFormat = "HH:mm:ss.fff";
+                    if (absoluteTimeError > 5) isBadTimeString = "??:??:??.???";
+                }
+                else if (resolutionInSecs < 1)
                 {
                     timeFormat = "HH:mm:ss.ff";
                     if (absoluteTimeError > 5) isBadTimeString = "??:??:??.??";
                 }
-                else if (resolutionInSecs < 0.6)
+                else if (resolutionInSecs < 10)
                 {
                     timeFormat = "HH:mm:ss.f";
                     if (absoluteTimeError > 50) isBadTimeString = "??:??:??.?";
