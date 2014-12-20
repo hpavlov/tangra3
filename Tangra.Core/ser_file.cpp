@@ -116,7 +116,7 @@ void SerFile::OpenFile(const char* filePath, SerLib::SerFileInfo* fileInfo, char
 	m_PixelsPerFrame = Width * Height;
 	
 	if (HasTimeStamps)
-		m_TimeStampStartOffset = 178 + m_CountFrames * m_RawFrameSize;
+		m_TimeStampStartOffset = 178 + (__int64)m_CountFrames * (__int64)m_RawFrameSize;
 	else
 		m_TimeStampStartOffset = -1;
 	
