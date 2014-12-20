@@ -95,6 +95,7 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
         public void NextFrame(int frameNo, MovementType movementType, bool isLastFrame, AstroImage astroImage, int firstFrameInIntegrationPeriod)
 		{
 			m_CurrentAstroImage = astroImage;
+            TangraContext.Current.CrashReportInfo.FrameNumber = frameNo;
 
             if (m_Running)
             {

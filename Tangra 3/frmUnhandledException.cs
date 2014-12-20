@@ -84,6 +84,18 @@ namespace Tangra
 
             if (TangraContext.Current.CrashReportInfo != null)
             {
+                try
+                {
+                    TangraContext.Current.CrashReportInfo.WorkingSet64 = Process.GetCurrentProcess().WorkingSet64;
+                    TangraContext.Current.CrashReportInfo.VirtualMemorySize64 = Process.GetCurrentProcess().VirtualMemorySize64;
+                    TangraContext.Current.CrashReportInfo.PrivateMemorySize64 = Process.GetCurrentProcess().PrivateMemorySize64;
+                    TangraContext.Current.CrashReportInfo.PeakWorkingSet64 = Process.GetCurrentProcess().PeakWorkingSet64;
+                    TangraContext.Current.CrashReportInfo.MinWorkingSet = Process.GetCurrentProcess().MinWorkingSet.ToInt64();
+                    TangraContext.Current.CrashReportInfo.MaxWorkingSet = Process.GetCurrentProcess().MaxWorkingSet.ToInt64();
+                }
+                catch
+                { }
+                
                 using(TextWriter wrt = new StringWriter(crashReportInfo))
                 {
                     ser.Serialize(wrt, TangraContext.Current.CrashReportInfo);

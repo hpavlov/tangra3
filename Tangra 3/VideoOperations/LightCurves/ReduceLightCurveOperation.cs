@@ -250,6 +250,8 @@ namespace Tangra.VideoOperations.LightCurves
             m_AstroImage = astroImage;
 			m_CurrFrameNo = frameNo;
 
+            TangraContext.Current.CrashReportInfo.FrameNumber = frameNo;
+
             if (m_Correcting)
                 // Do not track or process the frame while correcting the tracking
                 return;

@@ -13,8 +13,17 @@ namespace Tangra.Model.Context
         public string VideoFile { get; set; }
 		public string VideoOperation { get; set; }		
 		public string Tracker { get; set; }
+        public long FrameNumber { get; set; }
+
 		[XmlIgnore]
 		public string ReductionContext { get; set; }
+
+        public long WorkingSet64 { get; set; }
+        public long VirtualMemorySize64 { get; set; }
+        public long PrivateMemorySize64 { get; set; }
+        public long PeakWorkingSet64 { get; set; }
+        public long MinWorkingSet  { get; set; }
+        public long MaxWorkingSet { get; set; }
     }
 
 	public class TangraContext
