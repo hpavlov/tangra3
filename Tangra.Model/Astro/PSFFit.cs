@@ -313,6 +313,9 @@ namespace Tangra.Model.Astro
 
         public double GetVariance()
         {
+            if (!m_IsSolved) 
+                return double.NaN;
+
             double sumSq = 0;
             int width = m_Residuals.GetLength(0);
             int height = m_Residuals.GetLength(1);
@@ -957,7 +960,7 @@ namespace Tangra.Model.Astro
 		
 		double ITrackedObjectPsfFit.GetResidualAt(int x, int y)
 		{
-			return m_Residuals[x, y];
+			return m_IsSolved ? m_Residuals[x, y] : double.NaN;
 		}
 
 
@@ -1081,31 +1084,32 @@ namespace Tangra.Model.Astro
                 yPrev = y;
             }
 
-            if (m_Residuals == null) 
-                return;
+            if (m_IsSolved)
+            {
+                for (int x = 0; x < m_MatrixSize; x++)
+                    for (int y = 0; y < m_MatrixSize; y++)
+                    {
+                        double z0 = GetPSFValueInternal(x, y);
+                        double z = z0 + m_Residuals[x, y];
+                        double d = Math.Sqrt((x - m_X0) * (x - m_X0) + (y - m_Y0) * (y - m_Y0));
 
-            for (int x = 0; x < m_MatrixSize; x++)
-                for (int y = 0; y < m_MatrixSize; y++)
-                {
-                    double z0 = GetPSFValueInternal(x, y);
-                    double z = z0 + m_Residuals[x, y];
-                    double d = Math.Sqrt((x - m_X0) * (x - m_X0) + (y - m_Y0) * (y - m_Y0));
+                        float xVal = (float)(margin + (halfWidth + Math.Sign(x - m_X0) * d) * xScale);
+                        float yVal = rect.Height - margin - (float)(z - m_IBackground) * yScale;
 
-                    float xVal = (float)(margin + (halfWidth + Math.Sign(x - m_X0) * d) * xScale);
-                    float yVal = rect.Height - margin - (float)(z - m_IBackground) * yScale;
+                        g.FillRectangle(
+                            d <= aperture ? incldedPinBrush : excludedBrush,
+                            xVal - 1, yVal - 1, 3, 3);
+                    }
 
-					g.FillRectangle(
-						d <= aperture ? incldedPinBrush : excludedBrush, 
-                        xVal - 1, yVal -1, 3,  3);
-                }
+                // Uncomment to draw the FWHM
+                //g.DrawLine(
+                //    Pens.White,
+                //    rect.Width / 2 - ((float)FWHM * xScale / 2),
+                //    rect.Height - margin - ((float)m_IStarMax - (float)m_IBackground) * yScale / 2,
+                //    rect.Width / 2 + ((float)FWHM * xScale / 2),
+                //    rect.Height - margin - ((float)m_IStarMax - (float)m_IBackground) * yScale / 2);                
+            }
 
-            // Uncomment to draw the FWHM
-            //g.DrawLine(
-            //    Pens.White,
-            //    rect.Width / 2 - ((float)FWHM * xScale / 2),
-            //    rect.Height - margin - ((float)m_IStarMax - (float)m_IBackground) * yScale / 2,
-            //    rect.Width / 2 + ((float)FWHM * xScale / 2),
-            //    rect.Height - margin - ((float)m_IStarMax - (float)m_IBackground) * yScale / 2);
         }
 
 		public void DrawDataPixels(Graphics g, Rectangle rect, int bpp, uint normVal)
@@ -1171,6 +1175,9 @@ namespace Tangra.Model.Astro
 
         public double GetLeastSquareFittedAmplitude(double empericalPSFR0)
         {
+            if (!m_IsSolved)
+                return double.NaN;
+
             // I = A * Gauss (empericalPSFR0) + b
             // Quick Least Square fit for A
             // 
@@ -1227,7 +1234,7 @@ namespace Tangra.Model.Astro
 
             for (int x = 0; x < m_MatrixSize; x++)
                 for (int y = 0; y < m_MatrixSize; y++)
-                    writer.Write(m_Residuals[x, y]);
+                    writer.Write(m_IsSolved ? m_Residuals[x, y] : double.NaN);
 
             writer.Write(m_NewMatrixSize);
             writer.Write(m_NewMatrixX0);
