@@ -176,7 +176,16 @@ namespace Tangra.VideoOperations.LightCurves.Report
 		public DateTime RTime { get; set; }
 		public int DTimeErrorMS { get; set; }
 		public int RTimeErrorMS { get; set; }
+
+        public DateTime DTimeAOTA { get; set; }
+        public DateTime RTimeAOTA { get; set; }
+        public int DTimeErrorMSAOTA { get; set; }
+        public int RTimeErrorMSAOTA { get; set; }
+
 		public DateTime DTimeMostProbable { get; set; }
 		public DateTime RTimeMostProbable { get; set; }
+
+        public bool InstrumentalDelaysApplied { get; set; }
+        public bool ReportTangraTimesRatherThanAOTATimes { get; set; }
 	}
 }

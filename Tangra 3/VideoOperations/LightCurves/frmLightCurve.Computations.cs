@@ -953,7 +953,7 @@ namespace Tangra.VideoOperations.LightCurves
             }
         }
 
-		void ILightCurveDataProvider.SetFoundOccultationEvent(int eventId, float dFrame, float rFrame, float dFrameErrorMinus, float dFrameErrorPlus, float rFrameErrorMinus, float rFrameErrorPlus, string dTime, string rTime)
+        void ILightCurveDataProvider.SetFoundOccultationEvent(int eventId, float dFrame, float rFrame, float dFrameErrorMinus, float dFrameErrorPlus, float rFrameErrorMinus, float rFrameErrorPlus, string dTime, string rTime, bool cameraDelaysKnownToAOTA)
 		{
 			if (m_EventTimesReport != null)
 			{
@@ -1023,9 +1023,46 @@ namespace Tangra.VideoOperations.LightCurves
                         // TODO: Use the times from AOTA??
                     }
 
-					// TODO: Parse the +/- part of each time 
-	                DateTime aotaDTime = DateTime.ParseExact(dTime, "", CultureInfo.InvariantCulture);
-					DateTime aotaRTime = DateTime.ParseExact(rTime, "", CultureInfo.InvariantCulture);
+                    DateTime? aotaDTime = null;
+                    DateTime? aotaRTime = null;
+
+                    // Parse the +/- part of each time e.g. "9 40 25.79 ± 0.07"
+                    string[] tokens = dTime.Split('±');
+                    if (tokens.Length == 2)
+                    {
+                        evt.DTimeErrorMSAOTA = (int)Math.Round(double.Parse(tokens[1].Trim()) * 1000.0);
+                        string[] ttokens = tokens[0].Trim().Split(' ');
+
+                        aotaDTime = m_LCFile.Header.GetFrameTime(m_LCFile.Header.MinFrame);
+                        if (aotaDTime.HasValue)
+                        {
+                            double secs = double.Parse(ttokens[2]);
+                            int secsInt = (int) secs;
+                            int millilsecsInt = (int) Math.Round((secs - secsInt)*1000.0);
+                            aotaDTime = new DateTime(aotaDTime.Value.Year, aotaDTime.Value.Month, aotaDTime.Value.Day, int.Parse(ttokens[0]), int.Parse(ttokens[1]), secsInt, millilsecsInt);
+
+                            tokens = rTime.Split('±');
+                            if (tokens.Length == 2)
+                            {
+                                evt.RTimeErrorMSAOTA = (int)Math.Round(double.Parse(tokens[1].Trim()) * 1000.0);
+                                ttokens = tokens[0].Trim().Split(' ');
+
+                                aotaRTime = m_LCFile.Header.GetFrameTime(m_LCFile.Header.MinFrame);
+                                if (aotaRTime.HasValue)
+                                {
+                                    secs = double.Parse(ttokens[2]);
+                                    secsInt = (int)secs;
+                                    millilsecsInt = (int)Math.Round((secs - secsInt) * 1000.0);
+                                    aotaRTime = new DateTime(aotaRTime.Value.Year, aotaRTime.Value.Month, aotaRTime.Value.Day, int.Parse(ttokens[0]), int.Parse(ttokens[1]), secsInt, millilsecsInt);
+
+                                    if (aotaRTime.Value < aotaDTime.Value) aotaRTime.Value.AddDays(1);
+
+                                    evt.DTimeAOTA = aotaDTime.Value;
+                                    evt.RTimeAOTA = aotaRTime.Value;
+                                }
+                            }
+                        }
+                    }
 
                     if (gotTimes && m_EventTimesReport.TangraCanApplyInstrumentalDelays == InstrumentalDelayStatus.Yes)
                     {
@@ -1036,12 +1073,45 @@ namespace Tangra.VideoOperations.LightCurves
                         evt.RTimeMostProbable = evt.RTimeMostProbable.AddSeconds(instrDelay);
                     }
 
-					if (m_EventTimesReport.VideoFileFormat != "AVI" &&
-					    m_EventTimesReport.TangraCanApplyInstrumentalDelays == InstrumentalDelayStatus.Yes)
+					if (aotaDTime.HasValue && aotaRTime.HasValue &&
+					    (Math.Abs(new TimeSpan(aotaDTime.Value.Ticks - evt.DTime.Ticks).TotalMilliseconds) > 10 || Math.Abs(new TimeSpan(aotaRTime.Value.Ticks - evt.RTime.Ticks).TotalMilliseconds) > 10) &&
+					    m_EventTimesReport.VideoFileFormat != "AVI" &&
+					    m_EventTimesReport.TangraCanApplyInstrumentalDelays == InstrumentalDelayStatus.Yes &&
+					    cameraDelaysKnownToAOTA)
 					{
-						// TODO: If the AOTA and Tangra times are different, then ask the use which times they want to use
-						// TODO: Add a flag in the report to indicate which times to be used in OW
+					    // AOTA and Tangra times are different. Ask the use which times they want to use
+					    // Add a flag in the report to indicate which times to be used in OW
+					    var frm = new frmChooseTimesToReport();
+                        frm.SetTimes(evt);
+                        frm.CameraNameTangra = m_LCFile.Footer.CameraName;
+                        frm.CameraNameAOTA = m_EventTimesReport.CameraName;
+                        frm.TangraKnowsCameraDelays = m_EventTimesReport.TangraCanApplyInstrumentalDelays == InstrumentalDelayStatus.Yes;
+                        frm.AOTAKnowsCameraDelays = cameraDelaysKnownToAOTA;
+					    frm.ShowDialog(this);
+
+                        evt.ReportTangraTimesRatherThanAOTATimes = frm.UseTangrasTimes;
+                        evt.InstrumentalDelaysApplied = evt.ReportTangraTimesRatherThanAOTATimes 
+                            ? m_EventTimesReport.TangraCanApplyInstrumentalDelays == InstrumentalDelayStatus.Yes 
+                            : cameraDelaysKnownToAOTA;
 					}
+					else if (m_EventTimesReport.VideoFileFormat == "AVI")
+					{
+					    // Always use the times provided by AOTA when working with AVI files
+					    evt.InstrumentalDelaysApplied = cameraDelaysKnownToAOTA;
+					    evt.ReportTangraTimesRatherThanAOTATimes = false;
+					}
+					else if ((m_EventTimesReport.VideoFileFormat == "ADV" || m_EventTimesReport.VideoFileFormat == "AAV") && !cameraDelaysKnownToAOTA)
+					{
+					    // For ADV/AAV files prefer Tangra's times (when AOTA doesn't know hwo to apply delays)
+                        evt.InstrumentalDelaysApplied = m_EventTimesReport.TangraCanApplyInstrumentalDelays != InstrumentalDelayStatus.No;
+                        evt.ReportTangraTimesRatherThanAOTATimes = true;
+					}
+                    else
+                    {
+                        // Otherwise use AOTA's Times
+                        evt.InstrumentalDelaysApplied = cameraDelaysKnownToAOTA;
+                        evt.ReportTangraTimesRatherThanAOTATimes = false;
+                    }
                 }
 
 				m_EventTimesReport.Events.Add(evt);

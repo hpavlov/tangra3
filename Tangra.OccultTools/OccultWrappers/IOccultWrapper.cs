@@ -35,6 +35,7 @@ namespace Tangra.OccultTools.OccultWrappers
         public int MeasurementsBinned;
         public bool MeasuredAtFieldLevel;
         public bool TimeScaleFromMeasuringTool;
+        public bool CameraDelaysKnownToAOTA;
     }
 
     public class AotaReturnValue

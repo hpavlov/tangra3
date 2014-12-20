@@ -18,7 +18,7 @@ namespace Tangra.OccultTools.OccultWrappers
 {
     public class OccultSDKWrapper : IOccultWrapper
     {
-        private const string MIN_VERSION_OCCULT_REQUIRED = "4.1.0.25";
+        private const string MIN_VERSION_OCCULT_REQUIRED = "4.1.4.0";
         private const string MIN_VERSION_TANGRA_REQUIRED = "3.0.84";
 
         private IAOTAClientCallbacks m_ClientCallbacks;
@@ -69,6 +69,8 @@ namespace Tangra.OccultTools.OccultWrappers
 
             private static string s_IncompatibleVersionOfOccultErrorMessage = null;
 
+            private static bool s_NeedNewVersionOfTangra = false;
+
             public static string HasSupportedVersionOfOccult(string occultLocation)
             {
                 try
@@ -111,6 +113,8 @@ namespace Tangra.OccultTools.OccultWrappers
             {
                 if (AssemblyOccultUtilities == null)
                 {
+                    s_NeedNewVersionOfTangra = false;
+
                     string path = Path.Combine(occultLocation, "OccultUtilities.dll");
                     if (!File.Exists(path))
                     {
@@ -160,6 +164,7 @@ namespace Tangra.OccultTools.OccultWrappers
                                 if (requiredVersion > currentVersion)
                                 {
                                     s_IncompatibleVersionOfOccultErrorMessage = "Your version of Occult is newer than the version supported by Tangra3. Please update Tangra3 to use AOTA.";
+                                    s_NeedNewVersionOfTangra = true;
                                     return;
                                 }
                                 else if (requiredVersion < currentVersion)
@@ -175,10 +180,29 @@ namespace Tangra.OccultTools.OccultWrappers
 
                     Type probledType = AssemblyOccultUtilities.GetType("AOTA.AOTA_ExternalAccess");
 
-                    if (probledType != null && probledType.GetInterfaces().Contains(typeof (IAOTAExternalAccess)))
+                    if (probledType != null)
                     {
-                        TYPE_AOTA_ExternalAccess = probledType;
-                        s_IncompatibleVersionOfOccultErrorMessage = null;
+                        if (probledType.GetInterfaces().Contains(typeof (IAOTAExternalAccess)))
+                        {
+                            TYPE_AOTA_ExternalAccess = probledType;
+                            s_IncompatibleVersionOfOccultErrorMessage = null;
+                        }
+                        else
+                        {
+                            Version currOccultVersion = probledType.Assembly.GetName().Version;
+                            Version supportedVersion = new Version(MIN_VERSION_OCCULT_REQUIRED);
+                            if (supportedVersion < currOccultVersion)
+                            {
+                                s_IncompatibleVersionOfOccultErrorMessage = "Your version of Occult  " + currOccultVersion.ToString() + " is newer than the version supported by Tangra3. Please update Tangra3 to use AOTA.";
+                                s_NeedNewVersionOfTangra = true;
+                            }
+                            else
+                            {
+                                s_IncompatibleVersionOfOccultErrorMessage = "You need Occult version " + MIN_VERSION_OCCULT_REQUIRED + " or newer to use AOTA from Tangra. Please update Occult.";        
+                            }
+                        }
+                        
+
                     }
                     else
                         s_IncompatibleVersionOfOccultErrorMessage = "You need Occult version " + MIN_VERSION_OCCULT_REQUIRED + " or newer to use AOTA from Tangra. Please update Occult.";
@@ -380,6 +404,7 @@ namespace Tangra.OccultTools.OccultWrappers
                 destination.MeasurementsBinned = (int)GetReflectedFieldValue(sourceType, source, "MeasurementsBinned", 0);
                 destination.MeasuredAtFieldLevel = (bool)GetReflectedFieldValue(sourceType, source, "MeasuredAtFieldLevel", false);
                 destination.TimeScaleFromMeasuringTool = (bool)GetReflectedFieldValue(sourceType, source, "TimeScaleFromMeasuringTool", false);
+                destination.CameraDelaysKnownToAOTA = (bool)GetReflectedFieldValue(sourceType, source, "CameraDelaysKnownToAOTA", false);
             }
 
             private static object GetReflectedFieldValue(Type sourceType, object source, string fieldName, object defaultValue)

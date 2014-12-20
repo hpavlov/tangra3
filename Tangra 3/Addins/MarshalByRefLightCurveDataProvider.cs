@@ -95,11 +95,11 @@ namespace Tangra.Addins
 			firstIntegratingFrame = m_FirstIntegratingFrame;
 		}
 
-		public void SetFoundOccultationEvent(int eventId, float dFrame, float rFrame, float dFrameErrorMinus, float dFrameErrorPlus, float rFrameErrorMinus, float rFrameErrorPlus, string dTime, string rTime)
+        public void SetFoundOccultationEvent(int eventId, float dFrame, float rFrame, float dFrameErrorMinus, float dFrameErrorPlus, float rFrameErrorMinus, float rFrameErrorPlus, string dTime, string rTime, bool cameraDelaysKnownToAOTA)
 		{
 			try
 			{
-				m_DelegatedLocalProvider.SetFoundOccultationEvent(eventId, dFrame, rFrame, dFrameErrorMinus, dFrameErrorPlus, rFrameErrorMinus, rFrameErrorPlus, dTime, rTime);
+                m_DelegatedLocalProvider.SetFoundOccultationEvent(eventId, dFrame, rFrame, dFrameErrorMinus, dFrameErrorPlus, rFrameErrorMinus, rFrameErrorPlus, dTime, rTime, cameraDelaysKnownToAOTA);
 			}
 			catch
 			{

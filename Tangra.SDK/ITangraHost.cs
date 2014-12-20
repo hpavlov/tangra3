@@ -28,7 +28,7 @@ namespace Tangra.SDK
 		ISingleMeasurement[] GetTargetMeasurements();
 		ISingleMeasurement[] GetComparisonObjectMeasurements(int comparisonObjectId);
 		void GetIntegrationRateAndFirstFrame(out int integrationRate, out int firstIntegratingFrame);
-		void SetFoundOccultationEvent(int eventId, float dFrame, float rFrame, float dFrameErrorMinus, float dFrameErrorPlus, float rFrameErrorMinus, float rFrameErrorPlus, string dTime, string rTime);
+        void SetFoundOccultationEvent(int eventId, float dFrame, float rFrame, float dFrameErrorMinus, float dFrameErrorPlus, float rFrameErrorMinus, float rFrameErrorPlus, string dTime, string rTime, bool cameraDelaysKnownToAOTA);
 		void SetNoOccultationEvents();
         void SetTimeExtractionEngine(string engineAndVersion);
 		string VideoCameraName { get; }
