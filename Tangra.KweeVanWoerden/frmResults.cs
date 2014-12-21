@@ -8,12 +8,14 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.SDK;
 
 namespace Tangra.KweeVanWoerden
 {
 	public partial class frmResults : Form
 	{
 		internal KweeVanWoerdenMinimum.KweeVanWoerdenResult Results;
+	    internal ITangraHost TangraHost;
 
 		public frmResults()
 		{
@@ -55,6 +57,14 @@ namespace Tangra.KweeVanWoerden
 			tbxT0.Text = Results.T0.ToString("0.000000");
 			tbxTotalObs.Text = Results.NumberObservations.ToString();
 			tbxIncludedObs.Text = Results.IncludedObservations.ToString() + "%";
+            tbxUncertaintyInSec.Text = (Results.Time_Of_Minimum_Uncertainty * 86400.0).ToString("0.0");
 		}
+
+        private void btnCalcHJD_Click(object sender, EventArgs e)
+        {
+            var frm = new frmHJDCalculation();
+            frm.TimeOfMinimumJD = Results.Time_Of_Minimum_JD;
+            frm.ShowDialog(TangraHost.ParentWindow);
+        }
 	}
 }

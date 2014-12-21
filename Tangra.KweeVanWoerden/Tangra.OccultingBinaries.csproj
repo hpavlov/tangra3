@@ -41,11 +41,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssemblyHelper.cs" />
+    <Compile Include="AstroUtilities.cs" />
+    <Compile Include="AstroConvert.cs" />
     <Compile Include="frmAddinConfig.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmAddinConfig.Designer.cs">
       <DependentUpon>frmAddinConfig.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmConfigureRun.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmConfigureRun.Designer.cs">
+      <DependentUpon>frmConfigureRun.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmHJDCalculation.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmHJDCalculation.Designer.cs">
+      <DependentUpon>frmHJDCalculation.cs</DependentUpon>
     </Compile>
     <Compile Include="frmResults.cs">
       <SubType>Form</SubType>
@@ -72,6 +87,12 @@
     <EmbeddedResource Include="frmAddinConfig.resx">
       <DependentUpon>frmAddinConfig.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="frmConfigureRun.resx">
+      <DependentUpon>frmConfigureRun.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmHJDCalculation.resx">
+      <DependentUpon>frmHJDCalculation.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmResults.resx">
       <DependentUpon>frmResults.cs</DependentUpon>
     </EmbeddedResource>
@@ -84,10 +105,14 @@
     <None Include="ReferenceCode\Kwee_Van_Woerden_Journal_Paper.pdf" />
     <None Include="ReferenceCode\Kwee_Van_Woerden_Main_Program.f90" />
     <None Include="ReferenceCode\Kwee_Van_Woerden_Subroutine.f90" />
+    <EmbeddedResource Include="Resources\Constellations.bin" />
+    <EmbeddedResource Include="Resources\Earth.bin" />
     <None Include="Resources\EclipsingBinaries.ico" />
     <EmbeddedResource Include="Resources\Input_Observations.bin" />
+    <EmbeddedResource Include="Resources\Nutation.bin" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\iii.dat" />
     <None Include="Resources\Input_Observations.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

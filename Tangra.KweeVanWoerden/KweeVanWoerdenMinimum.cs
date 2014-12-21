@@ -151,10 +151,26 @@ namespace Tangra.KweeVanWoerden
 
 				bool hasReliableTimeBase = dataProvider.HasReliableTimeBase;
 
-				double[] dataWithBg = measurements.Select(x => (double)(x.Measurement + x.Background)).ToArray();
 				double[] frameIds = measurements.Select(x => (double)x.CurrFrameNo).ToArray();
+                double[] dataWithBg;
+				double[] dataBg;
 
-				double[] dataBg = measurements.Select(x => (double)x.Background).ToArray();
+                var frm = new frmConfigureRun();
+                frm.NumStars = dataProvider.NumberOfMeasuredComparisonObjects + 1;
+                frm.ShowDialog(m_TangraHost.ParentWindow);
+
+                if (frm.VariableStarIndex == 0)
+                {
+                    dataWithBg = measurements.Select(x => (double) (x.Measurement + x.Background)).ToArray();
+                    dataBg = measurements.Select(x => (double) x.Background).ToArray();
+                }
+                else
+                {
+                    ISingleMeasurement[] altMeasurements = dataProvider.GetComparisonObjectMeasurements(frm.VariableStarIndex - 1);
+
+                    dataWithBg = altMeasurements.Select(x => (double)(x.Measurement + x.Background)).ToArray();
+                    dataBg = altMeasurements.Select(x => (double)x.Background).ToArray();                    
+                }
 
 				DateTime[] timestamps = measurements.Select(x => x.Timestamp).ToArray();
 
@@ -183,12 +199,25 @@ namespace Tangra.KweeVanWoerden
 				// Now go and get the comparison star data
 				if (dataProvider.NumberOfMeasuredComparisonObjects > 0)
 				{
-					ISingleMeasurement[] compMeasurements = dataProvider.GetComparisonObjectMeasurements(0);
+                    ISingleMeasurement[] compMeasurements = frm.ComparisonStarIndex == 0 ? dataProvider.GetTargetMeasurements() : dataProvider.GetComparisonObjectMeasurements(frm.ComparisonStarIndex - 1);
 
 					if (compMeasurements != null)
 					{
-						double[] compDataWithBg = compMeasurements.Select(x => (double)(x.Measurement + x.Background)).ToArray();
-						double[] compBg = compMeasurements.Select(x => (double)x.Background).ToArray();
+					    double[] compDataWithBg;
+					    double[] compBg;
+
+                        if (frm.UseNormalisation)
+                        {
+                            compDataWithBg = compMeasurements.Select(x => (double)(x.Measurement + x.Background)).ToArray();
+                            compBg = compMeasurements.Select(x => (double)x.Background).ToArray();
+                        }
+                        else
+                        {
+                            double compDataWithBgAverage = compMeasurements.Average(x => x.Measurement + x.Background);
+                            double compBgAverage = compMeasurements.Average(x => x.Background);
+                            compDataWithBg = compMeasurements.Select(x => compDataWithBgAverage).ToArray();
+                            compBg = compMeasurements.Select(x => compBgAverage).ToArray();                            
+                        }
 
 						double jdAtUtcMidnight = DateUtcToJulian(new DateTime(startFrameStartDayTicks));
 
@@ -204,6 +233,7 @@ namespace Tangra.KweeVanWoerden
 		{
 			var frmResults = new frmResults();
 			frmResults.Results = result;
+		    frmResults.TangraHost = m_TangraHost;
 			frmResults.StartPosition = FormStartPosition.CenterParent;
 			frmResults.ShowDialog(m_TangraHost.ParentWindow);
 		}
@@ -346,7 +376,7 @@ namespace Tangra.KweeVanWoerden
 				MessageBoxIcon.Error);
 		}
 
-		private KweeVanWoerdenResult Kwee_van_Woerden(long Number_Obs, double Time_First, double[] Time, double[] Variable_Star_DN, double[] Variable_Sky_DN, double[] Comparison_Star_DN, double[] Comparison_Sky_DN)
+		private KweeVanWoerdenResult Kwee_van_Woerden(long Number_Obs, double Time_First_JD, double[] SecondsFromTimeFirstJD, double[] Variable_Star_DN, double[] Variable_Sky_DN, double[] Comparison_Star_DN, double[] Comparison_Sky_DN)
 		{
 			/* Constant parameter */
 			long         Normal_Points = 101;                     /* Number of evenly spaced data pairs used in the analysis */
@@ -395,6 +425,11 @@ namespace Tangra.KweeVanWoerden
 
 			rv.Observations_File.Add("                Time     Luminosity_Ratio     Variable_Star_DN      Variable_Sky_DN   Comparison_Star_DN    Comparison_Sky_DN");
 			rv.Normals_File.Add("                Time    Luminosity_Ratio");
+
+
+		    double[] Time = new double[Number_Obs];
+            for (int k = 0; k < Number_Obs; k++)
+                Time[k] = SecondsFromTimeFirstJD[k] / 86400.0;
 
 			Luminosity_Ratio = new double[Number_Obs];
 			/* Determine luminosity ratios */
@@ -521,12 +556,12 @@ namespace Tangra.KweeVanWoerden
 			rv.T0 = T0;
 			rv.T0_Uncertainty = T0_Uncertainty;			
 			rv.Time_Of_Minimum = Time_Normal[1] + ((Sum_Of_Squares_Smallest_Index - 1) + (T0 - 2.0)) * Time_Interval;
-			rv.Time_Of_Minimum_JD = Time_First + rv.Time_Of_Minimum;
+            rv.Time_Of_Minimum_JD = Time_First_JD + rv.Time_Of_Minimum;
 			rv.Time_Of_Minimum_Uncertainty = T0_Uncertainty * Time_Interval;
 			rv.Success = true;
 
 			rv.Summary_File.Add(string.Format("      Time_First               Number_Obs"));
-			rv.Summary_File.Add(Time_First.ToString("#########0.000000").PadLeft(20) + " " + Number_Obs.ToString("#########0").PadLeft(20));
+            rv.Summary_File.Add(Time_First_JD.ToString("#########0.000000").PadLeft(20) + " " + Number_Obs.ToString("#########0").PadLeft(20));
 			rv.Summary_File.Add(string.Format("\n               Time of minimum: \n"));
 			rv.Summary_File.Add(string.Format("      Bins-Quadratic          Uncertainty"));
 			rv.Summary_File.Add(T0.ToString("#########0.000000").PadLeft(20) + " " + T0_Uncertainty.ToString("#########0.000000").PadLeft(20));
