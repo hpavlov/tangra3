@@ -477,6 +477,9 @@ namespace Tangra.KweeVanWoerden
 				rv.Normals_File.Add(Time_Normal[i].ToString("#########0.000000").PadLeft(20) + " " + Luminosity_Normal[i].ToString("#########0.000000").PadLeft(20));
 			}
 
+		    rv.Buckets.Clear();
+            rv.Buckets.AddRange(Luminosity_Normal);
+
 			/* Locate the faintest luminosity */
 			Luminosity_Faintest = 1000000000.0;
 			Luminosity_Faintest_Index = 0;
@@ -497,6 +500,9 @@ namespace Tangra.KweeVanWoerden
 			if ( Luminosity_Faintest_Index > Normal_Point_Middle ) { Start_Light_Curve = 2 * Luminosity_Faintest_Index - Normal_Points + 1; }
 			rv.IncludedObservations = Stop_Light_Curve - Start_Light_Curve - 2;
 
+		    rv.Start_Light_Curve = Start_Light_Curve;
+            rv.Stop_Light_Curve = Stop_Light_Curve;
+
 			/* Compute the normalized sums of squares of luminosity differences across an array of times */
 			Start_Sum_Squares = Start_Light_Curve + 1;
 			Stop_Sum_Squares  = Stop_Light_Curve  - 1;
@@ -516,6 +522,9 @@ namespace Tangra.KweeVanWoerden
 
 				Sum_Of_Squares_Mean[i] = Sum_Of_Squares / (float) Sum_Of_Squares_Count[i];
 			}
+
+            rv.Sum_Of_Squares_Count.Clear();
+            rv.Sum_Of_Squares_Count.AddRange(Sum_Of_Squares_Count);
 
 			/* Find the smallest normalized sum of squares */
 			Sum_Of_Squares_Smallest = 1000000000;
@@ -590,6 +599,10 @@ namespace Tangra.KweeVanWoerden
 			public List<string> Summary_File = new List<string>();
 			public List<string> Observations_File = new List<string>();
 			public List<string> Normals_File = new List<string>();
+		    public List<double> Buckets = new List<double>();
+            public List<long> Sum_Of_Squares_Count = new List<long>();
+		    public long Start_Light_Curve;
+            public long Stop_Light_Curve;
 		}
 	}
 }

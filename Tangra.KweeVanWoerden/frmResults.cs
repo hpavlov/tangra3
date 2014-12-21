@@ -58,6 +58,31 @@ namespace Tangra.KweeVanWoerden
 			tbxTotalObs.Text = Results.NumberObservations.ToString();
 			tbxIncludedObs.Text = Results.IncludedObservations.ToString() + "%";
             tbxUncertaintyInSec.Text = (Results.Time_Of_Minimum_Uncertainty * 86400.0).ToString("0.0");
+
+		    picGraph.Image = new Bitmap(picGraph.Width, picGraph.Height);
+            using (Graphics g = Graphics.FromImage(picGraph.Image))
+            {
+                g.Clear(SystemColors.ControlDark);
+                float xScale = picGraph.Width * 1.0f / Results.Buckets.Count;
+                float yScale = picGraph.Height * 1.0f / (float)Results.Buckets.Max();
+
+                float xScaleSQ = picGraph.Width * 1.0f / Results.Sum_Of_Squares_Count.Count;
+                float yScaleSQ = picGraph.Height * 1.0f / (float)Results.Sum_Of_Squares_Count.Max();
+
+                for (int i = 0; i < Results.Buckets.Count - 1; i++)
+                {
+                    Brush brush = i < Results.Start_Light_Curve || i > Results.Stop_Light_Curve ? Brushes.DarkBlue : Brushes.Aqua;
+                    g.FillRectangle(brush, xScale * i, yScale * (float)Results.Buckets[i], xScale, picGraph.Height - 2 - yScale * (float)Results.Buckets[i]);
+
+                    if (i > Results.Start_Light_Curve && i < Results.Stop_Light_Curve)
+                    {
+                        g.FillRectangle(Brushes.OrangeRed, xScaleSQ * i, yScaleSQ * (float)Results.Sum_Of_Squares_Count[i], xScaleSQ, 4);                        
+                    }
+                }
+                g.Save();
+            }
+
+		    picGraph.Refresh();
 		}
 
         private void btnCalcHJD_Click(object sender, EventArgs e)
