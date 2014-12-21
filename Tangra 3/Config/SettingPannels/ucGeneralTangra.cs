@@ -85,7 +85,7 @@ namespace Tangra.Config.SettingPannels
 			TangraFileAssociations fileAssocHelper = btnAssociateFiles.Tag as TangraFileAssociations;
 			if (fileAssocHelper != null)
 			{
-				fileAssocHelper.Associate();
+				fileAssocHelper.Associate(true);
 				UpdateFileAssociationsButtonState();
 			}
 			else

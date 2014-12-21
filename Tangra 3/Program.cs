@@ -97,7 +97,7 @@ namespace Tangra
 				var fileAssociation = new TangraFileAssociations();
 				if (!fileAssociation.Registered || isRegisterAssociationsCommand)
 				{
-					fileAssociation.Associate();
+					fileAssociation.Associate(false);
 				}
 			}
 			catch (Exception ex)

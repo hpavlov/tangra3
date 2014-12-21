@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security;
 using System.Text;
 using System.Windows.Forms;
 using BrendanGrant.Helpers.FileAssociation;
@@ -65,27 +66,39 @@ namespace Tangra.Helpers
 			}
 		}
 
-		public void Associate()
+		public void Associate(bool showError)
 		{
 			// NOTE: Icons have been embedded with this tool: http://einaregilsson.com/add-multiple-icons-to-a-dotnet-application/
 
-			m_AssociationManager.Associate(
-				PGID_LC_FILE, string.Format("\"{0}\" \"%L\"", 
-				Process.GetCurrentProcess().Modules[0].FileName), 
-				PGID_LC_FILE_EXT,
-				new ProgramIcon(string.Format("\"{0}\"", Process.GetCurrentProcess().Modules[0].FileName), 1));
+            try
+            {
+			    m_AssociationManager.Associate(
+				    PGID_LC_FILE, string.Format("\"{0}\" \"%L\"", 
+				    Process.GetCurrentProcess().Modules[0].FileName), 
+				    PGID_LC_FILE_EXT,
+				    new ProgramIcon(string.Format("\"{0}\"", Process.GetCurrentProcess().Modules[0].FileName), 1));
 
-			m_AssociationManager.Associate(
-				PGID_AAV_FILE, string.Format("\"{0}\" \"%L\"",
-				Process.GetCurrentProcess().Modules[0].FileName),
-				PGID_AAV_FILE_EXT,
-				new ProgramIcon(string.Format("\"{0}\"", Process.GetCurrentProcess().Modules[0].FileName), 2));
+			    m_AssociationManager.Associate(
+				    PGID_AAV_FILE, string.Format("\"{0}\" \"%L\"",
+				    Process.GetCurrentProcess().Modules[0].FileName),
+				    PGID_AAV_FILE_EXT,
+				    new ProgramIcon(string.Format("\"{0}\"", Process.GetCurrentProcess().Modules[0].FileName), 2));
 
-			m_AssociationManager.Associate(
-				PGID_ADV_FILE, string.Format("\"{0}\" \"%L\"",
-				Process.GetCurrentProcess().Modules[0].FileName),
-				PGID_ADV_FILE_EXT,
-				new ProgramIcon(string.Format("\"{0}\"", Process.GetCurrentProcess().Modules[0].FileName), 3));
+			    m_AssociationManager.Associate(
+				    PGID_ADV_FILE, string.Format("\"{0}\" \"%L\"",
+				    Process.GetCurrentProcess().Modules[0].FileName),
+				    PGID_ADV_FILE_EXT,
+				    new ProgramIcon(string.Format("\"{0}\"", Process.GetCurrentProcess().Modules[0].FileName), 3));
+            }
+            catch (SecurityException sex)
+            {
+                if (showError)
+                {
+                    MessageBox.Show("You need to run Tangra as Administrator to do this.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else
+                    Trace.WriteLine(sex.ToString());
+            }
 		}
 	}
 }
