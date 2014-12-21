@@ -6,8 +6,10 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Helpers;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
 using Tangra.Model.Video;
@@ -22,6 +24,7 @@ namespace Tangra.View
 		private int m_ExtraWidth;
 		private int m_ExtraHeight;
 		private IFramePlayer m_FramePlayer;
+	    private string m_TangraDisplayVersion;
 
 		public VideoFileView(frmMain mainForm)
 		{
@@ -29,6 +32,10 @@ namespace Tangra.View
 
 			m_ExtraWidth = m_MainForm.Width - m_MainForm.pictureBox.Width + 1;
 			m_ExtraHeight = m_MainForm.Height - m_MainForm.pictureBox.Height + 1;
+
+		    Version tangraVersion = Assembly.GetExecutingAssembly().GetName().Version;
+            bool isBeta = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(BetaReleaseAttribute), false).Length == 1;
+            m_TangraDisplayVersion = string.Format("v{0}.{1}{2}", tangraVersion.Major, tangraVersion.Minor, isBeta ? " BETA" : "");
 		}
 
 		internal void SetFramePlayer(IFramePlayer framePlayer)
@@ -40,11 +47,11 @@ namespace Tangra.View
 		{
 			if (TangraContext.Current.HasAnyFileLoaded)
 			{
-                m_MainForm.Text = string.Format("Tangra v3.1 - {0}, {1}", TangraContext.Current.FileName, TangraContext.Current.FileFormat);
+                m_MainForm.Text = string.Format("Tangra {0} - {1}, {2}", m_TangraDisplayVersion, TangraContext.Current.FileName, TangraContext.Current.FileFormat);
 			}
 			else
 			{
-                m_MainForm.Text = "Tangra v3.1";
+                m_MainForm.Text = string.Format("Tangra {0}", m_TangraDisplayVersion);
 
 				if (m_MainForm.pictureBox.Image != null)
 				{
