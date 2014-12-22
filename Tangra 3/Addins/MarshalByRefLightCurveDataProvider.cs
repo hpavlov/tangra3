@@ -20,6 +20,8 @@ namespace Tangra.Addins
 		private ISingleMeasurement[] m_Comp3Measurements;
 		private int m_IntegrationRate;
 		private int m_FirstIntegratingFrame;
+        private ITangraDrawingSettings m_TangraDrawingSettings;
+
 
 		private ILightCurveDataProvider m_DelegatedLocalProvider;
 
@@ -36,6 +38,7 @@ namespace Tangra.Addins
             NumberIntegratedFrames = localProvider.NumberIntegratedFrames;
 			MinFrameNumber = localProvider.MinFrameNumber;
 			MaxFrameNumber = localProvider.MaxFrameNumber;
+		    m_TangraDrawingSettings = localProvider.GetTangraDrawingSettings();
 
             CurrentlySelectedFrameNumber = localProvider.CurrentlySelectedFrameNumber;
             HasReliableTimeBase = localProvider.HasReliableTimeBase;
@@ -80,6 +83,11 @@ namespace Tangra.Addins
 		{
 			return m_TargetMeasurements;
 		}
+
+        public ITangraDrawingSettings GetTangraDrawingSettings()
+        {
+            return m_TangraDrawingSettings;
+        }
 
 		public ISingleMeasurement[] GetComparisonObjectMeasurements(int comparisonObjectId)
 		{

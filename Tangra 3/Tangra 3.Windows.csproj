@@ -117,6 +117,7 @@
     <Compile Include="Addins\MarshalByRefLightCurveDataProvider.cs" />
     <Compile Include="Addins\SettingsStorageProvider.cs" />
     <Compile Include="Addins\SingleMeasurement.cs" />
+    <Compile Include="Addins\TangraDrawingSettings.cs" />
     <Compile Include="Addins\TangraHostDelegate.cs" />
     <Compile Include="Config\frmChooseFirstTimeOcrSettings.cs">
       <SubType>Form</SubType>

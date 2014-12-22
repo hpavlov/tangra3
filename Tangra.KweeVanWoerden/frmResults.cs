@@ -54,13 +54,51 @@ namespace Tangra.KweeVanWoerden
 
 			// 1E-6 days is a precision of 0.08 sec - good enough for our purposes
 			tbxT0JD.Text = Results.Time_Of_Minimum_JD.ToString("0.000000");
+		    tbxT0UT.Text =  AstroUtilities.JDToDateTimeUtc(Results.Time_Of_Minimum_JD).ToString("dd MMM yyyy, HH:mm:ss.fff");
 			tbxT0Uncertainty.Text = Results.Time_Of_Minimum_Uncertainty.ToString("0.000000");
 			tbxT0.Text = Results.T0.ToString("0.000000");
 			tbxTotalObs.Text = Results.NumberObservations.ToString();
 			tbxIncludedObs.Text = Results.IncludedObservations.ToString() + "%";
             tbxUncertaintyInSec.Text = (Results.Time_Of_Minimum_Uncertainty * 86400.0).ToString("0.0");
 
-		    picGraph.Image = new Bitmap(picGraph.Width, picGraph.Height);
+		    PlotKweeVanWoerden();
+
+
+            tbxT0JD_CF.Text = PolyResults.Time_Of_Minimum_JD.ToString("0.000000");
+            tbxT0UT_CF.Text = AstroUtilities.JDToDateTimeUtc(PolyResults.Time_Of_Minimum_JD).ToString("dd MMM yyyy, HH:mm:ss.fff");
+
+
+		    PlotPolyFit();
+		}
+
+        private void PlotPolyFit()
+        {
+            picGraphPoly.Image = new Bitmap(picGraphPoly.Width, picGraphPoly.Height);
+            using (Graphics g = Graphics.FromImage(picGraphPoly.Image))
+            {
+                g.Clear(SystemColors.ControlDark);
+
+                float xScale = picGraphPoly.Width * 1.0f / PolyResults.DataPoints.Count;
+                double maxVal = PolyResults.DataPoints.Max();
+                double minVal = PolyResults.DataPoints.Min();
+
+                float yScale = (float)((picGraphPoly.Height - 2) * 1.0f / (maxVal - minVal));
+
+                for (int i = 0; i < PolyResults.FittedValues.Count - 1; i++)
+                {
+                    g.FillRectangle(Brushes.OrangeRed, xScale * i, picGraphPoly.Height - 2 - yScale * (float)(PolyResults.FittedValues[i] - minVal), xScale, 2);
+                    g.FillRectangle(Brushes.Aqua, xScale * i, picGraphPoly.Height - 2 - yScale * (float)(PolyResults.DataPoints[i] - minVal), xScale, 2);
+                }
+
+                g.Save();
+            }
+
+            picGraphPoly.Refresh();
+        }
+
+        private void PlotKweeVanWoerden()
+        {
+            picGraph.Image = new Bitmap(picGraph.Width, picGraph.Height);
             using (Graphics g = Graphics.FromImage(picGraph.Image))
             {
                 g.Clear(SystemColors.ControlDark);
@@ -68,34 +106,37 @@ namespace Tangra.KweeVanWoerden
                 float yScale = picGraph.Height * 1.0f / (float)Results.Buckets.Max();
 
                 float xScaleSQ = picGraph.Width * 1.0f / Results.Sum_Of_Squares_Mean.Count;
-				float yScaleSQ = picGraph.Height * 1.0f / (float)Results.Sum_Of_Squares_Mean.Max();
-
-				float yScalePoly = picGraph.Height * 1.0f / ((float)PolyResults.FittedValues.Max() - (float)PolyResults.FittedValues.Min());
-				
+                float yScaleSQ = picGraph.Height * 1.0f / (float)Results.Sum_Of_Squares_Mean.Max();
 
                 for (int i = 0; i < Results.Buckets.Count - 1; i++)
                 {
                     Brush brush = i < Results.Start_Light_Curve || i > Results.Stop_Light_Curve ? Brushes.DarkBlue : Brushes.Aqua;
-					g.FillRectangle(i == Results.Sum_Of_Squares_Smallest_Index ? Brushes.GreenYellow : brush, xScale * i, yScale * (float)Results.Buckets[i], xScale, picGraph.Height - 2 - yScale * (float)Results.Buckets[i]);
+                    g.FillRectangle(i == Results.Sum_Of_Squares_Smallest_Index ? Brushes.GreenYellow : brush, xScale * i, yScale * (float)Results.Buckets[i], xScale, picGraph.Height - 2 - yScale * (float)Results.Buckets[i]);
 
                     if (i > Results.Start_Light_Curve && i < Results.Stop_Light_Curve)
                     {
-						g.FillRectangle(Brushes.OrangeRed, xScaleSQ * i, yScaleSQ * (float)Results.Sum_Of_Squares_Mean[i], xScaleSQ, 4);                        
+                        g.FillRectangle(Brushes.OrangeRed, xScaleSQ * i, yScaleSQ * (float)Results.Sum_Of_Squares_Mean[i], xScaleSQ, 4);
                     }
-
-					g.FillRectangle(Brushes.Gold, xScaleSQ * i, yScalePoly * ((float)PolyResults.FittedValues[i] - (float)PolyResults.FittedValues.Min()), xScaleSQ, 4);                        
                 }
                 g.Save();
             }
 
-		    picGraph.Refresh();
-		}
+            picGraph.Refresh();
+        }
 
         private void btnCalcHJD_Click(object sender, EventArgs e)
         {
             var frm = new frmHJDCalculation();
             frm.TimeOfMinimumJD = Results.Time_Of_Minimum_JD;
-            frm.ShowDialog(TangraHost.ParentWindow);
+            frm.ShowDialog(this);
+            if (!double.IsNaN(frm.TimeOfMinimumHJD))
+            {
+                tbxT0HJD.Text = frm.TimeOfMinimumHJD.ToString();
+                tbxT0HJD_CF.Text = (frm.TimeCorrectionHJD + PolyResults.Time_Of_Minimum_JD).ToString();
+
+                btnCalcHJD.Visible = false;
+                btnCalcHJD2.Visible = false;
+            }
         }
 	}
 }

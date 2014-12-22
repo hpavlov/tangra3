@@ -94,16 +94,6 @@ namespace Tangra.KweeVanWoerden
 			return j;
 		}
 
-		//----------------------------------------------------------------------------------------
-		// UTC Julian date to UTC DateTime
-		//----------------------------------------------------------------------------------------
-		private DateTime JulianToDateUtc(double j)
-		{
-			long tix = (long)(6.30822816E+17 + (8.64E+11 * (j - 2451544.5)));
-			DateTime dt = new DateTime(tix);
-			return dt;
-		}
-
 		public void Execute()
 		{
 			if (m_Running)
@@ -156,6 +146,7 @@ namespace Tangra.KweeVanWoerden
 				double[] dataBg;
 
                 var frm = new frmConfigureRun();
+			    frm.DataProvider = dataProvider;
                 frm.NumStars = dataProvider.NumberOfMeasuredComparisonObjects + 1;
 				frm.FromFrameNo = dataProvider.MinFrameNumber;
 				frm.ToFrameNo = dataProvider.MaxFrameNumber;
@@ -225,9 +216,31 @@ namespace Tangra.KweeVanWoerden
 
 						double jdAtUtcMidnight = DateUtcToJulian(new DateTime(startFrameStartDayTicks));
 
-						KweeVanWoerdenResult result = Kwee_van_Woerden(frameIds.Length, jdAtUtcMidnight, secondsFromUTMidnight, dataWithBg, dataBg, compDataWithBg, compBg);
 
-						PolynomialFitResult polyResult = PolynomialFit(frameIds.Length, jdAtUtcMidnight, secondsFromUTMidnight, dataWithBg, dataBg, compDataWithBg, compBg);
+					    KweeVanWoerdenResult result;
+					    PolynomialFitResult polyResult;
+
+                        if (frm.IncludeDataFrom > 0 || frm.IncludeDataTo < dataWithBg.Length - 1)
+                        {
+                            double[] dataWithBgAlt = new double[frm.IncludeDataTo - frm.IncludeDataFrom];
+                            double[] dataBgAlt = new double[frm.IncludeDataTo - frm.IncludeDataFrom];
+                            double[] compDataWithBgAlt = new double[frm.IncludeDataTo - frm.IncludeDataFrom];
+                            double[] compBgAlt = new double[frm.IncludeDataTo - frm.IncludeDataFrom];
+                            for (int i = frm.IncludeDataFrom; i < frm.IncludeDataTo; i++)
+                            {
+                                dataWithBgAlt[i - frm.IncludeDataFrom] = dataWithBg[i];
+                                dataBgAlt[i - frm.IncludeDataFrom] = dataBg[i];
+                                compDataWithBgAlt[i - frm.IncludeDataFrom] = compDataWithBg[i];
+                                compBgAlt[i - frm.IncludeDataFrom] = compBg[i];
+                            }
+                            result = Kwee_van_Woerden(dataWithBgAlt.Length, jdAtUtcMidnight, secondsFromUTMidnight, dataWithBgAlt, dataBgAlt, compDataWithBgAlt, compBgAlt);
+                            polyResult = PolynomialFit(dataWithBgAlt.Length, jdAtUtcMidnight, secondsFromUTMidnight, dataWithBgAlt, dataBgAlt, compDataWithBgAlt, compBgAlt);                            
+                        }
+                        else
+                        {
+                            result = Kwee_van_Woerden(frameIds.Length, jdAtUtcMidnight, secondsFromUTMidnight, dataWithBg, dataBg, compDataWithBg, compBg);
+                            polyResult = PolynomialFit(frameIds.Length, jdAtUtcMidnight, secondsFromUTMidnight, dataWithBg, dataBg, compDataWithBg, compBg);                            
+                        }
 
 						PresentResults(result, polyResult);
 					}
@@ -389,6 +402,16 @@ namespace Tangra.KweeVanWoerden
 		                             double[] Variable_Star_DN, double[] Variable_Sky_DN, double[] Comparison_Star_DN,
 		                             double[] Comparison_Sky_DN)
 		{
+            // http://var2.astro.cz/library/1350745528_ebfit.pdf
+            // TODO: Implement non linear least square for this equation
+
+            // Mag(t) = M0 + C1 * F(t, t0, d, G)
+            // F(t, t0, d, G) = 1 - {1 - Exp[1 - cosh((t - t0 / d))] } ^ G;
+            // t0 - time of minimum
+            // d > 0 is the minimum width
+            // G > 0 - the pointedness, G > 1 corresponds to flat minima (total eclipse)
+            // 
+
 			var rv = new PolynomialFitResult();
 			rv.TimePoints = new List<double>();
 
@@ -398,13 +421,15 @@ namespace Tangra.KweeVanWoerden
 			for (int i = 0; i < Number_Obs; i++)
 			{
 				double x = SecondsFromTimeFirstJD[i] / (24 * 3600);
+                double y = (Variable_Star_DN[i] - Variable_Sky_DN[i]) / (Comparison_Star_DN[i] - Comparison_Sky_DN[i]);
 				rv.TimePoints.Add(x);
+                rv.DataPoints.Add(y);
 
 				A[i, 0] = x * x;
 				A[i, 1] = x;
 				A[i, 2] = 1;
 
-				X[i, 0] = (Variable_Star_DN[i] - Variable_Sky_DN[i]) / (Comparison_Star_DN[i] - Comparison_Sky_DN[i]);
+				X[i, 0] = y;
 			}
 
 			SafeMatrix a_T = A.Transpose();
@@ -646,6 +671,7 @@ namespace Tangra.KweeVanWoerden
 			public double Time_Of_Minimum_JD;
 			public double Time_Of_Minimum_Uncertainty;
 			public List<double> TimePoints = new List<double>();
+            public List<double> DataPoints = new List<double>();
 			public List<double> FittedValues = new List<double>();
 		}
 

@@ -12,10 +12,20 @@ namespace Tangra.KweeVanWoerden
     public partial class frmHJDCalculation : Form
     {
         internal double TimeOfMinimumJD;
+        internal double TimeOfMinimumHJD;
+        internal double TimeCorrectionHJD;
 
         public frmHJDCalculation()
         {
             InitializeComponent();
+
+            TimeOfMinimumHJD = double.NaN;
+            TimeCorrectionHJD = double.NaN;
+        }
+
+        private void frmHJDCalculation_Load(object sender, EventArgs e)
+        {
+            dateTimePicker.Value = AstroUtilities.JDToDateTimeUtc(TimeOfMinimumJD).Date;
         }
 
         private void btnCalculate_Click(object sender, EventArgs e)
@@ -36,9 +46,29 @@ namespace Tangra.KweeVanWoerden
             // HJD = JD - (r/c) * [sin(d) * sin (dSun) + cos(d) * cos (dSun) * cos (a - aSun)]
             double correction = (sunDistance * 1.4960E11 / C) * (Math.Sin(dRad) * Math.Sin(sunDec) + Math.Cos(dRad) * Math.Cos(sunDec) * Math.Cos(raRad - sunRA));
 
-            double hjd = TimeOfMinimumJD - (correction / 3600 * 24);
+            double hjd = TimeOfMinimumJD - (correction / (3600 * 24));
 
             tbxCorrection.Text = hjd.ToString();
+
+            TimeOfMinimumHJD = hjd;
+            TimeCorrectionHJD = -(correction/(3600*24));
+        }
+
+        private void btnFindGSVSStar_Click(object sender, EventArgs e)
+        {
+            string userDesig = tbxVarStar.Text.Trim();
+            EclipsingVariable foundVar = EclipsingVariableCatalogue.Instance.Stars.FirstOrDefault(x => x.Designation.Equals(userDesig, StringComparison.InvariantCultureIgnoreCase) || x.StandardDesignation.Equals(userDesig, StringComparison.InvariantCultureIgnoreCase));
+            if (foundVar != null)
+            {
+                double ra = foundVar.RA*15*Math.PI/180.0;
+                double de = foundVar.Dec*Math.PI / 180.0;
+
+                AstroUtilities.ApparentStarPosition(ref ra, ref de, 0, 0, 2000, TimeOfMinimumJD);
+
+                tbxRA.Text = AstroConvert.ToStringValue(ra * 180 / (Math.PI * 15), "HH MM SS.T");
+                tbxDE.Text = AstroConvert.ToStringValue(de * 180 / Math.PI, "DD MM SS");
+            }
+
         }
     }
 }

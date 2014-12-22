@@ -44,6 +44,7 @@
     <Compile Include="AssemblyHelper.cs" />
     <Compile Include="AstroUtilities.cs" />
     <Compile Include="AstroConvert.cs" />
+    <Compile Include="EclipsingVariableCatalogue.cs" />
     <Compile Include="frmAddinConfig.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -115,6 +116,9 @@
   <ItemGroup>
     <None Include="Resources\iii.dat" />
     <None Include="Resources\Input_Observations.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\EclipsingBinaries.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -321,6 +321,17 @@ namespace Tangra.KweeVanWoerden
             return num3;
         }
 
+
+        //----------------------------------------------------------------------------------------
+        // UTC Julian date to UTC DateTime
+        //----------------------------------------------------------------------------------------
+        public static DateTime JDToDateTimeUtc(double j)
+        {
+            long tix = (long)(6.30822816E+17 + (8.64E+11 * (j - 2451544.5)));
+            DateTime dt = new DateTime(tix);
+            return dt;
+        }
+
         public static string GetConstellation(double ra2000Hrs, double dec2000Deg, out string abbreviatedName)
         {
             double rA = ra2000Hrs * 15 * Math.PI / 180;

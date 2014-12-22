@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,6 +39,7 @@ namespace Tangra.SDK
         int NumberIntegratedFrames { get; }
 		int MinFrameNumber { get; }
 		int MaxFrameNumber { get; }
+	    ITangraDrawingSettings GetTangraDrawingSettings();
 	}
 
 	public interface ITangraHost
@@ -58,4 +60,12 @@ namespace Tangra.SDK
         DateTime Timestamp { get; }
         bool IsCorrectedForInstrumentalDelay { get; }
 	}
+
+    public interface ITangraDrawingSettings
+    {
+        Color Target1Color { get; }
+        Color Target2Color { get; }
+        Color Target3Color { get; }
+        Color Target4Color { get; }
+    }
 }

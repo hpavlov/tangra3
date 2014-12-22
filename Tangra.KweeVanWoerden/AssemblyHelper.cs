@@ -5,6 +5,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Xml.Serialization;
 
 namespace Tangra.KweeVanWoerden
 {
@@ -164,6 +165,27 @@ namespace Tangra.KweeVanWoerden
                 input.Position = 0;
                 return input;
             }
+        }
+    }
+
+    class Serialization
+    {
+        public static T Deserialize<T>(string serializedXmlString)
+        {
+            using (var reader = new StringReader(serializedXmlString))
+            {
+                var serializer = new XmlSerializer(typeof(T));
+                return (T)serializer.Deserialize(reader);
+            }
+        }
+
+        public static string AsXmlString<T>(T instance)
+        {
+            var stream = new StringWriter();
+            var xml = new XmlSerializer(typeof(T));
+            xml.Serialize(stream, instance);
+            stream.Close();
+            return stream.ToString();
         }
     }
 }

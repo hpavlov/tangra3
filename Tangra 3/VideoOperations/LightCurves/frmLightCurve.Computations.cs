@@ -1188,6 +1188,11 @@ namespace Tangra.VideoOperations.LightCurves
                 return m_LightCurveController.Context.AllReadings[occultedStarIndex].Select(x => new SingleMeasurement(x, x.CurrFrameNo, m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
 		}
 
+        ITangraDrawingSettings ILightCurveDataProvider.GetTangraDrawingSettings()
+        {
+            return new TangraDrawingSettings(m_DisplaySettings);
+        }
+
 		ISingleMeasurement[] ILightCurveDataProvider.GetComparisonObjectMeasurements(int comparisonObjectId)
 		{
 			int occultedStarIndex;

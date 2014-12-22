@@ -87,6 +87,7 @@
             this.btnFindGSVSStar.TabIndex = 4;
             this.btnFindGSVSStar.Text = "Set";
             this.btnFindGSVSStar.UseVisualStyleBackColor = true;
+            this.btnFindGSVSStar.Click += new System.EventHandler(this.btnFindGSVSStar_Click);
             // 
             // label3
             // 
@@ -196,6 +197,7 @@
             this.Name = "frmHJDCalculation";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Calculate HJD";
+            this.Load += new System.EventHandler(this.frmHJDCalculation_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
