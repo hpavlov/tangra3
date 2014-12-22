@@ -36,6 +36,8 @@ namespace Tangra.SDK
 	    void FinishedLightCurveEventTimeExtraction();
         string VideoSystem { get; }
         int NumberIntegratedFrames { get; }
+		int MinFrameNumber { get; }
+		int MaxFrameNumber { get; }
 	}
 
 	public interface ITangraHost

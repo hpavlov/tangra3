@@ -157,7 +157,11 @@ namespace Tangra.KweeVanWoerden
 
                 var frm = new frmConfigureRun();
                 frm.NumStars = dataProvider.NumberOfMeasuredComparisonObjects + 1;
-                frm.ShowDialog(m_TangraHost.ParentWindow);
+				frm.FromFrameNo = dataProvider.MinFrameNumber;
+				frm.ToFrameNo = dataProvider.MaxFrameNumber;
+				frm.TargetData = dataProvider.GetTargetMeasurements();
+				if (frm.ShowDialog(m_TangraHost.ParentWindow) == DialogResult.Cancel)
+					return;
 
                 if (frm.VariableStarIndex == 0)
                 {
@@ -223,16 +227,19 @@ namespace Tangra.KweeVanWoerden
 
 						KweeVanWoerdenResult result = Kwee_van_Woerden(frameIds.Length, jdAtUtcMidnight, secondsFromUTMidnight, dataWithBg, dataBg, compDataWithBg, compBg);
 
-						PresentResults(result);
+						PolynomialFitResult polyResult = PolynomialFit(frameIds.Length, jdAtUtcMidnight, secondsFromUTMidnight, dataWithBg, dataBg, compDataWithBg, compBg);
+
+						PresentResults(result, polyResult);
 					}
 				}
 			}
 		}
 
-		private void PresentResults(KweeVanWoerdenResult result)
+		private void PresentResults(KweeVanWoerdenResult result, PolynomialFitResult polyResult = null)
 		{
 			var frmResults = new frmResults();
 			frmResults.Results = result;
+			frmResults.PolyResults = polyResult;
 		    frmResults.TangraHost = m_TangraHost;
 			frmResults.StartPosition = FormStartPosition.CenterParent;
 			frmResults.ShowDialog(m_TangraHost.ParentWindow);
@@ -275,7 +282,7 @@ namespace Tangra.KweeVanWoerden
 
 				for (int i = 0; i < dataPoints; i++)
 				{
-					times[i] = rdr.ReadDouble();
+					times[i] = rdr.ReadDouble() * 86400.0; // Convert from days to seconds
 					varStar[i] = rdr.ReadDouble();
 					varSky[i] = rdr.ReadDouble();
 					compStar[i] = rdr.ReadDouble();
@@ -285,7 +292,9 @@ namespace Tangra.KweeVanWoerden
 
 			KweeVanWoerdenResult result = Kwee_van_Woerden(dataPoints, jdAtUtcMidnight, times, varStar, varSky, compStar, compSky);
 
-			PresentResults(result);
+			PolynomialFitResult polyResult = PolynomialFit(dataPoints, jdAtUtcMidnight, times, varStar, varSky, compStar, compSky);
+
+			PresentResults(result, polyResult);
 		}
 
 		[Obsolete("The old implementation calling the Fortran library")]
@@ -374,6 +383,48 @@ namespace Tangra.KweeVanWoerden
 				"Occulting Binaries Addin for Tangra",
 				MessageBoxButtons.OK,
 				MessageBoxIcon.Error);
+		}
+
+		private PolynomialFitResult PolynomialFit(long Number_Obs, double Time_First_JD, double[] SecondsFromTimeFirstJD,
+		                             double[] Variable_Star_DN, double[] Variable_Sky_DN, double[] Comparison_Star_DN,
+		                             double[] Comparison_Sky_DN)
+		{
+			var rv = new PolynomialFitResult();
+			rv.TimePoints = new List<double>();
+
+			SafeMatrix A = new SafeMatrix((int)Number_Obs, 3);
+			SafeMatrix X = new SafeMatrix((int)Number_Obs, 1);
+
+			for (int i = 0; i < Number_Obs; i++)
+			{
+				double x = SecondsFromTimeFirstJD[i] / (24 * 3600);
+				rv.TimePoints.Add(x);
+
+				A[i, 0] = x * x;
+				A[i, 1] = x;
+				A[i, 2] = 1;
+
+				X[i, 0] = (Variable_Star_DN[i] - Variable_Sky_DN[i]) / (Comparison_Star_DN[i] - Comparison_Sky_DN[i]);
+			}
+
+			SafeMatrix a_T = A.Transpose();
+			SafeMatrix aa = a_T * A;
+			SafeMatrix aa_inv = aa.Inverse();
+			SafeMatrix bx = (aa_inv * a_T) * X;
+
+			rv.A = bx[0, 0];
+			rv.B = bx[1, 0];
+			rv.C = bx[2, 0];
+
+			for (int i = 0; i < Number_Obs; i++)
+			{
+				rv.FittedValues.Add(rv.A * rv.TimePoints[i] * rv.TimePoints[i] + rv.B * rv.TimePoints[i] + rv.C);
+			}
+
+			rv.Time_Of_Minimum_JD = Time_First_JD - rv.B / (2 * rv.A);
+			//rv.Time_Of_Minimum_Uncertainty = Math.Sqrt((4.0 * rv.A * rv.C - rv.B * rv.B) / (4.0 * rv.A * rv.A) / ((float)Normal_Points / 4.0 - 1.0));
+
+			return rv;
 		}
 
 		private KweeVanWoerdenResult Kwee_van_Woerden(long Number_Obs, double Time_First_JD, double[] SecondsFromTimeFirstJD, double[] Variable_Star_DN, double[] Variable_Sky_DN, double[] Comparison_Star_DN, double[] Comparison_Sky_DN)
@@ -525,6 +576,8 @@ namespace Tangra.KweeVanWoerden
 
             rv.Sum_Of_Squares_Count.Clear();
             rv.Sum_Of_Squares_Count.AddRange(Sum_Of_Squares_Count);
+			rv.Sum_Of_Squares_Mean.Clear();
+			rv.Sum_Of_Squares_Mean.AddRange(Sum_Of_Squares_Mean);
 
 			/* Find the smallest normalized sum of squares */
 			Sum_Of_Squares_Smallest = 1000000000;
@@ -541,6 +594,8 @@ namespace Tangra.KweeVanWoerden
 					}
 				}
 			}
+
+			rv.Sum_Of_Squares_Smallest_Index = Sum_Of_Squares_Smallest_Index;
 
             if (Sum_Of_Squares_Smallest_Index - 2 < 0 ||
                 Sum_Of_Squares_Smallest_Index + 2 > Sum_Of_Squares_Mean.Length - 1)
@@ -583,6 +638,17 @@ namespace Tangra.KweeVanWoerden
 			return rv;
 		}
 
+		internal class PolynomialFitResult
+		{
+			public double A;
+			public double B;
+			public double C;
+			public double Time_Of_Minimum_JD;
+			public double Time_Of_Minimum_Uncertainty;
+			public List<double> TimePoints = new List<double>();
+			public List<double> FittedValues = new List<double>();
+		}
+
 		internal class KweeVanWoerdenResult
 		{
 			public long NumberObservations;
@@ -601,8 +667,10 @@ namespace Tangra.KweeVanWoerden
 			public List<string> Normals_File = new List<string>();
 		    public List<double> Buckets = new List<double>();
             public List<long> Sum_Of_Squares_Count = new List<long>();
+			public List<double> Sum_Of_Squares_Mean = new List<double>();
 		    public long Start_Light_Curve;
             public long Stop_Light_Curve;
+			public long Sum_Of_Squares_Smallest_Index;
 		}
 	}
 }

@@ -932,6 +932,16 @@ namespace Tangra.VideoOperations.LightCurves
             get { return m_LCFile.Footer.AAVFrameIntegration > 0 ? m_LCFile.Footer.AAVFrameIntegration : 0; }
         }
 
+	    int ILightCurveDataProvider.MinFrameNumber
+	    {
+			get { return (int)m_LCFile.Header.MinFrame; }
+	    }
+
+	    int ILightCurveDataProvider.MaxFrameNumber
+	    {
+			get { return (int)m_LCFile.Header.MaxFrame; }
+	    }
+
         int ILightCurveDataProvider.CurrentlySelectedFrameNumber
         {
             get { return (int)m_LightCurveController.Context.SelectedFrameNo; }

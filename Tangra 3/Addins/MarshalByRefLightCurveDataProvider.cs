@@ -34,6 +34,9 @@ namespace Tangra.Addins
             VideoCameraName = localProvider.VideoCameraName;
             VideoSystem = localProvider.VideoSystem;
             NumberIntegratedFrames = localProvider.NumberIntegratedFrames;
+			MinFrameNumber = localProvider.MinFrameNumber;
+			MaxFrameNumber = localProvider.MaxFrameNumber;
+
             CurrentlySelectedFrameNumber = localProvider.CurrentlySelectedFrameNumber;
             HasReliableTimeBase = localProvider.HasReliableTimeBase;
 			m_TargetMeasurements = localProvider.GetTargetMeasurements();
@@ -64,6 +67,10 @@ namespace Tangra.Addins
         public string VideoSystem { get; private set; }
 
         public int NumberIntegratedFrames { get; private set; }
+
+		public int MinFrameNumber { get; private set; }
+
+		public int MaxFrameNumber { get; private set; }
 
         public int CurrentlySelectedFrameNumber { get; private set; }
 

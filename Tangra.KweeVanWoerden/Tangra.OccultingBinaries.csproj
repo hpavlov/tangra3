@@ -76,6 +76,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resource.resx</DependentUpon>
     </Compile>
+    <Compile Include="SafeMatrix.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tangra.SDK\Tangra.SDK.csproj">

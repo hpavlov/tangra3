@@ -15,6 +15,7 @@ namespace Tangra.KweeVanWoerden
 	public partial class frmResults : Form
 	{
 		internal KweeVanWoerdenMinimum.KweeVanWoerdenResult Results;
+		internal KweeVanWoerdenMinimum.PolynomialFitResult PolyResults;
 	    internal ITangraHost TangraHost;
 
 		public frmResults()
@@ -66,18 +67,23 @@ namespace Tangra.KweeVanWoerden
                 float xScale = picGraph.Width * 1.0f / Results.Buckets.Count;
                 float yScale = picGraph.Height * 1.0f / (float)Results.Buckets.Max();
 
-                float xScaleSQ = picGraph.Width * 1.0f / Results.Sum_Of_Squares_Count.Count;
-                float yScaleSQ = picGraph.Height * 1.0f / (float)Results.Sum_Of_Squares_Count.Max();
+                float xScaleSQ = picGraph.Width * 1.0f / Results.Sum_Of_Squares_Mean.Count;
+				float yScaleSQ = picGraph.Height * 1.0f / (float)Results.Sum_Of_Squares_Mean.Max();
+
+				float yScalePoly = picGraph.Height * 1.0f / ((float)PolyResults.FittedValues.Max() - (float)PolyResults.FittedValues.Min());
+				
 
                 for (int i = 0; i < Results.Buckets.Count - 1; i++)
                 {
                     Brush brush = i < Results.Start_Light_Curve || i > Results.Stop_Light_Curve ? Brushes.DarkBlue : Brushes.Aqua;
-                    g.FillRectangle(brush, xScale * i, yScale * (float)Results.Buckets[i], xScale, picGraph.Height - 2 - yScale * (float)Results.Buckets[i]);
+					g.FillRectangle(i == Results.Sum_Of_Squares_Smallest_Index ? Brushes.GreenYellow : brush, xScale * i, yScale * (float)Results.Buckets[i], xScale, picGraph.Height - 2 - yScale * (float)Results.Buckets[i]);
 
                     if (i > Results.Start_Light_Curve && i < Results.Stop_Light_Curve)
                     {
-                        g.FillRectangle(Brushes.OrangeRed, xScaleSQ * i, yScaleSQ * (float)Results.Sum_Of_Squares_Count[i], xScaleSQ, 4);                        
+						g.FillRectangle(Brushes.OrangeRed, xScaleSQ * i, yScaleSQ * (float)Results.Sum_Of_Squares_Mean[i], xScaleSQ, 4);                        
                     }
+
+					g.FillRectangle(Brushes.Gold, xScaleSQ * i, yScalePoly * ((float)PolyResults.FittedValues[i] - (float)PolyResults.FittedValues.Min()), xScaleSQ, 4);                        
                 }
                 g.Save();
             }

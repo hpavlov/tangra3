@@ -1425,7 +1425,9 @@ namespace Tangra.VideoOperations.LightCurves
 				m_frmBackgroundHistograms = null;
 			}
 
-			CleanUpAllReadings(m_LightCurveController.Context.AllReadings);
+	        if (m_LightCurveController.Context != null)
+		        CleanUpAllReadings(m_LightCurveController.Context.AllReadings);
+
 	        foreach(List<BinnedValue> list in m_AllBinnedReadings) list.Clear();
 			m_FrameTiming.Clear();
 
