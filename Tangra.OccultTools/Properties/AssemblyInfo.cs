@@ -14,7 +14,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Tangra.OccultTools")]
-[assembly: AssemblyCopyright("Copyright © Hristo Pavlov 2013-2014")]
+[assembly: AssemblyCopyright("Copyright © Hristo Pavlov 2013-2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -36,5 +36,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.20")]
-[assembly: AssemblyFileVersion("1.0.0.20")]
+[assembly: AssemblyVersion("1.0.0.21")]
+[assembly: AssemblyFileVersion("1.0.0.21")]
