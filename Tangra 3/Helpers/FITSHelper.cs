@@ -172,7 +172,22 @@ namespace Tangra.Helpers
 
 			for (int y = 0; y < height; y++)
 			{
-				short[] dataRow = (short[])dataArray.GetValue(y);
+				object dataRowObject = dataArray.GetValue(y);
+
+				short[] dataRow;
+				if (dataRowObject is short[])
+					dataRow = (short[])dataRowObject;
+				else if (dataRowObject is Array)
+				{
+					Array arr = (Array) dataRowObject;
+					dataRow = new short[arr.Length];
+					for (int i = 0; i < arr.Length; i++)
+					{
+						dataRow[i] = Convert.ToInt16(arr.GetValue(i));
+					}
+				}
+				else
+					throw new ArrayTypeMismatchException();
 
 				for (int x = 0; x < width; x++)
 				{
