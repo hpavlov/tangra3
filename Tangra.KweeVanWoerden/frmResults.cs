@@ -67,6 +67,10 @@ namespace Tangra.KweeVanWoerden
             tbxT0JD_CF.Text = PolyResults.Time_Of_Minimum_JD.ToString("0.000000");
             tbxT0UT_CF.Text = AstroUtilities.JDToDateTimeUtc(PolyResults.Time_Of_Minimum_JD).ToString("dd MMM yyyy, HH:mm:ss.fff");
 
+			nudM0.Value = (decimal)PolyResults.M0;
+			nudC.Value = (decimal)PolyResults.C;
+			nudD.Value = (decimal)PolyResults.D;
+			nudG.Value = (decimal)PolyResults.G;
 
 		    PlotPolyFit();
 		}
@@ -87,6 +91,7 @@ namespace Tangra.KweeVanWoerden
                 for (int i = 0; i < PolyResults.FittedValues.Count - 1; i++)
                 {
                     g.FillRectangle(Brushes.OrangeRed, xScale * i, picGraphPoly.Height - 2 - yScale * (float)(PolyResults.FittedValues[i] - minVal), xScale, 2);
+					g.FillRectangle(Brushes.Yellow, xScale * i, picGraphPoly.Height - 2 - yScale * (float)(ComputeModelValue(PolyResults.TimePoints[i]) - minVal), xScale, 2);
                     g.FillRectangle(Brushes.Aqua, xScale * i, picGraphPoly.Height - 2 - yScale * (float)(PolyResults.DataPoints[i] - minVal), xScale, 2);
                 }
 
@@ -95,6 +100,12 @@ namespace Tangra.KweeVanWoerden
 
             picGraphPoly.Refresh();
         }
+
+		private double ComputeModelValue(double t)
+		{
+			double magVal = PolyResults.M0 + PolyResults.CC * (1 - Math.Pow(1 - Math.Exp(1 - Math.Cosh((t - PolyResults.T0) / PolyResults.D)), PolyResults.G));
+			return Math.Pow(10, (10 - magVal)/2.5);
+		}
 
         private void PlotKweeVanWoerden()
         {
@@ -138,5 +149,15 @@ namespace Tangra.KweeVanWoerden
                 btnCalcHJD2.Visible = false;
             }
         }
+
+		private void button2_Click(object sender, EventArgs e)
+		{
+			PolyResults.M0 = (double)nudM0.Value;
+			PolyResults.C = (double)nudC.Value;
+			PolyResults.D = (double)nudD.Value;
+			PolyResults.G = (double)nudG.Value;
+
+			PlotPolyFit();
+		}
 	}
 }

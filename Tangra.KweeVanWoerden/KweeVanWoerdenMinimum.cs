@@ -412,18 +412,24 @@ namespace Tangra.KweeVanWoerden
             // G > 0 - the pointedness, G > 1 corresponds to flat minima (total eclipse)
             // 
 
+
 			var rv = new PolynomialFitResult();
 			rv.TimePoints = new List<double>();
 
 			SafeMatrix A = new SafeMatrix((int)Number_Obs, 3);
 			SafeMatrix X = new SafeMatrix((int)Number_Obs, 1);
 
+			var dataPointsVar = new List<double>();
+			var dataPointsComp = new List<double>();
+			
 			for (int i = 0; i < Number_Obs; i++)
 			{
 				double x = SecondsFromTimeFirstJD[i] / (24 * 3600);
                 double y = (Variable_Star_DN[i] - Variable_Sky_DN[i]) / (Comparison_Star_DN[i] - Comparison_Sky_DN[i]);
 				rv.TimePoints.Add(x);
                 rv.DataPoints.Add(y);
+				dataPointsVar.Add(Variable_Star_DN[i] - Variable_Sky_DN[i]);
+				dataPointsComp.Add(Comparison_Star_DN[i] - Comparison_Sky_DN[i]);
 
 				A[i, 0] = x * x;
 				A[i, 1] = x;
@@ -449,6 +455,18 @@ namespace Tangra.KweeVanWoerden
 			rv.Time_Of_Minimum_JD = Time_First_JD - rv.B / (2 * rv.A);
 			//rv.Time_Of_Minimum_Uncertainty = Math.Sqrt((4.0 * rv.A * rv.C - rv.B * rv.B) / (4.0 * rv.A * rv.A) / ((float)Normal_Points / 4.0 - 1.0));
 
+			var fitter = new ModelFitter((int)Number_Obs, rv.TimePoints.ToArray(), dataPointsVar.ToArray(), dataPointsComp.ToArray());
+			fitter.Solve(true, -rv.B / (2 * rv.A));
+
+			for (int i = 0; i < fitter.Times.Count; i++)
+			{
+				rv.FittedValuesNonL.Add(fitter.NormIntensities[i]);
+			}
+			rv.G = fitter.G;
+			rv.M0 = fitter.M0;
+			rv.CC = fitter.C;
+			rv.D = fitter.D;
+			rv.T0 = fitter.T0;
 			return rv;
 		}
 
@@ -673,6 +691,13 @@ namespace Tangra.KweeVanWoerden
 			public List<double> TimePoints = new List<double>();
             public List<double> DataPoints = new List<double>();
 			public List<double> FittedValues = new List<double>();
+			public List<double> FittedValuesNonL = new List<double>();
+
+			public double M0 { get; set; }
+			public double CC { get; set; }
+			public double T0 { get; set; }
+			public double D { get; set; }
+			public double G { get; set; }
 		}
 
 		internal class KweeVanWoerdenResult
