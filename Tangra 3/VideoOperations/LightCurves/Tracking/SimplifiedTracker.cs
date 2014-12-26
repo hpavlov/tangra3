@@ -41,7 +41,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 				TrackedObjectLight trackedObject = (TrackedObjectLight)m_TrackedObjects[i];
 				trackedObject.NextFrame();
 
-				if (trackedObject.OriginalObject.IsFixedAperture || trackedObject.OriginalObject.TrackingType == TrackingType.OccultedStar)
+                if (trackedObject.OriginalObject.IsFixedAperture || (trackedObject.OriginalObject.IsOcultedStar() && m_IsFullDisappearance))
 				{
 					// Star position will be determined after the rest of the stars are found 
 				}

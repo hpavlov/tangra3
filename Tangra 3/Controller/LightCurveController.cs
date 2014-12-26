@@ -130,34 +130,36 @@ namespace Tangra.Controller
                 lcFile = LCFile.Load(fileName);
                 if (lcFile != null)
                 {
-					ReduceLightCurveOperation operation = (ReduceLightCurveOperation)m_VideoController.SetOperation<ReduceLightCurveOperation>(this, false);
-	                operation.SetLCFile(lcFile);
+                    ReduceLightCurveOperation operation =
+                        (ReduceLightCurveOperation)
+                        m_VideoController.SetOperation<ReduceLightCurveOperation>(this, false);
+                    operation.SetLCFile(lcFile);
 
                     string videoFile = GetVideoFileMatchingLcFile(lcFile, fileName);
                     if (!string.IsNullOrEmpty(videoFile) &&
-						File.Exists(videoFile))
+                        File.Exists(videoFile))
                     {
-						if (m_VideoController.OpenVideoFile(videoFile))
-						{							
-							TangraContext.Current.CanPlayVideo = false;
-							m_VideoController.UpdateViews();							
-						}
+                        if (m_VideoController.OpenVideoFile(videoFile))
+                        {
+                            TangraContext.Current.CanPlayVideo = false;
+                            m_VideoController.UpdateViews();
+                        }
                     }
                     else
                     {
                         // NOTE: No video file found, just show the saved averaged frame
-						TangraContext.Current.Reset();
+                        TangraContext.Current.Reset();
 
-						if (lcFile.Footer.AveragedFrameBytes != null)
-						{
-							if (m_VideoController.SingleBitmapFile(lcFile))
-							{							
-								TangraContext.Current.CanPlayVideo = false;
-								m_VideoController.UpdateViews();
+                        if (lcFile.Footer.AveragedFrameBytes != null)
+                        {
+                            if (m_VideoController.SingleBitmapFile(lcFile))
+                            {
+                                TangraContext.Current.CanPlayVideo = false;
+                                m_VideoController.UpdateViews();
 
-								PSFFit.SetDataRange(lcFile.Footer.DataBitPix, lcFile.Footer.DataAav16NormVal);
-							}
-						}
+                                PSFFit.SetDataRange(lcFile.Footer.DataBitPix, lcFile.Footer.DataAav16NormVal);
+                            }
+                        }
 
                         TangraContext.Current.CanPlayVideo = false;
                         TangraContext.Current.CanScrollFrames = false;
@@ -166,24 +168,28 @@ namespace Tangra.Controller
 
                     m_lcFileLoaded = true;
 
-					m_Context = new LightCurveContext(lcFile);
-					m_LightCurveForm = new frmLightCurve(this, m_AddinsController, lcFile, fileName);
-					m_LightCurveForm.SetGeoLocation(m_VideoController.GeoLocation);
+                    m_Context = new LightCurveContext(lcFile);
+                    m_LightCurveForm = new frmLightCurve(this, m_AddinsController, lcFile, fileName);
+                    m_LightCurveForm.SetGeoLocation(m_VideoController.GeoLocation);
                     m_LightCurveForm.Show(m_MainFormView);
                     m_LightCurveForm.Update();
 
-					// TODO: Review the VideoController-LightCurveController-ReduceLightCurveOperation relation and how they are initialized
-					// TODO: Provide a clean way of initializing the controller/operation state when opening an .lc file!
-					operation.EnterViewLightCurveMode(lcFile, m_VideoController, m_VideoController.m_pnlControlerPanel);
+                    // TODO: Review the VideoController-LightCurveController-ReduceLightCurveOperation relation and how they are initialized
+                    // TODO: Provide a clean way of initializing the controller/operation state when opening an .lc file!
+                    operation.EnterViewLightCurveMode(lcFile, m_VideoController, m_VideoController.m_pnlControlerPanel);
 
                     RegisterRecentFile(RecentFileType.LightCurve, fileName);
 
-					if (!string.IsNullOrEmpty(m_VideoController.CurrentVideoFileType))
-					{
-						// Move to the first frame in the light curve
-						m_VideoController.MoveToFrame((int)lcFile.Header.MinFrame);
-					}
+                    if (!string.IsNullOrEmpty(m_VideoController.CurrentVideoFileType))
+                    {
+                        // Move to the first frame in the light curve
+                        m_VideoController.MoveToFrame((int) lcFile.Header.MinFrame);
+                    }
                 }
+            }
+            catch (IOException ioex)
+            {
+                MessageBox.Show(ioex.Message, "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {

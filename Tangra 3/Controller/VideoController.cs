@@ -222,41 +222,50 @@ namespace Tangra.Controller
 				{
 					IFrameStream frameStream = null;
 
-                    if (fileExtension == ".adv" || fileExtension == ".aav")
-					{
-						AdvEquipmentInfo equipmentInfo;
-						GeoLocationInfo geoLocation;
-						frameStream = AstroDigitalVideoStream.OpenFile(fileName, out equipmentInfo, out geoLocation);
-						if (frameStream != null)
-						{
-							TangraContext.Current.UsingADV = true;
-							m_OverlayManager.InitAdvFile(equipmentInfo, geoLocation, frameStream.FirstFrame);
-						}
-					}
-					else if (fileExtension == ".ser")
-					{
-						SerEquipmentInfo equipmentInfo;
-						frameStream = SERVideoStream.OpenFile(fileName, m_MainForm, out equipmentInfo);
-						if (frameStream != null)
-						{
-							TangraContext.Current.IsSerFile = true;
-							m_OverlayManager.InitSerFile(equipmentInfo, frameStream.FirstFrame);
-						}
-					}
-					else if (fileExtension == ".bmp")
-					{
-						frameStream = SingleBitmapFileFrameStream.OpenFile(fileName);
-					}
-					else if (fileExtension == ".fit" || fileExtension == ".fits")
-					{
-						frameStream = SingleFITSFileFrameStream.OpenFile(fileName);
-					}
-					else
-					{
-						frameStream = VideoStream.OpenFile(fileName);
-					}
+                    try
+                    {
+                        if (fileExtension == ".adv" || fileExtension == ".aav")
+                        {
+                            AdvEquipmentInfo equipmentInfo;
+                            GeoLocationInfo geoLocation;
+                            frameStream = AstroDigitalVideoStream.OpenFile(fileName, out equipmentInfo, out geoLocation);
+                            if (frameStream != null)
+                            {
+                                TangraContext.Current.UsingADV = true;
+                                m_OverlayManager.InitAdvFile(equipmentInfo, geoLocation, frameStream.FirstFrame);
+                            }
+                        }
+                        else if (fileExtension == ".ser")
+                        {
+                            SerEquipmentInfo equipmentInfo;
+                            frameStream = SERVideoStream.OpenFile(fileName, m_MainForm, out equipmentInfo);
+                            if (frameStream != null)
+                            {
+                                TangraContext.Current.IsSerFile = true;
+                                m_OverlayManager.InitSerFile(equipmentInfo, frameStream.FirstFrame);
+                            }
+                        }
+                        else if (fileExtension == ".bmp")
+                        {
+                            frameStream = SingleBitmapFileFrameStream.OpenFile(fileName);
+                        }
+                        else if (fileExtension == ".fit" || fileExtension == ".fits")
+                        {
+                            frameStream = SingleFITSFileFrameStream.OpenFile(fileName);
+                        }
+                        else
+                        {
+                            frameStream = VideoStream.OpenFile(fileName);
+                        }
 
-					return frameStream;
+                        return frameStream;
+                    }
+                    catch (IOException ioex)
+                    {
+                        MessageBox.Show(ioex.Message, "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                        return null;
+                    }					
 				});
 	    }
 

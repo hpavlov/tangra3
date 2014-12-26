@@ -86,7 +86,7 @@ namespace Tangra.Video.AstroDigitalVideo
                 statusText.AppendLine();
 
             if (m_AavSettings.Popup_SystemTime)
-				statusText.AppendLine(string.Format("System Time: {0}", m_FrameState.SystemTime.ToString("dd MMM yyyy HH:mm:ss.fff")));
+				statusText.AppendLine(string.Format("PC Clock Time: {0}", m_FrameState.SystemTime.ToString("dd MMM yyyy HH:mm:ss.fff")));
 
 			if (m_AavSettings.Popup_SystemTime)
 				statusText.AppendLine();
