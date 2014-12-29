@@ -711,7 +711,15 @@ namespace Tangra.Video
 		/// <summary>Stop the video playback</summary>
 		public void Stop()
 		{
-			m_StopRequestReceived = true;
+			lock (m_FrameBitmapLock)
+			{
+				if (m_FramesBufferQueue.Count > 0)
+				{
+					m_FramesBufferQueue.Clear();
+				}
+
+				m_StopRequestReceived = true;
+			}
 
 			//Trace.WriteLine(string.Format("FramePlayer: Stop requested at frame {0}. Last displayed frame: {1}", m_CurrentFrameIndex, m_LastDisplayedFrameIndex));
 		}

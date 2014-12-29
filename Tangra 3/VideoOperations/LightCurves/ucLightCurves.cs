@@ -299,22 +299,25 @@ namespace Tangra.VideoOperations.LightCurves
 
         public void FinishWithMeasurements()
         {
-            // Once we enter time entering mode we clear any integration
-            m_VideoController.SetupFrameIntegration(1, FrameIntegratingMode.NoIntegration, PixelIntegrationType.Mean);
-            m_VideoController.UpdateViews();
+			if (!m_VideoController.IsRunning)
+			{
+				// Once we enter time entering mode we clear any integration
+				m_VideoController.SetupFrameIntegration(1, FrameIntegratingMode.NoIntegration, PixelIntegrationType.Mean);
+				m_VideoController.UpdateViews();
 
-            m_StateMachine.VideoOperation.FinishedWithMeasurements();
+				m_StateMachine.VideoOperation.FinishedWithMeasurements();
 
-            btnStop.Visible = false;
-            btnLightCurve.Visible = false;
-			gbxCorrections.Visible = false;
-	        m_CorrectTrackingTool = null;
-	        ucCorrSelection.CorrectTrackingTool = m_CorrectTrackingTool;
+				btnStop.Visible = false;
+				btnLightCurve.Visible = false;
+				gbxCorrections.Visible = false;
+				m_CorrectTrackingTool = null;
+				ucCorrSelection.CorrectTrackingTool = m_CorrectTrackingTool;
 
-            if (!LightCurveReductionContext.Instance.HasEmbeddedTimeStamps)
-                PrepareToEnterStarTime();
-            else
-                m_StateMachine.VideoOperation.ShowLightCurve(UsedTimeBase.EmbeddedTimeStamp);
+				if (!LightCurveReductionContext.Instance.HasEmbeddedTimeStamps)
+					PrepareToEnterStarTime();
+				else
+					m_StateMachine.VideoOperation.ShowLightCurve(UsedTimeBase.EmbeddedTimeStamp);
+			}
         }
 
 	    private delegate void PrepareToEnterStarTimeCallback();
