@@ -1555,12 +1555,23 @@ namespace Tangra.VideoOperations.LightCurves
                 saveCSVDialog.FileName = Path.ChangeExtension(Path.GetFileName(m_LCFilePath), ".csv");
             }
 
-			if (saveCSVDialog.ShowDialog() == DialogResult.OK)
-			{
-				if (ExportToCSV(saveCSVDialog.FileName))
-					Process.Start(saveCSVDialog.FileName);
-			}
-        }
+            var frm = new frmConfigureCsvExport();
+
+			DateTime? secondFrameTime = m_Header.GetFrameTime(m_LCFile.Header.MinFrame + 1);
+			if (secondFrameTime == null || secondFrameTime.Value.Year < 1900)
+			    frm.DisableAbsoluteTimeExport();
+
+		    if (frm.ShowDialog(this) == DialogResult.OK)
+		    {
+                CSVExportOptions options = frm.GetSelectedOptions();
+
+		        if (saveCSVDialog.ShowDialog() == DialogResult.OK)
+		        {
+		            if (ExportToCSV(saveCSVDialog.FileName, options))
+		                Process.Start(saveCSVDialog.FileName);
+		        }
+		    }
+		}
 
 		private void btnZoomOut_Click(object sender, EventArgs e)
 		{

@@ -31,7 +31,6 @@ namespace Tangra.VideoOperations.LightCurves
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmSelectReductionType));
             this.rbAsteroidal = new System.Windows.Forms.RadioButton();
             this.cbxShaking = new System.Windows.Forms.CheckBox();
-            this.cbxFlickering = new System.Windows.Forms.CheckBox();
             this.cbxFullDisappearance = new System.Windows.Forms.CheckBox();
             this.rbMutualEvent = new System.Windows.Forms.RadioButton();
             this.cbxReductionType = new System.Windows.Forms.ComboBox();
@@ -69,6 +68,7 @@ namespace Tangra.VideoOperations.LightCurves
             this.ucStretching = new Tangra.VideoOperations.LightCurves.ucPreProcessing();
             this.tabReduction = new System.Windows.Forms.TabPage();
             this.pnlBackground = new System.Windows.Forms.Panel();
+            this.cbxFlickering = new System.Windows.Forms.CheckBox();
             this.tabsOptions.SuspendLayout();
             this.tabGeneral.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -103,16 +103,6 @@ namespace Tangra.VideoOperations.LightCurves
             this.cbxShaking.Text = "Wind, shaking or movement";
             this.cbxShaking.UseVisualStyleBackColor = true;
             this.cbxShaking.CheckedChanged += new System.EventHandler(this.cbxShaking_CheckedChanged);
-            // 
-            // cbxFlickering
-            // 
-            this.cbxFlickering.AutoSize = true;
-            this.cbxFlickering.Location = new System.Drawing.Point(19, 184);
-            this.cbxFlickering.Name = "cbxFlickering";
-            this.cbxFlickering.Size = new System.Drawing.Size(102, 17);
-            this.cbxFlickering.TabIndex = 8;
-            this.cbxFlickering.Text = "Strong flickering";
-            this.cbxFlickering.UseVisualStyleBackColor = true;
             // 
             // cbxFullDisappearance
             // 
@@ -550,6 +540,16 @@ namespace Tangra.VideoOperations.LightCurves
             this.pnlBackground.Size = new System.Drawing.Size(291, 40);
             this.pnlBackground.TabIndex = 6;
             // 
+            // cbxFlickering
+            // 
+            this.cbxFlickering.AutoSize = true;
+            this.cbxFlickering.Location = new System.Drawing.Point(19, 184);
+            this.cbxFlickering.Name = "cbxFlickering";
+            this.cbxFlickering.Size = new System.Drawing.Size(165, 17);
+            this.cbxFlickering.TabIndex = 8;
+            this.cbxFlickering.Text = "Strong flickering or large stars";
+            this.cbxFlickering.UseVisualStyleBackColor = true;
+            // 
             // frmSelectReductionType
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -606,7 +606,6 @@ namespace Tangra.VideoOperations.LightCurves
         private System.Windows.Forms.ComboBox cbxReductionType;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.CheckBox cbxShaking;
-        private System.Windows.Forms.CheckBox cbxFlickering;
         private System.Windows.Forms.Button btnMoreOrLess;
         private System.Windows.Forms.TabPage tabGeneral;
         private System.Windows.Forms.TabPage tabReduction;
@@ -634,5 +633,6 @@ namespace Tangra.VideoOperations.LightCurves
 		private System.Windows.Forms.Panel pnlMutualType;
 		private System.Windows.Forms.RadioButton rbMutualEcl;
 		private System.Windows.Forms.RadioButton rbMutualOcc;
+        private System.Windows.Forms.CheckBox cbxFlickering;
     }
 }

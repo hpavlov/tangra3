@@ -588,9 +588,9 @@ namespace Tangra.VideoOperations.LightCurves
             return (uint)(fullScale / 15);
         }
 
-		public bool ExportToCSV(string fileName)
+		public bool ExportToCSV(string fileName, CSVExportOptions options)
 		{
-			StringBuilder output = new StringBuilder();
+			var output = new StringBuilder();
 
             string videoSystem;
             double absoluteTimeError = m_TimestampDiscrepencyFlag
@@ -606,14 +606,15 @@ namespace Tangra.VideoOperations.LightCurves
 
                 CSVExportAddCommonHeader(output, true);
 
-				output.Append("BinNo,Time (UT)");
+                output.Append(string.Format("BinNo,Time ({0})", options.FormatTimeLabel()));
 
 				for (int j = 0; j < objCount; j++)
 					output.AppendFormat(",Binned Measurment ({0})", j + 1);
 
 				output.AppendLine();
 
-                string isBadTimeString = null;
+                bool isBadTime = false;
+			    double timePrecisionSec = 0;
 
                 double resolutionInSecs = m_LightCurveController.Context.Binning / (2.0 * m_Header.FramesPerSecond);
 
@@ -626,33 +627,38 @@ namespace Tangra.VideoOperations.LightCurves
 					resolutionInSecs = m_LightCurveController.Context.Binning * allExposures[allExposures.Count / 2] / 1000.0;
 				}
 
-                string timeFormat = "HH:mm:ss";
-
                 if (resolutionInSecs < 0.1)
                 {
-                    timeFormat = "HH:mm:ss.fff";
-                    if (absoluteTimeError > 5) isBadTimeString = "??:??:??.???";
+                    timePrecisionSec = 0.001;
+                    if (absoluteTimeError > 5) isBadTime = true;
                 }
                 else if (resolutionInSecs < 1)
                 {
-                    timeFormat = "HH:mm:ss.ff";
-                    if (absoluteTimeError > 5) isBadTimeString = "??:??:??.??";
+                    timePrecisionSec = 0.01;
+                    if (absoluteTimeError > 5) isBadTime = true;
                 }
                 else if (resolutionInSecs < 10)
                 {
-                    timeFormat = "HH:mm:ss.f";
-                    if (absoluteTimeError > 50) isBadTimeString = "??:??:??.?";
+                    timePrecisionSec = 0.1;
+                    if (absoluteTimeError > 50) isBadTime = true;
                 }
-                else if (absoluteTimeError > 500) 
-                    isBadTimeString = "??:??:??";
-				else if (!m_LCFile.Footer.ReductionContext.HasEmbeddedTimeStamps /* If the times are entered by the user, only include the times for the frames enterred by the user*/)
-                    isBadTimeString = "??:??:??";
+                else if (absoluteTimeError > 500)
+                {
+                    timePrecisionSec = 0.01;
+                    isBadTime = true;
+                }
+                else if (!m_LCFile.Footer.ReductionContext.HasEmbeddedTimeStamps
+                    /* If the times are entered by the user, only include the times for the frames enterred by the user*/)
+                {
+                    timePrecisionSec = 0.01;
+                    isBadTime = true;
+                }
 
-				if (m_LCFile.Footer.ReductionContext.LightCurveReductionType == LightCurveReductionType.MutualEvent &&
+			    if (m_LCFile.Footer.ReductionContext.LightCurveReductionType == LightCurveReductionType.MutualEvent &&
 				    absoluteTimeError/500 < resolutionInSecs)
 				{
 					// Force export the time for mutual events where half the resolution is better than the absolute timing error 
-					isBadTimeString = null;
+                    isBadTime = false;
 				}
 
 				for (int i = 0; i < count; i++)
@@ -661,21 +667,21 @@ namespace Tangra.VideoOperations.LightCurves
 					DateTime middleBinTime = m_LCFile.GetTimeForFrame(firstFrameNoInBin + (m_LightCurveController.Context.Binning / 2.0), out isCorrectedForInstrumentalDelay);
 
 				    string timeStr;
-					if (isBadTimeString != null)
+                    if (isBadTime)
 					{
 						if (i == m_Header.FirstTimedFrameNo)
-							timeStr = m_Header.FirstTimedFrameTime.ToString(timeFormat);
+							timeStr = options.FormatTime(m_Header.FirstTimedFrameTime, timePrecisionSec);
 						else if (i == m_Header.LastTimedFrameNo)
-							timeStr = m_Header.SecondTimedFrameTime.ToString(timeFormat);
+                            timeStr = options.FormatTime(m_Header.SecondTimedFrameTime, timePrecisionSec);
 						else
-							timeStr = isBadTimeString;
+                            timeStr = options.FormatInvalidTime(timePrecisionSec);
 					}
 					else
 					{
 						if (middleBinTime == DateTime.MaxValue)
 							timeStr = "";
 						else
-							timeStr = middleBinTime.ToString(timeFormat);
+                            timeStr = options.FormatTime(middleBinTime, timePrecisionSec);
 					}
 
 					output.AppendFormat("{0},{1}", i + 1, timeStr);
@@ -702,7 +708,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 				int count = m_LightCurveController.Context.AllReadings[0].Count;
 
-				output.Append("FrameNo,Time (UT)");
+                output.Append(string.Format("FrameNo,Time ({0})", options.FormatTimeLabel()));
 
 				for (int j = 0; j < objCount; j++)
 				{
@@ -713,13 +719,22 @@ namespace Tangra.VideoOperations.LightCurves
 				}
 				output.AppendLine();
 
-			    string isBadTimeString = null;
-                if (absoluteTimeError > 5) 
-                    isBadTimeString = "??:??:??.???";
-                else if (!m_LCFile.Footer.ReductionContext.HasEmbeddedTimeStamps /* If the times are entered by the user, only include the times for the frames enterred by the user*/)
-                    isBadTimeString = "??:??:??";
+			    bool isBadTime = false;
+                double timePrecisionSec = 0;
 
-                string timeFormat = "HH:mm:ss.fff";
+                if (absoluteTimeError > 5)
+                {
+                    timePrecisionSec = 0.001;
+                    isBadTime = true;
+                }                    
+                else if (!m_LCFile.Footer.ReductionContext.HasEmbeddedTimeStamps
+                    /* If the times are entered by the user, only include the times for the frames enterred by the user*/)
+                {
+                    timePrecisionSec = 0.01;
+                    isBadTime = true;                    
+                }
+                else
+                    timePrecisionSec = 0.001;
 
 				for (int i = 0; i < count; i++)
 				{
@@ -732,23 +747,23 @@ namespace Tangra.VideoOperations.LightCurves
 				        currFrameTime = DateTime.MaxValue;
 
                     string timeStr;
-					if (isBadTimeString != null)
+                    if (isBadTime)
 					{
-						if (currFrameTime == DateTime.MaxValue)
-							timeStr = "";
-						else if (frameNo == m_Header.FirstTimedFrameNo)
-							timeStr = m_Header.FirstTimedFrameTime.ToString(timeFormat);
-						else if (frameNo == m_Header.LastTimedFrameNo)
-							timeStr = m_Header.SecondTimedFrameTime.ToString(timeFormat);
-						else
-							timeStr = isBadTimeString;
+                        if (currFrameTime == DateTime.MaxValue)
+                            timeStr = "";
+                        else if (i == m_Header.FirstTimedFrameNo)
+                            timeStr = options.FormatTime(m_Header.FirstTimedFrameTime, timePrecisionSec);
+                        else if (i == m_Header.LastTimedFrameNo)
+                            timeStr = options.FormatTime(m_Header.SecondTimedFrameTime, timePrecisionSec);
+                        else
+                            timeStr = options.FormatInvalidTime(timePrecisionSec);
 					}
 					else
 					{
 						if (currFrameTime == DateTime.MaxValue)
 							timeStr = "";
 						else
-							timeStr = currFrameTime.ToString(timeFormat);
+                            timeStr = options.FormatTime(currFrameTime, timePrecisionSec);
 					}
 
 					output.AppendFormat("{0},{1}", frameNo, timeStr);

@@ -289,9 +289,16 @@ namespace Tangra.VideoOperations.LightCurves
 					}
 				}
 
-                m_Tracker.NextFrame(frameNo, astroImage);
+                if (m_VideoController.IsAstroAnalogueVideo && frameNo == 0)
+                {
+                    // Do not attempt refining on the first AAV frame as it has unique dynamic range and the refining is not going to work at all.
+                }
+                else
+                {
+                    m_Tracker.NextFrame(frameNo, astroImage);
 
-	            if (!m_Tracker.IsTrackedSuccessfully) m_NumberFramesWithBadTracking++;
+                    if (!m_Tracker.IsTrackedSuccessfully) m_NumberFramesWithBadTracking++;                    
+                }
 
 				m_VideoController.SetDisplayHueBackgroundModeTargets(m_Tracker.TrackedObjects);
 

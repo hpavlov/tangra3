@@ -28,24 +28,24 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("General");
-            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Analogue Video");
-            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Astro Analogue Video");
-            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Astro Digital Video");
-            System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("Video", new System.Windows.Forms.TreeNode[] {
-            treeNode2,
-            treeNode3,
-            treeNode4});
-            System.Windows.Forms.TreeNode treeNode6 = new System.Windows.Forms.TreeNode("Pre-Processing");
-            System.Windows.Forms.TreeNode treeNode7 = new System.Windows.Forms.TreeNode("Photometry");
-            System.Windows.Forms.TreeNode treeNode8 = new System.Windows.Forms.TreeNode("Tracking");
-            System.Windows.Forms.TreeNode treeNode9 = new System.Windows.Forms.TreeNode("Compatibility");
-            System.Windows.Forms.TreeNode treeNode10 = new System.Windows.Forms.TreeNode("Addins");
-            System.Windows.Forms.TreeNode treeNode11 = new System.Windows.Forms.TreeNode("Light Curves");
-            System.Windows.Forms.TreeNode treeNode12 = new System.Windows.Forms.TreeNode("Light Curve Viewer");
-            System.Windows.Forms.TreeNode treeNode13 = new System.Windows.Forms.TreeNode("Customize", new System.Windows.Forms.TreeNode[] {
-            treeNode11,
-            treeNode12});
+            System.Windows.Forms.TreeNode treeNode14 = new System.Windows.Forms.TreeNode("General");
+            System.Windows.Forms.TreeNode treeNode15 = new System.Windows.Forms.TreeNode("Analogue Video");
+            System.Windows.Forms.TreeNode treeNode16 = new System.Windows.Forms.TreeNode("Astro Analogue Video");
+            System.Windows.Forms.TreeNode treeNode17 = new System.Windows.Forms.TreeNode("Astro Digital Video");
+            System.Windows.Forms.TreeNode treeNode18 = new System.Windows.Forms.TreeNode("Video", new System.Windows.Forms.TreeNode[] {
+            treeNode15,
+            treeNode16,
+            treeNode17});
+            System.Windows.Forms.TreeNode treeNode19 = new System.Windows.Forms.TreeNode("Pre-Processing");
+            System.Windows.Forms.TreeNode treeNode20 = new System.Windows.Forms.TreeNode("Photometry");
+            System.Windows.Forms.TreeNode treeNode21 = new System.Windows.Forms.TreeNode("Tracking");
+            System.Windows.Forms.TreeNode treeNode22 = new System.Windows.Forms.TreeNode("Compatibility");
+            System.Windows.Forms.TreeNode treeNode23 = new System.Windows.Forms.TreeNode("Addins");
+            System.Windows.Forms.TreeNode treeNode24 = new System.Windows.Forms.TreeNode("Light Curves");
+            System.Windows.Forms.TreeNode treeNode25 = new System.Windows.Forms.TreeNode("Light Curve Viewer");
+            System.Windows.Forms.TreeNode treeNode26 = new System.Windows.Forms.TreeNode("Customize", new System.Windows.Forms.TreeNode[] {
+            treeNode24,
+            treeNode25});
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmTangraSettings));
             this.tvSettings = new System.Windows.Forms.TreeView();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -53,60 +53,64 @@
             this.btnOK = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnResetDefaults = new System.Windows.Forms.Button();
+            this.btnExport = new System.Windows.Forms.Button();
+            this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
+            this.btnImport = new System.Windows.Forms.Button();
+            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.SuspendLayout();
             // 
             // tvSettings
             // 
             this.tvSettings.Location = new System.Drawing.Point(3, 5);
             this.tvSettings.Name = "tvSettings";
-            treeNode1.Name = "ndGeneral";
-            treeNode1.Tag = "0";
-            treeNode1.Text = "General";
-            treeNode2.Name = "ndAnalogueVideo";
-            treeNode2.Tag = "2";
-            treeNode2.Text = "Analogue Video";
-            treeNode3.Name = "ndAAV";
-            treeNode3.Tag = "10";
-            treeNode3.Text = "Astro Analogue Video";
-            treeNode4.Name = "ndADV";
-            treeNode4.Tag = "3";
-            treeNode4.Text = "Astro Digital Video";
-            treeNode5.Name = "ndVideo";
-            treeNode5.Tag = "1";
-            treeNode5.Text = "Video";
-            treeNode6.Name = "ndPreProcessing";
-            treeNode6.Tag = "11";
-            treeNode6.Text = "Pre-Processing";
-            treeNode7.Name = "ndPhotometry";
-            treeNode7.Tag = "4";
-            treeNode7.Text = "Photometry";
-            treeNode8.Name = "ndTracking";
-            treeNode8.Tag = "6";
-            treeNode8.Text = "Tracking";
-            treeNode9.Name = "ndCompatibility";
-            treeNode9.Tag = "8";
-            treeNode9.Text = "Compatibility";
-            treeNode10.Name = "ndAddins";
-            treeNode10.Tag = "12";
-            treeNode10.Text = "Addins";
-            treeNode11.Name = "ndLightCurves";
-            treeNode11.Tag = "7";
-            treeNode11.Text = "Light Curves";
-            treeNode12.Name = "ndCurveViewer";
-            treeNode12.Tag = "9";
-            treeNode12.Text = "Light Curve Viewer";
-            treeNode13.Name = "ndCustomize";
-            treeNode13.Tag = "7";
-            treeNode13.Text = "Customize";
+            treeNode14.Name = "ndGeneral";
+            treeNode14.Tag = "0";
+            treeNode14.Text = "General";
+            treeNode15.Name = "ndAnalogueVideo";
+            treeNode15.Tag = "2";
+            treeNode15.Text = "Analogue Video";
+            treeNode16.Name = "ndAAV";
+            treeNode16.Tag = "10";
+            treeNode16.Text = "Astro Analogue Video";
+            treeNode17.Name = "ndADV";
+            treeNode17.Tag = "3";
+            treeNode17.Text = "Astro Digital Video";
+            treeNode18.Name = "ndVideo";
+            treeNode18.Tag = "1";
+            treeNode18.Text = "Video";
+            treeNode19.Name = "ndPreProcessing";
+            treeNode19.Tag = "11";
+            treeNode19.Text = "Pre-Processing";
+            treeNode20.Name = "ndPhotometry";
+            treeNode20.Tag = "4";
+            treeNode20.Text = "Photometry";
+            treeNode21.Name = "ndTracking";
+            treeNode21.Tag = "6";
+            treeNode21.Text = "Tracking";
+            treeNode22.Name = "ndCompatibility";
+            treeNode22.Tag = "8";
+            treeNode22.Text = "Compatibility";
+            treeNode23.Name = "ndAddins";
+            treeNode23.Tag = "12";
+            treeNode23.Text = "Addins";
+            treeNode24.Name = "ndLightCurves";
+            treeNode24.Tag = "7";
+            treeNode24.Text = "Light Curves";
+            treeNode25.Name = "ndCurveViewer";
+            treeNode25.Tag = "9";
+            treeNode25.Text = "Light Curve Viewer";
+            treeNode26.Name = "ndCustomize";
+            treeNode26.Tag = "7";
+            treeNode26.Text = "Customize";
             this.tvSettings.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode1,
-            treeNode5,
-            treeNode6,
-            treeNode7,
-            treeNode8,
-            treeNode9,
-            treeNode10,
-            treeNode13});
+            treeNode14,
+            treeNode18,
+            treeNode19,
+            treeNode20,
+            treeNode21,
+            treeNode22,
+            treeNode23,
+            treeNode26});
             this.tvSettings.Size = new System.Drawing.Size(176, 359);
             this.tvSettings.TabIndex = 7;
             this.tvSettings.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.tvSettings_BeforeSelect);
@@ -150,18 +154,52 @@
             // btnResetDefaults
             // 
             this.btnResetDefaults.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnResetDefaults.Location = new System.Drawing.Point(185, 373);
+            this.btnResetDefaults.Location = new System.Drawing.Point(4, 373);
             this.btnResetDefaults.Name = "btnResetDefaults";
             this.btnResetDefaults.Size = new System.Drawing.Size(106, 23);
             this.btnResetDefaults.TabIndex = 14;
             this.btnResetDefaults.Text = "Reset Defaults";
             this.btnResetDefaults.Click += new System.EventHandler(this.btnResetDefaults_Click);
             // 
+            // btnExport
+            // 
+            this.btnExport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnExport.Location = new System.Drawing.Point(116, 373);
+            this.btnExport.Name = "btnExport";
+            this.btnExport.Size = new System.Drawing.Size(75, 23);
+            this.btnExport.TabIndex = 15;
+            this.btnExport.Text = "Export";
+            this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
+            // 
+            // saveFileDialog1
+            // 
+            this.saveFileDialog1.DefaultExt = "xml";
+            this.saveFileDialog1.FileName = "TangraSettings.xml";
+            this.saveFileDialog1.Filter = "Xml files|*.xml|All files|*.*";
+            // 
+            // btnImport
+            // 
+            this.btnImport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnImport.Location = new System.Drawing.Point(197, 373);
+            this.btnImport.Name = "btnImport";
+            this.btnImport.Size = new System.Drawing.Size(75, 23);
+            this.btnImport.TabIndex = 16;
+            this.btnImport.Text = "Import";
+            this.btnImport.Click += new System.EventHandler(this.btnImport_Click);
+            // 
+            // openFileDialog1
+            // 
+            this.openFileDialog1.DefaultExt = "xml";
+            this.openFileDialog1.FileName = "TangraSettings.xml";
+            this.openFileDialog1.Filter = "Xml files|*.xml|All files|*.*";
+            // 
             // frmTangraSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(665, 404);
+            this.Controls.Add(this.btnImport);
+            this.Controls.Add(this.btnExport);
             this.Controls.Add(this.btnResetDefaults);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOK);
@@ -186,5 +224,9 @@
 		private System.Windows.Forms.Button btnOK;
 		private System.Windows.Forms.Button btnCancel;
 		private System.Windows.Forms.Button btnResetDefaults;
+        private System.Windows.Forms.Button btnExport;
+        private System.Windows.Forms.SaveFileDialog saveFileDialog1;
+        private System.Windows.Forms.Button btnImport;
+        private System.Windows.Forms.OpenFileDialog openFileDialog1;
 	}
 }

@@ -7,9 +7,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 using Tangra.Config.SettingPannels;
 using Tangra.Controller;
 using Tangra.Helpers;
@@ -236,5 +238,48 @@ namespace Tangra.Config
 					MessageBoxIcon.Information);
 			}
 		}
+
+        private void btnExport_Click(object sender, EventArgs e)
+        {
+            if (saveFileDialog1.ShowDialog(this) == DialogResult.OK)
+            {
+                File.WriteAllText(saveFileDialog1.FileName, Properties.Settings.Default.TangraSettings);    
+            }
+        }
+
+        private void btnImport_Click(object sender, EventArgs e)
+        {
+            if (openFileDialog1.ShowDialog(this) == DialogResult.OK)
+            {
+                try
+                {
+                    string xmlString = File.ReadAllText(openFileDialog1.FileName);
+                    var ser = new XmlSerializer(typeof(TangraConfig));
+                    using (TextReader rdr = new StringReader(xmlString))
+                    {
+                        TangraConfig loadedSettings = (TangraConfig)ser.Deserialize(rdr);
+                        if (loadedSettings != null)
+                        {
+                            if (MessageBox.Show(
+                                this, 
+                                "This will overwrite your Tangra settings. This process cannot be undone. Do you want to continue?", 
+                                "Tangra", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+                            {
+                                Properties.Settings.Default.TangraSettings = xmlString;
+                                Properties.Settings.Default.Save();
+
+                                MessageBox.Show(this, "Settings imported successfuly.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                                Close();
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(this, "Cannot import Tangra settings: " + ex.Message, "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                } 
+            }
+        }
 	}
 }

@@ -220,7 +220,7 @@
             this.cbxAdvsPopupSystemTime.Name = "cbxAdvsPopupSystemTime";
             this.cbxAdvsPopupSystemTime.Size = new System.Drawing.Size(120, 19);
             this.cbxAdvsPopupSystemTime.TabIndex = 47;
-            this.cbxAdvsPopupSystemTime.Text = "System Time";
+            this.cbxAdvsPopupSystemTime.Text = "PC Clock Time";
             this.cbxAdvsPopupSystemTime.CheckedChanged += new System.EventHandler(this.OnAdvPopupSettingChanged);
             // 
             // cbxAdvsPopupTimeStamp
