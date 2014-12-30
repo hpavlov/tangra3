@@ -49,6 +49,7 @@ namespace Tangra.PInvoke
 			EndFrameNtpTimeStampMillisecondsHi = copyFrom.EndFrameNtpTimeStampMillisecondsHi;
 			EndFrameSecondaryTimeStampMillisecondsLo = copyFrom.EndFrameSecondaryTimeStampMillisecondsLo;
 			EndFrameSecondaryTimeStampMillisecondsHi = copyFrom.EndFrameSecondaryTimeStampMillisecondsHi;
+			NtpTimeStampError = copyFrom.NtpTimeStampError;
 			
 		}
 
@@ -90,6 +91,7 @@ namespace Tangra.PInvoke
 			EndFrameNtpTimeStampMillisecondsHi = 0;
 			EndFrameSecondaryTimeStampMillisecondsLo = 0;
 			EndFrameSecondaryTimeStampMillisecondsHi = 0;
+			EndNtpTimeStampError = -1;
 #else
 			MidFrameTimeStampMillisecondsLo = 0;
 			MidFrameTimeStampMillisecondsHi = 0;
@@ -107,6 +109,7 @@ namespace Tangra.PInvoke
 			EndFrameNtpTimeStampMillisecondsHi = 0;
 			EndFrameSecondaryTimeStampMillisecondsLo = 0;
 			EndFrameSecondaryTimeStampMillisecondsHi = 0;
+			NtpTimeStampError = -1;
 #endif
 		}
 
@@ -154,6 +157,8 @@ namespace Tangra.PInvoke
 		public uint EndFrameSecondaryTimeStampMillisecondsLo;
 		[FieldOffset(72)]
 		public uint EndFrameSecondaryTimeStampMillisecondsHi;
+		[FieldOffset(76)]
+		public int NtpTimeStampError;
 
 		public DateTime MiddleExposureTimeStamp
 		{

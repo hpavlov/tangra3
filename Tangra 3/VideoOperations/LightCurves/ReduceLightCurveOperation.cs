@@ -91,6 +91,7 @@ namespace Tangra.VideoOperations.LightCurves
         private int m_AavFrameIntegration;
 	    private string m_AavNativeVideoFormat;
 		private bool m_DebugMode;
+	    private int m_AavNtpTimestampError = -1;
 
         private LCState m_BackedUpSelectMeasuringStarsState = null;
 
@@ -356,7 +357,7 @@ namespace Tangra.VideoOperations.LightCurves
 
                         if (canSwitchFromRefiningToMeasuringNow)
                         {
-							m_VideoController.AstroAnalogueVideoNormaliseNtpDataIfNeeded();
+							m_AavNtpTimestampError = m_VideoController.AstroAnalogueVideoNormaliseNtpDataIfNeeded();
 
                             // Begin measurements
                             m_Measuring = true;
@@ -2096,6 +2097,7 @@ namespace Tangra.VideoOperations.LightCurves
                 m_CameraName,
 				m_AavNativeVideoFormat,
                 m_AavFrameIntegration,
+				m_AavNtpTimestampError,
 				PSFFit.BitPix,
 				PSFFit.NormVal);
 

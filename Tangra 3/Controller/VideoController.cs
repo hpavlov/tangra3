@@ -649,7 +649,7 @@ namespace Tangra.Controller
 			get { return m_FramePlayer.AstroAnalogueVideoHasOcrData || m_FramePlayer.AstroAnalogueVideoHasNtpData; }
         }
 
-		public void AstroAnalogueVideoNormaliseNtpDataIfNeeded()
+		public int AstroAnalogueVideoNormaliseNtpDataIfNeeded()
 		{
 			if (m_FramePlayer.IsAstroAnalogueVideo && m_FramePlayer.AstroAnalogueVideoHasNtpData && !m_FramePlayer.AstroAnalogueVideoHasOcrData)
 			{
@@ -658,11 +658,11 @@ namespace Tangra.Controller
 				{
 					frm.StartPosition = FormStartPosition.CenterParent;
 
-					m_FramePlayer.AstroAnalogueVideoNormaliseNtpDataIfNeeded((percDone) =>
+					return m_FramePlayer.AstroAnalogueVideoNormaliseNtpDataIfNeeded((percDone) =>
 						{
 							if (percDone == 0)
 							{
-								frm.Show(m_MainForm);								
+								frm.Show(m_MainForm);
 							}
 
 							if (percDone == 100)
@@ -673,7 +673,7 @@ namespace Tangra.Controller
 							{
 								frm.SetProgress(percDone);
 								frm.Update();
-								Application.DoEvents();								
+								Application.DoEvents();
 							}
 						});
 				}
@@ -684,6 +684,8 @@ namespace Tangra.Controller
 				}
 				
 			}
+
+			return - 1;
 		}
 
         public int AstroAnalogueVideoIntegratedAAVFrames

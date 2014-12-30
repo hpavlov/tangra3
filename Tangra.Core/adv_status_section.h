@@ -43,6 +43,7 @@ struct AdvFrameInfo
 	long EndNtpTimeStampHi;
 	long EndSecondaryTimeStampHi;
 	long EndSecondaryTimeStampLo;
+	long NtpTimeStampError;
 
 };
 

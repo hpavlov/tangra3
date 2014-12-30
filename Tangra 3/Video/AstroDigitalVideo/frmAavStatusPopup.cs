@@ -85,6 +85,9 @@ namespace Tangra.Video.AstroDigitalVideo
 			if (m_AavSettings.Popup_Timestamp || m_AavSettings.Popup_Exposure)
                 statusText.AppendLine();
 
+			if (m_AavSettings.Popup_NtpTimestamp)
+				statusText.AppendLine(string.Format("NTP Timestamp: {0}", m_FrameState.HasValidNtpTimeStamp ? m_FrameState.EndFrameNtpTime.ToString("dd MMM yyyy HH:mm:ss.fff") : ""));
+
             if (m_AavSettings.Popup_SystemTime)
 				statusText.AppendLine(string.Format("PC Clock Time: {0}", m_FrameState.SystemTime.ToString("dd MMM yyyy HH:mm:ss.fff")));
 

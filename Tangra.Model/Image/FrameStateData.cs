@@ -11,6 +11,7 @@ namespace Tangra.Model.Image
 		public DateTime CentralExposureTime;
 		public DateTime SystemTime;
 		public DateTime EndFrameNtpTime;
+		public int NtpTimeStampError;
 		public float ExposureInMilliseconds;
 		public float Gamma;
 		public float Gain;

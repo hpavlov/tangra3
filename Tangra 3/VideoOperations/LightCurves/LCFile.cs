@@ -445,8 +445,14 @@ namespace Tangra.VideoOperations.LightCurves
 
 				rv = rv.AddSeconds(corrInstrumentalDelay);
 
+				string prefix = "OSD ";
+				if (Footer.AavNtpTimestampError > -1)
+					prefix = "NTP ";
+				else if (Footer.TimestampOCR == null && Footer.ReductionContext.HasEmbeddedTimeStamps)
+					prefix = "";
+
 				correctedForInstrumentalDelayMessage = string.Format(
-					"Instrumental delay has been applied to the times\r\n\r\nEnd of first field OSD timestamp: {0}", headerComputedTime.ToString("HH:mm:ss.fff"));
+					"Instrumental delay has been applied to the times\r\n\r\nEnd of first field {0}timestamp: {1}", prefix, headerComputedTime.ToString("HH:mm:ss.fff"));
 			}
 
 			return rv;
@@ -538,8 +544,14 @@ namespace Tangra.VideoOperations.LightCurves
                 DateTime endOfFirstField = rv.AddSeconds(corrEndFirstField);
                 rv = rv.AddSeconds(corrEndFirstField + corrInstrumentalDelay);
 
+	            string prefix = "OSD ";
+				if (Footer.AavNtpTimestampError > -1)
+					prefix = "NTP ";
+				else if (Footer.TimestampOCR == null && Footer.ReductionContext.HasEmbeddedTimeStamps)
+					prefix = "";
+
                 correctedForInstrumentalDelayMessage = string.Format(
-                    "Instrumental delay has been applied to the times\r\n\r\nEnd of first field OSD timestamp: {0}", endOfFirstField.ToString("HH:mm:ss.fff"));
+					"Instrumental delay has been applied to the times\r\n\r\nEnd of first field {0}timestamp: {1}", prefix, endOfFirstField.ToString("HH:mm:ss.fff"));
             }
 
 			return rv;
@@ -1841,7 +1853,7 @@ namespace Tangra.VideoOperations.LightCurves
     {
         public static LCMeasurementFooter Empty = new LCMeasurementFooter();
 
-        private static int SERIALIZATION_VERSION = 8;
+        private static int SERIALIZATION_VERSION = 9;
 
         internal byte[] AveragedFrameBytes;
     	internal int AveragedFrameWidth;
@@ -1860,6 +1872,7 @@ namespace Tangra.VideoOperations.LightCurves
         internal string CameraName;
         internal int AAVFrameIntegration;
 		internal string AAVNativeVideoFormat;
+	    internal int AavNtpTimestampError;
 
 	    internal int DataBitPix;
 		internal uint DataAav16NormVal;
@@ -1877,6 +1890,7 @@ namespace Tangra.VideoOperations.LightCurves
             string cameraName,
 			string aavNativeVideoFormat,
             int aavFrameIntegration,
+			int aavNtpTimestampError,
 			int dataBitPix,
 			uint dataAav16NormVal)
         {
@@ -1897,6 +1911,7 @@ namespace Tangra.VideoOperations.LightCurves
             CameraName = cameraName ?? string.Empty;
             AAVFrameIntegration = aavFrameIntegration;
 	        AAVNativeVideoFormat = aavNativeVideoFormat;
+	        AavNtpTimestampError = aavNtpTimestampError;
 
 	        DataBitPix = dataBitPix;
 	        DataAav16NormVal = dataAav16NormVal;
@@ -1941,6 +1956,7 @@ namespace Tangra.VideoOperations.LightCurves
             CameraName = string.Empty;
             AAVFrameIntegration = -1;
 	        AAVNativeVideoFormat = string.Empty;
+	        AavNtpTimestampError = -1;
 
 			DataBitPix = 8;
 			DataAav16NormVal = 0;
@@ -1988,6 +2004,11 @@ namespace Tangra.VideoOperations.LightCurves
 									{
 										DataBitPix = reader.ReadInt32();
 										DataAav16NormVal = reader.ReadUInt32();
+
+										if (version > 8)
+										{
+											AavNtpTimestampError = reader.ReadInt32();
+										}
 									}
 								}
                             }
@@ -2057,6 +2078,8 @@ namespace Tangra.VideoOperations.LightCurves
 
 			writer.Write(DataBitPix);
 			writer.Write(DataAav16NormVal);
+
+	        writer.Write(AavNtpTimestampError);
         }
     }
 

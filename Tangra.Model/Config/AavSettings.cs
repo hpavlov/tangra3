@@ -25,6 +25,8 @@ namespace Tangra.Model.Config
 		public bool Popup_GPSFix = false;
 		public bool Popup_Almanac = false;
 
+		public bool Popup_NtpTimestamp = false;
+
 		public bool SplitFieldsOSD = true;
 
 		public bool NtpTimeDebugFlag = false;

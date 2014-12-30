@@ -53,6 +53,7 @@ namespace Tangra.Config.SettingPannels
 			cbxAavSplitFieldsOSD.Checked = TangraConfig.Settings.AAV.SplitFieldsOSD;
 
 			cbxNtpDebugFlag.Checked = TangraConfig.Settings.AAV.NtpTimeDebugFlag;
+			cbxAdvsPopupNTPTime.Checked = TangraConfig.Settings.AAV.Popup_NtpTimestamp;
 		}
 
         public override void SaveSettings()
@@ -72,6 +73,7 @@ namespace Tangra.Config.SettingPannels
 			TangraConfig.Settings.AAV.SplitFieldsOSD = cbxAavSplitFieldsOSD.Checked;
 
 			TangraConfig.Settings.AAV.NtpTimeDebugFlag = cbxNtpDebugFlag.Checked;
+			TangraConfig.Settings.AAV.Popup_NtpTimestamp = cbxAdvsPopupNTPTime.Checked;
 
 			if (m_AavPopupCustomizer != null)
 			{
@@ -87,6 +89,7 @@ namespace Tangra.Config.SettingPannels
 				Popup_Timestamp = cbxAdvsPopupTimeStamp.Checked,
 				Popup_Exposure = cbxAdvsPopupExposure.Checked,
 				Popup_SystemTime = cbxAdvsPopupSystemTime.Checked,
+				Popup_NtpTimestamp = cbxAdvsPopupNTPTime.Checked,
 				Popup_Satellites = cbxAdvsPopupSatellites.Checked,
 				Popup_GPSFix = cbxAdvsPopupGPSFix.Checked,
 				Popup_Almanac = cbxAdvsPopupAlmanac.Checked,

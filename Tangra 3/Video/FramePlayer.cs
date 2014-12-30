@@ -782,10 +782,13 @@ namespace Tangra.Video
 			}
 		}
 
-		public void AstroAnalogueVideoNormaliseNtpDataIfNeeded(Action<int> progressCallback)
+		public int AstroAnalogueVideoNormaliseNtpDataIfNeeded(Action<int> progressCallback)
 		{
 			if (IsAstroAnalogueVideo)
-				((AstroDigitalVideoStream)m_VideoStream).AstroAnalogueVideoNormaliseNtpDataIfNeeded(progressCallback);
+			{
+				return ((AstroDigitalVideoStream) m_VideoStream).AstroAnalogueVideoNormaliseNtpDataIfNeeded(progressCallback);
+			}
+			return -1;
 		}
 
         public int AstroAnalogueVideoIntegratedAAVFrames

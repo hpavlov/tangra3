@@ -371,6 +371,7 @@ namespace Tangra.Video
 				rv.CentralExposureTime = m_CurrentFrameInfo.MiddleExposureTimeStamp;
 				rv.SystemTime = m_CurrentFrameInfo.SystemTime;
 				rv.EndFrameNtpTime = m_CurrentFrameInfo.EndExposureNtpTimeStamp;
+				rv.NtpTimeStampError = m_CurrentFrameInfo.NtpTimeStampError;
 				rv.ExposureInMilliseconds = m_CurrentFrameInfo.Exposure10thMs / 10.0f;
 
 				rv.NumberIntegratedFrames = (int)m_CurrentFrameInfo.IntegratedFrames;
@@ -413,7 +414,7 @@ namespace Tangra.Video
 					rv.ExposureInMilliseconds = (float)(1000 / m_FrameRate);
 				}
 
-				if (NtpDataAvailable && !OcrDataAvailable && m_UseNtpTimeAsCentralExposureTime)
+				if (m_UsesNtpTimestamps && !OcrDataAvailable && m_UseNtpTimeAsCentralExposureTime)
 					AddExtraNtpDebugTimes(ref rv, m_CurrentFrameInfo);
 
 				return rv;
@@ -431,6 +432,7 @@ namespace Tangra.Video
 				rv.CentralExposureTime = frameInfo.MiddleExposureTimeStamp;
 				rv.SystemTime = frameInfo.SystemTime;
 				rv.EndFrameNtpTime = frameInfo.EndExposureNtpTimeStamp;
+				rv.NtpTimeStampError = frameInfo.NtpTimeStampError;
 				rv.ExposureInMilliseconds = frameInfo.Exposure10thMs / 10.0f;
 
 				rv.NumberIntegratedFrames = (int)frameInfo.IntegratedFrames;
@@ -473,7 +475,7 @@ namespace Tangra.Video
 					rv.ExposureInMilliseconds = (float)(1000 / m_FrameRate);
 				}
 
-				if (NtpDataAvailable && !OcrDataAvailable && m_UseNtpTimeAsCentralExposureTime)
+				if (m_UsesNtpTimestamps && !OcrDataAvailable && m_UseNtpTimeAsCentralExposureTime)
 					AddExtraNtpDebugTimes(ref rv, frameInfo);
 
 				return rv;
@@ -582,8 +584,10 @@ namespace Tangra.Video
 		private long m_CalibratedNtpTimeZeroPoint;
 		private LinearRegression m_CalibratedNtpTimeSource;
 
-		public void AstroAnalogueVideoNormaliseNtpDataIfNeeded(Action<int> progressCallback)
+		public int AstroAnalogueVideoNormaliseNtpDataIfNeeded(Action<int> progressCallback)
 		{
+			int ntpError = -1;
+
 			if (NtpDataAvailable && !OcrDataAvailable && !m_UseNtpTimeAsCentralExposureTime)
 			{
 				if (m_CountFrames > 1 /* No Timestamp for first frame */ + 1 /* No Timestamp for last frame*/ + 3 /* Minimum timestamped frames for a FIT */)
@@ -599,6 +603,9 @@ namespace Tangra.Video
 						int percentDoneCalled = 0;						
 						if (progressCallback != null) progressCallback(percentDone);
 
+						long ntpTimestampErrorSum = 0;
+						int ntpTimestampErrorDatapoints = 0;
+
 						for (int i = m_FirstFrame; i < m_FirstFrame + m_CountFrames; i++)
 						{
 							FrameStateData stateChannel = GetFrameStatusChannel(i);
@@ -608,6 +615,8 @@ namespace Tangra.Video
 								if (zeroPointTicks == -1)
 									zeroPointTicks = centralTicks;
 								lr.AddDataPoint(i, new TimeSpan(centralTicks - zeroPointTicks).TotalMilliseconds);
+								ntpTimestampErrorSum += stateChannel.NtpTimeStampError;
+								ntpTimestampErrorDatapoints++;
 							}
 
 							percentDone = 100 * (i - m_FirstFrame) / m_CountFrames;
@@ -625,6 +634,7 @@ namespace Tangra.Video
 							m_CalibratedNtpTimeZeroPoint = zeroPointTicks;
 							m_CalibratedNtpTimeSource = lr;
 							m_UseNtpTimeAsCentralExposureTime = true;
+							ntpError = (int)Math.Round(lr.StdDev + (ntpTimestampErrorSum * 1.0 / ntpTimestampErrorDatapoints));
 
 							Trace.WriteLine(string.Format("NTP Timebase Established. 1-Sigma = {0} ms", lr.StdDev.ToString("0.00")));
 						}
@@ -636,7 +646,9 @@ namespace Tangra.Video
 						Trace.WriteLine(ex.GetFullStackTrace());
 					}
 				}
-			}			
+			}
+
+			return ntpError;
 		}
 
 		private DateTime ComputeCentralExposureTimeFromNtpTime(int frameNo)
