@@ -27,8 +27,7 @@ namespace Tangra
                 this.lblProductName.Text = String.Format("{0} v{1}{2}, Released on {3}", AssemblyProduct, AssemblyFileVersion, IsBetaRelease ? " BETA" : "", AssemblyReleaseDate);
             }
             else
-                this.lblProductName.Text = String.Format("{0} v{1}, Unreleased ALPHA Version", AssemblyProduct,
-                                                         AssemblyFileVersion);
+                this.lblProductName.Text = String.Format("{0} v{1}, Unreleased ALPHA Version", AssemblyProduct, AssemblyFileVersion);
         }
 
         #region Assembly Attribute Accessorsw

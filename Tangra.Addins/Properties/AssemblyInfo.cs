@@ -14,7 +14,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Tangra.Addins")]
-[assembly: AssemblyCopyright("Copyright © Hristo Pavlov 2013-2014")]
+[assembly: AssemblyCopyright("Copyright © Hristo Pavlov 2013-2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
