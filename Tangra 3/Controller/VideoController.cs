@@ -1106,22 +1106,22 @@ namespace Tangra.Controller
 
 		public void SetDisplayHueBackgroundModeTargets(List<ITrackedObject> trackedObjectsPositions)
 		{
-			if (trackedObjectsPositions.Count > 0)
+			if (trackedObjectsPositions.Count > 0 && trackedObjectsPositions[0].Center != null)
 			{
 				m_HBMTarget1X = trackedObjectsPositions[0].Center.X;
-				m_HBMTarget1Y = trackedObjectsPositions[0].Center.Y;				
+				m_HBMTarget1Y = trackedObjectsPositions[0].Center.Y;
 			}
-			if (trackedObjectsPositions.Count > 1)
+			if (trackedObjectsPositions.Count > 1 && trackedObjectsPositions[1].Center != null)
 			{
 				m_HBMTarget2X = trackedObjectsPositions[1].Center.X;
 				m_HBMTarget2Y = trackedObjectsPositions[1].Center.Y;
 			}
-			if (trackedObjectsPositions.Count > 2)
+			if (trackedObjectsPositions.Count > 2 && trackedObjectsPositions[2].Center != null)
 			{
 				m_HBMTarget3X = trackedObjectsPositions[2].Center.X;
 				m_HBMTarget3Y = trackedObjectsPositions[2].Center.Y;
 			}
-			if (trackedObjectsPositions.Count > 3)
+			if (trackedObjectsPositions.Count > 3 && trackedObjectsPositions[3].Center != null)
 			{
 				m_HBMTarget4X = trackedObjectsPositions[3].Center.X;
 				m_HBMTarget4Y = trackedObjectsPositions[3].Center.Y;

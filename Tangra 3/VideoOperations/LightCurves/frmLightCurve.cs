@@ -410,6 +410,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 			Regex regexAavSourceInfo = new Regex("^Video \\(AAV\\.\\d+\\)$");
 
+	        lblFrameTime.BackColor = SystemColors.Control;
 	        lblInstDelayWarning.SendToBack();
             lblInstDelayWarning.Visible = 
                 // Can determine the frame times
@@ -2394,6 +2395,13 @@ namespace Tangra.VideoOperations.LightCurves
 
 			var frm = new frmSetReferenceMag();
 			frm.SetCurrentMeasurements(m_SelectedMeasurements, m_LightCurveController.Context);
+			frm.ShowDialog(this);
+		}
+
+		private void miLightCurveInformation_Click(object sender, EventArgs e)
+		{
+			var frm = new frmCompleteReductionInfoForm(m_LCFile);
+			frm.StartPosition = FormStartPosition.CenterParent;
 			frm.ShowDialog(this);
 		}
 

@@ -99,12 +99,6 @@ namespace Tangra.VideoOperations.LightCurves
 			}
         }
 
-		private void btnCompleteInfo_Click(object sender, EventArgs e)
-		{
-			var frm = new frmCompleteReductionInfoForm(m_lcFile);
-			frm.ShowDialog(this);
-		}
-
 		private void btnShowFields_Click(object sender, EventArgs e)
 		{
 			m_ShowingFields = !m_ShowingFields;

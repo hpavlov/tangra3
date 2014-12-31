@@ -466,7 +466,7 @@ namespace Tangra.Video
 
 			int nextFrameIdToBuffer = context.FirstFrameNo;
 
-			while (m_IsRunning && m_VideoStream != null)
+			while (m_IsRunning && !m_StopRequestReceived &&  m_VideoStream != null)
 			{
 				if (nextFrameIdToBuffer > -1 &&
 					m_FramesBufferQueue.Count < context.BufferSize)
@@ -497,18 +497,21 @@ namespace Tangra.Video
 
 		private void BufferNonIntegratedFrame(int nextFrameIdToBuffer)
 		{
-			Pixelmap bmp = m_VideoStream.GetPixelmap(nextFrameIdToBuffer);
+			Pixelmap bmp = m_IsRunning && !m_StopRequestReceived ? m_VideoStream.GetPixelmap(nextFrameIdToBuffer) : null;
 
-			lock (m_FrameBitmapLock)
+			if (bmp != null)
 			{
-			    var bufferedFrame = new BufferedFrame()
-			    {
-				    FrameNo = nextFrameIdToBuffer,
-                    FirstFrameInIntegrationPeriod = nextFrameIdToBuffer,
-				    Image = bmp
-			    };
+				lock (m_FrameBitmapLock)
+				{
+					var bufferedFrame = new BufferedFrame()
+					{
+						FrameNo = nextFrameIdToBuffer,
+						FirstFrameInIntegrationPeriod = nextFrameIdToBuffer,
+						Image = bmp
+					};
 
-				m_FramesBufferQueue.Enqueue(bufferedFrame);				
+					m_FramesBufferQueue.Enqueue(bufferedFrame);
+				}
 			}
 		}
 
@@ -519,19 +522,22 @@ namespace Tangra.Video
 
 		private void BufferRunningAverageIntegratedFrame(int nextFrameIdToBuffer)
 		{
-			Pixelmap thisFrame = ProduceRunningAverageIntegratedFrame(nextFrameIdToBuffer);
+			Pixelmap thisFrame = m_IsRunning && !m_StopRequestReceived ? ProduceRunningAverageIntegratedFrame(nextFrameIdToBuffer) : null;
 
-			// 4) Produce the integrated bitmap
-			lock(m_FrameBitmapLock)
+			if (thisFrame != null)
 			{
-				var bufferedFrame = new BufferedFrame()
+				// 4) Produce the integrated bitmap
+				lock (m_FrameBitmapLock)
 				{
-					FrameNo = nextFrameIdToBuffer,
-                    FirstFrameInIntegrationPeriod = nextFrameIdToBuffer,
-					Image = thisFrame
-				};
+					var bufferedFrame = new BufferedFrame()
+					{
+						FrameNo = nextFrameIdToBuffer,
+						FirstFrameInIntegrationPeriod = nextFrameIdToBuffer,
+						Image = thisFrame
+					};
 
-				m_FramesBufferQueue.Enqueue(bufferedFrame);
+					m_FramesBufferQueue.Enqueue(bufferedFrame);
+				}
 			}
 		}
 
@@ -544,7 +550,7 @@ namespace Tangra.Video
 		{
 			for (int i = 0; i < m_FramesToIntegrate; i++)
 			{
-				Pixelmap thisFrame = ProduceBinningIntegratedFrame(nextFrameIdToBuffer);
+				Pixelmap thisFrame = m_IsRunning && !m_StopRequestReceived ? ProduceBinningIntegratedFrame(nextFrameIdToBuffer) : null;
 
 				lock (m_FrameBitmapLock)
 				{

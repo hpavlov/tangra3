@@ -48,7 +48,6 @@
 			this.label15 = new System.Windows.Forms.Label();
 			this.lblPreProcessing = new System.Windows.Forms.Label();
 			this.label8 = new System.Windows.Forms.Label();
-			this.btnCompleteInfo = new System.Windows.Forms.Button();
 			this.btnShowFields = new System.Windows.Forms.Button();
 			this.lblTracker = new System.Windows.Forms.Label();
 			this.lblTrackerLabel = new System.Windows.Forms.Label();
@@ -234,18 +233,9 @@
 			this.label8.TabIndex = 32;
 			this.label8.Text = "Pre-Processing: ";
 			// 
-			// btnCompleteInfo
-			// 
-			this.btnCompleteInfo.Location = new System.Drawing.Point(14, 228);
-			this.btnCompleteInfo.Name = "btnCompleteInfo";
-			this.btnCompleteInfo.Size = new System.Drawing.Size(157, 23);
-			this.btnCompleteInfo.TabIndex = 40;
-			this.btnCompleteInfo.Text = "Show More Info";
-			this.btnCompleteInfo.Click += new System.EventHandler(this.btnCompleteInfo_Click);
-			// 
 			// btnShowFields
 			// 
-			this.btnShowFields.Location = new System.Drawing.Point(14, 257);
+			this.btnShowFields.Location = new System.Drawing.Point(13, 242);
 			this.btnShowFields.Name = "btnShowFields";
 			this.btnShowFields.Size = new System.Drawing.Size(103, 23);
 			this.btnShowFields.TabIndex = 41;
@@ -277,7 +267,6 @@
 			this.Controls.Add(this.lblTracker);
 			this.Controls.Add(this.lblTrackerLabel);
 			this.Controls.Add(this.btnShowFields);
-			this.Controls.Add(this.btnCompleteInfo);
 			this.Controls.Add(this.lblPreProcessing);
 			this.Controls.Add(this.label8);
 			this.Controls.Add(this.lblFPSComp);
@@ -327,7 +316,6 @@
 		private System.Windows.Forms.Label label15;
 		private System.Windows.Forms.Label lblPreProcessing;
 		private System.Windows.Forms.Label label8;
-		private System.Windows.Forms.Button btnCompleteInfo;
 		private System.Windows.Forms.Button btnShowFields;
 		private System.Windows.Forms.Label lblTracker;
 		private System.Windows.Forms.Label lblTrackerLabel;

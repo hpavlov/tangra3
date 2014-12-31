@@ -310,6 +310,7 @@
     <Compile Include="VideoOperations\LightCurves\InfoForms\frmSetReferenceMag.Designer.cs">
       <DependentUpon>frmSetReferenceMag.cs</DependentUpon>
     </Compile>
+    <Compile Include="VideoOperations\LightCurves\InfoForms\LCFileTagValuePair.cs" />
     <Compile Include="VideoOperations\LightCurves\InfoForms\MagnitudeConverter.cs" />
     <Compile Include="VideoOperations\LightCurves\MutualEvents\frmAddOrEditMutualEventsTarget.cs">
       <SubType>Form</SubType>
@@ -830,6 +831,7 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Properties\DataSources\Tangra.VideoOperations.LightCurves.InfoForms.LCFileTagValuePair.datasource" />
     <None Include="Properties\DataSources\Tangra.VideoOperations.LightCurves.LCFileSeriesEntry.datasource" />
     <None Include="Properties\DataSources\Tangra.VideoTools.TagValuePair.datasource" />
     <None Include="Properties\Settings.settings">

@@ -9,6 +9,7 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using Tangra.Model.Video;
@@ -132,6 +133,59 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 				lblReprocessVal2Label.Text = "Contrast:";
 				lblReprocessVal1.Text = m_lcFile.Footer.ReductionContext.Brightness.ToString();
 				lblReprocessVal2.Text = m_lcFile.Footer.ReductionContext.Contrast.ToString();
+			}
+		}
+
+		private void btnShowAll_Click(object sender, EventArgs e)
+		{
+			BuildAllInfo();
+			dgvLCFileInfo.Visible = true;
+			dgvLCFileInfo.BringToFront();
+		}
+
+		private void BuildAllInfo()
+		{
+			var data = new List<LCFileTagValuePair>();
+
+			AddPropertiesViaReflection(m_lcFile, data);
+			AddPropertiesViaReflection(m_lcFile.Header, data);
+			AddPropertiesViaReflection(m_lcFile.Footer, data);
+			AddPropertiesViaReflection(m_lcFile.Footer.ReductionContext, data, "Reduction.");
+			for (int i = 0; i < m_lcFile.Footer.TrackedObjects.Count; i++)
+				AddPropertiesViaReflection(m_lcFile.Footer.TrackedObjects[i], data, string.Format("ObjectConfig[{0}].", i));
+				
+
+			data.Sort((x, y) => x.Property.CompareTo(y.Property));
+			dgvLCFileInfo.DataSource = data;
+		}
+
+		private void AddPropertiesViaReflection(object root, List<LCFileTagValuePair> data, string prefix = null)
+		{
+			PropertyInfo[] pis = root.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+			foreach (PropertyInfo pi in pis)
+			{
+				if (pi.PropertyType.IsPrimitive || pi.PropertyType == typeof(string) || pi.PropertyType.IsEnum)
+				{
+					data.Add(new LCFileTagValuePair()
+						{
+							Property = prefix + pi.Name,
+							Value = Convert.ToString(pi.GetValue(root, null))
+						});
+				}
+			}
+
+			FieldInfo[] fis = root.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+			foreach (FieldInfo fi in fis)
+			{
+				if (fi.IsPrivate) continue;
+				if (fi.FieldType.IsPrimitive || fi.FieldType == typeof(string) || fi.FieldType.IsEnum)
+				{
+					data.Add(new LCFileTagValuePair()
+					{
+						Property = prefix + fi.Name,
+						Value = Convert.ToString(fi.GetValue(root))
+					});
+				}
 			}
 		}
 	}
