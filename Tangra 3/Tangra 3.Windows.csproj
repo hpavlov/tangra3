@@ -304,6 +304,12 @@
     <Compile Include="VideoOperations\LightCurves\frmConfigureCsvExport.Designer.cs">
       <DependentUpon>frmConfigureCsvExport.cs</DependentUpon>
     </Compile>
+    <Compile Include="VideoOperations\LightCurves\frmConfirmDay.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\frmConfirmDay.Designer.cs">
+      <DependentUpon>frmConfirmDay.cs</DependentUpon>
+    </Compile>
     <Compile Include="VideoOperations\LightCurves\InfoForms\frmSetReferenceMag.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -703,6 +709,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\LightCurves\frmConfigureCsvExport.resx">
       <DependentUpon>frmConfigureCsvExport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\frmConfirmDay.resx">
+      <DependentUpon>frmConfirmDay.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\LightCurves\InfoForms\frmSetReferenceMag.resx">
       <DependentUpon>frmSetReferenceMag.cs</DependentUpon>

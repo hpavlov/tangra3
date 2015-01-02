@@ -1082,6 +1082,12 @@ namespace Tangra.VideoOperations.LightCurves
 							toolTip1.SetToolTip(lblInstDelayWarning, correctedForInstrumentalDelayMessage);
 							toolTip1.SetToolTip(lblFrameTime, correctedForInstrumentalDelayMessage);
 						}
+                        else if (m_LightCurveController.Context.InstrumentalDelayCorrectionsNotRequired)
+                        {
+                            lblInstDelayWarning.ForeColor = Color.Green;
+                            lblFrameTime.BackColor = SystemColors.Control;
+                            toolTip1.SetToolTip(lblFrameTime, "Instrumental delay correction not required");
+                        }
 						else
 						{
 							lblInstDelayWarning.ForeColor = Color.Red;

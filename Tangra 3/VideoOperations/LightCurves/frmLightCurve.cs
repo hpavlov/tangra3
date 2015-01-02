@@ -1558,9 +1558,13 @@ namespace Tangra.VideoOperations.LightCurves
 
             var frm = new frmConfigureCsvExport();
 
-			DateTime? secondFrameTime = m_Header.GetFrameTime(m_LCFile.Header.MinFrame + 1);
-			if (secondFrameTime == null || secondFrameTime.Value.Year < 1900)
-			    frm.DisableAbsoluteTimeExport();
+		    frm.DisplaySettings = m_DisplaySettings;
+		    frm.TrackedObjects.AddRange(m_LCFile.Footer.TrackedObjects);
+		    frm.LCFile = m_LCFile;
+		    frm.Binning = m_LightCurveController.Context.Binning > 0;
+            frm.OnlyExportSignalMunusBg =
+                m_LightCurveController.Context.SignalMethod == TangraConfig.PhotometryReductionMethod.PsfPhotometry &&
+                m_LightCurveController.Context.PsfQuadratureMethod == TangraConfig.PsfQuadrature.Analytical;
 
 		    if (frm.ShowDialog(this) == DialogResult.OK)
 		    {

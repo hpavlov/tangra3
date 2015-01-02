@@ -604,12 +604,12 @@ namespace Tangra.VideoOperations.LightCurves
 				int count = m_AllBinnedReadings[0].Count;
 				int firstFrameNoInBin = (int)m_Header.MinFrame;
 
-                CSVExportAddCommonHeader(output, true);
+                CSVExportAddCommonHeader(output, options, true);
 
                 output.Append(string.Format("BinNo,Time ({0})", options.FormatTimeLabel()));
 
 				for (int j = 0; j < objCount; j++)
-					output.AppendFormat(",Binned Measurment ({0})", j + 1);
+                    output.Append(options.FormatPhotometricValueHeaderForObject(j + 1, false, true));
 
 				output.AppendLine();
 
@@ -678,7 +678,7 @@ namespace Tangra.VideoOperations.LightCurves
 					}
 					else
 					{
-						if (middleBinTime == DateTime.MaxValue)
+                        if (middleBinTime == DateTime.MinValue || middleBinTime == DateTime.MaxValue)
 							timeStr = "";
 						else
                             timeStr = options.FormatTime(middleBinTime, timePrecisionSec);
@@ -689,8 +689,7 @@ namespace Tangra.VideoOperations.LightCurves
 					for (int j = 0; j < objCount; j++)
 					{
 						BinnedValue reading = m_AllBinnedReadings[j][i];
-						output.AppendFormat(",{0}",
-							reading.AdjustedValue.ToString(CultureInfo.InvariantCulture));
+                        output.Append(options.FormatPhotometricValue(reading.IsSuccessfulReading, reading.AdjustedValue, 0, false, true));
 					}
 
 					output.AppendLine();
@@ -700,7 +699,7 @@ namespace Tangra.VideoOperations.LightCurves
 			}
 			else
 			{
-                CSVExportAddCommonHeader(output, false);
+                CSVExportAddCommonHeader(output, options, false);
 
 				bool onlyExportSignalMunusBg =
 					m_LightCurveController.Context.SignalMethod == TangraConfig.PhotometryReductionMethod.PsfPhotometry &&
@@ -712,10 +711,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 				for (int j = 0; j < objCount; j++)
 				{
-                    if (!onlyExportSignalMunusBg)
-					    output.AppendFormat(",Signal ({0}), Background ({0})", j + 1);
-                    else
-                        output.AppendFormat(",SignalMinusBackground ({0})", j + 1);
+                    output.Append(options.FormatPhotometricValueHeaderForObject(j + 1, onlyExportSignalMunusBg, false));
 				}
 				output.AppendLine();
 
@@ -749,7 +745,7 @@ namespace Tangra.VideoOperations.LightCurves
                     string timeStr;
                     if (isBadTime)
 					{
-                        if (currFrameTime == DateTime.MaxValue)
+                        if (currFrameTime == DateTime.MinValue || currFrameTime == DateTime.MaxValue)
                             timeStr = "";
                         else if (frameNo == m_Header.FirstTimedFrameNo)
                             timeStr = options.FormatTime(m_Header.FirstTimedFrameTime, timePrecisionSec);
@@ -760,7 +756,7 @@ namespace Tangra.VideoOperations.LightCurves
 					}
 					else
 					{
-						if (currFrameTime == DateTime.MaxValue)
+                        if (currFrameTime == DateTime.MinValue || currFrameTime == DateTime.MaxValue)
 							timeStr = "";
 						else
                             timeStr = options.FormatTime(currFrameTime, timePrecisionSec);
@@ -771,17 +767,7 @@ namespace Tangra.VideoOperations.LightCurves
 					for (int j = 0; j < objCount; j++)
 					{
 						LCMeasurement reading = m_LightCurveController.Context.AllReadings[j][i];
-                        if (reading.IsSuccessfulReading)
-                        {
-                            if (!onlyExportSignalMunusBg)
-                                output.AppendFormat(",{0},{1}",
-                                                    reading.TotalReading.ToString(CultureInfo.InvariantCulture),
-                                                    reading.TotalBackground.ToString(CultureInfo.InvariantCulture));
-                            else
-                                output.AppendFormat(",{0}", reading.TotalReading.ToString(CultureInfo.InvariantCulture));
-                        }
-                        else
-                            output.Append(",,");
+                        output.Append(options.FormatPhotometricValue(reading.IsSuccessfulReading, reading.TotalReading, reading.TotalBackground, onlyExportSignalMunusBg, false));
 					}
 
 					output.AppendLine();
@@ -800,7 +786,7 @@ namespace Tangra.VideoOperations.LightCurves
 			}
 		}
 
-        private void CSVExportAddCommonHeader(StringBuilder output, bool binning)
+        private void CSVExportAddCommonHeader(StringBuilder output, CSVExportOptions options, bool binning)
         {
             Version ver = Assembly.GetExecutingAssembly().GetName().Version;
 
@@ -826,7 +812,8 @@ namespace Tangra.VideoOperations.LightCurves
 
             output.Append("Reversed Gamma, Colour, Measured Band, Integration, Digital Filter, Signal Method, Background Method, Instrumental Delay Corrections, Camera, AAV Integration, First Frame, Last Frame");
             if (addPSFReductionDetails) output.Append(", PSF Fitting");
-            if (addPSFAverageModelDetails) output.Append(", Modeled FWHM, Average FWHM"); 
+            if (addPSFAverageModelDetails) output.Append(", Modeled FWHM, Average FWHM");
+            if (options.PhotometricFormat == PhotometricFormat.Magnitudes) output.Append(", Zero Magnitude");
             output.AppendLine();
             output.AppendFormat("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11}", 
                 m_LightCurveController.Context.EncodingGamma.ToString("0.00"),
@@ -846,6 +833,7 @@ namespace Tangra.VideoOperations.LightCurves
 
             if (addPSFReductionDetails) output.AppendFormat(",{0}", m_LightCurveController.Context.PsfFittingMethod);
             if (addPSFAverageModelDetails) output.AppendFormat(",{0},{1}", float.IsNaN(m_LightCurveController.Context.ManualAverageFWHM) ? "auto" : "manual", !float.IsNaN(m_LightCurveController.Context.ManualAverageFWHM) ? m_LightCurveController.Context.ManualAverageFWHM.ToString("0.00") : m_Footer.RefinedAverageFWHM.ToString("0.00"));
+            if (options.PhotometricFormat == PhotometricFormat.Magnitudes) output.AppendFormat(",{0}", options.M0.ToString("0.000"));
 
             output.AppendLine();output.AppendLine();
             output.Append("Object, Type, Aperture, Tolerance, FWHM, Measured, StartingX, StartingY, Fixed"); output.AppendLine();

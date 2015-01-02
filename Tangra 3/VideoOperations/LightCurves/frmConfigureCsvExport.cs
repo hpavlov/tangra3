@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Model.Config;
+using Tangra.Model.Helpers;
+using Tangra.VideoOperations.LightCurves.Tracking;
 
 namespace Tangra.VideoOperations.LightCurves
 {
@@ -14,11 +18,112 @@ namespace Tangra.VideoOperations.LightCurves
         public frmConfigureCsvExport()
         {
             InitializeComponent();
+
+            TrackedObjects = new List<TrackedObjectConfig>();
+
+            pb1.Image = new Bitmap(pb1.Width, pb1.Height, PixelFormat.Format24bppRgb);
+            pb2.Image = new Bitmap(pb2.Width, pb1.Height, PixelFormat.Format24bppRgb);
+            pb3.Image = new Bitmap(pb3.Width, pb1.Height, PixelFormat.Format24bppRgb);
+            pb4.Image = new Bitmap(pb4.Width, pb1.Height, PixelFormat.Format24bppRgb);
         }
 
-        internal void DisableAbsoluteTimeExport()
+        internal TangraConfig.LightCurvesDisplaySettings DisplaySettings;
+
+        internal List<TrackedObjectConfig> TrackedObjects;
+
+        internal LCFile LCFile;
+
+        internal bool Binning;
+        internal bool OnlyExportSignalMunusBg;
+
+        private double[] m_MedianFluxes = new double[4];
+        private double m_M0;
+
+        private void frmConfigureCsvExport_Load(object sender, EventArgs e)
         {
-            rbJulianDays.Enabled = false;
+            rbFlux.Checked = true;
+            pnlFlux.BringToFront();
+            pnlMagnitude.SendToBack();
+
+            if (TrackedObjects.Count < 4)
+            {
+                pb4.Visible = false;
+                nudMag4.Visible = false;
+            }
+
+            if (TrackedObjects.Count < 3)
+            {
+                pb3.Visible = false;
+                nudMag3.Visible = false;
+            }
+
+            if (TrackedObjects.Count < 2)
+            {
+                pb2.Visible = false;
+                nudMag2.Visible = false;
+            }
+
+            using (Graphics g = Graphics.FromImage(pb1.Image))
+            {
+                g.Clear(DisplaySettings.Target1Color);
+            }
+            using (Graphics g = Graphics.FromImage(pb2.Image))
+            {
+                g.Clear(DisplaySettings.Target2Color);
+            }
+            using (Graphics g = Graphics.FromImage(pb3.Image))
+            {
+                g.Clear(DisplaySettings.Target3Color);
+            }
+            using (Graphics g = Graphics.FromImage(pb4.Image))
+            {
+                g.Clear(DisplaySettings.Target4Color);
+            }
+
+            for (int k = 0; k < TrackedObjects.Count; k++)
+            {
+                var medianCalcList = new List<double>();
+                for (int i = 0; i < 100 && i < LCFile.Data[k].Count; i++)
+                {
+                    double flux;
+                    if (Binning)
+                        flux = LCFile.Data[k][i].AdjustedReading;
+                    else if (!OnlyExportSignalMunusBg)
+                        flux = LCFile.Data[k][i].TotalReading - LCFile.Data[k][i].TotalBackground;
+                    else
+                        flux = LCFile.Data[k][i].TotalReading;
+
+                    medianCalcList.Add(flux);
+                }
+                medianCalcList.Sort();
+                m_MedianFluxes[k] = medianCalcList[medianCalcList.Count / 2];
+            }
+
+            RecalculateMagnitudes(0, 10);
+        }
+
+        private void RecalculateMagnitudes(int refIndex, double refMagnitude)
+        {
+            // m = m0 - 2.5 Log10(Flux);
+            // m0 = refMagnitude + 2.5 Log10(Flux);
+
+            m_M0 = refMagnitude + 2.5 * Math.Log10(m_MedianFluxes[refIndex]);
+
+            NumericUpDown[] magControls = new NumericUpDown[] { nudMag1, nudMag2, nudMag3, nudMag4 };
+
+            try
+            {
+                for (int i = 0; i < TrackedObjects.Count; i++) magControls[i].ValueChanged -= MagValueChanged;
+
+                for (int i = 0; i < TrackedObjects.Count; i++)
+                {
+                    magControls[i].Value = (decimal)(m_M0 - 2.5 * Math.Log10(m_MedianFluxes[i]));
+                }
+            }
+            finally
+            {
+                for (int i = 0; i < TrackedObjects.Count; i++) magControls[i].ValueChanged += MagValueChanged;
+            }
         }
 
         internal CSVExportOptions GetSelectedOptions()
@@ -29,7 +134,144 @@ namespace Tangra.VideoOperations.LightCurves
             else if (rbDecimalDays.Checked) rv.TimeFormat = TimeFormat.DecimalDays;
             else if (rbJulianDays.Checked) rv.TimeFormat = TimeFormat.DecimalJulianDays;
 
+            if (rbFlux.Checked) rv.PhotometricFormat = PhotometricFormat.RelativeFlux;
+            else if (rbMagnitude.Checked) rv.PhotometricFormat = PhotometricFormat.Magnitudes;
+
+            rv.M0 = m_M0;
+
+            rv.ExportAtmosphericExtinction = cbxAtmExtExport.Checked;
+            if (cbxAtmExtExport.Checked)
+            {
+                rv.RAHours = m_RAHours;
+                rv.DEDeg = m_DEDeg;
+                rv.LongitudeDeg = m_Longitude;
+                rv.LatitudeDeg = m_Latitude;
+            }
+
+            if (m_ConfirmedDate.HasValue)
+            {
+                rv.FistMeasurementDay = m_ConfirmedDate;
+                rv.FistMeasurementTimeStamp = LCFile.GetTimeForFrame(LCFile.Header.MinFrame);                
+            }
+
             return rv;
+        }
+
+        private void rbMagnitude_CheckedChanged(object sender, EventArgs e)
+        {
+            if (rbFlux.Checked)
+            {
+                pnlFlux.BringToFront();
+                pnlMagnitude.SendToBack();
+            }
+            else if (rbMagnitude.Checked)
+            {
+                pnlMagnitude.BringToFront();
+                pnlFlux.SendToBack();                
+            }
+        }
+
+        private void cbxAtmExtExport_CheckedChanged(object sender, EventArgs e)
+        {
+            pnlExtinction.Enabled = cbxAtmExtExport.Checked;
+        }
+
+        private void MagValueChanged(object sender, EventArgs e)
+        {
+            var magControls = new List<NumericUpDown>( new [] { nudMag1, nudMag2, nudMag3, nudMag4 });
+            NumericUpDown nud = sender as NumericUpDown;
+            if (nud != null)
+            {
+                int idx = magControls.IndexOf(nud);
+                if (idx >= 0 && idx < TrackedObjects.Count)
+                {
+                    RecalculateMagnitudes(idx, (double) nud.Value);
+                }
+            }            
+        }
+
+        private double m_RAHours;
+        private double m_DEDeg;
+        private double m_Longitude;
+        private double m_Latitude;
+        private DateTime? m_ConfirmedDate;
+
+        private void btnOK_Click(object sender, EventArgs e)
+        {
+            if (cbxAtmExtExport.Checked)
+            {
+                try
+                {
+                    m_RAHours = AstroConvert.ToRightAcsension(tbxRA.Text);
+                }
+                catch (FormatException)
+                {
+                    MessageBox.Show(this, "Please enter a valid Right Ascension value (e.g. 23 03 12)", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    tbxRA.Focus();
+                    return;
+                }
+
+                try
+                {
+                    m_DEDeg = AstroConvert.ToDeclination(tbxDec.Text);
+                }
+                catch (FormatException)
+                {
+                    MessageBox.Show(this, "Please enter a valid Declination values (e.g. +76 13 18)", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    tbxDec.Focus();
+                    return;
+                }
+
+                try
+                {
+                    m_Latitude = AstroConvert.ToDeclination(tbxLatitude.Text);
+                }
+                catch (FormatException)
+                {
+                    MessageBox.Show(this, "Please enter a valid Latitude values (e.g. -33 12 12)", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    tbxLatitude.Focus();
+                    return;
+                }
+
+                try
+                {
+                    m_Longitude = AstroConvert.ToDeclination(tbxLongitude.Text);
+                }
+                catch (FormatException)
+                {
+                    MessageBox.Show(this, "Please enter a valid Longitude values (e.g. -86 09 12)", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    tbxLongitude.Focus();
+                    return;
+                }
+            }
+
+            bool dayConfirmationRequired = (rbJulianDays.Checked || (rbMagnitude.Checked && cbxAtmExtExport.Checked));
+
+            if (dayConfirmationRequired)
+            {
+                DateTime firstTimestamp = LCFile.GetTimeForFrame(LCFile.Header.MinFrame);
+
+                if (firstTimestamp.Year > 1900 && LCFile.Header.TimingType == MeasurementTimingType.EmbeddedTimeForEachFrame)
+                {
+                    // No need to confirm the date. This is either an ADV file or an AAV file with time OCR-ed on the flly during the recording or AAV file with NTP timestamp
+                }
+                else
+                {
+                    var frm = new frmConfirmDay();
+                    frm.SelectedDay = firstTimestamp;
+                    frm.StartPosition = FormStartPosition.CenterParent;
+                    if (frm.ShowDialog(this) != DialogResult.OK)
+                        return;
+
+                    m_ConfirmedDate = frm.SelectedDay.Value;                    
+                }
+            }
+
+            // TODO: Confirm object is above horizon
+
+            DialogResult = DialogResult.OK;
+
+            Close();
         }
     }
 }
