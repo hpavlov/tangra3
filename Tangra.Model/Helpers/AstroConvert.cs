@@ -173,6 +173,7 @@ namespace Tangra.Model.Helpers
             }
 
             format = format.Replace("MM", mm.ToString("00"));
+            format = format.Replace("DDD", dd.ToString("000"));
             format = format.Replace("DD", dd.ToString("00"));
             format = format.Replace("HH", dd.ToString("00"));
             

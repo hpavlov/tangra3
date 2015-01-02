@@ -284,6 +284,7 @@
       <DependentUpon>frmUnhandledException.cs</DependentUpon>
     </Compile>
     <Compile Include="Helpers\ApplicationSettingsSerializer.cs" />
+    <Compile Include="Helpers\AtmosphericExtinctionCalculator.cs" />
     <Compile Include="Helpers\CrossPlaform.cs" />
     <Compile Include="Helpers\DuplicateFrameAvoider.cs" />
     <Compile Include="Helpers\Extensions.cs" />
@@ -297,6 +298,7 @@
     <Compile Include="Helpers\TangraFileAssociations.cs" />
     <Compile Include="Helpers\UsageStats.cs" />
     <Compile Include="Helpers\WindowsHelpers.cs" />
+    <Compile Include="Model\CoordsAndLocation.cs" />
     <Compile Include="VideoOperations\LightCurves\CSVExportOptions.cs" />
     <Compile Include="VideoOperations\LightCurves\frmConfigureCsvExport.cs">
       <SubType>Form</SubType>
@@ -857,9 +859,7 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Model\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="img\aboutbox4.bmp" />
     <None Include="img\lc_logo.bmp" />

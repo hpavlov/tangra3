@@ -48,6 +48,7 @@ namespace Tangra.VideoOperations.LightCurves
         public double DEDeg { get; set; }
         public double LongitudeDeg { get; set; }
         public double LatitudeDeg { get; set; }
+        public double HeightKM { get; set; }
 
         private string GetStringTimeFormat(double timePrecisionSec, bool isBadTime)
         {

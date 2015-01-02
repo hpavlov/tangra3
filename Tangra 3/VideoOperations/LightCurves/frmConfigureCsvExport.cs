@@ -7,6 +7,8 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Helpers;
+using Tangra.Model;
 using Tangra.Model.Config;
 using Tangra.Model.Helpers;
 using Tangra.VideoOperations.LightCurves.Tracking;
@@ -25,6 +27,17 @@ namespace Tangra.VideoOperations.LightCurves
             pb2.Image = new Bitmap(pb2.Width, pb1.Height, PixelFormat.Format24bppRgb);
             pb3.Image = new Bitmap(pb3.Width, pb1.Height, PixelFormat.Format24bppRgb);
             pb4.Image = new Bitmap(pb4.Width, pb1.Height, PixelFormat.Format24bppRgb);
+
+            try
+            {
+                CoordsAndLocation savedSettings = Properties.Settings.Default.AtmExtRememberedConfig.Deserialize<CoordsAndLocation>();
+                tbxRA.Text = AstroConvert.ToStringValue(savedSettings.RAHours, "HH MM SS");
+                tbxDec.Text = AstroConvert.ToStringValue(savedSettings.DEDeg, "+DD MM SS");
+                tbxLatitude.Text = AstroConvert.ToStringValue(savedSettings.LatitudeDeg, "+DD MM SS");
+                tbxLongitude.Text = AstroConvert.ToStringValue(savedSettings.LongitudeDeg, "DDD MM SS");
+                tbxHeightKm.Text = savedSettings.HeightKM.ToString("0.000");
+            }
+            catch { }            
         }
 
         internal TangraConfig.LightCurvesDisplaySettings DisplaySettings;
@@ -146,6 +159,7 @@ namespace Tangra.VideoOperations.LightCurves
                 rv.DEDeg = m_DEDeg;
                 rv.LongitudeDeg = m_Longitude;
                 rv.LatitudeDeg = m_Latitude;
+                rv.HeightKM = m_HeightKm;
             }
 
             if (m_ConfirmedDate.HasValue)
@@ -194,56 +208,12 @@ namespace Tangra.VideoOperations.LightCurves
         private double m_DEDeg;
         private double m_Longitude;
         private double m_Latitude;
+        private double m_HeightKm;
         private DateTime? m_ConfirmedDate;
 
         private void btnOK_Click(object sender, EventArgs e)
         {
-            if (cbxAtmExtExport.Checked)
-            {
-                try
-                {
-                    m_RAHours = AstroConvert.ToRightAcsension(tbxRA.Text);
-                }
-                catch (FormatException)
-                {
-                    MessageBox.Show(this, "Please enter a valid Right Ascension value (e.g. 23 03 12)", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    tbxRA.Focus();
-                    return;
-                }
-
-                try
-                {
-                    m_DEDeg = AstroConvert.ToDeclination(tbxDec.Text);
-                }
-                catch (FormatException)
-                {
-                    MessageBox.Show(this, "Please enter a valid Declination values (e.g. +76 13 18)", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    tbxDec.Focus();
-                    return;
-                }
-
-                try
-                {
-                    m_Latitude = AstroConvert.ToDeclination(tbxLatitude.Text);
-                }
-                catch (FormatException)
-                {
-                    MessageBox.Show(this, "Please enter a valid Latitude values (e.g. -33 12 12)", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    tbxLatitude.Focus();
-                    return;
-                }
-
-                try
-                {
-                    m_Longitude = AstroConvert.ToDeclination(tbxLongitude.Text);
-                }
-                catch (FormatException)
-                {
-                    MessageBox.Show(this, "Please enter a valid Longitude values (e.g. -86 09 12)", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    tbxLongitude.Focus();
-                    return;
-                }
-            }
+            m_ConfirmedDate = null;
 
             bool dayConfirmationRequired = (rbJulianDays.Checked || (rbMagnitude.Checked && cbxAtmExtExport.Checked));
 
@@ -263,9 +233,95 @@ namespace Tangra.VideoOperations.LightCurves
                     if (frm.ShowDialog(this) != DialogResult.OK)
                         return;
 
-                    m_ConfirmedDate = frm.SelectedDay.Value;                    
+                    m_ConfirmedDate = frm.SelectedDay.Value;
                 }
             }
+
+            if (cbxAtmExtExport.Checked)
+            {
+                try
+                {
+                    m_RAHours = AstroConvert.ToRightAcsension(tbxRA.Text);
+                }
+                catch (FormatException)
+                {
+                    MessageBox.Show(this, "Please enter a valid Right Ascension value (e.g. 23 03 12)", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    tbxRA.Focus();
+                    return;
+                }
+
+                try
+                {
+                    m_DEDeg = AstroConvert.ToDeclination(tbxDec.Text);
+                }
+                catch (FormatException)
+                {
+                    MessageBox.Show(this, "Please enter a valid Declination value (e.g. +76 13 18)", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    tbxDec.Focus();
+                    return;
+                }
+
+                try
+                {
+                    m_Latitude = AstroConvert.ToDeclination(tbxLatitude.Text);
+                }
+                catch (FormatException)
+                {
+                    MessageBox.Show(this, "Please enter a valid Latitude value (e.g. -33 12 12)", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    tbxLatitude.Focus();
+                    return;
+                }
+
+                try
+                {
+                    m_Longitude = AstroConvert.ToDeclination(tbxLongitude.Text);
+                }
+                catch (FormatException)
+                {
+                    MessageBox.Show(this, "Please enter a valid Longitude value (e.g. -86 09 12)", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    tbxLongitude.Focus();
+                    return;
+                }
+
+                try
+                {
+                    m_HeightKm = double.Parse(tbxHeightKm.Text);
+                }
+                catch (FormatException)
+                {
+                    MessageBox.Show(this, "Please enter a valid Height value (e.g. 0.150)", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    tbxHeightKm.Focus();
+                    return;
+                }
+
+                var calc = new AtmosphericExtinctionCalculator(m_RAHours, m_DEDeg, m_Longitude, m_Latitude, m_HeightKm);
+                DateTime firstTimestamp = LCFile.GetTimeForFrame(LCFile.Header.MinFrame);
+                if (m_ConfirmedDate != null)
+                    firstTimestamp = m_ConfirmedDate.Value.Date.AddTicks(firstTimestamp.Ticks - firstTimestamp.Date.Ticks);
+
+                double zenithAngle = calc.CalculateZenithAngle(firstTimestamp);
+                if (zenithAngle > 90)
+                {
+                    MessageBox.Show(this, "The object is below the horizon.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
+                var savedSettings = new CoordsAndLocation()
+                {
+                    RAHours = m_RAHours,
+                    DEDeg = m_DEDeg,
+                    LatitudeDeg = m_Latitude,
+                    LongitudeDeg = m_Longitude,
+                    HeightKM = m_HeightKm
+                };
+                try
+                {
+                    Properties.Settings.Default.AtmExtRememberedConfig = savedSettings.AsSerialized();
+                    Properties.Settings.Default.Save();
+                }
+                catch { }            
+
+            }
+
 
             // TODO: Confirm object is above horizon
 

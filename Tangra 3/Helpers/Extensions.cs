@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Xml;
 using System.Xml.Serialization;
 using Tangra.Model.Helpers;
 using Tangra.VideoOperations.LightCurves;
@@ -99,5 +100,51 @@ namespace Tangra.Helpers
 
 			return xmlSer.ToString();
 		}
+
+        public static void Serialize<T>(this object instance, Stream stream)
+        {
+            var xmlSerializer = new XmlSerializer(typeof(T));
+            xmlSerializer.Serialize(stream, instance);
+        }
+
+        public static string AsSerialized(this object instance)
+        {
+            var xmlSerializer = new XmlSerializer(instance.GetType());
+            StringBuilder output = new StringBuilder();
+            using (StringWriter wrt = new StringWriter(output))
+            {
+                xmlSerializer.Serialize(wrt, instance);
+                wrt.Flush();
+            }
+            return output.ToString();
+        }
+
+        public static T Deserialize<T>(this string serializedXmlString)
+        {
+            using (var reader = new StringReader(serializedXmlString))
+            {
+                var serializer = new XmlSerializer(typeof(T));
+                return (T)serializer.Deserialize(reader);
+            }
+        }
+
+        public static T Deserialize<T>(XmlNode rootNode)
+        {
+            using (var reader = new XmlNodeReader(rootNode))
+            {
+                var serializer = new XmlSerializer(typeof(T));
+                return (T)serializer.Deserialize(reader);
+            }
+        }
+
+        public static string Serialize<T>(this object instance)
+        {
+            using (var memStr = new StringWriter())
+            {
+                var xmlSerializer = new XmlSerializer(typeof(T));
+                xmlSerializer.Serialize(memStr, instance);
+                return memStr.ToString();
+            }
+        }
 	}
 }

@@ -16,6 +16,7 @@ using System.Windows.Forms;
 using Tangra.Addins;
 using Tangra.Config;
 using Tangra.Controller;
+using Tangra.Helpers;
 using Tangra.Model.Config;
 using Tangra.Model.Image;
 using Tangra.Model.Numerical;
@@ -592,6 +593,10 @@ namespace Tangra.VideoOperations.LightCurves
 		{
 			var output = new StringBuilder();
 
+		    AtmosphericExtinctionCalculator atmExtCalc = null;
+            if (options.ExportAtmosphericExtinction)
+                atmExtCalc = new AtmosphericExtinctionCalculator(options.RAHours, options.DEDeg, options.LongitudeDeg, options.LatitudeDeg, options.HeightKM);
+
             string videoSystem;
             double absoluteTimeError = m_TimestampDiscrepencyFlag
                                            ? m_Header.GetAbsoluteTimeDeltaInMilliseconds(out videoSystem)
@@ -611,7 +616,6 @@ namespace Tangra.VideoOperations.LightCurves
 				for (int j = 0; j < objCount; j++)
                     output.Append(options.FormatPhotometricValueHeaderForObject(j + 1, false, true));
 
-				output.AppendLine();
 
                 bool isBadTime = false;
 			    double timePrecisionSec = 0;
@@ -654,12 +658,19 @@ namespace Tangra.VideoOperations.LightCurves
                     isBadTime = m_TimestampDiscrepencyFlag;
                 }
 
-			    if (m_LCFile.Footer.ReductionContext.LightCurveReductionType == LightCurveReductionType.MutualEvent &&
-				    absoluteTimeError/500 < resolutionInSecs)
+                if (isBadTime && 
+                    m_LCFile.Footer.ReductionContext.LightCurveReductionType == LightCurveReductionType.MutualEvent && absoluteTimeError/500 < resolutionInSecs)
 				{
 					// Force export the time for mutual events where half the resolution is better than the absolute timing error 
-                    isBadTime = true;
+                    isBadTime = false;
 				}
+
+			    if (options.PhotometricFormat == PhotometricFormat.Magnitudes && atmExtCalc != null)
+			    {
+			        output.Append(", Atmospheric Extinction");
+			    }
+
+			    output.AppendLine();
 
 				for (int i = 0; i < count; i++)
 				{
@@ -692,6 +703,13 @@ namespace Tangra.VideoOperations.LightCurves
                         output.Append(options.FormatPhotometricValue(reading.IsSuccessfulReading, reading.AdjustedValue, 0, false, true));
 					}
 
+                    if (options.PhotometricFormat == PhotometricFormat.Magnitudes && atmExtCalc != null &&
+                        middleBinTime != DateTime.MinValue && middleBinTime != DateTime.MaxValue)
+                    {
+                        double extinction = atmExtCalc.CalculateExtinction(middleBinTime);
+                        output.AppendFormat(",{0}", extinction.ToString("0.000"));
+                    }
+
 					output.AppendLine();
 
 					firstFrameNoInBin += m_LightCurveController.Context.Binning;
@@ -713,7 +731,6 @@ namespace Tangra.VideoOperations.LightCurves
 				{
                     output.Append(options.FormatPhotometricValueHeaderForObject(j + 1, onlyExportSignalMunusBg, false));
 				}
-				output.AppendLine();
 
 			    bool isBadTime = false;
                 double timePrecisionSec = 0;
@@ -731,6 +748,12 @@ namespace Tangra.VideoOperations.LightCurves
                 }
                 else
                     timePrecisionSec = 0.001;
+
+                if (options.PhotometricFormat == PhotometricFormat.Magnitudes && atmExtCalc != null)
+                {
+                    output.Append(", Atmospheric Extinction");
+                }
+                output.AppendLine();
 
 				for (int i = 0; i < count; i++)
 				{
@@ -769,6 +792,13 @@ namespace Tangra.VideoOperations.LightCurves
 						LCMeasurement reading = m_LightCurveController.Context.AllReadings[j][i];
                         output.Append(options.FormatPhotometricValue(reading.IsSuccessfulReading, reading.TotalReading, reading.TotalBackground, onlyExportSignalMunusBg, false));
 					}
+
+                    if (options.PhotometricFormat == PhotometricFormat.Magnitudes && atmExtCalc != null &&
+                        currFrameTime != DateTime.MinValue && currFrameTime != DateTime.MaxValue)
+                    {
+                        double extinction = atmExtCalc.CalculateExtinction(currFrameTime);
+                        output.AppendFormat(",{0}", extinction.ToString("0.000"));
+                    }
 
 					output.AppendLine();
 				}

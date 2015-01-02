@@ -118,5 +118,17 @@ namespace Tangra.Properties {
                 this["UsageStatsLastSent"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string AtmExtRememberedConfig {
+            get {
+                return ((string)(this["AtmExtRememberedConfig"]));
+            }
+            set {
+                this["AtmExtRememberedConfig"] = value;
+            }
+        }
     }
 }

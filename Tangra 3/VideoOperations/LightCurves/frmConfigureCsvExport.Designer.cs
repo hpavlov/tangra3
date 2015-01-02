@@ -36,7 +36,6 @@
             this.rbTimeString = new System.Windows.Forms.RadioButton();
             this.tabValues = new System.Windows.Forms.TabPage();
             this.pnlMagnitude = new System.Windows.Forms.Panel();
-            this.pb4 = new System.Windows.Forms.PictureBox();
             this.pnlExtinction = new System.Windows.Forms.Panel();
             this.tbxLongitude = new System.Windows.Forms.TextBox();
             this.tbxRA = new System.Windows.Forms.TextBox();
@@ -48,11 +47,8 @@
             this.label6 = new System.Windows.Forms.Label();
             this.nudMag4 = new System.Windows.Forms.NumericUpDown();
             this.nudMag1 = new System.Windows.Forms.NumericUpDown();
-            this.pb3 = new System.Windows.Forms.PictureBox();
             this.cbxAtmExtExport = new System.Windows.Forms.CheckBox();
             this.nudMag3 = new System.Windows.Forms.NumericUpDown();
-            this.pb1 = new System.Windows.Forms.PictureBox();
-            this.pb2 = new System.Windows.Forms.PictureBox();
             this.nudMag2 = new System.Windows.Forms.NumericUpDown();
             this.pnlFlux = new System.Windows.Forms.Panel();
             this.label4 = new System.Windows.Forms.Label();
@@ -60,20 +56,27 @@
             this.rbFlux = new System.Windows.Forms.RadioButton();
             this.btnOK = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
+            this.pb4 = new System.Windows.Forms.PictureBox();
+            this.pb3 = new System.Windows.Forms.PictureBox();
+            this.pb1 = new System.Windows.Forms.PictureBox();
+            this.pb2 = new System.Windows.Forms.PictureBox();
+            this.tbxHeightKm = new System.Windows.Forms.TextBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
             this.tabSettings.SuspendLayout();
             this.tabTime.SuspendLayout();
             this.tabValues.SuspendLayout();
             this.pnlMagnitude.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pb4)).BeginInit();
             this.pnlExtinction.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudMag4)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMag1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pb3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMag3)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pb1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pb2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMag2)).BeginInit();
             this.pnlFlux.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pb4)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pb3)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pb1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pb2)).BeginInit();
             this.SuspendLayout();
             // 
             // tabSettings
@@ -83,7 +86,7 @@
             this.tabSettings.Location = new System.Drawing.Point(12, 12);
             this.tabSettings.Name = "tabSettings";
             this.tabSettings.SelectedIndex = 0;
-            this.tabSettings.Size = new System.Drawing.Size(329, 172);
+            this.tabSettings.Size = new System.Drawing.Size(329, 206);
             this.tabSettings.TabIndex = 0;
             // 
             // tabTime
@@ -150,7 +153,7 @@
             this.tabValues.Controls.Add(this.rbFlux);
             this.tabValues.Location = new System.Drawing.Point(4, 22);
             this.tabValues.Name = "tabValues";
-            this.tabValues.Size = new System.Drawing.Size(321, 146);
+            this.tabValues.Size = new System.Drawing.Size(321, 180);
             this.tabValues.TabIndex = 1;
             this.tabValues.Text = "Photometric Values";
             this.tabValues.UseVisualStyleBackColor = true;
@@ -169,22 +172,14 @@
             this.pnlMagnitude.Controls.Add(this.nudMag2);
             this.pnlMagnitude.Location = new System.Drawing.Point(3, 31);
             this.pnlMagnitude.Name = "pnlMagnitude";
-            this.pnlMagnitude.Size = new System.Drawing.Size(315, 119);
+            this.pnlMagnitude.Size = new System.Drawing.Size(315, 146);
             this.pnlMagnitude.TabIndex = 4;
-            // 
-            // pb4
-            // 
-            this.pb4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.pb4.BackColor = System.Drawing.Color.Maroon;
-            this.pb4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pb4.Location = new System.Drawing.Point(228, 12);
-            this.pb4.Name = "pb4";
-            this.pb4.Size = new System.Drawing.Size(10, 11);
-            this.pb4.TabIndex = 19;
-            this.pb4.TabStop = false;
             // 
             // pnlExtinction
             // 
+            this.pnlExtinction.Controls.Add(this.label8);
+            this.pnlExtinction.Controls.Add(this.label7);
+            this.pnlExtinction.Controls.Add(this.tbxHeightKm);
             this.pnlExtinction.Controls.Add(this.tbxLongitude);
             this.pnlExtinction.Controls.Add(this.tbxRA);
             this.pnlExtinction.Controls.Add(this.tbxDec);
@@ -196,7 +191,7 @@
             this.pnlExtinction.Enabled = false;
             this.pnlExtinction.Location = new System.Drawing.Point(19, 57);
             this.pnlExtinction.Name = "pnlExtinction";
-            this.pnlExtinction.Size = new System.Drawing.Size(289, 59);
+            this.pnlExtinction.Size = new System.Drawing.Size(289, 86);
             this.pnlExtinction.TabIndex = 0;
             // 
             // tbxLongitude
@@ -295,17 +290,6 @@
             65536});
             this.nudMag1.ValueChanged += new System.EventHandler(this.MagValueChanged);
             // 
-            // pb3
-            // 
-            this.pb3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.pb3.BackColor = System.Drawing.Color.Maroon;
-            this.pb3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pb3.Location = new System.Drawing.Point(159, 12);
-            this.pb3.Name = "pb3";
-            this.pb3.Size = new System.Drawing.Size(10, 11);
-            this.pb3.TabIndex = 17;
-            this.pb3.TabStop = false;
-            // 
             // cbxAtmExtExport
             // 
             this.cbxAtmExtExport.AutoSize = true;
@@ -330,28 +314,6 @@
             0,
             65536});
             this.nudMag3.ValueChanged += new System.EventHandler(this.MagValueChanged);
-            // 
-            // pb1
-            // 
-            this.pb1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.pb1.BackColor = System.Drawing.Color.Maroon;
-            this.pb1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pb1.Location = new System.Drawing.Point(21, 13);
-            this.pb1.Name = "pb1";
-            this.pb1.Size = new System.Drawing.Size(10, 11);
-            this.pb1.TabIndex = 13;
-            this.pb1.TabStop = false;
-            // 
-            // pb2
-            // 
-            this.pb2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.pb2.BackColor = System.Drawing.Color.Maroon;
-            this.pb2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pb2.Location = new System.Drawing.Point(90, 12);
-            this.pb2.Name = "pb2";
-            this.pb2.Size = new System.Drawing.Size(10, 11);
-            this.pb2.TabIndex = 15;
-            this.pb2.TabStop = false;
             // 
             // nudMag2
             // 
@@ -409,7 +371,7 @@
             // 
             // btnOK
             // 
-            this.btnOK.Location = new System.Drawing.Point(185, 193);
+            this.btnOK.Location = new System.Drawing.Point(186, 224);
             this.btnOK.Name = "btnOK";
             this.btnOK.Size = new System.Drawing.Size(75, 23);
             this.btnOK.TabIndex = 2;
@@ -420,18 +382,89 @@
             // btnCancel
             // 
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(266, 193);
+            this.btnCancel.Location = new System.Drawing.Point(267, 224);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 3;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             // 
+            // pb4
+            // 
+            this.pb4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.pb4.BackColor = System.Drawing.Color.Maroon;
+            this.pb4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.pb4.Location = new System.Drawing.Point(228, 12);
+            this.pb4.Name = "pb4";
+            this.pb4.Size = new System.Drawing.Size(10, 11);
+            this.pb4.TabIndex = 19;
+            this.pb4.TabStop = false;
+            // 
+            // pb3
+            // 
+            this.pb3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.pb3.BackColor = System.Drawing.Color.Maroon;
+            this.pb3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.pb3.Location = new System.Drawing.Point(159, 12);
+            this.pb3.Name = "pb3";
+            this.pb3.Size = new System.Drawing.Size(10, 11);
+            this.pb3.TabIndex = 17;
+            this.pb3.TabStop = false;
+            // 
+            // pb1
+            // 
+            this.pb1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.pb1.BackColor = System.Drawing.Color.Maroon;
+            this.pb1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.pb1.Location = new System.Drawing.Point(21, 13);
+            this.pb1.Name = "pb1";
+            this.pb1.Size = new System.Drawing.Size(10, 11);
+            this.pb1.TabIndex = 13;
+            this.pb1.TabStop = false;
+            // 
+            // pb2
+            // 
+            this.pb2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.pb2.BackColor = System.Drawing.Color.Maroon;
+            this.pb2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.pb2.Location = new System.Drawing.Point(90, 12);
+            this.pb2.Name = "pb2";
+            this.pb2.Size = new System.Drawing.Size(10, 11);
+            this.pb2.TabIndex = 15;
+            this.pb2.TabStop = false;
+            // 
+            // tbxHeightKm
+            // 
+            this.tbxHeightKm.Location = new System.Drawing.Point(181, 60);
+            this.tbxHeightKm.Name = "tbxHeightKm";
+            this.tbxHeightKm.Size = new System.Drawing.Size(76, 20);
+            this.tbxHeightKm.TabIndex = 12;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label7.Location = new System.Drawing.Point(164, 60);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(15, 16);
+            this.label7.TabIndex = 13;
+            this.label7.Text = "h";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label8.Location = new System.Drawing.Point(260, 62);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(25, 16);
+            this.label8.TabIndex = 14;
+            this.label8.Text = "km";
+            // 
             // frmConfigureCsvExport
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(354, 225);
+            this.ClientSize = new System.Drawing.Size(354, 259);
             this.ControlBox = false;
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOK);
@@ -448,17 +481,17 @@
             this.tabValues.PerformLayout();
             this.pnlMagnitude.ResumeLayout(false);
             this.pnlMagnitude.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pb4)).EndInit();
             this.pnlExtinction.ResumeLayout(false);
             this.pnlExtinction.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudMag4)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMag1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pb3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMag3)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pb1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pb2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMag2)).EndInit();
             this.pnlFlux.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pb4)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pb3)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pb1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pb2)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -497,5 +530,8 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Panel pnlMagnitude;
         private System.Windows.Forms.Panel pnlExtinction;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.TextBox tbxHeightKm;
     }
 }
