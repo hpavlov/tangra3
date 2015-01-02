@@ -185,6 +185,10 @@ namespace Tangra.Controller
                         // Move to the first frame in the light curve
                         m_VideoController.MoveToFrame((int) lcFile.Header.MinFrame);
                     }
+
+                    TangraContext.Current.FileName = Path.GetFileName(fileName);
+                    TangraContext.Current.FileFormat = m_lcFile.Header.SourceInfo;
+                    m_VideoController.UpdateViews();
                 }
             }
             catch (IOException ioex)

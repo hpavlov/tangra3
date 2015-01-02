@@ -30,13 +30,12 @@
         {
             this.tabSettings = new System.Windows.Forms.TabControl();
             this.tabTime = new System.Windows.Forms.TabPage();
+            this.label2 = new System.Windows.Forms.Label();
             this.rbJulianDays = new System.Windows.Forms.RadioButton();
             this.rbDecimalDays = new System.Windows.Forms.RadioButton();
-            this.label1 = new System.Windows.Forms.Label();
             this.rbTimeString = new System.Windows.Forms.RadioButton();
             this.btnOK = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
-            this.label2 = new System.Windows.Forms.Label();
             this.tabSettings.SuspendLayout();
             this.tabTime.SuspendLayout();
             this.SuspendLayout();
@@ -55,20 +54,29 @@
             this.tabTime.Controls.Add(this.label2);
             this.tabTime.Controls.Add(this.rbJulianDays);
             this.tabTime.Controls.Add(this.rbDecimalDays);
-            this.tabTime.Controls.Add(this.label1);
             this.tabTime.Controls.Add(this.rbTimeString);
             this.tabTime.Location = new System.Drawing.Point(4, 22);
             this.tabTime.Name = "tabTime";
             this.tabTime.Padding = new System.Windows.Forms.Padding(3);
             this.tabTime.Size = new System.Drawing.Size(321, 146);
             this.tabTime.TabIndex = 0;
-            this.tabTime.Text = "Time";
+            this.tabTime.Text = "Timestamp Export";
             this.tabTime.UseVisualStyleBackColor = true;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(37, 40);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(173, 13);
+            this.label2.TabIndex = 4;
+            this.label2.Text = "(Default format supported by AOTA)";
             // 
             // rbJulianDays
             // 
             this.rbJulianDays.AutoSize = true;
-            this.rbJulianDays.Location = new System.Drawing.Point(27, 105);
+            this.rbJulianDays.Location = new System.Drawing.Point(18, 108);
             this.rbJulianDays.Name = "rbJulianDays";
             this.rbJulianDays.Size = new System.Drawing.Size(164, 17);
             this.rbJulianDays.TabIndex = 3;
@@ -78,27 +86,18 @@
             // rbDecimalDays
             // 
             this.rbDecimalDays.AutoSize = true;
-            this.rbDecimalDays.Location = new System.Drawing.Point(27, 81);
+            this.rbDecimalDays.Location = new System.Drawing.Point(18, 69);
             this.rbDecimalDays.Name = "rbDecimalDays";
             this.rbDecimalDays.Size = new System.Drawing.Size(259, 17);
             this.rbDecimalDays.TabIndex = 2;
             this.rbDecimalDays.Text = "Days with Decimals from 0 UT of First Frame Date";
             this.rbDecimalDays.UseVisualStyleBackColor = true;
             // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 9);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(109, 13);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "Export Timestamp As:";
-            // 
             // rbTimeString
             // 
             this.rbTimeString.AutoSize = true;
             this.rbTimeString.Checked = true;
-            this.rbTimeString.Location = new System.Drawing.Point(27, 36);
+            this.rbTimeString.Location = new System.Drawing.Point(18, 20);
             this.rbTimeString.Name = "rbTimeString";
             this.rbTimeString.Size = new System.Drawing.Size(145, 17);
             this.rbTimeString.TabIndex = 0;
@@ -126,16 +125,6 @@
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(46, 56);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(173, 13);
-            this.label2.TabIndex = 4;
-            this.label2.Text = "(Default format supported by AOTA)";
-            // 
             // frmConfigureCsvExport
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -162,7 +151,6 @@
         private System.Windows.Forms.TabPage tabTime;
         private System.Windows.Forms.RadioButton rbJulianDays;
         private System.Windows.Forms.RadioButton rbDecimalDays;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.RadioButton rbTimeString;
         private System.Windows.Forms.Button btnOK;
         private System.Windows.Forms.Button btnCancel;

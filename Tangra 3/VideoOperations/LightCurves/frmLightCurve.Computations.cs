@@ -648,17 +648,17 @@ namespace Tangra.VideoOperations.LightCurves
                     isBadTime = true;
                 }
                 else if (!m_LCFile.Footer.ReductionContext.HasEmbeddedTimeStamps
-                    /* If the times are entered by the user, only include the times for the frames enterred by the user*/)
+                    /* If the times are entered by the user, only include the times for the frames enterred by the user. Unless the calculated timing descrepency is small (m_TimestampDiscrepencyFlag = false) */)
                 {
                     timePrecisionSec = 0.01;
-                    isBadTime = true;
+                    isBadTime = m_TimestampDiscrepencyFlag;
                 }
 
 			    if (m_LCFile.Footer.ReductionContext.LightCurveReductionType == LightCurveReductionType.MutualEvent &&
 				    absoluteTimeError/500 < resolutionInSecs)
 				{
 					// Force export the time for mutual events where half the resolution is better than the absolute timing error 
-                    isBadTime = false;
+                    isBadTime = true;
 				}
 
 				for (int i = 0; i < count; i++)
@@ -669,9 +669,9 @@ namespace Tangra.VideoOperations.LightCurves
 				    string timeStr;
                     if (isBadTime)
 					{
-						if (i == m_Header.FirstTimedFrameNo)
+                        if (m_Header.FirstTimedFrameNo >= firstFrameNoInBin && m_Header.FirstTimedFrameNo <= firstFrameNoInBin + m_LightCurveController.Context.Binning)
 							timeStr = options.FormatTime(m_Header.FirstTimedFrameTime, timePrecisionSec);
-						else if (i == m_Header.LastTimedFrameNo)
+                        else if (m_Header.LastTimedFrameNo >= firstFrameNoInBin && m_Header.LastTimedFrameNo <= firstFrameNoInBin + m_LightCurveController.Context.Binning)
                             timeStr = options.FormatTime(m_Header.SecondTimedFrameTime, timePrecisionSec);
 						else
                             timeStr = options.FormatInvalidTime(timePrecisionSec);
@@ -728,10 +728,10 @@ namespace Tangra.VideoOperations.LightCurves
                     isBadTime = true;
                 }                    
                 else if (!m_LCFile.Footer.ReductionContext.HasEmbeddedTimeStamps
-                    /* If the times are entered by the user, only include the times for the frames enterred by the user*/)
+                    /* If the times are entered by the user, only include the times for the frames enterred by the user. Unless the calculated timing descrepency is small (m_TimestampDiscrepencyFlag = false) */)
                 {
                     timePrecisionSec = 0.01;
-                    isBadTime = true;                    
+                    isBadTime = m_TimestampDiscrepencyFlag;                    
                 }
                 else
                     timePrecisionSec = 0.001;
@@ -751,9 +751,9 @@ namespace Tangra.VideoOperations.LightCurves
 					{
                         if (currFrameTime == DateTime.MaxValue)
                             timeStr = "";
-                        else if (i == m_Header.FirstTimedFrameNo)
+                        else if (frameNo == m_Header.FirstTimedFrameNo)
                             timeStr = options.FormatTime(m_Header.FirstTimedFrameTime, timePrecisionSec);
-                        else if (i == m_Header.LastTimedFrameNo)
+                        else if (frameNo == m_Header.LastTimedFrameNo)
                             timeStr = options.FormatTime(m_Header.SecondTimedFrameTime, timePrecisionSec);
                         else
                             timeStr = options.FormatInvalidTime(timePrecisionSec);

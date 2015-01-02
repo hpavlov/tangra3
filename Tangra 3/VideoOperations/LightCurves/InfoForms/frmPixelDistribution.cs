@@ -26,6 +26,8 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 		private uint m_MaxBuckets = 255;
     	private int m_Bpp = 8;
 
+        private const int MAX_VALUES_FOR_BG_MEDIAN = 1000000;
+
     	private float m_BucketFactor = 1;
 
         internal frmPixelDistribution(List<List<LCMeasurement>> readings, uint maxPixelValue, int bpp)
@@ -88,7 +90,8 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 								m_Distribution[val]++;
 								sum++;
 
-								m_allBgValues.Add(val);
+                                if (m_allBgValues.Count < MAX_VALUES_FOR_BG_MEDIAN)
+								    m_allBgValues.Add(val);
 							}
 						}						
 					}
@@ -118,7 +121,8 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 								m_Distribution[bucket]++;
 								sum++;
 
-								m_allBgValues.Add(val);
+                                if (m_allBgValues.Count < MAX_VALUES_FOR_BG_MEDIAN)
+								    m_allBgValues.Add(val);
 							}
 						}
 					}
@@ -159,7 +163,9 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
                                 sum++;
 
                                 m_Distribution[mea.PixelData[x, y]]++;
-                                m_allBgValues.Add(mea.PixelData[x, y]);
+
+                                if (m_allBgValues.Count < MAX_VALUES_FOR_BG_MEDIAN)
+                                    m_allBgValues.Add(mea.PixelData[x, y]);
                             }
                         }
                     }
@@ -194,7 +200,8 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
                                 m_Distribution[bucket]++;
                                 sum++;
 
-                                m_allBgValues.Add(val);
+                                if (m_allBgValues.Count < MAX_VALUES_FOR_BG_MEDIAN)
+                                    m_allBgValues.Add(val);
                             }
                         }
                     }
