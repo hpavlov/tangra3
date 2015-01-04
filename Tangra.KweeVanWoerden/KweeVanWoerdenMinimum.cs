@@ -156,15 +156,15 @@ namespace Tangra.KweeVanWoerden
 
                 if (frm.VariableStarIndex == 0)
                 {
-                    dataWithBg = measurements.Select(x => (double) (x.Measurement + x.Background)).ToArray();
-                    dataBg = measurements.Select(x => (double) x.Background).ToArray();
+                    dataWithBg = measurements.Select(x => x.IsSuccessful ? (double)(x.Measurement + x.Background) : double.NaN).ToArray();
+                    dataBg = measurements.Select(x => x.IsSuccessful ? (double)x.Background : double.NaN).ToArray();
                 }
                 else
                 {
                     ISingleMeasurement[] altMeasurements = dataProvider.GetComparisonObjectMeasurements(frm.VariableStarIndex - 1);
 
-                    dataWithBg = altMeasurements.Select(x => (double)(x.Measurement + x.Background)).ToArray();
-                    dataBg = altMeasurements.Select(x => (double)x.Background).ToArray();                    
+                    dataWithBg = altMeasurements.Select(x => x.IsSuccessful ? (double)(x.Measurement + x.Background) : double.NaN).ToArray();
+                    dataBg = altMeasurements.Select(x => x.IsSuccessful ? (double)x.Background : double.NaN).ToArray();                    
                 }
 
 				DateTime[] timestamps = measurements.Select(x => x.Timestamp).ToArray();
@@ -203,13 +203,13 @@ namespace Tangra.KweeVanWoerden
 
                         if (frm.UseNormalisation)
                         {
-                            compDataWithBg = compMeasurements.Select(x => (double)(x.Measurement + x.Background)).ToArray();
-                            compBg = compMeasurements.Select(x => (double)x.Background).ToArray();
+                            compDataWithBg = compMeasurements.Select(x => x.IsSuccessful ? (double)(x.Measurement + x.Background) : double.NaN).ToArray();
+                            compBg = compMeasurements.Select(x => x.IsSuccessful ? (double)x.Background : double.NaN).ToArray();
                         }
                         else
                         {
-                            double compDataWithBgAverage = compMeasurements.Average(x => x.Measurement + x.Background);
-                            double compBgAverage = compMeasurements.Average(x => x.Background);
+                            double compDataWithBgAverage = compMeasurements.Average(x => x.IsSuccessful ? x.Measurement + x.Background : double.NaN);
+                            double compBgAverage = compMeasurements.Average(x => x.IsSuccessful ? x.Background : double.NaN);
                             compDataWithBg = compMeasurements.Select(x => compDataWithBgAverage).ToArray();
                             compBg = compMeasurements.Select(x => compBgAverage).ToArray();                            
                         }
@@ -220,33 +220,78 @@ namespace Tangra.KweeVanWoerden
 					    KweeVanWoerdenResult result;
 					    PolynomialFitResult polyResult;
 
+                        var times = new List<double>();
+                        var dataWithBgLst = new List<double>();
+                        var dataBgLst = new List<double>();
+                        var compDataWithBgLst = new List<double>();
+                        var compBgLst = new List<double>();
+
                         if (frm.IncludeDataFrom > 0 || frm.IncludeDataTo < dataWithBg.Length - 1)
                         {
+                            double[] timesAlt = new double[frm.IncludeDataTo - frm.IncludeDataFrom];
                             double[] dataWithBgAlt = new double[frm.IncludeDataTo - frm.IncludeDataFrom];
                             double[] dataBgAlt = new double[frm.IncludeDataTo - frm.IncludeDataFrom];
                             double[] compDataWithBgAlt = new double[frm.IncludeDataTo - frm.IncludeDataFrom];
                             double[] compBgAlt = new double[frm.IncludeDataTo - frm.IncludeDataFrom];
                             for (int i = frm.IncludeDataFrom; i < frm.IncludeDataTo; i++)
                             {
+                                timesAlt[i - frm.IncludeDataFrom] = secondsFromUTMidnight[i];
                                 dataWithBgAlt[i - frm.IncludeDataFrom] = dataWithBg[i];
                                 dataBgAlt[i - frm.IncludeDataFrom] = dataBg[i];
                                 compDataWithBgAlt[i - frm.IncludeDataFrom] = compDataWithBg[i];
                                 compBgAlt[i - frm.IncludeDataFrom] = compBg[i];
                             }
-                            result = Kwee_van_Woerden(dataWithBgAlt.Length, jdAtUtcMidnight, secondsFromUTMidnight, dataWithBgAlt, dataBgAlt, compDataWithBgAlt, compBgAlt);
-                            polyResult = PolynomialFit(dataWithBgAlt.Length, jdAtUtcMidnight, secondsFromUTMidnight, dataWithBgAlt, dataBgAlt, compDataWithBgAlt, compBgAlt);                            
+
+                            times.AddRange(timesAlt);
+                            dataWithBgLst.AddRange(dataWithBgAlt);
+                            dataBgLst.AddRange(dataBgAlt);
+                            compDataWithBgLst.AddRange(compDataWithBgAlt);
+                            compBgLst.AddRange(compBgAlt);
+
+                            RemoveInvalidMeasurements(times, dataWithBgLst, dataBgLst, compDataWithBgLst, compBgLst);               
                         }
                         else
                         {
-                            result = Kwee_van_Woerden(frameIds.Length, jdAtUtcMidnight, secondsFromUTMidnight, dataWithBg, dataBg, compDataWithBg, compBg);
-                            polyResult = PolynomialFit(frameIds.Length, jdAtUtcMidnight, secondsFromUTMidnight, dataWithBg, dataBg, compDataWithBg, compBg);                            
+                            times.AddRange(secondsFromUTMidnight);
+                            dataWithBgLst.AddRange(dataWithBg);
+                            dataBgLst.AddRange(dataBg);
+                            compDataWithBgLst.AddRange(compDataWithBg);
+                            compBgLst.AddRange(compBg);
+
+                            RemoveInvalidMeasurements(times, dataWithBgLst, dataBgLst, compDataWithBgLst, compBgLst);                          
                         }
+
+
+                        result = Kwee_van_Woerden(times.Count, jdAtUtcMidnight, times.ToArray(), dataWithBgLst.ToArray(), dataBgLst.ToArray(), compDataWithBgLst.ToArray(), compBgLst.ToArray());
+                        polyResult = PolynomialFit(times.Count, jdAtUtcMidnight, times.ToArray(), dataWithBgLst.ToArray(), dataBgLst.ToArray(), compDataWithBgLst.ToArray(), compBgLst.ToArray(), (int)result.Start_Light_Curve_Obs_Index, (int)result.Stop_Light_Curve_Obs_Index, result.Time_Of_Minimum);  
 
 						PresentResults(result, polyResult);
 					}
 				}
 			}
 		}
+
+        private void RemoveInvalidMeasurements(List<double> times, List<double> dataWithBg, List<double> dataBg, List<double> compDataWithBg, List<double> compBg)
+        {
+            var badDataIndexes = new List<int>();
+
+            for (int i = 0; i < dataWithBg.Count; i++) 
+                if (double.IsNaN(dataWithBg[i])) badDataIndexes.Add(i);
+            for (int i = 0; i < compDataWithBg.Count; i++)
+                if (double.IsNaN(dataWithBg[i])) badDataIndexes.Add(i);
+
+            var sortedIndexes = badDataIndexes.Distinct().ToList();
+            sortedIndexes.Sort((x, y) => y.CompareTo(x));
+
+            for (int i = 0; i < sortedIndexes.Count ; i++)
+            {
+                times.RemoveAt(sortedIndexes[i]);
+                dataWithBg.RemoveAt(sortedIndexes[i]);
+                dataBg.RemoveAt(sortedIndexes[i]);
+                compDataWithBg.RemoveAt(sortedIndexes[i]);
+                compBg.RemoveAt(sortedIndexes[i]);
+            }
+        }
 
 		private void PresentResults(KweeVanWoerdenResult result, PolynomialFitResult polyResult = null)
 		{
@@ -305,7 +350,7 @@ namespace Tangra.KweeVanWoerden
 
 			KweeVanWoerdenResult result = Kwee_van_Woerden(dataPoints, jdAtUtcMidnight, times, varStar, varSky, compStar, compSky);
 
-			PolynomialFitResult polyResult = PolynomialFit(dataPoints, jdAtUtcMidnight, times, varStar, varSky, compStar, compSky);
+            PolynomialFitResult polyResult = PolynomialFit(dataPoints, jdAtUtcMidnight, times, varStar, varSky, compStar, compSky, (int)result.Start_Light_Curve_Obs_Index, (int)result.Stop_Light_Curve_Obs_Index, result.Time_Of_Minimum);
 
 			PresentResults(result, polyResult);
 		}
@@ -400,7 +445,8 @@ namespace Tangra.KweeVanWoerden
 
 		private PolynomialFitResult PolynomialFit(long Number_Obs, double Time_First_JD, double[] SecondsFromTimeFirstJD,
 		                             double[] Variable_Star_DN, double[] Variable_Sky_DN, double[] Comparison_Star_DN,
-		                             double[] Comparison_Sky_DN)
+		                             double[] Comparison_Sky_DN,
+                                     int firstObsIndex, int lastObsIndex, double kweeVanWoerdenT0)
 		{
             // http://var2.astro.cz/library/1350745528_ebfit.pdf
             // TODO: Implement non linear least square for this equation
@@ -416,57 +462,47 @@ namespace Tangra.KweeVanWoerden
 			var rv = new PolynomialFitResult();
 			rv.TimePoints = new List<double>();
 
-			SafeMatrix A = new SafeMatrix((int)Number_Obs, 3);
-			SafeMatrix X = new SafeMatrix((int)Number_Obs, 1);
 
 			var dataPointsVar = new List<double>();
 			var dataPointsComp = new List<double>();
-			
-			for (int i = 0; i < Number_Obs; i++)
+
+            for (int i = 0; i < Number_Obs; i++)
 			{
-				double x = SecondsFromTimeFirstJD[i] / (24 * 3600);
                 double y = (Variable_Star_DN[i] - Variable_Sky_DN[i]) / (Comparison_Star_DN[i] - Comparison_Sky_DN[i]);
-				rv.TimePoints.Add(x);
+                if (i >= firstObsIndex && i < lastObsIndex)
+                {
+                    double x = SecondsFromTimeFirstJD[i] / (24 * 3600);
+                    rv.TimePoints.Add(x);
+                    dataPointsVar.Add(Variable_Star_DN[i] - Variable_Sky_DN[i]);
+                    dataPointsComp.Add(Comparison_Star_DN[i] - Comparison_Sky_DN[i]);                    
+                }
+
                 rv.DataPoints.Add(y);
-				dataPointsVar.Add(Variable_Star_DN[i] - Variable_Sky_DN[i]);
-				dataPointsComp.Add(Comparison_Star_DN[i] - Comparison_Sky_DN[i]);
-
-				A[i, 0] = x * x;
-				A[i, 1] = x;
-				A[i, 2] = 1;
-
-				X[i, 0] = y;
 			}
 
-			SafeMatrix a_T = A.Transpose();
-			SafeMatrix aa = a_T * A;
-			SafeMatrix aa_inv = aa.Inverse();
-			SafeMatrix bx = (aa_inv * a_T) * X;
+            var fitter = new ModelFitter(rv.TimePoints.Count, rv.TimePoints.ToArray(), dataPointsVar.ToArray(), dataPointsComp.ToArray());
+            fitter.Solve(true, kweeVanWoerdenT0);
 
-			rv.A = bx[0, 0];
-			rv.B = bx[1, 0];
-			rv.C = bx[2, 0];
+            for (int i = 0; i < Number_Obs; i++)
+            {
+                if (i >= firstObsIndex && i < lastObsIndex)
+                    rv.FittedValues.Add(fitter.NormIntensities[i]);
+                else
+                    rv.FittedValues.Add(double.NaN);
+            }
 
-			for (int i = 0; i < Number_Obs; i++)
-			{
-				rv.FittedValues.Add(rv.A * rv.TimePoints[i] * rv.TimePoints[i] + rv.B * rv.TimePoints[i] + rv.C);
-			}
-
-			rv.Time_Of_Minimum_JD = Time_First_JD - rv.B / (2 * rv.A);
-			//rv.Time_Of_Minimum_Uncertainty = Math.Sqrt((4.0 * rv.A * rv.C - rv.B * rv.B) / (4.0 * rv.A * rv.A) / ((float)Normal_Points / 4.0 - 1.0));
-
-			var fitter = new ModelFitter((int)Number_Obs, rv.TimePoints.ToArray(), dataPointsVar.ToArray(), dataPointsComp.ToArray());
-			fitter.Solve(true, -rv.B / (2 * rv.A));
-
-			for (int i = 0; i < fitter.Times.Count; i++)
-			{
-				rv.FittedValuesNonL.Add(fitter.NormIntensities[i]);
-			}
 			rv.G = fitter.G;
 			rv.M0 = fitter.M0;
-			rv.CC = fitter.C;
+			rv.C = fitter.C;
 			rv.D = fitter.D;
 			rv.T0 = fitter.T0;
+
+		    rv.StartIndex = firstObsIndex;
+            rv.StopIndex = lastObsIndex;
+
+            rv.Time_Of_Minimum_JD = Time_First_JD + fitter.T0;
+		    rv.Time_Of_Minimum_Uncertainty = 0; // Math.Sqrt((4.0 * rv.A * rv.C - rv.B * rv.B) / (4.0 * rv.A * rv.A) / ((float)(rv.TimePoints.Count / 4.0 - 1.0)));
+
 			return rv;
 		}
 
@@ -540,6 +576,8 @@ namespace Tangra.KweeVanWoerden
 					Comparison_Sky_DN[i].ToString("#########0.000000").PadLeft(20));
 			}
 
+		    bool hasEmptyBins = false;
+
 			/* Compute normal point times and luminosities */
 			Time_Interval = ( Time[Number_Obs - 1] - Time[0] ) / (float)Normal_Points;
 			for (i = 0; i < Normal_Points; i++) 
@@ -561,15 +599,56 @@ namespace Tangra.KweeVanWoerden
 				if ( Luminosity_Normal_Count > 0 ) 
 				{
 					Luminosity_Normal[i] = Luminosity_Normal_Sum / (float)Luminosity_Normal_Count;
+                    rv.Normals_File.Add(Time_Normal[i].ToString("#########0.000000").PadLeft(20) + " " + Luminosity_Normal[i].ToString("#########0.000000").PadLeft(20));
 				}
-				else 
+				else
 				{
-					rv.ErrorMessage = string.Format("Bad value for Luminosity_Normal_Count[{0}] = {1}", i, Luminosity_Normal_Count);
-					return rv;
+				    hasEmptyBins = true;
+				    Luminosity_Normal[i] = double.NaN;
 				}
-
-				rv.Normals_File.Add(Time_Normal[i].ToString("#########0.000000").PadLeft(20) + " " + Luminosity_Normal[i].ToString("#########0.000000").PadLeft(20));
 			}
+
+            if (hasEmptyBins)
+            {
+                for (i = 0; i < Normal_Points; i++)
+                {
+                    bool isEmptyBin = double.IsNaN(Luminosity_Normal[i]);
+                    if (isEmptyBin)
+                    {
+                        double? prevBin2 = i <= 1 ? (double?)null : Luminosity_Normal[i - 2];
+                        double? prevBin = i == 0 ? (double?) null : Luminosity_Normal[i - 1];
+                        var emptyBins = new List<double>();
+                        long k = i;
+                        while (k < Normal_Points && double.IsNaN(Luminosity_Normal[k]))
+                        {
+                            k++;
+                            emptyBins.Add(double.NaN);
+                        }
+                        double? nextBin = k == Normal_Points ? (double?)null : Luminosity_Normal[k];
+                        double? nextBin2 = k + 1 < Normal_Points ? (double?)null : Luminosity_Normal[k + 1];
+
+                        if ((prevBin == null && nextBin2 == null) || (prevBin2 == null && nextBin == null))
+                        {
+                            rv.ErrorMessage = "Too many empty bins!";
+                            return rv;
+                        }
+
+                        double step = 0;
+                        if (prevBin == null)
+                            step = nextBin2.Value - nextBin.Value;
+                        else if (nextBin == null)
+                            step = prevBin.Value - prevBin2.Value;
+                        else
+                            step = (nextBin.Value - prevBin.Value) / (1 + emptyBins.Count);
+
+
+                        for (int l = 0; l < emptyBins.Count; l++)
+                        {
+                            Luminosity_Normal[i + l] = prevBin.Value + l * step;
+                        }
+                    }
+                }
+            }
 
 		    rv.Buckets.Clear();
             rv.Buckets.AddRange(Luminosity_Normal);
@@ -596,6 +675,18 @@ namespace Tangra.KweeVanWoerden
 
 		    rv.Start_Light_Curve = Start_Light_Curve;
             rv.Stop_Light_Curve = Stop_Light_Curve;
+
+            double startTime = Time[0] + Start_Light_Curve * Time_Interval;
+            double stopTime = Time[0] + (Stop_Light_Curve + 1) * Time_Interval;
+            long startIndex = 0;
+		    long stopIndex = Number_Obs - 1;
+		    for (int k = 0; k < Number_Obs; k++)
+		    {
+                if (Start_Light_Curve > 0 && Time[k] <= startTime) startIndex = k + 1;
+                if (Stop_Light_Curve < Number_Obs - 1 && k > 1 && Time[k] > stopTime && Time[k - 1] < stopTime) stopIndex = k - 1;
+		    }
+		    rv.Start_Light_Curve_Obs_Index = startIndex;
+            rv.Stop_Light_Curve_Obs_Index = stopIndex;
 
 			/* Compute the normalized sums of squares of luminosity differences across an array of times */
 			Start_Sum_Squares = Start_Light_Curve + 1;
@@ -683,21 +774,20 @@ namespace Tangra.KweeVanWoerden
 
 		internal class PolynomialFitResult
 		{
-			public double A;
-			public double B;
-			public double C;
 			public double Time_Of_Minimum_JD;
 			public double Time_Of_Minimum_Uncertainty;
 			public List<double> TimePoints = new List<double>();
             public List<double> DataPoints = new List<double>();
 			public List<double> FittedValues = new List<double>();
-			public List<double> FittedValuesNonL = new List<double>();
 
 			public double M0 { get; set; }
-			public double CC { get; set; }
+			public double C { get; set; }
 			public double T0 { get; set; }
 			public double D { get; set; }
 			public double G { get; set; }
+
+		    public int StartIndex;
+            public int StopIndex;
 		}
 
 		internal class KweeVanWoerdenResult
@@ -722,6 +812,9 @@ namespace Tangra.KweeVanWoerden
 		    public long Start_Light_Curve;
             public long Stop_Light_Curve;
 			public long Sum_Of_Squares_Smallest_Index;
+
+		    public long Start_Light_Curve_Obs_Index;
+		    public long Stop_Light_Curve_Obs_Index;
 		}
 	}
 }

@@ -23,6 +23,11 @@ namespace Tangra.KweeVanWoerden
 			InitializeComponent();
 		}
 
+        public override object InitializeLifetimeService()
+        {
+            // The lifetime of the object is managed by the add-in
+            return null;
+        }
 
 		private void btnSaveFiles_Click(object sender, EventArgs e)
 		{
@@ -86,13 +91,23 @@ namespace Tangra.KweeVanWoerden
                 double maxVal = PolyResults.DataPoints.Max();
                 double minVal = PolyResults.DataPoints.Min();
 
+                double maxPoly = PolyResults.FittedValues.Where(x => !double.IsNaN(x)).Max();
+                double minPoly = PolyResults.FittedValues.Where(x => !double.IsNaN(x)).Min();
+                float polyCoeff = (float)((maxVal - minVal) / (maxPoly - minPoly));
+
                 float yScale = (float)((picGraphPoly.Height - 2) * 1.0f / (maxVal - minVal));
 
                 for (int i = 0; i < PolyResults.FittedValues.Count - 1; i++)
                 {
-                    g.FillRectangle(Brushes.OrangeRed, xScale * i, picGraphPoly.Height - 2 - yScale * (float)(PolyResults.FittedValues[i] - minVal), xScale, 2);
-					g.FillRectangle(Brushes.Yellow, xScale * i, picGraphPoly.Height - 2 - yScale * (float)(ComputeModelValue(PolyResults.TimePoints[i]) - minVal), xScale, 2);
-                    g.FillRectangle(Brushes.Aqua, xScale * i, picGraphPoly.Height - 2 - yScale * (float)(PolyResults.DataPoints[i] - minVal), xScale, 2);
+                    if (!double.IsNaN(PolyResults.FittedValues[i]))
+                    {
+                        g.FillRectangle(Brushes.OrangeRed, xScale * i, picGraphPoly.Height - 2 - yScale * polyCoeff * (float)(PolyResults.FittedValues[i] - minPoly), xScale, 2);
+
+                        if (i >= PolyResults.StartIndex && i < PolyResults.StopIndex)
+                            g.FillRectangle(Brushes.Yellow, xScale * i, picGraphPoly.Height - 2 - yScale * polyCoeff * (float)(ComputeModelValue(PolyResults.TimePoints[i - PolyResults.StartIndex]) - minPoly), xScale, 2);
+                    }
+
+                    g.FillRectangle(Brushes.Aqua, xScale * i, picGraphPoly.Height - 2 - yScale * (float)(PolyResults.DataPoints[i] - minVal), xScale, 2);     
                 }
 
                 g.Save();
@@ -103,7 +118,7 @@ namespace Tangra.KweeVanWoerden
 
 		private double ComputeModelValue(double t)
 		{
-			double magVal = PolyResults.M0 + PolyResults.CC * (1 - Math.Pow(1 - Math.Exp(1 - Math.Cosh((t - PolyResults.T0) / PolyResults.D)), PolyResults.G));
+			double magVal = PolyResults.M0 + PolyResults.C * (1 - Math.Pow(1 - Math.Exp(1 - Math.Cosh((t - PolyResults.T0) / PolyResults.D)), PolyResults.G));
 			return Math.Pow(10, (10 - magVal)/2.5);
 		}
 
