@@ -209,13 +209,15 @@ namespace Tangra.VideoOperations.LightCurves
 	            int binnedBackgroundSum = 0;
                 int binnedSuccessfulReadings = 0;
                 int binNo = 1;
+                int delta_bin_ref_frame = m_LightCurveController.Context.Binning - (m_LightCurveController.Context.BinningFirstFrame - (int)m_LightCurveController.Context.MinFrame);
+
                 BinnedValue binnedValue = new BinnedValue();
                 binnedValue.ReadingIndexFrom = 0;
                 binnedValue.BinNo = binNo;
 
                 foreach (LCMeasurement reading in m_LightCurveController.Context.AllReadings[i])
                 {
-                    if (idx % m_LightCurveController.Context.Binning == 0)
+                    if ((idx + delta_bin_ref_frame) % m_LightCurveController.Context.Binning == 0)
                     {
                         binnedValue.TotalSum = binnedSum;
 	                    binnedValue.TotalBackgroundSum = binnedBackgroundSum;
@@ -667,7 +669,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 			    if (options.PhotometricFormat == PhotometricFormat.Magnitudes && atmExtCalc != null)
 			    {
-			        output.Append(", Atmospheric Extinction");
+			        output.Append(", Atmospheric Extinction, Altitude (deg), Air Mass");
 			    }
 
 			    output.AppendLine();
@@ -706,8 +708,10 @@ namespace Tangra.VideoOperations.LightCurves
                     if (options.PhotometricFormat == PhotometricFormat.Magnitudes && atmExtCalc != null &&
                         middleBinTime != DateTime.MinValue && middleBinTime != DateTime.MaxValue)
                     {
-                        double extinction = atmExtCalc.CalculateExtinction(middleBinTime);
-                        output.AppendFormat(",{0}", extinction.ToString("0.000"));
+                        double altitudeDeg;
+                        double airMass;
+                        double extinction = atmExtCalc.CalculateExtinction(middleBinTime, out altitudeDeg, out airMass);
+                        output.AppendFormat(",{0},{1},{2}", extinction.ToString("0.000"), altitudeDeg.ToString("0.0"), airMass.ToString("0.0000"));
                     }
 
 					output.AppendLine();
@@ -751,7 +755,7 @@ namespace Tangra.VideoOperations.LightCurves
 
                 if (options.PhotometricFormat == PhotometricFormat.Magnitudes && atmExtCalc != null)
                 {
-                    output.Append(", Atmospheric Extinction");
+                    output.Append(", Atmospheric Extinction, Altitude (deg), Air Mass");
                 }
                 output.AppendLine();
 
@@ -796,8 +800,10 @@ namespace Tangra.VideoOperations.LightCurves
                     if (options.PhotometricFormat == PhotometricFormat.Magnitudes && atmExtCalc != null &&
                         currFrameTime != DateTime.MinValue && currFrameTime != DateTime.MaxValue)
                     {
-                        double extinction = atmExtCalc.CalculateExtinction(currFrameTime);
-                        output.AppendFormat(",{0}", extinction.ToString("0.000"));
+                        double altitudeDeg;
+                        double airMass;
+                        double extinction = atmExtCalc.CalculateExtinction(currFrameTime, out altitudeDeg, out airMass);
+                        output.AppendFormat(",{0},{1},{2}", extinction.ToString("0.000"), altitudeDeg.ToString("0.0"), airMass.ToString("0.0000"));
                     }
 
 					output.AppendLine();

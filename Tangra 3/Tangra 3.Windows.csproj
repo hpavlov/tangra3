@@ -312,6 +312,13 @@
     <Compile Include="VideoOperations\LightCurves\frmConfirmDay.Designer.cs">
       <DependentUpon>frmConfirmDay.cs</DependentUpon>
     </Compile>
+    <Compile Include="VideoOperations\LightCurves\frmDefineBinning.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\frmDefineBinning.Designer.cs">
+      <DependentUpon>frmDefineBinning.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\Helpers\LCFileImagePixelProvider.cs" />
     <Compile Include="VideoOperations\LightCurves\InfoForms\frmSetReferenceMag.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -427,12 +434,6 @@
     </Compile>
     <Compile Include="VideoOperations\LightCurves\frmConfigureReprocessing.Designer.cs">
       <DependentUpon>frmConfigureReprocessing.cs</DependentUpon>
-    </Compile>
-    <Compile Include="VideoOperations\LightCurves\frmCustomBinning.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="VideoOperations\LightCurves\frmCustomBinning.Designer.cs">
-      <DependentUpon>frmCustomBinning.cs</DependentUpon>
     </Compile>
     <Compile Include="VideoOperations\LightCurves\frmEditLcDataSeries.cs">
       <SubType>Form</SubType>
@@ -601,6 +602,12 @@
     <Compile Include="Video\AstroDigitalVideo\UI\AdvTagValuePair.cs" />
     <Compile Include="Video\BMPFileSequenceStream.cs" />
     <Compile Include="Video\FITSFileSequenceStream.cs" />
+    <Compile Include="Video\frmIntegrationDetection.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Video\frmIntegrationDetection.Designer.cs">
+      <DependentUpon>frmIntegrationDetection.cs</DependentUpon>
+    </Compile>
     <Compile Include="Video\SERVideoStream.cs" />
     <Compile Include="Video\SER\frmEnterSERFileInfo.cs">
       <SubType>Form</SubType>
@@ -715,6 +722,9 @@
     <EmbeddedResource Include="VideoOperations\LightCurves\frmConfirmDay.resx">
       <DependentUpon>frmConfirmDay.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\frmDefineBinning.resx">
+      <DependentUpon>frmDefineBinning.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\LightCurves\InfoForms\frmSetReferenceMag.resx">
       <DependentUpon>frmSetReferenceMag.cs</DependentUpon>
     </EmbeddedResource>
@@ -769,9 +779,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\LightCurves\frmConfigureReprocessing.resx">
       <DependentUpon>frmConfigureReprocessing.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="VideoOperations\LightCurves\frmCustomBinning.resx">
-      <DependentUpon>frmCustomBinning.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\LightCurves\frmEditLcDataSeries.resx">
       <DependentUpon>frmEditLcDataSeries.cs</DependentUpon>
@@ -829,6 +836,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Video\AstroDigitalVideo\frmAdvViewer.resx">
       <DependentUpon>frmAdvViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Video\frmIntegrationDetection.resx">
+      <DependentUpon>frmIntegrationDetection.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Video\frmJumpToFrame.resx">
       <DependentUpon>frmJumpToFrame.cs</DependentUpon>

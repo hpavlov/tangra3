@@ -44,6 +44,7 @@ namespace Tangra.Addins
             }
 
             IsCorrectedForInstrumentalDelay = lcFile.Header.InstrumentalDelayCorrectionsNotRequired() || !string.IsNullOrEmpty(isCorrectedForInstrumentalDelay);
+            IsSuccessful = lcMeasurement.IsSuccessfulReading;
 		}
 
         internal SingleMeasurement(frmLightCurve.BinnedValue binnedMeasurement, int targetNo, double binMiddleFrameNo, LCFile lcFile, bool dontIncludeTimes)
@@ -65,6 +66,7 @@ namespace Tangra.Addins
             }
 
             IsCorrectedForInstrumentalDelay = lcFile.Header.InstrumentalDelayCorrectionsNotRequired() || !string.IsNullOrEmpty(isCorrectedForInstrumentalDelay);
+            IsSuccessful = binnedMeasurement.IsSuccessfulReading;
 		}
 
 		public int CurrFrameNo { get; private set; }
@@ -78,5 +80,7 @@ namespace Tangra.Addins
         public DateTime Timestamp { get; private set; }
 
         public bool IsCorrectedForInstrumentalDelay { get; private set; }
+
+        public bool IsSuccessful { get; private set; }
 	}
 }

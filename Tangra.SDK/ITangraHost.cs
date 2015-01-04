@@ -59,6 +59,7 @@ namespace Tangra.SDK
 		float Background { get; }
         DateTime Timestamp { get; }
         bool IsCorrectedForInstrumentalDelay { get; }
+        bool IsSuccessful { get; }
 	}
 
     public interface ITangraDrawingSettings

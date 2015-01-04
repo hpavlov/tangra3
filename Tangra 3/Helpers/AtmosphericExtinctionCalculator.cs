@@ -43,17 +43,19 @@ namespace Tangra.Helpers
             return Z_Radians * 180 / Math.PI;
         }
 
-        public double CalculateExtinction(DateTime time)
+        public double CalculateExtinction(DateTime time, out double altitudeDeg, out double airMass)
         {
             double A_OZ = 0.016;
             double A_RAY = 0.1451 * Math.Exp(-HeightKm / 7.996);
             double A_AER = 0.120 * Math.Exp(-HeightKm / 1.5);
 
-            double Z_Radians = CalculateZenithAngle(time) * DEG_TO_RAD;
+            double zenithAngleDeg = CalculateZenithAngle(time);
+            double Z_Radians =  zenithAngleDeg * DEG_TO_RAD;
 
-            double AirMass = 1 / (Math.Cos(Z_Radians) + 0.025 * Math.Exp(-11 * Math.Cos(Z_Radians)));
+            airMass = 1 / (Math.Cos(Z_Radians) + 0.025 * Math.Exp(-11 * Math.Cos(Z_Radians)));
+            altitudeDeg = 90 - zenithAngleDeg;
 
-            return AirMass * (A_OZ + A_RAY + A_AER);
+            return airMass * (A_OZ + A_RAY + A_AER);
         }
     }
 }

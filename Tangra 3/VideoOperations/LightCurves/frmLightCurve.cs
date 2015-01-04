@@ -318,14 +318,6 @@ namespace Tangra.VideoOperations.LightCurves
             sbZoomStartFrame.Minimum = (int)m_Header.MinFrame;
             sbZoomStartFrame.Maximum = (int)m_Header.MaxFrame;
 
-			if (m_Footer.ReductionContext.FrameIntegratingMode == FrameIntegratingMode.SteppedAverage &&
-				m_Footer.ReductionContext.NumberFramesToIntegrate > 1)
-			{
-				object miPreDefBinning = SetBinning(m_Footer.ReductionContext.NumberFramesToIntegrate);
-				if (miPreDefBinning != null)
-					BinningMenuItemChecked(miPreDefBinning, EventArgs.Empty);
-			}
-
             // Mark it dirty so the values are computed for the first time
             m_LightCurveController.Context.MarkDirtyNoFullReprocessing();
 
@@ -787,21 +779,44 @@ namespace Tangra.VideoOperations.LightCurves
 				return;
 			}
 
-			if (sender == miCustomBinning)
-			{
-				frmCustomBinning frmCustomBinning = new frmCustomBinning();
-				frmCustomBinning.nudNumFramesToBin.Value = m_LightCurveController.Context.Binning;
-				if (frmCustomBinning.ShowDialog(this) == DialogResult.OK)
-				{
-					int userBins = (int)frmCustomBinning.nudNumFramesToBin.Value;
+            int selectedBins = m_LightCurveController.Context.Binning;
+            m_LightCurveController.Context.BinningFirstFrame = (int)m_LCFile.Header.MinFrame;
 
-					sender = SetBinning(userBins);
+            if (sender == miNoBinning)
+                selectedBins = 0;
+            else if (sender == miBinning4)
+                selectedBins = 4;
+            else if (sender == miBinning8)
+                selectedBins = 8;
+            else if (sender == miBinning16)
+                selectedBins = 16;
+            else if (sender == miBinning32)
+                selectedBins = 32;
+            else if (sender == miBinning64)
+                selectedBins = 64;
+            
+            
+            if (sender == miCustomBinning ||
+                (m_LCFile.Header.GetVideoFileFormat() == VideoFileFormat.AVI && selectedBins > 0))
+			{
+                var frm = new frmDefineBinning();
+                frm.LCFile = m_LCFile;
+			    frm.nudNumFramesToBin.Value = selectedBins;
+                if (frm.ShowDialog(this)== DialogResult.OK)
+				{
+                    selectedBins = (int)frm.nudNumFramesToBin.Value;
+                    int referenceFrame = (int)frm.nudReferenceFrame.Value;
+                    while (referenceFrame > m_LCFile.Header.MinFrame + selectedBins) referenceFrame -= selectedBins;
+
+                    m_LightCurveController.Context.BinningFirstFrame = referenceFrame;
+
+                    SetBinning(selectedBins);
 				}
 				else
 					return;
 			}
 
-            if (sender == miNoBinning)
+            if (selectedBins == 0)
             {
                 miNoBinning.Checked = true;
                 miBinning4.Checked = false;
@@ -814,7 +829,7 @@ namespace Tangra.VideoOperations.LightCurves
                 m_LightCurveController.Context.Binning = 0;
                 tslblBinning.Text = "No Binning";
             }
-            else if (sender == miBinning4)
+            else if (selectedBins == 4)
             {
                 miNoBinning.Checked = false;
                 miBinning4.Checked = true;
@@ -827,7 +842,7 @@ namespace Tangra.VideoOperations.LightCurves
                 m_LightCurveController.Context.Binning = 4;
                 tslblBinning.Text = "Binning 4 Frames";
             }
-            else if (sender == miBinning8)
+            else if (selectedBins == 8)
             {
                 miNoBinning.Checked = false;
                 miBinning4.Checked = false;
@@ -840,7 +855,7 @@ namespace Tangra.VideoOperations.LightCurves
                 m_LightCurveController.Context.Binning = 8;
                 tslblBinning.Text = "Binning 8 Frames";
             }
-            else if (sender == miBinning16)
+            else if (selectedBins == 16)
             {
                 miNoBinning.Checked = false;
                 miBinning4.Checked = false;
@@ -853,7 +868,7 @@ namespace Tangra.VideoOperations.LightCurves
                 m_LightCurveController.Context.Binning = 16;
                 tslblBinning.Text = "Binning 16 Frames";
             }
-            else if (sender == miBinning32)
+            else if (selectedBins == 32)
             {
                 miNoBinning.Checked = false;
                 miBinning4.Checked = false;
@@ -866,7 +881,7 @@ namespace Tangra.VideoOperations.LightCurves
                 m_LightCurveController.Context.Binning = 32;
                 tslblBinning.Text = "Binning 32 Frames";
             }
-            else if (sender == miBinning64)
+            else if (selectedBins == 64)
             {
                 miNoBinning.Checked = false;
                 miBinning4.Checked = false;

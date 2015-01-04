@@ -65,6 +65,7 @@ namespace Tangra.Controller
 		private bool m_RequiresFullReprocessing = false;
 		private ProcessingType m_ProcessingType = ProcessingType.SignalMinusBackground;
 		private int m_Binning = 0;
+	    private int m_BinningFirstFrame = 0;
 		private int m_Normalisation = -1;
 		private FilterType m_Filter = FilterType.NoFilter;
 		private NormalisationMethod m_NormMethod = NormalisationMethod.Average4Frame;
@@ -192,6 +193,19 @@ namespace Tangra.Controller
 				}
 			}
 		}
+
+	    public int BinningFirstFrame
+	    {
+            get { return m_BinningFirstFrame; }
+			set
+			{
+                if (m_BinningFirstFrame != value)
+				{
+                    m_BinningFirstFrame = value;
+					m_Dirty = true;
+				}
+			}
+	    }
 
 		public int Binning
 		{
