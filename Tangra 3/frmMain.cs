@@ -114,6 +114,12 @@ namespace Tangra
 			{ }			
 		}
 
+        public override object InitializeLifetimeService()
+        {
+            // The lifetime of the object is managed by Tangra
+            return null;
+        }
+
 		#region Frame Rendering
 
 		private RenderFrameContext m_LastFrameContext = RenderFrameContext.Empty;

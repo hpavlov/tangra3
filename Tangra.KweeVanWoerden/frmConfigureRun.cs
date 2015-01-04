@@ -42,6 +42,12 @@ namespace Tangra.KweeVanWoerden
             InitializeComponent();
         }
 
+        public override object InitializeLifetimeService()
+        {
+            // The lifetime of the object is managed by the add-in
+            return null;
+        }
+
         private void frmConfigureRun_Load(object sender, EventArgs e)
         {
             ITangraDrawingSettings settings = DataProvider.GetTangraDrawingSettings();
@@ -90,7 +96,7 @@ namespace Tangra.KweeVanWoerden
 			tbarTo.Maximum = ToFrameNo;
 			tbarTo.Value = ToFrameNo;
 
-	        m_DisplayData = TargetData.Select(x => x.Measurement).ToArray();
+	        m_DisplayData = TargetData.Where(x => x.IsSuccessful).Select(x => x.Measurement).ToArray();
 
             IncludeDataFrom = 0;
             IncludeDataTo = m_DisplayData.Length - 1;

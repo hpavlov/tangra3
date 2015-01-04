@@ -199,7 +199,7 @@ namespace Tangra.Video
 				lblCertainty.Text = "N/A";
 
 				btnAccept.Visible = false;
-				btnReject.Text = "Cancel";
+				btnReject.Text = "Close";
 			}
 		}
 

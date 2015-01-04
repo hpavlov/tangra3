@@ -22,6 +22,12 @@ namespace Tangra.KweeVanWoerden
 			InitializeComponent();
 		}
 
+        public override object InitializeLifetimeService()
+        {
+            // The lifetime of the object is managed by the add-in
+            return null;
+        }
+
 		internal void SetSettings(KweeVanWoerdenAddinSettings settings)
 		{
 			m_Settings = settings;

@@ -23,6 +23,12 @@ namespace Tangra.KweeVanWoerden
             TimeCorrectionHJD = double.NaN;
         }
 
+        public override object InitializeLifetimeService()
+        {
+            // The lifetime of the object is managed by the add-in
+            return null;
+        }
+
         private void frmHJDCalculation_Load(object sender, EventArgs e)
         {
             dateTimePicker.Value = AstroUtilities.JDToDateTimeUtc(TimeOfMinimumJD).Date;
