@@ -490,31 +490,76 @@ namespace Tangra.VideoOperations.LightCurves
 					if (i != m_Header.MinAdjustedReading)
 						g.DrawLine(m_DisplaySettings.GridLinesPen, m_MinX, y, m_MaxX, y);
 				}
+
+                string labelFlux = "Flux";
+                SizeF labelFluxSize = g.MeasureString(labelFlux, s_AxisFont);
+
+                g.DrawString(labelFlux, s_AxisFont, m_DisplaySettings.LabelsBrush, m_MinX - labelFluxSize.Width, m_MinY - labelFluxSize.Height);
 			}
 
 			g.DrawLine(m_DisplaySettings.GridLinesPen, m_MinX, m_MinY, m_MaxX, m_MinY);
 
 			if (m_DisplaySettings.DrawGrid)
 			{
-				interval = GetXAxisInterval(g);
+			    if (m_LightCurveController.Context.XAxisLabels == LightCurveContext.XAxisMode.FrameNo)
+			    {
+                    interval = GetXAxisInterval(g);
 
-				uint firstMark = interval * (1 + m_MinDisplayedFrame / interval);
+                    uint firstMark = interval * (1 + m_MinDisplayedFrame / interval);
 
-				for (uint i = firstMark; i <= m_MaxDisplayedFrame; i += interval)
-				{
-					string label = i.ToString();
-					SizeF labelSize = g.MeasureString(label, s_AxisFont);
+                    for (uint i = firstMark; i <= m_MaxDisplayedFrame; i += interval)
+                    {
+                        string label = i.ToString();
+                        SizeF labelSize = g.MeasureString(label, s_AxisFont);
 
-					long currAxisPosTicks = m_Header.GetTimeForFrameFromFrameTiming(i, true).Ticks;
-					float x = m_MinX + (currAxisPosTicks - m_MinDisplayedFrameTimestampTicks) * m_TimestampScaleX;
-					float y = m_MaxY + 5;
+                        long currAxisPosTicks = m_Header.GetTimeForFrameFromFrameTiming(i, true).Ticks;
+                        float x = m_MinX + (currAxisPosTicks - m_MinDisplayedFrameTimestampTicks) * m_TimestampScaleX;
+                        float y = m_MaxY + 5;
 
-					if (firstMark != m_MinDisplayedFrame && x < m_MaxX)
-					{
-						g.DrawString(label, s_AxisFont, m_DisplaySettings.LabelsBrush, x - labelSize.Width / 2, y);
-						g.DrawLine(m_DisplaySettings.GridLinesPen, x, m_MinY, x, m_MaxY);
-					}
-				}
+                        if (firstMark != m_MinDisplayedFrame && x < m_MaxX)
+                        {
+                            g.DrawString(label, s_AxisFont, m_DisplaySettings.LabelsBrush, x - labelSize.Width / 2, y);
+                            g.DrawLine(m_DisplaySettings.GridLinesPen, x + 1, m_MinY, x + 1, m_MaxY);
+                        }
+                    }
+			    }
+                else if (m_LightCurveController.Context.XAxisLabels == LightCurveContext.XAxisMode.Time)
+                {
+                    interval = GetXAxisTimeInterval(g);
+                    DateTime? firstTime = m_Header.GetFrameTime(m_MinDisplayedFrame);
+                    if (firstTime.HasValue)
+                    {
+                        DateTime? frame1 = m_Header.GetFrameTime(m_MinDisplayedFrame);
+
+                        for (uint i = m_MinDisplayedFrame + 1; i < m_MaxDisplayedFrame; i++)
+                        {
+                            DateTime? frame2 = m_Header.GetFrameTime(i + 1);
+
+                            if (frame1.HasValue && frame2.HasValue)
+                            {
+                                if ((int)(new TimeSpan(frame2.Value.Ticks - frame2.Value.Date.Ticks).TotalSeconds / interval) >
+                                    (int)(new TimeSpan(frame1.Value.Ticks - frame1.Value.Date.Ticks).TotalSeconds / interval))
+                                {
+                                    string label = interval < 60 ? frame2.Value.ToString("HH:mm:ss") : frame2.Value.ToString("HH:mm");
+                                    SizeF labelSize = g.MeasureString(label, s_AxisFont);
+
+                                    long currAxisPosTicks = m_Header.GetTimeForFrameFromFrameTiming(i + 1, true).Ticks;
+                                    float x = m_MinX + (currAxisPosTicks - m_MinDisplayedFrameTimestampTicks) * m_TimestampScaleX;
+                                    float y = m_MaxY + 5;
+
+                                    g.DrawLine(m_DisplaySettings.GridLinesPen, x + 1, m_MinY, x + 1, m_MaxY);
+
+                                    if (x + labelSize.Width / 2 < m_MaxX)
+                                        g.DrawString(label, s_AxisFont, m_DisplaySettings.LabelsBrush, x - labelSize.Width / 2, y);
+                                }
+                            }
+
+                            frame1 = frame2;
+                        }
+
+                        g.DrawString("UT", s_AxisFont, m_DisplaySettings.LabelsBrush, m_MaxX, m_MaxY + 5);
+                    }
+                }
 			}
 
 			g.DrawLine(m_DisplaySettings.GridLinesPen, m_MaxX, m_MinY, m_MaxX, m_MaxY);
@@ -548,6 +593,11 @@ namespace Tangra.VideoOperations.LightCurves
                     if (i != m_Header.MinAdjustedReading)
                         g.DrawLine(m_DisplaySettings.GridLinesPen, m_MinX, y, m_MaxX, y);
                 }
+
+                string labelFlux = "Flux";
+                SizeF labelFluxSize = g.MeasureString(labelFlux, s_AxisFont);
+
+                g.DrawString(labelFlux, s_AxisFont, m_DisplaySettings.LabelsBrush, m_MinX - labelFluxSize.Width, m_MinY - labelFluxSize.Height);
             }
 
             g.DrawLine(m_DisplaySettings.GridLinesPen, m_MinX, m_MinY, m_MaxX, m_MinY);
@@ -569,14 +619,45 @@ namespace Tangra.VideoOperations.LightCurves
 
 						if (firstMark != m_MinDisplayedFrame && x < m_MaxX)
 						{
-							g.DrawString(label, s_AxisFont, m_DisplaySettings.LabelsBrush, x - labelSize.Width / 2, y);
-							g.DrawLine(m_DisplaySettings.GridLinesPen, x, m_MinY, x, m_MaxY);
+							g.DrawLine(m_DisplaySettings.GridLinesPen, x + 1, m_MinY, x + 1, m_MaxY);
+
+                            if (x + labelSize.Width / 2 < m_MaxX)
+                                g.DrawString(label, s_AxisFont, m_DisplaySettings.LabelsBrush, x - labelSize.Width / 2, y);
 						}
 					}
 				}
 				else if (m_LightCurveController.Context.XAxisLabels == LightCurveContext.XAxisMode.Time)
 				{
-					//TODO: Make this display hours and minites in the format HH:MM; Intervals of 1 min, 5 min, 10 min, 15 min, 30 min, 60 min, 120 min
+                    interval = GetXAxisTimeInterval(g);
+				    DateTime? firstTime = m_LCFile.Header.GetFrameTime(m_MinDisplayedFrame);
+                    if (firstTime.HasValue)
+                    {
+                        DateTime? frame1 = m_LCFile.Header.GetFrameTime(m_MinDisplayedFrame);
+
+                        for (uint i = m_MinDisplayedFrame + 1; i < m_MaxDisplayedFrame; i++)
+                        {
+                            DateTime? frame2 = m_LCFile.Header.GetFrameTime(i + 1);
+
+                            if (frame1.HasValue && frame2.HasValue)
+                            {
+                                if ((int)(new TimeSpan(frame2.Value.Ticks - frame2.Value.Date.Ticks).TotalSeconds/interval) >
+                                    (int)(new TimeSpan(frame1.Value.Ticks - frame1.Value.Date.Ticks).TotalSeconds/interval))
+                                {
+                                    string label = interval < 60 ? frame2.Value.ToString("HH:mm:ss") : frame2.Value.ToString("HH:mm");
+                                    SizeF labelSize = g.MeasureString(label, s_AxisFont);
+                                    float x = m_MinX + (i + 1 - m_MinDisplayedFrame) * m_ScaleX;
+                                    float y = m_MaxY + 5;
+
+                                    g.DrawString(label, s_AxisFont, m_DisplaySettings.LabelsBrush, x - labelSize.Width / 2, y);
+                                    g.DrawLine(m_DisplaySettings.GridLinesPen, x + 1, m_MinY, x + 1, m_MaxY);                                 
+                                }
+                            }
+
+                            frame1 = frame2;
+                        }
+
+                        g.DrawString("UT", s_AxisFont, m_DisplaySettings.LabelsBrush, m_MaxX, m_MaxY + 5);
+                    }
 				}
             }
 

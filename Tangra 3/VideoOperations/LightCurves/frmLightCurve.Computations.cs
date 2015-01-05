@@ -530,6 +530,41 @@ namespace Tangra.VideoOperations.LightCurves
 	
         }
 
+        private uint GetXAxisTimeInterval(Graphics g)
+        {
+            DateTime? lastTimestamp = m_Header.GetFrameTime(m_MaxDisplayedFrame);
+            DateTime? firstTimestamp = m_Header.GetFrameTime(m_MinDisplayedFrame);
+            if (!lastTimestamp.HasValue || !firstTimestamp.HasValue)
+                return 120;
+
+            float fullScale = (float)new TimeSpan(lastTimestamp.Value.Ticks - firstTimestamp.Value.Ticks).TotalSeconds;
+
+            string label = "23:59";
+            string labelSecs = "23:59:59";
+
+            SizeF labelSize = g.MeasureString(label, s_AxisFont);
+
+            int numLabels = (int)Math.Floor((m_MaxX - m_MinX) / (1.5f * labelSize.Width));
+
+            labelSize = g.MeasureString(labelSecs, s_AxisFont);
+            int numLabelsSecs = (int)Math.Floor((m_MaxX - m_MinX) / (1.2f * labelSize.Width));
+
+            uint[] goodIntervalsInMinutes = new uint[] { 1, 2, 5, 10, 15, 30, 1 * 60, 2 * 60, 5 * 60, 10 * 60, 15 * 60, 30 * 60, 60 * 60, 120 * 60 };
+
+            float markIntervalSize = fullScale / numLabels;
+
+            uint interval = goodIntervalsInMinutes.FirstOrDefault(x => x > markIntervalSize);
+            if (interval < 60)
+            {
+                markIntervalSize = fullScale / numLabelsSecs;
+                interval = goodIntervalsInMinutes.FirstOrDefault(x => x > markIntervalSize);
+            }
+
+            if (interval == 0) interval = 120;
+
+            return interval;
+        }
+
 		private uint GetXAxisInterval(Graphics g)
         {
 			float fullScale = (m_MaxDisplayedFrame - m_MinDisplayedFrame);

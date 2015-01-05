@@ -328,56 +328,66 @@ namespace Tangra.VideoOperations.LightCurves
 
             m_HasEmbeddedTimeStamps = m_Footer.ReductionContext.HasEmbeddedTimeStamps;
 
-			if (m_Header.SecondTimedFrameTime != DateTime.MinValue || hasEmbeddedTimeStamps)
+            if (m_Header.SecondTimedFrameTime != DateTime.MinValue || hasEmbeddedTimeStamps)
             {
-				if (!hasEmbeddedTimeStamps)
-				{
+                if (!hasEmbeddedTimeStamps)
+                {
                     string videoSystem;
                     double timeDelta = m_Header.GetAbsoluteTimeDeltaInMilliseconds(out videoSystem);
 
-					m_TimestampDiscrepencyFlag = timeDelta > TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMs;
+                    m_TimestampDiscrepencyFlag = timeDelta > TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMs;
 
-					if (m_TimestampDiscrepencyFlag)
-					{
+                    if (m_TimestampDiscrepencyFlag)
+                    {
                         if (videoSystem == null)
-						{
+                        {
                             MessageBox.Show(this,
                                             "This video has an unusual frame rate.\r\n\r\nPlease use the timestamps on the corresponding video frames when timing events from this video.",
                                             "Warning",
                                             MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
-							lblFrameTime.ForeColor = Color.Red;
-						}
+                            lblFrameTime.ForeColor = Color.Red;
+                        }
                         else
                         {
-							if (m_LCFile.Header.GetVideoFileFormat() != VideoFileFormat.SER)
-							{
-								MessageBox.Show(this,
-												string.Format(
-													"The time derived from entered frame times in this {1} video shows an error higher than {0} ms.\r\n\r\nPlease use the timestamps on the corresponding video frames when timing events from this video."
-													, timeDelta.ToString("0.0"), videoSystem),
-												"Warning",
-												MessageBoxButtons.OK, MessageBoxIcon.Warning);
-							}
+                            if (m_LCFile.Header.GetVideoFileFormat() != VideoFileFormat.SER)
+                            {
+                                MessageBox.Show(this,
+                                                string.Format(
+                                                    "The time derived from entered frame times in this {1} video shows an error higher than {0} ms.\r\n\r\nPlease use the timestamps on the corresponding video frames when timing events from this video."
+                                                    , timeDelta.ToString("0.0"), videoSystem),
+                                                "Warning",
+                                                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            }
 
                             lblFrameTime.ForeColor = Color.Red;
                         }
-					}
-					else
-					{
-						lblFrameTime.ForeColor = SystemColors.WindowText;
-					}					
-				}
-				else
-				{
-					lblFrameTime.ForeColor = Color.DarkGreen;
-					m_TimestampDiscrepencyFlag = false;
-				}
+                    }
+                    else
+                    {
+                        lblFrameTime.ForeColor = SystemColors.WindowText;
+                    }
+                }
+                else
+                {
+                    lblFrameTime.ForeColor = Color.DarkGreen;
+                    m_TimestampDiscrepencyFlag = false;
+                }
+
+                m_LightCurveController.Context.XAxisLabels = LightCurveContext.XAxisMode.Time;
+                miXAxisUserFrameNumbers.Checked = false;
+                miXAxisUserTime.Checked = true;
             }
             else
+            {
                 lblFrameTime.ForeColor = Color.Red;
-            
-			UpdateContextDisplays();
+
+                m_LightCurveController.Context.XAxisLabels = LightCurveContext.XAxisMode.FrameNo;
+                miXAxisUserFrameNumbers.Checked = true;
+                miXAxisUserTime.Checked = false;
+            }
+
+            UpdateContextDisplays();
 			UpdateFormTitle();
 
 			if (m_frmZoomedPixels != null)
