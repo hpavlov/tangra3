@@ -30,6 +30,8 @@
 			this.miSaveAsImage = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
 			this.miCopyToClipboard = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
+			this.miLightCurveInformation = new System.Windows.Forms.ToolStripMenuItem();
 			this.miData = new System.Windows.Forms.ToolStripMenuItem();
 			this.miShowZoomedAreas = new System.Windows.Forms.ToolStripMenuItem();
 			this.miShowPSFFits = new System.Windows.Forms.ToolStripMenuItem();
@@ -92,8 +94,6 @@
 			this.saveCSVDialog = new System.Windows.Forms.SaveFileDialog();
 			this.firstFrameTimer = new System.Windows.Forms.Timer(this.components);
 			this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-			this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
-			this.miLightCurveInformation = new System.Windows.Forms.ToolStripMenuItem();
 			this.pnlChart = new Tangra.Controls.SmoothPanel();
 			this.btnSetMags = new System.Windows.Forms.Button();
 			this.btnZoomIn = new System.Windows.Forms.Button();
@@ -140,6 +140,9 @@
 			this.lblMeasurement2 = new System.Windows.Forms.Label();
 			this.lblMeasurement3 = new System.Windows.Forms.Label();
 			this.lblMeasurement4 = new System.Windows.Forms.Label();
+			this.xAxisLabelsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.miXAxisUserFrameNumbers = new System.Windows.Forms.ToolStripMenuItem();
+			this.miXAxisUserTime = new System.Windows.Forms.ToolStripMenuItem();
 			this.pnlLegend.SuspendLayout();
 			this.panel2.SuspendLayout();
 			this.menuStrip1.SuspendLayout();
@@ -278,6 +281,18 @@
 			this.miCopyToClipboard.Text = "Copy &Plot to Clipboard";
 			this.miCopyToClipboard.Click += new System.EventHandler(this.miCopyToClipboard_Click);
 			// 
+			// toolStripMenuItem2
+			// 
+			this.toolStripMenuItem2.Name = "toolStripMenuItem2";
+			this.toolStripMenuItem2.Size = new System.Drawing.Size(198, 6);
+			// 
+			// miLightCurveInformation
+			// 
+			this.miLightCurveInformation.Name = "miLightCurveInformation";
+			this.miLightCurveInformation.Size = new System.Drawing.Size(201, 22);
+			this.miLightCurveInformation.Text = "Light Curve &Information";
+			this.miLightCurveInformation.Click += new System.EventHandler(this.miLightCurveInformation_Click);
+			// 
 			// miData
 			// 
 			this.miData.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -392,6 +407,7 @@
 			// 
 			this.processToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.miDisplaySettings,
+            this.xAxisLabelsToolStripMenuItem,
             this.miAddTitle});
 			this.processToolStripMenuItem.Name = "processToolStripMenuItem";
 			this.processToolStripMenuItem.Size = new System.Drawing.Size(75, 20);
@@ -753,18 +769,6 @@
 			// 
 			this.firstFrameTimer.Interval = 250;
 			this.firstFrameTimer.Tick += new System.EventHandler(this.firstFrameTimer_Tick);
-			// 
-			// toolStripMenuItem2
-			// 
-			this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-			this.toolStripMenuItem2.Size = new System.Drawing.Size(198, 6);
-			// 
-			// miLightCurveInformation
-			// 
-			this.miLightCurveInformation.Name = "miLightCurveInformation";
-			this.miLightCurveInformation.Size = new System.Drawing.Size(201, 22);
-			this.miLightCurveInformation.Text = "Light Curve &Information";
-			this.miLightCurveInformation.Click += new System.EventHandler(this.miLightCurveInformation_Click);
 			// 
 			// pnlChart
 			// 
@@ -1293,6 +1297,29 @@
 			this.lblMeasurement4.Size = new System.Drawing.Size(0, 13);
 			this.lblMeasurement4.TabIndex = 15;
 			// 
+			// xAxisLabelsToolStripMenuItem
+			// 
+			this.xAxisLabelsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miXAxisUserFrameNumbers,
+            this.miXAxisUserTime});
+			this.xAxisLabelsToolStripMenuItem.Name = "xAxisLabelsToolStripMenuItem";
+			this.xAxisLabelsToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+			this.xAxisLabelsToolStripMenuItem.Text = "&X Axis Labels";
+			// 
+			// miXAxisUserFrameNumbers
+			// 
+			this.miXAxisUserFrameNumbers.Name = "miXAxisUserFrameNumbers";
+			this.miXAxisUserFrameNumbers.Size = new System.Drawing.Size(159, 22);
+			this.miXAxisUserFrameNumbers.Text = "&Frame Numbers";
+			this.miXAxisUserFrameNumbers.Click += new System.EventHandler(this.miXAxisUserFrameNumbers_Click);
+			// 
+			// miXAxisUserTime
+			// 
+			this.miXAxisUserTime.Name = "miXAxisUserTime";
+			this.miXAxisUserTime.Size = new System.Drawing.Size(159, 22);
+			this.miXAxisUserTime.Text = "&Time";
+			this.miXAxisUserTime.Click += new System.EventHandler(this.miXAxisUserTime_Click);
+			// 
 			// frmLightCurve
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1474,5 +1501,8 @@
 		private System.Windows.Forms.Label lblMagnitude4;
 		private System.Windows.Forms.ToolStripSeparator toolStripMenuItem2;
 		private System.Windows.Forms.ToolStripMenuItem miLightCurveInformation;
+		private System.Windows.Forms.ToolStripMenuItem xAxisLabelsToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem miXAxisUserFrameNumbers;
+		private System.Windows.Forms.ToolStripMenuItem miXAxisUserTime;
     }
 }

@@ -2424,5 +2424,21 @@ namespace Tangra.VideoOperations.LightCurves
 			frm.ShowDialog(this);
 		}
 
+		private void miXAxisUserFrameNumbers_Click(object sender, EventArgs e)
+		{
+			m_LightCurveController.Context.XAxisLabels = LightCurveContext.XAxisMode.FrameNo;
+			miXAxisUserFrameNumbers.Checked = true;
+			miXAxisUserTime.Checked = false;
+			pnlChart.Invalidate();
+		}
+
+		private void miXAxisUserTime_Click(object sender, EventArgs e)
+		{
+			m_LightCurveController.Context.XAxisLabels = LightCurveContext.XAxisMode.Time;
+			miXAxisUserFrameNumbers.Checked = false;
+			miXAxisUserTime.Checked = true;
+			pnlChart.Invalidate();
+		}
+
 	}
 }

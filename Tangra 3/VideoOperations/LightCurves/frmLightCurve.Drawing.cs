@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using Tangra.Config;
+using Tangra.Controller;
 using Tangra.Model.Astro;
 using Tangra.Helpers;
 using Tangra.Model.Context;
@@ -553,23 +554,30 @@ namespace Tangra.VideoOperations.LightCurves
 
             if (m_DisplaySettings.DrawGrid)
             {
-                interval = GetXAxisInterval(g);
+				if (m_LightCurveController.Context.XAxisLabels == LightCurveContext.XAxisMode.FrameNo)
+				{
+					interval = GetXAxisInterval(g);
 
-                uint firstMark = interval*(1 + m_MinDisplayedFrame/interval);
+					uint firstMark = interval * (1 + m_MinDisplayedFrame / interval);
 
-                for (uint i = firstMark; i <= m_MaxDisplayedFrame; i += interval)
-                {
-                    string label = i.ToString();
-                    SizeF labelSize = g.MeasureString(label, s_AxisFont);
-                    float x = m_MinX + (i - m_MinDisplayedFrame)*m_ScaleX;
-                    float y = m_MaxY + 5;
+					for (uint i = firstMark; i <= m_MaxDisplayedFrame; i += interval)
+					{
+						string label = i.ToString();
+						SizeF labelSize = g.MeasureString(label, s_AxisFont);
+						float x = m_MinX + (i - m_MinDisplayedFrame) * m_ScaleX;
+						float y = m_MaxY + 5;
 
-                    if (firstMark != m_MinDisplayedFrame && x < m_MaxX)
-                    {
-                        g.DrawString(label, s_AxisFont, m_DisplaySettings.LabelsBrush, x - labelSize.Width/2, y);
-                        g.DrawLine(m_DisplaySettings.GridLinesPen, x, m_MinY, x, m_MaxY);
-                    }
-                }
+						if (firstMark != m_MinDisplayedFrame && x < m_MaxX)
+						{
+							g.DrawString(label, s_AxisFont, m_DisplaySettings.LabelsBrush, x - labelSize.Width / 2, y);
+							g.DrawLine(m_DisplaySettings.GridLinesPen, x, m_MinY, x, m_MaxY);
+						}
+					}
+				}
+				else if (m_LightCurveController.Context.XAxisLabels == LightCurveContext.XAxisMode.Time)
+				{
+					//TODO: Make this display hours and minites in the format HH:MM; Intervals of 1 min, 5 min, 10 min, 15 min, 30 min, 60 min, 120 min
+				}
             }
 
             g.DrawLine(m_DisplaySettings.GridLinesPen, m_MaxX, m_MinY, m_MaxX, m_MaxY);

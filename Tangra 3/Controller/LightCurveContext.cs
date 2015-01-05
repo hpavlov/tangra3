@@ -60,6 +60,12 @@ namespace Tangra.Controller
 			FromBackgroundDistribution
 		}
 
+		internal enum XAxisMode
+		{
+			FrameNo,
+			Time
+		}
+
 		private bool m_Dirty = false;
 		private bool m_FirstZoomedFrameChanged = false;
 		private bool m_RequiresFullReprocessing = false;
@@ -82,6 +88,8 @@ namespace Tangra.Controller
 		public int ObjectCount;
 
 		public uint m_SelectedFrameNo = 0;
+
+		private XAxisMode m_XAxisMode;
 
 		public uint SelectedFrameNo
 		{
@@ -176,6 +184,19 @@ namespace Tangra.Controller
 				if (m_ProcessingType != value)
 				{
 					m_ProcessingType = value;
+					m_Dirty = true;
+				}
+			}
+		}
+
+		public XAxisMode XAxisLabels
+		{
+			get { return m_XAxisMode; }
+			set
+			{
+				if (m_XAxisMode != value)
+				{
+					m_XAxisMode = value;
 					m_Dirty = true;
 				}
 			}
