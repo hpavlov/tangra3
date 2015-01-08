@@ -1520,7 +1520,7 @@ namespace Tangra.VideoOperations.LightCurves
 			{
 				g.Clear(m_DisplaySettings.BackgroundColor);
 				g.DrawImage(m_Graph, new Point(0, 0));
-				g.DrawImage(Properties.Resources.lc_logo, new Point(m_MinX - logoWidth - 6, m_MinY - logoWidth - 6));
+				g.DrawImage(Properties.Resources.lc_logo, new Point(m_MinX + 6, m_MinY - logoWidth - 6));
 
 				string legend = string.Format(
 					  "{0} - {1}, {2}{3}{4}",
@@ -1528,26 +1528,58 @@ namespace Tangra.VideoOperations.LightCurves
 					  ExplainSignalMethod(), ExplainBackgroundMethod(), ExplainDigitalFilter(), ExplainGamma());
 
 				SizeF labelSize = g.MeasureString(legend, s_AxisFont);
-				float x = m_MinX;
+				float x = m_MinX + logoWidth + 12;
 				float y = m_MinY - 6 - labelSize.Height;
 				g.DrawString(legend, s_AxisFont, m_DisplaySettings.LabelsBrush, x, y);
 
 				uint interval = GetXAxisInterval(g);
 				uint firstMark = interval * (1 + m_MinDisplayedFrame / interval);
-				string isCorrectedForInstrumentalDelay;
-				DateTime firstTime = m_LCFile.GetTimeForFrame(firstMark, out isCorrectedForInstrumentalDelay);
-				double frameDuration = m_LCFile.Header.SecondsPerFrameComputed();
-				string frameDurStr = string.Empty;
-				if (!double.IsNaN(frameDuration))
-					frameDurStr = string.Format(", 1 frame = {0} sec", frameDuration.ToString("0.000"));
 
-                if (firstTime != DateTime.MaxValue)
-				    legend = string.Format("{0} = {1} UT{2}", firstMark, firstTime.ToString("dd MMM yyyy, HH:mm:ss.fff"), frameDurStr);
+                string isCorrectedForInstrumentalDelay;
+
+                if (m_LightCurveController.Context.XAxisLabels == LightCurveContext.XAxisMode.FrameNo)
+                {
+                    DateTime firstTime = m_LCFile.GetTimeForFrame(firstMark, out isCorrectedForInstrumentalDelay);
+                    double frameDuration = m_LCFile.Header.SecondsPerFrameComputed();
+                    string frameDurStr = string.Empty;
+                    if (!double.IsNaN(frameDuration))
+                        frameDurStr = string.Format(", 1 frame = {0} sec", frameDuration.ToString("0.000"));
+
+                    if (firstTime != DateTime.MaxValue)
+                        legend = string.Format("{0} = {1} UT{2}", firstMark, firstTime.ToString("dd MMM yyyy, HH:mm:ss.fff"), frameDurStr);
+                    else
+                        legend = string.Format("No frame times entered{0} ", frameDurStr);                    
+                }
                 else
-                    legend = string.Format("No frame times entered{0} ", frameDurStr);
+                { 
+                    DateTime firstTime = m_LCFile.GetTimeForFrame(m_LCFile.Header.MinFrame, out isCorrectedForInstrumentalDelay);
+
+                    legend = string.Format("{0}", firstTime.ToString("dd MMM yyyy"));
+                }
+
+                switch (m_LightCurveController.Context.ProcessingType)
+                {
+                    case ProcessingType.SignalMinusBackground:
+                        legend += ", Signal-minus-Background, ";
+                        break;
+                    case ProcessingType.SignalOnly:
+                        legend += ", Signal-Only, ";
+                        break;
+                    case ProcessingType.BackgroundOnly:
+                        legend += ", Background-Only, ";
+                        break;
+                    case ProcessingType.SignalDividedByNoise:
+                        legend += ", Signal-devided by-Noise, ";
+                        break;
+                    case ProcessingType.SignalDividedByBackground:
+                        legend += ", Signal-devided by-Background, ";
+                        break;
+                }
+
+                legend += string.Format("{0}{1}{2}", m_LCFile.Header.GetVideoFileFormat().ToString(), string.IsNullOrWhiteSpace(m_LCFile.Footer.CameraName) ? "" : ", ", m_LCFile.Footer.CameraName);
 
 				labelSize = g.MeasureString(firstMark.ToString(), s_AxisFont);
-				x = m_MinX + (firstMark - m_MinDisplayedFrame) * m_ScaleX - labelSize.Width / 2;
+                x = m_MinX;
 				y = m_MaxY + 12 + labelSize.Height;
 				
 				g.DrawString(legend, s_AxisFont, m_DisplaySettings.LabelsBrush, x, y);

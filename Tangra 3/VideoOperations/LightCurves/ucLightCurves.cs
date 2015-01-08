@@ -517,6 +517,21 @@ namespace Tangra.VideoOperations.LightCurves
 				return;
 			}
 
+            if (LightCurveReductionContext.Instance.ReductionMethod == TangraConfig.PhotometryReductionMethod.AperturePhotometry &&
+                m_StateMachine.MeasuringStars.Any(x => x.GroupId >= 0))
+            {
+                if (m_VideoController.ShowMessageBox(
+                    "You have selected two stars grouped in one measurement group but the current photometry method is set to 'Aperture Photometry'. This will lead to results that could be incorrect and/or unwanted. PSF Fitting Photometry should be used with grouped stars." +
+                    "\r\n\r\nIf you want to change to using PSF Fitting Photometry and continue with the reduction then with press 'Yes'. Otherwise press 'No' to go back and reconfigure your objects.",
+                    "Warning",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.No)
+                {
+                    return;
+                }
+
+                LightCurveReductionContext.Instance.ReductionMethod = TangraConfig.PhotometryReductionMethod.PsfPhotometry;
+            }
+
 			int numberGuidingStars = m_StateMachine.MeasuringStars.Count(t => t.TrackingType == TrackingType.GuidingStar);
 			int numberComparisonStars = m_StateMachine.MeasuringStars.Count(t => t.TrackingType == TrackingType.ComparisonStar);
 			bool warnedAboutGuidingStars = false;
