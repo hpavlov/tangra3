@@ -99,7 +99,7 @@ namespace Tangra.KweeVanWoerden
 
 		public string Author
 		{
-			get { return "Anthony Mallama"; }
+			get { return "A.Mallama & H.Pavlov"; }
 		}
 
 		public string Version

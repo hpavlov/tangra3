@@ -36,7 +36,6 @@ namespace Tangra.KweeVanWoerden
 
 		private double ComputeModelValue(double t)
 		{
-			//return M0 + C * (1 - Math.Pow(1 - Math.Exp(1 - Math.Cosh((t - T0) / D)), G));
             return M0 - Math.Pow(1 - Math.Exp(1 - Math.Cosh((t - T0) / D)), G);
 		}
 
@@ -121,41 +120,41 @@ namespace Tangra.KweeVanWoerden
 			double[] minCorr = new double[] {double.MaxValue, double.MaxValue, double.MaxValue, double.MaxValue, double.MaxValue};
 
 
-            // Our guess ot T0 is very close, so assume it is contant and solve for G and D
-            for (int iter = NumberIterations; iter > 0; iter--)
-            {
-                var A = new SafeMatrix(varMagnitudes.Count, 2);
-                var X = new SafeMatrix(varMagnitudes.Count, 1);
+            //// Our guess ot T0 is very close, so assume it is contant and solve for G and D
+            //for (int iter = NumberIterations; iter > 0; iter--)
+            //{
+            //    var A = new SafeMatrix(varMagnitudes.Count, 2);
+            //    var X = new SafeMatrix(varMagnitudes.Count, 1);
 
-                for (int index = 0; index < varMagnitudes.Count; index++)
-                {
-                    double t = varTimes[index];
-                    double difference = ComputeModelValue(t) - varMagnitudes[index];
-                    X[index, 0] = -difference;
+            //    for (int index = 0; index < varMagnitudes.Count; index++)
+            //    {
+            //        double t = varTimes[index];
+            //        double difference = ComputeModelValue(t) - varMagnitudes[index];
+            //        X[index, 0] = -difference;
 
-                    double GAMMA = 1 - Math.Exp(1 - Math.Cosh((t - T0) / D));
-                    double GAMMA_G = Math.Pow(GAMMA, G);
+            //        double GAMMA = 1 - Math.Exp(1 - Math.Cosh((t - T0) / D));
+            //        double GAMMA_G = Math.Pow(GAMMA, G);
 
-                    A[index, 0] = GAMMA_G * Math.Log(G); // G
-                    A[index, 1] = -(G / D) * Math.Pow(GAMMA, G - 1) * Math.Exp(1 - Math.Cosh((t - T0) / D)) * Math.Sinh((t - T0) / D) * (t - T0) / D; // D
-                }
+            //        A[index, 0] = GAMMA_G * Math.Log(G); // G
+            //        A[index, 1] = -(G / D) * Math.Pow(GAMMA, G - 1) * Math.Exp(1 - Math.Cosh((t - T0) / D)) * Math.Sinh((t - T0) / D) * (t - T0) / D; // D
+            //    }
 
-                SafeMatrix a_T = A.Transpose();
-                SafeMatrix aa = a_T * A;
-                SafeMatrix aa_inv = aa.Inverse();
-                SafeMatrix Y = (aa_inv * a_T) * X;
+            //    SafeMatrix a_T = A.Transpose();
+            //    SafeMatrix aa = a_T * A;
+            //    SafeMatrix aa_inv = aa.Inverse();
+            //    SafeMatrix Y = (aa_inv * a_T) * X;
 
-                D += Y[1, 0];
-                if (D < 0) D = 0.001;
+            //    D += Y[1, 0];
+            //    if (D < 0) D = 0.001;
 
-                // Enforce maximum correction for G of |0.1|. G > 0
-                //if (Y[0, 0] > 0.01) Y[0, 0] = 0.01;
-                //if (Y[0, 0] < -0.01) Y[0, 0] = -0.01;
-                G += Y[0, 0];
-                if (G < 0) G = 0.001;
+            //    // Enforce maximum correction for G of |0.1|. G > 0
+            //    //if (Y[0, 0] > 0.01) Y[0, 0] = 0.01;
+            //    //if (Y[0, 0] < -0.01) Y[0, 0] = -0.01;
+            //    G += Y[0, 0];
+            //    if (G < 0) G = 0.001;
 
-                Trace.WriteLine(string.Format("D Corr: {0}\t\t G Corr: {1}", Y[1, 0], Y[0, 0]));
-            }
+            //    Trace.WriteLine(string.Format("D Corr: {0}\t\t G Corr: {1}", Y[1, 0], Y[0, 0]));
+            //}
 
 			for (int iter = NumberIterations; iter > 0; iter--)
 			{
@@ -171,8 +170,8 @@ namespace Tangra.KweeVanWoerden
 					double GAMMA = 1 - Math.Exp(1 - Math.Cosh((t - T0) / D));
 					double GAMMA_G = Math.Pow(GAMMA, G);
 
-					A[index, 0] = GAMMA_G * Math.Log(G); // G
-                    A[index, 1] = -(G / D) * Math.Pow(GAMMA, G - 1) * Math.Exp(1 - Math.Cosh((t - T0) / D)) * Math.Sinh((t - T0) / D); // T0
+					A[index, 0] = -GAMMA_G * Math.Log(G); // G
+                    A[index, 1] = (G / D) * Math.Pow(GAMMA, G - 1) * Math.Exp(1 - Math.Cosh((t - T0) / D)) * Math.Sinh((t - T0) / D); // T0
 					A[index, 2] = A[index, 1] * (t - T0) / D; // D
 				}
 

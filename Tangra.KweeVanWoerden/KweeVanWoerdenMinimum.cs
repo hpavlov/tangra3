@@ -449,15 +449,23 @@ namespace Tangra.KweeVanWoerden
                                      int firstObsIndex, int lastObsIndex, double kweeVanWoerdenT0)
 		{
             // http://var2.astro.cz/library/1350745528_ebfit.pdf
-            // TODO: Implement non linear least square for this equation
-
+            //
             // Mag(t) = M0 + C1 * F(t, t0, d, G)
             // F(t, t0, d, G) = 1 - {1 - Exp[1 - cosh((t - t0 / d))] } ^ G;
             // t0 - time of minimum
             // d > 0 is the minimum width
             // G > 0 - the pointedness, G > 1 corresponds to flat minima (total eclipse)
             // 
-
+            // -----------------------------------------------------------------------------
+            //
+            // We use a simplified model:
+            //
+            // Mag(t) = M0 - C * {1 - Exp[1 - cosh((t - T0 / D))] } ^ G
+            //
+            // Where M0 is a constrant and we don't fit for it
+            // C has been fixed to +1
+            // t0 is taken from the KweeVanWoerden solution
+            // ------------------------------------------------------------------------------
 
 			var rv = new PolynomialFitResult();
 			rv.TimePoints = new List<double>();
@@ -486,7 +494,7 @@ namespace Tangra.KweeVanWoerden
             for (int i = 0; i < Number_Obs; i++)
             {
                 if (i >= firstObsIndex && i < lastObsIndex)
-                    rv.FittedValues.Add(fitter.NormIntensities[i]);
+                    rv.FittedValues.Add(fitter.NormIntensities[i - firstObsIndex]);
                 else
                     rv.FittedValues.Add(double.NaN);
             }
