@@ -97,6 +97,7 @@ namespace Tangra.Model.Astro
 
 		private IBackgroundModelProvider m_BackgroundModel;
 		private bool m_UsesBackgroundModel = false;
+	    private int m_BackgroundModelOffset = 0;
 
 		public static void SetDataRange(int bitPix, uint bitPix16NormVal)
 		{
@@ -386,6 +387,7 @@ namespace Tangra.Model.Astro
 		{
 			m_BackgroundModel = backgroundModel;
 			m_UsesBackgroundModel = m_BackgroundModel != null;
+		    m_BackgroundModelOffset = 0;
 
             if (newMatrixSize == 17 || newMatrixSize == 35 || newMatrixSize == 0)
 			{
@@ -395,6 +397,8 @@ namespace Tangra.Model.Astro
 			{
 				uint[,] newData = new uint[newMatrixSize,newMatrixSize];
 				int halfSize = newMatrixSize/2;
+
+                m_BackgroundModelOffset = (intensity.GetLength(0) - newMatrixSize) / 2;
 
 				int xx = 0, yy = 0;
 				for (int y = 9 - halfSize - 1; y <= 9 + halfSize - 1; y++)
@@ -414,6 +418,8 @@ namespace Tangra.Model.Astro
 			{
 				uint[,] newData = new uint[newMatrixSize, newMatrixSize];
 				int halfSize = newMatrixSize / 2;
+
+                m_BackgroundModelOffset = (intensity.GetLength(0) - newMatrixSize) / 2;
 
 				int xx = 0, yy = 0;
 				for (int y = 18 - halfSize - 1; y <= 18 + halfSize - 1; y++)
@@ -526,7 +532,7 @@ namespace Tangra.Model.Astro
 				for (int x = 0; x < intensity.GetLength(0); x++)
 				{
 					if (m_BackgroundModel != null)
-						intensityLine[x + y*intensity.GetLength(1)] = (uint)Math.Round(intensity[x, y] - m_BackgroundModel.ComputeValue(x, y));
+                        intensityLine[x + y * intensity.GetLength(1)] = (uint)Math.Round(intensity[x, y] - m_BackgroundModel.ComputeValue(x + m_BackgroundModelOffset, y + m_BackgroundModelOffset));
 					else
 						intensityLine[x + y*intensity.GetLength(1)] = intensity[x, y];
 				}
@@ -647,7 +653,8 @@ namespace Tangra.Model.Astro
                             {
                                 index++;
 
-								if (m_BackgroundModel != null) zval -= m_BackgroundModel.ComputeValue(i, j);
+                                if (m_BackgroundModel != null) 
+                                    zval -= m_BackgroundModel.ComputeValue(i + m_BackgroundModelOffset, j + m_BackgroundModelOffset);
 
                                 double exp_val = fx[i]*fy[j];
 
@@ -858,7 +865,8 @@ namespace Tangra.Model.Astro
 							{
 								index++;
 
-								if (m_BackgroundModel != null) zval -= m_BackgroundModel.ComputeValue(i, j);
+								if (m_BackgroundModel != null)
+                                    zval -= m_BackgroundModel.ComputeValue(i + m_BackgroundModelOffset, j + m_BackgroundModelOffset);
 
 								double exp_val = fx[i] * fy[j];
 

@@ -88,12 +88,15 @@ namespace Tangra.Model.Astro
 
 		public void Fit(uint[,] pixels, PSFFit star1, PSFFit star2)
 		{
-            m_Star1Center = new ImagePixel(star1.Brightness, star1.X0_Matrix, star1.Y0_Matrix);
+		    int dataMatrixSize = pixels.GetLength(0);
+            int offset = (dataMatrixSize - star1.MatrixSize) / 2;
+            m_Star1Center = new ImagePixel(star1.Brightness, star1.X0_Matrix + offset, star1.Y0_Matrix + offset);
 			m_Star1MinDistance = star1.FWHM * 2.0;
 
 			if (star2 != null)
 			{
-                m_Star2Center = new ImagePixel(star2.Brightness, star2.X0_Matrix, star2.Y0_Matrix);
+                offset = (dataMatrixSize - star2.MatrixSize) / 2;
+                m_Star2Center = new ImagePixel(star2.Brightness, star2.X0_Matrix + offset, star2.Y0_Matrix + offset);
 				m_Star2MinDistance = star2.FWHM * 2.0;
 			}
 			else

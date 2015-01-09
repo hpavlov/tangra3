@@ -151,7 +151,8 @@ namespace Tangra.Model.Image
 
 		internal NotMeasuredReasons DoAperturePhotometry(
             uint[,] matrix, int x0Int, int y0Int, float x0, float y0, float aperture, int matrixSize,
-			uint[,] backgroundArea, float bgAnnulusFactor,
+			uint[,] backgroundArea, float bgAnnulusFactor, 
+            IBackgroundModelProvider doubleFitBackgroundModel,
 			int centerX = 0, int centerY = 0)
         {
             if (matrix.GetLength(0) != 17 && matrix.GetLength(0) != 35)
@@ -189,11 +190,13 @@ namespace Tangra.Model.Image
                 }
 				else if (m_BackgroundMethod == TangraConfig.BackgroundMethod.Background3DPolynomial)
 				{
-					m_TotalBackground = Get3DPolynomialBackground(backgroundArea, m_Aperture);
+                    int offset = (35 - side) / 2;
+                    m_TotalBackground = Get3DPolynomialBackground(backgroundArea, m_Aperture, m_XCenter + offset, m_YCenter + offset, doubleFitBackgroundModel);
 				}
 	            else if (m_BackgroundMethod != TangraConfig.BackgroundMethod.PSFBackground)
 	            {
-					double bgFromAnnulus = GetBackground(backgroundArea, m_Aperture, m_XCenter, m_YCenter, bgAnnulusFactor);
+                    int offset = (35 - side) / 2;
+                    double bgFromAnnulus = GetBackground(backgroundArea, m_Aperture, m_XCenter + offset, m_YCenter + offset, bgAnnulusFactor);
 		            m_TotalBackground = (uint) Math.Round(m_TotalPixels*(float) bgFromAnnulus);
 	            }
 	            else
@@ -320,7 +323,8 @@ namespace Tangra.Model.Image
 				}
                 else
                 {
-					double bgFromAnnulus = GetBackground(backgroundArea, m_Aperture, m_XCenter, m_YCenter, bgAnnulusFactor);
+                    int offset = (35 - fit.MatrixSize) / 2;
+                    double bgFromAnnulus = GetBackground(backgroundArea, m_Aperture, m_XCenter + offset, m_YCenter + offset, bgAnnulusFactor);
 					m_TotalBackground = Math.PI * m_Aperture * m_Aperture * (float)bgFromAnnulus;
                 }
             }
@@ -344,7 +348,8 @@ namespace Tangra.Model.Image
 				}
                 else
                 {
-					double bgFromAnnulus = GetBackground(backgroundArea, m_Aperture, m_XCenter, m_YCenter, bgAnnulusFactor);
+                    int offset = (35 - fit.MatrixSize) / 2;
+                    double bgFromAnnulus = GetBackground(backgroundArea, m_Aperture, m_XCenter + offset, m_YCenter + offset, bgAnnulusFactor);
                     m_TotalReading = (fit.IMax - bgFromAnnulus) * fit.R0 * fit.R0 * Math.PI;
                     m_TotalBackground = Math.PI * apertureForBackground * apertureForBackground * (float)bgFromAnnulus;
                 }
@@ -439,7 +444,8 @@ namespace Tangra.Model.Image
 				}
                 else if (m_BackgroundMethod != TangraConfig.BackgroundMethod.PSFBackground)
                 {
-					double bgFromAnnulus = GetBackground(backgroundArea, m_Aperture, m_XCenter, m_YCenter, bgAnnulusFactor);
+                    int offset = (35 - fit.MatrixSize) / 2;
+                    double bgFromAnnulus = GetBackground(backgroundArea, m_Aperture, m_XCenter + offset, m_YCenter + offset, bgAnnulusFactor);
                     m_TotalBackground = (uint)Math.Round(m_TotalPixels * (float)bgFromAnnulus);
                 }
                 else
@@ -682,18 +688,22 @@ namespace Tangra.Model.Image
             return Math.Round(total);
         }
 
-		private double Get3DPolynomialBackground(uint[,] backgroundArea, float aperture)
+        private double Get3DPolynomialBackground(uint[,] backgroundArea, float aperture, double x0, double y0, IBackgroundModelProvider doubleFitBackgroundModel)
 		{
 			int side = backgroundArea.GetLength(0);
 			var bg3dFit = new Background3DPolynomialFit();
-			bg3dFit.Fit(backgroundArea, m_XCenter, m_YCenter, 2 * aperture);
+            if (doubleFitBackgroundModel == null)
+                bg3dFit.Fit(backgroundArea, (float) x0, (float) y0, 2*aperture);
 
-			int[,] fittedBgPixels = bg3dFit.GetFittedPixels();
 			float totalBgPixels = 0;
 			return GetReading(
 				aperture,
 				backgroundArea, side, side,
-				m_XCenter, m_YCenter, (x, y) => fittedBgPixels[x, y], ref totalBgPixels);
+                (float)x0, (float)y0, 
+                (x, y) => doubleFitBackgroundModel != null 
+                    ? doubleFitBackgroundModel.ComputeValue(x, y) 
+                    : bg3dFit.ComputeValue(x, y), 
+                ref totalBgPixels);
 		}
 
 		private double GetBackground(uint[,] pixels, float signalApertureRadius, double x0, double y0, float bgAnnulusFactor)
@@ -937,6 +947,7 @@ namespace Tangra.Model.Image
 
 			DoublePSFFit doublefit = null;
 			PSFFit fit = null;
+		    IBackgroundModelProvider doubleFitBackgroundModel = null;
 			if (objectsInGroup != null && objectsInGroup.Length == 2)
 			{
 				int x1 = (int) Math.Round((data.GetLength(0)/2) + objectsInGroup[0].XDouble - center.XDouble);
@@ -965,7 +976,8 @@ namespace Tangra.Model.Image
 					doublefit.Fit(data, bg3dFit, x1, y1, x2, y2);
 
 					star1 = doublefit.GetGaussian1();
-					star2 = doublefit.GetGaussian2();					
+					star2 = doublefit.GetGaussian2();
+				    doubleFitBackgroundModel = bg3dFit;
 				}
 
 				double d1 = ImagePixel.ComputeDistance(measurableObject.Center.XDouble, doublefit.X1Center, measurableObject.Center.YDouble, doublefit.Y1Center);
@@ -1004,9 +1016,9 @@ namespace Tangra.Model.Image
 				if (m_BackgroundMethod == TangraConfig.BackgroundMethod.Background3DPolynomial)
 				{
 					var bg3dFit = new Background3DPolynomialFit();
-					bg3dFit.Fit(data, fit, null);
+					bg3dFit.Fit(backgroundPixels, fit, null);
 
-					fit.Fit(data, bg3dFit, measurableObject.PsfFittingMatrixSize);
+                    fit.Fit(backgroundPixels, bg3dFit, measurableObject.PsfFittingMatrixSize);
 				}
 			}
 			
@@ -1048,8 +1060,8 @@ namespace Tangra.Model.Image
 					data, centerX, centerY, msrX0, msrY0,
 					aperture,
 					measurableObject.PsfFittingMatrixSize,
-					backgroundPixels, bgAnnulusFactor,
-					measurableObject.Center.X, measurableObject.Center.Y);
+					backgroundPixels, bgAnnulusFactor, doubleFitBackgroundModel,
+                    measurableObject.Center.X, measurableObject.Center.Y);
 			}
 			else if (reductionMethod == TangraConfig.PhotometryReductionMethod.OptimalExtraction)
 			{
