@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using Tangra.Model.Helpers;
 
 namespace Tangra.VideoOperations.LightCurves
 {
@@ -177,14 +178,14 @@ namespace Tangra.VideoOperations.LightCurves
                 if (isSuccessfulReading || binning)
                 {
                     if (binning)
-                        return string.Format(",{0}", totalReading.ToString(CultureInfo.InvariantCulture));
+                        return string.Format(",{0}", totalReading.ToString(5));
 
                     if (!onlyExportSignalMunusBg)
                         return string.Format(",{0},{1}",
-                                             totalReading.ToString(CultureInfo.InvariantCulture),
-                                             totalBackground.ToString(CultureInfo.InvariantCulture));
+                                             totalReading.ToString(5),
+                                             totalBackground.ToString(5));
                     else
-                        return string.Format(",{0}", totalReading.ToString(CultureInfo.InvariantCulture));
+                        return string.Format(",{0}", totalReading.ToString(5));
                 }
                 else
                 {
@@ -209,7 +210,7 @@ namespace Tangra.VideoOperations.LightCurves
 
                     double mag = M0 - 2.5*Math.Log10(flux);
 
-                    return string.Format(",{0}", mag.ToString("0.00", CultureInfo.InvariantCulture));
+                    return string.Format(",{0}", mag.ToString(5));
                 }
                 else
                 {

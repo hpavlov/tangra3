@@ -18,6 +18,7 @@ using Tangra.Config;
 using Tangra.Controller;
 using Tangra.Helpers;
 using Tangra.Model.Config;
+using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.Model.Numerical;
 using Tangra.Model.Video;
@@ -746,7 +747,7 @@ namespace Tangra.VideoOperations.LightCurves
                         double altitudeDeg;
                         double airMass;
                         double extinction = atmExtCalc.CalculateExtinction(middleBinTime, out altitudeDeg, out airMass);
-                        output.AppendFormat(",{0},{1},{2}", extinction.ToString("0.000"), altitudeDeg.ToString("0.0"), airMass.ToString("0.0000"));
+                        output.AppendFormat(",{0},{1},{2}", extinction.ToString(5), altitudeDeg.ToString(3), airMass.ToString(5));
                     }
 
 					output.AppendLine();
@@ -838,7 +839,7 @@ namespace Tangra.VideoOperations.LightCurves
                         double altitudeDeg;
                         double airMass;
                         double extinction = atmExtCalc.CalculateExtinction(currFrameTime, out altitudeDeg, out airMass);
-                        output.AppendFormat(",{0},{1},{2}", extinction.ToString("0.000"), altitudeDeg.ToString("0.0"), airMass.ToString("0.0000"));
+                        output.AppendFormat(",{0},{1},{2}", extinction.ToString(5), altitudeDeg.ToString(3), airMass.ToString(5));
                     }
 
 					output.AppendLine();
