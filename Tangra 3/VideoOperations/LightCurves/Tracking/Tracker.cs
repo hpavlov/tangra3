@@ -226,15 +226,18 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                 // We have a problem. Try to find the star in the area using other means
                 IImagePixel centroid = astroImage.GetCentroid((int)trackedObject.LastFrameX, (int)trackedObject.LastFrameY, bestMaxFixAreaSize, m_MedianValue);
 
-                double maxAllowedDistance = !float.IsNaN(trackedObject.OriginalObject.RefinedFWHM)
-                                                ? 2 * trackedObject.OriginalObject.RefinedFWHM
-                                                : 3 * TangraConfig.Settings.Special.LostTrackingMinDistance;
-
-                if (centroid.DistanceTo(new ImagePixel((int)trackedObject.LastFrameX, (int)trackedObject.LastFrameY)) < maxAllowedDistance)
+                if (centroid != null)
                 {
-                    pixels = astroImage.GetPixelsArea(centroid.X, centroid.Y, bestMaxFixAreaSize);
-                    gaussian = new PSFFit(centroid.X, centroid.Y);
-                    gaussian.Fit(pixels, bestMaxFixAreaSize);
+                    double maxAllowedDistance = !float.IsNaN(trackedObject.OriginalObject.RefinedFWHM)
+                                                    ? 2 * trackedObject.OriginalObject.RefinedFWHM
+                                                    : 3 * TangraConfig.Settings.Special.LostTrackingMinDistance;
+
+                    if (centroid.DistanceTo(new ImagePixel((int)trackedObject.LastFrameX, (int)trackedObject.LastFrameY)) < maxAllowedDistance)
+                    {
+                        pixels = astroImage.GetPixelsArea(centroid.X, centroid.Y, bestMaxFixAreaSize);
+                        gaussian = new PSFFit(centroid.X, centroid.Y);
+                        gaussian.Fit(pixels, bestMaxFixAreaSize);
+                    }                    
                 }
             }
 
