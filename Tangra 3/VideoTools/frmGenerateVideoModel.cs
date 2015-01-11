@@ -151,20 +151,26 @@ namespace Tangra.VideoTools
 		private static Font s_SmallFont = new Font(FontFamily.GenericSansSerif, 7);
 		private const double FWHM_GAIN_PER_MAG = 0.15;
 
+        private float GetPsfMaxForMagnitude(double standardI, double standardMag, double mag)
+        {
+            return (float)((double)standardI / Math.Pow(10, (mag - standardMag) / 2.5));
+        }
+
 		private Pixelmap GenerateFrame(double percentDone, int frameNo, ModelConfig modelConfig)
 		{
-			int I1 = (int)Math.Round((double)modelConfig.StandardStarIntensity);
-			int I2 = (int)Math.Round((double)modelConfig.StandardStarIntensity / Math.Pow(10, (modelConfig.StarMag2 - modelConfig.StandardStarMag) / 2.5));
-			int I3 = (int)Math.Round((double)modelConfig.StandardStarIntensity / Math.Pow(10, (modelConfig.StarMag3 - modelConfig.StandardStarMag) / 2.5));
-			int I4 = (int)Math.Round((double)modelConfig.StandardStarIntensity / Math.Pow(10, (modelConfig.StarMag4 - modelConfig.StandardStarMag) / 2.5));
-			int I5 = (int)Math.Round((double)modelConfig.StandardStarIntensity / Math.Pow(10, (modelConfig.StarMag5 - modelConfig.StandardStarMag) / 2.5));
+            float I1 = (float)modelConfig.StandardStarIntensity;
+			float I2 = GetPsfMaxForMagnitude(modelConfig.StandardStarIntensity, modelConfig.StandardStarMag, modelConfig.StarMag2);
+            float I3 = GetPsfMaxForMagnitude(modelConfig.StandardStarIntensity, modelConfig.StandardStarMag, modelConfig.StarMag3);
+            float I4 = GetPsfMaxForMagnitude(modelConfig.StandardStarIntensity, modelConfig.StandardStarMag, modelConfig.StarMag4);
+            float I5 = GetPsfMaxForMagnitude(modelConfig.StandardStarIntensity, modelConfig.StandardStarMag, modelConfig.StarMag5);
 			int IPB1 = (int)Math.Round((double)modelConfig.StandardStarIntensity / Math.Pow(10, (modelConfig.PassByMag1 - modelConfig.StandardStarMag) / 2.5));
 			int IPB2 = (int)Math.Round((double)modelConfig.StandardStarIntensity / Math.Pow(10, (modelConfig.PassByMag2 - modelConfig.StandardStarMag) / 2.5));
 			float fwhm1 = (float) modelConfig.FWHM;
-			float fwhm2 = (float)(modelConfig.FWHM + (modelConfig.StandardStarMag - modelConfig.StarMag2) * FWHM_GAIN_PER_MAG);
-			float fwhm3 = (float)(modelConfig.FWHM + (modelConfig.StandardStarMag - modelConfig.StarMag3) * FWHM_GAIN_PER_MAG);
-			float fwhm4 = (float)(modelConfig.FWHM + (modelConfig.StandardStarMag - modelConfig.StarMag4) * FWHM_GAIN_PER_MAG);
-			float fwhm5 = (float)(modelConfig.FWHM + (modelConfig.StandardStarMag - modelConfig.StarMag5) * FWHM_GAIN_PER_MAG);
+            // NOTE: Use the same FWHM to get accurate photometry
+            //float fwhm2 = (float)(modelConfig.FWHM + (modelConfig.StandardStarMag - modelConfig.StarMag2) * FWHM_GAIN_PER_MAG);
+            //float fwhm3 = (float)(modelConfig.FWHM + (modelConfig.StandardStarMag - modelConfig.StarMag3) * FWHM_GAIN_PER_MAG);
+            //float fwhm4 = (float)(modelConfig.FWHM + (modelConfig.StandardStarMag - modelConfig.StarMag4) * FWHM_GAIN_PER_MAG);
+            //float fwhm5 = (float)(modelConfig.FWHM + (modelConfig.StandardStarMag - modelConfig.StarMag5) * FWHM_GAIN_PER_MAG);
 			float fwhm_pb1 = (float)(modelConfig.FWHM + (modelConfig.StandardStarMag - modelConfig.PassByMag1) * FWHM_GAIN_PER_MAG);
 			float fwhm_pb2 = (float)(modelConfig.FWHM + (modelConfig.StandardStarMag - modelConfig.PassByMag2) * FWHM_GAIN_PER_MAG);
 
@@ -195,10 +201,10 @@ namespace Tangra.VideoTools
 				GenerateNoise(bmp, simulatedBackground, modelConfig.NoiseMean, modelConfig.NoiseStdDev);
 
 				GenerateStar(bmp, 25, 160, (float)fwhm1, I1);
-				if (modelConfig.SimulateStar2) GenerateStar(bmp, 75, 160, (float)fwhm2, I2);
-				if (modelConfig.SimulateStar3) GenerateStar(bmp, 125, 160, (float)fwhm3, I3);
-				if (modelConfig.SimulateStar4) GenerateStar(bmp, 175, 160, (float)fwhm4, I4);
-				if (modelConfig.SimulateStar5) GenerateStar(bmp, 225, 160, (float)fwhm5, I5);
+				if (modelConfig.SimulateStar2) GenerateStar(bmp, 75, 160, (float)fwhm1, I2);
+				if (modelConfig.SimulateStar3) GenerateStar(bmp, 125, 160, (float)fwhm1, I3);
+				if (modelConfig.SimulateStar4) GenerateStar(bmp, 175, 160, (float)fwhm1, I4);
+				if (modelConfig.SimulateStar5) GenerateStar(bmp, 225, 160, (float)fwhm1, I5);
 
 				if (modelConfig.SimulatePassBy)
 				{

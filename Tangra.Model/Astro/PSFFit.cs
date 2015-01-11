@@ -174,6 +174,11 @@ namespace Tangra.Model.Astro
             return GetPSFValueInternal(x, y);
         }
 
+        public double GetFittedBackgroundModelValue(double x, double y)
+        {
+            return m_BackgroundModel.ComputeValue(x + m_BackgroundModelOffset, y + m_BackgroundModelOffset);
+        }
+
         public double XCenter
         {
             get { return m_xCenter + m_X0 - m_HalfWidth; }
