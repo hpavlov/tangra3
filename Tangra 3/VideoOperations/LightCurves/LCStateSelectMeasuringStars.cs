@@ -157,6 +157,14 @@ namespace Tangra.VideoOperations.LightCurves
 
             Context.m_SelectedMeasuringStar = Context.MeasuringStars.Count - 1;
             Context.VideoOperation.SelectedTargetChanged(Context.m_SelectedMeasuringStar);
+
+			// Make all the aperture the same size as the current one
+			for (int i = 0; i < Context.MeasuringStars.Count; i++)
+			{
+				TrackedObjectConfig obj = Context.MeasuringStars[i];
+				obj.ApertureInPixels = selectedObject.ApertureInPixels;
+				Context.m_MeasuringApertures[i] = selectedObject.ApertureInPixels;
+			}
         }
     }
 }

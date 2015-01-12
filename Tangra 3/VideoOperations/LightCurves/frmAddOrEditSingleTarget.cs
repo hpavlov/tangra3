@@ -36,7 +36,7 @@ namespace Tangra.VideoOperations.LightCurves
 		private Brush m_Brush;
 		private Color m_Color = Color.WhiteSmoke;
 
-		private float m_Aperture = 2.5f;
+		private float? m_Aperture = null;
 		private TangraConfig.PreProcessingFilter SelectedFilter;
 		private uint[,] m_ProcessingPixels;
 		private byte[,] m_DisplayPixels;
@@ -169,6 +169,8 @@ namespace Tangra.VideoOperations.LightCurves
 
             SelectedFilter = LightCurveReductionContext.Instance.DigitalFilter;
 
+	        if (m_State.MeasuringApertures.Count > 0) m_Aperture = m_State.MeasuringApertures[0];
+
             picTarget1Pixels.Image = new Bitmap(119, 119, PixelFormat.Format24bppRgb);
             picTarget1PSF.Image = new Bitmap(picTarget1PSF.Width, picTarget1PSF.Height);
 
@@ -259,10 +261,19 @@ namespace Tangra.VideoOperations.LightCurves
             rbGuidingStar.Text = "Guiding Star";
             m_IsBrightEnoughForAutoGuidingStar = false;
 
-			if (gaussian != null && !double.IsNaN(gaussian.FWHM) && TangraConfig.Settings.Photometry.SignalApertureUnitDefault == TangraConfig.SignalApertureUnit.FWHM)
-				m_Aperture = (float)(gaussian.FWHM * TangraConfig.Settings.Photometry.DefaultSignalAperture);
-			else
-				m_Aperture = (float)(TangraConfig.Settings.Photometry.DefaultSignalAperture);
+			if (m_Aperture == null)
+			{
+				if (gaussian != null && !double.IsNaN(gaussian.FWHM) && TangraConfig.Settings.Photometry.SignalApertureUnitDefault == TangraConfig.SignalApertureUnit.FWHM)
+					m_Aperture = (float)(gaussian.FWHM * TangraConfig.Settings.Photometry.DefaultSignalAperture);
+				else
+					m_Aperture = (float)(TangraConfig.Settings.Photometry.DefaultSignalAperture);
+			}
+			else if (
+				gaussian != null && !double.IsNaN(gaussian.FWHM) && TangraConfig.Settings.Photometry.SignalApertureUnitDefault == TangraConfig.SignalApertureUnit.FWHM &&
+				m_Aperture < (float)(gaussian.FWHM * TangraConfig.Settings.Photometry.DefaultSignalAperture))
+			{
+				m_Aperture = (float) (gaussian.FWHM*TangraConfig.Settings.Photometry.DefaultSignalAperture);
+			}
 
             nudFitMatrixSize.ValueChanged -= nudFitMatrixSize_ValueChanged;
             try
@@ -297,7 +308,7 @@ namespace Tangra.VideoOperations.LightCurves
                     rbGuidingStar.Text = "Guiding Star";
 
                     // There are no stars that are bright enough. Simply let the user do what they want, but still try to default to a sensible aperture size
-					MeasurementsHelper measurement = ReduceLightCurveOperation.DoConfiguredMeasurement(m_ProcessingPixels, m_Aperture, m_AstroImage.Pixelmap.BitPixCamera, 3.0, ref matirxSize);
+					MeasurementsHelper measurement = ReduceLightCurveOperation.DoConfiguredMeasurement(m_ProcessingPixels, m_Aperture.Value, m_AstroImage.Pixelmap.BitPixCamera, 3.0, ref matirxSize);
 
 	                if (measurement.FoundBestPSFFit != null &&
 	                    measurement.FoundBestPSFFit.IsSolved &&
@@ -324,7 +335,7 @@ namespace Tangra.VideoOperations.LightCurves
 
                     for (int i = 0; i < 2; i++)
                     {
-						MeasurementsHelper measurement = ReduceLightCurveOperation.DoConfiguredMeasurement(m_ProcessingPixels, m_Aperture, m_AstroImage.Pixelmap.BitPixCamera, bestFindTolerance, ref matirxSize);
+						MeasurementsHelper measurement = ReduceLightCurveOperation.DoConfiguredMeasurement(m_ProcessingPixels, m_Aperture.Value, m_AstroImage.Pixelmap.BitPixCamera, bestFindTolerance, ref matirxSize);
                         if (measurement != null && matirxSize != -1)
                         {
                             if (matirxSize < 5)
@@ -429,18 +440,20 @@ namespace Tangra.VideoOperations.LightCurves
                 decimal appVal;
                 if (float.IsNaN(preselectedAperture))
                 {
-					if (float.IsNaN(m_Aperture))
+					if (float.IsNaN(m_Aperture.Value))
 					{
 						appVal = Convert.ToDecimal(TangraConfig.Settings.Photometry.DefaultSignalAperture);
 					}
 					else
 					{
-						appVal = Convert.ToDecimal(m_Aperture);
+						appVal = Convert.ToDecimal(m_Aperture.Value);
 						if (nudAperture1.Maximum < appVal) nudAperture1.Maximum = appVal + 1;
 					}
                 }
                 else
                     appVal = (decimal)preselectedAperture;
+
+				if ((float)appVal > m_Aperture) m_Aperture = (float)appVal;
 
 				nudAperture1.SetNUDValue(Math.Round(appVal, 2));
 
@@ -571,6 +584,7 @@ namespace Tangra.VideoOperations.LightCurves
 		internal void PlotGaussian()
 		{
             if (m_Gaussian == null) return;
+			if (!m_Aperture.HasValue) return;
 
 			Bitmap bmp = picTarget1PSF.Image as Bitmap;
 			if (bmp != null)
@@ -579,14 +593,14 @@ namespace Tangra.VideoOperations.LightCurves
 
 				using (Graphics g = Graphics.FromImage(bmp))
 				{
-					m_Gaussian.DrawInternalPoints(g, rect, m_Aperture, m_Brush, m_AstroImage.Pixelmap.BitPixCamera);
+					m_Gaussian.DrawInternalPoints(g, rect, m_Aperture.Value, m_Brush, m_AstroImage.Pixelmap.BitPixCamera);
 					g.Save();
 				}
 			}
 
 
 			lblFWHM1.Text =
-				string.Format("{0} px = {1} FWHM", m_Aperture.ToString("0.00"),(m_Aperture / m_FWHM).ToString("0.00"));
+				string.Format("{0} px = {1} FWHM", m_Aperture.Value.ToString("0.00"), (m_Aperture.Value / m_FWHM).ToString("0.00"));
 
 			picTarget1PSF.Refresh();
 		}

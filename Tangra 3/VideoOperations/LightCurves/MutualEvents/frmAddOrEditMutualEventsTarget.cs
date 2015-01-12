@@ -114,6 +114,14 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 	        ObjectToAdd = null;
 			ObjectToAdd2 = null;
 
+			float? commonAperture = m_State.MeasuringApertures.Count > 0
+				? m_State.MeasuringApertures[0] :
+				(float?)null;
+
+			m_Aperture = commonAperture;
+			m_Aperture1 = commonAperture;
+			m_Aperture2 = commonAperture;
+
             m_Center = new ImagePixel(center);
 			m_OriginalCenter = new ImagePixel(center);
 
@@ -139,6 +147,14 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 			m_AstroImage = m_VideoController.GetCurrentAstroImage(false);
 
 			ObjectToAdd = selectedObject;
+
+			float? commonAperture = m_State.MeasuringApertures.Count > 0 
+				? m_State.MeasuringApertures[0] : 
+				(float?)null;
+
+			m_Aperture = commonAperture;
+			m_Aperture1 = commonAperture;
+			m_Aperture2 = commonAperture;
 
 			m_Center = new ImagePixel(selectedObject.ApertureStartingX, selectedObject.ApertureStartingY);
 			m_OriginalCenter = new ImagePixel(selectedObject.ApertureStartingX, selectedObject.ApertureStartingY);
@@ -249,10 +265,6 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 
 			if (doubleModeDisabled || !autoDoubleObjectLocated)
 				rbOneObject.Checked = true;
-
-			m_Aperture = null;
-			m_Aperture1 = null;
-			m_Aperture2 = null;
 
 			UpdateStateControls();
 
@@ -372,6 +384,9 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 			{
 				g.Clear(m_Color);
 				g.DrawRectangle(Pens.Black, 0, 0, 15, 15);
+
+				if (rbTwoObjects.Checked)
+					g.FillRectangle(m_Brush2, 1, 8, 14, 7);
 			}
 
 			using (Graphics g = Graphics.FromImage(pbox1a.Image))
@@ -386,14 +401,7 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 
 		private void DrawCollorPanel2()
 		{
-			pbox2.Image = new Bitmap(16, 16);
 			pbox2a.Image = new Bitmap(16, 16);
-
-			using (Graphics g = Graphics.FromImage(pbox2.Image))
-			{
-				g.Clear(m_Color2);
-				g.DrawRectangle(Pens.Black, 0, 0, 15, 15);
-			}
 
 			using (Graphics g = Graphics.FromImage(pbox2a.Image))
 			{
@@ -401,7 +409,6 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 				g.DrawRectangle(Pens.Black, 0, 0, 15, 15);
 			}
 
-			pbox2.Refresh();
 			pbox2a.Refresh();
 		}
 
@@ -593,9 +600,16 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 						m_Aperture = (float)(m_Gaussian.FWHM * TangraConfig.Settings.Photometry.DefaultSignalAperture);
 					else
 						m_Aperture = (float)(TangraConfig.Settings.Photometry.DefaultSignalAperture);
-
-					nudAperture1.SetNUDValue(m_Aperture.Value);
 				}
+				else if (
+					TangraConfig.Settings.Photometry.SignalApertureUnitDefault == TangraConfig.SignalApertureUnit.FWHM &&
+					m_Aperture < (float)(psfFit.FWHM * TangraConfig.Settings.Photometry.DefaultSignalAperture))
+				{
+					// When the default aperture size is in FWHM we always use the largest aperture so far
+					m_Aperture = (float)(psfFit.FWHM * TangraConfig.Settings.Photometry.DefaultSignalAperture);
+				}
+
+				nudAperture1.SetNUDValue(m_Aperture.Value);
 
 				m_Aperture1 = null;
 				m_Aperture2 = null;
@@ -677,8 +691,13 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 						m_Aperture1 = (float)(psfFit.FWHM1 * TangraConfig.Settings.Photometry.DefaultSignalAperture);
 					else
 						m_Aperture1 = (float)(TangraConfig.Settings.Photometry.DefaultSignalAperture);
-
-					nudAperture1.SetNUDValue(m_Aperture1.Value);
+				}
+				else if (
+					TangraConfig.Settings.Photometry.SignalApertureUnitDefault == TangraConfig.SignalApertureUnit.FWHM &&
+					m_Aperture1 < (float)(psfFit.FWHM1 * TangraConfig.Settings.Photometry.DefaultSignalAperture))
+				{
+					// When the default aperture size is in FWHM we always use the largest aperture so far
+					m_Aperture1 = (float)(psfFit.FWHM1 * TangraConfig.Settings.Photometry.DefaultSignalAperture);
 				}
 
 				if (m_Aperture2 == null)
@@ -687,9 +706,19 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 						m_Aperture2 = (float)(psfFit.FWHM2 * TangraConfig.Settings.Photometry.DefaultSignalAperture);
 					else
 						m_Aperture2 = (float)(TangraConfig.Settings.Photometry.DefaultSignalAperture);
-
-					nudAperture2.SetNUDValue(m_Aperture2.Value);
 				}
+				else if (
+					TangraConfig.Settings.Photometry.SignalApertureUnitDefault == TangraConfig.SignalApertureUnit.FWHM &&
+					m_Aperture2 < (float)(psfFit.FWHM2 * TangraConfig.Settings.Photometry.DefaultSignalAperture))
+				{
+					// When the default aperture size is in FWHM we always use the largest aperture so far
+					m_Aperture2 = (float) (psfFit.FWHM2*TangraConfig.Settings.Photometry.DefaultSignalAperture);
+				}
+
+				if (m_Aperture1 > m_Aperture2) m_Aperture2 = m_Aperture1;
+				if (m_Aperture2 > m_Aperture1) m_Aperture1 = m_Aperture2;
+
+				nudAperture1.SetNUDValue(m_Aperture1.Value);
 
 				m_Aperture = null;
 				m_Gaussian = null;
@@ -840,7 +869,7 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 
 			// Add the second star (with bigger amplitude)
 		    ObjectToAdd2 = new TrackedObjectConfig();
-			ObjectToAdd2.ApertureInPixels = (float)nudAperture2.Value;
+			ObjectToAdd2.ApertureInPixels = (float)nudAperture1.Value;
 			ObjectToAdd2.MeasureThisObject = true; /* We measure all objects (comparison or occulted), unless specified otherwise by the user */
 			ObjectToAdd2.ApertureMatrixX0 = m_X2;
 			ObjectToAdd2.ApertureMatrixY0 = m_Y2;
@@ -892,24 +921,11 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 			UpdateViews();
 		}
 
-		private void nudAperture2_ValueChanged(object sender, EventArgs e)
-		{
-			if (rbTwoObjects.Checked)
-			{
-				m_Aperture2 = (float)nudAperture2.Value;
-
-				UpdateViews();
-			}
-		}
-
 		private void UpdateStateControls()
 		{
 			bool twoObjects = rbTwoObjects.Checked;
 
-			pbox2.Visible = twoObjects;
 			pbox2a.Visible = twoObjects;
-			nudAperture2.Visible = twoObjects;
-			lblAperture2.Visible = twoObjects;
 			lblFWHM2.Visible = twoObjects;
 
 			rbOccElc1.Visible = rbOcculted.Checked;
