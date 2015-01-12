@@ -517,6 +517,18 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void btnOK_Click(object sender, EventArgs e)
         {
+            if (ComboboxIndexToPhotometryReductionMethod() == TangraConfig.PhotometryReductionMethod.PsfPhotometry &&
+                ComboboxIndexToPsfQuadratureMethod() == TangraConfig.PsfQuadrature.Analytical)
+            {
+                if (ComboboxIndexToBackgroundMethod() != TangraConfig.BackgroundMethod.PSFBackground &&
+                    ComboboxIndexToBackgroundMethod() != TangraConfig.BackgroundMethod.Background3DPolynomial)
+                {
+                    MessageBox.Show(this, "Only 'PSF-Fitting Background' and '3D Polynomial Fit' are supported with 'Full Analytical Quadrature'. Please choose a different background method.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    cbxBackgroundMethod.Focus();
+                    return;
+                }
+            }
+
 			m_Context.BackgroundMethod = ComboboxIndexToBackgroundMethod();
 			m_Context.SignalMethod = ComboboxIndexToPhotometryReductionMethod();
 			m_Context.PsfQuadratureMethod = ComboboxIndexToPsfQuadratureMethod();
@@ -672,15 +684,12 @@ namespace Tangra.VideoOperations.LightCurves
 		private void EnsurePsfBackgroundControlsStatus()
 		{
 			if (ComboboxIndexToPhotometryReductionMethod() == TangraConfig.PhotometryReductionMethod.PsfPhotometry &&
-				ComboboxIndexToPsfQuadratureMethod() == TangraConfig.PsfQuadrature.Analytical)
+				ComboboxIndexToPsfQuadratureMethod() == TangraConfig.PsfQuadrature.Analytical &&
+                ComboboxIndexToBackgroundMethod() != TangraConfig.BackgroundMethod.PSFBackground && 
+                ComboboxIndexToBackgroundMethod() != TangraConfig.BackgroundMethod.Background3DPolynomial)
 			{
 				SetComboboxIndexFromBackgroundMethod(TangraConfig.BackgroundMethod.PSFBackground);
-				cbxBackgroundMethod.Enabled = false;
 			}
-			else
-			{
-				cbxBackgroundMethod.Enabled = true;
-			}			
 		}
 
 		private void cbxBackgroundMethod_SelectedIndexChanged(object sender, EventArgs e)

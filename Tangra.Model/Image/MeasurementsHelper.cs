@@ -338,13 +338,11 @@ namespace Tangra.Model.Image
             }
             else
             {
-                double apertureForBackground = 3 * fit.FWHM;
-
                 // Analytical quadrature (Gauss Integral)		
                 if (m_BackgroundMethod == TangraConfig.BackgroundMethod.PSFBackground)
                 {
                     m_TotalReading = (fit.IMax - fit.I0) * fit.R0 * fit.R0 * Math.PI;
-                    m_TotalBackground = Math.PI * apertureForBackground * apertureForBackground * (float)fit.I0;
+                    m_TotalBackground = 0; // The background has been already included in the TotalReading
                 }
 				else if (m_BackgroundMethod == TangraConfig.BackgroundMethod.Background3DPolynomial)
 				{
@@ -352,27 +350,14 @@ namespace Tangra.Model.Image
 						throw new InvalidOperationException("3D-Polynomial was not applied correctly.");
 
 					m_TotalReading = (fit.IMax - fit.I0) * fit.R0 * fit.R0 * Math.PI;
-					m_TotalBackground = Math.PI * apertureForBackground * apertureForBackground * (float)fit.I0;
+					m_TotalBackground = 0; // The background has been already included in the TotalReading
 				}
                 else
-                {
-                    int offset = (35 - fit.MatrixSize) / 2;
-                    double bgFromAnnulus = GetBackground(backgroundArea, m_Aperture, m_XCenter + offset, m_YCenter + offset, bgAnnulusFactor);
-                    m_TotalReading = (fit.IMax - bgFromAnnulus) * fit.R0 * fit.R0 * Math.PI;
-                    m_TotalBackground = Math.PI * apertureForBackground * apertureForBackground * (float)bgFromAnnulus;
-                }
-
-                // Artificially add some background
-                m_TotalReading += m_TotalBackground;
+				{
+                    throw new InvalidOperationException("Analytical quadrature only works with PSFBackground and Background3DPolynomial.");
+				}
             }
         }
-
-		// TODO: Run test for: PSF Photometry (analytical, average model)
-		//		               PSF Photometry (quandrature, average model)
-		//		               PSF Photometry (analytical, non linear fit)
-		//		               PSF Photometry (quandrature, non linear fit)
-		//
-		// TODO: Make sure all return numbers. Check why only 'signal-minus background' was available in some cases. Is this the right thing to do??
 
 		internal NotMeasuredReasons DoOptimalExtractionPhotometry(
 			PSFFit fit,
