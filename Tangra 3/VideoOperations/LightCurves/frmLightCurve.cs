@@ -144,10 +144,13 @@ namespace Tangra.VideoOperations.LightCurves
 			switch (m_LightCurveController.Context.SignalMethod)
 			{
 				case TangraConfig.PhotometryReductionMethod.AperturePhotometry:
-					return "Aperture Photometry";
+                    return "Aperture Photometry";
 
 				case TangraConfig.PhotometryReductionMethod.PsfPhotometry:
-					return "PSF Photometry";
+					string rv =  "PSF Photometry";
+                    if (m_LightCurveController.Context.PsfFittingMethod == TangraConfig.PsfFittingMethod.LinearFitOfAveragedModel) rv += " (Averaged Model)";
+                    if (m_LightCurveController.Context.PsfQuadratureMethod == TangraConfig.PsfQuadrature.Analytical) rv += " (Analytical)";
+			        return rv;
 
 				case TangraConfig.PhotometryReductionMethod.OptimalExtraction:
 					return "Optimal Extraction Photometry";

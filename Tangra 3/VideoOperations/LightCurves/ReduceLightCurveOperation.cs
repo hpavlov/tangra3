@@ -1958,6 +1958,7 @@ namespace Tangra.VideoOperations.LightCurves
 				synchronise,
 				LightCurveReductionContext.Instance.ReductionMethod,
 				LightCurveReductionContext.Instance.PsfQuadratureMethod,
+                TangraConfig.Settings.Photometry.PsfFittingMethod,
 				trackedObject.OriginalObject.ApertureInPixels,
 				refinedFWHM,
 				averageFWHM,
@@ -2018,6 +2019,7 @@ namespace Tangra.VideoOperations.LightCurves
 			bool synchronise,
 			TangraConfig.PhotometryReductionMethod reductionMethod,
 			TangraConfig.PsfQuadrature psfQuadrature,
+            TangraConfig.PsfFittingMethod psfFittngMethod,
 			float aperture,
 			double refinedFWHM,
 			float refinedAverageFWHM,
@@ -2028,7 +2030,7 @@ namespace Tangra.VideoOperations.LightCurves
 			)
 		{
 			return measurer.MeasureObject(
-				center, data, backgroundPixels, bpp, filter, synchronise, reductionMethod, psfQuadrature,
+				center, data, backgroundPixels, bpp, filter, synchronise, reductionMethod, psfQuadrature, psfFittngMethod,
 				aperture, refinedFWHM, refinedAverageFWHM, measurableObject, groupCenters, aperturesInGroup, fullDisappearance);
 		}
 

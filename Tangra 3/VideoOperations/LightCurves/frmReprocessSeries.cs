@@ -281,6 +281,7 @@ namespace Tangra.VideoOperations.LightCurves
 				false,
 				Context.SignalMethod,
 				Context.PsfQuadratureMethod,
+                Context.PsfFittingMethod,
 				newSignalAperture,
 				objConfig.RefinedFWHM,
 				Footer.RefinedAverageFWHM,

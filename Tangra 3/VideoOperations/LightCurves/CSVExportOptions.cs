@@ -185,7 +185,7 @@ namespace Tangra.VideoOperations.LightCurves
                                              totalReading.ToString(5),
                                              totalBackground.ToString(5));
                     else
-                        return string.Format(",{0}", totalReading.ToString(5));
+                        return string.Format(",{0}", (totalReading - totalBackground).ToString(5));
                 }
                 else
                 {

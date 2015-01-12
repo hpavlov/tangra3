@@ -738,6 +738,9 @@ namespace Tangra.Model.Astro
 
 		private void LinearFitOfAveragedModel(uint[,] intensity)
         {
+            if (m_BackgroundModel != null)
+                throw new NotSupportedException("Background modelling cannot be used directly with linear fit of average model.");
+
             // First do a non linear fit to find X0 and Y0
             NonLinearFit(intensity, false);
 

@@ -522,6 +522,7 @@ namespace Tangra.VideoOperations.LightCurves
 			m_Context.PsfQuadratureMethod = ComboboxIndexToPsfQuadratureMethod();
 			m_Context.Filter = (LightCurveContext.FilterType)cbxDigitalFilter.SelectedIndex;
 			m_Context.EncodingGamma = (double)nudGamma.Value;
+            m_Context.PsfFittingMethod = TangraConfig.Settings.Photometry.PsfFittingMethod;
 
             DialogResult = DialogResult.OK;
             Close();
