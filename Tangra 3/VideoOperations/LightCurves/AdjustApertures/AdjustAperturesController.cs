@@ -25,7 +25,7 @@ namespace Tangra.VideoOperations.LightCurves.AdjustApertures
 			m_StateMachine = stateMachine;
 			m_VideoController = videoController;
 
-			var frm = new frmAdjustApertures();
+			var frm = new frmAdjustApertures(stateMachine);
 
 			frm.Controller = this;
 			frm.Model = new AdjustAperturesViewModel(m_StateMachine.MeasuringApertures, m_StateMachine.MeasuringStars);

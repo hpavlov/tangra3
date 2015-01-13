@@ -28,6 +28,11 @@ namespace Tangra.VideoOperations.LightCurves.AdjustApertures
 		public frmAdjustApertures()
 		{
 			InitializeComponent();
+		}
+
+		internal frmAdjustApertures(LCStateMachine stateMachine)
+		{
+			InitializeComponent();
 
 			picTarget1Pixels.Image = new Bitmap(picTarget1Pixels.Width, picTarget1Pixels.Height);
 			picTarget2Pixels.Image = new Bitmap(picTarget2Pixels.Width, picTarget2Pixels.Height);
@@ -43,18 +48,8 @@ namespace Tangra.VideoOperations.LightCurves.AdjustApertures
             m_SettingControlValues = true;
             try
             {
-                if (TangraConfig.Settings.Photometry.SignalApertureUnitDefault == TangraConfig.SignalApertureUnit.FWHM)
-                {
-                    nudCommonAperture.SetNUDValue(TangraConfig.Settings.Photometry.DefaultSignalAperture);
-                    cbxCommonUnit.SelectedIndex = 1;
-                    nudFWHMAperture.SetNUDValue(TangraConfig.Settings.Photometry.DefaultSignalAperture);
-                }
-                else if (TangraConfig.Settings.Photometry.SignalApertureUnitDefault == TangraConfig.SignalApertureUnit.Pixels)
-                {
-                    nudCommonAperture.SetNUDValue(1.2);
-                    cbxCommonUnit.SelectedIndex = 0;
-                    nudFWHMAperture.SetNUDValue(1.2);
-                }
+				nudCommonAperture.SetNUDValue(stateMachine.MeasuringApertures[0]);
+				cbxCommonUnit.SelectedIndex = 0;
 
                 if (!rbSameApertures.Checked)
                 {
@@ -175,7 +170,6 @@ namespace Tangra.VideoOperations.LightCurves.AdjustApertures
                     PlotPixels(picTarget4Pixels, 3);
                 }
 
-                pnlBoundToFWHM.Enabled = rbBoundToFWHM.Checked;
                 pnlSameApertures.Enabled = rbSameApertures.Checked;
                 pnlCusomApertures.Enabled = rbCusomApertures.Checked;
 		    }
@@ -203,9 +197,8 @@ namespace Tangra.VideoOperations.LightCurves.AdjustApertures
 				}
 
 			    float apertureInPixels = Model.Apertures[targetId];
-				int appOffs = target.Gaussian != null ? (35 - target.Gaussian.MatrixSize) / 2 : 9;
-				float apX = appOffs + target.ApertureMatrixX0;
-				float apY = appOffs + target.ApertureMatrixY0;
+				float apX = 9 + target.ApertureMatrixX0;
+				float apY = 9 + target.ApertureMatrixY0;
                 float apRectX = 2 * (apX - apertureInPixels);
                 float apRectY = 2 * (apY - apertureInPixels);
                 float apertureSize = 4 * apertureInPixels;
@@ -257,14 +250,7 @@ namespace Tangra.VideoOperations.LightCurves.AdjustApertures
         {
             if (Model != null && !m_SettingControlValues)
             {
-                if (rbBoundToFWHM.Checked)
-                {
-                    for (int i = 0; i < Model.Apertures.Length; i++)
-                    {
-                        Model.Apertures[i] = Model.FWHMs[i] * (float)nudFWHMAperture.Value;
-                    }
-                }
-                else if (rbSameApertures.Checked)
+                if (rbSameApertures.Checked)
                 {
                     float commonValue = 4.0f;
                     if (cbxCommonUnit.SelectedIndex == 0)

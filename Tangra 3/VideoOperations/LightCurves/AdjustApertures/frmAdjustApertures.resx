@@ -120,11 +120,17 @@
   <metadata name="menuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
+  <metadata name="menuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
+  </metadata>
   <data name="label2.Text" xml:space="preserve">
     <value>    This screen allows you to adjust in bulk the aperture sizes of all objects that have been added so far for measurement. If you make changes to the objects you will need to open this form again and redo the adjustments.</value>
   </data>
   <data name="label4.Text" xml:space="preserve">
-    <value>    Use this option when doing measurements of the same objects across multiple files or when higher precision is required for quantative photometry of bright non-saturated objects using aperture photometry.</value>
+    <value>    This is the default option in Tangra. It ensures quantative photometric precision for bright non-saturated objects using aperture photometry or focused and non-saturated up to moderately saturated objects using PSF photometry. You can manually set the aperture size from here when doing measurements of the same objects across multiple files so the apertures are the same in all files.</value>
+  </data>
+  <data name="label5.Text" xml:space="preserve">
+    <value>    You can also provide different aperture sizes for the different objects. This will make any relative brightness or stellar magnitude measurements incorrect, but will give a little better SNR which could be useful for timing occultations.</value>
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
