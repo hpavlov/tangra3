@@ -1816,7 +1816,7 @@ namespace Tangra.VideoOperations.LightCurves
                     Trace.Assert(prevFrameId != frameState.VideoCameraFrameId || frameState.VideoCameraFrameId == 0 /* When VideoCameraFrameId is not supported */);
                     prevFrameId = frameState.VideoCameraFrameId;
 
-                    int frameDuration = (int)Math.Round(frameState.ExposureInMilliseconds);
+                    int frameDuration = (int)Math.Ceiling(frameState.ExposureInMilliseconds);
 
                     LCFile.SaveOnTheFlyFrameTiming(new LCFrameTiming(frameState.CentralExposureTime, frameDuration));
                 }
