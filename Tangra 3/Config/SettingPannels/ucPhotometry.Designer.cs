@@ -57,10 +57,10 @@
 			this.nudSNFrameWindow = new System.Windows.Forms.NumericUpDown();
 			this.label25 = new System.Windows.Forms.Label();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.groupBox2 = new System.Windows.Forms.GroupBox();
+			this.rb3DThirdOrder = new System.Windows.Forms.RadioButton();
 			this.rb3DFirstOrder = new System.Windows.Forms.RadioButton();
 			this.rb3DSecondOrder = new System.Windows.Forms.RadioButton();
-			this.rb3DThirdOrder = new System.Windows.Forms.RadioButton();
-			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.groupControl2.SuspendLayout();
 			this.pnlSeeingSettings.SuspendLayout();
 			this.pnlUserSeeing.SuspendLayout();
@@ -351,9 +351,24 @@
 			// nudSNFrameWindow
 			// 
 			this.nudSNFrameWindow.Location = new System.Drawing.Point(180, 318);
+			this.nudSNFrameWindow.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+			this.nudSNFrameWindow.Minimum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
 			this.nudSNFrameWindow.Name = "nudSNFrameWindow";
 			this.nudSNFrameWindow.Size = new System.Drawing.Size(47, 20);
 			this.nudSNFrameWindow.TabIndex = 58;
+			this.nudSNFrameWindow.Value = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
 			// 
 			// label25
 			// 
@@ -381,6 +396,29 @@
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Background Measurements";
 			// 
+			// groupBox2
+			// 
+			this.groupBox2.Controls.Add(this.rb3DThirdOrder);
+			this.groupBox2.Controls.Add(this.rb3DFirstOrder);
+			this.groupBox2.Controls.Add(this.rb3DSecondOrder);
+			this.groupBox2.Location = new System.Drawing.Point(19, 185);
+			this.groupBox2.Name = "groupBox2";
+			this.groupBox2.Size = new System.Drawing.Size(194, 88);
+			this.groupBox2.TabIndex = 41;
+			this.groupBox2.TabStop = false;
+			this.groupBox2.Text = "3D-Polynomial Fitting";
+			// 
+			// rb3DThirdOrder
+			// 
+			this.rb3DThirdOrder.AutoSize = true;
+			this.rb3DThirdOrder.Location = new System.Drawing.Point(23, 64);
+			this.rb3DThirdOrder.Name = "rb3DThirdOrder";
+			this.rb3DThirdOrder.Size = new System.Drawing.Size(70, 17);
+			this.rb3DThirdOrder.TabIndex = 40;
+			this.rb3DThirdOrder.TabStop = true;
+			this.rb3DThirdOrder.Text = "3-rd order";
+			this.rb3DThirdOrder.UseVisualStyleBackColor = true;
+			// 
 			// rb3DFirstOrder
 			// 
 			this.rb3DFirstOrder.AutoSize = true;
@@ -402,29 +440,6 @@
 			this.rb3DSecondOrder.TabStop = true;
 			this.rb3DSecondOrder.Text = "2-nd order";
 			this.rb3DSecondOrder.UseVisualStyleBackColor = true;
-			// 
-			// rb3DThirdOrder
-			// 
-			this.rb3DThirdOrder.AutoSize = true;
-			this.rb3DThirdOrder.Location = new System.Drawing.Point(23, 64);
-			this.rb3DThirdOrder.Name = "rb3DThirdOrder";
-			this.rb3DThirdOrder.Size = new System.Drawing.Size(70, 17);
-			this.rb3DThirdOrder.TabIndex = 40;
-			this.rb3DThirdOrder.TabStop = true;
-			this.rb3DThirdOrder.Text = "3-rd order";
-			this.rb3DThirdOrder.UseVisualStyleBackColor = true;
-			// 
-			// groupBox2
-			// 
-			this.groupBox2.Controls.Add(this.rb3DThirdOrder);
-			this.groupBox2.Controls.Add(this.rb3DFirstOrder);
-			this.groupBox2.Controls.Add(this.rb3DSecondOrder);
-			this.groupBox2.Location = new System.Drawing.Point(19, 185);
-			this.groupBox2.Name = "groupBox2";
-			this.groupBox2.Size = new System.Drawing.Size(194, 88);
-			this.groupBox2.TabIndex = 41;
-			this.groupBox2.TabStop = false;
-			this.groupBox2.Text = "3D-Polynomial Fitting";
 			// 
 			// ucPhotometry
 			// 

@@ -99,7 +99,7 @@ namespace Tangra.VideoOperations.LightCurves
 					if (totalMinValue > adjustedValue) totalMinValue = adjustedValue;
 					if (totalMaxValue < adjustedValue) totalMaxValue = adjustedValue;
 
-                    if (m_IncludeObjects[i])
+                    if (m_IncludeObjects[i] && reading.IsSuccessfulReading)
                     {
 						bool includeInMinMaxCalcs = j > 10;
 
@@ -318,8 +318,11 @@ namespace Tangra.VideoOperations.LightCurves
                     {
 						double normValue = m_AllBinnedReadings[i][j].AdjustedValue * normalIndexes[j];
                         m_AllBinnedReadings[i][j].AdjustedValue = normValue;
-						if (minValue > normValue) minValue = (int)normValue;
-						if (maxValue < normValue) maxValue = (int)normValue;
+						if (m_AllBinnedReadings[i][j].IsSuccessfulReading || m_DisplaySettings.DrawInvalidDataPoints)
+						{
+							if (minValue > normValue) minValue = (int)normValue;
+							if (maxValue < normValue) maxValue = (int)normValue;
+						}
                     }
                 }
             }
@@ -337,8 +340,11 @@ namespace Tangra.VideoOperations.LightCurves
 						double normValue = Math.Round(m_LightCurveController.Context.AllReadings[i][j].AdjustedReading * normalIndexes[j]);
 						LCMeasurement measurement = m_LightCurveController.Context.AllReadings[i][j];
                         measurement.AdjustedReading = (int)normValue;
-						if (minValue > normValue) minValue = (int)normValue;
-						if (maxValue < normValue) maxValue = (int)normValue;
+						if (measurement.IsSuccessfulReading || m_DisplaySettings.DrawInvalidDataPoints)
+						{
+							if (minValue > normValue) minValue = (int)normValue;
+							if (maxValue < normValue) maxValue = (int)normValue;
+						}
                         m_LightCurveController.Context.AllReadings[i][j] = measurement;
 					}
                 }
@@ -426,19 +432,26 @@ namespace Tangra.VideoOperations.LightCurves
                 }
             }
 
-            double firstValue = averages.FirstOrDefault(x => !double.IsNaN(x));
-            if (double.IsNaN(firstValue) || firstValue == 0)
-            {
-                for (int i = 0; i < maxIdx; i++) normalIndexes.Add(1);
-            }
+	        int nonNanValues = averages.Count(x => !double.IsNaN(x));
 
-            for (int i = 0; i < maxIdx; i++)
-            {
-                if (double.IsNaN(averages[i]))
-                    normalIndexes.Add(1);
-                else
-                    normalIndexes.Add(firstValue / averages[i]);
-            }
+			if (nonNanValues < 3)
+			{
+				for (int i = 0; i < maxIdx; i++) normalIndexes.Add(1);
+			}
+			else
+			{
+				List<double> first3 = averages.Where(x => !double.IsNaN(x)).Take(3).ToList();
+				first3.Sort();
+				double normValue = first3[1];
+
+				for (int i = 0; i < maxIdx; i++)
+				{
+					if (double.IsNaN(averages[i]))
+						normalIndexes.Add(1);
+					else
+						normalIndexes.Add(normValue / averages[i]);
+				}
+			}
         }
 
 
