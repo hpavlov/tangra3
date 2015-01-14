@@ -63,9 +63,6 @@ namespace Tangra.VideoOperations.LightCurves
 	    private int m_PartiallySuccessfulFrames = 0;
         private Stopwatch m_StopWatch = new Stopwatch();
 
-        private readonly Pen[] m_AllPens = new Pen[4];
-        private readonly Brush[] m_AllBrushes = new Brush[4];
-
 	    private uint[] m_LastTotalReading = new uint[4];
 	    private uint[] m_LastTotalBackground = new uint[4];
 	    private float[] m_LastApertureX = new float[4];
@@ -104,6 +101,8 @@ namespace Tangra.VideoOperations.LightCurves
 		private int m_NumberOcredVtiOsdFrames;
 		private int m_NumberFailedOcredVtiOsdFrames;
 
+	    private TangraConfig.LightCurvesDisplaySettings m_DisplaySettings;
+
 		public ReduceLightCurveOperation()
 		{
 			Debug.Assert(false, "This constructor should not be called.");
@@ -114,15 +113,9 @@ namespace Tangra.VideoOperations.LightCurves
 			m_LightCurveController = lightCurveController;
 			m_DebugMode = debugMode;
 
-            m_AllPens[0] = new Pen(TangraConfig.Settings.Color.Target1);
-            m_AllPens[1] = new Pen(TangraConfig.Settings.Color.Target2);
-            m_AllPens[2] = new Pen(TangraConfig.Settings.Color.Target3);
-            m_AllPens[3] = new Pen(TangraConfig.Settings.Color.Target4);
-
-            m_AllBrushes[0] = new SolidBrush(TangraConfig.Settings.Color.Target1);
-            m_AllBrushes[1] = new SolidBrush(TangraConfig.Settings.Color.Target2);
-            m_AllBrushes[2] = new SolidBrush(TangraConfig.Settings.Color.Target3);
-            m_AllBrushes[3] = new SolidBrush(TangraConfig.Settings.Color.Target4); 
+			m_DisplaySettings = new TangraConfig.LightCurvesDisplaySettings();
+			m_DisplaySettings.Load();
+			m_DisplaySettings.Initialize();
         }
 
 		internal void SetLCFile(LCFile loadedFile)
@@ -484,9 +477,9 @@ namespace Tangra.VideoOperations.LightCurves
 
 							if (!float.IsNaN(delta))
 							{
-								g.DrawEllipse(m_AllPens[i], data.X0 - delta, data.Y0 - delta, 2 * delta, 2 * delta);
+								g.DrawEllipse(m_DisplaySettings.TargetPens[i], data.X0 - delta, data.Y0 - delta, 2 * delta, 2 * delta);
 								g.DrawString(string.Format("x={0}; y={1}", data.X0.ToString("0.0"), data.Y0.ToString("0.0")),
-											 s_FONT, m_AllBrushes[i], data.X0, data.Y0 + 2 * delta);
+											 s_FONT, m_DisplaySettings.TargetBrushes[i], data.X0, data.Y0 + 2 * delta);
 
 							}
 						}
@@ -511,7 +504,7 @@ namespace Tangra.VideoOperations.LightCurves
 
                                 if (!float.IsNaN(app))
                                 {
-									g.DrawEllipse(m_AllPens[i], (float)center.XDouble + m_ManualTrackingDeltaX[i] - app, (float)center.YDouble + m_ManualTrackingDeltaY[i] - app, 2 * app, 2 * app);
+									g.DrawEllipse(m_DisplaySettings.TargetPens[i], (float)center.XDouble + m_ManualTrackingDeltaX[i] - app, (float)center.YDouble + m_ManualTrackingDeltaY[i] - app, 2 * app, 2 * app);
                                 }
                             }
                         }
@@ -528,7 +521,7 @@ namespace Tangra.VideoOperations.LightCurves
 
                             if (center != null)
                             {
-								g.DrawEllipse(m_AllPens[i], (float)center.XDouble + m_ManualTrackingDeltaX[i] - app, (float)center.YDouble + m_ManualTrackingDeltaY[i] - app, 2 * app, 2 * app);
+								g.DrawEllipse(m_DisplaySettings.TargetPens[i], (float)center.XDouble + m_ManualTrackingDeltaX[i] - app, (float)center.YDouble + m_ManualTrackingDeltaY[i] - app, 2 * app, 2 * app);
                             }
                         }
 
@@ -565,7 +558,7 @@ namespace Tangra.VideoOperations.LightCurves
                         {
                             if (!float.IsNaN(delta))
                                 g.DrawArc(
-                                    m_AllPens[i], (float)center.XDouble - delta,
+									m_DisplaySettings.TargetPens[i], (float)center.XDouble - delta,
                                     (float)center.YDouble - delta, 2 * delta, 2 * delta,
                                     0, (float)Math.Min(360 * (1 - m_Tracker.RefiningPercentageWorkLeft), 360));
                         }
@@ -577,7 +570,7 @@ namespace Tangra.VideoOperations.LightCurves
                     {
                         TrackedObjectConfig star = m_StateMachine.MeasuringStars[i];
                         float aperture = m_StateMachine.MeasuringApertures[i] + 1;
-                        Pen pen = m_AllPens[i];
+						Pen pen = m_DisplaySettings.TargetPens[i];
 
 						float centerX = star.ApertureStartingX + m_ManualTrackingDeltaX[i];
 						float centerY = star.ApertureStartingY + m_ManualTrackingDeltaY[i];
@@ -636,7 +629,7 @@ namespace Tangra.VideoOperations.LightCurves
 
                         Pen pen =
                             isMeasuringStar
-                            ? m_AllPens[m_StateMachine.SelectedMeasuringStar]
+							? m_DisplaySettings.TargetPens[m_StateMachine.SelectedMeasuringStar]
                             : Pens.WhiteSmoke;
 
 						Bitmap zoomedBmp = m_AstroImage.GetZoomImagePixels(star.X, star.Y, TangraConfig.Settings.Color.Saturation, TangraConfig.Settings.Photometry.Saturation);
@@ -649,6 +642,11 @@ namespace Tangra.VideoOperations.LightCurves
 
                             if (isMeasuringStar)
                             {
+								Pen bgPen =
+									isMeasuringStar
+									? m_DisplaySettings.TargetBackgroundPens[m_StateMachine.SelectedMeasuringStar]
+									: Pens.WhiteSmoke;
+
                                 // Draw background annulus
                                 float innerRadius = aperture * TangraConfig.Settings.Photometry.AnnulusInnerRadius;
                                 float outerRadius = (float)Math.Sqrt(TangraConfig.Settings.Photometry.AnnulusMinPixels / Math.PI + innerRadius * innerRadius);
@@ -656,8 +654,8 @@ namespace Tangra.VideoOperations.LightCurves
                                 innerRadius *= 8.0f;
                                 outerRadius *= 8.0f;
 
-                                gz.DrawEllipse(pen, x - innerRadius, y - innerRadius, 2 * innerRadius, 2 * innerRadius);
-                                gz.DrawEllipse(pen, x - outerRadius, y - outerRadius, 2 * outerRadius, 2 * outerRadius);
+                                gz.DrawEllipse(bgPen, x - innerRadius, y - innerRadius, 2 * innerRadius, 2 * innerRadius);
+                                gz.DrawEllipse(bgPen, x - outerRadius, y - outerRadius, 2 * outerRadius, 2 * outerRadius);
                             }
 
                             gz.Save();
@@ -766,7 +764,7 @@ namespace Tangra.VideoOperations.LightCurves
 				foreach (ITrackedObject obj in m_Tracker.TrackedObjects)
 				{
 					int beg = obj.TargetNo * (objHeight) + obj.TargetNo * 20 + 10;
-					g.FillRectangle(m_AllBrushes[obj.TargetNo], 1, beg, 4, objHeight);
+					g.FillRectangle(m_DisplaySettings.TargetBrushes[obj.TargetNo], 1, beg, 4, objHeight);
 					g.FillRectangle(m_MedianBackgroundBrush, 5, beg, width - 9, objHeight);
 				}
 
@@ -864,14 +862,14 @@ namespace Tangra.VideoOperations.LightCurves
                                     xx = xx * 8 + 0.5f;
                                     yy = yy * 8 + 0.5f;
 
-                                    gMain.DrawLine(m_AllPens[obj.TargetNo], xx - 16, yy, xx, yy);
-                                    gMain.DrawLine(m_AllPens[obj.TargetNo], xx - 16, yy + 1, xx, yy + 1);
-                                    gMain.DrawLine(m_AllPens[obj.TargetNo], xx, yy - 16, xx, yy);
-                                    gMain.DrawLine(m_AllPens[obj.TargetNo], xx + 1, yy - 16, xx + 1, yy);
-                                    gMain.DrawLine(m_AllPens[obj.TargetNo], xx + 16, yy, xx, yy);
-                                    gMain.DrawLine(m_AllPens[obj.TargetNo], xx + 16, yy + 1, xx, yy + 1);
-                                    gMain.DrawLine(m_AllPens[obj.TargetNo], xx, yy + 16, xx, yy);
-                                    gMain.DrawLine(m_AllPens[obj.TargetNo], xx + 1, yy + 16, xx + 1, yy);
+									gMain.DrawLine(m_DisplaySettings.TargetPens[obj.TargetNo], xx - 16, yy, xx, yy);
+									gMain.DrawLine(m_DisplaySettings.TargetPens[obj.TargetNo], xx - 16, yy + 1, xx, yy + 1);
+									gMain.DrawLine(m_DisplaySettings.TargetPens[obj.TargetNo], xx, yy - 16, xx, yy);
+									gMain.DrawLine(m_DisplaySettings.TargetPens[obj.TargetNo], xx + 1, yy - 16, xx + 1, yy);
+									gMain.DrawLine(m_DisplaySettings.TargetPens[obj.TargetNo], xx + 16, yy, xx, yy);
+									gMain.DrawLine(m_DisplaySettings.TargetPens[obj.TargetNo], xx + 16, yy + 1, xx, yy + 1);
+									gMain.DrawLine(m_DisplaySettings.TargetPens[obj.TargetNo], xx, yy + 16, xx, yy);
+									gMain.DrawLine(m_DisplaySettings.TargetPens[obj.TargetNo], xx + 1, yy + 16, xx + 1, yy);
                                 }
                             }
 
@@ -906,7 +904,7 @@ namespace Tangra.VideoOperations.LightCurves
 
                                 float halfAper = m_LoadedLcFile.Header.MeasurementApertures[targNo] * 8;
 
-                                gMain.DrawEllipse(m_AllPens[targNo], xx - halfAper, yy - halfAper, 2 * halfAper, 2 * halfAper);
+								gMain.DrawEllipse(m_DisplaySettings.TargetPens[targNo], xx - halfAper, yy - halfAper, 2 * halfAper, 2 * halfAper);
 
                                 if (DebugContext.DebugSubPixelMeasurements)
                                 {
@@ -1000,7 +998,7 @@ namespace Tangra.VideoOperations.LightCurves
 			{
 				if (obj.PSFFit != null)
 				{
-					obj.PSFFit.DrawDataPixels(g, m_ZoomPixelRects[obj.TargetNo], obj.OriginalObject.ApertureInPixels, m_AllPens[obj.TargetNo], m_VideoController.VideoBitPix, m_VideoController.VideoAav16NormVal);
+					obj.PSFFit.DrawDataPixels(g, m_ZoomPixelRects[obj.TargetNo], obj.OriginalObject.ApertureInPixels, m_DisplaySettings.TargetPens[obj.TargetNo], m_VideoController.VideoBitPix, m_VideoController.VideoAav16NormVal);
 				}
 				else if (obj.IsLocated)
 				{
@@ -1014,7 +1012,7 @@ namespace Tangra.VideoOperations.LightCurves
 							m_ZoomPixelRects[obj.TargetNo],
 							m_VideoController.VideoBitPix, m_VideoController.VideoAav16NormVal,
 							(float)obj.Center.XDouble - x0 + 8, (float)obj.Center.YDouble - y0 + 8,
-							obj.OriginalObject.ApertureInPixels, m_AllPens[obj.TargetNo]);
+							obj.OriginalObject.ApertureInPixels, m_DisplaySettings.TargetPens[obj.TargetNo]);
 					}
 				}
 			}
@@ -1058,7 +1056,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 					if ((!m_Tracker.IsTrackedSuccessfully || obj.OriginalObject.ProcessInPsfGroup) && (!obj.IsLocated || obj.IsOffScreen))
 					{
-						pen = m_AllPens[obj.TargetNo];
+						pen = m_DisplaySettings.TargetPens[obj.TargetNo];
 					}
 					else if (isAperturePhotometry &&
 						!double.IsNaN(obj.Center.XDouble) &&
@@ -1079,7 +1077,7 @@ namespace Tangra.VideoOperations.LightCurves
 					}
 					else
 					{
-						pen = m_AllPens[obj.TargetNo];
+						pen = m_DisplaySettings.TargetPens[obj.TargetNo];
 					}
 
 					if (w > width - 4)

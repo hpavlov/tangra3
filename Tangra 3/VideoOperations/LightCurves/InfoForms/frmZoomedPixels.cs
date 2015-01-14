@@ -277,6 +277,32 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 						2 * ap * MAGN,
 						2 * ap * MAGN);
 
+					if (m_LightcurveController.Context.BackgroundMethod != TangraConfig.BackgroundMethod.Background3DPolynomial &&
+					    m_LightcurveController.Context.BackgroundMethod != TangraConfig.BackgroundMethod.PSFBackground)
+					{
+						Pen bgPen = reading.IsSuccessfulReading
+							? m_DisplaySettings.TargetBackgroundPens[reading.TargetNo]
+							: new Pen(Color.FromArgb(64, Color.Gray.R, Color.Gray.G, Color.Gray.B));
+
+						// If Average Background is used, then plot the background annulus
+						float innerRadius = ap * TangraConfig.Settings.Photometry.AnnulusInnerRadius;
+						float outerRadius = (float)Math.Sqrt(TangraConfig.Settings.Photometry.AnnulusMinPixels / Math.PI + innerRadius * innerRadius);
+
+						g.DrawEllipse(
+							bgPen,
+							(float)(MAGN * (reading.X0 - pixelsCenterX + ax - innerRadius)),
+							(float)(MAGN * (reading.Y0 - pixelsCenterY + ay - innerRadius)),
+							2 * innerRadius * MAGN,
+							2 * innerRadius * MAGN);
+
+						g.DrawEllipse(
+							bgPen,
+							(float)(MAGN * (reading.X0 - pixelsCenterX + ax - outerRadius)),
+							(float)(MAGN * (reading.Y0 - pixelsCenterY + ay - outerRadius)),
+							2 * outerRadius * MAGN,
+							2 * outerRadius * MAGN);
+					}
+
 					string title = m_ObjectTitles[reading.TargetNo];
 					SizeF fntSize = g.MeasureString(title, s_TitleFont);
 					g.DrawString(

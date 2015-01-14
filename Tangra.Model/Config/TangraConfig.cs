@@ -947,6 +947,7 @@ namespace Tangra.Model.Config
 
 			public Color[] TargetColors;
 			public Pen[] TargetPens;
+			public Pen[] TargetBackgroundPens;
 			public Brush[] TargetBrushes;
 			public Pen[] WarningColorPens;
 			public Brush[] WarningColorBrushes;
@@ -955,6 +956,11 @@ namespace Tangra.Model.Config
 			public Pen Target2Pen;
 			public Pen Target3Pen;
 			public Pen Target4Pen;
+
+			public Pen Target1BgPen;
+			public Pen Target2BgPen;
+			public Pen Target3BgPen;
+			public Pen Target4BgPen;
 
 			public Brush Target1Brush;
 			public Brush Target2Brush;
@@ -1033,6 +1039,11 @@ namespace Tangra.Model.Config
 				if (Target3Pen != null) Target3Pen.Dispose(); Target3Pen = new Pen(Target3Color);
 				if (Target4Pen != null) Target4Pen.Dispose(); Target4Pen = new Pen(Target4Color);
 
+				if (Target1BgPen != null) Target1BgPen.Dispose(); Target1BgPen = new Pen(System.Drawing.Color.FromArgb(64, Target1Color.R, Target1Color.G, Target1Color.B));
+				if (Target2BgPen != null) Target2BgPen.Dispose(); Target2BgPen = new Pen(System.Drawing.Color.FromArgb(64, Target2Color.R, Target2Color.G, Target2Color.B));
+				if (Target3BgPen != null) Target3BgPen.Dispose(); Target3BgPen = new Pen(System.Drawing.Color.FromArgb(64, Target3Color.R, Target3Color.G, Target3Color.B));
+				if (Target4BgPen != null) Target4BgPen.Dispose(); Target4BgPen = new Pen(System.Drawing.Color.FromArgb(64, Target4Color.R, Target4Color.G, Target4Color.B));
+				
 				if (Target1Brush != null) Target1Brush.Dispose(); Target1Brush = new SolidBrush(Target1Color);
 				if (Target2Brush != null) Target2Brush.Dispose(); Target2Brush = new SolidBrush(Target2Color);
 				if (Target3Brush != null) Target3Brush.Dispose(); Target3Brush = new SolidBrush(Target3Color);
@@ -1045,6 +1056,7 @@ namespace Tangra.Model.Config
 
 				TargetColors = new Color[] { Target1Color, Target2Color, Target3Color, Target4Color };
 				TargetPens = new Pen[] { Target1Pen, Target2Pen, Target3Pen, Target4Pen };
+				TargetBackgroundPens = new Pen[] { Target1BgPen, Target2BgPen, Target3BgPen, Target4BgPen };
 				TargetBrushes = new Brush[] { Target1Brush, Target2Brush, Target3Brush, Target4Brush };
 
 				WarningColorPens = new Pen[]
