@@ -109,6 +109,7 @@ public:
 	void NextFrame(int frameNo, unsigned long* pixels);
 	long TrackerGetTargetState(long objectId, NativeTrackedObjectInfo* trackingInfo, NativePsfFitInfo* psfInfo, double* residuals);
 	bool IsTrackedSuccessfully();
+	bool DoManualFrameCorrection(long objectId, long deltaX, long deltaY);
 };
 
 /* Make sure functions are exported with C linkage under C++ compilers. */
@@ -123,6 +124,7 @@ DLL_PUBLIC long TrackerConfigureObject(long objectId, bool isFixedAperture, bool
 DLL_PUBLIC long TrackerNextFrame(long frameId, unsigned long* pixels);
 DLL_PUBLIC long TrackerGetTargetState(long objectId, NativeTrackedObjectInfo* trackingInfo, NativePsfFitInfo* psfInfo, double* residuals);
 DLL_PUBLIC long TrackerInitialiseNewTracking();
+DLL_PUBLIC long TrackerDoManualFrameCorrection(long objectId, long deltaX, long deltaY);
 
 #ifdef __cplusplus
 } // __cplusplus defined.

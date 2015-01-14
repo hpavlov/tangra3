@@ -72,6 +72,7 @@ EXPORTS
 	TrackerNextFrame
 	TrackerConfigureObject
 	TrackerGetTargetState
+	TrackerDoManualFrameCorrection
 	
 	; Image Processing
 	Convolution

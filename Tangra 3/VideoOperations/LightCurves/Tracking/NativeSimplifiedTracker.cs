@@ -136,6 +136,9 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 						NotMeasuredReasons.TrackedSuccessfully,
 						new ImagePixel(trackedObject.Center.Brightness, trackedObject.Center.XDouble + deltaX, trackedObject.Center.YDouble + deltaY),
                         1);
+
+					NativeTracking.DoManualFrameCorrection(targetId, deltaX, deltaY);
+					
 					break;
 				}
 			}

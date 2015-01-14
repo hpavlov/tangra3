@@ -209,6 +209,10 @@ namespace Tangra.PInvoke
 		//DLL_PUBLIC long TrackerInitialiseNewTracking();
 		private static extern int TrackerInitialiseNewTracking();
 
+		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+		//DLL_PUBLIC long TrackerDoManualFrameCorrection(long objectId, long deltaX, long deltaY);
+		private static extern int TrackerDoManualFrameCorrection(int objectId, int deltaX, int deltaY);
+
 		internal static void ConfigureNativeTracker()
 		{
 			TrackerSettings(
@@ -268,6 +272,11 @@ namespace Tangra.PInvoke
 			}
 
 			return rv == 0;
+		}
+
+		internal static bool DoManualFrameCorrection(int objectId, int deltaX, int deltaY)
+		{
+			return TrackerDoManualFrameCorrection(objectId, deltaX, deltaY) == 0;
 		}
 	}
 }

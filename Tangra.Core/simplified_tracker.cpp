@@ -127,6 +127,21 @@ void SimplifiedTracker::InitialiseNewTracking()
 		m_TrackedObjects[i]->InitialiseNewTracking();
 }
 
+bool SimplifiedTracker::DoManualFrameCorrection(long objectId, long deltaX, long deltaY)
+{
+	for (int i = 0; i < m_NumTrackedObjects; i++)
+	{
+		if (m_TrackedObjects[i]->ObjectId == objectId)
+		{
+			m_TrackedObjects[i]->SetIsTracked(true, TrackedSuccessfully, m_TrackedObjects[i]->CenterXDouble + deltaX, m_TrackedObjects[i]->CenterYDouble + deltaY, 1);
+			m_TrackedObjects[i]->LastKnownGoodPositionXDouble = m_TrackedObjects[i]->CenterXDouble;
+			m_TrackedObjects[i]->LastKnownGoodPositionYDouble = m_TrackedObjects[i]->CenterYDouble;
+			m_TrackedObjects[i]->IsLocated = true;
+			return true;
+		}
+	}
+}
+
 bool SimplifiedTracker::IsTrackedSuccessfully()
 {
 	return this->m_IsTrackedSuccessfully;
@@ -397,6 +412,15 @@ long TrackerNextFrame(long frameId, unsigned long* pixels)
 	return -2;
 }
 
+long TrackerDoManualFrameCorrection(long objectId, long deltaX, long deltaY)
+{
+	if (NULL != s_Tracker) 
+	{
+		return s_Tracker->DoManualFrameCorrection(objectId, deltaX, deltaY) ? 0 : -1;
+	}
+
+	return -2;	
+}
 long TrackerGetTargetState(long objectId, NativeTrackedObjectInfo* trackingInfo, NativePsfFitInfo* psfInfo, double* residuals)
 {
 	if (NULL != s_Tracker)
