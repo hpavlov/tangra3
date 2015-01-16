@@ -232,6 +232,8 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                                                     ? 2 * trackedObject.OriginalObject.RefinedFWHM
                                                     : 3 * TangraConfig.Settings.Special.LostTrackingMinDistance;
 
+	                if (LightCurveReductionContext.Instance.WindOrShaking) maxAllowedDistance *= 1.5;
+
                     if (centroid.DistanceTo(new ImagePixel((int)trackedObject.LastFrameX, (int)trackedObject.LastFrameY)) < maxAllowedDistance)
                     {
                         pixels = astroImage.GetPixelsArea(centroid.X, centroid.Y, bestMaxFixAreaSize);
