@@ -191,7 +191,7 @@ namespace Tangra.Model.Astro
 
 		public bool UsesBackgroundModel
 		{
-			get { return m_UsesBackgroundModel; }
+			get { return m_UsesBackgroundModel && m_BackgroundModel != null; }
 		}
 
         public int MatrixSize
