@@ -124,12 +124,12 @@ namespace Tangra.VideoOperations.LightCurves
         {
             if (TimeFormat == TimeFormat.String)
             {
-                return time.ToString(GetStringTimeFormat(timePrecisionSec, false));
+				return time.ToString(GetStringTimeFormat(timePrecisionSec, false), CultureInfo.InvariantCulture);
             }
             else if (TimeFormat == TimeFormat.DecimalDays)
             {
                 double decimalDay = (time.Hour + time.Minute / 60.0 + (time.Second + time.Millisecond / 1000.0) / 3600.0) / 24.0;
-                return decimalDay.ToString(GetDecimalDaysTimeFormat(timePrecisionSec));
+				return decimalDay.ToString(GetDecimalDaysTimeFormat(timePrecisionSec), CultureInfo.InvariantCulture);
             }
             else if (TimeFormat == TimeFormat.DecimalJulianDays)
             {
@@ -137,7 +137,7 @@ namespace Tangra.VideoOperations.LightCurves
                     time = FirstConfirmedMeasurementTimeStamp.AddTicks(time.Ticks - FistMeasurementTimeStamp.Value.Ticks);
 
                 double jd = JDUtcAtDate(time);
-                return jd.ToString(GetDecimalDaysTimeFormat(timePrecisionSec));
+                return jd.ToString(GetDecimalDaysTimeFormat(timePrecisionSec), CultureInfo.InvariantCulture);
             }
             else
                 throw new ArgumentOutOfRangeException();

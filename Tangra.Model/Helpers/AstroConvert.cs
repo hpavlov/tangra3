@@ -51,7 +51,7 @@ namespace Tangra.Model.Helpers
             // this method will round and then append zeros if needed.
             // i.e. if you round .002 to two significant figures, the resulting number should be .0020.
 
-            var currentInfo = CultureInfo.CurrentCulture.NumberFormat;
+            var currentInfo = CultureInfo.InvariantCulture.NumberFormat;
 
             if (double.IsNaN(value))
             {
