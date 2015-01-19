@@ -474,6 +474,9 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 
 			stateManager.BlockOffsetsX[CHAR_INDEXES[posIdx]] = stateManager.LastBlockOffsetsX;
 
+			for (int k = CHAR_INDEXES[posIdx] + 1; k <= 28; k++)
+				stateManager.BlockOffsetsX[k] = stateManager.BlockOffsetsX[k - 1] + (stateManager.BlockOffsetsX[k - 2] - stateManager.BlockOffsetsX[k - 3]); 
+
 			return true;
 		}
 
@@ -595,9 +598,9 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 					walkForwardIndex++;
 					if (walkForwardIndex < 10) stateManager.LearnDigitPattern(normalizedPositions[walkForwardIndex].LastFrameNoDigit, 9);
 
-					SetupSixEightNineThreeDiffs(stateManager);
-
 					stateManager.SwapFieldsOrder = true;
+
+					SetupSixEightNineThreeDiffs(stateManager);
 
 					return true;
 				}
