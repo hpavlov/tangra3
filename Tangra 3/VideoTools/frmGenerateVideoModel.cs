@@ -273,7 +273,7 @@ namespace Tangra.VideoTools
 					for (int x = 0; x < bmp.Width; ++x)
 					{
 					    double bgPixel = Math.Min(255, Math.Max(0, simulatedBackground[x, y] + Math.Abs(Random(mean, stdDev))));
-                        byte val = (byte)bgPixel;
+                        byte val = (byte)Math.Round(bgPixel);
 
 						p[0] = val;
 						p[1] = val;
