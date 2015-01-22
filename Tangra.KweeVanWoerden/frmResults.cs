@@ -17,6 +17,7 @@ namespace Tangra.KweeVanWoerden
 		internal KweeVanWoerdenMinimum.KweeVanWoerdenResult Results;
 		internal KweeVanWoerdenMinimum.PolynomialFitResult PolyResults;
 	    internal ITangraHost TangraHost;
+		internal int TargetId = 0;
 
 		public frmResults()
 		{
@@ -41,8 +42,28 @@ namespace Tangra.KweeVanWoerden
 			}
 		}
 
+		private Brush m_TargetBrush;
+
 		private void frmResults_Load(object sender, EventArgs e)
 		{
+			ILightCurveDataProvider dataProvider = TangraHost.GetLightCurveDataProvider();
+			if (dataProvider != null)
+			{
+				ITangraDrawingSettings settings = dataProvider.GetTangraDrawingSettings();
+
+				Color targetColor = settings.Target1Color;
+				if (TargetId == 0) targetColor = settings.Target1Color;
+				else if (TargetId == 1) targetColor = settings.Target2Color;
+				else if (TargetId == 2) targetColor = settings.Target3Color;
+				else if (TargetId == 3) targetColor = settings.Target4Color;
+
+				m_TargetBrush = new SolidBrush(targetColor);
+			}
+			else
+			{
+				m_TargetBrush = Brushes.DeepSkyBlue;
+			}
+
 			if (Results.Success)
 			{
 				tbxErrorMessage.Visible = false;
@@ -133,15 +154,22 @@ namespace Tangra.KweeVanWoerden
 
                 float xScaleSQ = picGraph.Width * 1.0f / Results.Sum_Of_Squares_Mean.Count;
                 float yScaleSQ = picGraph.Height * 1.0f / (float)Results.Sum_Of_Squares_Mean.Max();
+	            float prevSqMeanX = float.NaN;
+				float prevSqMeanY = float.NaN;
 
                 for (int i = 0; i < Results.Buckets.Count - 1; i++)
                 {
-                    Brush brush = i < Results.Start_Light_Curve || i > Results.Stop_Light_Curve ? Brushes.DarkBlue : Brushes.Aqua;
+					Brush brush = i < Results.Start_Light_Curve || i > Results.Stop_Light_Curve ? SystemBrushes.ControlDarkDark : m_TargetBrush;
                     g.FillRectangle(i == Results.Sum_Of_Squares_Smallest_Index ? Brushes.GreenYellow : brush, xScale * i, yScale * (float)Results.Buckets[i], xScale, picGraph.Height - 2 - yScale * (float)Results.Buckets[i]);
 
                     if (i > Results.Start_Light_Curve && i < Results.Stop_Light_Curve)
                     {
-                        g.FillRectangle(Brushes.OrangeRed, xScaleSQ * i, yScaleSQ * (float)Results.Sum_Of_Squares_Mean[i], xScaleSQ, 4);
+	                    float x = xScaleSQ*i;
+	                    float y = yScaleSQ*(float) Results.Sum_Of_Squares_Mean[i];
+                        g.FillEllipse(Brushes.OrangeRed, x, y, 2, 2);
+						if (!float.IsNaN(prevSqMeanX)) g.DrawLine(Pens.OrangeRed, prevSqMeanX, prevSqMeanY, x, y);
+	                    prevSqMeanX = x;
+	                    prevSqMeanY = y;
                     }
                 }
                 g.Save();

@@ -263,9 +263,9 @@ namespace Tangra.KweeVanWoerden
 
 
                         result = Kwee_van_Woerden(times.Count, jdAtUtcMidnight, times.ToArray(), dataWithBgLst.ToArray(), dataBgLst.ToArray(), compDataWithBgLst.ToArray(), compBgLst.ToArray());
-                        polyResult = PolynomialFit(times.Count, jdAtUtcMidnight, times.ToArray(), dataWithBgLst.ToArray(), dataBgLst.ToArray(), compDataWithBgLst.ToArray(), compBgLst.ToArray(), (int)result.Start_Light_Curve_Obs_Index, (int)result.Stop_Light_Curve_Obs_Index, result.Time_Of_Minimum);  
+                        polyResult = PolynomialFit(times.Count, jdAtUtcMidnight, times.ToArray(), dataWithBgLst.ToArray(), dataBgLst.ToArray(), compDataWithBgLst.ToArray(), compBgLst.ToArray(), (int)result.Start_Light_Curve_Obs_Index, (int)result.Stop_Light_Curve_Obs_Index, result.Time_Of_Minimum);
 
-						PresentResults(result, polyResult);
+						PresentResults(frm.VariableStarIndex, result, polyResult);
 					}
 				}
 			}
@@ -293,12 +293,13 @@ namespace Tangra.KweeVanWoerden
             }
         }
 
-		private void PresentResults(KweeVanWoerdenResult result, PolynomialFitResult polyResult = null)
+		private void PresentResults(int targetId, KweeVanWoerdenResult result, PolynomialFitResult polyResult = null)
 		{
 			var frmResults = new frmResults();
 			frmResults.Results = result;
 			frmResults.PolyResults = polyResult;
 		    frmResults.TangraHost = m_TangraHost;
+			frmResults.TargetId = targetId;
 			frmResults.StartPosition = FormStartPosition.CenterParent;
 			frmResults.ShowDialog(m_TangraHost.ParentWindow);
 		}
@@ -352,7 +353,7 @@ namespace Tangra.KweeVanWoerden
 
             PolynomialFitResult polyResult = PolynomialFit(dataPoints, jdAtUtcMidnight, times, varStar, varSky, compStar, compSky, (int)result.Start_Light_Curve_Obs_Index, (int)result.Stop_Light_Curve_Obs_Index, result.Time_Of_Minimum);
 
-			PresentResults(result, polyResult);
+			PresentResults(0, result, polyResult);
 		}
 
 		[Obsolete("The old implementation calling the Fortran library")]
@@ -488,27 +489,27 @@ namespace Tangra.KweeVanWoerden
                 rv.DataPoints.Add(y);
 			}
 
-            var fitter = new ModelFitter(rv.TimePoints.Count, rv.TimePoints.ToArray(), dataPointsVar.ToArray(), dataPointsComp.ToArray());
-            fitter.Solve(true, kweeVanWoerdenT0);
+			//var fitter = new ModelFitter(rv.TimePoints.Count, rv.TimePoints.ToArray(), dataPointsVar.ToArray(), dataPointsComp.ToArray());
+			//fitter.Solve(true, kweeVanWoerdenT0);
 
-            for (int i = 0; i < Number_Obs; i++)
-            {
-                if (i >= firstObsIndex && i < lastObsIndex)
-                    rv.FittedValues.Add(fitter.NormIntensities[i - firstObsIndex]);
-                else
-                    rv.FittedValues.Add(double.NaN);
-            }
+			//for (int i = 0; i < Number_Obs; i++)
+			//{
+			//	if (i >= firstObsIndex && i < lastObsIndex)
+			//		rv.FittedValues.Add(fitter.NormIntensities[i - firstObsIndex]);
+			//	else
+			//		rv.FittedValues.Add(double.NaN);
+			//}
 
-			rv.G = fitter.G;
-			rv.M0 = fitter.M0;
-			rv.C = fitter.C;
-			rv.D = fitter.D;
-			rv.T0 = fitter.T0;
+			//rv.G = fitter.G;
+			//rv.M0 = fitter.M0;
+			//rv.C = fitter.C;
+			//rv.D = fitter.D;
+			//rv.T0 = fitter.T0;
 
 		    rv.StartIndex = firstObsIndex;
             rv.StopIndex = lastObsIndex;
 
-            rv.Time_Of_Minimum_JD = Time_First_JD + fitter.T0;
+            //rv.Time_Of_Minimum_JD = Time_First_JD + fitter.T0;
 		    rv.Time_Of_Minimum_Uncertainty = 0; // Math.Sqrt((4.0 * rv.A * rv.C - rv.B * rv.B) / (4.0 * rv.A * rv.A) / ((float)(rv.TimePoints.Count / 4.0 - 1.0)));
 
 			return rv;
