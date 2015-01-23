@@ -124,7 +124,7 @@ namespace Tangra
 			Trace.WriteLine(string.Format("Tangra Core v{0}", engineVersion));
             if (minCoreVersionRequired != null && !minCoreVersionRequired.IsReqiredVersion(engineVersion))
             {
-                MessageBox.Show("Your installations of Tangra3 desn't have the latest version of TangraCore.dll. Please check for updates.","Tangra 3", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Your installation of Tangra3 desn't have the latest version of TangraCore.dll. Please check for updates.","Tangra 3", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 
 			engineVersion = TangraVideo.GetVideoEngineVersion();
@@ -132,7 +132,7 @@ namespace Tangra
 
             if (minVideoVersionRequired != null && !minVideoVersionRequired.IsReqiredVersion(engineVersion))
             {
-                MessageBox.Show("Your installations of Tangra3 desn't have the latest version of TangraVideo.dll. Please check for updates.", "Tangra 3", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Your installation of Tangra3 desn't have the latest version of TangraVideo.dll. Please check for updates.", "Tangra 3", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 		}
 

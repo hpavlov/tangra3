@@ -279,6 +279,10 @@ namespace Tangra.KweeVanWoerden
                 if (double.IsNaN(dataWithBg[i])) badDataIndexes.Add(i);
             for (int i = 0; i < compDataWithBg.Count; i++)
                 if (double.IsNaN(dataWithBg[i])) badDataIndexes.Add(i);
+            for (int i = 0; i < dataBg.Count; i++)
+                if (double.IsNaN(dataBg[i])) badDataIndexes.Add(i);
+            for (int i = 0; i < compBg.Count; i++)
+                if (double.IsNaN(compBg[i])) badDataIndexes.Add(i);
 
             var sortedIndexes = badDataIndexes.Distinct().ToList();
             sortedIndexes.Sort((x, y) => y.CompareTo(x));
