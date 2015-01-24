@@ -1635,7 +1635,9 @@ namespace Tangra.VideoOperations.LightCurves
 
 		internal double[] ReferenceMagnitudes;
 
-        private static int SERIALIZATION_VERSION = 5;
+        internal double ReferenceIntensity;
+
+        private static int SERIALIZATION_VERSION = 6;
 
         internal LCMeasurementHeader(
             string pathToVideoFile, string sourceInfo,
@@ -1699,6 +1701,8 @@ namespace Tangra.VideoOperations.LightCurves
 
 			ReferenceMagnitudes = new double[measurementApertures.Length];
 	        for (int i = 0; i < ReferenceMagnitudes.Length; i++) ReferenceMagnitudes[i] = double.NaN;
+
+            ReferenceIntensity = double.NaN;
 	        
             FramesPerSecond = framesPerSecond;
         }
@@ -1751,6 +1755,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 			ReferenceMagnitudes = new double[ObjectCount];
 			for (int i = 0; i < ReferenceMagnitudes.Length; i++) ReferenceMagnitudes[i] = double.NaN;
+            ReferenceIntensity = double.NaN;
 
             if (version > 1)
             {
@@ -1775,6 +1780,11 @@ namespace Tangra.VideoOperations.LightCurves
 							{
 								ReferenceMagnitudes[i] = reader.ReadDouble();
 							}
+
+						    if (version > 5)
+						    {
+                                ReferenceIntensity = reader.ReadDouble();
+						    }
 						}
 					}
 				}
@@ -1846,7 +1856,10 @@ namespace Tangra.VideoOperations.LightCurves
 			// VERSION 5 Data
 			for (int i = 0; i < ObjectCount; i++)
 				writer.Write(ReferenceMagnitudes[i]);
-		}
+
+            // VERSION 6 Data
+            writer.Write(ReferenceIntensity);
+        }
     }
 
     internal struct LCMeasurementFooter

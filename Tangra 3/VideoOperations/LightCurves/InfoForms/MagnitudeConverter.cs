@@ -12,12 +12,14 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 	public class MagnitudeConverter
 	{
 		private double[] m_ReferenceMagnitudes;
+	    private double m_ReferenceIntensity;
 
 		private int m_ReferenceIndex = -1;
 
-		internal MagnitudeConverter(double[] referenceMagnitudes)
+		internal MagnitudeConverter(double[] referenceMagnitudes, double referenceIntensity)
 		{
 			m_ReferenceMagnitudes = referenceMagnitudes;
+		    m_ReferenceIntensity = referenceIntensity;
 		}
 
 		public bool CanComputeMagnitudes
@@ -40,13 +42,13 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 				double refMagnitude = m_ReferenceMagnitudes[m_ReferenceIndex];
 
 				if (rv.Length > 0)
-					rv[0] = refMagnitude - 2.5 * Math.Log10(mesurements[0].AdjustedReading / refIntensity);
+					rv[0] = refMagnitude - 2.5 * Math.Log10(Math.Max(1, mesurements[0].AdjustedReading) / refIntensity);
 				if (rv.Length > 1)
-					rv[1] = refMagnitude - 2.5 * Math.Log10(mesurements[1].AdjustedReading / refIntensity);
+					rv[1] = refMagnitude - 2.5 * Math.Log10(Math.Max(1, mesurements[1].AdjustedReading) / refIntensity);
 				if (rv.Length > 2)
-					rv[2] = refMagnitude - 2.5 * Math.Log10(mesurements[2].AdjustedReading / refIntensity);
+					rv[2] = refMagnitude - 2.5 * Math.Log10(Math.Max(1, mesurements[2].AdjustedReading) / refIntensity);
 				if (rv.Length > 3)
-					rv[3] = refMagnitude - 2.5 * Math.Log10(mesurements[3].AdjustedReading / refIntensity);
+					rv[3] = refMagnitude - 2.5 * Math.Log10(Math.Max(1, mesurements[3].AdjustedReading) / refIntensity);
 			}
 			else
 				for (int i = 0; i < rv.Length; i++) rv[i] = double.NaN;
@@ -54,9 +56,34 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 			return rv;
 		}
 
-		public void SetReferenceMagnitude(int referenceIndex, double referenceMag)
+	    internal double ComputeMagnitude(double adjustedReading)
+	    {
+	        if (CanComputeMagnitudes)
+	        {
+                double refIntensity = m_ReferenceIntensity;
+	            double refMagnitude = m_ReferenceMagnitudes[m_ReferenceIndex];
+                return refMagnitude - 2.5 * Math.Log10(Math.Max(1, adjustedReading) / refIntensity);
+	        }
+            else
+                return double.NaN;
+	    }
+
+        internal double ComputeFlux(double magnitude)
+        {
+            if (CanComputeMagnitudes)
+            {
+                double refIntensity = m_ReferenceIntensity;
+                double refMagnitude = m_ReferenceMagnitudes[m_ReferenceIndex];
+                return Math.Max(1, refIntensity * Math.Pow(10, (refMagnitude - magnitude) / 2.5));
+            }
+            else
+                return double.NaN;
+        }
+
+	    public void SetReferenceMagnitude(int referenceIndex, double referenceMag, double referenceIntensity)
 		{
 			m_ReferenceIndex = -1;
+	        m_ReferenceIntensity = referenceIntensity;
 
 			for (int i = 0; i < m_ReferenceMagnitudes.Length; i++)
 			{

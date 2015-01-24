@@ -143,6 +143,8 @@ namespace Tangra.VideoOperations.LightCurves
 
 				SetLegendColors();
 
+			    bool drawLine = m_LightCurveController.Context.ChartType == LightCurveContext.LightCurveMode.Line;
+
 				using (Graphics g = Graphics.FromImage(m_Graph))
 				{
 					uint axisInterval = GetYAxisInterval(g);
@@ -178,11 +180,10 @@ namespace Tangra.VideoOperations.LightCurves
 						float datapointFrom = m_DisplaySettings.DatapointSize / 2.0f;
 						float datapointSize = m_DisplaySettings.DatapointSize;
 
-						DrawAxisByTimeStamp(g, axisInterval);
-
 						int idx = 0;
 						m_FramesIndex.Add((uint)m_MinDisplayedFrame);
 						m_MeasurementsIndex.Add(0);
+					    double minAdjustedReading = double.MaxValue;
 
 						for (int i = 0; i < m_Header.ObjectCount; i++)
 						{
@@ -254,12 +255,14 @@ namespace Tangra.VideoOperations.LightCurves
 										/* Excluding NaN binned values */
 										continue;
 
+								    if (adjustedReading < minAdjustedReading) minAdjustedReading = adjustedReading;
+
 									Pen pen = GetPenForTarget(i, reading.IsSuccessfulReading);
 									Brush brush = GetBrushForTarget(i, reading.IsSuccessfulReading);
 
 									if (prevPoint != PointF.Empty)
 									{
-										if (!prevReadingIsOffScreen)
+										if (!prevReadingIsOffScreen && drawLine)
 											g.DrawLine(pen, prevPoint.X, prevPoint.Y, x, y);
 									}
 									else
@@ -285,6 +288,8 @@ namespace Tangra.VideoOperations.LightCurves
 								}
 							}
 						}
+
+                        DrawAxisByTimeStamp(g, axisInterval, minAdjustedReading);
 					}
 
 					g.Save();
@@ -323,6 +328,8 @@ namespace Tangra.VideoOperations.LightCurves
 
                 SetLegendColors();
 
+                bool drawLine = m_LightCurveController.Context.ChartType == LightCurveContext.LightCurveMode.Line;
+
                 using (Graphics g = Graphics.FromImage(m_Graph))
                 {
                     uint axisInterval = GetYAxisInterval(g);
@@ -358,11 +365,11 @@ namespace Tangra.VideoOperations.LightCurves
                         float datapointFrom = m_DisplaySettings.DatapointSize / 2.0f;
                         float datapointSize = m_DisplaySettings.DatapointSize;
 
-                        DrawAxis(g, axisInterval);
-
                         int idx = 0;
 						m_FramesIndex.Add((uint)m_MinDisplayedFrame);
                         m_MeasurementsIndex.Add(0);
+
+                        double minAdjustedReading = double.MaxValue;
 
                         for (int i = 0; i < m_Header.ObjectCount; i++)
                         {
@@ -432,12 +439,14 @@ namespace Tangra.VideoOperations.LightCurves
                                         /* Excluding NaN binned values */
                                         continue;
 
+                                    if (minAdjustedReading > adjustedReading) minAdjustedReading = adjustedReading;
+
 									Pen pen = GetPenForTarget(i, reading.IsSuccessfulReading);
 									Brush brush = GetBrushForTarget(i, reading.IsSuccessfulReading);
 
                                     if (prevPoint != PointF.Empty)
                                     {
-                                        if (!prevReadingIsOffScreen)
+                                        if (!prevReadingIsOffScreen && drawLine)
                                             g.DrawLine(pen, prevPoint.X, prevPoint.Y, x, y);
                                     }
                                     else
@@ -462,6 +471,8 @@ namespace Tangra.VideoOperations.LightCurves
                                 }
                             }
                         }
+
+                        DrawAxis(g, axisInterval, minAdjustedReading);
                     }
 
                     g.Save();
@@ -471,30 +482,96 @@ namespace Tangra.VideoOperations.LightCurves
 
         private static Font s_AxisFont = new Font(FontFamily.GenericMonospace, 9);
 
-		private void DrawAxisByTimeStamp(Graphics g, uint interval)
+        private void GetYAxisMagnitudeCalibration(Graphics g, double minAdjustedReading, out double intensityFrom, out double intensityTo, out double intensityFactor)
+        {
+            int magMin = (int)Math.Floor(m_LightCurveController.Context.MagnitudeConverter.ComputeMagnitude(Math.Max(0, minAdjustedReading * 0.9)) * 10) + 1;
+            int magMax = (int)Math.Ceiling(m_LightCurveController.Context.MagnitudeConverter.ComputeMagnitude(m_Header.MaxAdjustedReading) * 10) - 1;
+
+            SizeF labelSize = g.MeasureString("12.0", s_AxisFont);
+            double maxLabels = (m_MaxY - m_MinY) / (labelSize.Height * 2);
+
+            int[] best_intervals = new int[] { 1, 2, 5, 10, 20, 50 };
+
+            int interval = 50;
+            for (int i = 0; i < best_intervals.Length - 1; i++)
+            {
+                int numMarks = (int)Math.Ceiling((magMin - magMax) / (double)best_intervals[i]);
+                if (numMarks >= 5 && numMarks <= 10 && maxLabels * 2 * numMarks < (m_MaxY - m_MinY))
+                {
+                    interval = best_intervals[i];
+                    break;
+                }
+            }
+            
+            while (magMin % interval != 0) magMin += 1;
+            intensityFactor = Math.Pow(10, (interval / 25.0));
+
+            intensityFrom = m_LightCurveController.Context.MagnitudeConverter.ComputeFlux((magMin / 10.0) + 1);
+            intensityTo = m_LightCurveController.Context.MagnitudeConverter.ComputeFlux((magMax / 10.0));
+        }
+
+        private void DrawAxisByTimeStamp(Graphics g, uint interval, double minAdjustedReading)
 		{
 			if (interval == 0) interval = 1;
 
 			g.DrawLine(m_DisplaySettings.GridLinesPen, m_MinX, m_MinY, m_MinX, m_MaxY);
 			g.DrawLine(m_DisplaySettings.GridLinesPen, m_MinX, m_MaxY, m_MaxX, m_MaxY);
 
-			for (int i = m_Header.MinAdjustedReading; i < m_Header.MaxAdjustedReading; i += (int)interval)
-			{
-				string label = GetYAxisLabel(i);
-				SizeF labelSize = g.MeasureString(label, s_AxisFont);
-				float x = m_MinX - labelSize.Width;
-				float y = m_MaxY - (i - m_Header.MinAdjustedReading) * m_ScaleY;
-				g.DrawString(label, s_AxisFont, m_DisplaySettings.LabelsBrush, x, y - labelSize.Height / 2);
-				if (i != m_Header.MinAdjustedReading && m_DisplaySettings.DrawGrid)
-					g.DrawLine(m_DisplaySettings.GridLinesPen, m_MinX, y, m_MaxX, y);
-			}
+            if (m_LightCurveController.Context.YAxisLabels == LightCurveContext.YAxisMode.Magnitudes && 
+                m_LightCurveController.Context.MagnitudeConverter.CanComputeMagnitudes &&
+                m_LightCurveController.Context.ProcessingType == ProcessingType.SignalMinusBackground)
+            {
 
-            string labelFlux = "Flux";
-            SizeF labelFluxSize = g.MeasureString(labelFlux, s_AxisFont);
+                double intensityFactor, intensityFrom, intensityTo;
+                GetYAxisMagnitudeCalibration(g, minAdjustedReading, out intensityFrom, out intensityTo, out intensityFactor);
 
-            g.DrawString(labelFlux, s_AxisFont, m_DisplaySettings.LabelsBrush, m_MinX - labelFluxSize.Width, m_MinY - labelFluxSize.Height);
+                double i = intensityFrom;
+                float yMin = m_MaxY - (float)(i - intensityFrom) * m_ScaleY;
+                float yMax = m_MaxY - (float)(i - intensityTo) * m_ScaleY;
 
-			g.DrawLine(m_DisplaySettings.GridLinesPen, m_MinX, m_MinY, m_MaxX, m_MinY);
+                while (i < m_Header.MaxAdjustedReading)
+                {
+                    float magnitude = (float)m_LightCurveController.Context.MagnitudeConverter.ComputeMagnitude(i);
+                    string label = magnitude.ToString("0.0");
+                    SizeF labelSize = g.MeasureString(label, s_AxisFont);
+                    float x = m_MinX - labelSize.Width;
+                    float y = m_MaxY - (float)(i - m_Header.MinAdjustedReading) * m_ScaleY;
+
+                    if (i > m_Header.MinAdjustedReading && m_DisplaySettings.DrawGrid)
+                    {
+                        g.DrawLine(m_DisplaySettings.GridLinesPen, m_MinX, y, m_MaxX, y);
+                        g.DrawString(label, s_AxisFont, m_DisplaySettings.LabelsBrush, x, y - labelSize.Height / 2);
+                    }
+
+                    i *= intensityFactor;
+                }
+
+                string labelFlux = "Mag";
+                SizeF labelFluxSize = g.MeasureString(labelFlux, s_AxisFont);
+
+                g.DrawString(labelFlux, s_AxisFont, m_DisplaySettings.LabelsBrush, m_MinX - labelFluxSize.Width, m_MinY - labelFluxSize.Height);
+            } 
+            else
+		    {
+                for (int i = m_Header.MinAdjustedReading; i < m_Header.MaxAdjustedReading; i += (int)interval)
+                {
+                    string label = GetYAxisLabel(i);
+                    SizeF labelSize = g.MeasureString(label, s_AxisFont);
+                    float x = m_MinX - labelSize.Width;
+                    float y = m_MaxY - (i - m_Header.MinAdjustedReading) * m_ScaleY;
+                    g.DrawString(label, s_AxisFont, m_DisplaySettings.LabelsBrush, x, y - labelSize.Height / 2);
+                    if (i != m_Header.MinAdjustedReading && m_DisplaySettings.DrawGrid)
+                        g.DrawLine(m_DisplaySettings.GridLinesPen, m_MinX, y, m_MaxX, y);
+                }
+
+                string labelFlux = "Flux";
+                SizeF labelFluxSize = g.MeasureString(labelFlux, s_AxisFont);
+
+                g.DrawString(labelFlux, s_AxisFont, m_DisplaySettings.LabelsBrush, m_MinX - labelFluxSize.Width, m_MinY - labelFluxSize.Height);
+		    }
+
+
+		    g.DrawLine(m_DisplaySettings.GridLinesPen, m_MinX, m_MinY, m_MaxX, m_MinY);
 
 			if (m_LightCurveController.Context.XAxisLabels == LightCurveContext.XAxisMode.FrameNo)
 			{
@@ -567,31 +644,69 @@ namespace Tangra.VideoOperations.LightCurves
 			else return string.Format("{0}M", axisValue / 1000000);
 		}
 
-    	private void DrawAxis(Graphics g, uint interval)
+        private void DrawAxis(Graphics g, uint interval, double minAdjustedReading)
         {
 			if (interval == 0) interval = 1; 
 
             g.DrawLine(m_DisplaySettings.GridLinesPen, m_MinX, m_MinY, m_MinX, m_MaxY);
             g.DrawLine(m_DisplaySettings.GridLinesPen, m_MinX, m_MaxY, m_MaxX, m_MaxY);
 
-            for (int i = m_Header.MinAdjustedReading; i < m_Header.MaxAdjustedReading; i += (int) interval)
+            if (m_LightCurveController.Context.YAxisLabels == LightCurveContext.YAxisMode.Magnitudes &&
+                m_LightCurveController.Context.MagnitudeConverter.CanComputeMagnitudes &&
+                m_LightCurveController.Context.ProcessingType == ProcessingType.SignalMinusBackground)
             {
-				string label = GetYAxisLabel(i);
 
-                SizeF labelSize = g.MeasureString(label, s_AxisFont);
-                float x = m_MinX - labelSize.Width;
-                float y = m_MaxY - (i - m_Header.MinAdjustedReading)*m_ScaleY;
-                g.DrawString(label, s_AxisFont, m_DisplaySettings.LabelsBrush, x, y - labelSize.Height/2);
-                if (i != m_Header.MinAdjustedReading && m_DisplaySettings.DrawGrid)
-                    g.DrawLine(m_DisplaySettings.GridLinesPen, m_MinX, y, m_MaxX, y);
-            }
+                double intensityFactor, intensityFrom, intensityTo;
+                GetYAxisMagnitudeCalibration(g, minAdjustedReading, out intensityFrom, out intensityTo, out intensityFactor);
 
-            string labelFlux = "Flux";
-            SizeF labelFluxSize = g.MeasureString(labelFlux, s_AxisFont);
+                double i = intensityFrom;
+                float yMin = m_MaxY - (float)(i - intensityFrom) * m_ScaleY;
+                float yMax = m_MaxY - (float)(i - intensityTo) * m_ScaleY;
 
-            g.DrawString(labelFlux, s_AxisFont, m_DisplaySettings.LabelsBrush, m_MinX - labelFluxSize.Width, m_MinY - labelFluxSize.Height);
+                while (i < m_Header.MaxAdjustedReading)
+                {
+                    float magnitude = (float)m_LightCurveController.Context.MagnitudeConverter.ComputeMagnitude(i);
+                    string label = magnitude.ToString("0.0");
+                    SizeF labelSize = g.MeasureString(label, s_AxisFont);
+                    float x = m_MinX - labelSize.Width;
+                    float y = m_MaxY - (float)(i - m_Header.MinAdjustedReading) * m_ScaleY;
 
-            g.DrawLine(m_DisplaySettings.GridLinesPen, m_MinX, m_MinY, m_MaxX, m_MinY);
+                    if (i > m_Header.MinAdjustedReading && m_DisplaySettings.DrawGrid)
+                    {
+                        g.DrawLine(m_DisplaySettings.GridLinesPen, m_MinX, y, m_MaxX, y);
+                        g.DrawString(label, s_AxisFont, m_DisplaySettings.LabelsBrush, x, y - labelSize.Height / 2);
+                    }
+
+                    i *= intensityFactor;
+                }
+
+                string labelFlux = "Mag";
+                SizeF labelFluxSize = g.MeasureString(labelFlux, s_AxisFont);
+
+                g.DrawString(labelFlux, s_AxisFont, m_DisplaySettings.LabelsBrush, m_MinX - labelFluxSize.Width, m_MinY - labelFluxSize.Height);
+            } 
+            else if (m_LightCurveController.Context.YAxisLabels == LightCurveContext.YAxisMode.Flux)
+    	    {
+                for (int i = m_Header.MinAdjustedReading; i < m_Header.MaxAdjustedReading; i += (int)interval)
+                {
+                    string label = GetYAxisLabel(i);
+
+                    SizeF labelSize = g.MeasureString(label, s_AxisFont);
+                    float x = m_MinX - labelSize.Width;
+                    float y = m_MaxY - (i - m_Header.MinAdjustedReading) * m_ScaleY;
+                    g.DrawString(label, s_AxisFont, m_DisplaySettings.LabelsBrush, x, y - labelSize.Height / 2);
+                    if (i != m_Header.MinAdjustedReading && m_DisplaySettings.DrawGrid)
+                        g.DrawLine(m_DisplaySettings.GridLinesPen, m_MinX, y, m_MaxX, y);
+                }
+
+                string labelFlux = "Flux";
+                SizeF labelFluxSize = g.MeasureString(labelFlux, s_AxisFont);
+
+                g.DrawString(labelFlux, s_AxisFont, m_DisplaySettings.LabelsBrush, m_MinX - labelFluxSize.Width, m_MinY - labelFluxSize.Height);
+    	    }
+            
+
+    	    g.DrawLine(m_DisplaySettings.GridLinesPen, m_MinX, m_MinY, m_MaxX, m_MinY);
 
 			if (m_LightCurveController.Context.XAxisLabels == LightCurveContext.XAxisMode.FrameNo)
 			{
@@ -906,9 +1021,11 @@ namespace Tangra.VideoOperations.LightCurves
 
                         for (int i = 0; i < m_Header.ObjectCount; i++)
                         {
-                            if (!m_IncludeObjects[i]) continue;
-
                             LCMeasurement reading = m_LightCurveController.Context.AllReadings[i][id];
+
+                            m_SelectedMeasurements[i] = reading;
+
+                            if (!m_IncludeObjects[i]) continue;
 
                             bool drawThisReading = m_DisplaySettings.DrawInvalidDataPoints || reading.IsSuccessfulReading;
 
@@ -921,9 +1038,7 @@ namespace Tangra.VideoOperations.LightCurves
 								}
 								catch (OverflowException)
 								{ }   								
-                            }
-
-                            m_SelectedMeasurements[i] = reading;
+                            }                            
                         }
                     }
 

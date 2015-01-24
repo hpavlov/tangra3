@@ -208,7 +208,7 @@ namespace Tangra.VideoOperations.LightCurves
                     else
                         flux = totalReading;
 
-                    double mag = M0 - 2.5*Math.Log10(flux);
+                    double mag = M0 - 2.5*Math.Log10(Math.Max(1, flux));
 
                     return string.Format(",{0}", mag.ToString(5));
                 }

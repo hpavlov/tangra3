@@ -31,7 +31,7 @@ namespace Tangra.Controller
 				}
 			}
 
-			MagnitudeConverter = new MagnitudeConverter(lcFile.Header.ReferenceMagnitudes);
+			MagnitudeConverter = new MagnitudeConverter(lcFile.Header.ReferenceMagnitudes, lcFile.Header.ReferenceIntensity);
 
 			for (int i = 0; i < 4; i++)
 				m_ObjectTitles[i] = string.Format("Object {0}", i);
@@ -66,6 +66,18 @@ namespace Tangra.Controller
 			Time
 		}
 
+        internal enum YAxisMode
+        {
+            Flux,
+            Magnitudes
+        }
+
+        internal enum LightCurveMode
+        {
+            Line,
+            Scatter
+        }
+
 		private bool m_Dirty = false;
 		private bool m_FirstZoomedFrameChanged = false;
 		private bool m_RequiresFullReprocessing = false;
@@ -90,6 +102,9 @@ namespace Tangra.Controller
 		public uint m_SelectedFrameNo = 0;
 
 		private XAxisMode m_XAxisMode;
+        private YAxisMode m_YAxisMode;
+        private LightCurveMode m_LightCurveMode;
+        
 
 		public uint SelectedFrameNo
 		{
@@ -201,6 +216,32 @@ namespace Tangra.Controller
 				}
 			}
 		}
+
+        public YAxisMode YAxisLabels
+        {
+            get { return m_YAxisMode; }
+            set
+            {
+                if (m_YAxisMode != value)
+                {
+                    m_YAxisMode = value;
+                    m_Dirty = true;
+                }
+            }
+        }
+
+        public LightCurveMode ChartType
+        {
+            get { return m_LightCurveMode; }
+            set
+            {
+                if (m_LightCurveMode != value)
+                {
+                    m_LightCurveMode = value;
+                    m_Dirty = true;
+                }
+            }
+        }
 
 		public bool OutlierRemoval
 		{

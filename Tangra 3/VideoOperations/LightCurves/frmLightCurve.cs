@@ -309,10 +309,7 @@ namespace Tangra.VideoOperations.LightCurves
 				allObjMenuItems[i].Text = string.Format("Object {0} ({1})", i + 1, ExplainTrackingType(m_Footer.TrackedObjects[i].TrackingType));
 			}
 
-            if (m_Header.ReductionType == LightCurveReductionType.MutualEvent)
-                    m_LightCurveController.Context.ProcessingType = ProcessingType.SignalOnly;
-            else
-                m_LightCurveController.Context.ProcessingType = ProcessingType.SignalMinusBackground;
+            m_LightCurveController.Context.ProcessingType = ProcessingType.SignalMinusBackground;
 
             m_MinDisplayedFrame = m_Header.MinFrame;
             m_MaxDisplayedFrame = m_Header.MaxFrame;
@@ -389,6 +386,9 @@ namespace Tangra.VideoOperations.LightCurves
                 miXAxisUserFrameNumbers.Checked = true;
                 miXAxisUserTime.Checked = false;
             }
+
+            m_LightCurveController.Context.YAxisLabels = LightCurveContext.YAxisMode.Flux;
+            m_LightCurveController.Context.ChartType = LightCurveContext.LightCurveMode.Line;
 
             UpdateContextDisplays();
 			UpdateFormTitle();
@@ -671,6 +671,8 @@ namespace Tangra.VideoOperations.LightCurves
 				miSignalDividedByNoise.Checked = false;
 
                 m_LightCurveController.Context.ProcessingType = ProcessingType.SignalOnly;
+                m_LightCurveController.Context.YAxisLabels = LightCurveContext.YAxisMode.Flux;
+                miYAxisFlux.Checked = true;
                 tslblSignalType.Text = "Signal-Only";
             }
             else if (sender == miNoiseOnly)
@@ -682,6 +684,8 @@ namespace Tangra.VideoOperations.LightCurves
 				miSignalDividedByNoise.Checked = false;
 
                 m_LightCurveController.Context.ProcessingType = ProcessingType.BackgroundOnly;
+                m_LightCurveController.Context.YAxisLabels = LightCurveContext.YAxisMode.Flux;
+                miYAxisFlux.Checked = true;
                 tslblSignalType.Text = "Background-Only";
             }
 			else if (sender == miSignalDividedByBackground)
@@ -693,6 +697,8 @@ namespace Tangra.VideoOperations.LightCurves
 				miSignalDividedByNoise.Checked = false;
 
 				m_LightCurveController.Context.ProcessingType = ProcessingType.SignalDividedByBackground;
+                m_LightCurveController.Context.YAxisLabels = LightCurveContext.YAxisMode.Flux;
+                miYAxisFlux.Checked = true;
 				tslblSignalType.Text = "Signal-divided by-Background ( % )";
 			}
 			else if (sender == miSignalDividedByNoise)
@@ -704,6 +710,8 @@ namespace Tangra.VideoOperations.LightCurves
 				miSignalDividedByNoise.Checked = true;
 
 				m_LightCurveController.Context.ProcessingType = ProcessingType.SignalDividedByNoise;
+                m_LightCurveController.Context.YAxisLabels = LightCurveContext.YAxisMode.Flux;
+                miYAxisFlux.Checked = true;
 				tslblSignalType.Text = "Signal-divided by-Noise ( % )";
 			}
 
@@ -1563,7 +1571,8 @@ namespace Tangra.VideoOperations.LightCurves
                 switch (m_LightCurveController.Context.ProcessingType)
                 {
                     case ProcessingType.SignalMinusBackground:
-                        legend += ", Signal-minus-Background, ";
+                        // This is the default one, no need to say specifically what it is (a waste of space)
+                        legend += ", ";
                         break;
                     case ProcessingType.SignalOnly:
                         legend += ", Signal-Only, ";
@@ -2377,7 +2386,7 @@ namespace Tangra.VideoOperations.LightCurves
 		private void frmLightCurve_Shown(object sender, EventArgs e)
 		{
 			miOutlierRemoval.Checked = m_LightCurveController.Context.OutlierRemoval;
-			btnSetMags.Visible = TangraConfig.Settings.Special.AllowLCMagnitudeDisplay;
+            yAxisLabelsToolStripMenuItem.Visible = TangraConfig.Settings.Special.AllowLCMagnitudeDisplay;
 		}
 
 		public void ReloadAddins()
@@ -2452,16 +2461,6 @@ namespace Tangra.VideoOperations.LightCurves
 			pnlChart.Invalidate();
 		}
 
-		private void btnSetMags_Click(object sender, EventArgs e)
-		{
-			UsageStats.Instance.QuickReprocessInvoked++;
-			UsageStats.Instance.Save();
-
-			var frm = new frmSetReferenceMag();
-			frm.SetCurrentMeasurements(m_SelectedMeasurements, m_LightCurveController.Context);
-			frm.ShowDialog(this);
-		}
-
 		private void miLightCurveInformation_Click(object sender, EventArgs e)
 		{
 			var frm = new frmCompleteReductionInfoForm(m_LCFile);
@@ -2484,6 +2483,46 @@ namespace Tangra.VideoOperations.LightCurves
 			miXAxisUserTime.Checked = true;
 			pnlChart.Invalidate();
 		}
+
+        private void miYAxisFlux_Click(object sender, EventArgs e)
+        {
+            m_LightCurveController.Context.YAxisLabels = LightCurveContext.YAxisMode.Flux;
+            miYAxisFlux.Checked = true;
+            miYAxisMags.Checked = false;
+            pnlChart.Invalidate();
+        }
+
+        private void miYAxisMags_Click(object sender, EventArgs e)
+        {
+            UsageStats.Instance.MagnitudeCalculationsInvoked++;
+            UsageStats.Instance.Save();
+
+            var frm = new frmSetReferenceMag();
+            frm.SetCurrentMeasurements(m_SelectedMeasurements, m_LightCurveController.Context);
+            if (frm.ShowDialog(this) == DialogResult.OK)
+            {
+                m_LightCurveController.Context.YAxisLabels = LightCurveContext.YAxisMode.Magnitudes;
+                miYAxisMags.Checked = true;
+                miYAxisFlux.Checked = false;
+                pnlChart.Invalidate();                
+            }
+        }
+
+        private void miLightCurveLine_Click(object sender, EventArgs e)
+        {
+            m_LightCurveController.Context.ChartType = LightCurveContext.LightCurveMode.Line;
+            miLightCurveLine.Checked = true;
+            miLightCurveScatter.Checked = false;
+            pnlChart.Invalidate();
+        }
+
+        private void miLightCurveScatter_Click(object sender, EventArgs e)
+        {
+            m_LightCurveController.Context.ChartType = LightCurveContext.LightCurveMode.Scatter;
+            miLightCurveScatter.Checked = true;
+            miLightCurveLine.Checked = false;            
+            pnlChart.Invalidate();
+        }
 
 	}
 }

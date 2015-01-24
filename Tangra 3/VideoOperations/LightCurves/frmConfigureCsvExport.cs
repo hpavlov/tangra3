@@ -120,7 +120,7 @@ namespace Tangra.VideoOperations.LightCurves
             // m = m0 - 2.5 Log10(Flux);
             // m0 = refMagnitude + 2.5 Log10(Flux);
 
-            m_M0 = refMagnitude + 2.5 * Math.Log10(m_MedianFluxes[refIndex]);
+            m_M0 = refMagnitude + 2.5 * Math.Log10(Math.Max(1, m_MedianFluxes[refIndex]));
 
             NumericUpDown[] magControls = new NumericUpDown[] { nudMag1, nudMag2, nudMag3, nudMag4 };
 
