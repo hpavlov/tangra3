@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Tangra.Controller;
+using Tangra.Helpers;
 using Tangra.Model.Config;
 
 namespace Tangra.VideoOperations.LightCurves.InfoForms
@@ -18,19 +19,20 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 	public partial class frmSetReferenceMag : Form
 	{
 		private Color[] m_AllTargetColors;
-		private double[] m_Intensities = new double[4];
+        private int[] m_Intensities = new int[4];
+	    private int m_OccultedStarIndex;
 
 		private LightCurveContext m_Context;
-		private LCMeasurement[] m_Measurements;
 
 		public frmSetReferenceMag()
 		{
 			InitializeComponent();
 		}
 
-		internal void SetCurrentMeasurements(LCMeasurement[] measurements, LightCurveContext context)
+		internal void SetCurrentMeasurements(LCMeasurement[] measurements, LightCurveContext context, int occultedStarIndex)
 		{
 			m_Context = context;
+		    m_OccultedStarIndex = occultedStarIndex;
 
 			m_AllTargetColors = new Color[]
 		    {
@@ -52,79 +54,15 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 
 			if (measurements == null || measurements.Length == 0)
 			{
+			    int numFramesMedian = Math.Min(context.AllReadings[1].Count, TangraConfig.Settings.Photometry.SNFrameWindow);
+
 				// If there is current selection then use the first reading from the LC file
-				m_Measurements = new LCMeasurement[context.ObjectCount];
-				m_Measurements[0] = context.AllReadings[0][0];
-				if (m_Measurements.Length > 1) m_Measurements[1] = context.AllReadings[1][0];
-				if (m_Measurements.Length > 2) m_Measurements[2] = context.AllReadings[2][0];
-				if (m_Measurements.Length > 3) m_Measurements[3] = context.AllReadings[3][0];
+				m_Intensities = new int[context.ObjectCount];
+                m_Intensities[0] = context.AllReadings[0].Take(numFramesMedian).Select(x => x.AdjustedReading).ToList().Median();
+                if (context.ObjectCount > 1) m_Intensities[1] = context.AllReadings[1].Take(numFramesMedian).Select(x => x.AdjustedReading).ToList().Median();
+                if (context.ObjectCount > 2) m_Intensities[2] = context.AllReadings[2].Take(numFramesMedian).Select(x => x.AdjustedReading).ToList().Median();
+                if (context.ObjectCount > 3) m_Intensities[3] = context.AllReadings[3].Take(numFramesMedian).Select(x => x.AdjustedReading).ToList().Median();
 			}
-			else
-				m_Measurements = measurements;
-
-			m_Intensities = new double[m_Measurements.Length];
-            double[] referenceMags = new double[] { double.NaN, double.NaN, double.NaN, double.NaN };
-		    double[] calculatedMags = new double[] {double.NaN, double.NaN, double.NaN, double.NaN};
-
-            if (m_Context.MagnitudeConverter.CanComputeMagnitudes)
-            {
-                referenceMags = m_Context.MagnitudeConverter.GetReferenceMagnitudes();
-                calculatedMags = m_Context.MagnitudeConverter.ComputeMagnitudes(m_Measurements);
-            }
-
-			if (m_Measurements.Length > 0)
-			{
-				pnl1.Visible = true;
-				m_Intensities[0] = m_Measurements[0].AdjustedReading;
-				label1.Text = m_Intensities[0].ToString("0.0");
-			}
-
-			if (m_Measurements.Length > 1)
-			{
-				pnl2.Visible = true;
-				m_Intensities[1] = m_Measurements[1].AdjustedReading;
-				label2.Text = m_Intensities[1].ToString("0.0");
-			}
-
-			if (m_Measurements.Length > 2)
-			{
-				pnl3.Visible = true;
-				m_Intensities[2] = m_Measurements[2].AdjustedReading;
-				label3.Text = m_Intensities[2].ToString("0.0");
-			}
-
-			if (m_Measurements.Length > 3)
-			{
-				pnl4.Visible = true;
-				m_Intensities[3] = m_Measurements[3].AdjustedReading;
-				label4.Text = m_Intensities[3].ToString("0.0");
-			}
-
-			rb1.Checked = false;
-			rb2.Checked = false;
-			rb3.Checked = false;
-			rb4.Checked = false;
-
-		    if (m_Measurements.Length > 0 && !double.IsNaN(referenceMags[0]))
-		    {
-                nudMag1.Value = (decimal)calculatedMags[0];
-		        rb1.Checked = true;
-		    }
-            if (m_Measurements.Length > 1 && !double.IsNaN(referenceMags[1]))
-            {
-                nudMag2.Value = (decimal)calculatedMags[1];
-                rb2.Checked = true;
-            }
-            if (m_Measurements.Length > 2 && !double.IsNaN(referenceMags[2]))
-            {
-                nudMag3.Value = (decimal)calculatedMags[2];
-                rb3.Checked = true;
-            }
-            if (m_Measurements.Length > 3 && !double.IsNaN(referenceMags[3]))
-            {
-                nudMag4.Value = (decimal)calculatedMags[3];
-                rb4.Checked = true;
-            }
 		}
 
 		private void ReferenceStartRadioButtonChanged(object sender, EventArgs e)
@@ -241,6 +179,69 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 				DialogResult = DialogResult.OK;
 				Close();
 			}
-		}
+        }
+
+        private void frmSetReferenceMag_Shown(object sender, EventArgs e)
+        {
+            double[] referenceMags = new double[] { double.NaN, double.NaN, double.NaN, double.NaN };
+            double[] calculatedMags = new double[] { double.NaN, double.NaN, double.NaN, double.NaN };
+
+            if (m_Context.MagnitudeConverter.CanComputeMagnitudes)
+            {
+                referenceMags = m_Context.MagnitudeConverter.GetReferenceMagnitudes();
+                calculatedMags = m_Context.MagnitudeConverter.ComputeMagnitudes(m_Intensities);
+            }
+
+            if (m_Intensities.Length > 0)
+            {
+                pnl1.Visible = true;
+                label1.Text = m_Intensities[0].ToString("0.0");
+            }
+
+            if (m_Intensities.Length > 1)
+            {
+                pnl2.Visible = true;
+                label2.Text = m_Intensities[1].ToString("0.0");
+            }
+
+            if (m_Intensities.Length > 2)
+            {
+                pnl3.Visible = true;
+                label3.Text = m_Intensities[2].ToString("0.0");
+            }
+
+            if (m_Intensities.Length > 3)
+            {
+                pnl4.Visible = true;
+                label4.Text = m_Intensities[3].ToString("0.0");
+            }
+
+            rb1.Checked = false;
+            rb2.Checked = false;
+            rb3.Checked = false;
+            rb4.Checked = false;
+
+            if (m_Intensities.Length > 0 && !double.IsNaN(referenceMags[0]))
+            {
+                nudMag1.Value = (decimal)calculatedMags[0];
+            }
+            if (m_Intensities.Length > 1 && !double.IsNaN(referenceMags[1]))
+            {
+                nudMag2.Value = (decimal)calculatedMags[1];
+            }
+            if (m_Intensities.Length > 2 && !double.IsNaN(referenceMags[2]))
+            {
+                nudMag3.Value = (decimal)calculatedMags[2];
+            }
+            if (m_Intensities.Length > 3 && !double.IsNaN(referenceMags[3]))
+            {
+                nudMag4.Value = (decimal)calculatedMags[3];
+            }
+
+            if (m_OccultedStarIndex == 0 && m_Intensities.Length > 0)
+                rb2.Checked = true;
+            else
+                rb1.Checked = true;
+        }
 	}
 }

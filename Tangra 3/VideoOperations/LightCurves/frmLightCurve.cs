@@ -2501,7 +2501,8 @@ namespace Tangra.VideoOperations.LightCurves
             UsageStats.Instance.Save();
 
             var frm = new frmSetReferenceMag();
-            frm.SetCurrentMeasurements(m_SelectedMeasurements, m_LightCurveController.Context);
+
+            frm.SetCurrentMeasurements(m_SelectedMeasurements, m_LightCurveController.Context, m_Footer.TrackedObjects.FindIndex(x => x.TrackingType == TrackingType.OccultedStar));
             if (frm.ShowDialog(this) == DialogResult.OK)
             {
                 m_LightCurveController.Context.YAxisLabels = LightCurveContext.YAxisMode.Magnitudes;
