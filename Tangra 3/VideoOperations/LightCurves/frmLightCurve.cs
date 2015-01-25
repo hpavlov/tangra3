@@ -1588,6 +1588,9 @@ namespace Tangra.VideoOperations.LightCurves
                         break;
                 }
 
+                if (m_LightCurveController.Context.Binning > 1)
+                    legend += string.Format(", Bins of {0}, ", m_LightCurveController.Context.Binning);
+
                 legend += string.Format("{0}{1}{2}", m_LCFile.Header.GetVideoFileFormat().ToString(), string.IsNullOrWhiteSpace(m_LCFile.Footer.CameraName) ? "" : ", ", m_LCFile.Footer.CameraName);
 
 				labelSize = g.MeasureString(firstMark.ToString(), s_AxisFont);

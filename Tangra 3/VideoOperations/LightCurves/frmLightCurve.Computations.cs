@@ -726,7 +726,11 @@ namespace Tangra.VideoOperations.LightCurves
 				for (int i = 0; i < count; i++)
 				{
 					string isCorrectedForInstrumentalDelay;
-					DateTime middleBinTime = m_LCFile.GetTimeForFrame(firstFrameNoInBin + (m_LightCurveController.Context.Binning / 2.0), out isCorrectedForInstrumentalDelay);
+                    double midBinFrameNumber = firstFrameNoInBin + (m_LightCurveController.Context.Binning / 2.0);
+
+				    DateTime middleBinTime = midBinFrameNumber <= m_Header.MaxFrame && midBinFrameNumber >= m_Header.MinFrame
+				            ? m_LCFile.GetTimeForFrame(midBinFrameNumber, out isCorrectedForInstrumentalDelay)
+				            : DateTime.MinValue;
 
 				    string timeStr;
                     if (isBadTime)
