@@ -38,6 +38,7 @@ namespace Tangra.OCR
         bool ProcessCalibrationFrame(int frameNo, uint[] data);
         void AddConfiguration(uint[] data, OCRConfigEntry config);
 		Dictionary<string, uint[]> GetCalibrationReportImages();
+	    List<string> GetCalibrationErrors();
         uint[] GetLastUnmodifiedImage();
 		TimestampOCRData InitializationData { get; }
 	    void DrawLegend(Graphics graphics);

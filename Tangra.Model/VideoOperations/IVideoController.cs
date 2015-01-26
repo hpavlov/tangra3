@@ -49,6 +49,6 @@ namespace Tangra.Model.VideoOperations
 		string CurrentVideoFileType { get; }
 
         void RegisterExtractingOcrTimestamps();
-        void RegisterOcrError();
+		void RegisterOcrError();
     }
 }

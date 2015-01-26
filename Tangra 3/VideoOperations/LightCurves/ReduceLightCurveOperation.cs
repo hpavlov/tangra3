@@ -1617,6 +1617,29 @@ namespace Tangra.VideoOperations.LightCurves
 
 			m_ControlPanel.SetupLCFileInfo(m_LightCurveController.LcFile);
 			m_ControlPanel.UpdateState();
+
+			if (TangraContext.Current.OcrErrors > 8)
+			{
+				if (m_LightCurveController.ShowMessageBox(string.Format("There were {0} timestamps that failed OCR, would you like to send an error report to the maintainers of Tangra?", TangraContext.Current.OcrErrors), "Tangra", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes)
+				{
+					var images = m_TimestampOCR.GetCalibrationReportImages();
+					bool reportSendingErrored = false;
+					try
+					{
+						frmOsdOcrCalibrationFailure.SendOcrErrorReport(m_TimestampOCR, images, null);
+					}
+					catch (Exception ex)
+					{
+						m_LightCurveController.ShowMessageBox("Error submitting report: " + ex.Message, "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+						reportSendingErrored = true;
+					}
+					finally
+					{
+						if (!reportSendingErrored)
+							MessageBox.Show("The error report was submitted successfully.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Information);
+					}
+				}
+			}
         }
 
         public void InitGetStartTime()

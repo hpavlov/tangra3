@@ -1856,7 +1856,7 @@ namespace Tangra.Controller
             }            
         }
 
-        public void RegisterOcrError()
+		public void RegisterOcrError()
         {
             TangraContext.Current.OcrErrors++;
             m_VideoFileView.Update();

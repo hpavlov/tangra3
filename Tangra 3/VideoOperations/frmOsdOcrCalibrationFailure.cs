@@ -86,24 +86,53 @@ namespace Tangra.VideoOperations
 		private void btnSendReport_Click(object sender, EventArgs e)
 		{
 			Cursor = Cursors.WaitCursor;
+            EnableDisableFormControls(false);
+
+			bool reportSendingErrored = false;
+
+			try
+			{
+				SendOcrErrorReport(m_TimestampOCR, Images, LastUnmodifiedImage);
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(this, "Error sending the report.\r\n\r\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				reportSendingErrored = true;
+			}
+			finally
+			{
+
+				Cursor = Cursors.Default;
+
+				EnableDisableFormControls(true);
+
+				if (!reportSendingErrored)
+					MessageBox.Show("The error report was submitted successfully.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+				DialogResult = DialogResult.OK;
+				Close();
+			}
+		}
+
+		public static void SendOcrErrorReport(ITimestampOcr timestampOCR, Dictionary<string, uint[]> images, uint[] lastUnmodifiedImage)
+		{
 			string tempDir = Path.GetFullPath(Path.GetTempPath() + @"\" + Guid.NewGuid().ToString());
 			string tempFile = Path.GetTempFileName();
-            EnableDisableFormControls(false);
-		    bool reportSendingErrored = false;
+			
 			try
 			{
 				Directory.CreateDirectory(tempDir);
 
-				int fieldAreaWidth = m_TimestampOCR.InitializationData.OSDFrame.Width;
-				int fieldAreaHeight = m_TimestampOCR.InitializationData.OSDFrame.Height;
-				int frameWidth = m_TimestampOCR.InitializationData.FrameWidth;
-				int frameHeight = m_TimestampOCR.InitializationData.FrameHeight;
+				int fieldAreaWidth = timestampOCR.InitializationData.OSDFrame.Width;
+				int fieldAreaHeight = timestampOCR.InitializationData.OSDFrame.Height;
+				int frameWidth = timestampOCR.InitializationData.FrameWidth;
+				int frameHeight = timestampOCR.InitializationData.FrameHeight;
 
-				foreach (string key in Images.Keys)
+				foreach (string key in images.Keys)
 				{
-					uint[] pixels = Images[key];
+					uint[] pixels = images[key];
 					Bitmap img = null;
-					if (pixels.Length == fieldAreaWidth*fieldAreaHeight)
+					if (pixels.Length == fieldAreaWidth * fieldAreaHeight)
 						img = Pixelmap.ConstructBitmapFromBitmapPixels(pixels, fieldAreaWidth, fieldAreaHeight);
 					else if (pixels.Length == frameWidth * frameHeight)
 						img = Pixelmap.ConstructBitmapFromBitmapPixels(pixels, frameWidth, frameHeight);
@@ -112,9 +141,9 @@ namespace Tangra.VideoOperations
 						img.Save(Path.GetFullPath(string.Format(@"{0}\{1}", tempDir, key)), ImageFormat.Bmp);
 				}
 
-				if (LastUnmodifiedImage != null)
+				if (lastUnmodifiedImage != null)
 				{
-					Bitmap fullFrame = Pixelmap.ConstructBitmapFromBitmapPixels(LastUnmodifiedImage, frameWidth, frameHeight);
+					Bitmap fullFrame = Pixelmap.ConstructBitmapFromBitmapPixels(lastUnmodifiedImage, frameWidth, frameHeight);
 					fullFrame.Save(Path.GetFullPath(string.Format(@"{0}\full-frame.bmp", tempDir)), ImageFormat.Bmp);
 				}
 
@@ -124,18 +153,20 @@ namespace Tangra.VideoOperations
 				var binding = new BasicHttpBinding();
 				var address = new EndpointAddress("http://www.tangra-observatory.org/TangraErrors/ErrorReports.asmx");
 				var client = new TangraService.ServiceSoapClient(binding, address);
+				
+				string errorReportBody = "OSD OCR Calibration Error\r\n\r\n" +
+				                         "OCR OSD Engine: " + timestampOCR.NameAndVersion() + "\r\n" +
+				                         "OSD Type: " + timestampOCR.OSDType() + "\r\n\r\n" +
+				                         frmSystemInfo.GetFullVersionInfo();
+
+				List<string> errorMesages = timestampOCR.GetCalibrationErrors();
+				if (errorMesages != null && errorMesages.Count > 0)
+					errorReportBody += "\r\n\r\n" + string.Join("\r\n", errorMesages);
+
 				client.ReportErrorWithAttachment(
-					"OSD OCR Calibration Error\r\n\r\n" + 
-                    "OCR OSD Engine: " + m_TimestampOCR.NameAndVersion() + "\r\n" +
-                    "OSD Type: " + m_TimestampOCR.OSDType() + "\r\n\r\n" +
-                    frmSystemInfo.GetFullVersionInfo(), 
-                    string.Format("CalibrationFrames-{0}.zip", Guid.NewGuid().ToString()),
+					errorReportBody,
+					string.Format("CalibrationFrames-{0}.zip", Guid.NewGuid().ToString()),
 					attachment);
-			}
-			catch (Exception ex)
-			{
-				MessageBox.Show(this, "Error sending the report.\r\n\r\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-			    reportSendingErrored = true;
 			}
 			finally
 			{
@@ -156,16 +187,6 @@ namespace Tangra.VideoOperations
 					}
 					catch { }
 				}
-
-				Cursor = Cursors.Default;
-
-                EnableDisableFormControls(true);
-
-                if (!reportSendingErrored)
-			        MessageBox.Show("The error report was submitted successfully.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-				DialogResult = DialogResult.OK;
-				Close();
 			}
 		}
 	}
