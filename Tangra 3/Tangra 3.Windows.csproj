@@ -608,6 +608,7 @@
     <Compile Include="Video\frmIntegrationDetection.Designer.cs">
       <DependentUpon>frmIntegrationDetection.cs</DependentUpon>
     </Compile>
+    <Compile Include="Video\IFITSStream.cs" />
     <Compile Include="Video\SERVideoStream.cs" />
     <Compile Include="Video\SER\frmEnterSERFileInfo.cs">
       <SubType>Form</SubType>

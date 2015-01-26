@@ -47,7 +47,7 @@ namespace Tangra.Helpers
 		}
 
 		private static Regex FITS_DATE_REGEX = new Regex("(?<DateStr>\\d\\d\\d\\d\\-\\d\\d\\-\\d\\dT\\d\\d:\\d\\d:\\d\\d(\\.\\d+)?)");
-		public static void Load16BitFitsFile(string fileName, out uint[] pixelsFlat, out int width, out int height, out int bpp, out DateTime? timestamp, out double? exposure)
+        public static void Load16BitFitsFile(string fileName, out uint[] pixelsFlat, out int width, out int height, out int bpp, out DateTime? timestamp, out double? exposure, out uint minPixelValue, out uint maxPixelValue)
 		{
 			int pixWidth = 0;
 			int pixHeight = 0;
@@ -140,7 +140,8 @@ namespace Tangra.Helpers
 			timestamp = fitsTimestamp;
 			exposure = fitsExposure;
 
-			uint maxPresentPixelValue = 0;
+            maxPixelValue = 0;
+            minPixelValue = uint.MaxValue;
             uint mask = (uint)(((uint)1 << pixBpp) - 1);
 
 			for (int y = 0; y < height; y++)
@@ -149,16 +150,16 @@ namespace Tangra.Helpers
 				{
                     uint val = pixels[x, y] & mask;
 					pixelsFlat[x + y * width] = val;
-					if (maxPresentPixelValue < val)
-						maxPresentPixelValue = val;
+                    if (maxPixelValue < val) maxPixelValue = val;
+                    if (minPixelValue > val) minPixelValue = val;
 				}
 			}
 
-			if (maxPresentPixelValue < 256)
+            if (maxPixelValue < 256)
 				bpp = 8;
-			else if (maxPresentPixelValue < 4096)
+            else if (maxPixelValue < 4096)
 				bpp = 12;
-			else if (maxPresentPixelValue < 16384)
+            else if (maxPixelValue < 16384)
 				bpp = 14;
 			else
 				bpp = pixBpp;

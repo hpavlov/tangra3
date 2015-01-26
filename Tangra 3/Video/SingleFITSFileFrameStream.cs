@@ -7,17 +7,19 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using Tangra.Controller;
 using Tangra.Helpers;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
 using Tangra.Model.Image;
 using Tangra.Model.Video;
+using Tangra.Model.VideoOperations;
 using Tangra.PInvoke;
 using Tangra.VideoOperations.LightCurves;
 
 namespace Tangra.Video
 {
-	internal class SingleFITSFileFrameStream : IDisposable, IFrameStream
+    internal class SingleFITSFileFrameStream : IDisposable, IFrameStream, IFITSStream
 	{
 		internal const string SINGLE_FITS_FILE_ENGINE = "FITS.Image";
 
@@ -30,6 +32,9 @@ namespace Tangra.Video
 		private int m_Bpp;
 		private uint[] m_FlatPixels;
 
+        private uint m_MinPixelValue;
+        private uint m_MaxPixelValue;
+
 		public static SingleFITSFileFrameStream OpenFile(string fileName)
 		{
 			uint[] pixelsFlat;
@@ -38,15 +43,17 @@ namespace Tangra.Video
 			int bpp;
 			DateTime? timestamp;
 			double? exposure;
+		    uint minPixelValue;
+            uint maxPixelValue;
 
-			FITSHelper.Load16BitFitsFile(fileName, out pixelsFlat, out width, out height, out bpp, out timestamp, out exposure);
+            FITSHelper.Load16BitFitsFile(fileName, out pixelsFlat, out width, out height, out bpp, out timestamp, out exposure, out minPixelValue, out maxPixelValue);
 
-			TangraContext.Current.RenderingEngine = SINGLE_FITS_FILE_ENGINE;
+		    TangraContext.Current.RenderingEngine = SINGLE_FITS_FILE_ENGINE;
 
-			return new SingleFITSFileFrameStream(pixelsFlat, width, height, bpp);
+            return new SingleFITSFileFrameStream(pixelsFlat, width, height, bpp, minPixelValue, maxPixelValue);
 		}
 
-		private SingleFITSFileFrameStream(uint[] flatPixels, int width, int height, int bpp)
+		private SingleFITSFileFrameStream(uint[] flatPixels, int width, int height, int bpp, uint minPixelValue, uint maxPixelValue)
 		{
 			m_FlatPixels = flatPixels;
 			m_Width = width;
@@ -56,6 +63,9 @@ namespace Tangra.Video
 			m_FirstFrame = 0;
 			m_LastFrame = 0;
 			m_NumFrames = 1;
+
+		    m_MinPixelValue = minPixelValue;
+		    m_MaxPixelValue = maxPixelValue;
 		}
 
 		#region IFrameStream Members
@@ -169,5 +179,16 @@ namespace Tangra.Video
 		#endregion
 
 
-	}
+
+        public uint MinPixelValue
+        {
+            get { return m_MinPixelValue; }
+        }
+
+        public uint MaxPixelValue
+        {
+            get { return m_MaxPixelValue; }
+        }
+
+    }
 }

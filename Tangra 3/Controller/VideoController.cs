@@ -327,7 +327,17 @@ namespace Tangra.Controller
 				m_DynamicToValue = 0;
 				m_DynamicMaxPixelValue = 0;
 
-				m_FramePlayer.MoveToFrame(frameStream.FirstFrame);
+			    m_FramePlayer.MoveToFrame(frameStream.FirstFrame);
+
+                IFITSStream fitsSteream = m_FramePlayer.Video as IFITSStream;
+                if (fitsSteream != null)
+                {
+                    SetDisplayIntensifyMode(DisplayIntensifyMode.Dynamic, (int)fitsSteream.MinPixelValue, (int)fitsSteream.MaxPixelValue);
+                    m_MainForm.tsmiOff.Checked = false;
+                    m_MainForm.tsmiLo.Checked = false;
+                    m_MainForm.tsmiHigh.Checked = false;
+                    m_MainForm.tsmiDynamic.Checked = true;
+                }
 
 				m_VideoFileView.Update();
 

@@ -16,10 +16,13 @@ using Tangra.PInvoke;
 
 namespace Tangra.Video
 {
-    internal class FITSFileSequenceStream : IDisposable, IFrameStream
+    internal class FITSFileSequenceStream : IDisposable, IFrameStream, IFITSStream
     {
         private List<string> m_FitsFilesList = new List<string>();
- 
+
+        private uint m_MinPixelValueFirstImage;
+        private uint m_MaxPixelValueFirstImage;
+
         public static FITSFileSequenceStream OpenFolder(string[] fitsFiles)
         {
 			UsageStats.Instance.ProcessedFitsFolderFiles++;
@@ -45,8 +48,13 @@ namespace Tangra.Video
             int bpp;
 			DateTime? timestamp;
 			double? exposure;
+            uint minPixelValue;
+            uint maxPixelValue;
 
-			FITSHelper.Load16BitFitsFile(m_FitsFilesList[0], out pixelsFlat, out width, out height, out bpp, out timestamp, out exposure);
+            FITSHelper.Load16BitFitsFile(m_FitsFilesList[0], out pixelsFlat, out width, out height, out bpp, out timestamp, out exposure, out minPixelValue, out maxPixelValue);
+
+            m_MinPixelValueFirstImage = minPixelValue;
+            m_MaxPixelValueFirstImage = maxPixelValue;
 
             Width = width;
             Height = height;
@@ -87,8 +95,10 @@ namespace Tangra.Video
             int bpp;
 			DateTime? timestamp;
 			double? exposure;
+            uint minPixelValue;
+            uint maxPixelValue;
 
-			FITSHelper.Load16BitFitsFile(m_FitsFilesList[index], out pixelsFlat, out width, out height, out bpp, out timestamp, out exposure);
+            FITSHelper.Load16BitFitsFile(m_FitsFilesList[index], out pixelsFlat, out width, out height, out bpp, out timestamp, out exposure, out minPixelValue, out maxPixelValue);
 
             byte[] displayBitmapBytes = new byte[Width * Height];
             byte[] rawBitmapBytes = new byte[(Width * Height * 3) + 40 + 14 + 1];
@@ -151,5 +161,15 @@ namespace Tangra.Video
         }
 
 		public bool HasUTCTimeStamps { get; private set; }
+
+        public uint MinPixelValue
+        {
+            get { return m_MinPixelValueFirstImage; }
+        }
+
+        public uint MaxPixelValue
+        {
+            get { return m_MaxPixelValueFirstImage; }
+        }
     }
 }
