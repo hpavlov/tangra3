@@ -477,7 +477,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 		EventTimesReport m_EventTimesReport;
 
-		public bool PrepareForLightCurveEventTimeExtraction(string addinName)
+		public bool PrepareForLightCurveEventTimeExtraction(string addinName, bool binningOk)
 		{
 			m_EventTimesReport = null;
 
@@ -546,7 +546,7 @@ namespace Tangra.VideoOperations.LightCurves
 				m_EventTimesReport.TangraCanApplyInstrumentalDelays = m_LCFile.Header.GetInstrumentalDelaysApplied(m_EventTimesReport.VideoFileFormat);
 			}
 
-            if (m_LightCurveController.Context.Binning > 1)
+			if (m_LightCurveController.Context.Binning > 1 && !binningOk)
             {
                 MessageBox.Show(this, "This add-in cannot run when binning is in use.", "Tangra3", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;

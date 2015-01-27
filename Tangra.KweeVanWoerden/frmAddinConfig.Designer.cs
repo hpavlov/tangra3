@@ -86,7 +86,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "frmAddinConfig";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Occulting Binaries Addin Configuration";
+            this.Text = "Eclipsing Binaries Addin Configuration";
             this.ResumeLayout(false);
             this.PerformLayout();
 

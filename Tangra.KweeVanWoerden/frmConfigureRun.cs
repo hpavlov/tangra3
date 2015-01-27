@@ -26,6 +26,9 @@ namespace Tangra.KweeVanWoerden
         internal int IncludeDataFrom = 0;
         internal int IncludeDataTo = 0;
 
+	    internal bool RunKvW = true;
+	    internal bool RunCurveFitting = false;
+
 	    private float[] m_DisplayData;
 
         private Color m_Target1Color;
@@ -119,6 +122,8 @@ namespace Tangra.KweeVanWoerden
                 MessageBox.Show("Variable and Comparison star must be different stars.");
                 return;
             }
+
+	        RunCurveFitting = cbxCurveFitting.Checked;
 
             Close();
         }

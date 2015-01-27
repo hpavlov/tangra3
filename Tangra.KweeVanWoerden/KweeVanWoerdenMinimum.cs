@@ -66,12 +66,12 @@ namespace Tangra.KweeVanWoerden
 
 		public string DisplayName
 		{
-			get { return "Occulting Binary Epoch of Minimum"; }
+			get { return "Eclipsing Binary Time of Minima Analysis"; }
 		}
 
 		public AddinActionType ActionType
 		{
-			get { return AddinActionType.LightCurveEventTimeExtractor; }
+			get { return AddinActionType.LightCurveEventTimeExtractorSupportsBinning; }
 		}
 
 		public IntPtr Icon
@@ -98,7 +98,7 @@ namespace Tangra.KweeVanWoerden
 		{
 			if (m_Running)
 			{
-				ShowErrorMessage("Extract Occulting Binary Minimum Time is already running.");
+				ShowErrorMessage("Extract Eclipsing Binary Time of Minima is already running.");
 				return;
 			}
 
@@ -110,7 +110,7 @@ namespace Tangra.KweeVanWoerden
 					MessageBox.Show(
 						m_TangraHost.ParentWindow,
 					    "A simulated dataset will be used rather than real data.\r\n\r\nTo use actual light curve data from Tangra please reconfigure the add-in from the Settings.",
-						"Occulting Binaries for Tangra", 
+						"Eclipsing Binaries Addin for Tangra", 
 						MessageBoxButtons.OK, 
 						MessageBoxIcon.Warning);
 
@@ -153,6 +153,8 @@ namespace Tangra.KweeVanWoerden
 				frm.TargetData = dataProvider.GetTargetMeasurements();
 				if (frm.ShowDialog(m_TangraHost.ParentWindow) == DialogResult.Cancel)
 					return;
+
+				bool useCurveFitting = frm.RunCurveFitting;
 
                 if (frm.VariableStarIndex == 0)
                 {
@@ -263,7 +265,9 @@ namespace Tangra.KweeVanWoerden
 
 
                         result = Kwee_van_Woerden(times.Count, jdAtUtcMidnight, times.ToArray(), dataWithBgLst.ToArray(), dataBgLst.ToArray(), compDataWithBgLst.ToArray(), compBgLst.ToArray());
-                        polyResult = PolynomialFit(times.Count, jdAtUtcMidnight, times.ToArray(), dataWithBgLst.ToArray(), dataBgLst.ToArray(), compDataWithBgLst.ToArray(), compBgLst.ToArray(), (int)result.Start_Light_Curve_Obs_Index, (int)result.Stop_Light_Curve_Obs_Index, result.Time_Of_Minimum);
+						polyResult = useCurveFitting
+							? PolynomialFit(times.Count, jdAtUtcMidnight, times.ToArray(), dataWithBgLst.ToArray(), dataBgLst.ToArray(), compDataWithBgLst.ToArray(), compBgLst.ToArray(), (int)result.Start_Light_Curve_Obs_Index, (int)result.Stop_Light_Curve_Obs_Index, result.Time_Of_Minimum)
+							: null;
 
 						PresentResults(frm.VariableStarIndex, result, polyResult);
 					}
@@ -364,11 +368,11 @@ namespace Tangra.KweeVanWoerden
 		private string CallKweeVanWoerden(int numObs, double jdAtUtcMidnight, double[] timePoints, double[] dataWithBg, double[] dataBg, double[] compDataWithBg, double[] compBg)
 		{			
 			string nativeDllPath = Path.GetFullPath(FORTRAN_DLL_DIRECTORY_PATH + @"\kwee_van_woerden_subroutine.dll");
-			Trace.WriteLine("DLL Path: " + nativeDllPath, "Occulting Binaries for Tangra");
+			Trace.WriteLine("DLL Path: " + nativeDllPath, "Occulting Binaries Addin for Tangra");
 
 			if (!File.Exists(nativeDllPath))
 			{
-				MessageBox.Show(m_TangraHost.ParentWindow, "Cannot find kwee_van_woerden_subroutine.dll", "Occulting Binaries for Tangra", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+				MessageBox.Show(m_TangraHost.ParentWindow, "Cannot find kwee_van_woerden_subroutine.dll", "Eclipsing Binaries Addin for Tangra", MessageBoxButtons.OK, MessageBoxIcon.Stop);
 				return null;
 			}
 
@@ -417,7 +421,7 @@ namespace Tangra.KweeVanWoerden
 						if (File.Exists(outputFile))
 							return outputFile;
 						else
-							MessageBox.Show(m_TangraHost.ParentWindow, "No solution was found with the current data", "Occulting Binaries for Tangra", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+							MessageBox.Show(m_TangraHost.ParentWindow, "No solution was found with the current data", "Eclipsing Binaries Addin for Tangra", MessageBoxButtons.OK, MessageBoxIcon.Stop);
 					}
 				}
 				finally
@@ -427,7 +431,7 @@ namespace Tangra.KweeVanWoerden
 			}
 			else 
 			{
-				MessageBox.Show(m_TangraHost.ParentWindow, "Cannot load kwee_van_woerden_subroutine.dll", "Occulting Binaries for Tangra", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+				MessageBox.Show(m_TangraHost.ParentWindow, "Cannot load kwee_van_woerden_subroutine.dll", "Eclipsing Binaries Addin for Tangra", MessageBoxButtons.OK, MessageBoxIcon.Stop);
 			}
 
 			return null;
@@ -443,7 +447,7 @@ namespace Tangra.KweeVanWoerden
 			MessageBox.Show(
 				m_TangraHost.ParentWindow,
 				errorMessage,
-				"Occulting Binaries Addin for Tangra",
+				"Eclipsing Binaries Addin for Tangra",
 				MessageBoxButtons.OK,
 				MessageBoxIcon.Error);
 		}
@@ -487,33 +491,33 @@ namespace Tangra.KweeVanWoerden
                     double x = SecondsFromTimeFirstJD[i] / (24 * 3600);
                     rv.TimePoints.Add(x);
                     dataPointsVar.Add(Variable_Star_DN[i] - Variable_Sky_DN[i]);
-                    dataPointsComp.Add(Comparison_Star_DN[i] - Comparison_Sky_DN[i]);                    
+                    dataPointsComp.Add(Comparison_Star_DN[i] - Comparison_Sky_DN[i]);
                 }
 
                 rv.DataPoints.Add(y);
 			}
 
-			//var fitter = new ModelFitter(rv.TimePoints.Count, rv.TimePoints.ToArray(), dataPointsVar.ToArray(), dataPointsComp.ToArray());
-			//fitter.Solve(true, kweeVanWoerdenT0);
+			var fitter = new ModelFitter(rv.TimePoints.Count, rv.TimePoints.ToArray(), dataPointsVar.ToArray(), dataPointsComp.ToArray());
+			fitter.Solve(true, kweeVanWoerdenT0);
 
-			//for (int i = 0; i < Number_Obs; i++)
-			//{
-			//	if (i >= firstObsIndex && i < lastObsIndex)
-			//		rv.FittedValues.Add(fitter.NormIntensities[i - firstObsIndex]);
-			//	else
-			//		rv.FittedValues.Add(double.NaN);
-			//}
+			for (int i = 0; i < Number_Obs; i++)
+			{
+				if (i >= firstObsIndex && i < lastObsIndex)
+					rv.FittedValues.Add(fitter.NormIntensities[i - firstObsIndex]);
+				else
+					rv.FittedValues.Add(double.NaN);
+			}
 
-			//rv.G = fitter.G;
-			//rv.M0 = fitter.M0;
-			//rv.C = fitter.C;
-			//rv.D = fitter.D;
-			//rv.T0 = fitter.T0;
+			rv.G = fitter.G;
+			rv.M0 = fitter.M0;
+			rv.C = fitter.C;
+			rv.D = fitter.D;
+			rv.T0 = fitter.T0;
 
 		    rv.StartIndex = firstObsIndex;
             rv.StopIndex = lastObsIndex;
 
-            //rv.Time_Of_Minimum_JD = Time_First_JD + fitter.T0;
+            rv.Time_Of_Minimum_JD = Time_First_JD + fitter.T0;
 		    rv.Time_Of_Minimum_Uncertainty = 0; // Math.Sqrt((4.0 * rv.A * rv.C - rv.B * rv.B) / (4.0 * rv.A * rv.A) / ((float)(rv.TimePoints.Count / 4.0 - 1.0)));
 
 			return rv;

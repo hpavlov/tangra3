@@ -1026,12 +1026,24 @@ namespace Tangra.VideoOperations.LightCurves
 
 	    int ILightCurveDataProvider.MinFrameNumber
 	    {
-			get { return (int)m_LCFile.Header.MinFrame; }
+			get
+			{
+				if (m_LightCurveController.Context.Binning > 0)
+					return 0;
+				else
+					return (int) m_LCFile.Header.MinFrame;
+			}
 	    }
 
 	    int ILightCurveDataProvider.MaxFrameNumber
 	    {
-			get { return (int)m_LCFile.Header.MaxFrame; }
+			get
+			{
+				if (m_LightCurveController.Context.Binning > 0)
+					return m_AllBinnedReadings[0].Count;
+				else
+					return (int)m_LCFile.Header.MaxFrame;
+			}
 	    }
 
         int ILightCurveDataProvider.CurrentlySelectedFrameNumber

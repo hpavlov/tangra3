@@ -40,10 +40,11 @@ namespace Tangra.SDK
 
 	public enum AddinActionType
 	{
-		LightCurve,
-		LightCurveEventTimeExtractor,
-		Astrometry,
-		Generic
+		LightCurve = 0,
+		LightCurveEventTimeExtractor = 1,
+		LightCurveEventTimeExtractorSupportsBinning = 2,
+		Astrometry = 3,
+		Generic = 4
 	}
 
 	public interface ITangraAddinAction

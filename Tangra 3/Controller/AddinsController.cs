@@ -97,7 +97,7 @@ namespace Tangra.Controller
 				{
 					foreach (ITangraAddinAction action in addin.Instance.GetAddinActions())
 					{
-						if (action.ActionType == AddinActionType.LightCurve || action.ActionType == AddinActionType.LightCurveEventTimeExtractor)
+						if (action.ActionType == AddinActionType.LightCurve || action.ActionType == AddinActionType.LightCurveEventTimeExtractor || action.ActionType == AddinActionType.LightCurveEventTimeExtractorSupportsBinning)
 						{
 							ToolStripMenuItem item = new ToolStripMenuItem(action.DisplayName);
 							item.Click += OnLightCurveAddinItemClick;
@@ -147,10 +147,11 @@ namespace Tangra.Controller
 					{
 						addinActonName = addinAction.DisplayName;
 						bool isEventTimeExtrator = addinAction.ActionType == AddinActionType.LightCurveEventTimeExtractor;
+						bool isEventTimeExtratorSupportsBinning = addinAction.ActionType == AddinActionType.LightCurveEventTimeExtractorSupportsBinning;
 						bool canExecuteAction = false;
 
-						if (isEventTimeExtrator)
-							canExecuteAction = (m_LocalLightCurveDataProvider as frmLightCurve).PrepareForLightCurveEventTimeExtraction(addinActonName);
+						if (isEventTimeExtrator || isEventTimeExtratorSupportsBinning)
+							canExecuteAction = (m_LocalLightCurveDataProvider as frmLightCurve).PrepareForLightCurveEventTimeExtraction(addinActonName, isEventTimeExtratorSupportsBinning);
 						else
 							canExecuteAction = true;
 

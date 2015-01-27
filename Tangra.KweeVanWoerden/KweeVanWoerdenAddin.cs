@@ -94,12 +94,12 @@ namespace Tangra.KweeVanWoerden
 
 		public string DisplayName
 		{
-			get { return "Occulting Binaries for Tangra"; }
+			get { return "Eclipsing Binaries for Tangra"; }
 		}
 
 		public string Author
 		{
-			get { return "A.Mallama & H.Pavlov"; }
+			get { return "A.Mallama && H.Pavlov"; }
 		}
 
 		public string Version
@@ -109,7 +109,7 @@ namespace Tangra.KweeVanWoerden
 
 		public string Description
 		{
-			get { return "Addin for Tangra 3 for determining the epoch of minimum for occulting binaries"; }
+			get { return "Addin for Tangra 3 for determining the time of minima of eclipsing binary stars"; }
 		}
 
 		public string Url
