@@ -90,15 +90,18 @@ namespace Tangra.KweeVanWoerden
 		    PlotKweeVanWoerden();
 
 
-            tbxT0JD_CF.Text = PolyResults.Time_Of_Minimum_JD.ToString("0.000000");
-            tbxT0UT_CF.Text = AstroUtilities.JDToDateTimeUtc(PolyResults.Time_Of_Minimum_JD).ToString("dd MMM yyyy, HH:mm:ss.fff");
+            if (PolyResults != null)
+            {
+                tbxT0JD_CF.Text = PolyResults.Time_Of_Minimum_JD.ToString("0.000000");
+                tbxT0UT_CF.Text = AstroUtilities.JDToDateTimeUtc(PolyResults.Time_Of_Minimum_JD).ToString("dd MMM yyyy, HH:mm:ss.fff");
 
-			nudM0.Value = (decimal)PolyResults.M0;
-			nudC.Value = (decimal)PolyResults.C;
-			nudD.Value = (decimal)PolyResults.D;
-			nudG.Value = (decimal)PolyResults.G;
+                nudM0.Value = (decimal)PolyResults.M0;
+                nudC.Value = (decimal)PolyResults.C;
+                nudD.Value = (decimal)PolyResults.D;
+                nudG.Value = (decimal)PolyResults.G;
 
-		    PlotPolyFit();
+                PlotPolyFit();                
+            }
 		}
 
         private void PlotPolyFit()
@@ -186,7 +189,8 @@ namespace Tangra.KweeVanWoerden
             if (!double.IsNaN(frm.TimeOfMinimumHJD))
             {
                 tbxT0HJD.Text = frm.TimeOfMinimumHJD.ToString();
-                tbxT0HJD_CF.Text = (frm.TimeCorrectionHJD + PolyResults.Time_Of_Minimum_JD).ToString();
+                if (PolyResults != null)
+                    tbxT0HJD_CF.Text = (frm.TimeCorrectionHJD + PolyResults.Time_Of_Minimum_JD).ToString();
 
                 btnCalcHJD.Visible = false;
                 btnCalcHJD2.Visible = false;
