@@ -97,7 +97,7 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 					}
 				}				
 			}
-			else if (m_Bpp == 12 || m_Bpp == 14)
+            else if (m_Bpp == 12 || m_Bpp == 14 || m_Bpp == 16)
 			{
 
 				for (uint i = 0; i <= m_MaxBuckets; i++)
@@ -171,7 +171,7 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
                     }
                 }
             }
-            else if (m_Bpp == 12 || m_Bpp == 14)
+            else if (m_Bpp == 12 || m_Bpp == 14 || m_Bpp == 16)
             {
 
                 for (uint i = 0; i <= m_MaxBuckets; i++)
