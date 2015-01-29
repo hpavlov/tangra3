@@ -1,7 +1,3 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-
 #include "stdafx.h"
 #include "TangraVideo.h"
 #include "TangraAviFile.h"
@@ -19,7 +15,7 @@ PGETFRAME g_pGetFrame = NULL;
 
 HRESULT TangraVideoEnumVideoEngines(char* videoEngines)
 {
-	strcpy(videoEngines, "VideoForWindows;DirectShow");
+	strcpy(videoEngines, "VideoForWindows (2Gb Limit);DirectShow");
 	
 	return S_OK;
 }
@@ -122,22 +118,7 @@ HRESULT OpenAviFile(const char* fileName, VideoFileInfo* fileInfo)
 			else
 			{
 				TangraVideoCloseFile();
-
-				fileInfo->CountFrames = 0;
-				fileInfo->FirstFrame = 0;
-				fileInfo->Width = lpFormat.biWidth;
-				fileInfo->Height = lpFormat.biHeight;
-				fileInfo->BitmapImageSize= lpFormat.biSizeImage;
-				fileInfo->FrameRate = 0;
-				strncpy(fileInfo->EngineBuffer, "VWF\0", 4);
-				fileInfo->VideoFileTypeBuffer[0] = (lpFormat.biCompression >> 24) & 0xFF;
-				fileInfo->VideoFileTypeBuffer[1] = (lpFormat.biCompression >> 16) & 0xFF;
-				fileInfo->VideoFileTypeBuffer[2] = (lpFormat.biCompression >> 8) & 0xFF;
-				fileInfo->VideoFileTypeBuffer[3] = lpFormat.biCompression & 0xFF;
-				fileInfo->VideoFileTypeBuffer[4] = 0;
-
-				rv = E_FAIL;
-			}
+			}								
 		}
 	}
 
