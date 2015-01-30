@@ -1379,8 +1379,8 @@ namespace Tangra.VideoOperations.LightCurves
 			PictureBox[] psfBoxes = new PictureBox[] { picTarget1PSF, picTarget2PSF, picTarget3PSF, picTarget4PSF };
 			Label[] msrmntLabels = new Label[] {lblMeasurement1, lblMeasurement2, lblMeasurement3, lblMeasurement4};
 			Label[] magsLabels = new Label[] { lblMagnitude1, lblMagnitude2, lblMagnitude3, lblMagnitude4 };
-			Label[] snlblLabels = new Label[] { lblSNLBL1, lblSNLBL1, lblSNLBL1, lblSNLBL1 };
-			Label[] snLabels = new Label[] { lblSN1, lblSN1, lblSN1, lblSN1 };
+			Label[] snlblLabels = new Label[] { lblSNLBL1, lblSNLBL2, lblSNLBL3, lblSNLBL4 };
+			Label[] snLabels = new Label[] { lblSN1, lblSN2, lblSN3, lblSN4 };
 			
 
 			int numCheckedBefore = 0;
@@ -1589,7 +1589,7 @@ namespace Tangra.VideoOperations.LightCurves
                 }
 
                 if (m_LightCurveController.Context.Binning > 1)
-                    legend += string.Format(", Bins of {0}, ", m_LightCurveController.Context.Binning);
+                    legend += string.Format("Bins of {0}, ", m_LightCurveController.Context.Binning);
 
                 legend += string.Format("{0}{1}{2}", m_LCFile.Header.GetVideoFileFormat().ToString(), string.IsNullOrWhiteSpace(m_LCFile.Footer.CameraName) ? "" : ", ", m_LCFile.Footer.CameraName);
 
