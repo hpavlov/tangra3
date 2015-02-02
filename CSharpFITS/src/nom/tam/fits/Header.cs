@@ -1536,7 +1536,7 @@ namespace nom.tam.fits
           //Console.Out.WriteLine("key = '" + key + "'");
           if(key == null || (!key.Equals("SIMPLE") && !key.Equals("XTENSION")))
           {
-            throw new IOException("Not FITS format at " + fileOffset + ":" + cbuf);
+            throw new HeaderCardException("Not FITS format at " + fileOffset + ":" + cbuf);
           }
 
           firstCard = false;

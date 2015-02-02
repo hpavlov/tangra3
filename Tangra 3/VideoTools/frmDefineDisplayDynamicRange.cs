@@ -178,5 +178,10 @@ namespace Tangra.VideoTools
 			m_VideoController.SetDisplayIntensifyMode(DisplayIntensifyMode.Dynamic, tbarFrom.Value, tbarTo.Value);
 		}
 
+        private void frmDefineDisplayDynamicRange_Load(object sender, EventArgs e)
+        {
+            Text = string.Format("Define Display Dynamic Range ({0} bit)", m_Bpp);
+        }
+
 	}
 }

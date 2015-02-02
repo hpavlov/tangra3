@@ -216,6 +216,9 @@ namespace Tangra.Controller
 	    {
 			string fileExtension = Path.GetExtension(fileName);
 
+	        if (fileExtension != null) 
+                fileExtension = fileExtension.ToLower();
+
 		    return OpenVideoFileInternal(
 				fileName, 
 				() =>

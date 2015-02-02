@@ -41,7 +41,20 @@ namespace Tangra.Helpers
 					return false;
 				}
 
-				pixels = Load16BitImageData((Array)imageHDU.Data.DataArray, imageHDU.Axes[0], imageHDU.Axes[1], out medianValue);
+
+			    uint bzero = 0;
+                HeaderCard bZeroCard = imageHDU.Header.FindCard("BZERO");
+			    if (bZeroCard != null)
+			    {
+                    try
+                    {
+                        bzero = (uint)double.Parse(bZeroCard.Value);                        
+                    }
+                    catch
+			        { }
+			    }
+
+			    pixels = Load16BitImageData((Array)imageHDU.Data.DataArray, imageHDU.Axes[0], imageHDU.Axes[1], bzero, out medianValue);
 				return true;
 			}
 		}
@@ -165,7 +178,7 @@ namespace Tangra.Helpers
 				bpp = pixBpp;
 		}
 
-		private static uint[,] Load16BitImageData(Array dataArray, int height, int width, out uint medianValue)
+		private static uint[,] Load16BitImageData(Array dataArray, int height, int width, uint bzero , out uint medianValue)
 		{
 			var medianCalcList = new List<uint>();
 
@@ -192,7 +205,7 @@ namespace Tangra.Helpers
 
 				for (int x = 0; x < width; x++)
 				{
-					uint val = (ushort)dataRow[x];
+                    uint val = (uint)(bzero + (int)dataRow[x]);
 
 					data[x, y] = val;
 					medianCalcList.Add(val);

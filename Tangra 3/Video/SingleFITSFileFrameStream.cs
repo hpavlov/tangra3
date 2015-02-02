@@ -129,9 +129,9 @@ namespace Tangra.Video
 			uint[] flatPixelsCopy = new uint[m_FlatPixels.Length];
 			Array.Copy(m_FlatPixels, flatPixelsCopy, m_FlatPixels.Length);
 
-			TangraCore.PreProcessors.ApplyPreProcessingPixelsOnly(flatPixelsCopy, m_Width, m_Height, 16);
+            TangraCore.PreProcessors.ApplyPreProcessingPixelsOnly(flatPixelsCopy, m_Width, m_Height, m_Bpp);
 
-			TangraCore.GetBitmapPixels(m_Width, m_Height, flatPixelsCopy, rawBitmapBytes, displayBitmapBytes, true, 16, 0);
+            TangraCore.GetBitmapPixels(m_Width, m_Height, flatPixelsCopy, rawBitmapBytes, displayBitmapBytes, true, m_Bpp, 0);
 
 			Bitmap displayBitmap = Pixelmap.ConstructBitmapFromBitmapPixels(displayBitmapBytes, m_Width, m_Height);
 

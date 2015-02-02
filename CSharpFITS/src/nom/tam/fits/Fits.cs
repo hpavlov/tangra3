@@ -660,10 +660,17 @@ namespace nom.tam.fits
 			{
 				try
 				{
-					if (ReadHDU() == null)
-					{
-						break;
-					}
+				    if (ReadHDU() == null)
+				    {
+				        break;
+				    }
+				}
+				catch (HeaderCardException hcex)
+				{
+				    if (NumberOfHDUs == 0)
+				        throw new FitsException(hcex.Message);
+				    else
+				        break;
 				}
 				catch(IOException e)
 				{
