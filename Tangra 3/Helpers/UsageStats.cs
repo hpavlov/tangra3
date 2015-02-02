@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -45,10 +46,17 @@ namespace Tangra.Helpers
 
 		public void Save()
 		{
-			var serData = new StringBuilder();
-            m_Serializer.Serialize(XmlWriter.Create(serData, new XmlWriterSettings { OmitXmlDeclaration = true, Indent = true }), this);
-			Properties.Settings.Default.UsageStatistics = serData.ToString();
-			Properties.Settings.Default.Save();
+            try
+            {
+                var serData = new StringBuilder();
+                m_Serializer.Serialize(XmlWriter.Create(serData, new XmlWriterSettings { OmitXmlDeclaration = true, Indent = true }), this);
+                Properties.Settings.Default.UsageStatistics = serData.ToString();
+                Properties.Settings.Default.Save();                
+            }
+            catch(Exception ex)
+            {
+                Trace.WriteLine(ex);
+            }
 		}
 
 		public static UsageStats Instance;

@@ -694,7 +694,9 @@ namespace Tangra.OCR
 
 					if (m_CalibrationErrors.Count < 16)
 					{
-						m_CalibrationImages.Add(string.Format("ocrerr_{0}.bmp", frameNo), m_Processor.CurrentImage);
+					    var copy = new List<uint>();
+					    copy.AddRange(m_Processor.CurrentImage);
+                        m_CalibrationImages.Add(string.Format("ocrerr_{0}.bmp", frameNo), copy.ToArray());
 						m_CalibrationErrors.Add(errorText);
 					}
 
