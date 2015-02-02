@@ -177,7 +177,7 @@ namespace Tangra.Config.SettingPannels
 
 		private void linkLblOW_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
 		{
-			Process.Start("http://www.hristopavlov.net/OccultWatcher/");
+			HttpHelper.OpenUrl("http://www.hristopavlov.net/OccultWatcher/");
 		}
 	}
 }

@@ -120,7 +120,7 @@ namespace Tangra.Config.SettingPannels
 
 		private void linkLabelAAV_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
 		{
-			Process.Start("http://www.hristopavlov.net/OccuRec");
+			HttpHelper.OpenUrl("http://www.hristopavlov.net/OccuRec");
 		}
 	}
 }

@@ -677,7 +677,7 @@ namespace Tangra
 			UsageStats.Instance.OnlineHelpMenuUsed++;
 			UsageStats.Instance.Save();
 
-            Process.Start("http://www.hristopavlov.net/Tangra3");
+            HttpHelper.OpenUrl("http://www.hristopavlov.net/Tangra3");
         }
 
         #region Picture Box Events
@@ -891,7 +891,7 @@ namespace Tangra
 				Close();
 			}
 			else
-				Process.Start("http://www.hristopavlov.net/Tangra3");
+				HttpHelper.OpenUrl("http://www.hristopavlov.net/Tangra3");
         }
 
 		private void miLoadedAddins_Click(object sender, EventArgs e)

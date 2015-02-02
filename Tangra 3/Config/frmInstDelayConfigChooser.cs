@@ -11,6 +11,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Helpers;
 
 namespace Tangra.Config
 {
@@ -62,7 +63,7 @@ namespace Tangra.Config
 
 		private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
 		{
-			Process.Start("http://www.dangl.at/ausruest/vid_tim/vid_tim1.htm");
+			HttpHelper.OpenUrl("http://www.dangl.at/ausruest/vid_tim/vid_tim1.htm");
 		}
 
 		private void rbCorrect_CheckedChanged(object sender, EventArgs e)
