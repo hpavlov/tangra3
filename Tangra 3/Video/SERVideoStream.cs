@@ -246,5 +246,15 @@ namespace Tangra.Video
 		{
 			return m_FileInfo.NormalisationValue;
 		}
+
+        public string GetFrameFileName(int index)
+        {
+            throw new NotSupportedException();
+        }
+
+        public bool SupportsFrameFileNames
+        {
+            get { return false; }
+        }
 	}
 }

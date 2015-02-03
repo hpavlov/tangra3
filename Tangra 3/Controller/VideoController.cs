@@ -184,6 +184,13 @@ namespace Tangra.Controller
             }
             else
             {
+                // TODO: Sort files by FITS Exposure. Show a "Sorting FITS files ...." form or message
+                //var files = new List<FileInfo>();
+                //files.AddRange(fitsFiles.Select(x => new FileInfo(x)));
+                //files.Sort((x, y) => x.CreationTimeUtc.CompareTo(y.CreationTimeUtc));
+
+                //fitsFiles = files.Select(x => x.FullName).ToArray();
+
                 return OpenVideoFileInternal(
                     folderName,
                     () =>
@@ -406,7 +413,8 @@ namespace Tangra.Controller
                     m_CurrentFrameContext.MovementType, 
                     m_CurrentFrameContext.IsLastFrame, 
                     m_AstroImage, 
-                    m_CurrentFrameContext.FirstFrameInIntegrationPeriod);
+                    m_CurrentFrameContext.FirstFrameInIntegrationPeriod,
+                    m_CurrentFrameContext.CurrentFrameFileName);
 
                 if (m_CurrentOperation.HasCustomZoomImage &&
                     m_ZoomedImageView != null)
@@ -934,7 +942,7 @@ namespace Tangra.Controller
 			UpdateViews();
 		}
 
-        void IVideoFrameRenderer.RenderFrame(int currentFrameIndex, Pixelmap currentPixelmap, MovementType movementType, bool isLastFrame, int msToWait, int firstFrameInIntegrationPeriod)
+        void IVideoFrameRenderer.RenderFrame(int currentFrameIndex, Pixelmap currentPixelmap, MovementType movementType, bool isLastFrame, int msToWait, int firstFrameInIntegrationPeriod, string frameFileName)
 		{
 			try
 			{
@@ -947,7 +955,8 @@ namespace Tangra.Controller
                                 movementType,
                                 isLastFrame,
                                 msToWait,
-                                firstFrameInIntegrationPeriod
+                                firstFrameInIntegrationPeriod,
+                                frameFileName
                             });
 			}
 			catch (ObjectDisposedException)

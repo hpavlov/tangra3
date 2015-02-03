@@ -121,6 +121,16 @@ namespace Tangra.Video
 		public void EnsureFrameClose()
 		{ }
 
+        public string GetFrameFileName(int index)
+        {
+            throw new NotSupportedException();
+        }
+
+        public bool SupportsFrameFileNames
+        {
+            get { return false; }
+        }
+
 		public Pixelmap GetPixelmap(int index)
 		{
 			byte[] displayBitmapBytes = new byte[m_Width * m_Height];

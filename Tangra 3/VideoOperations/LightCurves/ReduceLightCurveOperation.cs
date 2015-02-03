@@ -71,6 +71,7 @@ namespace Tangra.VideoOperations.LightCurves
 	    private DateTime[] m_LastOCRedTimeStamp = new DateTime[4];
 
         internal int m_CurrFrameNo = -1;
+        internal string m_CurrFileName = null;
         private int m_FirstMeasuredFrame;
         internal uint m_MinFrame;
         internal uint m_MaxFrame;
@@ -239,10 +240,11 @@ namespace Tangra.VideoOperations.LightCurves
         internal byte FrameBackgroundMode = 0;
         internal int m_PrevMeasuredFrame = -1;
 
-        public void NextFrame(int frameNo, MovementType movementType, bool isLastFrame, AstroImage astroImage, int firstFrameInIntegrationPeriod)
+        public void NextFrame(int frameNo, MovementType movementType, bool isLastFrame, AstroImage astroImage, int firstFrameInIntegrationPeriod, string fileName)
         {
             m_AstroImage = astroImage;
 			m_CurrFrameNo = frameNo;
+            m_CurrFileName = fileName;
 
             TangraContext.Current.CrashReportInfo.FrameNumber = frameNo;
 
@@ -1180,6 +1182,7 @@ namespace Tangra.VideoOperations.LightCurves
         {
             m_MeasurementInterval = 1;
             m_CurrFrameNo = -1;
+            m_CurrFileName = null;
 
             m_StateMachine = new LCStateMachine(this, m_VideoController);
 
@@ -1816,6 +1819,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 			m_MeasurementInterval = 1;
 			m_CurrFrameNo = -1;
+		    m_CurrFileName = null;
 
 			m_ControlPanel.BeginConfiguration(m_StateMachine, m_VideoController);
 			m_ControlPanel.SetupLCFileInfo(m_LightCurveController.LcFile);
@@ -1901,6 +1905,7 @@ namespace Tangra.VideoOperations.LightCurves
 					// Add unsuccessfull measurement for this object and this frame
 					LCFile.SaveOnTheFlyMeasurement(LCMeasurement.UnsuccessfulMeasurement(
 													(uint)m_CurrFrameNo,
+                                                    m_CurrFileName,
 													(byte)trackedObject.TargetNo,
 													flags,
 						/* but we want to use the actual measurement fit. This only matters for reviewing the light curve when not opened from a file. */
@@ -1958,6 +1963,7 @@ namespace Tangra.VideoOperations.LightCurves
 			var measuredObject = new LCMeasurement()
 			{
 				CurrFrameNo = (uint) m_CurrFrameNo,
+                CurrFileName = m_CurrFileName,
 				TargetNo = (byte) trackedObject.TargetNo,
 				X0 = msrX0,
 				Y0 = msrY0,

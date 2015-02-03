@@ -15,7 +15,8 @@ namespace Tangra.Model.Video
 		MovementType movementType,
 		bool isLastFrame,
 		int milisecondsToWait,
-        int firstFrameInIntegrationPeriod);
+        int firstFrameInIntegrationPeriod,
+        string frameFileName);
 
 
 
@@ -23,7 +24,7 @@ namespace Tangra.Model.Video
 	{
 		void PlayerStarted();
 		void PlayerStopped(int lastDisplayedFrame, bool userStopRequest);
-        void RenderFrame(int currentFrameIndex, Pixelmap currentPixelmap, MovementType movementType, bool isLastFrame, int msToWait, int firstFrameInIntegrationPeriod);
+        void RenderFrame(int currentFrameIndex, Pixelmap currentPixelmap, MovementType movementType, bool isLastFrame, int msToWait, int firstFrameInIntegrationPeriod, string currentFrameFileName);
 	}
 
 	public interface IFrameStream
@@ -37,6 +38,7 @@ namespace Tangra.Model.Video
 		double FrameRate { get; }
 		double MillisecondsPerFrame { get; }
 		Pixelmap GetPixelmap(int index);
+        string GetFrameFileName(int index);
 		int RecommendedBufferSize { get; }
 		string VideoFileType { get; }
 
@@ -46,6 +48,7 @@ namespace Tangra.Model.Video
 
 		uint GetAav16NormVal();
 	    bool SupportsSoftwareIntegration { get; }
+        bool SupportsFrameFileNames { get; }
 	}
 
 	public class GeoLocationInfo

@@ -18,7 +18,7 @@ namespace Tangra.Model.VideoOperations
         void FinalizeOperation();
 
         void PlayerStarted();
-        void NextFrame(int frameNo, MovementType movementType, bool isLastFrame, AstroImage astroImage, int firstFrameInIntegrationPeriod);
+        void NextFrame(int frameNo, MovementType movementType, bool isLastFrame, AstroImage astroImage, int firstFrameInIntegrationPeriod, string fileName);
         void ImageToolChanged(ImageTool newTool, ImageTool oldTool);
 
         void PreDraw(Graphics g);

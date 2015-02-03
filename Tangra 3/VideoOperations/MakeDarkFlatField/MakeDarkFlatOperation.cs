@@ -92,7 +92,7 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
         public void PlayerStarted()
         { }
 
-        public void NextFrame(int frameNo, MovementType movementType, bool isLastFrame, AstroImage astroImage, int firstFrameInIntegrationPeriod)
+        public void NextFrame(int frameNo, MovementType movementType, bool isLastFrame, AstroImage astroImage, int firstFrameInIntegrationPeriod, string frameFileName)
 		{
 			m_CurrentAstroImage = astroImage;
             TangraContext.Current.CrashReportInfo.FrameNumber = frameNo;
@@ -220,7 +220,7 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
 
 				for (int x = 0; x < m_CurrentAstroImage.Width; x++)
 				{
-                    bimg[y][x] = (short)Math.Min(ushort.MaxValue, Math.Max(0, data[x, y]));
+                    bimg[y][x] = (short)Math.Min(ushort.MaxValue, Math.Max(0, data[x, m_CurrentAstroImage.Height - y - 1]));
 				}
 			}
 

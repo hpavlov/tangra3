@@ -166,6 +166,7 @@ namespace Tangra.Video
 		{
 			public Pixelmap Image;
 			public int FrameNo;
+		    public string FrameFileName;
             public int FirstFrameInIntegrationPeriod;
 		}
 
@@ -403,7 +404,9 @@ namespace Tangra.Video
 				else
 				    throw new NotSupportedException();
 
-				DisplayCurrentFrameInternal(movementType, currentBitmap);
+                string frameFileName = m_VideoStream.SupportsFrameFileNames ? m_VideoStream.GetFrameFileName(m_CurrentFrameIndex) : null;
+
+                DisplayCurrentFrameInternal(movementType, currentBitmap, frameFileName);
 			}
 		}
 
@@ -412,19 +415,20 @@ namespace Tangra.Video
             if (m_VideoStream != null)
             {
                 Pixelmap currentBitmap = m_VideoStream.GetPixelmap(m_CurrentFrameIndex);
+                string frameFileName = m_VideoStream.SupportsFrameFileNames ? m_VideoStream.GetFrameFileName(m_CurrentFrameIndex) : null;
 
-                DisplayCurrentFrameInternal(movementType, currentBitmap);
+                DisplayCurrentFrameInternal(movementType, currentBitmap, frameFileName);
             }
         }
 
-		private void DisplayCurrentFrameInternal(MovementType movementType, Pixelmap currentPixelmap)
+		private void DisplayCurrentFrameInternal(MovementType movementType, Pixelmap currentPixelmap, string frameFileName)
 		{
 			if (m_VideoStream != null)
 			{
 				if (m_CurrentFrameIndex >= m_VideoStream.FirstFrame &&
 				    m_CurrentFrameIndex <= m_VideoStream.LastFrame)
 				{
-					m_FrameRenderer.RenderFrame(m_CurrentFrameIndex, currentPixelmap, movementType, false, 0, m_CurrentFrameIndex);
+                    m_FrameRenderer.RenderFrame(m_CurrentFrameIndex, currentPixelmap, movementType, false, 0, m_CurrentFrameIndex, frameFileName);
 					m_LastDisplayedFrameIndex = m_CurrentFrameIndex;
 				}
 			}
@@ -507,7 +511,8 @@ namespace Tangra.Video
 					{
 						FrameNo = nextFrameIdToBuffer,
 						FirstFrameInIntegrationPeriod = nextFrameIdToBuffer,
-						Image = bmp
+						Image = bmp,
+                        FrameFileName = m_VideoStream.SupportsFrameFileNames ? m_VideoStream.GetFrameFileName(nextFrameIdToBuffer) : null
 					};
 
 					m_FramesBufferQueue.Enqueue(bufferedFrame);
@@ -636,7 +641,8 @@ namespace Tangra.Video
                         MovementType.Step,
 						m_CurrentFrameIndex + m_Step >= lastFrame, 
                         msToWait,
-                        currentFrame.FirstFrameInIntegrationPeriod);
+                        currentFrame.FirstFrameInIntegrationPeriod,
+                        currentFrame.FrameFileName);
 
 					m_LastDisplayedFrameIndex = currentFrame.FrameNo;
 
@@ -675,6 +681,7 @@ namespace Tangra.Video
 						sw.Start();
 
 					Pixelmap currentPixelmap = m_VideoStream != null ? m_VideoStream.GetPixelmap(m_CurrentFrameIndex) : null;
+                    string frameFileName = m_VideoStream != null && m_VideoStream.SupportsFrameFileNames ? m_VideoStream.GetFrameFileName(m_CurrentFrameIndex) : null;
 
 					int msToWait = -1;
 					if (m_MillisecondsPerFrame != 0)
@@ -691,7 +698,8 @@ namespace Tangra.Video
 								MovementType.Step,
 								m_CurrentFrameIndex + m_Step >= lastFrame,
 								msToWait,
-                                m_CurrentFrameIndex);
+                                m_CurrentFrameIndex,
+                                frameFileName);
 
 					m_LastDisplayedFrameIndex = m_CurrentFrameIndex;
 				}

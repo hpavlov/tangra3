@@ -87,6 +87,19 @@ namespace Tangra.Video
             get { return 0; }
         }
 
+        public string GetFrameFileName(int index)
+        {
+            if (index >= 0 && index < m_FitsFilesList.Count)
+                return Path.GetFileNameWithoutExtension(m_FitsFilesList[index]);
+
+            return null;
+        }
+
+        public bool SupportsFrameFileNames
+        {
+            get { return true; }
+        }
+
         public Pixelmap GetPixelmap(int index)
         {
             uint[] pixelsFlat;

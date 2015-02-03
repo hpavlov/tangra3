@@ -207,7 +207,7 @@ namespace Tangra.Helpers
 				{
                     uint val = (uint)(bzero + (int)dataRow[x]);
 
-					data[x, y] = val;
+                    data[x, height - y - 1] = val;
 					medianCalcList.Add(val);
 				}
 			}

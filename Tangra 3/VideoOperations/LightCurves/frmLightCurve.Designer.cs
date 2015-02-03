@@ -51,6 +51,12 @@
             this.xAxisLabelsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.miXAxisUserFrameNumbers = new System.Windows.Forms.ToolStripMenuItem();
             this.miXAxisUserTime = new System.Windows.Forms.ToolStripMenuItem();
+            this.yAxisLabelsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.miYAxisFlux = new System.Windows.Forms.ToolStripMenuItem();
+            this.miYAxisMags = new System.Windows.Forms.ToolStripMenuItem();
+            this.miLightCurvePlot = new System.Windows.Forms.ToolStripMenuItem();
+            this.miLightCurveLine = new System.Windows.Forms.ToolStripMenuItem();
+            this.miLightCurveScatter = new System.Windows.Forms.ToolStripMenuItem();
             this.miAddTitle = new System.Windows.Forms.ToolStripMenuItem();
             this.miAddins = new System.Windows.Forms.ToolStripMenuItem();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
@@ -97,12 +103,6 @@
             this.saveCSVDialog = new System.Windows.Forms.SaveFileDialog();
             this.firstFrameTimer = new System.Windows.Forms.Timer(this.components);
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.yAxisLabelsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.miYAxisFlux = new System.Windows.Forms.ToolStripMenuItem();
-            this.miYAxisMags = new System.Windows.Forms.ToolStripMenuItem();
-            this.miLightCurvePlot = new System.Windows.Forms.ToolStripMenuItem();
-            this.miLightCurveLine = new System.Windows.Forms.ToolStripMenuItem();
-            this.miLightCurveScatter = new System.Windows.Forms.ToolStripMenuItem();
             this.pnlChart = new Tangra.Controls.SmoothPanel();
             this.btnZoomIn = new System.Windows.Forms.Button();
             this.btnZoomOut = new System.Windows.Forms.Button();
@@ -449,6 +449,56 @@
             this.miXAxisUserTime.Size = new System.Drawing.Size(149, 22);
             this.miXAxisUserTime.Text = "&Time";
             this.miXAxisUserTime.Click += new System.EventHandler(this.miXAxisUserTime_Click);
+            // 
+            // yAxisLabelsToolStripMenuItem
+            // 
+            this.yAxisLabelsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miYAxisFlux,
+            this.miYAxisMags});
+            this.yAxisLabelsToolStripMenuItem.Name = "yAxisLabelsToolStripMenuItem";
+            this.yAxisLabelsToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.yAxisLabelsToolStripMenuItem.Text = "&Y Axis Labels";
+            // 
+            // miYAxisFlux
+            // 
+            this.miYAxisFlux.Checked = true;
+            this.miYAxisFlux.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.miYAxisFlux.Name = "miYAxisFlux";
+            this.miYAxisFlux.Size = new System.Drawing.Size(129, 22);
+            this.miYAxisFlux.Text = "&Flux";
+            this.miYAxisFlux.Click += new System.EventHandler(this.miYAxisFlux_Click);
+            // 
+            // miYAxisMags
+            // 
+            this.miYAxisMags.Name = "miYAxisMags";
+            this.miYAxisMags.Size = new System.Drawing.Size(129, 22);
+            this.miYAxisMags.Text = "&Magnitudes";
+            this.miYAxisMags.Click += new System.EventHandler(this.miYAxisMags_Click);
+            // 
+            // miLightCurvePlot
+            // 
+            this.miLightCurvePlot.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miLightCurveLine,
+            this.miLightCurveScatter});
+            this.miLightCurvePlot.Name = "miLightCurvePlot";
+            this.miLightCurvePlot.Size = new System.Drawing.Size(155, 22);
+            this.miLightCurvePlot.Text = "Light Curve Plot";
+            // 
+            // miLightCurveLine
+            // 
+            this.miLightCurveLine.Checked = true;
+            this.miLightCurveLine.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.miLightCurveLine.Name = "miLightCurveLine";
+            this.miLightCurveLine.Size = new System.Drawing.Size(109, 22);
+            this.miLightCurveLine.Text = "&Line";
+            this.miLightCurveLine.Click += new System.EventHandler(this.miLightCurveLine_Click);
+            // 
+            // miLightCurveScatter
+            // 
+            this.miLightCurveScatter.Name = "miLightCurveScatter";
+            this.miLightCurveScatter.Size = new System.Drawing.Size(109, 22);
+            this.miLightCurveScatter.Text = "&Scatter";
+            this.miLightCurveScatter.Click += new System.EventHandler(this.miLightCurveScatter_Click);
             // 
             // miAddTitle
             // 
@@ -800,56 +850,6 @@
             this.firstFrameTimer.Interval = 250;
             this.firstFrameTimer.Tick += new System.EventHandler(this.firstFrameTimer_Tick);
             // 
-            // yAxisLabelsToolStripMenuItem
-            // 
-            this.yAxisLabelsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.miYAxisFlux,
-            this.miYAxisMags});
-            this.yAxisLabelsToolStripMenuItem.Name = "yAxisLabelsToolStripMenuItem";
-            this.yAxisLabelsToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
-            this.yAxisLabelsToolStripMenuItem.Text = "&Y Axis Labels";
-            // 
-            // miYAxisFlux
-            // 
-            this.miYAxisFlux.Checked = true;
-            this.miYAxisFlux.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.miYAxisFlux.Name = "miYAxisFlux";
-            this.miYAxisFlux.Size = new System.Drawing.Size(152, 22);
-            this.miYAxisFlux.Text = "&Flux";
-            this.miYAxisFlux.Click += new System.EventHandler(this.miYAxisFlux_Click);
-            // 
-            // miYAxisMags
-            // 
-            this.miYAxisMags.Name = "miYAxisMags";
-            this.miYAxisMags.Size = new System.Drawing.Size(152, 22);
-            this.miYAxisMags.Text = "&Magnitudes";
-            this.miYAxisMags.Click += new System.EventHandler(this.miYAxisMags_Click);
-            // 
-            // miLightCurvePlot
-            // 
-            this.miLightCurvePlot.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.miLightCurveLine,
-            this.miLightCurveScatter});
-            this.miLightCurvePlot.Name = "miLightCurvePlot";
-            this.miLightCurvePlot.Size = new System.Drawing.Size(155, 22);
-            this.miLightCurvePlot.Text = "Light Curve Plot";
-            // 
-            // miLightCurveLine
-            // 
-            this.miLightCurveLine.Checked = true;
-            this.miLightCurveLine.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.miLightCurveLine.Name = "miLightCurveLine";
-            this.miLightCurveLine.Size = new System.Drawing.Size(152, 22);
-            this.miLightCurveLine.Text = "&Line";
-            this.miLightCurveLine.Click += new System.EventHandler(this.miLightCurveLine_Click);
-            // 
-            // miLightCurveScatter
-            // 
-            this.miLightCurveScatter.Name = "miLightCurveScatter";
-            this.miLightCurveScatter.Size = new System.Drawing.Size(152, 22);
-            this.miLightCurveScatter.Text = "&Scatter";
-            this.miLightCurveScatter.Click += new System.EventHandler(this.miLightCurveScatter_Click);
-            // 
             // pnlChart
             // 
             this.pnlChart.BackColor = System.Drawing.Color.White;
@@ -1136,9 +1136,9 @@
             this.lblFrameNo.AutoSize = true;
             this.lblFrameNo.Location = new System.Drawing.Point(65, 11);
             this.lblFrameNo.Name = "lblFrameNo";
-            this.lblFrameNo.Size = new System.Drawing.Size(35, 13);
+            this.lblFrameNo.Size = new System.Drawing.Size(27, 13);
             this.lblFrameNo.TabIndex = 1;
-            this.lblFrameNo.Text = "sdfsdf";
+            this.lblFrameNo.Text = "frNo";
             // 
             // picTarget4PSF
             // 

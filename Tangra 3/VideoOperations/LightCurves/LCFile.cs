@@ -765,6 +765,7 @@ namespace Tangra.VideoOperations.LightCurves
 		internal float ApertureSize;
 
         internal PSFFit PsfFit;
+        internal string CurrFileName;
 
         internal string GetFlagsExplained()
         {
@@ -863,7 +864,7 @@ namespace Tangra.VideoOperations.LightCurves
 
         public DateTime OSDTimeStamp;
 
-        private static int SERIALIZATION_VERSION = 8;
+        private static int SERIALIZATION_VERSION = 9;
         private static int MINAMAL_SUPPORTED_VERSION = 3;
     	private static int FIRST_UINT_MATRIX_VERSION = 7;
 
@@ -871,6 +872,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 		internal static LCMeasurement UnsuccessfulMeasurement(
 			uint currFrameNo,
+            string currFileName,
 			byte targetNo,
 			uint flagsDWORD,
 			uint[,] pixelData,
@@ -879,6 +881,7 @@ namespace Tangra.VideoOperations.LightCurves
 		{
 			return new LCMeasurement(
 				currFrameNo,
+                currFileName,
 				targetNo,
 				0,
 				0,
@@ -893,6 +896,7 @@ namespace Tangra.VideoOperations.LightCurves
 
         private LCMeasurement(
             uint currFrameNo,
+            string currFileName,
             byte targetNo,
             uint totalReading,
             uint totalBackground,
@@ -934,6 +938,7 @@ namespace Tangra.VideoOperations.LightCurves
 			ApertureSize = apertureSize;
 			ApertureX = apertureX;
 			ApertureY = apertureY;
+            CurrFileName = currFileName;
         }
 
 		internal LCMeasurement(BinaryReader reader, LCMeasurement prevMeasurement, int groupId)
@@ -981,6 +986,8 @@ namespace Tangra.VideoOperations.LightCurves
 
             OSDTimeStamp = DateTime.MinValue;
         	FlagsDWORD = 0;
+		    CurrFileName = null;
+
 			if (version > 4)
             {
                 OSDTimeStamp = new DateTime(reader.ReadInt64());
@@ -996,6 +1003,12 @@ namespace Tangra.VideoOperations.LightCurves
 						ApertureX = reader.ReadSingle();
 						ApertureY = reader.ReadSingle();
 						ApertureSize = reader.ReadSingle();
+
+					    if (version > 8)
+					    {
+					        int fileNameSize = reader.ReadInt32();
+                            if (fileNameSize > 0) CurrFileName = reader.ReadString();
+					    }
 					}
 				}
             }
@@ -1036,6 +1049,10 @@ namespace Tangra.VideoOperations.LightCurves
 	        writer.Write(ApertureX);
 			writer.Write(ApertureY);
 			writer.Write(ApertureSize);
+
+            // Version 9 Data
+            writer.Write(CurrFileName == null ? 0 : CurrFileName.Length);
+            if (CurrFileName != null) writer.Write(CurrFileName);
         }
 
 		internal int ReProcessingPsfFitMatrixSize;

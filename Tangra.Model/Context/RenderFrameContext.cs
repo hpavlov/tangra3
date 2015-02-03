@@ -14,6 +14,7 @@ namespace Tangra.Model.Context
 		public bool IsLastFrame;
 		public int MsToWait;
 	    public int FirstFrameInIntegrationPeriod;
+	    public string CurrentFrameFileName;
 
 		public RenderFrameContext Clone()
 		{
@@ -24,6 +25,7 @@ namespace Tangra.Model.Context
 			clone.IsLastFrame = this.IsLastFrame;
 			clone.MsToWait = this.MsToWait;
 		    clone.FirstFrameInIntegrationPeriod = this.FirstFrameInIntegrationPeriod;
+		    clone.CurrentFrameFileName = this.CurrentFrameFileName;
 
 			return clone;
 		}

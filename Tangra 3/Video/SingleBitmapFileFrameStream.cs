@@ -160,6 +160,16 @@ namespace Tangra.Video
 			get { return null; }
 		}
 
+        public string GetFrameFileName(int index)
+        {
+            throw new NotSupportedException();
+        }
+
+        public bool SupportsFrameFileNames
+        {
+            get { return false; }
+        }
+
 		#endregion
 
 		#region IDisposable Members

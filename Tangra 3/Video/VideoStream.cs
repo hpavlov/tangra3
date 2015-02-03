@@ -186,5 +186,16 @@ namespace Tangra.Video
 		{
 			TangraVideo.CloseFile();
 		}
-	}
+
+
+        public string GetFrameFileName(int index)
+        {
+            throw new NotSupportedException();
+        }
+
+        public bool SupportsFrameFileNames
+        {
+            get { return false; }
+        }
+    }
 }

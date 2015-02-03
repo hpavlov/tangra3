@@ -342,6 +342,16 @@ namespace Tangra.Video
             get { return false; }
         }
 
+        public string GetFrameFileName(int index)
+        {
+            throw new NotSupportedException();
+        }
+
+        public bool SupportsFrameFileNames
+        {
+            get { return false; }
+        }
+
 		public string VideoFileType
 		{
             get { return string.Format("{0}.{1}", m_Engine, BitPix); }

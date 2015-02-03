@@ -141,7 +141,8 @@ namespace Tangra
 			MovementType movementType,
 			bool isLastFrame,
 			int msToWait,
-            int firstFrameInIntegrationPeriod)
+            int firstFrameInIntegrationPeriod,
+            string currentFrameFileName)
 		{
 			m_LastFrameContext = new RenderFrameContext()
 			{
@@ -149,7 +150,8 @@ namespace Tangra
 				MovementType = movementType,
 				IsLastFrame = isLastFrame,
 				MsToWait = msToWait,
-                FirstFrameInIntegrationPeriod = firstFrameInIntegrationPeriod
+                FirstFrameInIntegrationPeriod = firstFrameInIntegrationPeriod,
+                CurrentFrameFileName = currentFrameFileName
 			};
 
 			RenderFrame(m_LastFrameContext, currentPixelmap);
