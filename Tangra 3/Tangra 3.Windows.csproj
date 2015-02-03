@@ -602,15 +602,21 @@
     <Compile Include="Video\AstroDigitalVideo\Interfaces.cs" />
     <Compile Include="Video\AstroDigitalVideo\UI\AdvTagValuePair.cs" />
     <Compile Include="Video\BMPFileSequenceStream.cs" />
-    <Compile Include="Video\FITSFileSequenceStream.cs" />
+    <Compile Include="Video\FITS\FITSFileSequenceStream.cs" />
+    <Compile Include="Video\FITS\frmSortFitsFiles.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Video\FITS\frmSortFitsFiles.Designer.cs">
+      <DependentUpon>frmSortFitsFiles.cs</DependentUpon>
+    </Compile>
     <Compile Include="Video\frmIntegrationDetection.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Video\frmIntegrationDetection.Designer.cs">
       <DependentUpon>frmIntegrationDetection.cs</DependentUpon>
     </Compile>
-    <Compile Include="Video\IFITSStream.cs" />
-    <Compile Include="Video\SERVideoStream.cs" />
+    <Compile Include="Video\FITS\IFITSStream.cs" />
+    <Compile Include="Video\SER\SERVideoStream.cs" />
     <Compile Include="Video\SER\frmEnterSERFileInfo.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -623,7 +629,7 @@
     <Compile Include="Video\SER\frmSerStatusPopup.Designer.cs">
       <DependentUpon>frmSerStatusPopup.cs</DependentUpon>
     </Compile>
-    <Compile Include="Video\SingleFITSFileFrameStream.cs" />
+    <Compile Include="Video\FITS\SingleFITSFileFrameStream.cs" />
     <Compile Include="Video\FramePlayer.cs" />
     <Compile Include="Video\frmJumpToFrame.cs">
       <SubType>Form</SubType>
@@ -838,6 +844,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Video\AstroDigitalVideo\frmAdvViewer.resx">
       <DependentUpon>frmAdvViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Video\FITS\frmSortFitsFiles.resx">
+      <DependentUpon>frmSortFitsFiles.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Video\frmIntegrationDetection.resx">
       <DependentUpon>frmIntegrationDetection.cs</DependentUpon>

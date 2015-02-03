@@ -14,6 +14,7 @@ using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using Tangra.Helpers;
+using Tangra.Video.FITS;
 using Tangra.Video.SER;
 using Tangra.VideoOperations.LightCurves.Tracking;
 using Tangra.VideoTools;
@@ -184,12 +185,11 @@ namespace Tangra.Controller
             }
             else
             {
-                // TODO: Sort files by FITS Exposure. Show a "Sorting FITS files ...." form or message
-                //var files = new List<FileInfo>();
-                //files.AddRange(fitsFiles.Select(x => new FileInfo(x)));
-                //files.Sort((x, y) => x.CreationTimeUtc.CompareTo(y.CreationTimeUtc));
-
-                //fitsFiles = files.Select(x => x.FullName).ToArray();
+                var frm = new frmSortFitsFiles();
+                frm.SetFiles(fitsFiles);
+                frm.StartPosition = FormStartPosition.CenterParent;
+                frm.ShowDialog(m_MainForm);
+                fitsFiles = frm.GetSortedFiles();
 
                 return OpenVideoFileInternal(
                     folderName,

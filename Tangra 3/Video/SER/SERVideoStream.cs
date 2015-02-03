@@ -18,7 +18,7 @@ using Tangra.Model.Video;
 using Tangra.PInvoke;
 using Tangra.Video.SER;
 
-namespace Tangra.Video
+namespace Tangra.Video.SER
 {
 	public class SerEquipmentInfo
 	{

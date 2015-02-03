@@ -14,7 +14,7 @@ using Tangra.Model.Image;
 using Tangra.Model.Video;
 using Tangra.PInvoke;
 
-namespace Tangra.Video
+namespace Tangra.Video.FITS
 {
     internal class FITSFileSequenceStream : IDisposable, IFrameStream, IFITSStream
     {

@@ -12,6 +12,7 @@ using System.Text;
 using System.Windows.Forms;
 using Tangra.Model.Video;
 using Tangra.Video;
+using Tangra.Video.SER;
 
 namespace Tangra.VideoTools
 {

@@ -10,6 +10,7 @@ using System.Text;
 using Tangra.Model.Config;
 using Tangra.Model.Image;
 using Tangra.Model.Video;
+using Tangra.Video.SER;
 
 namespace Tangra.Video.AstroDigitalVideo
 {

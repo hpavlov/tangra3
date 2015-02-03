@@ -59,6 +59,68 @@ namespace Tangra.Helpers
 			}
 		}
 
+        public static DateTime? ParseExposure(Header header, out bool isMidPoint, out double? fitsExposure)
+        {
+            // FITS Card definitions taken from here:
+            // http://www.cyanogen.com/help/maximdl/FITS_File_Header_Definitions.htm
+            // http://www.cv.nrao.edu/fits/documents/standards/year2000.txt
+
+            isMidPoint = false;
+            fitsExposure = null;
+
+            HeaderCard exposureCard = header.FindCard("EXPOSURE");
+            if (exposureCard == null) exposureCard = header.FindCard("EXPTIME");
+            if (exposureCard == null) exposureCard = header.FindCard("RAWTIME");
+            if (exposureCard != null && !string.IsNullOrWhiteSpace(exposureCard.Value))
+            {
+                fitsExposure = double.Parse(exposureCard.Value.Trim(), CultureInfo.InvariantCulture);
+
+                string dateTimeStr = null;
+                HeaderCard timeCard = header.FindCard("TIMEOBS");
+                HeaderCard dateCard;
+                if (timeCard != null)
+                {
+                    dateCard = header.FindCard("DATEOBS");
+                    if (dateCard != null)
+                        dateTimeStr = string.Format("{0}T{1}", dateCard.Value, timeCard.Value);
+                }
+                else
+                {
+                    dateCard = header.FindCard("DATE-OBS");
+                    timeCard = header.FindCard("TIME-OBS");
+                    if (timeCard != null && dateCard != null)
+                        dateTimeStr = string.Format("{0}T{1}", dateCard.Value, timeCard.Value);
+                    else if (dateCard != null)
+                        dateTimeStr = dateCard.Value;
+                    else
+                    {
+                        timeCard = header.FindCard("MIDPOINT");
+                        if (timeCard != null)
+                        {
+                            dateTimeStr = timeCard.Value;
+                            isMidPoint = true;
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrWhiteSpace(dateTimeStr))
+                {
+                    Match regexMatch = FITS_DATE_REGEX.Match(dateTimeStr);
+                    if (regexMatch.Success)
+                    {
+                        DateTime startObs = DateTime.Parse(regexMatch.Groups["DateStr"].Value.Trim(), CultureInfo.InvariantCulture);
+                        // DATE-OBS is the start of the observation, unless given in "MIDPOINT"
+                        if (!isMidPoint)
+                            return startObs.AddSeconds(fitsExposure.Value/2.0);
+                        else
+                            return startObs;
+                    }
+                }
+            }
+
+            return null;
+        }
+
 		private static Regex FITS_DATE_REGEX = new Regex("(?<DateStr>\\d\\d\\d\\d\\-\\d\\d\\-\\d\\dT\\d\\d:\\d\\d:\\d\\d(\\.\\d+)?)");
         public static void Load16BitFitsFile(string fileName, out uint[] pixelsFlat, out int width, out int height, out int bpp, out DateTime? timestamp, out double? exposure, out uint minPixelValue, out uint maxPixelValue)
 		{
@@ -84,58 +146,9 @@ namespace Tangra.Helpers
 
 					try
 					{
-						// FITS Card definitions taken from here:
-						// http://www.cyanogen.com/help/maximdl/FITS_File_Header_Definitions.htm
-						// http://www.cv.nrao.edu/fits/documents/standards/year2000.txt
-
 						bool isMidPoint = false;
-						HeaderCard exposureCard = imageHDU.Header.FindCard("EXPOSURE");
-						if (exposureCard == null) exposureCard = imageHDU.Header.FindCard("EXPTIME");
-						if (exposureCard == null) exposureCard = imageHDU.Header.FindCard("RAWTIME");
-						if (exposureCard != null && !string.IsNullOrWhiteSpace(exposureCard.Value))
-						{
-							fitsExposure = double.Parse(exposureCard.Value.Trim(), CultureInfo.InvariantCulture);
-
-							string dateTimeStr = null;
-							HeaderCard timeCard = imageHDU.Header.FindCard("TIMEOBS");
-							HeaderCard dateCard;
-							if (timeCard != null)
-							{
-								dateCard = imageHDU.Header.FindCard("DATEOBS");
-								if (dateCard != null)
-									dateTimeStr = string.Format("{0}T{1}", dateCard.Value, timeCard.Value);
-							}
-							else
-							{
-								dateCard = imageHDU.Header.FindCard("DATE-OBS");
-								timeCard = imageHDU.Header.FindCard("TIME-OBS");
-								if (timeCard != null && dateCard != null)
-									dateTimeStr = string.Format("{0}T{1}", dateCard.Value, timeCard.Value);
-								else if (dateCard != null)
-									dateTimeStr = dateCard.Value;
-								else
-								{
-									timeCard = imageHDU.Header.FindCard("MIDPOINT");
-									if (timeCard != null)
-									{
-										dateTimeStr = timeCard.Value;
-										isMidPoint = true;
-									}
-								}
-							}
-
-							if (!string.IsNullOrWhiteSpace(dateTimeStr))
-							{
-								Match regexMatch = FITS_DATE_REGEX.Match(dateTimeStr);
-								if (regexMatch.Success)
-								{
-									DateTime startObs = DateTime.Parse(regexMatch.Groups["DateStr"].Value.Trim(), CultureInfo.InvariantCulture);
-									// DATE-OBS is the start of the observation, unless given in "MIDPOINT"
-									if (!isMidPoint)
-										fitsTimestamp = startObs.AddSeconds(fitsExposure.Value / 2.0);
-								}
-							}
-						}
+                        fitsTimestamp = ParseExposure(imageHDU.Header, out isMidPoint, out fitsExposure);
+					    
 					}
 					catch (Exception ex)
 					{

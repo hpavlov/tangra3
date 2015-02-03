@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Tangra.Video
+namespace Tangra.Video.FITS
 {
     public interface IFITSStream
     {

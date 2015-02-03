@@ -17,7 +17,7 @@ using Tangra.Model.VideoOperations;
 using Tangra.PInvoke;
 using Tangra.VideoOperations.LightCurves;
 
-namespace Tangra.Video
+namespace Tangra.Video.FITS
 {
     internal class SingleFITSFileFrameStream : IDisposable, IFrameStream, IFITSStream
 	{
