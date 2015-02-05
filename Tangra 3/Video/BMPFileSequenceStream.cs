@@ -107,7 +107,7 @@ namespace Tangra.Video
         public string GetFrameFileName(int index)
         {
             if (index >= 0 && index < m_BmpFilesList.Count)
-                return Path.GetFileNameWithoutExtension(m_BmpFilesList[index]);
+                return Path.GetFileName(m_BmpFilesList[index]);
 
             return null;
         }

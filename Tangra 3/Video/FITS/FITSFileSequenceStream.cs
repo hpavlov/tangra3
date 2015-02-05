@@ -36,7 +36,6 @@ namespace Tangra.Video.FITS
         private FITSFileSequenceStream(string[] fitsFiles)
         {
             m_FitsFilesList.AddRange(fitsFiles);
-            m_FitsFilesList.Sort();
 
             FirstFrame = 0;
             LastFrame = m_FitsFilesList.Count - 1;
@@ -90,7 +89,7 @@ namespace Tangra.Video.FITS
         public string GetFrameFileName(int index)
         {
             if (index >= 0 && index < m_FitsFilesList.Count)
-                return Path.GetFileNameWithoutExtension(m_FitsFilesList[index]);
+                return Path.GetFileName(m_FitsFilesList[index]);
 
             return null;
         }

@@ -183,7 +183,7 @@ namespace Tangra.VideoOperations.LightCurves.AdjustApertures
 		{
 			TrackedObjectConfig target = Model.MeasuringStars[targetId];
 
-			uint[,] pixels = Controller.GetPixels(target.OriginalFieldCenterX, target.OriginalFieldCenterY);
+			byte[,] pixels = Controller.GetDisplayBitmapPixels(target.OriginalFieldCenterX, target.OriginalFieldCenterY);
 
 			using (Graphics g = Graphics.FromImage(pic.Image))
 			{
@@ -191,7 +191,7 @@ namespace Tangra.VideoOperations.LightCurves.AdjustApertures
 				{
 					for (int y = 0; y < 35; y++)
 					{
-						byte pixel = (byte)Math.Max(0, Math.Min(255, pixels[x, y]));
+						byte pixel = pixels[x, y];
 						g.FillRectangle(m_GragBrushes[pixel], 2*x, 2*y, 2, 2);
 					}
 				}

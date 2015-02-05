@@ -45,9 +45,9 @@ namespace Tangra.VideoOperations.LightCurves.AdjustApertures
 		    return false;
 		}
 
-		internal uint[,] GetPixels(int xCenter, int yCenter)
+		internal byte[,] GetDisplayBitmapPixels(int xCenter, int yCenter)
 		{
-			return m_VideoController.GetCurrentAstroImage(false).GetMeasurableAreaPixels(xCenter, yCenter, 35);
+			return m_VideoController.GetCurrentAstroImage(false).GetMeasurableAreaDisplayBitmapPixels(xCenter, yCenter, 35);
 		}
 
         internal void ApplyDisplayModeAdjustments(Bitmap bmp)

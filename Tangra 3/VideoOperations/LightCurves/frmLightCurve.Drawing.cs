@@ -1262,7 +1262,7 @@ namespace Tangra.VideoOperations.LightCurves
 				if (!LCMeasurement.IsEmpty(firstNonExcludedMeasurement))
 				{
 				    lblFrameNo.Text = firstNonExcludedMeasurement.CurrFrameNo.ToString();
-                    if (firstNonExcludedMeasurement.CurrFileName != null) lblFrameNo.Text += string.Format("    |{0}|", firstNonExcludedMeasurement.CurrFileName);
+                    if (firstNonExcludedMeasurement.CurrFileName != null) lblFrameNo.Text += string.Format("     {0}", firstNonExcludedMeasurement.CurrFileName);
 					string correctedForInstrumentalDelayMessage = null;
 					if (m_LCFile.CanDetermineFrameTimes)
 					{
