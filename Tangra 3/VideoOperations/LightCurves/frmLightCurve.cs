@@ -22,6 +22,7 @@ using Tangra.Model.Config;
 using Tangra.Model.Helpers;
 using Tangra.Model.Numerical;
 using Tangra.Model.Video;
+using Tangra.Model.VideoOperations;
 using Tangra.Resources;
 using Tangra.SDK;
 using Tangra.VideoOperations.LightCurves.InfoForms;
@@ -2528,5 +2529,57 @@ namespace Tangra.VideoOperations.LightCurves
             pnlChart.Invalidate();
         }
 
+        private void miCurrDataPoint_DropDownOpening(object sender, EventArgs e)
+        {
+            if (m_LightCurveController.Context.SelectedFrameNo >= m_LightCurveController.Context.MinFrame &&
+                m_LightCurveController.Context.SelectedFrameNo <= m_LightCurveController.Context.MaxFrame)
+            {
+                miSetInvalidDataPoint.Enabled = true;
+                miSetValidDataPoint.Enabled = true;
+            }
+            else
+            {
+                miSetInvalidDataPoint.Enabled = false;
+                miSetValidDataPoint.Enabled = false;                
+            }
+        }
+
+        private void miSetInvalidDataPoint_Click(object sender, EventArgs e)
+        {
+            if (m_LightCurveController.Context.SelectedFrameNo >= m_LightCurveController.Context.MinFrame &&
+                m_LightCurveController.Context.SelectedFrameNo <= m_LightCurveController.Context.MaxFrame)
+            {
+                for (int i = 0; i < m_LightCurveController.Context.ObjectCount; i++)
+                {
+                    int lcDataIdx = (int)(m_LightCurveController.Context.SelectedFrameNo - m_LightCurveController.Context.MinFrame);
+                    LCMeasurement lcMea = m_LCFile.Data[i][lcDataIdx];
+                    lcMea.FlagsDWORD = 3;
+                    lcMea.Flags = 3;
+                    m_LCFile.Data[i][lcDataIdx] = lcMea;
+                }
+
+                pnlChart.Invalidate();
+                RedrawPlot();
+            }
+        }
+
+        private void miSetValidDataPoint_Click(object sender, EventArgs e)
+        {
+            if (m_LightCurveController.Context.SelectedFrameNo >= m_LightCurveController.Context.MinFrame &&
+                m_LightCurveController.Context.SelectedFrameNo <= m_LightCurveController.Context.MaxFrame)
+            {
+                for (int i = 0; i < m_LightCurveController.Context.ObjectCount; i++)
+                {
+                    int lcDataIdx = (int)(m_LightCurveController.Context.SelectedFrameNo - m_LightCurveController.Context.MinFrame);
+                    LCMeasurement lcMea = m_LCFile.Data[i][lcDataIdx];
+                    lcMea.FlagsDWORD = 1;
+                    lcMea.Flags = 1;
+                    m_LCFile.Data[i][lcDataIdx] = lcMea;
+                }
+
+                pnlChart.Invalidate();
+                RedrawPlot();
+            }
+        }
 	}
 }
