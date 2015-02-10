@@ -2202,11 +2202,11 @@ namespace Tangra.VideoOperations.LightCurves
 						// Remove the previous group as now the group is different or is not a group
 						List<TrackedObjectConfig> objectsInGroup = m_StateMachine.MeasuringStars.Where(x => x.GroupId == selectedObject.GroupId).ToList();
 						foreach (TrackedObjectConfig prevObj in objectsInGroup)
-							m_StateMachine.ObjectSelected(prevObj, false, true /* Ctrl = 'DELETE' */);						
+							m_StateMachine.ObjectSelected(prevObj, false, true /* Ctrl = 'DELETE' */);
 					}
 					else
 						// Remove the previous object as now we have a group of objects
-						m_StateMachine.ObjectSelected(selectedObject, false, true /* Ctrl = 'DELETE' */);						
+						m_StateMachine.ObjectSelected(selectedObject, false, true /* Ctrl = 'DELETE' */);
 				}
 
 				m_StateMachine.ObjectEdited(selectedStarId, frmAddMutualTarget.ObjectToAdd);

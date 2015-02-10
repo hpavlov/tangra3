@@ -287,7 +287,7 @@ namespace Tangra.Model.Astro
 
             uint saturationLevel = saturationLevels.GetSaturationForBpp(m_Pixelmap.BitPixCamera);
 
-            BitmapData zoomedData = featureBitmap.LockBits(new Rectangle(0, 0, 31 * 8, 31 * 8), ImageLockMode.ReadWrite, featureBitmap.PixelFormat);
+			BitmapData zoomedData = featureBitmap.LockBits(new Rectangle(0, 0, 31 * 8, 31 * 8), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
             try
             {
                 int bytes = zoomedData.Stride * featureBitmap.Height;
@@ -299,46 +299,49 @@ namespace Tangra.Model.Astro
 
                 int selIdx = 0;
 
-                for (int yy = -15; yy < 16; yy++)
-                    for (int xx = -15; xx < 16; xx++)
-                    {
-                        for (int i = 0; i < 8; i++)
-                            for (int j = 0; j < 8; j++)
-                            {
-                                int x = x0 + xx;
-                                int y = y0 + yy;
+				if (m_Pixelmap.DisplayBitmapPixels != null && m_Pixelmap.DisplayBitmapPixels.Length == width*height)
+				{
+					for (int yy = -15; yy < 16; yy++)
+						for (int xx = -15; xx < 16; xx++)
+						{
+							for (int i = 0; i < 8; i++)
+								for (int j = 0; j < 8; j++)
+								{
+									int x = x0 + xx;
+									int y = y0 + yy;
 
-                                int zoomedX = 8 * (xx + 15) + i;
-                                int zoomedY = 8 * (yy + 15) + j;
+									int zoomedX = 8 * (xx + 15) + i;
+									int zoomedY = 8 * (yy + 15) + j;
 
 
-                                byte zoomedByte = 0;
-                                uint pixelVal = 0;
-                                if (x >= 0 && x < width && y >= 0 && y < height)
-                                {
-                                    zoomedByte = m_Pixelmap.DisplayBitmapPixels[y * width + x];
-                                    pixelVal = m_Pixelmap[x, y];
-                                }
+									byte zoomedByte = 0;
+									uint pixelVal = 0;
+									if (x >= 0 && x < width && y >= 0 && y < height)
+									{
+										zoomedByte = m_Pixelmap.DisplayBitmapPixels[y * width + x];
+										pixelVal = m_Pixelmap[x, y];
+									}
 
-                                int zoomedIdx = zoomedData.Stride * zoomedY + zoomedX * AstroImage.BytesPerDisplayBitmapPixel;
+									int zoomedIdx = zoomedData.Stride * zoomedY + zoomedX * AstroImage.BytesPerDisplayBitmapPixel;
 
-                                if (pixelVal > saturationLevel)
-                                {
-                                    // Saturation detected
-                                    zoomedValues[zoomedIdx] = saturatedR;
-                                    zoomedValues[zoomedIdx + 1] = saturatedG;
-                                    zoomedValues[zoomedIdx + 2] = saturatedB;
-                                }
-                                else
-                                {
-                                    zoomedValues[zoomedIdx] = zoomedByte;
-                                    zoomedValues[zoomedIdx + 1] = zoomedByte;
-                                    zoomedValues[zoomedIdx + 2] = zoomedByte;
-                                }
-                            }
+									if (pixelVal > saturationLevel)
+									{
+										// Saturation detected
+										zoomedValues[zoomedIdx] = saturatedR;
+										zoomedValues[zoomedIdx + 1] = saturatedG;
+										zoomedValues[zoomedIdx + 2] = saturatedB;
+									}
+									else
+									{
+										zoomedValues[zoomedIdx] = zoomedByte;
+										zoomedValues[zoomedIdx + 1] = zoomedByte;
+										zoomedValues[zoomedIdx + 2] = zoomedByte;
+									}
+								}
 
-                        selIdx++;
-                    }
+							selIdx++;
+						}
+				}
 
                 Marshal.Copy(zoomedValues, 0, zoomedData.Scan0, bytes);
             }

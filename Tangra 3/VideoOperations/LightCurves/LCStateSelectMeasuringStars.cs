@@ -138,11 +138,15 @@ namespace Tangra.VideoOperations.LightCurves
 				int idx = selectedStarId < 0 ? Context.MeasuringStars.IndexOf(selectedObject) : selectedStarId;
                 if (idx > -1)
                 {
-					Context.MeasuringStars[idx] = selectedObject;
-					Context.MeasuringApertures[idx] = selectedObject.ApertureInPixels;
-					Context.PsfFitMatrixSizes[idx] = selectedObject.PsfFitMatrixSize;
+					if (idx >= 0 && idx < Context.MeasuringStars.Count)
+					{
+						Context.MeasuringStars[idx] = selectedObject;
+						Context.MeasuringApertures[idx] = selectedObject.ApertureInPixels;
+						Context.PsfFitMatrixSizes[idx] = selectedObject.PsfFitMatrixSize;
 
-                    Context.VideoOperation.SelectedTargetChanged(idx);
+						Context.VideoOperation.SelectedTargetChanged(idx);
+					}
+
                     return;
                 }
                 if (Context.MeasuringStars.FindAll(obj => obj.MeasureThisObject).Count >= 4) return;
