@@ -1304,7 +1304,7 @@ namespace Tangra.VideoOperations.LightCurves
 				m_VideoController.UpdateViews();
 			}
 			else
-				m_VideoController.PlayVideo();
+                m_VideoController.PlayVideo(m_CurrFrameNo > -1 ? (int?)m_CurrFrameNo : null);
         }
 
         private void InitializeTimestampOCR()

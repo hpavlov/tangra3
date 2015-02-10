@@ -675,9 +675,9 @@ namespace Tangra.Video
 				int lastFrame = m_VideoStream.LastFrame;
 
 				Stopwatch sw = new Stopwatch();
-				for (; (m_CurrentFrameIndex < lastFrame) && m_IsRunning && !m_StopRequestReceived; m_CurrentFrameIndex += (int)m_Step)
+				for (; (m_CurrentFrameIndex <= lastFrame) && m_IsRunning && !m_StopRequestReceived; m_CurrentFrameIndex += (int)m_Step)
 				{
-					if (m_CurrentFrameIndex >= lastFrame)
+					if (m_CurrentFrameIndex > lastFrame)
 						break;
 
 					if (m_MillisecondsPerFrame != 0)

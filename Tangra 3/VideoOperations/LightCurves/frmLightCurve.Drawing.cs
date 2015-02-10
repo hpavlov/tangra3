@@ -1201,6 +1201,7 @@ namespace Tangra.VideoOperations.LightCurves
 			if (m_SelectedMeasurements == null ||
 			    selectedMeasurements[0].CurrFrameNo != m_SelectedMeasurements[0].CurrFrameNo)
 			{
+                m_SelectedMeasurements = selectedMeasurements;
 				SelectMeasurement((int)(selectedMeasurements[0].CurrFrameNo - m_Header.MinFrame));
 				DisplayCurrentMeasurements();
 			}			
