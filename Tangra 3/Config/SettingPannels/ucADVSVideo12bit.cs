@@ -132,7 +132,7 @@ namespace Tangra.Config.SettingPannels
 
 		private void linkLabelADVS_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
 		{
-			HttpHelper.OpenUrl("http://www.kuriwaobservatory.com/ADVS.html");
+			ShellHelper.OpenUrl("http://www.kuriwaobservatory.com/ADVS.html");
 		}
 	}
 }

@@ -679,7 +679,7 @@ namespace Tangra
 			UsageStats.Instance.OnlineHelpMenuUsed++;
 			UsageStats.Instance.Save();
 
-            HttpHelper.OpenUrl("http://www.hristopavlov.net/Tangra3");
+            ShellHelper.OpenUrl("http://www.hristopavlov.net/Tangra3");
         }
 
         #region Picture Box Events
@@ -893,7 +893,7 @@ namespace Tangra
 				Close();
 			}
 			else
-				HttpHelper.OpenUrl("http://www.hristopavlov.net/Tangra3");
+				ShellHelper.OpenUrl("http://www.hristopavlov.net/Tangra3");
         }
 
 		private void miLoadedAddins_Click(object sender, EventArgs e)
@@ -1002,7 +1002,7 @@ namespace Tangra
 
         private void miYahooGroup_Click(object sender, EventArgs e)
         {
-            Process.Start("https://groups.yahoo.com/neo/groups/Tangra/info");
+			ShellHelper.OpenUrl("https://groups.yahoo.com/neo/groups/Tangra/info");
         }
 
 	}

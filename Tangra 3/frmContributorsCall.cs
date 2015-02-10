@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Helpers;
 
 namespace Tangra
 {
@@ -19,12 +20,12 @@ namespace Tangra
 
 		private void linkLabel1_Click(object sender, EventArgs e)
 		{
-			Process.Start("https://github.com/hpavlov/tangra3");
+			ShellHelper.OpenUrl("https://github.com/hpavlov/tangra3");
 		}
 
 		private void linkLabel2_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
 		{
-			Process.Start("mailto://hristo_dpavlov@yahoo.com");
+			ShellHelper.OpenUrl("mailto://hristo_dpavlov@yahoo.com");
 		}
 	}
 }

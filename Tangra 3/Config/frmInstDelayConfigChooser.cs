@@ -63,7 +63,7 @@ namespace Tangra.Config
 
 		private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
 		{
-			HttpHelper.OpenUrl("http://www.dangl.at/ausruest/vid_tim/vid_tim1.htm");
+			ShellHelper.OpenUrl("http://www.dangl.at/ausruest/vid_tim/vid_tim1.htm");
 		}
 
 		private void rbCorrect_CheckedChanged(object sender, EventArgs e)

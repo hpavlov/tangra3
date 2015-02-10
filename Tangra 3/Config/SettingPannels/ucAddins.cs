@@ -113,7 +113,7 @@ namespace Tangra.Config.SettingPannels
         private void lblUrl_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             if (!string.IsNullOrEmpty(lblUrl.Text) && lblUrl.Text.StartsWith("http", StringComparison.InvariantCultureIgnoreCase))
-                Process.Start(lblUrl.Text);
+				ShellHelper.OpenUrl(lblUrl.Text);
         }
 
         private void btnConfigure_Click(object sender, EventArgs e)
@@ -177,7 +177,7 @@ namespace Tangra.Config.SettingPannels
 
 		private void linkLblOW_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
 		{
-			HttpHelper.OpenUrl("http://www.hristopavlov.net/OccultWatcher/");
+			ShellHelper.OpenUrl("http://www.hristopavlov.net/OccultWatcher/");
 		}
 	}
 }

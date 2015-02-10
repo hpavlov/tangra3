@@ -295,7 +295,7 @@
     <Compile Include="Helpers\frmChooseFitsFolder.Designer.cs">
       <DependentUpon>frmChooseFitsFolder.cs</DependentUpon>
     </Compile>
-    <Compile Include="Helpers\HttpHelper.cs" />
+    <Compile Include="Helpers\ShellHelper.cs" />
     <Compile Include="Helpers\TangraFileAssociations.cs" />
     <Compile Include="Helpers\UsageStats.cs" />
     <Compile Include="Helpers\WindowsHelpers.cs" />

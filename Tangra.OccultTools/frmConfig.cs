@@ -76,7 +76,11 @@ namespace Tangra.OccultTools
 
 		private void llOccult4_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
 		{
-			Process.Start("http://www.lunar-occultations.com/iota/occult4.htm");
+			try
+			{
+				Process.Start("http://www.lunar-occultations.com/iota/occult4.htm");
+			}
+			catch { }
 		}
     }
 }

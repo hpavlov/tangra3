@@ -142,11 +142,11 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
 								 ref fileName) == DialogResult.OK)
 							{
 								field.Save(fileName, ImageFormat.Bmp);
-								Process.Start(fileName);
+								ShellHelper.OpenFile(fileName);
 							}
 
 							m_Running = false;
-							m_VideoController.StopVideo();					
+							m_VideoController.StopVideo();
 						}
 						else
 						{

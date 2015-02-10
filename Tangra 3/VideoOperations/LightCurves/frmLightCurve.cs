@@ -1646,7 +1646,7 @@ namespace Tangra.VideoOperations.LightCurves
 		        if (saveCSVDialog.ShowDialog() == DialogResult.OK)
 		        {
 		            if (ExportToCSV(saveCSVDialog.FileName, options))
-		                Process.Start(saveCSVDialog.FileName);
+						ShellHelper.OpenFile(saveCSVDialog.FileName);
 		        }
 		    }
 		}
@@ -2452,7 +2452,7 @@ namespace Tangra.VideoOperations.LightCurves
 				{
 					string tempFile = Path.ChangeExtension(Path.GetTempFileName(), ".csv");
 					File.WriteAllText(tempFile, output.ToString());
-					Process.Start(tempFile);
+					ShellHelper.OpenFile(tempFile);
 				}
 			}
 		}
