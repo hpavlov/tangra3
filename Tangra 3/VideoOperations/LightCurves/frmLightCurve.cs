@@ -1759,7 +1759,7 @@ namespace Tangra.VideoOperations.LightCurves
         {
             if (e.KeyCode == Keys.Left)
             {
-                if (m_LightCurveController.Context.SelectedFrameNo >= m_MinDisplayedFrame) SelectFrame(m_LightCurveController.Context.SelectedFrameNo - 1, true);
+                if (m_LightCurveController.Context.SelectedFrameNo > m_MinDisplayedFrame) SelectFrame(m_LightCurveController.Context.SelectedFrameNo - 1, true);
             }
             else if (e.KeyCode == Keys.Right)
             {
@@ -1778,7 +1778,7 @@ namespace Tangra.VideoOperations.LightCurves
                 frameNo <= m_LCFile.Header.MaxFrame)
             {
                 m_LightCurveController.Context.SelectedFrameNo = frameNo;
-                SelectFrame(m_LightCurveController.Context.SelectedFrameNo, true);                
+                SelectFrame(m_LightCurveController.Context.SelectedFrameNo, true);
             }
         }
 
@@ -1796,11 +1796,14 @@ namespace Tangra.VideoOperations.LightCurves
         {
             e.Graphics.Clear(SystemColors.Control /* This should be the same colour as the panel i.e. SystemColors.Control */);
 
-            if (m_ZoomScrollMode && m_ZoomLevel > 1)
-            {
-                pnlMeasurementDetails.Visible = false;
-                DoDrawSmallGraph(e.Graphics);
-            }
+	        if (!m_Reprocessing)
+	        {
+				if (m_ZoomScrollMode && m_ZoomLevel > 1)
+				{
+					pnlMeasurementDetails.Visible = false;
+					DoDrawSmallGraph(e.Graphics);
+				}
+	        }
         }
 
         private int m_SmallGraphZoomFromX;
