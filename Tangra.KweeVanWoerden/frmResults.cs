@@ -67,15 +67,13 @@ namespace Tangra.KweeVanWoerden
 			if (Results.Success)
 			{
 				tbxErrorMessage.Visible = false;
-				lblCalcStatus.ForeColor = Color.Green;
-				lblCalcStatus.Text = "The calculation was successful";
+                picGraph.Visible = true;
 			}
 			else
 			{
 				tbxErrorMessage.Text = Results.ErrorMessage;
 				tbxErrorMessage.Visible = true;
-				lblCalcStatus.ForeColor = Color.Red;
-				lblCalcStatus.Text = "Error occurred during the calculation";
+                picGraph.Visible = false;
 			}
 
 			// 1E-6 days is a precision of 0.08 sec - good enough for our purposes
