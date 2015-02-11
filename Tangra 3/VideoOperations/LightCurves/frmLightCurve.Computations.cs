@@ -847,7 +847,7 @@ namespace Tangra.VideoOperations.LightCurves
 					for (int j = 0; j < objCount; j++)
 					{
 						LCMeasurement reading = m_LightCurveController.Context.AllReadings[j][i];
-                        output.Append(options.FormatPhotometricValue(reading.IsSuccessfulReading, reading.TotalReading, reading.TotalBackground, onlyExportSignalMunusBg, false));
+						output.Append(options.FormatPhotometricValue(reading.IsSuccessfulReading, (int)reading.TotalReading, (int)reading.TotalBackground, onlyExportSignalMunusBg, false));
 					}
 
                     if (options.PhotometricFormat == PhotometricFormat.Magnitudes && atmExtCalc != null &&

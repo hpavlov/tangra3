@@ -268,8 +268,11 @@ namespace Tangra.Controller
 
         internal void ConfigureSaveLcFileDialog(SaveFileDialog saveFileDialog)
         {
-            saveFileDialog.InitialDirectory = Path.GetDirectoryName(m_VideoController.CurrentVideoFileName);
-            saveFileDialog.FileName = Path.ChangeExtension(Path.GetFileName(m_VideoController.CurrentVideoFileName), ".lc");
+			if (saveFileDialog != null)
+			{
+				saveFileDialog.InitialDirectory = Path.GetDirectoryName(m_VideoController.CurrentVideoFileName);
+				saveFileDialog.FileName = Path.ChangeExtension(Path.GetFileName(m_VideoController.CurrentVideoFileName), ".lc");
+			}
         }
 
 	    internal LightCurveContext Context
