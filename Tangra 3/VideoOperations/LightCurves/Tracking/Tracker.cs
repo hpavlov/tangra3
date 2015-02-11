@@ -1156,7 +1156,8 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
         {
             foreach (TrackedObject trackedObject in TrackedObjects)
             {
-				if (trackedObject.TargetNo == targetId)
+				if (trackedObject.LastKnownGoodPosition != null && 
+					trackedObject.TargetNo == targetId)
 				{
 					trackedObject.ThisFrameX = (float)trackedObject.LastKnownGoodPosition.XDouble + deltaX;
 					trackedObject.ThisFrameY = (float)trackedObject.LastKnownGoodPosition.YDouble + deltaY;

@@ -131,7 +131,8 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 		public void BeginMeasurements(IAstroImage astroImage)
 		{
-			// Nothing special to do as there is no premilinary refining used by the AdHocTracker
+			// We consider the first frame of the measurements successfully tracked (after the refining is completed)
+			IsTrackedSuccessfully = true;
 		}
 
 		public virtual void NextFrame(int frameNo, IAstroImage astroImage)

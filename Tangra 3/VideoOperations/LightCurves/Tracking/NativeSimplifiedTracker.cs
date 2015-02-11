@@ -155,7 +155,8 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 		public void BeginMeasurements(IAstroImage astroImage)
 		{
-			// Nothing special to do when beginning measurements
+			// We consider the first frame of the measurements successfully tracked (after the refining is completed)
+			IsTrackedSuccessfully = true;
 		}
 	}
 }

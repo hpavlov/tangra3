@@ -33,6 +33,14 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             m_RefiningFramesLeft = TangraConfig.Settings.Tracking.RefiningFrames;
         }
 
+		public override void BeginMeasurements(IAstroImage astroImage)
+		{
+			base.BeginMeasurements(astroImage);
+
+			// We consider the first frame of the measurements successfully tracked (after the refining is completed)
+			m_IsTrackedSuccessfully = true;
+		}
+
         public override void NextFrame(int frameNo, IAstroImage astroImage)
         {
             base.NextFrame(frameNo, astroImage);
