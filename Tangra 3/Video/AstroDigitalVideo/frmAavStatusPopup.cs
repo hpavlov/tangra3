@@ -85,6 +85,19 @@ namespace Tangra.Video.AstroDigitalVideo
 			if (m_AavSettings.Popup_Timestamp || m_AavSettings.Popup_Exposure)
                 statusText.AppendLine();
 
+			if (m_AavSettings.Popup_Gain)
+				statusText.AppendLine(m_FrameState.Gain > 0
+							? string.Format("Gain: {0} dB", m_FrameState.Gain.ToString("0"))
+							: "Gain: Unknown");
+
+			if (m_AavSettings.Popup_Gamma)
+				statusText.AppendLine(m_FrameState.Gamma > 0
+							? string.Format("Gamma: {0}", m_FrameState.Gamma.ToString("0.000"))
+							: "Gamma: Unknown");
+
+			if (m_AavSettings.Popup_Gain || m_AavSettings.Popup_Gamma)
+				statusText.AppendLine();
+
 			if (m_AavSettings.Popup_NtpTimestamp)
 				statusText.AppendLine(string.Format("NTP Timestamp: {0}", m_FrameState.HasValidNtpTimeStamp ? m_FrameState.EndFrameNtpTime.ToString("dd MMM yyyy HH:mm:ss.fff") : ""));
 

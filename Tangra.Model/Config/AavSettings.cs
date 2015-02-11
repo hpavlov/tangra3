@@ -20,6 +20,9 @@ namespace Tangra.Model.Config
 		public bool Popup_Timestamp = false;
 		public bool Popup_Exposure = false;
 
+		public bool Popup_Gain = true;
+		public bool Popup_Gamma = true;
+
 		public bool Popup_SystemTime = true;
 		public bool Popup_Satellites = false;
 		public bool Popup_GPSFix = false;

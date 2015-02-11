@@ -49,6 +49,8 @@ namespace Tangra.Config.SettingPannels
 			cbxAdvsPopupSatellites.Checked = TangraConfig.Settings.AAV.Popup_Satellites;
 			cbxAdvsPopupGPSFix.Checked = TangraConfig.Settings.AAV.Popup_GPSFix;
 			cbxAdvsPopupAlmanac.Checked = TangraConfig.Settings.AAV.Popup_Almanac;
+			cbxAdvsPopupGain.Checked = TangraConfig.Settings.AAV.Popup_Gain;
+			cbxAdvsPopupGamma.Checked = TangraConfig.Settings.AAV.Popup_Gamma;
 
 			cbxAavSplitFieldsOSD.Checked = TangraConfig.Settings.AAV.SplitFieldsOSD;
 
@@ -69,6 +71,8 @@ namespace Tangra.Config.SettingPannels
 			TangraConfig.Settings.AAV.Popup_Satellites = cbxAdvsPopupSatellites.Checked;
 			TangraConfig.Settings.AAV.Popup_GPSFix = cbxAdvsPopupGPSFix.Checked;
 			TangraConfig.Settings.AAV.Popup_Almanac = cbxAdvsPopupAlmanac.Checked;
+	        TangraConfig.Settings.AAV.Popup_Gain = cbxAdvsPopupGain.Checked;
+	        TangraConfig.Settings.AAV.Popup_Gamma = cbxAdvsPopupGamma.Checked;
 
 			TangraConfig.Settings.AAV.SplitFieldsOSD = cbxAavSplitFieldsOSD.Checked;
 
@@ -93,6 +97,8 @@ namespace Tangra.Config.SettingPannels
 				Popup_Satellites = cbxAdvsPopupSatellites.Checked,
 				Popup_GPSFix = cbxAdvsPopupGPSFix.Checked,
 				Popup_Almanac = cbxAdvsPopupAlmanac.Checked,
+				Popup_Gain = cbxAdvsPopupGain.Checked,
+				Popup_Gamma = cbxAdvsPopupGamma.Checked,
 				SplitFieldsOSD = cbxAavSplitFieldsOSD.Checked,
 			};
 
