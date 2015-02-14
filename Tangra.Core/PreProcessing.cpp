@@ -214,7 +214,7 @@ long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height
 
 	long rv = S_OK;
 
-	if (NULL != g_DarkFramePixelsCopy)
+	if (NULL != g_DarkFramePixelsCopy || NULL != g_FlatFramePixelsCopy)
 	{
 		rv = PreProcessingApplyDarkFlatFrame(pixels, width, height, bpp, g_DarkFramePixelsCopy, g_FlatFramePixelsCopy, g_DarkFrameMedian, g_DarkFrameAdjustLevelToMedian, g_FlatFrameMedian);
 		if (rv != S_OK) return rv;
