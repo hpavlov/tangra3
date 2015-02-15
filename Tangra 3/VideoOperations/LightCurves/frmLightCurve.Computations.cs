@@ -218,6 +218,12 @@ namespace Tangra.VideoOperations.LightCurves
 
                 foreach (LCMeasurement reading in m_LightCurveController.Context.AllReadings[i])
                 {
+                    binnedSum += reading.AdjustedReading;
+                    binnedBackgroundSum += (int)reading.TotalBackground;
+
+                    if (reading.IsSuccessfulReading)
+                        binnedSuccessfulReadings++;
+
                     if ((idx + delta_bin_ref_frame) % m_LightCurveController.Context.Binning == 0)
                     {
                         binnedValue.TotalSum = binnedSum;
@@ -241,21 +247,10 @@ namespace Tangra.VideoOperations.LightCurves
 
 						binnedSum = reading.AdjustedReading;
 	                    binnedBackgroundSum = (int)reading.TotalBackground;
-
-                        if (reading.IsSuccessfulReading)
-							binnedSuccessfulReadings++;
                         
                         binnedValue = new BinnedValue();
                         binnedValue.ReadingIndexFrom = idx;
                         binnedValue.BinNo = binNo;
-                    }
-                    else
-                    {
-						binnedSum += reading.AdjustedReading;
-						binnedBackgroundSum += (int)reading.TotalBackground;
-
-                        if (reading.IsSuccessfulReading)
-							binnedSuccessfulReadings++;
                     }
 
                     idx++;
@@ -726,11 +721,22 @@ namespace Tangra.VideoOperations.LightCurves
 				for (int i = 0; i < count; i++)
 				{
 					string isCorrectedForInstrumentalDelay;
-                    double midBinFrameNumber = firstFrameNoInBin + (m_LightCurveController.Context.Binning / 2.0);
+                    double midBinFrameNumber = firstFrameNoInBin + (m_LightCurveController.Context.Binning / 2.0) - 0.5;
 
-				    DateTime middleBinTime = midBinFrameNumber <= m_Header.MaxFrame && midBinFrameNumber >= m_Header.MinFrame
-				            ? m_LCFile.GetTimeForFrame(midBinFrameNumber, out isCorrectedForInstrumentalDelay)
-				            : DateTime.MinValue;
+				    DateTime middleBinTime = DateTime.MinValue;
+
+                    if (midBinFrameNumber <= m_Header.MaxFrame && midBinFrameNumber >= m_Header.MinFrame)
+                    {
+                        int midBinFrameNumberInt = (int)midBinFrameNumber;
+                        double midBinFrameNumberFrac = midBinFrameNumber - midBinFrameNumberInt;
+
+                        middleBinTime = m_LCFile.GetTimeForFrame(midBinFrameNumberInt, out isCorrectedForInstrumentalDelay);
+                        if (middleBinTime > DateTime.MinValue && midBinFrameNumberFrac > 0.00001 && midBinFrameNumberInt + 1 <= m_Header.MaxFrame)
+                        {
+                            DateTime middleBinPlusOneTime = m_LCFile.GetTimeForFrame(midBinFrameNumberInt + 1, out isCorrectedForInstrumentalDelay);
+                            middleBinTime = middleBinTime.AddTicks((long)((middleBinPlusOneTime.Ticks - middleBinTime.Ticks) * midBinFrameNumberFrac));
+                        }
+                    }
 
 				    string timeStr;
                     if (isBadTime)

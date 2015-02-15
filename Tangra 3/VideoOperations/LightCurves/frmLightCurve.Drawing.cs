@@ -381,7 +381,7 @@ namespace Tangra.VideoOperations.LightCurves
                             BinnedValue currBin = null;
                             int binnedIdx = -1;
                             int nextPlotIndex = -1;
-                            int readingIdx = 0;
+                            int readingIdx = -1;
 							bool prevReadingIsOffScreen = true;
                             foreach (LCMeasurement reading in m_LightCurveController.Context.AllReadings[i])
                             {
@@ -394,7 +394,7 @@ namespace Tangra.VideoOperations.LightCurves
                                 if (m_LightCurveController.Context.Binning > 0)
                                 {
                                     if (currBin == null || 
-                                        currBin.ReadingIndexTo <= readingIdx)
+                                        currBin.ReadingIndexTo < readingIdx)
                                     {
                                         binnedIdx++;
                                         if (binnedIdx < binnedValues.Count)
