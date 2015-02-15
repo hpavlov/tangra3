@@ -226,6 +226,8 @@ namespace Tangra.VideoOperations.LightCurves
 
                     if ((idx + delta_bin_ref_frame) % m_LightCurveController.Context.Binning == 0)
                     {
+						binNo++;
+
                         binnedValue.TotalSum = binnedSum;
 	                    binnedValue.TotalBackgroundSum = binnedBackgroundSum;
                     	binnedValue.AdjustedValue = binnedSum * 1.0 / m_LightCurveController.Context.Binning;
@@ -242,15 +244,14 @@ namespace Tangra.VideoOperations.LightCurves
                             if (maxValue < binnedValue.AdjustedValue) maxValue = (int) binnedValue.AdjustedValue + 1;
                         }
 
-                        binNo++;
                         binnedSuccessfulReadings = 0;
 
-						binnedSum = reading.AdjustedReading;
-	                    binnedBackgroundSum = (int)reading.TotalBackground;
-                        
-                        binnedValue = new BinnedValue();
-                        binnedValue.ReadingIndexFrom = idx;
-                        binnedValue.BinNo = binNo;
+						binnedSum = 0;
+	                    binnedBackgroundSum = 0;
+
+						binnedValue = new BinnedValue();
+						binnedValue.ReadingIndexFrom = idx;
+						binnedValue.BinNo = binNo;
                     }
 
                     idx++;
@@ -806,7 +807,7 @@ namespace Tangra.VideoOperations.LightCurves
                 else if (!m_LCFile.Footer.ReductionContext.HasEmbeddedTimeStamps
                     /* If the times are entered by the user, only include the times for the frames enterred by the user. Unless the calculated timing descrepency is small (m_TimestampDiscrepencyFlag = false) */)
                 {
-                    timePrecisionSec = 0.01;
+                    timePrecisionSec = 0.001;
                     isBadTime = m_TimestampDiscrepencyFlag;                    
                 }
                 else
@@ -887,7 +888,7 @@ namespace Tangra.VideoOperations.LightCurves
 
             output.AppendFormat("Tangra v{0}", ver.ToString()); output.AppendLine();
             if (binning)
-                output.AppendFormat("Measurments of {0} objects; Bins of {1} frames; Binned Measurement = {2}", m_Header.ObjectCount, m_LightCurveController.Context.Binning, m_LightCurveController.Context.ProcessingType);
+				output.AppendFormat("Measurments of {0} objects; Bins of {1} frames starting at frame {2}; Binned Measurement = {3}", m_Header.ObjectCount, m_LightCurveController.Context.Binning, m_LightCurveController.Context.BinningFirstFrame, m_LightCurveController.Context.ProcessingType);
             else
                 output.AppendFormat("Measurments of {0} objects", m_Header.ObjectCount);
 
