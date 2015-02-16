@@ -721,6 +721,9 @@ namespace Tangra.VideoOperations.LightCurves
 
 				for (int i = 0; i < count; i++)
 				{
+					if (options.Spacing > 1 && i%options.Spacing != 0) 
+						continue;
+
 					string isCorrectedForInstrumentalDelay;
                     double midBinFrameNumber = firstFrameNoInBin + (m_LightCurveController.Context.Binning / 2.0) - 0.5;
 
@@ -783,17 +786,13 @@ namespace Tangra.VideoOperations.LightCurves
 			{
                 CSVExportAddCommonHeader(output, options, false);
 
-				bool onlyExportSignalMunusBg =
-					m_LightCurveController.Context.SignalMethod == TangraConfig.PhotometryReductionMethod.PsfPhotometry &&
-					m_LightCurveController.Context.PsfQuadratureMethod == TangraConfig.PsfQuadrature.Analytical;
-
 				int count = m_LightCurveController.Context.AllReadings[0].Count;
 
                 output.Append(string.Format("FrameNo,Time ({0})", options.FormatTimeLabel()));
 
 				for (int j = 0; j < objCount; j++)
 				{
-                    output.Append(options.FormatPhotometricValueHeaderForObject(j + 1, onlyExportSignalMunusBg, false));
+                    output.Append(options.FormatPhotometricValueHeaderForObject(j + 1, options.ForceSignalMinusBackground, false));
 				}
 
 			    bool isBadTime = false;
@@ -821,6 +820,9 @@ namespace Tangra.VideoOperations.LightCurves
 
 				for (int i = 0; i < count; i++)
 				{
+					if (options.Spacing > 1 && i % options.Spacing != 0)
+						continue;
+
 					uint frameNo = m_LightCurveController.Context.AllReadings[0][i].CurrFrameNo;
 					string isCorrectedForInstrumentalDelay;
 					DateTime currFrameTime = m_LCFile.GetTimeForFrame(frameNo, out isCorrectedForInstrumentalDelay);
@@ -854,7 +856,7 @@ namespace Tangra.VideoOperations.LightCurves
 					for (int j = 0; j < objCount; j++)
 					{
 						LCMeasurement reading = m_LightCurveController.Context.AllReadings[j][i];
-						output.Append(options.FormatPhotometricValue(reading.IsSuccessfulReading, (int)reading.TotalReading, (int)reading.TotalBackground, onlyExportSignalMunusBg, false));
+						output.Append(options.FormatPhotometricValue(reading.IsSuccessfulReading, (int)reading.TotalReading, (int)reading.TotalBackground, options.ForceSignalMinusBackground, false));
 					}
 
                     if (options.PhotometricFormat == PhotometricFormat.Magnitudes && atmExtCalc != null &&

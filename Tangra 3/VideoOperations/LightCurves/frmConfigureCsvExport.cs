@@ -113,6 +113,23 @@ namespace Tangra.VideoOperations.LightCurves
             }
 
             RecalculateMagnitudes(0, 10);
+
+	        cbxSpacingOptions.SelectedIndex = 0;
+			if (Binning || OnlyExportSignalMunusBg)
+			{
+				lblSAndB.Visible = false;
+				lblSmB.Visible = true;
+				rbSeriesSmB.Enabled = true;
+				rbSeriesSmB.Checked = true;
+				rbSeriesSAndB.Enabled = false;
+			}
+			else
+			{
+				lblSAndB.Visible = true;
+				lblSmB.Visible = false;
+				rbSeriesSAndB.Enabled = true;
+				rbSeriesSAndB.Checked = true;
+			}
         }
 
         private void RecalculateMagnitudes(int refIndex, double refMagnitude)
@@ -165,8 +182,11 @@ namespace Tangra.VideoOperations.LightCurves
             if (m_ConfirmedDate.HasValue)
             {
                 rv.FistMeasurementDay = m_ConfirmedDate;
-                rv.FistMeasurementTimeStamp = LCFile.GetTimeForFrame(LCFile.Header.MinFrame);                
+                rv.FistMeasurementTimeStamp = LCFile.GetTimeForFrame(LCFile.Header.MinFrame);
             }
+
+	        rv.Spacing = cbxSpacingOptions.SelectedIndex + 1;
+	        rv.ForceSignalMinusBackground = this.OnlyExportSignalMunusBg || rbSeriesSmB.Checked;
 
             return rv;
         }

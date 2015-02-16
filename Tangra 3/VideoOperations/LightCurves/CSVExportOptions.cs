@@ -26,7 +26,11 @@ namespace Tangra.VideoOperations.LightCurves
 
         public PhotometricFormat PhotometricFormat { get; set; }
 
-        public DateTime? FistMeasurementDay { get; set; }
+		public int Spacing { get; set; }
+
+		public bool ForceSignalMinusBackground { get; set; }
+
+	    public DateTime? FistMeasurementDay { get; set; }
         public DateTime? FistMeasurementTimeStamp { get; set; }
 
         private DateTime? m_FirstConfirmedMeasurementTimeStamp;
