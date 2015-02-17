@@ -29,7 +29,7 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void frmConfirmDay_Load(object sender, EventArgs e)
         {
-            if (SelectedDay.HasValue && SelectedDay.Value.Year > 1900)
+            if (SelectedDay.HasValue && SelectedDay.Value.Year > 1900 && SelectedDay.Value.Year < 9000)
                 dateTimePicker.Value = SelectedDay.Value;
             else
                 dateTimePicker.Value = DateTime.Today;
