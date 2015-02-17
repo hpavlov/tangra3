@@ -590,7 +590,8 @@ namespace Tangra.VideoOperations.LightCurves
 
                     if (firstMark != m_MinDisplayedFrame && x < m_MaxX)
                     {
-                        g.DrawString(label, s_AxisFont, m_DisplaySettings.LabelsBrush, x - labelSize.Width / 2, y);
+						if (x + labelSize.Width / 2 < m_MaxX - 2 && x - labelSize.Width / 2 > m_MinX) 
+							g.DrawString(label, s_AxisFont, m_DisplaySettings.LabelsBrush, x - labelSize.Width / 2, y);
 						if (m_DisplaySettings.DrawGrid) g.DrawLine(m_DisplaySettings.GridLinesPen, x + 1, m_MinY, x + 1, m_MaxY);
                     }
                 }
@@ -609,8 +610,9 @@ namespace Tangra.VideoOperations.LightCurves
 
                         if (frame1.HasValue && frame2.HasValue)
                         {
-                            if ((int)(new TimeSpan(frame2.Value.Ticks - frame2.Value.Date.Ticks).TotalSeconds / interval) >
-                                (int)(new TimeSpan(frame1.Value.Ticks - frame1.Value.Date.Ticks).TotalSeconds / interval))
+                            if (((int)(new TimeSpan(frame2.Value.Ticks - frame2.Value.Date.Ticks).TotalSeconds / interval) >
+                                (int)(new TimeSpan(frame1.Value.Ticks - frame1.Value.Date.Ticks).TotalSeconds / interval)) ||
+								(frame2.Value.Date.Ticks > frame1.Value.Date.Ticks) /* Date Change */)
                             {
                                 string label = interval < 60 ? frame2.Value.ToString("HH:mm:ss") : frame2.Value.ToString("HH:mm");
                                 SizeF labelSize = g.MeasureString(label, s_AxisFont);
@@ -621,7 +623,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 								if (m_DisplaySettings.DrawGrid) g.DrawLine(m_DisplaySettings.GridLinesPen, x + 1, m_MinY, x + 1, m_MaxY);
 
-                                if (x + labelSize.Width / 2 < m_MaxX)
+								if (x + labelSize.Width / 2 < m_MaxX - 2 && x - labelSize.Width / 2 > m_MinX) 
                                     g.DrawString(label, s_AxisFont, m_DisplaySettings.LabelsBrush, x - labelSize.Width / 2, y);
                             }
                         }
@@ -725,7 +727,7 @@ namespace Tangra.VideoOperations.LightCurves
 					{
 						if (m_DisplaySettings.DrawGrid) g.DrawLine(m_DisplaySettings.GridLinesPen, x + 1, m_MinY, x + 1, m_MaxY);
 
-                        if (x + labelSize.Width / 2 < m_MaxX)
+						if (x + labelSize.Width / 2 < m_MaxX - 2 && x - labelSize.Width / 2 > m_MinX) 
                             g.DrawString(label, s_AxisFont, m_DisplaySettings.LabelsBrush, x - labelSize.Width / 2, y);
 					}
 				}
@@ -744,16 +746,18 @@ namespace Tangra.VideoOperations.LightCurves
 
                         if (frame1.HasValue && frame2.HasValue)
                         {
-                            if ((int)(new TimeSpan(frame2.Value.Ticks - frame2.Value.Date.Ticks).TotalSeconds/interval) >
-                                (int)(new TimeSpan(frame1.Value.Ticks - frame1.Value.Date.Ticks).TotalSeconds/interval))
+                            if (((int)(new TimeSpan(frame2.Value.Ticks - frame2.Value.Date.Ticks).TotalSeconds/interval) >
+                                (int)(new TimeSpan(frame1.Value.Ticks - frame1.Value.Date.Ticks).TotalSeconds/interval)) ||
+								(frame2.Value.Date.Ticks > frame1.Value.Date.Ticks) /* Date Change */)
                             {
                                 string label = interval < 60 ? frame2.Value.ToString("HH:mm:ss") : frame2.Value.ToString("HH:mm");
                                 SizeF labelSize = g.MeasureString(label, s_AxisFont);
                                 float x = m_MinX + (i + 1 - m_MinDisplayedFrame) * m_ScaleX;
                                 float y = m_MaxY + 5;
 
-                                g.DrawString(label, s_AxisFont, m_DisplaySettings.LabelsBrush, x - labelSize.Width / 2, y);
-								if (m_DisplaySettings.DrawGrid) g.DrawLine(m_DisplaySettings.GridLinesPen, x + 1, m_MinY, x + 1, m_MaxY);                                 
+								if (x + labelSize.Width / 2 < m_MaxX - 2 && x - labelSize.Width / 2 > m_MinX) 
+									g.DrawString(label, s_AxisFont, m_DisplaySettings.LabelsBrush, x - labelSize.Width / 2, y);
+								if (m_DisplaySettings.DrawGrid) g.DrawLine(m_DisplaySettings.GridLinesPen, x + 1, m_MinY, x + 1, m_MaxY);
                             }
                         }
 
