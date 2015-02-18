@@ -42,6 +42,19 @@ namespace Tangra.VideoOperations
 		{
 			lock(s_SyncRoot)
 			{
+				if (s_FullPreviewForm != null)
+				{
+					try
+					{
+						// This will test if the form has been disposed
+						if (!s_FullPreviewForm.Visible && s_FullPreviewForm.Handle == IntPtr.Zero)
+							s_FullPreviewForm = null;
+					}
+					catch(ObjectDisposedException)
+					{
+						s_FullPreviewForm = null;
+					}
+				}
 				if (s_FullPreviewForm == null)
 				{
 					s_FullPreviewForm = new frmFullSizePreview();
