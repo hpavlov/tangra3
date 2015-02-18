@@ -354,6 +354,24 @@ namespace Tangra.VideoOperations.LightCurves
 
                 if (m_Measuring)
                 {
+					if (!m_Tracker.IsTrackedSuccessfully &&
+						 LightCurveReductionContext.Instance.StopOnLostTracking)
+					{
+						m_ControlPanel.StopMeasurements(ucLightCurves.StopReason.LostTracking);
+
+						if (TangraConfig.Settings.Tracking.PlaySound)
+							Console.Beep(800, 750);
+
+						if (TangraConfig.Settings.Tracking.PopUpOnLostTracking)
+							m_VideoController.ShowMessageBox(
+								"Use the mouse to pan the object apertures back to the object location and press 'Continue' to continue with the measurements. You can also do adjustments to the objects individually or skip the frame all together.",
+								"Tracking has been lost",
+								MessageBoxButtons.OK,
+								MessageBoxIcon.Exclamation);
+
+						return;
+					}
+
                     m_ProcessedFrames++;
                     if (!m_Tracker.IsTrackedSuccessfully) m_UnsuccessfulFrames++;
 	                if (m_Tracker.IsTrackedSuccessfully && m_Tracker.TrackedObjects.Any(x => !x.IsLocated))
@@ -368,24 +386,6 @@ namespace Tangra.VideoOperations.LightCurves
                     m_StopWatch.Stop();
                     m_ControlPanel.UpdateProcessedFrames(m_ProcessedFrames, m_UnsuccessfulFrames, m_PartiallySuccessfulFrames, (int)(m_StopWatch.ElapsedMilliseconds / 1000));
                     m_StopWatch.Start();
-
-                    if (!m_Tracker.IsTrackedSuccessfully &&
-                         LightCurveReductionContext.Instance.StopOnLostTracking)
-                    {
-                        m_ControlPanel.StopMeasurements();
-
-                        if (TangraConfig.Settings.Tracking.PlaySound)
-                            Console.Beep(800, 750);
-
-						if (TangraConfig.Settings.Tracking.PopUpOnLostTracking)
-							m_VideoController.ShowMessageBox(
-								"Use the mouse to pan the object apertures back to the object location and press 'Continue' to continue with the measurements. You can also do adjustments to the objects individually or skip the frame all together.",
-								"Tracking has been lost",
-								MessageBoxButtons.OK, 
-								MessageBoxIcon.Exclamation);
-
-                        return;
-                    }
                 }
             }
 			else if (m_ViewingLightCurve && m_LightCurveController.LcFile != null)
@@ -417,7 +417,7 @@ namespace Tangra.VideoOperations.LightCurves
                 }
                 else if (m_Measuring)
                 {
-                    m_ControlPanel.StopMeasurements();
+                    m_ControlPanel.StopMeasurements(ucLightCurves.StopReason.EndOfFile);
 
                     if (TangraConfig.Settings.Tracking.PlaySound)
                         Console.Beep();

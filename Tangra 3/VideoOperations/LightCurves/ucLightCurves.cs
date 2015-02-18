@@ -262,12 +262,20 @@ namespace Tangra.VideoOperations.LightCurves
 			}
         }
 
-        public void StopMeasurements()
+		public enum StopReason
+		{
+			User,
+			LostTracking,
+			EndOfFile
+		}
+
+        public void StopMeasurements(StopReason reason)
         {
 			 m_StateMachine.VideoOperation.StopMeasurements((correctTrackingTool) =>
 				{
 					m_CorrectTrackingTool = correctTrackingTool;
 					m_StoppedAtFrameNo = m_StateMachine.VideoOperation.m_CurrFrameNo;
+					m_StopReason = reason;
 
 					btnStop.Text = "Continue Measurements";
 
@@ -598,11 +606,19 @@ namespace Tangra.VideoOperations.LightCurves
         }
 
         private int m_StoppedAtFrameNo = -1;
+	    private StopReason m_StopReason;
+
         private void btnStop_Click(object sender, EventArgs e)
         {
 			if (m_StoppedAtFrameNo != -1)
 			{
-				m_StateMachine.VideoOperation.ContinueMeasurements(m_StoppedAtFrameNo);
+				 // NOTE: If this was a manual correction of lost tracking we should continue from the previous frame (to correct the tracking and do a measurement)
+				 //       Otherwise continue from the stopped frame
+				int continueFromFrame = m_StopReason == StopReason.LostTracking
+					                        ? m_StoppedAtFrameNo - 1
+					                        : m_StoppedAtFrameNo;
+
+				m_StateMachine.VideoOperation.ContinueMeasurements(continueFromFrame);
 				m_StoppedAtFrameNo = -1;
 				btnStop.Text = "Stop";
 				
@@ -619,7 +635,7 @@ namespace Tangra.VideoOperations.LightCurves
 				}
 				else
 				{
-					StopMeasurements();
+					StopMeasurements(StopReason.User);
 				}
 			}
         }
