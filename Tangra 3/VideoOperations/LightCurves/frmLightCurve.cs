@@ -336,7 +336,7 @@ namespace Tangra.VideoOperations.LightCurves
                     string videoSystem;
                     double timeDelta = m_Header.GetAbsoluteTimeDeltaInMilliseconds(out videoSystem);
 
-                    m_TimestampDiscrepencyFlag = timeDelta > TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMs;
+                    m_TimestampDiscrepencyFlag = Math.Abs(timeDelta) > TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMs;
 
                     if (m_TimestampDiscrepencyFlag)
                     {
@@ -353,10 +353,14 @@ namespace Tangra.VideoOperations.LightCurves
                         {
                             if (m_LCFile.Header.GetVideoFileFormat() != VideoFileFormat.SER)
                             {
+	                            string extraMessage = timeDelta < 0 
+									? "This may indicate that video frames have been duplicated by the recording software. " 
+									: "This may indicate that video frames have been dropped by the recording software. ";
+
                                 MessageBox.Show(this,
                                                 string.Format(
-                                                    "The time derived from entered frame times in this {1} video shows an error higher than {0} ms.\r\n\r\nPlease use the timestamps on the corresponding video frames when timing events from this video."
-                                                    , timeDelta.ToString("0.0"), videoSystem),
+                                                    "The time derived from entered frame times in this {1} video shows an error of {0} ms.\r\n\r\n{2}\r\n\r\nPlease use the timestamps on the corresponding video frames when timing events from this video."
+                                                    , timeDelta.ToString("0.0"), videoSystem, extraMessage),
                                                 "Warning",
                                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
                             }

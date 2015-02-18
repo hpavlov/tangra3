@@ -646,7 +646,7 @@ namespace Tangra.VideoOperations.LightCurves
 
             string videoSystem;
             double absoluteTimeError = m_TimestampDiscrepencyFlag
-                                           ? m_Header.GetAbsoluteTimeDeltaInMilliseconds(out videoSystem)
+                                           ? Math.Abs(m_Header.GetAbsoluteTimeDeltaInMilliseconds(out videoSystem))
                                            : 0;
 
 			uint objCount = m_Header.ObjectCount;

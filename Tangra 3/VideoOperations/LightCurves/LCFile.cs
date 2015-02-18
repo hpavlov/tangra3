@@ -1158,7 +1158,7 @@ namespace Tangra.VideoOperations.LightCurves
             }
 
             double videoTimeInSec = (LastTimedFrameNo - FirstTimedFrameNo) / assumedFrameRate;
-            return Math.Abs(videoTimeInSec - totalTimeStapmedTime.TotalSeconds) * 1000;
+			return (totalTimeStapmedTime.TotalSeconds - videoTimeInSec) * 1000;
         }
 
         internal bool DoesTimeStampDerivedTimeMatchStandardFrameRate(out string videoSystem, out double derivedFrameRate)
