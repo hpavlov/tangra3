@@ -105,6 +105,8 @@ namespace Tangra.VideoOperations.LightCurves
 
 	    private TangraConfig.LightCurvesDisplaySettings m_DisplaySettings;
 
+		private Panel m_ControlPanelHolder;
+
 		public ReduceLightCurveOperation()
 		{
 			Debug.Assert(false, "This constructor should not be called.");
@@ -152,6 +154,7 @@ namespace Tangra.VideoOperations.LightCurves
 			m_NumberFailedOcredVtiOsdFrames = 0;
 
             m_VideoController = (VideoController)videoContoller;
+	        m_ControlPanelHolder = controlPanel;
 
 			var configForm = new frmSelectReductionType(m_VideoController, framePlayer);
             if (configForm.ShowDialog(topForm) == DialogResult.OK)
@@ -1800,12 +1803,12 @@ namespace Tangra.VideoOperations.LightCurves
 			return DialogResult.OK;			
 		}
 
-		internal void EnterViewLightCurveMode(LCFile lcFile, IVideoController videoController, Panel controlPanel)
+		internal void EnterViewLightCurveMode(LCFile lcFile, IVideoController videoController)
 		{
 			// TODO: This method needs to be called from somewhere else
 
 			m_VideoController = (VideoController)videoController;
-			EnsureControlPanel(controlPanel);
+			EnsureControlPanel(m_ControlPanelHolder);
 
 			m_LightCurveController.SetLcFile(lcFile);
 

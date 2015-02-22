@@ -21,7 +21,7 @@ namespace Tangra.Model.VideoOperations
 		void UpdateViews();
         
 		void RefreshCurrentFrame();
-	    void RedrawCurrentFrame(bool showFields);
+	    void RedrawCurrentFrame(bool showFields, bool reloadImage = false);
         void ToggleShowFieldsMode(bool showFields);
 
 		void UpdateZoomedImage(Bitmap zoomedBitmap, ImagePixel center);
@@ -36,7 +36,7 @@ namespace Tangra.Model.VideoOperations
 		int VideoFirstFrame { get; }
 		int VideoLastFrame { get; }
 
-		void PlayVideo(int? startAtFrame = null);
+		void PlayVideo(int? startAtFrame = null, uint step = 1);
 	    void StopVideo(Action<int, bool> callback = null);
 	    void MoveToFrame(int frameId);
 	    void StepForward();

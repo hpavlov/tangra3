@@ -34,7 +34,7 @@ namespace Tangra.View
 			if (imageTool != null &&
 				m_VideoController != null)
 			{
-				m_VideoController.DisplayCursorImageCoordinates(new Point(imageTool.MouseX, imageTool.MouseY));
+				m_VideoController.DisplayCursorPositionDetails(new Point(imageTool.MouseX, imageTool.MouseY));
 			}
 		}
 

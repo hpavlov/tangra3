@@ -68,7 +68,7 @@ namespace Tangra.Config.SettingPannels
 
 		private void UpdateControlState()
 		{
-			pnlEnterGammaValue.Enabled = cbxGammaTheFullFrame.Checked;			
+			pnlEnterGammaValue.Enabled = cbxGammaTheFullFrame.Checked;
 		}
 
 		public override void Reset()

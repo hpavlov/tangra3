@@ -38,14 +38,14 @@ using Cursor = System.Windows.Forms.Cursor;
 
 namespace Tangra.Controller
 {
-    public class VideoController : IDisposable, IVideoFrameRenderer, IVideoController
+	public class VideoController : IDisposable, IVideoFrameRenderer, IVideoController, IImagePixelProvider
 	{
 		private VideoFileView m_VideoFileView;
         private ZoomedImageView m_ZoomedImageView;
 	    private ImageToolView m_ImageToolView;
 
 		private Form m_MainFormView;
-	    internal Panel m_pnlControlerPanel;
+	    private Panel m_pnlControlerPanel;
 
 		private IFramePlayer m_FramePlayer;
 
@@ -535,8 +535,15 @@ namespace Tangra.Controller
             if (m_CurrentOperation != null)
                 m_CurrentOperation.PreDraw(g);
 
+			if (m_ImageTool != null)
+				m_ImageTool.PreDraw(g);
+
+
             if (m_CurrentOperation != null)
-                m_CurrentOperation.PostDraw(g);			
+                m_CurrentOperation.PostDraw(g);
+
+	        if (m_ImageTool != null)
+		        m_ImageTool.PostDraw(g);
         }
 
         public bool m_ShowFields;
@@ -547,7 +554,7 @@ namespace Tangra.Controller
             RedrawCurrentFrame(m_ShowFields);
         }
 
-		public void RedrawCurrentFrame(bool showFields)
+		public void RedrawCurrentFrame(bool showFields, bool reloadImage = false)
 		{
             if (m_AstroImage != null &&
                 m_AstroImage.Pixelmap != null)
@@ -560,7 +567,11 @@ namespace Tangra.Controller
                         m_MainForm.pictureBox.Image = pixelMapWithFields;
                     }
                 }
-                else
+				else if (reloadImage)
+				{
+					m_MainForm.pictureBox.Image = m_AstroImage.Pixelmap.CreateNewDisplayBitmap();
+				}
+				else
                     m_MainForm.pictureBox.Image = m_AstroImage.Pixelmap.DisplayBitmap;
             }
 
@@ -574,6 +585,25 @@ namespace Tangra.Controller
 			}
 
 			m_MainForm.pictureBox.Refresh();
+		}
+
+		internal void OverwriteCurrentFrame(Bitmap newBmp)
+		{
+			if (m_MainForm != null &&
+				m_MainForm.pictureBox != null)
+			{
+				m_MainForm.pictureBox.Image = newBmp;
+				m_MainForm.pictureBox.Invalidate();
+			}
+		}
+
+		public void InvalidatePictureBox()
+		{
+			if (m_MainForm != null &&
+			    m_MainForm.pictureBox != null)
+			{
+				m_MainForm.pictureBox.Invalidate();
+			}
 		}
 
 		public bool IsRunning
@@ -765,9 +795,9 @@ namespace Tangra.Controller
 			m_FramePlayer.StepForward(seconds);
 		}
 
-		public void PlayVideo(int? startAtFrame = null)
+		public void PlayVideo(int? startAtFrame = null, uint step = 1)
 		{
-			m_FramePlayer.Start(FramePlaySpeed.Fastest, startAtFrame, 1);
+			m_FramePlayer.Start(FramePlaySpeed.Fastest, startAtFrame, step);
 
 			m_VideoFileView.Update();
 		}
@@ -865,10 +895,21 @@ namespace Tangra.Controller
 	        ZoomedCenter = null;
         }
 
+		internal void ClearControlPanel()
+		{
+			m_pnlControlerPanel.Controls.Clear();
+		}
+
 		internal void SetPictureBoxCursor(Cursor cursor)
 		{
 			if (m_MainForm != null)
 				m_MainForm.pictureBox.Cursor = cursor;
+		}
+
+		internal void SetCursor(Cursor cursor)
+		{
+			if (m_MainForm != null)
+				m_MainForm.Cursor = cursor;
 		}
 
         public AstroImage GetCurrentAstroImage(bool integrated)
@@ -881,9 +922,11 @@ namespace Tangra.Controller
                 return new AstroImage(image);
             }
             else
-                // Don't integrate if the wind or shaking flag is set. Faint stars are unlikely to be seen anyway 
-                // with integration in a case of a good shake
-                return m_AstroImage;          
+			{
+				// Don't integrate if the wind or shaking flag is set. Faint stars are unlikely to be seen anyway 
+				// with integration in a case of a good shake
+				return m_AstroImage;
+			};
         }
 
 		internal Pixelmap GetFrame(int frameId)
@@ -1776,6 +1819,11 @@ namespace Tangra.Controller
 			return rv;
 		}
 
+		public void ShowTangraSettingsDialog(bool showCatalogRequiredHint, bool showLocationRequiredHint)
+		{
+			m_MainForm.ShowSettings(showCatalogRequiredHint, showLocationRequiredHint);
+		}
+
         internal delegate T SetFITSDataDelegate<T>(uint clr);
 
         private T[][] SaveImageData<T>(Pixelmap pixelmap, SetFITSDataDelegate<T> setValue)
@@ -1912,8 +1960,11 @@ namespace Tangra.Controller
 			return new Point(0, 0);
 		}
 
-		internal void DisplayCursorImageCoordinates(Point imagePos)
+		internal void DisplayCursorPositionDetails(Point imagePos, string moreInfo = null)
 		{
+			bool hintVisible = false;
+			string hint = string.Empty;
+
 			if (TangraConfig.Settings.Generic.ShowCursorPosition &&
 				imagePos.X >= 0 &&
 				imagePos.Y >= 0)
@@ -1921,20 +1972,87 @@ namespace Tangra.Controller
 				if (m_AstroImage != null)
 				{
 					uint pixval = m_AstroImage.GetPixel(imagePos.X, imagePos.Y);
-					m_MainForm.ssMoreInfo.Text = string.Format("({0}, {1})={2}", imagePos.X, imagePos.Y, pixval);
-					m_MainForm.ssMoreInfo.Visible = true;
+					hint = string.Format("({0}, {1})={2}", imagePos.X, imagePos.Y, pixval);
+					hintVisible = true;
 				}
 				else
 				{
-					m_MainForm.ssMoreInfo.Text = string.Format("X={0} Y={1}", imagePos.X, imagePos.Y);
-					m_MainForm.ssMoreInfo.Visible = true;
+					hint = string.Format("X={0} Y={1}", imagePos.X, imagePos.Y);
+					hintVisible = true;
 				}
 				
 			}
-			else
+			
+			if (!string.IsNullOrEmpty(moreInfo))
 			{
-				m_MainForm.ssMoreInfo.Visible = false;
+				hint = hint.TrimEnd(' ') + " " + moreInfo;
+				hintVisible = true;
 			}
+			
+			m_MainForm.ssMoreInfo.Visible = hintVisible;
+			if (hintVisible)
+				m_MainForm.ssMoreInfo.Text = hint;
 		}
-    }
+
+		internal void ChangeImageTool(ImageTool newTool)
+		{
+			ImageTool oldImageTool = m_ImageTool;
+
+			m_ImageTool = newTool;
+			if (!m_ImageTool.TrySwitchTo(m_CurrentOperation, m_ImageToolView, oldImageTool))
+			{
+				m_ImageTool = oldImageTool;
+			}
+
+			//HandleToolSelection();
+		}
+
+		internal ImageTool CurrentImageTool 
+		{
+			get { return m_ImageTool; }
+		}
+
+		int IImagePixelProvider.Width
+		{
+			get { return m_FramePlayer.Video.Width; }
+		}
+
+		int IImagePixelProvider.Height
+		{
+			get { return m_FramePlayer.Video.Height; }
+		}
+
+		int IImagePixelProvider.LastFrame
+		{
+			get { return m_FramePlayer.Video.LastFrame; }
+		}
+
+		int[,] IImagePixelProvider.GetPixelArray(int frameNo, Rectangle rect)
+		{
+			if (rect.Width != 32 || rect.Height != 32)
+				throw new NotSupportedException();
+
+			int[,] rv = new int[32, 32];
+
+			Pixelmap pixelmap = m_FramePlayer.GetFrame(frameNo, true);
+
+			for (int x = 0; x < 32; x++)
+			for (int y = 0; y < 32; y++)
+			{
+				rv[x, y] = (int)pixelmap.Pixels[(x + rect.Left) + (y + rect.Top) * pixelmap.Width];
+			}
+
+			return rv;
+		}
+
+		public void SetFlipSettings(bool flipVertically, bool flipHorizontally, bool rotate180)
+		{
+			m_FramePlayer.SetFlipSettings(flipVertically, flipHorizontally, rotate180);
+		}
+
+		public void SetBorderClip(int pixelsToClip)
+		{
+			m_FramePlayer.SetBorderClip(pixelsToClip);
+		}
+	}
 }

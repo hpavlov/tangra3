@@ -81,6 +81,7 @@ namespace Tangra.View
 
 
 			m_MainForm.miReduceLightCurve.Enabled = TangraContext.Current.HasAnyFileLoaded;
+			m_MainForm.miAstrometry.Enabled = TangraContext.Current.HasAnyFileLoaded;
 			m_MainForm.miMakeDarkFlat.Enabled = TangraContext.Current.HasAnyFileLoaded;
 
 			m_MainForm.miLoadDark.Enabled = TangraContext.Current.HasAnyFileLoaded && TangraContext.Current.CanLoadDarkFrame;

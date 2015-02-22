@@ -367,6 +367,11 @@ namespace Tangra.Video
             get { return string.Format("{0}.{1}", m_Engine, BitPix); }
 		}
 
+		public Rectangle VideoFrameSize
+		{
+			get { return new Rectangle(0, 0, Width, Height); }
+		}
+
 		public string CameraModel
 		{
 			get { return m_CameraModel; }

@@ -103,7 +103,8 @@ namespace Tangra.Config.SettingPannels
 			this.cbxOnOpenOperation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.cbxOnOpenOperation.Items.AddRange(new object[] {
             "Do nothing",
-            "Reduce a light curve"});
+            "Reduce a light curve",
+            "Run astrometry"});
 			this.cbxOnOpenOperation.Location = new System.Drawing.Point(6, 19);
 			this.cbxOnOpenOperation.Name = "cbxOnOpenOperation";
 			this.cbxOnOpenOperation.Size = new System.Drawing.Size(193, 21);

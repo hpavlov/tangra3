@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using Tangra.Model.Astro;
 using Tangra.Model.Image;
 
 namespace Tangra.Model.Context

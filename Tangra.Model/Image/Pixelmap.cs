@@ -12,7 +12,7 @@ namespace Tangra.Model.Image
 {
 	public class Pixelmap : IDisposable
 	{
-        private uint m_MaxPixelValue;
+        private uint? m_MaxPixelValue;
         private int m_BitPix = 8;
 
 		private uint[] m_Pixels;
@@ -25,7 +25,7 @@ namespace Tangra.Model.Image
 		{
 		    Width = width;
 			Height = height;
-			m_BitPix = bitPix;
+			BitPixCamera = bitPix;
 			m_Pixels = pixels;			
             m_DisplayBitmapPixels = displayBitmapBytes;			
 			if (bmp != null && bmp.PixelFormat != PixelFormat.Format24bppRgb)
@@ -53,7 +53,7 @@ namespace Tangra.Model.Image
 		{
 			Width = cloneFrom.Width;
 			Height = cloneFrom.Height;
-			m_BitPix = cloneFrom.m_BitPix;
+			BitPixCamera = cloneFrom.m_BitPix;
 			m_Pixels = cloneFrom.m_Pixels;			
 			m_DisplayBitmapPixels = cloneFrom.m_DisplayBitmapPixels;
 			try
@@ -95,7 +95,16 @@ namespace Tangra.Model.Image
                 return uint.MaxValue;
         }
 
-        public uint MaxPixelValue { get { return m_MaxPixelValue; } }
+		public uint MaxPixelValue
+		{
+			get
+			{
+				if (!m_MaxPixelValue.HasValue)
+					m_MaxPixelValue = GetMaxValueForBitPix(m_BitPix);
+
+				return m_MaxPixelValue.Value;
+			}
+		}
 
         public uint this[int x, int y]
         {

@@ -36,6 +36,7 @@
 			this.miShowFields = new System.Windows.Forms.ToolStripMenuItem();
 			this.miTasks = new System.Windows.Forms.ToolStripMenuItem();
 			this.miReduceLightCurve = new System.Windows.Forms.ToolStripMenuItem();
+			this.miAstrometry = new System.Windows.Forms.ToolStripMenuItem();
 			this.miMakeDarkFlat = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
 			this.miLoadDark = new System.Windows.Forms.ToolStripMenuItem();
@@ -82,6 +83,7 @@
 			this.pnlControlerPanel = new System.Windows.Forms.Panel();
 			this.zoomedImage = new System.Windows.Forms.PictureBox();
 			this.panelVideo = new System.Windows.Forms.Panel();
+			this.pictureBox = new Tangra.Controls.ImagePanel();
 			this.pnlPlayControls = new System.Windows.Forms.Panel();
 			this.pnlPlayButtons = new System.Windows.Forms.Panel();
 			this.btnJumpTo = new System.Windows.Forms.Button();
@@ -99,7 +101,6 @@
 			this.openAdvFileDialog = new System.Windows.Forms.OpenFileDialog();
 			this.saveFrameDialog = new System.Windows.Forms.SaveFileDialog();
 			this.timerCommandArgs = new System.Windows.Forms.Timer(this.components);
-			this.pictureBox = new Tangra.Controls.ImagePanel();
 			this.mainMenu.SuspendLayout();
 			this.statusStrip.SuspendLayout();
 			this.panelRight.SuspendLayout();
@@ -248,6 +249,7 @@
 			// 
 			this.miTasks.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.miReduceLightCurve,
+            this.miAstrometry,
             this.miMakeDarkFlat,
             this.toolStripMenuItem3,
             this.miLoadDark,
@@ -263,6 +265,14 @@
 			this.miReduceLightCurve.Text = "&Light Curve Reduction";
 			this.miReduceLightCurve.Click += new System.EventHandler(this.miReduceLightCurve_Click);
 			this.miReduceLightCurve.MouseDown += new System.Windows.Forms.MouseEventHandler(this.miReduceLightCurve_MouseDown);
+			// 
+			// miAstrometry
+			// 
+			this.miAstrometry.Name = "miAstrometry";
+			this.miAstrometry.Size = new System.Drawing.Size(217, 22);
+			this.miAstrometry.Text = "&Astrometry";
+			this.miAstrometry.Click += new System.EventHandler(this.miAstrometry_Click);
+			this.miAstrometry.MouseDown += new System.Windows.Forms.MouseEventHandler(this.miAstrometry_MouseDown);
 			// 
 			// miMakeDarkFlat
 			// 
@@ -672,6 +682,27 @@
 			this.panelVideo.Size = new System.Drawing.Size(607, 570);
 			this.panelVideo.TabIndex = 4;
 			// 
+			// pictureBox
+			// 
+			this.pictureBox.AllowDrop = true;
+			this.pictureBox.BackColor = System.Drawing.SystemColors.ControlDark;
+			this.pictureBox.CanvasSize = new System.Drawing.Size(60, 40);
+			this.pictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.pictureBox.Image = null;
+			this.pictureBox.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
+			this.pictureBox.Location = new System.Drawing.Point(0, 0);
+			this.pictureBox.Name = "pictureBox";
+			this.pictureBox.Size = new System.Drawing.Size(607, 503);
+			this.pictureBox.TabIndex = 2;
+			this.pictureBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragDrop);
+			this.pictureBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragEnter);
+			this.pictureBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseClick);
+			this.pictureBox.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDoubleClick);
+			this.pictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDown);
+			this.pictureBox.MouseLeave += new System.EventHandler(this.pictureBox_MouseLeave);
+			this.pictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseMove);
+			this.pictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseUp);
+			// 
 			// pnlPlayControls
 			// 
 			this.pnlPlayControls.Controls.Add(this.pnlPlayButtons);
@@ -829,27 +860,6 @@
 			// 
 			this.timerCommandArgs.Tick += new System.EventHandler(this.timerCommandArgs_Tick);
 			// 
-			// pictureBox
-			// 
-			this.pictureBox.AllowDrop = true;
-			this.pictureBox.BackColor = System.Drawing.SystemColors.ControlDark;
-			this.pictureBox.CanvasSize = new System.Drawing.Size(60, 40);
-			this.pictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.pictureBox.Image = null;
-			this.pictureBox.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
-			this.pictureBox.Location = new System.Drawing.Point(0, 0);
-			this.pictureBox.Name = "pictureBox";
-			this.pictureBox.Size = new System.Drawing.Size(607, 503);
-			this.pictureBox.TabIndex = 2;
-			this.pictureBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragDrop);
-			this.pictureBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragEnter);
-			this.pictureBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseClick);
-			this.pictureBox.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDoubleClick);
-			this.pictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDown);
-			this.pictureBox.MouseLeave += new System.EventHandler(this.pictureBox_MouseLeave);
-			this.pictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseMove);
-			this.pictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseUp);
-			// 
 			// frmMain
 			// 
 			this.AllowDrop = true;
@@ -971,7 +981,8 @@
 		private System.Windows.Forms.ToolStripMenuItem miOpenFitsSequence;
 		protected internal System.Windows.Forms.ToolStripMenuItem tsmiDynamic;
 		private System.Windows.Forms.ToolStripMenuItem miCallForContributions;
-        private System.Windows.Forms.ToolStripMenuItem miYahooGroup;
+		private System.Windows.Forms.ToolStripMenuItem miYahooGroup;
+		protected internal System.Windows.Forms.ToolStripMenuItem miAstrometry;
 	}
 }
 

@@ -87,6 +87,9 @@ namespace Tangra.Model.ImageTools
         public virtual void MouseDoubleClick(Point location) { }
         public virtual void OnNewFrame(int currentFrameIndex, bool isLastFrame) { }
 
+		public virtual void PreDraw(Graphics g) { }
+		public virtual void PostDraw(Graphics g) { }
+
         public virtual ZoomImageBehaviour ZoomBehaviour
         {
             get { return ZoomImageBehaviour.DisplayCentroid; }

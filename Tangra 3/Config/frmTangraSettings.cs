@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using Tangra.Astrometry.Recognition;
 using Tangra.Config.SettingPannels;
 using Tangra.Controller;
 using Tangra.Helpers;
@@ -30,7 +31,10 @@ namespace Tangra.Config
 		private IAddinContainer[] m_AddinContainers;
 	    private AddinsController m_AddinsController;
 
+		private ucStarCatalogues m_ucStarCatalogues;
+
 		public bool ShowCatalogRequiredHint = false;
+		public bool ShowLocationRequiredHint = false;
 
 		public frmTangraSettings(
             ILightCurveFormCustomizer lightCurveCustomizer, 
@@ -79,18 +83,23 @@ namespace Tangra.Config
 
 			m_PropertyPages.Add(4, new ucPhotometry());
 
+			m_PropertyPages.Add(13, new ucAstrometry());
+			m_ucStarCatalogues = new ucStarCatalogues(false);
+			m_PropertyPages.Add(14, m_ucStarCatalogues);
+
 			m_PropertyPages.Add(6, new ucTracking());
 
 #if WIN32
             m_PropertyPages.Add(8, new ucCompatibility());
 #else
-            tvSettings.Nodes.RemoveAt(5);
+			tvSettings.Nodes.RemoveByKey("ndCompatibility");
 #endif
 
             m_PropertyPages.Add(12, new ucAddins(m_AddinsController, m_AddinContainers));
 
 			m_PropertyPages.Add(7, new ucCustomizeLightCurves());
 			m_PropertyPages.Add(9, new ucCustomizeLightCurveViewer());
+			m_PropertyPages.Add(15, new ucCustomizeAstrometry());
 		}
 
 		private void SetFormTitle(TreeNode currentNode)
@@ -156,7 +165,41 @@ namespace Tangra.Config
 
 		private void frmTangraSettings2_Load(object sender, EventArgs e)
 		{
-			tvSettings.SelectedNode = tvSettings.Nodes["ndGeneral"];
+			if (ShowCatalogRequiredHint)
+			{
+				tvSettings.SelectedNode = tvSettings.Nodes["ndCatalogues"];
+
+				if (TangraConfig.Settings.StarCatalogue.Catalog == TangraConfig.StarCatalog.NotSpecified)
+				{
+					MessageBox.Show("Star catalog is required for calibration and astrometry.", "Star Catalog Required", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					m_ucStarCatalogues.cbxCatalogue.Focus();
+				}
+				else
+				{
+					var catalogValidator = new StarCatalogueFacade(TangraConfig.Settings.StarCatalogue);
+
+					if (!catalogValidator.VerifyCurrentCatalogue(TangraConfig.Settings.StarCatalogue.Catalog, ref TangraConfig.Settings.StarCatalogue.CatalogLocation))
+					{
+						tvSettings.SelectedNode = tvSettings.Nodes["ndCatalogues"];
+
+						MessageBox.Show("The current star catalog location is invalid.", "Star Catalog Invalid", MessageBoxButtons.OK, MessageBoxIcon.Error);
+						m_ucStarCatalogues.tbxCatalogueLocation.Focus();
+						m_ucStarCatalogues.tbxCatalogueLocation.SelectAll();
+
+					}
+				}
+			}
+			else if (ShowLocationRequiredHint)
+			{
+				MessageBox.Show(
+					this,
+					"Please enter your site location or MPC observatory code",
+					"Information Required", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+				tvSettings.SelectedNode = tvSettings.Nodes["ndCatalogues"];
+			}
+			else
+				tvSettings.SelectedNode = tvSettings.Nodes["ndGeneral"];
 		}
 
 		private void btnOK_Click(object sender, EventArgs e)

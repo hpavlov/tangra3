@@ -18,6 +18,7 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
 using Tangra.Addins;
+using Tangra.Astrometry.Recognition;
 using Tangra.Config;
 using Tangra.Controller;
 using Tangra.Helpers;
@@ -33,6 +34,8 @@ using Tangra.Properties;
 using Tangra.SDK;
 using Tangra.Video;
 using Tangra.Video.AstroDigitalVideo;
+using Tangra.VideoOperations.Astrometry;
+using Tangra.VideoOperations.Astrometry.Engine;
 using Tangra.VideoOperations.LightCurves;
 using Tangra.VideoOperations.MakeDarkFlatField;
 using Tangra.VideoTools;
@@ -46,6 +49,7 @@ namespace Tangra
 	{
 		private VideoController m_VideoController;
 	    private LightCurveController m_LightCurveController;
+		private AstrometryController m_AstrometryController;
 		private DarkFlatFrameController m_MakeDarkFlatController;
 		private AutoUpdatesController m_AutoUpdatesController;
 		private AddinsController m_AddinsController;
@@ -54,6 +58,8 @@ namespace Tangra
 		private ImageToolView m_ImageToolView;
         private ZoomedImageView m_ZoomedImageView;
 		private bool m_FormLoaded = false;
+
+		private LongOperationsManager m_LongOperationsManager;
 
 		public frmMain()
 		{
@@ -68,8 +74,11 @@ namespace Tangra
 			m_VideoController = new VideoController(this, m_VideoFileView, m_ZoomedImageView, m_ImageToolView, pnlControlerPanel);
 			m_AddinsController = new AddinsController(this, m_VideoController);
 
+			m_LongOperationsManager = new LongOperationsManager(this, m_VideoController);
+
 			m_LightCurveController = new LightCurveController(this, m_VideoController, m_AddinsController);
 			m_MakeDarkFlatController = new DarkFlatFrameController(this, m_VideoController);
+			m_AstrometryController = new AstrometryController(m_VideoController, m_LongOperationsManager);
 			m_AutoUpdatesController = new AutoUpdatesController(this, m_VideoController);
 
 			NotificationManager.Instance.SetVideoController(m_VideoController);
@@ -333,7 +342,7 @@ namespace Tangra
                 g.Save();
             }
 
-			m_VideoController.ApplyDisplayModeAdjustments(m_VideoContext.Pixelmap.DisplayBitmap, true, m_VideoContext.Pixelmap);	
+			m_VideoController.ApplyDisplayModeAdjustments(m_VideoContext.Pixelmap.DisplayBitmap, true, m_VideoContext.Pixelmap);
 		}
 
 		#endregion
@@ -415,6 +424,13 @@ namespace Tangra
 					return true;
 				}
             }
+			else if (TangraConfig.Settings.Generic.OnOpenOperation == TangraConfig.OnOpenOperation.Astrometry)
+			{
+				return StartAstrometry(false);
+			}
+
+			// NOTE: If no operation is selected, then set the default Arrow tool
+			m_VideoController.SelectImageTool<ArrowTool>();
 
             return false;
         }
@@ -437,8 +453,7 @@ namespace Tangra
 					{
 						if (runDefaultAction && !SelectVideoOperation())
 						{
-							// NOTE: If no operation is selected, then set the default Arrow tool
-							m_VideoController.SelectImageTool<ArrowTool>();
+							// User cancelled astrometry
 						}
 					}
 				}
@@ -480,19 +495,26 @@ namespace Tangra
 
 		private void miSettings_Click(object sender, EventArgs e)
 		{
+			ShowSettings(false);
+		}
+
+		internal void ShowSettings(bool showCatalogRequiredHint = false, bool showLocationRequiredHint = false)
+		{
 			IAddinContainer lightCurveAddinContainer = m_LightCurveController.LightCurveFormAddinContainer;
 			IAddinContainer[] addinContainers = lightCurveAddinContainer != null
-				    ? new IAddinContainer[] {lightCurveAddinContainer}
-				    : new IAddinContainer[] {};
+					? new IAddinContainer[] { lightCurveAddinContainer }
+					: new IAddinContainer[] { };
 
 			var frmSettings = new frmTangraSettings(
-                null, 
-                m_VideoController.AdvStatusPopupFormCustomizer, 
-                m_VideoController.AavStatusPopupFormCustomizer,
-                m_AddinsController,
+				null,
+				m_VideoController.AdvStatusPopupFormCustomizer,
+				m_VideoController.AavStatusPopupFormCustomizer,
+				m_AddinsController,
 				addinContainers);
 
 			frmSettings.StartPosition = FormStartPosition.CenterParent;
+			frmSettings.ShowCatalogRequiredHint = showCatalogRequiredHint;
+			frmSettings.ShowLocationRequiredHint = showLocationRequiredHint;
 			if (frmSettings.ShowDialog(this) == DialogResult.OK)
 			{
 				m_VideoController.RefreshCurrentFrame();
@@ -628,7 +650,7 @@ namespace Tangra
         {
             miRecentVideos.DropDownItems.Clear();
 
-            foreach (string recentFilePath in TangraConfig.Settings.RecentFiles.Lists[(int)RecentFileType.Video])
+            foreach (string recentFilePath in TangraConfig.Settings.RecentFiles.Lists[RecentFileType.Video])
             {
                 if (File.Exists(recentFilePath))
                 {
@@ -642,7 +664,7 @@ namespace Tangra
 
 			miRecentLightCurves.DropDownItems.Clear();
 
-			foreach (string recentFilePath in TangraConfig.Settings.RecentFiles.Lists[(int)RecentFileType.LightCurve])
+			foreach (string recentFilePath in TangraConfig.Settings.RecentFiles.Lists[RecentFileType.LightCurve])
 			{
 				if (File.Exists(recentFilePath))
 				{
@@ -966,11 +988,7 @@ namespace Tangra
                 {
 					TangraConfig.Settings.LastUsed.FitsSeqenceLastFolderLocation = frm.tbxFolderPath.Text;
 
-					if (!SelectVideoOperation())
-					{
-						// NOTE: If no operation is selected, then set the default Arrow tool
-						m_VideoController.SelectImageTool<ArrowTool>();
-					}
+	                SelectVideoOperation();
                 }
             }
         }
@@ -978,7 +996,7 @@ namespace Tangra
 		private void zoomedImage_MouseMove(object sender, MouseEventArgs e)
 		{
 			Point imagePos = m_VideoController.GetImageCoordinatesFromZoomedImage(e.Location);
-			m_VideoController.DisplayCursorImageCoordinates(imagePos);
+			m_VideoController.DisplayCursorPositionDetails(imagePos);
 		}
 
 		private void frmMain_Shown(object sender, EventArgs e)
@@ -1004,6 +1022,146 @@ namespace Tangra
         {
 			ShellHelper.OpenUrl("https://groups.yahoo.com/neo/groups/Tangra/info");
         }
+
+		private void miAstrometry_Click(object sender, EventArgs e)
+		{
+
+		}
+
+		private void miAstrometry_MouseDown(object sender, MouseEventArgs e)
+		{
+			bool debugMode = e.Button == MouseButtons.Middle;
+
+			StartAstrometry(debugMode);
+		}
+
+		private bool StartAstrometry(bool debugMode)
+		{
+			AstrometryContext.Current.Reset();
+
+			if (ChooseCalibratedConfigurationDialog(debugMode))
+			{
+				m_VideoController.ChangeImageTool(new SelectAstrometricObjectTool(m_AstrometryController, m_VideoController));
+
+				m_VideoController.ActivateOperation<VideoAstrometryOperation>(m_AstrometryController, debugMode);
+				
+				TangraContext.Current.CanPlayVideo = false;
+				m_VideoController.UpdateViews();
+
+				return true;
+			}
+
+			return false;
+		}
+
+		public bool IsAstrometryUnconfigured(StarCatalogueFacade facade)
+		{
+			if (TangraConfig.Settings.StarCatalogue.Catalog == TangraConfig.StarCatalog.NotSpecified)
+				return true;
+
+			if (!facade.VerifyCurrentCatalogue(TangraConfig.Settings.StarCatalogue.Catalog, ref TangraConfig.Settings.StarCatalogue.CatalogLocation))
+				return true;
+
+			return false;
+		}
+
+		private bool EnsureAstrometryConfiguration()
+		{
+			StarCatalogueFacade facade = new StarCatalogueFacade(TangraConfig.Settings.StarCatalogue);
+			if (IsAstrometryUnconfigured(facade))
+			{
+				ShowSettings(true);
+
+				if (IsAstrometryUnconfigured(facade))
+					return false;
+			}
+
+			return true;
+		}
+
+		private bool ChooseCalibratedConfigurationDialog(bool debugMode)
+		{
+			// TODO: Consider adding pre-processing later
+
+			//var frmPreProcessing = new frmPreProcessing(this);
+			//frmPreProcessing.StartPosition = FormStartPosition.CenterParent;
+
+			//if (frmPreProcessing.ShowDialog(this) == DialogResult.Cancel)
+			//	return false;
+			//else
+			//{
+			//	// TODO: Setup preprocessing filter and refresh the current frame before continuing
+			//}
+
+
+			if (!EnsureAstrometryConfiguration())
+				return false;
+
+			frmChooseCamera frmCamera = new frmChooseCamera(TangraContext.Current.FrameWidth, TangraContext.Current.FrameHeight);
+			if (frmCamera.ShowDialog(this) == DialogResult.Cancel)
+			{
+				return false;
+			}
+			else
+			{
+				TangraContext.Current.HasConfigurationChosen = true;
+				TangraConfig.ScopeRecorderConfiguration config = TangraConfig.Settings.PlateSolve.SelectedScopeRecorderConfig;
+#if ASTROMETRY_DEBUG
+				Trace.Assert(config != null);
+#endif
+				AstrometryContext.Current.VideoCamera = TangraConfig.Settings.PlateSolve.SelectedCamera;
+				AstrometryContext.Current.PlateConstants = TangraConfig.Settings.PlateSolve.GetPlateConstants(new Rectangle(0, 0, TangraContext.Current.FrameWidth, TangraContext.Current.FrameHeight));
+
+				m_VideoController.SetFlipSettings(config.FlipVertically, config.FlipHorizontally, config.Rotate180);
+				int clipedBorderPixels = config.ClipBorderPixels[TangraConfig.Settings.PlateSolve.SelectedCameraModel];
+				m_VideoController.SetBorderClip(clipedBorderPixels);
+
+				bool refreshed = false;
+				if (clipedBorderPixels > 0)
+				{
+					m_VideoController.RefreshCurrentFrame();
+					refreshed = true;
+				}
+
+				TangraContext.Current.CanChangeTool = true;
+
+				if (frmCamera.IsNewConfiguration)
+				{
+					// This will create a default configuration 
+					Rectangle defaultRect = AstrometryContext.Current.OSDRectToExclude;
+					AstrometryContext.Current.OSDRectToExclude = defaultRect;
+
+					m_VideoController.ChangeImageTool(new FrameSizer(m_VideoController));
+
+					// Now that we have a configuration, refresh so we can get an AstroImage (StarMap)
+					m_VideoController.RefreshCurrentFrame();
+				}
+
+				if (frmCamera.SolvePlateConstantsNow)
+				{
+					LoadCalibrationToolForCurrentConfiguration(debugMode);
+
+					TangraContext.Current.IsCalibrating = true;
+					m_VideoController.UpdateViews();
+
+					m_VideoController.RefreshCurrentFrame();
+					//m_VideoController.RedrawCurrentFrame(false);
+
+					return false; /* Don't want to continue loading the current action as we are going to calibrate */
+				}
+
+				TangraContext.Current.HasConfigurationSolved = AstrometryContext.Current.PlateConstants != null;
+
+				return TangraContext.Current.HasConfigurationSolved;
+			}
+		}
+
+		private void LoadCalibrationToolForCurrentConfiguration(bool debugMode)
+		{
+			m_VideoController.ChangeImageTool(new PlateCalibrationTool(m_AstrometryController, m_VideoController, debugMode));
+			(m_VideoController.CurrentImageTool as PlateCalibrationTool).LoadControler(pnlControlerPanel);
+			m_VideoController.SetPictureBoxCursor(Cursors.Arrow);
+		}
 
 	}
 }

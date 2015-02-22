@@ -1159,5 +1159,71 @@ namespace Tangra.Model.Image
 
 			bitmap.UnlockBits(bmData);
 		}
+
+		public static double GetMode(List<uint> allBgReadings, double rejectionBackgoundPixelsStdDevCoeff)
+		{
+
+			// Method 1: - Keep recomputing Median and Mean until they stop changing
+			//           - Then use MODE (mode = 3 x (median) - 2 x (mean))
+
+			List<double> allBgResiduals = new List<double>();
+
+			double oldMean = double.NaN;
+			double oldMedian = double.NaN;
+			double mean = double.NaN;
+			double median = double.NaN;
+			double mode = 0;
+			double sum;
+
+			do
+			{
+				oldMean = mean;
+				oldMedian = median;
+
+				sum = 0;
+				for (int i = 0; i < allBgReadings.Count; i++)
+					sum += allBgReadings[i];
+
+
+				mean = 1.0 * sum / allBgReadings.Count;
+				median = 0;
+
+				if (allBgReadings.Count > 0)
+				{
+					allBgReadings.Sort();
+					if (allBgReadings.Count % 2 == 1)
+						median = allBgReadings[allBgReadings.Count / 2];
+					else
+						median = (allBgReadings[allBgReadings.Count / 2] + allBgReadings[(allBgReadings.Count / 2) - 1]) / 2.0;
+
+					mode = 3 * median - 2 * mean;
+				}
+
+				// Compute the residuals and StdDev
+				double sqVariance = 0;
+				allBgResiduals.Clear();
+				for (int i = 0; i < allBgReadings.Count; i++)
+				{
+					float residual = (float)(allBgReadings[i] - mean);
+					allBgResiduals.Add(residual);
+					sqVariance += residual * residual;
+				}
+				double stdDev = rejectionBackgoundPixelsStdDevCoeff * Math.Sqrt(sqVariance / allBgReadings.Count);
+
+				// Remove all points beyond RejectionBackgoundPixelsStdDevCoeff * sigma
+				for (int i = allBgReadings.Count - 1; i >= 0; i--)
+				{
+					if (Math.Abs(allBgResiduals[i]) > stdDev)
+					{
+						allBgReadings.RemoveAt(i);
+					}
+				}
+			}
+			while (
+				Math.Round(oldMean) != Math.Round(mean) &&
+				Math.Round(oldMedian) != Math.Round(median));
+
+			return mode;
+		}
 	}
 }

@@ -50,7 +50,8 @@ namespace Tangra.Model.Config
 	public enum RecentFileType
 	{
 		Video,
-		LightCurve
+		LightCurve,
+		MPCReport
 	}
 
 	public class RecentFilesConfig
@@ -58,9 +59,9 @@ namespace Tangra.Model.Config
 		internal RecentFilesConfig()
         {
 			Lists.Clear();
-			Lists.Add(0, new List<string>());
-			Lists.Add(1, new List<string>());
-			Lists.Add(2, new List<string>());
+			Lists.Add(RecentFileType.Video, new List<string>());
+			Lists.Add(RecentFileType.LightCurve, new List<string>());
+			Lists.Add(RecentFileType.MPCReport, new List<string>());
         }
 
 		internal RecentFilesConfig(RecentFilesConfig copyFrom)
@@ -68,32 +69,32 @@ namespace Tangra.Model.Config
 		{
 			if (copyFrom != null)
 			{
-				Lists[0].AddRange(copyFrom.Lists[0]);
-				Lists[1].AddRange(copyFrom.Lists[1]);
-				Lists[2].AddRange(copyFrom.Lists[2]);				
+				Lists[RecentFileType.Video].AddRange(copyFrom.Lists[RecentFileType.Video]);
+				Lists[RecentFileType.LightCurve].AddRange(copyFrom.Lists[RecentFileType.LightCurve]);
+				Lists[RecentFileType.MPCReport].AddRange(copyFrom.Lists[RecentFileType.MPCReport]);
 			}
 		}
 
 		private int MAX_RECENT_FILES = 20;
 
-		public Dictionary<int, List<string>> Lists = new Dictionary<int, List<string>>();
+		public Dictionary<RecentFileType, List<string>> Lists = new Dictionary<RecentFileType, List<string>>();
 
 		public void NewRecentFile(RecentFileType recentFilesGroup, string filePath)
 		{
-			if (Lists[(int)recentFilesGroup].IndexOf(filePath) != -1)
-				Lists[(int)recentFilesGroup].Remove(filePath);
+			if (Lists[recentFilesGroup].IndexOf(filePath) != -1)
+				Lists[recentFilesGroup].Remove(filePath);
 
-			Lists[(int)recentFilesGroup].Insert(0, filePath);
+			Lists[recentFilesGroup].Insert(0, filePath);
 
 			while (Lists.Count > MAX_RECENT_FILES)
-				Lists[(int)recentFilesGroup].RemoveAt(MAX_RECENT_FILES - 1);
+				Lists[recentFilesGroup].RemoveAt(MAX_RECENT_FILES - 1);
 		}
 
 		private void LoadRecentFiles(string savedContent)
 		{
-			Lists[0].Clear();
-			Lists[1].Clear();
-			Lists[2].Clear();
+			Lists[RecentFileType.Video].Clear();
+			Lists[RecentFileType.LightCurve].Clear();
+			Lists[RecentFileType.MPCReport].Clear();
 
 			string[] lines = savedContent.Split('\n');
 			foreach(string line in lines)
@@ -103,7 +104,7 @@ namespace Tangra.Model.Config
 				int listId = 0;
 				if (tokens.Length == 2 && int.TryParse(tokens[0], out listId))
 				{
-					Lists[listId].Add(tokens[1].Trim());					
+					Lists[(RecentFileType)listId].Add(tokens[1].Trim());
 				}
 			}
 		}
@@ -112,11 +113,11 @@ namespace Tangra.Model.Config
 		{
 			var output = new StringBuilder();
 
-			foreach (int key in Lists.Keys)
+			foreach (RecentFileType key in Lists.Keys)
 			{
 				foreach (string fileName in Lists[key])
 				{
-					output.Append(string.Format("{0}={1}\n", key, fileName));
+					output.Append(string.Format("{0}={1}\n", (int)key, fileName));
 				}				
 			}
 
@@ -138,10 +139,10 @@ namespace Tangra.Model.Config
 			{
 				Trace.WriteLine(ex);
 
-				Lists[0].Clear();
-				Lists[1].Clear();
-				Lists[2].Clear();
-			}				
+				Lists[RecentFileType.Video].Clear();
+				Lists[RecentFileType.LightCurve].Clear();
+				Lists[RecentFileType.MPCReport].Clear();
+			}
 		}	
 	}
 
@@ -254,11 +255,27 @@ namespace Tangra.Model.Config
 			Settings.RecentFiles = persistedRecentFiles;
 		}
 
+		public bool HasSiteCoordinatesOrCOD
+		{
+			get
+			{
+				return
+					(Astrometry.UseMPCCode && !string.IsNullOrEmpty(Astrometry.MPCObservatoryCode)) ||
+					(!double.IsNaN(Generic.Longitude) && !double.IsNaN(Generic.Latitude));
+			}
+		}
+
 		public PhotometrySettings Photometry = new PhotometrySettings();
 		public TrackingSettings Tracking = new TrackingSettings();
 		public Colors Color = new Colors();
 		public GenericSettings Generic = new GenericSettings();
 		public SpecialSettings Special = new SpecialSettings();
+		public AstrometrySettings Astrometry = new AstrometrySettings();
+		public CatalogSettings StarCatalogue = new CatalogSettings();
+		public PlateSolveSettings PlateSolve = new PlateSolveSettings();
+		public OSDSizes OSDSizes = new OSDSizes();
+		public UrlSettings Urls = new UrlSettings();
+		public HelpSystemFlags HelpFlags = new HelpSystemFlags();
 
 	    public LastUsedSettings LastUsed = new LastUsedSettings();
 
@@ -516,7 +533,8 @@ namespace Tangra.Model.Config
 		public enum OnOpenOperation
 		{
 			DoNothing = 0,
-			StartLightCurveReduction = 1
+			StartLightCurveReduction = 1,
+			Astrometry = 2
 		}
 
 		public enum PerformanceQuality
@@ -567,6 +585,9 @@ namespace Tangra.Model.Config
 
             public IsolationLevel AddinIsolationLevel = IsolationLevel.AppDomain;
 			public OWExportMode OWEventTimesExportMode = OWExportMode.AlwaysExportEventTimes;
+
+			public double Longitude = double.NaN;
+			public double Latitude = double.NaN;
 		}
 
         public class LastUsedSettings
@@ -585,6 +606,21 @@ namespace Tangra.Model.Config
             public List<SameSizeApertureConfig> SameSizeApertures = new List<SameSizeApertureConfig>();
 	        public string FitsSeqenceLastFolderLocation;
 	        public string EmailAddressForErrorReporting;
+
+	        public double FocalLength;
+	        public string AstrRAHours;
+	        public string AstrDEDeg;
+	        public DateTime ObservationEpoch = new DateTime(2014, 03, 01);
+	        public DateTime LastIdentifyObjectsDate;
+
+	        public PhotometryReductionMethod AstrometryPhotometryReductionMethod;
+	        public BackgroundMethod AstrometryPhotometryBackgroundMethod;
+	        public bool AstrometryFitMagnitudes;
+	        public DateTime LastAstrometryUTCDate;
+	        public double AstrErrFoVs;
+	        public double AstrMinMag;
+	        public double AstrMaxMag;
+	        public int AstrSearchTypeIndex;
         }
 
         public class SameSizeApertureConfig
@@ -1083,6 +1119,677 @@ namespace Tangra.Model.Config
 			{
 				return System.Drawing.Color.FromArgb(clr.A, 255 - clr.R, 255 - clr.G, 255 - clr.B);
 			}
+		}
+
+		public class AstrometrySettings : IAstrometrySettings
+		{
+			public class ColorSettings
+			{
+				[XmlIgnore]
+				public Color ReferenceStar
+				{
+					get
+					{
+						return System.Drawing.Color.FromArgb(ReferenceStarRGB);
+					}
+					set
+					{
+						ReferenceStarRGB = value.ToArgb();
+					}
+				}
+
+				[XmlIgnore]
+				public Color RejectedReferenceStar
+				{
+					get
+					{
+						return System.Drawing.Color.FromArgb(RejectedReferenceStarRGB);
+					}
+					set
+					{
+						RejectedReferenceStarRGB = value.ToArgb();
+					}
+				}
+
+				[XmlIgnore]
+				public Color UndetectedReferenceStar
+				{
+					get
+					{
+						return System.Drawing.Color.FromArgb(UndetectedReferenceStarRGB);
+					}
+					set
+					{
+						UndetectedReferenceStarRGB = value.ToArgb();
+					}
+				}
+
+				[XmlIgnore]
+				public Color UserObject
+				{
+					get
+					{
+						return System.Drawing.Color.FromArgb(UserObjectRGB);
+					}
+					set
+					{
+						UserObjectRGB = value.ToArgb();
+					}
+				}
+
+				[XmlIgnore]
+				public Color CatalogueStar
+				{
+					get
+					{
+						return System.Drawing.Color.FromArgb(CatalogueStarRGB);
+					}
+					set
+					{
+						CatalogueStarRGB = value.ToArgb();
+					}
+				}
+
+				public int ReferenceStarRGB = System.Drawing.Color.Lime.ToArgb();
+				public int RejectedReferenceStarRGB = System.Drawing.Color.Orange.ToArgb();
+				public int UndetectedReferenceStarRGB = System.Drawing.Color.Silver.ToArgb();
+				public int UserObjectRGB = System.Drawing.Color.Yellow.ToArgb();
+				public int CatalogueStarRGB = System.Drawing.Color.Blue.ToArgb();
+			}
+
+			public AstrometrySettings()
+			{
+				Colors = new ColorSettings();
+				MPCHeader = new MPCHeaderSettings();
+
+				DetectionLimit = 0.5; /* This is used to determine whether the fit is good */
+
+				Method = AstrometricMethod.AutomaticFit;
+
+				MinimumNumberOfStars = 7;
+				MaximumNumberOfStars = 100;
+				MaxResidual = 1.0;
+				MaximumPSFElongation = 35;
+
+				AlignmentMethod = FieldAlignmentMethod.Pyramid;
+
+#pragma warning disable 612,618
+				PyramidDistanceTolerance = 6;
+#pragma warning restore 612,618
+				PyramidDistanceToleranceInPixels = 6;
+				PyramidOptimumStarsToMatch = 25;
+				DistributionZoneStars = 5;
+				LimitReferenceStarDetection = 0.75; /* This is used for auto limit mag detection */
+				MinReferenceStarFWHM = 1.8;
+				MaxReferenceStarFWHM = 6.0;
+				MaximumPSFElongation = 35; /* 35% */
+				PyramidRemoveNonStellarObject = false;
+
+				PyramidFocalLengthAllowance = 0.05;
+				PyramidTimeoutInSeconds = 60;
+			}
+
+			public AstrometrySettings Clone()
+			{
+				AstrometrySettings clone = new AstrometrySettings();
+
+				clone.DetectionLimit = this.DetectionLimit;
+				clone.Method = this.Method;
+				clone.MinimumNumberOfStars = this.MinimumNumberOfStars;
+				clone.MaximumNumberOfStars = this.MaximumNumberOfStars;
+				clone.MaxResidual = this.MaxResidual;
+				clone.AlignmentMethod = this.AlignmentMethod;
+#pragma warning disable 612,618
+				clone.PyramidDistanceTolerance = this.PyramidDistanceTolerance;
+#pragma warning restore 612,618
+				clone.PyramidDistanceToleranceInPixels = this.PyramidDistanceToleranceInPixels;
+				clone.PyramidOptimumStarsToMatch = this.PyramidOptimumStarsToMatch;
+				clone.PyramidFocalLengthAllowance = this.PyramidFocalLengthAllowance;
+				clone.PyramidTimeoutInSeconds = this.PyramidTimeoutInSeconds;
+				clone.DistributionZoneStars = this.DistributionZoneStars;
+				clone.LimitReferenceStarDetection = this.LimitReferenceStarDetection;
+				clone.MinReferenceStarFWHM = this.MinReferenceStarFWHM;
+				clone.MaxReferenceStarFWHM = this.MaxReferenceStarFWHM;
+				clone.MaximumPSFElongation = this.MaximumPSFElongation;
+				clone.PyramidRemoveNonStellarObject = this.PyramidRemoveNonStellarObject;
+				return clone;
+			}
+
+			public ColorSettings Colors;
+			public MPCHeaderSettings MPCHeader;
+
+			public MagInputBand DefaultMagInputBand = MagInputBand.Unfiltered;
+			public MagOutputBand DefaultMagOutputBand = MagOutputBand.CousinsR;
+
+			public double AssumedTargetVRColour = 0.4;
+
+			public double DetectionLimit { get; set; }
+
+			public static int NumberStarsRequiredForQuadraticFit = 10;
+
+			public AstrometricMethod Method { get; set; }
+
+			public int MinimumNumberOfStars { get; set; }
+
+			public int MaximumNumberOfStars { get; set; }
+
+			public int MaximumPSFElongation { get; set; }
+
+			public double MaxResidual { get; set; }
+
+			public double MaxPreliminaryResidual
+			{
+				get { return MaxResidual * 6.0; }
+			}
+
+			public FieldAlignmentMethod AlignmentMethod { get; set; }
+
+			[Obsolete]
+			public double PyramidDistanceTolerance { get; set; }
+
+			public double PyramidDistanceToleranceInPixels { get; set; }
+
+			public double PyramidOptimumStarsToMatch { get; set; }
+			public int DistributionZoneStars { get; set; }
+			public double LimitReferenceStarDetection { get; set; }
+
+			public double MinReferenceStarFWHM { get; set; }
+			public double MaxReferenceStarFWHM { get; set; }
+			public bool PyramidRemoveNonStellarObject { get; set; }
+
+			public double PyramidFocalLengthAllowance { get; set; }
+			public bool PyramidForceFixedFocalLength
+			{
+				get { return PyramidFocalLengthAllowance <= 0; }
+			}
+
+			public int PyramidTimeoutInSeconds { get; set; }
+
+			public bool UseMPCCode { get; set; }
+			public string MPCObservatoryCode { get; set; }
+		}
+
+		public class UrlSettings
+		{
+			public UrlSettings()
+			{
+				SetDefaults();
+			}
+
+			public void SetDefaults()
+			{
+				MPCEphe2ServiceUrl = "http://scully.cfa.harvard.edu/cgi-bin/mpeph2.cgi";
+			}
+
+			public string MPCEphe2ServiceUrl;
+		}
+
+		public class StarIDSettings
+		{
+			public double RAHours = double.NaN;
+			public double DEDeg = double.NaN;
+			public double ErrFoVs = double.NaN;
+			public int Method = 0;
+			public string ServerName = string.Empty;
+			public string DatabaseName = string.Empty;
+		}
+
+		public class PlateSolveSettings
+		{
+			public StarIDSettings StarIDSettings = new StarIDSettings();
+			public string SelectedCameraModel;
+			public string SelectedScopeRecorder;
+			public bool UseLowPassForAstrometry;
+
+			public List<VideoCamera> VideoCameras = new List<VideoCamera>();
+			public List<ScopeRecorderConfiguration> ScopeRecorders = new List<ScopeRecorderConfiguration>();
+			public List<PersistedPlateConstants> SolvedPlateConstants = new List<PersistedPlateConstants>();
+
+			public PlateSolveSettings()
+			{
+				VideoCamera.AddCameraConfigurations(VideoCameras);
+			}
+
+			public PersistedPlateConstants GetPlateConstants(VideoCamera camera, ScopeRecorderConfiguration config, Rectangle plateSize)
+			{
+				if (camera != null && config != null)
+				{
+					foreach (PersistedPlateConstants pltCon in SolvedPlateConstants)
+					{
+						if (pltCon.CameraModel == camera.Model &&
+							pltCon.ScopeRecoderConfig == config.Title &&
+							pltCon.PlateWidth == plateSize.Width &&
+							pltCon.PlateHeight == plateSize.Height)
+						{
+							return pltCon;
+						}
+					}
+				}
+
+				return null;
+			}
+
+			public void SetPlateConstants(PersistedPlateConstants pltConst, Rectangle plateSize)
+			{
+				if (SelectedCameraModel != null &&
+					SelectedScopeRecorder != null)
+				{
+					SetPlateConstants(SelectedCamera, SelectedScopeRecorderConfig, plateSize, pltConst);
+				}
+				else
+					throw new InvalidOperationException();
+			}
+
+			public void SetPlateConstants(VideoCamera camera, ScopeRecorderConfiguration config, Rectangle plateSize, PersistedPlateConstants pltConst)
+			{
+				if (camera != null && config != null && pltConst != null)
+				{
+					foreach (PersistedPlateConstants pltCon in SolvedPlateConstants)
+					{
+						if (pltCon.CameraModel == camera.Model &&
+							pltCon.ScopeRecoderConfig == config.Title &&
+							pltCon.PlateWidth == plateSize.Width &&
+							pltCon.PlateHeight == plateSize.Height)
+						{
+							pltCon.EffectiveFocalLength = pltConst.EffectiveFocalLength;
+							pltCon.EffectivePixelHeight = pltConst.EffectivePixelHeight;
+							pltCon.EffectivePixelWidth = pltConst.EffectivePixelWidth;
+
+							return;
+						}
+					}
+
+					pltConst.ScopeRecoderConfig = config.Title;
+					pltConst.CameraModel = camera.Model;
+					pltConst.PlateWidth = plateSize.Width;
+					pltConst.PlateHeight = plateSize.Height;
+
+					SolvedPlateConstants.Add(pltConst);
+				}
+			}
+
+			public ScopeRecorderConfiguration SelectedScopeRecorderConfig
+			{
+				get
+				{
+					if (SelectedScopeRecorder != null)
+					{
+						return ScopeRecorders.FirstOrDefault((c) => c.Title == SelectedScopeRecorder);
+					}
+					else
+						return null;
+				}
+			}
+
+			public VideoCamera SelectedCamera
+			{
+				get
+				{
+					if (SelectedCameraModel != null)
+					{
+						return VideoCameras.FirstOrDefault((c) => c.Model == SelectedCameraModel);
+					}
+					else
+						return null;
+				}
+			}
+
+			public PersistedPlateConstants GetPlateConstants(Rectangle plateSize)
+			{
+				if (SelectedCameraModel != null &&
+					SelectedScopeRecorder != null)
+				{
+					return GetPlateConstants(SelectedCamera, SelectedScopeRecorderConfig, plateSize);
+				}
+				else
+					return null;
+			}
+		}
+
+		public class PersistedPlateConstants
+		{
+			public string ScopeRecoderConfig;
+			public string CameraModel;
+			public int PlateWidth;
+			public int PlateHeight;
+
+			public double EffectiveFocalLength;
+			public double EffectivePixelWidth;
+			public double EffectivePixelHeight;
+		}
+
+		public enum MagOutputBand
+		{
+			JohnsonV,
+			CousinsR
+		}
+
+		public enum MagInputBand
+		{
+			Unfiltered,
+			JohnsonV,
+			CousinsR,
+			SLOAN_r,
+			SLOAN_g
+		}
+
+		public class ScopeRecorderConfiguration
+		{
+			[XmlIgnore]
+			public bool IsNew;
+
+			public string Title;
+
+			public int Top;
+			public int Left;
+			public int Width;
+			public int Height;
+			public ConfigurationLimitingMagnitudes LimitingMagnitudes;
+			public ConfigurationClipBorderPixels ClipBorderPixels;
+			public ConfigurationRawFrameSizes RawFrameSizes;
+			public bool FlipHorizontally = false;
+			public bool FlipVertically = false;
+			public bool Rotate180 = false;
+
+			public override string ToString()
+			{
+				return Title;
+			}
+
+			public ScopeRecorderConfiguration()
+			{
+				IsNew = false;
+			}
+
+			public ScopeRecorderConfiguration(string cameraModel, int width, int height)
+			{
+				LimitingMagnitudes = new ConfigurationLimitingMagnitudes();
+				ClipBorderPixels = new ConfigurationClipBorderPixels();
+				RawFrameSizes = new ConfigurationRawFrameSizes();
+				RawFrameSizes[cameraModel] = new Rectangle(0, 0, width, height);
+				IsNew = true;
+			}
+
+			public Rectangle GetRectangle()
+			{
+				return new Rectangle(Left, Top, Width, Height);
+			}
+		}
+
+		public class ConfigurationLimitingMagnitudes
+		{
+			public List<string> Keys = new List<string>();
+			public List<double> Values = new List<double>();
+
+			public static double DEFAULT_LIMITING_MAGNITUDE = 12.0;
+
+			internal ConfigurationLimitingMagnitudes()
+			{ }
+
+			public double this[string camera]
+			{
+				get
+				{
+					int idx = Keys.IndexOf(camera);
+					if (idx != -1)
+						return Values[idx];
+					else
+						return DEFAULT_LIMITING_MAGNITUDE;
+				}
+				set
+				{
+					int idx = Keys.IndexOf(camera);
+					if (idx != -1)
+						Values[idx] = value;
+					else
+					{
+						Keys.Add(camera);
+						Values.Add(value);
+					}
+				}
+			}
+		}
+
+		public class ConfigurationClipBorderPixels
+		{
+			public List<string> Keys = new List<string>();
+			public List<int> Values = new List<int>();
+
+			public static int DEFAULT_CLIP_BORDER = 0;
+
+			public ConfigurationClipBorderPixels()
+			{ }
+
+			public int this[string camera]
+			{
+				get
+				{
+					int idx = Keys.IndexOf(camera);
+					if (idx != -1)
+						return Values[idx];
+					else
+						return DEFAULT_CLIP_BORDER;
+				}
+				set
+				{
+					int idx = Keys.IndexOf(camera);
+					if (idx != -1)
+						Values[idx] = value;
+					else
+					{
+						Keys.Add(camera);
+						Values.Add(value);
+					}
+				}
+			}
+		}
+
+		public class ConfigurationRawFrameSizes
+		{
+			public List<string> Keys = new List<string>();
+			public List<long> Values = new List<long>();
+
+			internal ConfigurationRawFrameSizes()
+			{ }
+
+			public Rectangle this[string camera]
+			{
+				get
+				{
+					int idx = Keys.IndexOf(camera);
+					if (idx != -1)
+					{
+						int width = (int)(Values[idx] % 10000);
+						int height = (int)(Values[idx] / 10000);
+						return new Rectangle(0, 0, width, height);
+					}
+					else
+						return Rectangle.Empty;
+				}
+				set
+				{
+					if (value == Rectangle.Empty)
+						throw new ArgumentException("Cannot set empty rectangle as frame size");
+
+					int idx = Keys.IndexOf(camera);
+					long valToSave = value.Width + 10000 * value.Height;
+					if (idx != -1)
+						Values[idx] = valToSave;
+					else
+					{
+						Keys.Add(camera);
+						Values.Add(valToSave);
+					}
+				}
+			}
+		}
+
+		public enum StarCatalog
+		{
+			NotSpecified = 0,
+			UCAC2 = 1,
+			NOMAD = 2,
+			UCAC3 = 3,
+			PPMXL = 4,
+			UCAC4 = 5
+		}
+
+		public class CatalogSettings
+		{
+			public StarCatalog Catalog = StarCatalog.NotSpecified;
+			public string CatalogLocation = string.Empty;
+			public Guid CatalogMagnitudeBandId = Guid.Empty;
+
+			public static string GetNETCode(StarCatalog catalog)
+			{
+				switch (catalog)
+				{
+					case StarCatalog.NotSpecified:
+						return string.Empty;
+					case StarCatalog.UCAC2:
+						return "UCAC2";
+					case StarCatalog.UCAC3:
+						return "UCAC3";
+					case StarCatalog.NOMAD:
+						return "NOMAD";
+					case StarCatalog.PPMXL:
+						return "PPMXL";
+					case StarCatalog.UCAC4:
+						return "UCAC4";
+					default:
+						throw new ArgumentOutOfRangeException("catalog");
+				}
+			}
+		}
+
+		public class MPCHeaderSettings
+		{
+			private string m_COD;
+			private string m_CON;
+			private string m_OBS;
+			private string m_MEA;
+			private string m_TEL;
+			private string m_CON2;
+			private string m_ACK;
+			private string m_AC2;
+			private string m_COM;
+
+			private bool m_DefaultValues = true;
+
+			public string COD
+			{
+				get { return m_COD; }
+				set
+				{
+					m_COD = value;
+					m_DefaultValues = false;
+				}
+			}
+
+			public string CON
+			{
+				get { return m_CON; }
+				set
+				{
+					m_CON = value;
+					m_DefaultValues = false;
+				}
+			}
+
+			public string OBS
+			{
+				get { return m_OBS; }
+				set
+				{
+					m_OBS = value;
+					m_DefaultValues = false;
+				}
+			}
+
+			public string MEA
+			{
+				get { return m_MEA; }
+				set
+				{
+					m_MEA = value;
+					m_DefaultValues = false;
+				}
+			}
+
+			public string TEL
+			{
+				get { return m_TEL; }
+				set
+				{
+					m_TEL = value;
+					m_DefaultValues = false;
+				}
+			}
+
+			public string CON2
+			{
+				get { return m_CON2; }
+				set
+				{
+					m_CON2 = value;
+					m_DefaultValues = false;
+				}
+			}
+
+			public string ACK
+			{
+				get { return m_ACK; }
+				set
+				{
+					m_ACK = value;
+					m_DefaultValues = false;
+				}
+			}
+
+			public string AC2
+			{
+				get { return m_AC2; }
+				set
+				{
+					m_AC2 = value;
+					m_DefaultValues = false;
+				}
+			}
+
+			public string COM
+			{
+				get { return m_COM; }
+				set
+				{
+					m_COM = value;
+					m_DefaultValues = false;
+				}
+			}
+
+			public void UseDefaultValues()
+			{
+				m_COD = "XXX";
+				m_CON = "John Smith [john.smith@email.com]";
+				m_OBS = "J. Smith";
+				m_MEA = "J. Smith";
+				m_TEL = "0.20-m f/3.3 Schmidt-Cassegrain + GPS-tagged video";
+				m_CON2 = "";
+				m_COM = "";
+				m_ACK = "";
+				m_AC2 = "";
+
+				m_DefaultValues = true;
+			}
+
+			public bool HasDefaultValues
+			{
+				get { return m_DefaultValues; }
+			}
+		}
+
+		public class HelpSystemFlags
+		{
+			public bool DontShowCalibrationHelpFormAgain = false;
 		}
 	}
 }

@@ -22,7 +22,17 @@ namespace Tangra.Model.Image
 		public double XDouble { get; private set; }
 		public double YDouble { get; private set; }
 
-		public int Brightness { get; private set; }
+		public int Brightness { get; set; }
+		public int FeautureId { get; private set; }
+
+		public bool IsSaturated
+		{
+			get
+			{
+				return false;
+				return Brightness > 255;
+			}
+		}
 
         /// <summary>
         /// This needs to be set by the code that created the ImagePixel
@@ -51,7 +61,17 @@ namespace Tangra.Model.Image
 
             X = (int)Math.Round(XDouble);
             Y = (int)Math.Round(YDouble);
+
+	        FeautureId = 0;
         }
+
+		public static ImagePixel CreateImagePixelWithFeatureId(int featureId, int brightness, double x, double y)
+		{
+			var rv = new ImagePixel(brightness, x, y);
+			rv.FeautureId = featureId;
+
+			return rv;
+		}
 
         public bool IsSpecified
         {

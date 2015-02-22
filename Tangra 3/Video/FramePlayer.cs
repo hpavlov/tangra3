@@ -173,6 +173,11 @@ namespace Tangra.Video
 		private int m_CurrentFrameIndex = -1;
 		private int m_LastDisplayedFrameIndex = -1;
 
+		private bool m_FlipVertically = false;
+		private bool m_FlipHorizontally = false;
+		private bool m_Rotate180 = false;
+		private int m_BorderPixelsToClear = 0;
+
 		public void StepForward()
 		{
 			if (m_VideoStream != null)
@@ -431,6 +436,8 @@ namespace Tangra.Video
 				if (m_CurrentFrameIndex >= m_VideoStream.FirstFrame &&
 				    m_CurrentFrameIndex <= m_VideoStream.LastFrame)
 				{
+					ApplyFlipAndRotation(currentPixelmap);
+
 					m_FrameRenderer.RenderFrame(m_CurrentFrameIndex, currentPixelmap, movementType, m_CurrentFrameIndex == m_VideoStream.LastFrame, 0, m_CurrentFrameIndex, frameFileName);
 					m_LastDisplayedFrameIndex = m_CurrentFrameIndex;
 				}
@@ -637,6 +644,8 @@ namespace Tangra.Video
 
 				    Debug.Assert(currentFrame.FrameNo == m_CurrentFrameIndex);
 
+					ApplyFlipAndRotation(currentPixelmap);
+
 					//show frame
 					m_FrameRenderer.RenderFrame(
                         currentFrame.FrameNo, 
@@ -693,6 +702,8 @@ namespace Tangra.Video
 						msToWait = m_MillisecondsPerFrame - (int)sw.ElapsedMilliseconds;
 						sw.Reset();
 					}
+
+					ApplyFlipAndRotation(currentPixelmap);
 
 					//show frame
 					m_FrameRenderer.RenderFrame(
@@ -843,6 +854,60 @@ namespace Tangra.Video
 					return ((AstroDigitalVideoStream)m_VideoStream).VideoStandard;
 				else
 					return null;
+			}
+		}
+
+		public void SetFlipSettings(bool flipVertically, bool flipHorizontally, bool rotate180)
+		{
+			m_FlipVertically = flipVertically;
+			m_FlipHorizontally = flipHorizontally;
+			m_Rotate180 = rotate180;
+		}
+
+		public void SetBorderClip(int pixelsToClip)
+		{
+			m_BorderPixelsToClear = pixelsToClip;
+		}
+
+		private void ApplyFlipAndRotation(Pixelmap currentPixelmap)
+		{
+			if (currentPixelmap != null)
+			{
+				if (m_FlipVertically && m_FlipHorizontally)
+				{
+					throw new NotImplementedException();
+					//if (m_Rotate180)
+					//	currentBitmap.RotateFlip(RotateFlipType.Rotate180FlipXY);
+					//else
+					//	currentBitmap.RotateFlip(RotateFlipType.RotateNoneFlipXY);
+				}
+				else if (m_FlipVertically)
+				{
+					throw new NotImplementedException();
+					//if (m_Rotate180)
+					//	currentBitmap.RotateFlip(RotateFlipType.Rotate180FlipY);
+					//else
+					//	currentBitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);
+				}
+				else if (m_FlipHorizontally)
+				{
+					throw new NotImplementedException();
+					//if (m_Rotate180)
+					//	currentBitmap.RotateFlip(RotateFlipType.Rotate180FlipX);
+					//else
+					//	currentBitmap.RotateFlip(RotateFlipType.RotateNoneFlipX);
+				}
+				else if (m_Rotate180)
+				{
+					throw new NotImplementedException();
+					//currentBitmap.RotateFlip(RotateFlipType.Rotate180FlipNone);
+				}
+
+				if (m_BorderPixelsToClear > 0)
+				{
+					throw new NotImplementedException();
+					//BitmapFilter.ClearBorderPixels(currentBitmap, m_BorderPixelsToClear);
+				}
 			}
 		}
 	}
