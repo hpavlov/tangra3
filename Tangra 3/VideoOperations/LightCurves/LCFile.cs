@@ -1156,6 +1156,11 @@ namespace Tangra.VideoOperations.LightCurves
                 assumedFrameRate = 29.97;
                 videoSystem = "NTSC";
             }
+            else if (SourceInfo.Contains("(SER."))
+            {
+                assumedFrameRate = ComputedFramesPerSecond;
+                videoSystem = "SER";
+            }
 
             double videoTimeInSec = (LastTimedFrameNo - FirstTimedFrameNo) / assumedFrameRate;
 			return (totalTimeStapmedTime.TotalSeconds - videoTimeInSec) * 1000;
