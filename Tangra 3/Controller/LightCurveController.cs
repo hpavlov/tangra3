@@ -268,7 +268,7 @@ namespace Tangra.Controller
 
         internal void ConfigureSaveLcFileDialog(SaveFileDialog saveFileDialog)
         {
-			if (saveFileDialog != null)
+            if (saveFileDialog != null && m_VideoController != null)
 			{
 				saveFileDialog.InitialDirectory = Path.GetDirectoryName(m_VideoController.CurrentVideoFileName);
 				saveFileDialog.FileName = Path.ChangeExtension(Path.GetFileName(m_VideoController.CurrentVideoFileName), ".lc");
