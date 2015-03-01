@@ -495,13 +495,11 @@ namespace Tangra.VideoOperations.LightCurves
                     m_LCFile.Header.HasNonEqualySpacedDataPoints())
 				{
 					MessageBox.Show(
-						this, 
-						"Cannot extract event times when the processed light curve has non equally spaced data points.", 
+						this,
+                        "This light curve contains non equally spaced data points. Before you continue make sure that this addin supports that type of light curves.", 
 						"Tangra3 - " + addinName, 
 						MessageBoxButtons.OK, 
-						MessageBoxIcon.Error);
-
-					return false;
+						MessageBoxIcon.Warning);
 				}
 
 				m_EventTimesReport = new EventTimesReport()
@@ -797,12 +795,10 @@ namespace Tangra.VideoOperations.LightCurves
 				m_Header.HasNonEqualySpacedDataPoints())
 			{
                 m_LightCurveController.ShowMessageBox(
-					"Binning is not supported for light curves with non equaly spaced datapoints.",
+                    "This video contains non equaly spaced datapoints. Take care when using the binned data as some bins will also correspond to time intervals with different durations.",
 					"Tangra",
 					MessageBoxButtons.OK,
-					MessageBoxIcon.Error);
-
-				return;
+					MessageBoxIcon.Warning);
 			}
 
             int selectedBins = m_LightCurveController.Context.Binning;
