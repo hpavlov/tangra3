@@ -632,6 +632,7 @@ namespace Tangra.OCR
         private DateTime ExtractDateTime(int frameNo, IotaVtiTimeStamp oddFieldOSD, IotaVtiTimeStamp evenFieldOSD)
         {
             bool failedValidation = false;
+            string failedReason = null;
 
 	        if (oddFieldOSD == null || evenFieldOSD == null)
 		        return DateTime.MinValue;
@@ -641,6 +642,7 @@ namespace Tangra.OCR
             {
                 // Video fields are not consequtive
                 failedValidation = true;
+                failedReason = "Video fields are not consequtive";
             }
 
 			int oddMs = (int)Math.Round(oddFieldOSD.Milliseconds10 / 10.0f);
@@ -662,6 +664,7 @@ namespace Tangra.OCR
                 {
                     // PAL field is not 20 ms
                     failedValidation = true;
+                    failedReason = string.Format("PAL field is not 20 ms. It is {0} ms", fieldDuration);
                 }
 
                 if (m_Processor.VideoFormat.Value == VideoFormat.NTSC &&
@@ -669,6 +672,7 @@ namespace Tangra.OCR
                 {
                     // NTSC field is not 16.68 ms
                     failedValidation = true;
+                    failedReason = string.Format("NTSC field is not 16.68 ms. It is {0} ms", fieldDuration);
                 }
 
                 int oddEvenFieldDirection = oddFieldTimestamp.Ticks - evenFieldTimestamp.Ticks < 0 ? -1 : 1;
@@ -677,18 +681,21 @@ namespace Tangra.OCR
                 {
                     // Field timestamps are wrong have changed order (did they swap)?
                     failedValidation = true;
+                    failedReason = "Field timestamps are wrong have changed order (did they swap)?";
                 }
 
 				if (failedValidation)
 				{
-					failedValidation = !m_Corrector.TryToCorrect(frameNo, oddFieldOSD, evenFieldOSD, m_Processor.EvenBeforeOdd, ref oddFieldTimestamp, ref evenFieldTimestamp);
+				    string correctionInfo;
+                    failedValidation = !m_Corrector.TryToCorrect(frameNo, oddFieldOSD, evenFieldOSD, m_Processor.EvenBeforeOdd, ref oddFieldTimestamp, ref evenFieldTimestamp, out correctionInfo);
+				    failedReason += ". " + correctionInfo;
 				}
 
                 if (failedValidation)
                 {
-					string errorText = string.Format("ORC ERR: FrameNo: {0}, Odd Timestamp: {1}:{2}:{3}.{4} {5}, Even Timestamp: {6}:{7}:{8}.{9} {10}",
+					string errorText = string.Format("ORC ERR: FrameNo: {0}, Odd Timestamp: {1}:{2}:{3}.{4} {5}, Even Timestamp: {6}:{7}:{8}.{9} {10}, {11}",
 						frameNo, oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds, oddFieldOSD.Milliseconds10, oddFieldOSD.FrameNumber,
-						evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds, evenFieldOSD.Milliseconds10, evenFieldOSD.FrameNumber);
+                        evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds, evenFieldOSD.Milliseconds10, evenFieldOSD.FrameNumber, failedReason);
 
 	                Trace.WriteLine(errorText);
 

@@ -37,12 +37,15 @@ namespace Tangra.OCR
 			m_VideoFormat = videoFormat.Value;
 		}
 
-		public bool TryToCorrect(int frameNo, IotaVtiTimeStamp oddFieldOSD, IotaVtiTimeStamp evenFieldOSD, bool evenBeforeOdd, ref DateTime oddFieldTimestamp, ref DateTime evenFieldTimestamp)
+        public bool TryToCorrect(int frameNo, IotaVtiTimeStamp oddFieldOSD, IotaVtiTimeStamp evenFieldOSD, bool evenBeforeOdd, ref DateTime oddFieldTimestamp, ref DateTime evenFieldTimestamp, out string correctionDebugInfo)
 		{
-			if (m_PrevFrameNo == -1 || m_PrevOddTicks == -1 || m_PrevEvenTicks == -1)
-				return false;
+            if (m_PrevFrameNo == -1 || m_PrevOddTicks == -1 || m_PrevEvenTicks == -1)
+            {
+                correctionDebugInfo = "Cannot correct. m_PrevFrameNo == -1 || m_PrevOddTicks == -1 || m_PrevEvenTicks == -1";
+                return false;
+            }
 
-            string correctionDebugInfo = string.Format("IOTA-VTI Correction Attempt for Frame {0}. {1:D2}:{2:D2}:{3:D2}.{4:D4} ({5}) - {6:D2}:{7:D2}:{8:D2}.{9:D4} ({10})", 
+            correctionDebugInfo = string.Format("IOTA-VTI Correction Attempt for Frame {0}. {1:D2}:{2:D2}:{3:D2}.{4:D4} ({5}) - {6:D2}:{7:D2}:{8:D2}.{9:D4} ({10})", 
                     frameNo, 
                     oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds, oddFieldOSD.Milliseconds10, oddFieldOSD.FrameNumber,
                     evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds, evenFieldOSD.Milliseconds10, evenFieldOSD.FrameNumber);

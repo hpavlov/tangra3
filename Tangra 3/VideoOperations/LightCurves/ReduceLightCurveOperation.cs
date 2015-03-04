@@ -293,64 +293,64 @@ namespace Tangra.VideoOperations.LightCurves
                 {
                     m_Tracker.NextFrame(frameNo, astroImage);
 
-                    if (!m_Tracker.IsTrackedSuccessfully) m_NumberFramesWithBadTracking++;                    
+                    if (!m_Tracker.IsTrackedSuccessfully) m_NumberFramesWithBadTracking++;
+
+                    m_VideoController.SetDisplayHueBackgroundModeTargets(m_Tracker.TrackedObjects);
+
+                    if (m_Refining)
+                    {
+                        if (m_Tracker.RefiningPercentageWorkLeft <= 0)
+                        {
+                            bool canSwitchFromRefiningToMeasuringNow = true;
+
+                            if (m_VideoController.IsUsingSteppedAveraging)
+                            {
+                                // When using stepped averaging the measurements should start at the first frame of an integration 'step'
+                                // which means we need to flip the switch from 'Refining' to 'Measuring' one frame before that
+                                if (firstFrameInIntegrationPeriod + m_VideoController.FramesToIntegrate - 1 > frameNo)
+                                {
+                                    Trace.WriteLine(string.Format("Skipping frame {0}, waiting for the first frame in the next integration period to start measurments.", frameNo));
+                                    canSwitchFromRefiningToMeasuringNow = false;
+                                }
+                            }
+
+                            if (canSwitchFromRefiningToMeasuringNow)
+                            {
+                                m_AavNtpTimestampError = m_VideoController.AstroAnalogueVideoNormaliseNtpDataIfNeeded();
+
+                                // Begin measurements
+                                m_Measuring = true;
+                                m_Refining = false;
+
+                                m_ProcessedFrames = 0;
+                                m_UnsuccessfulFrames = 0;
+                                m_PartiallySuccessfulFrames = 0;
+                                m_StopWatch.Reset();
+                                m_StopWatch.Start();
+
+                                m_Tracker.BeginMeasurements(astroImage);
+
+                                // IMPORTANT: The finalHeader must be changed as well if changing this
+                                LCFile.NewOnTheFlyOutputFile(
+                                    m_VideoController.CurrentVideoFileName,
+                                    string.Format("Video ({0})", m_VideoController.CurrentVideoFileType),
+                                    (byte)m_Tracker.TrackedObjects.Count, (float)m_Tracker.PositionTolerance);
+
+                                m_MinFrame = uint.MaxValue;
+                                m_MaxFrame = uint.MinValue;
+                                m_TotalFrames = 0;
+                                m_FirstMeasuredFrame = frameNo;
+
+                                m_AverageFWHM = astroImage.GetAverageFWHM();
+
+                                if (m_TimestampOCR != null && osdPixels != null)
+                                    m_TimestampOCR.PrepareForMeasurements(osdPixels);
+
+                                m_VideoController.StatusChanged("Measuring");
+                            }
+                        }
+                    }
                 }
-
-				m_VideoController.SetDisplayHueBackgroundModeTargets(m_Tracker.TrackedObjects);
-
-				if (m_Refining)
-				{
-					if (m_Tracker.RefiningPercentageWorkLeft <= 0)
-					{
-						bool canSwitchFromRefiningToMeasuringNow = true;
-
-						if (m_VideoController.IsUsingSteppedAveraging)
-						{
-							// When using stepped averaging the measurements should start at the first frame of an integration 'step'
-							// which means we need to flip the switch from 'Refining' to 'Measuring' one frame before that
-							if (firstFrameInIntegrationPeriod + m_VideoController.FramesToIntegrate - 1 > frameNo)
-							{
-								Trace.WriteLine(string.Format("Skipping frame {0}, waiting for the first frame in the next integration period to start measurments.", frameNo));
-								canSwitchFromRefiningToMeasuringNow = false;
-							}
-						}
-
-						if (canSwitchFromRefiningToMeasuringNow)
-						{
-							m_AavNtpTimestampError = m_VideoController.AstroAnalogueVideoNormaliseNtpDataIfNeeded();
-
-							// Begin measurements
-							m_Measuring = true;
-							m_Refining = false;
-
-							m_ProcessedFrames = 0;
-							m_UnsuccessfulFrames = 0;
-							m_PartiallySuccessfulFrames = 0;
-							m_StopWatch.Reset();
-							m_StopWatch.Start();
-
-							m_Tracker.BeginMeasurements(astroImage);
-
-							// IMPORTANT: The finalHeader must be changed as well if changing this
-							LCFile.NewOnTheFlyOutputFile(
-								m_VideoController.CurrentVideoFileName,
-								string.Format("Video ({0})", m_VideoController.CurrentVideoFileType),
-								(byte)m_Tracker.TrackedObjects.Count, (float)m_Tracker.PositionTolerance);
-
-							m_MinFrame = uint.MaxValue;
-							m_MaxFrame = uint.MinValue;
-							m_TotalFrames = 0;
-							m_FirstMeasuredFrame = frameNo;
-
-							m_AverageFWHM = astroImage.GetAverageFWHM();
-
-							if (m_TimestampOCR != null && osdPixels != null)
-								m_TimestampOCR.PrepareForMeasurements(osdPixels);
-
-							m_VideoController.StatusChanged("Measuring");
-						}
-					}
-				}
 
                 if (m_Measuring)
                 {
