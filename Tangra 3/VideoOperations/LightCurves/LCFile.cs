@@ -170,6 +170,10 @@ namespace Tangra.VideoOperations.LightCurves
                 {
                     int itemsInGroup = reader.ReadInt32();
 
+                    if (itemsInGroup < lcFile.Header.MeasuredFrames) 
+                        // Generally should not happen but it could!
+                        lcFile.Header.MeasuredFrames = (uint)itemsInGroup;
+
 	                bool showProgress = true; //(totalObjects * itemsInGroup) / 100 > 100;
                     bool notSupported = false;
 
