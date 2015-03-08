@@ -816,6 +816,14 @@ namespace Tangra.Video
 	        }
 	    }
 
+        public int AstroAnalogueVideoStackedFrameRate
+	    {
+	        get
+	        {
+                return IsAstroAnalogueVideo ? ((AstroDigitalVideoStream)m_VideoStream).AAVStackingRate : 0;
+	        }
+	    }        
+
 		public string AstroVideoCameraModel
 		{
 			get

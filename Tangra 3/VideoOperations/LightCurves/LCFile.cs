@@ -428,26 +428,36 @@ namespace Tangra.VideoOperations.LightCurves
 			int integratedFields = 0;
 			double ntscCountedFrames = 29.97 / Header.ComputedFramesPerSecond;
 			double palCountedFrames = 25.00 / Header.ComputedFramesPerSecond;
+		    double videoStandardFieldDurationSec = 0;
 			for (int i = 0; i < 256; i++)
 			{
 				if (Math.Abs(i - ntscCountedFrames) < 0.01)
 				{
 					integratedFields = 2 * i;
+                    videoStandardFieldDurationSec = 0.01668335;
 					break;
 				}
 
 				if (Math.Abs(i - palCountedFrames) < 0.01)
 				{
 					integratedFields = 2 * i;
+                    videoStandardFieldDurationSec = 0.02;
 					break;
 				}
 			}
 
+		    double corrEndFirstField = 0;
 			if (integratedFields > 0 && Footer.InstrumentalDelayConfig.ContainsKey(integratedFields / 2))
 			{
+                if (Footer.AAVStackedFrameRate > 1)
+                {
+                    corrEndFirstField = ((integratedFields / 2) - 1) * videoStandardFieldDurationSec;
+                    integratedFields = 2;
+                }
+
 				double corrInstrumentalDelay = Footer.InstrumentalDelayConfig[integratedFields / 2]; // This is already negative
 
-				rv = rv.AddSeconds(corrInstrumentalDelay);
+                rv = rv.AddSeconds(corrEndFirstField + corrInstrumentalDelay);
 
 				string prefix = "OSD ";
 				if (Footer.AavNtpTimestampError > -1)
@@ -457,6 +467,9 @@ namespace Tangra.VideoOperations.LightCurves
 
 				correctedForInstrumentalDelayMessage = string.Format(
 					"Instrumental delay has been applied to the times\r\n\r\nEnd of first field {0}timestamp: {1}", prefix, headerComputedTime.ToString("HH:mm:ss.fff"));
+
+                if (Footer.AAVStackedFrameRate > 1)
+                    correctedForInstrumentalDelayMessage += string.Format("\r\n\r\nThis is a non-integrated video stacked at x{0} frames", Footer.AAVStackedFrameRate);
 			}
 
 			return rv;
@@ -466,7 +479,8 @@ namespace Tangra.VideoOperations.LightCurves
         {
             double corrEndFirstField;
             double corrInstrumentalDelay;
-            if (GetInstrumentalDelayAtFrame(frameNo, out corrEndFirstField, out corrInstrumentalDelay))
+            double corrTimestampHint;
+            if (GetInstrumentalDelayAtFrame(frameNo, out corrEndFirstField, out corrTimestampHint, out corrInstrumentalDelay))
             {
                 return corrInstrumentalDelay;
             }
@@ -474,9 +488,10 @@ namespace Tangra.VideoOperations.LightCurves
             return 0;
         }
 
-        private bool GetInstrumentalDelayAtFrame(double frameNo, out double corrEndFirstField, out double corrInstrumentalDelay)
+        private bool GetInstrumentalDelayAtFrame(double frameNo, out double corrEndFirstField, out double corrTimestampHint, out double corrInstrumentalDelay)
         {
             corrEndFirstField = 0;
+            corrTimestampHint = 0;
             corrInstrumentalDelay = 0;
 
             int frameTimingIndex = (int)((uint)frameNo - Header.MinFrame);
@@ -524,7 +539,18 @@ namespace Tangra.VideoOperations.LightCurves
                 {
                     // Apply correction: [FRAMETIME - ((1/2 * INTEGRATION PERIOD) - 1 FIELD) * (PAL or NTSC FrameRate) - GERHARD_CORRECTION(INTEGRATION PERIOD)]
                     corrEndFirstField = -1 * (((integratedFields / 2) - 1) * videoStandardFieldDurationSec); // Half frame back sets us at the begining of the first field, then add 1 field to get to the end of the field
-                    corrInstrumentalDelay = Footer.InstrumentalDelayConfig[integratedFields / 2]; // This is already negative
+
+                    corrTimestampHint = corrEndFirstField;
+
+                    if (Footer.AAVStackedFrameRate > 1)
+                    {
+                        // If stacking was used then the instrumental delay should be applied based on 1 frame integration (no integration)
+                        integratedFields = 2;
+                        corrEndFirstField = 0;
+                    }
+
+                    corrInstrumentalDelay = corrEndFirstField + Footer.InstrumentalDelayConfig[integratedFields / 2]; // This is already negative
+
                     return true;
                 }
             }
@@ -543,9 +569,10 @@ namespace Tangra.VideoOperations.LightCurves
 
             double corrEndFirstField;
             double corrInstrumentalDelay;
-            if (GetInstrumentalDelayAtFrame(frameNo, out corrEndFirstField, out corrInstrumentalDelay))
+		    double corrTimestampHint;
+            if (GetInstrumentalDelayAtFrame(frameNo, out corrEndFirstField, out corrTimestampHint, out corrInstrumentalDelay))
             {
-                DateTime endOfFirstField = rv.AddSeconds(corrEndFirstField);
+                DateTime endOfFirstField = rv.AddSeconds(corrTimestampHint);
                 rv = rv.AddSeconds(corrEndFirstField + corrInstrumentalDelay);
 
 	            string prefix = "OSD ";
@@ -556,6 +583,9 @@ namespace Tangra.VideoOperations.LightCurves
 
                 correctedForInstrumentalDelayMessage = string.Format(
 					"Instrumental delay has been applied to the times\r\n\r\nEnd of first field {0}timestamp: {1}", prefix, endOfFirstField.ToString("HH:mm:ss.fff"));
+
+                if (Footer.AAVStackedFrameRate > 1)
+                    correctedForInstrumentalDelayMessage += string.Format("\r\n\r\nThis is a non-integrated video stacked at x{0} frames", Footer.AAVStackedFrameRate);
             }
 
 			return rv;
@@ -1892,7 +1922,7 @@ namespace Tangra.VideoOperations.LightCurves
     {
         public static LCMeasurementFooter Empty = new LCMeasurementFooter();
 
-        private static int SERIALIZATION_VERSION = 9;
+        private static int SERIALIZATION_VERSION = 10;
 
         internal byte[] AveragedFrameBytes;
     	internal int AveragedFrameWidth;
@@ -1915,6 +1945,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 	    internal int DataBitPix;
 		internal uint DataAav16NormVal;
+        internal int AAVStackedFrameRate;
 
         internal LCMeasurementFooter(
 			Pixelmap averagedFrame, 
@@ -1931,7 +1962,8 @@ namespace Tangra.VideoOperations.LightCurves
             int aavFrameIntegration,
 			int aavNtpTimestampError,
 			int dataBitPix,
-			uint dataAav16NormVal)
+			uint dataAav16NormVal,
+            int aavStackedFrameRate)
         {
 			AveragedFrameBytes = averagedFrame.DisplayBitmapPixels;
         	AveragedFrameWidth = averagedFrame.Width;
@@ -1954,6 +1986,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 	        DataBitPix = dataBitPix;
 	        DataAav16NormVal = dataAav16NormVal;
+            AAVStackedFrameRate = aavStackedFrameRate;
         }
 
         internal LCMeasurementFooter(BinaryReader reader)
@@ -1999,6 +2032,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 			DataBitPix = 8;
 			DataAav16NormVal = 0;
+            AAVStackedFrameRate = 0;
 
 			if (version > 1)
 			{
@@ -2047,6 +2081,11 @@ namespace Tangra.VideoOperations.LightCurves
 										if (version > 8)
 										{
 											AavNtpTimestampError = reader.ReadInt32();
+
+                                            if (version > 9)
+                                            {
+                                                AAVStackedFrameRate = reader.ReadInt32();
+                                            }
 										}
 									}
 								}
@@ -2119,6 +2158,8 @@ namespace Tangra.VideoOperations.LightCurves
 			writer.Write(DataAav16NormVal);
 
 	        writer.Write(AavNtpTimestampError);
+
+            writer.Write(AAVStackedFrameRate);
         }
     }
 

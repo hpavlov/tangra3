@@ -89,6 +89,7 @@ namespace Tangra.Video
 		private int m_OsdFirstLine = 0;
 		private int m_OsdLastLine = 0;
 		private bool m_UsesNtpTimestamps;
+	    private int m_StackingRate = 0;
 
 		private int m_AlmanacOffsetLastFrame;
 		private bool m_AlamanacOffsetLastFrameIsGood;
@@ -151,6 +152,9 @@ namespace Tangra.Video
                 {
 					m_IntegratedAAVFrames = (int)Math.Round(m_NativeFrameRate / m_EffectiveFrameRate);
                 }
+
+			    int.TryParse(GetFileTag("FRAME-STACKING-RATE"), out m_StackingRate);
+			    if (m_StackingRate == 1) m_StackingRate = 0; // Video stacked at x1 is a non-stacked video
 			}
 			else
 			{
@@ -216,6 +220,12 @@ namespace Tangra.Video
 		{
             get { return m_IntegratedAAVFrames; }
 		}
+
+
+        public int AAVStackingRate
+        {
+            get { return m_StackingRate; }
+        }
 
 		public string VideoStandard
 		{
