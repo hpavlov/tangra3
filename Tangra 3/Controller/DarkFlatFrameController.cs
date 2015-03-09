@@ -95,10 +95,12 @@ namespace Tangra.Controller
 								imageHDU.Axes[1] != TangraContext.Current.FrameWidth ||
 								imageHDU.BitPix != 16)
 							{
-								m_VideoController.ShowMessageBox(
-									"Selected image is not compatible with the currently loaded video.", "Tangra",
-									MessageBoxButtons.OK, MessageBoxIcon.Error);
-								return false;
+								if (m_VideoController.ShowMessageBox(
+								    "Selected image may not be compatible with the currently loaded video. Do you wish to continue?", "Tangra",
+								    MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
+								{
+                                    return false;
+								}								
 							}
 
 							return true;

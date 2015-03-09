@@ -210,7 +210,7 @@ namespace Tangra.Helpers
 					dataRow = new short[arr.Length];
 					for (int i = 0; i < arr.Length; i++)
 					{
-						dataRow[i] = Convert.ToInt16(arr.GetValue(i));
+						dataRow[i] = (short)Convert.ToInt32(arr.GetValue(i));
 					}
 				}
 				else
