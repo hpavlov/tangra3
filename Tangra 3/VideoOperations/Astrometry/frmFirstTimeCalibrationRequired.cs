@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Tangra.Config;
+using Tangra.Helpers;
 using Tangra.Model.Config;
 
 namespace Tangra.VideoOperations.Astrometry
@@ -33,5 +34,10 @@ namespace Tangra.VideoOperations.Astrometry
 			DialogResult = DialogResult.OK;
 			Close();
 		}
+
+        private void lnkCalinrationHelpLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            ShellHelper.OpenUrl("http://www.hristopavlov.net/Tangra/Calibration/");
+        }
 	}
 }

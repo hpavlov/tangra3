@@ -112,7 +112,7 @@ namespace Tangra.ImageTools
                         m_StateTransition = SizerState.ResizingDown;
                     }
                 }
-                else if (x1 > m_UserFrame.Width - s_FrameWidth && x1 <= m_UserFrame.Width && y1 >= 0 && y1 < s_FrameWidth)
+                else if (x1 >= 0 && x1 < s_FrameWidth && y1 >= m_UserFrame.Height - s_FrameWidth && y1 < m_UserFrame.Height)
                 {
                     if (m_StateTransition != SizerState.ResizingBottomLeft)
                     {
@@ -120,9 +120,7 @@ namespace Tangra.ImageTools
                         m_StateTransition = SizerState.ResizingBottomLeft;
                     }
                 }
-                else if (
-                    x1 > m_UserFrame.Width - s_FrameWidth && x1 <= m_UserFrame.Width &&
-                    y1 >= s_FrameWidth && y1 <= m_UserFrame.Height - s_FrameWidth)
+                else if (x1 >= 0 && x1 < s_FrameWidth && y1 > 0 && y1 <= m_UserFrame.Height)
                 {
                     if (m_StateTransition != SizerState.ResizingLeft)
                     {
@@ -158,7 +156,7 @@ namespace Tangra.ImageTools
                         m_StateTransition = SizerState.ResizingTopRight;
                     }
                 }
-                else if (x1 >= s_FrameWidth && x1 <= m_UserFrame.Height - s_FrameWidth && y1 >= 0 && y1 < s_FrameWidth)
+                else if (x1 >= m_UserFrame.Width - s_FrameWidth && x1 <= m_UserFrame.Width && y1 >= 0 && y1 < m_UserFrame.Height)
                 {
                     if (m_StateTransition != SizerState.ResizingRight)
                     {
@@ -200,9 +198,9 @@ namespace Tangra.ImageTools
 				}
 				else if (m_State == SizerState.ResizingBottomLeft)
 				{
-					m_UserFrame.Height = m_UserFrame.Bottom - posY;
-					m_UserFrame.Width = posX - m_UserFrame.Left;
-					m_UserFrame.Y = posY;
+                    m_UserFrame.Width = m_UserFrame.Right - posX;
+                    m_UserFrame.X = posX;
+                    m_UserFrame.Height = posY - m_UserFrame.Y;
 				}
 				else if (m_State == SizerState.ResizingUp)
 				{
@@ -221,12 +219,12 @@ namespace Tangra.ImageTools
 				}
 				else if (m_State == SizerState.ResizingLeft)
 				{
-					m_UserFrame.Width = posX - m_UserFrame.Left;
+                    m_UserFrame.Width = m_UserFrame.Right - posX;
+                    m_UserFrame.X = posX;
 				}
 				else if (m_State == SizerState.ResizingRight)
 				{
-					m_UserFrame.Width = m_UserFrame.Right - posX;
-					m_UserFrame.X = posX;
+                    m_UserFrame.Width = posX - m_UserFrame.Left;
 				}
 
 				TriggerRedraw();
