@@ -37,13 +37,44 @@ namespace Tangra.ImageTools
 	    protected VideoController m_VideoController;
 
         private static int s_FrameWidth = 3;
-	    private static string s_DisplayText = "OSD EXCLUSION AREA";
+
+	    private static string s_DisplayTextOSDExclude = "OSD EXCLUSION AREA";
+		private static string s_DisplayTextInclude = "INCLUSION AREA";
         
         protected Rectangle m_UserFrame;
         private bool m_Dragging = false;
 
         private SizerState m_State = SizerState.Normal;
         private SizerState m_StateTransition = SizerState.Normal;
+
+		public event OnAreaChanged AreaChanged;
+
+	    private bool? m_LimitByInclusion;
+
+	    protected bool LimitByInclusion
+	    {
+		    get
+		    {
+			    return m_LimitByInclusion.HasValue && m_LimitByInclusion.Value;
+		    }
+			set
+			{
+				if (!m_LimitByInclusion.HasValue || m_LimitByInclusion.Value != value)
+				{
+					m_LimitByInclusion = value;
+					if (m_LimitByInclusion.Value)
+					{
+						m_UserFrame = new Rectangle(AstrometryContext.Current.RectToInclude.X, AstrometryContext.Current.RectToInclude.Y,
+													AstrometryContext.Current.RectToInclude.Width, AstrometryContext.Current.RectToInclude.Height);
+					}
+					else
+					{
+						m_UserFrame = new Rectangle(AstrometryContext.Current.OSDRectToExclude.X, AstrometryContext.Current.OSDRectToExclude.Y,
+													AstrometryContext.Current.OSDRectToExclude.Width, AstrometryContext.Current.OSDRectToExclude.Height);
+					}
+				}
+			}
+	    }
 
 		public FrameSizer(VideoController videoController)
 		{
@@ -64,18 +95,27 @@ namespace Tangra.ImageTools
             m_State = SizerState.Normal;
             m_StateTransition = SizerState.Normal;
 
-			if (m_UserFrame == Rectangle.Empty)
-				// Load from saved one or default 
-				m_UserFrame = new Rectangle(AstrometryContext.Current.OSDRectToExclude.X, AstrometryContext.Current.OSDRectToExclude.Y,
-											AstrometryContext.Current.OSDRectToExclude.Width, AstrometryContext.Current.OSDRectToExclude.Height);
+	        if (m_UserFrame == Rectangle.Empty)
+		        // Load from saved one or default 
+		        LimitByInclusion = false;
         }
 
         public override void Deactivate()
         {
             if (m_UserFrame != Rectangle.Empty)
             {
-                AstrometryContext.Current.OSDRectToExclude = new Rectangle(m_UserFrame.X, m_UserFrame.Y, m_UserFrame.Width, m_UserFrame.Height);
-				TangraConfig.Settings.OSDSizes.AddOrUpdateOSDRectangleForFrameSize(TangraContext.Current.FrameWidth, TangraContext.Current.FrameWidth, AstrometryContext.Current.OSDRectToExclude);
+				if (LimitByInclusion)
+				{
+					AstrometryContext.Current.RectToInclude = new Rectangle(m_UserFrame.X, m_UserFrame.Y, m_UserFrame.Width, m_UserFrame.Height);
+					AstrometryContext.Current.LimitByInclusion = true;
+					TangraConfig.Settings.IncludeAreaSizes.AddOrUpdateInclusionRectangleForFrameSize(TangraContext.Current.FrameWidth, TangraContext.Current.FrameWidth, AstrometryContext.Current.OSDRectToExclude);
+				}
+				else
+				{
+					AstrometryContext.Current.OSDRectToExclude = new Rectangle(m_UserFrame.X, m_UserFrame.Y, m_UserFrame.Width, m_UserFrame.Height);
+					AstrometryContext.Current.LimitByInclusion = false;
+					TangraConfig.Settings.OSDSizes.AddOrUpdateOSDRectangleForFrameSize(TangraContext.Current.FrameWidth, TangraContext.Current.FrameWidth, AstrometryContext.Current.OSDRectToExclude);
+				}
 	            TangraConfig.Settings.Save();
             }
 
@@ -252,9 +292,21 @@ namespace Tangra.ImageTools
                 m_StateTransition = SizerState.Normal;
 
                 m_VideoController.SetPictureBoxCursor(Cursors.Arrow);
-				AstrometryContext.Current.OSDRectToExclude = new Rectangle(m_UserFrame.X, m_UserFrame.Y, m_UserFrame.Width, m_UserFrame.Height);
+				if (LimitByInclusion)
+				{
+					AstrometryContext.Current.RectToInclude = new Rectangle(m_UserFrame.X, m_UserFrame.Y, m_UserFrame.Width, m_UserFrame.Height);
+					AstrometryContext.Current.LimitByInclusion = true;
+				}
+				else
+				{
+					AstrometryContext.Current.OSDRectToExclude = new Rectangle(m_UserFrame.X, m_UserFrame.Y, m_UserFrame.Width, m_UserFrame.Height);
+					AstrometryContext.Current.LimitByInclusion = false;
+				}
 
-	            TriggerRedraw();
+				if (AreaChanged != null)
+					AreaChanged();
+	            
+				TriggerRedraw();
             }
         }
 
@@ -269,16 +321,31 @@ namespace Tangra.ImageTools
 		{
 			if (m_UserFrame != Rectangle.Empty)
 			{
-				Pen osdAreaPen = m_Dragging ? Pens.Purple : Pens.Blue;
-				Brush osdAreaBrush = m_Dragging ? Brushes.Purple : Brushes.Blue;
+				if (LimitByInclusion)
+				{
+					Pen osdAreaPen = m_Dragging ? Pens.Purple : Pens.Lime;
+					Brush osdAreaBrush = m_Dragging ? Brushes.Purple : Brushes.Lime;
 
-				Rectangle rect = m_UserFrame;
-				rect.Inflate(-1, -1);
-				g.DrawRectangle(osdAreaPen, rect);
-				g.FillRectangle(new SolidBrush(Color.FromArgb(20, 0, 0, 255)), m_UserFrame);
+					Rectangle rect = m_UserFrame;
+					rect.Inflate(-1, -1);
+					g.DrawRectangle(osdAreaPen, rect);
+					g.FillRectangle(new SolidBrush(Color.FromArgb(20, 0, 255, 0)), m_UserFrame);
 
-				SizeF size = g.MeasureString(s_DisplayText, s_Font);
-				g.DrawString(s_DisplayText, s_Font, osdAreaBrush, m_UserFrame.Left + 1, m_UserFrame.Top + 1 - size.Height);
+					g.DrawString(s_DisplayTextInclude, s_Font, osdAreaBrush, m_UserFrame.Left + 1, m_UserFrame.Top + 1);
+				}
+				else
+				{
+					Pen osdAreaPen = m_Dragging ? Pens.Purple : Pens.LightCoral;
+					Brush osdAreaBrush = m_Dragging ? Brushes.Purple : Brushes.LightCoral;
+
+					Rectangle rect = m_UserFrame;
+					rect.Inflate(-1, -1);
+					g.DrawRectangle(osdAreaPen, rect);
+					g.FillRectangle(new SolidBrush(Color.FromArgb(20, 255, 0, 0)), m_UserFrame);
+
+					SizeF size = g.MeasureString(s_DisplayTextOSDExclude, s_Font);
+					g.DrawString(s_DisplayTextOSDExclude, s_Font, osdAreaBrush, m_UserFrame.Left + 1, m_UserFrame.Top + 1 - size.Height);
+				}
 			}
 		}
 

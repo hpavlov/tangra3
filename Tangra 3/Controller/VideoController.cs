@@ -2049,10 +2049,5 @@ namespace Tangra.Controller
 		{
 			m_FramePlayer.SetFlipSettings(flipVertically, flipHorizontally, rotate180);
 		}
-
-		public void SetBorderClip(int pixelsToClip)
-		{
-			m_FramePlayer.SetBorderClip(pixelsToClip);
-		}
 	}
 }

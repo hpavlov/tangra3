@@ -35,9 +35,8 @@ namespace Tangra.Astrometry.Analysis
 		}
 
 		public void ResolvePeakPixels(
-			Rectangle OSDRectangleToExclude, 
-			int edgeDistance,
-			int minDistanceBetweenPixels)
+			Rectangle osdRectangleToExclude, Rectangle rectToInclude, bool limitByInclusion,
+			int edgeDistance, int minDistanceBetweenPixels)
 		{
 				int width = m_Image.Width;
 				int height = m_Image.Height;
@@ -49,7 +48,9 @@ namespace Tangra.Astrometry.Analysis
 				{
 					for (int x = edgeDistance; x < width - edgeDistance; ++x)
 					{
-						if (OSDRectangleToExclude.Contains(x, y)) continue;
+						if (limitByInclusion && !rectToInclude.Contains(x, y)) continue;
+						if (!limitByInclusion && osdRectangleToExclude.Contains(x, y)) continue;
+
 						allPixels.Add(data[x, y]);
 					}
 				}
@@ -75,7 +76,9 @@ namespace Tangra.Astrometry.Analysis
 								int xx = x + i;
 								int yy = y + j;
 
-								if (OSDRectangleToExclude.Contains(xx, yy)) continue;
+								if (limitByInclusion && !rectToInclude.Contains(xx, yy)) continue;
+								if (!limitByInclusion && osdRectangleToExclude.Contains(xx, yy)) continue;
+
 								if (data[xx, yy] < mode) continue;
 
 								if (data[xx, yy] > maxVal)

@@ -276,6 +276,8 @@ namespace Tangra.VideoOperations.Astrometry
 							TangraConfig.PreProcessingFilter.NoFilter,
 							TangraConfig.Settings.StarCatalogue.CatalogMagnitudeBandId,
 							AstrometryContext.Current.OSDRectToExclude,
+							AstrometryContext.Current.RectToInclude,
+							AstrometryContext.Current.LimitByInclusion,
 							TangraConfig.Settings.Astrometry,
 							ObjectResolverSettings.Default);
 				}
@@ -416,6 +418,8 @@ namespace Tangra.VideoOperations.Astrometry
 				AstrometryContext.Current.StarMapConfig,
 				astroImage,
 				AstrometryContext.Current.OSDRectToExclude,
+				AstrometryContext.Current.RectToInclude,
+				AstrometryContext.Current.LimitByInclusion,
 				(int)TangraConfig.Settings.Astrometry.PyramidOptimumStarsToMatch);
 
 			AstrometryContext.Current.StarMap = starMap;

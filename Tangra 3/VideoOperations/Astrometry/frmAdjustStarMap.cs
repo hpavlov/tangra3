@@ -76,7 +76,13 @@ namespace Tangra.VideoOperations.Astrometry
 					TangraConfig.Settings.Astrometry.MaximumPSFElongation,
 					TangraConfig.Settings.Astrometry.LimitReferenceStarDetection);
 
-				StarMap.FindBestMap(StarMapConfig, astroImage, AstrometryContext.Current.OSDRectToExclude, optimumStars);
+				StarMap.FindBestMap(
+					StarMapConfig, 
+					astroImage, 
+					AstrometryContext.Current.OSDRectToExclude, 
+					AstrometryContext.Current.RectToInclude,
+					AstrometryContext.Current.LimitByInclusion, 
+					optimumStars);
 
 				// NOTE: This will crash 
 				imgFrame.Image = RawBitmap;

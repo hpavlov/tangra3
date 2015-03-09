@@ -314,7 +314,7 @@ namespace Tangra.Astrometry
 			get { return m_SaturatedFlags; }
 		}
 
-		public static void PSFPhotometry(FitInfo astrometricFit, List<IStar> catalogueStars, AstroImage currentAstroImage, Rectangle osdRectToExclude)
+		public static void PSFPhotometry(FitInfo astrometricFit, List<IStar> catalogueStars, AstroImage currentAstroImage, Rectangle osdRectToExclude, Rectangle rectToInclude, bool limitByInclusion)
 		{
 			StringBuilder output = new StringBuilder();
 
@@ -323,7 +323,8 @@ namespace Tangra.Astrometry
                 uint[,] data = currentAstroImage.GetMeasurableAreaPixels(
 					(int)Math.Round(pair.x), (int)Math.Round(pair.y), 9);
 
-                if (osdRectToExclude.Contains((int)pair.x, (int)pair.y)) continue;
+				if (limitByInclusion && !rectToInclude.Contains((int)pair.x, (int)pair.y)) continue;
+				if (!limitByInclusion && osdRectToExclude.Contains((int)pair.x, (int)pair.y)) continue;
 
 				PSFFit gaussian = new PSFFit((int)Math.Round(pair.x), (int)Math.Round(pair.y));
 				gaussian.Fit(data);
@@ -427,6 +428,8 @@ namespace Tangra.Astrometry
 
 			AstroImage currentAstroImage = videoController.GetCurrentAstroImage(false);
 			Rectangle osdRectToExclude = astrometryController.OSDRectToExclude;
+			Rectangle rectToInclude = astrometryController.RectToInclude;
+			bool limitByInclusion = astrometryController.LimitByInclusion;
 
 			int matSize = CorePhotometrySettings.Default.MatrixSizeForCalibratedPhotometry;
 			uint saturatedValue = TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(bitPix);
@@ -441,7 +444,8 @@ namespace Tangra.Astrometry
 			{
 				foreach (PlateConstStarPair pair in astrometricFit.AllStarPairs)
 				{
-					if (osdRectToExclude.Contains((int)pair.x, (int)pair.y)) continue;
+					if (limitByInclusion && !rectToInclude.Contains((int)pair.x, (int)pair.y)) continue;
+					if (!limitByInclusion && osdRectToExclude.Contains((int)pair.x, (int)pair.y)) continue;
 
 					IStar star = catalogueStars.Find(s => s.StarNo == pair.StarNo);
 					if (star == null || double.IsNaN(star.Mag) || star.Mag == 0) continue;

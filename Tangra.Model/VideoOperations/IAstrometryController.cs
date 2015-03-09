@@ -22,6 +22,8 @@ namespace Tangra.Model.VideoOperations
 		void NotifyBeginLongOperation(string description);
 		void NotifyEndLongOperation();
 		Rectangle OSDRectToExclude { get; }
+		Rectangle RectToInclude { get; }
+		bool LimitByInclusion { get; }
 
 		AstroPlate GetCurrentAstroPlate();
 		void RunCalibrationWithCurrentPreliminaryFit();

@@ -24,7 +24,7 @@ namespace Tangra.VideoOperations.Astrometry.Engine
 		public TangraConfig.PersistedPlateConstants PlateConstants { get; set; }
 
 		private Rectangle m_OSDRectToExclude = Rectangle.Empty;
-
+		
 		public Rectangle OSDRectToExclude
 		{
 			get
@@ -39,6 +39,25 @@ namespace Tangra.VideoOperations.Astrometry.Engine
 				m_OSDRectToExclude = value;
 			}
 		}
+
+		private Rectangle m_RectToInclude = Rectangle.Empty;
+
+		public Rectangle RectToInclude
+		{
+			get
+			{
+				if (m_RectToInclude == Rectangle.Empty)
+					m_RectToInclude = TangraConfig.Settings.IncludeAreaSizes.GetInclusionRectangleForFrameSize(Current.FullFrame.Width, Current.FullFrame.Height);
+
+				return m_RectToInclude;
+			}
+			set
+			{
+				m_RectToInclude = value;
+			}
+		}
+
+		public bool LimitByInclusion { get; set; }
 
 		public AstrometricState AstrometricState { get; set; }
 		public VideoCamera VideoCamera { get; set; }

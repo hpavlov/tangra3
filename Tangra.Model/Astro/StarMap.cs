@@ -34,6 +34,8 @@ namespace Tangra.Model.Astro
 		private List<StarMapFeature> m_Features = new List<StarMapFeature>();
 
 		private Rectangle m_OSDFrameToExclude = Rectangle.Empty;
+		private Rectangle m_FrameToInclude = Rectangle.Empty;
+		private bool m_LimitByInclusion = false;
 		private Dictionary<int, int> m_IndexToFeatureIdMap = new Dictionary<int, int>();
 		private int m_FeatureId = 0;
 
@@ -68,9 +70,8 @@ namespace Tangra.Model.Astro
 		}
 
 		public int FindBestMap(
-			StarMapInternalConfig config, 
-			AstroImage image, 
-			Rectangle osdFrameToExclude,
+			StarMapInternalConfig config, AstroImage image, 
+			Rectangle osdFrameToExclude, Rectangle frameToInclude, bool limitByInclusion,
 			int optimumStarsInField)
 		{
 			m_Config = config;
@@ -83,6 +84,8 @@ namespace Tangra.Model.Astro
 			m_Pixelmap = image.Pixelmap;
 
 			m_OSDFrameToExclude = osdFrameToExclude;
+			m_FrameToInclude = frameToInclude;
+			m_LimitByInclusion = limitByInclusion;
 
 			m_AverageBackgroundNoise = m_Pixelmap.MaxPixelValue;
 			double snRatio = 0.15;
@@ -287,12 +290,14 @@ namespace Tangra.Model.Astro
 			}
 		}
 
-		public void InitializeStarMapButDontProcess(StarMapInternalConfig config, AstroImage image, Rectangle osdFrameToExclude)
+		public void InitializeStarMapButDontProcess(StarMapInternalConfig config, AstroImage image, Rectangle osdFrameToExclude, Rectangle frameToInclude, bool limitByInclusion)
 		{
 			m_FullWidth = image.Width;
 			m_FullHeight = image.Height;
 			m_Pixelmap = image.Pixelmap;
 			m_OSDFrameToExclude = osdFrameToExclude;
+			m_FrameToInclude = frameToInclude;
+			m_LimitByInclusion = limitByInclusion;
 
 			try
 			{
@@ -327,6 +332,8 @@ namespace Tangra.Model.Astro
 			foreach (StarMapFeature feature in copyFrom.m_Features) m_Features.Add((StarMapFeature)feature.Clone());
 
 			m_OSDFrameToExclude = new Rectangle(copyFrom.m_OSDFrameToExclude.Left, copyFrom.m_OSDFrameToExclude.Top, copyFrom.m_OSDFrameToExclude.Width, copyFrom.m_OSDFrameToExclude.Height);
+			m_FrameToInclude = new Rectangle(copyFrom.m_FrameToInclude.Left, copyFrom.m_FrameToInclude.Top, copyFrom.m_FrameToInclude.Width, copyFrom.m_FrameToInclude.Height);
+			m_LimitByInclusion = copyFrom.m_LimitByInclusion;
 
 			m_IndexToFeatureIdMap.Clear();
 			foreach (int key in copyFrom.m_IndexToFeatureIdMap.Keys) m_IndexToFeatureIdMap.Add(key, copyFrom.m_IndexToFeatureIdMap[key]);
@@ -431,9 +438,13 @@ namespace Tangra.Model.Astro
 			if (x < 0 || y < 0 || x >= m_FullWidth || y >= m_FullHeight) 
 				return false;
 
-			// Inside the OSD frame
-			if (m_OSDFrameToExclude.Contains(x, y))
-				return false;
+			if (m_LimitByInclusion)
+				// Include pixels inside the defined area
+				return m_FrameToInclude.Contains(x, y);
+			else
+				// Inside the OSD frame so don't include
+				if (m_OSDFrameToExclude.Contains(x, y))
+					return false;
 
 			return true;
 		}

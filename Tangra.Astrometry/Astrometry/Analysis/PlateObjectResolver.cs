@@ -91,7 +91,9 @@ namespace Tangra.Astrometry.Analysis
 			TangraConfig.BackgroundMethod backgroundMethod,
 			TangraConfig.PreProcessingFilter filter,
 			Guid magnitudeBandId,
-			Rectangle OSDRectangleToExclude,
+			Rectangle osdRectangleToExclude,
+			Rectangle rectToInclude,
+			bool limitByInclusion,
 			IAstrometrySettings astrometrySettings,
 			ObjectResolverSettings objectResolverSettings)
 		{
@@ -104,7 +106,7 @@ namespace Tangra.Astrometry.Analysis
 				astrometrySettings.MaximumPSFElongation,
 				astrometrySettings.LimitReferenceStarDetection);
 
-			starMap.FindBestMap(StarMapInternalConfig.Default, m_Image, OSDRectangleToExclude, (int)astrometrySettings.PyramidOptimumStarsToMatch);
+			starMap.FindBestMap(StarMapInternalConfig.Default, m_Image, osdRectangleToExclude, rectToInclude, limitByInclusion, (int)astrometrySettings.PyramidOptimumStarsToMatch);
 
 			float r0 = 0;
 
@@ -130,7 +132,7 @@ namespace Tangra.Astrometry.Analysis
 			Trace.WriteLine(string.Format("Plate FWHM: {0}", 2 * Math.Sqrt(Math.Log(2)) * r0));
 
 			PeakPixelResolver resolver = new PeakPixelResolver(m_Image);
-			resolver.ResolvePeakPixels(OSDRectangleToExclude, objectResolverSettings.ExcludeEdgeAreaPixels, objectResolverSettings.MinDistanceBetweenPeakPixels);
+			resolver.ResolvePeakPixels(osdRectangleToExclude, rectToInclude, limitByInclusion, objectResolverSettings.ExcludeEdgeAreaPixels, objectResolverSettings.MinDistanceBetweenPeakPixels);
 
 			List<double> identifiedMagnitudes = new List<double>();
 			List<double> identifiedR0s = new List<double>();

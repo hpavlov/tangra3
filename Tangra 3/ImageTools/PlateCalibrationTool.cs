@@ -38,6 +38,14 @@ namespace Tangra.ImageTools
 		Solved
 	}
 
+	internal enum AreaType
+	{
+		OSDExclusion,
+		Inclusion
+	}
+
+	internal delegate void OnAreaChanged();
+
 	internal interface IPlateCalibrationTool
 	{
 		void RotationChanged(int newValue);
@@ -51,9 +59,11 @@ namespace Tangra.ImageTools
 		void Solve(bool debug);
 		void ActivateCalibration();
 		void ActivateOsdAreaSizing();
+		void SetAreaType(AreaType areaType);
 		void ChangePlottedFit(int fitGrade);
 		void Set3StarIdMode();
 		void SetManualFitMode();
+		event OnAreaChanged AreaChanged;
 	}
 
 	internal class PlateCalibrationTool : CalibrationToolBase, INotificationReceiver, IDisposable
@@ -67,9 +77,16 @@ namespace Tangra.ImageTools
 			m_DebugMode = debugMode;
 
 			m_OSDExcluderTool = new OSDExcluder(videoController);
+			m_OSDExcluderTool.AreaChanged += m_OSDExcluderTool_AreaChanged;
 
 			if (s_PlatesolveController == null)
 				s_PlatesolveController = new ucCalibrationPanel(astrometryController, videoController, this);
+		}
+
+		void m_OSDExcluderTool_AreaChanged()
+		{
+			if (AreaChangedHandler != null)
+				AreaChangedHandler();
 		}
 
 		public override ZoomImageBehaviour ZoomBehaviour
@@ -259,6 +276,15 @@ namespace Tangra.ImageTools
 			}
 		}
 
+		public override void SetAreaType(AreaType areaType)
+		{
+			if (m_State == FittingsState.Configuring)
+			{
+				m_OSDExcluderTool.SetAreaType(areaType);
+				m_VideoController.RedrawCurrentFrame(false, true);
+			}
+		}
+
 		public override void ActivateCalibration()
 		{
 			if (m_State == FittingsState.Configuring)
@@ -282,6 +308,8 @@ namespace Tangra.ImageTools
 				AstrometryContext.Current.StarMapConfig, 
 				image,
 				AstrometryContext.Current.OSDRectToExclude,
+				AstrometryContext.Current.RectToInclude,
+				AstrometryContext.Current.LimitByInclusion,
 				(int)TangraConfig.Settings.Astrometry.PyramidOptimumStarsToMatch);
 
 			AstrometryContext.Current.StarMap = starMap;

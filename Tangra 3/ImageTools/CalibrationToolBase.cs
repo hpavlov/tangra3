@@ -829,6 +829,24 @@ namespace Tangra.ImageTools
 
 		public virtual void ActivateOsdAreaSizing() { }
 
+		public virtual void SetAreaType(AreaType areaType) { }
+
+		protected OnAreaChanged AreaChangedHandler;
+
+		public event OnAreaChanged AreaChanged
+		{
+			add
+			{
+				AreaChangedHandler -= value;
+				AreaChangedHandler += value;
+			}
+
+			remove
+			{
+				AreaChangedHandler -= value;
+			}
+		}
+
 		public void Set3StarIdMode()
 		{
 			m_Is3StarIdMode = true;

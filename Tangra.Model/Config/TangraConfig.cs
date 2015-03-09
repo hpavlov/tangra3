@@ -274,6 +274,7 @@ namespace Tangra.Model.Config
 		public CatalogSettings StarCatalogue = new CatalogSettings();
 		public PlateSolveSettings PlateSolve = new PlateSolveSettings();
 		public OSDSizes OSDSizes = new OSDSizes();
+		public IncludeAreaSizes IncludeAreaSizes = new IncludeAreaSizes(); 
 		public UrlSettings Urls = new UrlSettings();
 		public HelpSystemFlags HelpFlags = new HelpSystemFlags();
 
@@ -1485,7 +1486,6 @@ namespace Tangra.Model.Config
 			public int Width;
 			public int Height;
 			public ConfigurationLimitingMagnitudes LimitingMagnitudes;
-			public ConfigurationClipBorderPixels ClipBorderPixels;
 			public ConfigurationRawFrameSizes RawFrameSizes;
 			public bool FlipHorizontally = false;
 			public bool FlipVertically = false;
@@ -1504,7 +1504,6 @@ namespace Tangra.Model.Config
 			public ScopeRecorderConfiguration(string cameraModel, int width, int height)
 			{
 				LimitingMagnitudes = new ConfigurationLimitingMagnitudes();
-				ClipBorderPixels = new ConfigurationClipBorderPixels();
 				RawFrameSizes = new ConfigurationRawFrameSizes();
 				RawFrameSizes[cameraModel] = new Rectangle(0, 0, width, height);
 				IsNew = true;
@@ -1535,40 +1534,6 @@ namespace Tangra.Model.Config
 						return Values[idx];
 					else
 						return DEFAULT_LIMITING_MAGNITUDE;
-				}
-				set
-				{
-					int idx = Keys.IndexOf(camera);
-					if (idx != -1)
-						Values[idx] = value;
-					else
-					{
-						Keys.Add(camera);
-						Values.Add(value);
-					}
-				}
-			}
-		}
-
-		public class ConfigurationClipBorderPixels
-		{
-			public List<string> Keys = new List<string>();
-			public List<int> Values = new List<int>();
-
-			public static int DEFAULT_CLIP_BORDER = 0;
-
-			public ConfigurationClipBorderPixels()
-			{ }
-
-			public int this[string camera]
-			{
-				get
-				{
-					int idx = Keys.IndexOf(camera);
-					if (idx != -1)
-						return Values[idx];
-					else
-						return DEFAULT_CLIP_BORDER;
 				}
 				set
 				{

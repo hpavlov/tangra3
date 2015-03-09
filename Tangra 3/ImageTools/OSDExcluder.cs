@@ -29,7 +29,7 @@ namespace Tangra.ImageTools
 
         public override void Activate()
         {
-			m_UserFrame = TangraConfig.Settings.OSDSizes.GetOSDRectangleForFrameSize(m_VideoWidth, m_VideoHeight);
+	        LimitByInclusion = false;
             
             base.Activate();
         }
@@ -37,10 +37,20 @@ namespace Tangra.ImageTools
         public override void Deactivate()
         {
             // Save the modified frame
-			TangraConfig.Settings.OSDSizes.AddOrUpdateOSDRectangleForFrameSize(m_VideoWidth, m_VideoHeight, m_UserFrame);
+	        if (LimitByInclusion)
+		        TangraConfig.Settings.OSDSizes.AddOrUpdateOSDRectangleForFrameSize(m_VideoWidth, m_VideoHeight, m_UserFrame);
+	        else
+				TangraConfig.Settings.IncludeAreaSizes.AddOrUpdateInclusionRectangleForFrameSize(m_VideoWidth, m_VideoHeight, m_UserFrame);
+
 			TangraConfig.Settings.Save();
 
             base.Deactivate();
         }
+
+		internal void SetAreaType(AreaType areaType)
+		{
+			// This will load the correct area in the m_UserFrame too
+			LimitByInclusion = areaType == AreaType.Inclusion;
+		}
     }
 }

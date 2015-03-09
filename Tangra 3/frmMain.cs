@@ -1113,23 +1113,18 @@ namespace Tangra
 				AstrometryContext.Current.PlateConstants = TangraConfig.Settings.PlateSolve.GetPlateConstants(new Rectangle(0, 0, TangraContext.Current.FrameWidth, TangraContext.Current.FrameHeight));
 
 				m_VideoController.SetFlipSettings(config.FlipVertically, config.FlipHorizontally, config.Rotate180);
-				int clipedBorderPixels = config.ClipBorderPixels[TangraConfig.Settings.PlateSolve.SelectedCameraModel];
-				m_VideoController.SetBorderClip(clipedBorderPixels);
-
-				bool refreshed = false;
-				if (clipedBorderPixels > 0)
-				{
-					m_VideoController.RefreshCurrentFrame();
-					refreshed = true;
-				}
 
 				TangraContext.Current.CanChangeTool = true;
 
 				if (frmCamera.IsNewConfiguration)
 				{
-					// This will create a default configuration 
-					Rectangle defaultRect = AstrometryContext.Current.OSDRectToExclude;
+					// This will create a default configurations
+					Rectangle defaultRect = AstrometryContext.Current.RectToInclude;
+					AstrometryContext.Current.RectToInclude = defaultRect;
+					defaultRect = AstrometryContext.Current.OSDRectToExclude;
 					AstrometryContext.Current.OSDRectToExclude = defaultRect;
+					// By default we use an OSD Exclude area
+					AstrometryContext.Current.LimitByInclusion = false;
 
 					m_VideoController.ChangeImageTool(new FrameSizer(m_VideoController));
 

@@ -84,7 +84,6 @@ namespace Tangra.Model.Video
 	{
 		void SetFrameRenderer(IVideoFrameRenderer frameRenderer);
 		void SetFlipSettings(bool flipVertically, bool flipHorizontally, bool rotate180);
-		void SetBorderClip(int pixelsToClip);
 		bool IsRunning { get; }
 		bool IsAstroDigitalVideo { get; }
 		bool IsAstroAnalogueVideo { get; }

@@ -79,8 +79,6 @@
 			this.nudLimitMagnitude = new System.Windows.Forms.NumericUpDown();
 			this.lblLimitingMagnitude = new System.Windows.Forms.Label();
 			this.pnlEditableConfigSettings = new System.Windows.Forms.Panel();
-			this.label22 = new System.Windows.Forms.Label();
-			this.nudClipBorderPixels = new System.Windows.Forms.NumericUpDown();
 			this.cbxRotate180 = new System.Windows.Forms.CheckBox();
 			this.btnPreProcessingFilter = new System.Windows.Forms.Button();
 			this.toolTip = new System.Windows.Forms.ToolTip(this.components);
@@ -92,7 +90,6 @@
 			this.gbxSolved.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nudLimitMagnitude)).BeginInit();
 			this.pnlEditableConfigSettings.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.nudClipBorderPixels)).BeginInit();
 			this.contextMenuFilter.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -596,8 +593,6 @@
 			// 
 			// pnlEditableConfigSettings
 			// 
-			this.pnlEditableConfigSettings.Controls.Add(this.label22);
-			this.pnlEditableConfigSettings.Controls.Add(this.nudClipBorderPixels);
 			this.pnlEditableConfigSettings.Controls.Add(this.cbxRotate180);
 			this.pnlEditableConfigSettings.Controls.Add(this.cbxFlipHorizontally);
 			this.pnlEditableConfigSettings.Controls.Add(this.cbxFlipVertically);
@@ -607,27 +602,6 @@
 			this.pnlEditableConfigSettings.Name = "pnlEditableConfigSettings";
 			this.pnlEditableConfigSettings.Size = new System.Drawing.Size(383, 51);
 			this.pnlEditableConfigSettings.TabIndex = 74;
-			// 
-			// label22
-			// 
-			this.label22.AutoSize = true;
-			this.label22.Location = new System.Drawing.Point(237, 30);
-			this.label22.Name = "label22";
-			this.label22.Size = new System.Drawing.Size(91, 13);
-			this.label22.TabIndex = 77;
-			this.label22.Text = "Clip Border Pixels:";
-			// 
-			// nudClipBorderPixels
-			// 
-			this.nudClipBorderPixels.Location = new System.Drawing.Point(333, 27);
-			this.nudClipBorderPixels.Maximum = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
-			this.nudClipBorderPixels.Name = "nudClipBorderPixels";
-			this.nudClipBorderPixels.Size = new System.Drawing.Size(39, 20);
-			this.nudClipBorderPixels.TabIndex = 76;
 			// 
 			// cbxRotate180
 			// 
@@ -709,7 +683,6 @@
 			((System.ComponentModel.ISupportInitialize)(this.nudLimitMagnitude)).EndInit();
 			this.pnlEditableConfigSettings.ResumeLayout(false);
 			this.pnlEditableConfigSettings.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.nudClipBorderPixels)).EndInit();
 			this.contextMenuFilter.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
@@ -773,8 +746,6 @@
 		private System.Windows.Forms.ComboBox cbxSavedConfigurations;
 		private System.Windows.Forms.Button btnCancel;
 		private System.Windows.Forms.Button btnOK;
-        private System.Windows.Forms.ComboBox cbxSavedCameras;
-        private System.Windows.Forms.Label label22;
-        private System.Windows.Forms.NumericUpDown nudClipBorderPixels;
+		private System.Windows.Forms.ComboBox cbxSavedCameras;
 	}
 }

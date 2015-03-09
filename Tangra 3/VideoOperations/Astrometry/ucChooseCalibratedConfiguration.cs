@@ -283,10 +283,6 @@ namespace Tangra.VideoOperations.Astrometry
 			{
 				nudLimitMagnitude.Value = (decimal)config.LimitingMagnitudes[camera.Model];
 			    m_LimitingMagnitudeChanged = false;
-                if (config.ClipBorderPixels != null)
-                    nudClipBorderPixels.Value = (decimal)config.ClipBorderPixels[camera.Model];
-                else
-                    nudClipBorderPixels.Value = 0;
 
 				cbxFlipVertically.Checked = config.FlipVertically;
 				cbxFlipHorizontally.Checked = config.FlipHorizontally;
@@ -323,9 +319,6 @@ namespace Tangra.VideoOperations.Astrometry
                 config.FlipVertically = cbxFlipVertically.Checked;
                 config.FlipHorizontally = cbxFlipHorizontally.Checked;
                 config.Rotate180 = cbxRotate180.Checked;
-
-                if (config.ClipBorderPixels == null) config.ClipBorderPixels = new TangraConfig.ConfigurationClipBorderPixels();
-                config.ClipBorderPixels[camera.Model] = (int)nudClipBorderPixels.Value;
 
                 TangraConfig.Settings.Save();
 
@@ -426,8 +419,6 @@ namespace Tangra.VideoOperations.Astrometry
 
 			    m_LimitingMagnitudeChanged = config.LimitingMagnitudes[camera.Model] != (double) nudLimitMagnitude.Value;                
 				config.LimitingMagnitudes[camera.Model] = (double)nudLimitMagnitude.Value;
-                if (config.ClipBorderPixels == null) config.ClipBorderPixels = new TangraConfig.ConfigurationClipBorderPixels();
-                config.ClipBorderPixels[camera.Model] = (int)nudClipBorderPixels.Value;
 				config.FlipVertically = cbxFlipVertically.Checked;
 				config.FlipHorizontally = cbxFlipHorizontally.Checked;
 				config.Rotate180 = cbxRotate180.Checked;

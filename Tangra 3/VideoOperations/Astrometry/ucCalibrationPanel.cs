@@ -44,6 +44,7 @@ namespace Tangra.VideoOperations.Astrometry
 			m_AstrometryController = astrometryController;
 			m_VideoController = videoController;
 			m_CalibrationTool = configTool;
+			m_CalibrationTool.AreaChanged += m_CalibrationTool_AreaChanged;
 
 			pnlDebugFits.Visible = false;
 
@@ -55,6 +56,11 @@ namespace Tangra.VideoOperations.Astrometry
 			m_InitialPixelmap = m_VideoController.GetCurrentAstroImage(false).Pixelmap;
 
 			m_CalibrationTool.ActivateOsdAreaSizing();
+		}
+
+		void m_CalibrationTool_AreaChanged()
+		{
+			TriggerStarMapRecalc();
 		}
 
 
@@ -587,11 +593,20 @@ namespace Tangra.VideoOperations.Astrometry
 				starMapConfig,
 				image,
 				AstrometryContext.Current.OSDRectToExclude,
+				AstrometryContext.Current.RectToInclude,
+				AstrometryContext.Current.LimitByInclusion,
 				optimumStarsInField);
 
 			AstrometryContext.Current.StarMap = starMap;
 
 			m_VideoController.RedrawCurrentFrame(false, true);
+		}
+
+		private void AreaTypeSelectionChanged(object sender, EventArgs e)
+		{
+			AreaType selectedType = rbOSDExclusion.Checked ? AreaType.OSDExclusion : AreaType.Inclusion;
+			m_CalibrationTool.SetAreaType(selectedType);
+			TriggerStarMapRecalc();
 		}
 	}
 }

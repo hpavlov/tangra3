@@ -148,5 +148,14 @@ namespace Tangra.Controller
 		{
 			get { return AstrometryContext.Current.OSDRectToExclude; }
 		}
+
+		public Rectangle RectToInclude
+		{
+			get { return AstrometryContext.Current.RectToInclude; }
+		}
+		public bool LimitByInclusion
+		{
+			get { return AstrometryContext.Current.LimitByInclusion; }
+		}
 	}
 }
