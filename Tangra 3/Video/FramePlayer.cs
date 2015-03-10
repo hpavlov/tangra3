@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
 using Tangra.Model.Image;
@@ -873,41 +874,31 @@ namespace Tangra.Video
 		{
 			if (currentPixelmap != null)
 			{
-				if (m_FlipVertically && m_FlipHorizontally)
-				{
-					throw new NotImplementedException();
-					//if (m_Rotate180)
-					//	currentBitmap.RotateFlip(RotateFlipType.Rotate180FlipXY);
-					//else
-					//	currentBitmap.RotateFlip(RotateFlipType.RotateNoneFlipXY);
-				}
-				else if (m_FlipVertically)
-				{
-					throw new NotImplementedException();
-					//if (m_Rotate180)
-					//	currentBitmap.RotateFlip(RotateFlipType.Rotate180FlipY);
-					//else
-					//	currentBitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);
-				}
-				else if (m_FlipHorizontally)
-				{
-					throw new NotImplementedException();
-					//if (m_Rotate180)
-					//	currentBitmap.RotateFlip(RotateFlipType.Rotate180FlipX);
-					//else
-					//	currentBitmap.RotateFlip(RotateFlipType.RotateNoneFlipX);
-				}
-				else if (m_Rotate180)
-				{
-					throw new NotImplementedException();
-					//currentBitmap.RotateFlip(RotateFlipType.Rotate180FlipNone);
-				}
-
-				if (m_BorderPixelsToClear > 0)
-				{
-					throw new NotImplementedException();
-					//BitmapFilter.ClearBorderPixels(currentBitmap, m_BorderPixelsToClear);
-				}
+				//if (m_FlipVertically && m_FlipHorizontally)
+				//{
+				//	if (m_Rotate180)
+				//		currentBitmap.RotateFlip(RotateFlipType.Rotate180FlipXY);
+				//	else
+				//		currentBitmap.RotateFlip(RotateFlipType.RotateNoneFlipXY);
+				//}
+				//else if (m_FlipVertically)
+				//{
+				//	if (m_Rotate180)
+				//		currentBitmap.RotateFlip(RotateFlipType.Rotate180FlipY);
+				//	else
+				//		currentBitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);
+				//}
+				//else if (m_FlipHorizontally)
+				//{
+				//	if (m_Rotate180)
+				//		currentBitmap.RotateFlip(RotateFlipType.Rotate180FlipX);
+				//	else
+				//		currentBitmap.RotateFlip(RotateFlipType.RotateNoneFlipX);
+				//}
+				//else if (m_Rotate180)
+				//{
+				//	currentBitmap.RotateFlip(RotateFlipType.Rotate180FlipNone);
+				//}
 			}
 		}
 	}

@@ -46,10 +46,10 @@ namespace Tangra.StarCatalogues.UCAC4
         private static CatalogMagnitudeBand ModelFitMagnitudeBand = new CatalogMagnitudeBand(UCAC4Entry.BAND_ID_UNFILTERED, "Model Fit Magnitude (fMag)");
         private static CatalogMagnitudeBand JohnsonVMagnitudeBand = new CatalogMagnitudeBand(UCAC4Entry.BAND_ID_V, "Johnson V (APASS)");
         private static CatalogMagnitudeBand CousinsRFromMagnitudeBand = new CatalogMagnitudeBand(UCAC4Entry.BAND_ID_R, "Cousins R - Computed from APASS V and B");
-        private static CatalogMagnitudeBand SloanRMagnitudeBand = new CatalogMagnitudeBand(UCAC4Entry.BAND_ID_SLOAN_r, "SLOAN r (APASS)");
-        private static CatalogMagnitudeBand SloanGMagnitudeBand = new CatalogMagnitudeBand(UCAC4Entry.BAND_ID_SLOAN_r, "SLOAN g (APASS)");
+        private static CatalogMagnitudeBand SloanRMagnitudeBand = new CatalogMagnitudeBand(UCAC4Entry.BAND_ID_SLOAN_r, "SLOAN r' (APASS)");
+        private static CatalogMagnitudeBand SloanGMagnitudeBand = new CatalogMagnitudeBand(UCAC4Entry.BAND_ID_SLOAN_r, "SLOAN g' (APASS)");
 
-        public static CatalogMagnitudeBand[] CatalogMagnitudeBands = new CatalogMagnitudeBand[] { ModelFitMagnitudeBand, SloanRMagnitudeBand, SloanGMagnitudeBand, JohnsonVMagnitudeBand, CousinsRFromMagnitudeBand };
+        public static CatalogMagnitudeBand[] CatalogMagnitudeBands = new CatalogMagnitudeBand[] { ModelFitMagnitudeBand, SloanRMagnitudeBand, /*SloanGMagnitudeBand,*/ JohnsonVMagnitudeBand, CousinsRFromMagnitudeBand };
 
 		public static double ConvertMagnitude(double measuredMag, double vrColorIndex, Guid catalogMagBand, TangraConfig.MagOutputBand magOutputBand)
 		{
@@ -86,10 +86,9 @@ namespace Tangra.StarCatalogues.UCAC4
 
 			if (catalogMagBand == UCAC4Entry.BAND_ID_UNFILTERED)
 			{
-				throw new NotImplementedException("Need to determine the formulas for converting from fitMag to V and R from LONEOS?");
-				//double jk = ColourIndexTables.GetJKFromVR(vrColorIndex);
-				//if (magOutputBand == MagOutputBand.CousinsR) return -0.295 * jk + 1.323 * measuredMag - 0.0377 * measuredMag * measuredMag + 0.001142 * measuredMag * measuredMag * measuredMag - 0.68;
-				//if (magOutputBand == MagOutputBand.JohnsonV) return 0.552 * jk + 1.578 * measuredMag - 0.0560 * measuredMag * measuredMag + 0.001562 * measuredMag * measuredMag * measuredMag - 1.76;
+				double jk = ColourIndexTables.GetJKFromVR(vrColorIndex);
+				if (magOutputBand == TangraConfig.MagOutputBand.CousinsR) return -0.295 * jk + 1.323 * measuredMag - 0.0377 * measuredMag * measuredMag + 0.001142 * measuredMag * measuredMag * measuredMag - 0.68;
+				if (magOutputBand == TangraConfig.MagOutputBand.JohnsonV) return 0.552 * jk + 1.578 * measuredMag - 0.0560 * measuredMag * measuredMag + 0.001562 * measuredMag * measuredMag * measuredMag - 1.76;
 			}
 
 			return double.NaN;
