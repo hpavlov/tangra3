@@ -9,6 +9,7 @@
 
 PreProcessingType s_PreProcessingType;
 PreProcessingFilter s_PreProcessingFilter;
+RotateFlipType g_RotateFlipType;
 unsigned int  g_PreProcessingFromValue;
 unsigned int  g_PreProcessingToValue;
 long g_PreProcessingBrigtness;
@@ -39,6 +40,7 @@ bool UsesPreProcessing()
 long PreProcessingClearAll()
 {
 	s_PreProcessingType = pptpNone;
+	g_RotateFlipType = RotateNoneFlipNone;
 	g_PreProcessingFromValue = 0;
 	g_PreProcessingToValue = 0;
 	g_PreProcessingBrigtness = 0;
@@ -76,11 +78,12 @@ long PreProcessingUsesPreProcessing(bool* usesPreProcessing)
 	return S_OK;
 }
 
-long PreProcessingGetConfig(PreProcessingType* preProcessingType, unsigned int* fromValue, unsigned int* toValue, long* brigtness, long* contrast, PreProcessingFilter* filter, float* gamma, unsigned int* darkPixelsCount, unsigned int* flatPixelsCount)
+long PreProcessingGetConfig(PreProcessingType* preProcessingType, unsigned int* fromValue, unsigned int* toValue, long* brigtness, long* contrast, PreProcessingFilter* filter, float* gamma, unsigned int* darkPixelsCount, unsigned int* flatPixelsCount, RotateFlipType* rotateFlipType)
 {
 	if (g_UsesPreProcessing)
 	{
 		*preProcessingType = s_PreProcessingType;
+		*rotateFlipType = g_RotateFlipType;
 		*fromValue = g_PreProcessingFromValue;
 		*toValue = g_PreProcessingToValue;
 		*brigtness = g_PreProcessingBrigtness;
@@ -146,6 +149,14 @@ long PreProcessingDarkFrameAdjustLevelToMedian(bool adjustLevelToMedian)
 	g_DarkFrameAdjustLevelToMedian = adjustLevelToMedian;
 	
 	return S_OK;
+}
+
+long PreProcessingAddFlipAndRotation(enum RotateFlipType rotateFlipType)
+{
+	g_RotateFlipType = rotateFlipType;
+	g_UsesPreProcessing = true;
+	
+	return S_OK;	
 }
 
 long PreProcessingAddDarkFrame(unsigned long* darkFramePixels, unsigned long pixelsCount, unsigned long darkFrameMedian)
@@ -220,6 +231,12 @@ long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height
 		if (rv != S_OK) return rv;
 	}
 
+	if (g_RotateFlipType > 0)
+	{
+		rv = PreProcessingFlipRotate(pixels, width, height, bpp, g_RotateFlipType); 
+		if (rv != S_OK) return rv;
+	}
+	
 	if (s_PreProcessingType == pptpStretching)
 	{
 		rv = PreProcessingStretch(pixels, width, height, bpp, g_PreProcessingFromValue, g_PreProcessingToValue);

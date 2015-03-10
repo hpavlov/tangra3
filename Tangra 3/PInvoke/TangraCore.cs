@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -409,6 +410,9 @@ namespace Tangra.PInvoke
 			private static extern int PreProcessingUsesPreProcessing([In, Out] ref bool usesPreProcessing);
 
 			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+			private static extern int PreProcessingAddFlipAndRotation(int rotateFlipType);
+
+			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
 			private static extern int PreProcessingGetConfig(
 					[In, Out] ref PreProcessingType preProcessingType,
 					[In, Out] ref ushort fromValue,
@@ -418,7 +422,8 @@ namespace Tangra.PInvoke
 					[In, Out] ref TangraConfig.PreProcessingFilter filter,
 					[In, Out] ref float gamma,
 					[In, Out] ref ushort darkPixelsCount,
-					[In, Out] ref ushort flatPixelsCount);
+					[In, Out] ref ushort flatPixelsCount,
+					[In, Out] ref RotateFlipType rotateFlipType);
 
 			
 			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
@@ -452,6 +457,11 @@ namespace Tangra.PInvoke
 			public static void AddGammaCorrection(float encodingGamma)
 			{
                 PreProcessingAddGammaCorrection(encodingGamma);
+			}
+
+			public static void AddFlipAndRotation(RotateFlipType rotateFlipType)
+			{
+				PreProcessingAddFlipAndRotation((int)rotateFlipType);
 			}
 
 			public static void AddDarkFrame(uint[,] darkFramePixels, uint darkFrameMedian)
@@ -520,10 +530,12 @@ namespace Tangra.PInvoke
 					float gamma = 0;
 					ushort darkPixelsCount = 0;
 					ushort flatPixelsCount = 0;
+					RotateFlipType rotateFlipType = 0;
 
-					PreProcessingGetConfig(ref preProcessingType, ref fromValue, ref toValue, ref brigtness, ref contrast, ref filter, ref gamma, ref darkPixelsCount, ref flatPixelsCount);
+					PreProcessingGetConfig(ref preProcessingType, ref fromValue, ref toValue, ref brigtness, ref contrast, ref filter, ref gamma, ref darkPixelsCount, ref flatPixelsCount, ref rotateFlipType);
 
 					preProcessingInfo.PreProcessingType = preProcessingType;
+					preProcessingInfo.RotateFlipType = rotateFlipType;
 
 					if (preProcessingType == PreProcessingType.BrightnessContrast)
 					{
@@ -588,6 +600,7 @@ namespace Tangra.PInvoke
 		public ushort DarkFrameBytes;
 		public ushort FlatFrameBytes;
 		public TangraConfig.PreProcessingFilter Filter;
+		public RotateFlipType RotateFlipType;
 	}
 
 	

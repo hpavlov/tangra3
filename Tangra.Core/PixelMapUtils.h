@@ -6,6 +6,7 @@
 #define PIXELMAP_UTILS
 
 #include "cross_platform.h"
+#include "PreProcessing.h"
 
 /* Make sure functions are exported with C linkage under C++ compilers. */
 #ifdef __cplusplus
@@ -23,6 +24,7 @@ DLL_PUBLIC HRESULT BitmapSplitFieldsOSD(BYTE* bitmapPixels, long firstOsdLine, l
 
 
 // Pre-Processing 
+DLL_PUBLIC HRESULT PreProcessingFlipRotate(unsigned long* pixels, long width, long height, int bpp, enum RotateFlipType flipRotateType);
 DLL_PUBLIC HRESULT PreProcessingStretch(unsigned long* pixels, long width, long height, int bpp, int fromValue, int toValue);
 DLL_PUBLIC HRESULT PreProcessingClip(unsigned long* pixels, long width, long height, int bpp, int fromValue, int toValue);
 DLL_PUBLIC HRESULT PreProcessingBrightnessContrast(unsigned long* pixels, long width, long height, int bpp, long brightness, long cotrast);

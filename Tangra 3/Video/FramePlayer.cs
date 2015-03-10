@@ -437,8 +437,6 @@ namespace Tangra.Video
 				if (m_CurrentFrameIndex >= m_VideoStream.FirstFrame &&
 				    m_CurrentFrameIndex <= m_VideoStream.LastFrame)
 				{
-					ApplyFlipAndRotation(currentPixelmap);
-
 					m_FrameRenderer.RenderFrame(m_CurrentFrameIndex, currentPixelmap, movementType, m_CurrentFrameIndex == m_VideoStream.LastFrame, 0, m_CurrentFrameIndex, frameFileName);
 					m_LastDisplayedFrameIndex = m_CurrentFrameIndex;
 				}
@@ -645,8 +643,6 @@ namespace Tangra.Video
 
 				    Debug.Assert(currentFrame.FrameNo == m_CurrentFrameIndex);
 
-					ApplyFlipAndRotation(currentPixelmap);
-
 					//show frame
 					m_FrameRenderer.RenderFrame(
                         currentFrame.FrameNo, 
@@ -703,8 +699,6 @@ namespace Tangra.Video
 						msToWait = m_MillisecondsPerFrame - (int)sw.ElapsedMilliseconds;
 						sw.Reset();
 					}
-
-					ApplyFlipAndRotation(currentPixelmap);
 
 					//show frame
 					m_FrameRenderer.RenderFrame(
@@ -863,43 +857,37 @@ namespace Tangra.Video
 			m_FlipVertically = flipVertically;
 			m_FlipHorizontally = flipHorizontally;
 			m_Rotate180 = rotate180;
+
+			if (m_FlipVertically && m_FlipHorizontally)
+			{
+				if (m_Rotate180)
+					TangraCore.PreProcessors.AddFlipAndRotation(RotateFlipType.Rotate180FlipXY);
+				else
+					TangraCore.PreProcessors.AddFlipAndRotation(RotateFlipType.RotateNoneFlipXY);
+			}
+			else if (m_FlipVertically)
+			{
+				if (m_Rotate180)
+					TangraCore.PreProcessors.AddFlipAndRotation(RotateFlipType.Rotate180FlipY);
+				else
+					TangraCore.PreProcessors.AddFlipAndRotation(RotateFlipType.RotateNoneFlipY);
+			}
+			else if (m_FlipHorizontally)
+			{
+				if (m_Rotate180)
+					TangraCore.PreProcessors.AddFlipAndRotation(RotateFlipType.Rotate180FlipX);
+				else
+					TangraCore.PreProcessors.AddFlipAndRotation(RotateFlipType.RotateNoneFlipX);
+			}
+			else if (m_Rotate180)
+			{
+				TangraCore.PreProcessors.AddFlipAndRotation(RotateFlipType.Rotate180FlipNone);
+			}
 		}
 
 		public void SetBorderClip(int pixelsToClip)
 		{
 			m_BorderPixelsToClear = pixelsToClip;
-		}
-
-		private void ApplyFlipAndRotation(Pixelmap currentPixelmap)
-		{
-			if (currentPixelmap != null)
-			{
-				//if (m_FlipVertically && m_FlipHorizontally)
-				//{
-				//	if (m_Rotate180)
-				//		currentBitmap.RotateFlip(RotateFlipType.Rotate180FlipXY);
-				//	else
-				//		currentBitmap.RotateFlip(RotateFlipType.RotateNoneFlipXY);
-				//}
-				//else if (m_FlipVertically)
-				//{
-				//	if (m_Rotate180)
-				//		currentBitmap.RotateFlip(RotateFlipType.Rotate180FlipY);
-				//	else
-				//		currentBitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);
-				//}
-				//else if (m_FlipHorizontally)
-				//{
-				//	if (m_Rotate180)
-				//		currentBitmap.RotateFlip(RotateFlipType.Rotate180FlipX);
-				//	else
-				//		currentBitmap.RotateFlip(RotateFlipType.RotateNoneFlipX);
-				//}
-				//else if (m_Rotate180)
-				//{
-				//	currentBitmap.RotateFlip(RotateFlipType.Rotate180FlipNone);
-				//}
-			}
 		}
 	}
 }

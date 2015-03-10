@@ -23,6 +23,26 @@ enum PreProcessingType
 	pptpBrightnessContrast = 3
 };
 
+enum RotateFlipType
+{
+	Rotate180FlipXY = 0,
+	RotateNoneFlipNone = 0,
+	Rotate270FlipXY = 1,
+	Rotate90FlipNone = 1,
+	Rotate180FlipNone = 2,
+	RotateNoneFlipXY = 2,
+	Rotate270FlipNone = 3,
+	Rotate90FlipXY = 3,
+	Rotate180FlipY = 4,
+	RotateNoneFlipX = 4,
+	Rotate270FlipY = 5,
+	Rotate90FlipX = 5,
+	Rotate180FlipX = 6,
+	RotateNoneFlipY = 6,
+	Rotate270FlipX = 7,
+	Rotate90FlipY = 7
+};
+
 /* Make sure functions are exported with C linkage under C++ compilers. */
 #ifdef __cplusplus
 extern "C"
@@ -39,6 +59,7 @@ DLL_PUBLIC long PreProcessingAddGammaCorrection(float gamma);
 DLL_PUBLIC long PreProcessingAddDarkFrame(unsigned long* darkFramePixels, unsigned long pixelsCount, unsigned long darkFrameMedian);
 DLL_PUBLIC long PreProcessingDarkFrameAdjustLevelToMedian(bool adjustLevelToMedian);
 DLL_PUBLIC long PreProcessingAddFlatFrame(unsigned long* flatFramePixels, unsigned long pixelsCount, unsigned long flatFrameMedian);
+DLL_PUBLIC long PreProcessingAddFlipAndRotation(enum RotateFlipType rotateFlipType);
 DLL_PUBLIC long PreProcessingUsesPreProcessing(bool* usesPreProcessing);
 DLL_PUBLIC long PreProcessingGetConfig(
 	PreProcessingType* preProcessingType, 
@@ -49,7 +70,8 @@ DLL_PUBLIC long PreProcessingGetConfig(
 	PreProcessingFilter* filter, 
 	float* gamma, 
 	unsigned int* darkPixelsCount, 
-	unsigned int* flatPixelsCount);
+	unsigned int* flatPixelsCount,
+	RotateFlipType* rotateFlipType);
 
 DLL_PUBLIC long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height, int bpp);
 DLL_PUBLIC long ApplyPreProcessing(unsigned long* pixels, long width, long height, int bpp, BYTE* bitmapPixels, BYTE* bitmapBytes);

@@ -667,6 +667,13 @@ void BuildGammaTableForBpp(int bpp, float gamma)
 	}
 }
 
+HRESULT PreProcessingFlipRotate(unsigned long* pixels, long width, long height, int bpp, enum RotateFlipType flipRotateType)
+{
+	// TODO: Implement the actual flipping and rotation
+	
+	return S_OK;
+}
+
 HRESULT PreProcessingStretch(unsigned long* pixels, long width, long height, int bpp, int fromValue, int toValue)
 {
 	int minValue, maxValue;
