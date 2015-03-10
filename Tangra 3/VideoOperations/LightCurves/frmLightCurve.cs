@@ -1115,6 +1115,7 @@ namespace Tangra.VideoOperations.LightCurves
             }
 
             miNormalisation16DataPoints.Enabled = m_LightCurveController.Context.Normalisation >= 0;
+			miNormalisation8DataPoints.Enabled = m_LightCurveController.Context.Normalisation >= 0;
             miNormalisation4DataPoints.Enabled = m_LightCurveController.Context.Normalisation >= 0;
             miNormalisation1DataPoints.Enabled = m_LightCurveController.Context.Normalisation >= 0;
             miNormalisationLinearFit.Enabled = m_LightCurveController.Context.Normalisation >= 0;
@@ -2302,15 +2303,27 @@ namespace Tangra.VideoOperations.LightCurves
             if (sender == miNormalisation16DataPoints)
             {
                 miNormalisation16DataPoints.Checked = true;
+				miNormalisation8DataPoints.Checked = false;
                 miNormalisation4DataPoints.Checked = false;
                 miNormalisation1DataPoints.Checked = false;
                 miNormalisationLinearFit.Checked = false;
 
                 m_LightCurveController.Context.NormMethod = LightCurveContext.NormalisationMethod.Average16Frame;
             }
+			else if (sender == miNormalisation8DataPoints)
+			{
+				miNormalisation16DataPoints.Checked = false;
+				miNormalisation8DataPoints.Checked = true;
+				miNormalisation4DataPoints.Checked = false;
+				miNormalisation1DataPoints.Checked = false;
+				miNormalisationLinearFit.Checked = false;
+
+				m_LightCurveController.Context.NormMethod = LightCurveContext.NormalisationMethod.Average8Frame;
+			}
             else if (sender == miNormalisation4DataPoints)
             {
                 miNormalisation16DataPoints.Checked = false;
+				miNormalisation8DataPoints.Checked = false;
                 miNormalisation4DataPoints.Checked = true;
                 miNormalisation1DataPoints.Checked = false;
                 miNormalisationLinearFit.Checked = false;
@@ -2320,6 +2333,7 @@ namespace Tangra.VideoOperations.LightCurves
             else if (sender == miNormalisation1DataPoints)
             {
                 miNormalisation16DataPoints.Checked = false;
+				miNormalisation8DataPoints.Checked = false;
                 miNormalisation4DataPoints.Checked = false;
                 miNormalisation1DataPoints.Checked = true;
                 miNormalisationLinearFit.Checked = false;
@@ -2329,6 +2343,7 @@ namespace Tangra.VideoOperations.LightCurves
             else if (sender == miNormalisationLinearFit)
             {
                 miNormalisation16DataPoints.Checked = false;
+				miNormalisation8DataPoints.Checked = false;
                 miNormalisation4DataPoints.Checked = false;
                 miNormalisation1DataPoints.Checked = false;
                 miNormalisationLinearFit.Checked = true;

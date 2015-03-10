@@ -289,6 +289,13 @@ namespace Tangra.VideoOperations.LightCurves
                         PerformAverageReadingsNormalisation(ref normalIndexes, 4);
                     break;
 
+				case LightCurveContext.NormalisationMethod.Average8Frame:
+					if (m_LightCurveController.Context.Binning > 0)
+						PerformAverageBinnedNormalisation(ref normalIndexes, 8);
+					else
+						PerformAverageReadingsNormalisation(ref normalIndexes, 8);
+					break;
+
                 case LightCurveContext.NormalisationMethod.Average16Frame:
                     if (m_LightCurveController.Context.Binning > 0)
                         PerformAverageBinnedNormalisation(ref normalIndexes, 16);
@@ -465,7 +472,7 @@ namespace Tangra.VideoOperations.LightCurves
                     int idx = i + j;
                     if (idx >= 0 && idx < maxIdx)
                     {
-                        if (m_LightCurveController.Context.AllReadings[m_LightCurveController.Context.Normalisation][idx].IsSuccessfulReading)
+						if (m_AllBinnedReadings[m_LightCurveController.Context.Normalisation][idx].IsSuccessfulReading)
                         {
                             sum += m_AllBinnedReadings[m_LightCurveController.Context.Normalisation][idx].AdjustedValue;
                             readings++;

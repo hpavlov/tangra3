@@ -900,6 +900,11 @@ namespace Tangra.Controller
 			m_pnlControlerPanel.Controls.Clear();
 		}
 
+		internal Panel ControlerPanel
+		{
+			get { return m_pnlControlerPanel;}
+		}
+
 		internal void SetPictureBoxCursor(Cursor cursor)
 		{
 			if (m_MainForm != null)

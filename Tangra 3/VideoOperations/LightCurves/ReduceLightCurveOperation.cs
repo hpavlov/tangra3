@@ -1803,9 +1803,9 @@ namespace Tangra.VideoOperations.LightCurves
 			return DialogResult.OK;			
 		}
 
-		internal void EnterViewLightCurveMode(LCFile lcFile, IVideoController videoController)
+		internal void EnterViewLightCurveMode(LCFile lcFile, IVideoController videoController, Panel controlPanelHolder)
 		{
-			// TODO: This method needs to be called from somewhere else
+			m_ControlPanelHolder = controlPanelHolder;
 
 			m_VideoController = (VideoController)videoController;
 			EnsureControlPanel(m_ControlPanelHolder);

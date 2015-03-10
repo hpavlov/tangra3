@@ -176,7 +176,7 @@ namespace Tangra.Controller
 
                     // TODO: Review the VideoController-LightCurveController-ReduceLightCurveOperation relation and how they are initialized
                     // TODO: Provide a clean way of initializing the controller/operation state when opening an .lc file!
-                    operation.EnterViewLightCurveMode(lcFile, m_VideoController);
+					operation.EnterViewLightCurveMode(lcFile, m_VideoController, m_VideoController.ControlerPanel);
 
                     RegisterRecentFile(RecentFileType.LightCurve, fileName);
 

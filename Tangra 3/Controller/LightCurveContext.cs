@@ -49,6 +49,7 @@ namespace Tangra.Controller
 		internal enum NormalisationMethod
 		{
 			Average4Frame,
+			Average8Frame,
 			Average16Frame,
 			LinearFit,
 			FrameByFrame
