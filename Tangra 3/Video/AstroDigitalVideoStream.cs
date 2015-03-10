@@ -307,7 +307,8 @@ namespace Tangra.Video
 				}
 
                 var rv = new Pixelmap(m_Width, m_Height, m_BitPix, pixels, displayBitmap, displayBitmapBytes);
-				rv.FrameState = GetCurrentFrameState(index);
+			    rv.SetMaxSignalValue(m_Aav16NormVal);
+ 				rv.FrameState = GetCurrentFrameState(index);
 				return rv;
 			}
 		}
@@ -529,7 +530,9 @@ namespace Tangra.Video
 			{
 				Bitmap displayBitmap = (Bitmap)Bitmap.FromStream(memStr);
 
-                return new Pixelmap(m_Width, m_Height, m_BitPix, pixels, displayBitmap, displayBitmapBytes);
+                var rv =  new Pixelmap(m_Width, m_Height, m_BitPix, pixels, displayBitmap, displayBitmapBytes);
+                rv.SetMaxSignalValue(m_Aav16NormVal);
+			    return rv;
 			}
 		}
 

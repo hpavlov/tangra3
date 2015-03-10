@@ -76,7 +76,7 @@ namespace Tangra.Model.Astro
 			psfFit.Fit(data);
 			if (psfFit.IsSolved)
 			{
-				ImagePixel psfPixel = new ImagePixel((int)Math.Min(m_Pixelmap.MaxPixelValue, (uint)Math.Round(psfFit.IMax)), psfFit.XCenter, psfFit.YCenter);
+				ImagePixel psfPixel = new ImagePixel((int)Math.Min(m_Pixelmap.MaxSignalValue, (uint)Math.Round(psfFit.IMax)), psfFit.XCenter, psfFit.YCenter);
 				psfPixel.SignalNoise = psfFit.Certainty;
 				return psfPixel;
 			}

@@ -13,6 +13,7 @@ namespace Tangra.Model.Image
 	public class Pixelmap : IDisposable
 	{
         private uint? m_MaxPixelValue;
+	    private uint? m_MaxSignalValue;
         private int m_BitPix = 8;
 
 		private uint[] m_Pixels;
@@ -105,6 +106,22 @@ namespace Tangra.Model.Image
 				return m_MaxPixelValue.Value;
 			}
 		}
+
+        public void SetMaxSignalValue(uint aav16NormalValue)
+        {
+            m_MaxSignalValue = aav16NormalValue;
+        }
+
+        public uint MaxSignalValue
+        {
+            get
+            {
+                if (m_MaxSignalValue.HasValue)
+                    return m_MaxSignalValue.Value;
+                else
+                    return MaxPixelValue;
+            }
+        }
 
         public uint this[int x, int y]
         {
