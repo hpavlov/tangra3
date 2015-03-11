@@ -84,6 +84,7 @@
 			this.contextMenuFilter = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.miNoFilter = new System.Windows.Forms.ToolStripMenuItem();
 			this.miLowPass = new System.Windows.Forms.ToolStripMenuItem();
+			this.lblConfigAreaInfo = new System.Windows.Forms.Label();
 			this.groupBox1.SuspendLayout();
 			this.pnlNotSolved.SuspendLayout();
 			this.gbxSolved.SuspendLayout();
@@ -377,9 +378,9 @@
 			this.pnlNotSolved.Controls.Add(this.cbxSolveConstantsNow);
 			this.pnlNotSolved.Controls.Add(this.label21);
 			this.pnlNotSolved.Controls.Add(this.label20);
-			this.pnlNotSolved.Location = new System.Drawing.Point(13, 227);
+			this.pnlNotSolved.Location = new System.Drawing.Point(13, 211);
 			this.pnlNotSolved.Name = "pnlNotSolved";
-			this.pnlNotSolved.Size = new System.Drawing.Size(385, 87);
+			this.pnlNotSolved.Size = new System.Drawing.Size(394, 103);
 			this.pnlNotSolved.TabIndex = 66;
 			// 
 			// linkLblAboutCalibration
@@ -414,6 +415,7 @@
 			// 
 			// gbxSolved
 			// 
+			this.gbxSolved.Controls.Add(this.lblConfigAreaInfo);
 			this.gbxSolved.Controls.Add(this.label17);
 			this.gbxSolved.Controls.Add(this.label15);
 			this.gbxSolved.Controls.Add(this.btnRecalibrate);
@@ -426,9 +428,9 @@
 			this.gbxSolved.Controls.Add(this.label13);
 			this.gbxSolved.Controls.Add(this.label14);
 			this.gbxSolved.Controls.Add(this.label16);
-			this.gbxSolved.Location = new System.Drawing.Point(15, 229);
+			this.gbxSolved.Location = new System.Drawing.Point(15, 212);
 			this.gbxSolved.Name = "gbxSolved";
-			this.gbxSolved.Size = new System.Drawing.Size(383, 74);
+			this.gbxSolved.Size = new System.Drawing.Size(383, 99);
 			this.gbxSolved.TabIndex = 67;
 			this.gbxSolved.TabStop = false;
 			this.gbxSolved.Text = "Solved Configuration";
@@ -639,11 +641,19 @@
 			this.miLowPass.Text = "&Low-Pass Filter";
 			this.miLowPass.CheckedChanged += new System.EventHandler(this.miFilter_CheckedChanged);
 			// 
+			// lblConfigAreaInfo
+			// 
+			this.lblConfigAreaInfo.AutoSize = true;
+			this.lblConfigAreaInfo.Location = new System.Drawing.Point(6, 78);
+			this.lblConfigAreaInfo.Name = "lblConfigAreaInfo";
+			this.lblConfigAreaInfo.Size = new System.Drawing.Size(161, 13);
+			this.lblConfigAreaInfo.TabIndex = 67;
+			this.lblConfigAreaInfo.Text = "Inclusion Area [(0,0) - (120, 347)]";
+			// 
 			// ucChooseCalibratedConfiguration
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.Controls.Add(this.pnlNotSolved);
 			this.Controls.Add(this.pnlEditableConfigSettings);
 			this.Controls.Add(this.btnPreProcessingFilter);
 			this.Controls.Add(this.btnEditCamera);
@@ -659,6 +669,7 @@
 			this.Controls.Add(this.btnOK);
 			this.Controls.Add(this.cbxSavedCameras);
 			this.Controls.Add(this.gbxSolved);
+			this.Controls.Add(this.pnlNotSolved);
 			this.Name = "ucChooseCalibratedConfiguration";
 			this.Size = new System.Drawing.Size(410, 366);
 			this.Load += new System.EventHandler(this.ucCameraSettings_Load);
@@ -734,5 +745,6 @@
 		private System.Windows.Forms.Button btnCancel;
 		private System.Windows.Forms.Button btnOK;
 		private System.Windows.Forms.ComboBox cbxSavedCameras;
+		private System.Windows.Forms.Label lblConfigAreaInfo;
 	}
 }

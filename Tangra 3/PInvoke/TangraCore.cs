@@ -398,13 +398,13 @@ namespace Tangra.PInvoke
 			private static extern int PreProcessingAddGammaCorrection(float encodingGamma);
 
 			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-			private static extern int PreProcessingAddDarkFrame(uint[] darkFramePixels, uint pixelsCount, uint darkFrameMedian);
+			private static extern int PreProcessingAddDarkFrame(float[] darkFramePixels, uint pixelsCount, float darkFrameMedian);
 
 			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
 			private static extern int PreProcessingDarkFrameAdjustLevelToMedian(bool adjustLevelToMedian);
 
 			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-			private static extern int PreProcessingAddFlatFrame(uint[] flatFramePixels, uint pixelsCount, uint flatFrameMedian);
+			private static extern int PreProcessingAddFlatFrame(float[] flatFramePixels, uint pixelsCount, float flatFrameMedian);
 
 			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
 			private static extern int PreProcessingUsesPreProcessing([In, Out] ref bool usesPreProcessing);
@@ -464,13 +464,13 @@ namespace Tangra.PInvoke
 				PreProcessingAddFlipAndRotation((int)rotateFlipType);
 			}
 
-			public static void AddDarkFrame(uint[,] darkFramePixels, uint darkFrameMedian)
+			public static void AddDarkFrame(float[,] darkFramePixels, float darkFrameMedian)
 			{
 				int width = darkFramePixels.GetLength(0);
 				int height = darkFramePixels.GetLength(1);
 
 				uint pixelsCount = (uint)(width * height);
-				uint[] darkFrame = new uint[pixelsCount];
+				float[] darkFrame = new float[pixelsCount];
 
 				int idx = 0;
 				
@@ -490,13 +490,13 @@ namespace Tangra.PInvoke
 				PreProcessingDarkFrameAdjustLevelToMedian(TangraConfig.Settings.Generic.DarkFrameAdjustLevelToMedian);
 			}
 
-			public static void AddFlatFrame(uint[,] flatFramePixels, uint flatFrameMedian)
+			public static void AddFlatFrame(float[,] flatFramePixels, float flatFrameMedian)
 			{
 				int width = flatFramePixels.GetLength(0);
 				int height = flatFramePixels.GetLength(1);
 
 				uint pixelsCount = (uint)(width * height);
-				uint[] flatFrame = new uint[pixelsCount];
+				float[] flatFrame = new float[pixelsCount];
 
 				int idx = 0;
 

@@ -35,7 +35,7 @@ namespace Tangra.Controller
 			get { return TangraCore.PreProcessors.PreProcessingHasDarkFrameSet(); }
 		}
 
-		private bool LoadDarkOrFlatFrameInternal(string title, ref uint[,] pixels, ref uint medianValue)
+		private bool LoadDarkOrFlatFrameInternal(string title, ref float[,] pixels, ref float medianValue)
 		{
 			string filter = m_VideoController.VideoBitPix > 8
 								? "FITS Image 16 bit (*.fit;*.fits)|*.fit;*.fits"
@@ -51,8 +51,8 @@ namespace Tangra.Controller
 				{
 					using (Bitmap bmp = (Bitmap) Image.FromFile(fileName))
 					{
-						uint[,] pixelsCopy = new uint[bmp.Width, bmp.Height];
-						var medianCalcList = new List<uint>();
+						float[,] pixelsCopy = new float[bmp.Width, bmp.Height];
+						var medianCalcList = new List<float>();
 
 						BitmapFilter.BitmapPixelOperation(
 							bmp,
@@ -83,24 +83,45 @@ namespace Tangra.Controller
 				}
 				else if (extension == ".fit" || extension == ".fits")
 				{
-					return FITSHelper.Load16BitFitsFile(
+					Type pixelDataType;
+
+					return FITSHelper.LoadFloatingPointFitsFile(
 						fileName,
 						out pixels,
 						out medianValue,
+						out pixelDataType,
 						delegate(BasicHDU imageHDU)
 						{
 							if (
 								imageHDU.Axes.Count() != 2 ||
 								imageHDU.Axes[0] != TangraContext.Current.FrameHeight ||
-								imageHDU.Axes[1] != TangraContext.Current.FrameWidth ||
-								imageHDU.BitPix != 16)
+								imageHDU.Axes[1] != TangraContext.Current.FrameWidth)
+							{
+								m_VideoController.ShowMessageBox(
+									"Selected image may has a different frame size from the currently loaded video.", "Tangra",
+									MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                                return false;
+							}
+
+							bool isFloatingPointImage = false;
+							Array dataArray = (Array)imageHDU.Data.DataArray;
+							object entry = dataArray.GetValue(0);
+							if (entry is float[])
+								isFloatingPointImage = true;
+							else if (entry is Array)
+							{
+								isFloatingPointImage = ((Array)entry).GetValue(0) is float;
+							}
+
+							if (!isFloatingPointImage && imageHDU.BitPix != 16)
 							{
 								if (m_VideoController.ShowMessageBox(
-								    "Selected image may not be compatible with the currently loaded video. Do you wish to continue?", "Tangra",
-								    MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
+									"Selected image data type may not be compatible with the currently loaded video. Do you wish to continue?", "Tangra",
+									MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.No)
 								{
-                                    return false;
-								}								
+									return false;
+								}
 							}
 
 							return true;
@@ -119,8 +140,8 @@ namespace Tangra.Controller
 
 		public void LoadDarkFrame()
 		{
-			uint[,] pixels = new uint[0, 0];
-			uint medianValue = 0;
+			float[,] pixels = new float[0, 0];
+			float medianValue = 0;
 
 			if (LoadDarkOrFlatFrameInternal("Load dark frame ...", ref pixels, ref medianValue))
 			{
@@ -138,8 +159,8 @@ namespace Tangra.Controller
 
 		public void LoadFlatFrame()
 		{
-			uint[,] pixels = new uint[0, 0];
-			uint medianValue = 0;
+			float[,] pixels = new float[0, 0];
+			float medianValue = 0;
 
 			if (LoadDarkOrFlatFrameInternal("Load flat frame ...", ref pixels, ref medianValue))
 			{

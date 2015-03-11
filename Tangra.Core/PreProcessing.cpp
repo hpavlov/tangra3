@@ -17,10 +17,10 @@ long g_PreProcessingContrast;
 float g_EncodingGamma;
 bool g_UsesPreProcessing = false;
 
-unsigned long* g_DarkFramePixelsCopy = NULL;
-unsigned long* g_FlatFramePixelsCopy = NULL;
-long g_FlatFrameMedian = 0;
-long g_DarkFrameMedian = 0;
+float* g_DarkFramePixelsCopy = NULL;
+float* g_FlatFramePixelsCopy = NULL;
+float g_FlatFrameMedian = 0;
+float g_DarkFrameMedian = 0;
 bool g_DarkFrameAdjustLevelToMedian = false;
 unsigned int g_DarkFramePixelsCount = 0;
 unsigned int g_FlatFramePixelsCount = 0;
@@ -159,7 +159,7 @@ long PreProcessingAddFlipAndRotation(enum RotateFlipType rotateFlipType)
 	return S_OK;	
 }
 
-long PreProcessingAddDarkFrame(unsigned long* darkFramePixels, unsigned long pixelsCount, unsigned long darkFrameMedian)
+long PreProcessingAddDarkFrame(float* darkFramePixels, unsigned long pixelsCount, float darkFrameMedian)
 {
 	if (NULL != g_DarkFramePixelsCopy)
 	{
@@ -167,9 +167,9 @@ long PreProcessingAddDarkFrame(unsigned long* darkFramePixels, unsigned long pix
 		g_DarkFramePixelsCopy = NULL;
 	}
 
-	long bytesCount = pixelsCount * sizeof(unsigned long);
+	long bytesCount = pixelsCount * sizeof(float);
 	
-	g_DarkFramePixelsCopy = (unsigned long*)malloc(bytesCount);
+	g_DarkFramePixelsCopy = (float*)malloc(bytesCount);
 	memcpy(g_DarkFramePixelsCopy, darkFramePixels, bytesCount);
 	g_DarkFramePixelsCount = pixelsCount;
 	g_DarkFrameMedian = darkFrameMedian;	
@@ -179,7 +179,7 @@ long PreProcessingAddDarkFrame(unsigned long* darkFramePixels, unsigned long pix
 	return S_OK;
 }
 
-long PreProcessingAddFlatFrame(unsigned long* flatFramePixels, unsigned long pixelsCount, unsigned long flatFrameMedian)
+long PreProcessingAddFlatFrame(float* flatFramePixels, unsigned long pixelsCount, float flatFrameMedian)
 {
 	if (NULL != g_FlatFramePixelsCopy)
 	{
@@ -187,9 +187,9 @@ long PreProcessingAddFlatFrame(unsigned long* flatFramePixels, unsigned long pix
 		g_FlatFramePixelsCopy = NULL;
 	}
 
-	long bytesCount = pixelsCount * sizeof(unsigned long);
+	long bytesCount = pixelsCount * sizeof(float);
 
-	g_FlatFramePixelsCopy = (unsigned long*)malloc(bytesCount);
+	g_FlatFramePixelsCopy = (float*)malloc(bytesCount);
 	memcpy(g_FlatFramePixelsCopy, flatFramePixels, bytesCount);
 	g_FlatFramePixelsCount = pixelsCount;
 	g_FlatFrameMedian = flatFrameMedian;

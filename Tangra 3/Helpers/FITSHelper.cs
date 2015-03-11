@@ -24,7 +24,25 @@ namespace Tangra.Helpers
 	{
 		public delegate bool CheckOpenedFitsFileCallback(BasicHDU imageHDU);
 
-		public static bool Load16BitFitsFile(string fileName, out uint[,] pixels, out uint medianValue, CheckOpenedFitsFileCallback callback)
+		internal delegate void LoadFitsDataCallback<TData>(Array dataArray, int height, int width, double bzero, out TData[,] pixels, out TData medianValue, out Type pixelDataType);
+
+		public static bool LoadFloatingPointFitsFile(string fileName, out float[,] pixels, out float medianValue, out Type pixelDataType, CheckOpenedFitsFileCallback callback)
+		{
+			return LoadFitsFileInternal<float>(fileName, out pixels, out medianValue, out pixelDataType, callback, (Array dataArray, int height, int width, double bzero, out float[,] ppx, out float median, out Type dataType) =>
+			{
+				ppx = LoadFloatImageData(dataArray, height, width, (float)bzero, out median, out dataType);
+			});
+		}
+
+		public static bool Load16BitFitsFile(string fileName, out uint[,] pixels, out uint medianValue, out Type pixelDataType, CheckOpenedFitsFileCallback callback)
+		{
+			return LoadFitsFileInternal<uint>(fileName, out pixels, out medianValue, out pixelDataType, callback, (Array dataArray, int height, int width, double bzero, out uint[,] ppx, out uint median, out Type dataType) =>
+				{
+					ppx = Load16BitImageData(dataArray, height, width, (uint)bzero, out median, out dataType);
+				});
+		}
+
+		private static bool LoadFitsFileInternal<TData>(string fileName, out TData[,] pixels, out TData medianValue, out Type pixelDataType, CheckOpenedFitsFileCallback callback, LoadFitsDataCallback<TData> loadDataCallback)
 		{
 			Fits fitsFile = new Fits();
 
@@ -36,8 +54,9 @@ namespace Tangra.Helpers
 
 				if (callback != null && !(callback(imageHDU)))
 				{
-					pixels = new uint[0,0];
-					medianValue = 0;
+					pixels = new TData[0, 0];
+					medianValue = default(TData);
+					pixelDataType = typeof (TData);
 					return false;
 				}
 
@@ -48,13 +67,14 @@ namespace Tangra.Helpers
 			    {
                     try
                     {
-                        bzero = (uint)double.Parse(bZeroCard.Value);                        
+                        bzero = (uint)double.Parse(bZeroCard.Value);
                     }
                     catch
 			        { }
 			    }
 
-			    pixels = Load16BitImageData((Array)imageHDU.Data.DataArray, imageHDU.Axes[0], imageHDU.Axes[1], bzero, out medianValue);
+				loadDataCallback((Array)imageHDU.Data.DataArray, imageHDU.Axes[0], imageHDU.Axes[1], bzero, out pixels, out medianValue, out pixelDataType);
+
 				return true;
 			}
 		}
@@ -133,11 +153,13 @@ namespace Tangra.Helpers
 
 			DateTime? fitsTimestamp = null;
 			double? fitsExposure = null;
+	        Type pixelDataType = null;
 
 			Load16BitFitsFile(
 				fileName,
 				out pixels,
 				out medianValue,
+				out pixelDataType,
 				delegate(BasicHDU imageHDU)
 				{
 					pixWidth = imageHDU.Axes[1];
@@ -181,7 +203,11 @@ namespace Tangra.Helpers
 				}
 			}
 
-			// TODO: If data type is float or double, then what bpp should be reported? 
+			if (pixelDataType == typeof (float))
+			{
+				// TODO: If data type is float then what bpp should be reported?
+			}
+			
 
             if (maxPixelValue < 256)
 				bpp = 8;
@@ -193,9 +219,67 @@ namespace Tangra.Helpers
 				bpp = pixBpp;
 		}
 
-		private static uint[,] Load16BitImageData(Array dataArray, int height, int width, uint bzero , out uint medianValue)
+		private static float[,] LoadFloatImageData(Array dataArray, int height, int width, float bzero, out float medianValue, out Type dataType)
+		{
+			var medianCalcList = new List<float>();
+
+			float[,] data = new float[width, height];
+
+			dataType = null;
+
+			for (int y = 0; y < height; y++)
+			{
+				object dataRowObject = dataArray.GetValue(y);
+
+				float[] dataRow;
+				if (dataRowObject is float[])
+				{
+					dataRow = (float[]) dataRowObject;
+					dataType = typeof(float);
+				}
+				else if (dataRowObject is Array)
+				{
+					Array arr = (Array) dataRowObject;
+					dataRow = new float[arr.Length];
+					for (int i = 0; i < arr.Length; i++)
+					{
+						if (dataType == null) dataType = arr.GetValue(i).GetType();
+						dataRow[i] = (float) Convert.ToSingle(arr.GetValue(i));
+					}
+				}
+				else
+					throw new ArrayTypeMismatchException();
+
+				for (int x = 0; x < width; x++)
+				{
+					float val = (float)(bzero + dataRow[x]);
+
+					data[x, height - y - 1] = val;
+					medianCalcList.Add(val);
+				}
+			}
+
+			if (medianCalcList.Count > 0)
+			{
+				medianCalcList.Sort();
+
+				if (medianCalcList.Count % 2 == 1)
+					medianValue = medianCalcList[medianCalcList.Count / 2];
+				else
+					medianValue = (medianCalcList[medianCalcList.Count / 2] + medianCalcList[1 + (medianCalcList.Count / 2)]) / 2;
+			}
+			else
+				medianValue = 0;
+
+			return data;
+
+		}
+
+		private static uint[,] Load16BitImageData(Array dataArray, int height, int width, uint bzero , out uint medianValue, out Type dataType)
 		{
 			var medianCalcList = new List<uint>();
+
+			dataType = null;
 
 			uint[,] data = new uint[width, height];
 
@@ -205,14 +289,18 @@ namespace Tangra.Helpers
 
 				short[] dataRow;
 				if (dataRowObject is short[])
-					dataRow = (short[])dataRowObject;
+				{
+					dataRow = (short[]) dataRowObject;
+					dataType = typeof (short);
+				}
 				else if (dataRowObject is Array)
 				{
 					Array arr = (Array) dataRowObject;
 					dataRow = new short[arr.Length];
 					for (int i = 0; i < arr.Length; i++)
 					{
-						dataRow[i] = (short)Convert.ToInt32(arr.GetValue(i));
+						if (dataType == null) dataType = arr.GetValue(i).GetType();
+						dataRow[i] = (short) Convert.ToInt32(arr.GetValue(i));
 					}
 				}
 				else

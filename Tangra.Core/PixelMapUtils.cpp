@@ -18,61 +18,45 @@ void CopyPixelsFromFormat16BPP(BYTE* pDIB, BITMAPINFOHEADER bih, long compressio
 	BYTE* src = pDIB + sizeof(BITMAPINFOHEADER);
 
 	unsigned int lineWidth = ((bih.biWidth * 16 / 8) + 3) & ~3;
-	
-	for (long y = bih.biHeight - 1; y >= 0; y--)
-	{
+
+	for (long y = bih.biHeight - 1; y >= 0; y--) {
 		unsigned long* rowPixels = pixels + y * bih.biWidth;
 		BYTE* rowBitmapPixels = bitmapBytes + y * bih.biWidth;
-			
-		for(long x = 0; x < bih.biWidth; x++)
-		{
+
+		for(long x = 0; x < bih.biWidth; x++) {
 			BYTE val;
 			unsigned char red;
 			unsigned char green;
 			unsigned char blue;
-			
-			if (compression == 0)
-			{
+
+			if (compression == 0) {
 				unsigned short color = *((unsigned short*) src);
 				red = (unsigned char)(((color >> 10) & 0x1f) << 3);
 				green = (unsigned char)(((color >> 5) & 0x1f) << 3);
 				blue = (unsigned char)((color & 0x1f) << 3);
-				
-				src += 2;		
-			}
-			else if (compression == 1) 
-			{ 
+
+				src += 2;
+			} else if (compression == 1) {
 				// RLE 8. Not supported in 16 bit mode
-			}
-			else if (compression == 2) 
-			{ 
+			} else if (compression == 2) {
 				// RLE 4. Not supported in 16 bit mode
-			}
-			else if (compression == 3) 
-			{
+			} else if (compression == 3) {
 				// BITFIELDS. Not supported in 16 bit mode
 			};
-			
-			if (s_COLOR_CHANNEL == Blue)
-			{
+
+			if (s_COLOR_CHANNEL == Blue) {
 				val = blue;
-			}
-			else if (s_COLOR_CHANNEL == Green)
-			{
+			} else if (s_COLOR_CHANNEL == Green) {
 				val = green;
-			}
-			else if (s_COLOR_CHANNEL == Red)
-			{
+			} else if (s_COLOR_CHANNEL == Red) {
 				val = red;
+			} else if (s_COLOR_CHANNEL == GrayScale) {
+				val = (unsigned char)(.299 * red + .587 * green + .114 * blue);
 			}
-			else if (s_COLOR_CHANNEL == GrayScale)
-			{
-				val = (unsigned char)(.299 * red + .587 * green + .114 * blue); 
-			}
-			
+
 			*rowPixels++= (unsigned long)val;
 			*rowBitmapPixels++=val;
-			
+
 			*bitmapPixels++=val;
 			*bitmapPixels++=val;
 			*bitmapPixels++=val;
@@ -86,57 +70,41 @@ void CopyPixelsFromFormat16BPP(BYTE* pDIB, long width, long height, long compres
 	BYTE* src = pDIB + sizeof(BITMAPINFOHEADER);
 
 	unsigned int lineWidth = ((width * 16 / 8) + 3) & ~3;
-	
-	for (long y = height - 1; y >= 0; y--)
-	{
+
+	for (long y = height - 1; y >= 0; y--) {
 		unsigned long* rowPixels = pixels + y * width;
-			
-		for(long x = 0; x < width; x++)
-		{
+
+		for(long x = 0; x < width; x++) {
 			BYTE val;
 			unsigned char red;
 			unsigned char green;
 			unsigned char blue;
-			
-			if (compression == 0)
-			{
+
+			if (compression == 0) {
 				unsigned short color = *((unsigned short*) src);
 				red = (unsigned char)(((color >> 10) & 0x1f) << 3);
 				green = (unsigned char)(((color >> 5) & 0x1f) << 3);
 				blue = (unsigned char)((color & 0x1f) << 3);
-				
-				src += 2;		
-			}
-			else if (compression == 1) 
-			{ 
+
+				src += 2;
+			} else if (compression == 1) {
 				// RLE 8. Not supported in 16 bit mode
-			}
-			else if (compression == 2) 
-			{ 
+			} else if (compression == 2) {
 				// RLE 4. Not supported in 16 bit mode
-			}
-			else if (compression == 3) 
-			{
+			} else if (compression == 3) {
 				// BITFIELDS. Not supported in 16 bit mode
 			};
-			
-			if (s_COLOR_CHANNEL == Blue)
-			{
+
+			if (s_COLOR_CHANNEL == Blue) {
 				val = blue;
-			}
-			else if (s_COLOR_CHANNEL == Green)
-			{
+			} else if (s_COLOR_CHANNEL == Green) {
 				val = green;
-			}
-			else if (s_COLOR_CHANNEL == Red)
-			{
+			} else if (s_COLOR_CHANNEL == Red) {
 				val = red;
+			} else if (s_COLOR_CHANNEL == GrayScale) {
+				val = (unsigned char)(.299 * red + .587 * green + .114 * blue);
 			}
-			else if (s_COLOR_CHANNEL == GrayScale)
-			{
-				val = (unsigned char)(.299 * red + .587 * green + .114 * blue); 
-			}
-			
+
 			*rowPixels++= (unsigned long)val;
 		}
 	}
@@ -152,8 +120,8 @@ void CopyPixelsFromFormat8BPP(BYTE* pDIB, BITMAPINFOHEADER bih, unsigned long* p
 
 void CopyPixelsFromFormat4BPP(BYTE* pDIB, BITMAPINFOHEADER bih, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
 {
-	//PixelFormat.Format4bppIndexed	
-	
+	//PixelFormat.Format4bppIndexed
+
 	long length = (bih.biWidth * bih.biHeight);
 	BYTE* src = pDIB + sizeof(BITMAPINFOHEADER);
 }
@@ -174,14 +142,12 @@ void CopyPixelsInTriplets(BYTE* pDIB, BITMAPINFOHEADER bih, unsigned long* pixel
 
 	unsigned long *lsrc = (unsigned long *)src;
 	size_t triplets = length >> 2;
-	while (triplets--)
-	{
+	while (triplets--) {
 		b12 = *lsrc++;
 		b23 = *lsrc++;
 		b34 = *lsrc++;
 
-		if (currLinePos == 0) 
-		{
+		if (currLinePos == 0) {
 			currLinePos = width;
 			pixels-=2*width;
 			bitmapBytes-=2*width;
@@ -189,30 +155,23 @@ void CopyPixelsInTriplets(BYTE* pDIB, BITMAPINFOHEADER bih, unsigned long* pixel
 
 		//depends upon bigendian or little endian cpu
 
-		if (s_COLOR_CHANNEL == Blue)
-		{
-			val1 = (unsigned char)(b12); 
+		if (s_COLOR_CHANNEL == Blue) {
+			val1 = (unsigned char)(b12);
 			val2 = (unsigned char)(b12 >> 24);
 			val3 = (unsigned char)(b23 >> 16);
 			val4 = (unsigned char)(b34 >> 8);
-		}
-		else if (s_COLOR_CHANNEL == Green)
-		{
-			val1 = (unsigned char)(b12 >> 8); 
+		} else if (s_COLOR_CHANNEL == Green) {
+			val1 = (unsigned char)(b12 >> 8);
 			val2 = (unsigned char)(b23);
 			val3 = (unsigned char)(b23 >> 24);
 			val4 = (unsigned char)(b34 >> 16);
-		}
-		else if (s_COLOR_CHANNEL == Red)
-		{
-			val1 = (unsigned char)(b12 >> 16); 
+		} else if (s_COLOR_CHANNEL == Red) {
+			val1 = (unsigned char)(b12 >> 16);
 			val2 = (unsigned char)(b23 >> 8);
 			val3 = (unsigned char)(b34);
 			val4 = (unsigned char)(b34 >> 24);
-		}
-		else if (s_COLOR_CHANNEL == GrayScale)
-		{
-			val1 = (unsigned char)(.299 * (unsigned char)(b12) + .587 * (unsigned char)(b12 >> 8) + .114 * (unsigned char)(b12 >> 16)); 
+		} else if (s_COLOR_CHANNEL == GrayScale) {
+			val1 = (unsigned char)(.299 * (unsigned char)(b12) + .587 * (unsigned char)(b12 >> 8) + .114 * (unsigned char)(b12 >> 16));
 			val2 = (unsigned char)(.299 * (unsigned char)(b12 >> 24) + .587 * (unsigned char)(b23) + .114 * (unsigned char)(b23 >> 8));
 			val3 = (unsigned char)(.299 * (unsigned char)(b23 >> 16) + .587 * (unsigned char)(b23 >> 16) + .114 * (unsigned char)(b34));
 			val4 = (unsigned char)(.299 * (unsigned char)(b34 >> 8) + .587 * (unsigned char)(b34 >> 16) + .114 * (unsigned char)(b34 >> 24));
@@ -226,8 +185,7 @@ void CopyPixelsInTriplets(BYTE* pDIB, BITMAPINFOHEADER bih, unsigned long* pixel
 		*bitmapPixels++=val1;
 		currLinePos--;
 
-		if (currLinePos == 0) 
-		{
+		if (currLinePos == 0) {
 			currLinePos = width;
 			pixels-=width;
 			bitmapBytes-=width;
@@ -237,25 +195,23 @@ void CopyPixelsInTriplets(BYTE* pDIB, BITMAPINFOHEADER bih, unsigned long* pixel
 		*bitmapBytes++=val2;
 		*bitmapPixels++=val2;
 		*bitmapPixels++=val2;
-		*bitmapPixels++=val2;		
+		*bitmapPixels++=val2;
 		currLinePos--;
 
-		if (currLinePos == 0) 
-		{
+		if (currLinePos == 0) {
 			currLinePos = width;
 			pixels-=width;
 			bitmapBytes-=width;
 		}
-		
+
 		*pixels++=val3;
 		*bitmapBytes++=val3;
 		*bitmapPixels++=val3;
 		*bitmapPixels++=val3;
-		*bitmapPixels++=val3;		
+		*bitmapPixels++=val3;
 		currLinePos--;
 
-		if (currLinePos == 0) 
-		{
+		if (currLinePos == 0) {
 			currLinePos = width;
 			pixels-=width;
 			bitmapBytes-=width;
@@ -265,7 +221,7 @@ void CopyPixelsInTriplets(BYTE* pDIB, BITMAPINFOHEADER bih, unsigned long* pixel
 		*bitmapBytes++=val4;
 		*bitmapPixels++=val4;
 		*bitmapPixels++=val4;
-		*bitmapPixels++=val4;		
+		*bitmapPixels++=val4;
 		currLinePos--;
 	}
 }
@@ -284,44 +240,35 @@ void CopyPixelsInTriplets(BYTE* pDIB, long width, long height, unsigned long* pi
 
 	unsigned long *lsrc = (unsigned long *)src;
 	size_t triplets = length >> 2;
-	while (triplets--)
-	{
+	while (triplets--) {
 		b12 = *lsrc++;
 		b23 = *lsrc++;
 		b34 = *lsrc++;
 
-		if (currLinePos == 0) 
-		{
+		if (currLinePos == 0) {
 			currLinePos = width;
 			pixels-=2*width;
 		}
 
 		//depends upon bigendian or little endian cpu
 
-		if (s_COLOR_CHANNEL == Blue)
-		{
-			val1 = (unsigned char)(b12); 
+		if (s_COLOR_CHANNEL == Blue) {
+			val1 = (unsigned char)(b12);
 			val2 = (unsigned char)(b12 >> 24);
 			val3 = (unsigned char)(b23 >> 16);
 			val4 = (unsigned char)(b34 >> 8);
-		}
-		else if (s_COLOR_CHANNEL == Green)
-		{
-			val1 = (unsigned char)(b12 >> 8); 
+		} else if (s_COLOR_CHANNEL == Green) {
+			val1 = (unsigned char)(b12 >> 8);
 			val2 = (unsigned char)(b23);
 			val3 = (unsigned char)(b23 >> 24);
 			val4 = (unsigned char)(b34 >> 16);
-		}
-		else if (s_COLOR_CHANNEL == Red)
-		{
-			val1 = (unsigned char)(b12 >> 16); 
+		} else if (s_COLOR_CHANNEL == Red) {
+			val1 = (unsigned char)(b12 >> 16);
 			val2 = (unsigned char)(b23 >> 8);
 			val3 = (unsigned char)(b34);
 			val4 = (unsigned char)(b34 >> 24);
-		}
-		else if (s_COLOR_CHANNEL == GrayScale)
-		{
-			val1 = (unsigned char)(.299 * (unsigned char)(b12) + .587 * (unsigned char)(b12 >> 8) + .114 * (unsigned char)(b12 >> 16)); 
+		} else if (s_COLOR_CHANNEL == GrayScale) {
+			val1 = (unsigned char)(.299 * (unsigned char)(b12) + .587 * (unsigned char)(b12 >> 8) + .114 * (unsigned char)(b12 >> 16));
 			val2 = (unsigned char)(.299 * (unsigned char)(b12 >> 24) + .587 * (unsigned char)(b23) + .114 * (unsigned char)(b23 >> 8));
 			val3 = (unsigned char)(.299 * (unsigned char)(b23 >> 16) + .587 * (unsigned char)(b23 >> 16) + .114 * (unsigned char)(b34));
 			val4 = (unsigned char)(.299 * (unsigned char)(b34 >> 8) + .587 * (unsigned char)(b34 >> 16) + .114 * (unsigned char)(b34 >> 24));
@@ -331,8 +278,7 @@ void CopyPixelsInTriplets(BYTE* pDIB, long width, long height, unsigned long* pi
 		*pixels++=val1;
 		currLinePos--;
 
-		if (currLinePos == 0) 
-		{
+		if (currLinePos == 0) {
 			currLinePos = width;
 			pixels-=width;
 		}
@@ -340,17 +286,15 @@ void CopyPixelsInTriplets(BYTE* pDIB, long width, long height, unsigned long* pi
 		*pixels++=val2;
 		currLinePos--;
 
-		if (currLinePos == 0) 
-		{
+		if (currLinePos == 0) {
 			currLinePos = width;
 			pixels-=width;
 		}
-		
+
 		*pixels++=val3;
 		currLinePos--;
 
-		if (currLinePos == 0) 
-		{
+		if (currLinePos == 0) {
 			currLinePos = width;
 			pixels-=width;
 		}
@@ -365,12 +309,12 @@ HRESULT GetPixelMapPixelsOnly(BYTE* pDIB, long width, long height, unsigned long
 {
 	BITMAPINFOHEADER bih;
 	memmove(&bih.biSize, pDIB, sizeof(BITMAPINFOHEADER));
-	
+
 	if (bih.biBitCount == 24)
 		CopyPixelsInTriplets(pDIB, width, height, pixels);
 	else if (bih.biBitCount == 16)
 		CopyPixelsFromFormat16BPP(pDIB, width, height, bih.biCompression, pixels);
-		
+
 	return S_OK;
 }
 
@@ -383,27 +327,27 @@ HRESULT GetPixelMapBits(BYTE* pDIB, long* width, long* height, DWORD imageSize, 
 HRESULT GetPixelMapBitsAndHBitmap(BYTE* pDIB, long* width, long* height, DWORD imageSize, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, HBITMAP hBitmap)
 {
 	//OutputDebugString("GetPixelMapBitsAndHBitmap.214");
-	
+
 	BITMAPINFOHEADER bih;
 	memmove(&bih.biSize, pDIB, sizeof(BITMAPINFOHEADER));
 
 	int originalBitCount = bih.biBitCount;
 	int originalCompression = bih.biCompression;
-	
+
 	if (*width == 0) *width = bih.biWidth;
 	if (*height == 0) *height = bih.biHeight;
 
-	bih.biSize = sizeof(BITMAPINFOHEADER); 
-	bih.biPlanes = 1; 
-	bih.biBitCount = 24;                          // 24-bit 
-	bih.biCompression = BI_RGB;                   // no compression 
-	bih.biSizeImage = *width * ABS(*height) * 3;    // width * height * (RGB bytes) 
-	bih.biXPelsPerMeter = 0; 
-	bih.biYPelsPerMeter = 0; 
-	bih.biClrUsed = 0; 
-	bih.biClrImportant = 0; 
-	bih.biWidth = *width;                          // bitmap width 
-	bih.biHeight = *height;                        // bitmap height 
+	bih.biSize = sizeof(BITMAPINFOHEADER);
+	bih.biPlanes = 1;
+	bih.biBitCount = 24;                          // 24-bit
+	bih.biCompression = BI_RGB;                   // no compression
+	bih.biSizeImage = *width * ABS(*height) * 3;    // width * height * (RGB bytes)
+	bih.biXPelsPerMeter = 0;
+	bih.biYPelsPerMeter = 0;
+	bih.biClrUsed = 0;
+	bih.biClrImportant = 0;
+	bih.biWidth = *width;                          // bitmap width
+	bih.biHeight = *height;                        // bitmap height
 
 	// and BitmapInfo variable-length UDT
 	BYTE memBitmapInfo[40];
@@ -419,10 +363,10 @@ HRESULT GetPixelMapBitsAndHBitmap(BYTE* pDIB, long* width, long* height, DWORD i
 	// Copy the display bitmap including the header
 	memmove(bitmapPixels, &bfh, sizeof(bfh));
 	memmove(bitmapPixels + sizeof(bfh), &memBitmapInfo, sizeof(memBitmapInfo));
-	
+
 	bitmapPixels = bitmapPixels + sizeof(bfh) + sizeof(memBitmapInfo);
 
-    // See http://www.kalytta.com/bitmap.h for handling different bitmap formats
+	// See http://www.kalytta.com/bitmap.h for handling different bitmap formats
 	if (originalBitCount == 24)
 		CopyPixelsInTriplets(pDIB, bih, pixels, bitmapPixels, bitmapBytes);
 	else if (originalBitCount == 16)
@@ -431,7 +375,7 @@ HRESULT GetPixelMapBitsAndHBitmap(BYTE* pDIB, long* width, long* height, DWORD i
 	//	CopyPixelsFromFormat8BPP(pDIB, bih, pixels, bitmapPixels, bitmapBytes);
 	//else if (bih.biBitCount == 4)
 	//	CopyPixelsFromFormat4BPP(pDIB, bih, pixels, bitmapPixels, bitmapBytes);
-            
+
 	return S_OK;
 }
 
@@ -440,19 +384,19 @@ HRESULT GetBitmapPixels(long width, long height, unsigned long* pixels, BYTE* bi
 {
 	BYTE* pp = bitmapPixels;
 
-	// define the bitmap information header 
+	// define the bitmap information header
 	BITMAPINFOHEADER bih;
-	bih.biSize = sizeof(BITMAPINFOHEADER); 
-	bih.biPlanes = 1; 
-	bih.biBitCount = 24;                          // 24-bit 
-	bih.biCompression = BI_RGB;                   // no compression 
-	bih.biSizeImage = width * ABS(height) * 3;    // width * height * (RGB bytes) 
-	bih.biXPelsPerMeter = 0; 
-	bih.biYPelsPerMeter = 0; 
-	bih.biClrUsed = 0; 
-	bih.biClrImportant = 0; 
-	bih.biWidth = width;                          // bitmap width 
-	bih.biHeight = height;                        // bitmap height 
+	bih.biSize = sizeof(BITMAPINFOHEADER);
+	bih.biPlanes = 1;
+	bih.biBitCount = 24;                          // 24-bit
+	bih.biCompression = BI_RGB;                   // no compression
+	bih.biSizeImage = width * ABS(height) * 3;    // width * height * (RGB bytes)
+	bih.biXPelsPerMeter = 0;
+	bih.biYPelsPerMeter = 0;
+	bih.biClrUsed = 0;
+	bih.biClrImportant = 0;
+	bih.biWidth = width;                          // bitmap width
+	bih.biHeight = height;                        // bitmap height
 
 	// and BitmapInfo variable-length UDT
 	BYTE memBitmapInfo[40];
@@ -487,10 +431,8 @@ HRESULT GetBitmapPixels(long width, long height, unsigned long* pixels, BYTE* bi
 	else if (bpp == 16) shiftVal = 8;
 
 	int total = width * height;
-	while(total--)
-	{
-		if (currLinePos == 0) 
-		{
+	while(total--) {
+		if (currLinePos == 0) {
 			currLinePos = width;
 			bitmapPixels-=6*width;
 		};
@@ -499,22 +441,17 @@ HRESULT GetBitmapPixels(long width, long height, unsigned long* pixels, BYTE* bi
 		pixels++;
 
 		unsigned int dblVal;
-		if (bpp == 8)
-		{
+		if (bpp == 8) {
 			dblVal = val;
-		}
-		else if (normVal > 0)
-		{
+		} else if (normVal > 0) {
 			dblVal = (unsigned int)(255.0 * val / normVal);
-		}
-		else
-		{
+		} else {
 			dblVal = val >> shiftVal;
 		}
-		 
+
 
 		BYTE btVal = (BYTE)(dblVal & 0xFF);
-		
+
 		*bitmapPixels = btVal;
 		*(bitmapPixels + 1) = btVal;
 		*(bitmapPixels + 2) = btVal;
@@ -532,7 +469,7 @@ long GetNewLinePosition(long line, long firstOsdLine, long lastOsdLine)
 {
 	if (line < firstOsdLine || line > lastOsdLine)
 		return -1;
-	else	
+	else
 		return firstOsdLine + ((line - firstOsdLine) / 2) + ((line - 1) % 2) * ((lastOsdLine - firstOsdLine) / 2);
 }
 
@@ -543,65 +480,58 @@ HRESULT BitmapSplitFieldsOSD(BYTE* bitmapPixels, long firstOsdLine, long lastOsd
 
 	if (firstOsdLine >= lastOsdLine || firstOsdLine < 0 || lastOsdLine > bih.biHeight)
 		return E_FAIL;
-		
+
 	int stride = bih.biWidth * (bih.biBitCount / 8);
-	
+
 	int moveFrom = firstOsdLine;
 	int moveTo = -1;
 	int buffedLine = -1;
-	
+
 	BYTE* buffer1 = (BYTE*)malloc(stride);
 	BYTE* buffer2 = (BYTE*)malloc(stride);
-	
+
 	long a = bih.biHeight;
 	long b = -1;
-	
+
 	bool* movedLines = (bool*)malloc(lastOsdLine - firstOsdLine);
-	
+
 	for (int i = 0; i <= lastOsdLine - firstOsdLine; i++) movedLines[i] = false;
-		
+
 	BYTE* ppFirstBitmapPixel = bitmapPixels + 55;
-				
-	for (int counter = firstOsdLine; counter <= lastOsdLine; counter++)
-	{
+
+	for (int counter = firstOsdLine; counter <= lastOsdLine; counter++) {
 		if (movedLines[counter - firstOsdLine])
 			continue;
-		
+
 		moveFrom = counter;
 		memmove(buffer1, ppFirstBitmapPixel + (a + b * moveFrom) * stride, stride);
-		
-		do
-		{
+
+		do {
 			moveTo = GetNewLinePosition(moveFrom, firstOsdLine, lastOsdLine);
-			
-			if (moveTo != -1)
-			{
-				if (moveFrom != moveTo && !movedLines[moveTo - firstOsdLine])
-				{
+
+			if (moveTo != -1) {
+				if (moveFrom != moveTo && !movedLines[moveTo - firstOsdLine]) {
 					memmove(buffer2, ppFirstBitmapPixel + (a + b * moveTo) * stride, stride);
 					buffedLine = moveTo;
-					
+
 					memmove(ppFirstBitmapPixel + (a + b * moveTo) * stride, buffer1, stride);
 					memmove(buffer1, buffer2, stride);
-					
+
 					movedLines[moveTo - firstOsdLine] = true;
-				}
-				else
-				{
+				} else {
 					movedLines[moveTo - firstOsdLine] = true;
 					break;
 				}
 			}
-			
+
 			moveFrom = moveTo;
-		}
-		while(true);
+		} while(true);
 	};
-	
+
 	delete buffer1;
 	delete buffer2;
 	delete movedLines;
-	
+
 	return S_OK;
 }
 
@@ -615,11 +545,11 @@ void GetMinMaxValuesForBpp(int bpp, int* minValue, int* maxValue)
 	else if (bpp == 12)
 		*maxValue = 0xFFF;
 	else if (bpp == 14)
-		*maxValue = 0x3FFF;		
+		*maxValue = 0x3FFF;
 	else if (bpp == 16)
 		*maxValue = 0xFFFF;
-	else 
-		*maxValue = (1 << bpp) - 1;		
+	else
+		*maxValue = (1 << bpp) - 1;
 }
 
 int s_GammaTableBpp = 0;
@@ -629,28 +559,25 @@ unsigned int* s_GammaTable = NULL;
 void BuildGammaTableForBpp(int bpp, float gamma)
 {
 	if (s_GammaTableBpp != bpp ||
-		ABS(s_GammaTableEncodingGamma - gamma) >= 0.01)
-	{
-		if (NULL != s_GammaTable)
-		{
+	    ABS(s_GammaTableEncodingGamma - gamma) >= 0.01) {
+		if (NULL != s_GammaTable) {
 			delete s_GammaTable;
 			s_GammaTable = NULL;
 		}
-		
+
 		int minValue;
 		int maxValue;
-		
+
 		GetMinMaxValuesForBpp(bpp, &minValue, &maxValue);
-		
+
 		float decodingGamma = 1.0f / gamma;
 		float gammaPixelConvCoeff = maxValue / pow(maxValue, decodingGamma);
-		
+
 		s_GammaTable = (unsigned int*)malloc((maxValue + 1) * sizeof(unsigned int));
-		
+
 		unsigned int* itt = s_GammaTable;
-		
-		for (int idx = 0; idx <= maxValue; idx++)
-		{
+
+		for (int idx = 0; idx <= maxValue; idx++) {
 			float conversionValue =  gammaPixelConvCoeff * pow(idx, decodingGamma);
 			if (conversionValue + 0.5 >= maxValue)
 				*itt = maxValue;
@@ -658,10 +585,10 @@ void BuildGammaTableForBpp(int bpp, float gamma)
 				*itt = minValue;
 			else
 				*itt = (unsigned int)(conversionValue + 0.5); // rounded to nearest int
-				
+
 			itt++;
 		}
-		
+
 		s_GammaTableBpp = bpp;
 		s_GammaTableEncodingGamma = gamma;
 	}
@@ -669,87 +596,66 @@ void BuildGammaTableForBpp(int bpp, float gamma)
 
 HRESULT PreProcessingFlipRotate(unsigned long* pixels, long width, long height, int bpp, enum RotateFlipType flipRotateType)
 {
-	if (flipRotateType == 0)
-	{
+	if (flipRotateType == 0) {
 		//Rotate180FlipXY = 0,
 		//RotateNoneFlipNone = 0,
-		
+
 		// NOTE: Nothing to do
-	}
-	else if (flipRotateType == 1)
-	{
+	} else if (flipRotateType == 1) {
 		//Rotate270FlipXY = 1,
 		//Rotate90FlipNone = 1,
-		
+
 		// NOTE: Not supported
-	}
-	else if (flipRotateType == 2)
-	{
+	} else if (flipRotateType == 2) {
 		//Rotate180FlipNone = 2,
 		//RotateNoneFlipXY = 2,
-		
-		for	(long x = 0; x < width / 2; x ++)
-		{
-			for	(long y = 0; y < height; y ++)
-			{
-			unsigned long tmp = pixels[width * y + x];
+
+		for	(long x = 0; x < width / 2; x ++) {
+			for	(long y = 0; y < height; y ++) {
+				unsigned long tmp = pixels[width * y + x];
 				pixels[width * y + x] = pixels[width * (height - 1 - y) + (width - 1 - x)];
 				pixels[width * (height - 1 - y) + (width - 1 - x)] = tmp;
 			}
 		}
-	}
-	else if (flipRotateType == 3)
-	{
+	} else if (flipRotateType == 3) {
 		//Rotate270FlipNone = 3,
 		//Rotate90FlipXY = 3,
 
 		// NOTE: Not supported
-	}
-	else if (flipRotateType == 4)
-	{	
-		//Rotate180FlipY = 4,
+	} else if (flipRotateType == 4) {
+		//DRotate180FlipY = 4,
 		//RotateNoneFlipX = 4,
-	
-		for	(long x = 0; x < width / 2; x ++)
-		{
-			for	(long y = 0; y < height; y ++)
-			{
+
+		for	(long x = 0; x < width / 2; x ++) {
+			for	(long y = 0; y < height; y ++) {
 				unsigned long tmp = pixels[width * y + x];
 				pixels[width * y + x] = pixels[width * y + (width - 1 - x)];
 				pixels[width * y + (width - 1 - x)] = tmp;
 			}
-		}	
-	}
-	else if (flipRotateType == 5)
-	{
+		}
+	} else if (flipRotateType == 5) {
 		//Rotate270FlipY = 5,
 		//Rotate90FlipX = 5,
 
-		// NOTE: Not supported		
-	}
-	else if (flipRotateType == 6)
-	{
+		// NOTE: Not supported
+	} else if (flipRotateType == 6) {
 		//Rotate180FlipX = 6,
 		//RotateNoneFlipY = 6,
-		
-		for	(long y = 0; y < height / 2; y ++)
-		{
-			for	(long x = 0; x < width; x ++)
-			{
+
+		for	(long y = 0; y < height / 2; y ++) {
+			for	(long x = 0; x < width; x ++) {
 				unsigned long tmp = pixels[width * y + x];
 				pixels[width * y + x] = pixels[width * (height - 1 - y) + x];
 				pixels[width * (height - 1 - y) + x] = tmp;
 			}
-		}			
-	}
-	else if (flipRotateType == 6)
-	{
+		}
+	} else if (flipRotateType == 6) {
 		//Rotate270FlipX = 7,
 		//Rotate90FlipY = 7
-		
+
 		// NOTE: Not supported
 	}
-	
+
 	return S_OK;
 }
 
@@ -765,14 +671,12 @@ HRESULT PreProcessingStretch(unsigned long* pixels, long width, long height, int
 	unsigned long* pPixels = pixels;
 	float coeff = ((float)(maxValue - minValue)) / (toValue - fromValue);
 
-	while(totalPixels--)
-	{
-		if (*pPixels < fromValue) 
+	while(totalPixels--) {
+		if (*pPixels < fromValue)
 			*pPixels = minValue;
-		else if (*pPixels > toValue) 
+		else if (*pPixels > toValue)
 			*pPixels = maxValue;
-		else	
-		{
+		else {
 			float newValue = coeff * (*pPixels - fromValue);
 			if (newValue < minValue) newValue = minValue;
 			if (newValue > maxValue) newValue = maxValue;
@@ -794,12 +698,11 @@ HRESULT PreProcessingClip(unsigned long* pixels, long width, long height, int bp
 
 	long totalPixels = width * height;
 	unsigned long* pPixels = pixels;
-	
-	while(totalPixels--)
-	{
-		if (*pPixels < fromValue) 
+
+	while(totalPixels--) {
+		if (*pPixels < fromValue)
 			*pPixels = fromValue;
-		else if (*pPixels > toValue) 
+		else if (*pPixels > toValue)
 			*pPixels = toValue;
 
 		pPixels++;
@@ -829,9 +732,8 @@ HRESULT PreProcessingBrightnessContrast(unsigned long* pixels, long width, long 
 
 	double contrastCoeff = (100.0 + cotrast) / 100.0;
 	contrastCoeff *= contrastCoeff;
-	
-	while(totalPixels--)
-	{
+
+	while(totalPixels--) {
 		double pixel = *pPixels + bppBrightness;
 		if (pixel < minValue) pixel = minValue;
 		if (pixel > maxValue) pixel = maxValue;
@@ -843,10 +745,10 @@ HRESULT PreProcessingBrightnessContrast(unsigned long* pixels, long width, long 
 		pixel *= maxValue;
 		if (pixel < minValue) pixel = minValue;
 		if (pixel > maxValue) pixel = maxValue;
-		
+
 		*pPixels = (long)pixel;
 
- 		pPixels++;
+		pPixels++;
 	}
 
 	return S_OK;
@@ -858,86 +760,76 @@ HRESULT PreProcessingGamma(unsigned long* pixels, long width, long height, int b
 
 	long totalPixels = width * height;
 	unsigned long* pPixels = pixels;
-	
-	while(totalPixels--)
-	{
+
+	while(totalPixels--) {
 		*pPixels = *(s_GammaTable + *pPixels);
-		pPixels++;
-	}
-
-	return S_OK;	
-}
-
-HRESULT PreProcessingApplyDarkFlatFrame(
-	unsigned long* pixels, long width, long height, int bpp, 
-	unsigned long* darkPixels, unsigned long* flatPixels, unsigned long darkMedian, bool darkFrameAdjustLevelToMedian, unsigned long flatMedian)
-{
-	int minValue, maxValue;
-	GetMinMaxValuesForBpp(bpp, &minValue, &maxValue);
-	
-	long totalPixels = width * height;
-	unsigned long* pPixels = pixels;
-	unsigned long* pDarkPixels = darkPixels;
-	unsigned long* pFlatPixels = flatPixels;
-	
-	while(totalPixels--)
-	{
-		unsigned long pixelValue = *pPixels;
-		
-		if (NULL != darkPixels && NULL != flatPixels)
-		{
-			//          original - dark
-			// Final = -------------------- * MEDIAN (flat)
-			//               flat
-
-			pixelValue = pixelValue - *pDarkPixels + (darkFrameAdjustLevelToMedian ? darkMedian : 0);
-			if ((long)pixelValue < minValue) pixelValue = minValue;				
-			
-			if (NULL != flatPixels)
-			{
-				pixelValue = (unsigned long)((double)pixelValue * (double)flatMedian) / ((double)*pFlatPixels);
-
-				pFlatPixels++;
-			}
-			pDarkPixels++;
-		}	
-		else if (NULL != flatPixels)
-		{
-			//          original
-			// Final = ------------ * MEDIAN (flat)
-			//            flat
-
-			pixelValue = (unsigned long)((double)pixelValue * ((double)flatMedian)) / ((double)*pFlatPixels);
-			pFlatPixels++;
-		}
-		else if (NULL != pDarkPixels)
-		{
-			//          
-			// Final = original - dark
-			//            
-
-			pixelValue = pixelValue - *pDarkPixels + (darkFrameAdjustLevelToMedian ? darkMedian : 0);
-
-			pDarkPixels++;
-		}	
-		
-		if ((long)pixelValue > maxValue)
-			pixelValue = maxValue;
-		else if ((long)pixelValue < minValue)
-			pixelValue = minValue;			
-		
-		*pPixels = pixelValue;
-		
 		pPixels++;
 	}
 
 	return S_OK;
 }
 
-struct ConvMatrix
+HRESULT PreProcessingApplyDarkFlatFrame(
+    unsigned long* pixels, long width, long height, int bpp,
+    float* darkPixels, float* flatPixels, float darkMedian, bool darkFrameAdjustLevelToMedian, float flatMedian)
 {
-	ConvMatrix()
-	{
+	int minValue, maxValue;
+	GetMinMaxValuesForBpp(bpp, &minValue, &maxValue);
+
+	long totalPixels = width * height;
+	unsigned long* pPixels = pixels;
+	float* pDarkPixels = darkPixels;
+	float* pFlatPixels = flatPixels;
+
+	while(totalPixels--) {
+		unsigned long pixelValue = *pPixels;
+
+		if (NULL != darkPixels && NULL != flatPixels) {
+			//          original - dark
+			// Final = -------------------- * MEDIAN (flat)
+			//               flat
+
+			pixelValue = pixelValue - *pDarkPixels + (darkFrameAdjustLevelToMedian ? darkMedian : 0);
+			if ((long)pixelValue < minValue) pixelValue = minValue;
+
+			if (NULL != flatPixels) {
+				pixelValue = (unsigned long)((double)pixelValue * (double)flatMedian) / ((double)*pFlatPixels);
+
+				pFlatPixels++;
+			}
+			pDarkPixels++;
+		} else if (NULL != flatPixels) {
+			//          original
+			// Final = ------------ * MEDIAN (flat)
+			//            flat
+
+			pixelValue = (unsigned long)((double)pixelValue * ((double)flatMedian)) / ((double)*pFlatPixels);
+			pFlatPixels++;
+		} else if (NULL != pDarkPixels) {
+			//
+			// Final = original - dark
+			//
+
+			pixelValue = (unsigned long)((double)pixelValue - (double)*pDarkPixels + (darkFrameAdjustLevelToMedian ? (double)darkMedian : 0));
+
+			pDarkPixels++;
+		}
+
+		if ((long)pixelValue > maxValue)
+			pixelValue = maxValue;
+		else if ((long)pixelValue < minValue)
+			pixelValue = minValue;
+
+		*pPixels = pixelValue;
+
+		pPixels++;
+	}
+
+	return S_OK;
+}
+
+struct ConvMatrix {
+	ConvMatrix() {
 		TopLeft = 0;
 		TopMid = 0;
 		TopRight = 0;
@@ -948,20 +840,20 @@ struct ConvMatrix
 		BottomMid = 0;
 		BottomRight = 0;
 		Factor = 1;
-		Offset = 0;		
+		Offset = 0;
 	}
-	
+
 	float TopLeft;
 	float TopMid;
 	float TopRight;
-    float MidLeft;
+	float MidLeft;
 	float Pixel;
 	float MidRight;
-    float BottomLeft;
+	float BottomLeft;
 	float BottomMid;
 	float BottomRight;
-    int Factor;
-    int Offset;
+	int Factor;
+	int Offset;
 };
 
 bool convMatrixConstantsInitialized = false;
@@ -969,19 +861,18 @@ ConvMatrix LOW_PASS_FILTER_MATRIX;
 
 void EnsureConvMatrixConstantsInitialized()
 {
-	if (!convMatrixConstantsInitialized)
-	{
+	if (!convMatrixConstantsInitialized) {
 		// http://www.echoview.com/WebHelp/Reference/Algorithms/Operators/Convolution_algorithms.htm
 		LOW_PASS_FILTER_MATRIX.TopLeft = 1/16.0f;
 		LOW_PASS_FILTER_MATRIX.TopMid = 1/8.0f;
 		LOW_PASS_FILTER_MATRIX.TopRight = 1/16.0f;
 		LOW_PASS_FILTER_MATRIX.MidLeft = 1/8.0f;
 		LOW_PASS_FILTER_MATRIX.Pixel = 1/4.0f;
-		LOW_PASS_FILTER_MATRIX.MidRight = 1/8.0f;		
+		LOW_PASS_FILTER_MATRIX.MidRight = 1/8.0f;
 		LOW_PASS_FILTER_MATRIX.BottomLeft = 1/16.0f;
 		LOW_PASS_FILTER_MATRIX.BottomMid = 1/8.0f;
 		LOW_PASS_FILTER_MATRIX.BottomRight = 1/16.0f;
-		
+
 		convMatrixConstantsInitialized = true;
 	}
 }
@@ -991,34 +882,32 @@ void Conv3x3(unsigned long* pixels, long width, long height, int bpp, ConvMatrix
 	// Avoid divide by zero errors
 	if (0 == m->Factor)
 		return;
-		
-	int minValue, maxValue;
-	GetMinMaxValuesForBpp(bpp, &minValue, &maxValue);		
 
-	for (int y = 0; y < height - 2; ++y)
-	{
-		for (int x = 0; x < width - 2; ++x)
-		{
+	int minValue, maxValue;
+	GetMinMaxValuesForBpp(bpp, &minValue, &maxValue);
+
+	for (int y = 0; y < height - 2; ++y) {
+		for (int x = 0; x < width - 2; ++x) {
 			double dblPixel = (unsigned long)(
-			(
-				(
-					((double)*(pixels + x + y * width) * m->TopLeft) +
-					((double)*(pixels + (x + 1) + y * width) * m->TopMid) +
-					((double)*(pixels + (x + 2) + y * width) * m->TopRight) +
-					((double)*(pixels + x + (y + 1) * width) * m->MidLeft) +
-					((double)*(pixels + (x + 1) + (y + 1) * width) * m->Pixel) +
-					((double)*(pixels + (x + 2) + (y + 1) * width) * m->MidRight) +
-					((double)*(pixels + x + (y + 2) * width) * m->BottomLeft) +
-					((double)*(pixels + (x + 1) + (y + 2) * width) * m->BottomMid) +
-					((double)*(pixels + (x + 2) + (y + 2) * width) * m->BottomRight)
-				) / m->Factor
-			) + m->Offset
-			+ 0.5 /*rounded*/ );
+			                      (
+			                          (
+			                              ((double)*(pixels + x + y * width) * m->TopLeft) +
+			                              ((double)*(pixels + (x + 1) + y * width) * m->TopMid) +
+			                              ((double)*(pixels + (x + 2) + y * width) * m->TopRight) +
+			                              ((double)*(pixels + x + (y + 1) * width) * m->MidLeft) +
+			                              ((double)*(pixels + (x + 1) + (y + 1) * width) * m->Pixel) +
+			                              ((double)*(pixels + (x + 2) + (y + 1) * width) * m->MidRight) +
+			                              ((double)*(pixels + x + (y + 2) * width) * m->BottomLeft) +
+			                              ((double)*(pixels + (x + 1) + (y + 2) * width) * m->BottomMid) +
+			                              ((double)*(pixels + (x + 2) + (y + 2) * width) * m->BottomRight)
+			                          ) / m->Factor
+			                      ) + m->Offset
+			                      + 0.5 /*rounded*/ );
 
 			if (dblPixel < 0) dblPixel = 0;
 			if (dblPixel > maxValue) dblPixel = maxValue;
 			if (dblPixel < minValue) dblPixel = minValue;
-			
+
 			*(pixels + (x + 1) + (y  + 1) * width) = (unsigned long)dblPixel;
 		}
 	}
@@ -1027,7 +916,7 @@ void Conv3x3(unsigned long* pixels, long width, long height, int bpp, ConvMatrix
 DLL_PUBLIC HRESULT PreProcessingLowPassFilter(unsigned long* pixels, long width, long height, int bpp)
 {
 	Conv3x3(pixels, width, height, bpp, &LOW_PASS_FILTER_MATRIX);
-	
+
 	return S_OK;
 }
 
@@ -1041,20 +930,18 @@ long g_LPDBufferHeight = -1;
 
 void InitializeLowPassDifferenceFilter(long width, long height)
 {
-	if (g_LPDBufferWidth != width ||	
-		g_LPDBufferHeight != height)
-	{
-		if (NULL != g_LowPassDataLPDBuffer)
-		{
+	if (g_LPDBufferWidth != width ||
+	    g_LPDBufferHeight != height) {
+		if (NULL != g_LowPassDataLPDBuffer) {
 			delete g_LowPassDataLPDBuffer;
 			g_LowPassDataLPDBuffer = NULL;
 		}
-		
-		g_LowPassDataLPDBuffer = (unsigned long*)malloc(width * height * sizeof(unsigned long));	
-		
+
+		g_LowPassDataLPDBuffer = (unsigned long*)malloc(width * height * sizeof(unsigned long));
+
 		g_LPDBufferWidth = width;
-		g_LPDBufferHeight = height;		
-	}	
+		g_LPDBufferHeight = height;
+	}
 }
 
 void AddValueForMedianComp(unsigned long val)
@@ -1071,9 +958,9 @@ void ClearMedian5x5ValuesBuffer()
 unsigned long GetMedianValueFromBuffer()
 {
 	unsigned long median = 0;
-	
+
 	std::sort(g_Median5x5ValuesBuffer, g_Median5x5ValuesBuffer + g_IdxMedian5x5ValuesBuffer + 1);
-	
+
 	int middleCal = (g_IdxMedian5x5ValuesBuffer + 1) / 2;
 	if ((g_IdxMedian5x5ValuesBuffer + 1) % 2 == 1)
 		median = g_Median5x5ValuesBuffer[middleCal];
@@ -1081,29 +968,26 @@ unsigned long GetMedianValueFromBuffer()
 		median = (unsigned long)(((float)g_Median5x5ValuesBuffer[middleCal] + (float)g_Median5x5ValuesBuffer[middleCal - 1]) / 2.0);
 	else if (g_IdxMedian5x5ValuesBuffer == 1)
 		median = g_Median5x5ValuesBuffer[0];
-	
+
 	return median;
 }
 
 DLL_PUBLIC HRESULT PreProcessingLowPassDifferenceFilter(unsigned long* pixels, long width, long height, int bpp)
 {
 	InitializeLowPassDifferenceFilter(width, height);
-	
+
 	unsigned long* lowPassData = g_LowPassDataLPDBuffer;
-	
+
 	memcpy(lowPassData, pixels, width * height * sizeof(unsigned long));
-	
+
 	Conv3x3(lowPassData, width, height, bpp, &LOW_PASS_FILTER_MATRIX);
-		
-	for (int y = 0; y < height; ++y)
-	{
-		for (int x = 0; x < width; ++x)
-		{
+
+	for (int y = 0; y < height; ++y) {
+		for (int x = 0; x < width; ++x) {
 			// The median 5x5 value is the median of all values in the 5x5 region around the point
 			ClearMedian5x5ValuesBuffer();
 
-			if (x - 2 >= 0)
-			{
+			if (x - 2 >= 0) {
 				if (y - 2 >= 0) AddValueForMedianComp(lowPassData[x - 2 + (y - 2)*width]);
 				if (y - 1 >= 0) AddValueForMedianComp(lowPassData[x - 2 + (y - 1)*width]);
 				AddValueForMedianComp(lowPassData[x - 2 + y*width]);
@@ -1111,8 +995,7 @@ DLL_PUBLIC HRESULT PreProcessingLowPassDifferenceFilter(unsigned long* pixels, l
 				if (y + 2 < height) AddValueForMedianComp(lowPassData[x - 2 + (y + 2)*width]);
 			}
 
-			if (x - 1 >= 0)
-			{
+			if (x - 1 >= 0) {
 				if (y - 2 >= 0) AddValueForMedianComp(lowPassData[x - 1 + (y - 2)*width]);
 				if (y - 1 >= 0) AddValueForMedianComp(lowPassData[x - 1 + (y - 1)*width]);
 				AddValueForMedianComp(lowPassData[x - 1 + y*width]);
@@ -1122,8 +1005,7 @@ DLL_PUBLIC HRESULT PreProcessingLowPassDifferenceFilter(unsigned long* pixels, l
 
 			AddValueForMedianComp(lowPassData[x + y*width]);
 
-			if (x + 1 < width)
-			{
+			if (x + 1 < width) {
 				if (y - 2 >= 0) AddValueForMedianComp(lowPassData[x + 1 + (y - 2)*width]);
 				if (y - 1 >= 0) AddValueForMedianComp(lowPassData[x + 1 + (y - 1)*width]);
 				AddValueForMedianComp(lowPassData[x + 1 + y*width]);
@@ -1131,8 +1013,7 @@ DLL_PUBLIC HRESULT PreProcessingLowPassDifferenceFilter(unsigned long* pixels, l
 				if (y + 2 < height) AddValueForMedianComp(lowPassData[x + 1 + (y + 2)*width]);
 			}
 
-			if (x + 2 < width)
-			{
+			if (x + 2 < width) {
 				if (y - 2 >= 0) AddValueForMedianComp(lowPassData[x + 2 + (y - 2)*width]);
 				if (y - 1 >= 0) AddValueForMedianComp(lowPassData[x + 2 + (y - 1)*width]);
 				AddValueForMedianComp(lowPassData[x + 2 + y*width]);
