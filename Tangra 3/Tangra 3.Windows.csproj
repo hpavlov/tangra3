@@ -1155,7 +1155,9 @@
     </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>"$(SolutionDir)Resources\InsertIcons.exe" "$(TargetPath)" "$(ProjectDir)img\lc_logo.ico";"$(ProjectDir)img\aav_file.ico";"$(ProjectDir)img\adv_file.ico"</PostBuildEvent>
+    <PostBuildEvent>"$(SolutionDir)Resources\InsertIcons.exe" "$(TargetPath)" "$(ProjectDir)img\lc_logo.ico";"$(ProjectDir)img\aav_file.ico";"$(ProjectDir)img\adv_file.ico"
+xcopy "$(ProjectDir)WindowsFiles\$(ConfigurationName)" "$(TargetDir)" /Y
+</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
