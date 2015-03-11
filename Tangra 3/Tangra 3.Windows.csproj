@@ -114,6 +114,7 @@
     <Compile Include="Addins\frmConfirmIntegrationRate.Designer.cs">
       <DependentUpon>frmConfirmIntegrationRate.cs</DependentUpon>
     </Compile>
+    <Compile Include="Addins\MarshalByRefAstrometryProvider.cs" />
     <Compile Include="Addins\MarshalByRefLightCurveDataProvider.cs" />
     <Compile Include="Addins\SettingsStorageProvider.cs" />
     <Compile Include="Addins\SingleMeasurement.cs" />

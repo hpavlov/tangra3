@@ -26,7 +26,9 @@ namespace Tangra.Controller
 		private frmMain m_MainForm;
 		private AddinManager m_AddinManager;
 	    private ILightCurveDataProvider m_LocalLightCurveDataProvider;
+        private IAstrometryProvider m_LocalAstrometryProvider;
         private MarshalByRefLightCurveDataProvider m_DelegatedLightCurveDataProvider;
+        private MarshalByRefAstrometryProvider m_DelegatedAstrometryProvider;
 
 		public AddinsController(frmMain mainFormView, VideoController videoController)
 		{
@@ -139,6 +141,9 @@ namespace Tangra.Controller
 
 					m_DelegatedLightCurveDataProvider = new MarshalByRefLightCurveDataProvider(m_LocalLightCurveDataProvider);
 					m_AddinManager.SetLightCurveDataProvider(m_DelegatedLightCurveDataProvider);
+
+                    m_DelegatedAstrometryProvider = new MarshalByRefAstrometryProvider(m_LocalAstrometryProvider);
+                    m_AddinManager.SetAstrometryProvider(m_DelegatedAstrometryProvider);
 					string addinActonName = string.Empty;
 
 					if (waitCursorCtl != null) waitCursorCtl.Cursor = Cursors.WaitCursor;
@@ -217,6 +222,13 @@ namespace Tangra.Controller
 			m_LocalLightCurveDataProvider = provider;
 		    m_DelegatedLightCurveDataProvider = null;
 		}
+
+        internal void SetAstrometryProvider(IAstrometryProvider provider)
+		{
+            m_LocalAstrometryProvider = provider;
+            m_DelegatedAstrometryProvider = null;
+		}
+        
 
         public void FinaliseAddins()
         {

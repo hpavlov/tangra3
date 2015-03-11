@@ -49,6 +49,12 @@ namespace Tangra.Addins
         {
             m_AddinManager.PositionToFrame(frameNo);
         }
-        
-	}
+
+
+
+        public IAstrometryProvider GetAstrometryProvider()
+        {
+            return m_AddinManager.AstrometryProvider;
+        }
+    }
 }

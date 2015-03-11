@@ -42,10 +42,16 @@ namespace Tangra.SDK
 	    ITangraDrawingSettings GetTangraDrawingSettings();
 	}
 
+    public interface IAstrometryProvider
+    {
+        ITangraAstrometricSolution GetCurrentFrameAstrometricSolution();
+    }
+
 	public interface ITangraHost
 	{
 		ISettingsStorageProvider GetSettingsProvider();
 		ILightCurveDataProvider GetLightCurveDataProvider();
+	    IAstrometryProvider GetAstrometryProvider();
 		IWin32Window ParentWindow { get; }
 	    void PositionToFrame(int frameNo);
 	}
