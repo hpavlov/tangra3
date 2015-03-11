@@ -56,6 +56,8 @@ namespace Tangra.VideoOperations.Astrometry
 			m_InitialPixelmap = m_VideoController.GetCurrentAstroImage(false).Pixelmap;
 
 			m_CalibrationTool.ActivateOsdAreaSizing();
+
+		    rbInclusion.Checked = TangraConfig.Settings.PlateSolve.SelectedScopeRecorderConfig.IsInclusionArea;
 		}
 
 		void m_CalibrationTool_AreaChanged()

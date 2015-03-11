@@ -16,16 +16,9 @@ namespace Tangra.ImageTools
 {
     internal class OSDExcluder : FrameSizer
     {
-        private int m_VideoWidth;
-        private int m_VideoHeight;
-
 		public OSDExcluder(VideoController videoController)
 			: base(videoController)
-        {
-            m_VideoWidth = TangraContext.Current.FrameWidth;
-			m_VideoHeight = TangraContext.Current.FrameHeight;
-            
-        }
+        { }
 
         public override void Activate()
         {
@@ -37,10 +30,16 @@ namespace Tangra.ImageTools
         public override void Deactivate()
         {
             // Save the modified frame
-	        if (LimitByInclusion)
-		        TangraConfig.Settings.OSDSizes.AddOrUpdateOSDRectangleForFrameSize(m_VideoWidth, m_VideoHeight, m_UserFrame);
-	        else
-				TangraConfig.Settings.IncludeAreaSizes.AddOrUpdateInclusionRectangleForFrameSize(m_VideoWidth, m_VideoHeight, m_UserFrame);
+            if (LimitByInclusion)
+            {
+                TangraConfig.Settings.PlateSolve.SelectedScopeRecorderConfig.InclusionArea = m_UserFrame;
+                TangraConfig.Settings.PlateSolve.SelectedScopeRecorderConfig.IsInclusionArea = true;
+            }
+            else
+            {
+                TangraConfig.Settings.PlateSolve.SelectedScopeRecorderConfig.OSDExclusionArea = m_UserFrame;
+                TangraConfig.Settings.PlateSolve.SelectedScopeRecorderConfig.IsInclusionArea = false;
+            }
 
 			TangraConfig.Settings.Save();
 
@@ -49,8 +48,11 @@ namespace Tangra.ImageTools
 
 		internal void SetAreaType(AreaType areaType)
 		{
-			// This will load the correct area in the m_UserFrame too
 			LimitByInclusion = areaType == AreaType.Inclusion;
+		    if (LimitByInclusion)
+		        m_UserFrame = TangraConfig.Settings.PlateSolve.SelectedScopeRecorderConfig.InclusionArea;
+            else
+                m_UserFrame = TangraConfig.Settings.PlateSolve.SelectedScopeRecorderConfig.OSDExclusionArea;
 		}
     }
 }

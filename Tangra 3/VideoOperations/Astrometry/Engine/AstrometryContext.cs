@@ -29,10 +29,13 @@ namespace Tangra.VideoOperations.Astrometry.Engine
 		{
 			get
 			{
-				if (m_OSDRectToExclude == Rectangle.Empty)
-					m_OSDRectToExclude = TangraConfig.Settings.OSDSizes.GetOSDRectangleForFrameSize(Current.FullFrame.Width, Current.FullFrame.Height);
+			    if (m_OSDRectToExclude == Rectangle.Empty)
+			    {
+                    m_OSDRectToExclude = TangraConfig.Settings.PlateSolve.SelectedScopeRecorderConfig.OSDExclusionArea;
+                    LimitByInclusion = TangraConfig.Settings.PlateSolve.SelectedScopeRecorderConfig.IsInclusionArea;
+			    }
 
-				return m_OSDRectToExclude;
+			    return m_OSDRectToExclude;
 			}
 			set
 			{
@@ -46,8 +49,11 @@ namespace Tangra.VideoOperations.Astrometry.Engine
 		{
 			get
 			{
-				if (m_RectToInclude == Rectangle.Empty)
-					m_RectToInclude = TangraConfig.Settings.IncludeAreaSizes.GetInclusionRectangleForFrameSize(Current.FullFrame.Width, Current.FullFrame.Height);
+                if (m_RectToInclude == Rectangle.Empty)
+                {
+                    m_RectToInclude = TangraConfig.Settings.PlateSolve.SelectedScopeRecorderConfig.InclusionArea;
+                    LimitByInclusion = TangraConfig.Settings.PlateSolve.SelectedScopeRecorderConfig.IsInclusionArea;
+                }
 
 				return m_RectToInclude;
 			}

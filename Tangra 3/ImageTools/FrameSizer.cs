@@ -49,32 +49,7 @@ namespace Tangra.ImageTools
 
 		public event OnAreaChanged AreaChanged;
 
-	    private bool? m_LimitByInclusion;
-
-	    protected bool LimitByInclusion
-	    {
-		    get
-		    {
-			    return m_LimitByInclusion.HasValue && m_LimitByInclusion.Value;
-		    }
-			set
-			{
-				if (!m_LimitByInclusion.HasValue || m_LimitByInclusion.Value != value)
-				{
-					m_LimitByInclusion = value;
-					if (m_LimitByInclusion.Value)
-					{
-						m_UserFrame = new Rectangle(AstrometryContext.Current.RectToInclude.X, AstrometryContext.Current.RectToInclude.Y,
-													AstrometryContext.Current.RectToInclude.Width, AstrometryContext.Current.RectToInclude.Height);
-					}
-					else
-					{
-						m_UserFrame = new Rectangle(AstrometryContext.Current.OSDRectToExclude.X, AstrometryContext.Current.OSDRectToExclude.Y,
-													AstrometryContext.Current.OSDRectToExclude.Width, AstrometryContext.Current.OSDRectToExclude.Height);
-					}
-				}
-			}
-	    }
+        protected bool LimitByInclusion { get; set; }
 
 		public FrameSizer(VideoController videoController)
 		{
@@ -95,9 +70,14 @@ namespace Tangra.ImageTools
             m_State = SizerState.Normal;
             m_StateTransition = SizerState.Normal;
 
-	        if (m_UserFrame == Rectangle.Empty)
-		        // Load from saved one or default 
-		        LimitByInclusion = false;
+            if (m_UserFrame == Rectangle.Empty)
+            {
+                LimitByInclusion = TangraConfig.Settings.PlateSolve.SelectedScopeRecorderConfig.IsInclusionArea;
+                if (LimitByInclusion)
+                    m_UserFrame = TangraConfig.Settings.PlateSolve.SelectedScopeRecorderConfig.InclusionArea;
+                else
+                    m_UserFrame = TangraConfig.Settings.PlateSolve.SelectedScopeRecorderConfig.OSDExclusionArea;
+            }
         }
 
         public override void Deactivate()
@@ -108,13 +88,15 @@ namespace Tangra.ImageTools
 				{
 					AstrometryContext.Current.RectToInclude = new Rectangle(m_UserFrame.X, m_UserFrame.Y, m_UserFrame.Width, m_UserFrame.Height);
 					AstrometryContext.Current.LimitByInclusion = true;
-					TangraConfig.Settings.IncludeAreaSizes.AddOrUpdateInclusionRectangleForFrameSize(TangraContext.Current.FrameWidth, TangraContext.Current.FrameWidth, AstrometryContext.Current.OSDRectToExclude);
+                    TangraConfig.Settings.PlateSolve.SelectedScopeRecorderConfig.InclusionArea = m_UserFrame;
+                    TangraConfig.Settings.PlateSolve.SelectedScopeRecorderConfig.IsInclusionArea = true;
 				}
 				else
 				{
 					AstrometryContext.Current.OSDRectToExclude = new Rectangle(m_UserFrame.X, m_UserFrame.Y, m_UserFrame.Width, m_UserFrame.Height);
 					AstrometryContext.Current.LimitByInclusion = false;
-					TangraConfig.Settings.OSDSizes.AddOrUpdateOSDRectangleForFrameSize(TangraContext.Current.FrameWidth, TangraContext.Current.FrameWidth, AstrometryContext.Current.OSDRectToExclude);
+                    TangraConfig.Settings.PlateSolve.SelectedScopeRecorderConfig.OSDExclusionArea = m_UserFrame;
+                    TangraConfig.Settings.PlateSolve.SelectedScopeRecorderConfig.IsInclusionArea = false;
 				}
 	            TangraConfig.Settings.Save();
             }

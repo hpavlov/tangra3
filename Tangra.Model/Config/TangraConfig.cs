@@ -273,8 +273,6 @@ namespace Tangra.Model.Config
 		public AstrometrySettings Astrometry = new AstrometrySettings();
 		public CatalogSettings StarCatalogue = new CatalogSettings();
 		public PlateSolveSettings PlateSolve = new PlateSolveSettings();
-		public OSDSizes OSDSizes = new OSDSizes();
-		public IncludeAreaSizes IncludeAreaSizes = new IncludeAreaSizes(); 
 		public UrlSettings Urls = new UrlSettings();
 		public HelpSystemFlags HelpFlags = new HelpSystemFlags();
 
@@ -1476,6 +1474,11 @@ namespace Tangra.Model.Config
 
 		public class ScopeRecorderConfiguration
 		{
+            protected static double MIN_KIWI_X_PERC = 0; //0.08183;
+            protected static double MAX_KIWI_X_PERC = 1; //0.91540;
+            protected static double MIN_KIWI_Y_PERC = 0.83; //0.87370;
+            protected static double MAX_KIWI_Y_PERC = 1; //0.93772;
+
 			[XmlIgnore]
 			public bool IsNew;
 
@@ -1489,6 +1492,9 @@ namespace Tangra.Model.Config
 			public ConfigurationRawFrameSizes RawFrameSizes;
 			public bool FlipHorizontally = false;
 			public bool FlipVertically = false;
+		    public bool IsInclusionArea = false;
+		    public Rectangle OSDExclusionArea;
+            public Rectangle InclusionArea;
 
 			public override string ToString()
 			{
@@ -1505,13 +1511,34 @@ namespace Tangra.Model.Config
 				LimitingMagnitudes = new ConfigurationLimitingMagnitudes();
 				RawFrameSizes = new ConfigurationRawFrameSizes();
 				RawFrameSizes[cameraModel] = new Rectangle(0, 0, width, height);
-				IsNew = true;
+				
+			    IsInclusionArea = false;
+                OSDExclusionArea = GetDefaultOSDExclusionRectangle(width, height);
+                InclusionArea = GetDefaultInclusionRectangle(width, height);
+
+                IsNew = true;
 			}
 
 			public Rectangle GetRectangle()
 			{
 				return new Rectangle(Left, Top, Width, Height);
 			}
+
+            private Rectangle GetDefaultInclusionRectangle(int width, int height)
+            {
+                return new Rectangle(0, 0,
+                                    (int)Math.Round((MAX_KIWI_X_PERC - MIN_KIWI_X_PERC) * width),
+                                    (int)Math.Round((1 - (MAX_KIWI_Y_PERC - MIN_KIWI_Y_PERC)) * height));
+            }
+
+            private Rectangle GetDefaultOSDExclusionRectangle(int width, int height)
+            {
+                return new Rectangle(
+                                    (int)Math.Round(MIN_KIWI_X_PERC * width),
+                                    (int)Math.Round(MIN_KIWI_Y_PERC * height),
+                                    (int)Math.Round((MAX_KIWI_X_PERC - MIN_KIWI_X_PERC) * width),
+                                    (int)Math.Round((MAX_KIWI_Y_PERC - MIN_KIWI_Y_PERC) * height));
+            }
 		}
 
 		public class ConfigurationLimitingMagnitudes
