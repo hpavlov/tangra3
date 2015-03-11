@@ -176,8 +176,6 @@ namespace Tangra.Video
 
 		private bool m_FlipVertically = false;
 		private bool m_FlipHorizontally = false;
-		private bool m_Rotate180 = false;
-		private int m_BorderPixelsToClear = 0;
 
 		public void StepForward()
 		{
@@ -852,42 +850,23 @@ namespace Tangra.Video
 			}
 		}
 
-		public void SetFlipSettings(bool flipVertically, bool flipHorizontally, bool rotate180)
+		public void SetFlipSettings(bool flipVertically, bool flipHorizontally)
 		{
 			m_FlipVertically = flipVertically;
 			m_FlipHorizontally = flipHorizontally;
-			m_Rotate180 = rotate180;
 
 			if (m_FlipVertically && m_FlipHorizontally)
 			{
-				if (m_Rotate180)
-					TangraCore.PreProcessors.AddFlipAndRotation(RotateFlipType.Rotate180FlipXY);
-				else
-					TangraCore.PreProcessors.AddFlipAndRotation(RotateFlipType.RotateNoneFlipXY);
+				TangraCore.PreProcessors.AddFlipAndRotation(RotateFlipType.RotateNoneFlipXY);
 			}
 			else if (m_FlipVertically)
 			{
-				if (m_Rotate180)
-					TangraCore.PreProcessors.AddFlipAndRotation(RotateFlipType.Rotate180FlipY);
-				else
-					TangraCore.PreProcessors.AddFlipAndRotation(RotateFlipType.RotateNoneFlipY);
+				TangraCore.PreProcessors.AddFlipAndRotation(RotateFlipType.RotateNoneFlipY);
 			}
 			else if (m_FlipHorizontally)
 			{
-				if (m_Rotate180)
-					TangraCore.PreProcessors.AddFlipAndRotation(RotateFlipType.Rotate180FlipX);
-				else
-					TangraCore.PreProcessors.AddFlipAndRotation(RotateFlipType.RotateNoneFlipX);
+				TangraCore.PreProcessors.AddFlipAndRotation(RotateFlipType.RotateNoneFlipX);
 			}
-			else if (m_Rotate180)
-			{
-				TangraCore.PreProcessors.AddFlipAndRotation(RotateFlipType.Rotate180FlipNone);
-			}
-		}
-
-		public void SetBorderClip(int pixelsToClip)
-		{
-			m_BorderPixelsToClear = pixelsToClip;
 		}
 	}
 }

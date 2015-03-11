@@ -286,7 +286,6 @@ namespace Tangra.VideoOperations.Astrometry
 
 				cbxFlipVertically.Checked = config.FlipVertically;
 				cbxFlipHorizontally.Checked = config.FlipHorizontally;
-				cbxRotate180.Checked = config.Rotate180;
 			}
 			finally
 			{
@@ -318,7 +317,6 @@ namespace Tangra.VideoOperations.Astrometry
 
                 config.FlipVertically = cbxFlipVertically.Checked;
                 config.FlipHorizontally = cbxFlipHorizontally.Checked;
-                config.Rotate180 = cbxRotate180.Checked;
 
                 TangraConfig.Settings.Save();
 
@@ -421,7 +419,6 @@ namespace Tangra.VideoOperations.Astrometry
 				config.LimitingMagnitudes[camera.Model] = (double)nudLimitMagnitude.Value;
 				config.FlipVertically = cbxFlipVertically.Checked;
 				config.FlipHorizontally = cbxFlipHorizontally.Checked;
-				config.Rotate180 = cbxRotate180.Checked;
 
 				TangraConfig.Settings.Save();
 			}

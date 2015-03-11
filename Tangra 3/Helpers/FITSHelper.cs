@@ -181,6 +181,8 @@ namespace Tangra.Helpers
 				}
 			}
 
+			// TODO: If data type is float or double, then what bpp should be reported? 
+
             if (maxPixelValue < 256)
 				bpp = 8;
             else if (maxPixelValue < 4096)

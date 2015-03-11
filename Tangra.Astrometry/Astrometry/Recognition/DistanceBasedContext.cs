@@ -1898,7 +1898,7 @@ namespace Tangra.Astrometry.Recognition
 			{
 #if PYRAMID_DEBUG || DEBUG
 
-                foreach(AstroPixel pixel in m_MatchedPairs.Keys)
+                foreach(ImagePixel pixel in m_MatchedPairs.Keys)
                 {
                     IStar star = m_MatchedPairs[pixel];
                     foreach(int featureId in m_MatchedFeatureIdToStarIdIndexes.Keys)

@@ -1112,7 +1112,7 @@ namespace Tangra
 				AstrometryContext.Current.VideoCamera = TangraConfig.Settings.PlateSolve.SelectedCamera;
 				AstrometryContext.Current.PlateConstants = TangraConfig.Settings.PlateSolve.GetPlateConstants(new Rectangle(0, 0, TangraContext.Current.FrameWidth, TangraContext.Current.FrameHeight));
 
-				m_VideoController.SetFlipSettings(config.FlipVertically, config.FlipHorizontally, config.Rotate180);
+				m_VideoController.SetFlipSettings(config.FlipVertically, config.FlipHorizontally);
 
 				TangraContext.Current.CanChangeTool = true;
 
@@ -1127,10 +1127,10 @@ namespace Tangra
 					AstrometryContext.Current.LimitByInclusion = false;
 
 					m_VideoController.ChangeImageTool(new FrameSizer(m_VideoController));
-
-					// Now that we have a configuration, refresh so we can get an AstroImage (StarMap)
-					m_VideoController.RefreshCurrentFrame();
 				}
+
+				if (frmCamera.IsNewConfiguration || config.FlipVertically || config.FlipHorizontally)
+					m_VideoController.RefreshCurrentFrame();
 
 				if (frmCamera.SolvePlateConstantsNow)
 				{

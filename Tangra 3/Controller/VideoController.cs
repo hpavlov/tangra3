@@ -2050,9 +2050,9 @@ namespace Tangra.Controller
 			return rv;
 		}
 
-		public void SetFlipSettings(bool flipVertically, bool flipHorizontally, bool rotate180)
+		public void SetFlipSettings(bool flipVertically, bool flipHorizontally)
 		{
-			m_FramePlayer.SetFlipSettings(flipVertically, flipHorizontally, rotate180);
+			m_FramePlayer.SetFlipSettings(flipVertically, flipHorizontally);
 		}
 	}
 }

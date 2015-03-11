@@ -92,7 +92,7 @@ namespace Tangra.PInvoke
 			EndFrameNtpTimeStampMillisecondsHi = 0;
 			EndFrameSecondaryTimeStampMillisecondsLo = 0;
 			EndFrameSecondaryTimeStampMillisecondsHi = 0;
-			EndNtpTimeStampError = -1;
+			NtpTimeStampError = -1;
 #else
 			MidFrameTimeStampMillisecondsLo = 0;
 			MidFrameTimeStampMillisecondsHi = 0;

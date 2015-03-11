@@ -669,7 +669,86 @@ void BuildGammaTableForBpp(int bpp, float gamma)
 
 HRESULT PreProcessingFlipRotate(unsigned long* pixels, long width, long height, int bpp, enum RotateFlipType flipRotateType)
 {
-	// TODO: Implement the actual flipping and rotation
+	if (flipRotateType == 0)
+	{
+		//Rotate180FlipXY = 0,
+		//RotateNoneFlipNone = 0,
+		
+		// NOTE: Nothing to do
+	}
+	else if (flipRotateType == 1)
+	{
+		//Rotate270FlipXY = 1,
+		//Rotate90FlipNone = 1,
+		
+		// NOTE: Not supported
+	}
+	else if (flipRotateType == 2)
+	{
+		//Rotate180FlipNone = 2,
+		//RotateNoneFlipXY = 2,
+		
+		for	(long x = 0; x < width / 2; x ++)
+		{
+			for	(long y = 0; y < height; y ++)
+			{
+			unsigned long tmp = pixels[width * y + x];
+				pixels[width * y + x] = pixels[width * (height - 1 - y) + (width - 1 - x)];
+				pixels[width * (height - 1 - y) + (width - 1 - x)] = tmp;
+			}
+		}
+	}
+	else if (flipRotateType == 3)
+	{
+		//Rotate270FlipNone = 3,
+		//Rotate90FlipXY = 3,
+
+		// NOTE: Not supported
+	}
+	else if (flipRotateType == 4)
+	{	
+		//Rotate180FlipY = 4,
+		//RotateNoneFlipX = 4,
+	
+		for	(long x = 0; x < width / 2; x ++)
+		{
+			for	(long y = 0; y < height; y ++)
+			{
+				unsigned long tmp = pixels[width * y + x];
+				pixels[width * y + x] = pixels[width * y + (width - 1 - x)];
+				pixels[width * y + (width - 1 - x)] = tmp;
+			}
+		}	
+	}
+	else if (flipRotateType == 5)
+	{
+		//Rotate270FlipY = 5,
+		//Rotate90FlipX = 5,
+
+		// NOTE: Not supported		
+	}
+	else if (flipRotateType == 6)
+	{
+		//Rotate180FlipX = 6,
+		//RotateNoneFlipY = 6,
+		
+		for	(long y = 0; y < height / 2; y ++)
+		{
+			for	(long x = 0; x < width; x ++)
+			{
+				unsigned long tmp = pixels[width * y + x];
+				pixels[width * y + x] = pixels[width * (height - 1 - y) + x];
+				pixels[width * (height - 1 - y) + x] = tmp;
+			}
+		}			
+	}
+	else if (flipRotateType == 6)
+	{
+		//Rotate270FlipX = 7,
+		//Rotate90FlipY = 7
+		
+		// NOTE: Not supported
+	}
 	
 	return S_OK;
 }

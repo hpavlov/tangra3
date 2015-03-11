@@ -79,7 +79,6 @@
 			this.nudLimitMagnitude = new System.Windows.Forms.NumericUpDown();
 			this.lblLimitingMagnitude = new System.Windows.Forms.Label();
 			this.pnlEditableConfigSettings = new System.Windows.Forms.Panel();
-			this.cbxRotate180 = new System.Windows.Forms.CheckBox();
 			this.btnPreProcessingFilter = new System.Windows.Forms.Button();
 			this.toolTip = new System.Windows.Forms.ToolTip(this.components);
 			this.contextMenuFilter = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -550,7 +549,7 @@
 			// cbxFlipHorizontally
 			// 
 			this.cbxFlipHorizontally.AutoSize = true;
-			this.cbxFlipHorizontally.Location = new System.Drawing.Point(0, 28);
+			this.cbxFlipHorizontally.Location = new System.Drawing.Point(98, 7);
 			this.cbxFlipHorizontally.Name = "cbxFlipHorizontally";
 			this.cbxFlipHorizontally.Size = new System.Drawing.Size(99, 17);
 			this.cbxFlipHorizontally.TabIndex = 72;
@@ -593,25 +592,14 @@
 			// 
 			// pnlEditableConfigSettings
 			// 
-			this.pnlEditableConfigSettings.Controls.Add(this.cbxRotate180);
 			this.pnlEditableConfigSettings.Controls.Add(this.cbxFlipHorizontally);
 			this.pnlEditableConfigSettings.Controls.Add(this.cbxFlipVertically);
 			this.pnlEditableConfigSettings.Controls.Add(this.lblLimitingMagnitude);
 			this.pnlEditableConfigSettings.Controls.Add(this.nudLimitMagnitude);
 			this.pnlEditableConfigSettings.Location = new System.Drawing.Point(15, 172);
 			this.pnlEditableConfigSettings.Name = "pnlEditableConfigSettings";
-			this.pnlEditableConfigSettings.Size = new System.Drawing.Size(383, 51);
+			this.pnlEditableConfigSettings.Size = new System.Drawing.Size(383, 35);
 			this.pnlEditableConfigSettings.TabIndex = 74;
-			// 
-			// cbxRotate180
-			// 
-			this.cbxRotate180.AutoSize = true;
-			this.cbxRotate180.Location = new System.Drawing.Point(125, 7);
-			this.cbxRotate180.Name = "cbxRotate180";
-			this.cbxRotate180.Size = new System.Drawing.Size(100, 17);
-			this.cbxRotate180.TabIndex = 74;
-			this.cbxRotate180.Text = "Rotate 180 deg";
-			this.cbxRotate180.UseVisualStyleBackColor = true;
 			// 
 			// btnPreProcessingFilter
 			// 
@@ -698,7 +686,6 @@
 		private System.Windows.Forms.Label label12;
 		private System.Windows.Forms.TextBox tbxSolvedCellX;
 		private System.Windows.Forms.Panel pnlEditableConfigSettings;
-		private System.Windows.Forms.CheckBox cbxRotate180;
 		private System.Windows.Forms.CheckBox cbxFlipHorizontally;
 		private System.Windows.Forms.CheckBox cbxFlipVertically;
 		private System.Windows.Forms.Label lblLimitingMagnitude;

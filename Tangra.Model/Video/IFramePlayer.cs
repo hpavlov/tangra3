@@ -83,7 +83,7 @@ namespace Tangra.Model.Video
 	public interface IFramePlayer
 	{
 		void SetFrameRenderer(IVideoFrameRenderer frameRenderer);
-		void SetFlipSettings(bool flipVertically, bool flipHorizontally, bool rotate180);
+		void SetFlipSettings(bool flipVertically, bool flipHorizontally);
 		bool IsRunning { get; }
 		bool IsAstroDigitalVideo { get; }
 		bool IsAstroAnalogueVideo { get; }

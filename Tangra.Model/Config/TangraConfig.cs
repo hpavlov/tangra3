@@ -1489,7 +1489,6 @@ namespace Tangra.Model.Config
 			public ConfigurationRawFrameSizes RawFrameSizes;
 			public bool FlipHorizontally = false;
 			public bool FlipVertically = false;
-			public bool Rotate180 = false;
 
 			public override string ToString()
 			{
