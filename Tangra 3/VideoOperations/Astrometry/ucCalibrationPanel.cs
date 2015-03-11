@@ -284,6 +284,15 @@ namespace Tangra.VideoOperations.Astrometry
 		public void SetManualStarIdentificationMode(bool manualIdentification)
 		{
 			pnlSolve.Enabled = !manualIdentification;
+
+            if (manualIdentification)
+            {
+		        pnlToleranceControl.Visible = true;
+                pnlToleranceControl.Enabled = true;
+		        pnlToleranceControl.BringToFront();                
+            }
+            else
+                pnlToleranceControl.Visible = false;
 		}
 
 		public void UpdateAspect(double aspect)
@@ -609,6 +618,11 @@ namespace Tangra.VideoOperations.Astrometry
 			AreaType selectedType = rbOSDExclusion.Checked ? AreaType.OSDExclusion : AreaType.Inclusion;
 			m_CalibrationTool.SetAreaType(selectedType);
 			TriggerStarMapRecalc();
-		}
+        }
+
+        private void tbarTolerance_ValueChanged(object sender, EventArgs e)
+        {
+            m_CalibrationTool.SetTolerance(tbarTolerance.Value);
+        }
 	}
 }

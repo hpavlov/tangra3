@@ -40,6 +40,8 @@ namespace Tangra.ImageTools
 		protected bool m_ShowMagnitudes = false;
 		protected bool m_Grid = false;
 
+	    protected int m_Tolerance = 2;
+
 		protected FittingsState m_State = FittingsState.Configuring;
 
 		protected Pen catalogStarPen;
@@ -598,7 +600,7 @@ namespace Tangra.ImageTools
                         }
                         else
                         {
-                            DirectTransRotAstrometry threeStarSolution = DirectTransRotAstrometry.SolveByThreeStars(m_Image, m_UserStarIdentification);
+                            DirectTransRotAstrometry threeStarSolution = DirectTransRotAstrometry.SolveByThreeStars(m_Image, m_UserStarIdentification, m_Tolerance);
                             if (threeStarSolution != null)
                             {
                                 m_SolvedPlate = threeStarSolution;
@@ -619,10 +621,10 @@ namespace Tangra.ImageTools
                             else
                             {
 								m_VideoController.ShowMessageBox(
-                                    "Cannot complete calibration. Please try again with different stars.",
+                                    "Cannot complete calibration. Please try again with higher initial fit tolerance and/or with different stars. Be sure that the stars are well separated.",
                                     "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                                m_UserStarIdentification.Clear();
+                                m_UserStarIdentification.Remove(m_UserStarIdentification.Keys.ToList()[2]);
                             }                            
                         }
 					}
@@ -831,7 +833,12 @@ namespace Tangra.ImageTools
 
 		public virtual void SetAreaType(AreaType areaType) { }
 
-		protected OnAreaChanged AreaChangedHandler;
+	    public virtual void SetTolerance(int tolerance)
+	    {
+	        m_Tolerance = tolerance;
+	    }
+
+	    protected OnAreaChanged AreaChangedHandler;
 
 		public event OnAreaChanged AreaChanged
 		{

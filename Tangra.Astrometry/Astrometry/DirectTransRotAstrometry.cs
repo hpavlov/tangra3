@@ -109,7 +109,8 @@ namespace Tangra.Astrometry
 
 		public static DirectTransRotAstrometry SolveByThreeStars(
 			AstroPlate image,
-			Dictionary<ImagePixel, IStar> userStarIdentification)
+			Dictionary<ImagePixel, IStar> userStarIdentification,
+            int tolerance)
 		{
 			double SingularityMinDiffPix = 2.0;
 
@@ -246,14 +247,19 @@ namespace Tangra.Astrometry
                     (x2 - xx2) * (x2 - xx2) + (y2 - yy2) * (y2 - yy2) +
                     (x3 - xx3) * (x3 - xx3) + (y3 - yy3) * (y3 - yy3));
 
+		        double maxResidual = CorePyramidConfig.Default.MaxThreeIdentifiedStarsFitResidual;
+		        if (tolerance == 1) maxResidual *= 0.75;
+                else if (tolerance == 3) maxResidual *= 2;
+                else if (tolerance == 4) maxResidual *= 3;
+
                 if (residual1 < residual2)
                 {
-                    if (residual1 < CorePyramidConfig.Default.MaxThreeIdentifiedStarsFitResidual && aspect1 > 0)
+                    if (residual1 < maxResidual && aspect1 > 0)
                         return solution1;
                 }
                 else
                 {
-                    if (residual2 < CorePyramidConfig.Default.MaxThreeIdentifiedStarsFitResidual && aspect2 > 0)
+                    if (residual2 < maxResidual && aspect2 > 0)
                         return solution2;			
                 }		        
 		    }
@@ -263,14 +269,15 @@ namespace Tangra.Astrometry
 
 		public static DirectTransRotAstrometry SolveByThreeStars(
 			AstroPlate image,
-			Dictionary<PSFFit, IStar> userStarIdentification)
+			Dictionary<PSFFit, IStar> userStarIdentification,
+            int tolerance)
 		{
 			Dictionary<ImagePixel, IStar> transformedDict =
 				userStarIdentification.ToDictionary(
 					kvp => new ImagePixel(255, kvp.Key.XCenter, kvp.Key.YCenter),
 					kvp => kvp.Value);
 
-			return SolveByThreeStars(image, transformedDict);
+            return SolveByThreeStars(image, transformedDict, tolerance);
 		}
 
 		#region ISerializable Members

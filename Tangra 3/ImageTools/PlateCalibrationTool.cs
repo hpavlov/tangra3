@@ -60,6 +60,7 @@ namespace Tangra.ImageTools
 		void ActivateCalibration();
 		void ActivateOsdAreaSizing();
 		void SetAreaType(AreaType areaType);
+	    void SetTolerance(int tolerance);
 		void ChangePlottedFit(int fitGrade);
 		void Set3StarIdMode();
 		void SetManualFitMode();

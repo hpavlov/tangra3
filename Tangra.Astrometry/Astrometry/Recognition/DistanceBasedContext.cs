@@ -1971,7 +1971,7 @@ namespace Tangra.Astrometry.Recognition
 					threeStarDict.Add(ImagePixel.CreateImagePixelWithFeatureId(2, 255, pair_k.XImage, pair_k.YImage), pair_k.Star);
 
 					DirectTransRotAstrometry threeStarSolution = 
-						DirectTransRotAstrometry.SolveByThreeStars(m_PlateConfig, threeStarDict);
+						DirectTransRotAstrometry.SolveByThreeStars(m_PlateConfig, threeStarDict, 2);
 
 					if (threeStarSolution == null)
 					{
