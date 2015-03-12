@@ -6,12 +6,17 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Astrometry;
 using Tangra.Model.Astro;
+using Tangra.Model.Config;
 using Tangra.Model.Image;
+using Tangra.Model.VideoOperations;
+using Tangra.VideoOperations.LightCurves;
 
 namespace Tangra
 {
@@ -20,11 +25,23 @@ namespace Tangra
 		private PSFFit m_PSFFit;
 		private int m_Bpp;
 		private uint m_NormVal;
+	    private MeasurementsHelper m_Measurer;
+	    private IVideoController m_VideoController;
+
+        private static TangraConfig.BackgroundMethod BACKGROUND_METHOD = TangraConfig.BackgroundMethod.AverageBackground;
+        private static TangraConfig.PhotometryReductionMethod SIGNAL_METHOD = TangraConfig.PhotometryReductionMethod.AperturePhotometry;
 
 		public frmTargetPSFViewerForm()
 		{
 			InitializeComponent();
 		}
+
+        public frmTargetPSFViewerForm(IVideoController videoController)
+        {
+            InitializeComponent();
+
+            m_VideoController = videoController;
+        }
 
 		public void ShowTargetPSF(PSFFit psfFit, int bpp, uint aav16Normval, uint[,] backgroundPixels)
 		{
@@ -46,18 +63,17 @@ namespace Tangra
 				picPixels.Width = side;
 				picPixels.Height = side;
 				picPixels.Image = new Bitmap(side, side);
-				using (Graphics g = Graphics.FromImage(picPixels.Image))
-				{
-					m_PSFFit.DrawDataPixels(g, new Rectangle(0, 0, picPixels.Width, picPixels.Height), -1, Pens.Lime, m_Bpp, m_NormVal);
-					g.Save();
-				}
-
 
 				lblI0.Text = m_PSFFit.I0.ToString("0.0");
 				lblIMax.Text = m_PSFFit.IMax.ToString("0.0");
 				lblIAmp.Text = (m_PSFFit.IMax - m_PSFFit.I0).ToString("0.0");
 				lblX.Text = m_PSFFit.XCenter.ToString("0.0");
-				lblY.Text = m_PSFFit.YCenter.ToString("0.0");						
+				lblY.Text = m_PSFFit.YCenter.ToString("0.0");
+			    
+                nudMeasuringAperture.Enabled = true;
+			    EnsureMeasurer(2);
+
+			    MeasureCurrentPSF();
 			}
 			else
 			{
@@ -79,6 +95,11 @@ namespace Tangra
 				lblIAmp.Text = "N/A";
 				lblY.Text = "N/A";
 				lblX.Text = "N/A";
+
+                nudMeasuringAperture.Enabled = false;
+
+			    tbxBg.Text = "";
+                tbxSmBG.Text = "";
 			}
 
 			CalculateAndDisplayBackground(backgroundPixels);
@@ -86,6 +107,57 @@ namespace Tangra
 			picFIT.Refresh();
 			picPixels.Refresh();
 		}
+
+        private void MeasureCurrentPSF()
+        {
+            float aperture = (float) nudMeasuringAperture.Value;
+
+			using (Graphics g = Graphics.FromImage(picPixels.Image))
+			{
+                m_PSFFit.DrawDataPixels(g, new Rectangle(0, 0, picPixels.Width, picPixels.Height), aperture, Pens.Lime, m_Bpp, m_NormVal);
+				g.Save();
+			}
+            picPixels.Invalidate();
+
+            int centerX = (int)Math.Round(m_PSFFit.XCenter);
+            int centerY = (int)Math.Round(m_PSFFit.YCenter);
+
+            uint[,] data = m_VideoController.GetCurrentAstroImage(false).GetMeasurableAreaPixels(centerX, centerY, 17);
+            uint[,] bagPixels = m_VideoController.GetCurrentAstroImage(false).GetMeasurableAreaPixels(centerX, centerY, 35);
+
+            NotMeasuredReasons rv = MeasureObject(
+                new ImagePixel(m_PSFFit.XCenter, m_PSFFit.YCenter),
+                data,
+                bagPixels,
+                m_VideoController.VideoBitPix,
+                m_Measurer,
+                TangraConfig.PreProcessingFilter.NoFilter,
+                SIGNAL_METHOD,
+                TangraConfig.PsfQuadrature.NumericalInAperture,
+                TangraConfig.Settings.Photometry.PsfFittingMethod,
+                aperture,
+                m_PSFFit.FWHM,
+                (float)m_PSFFit.FWHM,
+                new FakeIMeasuredObject(m_PSFFit),
+                null,
+                null,
+                false);
+
+            double reading = m_Measurer.TotalReading;
+            double bgReading = m_Measurer.TotalBackground;
+
+            if (rv == NotMeasuredReasons.MeasuredSuccessfully)
+            {
+                tbxSmBG.Text = (reading - bgReading).ToString("0.000");
+                tbxBg.Text = bgReading.ToString("0.000");
+            }
+            else
+            {
+                Trace.WriteLine("TargetPSFViewer.NotMeasuredReasons: " + rv.ToString());
+                tbxBg.Text = "ERR";
+                tbxSmBG.Text = "ERR";
+            }
+        }
 
 		private void CalculateAndDisplayBackground(uint[,] backgroundPixels)
 		{
@@ -156,5 +228,49 @@ namespace Tangra
 		{
 			Clipboard.SetText(string.Format("Base={0}  Maximum={1}  Amplitude={2}  X={3}  Y={4}\r\nBackground={5} 1-sigma Noise={6} SNR={7}", lblI0.Text, lblIMax.Text, lblIAmp.Text, lblX.Text, lblY.Text, lblBackground.Text, lblNoise.Text, lblSNR.Text));
 		}
+
+        private NotMeasuredReasons MeasureObject(
+            IImagePixel center,
+            uint[,] data,
+            uint[,] backgroundPixels,
+            int bpp,
+            MeasurementsHelper measurer,
+            TangraConfig.PreProcessingFilter filter,
+            TangraConfig.PhotometryReductionMethod reductionMethod,
+            TangraConfig.PsfQuadrature psfQuadrature,
+            TangraConfig.PsfFittingMethod psfFittngMethod,
+            float aperture,
+            double refinedFWHM,
+            float refinedAverageFWHM,
+            IMeasurableObject measurableObject,
+            IImagePixel[] groupCenters,
+            float[] aperturesInGroup,
+            bool fullDisappearance
+            )
+        {
+            return measurer.MeasureObject(
+                center, data, backgroundPixels, bpp, filter, reductionMethod, psfQuadrature, psfFittngMethod,
+                aperture, refinedFWHM, refinedAverageFWHM, measurableObject, groupCenters, aperturesInGroup, fullDisappearance);
+        }
+
+        private void EnsureMeasurer(float positionTolerance)
+        {
+            m_Measurer = new MeasurementsHelper(
+                                m_VideoController.VideoBitPix,
+                                BACKGROUND_METHOD,
+                                TangraConfig.Settings.Photometry.SubPixelSquareSize,
+                                TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(m_VideoController.VideoBitPix));
+
+            m_Measurer.SetCoreProperties(
+                TangraConfig.Settings.Photometry.AnnulusInnerRadius,
+                TangraConfig.Settings.Photometry.AnnulusMinPixels,
+                TangraConfig.PhotometrySettings.REJECTION_BACKGROUND_PIXELS_STD_DEV,
+                positionTolerance);
+        }
+
+        private void nudMeasuringAperture_ValueChanged(object sender, EventArgs e)
+        {
+            MeasureCurrentPSF();
+        }
 	}
 }

@@ -94,6 +94,7 @@
     <Compile Include="Astro\AstroImage.cs" />
     <Compile Include="Astro\CCDMatrix.cs" />
     <Compile Include="Astro\DoublePSFFit.cs" />
+    <Compile Include="Astro\FakeIMeasuredObject.cs" />
     <Compile Include="Astro\IStarMap.cs" />
     <Compile Include="Astro\StarFinder.cs" />
     <Compile Include="Astro\PSFFit.cs" />

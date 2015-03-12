@@ -1388,7 +1388,7 @@ namespace Tangra.Controller
         public void TogglePSFViewerForm(bool forceShow)
         {
             if (m_TargetPSFViewerForm == null)
-                m_TargetPSFViewerForm = new frmTargetPSFViewerForm();
+                m_TargetPSFViewerForm = new frmTargetPSFViewerForm(this);
 
             if (m_FramePlayer.Video != null && !m_TargetPSFViewerForm.Visible)
             {
@@ -1398,7 +1398,7 @@ namespace Tangra.Controller
                 }
                 catch (ObjectDisposedException)
                 {
-                    m_TargetPSFViewerForm = new frmTargetPSFViewerForm();
+                    m_TargetPSFViewerForm = new frmTargetPSFViewerForm(this);
                     m_TargetPSFViewerForm.Show(m_MainFormView);
                 }
 

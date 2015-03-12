@@ -278,7 +278,6 @@ namespace Tangra.VideoOperations.LightCurves
 				Context.BitPix,
 				measurer,
 				filter,
-				false,
 				Context.SignalMethod,
 				Context.PsfQuadratureMethod,
                 Context.PsfFittingMethod,

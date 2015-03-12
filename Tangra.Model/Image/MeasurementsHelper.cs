@@ -889,7 +889,6 @@ namespace Tangra.Model.Image
             uint[,] backgroundPixels,
 			int bpp,
             TangraConfig.PreProcessingFilter filter,
-            bool synchronise,
             TangraConfig.PhotometryReductionMethod reductionMethod,
 			TangraConfig.PsfQuadrature psfQuadrature,
             TangraConfig.PsfFittingMethod psfFittingMethod,

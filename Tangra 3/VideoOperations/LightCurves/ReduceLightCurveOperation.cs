@@ -1896,7 +1896,7 @@ namespace Tangra.VideoOperations.LightCurves
 					MeasureTrackedObject2(trackedObject,
 											m_Measurer,
 											LightCurveReductionContext.Instance.DigitalFilter,
-											false,
+                                            false,
 											objectsInGroup,
 											m_Tracker.RefinedFWHM[trackedObject.TargetNo],
 											m_Tracker.RefinedAverageFWHM);
@@ -1988,7 +1988,6 @@ namespace Tangra.VideoOperations.LightCurves
 				m_VideoController.VideoBitPix,
 				measurer,
 				filter,
-				synchronise,
 				LightCurveReductionContext.Instance.ReductionMethod,
 				LightCurveReductionContext.Instance.PsfQuadratureMethod,
                 TangraConfig.Settings.Photometry.PsfFittingMethod,
@@ -2049,7 +2048,6 @@ namespace Tangra.VideoOperations.LightCurves
 			int bpp,
 			MeasurementsHelper measurer,
 			TangraConfig.PreProcessingFilter filter,
-			bool synchronise,
 			TangraConfig.PhotometryReductionMethod reductionMethod,
 			TangraConfig.PsfQuadrature psfQuadrature,
             TangraConfig.PsfFittingMethod psfFittngMethod,
@@ -2063,7 +2061,7 @@ namespace Tangra.VideoOperations.LightCurves
 			)
 		{
 			return measurer.MeasureObject(
-				center, data, backgroundPixels, bpp, filter, synchronise, reductionMethod, psfQuadrature, psfFittngMethod,
+				center, data, backgroundPixels, bpp, filter, reductionMethod, psfQuadrature, psfFittngMethod,
 				aperture, refinedFWHM, refinedAverageFWHM, measurableObject, groupCenters, aperturesInGroup, fullDisappearance);
 		}
 
