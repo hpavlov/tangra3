@@ -16,6 +16,7 @@ using System.Windows.Forms;
 using Tangra.Helpers;
 using Tangra.Video.FITS;
 using Tangra.Video.SER;
+using Tangra.VideoOperations.Astrometry;
 using Tangra.VideoOperations.LightCurves.Tracking;
 using Tangra.VideoTools;
 using nom.tam.fits;
@@ -68,6 +69,7 @@ namespace Tangra.Controller
 	    private uint[,] m_TargetBackgroundPixels;
 
 	    private LightCurveController m_LightCurveController;
+		private AddinsController m_AddinsController;
 	    private frmMain m_MainForm;
 
 		private DisplayIntensifyMode m_DisplayIntensifyMode = DisplayIntensifyMode.Off;
@@ -126,9 +128,14 @@ namespace Tangra.Controller
 			UsageStats.Instance.Save();
 		}
 
-		public void SetLightCurveController(LightCurveController lightCurveController)
+		internal void SetLightCurveController(LightCurveController lightCurveController)
 		{
 			m_LightCurveController = lightCurveController;
+		}
+
+		internal void SetAddinsController(AddinsController addinsController)
+		{
+			m_AddinsController = addinsController;
 		}
 
 		public void CloseOpenedVideoFile()
@@ -1556,7 +1563,11 @@ namespace Tangra.Controller
 					return false;
 				}
 				else
-				{					
+				{
+					var operation = m_CurrentOperation as IRequiresAddinsController;
+					if (operation != null)
+						operation.SetAddinsController(m_AddinsController);
+
 					return true;
 				}
 			}

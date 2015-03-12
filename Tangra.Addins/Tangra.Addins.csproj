@@ -69,6 +69,8 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -76,16 +78,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MeasurementsExportAddin.cs" />
     <Compile Include="StandardTangraAddin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Tangra.Model\Tangra.Model.csproj">
+      <Project>{70bbc9a7-7dd9-4a4d-b972-6665c65875c6}</Project>
+      <Name>Tangra.Model</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\Tangra.SDK\Tangra.SDK.csproj">
       <Project>{bea778ee-f0be-49f3-bee4-0b8ed2d778f9}</Project>
       <Name>Tangra.SDK</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy "$(TargetPath)" "$(SolutionDir)Tangra 3\bin\$(ConfigurationName)\Addins\" /Y</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

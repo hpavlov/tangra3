@@ -13,6 +13,7 @@ using System.Text;
 using System.Windows.Forms;
 using Tangra.Astrometry;
 using Tangra.Config;
+using Tangra.Helpers;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
 using Tangra.Model.Video;
@@ -497,7 +498,7 @@ namespace Tangra.VideoOperations.Astrometry
 
 		private void linkLblAboutCalibration_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
 		{
-			Process.Start("http://www.hristopavlov.net/Tangra/Calibration");
+			ShellHelper.OpenUrl("http://www.hristopavlov.net/Tangra/Calibration");
 		}
 
 	}

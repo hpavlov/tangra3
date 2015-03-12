@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting;
 using System.Text;
 using System.Threading.Tasks;
 using Tangra.SDK;
@@ -15,15 +16,22 @@ namespace Tangra.Addins
 	public class StandardTangraAddin : MarshalByRefObject, ITangraAddin
 	{
 		private ITangraHost m_Host;
+		private MeasurementsExportAddin m_MeasurementsExportAddin;
 
 		public void Initialise(ITangraHost host)
 		{
 			m_Host = host;
+
+			m_MeasurementsExportAddin = new MeasurementsExportAddin();
+			m_MeasurementsExportAddin.Initialise(m_Host);
+
+			RemotingConfiguration.RegisterWellKnownServiceType(typeof(StandardTangraAddin), "StandardTangraAddin", WellKnownObjectMode.Singleton);
+			RemotingConfiguration.RegisterWellKnownServiceType(typeof(MeasurementsExportAddin), "MeasurementsExportAddin", WellKnownObjectMode.Singleton);
 		}
 
 		public void Finalise()
 		{
-			
+			m_MeasurementsExportAddin.Finalise();
 		}
 
 		public void Configure()
@@ -58,12 +66,19 @@ namespace Tangra.Addins
 
 		public ITangraAddinAction[] GetAddinActions()
 		{
-			return new ITangraAddinAction[] { };
+			return new ITangraAddinAction[] { m_MeasurementsExportAddin };
 		}
 
 		public void OnEventNotification(AddinFiredEventType eventType)
 		{
-			
+			if (eventType == AddinFiredEventType.BeginMultiFrameAstrometry)
+			{
+				m_MeasurementsExportAddin.OnBeginMultiFrameAstrometry();
+			}
+			else if (eventType == AddinFiredEventType.EndMultiFrameAstrometry)
+			{
+				m_MeasurementsExportAddin.OnEndMultiFrameAstrometry();
+			}
 		}
 	}
 }

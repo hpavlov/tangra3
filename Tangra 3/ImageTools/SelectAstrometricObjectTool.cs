@@ -27,6 +27,8 @@ namespace Tangra.ImageTools
 	{
 		public double RADeg;
 		public double DEDeg;
+		public double X0;
+		public double Y0;
 		public PlateConstStarPair FittedStar;
 		public LeastSquareFittedAstrometry Solution;
 		public ImagePixel Pixel;
@@ -138,7 +140,7 @@ namespace Tangra.ImageTools
 					if (astrometryTracker != null &&
 						astrometryTracker.AstrometricFit != null)
 					{
-						SelectedObject objInfo = new SelectedObject();
+						var objInfo = new SelectedObject() { X0 = e.Pixel.XDouble, Y0 = e.Pixel.YDouble };
 						astrometryTracker.AstrometricFit.GetRADEFromImageCoords(e.Pixel.XDouble, e.Pixel.YDouble, out objInfo.RADeg, out objInfo.DEDeg);
 						objInfo.FittedStar = astrometryTracker.AstrometricFit.FitInfo.GetFittedStar(e.Pixel);
 						objInfo.Solution = astrometryTracker.AstrometricFit;

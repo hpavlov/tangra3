@@ -84,6 +84,7 @@ namespace Tangra
 			NotificationManager.Instance.SetVideoController(m_VideoController);
 
 			m_VideoController.SetLightCurveController(m_LightCurveController);
+			m_VideoController.SetAddinsController(m_AddinsController);
 
 			BuildRecentFilesMenu();
 

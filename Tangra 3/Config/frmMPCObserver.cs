@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Tangra.Config;
+using Tangra.Helpers;
 using Tangra.Model.Config;
 
 namespace Tangra.Config
@@ -56,7 +57,7 @@ namespace Tangra.Config
 
 		private void btnHelp_Click(object sender, EventArgs e)
 		{
-			Process.Start("http://www.cfa.harvard.edu/iau/info/ObsDetails.html");
+			ShellHelper.OpenUrl("http://www.cfa.harvard.edu/iau/info/ObsDetails.html");
 		}
 
 		private void btnOK_Click(object sender, EventArgs e)

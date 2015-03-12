@@ -215,13 +215,6 @@ namespace Tangra.Controller
             }
         }
             
-        private void OnRunAstrometryAddin()
-        {
-            // TODO:
-            m_DelegatedAstrometryProvider = new MarshalByRefAstrometryProvider(m_LocalAstrometryProvider);
-            m_AddinManager.SetAstrometryProvider(m_DelegatedAstrometryProvider);
-        }
-
 		internal void SetLightCurveDataProvider(ILightCurveDataProvider provider)
 		{
 			m_LocalLightCurveDataProvider = provider;
@@ -231,7 +224,8 @@ namespace Tangra.Controller
         internal void SetAstrometryProvider(IAstrometryProvider provider)
 		{
             m_LocalAstrometryProvider = provider;
-            m_DelegatedAstrometryProvider = null;
+			m_DelegatedAstrometryProvider = new MarshalByRefAstrometryProvider(m_LocalAstrometryProvider);
+			m_AddinManager.SetAstrometryProvider(m_DelegatedAstrometryProvider);
 		}
         
 
@@ -252,5 +246,28 @@ namespace Tangra.Controller
                 m_AddinManager.Addins.Clear();
             }
         }
+
+		public List<ITangraAddinAction> GetAstrometryActions(out List<ITangraAddin> astrometryAddins)
+		{
+			var rv = new List<ITangraAddinAction>();
+			astrometryAddins = new List<ITangraAddin>();
+
+			if (m_AddinManager.Addins.Count > 0)
+			{
+				foreach (Addin addin in m_AddinManager.Addins)
+				{
+					foreach (ITangraAddinAction action in addin.Instance.GetAddinActions())
+					{
+						if (action.ActionType == AddinActionType.Astrometry)
+						{
+							rv.Add(action);
+							if (!astrometryAddins.Contains(addin.Instance)) astrometryAddins.Add(addin.Instance);
+						}
+					}
+				}
+			}
+
+			return rv;
+		}
     }
 }

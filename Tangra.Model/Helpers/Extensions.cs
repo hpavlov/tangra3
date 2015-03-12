@@ -100,5 +100,14 @@ namespace Tangra.Model.Helpers
 			else
 				return uint.MaxValue;
 		}
+
+		public static T SortAndGetMedian<T>(this List<T> data)
+		{
+			if (data.Count == 0) return default(T);
+
+			data.Sort();
+
+			return data[data.Count / 2];
+		}
     }
 }

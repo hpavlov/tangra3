@@ -17,6 +17,7 @@ using Tangra.Astrometry;
 using Tangra.AstroServices;
 using Tangra.Config;
 using Tangra.Controller;
+using Tangra.Helpers;
 using Tangra.ImageTools;
 using Tangra.Model.Config;
 using Tangra.Model.Helpers;
@@ -1623,12 +1624,12 @@ namespace Tangra.VideoOperations.Astrometry
 
         private void linkCommonIssues1_Click(object sender, EventArgs e)
         {
-            Process.Start("http://www.hristopavlov.net/Tangra/CommonPlateSolveIssues");
+			ShellHelper.OpenUrl("http://www.hristopavlov.net/Tangra/CommonPlateSolveIssues");
         }
 
         private void linkCommonIssues2_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            Process.Start("http://www.hristopavlov.net/Tangra/CommonPlateSolveIssues");
+			ShellHelper.OpenUrl("http://www.hristopavlov.net/Tangra/CommonPlateSolveIssues");
         }
 
 		private void btnSaveUnitTestData_Click(object sender, EventArgs e)

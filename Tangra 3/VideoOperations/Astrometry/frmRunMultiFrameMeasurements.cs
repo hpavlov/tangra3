@@ -29,7 +29,7 @@ namespace Tangra.VideoOperations.Astrometry
 		private MeasurementContext m_MeasurementContext;
 	    private FieldSolveContext m_FieldSolveContext;
 		private VideoController m_VideoController;
-		private AddinsController m_AddinController;
+		private AddinsController m_AddinsController;
 
         private List<ITangraAddinAction> m_AstrometryAddinActions = new List<ITangraAddinAction>();
         private List<ITangraAddin> m_AstrometryAddins = new List<ITangraAddin>();
@@ -41,7 +41,7 @@ namespace Tangra.VideoOperations.Astrometry
 			InitializeComponent();
 
 			m_VideoController = videoController;
-	        m_AddinController = addinsController;
+	        m_AddinsController = addinsController;
 
 			m_VideoAstrometry = astrometry;
 			m_MeasurementContext = measurementContext;
@@ -79,16 +79,7 @@ namespace Tangra.VideoOperations.Astrometry
         	pnlIntegration.Visible = false;
         	cbxInstDelayUnit.SelectedIndex = 0;
 
-
-			// TODO: Enable Add-ins support
-			//m_AstrometryAddinActions = m_Host.LoadedAddins
-			//	.SelectMany(a => a.GetAddinActions())
-			//	.Where(a => a.ActionType == AddinActionType.Astrometry)
-			//	.ToList();
-
-			//m_AstrometryAddins = m_Host.LoadedAddins
-			//	.Where(a => a.GetAddinActions().Where(ac => ac.ActionType == AddinActionType.Astrometry).Count() > 0)
-			//	.ToList();
+	        m_AstrometryAddinActions = m_AddinsController.GetAstrometryActions(out m_AstrometryAddins);
 
             foreach (ITangraAddinAction action in m_AstrometryAddinActions)
             {
@@ -473,7 +464,7 @@ namespace Tangra.VideoOperations.Astrometry
 
 		private void linkExamples_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
 		{
-			Process.Start("http://www.hristopavlov.net/Tangra/AstrometryExamples");
+			ShellHelper.OpenUrl("http://www.hristopavlov.net/Tangra/AstrometryExamples");
 		}
 
 		private void nudIntegratedFrames_ValueChanged(object sender, EventArgs e)

@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Addins;
 using Tangra.AstroServices;
 using Tangra.Astrometry;
 using Tangra.Astrometry.Analysis;
@@ -40,8 +41,8 @@ namespace Tangra.VideoOperations.Astrometry
 		public bool ShowStarLabels;
 		public bool ShowStarMagnitudes;
 	}
-	
-	public class VideoAstrometryOperation : VideoOperationBase, IVideoOperation
+
+	public class VideoAstrometryOperation : VideoOperationBase, IVideoOperation, IRequiresAddinsController, IAstrometryProvider
 	{
 		private enum DisplayedView
 		{
@@ -121,9 +122,6 @@ namespace Tangra.VideoOperations.Astrometry
 		{
 			m_VideoController = videoController as VideoController; // Hack
 			
-			// TODO: Add support for Add-ins
-			//m_AddinsController = addinsController;
-
 			m_ControlPanelHolder = controlPanel;
 
 			m_AstrometricState.Measurements.Clear();
@@ -138,6 +136,11 @@ namespace Tangra.VideoOperations.Astrometry
 			}
 
 			return false;
+		}
+
+		public void SetAddinsController(AddinsController addinsController)
+		{
+			m_AddinsController = addinsController;
 		}
 
 		private bool PrepareForAstrometry()
@@ -201,8 +204,13 @@ namespace Tangra.VideoOperations.Astrometry
 			m_AstrometricState.MeasuringState = AstrometryInFramesState.RunningMeasurements;
 			m_ViewControl.FrameMeasurementStarted();
 
-			foreach (ITangraAddin addin in m_AstrometryAddins)
-				addin.OnEventNotification(AddinFiredEventType.BeginMultiFrameAstrometry);
+			if (m_AstrometryAddins.Count > 0)
+			{
+				m_AddinsController.SetAstrometryProvider(this);
+
+				foreach (ITangraAddin addin in m_AstrometryAddins)
+					addin.OnEventNotification(AddinFiredEventType.BeginMultiFrameAstrometry);
+			}
 
 			m_VideoController.PlayVideo(null, (uint)m_MeasurementContext.FrameInterval);
 
@@ -578,7 +586,8 @@ namespace Tangra.VideoOperations.Astrometry
 			if (m_AstrometricState.MeasuringState == AstrometryInFramesState.RunningMeasurements && 
 				m_MeasurementContext != null)
 			{
-				if (m_AstrometricState.Measurements.Count >= m_MeasurementContext.MaxMeasurements)
+				if (m_AstrometricState.Measurements.Count >= m_MeasurementContext.MaxMeasurements ||
+					m_CurrentFrameIndex + m_MeasurementContext.FrameInterval > m_VideoController.VideoLastFrame)
 				{
 					m_VideoController.StopVideo();
 					isLastMeasurement = true;
@@ -698,12 +707,6 @@ namespace Tangra.VideoOperations.Astrometry
 
 		private void ExecuteAstrometryAddins()
 		{
-			// TODO: Implement add-in support
-
-			//m_Host.TangraApplicationImpl.SetAstrometryState(
-			//	new TangraAstrometricSolutionImpl(m_AstrometricFit, m_PhotometricFit, m_AstrometricState, m_Context)
-			//);
-
 			foreach (ITangraAddinAction addinAction in m_AstrometryAddinActions)
 			{
 				addinAction.Execute();
@@ -901,6 +904,11 @@ namespace Tangra.VideoOperations.Astrometry
 		internal void NewObjectSelected(SelectedObject objInfo)
 		{
 			m_ViewControl.PresentSelectedObject(objInfo);
+		}
+
+		public ITangraAstrometricSolution GetCurrentFrameAstrometricSolution()
+		{
+			return new AstrometricSolutionImpl(m_AstrometricFit, m_PhotometricFit, m_AstrometricState, m_Context);
 		}
 	}
 }

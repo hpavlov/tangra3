@@ -108,6 +108,7 @@
     <Compile Include="Addins\Addin.cs" />
     <Compile Include="Addins\AddinManager.cs" />
     <Compile Include="Addins\AddinTrackingHandler.cs" />
+    <Compile Include="Addins\AstrometricSolutionImpl.cs" />
     <Compile Include="Addins\frmConfirmIntegrationRate.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -240,6 +241,7 @@
     <Compile Include="Config\InstrumentalDelayConfigManager.cs" />
     <Compile Include="Controller\AstrometryController.cs" />
     <Compile Include="Controller\AutoUpdatesController.cs" />
+    <Compile Include="Controller\IRequiresAddinsController.cs" />
     <Compile Include="Controller\LightCurveContext.cs" />
     <Compile Include="Controller\LightCurveController.cs" />
     <Compile Include="Controller\DarkFlatFrameController.cs" />

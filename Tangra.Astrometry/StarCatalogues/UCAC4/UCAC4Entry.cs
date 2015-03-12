@@ -223,23 +223,23 @@ namespace Tangra.StarCatalogues.UCAC4
 
         //  I*1 1/100 mag  error of B magnitude from APASS         (14)
         [FieldOffset(56)]
-		internal byte apase_B;
+		public byte apase_B;
 
         //  I*1 1/100 mag  error of V magnitude from APASS         (14)
         [FieldOffset(57)]
-		internal byte apase_V;
+		public byte apase_V;
 
         //  I*1 1/100 mag  error of g magnitude from APASS         (14)
         [FieldOffset(58)]
-		internal byte apase_g;
+		public byte apase_g;
 
         //  I*1 1/100 mag  error of r magnitude from APASS         (14)
         [FieldOffset(59)]
-		internal byte apase_r;
+		public byte apase_r;
 
         //  I*1 1/100 mag  error of i magnitude from APASS         (14)
         [FieldOffset(60)]
-		internal byte apase_i;
+		public byte apase_i;
 
         //  I*1            Yale SPM g-flag*10  c-flag              (15)
         [FieldOffset(61)]
