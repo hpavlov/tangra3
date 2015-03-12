@@ -13,7 +13,10 @@ namespace Tangra.Addins
 
         public MarshalByRefAstrometryProvider(IAstrometryProvider localAstrometryProvider)
         {
-            m_TangraAstrometricSolution = localAstrometryProvider.GetCurrentFrameAstrometricSolution();
+            if (localAstrometryProvider != null)
+                m_TangraAstrometricSolution = localAstrometryProvider.GetCurrentFrameAstrometricSolution();
+            else
+                m_TangraAstrometricSolution = null;
         }
 
         public ITangraAstrometricSolution GetCurrentFrameAstrometricSolution()

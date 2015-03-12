@@ -142,8 +142,6 @@ namespace Tangra.Controller
 					m_DelegatedLightCurveDataProvider = new MarshalByRefLightCurveDataProvider(m_LocalLightCurveDataProvider);
 					m_AddinManager.SetLightCurveDataProvider(m_DelegatedLightCurveDataProvider);
 
-                    m_DelegatedAstrometryProvider = new MarshalByRefAstrometryProvider(m_LocalAstrometryProvider);
-                    m_AddinManager.SetAstrometryProvider(m_DelegatedAstrometryProvider);
 					string addinActonName = string.Empty;
 
 					if (waitCursorCtl != null) waitCursorCtl.Cursor = Cursors.WaitCursor;
@@ -217,6 +215,13 @@ namespace Tangra.Controller
             }
         }
             
+        private void OnRunAstrometryAddin()
+        {
+            // TODO:
+            m_DelegatedAstrometryProvider = new MarshalByRefAstrometryProvider(m_LocalAstrometryProvider);
+            m_AddinManager.SetAstrometryProvider(m_DelegatedAstrometryProvider);
+        }
+
 		internal void SetLightCurveDataProvider(ILightCurveDataProvider provider)
 		{
 			m_LocalLightCurveDataProvider = provider;
