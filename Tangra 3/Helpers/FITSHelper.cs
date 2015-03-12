@@ -164,7 +164,7 @@ namespace Tangra.Helpers
 				{
 					pixWidth = imageHDU.Axes[1];
 					pixHeight = imageHDU.Axes[0];
-					pixBpp = imageHDU.BitPix;
+					pixBpp = Math.Abs(imageHDU.BitPix); /* float and double are -32 and -64 respectively */
 
 					try
 					{
@@ -191,23 +191,23 @@ namespace Tangra.Helpers
             maxPixelValue = 0;
             minPixelValue = uint.MaxValue;
             uint mask = (uint)(((uint)1 << pixBpp) - 1);
+            if (pixelDataType == typeof (float) || pixelDataType == typeof (double))
+            {
+                mask = 0;
+                pixBpp = 16; // Pretending float data is 16 bit. This is the maximum currently supported by Tangra
+            }
 
 			for (int y = 0; y < height; y++)
 			{
 				for (int x = 0; x < width; x++)
 				{
-                    uint val = pixels[x, y] & mask;
+                    uint val = pixels[x, y];
+                    if (mask > 0) val = val & mask;
 					pixelsFlat[x + y * width] = val;
                     if (maxPixelValue < val) maxPixelValue = val;
                     if (minPixelValue > val) minPixelValue = val;
 				}
-			}
-
-			if (pixelDataType == typeof (float))
-			{
-				// TODO: If data type is float then what bpp should be reported?
-			}
-			
+			}		
 
             if (maxPixelValue < 256)
 				bpp = 8;
