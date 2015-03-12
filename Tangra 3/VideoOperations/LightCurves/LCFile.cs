@@ -1437,15 +1437,32 @@ namespace Tangra.VideoOperations.LightCurves
 			bool embeddedTimes = LcFile != null && LcFile.FrameTiming != null && LcFile.FrameTiming.Count > 1 /* need 2 frames to find the duration */;
 
 			if (embeddedTimes)
-			{				
-				long firstFrameTicks = LcFile.FrameTiming[0].FrameMidTime.Ticks;
-                long secondFrameTicks = LcFile.FrameTiming[LcFile.FrameTiming.Count - 1].FrameMidTime.Ticks;
-                long frameDurationTicks = (secondFrameTicks - firstFrameTicks) / (LcFile.FrameTiming.Count);
+			{
+			    int firstFrameWithTimestampIdx = 0;
+			    int framesCount = LcFile.FrameTiming.Count;
+                long firstFrameTicks = LcFile.FrameTiming[firstFrameWithTimestampIdx].FrameMidTime.Ticks;
+                while (firstFrameTicks == 0) /* When OCR is used the timestamps can be zero (failed recognition) */
+                {
+                    firstFrameWithTimestampIdx++;
+                    framesCount--;
+                    firstFrameTicks = LcFile.FrameTiming[firstFrameWithTimestampIdx].FrameMidTime.Ticks;
+                }
+
+                int lastFrameWithTimestampIdx = LcFile.FrameTiming.Count - 1;
+                long secondFrameTicks = LcFile.FrameTiming[lastFrameWithTimestampIdx].FrameMidTime.Ticks;
+                while (secondFrameTicks == 0) /* When OCR is used the timestamps can be zero (failed recognition) */
+                {
+                    lastFrameWithTimestampIdx--;
+                    framesCount--;
+                    firstFrameTicks = LcFile.FrameTiming[lastFrameWithTimestampIdx].FrameMidTime.Ticks;
+                }
+
+                long frameDurationTicks = (secondFrameTicks - firstFrameTicks) / framesCount;
 
                 if (frameNo < MinFrame)
-                    return LcFile.FrameTiming[0].FrameMidTime.AddTicks((int)(frameNo - MinFrame) * frameDurationTicks);
+                    return LcFile.FrameTiming[firstFrameWithTimestampIdx].FrameMidTime.AddTicks((int)(frameNo - MinFrame) * frameDurationTicks);
 				else if (frameNo > MaxFrame)
-                    return LcFile.FrameTiming[LcFile.FrameTiming.Count - 1].FrameMidTime.AddTicks((int)(frameNo - MaxFrame) * frameDurationTicks);
+                    return LcFile.FrameTiming[lastFrameWithTimestampIdx].FrameMidTime.AddTicks((int)(frameNo - MaxFrame) * frameDurationTicks);
 				else
 					return GetTimeForFrameFromFrameTiming(frameNo, true);
 			}
