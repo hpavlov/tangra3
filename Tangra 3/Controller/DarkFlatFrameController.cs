@@ -37,102 +37,56 @@ namespace Tangra.Controller
 
 		private bool LoadDarkOrFlatFrameInternal(string title, ref float[,] pixels, ref float medianValue)
 		{
-			string filter = m_VideoController.VideoBitPix > 8
-								? "FITS Image 16 bit (*.fit;*.fits)|*.fit;*.fits"
-								: "Bitmaps (*.bmp)|*.bmp|FITS Image 16 bit (*.fit;*.fits)|*.fit;*.fits";
-								 
+			string filter = "FITS Image 16 bit (*.fit;*.fits)|*.fit;*.fits";
+
 			string fileName;
 			if (m_VideoController.ShowOpenFileDialog(title, filter, out fileName) == DialogResult.OK &&
 				File.Exists(fileName))
 			{
-				string extension = Path.GetExtension(fileName);
+				
+				Type pixelDataType;
 
-				if (extension == ".bmp")
-				{
-					using (Bitmap bmp = (Bitmap) Image.FromFile(fileName))
+				return FITSHelper.LoadFloatingPointFitsFile(
+					fileName,
+					out pixels,
+					out medianValue,
+					out pixelDataType,
+					delegate(BasicHDU imageHDU)
 					{
-						float[,] pixelsCopy = new float[bmp.Width, bmp.Height];
-						var medianCalcList = new List<float>();
-
-						BitmapFilter.BitmapPixelOperation(
-							bmp,
-							(int x, int y, byte r, byte g, byte b) =>
-							{
-								uint val = Pixelmap.GetColourChannelValue(TangraConfig.Settings.Photometry.ColourChannel, r, g, b);
-
-								pixelsCopy[x, y] = val;
-
-								medianCalcList.Add(val);
-							}
-						);
-
-						if (medianCalcList.Count > 0)
+						if (
+							imageHDU.Axes.Count() != 2 ||
+							imageHDU.Axes[0] != TangraContext.Current.FrameHeight ||
+							imageHDU.Axes[1] != TangraContext.Current.FrameWidth)
 						{
-							medianCalcList.Sort();
+							m_VideoController.ShowMessageBox(
+								"Selected image may has a different frame size from the currently loaded video.", "Tangra",
+								MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-							if (medianCalcList.Count % 2 == 1)
-								medianValue = medianCalcList[medianCalcList.Count / 2];
-							else
-								medianValue = (medianCalcList[medianCalcList.Count / 2] + medianCalcList[1 + (medianCalcList.Count / 2)]) / 2;
+                            return false;
 						}
 
-						pixels = pixelsCopy;
-					}
-
-					return true;
-				}
-				else if (extension == ".fit" || extension == ".fits")
-				{
-					Type pixelDataType;
-
-					return FITSHelper.LoadFloatingPointFitsFile(
-						fileName,
-						out pixels,
-						out medianValue,
-						out pixelDataType,
-						delegate(BasicHDU imageHDU)
+						bool isFloatingPointImage = false;
+						Array dataArray = (Array)imageHDU.Data.DataArray;
+						object entry = dataArray.GetValue(0);
+						if (entry is float[])
+							isFloatingPointImage = true;
+						else if (entry is Array)
 						{
-							if (
-								imageHDU.Axes.Count() != 2 ||
-								imageHDU.Axes[0] != TangraContext.Current.FrameHeight ||
-								imageHDU.Axes[1] != TangraContext.Current.FrameWidth)
+							isFloatingPointImage = ((Array)entry).GetValue(0) is float;
+						}
+
+						if (!isFloatingPointImage && imageHDU.BitPix != 16)
+						{
+							if (m_VideoController.ShowMessageBox(
+								"Selected image data type may not be compatible with the currently loaded video. Do you wish to continue?", "Tangra",
+								MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.No)
 							{
-								m_VideoController.ShowMessageBox(
-									"Selected image may has a different frame size from the currently loaded video.", "Tangra",
-									MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                                return false;
+								return false;
 							}
+						}
 
-							bool isFloatingPointImage = false;
-							Array dataArray = (Array)imageHDU.Data.DataArray;
-							object entry = dataArray.GetValue(0);
-							if (entry is float[])
-								isFloatingPointImage = true;
-							else if (entry is Array)
-							{
-								isFloatingPointImage = ((Array)entry).GetValue(0) is float;
-							}
-
-							if (!isFloatingPointImage && imageHDU.BitPix != 16)
-							{
-								if (m_VideoController.ShowMessageBox(
-									"Selected image data type may not be compatible with the currently loaded video. Do you wish to continue?", "Tangra",
-									MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.No)
-								{
-									return false;
-								}
-							}
-
-							return true;
-						});
-				
-				}
-				else
-				{
-					MessageBox.Show(m_MainFormView, "Tangra", "Unsupported file type.", MessageBoxButtons.OK, MessageBoxIcon.Error);
-					return false;
-				}
+						return true;
+					});
 			}
 
 			return false;

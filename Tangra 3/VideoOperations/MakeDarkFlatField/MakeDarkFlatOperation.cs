@@ -48,11 +48,11 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
         private int m_FramesDone = 0;
         private bool m_Running = false;
         private FrameType m_FrameType;
-        private AveragingType m_AveragingType;
+	    private int m_FrameNumber = 0;
 
 	    private AstroImage m_CurrentAstroImage;
 
-        private ulong[,] m_SummedBitmap;
+        private float[,] m_SummedBitmap;
 
 	    public MakeDarkFlatOperation()
 	    { }
@@ -95,6 +95,7 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
         public void NextFrame(int frameNo, MovementType movementType, bool isLastFrame, AstroImage astroImage, int firstFrameInIntegrationPeriod, string frameFileName)
 		{
 			m_CurrentAstroImage = astroImage;
+	        m_FrameNumber = frameNo;
             TangraContext.Current.CrashReportInfo.FrameNumber = frameNo;
 
             if (m_Running)
@@ -103,7 +104,7 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
                 {
 					Pixelmap currPixelmap = astroImage.Pixelmap;
                     if (m_FramesDone == 0)
-                        m_SummedBitmap = new ulong[currPixelmap.Width, currPixelmap.Height];
+                        m_SummedBitmap = new float[currPixelmap.Width, currPixelmap.Height];
 
                     for (int x = 0; x < currPixelmap.Width; x++)
                         for (int y = 0; y < currPixelmap.Height; y++)
@@ -116,90 +117,55 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
 
                     if (m_FramesDone == m_NumFrames)
                     {
-						if (currPixelmap.BitPixCamera <= 8)
+						// Averaging
+						for (int x = 0; x < currPixelmap.Width; x++)
+						for (int y = 0; y < currPixelmap.Height; y++)
 						{
-							Bitmap field = new Bitmap(currPixelmap.Width, currPixelmap.Height);
-
-							// Averaging
-							for (int x = 0; x < currPixelmap.Width; x++)
-								for (int y = 0; y < currPixelmap.Height; y++)
-								{
-									byte bt = (byte)(m_SummedBitmap[x, y] / (uint)m_FramesDone);
-
-									field.SetPixel(x, y, Color.FromArgb(bt, bt, bt));
-								}
-
-							m_ControlPanel.SetStopped();
-
-							string fileName = string.Format(
-								"{0}_{1}.bmp",
-								Path.GetFileNameWithoutExtension(m_VideoController.CurrentVideoFileName),
-								m_FrameType == FrameType.Dark ? "DARK" : "FLAT");
-
-							if (m_VideoController.ShowSaveFileDialog(
-								"Save " + (m_FrameType == FrameType.Dark ? "dark" : "flat") + " fame", 
-								"Bitmaps (*.bmp)|*.bmp",
-								 ref fileName) == DialogResult.OK)
-							{
-								field.Save(fileName, ImageFormat.Bmp);
-								ShellHelper.OpenFile(fileName);
-							}
-
-							m_Running = false;
-							m_VideoController.StopVideo();
+							m_SummedBitmap[x, y] = (m_SummedBitmap[x, y] / (ulong)m_FramesDone);
 						}
-						else
+
+						m_ControlPanel.SetStopped();
+
+						string fileName = string.Format(
+							"{0}_{1}.fit",
+							Path.GetFileNameWithoutExtension(m_VideoController.CurrentVideoFileName),
+							m_FrameType == FrameType.Dark ? "DARK" : "FLAT");
+
+						if (m_VideoController.ShowSaveFileDialog(
+							"Save " + (m_FrameType == FrameType.Dark ? "dark" : "flat") + " fame", 
+							"FITS Image (*.fit)|*.fit", 
+							ref fileName) == DialogResult.OK)
 						{
-							// Averaging
-							for (int x = 0; x < currPixelmap.Width; x++)
-							for (int y = 0; y < currPixelmap.Height; y++)
-							{
-								m_SummedBitmap[x, y] = (m_SummedBitmap[x, y] / (ulong)m_FramesDone);
-							}
-
-							m_ControlPanel.SetStopped();
-
-							string fileName = string.Format(
-								"{0}_{1}.fit",
-								Path.GetFileNameWithoutExtension(m_VideoController.CurrentVideoFileName),
-								m_FrameType == FrameType.Dark ? "DARK" : "FLAT");
-
-							if (m_VideoController.ShowSaveFileDialog(
-								"Save " + (m_FrameType == FrameType.Dark ? "dark" : "flat") + " fame", 
-								"FITS Image 16 bit (*.fit)|*.fit", 
-								ref fileName) == DialogResult.OK)
-							{
-								Fits f = new Fits();
+							Fits f = new Fits();
 								
-								object data = SaveImageData(m_SummedBitmap); 
+							object data = SaveImageData(m_SummedBitmap); 
 
-								BasicHDU imageHDU = Fits.MakeHDU(data);
+							BasicHDU imageHDU = Fits.MakeHDU(data);
 
-								nom.tam.fits.Header hdr = imageHDU.Header;
-								hdr.AddValue("SIMPLE", "T", null);
+							nom.tam.fits.Header hdr = imageHDU.Header;
+							hdr.AddValue("SIMPLE", "T", null);
 
-								hdr.AddValue("BITPIX", 16, null);
-								hdr.AddValue("NAXIS", 2, null);
-								hdr.AddValue("NAXIS1", currPixelmap.Width, null);
-								hdr.AddValue("NAXIS2", currPixelmap.Height, null);
-								hdr.AddValue("NOTES", string.Format(
-									"{0} generated from {1}", 
-									m_FrameType == FrameType.Dark ? "DARK" : "FLAT", 
-									Path.GetFileNameWithoutExtension(m_VideoController.CurrentVideoFileName)), null);
+							hdr.AddValue("BITPIX", -32 /* Floating Point Data*/, null);
+							hdr.AddValue("NAXIS", 2, null);
+							hdr.AddValue("NAXIS1", currPixelmap.Width, null);
+							hdr.AddValue("NAXIS2", currPixelmap.Height, null);
+							hdr.AddValue("NOTES", string.Format(
+								"{0} generated from {1}", 
+								m_FrameType == FrameType.Dark ? "DARK" : "FLAT", 
+								Path.GetFileNameWithoutExtension(m_VideoController.CurrentVideoFileName)), null);
 
-								f.AddHDU(imageHDU);
+							f.AddHDU(imageHDU);
 
-								// Write a FITS file.
-								using (BufferedFile bf = new BufferedFile(fileName, FileAccess.ReadWrite, FileShare.ReadWrite))
-								{
-									f.Write(bf);
-									bf.Flush();
-								}
+							// Write a FITS file.
+							using (BufferedFile bf = new BufferedFile(fileName, FileAccess.ReadWrite, FileShare.ReadWrite))
+							{
+								f.Write(bf);
+								bf.Flush();
 							}
-
-							m_Running = false;
-							m_VideoController.StopVideo();
 						}
+
+						m_Running = false;
+						m_VideoController.StopVideo();
 
 						if (m_FrameType == FrameType.Dark) UsageStats.Instance.DarkFramesProduced++;
 						if (m_FrameType == FrameType.Flat) UsageStats.Instance.FlatFramesProduced++;
@@ -210,17 +176,17 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
             }
         }
 
-		private short[][] SaveImageData(ulong[,] data)
+		private float[][] SaveImageData(float[,] data)
 		{
-            short[][] bimg = new short[m_CurrentAstroImage.Height][];
+			float[][] bimg = new float[m_CurrentAstroImage.Height][];
 
 			for (int y = 0; y < m_CurrentAstroImage.Height; y++)
 			{
-                bimg[y] = new short[m_CurrentAstroImage.Width];
+				bimg[y] = new float[m_CurrentAstroImage.Width];
 
 				for (int x = 0; x < m_CurrentAstroImage.Width; x++)
 				{
-                    bimg[y][x] = (short)Math.Min(ushort.MaxValue, Math.Max(0, data[x, m_CurrentAstroImage.Height - y - 1]));
+                    bimg[y][x] = (float)Math.Max(0, data[x, m_CurrentAstroImage.Height - y - 1]);
 				}
 			}
 
@@ -251,7 +217,7 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
 			m_VideoController.UpdateViews();
 		}
 
-		internal bool CanStartProducingFrame(bool isFlatFrame)
+		internal bool CanStartProducingFrame(bool isFlatFrame, int numFramesToTake)
 		{
 			if (isFlatFrame &&
 				!m_MakeDarkFlatController.HasDarkFrameBytes)
@@ -264,15 +230,24 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
 				return false;
 			}
 
+			if (m_VideoController.VideoLastFrame - m_FrameNumber < numFramesToTake)
+			{
+				m_VideoController.ShowMessageBox(
+					"The operation cannot start because there are insufficient number of frames remaining until the end of the video.",
+					"Dark frame required",
+					MessageBoxButtons.OK,
+					MessageBoxIcon.Error);
+				return false;
+			}
+
 			return true;
 		}
 
-        internal void StartProducingFrame(bool darkRatherThanFlat, bool meanRatherThanMedianm, int framesToAverage)
+        internal void StartProducingFrame(bool darkRatherThanFlat, int framesToAverage)
         {
             m_NumFrames = framesToAverage;
             m_FramesDone = 0;
             m_FrameType = darkRatherThanFlat ? FrameType.Dark : FrameType.Flat;
-            m_AveragingType = meanRatherThanMedianm ? AveragingType.Mean : AveragingType.Median;
 
             m_Running = true;
             m_VideoController.PlayVideo();

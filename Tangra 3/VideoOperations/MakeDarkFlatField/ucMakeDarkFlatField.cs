@@ -32,8 +32,8 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
 				m_Operation.CancelProducingFrame();
 			else
 			{
-				if (m_Operation.CanStartProducingFrame(rbFlat.Checked))
-					m_Operation.StartProducingFrame(rbDark.Checked, rbMean.Checked, (int) nudNumFrames.Value);
+				if (m_Operation.CanStartProducingFrame(rbFlat.Checked, (int)nudNumFrames.Value))
+					m_Operation.StartProducingFrame(rbDark.Checked, (int) nudNumFrames.Value);
 			}
         }
 
