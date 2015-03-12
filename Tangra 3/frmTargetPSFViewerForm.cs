@@ -28,8 +28,8 @@ namespace Tangra
 	    private MeasurementsHelper m_Measurer;
 	    private IVideoController m_VideoController;
 
-        private static TangraConfig.BackgroundMethod BACKGROUND_METHOD = TangraConfig.BackgroundMethod.AverageBackground;
-        private static TangraConfig.PhotometryReductionMethod SIGNAL_METHOD = TangraConfig.PhotometryReductionMethod.AperturePhotometry;
+        private TangraConfig.BackgroundMethod m_BackgroundMethod = TangraConfig.BackgroundMethod.PSFBackground;
+        private TangraConfig.PhotometryReductionMethod m_SignalMethod = TangraConfig.PhotometryReductionMethod.PsfPhotometry;
 
 		public frmTargetPSFViewerForm()
 		{
@@ -41,6 +41,8 @@ namespace Tangra
             InitializeComponent();
 
             m_VideoController = videoController;
+            m_PSFFit = null;
+            cbMeaMethod.SelectedIndex = 0;
         }
 
 		public void ShowTargetPSF(PSFFit psfFit, int bpp, uint aav16Normval, uint[,] backgroundPixels)
@@ -71,8 +73,9 @@ namespace Tangra
 				lblY.Text = m_PSFFit.YCenter.ToString("0.0");
 			    
                 nudMeasuringAperture.Enabled = true;
-			    EnsureMeasurer(2);
+			    SetMeasurementMethods();
 
+                EnsureMeasurer(2);
 			    MeasureCurrentPSF();
 			}
 			else
@@ -108,8 +111,24 @@ namespace Tangra
 			picPixels.Refresh();
 		}
 
+        private void SetMeasurementMethods()
+        {
+            if (cbMeaMethod.SelectedIndex == 0)
+            {
+                m_BackgroundMethod = TangraConfig.BackgroundMethod.AverageBackground;
+                m_SignalMethod = TangraConfig.PhotometryReductionMethod. AperturePhotometry;                
+            }
+            else if (cbMeaMethod.SelectedIndex == 1)
+            {
+                m_BackgroundMethod = TangraConfig.BackgroundMethod.PSFBackground;
+                m_SignalMethod = TangraConfig.PhotometryReductionMethod.PsfPhotometry;            
+            }
+        }
+
         private void MeasureCurrentPSF()
         {
+            if (m_PSFFit == null) return;
+
             float aperture = (float) nudMeasuringAperture.Value;
 
 			using (Graphics g = Graphics.FromImage(picPixels.Image))
@@ -132,7 +151,7 @@ namespace Tangra
                 m_VideoController.VideoBitPix,
                 m_Measurer,
                 TangraConfig.PreProcessingFilter.NoFilter,
-                SIGNAL_METHOD,
+                m_SignalMethod,
                 TangraConfig.PsfQuadrature.NumericalInAperture,
                 TangraConfig.Settings.Photometry.PsfFittingMethod,
                 aperture,
@@ -257,7 +276,7 @@ namespace Tangra
         {
             m_Measurer = new MeasurementsHelper(
                                 m_VideoController.VideoBitPix,
-                                BACKGROUND_METHOD,
+                                m_BackgroundMethod,
                                 TangraConfig.Settings.Photometry.SubPixelSquareSize,
                                 TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(m_VideoController.VideoBitPix));
 
@@ -270,6 +289,13 @@ namespace Tangra
 
         private void nudMeasuringAperture_ValueChanged(object sender, EventArgs e)
         {
+            MeasureCurrentPSF();
+        }
+
+        private void cbMeaMethod_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            SetMeasurementMethods();
+            EnsureMeasurer(2);
             MeasureCurrentPSF();
         }
 	}

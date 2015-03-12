@@ -61,6 +61,8 @@
             this.tbxSmBG = new System.Windows.Forms.TextBox();
             this.tbxBg = new System.Windows.Forms.TextBox();
             this.label14 = new System.Windows.Forms.Label();
+            this.label16 = new System.Windows.Forms.Label();
+            this.cbMeaMethod = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.picPixels)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picFIT)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMeasuringAperture)).BeginInit();
@@ -298,7 +300,7 @@
             // nudMeasuringAperture
             // 
             this.nudMeasuringAperture.DecimalPlaces = 2;
-            this.nudMeasuringAperture.Location = new System.Drawing.Point(116, 340);
+            this.nudMeasuringAperture.Location = new System.Drawing.Point(158, 342);
             this.nudMeasuringAperture.Maximum = new decimal(new int[] {
             16,
             0,
@@ -322,11 +324,11 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(3, 343);
+            this.label7.Location = new System.Drawing.Point(136, 346);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(111, 13);
+            this.label7.Size = new System.Drawing.Size(17, 13);
             this.label7.TabIndex = 33;
-            this.label7.Text = "Measurment Aperture:";
+            this.label7.Text = "A.";
             // 
             // pnlSplitter
             // 
@@ -339,7 +341,7 @@
             // label15
             // 
             this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(186, 343);
+            this.label15.Location = new System.Drawing.Point(216, 346);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(48, 13);
             this.label15.TabIndex = 35;
@@ -348,16 +350,16 @@
             // tbxSmBG
             // 
             this.tbxSmBG.BackColor = System.Drawing.SystemColors.Info;
-            this.tbxSmBG.Location = new System.Drawing.Point(233, 341);
+            this.tbxSmBG.Location = new System.Drawing.Point(261, 342);
             this.tbxSmBG.Name = "tbxSmBG";
             this.tbxSmBG.ReadOnly = true;
-            this.tbxSmBG.Size = new System.Drawing.Size(112, 20);
+            this.tbxSmBG.Size = new System.Drawing.Size(103, 20);
             this.tbxSmBG.TabIndex = 36;
             // 
             // tbxBg
             // 
             this.tbxBg.BackColor = System.Drawing.SystemColors.Info;
-            this.tbxBg.Location = new System.Drawing.Point(402, 341);
+            this.tbxBg.Location = new System.Drawing.Point(400, 342);
             this.tbxBg.Name = "tbxBg";
             this.tbxBg.ReadOnly = true;
             this.tbxBg.Size = new System.Drawing.Size(91, 20);
@@ -366,17 +368,41 @@
             // label14
             // 
             this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(368, 344);
+            this.label14.Location = new System.Drawing.Point(368, 346);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(32, 13);
             this.label14.TabIndex = 37;
             this.label14.Text = "Bg = ";
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(4, 346);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(19, 13);
+            this.label16.TabIndex = 39;
+            this.label16.Text = "M.";
+            // 
+            // cbMeaMethod
+            // 
+            this.cbMeaMethod.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbMeaMethod.FormattingEnabled = true;
+            this.cbMeaMethod.Items.AddRange(new object[] {
+            "Aperture",
+            "PSF"});
+            this.cbMeaMethod.Location = new System.Drawing.Point(25, 342);
+            this.cbMeaMethod.Name = "cbMeaMethod";
+            this.cbMeaMethod.Size = new System.Drawing.Size(105, 21);
+            this.cbMeaMethod.TabIndex = 40;
+            this.cbMeaMethod.SelectedIndexChanged += new System.EventHandler(this.cbMeaMethod_SelectedIndexChanged);
             // 
             // frmTargetPSFViewerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(501, 367);
+            this.Controls.Add(this.cbMeaMethod);
+            this.Controls.Add(this.label16);
             this.Controls.Add(this.tbxBg);
             this.Controls.Add(this.label14);
             this.Controls.Add(this.tbxSmBG);
@@ -455,5 +481,7 @@
         private System.Windows.Forms.TextBox tbxSmBG;
         private System.Windows.Forms.TextBox tbxBg;
         private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.Label label16;
+        private System.Windows.Forms.ComboBox cbMeaMethod;
 	}
 }
