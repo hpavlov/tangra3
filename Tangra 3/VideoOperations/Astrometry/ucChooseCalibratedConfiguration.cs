@@ -272,6 +272,9 @@ namespace Tangra.VideoOperations.Astrometry
 				tbxSolvedCellX.Text = pltCopnst.EffectivePixelWidth.ToString("0.000");
 				tbxSolvedCellY.Text = pltCopnst.EffectivePixelHeight.ToString("0.000");
 				tbxSolvedFocalLength.Text = pltCopnst.EffectiveFocalLength.ToString("0.0");
+
+			    Rectangle rect = config.IsInclusionArea ? config.InclusionArea : config.OSDExclusionArea;
+                lblConfigAreaInfo.Text = string.Format("{0} Area [({1},{2})-({3},{4})]", config.IsInclusionArea ? "Inclusion" : "Exclusion", rect.Left, rect.Top, rect.Right, rect.Bottom);
 			}
 
 			pnlEditableConfigSettings.Visible = true;
