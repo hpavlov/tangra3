@@ -56,10 +56,10 @@ DLL_PUBLIC long PreProcessingAddClipping(unsigned int  fromValue, unsigned int  
 DLL_PUBLIC long PreProcessingAddBrightnessContrast(long brigtness, long contrast);
 DLL_PUBLIC long PreProcessingAddDigitalFilter(enum PreProcessingFilter filter);
 DLL_PUBLIC long PreProcessingAddGammaCorrection(float gamma);
-DLL_PUBLIC long PreProcessingAddDarkFrame(float* darkFramePixels, unsigned long pixelsCount, float darkFrameMedian);
+DLL_PUBLIC long PreProcessingAddDarkFrame(float* darkFramePixels, unsigned long pixelsCount, float darkFrameMedian, float exposureSeconds);
 DLL_PUBLIC long PreProcessingDarkFrameAdjustLevelToMedian(bool adjustLevelToMedian);
-DLL_PUBLIC long PreProcessingAddFlatFrame(float* flatFramePixels, unsigned long pixelsCount, float flatFrameMedian);
-DLL_PUBLIC long PreProcessingAddBiasFrame(float* biasFramePixels, unsigned long pixelsCount, float biasFrameMedian);
+DLL_PUBLIC long PreProcessingAddFlatFrame(float* flatFramePixels, unsigned long pixelsCount, float flatFrameMedian, float exposureSeconds);
+DLL_PUBLIC long PreProcessingAddBiasFrame(float* biasFramePixels, unsigned long pixelsCount, float biasFrameMedian, float exposureSeconds);
 DLL_PUBLIC long PreProcessingAddFlipAndRotation(enum RotateFlipType rotateFlipType);
 DLL_PUBLIC long PreProcessingUsesPreProcessing(bool* usesPreProcessing);
 DLL_PUBLIC long PreProcessingGetConfig(
@@ -75,9 +75,9 @@ DLL_PUBLIC long PreProcessingGetConfig(
 	unsigned int* biasPixelsCount,
 	RotateFlipType* rotateFlipType);
 
-DLL_PUBLIC long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height, int bpp);
-DLL_PUBLIC long ApplyPreProcessing(unsigned long* pixels, long width, long height, int bpp, BYTE* bitmapPixels, BYTE* bitmapBytes);
-long ApplyPreProcessingWithNormalValue(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal, BYTE* bitmapPixels, BYTE* bitmapBytes);
+DLL_PUBLIC long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height, int bpp, float exposureSeconds);
+DLL_PUBLIC long ApplyPreProcessing(unsigned long* pixels, long width, long height, int bpp, float exposureSeconds, BYTE* bitmapPixels, BYTE* bitmapBytes);
+long ApplyPreProcessingWithNormalValue(unsigned long* pixels, long width, long height, int bpp, float exposureSeconds, unsigned long normVal, BYTE* bitmapPixels, BYTE* bitmapBytes);
 
 #ifdef __cplusplus
 } // __cplusplus defined.

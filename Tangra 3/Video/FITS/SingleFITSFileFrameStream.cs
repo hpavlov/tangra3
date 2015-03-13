@@ -30,6 +30,7 @@ namespace Tangra.Video.FITS
 		private int m_Width;
 		private int m_Height;
 		private int m_Bpp;
+        private float m_Exposure;
 		private uint[] m_FlatPixels;
 
         private uint m_MinPixelValue;
@@ -50,15 +51,16 @@ namespace Tangra.Video.FITS
 
 		    TangraContext.Current.RenderingEngine = SINGLE_FITS_FILE_ENGINE;
 
-            return new SingleFITSFileFrameStream(pixelsFlat, width, height, bpp, minPixelValue, maxPixelValue);
+            return new SingleFITSFileFrameStream(pixelsFlat, width, height, bpp, exposure, minPixelValue, maxPixelValue);
 		}
 
-		private SingleFITSFileFrameStream(uint[] flatPixels, int width, int height, int bpp, uint minPixelValue, uint maxPixelValue)
+		private SingleFITSFileFrameStream(uint[] flatPixels, int width, int height, int bpp, double? exposure, uint minPixelValue, uint maxPixelValue)
 		{
 			m_FlatPixels = flatPixels;
 			m_Width = width;
 			m_Height = height;
 			m_Bpp = bpp;
+		    m_Exposure = exposure.HasValue ? (float)exposure.Value : 0;
 
 			m_FirstFrame = 0;
 			m_LastFrame = 0;
@@ -139,7 +141,7 @@ namespace Tangra.Video.FITS
 			uint[] flatPixelsCopy = new uint[m_FlatPixels.Length];
 			Array.Copy(m_FlatPixels, flatPixelsCopy, m_FlatPixels.Length);
 
-            TangraCore.PreProcessors.ApplyPreProcessingPixelsOnly(flatPixelsCopy, m_Width, m_Height, m_Bpp);
+            TangraCore.PreProcessors.ApplyPreProcessingPixelsOnly(flatPixelsCopy, m_Width, m_Height, m_Bpp, m_Exposure);
 
             TangraCore.GetBitmapPixels(m_Width, m_Height, flatPixelsCopy, rawBitmapBytes, displayBitmapBytes, true, m_Bpp, 0);
 

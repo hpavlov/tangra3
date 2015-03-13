@@ -23,6 +23,9 @@ float* g_BiasFramePixelsCopy = NULL;
 float g_FlatFrameMedian = 0;
 float g_DarkFrameMedian = 0;
 float g_BiasFrameMedian = 0;
+float g_FlatFrameExposure = 0;
+float g_DarkFrameExposure = 0;
+float g_BiasFrameExposure = 0;
 bool g_DarkFrameAdjustLevelToMedian = false;
 unsigned int g_DarkFramePixelsCount = 0;
 unsigned int g_FlatFramePixelsCount = 0;
@@ -78,6 +81,10 @@ long PreProcessingClearAll()
 	g_DarkFrameMedian = 0;
 	g_BiasFrameMedian = 0;
 	g_DarkFrameAdjustLevelToMedian = false;
+
+	g_FlatFrameExposure = 0;
+	g_DarkFrameExposure = 0;
+	g_BiasFrameExposure = 0;
 
 	return S_OK;
 }
@@ -171,7 +178,7 @@ long PreProcessingAddFlipAndRotation(enum RotateFlipType rotateFlipType)
 	return S_OK;	
 }
 
-long PreProcessingAddDarkFrame(float* darkFramePixels, unsigned long pixelsCount, float darkFrameMedian)
+long PreProcessingAddDarkFrame(float* darkFramePixels, unsigned long pixelsCount, float darkFrameMedian, float exposureSeconds)
 {
 	if (NULL != g_DarkFramePixelsCopy)
 	{
@@ -185,13 +192,14 @@ long PreProcessingAddDarkFrame(float* darkFramePixels, unsigned long pixelsCount
 	memcpy(g_DarkFramePixelsCopy, darkFramePixels, bytesCount);
 	g_DarkFramePixelsCount = pixelsCount;
 	g_DarkFrameMedian = darkFrameMedian;	
+	g_DarkFrameExposure = exposureSeconds;
 
 	g_UsesPreProcessing = true;
 
 	return S_OK;
 }
 
-long PreProcessingAddBiasFrame(float* biasFramePixels, unsigned long pixelsCount, float biasFrameMedian)
+long PreProcessingAddBiasFrame(float* biasFramePixels, unsigned long pixelsCount, float biasFrameMedian, float exposureSeconds)
 {
 	if (NULL != g_BiasFramePixelsCopy)
 	{
@@ -205,13 +213,14 @@ long PreProcessingAddBiasFrame(float* biasFramePixels, unsigned long pixelsCount
 	memcpy(g_BiasFramePixelsCopy, biasFramePixels, bytesCount);
 	g_BiasFramePixelsCount = pixelsCount;
 	g_BiasFrameMedian = biasFrameMedian;	
+	g_BiasFrameExposure = exposureSeconds;
 
 	g_UsesPreProcessing = true;
 
 	return S_OK;
 }
 
-long PreProcessingAddFlatFrame(float* flatFramePixels, unsigned long pixelsCount, float flatFrameMedian)
+long PreProcessingAddFlatFrame(float* flatFramePixels, unsigned long pixelsCount, float flatFrameMedian, float exposureSeconds)
 {
 	if (NULL != g_FlatFramePixelsCopy)
 	{
@@ -225,6 +234,7 @@ long PreProcessingAddFlatFrame(float* flatFramePixels, unsigned long pixelsCount
 	memcpy(g_FlatFramePixelsCopy, flatFramePixels, bytesCount);
 	g_FlatFramePixelsCount = pixelsCount;
 	g_FlatFrameMedian = flatFrameMedian;
+	g_FlatFrameExposure = exposureSeconds;
 
 	g_UsesPreProcessing = true;
 
@@ -232,26 +242,26 @@ long PreProcessingAddFlatFrame(float* flatFramePixels, unsigned long pixelsCount
 }
 
 
-long ApplyPreProcessingWithNormalValue(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal, BYTE* bitmapPixels, BYTE* bitmapBytes)
+long ApplyPreProcessingWithNormalValue(unsigned long* pixels, long width, long height, int bpp, float exposureSeconds, unsigned long normVal, BYTE* bitmapPixels, BYTE* bitmapBytes)
 {
-	long rv = ApplyPreProcessingPixelsOnly(pixels, width, height, bpp);
+	long rv = ApplyPreProcessingPixelsOnly(pixels, width, height, bpp, exposureSeconds);
 	if (!SUCCEEDED(rv)) return rv;
 
 	return GetBitmapPixels(width, height, pixels, bitmapPixels, bitmapBytes, false, bpp, normVal);
 }
 
-long ApplyPreProcessing(unsigned long* pixels, long width, long height, int bpp, BYTE* bitmapPixels, BYTE* bitmapBytes)
+long ApplyPreProcessing(unsigned long* pixels, long width, long height, int bpp, float exposureSeconds, BYTE* bitmapPixels, BYTE* bitmapBytes)
 {
-	long rv = ApplyPreProcessingPixelsOnly(pixels, width, height, bpp);
+	long rv = ApplyPreProcessingPixelsOnly(pixels, width, height, bpp, exposureSeconds);
 	if (!SUCCEEDED(rv)) return rv;
 
 	return GetBitmapPixels(width, height, pixels, bitmapPixels, bitmapBytes, false, bpp, 0);
 }
 
-long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height, int bpp)
+long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height, int bpp, float exposureSeconds)
 {
 	// Use the following order when applying pre-processing
-	// (1) Dark/Flat
+	// (1) Bias/Dark/Flat
 	// (2) Stretch/Clip/Brightness
 	// (3) Gamma
 
@@ -262,7 +272,8 @@ long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height
 		rv = PreProcessingApplyBiasDarkFlatFrame(
 			pixels, width, height, bpp, 
 			g_BiasFramePixelsCopy, g_DarkFramePixelsCopy, g_FlatFramePixelsCopy, 
-			g_BiasFrameMedian, g_DarkFrameMedian, g_DarkFrameAdjustLevelToMedian, g_FlatFrameMedian);
+			g_BiasFrameMedian, g_DarkFrameMedian, g_DarkFrameAdjustLevelToMedian, g_FlatFrameMedian,
+			g_BiasFrameExposure, g_DarkFrameExposure, g_FlatFrameExposure);
 			
 		if (rv != S_OK) return rv;
 	}

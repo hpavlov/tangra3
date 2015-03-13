@@ -26,9 +26,9 @@ namespace Tangra.Helpers
 
 		internal delegate void LoadFitsDataCallback<TData>(Array dataArray, int height, int width, double bzero, out TData[,] pixels, out TData medianValue, out Type pixelDataType);
 
-		public static bool LoadFloatingPointFitsFile(string fileName, out float[,] pixels, out float medianValue, out Type pixelDataType, CheckOpenedFitsFileCallback callback)
+		public static bool LoadFloatingPointFitsFile(string fileName, out float[,] pixels, out float medianValue, out Type pixelDataType, out float exposureSeconds, CheckOpenedFitsFileCallback callback)
 		{
-			return LoadFitsFileInternal<float>(fileName, out pixels, out medianValue, out pixelDataType, callback, (Array dataArray, int height, int width, double bzero, out float[,] ppx, out float median, out Type dataType) =>
+            return LoadFitsFileInternal<float>(fileName, out pixels, out medianValue, out pixelDataType, out exposureSeconds, callback, (Array dataArray, int height, int width, double bzero, out float[,] ppx, out float median, out Type dataType) =>
 			{
 				ppx = LoadFloatImageData(dataArray, height, width, (float)bzero, out median, out dataType);
 			});
@@ -36,13 +36,14 @@ namespace Tangra.Helpers
 
 		public static bool Load16BitFitsFile(string fileName, out uint[,] pixels, out uint medianValue, out Type pixelDataType, CheckOpenedFitsFileCallback callback)
 		{
-			return LoadFitsFileInternal<uint>(fileName, out pixels, out medianValue, out pixelDataType, callback, (Array dataArray, int height, int width, double bzero, out uint[,] ppx, out uint median, out Type dataType) =>
+		    float exposureSeconds;
+            return LoadFitsFileInternal<uint>(fileName, out pixels, out medianValue, out pixelDataType, out exposureSeconds, callback, (Array dataArray, int height, int width, double bzero, out uint[,] ppx, out uint median, out Type dataType) =>
 				{
 					ppx = Load16BitImageData(dataArray, height, width, (uint)bzero, out median, out dataType);
 				});
 		}
 
-		private static bool LoadFitsFileInternal<TData>(string fileName, out TData[,] pixels, out TData medianValue, out Type pixelDataType, CheckOpenedFitsFileCallback callback, LoadFitsDataCallback<TData> loadDataCallback)
+		private static bool LoadFitsFileInternal<TData>(string fileName, out TData[,] pixels, out TData medianValue, out Type pixelDataType, out float frameExposure, CheckOpenedFitsFileCallback callback, LoadFitsDataCallback<TData> loadDataCallback)
 		{
 			Fits fitsFile = new Fits();
 
@@ -57,6 +58,7 @@ namespace Tangra.Helpers
 					pixels = new TData[0, 0];
 					medianValue = default(TData);
 					pixelDataType = typeof (TData);
+				    frameExposure = 0;
 					return false;
 				}
 
@@ -72,6 +74,19 @@ namespace Tangra.Helpers
                     catch
 			        { }
 			    }
+
+
+                bool isMidPoint;
+                double? fitsExposure = null;
+                try
+                {
+                    ParseExposure(imageHDU.Header, out isMidPoint, out fitsExposure);                    
+                }
+                catch (Exception ex)
+                {
+                    Trace.WriteLine(ex.ToString());
+                }
+                frameExposure = fitsExposure.HasValue ? (float)fitsExposure.Value : 0;
 
 				loadDataCallback((Array)imageHDU.Data.DataArray, imageHDU.Axes[0], imageHDU.Axes[1], bzero, out pixels, out medianValue, out pixelDataType);
 

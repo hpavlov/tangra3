@@ -35,7 +35,7 @@ namespace Tangra.Controller
 			get { return TangraCore.PreProcessors.PreProcessingHasDarkFrameSet(); }
 		}
 
-		private bool LoadDarkFlatOrBiasFrameInternal(string title, ref float[,] pixels, ref float medianValue)
+        private bool LoadDarkFlatOrBiasFrameInternal(string title, ref float[,] pixels, ref float medianValue, ref float exposureSeconds)
 		{
 			string filter = "FITS Image 16 bit (*.fit;*.fits)|*.fit;*.fits";
 
@@ -51,6 +51,7 @@ namespace Tangra.Controller
 					out pixels,
 					out medianValue,
 					out pixelDataType,
+                    out exposureSeconds,
 					delegate(BasicHDU imageHDU)
 					{
 						if (
@@ -59,7 +60,7 @@ namespace Tangra.Controller
 							imageHDU.Axes[1] != TangraContext.Current.FrameWidth)
 						{
 							m_VideoController.ShowMessageBox(
-								"Selected image may has a different frame size from the currently loaded video.", "Tangra",
+								"Selected image has a different frame size from the currently loaded video.", "Tangra",
 								MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                             return false;
@@ -96,13 +97,14 @@ namespace Tangra.Controller
 		{
 			float[,] pixels = new float[0, 0];
 			float medianValue = 0;
+		    float exposureSeconds = 0;
 
-			if (LoadDarkFlatOrBiasFrameInternal("Load dark frame ...", ref pixels, ref medianValue))
+            if (LoadDarkFlatOrBiasFrameInternal("Load dark frame ...", ref pixels, ref medianValue, ref exposureSeconds))
 			{
 				UsageStats.Instance.DarkFramesUsed++;
 				UsageStats.Instance.Save();
 
-				TangraCore.PreProcessors.AddDarkFrame(pixels, medianValue);
+                TangraCore.PreProcessors.AddDarkFrame(pixels, medianValue, exposureSeconds);
 
 				TangraContext.Current.DarkFrameLoaded = true;
 				m_VideoController.UpdateViews();
@@ -115,13 +117,14 @@ namespace Tangra.Controller
 		{
 			float[,] pixels = new float[0, 0];
 			float medianValue = 0;
+            float exposureSeconds = 0;
 
-			if (LoadDarkFlatOrBiasFrameInternal("Load flat frame ...", ref pixels, ref medianValue))
+            if (LoadDarkFlatOrBiasFrameInternal("Load flat frame ...", ref pixels, ref medianValue, ref exposureSeconds))
 			{
 				UsageStats.Instance.FlatFramesUsed++;
 				UsageStats.Instance.Save();
 
-				TangraCore.PreProcessors.AddFlatFrame(pixels, medianValue);
+                TangraCore.PreProcessors.AddFlatFrame(pixels, medianValue, exposureSeconds);
 
 				TangraContext.Current.FlatFrameLoaded = true;
 				m_VideoController.UpdateViews();
@@ -134,13 +137,14 @@ namespace Tangra.Controller
         {
             float[,] pixels = new float[0, 0];
             float medianValue = 0;
+            float exposureSeconds = 0;
 
-            if (LoadDarkFlatOrBiasFrameInternal("Load bias frame ...", ref pixels, ref medianValue))
+            if (LoadDarkFlatOrBiasFrameInternal("Load bias frame ...", ref pixels, ref medianValue, ref exposureSeconds))
             {
                 UsageStats.Instance.BiasFramesUsed++;
                 UsageStats.Instance.Save();
 
-                TangraCore.PreProcessors.AddBiasFrame(pixels, medianValue);
+                TangraCore.PreProcessors.AddBiasFrame(pixels, medianValue, exposureSeconds);
 
                 TangraContext.Current.BiasFrameLoaded = true;
                 m_VideoController.UpdateViews();

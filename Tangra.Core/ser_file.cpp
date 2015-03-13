@@ -240,7 +240,7 @@ HRESULT SERGetFrame(int frameNo, unsigned long* pixels, BYTE* bitmapPixels, BYTE
 		if (SUCCEEDED(rv))
 		{
 			if (g_UsesPreProcessing) 
-				return ApplyPreProcessingWithNormalValue(pixels, m_SerFile->Width, m_SerFile->Height, cameraBitPix, m_SerFile->NormalisationValue, bitmapPixels, bitmapBytes);
+				return ApplyPreProcessingWithNormalValue(pixels, m_SerFile->Width, m_SerFile->Height, cameraBitPix, 0 /* Not Supported */, m_SerFile->NormalisationValue, bitmapPixels, bitmapBytes);
 			else
 				return GetBitmapPixels(m_SerFile->Width, m_SerFile->Height, pixels, bitmapPixels, bitmapBytes, m_SerFile->LittleEndian, cameraBitPix, m_SerFile->NormalisationValue);
 		}
@@ -278,7 +278,7 @@ HRESULT SERGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSl
 
 			if (g_UsesPreProcessing)
 			{
-				rv = ApplyPreProcessingPixelsOnly(pixels, m_SerFile->Width, m_SerFile->Height, cameraBitPix);
+				rv = ApplyPreProcessingPixelsOnly(pixels, m_SerFile->Width, m_SerFile->Height, cameraBitPix, 0 /* Exposure not supported for applying Bias/Dark/Flat */);
 
 				if (!SUCCEEDED(rv))
 				{
