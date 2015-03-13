@@ -407,6 +407,9 @@ namespace Tangra.PInvoke
 			private static extern int PreProcessingAddFlatFrame(float[] flatFramePixels, uint pixelsCount, float flatFrameMedian);
 
 			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+            private static extern int PreProcessingAddBiasFrame(float[] biasFramePixels, uint pixelsCount, float biasFrameMedian);
+
+			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
 			private static extern int PreProcessingUsesPreProcessing([In, Out] ref bool usesPreProcessing);
 
 			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
@@ -423,6 +426,7 @@ namespace Tangra.PInvoke
 					[In, Out] ref float gamma,
 					[In, Out] ref ushort darkPixelsCount,
 					[In, Out] ref ushort flatPixelsCount,
+                    [In, Out] ref ushort biasPixelsCount,
 					[In, Out] ref RotateFlipType rotateFlipType);
 
 			
@@ -510,6 +514,26 @@ namespace Tangra.PInvoke
 				PreProcessingAddFlatFrame(flatFrame, pixelsCount, flatFrameMedian);
 			}
 
+            public static void AddBiasFrame(float[,] biasFramePixels, float biasFrameMedian)
+            {
+                int width = biasFramePixels.GetLength(0);
+                int height = biasFramePixels.GetLength(1);
+
+                uint pixelsCount = (uint)(width * height);
+                float[] biasFrame = new float[pixelsCount];
+
+                int idx = 0;
+
+                for (int y = 0; y < height; y++)
+                    for (int x = 0; x < width; x++)
+                    {
+                        biasFrame[idx] = biasFramePixels[x, y];
+                        idx++;
+                    }
+
+                PreProcessingAddBiasFrame(biasFrame, pixelsCount, biasFrameMedian);
+            }
+
 			public static void PreProcessingGetConfig(out PreProcessingInfo preProcessingInfo)
 			{
 				preProcessingInfo = new PreProcessingInfo();
@@ -530,9 +554,10 @@ namespace Tangra.PInvoke
 					float gamma = 0;
 					ushort darkPixelsCount = 0;
 					ushort flatPixelsCount = 0;
+				    ushort biasPixelsCount = 0;
 					RotateFlipType rotateFlipType = 0;
 
-					PreProcessingGetConfig(ref preProcessingType, ref fromValue, ref toValue, ref brigtness, ref contrast, ref filter, ref gamma, ref darkPixelsCount, ref flatPixelsCount, ref rotateFlipType);
+					PreProcessingGetConfig(ref preProcessingType, ref fromValue, ref toValue, ref brigtness, ref contrast, ref filter, ref gamma, ref darkPixelsCount, ref flatPixelsCount, ref biasPixelsCount, ref rotateFlipType);
 
 					preProcessingInfo.PreProcessingType = preProcessingType;
 					preProcessingInfo.RotateFlipType = rotateFlipType;
@@ -557,6 +582,7 @@ namespace Tangra.PInvoke
 					preProcessingInfo.Filter = filter;
 					preProcessingInfo.DarkFrameBytes = darkPixelsCount;
 					preProcessingInfo.FlatFrameBytes = flatPixelsCount;
+				    preProcessingInfo.BiasFrameBytes = biasPixelsCount;
 				}
 			}
 
@@ -599,6 +625,7 @@ namespace Tangra.PInvoke
 		public float GammaCorrection;
 		public ushort DarkFrameBytes;
 		public ushort FlatFrameBytes;
+	    public ushort BiasFrameBytes;
 		public TangraConfig.PreProcessingFilter Filter;
 		public RotateFlipType RotateFlipType;
 	}

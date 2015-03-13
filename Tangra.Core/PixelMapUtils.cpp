@@ -769,15 +769,17 @@ HRESULT PreProcessingGamma(unsigned long* pixels, long width, long height, int b
 	return S_OK;
 }
 
-HRESULT PreProcessingApplyDarkFlatFrame(
+HRESULT PreProcessingApplyBiasDarkFlatFrame(
     unsigned long* pixels, long width, long height, int bpp,
-    float* darkPixels, float* flatPixels, float darkMedian, bool darkFrameAdjustLevelToMedian, float flatMedian)
+    float* biasPixels, float* darkPixels, float* flatPixels, 
+	float biasMedian, float darkMedian, bool darkFrameAdjustLevelToMedian, float flatMedian)
 {
 	int minValue, maxValue;
 	GetMinMaxValuesForBpp(bpp, &minValue, &maxValue);
 
 	long totalPixels = width * height;
 	unsigned long* pPixels = pixels;
+	float* pBiasPixels = biasPixels;
 	float* pDarkPixels = darkPixels;
 	float* pFlatPixels = flatPixels;
 

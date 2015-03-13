@@ -175,6 +175,7 @@ namespace Tangra.VideoOperations.LightCurves
 	            return true;
             }
 
+            TangraContext.Current.CanLoadBiasFrame = true;
 			TangraContext.Current.CanLoadDarkFrame = true;
 			TangraContext.Current.CanLoadFlatFrame = true;
 

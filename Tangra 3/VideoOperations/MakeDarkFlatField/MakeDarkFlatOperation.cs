@@ -85,7 +85,8 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
 
 			TangraContext.Current.CanLoadFlatFrame = false;
 			TangraContext.Current.CanLoadDarkFrame = false;
-        
+		    TangraContext.Current.CanLoadBiasFrame = false;
+
             return true;
         }
 

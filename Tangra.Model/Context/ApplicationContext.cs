@@ -66,9 +66,11 @@ namespace Tangra.Model.Context
 
 		public bool CanLoadDarkFrame = false;
 		public bool CanLoadFlatFrame = false;
+        public bool CanLoadBiasFrame = false;
 
 		public bool DarkFrameLoaded = false;
 		public bool FlatFrameLoaded = false;
+        public bool BiasFrameLoaded = false;
 
 		public bool HasAnyFileLoaded
 		{
@@ -141,6 +143,7 @@ namespace Tangra.Model.Context
 			FlatFrameLoaded = false;
 			CanLoadDarkFrame = false;
 			CanLoadFlatFrame = false;
+		    CanLoadBiasFrame = false;
 
 		    RenderingEngine = null;
 

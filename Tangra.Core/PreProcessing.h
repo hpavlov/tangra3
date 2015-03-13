@@ -59,6 +59,7 @@ DLL_PUBLIC long PreProcessingAddGammaCorrection(float gamma);
 DLL_PUBLIC long PreProcessingAddDarkFrame(float* darkFramePixels, unsigned long pixelsCount, float darkFrameMedian);
 DLL_PUBLIC long PreProcessingDarkFrameAdjustLevelToMedian(bool adjustLevelToMedian);
 DLL_PUBLIC long PreProcessingAddFlatFrame(float* flatFramePixels, unsigned long pixelsCount, float flatFrameMedian);
+DLL_PUBLIC long PreProcessingAddBiasFrame(float* biasFramePixels, unsigned long pixelsCount, float biasFrameMedian);
 DLL_PUBLIC long PreProcessingAddFlipAndRotation(enum RotateFlipType rotateFlipType);
 DLL_PUBLIC long PreProcessingUsesPreProcessing(bool* usesPreProcessing);
 DLL_PUBLIC long PreProcessingGetConfig(
@@ -71,6 +72,7 @@ DLL_PUBLIC long PreProcessingGetConfig(
 	float* gamma, 
 	unsigned int* darkPixelsCount, 
 	unsigned int* flatPixelsCount,
+	unsigned int* biasPixelsCount,
 	RotateFlipType* rotateFlipType);
 
 DLL_PUBLIC long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height, int bpp);

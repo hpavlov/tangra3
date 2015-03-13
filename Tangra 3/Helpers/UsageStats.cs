@@ -75,6 +75,7 @@ namespace Tangra.Helpers
 		public int VideoForWindowsUsed { get; set; }
 		public int DarkFramesUsed { get; set; }
 		public int FlatFramesUsed { get; set; }
+        public int BiasFramesUsed { get; set; }
 
 		public int TrackedAsteroidals { get; set; }
 		public int TrackingWithRecoverUsed { get; set; }

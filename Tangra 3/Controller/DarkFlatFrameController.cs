@@ -35,7 +35,7 @@ namespace Tangra.Controller
 			get { return TangraCore.PreProcessors.PreProcessingHasDarkFrameSet(); }
 		}
 
-		private bool LoadDarkOrFlatFrameInternal(string title, ref float[,] pixels, ref float medianValue)
+		private bool LoadDarkFlatOrBiasFrameInternal(string title, ref float[,] pixels, ref float medianValue)
 		{
 			string filter = "FITS Image 16 bit (*.fit;*.fits)|*.fit;*.fits";
 
@@ -97,7 +97,7 @@ namespace Tangra.Controller
 			float[,] pixels = new float[0, 0];
 			float medianValue = 0;
 
-			if (LoadDarkOrFlatFrameInternal("Load dark frame ...", ref pixels, ref medianValue))
+			if (LoadDarkFlatOrBiasFrameInternal("Load dark frame ...", ref pixels, ref medianValue))
 			{
 				UsageStats.Instance.DarkFramesUsed++;
 				UsageStats.Instance.Save();
@@ -116,7 +116,7 @@ namespace Tangra.Controller
 			float[,] pixels = new float[0, 0];
 			float medianValue = 0;
 
-			if (LoadDarkOrFlatFrameInternal("Load flat frame ...", ref pixels, ref medianValue))
+			if (LoadDarkFlatOrBiasFrameInternal("Load flat frame ...", ref pixels, ref medianValue))
 			{
 				UsageStats.Instance.FlatFramesUsed++;
 				UsageStats.Instance.Save();
@@ -129,5 +129,24 @@ namespace Tangra.Controller
 				m_VideoController.RefreshCurrentFrame();
 			}
 		}
+
+        public void LoadBiasFrame()
+        {
+            float[,] pixels = new float[0, 0];
+            float medianValue = 0;
+
+            if (LoadDarkFlatOrBiasFrameInternal("Load bias frame ...", ref pixels, ref medianValue))
+            {
+                UsageStats.Instance.BiasFramesUsed++;
+                UsageStats.Instance.Save();
+
+                TangraCore.PreProcessors.AddBiasFrame(pixels, medianValue);
+
+                TangraContext.Current.BiasFrameLoaded = true;
+                m_VideoController.UpdateViews();
+
+                m_VideoController.RefreshCurrentFrame();
+            }   
+        }
 	}
 }

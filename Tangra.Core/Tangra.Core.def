@@ -30,6 +30,7 @@ EXPORTS
 	PreProcessingAddBrightnessContrast
 	PreProcessingAddDigitalFilter
 	PreProcessingAddGammaCorrection
+	PreProcessingAddBiasFrame
 	PreProcessingAddDarkFrame
 	PreProcessingAddFlatFrame
 	PreProcessingDarkFrameAdjustLevelToMedian

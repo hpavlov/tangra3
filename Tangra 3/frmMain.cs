@@ -890,6 +890,19 @@ namespace Tangra
 			}			
 		}
 
+        private void miLoadBias_Click(object sender, EventArgs e)
+        {
+            Cursor = Cursors.WaitCursor;
+            try
+            {
+                m_MakeDarkFlatController.LoadBiasFrame();
+            }
+            finally
+            {
+                Cursor = Cursors.Default;
+            }	
+        }
+
         private void miShowFields_Click(object sender, EventArgs e)
         {
             m_VideoController.RedrawCurrentFrame(true);

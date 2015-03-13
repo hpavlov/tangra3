@@ -325,6 +325,7 @@ namespace Tangra.Controller
 				TangraContext.Current.HasVideoLoaded = true;
 				TangraContext.Current.CanPlayVideo = true;
 				TangraContext.Current.CanChangeTool = true;
+			    TangraContext.Current.CanLoadBiasFrame = true;
 				TangraContext.Current.CanLoadDarkFrame = true;
 				TangraContext.Current.CanLoadFlatFrame = true;
 				TangraContext.Current.CanScrollFrames = true;	

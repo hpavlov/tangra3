@@ -86,6 +86,7 @@ namespace Tangra.View
 
 			m_MainForm.miLoadDark.Enabled = TangraContext.Current.HasAnyFileLoaded && TangraContext.Current.CanLoadDarkFrame;
 			m_MainForm.miLoadFlat.Enabled = TangraContext.Current.HasAnyFileLoaded && TangraContext.Current.CanLoadFlatFrame;
+            m_MainForm.miLoadBias.Enabled = TangraContext.Current.HasAnyFileLoaded && TangraContext.Current.CanLoadBiasFrame;
 
 			m_MainForm.pnlPlayControls.Enabled = TangraContext.Current.HasVideoLoaded;
 			m_MainForm.pnlPlayButtons.Enabled = TangraContext.Current.HasVideoLoaded;
@@ -155,6 +156,7 @@ namespace Tangra.View
 					preProcessingInfoTooltip += string.Format("Reversing encoding Gamma of {0}\r\n", preProcessingInfo.GammaCorrection.ToString("0.00"));
 				}
 
+                if (preProcessingInfo.BiasFrameBytes > 0) preProcessingInfoStr += "|BIAS";
 				if (preProcessingInfo.DarkFrameBytes > 0) preProcessingInfoStr += "|DARK";
 				if (preProcessingInfo.FlatFrameBytes > 0) preProcessingInfoStr += "|FLAT";
 
