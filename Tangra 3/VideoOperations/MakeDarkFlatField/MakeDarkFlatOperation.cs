@@ -25,20 +25,21 @@ using nom.tam.util;
 
 namespace Tangra.VideoOperations.MakeDarkFlatField
 {
+    enum FrameType
+    {
+        Dark,
+        Flat,
+        Bias
+    }
+
+    enum AveragingType
+    {
+        Median,
+        Mean
+    }
+
     public class MakeDarkFlatOperation : VideoOperationBase, IVideoOperation
     {
-        enum FrameType
-        {
-            Dark,
-            Flat
-        }
-
-        enum AveragingType
-        {
-            Median,
-            Mean
-        }
-
 	    private DarkFlatFrameController m_MakeDarkFlatController;
 	    private IVideoController m_VideoController;
         private ucMakeDarkFlatField m_ControlPanel = null;
@@ -66,6 +67,10 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
 
 		public bool InitializeOperation(IVideoController videoController, Panel controlPanel, IFramePlayer framePlayer, Form topForm)
         {
+            TangraContext.Current.CanLoadFlatFrame = false;
+            TangraContext.Current.CanLoadDarkFrame = false;
+            TangraContext.Current.CanLoadBiasFrame = false;
+
             m_VideoController = videoController;
 
             if (m_ControlPanel == null)
@@ -82,10 +87,6 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
             controlPanel.Controls.Clear();
             controlPanel.Controls.Add(m_ControlPanel);
             m_ControlPanel.Dock = DockStyle.Fill;
-
-			TangraContext.Current.CanLoadFlatFrame = false;
-			TangraContext.Current.CanLoadDarkFrame = false;
-		    TangraContext.Current.CanLoadBiasFrame = false;
 
             return true;
         }
@@ -212,9 +213,11 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
 
         #endregion
 
-		internal void SelectedFrameTypeChanged(bool isFlatFrame)
+		internal void SelectedFrameTypeChanged(FrameType frameType)
 		{
-			TangraContext.Current.CanLoadDarkFrame = isFlatFrame;
+            TangraContext.Current.CanLoadDarkFrame = frameType == FrameType.Flat;
+		    TangraContext.Current.CanLoadBiasFrame = frameType != FrameType.Bias;
+
 			m_VideoController.UpdateViews();
 		}
 

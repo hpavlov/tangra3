@@ -13,6 +13,7 @@ using System.Windows.Forms;
 
 namespace Tangra.VideoOperations.MakeDarkFlatField
 {
+
     public partial class ucMakeDarkFlatField : UserControl
     {
         private MakeDarkFlatOperation m_Operation;
@@ -24,6 +25,11 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
             InitializeComponent();
 
             m_Operation = operation;
+        }
+
+        private void ucMakeDarkFlatField_Load(object sender, EventArgs e)
+        {
+            UpdateState();
         }
 
         private void btnProcess_Click(object sender, EventArgs e)
@@ -63,10 +69,22 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
             btnProcess.Text = "Produce Averaged Frame";
         }
 
-		private void rbFlat_CheckedChanged(object sender, EventArgs e)
-		{
-			m_Operation.SelectedFrameTypeChanged(rbFlat.Checked);
-		}
+
+        private void FrameTypeChanged(object sender, EventArgs e)
+        {
+            UpdateState();
+        }
+
+        private void UpdateState()
+        {
+            pnlExposure.Visible = !rbBias.Checked;
+
+            FrameType frameType = FrameType.Bias;
+            if (rbFlat.Checked) frameType = FrameType.Flat;
+            else if (rbDark.Checked) frameType = FrameType.Dark;
+
+            m_Operation.SelectedFrameTypeChanged(frameType);          
+        }
 
     }
 }
