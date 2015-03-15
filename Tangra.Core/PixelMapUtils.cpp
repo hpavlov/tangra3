@@ -772,8 +772,7 @@ HRESULT PreProcessingGamma(unsigned long* pixels, long width, long height, int b
 HRESULT PreProcessingApplyBiasDarkFlatFrame(
     unsigned long* pixels, long width, long height, int bpp,
     float* biasPixels, float* darkPixels, float* flatPixels, 
-	float biasMedian, float darkMedian, bool darkFrameAdjustLevelToMedian, float flatMedian,
-	float biasExposure, float darkExposure, float flatExposure)
+	float scienseExposure, float darkExposure, float flatMedian)
 {
 	int minValue, maxValue;
 	GetMinMaxValuesForBpp(bpp, &minValue, &maxValue);
@@ -783,47 +782,31 @@ HRESULT PreProcessingApplyBiasDarkFlatFrame(
 	float* pBiasPixels = biasPixels;
 	float* pDarkPixels = darkPixels;
 	float* pFlatPixels = flatPixels;
+	
+	float coeffDarkExposureScaling = 1;
+	if (darkExposure > 0 && scienseExposure > 0) coeffDarkExposureScaling = scienseExposure / darkExposure;
+	
+	while(totalPixels--) 
+	{
+		double pixelValue = *pPixels;
 
-	while(totalPixels--) {
-		unsigned long pixelValue = *pPixels;
-
-		if (NULL != darkPixels && NULL != flatPixels) {
-			//          original - dark
-			// Final = -------------------- * MEDIAN (flat)
-			//               flat
-
-			pixelValue = pixelValue - *pDarkPixels + (darkFrameAdjustLevelToMedian ? darkMedian : 0);
-			if ((long)pixelValue < minValue) pixelValue = minValue;
-
-			if (NULL != flatPixels) {
-				pixelValue = (unsigned long)((double)pixelValue * (double)flatMedian) / ((double)*pFlatPixels);
-
-				pFlatPixels++;
-			}
-			pDarkPixels++;
-		} else if (NULL != flatPixels) {
-			//          original
-			// Final = ------------ * MEDIAN (flat)
-			//            flat
-
-			pixelValue = (unsigned long)((double)pixelValue * ((double)flatMedian)) / ((double)*pFlatPixels);
-			pFlatPixels++;
-		} else if (NULL != pDarkPixels) {
-			//
-			// Final = original - dark
-			//
-
-			pixelValue = (unsigned long)((double)pixelValue - (double)*pDarkPixels + (darkFrameAdjustLevelToMedian ? (double)darkMedian : 0));
-
-			pDarkPixels++;
-		}
+		//          original - bias - (T_image/T_dark) * dark
+		// Final = ------------------------------------------- * MEDIAN (flat)
+		//                          flat
+			
+			
+		if (NULL != biasPixels)	pixelValue = pixelValue - *pBiasPixels;
+		
+		if (NULL != darkPixels) pixelValue = pixelValue - ((NULL != biasPixels ? (*pDarkPixels - *pBiasPixels) : *pDarkPixels) * coeffDarkExposureScaling);
+			
+		if (NULL != flatPixels) pixelValue = pixelValue * (double)flatMedian / *pFlatPixels;
 
 		if ((long)pixelValue > maxValue)
 			pixelValue = maxValue;
 		else if ((long)pixelValue < minValue)
 			pixelValue = minValue;
 
-		*pPixels = pixelValue;
+		*pPixels = (unsigned long)(pixelValue + 0.5);
 
 		pPixels++;
 	}

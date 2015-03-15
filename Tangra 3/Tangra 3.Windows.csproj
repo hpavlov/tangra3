@@ -220,12 +220,6 @@
     <Compile Include="Config\SettingPannels\ucPhotometry.Designer.cs">
       <DependentUpon>ucPhotometry.cs</DependentUpon>
     </Compile>
-    <Compile Include="Config\SettingPannels\ucPreProcessingSettings.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Config\SettingPannels\ucPreProcessingSettings.Designer.cs">
-      <DependentUpon>ucPreProcessingSettings.cs</DependentUpon>
-    </Compile>
     <Compile Include="Config\SettingPannels\ucStarCatalogues.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -847,9 +841,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Config\SettingPannels\ucPhotometry.resx">
       <DependentUpon>ucPhotometry.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Config\SettingPannels\ucPreProcessingSettings.resx">
-      <DependentUpon>ucPreProcessingSettings.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Config\SettingPannels\ucStarCatalogues.resx">
       <DependentUpon>ucStarCatalogues.cs</DependentUpon>

@@ -33,7 +33,6 @@ EXPORTS
 	PreProcessingAddBiasFrame
 	PreProcessingAddDarkFrame
 	PreProcessingAddFlatFrame
-	PreProcessingDarkFrameAdjustLevelToMedian
 	PreProcessingAddFlipAndRotation
 	PreProcessingUsesPreProcessing
 	PreProcessingGetConfig	

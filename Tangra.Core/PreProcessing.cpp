@@ -21,12 +21,7 @@ float* g_DarkFramePixelsCopy = NULL;
 float* g_FlatFramePixelsCopy = NULL;
 float* g_BiasFramePixelsCopy = NULL;
 float g_FlatFrameMedian = 0;
-float g_DarkFrameMedian = 0;
-float g_BiasFrameMedian = 0;
-float g_FlatFrameExposure = 0;
 float g_DarkFrameExposure = 0;
-float g_BiasFrameExposure = 0;
-bool g_DarkFrameAdjustLevelToMedian = false;
 unsigned int g_DarkFramePixelsCount = 0;
 unsigned int g_FlatFramePixelsCount = 0;
 unsigned int g_BiasFramePixelsCount = 0;
@@ -78,13 +73,7 @@ long PreProcessingClearAll()
 	}
 
 	g_FlatFrameMedian = 0;
-	g_DarkFrameMedian = 0;
-	g_BiasFrameMedian = 0;
-	g_DarkFrameAdjustLevelToMedian = false;
-
-	g_FlatFrameExposure = 0;
 	g_DarkFrameExposure = 0;
-	g_BiasFrameExposure = 0;
 
 	return S_OK;
 }
@@ -163,13 +152,6 @@ long PreProcessingAddGammaCorrection(float gamma)
 	return S_OK;
 }
 
-long PreProcessingDarkFrameAdjustLevelToMedian(bool adjustLevelToMedian)
-{
-	g_DarkFrameAdjustLevelToMedian = adjustLevelToMedian;
-	
-	return S_OK;
-}
-
 long PreProcessingAddFlipAndRotation(enum RotateFlipType rotateFlipType)
 {
 	g_RotateFlipType = rotateFlipType;
@@ -178,7 +160,7 @@ long PreProcessingAddFlipAndRotation(enum RotateFlipType rotateFlipType)
 	return S_OK;	
 }
 
-long PreProcessingAddDarkFrame(float* darkFramePixels, unsigned long pixelsCount, float darkFrameMedian, float exposureSeconds)
+long PreProcessingAddDarkFrame(float* darkFramePixels, unsigned long pixelsCount, float exposureSeconds)
 {
 	if (NULL != g_DarkFramePixelsCopy)
 	{
@@ -191,7 +173,6 @@ long PreProcessingAddDarkFrame(float* darkFramePixels, unsigned long pixelsCount
 	g_DarkFramePixelsCopy = (float*)malloc(bytesCount);
 	memcpy(g_DarkFramePixelsCopy, darkFramePixels, bytesCount);
 	g_DarkFramePixelsCount = pixelsCount;
-	g_DarkFrameMedian = darkFrameMedian;	
 	g_DarkFrameExposure = exposureSeconds;
 
 	g_UsesPreProcessing = true;
@@ -199,7 +180,7 @@ long PreProcessingAddDarkFrame(float* darkFramePixels, unsigned long pixelsCount
 	return S_OK;
 }
 
-long PreProcessingAddBiasFrame(float* biasFramePixels, unsigned long pixelsCount, float biasFrameMedian, float exposureSeconds)
+long PreProcessingAddBiasFrame(float* biasFramePixels, unsigned long pixelsCount)
 {
 	if (NULL != g_BiasFramePixelsCopy)
 	{
@@ -212,15 +193,13 @@ long PreProcessingAddBiasFrame(float* biasFramePixels, unsigned long pixelsCount
 	g_BiasFramePixelsCopy = (float*)malloc(bytesCount);
 	memcpy(g_BiasFramePixelsCopy, biasFramePixels, bytesCount);
 	g_BiasFramePixelsCount = pixelsCount;
-	g_BiasFrameMedian = biasFrameMedian;	
-	g_BiasFrameExposure = exposureSeconds;
 
 	g_UsesPreProcessing = true;
 
 	return S_OK;
 }
 
-long PreProcessingAddFlatFrame(float* flatFramePixels, unsigned long pixelsCount, float flatFrameMedian, float exposureSeconds)
+long PreProcessingAddFlatFrame(float* flatFramePixels, unsigned long pixelsCount, float flatFrameMedian)
 {
 	if (NULL != g_FlatFramePixelsCopy)
 	{
@@ -234,7 +213,6 @@ long PreProcessingAddFlatFrame(float* flatFramePixels, unsigned long pixelsCount
 	memcpy(g_FlatFramePixelsCopy, flatFramePixels, bytesCount);
 	g_FlatFramePixelsCount = pixelsCount;
 	g_FlatFrameMedian = flatFrameMedian;
-	g_FlatFrameExposure = exposureSeconds;
 
 	g_UsesPreProcessing = true;
 
@@ -272,8 +250,7 @@ long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height
 		rv = PreProcessingApplyBiasDarkFlatFrame(
 			pixels, width, height, bpp, 
 			g_BiasFramePixelsCopy, g_DarkFramePixelsCopy, g_FlatFramePixelsCopy, 
-			g_BiasFrameMedian, g_DarkFrameMedian, g_DarkFrameAdjustLevelToMedian, g_FlatFrameMedian,
-			g_BiasFrameExposure, g_DarkFrameExposure, g_FlatFrameExposure);
+			exposureSeconds, g_DarkFrameExposure, g_FlatFrameMedian);
 			
 		if (rv != S_OK) return rv;
 	}

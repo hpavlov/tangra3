@@ -35,8 +35,7 @@ DLL_PUBLIC HRESULT PreProcessingApplyBiasDarkFlatFrame(
 	long height, 
 	int bpp, 
 	float* biasPixels, float* darkPixels, float* flatPixels, 
-	float biasMedian, float darkMedian, bool darkFrameAdjustLevelToMedian, float flatMedian,
-	float biasExposure, float darkExposure, float flatExposure);
+	float scienseExposure, float darkExposure, float flatMedian);
 DLL_PUBLIC HRESULT PreProcessingLowPassFilter(unsigned long* pixels, long width, long height, int bpp);
 DLL_PUBLIC HRESULT PreProcessingLowPassDifferenceFilter(unsigned long* pixels, long width, long height, int bpp);
 

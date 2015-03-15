@@ -565,7 +565,6 @@ namespace Tangra.Model.Config
 			public PerformanceQuality PerformanceQuality;
 			public bool ReverseGammaCorrection = false;
 			public int AviRenderingEngineIndex = 1;
-			public bool DarkFrameAdjustLevelToMedian = false;
 
 			public bool AcceptBetaUpdates = false;
 			public bool SubmitUsageStats = true;

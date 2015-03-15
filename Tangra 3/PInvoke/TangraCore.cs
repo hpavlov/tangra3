@@ -398,16 +398,13 @@ namespace Tangra.PInvoke
 			private static extern int PreProcessingAddGammaCorrection(float encodingGamma);
 
 			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-            private static extern int PreProcessingAddDarkFrame(float[] darkFramePixels, uint pixelsCount, float darkFrameMedian, float exposureSeconds);
+            private static extern int PreProcessingAddDarkFrame(float[] darkFramePixels, uint pixelsCount, float exposureSeconds);
 
 			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-			private static extern int PreProcessingDarkFrameAdjustLevelToMedian(bool adjustLevelToMedian);
+            private static extern int PreProcessingAddFlatFrame(float[] flatFramePixels, uint pixelsCount, float flatFrameMedian);
 
 			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-            private static extern int PreProcessingAddFlatFrame(float[] flatFramePixels, uint pixelsCount, float flatFrameMedian, float exposureSeconds);
-
-			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-            private static extern int PreProcessingAddBiasFrame(float[] biasFramePixels, uint pixelsCount, float biasFrameMedian, float exposureSeconds);
+            private static extern int PreProcessingAddBiasFrame(float[] biasFramePixels, uint pixelsCount);
 
 			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
 			private static extern int PreProcessingUsesPreProcessing([In, Out] ref bool usesPreProcessing);
@@ -468,7 +465,7 @@ namespace Tangra.PInvoke
 				PreProcessingAddFlipAndRotation((int)rotateFlipType);
 			}
 
-			public static void AddDarkFrame(float[,] darkFramePixels, float darkFrameMedian, float exposureSeconds)
+			public static void AddDarkFrame(float[,] darkFramePixels, float exposureSeconds, int imagesCombined)
 			{
 				int width = darkFramePixels.GetLength(0);
 				int height = darkFramePixels.GetLength(1);
@@ -481,20 +478,15 @@ namespace Tangra.PInvoke
 				for (int y = 0; y < height; y++)
 					for (int x = 0; x < width; x++)
 					{
-						darkFrame[idx] = darkFramePixels[x, y];
+                        darkFrame[idx] = darkFramePixels[x, y];
+                        //if (imagesCombined > 1) darkFrame[idx] = darkFrame[idx] / imagesCombined;
 						idx++;
 					}
 
-				PreProcessingDarkFrameAdjustLevelToMedian(TangraConfig.Settings.Generic.DarkFrameAdjustLevelToMedian);
-                PreProcessingAddDarkFrame(darkFrame, pixelsCount, darkFrameMedian, exposureSeconds);
+                PreProcessingAddDarkFrame(darkFrame, pixelsCount, exposureSeconds);
 			}
 
-			public static void SetDarkFrameAdjustLevelToMedian()
-			{
-				PreProcessingDarkFrameAdjustLevelToMedian(TangraConfig.Settings.Generic.DarkFrameAdjustLevelToMedian);
-			}
-
-            public static void AddFlatFrame(float[,] flatFramePixels, float flatFrameMedian, float exposureSeconds)
+            public static void AddFlatFrame(float[,] flatFramePixels, float flatFrameMedian)
 			{
 				int width = flatFramePixels.GetLength(0);
 				int height = flatFramePixels.GetLength(1);
@@ -511,10 +503,10 @@ namespace Tangra.PInvoke
 						idx++;
 					}
 
-                PreProcessingAddFlatFrame(flatFrame, pixelsCount, flatFrameMedian, exposureSeconds);
+                PreProcessingAddFlatFrame(flatFrame, pixelsCount, flatFrameMedian);
 			}
 
-            public static void AddBiasFrame(float[,] biasFramePixels, float biasFrameMedian, float exposureSeconds)
+            public static void AddBiasFrame(float[,] biasFramePixels, int imagesCombined)
             {
                 int width = biasFramePixels.GetLength(0);
                 int height = biasFramePixels.GetLength(1);
@@ -528,10 +520,11 @@ namespace Tangra.PInvoke
                     for (int x = 0; x < width; x++)
                     {
                         biasFrame[idx] = biasFramePixels[x, y];
+                        //if (imagesCombined > 1) biasFrame[idx] = biasFrame[idx] / imagesCombined;
                         idx++;
                     }
 
-                PreProcessingAddBiasFrame(biasFrame, pixelsCount, biasFrameMedian, exposureSeconds);
+                PreProcessingAddBiasFrame(biasFrame, pixelsCount);
             }
 
 			public static void PreProcessingGetConfig(out PreProcessingInfo preProcessingInfo)
