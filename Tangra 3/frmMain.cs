@@ -869,7 +869,7 @@ namespace Tangra
 			Cursor = Cursors.WaitCursor;
 			try
 			{
-				m_MakeDarkFlatController.LoadDarkFrame(false);
+				m_MakeDarkFlatController.LoadDarkFrame(false, true);
 			}
 			finally
 			{
@@ -883,13 +883,27 @@ namespace Tangra
 			Cursor = Cursors.WaitCursor;
 			try
 			{
-				m_MakeDarkFlatController.LoadDarkFrame(true);
+				m_MakeDarkFlatController.LoadDarkFrame(true, false);
 			}
 			finally
 			{
 				Cursor = Cursors.Default;
 			}
 		}
+
+
+        private void miLoadDarkLongerExp_Click(object sender, EventArgs e)
+        {
+            Cursor = Cursors.WaitCursor;
+            try
+            {
+                m_MakeDarkFlatController.LoadDarkFrame(false, false);
+            }
+            finally
+            {
+                Cursor = Cursors.Default;
+            }
+        }
 
 		private void miLoadFlat_Click(object sender, EventArgs e)
 		{

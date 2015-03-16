@@ -398,7 +398,7 @@ namespace Tangra.PInvoke
 			private static extern int PreProcessingAddGammaCorrection(float encodingGamma);
 
 			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-			private static extern int PreProcessingAddDarkFrame(float[] darkFramePixels, uint pixelsCount, float exposureSeconds, bool isBiasCorrected);
+            private static extern int PreProcessingAddDarkFrame(float[] darkFramePixels, uint pixelsCount, float exposureSeconds, bool isBiasCorrected, bool isSameExposure);
 
 			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
             private static extern int PreProcessingAddFlatFrame(float[] flatFramePixels, uint pixelsCount, float flatFrameMedian);
@@ -465,7 +465,7 @@ namespace Tangra.PInvoke
 				PreProcessingAddFlipAndRotation((int)rotateFlipType);
 			}
 
-			public static void AddDarkFrame(float[,] darkFramePixels, float exposureSeconds, bool isBiasCorrected)
+            public static void AddDarkFrame(float[,] darkFramePixels, float exposureSeconds, bool isBiasCorrected, bool isSameExposure)
 			{
 				int width = darkFramePixels.GetLength(0);
 				int height = darkFramePixels.GetLength(1);
@@ -482,7 +482,7 @@ namespace Tangra.PInvoke
 						idx++;
 					}
 
-				PreProcessingAddDarkFrame(darkFrame, pixelsCount, exposureSeconds, isBiasCorrected);
+                PreProcessingAddDarkFrame(darkFrame, pixelsCount, exposureSeconds, isBiasCorrected, isSameExposure);
 			}
 
             public static void AddFlatFrame(float[,] flatFramePixels, float flatFrameMedian)

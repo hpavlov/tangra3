@@ -86,6 +86,7 @@
             this.pnlControlerPanel = new System.Windows.Forms.Panel();
             this.zoomedImage = new System.Windows.Forms.PictureBox();
             this.panelVideo = new System.Windows.Forms.Panel();
+            this.pictureBox = new Tangra.Controls.ImagePanel();
             this.pnlPlayControls = new System.Windows.Forms.Panel();
             this.pnlPlayButtons = new System.Windows.Forms.Panel();
             this.btnJumpTo = new System.Windows.Forms.Button();
@@ -103,7 +104,7 @@
             this.openAdvFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.saveFrameDialog = new System.Windows.Forms.SaveFileDialog();
             this.timerCommandArgs = new System.Windows.Forms.Timer(this.components);
-            this.pictureBox = new Tangra.Controls.ImagePanel();
+            this.miLoadDarkLongerExp = new System.Windows.Forms.ToolStripMenuItem();
             this.mainMenu.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.panelRight.SuspendLayout();
@@ -293,6 +294,7 @@
             this.loadCalibrationFrameToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.miLoadBias,
             this.miLoadDark,
+            this.miLoadDarkLongerExp,
             this.miLoadMasterDark,
             this.miLoadFlat});
             this.loadCalibrationFrameToolStripMenuItem.Name = "loadCalibrationFrameToolStripMenuItem";
@@ -302,28 +304,28 @@
             // miLoadBias
             // 
             this.miLoadBias.Name = "miLoadBias";
-            this.miLoadBias.Size = new System.Drawing.Size(246, 22);
+            this.miLoadBias.Size = new System.Drawing.Size(213, 22);
             this.miLoadBias.Text = "Master &Bias";
             this.miLoadBias.Click += new System.EventHandler(this.miLoadBias_Click);
             // 
             // miLoadDark
             // 
             this.miLoadDark.Name = "miLoadDark";
-            this.miLoadDark.Size = new System.Drawing.Size(246, 22);
+            this.miLoadDark.Size = new System.Drawing.Size(213, 22);
             this.miLoadDark.Text = "&Dark (Same Exposure)";
             this.miLoadDark.Click += new System.EventHandler(this.miLoadDark_Click);
             // 
             // miLoadMasterDark
             // 
             this.miLoadMasterDark.Name = "miLoadMasterDark";
-            this.miLoadMasterDark.Size = new System.Drawing.Size(246, 22);
+            this.miLoadMasterDark.Size = new System.Drawing.Size(213, 22);
             this.miLoadMasterDark.Text = "&Master Dark (Bias Corrected)";
             this.miLoadMasterDark.Click += new System.EventHandler(this.miLoadMasterDark_Click);
             // 
             // miLoadFlat
             // 
             this.miLoadFlat.Name = "miLoadFlat";
-            this.miLoadFlat.Size = new System.Drawing.Size(246, 22);
+            this.miLoadFlat.Size = new System.Drawing.Size(213, 22);
             this.miLoadFlat.Text = "Master &Flat";
             this.miLoadFlat.Click += new System.EventHandler(this.miLoadFlat_Click);
             // 
@@ -709,6 +711,27 @@
             this.panelVideo.Size = new System.Drawing.Size(607, 570);
             this.panelVideo.TabIndex = 4;
             // 
+            // pictureBox
+            // 
+            this.pictureBox.AllowDrop = true;
+            this.pictureBox.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.pictureBox.CanvasSize = new System.Drawing.Size(60, 40);
+            this.pictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBox.Image = null;
+            this.pictureBox.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
+            this.pictureBox.Location = new System.Drawing.Point(0, 0);
+            this.pictureBox.Name = "pictureBox";
+            this.pictureBox.Size = new System.Drawing.Size(607, 503);
+            this.pictureBox.TabIndex = 2;
+            this.pictureBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragDrop);
+            this.pictureBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragEnter);
+            this.pictureBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseClick);
+            this.pictureBox.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDoubleClick);
+            this.pictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDown);
+            this.pictureBox.MouseLeave += new System.EventHandler(this.pictureBox_MouseLeave);
+            this.pictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseMove);
+            this.pictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseUp);
+            // 
             // pnlPlayControls
             // 
             this.pnlPlayControls.Controls.Add(this.pnlPlayButtons);
@@ -866,26 +889,12 @@
             // 
             this.timerCommandArgs.Tick += new System.EventHandler(this.timerCommandArgs_Tick);
             // 
-            // pictureBox
+            // miLoadDarkLongerExp
             // 
-            this.pictureBox.AllowDrop = true;
-            this.pictureBox.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.pictureBox.CanvasSize = new System.Drawing.Size(60, 40);
-            this.pictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBox.Image = null;
-            this.pictureBox.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
-            this.pictureBox.Location = new System.Drawing.Point(0, 0);
-            this.pictureBox.Name = "pictureBox";
-            this.pictureBox.Size = new System.Drawing.Size(607, 503);
-            this.pictureBox.TabIndex = 2;
-            this.pictureBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragDrop);
-            this.pictureBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragEnter);
-            this.pictureBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseClick);
-            this.pictureBox.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDoubleClick);
-            this.pictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDown);
-            this.pictureBox.MouseLeave += new System.EventHandler(this.pictureBox_MouseLeave);
-            this.pictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseMove);
-            this.pictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseUp);
+            this.miLoadDarkLongerExp.Name = "miLoadDarkLongerExp";
+            this.miLoadDarkLongerExp.Size = new System.Drawing.Size(213, 22);
+            this.miLoadDarkLongerExp.Text = "Dark (Longer Exposure)";
+            this.miLoadDarkLongerExp.Click += new System.EventHandler(this.miLoadDarkLongerExp_Click);
             // 
             // frmMain
             // 
@@ -1013,6 +1022,7 @@
 		protected internal System.Windows.Forms.ToolStripMenuItem miLoadDark;
 		protected internal System.Windows.Forms.ToolStripMenuItem miLoadMasterDark;
 		protected internal System.Windows.Forms.ToolStripMenuItem miLoadFlat;
+        protected internal System.Windows.Forms.ToolStripMenuItem miLoadDarkLongerExp;
 	}
 }
 

@@ -795,24 +795,34 @@ HRESULT PreProcessingApplyBiasDarkFlatFrame(
 		//                          flat
 			
 			
-		if (NULL != biasPixels && !isSameExposureDarkFrame)	pixelValue = pixelValue - *pBiasPixels;
+		if (NULL != biasPixels && !isSameExposureDarkFrame)	
+		{
+			pixelValue = pixelValue - *pBiasPixels;
+			if (pixelValue < minValue) pixelValue = minValue;
+		}
 		
 		if (NULL != darkPixels) 
 		{
-			if (darkFrameIsBiasCorrected)
-				pixelValue = pixelValue - ((NULL != biasPixels ? (*pDarkPixels - *pBiasPixels) : *pDarkPixels) * coeffDarkExposureScaling);	
-			else if (isSameExposureDarkFrame)
+			if (isSameExposureDarkFrame)
 				pixelValue = pixelValue - *pDarkPixels;	
+			else if (darkFrameIsBiasCorrected)
+				pixelValue = pixelValue - (*pDarkPixels * coeffDarkExposureScaling);
+			else if (!darkFrameIsBiasCorrected)
+			{
+				double participatingDarkCurrent = NULL != biasPixels ? (*pDarkPixels - *pBiasPixels) : *pDarkPixels;
+				if (participatingDarkCurrent < minValue) participatingDarkCurrent = minValue;
+				pixelValue = pixelValue - (participatingDarkCurrent * coeffDarkExposureScaling);				
+			}
 		}
 			
 		if (NULL != flatPixels) pixelValue = pixelValue * (double)flatMedian / *pFlatPixels;
 
 		if ((long)pixelValue > maxValue)
-			pixelValue = maxValue;
+			*pPixels = maxValue;
 		else if ((long)pixelValue < minValue)
-			pixelValue = minValue;
-
-		*pPixels = (unsigned long)(pixelValue + 0.5);
+			*pPixels = minValue;
+		else
+			*pPixels = (unsigned long)(pixelValue + 0.5);
 
 		pPixels++;
 	}

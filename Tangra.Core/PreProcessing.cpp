@@ -164,7 +164,7 @@ long PreProcessingAddFlipAndRotation(enum RotateFlipType rotateFlipType)
 	return S_OK;	
 }
 
-long PreProcessingAddDarkFrame(float* darkFramePixels, unsigned long pixelsCount, float exposureSeconds, bool isBiasCorrected)
+long PreProcessingAddDarkFrame(float* darkFramePixels, unsigned long pixelsCount, float exposureSeconds, bool isBiasCorrected, bool isSameExposure)
 {
 	if (NULL != g_DarkFramePixelsCopy)
 	{
@@ -179,11 +179,11 @@ long PreProcessingAddDarkFrame(float* darkFramePixels, unsigned long pixelsCount
 	g_DarkFramePixelsCount = pixelsCount;
 	g_DarkFrameExposure = exposureSeconds;
 	g_DarkFrameIsBiasCorrected = isBiasCorrected;
-	g_IsSameExposureDarkFrame = !isBiasCorrected;
+	g_IsSameExposureDarkFrame = isSameExposure;
 	
-	if (!isBiasCorrected)
+	if (!isBiasCorrected && isSameExposure)
 	{
-		// If we are loading a Dark frame that already has bias in it, then remove the currently loaded bias frame
+		// If we are loading a same exposure Dark frame that already has bias in it, then remove the currently loaded bias frame
 		
 		g_BiasFramePixelsCount = 0;
 		

@@ -115,7 +115,7 @@ namespace Tangra
         {
             if (cbMeaMethod.SelectedIndex == 0)
             {
-                m_BackgroundMethod = TangraConfig.BackgroundMethod.AverageBackground;
+                m_BackgroundMethod = TangraConfig.BackgroundMethod.BackgroundMedian;
                 m_SignalMethod = TangraConfig.PhotometryReductionMethod. AperturePhotometry;                
             }
             else if (cbMeaMethod.SelectedIndex == 1)

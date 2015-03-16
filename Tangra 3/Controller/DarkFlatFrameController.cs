@@ -106,7 +106,7 @@ namespace Tangra.Controller
 			return false;
 		}
 
-		public void LoadDarkFrame(bool isMasterDark)
+		public void LoadDarkFrame(bool isMasterDark, bool isSameExposure)
 		{
 			float[,] pixels = new float[0, 0];
 			float medianValue = 0;
@@ -118,7 +118,7 @@ namespace Tangra.Controller
 				UsageStats.Instance.DarkFramesUsed++;
 				UsageStats.Instance.Save();
 
-				TangraCore.PreProcessors.AddDarkFrame(pixels, exposureSeconds, isMasterDark);
+                TangraCore.PreProcessors.AddDarkFrame(pixels, exposureSeconds, isMasterDark, isSameExposure);
 
 				TangraContext.Current.DarkFrameLoaded = true;
 				m_VideoController.UpdateViews();
