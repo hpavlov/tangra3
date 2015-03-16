@@ -869,12 +869,26 @@ namespace Tangra
 			Cursor = Cursors.WaitCursor;
 			try
 			{
-				m_MakeDarkFlatController.LoadDarkFrame();
+				m_MakeDarkFlatController.LoadDarkFrame(false);
 			}
 			finally
 			{
 				Cursor = Cursors.Default;
-			}			
+			}
+		}
+
+
+		private void miLoadMasterDark_Click(object sender, EventArgs e)
+		{
+			Cursor = Cursors.WaitCursor;
+			try
+			{
+				m_MakeDarkFlatController.LoadDarkFrame(true);
+			}
+			finally
+			{
+				Cursor = Cursors.Default;
+			}
 		}
 
 		private void miLoadFlat_Click(object sender, EventArgs e)
@@ -1171,6 +1185,7 @@ namespace Tangra
 			(m_VideoController.CurrentImageTool as PlateCalibrationTool).LoadControler(pnlControlerPanel);
 			m_VideoController.SetPictureBoxCursor(Cursors.Arrow);
 		}
+
 
 	}
 }

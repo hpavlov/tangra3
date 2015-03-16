@@ -85,6 +85,7 @@ namespace Tangra.View
 			m_MainForm.miMakeDarkFlat.Enabled = TangraContext.Current.HasAnyFileLoaded;
 
 			m_MainForm.miLoadDark.Enabled = TangraContext.Current.HasAnyFileLoaded && TangraContext.Current.CanLoadDarkFrame;
+			m_MainForm.miLoadMasterDark.Enabled = TangraContext.Current.HasAnyFileLoaded && TangraContext.Current.CanLoadDarkFrame;
 			m_MainForm.miLoadFlat.Enabled = TangraContext.Current.HasAnyFileLoaded && TangraContext.Current.CanLoadFlatFrame;
             m_MainForm.miLoadBias.Enabled = TangraContext.Current.HasAnyFileLoaded && TangraContext.Current.CanLoadBiasFrame;
 

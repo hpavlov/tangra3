@@ -772,7 +772,7 @@ HRESULT PreProcessingGamma(unsigned long* pixels, long width, long height, int b
 HRESULT PreProcessingApplyBiasDarkFlatFrame(
     unsigned long* pixels, long width, long height, int bpp,
     float* biasPixels, float* darkPixels, float* flatPixels, 
-	float scienseExposure, float darkExposure, float flatMedian)
+	float scienseExposure, float darkExposure, bool darkFrameIsBiasCorrected, bool isSameExposureDarkFrame, float flatMedian)
 {
 	int minValue, maxValue;
 	GetMinMaxValuesForBpp(bpp, &minValue, &maxValue);
@@ -795,9 +795,15 @@ HRESULT PreProcessingApplyBiasDarkFlatFrame(
 		//                          flat
 			
 			
-		if (NULL != biasPixels)	pixelValue = pixelValue - *pBiasPixels;
+		if (NULL != biasPixels && !isSameExposureDarkFrame)	pixelValue = pixelValue - *pBiasPixels;
 		
-		if (NULL != darkPixels) pixelValue = pixelValue - ((NULL != biasPixels ? (*pDarkPixels - *pBiasPixels) : *pDarkPixels) * coeffDarkExposureScaling);
+		if (NULL != darkPixels) 
+		{
+			if (darkFrameIsBiasCorrected)
+				pixelValue = pixelValue - ((NULL != biasPixels ? (*pDarkPixels - *pBiasPixels) : *pDarkPixels) * coeffDarkExposureScaling);	
+			else if (isSameExposureDarkFrame)
+				pixelValue = pixelValue - *pDarkPixels;	
+		}
 			
 		if (NULL != flatPixels) pixelValue = pixelValue * (double)flatMedian / *pFlatPixels;
 

@@ -398,7 +398,7 @@ namespace Tangra.PInvoke
 			private static extern int PreProcessingAddGammaCorrection(float encodingGamma);
 
 			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-            private static extern int PreProcessingAddDarkFrame(float[] darkFramePixels, uint pixelsCount, float exposureSeconds);
+			private static extern int PreProcessingAddDarkFrame(float[] darkFramePixels, uint pixelsCount, float exposureSeconds, bool isBiasCorrected);
 
 			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
             private static extern int PreProcessingAddFlatFrame(float[] flatFramePixels, uint pixelsCount, float flatFrameMedian);
@@ -465,7 +465,7 @@ namespace Tangra.PInvoke
 				PreProcessingAddFlipAndRotation((int)rotateFlipType);
 			}
 
-			public static void AddDarkFrame(float[,] darkFramePixels, float exposureSeconds, int imagesCombined)
+			public static void AddDarkFrame(float[,] darkFramePixels, float exposureSeconds, bool isBiasCorrected)
 			{
 				int width = darkFramePixels.GetLength(0);
 				int height = darkFramePixels.GetLength(1);
@@ -479,11 +479,10 @@ namespace Tangra.PInvoke
 					for (int x = 0; x < width; x++)
 					{
                         darkFrame[idx] = darkFramePixels[x, y];
-                        //if (imagesCombined > 1) darkFrame[idx] = darkFrame[idx] / imagesCombined;
 						idx++;
 					}
 
-                PreProcessingAddDarkFrame(darkFrame, pixelsCount, exposureSeconds);
+				PreProcessingAddDarkFrame(darkFrame, pixelsCount, exposureSeconds, isBiasCorrected);
 			}
 
             public static void AddFlatFrame(float[,] flatFramePixels, float flatFrameMedian)
@@ -506,7 +505,7 @@ namespace Tangra.PInvoke
                 PreProcessingAddFlatFrame(flatFrame, pixelsCount, flatFrameMedian);
 			}
 
-            public static void AddBiasFrame(float[,] biasFramePixels, int imagesCombined)
+            public static void AddBiasFrame(float[,] biasFramePixels)
             {
                 int width = biasFramePixels.GetLength(0);
                 int height = biasFramePixels.GetLength(1);
@@ -520,7 +519,6 @@ namespace Tangra.PInvoke
                     for (int x = 0; x < width; x++)
                     {
                         biasFrame[idx] = biasFramePixels[x, y];
-                        //if (imagesCombined > 1) biasFrame[idx] = biasFrame[idx] / imagesCombined;
                         idx++;
                     }
 

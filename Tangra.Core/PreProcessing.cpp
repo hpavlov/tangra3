@@ -22,6 +22,8 @@ float* g_FlatFramePixelsCopy = NULL;
 float* g_BiasFramePixelsCopy = NULL;
 float g_FlatFrameMedian = 0;
 float g_DarkFrameExposure = 0;
+bool g_DarkFrameIsBiasCorrected = false;
+bool g_IsSameExposureDarkFrame = false;
 unsigned int g_DarkFramePixelsCount = 0;
 unsigned int g_FlatFramePixelsCount = 0;
 unsigned int g_BiasFramePixelsCount = 0;
@@ -74,6 +76,8 @@ long PreProcessingClearAll()
 
 	g_FlatFrameMedian = 0;
 	g_DarkFrameExposure = 0;
+	g_DarkFrameIsBiasCorrected = false;
+	g_IsSameExposureDarkFrame = false;
 
 	return S_OK;
 }
@@ -160,7 +164,7 @@ long PreProcessingAddFlipAndRotation(enum RotateFlipType rotateFlipType)
 	return S_OK;	
 }
 
-long PreProcessingAddDarkFrame(float* darkFramePixels, unsigned long pixelsCount, float exposureSeconds)
+long PreProcessingAddDarkFrame(float* darkFramePixels, unsigned long pixelsCount, float exposureSeconds, bool isBiasCorrected)
 {
 	if (NULL != g_DarkFramePixelsCopy)
 	{
@@ -174,7 +178,9 @@ long PreProcessingAddDarkFrame(float* darkFramePixels, unsigned long pixelsCount
 	memcpy(g_DarkFramePixelsCopy, darkFramePixels, bytesCount);
 	g_DarkFramePixelsCount = pixelsCount;
 	g_DarkFrameExposure = exposureSeconds;
-
+	g_DarkFrameIsBiasCorrected = isBiasCorrected;
+	g_IsSameExposureDarkFrame = !isBiasCorrected;
+	
 	g_UsesPreProcessing = true;
 
 	return S_OK;
@@ -250,7 +256,7 @@ long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height
 		rv = PreProcessingApplyBiasDarkFlatFrame(
 			pixels, width, height, bpp, 
 			g_BiasFramePixelsCopy, g_DarkFramePixelsCopy, g_FlatFramePixelsCopy, 
-			exposureSeconds, g_DarkFrameExposure, g_FlatFrameMedian);
+			exposureSeconds, g_DarkFrameExposure, g_DarkFrameIsBiasCorrected, g_IsSameExposureDarkFrame, g_FlatFrameMedian);
 			
 		if (rv != S_OK) return rv;
 	}

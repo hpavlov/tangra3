@@ -101,7 +101,7 @@ namespace Tangra.Controller
 			return false;
 		}
 
-		public void LoadDarkFrame()
+		public void LoadDarkFrame(bool isMasterDark)
 		{
 			float[,] pixels = new float[0, 0];
 			float medianValue = 0;
@@ -113,7 +113,7 @@ namespace Tangra.Controller
 				UsageStats.Instance.DarkFramesUsed++;
 				UsageStats.Instance.Save();
 
-                TangraCore.PreProcessors.AddDarkFrame(pixels, exposureSeconds, imagesCombined);
+				TangraCore.PreProcessors.AddDarkFrame(pixels, exposureSeconds, isMasterDark);
 
 				TangraContext.Current.DarkFrameLoaded = true;
 				m_VideoController.UpdateViews();
@@ -155,7 +155,7 @@ namespace Tangra.Controller
                 UsageStats.Instance.BiasFramesUsed++;
                 UsageStats.Instance.Save();
 
-                TangraCore.PreProcessors.AddBiasFrame(pixels, imagesCombined);
+                TangraCore.PreProcessors.AddBiasFrame(pixels);
 
                 TangraContext.Current.BiasFrameLoaded = true;
                 m_VideoController.UpdateViews();
