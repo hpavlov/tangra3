@@ -54,6 +54,8 @@ namespace Tangra.OCR
 
 			if (!evenBeforeOdd)
 			{
+				DateTime oddTimestampToCheck = oddFieldTimestamp;
+
 				fieldDuration = Math.Abs(new TimeSpan(oddFieldTimestamp.Ticks - m_PrevEvenTicks).TotalMilliseconds);
 				
 				if (!IsFieldDurationOkay(fieldDuration))
@@ -64,9 +66,11 @@ namespace Tangra.OCR
                         Trace.WriteLine("IOTA-VTI Correction Failed: Cannot correct field duration PrevEven -> CurrOdd.");
 				        return false;
 				    }
+					else
+						oddTimestampToCheck = new DateTime(1, 1, 1, oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds, (int)Math.Round(oddFieldOSD.Milliseconds10 / 10.0f));
 				}
 
-				fieldDuration = Math.Abs(new TimeSpan(oddFieldTimestamp.Ticks - evenFieldTimestamp.Ticks).TotalMilliseconds);
+				fieldDuration = Math.Abs(new TimeSpan(oddTimestampToCheck.Ticks - evenFieldTimestamp.Ticks).TotalMilliseconds);
 
 				if (!IsFieldDurationOkay(fieldDuration))
 				{
@@ -80,19 +84,23 @@ namespace Tangra.OCR
 			}
 			else
 			{
+				DateTime evenTimestampToCheck = evenFieldTimestamp;
+
 				fieldDuration = Math.Abs(new TimeSpan(evenFieldTimestamp.Ticks - m_PrevOddTicks).TotalMilliseconds);
 
 				if (!IsFieldDurationOkay(fieldDuration))
 				{
-				    if (!TryCorrectTimestamp(m_PrevOddTicks, evenFieldTimestamp, evenFieldOSD))
-				    {
-                        Trace.WriteLine(correctionDebugInfo);
-                        Trace.WriteLine("IOTA-VTI Correction Failed: Cannot correct field duration PrevOdd -> CurrEven.");
-				        return false;
-				    }
+					if (!TryCorrectTimestamp(m_PrevOddTicks, evenFieldTimestamp, evenFieldOSD))
+					{
+						Trace.WriteLine(correctionDebugInfo);
+						Trace.WriteLine("IOTA-VTI Correction Failed: Cannot correct field duration PrevOdd -> CurrEven.");
+						return false;
+					}
+					else
+						evenTimestampToCheck = new DateTime(1,1,1, evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds, (int)Math.Round(evenFieldOSD.Milliseconds10 / 10.0f));
 				}
 
-				fieldDuration = Math.Abs(new TimeSpan(evenFieldTimestamp.Ticks - oddFieldTimestamp.Ticks).TotalMilliseconds);
+				fieldDuration = Math.Abs(new TimeSpan(evenTimestampToCheck.Ticks - oddFieldTimestamp.Ticks).TotalMilliseconds);
 
 				if (!IsFieldDurationOkay(fieldDuration))
 				{

@@ -101,7 +101,7 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
             int.TryParse(timeStampStrings.HH, out Hours);
             int.TryParse(timeStampStrings.MM, out Minutes);
             int.TryParse(timeStampStrings.SS, out Seconds);
-            int.TryParse(timeStampStrings.FFFF1.Length == 4 ? timeStampStrings.FFFF1 : timeStampStrings.FFFF2, out Milliseconds10);
+			int.TryParse(timeStampStrings.FFFF1.Length == 4 ? timeStampStrings.FFFF1.Replace(' ', '0') : timeStampStrings.FFFF2.Replace(' ', '0'), out Milliseconds10);
             int.TryParse(timeStampStrings.FRAMENO, out FrameNumber);
 		}
 

@@ -205,7 +205,7 @@ namespace Tangra.OCR
         {
             for (int y = m_FromLine; y < m_ToLine; y++)
             {
-                bool isOddLine = y % 2 == 1;
+                bool isOddLine = (y - 1) % 2 == 1; // y is zero-based so add/even calculations should be performed counting from zero
                 int lineNo = (y - m_FromLine) / 2;
                 if (isOddLine)
                     Array.Copy(data, y * m_FieldAreaWidth, m_OddFieldPixels, lineNo * m_FieldAreaWidth, m_FieldAreaWidth);
