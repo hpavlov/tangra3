@@ -442,6 +442,21 @@ namespace Tangra.Model.Image
 			return new Pixelmap(bmp.Width, bmp.Height, 8, pixels, bmp, displayBitmapPixels);
 		}		
 
+		public static uint[,] ConvertFromFlatToXYArray(uint[] flatArray, int width, int height)
+		{
+			var rv = new uint[width, height];
+
+			for (int y = 0; y < height; y++)
+			{
+				for (int x = 0; x < width; x++)
+				{
+					rv[x, y] = flatArray[x + (y * width)];
+				}
+			}
+
+			return rv;
+		}
+
 		public void CopyPixelsFrom(uint[,] pixels, int bpp)
 		{
 			if (pixels.GetLength(0) != Width || pixels.GetLength(1) != Height)

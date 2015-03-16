@@ -72,6 +72,8 @@ namespace Tangra.Controller
 		private AddinsController m_AddinsController;
 	    private frmMain m_MainForm;
 
+		private RenderOverlayCallback m_CustomOverlayRenderer;
+
 		private DisplayIntensifyMode m_DisplayIntensifyMode = DisplayIntensifyMode.Off;
 	    private bool m_DisplayInvertedMode = false;
         private bool m_DisplayHueIntensityMode = false;
@@ -552,6 +554,20 @@ namespace Tangra.Controller
 
 	        if (m_ImageTool != null)
 		        m_ImageTool.PostDraw(g);
+
+			if (m_CustomOverlayRenderer != null && m_CurrentOperation == null)
+			{
+				// Run custom overlay renderers when no operation is selected
+				try
+				{
+					m_CustomOverlayRenderer(g);
+				}
+				catch (Exception ex)
+				{
+					Trace.WriteLine(ex);
+				}
+			}
+				
         }
 
         public bool m_ShowFields;
@@ -1678,7 +1694,7 @@ namespace Tangra.Controller
                 {
                     uint[,] data = m_AstroImage.GetMeasurableAreaPixels(pixel.X, pixel.Y, matrixSize);
                     m_TargetPsfFit = new PSFFit(pixel.X, pixel.Y);
-                    m_TargetPsfFit.Fit(data);
+					m_TargetPsfFit.Fit(data);
                     if (m_TargetPsfFit.IsSolved)
                     {
                         pixel = new ImagePixel(m_TargetPsfFit.Brightness, m_TargetPsfFit.XCenter, m_TargetPsfFit.YCenter);
@@ -2065,6 +2081,18 @@ namespace Tangra.Controller
 		public void SetFlipSettings(bool flipVertically, bool flipHorizontally)
 		{
 			m_FramePlayer.SetFlipSettings(flipVertically, flipHorizontally);
+		}
+
+		public delegate void RenderOverlayCallback(Graphics g);
+ 
+		internal void RegisterOverlayRenderer(RenderOverlayCallback callback)
+		{
+			m_CustomOverlayRenderer = callback;
+		}
+
+		internal void DeregisterOverlayRenderer(RenderOverlayCallback callback)
+		{
+			m_CustomOverlayRenderer = null;
 		}
 	}
 }

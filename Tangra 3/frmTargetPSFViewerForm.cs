@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Tangra.Astrometry;
+using Tangra.Controller;
 using Tangra.Model.Astro;
 using Tangra.Model.Config;
 using Tangra.Model.Image;
@@ -26,17 +27,21 @@ namespace Tangra
 		private int m_Bpp;
 		private uint m_NormVal;
 	    private MeasurementsHelper m_Measurer;
-	    private IVideoController m_VideoController;
+	    private VideoController m_VideoController;
 
         private TangraConfig.BackgroundMethod m_BackgroundMethod = TangraConfig.BackgroundMethod.PSFBackground;
         private TangraConfig.PhotometryReductionMethod m_SignalMethod = TangraConfig.PhotometryReductionMethod.PsfPhotometry;
+
+		private float m_Aperture;
+		private float m_InnerRadius;
+		private float m_OuterRadius;
 
 		public frmTargetPSFViewerForm()
 		{
 			InitializeComponent();
 		}
 
-        public frmTargetPSFViewerForm(IVideoController videoController)
+        public frmTargetPSFViewerForm(VideoController videoController)
         {
             InitializeComponent();
 
@@ -44,6 +49,27 @@ namespace Tangra
             m_PSFFit = null;
             cbMeaMethod.SelectedIndex = 0;
         }
+
+		private void frmTargetPSFViewerForm_FormClosed(object sender, FormClosedEventArgs e)
+		{
+			m_VideoController.DeregisterOverlayRenderer(RenderOverlay);
+			m_VideoController.RefreshCurrentFrame();
+		}
+
+
+		private void frmTargetPSFViewerForm_VisibleChanged(object sender, EventArgs e)
+		{
+			if (Visible)
+			{
+				m_VideoController.RegisterOverlayRenderer(RenderOverlay);
+				m_VideoController.RefreshCurrentFrame();
+			}
+			else
+			{
+				m_VideoController.DeregisterOverlayRenderer(RenderOverlay);
+				m_VideoController.RefreshCurrentFrame();
+			}
+		}
 
 		public void ShowTargetPSF(PSFFit psfFit, int bpp, uint aav16Normval, uint[,] backgroundPixels)
 		{
@@ -176,6 +202,13 @@ namespace Tangra
                 tbxBg.Text = "ERR";
                 tbxSmBG.Text = "ERR";
             }
+
+			// Show the apertures in the main view
+	        m_Aperture = aperture;
+			m_InnerRadius = (float)(TangraConfig.Settings.Photometry.AnnulusInnerRadius * aperture);
+			m_OuterRadius = (float)Math.Sqrt(TangraConfig.Settings.Photometry.AnnulusMinPixels / Math.PI + m_InnerRadius * m_InnerRadius);
+
+			m_VideoController.RefreshCurrentFrame();
         }
 
 		private void CalculateAndDisplayBackground(uint[,] backgroundPixels)
@@ -298,5 +331,17 @@ namespace Tangra
             EnsureMeasurer(2);
             MeasureCurrentPSF();
         }
+
+		private static Pen s_AperturePen = new Pen(Color.FromArgb(70, Color.GreenYellow.R, Color.GreenYellow.G, Color.GreenYellow.B));
+
+		internal void RenderOverlay(Graphics g)
+		{
+			float x0 = (float)m_PSFFit.XCenter;
+			float y0 = (float)m_PSFFit.YCenter;
+
+			g.DrawEllipse(s_AperturePen, x0 - m_Aperture, y0 - m_Aperture, 2 * m_Aperture, 2 * m_Aperture);
+			g.DrawEllipse(s_AperturePen, x0 - m_InnerRadius, y0 - m_InnerRadius, 2 * m_InnerRadius, 2 * m_InnerRadius);
+			g.DrawEllipse(s_AperturePen, x0 - m_OuterRadius, y0 - m_OuterRadius, 2 * m_OuterRadius, 2 * m_OuterRadius);
+		}
 	}
 }
