@@ -645,17 +645,10 @@ namespace Tangra.OCR
                 failedReason = "Video fields are not consequtive";
             }
 
-			int oddMs = (int)Math.Round(oddFieldOSD.Milliseconds10 / 10.0f);
-			if (oddMs >= 1000) oddMs = 999;
-
             try
             {
-                DateTime oddFieldTimestamp = new DateTime(1, 1, 1, oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds, oddMs);
-
-                int evenMs = (int)Math.Round(evenFieldOSD.Milliseconds10 / 10.0f);
-                if (evenMs >= 1000) evenMs = 999;
-
-                DateTime evenFieldTimestamp = new DateTime(1, 1, 1, evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds, evenMs);
+				DateTime oddFieldTimestamp = new DateTime(1, 1, 1, oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds).AddMilliseconds(Math.Min(10000, oddFieldOSD.Milliseconds10) / 10.0f);
+				DateTime evenFieldTimestamp = new DateTime(1, 1, 1, evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds).AddMilliseconds(Math.Min(10000, evenFieldOSD.Milliseconds10) / 10.0f);
 
                 double fieldDuration = Math.Abs(new TimeSpan(oddFieldTimestamp.Ticks - evenFieldTimestamp.Ticks).TotalMilliseconds);
 

@@ -275,7 +275,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 					if (!m_TimestampOCR.RequiresConfiguring)
 					{
-						if (m_Refining)
+						if (m_Refining && m_Tracker.RefiningPercentageWorkLeft > 0)
 							m_TimestampOCR.RefiningFrame(osdPixels, m_Tracker.RefiningPercentageWorkLeft);
 						else
 							if (!m_TimestampOCR.ExtractTime(frameNo, osdPixels, out m_OCRedTimeStamp))

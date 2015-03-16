@@ -60,14 +60,14 @@ namespace Tangra.OCR
 				
 				if (!IsFieldDurationOkay(fieldDuration))
 				{
-				    if (!TryCorrectTimestamp(m_PrevEvenTicks, oddFieldTimestamp, oddFieldOSD))
-				    {
-				        Trace.WriteLine(correctionDebugInfo);
-                        Trace.WriteLine("IOTA-VTI Correction Failed: Cannot correct field duration PrevEven -> CurrOdd.");
-				        return false;
-				    }
+					if (!TryCorrectTimestamp(m_PrevEvenTicks, oddFieldTimestamp, oddFieldOSD))
+					{
+						Trace.WriteLine(correctionDebugInfo);
+						Trace.WriteLine("IOTA-VTI Correction Failed: Cannot correct field duration PrevEven -> CurrOdd.");
+						return false;
+					}
 					else
-						oddTimestampToCheck = new DateTime(1, 1, 1, oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds, (int)Math.Round(oddFieldOSD.Milliseconds10 / 10.0f));
+						oddTimestampToCheck = new DateTime(1, 1, 1, oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds).AddMilliseconds(Math.Min(10000, oddFieldOSD.Milliseconds10) / 10.0f);
 				}
 
 				fieldDuration = Math.Abs(new TimeSpan(oddTimestampToCheck.Ticks - evenFieldTimestamp.Ticks).TotalMilliseconds);
@@ -97,7 +97,7 @@ namespace Tangra.OCR
 						return false;
 					}
 					else
-						evenTimestampToCheck = new DateTime(1,1,1, evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds, (int)Math.Round(evenFieldOSD.Milliseconds10 / 10.0f));
+						evenTimestampToCheck = new DateTime(1, 1, 1, evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds).AddMilliseconds(Math.Min(10000, evenFieldOSD.Milliseconds10) / 10.0f);
 				}
 
 				fieldDuration = Math.Abs(new TimeSpan(evenTimestampToCheck.Ticks - oddFieldTimestamp.Ticks).TotalMilliseconds);
@@ -138,8 +138,8 @@ namespace Tangra.OCR
 				}
 			}
 
-			oddFieldTimestamp = new DateTime(1, 1, 1, oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds, (int)Math.Round(oddFieldOSD.Milliseconds10 / 10.0f));
-			evenFieldTimestamp = new DateTime(1, 1, 1, evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds, (int)Math.Round(evenFieldOSD.Milliseconds10 / 10.0f));
+			oddFieldTimestamp = new DateTime(1, 1, 1, oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds).AddMilliseconds(Math.Min(10000, oddFieldOSD.Milliseconds10) / 10.0f);
+			evenFieldTimestamp = new DateTime(1, 1, 1, evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds).AddMilliseconds(Math.Min(10000, evenFieldOSD.Milliseconds10) / 10.0f);
 
 			return true;
 		}
@@ -182,12 +182,12 @@ namespace Tangra.OCR
 
 			if (numberDifferences <= TangraConfig.Settings.Generic.OcrMaxNumberErrorsToAutoCorrect)
 			{
-				// We can correct the single offending character
+				// We can correct the one or two offending characters
 
 				fieldToCorrect.Hours = expectedDateTime.Hour;
 				fieldToCorrect.Minutes = expectedDateTime.Minute;
 				fieldToCorrect.Seconds = expectedDateTime.Second;
-				fieldToCorrect.Milliseconds10 = expectedDateTime.Millisecond * 10;
+				fieldToCorrect.Milliseconds10 = (int)Math.Round((expectedDateTime.Ticks % 10000000) / 1000.0);
 
 				return true;
 			}
