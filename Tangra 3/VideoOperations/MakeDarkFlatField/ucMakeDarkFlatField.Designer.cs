@@ -30,22 +30,23 @@
         {
             this.label1 = new System.Windows.Forms.Label();
             this.pnlSettings = new System.Windows.Forms.Panel();
+            this.pnlExposure = new System.Windows.Forms.Panel();
+            this.label3 = new System.Windows.Forms.Label();
+            this.nudEffectiveExposureSeconds = new System.Windows.Forms.NumericUpDown();
+            this.label2 = new System.Windows.Forms.Label();
             this.groupControl1 = new System.Windows.Forms.GroupBox();
-            this.rbFlat = new System.Windows.Forms.RadioButton();
             this.rbDark = new System.Windows.Forms.RadioButton();
             this.nudNumFrames = new System.Windows.Forms.NumericUpDown();
             this.btnProcess = new System.Windows.Forms.Button();
             this.pbar = new System.Windows.Forms.ProgressBar();
-            this.rbBias = new System.Windows.Forms.RadioButton();
-            this.pnlExposure = new System.Windows.Forms.Panel();
-            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
+            this.rbMasterDark = new System.Windows.Forms.RadioButton();
+            this.rbMasterBias = new System.Windows.Forms.RadioButton();
+            this.rbMasterFlat = new System.Windows.Forms.RadioButton();
             this.pnlSettings.SuspendLayout();
+            this.pnlExposure.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudEffectiveExposureSeconds)).BeginInit();
             this.groupControl1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudNumFrames)).BeginInit();
-            this.pnlExposure.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -68,10 +69,57 @@
             this.pnlSettings.Size = new System.Drawing.Size(254, 164);
             this.pnlSettings.TabIndex = 7;
             // 
+            // pnlExposure
+            // 
+            this.pnlExposure.Controls.Add(this.label3);
+            this.pnlExposure.Controls.Add(this.nudEffectiveExposureSeconds);
+            this.pnlExposure.Controls.Add(this.label2);
+            this.pnlExposure.Location = new System.Drawing.Point(1, 72);
+            this.pnlExposure.Name = "pnlExposure";
+            this.pnlExposure.Size = new System.Drawing.Size(250, 44);
+            this.pnlExposure.TabIndex = 11;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(175, 15);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(24, 13);
+            this.label3.TabIndex = 10;
+            this.label3.Text = "sec";
+            // 
+            // nudEffectiveExposureSeconds
+            // 
+            this.nudEffectiveExposureSeconds.DecimalPlaces = 2;
+            this.nudEffectiveExposureSeconds.Location = new System.Drawing.Point(107, 12);
+            this.nudEffectiveExposureSeconds.Maximum = new decimal(new int[] {
+            1024,
+            0,
+            0,
+            0});
+            this.nudEffectiveExposureSeconds.Name = "nudEffectiveExposureSeconds";
+            this.nudEffectiveExposureSeconds.Size = new System.Drawing.Size(62, 20);
+            this.nudEffectiveExposureSeconds.TabIndex = 8;
+            this.nudEffectiveExposureSeconds.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(4, 15);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(99, 13);
+            this.label2.TabIndex = 7;
+            this.label2.Text = "Effective Exposure:";
+            // 
             // groupControl1
             // 
-            this.groupControl1.Controls.Add(this.rbBias);
-            this.groupControl1.Controls.Add(this.rbFlat);
+            this.groupControl1.Controls.Add(this.rbMasterDark);
+            this.groupControl1.Controls.Add(this.rbMasterBias);
+            this.groupControl1.Controls.Add(this.rbMasterFlat);
             this.groupControl1.Controls.Add(this.rbDark);
             this.groupControl1.Location = new System.Drawing.Point(3, 3);
             this.groupControl1.Name = "groupControl1";
@@ -80,22 +128,14 @@
             this.groupControl1.TabStop = false;
             this.groupControl1.Text = "Type";
             // 
-            // rbFlat
-            // 
-            this.rbFlat.Location = new System.Drawing.Point(95, 31);
-            this.rbFlat.Name = "rbFlat";
-            this.rbFlat.Size = new System.Drawing.Size(60, 19);
-            this.rbFlat.TabIndex = 12;
-            this.rbFlat.Text = "Flat";
-            this.rbFlat.CheckedChanged += new System.EventHandler(this.FrameTypeChanged);
-            // 
             // rbDark
             // 
             this.rbDark.Checked = true;
-            this.rbDark.Location = new System.Drawing.Point(20, 31);
+            this.rbDark.Location = new System.Drawing.Point(21, 19);
             this.rbDark.Name = "rbDark";
-            this.rbDark.Size = new System.Drawing.Size(54, 19);
+            this.rbDark.Size = new System.Drawing.Size(80, 19);
             this.rbDark.TabIndex = 11;
+            this.rbDark.TabStop = true;
             this.rbDark.Text = "Dark";
             this.rbDark.CheckedChanged += new System.EventHandler(this.FrameTypeChanged);
             // 
@@ -133,60 +173,32 @@
             this.pbar.TabIndex = 9;
             this.pbar.Visible = false;
             // 
-            // rbBias
+            // rbMasterDark
             // 
-            this.rbBias.Location = new System.Drawing.Point(172, 31);
-            this.rbBias.Name = "rbBias";
-            this.rbBias.Size = new System.Drawing.Size(52, 19);
-            this.rbBias.TabIndex = 13;
-            this.rbBias.Text = "Bias";
-            this.rbBias.CheckedChanged += new System.EventHandler(this.FrameTypeChanged);
+            this.rbMasterDark.Location = new System.Drawing.Point(21, 38);
+            this.rbMasterDark.Name = "rbMasterDark";
+            this.rbMasterDark.Size = new System.Drawing.Size(101, 19);
+            this.rbMasterDark.TabIndex = 12;
+            this.rbMasterDark.Text = "Master Dark";
+            this.rbMasterDark.CheckedChanged += new System.EventHandler(this.FrameTypeChanged);
             // 
-            // pnlExposure
+            // rbMasterBias
             // 
-            this.pnlExposure.Controls.Add(this.label3);
-            this.pnlExposure.Controls.Add(this.numericUpDown1);
-            this.pnlExposure.Controls.Add(this.label2);
-            this.pnlExposure.Location = new System.Drawing.Point(1, 72);
-            this.pnlExposure.Name = "pnlExposure";
-            this.pnlExposure.Size = new System.Drawing.Size(250, 44);
-            this.pnlExposure.TabIndex = 11;
+            this.rbMasterBias.Location = new System.Drawing.Point(124, 19);
+            this.rbMasterBias.Name = "rbMasterBias";
+            this.rbMasterBias.Size = new System.Drawing.Size(93, 19);
+            this.rbMasterBias.TabIndex = 13;
+            this.rbMasterBias.Text = "Master Bias";
+            this.rbMasterBias.CheckedChanged += new System.EventHandler(this.FrameTypeChanged);
             // 
-            // numericUpDown1
+            // rbMasterFlat
             // 
-            this.numericUpDown1.DecimalPlaces = 2;
-            this.numericUpDown1.Location = new System.Drawing.Point(107, 12);
-            this.numericUpDown1.Maximum = new decimal(new int[] {
-            1024,
-            0,
-            0,
-            0});
-            this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(62, 20);
-            this.numericUpDown1.TabIndex = 8;
-            this.numericUpDown1.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(4, 15);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(99, 13);
-            this.label2.TabIndex = 7;
-            this.label2.Text = "Effective Exposure:";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(175, 15);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(24, 13);
-            this.label3.TabIndex = 10;
-            this.label3.Text = "sec";
+            this.rbMasterFlat.Location = new System.Drawing.Point(124, 38);
+            this.rbMasterFlat.Name = "rbMasterFlat";
+            this.rbMasterFlat.Size = new System.Drawing.Size(93, 19);
+            this.rbMasterFlat.TabIndex = 12;
+            this.rbMasterFlat.Text = "Master Flat";
+            this.rbMasterFlat.CheckedChanged += new System.EventHandler(this.FrameTypeChanged);
             // 
             // ucMakeDarkFlatField
             // 
@@ -201,11 +213,11 @@
             this.Load += new System.EventHandler(this.ucMakeDarkFlatField_Load);
             this.pnlSettings.ResumeLayout(false);
             this.pnlSettings.PerformLayout();
-            this.groupControl1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.nudNumFrames)).EndInit();
             this.pnlExposure.ResumeLayout(false);
             this.pnlExposure.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudEffectiveExposureSeconds)).EndInit();
+            this.groupControl1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.nudNumFrames)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -217,13 +229,14 @@
 		private System.Windows.Forms.Button btnProcess;
 		private System.Windows.Forms.NumericUpDown nudNumFrames;
 		private System.Windows.Forms.ProgressBar pbar;
-		private System.Windows.Forms.GroupBox groupControl1;
-		private System.Windows.Forms.RadioButton rbFlat;
-		private System.Windows.Forms.RadioButton rbDark;
-        private System.Windows.Forms.RadioButton rbBias;
+        private System.Windows.Forms.GroupBox groupControl1;
+        private System.Windows.Forms.RadioButton rbDark;
         private System.Windows.Forms.Panel pnlExposure;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.NumericUpDown numericUpDown1;
+        private System.Windows.Forms.NumericUpDown nudEffectiveExposureSeconds;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.RadioButton rbMasterDark;
+        private System.Windows.Forms.RadioButton rbMasterBias;
+        private System.Windows.Forms.RadioButton rbMasterFlat;
     }
 }

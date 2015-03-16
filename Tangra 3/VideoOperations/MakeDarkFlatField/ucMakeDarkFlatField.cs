@@ -38,8 +38,11 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
 				m_Operation.CancelProducingFrame();
 			else
 			{
-				if (m_Operation.CanStartProducingFrame(rbFlat.Checked, (int)nudNumFrames.Value))
-					m_Operation.StartProducingFrame(rbDark.Checked, (int) nudNumFrames.Value);
+			    float exposure = (float) nudEffectiveExposureSeconds.Value;
+			    if (FrameType == FrameType.MasterBias) exposure = 0;
+
+                if (m_Operation.CanStartProducingFrame(FrameType, (int)nudNumFrames.Value))
+                    m_Operation.StartProducingFrame(FrameType, (int)nudNumFrames.Value, exposure);
 			}
         }
 
@@ -75,13 +78,24 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
             UpdateState();
         }
 
+        private FrameType FrameType
+        {
+            get
+            {
+                FrameType frameType = FrameType.MasterBias;
+                if (rbMasterFlat.Checked) frameType = FrameType.MasterFlat;
+                else if (rbDark.Checked) frameType = FrameType.Dark;
+                else if (rbMasterDark.Checked) frameType = FrameType.MasterDark;
+
+                return frameType;
+            }
+        }
+
         private void UpdateState()
         {
-            pnlExposure.Visible = !rbBias.Checked;
+            FrameType frameType = FrameType;
 
-            FrameType frameType = FrameType.Bias;
-            if (rbFlat.Checked) frameType = FrameType.Flat;
-            else if (rbDark.Checked) frameType = FrameType.Dark;
+            pnlExposure.Visible = frameType != FrameType.MasterBias;
 
             m_Operation.SelectedFrameTypeChanged(frameType);          
         }

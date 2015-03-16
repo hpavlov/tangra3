@@ -584,6 +584,14 @@ namespace Tangra.PInvoke
 
 				return preProcessingInfo.DarkFrameBytes > 0;
 			}
+
+            public static bool PreProcessingHasBiasFrameSet()
+            {
+                PreProcessingInfo preProcessingInfo;
+                PreProcessingGetConfig(out preProcessingInfo);
+
+                return preProcessingInfo.BiasFrameBytes > 0;
+            }
 		}
 
 		public static byte[] Lagarith16Decompress(uint width, uint height, byte[] compressedBytes)

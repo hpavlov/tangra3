@@ -35,6 +35,11 @@ namespace Tangra.Controller
 			get { return TangraCore.PreProcessors.PreProcessingHasDarkFrameSet(); }
 		}
 
+        public bool HasBiasFrameBytes
+        {
+            get { return TangraCore.PreProcessors.PreProcessingHasBiasFrameSet(); }
+        }
+
         private bool LoadDarkFlatOrBiasFrameInternal(string title, ref float[,] pixels, ref float medianValue, ref float exposureSeconds, ref int imagesCombined)
         {
 			string filter = "FITS Image 16 bit (*.fit;*.fits)|*.fit;*.fits";

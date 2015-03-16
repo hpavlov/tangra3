@@ -181,6 +181,19 @@ long PreProcessingAddDarkFrame(float* darkFramePixels, unsigned long pixelsCount
 	g_DarkFrameIsBiasCorrected = isBiasCorrected;
 	g_IsSameExposureDarkFrame = !isBiasCorrected;
 	
+	if (!isBiasCorrected)
+	{
+		// If we are loading a Dark frame that already has bias in it, then remove the currently loaded bias frame
+		
+		g_BiasFramePixelsCount = 0;
+		
+		if (NULL != g_BiasFramePixelsCopy)
+		{
+			delete g_BiasFramePixelsCopy;
+			g_BiasFramePixelsCopy = NULL;
+		}		
+	}
+	
 	g_UsesPreProcessing = true;
 
 	return S_OK;

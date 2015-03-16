@@ -321,6 +321,7 @@
     <Compile Include="Helpers\ShellHelper.cs" />
     <Compile Include="Helpers\TangraFileAssociations.cs" />
     <Compile Include="Helpers\UsageStats.cs" />
+    <Compile Include="Helpers\VersionHelper.cs" />
     <Compile Include="Helpers\WindowsHelpers.cs" />
     <Compile Include="ImageTools\CalibrationToolBase.cs" />
     <Compile Include="ImageTools\FrameSizer.cs" />

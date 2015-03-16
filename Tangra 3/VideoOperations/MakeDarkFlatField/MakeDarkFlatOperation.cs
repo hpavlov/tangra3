@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -28,8 +29,9 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
     enum FrameType
     {
         Dark,
-        Flat,
-        Bias
+        MasterDark,
+        MasterFlat,
+        MasterBias
     }
 
     enum AveragingType
@@ -47,13 +49,14 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
 
         private int m_NumFrames = 64;
         private int m_FramesDone = 0;
+        private float m_ExposureSeconds = 0;
         private bool m_Running = false;
         private FrameType m_FrameType;
 	    private int m_FrameNumber = 0;
 
 	    private AstroImage m_CurrentAstroImage;
 
-        private float[,] m_SummedBitmap;
+        private float[,] m_AveragedData;
 
 	    public MakeDarkFlatOperation()
 	    { }
@@ -106,12 +109,12 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
                 {
 					Pixelmap currPixelmap = astroImage.Pixelmap;
                     if (m_FramesDone == 0)
-                        m_SummedBitmap = new float[currPixelmap.Width, currPixelmap.Height];
+                        m_AveragedData = new float[currPixelmap.Width, currPixelmap.Height];
 
                     for (int x = 0; x < currPixelmap.Width; x++)
                         for (int y = 0; y < currPixelmap.Height; y++)
                         {
-                            m_SummedBitmap[x, y] += currPixelmap[x, y];
+                            m_AveragedData[x, y] += currPixelmap[x, y];
                         }
 
                     m_FramesDone++;
@@ -123,24 +126,21 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
 						for (int x = 0; x < currPixelmap.Width; x++)
 						for (int y = 0; y < currPixelmap.Height; y++)
 						{
-							m_SummedBitmap[x, y] = (m_SummedBitmap[x, y] / (ulong)m_FramesDone);
+							m_AveragedData[x, y] = (m_AveragedData[x, y] / (ulong)m_FramesDone);
 						}
 
 						m_ControlPanel.SetStopped();
 
-						string fileName = string.Format(
-							"{0}_{1}.fit",
-							Path.GetFileNameWithoutExtension(m_VideoController.CurrentVideoFileName),
-							m_FrameType == FrameType.Dark ? "DARK" : "FLAT");
+						string fileName = string.Format("{0}_{1}.fit", Path.GetFileNameWithoutExtension(m_VideoController.CurrentVideoFileName), m_FrameType.ToString());
 
 						if (m_VideoController.ShowSaveFileDialog(
-							"Save " + (m_FrameType == FrameType.Dark ? "dark" : "flat") + " fame", 
+                            "Save " + m_FrameType.ToString() + " fame", 
 							"FITS Image (*.fit)|*.fit", 
 							ref fileName) == DialogResult.OK)
 						{
 							Fits f = new Fits();
 								
-							object data = SaveImageData(m_SummedBitmap); 
+							object data = SaveImageData(m_AveragedData); 
 
 							BasicHDU imageHDU = Fits.MakeHDU(data);
 
@@ -151,12 +151,19 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
 							hdr.AddValue("NAXIS", 2, null);
 							hdr.AddValue("NAXIS1", currPixelmap.Width, null);
 							hdr.AddValue("NAXIS2", currPixelmap.Height, null);
-							hdr.AddValue("NOTES", string.Format(
-								"{0} generated from {1}", 
-								m_FrameType == FrameType.Dark ? "DARK" : "FLAT", 
-								Path.GetFileNameWithoutExtension(m_VideoController.CurrentVideoFileName)), null);
 
-							f.AddHDU(imageHDU);
+							hdr.AddValue("NOTES", string.Format("{0} generated from {1}", m_FrameType.ToString(), Path.GetFileNameWithoutExtension(m_VideoController.CurrentVideoFileName)), null);
+
+						    if (m_ExposureSeconds > 0)
+						    {
+						        hdr.AddValue("EXPOSURE", m_ExposureSeconds.ToString("0.000", CultureInfo.InvariantCulture), null);
+                                hdr.AddValue("EXPTIME", m_ExposureSeconds.ToString("0.000", CultureInfo.InvariantCulture), null);
+						    }
+
+                            hdr.AddValue("SNAPSHOT", m_NumFrames.ToString(), null);
+                            hdr.AddValue("TANGRAVE", string.Format("{0} v{1}", VersionHelper.AssemblyProduct, VersionHelper.AssemblyFileVersion), null);
+
+						    f.AddHDU(imageHDU);
 
 							// Write a FITS file.
 							using (BufferedFile bf = new BufferedFile(fileName, FileAccess.ReadWrite, FileShare.ReadWrite))
@@ -170,7 +177,7 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
 						m_VideoController.StopVideo();
 
 						if (m_FrameType == FrameType.Dark) UsageStats.Instance.DarkFramesProduced++;
-						if (m_FrameType == FrameType.Flat) UsageStats.Instance.FlatFramesProduced++;
+						if (m_FrameType == FrameType.MasterFlat) UsageStats.Instance.FlatFramesProduced++;
 
 						UsageStats.Instance.Save();
                     }
@@ -215,24 +222,35 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
 
 		internal void SelectedFrameTypeChanged(FrameType frameType)
 		{
-            TangraContext.Current.CanLoadDarkFrame = frameType == FrameType.Flat;
-		    TangraContext.Current.CanLoadBiasFrame = frameType != FrameType.Bias;
+            TangraContext.Current.CanLoadDarkFrame = frameType == FrameType.MasterFlat;
+            TangraContext.Current.CanLoadBiasFrame = frameType != FrameType.MasterBias && frameType != FrameType.Dark;
 
 			m_VideoController.UpdateViews();
 		}
 
-		internal bool CanStartProducingFrame(bool isFlatFrame, int numFramesToTake)
+        internal bool CanStartProducingFrame(FrameType frameType, int numFramesToTake)
 		{
-			if (isFlatFrame &&
+            if (frameType == FrameType.MasterFlat &&
 				!m_MakeDarkFlatController.HasDarkFrameBytes)
 			{
 				m_VideoController.ShowMessageBox(
-					"Please load a dark frame from the 'Video Actions' -> 'Load a Dark Frame' menu in order to dark frame correct the produced flat frame. You may need to produce your dark frame first.", 
+					"Please load a dark frame from the 'Reduction' -> 'Load Calibration Frame' menu in order to dark frame correct the produced master flat frame. You may need to produce your dark frame first.", 
 					"Dark frame required",
 					MessageBoxButtons.OK,
 					MessageBoxIcon.Error);
 				return false;
 			}
+
+            if (frameType == FrameType.MasterDark &&
+                !m_MakeDarkFlatController.HasBiasFrameBytes)
+            {
+                m_VideoController.ShowMessageBox(
+                    "Please load a bias frame from the 'Reduction' -> 'Load Calibration Frame' menu in order to bias frame correct the produced master dark frame. You may need to produce your bias frame first.",
+                    "Bias frame required",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                return false;
+            }
 
 			if (m_VideoController.VideoLastFrame - m_FrameNumber < numFramesToTake)
 			{
@@ -247,11 +265,12 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
 			return true;
 		}
 
-        internal void StartProducingFrame(bool darkRatherThanFlat, int framesToAverage)
+        internal void StartProducingFrame(FrameType frameType, int framesToAverage, float effectiveExposureSeconds)
         {
             m_NumFrames = framesToAverage;
             m_FramesDone = 0;
-            m_FrameType = darkRatherThanFlat ? FrameType.Dark : FrameType.Flat;
+            m_ExposureSeconds = effectiveExposureSeconds;
+            m_FrameType = frameType;
 
             m_Running = true;
             m_VideoController.PlayVideo();

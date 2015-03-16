@@ -20,116 +20,15 @@ namespace Tangra
         {
             InitializeComponent();
 
-            this.Text = String.Format("About {0}", AssemblyTitle);			
-	        this.textBoxDescription.Text = AssemblyDescription;
-            if (!string.IsNullOrEmpty(AssemblyReleaseDate))
+            this.Text = string.Format("About {0}", VersionHelper.AssemblyTitle);
+            this.textBoxDescription.Text = VersionHelper.AssemblyDescription;
+            if (!string.IsNullOrEmpty(VersionHelper.AssemblyReleaseDate))
             {
-                this.lblProductName.Text = String.Format("{0} v{1}{2}, Released on {3}", AssemblyProduct, AssemblyFileVersion, IsBetaRelease ? " BETA" : "", AssemblyReleaseDate);
+                this.lblProductName.Text = string.Format("{0} v{1}{2}, Released on {3}", VersionHelper.AssemblyProduct, VersionHelper.AssemblyFileVersion, VersionHelper.IsBetaRelease ? " BETA" : "", VersionHelper.AssemblyReleaseDate);
             }
             else
-                this.lblProductName.Text = String.Format("{0} v{1}, Unreleased ALPHA Version", AssemblyProduct, AssemblyFileVersion);
+                this.lblProductName.Text = string.Format("{0} v{1}, Unreleased ALPHA Version", VersionHelper.AssemblyProduct, VersionHelper.AssemblyFileVersion);
         }
-
-        #region Assembly Attribute Accessorsw
-
-        public string AssemblyTitle
-        {
-            get
-            {
-                object[] attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyTitleAttribute), false);
-                if (attributes.Length > 0)
-                {
-                    AssemblyTitleAttribute titleAttribute = (AssemblyTitleAttribute)attributes[0];
-                    if (titleAttribute.Title != "")
-                    {
-                        return titleAttribute.Title;
-                    }
-                }
-                return System.IO.Path.GetFileNameWithoutExtension(Assembly.GetExecutingAssembly().CodeBase);
-            }
-        }
-
-        public static string AssemblyVersion
-        {
-            get
-            {
-                return Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            }
-        }
-
-        public static string AssemblyFileVersion
-        {
-            get
-            {
-                object[] atts = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyFileVersionAttribute), true);
-                if (atts != null && atts.Length == 1)
-                    return ((AssemblyFileVersionAttribute)atts[0]).Version;
-                else
-                    return AssemblyVersion;
-            }
-        }
-
-        public string AssemblyDescription
-        {
-            get
-            {
-                object[] attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyDescriptionAttribute), false);
-                if (attributes.Length == 0)
-                {
-                    return "";
-                }
-                return ((AssemblyDescriptionAttribute)attributes[0]).Description;
-            }
-        }
-
-        public string AssemblyProduct
-        {
-            get
-            {
-                object[] attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyProductAttribute), false);
-                if (attributes.Length == 0)
-                {
-                    return "";
-                }
-                return ((AssemblyProductAttribute)attributes[0]).Product;
-            }
-        }
-
-        public string AssemblyReleaseDate
-        {
-            get
-            {
-                object[] attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(ReleaseDateAttribute), false);
-                if (attributes.Length == 0)
-                {
-                    return "";
-                }
-                return ((ReleaseDateAttribute)attributes[0]).ReleaseDate.ToString("dd MMM yyyy");
-            }
-        }
-
-        public bool IsBetaRelease
-        {
-            get
-            {
-                object[] attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(BetaReleaseAttribute), false);
-                return attributes.Length == 1;
-            }
-        }
-
-        public string AssemblyCompany
-        {
-            get
-            {
-                object[] attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyCompanyAttribute), false);
-                if (attributes.Length == 0)
-                {
-                    return "";
-                }
-                return ((AssemblyCompanyAttribute)attributes[0]).Company;
-            }
-        }
-        #endregion
 
         private void btnSystemInfo_Click(object sender, EventArgs e)
         {

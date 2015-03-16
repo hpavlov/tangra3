@@ -504,7 +504,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 				m_EventTimesReport = new EventTimesReport()
 				{
-                    TangraVersion = string.Format("Tangra v{0}", frmAbout.AssemblyFileVersion),
+                    TangraVersion = string.Format("Tangra v{0}", VersionHelper.AssemblyFileVersion),
                     AddinAction = addinName,
 					LcFilePath = m_LCFilePath,
 					VideoFilePath = m_LCFile.Header.PathToVideoFile,
