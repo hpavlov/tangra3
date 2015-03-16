@@ -39,9 +39,6 @@
 			this.miAstrometry = new System.Windows.Forms.ToolStripMenuItem();
 			this.miMakeDarkFlat = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
-			this.miLoadBias = new System.Windows.Forms.ToolStripMenuItem();
-			this.miLoadDark = new System.Windows.Forms.ToolStripMenuItem();
-			this.miLoadFlat = new System.Windows.Forms.ToolStripMenuItem();
 			this.miTools = new System.Windows.Forms.ToolStripMenuItem();
 			this.miTargetPSFViewer = new System.Windows.Forms.ToolStripMenuItem();
 			this.miFrameStatusData = new System.Windows.Forms.ToolStripMenuItem();
@@ -101,7 +98,11 @@
 			this.openAdvFileDialog = new System.Windows.Forms.OpenFileDialog();
 			this.saveFrameDialog = new System.Windows.Forms.SaveFileDialog();
 			this.timerCommandArgs = new System.Windows.Forms.Timer(this.components);
+			this.loadCalibrationFrameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.miLoadBias = new System.Windows.Forms.ToolStripMenuItem();
 			this.miLoadMasterDark = new System.Windows.Forms.ToolStripMenuItem();
+			this.miLoadDark = new System.Windows.Forms.ToolStripMenuItem();
+			this.miLoadFlat = new System.Windows.Forms.ToolStripMenuItem();
 			this.pictureBox = new Tangra.Controls.ImagePanel();
 			this.mainMenu.SuspendLayout();
 			this.statusStrip.SuspendLayout();
@@ -254,10 +255,7 @@
             this.miAstrometry,
             this.miMakeDarkFlat,
             this.toolStripMenuItem3,
-            this.miLoadBias,
-            this.miLoadDark,
-            this.miLoadMasterDark,
-            this.miLoadFlat});
+            this.loadCalibrationFrameToolStripMenuItem});
 			this.miTasks.Name = "miTasks";
 			this.miTasks.Size = new System.Drawing.Size(48, 20);
 			this.miTasks.Text = "&Tasks";
@@ -265,7 +263,7 @@
 			// miReduceLightCurve
 			// 
 			this.miReduceLightCurve.Name = "miReduceLightCurve";
-			this.miReduceLightCurve.Size = new System.Drawing.Size(289, 22);
+			this.miReduceLightCurve.Size = new System.Drawing.Size(244, 22);
 			this.miReduceLightCurve.Text = "&Light Curve Reduction";
 			this.miReduceLightCurve.Click += new System.EventHandler(this.miReduceLightCurve_Click);
 			this.miReduceLightCurve.MouseDown += new System.Windows.Forms.MouseEventHandler(this.miReduceLightCurve_MouseDown);
@@ -273,7 +271,7 @@
 			// miAstrometry
 			// 
 			this.miAstrometry.Name = "miAstrometry";
-			this.miAstrometry.Size = new System.Drawing.Size(289, 22);
+			this.miAstrometry.Size = new System.Drawing.Size(244, 22);
 			this.miAstrometry.Text = "&Astrometry";
 			this.miAstrometry.Click += new System.EventHandler(this.miAstrometry_Click);
 			this.miAstrometry.MouseDown += new System.Windows.Forms.MouseEventHandler(this.miAstrometry_MouseDown);
@@ -281,35 +279,14 @@
 			// miMakeDarkFlat
 			// 
 			this.miMakeDarkFlat.Name = "miMakeDarkFlat";
-			this.miMakeDarkFlat.Size = new System.Drawing.Size(289, 22);
+			this.miMakeDarkFlat.Size = new System.Drawing.Size(244, 22);
 			this.miMakeDarkFlat.Text = "Produce Dark, Flat or Bias Frame";
 			this.miMakeDarkFlat.Click += new System.EventHandler(this.miMakeDarkFlat_Click);
 			// 
 			// toolStripMenuItem3
 			// 
 			this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-			this.toolStripMenuItem3.Size = new System.Drawing.Size(286, 6);
-			// 
-			// miLoadBias
-			// 
-			this.miLoadBias.Name = "miLoadBias";
-			this.miLoadBias.Size = new System.Drawing.Size(289, 22);
-			this.miLoadBias.Text = "Load Master &Bias Frame";
-			this.miLoadBias.Click += new System.EventHandler(this.miLoadBias_Click);
-			// 
-			// miLoadDark
-			// 
-			this.miLoadDark.Name = "miLoadDark";
-			this.miLoadDark.Size = new System.Drawing.Size(289, 22);
-			this.miLoadDark.Text = "Load &Dark Frame (Same Exposure)";
-			this.miLoadDark.Click += new System.EventHandler(this.miLoadDark_Click);
-			// 
-			// miLoadFlat
-			// 
-			this.miLoadFlat.Name = "miLoadFlat";
-			this.miLoadFlat.Size = new System.Drawing.Size(289, 22);
-			this.miLoadFlat.Text = "Load Master &Flat Frame";
-			this.miLoadFlat.Click += new System.EventHandler(this.miLoadFlat_Click);
+			this.toolStripMenuItem3.Size = new System.Drawing.Size(241, 6);
 			// 
 			// miTools
 			// 
@@ -850,12 +827,44 @@
 			// 
 			this.timerCommandArgs.Tick += new System.EventHandler(this.timerCommandArgs_Tick);
 			// 
+			// loadCalibrationFrameToolStripMenuItem
+			// 
+			this.loadCalibrationFrameToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miLoadBias,
+            this.miLoadDark,
+            this.miLoadMasterDark,
+            this.miLoadFlat});
+			this.loadCalibrationFrameToolStripMenuItem.Name = "loadCalibrationFrameToolStripMenuItem";
+			this.loadCalibrationFrameToolStripMenuItem.Size = new System.Drawing.Size(244, 22);
+			this.loadCalibrationFrameToolStripMenuItem.Text = "Load &Calibration Frame";
+			// 
+			// miLoadBias
+			// 
+			this.miLoadBias.Name = "miLoadBias";
+			this.miLoadBias.Size = new System.Drawing.Size(224, 22);
+			this.miLoadBias.Text = "Master &Bias";
+			this.miLoadBias.Click += new System.EventHandler(this.miLoadBias_Click);
+			// 
 			// miLoadMasterDark
 			// 
 			this.miLoadMasterDark.Name = "miLoadMasterDark";
-			this.miLoadMasterDark.Size = new System.Drawing.Size(289, 22);
-			this.miLoadMasterDark.Text = "Load Master Dark Frame (Bias Corrected)";
+			this.miLoadMasterDark.Size = new System.Drawing.Size(224, 22);
+			this.miLoadMasterDark.Text = "&Master Dark (Bias Corrected)";
 			this.miLoadMasterDark.Click += new System.EventHandler(this.miLoadMasterDark_Click);
+			// 
+			// miLoadDark
+			// 
+			this.miLoadDark.Name = "miLoadDark";
+			this.miLoadDark.Size = new System.Drawing.Size(224, 22);
+			this.miLoadDark.Text = "&Dark (Same Exposure)";
+			this.miLoadDark.Click += new System.EventHandler(this.miLoadDark_Click);
+			// 
+			// miLoadFlat
+			// 
+			this.miLoadFlat.Name = "miLoadFlat";
+			this.miLoadFlat.Size = new System.Drawing.Size(224, 22);
+			this.miLoadFlat.Text = "Master &Flat";
+			this.miLoadFlat.Click += new System.EventHandler(this.miLoadFlat_Click);
 			// 
 			// pictureBox
 			// 
@@ -982,8 +991,6 @@
 		protected internal System.Windows.Forms.OpenFileDialog openAdvFileDialog;
 		private System.Windows.Forms.ToolStripSeparator toolStripMenuItem3;
 		protected internal System.Windows.Forms.ToolStripMenuItem miMakeDarkFlat;
-		protected internal System.Windows.Forms.ToolStripMenuItem miLoadDark;
-		protected internal System.Windows.Forms.ToolStripMenuItem miLoadFlat;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem4;
         private System.Windows.Forms.ToolStripMenuItem miShowFields;
         protected internal System.Windows.Forms.ToolStripMenuItem tsmiHueIntensity;
@@ -1001,8 +1008,11 @@
 		private System.Windows.Forms.ToolStripMenuItem miCallForContributions;
 		private System.Windows.Forms.ToolStripMenuItem miYahooGroup;
 		protected internal System.Windows.Forms.ToolStripMenuItem miAstrometry;
+		private System.Windows.Forms.ToolStripMenuItem loadCalibrationFrameToolStripMenuItem;
 		protected internal System.Windows.Forms.ToolStripMenuItem miLoadBias;
+		protected internal System.Windows.Forms.ToolStripMenuItem miLoadDark;
 		protected internal System.Windows.Forms.ToolStripMenuItem miLoadMasterDark;
+		protected internal System.Windows.Forms.ToolStripMenuItem miLoadFlat;
 	}
 }
 
