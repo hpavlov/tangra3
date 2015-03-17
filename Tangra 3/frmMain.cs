@@ -334,16 +334,21 @@ namespace Tangra
 			if (m_VideoController.HasAstroImageState)
 			{
 				m_VideoController.OverlayStateForFrame(m_VideoContext.Pixelmap.DisplayBitmap, m_CurrentFrameId);
-			}						         
+			}
 
             using (Graphics g = Graphics.FromImage(m_VideoContext.Pixelmap.DisplayBitmap))
             {
                 m_VideoController.CompleteRenderFrame(g);
-
                 g.Save();
             }
 
 			m_VideoController.ApplyDisplayModeAdjustments(m_VideoContext.Pixelmap.DisplayBitmap, true, m_VideoContext.Pixelmap);
+
+			using (Graphics g = Graphics.FromImage(m_VideoContext.Pixelmap.DisplayBitmap))
+			{
+				m_VideoController.RunCustomRenderers(g);
+				g.Save();
+			}
 		}
 
 		#endregion

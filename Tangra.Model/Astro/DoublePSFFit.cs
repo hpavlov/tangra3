@@ -527,7 +527,7 @@ namespace Tangra.Model.Astro
 				m_IStarMax2 * Math.Exp(-((x - m_X2) * (x - m_X2) + (y - m_Y2) * (y - m_Y2)) / (m_R2 * m_R2));
 		}
 
-		public void DrawGraph(System.Drawing.Graphics g, System.Drawing.Rectangle rect, int bpp, uint normVal)
+		public void DrawGraph(System.Drawing.Graphics g, System.Drawing.Rectangle rect, int bpp, uint normVal, float aperture = 0)
 		{
 			throw new NotImplementedException();
 		}

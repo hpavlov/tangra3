@@ -71,6 +71,20 @@ namespace Tangra
 			}
 		}
 
+		private void DrawPsf()
+		{
+			if (picFIT.Image != null)
+			{
+				using (Graphics g = Graphics.FromImage(picFIT.Image))
+				{
+					m_PSFFit.DrawGraph(g, new Rectangle(0, 0, picFIT.Image.Width, picFIT.Image.Height), m_Bpp, m_NormVal, (float)nudMeasuringAperture.Value);
+					g.Save();
+				}
+
+				picFIT.Invalidate();
+			}
+		}
+
 		public void ShowTargetPSF(PSFFit psfFit, int bpp, uint aav16Normval, uint[,] backgroundPixels)
 		{
 			m_PSFFit = psfFit;
@@ -81,11 +95,7 @@ namespace Tangra
 
 			if (m_PSFFit != null)
 			{
-				using (Graphics g = Graphics.FromImage(picFIT.Image))
-				{
-					m_PSFFit.DrawGraph(g, new Rectangle(0, 0, picFIT.Image.Width, picFIT.Image.Height), m_Bpp, m_NormVal);
-					g.Save();
-				}
+				DrawPsf();
 
 				int side = m_PSFFit.MatrixSize * 16;
 				picPixels.Width = side;
@@ -323,6 +333,7 @@ namespace Tangra
         private void nudMeasuringAperture_ValueChanged(object sender, EventArgs e)
         {
             MeasureCurrentPSF();
+	        DrawPsf();
         }
 
         private void cbMeaMethod_SelectedIndexChanged(object sender, EventArgs e)
@@ -330,9 +341,10 @@ namespace Tangra
             SetMeasurementMethods();
             EnsureMeasurer(2);
             MeasureCurrentPSF();
+			DrawPsf();
         }
 
-		private static Pen s_AperturePen = new Pen(Color.FromArgb(70, Color.GreenYellow.R, Color.GreenYellow.G, Color.GreenYellow.B));
+		private static Pen s_AperturePen = new Pen(Color.FromArgb(80, Color.Yellow.R, Color.Yellow.G, Color.Yellow.B));
 
 		internal void RenderOverlay(Graphics g)
 		{

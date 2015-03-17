@@ -171,9 +171,9 @@ namespace Tangra.PInvoke
 			PSFFit.DrawDataPixels(g, rect, aperture, aperturePen, bpp, normVal, this);
 		}
 
-		public void DrawGraph(System.Drawing.Graphics g, System.Drawing.Rectangle rect, int bpp, uint normVal)
+		public void DrawGraph(System.Drawing.Graphics g, System.Drawing.Rectangle rect, int bpp, uint normVal, float aperture = 0)
 		{
-			PSFFit.DrawGraph(g, rect, bpp, normVal, this, m_Saturation);
+			PSFFit.DrawGraph(g, rect, bpp, normVal, this, m_Saturation, aperture);
 		}
 	}
 

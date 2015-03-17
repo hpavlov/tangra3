@@ -47,12 +47,12 @@ namespace Tangra.Model.Astro
 		double GetResidualAt(int x, int y);
 
 		void DrawDataPixels(Graphics g, Rectangle rect, float aperture, Pen aperturePen, int bpp, uint normVal);
-		void DrawGraph(Graphics g, Rectangle rect, int bpp, uint normVal);
+		void DrawGraph(Graphics g, Rectangle rect, int bpp, uint normVal, float aperture = 0);
 	}
 
     public interface IPSFFit
     {
-		void DrawGraph(Graphics g, Rectangle rect, int bpp, uint normVal);
+		void DrawGraph(Graphics g, Rectangle rect, int bpp, uint normVal, float aperture = 0);
 		void DrawDataPixels(Graphics g, Rectangle rect, int bpp, uint normVal);
         int MatrixSize { get; }
     }
@@ -980,12 +980,12 @@ namespace Tangra.Model.Astro
 		}
 
 
-		public void DrawGraph(Graphics g, Rectangle rect, int bpp, uint normVal)
+		public void DrawGraph(Graphics g, Rectangle rect, int bpp, uint normVal, float aperture = 0)
 		{
-			DrawGraph(g, rect, bpp, normVal, this, m_Saturation);
+			DrawGraph(g, rect, bpp, normVal, this, m_Saturation, aperture);
 		}
 
-		public static void DrawGraph(Graphics g, Rectangle rect, int bpp, uint normVal, ITrackedObjectPsfFit trackedPsf, uint saturation)
+		public static void DrawGraph(Graphics g, Rectangle rect, int bpp, uint normVal, ITrackedObjectPsfFit trackedPsf, uint saturation, float aperture = 0)
         {
             float margin = 6.0f;
             double maxZ = 256;
@@ -1009,8 +1009,18 @@ namespace Tangra.Model.Astro
         	Brush bgBrush = SystemBrushes.ControlDarkDark;
 			Brush includedPointsBrush = Brushes.Yellow;
 			Brush excludedPointBrush = Brushes.Gray;
+			Brush insideApertureBrush = Brushes.GreenYellow;
 
 			g.FillRectangle(bgBrush, rect);
+
+			if (aperture > 0)
+			{
+				int x1 = (int)Math.Round(margin + (halfWidth - aperture) * xScale);
+				int x2 = (int)Math.Round(margin + (halfWidth + aperture) * xScale);
+				g.FillRectangle(
+					new SolidBrush(Color.FromArgb(60, Color.GreenYellow.R, Color.GreenYellow.G, Color.GreenYellow.B)),
+					new Rectangle(x1, (int)margin, x2 - x1, (int)(rect.Height - margin)));
+			}
 
 			if (!trackedPsf.IsSolved)
                 return;

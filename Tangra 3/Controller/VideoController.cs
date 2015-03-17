@@ -554,7 +554,10 @@ namespace Tangra.Controller
 
 	        if (m_ImageTool != null)
 		        m_ImageTool.PostDraw(g);
+        }
 
+		internal void RunCustomRenderers(Graphics g)
+		{
 			if (m_CustomOverlayRenderer != null && m_CurrentOperation == null)
 			{
 				// Run custom overlay renderers when no operation is selected
@@ -567,8 +570,7 @@ namespace Tangra.Controller
 					Trace.WriteLine(ex);
 				}
 			}
-				
-        }
+		}
 
         public bool m_ShowFields;
 
@@ -593,6 +595,7 @@ namespace Tangra.Controller
                 }
 				else if (reloadImage)
 				{
+					// NOTE: Applying pre-processing here will break the Astrometry overlays
 					m_MainForm.pictureBox.Image = m_AstroImage.Pixelmap.CreateNewDisplayBitmap();
 				}
 				else
