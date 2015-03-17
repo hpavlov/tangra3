@@ -73,7 +73,7 @@ namespace Tangra
 
 		private void DrawPsf()
 		{
-			if (picFIT.Image != null)
+            if (m_PSFFit != null && picFIT.Image != null)
 			{
 				using (Graphics g = Graphics.FromImage(picFIT.Image))
 				{
@@ -156,8 +156,33 @@ namespace Tangra
             }
             else if (cbMeaMethod.SelectedIndex == 1)
             {
+                m_BackgroundMethod = TangraConfig.BackgroundMethod.AverageBackground;
+                m_SignalMethod = TangraConfig.PhotometryReductionMethod.AperturePhotometry;            
+            }
+            else if (cbMeaMethod.SelectedIndex == 2)
+            {
+                m_BackgroundMethod = TangraConfig.BackgroundMethod.BackgroundMode;
+                m_SignalMethod = TangraConfig.PhotometryReductionMethod.AperturePhotometry;
+            }
+            else if (cbMeaMethod.SelectedIndex == 3)
+            {
                 m_BackgroundMethod = TangraConfig.BackgroundMethod.PSFBackground;
-                m_SignalMethod = TangraConfig.PhotometryReductionMethod.PsfPhotometry;            
+                m_SignalMethod = TangraConfig.PhotometryReductionMethod.PsfPhotometry;
+            }
+            else if (cbMeaMethod.SelectedIndex == 4)
+            {
+                m_BackgroundMethod = TangraConfig.BackgroundMethod.BackgroundMedian;
+                m_SignalMethod = TangraConfig.PhotometryReductionMethod.PsfPhotometry;
+            }
+            else if (cbMeaMethod.SelectedIndex == 5)
+            {
+                m_BackgroundMethod = TangraConfig.BackgroundMethod.AverageBackground;
+                m_SignalMethod = TangraConfig.PhotometryReductionMethod.PsfPhotometry;
+            }
+            else if (cbMeaMethod.SelectedIndex == 6)
+            {
+                m_BackgroundMethod = TangraConfig.BackgroundMethod.BackgroundMode;
+                m_SignalMethod = TangraConfig.PhotometryReductionMethod.PsfPhotometry;
             }
         }
 
@@ -332,16 +357,22 @@ namespace Tangra
 
         private void nudMeasuringAperture_ValueChanged(object sender, EventArgs e)
         {
-            MeasureCurrentPSF();
-	        DrawPsf();
+            if (m_PSFFit != null)
+            {
+                MeasureCurrentPSF();
+                DrawPsf();                
+            }
         }
 
         private void cbMeaMethod_SelectedIndexChanged(object sender, EventArgs e)
         {
-            SetMeasurementMethods();
-            EnsureMeasurer(2);
-            MeasureCurrentPSF();
-			DrawPsf();
+            if (m_PSFFit != null)
+            {
+                SetMeasurementMethods();
+                EnsureMeasurer(2);
+                MeasureCurrentPSF();
+                DrawPsf();
+            }
         }
 
 		private static Pen s_AperturePen = new Pen(Color.FromArgb(80, Color.Yellow.R, Color.Yellow.G, Color.Yellow.B));
