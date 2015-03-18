@@ -535,7 +535,7 @@ HRESULT BitmapSplitFieldsOSD(BYTE* bitmapPixels, long firstOsdLine, long lastOsd
 	return S_OK;
 }
 
-void GetMinMaxValuesForBpp(int bpp, int* minValue, int* maxValue)
+void GetMinMaxValuesForBpp(int bpp, unsigned long normVal, int* minValue, int* maxValue)
 {
 	*minValue = 0;
 	*maxValue = 0;
@@ -547,7 +547,7 @@ void GetMinMaxValuesForBpp(int bpp, int* minValue, int* maxValue)
 	else if (bpp == 14)
 		*maxValue = 0x3FFF;
 	else if (bpp == 16)
-		*maxValue = 0xFFFF;
+		*maxValue = normVal > 0 ? normVal : 0xFFFF;
 	else
 		*maxValue = (1 << bpp) - 1;
 }
@@ -556,7 +556,7 @@ int s_GammaTableBpp = 0;
 float s_GammaTableEncodingGamma = 1.0f;
 unsigned int* s_GammaTable = NULL;
 
-void BuildGammaTableForBpp(int bpp, float gamma)
+void BuildGammaTableForBpp(int bpp, unsigned long normVal, float gamma)
 {
 	if (s_GammaTableBpp != bpp ||
 	    ABS(s_GammaTableEncodingGamma - gamma) >= 0.01) {
@@ -568,7 +568,7 @@ void BuildGammaTableForBpp(int bpp, float gamma)
 		int minValue;
 		int maxValue;
 
-		GetMinMaxValuesForBpp(bpp, &minValue, &maxValue);
+		GetMinMaxValuesForBpp(bpp, normVal, &minValue, &maxValue);
 
 		float decodingGamma = 1.0f / gamma;
 		float gammaPixelConvCoeff = maxValue / pow(maxValue, decodingGamma);
@@ -659,10 +659,10 @@ HRESULT PreProcessingFlipRotate(unsigned long* pixels, long width, long height, 
 	return S_OK;
 }
 
-HRESULT PreProcessingStretch(unsigned long* pixels, long width, long height, int bpp, int fromValue, int toValue)
+HRESULT PreProcessingStretch(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal, int fromValue, int toValue)
 {
 	int minValue, maxValue;
-	GetMinMaxValuesForBpp(bpp, &minValue, &maxValue);
+	GetMinMaxValuesForBpp(bpp, normVal, &minValue, &maxValue);
 
 	if (fromValue < minValue) fromValue = minValue;
 	if (toValue > maxValue) toValue = maxValue;
@@ -688,10 +688,10 @@ HRESULT PreProcessingStretch(unsigned long* pixels, long width, long height, int
 	return S_OK;
 }
 
-HRESULT PreProcessingClip(unsigned long* pixels, long width, long height, int bpp, int fromValue, int toValue)
+HRESULT PreProcessingClip(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal, int fromValue, int toValue)
 {
 	int minValue, maxValue;
-	GetMinMaxValuesForBpp(bpp, &minValue, &maxValue);
+	GetMinMaxValuesForBpp(bpp, normVal, &minValue, &maxValue);
 
 	if (fromValue < minValue) fromValue = minValue;
 	if (toValue > maxValue) toValue = maxValue;
@@ -711,10 +711,10 @@ HRESULT PreProcessingClip(unsigned long* pixels, long width, long height, int bp
 	return S_OK;
 }
 
-HRESULT PreProcessingBrightnessContrast(unsigned long* pixels, long width, long height, int bpp, long brightness, long cotrast)
+HRESULT PreProcessingBrightnessContrast(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal, long brightness, long cotrast)
 {
 	int minValue, maxValue;
-	GetMinMaxValuesForBpp(bpp, &minValue, &maxValue);
+	GetMinMaxValuesForBpp(bpp, normVal, &minValue, &maxValue);
 
 	if (brightness < -255) brightness = -255;
 	if (brightness > 255) brightness = 255;
@@ -754,9 +754,9 @@ HRESULT PreProcessingBrightnessContrast(unsigned long* pixels, long width, long 
 	return S_OK;
 }
 
-HRESULT PreProcessingGamma(unsigned long* pixels, long width, long height, int bpp, float gamma)
+HRESULT PreProcessingGamma(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal, float gamma)
 {
-	BuildGammaTableForBpp(bpp, gamma);
+	BuildGammaTableForBpp(bpp, normVal, gamma);
 
 	long totalPixels = width * height;
 	unsigned long* pPixels = pixels;
@@ -770,12 +770,12 @@ HRESULT PreProcessingGamma(unsigned long* pixels, long width, long height, int b
 }
 
 HRESULT PreProcessingApplyBiasDarkFlatFrame(
-    unsigned long* pixels, long width, long height, int bpp,
+    unsigned long* pixels, long width, long height, int bpp, unsigned long normVal,
     float* biasPixels, float* darkPixels, float* flatPixels, 
 	float scienseExposure, float darkExposure, bool darkFrameIsBiasCorrected, bool isSameExposureDarkFrame, float flatMedian)
 {
 	int minValue, maxValue;
-	GetMinMaxValuesForBpp(bpp, &minValue, &maxValue);
+	GetMinMaxValuesForBpp(bpp, normVal, &minValue, &maxValue);
 
 	long totalPixels = width * height;
 	unsigned long* pPixels = pixels;
@@ -825,6 +825,10 @@ HRESULT PreProcessingApplyBiasDarkFlatFrame(
 			*pPixels = (unsigned long)(pixelValue + 0.5);
 
 		pPixels++;
+		
+		if (NULL != biasPixels) pBiasPixels++;
+		if (NULL != darkPixels) pDarkPixels++;
+		if (NULL != flatPixels) pFlatPixels++;
 	}
 
 	return S_OK;
@@ -879,14 +883,14 @@ void EnsureConvMatrixConstantsInitialized()
 	}
 }
 
-void Conv3x3(unsigned long* pixels, long width, long height, int bpp, ConvMatrix* m)
+void Conv3x3(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal, ConvMatrix* m)
 {
 	// Avoid divide by zero errors
 	if (0 == m->Factor)
 		return;
 
 	int minValue, maxValue;
-	GetMinMaxValuesForBpp(bpp, &minValue, &maxValue);
+	GetMinMaxValuesForBpp(bpp, normVal, &minValue, &maxValue);
 
 	for (int y = 0; y < height - 2; ++y) {
 		for (int x = 0; x < width - 2; ++x) {
@@ -915,9 +919,9 @@ void Conv3x3(unsigned long* pixels, long width, long height, int bpp, ConvMatrix
 	}
 }
 
-DLL_PUBLIC HRESULT PreProcessingLowPassFilter(unsigned long* pixels, long width, long height, int bpp)
+DLL_PUBLIC HRESULT PreProcessingLowPassFilter(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal)
 {
-	Conv3x3(pixels, width, height, bpp, &LOW_PASS_FILTER_MATRIX);
+	Conv3x3(pixels, width, height, bpp, normVal, &LOW_PASS_FILTER_MATRIX);
 
 	return S_OK;
 }
@@ -974,7 +978,7 @@ unsigned long GetMedianValueFromBuffer()
 	return median;
 }
 
-DLL_PUBLIC HRESULT PreProcessingLowPassDifferenceFilter(unsigned long* pixels, long width, long height, int bpp)
+DLL_PUBLIC HRESULT PreProcessingLowPassDifferenceFilter(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal)
 {
 	InitializeLowPassDifferenceFilter(width, height);
 
@@ -982,7 +986,7 @@ DLL_PUBLIC HRESULT PreProcessingLowPassDifferenceFilter(unsigned long* pixels, l
 
 	memcpy(lowPassData, pixels, width * height * sizeof(unsigned long));
 
-	Conv3x3(lowPassData, width, height, bpp, &LOW_PASS_FILTER_MATRIX);
+	Conv3x3(lowPassData, width, height, bpp, normVal, &LOW_PASS_FILTER_MATRIX);
 
 	for (int y = 0; y < height; ++y) {
 		for (int x = 0; x < width; ++x) {

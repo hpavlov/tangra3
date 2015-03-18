@@ -74,7 +74,7 @@ DLL_PUBLIC long PreProcessingGetConfig(
 	unsigned int* biasPixelsCount,
 	RotateFlipType* rotateFlipType);
 
-DLL_PUBLIC long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height, int bpp, float exposureSeconds);
+DLL_PUBLIC long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal, float exposureSeconds);
 DLL_PUBLIC long ApplyPreProcessing(unsigned long* pixels, long width, long height, int bpp, float exposureSeconds, BYTE* bitmapPixels, BYTE* bitmapBytes);
 long ApplyPreProcessingWithNormalValue(unsigned long* pixels, long width, long height, int bpp, float exposureSeconds, unsigned long normVal, BYTE* bitmapPixels, BYTE* bitmapBytes);
 

@@ -428,7 +428,7 @@ namespace Tangra.PInvoke
 
 			
 			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-            public static extern int ApplyPreProcessingPixelsOnly(uint[] pixesl, int width, int height, int bpp, float exposureSeconds);
+            public static extern int ApplyPreProcessingPixelsOnly(uint[] pixesl, int width, int height, int bpp, uint normVal, float exposureSeconds);
 
 			public static void ClearAll()
 			{

@@ -241,7 +241,7 @@ long PreProcessingAddFlatFrame(float* flatFramePixels, unsigned long pixelsCount
 
 long ApplyPreProcessingWithNormalValue(unsigned long* pixels, long width, long height, int bpp, float exposureSeconds, unsigned long normVal, BYTE* bitmapPixels, BYTE* bitmapBytes)
 {
-	long rv = ApplyPreProcessingPixelsOnly(pixels, width, height, bpp, exposureSeconds);
+	long rv = ApplyPreProcessingPixelsOnly(pixels, width, height, bpp, normVal, exposureSeconds);
 	if (!SUCCEEDED(rv)) return rv;
 
 	return GetBitmapPixels(width, height, pixels, bitmapPixels, bitmapBytes, false, bpp, normVal);
@@ -249,13 +249,13 @@ long ApplyPreProcessingWithNormalValue(unsigned long* pixels, long width, long h
 
 long ApplyPreProcessing(unsigned long* pixels, long width, long height, int bpp, float exposureSeconds, BYTE* bitmapPixels, BYTE* bitmapBytes)
 {
-	long rv = ApplyPreProcessingPixelsOnly(pixels, width, height, bpp, exposureSeconds);
+	long rv = ApplyPreProcessingPixelsOnly(pixels, width, height, bpp, 0, exposureSeconds);
 	if (!SUCCEEDED(rv)) return rv;
 
 	return GetBitmapPixels(width, height, pixels, bitmapPixels, bitmapBytes, false, bpp, 0);
 }
 
-long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height, int bpp, float exposureSeconds)
+long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal, float exposureSeconds)
 {
 	// Use the following order when applying pre-processing
 	// (1) Bias/Dark/Flat
@@ -267,7 +267,7 @@ long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height
 	if (NULL != g_BiasFramePixelsCopy || NULL != g_DarkFramePixelsCopy || NULL != g_FlatFramePixelsCopy)
 	{
 		rv = PreProcessingApplyBiasDarkFlatFrame(
-			pixels, width, height, bpp, 
+			pixels, width, height, bpp, normVal,
 			g_BiasFramePixelsCopy, g_DarkFramePixelsCopy, g_FlatFramePixelsCopy, 
 			exposureSeconds, g_DarkFrameExposure, g_DarkFrameIsBiasCorrected, g_IsSameExposureDarkFrame, g_FlatFrameMedian);
 			
@@ -282,34 +282,34 @@ long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height
 	
 	if (s_PreProcessingType == pptpStretching)
 	{
-		rv = PreProcessingStretch(pixels, width, height, bpp, g_PreProcessingFromValue, g_PreProcessingToValue);
+		rv = PreProcessingStretch(pixels, width, height, bpp, normVal, g_PreProcessingFromValue, g_PreProcessingToValue);
 		if (rv != S_OK) return rv;
 	}
 	else if (s_PreProcessingType == pptpClipping)
 	{
-		rv = PreProcessingClip(pixels, width, height, bpp, g_PreProcessingFromValue, g_PreProcessingToValue);
+		rv = PreProcessingClip(pixels, width, height, bpp, normVal, g_PreProcessingFromValue, g_PreProcessingToValue);
 		if (rv != S_OK) return rv;
 	}
 	else if (s_PreProcessingType == pptpBrightnessContrast)
 	{
-		rv = PreProcessingBrightnessContrast(pixels, width, height, bpp, g_PreProcessingBrigtness, g_PreProcessingContrast);
+		rv = PreProcessingBrightnessContrast(pixels, width, height, bpp, normVal, g_PreProcessingBrigtness, g_PreProcessingContrast);
 		if (rv != S_OK) return rv;
 	}
 
 	if (s_PreProcessingFilter == ppfLowPassFilter)
 	{
-		rv = PreProcessingLowPassFilter(pixels, width, height, bpp);
+		rv = PreProcessingLowPassFilter(pixels, width, height, bpp, normVal);
 		if (rv != S_OK) return rv;
 	}
 	else if (s_PreProcessingFilter == ppfLowPassDifferenceFilter)
 	{
-		rv = PreProcessingLowPassDifferenceFilter(pixels, width, height, bpp);
+		rv = PreProcessingLowPassDifferenceFilter(pixels, width, height, bpp, normVal);
 		if (rv != S_OK) return rv;
 	}
 	
 	if (ABS(g_EncodingGamma - 1.0f) > 0.01)
 	{
-		rv = PreProcessingGamma(pixels, width, height, bpp, g_EncodingGamma);
+		rv = PreProcessingGamma(pixels, width, height, bpp, normVal, g_EncodingGamma);
 		if (rv != S_OK) return rv;
 	}
 

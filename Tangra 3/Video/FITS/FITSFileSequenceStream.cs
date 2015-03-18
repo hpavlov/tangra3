@@ -118,7 +118,7 @@ namespace Tangra.Video.FITS
             uint[] flatPixelsCopy = new uint[pixelsFlat.Length];
             Array.Copy(pixelsFlat, flatPixelsCopy, pixelsFlat.Length);
 
-            TangraCore.PreProcessors.ApplyPreProcessingPixelsOnly(flatPixelsCopy, Width, Height, BitPix, exposure.HasValue ? (float)exposure.Value : 0);
+            TangraCore.PreProcessors.ApplyPreProcessingPixelsOnly(flatPixelsCopy, Width, Height, BitPix, 0 /* No normal value for FITS files */, exposure.HasValue ? (float)exposure.Value : 0);
 
             TangraCore.GetBitmapPixels(Width, Height, flatPixelsCopy, rawBitmapBytes, displayBitmapBytes, true, BitPix, 0);
 
