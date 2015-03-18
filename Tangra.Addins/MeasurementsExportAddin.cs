@@ -11,6 +11,16 @@ using Tangra.SDK;
 
 namespace Tangra.Addins
 {
+	public enum ExportMagType
+	{
+		Clear,
+		V,
+		R,
+		B,
+		J,
+		K
+	}
+
 	[Serializable]
 	public class MeasurementsExportAddin : MarshalByRefObject, ITangraAddinAction
 	{
@@ -89,10 +99,12 @@ namespace Tangra.Addins
 
 		internal void OnEndMultiFrameAstrometry()
 		{
+			ExportMagType type = Properties.Settings.Default.ExportMag;
+
 			if (m_MeasurementsPerStar.Count > 0)
 			{
 				var output = new StringBuilder();
-				output.Append("Star No, RA Deg (J2000), DE Deg (J2000), Catalog Mag, Average Intencity, Error, Median Intencity, Error, Average PSF Amplitude, Error, Median PSF Amplitude, Error, All Frames, Saturated Frames, Excluded Frames\r\n");
+				output.Append(string.Format("Star No, RA Deg (J2000), DE Deg (J2000), Catalog Mag ({0}), Average Intencity, Error, Median Intencity, Error, Average PSF Amplitude, Error, Median PSF Amplitude, Error, All Frames, Saturated Frames, Excluded Frames\r\n", type.ToString()));
 
 				foreach (ulong starNo in m_MeasurementsPerStar.Keys)
 				{
@@ -101,31 +113,41 @@ namespace Tangra.Addins
 					List<MeasurementInfo> mea = m_MeasurementsPerStar[starNo];
 					List<float> intensities = mea.Select(x => x.Intensity).Where(i => i > 0).ToList();
 					float average = intensities.Count > 0 ? intensities.Average() : float.NaN;
-					float averageError = intensities.Count > 0
-						? (float)Math.Sqrt(intensities.Select(x => Math.Pow(x - average, 2)).Sum() / intensities.Count - 1)
+					float averageError = intensities.Count > 1
+						? (float)Math.Sqrt(intensities.Select(x => Math.Pow(x - average, 2)).Sum() / (intensities.Count - 1))
 						: float.NaN;
 
 					float median = intensities.Count > 0 ? intensities.SortAndGetMedian() : float.NaN;
-					float medianError = intensities.Count > 0
-						? (float)Math.Sqrt(intensities.Select(x => Math.Pow(x - median, 2)).Sum() / intensities.Count - 1)
+					float medianError = intensities.Count > 1
+						? (float)Math.Sqrt(intensities.Select(x => Math.Pow(x - median, 2)).Sum() / (intensities.Count - 1))
 						: float.NaN;
 
 					List<float> amplitudes = mea.Select(x => x.PsfAmplitude).Where(i => i > 0).ToList();
 					float averageAmp = amplitudes.Count > 0 ? amplitudes.Average() : float.NaN;
-					float averageAmpError = amplitudes.Count > 0
-						? (float)Math.Sqrt(amplitudes.Select(x => Math.Pow(x - averageAmp, 2)).Sum() / amplitudes.Count - 1)
+					float averageAmpError = amplitudes.Count > 1
+						? (float)Math.Sqrt(amplitudes.Select(x => Math.Pow(x - averageAmp, 2)).Sum() / (amplitudes.Count - 1))
 						: float.NaN;
 
 					float medianAmp = amplitudes.Count > 0 ? amplitudes.SortAndGetMedian() : float.NaN;
-					float medianAmpError = amplitudes.Count > 0
-						? (float)Math.Sqrt(amplitudes.Select(x => Math.Pow(x - medianAmp, 2)).Sum() / amplitudes.Count - 1)
+					float medianAmpError = amplitudes.Count > 1
+						? (float)Math.Sqrt(amplitudes.Select(x => Math.Pow(x - medianAmp, 2)).Sum() / (amplitudes.Count - 1))
 						: float.NaN;
 
 					int allMea = mea.Count;
 					int allSaturated = mea.Count(x => x.IsSaturated);
-					int allHighRes = mea.Count(x => x.ExcludedForHighResiduals || x.Intensity == 0 || x.PsfAmplitude == -1);
+					int allHighRes = mea.Count(x => x.ExcludedForHighResiduals || Math.Abs(x.Intensity) < 0.001 || Math.Abs(x.PsfAmplitude-1) < 0.001);
 
-					output.AppendFormat("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}, {12}, {13}, {14}\r\n", starNo, catStar.RAJ2000Deg, catStar.DEJ2000Deg, catStar.Mag,
+					float exportMag;
+
+					if (type == ExportMagType.V) exportMag = catStar.MagV;
+					else if (type == ExportMagType.R) exportMag = catStar.MagR;
+					else if (type == ExportMagType.B) exportMag = catStar.MagB;
+					else if (type == ExportMagType.J) exportMag = catStar.MagJ;
+					else if (type == ExportMagType.K) exportMag = catStar.MagK;
+					else
+						exportMag = catStar.Mag;
+		
+					output.AppendFormat("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}, {12}, {13}, {14}\r\n", starNo, catStar.RAJ2000Deg, catStar.DEJ2000Deg, exportMag,
 							average, averageError, median, medianError, averageAmp, averageAmpError, medianAmp, medianAmpError, allMea, allSaturated, allHighRes);
 				}
 

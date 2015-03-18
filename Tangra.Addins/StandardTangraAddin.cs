@@ -36,7 +36,8 @@ namespace Tangra.Addins
 
 		public void Configure()
 		{
-			
+			var frm = new frmConfigureAddin();
+			frm.ShowDialog(m_Host.ParentWindow);
 		}
 
 		public string DisplayName

@@ -41,7 +41,7 @@ namespace Tangra.ImageTools
 	    private static string s_DisplayTextOSDExclude = "OSD EXCLUSION AREA";
 		private static string s_DisplayTextInclude = "INCLUSION AREA";
         
-        protected Rectangle m_UserFrame;
+        private Rectangle m_UserFrame;
         private bool m_Dragging = false;
 
         private SizerState m_State = SizerState.Normal;
@@ -54,6 +54,14 @@ namespace Tangra.ImageTools
 		public FrameSizer(VideoController videoController)
 		{
 			m_VideoController = videoController;
+		}
+
+		protected void SetUserFrame(Rectangle userFrame)
+		{
+			m_UserFrame.X = userFrame.X;
+			m_UserFrame.Y = userFrame.Y;
+			m_UserFrame.Width = userFrame.Width;
+			m_UserFrame.Height = userFrame.Height;
 		}
 
         public override ZoomImageBehaviour ZoomBehaviour
@@ -69,6 +77,7 @@ namespace Tangra.ImageTools
 			m_VideoController.SetPictureBoxCursor(Cursors.Arrow);
             m_State = SizerState.Normal;
             m_StateTransition = SizerState.Normal;
+			LimitByInclusion = false;
 
             if (m_UserFrame == Rectangle.Empty)
             {

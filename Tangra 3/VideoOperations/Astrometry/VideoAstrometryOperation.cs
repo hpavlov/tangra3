@@ -96,7 +96,7 @@ namespace Tangra.VideoOperations.Astrometry
 		private Dictionary<PSFFit, IStar> m_IdentifiedObjects = null;
 		private Dictionary<PSFFit, double> m_UnknownObjects = null;
 
-		private float m_empericalPSFR0;
+		private float m_empericalPSFR0 = float.NaN;
 		private AstroImage m_AstroImage;
 
 		private bool m_ShowStarLabels = false;
@@ -153,6 +153,7 @@ namespace Tangra.VideoOperations.Astrometry
 				m_Context = frmFieldSolve.Context;
 				m_CatalogueStars = m_Context.CatalogueStars;
 				m_ViewControl.m_CatalogueStars = m_CatalogueStars;
+				m_empericalPSFR0 = float.NaN;
 
 				AstrometryContext.Current.FieldSolveContext = m_Context;
 
@@ -204,6 +205,15 @@ namespace Tangra.VideoOperations.Astrometry
 			m_AstrometricState.MeasuringState = AstrometryInFramesState.RunningMeasurements;
 			m_ViewControl.FrameMeasurementStarted();
 
+			UpdateAddinReferences();
+
+			m_VideoController.PlayVideo(null, (uint)m_MeasurementContext.FrameInterval);
+
+			m_ViewControl.ShowMeasurementsView();
+		}
+
+		private void UpdateAddinReferences()
+		{
 			if (m_AstrometryAddins.Count > 0)
 			{
 				m_AddinsController.SetAstrometryProvider(this);
@@ -211,12 +221,7 @@ namespace Tangra.VideoOperations.Astrometry
 				foreach (ITangraAddin addin in m_AstrometryAddins)
 					addin.OnEventNotification(AddinFiredEventType.BeginMultiFrameAstrometry);
 			}
-
-			m_VideoController.PlayVideo(null, (uint)m_MeasurementContext.FrameInterval);
-
-			m_ViewControl.ShowMeasurementsView();
 		}
-
 
 		private void EnsureSwitchedToAstormetricFitView(Panel controlPanel)
 		{
@@ -533,12 +538,12 @@ namespace Tangra.VideoOperations.Astrometry
 						m_AstroImage.Pixelmap.BitPixCamera,
 						m_AstrometricFit.FitInfo,
 						m_MeasurementContext == null
-							? TangraConfig.PhotometryReductionMethod.OptimalExtraction
+							? TangraConfig.PhotometryReductionMethod.AperturePhotometry
 							: m_MeasurementContext.PhotometryReductionMethod,
 						TangraConfig.Settings.Photometry.PsfQuadrature,
 						TangraConfig.Settings.Photometry.PsfFittingMethod,
 						m_MeasurementContext == null
-							? TangraConfig.BackgroundMethod.BackgroundMode
+							? TangraConfig.BackgroundMethod.AverageBackground
 							: m_MeasurementContext.PhotometryBackgroundMethod,
 						TangraConfig.Settings.PlateSolve.UseLowPassForAstrometry
 							? TangraConfig.PreProcessingFilter.LowPassFilter
@@ -707,6 +712,8 @@ namespace Tangra.VideoOperations.Astrometry
 
 		private void ExecuteAstrometryAddins()
 		{
+			UpdateAddinReferences();
+
 			foreach (ITangraAddinAction addinAction in m_AstrometryAddinActions)
 			{
 				addinAction.Execute();

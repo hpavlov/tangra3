@@ -867,6 +867,10 @@ namespace Tangra.Video
 			{
 				TangraCore.PreProcessors.AddFlipAndRotation(RotateFlipType.RotateNoneFlipX);
 			}
+			else
+			{
+				TangraCore.PreProcessors.AddFlipAndRotation(RotateFlipType.RotateNoneFlipNone);
+			}
 		}
 	}
 }

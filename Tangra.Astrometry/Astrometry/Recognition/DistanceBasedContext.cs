@@ -2436,12 +2436,12 @@ namespace Tangra.Astrometry.Recognition
 #if ASTROMETRY_DEBUG
 						improvementLog.Fail(SolutionImprovementFailureReason.TooManyUncertainStars);
 #endif
-						Trace.WriteLine(string.Format("Failing potential fit because there are {0} out of {1} uncertain stars in the improved solultion.", uncertainStars, allPairsInTheFrame.Count));
+						Trace.WriteLine(string.Format("Failing potential fit because there are {0} out of {1} uncertain stars in the improved solution.", uncertainStars, allPairsInTheFrame.Count));
 						return false;
 					}
 
 					int excludedStars = allPairsInTheFrame.Count(p => p.FitInfo.ExcludedForHighResidual);
-					if (allPairsInTheFrame.Count - excludedStars < excludedStars)
+					if (allPairsInTheFrame.Count - excludedStars < 20 && allPairsInTheFrame.Count - excludedStars < excludedStars)
 					{
 						// Cant be right!
 #if ASTROMETRY_DEBUG
