@@ -205,22 +205,17 @@ namespace Tangra.VideoOperations.Astrometry
 			m_AstrometricState.MeasuringState = AstrometryInFramesState.RunningMeasurements;
 			m_ViewControl.FrameMeasurementStarted();
 
-			UpdateAddinReferences();
+            if (m_AstrometryAddins.Count > 0)
+            {
+                m_AddinsController.SetAstrometryProvider(this);
+
+                foreach (ITangraAddin addin in m_AstrometryAddins)
+                    addin.OnEventNotification(AddinFiredEventType.BeginMultiFrameAstrometry);
+            }
 
 			m_VideoController.PlayVideo(null, (uint)m_MeasurementContext.FrameInterval);
 
 			m_ViewControl.ShowMeasurementsView();
-		}
-
-		private void UpdateAddinReferences()
-		{
-			if (m_AstrometryAddins.Count > 0)
-			{
-				m_AddinsController.SetAstrometryProvider(this);
-
-				foreach (ITangraAddin addin in m_AstrometryAddins)
-					addin.OnEventNotification(AddinFiredEventType.BeginMultiFrameAstrometry);
-			}
 		}
 
 		private void EnsureSwitchedToAstormetricFitView(Panel controlPanel)
@@ -712,23 +707,24 @@ namespace Tangra.VideoOperations.Astrometry
 
 		private void ExecuteAstrometryAddins()
 		{
-			UpdateAddinReferences();
+		    if (m_AstrometryAddins.Count > 0)
+		    {
+		        m_AddinsController.SetAstrometryProvider(this);
 
-			foreach (ITangraAddinAction addinAction in m_AstrometryAddinActions)
-			{
-				addinAction.Execute();
-			}
+		        foreach (ITangraAddinAction addinAction in m_AstrometryAddinActions)
+		        {
+		            addinAction.Execute();
+		        }
+		    }
 		}
 
 		public void ImageToolChanged(Model.ImageTools.ImageTool newTool, Model.ImageTools.ImageTool oldTool)
 		{ }
 
-		public void PreDraw(System.Drawing.Graphics g)
-		{
-			
-		}
+		public void PreDraw(Graphics g)
+		{ }
 
-		public void PostDraw(System.Drawing.Graphics g)
+		public void PostDraw(Graphics g)
 		{
 			if (m_AstrometricState.MeasuringState == AstrometryInFramesState.Aborting)
 				return;

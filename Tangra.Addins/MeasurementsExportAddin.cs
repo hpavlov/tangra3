@@ -138,10 +138,10 @@ namespace Tangra.Addins
 					int allHighRes = mea.Count(x => x.ExcludedForHighResiduals || Math.Abs(x.Intensity) < 0.001 || Math.Abs(x.PsfAmplitude-1) < 0.001);
 
 					float exportMag;
-
-					if (type == ExportMagType.V) exportMag = catStar.MagV;
-					else if (type == ExportMagType.R) exportMag = catStar.MagR;
-					else if (type == ExportMagType.B) exportMag = catStar.MagB;
+				    var apassData = catStar as ITangraAPASSStarMagnitudes;
+                    if (type == ExportMagType.V) exportMag = apassData != null ? apassData.V : catStar.MagV;
+                    else if (type == ExportMagType.R) exportMag = apassData != null ? apassData.r : catStar.MagR;
+                    else if (type == ExportMagType.B) exportMag = apassData != null ? apassData.B : catStar.MagB;
 					else if (type == ExportMagType.J) exportMag = catStar.MagJ;
 					else if (type == ExportMagType.K) exportMag = catStar.MagK;
 					else
