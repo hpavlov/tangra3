@@ -1572,6 +1572,8 @@ namespace Tangra.Controller
 			else
 				m_LightCurveController.EnsureLightCurveFormClosed();
 
+			m_pnlControlerPanel.Controls.Clear();
+
 			try
 			{
 				m_CurrentOperation = CreateOperation<TOperation>(constructorParams);

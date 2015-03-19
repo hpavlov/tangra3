@@ -152,7 +152,9 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
 							hdr.AddValue("NAXIS1", currPixelmap.Width, null);
 							hdr.AddValue("NAXIS2", currPixelmap.Height, null);
 
-							hdr.AddValue("NOTES", string.Format("{0} generated from {1}", m_FrameType.ToString(), Path.GetFileNameWithoutExtension(m_VideoController.CurrentVideoFileName)), null);
+							string notes = string.Format("{0} generated from {1}", m_FrameType.ToString(), Path.GetFileNameWithoutExtension(m_VideoController.CurrentVideoFileName));
+							if (notes.Length > HeaderCard.MAX_VALUE_LENGTH) notes = notes.Substring(0, HeaderCard.MAX_VALUE_LENGTH);
+							hdr.AddValue("NOTES", notes, null);
 
 						    if (m_ExposureSeconds > 0)
 						    {
