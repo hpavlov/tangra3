@@ -72,6 +72,9 @@ namespace Tangra.VideoOperations.Astrometry
 			this.gbConfig = new System.Windows.Forms.GroupBox();
 			this.pnlAddins = new System.Windows.Forms.Panel();
 			this.clbAddinsToRun = new System.Windows.Forms.CheckedListBox();
+			this.label16 = new System.Windows.Forms.Label();
+			this.nudAperture = new System.Windows.Forms.NumericUpDown();
+			this.label17 = new System.Windows.Forms.Label();
 			this.pnlExportConfig.SuspendLayout();
 			this.pnlExportPhotometry.SuspendLayout();
 			this.pnlPhotometry.SuspendLayout();
@@ -87,6 +90,7 @@ namespace Tangra.VideoOperations.Astrometry
 			((System.ComponentModel.ISupportInitialize)(this.nudIntegratedFrames)).BeginInit();
 			this.gbConfig.SuspendLayout();
 			this.pnlAddins.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.nudAperture)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// btnNext
@@ -201,6 +205,9 @@ namespace Tangra.VideoOperations.Astrometry
 			// 
 			// pnlPhotometryMethods
 			// 
+			this.pnlPhotometryMethods.Controls.Add(this.label17);
+			this.pnlPhotometryMethods.Controls.Add(this.nudAperture);
+			this.pnlPhotometryMethods.Controls.Add(this.label16);
 			this.pnlPhotometryMethods.Controls.Add(this.cbxCatalogPhotometryBand);
 			this.pnlPhotometryMethods.Controls.Add(this.lblCatBand);
 			this.pnlPhotometryMethods.Controls.Add(this.label53);
@@ -212,7 +219,7 @@ namespace Tangra.VideoOperations.Astrometry
 			this.pnlPhotometryMethods.Enabled = false;
 			this.pnlPhotometryMethods.Location = new System.Drawing.Point(25, 24);
 			this.pnlPhotometryMethods.Name = "pnlPhotometryMethods";
-			this.pnlPhotometryMethods.Size = new System.Drawing.Size(343, 213);
+			this.pnlPhotometryMethods.Size = new System.Drawing.Size(343, 228);
 			this.pnlPhotometryMethods.TabIndex = 2;
 			// 
 			// cbxCatalogPhotometryBand
@@ -223,7 +230,7 @@ namespace Tangra.VideoOperations.Astrometry
             "Model Fit Magnitude (fMag)",
             "Johnson V - Computed from fMag",
             "Cousins R - Computed from fMag"});
-			this.cbxCatalogPhotometryBand.Location = new System.Drawing.Point(6, 141);
+			this.cbxCatalogPhotometryBand.Location = new System.Drawing.Point(6, 154);
 			this.cbxCatalogPhotometryBand.Name = "cbxCatalogPhotometryBand";
 			this.cbxCatalogPhotometryBand.Size = new System.Drawing.Size(247, 21);
 			this.cbxCatalogPhotometryBand.TabIndex = 40;
@@ -231,7 +238,7 @@ namespace Tangra.VideoOperations.Astrometry
 			// lblCatBand
 			// 
 			this.lblCatBand.AutoSize = true;
-			this.lblCatBand.Location = new System.Drawing.Point(3, 125);
+			this.lblCatBand.Location = new System.Drawing.Point(3, 138);
 			this.lblCatBand.Name = "lblCatBand";
 			this.lblCatBand.Size = new System.Drawing.Size(209, 13);
 			this.lblCatBand.TabIndex = 39;
@@ -240,7 +247,7 @@ namespace Tangra.VideoOperations.Astrometry
 			// label53
 			// 
 			this.label53.AutoSize = true;
-			this.label53.Location = new System.Drawing.Point(3, 170);
+			this.label53.Location = new System.Drawing.Point(3, 183);
 			this.label53.Name = "label53";
 			this.label53.Size = new System.Drawing.Size(120, 13);
 			this.label53.TabIndex = 38;
@@ -253,7 +260,7 @@ namespace Tangra.VideoOperations.Astrometry
 			this.cbxOutputMagBand.Items.AddRange(new object[] {
             "Johnson V",
             "Cousins R"});
-			this.cbxOutputMagBand.Location = new System.Drawing.Point(6, 186);
+			this.cbxOutputMagBand.Location = new System.Drawing.Point(6, 199);
 			this.cbxOutputMagBand.Name = "cbxOutputMagBand";
 			this.cbxOutputMagBand.Size = new System.Drawing.Size(140, 21);
 			this.cbxOutputMagBand.TabIndex = 37;
@@ -722,6 +729,52 @@ namespace Tangra.VideoOperations.Astrometry
 			this.clbAddinsToRun.Size = new System.Drawing.Size(372, 214);
 			this.clbAddinsToRun.TabIndex = 1;
 			// 
+			// label16
+			// 
+			this.label16.AutoSize = true;
+			this.label16.Location = new System.Drawing.Point(3, 94);
+			this.label16.Name = "label16";
+			this.label16.Size = new System.Drawing.Size(71, 13);
+			this.label16.TabIndex = 41;
+			this.label16.Text = "Aperture size:";
+			// 
+			// nudAperture
+			// 
+			this.nudAperture.DecimalPlaces = 2;
+			this.nudAperture.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+			this.nudAperture.Location = new System.Drawing.Point(76, 91);
+			this.nudAperture.Maximum = new decimal(new int[] {
+            20,
+            0,
+            0,
+            0});
+			this.nudAperture.Minimum = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+			this.nudAperture.Name = "nudAperture";
+			this.nudAperture.Size = new System.Drawing.Size(49, 20);
+			this.nudAperture.TabIndex = 42;
+			this.nudAperture.Value = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+			// 
+			// label17
+			// 
+			this.label17.AutoSize = true;
+			this.label17.Location = new System.Drawing.Point(128, 94);
+			this.label17.Name = "label17";
+			this.label17.Size = new System.Drawing.Size(20, 13);
+			this.label17.TabIndex = 43;
+			this.label17.Text = "pix";
+			// 
 			// frmRunMultiFrameMeasurements
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -763,6 +816,7 @@ namespace Tangra.VideoOperations.Astrometry
 			((System.ComponentModel.ISupportInitialize)(this.nudIntegratedFrames)).EndInit();
 			this.gbConfig.ResumeLayout(false);
 			this.pnlAddins.ResumeLayout(false);
+			((System.ComponentModel.ISupportInitialize)(this.nudAperture)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -824,6 +878,9 @@ namespace Tangra.VideoOperations.Astrometry
 		private System.Windows.Forms.Label label15;
         private System.Windows.Forms.Panel pnlAddins;
         private System.Windows.Forms.CheckedListBox clbAddinsToRun;
+		private System.Windows.Forms.Label label17;
+		private System.Windows.Forms.NumericUpDown nudAperture;
+		private System.Windows.Forms.Label label16;
 
 	}
 }

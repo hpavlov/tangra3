@@ -86,6 +86,7 @@ namespace Tangra.VideoOperations.Astrometry
 		internal int FirstFrameId { get; set; }
 		internal double FrameRate { get; set; }
 
+		internal float ApertureSize { get; set; }
 		internal bool PerformPhotometricFit { get; set; }
 		internal TangraConfig.PhotometryReductionMethod PhotometryReductionMethod { get; set; }
 		internal TangraConfig.BackgroundMethod PhotometryBackgroundMethod { get; set; }

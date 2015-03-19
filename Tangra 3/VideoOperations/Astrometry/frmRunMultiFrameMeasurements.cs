@@ -61,6 +61,20 @@ namespace Tangra.VideoOperations.Astrometry
 			SetComboboxIndexFromBackgroundMethod(TangraConfig.Settings.LastUsed.AstrometryPhotometryBackgroundMethod);
 			cbxFitMagnitudes.Checked = TangraConfig.Settings.LastUsed.AstrometryFitMagnitudes;
 
+			if (TangraConfig.Settings.Photometry.SignalApertureUnitDefault == TangraConfig.SignalApertureUnit.FWHM)
+			{
+				if (AstrometryContext.Current.CurrentPhotometricFit != null &&
+					AstrometryContext.Current.CurrentPhotometricFit.PSFGaussians.Count > 3)
+				{
+					double medianFwhm = AstrometryContext.Current.CurrentPhotometricFit.PSFGaussians.Select(x => x.FWHM).ToList().Median();
+					nudAperture.Value = (decimal)(medianFwhm * TangraConfig.Settings.Photometry.DefaultSignalAperture);
+				}
+				else
+					nudAperture.Value = 4;
+			}
+			else
+				nudAperture.Value = (decimal)TangraConfig.Settings.Photometry.DefaultSignalAperture;
+
 			cbxOutputMagBand.SelectedIndex = (int)TangraConfig.Settings.Astrometry.DefaultMagOutputBand;
             
             lblCatBand.Text = string.Format("Magnitude Band for Photometry (from {0})", m_FieldSolveContext.StarCatalogueFacade.CatalogNETCode);
@@ -232,6 +246,7 @@ namespace Tangra.VideoOperations.Astrometry
 			m_MeasurementContext.FrameInterval = ucFrameInterval.Value;
 			m_MeasurementContext.FirstFrameUtcTime = ucUtcTimePicker.DateTimeUtc;
 			m_MeasurementContext.PerformPhotometricFit = cbxFitMagnitudes.Checked;
+			m_MeasurementContext.ApertureSize = (float)nudAperture.Value;
 			m_MeasurementContext.PhotometryReductionMethod = ComboboxIndexToPhotometryReductionMethod();
 			m_MeasurementContext.PhotometryBackgroundMethod = ComboboxIndexToBackgroundMethod();
 			m_MeasurementContext.ExportCSV = cbxExport.Checked;

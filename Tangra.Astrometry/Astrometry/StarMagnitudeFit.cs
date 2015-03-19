@@ -363,6 +363,7 @@ namespace Tangra.Astrometry
 			List<IStar> catalogueStars,
             Guid magnitudeBandId,
 			float encodingGamma,
+			float? aperture,
 			ref float empericalPSFR0)
 		{
 			MeasurementsHelper measurer = new MeasurementsHelper(
@@ -463,7 +464,7 @@ namespace Tangra.Astrometry
 						photometryReductionMethod,
 						psfQuadrature,
 						psfFittingMethod,
-						(float)Aperture(record.PsfFit.FWHM),
+						aperture != null ? aperture.Value : (float)Aperture(record.PsfFit.FWHM),
 						record.PsfFit.FWHM,
 						(float)empericalFWHM,
 						new FakeIMeasuredObject(record.PsfFit), 

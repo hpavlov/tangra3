@@ -123,6 +123,7 @@ namespace Tangra.Astrometry.Analysis
 				m_Stars,
 				magnitudeBandId,
 				1.0f,
+				null,
 				ref r0);
 
 
