@@ -36,6 +36,8 @@ EXPORTS
 	PreProcessingAddFlipAndRotation
 	PreProcessingUsesPreProcessing
 	PreProcessingGetConfig	
+	PreProcessingDisable
+	PreProcessingEnable
 	
 	; Manual Preprocessing
 	PreProcessingStretch

@@ -16,6 +16,7 @@ long g_PreProcessingBrigtness;
 long g_PreProcessingContrast;
 float g_EncodingGamma;
 bool g_UsesPreProcessing = false;
+bool g_PreProcessingDisabled = false;
 
 float* g_DarkFramePixelsCopy = NULL;
 float* g_FlatFramePixelsCopy = NULL;
@@ -37,7 +38,7 @@ float ABS(float x)
 
 bool UsesPreProcessing()
 {
-	return g_UsesPreProcessing;
+	return g_UsesPreProcessing && !g_PreProcessingDisabled;
 }
 
 long PreProcessingClearAll()
@@ -84,14 +85,14 @@ long PreProcessingClearAll()
 
 long PreProcessingUsesPreProcessing(bool* usesPreProcessing)
 {
-	*usesPreProcessing = g_UsesPreProcessing;
+	*usesPreProcessing = g_UsesPreProcessing && !g_PreProcessingDisabled;
 
 	return S_OK;
 }
 
 long PreProcessingGetConfig(PreProcessingType* preProcessingType, unsigned int* fromValue, unsigned int* toValue, long* brigtness, long* contrast, PreProcessingFilter* filter, float* gamma, unsigned int* darkPixelsCount, unsigned int* flatPixelsCount, unsigned int* biasPixelsCount, RotateFlipType* rotateFlipType)
 {
-	if (g_UsesPreProcessing)
+	if (g_UsesPreProcessing && !g_PreProcessingDisabled)
 	{
 		*preProcessingType = s_PreProcessingType;
 		*rotateFlipType = g_RotateFlipType;
@@ -107,6 +108,18 @@ long PreProcessingGetConfig(PreProcessingType* preProcessingType, unsigned int* 
 		*gamma = g_EncodingGamma;
 	}
 
+	return S_OK;
+}
+
+long PreProcessingDisable()
+{
+	g_PreProcessingDisabled = true;
+	return S_OK;
+}
+
+long PreProcessingEnable()
+{
+	g_PreProcessingDisabled = false;
 	return S_OK;
 }
 

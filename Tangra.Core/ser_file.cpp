@@ -219,7 +219,7 @@ HRESULT SERGetFrame(int frameNo, unsigned long* pixels, BYTE* bitmapPixels, BYTE
 		HRESULT rv = m_SerFile->GetFrame(frameNo, pixels, cameraBitPix, frameInfo);
 
 		if (SUCCEEDED(rv)) {
-			if (g_UsesPreProcessing)
+			if (g_UsesPreProcessing && !g_PreProcessingDisabled)
 				return ApplyPreProcessingWithNormalValue(
 					pixels, 
 					m_SerFile->Width, 
@@ -269,7 +269,7 @@ HRESULT SERGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSl
 				return rv;
 			}
 
-			if (g_UsesPreProcessing) {
+			if (g_UsesPreProcessing && !g_PreProcessingDisabled) {
 				rv = ApplyPreProcessingPixelsOnly(
 					pixels, 
 					m_SerFile->Width, 
