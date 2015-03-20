@@ -353,6 +353,13 @@ namespace Tangra
                 TangraConfig.Settings.Photometry.AnnulusMinPixels,
                 TangraConfig.PhotometrySettings.REJECTION_BACKGROUND_PIXELS_STD_DEV,
                 positionTolerance);
+
+            m_Measurer.GetImagePixelsCallback += m_Measurer_GetImagePixelsCallback;
+        }
+
+        uint[,] m_Measurer_GetImagePixelsCallback(int x, int y, int matrixSize)
+        {
+            return m_VideoController.GetCurrentAstroImage(false).GetMeasurableAreaPixels(x, y, matrixSize);
         }
 
         private void nudMeasuringAperture_ValueChanged(object sender, EventArgs e)
