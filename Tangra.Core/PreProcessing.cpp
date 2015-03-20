@@ -287,7 +287,7 @@ long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height
 		if (rv != S_OK) return rv;
 	}
 
-	if (g_RotateFlipType > 0)
+	if (g_RotateFlipType > RotateNoneFlipNone)
 	{
 		rv = PreProcessingFlipRotate(pixels, width, height, bpp, g_RotateFlipType); 
 		if (rv != S_OK) return rv;

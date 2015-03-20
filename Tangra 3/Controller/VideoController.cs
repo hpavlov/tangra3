@@ -2085,7 +2085,9 @@ namespace Tangra.Controller
 
 		public void SetFlipSettings(bool flipVertically, bool flipHorizontally)
 		{
-			m_FramePlayer.SetFlipSettings(flipVertically, flipHorizontally);
+            if (m_FramePlayer.Video.BitPix > 8)
+                // NOTE: Flip/Rotate doesn't currently work when invoked via Tangra.Video.dll and is disabled for 8 bit video
+			    m_FramePlayer.SetFlipSettings(flipVertically, flipHorizontally);
 		}
 
 		public delegate void RenderOverlayCallback(Graphics g);
