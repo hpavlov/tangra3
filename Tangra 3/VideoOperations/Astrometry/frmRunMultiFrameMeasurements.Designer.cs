@@ -30,6 +30,9 @@ namespace Tangra.VideoOperations.Astrometry
 			this.pnlPhotometry = new System.Windows.Forms.Panel();
 			this.cbxFitMagnitudes = new System.Windows.Forms.CheckBox();
 			this.pnlPhotometryMethods = new System.Windows.Forms.Panel();
+			this.label17 = new System.Windows.Forms.Label();
+			this.nudAperture = new System.Windows.Forms.NumericUpDown();
+			this.label16 = new System.Windows.Forms.Label();
 			this.cbxCatalogPhotometryBand = new System.Windows.Forms.ComboBox();
 			this.lblCatBand = new System.Windows.Forms.Label();
 			this.label53 = new System.Windows.Forms.Label();
@@ -72,13 +75,11 @@ namespace Tangra.VideoOperations.Astrometry
 			this.gbConfig = new System.Windows.Forms.GroupBox();
 			this.pnlAddins = new System.Windows.Forms.Panel();
 			this.clbAddinsToRun = new System.Windows.Forms.CheckedListBox();
-			this.label16 = new System.Windows.Forms.Label();
-			this.nudAperture = new System.Windows.Forms.NumericUpDown();
-			this.label17 = new System.Windows.Forms.Label();
 			this.pnlExportConfig.SuspendLayout();
 			this.pnlExportPhotometry.SuspendLayout();
 			this.pnlPhotometry.SuspendLayout();
 			this.pnlPhotometryMethods.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.nudAperture)).BeginInit();
 			this.pnlAstrometry.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nudNumberMeasurements)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudMaxStdDev)).BeginInit();
@@ -90,7 +91,6 @@ namespace Tangra.VideoOperations.Astrometry
 			((System.ComponentModel.ISupportInitialize)(this.nudIntegratedFrames)).BeginInit();
 			this.gbConfig.SuspendLayout();
 			this.pnlAddins.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.nudAperture)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// btnNext
@@ -221,6 +221,52 @@ namespace Tangra.VideoOperations.Astrometry
 			this.pnlPhotometryMethods.Name = "pnlPhotometryMethods";
 			this.pnlPhotometryMethods.Size = new System.Drawing.Size(343, 228);
 			this.pnlPhotometryMethods.TabIndex = 2;
+			// 
+			// label17
+			// 
+			this.label17.AutoSize = true;
+			this.label17.Location = new System.Drawing.Point(128, 94);
+			this.label17.Name = "label17";
+			this.label17.Size = new System.Drawing.Size(20, 13);
+			this.label17.TabIndex = 43;
+			this.label17.Text = "pix";
+			// 
+			// nudAperture
+			// 
+			this.nudAperture.DecimalPlaces = 2;
+			this.nudAperture.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+			this.nudAperture.Location = new System.Drawing.Point(76, 91);
+			this.nudAperture.Maximum = new decimal(new int[] {
+            20,
+            0,
+            0,
+            0});
+			this.nudAperture.Minimum = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+			this.nudAperture.Name = "nudAperture";
+			this.nudAperture.Size = new System.Drawing.Size(49, 20);
+			this.nudAperture.TabIndex = 42;
+			this.nudAperture.Value = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+			// 
+			// label16
+			// 
+			this.label16.AutoSize = true;
+			this.label16.Location = new System.Drawing.Point(3, 94);
+			this.label16.Name = "label16";
+			this.label16.Size = new System.Drawing.Size(71, 13);
+			this.label16.TabIndex = 41;
+			this.label16.Text = "Aperture size:";
 			// 
 			// cbxCatalogPhotometryBand
 			// 
@@ -703,8 +749,8 @@ namespace Tangra.VideoOperations.Astrometry
 			// 
 			this.gbConfig.Controls.Add(this.pnlPhotometry);
 			this.gbConfig.Controls.Add(this.pnlAddins);
-			this.gbConfig.Controls.Add(this.pnlAstrometry);
 			this.gbConfig.Controls.Add(this.pnlTime);
+			this.gbConfig.Controls.Add(this.pnlAstrometry);
 			this.gbConfig.Location = new System.Drawing.Point(13, 13);
 			this.gbConfig.Name = "gbConfig";
 			this.gbConfig.Size = new System.Drawing.Size(441, 282);
@@ -728,52 +774,6 @@ namespace Tangra.VideoOperations.Astrometry
 			this.clbAddinsToRun.Name = "clbAddinsToRun";
 			this.clbAddinsToRun.Size = new System.Drawing.Size(372, 214);
 			this.clbAddinsToRun.TabIndex = 1;
-			// 
-			// label16
-			// 
-			this.label16.AutoSize = true;
-			this.label16.Location = new System.Drawing.Point(3, 94);
-			this.label16.Name = "label16";
-			this.label16.Size = new System.Drawing.Size(71, 13);
-			this.label16.TabIndex = 41;
-			this.label16.Text = "Aperture size:";
-			// 
-			// nudAperture
-			// 
-			this.nudAperture.DecimalPlaces = 2;
-			this.nudAperture.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            65536});
-			this.nudAperture.Location = new System.Drawing.Point(76, 91);
-			this.nudAperture.Maximum = new decimal(new int[] {
-            20,
-            0,
-            0,
-            0});
-			this.nudAperture.Minimum = new decimal(new int[] {
-            2,
-            0,
-            0,
-            0});
-			this.nudAperture.Name = "nudAperture";
-			this.nudAperture.Size = new System.Drawing.Size(49, 20);
-			this.nudAperture.TabIndex = 42;
-			this.nudAperture.Value = new decimal(new int[] {
-            2,
-            0,
-            0,
-            0});
-			// 
-			// label17
-			// 
-			this.label17.AutoSize = true;
-			this.label17.Location = new System.Drawing.Point(128, 94);
-			this.label17.Name = "label17";
-			this.label17.Size = new System.Drawing.Size(20, 13);
-			this.label17.TabIndex = 43;
-			this.label17.Text = "pix";
 			// 
 			// frmRunMultiFrameMeasurements
 			// 
@@ -801,6 +801,7 @@ namespace Tangra.VideoOperations.Astrometry
 			this.pnlPhotometry.PerformLayout();
 			this.pnlPhotometryMethods.ResumeLayout(false);
 			this.pnlPhotometryMethods.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.nudAperture)).EndInit();
 			this.pnlAstrometry.ResumeLayout(false);
 			this.pnlAstrometry.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nudNumberMeasurements)).EndInit();
@@ -816,7 +817,6 @@ namespace Tangra.VideoOperations.Astrometry
 			((System.ComponentModel.ISupportInitialize)(this.nudIntegratedFrames)).EndInit();
 			this.gbConfig.ResumeLayout(false);
 			this.pnlAddins.ResumeLayout(false);
-			((System.ComponentModel.ISupportInitialize)(this.nudAperture)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

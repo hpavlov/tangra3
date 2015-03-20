@@ -187,11 +187,13 @@ namespace Tangra.VideoOperations.Astrometry
 
 							return;
 						}
-					}					
+					}
+
+					ucFrameInterval.Recalculate();
 				}
 
 				activePage++;
-				DisplayActivePage();	
+				DisplayActivePage();
 			}
 		}
 
@@ -348,10 +350,9 @@ namespace Tangra.VideoOperations.Astrometry
 			if (TangraContext.Current.HasVideoLoaded)
 			{
 				m_MeasurementContext.MaxMeasurements = m_VideoController.VideoCountFrames / e.FrameInterval;
-				decimal oldValue = nudNumberMeasurements.Value;
 				nudNumberMeasurements.Value = nudNumberMeasurements.Minimum;
 				nudNumberMeasurements.Maximum = m_MeasurementContext.MaxMeasurements;
-				nudNumberMeasurements.Value = Math.Min(nudNumberMeasurements.Maximum, oldValue);
+				nudNumberMeasurements.Value = m_MeasurementContext.MaxMeasurements;
 			}
 		}
 

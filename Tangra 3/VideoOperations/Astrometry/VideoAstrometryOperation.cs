@@ -28,6 +28,7 @@ using Tangra.Model.VideoOperations;
 using Tangra.SDK;
 using Tangra.StarCatalogues;
 using Tangra.VideoOperations.Astrometry.Engine;
+using Tangra.PInvoke;
 
 namespace Tangra.VideoOperations.Astrometry
 {
@@ -422,9 +423,19 @@ namespace Tangra.VideoOperations.Astrometry
 					TangraConfig.Settings.Astrometry.MaximumPSFElongation,
 					TangraConfig.Settings.Astrometry.LimitReferenceStarDetection);
 
+			AstroImage noPreProcImage = astroImage;
+			TangraCore.PreProcessors.PreProcessingDisable();
+			try
+			{
+				noPreProcImage = new AstroImage(m_VideoController.GetFrame(frameNo));
+			}
+			finally
+			{
+				TangraCore.PreProcessors.PreProcessingEnable();
+			}
 			starMap.FindBestMap(
 				AstrometryContext.Current.StarMapConfig,
-				astroImage,
+				noPreProcImage,
 				AstrometryContext.Current.OSDRectToExclude,
 				AstrometryContext.Current.RectToInclude,
 				AstrometryContext.Current.LimitByInclusion,

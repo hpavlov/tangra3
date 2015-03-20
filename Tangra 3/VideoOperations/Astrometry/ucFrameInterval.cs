@@ -43,11 +43,16 @@ namespace Tangra.VideoOperations.Astrometry
 			m_Value = 1;
 		}
 
-		private void cbxEveryFrame_SelectedIndexChanged(object sender, EventArgs e)
+		internal void Recalculate()
 		{
 			m_Value = INDEX_TO_VAL_MAP[cbxEveryFrame.SelectedIndex];
 			if (FrameIntervalChanged != null)
 				FrameIntervalChanged(this, new FrameIntervalChangedEventArgs(m_Value));
+		}
+
+		private void cbxEveryFrame_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			Recalculate();
 		}
 	}
 

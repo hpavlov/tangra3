@@ -413,6 +413,12 @@ namespace Tangra.PInvoke
 			private static extern int PreProcessingAddFlipAndRotation(int rotateFlipType);
 
 			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+			public static extern int PreProcessingEnable();
+
+			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+			public static extern int PreProcessingDisable();
+
+			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
 			private static extern int PreProcessingGetConfig(
 					[In, Out] ref PreProcessingType preProcessingType,
 					[In, Out] ref ushort fromValue,
