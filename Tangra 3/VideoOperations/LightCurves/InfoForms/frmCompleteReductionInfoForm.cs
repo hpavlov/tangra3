@@ -91,7 +91,7 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 
 			lblWind.Text = m_lcFile.Footer.ReductionContext.WindOrShaking ? "Yes" : "No";
 			lblFullD.Text = m_lcFile.Footer.ReductionContext.FullDisappearance ? "Yes" : "No";
-			lblFlickering.Text = m_lcFile.Footer.ReductionContext.HighFlickering ? "Yes" : "No";
+			lblFlickering.Text = m_lcFile.Footer.ReductionContext.HighFlickeringOrLargeStars ? "Yes" : "No";
             lblFieldRotation.Text = m_lcFile.Footer.ReductionContext.FieldRotation ? "Yes" : "No";
 
 			lblIsColourVideo.Text = m_lcFile.Footer.ReductionContext.IsColourVideo ? "Yes" : "No";

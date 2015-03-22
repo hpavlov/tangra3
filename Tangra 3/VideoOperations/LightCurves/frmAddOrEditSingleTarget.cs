@@ -968,9 +968,9 @@ namespace Tangra.VideoOperations.LightCurves
 					double tolerance = 1;
 					if (m_Gaussian != null) tolerance = m_Gaussian.FWHM * TangraConfig.Settings.Special.ToleranceFWHMCoeff;
 					if (tolerance < TangraConfig.Settings.Special.ToleranceMinValueFullDisappearance) tolerance = TangraConfig.Settings.Special.ToleranceMinValueFullDisappearance;
-					if (LightCurveReductionContext.Instance.WindOrShaking && LightCurveReductionContext.Instance.HighFlickering)
+					if (LightCurveReductionContext.Instance.WindOrShaking && LightCurveReductionContext.Instance.HighFlickeringOrLargeStars)
 						tolerance = TangraConfig.Settings.Special.ToleranceTwoBadnessCoeff * tolerance;
-					else if (LightCurveReductionContext.Instance.HighFlickering || LightCurveReductionContext.Instance.HighFlickering)
+					else if (LightCurveReductionContext.Instance.HighFlickeringOrLargeStars || LightCurveReductionContext.Instance.HighFlickeringOrLargeStars)
 						tolerance = TangraConfig.Settings.Special.ToleranceOneBadnessCoeff * tolerance;
 
 					if (!LightCurveReductionContext.Instance.FullDisappearance)

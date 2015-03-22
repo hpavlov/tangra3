@@ -63,7 +63,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                 if (trackedObject.IsOccultedStar) OccultedStar = trackedObject;
              }
 
-            m_AllowedSignalFluctoation = LightCurveReductionContext.Instance.HighFlickering ? 1.90f : 1.30f;
+            m_AllowedSignalFluctoation = LightCurveReductionContext.Instance.HighFlickeringOrLargeStars ? 1.90f : 1.30f;
 
             //if this is not an aperture photometry we MUST have a PSF fit anyway so
             //       also fit objects with fixed aperture. Also not allow fixed apertures to be added
@@ -221,7 +221,8 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             PSFFit gaussian = new PSFFit((int)trackedObject.LastFrameX, (int)trackedObject.LastFrameY);
             gaussian.Fit(pixels, bestMaxFixAreaSize);
 
-            if (gaussian.Certainty < TangraConfig.Settings.Special.MinGuidingStarCertainty && trackedObject.LastKnownGoodPsfCertainty > TangraConfig.Settings.Special.GoodGuidingStarCertainty)
+            if (gaussian.Certainty < TangraConfig.Settings.Special.MinGuidingStarCertainty &&
+				(trackedObject.LastKnownGoodPsfCertainty > TangraConfig.Settings.Special.GoodGuidingStarCertainty || LightCurveReductionContext.Instance.HighFlickeringOrLargeStars))
             {
                 // We have a problem. Try to find the star in the area using other means
                 IImagePixel centroid = astroImage.GetCentroid((int)trackedObject.LastFrameX, (int)trackedObject.LastFrameY, bestMaxFixAreaSize, m_MedianValue);
@@ -301,7 +302,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                     //    catch { }
                     //}
 
-                    if (!trackedObject.HasRefinedPositions || fluckDiff < 1 || LightCurveReductionContext.Instance.HighFlickering)
+                    if (!trackedObject.HasRefinedPositions || fluckDiff < 1 || LightCurveReductionContext.Instance.HighFlickeringOrLargeStars)
                     {
                         trackedObject.PSFFit = gaussian;
                         trackedObject.ThisFrameX = (float)gaussian.XCenter;
@@ -934,7 +935,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                             double brightnessFluctoation = (obj1.RefinedOrLastSignalLevel - gaussian.IMax + gaussian.I0) / obj1.RefinedOrLastSignalLevel;
                             double fluckDiff = Math.Abs(brightnessFluctoation) / m_AllowedSignalFluctoation;
 
-                            if (fluckDiff < 1 || LightCurveReductionContext.Instance.HighFlickering)
+                            if (fluckDiff < 1 || LightCurveReductionContext.Instance.HighFlickeringOrLargeStars)
                             {
 								obj1.PSFFit = gaussian;
                                 obj1.ThisFrameX = (float) gaussian.XCenter;
@@ -1071,7 +1072,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
             if (maxResiduals.Count > 0)
             {
-                float coeff = LightCurveReductionContext.Instance.HighFlickering 
+                float coeff = LightCurveReductionContext.Instance.HighFlickeringOrLargeStars 
 					? TangraConfig.Settings.Special.BrightnessFluctoationCoefficientHighFlickering 
 					: TangraConfig.Settings.Special.BrightnessFluctoationCoefficientNoFlickering;
 

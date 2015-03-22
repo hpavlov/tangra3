@@ -170,7 +170,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                     //    catch { }
                     //}
 
-                    if (fluckDiff < 1 || LightCurveReductionContext.Instance.HighFlickering)
+                    if (fluckDiff < 1 || LightCurveReductionContext.Instance.HighFlickeringOrLargeStars)
                     {
                         OccultedStar.PSFFit = gaussian;
                         OccultedStar.ThisFrameX = (float)gaussian.XCenter;

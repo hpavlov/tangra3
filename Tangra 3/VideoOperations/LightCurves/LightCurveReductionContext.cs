@@ -47,7 +47,7 @@ namespace Tangra.VideoOperations.LightCurves
         public TangraConfig.PhotometryReductionMethod ReductionMethod;
 		public TangraConfig.PsfQuadrature PsfQuadratureMethod;
         public bool FullDisappearance;
-        public bool HighFlickering;
+        public bool HighFlickeringOrLargeStars;
         public bool WindOrShaking;
         public bool AllFaintStars;
         public bool StopOnLostTracking;
@@ -179,7 +179,7 @@ namespace Tangra.VideoOperations.LightCurves
             fileWriter.Write((int)LightCurveReductionType);
             fileWriter.Write((int)ReductionMethod);
             fileWriter.Write(FullDisappearance);
-            fileWriter.Write(HighFlickering);
+            fileWriter.Write(HighFlickeringOrLargeStars);
             fileWriter.Write(WindOrShaking);
             fileWriter.Write(AllFaintStars);
             fileWriter.Write((int)FrameIntegratingMode);
@@ -237,7 +237,7 @@ namespace Tangra.VideoOperations.LightCurves
                 instance.ReductionMethod = (TangraConfig.PhotometryReductionMethod)reader.ReadInt32();
 
                 instance.FullDisappearance = reader.ReadBoolean();
-                instance.HighFlickering = reader.ReadBoolean();
+                instance.HighFlickeringOrLargeStars = reader.ReadBoolean();
                 instance.WindOrShaking = reader.ReadBoolean();
                 instance.AllFaintStars = reader.ReadBoolean();
 

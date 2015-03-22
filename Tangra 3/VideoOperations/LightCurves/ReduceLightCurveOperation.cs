@@ -1588,7 +1588,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 			if (file.Footer.ReductionContext.FullDisappearance) UsageStats.Instance.FullDisappearanceFlag++;
 			if (file.Footer.ReductionContext.WindOrShaking) UsageStats.Instance.WindOrShakingFlag++;
-			if (file.Footer.ReductionContext.HighFlickering) UsageStats.Instance.FlickeringFlag++;
+			if (file.Footer.ReductionContext.HighFlickeringOrLargeStars) UsageStats.Instance.FlickeringFlag++;
 			if (file.Footer.ReductionContext.FieldRotation) UsageStats.Instance.FieldRotationFlag++;
 			if (file.Footer.ReductionContext.IsDriftThrough) UsageStats.Instance.DriftThroughFlag++;
 			if (file.Footer.ReductionContext.NumberFramesToIntegrate > 1) UsageStats.Instance.SoftwareIntegrationUsed++;

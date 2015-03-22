@@ -151,7 +151,7 @@ namespace Tangra.VideoOperations.LightCurves
 			LightCurveReductionContext.Instance.ReductionMethod = ComboboxIndexToPhotometryReductionMethod();
 	        LightCurveReductionContext.Instance.PsfQuadratureMethod = TangraConfig.Settings.Photometry.PsfQuadrature;
 			LightCurveReductionContext.Instance.FullDisappearance = cbxFullDisappearance.Checked;
-			LightCurveReductionContext.Instance.HighFlickering = cbxFlickering.Checked;
+			LightCurveReductionContext.Instance.HighFlickeringOrLargeStars = cbxFlickering.Checked;
 			LightCurveReductionContext.Instance.WindOrShaking = cbxShaking.Checked;
 			LightCurveReductionContext.Instance.StopOnLostTracking = cbxShaking.Checked && cbxStopOnLostTracking.Checked;
 			LightCurveReductionContext.Instance.FieldRotation = cbxFieldRotation.Checked;

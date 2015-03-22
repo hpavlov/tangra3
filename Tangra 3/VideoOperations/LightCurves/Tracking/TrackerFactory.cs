@@ -24,7 +24,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                 if (LightCurveReductionContext.Instance.WindOrShaking ||
                     LightCurveReductionContext.Instance.StopOnLostTracking ||
                     LightCurveReductionContext.Instance.IsDriftThrough ||
-                    LightCurveReductionContext.Instance.HighFlickering ||
+                    LightCurveReductionContext.Instance.HighFlickeringOrLargeStars ||
                     LightCurveReductionContext.Instance.FullDisappearance)
                 {
                     createRefiningTracker = true;
