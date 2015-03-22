@@ -31,10 +31,6 @@ namespace Tangra.VideoOperations.Astrometry
 			ucCameraSettings1.FrameWidth = frameWidth;
 			ucCameraSettings1.FrameHeight = frameHeight;
 			ucCameraSettings1.SetParentForm(this);
-
-            // NOTE: Flip/Rotate doesn't currently work when invoked via Tangra.Video.dll and is disabled for 8 bit video
-            ucCameraSettings1.cbxFlipVertically.Visible = bitPix > 8;
-            ucCameraSettings1.cbxFlipHorizontally.Visible = bitPix > 8;
 		}
 	}
 }

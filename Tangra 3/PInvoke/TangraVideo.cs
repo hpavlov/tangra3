@@ -195,16 +195,15 @@ namespace Tangra.PInvoke
 
 					if (rv == 0)
 					{
-                        byte[] displayBitmapBytes = new byte[width * height];
                         byte[] rawBitmapBytes = new byte[(width * height * 3) + 40 + 14 + 1];
 
                         Array.Copy(pixels, originalPixels, pixels.Length);
 
                         TangraCore.PreProcessors.ApplyPreProcessingPixelsOnly(pixels, width, height, 8, 0 /* No normal value for FITS files */, 0 /* No exposure support for 8 bit darks. They must be same exposure */);
 
-                        TangraCore.GetBitmapPixels(width, height, pixels, rawBitmapBytes, displayBitmapBytes, true, 8, 0);
+						TangraCore.GetBitmapPixels(width, height, pixels, rawBitmapBytes, bitmapBytes, true, 8, 0);
 
-                        videoFrame = Pixelmap.ConstructBitmapFromBitmapPixels(displayBitmapBytes, width, height);					
+						videoFrame = Pixelmap.ConstructBitmapFromBitmapPixels(bitmapBytes, width, height);
 					}
 					else
 						throw new InvalidOperationException("The core returned an error when trying to get a frame. Error code: " + rv.ToString());
@@ -278,16 +277,15 @@ namespace Tangra.PInvoke
 
                 TangraVideoGetIntegratedFrame(startFrameNo, framesToIntegrate, isSlidingIntegration, isMedianAveraging, pixels, bitmapPixels, bitmapBytes);
 
-                byte[] displayBitmapBytes = new byte[s_fileInfo.Width * s_fileInfo.Height];
                 byte[] rawBitmapBytes = new byte[(s_fileInfo.Width * s_fileInfo.Height * 3) + 40 + 14 + 1];
 
                 Array.Copy(pixels, originalPixels, pixels.Length);
 
                 TangraCore.PreProcessors.ApplyPreProcessingPixelsOnly(pixels, s_fileInfo.Width, s_fileInfo.Height, 8, 0 /* No normal value for FITS files */, 0 /* No exposure support for 8 bit darks. They must be same exposure */);
 
-                TangraCore.GetBitmapPixels(s_fileInfo.Width, s_fileInfo.Height, pixels, rawBitmapBytes, displayBitmapBytes, true, 8, 0);
+				TangraCore.GetBitmapPixels(s_fileInfo.Width, s_fileInfo.Height, pixels, rawBitmapBytes, bitmapBytes, true, 8, 0);
 
-                bitmap = Pixelmap.ConstructBitmapFromBitmapPixels(displayBitmapBytes, s_fileInfo.Width, s_fileInfo.Height);	
+				bitmap = Pixelmap.ConstructBitmapFromBitmapPixels(bitmapBytes, s_fileInfo.Width, s_fileInfo.Height);	
 			}
 			else
 			{
