@@ -982,24 +982,32 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 
 		private void btnAdd_Click(object sender, EventArgs e)
 		{
-		    if (rbTwoObjects.Checked)
-		    {
-		        if (MessageBox.Show(this,
-		                            "Double PSF-Fitting only works if the two objects do not merge and do not get too close to each other. Are the two objects going to get closer than 1 FHWM in this video?",
-		                            "Warning",
-		                            MessageBoxButtons.YesNo,
-		                            MessageBoxIcon.Warning,
-		                            MessageBoxDefaultButton.Button1) == DialogResult.Yes)
-		        {
-		            MessageBox.Show(this, "It is recommended in this case to use one single aperture around both obejcts.", "Tangra3", MessageBoxButtons.OK, MessageBoxIcon.Information);
-		            return;
-		        }
-		        CopyDoubleObjectsToAdd();
-		    }
-		    else
-		        CopyObjectToAdd();
+			if (rbTwoObjects.Checked)
+			{
+				if (m_DoubleGaussian == null)
+				{
+					MessageBox.Show(this, "Object(s) were not defined well. Please try again.", "Tangra3", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					return;
+				}
 
-		    DialogResult = DialogResult.OK;
+				if (MessageBox.Show(this,
+				                    "Double PSF-Fitting only works if the two objects do not merge and do not get too close to each other. Are the two objects going to get closer than 1 FHWM in this video?",
+				                    "Warning",
+				                    MessageBoxButtons.YesNo,
+				                    MessageBoxIcon.Warning,
+				                    MessageBoxDefaultButton.Button1) == DialogResult.Yes)
+				{
+					MessageBox.Show(this, "It is recommended in this case to use one single aperture around both obejcts.", "Tangra3", MessageBoxButtons.OK, MessageBoxIcon.Information);
+					return;
+				}
+				CopyDoubleObjectsToAdd();
+			}
+			else
+			{
+				CopyObjectToAdd();
+			}
+
+			DialogResult = DialogResult.OK;
 			Close();
 		}
 
@@ -1020,7 +1028,15 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 		private void btnDelete_Click(object sender, EventArgs e)
 		{
 			if (rbTwoObjects.Checked)
+			{
+				if (m_DoubleGaussian == null)
+				{
+					MessageBox.Show(this, "Object(s) were not defined well. Please try again.", "Tangra3", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					return;
+				}
+
 				CopyDoubleObjectsToAdd();
+			}
 			else
 				CopyObjectToAdd();
 
