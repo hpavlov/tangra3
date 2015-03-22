@@ -211,7 +211,7 @@ HRESULT SERCloseFile()
 	return S_OK;
 }
 
-HRESULT SERGetFrame(int frameNo, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, int cameraBitPix, SerLib::SerFrameInfo* frameInfo)
+HRESULT SERGetFrame(int frameNo, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapPixels, BYTE* bitmapBytes, int cameraBitPix, SerLib::SerFrameInfo* frameInfo)
 {
 	if (NULL != m_SerFile) {
 		if (cameraBitPix == 0) cameraBitPix = m_SerFile->Bpp;
@@ -219,7 +219,10 @@ HRESULT SERGetFrame(int frameNo, unsigned long* pixels, BYTE* bitmapPixels, BYTE
 		HRESULT rv = m_SerFile->GetFrame(frameNo, pixels, cameraBitPix, frameInfo);
 
 		if (SUCCEEDED(rv)) {
-			if (g_UsesPreProcessing && !g_PreProcessingDisabled)
+			if (g_UsesPreProcessing)
+			{
+				memcpy(originalPixels, pixels, m_SerFile->Width * m_SerFile->Height * sizeof(unsigned long));
+				
 				return ApplyPreProcessingWithNormalValue(
 					pixels, 
 					m_SerFile->Width, 
@@ -228,7 +231,8 @@ HRESULT SERGetFrame(int frameNo, unsigned long* pixels, BYTE* bitmapPixels, BYTE
 					0 /* Not Supported */, 
 					m_SerFile->NormalisationValue, 
 					bitmapPixels, 
-					bitmapBytes);
+					bitmapBytes);					
+			}
 			else
 				return GetBitmapPixels(
 				           m_SerFile->Width,
@@ -247,7 +251,7 @@ HRESULT SERGetFrame(int frameNo, unsigned long* pixels, BYTE* bitmapPixels, BYTE
 	return E_FAIL;
 }
 
-HRESULT SERGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, BYTE* bitmapBytes, BYTE* bitmapDisplayBytes, int cameraBitPix, SerLib::SerFrameInfo* frameInfo)
+HRESULT SERGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapBytes, BYTE* bitmapDisplayBytes, int cameraBitPix, SerLib::SerFrameInfo* frameInfo)
 {
 	if (NULL != m_SerFile) {
 		HRESULT rv;
@@ -269,7 +273,10 @@ HRESULT SERGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSl
 				return rv;
 			}
 
-			if (g_UsesPreProcessing && !g_PreProcessingDisabled) {
+			if (g_UsesPreProcessing) 
+			{
+				memcpy(originalPixels, pixels, m_SerFile->Width * m_SerFile->Height * sizeof(unsigned long));
+			
 				rv = ApplyPreProcessingPixelsOnly(
 					pixels, 
 					m_SerFile->Width, 

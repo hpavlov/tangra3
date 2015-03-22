@@ -127,8 +127,6 @@ HRESULT OpenAviFile(const char* fileName, VideoFileInfo* fileInfo)
 
 HRESULT TangraVideoOpenFile(const char* fileName, VideoFileInfo* fileInfo)
 {
-	bool usesPreProcessing = TangraCore::UsesPreProcessing();
-
 	HRESULT rv = E_FAIL;
 
 	if (g_SelectedEngine == 0)

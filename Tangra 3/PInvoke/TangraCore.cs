@@ -316,12 +316,12 @@ namespace Tangra.PInvoke
 		public static extern int ADVCloseFile();
 				
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-		//HRESULT ADVGetFrame(int frameNo, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, AdvLib::AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError);
-		public static extern int ADVGetFrame(int frameNo, [In, Out] uint[] pixels, [In, Out] byte[] bitmapBytes, [In, Out] byte[] bitmapDisplayBytes, [In, Out] AdvFrameInfoNative frameInfo, [In, Out] byte[] gpsFix, [In, Out] byte[] userCommand, [In, Out] byte[] systemError);
+        //HRESULT ADVGetFrame(int frameNo, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapPixels, BYTE* bitmapBytes, AdvLib::AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError);
+        public static extern int ADVGetFrame(int frameNo, [In, Out] uint[] pixels, [In, Out] uint[] originalPixels, [In, Out] byte[] bitmapBytes, [In, Out] byte[] bitmapDisplayBytes, [In, Out] AdvFrameInfoNative frameInfo, [In, Out] byte[] gpsFix, [In, Out] byte[] userCommand, [In, Out] byte[] systemError);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-		//HRESULT ADVGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, BYTE* bitmapBytes, BYTE* bitmapDisplayBytes, AdvLib::AdvFrameInfo* frameInfo);
-		public static extern int ADVGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, [Out] uint[] pixels, [Out] byte[] bitmapBytes, [Out] byte[] bitmapDisplayBytes, [In, Out] AdvFrameInfoNative frameInfo);
+        //HRESULT ADVGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapBytes, BYTE* bitmapDisplayBytes, AdvLib::AdvFrameInfo* frameInfo);
+        public static extern int ADVGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, [Out] uint[] pixels, [In, Out] uint[] originalPixels, [Out] byte[] bitmapBytes, [Out] byte[] bitmapDisplayBytes, [In, Out] AdvFrameInfoNative frameInfo);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
 		//HRESULT ADVGetFrameStatusChannel(int frameNo, AdvLib::AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError);
@@ -358,12 +358,12 @@ namespace Tangra.PInvoke
 		public static extern int SERCloseFile();
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-		//HRESULT SERGetFrame(int frameNo, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, SerLib::SerFrameInfo* frameInfo);
-		public static extern int SERGetFrame(int frameNo, [In, Out] uint[] pixels, [In, Out] byte[] bitmapBytes, [In, Out] byte[] bitmapDisplayBytes, int cameraBitPix, [In, Out] ref SerNativeFrameInfo frameInfo);
+        //HRESULT SERGetFrame(int frameNo, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapPixels, BYTE* bitmapBytes, SerLib::SerFrameInfo* frameInfo);
+        public static extern int SERGetFrame(int frameNo, [In, Out] uint[] pixels, [In, Out] uint[] originalPixels, [In, Out] byte[] bitmapBytes, [In, Out] byte[] bitmapDisplayBytes, int cameraBitPix, [In, Out] ref SerNativeFrameInfo frameInfo);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-		//HRESULT SERGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, BYTE* bitmapBytes, BYTE* bitmapDisplayBytes, AdvLib::AdvFrameInfo* frameInfo);
-		public static extern int SERGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, [Out] uint[] pixels, [Out] byte[] bitmapBytes, [Out] byte[] bitmapDisplayBytes, int cameraBitPix, [In, Out] ref SerNativeFrameInfo frameInfo);
+        //HRESULT SERGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapBytes, BYTE* bitmapDisplayBytes, AdvLib::AdvFrameInfo* frameInfo);
+        public static extern int SERGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, [Out] uint[] pixels, [In, Out] uint[] originalPixels, [Out] byte[] bitmapBytes, [Out] byte[] bitmapDisplayBytes, int cameraBitPix, [In, Out] ref SerNativeFrameInfo frameInfo);
 
 
 		public static string GetTangraCoreVersion()
@@ -413,12 +413,6 @@ namespace Tangra.PInvoke
 			private static extern int PreProcessingAddFlipAndRotation(int rotateFlipType);
 
 			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-			public static extern int PreProcessingEnable();
-
-			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-			public static extern int PreProcessingDisable();
-
-			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
 			private static extern int PreProcessingGetConfig(
 					[In, Out] ref PreProcessingType preProcessingType,
 					[In, Out] ref ushort fromValue,
@@ -431,8 +425,7 @@ namespace Tangra.PInvoke
 					[In, Out] ref ushort flatPixelsCount,
                     [In, Out] ref ushort biasPixelsCount,
 					[In, Out] ref RotateFlipType rotateFlipType);
-
-			
+		
 			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
             public static extern int ApplyPreProcessingPixelsOnly(uint[] pixesl, int width, int height, int bpp, uint normVal, float exposureSeconds);
 
@@ -440,6 +433,13 @@ namespace Tangra.PInvoke
 			{
 				PreProcessingClearAll();
 			}
+
+            public static bool UsesPreProcessing()
+            {
+                bool usesPreProcessing = false;
+                PreProcessingUsesPreProcessing(ref usesPreProcessing);
+                return usesPreProcessing;
+            }
 
 			public static void AddStretching(ushort fromValue, ushort toValue)
 			{

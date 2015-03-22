@@ -423,19 +423,21 @@ namespace Tangra.VideoOperations.Astrometry
 					TangraConfig.Settings.Astrometry.MaximumPSFElongation,
 					TangraConfig.Settings.Astrometry.LimitReferenceStarDetection);
 
-			AstroImage noPreProcImage = astroImage;
-			TangraCore.PreProcessors.PreProcessingDisable();
-			try
-			{
-				noPreProcImage = new AstroImage(m_VideoController.GetFrame(frameNo));
-			}
-			finally
-			{
-				TangraCore.PreProcessors.PreProcessingEnable();
-			}
+		    AstroImage noPreProcImage = astroImage;
+
+            if (TangraCore.PreProcessors.UsesPreProcessing())
+            {
+                // Make sure we are using the unprocessed pixels to build the starmap for astrometry
+                Pixelmap unprocessPixelmap = new Pixelmap(astroImage.Pixelmap.Width, astroImage.Pixelmap.Height,
+                                                          astroImage.Pixelmap.BitPixCamera, astroImage.Pixelmap.UnprocessedPixels,
+                                                          null, null);
+                unprocessPixelmap.SetMaxSignalValue(astroImage.Pixelmap.MaxSignalValue);
+                noPreProcImage = new AstroImage(unprocessPixelmap);                
+            }
+
 			starMap.FindBestMap(
 				AstrometryContext.Current.StarMapConfig,
-				noPreProcImage,
+                noPreProcImage,
 				AstrometryContext.Current.OSDRectToExclude,
 				AstrometryContext.Current.RectToInclude,
 				AstrometryContext.Current.LimitByInclusion,

@@ -1083,9 +1083,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <None Include="Service References\TangraService\ErrorReports1.wsdl" />
-    <None Include="WindowsFiles\app.config">
-      <SubType>Designer</SubType>
-    </None>
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -1106,12 +1103,6 @@
     </Content>
     <None Include="Service References\TangraService\ErrorReports1.disco" />
     <Content Include="TODO-List.txt" />
-    <Content Include="WindowsFiles\TangraCore.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="WindowsFiles\TangraVideo.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <None Include="img\stop24.bmp" />
     <None Include="img\play24.bmp" />
     <Content Include="tangra-big.ico" />

@@ -134,15 +134,20 @@ HRESULT ADVGetFramePixels(int frameNo, unsigned long* pixels, AdvLib::AdvFrameIn
 	return E_FAIL;
 }
 
-HRESULT ADVGetFrame(int frameNo, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, AdvLib::AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError)
+HRESULT ADVGetFrame(int frameNo, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapPixels, BYTE* bitmapBytes, AdvLib::AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError)
 {
 	HRESULT rv = ADVGetFramePixels(frameNo, pixels, frameInfo, gpsFix, userCommand, systemError);
 	if (SUCCEEDED(rv))
 	{
-		if (g_UsesPreProcessing && !g_PreProcessingDisabled) 
+		if (g_UsesPreProcessing) 
+		{
+			memcpy(originalPixels, pixels, g_TangraAdvFile->ImageSection->Width * g_TangraAdvFile->ImageSection->Height * sizeof(unsigned long));
+			
 			return ApplyPreProcessingWithNormalValue(
 				pixels, g_TangraAdvFile->ImageSection->Width, g_TangraAdvFile->ImageSection->Height, g_TangraAdvFile->ImageSection->DataBpp, frameInfo->Exposure10thMs / 10000.0,
 				g_TangraAdvFile->ImageSection->NormalisationValue, bitmapPixels, bitmapBytes);
+				
+		}
 		else
 			return GetBitmapPixels(
 				g_TangraAdvFile->ImageSection->Width, 
@@ -165,7 +170,7 @@ HRESULT ADVGetFrameStatusChannel(int frameNo, AdvLib::AdvFrameInfo* frameInfo, c
 	return S_OK;
 }
 
-HRESULT ADVGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, BYTE* bitmapBytes, BYTE* bitmapDisplayBytes, AdvLib::AdvFrameInfo* frameInfo)
+HRESULT ADVGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapBytes, BYTE* bitmapDisplayBytes, AdvLib::AdvFrameInfo* frameInfo)
 {
 	HRESULT rv;
 	int firstFrameToIntegrate = IntegrationManagerGetFirstFrameToIntegrate(startFrameNo, framesToIntegrate, isSlidingIntegration);
@@ -191,8 +196,10 @@ HRESULT ADVGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSl
 			return rv;
 		}
 
-		if (g_UsesPreProcessing && !g_PreProcessingDisabled)
+		if (g_UsesPreProcessing)
 		{
+			memcpy(originalPixels, pixels, g_TangraAdvFile->ImageSection->Width * g_TangraAdvFile->ImageSection->Height * sizeof(unsigned long));
+			
 			rv = ApplyPreProcessingPixelsOnly(
 				pixels, 
 				g_TangraAdvFile->ImageSection->Width, 
@@ -238,10 +245,10 @@ HRESULT ADVGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSl
 	return GetBitmapPixels(g_TangraAdvFile->ImageSection->Width, g_TangraAdvFile->ImageSection->Height, pixels, bitmapBytes, bitmapDisplayBytes, false, g_TangraAdvFile->ImageSection->DataBpp, g_TangraAdvFile->ImageSection->NormalisationValue);
 }
 
-HRESULT ADVGetFrame2(int frameNo, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
+HRESULT ADVGetFrame2(int frameNo, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
 {
 	AdvLib::AdvFrameInfo* frameInfo = new AdvLib::AdvFrameInfo();
-	ADVGetFrame(frameNo, pixels, bitmapPixels, bitmapBytes, frameInfo, NULL, NULL, NULL);
+	ADVGetFrame(frameNo, pixels, originalPixels, bitmapPixels, bitmapBytes, frameInfo, NULL, NULL, NULL);
 	delete frameInfo;
 
 	return S_OK;

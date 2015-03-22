@@ -103,9 +103,6 @@ HRESULT AviFileGetStreamInfo(PAVISTREAM paviStream, AVISTREAMINFO* streamInfo, B
 
 
 		HRESULT rv = TangraCore::GetPixelMapBits(pDIB, &width, &height, s_AviImageSize, pixels, bitmapPixels, bitmapBytes);
-	
-		if (TangraCore::UsesPreProcessing() && SUCCEEDED(rv)) 
-			rv = TangraCore::ApplyPreProcessing(pixels, width, height, 8, bitmapPixels, bitmapBytes);
 
 		return rv;
 	}
@@ -116,9 +113,6 @@ HRESULT AviFileGetStreamInfo(PAVISTREAM paviStream, AVISTREAMINFO* streamInfo, B
 		BYTE* pDIB = (BYTE*) AVIStreamGetFrame(frameObject, frameNo);
 
 		HRESULT rv = TangraCore::GetPixelMapPixelsOnly(pDIB, s_AviImageWidth, s_AviImageHeight, pixels);
-
-		if (TangraCore::UsesPreProcessing() && SUCCEEDED(rv)) 
-			rv = TangraCore::ApplyPreProcessingPixelsOnly(pixels, s_AviImageWidth, s_AviImageHeight, 8);
 
 		return rv;
 	}

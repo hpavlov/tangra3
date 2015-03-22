@@ -21,6 +21,7 @@ namespace Tangra.Model.Image
         private byte[] m_DisplayBitmapPixels;
 
 		public FrameStateData FrameState;
+	    public uint[] UnprocessedPixels;
 
         public Pixelmap(int width, int height, int bitPix, uint[] pixels, Bitmap bmp, byte[] displayBitmapBytes)
 		{
@@ -57,6 +58,7 @@ namespace Tangra.Model.Image
 			BitPixCamera = cloneFrom.m_BitPix;
 			m_Pixels = cloneFrom.m_Pixels;			
 			m_DisplayBitmapPixels = cloneFrom.m_DisplayBitmapPixels;
+		    m_MaxSignalValue = cloneFrom.m_MaxSignalValue;
 			try
 			{
 				m_Bitmap = cloneFrom.DisplayBitmap != null ? (Bitmap) cloneFrom.DisplayBitmap.Clone() : null;

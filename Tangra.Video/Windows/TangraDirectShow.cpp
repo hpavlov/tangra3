@@ -192,9 +192,6 @@ HRESULT TangraDirectShow::DirectShowGetFrame(long frameNo, unsigned long* pixels
 		if (SUCCEEDED(hr))
 		{
 			hr = TangraCore::GetPixelMapBits((BYTE*)(m_pBuffer), &m_Width, &m_Height, 0, pixels, bitmapPixels, bitmapBytes);
-
-			if (TangraCore::UsesPreProcessing() && SUCCEEDED(hr))
-				hr = TangraCore::ApplyPreProcessing(pixels, m_Width, m_Height, 8, bitmapPixels, bitmapBytes);
 		}
 		else
 		{
@@ -233,9 +230,6 @@ HRESULT TangraDirectShow::DirectShowGetFramePixels(long frameNo, unsigned long* 
 		if (SUCCEEDED(hr))
 		{
 			hr = TangraCore::GetPixelMapPixelsOnly((BYTE*)(m_pBuffer), m_Width, m_Height, pixels);
-
-			if (TangraCore::UsesPreProcessing() && SUCCEEDED(hr)) 
-				hr = TangraCore::ApplyPreProcessingPixelsOnly(pixels, m_Width, m_Height, 8);
 		}
 		else
 		{

@@ -152,12 +152,13 @@ namespace Tangra.Video.SER
 				throw new ApplicationException("Invalid frame position: " + index);
 
 			uint[] pixels = new uint[Width * Height];
+            uint[] unprocessedPixels = new uint[Width * Height];
 			byte[] displayBitmapBytes = new byte[Width * Height];
 			byte[] rawBitmapBytes = new byte[(Width * Height * 3) + 40 + 14 + 1];
 
 			var frameInfo = new SerNativeFrameInfo();
 
-			TangraCore.SERGetFrame(index, pixels, rawBitmapBytes, displayBitmapBytes, BitPix, ref frameInfo);
+            TangraCore.SERGetFrame(index, pixels, unprocessedPixels, rawBitmapBytes, displayBitmapBytes, BitPix, ref frameInfo);
 
 			m_CurrentFrameInfo = new SerFrameInfo(frameInfo);
 
@@ -176,7 +177,7 @@ namespace Tangra.Video.SER
 				}
 
 				var rv = new Pixelmap(Width, Height, BitPix, pixels, displayBitmap, displayBitmapBytes);
-
+			    rv.UnprocessedPixels = unprocessedPixels;
 				rv.FrameState = new FrameStateData()
 				{
 					SystemTime = m_CurrentFrameInfo.TimeStamp
@@ -209,11 +210,12 @@ namespace Tangra.Video.SER
 			int actualFramesToIntegrate = Math.Min(startFrameNo + framesToIntegrate, LastFrame - 1) - startFrameNo;
 
 			uint[] pixels = new uint[Width * Height];
+            uint[] unprocessedPixels = new uint[Width * Height];
 			byte[] displayBitmapBytes = new byte[Width * Height];
 			byte[] rawBitmapBytes = new byte[(Width * Height * 3) + 40 + 14 + 1];
 			var frameInfo = new SerNativeFrameInfo();
 
-			TangraCore.SERGetIntegratedFrame(startFrameNo, actualFramesToIntegrate, isSlidingIntegration, isMedianAveraging, pixels, rawBitmapBytes, displayBitmapBytes, BitPix, ref frameInfo);
+            TangraCore.SERGetIntegratedFrame(startFrameNo, actualFramesToIntegrate, isSlidingIntegration, isMedianAveraging, pixels, unprocessedPixels, rawBitmapBytes, displayBitmapBytes, BitPix, ref frameInfo);
 
 			m_CurrentFrameInfo = new SerFrameInfo(frameInfo);
 
@@ -222,7 +224,7 @@ namespace Tangra.Video.SER
 				Bitmap displayBitmap = (Bitmap)Bitmap.FromStream(memStr);
 
 				var rv = new Pixelmap(Width, Height, BitPix, pixels, displayBitmap, displayBitmapBytes);
-
+                rv.UnprocessedPixels = unprocessedPixels;
 				rv.FrameState = new FrameStateData()
 				{
 					SystemTime = m_CurrentFrameInfo.TimeStamp

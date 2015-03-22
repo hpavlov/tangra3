@@ -26,7 +26,7 @@ namespace TangraCore
 	HRESULT GetPixelMapPixelsOnly(BYTE* pDIB, long width, long height, unsigned long* pixels);
 
 	long ApplyPreProcessing(unsigned long* pixels, long width, long height, int bpp, BYTE* bitmapPixels, BYTE* bitmapBytes);
-	long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height, int bpp);
+	long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height, int bpp, float exposureSeconds);
 	bool UsesPreProcessing();
 }
 

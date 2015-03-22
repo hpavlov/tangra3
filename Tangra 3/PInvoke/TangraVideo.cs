@@ -90,16 +90,16 @@ namespace Tangra.PInvoke
 		private static extern int TangraVideoCloseFile();
 
 		[DllImport(LIBRARY_TANGRA_VIDEO, CallingConvention = CallingConvention.Cdecl)]
-		//HRESULT TangraVideoGetFrame(long frameNo, unsigned long* pixels, unsigned char* bitmapPixels, unsigned char* bitmapBytes);
-		private static extern int TangraVideoGetFrame(int frameNo, [Out] uint[] pixels, [Out] byte[] bitmapPixels, [Out] byte[] bitmapBytes);
+        //HRESULT TangraVideoGetFrame(long frameNo, unsigned long* pixels, unsigned char* bitmapPixels, unsigned char* bitmapBytes);
+        private static extern int TangraVideoGetFrame(int frameNo, [Out] uint[] pixels, [Out] byte[] bitmapPixels, [Out] byte[] bitmapBytes);
 
 		[DllImport(LIBRARY_TANGRA_VIDEO, CallingConvention = CallingConvention.Cdecl)]
-		//HRESULT TangraVideoGetFramePixels(long frameNo, unsigned long* pixels);
-		private static extern int TangraVideoGetFramePixels(int frameNo, uint[] pixels);
+        //HRESULT TangraVideoGetFramePixels(long frameNo, unsigned long* pixels);
+        private static extern int TangraVideoGetFramePixels(int frameNo, uint[] pixels);
 
 		[DllImport(LIBRARY_TANGRA_VIDEO, CallingConvention = CallingConvention.Cdecl)]
-		//HRESULT TangraVideoGetIntegratedFrame(long startFrameNo, long framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, unsigned char* bitmapPixels, unsigned char* bitmapBytes);
-		private static extern int TangraVideoGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, uint[] pixels, byte[] bitmapPixels, byte[] bitmapBytes);
+        //HRESULT TangraVideoGetIntegratedFrame(long startFrameNo, long framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, unsigned char* bitmapPixels, unsigned char* bitmapBytes);
+        private static extern int TangraVideoGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, uint[] pixels, byte[] bitmapPixels, byte[] bitmapBytes);
 
         [DllImport(LIBRARY_TANGRA_VIDEO, CallingConvention = CallingConvention.Cdecl)]
         private static extern int TangraCreateNewAviFile([MarshalAs(UnmanagedType.LPStr)]string fileName, int width, int height, int bpp, double fps, bool showCompressionDialog);
@@ -176,13 +176,16 @@ namespace Tangra.PInvoke
 
 		private static Font s_ErrorFont = new Font(FontFamily.GenericMonospace, 10, FontStyle.Regular);
 
-        public static void GetFrame(int frameNo, out uint[] pixels, out Bitmap videoFrame, out byte[] bitmapBytes)
-		{
+        public static void GetFrame(int frameNo, out uint[] pixels, out uint[] originalPixels, out Bitmap videoFrame, out byte[] bitmapBytes)
+        {
+            originalPixels = null;
+
 			if (s_fileInfo != null)
 			{
 				int width = s_fileInfo.Width;
 				int height = s_fileInfo.Height;
 				pixels = new uint[width * height];
+                originalPixels = new uint[width * height];
 				byte[] bitmapPixels = new byte[width * height * 3 + 40 + 14 + 1];
 				bitmapBytes = new byte[width * height];
 				int rv = -1;
@@ -192,10 +195,16 @@ namespace Tangra.PInvoke
 
 					if (rv == 0)
 					{
-						using (MemoryStream memStr = new MemoryStream(bitmapPixels))
-						{
-							videoFrame = (Bitmap)Bitmap.FromStream(memStr);
-						}						
+                        byte[] displayBitmapBytes = new byte[width * height];
+                        byte[] rawBitmapBytes = new byte[(width * height * 3) + 40 + 14 + 1];
+
+                        Array.Copy(pixels, originalPixels, pixels.Length);
+
+                        TangraCore.PreProcessors.ApplyPreProcessingPixelsOnly(pixels, width, height, 8, 0 /* No normal value for FITS files */, 0 /* No exposure support for 8 bit darks. They must be same exposure */);
+
+                        TangraCore.GetBitmapPixels(width, height, pixels, rawBitmapBytes, displayBitmapBytes, true, 8, 0);
+
+                        videoFrame = Pixelmap.ConstructBitmapFromBitmapPixels(displayBitmapBytes, width, height);					
 					}
 					else
 						throw new InvalidOperationException("The core returned an error when trying to get a frame. Error code: " + rv.ToString());
@@ -238,34 +247,47 @@ namespace Tangra.PInvoke
 			}
 		}
 
-		public static void GetFramePixels(int frameNo, out uint[] pixels)
+        public static void GetFramePixels(int frameNo, out uint[] pixels, out uint[] originalPixels)
 		{
 			if (s_fileInfo != null)
 			{
 				pixels = new uint[s_fileInfo.Width * s_fileInfo.Height];
+                originalPixels = new uint[s_fileInfo.Width * s_fileInfo.Height];
+                TangraVideoGetFramePixels(frameNo, pixels);
 
-				TangraVideoGetFramePixels(frameNo, pixels);
+                Array.Copy(pixels, originalPixels, pixels.Length);
+
+                TangraCore.PreProcessors.ApplyPreProcessingPixelsOnly(pixels, s_fileInfo.Width, s_fileInfo.Height, 8, 0 /* No normal value for FITS files */, 0 /* No exposure support for 8 bit darks. They must be same exposure */);
+
 			}
 			else
 			{
                 pixels = new uint[100 * 100];
+                originalPixels = new uint[100 * 100];
 			}	
 		}
 
-		public static void GetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, out uint[] pixels, out Bitmap bitmap, out byte[] bitmapBytes)
-		{
-			if (s_fileInfo != null)
+        public static void GetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, out uint[] pixels, out uint[] originalPixels, out Bitmap bitmap, out byte[] bitmapBytes)
+        {
+             if (s_fileInfo != null)
 			{
+                originalPixels = new uint[s_fileInfo.Width * s_fileInfo.Height];
 				pixels = new uint[s_fileInfo.Width * s_fileInfo.Height];
 				byte[] bitmapPixels = new byte[s_fileInfo.Width * s_fileInfo.Height * 3 + 40 + 14 + 1];
 				bitmapBytes = new byte[s_fileInfo.Width * s_fileInfo.Height];
 
-				TangraVideoGetIntegratedFrame(startFrameNo, framesToIntegrate, isSlidingIntegration, isMedianAveraging, pixels, bitmapPixels, bitmapBytes);
+                TangraVideoGetIntegratedFrame(startFrameNo, framesToIntegrate, isSlidingIntegration, isMedianAveraging, pixels, bitmapPixels, bitmapBytes);
 
-				using (MemoryStream memStr = new MemoryStream(bitmapPixels))
-				{
-					bitmap = (Bitmap)Bitmap.FromStream(memStr);
-				}
+                byte[] displayBitmapBytes = new byte[s_fileInfo.Width * s_fileInfo.Height];
+                byte[] rawBitmapBytes = new byte[(s_fileInfo.Width * s_fileInfo.Height * 3) + 40 + 14 + 1];
+
+                Array.Copy(pixels, originalPixels, pixels.Length);
+
+                TangraCore.PreProcessors.ApplyPreProcessingPixelsOnly(pixels, s_fileInfo.Width, s_fileInfo.Height, 8, 0 /* No normal value for FITS files */, 0 /* No exposure support for 8 bit darks. They must be same exposure */);
+
+                TangraCore.GetBitmapPixels(s_fileInfo.Width, s_fileInfo.Height, pixels, rawBitmapBytes, displayBitmapBytes, true, 8, 0);
+
+                bitmap = Pixelmap.ConstructBitmapFromBitmapPixels(displayBitmapBytes, s_fileInfo.Width, s_fileInfo.Height);	
 			}
 			else
 			{
@@ -279,6 +301,7 @@ namespace Tangra.PInvoke
 
                 bitmapBytes = new byte[100 * 100];
                 pixels = new uint[100 * 100];
+                originalPixels = new uint[100 * 100];
 			}
 		}
 

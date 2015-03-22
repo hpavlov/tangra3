@@ -94,8 +94,8 @@ extern "C"
 
 DLL_PUBLIC HRESULT SEROpenFile(char* fileName, SerLib::SerFileInfo* fileInfo, char* observer, char* instrument, char* telescope, bool checkMagic);
 DLL_PUBLIC HRESULT SERCloseFile();
-DLL_PUBLIC HRESULT SERGetFrame(int frameNo, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, int cameraBitPix, SerLib::SerFrameInfo* frameInfo);		
-DLL_PUBLIC HRESULT SERGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, BYTE* bitmapBytes, BYTE* bitmapDisplayBytes, int cameraBitPix, SerLib::SerFrameInfo* frameInfo);
+DLL_PUBLIC HRESULT SERGetFrame(int frameNo, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapPixels, BYTE* bitmapBytes, int cameraBitPix, SerLib::SerFrameInfo* frameInfo);		
+DLL_PUBLIC HRESULT SERGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapBytes, BYTE* bitmapDisplayBytes, int cameraBitPix, SerLib::SerFrameInfo* frameInfo);
 		
 #ifdef __cplusplus
 } // __cplusplus defined.

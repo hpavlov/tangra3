@@ -263,6 +263,7 @@ namespace Tangra.Video
 				throw new ApplicationException("Invalid frame position: " + index);
 
 			uint[] pixels = new uint[m_Width * m_Height];
+            uint[] unprocessedPixels = new uint[m_Width * m_Height];
 			byte[] displayBitmapBytes = new byte[m_Width * m_Height];
 			byte[] rawBitmapBytes = new byte[(m_Width * m_Height * 3) + 40 + 14 + 1];
 			var frameInfo = new AdvFrameInfoNative();
@@ -271,7 +272,7 @@ namespace Tangra.Video
 			byte[] userCommand = new byte[256 * 16];
 			byte[] systemError = new byte[256 * 16];
 
-			TangraCore.ADVGetFrame(index, pixels, rawBitmapBytes, displayBitmapBytes, frameInfo, gpsFix, userCommand, systemError);
+            TangraCore.ADVGetFrame(index, pixels, unprocessedPixels, rawBitmapBytes, displayBitmapBytes, frameInfo, gpsFix, userCommand, systemError);
 
 			m_CurrentFrameInfo = new AdvFrameInfo(frameInfo);
 			m_CurrentFrameInfo.UserCommandString = AdvFrameInfo.GetStringFromBytes(userCommand);
@@ -309,6 +310,7 @@ namespace Tangra.Video
                 var rv = new Pixelmap(m_Width, m_Height, m_BitPix, pixels, displayBitmap, displayBitmapBytes);
 			    rv.SetMaxSignalValue(m_Aav16NormVal);
  				rv.FrameState = GetCurrentFrameState(index);
+			    rv.UnprocessedPixels = unprocessedPixels;
 				return rv;
 			}
 		}
@@ -518,11 +520,12 @@ namespace Tangra.Video
 			int actualFramesToIntegrate = Math.Min(startFrameNo + framesToIntegrate, m_FirstFrame + m_CountFrames - 1) - startFrameNo;
 
 			uint[] pixels = new uint[m_Width * m_Height];
+            uint[] unprocessedPixels = new uint[m_Width * m_Height];
 			byte[] displayBitmapBytes = new byte[m_Width * m_Height];
 			byte[] rawBitmapBytes = new byte[(m_Width * m_Height * 3) + 40 + 14 + 1];
 			var frameInfo = new AdvFrameInfoNative();
 
-			TangraCore.ADVGetIntegratedFrame(startFrameNo, actualFramesToIntegrate, isSlidingIntegration, isMedianAveraging, pixels, rawBitmapBytes, displayBitmapBytes, frameInfo);
+            TangraCore.ADVGetIntegratedFrame(startFrameNo, actualFramesToIntegrate, isSlidingIntegration, isMedianAveraging, pixels, unprocessedPixels, rawBitmapBytes, displayBitmapBytes, frameInfo);
 
 			m_CurrentFrameInfo = new AdvFrameInfo(frameInfo);
 
@@ -532,6 +535,7 @@ namespace Tangra.Video
 
                 var rv =  new Pixelmap(m_Width, m_Height, m_BitPix, pixels, displayBitmap, displayBitmapBytes);
                 rv.SetMaxSignalValue(m_Aav16NormVal);
+                rv.UnprocessedPixels = unprocessedPixels;
 			    return rv;
 			}
 		}

@@ -141,11 +141,14 @@ namespace Tangra.Video
 			if (index > LastFrame) index = LastFrame;
 
 			uint[] pixels;
+            uint[] originalPixels;
 			Bitmap videoFrame;
 		    byte[] bitmapBytes;
-            TangraVideo.GetFrame(index, out pixels, out videoFrame, out bitmapBytes);
+            TangraVideo.GetFrame(index, out pixels, out originalPixels, out videoFrame, out bitmapBytes);
 
-            return new Pixelmap(Width, Height, 8, pixels, videoFrame, bitmapBytes);
+            var rv = new Pixelmap(Width, Height, 8, pixels, videoFrame, bitmapBytes);
+		    rv.UnprocessedPixels = originalPixels;
+		    return rv;
 		}
 
 		public int RecommendedBufferSize
@@ -169,12 +172,15 @@ namespace Tangra.Video
 			if (startFrameNo > LastFrame) startFrameNo = LastFrame;
 
 			uint[] pixels;
+            uint[] originalPixels;
 			Bitmap videoFrame;
 			byte[] bitmapBytes;
 
-			TangraVideo.GetIntegratedFrame(startFrameNo, framesToIntegrate, isSlidingIntegration, isMedianAveraging, out pixels, out videoFrame, out bitmapBytes);
+			TangraVideo.GetIntegratedFrame(startFrameNo, framesToIntegrate, isSlidingIntegration, isMedianAveraging, out pixels, out originalPixels, out videoFrame, out bitmapBytes);
 
-			return new Pixelmap(Width, Height, 8, pixels, videoFrame, bitmapBytes);
+			var rv = new Pixelmap(Width, Height, 8, pixels, videoFrame, bitmapBytes);
+		    rv.UnprocessedPixels = originalPixels;
+		    return rv;
 		}
 
 		public string Engine
