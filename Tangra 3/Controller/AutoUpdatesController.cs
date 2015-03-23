@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -40,6 +41,15 @@ namespace Tangra.Controller
 			{
 				m_MainFrom.pnlNewVersionAvailable.Visible = true;
 				m_ShowNegativeResultMessage = false;
+				m_MainFrom.pnlNewVersionAvailable.Text = "New version of Tangra is available. Click here to upgrade.";
+				m_MainFrom.pnlNewVersionAvailable.LinkColor = Color.Lime;
+			}
+			else if (eventCode == MSG_ID_NEW_TANGRA3_ADDIN_UPDATE_AVAILABLE)
+			{
+				m_MainFrom.pnlNewVersionAvailable.Visible = true;
+				m_MainFrom.pnlNewVersionAvailable.Text = "New add-in version is available. Click here to upgrade.";
+				m_MainFrom.pnlNewVersionAvailable.LinkColor = Color.Cyan;
+				m_ShowNegativeResultMessage = false;
 			}
 			else if (eventCode == MSG_ID_NO_TANGRA3_UPDATES_AVAILABLE)
 			{
@@ -62,6 +72,7 @@ namespace Tangra.Controller
 
 		private byte MSG_ID_NEW_TANGRA3_UPDATE_AVAILABLE = 13;
 		private byte MSG_ID_NO_TANGRA3_UPDATES_AVAILABLE = 14;
+		private byte MSG_ID_NEW_TANGRA3_ADDIN_UPDATE_AVAILABLE = 15;
 
 		public void CheckForUpdates(bool manualCheck)
 		{
@@ -86,14 +97,22 @@ namespace Tangra.Controller
 				m_LastUpdateTime = DateTime.Now;
 
 				int serverConfigVersion;
-				if (NewUpdatesAvailable(out serverConfigVersion) != null)
+				NewUpdateState updateState = NewUpdatesAvailable(out serverConfigVersion);
+				if (updateState == NewUpdateState.TangraUpdate)
 				{
 					Trace.WriteLine("There is a new update.", "Update");
 					m_MainFrom.Invoke(new OnUpdateEventDelegate(OnUpdateEvent), MSG_ID_NEW_TANGRA3_UPDATE_AVAILABLE);
 				}
+				if (updateState == NewUpdateState.AddinModuleUpdate)
+				{
+					Trace.WriteLine("There is a new add-in update.", "Update");
+					m_MainFrom.Invoke(new OnUpdateEventDelegate(OnUpdateEvent), MSG_ID_NEW_TANGRA3_ADDIN_UPDATE_AVAILABLE);
+				}
 				else
 				{
-					Trace.WriteLine(string.Format("There are no new {0}updates.", TangraConfig.Settings.Generic.AcceptBetaUpdates ? "beta " : ""), "Update");
+					Trace.WriteLine(
+						string.Format("There are no new {0}updates.", TangraConfig.Settings.Generic.AcceptBetaUpdates ? "beta " : ""),
+						"Update");
 					m_MainFrom.Invoke(new OnUpdateEventDelegate(OnUpdateEvent), MSG_ID_NO_TANGRA3_UPDATES_AVAILABLE);
 				}
 
@@ -268,8 +287,16 @@ namespace Tangra.Controller
 
 		private string tangra3UpdateServerVersion;
 
-		public XmlNode NewUpdatesAvailable(out int configUpdateVersion)
+		public enum NewUpdateState
 		{
+			NoNewUpdate,
+			TangraUpdate,
+			AddinModuleUpdate
+		}
+
+		public NewUpdateState NewUpdatesAvailable(out int configUpdateVersion)
+		{
+			NewUpdateState rv = NewUpdateState.NoNewUpdate;
 			configUpdateVersion = -1;
 			Uri updateUri = new Uri(UpdatesXmlFileLocation);
 
@@ -334,6 +361,8 @@ namespace Tangra.Controller
 
 							latestVersion = Version;
 							latestVersionNode = updateNode;
+
+							rv = NewUpdateState.TangraUpdate;
 #endif
                         }
 					}
@@ -342,9 +371,13 @@ namespace Tangra.Controller
 					foreach (XmlNode updateNode in xmlDoc.SelectNodes("/Tangra3/ModuleUpdate[@MustExist = 'false']"))
 					{
 						if (updateNode.Attributes["Version"] == null) continue;
+						bool mustExist = updateNode.Attributes["MustExist"].Value == "true";
+						bool isAddin = updateNode.Attributes["IsAddin"].Value == "true";
 
 						int Version = int.Parse(updateNode.Attributes["Version"].Value);
 						latestVersion = CurrentlyInstalledModuleVersion(updateNode.Attributes["File"].Value);
+
+						if (mustExist && latestVersion == 0) continue;
 
 						if (latestVersion < Version)
 						{
@@ -364,6 +397,8 @@ namespace Tangra.Controller
 
 							latestVersion = Version;
 							latestVersionNode = updateNode;
+							rv = isAddin ? NewUpdateState.AddinModuleUpdate : NewUpdateState.TangraUpdate;
+							break;
 						}
 					}
 
@@ -377,8 +412,6 @@ namespace Tangra.Controller
 						}
 					}
 #endif
-
-                    return latestVersionNode;
 				}
 			}
 			finally
@@ -388,7 +421,7 @@ namespace Tangra.Controller
 					response.Close();
 			}
 
-			return null;
+			return rv;
 		}
 
 		private int CurrentlyInstalledTangra3Version()
