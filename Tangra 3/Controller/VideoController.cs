@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 using Tangra.Helpers;
 using Tangra.Video.FITS;
@@ -2099,5 +2100,19 @@ namespace Tangra.Controller
 		{
 			m_CustomOverlayRenderer = null;
 		}
+
+        internal void ShutdownVideo()
+        {
+            if (m_FramePlayer.IsRunning)
+            {
+                m_FramePlayer.Stop();
+                int counter = 0;
+                while (m_FramePlayer.IsRunning && counter < 20)
+                {
+                    Thread.Sleep(50);
+                    counter++;
+                }
+            }
+        }
 	}
 }

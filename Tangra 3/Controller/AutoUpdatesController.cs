@@ -368,11 +368,11 @@ namespace Tangra.Controller
 					}
 
 #if WIN32
-					foreach (XmlNode updateNode in xmlDoc.SelectNodes("/Tangra3/ModuleUpdate[@MustExist = 'false']"))
+					foreach (XmlNode updateNode in xmlDoc.SelectNodes("/Tangra3/ModuleUpdate"))
 					{
 						if (updateNode.Attributes["Version"] == null) continue;
-						bool mustExist = updateNode.Attributes["MustExist"].Value == "true";
-						bool isAddin = updateNode.Attributes["IsAddin"].Value == "true";
+                        bool mustExist = updateNode.Attributes["MustExist"] != null && updateNode.Attributes["MustExist"].Value == "true";
+						bool isAddin = updateNode.Attributes["IsAddin"] != null && updateNode.Attributes["IsAddin"].Value == "true";
 
 						int Version = int.Parse(updateNode.Attributes["Version"].Value);
 						latestVersion = CurrentlyInstalledModuleVersion(updateNode.Attributes["File"].Value);
@@ -481,33 +481,43 @@ namespace Tangra.Controller
 
 		private int CurrentlyInstalledModuleVersion(string moduleFileName)
 		{
+            AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += CurrentDomain_ReflectionOnlyAssemblyResolve;
 			try
 			{
-				string modulePath = Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory + "\\" + moduleFileName);
-				if (File.Exists(modulePath))
-				{
-					Assembly asm = Assembly.ReflectionOnlyLoadFrom(modulePath);
+			    string modulePath = Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory + "\\" + moduleFileName);
+			    if (File.Exists(modulePath))
+			    {
+			        Assembly asm = Assembly.ReflectionOnlyLoadFrom(modulePath);
 
-					IList<CustomAttributeData> atts = CustomAttributeData.GetCustomAttributes(asm);
-					foreach (CustomAttributeData cad in atts)
-					{
-						if (cad.Constructor.DeclaringType.FullName == "System.Reflection.AssemblyFileVersionAttribute")
-						{
-							string currVersionString = (string)cad.ConstructorArguments[0].Value;
-							return VersionStringToVersion(currVersionString);
-						}
-					}
-				}
-				else
-					return 0;
+			        IList<CustomAttributeData> atts = CustomAttributeData.GetCustomAttributes(asm);
+			        foreach (CustomAttributeData cad in atts)
+			        {
+			            if (cad.Constructor.DeclaringType.FullName == "System.Reflection.AssemblyFileVersionAttribute")
+			            {
+			                string currVersionString = (string) cad.ConstructorArguments[0].Value;
+			                return VersionStringToVersion(currVersionString);
+			            }
+			        }
+			    }
+			    else
+			        return 0;
 			}
 			catch (Exception ex)
 			{
-				Trace.WriteLine(ex.ToString());
+			    Trace.WriteLine(ex.ToString());
+			}
+			finally
+			{
+                AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve -= CurrentDomain_ReflectionOnlyAssemblyResolve;
 			}
 
 			return 1000000;
 		}
+
+        Assembly CurrentDomain_ReflectionOnlyAssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            return Assembly.ReflectionOnlyLoad(args.Name);
+        }
 
 		private string UpdateLocation
 		{

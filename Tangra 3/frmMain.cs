@@ -972,6 +972,7 @@ namespace Tangra
 
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
+            m_VideoController.ShutdownVideo();
             m_AddinsController.FinaliseAddins();
         }
 

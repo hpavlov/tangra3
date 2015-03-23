@@ -508,23 +508,26 @@ namespace Tangra.Video
 
 		private void BufferNonIntegratedFrame(int nextFrameIdToBuffer)
 		{
-			Pixelmap bmp = m_IsRunning && !m_StopRequestReceived ? m_VideoStream.GetPixelmap(nextFrameIdToBuffer) : null;
+            if (m_IsRunning && !m_StopRequestReceived)
+            {
+                Pixelmap bmp = m_VideoStream.GetPixelmap(nextFrameIdToBuffer);
 
-			if (bmp != null)
-			{
-				lock (m_FrameBitmapLock)
+                if (bmp != null) 
 				{
-					var bufferedFrame = new BufferedFrame()
-					{
-						FrameNo = nextFrameIdToBuffer,
-						FirstFrameInIntegrationPeriod = nextFrameIdToBuffer,
-						Image = bmp,
-                        FrameFileName = m_VideoStream.SupportsFrameFileNames ? m_VideoStream.GetFrameFileName(nextFrameIdToBuffer) : null
-					};
+                    lock (m_FrameBitmapLock)
+                    {
+					    var bufferedFrame = new BufferedFrame()
+					    {
+						    FrameNo = nextFrameIdToBuffer,
+						    FirstFrameInIntegrationPeriod = nextFrameIdToBuffer,
+						    Image = bmp,
+                            FrameFileName = m_VideoStream.SupportsFrameFileNames ? m_VideoStream.GetFrameFileName(nextFrameIdToBuffer) : null
+					    };
 
-					m_FramesBufferQueue.Enqueue(bufferedFrame);
-				}
-			}
+					    m_FramesBufferQueue.Enqueue(bufferedFrame);
+                    }
+				}                
+            }
 		}
 
 		private Pixelmap ProduceRunningAverageIntegratedFrame(int firstFrameNoToIntegrate)
