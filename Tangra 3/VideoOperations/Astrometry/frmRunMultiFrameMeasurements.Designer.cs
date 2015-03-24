@@ -30,6 +30,10 @@ namespace Tangra.VideoOperations.Astrometry
 			this.pnlPhotometry = new System.Windows.Forms.Panel();
 			this.cbxFitMagnitudes = new System.Windows.Forms.CheckBox();
 			this.pnlPhotometryMethods = new System.Windows.Forms.Panel();
+			this.nudAnnulus = new System.Windows.Forms.NumericUpDown();
+			this.label18 = new System.Windows.Forms.Label();
+			this.nudGap = new System.Windows.Forms.NumericUpDown();
+			this.pboxAperturePreview = new System.Windows.Forms.PictureBox();
 			this.label17 = new System.Windows.Forms.Label();
 			this.nudAperture = new System.Windows.Forms.NumericUpDown();
 			this.label16 = new System.Windows.Forms.Label();
@@ -81,6 +85,9 @@ namespace Tangra.VideoOperations.Astrometry
 			this.pnlExportPhotometry.SuspendLayout();
 			this.pnlPhotometry.SuspendLayout();
 			this.pnlPhotometryMethods.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.nudAnnulus)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudGap)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.pboxAperturePreview)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudAperture)).BeginInit();
 			this.pnlAstrometry.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nudNumberMeasurements)).BeginInit();
@@ -207,6 +214,10 @@ namespace Tangra.VideoOperations.Astrometry
 			// 
 			// pnlPhotometryMethods
 			// 
+			this.pnlPhotometryMethods.Controls.Add(this.nudAnnulus);
+			this.pnlPhotometryMethods.Controls.Add(this.label18);
+			this.pnlPhotometryMethods.Controls.Add(this.nudGap);
+			this.pnlPhotometryMethods.Controls.Add(this.pboxAperturePreview);
 			this.pnlPhotometryMethods.Controls.Add(this.label17);
 			this.pnlPhotometryMethods.Controls.Add(this.nudAperture);
 			this.pnlPhotometryMethods.Controls.Add(this.label16);
@@ -219,19 +230,95 @@ namespace Tangra.VideoOperations.Astrometry
 			this.pnlPhotometryMethods.Controls.Add(this.cbxReductionType);
 			this.pnlPhotometryMethods.Controls.Add(this.cbxBackgroundMethod);
 			this.pnlPhotometryMethods.Enabled = false;
-			this.pnlPhotometryMethods.Location = new System.Drawing.Point(25, 24);
+			this.pnlPhotometryMethods.Location = new System.Drawing.Point(25, 26);
 			this.pnlPhotometryMethods.Name = "pnlPhotometryMethods";
-			this.pnlPhotometryMethods.Size = new System.Drawing.Size(343, 228);
+			this.pnlPhotometryMethods.Size = new System.Drawing.Size(377, 226);
 			this.pnlPhotometryMethods.TabIndex = 2;
+			// 
+			// nudAnnulus
+			// 
+			this.nudAnnulus.DecimalPlaces = 2;
+			this.nudAnnulus.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+			this.nudAnnulus.Location = new System.Drawing.Point(296, 93);
+			this.nudAnnulus.Maximum = new decimal(new int[] {
+            20,
+            0,
+            0,
+            0});
+			this.nudAnnulus.Minimum = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+			this.nudAnnulus.Name = "nudAnnulus";
+			this.nudAnnulus.Size = new System.Drawing.Size(49, 20);
+			this.nudAnnulus.TabIndex = 47;
+			this.nudAnnulus.Value = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+			this.nudAnnulus.ValueChanged += new System.EventHandler(this.AnnulusSizeChanged);
+			// 
+			// label18
+			// 
+			this.label18.AutoSize = true;
+			this.label18.Location = new System.Drawing.Point(229, 96);
+			this.label18.Name = "label18";
+			this.label18.Size = new System.Drawing.Size(69, 13);
+			this.label18.TabIndex = 46;
+			this.label18.Text = "pix, annulus: ";
+			// 
+			// nudGap
+			// 
+			this.nudGap.DecimalPlaces = 2;
+			this.nudGap.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+			this.nudGap.Location = new System.Drawing.Point(174, 93);
+			this.nudGap.Maximum = new decimal(new int[] {
+            20,
+            0,
+            0,
+            0});
+			this.nudGap.Minimum = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+			this.nudGap.Name = "nudGap";
+			this.nudGap.Size = new System.Drawing.Size(49, 20);
+			this.nudGap.TabIndex = 45;
+			this.nudGap.Value = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+			this.nudGap.ValueChanged += new System.EventHandler(this.AnnulusSizeChanged);
+			// 
+			// pboxAperturePreview
+			// 
+			this.pboxAperturePreview.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.pboxAperturePreview.Location = new System.Drawing.Point(260, 1);
+			this.pboxAperturePreview.Name = "pboxAperturePreview";
+			this.pboxAperturePreview.Size = new System.Drawing.Size(85, 85);
+			this.pboxAperturePreview.TabIndex = 44;
+			this.pboxAperturePreview.TabStop = false;
 			// 
 			// label17
 			// 
 			this.label17.AutoSize = true;
-			this.label17.Location = new System.Drawing.Point(128, 94);
+			this.label17.Location = new System.Drawing.Point(128, 96);
 			this.label17.Name = "label17";
-			this.label17.Size = new System.Drawing.Size(20, 13);
+			this.label17.Size = new System.Drawing.Size(50, 13);
 			this.label17.TabIndex = 43;
-			this.label17.Text = "pix";
+			this.label17.Text = "pix, gap: ";
 			// 
 			// nudAperture
 			// 
@@ -241,9 +328,9 @@ namespace Tangra.VideoOperations.Astrometry
             0,
             0,
             65536});
-			this.nudAperture.Location = new System.Drawing.Point(76, 91);
+			this.nudAperture.Location = new System.Drawing.Point(76, 93);
 			this.nudAperture.Maximum = new decimal(new int[] {
-            20,
+            30,
             0,
             0,
             0});
@@ -260,11 +347,12 @@ namespace Tangra.VideoOperations.Astrometry
             0,
             0,
             0});
+			this.nudAperture.ValueChanged += new System.EventHandler(this.nudAperture_ValueChanged);
 			// 
 			// label16
 			// 
 			this.label16.AutoSize = true;
-			this.label16.Location = new System.Drawing.Point(3, 94);
+			this.label16.Location = new System.Drawing.Point(3, 96);
 			this.label16.Name = "label16";
 			this.label16.Size = new System.Drawing.Size(71, 13);
 			this.label16.TabIndex = 41;
@@ -774,10 +862,10 @@ namespace Tangra.VideoOperations.Astrometry
 			// 
 			// gbConfig
 			// 
-			this.gbConfig.Controls.Add(this.pnlTime);
 			this.gbConfig.Controls.Add(this.pnlPhotometry);
-			this.gbConfig.Controls.Add(this.pnlAddins);
+			this.gbConfig.Controls.Add(this.pnlTime);
 			this.gbConfig.Controls.Add(this.pnlAstrometry);
+			this.gbConfig.Controls.Add(this.pnlAddins);
 			this.gbConfig.Location = new System.Drawing.Point(13, 13);
 			this.gbConfig.Name = "gbConfig";
 			this.gbConfig.Size = new System.Drawing.Size(441, 282);
@@ -828,6 +916,9 @@ namespace Tangra.VideoOperations.Astrometry
 			this.pnlPhotometry.PerformLayout();
 			this.pnlPhotometryMethods.ResumeLayout(false);
 			this.pnlPhotometryMethods.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.nudAnnulus)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudGap)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.pboxAperturePreview)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudAperture)).EndInit();
 			this.pnlAstrometry.ResumeLayout(false);
 			this.pnlAstrometry.PerformLayout();
@@ -910,6 +1001,10 @@ namespace Tangra.VideoOperations.Astrometry
 		private System.Windows.Forms.Label label16;
 		private System.Windows.Forms.ComboBox cbxInstDelayCamera;
 		private System.Windows.Forms.ComboBox cbxInstDelayMode;
+		private System.Windows.Forms.NumericUpDown nudAnnulus;
+		private System.Windows.Forms.Label label18;
+		private System.Windows.Forms.NumericUpDown nudGap;
+		private System.Windows.Forms.PictureBox pboxAperturePreview;
 
 	}
 }

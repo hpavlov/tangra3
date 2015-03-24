@@ -562,6 +562,8 @@ namespace Tangra.VideoOperations.Astrometry
 							: m_MeasurementContext.PhotometryCatalogBandId,
 						TangraConfig.Settings.Photometry.EncodingGamma,
 						m_MeasurementContext != null ? m_MeasurementContext.ApertureSize : (float?)null,
+						m_MeasurementContext != null ? m_MeasurementContext.AnnulusInnerRadius : (float?)null,
+						m_MeasurementContext != null ? m_MeasurementContext.AnnulusMinPixels : (int?)null,
 						ref m_empericalPSFR0);
 
 #if PROFILING

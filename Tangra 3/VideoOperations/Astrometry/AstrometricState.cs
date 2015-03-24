@@ -87,6 +87,9 @@ namespace Tangra.VideoOperations.Astrometry
 		internal double FrameRate { get; set; }
 
 		internal float ApertureSize { get; set; }
+		internal float AnnulusInnerRadius { get; set; }
+		internal int AnnulusMinPixels { get; set; }
+
 		internal bool PerformPhotometricFit { get; set; }
 		internal TangraConfig.PhotometryReductionMethod PhotometryReductionMethod { get; set; }
 		internal TangraConfig.BackgroundMethod PhotometryBackgroundMethod { get; set; }

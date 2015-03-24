@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -16,6 +17,7 @@ using Tangra.Controller;
 using Tangra.Helpers;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
+using Tangra.Model.Image;
 using Tangra.SDK;
 using Tangra.StarCatalogues;
 using Tangra.Video;
@@ -39,6 +41,8 @@ namespace Tangra.VideoOperations.Astrometry
             out List<ITangraAddinAction> astrometryAddinActions, out List<ITangraAddin> astrometryAddins)
 		{
 			InitializeComponent();
+
+			pboxAperturePreview.Image = new Bitmap(pboxAperturePreview.Width, pboxAperturePreview.Height, PixelFormat.Format24bppRgb);
 
 			m_VideoController = videoController;
 	        m_AddinsController = addinsController;
@@ -256,7 +260,11 @@ namespace Tangra.VideoOperations.Astrometry
 			m_MeasurementContext.FrameInterval = ucFrameInterval.Value;
 			m_MeasurementContext.FirstFrameUtcTime = ucUtcTimePicker.DateTimeUtc;
 			m_MeasurementContext.PerformPhotometricFit = cbxFitMagnitudes.Checked;
+			
 			m_MeasurementContext.ApertureSize = (float)nudAperture.Value;
+			m_MeasurementContext.AnnulusInnerRadius = ((float)nudGap.Value + (float)nudAperture.Value) / (float)nudAperture.Value;
+			m_MeasurementContext.AnnulusMinPixels = (int)(Math.PI * (Math.Pow((float)nudAnnulus.Value + (float)nudGap.Value + (float)nudAperture.Value, 2) - Math.Pow((float)nudGap.Value + (float)nudAperture.Value, 2)));
+
 			m_MeasurementContext.PhotometryReductionMethod = ComboboxIndexToPhotometryReductionMethod();
 			m_MeasurementContext.PhotometryBackgroundMethod = ComboboxIndexToBackgroundMethod();
 			m_MeasurementContext.ExportCSV = cbxExport.Checked;
@@ -360,7 +368,7 @@ namespace Tangra.VideoOperations.Astrometry
 				m_MeasurementContext.MaxMeasurements = m_VideoController.VideoCountFrames / e.FrameInterval;
 				nudNumberMeasurements.Value = nudNumberMeasurements.Minimum;
 				nudNumberMeasurements.Maximum = m_MeasurementContext.MaxMeasurements;
-				nudNumberMeasurements.Value = m_MeasurementContext.MaxMeasurements;
+				nudNumberMeasurements.Value = Math.Min(200, m_MeasurementContext.MaxMeasurements);
 			}
 		}
 
@@ -441,6 +449,7 @@ namespace Tangra.VideoOperations.Astrometry
 				pnlPhotometry.Visible = true;
                 pnlAddins.Visible = false;
 				gbConfig.Text = "Photometry";
+				PlotAperturePreview();
 			}
             else if (activePage == 3 && m_AstrometryAddinActions.Count != 0)
             {
@@ -590,6 +599,55 @@ namespace Tangra.VideoOperations.Astrometry
 					cbxInstDelayUnit.Enabled = false;
 				}
 			}
+		}
+
+		private void PlotAperturePreview()
+		{
+			if (m_MeasurementContext.ObjectToMeasure != null)
+			{
+				float x0 = m_MeasurementContext.ObjectToMeasure.X0;
+				float y0 = m_MeasurementContext.ObjectToMeasure.Y0;
+				byte[,] bmpPixels = m_VideoController.GetCurrentAstroImage(false).GetMeasurableAreaDisplayBitmapPixels((int) x0, (int) y0, 85);
+
+				Bitmap bmp = Pixelmap.ConstructBitmapFromBitmapPixels(bmpPixels, 85, 85);
+				using (Graphics g = Graphics.FromImage(pboxAperturePreview.Image))
+				{
+					g.DrawImage(bmp, 0, 0);
+					float xCenter = (x0 - (int)x0) + 85/2;
+					float yCenter = (y0 - (int)y0) + 85 / 2;
+
+					float radius = (float) nudAperture.Value;
+					g.DrawEllipse(Pens.YellowGreen, xCenter - radius, yCenter - radius, 2 * radius, 2 * radius);
+
+					radius = (float)(nudAperture.Value + nudGap.Value);
+					g.DrawEllipse(Pens.YellowGreen, xCenter - radius, yCenter - radius, 2 * radius, 2 * radius);
+
+					radius = (float)(nudAperture.Value + nudGap.Value + nudAnnulus.Value);
+					g.DrawEllipse(Pens.YellowGreen, xCenter - radius, yCenter - radius, 2 * radius, 2 * radius);
+
+					g.Save();
+				}
+
+				pboxAperturePreview.Invalidate();
+			}
+		}
+
+		private void nudAperture_ValueChanged(object sender, EventArgs e)
+		{
+			float innerRadius = TangraConfig.Settings.Photometry.AnnulusInnerRadius * (float)nudAperture.Value;
+			float outernRadius = (float)Math.Sqrt(TangraConfig.Settings.Photometry.AnnulusMinPixels / Math.PI + innerRadius * innerRadius);
+			decimal gap = (decimal)innerRadius - nudAperture.Value;
+			decimal annulus = (decimal)outernRadius - nudGap.Value - nudAperture.Value;
+
+			nudGap.SetNUDValue(gap);
+			nudAnnulus.SetNUDValue(annulus);
+
+			PlotAperturePreview();
+		}
+
+		private void AnnulusSizeChanged(object sender, EventArgs e)
+		{
+			PlotAperturePreview();
 		}
 	}
 }

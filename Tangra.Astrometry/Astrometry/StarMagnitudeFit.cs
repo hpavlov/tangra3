@@ -364,6 +364,8 @@ namespace Tangra.Astrometry
             Guid magnitudeBandId,
 			float encodingGamma,
 			float? aperture,
+			float? annulusInnerRadius,
+			int? annulusMinPixels,
 			ref float empericalPSFR0)
 		{
 			MeasurementsHelper measurer = new MeasurementsHelper(
@@ -373,8 +375,8 @@ namespace Tangra.Astrometry
                 TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(bitPix));
 
 			measurer.SetCoreProperties(
-				TangraConfig.Settings.Photometry.AnnulusInnerRadius,
-				TangraConfig.Settings.Photometry.AnnulusMinPixels,
+				annulusInnerRadius ?? TangraConfig.Settings.Photometry.AnnulusInnerRadius,
+				annulusMinPixels ?? TangraConfig.Settings.Photometry.AnnulusMinPixels,
                 CorePhotometrySettings.Default.RejectionBackgroundPixelsStdDev,
 				2 /* TODO: This must be configurable */);
 
