@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
@@ -134,26 +135,36 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void RecalculateMagnitudes(int refIndex, double refMagnitude)
         {
-            // m = m0 - 2.5 Log10(Flux);
-            // m0 = refMagnitude + 2.5 Log10(Flux);
+			if (refIndex < m_MedianFluxes.Length && refIndex > -1)
+			{
+				try
+				{
+					// m = m0 - 2.5 Log10(Flux);
+					// m0 = refMagnitude + 2.5 Log10(Flux);
 
-            m_M0 = refMagnitude + 2.5 * Math.Log10(Math.Max(1, m_MedianFluxes[refIndex]));
+					m_M0 = refMagnitude + 2.5 * Math.Log10(Math.Max(1, m_MedianFluxes[refIndex]));
 
-            NumericUpDown[] magControls = new NumericUpDown[] { nudMag1, nudMag2, nudMag3, nudMag4 };
+					NumericUpDown[] magControls = new NumericUpDown[] { nudMag1, nudMag2, nudMag3, nudMag4 };
 
-            try
-            {
-                for (int i = 0; i < TrackedObjects.Count; i++) magControls[i].ValueChanged -= MagValueChanged;
+					try
+					{
+						for (int i = 0; i < TrackedObjects.Count; i++) magControls[i].ValueChanged -= MagValueChanged;
 
-                for (int i = 0; i < TrackedObjects.Count; i++)
-                {
-                    magControls[i].Value = (decimal)(m_M0 - 2.5 * Math.Log10(m_MedianFluxes[i]));
-                }
-            }
-            finally
-            {
-                for (int i = 0; i < TrackedObjects.Count; i++) magControls[i].ValueChanged += MagValueChanged;
-            }
+						for (int i = 0; i < TrackedObjects.Count; i++)
+						{
+							magControls[i].Value = (decimal)(m_M0 - 2.5 * Math.Log10(m_MedianFluxes[i]));
+						}
+					}
+					finally
+					{
+						for (int i = 0; i < TrackedObjects.Count; i++) magControls[i].ValueChanged += MagValueChanged;
+					}
+				}
+				catch (Exception ex)
+				{
+					Trace.WriteLine(ex.GetFullStackTrace());
+				}
+			}
         }
 
         internal CSVExportOptions GetSelectedOptions()
