@@ -99,7 +99,7 @@ namespace Tangra.Astrometry
 			m_Sigma = 0;
 			for (int i = 0; i < intencities.Count; i++)
 			{
-				double computed = a + b * -2.5 * Math.Log10(intencities[i]);
+				double computed = a * -2.5 * Math.Log10(intencities[i]) + b * colours[i] + c;
 				double diff = Math.Abs(computed - magnitudes[i]);
 				m_Residuals.Add(diff);
 

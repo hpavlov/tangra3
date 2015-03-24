@@ -55,12 +55,14 @@ namespace Tangra.VideoOperations.Astrometry
 			this.label7 = new System.Windows.Forms.Label();
 			this.pnlTime = new System.Windows.Forms.Panel();
 			this.linkExamples = new System.Windows.Forms.LinkLabel();
-			this.label15 = new System.Windows.Forms.Label();
 			this.pnlInstrDelay = new System.Windows.Forms.Panel();
+			this.cbxInstDelayCamera = new System.Windows.Forms.ComboBox();
+			this.cbxInstDelayMode = new System.Windows.Forms.ComboBox();
 			this.label12 = new System.Windows.Forms.Label();
 			this.nudInstrDelay = new System.Windows.Forms.NumericUpDown();
 			this.cbxInstDelayUnit = new System.Windows.Forms.ComboBox();
 			this.cbxSignalType = new System.Windows.Forms.ComboBox();
+			this.label15 = new System.Windows.Forms.Label();
 			this.label10 = new System.Windows.Forms.Label();
 			this.pnlIntegration = new System.Windows.Forms.Panel();
 			this.btnDetectIntegration = new System.Windows.Forms.Button();
@@ -523,9 +525,9 @@ namespace Tangra.VideoOperations.Astrometry
 			// pnlTime
 			// 
 			this.pnlTime.Controls.Add(this.linkExamples);
-			this.pnlTime.Controls.Add(this.label15);
 			this.pnlTime.Controls.Add(this.pnlInstrDelay);
 			this.pnlTime.Controls.Add(this.cbxSignalType);
+			this.pnlTime.Controls.Add(this.label15);
 			this.pnlTime.Controls.Add(this.label10);
 			this.pnlTime.Controls.Add(this.pnlIntegration);
 			this.pnlTime.Controls.Add(this.label4);
@@ -535,13 +537,13 @@ namespace Tangra.VideoOperations.Astrometry
 			this.pnlTime.Controls.Add(this.cbxFrameTimeType);
 			this.pnlTime.Location = new System.Drawing.Point(7, 21);
 			this.pnlTime.Name = "pnlTime";
-			this.pnlTime.Size = new System.Drawing.Size(421, 245);
+			this.pnlTime.Size = new System.Drawing.Size(421, 252);
 			this.pnlTime.TabIndex = 14;
 			// 
 			// linkExamples
 			// 
 			this.linkExamples.AutoSize = true;
-			this.linkExamples.Location = new System.Drawing.Point(15, 228);
+			this.linkExamples.Location = new System.Drawing.Point(15, 234);
 			this.linkExamples.Name = "linkExamples";
 			this.linkExamples.Size = new System.Drawing.Size(278, 13);
 			this.linkExamples.TabIndex = 35;
@@ -549,24 +551,40 @@ namespace Tangra.VideoOperations.Astrometry
 			this.linkExamples.Text = "http://www.hristopavlov.net/Tangra/AstrometryExamples";
 			this.linkExamples.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkExamples_LinkClicked);
 			// 
-			// label15
-			// 
-			this.label15.AutoSize = true;
-			this.label15.Location = new System.Drawing.Point(14, 213);
-			this.label15.Name = "label15";
-			this.label15.Size = new System.Drawing.Size(325, 13);
-			this.label15.TabIndex = 34;
-			this.label15.Text = "For observation guidelines and step-by-step reduction examples see";
-			// 
 			// pnlInstrDelay
 			// 
+			this.pnlInstrDelay.Controls.Add(this.cbxInstDelayCamera);
+			this.pnlInstrDelay.Controls.Add(this.cbxInstDelayMode);
 			this.pnlInstrDelay.Controls.Add(this.label12);
 			this.pnlInstrDelay.Controls.Add(this.nudInstrDelay);
 			this.pnlInstrDelay.Controls.Add(this.cbxInstDelayUnit);
-			this.pnlInstrDelay.Location = new System.Drawing.Point(7, 166);
+			this.pnlInstrDelay.Location = new System.Drawing.Point(7, 151);
 			this.pnlInstrDelay.Name = "pnlInstrDelay";
-			this.pnlInstrDelay.Size = new System.Drawing.Size(330, 36);
+			this.pnlInstrDelay.Size = new System.Drawing.Size(397, 66);
 			this.pnlInstrDelay.TabIndex = 33;
+			// 
+			// cbxInstDelayCamera
+			// 
+			this.cbxInstDelayCamera.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.cbxInstDelayCamera.FormattingEnabled = true;
+			this.cbxInstDelayCamera.Location = new System.Drawing.Point(180, 7);
+			this.cbxInstDelayCamera.Name = "cbxInstDelayCamera";
+			this.cbxInstDelayCamera.Size = new System.Drawing.Size(184, 21);
+			this.cbxInstDelayCamera.TabIndex = 32;
+			this.cbxInstDelayCamera.SelectedIndexChanged += new System.EventHandler(this.cbxInstDelayCamera_SelectedIndexChanged);
+			// 
+			// cbxInstDelayMode
+			// 
+			this.cbxInstDelayMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.cbxInstDelayMode.FormattingEnabled = true;
+			this.cbxInstDelayMode.Items.AddRange(new object[] {
+            "Auto",
+            "Manual"});
+			this.cbxInstDelayMode.Location = new System.Drawing.Point(100, 7);
+			this.cbxInstDelayMode.Name = "cbxInstDelayMode";
+			this.cbxInstDelayMode.Size = new System.Drawing.Size(74, 21);
+			this.cbxInstDelayMode.TabIndex = 31;
+			this.cbxInstDelayMode.SelectedIndexChanged += new System.EventHandler(this.cbxInstDelayMode_SelectedIndexChanged);
 			// 
 			// label12
 			// 
@@ -585,14 +603,14 @@ namespace Tangra.VideoOperations.Astrometry
             0,
             0,
             65536});
-			this.nudInstrDelay.Location = new System.Drawing.Point(100, 8);
+			this.nudInstrDelay.Location = new System.Drawing.Point(100, 37);
 			this.nudInstrDelay.Maximum = new decimal(new int[] {
             1024,
             0,
             0,
             0});
 			this.nudInstrDelay.Name = "nudInstrDelay";
-			this.nudInstrDelay.Size = new System.Drawing.Size(56, 20);
+			this.nudInstrDelay.Size = new System.Drawing.Size(74, 20);
 			this.nudInstrDelay.TabIndex = 29;
 			// 
 			// cbxInstDelayUnit
@@ -602,7 +620,7 @@ namespace Tangra.VideoOperations.Astrometry
 			this.cbxInstDelayUnit.Items.AddRange(new object[] {
             "frames",
             "seconds"});
-			this.cbxInstDelayUnit.Location = new System.Drawing.Point(162, 7);
+			this.cbxInstDelayUnit.Location = new System.Drawing.Point(180, 37);
 			this.cbxInstDelayUnit.Name = "cbxInstDelayUnit";
 			this.cbxInstDelayUnit.Size = new System.Drawing.Size(70, 21);
 			this.cbxInstDelayUnit.TabIndex = 30;
@@ -621,6 +639,15 @@ namespace Tangra.VideoOperations.Astrometry
 			this.cbxSignalType.Size = new System.Drawing.Size(98, 21);
 			this.cbxSignalType.TabIndex = 32;
 			// 
+			// label15
+			// 
+			this.label15.AutoSize = true;
+			this.label15.Location = new System.Drawing.Point(14, 219);
+			this.label15.Name = "label15";
+			this.label15.Size = new System.Drawing.Size(325, 13);
+			this.label15.TabIndex = 34;
+			this.label15.Text = "For observation guidelines and step-by-step reduction examples see";
+			// 
 			// label10
 			// 
 			this.label10.AutoSize = true;
@@ -636,7 +663,7 @@ namespace Tangra.VideoOperations.Astrometry
 			this.pnlIntegration.Controls.Add(this.label14);
 			this.pnlIntegration.Controls.Add(this.nudIntegratedFrames);
 			this.pnlIntegration.Controls.Add(this.label13);
-			this.pnlIntegration.Location = new System.Drawing.Point(37, 93);
+			this.pnlIntegration.Location = new System.Drawing.Point(37, 81);
 			this.pnlIntegration.Name = "pnlIntegration";
 			this.pnlIntegration.Size = new System.Drawing.Size(374, 29);
 			this.pnlIntegration.TabIndex = 31;
@@ -695,7 +722,7 @@ namespace Tangra.VideoOperations.Astrometry
 			// label4
 			// 
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(13, 139);
+			this.label4.Location = new System.Drawing.Point(13, 127);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(95, 13);
 			this.label4.TabIndex = 8;
@@ -704,7 +731,7 @@ namespace Tangra.VideoOperations.Astrometry
 			// ucUtcTimePicker
 			// 
 			this.ucUtcTimePicker.DateTimeUtc = new System.DateTime(2009, 8, 4, 12, 21, 39, 406);
-			this.ucUtcTimePicker.Location = new System.Drawing.Point(105, 132);
+			this.ucUtcTimePicker.Location = new System.Drawing.Point(105, 120);
 			this.ucUtcTimePicker.Name = "ucUtcTimePicker";
 			this.ucUtcTimePicker.Size = new System.Drawing.Size(232, 26);
 			this.ucUtcTimePicker.TabIndex = 9;
@@ -714,9 +741,9 @@ namespace Tangra.VideoOperations.Astrometry
 			this.cbxExpectedMotion.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.cbxExpectedMotion.FormattingEnabled = true;
 			this.cbxExpectedMotion.Items.AddRange(new object[] {
-            "Slow < 2.0 \"/min",
+            "Slow (< 2.0 \"/min)",
             "Slow Flyby (2.0\"/min -> 200.0 \"/min)",
-            "Fast Flyby > 200.0\"/min"});
+            "Fast Flyby (> 200.0\"/min)"});
 			this.cbxExpectedMotion.Location = new System.Drawing.Point(105, 12);
 			this.cbxExpectedMotion.Name = "cbxExpectedMotion";
 			this.cbxExpectedMotion.Size = new System.Drawing.Size(211, 21);
@@ -726,7 +753,7 @@ namespace Tangra.VideoOperations.Astrometry
 			// label11
 			// 
 			this.label11.AutoSize = true;
-			this.label11.Location = new System.Drawing.Point(22, 65);
+			this.label11.Location = new System.Drawing.Point(22, 53);
 			this.label11.Name = "label11";
 			this.label11.Size = new System.Drawing.Size(83, 13);
 			this.label11.TabIndex = 26;
@@ -739,7 +766,7 @@ namespace Tangra.VideoOperations.Astrometry
 			this.cbxFrameTimeType.Items.AddRange(new object[] {
             "Non integrated frame",
             "First frame of integrated interval"});
-			this.cbxFrameTimeType.Location = new System.Drawing.Point(105, 62);
+			this.cbxFrameTimeType.Location = new System.Drawing.Point(105, 50);
 			this.cbxFrameTimeType.Name = "cbxFrameTimeType";
 			this.cbxFrameTimeType.Size = new System.Drawing.Size(184, 21);
 			this.cbxFrameTimeType.TabIndex = 27;
@@ -747,9 +774,9 @@ namespace Tangra.VideoOperations.Astrometry
 			// 
 			// gbConfig
 			// 
+			this.gbConfig.Controls.Add(this.pnlTime);
 			this.gbConfig.Controls.Add(this.pnlPhotometry);
 			this.gbConfig.Controls.Add(this.pnlAddins);
-			this.gbConfig.Controls.Add(this.pnlTime);
 			this.gbConfig.Controls.Add(this.pnlAstrometry);
 			this.gbConfig.Location = new System.Drawing.Point(13, 13);
 			this.gbConfig.Name = "gbConfig";
@@ -881,6 +908,8 @@ namespace Tangra.VideoOperations.Astrometry
 		private System.Windows.Forms.Label label17;
 		private System.Windows.Forms.NumericUpDown nudAperture;
 		private System.Windows.Forms.Label label16;
+		private System.Windows.Forms.ComboBox cbxInstDelayCamera;
+		private System.Windows.Forms.ComboBox cbxInstDelayMode;
 
 	}
 }

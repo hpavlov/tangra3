@@ -1339,13 +1339,16 @@ namespace Tangra.Model.Config
 			public string SelectedScopeRecorder;
 			public bool UseLowPassForAstrometry;
 
+			[XmlElement("VideoCameraList")]
 			public List<VideoCamera> VideoCameras = new List<VideoCamera>();
+
 			public List<ScopeRecorderConfiguration> ScopeRecorders = new List<ScopeRecorderConfiguration>();
 			public List<PersistedPlateConstants> SolvedPlateConstants = new List<PersistedPlateConstants>();
 
 			public PlateSolveSettings()
 			{
-				VideoCamera.AddCameraConfigurations(VideoCameras);
+				if (VideoCameras.Count == 0)
+					VideoCamera.AddCameraConfigurations(VideoCameras);
 			}
 
 			public PersistedPlateConstants GetPlateConstants(VideoCamera camera, ScopeRecorderConfiguration config, Rectangle plateSize)

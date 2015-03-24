@@ -101,6 +101,11 @@ namespace Tangra.VideoOperations.Astrometry
             }
             astrometryAddinActions = m_AstrometryAddinActions;
             astrometryAddins = m_AstrometryAddins;
+
+	        cbxInstDelayCamera.Items.Clear();
+	        cbxInstDelayCamera.Items.Add(string.Empty);
+	        cbxInstDelayCamera.Items.AddRange(InstrumentalDelayConfigManager.GetAvailableCameras().ToArray());
+	        cbxInstDelayCamera.Items.IndexOf(TangraConfig.Settings.PlateSolve.SelectedCameraModel);
 		}
 
         internal class AddinActionEntry
@@ -123,7 +128,7 @@ namespace Tangra.VideoOperations.Astrometry
 			double milisecondsDiff =
 				(m_VideoController.CurrentFrameIndex - AstrometryContext.Current.FieldSolveContext.FrameNoOfUtcTime) * 1000.0 / m_VideoController.VideoFrameRate;
 
-			ucUtcTimePicker.DateTimeUtc = AstrometryContext.Current.FieldSolveContext.UtcTime.AddMilliseconds(milisecondsDiff);            
+			ucUtcTimePicker.DateTimeUtc = AstrometryContext.Current.FieldSolveContext.UtcTime.AddMilliseconds(milisecondsDiff);
         }
 
 		/// <summary>
@@ -154,6 +159,9 @@ namespace Tangra.VideoOperations.Astrometry
             cbxInstDelayUnit.Enabled = true;
 		    nudIntegratedFrames.Enabled = true;
             btnDetectIntegration.Enabled = true;
+
+			cbxInstDelayCamera.SelectedIndex = 0; // No camera selected
+			cbxInstDelayMode.SelectedIndex = 1; // Manual
 
 			activePage = 0;
 			DisplayActivePage();
@@ -369,12 +377,22 @@ namespace Tangra.VideoOperations.Astrometry
 
 		private void cbxFrameTimeType_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			pnlIntegration.Visible = cbxFrameTimeType.SelectedIndex != 0;
+			if (cbxFrameTimeType.SelectedIndex != 0)
+			{
+				pnlIntegration.Visible = true;
 
-            nudInstrDelay.Enabled = true;
-            cbxInstDelayUnit.Enabled = true;
-            nudIntegratedFrames.Enabled = true;
-            btnDetectIntegration.Enabled = true;		  
+				nudIntegratedFrames.Enabled = true;
+				btnDetectIntegration.Enabled = true;
+			}
+			else
+			{
+				pnlIntegration.Visible = false;
+
+				nudIntegratedFrames.Enabled = false;
+				btnDetectIntegration.Enabled = false;
+			}
+
+			SetInstDelayControlsState();
 		}
 
 		private void cbxExpectedMotion_SelectedIndexChanged(object sender, EventArgs e)
@@ -454,6 +472,7 @@ namespace Tangra.VideoOperations.Astrometry
 			{
 				if (frm.IntegratedFrames != null)
 				{
+					cbxInstDelayMode.SelectedIndex = 0; // Set delay type to automatic
 					nudIntegratedFrames.SetNUDValue(frm.IntegratedFrames.Interval);
 					m_VideoController.MoveToFrame(frm.IntegratedFrames.StartingAtFrame);
 
@@ -473,7 +492,7 @@ namespace Tangra.VideoOperations.Astrometry
 					    "integration interval before you continue.",
 						"Warning",
 						MessageBoxButtons.OK,
-						MessageBoxIcon.Warning);					
+						MessageBoxIcon.Warning);
 				}
 			}
 		}
@@ -485,17 +504,90 @@ namespace Tangra.VideoOperations.Astrometry
 
 		private void nudIntegratedFrames_ValueChanged(object sender, EventArgs e)
 		{
+			SetInstrumentalDelay();
+		}
+
+		private void cbxInstDelayMode_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			SetInstDelayControlsState();
+			SetInstrumentalDelay();
+		}
+
+		private void SetInstDelayControlsState()
+		{
+			if (cbxInstDelayMode.SelectedIndex == 0)
+			{
+				cbxInstDelayCamera.Enabled = false;
+				cbxInstDelayUnit.Enabled = false;
+				nudInstrDelay.Enabled = false;
+			}
+			else if (cbxInstDelayMode.SelectedIndex == 1)
+			{
+				if (cbxInstDelayMode.SelectedIndex == 0)
+				{
+					cbxInstDelayCamera.Enabled = false;
+					cbxInstDelayUnit.Enabled = true;
+					nudInstrDelay.Enabled = true;
+				}
+				else if (cbxInstDelayMode.SelectedIndex == 1)
+				{
+					cbxInstDelayCamera.Enabled = true;
+					cbxInstDelayUnit.Enabled = cbxInstDelayCamera.SelectedIndex == 0;
+					nudInstrDelay.Enabled = cbxInstDelayCamera.SelectedIndex == 0;
+				}
+			}
+		}
+
+		private void cbxInstDelayCamera_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			SetKnownManualInstrumentalDelay();
+		}
+
+		private void SetInstrumentalDelay()
+		{
+			if (cbxFrameTimeType.SelectedIndex == 1)
+				SetKnownAutomaticInstrumentalDelay();
+			else if (cbxFrameTimeType.SelectedIndex == 0)
+				SetKnownManualInstrumentalDelay();
+		}
+
+		private void SetKnownAutomaticInstrumentalDelay()
+		{
 			int integration = (int)nudIntegratedFrames.Value;
 
-			Dictionary<int, float> corrections = InstrumentalDelayConfigManager.GetConfigurationForCamera(m_VideoController.AstroVideoCameraModel ?? AstrometryContext.Current.VideoCamera.Model);
+			string cameraModel = m_VideoController.AstroVideoCameraModel ?? AstrometryContext.Current.VideoCamera.Model;
+			Dictionary<int, float> corrections = InstrumentalDelayConfigManager.GetConfigurationForCamera(cameraModel);
 
 			float corr;
 			if (corrections.TryGetValue(integration, out corr))
 			{
 				if (!float.IsNaN(corr))
 				{
-					nudInstrDelay.SetNUDValue(corr);
-					cbxInstDelayUnit.SelectedIndex = 0;
+					cbxInstDelayCamera.SelectedIndex = cbxInstDelayCamera.Items.IndexOf(cameraModel);
+					SetKnownManualInstrumentalDelay();
+				}
+			}
+		}
+
+		private void SetKnownManualInstrumentalDelay()
+		{
+			if (cbxInstDelayCamera.SelectedIndex > -1)
+			{
+				if (cbxInstDelayCamera.Text == string.Empty)
+				{
+					nudInstrDelay.Enabled = true;
+					cbxInstDelayUnit.Enabled = true;
+				}
+				else
+				{
+					Dictionary<int, float> delaysConfig = InstrumentalDelayConfigManager.GetConfigurationForCamera(cbxInstDelayCamera.Text);
+					if (delaysConfig.ContainsKey((int)nudIntegratedFrames.Value))
+					{
+						nudInstrDelay.Value = -1 * (decimal)delaysConfig[(int)nudIntegratedFrames.Value];
+						cbxInstDelayUnit.SelectedIndex = 1;
+					}
+					nudInstrDelay.Enabled = false;
+					cbxInstDelayUnit.Enabled = false;
 				}
 			}
 		}
