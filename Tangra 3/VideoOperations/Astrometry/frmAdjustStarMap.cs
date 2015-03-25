@@ -61,9 +61,7 @@ namespace Tangra.VideoOperations.Astrometry
 			{
 				StarMapConfig = StarMapInternalConfig.Default;
 				StarMapConfig.StarMapperTolerance = m_Depth;
-				int optimumStars = -1;
-				if (m_Auto)
-					optimumStars = (int)TangraConfig.Settings.Astrometry.PyramidOptimumStarsToMatch;
+				StarMapConfig.OptimumStarsInField = m_Auto ? (int?)null : - 1;
 
 				if (RawBitmap != null) RawBitmap.Dispose();
 
@@ -81,8 +79,7 @@ namespace Tangra.VideoOperations.Astrometry
 					astroImage, 
 					AstrometryContext.Current.OSDRectToExclude, 
 					AstrometryContext.Current.RectToInclude,
-					AstrometryContext.Current.LimitByInclusion, 
-					optimumStars);
+					AstrometryContext.Current.LimitByInclusion);
 
 				// NOTE: This will crash 
 				imgFrame.Image = RawBitmap;

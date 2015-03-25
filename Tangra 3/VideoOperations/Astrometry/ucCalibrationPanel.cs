@@ -587,13 +587,16 @@ namespace Tangra.VideoOperations.Astrometry
 			timer1.Enabled = false;
 
 			StarMapInternalConfig starMapConfig = StarMapInternalConfig.Default;
-			starMapConfig.StarMapperTolerance = trbarDepth.Value;
-
-			int optimumStarsInField = -1;
+			
 			if (rbAuto.Checked)
 			{
-				optimumStarsInField = (int) TangraConfig.Settings.Astrometry.PyramidOptimumStarsToMatch;
+				starMapConfig.OptimumStarsInField = (int) TangraConfig.Settings.Astrometry.PyramidOptimumStarsToMatch;
 				starMapConfig.StarMapperTolerance = 2;
+			}
+			else
+			{
+				starMapConfig.OptimumStarsInField = -1;
+				starMapConfig.StarMapperTolerance = trbarDepth.Value;
 			}
 
 			var starMap = new StarMap();
@@ -605,10 +608,10 @@ namespace Tangra.VideoOperations.Astrometry
 				image,
 				AstrometryContext.Current.OSDRectToExclude,
 				AstrometryContext.Current.RectToInclude,
-				AstrometryContext.Current.LimitByInclusion,
-				optimumStarsInField);
+				AstrometryContext.Current.LimitByInclusion);
 
 			AstrometryContext.Current.StarMap = starMap;
+			AstrometryContext.Current.StarMapConfig = starMapConfig;
 
 			m_VideoController.RedrawCurrentFrame(false, true);
 		}

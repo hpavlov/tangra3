@@ -310,8 +310,7 @@ namespace Tangra.ImageTools
 				image,
 				AstrometryContext.Current.OSDRectToExclude,
 				AstrometryContext.Current.RectToInclude,
-				AstrometryContext.Current.LimitByInclusion,
-				(int)TangraConfig.Settings.Astrometry.PyramidOptimumStarsToMatch);
+				AstrometryContext.Current.LimitByInclusion);
 
 			AstrometryContext.Current.StarMap = starMap;
 

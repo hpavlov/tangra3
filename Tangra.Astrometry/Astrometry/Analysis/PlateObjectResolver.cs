@@ -106,7 +106,7 @@ namespace Tangra.Astrometry.Analysis
 				astrometrySettings.MaximumPSFElongation,
 				astrometrySettings.LimitReferenceStarDetection);
 
-			starMap.FindBestMap(StarMapInternalConfig.Default, m_Image, osdRectangleToExclude, rectToInclude, limitByInclusion, (int)astrometrySettings.PyramidOptimumStarsToMatch);
+			starMap.FindBestMap(StarMapInternalConfig.Default, m_Image, osdRectangleToExclude, rectToInclude, limitByInclusion);
 
 			float r0 = 0;
 

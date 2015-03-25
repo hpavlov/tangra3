@@ -15,7 +15,7 @@ namespace Tangra.Model.Astro
 
 		int FeaturesCount { get; }
 
-		int FindBestMap(StarMapInternalConfig config, AstroImage image, Rectangle osdFrameToExclude, Rectangle frameToInclude, bool limitByInclusion, int optimumNumberOfStars);
+		int FindBestMap(StarMapInternalConfig config, AstroImage image, Rectangle osdFrameToExclude, Rectangle frameToInclude, bool limitByInclusion);
 		void InitializeStarMapButDontProcess(StarMapInternalConfig config, AstroImage image, Rectangle osdFrameToExclude, Rectangle frameToInclude, bool limitByInclusion);
 
 		List<StarMapFeature> Features { get; }

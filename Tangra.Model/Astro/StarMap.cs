@@ -71,8 +71,7 @@ namespace Tangra.Model.Astro
 
 		public int FindBestMap(
 			StarMapInternalConfig config, AstroImage image, 
-			Rectangle osdFrameToExclude, Rectangle frameToInclude, bool limitByInclusion,
-			int optimumStarsInField)
+			Rectangle osdFrameToExclude, Rectangle frameToInclude, bool limitByInclusion)
 		{
 			m_Config = config;
 
@@ -88,6 +87,8 @@ namespace Tangra.Model.Astro
 			m_LimitByInclusion = limitByInclusion;
 
 			m_AverageBackgroundNoise = m_Pixelmap.MaxSignalValue;
+			int optimumStarsInField = config.OptimumStarsInField ?? (int)TangraConfig.Settings.Astrometry.PyramidOptimumStarsToMatch;
+
 			double snRatio = 0.15;
 			try
 			{

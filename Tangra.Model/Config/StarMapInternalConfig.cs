@@ -19,6 +19,7 @@ namespace Tangra.Model.Config
 			FeatureSearchRadius = 7;
 
 			MaxPixelsInFeature = 160;
+			OptimumStarsInField = null;
 		}
 
 		private StarMapInternalConfig()
@@ -56,5 +57,12 @@ namespace Tangra.Model.Config
 		///  The background threashold. We will not try to resolve any features fainter than this number
 		/// </summary>
 		public int MinStarMapThreashold { get; set; }
+
+		/// <summary>
+		/// NULL means default (TangraConfig.Settings.Astrometry.PyramidOptimumStarsToMatch), -1 means 
+		/// "Do not try for optimum stars but used the manually given StarMapperTolerance", any other values
+		/// means "Try for that many optimum stars in the field"
+		/// </summary>
+		public int? OptimumStarsInField { get; set; }
 	}
 }

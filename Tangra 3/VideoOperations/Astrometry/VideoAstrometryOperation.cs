@@ -440,8 +440,7 @@ namespace Tangra.VideoOperations.Astrometry
                 noPreProcImage,
 				AstrometryContext.Current.OSDRectToExclude,
 				AstrometryContext.Current.RectToInclude,
-				AstrometryContext.Current.LimitByInclusion,
-				(int)TangraConfig.Settings.Astrometry.PyramidOptimumStarsToMatch);
+				AstrometryContext.Current.LimitByInclusion);
 
 			AstrometryContext.Current.StarMap = starMap;
 
