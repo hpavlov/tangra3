@@ -613,8 +613,8 @@ namespace Tangra.VideoOperations.Astrometry
 				using (Graphics g = Graphics.FromImage(pboxAperturePreview.Image))
 				{
 					g.DrawImage(bmp, 0, 0);
-					float xCenter = (x0 - (int)x0) + 85/2;
-					float yCenter = (y0 - (int)y0) + 85 / 2;
+					float xCenter = (x0 - (int)x0) + 42;
+					float yCenter = (y0 - (int)y0) + 42;
 
 					float radius = (float) nudAperture.Value;
 					g.DrawEllipse(Pens.YellowGreen, xCenter - radius, yCenter - radius, 2 * radius, 2 * radius);
