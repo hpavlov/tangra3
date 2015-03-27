@@ -87,7 +87,15 @@ namespace Tangra.VideoOperations.Astrometry.Engine
 		public void Reset()
 		{
 			CurrentAstrometricFit = null;
+			CurrentPhotometricFit = null;
+			AstrometricState = null;
+			VideoCamera = null;
+			m_OSDRectToExclude = Rectangle.Empty;
+			m_RectToInclude = Rectangle.Empty;
+			FieldSolveContext = null;
+			PlateConstants = null;
 
+			StarMap = null;
 			StarMapConfig = StarMapInternalConfig.Default;
 		}
 	}

@@ -54,7 +54,7 @@ namespace Tangra.ImageTools
 
 		protected static Font m_StarInfoFont = new Font(FontFamily.GenericSerif, 8);
 
-		protected static ucCalibrationPanel s_PlatesolveController;
+		protected ucCalibrationPanel m_PlatesolveController;
 
 		protected IAstrometryController m_AstrometryController;
 		protected VideoController m_VideoController;
@@ -75,9 +75,9 @@ namespace Tangra.ImageTools
 		public void LoadControler(Panel panel)
 		{
 			panel.Controls.Clear();
-			s_PlatesolveController.UpdateState((int)FittingsState.Configuring);
+			m_PlatesolveController.UpdateState((int)FittingsState.Configuring);
 
-			panel.Controls.Add(s_PlatesolveController);
+			panel.Controls.Add(m_PlatesolveController);
 		}
 
 
@@ -605,9 +605,9 @@ namespace Tangra.ImageTools
                             {
                                 m_SolvedPlate = threeStarSolution;
 
-                                s_PlatesolveController.UpdateFocalLength((int)Math.Round(threeStarSolution.Image.EffectiveFocalLength));
-                                s_PlatesolveController.UpdateAspect(threeStarSolution.Aspect);
-                                s_PlatesolveController.UpdateRotation((int)Math.Round(threeStarSolution.EtaDeg));
+                                m_PlatesolveController.UpdateFocalLength((int)Math.Round(threeStarSolution.Image.EffectiveFocalLength));
+                                m_PlatesolveController.UpdateAspect(threeStarSolution.Aspect);
+                                m_PlatesolveController.UpdateRotation((int)Math.Round(threeStarSolution.EtaDeg));
                                 m_RADegCenter = threeStarSolution.RA0Deg;
                                 m_DEDegCenter = threeStarSolution.DE0Deg;
                                 m_Image.EffectiveFocalLength = threeStarSolution.Image.EffectiveFocalLength;
@@ -734,7 +734,7 @@ namespace Tangra.ImageTools
 
 		protected void UpdateToolControlDisplay()
 		{
-			s_PlatesolveController.SetManualStarIdentificationMode(
+			m_PlatesolveController.SetManualStarIdentificationMode(
 				m_UserStarIdentification != null && m_UserStarIdentification.Count > 0);		
 		}
 

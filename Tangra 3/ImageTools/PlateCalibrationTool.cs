@@ -80,8 +80,8 @@ namespace Tangra.ImageTools
 			m_OSDExcluderTool = new OSDExcluder(videoController);
 			m_OSDExcluderTool.AreaChanged += m_OSDExcluderTool_AreaChanged;
 
-			if (s_PlatesolveController == null)
-				s_PlatesolveController = new ucCalibrationPanel(astrometryController, videoController, this);
+			if (m_PlatesolveController == null)
+				m_PlatesolveController = new ucCalibrationPanel(astrometryController, videoController, this);
 		}
 
 		void m_OSDExcluderTool_AreaChanged()
@@ -365,7 +365,7 @@ namespace Tangra.ImageTools
 			m_PlateCalibrator = new PlateCalibration(m_CalibrationContext, calibrationSettings, m_AstrometryController);
 			
 			UpdateToolControlDisplay();
-			s_PlatesolveController.SetupControls();
+			m_PlatesolveController.SetupControls();
 			m_SolveState = -1;
 			DrawCatalogStarsFit();
 
@@ -374,13 +374,13 @@ namespace Tangra.ImageTools
 
 		private void UpdateControls()
 		{
-			s_PlatesolveController.UpdateAspect(m_Aspect);
-			s_PlatesolveController.UpdateFocalLength((int)m_FLength);
-			s_PlatesolveController.UpdateLimitMagnitude((int)Math.Round(m_LimitMag));
-			s_PlatesolveController.UpdateRotation((int)m_Eta);
-			s_PlatesolveController.UpdateShowGrid(m_Grid);
-			s_PlatesolveController.UpdateShowLabels(m_ShowLabels);
-			s_PlatesolveController.UpdateShowMagnitudes(m_ShowMagnitudes);
+			m_PlatesolveController.UpdateAspect(m_Aspect);
+			m_PlatesolveController.UpdateFocalLength((int)m_FLength);
+			m_PlatesolveController.UpdateLimitMagnitude((int)Math.Round(m_LimitMag));
+			m_PlatesolveController.UpdateRotation((int)m_Eta);
+			m_PlatesolveController.UpdateShowGrid(m_Grid);
+			m_PlatesolveController.UpdateShowLabels(m_ShowLabels);
+			m_PlatesolveController.UpdateShowMagnitudes(m_ShowMagnitudes);
 		}
 
 		internal delegate void OnPixelOperation(int idx, int x, int y);
@@ -641,8 +641,8 @@ namespace Tangra.ImageTools
 				{
 					m_SolvedPlate = m_PlateCalibrator.SolvePlateConstantsPhase4(m_LimitMag);
 					DrawCatalogStarsFit();
-					s_PlatesolveController.OnCalibrationFinished();
-					s_PlatesolveController.OnSuccessfulCalibration(m_CalibrationContext);
+					m_PlatesolveController.OnCalibrationFinished();
+					m_PlatesolveController.OnSuccessfulCalibration(m_CalibrationContext);
 					DrawCatalogStarsFit();
 				}
 
@@ -650,10 +650,10 @@ namespace Tangra.ImageTools
 			}
 			else
 			{
-				if (s_PlatesolveController != null &&
-					s_PlatesolveController.ParentForm != null)
+				if (m_PlatesolveController != null &&
+					m_PlatesolveController.ParentForm != null)
 				{
-					s_PlatesolveController.ParentForm.Cursor = Cursors.WaitCursor;
+					m_PlatesolveController.ParentForm.Cursor = Cursors.WaitCursor;
 					try
 					{
 			
@@ -683,7 +683,7 @@ namespace Tangra.ImageTools
 
 						if (m_CalibrationContext.SecondAstrometricFit == null) m_SolveState = -1;
 
-						s_PlatesolveController.OnCalibrationFinished();
+						m_PlatesolveController.OnCalibrationFinished();
 
 						if (m_SolveState != -1)
 						{
@@ -699,7 +699,7 @@ namespace Tangra.ImageTools
 
 								m_FitGrade = 4; /* Use the improved fit if possible */
 								m_LimitMag = m_CalibrationContext.FieldSolveContext.LimitMagn;
-								s_PlatesolveController.UpdateLimitMagnitude((int) Math.Round(m_LimitMag));
+								m_PlatesolveController.UpdateLimitMagnitude((int) Math.Round(m_LimitMag));
 
 								DrawCatalogStarsFit();
 
@@ -713,12 +713,12 @@ namespace Tangra.ImageTools
 								TangraContext.Current.HasVideoLoaded = false;
 								m_VideoController.UpdateViews();
 
-								s_PlatesolveController.OnSuccessfulCalibration(m_CalibrationContext);
+								m_PlatesolveController.OnSuccessfulCalibration(m_CalibrationContext);
 								m_State = FittingsState.Solved;
 							}
                             else
 							{
-                                s_PlatesolveController.OnUnsuccessfulCalibration(m_CalibrationContext, m_PlateCalibrator);
+                                m_PlatesolveController.OnUnsuccessfulCalibration(m_CalibrationContext, m_PlateCalibrator);
 
                                 m_State = FittingsState.Activated;
                                 m_VideoController.SetPictureBoxCursor(CustomCursors.PanEnabledCursor);
@@ -735,7 +735,7 @@ namespace Tangra.ImageTools
 						}
 						else
 						{
-                            s_PlatesolveController.OnUnsuccessfulCalibration(m_CalibrationContext, m_PlateCalibrator);
+                            m_PlatesolveController.OnUnsuccessfulCalibration(m_CalibrationContext, m_PlateCalibrator);
 
 							m_State = FittingsState.Activated;
 							m_VideoController.SetPictureBoxCursor(CustomCursors.PanEnabledCursor);
@@ -752,7 +752,7 @@ namespace Tangra.ImageTools
 					}
 					finally
 					{
-						s_PlatesolveController.ParentForm.Cursor = Cursors.Default;
+						m_PlatesolveController.ParentForm.Cursor = Cursors.Default;
 					}
 				}
 			}

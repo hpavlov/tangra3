@@ -222,6 +222,8 @@ namespace Tangra.Model.Config
 		{
 			if (!m_IsReadOnly)
 			{
+				this.PrepareForSaving();
+
 				var ser = new XmlSerializer(typeof(TangraConfig));
 				var strData = new StringBuilder();
 				using (TextWriter rdr = new StringWriter(strData))
@@ -246,6 +248,12 @@ namespace Tangra.Model.Config
 					Trace.WriteLine(ex.ToString());
 				}
 			}
+		}
+
+		public void PrepareForSaving()
+		{
+			if (PlateSolve.VideoCameras.Count > 0)
+				PlateSolve.VideoCameras = PlateSolve.VideoCameras.Distinct(PlateSolve).ToList();
 		}
 
 		public static void Reset(ISettingsSerializer serializer)
@@ -1332,14 +1340,14 @@ namespace Tangra.Model.Config
 			public string DatabaseName = string.Empty;
 		}
 
-		public class PlateSolveSettings
+		public class PlateSolveSettings : IEqualityComparer<VideoCamera>
 		{
 			public StarIDSettings StarIDSettings = new StarIDSettings();
 			public string SelectedCameraModel;
 			public string SelectedScopeRecorder;
 			public bool UseLowPassForAstrometry;
 
-			[XmlElement("VideoCameraList")]
+			[XmlElement("SupportedCameras")]
 			public List<VideoCamera> VideoCameras = new List<VideoCamera>();
 
 			public List<ScopeRecorderConfiguration> ScopeRecorders = new List<ScopeRecorderConfiguration>();
@@ -1444,6 +1452,21 @@ namespace Tangra.Model.Config
 				}
 				else
 					return null;
+			}
+
+			public bool Equals(VideoCamera x, VideoCamera y)
+			{
+				if (x == null && y == null) return true;
+				else if (x == null || y == null) return false;
+				else return x.Model == y.Model;
+			}
+
+			public int GetHashCode(VideoCamera obj)
+			{
+				if (obj == null || obj.Model == null) 
+					return 0;
+
+				return obj.Model.GetHashCode();
 			}
 		}
 

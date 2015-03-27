@@ -153,8 +153,6 @@ namespace Tangra.Controller
 			{
 				m_CurrentOperation.FinalizeOperation();
 				m_CurrentOperation = null;
-
-				m_MainForm.pnlControlerPanel.Controls.Clear();
 			}
 
 			if (m_ImageTool != null)
@@ -176,6 +174,8 @@ namespace Tangra.Controller
             TangraCore.PreProcessors.ClearAll();
 
 			UpdateViews();
+
+			m_MainForm.pnlControlerPanel.Controls.Clear();
 		}
 
 		internal bool SingleBitmapFile(LCFile lcFile)
