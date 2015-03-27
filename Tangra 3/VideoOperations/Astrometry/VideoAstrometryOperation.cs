@@ -215,8 +215,6 @@ namespace Tangra.VideoOperations.Astrometry
             }
 
 			m_VideoController.PlayVideo(null, (uint)m_MeasurementContext.FrameInterval);
-
-			m_ViewControl.ShowMeasurementsView();
 		}
 
 		private void EnsureSwitchedToAstormetricFitView(Panel controlPanel)

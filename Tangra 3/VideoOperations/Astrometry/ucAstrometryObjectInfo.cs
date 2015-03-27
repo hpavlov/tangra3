@@ -235,7 +235,7 @@ namespace Tangra.VideoOperations.Astrometry
 			InitNewMultiframeMeasurement();
 
 			SwitchToAstrometryControls(false);
-			pnlSwitchControl.Visible = false;
+			pnlSwitchControl.Visible = true;
 		}
 
 		internal void FrameMeasurementFinished()
