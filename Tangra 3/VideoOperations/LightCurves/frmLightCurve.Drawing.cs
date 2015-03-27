@@ -985,10 +985,13 @@ namespace Tangra.VideoOperations.LightCurves
                     if (!float.IsNaN(x))
                     {
                         int intX = (int)Math.Round(x) + 1;
-                        foreach (int y in m_OldLineBackup.Keys)
-                        {
-                            m_Graph.SetPixel(intX, y, m_OldLineBackup[y]);
-                        }
+						if (intX >= 0 && intX < m_Graph.Width)
+						{
+							foreach (int y in m_OldLineBackup.Keys)
+							{
+								m_Graph.SetPixel(intX, y, m_OldLineBackup[y]);
+							}
+						}
                     }
                 }
                 else
