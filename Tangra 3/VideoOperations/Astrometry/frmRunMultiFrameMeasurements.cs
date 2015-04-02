@@ -39,6 +39,7 @@ namespace Tangra.VideoOperations.Astrometry
 
 		private bool m_AavStacking;
 		private VideoFileFormat m_VideoFileFormat;
+	    private string m_NativeFormat;
 
         internal frmRunMultiFrameMeasurements(
 			VideoController videoController, AddinsController addinsController, VideoAstrometryOperation astrometry, MeasurementContext measurementContext, FieldSolveContext fieldSolveContext,
@@ -202,9 +203,9 @@ namespace Tangra.VideoOperations.Astrometry
 						FrameStateData frameState = m_VideoController.GetCurrentFrameState();
 						timestamp = timestamp.AddMilliseconds(-0.5 * frameState.ExposureInMilliseconds);
 
-						string nativeFormat = m_VideoController.GetVideoFormat(m_VideoFileFormat);
-						if (nativeFormat == "PAL") timestamp = timestamp.AddMilliseconds(20);
-						else if (nativeFormat == "NTSC") timestamp = timestamp.AddMilliseconds(16.68);
+						m_NativeFormat = m_VideoController.GetVideoFormat(m_VideoFileFormat);
+                        if (m_NativeFormat == "PAL") timestamp = timestamp.AddMilliseconds(20);
+                        else if (m_NativeFormat == "NTSC") timestamp = timestamp.AddMilliseconds(16.68);
 					}
 					ucUtcTimePicker.DateTimeUtc = timestamp;
 					ucUtcTimePicker.Enabled = false; // The video has embedded timestamp so the users should not enter times manually
@@ -347,6 +348,7 @@ namespace Tangra.VideoOperations.Astrometry
 			m_MeasurementContext.IntegratedFramesCount = (int)nudIntegratedFrames.Value;
 			m_MeasurementContext.AavStackedMode = m_AavStacking;
 			m_MeasurementContext.VideoFileFormat = m_VideoFileFormat;
+            m_MeasurementContext.NativeVideoFormat = m_NativeFormat;
 			m_MeasurementContext.MaxMeasurements = (int)nudNumberMeasurements.Value;
 
 			// TODO: Detect the integration automatically and position to the first frame of the next interval

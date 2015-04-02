@@ -202,6 +202,18 @@ namespace Tangra.VideoOperations.Astrometry
 			m_AstrometricState.ObjectToMeasure = m_UserObject;
 			m_AstrometricState.ObjectToMeasureSelected = true;
 
+            if (m_UserObject != null)
+            {
+                foreach (IIdentifiedObject idObj in m_AstrometricState.IdentifiedObjects)
+                {
+                    if (AngleUtility.Elongation(idObj.RAHours * 15, idObj.DEDeg, m_UserObject.RADeg, m_UserObject.DEDeg) * 3600 < 5)
+                    {
+                        m_AstrometricState.IdentifiedObjectToMeasure = idObj.ObjectName;
+                        break;
+                    }
+                }                
+            }
+
 			m_AstrometricState.Measurements.Clear();
 			m_AstrometricState.MeasuringState = AstrometryInFramesState.RunningMeasurements;
 			m_ViewControl.FrameMeasurementStarted();
@@ -880,7 +892,13 @@ namespace Tangra.VideoOperations.Astrometry
 		private void DrawKnownObject(Graphics g, double raDeg, double deDeg, string name)
 		{
 			double x, y;
-			m_AstrometricFit.GetImageCoordsFromRADE(raDeg, deDeg, out x, out y);
+            if (name == m_AstrometricState.IdentifiedObjectToMeasure)
+            {
+                x = m_AstrometricState.ObjectToMeasure.X0;
+                y = m_AstrometricState.ObjectToMeasure.Y0;
+            }
+            else
+			    m_AstrometricFit.GetImageCoordsFromRADE(raDeg, deDeg, out x, out y);
 
 			PSFFit pstFit;
 			m_StarMap.GetPSFFit((int)x, (int)y, PSFFittingMethod.NonLinearFit, out pstFit);

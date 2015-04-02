@@ -802,16 +802,27 @@ namespace Tangra.VideoOperations.Astrometry
 				}
 				else
 				{
+				    rv.ResolvedFrameNo = frameNumber;
+
 					FrameStateData frameState = m_VideoController.GetFrameStateData(frameNumber);
 					rv.UT = frameState.CentralExposureTime;
 
+                    // Convert Central time to the timestamp of the end of the first field
+                    rv.UT = rv.UT.AddMilliseconds(-0.5 * frameState.ExposureInMilliseconds);
+
+                    if (context.NativeVideoFormat == "PAL") rv.UT = rv.UT.AddMilliseconds(20);
+                    else if (context.NativeVideoFormat == "NTSC") rv.UT = rv.UT.AddMilliseconds(16.68);
+
 					if (context.AavStackedMode)
 					{
-						// TODO: Apply instrumental delay for Aav Stacked Frames
-						rv.UT = rv.UT.AddSeconds(-1 * instrumentalDelaySeconds);
+					    // TODO: Apply instrumental delay for Aav Stacked Frames
+					    rv.UT = rv.UT.AddSeconds(-1*instrumentalDelaySeconds);
 					}
 					else
-						rv.UT = rv.UT.AddSeconds(-1 * instrumentalDelaySeconds);
+					{
+                        // Then apply instrumental delay
+                        rv.UT = rv.UT.AddSeconds(-1 * instrumentalDelaySeconds);
+					}
 				}
 			}
 			else

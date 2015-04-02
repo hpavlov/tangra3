@@ -111,6 +111,7 @@ namespace Tangra.VideoOperations.Astrometry
 		internal int IntegratedFramesCount { get; set; }
 		internal bool AavStackedMode { get; set; }
 		internal VideoFileFormat VideoFileFormat { get; set; }
+        internal string NativeVideoFormat { get; set; }
 	}
 
 	public class AstrometricState
@@ -153,6 +154,7 @@ namespace Tangra.VideoOperations.Astrometry
 
 		internal AstrometryInFramesState MeasuringState = AstrometryInFramesState.Ready;
 		internal UserObjectContext ObjectToMeasure;
+	    internal string IdentifiedObjectToMeasure;
 
 		private static object s_SyncRoot = new object();
 		internal static AstrometricState EnsureAstrometricState()
