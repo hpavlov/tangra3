@@ -272,6 +272,7 @@ namespace Tangra.VideoOperations.LightCurves
             {
                 try
                 {
+                    if (string.IsNullOrWhiteSpace(tbxRA.Text)) throw new FormatException();
                     m_RAHours = AstroConvert.ToRightAcsension(tbxRA.Text);
                 }
                 catch (FormatException)
@@ -283,6 +284,7 @@ namespace Tangra.VideoOperations.LightCurves
 
                 try
                 {
+                    if (string.IsNullOrWhiteSpace(tbxDec.Text)) throw new FormatException();
                     m_DEDeg = AstroConvert.ToDeclination(tbxDec.Text);
                 }
                 catch (FormatException)
@@ -294,6 +296,7 @@ namespace Tangra.VideoOperations.LightCurves
 
                 try
                 {
+                    if (string.IsNullOrWhiteSpace(tbxLatitude.Text)) throw new FormatException();
                     m_Latitude = AstroConvert.ToDeclination(tbxLatitude.Text);
                 }
                 catch (FormatException)
@@ -305,6 +308,7 @@ namespace Tangra.VideoOperations.LightCurves
 
                 try
                 {
+                    if (string.IsNullOrWhiteSpace(tbxLongitude.Text)) throw new FormatException();
                     m_Longitude = AstroConvert.ToDeclination(tbxLongitude.Text);
                 }
                 catch (FormatException)
@@ -316,6 +320,7 @@ namespace Tangra.VideoOperations.LightCurves
 
                 try
                 {
+                    if (string.IsNullOrWhiteSpace(tbxHeightKm.Text)) throw new FormatException();
                     m_HeightKm = double.Parse(tbxHeightKm.Text);
                 }
                 catch (FormatException)
