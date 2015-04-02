@@ -15,6 +15,7 @@ using System.Windows.Forms;
 using Tangra.Astrometry;
 using Tangra.AstroServices;
 using Tangra.Config;
+using Tangra.Controller;
 using Tangra.Model.Config;
 
 namespace Tangra.VideoOperations.Astrometry
@@ -39,7 +40,7 @@ namespace Tangra.VideoOperations.Astrometry
             InitializeComponent();
         }
 
-		internal frmIdentifyObjects(IAstrometricFit fit, double fov, DateTime utcTime, double magLimit, string obsCode)
+		internal frmIdentifyObjects(IAstrometricFit fit, VideoController videoController, double fov, DateTime utcTime, double magLimit, string obsCode)
             : this()
 		{
 			m_Fit = fit;
@@ -51,10 +52,19 @@ namespace Tangra.VideoOperations.Astrometry
 			pnlProgress.Visible = false;
 			pnlEnterTime.Visible = true;
 
-			DateTime dt = TangraConfig.Settings.LastUsed.LastIdentifyObjectsDate;
-			if (dt == DateTime.MinValue) dt = DateTime.Now.ToUniversalTime();
-			dtTime.Value = dt;
-			dtDate.Value = dt;
+			DateTime? timeStamp = videoController.GetCurrentFrameTime();
+			if (timeStamp != null)
+			{
+				dtTime.Value = timeStamp.Value;
+				dtDate.Value = timeStamp.Value;
+			}
+			else
+			{
+				DateTime dt = TangraConfig.Settings.LastUsed.LastIdentifyObjectsDate;
+				if (dt == DateTime.MinValue) dt = DateTime.Now.ToUniversalTime();
+				dtTime.Value = dt;
+				dtDate.Value = dt;
+			}
 		}
 
         internal frmIdentifyObjects(string objectDesignation, DateTime utcTime, string obsCode)

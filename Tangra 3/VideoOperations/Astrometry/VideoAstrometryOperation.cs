@@ -334,6 +334,7 @@ namespace Tangra.VideoOperations.Astrometry
 
 					frmIdentifyObjects frm = new frmIdentifyObjects(
 						AstrometryContext.Current.CurrentAstrometricFit,
+						m_VideoController,
 						maxFieldInAcrmin / 2.0,
 						AstrometryContext.Current.FieldSolveContext.UtcTime,
 						AstrometryContext.Current.FieldSolveContext.LimitMagn + 0.5,

@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Tangra.Config;
+using Tangra.Controller;
 using Tangra.Model.Astro;
 using Tangra.Model.Config;
 using Tangra.Model.Helpers;
@@ -24,17 +25,20 @@ namespace Tangra.VideoOperations.Astrometry
 		internal FieldSolveContext Context;
 
 		private IAstrometryController m_AstrometryController;
+		private VideoController m_VideoController;
+
 
 		public frmSolveConfiguration()
 		{
 			InitializeComponent();
 		}
 
-		public frmSolveConfiguration(IAstrometryController astrometryController)
+		public frmSolveConfiguration(IAstrometryController astrometryController, VideoController videoController)
 		{
 			InitializeComponent();
 
 			m_AstrometryController = astrometryController;
+			m_VideoController = videoController;
 
 			if (TangraConfig.Settings.PlateSolve.SelectedScopeRecorderConfig != null)
 				tbxLimitMag.Text = TangraConfig.Settings.PlateSolve.SelectedScopeRecorderConfig.LimitingMagnitudes[TangraConfig.Settings.PlateSolve.SelectedCameraModel].ToString("0.0");
@@ -49,6 +53,10 @@ namespace Tangra.VideoOperations.Astrometry
 
 			dtpEpoch.Value = TangraConfig.Settings.LastUsed.ObservationEpoch;
 			tbxFocalLength.Text = TangraConfig.Settings.LastUsed.FocalLength.ToString("0");
+
+			DateTime? timeStamp = m_VideoController.GetCurrentFrameTime();
+			if (timeStamp != null)
+				dtpEpoch.Value = timeStamp.Value;
 		}
 
 		private void btnOK_Click(object sender, EventArgs e)

@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 using Tangra.Helpers;
@@ -2114,5 +2115,67 @@ namespace Tangra.Controller
                 }
             }
         }
+
+		private static Regex s_RegexSourceToFileFormat = new Regex("^(?<format>(ADV|AAV|AVI|SER|FITS))\\..+$");
+
+		/// <summary>
+		/// AVI|AAV|ADV|SER|FITS
+		/// </summary>
+		/// <returns></returns>
+		internal VideoFileFormat GetVideoFileFormat()
+		{
+			if (m_FramePlayer.Video != null &&
+				m_FramePlayer.Video.VideoFileType != null)
+			{
+				Match match = s_RegexSourceToFileFormat.Match(m_FramePlayer.Video.VideoFileType);
+				if (match.Success &&
+					match.Groups["format"] != null &&
+					match.Groups["format"].Success)
+				{
+					try
+					{
+						return (VideoFileFormat)Enum.Parse(typeof(VideoFileFormat), match.Groups["format"].Value);
+					}
+					catch (FormatException fex)
+					{ }
+				}
+			}
+			return VideoFileFormat.Unknown;
+		}
+
+		/// <summary>
+		/// PAL|NTSC|Digital
+		/// </summary>
+		/// <returns></returns>
+		internal string GetVideoFormat(VideoFileFormat videoFileFormat)
+		{
+			if (videoFileFormat == VideoFileFormat.ADV || videoFileFormat == VideoFileFormat.SER)
+				return "Digital";
+			if (videoFileFormat == VideoFileFormat.AAV)
+				return  AstroVideoNativeVideoStandard;
+			else if (!double.IsNaN(m_FramePlayer.Video.FrameRate))
+			{
+				if (Math.Abs(25 - m_FramePlayer.Video.FrameRate) < 1)
+					return "PAL";
+				else if (Math.Abs(29.97 - m_FramePlayer.Video.FrameRate) < 1)
+					return "NTSC";
+			}
+
+			return "";
+		}
+
+		internal DateTime? GetCurrentFrameTime()
+		{
+			FrameStateData frameState = GetCurrentFrameState();
+
+			if (frameState.HasValidNtpTimeStamp)
+				AstroAnalogueVideoNormaliseNtpDataIfNeeded();
+			
+			if (frameState.CentralExposureTime != DateTime.MaxValue &&
+			    frameState.CentralExposureTime != DateTime.MinValue)
+				return frameState.CentralExposureTime;
+
+			return null;
+		}
 	}
 }

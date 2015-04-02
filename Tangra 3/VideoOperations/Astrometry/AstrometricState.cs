@@ -15,6 +15,7 @@ using Tangra.Model.Astro;
 using Tangra.Model.Config;
 using Tangra.Model.Helpers;
 using Tangra.VideoOperations.Astrometry.Engine;
+using Tangra.VideoOperations.LightCurves;
 
 namespace Tangra.VideoOperations.Astrometry
 {
@@ -108,6 +109,8 @@ namespace Tangra.VideoOperations.Astrometry
 		internal double InstrumentalDelay { get; set; }
 		internal InstrumentalDelayUnits InstrumentalDelayUnits { get; set; }
 		internal int IntegratedFramesCount { get; set; }
+		internal bool AavStackedMode { get; set; }
+		internal VideoFileFormat VideoFileFormat { get; set; }
 	}
 
 	public class AstrometricState

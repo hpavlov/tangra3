@@ -414,7 +414,7 @@ namespace Tangra.VideoOperations.Astrometry
 
 		private void btnSolveConfiguration_Click(object sender, EventArgs e)
 		{
-			frmSolveConfiguration frmSolveConfig = new frmSolveConfiguration(m_AstrometryController);
+			frmSolveConfiguration frmSolveConfig = new frmSolveConfiguration(m_AstrometryController, m_VideoController);
 			frmSolveConfig.StartPosition = FormStartPosition.CenterParent;
 
 			if (frmSolveConfig.ShowDialog(this.ParentForm) == DialogResult.OK)

@@ -21,11 +21,13 @@ using Tangra.Helpers;
 using Tangra.ImageTools;
 using Tangra.Model.Config;
 using Tangra.Model.Helpers;
+using Tangra.Model.Image;
 using Tangra.Model.Numerical;
 using Tangra.Model.VideoOperations;
 using Tangra.StarCatalogues;
 using Tangra.VideoOperations.Astrometry.Engine;
 using Tangra.VideoOperations.Astrometry.MPCReport;
+using Tangra.VideoOperations.LightCurves;
 
 namespace Tangra.VideoOperations.Astrometry
 {
@@ -773,7 +775,7 @@ namespace Tangra.VideoOperations.Astrometry
 			public int ClosestNormalIntervalLastFrameNo;
 		}
 
-		private static FrameTime GetTimeForFrame(MeasurementContext context, int frameNumber, int firstVideoFrame)
+		private FrameTime GetTimeForFrame(MeasurementContext context, int frameNumber, int firstVideoFrame)
 		{
 			var rv = new FrameTime();
 			rv.RequestedFrameNo = frameNumber;
@@ -790,11 +792,27 @@ namespace Tangra.VideoOperations.Astrometry
 		    double sigma = 0.000005;
 			if (context.FrameTimeType == FrameTimeType.NonIntegratedFrameTime) 
 			{
-				// No integration is used, directly derive the time and apply instrumental delay
-                rv.ResolvedFrameNo = frameNumber - firstVideoFrame;
-				rv.UT =
-					context.FirstFrameUtcTime.AddSeconds(
-					((frameNumber - context.FirstFrameId - instrumentalDelayFrames) / context.FrameRate) - instrumentalDelaySeconds);
+				if (context.VideoFileFormat == VideoFileFormat.AVI)
+				{
+					// No integration is used, directly derive the time and apply instrumental delay
+					rv.ResolvedFrameNo = frameNumber - firstVideoFrame;
+					rv.UT =
+						context.FirstFrameUtcTime.AddSeconds(
+						((frameNumber - context.FirstFrameId - instrumentalDelayFrames) / context.FrameRate) - instrumentalDelaySeconds);
+				}
+				else
+				{
+					FrameStateData frameState = m_VideoController.GetFrameStateData(frameNumber);
+					rv.UT = frameState.CentralExposureTime;
+
+					if (context.AavStackedMode)
+					{
+						// TODO: Apply instrumental delay for Aav Stacked Frames
+						rv.UT = rv.UT.AddSeconds(-1 * instrumentalDelaySeconds);
+					}
+					else
+						rv.UT = rv.UT.AddSeconds(-1 * instrumentalDelaySeconds);
+				}
 			}
 			else
 			{
@@ -986,7 +1004,7 @@ namespace Tangra.VideoOperations.Astrometry
 
 		private static Brush s_NormalTimeIntervalHighlightBrush = new SolidBrush(Color.FromArgb(143, 142, 112));
 
-		private static ProcessingReturnValues FitAndPlotSlowFlyby(
+		private ProcessingReturnValues FitAndPlotSlowFlyby(
 			Dictionary<int, SingleMultiFrameMeasurement> measurements,
 			MeasurementValues meaValues,
 			GetProcessingValueCallback getValueCallback,
@@ -1198,7 +1216,7 @@ namespace Tangra.VideoOperations.Astrometry
 			return rv;
 		}
 
-		private static ProcessingReturnValues FitAndPlotFastFlyby(Dictionary<int, SingleMultiFrameMeasurement> measurements,
+		private ProcessingReturnValues FitAndPlotFastFlyby(Dictionary<int, SingleMultiFrameMeasurement> measurements,
 			MeasurementValues meaValues,
 			GetProcessingValueCallback getValueCallback,
 			Graphics g, float xScale, float yScale, int imageWidth, int imageHeight)

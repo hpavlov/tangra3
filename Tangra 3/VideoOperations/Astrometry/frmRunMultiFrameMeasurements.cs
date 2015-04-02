@@ -22,6 +22,7 @@ using Tangra.SDK;
 using Tangra.StarCatalogues;
 using Tangra.Video;
 using Tangra.VideoOperations.Astrometry.Engine;
+using Tangra.VideoOperations.LightCurves;
 
 namespace Tangra.VideoOperations.Astrometry
 {
@@ -35,6 +36,9 @@ namespace Tangra.VideoOperations.Astrometry
 
         private List<ITangraAddinAction> m_AstrometryAddinActions = new List<ITangraAddinAction>();
         private List<ITangraAddin> m_AstrometryAddins = new List<ITangraAddin>();
+
+		private bool m_AavStacking;
+		private VideoFileFormat m_VideoFileFormat;
 
         internal frmRunMultiFrameMeasurements(
 			VideoController videoController, AddinsController addinsController, VideoAstrometryOperation astrometry, MeasurementContext measurementContext, FieldSolveContext fieldSolveContext,
@@ -109,7 +113,6 @@ namespace Tangra.VideoOperations.Astrometry
 	        cbxInstDelayCamera.Items.Clear();
 	        cbxInstDelayCamera.Items.Add(string.Empty);
 	        cbxInstDelayCamera.Items.AddRange(InstrumentalDelayConfigManager.GetAvailableCameras().ToArray());
-	        cbxInstDelayCamera.Items.IndexOf(TangraConfig.Settings.PlateSolve.SelectedCameraModel);
 		}
 
         internal class AddinActionEntry
@@ -129,10 +132,20 @@ namespace Tangra.VideoOperations.Astrometry
 
         private void SyncTimeStampControlWithExpectedFrameTime()
         {
-			double milisecondsDiff =
-				(m_VideoController.CurrentFrameIndex - AstrometryContext.Current.FieldSolveContext.FrameNoOfUtcTime) * 1000.0 / m_VideoController.VideoFrameRate;
+	        VideoFileFormat format = m_VideoController.GetVideoFileFormat();
+			if (format == VideoFileFormat.AVI)
+			{
+				double milisecondsDiff =
+					(m_VideoController.CurrentFrameIndex - AstrometryContext.Current.FieldSolveContext.FrameNoOfUtcTime) * 1000.0 / m_VideoController.VideoFrameRate;
 
-			ucUtcTimePicker.DateTimeUtc = AstrometryContext.Current.FieldSolveContext.UtcTime.AddMilliseconds(milisecondsDiff);
+				ucUtcTimePicker.DateTimeUtc = AstrometryContext.Current.FieldSolveContext.UtcTime.AddMilliseconds(milisecondsDiff);
+			}
+			else
+			{
+				DateTime? timeStamp = m_VideoController.GetCurrentFrameTime();
+				if (timeStamp != null)
+					ucUtcTimePicker.DateTimeUtc = timeStamp.Value;
+			}
         }
 
 		/// <summary>
@@ -164,8 +177,59 @@ namespace Tangra.VideoOperations.Astrometry
 		    nudIntegratedFrames.Enabled = true;
             btnDetectIntegration.Enabled = true;
 
-			cbxInstDelayCamera.SelectedIndex = 0; // No camera selected
-			cbxInstDelayMode.SelectedIndex = 1; // Manual
+			cbxInstDelayCamera.SelectedIndex = cbxInstDelayCamera.Items.IndexOf(TangraConfig.Settings.PlateSolve.SelectedCameraModel);
+			cbxInstDelayMode.SelectedIndex = 0; // Automatic
+			if (cbxInstDelayCamera.SelectedIndex == -1)
+			{
+				cbxInstDelayCamera.SelectedIndex = 0; // No camera selected
+				cbxInstDelayMode.SelectedIndex = 1; // Manual
+			}
+
+			m_AavStacking = false;
+			m_VideoFileFormat = m_VideoController.GetVideoFileFormat();
+			if (m_VideoFileFormat != VideoFileFormat.AVI)
+			{
+				cbxFrameTimeType.SelectedIndex = 0;
+				cbxFrameTimeType.Enabled = false;
+
+				DateTime? timeStamp = m_VideoController.GetCurrentFrameTime();
+				if (timeStamp != null)
+				{
+					DateTime timestamp = timeStamp.Value;
+					if (m_VideoFileFormat == VideoFileFormat.AAV)
+					{
+						// Compute the first timestamp value
+						FrameStateData frameState = m_VideoController.GetCurrentFrameState();
+						timestamp = timestamp.AddMilliseconds(-0.5 * frameState.ExposureInMilliseconds);
+
+						string nativeFormat = m_VideoController.GetVideoFormat(m_VideoFileFormat);
+						if (nativeFormat == "PAL") timestamp = timestamp.AddMilliseconds(20);
+						else if (nativeFormat == "NTSC") timestamp = timestamp.AddMilliseconds(16.68);
+					}
+					ucUtcTimePicker.DateTimeUtc = timestamp;
+					ucUtcTimePicker.Enabled = false; // The video has embedded timestamp so the users should not enter times manually
+				}
+
+				if (m_VideoFileFormat == VideoFileFormat.AAV)
+				{
+					nudIntegratedFrames.Enabled = false;
+
+					if (m_VideoController.AstroAnalogueVideoStackedFrameRate > 0)
+					{
+						pnlIntegration.Visible = true;
+						btnDetectIntegration.Visible = false;
+						lblFrames.Text = string.Format("frames (stacking: {0} frames)", m_VideoController.AstroAnalogueVideoStackedFrameRate);
+						m_AavStacking = true;
+						nudIntegratedFrames.Value = m_VideoController.AstroAnalogueVideoIntegratedAAVFrames;
+					}
+					else if (m_VideoController.AstroAnalogueVideoIntegratedAAVFrames > 0)
+					{
+						pnlIntegration.Visible = true;
+						btnDetectIntegration.Visible = false;
+						nudIntegratedFrames.Value = m_VideoController.AstroAnalogueVideoIntegratedAAVFrames;
+					}
+				}
+			}
 
 			activePage = 0;
 			DisplayActivePage();
@@ -281,6 +345,8 @@ namespace Tangra.VideoOperations.Astrometry
 			m_MeasurementContext.InstrumentalDelay = (double)nudInstrDelay.Value;
 			m_MeasurementContext.InstrumentalDelayUnits = (InstrumentalDelayUnits)cbxInstDelayUnit.SelectedIndex;
 			m_MeasurementContext.IntegratedFramesCount = (int)nudIntegratedFrames.Value;
+			m_MeasurementContext.AavStackedMode = m_AavStacking;
+			m_MeasurementContext.VideoFileFormat = m_VideoFileFormat;
 			m_MeasurementContext.MaxMeasurements = (int)nudNumberMeasurements.Value;
 
 			// TODO: Detect the integration automatically and position to the first frame of the next interval

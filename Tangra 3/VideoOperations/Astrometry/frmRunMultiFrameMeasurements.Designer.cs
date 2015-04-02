@@ -47,6 +47,7 @@ namespace Tangra.VideoOperations.Astrometry
 			this.cbxBackgroundMethod = new System.Windows.Forms.ComboBox();
 			this.pnlAstrometry = new System.Windows.Forms.Panel();
 			this.label5 = new System.Windows.Forms.Label();
+			this.ucFrameInterval = new Tangra.VideoOperations.Astrometry.ucFrameInterval();
 			this.label3 = new System.Windows.Forms.Label();
 			this.nudNumberMeasurements = new System.Windows.Forms.NumericUpDown();
 			this.label2 = new System.Windows.Forms.Label();
@@ -69,9 +70,9 @@ namespace Tangra.VideoOperations.Astrometry
 			this.label10 = new System.Windows.Forms.Label();
 			this.pnlIntegration = new System.Windows.Forms.Panel();
 			this.btnDetectIntegration = new System.Windows.Forms.Button();
-			this.label14 = new System.Windows.Forms.Label();
+			this.lblFrames = new System.Windows.Forms.Label();
 			this.nudIntegratedFrames = new System.Windows.Forms.NumericUpDown();
-			this.label13 = new System.Windows.Forms.Label();
+			this.lblIntegration = new System.Windows.Forms.Label();
 			this.label4 = new System.Windows.Forms.Label();
 			this.ucUtcTimePicker = new Tangra.Model.Controls.ucUtcTimePicker();
 			this.cbxExpectedMotion = new System.Windows.Forms.ComboBox();
@@ -80,7 +81,6 @@ namespace Tangra.VideoOperations.Astrometry
 			this.gbConfig = new System.Windows.Forms.GroupBox();
 			this.pnlAddins = new System.Windows.Forms.Panel();
 			this.clbAddinsToRun = new System.Windows.Forms.CheckedListBox();
-			this.ucFrameInterval = new Tangra.VideoOperations.Astrometry.ucFrameInterval();
 			this.pnlExportConfig.SuspendLayout();
 			this.pnlExportPhotometry.SuspendLayout();
 			this.pnlPhotometry.SuspendLayout();
@@ -474,6 +474,15 @@ namespace Tangra.VideoOperations.Astrometry
 			this.label5.TabIndex = 8;
 			this.label5.Text = "Take up to";
 			// 
+			// ucFrameInterval
+			// 
+			this.ucFrameInterval.Location = new System.Drawing.Point(17, 15);
+			this.ucFrameInterval.Name = "ucFrameInterval";
+			this.ucFrameInterval.Size = new System.Drawing.Size(179, 27);
+			this.ucFrameInterval.TabIndex = 0;
+			this.ucFrameInterval.Value = 1;
+			this.ucFrameInterval.FrameIntervalChanged += new System.EventHandler<Tangra.VideoOperations.Astrometry.FrameIntervalChangedEventArgs>(this.ucFrameInterval_FrameIntervalChanged);
+			// 
 			// label3
 			// 
 			this.label3.AutoSize = true;
@@ -739,9 +748,9 @@ namespace Tangra.VideoOperations.Astrometry
 			// pnlIntegration
 			// 
 			this.pnlIntegration.Controls.Add(this.btnDetectIntegration);
-			this.pnlIntegration.Controls.Add(this.label14);
+			this.pnlIntegration.Controls.Add(this.lblFrames);
 			this.pnlIntegration.Controls.Add(this.nudIntegratedFrames);
-			this.pnlIntegration.Controls.Add(this.label13);
+			this.pnlIntegration.Controls.Add(this.lblIntegration);
 			this.pnlIntegration.Location = new System.Drawing.Point(37, 81);
 			this.pnlIntegration.Name = "pnlIntegration";
 			this.pnlIntegration.Size = new System.Drawing.Size(374, 29);
@@ -757,14 +766,14 @@ namespace Tangra.VideoOperations.Astrometry
 			this.btnDetectIntegration.UseVisualStyleBackColor = true;
 			this.btnDetectIntegration.Click += new System.EventHandler(this.btnDetectIntegration_Click);
 			// 
-			// label14
+			// lblFrames
 			// 
-			this.label14.AutoSize = true;
-			this.label14.Location = new System.Drawing.Point(130, 7);
-			this.label14.Name = "label14";
-			this.label14.Size = new System.Drawing.Size(38, 13);
-			this.label14.TabIndex = 32;
-			this.label14.Text = "frames";
+			this.lblFrames.AutoSize = true;
+			this.lblFrames.Location = new System.Drawing.Point(130, 7);
+			this.lblFrames.Name = "lblFrames";
+			this.lblFrames.Size = new System.Drawing.Size(38, 13);
+			this.lblFrames.TabIndex = 32;
+			this.lblFrames.Text = "frames";
 			// 
 			// nudIntegratedFrames
 			// 
@@ -789,14 +798,14 @@ namespace Tangra.VideoOperations.Astrometry
             0});
 			this.nudIntegratedFrames.ValueChanged += new System.EventHandler(this.nudIntegratedFrames_ValueChanged);
 			// 
-			// label13
+			// lblIntegration
 			// 
-			this.label13.AutoSize = true;
-			this.label13.Location = new System.Drawing.Point(7, 7);
-			this.label13.Name = "label13";
-			this.label13.Size = new System.Drawing.Size(60, 13);
-			this.label13.TabIndex = 30;
-			this.label13.Text = "Integration:";
+			this.lblIntegration.AutoSize = true;
+			this.lblIntegration.Location = new System.Drawing.Point(7, 7);
+			this.lblIntegration.Name = "lblIntegration";
+			this.lblIntegration.Size = new System.Drawing.Size(60, 13);
+			this.lblIntegration.TabIndex = 30;
+			this.lblIntegration.Text = "Integration:";
 			// 
 			// label4
 			// 
@@ -880,15 +889,6 @@ namespace Tangra.VideoOperations.Astrometry
 			this.clbAddinsToRun.Name = "clbAddinsToRun";
 			this.clbAddinsToRun.Size = new System.Drawing.Size(372, 214);
 			this.clbAddinsToRun.TabIndex = 1;
-			// 
-			// ucFrameInterval
-			// 
-			this.ucFrameInterval.Location = new System.Drawing.Point(17, 15);
-			this.ucFrameInterval.Name = "ucFrameInterval";
-			this.ucFrameInterval.Size = new System.Drawing.Size(179, 27);
-			this.ucFrameInterval.TabIndex = 0;
-			this.ucFrameInterval.Value = 1;
-			this.ucFrameInterval.FrameIntervalChanged += new System.EventHandler<Tangra.VideoOperations.Astrometry.FrameIntervalChangedEventArgs>(this.ucFrameInterval_FrameIntervalChanged);
 			// 
 			// frmRunMultiFrameMeasurements
 			// 
@@ -983,9 +983,9 @@ namespace Tangra.VideoOperations.Astrometry
 		private System.Windows.Forms.Label label10;
 		private System.Windows.Forms.Panel pnlIntegration;
 		private System.Windows.Forms.Button btnDetectIntegration;
-		private System.Windows.Forms.Label label14;
+		private System.Windows.Forms.Label lblFrames;
 		private System.Windows.Forms.NumericUpDown nudIntegratedFrames;
-		private System.Windows.Forms.Label label13;
+		private System.Windows.Forms.Label lblIntegration;
 		private System.Windows.Forms.Label label4;
 		private ucUtcTimePicker ucUtcTimePicker;
 		private System.Windows.Forms.ComboBox cbxExpectedMotion;
