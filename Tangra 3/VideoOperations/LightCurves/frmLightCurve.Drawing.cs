@@ -35,7 +35,7 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void DrawGraph(Graphics g)
         {
-            if (!LCMeasurementHeader.IsEmpty(m_Header))
+            if (!LCMeasurementHeader.IsEmpty(m_Header) && m_LightCurveController.Context != null)
             {
                 if (
                     m_Graph == null ||

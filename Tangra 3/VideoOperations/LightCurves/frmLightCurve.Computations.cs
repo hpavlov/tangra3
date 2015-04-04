@@ -732,7 +732,9 @@ namespace Tangra.VideoOperations.LightCurves
 						continue;
 
 					string isCorrectedForInstrumentalDelay;
-                    double midBinFrameNumber = firstFrameNoInBin + (m_LightCurveController.Context.Binning / 2.0) - 0.5;
+                    double midBinFrameNumber =  firstFrameNoInBin < m_LightCurveController.Context.BinningFirstFrame
+                            ? ((m_LightCurveController.Context.BinningFirstFrame - m_LightCurveController.Context.MinFrame) / 2.0) - 0.5
+                            : firstFrameNoInBin + (m_LightCurveController.Context.Binning / 2.0) - 0.5;
 
 				    DateTime middleBinTime = DateTime.MinValue;
 
@@ -786,7 +788,11 @@ namespace Tangra.VideoOperations.LightCurves
 
 					output.AppendLine();
 
-					firstFrameNoInBin += m_LightCurveController.Context.Binning;
+				    if (firstFrameNoInBin < m_LightCurveController.Context.BinningFirstFrame)
+                        // If this is the first incomplete bin, then next bin's first frame is the first binning frame
+				        firstFrameNoInBin = m_LightCurveController.Context.BinningFirstFrame;
+                    else
+					    firstFrameNoInBin += m_LightCurveController.Context.Binning;
 				}
 			}
 			else
