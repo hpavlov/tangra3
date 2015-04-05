@@ -15,6 +15,7 @@ using System.Windows.Forms;
 using Tangra.Config;
 using Tangra.Controller;
 using Tangra.Helpers;
+using Tangra.Model.Astro;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
 using Tangra.Model.Image;
@@ -41,6 +42,7 @@ namespace Tangra.VideoOperations.Astrometry
 		private bool m_AavIntegration;
 		private VideoFileFormat m_VideoFileFormat;
 	    private string m_NativeFormat;
+		private bool m_Initialised;
 
         internal frmRunMultiFrameMeasurements(
 			VideoController videoController, AddinsController addinsController, VideoAstrometryOperation astrometry, MeasurementContext measurementContext, FieldSolveContext fieldSolveContext,
@@ -115,6 +117,8 @@ namespace Tangra.VideoOperations.Astrometry
 	        cbxInstDelayCamera.Items.Clear();
 	        cbxInstDelayCamera.Items.Add(string.Empty);
 	        cbxInstDelayCamera.Items.AddRange(InstrumentalDelayConfigManager.GetAvailableCameras().ToArray());
+
+	        m_Initialised = true;
 		}
 
         internal class AddinActionEntry
@@ -219,6 +223,7 @@ namespace Tangra.VideoOperations.Astrometry
 
 					if (m_VideoController.AstroAnalogueVideoStackedFrameRate > 0)
 					{
+						cbxFrameTimeType.Items[0] = "AAV stacked frame";
 						pnlIntegration.Visible = true;
 						btnDetectIntegration.Visible = false;
 						lblFrames.Text = string.Format("frames (stacking: {0} frames)", m_VideoController.AstroAnalogueVideoStackedFrameRate);
@@ -227,6 +232,7 @@ namespace Tangra.VideoOperations.Astrometry
 					}
 					else if (m_VideoController.AstroAnalogueVideoIntegratedAAVFrames > 0)
 					{
+						cbxFrameTimeType.Items[0] = "AAV integrated frame";
 						pnlIntegration.Visible = true;
 						btnDetectIntegration.Visible = false;
 						nudIntegratedFrames.Value = m_VideoController.AstroAnalogueVideoIntegratedAAVFrames;
@@ -679,6 +685,18 @@ namespace Tangra.VideoOperations.Astrometry
 			{
 				float x0 = m_MeasurementContext.ObjectToMeasure.X0;
 				float y0 = m_MeasurementContext.ObjectToMeasure.Y0;
+
+				// x0 and y0 were measured on the first frame but we may have moved to a different frame due to positioning to the first frame of integration period
+				// so we determine the position of the object on the current frame in order to draw the aperture nicely centered
+				var fit = new PSFFit((int)x0, (int)y0);
+				fit.Fit(m_VideoController.GetCurrentAstroImage(false).GetMeasurableAreaPixels((int)x0, (int)y0));
+
+				if (fit.IsSolved)
+				{
+					x0 = (float)fit.XCenter;
+					y0 = (float)fit.YCenter;
+				}
+
 				byte[,] bmpPixels = m_VideoController.GetCurrentAstroImage(false).GetMeasurableAreaDisplayBitmapPixels((int) x0, (int) y0, 85);
 
 				Bitmap bmp = Pixelmap.ConstructBitmapFromBitmapPixels(bmpPixels, 85, 85);
@@ -706,8 +724,17 @@ namespace Tangra.VideoOperations.Astrometry
 
 		private void nudAperture_ValueChanged(object sender, EventArgs e)
 		{
-			float innerRadius = TangraConfig.Settings.Photometry.AnnulusInnerRadius * (float)nudAperture.Value;
-			float outernRadius = (float)Math.Sqrt(TangraConfig.Settings.Photometry.AnnulusMinPixels / Math.PI + innerRadius * innerRadius);
+			float annulusInnerRadius = TangraConfig.Settings.Photometry.AnnulusInnerRadius;
+			float annulusMinPixels = TangraConfig.Settings.Photometry.AnnulusMinPixels;
+			if (m_Initialised)
+			{
+				// If we have already set the initial values, we want to keep the new inner radius/min pixel values 
+				annulusInnerRadius = ((float)nudGap.Value + (float)nudAperture.Value) / (float)nudAperture.Value;
+				annulusMinPixels = (int)(Math.PI * (Math.Pow((float)nudAnnulus.Value + (float)nudGap.Value + (float)nudAperture.Value, 2) - Math.Pow((float)nudGap.Value + (float)nudAperture.Value, 2)));
+			}
+
+			float innerRadius = annulusInnerRadius * (float)nudAperture.Value;
+			float outernRadius = (float)Math.Sqrt(annulusMinPixels / Math.PI + innerRadius * innerRadius);
 			decimal gap = (decimal)innerRadius - nudAperture.Value;
 			decimal annulus = (decimal)outernRadius - nudGap.Value - nudAperture.Value;
 

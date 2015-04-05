@@ -1085,6 +1085,12 @@ namespace Tangra
 
 		private bool StartAstrometry(bool debugMode)
 		{
+			if (m_VideoController.GetVideoFileFormat() == VideoFileFormat.AAV &&
+			    m_VideoController.CurrentFrameIndex == m_VideoController.VideoFirstFrame)
+			{
+				m_VideoController.StepForward();
+			}
+
 			AstrometryContext.Current.Reset();
 
 			if (ChooseCalibratedConfigurationDialog(debugMode))
