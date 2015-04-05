@@ -18,8 +18,8 @@ namespace Tangra.VideoOperations.LightCurves
 {
     public partial class frmConfigureCsvExport : Form
     {
-        public frmConfigureCsvExport()
-        {
+		public frmConfigureCsvExport()
+		{
             InitializeComponent();
 
             TrackedObjects = new List<TrackedObjectConfig>();
@@ -38,7 +38,7 @@ namespace Tangra.VideoOperations.LightCurves
                 tbxLongitude.Text = AstroConvert.ToStringValue(savedSettings.LongitudeDeg, "DDD MM SS");
                 tbxHeightKm.Text = savedSettings.HeightKM.ToString("0.000");
             }
-            catch { }            
+            catch { }
         }
 
         internal TangraConfig.LightCurvesDisplaySettings DisplaySettings;
@@ -131,6 +131,10 @@ namespace Tangra.VideoOperations.LightCurves
 				rbSeriesSAndB.Enabled = true;
 				rbSeriesSAndB.Checked = true;
 			}
+
+			nudExportStartFromFrame.Minimum = LCFile.Header.MinFrame;
+			nudExportStartFromFrame.Maximum = LCFile.Header.MaxFrame - 1;
+			nudExportStartFromFrame.SetNUDValue((decimal)LCFile.Header.MinFrame);
         }
 
         private void RecalculateMagnitudes(int refIndex, double refMagnitude)
@@ -197,6 +201,7 @@ namespace Tangra.VideoOperations.LightCurves
             }
 
 	        rv.Spacing = cbxSpacingOptions.SelectedIndex + 1;
+	        rv.ExportStartingFrame = (int)nudExportStartFromFrame.Value;
 	        rv.ForceSignalMinusBackground = this.OnlyExportSignalMunusBg || rbSeriesSmB.Checked;
 
             return rv;
@@ -267,6 +272,13 @@ namespace Tangra.VideoOperations.LightCurves
                     m_ConfirmedDate = frm.SelectedDay.Value;
                 }
             }
+
+			if (Binning && (nudExportStartFromFrame.Value != nudExportStartFromFrame.Minimum || cbxSpacingOptions.SelectedIndex > 0))
+			{
+				MessageBox.Show(this, "When binning is used 'spacing' and a specific starting frame cannot be used as export options.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				tbxRA.Focus();
+				return;
+			}
 
             if (cbxAtmExtExport.Checked)
             {
@@ -357,7 +369,6 @@ namespace Tangra.VideoOperations.LightCurves
                 catch { }            
 
             }
-
 
             // TODO: Confirm object is above horizon
 

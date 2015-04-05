@@ -28,6 +28,8 @@ namespace Tangra.VideoOperations.LightCurves
 
 		public int Spacing { get; set; }
 
+		public int ExportStartingFrame { get; set; }
+
 		public bool ForceSignalMinusBackground { get; set; }
 
 	    public DateTime? FistMeasurementDay { get; set; }

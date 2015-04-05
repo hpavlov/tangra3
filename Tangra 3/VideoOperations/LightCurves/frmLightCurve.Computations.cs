@@ -728,7 +728,12 @@ namespace Tangra.VideoOperations.LightCurves
 
 				for (int i = 0; i < count; i++)
 				{
-					if (options.Spacing > 1 && i%options.Spacing != 0) 
+					if (options.Spacing > 1 && (i - options.ExportStartingFrame) % options.Spacing != 0) 
+						// Skip all frames in the 'spaces'
+						continue;
+
+					if (i < (options.ExportStartingFrame - m_LightCurveController.Context.MinFrame))
+						// Skip all frames before the first frame configured to begin the export from
 						continue;
 
 					string isCorrectedForInstrumentalDelay;
@@ -833,7 +838,12 @@ namespace Tangra.VideoOperations.LightCurves
 
 				for (int i = 0; i < count; i++)
 				{
-					if (options.Spacing > 1 && i % options.Spacing != 0)
+					if (options.Spacing > 1 && (i - options.ExportStartingFrame) % options.Spacing != 0)
+						// Skip all frames in the 'spaces'
+						continue;
+
+					if (i < (options.ExportStartingFrame - m_LightCurveController.Context.MinFrame))
+						// Skip all frames before the first frame configured to begin the export from
 						continue;
 
 					uint frameNo = m_LightCurveController.Context.AllReadings[0][i].CurrFrameNo;
@@ -841,7 +851,7 @@ namespace Tangra.VideoOperations.LightCurves
 					DateTime currFrameTime = m_LCFile.GetTimeForFrame(frameNo, out isCorrectedForInstrumentalDelay);
 
 				    if (!string.IsNullOrEmpty(m_LightCurveController.Context.InstrumentalDelayConfigName) && isCorrectedForInstrumentalDelay == null)
-                        // Single frames not corrected for instrumental delays, where insrumental delays are known, are considered bad times
+                        // Single frames not corrected for instrumental delays, where instrumental delays are known, are considered bad times
 				        currFrameTime = DateTime.MaxValue;
 
                     string timeStr;

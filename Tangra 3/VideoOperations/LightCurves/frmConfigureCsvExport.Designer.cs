@@ -61,15 +61,17 @@
 			this.label4 = new System.Windows.Forms.Label();
 			this.rbMagnitude = new System.Windows.Forms.RadioButton();
 			this.rbFlux = new System.Windows.Forms.RadioButton();
-			this.btnOK = new System.Windows.Forms.Button();
-			this.btnCancel = new System.Windows.Forms.Button();
 			this.tabSeries = new System.Windows.Forms.TabPage();
-			this.lblSAndB = new System.Windows.Forms.Label();
-			this.rbSeriesSAndB = new System.Windows.Forms.RadioButton();
+			this.cbxSpacingOptions = new System.Windows.Forms.ComboBox();
+			this.label11 = new System.Windows.Forms.Label();
 			this.lblSmB = new System.Windows.Forms.Label();
 			this.rbSeriesSmB = new System.Windows.Forms.RadioButton();
-			this.label11 = new System.Windows.Forms.Label();
-			this.cbxSpacingOptions = new System.Windows.Forms.ComboBox();
+			this.lblSAndB = new System.Windows.Forms.Label();
+			this.rbSeriesSAndB = new System.Windows.Forms.RadioButton();
+			this.btnOK = new System.Windows.Forms.Button();
+			this.btnCancel = new System.Windows.Forms.Button();
+			this.label9 = new System.Windows.Forms.Label();
+			this.nudExportStartFromFrame = new System.Windows.Forms.NumericUpDown();
 			this.tabSettings.SuspendLayout();
 			this.tabTime.SuspendLayout();
 			this.tabValues.SuspendLayout();
@@ -85,6 +87,7 @@
 			((System.ComponentModel.ISupportInitialize)(this.nudMag2)).BeginInit();
 			this.pnlFlux.SuspendLayout();
 			this.tabSeries.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.nudExportStartFromFrame)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// tabSettings
@@ -449,28 +452,10 @@
 			this.rbFlux.Text = "Relative Flux";
 			this.rbFlux.UseVisualStyleBackColor = true;
 			// 
-			// btnOK
-			// 
-			this.btnOK.Location = new System.Drawing.Point(186, 224);
-			this.btnOK.Name = "btnOK";
-			this.btnOK.Size = new System.Drawing.Size(75, 23);
-			this.btnOK.TabIndex = 2;
-			this.btnOK.Text = "OK";
-			this.btnOK.UseVisualStyleBackColor = true;
-			this.btnOK.Click += new System.EventHandler(this.btnOK_Click);
-			// 
-			// btnCancel
-			// 
-			this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.btnCancel.Location = new System.Drawing.Point(267, 224);
-			this.btnCancel.Name = "btnCancel";
-			this.btnCancel.Size = new System.Drawing.Size(75, 23);
-			this.btnCancel.TabIndex = 3;
-			this.btnCancel.Text = "Cancel";
-			this.btnCancel.UseVisualStyleBackColor = true;
-			// 
 			// tabSeries
 			// 
+			this.tabSeries.Controls.Add(this.nudExportStartFromFrame);
+			this.tabSeries.Controls.Add(this.label9);
 			this.tabSeries.Controls.Add(this.cbxSpacingOptions);
 			this.tabSeries.Controls.Add(this.label11);
 			this.tabSeries.Controls.Add(this.lblSmB);
@@ -485,26 +470,29 @@
 			this.tabSeries.Text = "Series";
 			this.tabSeries.UseVisualStyleBackColor = true;
 			// 
-			// lblSAndB
+			// cbxSpacingOptions
 			// 
-			this.lblSAndB.AutoSize = true;
-			this.lblSAndB.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.lblSAndB.Location = new System.Drawing.Point(45, 34);
-			this.lblSAndB.Name = "lblSAndB";
-			this.lblSAndB.Size = new System.Drawing.Size(173, 13);
-			this.lblSAndB.TabIndex = 6;
-			this.lblSAndB.Text = "(Default format supported by AOTA)";
+			this.cbxSpacingOptions.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.cbxSpacingOptions.FormattingEnabled = true;
+			this.cbxSpacingOptions.Items.AddRange(new object[] {
+            "Export All Data Points",
+            "Export Every 2-nd Data Point",
+            "Export Every 3-rd Data Point",
+            "Export Every 4-th Data Point",
+            "Export Every 5-th Data Point"});
+			this.cbxSpacingOptions.Location = new System.Drawing.Point(75, 112);
+			this.cbxSpacingOptions.Name = "cbxSpacingOptions";
+			this.cbxSpacingOptions.Size = new System.Drawing.Size(210, 21);
+			this.cbxSpacingOptions.TabIndex = 10;
 			// 
-			// rbSeriesSAndB
+			// label11
 			// 
-			this.rbSeriesSAndB.AutoSize = true;
-			this.rbSeriesSAndB.Checked = true;
-			this.rbSeriesSAndB.Location = new System.Drawing.Point(21, 14);
-			this.rbSeriesSAndB.Name = "rbSeriesSAndB";
-			this.rbSeriesSAndB.Size = new System.Drawing.Size(189, 17);
-			this.rbSeriesSAndB.TabIndex = 5;
-			this.rbSeriesSAndB.Text = "Signal and Background Separately";
-			this.rbSeriesSAndB.UseVisualStyleBackColor = true;
+			this.label11.AutoSize = true;
+			this.label11.Location = new System.Drawing.Point(21, 115);
+			this.label11.Name = "label11";
+			this.label11.Size = new System.Drawing.Size(49, 13);
+			this.label11.TabIndex = 9;
+			this.label11.Text = "Spacing:";
 			// 
 			// lblSmB
 			// 
@@ -527,29 +515,68 @@
 			this.rbSeriesSmB.Text = "Signal-minus-Background";
 			this.rbSeriesSmB.UseVisualStyleBackColor = true;
 			// 
-			// label11
+			// lblSAndB
 			// 
-			this.label11.AutoSize = true;
-			this.label11.Location = new System.Drawing.Point(21, 115);
-			this.label11.Name = "label11";
-			this.label11.Size = new System.Drawing.Size(49, 13);
-			this.label11.TabIndex = 9;
-			this.label11.Text = "Spacing:";
+			this.lblSAndB.AutoSize = true;
+			this.lblSAndB.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.lblSAndB.Location = new System.Drawing.Point(45, 34);
+			this.lblSAndB.Name = "lblSAndB";
+			this.lblSAndB.Size = new System.Drawing.Size(173, 13);
+			this.lblSAndB.TabIndex = 6;
+			this.lblSAndB.Text = "(Default format supported by AOTA)";
 			// 
-			// cbxSpacingOptions
+			// rbSeriesSAndB
 			// 
-			this.cbxSpacingOptions.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.cbxSpacingOptions.FormattingEnabled = true;
-			this.cbxSpacingOptions.Items.AddRange(new object[] {
-            "Export All Data Points",
-            "Export Every 2-nd Data Point",
-            "Export Every 3-rd Data Point",
-            "Export Every 4-th Data Point",
-            "Export Every 5-th Data Point"});
-			this.cbxSpacingOptions.Location = new System.Drawing.Point(75, 112);
-			this.cbxSpacingOptions.Name = "cbxSpacingOptions";
-			this.cbxSpacingOptions.Size = new System.Drawing.Size(210, 21);
-			this.cbxSpacingOptions.TabIndex = 10;
+			this.rbSeriesSAndB.AutoSize = true;
+			this.rbSeriesSAndB.Checked = true;
+			this.rbSeriesSAndB.Location = new System.Drawing.Point(21, 14);
+			this.rbSeriesSAndB.Name = "rbSeriesSAndB";
+			this.rbSeriesSAndB.Size = new System.Drawing.Size(189, 17);
+			this.rbSeriesSAndB.TabIndex = 5;
+			this.rbSeriesSAndB.TabStop = true;
+			this.rbSeriesSAndB.Text = "Signal and Background Separately";
+			this.rbSeriesSAndB.UseVisualStyleBackColor = true;
+			// 
+			// btnOK
+			// 
+			this.btnOK.Location = new System.Drawing.Point(186, 224);
+			this.btnOK.Name = "btnOK";
+			this.btnOK.Size = new System.Drawing.Size(75, 23);
+			this.btnOK.TabIndex = 2;
+			this.btnOK.Text = "OK";
+			this.btnOK.UseVisualStyleBackColor = true;
+			this.btnOK.Click += new System.EventHandler(this.btnOK_Click);
+			// 
+			// btnCancel
+			// 
+			this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+			this.btnCancel.Location = new System.Drawing.Point(267, 224);
+			this.btnCancel.Name = "btnCancel";
+			this.btnCancel.Size = new System.Drawing.Size(75, 23);
+			this.btnCancel.TabIndex = 3;
+			this.btnCancel.Text = "Cancel";
+			this.btnCancel.UseVisualStyleBackColor = true;
+			// 
+			// label9
+			// 
+			this.label9.AutoSize = true;
+			this.label9.Location = new System.Drawing.Point(21, 148);
+			this.label9.Name = "label9";
+			this.label9.Size = new System.Drawing.Size(84, 13);
+			this.label9.TabIndex = 11;
+			this.label9.Text = "Start from frame:";
+			// 
+			// nudSpacingStartFromFrame
+			// 
+			this.nudExportStartFromFrame.Location = new System.Drawing.Point(111, 145);
+			this.nudExportStartFromFrame.Maximum = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
+			this.nudExportStartFromFrame.Name = "nudExportStartFromFrame";
+			this.nudExportStartFromFrame.Size = new System.Drawing.Size(45, 20);
+			this.nudExportStartFromFrame.TabIndex = 12;
 			// 
 			// frmConfigureCsvExport
 			// 
@@ -585,6 +612,7 @@
 			this.pnlFlux.ResumeLayout(false);
 			this.tabSeries.ResumeLayout(false);
 			this.tabSeries.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.nudExportStartFromFrame)).EndInit();
 			this.ResumeLayout(false);
 
         }
@@ -633,5 +661,7 @@
 		private System.Windows.Forms.RadioButton rbSeriesSAndB;
 		private System.Windows.Forms.ComboBox cbxSpacingOptions;
 		private System.Windows.Forms.Label label11;
+		private System.Windows.Forms.NumericUpDown nudExportStartFromFrame;
+		private System.Windows.Forms.Label label9;
     }
 }
