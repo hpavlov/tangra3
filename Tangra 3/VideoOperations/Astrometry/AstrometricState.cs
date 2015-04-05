@@ -110,6 +110,7 @@ namespace Tangra.VideoOperations.Astrometry
 		internal InstrumentalDelayUnits InstrumentalDelayUnits { get; set; }
 		internal int IntegratedFramesCount { get; set; }
 		internal bool AavStackedMode { get; set; }
+		internal bool AavIntegration { get; set; }
 		internal VideoFileFormat VideoFileFormat { get; set; }
         internal string NativeVideoFormat { get; set; }
 	}

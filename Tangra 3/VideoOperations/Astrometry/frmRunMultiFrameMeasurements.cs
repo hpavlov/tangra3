@@ -38,6 +38,7 @@ namespace Tangra.VideoOperations.Astrometry
         private List<ITangraAddin> m_AstrometryAddins = new List<ITangraAddin>();
 
 		private bool m_AavStacking;
+		private bool m_AavIntegration;
 		private VideoFileFormat m_VideoFileFormat;
 	    private string m_NativeFormat;
 
@@ -187,6 +188,7 @@ namespace Tangra.VideoOperations.Astrometry
 			}
 
 			m_AavStacking = false;
+			m_AavIntegration = false;
 			m_VideoFileFormat = m_VideoController.GetVideoFileFormat();
 			if (m_VideoFileFormat != VideoFileFormat.AVI)
 			{
@@ -228,6 +230,7 @@ namespace Tangra.VideoOperations.Astrometry
 						pnlIntegration.Visible = true;
 						btnDetectIntegration.Visible = false;
 						nudIntegratedFrames.Value = m_VideoController.AstroAnalogueVideoIntegratedAAVFrames;
+						m_AavIntegration = true;
 					}
 				}
 			}
@@ -345,7 +348,8 @@ namespace Tangra.VideoOperations.Astrometry
 			m_MeasurementContext.FrameTimeType = (FrameTimeType)cbxFrameTimeType.SelectedIndex;
 			m_MeasurementContext.InstrumentalDelay = (double)nudInstrDelay.Value;
 			m_MeasurementContext.InstrumentalDelayUnits = (InstrumentalDelayUnits)cbxInstDelayUnit.SelectedIndex;
-			m_MeasurementContext.IntegratedFramesCount = (int)nudIntegratedFrames.Value;
+			m_MeasurementContext.IntegratedFramesCount = m_AavIntegration ? 1 : (int)nudIntegratedFrames.Value;
+			m_MeasurementContext.AavIntegration = m_AavIntegration;
 			m_MeasurementContext.AavStackedMode = m_AavStacking;
 			m_MeasurementContext.VideoFileFormat = m_VideoFileFormat;
             m_MeasurementContext.NativeVideoFormat = m_NativeFormat;
