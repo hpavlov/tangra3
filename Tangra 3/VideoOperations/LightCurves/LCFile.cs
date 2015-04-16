@@ -1442,7 +1442,7 @@ namespace Tangra.VideoOperations.LightCurves
 			    int firstFrameWithTimestampIdx = 0;
 			    int framesCount = LcFile.FrameTiming.Count;
                 long firstFrameTicks = LcFile.FrameTiming[firstFrameWithTimestampIdx].FrameMidTime.Ticks;
-                while (firstFrameTicks == 0) /* When OCR is used the timestamps can be zero (failed recognition) */
+				while (firstFrameTicks == 0 && firstFrameWithTimestampIdx < LcFile.FrameTiming.Count - 2) /* When OCR is used the timestamps can be zero (failed recognition) */
                 {
                     firstFrameWithTimestampIdx++;
                     framesCount--;
@@ -1451,7 +1451,7 @@ namespace Tangra.VideoOperations.LightCurves
 
                 int lastFrameWithTimestampIdx = LcFile.FrameTiming.Count - 1;
                 long secondFrameTicks = LcFile.FrameTiming[lastFrameWithTimestampIdx].FrameMidTime.Ticks;
-                while (secondFrameTicks == 0) /* When OCR is used the timestamps can be zero (failed recognition) */
+				while (secondFrameTicks == 0 && lastFrameWithTimestampIdx > 1) /* When OCR is used the timestamps can be zero (failed recognition) */
                 {
                     lastFrameWithTimestampIdx--;
                     framesCount--;
@@ -1485,7 +1485,7 @@ namespace Tangra.VideoOperations.LightCurves
                                 break;
                             }
                             offs++;
-                        }                        
+                        }
                     }
 
                     return timestamp;
