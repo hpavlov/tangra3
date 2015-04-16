@@ -248,6 +248,7 @@ namespace Tangra.VideoOperations.LightCurves
                 }
 
                 lcFile.Footer = new LCMeasurementFooter(reader);
+                lcFile.Header.LcFile = lcFile;
 
                 return lcFile;
             }
@@ -1431,7 +1432,7 @@ namespace Tangra.VideoOperations.LightCurves
 			return FormatDate(dtime);
 		}
 
-		internal DateTime? GetFrameTime(double frameNo)
+		internal DateTime? GetFrameTime(double frameNo, bool getFirstNearByValidTime = false)
 		{
 			bool manuallyEnteredTimes = FirstTimedFrameTime != DateTime.MaxValue && FirstTimedFrameTime != DateTime.MinValue;
 			bool embeddedTimes = LcFile != null && LcFile.FrameTiming != null && LcFile.FrameTiming.Count > 1 /* need 2 frames to find the duration */;
@@ -1464,7 +1465,32 @@ namespace Tangra.VideoOperations.LightCurves
 				else if (frameNo > MaxFrame)
                     return LcFile.FrameTiming[lastFrameWithTimestampIdx].FrameMidTime.AddTicks((int)(frameNo - MaxFrame) * frameDurationTicks);
 				else
-					return GetTimeForFrameFromFrameTiming(frameNo, true);
+                {
+                    DateTime timestamp =  GetTimeForFrameFromFrameTiming(frameNo, true);
+                    if (getFirstNearByValidTime)
+                    {
+                        int offs = 1;
+                        while (timestamp == DateTime.MinValue && offs < 32)
+                        {
+                            DateTime timestampNext = GetTimeForFrameFromFrameTiming(frameNo + offs, true);
+                            DateTime timestampPrev = GetTimeForFrameFromFrameTiming(frameNo - offs, true);
+                            if (timestampNext != DateTime.MinValue)
+                            {
+                                timestamp = timestampNext;
+                                break;
+                            }
+                            else if (timestampPrev != DateTime.MinValue)
+                            {
+                                timestamp = timestampPrev;
+                                break;
+                            }
+                            offs++;
+                        }                        
+                    }
+
+                    return timestamp;
+                }
+					
 			}
 			else if (manuallyEnteredTimes)
 			{

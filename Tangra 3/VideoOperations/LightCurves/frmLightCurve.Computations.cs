@@ -549,8 +549,8 @@ namespace Tangra.VideoOperations.LightCurves
 
         private uint GetXAxisTimeInterval(Graphics g)
         {
-            DateTime? lastTimestamp = m_Header.GetFrameTime(m_MaxDisplayedFrame);
-            DateTime? firstTimestamp = m_Header.GetFrameTime(m_MinDisplayedFrame);
+            DateTime? lastTimestamp = m_Header.GetFrameTime(m_MaxDisplayedFrame, true);
+            DateTime? firstTimestamp = m_Header.GetFrameTime(m_MinDisplayedFrame, true);
             if (!lastTimestamp.HasValue || !firstTimestamp.HasValue)
                 return 120;
 
