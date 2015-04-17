@@ -37,10 +37,12 @@
 			this.lblOsdReaderType = new System.Windows.Forms.Label();
 			this.pnlGenuineReport = new System.Windows.Forms.Panel();
 			this.pnlForcedReport = new System.Windows.Forms.Panel();
+			this.label5 = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
 			this.pictureBox2 = new System.Windows.Forms.PictureBox();
 			this.lblOsdReaderType2 = new System.Windows.Forms.Label();
-			this.label5 = new System.Windows.Forms.Label();
+			this.label4 = new System.Windows.Forms.Label();
+			this.tbxEmail = new System.Windows.Forms.TextBox();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
 			this.pnlGenuineReport.SuspendLayout();
 			this.pnlForcedReport.SuspendLayout();
@@ -49,8 +51,9 @@
 			// 
 			// btnSendReport
 			// 
+			this.btnSendReport.Enabled = false;
 			this.btnSendReport.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.btnSendReport.Location = new System.Drawing.Point(201, 219);
+			this.btnSendReport.Location = new System.Drawing.Point(202, 253);
 			this.btnSendReport.Name = "btnSendReport";
 			this.btnSendReport.Size = new System.Drawing.Size(120, 23);
 			this.btnSendReport.TabIndex = 0;
@@ -61,7 +64,7 @@
 			// btnIgnore
 			// 
 			this.btnIgnore.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.btnIgnore.Location = new System.Drawing.Point(92, 219);
+			this.btnIgnore.Location = new System.Drawing.Point(93, 253);
 			this.btnIgnore.Name = "btnIgnore";
 			this.btnIgnore.Size = new System.Drawing.Size(75, 23);
 			this.btnIgnore.TabIndex = 1;
@@ -106,13 +109,15 @@
 			// 
 			// pnlGenuineReport
 			// 
+			this.pnlGenuineReport.Controls.Add(this.label4);
+			this.pnlGenuineReport.Controls.Add(this.tbxEmail);
 			this.pnlGenuineReport.Controls.Add(this.label1);
 			this.pnlGenuineReport.Controls.Add(this.pictureBox1);
 			this.pnlGenuineReport.Controls.Add(this.label2);
 			this.pnlGenuineReport.Controls.Add(this.lblOsdReaderType);
 			this.pnlGenuineReport.Location = new System.Drawing.Point(3, 3);
 			this.pnlGenuineReport.Name = "pnlGenuineReport";
-			this.pnlGenuineReport.Size = new System.Drawing.Size(414, 210);
+			this.pnlGenuineReport.Size = new System.Drawing.Size(414, 244);
 			this.pnlGenuineReport.TabIndex = 6;
 			// 
 			// pnlForcedReport
@@ -126,6 +131,14 @@
 			this.pnlForcedReport.Size = new System.Drawing.Size(428, 210);
 			this.pnlForcedReport.TabIndex = 7;
 			this.pnlForcedReport.Visible = false;
+			// 
+			// label5
+			// 
+			this.label5.Location = new System.Drawing.Point(12, 66);
+			this.label5.Name = "label5";
+			this.label5.Size = new System.Drawing.Size(400, 135);
+			this.label5.TabIndex = 11;
+			this.label5.Text = "Please submit the error report using the button below.";
 			// 
 			// label3
 			// 
@@ -155,19 +168,28 @@
 			this.lblOsdReaderType2.TabIndex = 10;
 			this.lblOsdReaderType2.Text = "KIWI-OSD";
 			// 
-			// label5
+			// label4
 			// 
-			this.label5.Location = new System.Drawing.Point(12, 66);
-			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(400, 135);
-			this.label5.TabIndex = 11;
-			this.label5.Text = "Please submit the error report using the button below.";
+			this.label4.AutoSize = true;
+			this.label4.Location = new System.Drawing.Point(39, 213);
+			this.label4.Name = "label4";
+			this.label4.Size = new System.Drawing.Size(79, 13);
+			this.label4.TabIndex = 7;
+			this.label4.Text = "E-mail Address:";
+			// 
+			// tbxEmail
+			// 
+			this.tbxEmail.Location = new System.Drawing.Point(124, 210);
+			this.tbxEmail.Name = "tbxEmail";
+			this.tbxEmail.Size = new System.Drawing.Size(195, 20);
+			this.tbxEmail.TabIndex = 6;
+			this.tbxEmail.TextChanged += new System.EventHandler(this.tbxEmail_TextChanged);
 			// 
 			// frmOsdOcrCalibrationFailure
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(426, 260);
+			this.ClientSize = new System.Drawing.Size(428, 288);
 			this.Controls.Add(this.pnlForcedReport);
 			this.Controls.Add(this.pnlGenuineReport);
 			this.Controls.Add(this.btnIgnore);
@@ -204,5 +226,7 @@
 		private System.Windows.Forms.PictureBox pictureBox2;
 		private System.Windows.Forms.Label lblOsdReaderType2;
 		private System.Windows.Forms.Label label5;
+		private System.Windows.Forms.Label label4;
+		protected internal System.Windows.Forms.TextBox tbxEmail;
 	}
 }

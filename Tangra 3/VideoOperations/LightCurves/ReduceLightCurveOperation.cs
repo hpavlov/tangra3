@@ -26,6 +26,7 @@ using Tangra.Video;
 using Tangra.VideoOperations.LightCurves;
 using Tangra.Config;
 using Tangra.ImageTools;
+using Tangra.VideoOperations.LightCurves.Helpers;
 using Tangra.VideoOperations.LightCurves.Measurements;
 using Tangra.VideoOperations.LightCurves.MutualEvents;
 using Tangra.VideoOperations.LightCurves.Tracking;
@@ -1630,13 +1631,16 @@ namespace Tangra.VideoOperations.LightCurves
 
 			if (TangraContext.Current.OcrErrors > 8)
 			{
-				if (m_LightCurveController.ShowMessageBox(string.Format("There were {0} timestamps that failed OCR, would you like to send an error report to the maintainers of Tangra?", TangraContext.Current.OcrErrors), "Tangra", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes)
+				var frm = new frmOCRTooManyErrorsReport();
+				frm.OCRErrors = TangraContext.Current.OcrErrors;
+
+				if (m_VideoController.ShowDialog(frm) == DialogResult.OK)
 				{
 					var images = m_TimestampOCR.GetCalibrationReportImages();
 					bool reportSendingErrored = false;
 					try
 					{
-						frmOsdOcrCalibrationFailure.SendOcrErrorReport(m_TimestampOCR, images, null);
+						frmOsdOcrCalibrationFailure.SendOcrErrorReport(m_TimestampOCR, images, null, frm.tbxEmail.Text);
 					}
 					catch (Exception ex)
 					{

@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Tangra.Helpers;
 using Tangra.Model.Image;
@@ -92,7 +93,7 @@ namespace Tangra.VideoOperations
 
 			try
 			{
-				SendOcrErrorReport(m_TimestampOCR, Images, LastUnmodifiedImage);
+				SendOcrErrorReport(m_TimestampOCR, Images, LastUnmodifiedImage, tbxEmail.Text);
 			}
 			catch (Exception ex)
 			{
@@ -114,7 +115,7 @@ namespace Tangra.VideoOperations
 			}
 		}
 
-		public static void SendOcrErrorReport(ITimestampOcr timestampOCR, Dictionary<string, uint[]> images, uint[] lastUnmodifiedImage)
+		public static void SendOcrErrorReport(ITimestampOcr timestampOCR, Dictionary<string, uint[]> images, uint[] lastUnmodifiedImage, string email)
 		{
 			string tempDir = Path.GetFullPath(Path.GetTempPath() + @"\" + Guid.NewGuid().ToString());
 			string tempFile = Path.GetTempFileName();
@@ -157,6 +158,7 @@ namespace Tangra.VideoOperations
 				string errorReportBody = "OSD OCR Calibration Error\r\n\r\n" +
 				                         "OCR OSD Engine: " + timestampOCR.NameAndVersion() + "\r\n" +
 				                         "OSD Type: " + timestampOCR.OSDType() + "\r\n\r\n" +
+										 "Contact Email: " + email + "\r\n\r\n" +
 				                         frmSystemInfo.GetFullVersionInfo();
 
 				List<string> errorMesages = timestampOCR.GetCalibrationErrors();
@@ -188,6 +190,13 @@ namespace Tangra.VideoOperations
 					catch { }
 				}
 			}
+		}
+
+		private Regex m_SimpleEmailRegex = new Regex("^[^@]+@[^\\.]+\\.[^\\.]+$");
+
+		private void tbxEmail_TextChanged(object sender, EventArgs e)
+		{
+			btnSendReport.Enabled = m_SimpleEmailRegex.IsMatch(tbxEmail.Text);
 		}
 	}
 }
