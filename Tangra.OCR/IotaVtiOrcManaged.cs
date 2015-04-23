@@ -33,7 +33,7 @@ namespace Tangra.OCR
 		private int m_FieldAreaHeight;
 		private int m_FieldAreaWidth;
 
-		private bool m_TVSafeMode;
+		private bool m_TVSafeModeGuess;
         private IotaVtiOcrProcessor m_Processor;
 
 		private Dictionary<string, uint[]> m_CalibrationImages = new Dictionary<string, uint[]>();
@@ -499,7 +499,7 @@ namespace Tangra.OCR
 			}
 			#endregion
 
-			m_TVSafeMode = m_ToLine + (m_ToLine - m_FromLine) / 2 < m_InitializationData.FrameHeight;
+			m_TVSafeModeGuess = m_ToLine + (m_ToLine - m_FromLine) / 2 < m_InitializationData.FrameHeight;
 
             return true;
         }
@@ -524,7 +524,7 @@ namespace Tangra.OCR
                     m_InitializationData.OSDFrame.Width = m_FieldAreaWidth;
                     m_InitializationData.OSDFrame.Height = m_FieldAreaHeight;
 
-                    m_Processor = new IotaVtiOcrProcessor(m_TVSafeMode);
+					m_Processor = new IotaVtiOcrProcessor(m_TVSafeModeGuess);
                 }
             }
         }
@@ -583,7 +583,7 @@ namespace Tangra.OCR
 		    return m_Processor.IsCalibrated && !m_ForceErrorReport;
 		}
 
-	    public bool ProcessCalibrationFrame(int frameNo, uint[] oddPixels, uint[] evenPixels, int width, int height, bool isTVSafeMode)
+		public bool ProcessCalibrationFrame(int frameNo, uint[] oddPixels, uint[] evenPixels, int width, int height, bool isTVSafeModeGuess)
 	    {
 			if (m_Processor == null)
 			{
@@ -594,7 +594,7 @@ namespace Tangra.OCR
 				m_OddFieldPixelsPreProcessed = new uint[m_FieldAreaWidth * m_FieldAreaHeight];
 				m_EvenFieldPixelsPreProcessed = new uint[m_FieldAreaWidth * m_FieldAreaHeight];
 
-				m_Processor = new IotaVtiOcrProcessor(isTVSafeMode);
+				m_Processor = new IotaVtiOcrProcessor(isTVSafeModeGuess);
 			}
 
 			bool wasCalibrated = m_Processor.IsCalibrated;
