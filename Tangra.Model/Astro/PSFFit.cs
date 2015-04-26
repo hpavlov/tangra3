@@ -440,6 +440,27 @@ namespace Tangra.Model.Astro
 
 				Fit(newData);
 			}
+            else if (newMatrixSize < 33 && intensity.GetLength(0) == 33 /* Digital Filter in use */)
+            {
+                uint[,] newData = new uint[newMatrixSize, newMatrixSize];
+                int halfSize = newMatrixSize / 2;
+
+                m_BackgroundModelOffset = (intensity.GetLength(0) - newMatrixSize) / 2;
+
+                int xx = 0, yy = 0;
+                for (int y = 17 - halfSize - 1; y <= 17 + halfSize - 1; y++)
+                {
+                    xx = 0;
+                    for (int x = 17 - halfSize - 1; x <= 17 + halfSize - 1; x++)
+                    {
+                        newData[xx, yy] = intensity[x, y];
+                        xx++;
+                    }
+                    yy++;
+                }
+
+                Fit(newData);
+            }
 			else
 				throw new InvalidOperationException("Bad matrix size.");
 		}

@@ -159,7 +159,7 @@ namespace Tangra.VideoOperations.LightCurves
 
             m_EllapsedTime.Start();
 
-            measurer.GetImagePixelsCallback += new MeasurementsHelper.GetImagePixelsDelegate(measurer_GetImagePixelsCallback);
+            //measurer.GetImagePixelsCallback += new MeasurementsHelper.GetImagePixelsDelegate(measurer_GetImagePixelsCallback);
 
             int refreshCount = m_RefreshProgressEveryHowManyItems;
 
