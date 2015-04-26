@@ -74,17 +74,17 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 
 		public int LastFrameNoDigitPosition { get; set; }
 
-		public bool IsTvSafeMode { get; set; }
+		public bool IsTvSafeModeGuess { get; set; }
 
 		public bool IsCalibrated
 		{
 			get { return m_CurrentSate is IotaVtiOcrCalibratedState; }
 		}
 
-		public IotaVtiOcrProcessor(bool isTVSafeMode)
+		public IotaVtiOcrProcessor(bool isTVSafeModeGuess)
 		{
 			ChangeState<IotaVtiOcrCalibratingState>();
-			IsTvSafeMode = isTVSafeMode;
+			IsTvSafeModeGuess = isTVSafeModeGuess;
 		}
 
 		public void Process(uint[] pixels, int width, int height, Graphics g, int frameNo, bool isOddField)

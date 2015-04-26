@@ -248,7 +248,14 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 
 				var normalizedPositions = new List<CalibratedBlockPosition>();
 
-				if (CalibrateFrameNumberBlockPositions(stateManager, out normalizedPositions) &&
+				if (CalibrateFrameNumberBlockPositions(stateManager, stateManager.IsTvSafeModeGuess, out normalizedPositions) &&
+					RecognizedTimestampsConsistent(stateManager, normalizedPositions))
+				{
+					stateManager.ChangeState<IotaVtiOcrCalibratedState>();
+					stateManager.Process(stateManager.CurrentImage, stateManager.CurrentImageWidth, stateManager.CurrentImageHeight, graphics, frameNo, isOddField);
+					return;
+				}
+				else if (CalibrateFrameNumberBlockPositions(stateManager, !stateManager.IsTvSafeModeGuess, out normalizedPositions) &&
 					RecognizedTimestampsConsistent(stateManager, normalizedPositions))
 				{
 					stateManager.ChangeState<IotaVtiOcrCalibratedState>();
@@ -312,7 +319,7 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 			return bestStartPosition;
 		}
 
-		private bool CalibrateFrameNumberBlockPositions(IotaVtiOcrProcessor stateManager, out List<CalibratedBlockPosition> normalizedPositions)
+		private bool CalibrateFrameNumberBlockPositions(IotaVtiOcrProcessor stateManager, bool tvSafeMode, out List<CalibratedBlockPosition> normalizedPositions)
 		{
 			try
 			{
@@ -334,7 +341,7 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 						stateManager.SecondLastBlockOffsetsX = secondLast;
 
 						// Now go and determine the positions of the remaining blocks by matching their value to the 'learned' digits
-						return LocateRemainingBlockPositions(stateManager);
+						return LocateRemainingBlockPositions(stateManager, tvSafeMode);
 					}
 				}
 			}
@@ -392,7 +399,7 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 			return ' ';
 		}
 
-		private bool LocateRemainingBlockPositions(IotaVtiOcrProcessor stateManager)
+		private bool LocateRemainingBlockPositions(IotaVtiOcrProcessor stateManager, bool tvSafeMode)
 		{
 			var confirmedBlockPositions = new List<int>();
 
@@ -445,11 +452,11 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 			for (int i = 0; i < IotaVtiOcrProcessor.MAX_POSITIONS; i++)
 				stateManager.BlockOffsetsX[i] = -1;
 
-			int[] CHAR_INDEXES = stateManager.IsTvSafeMode
+			int[] CHAR_INDEXES = tvSafeMode
 				? new int[] { 3, 4, 6, 7, 9, 10, 12, 13, 14, 15, 17, 18, 19, 20, 22, 23, 24, 25, 26, 27, 28 }
 				: new int[] { 1, 3, 4, 6, 7, 9, 10, 12, 13, 14, 15, 17, 18, 19, 20, 22, 23, 24, 25, 26, 27, 28 };
 
-			if (!stateManager.IsTvSafeMode)
+			if (!tvSafeMode)
 				// In Non TV-Safe mode, make sure we are not trying to recognize the GPS Fix character, where 'P' can be mistaken for an '8'
                 // to also allow for the GPS character to be slightly off screen we remove all chars that are with offset less than half a block
 				distinctPositions.RemoveAll(x => x < 0.5 * stateManager.BlockWidth);

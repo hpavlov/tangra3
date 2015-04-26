@@ -52,7 +52,7 @@ namespace OcrTester
             foreach (string folder in testCases)
             {
                 string folderNameOnly = Path.GetFileName(folder);
-                bool isTvSafe = folderNameOnly.EndsWith("_tvsafe");
+                bool isTvSafeGuess = folderNameOnly.EndsWith("_tvsafe");
                 bool[] REVERSE_OPTIONS = new bool[] { false, true };
 
                 for (int option = 0; option <= 1; option++)
@@ -77,7 +77,7 @@ namespace OcrTester
                         Pixelmap pixelmapEven = Pixelmap.ConstructFromBitmap(bmpEven, TangraConfig.ColourChannel.Red);
 
                         if (!calibrated)
-                            calibrated = ocrEngine.ProcessCalibrationFrame(i / 2, pixelmapOdd.Pixels, pixelmapEven.Pixels, bmpOdd.Width, bmpOdd.Height, isTvSafe);
+							calibrated = ocrEngine.ProcessCalibrationFrame(i / 2, pixelmapOdd.Pixels, pixelmapEven.Pixels, bmpOdd.Width, bmpOdd.Height, isTvSafeGuess);
 
                         if (calibrated)
                         {
