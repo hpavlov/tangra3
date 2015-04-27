@@ -11,6 +11,7 @@ namespace Tangra.Model.Context
     public class CrashReportInfo
     {
         public string VideoFile { get; set; }
+        public string StreamType { get; set; }
 		public string VideoOperation { get; set; }		
 		public string Tracker { get; set; }
         public long FrameNumber { get; set; }

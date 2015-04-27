@@ -314,6 +314,7 @@ namespace Tangra.Controller
 				{
 					TangraContext.Current.FileName = Path.GetFileName(fileName);
 					TangraContext.Current.FileFormat = frameStream.VideoFileType;
+				    TangraContext.Current.CrashReportInfo.StreamType = m_FramePlayer.Video.GetType().Name;
 				}
 
 				if (!IsAstroDigitalVideo)
