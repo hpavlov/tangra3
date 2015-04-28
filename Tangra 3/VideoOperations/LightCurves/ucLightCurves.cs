@@ -797,7 +797,12 @@ namespace Tangra.VideoOperations.LightCurves
 		private void btnSkipThisFrame_Click(object sender, EventArgs e)
 		{
 			m_StoppedAtFrameNo = m_StateMachine.VideoOperation.SkipCurrentFrame(false);
-		}
+        }
+
+        private void btnSkip10Frames_Click(object sender, EventArgs e)
+        {
+            m_StoppedAtFrameNo = m_StateMachine.VideoOperation.SkipNextFrames(10, false);
+        }
 
     }
 }

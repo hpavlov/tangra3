@@ -2248,6 +2248,20 @@ namespace Tangra.VideoOperations.LightCurves
             return true;
         }
 
+        internal int SkipNextFrames(int framesToSkip, bool synchronise)
+        {
+            int nextFrameNo;
+            int skippedFrames = 0;
+            do
+            {
+                nextFrameNo = SkipCurrentFrame(synchronise);
+                skippedFrames++;
+            }
+            while (nextFrameNo < m_VideoController.VideoLastFrame && skippedFrames < framesToSkip);
+
+            return nextFrameNo;
+        }
+
 		internal int SkipCurrentFrame(bool synchronise)
 		{
 			if (m_VideoController.CurrentFrameIndex < m_VideoController.VideoLastFrame)

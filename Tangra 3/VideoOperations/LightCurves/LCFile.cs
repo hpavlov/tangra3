@@ -192,6 +192,7 @@ namespace Tangra.VideoOperations.LightCurves
                                 LCMeasurement prevMeasurement = LCMeasurement.Empty;
 
                                 int lastFrameNo = -1;
+                                uint firstFrameNo = 0;
 
                                 for (int j = 0; j < itemsInGroup; j++)
                                 {
@@ -204,11 +205,14 @@ namespace Tangra.VideoOperations.LightCurves
 
                                     LCMeasurement measurement = LCMeasurement.Empty;
 
+                                    
+
                                     for (int i = 0; i < totalObjects; i++)
                                     {
-	                                    ;
-										measurement = new LCMeasurement(reader, prevMeasurement, lcFile.Header.PsfGroupIds[i]);
+                                        measurement = new LCMeasurement(reader, prevMeasurement, lcFile.Header.PsfGroupIds[i], j == 0 ? null : (uint?)(firstFrameNo + j));
                                         prevMeasurement = measurement;
+
+                                        if (j == 0) firstFrameNo = prevMeasurement.CurrFrameNo;    
 
                                         if (lastFrameNo != (int)measurement.CurrFrameNo)
                                             lcFile.Data[i].Add(measurement);
@@ -976,7 +980,7 @@ namespace Tangra.VideoOperations.LightCurves
             CurrFileName = currFileName;
         }
 
-		internal LCMeasurement(BinaryReader reader, LCMeasurement prevMeasurement, int groupId)
+		internal LCMeasurement(BinaryReader reader, LCMeasurement prevMeasurement, int groupId, uint? expectedFrameNo)
         {
             AdjustedReading = 0;
             AdjustedBackground = 0;
@@ -986,7 +990,10 @@ namespace Tangra.VideoOperations.LightCurves
             if (version < MINAMAL_SUPPORTED_VERSION)
                 throw new NotSupportedException("This is an old light curve file and it is not supported any more.");
 
-            CurrFrameNo = reader.ReadUInt32();
+            uint recordedFrameNo = reader.ReadUInt32();
+            // Some .lc files have missing measurements, for them we want to reorder the frames
+		    CurrFrameNo = expectedFrameNo == null ? recordedFrameNo : expectedFrameNo.Value;
+
             TargetNo = reader.ReadByte();
             TotalReading = reader.ReadUInt32();
             TotalBackground = reader.ReadUInt32();
