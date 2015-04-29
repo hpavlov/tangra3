@@ -91,6 +91,7 @@ namespace Tangra.VideoOperations.LightCurves
 	    private string m_AavNativeVideoFormat;
 		private bool m_DebugMode;
 	    private int m_AavNtpTimestampError = -1;
+	    private float m_AavNtpFitOneSigmaError = float.NaN;
         private int m_AavStackedFrameRate;
 
         private LCState m_BackedUpSelectMeasuringStarsState = null;
@@ -322,8 +323,9 @@ namespace Tangra.VideoOperations.LightCurves
 
                             if (canSwitchFromRefiningToMeasuringNow)
                             {
-                                m_AavNtpTimestampError = m_VideoController.AstroAnalogueVideoNormaliseNtpDataIfNeeded();
-
+	                            float oneSigma;
+								m_AavNtpTimestampError = m_VideoController.AstroAnalogueVideoNormaliseNtpDataIfNeeded(out oneSigma);
+	                            m_AavNtpFitOneSigmaError = oneSigma;
                                 // Begin measurements
                                 m_Measuring = true;
                                 m_Refining = false;
@@ -2136,6 +2138,7 @@ namespace Tangra.VideoOperations.LightCurves
 				m_AavNativeVideoFormat,
                 m_AavFrameIntegration,
 				m_AavNtpTimestampError,
+				m_AavNtpFitOneSigmaError,
 				PSFFit.BitPix,
 				PSFFit.NormVal,
                 m_AavStackedFrameRate);

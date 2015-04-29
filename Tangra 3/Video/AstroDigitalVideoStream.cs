@@ -439,6 +439,8 @@ namespace Tangra.Video
 				if (m_UseNtpTimeAsCentralExposureTime)
 				{
 					rv.CentralExposureTime = ComputeCentralExposureTimeFromNtpTime(frameNo);
+					rv.NtpTimeFitSigma = m_NtpTimeFitSigma;
+					rv.NtpTimeAverageNetworkError = m_NtpTimeAverageNetworkError;
 					rv.ExposureInMilliseconds = (float)(1000 / m_FrameRate);
 				}
 
@@ -500,6 +502,8 @@ namespace Tangra.Video
 				if (m_UseNtpTimeAsCentralExposureTime)
 				{
 					rv.CentralExposureTime = ComputeCentralExposureTimeFromNtpTime(frameIndex);
+					rv.NtpTimeFitSigma = m_NtpTimeFitSigma;
+					rv.NtpTimeAverageNetworkError = m_NtpTimeAverageNetworkError;
 					rv.ExposureInMilliseconds = (float)(1000 / m_FrameRate);
 				}
 
@@ -614,11 +618,14 @@ namespace Tangra.Video
 
 		private bool m_UseNtpTimeAsCentralExposureTime = false;
 		private long m_CalibratedNtpTimeZeroPoint;
+		private double m_NtpTimeFitSigma;
+		private double m_NtpTimeAverageNetworkError;
 		private LinearRegression m_CalibratedNtpTimeSource;
 
-		public int AstroAnalogueVideoNormaliseNtpDataIfNeeded(Action<int> progressCallback)
+		public int AstroAnalogueVideoNormaliseNtpDataIfNeeded(Action<int> progressCallback, out float oneSigmaError)
 		{
 			int ntpError = -1;
+			oneSigmaError = float.NaN;
 
 			if (NtpDataAvailable && !OcrDataAvailable && !m_UseNtpTimeAsCentralExposureTime)
 			{
@@ -666,9 +673,13 @@ namespace Tangra.Video
 							m_CalibratedNtpTimeZeroPoint = zeroPointTicks;
 							m_CalibratedNtpTimeSource = lr;
 							m_UseNtpTimeAsCentralExposureTime = true;
-							ntpError = (int)Math.Round(lr.StdDev + (ntpTimestampErrorSum * 1.0 / ntpTimestampErrorDatapoints));
+							m_NtpTimeFitSigma = lr.StdDev;
+							m_NtpTimeAverageNetworkError = (ntpTimestampErrorSum * 1.0 / ntpTimestampErrorDatapoints);
+							ntpError = (int)Math.Round(m_NtpTimeFitSigma + m_NtpTimeAverageNetworkError);
 
 							Trace.WriteLine(string.Format("NTP Timebase Established. 1-Sigma = {0} ms", lr.StdDev.ToString("0.00")));
+
+							oneSigmaError = (float)m_NtpTimeFitSigma;
 						}
 
 						progressCallback(100);

@@ -806,12 +806,13 @@ namespace Tangra.Video
 			}
 		}
 
-		public int AstroAnalogueVideoNormaliseNtpDataIfNeeded(Action<int> progressCallback)
+		public int AstroAnalogueVideoNormaliseNtpDataIfNeeded(Action<int> progressCallback, out float oneSigmaError)
 		{
 			if (IsAstroAnalogueVideo)
 			{
-				return ((AstroDigitalVideoStream) m_VideoStream).AstroAnalogueVideoNormaliseNtpDataIfNeeded(progressCallback);
+				return ((AstroDigitalVideoStream)m_VideoStream).AstroAnalogueVideoNormaliseNtpDataIfNeeded(progressCallback, out oneSigmaError);
 			}
+			oneSigmaError = float.NaN;
 			return -1;
 		}
 

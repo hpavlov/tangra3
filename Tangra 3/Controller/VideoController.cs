@@ -730,7 +730,7 @@ namespace Tangra.Controller
 			get { return m_FramePlayer.AstroAnalogueVideoHasOcrData || m_FramePlayer.AstroAnalogueVideoHasNtpData; }
         }
 
-		public int AstroAnalogueVideoNormaliseNtpDataIfNeeded()
+		public int AstroAnalogueVideoNormaliseNtpDataIfNeeded(out float oneSigmaError)
 		{
 			if (m_FramePlayer.IsAstroAnalogueVideo && m_FramePlayer.AstroAnalogueVideoHasNtpData && !m_FramePlayer.AstroAnalogueVideoHasOcrData)
 			{
@@ -756,7 +756,8 @@ namespace Tangra.Controller
 								frm.Update();
 								Application.DoEvents();
 							}
-						});
+						},
+						out oneSigmaError);
 				}
 				finally
 				{
@@ -766,6 +767,7 @@ namespace Tangra.Controller
 				
 			}
 
+			oneSigmaError = float.NaN;
 			return - 1;
 		}
 
@@ -2170,8 +2172,11 @@ namespace Tangra.Controller
 			FrameStateData frameState = GetCurrentFrameState();
 
 			if (frameState.HasValidNtpTimeStamp)
-				AstroAnalogueVideoNormaliseNtpDataIfNeeded();
-			
+			{
+				float oneSigma;
+				AstroAnalogueVideoNormaliseNtpDataIfNeeded(out oneSigma);
+			}
+
 			if (frameState.CentralExposureTime != DateTime.MaxValue &&
 			    frameState.CentralExposureTime != DateTime.MinValue)
 				return frameState.CentralExposureTime;

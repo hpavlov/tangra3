@@ -1274,7 +1274,12 @@ namespace Tangra.VideoOperations.LightCurves
 					string correctedForInstrumentalDelayMessage = null;
 					if (m_LCFile.CanDetermineFrameTimes)
 					{
-						lblFrameTime.Text = m_LCFile.GetTimeForFrame(firstNonExcludedMeasurement.CurrFrameNo, out correctedForInstrumentalDelayMessage).ToString("HH:mm:ss.fff");
+						string frameTimeLbl = m_LCFile.GetTimeForFrame(firstNonExcludedMeasurement.CurrFrameNo, out correctedForInstrumentalDelayMessage).ToString("HH:mm:ss.fff");
+
+						if (!float.IsNaN(m_LCFile.Footer.AavNtpFitOneSigmaError))
+							frameTimeLbl += string.Format(" +/-{0} ms", m_LCFile.Footer.AavNtpFitOneSigmaError.ToString("0.0"));
+
+						lblFrameTime.Text = frameTimeLbl;
 
 						if (correctedForInstrumentalDelayMessage != null)
 						{
