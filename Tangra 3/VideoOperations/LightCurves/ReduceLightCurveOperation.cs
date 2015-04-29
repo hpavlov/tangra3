@@ -2139,6 +2139,7 @@ namespace Tangra.VideoOperations.LightCurves
                 m_AavFrameIntegration,
 				m_AavNtpTimestampError,
 				m_AavNtpFitOneSigmaError,
+				TangraConfig.Settings.AAV.NtpTimeUseDirectTimestamps,
 				PSFFit.BitPix,
 				PSFFit.NormVal,
                 m_AavStackedFrameRate);

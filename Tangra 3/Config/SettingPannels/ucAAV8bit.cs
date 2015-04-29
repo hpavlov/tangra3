@@ -56,6 +56,8 @@ namespace Tangra.Config.SettingPannels
 
 			cbxNtpDebugFlag.Checked = TangraConfig.Settings.AAV.NtpTimeDebugFlag;
 			cbxAdvsPopupNTPTime.Checked = TangraConfig.Settings.AAV.Popup_NtpTimestamp;
+
+			cbxNtpUsageType.SelectedIndex = TangraConfig.Settings.AAV.NtpTimeUseDirectTimestamps ? 1 : 0;
 		}
 
         public override void SaveSettings()
@@ -78,6 +80,8 @@ namespace Tangra.Config.SettingPannels
 
 			TangraConfig.Settings.AAV.NtpTimeDebugFlag = cbxNtpDebugFlag.Checked;
 			TangraConfig.Settings.AAV.Popup_NtpTimestamp = cbxAdvsPopupNTPTime.Checked;
+
+			TangraConfig.Settings.AAV.NtpTimeUseDirectTimestamps = cbxNtpUsageType.SelectedIndex == 1;
 
 			if (m_AavPopupCustomizer != null)
 			{

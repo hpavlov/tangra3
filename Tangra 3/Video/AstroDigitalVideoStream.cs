@@ -438,9 +438,7 @@ namespace Tangra.Video
 
 				if (m_UseNtpTimeAsCentralExposureTime)
 				{
-					rv.CentralExposureTime = ComputeCentralExposureTimeFromNtpTime(frameNo);
-					rv.NtpTimeFitSigma = m_NtpTimeFitSigma;
-					rv.NtpTimeAverageNetworkError = m_NtpTimeAverageNetworkError;
+					rv.CentralExposureTime = ComputeCentralExposureTimeFromNtpTime(frameNo, m_CurrentFrameInfo.EndExposureNtpTimeStamp);
 					rv.ExposureInMilliseconds = (float)(1000 / m_FrameRate);
 				}
 
@@ -501,9 +499,7 @@ namespace Tangra.Video
 
 				if (m_UseNtpTimeAsCentralExposureTime)
 				{
-					rv.CentralExposureTime = ComputeCentralExposureTimeFromNtpTime(frameIndex);
-					rv.NtpTimeFitSigma = m_NtpTimeFitSigma;
-					rv.NtpTimeAverageNetworkError = m_NtpTimeAverageNetworkError;
+					rv.CentralExposureTime = ComputeCentralExposureTimeFromNtpTime(frameIndex, frameInfo.EndExposureNtpTimeStamp);
 					rv.ExposureInMilliseconds = (float)(1000 / m_FrameRate);
 				}
 
@@ -694,9 +690,24 @@ namespace Tangra.Video
 			return ntpError;
 		}
 
-		private DateTime ComputeCentralExposureTimeFromNtpTime(int frameNo)
+		private DateTime ComputeCentralExposureTimeFromNtpTime(int frameNo, DateTime endFrameNtpTimestamp)
 		{
-			return new DateTime(m_CalibratedNtpTimeZeroPoint).AddMilliseconds(m_CalibratedNtpTimeSource.ComputeY(frameNo));
+			if (TangraConfig.Settings.AAV.NtpTimeUseDirectTimestamps)
+			{
+				if (endFrameNtpTimestamp.Ticks != 633979008000000000)
+				{
+					double frameDurationMilliseconds = 1000 / m_FrameRate;
+					long centralTicks = endFrameNtpTimestamp.AddMilliseconds(-0.5 * frameDurationMilliseconds).Ticks;
+
+					return new DateTime(centralTicks);
+				}
+
+				return DateTime.MinValue;
+			}
+			else
+			{
+				return new DateTime(m_CalibratedNtpTimeZeroPoint).AddMilliseconds(m_CalibratedNtpTimeSource.ComputeY(frameNo));
+			}
 		}
 
 		private GeoLocationInfo geoLocation;

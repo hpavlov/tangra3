@@ -23,9 +23,6 @@ namespace Tangra.Model.Image
 		public string GPSFixStatus;
 		public int? NumberIntegratedFrames;
 
-		public double NtpTimeFitSigma;
-		public double NtpTimeAverageNetworkError;
-
 		public Dictionary<string, object> AdditionalProperties;
 
 		public bool IsEmpty()

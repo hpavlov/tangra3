@@ -33,5 +33,7 @@ namespace Tangra.Model.Config
 		public bool SplitFieldsOSD = true;
 
 		public bool NtpTimeDebugFlag = false;
+
+		public bool NtpTimeUseDirectTimestamps = false;
 	}
 }

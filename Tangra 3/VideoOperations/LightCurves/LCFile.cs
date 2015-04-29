@@ -1993,6 +1993,7 @@ namespace Tangra.VideoOperations.LightCurves
 		internal string AAVNativeVideoFormat;
 	    internal int AavNtpTimestampError;
 	    internal float AavNtpFitOneSigmaError;
+	    internal bool AavNtpNoFittingUsed;
 
 	    internal int DataBitPix;
 		internal uint DataAav16NormVal;
@@ -2013,6 +2014,7 @@ namespace Tangra.VideoOperations.LightCurves
             int aavFrameIntegration,
 			int aavNtpTimestampError,
 			float aavNtpFitOneSigmaError,
+			bool aavNtpNoFittingUsed,
 			int dataBitPix,
 			uint dataAav16NormVal,
             int aavStackedFrameRate)
@@ -2036,6 +2038,7 @@ namespace Tangra.VideoOperations.LightCurves
 	        AAVNativeVideoFormat = aavNativeVideoFormat;
 	        AavNtpTimestampError = aavNtpTimestampError;
 			AavNtpFitOneSigmaError = aavNtpFitOneSigmaError;
+	        AavNtpNoFittingUsed = aavNtpNoFittingUsed;
 
 	        DataBitPix = dataBitPix;
 	        DataAav16NormVal = dataAav16NormVal;
@@ -2083,6 +2086,7 @@ namespace Tangra.VideoOperations.LightCurves
 	        AAVNativeVideoFormat = string.Empty;
 	        AavNtpTimestampError = -1;
 	        AavNtpFitOneSigmaError = float.NaN;
+	        AavNtpNoFittingUsed = false;
 
 			DataBitPix = 8;
 			DataAav16NormVal = 0;
@@ -2143,6 +2147,7 @@ namespace Tangra.VideoOperations.LightCurves
 	                                            if (version > 10)
 	                                            {
 													AavNtpFitOneSigmaError = reader.ReadSingle();
+		                                            AavNtpNoFittingUsed = reader.ReadBoolean();
 	                                            }
                                             }
 										}
@@ -2221,6 +2226,7 @@ namespace Tangra.VideoOperations.LightCurves
             writer.Write(AAVStackedFrameRate);
 
 	        writer.Write(AavNtpFitOneSigmaError);
+	        writer.Write(AavNtpNoFittingUsed);
         }
     }
 

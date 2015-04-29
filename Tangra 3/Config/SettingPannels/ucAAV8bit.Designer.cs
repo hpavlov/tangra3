@@ -54,6 +54,8 @@
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.cbxAavSplitFieldsOSD = new System.Windows.Forms.CheckBox();
 			this.cbxNtpDebugFlag = new System.Windows.Forms.CheckBox();
+			this.label1 = new System.Windows.Forms.Label();
+			this.cbxNtpUsageType = new System.Windows.Forms.ComboBox();
 			this.groupControl1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nudSaturation8bit)).BeginInit();
 			this.groupControl2.SuspendLayout();
@@ -296,18 +298,41 @@
 			// 
 			// cbxNtpDebugFlag
 			// 
-			this.cbxNtpDebugFlag.Location = new System.Drawing.Point(14, 316);
+			this.cbxNtpDebugFlag.Location = new System.Drawing.Point(230, 315);
 			this.cbxNtpDebugFlag.Name = "cbxNtpDebugFlag";
-			this.cbxNtpDebugFlag.Size = new System.Drawing.Size(256, 19);
+			this.cbxNtpDebugFlag.Size = new System.Drawing.Size(139, 19);
 			this.cbxNtpDebugFlag.TabIndex = 50;
-			this.cbxNtpDebugFlag.Text = "Prefer NTP over OCR Timestamps (Debug Only)";
+			this.cbxNtpDebugFlag.Text = "Prefer NTP over OCR";
 			this.cbxNtpDebugFlag.Visible = false;
+			// 
+			// label1
+			// 
+			this.label1.AutoSize = true;
+			this.label1.Location = new System.Drawing.Point(3, 319);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(120, 13);
+			this.label1.TabIndex = 51;
+			this.label1.Text = "NTP Timestamp Usage:";
+			// 
+			// cbxNtpUsageType
+			// 
+			this.cbxNtpUsageType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.cbxNtpUsageType.FormattingEnabled = true;
+			this.cbxNtpUsageType.Items.AddRange(new object[] {
+            "Linear Fit",
+            "Direct"});
+			this.cbxNtpUsageType.Location = new System.Drawing.Point(130, 314);
+			this.cbxNtpUsageType.Name = "cbxNtpUsageType";
+			this.cbxNtpUsageType.Size = new System.Drawing.Size(80, 21);
+			this.cbxNtpUsageType.TabIndex = 52;
 			// 
 			// ucAAV8bit
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.SystemColors.Control;
+			this.Controls.Add(this.cbxNtpUsageType);
+			this.Controls.Add(this.label1);
 			this.Controls.Add(this.cbxNtpDebugFlag);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.linkLabelAAV);
@@ -354,6 +379,8 @@
 		private System.Windows.Forms.CheckBox cbxAdvsPopupNTPTime;
 		private System.Windows.Forms.CheckBox cbxAdvsPopupGamma;
 		private System.Windows.Forms.CheckBox cbxAdvsPopupGain;
+		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.ComboBox cbxNtpUsageType;
 
 	}
 }
