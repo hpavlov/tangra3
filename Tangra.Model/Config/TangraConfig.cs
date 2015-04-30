@@ -879,6 +879,7 @@ namespace Tangra.Model.Config
 			public Color GridLinesColor;
 			public Pen GridLinesPen;
 			public Color LabelsColor;
+			public Pen LabelsPen;
 			public Brush LabelsBrush;
 			public Color SmallGraphFocusBackgroundBrushColor = System.Drawing.Color.LightCoral;
 			public Brush SmallGraphFocusBackgroundBrush;
@@ -1066,6 +1067,9 @@ namespace Tangra.Model.Config
 
 				if (LabelsBrush != null) LabelsBrush.Dispose();
 				LabelsBrush = new SolidBrush(LabelsColor);
+
+				if (LabelsPen != null) LabelsPen.Dispose();
+				LabelsPen = new Pen(LabelsColor);
 
 				if (SmallGraphFocusBackgroundBrush != null) SmallGraphFocusBackgroundBrush.Dispose();
 				SmallGraphFocusBackgroundBrush = new SolidBrush(SmallGraphFocusBackgroundBrushColor);

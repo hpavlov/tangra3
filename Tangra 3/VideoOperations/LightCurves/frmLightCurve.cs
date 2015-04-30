@@ -25,6 +25,7 @@ using Tangra.Model.Video;
 using Tangra.Model.VideoOperations;
 using Tangra.Resources;
 using Tangra.SDK;
+using Tangra.VideoOperations.LightCurves.Helpers;
 using Tangra.VideoOperations.LightCurves.InfoForms;
 using Tangra.VideoOperations.LightCurves.Report;
 using Tangra.VideoOperations.LightCurves.Tracking;
@@ -2599,5 +2600,19 @@ namespace Tangra.VideoOperations.LightCurves
                 RedrawPlot();
             }
         }
+
+		private void miAddTitle_Click(object sender, EventArgs e)
+		{
+			var frm = new frmSetLightCurveTitle();
+
+			frm.tbxTitle.Text = m_LightCurveController.Context.ChartTitle;
+
+			if (frm.ShowDialog(this) == DialogResult.OK)
+			{
+				m_LightCurveController.Context.ChartTitle = frm.tbxTitle.Text;
+				pnlChart.Invalidate();
+				RedrawPlot();
+			}
+		}
 	}
 }

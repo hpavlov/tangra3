@@ -79,10 +79,11 @@
 			this.miNormalisation4 = new System.Windows.Forms.ToolStripMenuItem();
 			this.miNormalizationSeparator = new System.Windows.Forms.ToolStripSeparator();
 			this.miNormalisationMethod = new System.Windows.Forms.ToolStripMenuItem();
-			this.miNormalisation16DataPoints = new System.Windows.Forms.ToolStripMenuItem();
-			this.miNormalisation4DataPoints = new System.Windows.Forms.ToolStripMenuItem();
-			this.miNormalisation1DataPoints = new System.Windows.Forms.ToolStripMenuItem();
 			this.miNormalisationLinearFit = new System.Windows.Forms.ToolStripMenuItem();
+			this.miNormalisation1DataPoints = new System.Windows.Forms.ToolStripMenuItem();
+			this.miNormalisation4DataPoints = new System.Windows.Forms.ToolStripMenuItem();
+			this.miNormalisation8DataPoints = new System.Windows.Forms.ToolStripMenuItem();
+			this.miNormalisation16DataPoints = new System.Windows.Forms.ToolStripMenuItem();
 			this.miNoNormalization = new System.Windows.Forms.ToolStripMenuItem();
 			this.tslblBinning = new System.Windows.Forms.ToolStripDropDownButton();
 			this.binningToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -94,11 +95,6 @@
 			this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
 			this.miCustomBinning = new System.Windows.Forms.ToolStripMenuItem();
 			this.miNoBinning = new System.Windows.Forms.ToolStripMenuItem();
-			this.miIncludeObject = new System.Windows.Forms.ToolStripDropDownButton();
-			this.miIncludeObj4 = new System.Windows.Forms.ToolStripMenuItem();
-			this.miIncludeObj3 = new System.Windows.Forms.ToolStripMenuItem();
-			this.miIncludeObj2 = new System.Windows.Forms.ToolStripMenuItem();
-			this.miIncludeObj1 = new System.Windows.Forms.ToolStripMenuItem();
 			this.pnlMain = new System.Windows.Forms.Panel();
 			this.panel1 = new System.Windows.Forms.Panel();
 			this.hintTimer = new System.Windows.Forms.Timer(this.components);
@@ -106,7 +102,6 @@
 			this.saveCSVDialog = new System.Windows.Forms.SaveFileDialog();
 			this.firstFrameTimer = new System.Windows.Forms.Timer(this.components);
 			this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-			this.miNormalisation8DataPoints = new System.Windows.Forms.ToolStripMenuItem();
 			this.pnlChart = new Tangra.Controls.SmoothPanel();
 			this.btnZoomIn = new System.Windows.Forms.Button();
 			this.btnZoomOut = new System.Windows.Forms.Button();
@@ -152,6 +147,11 @@
 			this.lblMeasurement2 = new System.Windows.Forms.Label();
 			this.lblMeasurement3 = new System.Windows.Forms.Label();
 			this.lblMeasurement4 = new System.Windows.Forms.Label();
+			this.miIncludeObject = new System.Windows.Forms.ToolStripDropDownButton();
+			this.miIncludeObj4 = new System.Windows.Forms.ToolStripMenuItem();
+			this.miIncludeObj3 = new System.Windows.Forms.ToolStripMenuItem();
+			this.miIncludeObj2 = new System.Windows.Forms.ToolStripMenuItem();
+			this.miIncludeObj1 = new System.Windows.Forms.ToolStripMenuItem();
 			this.pnlLegend.SuspendLayout();
 			this.panel2.SuspendLayout();
 			this.menuStrip1.SuspendLayout();
@@ -441,10 +441,10 @@
 			// 
 			this.processToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.miDisplaySettings,
+            this.miAddTitle,
             this.xAxisLabelsToolStripMenuItem,
             this.yAxisLabelsToolStripMenuItem,
-            this.miLightCurvePlot,
-            this.miAddTitle});
+            this.miLightCurvePlot});
 			this.processToolStripMenuItem.Name = "processToolStripMenuItem";
 			this.processToolStripMenuItem.Size = new System.Drawing.Size(75, 20);
 			this.processToolStripMenuItem.Text = "&Customize";
@@ -452,7 +452,7 @@
 			// miDisplaySettings
 			// 
 			this.miDisplaySettings.Name = "miDisplaySettings";
-			this.miDisplaySettings.Size = new System.Drawing.Size(163, 22);
+			this.miDisplaySettings.Size = new System.Drawing.Size(159, 22);
 			this.miDisplaySettings.Text = "&Display Settings";
 			this.miDisplaySettings.Click += new System.EventHandler(this.miDisplaySettings_Click);
 			// 
@@ -462,7 +462,7 @@
             this.miXAxisUserFrameNumbers,
             this.miXAxisUserTime});
 			this.xAxisLabelsToolStripMenuItem.Name = "xAxisLabelsToolStripMenuItem";
-			this.xAxisLabelsToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+			this.xAxisLabelsToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
 			this.xAxisLabelsToolStripMenuItem.Text = "&X Axis Labels";
 			// 
 			// miXAxisUserFrameNumbers
@@ -485,7 +485,7 @@
             this.miYAxisFlux,
             this.miYAxisMags});
 			this.yAxisLabelsToolStripMenuItem.Name = "yAxisLabelsToolStripMenuItem";
-			this.yAxisLabelsToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+			this.yAxisLabelsToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
 			this.yAxisLabelsToolStripMenuItem.Text = "&Y Axis Labels";
 			// 
 			// miYAxisFlux
@@ -510,7 +510,7 @@
             this.miLightCurveLine,
             this.miLightCurveScatter});
 			this.miLightCurvePlot.Name = "miLightCurvePlot";
-			this.miLightCurvePlot.Size = new System.Drawing.Size(163, 22);
+			this.miLightCurvePlot.Size = new System.Drawing.Size(159, 22);
 			this.miLightCurvePlot.Text = "Light Curve Plot";
 			// 
 			// miLightCurveLine
@@ -532,9 +532,9 @@
 			// miAddTitle
 			// 
 			this.miAddTitle.Name = "miAddTitle";
-			this.miAddTitle.Size = new System.Drawing.Size(163, 22);
-			this.miAddTitle.Text = "Edit Object &Titles";
-			this.miAddTitle.Visible = false;
+			this.miAddTitle.Size = new System.Drawing.Size(159, 22);
+			this.miAddTitle.Text = "Set Graph Title";
+			this.miAddTitle.Click += new System.EventHandler(this.miAddTitle_Click);
 			// 
 			// miAddins
 			// 
@@ -683,12 +683,19 @@
 			this.miNormalisationMethod.Size = new System.Drawing.Size(194, 22);
 			this.miNormalisationMethod.Text = "Normalisation Method";
 			// 
-			// miNormalisation16DataPoints
+			// miNormalisationLinearFit
 			// 
-			this.miNormalisation16DataPoints.Name = "miNormalisation16DataPoints";
-			this.miNormalisation16DataPoints.Size = new System.Drawing.Size(207, 22);
-			this.miNormalisation16DataPoints.Text = "16 Data Points Average";
-			this.miNormalisation16DataPoints.Click += new System.EventHandler(this.OnNormalisationMethodChanged);
+			this.miNormalisationLinearFit.Name = "miNormalisationLinearFit";
+			this.miNormalisationLinearFit.Size = new System.Drawing.Size(207, 22);
+			this.miNormalisationLinearFit.Text = "Linear Fit";
+			this.miNormalisationLinearFit.Click += new System.EventHandler(this.OnNormalisationMethodChanged);
+			// 
+			// miNormalisation1DataPoints
+			// 
+			this.miNormalisation1DataPoints.Name = "miNormalisation1DataPoints";
+			this.miNormalisation1DataPoints.Size = new System.Drawing.Size(207, 22);
+			this.miNormalisation1DataPoints.Text = "Data Point per Data Point";
+			this.miNormalisation1DataPoints.Click += new System.EventHandler(this.OnNormalisationMethodChanged);
 			// 
 			// miNormalisation4DataPoints
 			// 
@@ -699,19 +706,19 @@
 			this.miNormalisation4DataPoints.Text = "4 Data Points Average";
 			this.miNormalisation4DataPoints.Click += new System.EventHandler(this.OnNormalisationMethodChanged);
 			// 
-			// miNormalisation1DataPoints
+			// miNormalisation8DataPoints
 			// 
-			this.miNormalisation1DataPoints.Name = "miNormalisation1DataPoints";
-			this.miNormalisation1DataPoints.Size = new System.Drawing.Size(207, 22);
-			this.miNormalisation1DataPoints.Text = "Data Point per Data Point";
-			this.miNormalisation1DataPoints.Click += new System.EventHandler(this.OnNormalisationMethodChanged);
+			this.miNormalisation8DataPoints.Name = "miNormalisation8DataPoints";
+			this.miNormalisation8DataPoints.Size = new System.Drawing.Size(207, 22);
+			this.miNormalisation8DataPoints.Text = "8 Data Points Average";
+			this.miNormalisation8DataPoints.Click += new System.EventHandler(this.OnNormalisationMethodChanged);
 			// 
-			// miNormalisationLinearFit
+			// miNormalisation16DataPoints
 			// 
-			this.miNormalisationLinearFit.Name = "miNormalisationLinearFit";
-			this.miNormalisationLinearFit.Size = new System.Drawing.Size(207, 22);
-			this.miNormalisationLinearFit.Text = "Linear Fit";
-			this.miNormalisationLinearFit.Click += new System.EventHandler(this.OnNormalisationMethodChanged);
+			this.miNormalisation16DataPoints.Name = "miNormalisation16DataPoints";
+			this.miNormalisation16DataPoints.Size = new System.Drawing.Size(207, 22);
+			this.miNormalisation16DataPoints.Text = "16 Data Points Average";
+			this.miNormalisation16DataPoints.Click += new System.EventHandler(this.OnNormalisationMethodChanged);
 			// 
 			// miNoNormalization
 			// 
@@ -742,53 +749,53 @@
             this.toolStripMenuItem1,
             this.miCustomBinning});
 			this.binningToolStripMenuItem.Name = "binningToolStripMenuItem";
-			this.binningToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.binningToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
 			this.binningToolStripMenuItem.Text = "      Binning";
 			// 
 			// miBinning4
 			// 
 			this.miBinning4.Name = "miBinning4";
-			this.miBinning4.Size = new System.Drawing.Size(152, 22);
+			this.miBinning4.Size = new System.Drawing.Size(127, 22);
 			this.miBinning4.Text = "  4 Frames";
 			this.miBinning4.Click += new System.EventHandler(this.BinningMenuItemChecked);
 			// 
 			// miBinning8
 			// 
 			this.miBinning8.Name = "miBinning8";
-			this.miBinning8.Size = new System.Drawing.Size(152, 22);
+			this.miBinning8.Size = new System.Drawing.Size(127, 22);
 			this.miBinning8.Text = "  8 Frames";
 			this.miBinning8.Click += new System.EventHandler(this.BinningMenuItemChecked);
 			// 
 			// miBinning16
 			// 
 			this.miBinning16.Name = "miBinning16";
-			this.miBinning16.Size = new System.Drawing.Size(152, 22);
+			this.miBinning16.Size = new System.Drawing.Size(127, 22);
 			this.miBinning16.Text = "16 Frames";
 			this.miBinning16.Click += new System.EventHandler(this.BinningMenuItemChecked);
 			// 
 			// miBinning32
 			// 
 			this.miBinning32.Name = "miBinning32";
-			this.miBinning32.Size = new System.Drawing.Size(152, 22);
+			this.miBinning32.Size = new System.Drawing.Size(127, 22);
 			this.miBinning32.Text = "32 Frames";
 			this.miBinning32.Click += new System.EventHandler(this.BinningMenuItemChecked);
 			// 
 			// miBinning64
 			// 
 			this.miBinning64.Name = "miBinning64";
-			this.miBinning64.Size = new System.Drawing.Size(152, 22);
+			this.miBinning64.Size = new System.Drawing.Size(127, 22);
 			this.miBinning64.Text = "64 Frames";
 			this.miBinning64.Click += new System.EventHandler(this.BinningMenuItemChecked);
 			// 
 			// toolStripMenuItem1
 			// 
 			this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-			this.toolStripMenuItem1.Size = new System.Drawing.Size(149, 6);
+			this.toolStripMenuItem1.Size = new System.Drawing.Size(124, 6);
 			// 
 			// miCustomBinning
 			// 
 			this.miCustomBinning.Name = "miCustomBinning";
-			this.miCustomBinning.Size = new System.Drawing.Size(152, 22);
+			this.miCustomBinning.Size = new System.Drawing.Size(127, 22);
 			this.miCustomBinning.Text = "Custom";
 			this.miCustomBinning.Click += new System.EventHandler(this.BinningMenuItemChecked);
 			// 
@@ -797,50 +804,9 @@
 			this.miNoBinning.Checked = true;
 			this.miNoBinning.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.miNoBinning.Name = "miNoBinning";
-			this.miNoBinning.Size = new System.Drawing.Size(152, 22);
+			this.miNoBinning.Size = new System.Drawing.Size(137, 22);
 			this.miNoBinning.Text = " No Binning";
 			this.miNoBinning.Click += new System.EventHandler(this.BinningMenuItemChecked);
-			// 
-			// miIncludeObject
-			// 
-			this.miIncludeObject.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.miIncludeObj4,
-            this.miIncludeObj3,
-            this.miIncludeObj2,
-            this.miIncludeObj1});
-			this.miIncludeObject.Image = ((System.Drawing.Image)(resources.GetObject("miIncludeObject.Image")));
-			this.miIncludeObject.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.miIncludeObject.Name = "miIncludeObject";
-			this.miIncludeObject.Size = new System.Drawing.Size(118, 20);
-			this.miIncludeObject.Text = "Include Objects";
-			// 
-			// miIncludeObj4
-			// 
-			this.miIncludeObj4.Name = "miIncludeObj4";
-			this.miIncludeObj4.Size = new System.Drawing.Size(118, 22);
-			this.miIncludeObj4.Text = "Object 4";
-			this.miIncludeObj4.Click += new System.EventHandler(this.HandleIncludeExcludeObject);
-			// 
-			// miIncludeObj3
-			// 
-			this.miIncludeObj3.Name = "miIncludeObj3";
-			this.miIncludeObj3.Size = new System.Drawing.Size(118, 22);
-			this.miIncludeObj3.Text = "Object 3";
-			this.miIncludeObj3.Click += new System.EventHandler(this.HandleIncludeExcludeObject);
-			// 
-			// miIncludeObj2
-			// 
-			this.miIncludeObj2.Name = "miIncludeObj2";
-			this.miIncludeObj2.Size = new System.Drawing.Size(118, 22);
-			this.miIncludeObj2.Text = "Object 2";
-			this.miIncludeObj2.Click += new System.EventHandler(this.HandleIncludeExcludeObject);
-			// 
-			// miIncludeObj1
-			// 
-			this.miIncludeObj1.Name = "miIncludeObj1";
-			this.miIncludeObj1.Size = new System.Drawing.Size(118, 22);
-			this.miIncludeObj1.Text = "Object 1";
-			this.miIncludeObj1.Click += new System.EventHandler(this.HandleIncludeExcludeObject);
 			// 
 			// pnlMain
 			// 
@@ -879,13 +845,6 @@
 			// 
 			this.firstFrameTimer.Interval = 250;
 			this.firstFrameTimer.Tick += new System.EventHandler(this.firstFrameTimer_Tick);
-			// 
-			// miNormalisation8DataPoints
-			// 
-			this.miNormalisation8DataPoints.Name = "miNormalisation8DataPoints";
-			this.miNormalisation8DataPoints.Size = new System.Drawing.Size(207, 22);
-			this.miNormalisation8DataPoints.Text = "8 Data Points Average";
-			this.miNormalisation8DataPoints.Click += new System.EventHandler(this.OnNormalisationMethodChanged);
 			// 
 			// pnlChart
 			// 
@@ -1396,6 +1355,47 @@
 			this.lblMeasurement4.Name = "lblMeasurement4";
 			this.lblMeasurement4.Size = new System.Drawing.Size(0, 13);
 			this.lblMeasurement4.TabIndex = 15;
+			// 
+			// miIncludeObject
+			// 
+			this.miIncludeObject.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miIncludeObj4,
+            this.miIncludeObj3,
+            this.miIncludeObj2,
+            this.miIncludeObj1});
+			this.miIncludeObject.Image = ((System.Drawing.Image)(resources.GetObject("miIncludeObject.Image")));
+			this.miIncludeObject.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.miIncludeObject.Name = "miIncludeObject";
+			this.miIncludeObject.Size = new System.Drawing.Size(118, 20);
+			this.miIncludeObject.Text = "Include Objects";
+			// 
+			// miIncludeObj4
+			// 
+			this.miIncludeObj4.Name = "miIncludeObj4";
+			this.miIncludeObj4.Size = new System.Drawing.Size(118, 22);
+			this.miIncludeObj4.Text = "Object 4";
+			this.miIncludeObj4.Click += new System.EventHandler(this.HandleIncludeExcludeObject);
+			// 
+			// miIncludeObj3
+			// 
+			this.miIncludeObj3.Name = "miIncludeObj3";
+			this.miIncludeObj3.Size = new System.Drawing.Size(118, 22);
+			this.miIncludeObj3.Text = "Object 3";
+			this.miIncludeObj3.Click += new System.EventHandler(this.HandleIncludeExcludeObject);
+			// 
+			// miIncludeObj2
+			// 
+			this.miIncludeObj2.Name = "miIncludeObj2";
+			this.miIncludeObj2.Size = new System.Drawing.Size(118, 22);
+			this.miIncludeObj2.Text = "Object 2";
+			this.miIncludeObj2.Click += new System.EventHandler(this.HandleIncludeExcludeObject);
+			// 
+			// miIncludeObj1
+			// 
+			this.miIncludeObj1.Name = "miIncludeObj1";
+			this.miIncludeObj1.Size = new System.Drawing.Size(118, 22);
+			this.miIncludeObj1.Text = "Object 1";
+			this.miIncludeObj1.Click += new System.EventHandler(this.HandleIncludeExcludeObject);
 			// 
 			// frmLightCurve
 			// 

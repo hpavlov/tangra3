@@ -292,6 +292,16 @@ namespace Tangra.VideoOperations.LightCurves
                         DrawAxisByTimeStamp(g, axisInterval, minAdjustedReading);
 					}
 
+					if (!string.IsNullOrWhiteSpace(m_LightCurveController.Context.ChartTitle))
+					{
+						SizeF sizeF = g.MeasureString(m_LightCurveController.Context.ChartTitle, s_TitleFont);
+						float x0 = (pnlChart.Width - sizeF.Width) / 2;
+						float y0 = m_MinY + 6;
+						g.FillRectangle(m_DisplaySettings.BackgroundColorBrush, x0 - 2, y0 - 2, sizeF.Width + 5, sizeF.Height + 4);
+						g.DrawRectangle(m_DisplaySettings.LabelsPen, x0 - 2, y0 - 2, sizeF.Width + 5, sizeF.Height + 4);
+						g.DrawString(m_LightCurveController.Context.ChartTitle, s_TitleFont, m_DisplaySettings.LabelsBrush, x0, y0);
+					}
+
 					g.Save();
 				}
 			}			
@@ -475,12 +485,23 @@ namespace Tangra.VideoOperations.LightCurves
                         DrawAxis(g, axisInterval, minAdjustedReading);
                     }
 
+					if (!string.IsNullOrWhiteSpace(m_LightCurveController.Context.ChartTitle))
+					{
+						SizeF sizeF = g.MeasureString(m_LightCurveController.Context.ChartTitle, s_TitleFont);
+						float x0 = (pnlChart.Width - sizeF.Width)/2;
+						float y0 = m_MinY + 4;
+						g.FillRectangle(m_DisplaySettings.BackgroundColorBrush, x0 - 2, y0 - 2, sizeF.Width + 5, sizeF.Height + 4);
+						g.DrawRectangle(m_DisplaySettings.LabelsPen, x0 - 2, y0 - 2, sizeF.Width + 5, sizeF.Height + 4);
+						g.DrawString(m_LightCurveController.Context.ChartTitle, s_TitleFont, m_DisplaySettings.LabelsBrush, x0, y0);
+					}
+
                     g.Save();
                 }
             }
         }
 
         private static Font s_AxisFont = new Font(FontFamily.GenericMonospace, 9);
+		private static Font s_TitleFont = new Font(FontFamily.GenericSerif, 11, FontStyle.Bold);
 
         private void GetYAxisMagnitudeCalibration(Graphics g, double minAdjustedReading, out double intensityFrom, out double intensityTo, out double intensityFactor)
         {

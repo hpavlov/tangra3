@@ -105,6 +105,7 @@ namespace Tangra.Controller
 		private XAxisMode m_XAxisMode;
         private YAxisMode m_YAxisMode;
         private LightCurveMode m_LightCurveMode;
+		private string m_ChartTitle;
         
 
 		public uint SelectedFrameNo
@@ -243,6 +244,19 @@ namespace Tangra.Controller
                 }
             }
         }
+
+		public string ChartTitle
+		{
+			get { return m_ChartTitle; }
+			set
+			{
+				if (m_ChartTitle != value)
+				{
+					m_ChartTitle = value;
+					m_Dirty = true;
+				}
+			}
+		}
 
 		public bool OutlierRemoval
 		{
