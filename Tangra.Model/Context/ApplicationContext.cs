@@ -73,6 +73,8 @@ namespace Tangra.Model.Context
 		public bool FlatFrameLoaded = false;
         public bool BiasFrameLoaded = false;
 
+	    public bool OperationInProgress = false;
+
 		public bool HasAnyFileLoaded
 		{
 			get { return HasVideoLoaded || HasImageLoaded; }
@@ -150,6 +152,8 @@ namespace Tangra.Model.Context
 
 	        OcrErrors = 0;
             OcrExtractingTimestamps = false;
+
+		    OperationInProgress = false;
 
 		    CrashReportInfo = new CrashReportInfo();
 		}

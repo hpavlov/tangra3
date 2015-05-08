@@ -831,6 +831,8 @@ namespace Tangra.Controller
 		{
 			m_FramePlayer.Start(FramePlaySpeed.Fastest, startAtFrame, step);
 
+		    TangraContext.Current.OperationInProgress = true;
+
 			m_VideoFileView.Update();
 		}
 
@@ -849,6 +851,8 @@ namespace Tangra.Controller
 			OnVideoPlayerStopped();
 
 			m_VideoFileView.Update();
+
+            TangraContext.Current.OperationInProgress = false;
 		}
 
 	    private bool savedCanScrollFramesStateOnVideoStarted = false;

@@ -80,15 +80,15 @@ namespace Tangra.View
 			m_MainForm.miExportToCSV.Enabled = TangraContext.Current.HasAnyFileLoaded;
 
 
-			m_MainForm.miReduceLightCurve.Enabled = TangraContext.Current.HasAnyFileLoaded;
-			m_MainForm.miAstrometry.Enabled = TangraContext.Current.HasAnyFileLoaded;
-			m_MainForm.miMakeDarkFlat.Enabled = TangraContext.Current.HasAnyFileLoaded;
+			m_MainForm.miReduceLightCurve.Enabled = TangraContext.Current.HasAnyFileLoaded && !TangraContext.Current.OperationInProgress;
+            m_MainForm.miAstrometry.Enabled = TangraContext.Current.HasAnyFileLoaded && !TangraContext.Current.OperationInProgress;
+            m_MainForm.miMakeDarkFlat.Enabled = TangraContext.Current.HasAnyFileLoaded && !TangraContext.Current.OperationInProgress;
 
-			m_MainForm.miLoadDark.Enabled = TangraContext.Current.HasAnyFileLoaded && TangraContext.Current.CanLoadDarkFrame;
-			m_MainForm.miLoadMasterDark.Enabled = TangraContext.Current.HasAnyFileLoaded && TangraContext.Current.CanLoadDarkFrame;
-            m_MainForm.miLoadDarkLongerExp.Enabled = TangraContext.Current.HasAnyFileLoaded && TangraContext.Current.CanLoadDarkFrame;
-			m_MainForm.miLoadFlat.Enabled = TangraContext.Current.HasAnyFileLoaded && TangraContext.Current.CanLoadFlatFrame;
-            m_MainForm.miLoadBias.Enabled = TangraContext.Current.HasAnyFileLoaded && TangraContext.Current.CanLoadBiasFrame;
+            m_MainForm.miLoadDark.Enabled = TangraContext.Current.HasAnyFileLoaded && TangraContext.Current.CanLoadDarkFrame && !TangraContext.Current.OperationInProgress;
+            m_MainForm.miLoadMasterDark.Enabled = TangraContext.Current.HasAnyFileLoaded && TangraContext.Current.CanLoadDarkFrame && !TangraContext.Current.OperationInProgress;
+            m_MainForm.miLoadDarkLongerExp.Enabled = TangraContext.Current.HasAnyFileLoaded && TangraContext.Current.CanLoadDarkFrame && !TangraContext.Current.OperationInProgress;
+            m_MainForm.miLoadFlat.Enabled = TangraContext.Current.HasAnyFileLoaded && TangraContext.Current.CanLoadFlatFrame && !TangraContext.Current.OperationInProgress;
+            m_MainForm.miLoadBias.Enabled = TangraContext.Current.HasAnyFileLoaded && TangraContext.Current.CanLoadBiasFrame && !TangraContext.Current.OperationInProgress;
 
 			m_MainForm.pnlPlayControls.Enabled = TangraContext.Current.HasVideoLoaded;
 			m_MainForm.pnlPlayButtons.Enabled = TangraContext.Current.HasVideoLoaded;
