@@ -19,6 +19,7 @@ using System.Windows.Forms;
 using Tangra.Controller;
 using Tangra.Helpers;
 using Tangra.Model.Config;
+using Tangra.Model.Context;
 using Tangra.Model.Helpers;
 using Tangra.Model.Numerical;
 using Tangra.Model.Video;
@@ -237,7 +238,21 @@ namespace Tangra.VideoOperations.LightCurves
 		
         private void OnNewLCFile()
         {
-            m_Header.MinAdjustedReading = 0;
+	        miReprocess.Enabled = TangraContext.Current.CanProcessLightCurvePixels;
+			miShowPSFFits.Enabled = TangraContext.Current.CanProcessLightCurvePixels;
+			miShowZoomedAreas.Enabled = TangraContext.Current.CanProcessLightCurvePixels;
+			miBackgroundHistograms.Enabled = TangraContext.Current.CanProcessLightCurvePixels;
+	        if (!TangraContext.Current.CanProcessLightCurvePixels)
+	        {
+		        miShowPSFFits.Checked = false;
+				miShowZoomedAreas.Checked = false;
+				miBackgroundHistograms.Checked = false;
+		        HideZoomedAreas();
+				HideBackgroundHistograms();
+				HidePSFFits();
+	        }
+
+			m_Header.MinAdjustedReading = 0;
 
             // If there are a lot of measurements choose an appropriate binning value
             // But only when this is a mutual event
@@ -407,9 +422,12 @@ namespace Tangra.VideoOperations.LightCurves
 
 			//TODO: Remember the last shown form: PSF or Zoom
         	m_frmZoomedPixels = new frmZoomedPixels(m_LightCurveController.Context, m_LCFile, m_DisplaySettings, m_LightCurveController);
-			
-            miShowZoomedAreas.Checked = true;
-            ShowZoomedAreas();
+
+	        if (TangraContext.Current.CanProcessLightCurvePixels)
+	        {
+				miShowZoomedAreas.Checked = true;
+				ShowZoomedAreas();
+			}
 
 			m_frmPSFFits = new frmPSFFits(m_LightCurveController.Context, m_LCFile, m_DisplaySettings);
 			miShowPSFFits.Checked = false;

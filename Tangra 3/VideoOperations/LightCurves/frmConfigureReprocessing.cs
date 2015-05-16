@@ -15,6 +15,7 @@ using System.Windows.Forms;
 using Tangra.Controller;
 using Tangra.Model.Astro;
 using Tangra.Model.Config;
+using Tangra.Model.Context;
 using Tangra.Model.Image;
 
 namespace Tangra.VideoOperations.LightCurves
@@ -63,7 +64,8 @@ namespace Tangra.VideoOperations.LightCurves
 
             m_Saturation = TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(context.BitPix);
 
-            SetupControls();
+			if (TangraContext.Current.CanProcessLightCurvePixels)
+				SetupControls();
         }
 
         private void SetupControls()
@@ -315,6 +317,9 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void PlotMeasuredPixels()
         {
+			if (!TangraContext.Current.CanProcessLightCurvePixels)
+				return;
+
             PictureBox[] targetBoxes = new PictureBox[] { picTarget1Pixels, picTarget2Pixels, picTarget3Pixels, picTarget4Pixels };
             NumericUpDown[] targetApertures = new NumericUpDown[] { nudAperture1, nudAperture2, nudAperture3, nudAperture4 };
             NumericUpDown[] targetFitAreas = new NumericUpDown[] { nudFitArea1, nudFitArea2, nudFitArea3, nudFitArea4 };

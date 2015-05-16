@@ -2144,7 +2144,7 @@ namespace Tangra.VideoOperations.LightCurves
 				PSFFit.NormVal,
                 m_AavStackedFrameRate);
 
-			return LCFile.FlushOnTheFlyOutputFile(finalHeader, footer);
+			return LCFile.FlushOnTheFlyOutputFile(finalHeader, footer, m_VideoController);
 		}
 
 		internal void DoShowLightCurve(LCFile file)

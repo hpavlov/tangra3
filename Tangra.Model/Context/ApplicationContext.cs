@@ -72,6 +72,7 @@ namespace Tangra.Model.Context
 		public bool DarkFrameLoaded = false;
 		public bool FlatFrameLoaded = false;
         public bool BiasFrameLoaded = false;
+		public bool CanProcessLightCurvePixels = false;
 
 	    public bool OperationInProgress = false;
 
@@ -154,6 +155,7 @@ namespace Tangra.Model.Context
             OcrExtractingTimestamps = false;
 
 		    OperationInProgress = false;
+			CanProcessLightCurvePixels = false;
 
 		    CrashReportInfo = new CrashReportInfo();
 		}

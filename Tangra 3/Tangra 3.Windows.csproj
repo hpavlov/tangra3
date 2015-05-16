@@ -469,6 +469,12 @@
     <Compile Include="VideoOperations\LightCurves\frmDefineBinning.Designer.cs">
       <DependentUpon>frmDefineBinning.cs</DependentUpon>
     </Compile>
+    <Compile Include="VideoOperations\LightCurves\frmLcFileLoadOptions.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\frmLcFileLoadOptions.Designer.cs">
+      <DependentUpon>frmLcFileLoadOptions.cs</DependentUpon>
+    </Compile>
     <Compile Include="VideoOperations\LightCurves\Helpers\frmOCRTooManyErrorsReport.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -951,6 +957,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\LightCurves\frmDefineBinning.resx">
       <DependentUpon>frmDefineBinning.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\frmLcFileLoadOptions.resx">
+      <DependentUpon>frmLcFileLoadOptions.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\LightCurves\Helpers\frmOCRTooManyErrorsReport.resx">
       <DependentUpon>frmOCRTooManyErrorsReport.cs</DependentUpon>

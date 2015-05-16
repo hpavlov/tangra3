@@ -1096,6 +1096,9 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void PlotMeasuredPixels()
         {
+			if (!TangraContext.Current.CanProcessLightCurvePixels)
+				return;
+
             PictureBox[] targetBoxes = new PictureBox[] { picTarget1Pixels, picTarget2Pixels, picTarget3Pixels, picTarget4Pixels };
 
 			if (m_SelectedMeasurements != null)
@@ -1115,8 +1118,11 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void PlotSingleTargetPixels(PictureBox pictureBox, LCMeasurement reading)
         {
+			if (!TangraContext.Current.CanProcessLightCurvePixels)
+				return;
+
             Bitmap bmp = pictureBox.Image as Bitmap;
-            if (bmp != null)
+			if (bmp != null)
             {
 
                 int pixelsCenterX = (int)Math.Round(reading.X0);

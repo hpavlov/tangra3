@@ -15,9 +15,11 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
+using Tangra.Controller;
 using Tangra.Helpers;
 using Tangra.Model.Astro;
 using Tangra.Model.Config;
+using Tangra.Model.Context;
 using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.Model.VideoOperations;
@@ -124,10 +126,12 @@ namespace Tangra.VideoOperations.LightCurves
             }
         }
 
-        public static LCFile Load(string fileName)
+        public static LCFile Load(string fileName, VideoController videoController)
         {
 			UsageStats.Instance.LightCurvesOpened++;
 			UsageStats.Instance.Save();
+
+	        var fileInfo = new FileInfo(fileName);
 
             using (var inFile = new FileStream(fileName, FileMode.Open, FileAccess.Read))
             using (var deflateStream = new DeflateStream(inFile, CompressionMode.Decompress, true))
@@ -170,6 +174,19 @@ namespace Tangra.VideoOperations.LightCurves
                 {
                     int itemsInGroup = reader.ReadInt32();
 
+					bool supressPixelLoading = false;
+
+					if (itemsInGroup > 40000 || fileInfo.Length > 100 * 1024 * 1024)
+					{
+						var frm = new frmLcFileLoadOptions();
+						frm.StartPosition = FormStartPosition.CenterParent;
+						videoController.ShowDialog(frm);
+
+						supressPixelLoading = frm.rbSkipPixels.Checked;
+					}
+
+					TangraContext.Current.CanProcessLightCurvePixels = !supressPixelLoading;
+
                     if (itemsInGroup < lcFile.Header.MeasuredFrames) 
                         // Generally should not happen but it could!
                         lcFile.Header.MeasuredFrames = (uint)itemsInGroup;
@@ -205,11 +222,9 @@ namespace Tangra.VideoOperations.LightCurves
 
                                     LCMeasurement measurement = LCMeasurement.Empty;
 
-                                    
-
                                     for (int i = 0; i < totalObjects; i++)
                                     {
-                                        measurement = new LCMeasurement(reader, prevMeasurement, lcFile.Header.PsfGroupIds[i], j == 0 ? null : (uint?)(firstFrameNo + j));
+										measurement = new LCMeasurement(reader, prevMeasurement, lcFile.Header.PsfGroupIds[i], j == 0 ? null : (uint?)(firstFrameNo + j), supressPixelLoading);
                                         prevMeasurement = measurement;
 
                                         if (j == 0) firstFrameNo = prevMeasurement.CurrFrameNo;    
@@ -319,7 +334,7 @@ namespace Tangra.VideoOperations.LightCurves
 			}
         }
 
-        public static LCFile FlushOnTheFlyOutputFile(LCMeasurementHeader header, LCMeasurementFooter footer)
+        public static LCFile FlushOnTheFlyOutputFile(LCMeasurementHeader header, LCMeasurementFooter footer, VideoController videoController) 
         {
 			if (s_OnTheFlyFile != null)
 			{
@@ -373,7 +388,7 @@ namespace Tangra.VideoOperations.LightCurves
 				}
 			}
 
-            return LCFile.Load(s_OnTheFlyZippedFileName);
+			return LCFile.Load(s_OnTheFlyZippedFileName, videoController);
         }
 
 		public static void SaveOnTheFlyFrameTiming(LCFrameTiming frameTiming)
@@ -980,7 +995,7 @@ namespace Tangra.VideoOperations.LightCurves
             CurrFileName = currFileName;
         }
 
-		internal LCMeasurement(BinaryReader reader, LCMeasurement prevMeasurement, int groupId, uint? expectedFrameNo)
+		internal LCMeasurement(BinaryReader reader, LCMeasurement prevMeasurement, int groupId, uint? expectedFrameNo, bool supressPixelLoading)
         {
             AdjustedReading = 0;
             AdjustedBackground = 0;
@@ -1000,11 +1015,18 @@ namespace Tangra.VideoOperations.LightCurves
 
         	bool matrixAsBytes = version < FIRST_UINT_MATRIX_VERSION;
 
-            PixelData = new uint[MATRIX_SIZE, MATRIX_SIZE];
+			uint supressedVal = 0;
+			if (supressPixelLoading)
+				PixelData = new uint[1, 1];
+			else
+				PixelData = new uint[MATRIX_SIZE, MATRIX_SIZE];
             for (int i = 0; i < MATRIX_SIZE; i++)
                 for (int j = 0; j < MATRIX_SIZE; j++)
                 {
-					PixelData[i, j] = matrixAsBytes ? reader.ReadByte() : reader.ReadUInt32();
+					if (supressPixelLoading)
+						supressedVal = matrixAsBytes ? reader.ReadByte() : reader.ReadUInt32();
+					else
+						PixelData[i, j] = matrixAsBytes ? reader.ReadByte() : reader.ReadUInt32();
                 }
 
             Flags = reader.ReadByte();

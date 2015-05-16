@@ -127,7 +127,7 @@ namespace Tangra.Controller
             {
                 m_MainFormView.Update();
 
-                lcFile = LCFile.Load(fileName);
+                lcFile = LCFile.Load(fileName, m_VideoController);
                 if (lcFile != null)
                 {
                     ReduceLightCurveOperation operation =
@@ -223,7 +223,7 @@ namespace Tangra.Controller
 
 			m_LightCurveForm.SetNewLcFile(lcFile);
 
-			m_LightCurveForm.SetGeoLocation(m_VideoController.GeoLocation);								
+			m_LightCurveForm.SetGeoLocation(m_VideoController.GeoLocation);
 		}
 
 		public void EnsureLightCurveFormClosed()

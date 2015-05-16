@@ -13,6 +13,7 @@ using System.Text;
 using System.Windows.Forms;
 using Tangra.Controller;
 using Tangra.Model.Config;
+using Tangra.Model.Context;
 using Tangra.VideoOperations.LightCurves.Tracking;
 
 namespace Tangra.VideoOperations.LightCurves.InfoForms
@@ -131,6 +132,9 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 
 		private void PlotMeasuredPixels()
 		{
+			if (!TangraContext.Current.CanProcessLightCurvePixels)
+				return;
+
 			var targetBoxes = new PictureBox[] { picTarget1Pixels, picTarget2Pixels, picTarget3Pixels, picTarget4Pixels };
 
 			if (m_AllObjectsPeak == 0)
