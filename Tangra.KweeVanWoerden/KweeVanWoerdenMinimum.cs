@@ -525,20 +525,21 @@ namespace Tangra.KweeVanWoerden
 
 		private KweeVanWoerdenResult Kwee_van_Woerden(long Number_Obs, double Time_First_JD, double[] SecondsFromTimeFirstJD, double[] Variable_Star_DN, double[] Variable_Sky_DN, double[] Comparison_Star_DN, double[] Comparison_Sky_DN)
 		{
+			long BASE_NUMBER = 1000;
 			/* Constant parameter */
-			long         Normal_Points = 101;                     /* Number of evenly spaced data pairs used in the analysis */
+			long         Normal_Points = BASE_NUMBER + 1;         /* Number of evenly spaced data pairs used in the analysis */
 			long         Normal_Point_Middle;                     /* Index of the middle element of the normal point array */
 
 			/* Luminosity values */
 			double[]     Luminosity_Ratio;						  /* Variable luminosity divided by comparison luminosity */
 			double       Luminosity_Normal_Sum;                   /* Summation of luminosities for normal point computation */
 			long         Luminosity_Normal_Count;                 /* Counter for data points in one normal point */
-			double[]     Luminosity_Normal = new double[102];     /* Normalized luminosities */
+			double[] Luminosity_Normal = new double[BASE_NUMBER + 2];     /* Normalized luminosities */
 
 			/* Time values */
 			double       Time_Interval;                           /* Time interval between observations */
 			double       Time_Start, Time_Stop;                   /* Limits for normal points */
-			double[]     Time_Normal = new double[102];           /* Times corresponding to normal points */
+			double[] Time_Normal = new double[BASE_NUMBER + 2];           /* Times corresponding to normal points */
 
 			/* Symmetry analysis */
 			double       Luminosity_Faintest;                     /* Faintest normalized luminosity */
@@ -549,8 +550,8 @@ namespace Tangra.KweeVanWoerden
 			long         Start_Sum_Squares;                       /* Start element of the sum-of-squares array */
 			long         Stop_Sum_Squares;                        /* Stop element of the sum-of-squares array */
 			double       Sum_Of_Squares;                          /* Sum of squares across a time of symmetry */
-			long[]       Sum_Of_Squares_Count = new long[102];    /* Number of squares accumulated */
-			double[]     Sum_Of_Squares_Mean = new double[102];   /* Sum of squares divided by count */
+			long[] Sum_Of_Squares_Count = new long[BASE_NUMBER + 2];    /* Number of squares accumulated */
+			double[] Sum_Of_Squares_Mean = new double[BASE_NUMBER + 2];   /* Sum of squares divided by count */
 			long         Sum_Of_Squares_Smallest_Index;           /* Index of the smallest sum of squares */
 			double       Sum_Of_Squares_Smallest;                 /* Smallest sum of squares */
 
@@ -688,7 +689,7 @@ namespace Tangra.KweeVanWoerden
 			Normal_Point_Middle = Normal_Points / 2;
 			if ( Luminosity_Faintest_Index < Normal_Point_Middle ) { Stop_Light_Curve = 2 * Luminosity_Faintest_Index; }
 			if ( Luminosity_Faintest_Index > Normal_Point_Middle ) { Start_Light_Curve = 2 * Luminosity_Faintest_Index - Normal_Points + 1; }
-			rv.IncludedObservations = Stop_Light_Curve - Start_Light_Curve - 2;
+			rv.IncludedObservations = 100 * (Stop_Light_Curve - Start_Light_Curve - 2) / BASE_NUMBER;
 
 		    rv.Start_Light_Curve = Start_Light_Curve;
             rv.Stop_Light_Curve = Stop_Light_Curve;

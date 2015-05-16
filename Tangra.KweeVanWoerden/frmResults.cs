@@ -126,7 +126,7 @@ namespace Tangra.KweeVanWoerden
                         g.FillRectangle(Brushes.OrangeRed, xScale * i, picGraphPoly.Height - 2 - yScale * polyCoeff * (float)(PolyResults.FittedValues[i] - minPoly), xScale, 2);
 
                         if (i >= PolyResults.StartIndex && i < PolyResults.StopIndex)
-                            g.FillRectangle(Brushes.Yellow, xScale * i, picGraphPoly.Height - 2 - yScale * polyCoeff * (float)(ComputeModelValue(PolyResults.TimePoints[i - PolyResults.StartIndex]) - minPoly), xScale, 2);
+                            g.FillRectangle(Brushes.Yellow, xScale * i, picGraphPoly.Height - 2 - yScale * polyCoeff * (float)(ComputeModelValue(PolyResults.TimePoints[i - PolyResults.StartIndex]) - minPoly), Math.Min(4, xScale), 2);
                     }
 
                     g.FillRectangle(Brushes.Aqua, xScale * i, picGraphPoly.Height - 2 - yScale * (float)(PolyResults.DataPoints[i] - minVal), xScale, 2);     
