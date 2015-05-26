@@ -14,21 +14,30 @@ using Tangra.Config;
 using Tangra.Config.SettingPannels;
 using Tangra.Helpers;
 using Tangra.Model.Config;
+using Tangra.OCR;
 using Tangra.PInvoke;
 
 namespace Tangra.Config.SettingPannels
 {
 	public partial class ucAnalogueVideo8bit : SettingsPannel
 	{
-		public ucAnalogueVideo8bit()
-		{
-			InitializeComponent();
+        private OcrExtensionManager m_OcrExtensionManager;
 
-			cbxRenderingEngineAttemptOrder.Items.Clear();
-			
-			string[] availableRenderingEngines = TangraVideo.EnumVideoEngines();
-			cbxRenderingEngineAttemptOrder.Items.AddRange(availableRenderingEngines);
-		}
+	    public ucAnalogueVideo8bit()
+	    {
+            InitializeComponent();
+
+            cbxRenderingEngineAttemptOrder.Items.Clear();
+
+            string[] availableRenderingEngines = TangraVideo.EnumVideoEngines();
+            cbxRenderingEngineAttemptOrder.Items.AddRange(availableRenderingEngines);
+	    }
+
+        public ucAnalogueVideo8bit(OcrExtensionManager ocrExtensionManager)
+            : this()
+	    {
+            m_OcrExtensionManager = ocrExtensionManager;
+	    }
 
 		public override void LoadSettings()
 		{
@@ -43,11 +52,7 @@ namespace Tangra.Config.SettingPannels
 			cbxEnableOsdOcr.Checked = TangraConfig.Settings.Generic.OsdOcrEnabled;
 			cbxOcrAskEveryTime.Checked = TangraConfig.Settings.Generic.OcrAskEveryTime;
 
-			if (!string.IsNullOrEmpty(TangraConfig.Settings.Generic.OcrEngine))
-				cbxOcrEngine.SelectedIndex = cbxOcrEngine.Items.IndexOf(TangraConfig.Settings.Generic.OcrEngine);
-
-			if (cbxOcrEngine.SelectedIndex == -1)
-				cbxOcrEngine.SelectedIndex = 0;
+            m_OcrExtensionManager.LoadAvailableOcrEngines(cbxOcrEngine);
 
 			pnlOsdOcr.Enabled = cbxEnableOsdOcr.Checked;			
 		}

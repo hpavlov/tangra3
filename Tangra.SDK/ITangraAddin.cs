@@ -44,7 +44,8 @@ namespace Tangra.SDK
 		LightCurveEventTimeExtractor = 1,
 		LightCurveEventTimeExtractorSupportsBinning = 2,
 		Astrometry = 3,
-		Generic = 4
+		Generic = 4,
+        OcrEngine = 5
 	}
 
 	public interface ITangraAddinAction

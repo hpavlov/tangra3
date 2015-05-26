@@ -98,6 +98,7 @@ namespace Tangra.VideoOperations.LightCurves
 
         private MeasuringZoomImageType MeasuringZoomImageType = MeasuringZoomImageType.Stripe;
 	    private LightCurveController m_LightCurveController;
+        private OcrExtensionManager m_OcrExtensionManager;
 
 	    private LCFile m_LoadedLcFile;
 
@@ -114,9 +115,10 @@ namespace Tangra.VideoOperations.LightCurves
 			Debug.Assert(false, "This constructor should not be called.");
 		}
 
-		internal ReduceLightCurveOperation(LightCurveController lightCurveController, bool debugMode)
+        internal ReduceLightCurveOperation(LightCurveController lightCurveController, OcrExtensionManager ocrExtensionManager, bool debugMode)
 		{
 			m_LightCurveController = lightCurveController;
+            m_OcrExtensionManager = ocrExtensionManager;
 			m_DebugMode = debugMode;
 
 			m_DisplaySettings = new TangraConfig.LightCurvesDisplaySettings();
@@ -1327,7 +1329,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 				if (TangraConfig.Settings.Generic.OcrAskEveryTime)
 				{
-					var frm = new frmChooseOcrEngine();
+                    var frm = new frmChooseOcrEngine(m_OcrExtensionManager);
 					frm.StartPosition = FormStartPosition.CenterParent;
 					frm.ShowForceErrorReportOption = m_DebugMode;
 					if (m_VideoController.ShowDialog(frm) == DialogResult.Cancel ||
@@ -1337,7 +1339,7 @@ namespace Tangra.VideoOperations.LightCurves
 					forceSaveErrorReport = frm.ForceErrorReport;
 				}
 
-				m_TimestampOCR = OcrExtensionManager.GetCurrentOCR();
+                m_TimestampOCR = m_OcrExtensionManager.GetCurrentOcr();
 
 				if (m_TimestampOCR != null)
 				{

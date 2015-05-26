@@ -17,6 +17,7 @@ using Tangra.Config.SettingPannels;
 using Tangra.Controller;
 using Tangra.Helpers;
 using Tangra.Model.Config;
+using Tangra.OCR;
 
 namespace Tangra.Config
 {
@@ -30,6 +31,7 @@ namespace Tangra.Config
 		private IAavStatusPopupFormCustomizer m_AavPopupCustomizer;
 		private IAddinContainer[] m_AddinContainers;
 	    private AddinsController m_AddinsController;
+        private OcrExtensionManager m_OcrExtensionManager;
 
 		private ucStarCatalogues m_ucStarCatalogues;
 
@@ -41,7 +43,8 @@ namespace Tangra.Config
             IAdvStatusPopupFormCustomizer advPopupCustomizer, 
             IAavStatusPopupFormCustomizer aavPopupCustomizer,
             AddinsController addinsController,
-			IAddinContainer[] addinContainers)
+			IAddinContainer[] addinContainers,
+            OcrExtensionManager ocrExtensionManager)
 		{
 			InitializeComponent();
 
@@ -49,6 +52,7 @@ namespace Tangra.Config
 			m_AdvPopupCustomizer = advPopupCustomizer;
 			m_AavPopupCustomizer = aavPopupCustomizer;
 			m_AddinContainers = addinContainers;
+            m_OcrExtensionManager = ocrExtensionManager;
 
 			InitAllPropertyPages();
 
@@ -75,7 +79,7 @@ namespace Tangra.Config
 			m_PropertyPages.Add(0, new ucGeneralTangra());
 
 			m_PropertyPages.Add(1, new ucGeneralVideo());
-			m_PropertyPages.Add(2, new ucAnalogueVideo8bit());
+            m_PropertyPages.Add(2, new ucAnalogueVideo8bit(m_OcrExtensionManager));
 			m_PropertyPages.Add(3, new ucADVSVideo12bit());
 			m_PropertyPages.Add(10, new ucAAV8bit());
 

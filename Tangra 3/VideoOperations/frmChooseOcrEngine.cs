@@ -28,19 +28,19 @@ namespace Tangra.VideoOperations
 			get { return cbxForceErrorReport.Checked; }
 		}
 
-		public frmChooseOcrEngine()
+	    public frmChooseOcrEngine()
+	    {
+            InitializeComponent();
+
+            cbxEnableOsdOcr.Checked = TangraConfig.Settings.Generic.OsdOcrEnabled;
+            cbxOcrAskEveryTime.Checked = TangraConfig.Settings.Generic.OcrAskEveryTime;
+            pnlOsdOcr.Enabled = cbxEnableOsdOcr.Checked;
+	    }
+
+        public frmChooseOcrEngine(OcrExtensionManager ocrExtensionManager)
+            : this()
 		{
-			InitializeComponent();
-
-			if (!string.IsNullOrEmpty(TangraConfig.Settings.Generic.OcrEngine))
-				cbxOcrEngine.SelectedIndex = cbxOcrEngine.Items.IndexOf(TangraConfig.Settings.Generic.OcrEngine);	
-			
-			if (cbxOcrEngine.SelectedIndex == -1)
-				cbxOcrEngine.SelectedIndex = 0;
-
-			cbxEnableOsdOcr.Checked = TangraConfig.Settings.Generic.OsdOcrEnabled;
-			cbxOcrAskEveryTime.Checked = TangraConfig.Settings.Generic.OcrAskEveryTime;
-			pnlOsdOcr.Enabled = cbxEnableOsdOcr.Checked;
+            ocrExtensionManager.LoadAvailableOcrEngines(cbxOcrEngine);
 		}
 
 		private void btnOK_Click(object sender, EventArgs e)

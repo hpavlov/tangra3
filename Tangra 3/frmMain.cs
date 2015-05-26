@@ -29,6 +29,7 @@ using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.Model.Video;
 using Tangra.Model.VideoOperations;
+using Tangra.OCR;
 using Tangra.PInvoke;
 using Tangra.Properties;
 using Tangra.SDK;
@@ -53,6 +54,7 @@ namespace Tangra
 		private DarkFlatFrameController m_MakeDarkFlatController;
 		private AutoUpdatesController m_AutoUpdatesController;
 		private AddinsController m_AddinsController;
+        private OcrExtensionManager m_OcrExtensionManager;
 
 		private VideoFileView m_VideoFileView;
 		private ImageToolView m_ImageToolView;
@@ -73,6 +75,7 @@ namespace Tangra
 
 			m_VideoController = new VideoController(this, m_VideoFileView, m_ZoomedImageView, m_ImageToolView, pnlControlerPanel);
 			m_AddinsController = new AddinsController(this, m_VideoController);
+            m_OcrExtensionManager = new OcrExtensionManager(m_AddinsController);
 
 			m_LongOperationsManager = new LongOperationsManager(this, m_VideoController);
 
@@ -423,8 +426,8 @@ namespace Tangra
         {
             if (TangraConfig.Settings.Generic.OnOpenOperation == TangraConfig.OnOpenOperation.StartLightCurveReduction)
             {
-				
-				if (m_VideoController.ActivateOperation<ReduceLightCurveOperation>(m_LightCurveController, false))
+
+                if (m_VideoController.ActivateOperation<ReduceLightCurveOperation>(m_LightCurveController, m_OcrExtensionManager, false))
 				{
 					m_VideoController.RefreshCurrentFrame();
 					return true;
@@ -516,7 +519,8 @@ namespace Tangra
 				m_VideoController.AdvStatusPopupFormCustomizer,
 				m_VideoController.AavStatusPopupFormCustomizer,
 				m_AddinsController,
-				addinContainers);
+				addinContainers,
+                m_OcrExtensionManager);
 
 			frmSettings.StartPosition = FormStartPosition.CenterParent;
 			frmSettings.ShowCatalogRequiredHint = showCatalogRequiredHint;
@@ -984,7 +988,7 @@ namespace Tangra
 		private void miReduceLightCurve_MouseDown(object sender, MouseEventArgs e)
 		{
 			bool debugMode = e.Button == MouseButtons.Middle;
-			m_VideoController.ActivateOperation<ReduceLightCurveOperation>(m_LightCurveController, debugMode);
+            m_VideoController.ActivateOperation<ReduceLightCurveOperation>(m_LightCurveController, m_OcrExtensionManager, debugMode);
 		}
 
 		private void FileSystemFileDragDrop(object sender, DragEventArgs e)

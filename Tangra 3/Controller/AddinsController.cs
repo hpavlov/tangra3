@@ -247,7 +247,30 @@ namespace Tangra.Controller
             }
         }
 
-		public List<ITangraAddinAction> GetAstrometryActions(out List<ITangraAddin> astrometryAddins)
+        public List<ITangraAddinAction> GetTimestampOcrActions(out List<ITangraAddin> timestampOcrAddins)
+        {
+            var rv = new List<ITangraAddinAction>();
+            timestampOcrAddins = new List<ITangraAddin>();
+
+            if (m_AddinManager.Addins.Count > 0)
+            {
+                foreach (Addin addin in m_AddinManager.Addins)
+                {
+                    foreach (ITangraAddinAction action in addin.Instance.GetAddinActions())
+                    {
+                        if (action.ActionType == AddinActionType.OcrEngine)
+                        {
+                            rv.Add(action);
+                            if (!timestampOcrAddins.Contains(addin.Instance)) timestampOcrAddins.Add(addin.Instance);
+                        }
+                    }
+                }
+            }
+
+            return rv;
+        }
+
+        public List<ITangraAddinAction> GetAstrometryActions(out List<ITangraAddin> astrometryAddins)
 		{
 			var rv = new List<ITangraAddinAction>();
 			astrometryAddins = new List<ITangraAddin>();

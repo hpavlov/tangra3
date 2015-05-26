@@ -6,19 +6,58 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
+using Tangra.Controller;
 using Tangra.Model.Config;
+using Tangra.SDK;
 
 namespace Tangra.OCR
 {
 	public class OcrExtensionManager
 	{
-		public static ITimestampOcr GetCurrentOCR()
+        private AddinsController m_AddinsController;
+
+        public OcrExtensionManager(AddinsController addinsController)
+        {
+            m_AddinsController = addinsController;
+        }
+
+        public void LoadAvailableOcrEngines(ComboBox cbxOcrEngine)
+        {
+            var supported = new List<object>();
+            supported.Add("IOTA-VTI");
+
+            List<ITangraAddin> addins;
+            List<ITangraAddinAction> actions = m_AddinsController.GetTimestampOcrActions(out addins);
+            actions.ForEach(x => supported.Add(x.DisplayName));
+
+            supported.Sort();           
+
+            cbxOcrEngine.Items.Clear();
+            cbxOcrEngine.Items.AddRange(supported.ToArray());
+
+            if (!string.IsNullOrEmpty(TangraConfig.Settings.Generic.OcrEngine))
+                cbxOcrEngine.SelectedIndex = cbxOcrEngine.Items.IndexOf(TangraConfig.Settings.Generic.OcrEngine);
+
+            if (cbxOcrEngine.SelectedIndex == -1)
+                cbxOcrEngine.SelectedIndex = 0;
+        }
+
+		public ITimestampOcr GetCurrentOcr()
 		{
-			if (TangraConfig.Settings.Generic.OcrEngine != null &&
-				TangraConfig.Settings.Generic.OcrEngine.StartsWith("IOTA-VTI"))
-			{
-                return new IotaVtiOrcManaged();
-			}
+            if (TangraConfig.Settings.Generic.OcrEngine != null)
+            {
+                if (TangraConfig.Settings.Generic.OcrEngine.StartsWith("IOTA-VTI"))
+                    return new IotaVtiOrcManaged();
+
+                List<ITangraAddin> addins;
+                List<ITangraAddinAction> actions = m_AddinsController.GetTimestampOcrActions(out addins);
+                ITangraAddinAction ocrEngine = actions.SingleOrDefault(x => TangraConfig.Settings.Generic.OcrEngine.StartsWith(x.DisplayName));
+                if (ocrEngine != null)
+                {
+                    
+                }
+            }
 
 			return null;
 		}
