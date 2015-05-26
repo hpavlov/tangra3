@@ -26,6 +26,7 @@ namespace Tangra.OCR
         {
             var supported = new List<object>();
             supported.Add("IOTA-VTI");
+            supported.Add("KIWI-OSD");
 
             List<ITangraAddin> addins;
             List<ITangraAddinAction> actions = m_AddinsController.GetTimestampOcrActions(out addins);
@@ -50,12 +51,15 @@ namespace Tangra.OCR
                 if (TangraConfig.Settings.Generic.OcrEngine.StartsWith("IOTA-VTI"))
                     return new IotaVtiOrcManaged();
 
+                if (TangraConfig.Settings.Generic.OcrEngine.StartsWith("KIWI-OSD"))
+                    return new KiwiOsdOcr();
+
                 List<ITangraAddin> addins;
                 List<ITangraAddinAction> actions = m_AddinsController.GetTimestampOcrActions(out addins);
                 ITangraAddinAction ocrEngine = actions.SingleOrDefault(x => TangraConfig.Settings.Generic.OcrEngine.StartsWith(x.DisplayName));
                 if (ocrEngine != null)
                 {
-                    
+                    // TODO: Instantiate an ORC engine implemented as an Add-in
                 }
             }
 

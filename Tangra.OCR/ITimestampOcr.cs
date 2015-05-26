@@ -36,7 +36,6 @@ namespace Tangra.OCR
         void TryToAutoConfigure(uint[] data);
 
         bool ProcessCalibrationFrame(int frameNo, uint[] data);
-        void AddConfiguration(uint[] data, OCRConfigEntry config);
 		Dictionary<string, uint[]> GetCalibrationReportImages();
 	    List<string> GetCalibrationErrors();
         uint[] GetLastUnmodifiedImage();

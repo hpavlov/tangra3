@@ -625,9 +625,6 @@ namespace Tangra.OCR
         {
             return m_LatestFrameImage;
         }
-
-		public void AddConfiguration(uint[] data, OCRConfigEntry config)
-		{ }
 	     
         private DateTime ExtractDateTime(int frameNo, IotaVtiTimeStamp oddFieldOSD, IotaVtiTimeStamp evenFieldOSD)
         {
