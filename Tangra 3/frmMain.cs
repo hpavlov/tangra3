@@ -79,7 +79,7 @@ namespace Tangra
 
 			m_LongOperationsManager = new LongOperationsManager(this, m_VideoController);
 
-			m_LightCurveController = new LightCurveController(this, m_VideoController, m_AddinsController);
+            m_LightCurveController = new LightCurveController(this, m_VideoController, m_AddinsController, m_OcrExtensionManager);
 			m_MakeDarkFlatController = new DarkFlatFrameController(this, m_VideoController);
 			m_AstrometryController = new AstrometryController(m_VideoController, m_LongOperationsManager);
 			m_AutoUpdatesController = new AutoUpdatesController(this, m_VideoController);
