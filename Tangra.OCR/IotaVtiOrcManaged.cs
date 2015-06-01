@@ -463,7 +463,6 @@ namespace Tangra.OCR
 			int[] DELTAS = new int[] { 0, -1, 1 };
 	        int fromLineBase = m_FromLine;
 			int toLineBase = m_ToLine;
-	        bool matchFound = false;
 
 			PrepareOsdVideoFields(data);
 
@@ -490,7 +489,6 @@ namespace Tangra.OCR
 				if (bestBottomPositionOdd == bestBottomPositionEven &&
 				    bestTopPositionOdd == bestTopPositionEven)
 				{
-					matchFound = true;
 					m_FromLine = fromLineBase;
 					m_ToLine = toLineBase;
 

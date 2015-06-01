@@ -196,8 +196,6 @@ namespace Tangra.OCR
 				// Cannot correct more than one differences. Why not??
 				return false;
 			}
-
-			return true;
 		}
 
 		public string XorStrings(string a, string b)

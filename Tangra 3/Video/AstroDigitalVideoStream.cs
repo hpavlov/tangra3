@@ -79,7 +79,6 @@ namespace Tangra.Video
 
 		private int m_BitPix;
 		private uint m_Aav16NormVal;
-		private bool m_FileOpened;
 	    private string m_Engine;
 		private string m_CameraModel;
 		private string m_VideoStandard;
@@ -162,7 +161,6 @@ namespace Tangra.Video
 				m_OsdLastLine = 0;
 			}
 
-			m_FileOpened = true;
 		    m_OcrDataAvailable = null;
 		}
 

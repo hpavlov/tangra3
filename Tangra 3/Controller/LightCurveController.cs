@@ -31,7 +31,6 @@ namespace Tangra.Controller
 
         private frmLightCurve m_LightCurveForm;
 	    private AddinsController m_AddinsController;
-        private bool m_lcFileLoaded;
 		private LCFile m_lcFile = null;
 
 		private LightCurveContext m_Context;	    
@@ -42,7 +41,6 @@ namespace Tangra.Controller
             m_VideoController = videoController;
 			m_AddinsController = addinsController;
 
-            m_lcFileLoaded = false;
             m_LightCurveForm = null;
         }
 
@@ -165,8 +163,6 @@ namespace Tangra.Controller
                         TangraContext.Current.CanScrollFrames = false;
                         m_VideoController.UpdateViews();
                     }
-
-                    m_lcFileLoaded = true;
 
                     m_Context = new LightCurveContext(lcFile);
                     m_LightCurveForm = new frmLightCurve(this, m_AddinsController, lcFile, fileName);

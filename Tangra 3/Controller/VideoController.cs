@@ -2167,7 +2167,7 @@ namespace Tangra.Controller
 					{
 						return (VideoFileFormat)Enum.Parse(typeof(VideoFileFormat), match.Groups["format"].Value);
 					}
-					catch (FormatException fex)
+					catch (FormatException)
 					{ }
 				}
 			}

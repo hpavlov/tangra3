@@ -29,8 +29,8 @@ namespace Tangra.Astrometry
 		// Resulting apertue = FWHM * APERTURE_IN_FWHM + FIXED_APERTURE
 		private static float APERTURE_IN_FWHM = 0f;
 		private static float FIXED_APERTURE = 5f;
-		private static uint SATURATION_8BIT = 250;
-		private static uint SATURATION_16BIT = 4000;
+		//private static uint SATURATION_8BIT = 250;
+		//private static uint SATURATION_16BIT = 4000;
 		private static int PSF_FIT_AREA_SIZE = 11;
 
 		private List<double> m_Intencities;

@@ -16,7 +16,7 @@ namespace Tangra.Model.Astro
 {
 	public class DoublePSFFit : PSFFitBase, IPSFFit, ITrackedObjectPsfFit
 	{
-		private static double CERTAINTY_CONST = 0.5 / 0.03;
+		//private static double CERTAINTY_CONST = 0.5 / 0.03;
 
 		private static int NumberIterations = 10;
 		private int m_xCenter;
@@ -704,9 +704,7 @@ namespace Tangra.Model.Astro
 			float xScale = (float)(rect.Width * 1.0 - 2 * margin) / (halfWidth * 2);
 
 			float xPrev1 = float.NaN;
-			float xPrev2 = float.NaN;
 			float yPrev1 = float.NaN;
-			float yPrev2 = float.NaN;
 
 			g.FillRectangle(SystemBrushes.ControlDarkDark, rect);
 

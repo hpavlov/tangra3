@@ -30,7 +30,6 @@ namespace Tangra.Model.Image
 			get
 			{
 				return false;
-				return Brightness > 255;
 			}
 		}
 

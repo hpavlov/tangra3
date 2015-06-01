@@ -1900,7 +1900,7 @@ namespace Tangra.VideoOperations.LightCurves
 				if (trackedObject.OriginalObject.GroupId > -1)
 					objectsInGroup = m_Tracker.TrackedObjects.Where(x => x.OriginalObject.GroupId == trackedObject.OriginalObject.GroupId).ToList();
 
-				if (center != ImagePixel.Unspecified)
+				if ((ImagePixel)center != ImagePixel.Unspecified)
 				{
 					MeasureTrackedObject2(trackedObject,
 											m_Measurer,

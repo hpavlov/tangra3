@@ -984,8 +984,6 @@ namespace Tangra.Video.AstroDigitalVideo
 
 			//P7 0 09:38:45 0000xxxx 00000000
 
-		    long ticks = 0;
-
 		    ReplaceChar(ref osd, 3, '0', ' ');
 			ReplaceChar(ref osd, 29, '0', ' ');
 			ReplaceChar(ref osd, 30, '0', ' ');

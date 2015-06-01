@@ -187,8 +187,6 @@ namespace Tangra.Video.AstroDigitalVideo
 				g.Save();
 			}
 
-			int numTopLines = 0;
-
 			if (m_LastFrameNo + 1 != currentFrameNo)
 				// When frames jump we stop displaying the message
 				m_FramesLeftToDiplayMessage = 0;

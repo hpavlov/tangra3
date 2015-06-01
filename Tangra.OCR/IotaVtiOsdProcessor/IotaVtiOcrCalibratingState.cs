@@ -446,7 +446,7 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 
 			List<int> distinctPositions = confirmedBlockPositions.Distinct().ToList();
 			distinctPositions.Sort();
-			int idx = 0;
+
 			int posIdx = 0;
 			stateManager.BlockOffsetsX = new int[IotaVtiOcrProcessor.MAX_POSITIONS];
 			for (int i = 0; i < IotaVtiOcrProcessor.MAX_POSITIONS; i++)

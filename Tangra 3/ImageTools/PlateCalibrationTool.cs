@@ -98,12 +98,7 @@ namespace Tangra.ImageTools
 			}
 		}
 
-		private Bitmap m_ZoomedBitmap = null;
-		private byte[] m_CursorPoints = null;
-
 		private OSDExcluder m_OSDExcluderTool;
-
-		private byte[] RGBValues = null;
 
 		private FieldSolveContext m_FieldSolveContext;
 
@@ -262,7 +257,6 @@ namespace Tangra.ImageTools
 
 		public override void Deactivate()
 		{
-			RGBValues = null;
 			TangraConfig.Settings.Save();
 
 			if (m_State != FittingsState.Configuring)
