@@ -206,7 +206,15 @@ namespace Tangra.Controller
                     folderName,
                     () =>
                     {
-                        return FITSFileSequenceStream.OpenFolder(fitsFiles);
+                        bool hasNegativePixels;
+                        FITSFileSequenceStream stream = FITSFileSequenceStream.OpenFolder(fitsFiles, false, out hasNegativePixels);
+
+                        if (hasNegativePixels && CheckWithUserAboutNegativePixels())
+                        {
+                            stream = FITSFileSequenceStream.OpenFolder(fitsFiles, true, out hasNegativePixels);
+                        }
+
+                        return stream;
                     });
             }
         }
@@ -272,7 +280,12 @@ namespace Tangra.Controller
                         }
                         else if (fileExtension == ".fit" || fileExtension == ".fits")
                         {
-                            frameStream = SingleFITSFileFrameStream.OpenFile(fileName);
+                            bool hasNegativePixels;
+                            frameStream = SingleFITSFileFrameStream.OpenFile(fileName, false, out hasNegativePixels);
+                            if (hasNegativePixels && CheckWithUserAboutNegativePixels())
+                            {
+                                frameStream = SingleFITSFileFrameStream.OpenFile(fileName, true, out hasNegativePixels);    
+                            }
                         }
                         else
                         {
@@ -289,6 +302,17 @@ namespace Tangra.Controller
                     }					
 				});
 	    }
+
+        private bool CheckWithUserAboutNegativePixels()
+        {
+            return MessageBox.Show(
+                m_MainForm, 
+                "Negative pixel values have been found in this FITS file. Do you want to zero out all negative values?", 
+                "Tangra", 
+                MessageBoxButtons.YesNo, 
+                MessageBoxIcon.Warning, 
+                MessageBoxDefaultButton.Button1) == DialogResult.Yes;
+        }
 
 		public bool OpenVideoFileInternal(string fileName, Func<IFrameStream> frameStreamFactoryMethod)
 		{

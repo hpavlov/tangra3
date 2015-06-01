@@ -36,7 +36,7 @@ namespace Tangra.Video.FITS
         private uint m_MinPixelValue;
         private uint m_MaxPixelValue;
 
-		public static SingleFITSFileFrameStream OpenFile(string fileName)
+        public static SingleFITSFileFrameStream OpenFile(string fileName, bool zeroOutNegativePixels, out bool hasNegativePixels)
 		{
 			uint[] pixelsFlat;
 			int width;
@@ -47,7 +47,7 @@ namespace Tangra.Video.FITS
 		    uint minPixelValue;
             uint maxPixelValue;
 
-            FITSHelper.Load16BitFitsFile(fileName, out pixelsFlat, out width, out height, out bpp, out timestamp, out exposure, out minPixelValue, out maxPixelValue);
+            FITSHelper.Load16BitFitsFile(fileName, zeroOutNegativePixels, out pixelsFlat, out width, out height, out bpp, out timestamp, out exposure, out minPixelValue, out maxPixelValue, out hasNegativePixels);
 
 		    TangraContext.Current.RenderingEngine = SINGLE_FITS_FILE_ENGINE;
 

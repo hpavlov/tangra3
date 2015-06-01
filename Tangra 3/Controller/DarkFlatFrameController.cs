@@ -40,7 +40,7 @@ namespace Tangra.Controller
             get { return TangraCore.PreProcessors.PreProcessingHasBiasFrameSet(); }
         }
 
-        private bool LoadDarkFlatOrBiasFrameInternal(string title, ref float[,] pixels, ref float medianValue, ref float exposureSeconds, ref int imagesCombined)
+        private bool LoadDarkFlatOrBiasFrameInternal(string title, bool zeroOutNegativePixels, ref float[,] pixels, ref float medianValue, ref float exposureSeconds, ref int imagesCombined)
         {
 			string filter = "FITS Image 16 bit (*.fit;*.fits)|*.fit;*.fits";
 
@@ -51,13 +51,16 @@ namespace Tangra.Controller
 				
 				Type pixelDataType;
 			    int snapshot = 1;
+			    bool hasNegativePixels;
 
 				bool loaded = FITSHelper.LoadFloatingPointFitsFile(
 					fileName,
+                    zeroOutNegativePixels,
 					out pixels,
 					out medianValue,
 					out pixelDataType,
                     out exposureSeconds,
+                    out hasNegativePixels,
 					delegate(BasicHDU imageHDU)
 					{
 						if (
@@ -113,7 +116,7 @@ namespace Tangra.Controller
 		    float exposureSeconds = 0;
 		    int imagesCombined = 1;
 
-            if (LoadDarkFlatOrBiasFrameInternal("Load dark frame ...", ref pixels, ref medianValue, ref exposureSeconds, ref imagesCombined))
+            if (LoadDarkFlatOrBiasFrameInternal("Load dark frame ...", false, ref pixels, ref medianValue, ref exposureSeconds, ref imagesCombined))
 			{
 				UsageStats.Instance.DarkFramesUsed++;
 				UsageStats.Instance.Save();
@@ -134,7 +137,7 @@ namespace Tangra.Controller
             float exposureSeconds = 0;
             int imagesCombined = 1;
 
-            if (LoadDarkFlatOrBiasFrameInternal("Load flat frame ...", ref pixels, ref medianValue, ref exposureSeconds, ref imagesCombined))
+            if (LoadDarkFlatOrBiasFrameInternal("Load flat frame ...", false, ref pixels, ref medianValue, ref exposureSeconds, ref imagesCombined))
 			{
 				UsageStats.Instance.FlatFramesUsed++;
 				UsageStats.Instance.Save();
@@ -155,7 +158,7 @@ namespace Tangra.Controller
             float exposureSeconds = 0;
             int imagesCombined = 1;
 
-            if (LoadDarkFlatOrBiasFrameInternal("Load bias frame ...", ref pixels, ref medianValue, ref exposureSeconds, ref imagesCombined))
+            if (LoadDarkFlatOrBiasFrameInternal("Load bias frame ...", false, ref pixels, ref medianValue, ref exposureSeconds, ref imagesCombined))
             {
                 UsageStats.Instance.BiasFramesUsed++;
                 UsageStats.Instance.Save();

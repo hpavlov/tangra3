@@ -22,24 +22,26 @@ namespace Tangra.Video.FITS
 
         private uint m_MinPixelValueFirstImage;
         private uint m_MaxPixelValueFirstImage;
+        private bool m_ZeroOutNegativePixels = false;
 
-        public static FITSFileSequenceStream OpenFolder(string[] fitsFiles)
+        public static FITSFileSequenceStream OpenFolder(string[] fitsFiles, bool zeroOutNegativeValues, out bool hasNegativePixels)
         {
 			UsageStats.Instance.ProcessedFitsFolderFiles++;
 			UsageStats.Instance.Save();
 
-            var rv =  new FITSFileSequenceStream(fitsFiles);
+            var rv = new FITSFileSequenceStream(fitsFiles, zeroOutNegativeValues, out hasNegativePixels);
 	        rv.FileName = Path.GetDirectoryName(fitsFiles[0]);
 	        return rv;
         }
 
-        private FITSFileSequenceStream(string[] fitsFiles)
+        private FITSFileSequenceStream(string[] fitsFiles, bool zeroOutNegativeValues, out bool hasNegativePixels)
         {
             m_FitsFilesList.AddRange(fitsFiles);
 
             FirstFrame = 0;
             LastFrame = m_FitsFilesList.Count - 1;
             CountFrames = m_FitsFilesList.Count;
+            m_ZeroOutNegativePixels = zeroOutNegativeValues;
 
             uint[] pixelsFlat;
             int width;
@@ -50,7 +52,7 @@ namespace Tangra.Video.FITS
             uint minPixelValue;
             uint maxPixelValue;
 
-            FITSHelper.Load16BitFitsFile(m_FitsFilesList[0], out pixelsFlat, out width, out height, out bpp, out timestamp, out exposure, out minPixelValue, out maxPixelValue);
+            FITSHelper.Load16BitFitsFile(m_FitsFilesList[0], zeroOutNegativeValues, out pixelsFlat, out width, out height, out bpp, out timestamp, out exposure, out minPixelValue, out maxPixelValue, out hasNegativePixels);
 
             m_MinPixelValueFirstImage = minPixelValue;
             m_MaxPixelValueFirstImage = maxPixelValue;
@@ -109,8 +111,9 @@ namespace Tangra.Video.FITS
 			double? exposure;
             uint minPixelValue;
             uint maxPixelValue;
+            bool hasNegativePixels;
 
-            FITSHelper.Load16BitFitsFile(m_FitsFilesList[index], out pixelsFlat, out width, out height, out bpp, out timestamp, out exposure, out minPixelValue, out maxPixelValue);
+            FITSHelper.Load16BitFitsFile(m_FitsFilesList[index], m_ZeroOutNegativePixels, out pixelsFlat, out width, out height, out bpp, out timestamp, out exposure, out minPixelValue, out maxPixelValue, out hasNegativePixels);
 
             byte[] displayBitmapBytes = new byte[Width * Height];
             byte[] rawBitmapBytes = new byte[(Width * Height * 3) + 40 + 14 + 1];
