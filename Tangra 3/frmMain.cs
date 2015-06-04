@@ -39,6 +39,7 @@ using Tangra.VideoOperations.Astrometry;
 using Tangra.VideoOperations.Astrometry.Engine;
 using Tangra.VideoOperations.LightCurves;
 using Tangra.VideoOperations.MakeDarkFlatField;
+using Tangra.VideoOperations.Spectroscopy;
 using Tangra.VideoTools;
 using Tangra.View;
 using nom.tam.fits;
@@ -51,6 +52,7 @@ namespace Tangra
 		private VideoController m_VideoController;
 	    private LightCurveController m_LightCurveController;
 		private AstrometryController m_AstrometryController;
+	    private SpectroscopyController m_SpectroscopyController;
 		private DarkFlatFrameController m_MakeDarkFlatController;
 		private AutoUpdatesController m_AutoUpdatesController;
 		private AddinsController m_AddinsController;
@@ -82,6 +84,7 @@ namespace Tangra
             m_LightCurveController = new LightCurveController(this, m_VideoController, m_AddinsController, m_OcrExtensionManager);
 			m_MakeDarkFlatController = new DarkFlatFrameController(this, m_VideoController);
 			m_AstrometryController = new AstrometryController(m_VideoController, m_LongOperationsManager);
+		    m_SpectroscopyController = new SpectroscopyController(m_VideoController);
 			m_AutoUpdatesController = new AutoUpdatesController(this, m_VideoController);
 
 			NotificationManager.Instance.SetVideoController(m_VideoController);
@@ -1236,16 +1239,14 @@ namespace Tangra
 				m_VideoController.StepForward();
 			}
 
-			m_VideoController.RotateVideo();
-
 			//if (ChooseCalibratedConfigurationDialog(debugMode))
 			//{
 			//	m_VideoController.ChangeImageTool(new SelectAstrometricObjectTool(m_AstrometryController, m_VideoController));
 
-			//	m_VideoController.ActivateOperation<VideoAstrometryOperation>(m_AstrometryController, debugMode);
+            m_VideoController.ActivateOperation<VideoSpectroscopyOperation>(m_SpectroscopyController, debugMode);
 
-			//	TangraContext.Current.CanPlayVideo = false;
-			//	m_VideoController.UpdateViews();
+			TangraContext.Current.CanPlayVideo = false;
+			m_VideoController.UpdateViews();
 
 			//	return true;
 			//}

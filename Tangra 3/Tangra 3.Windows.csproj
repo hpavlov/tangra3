@@ -239,6 +239,7 @@
     <Compile Include="Controller\LightCurveContext.cs" />
     <Compile Include="Controller\LightCurveController.cs" />
     <Compile Include="Controller\DarkFlatFrameController.cs" />
+    <Compile Include="Controller\SpectroscopyController.cs" />
     <Compile Include="Controller\VideoController.cs" />
     <Compile Include="Controller\VideoOperationController.cs" />
     <Compile Include="Controller\AddinsController.cs" />
@@ -318,6 +319,7 @@
       <DependentUpon>frmLongRunningOperation.cs</DependentUpon>
     </Compile>
     <Compile Include="Helpers\LongOperationsManager.cs" />
+    <Compile Include="Helpers\RotationMapper.cs" />
     <Compile Include="Helpers\ShellHelper.cs" />
     <Compile Include="Helpers\TangraFileAssociations.cs" />
     <Compile Include="Helpers\UsageStats.cs" />
@@ -515,6 +517,13 @@
     <Compile Include="VideoOperations\LightCurves\ucCorrSelection.Designer.cs">
       <DependentUpon>ucCorrSelection.cs</DependentUpon>
     </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\ucSpectroscopy.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\ucSpectroscopy.Designer.cs">
+      <DependentUpon>ucSpectroscopy.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\VideoSpectroscopyOperation.cs" />
     <Compile Include="VideoTools\BackgroundModelGenerator.cs" />
     <Compile Include="VideoTools\frmDefineDisplayDynamicRange.cs">
       <SubType>Form</SubType>
@@ -979,6 +988,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\LightCurves\ucCorrSelection.resx">
       <DependentUpon>ucCorrSelection.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Spectroscopy\ucSpectroscopy.resx">
+      <DependentUpon>ucSpectroscopy.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VideoTools\frmDefineDisplayDynamicRange.resx">
       <DependentUpon>frmDefineDisplayDynamicRange.cs</DependentUpon>
