@@ -876,5 +876,11 @@ namespace Tangra.Video
 				TangraCore.PreProcessors.AddFlipAndRotation(RotateFlipType.RotateNoneFlipNone);
 			}
 		}
+
+		public void RotateVideo(float angle)
+		{
+			// This is an experimental code
+			m_VideoStream = new RotatedVideoStream(m_VideoStream, angle);
+		}
 	}
 }

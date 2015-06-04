@@ -1216,6 +1216,42 @@ namespace Tangra
 			m_VideoController.SetPictureBoxCursor(Cursors.Arrow);
 		}
 
+		private void miSpectroscopy_Click(object sender, EventArgs e)
+		{
+
+		}
+
+		private void miSpectroscopy_MouseDown(object sender, MouseEventArgs e)
+		{
+			bool debugMode = e.Button == MouseButtons.Middle;
+
+			StartSpectroscopy(debugMode);
+		}
+
+		private bool StartSpectroscopy(bool debugMode)
+		{
+			if (m_VideoController.GetVideoFileFormat() == VideoFileFormat.AAV &&
+				m_VideoController.CurrentFrameIndex == m_VideoController.VideoFirstFrame)
+			{
+				m_VideoController.StepForward();
+			}
+
+			m_VideoController.RotateVideo();
+
+			//if (ChooseCalibratedConfigurationDialog(debugMode))
+			//{
+			//	m_VideoController.ChangeImageTool(new SelectAstrometricObjectTool(m_AstrometryController, m_VideoController));
+
+			//	m_VideoController.ActivateOperation<VideoAstrometryOperation>(m_AstrometryController, debugMode);
+
+			//	TangraContext.Current.CanPlayVideo = false;
+			//	m_VideoController.UpdateViews();
+
+			//	return true;
+			//}
+
+			return false;
+		}
 
 	}
 }

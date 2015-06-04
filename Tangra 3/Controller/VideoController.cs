@@ -2211,5 +2211,10 @@ namespace Tangra.Controller
 
 			return null;
 		}
+
+		internal void RotateVideo()
+		{
+			m_FramePlayer.RotateVideo(45);
+		}
 	}
 }

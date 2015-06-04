@@ -115,6 +115,7 @@ namespace Tangra.Model.Video
 		void SetupFrameIntegration(int framesToIntegrate, FrameIntegratingMode frameMode, PixelIntegrationType pixelIntegrationType);
         FrameIntegratingMode FrameIntegratingMode { get; }
         int FramesToIntegrate { get; }
+		void RotateVideo(float angle);
 	}
 
 	public class PlayerContext

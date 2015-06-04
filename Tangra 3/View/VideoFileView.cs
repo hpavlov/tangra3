@@ -82,6 +82,7 @@ namespace Tangra.View
 
 			m_MainForm.miReduceLightCurve.Enabled = TangraContext.Current.HasAnyFileLoaded && !TangraContext.Current.OperationInProgress;
             m_MainForm.miAstrometry.Enabled = TangraContext.Current.HasAnyFileLoaded && !TangraContext.Current.OperationInProgress;
+			m_MainForm.miSpectroscopy.Enabled = TangraContext.Current.HasAnyFileLoaded && !TangraContext.Current.OperationInProgress;
             m_MainForm.miMakeDarkFlat.Enabled = TangraContext.Current.HasAnyFileLoaded && !TangraContext.Current.OperationInProgress;
 
             m_MainForm.miLoadDark.Enabled = TangraContext.Current.HasAnyFileLoaded && TangraContext.Current.CanLoadDarkFrame && !TangraContext.Current.OperationInProgress;

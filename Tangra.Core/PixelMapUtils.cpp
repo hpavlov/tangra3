@@ -1040,42 +1040,35 @@ DLL_PUBLIC HRESULT PreProcessingLowPassDifferenceFilter(unsigned long* pixels, l
 }
 
 
-HRESULT GetRotatedFrameDimentions(int width, int height, double angleDegrees, int* newWidth, int* newHeight)
+HRESULT GetRotatedFrameDimentions(long width, long height, double angleDegrees, long* newWidth, long* newHeight)
 {
-/*
+	float radians=(3.1416925*angleDegrees)/180; 
 
-Graphics::TBitmap *SrcBitmap=new Graphics::TBitmap; 
-Graphics::TBitmap *DestBitmap=new Graphics::TBitmap; 
-SrcBitmap->LoadFromFile("Crayon.bmp"); 
-//Convert degrees to radians 
-float radians=(2*3.1416*angle)/360; 
+	float cosine=(float)cos(radians); 
+	float sine=(float)sin(radians); 
 
-float cosine=(float)cos(radians); 
-float sine=(float)sin(radians); 
+	float Point1x=(-height*sine); 
+	float Point1y=(height*cosine); 
+	float Point2x=(width*cosine - height*sine); 
+	float Point2y=(height*cosine + width*sine); 
+	float Point3x=(width*cosine); 
+	float Point3y=(width*sine); 
 
-float Point1x=(-SrcBitmap->Height*sine); 
-float Point1y=(SrcBitmap->Height*cosine); 
-float Point2x=(SrcBitmap->Width*cosine-SrcBitmap->Height*sine); 
-float Point2y=(SrcBitmap->Height*cosine+SrcBitmap->Width*sine); 
-float Point3x=(SrcBitmap->Width*cosine); 
-float Point3y=(SrcBitmap->Width*sine); 
+	float minx=std::min((float)0, std::min(Point1x, std::min(Point2x,Point3x))); 
+	float miny=std::min((float)0, std::min(Point1y, std::min(Point2y,Point3y))); 
+	float maxx=std::max(Point1x, std::max(Point2x,Point3x)); 
+	float maxy=std::max(Point1y, std::max(Point2y,Point3y)); 
 
-float minx=min(0,min(Point1x,min(Point2x,Point3x))); 
-float miny=min(0,min(Point1y,min(Point2y,Point3y))); 
-float maxx=max(Point1x,max(Point2x,Point3x)); 
-float maxy=max(Point1y,max(Point2y,Point3y)); 
+	int DestBitmapWidth=(int)ceil(fabs(maxx)-minx); 
+	int DestBitmapHeight=(int)ceil(fabs(maxy)-miny); 
 
-int DestBitmapWidth=(int)ceil(fabs(maxx)-minx); 
-int DestBitmapHeight=(int)ceil(fabs(maxy)-miny); 
+	*newHeight = DestBitmapHeight; 
+	*newWidth = DestBitmapWidth;
 
-DestBitmap->Height=DestBitmapHeight; 
-DestBitmap->Width=DestBitmapWidth;
-
-*/
-	return E_NOTIMPL;
+	return S_OK;
 }
 
-HRESULT RotateFrame(int width, int height, double angleDegrees, unsigned long* originalPixels, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
+HRESULT RotateFrame(long width, long height, double angleDegrees, unsigned long* originalPixels, long destWidth, long destHeight, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, int dataBpp, unsigned long normalisationValue)
 {
 	// http://docs.opencv.org/doc/tutorials/imgproc/imgtrans/warp_affine/warp_affine.html?highlight=warpaffine
 	// http://stackoverflow.com/questions/2278414/rotating-an-image-in-c-c
@@ -1083,29 +1076,46 @@ HRESULT RotateFrame(int width, int height, double angleDegrees, unsigned long* o
 	// newx=x*cos(angle)+y*sin(angle) 
 	// newy=y*cos(angle)-x*sin(angle)
 
-/*
+	float radians=(3.1416925*angleDegrees)/180; 
+	float cosine=(float)cos(radians); 
+	float sine=(float)sin(radians); 
 
-for(int x=0;x<DestBitmapWidth;x++) 
-{ 
-  for(int y=0;y<DestBitmapHeight;y++) 
-  { 
-    int SrcBitmapx=(int)((x+minx)*cosine+(y+miny)*sine); 
-    int SrcBitmapy=(int)((y+miny)*cosine-(x+minx)*sine); 
-    if(SrcBitmapx>=0&&SrcBitmapx<SrcBitmap->Width&&SrcBitmapy>=0&& 
-         SrcBitmapy<SrcBitmap->Height) 
-    { 
-      DestBitmap->Canvas->Pixels[x][y]= 
-          SrcBitmap->Canvas->Pixels[SrcBitmapx][SrcBitmapy]; 
-    } 
-  } 
-} 
-//Show the rotated bitmap 
-Image1->Picture->Bitmap=DestBitmap; 
-delete DestBitmap; 
-delete SrcBitmap;
+	float Point1x=(-height*sine); 
+	float Point1y=(height*cosine); 
+	float Point2x=(width*cosine - height*sine); 
+	float Point2y=(height*cosine + width*sine); 
+	float Point3x=(width*cosine); 
+	float Point3y=(width*sine); 
 
-*/
-	return E_NOTIMPL;
+	float minx=std::min((float)0, std::min(Point1x, std::min(Point2x,Point3x))); 
+	float miny=std::min((float)0, std::min(Point1y, std::min(Point2y,Point3y))); 
+	float maxx=std::max(Point1x, std::max(Point2x,Point3x)); 
+	float maxy=std::max(Point1y, std::max(Point2y,Point3y)); 
+
+	for(int x=0;x<destWidth;x++) 
+	{ 
+	  for(int y=0;y<destHeight;y++) 
+	  { 
+		int SrcBitmapx=(int)((x+minx)*cosine+(y+miny)*sine); 
+		int SrcBitmapy=(int)((y+miny)*cosine-(x+minx)*sine); 
+		if(SrcBitmapx >= 0 && SrcBitmapx < width && SrcBitmapy >= 0&& SrcBitmapy < height) 
+		{ 
+		  pixels[x + destWidth * y]= originalPixels[SrcBitmapx + width * SrcBitmapy]; 
+		} 
+	  } 
+	} 
+	
+	return GetBitmapPixels(
+				destWidth, 
+				destHeight, 
+				pixels, 
+				bitmapPixels, 
+				bitmapBytes, 
+				true, 
+				dataBpp, 
+				normalisationValue);
+
+	return S_OK;
 }
 
 

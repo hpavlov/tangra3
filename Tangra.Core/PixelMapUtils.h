@@ -40,8 +40,8 @@ DLL_PUBLIC HRESULT PreProcessingApplyBiasDarkFlatFrame(
 DLL_PUBLIC HRESULT PreProcessingLowPassFilter(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal);
 DLL_PUBLIC HRESULT PreProcessingLowPassDifferenceFilter(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal);
 
-DLL_PUBLIC HRESULT GetRotatedFrameDimentions(int width, int height, double angleDegrees, int* newWidth, int* newHeight);
-DLL_PUBLIC HRESULT RotateFrame(int width, int height, double angleDegrees, unsigned long* originalPixels, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes);
+DLL_PUBLIC HRESULT GetRotatedFrameDimentions(long width, long height, double angleDegrees, long* newWidth, long* newHeight);
+DLL_PUBLIC HRESULT RotateFrame(long width, long height, double angleDegrees, unsigned long* originalPixels, long destWidth, long destHeight, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, int dataBpp, unsigned long normalisationValue);
 
 #ifdef __cplusplus
 } // __cplusplus defined.

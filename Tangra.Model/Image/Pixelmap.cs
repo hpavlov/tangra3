@@ -541,7 +541,7 @@ namespace Tangra.Model.Image
 			byte[] displayBitmapBytes = new byte[newWidth * newHeight];
 			byte[] rawBitmapBytes = new byte[(newWidth * newHeight * 3) + 40 + 14 + 1];
 
-			TangraModelCore.RotateFrame(Width, Height, null, angleDegrees, pixels, rawBitmapBytes, displayBitmapBytes);
+			TangraModelCore.RotateFrame(Width, Height, angleDegrees, m_Pixels, newWidth, newHeight, pixels, rawBitmapBytes, displayBitmapBytes, (short)m_BitPix, m_MaxSignalValue.HasValue ? m_MaxSignalValue.Value : 0);
 
 			using (var memStr = new MemoryStream(rawBitmapBytes))
 			{
