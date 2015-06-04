@@ -125,13 +125,15 @@ namespace Tangra.VideoOperations.Spectroscopy
         {
             if (m_OperationState == SpectroscopyState.ChoosingStar && e.Gausian != null && e.Gausian.IsSolved && e.Gausian.Certainty > 0.2)
             {
-                // TODO: Locate star and spectra
-                List<uint> pixels = new List<uint>();
-                float bestAngle = m_SpectroscopyController.LocateSpectraAngle(e.Gausian, pixels);
-                
+                float bestAngle = m_SpectroscopyController.LocateSpectraAngle(e.Gausian);
+
                 m_SelectedStar = new ImagePixel(e.Gausian.XCenter, e.Gausian.YCenter);
                 m_SelectedStarFWHM = e.Gausian.FWHM;
                 m_SelectedStarBestAngle = bestAngle;
+
+				var reader = new SpectraReader(m_VideoController.GetCurrentAstroImage(false), bestAngle);
+				Spectra spectra = reader.ReadSpectra((float)e.Gausian.XCenter, (float)e.Gausian.YCenter, (int)Math.Ceiling(m_SelectedStarFWHM));
+				m_ControlPanel.DisplaySpectra(spectra);
 
                 m_VideoController.RedrawCurrentFrame(false, true);
             }

@@ -20,7 +20,7 @@ namespace Tangra.Controller
 			m_VideoController = videoController;
 		}
 
-        internal float LocateSpectraAngle(PSFFit selectedStar, List<uint> pixels)
+        internal float LocateSpectraAngle(PSFFit selectedStar)
         {
             float x0 = (float)selectedStar.XCenter;
             float y0 = (float)selectedStar.YCenter;
@@ -65,10 +65,8 @@ namespace Tangra.Controller
 
             uint bestSum = 0;
             float bestAngle = 0f;
-            uint[] bestPixels = new uint[diagonnalPixels];
-            uint[] currPixels = new uint[diagonnalPixels];
 
-            for (float a = roughAngle - 1; a < roughAngle + 1; a += 0.1f)
+            for (float a = roughAngle - 1; a < roughAngle + 1; a += 0.02f)
             {
                 var mapper = new RotationMapper(image.Width, image.Height, a);
                 PointF p1 = mapper.GetDestCoords(x0, y0);
@@ -84,7 +82,6 @@ namespace Tangra.Controller
                     if (p.X >= 0 && p.X < width && p.Y >= 0 && p.Y < height)
                     {
                         uint pixVal = image.Pixelmap[(int)p.X, (int)p.Y];
-                        currPixels[d] = pixVal;
                         rowSum += pixVal;
                     }
                 }
@@ -93,12 +90,8 @@ namespace Tangra.Controller
                 {
                     bestSum = rowSum;
                     bestAngle = a;
-                    bestPixels = currPixels;
                 }
             }
-
-            pixels.Clear();
-            pixels.AddRange(bestPixels);
 
             return bestAngle;
         }

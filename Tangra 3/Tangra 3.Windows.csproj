@@ -517,6 +517,7 @@
     <Compile Include="VideoOperations\LightCurves\ucCorrSelection.Designer.cs">
       <DependentUpon>ucCorrSelection.cs</DependentUpon>
     </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\SpectraReader.cs" />
     <Compile Include="VideoOperations\Spectroscopy\ucSpectroscopy.cs">
       <SubType>UserControl</SubType>
     </Compile>
