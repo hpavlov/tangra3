@@ -30,6 +30,14 @@ namespace Tangra.Model.Helpers
 			[In] uint[] intensity, int squareSize, int saturation,
 			[In, Out] ref bool isSolved, [In, Out] ref double iBackground, [In, Out] ref double iStarMax, [In, Out] ref double x0, [In, Out] ref double y0, [In, Out] ref double r0, [In, Out] double[] residuals);
 
+		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+		//DLL_PUBLIC HRESULT RotateFrame(int width, int height, double angleDegrees, unsigned long* originalPixels, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes);
+		public static extern int RotateFrame(int width, int height, [In, Out] uint[] originalPixels, double angleDegrees, [In, Out] uint[] pixels, [In, Out] byte[] bitmapBytes, [In, Out] byte[] bitmapDisplayBytes);
+
+		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+		//DLL_PUBLIC HRESULT GetRotatedFrameDimentions(int width, int height, double angleDegrees, int* newWidth, int* newHeight);
+		public static extern int GetRotatedFrameDimentions(int width, int height, double angleDegrees, [In, Out] ref int newWidth, [In, Out] ref int newHeight);
+
 		public static SafeMatrix SolveLinearSystem(SafeMatrix A, SafeMatrix X)
 		{
 			double[] a = A.GetElements();

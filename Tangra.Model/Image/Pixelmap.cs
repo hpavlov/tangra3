@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Tangra.Model.Config;
@@ -530,5 +531,39 @@ namespace Tangra.Model.Image
 			return pixels;
 		}
 
+		public Pixelmap Rotate(double angleDegrees)
+		{
+			int newWidth = Width;
+			int newHeight = Height;
+			TangraModelCore.GetRotatedFrameDimentions(Width, Height, angleDegrees, ref newWidth, ref newHeight);
+
+			uint[] pixels = new uint[newWidth * newHeight];
+			byte[] displayBitmapBytes = new byte[newWidth * newHeight];
+			byte[] rawBitmapBytes = new byte[(newWidth * newHeight * 3) + 40 + 14 + 1];
+
+			TangraModelCore.RotateFrame(Width, Height, null, angleDegrees, pixels, rawBitmapBytes, displayBitmapBytes);
+
+			using (var memStr = new MemoryStream(rawBitmapBytes))
+			{
+				Bitmap displayBitmap;
+
+				try
+				{
+					displayBitmap = (Bitmap)Bitmap.FromStream(memStr);
+				}
+				catch (Exception ex)
+				{
+					Trace.WriteLine(ex.GetFullStackTrace());
+					displayBitmap = new Bitmap(newWidth, newHeight);
+				}
+
+				var rv = new Pixelmap(newWidth, newHeight, m_BitPix, pixels, displayBitmap, displayBitmapBytes);
+				if (m_MaxSignalValue.HasValue)
+					rv.SetMaxSignalValue(m_MaxSignalValue.Value);
+				rv.FrameState = FrameState;
+
+				return rv;
+			}
+		}
 	}
 }

@@ -784,6 +784,7 @@
       <DependentUpon>frmIntegrationDetection.cs</DependentUpon>
     </Compile>
     <Compile Include="Video\FITS\IFITSStream.cs" />
+    <Compile Include="Video\RotatedVideoStream.cs" />
     <Compile Include="Video\SER\SERVideoStream.cs" />
     <Compile Include="Video\SER\frmEnterSERFileInfo.cs">
       <SubType>Form</SubType>

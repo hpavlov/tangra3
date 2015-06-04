@@ -80,6 +80,8 @@ EXPORTS
 	PrepareImageForOCR
 	PrepareImageForOCRSingleStep
 	LargeChunkDenoise	
+	GetRotatedFrameDimentions
+	RotateFrame
 	
 	; SER Files
 	SEROpenFile

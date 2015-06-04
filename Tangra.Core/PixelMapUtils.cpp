@@ -1039,6 +1039,76 @@ DLL_PUBLIC HRESULT PreProcessingLowPassDifferenceFilter(unsigned long* pixels, l
 	return S_OK;
 }
 
+
+HRESULT GetRotatedFrameDimentions(int width, int height, double angleDegrees, int* newWidth, int* newHeight)
+{
+/*
+
+Graphics::TBitmap *SrcBitmap=new Graphics::TBitmap; 
+Graphics::TBitmap *DestBitmap=new Graphics::TBitmap; 
+SrcBitmap->LoadFromFile("Crayon.bmp"); 
+//Convert degrees to radians 
+float radians=(2*3.1416*angle)/360; 
+
+float cosine=(float)cos(radians); 
+float sine=(float)sin(radians); 
+
+float Point1x=(-SrcBitmap->Height*sine); 
+float Point1y=(SrcBitmap->Height*cosine); 
+float Point2x=(SrcBitmap->Width*cosine-SrcBitmap->Height*sine); 
+float Point2y=(SrcBitmap->Height*cosine+SrcBitmap->Width*sine); 
+float Point3x=(SrcBitmap->Width*cosine); 
+float Point3y=(SrcBitmap->Width*sine); 
+
+float minx=min(0,min(Point1x,min(Point2x,Point3x))); 
+float miny=min(0,min(Point1y,min(Point2y,Point3y))); 
+float maxx=max(Point1x,max(Point2x,Point3x)); 
+float maxy=max(Point1y,max(Point2y,Point3y)); 
+
+int DestBitmapWidth=(int)ceil(fabs(maxx)-minx); 
+int DestBitmapHeight=(int)ceil(fabs(maxy)-miny); 
+
+DestBitmap->Height=DestBitmapHeight; 
+DestBitmap->Width=DestBitmapWidth;
+
+*/
+	return E_NOTIMPL;
+}
+
+HRESULT RotateFrame(int width, int height, double angleDegrees, unsigned long* originalPixels, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
+{
+	// http://docs.opencv.org/doc/tutorials/imgproc/imgtrans/warp_affine/warp_affine.html?highlight=warpaffine
+	// http://stackoverflow.com/questions/2278414/rotating-an-image-in-c-c
+	// http://www.leunen.com/cbuilder/rotbmp.html
+	// newx=x*cos(angle)+y*sin(angle) 
+	// newy=y*cos(angle)-x*sin(angle)
+
+/*
+
+for(int x=0;x<DestBitmapWidth;x++) 
+{ 
+  for(int y=0;y<DestBitmapHeight;y++) 
+  { 
+    int SrcBitmapx=(int)((x+minx)*cosine+(y+miny)*sine); 
+    int SrcBitmapy=(int)((y+miny)*cosine-(x+minx)*sine); 
+    if(SrcBitmapx>=0&&SrcBitmapx<SrcBitmap->Width&&SrcBitmapy>=0&& 
+         SrcBitmapy<SrcBitmap->Height) 
+    { 
+      DestBitmap->Canvas->Pixels[x][y]= 
+          SrcBitmap->Canvas->Pixels[SrcBitmapx][SrcBitmapy]; 
+    } 
+  } 
+} 
+//Show the rotated bitmap 
+Image1->Picture->Bitmap=DestBitmap; 
+delete DestBitmap; 
+delete SrcBitmap;
+
+*/
+	return E_NOTIMPL;
+}
+
+
 __uint64 GetUInt64Average(__uint64 a, __uint64 b)
 {
 	return (a >> 1) + (b >> 1) + (a & b & 0x1);
