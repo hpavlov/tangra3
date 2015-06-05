@@ -53,6 +53,7 @@
 			this.btnMeasure.TabIndex = 1;
 			this.btnMeasure.Text = "Multi-Frame Measurement";
 			this.btnMeasure.UseVisualStyleBackColor = true;
+			this.btnMeasure.Click += new System.EventHandler(this.btnMeasure_Click);
 			// 
 			// lblSelectStarNote
 			// 

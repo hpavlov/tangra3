@@ -7,12 +7,19 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Controller;
+using Tangra.Model.Video;
+using Tangra.Model.VideoOperations;
+using Tangra.VideoOperations.Spectroscopy.Helpers;
 
 namespace Tangra.VideoOperations.Spectroscopy
 {
     public partial class ucSpectroscopy : UserControl
     {
         private VideoSpectroscopyOperation m_VideoOperation;
+	    private VideoController m_VideoContoller;
+	    private IFramePlayer m_FramePlayer;
+
 	    private static Pen[] m_GreyPens = new Pen[256];
 
 	    static ucSpectroscopy()
@@ -30,10 +37,12 @@ namespace Tangra.VideoOperations.Spectroscopy
 	        picSpectra.Image = new Bitmap(picSpectra.Width, picSpectra.Height, PixelFormat.Format24bppRgb);
         }
 
-        public ucSpectroscopy(VideoSpectroscopyOperation videoOperation)
+        public ucSpectroscopy(VideoSpectroscopyOperation videoOperation, VideoController videoContoller, IFramePlayer framePlayer)
             : this()
         {
             m_VideoOperation = videoOperation;
+	        m_FramePlayer = framePlayer;
+	        m_VideoContoller = videoContoller;
         }
 
 		public void DisplaySpectra(Spectra spectra)
@@ -58,5 +67,14 @@ namespace Tangra.VideoOperations.Spectroscopy
 			}
 			picSpectra.Invalidate();
 	    }
+
+		private void btnMeasure_Click(object sender, EventArgs e)
+		{
+			var frm = new frmRunMultiFrameSpectroscopy(m_FramePlayer);
+			if (m_VideoContoller.ShowDialog(frm) == DialogResult.OK)
+			{
+				m_VideoOperation.StartMeasurements(frm.NumberOfMeasurements, frm.CombineMethod);
+			}
+		}
     }
 }

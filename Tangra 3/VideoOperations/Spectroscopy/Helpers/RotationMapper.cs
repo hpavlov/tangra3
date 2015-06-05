@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 
-namespace Tangra.Helpers
+namespace Tangra.VideoOperations.Spectroscopy.Helpers
 {
     public class RotationMapper
     {

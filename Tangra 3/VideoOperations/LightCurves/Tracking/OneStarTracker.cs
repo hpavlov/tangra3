@@ -96,7 +96,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			{
 				int firstFrameId = m_PreviousPositionFrameIds[0];
 				expectedX = (float)m_LinearFitX.ComputeY(m_FrameNo - firstFrameId);
-				expectedY = (float)m_LinearFitY.ComputeY(m_FrameNo - firstFrameId);				
+				expectedY = (float)m_LinearFitY.ComputeY(m_FrameNo - firstFrameId);
 			}
 			else
 			{

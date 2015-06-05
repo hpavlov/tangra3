@@ -319,7 +319,7 @@
       <DependentUpon>frmLongRunningOperation.cs</DependentUpon>
     </Compile>
     <Compile Include="Helpers\LongOperationsManager.cs" />
-    <Compile Include="Helpers\RotationMapper.cs" />
+    <Compile Include="VideoOperations\Spectroscopy\Helpers\RotationMapper.cs" />
     <Compile Include="Helpers\ShellHelper.cs" />
     <Compile Include="Helpers\TangraFileAssociations.cs" />
     <Compile Include="Helpers\UsageStats.cs" />
@@ -517,7 +517,14 @@
     <Compile Include="VideoOperations\LightCurves\ucCorrSelection.Designer.cs">
       <DependentUpon>ucCorrSelection.cs</DependentUpon>
     </Compile>
-    <Compile Include="VideoOperations\Spectroscopy\SpectraReader.cs" />
+    <Compile Include="VideoOperations\Spectroscopy\frmRunMultiFrameSpectroscopy.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\frmRunMultiFrameSpectroscopy.Designer.cs">
+      <DependentUpon>frmRunMultiFrameSpectroscopy.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\Helpers\SpectraReader.cs" />
+    <Compile Include="VideoOperations\Spectroscopy\Tracking\SpectroscopyStarTracker.cs" />
     <Compile Include="VideoOperations\Spectroscopy\ucSpectroscopy.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -989,6 +996,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\LightCurves\ucCorrSelection.resx">
       <DependentUpon>ucCorrSelection.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Spectroscopy\frmRunMultiFrameSpectroscopy.resx">
+      <DependentUpon>frmRunMultiFrameSpectroscopy.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\Spectroscopy\ucSpectroscopy.resx">
       <DependentUpon>ucSpectroscopy.cs</DependentUpon>

@@ -389,6 +389,11 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             if (!double.IsNaN(fwhm)) RefiningFWHMs.Add(fwhm);
         }
 
+		internal void SetRefinedSignalLevel(PSFFit gaussian)
+		{
+			RefinedSignalLevel = (float)(gaussian.IMax - gaussian.I0);
+		}
+
         private float RefinedSignalLevel = float.NaN;
         public override float RefinedOrLastSignalLevel
         {

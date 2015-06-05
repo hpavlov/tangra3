@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using Tangra.Helpers;
 using Tangra.Model.Astro;
+using Tangra.VideoOperations.Spectroscopy.Helpers;
 
 namespace Tangra.Controller
 {

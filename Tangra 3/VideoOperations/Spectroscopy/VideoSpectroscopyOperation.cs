@@ -11,6 +11,9 @@ using Tangra.Model.Image;
 using Tangra.Model.ImageTools;
 using Tangra.Model.Video;
 using Tangra.Model.VideoOperations;
+using Tangra.VideoOperations.LightCurves.Tracking;
+using Tangra.VideoOperations.Spectroscopy.Helpers;
+using Tangra.VideoOperations.Spectroscopy.Tracking;
 
 namespace Tangra.VideoOperations.Spectroscopy
 {
@@ -24,6 +27,7 @@ namespace Tangra.VideoOperations.Spectroscopy
     public class VideoSpectroscopyOperation : VideoOperationBase, IVideoOperation
     {
         private IVideoController m_VideoController;
+	    private IFramePlayer m_FramePlayer;
         private SpectroscopyController m_SpectroscopyController;
         private ucSpectroscopy m_ControlPanel = null;
         private object m_SyncRoot = new object();
@@ -32,9 +36,15 @@ namespace Tangra.VideoOperations.Spectroscopy
         private int m_OriginalHeight;
         private RectangleF m_OriginalVideoFrame;
 
+	    private int m_MeasuredFrames;
+	    private int m_FramesToMeasure;
+	    private SpectraReader m_Reader;
+		private SpectroscopyStarTracker m_Tracker;
+
         private SpectroscopyState m_OperationState = SpectroscopyState.ChoosingStar;
-        private ImagePixel m_SelectedStar = null;
+        private IImagePixel m_SelectedStar = null;
         private double m_SelectedStarFWHM;
+		private PSFFit m_SelectedStarGaussian;
         private float m_SelectedStarBestAngle;
 
         public VideoSpectroscopyOperation()
@@ -48,6 +58,7 @@ namespace Tangra.VideoOperations.Spectroscopy
         public bool InitializeOperation(IVideoController videoContoller, Panel controlPanel, IFramePlayer framePlayer, Form topForm)
         {
             m_VideoController = videoContoller;
+	        m_FramePlayer = framePlayer;
 
             if (m_ControlPanel == null)
             {
@@ -55,7 +66,7 @@ namespace Tangra.VideoOperations.Spectroscopy
                 {
                     if (m_ControlPanel == null)
                     {
-                        m_ControlPanel = new ucSpectroscopy(this);
+						m_ControlPanel = new ucSpectroscopy(this, (VideoController)videoContoller, framePlayer);
                     }
                 }
             }
@@ -84,9 +95,46 @@ namespace Tangra.VideoOperations.Spectroscopy
             
         }
 
+	    internal void StartMeasurements(int numMeasurements, SpectraCombineMethod combineMethod)
+	    {
+		    m_MeasuredFrames = 0;
+			m_FramesToMeasure = numMeasurements;
+
+		    var starToTrack = new TrackedObjectConfig()
+		    {
+				ApertureInPixels = (float)(m_SelectedStarFWHM * 2),
+				MeasureThisObject = false,
+				ApertureDX = 0,
+				ApertureDY = 0,
+			
+				Gaussian = m_SelectedStarGaussian,
+				ApertureStartingX = (float)m_SelectedStarGaussian.XCenter,
+				ApertureStartingY = (float)m_SelectedStarGaussian.YCenter,
+				TrackingType = TrackingType.OccultedStar,
+				IsWeakSignalObject = false
+		    };
+
+			m_Tracker = new SpectroscopyStarTracker(starToTrack);
+
+			m_OperationState = SpectroscopyState.RunningMeasurements;
+			m_FramePlayer.Start(FramePlaySpeed.Fastest, null, 1);
+	    }
+
         public void NextFrame(int frameNo, MovementType movementType, bool isLastFrame, AstroImage astroImage, int firstFrameInIntegrationPeriod, string fileName)
         {
-            
+	        if (m_OperationState == SpectroscopyState.RunningMeasurements)
+	        {
+		        m_Tracker.NextFrame(frameNo, astroImage);
+		        if (m_Tracker.IsTrackedSuccessfully)
+		        {
+			        TrackedObject trackedStar = m_Tracker.TrackedStar;
+			        m_SelectedStar = trackedStar.Center;
+					m_Reader = new SpectraReader(astroImage, m_SelectedStarBestAngle);
+
+					// TODO: Track the star
+					//m_Reader.ReadSpectra()
+		        }
+	        }
         }
 
         public void ImageToolChanged(ImageTool newTool, ImageTool oldTool)
@@ -129,6 +177,7 @@ namespace Tangra.VideoOperations.Spectroscopy
 
                 m_SelectedStar = new ImagePixel(e.Gausian.XCenter, e.Gausian.YCenter);
                 m_SelectedStarFWHM = e.Gausian.FWHM;
+				m_SelectedStarGaussian = e.Gausian;
                 m_SelectedStarBestAngle = bestAngle;
 
 				var reader = new SpectraReader(m_VideoController.GetCurrentAstroImage(false), bestAngle);
