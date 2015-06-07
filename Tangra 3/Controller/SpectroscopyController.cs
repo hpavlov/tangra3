@@ -25,8 +25,11 @@ namespace Tangra.Controller
         {
             float x0 = (float)selectedStar.XCenter;
             float y0 = (float)selectedStar.YCenter;
-            
+            uint brigthness20 = (uint)(selectedStar.Brightness / 5);
+            uint bgFromPsf = (uint)(selectedStar.I0); 
+
             int minDistance = (int)(10 * selectedStar.FWHM);
+            int clearDist =  (int)(2 * selectedStar.FWHM);
 
             AstroImage image = m_VideoController.GetCurrentAstroImage(false);
 
@@ -35,6 +38,7 @@ namespace Tangra.Controller
 
             uint[] angles = new uint[360];
             uint[] sums = new uint[360];
+            uint[] pixAbove50Perc = new uint[360];
 
             int diagonnalPixels = (int)Math.Ceiling(Math.Sqrt(image.Width * image.Width + image.Height * image.Height));
             for (int i = 0; i < 360; i++)
@@ -45,6 +49,9 @@ namespace Tangra.Controller
                 float y1 = p1.Y;
 
                 uint rowSum = 0;
+                uint pixAbove50 = 0;
+                uint pixAbove50Max = 0;
+                bool prevPixAbove50 = false;
 
                 for (int d = minDistance; d < diagonnalPixels; d++)
                 {
@@ -52,17 +59,47 @@ namespace Tangra.Controller
 
                     if (p.X >= 0 && p.X < width && p.Y >= 0 && p.Y < height)
                     {
-                        rowSum += image.Pixelmap[(int)p.X, (int)p.Y];
+                        uint value = image.Pixelmap[(int) p.X, (int) p.Y];
+                        rowSum += value;
+                        PointF pu = mapper.GetSourceCoords(x1 + d, y1 + clearDist);
+                        PointF pd = mapper.GetSourceCoords(x1 + d, y1 - clearDist);
+                        if (pu.X >= 0 && pu.X < width && pu.Y >= 0 && pu.Y < height &&
+                            pd.X >= 0 && pd.X < width && pd.Y >= 0 && pd.Y < height)
+                        {
+                            uint value_u = image.Pixelmap[(int)pu.X, (int)pu.Y];
+                            uint value_d = image.Pixelmap[(int)pd.X, (int)pd.Y];
+                            if ((value - bgFromPsf) > brigthness20 && value > value_u && value > value_d)
+                            {
+                                if (prevPixAbove50) pixAbove50++;
+                                prevPixAbove50 = true;
+                            }
+                            else
+                            {
+                                prevPixAbove50 = false;
+                                if (pixAbove50Max < pixAbove50) pixAbove50Max = pixAbove50;
+                                pixAbove50 = 0;
+                            }                            
+                        }
+                        else
+                        {
+                            prevPixAbove50 = false;
+                            if (pixAbove50Max < pixAbove50) pixAbove50Max = pixAbove50;
+                            pixAbove50 = 0;
+                        }
                     }
                 }
 
                 angles[i] = (uint)i;
                 sums[i] = rowSum;
+                pixAbove50Perc[i] = pixAbove50Max;
             }
 
-            Array.Sort(sums, angles);
+            Array.Sort(pixAbove50Perc, angles);
 
             uint roughAngle = angles[359];
+
+            if (pixAbove50Perc[358] * 2 > pixAbove50Perc[359]) 
+                return float.NaN;
 
             uint bestSum = 0;
             float bestAngle = 0f;

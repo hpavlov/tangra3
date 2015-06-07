@@ -13,8 +13,10 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 	{
 		public int PixelNo;
 		public float Wavelength;
-		public float RawValue;
-		public float RawBackground;
+        public float RawSignal;
+        public float RawSignalPixelCount;        
+		public float RawBackgroundPerPixel;
+        public float RawValue;
 		public float SmoothedValue;
 	}
 
@@ -22,6 +24,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 	{
 		public int PixelWidth;
 		public uint MaxPixelValue;
+	    public int ZeroOrderPixelNo;
 		public List<SpectraPoint> Points = new List<SpectraPoint>();
 	}
 
@@ -37,7 +40,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 		private RotationMapper m_Mapper;
 		private RectangleF m_SourceVideoFrame;
 
-		private uint[] m_BgValues;
+	    private uint[] m_BgValues;
 		private uint[] m_BgPixelCount;
 
 		public SpectraReader(AstroImage image, float angleDegrees)
@@ -52,7 +55,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 			var rv = new Spectra()
 			{
 				PixelWidth = 2 * halfWidth,
-				MaxPixelValue = (uint)(2 * halfWidth) * m_Image.Pixelmap.MaxPixelValue
+                MaxPixelValue = (uint)(2 * halfWidth) * m_Image.Pixelmap.MaxSignalValue
 			};
 
 			int xFrom = int.MaxValue;
@@ -60,6 +63,8 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 
 			// Find the destination pixel range at the destination horizontal
 			PointF p1 = m_Mapper.GetDestCoords(x0, y0);
+		    rv.ZeroOrderPixelNo = (int)Math.Round(p1.X);
+            
 			for (float x = p1.X - m_Mapper.MaxDestDiagonal; x < p1.X + m_Mapper.MaxDestDiagonal; x++)
 			{
 				PointF p = m_Mapper.GetSourceCoords(x, p1.Y);
@@ -80,6 +85,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 			{
 				var point = new SpectraPoint();
 				point.PixelNo = x;
+			    point.RawSignalPixelCount = 0;
 
 				for (int z = -halfWidth; z <= halfWidth; z++)
 				{
@@ -87,10 +93,14 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 					int xx = (int)Math.Round(p.X);
 					int yy = (int)Math.Round(p.Y);
 
-					if (m_SourceVideoFrame.Contains(xx, yy))
-						point.RawValue += m_Image.Pixelmap[xx, yy];
+				    if (m_SourceVideoFrame.Contains(xx, yy))
+				    {
+				        point.RawValue += m_Image.Pixelmap[xx, yy];
+				        point.RawSignalPixelCount++;
+				    }
 				}
 
+			    point.RawSignal = point.RawValue;
 				rv.Points.Add(point);
 
 				#region Reads background 
@@ -106,8 +116,9 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 			{
 				if (bgMethod == SpectraCombineMethod.Average)
 				{
-					point.RawBackground = GetAverageBackgroundValue(point.PixelNo, xFrom, xTo, halfWidth);
-					point.RawValue -= point.RawBackground;
+					point.RawBackgroundPerPixel = GetAverageBackgroundValue(point.PixelNo, xFrom, xTo, halfWidth);
+					point.RawValue -= point.RawBackgroundPerPixel * point.RawSignalPixelCount;
+				    if (point.RawValue < 0) point.RawValue = 0;
 				}
 			}
 
