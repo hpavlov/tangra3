@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using Tangra.Helpers;
 using Tangra.Model.Astro;
+using Tangra.VideoOperations.Spectroscopy;
 using Tangra.VideoOperations.Spectroscopy.Helpers;
 
 namespace Tangra.Controller
@@ -132,6 +133,44 @@ namespace Tangra.Controller
             }
 
             return bestAngle;
+        }
+
+        internal void DisplayResult(List<Spectra> allFramesSpectra)
+        {
+            if (allFramesSpectra.Count > 0)
+            {
+                var masterSpectra = new MasterSpectra();
+                masterSpectra.ZeroOrderPixelNo = allFramesSpectra[0].ZeroOrderPixelNo;
+                masterSpectra.PixelWidth = allFramesSpectra[0].PixelWidth;
+                masterSpectra.MaxPixelValue = allFramesSpectra[0].MaxPixelValue;
+                masterSpectra.Points.AddRange(allFramesSpectra[0].Points);
+                masterSpectra.CombinedMeasurements = 1;
+
+                for (int i = 1; i < allFramesSpectra.Count; i++)
+                {
+                    Spectra nextSpectra = allFramesSpectra[i];
+                    for (int j = 0; j < masterSpectra.Points.Count; j++)
+                    {
+                        int indexNextSpectra = nextSpectra.ZeroOrderPixelNo - masterSpectra.ZeroOrderPixelNo + j;
+                        if (indexNextSpectra >= 0 && indexNextSpectra < nextSpectra.Points.Count)
+                        {
+                            masterSpectra.Points[j].RawValue += nextSpectra.Points[indexNextSpectra].RawValue;
+                            masterSpectra.Points[j].RawSignal += nextSpectra.Points[indexNextSpectra].RawSignal;
+                            masterSpectra.Points[j].RawSignalPixelCount += nextSpectra.Points[indexNextSpectra].RawSignalPixelCount;
+                        }
+                    }
+                }
+
+                // Normalize per row width
+                for (int i = 0; i < masterSpectra.Points.Count; i++)
+                {
+                    masterSpectra.Points[i].RawValue = masterSpectra.Points[i].RawValue * masterSpectra.PixelWidth / masterSpectra.Points[i].RawSignalPixelCount;
+                }
+
+                var frm = new frmViewSpectra(masterSpectra);
+                m_VideoController.ShowForm(frm);
+                
+            }
         }
     }
 }

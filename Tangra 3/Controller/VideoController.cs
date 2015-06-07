@@ -1861,6 +1861,11 @@ namespace Tangra.Controller
 			return frm.ShowDialog(m_MainFormView);
 		}
 
+        public void ShowForm(Form frm)
+        {
+            frm.Show(m_MainFormView);
+        }
+
 		public DialogResult ShowSaveFileDialog(string title, string filter, ref string fileName)
 		{
 			var sfd = new SaveFileDialog()

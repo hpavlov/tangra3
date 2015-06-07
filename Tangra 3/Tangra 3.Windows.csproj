@@ -319,6 +319,12 @@
       <DependentUpon>frmLongRunningOperation.cs</DependentUpon>
     </Compile>
     <Compile Include="Helpers\LongOperationsManager.cs" />
+    <Compile Include="VideoOperations\Spectroscopy\frmViewSpectra.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\frmViewSpectra.Designer.cs">
+      <DependentUpon>frmViewSpectra.cs</DependentUpon>
+    </Compile>
     <Compile Include="VideoOperations\Spectroscopy\Helpers\RotationMapper.cs" />
     <Compile Include="Helpers\ShellHelper.cs" />
     <Compile Include="Helpers\TangraFileAssociations.cs" />
@@ -999,6 +1005,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\Spectroscopy\frmRunMultiFrameSpectroscopy.resx">
       <DependentUpon>frmRunMultiFrameSpectroscopy.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Spectroscopy\frmViewSpectra.resx">
+      <DependentUpon>frmViewSpectra.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\Spectroscopy\ucSpectroscopy.resx">
       <DependentUpon>ucSpectroscopy.cs</DependentUpon>

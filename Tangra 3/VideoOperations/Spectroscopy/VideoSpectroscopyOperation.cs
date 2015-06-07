@@ -44,6 +44,10 @@ namespace Tangra.VideoOperations.Spectroscopy
         private SpectroscopyState m_OperationState = SpectroscopyState.ChoosingStar;
         private IImagePixel m_SelectedStar = null;
         private double m_SelectedStarFWHM;
+        private int m_SpectraReaderHalfWidth;
+        private SpectraCombineMethod m_CombineMethod;
+        private List<Spectra> m_AllFramesSpectra = new List<Spectra>();
+
 		private PSFFit m_SelectedStarGaussian;
         private float m_SelectedStarBestAngle;
 
@@ -116,7 +120,11 @@ namespace Tangra.VideoOperations.Spectroscopy
 
 			m_Tracker = new SpectroscopyStarTracker(starToTrack);
 
+	        m_SpectraReaderHalfWidth = (int)Math.Ceiling(m_SelectedStarFWHM);
 			m_OperationState = SpectroscopyState.RunningMeasurements;
+	        m_CombineMethod = combineMethod;
+	        m_AllFramesSpectra.Clear();
+
 			m_FramePlayer.Start(FramePlaySpeed.Fastest, null, 1);
 	    }
 
@@ -131,9 +139,16 @@ namespace Tangra.VideoOperations.Spectroscopy
 			        m_SelectedStar = trackedStar.Center;
 					m_Reader = new SpectraReader(astroImage, m_SelectedStarBestAngle);
 
-					// TODO: Track the star
-					//m_Reader.ReadSpectra()
+                    Spectra thisFrameSpectra = m_Reader.ReadSpectra(trackedStar.ThisFrameX, trackedStar.ThisFrameY, m_SpectraReaderHalfWidth, m_CombineMethod);
+		            m_AllFramesSpectra.Add(thisFrameSpectra);
 		        }
+
+                if (isLastFrame || m_AllFramesSpectra.Count >= m_FramesToMeasure)
+                {
+                    m_FramePlayer.Stop();
+                    m_SpectroscopyController.DisplayResult(m_AllFramesSpectra);
+                    m_AllFramesSpectra.Clear();
+                }
 	        }
         }
 

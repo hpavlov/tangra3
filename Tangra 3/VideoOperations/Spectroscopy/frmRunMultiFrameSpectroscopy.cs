@@ -27,12 +27,13 @@ namespace Tangra.VideoOperations.Spectroscopy
 		{
 			nudNumberMeasurements.Maximum = framePlayer.Video.LastFrame - framePlayer.CurrentFrameIndex;
 			nudNumberMeasurements.Value = Math.Min(200, nudNumberMeasurements.Maximum);
+		    cbxCombineMethod.SelectedIndex = 0;
 		}
 
 		private void btnNext_Click(object sender, EventArgs e)
 		{
 			NumberOfMeasurements = (int)nudNumberMeasurements.Value;
-			CombineMethod = SpectraCombineMethod.Average;
+            CombineMethod = (SpectraCombineMethod)cbxCombineMethod.SelectedIndex;
 
 			DialogResult = DialogResult.OK;
 			Close();

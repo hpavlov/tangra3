@@ -20,6 +20,11 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 		public float SmoothedValue;
 	}
 
+    public class MasterSpectra : Spectra
+    {
+        public int CombinedMeasurements;
+    }
+
 	public class Spectra
 	{
 		public int PixelWidth;
