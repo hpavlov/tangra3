@@ -78,9 +78,16 @@ namespace Tangra.Video.AstroDigitalVideo
                             : "Timestamp Not Available"));
 
 			if (m_AavSettings.Popup_Exposure)
-                 statusText.AppendLine(m_FrameState.HasValidTimeStamp 
-                            ? string.Format("Exposure Duration: {0} ms", m_FrameState.ExposureInMilliseconds.ToString("0"))
-                            : "Exposure Duration: Unknown");
+			{
+                if (m_FrameState.HasValidTimeStamp)
+                    statusText.AppendLine(string.Format("Exposure Duration: {0} ms", m_FrameState.ExposureInMilliseconds.ToString("0")));
+                else if (m_FrameState.NumberStackedFrames.HasValue && m_FrameState.NumberStackedFrames.Value > 0)
+                    statusText.AppendLine(string.Format("Exposure Duration: {0} stacked frames", m_FrameState.NumberStackedFrames.Value.ToString("0")));
+                else if (m_FrameState.NumberIntegratedFrames.HasValue && m_FrameState.NumberIntegratedFrames.Value > 0)
+                    statusText.AppendLine(string.Format("Exposure Duration: {0} integrated frames", m_FrameState.NumberIntegratedFrames.Value.ToString("0")));
+                else
+                    statusText.AppendLine("Exposure Duration: Unknown");
+			}
 
 			if (m_AavSettings.Popup_Timestamp || m_AavSettings.Popup_Exposure)
                 statusText.AppendLine();

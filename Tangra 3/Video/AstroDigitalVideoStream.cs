@@ -401,6 +401,7 @@ namespace Tangra.Video
 				rv.ExposureInMilliseconds = m_CurrentFrameInfo.Exposure10thMs / 10.0f;
 
 				rv.NumberIntegratedFrames = (int)m_CurrentFrameInfo.IntegratedFrames;
+			    rv.NumberStackedFrames = m_StackingRate;
 
 				int almanacStatus = m_CurrentFrameInfo.GPSAlmanacStatus;
 				int almanacOffset = m_CurrentFrameInfo.GetSignedAlamancOffset();

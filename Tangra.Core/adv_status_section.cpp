@@ -88,7 +88,7 @@ void AdvStatusSection::GetDataFromDataBytes(unsigned char* data, int sectionData
 			long value = (long)(((long)b2 << 8) + (long)b1);
 			
 			frameInfo->NtpTimeStampError = value;
-			 statusData+=2;
+			statusData+=3;
 		}
 		else if (strcmp("GPSTrackedSatellites", tagName) == 0)
 		{

@@ -22,6 +22,7 @@ namespace Tangra.Model.Image
 		public string AlmanacOffset;
 		public string GPSFixStatus;
 		public int? NumberIntegratedFrames;
+        public int? NumberStackedFrames;
 
 		public Dictionary<string, object> AdditionalProperties;
 
