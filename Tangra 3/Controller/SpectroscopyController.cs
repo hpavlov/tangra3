@@ -99,7 +99,8 @@ namespace Tangra.Controller
 
             uint roughAngle = angles[359];
 
-            if (pixAbove50Perc[358] * 2 > pixAbove50Perc[359]) 
+            if (pixAbove50Perc[358] * 2 > pixAbove50Perc[359] && // Second best should have a lot smaller score than the top one
+                Math.Abs((int)angles[358] - (int)angles[359]) != 1) // or for large stars the two best can be sequential angles
                 return float.NaN;
 
             uint bestSum = 0;

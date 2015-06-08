@@ -33,7 +33,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 		public List<SpectraPoint> Points = new List<SpectraPoint>();
 	}
 
-	public enum SpectraCombineMethod
+	public enum PixelCombineMethod
 	{
 		Average,
 		Median
@@ -55,7 +55,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 			m_SourceVideoFrame = new RectangleF(0, 0, image.Width, image.Height);
 		}
 
-		public Spectra ReadSpectra(float x0, float y0, int halfWidth, SpectraCombineMethod bgMethod = SpectraCombineMethod.Average)
+        public Spectra ReadSpectra(float x0, float y0, int halfWidth, PixelCombineMethod bgMethod = PixelCombineMethod.Average)
 		{
 			var rv = new Spectra()
 			{
@@ -109,7 +109,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 				rv.Points.Add(point);
 
 				#region Reads background 
-				if (bgMethod == SpectraCombineMethod.Average)
+                if (bgMethod == PixelCombineMethod.Average)
 				{
 					ReadAverageBackgroundForPixelIndex(halfWidth, x, p1.Y, x - xFrom);
 				}
@@ -119,7 +119,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 			// Apply background
 			foreach(SpectraPoint point in rv.Points)
 			{
-				if (bgMethod == SpectraCombineMethod.Average)
+                if (bgMethod == PixelCombineMethod.Average)
 				{
 					point.RawBackgroundPerPixel = GetAverageBackgroundValue(point.PixelNo, xFrom, xTo, halfWidth);
 					point.RawValue -= point.RawBackgroundPerPixel * point.RawSignalPixelCount;

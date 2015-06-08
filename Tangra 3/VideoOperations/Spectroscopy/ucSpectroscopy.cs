@@ -104,10 +104,10 @@ namespace Tangra.VideoOperations.Spectroscopy
 
 		private void btnMeasure_Click(object sender, EventArgs e)
 		{
-			var frm = new frmRunMultiFrameSpectroscopy(m_FramePlayer);
+			var frm = new frmRunMultiFrameSpectroscopy(m_FramePlayer, m_VideoOperation);
 			if (m_VideoContoller.ShowDialog(frm) == DialogResult.OK)
 			{
-				m_VideoOperation.StartMeasurements(frm.NumberOfMeasurements, frm.CombineMethod);
+                m_VideoOperation.StartMeasurements(frm.NumberOfMeasurements, frm.MeasurementAreaWing, frm.BackgroundMethod);
 			}
 		}
     }
