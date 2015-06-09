@@ -55,7 +55,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 			m_SourceVideoFrame = new RectangleF(0, 0, image.Width, image.Height);
 		}
 
-        public Spectra ReadSpectra(float x0, float y0, int halfWidth, PixelCombineMethod bgMethod = PixelCombineMethod.Average)
+        public Spectra ReadSpectra(float x0, float y0, int halfWidth, PixelCombineMethod bgMethod)
 		{
 			var rv = new Spectra()
 			{

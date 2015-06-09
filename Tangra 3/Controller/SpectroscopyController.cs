@@ -136,7 +136,7 @@ namespace Tangra.Controller
             return bestAngle;
         }
 
-        internal void DisplayResult(List<Spectra> allFramesSpectra)
+		internal void DisplayResult(List<Spectra> allFramesSpectra, PixelCombineMethod frameCombineMethod)
         {
             if (allFramesSpectra.Count > 0)
             {
