@@ -30,6 +30,8 @@
 		{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmRunMultiFrameSpectroscopy));
 			this.gbConfig = new System.Windows.Forms.GroupBox();
+			this.picAreas = new System.Windows.Forms.PictureBox();
+			this.cbxCombineMethod = new System.Windows.Forms.ComboBox();
 			this.label6 = new System.Windows.Forms.Label();
 			this.nudBackgroundWing = new System.Windows.Forms.NumericUpDown();
 			this.label7 = new System.Windows.Forms.Label();
@@ -44,13 +46,11 @@
 			this.nudNumberMeasurements = new System.Windows.Forms.NumericUpDown();
 			this.btnPrevious = new System.Windows.Forms.Button();
 			this.btnNext = new System.Windows.Forms.Button();
-			this.cbxCombineMethod = new System.Windows.Forms.ComboBox();
-			this.picAreas = new System.Windows.Forms.PictureBox();
 			this.gbConfig.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.picAreas)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudBackgroundWing)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudAreaWing)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudNumberMeasurements)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.picAreas)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// gbConfig
@@ -75,6 +75,27 @@
 			this.gbConfig.TabIndex = 19;
 			this.gbConfig.TabStop = false;
 			this.gbConfig.Text = "Spectroscopy";
+			// 
+			// picAreas
+			// 
+			this.picAreas.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.picAreas.Location = new System.Drawing.Point(11, 196);
+			this.picAreas.Name = "picAreas";
+			this.picAreas.Size = new System.Drawing.Size(419, 74);
+			this.picAreas.TabIndex = 36;
+			this.picAreas.TabStop = false;
+			// 
+			// cbxCombineMethod
+			// 
+			this.cbxCombineMethod.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.cbxCombineMethod.FormattingEnabled = true;
+			this.cbxCombineMethod.Items.AddRange(new object[] {
+            "Averages",
+            "Medians"});
+			this.cbxCombineMethod.Location = new System.Drawing.Point(242, 30);
+			this.cbxCombineMethod.Name = "cbxCombineMethod";
+			this.cbxCombineMethod.Size = new System.Drawing.Size(84, 21);
+			this.cbxCombineMethod.TabIndex = 35;
 			// 
 			// label6
 			// 
@@ -247,27 +268,6 @@
 			this.btnNext.UseVisualStyleBackColor = true;
 			this.btnNext.Click += new System.EventHandler(this.btnNext_Click);
 			// 
-			// cbxCombineMethod
-			// 
-			this.cbxCombineMethod.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.cbxCombineMethod.FormattingEnabled = true;
-			this.cbxCombineMethod.Items.AddRange(new object[] {
-            "Average",
-            "Median"});
-			this.cbxCombineMethod.Location = new System.Drawing.Point(246, 30);
-			this.cbxCombineMethod.Name = "cbxCombineMethod";
-			this.cbxCombineMethod.Size = new System.Drawing.Size(84, 21);
-			this.cbxCombineMethod.TabIndex = 35;
-			// 
-			// picAreas
-			// 
-			this.picAreas.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.picAreas.Location = new System.Drawing.Point(11, 196);
-			this.picAreas.Name = "picAreas";
-			this.picAreas.Size = new System.Drawing.Size(419, 74);
-			this.picAreas.TabIndex = 36;
-			this.picAreas.TabStop = false;
-			// 
 			// frmRunMultiFrameSpectroscopy
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -285,10 +285,10 @@
 			this.Load += new System.EventHandler(this.frmRunMultiFrameSpectroscopy_Load);
 			this.gbConfig.ResumeLayout(false);
 			this.gbConfig.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.picAreas)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudBackgroundWing)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudAreaWing)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudNumberMeasurements)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.picAreas)).EndInit();
 			this.ResumeLayout(false);
 
 		}

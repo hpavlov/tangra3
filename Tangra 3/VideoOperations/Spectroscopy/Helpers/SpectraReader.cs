@@ -119,6 +119,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 
 	    private uint[] m_BgValues;
 		private uint[] m_BgPixelCount;
+		private List<uint>[] m_BgValuesList;
 
 		public SpectraReader(AstroImage image, float angleDegrees)
 		{
@@ -157,6 +158,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 
 			m_BgValues = new uint[xTo - xFrom + 1];
 			m_BgPixelCount = new uint[xTo - xFrom + 1];
+			m_BgValuesList = new List<uint>[xTo - xFrom + 1];
 
 			// Get all readings in the range
 			for (int x = xFrom; x <= xTo; x++)
@@ -186,6 +188,11 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 				{
 					ReadAverageBackgroundForPixelIndex(halfWidth, bgHalfWidth, x, p1.Y, x - xFrom);
 				}
+				else if (bgMethod == PixelCombineMethod.Median)
+				{
+					ReadMedianBackgroundForPixelIndex(halfWidth, bgHalfWidth, x, p1.Y, x - xFrom);
+				}
+
 				#endregion
 			}
 
@@ -195,12 +202,35 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
                 if (bgMethod == PixelCombineMethod.Average)
 				{
 					point.RawBackgroundPerPixel = GetAverageBackgroundValue(point.PixelNo, xFrom, xTo, bgHalfWidth);
-					point.RawValue -= point.RawBackgroundPerPixel * point.RawSignalPixelCount;
-				    if (point.RawValue < 0) point.RawValue = 0;
 				}
+				else if (bgMethod == PixelCombineMethod.Median)
+				{
+					point.RawBackgroundPerPixel = GetMedianBackgroundValue(point.PixelNo, xFrom, xTo, bgHalfWidth);
+				}
+
+				point.RawValue -= point.RawBackgroundPerPixel * point.RawSignalPixelCount;
+				if (point.RawValue < 0) point.RawValue = 0;
 			}
 
 			return rv;
+		}
+
+		private float GetMedianBackgroundValue(int pixelNo, int xFrom, int xTo, int horizontalSpan)
+		{
+			var allAreaBgPixels = new List<uint>();
+			int idxFrom = Math.Max(xFrom, pixelNo - horizontalSpan);
+			int idxTo = Math.Min(xTo, pixelNo + horizontalSpan);
+
+			for (int i = idxFrom; i <= idxTo; i++)
+			{
+				allAreaBgPixels.AddRange(m_BgValuesList[i - xFrom]);
+			}
+
+			allAreaBgPixels.Sort();
+
+			return allAreaBgPixels.Count == 0 
+				? 0 
+				: allAreaBgPixels[allAreaBgPixels.Count / 2];
 		}
 
 		private float GetAverageBackgroundValue(int pixelNo, int xFrom, int xTo, int horizontalSpan)
@@ -214,7 +244,41 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 				bgSum += m_BgValues[i - xFrom];
 				pixCount += m_BgPixelCount[i - xFrom];
 			}
-			return bgSum / pixCount;
+			return pixCount == 0 
+				? 0 
+				: bgSum / pixCount;
+		}
+
+		private void ReadMedianBackgroundForPixelIndex(int halfWidth, int bgHalfWidth, float x1, float y1, int index)
+		{
+			var allBgPixels = new List<uint>();
+
+			for (int z = -bgHalfWidth - halfWidth; z < -halfWidth; z++)
+			{
+				PointF p = m_Mapper.GetSourceCoords(x1, y1 + z);
+				int xx = (int)Math.Round(p.X);
+				int yy = (int)Math.Round(p.Y);
+
+				if (m_SourceVideoFrame.Contains(xx, yy))
+				{
+					allBgPixels.Add(m_Image.Pixelmap[xx, yy]);
+				}
+			}
+
+			for (int z = halfWidth + 1; z <= halfWidth + bgHalfWidth; z++)
+			{
+				PointF p = m_Mapper.GetSourceCoords(x1, y1 + z);
+				int xx = (int)Math.Round(p.X);
+				int yy = (int)Math.Round(p.Y);
+
+				if (m_SourceVideoFrame.Contains(xx, yy))
+				{
+					allBgPixels.Add(m_Image.Pixelmap[xx, yy]);
+				}
+			}
+
+			m_BgValuesList[index] = allBgPixels;
+			m_BgPixelCount[index] = 1;
 		}
 
 		private void ReadAverageBackgroundForPixelIndex(int halfWidth, int bgHalfWidth, float x1, float y1, int index)

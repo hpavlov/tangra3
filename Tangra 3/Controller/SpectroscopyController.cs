@@ -155,26 +155,61 @@ namespace Tangra.Controller
                 masterSpectra.Points.AddRange(allFramesSpectra[0].Points);
                 masterSpectra.CombinedMeasurements = 1;
 
-                for (int i = 1; i < allFramesSpectra.Count; i++)
-                {
-                    Spectra nextSpectra = allFramesSpectra[i];
-                    for (int j = 0; j < masterSpectra.Points.Count; j++)
-                    {
-                        int indexNextSpectra = nextSpectra.ZeroOrderPixelNo - masterSpectra.ZeroOrderPixelNo + j;
-                        if (indexNextSpectra >= 0 && indexNextSpectra < nextSpectra.Points.Count)
-                        {
-                            masterSpectra.Points[j].RawValue += nextSpectra.Points[indexNextSpectra].RawValue;
-                            masterSpectra.Points[j].RawSignal += nextSpectra.Points[indexNextSpectra].RawSignal;
-                            masterSpectra.Points[j].RawSignalPixelCount += nextSpectra.Points[indexNextSpectra].RawSignalPixelCount;
-                        }
-                    }
-                }
+	            if (frameCombineMethod == PixelCombineMethod.Average)
+	            {
+					for (int i = 1; i < allFramesSpectra.Count; i++)
+					{
+						Spectra nextSpectra = allFramesSpectra[i];
+						for (int j = 0; j < masterSpectra.Points.Count; j++)
+						{
+							int indexNextSpectra = nextSpectra.ZeroOrderPixelNo - masterSpectra.ZeroOrderPixelNo + j;
+							if (indexNextSpectra >= 0 && indexNextSpectra < nextSpectra.Points.Count)
+							{
+								masterSpectra.Points[j].RawValue += nextSpectra.Points[indexNextSpectra].RawValue;
+								masterSpectra.Points[j].RawSignal += nextSpectra.Points[indexNextSpectra].RawSignal;
+								masterSpectra.Points[j].RawSignalPixelCount += nextSpectra.Points[indexNextSpectra].RawSignalPixelCount;
+							}
+						}
+					}
 
-                // Normalize per row width
-                for (int i = 0; i < masterSpectra.Points.Count; i++)
-                {
-                    masterSpectra.Points[i].RawValue = masterSpectra.Points[i].RawValue * masterSpectra.SignalAreaWidth / masterSpectra.Points[i].RawSignalPixelCount;
-                }
+					// Normalize per row width
+					for (int i = 0; i < masterSpectra.Points.Count; i++)
+					{
+						masterSpectra.Points[i].RawValue = masterSpectra.Points[i].RawValue * masterSpectra.SignalAreaWidth / masterSpectra.Points[i].RawSignalPixelCount;
+					}
+	            }
+				else if (frameCombineMethod == PixelCombineMethod.Median)
+				{
+					var valueLists = new List<float>[masterSpectra.Points.Count];
+					for (int j = 0; j < masterSpectra.Points.Count; j++) valueLists[j] = new List<float>();
+
+					var signalLists = new List<float>[masterSpectra.Points.Count];
+					for (int j = 0; j < masterSpectra.Points.Count; j++) signalLists[j] = new List<float>();
+
+					for (int i = 1; i < allFramesSpectra.Count; i++)
+					{
+						Spectra nextSpectra = allFramesSpectra[i];
+						for (int j = 0; j < masterSpectra.Points.Count; j++)
+						{
+							int indexNextSpectra = nextSpectra.ZeroOrderPixelNo - masterSpectra.ZeroOrderPixelNo + j;
+							if (indexNextSpectra >= 0 && indexNextSpectra < nextSpectra.Points.Count)
+							{
+								valueLists[j].Add(nextSpectra.Points[indexNextSpectra].RawValue);
+								signalLists[j].Add(nextSpectra.Points[indexNextSpectra].RawValue);
+							}
+						}
+					}
+
+					for (int i = 0; i < masterSpectra.Points.Count; i++)
+					{
+						valueLists[i].Sort();
+						signalLists[i].Sort();
+
+						masterSpectra.Points[i].RawValue = valueLists[i].Count == 0 ? 0 : valueLists[i][valueLists[i].Count / 2];
+						masterSpectra.Points[i].RawSignal = signalLists[i].Count == 0 ? 0 : signalLists[i][signalLists[i].Count / 2];
+						masterSpectra.Points[i].RawSignalPixelCount = signalLists[i].Count;
+					}
+				}
             }
 
 			return masterSpectra;
