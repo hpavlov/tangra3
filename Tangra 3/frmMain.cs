@@ -457,6 +457,10 @@ namespace Tangra
 			{				
 				m_LightCurveController.OpenLcFile(fileName);
 			}
+			else if (fileExt == ".spectra")
+			{
+				m_SpectroscopyController.OpenSpectraFile(fileName);
+			}
 			else
 			{
 				try
@@ -688,6 +692,20 @@ namespace Tangra
 			}
 
 			miRecentLightCurves.Enabled = miRecentLightCurves.DropDownItems.Count > 0;
+
+			miRecentSpectras.DropDownItems.Clear();
+
+			foreach (string recentFilePath in TangraConfig.Settings.RecentFiles.Lists[RecentFileType.Spectra])
+			{
+				if (File.Exists(recentFilePath))
+				{
+					ToolStripMenuItem miRecentFile = (ToolStripMenuItem)miRecentSpectras.DropDownItems.Add(recentFilePath);
+					miRecentFile.Tag = recentFilePath;
+					miRecentFile.Click += new EventHandler(miRecentFileMenuItemClick);
+				}
+			}
+
+			miRecentSpectras.Enabled = miRecentSpectras.DropDownItems.Count > 0;
         }		
 
 		private void miRecentFileMenuItemClick(object sender, EventArgs e)

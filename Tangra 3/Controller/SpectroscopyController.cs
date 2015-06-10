@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using Tangra.Helpers;
 using Tangra.Model.Astro;
+using Tangra.Model.Config;
 using Tangra.VideoOperations.Spectroscopy;
 using Tangra.VideoOperations.Spectroscopy.Helpers;
 
@@ -249,12 +250,17 @@ namespace Tangra.Controller
 			}
 	    }
 
-	    private void OpenSpectraFile(string fileName)
+	    internal void OpenSpectraFile(string fileName)
 	    {
-		    SpectraFile spectraFile = SpectraFile.Load(fileName);
-		    if (spectraFile != null)
+		    if (File.Exists(fileName))
 		    {
-			    DisplaySpectra(spectraFile.Data);
+				SpectraFile spectraFile = SpectraFile.Load(fileName);
+				if (spectraFile != null)
+				{
+					DisplaySpectra(spectraFile.Data);
+				}
+
+				m_VideoController.RegisterRecentFile(RecentFileType.Spectra, fileName);
 		    }
 	    }
     }

@@ -62,7 +62,7 @@ namespace Tangra.Controller
 
             if (openFileDialog.ShowDialog(m_MainFormView) == DialogResult.OK)
             {
-                OpenLcFile(openFileDialog.FileName);        
+                OpenLcFile(openFileDialog.FileName);
             }
         }
 
