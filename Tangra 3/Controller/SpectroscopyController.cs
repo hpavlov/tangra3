@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 using Tangra.Helpers;
 using Tangra.Model.Astro;
 using Tangra.VideoOperations.Spectroscopy;
@@ -17,9 +19,11 @@ namespace Tangra.Controller
 
 		private VideoController m_VideoController;
 		private frmViewSpectra m_ViewSpectraForm;
+		private Form m_MainFormView;
 
-        internal SpectroscopyController(VideoController videoController)
+		internal SpectroscopyController(Form mainFormView, VideoController videoController)
 		{
+			m_MainFormView = mainFormView;
 			m_VideoController = videoController;
 			m_ViewSpectraForm = null;
 		}
@@ -210,7 +214,48 @@ namespace Tangra.Controller
 	    {
 		    EnsureViewSpectraFormClosed();
 
-			m_ViewSpectraForm = new frmViewSpectra();
+			m_ViewSpectraForm = new frmViewSpectra(this);
+	    }
+
+		public void ConfigureSaveSpectraFileDialog(SaveFileDialog saveFileDialog)
+	    {
+			try
+			{
+				saveFileDialog.InitialDirectory = Path.GetDirectoryName(m_VideoController.CurrentVideoFileName);
+				saveFileDialog.FileName = Path.ChangeExtension(Path.GetFileName(m_VideoController.CurrentVideoFileName), ".spectra");
+			}
+			catch { /* In some rare cases m_VideoController.CurrentVideoFileName may throw an error. We want to ignore it. */ }
+	    }
+
+		public SpectraFileHeader GetSpectraFileHeader()
+	    {
+		    return new SpectraFileHeader()
+		    {
+			    PathToVideoFile = m_VideoController.CurrentVideoFileName
+		    };
+	    }
+
+	    public void LoadSpectraFile()
+	    {
+			var openFileDialog = new OpenFileDialog()
+			{
+				Filter = "Tangra Spectra Reduction (*.spectra)|*.spectra",
+				CheckFileExists = true
+			};
+
+			if (openFileDialog.ShowDialog(m_MainFormView) == DialogResult.OK)
+			{
+				OpenSpectraFile(openFileDialog.FileName);
+			}
+	    }
+
+	    private void OpenSpectraFile(string fileName)
+	    {
+		    SpectraFile spectraFile = SpectraFile.Load(fileName);
+		    if (spectraFile != null)
+		    {
+			    DisplaySpectra(spectraFile.Data);
+		    }
 	    }
     }
 }

@@ -7,6 +7,7 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Controller;
 using Tangra.VideoOperations.Spectroscopy.Helpers;
 
 namespace Tangra.VideoOperations.Spectroscopy
@@ -14,6 +15,8 @@ namespace Tangra.VideoOperations.Spectroscopy
     public partial class frmViewSpectra : Form
     {
         private MasterSpectra m_Spectra;
+	    private SpectraFileHeader m_Header;
+	    private SpectroscopyController m_SpectroscopyController;
 
         private static Brush[] m_GreyBrushes = new Brush[256];
 
@@ -25,9 +28,15 @@ namespace Tangra.VideoOperations.Spectroscopy
 		    }
 	    }
 
-        public frmViewSpectra()
-        {
-            InitializeComponent();
+	    public frmViewSpectra()
+	    {
+			InitializeComponent();
+	    }
+
+	    public frmViewSpectra(SpectroscopyController controller)
+			: this()
+	    {
+		    m_SpectroscopyController = controller;
 
             picSpectraGraph.Image = new Bitmap(picSpectraGraph.Width, picSpectraGraph.Height, PixelFormat.Format24bppRgb);
             picSpectra.Image = new Bitmap(picSpectra.Width, picSpectra.Height, PixelFormat.Format24bppRgb);
@@ -40,8 +49,13 @@ namespace Tangra.VideoOperations.Spectroscopy
 
         private void frmViewSpectra_Load(object sender, EventArgs e)
         {
-            DisplaySpectra(m_Spectra);
+	        PlotSpectra();
         }
+
+	    private void PlotSpectra()
+	    {
+			DisplaySpectra(m_Spectra);
+	    }
 
         public void DisplaySpectra(Spectra spectra)
         {
@@ -55,7 +69,7 @@ namespace Tangra.VideoOperations.Spectroscopy
             using (Graphics g = Graphics.FromImage(picSpectra.Image))
             using (Graphics g2 = Graphics.FromImage(picSpectraGraph.Image))
             {
-                g2.Clear(SystemColors.Control);
+                g2.Clear(Color.WhiteSmoke);
 
                 foreach (SpectraPoint point in spectra.Points)
                 {
@@ -88,5 +102,42 @@ namespace Tangra.VideoOperations.Spectroscopy
             picSpectraGraph.Invalidate();
         }
 
+		private void frmViewSpectra_Resize(object sender, EventArgs e)
+		{
+			picSpectraGraph.Image = new Bitmap(picSpectraGraph.Width, picSpectraGraph.Height, PixelFormat.Format24bppRgb);
+			picSpectra.Image = new Bitmap(picSpectra.Width, picSpectra.Height, PixelFormat.Format24bppRgb);
+
+			PlotSpectra();
+		}
+
+		private void miSaveSpectra_Click(object sender, EventArgs e)
+		{
+			SaveSpectraFile();
+		}
+
+		private void SaveSpectraFile()
+		{
+			m_SpectroscopyController.ConfigureSaveSpectraFileDialog(saveFileDialog);
+
+			if (saveFileDialog.ShowDialog(this) == DialogResult.OK)
+			{
+				Update();
+
+				Cursor = Cursors.WaitCursor;
+				try
+				{
+					m_Header = m_SpectroscopyController.GetSpectraFileHeader();
+
+					SpectraFile.Save(saveFileDialog.FileName, m_Header, m_Spectra);
+
+					//m_LCFilePath = saveFileDialog.FileName;
+					//m_LightCurveController.RegisterRecentFile(RecentFileType.LightCurve, saveFileDialog.FileName);
+				}
+				finally
+				{
+					Cursor = Cursors.Default;
+				}
+			}
+		}
     }
 }

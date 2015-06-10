@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Text;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Tangra.Helpers;
@@ -14,15 +15,85 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 		public int PixelNo;
 		public float Wavelength;
         public float RawSignal;
-        public float RawSignalPixelCount;        
+        public float RawSignalPixelCount;
 		public float RawBackgroundPerPixel;
         public float RawValue;
 		public float SmoothedValue;
+
+		private static int SERIALIZATION_VERSION = 1;
+
+		internal SpectraPoint()
+		{ }
+
+		public SpectraPoint(BinaryReader reader)
+		{
+			int version = reader.ReadInt32();
+
+			PixelNo = reader.ReadInt32();
+			Wavelength = reader.ReadSingle();
+			RawSignal = reader.ReadSingle();
+			RawSignalPixelCount = reader.ReadSingle();
+			RawBackgroundPerPixel = reader.ReadSingle();
+			RawValue = reader.ReadSingle();
+			SmoothedValue = reader.ReadSingle();
+		}
+
+		public void WriteTo(BinaryWriter writer)
+		{
+			writer.Write(SERIALIZATION_VERSION);
+
+			writer.Write(PixelNo);
+			writer.Write(Wavelength);
+			writer.Write(RawSignal);
+			writer.Write(RawSignalPixelCount);
+			writer.Write(RawBackgroundPerPixel);
+			writer.Write(RawValue);
+			writer.Write(SmoothedValue);
+		}
 	}
 
     public class MasterSpectra : Spectra
     {
         public int CombinedMeasurements;
+
+		private static int SERIALIZATION_VERSION = 1;
+
+	    internal MasterSpectra()
+	    { }
+
+	    public MasterSpectra(BinaryReader reader)
+	    {
+		    int version = reader.ReadInt32();
+
+			CombinedMeasurements = reader.ReadInt32();
+			SignalAreaWidth = reader.ReadInt32();
+			MaxPixelValue = reader.ReadUInt32();
+			ZeroOrderPixelNo = reader.ReadInt32();
+
+			int pixelsCount = reader.ReadInt32();
+		    Points = new List<SpectraPoint>();
+			for (int i = 0; i < pixelsCount; i++)
+			{
+				var point = new SpectraPoint(reader);
+				Points.Add(point);
+			}
+	    }
+
+	    public void WriteTo(BinaryWriter writer)
+	    {
+			writer.Write(SERIALIZATION_VERSION);
+
+			writer.Write(CombinedMeasurements);
+			writer.Write(SignalAreaWidth);
+			writer.Write(MaxPixelValue);
+			writer.Write(ZeroOrderPixelNo);
+
+			writer.Write(Points.Count);
+		    foreach (var spectraPoint in Points)
+		    {
+				spectraPoint.WriteTo(writer);
+		    }
+	    }
     }
 
 	public class Spectra

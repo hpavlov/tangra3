@@ -530,6 +530,7 @@
       <DependentUpon>frmRunMultiFrameSpectroscopy.cs</DependentUpon>
     </Compile>
     <Compile Include="VideoOperations\Spectroscopy\Helpers\SpectraReader.cs" />
+    <Compile Include="VideoOperations\Spectroscopy\SpectraFile.cs" />
     <Compile Include="VideoOperations\Spectroscopy\Tracking\SpectroscopyStarTracker.cs" />
     <Compile Include="VideoOperations\Spectroscopy\ucSpectroscopy.cs">
       <SubType>UserControl</SubType>

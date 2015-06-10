@@ -84,7 +84,7 @@ namespace Tangra
             m_LightCurveController = new LightCurveController(this, m_VideoController, m_AddinsController, m_OcrExtensionManager);
 			m_MakeDarkFlatController = new DarkFlatFrameController(this, m_VideoController);
 			m_AstrometryController = new AstrometryController(m_VideoController, m_LongOperationsManager);
-		    m_SpectroscopyController = new SpectroscopyController(m_VideoController);
+		    m_SpectroscopyController = new SpectroscopyController(this, m_VideoController);
 			m_AutoUpdatesController = new AutoUpdatesController(this, m_VideoController);
 
 			NotificationManager.Instance.SetVideoController(m_VideoController);
@@ -1254,5 +1254,9 @@ namespace Tangra
 			return false;
 		}
 
+		private void miOpenSpectra_Click(object sender, EventArgs e)
+		{
+			m_SpectroscopyController.LoadSpectraFile();
+		}
 	}
 }
