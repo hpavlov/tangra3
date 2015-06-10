@@ -18,8 +18,11 @@ namespace Tangra.VideoOperations.Spectroscopy
 	{
 		public int NumberOfMeasurements { get; private set; }
         public int MeasurementAreaWing { get; private set; }
+		public int BackgroundAreaWing { get; private set; }
 	    public PixelCombineMethod BackgroundMethod { get; private set; }
 		public PixelCombineMethod FrameCombineMethod { get; private set; }
+
+		private bool m_Initialised = false;
 
 		private VideoSpectroscopyOperation m_VideoOperation;
 		private AstroImage m_AstroImage;
@@ -52,15 +55,19 @@ namespace Tangra.VideoOperations.Spectroscopy
 
 			nudNumberMeasurements.Maximum = framePlayer.Video.LastFrame - framePlayer.CurrentFrameIndex;
 			nudNumberMeasurements.Value = Math.Min(200, nudNumberMeasurements.Maximum);
-            nudAreaWing.Value = (int)Math.Ceiling(videoOperation.SelectedStarFWHM);
+            nudAreaWing.Value = videoOperation.SpectraReaderHalfWidth;
+			nudBackgroundWing.Value = videoOperation.SpectraReaderBackgroundHalfWidth;
 		    cbxBackgroundMethod.SelectedIndex = 0;
 	        cbxCombineMethod.SelectedIndex = 0;
+
+	        m_Initialised = true;
         }
 
 		private void btnNext_Click(object sender, EventArgs e)
 		{
 			NumberOfMeasurements = (int)nudNumberMeasurements.Value;
             MeasurementAreaWing = (int)nudAreaWing.Value;
+			BackgroundAreaWing = (int)nudBackgroundWing.Value;
             BackgroundMethod = (PixelCombineMethod)cbxBackgroundMethod.SelectedIndex;
 			FrameCombineMethod = (PixelCombineMethod)cbxCombineMethod.SelectedIndex;
 
@@ -75,14 +82,20 @@ namespace Tangra.VideoOperations.Spectroscopy
 
 		private void nudAreaWing_ValueChanged(object sender, EventArgs e)
 		{
-			m_VideoOperation.UpdateMeasurementAreasDisplay((int)nudAreaWing.Value, (int)nudBackgroundWing.Value);
-			PlotMeasurementAreas();
+			if (m_Initialised)
+			{
+				m_VideoOperation.UpdateMeasurementAreasDisplay((int)nudAreaWing.Value, (int)nudBackgroundWing.Value);
+				PlotMeasurementAreas();
+			}
 		}
 
 		private void nudBackgroundWing_ValueChanged(object sender, EventArgs e)
 		{
-			m_VideoOperation.UpdateMeasurementAreasDisplay((int)nudAreaWing.Value, (int)nudBackgroundWing.Value);
-			PlotMeasurementAreas();
+			if (m_Initialised)
+			{
+				m_VideoOperation.UpdateMeasurementAreasDisplay((int)nudAreaWing.Value, (int)nudBackgroundWing.Value);
+				PlotMeasurementAreas();
+			}
 		}
 
 		private int m_StartDestXValue;
@@ -97,7 +110,7 @@ namespace Tangra.VideoOperations.Spectroscopy
 
 			IImagePixel starCenter = m_VideoOperation.SelectedStar;
 			var reader = new SpectraReader(m_AstroImage, m_VideoOperation.SelectedStarBestAngle);
-			Spectra spectra = reader.ReadSpectra((float)starCenter.XDouble, (float)starCenter.YDouble, (int)nudAreaWing.Value, PixelCombineMethod.Average);
+			Spectra spectra = reader.ReadSpectra((float)starCenter.XDouble, (float)starCenter.YDouble, (int)nudAreaWing.Value, (int)nudBackgroundWing.Value, PixelCombineMethod.Average);
 
 			var mapper = new RotationMapper(m_AstroImage.Width, m_AstroImage.Height, m_VideoOperation.SelectedStarBestAngle);
 			
@@ -154,15 +167,33 @@ namespace Tangra.VideoOperations.Spectroscopy
 			}
 		}
 
+		private static Pen s_SpectraBackgroundPen = new Pen(Color.FromArgb(70, 255, 0, 0));
+
 		private void PlotMeasurementAreas()
 		{
 			if (m_ZoomedRawImage == null)
 				PrepareRawImage();
 
-			using (Graphics g = Graphics.FromImage(picAreas.Image))
+			if (m_ZoomedRawImage != null)
 			{
-				g.DrawImage(m_ZoomedRawImage, 0, 0);
-				g.Save();
+				using (Graphics g = Graphics.FromImage(picAreas.Image))
+				{
+					g.DrawImage(m_ZoomedRawImage, 0, 0);
+
+					float y1 = (float)((int)nudAreaWing.Value + m_DestVerticalPixelCount) * m_ZoomRatio - m_ZoomRatio / 2.0f;
+					float y2 = (float)((int)-nudAreaWing.Value + m_DestVerticalPixelCount) * m_ZoomRatio + m_ZoomRatio / 2.0f;
+
+					g.DrawLine(Pens.Red, 0, y1, m_ZoomedRawImage.Width, y1);
+					g.DrawLine(Pens.Red, 0, y2, m_ZoomedRawImage.Width, y2);
+
+					float y3 = (float)((int)nudAreaWing.Value + (int)nudBackgroundWing.Value + m_DestVerticalPixelCount) * m_ZoomRatio - m_ZoomRatio / 2.0f;
+					float y4 = (float)((int)-nudAreaWing.Value - (int)nudBackgroundWing.Value + m_DestVerticalPixelCount) * m_ZoomRatio + m_ZoomRatio / 2.0f;
+
+					g.DrawLine(s_SpectraBackgroundPen, 0, y3, m_ZoomedRawImage.Width, y3);
+					g.DrawLine(s_SpectraBackgroundPen, 0, y4, m_ZoomedRawImage.Width, y4);
+
+					g.Save();
+				}
 			}
 
 			picAreas.Invalidate();

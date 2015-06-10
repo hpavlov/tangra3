@@ -16,10 +16,12 @@ namespace Tangra.Controller
 		private object m_SyncLock = new object();
 
 		private VideoController m_VideoController;
+		private frmViewSpectra m_ViewSpectraForm;
 
         internal SpectroscopyController(VideoController videoController)
 		{
 			m_VideoController = videoController;
+			m_ViewSpectraForm = null;
 		}
 
         internal float LocateSpectraAngle(PSFFit selectedStar)
@@ -136,13 +138,14 @@ namespace Tangra.Controller
             return bestAngle;
         }
 
-		internal void DisplayResult(List<Spectra> allFramesSpectra, PixelCombineMethod frameCombineMethod)
+		internal MasterSpectra ComputeResult(List<Spectra> allFramesSpectra, PixelCombineMethod frameCombineMethod)
         {
+			var masterSpectra = new MasterSpectra();
+
             if (allFramesSpectra.Count > 0)
             {
-                var masterSpectra = new MasterSpectra();
                 masterSpectra.ZeroOrderPixelNo = allFramesSpectra[0].ZeroOrderPixelNo;
-                masterSpectra.PixelWidth = allFramesSpectra[0].PixelWidth;
+                masterSpectra.SignalAreaWidth = allFramesSpectra[0].SignalAreaWidth;
                 masterSpectra.MaxPixelValue = allFramesSpectra[0].MaxPixelValue;
                 masterSpectra.Points.AddRange(allFramesSpectra[0].Points);
                 masterSpectra.CombinedMeasurements = 1;
@@ -165,13 +168,49 @@ namespace Tangra.Controller
                 // Normalize per row width
                 for (int i = 0; i < masterSpectra.Points.Count; i++)
                 {
-                    masterSpectra.Points[i].RawValue = masterSpectra.Points[i].RawValue * masterSpectra.PixelWidth / masterSpectra.Points[i].RawSignalPixelCount;
+                    masterSpectra.Points[i].RawValue = masterSpectra.Points[i].RawValue * masterSpectra.SignalAreaWidth / masterSpectra.Points[i].RawSignalPixelCount;
                 }
-
-                var frm = new frmViewSpectra(masterSpectra);
-                m_VideoController.ShowForm(frm);
-                
             }
+
+			return masterSpectra;
         }
+
+	    internal void DisplaySpectra(MasterSpectra masterSpectra)
+	    {
+		    EnsureViewSpectraForm();
+
+			m_ViewSpectraForm.SetMasterSpectra(masterSpectra);
+			m_ViewSpectraForm.Show();
+	    }
+
+	    public void EnsureViewSpectraFormClosed()
+	    {
+			if (m_ViewSpectraForm != null)
+			{
+				try
+				{
+					if (m_ViewSpectraForm.Visible) m_ViewSpectraForm.Close();
+					m_ViewSpectraForm.Dispose();
+				}
+				catch
+				{ }
+
+				try
+				{
+					m_ViewSpectraForm.Dispose();
+				}
+				catch
+				{ }
+
+				m_ViewSpectraForm = null;
+			}
+	    }
+
+	    public void EnsureViewSpectraForm()
+	    {
+		    EnsureViewSpectraFormClosed();
+
+			m_ViewSpectraForm = new frmViewSpectra();
+	    }
     }
 }

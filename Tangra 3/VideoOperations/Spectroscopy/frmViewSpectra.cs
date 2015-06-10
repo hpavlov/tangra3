@@ -33,11 +33,10 @@ namespace Tangra.VideoOperations.Spectroscopy
             picSpectra.Image = new Bitmap(picSpectra.Width, picSpectra.Height, PixelFormat.Format24bppRgb);
         }
 
-        public frmViewSpectra(MasterSpectra masterSpectra)
-            : this()
-        {
-            m_Spectra = masterSpectra;
-        }
+		internal void SetMasterSpectra(MasterSpectra masterSpectra)
+	    {
+			m_Spectra = masterSpectra;
+	    }
 
         private void frmViewSpectra_Load(object sender, EventArgs e)
         {

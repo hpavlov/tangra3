@@ -52,7 +52,7 @@ namespace Tangra.VideoOperations.Spectroscopy
             lblSelectStarNote.Visible = true; 
         }
 
-		public void DisplaySpectra(Spectra spectra)
+		public void PreviewSpectra(Spectra spectra)
 	    {
 			btnMeasure.Enabled = true;
 			picSpectra.Visible = true;
@@ -80,13 +80,30 @@ namespace Tangra.VideoOperations.Spectroscopy
 			picSpectra.Invalidate();
 	    }
 
+	    public void MeasurementsStarted()
+	    {
+			btnMeasure.Enabled = false;
+	    }
+
+	    public void MeasurementsFinished()
+	    {
+			btnMeasure.Visible = false;
+		    btnShowSpectra.Visible = true;
+		    btnShowSpectra.BringToFront();
+	    }
+
 		private void btnMeasure_Click(object sender, EventArgs e)
 		{
 			var frm = new frmRunMultiFrameSpectroscopy(m_FramePlayer, m_VideoOperation, m_VideoContoller.GetCurrentAstroImage(false));
 			if (m_VideoContoller.ShowDialog(frm) == DialogResult.OK)
 			{
-				m_VideoOperation.StartMeasurements(frm.NumberOfMeasurements, frm.MeasurementAreaWing, frm.BackgroundMethod, frm.FrameCombineMethod);
+				m_VideoOperation.StartMeasurements(frm.NumberOfMeasurements, frm.MeasurementAreaWing, frm.BackgroundAreaWing, frm.BackgroundMethod, frm.FrameCombineMethod);
 			}
+		}
+
+		private void btnShowSpectra_Click(object sender, EventArgs e)
+		{
+			m_VideoOperation.DisplaySpectra();
 		}
     }
 }
