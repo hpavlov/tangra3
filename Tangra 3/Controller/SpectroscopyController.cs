@@ -155,6 +155,7 @@ namespace Tangra.Controller
                 masterSpectra.ZeroOrderPixelNo = allFramesSpectra[0].ZeroOrderPixelNo;
                 masterSpectra.SignalAreaWidth = allFramesSpectra[0].SignalAreaWidth;
                 masterSpectra.MaxPixelValue = allFramesSpectra[0].MaxPixelValue;
+				masterSpectra.MaxSpectraValue = allFramesSpectra[0].MaxSpectraValue;
                 masterSpectra.Points.AddRange(allFramesSpectra[0].Points);
                 masterSpectra.CombinedMeasurements = 1;
 

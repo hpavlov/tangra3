@@ -68,6 +68,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 			CombinedMeasurements = reader.ReadInt32();
 			SignalAreaWidth = reader.ReadInt32();
 			MaxPixelValue = reader.ReadUInt32();
+			MaxSpectraValue = reader.ReadUInt32();
 			ZeroOrderPixelNo = reader.ReadInt32();
 
 			int pixelsCount = reader.ReadInt32();
@@ -86,6 +87,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 			writer.Write(CombinedMeasurements);
 			writer.Write(SignalAreaWidth);
 			writer.Write(MaxPixelValue);
+		    writer.Write(MaxSpectraValue);
 			writer.Write(ZeroOrderPixelNo);
 
 			writer.Write(Points.Count);
@@ -101,6 +103,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 		public int SignalAreaWidth;
 		public int BackgroundAreaHalfWidth;
 		public uint MaxPixelValue;
+		public uint MaxSpectraValue;
 	    public int ZeroOrderPixelNo;
 		public List<SpectraPoint> Points = new List<SpectraPoint>();
 	}
@@ -211,6 +214,8 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 				point.RawValue -= point.RawBackgroundPerPixel * point.RawSignalPixelCount;
 				if (point.RawValue < 0) point.RawValue = 0;
 			}
+
+			rv.MaxSpectraValue = (uint)Math.Ceiling(rv.Points.Where(x => x.PixelNo > rv.ZeroOrderPixelNo + 20).Select(x => x.RawValue).Max());
 
 			return rv;
 		}

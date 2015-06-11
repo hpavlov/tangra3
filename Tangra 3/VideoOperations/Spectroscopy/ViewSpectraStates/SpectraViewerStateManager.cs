@@ -17,10 +17,16 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 	    private frmViewSpectra m_frmViewSpectra;
 	    private SpectroscopyController m_SpectroscopyController;
 
+		public const int X_AXIS_WIDTH = 100;
+		public const int Y_AXIS_WIDTH = 50;
+		public const int BORDER_GAP = 10;
+
 		private int m_XOffset;
 		private float m_XCoeff;
 		private float m_ColorCoeff;
 		private float m_YCoeff;
+		private float m_XCoeffCalibrated;
+		private float m_YCoeffCalibrated;
 
 	    private bool m_ShowCommonLines = false;
 
@@ -28,7 +34,10 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
         private static Font s_LegendFont = new Font(FontFamily.GenericSansSerif, 8, FontStyle.Bold);
 	    private static Pen s_KnownLinePen = new Pen(Color.FromArgb(60, 0, 0, 255));
         private static Brush s_KnownLineBrush = new SolidBrush(Color.FromArgb(60, 0, 0, 255));
-
+		private static Pen s_GridLinesPen = new Pen(Color.FromArgb(180, 180, 180));
+		private static Pen s_SpectraPen = new Pen(Color.Aqua, 2);
+		private static Brush s_KnownLineLabelBrush = Brushes.Blue;
+		
 		static SpectraViewerStateManager()
 	    {
 		    for (int i = 0; i < 256; i++)
@@ -71,18 +80,26 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 
 			m_XOffset = masterSpectra.ZeroOrderPixelNo - 10;
 			m_XCoeff = m_View.Width * 1.0f / masterSpectra.Points.Count;
-			m_ColorCoeff = 1.5f * 256.0f / masterSpectra.MaxPixelValue;
-			m_YCoeff = (m_View.Width - 20) * 1.0f / masterSpectra.MaxPixelValue;
+			m_XCoeffCalibrated = (m_View.Width - X_AXIS_WIDTH) * 1.0f / masterSpectra.Points.Count;
+			m_ColorCoeff = 255.0f / masterSpectra.MaxPixelValue;
+			m_YCoeff = (m_View.Height - 2 * BORDER_GAP) * 1.0f / masterSpectra.MaxSpectraValue;
+			m_YCoeffCalibrated = (m_View.Height - Y_AXIS_WIDTH - 2 * BORDER_GAP) * 1.0f / masterSpectra.MaxSpectraValue;
 		}
 
 		internal int GetSpectraPixelNoFromMouseCoordinates(Point point)
 		{
-			return (int)Math.Round(point.X/m_XCoeff + m_XOffset);
+			if (m_SpectroscopyController.IsCalibrated())
+				return (int)Math.Round((point.X - X_AXIS_WIDTH) / m_XCoeffCalibrated + m_XOffset);
+			else
+				return (int)Math.Round(point.X / m_XCoeff + m_XOffset);
 		}
 
 		internal float GetMouseXFromSpectraPixel(int pixelNo)
 		{
-			return m_XCoeff * (pixelNo - m_XOffset);
+			if (m_SpectroscopyController.IsCalibrated())
+				return X_AXIS_WIDTH + m_XCoeffCalibrated * (pixelNo - m_XOffset);
+			else
+				return m_XCoeff * (pixelNo - m_XOffset);
 		}
 
         internal void ShowCommonLines(bool show)
@@ -94,6 +111,11 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 		public void DrawSpectra(PictureBox picSpectra, PictureBox picSpectraGraph)
 		{
 			PointF prevPoint = PointF.Empty;
+			bool isCalibrated = m_SpectroscopyController.IsCalibrated();
+			int xAxisOffset = isCalibrated ? X_AXIS_WIDTH: 0;
+			int yAxisOffset = isCalibrated ? Y_AXIS_WIDTH : 0;
+			float xCoeff = isCalibrated ? m_XCoeffCalibrated : m_XCoeff;
+			float yCoeff = isCalibrated ? m_YCoeffCalibrated : m_YCoeff;
 
 			using (Graphics g = Graphics.FromImage(picSpectra.Image))
 			using (Graphics g2 = Graphics.FromImage(picSpectraGraph.Image))
@@ -103,18 +125,18 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 				if (m_CurrentState != null)
 					m_CurrentState.PreDraw(g2);
 
-                if (m_ShowCommonLines && m_SpectroscopyController.IsCalibrated())
+				if (m_ShowCommonLines && isCalibrated)
                     ShowCommonLines(g2);
 
 				foreach (SpectraPoint point in m_MasterSpectra.Points)
 				{
-					byte clr = (byte)(Math.Round(point.RawValue * m_ColorCoeff));
-					float x = m_XCoeff * (point.PixelNo - m_XOffset);
+					byte clr = (byte)(Math.Max(0, Math.Min(255, Math.Round(point.RawValue * m_ColorCoeff))));
+					float x = xAxisOffset + xCoeff * (point.PixelNo - m_XOffset);
 					if (x >= 0)
 					{
-						g.FillRectangle(s_GreyBrushes[clr], x, 0, m_XCoeff, picSpectra.Width);
+						g.FillRectangle(s_GreyBrushes[clr], x, 0, xCoeff, picSpectra.Height);
 
-						PointF graphPoint = new PointF(x, picSpectraGraph.Image.Height - 10 - (float)Math.Round(point.RawValue * m_YCoeff));
+						PointF graphPoint = new PointF(x, picSpectraGraph.Image.Height - BORDER_GAP - (float)Math.Round(point.RawValue * yCoeff) - yAxisOffset);
 						if (prevPoint != PointF.Empty)
 						{
 							if (graphPoint.X > 0 && graphPoint.X < picSpectraGraph.Image.Width && graphPoint.Y > 0 &&
@@ -122,7 +144,7 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 								prevPoint.X > 0 && prevPoint.X < picSpectraGraph.Image.Width && prevPoint.Y > 0 &&
 								prevPoint.Y < picSpectraGraph.Image.Height)
 							{
-								g2.DrawLine(Pens.Aqua, prevPoint, graphPoint);
+								g2.DrawLine(s_SpectraPen, prevPoint, graphPoint);
 							}
 						}
 						prevPoint = graphPoint;
@@ -132,12 +154,20 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 				if (m_CurrentState != null)
 					m_CurrentState.PostDraw(g2);
 
+				if (isCalibrated)
+					DrawAxis(g2);
+
 				g.Save();
 				g2.Save();
 			}
 
 			picSpectra.Invalidate();
 			picSpectraGraph.Invalidate();
+		}
+
+		private void DrawAxis(Graphics g)
+		{
+			g.DrawRectangle(s_GridLinesPen, X_AXIS_WIDTH, BORDER_GAP, m_View.Width - X_AXIS_WIDTH - BORDER_GAP, m_View.Height - Y_AXIS_WIDTH - BORDER_GAP);
 		}
 
         private void ShowCommonLines(Graphics g)
@@ -159,17 +189,17 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
                     pixelNo = calibrator.ResolvePixelNo(line.ToWavelength);
                     x2 = GetMouseXFromSpectraPixel(pixelNo);
 
-                    g.FillRectangle(s_KnownLineBrush, x1, i * verticalSpacing, x2 - x1, m_View.Height - i * verticalSpacing);
+					g.FillRectangle(s_KnownLineBrush, x1, i * verticalSpacing + BORDER_GAP, x2 - x1, m_View.Height - i * verticalSpacing - BORDER_GAP - Y_AXIS_WIDTH);
                 }
                 else
                 {
                     int pixelNo = calibrator.ResolvePixelNo(line.FromWavelength);
                     x2 = GetMouseXFromSpectraPixel(pixelNo);
 
-                    g.DrawLine(s_KnownLinePen, x2, i * verticalSpacing, x2, m_View.Height);
+					g.DrawLine(s_KnownLinePen, x2, i * verticalSpacing + BORDER_GAP, x2, m_View.Height - Y_AXIS_WIDTH);
                 }
 
-                g.DrawString(line.Designation != null ? string.Format("{0} ({1})", line.Element, line.Designation) : line.Element, s_LegendFont, Brushes.Blue, x2 + 3, i * verticalSpacing);
+				g.DrawString(line.Designation != null ? string.Format("{0} ({1})", line.Element, line.Designation) : line.Element, s_LegendFont, s_KnownLineLabelBrush, x2 + 3, i * verticalSpacing + BORDER_GAP);
             }
         }
 
