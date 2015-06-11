@@ -21,6 +21,9 @@ namespace Tangra.Controller
 		private VideoController m_VideoController;
 		private frmViewSpectra m_ViewSpectraForm;
 		private Form m_MainFormView;
+        private SpectraCalibrator m_SpectraCalibrator;
+        private MasterSpectra m_CurrentSpectra;
+
 
 		internal SpectroscopyController(Form mainFormView, VideoController videoController)
 		{
@@ -219,6 +222,9 @@ namespace Tangra.Controller
 	    {
 		    EnsureViewSpectraForm();
 
+	        m_CurrentSpectra = masterSpectra;
+            m_SpectraCalibrator = new SpectraCalibrator(masterSpectra);
+
 			m_ViewSpectraForm.SetMasterSpectra(masterSpectra);
 			m_ViewSpectraForm.Show();
 	    }
@@ -258,6 +264,7 @@ namespace Tangra.Controller
 			try
 			{
 				saveFileDialog.InitialDirectory = Path.GetDirectoryName(m_VideoController.CurrentVideoFileName);
+			    saveFileDialog.Filter = "Tangra Spectra Reduction (*.spectra)|*.spectra";
 				saveFileDialog.FileName = Path.ChangeExtension(Path.GetFileName(m_VideoController.CurrentVideoFileName), ".spectra");
 			}
 			catch { /* In some rare cases m_VideoController.CurrentVideoFileName may throw an error. We want to ignore it. */ }
@@ -295,8 +302,34 @@ namespace Tangra.Controller
 					DisplaySpectra(spectraFile.Data);
 				}
 
-				m_VideoController.RegisterRecentFile(RecentFileType.Spectra, fileName);
+		        RegisterRecentSpectraFile(fileName);
 		    }
 	    }
+
+        internal void RegisterRecentSpectraFile(string fileName)
+        {
+            m_VideoController.RegisterRecentFile(RecentFileType.Spectra, fileName);
+        }
+
+        internal void SetMarker(int pixelNo, float wavelength)
+        {
+            m_SpectraCalibrator.SetMarker(pixelNo, wavelength);
+        }
+
+        internal bool IsCalibrated()
+        {
+            return m_SpectraCalibrator.IsCalibrated();
+        }
+
+        internal SpectraCalibrator GetSpectraCalibrator()
+        {
+            return m_SpectraCalibrator;
+        }
+
+        internal void SelectPixel(int pixelNo)
+        {
+            float waveLength = m_SpectraCalibrator.ResolveWavelength(pixelNo);
+            m_ViewSpectraForm.DisplaySelectedDataPoint(pixelNo, waveLength);
+        }
     }
 }

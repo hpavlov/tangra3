@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Controller;
 using Tangra.VideoOperations.Spectroscopy.Helpers;
 
 namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
@@ -13,13 +14,20 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 		private SpectraViewerStateBase m_CurrentState;
 		private PictureBox m_View;
 		private MasterSpectra m_MasterSpectra;
+	    private frmViewSpectra m_frmViewSpectra;
+	    private SpectroscopyController m_SpectroscopyController;
 
 		private int m_XOffset;
 		private float m_XCoeff;
 		private float m_ColorCoeff;
 		private float m_YCoeff;
 
+	    private bool m_ShowCommonLines = false;
+
         private static Brush[] s_GreyBrushes = new Brush[256];
+        private static Font s_LegendFont = new Font(FontFamily.GenericSansSerif, 8, FontStyle.Bold);
+	    private static Pen s_KnownLinePen = new Pen(Color.FromArgb(60, 0, 0, 255));
+        private static Brush s_KnownLineBrush = new SolidBrush(Color.FromArgb(60, 0, 0, 255));
 
 		static SpectraViewerStateManager()
 	    {
@@ -29,9 +37,11 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 		    }
 	    }
 
-		internal SpectraViewerStateManager(PictureBox view)
+		internal SpectraViewerStateManager(SpectroscopyController spectroscopyController, PictureBox view, frmViewSpectra frmViewSpectra)
 		{
 			m_View = view;
+		    m_frmViewSpectra = frmViewSpectra;
+		    m_SpectroscopyController = spectroscopyController;
 		}
 
 		public void ChangeState<TNewState>() where TNewState : SpectraViewerStateBase, new()
@@ -42,13 +52,15 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 			m_CurrentState = null;
 
 			m_CurrentState = new TNewState();
-			m_CurrentState.Initialise(this, m_View);
+            m_CurrentState.Initialise(this, m_View, m_SpectroscopyController);
 			m_CurrentState.SetMasterSpectra(m_MasterSpectra);
 		}
 
 		internal void Redraw()
 		{
-			m_View.Parent.Parent.Refresh();
+		    m_frmViewSpectra.PlotSpectra();
+            m_View.Invalidate();
+            m_View.Update();
 		}
 
 		public void SetMasterSpectra(MasterSpectra masterSpectra)
@@ -73,6 +85,12 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 			return m_XCoeff * (pixelNo - m_XOffset);
 		}
 
+        internal void ShowCommonLines(bool show)
+        {
+            m_ShowCommonLines = show;
+            Redraw();
+        }
+
 		public void DrawSpectra(PictureBox picSpectra, PictureBox picSpectraGraph)
 		{
 			PointF prevPoint = PointF.Empty;
@@ -80,10 +98,13 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 			using (Graphics g = Graphics.FromImage(picSpectra.Image))
 			using (Graphics g2 = Graphics.FromImage(picSpectraGraph.Image))
 			{
-				g2.Clear(Color.WhiteSmoke);
+                g2.Clear(SystemColors.ControlDark);
 
 				if (m_CurrentState != null)
 					m_CurrentState.PreDraw(g2);
+
+                if (m_ShowCommonLines && m_SpectroscopyController.IsCalibrated())
+                    ShowCommonLines(g2);
 
 				foreach (SpectraPoint point in m_MasterSpectra.Points)
 				{
@@ -101,7 +122,7 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 								prevPoint.X > 0 && prevPoint.X < picSpectraGraph.Image.Width && prevPoint.Y > 0 &&
 								prevPoint.Y < picSpectraGraph.Image.Height)
 							{
-								g2.DrawLine(Pens.Red, prevPoint, graphPoint);
+								g2.DrawLine(Pens.Aqua, prevPoint, graphPoint);
 							}
 						}
 						prevPoint = graphPoint;
@@ -119,41 +140,79 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 			picSpectraGraph.Invalidate();
 		}
 
+        private void ShowCommonLines(Graphics g)
+        {
+            SpectraCalibrator calibrator = m_SpectroscopyController.GetSpectraCalibrator();
 
-		public virtual void MouseClick(object sender, MouseEventArgs e)
+            SizeF measuredLabel = g.MeasureString("H", s_LegendFont);
+            float verticalSpacing = measuredLabel.Height * 1.3f;
+
+            for (int i = 0; i < SpectraLineLibrary.CommonLines.Count; i++)
+            {
+                LineEntry line = SpectraLineLibrary.CommonLines[i];
+                float x2 = 0;
+
+                if (line.IsWideArea)
+                {
+                    int pixelNo = calibrator.ResolvePixelNo(line.FromWavelength);
+                    float x1 = GetMouseXFromSpectraPixel(pixelNo);
+                    pixelNo = calibrator.ResolvePixelNo(line.ToWavelength);
+                    x2 = GetMouseXFromSpectraPixel(pixelNo);
+
+                    g.FillRectangle(s_KnownLineBrush, x1, i * verticalSpacing, x2 - x1, m_View.Height - i * verticalSpacing);
+                }
+                else
+                {
+                    int pixelNo = calibrator.ResolvePixelNo(line.FromWavelength);
+                    x2 = GetMouseXFromSpectraPixel(pixelNo);
+
+                    g.DrawLine(s_KnownLinePen, x2, i * verticalSpacing, x2, m_View.Height);
+                }
+
+                g.DrawString(line.Designation != null ? string.Format("{0} ({1})", line.Element, line.Designation) : line.Element, s_LegendFont, Brushes.Blue, x2 + 3, i * verticalSpacing);
+            }
+        }
+
+		public void MouseClick(object sender, MouseEventArgs e)
 		{
 			if (m_CurrentState != null) 
 				m_CurrentState.MouseClick(sender, e);
 		}
 
-		public virtual void MouseDown(object sender, MouseEventArgs e)
+		public void MouseDown(object sender, MouseEventArgs e)
 		{
 			if (m_CurrentState != null)
 				m_CurrentState.MouseDown(sender, e);
 		}
 
-		public virtual void MouseEnter(object sender, EventArgs e)
+		public void MouseEnter(object sender, EventArgs e)
 		{
 			if (m_CurrentState != null)
 				m_CurrentState.MouseEnter(sender, e);
 		}
 
-		public virtual void MouseLeave(object sender, EventArgs e)
+		public void MouseLeave(object sender, EventArgs e)
 		{
 			if (m_CurrentState != null)
 				m_CurrentState.MouseLeave(sender, e);
 		}
 
-		public virtual void MouseMove(object sender, MouseEventArgs e)
+		public void MouseMove(object sender, MouseEventArgs e)
 		{
 			if (m_CurrentState != null)
 				m_CurrentState.MouseMove(sender, e);
 		}
 
-		public virtual void MouseUp(object sender, MouseEventArgs e)
+		public void MouseUp(object sender, MouseEventArgs e)
 		{
 			if (m_CurrentState != null)
 				m_CurrentState.MouseUp(sender, e);
 		}
+
+        public void PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            if (m_CurrentState != null)
+                m_CurrentState.PreviewKeyDown(sender, e);
+        }
 	}
 }

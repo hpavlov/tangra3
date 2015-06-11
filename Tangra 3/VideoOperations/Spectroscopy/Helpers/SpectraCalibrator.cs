@@ -6,49 +6,88 @@ using System.Text;
 namespace Tangra.VideoOperations.Spectroscopy.Helpers
 {
 	public class SpectraCalibrator
-	{
-			//http://en.wikipedia.org/wiki/Fraunhofer_lines
+    {
+	    private MasterSpectra m_MasterSpectra;
 
-			//Designation Element Wavelength (nm)
+	    private int? m_PixelNo1;
+	    private float m_Wavelength1;
 
-			//y O2 898.765 
-			//Z O2 822.696 
-			//A O2 759.370 
-			//B O2 686.719 
-			//C Hα 656.281 
-			//a O2 627.661 
-			//D1 Na 589.592 
-			//D2 Na 588.995 
-			//D3 or d He 587.5618 
-			//e Hg 546.073 
-			//E2 Fe 527.039 
-			//b1 Mg 518.362 
-			//b2 Mg 517.270 
-			//b3 Fe 516.891 
-			//b4 Mg 516.733 
- 
-
-			//Designation Element Wavelength (nm)
-
-			//c Fe 495.761 
-			//F Hβ 486.134 
-			//d Fe 466.814 
-			//e Fe 438.355 
-			//G' Hγ 434.047 
-			//G Fe 430.790 
-			//G Ca 430.774 
-			//h Hδ 410.175 
-			//H Ca+ 396.847 
-			//K Ca+ 393.368 
-			//L Fe 382.044 
-			//N Fe 358.121 
-			//P Ti+ 336.112 
-			//T Fe 302.108 
-			//t Ni 299.444 
+        private int? m_PixelNo2;
+        private float m_Wavelength2;
 
 
+	    private int m_ZeroPixelNo;
+        private float m_ZeroWavelength;
+	    private float m_AperPixels;
 
-			// http://www.astrosurf.com/buil/us/vatlas/vatlas.htm
-			// http://www.astrosurf.com/buil/us/spe2/hresol4.htm
-	}
+	    public SpectraCalibrator(MasterSpectra masterSpectra)
+	    {
+	        m_MasterSpectra = masterSpectra;
+	    }
+
+	    public void SetMarker(int pixelNo, float wavelength)
+        {
+            if (!m_PixelNo1.HasValue)
+            {
+                m_PixelNo1 = pixelNo;
+                m_Wavelength1 = wavelength;
+            }
+            else if (!m_PixelNo2.HasValue && m_PixelNo1.Value != pixelNo && Math.Abs(m_Wavelength1-wavelength) > 0.1)
+            {
+                m_PixelNo2 = pixelNo;
+                m_Wavelength2 = wavelength;
+
+                Calibrate();
+            }
+        }
+
+        private void Calibrate()
+        {
+            if (m_PixelNo1.HasValue && m_PixelNo2.HasValue)
+            {
+                if (m_PixelNo1.Value > m_PixelNo2.Value)
+                {
+                    m_ZeroPixelNo = m_PixelNo2.Value;
+                    m_ZeroWavelength = m_Wavelength2;
+                    m_AperPixels = (m_Wavelength1 - m_Wavelength2) / (m_PixelNo1.Value - m_PixelNo2.Value);
+                }
+                else
+                {
+                    m_ZeroPixelNo = m_PixelNo1.Value;
+                    m_ZeroWavelength = m_Wavelength1;
+                    m_AperPixels = (m_Wavelength2 - m_Wavelength1) / (m_PixelNo2.Value - m_PixelNo1.Value);
+                }
+            }
+        }
+
+        public bool IsCalibrated()
+        {
+            return m_PixelNo1.HasValue && m_PixelNo2.HasValue;
+        }
+
+        public float GetCalibrationScale()
+        {
+            return m_AperPixels;
+        }
+
+        public void Reset()
+        {
+            m_PixelNo1 = null;
+            m_PixelNo2 = null;
+        }
+
+        public float ResolveWavelength(int pixelNo)
+        {
+            SpectraPoint point = m_MasterSpectra.Points.SingleOrDefault(x => x.PixelNo == pixelNo);
+            if (point != null)
+                return m_ZeroWavelength + (point.PixelNo - m_ZeroPixelNo) * m_AperPixels;
+
+            return float.NaN;
+        }
+
+        public int ResolvePixelNo(float wavelength)
+        {
+            return (int)Math.Round(m_ZeroPixelNo + (wavelength - m_ZeroWavelength)/m_AperPixels); 
+        }
+    }
 }

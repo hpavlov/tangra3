@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Controller;
 using Tangra.VideoOperations.Spectroscopy.Helpers;
 
 namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
@@ -12,6 +13,7 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 	{
 		protected MasterSpectra m_MasterSpectra;
 		protected SpectraViewerStateManager m_StateManager;
+	    protected SpectroscopyController m_SpectroscopyController;
 		protected PictureBox m_View;
 
 		public void SetMasterSpectra(MasterSpectra masterSpectra)
@@ -19,9 +21,10 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 			m_MasterSpectra = masterSpectra;
 		}
 
-		public virtual void Initialise(SpectraViewerStateManager manager, PictureBox view)
+        public virtual void Initialise(SpectraViewerStateManager manager, PictureBox view, SpectroscopyController spectroscopyController)
 		{
 			m_StateManager = manager;
+            m_SpectroscopyController = spectroscopyController;
 			m_View = view;
 		}
 
@@ -51,5 +54,8 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 
 		public virtual void MouseUp(object sender, MouseEventArgs e)
 		{ }
+
+        public virtual void PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        { }
 	}
 }

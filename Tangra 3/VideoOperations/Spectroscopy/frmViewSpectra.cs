@@ -33,7 +33,7 @@ namespace Tangra.VideoOperations.Spectroscopy
             picSpectraGraph.Image = new Bitmap(picSpectraGraph.Width, picSpectraGraph.Height, PixelFormat.Format24bppRgb);
             picSpectra.Image = new Bitmap(picSpectra.Width, picSpectra.Height, PixelFormat.Format24bppRgb);
 
-			m_StateManager = new SpectraViewerStateManager(picSpectraGraph);
+            m_StateManager = new SpectraViewerStateManager(m_SpectroscopyController, picSpectraGraph, this);
         }
 
 		internal void SetMasterSpectra(MasterSpectra masterSpectra)
@@ -45,11 +45,17 @@ namespace Tangra.VideoOperations.Spectroscopy
         private void frmViewSpectra_Load(object sender, EventArgs e)
         {
 	        PlotSpectra();
+
+            if (!m_SpectroscopyController.IsCalibrated())
+                m_StateManager.ChangeState<SpectraViewerStateCalibrate>();
         }
 
-	    private void PlotSpectra()
+	    internal void PlotSpectra()
 	    {
 			m_StateManager.DrawSpectra(picSpectra, picSpectraGraph);
+
+	        gbxDispersion.Visible = m_SpectroscopyController.IsCalibrated();
+	        lblDispersion.Text = m_SpectroscopyController.GetSpectraCalibrator().GetCalibrationScale().ToString("0.0 A/pixel");
 	    }
 
 		private void frmViewSpectra_Resize(object sender, EventArgs e)
@@ -80,8 +86,7 @@ namespace Tangra.VideoOperations.Spectroscopy
 
 					SpectraFile.Save(saveFileDialog.FileName, m_Header, m_Spectra);
 
-					//m_LCFilePath = saveFileDialog.FileName;
-					//m_LightCurveController.RegisterRecentFile(RecentFileType.LightCurve, saveFileDialog.FileName);
+					m_SpectroscopyController.RegisterRecentSpectraFile(saveFileDialog.FileName);
 				}
 				finally
 				{
@@ -120,9 +125,27 @@ namespace Tangra.VideoOperations.Spectroscopy
 			m_StateManager.MouseUp(sender, e);
 		}
 
+        private void picSpectraGraph_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            m_StateManager.PreviewKeyDown(sender, e);
+        }
+
 		private void miSpectralCalibration_Click(object sender, EventArgs e)
 		{
 			m_StateManager.ChangeState<SpectraViewerStateCalibrate>();
 		}
+
+        internal void DisplaySelectedDataPoint(int pixelNo, float wavelength)
+        {
+            label1.Text = pixelNo.ToString();
+            label2.Text = wavelength.ToString("0.0 A");
+        }
+
+        private void miShowCommonLines_CheckedChanged(object sender, EventArgs e)
+        {
+            m_StateManager.ShowCommonLines(miShowCommonLines.Checked);
+        }
+
+
     }
 }

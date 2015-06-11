@@ -319,6 +319,12 @@
       <DependentUpon>frmLongRunningOperation.cs</DependentUpon>
     </Compile>
     <Compile Include="Helpers\LongOperationsManager.cs" />
+    <Compile Include="VideoOperations\Spectroscopy\frmEnterWavelength.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\frmEnterWavelength.Designer.cs">
+      <DependentUpon>frmEnterWavelength.cs</DependentUpon>
+    </Compile>
     <Compile Include="VideoOperations\Spectroscopy\frmViewSpectra.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -530,6 +536,7 @@
       <DependentUpon>frmRunMultiFrameSpectroscopy.cs</DependentUpon>
     </Compile>
     <Compile Include="VideoOperations\Spectroscopy\Helpers\SpectraCalibrator.cs" />
+    <Compile Include="VideoOperations\Spectroscopy\Helpers\SpectraLineLibrary.cs" />
     <Compile Include="VideoOperations\Spectroscopy\Helpers\SpectraReader.cs" />
     <Compile Include="VideoOperations\Spectroscopy\SpectraFile.cs" />
     <Compile Include="VideoOperations\Spectroscopy\Tracking\SpectroscopyStarTracker.cs" />
@@ -542,6 +549,7 @@
     <Compile Include="VideoOperations\Spectroscopy\VideoSpectroscopyOperation.cs" />
     <Compile Include="VideoOperations\Spectroscopy\ViewSpectraStates\SpectraViewerStateBase.cs" />
     <Compile Include="VideoOperations\Spectroscopy\ViewSpectraStates\SpectraViewerStateCalibrate.cs" />
+    <Compile Include="VideoOperations\Spectroscopy\ViewSpectraStates\SpectraViewerStateCalibrated.cs" />
     <Compile Include="VideoOperations\Spectroscopy\ViewSpectraStates\SpectraViewerStateManager.cs" />
     <Compile Include="VideoTools\BackgroundModelGenerator.cs" />
     <Compile Include="VideoTools\frmDefineDisplayDynamicRange.cs">
@@ -1007,6 +1015,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\LightCurves\ucCorrSelection.resx">
       <DependentUpon>ucCorrSelection.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Spectroscopy\frmEnterWavelength.resx">
+      <DependentUpon>frmEnterWavelength.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\Spectroscopy\frmRunMultiFrameSpectroscopy.resx">
       <DependentUpon>frmRunMultiFrameSpectroscopy.cs</DependentUpon>
