@@ -529,6 +529,7 @@
     <Compile Include="VideoOperations\Spectroscopy\frmRunMultiFrameSpectroscopy.Designer.cs">
       <DependentUpon>frmRunMultiFrameSpectroscopy.cs</DependentUpon>
     </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\Helpers\SpectraCalibrator.cs" />
     <Compile Include="VideoOperations\Spectroscopy\Helpers\SpectraReader.cs" />
     <Compile Include="VideoOperations\Spectroscopy\SpectraFile.cs" />
     <Compile Include="VideoOperations\Spectroscopy\Tracking\SpectroscopyStarTracker.cs" />
@@ -539,6 +540,9 @@
       <DependentUpon>ucSpectroscopy.cs</DependentUpon>
     </Compile>
     <Compile Include="VideoOperations\Spectroscopy\VideoSpectroscopyOperation.cs" />
+    <Compile Include="VideoOperations\Spectroscopy\ViewSpectraStates\SpectraViewerStateBase.cs" />
+    <Compile Include="VideoOperations\Spectroscopy\ViewSpectraStates\SpectraViewerStateCalibrate.cs" />
+    <Compile Include="VideoOperations\Spectroscopy\ViewSpectraStates\SpectraViewerStateManager.cs" />
     <Compile Include="VideoTools\BackgroundModelGenerator.cs" />
     <Compile Include="VideoTools\frmDefineDisplayDynamicRange.cs">
       <SubType>Form</SubType>

@@ -39,6 +39,8 @@
 			this.miSaveSpectra = new System.Windows.Forms.ToolStripMenuItem();
 			this.miView = new System.Windows.Forms.ToolStripMenuItem();
 			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
+			this.miData = new System.Windows.Forms.ToolStripMenuItem();
+			this.miSpectralCalibration = new System.Windows.Forms.ToolStripMenuItem();
 			this.pnlClient.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.picSpectraGraph)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.picSpectra)).BeginInit();
@@ -72,6 +74,12 @@
 			this.picSpectraGraph.Size = new System.Drawing.Size(807, 408);
 			this.picSpectraGraph.TabIndex = 1;
 			this.picSpectraGraph.TabStop = false;
+			this.picSpectraGraph.MouseClick += new System.Windows.Forms.MouseEventHandler(this.picSpectraGraph_MouseClick);
+			this.picSpectraGraph.MouseDown += new System.Windows.Forms.MouseEventHandler(this.picSpectraGraph_MouseDown);
+			this.picSpectraGraph.MouseEnter += new System.EventHandler(this.picSpectraGraph_MouseEnter);
+			this.picSpectraGraph.MouseLeave += new System.EventHandler(this.picSpectraGraph_MouseLeave);
+			this.picSpectraGraph.MouseMove += new System.Windows.Forms.MouseEventHandler(this.picSpectraGraph_MouseMove);
+			this.picSpectraGraph.MouseUp += new System.Windows.Forms.MouseEventHandler(this.picSpectraGraph_MouseUp);
 			// 
 			// picSpectra
 			// 
@@ -86,6 +94,7 @@
 			// 
 			this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.miFile,
+            this.miData,
             this.miView});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
@@ -120,6 +129,21 @@
 			this.miView.Name = "miView";
 			this.miView.Size = new System.Drawing.Size(44, 20);
 			this.miView.Text = "&View";
+			// 
+			// miData
+			// 
+			this.miData.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miSpectralCalibration});
+			this.miData.Name = "miData";
+			this.miData.Size = new System.Drawing.Size(43, 20);
+			this.miData.Text = "&Data";
+			// 
+			// miSpectralCalibration
+			// 
+			this.miSpectralCalibration.Name = "miSpectralCalibration";
+			this.miSpectralCalibration.Size = new System.Drawing.Size(177, 22);
+			this.miSpectralCalibration.Text = "Spectral &Calibration";
+			this.miSpectralCalibration.Click += new System.EventHandler(this.miSpectralCalibration_Click);
 			// 
 			// frmViewSpectra
 			// 
@@ -156,5 +180,7 @@
 		private System.Windows.Forms.ToolStripMenuItem miSaveSpectra;
 		private System.Windows.Forms.ToolStripMenuItem miView;
 		private System.Windows.Forms.SaveFileDialog saveFileDialog;
+		private System.Windows.Forms.ToolStripMenuItem miData;
+		private System.Windows.Forms.ToolStripMenuItem miSpectralCalibration;
     }
 }
