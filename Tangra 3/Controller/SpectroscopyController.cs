@@ -179,7 +179,9 @@ namespace Tangra.Controller
 					// Normalize per row width
 					for (int i = 0; i < masterSpectra.Points.Count; i++)
 					{
-						masterSpectra.Points[i].RawValue = masterSpectra.Points[i].RawValue * masterSpectra.SignalAreaWidth / masterSpectra.Points[i].RawSignalPixelCount;
+						masterSpectra.Points[i].RawValue = masterSpectra.Points[i].RawSignalPixelCount == 0 
+							? 0 
+							: masterSpectra.Points[i].RawValue * masterSpectra.SignalAreaWidth / masterSpectra.Points[i].RawSignalPixelCount;
 					}
 	            }
 				else if (frameCombineMethod == PixelCombineMethod.Median)

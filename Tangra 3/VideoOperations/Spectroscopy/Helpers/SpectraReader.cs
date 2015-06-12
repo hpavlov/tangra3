@@ -152,7 +152,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 				PointF p = m_Mapper.GetSourceCoords(x, p1.Y);
 				if (m_SourceVideoFrame.Contains(p))
 				{
-					int xx = (int)Math.Round(p.X);
+					int xx = (int) p.X;
 
 					if (xx < xFrom) xFrom = xx;
 					if (xx > xTo) xTo = xx;

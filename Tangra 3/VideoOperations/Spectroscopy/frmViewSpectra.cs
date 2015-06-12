@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -139,6 +140,12 @@ namespace Tangra.VideoOperations.Spectroscopy
         {
             label1.Text = pixelNo.ToString();
             label2.Text = wavelength.ToString("0.0 A");
+
+	        SpectraPoint point = m_Spectra.Points.SingleOrDefault(x => x.PixelNo == pixelNo);
+	        if (point != null)
+	        {
+				label3.Text = point.RawValue.ToString("0.0");
+	        }
         }
 
         private void miShowCommonLines_CheckedChanged(object sender, EventArgs e)
@@ -146,6 +153,16 @@ namespace Tangra.VideoOperations.Spectroscopy
             m_StateManager.ShowCommonLines(miShowCommonLines.Checked);
         }
 
+		private void miExport_Click(object sender, EventArgs e)
+		{
+			SpectraCalibrator calibrator = m_SpectroscopyController.GetSpectraCalibrator();
+			var bld = new StringBuilder();
 
+			foreach (SpectraPoint point in m_Spectra.Points)
+			{
+				float wavelength = calibrator.ResolveWavelength(point.PixelNo);
+				bld.AppendFormat("{0},{1}\r\n", wavelength, point.RawValue);
+			}
+		}
     }
 }

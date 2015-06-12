@@ -79,8 +79,8 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 				m_CurrentState.SetMasterSpectra(masterSpectra);
 
 			m_XOffset = masterSpectra.ZeroOrderPixelNo - 10;
-			m_XCoeff = m_View.Width * 1.0f / masterSpectra.Points.Count;
-			m_XCoeffCalibrated = (m_View.Width - X_AXIS_WIDTH) * 1.0f / masterSpectra.Points.Count;
+			m_XCoeff = m_View.Width * 1.0f / (masterSpectra.Points.Count - masterSpectra.ZeroOrderPixelNo);
+			m_XCoeffCalibrated = (m_View.Width - X_AXIS_WIDTH) * 1.0f / (masterSpectra.Points.Count - masterSpectra.ZeroOrderPixelNo);
 			m_ColorCoeff = 255.0f / masterSpectra.MaxPixelValue;
 			m_YCoeff = (m_View.Height - 2 * BORDER_GAP) * 1.0f / masterSpectra.MaxSpectraValue;
 			m_YCoeffCalibrated = (m_View.Height - Y_AXIS_WIDTH - 2 * BORDER_GAP) * 1.0f / masterSpectra.MaxSpectraValue;
@@ -139,13 +139,15 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 						PointF graphPoint = new PointF(x, picSpectraGraph.Image.Height - BORDER_GAP - (float)Math.Round(point.RawValue * yCoeff) - yAxisOffset);
 						if (prevPoint != PointF.Empty)
 						{
-							if (graphPoint.X > 0 && graphPoint.X < picSpectraGraph.Image.Width && graphPoint.Y > 0 &&
-								graphPoint.Y < picSpectraGraph.Image.Height &&
-								prevPoint.X > 0 && prevPoint.X < picSpectraGraph.Image.Width && prevPoint.Y > 0 &&
-								prevPoint.Y < picSpectraGraph.Image.Height)
-							{
-								g2.DrawLine(s_SpectraPen, prevPoint, graphPoint);
-							}
+							g2.DrawLine(s_SpectraPen, prevPoint, graphPoint);
+
+							//if (graphPoint.X > 0 && graphPoint.X < picSpectraGraph.Image.Width && graphPoint.Y > 0 &&
+							//	graphPoint.Y < picSpectraGraph.Image.Height &&
+							//	prevPoint.X > 0 && prevPoint.X < picSpectraGraph.Image.Width && prevPoint.Y > 0 &&
+							//	prevPoint.Y < picSpectraGraph.Image.Height)
+							//{
+							//	g2.DrawLine(s_SpectraPen, prevPoint, graphPoint);
+							//}
 						}
 						prevPoint = graphPoint;
 					}
