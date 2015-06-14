@@ -178,8 +178,15 @@ namespace Tangra.KweeVanWoerden
 
 				if (!hasReliableTimeBase)
 				{
-					ShowErrorMessage("This light curve measurement does not have a reliable time base.");
-					return;
+                    if (MessageBox.Show(
+                        m_TangraHost.ParentWindow,
+                        "This light curve may not have a reliable time base. Do you want to continue?",
+                        "Eclipsing Binaries Addin for Tangra",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Warning) == DialogResult.No)
+                    {
+                        return;
+                    }
 				}
 
 				double[] secondsFromUTMidnight = new double[timestamps.Length];
