@@ -7,16 +7,24 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.VideoOperations.Spectroscopy.ViewSpectraStates;
 
 namespace Tangra.VideoOperations.Spectroscopy
 {
     public partial class frmEnterWavelength : Form
     {
         public float SelectedWaveLength;
+        private SpectraViewerStateCalibrate m_State;
 
         public frmEnterWavelength()
         {
             InitializeComponent();
+        }
+
+        public frmEnterWavelength(SpectraViewerStateCalibrate state)
+            : this()
+        {
+            m_State = state;
         }
 
         private void UpdateCheckboxDerivedState(object sender, EventArgs e)
@@ -60,7 +68,13 @@ namespace Tangra.VideoOperations.Spectroscopy
                 SelectedWaveLength = float.Parse(lvFraunhoferLines.SelectedItems[0].SubItems[2].Text, CultureInfo.InvariantCulture);
             }
 
-            DialogResult = DialogResult.OK;
+            m_State.CalibrationPointSelected(SelectedWaveLength);
+
+            Close();
+        }
+
+        private void btnCancel_Click(object sender, EventArgs e)
+        {
             Close();
         }
     }

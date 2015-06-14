@@ -12,6 +12,7 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 	public class SpectraViewerStateCalibrate : SpectraViewerStateBase
 	{
 		private SpectraPoint m_SelectedPoint;
+        private frmEnterWavelength m_frmEnterWavelength = null;
 
         public override void Initialise(SpectraViewerStateManager manager, PictureBox view, SpectroscopyController spectroscopyController)
 		{
@@ -19,6 +20,31 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 
 			view.Cursor = Cursors.Arrow;
 		}
+
+        public override void Finalise()
+        {
+            if (m_frmEnterWavelength != null)
+            {
+                try
+                {
+                    if (m_frmEnterWavelength.Visible)
+                        m_frmEnterWavelength.Close();
+                }
+                catch
+                { }
+
+                try
+                {
+                    m_frmEnterWavelength.Dispose();
+                }
+                catch
+                { }
+
+                m_frmEnterWavelength = null;
+            }
+
+            base.Finalise();
+        }
 
 		public override void MouseClick(object sender, MouseEventArgs e)
 		{
@@ -59,15 +85,39 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 
                 m_StateManager.Redraw();
 
-                var frm = new frmEnterWavelength();
-                if (frm.ShowDialog(m_View) == DialogResult.OK)
-                {
-                    m_SpectroscopyController.SetMarker(m_SelectedPoint.PixelNo, frm.SelectedWaveLength);
-                    if (m_SpectroscopyController.IsCalibrated())
-                        m_StateManager.ChangeState<SpectraViewerStateCalibrated>();
-                }
+                EnsureEnterWavelengthForm();
             }
 		}
+
+        private void EnsureEnterWavelengthForm()
+        {
+            if (m_frmEnterWavelength == null)
+                m_frmEnterWavelength = new frmEnterWavelength();
+
+            if (!m_frmEnterWavelength.Visible)
+            {
+                try
+                {
+                    m_frmEnterWavelength.Show(m_View);
+                }
+                catch (ObjectDisposedException)
+                {
+                    m_frmEnterWavelength = new frmEnterWavelength();
+                    m_frmEnterWavelength.Show(m_View);
+                }
+
+                m_frmEnterWavelength.Top = m_View.Top;
+                m_frmEnterWavelength.Left = m_View.Right;
+            }
+        }
+
+        internal void CalibrationPointSelected(float selectedWaveLength)
+        {
+            m_SpectroscopyController.SetMarker(m_SelectedPoint.PixelNo, selectedWaveLength);
+
+            if (m_SpectroscopyController.IsCalibrated())
+                m_StateManager.ChangeState<SpectraViewerStateCalibrated>();
+        }
 
 		public override void PreDraw(Graphics g)
 		{
