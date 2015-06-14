@@ -14,6 +14,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Tracking
 	{
 		private bool m_IsTrackedSuccessfully = false;
 		private int m_FrameNo;
+	    private static int FIT_AREA = 35;
 
 		public TrackedObject TrackedStar;
 
@@ -57,15 +58,15 @@ namespace Tangra.VideoOperations.Spectroscopy.Tracking
 
 			GetExpectedXY(out expectedX, out expectedY);
 
-			uint[,] pixels = astroImage.GetPixelsArea((int)expectedX, (int)expectedY, 35);
+            uint[,] pixels = astroImage.GetPixelsArea((int)expectedX, (int)expectedY, FIT_AREA);
 
 			// There is only one object in the area, just do a wide fit followed by a fit with the selected matrix size
 			PSFFit gaussian = new PSFFit((int)expectedX, (int)expectedY);
-			gaussian.Fit(pixels, 35);
+            gaussian.Fit(pixels, FIT_AREA);
 
 			IImagePixel firstCenter = new ImagePixel((int)gaussian.XCenter, (int)gaussian.YCenter);
 
-			pixels = astroImage.GetPixelsArea(firstCenter.X, firstCenter.Y, 35);
+            pixels = astroImage.GetPixelsArea(firstCenter.X, firstCenter.Y, FIT_AREA);
 			gaussian = new PSFFit(firstCenter.X, firstCenter.Y);
 			gaussian.Fit(pixels, TrackedStar.PsfFitMatrixSize);
 			if (gaussian.IsSolved)

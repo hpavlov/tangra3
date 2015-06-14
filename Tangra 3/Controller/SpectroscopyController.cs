@@ -32,11 +32,13 @@ namespace Tangra.Controller
 			m_ViewSpectraForm = null;
 		}
 
-        internal float LocateSpectraAngle(PSFFit selectedStar)
+        internal float LocateSpectraAngle(PSFFit selectedStar, int? roughStartingAngle = null)
         {
             float x0 = (float)selectedStar.XCenter;
             float y0 = (float)selectedStar.YCenter;
-            uint brigthness20 = (uint)(selectedStar.Brightness / 5);
+            uint brigthness10 = (uint)(0.1 * selectedStar.Brightness);
+            uint brigthness20 = (uint)(0.2 * selectedStar.Brightness);
+            uint brigthness40 = (uint)(0.4 * selectedStar.Brightness);
             uint bgFromPsf = (uint)(selectedStar.I0); 
 
             int minDistance = (int)(10 * selectedStar.FWHM);
@@ -49,10 +51,22 @@ namespace Tangra.Controller
 
             uint[] angles = new uint[360];
             uint[] sums = new uint[360];
-            uint[] pixAbove50Perc = new uint[360];
+            uint[] pixAbove10Perc = new uint[360];
+            uint[] pixAbove20Perc = new uint[360];
+            uint[] pixAbove40Perc = new uint[360];
 
             int diagonnalPixels = (int)Math.Ceiling(Math.Sqrt(image.Width * image.Width + image.Height * image.Height));
-            for (int i = 0; i < 360; i++)
+
+            int iFrom = 0;
+            int iTo = 360;
+            if (roughStartingAngle.HasValue)
+            {
+                iFrom = roughStartingAngle.Value - 10;
+                iTo = roughStartingAngle.Value + 10;
+            }
+
+            bool peakFound = false;
+            for (int i = iFrom; i < iTo; i++)
             {
                 var mapper = new RotationMapper(image.Width, image.Height, i);
                 PointF p1 = mapper.GetDestCoords(x0, y0);
@@ -60,10 +74,16 @@ namespace Tangra.Controller
                 float y1 = p1.Y;
 
                 uint rowSum = 0;
-                uint pixAbove50 = 0;
-                uint pixAbove50Max = 0;
-                bool prevPixAbove50 = false;
-
+                uint pixAbove10 = 0;
+                uint pixAbove10Max = 0;
+                bool prevPixAbove10 = false;
+                uint pixAbove20 = 0;
+                uint pixAbove20Max = 0;
+                bool prevPixAbove20 = false;
+                uint pixAbove40 = 0;
+                uint pixAbove40Max = 0;
+                bool prevPixAbove40 = false;
+                
                 for (int d = minDistance; d < diagonnalPixels; d++)
                 {
                     PointF p = mapper.GetSourceCoords(x1 + d, y1);
@@ -79,38 +99,88 @@ namespace Tangra.Controller
                         {
                             uint value_u = image.Pixelmap[(int)pu.X, (int)pu.Y];
                             uint value_d = image.Pixelmap[(int)pd.X, (int)pd.Y];
-                            if ((value - bgFromPsf) > brigthness20 && value > value_u && value > value_d)
+                            if ((value - bgFromPsf) > brigthness10 && value > value_u && value > value_d)
                             {
-                                if (prevPixAbove50) pixAbove50++;
-                                prevPixAbove50 = true;
+                                if (prevPixAbove10) pixAbove10++;
+                                prevPixAbove10 = true;
                             }
                             else
                             {
-                                prevPixAbove50 = false;
-                                if (pixAbove50Max < pixAbove50) pixAbove50Max = pixAbove50;
-                                pixAbove50 = 0;
-                            }                            
+                                prevPixAbove10 = false;
+                                if (pixAbove10Max < pixAbove10) pixAbove10Max = pixAbove10;
+                                pixAbove10 = 0;
+                                peakFound = true;
+                            }
+
+                            if ((value - bgFromPsf) > brigthness20 && value > value_u && value > value_d)
+                            {
+                                if (prevPixAbove20) pixAbove20++;
+                                prevPixAbove20 = true;
+                            }
+                            else
+                            {
+                                prevPixAbove20 = false;
+                                if (pixAbove20Max < pixAbove20) pixAbove20Max = pixAbove20;
+                                pixAbove20 = 0;
+                                peakFound = true;
+                            }
+
+                            if ((value - bgFromPsf) > brigthness40 && value > value_u && value > value_d)
+                            {
+                                if (prevPixAbove40) pixAbove40++;
+                                prevPixAbove40 = true;
+                            }
+                            else
+                            {
+                                prevPixAbove40 = false;
+                                if (pixAbove40Max < pixAbove40) pixAbove40Max = pixAbove40;
+                                pixAbove40 = 0;
+                                peakFound = true;
+                            } 
                         }
                         else
                         {
-                            prevPixAbove50 = false;
-                            if (pixAbove50Max < pixAbove50) pixAbove50Max = pixAbove50;
-                            pixAbove50 = 0;
+                            prevPixAbove10 = false;
+                            if (pixAbove10Max < pixAbove10) pixAbove10Max = pixAbove10;
+                            pixAbove10 = 0;
+
+                            prevPixAbove20 = false;
+                            if (pixAbove20Max < pixAbove20) pixAbove20Max = pixAbove20;
+                            pixAbove20 = 0;
+
+                            prevPixAbove40 = false;
+                            if (pixAbove40Max < pixAbove40) pixAbove40Max = pixAbove40;
+                            pixAbove40 = 0;
+
+                            peakFound = true;
                         }
                     }
                 }
 
                 angles[i] = (uint)i;
                 sums[i] = rowSum;
-                pixAbove50Perc[i] = pixAbove50Max;
+                pixAbove10Perc[i] = pixAbove10Max;
+                pixAbove20Perc[i] = pixAbove20Max;
+                pixAbove40Perc[i] = pixAbove40Max;
             }
 
-            Array.Sort(pixAbove50Perc, angles);
+            if (!peakFound)
+                return float.NaN;
+
+            var angles10 = new List<uint>(angles).ToArray();
+            var angles20 = new List<uint>(angles).ToArray();
+            var angles40 = new List<uint>(angles).ToArray();
+
+            Array.Sort(sums, angles);
+            Array.Sort(pixAbove10Perc, angles10);
+            Array.Sort(pixAbove20Perc, angles20);
+            Array.Sort(pixAbove40Perc, angles40);
 
             uint roughAngle = angles[359];
 
-            if (pixAbove50Perc[358] * 2 > pixAbove50Perc[359] && // Second best should have a lot smaller score than the top one
-                Math.Abs((int)angles[358] - (int)angles[359]) != 1) // or for large stars the two best can be sequential angles
+            if (//pixAbove50Perc[358] * 2 > pixAbove50Perc[359] && // Second best should have a lot smaller score than the top one
+                Math.Abs((int)angles[358] - (int)angles[359]) != 1 && // or for large stars the two best can be sequential angles
+                !roughStartingAngle.HasValue) // unless the user provided the first rough approximation
                 return float.NaN;
 
             uint bestSum = 0;
@@ -146,7 +216,7 @@ namespace Tangra.Controller
             return bestAngle;
         }
 
-		internal MasterSpectra ComputeResult(List<Spectra> allFramesSpectra, PixelCombineMethod frameCombineMethod)
+		internal MasterSpectra ComputeResult(List<Spectra> allFramesSpectra, PixelCombineMethod frameCombineMethod, bool useFineAdjustments)
         {
 			var masterSpectra = new MasterSpectra();
 
@@ -159,21 +229,50 @@ namespace Tangra.Controller
                 masterSpectra.Points.AddRange(allFramesSpectra[0].Points);
                 masterSpectra.CombinedMeasurements = 1;
 
+                var originalMasterPoints = new List<SpectraPoint>();
+                originalMasterPoints.AddRange(masterSpectra.Points);
+
 	            if (frameCombineMethod == PixelCombineMethod.Average)
 	            {
 					for (int i = 1; i < allFramesSpectra.Count; i++)
 					{
 						Spectra nextSpectra = allFramesSpectra[i];
-						for (int j = 0; j < masterSpectra.Points.Count; j++)
-						{
-							int indexNextSpectra = nextSpectra.ZeroOrderPixelNo - masterSpectra.ZeroOrderPixelNo + j;
-							if (indexNextSpectra >= 0 && indexNextSpectra < nextSpectra.Points.Count)
-							{
-								masterSpectra.Points[j].RawValue += nextSpectra.Points[indexNextSpectra].RawValue;
-								masterSpectra.Points[j].RawSignal += nextSpectra.Points[indexNextSpectra].RawSignal;
-								masterSpectra.Points[j].RawSignalPixelCount += nextSpectra.Points[indexNextSpectra].RawSignalPixelCount;
-							}
-						}
+					    int bestOffset = 0;
+
+                        if (useFineAdjustments)
+                        {
+                            float bestOffsetValue = float.MaxValue;
+
+                            for (int probeOffset = -2; probeOffset <= 2; probeOffset++)
+                            {
+                                float currOffsetValue = 0;
+                                for (int j = 0; j < masterSpectra.Points.Count; j++)
+                                {
+                                    int indexNextSpectra = nextSpectra.ZeroOrderPixelNo - masterSpectra.ZeroOrderPixelNo + j + probeOffset;
+                                    if (indexNextSpectra >= 0 && indexNextSpectra < nextSpectra.Points.Count)
+                                    {
+                                        currOffsetValue += Math.Abs(originalMasterPoints[j].RawValue - nextSpectra.Points[indexNextSpectra].RawValue);
+                                    }
+                                }
+
+                                if (currOffsetValue < bestOffsetValue)
+                                {
+                                    bestOffsetValue = currOffsetValue;
+                                    bestOffset = probeOffset;
+                                }
+                            }                            
+                        }
+
+                        for (int j = 0; j < masterSpectra.Points.Count; j++)
+                        {
+                            int indexNextSpectra = nextSpectra.ZeroOrderPixelNo - masterSpectra.ZeroOrderPixelNo + j + bestOffset;
+                            if (indexNextSpectra >= 0 && indexNextSpectra < nextSpectra.Points.Count)
+                            {
+                                masterSpectra.Points[j].RawValue += nextSpectra.Points[indexNextSpectra].RawValue;
+                                masterSpectra.Points[j].RawSignal += nextSpectra.Points[indexNextSpectra].RawSignal;
+                                masterSpectra.Points[j].RawSignalPixelCount += nextSpectra.Points[indexNextSpectra].RawSignalPixelCount;
+                            }
+                        }
 					}
 
 					// Normalize per row width
@@ -195,9 +294,36 @@ namespace Tangra.Controller
 					for (int i = 1; i < allFramesSpectra.Count; i++)
 					{
 						Spectra nextSpectra = allFramesSpectra[i];
+
+                        int bestOffset = 0;
+
+                        if (useFineAdjustments)
+                        {
+                            float bestOffsetValue = float.MaxValue;
+
+                            for (int probeOffset = -2; probeOffset <= 2; probeOffset++)
+                            {
+                                float currOffsetValue = 0;
+                                for (int j = 0; j < masterSpectra.Points.Count; j++)
+                                {
+                                    int indexNextSpectra = nextSpectra.ZeroOrderPixelNo - masterSpectra.ZeroOrderPixelNo + j + probeOffset;
+                                    if (indexNextSpectra >= 0 && indexNextSpectra < nextSpectra.Points.Count)
+                                    {
+                                        currOffsetValue += Math.Abs(originalMasterPoints[j].RawValue - nextSpectra.Points[indexNextSpectra].RawValue);
+                                    }
+                                }
+
+                                if (currOffsetValue < bestOffsetValue)
+                                {
+                                    bestOffsetValue = currOffsetValue;
+                                    bestOffset = probeOffset;
+                                }
+                            }
+                        }
+
 						for (int j = 0; j < masterSpectra.Points.Count; j++)
 						{
-							int indexNextSpectra = nextSpectra.ZeroOrderPixelNo - masterSpectra.ZeroOrderPixelNo + j;
+                            int indexNextSpectra = nextSpectra.ZeroOrderPixelNo - masterSpectra.ZeroOrderPixelNo + j + bestOffset;
 							if (indexNextSpectra >= 0 && indexNextSpectra < nextSpectra.Points.Count)
 							{
 								valueLists[j].Add(nextSpectra.Points[indexNextSpectra].RawValue);

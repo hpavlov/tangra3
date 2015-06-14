@@ -35,7 +35,7 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 	    private static Pen s_KnownLinePen = new Pen(Color.FromArgb(60, 0, 0, 255));
         private static Brush s_KnownLineBrush = new SolidBrush(Color.FromArgb(60, 0, 0, 255));
 		private static Pen s_GridLinesPen = new Pen(Color.FromArgb(180, 180, 180));
-		private static Pen s_SpectraPen = new Pen(Color.Aqua, 2);
+		private static Pen s_SpectraPen = new Pen(Color.Aqua, 1);
 		private static Brush s_KnownLineLabelBrush = Brushes.Blue;
 		
 		static SpectraViewerStateManager()

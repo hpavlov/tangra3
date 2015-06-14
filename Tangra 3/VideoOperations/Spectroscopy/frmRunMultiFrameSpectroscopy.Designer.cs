@@ -30,6 +30,7 @@
 		{
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmRunMultiFrameSpectroscopy));
             this.gbConfig = new System.Windows.Forms.GroupBox();
+            this.cbxFineAdjustments = new System.Windows.Forms.CheckBox();
             this.picAreas = new System.Windows.Forms.PictureBox();
             this.cbxCombineMethod = new System.Windows.Forms.ComboBox();
             this.label6 = new System.Windows.Forms.Label();
@@ -46,6 +47,7 @@
             this.nudNumberMeasurements = new System.Windows.Forms.NumericUpDown();
             this.btnPrevious = new System.Windows.Forms.Button();
             this.btnNext = new System.Windows.Forms.Button();
+            this.cbxUseLowPassFilter = new System.Windows.Forms.CheckBox();
             this.gbConfig.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picAreas)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudBackgroundWing)).BeginInit();
@@ -55,6 +57,8 @@
             // 
             // gbConfig
             // 
+            this.gbConfig.Controls.Add(this.cbxUseLowPassFilter);
+            this.gbConfig.Controls.Add(this.cbxFineAdjustments);
             this.gbConfig.Controls.Add(this.picAreas);
             this.gbConfig.Controls.Add(this.cbxCombineMethod);
             this.gbConfig.Controls.Add(this.label6);
@@ -75,6 +79,16 @@
             this.gbConfig.TabIndex = 19;
             this.gbConfig.TabStop = false;
             this.gbConfig.Text = "Spectroscopy";
+            // 
+            // cbxFineAdjustments
+            // 
+            this.cbxFineAdjustments.AutoSize = true;
+            this.cbxFineAdjustments.Location = new System.Drawing.Point(242, 57);
+            this.cbxFineAdjustments.Name = "cbxFineAdjustments";
+            this.cbxFineAdjustments.Size = new System.Drawing.Size(128, 17);
+            this.cbxFineAdjustments.TabIndex = 37;
+            this.cbxFineAdjustments.Text = "Use Fine Adjustments";
+            this.cbxFineAdjustments.UseVisualStyleBackColor = true;
             // 
             // picAreas
             // 
@@ -268,6 +282,16 @@
             this.btnNext.UseVisualStyleBackColor = true;
             this.btnNext.Click += new System.EventHandler(this.btnNext_Click);
             // 
+            // cbxUseLowPassFilter
+            // 
+            this.cbxUseLowPassFilter.AutoSize = true;
+            this.cbxUseLowPassFilter.Location = new System.Drawing.Point(242, 77);
+            this.cbxUseLowPassFilter.Name = "cbxUseLowPassFilter";
+            this.cbxUseLowPassFilter.Size = new System.Drawing.Size(119, 17);
+            this.cbxUseLowPassFilter.TabIndex = 38;
+            this.cbxUseLowPassFilter.Text = "Use Low Pass Filter";
+            this.cbxUseLowPassFilter.UseVisualStyleBackColor = true;
+            // 
             // frmRunMultiFrameSpectroscopy
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -312,5 +336,7 @@
 		private System.Windows.Forms.Label label7;
 		private System.Windows.Forms.ComboBox cbxCombineMethod;
 		private System.Windows.Forms.PictureBox picAreas;
+        private System.Windows.Forms.CheckBox cbxFineAdjustments;
+        private System.Windows.Forms.CheckBox cbxUseLowPassFilter;
 	}
 }

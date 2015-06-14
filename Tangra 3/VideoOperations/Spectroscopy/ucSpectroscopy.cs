@@ -97,7 +97,7 @@ namespace Tangra.VideoOperations.Spectroscopy
 			var frm = new frmRunMultiFrameSpectroscopy(m_FramePlayer, m_VideoOperation, m_VideoContoller.GetCurrentAstroImage(false));
 			if (m_VideoContoller.ShowDialog(frm) == DialogResult.OK)
 			{
-				m_VideoOperation.StartMeasurements(frm.NumberOfMeasurements, frm.MeasurementAreaWing, frm.BackgroundAreaWing, frm.BackgroundMethod, frm.FrameCombineMethod);
+                m_VideoOperation.StartMeasurements(frm.NumberOfMeasurements, frm.MeasurementAreaWing, frm.BackgroundAreaWing, frm.BackgroundMethod, frm.FrameCombineMethod, frm.UseFineAdjustments, frm.UseLowPassFilter);
 			}
 		}
 

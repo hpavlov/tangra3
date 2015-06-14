@@ -8,8 +8,10 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Tangra.Model.Astro;
+using Tangra.Model.Config;
 using Tangra.Model.Image;
 using Tangra.Model.Video;
+using Tangra.PInvoke;
 using Tangra.VideoOperations.Spectroscopy.Helpers;
 
 namespace Tangra.VideoOperations.Spectroscopy
@@ -21,8 +23,11 @@ namespace Tangra.VideoOperations.Spectroscopy
 		public int BackgroundAreaWing { get; private set; }
 	    public PixelCombineMethod BackgroundMethod { get; private set; }
 		public PixelCombineMethod FrameCombineMethod { get; private set; }
+        public bool UseFineAdjustments { get; private set; }
+        public bool UseLowPassFilter { get; private set; }
 
-		private bool m_Initialised = false;
+
+	    private bool m_Initialised = false;
 
 		private VideoSpectroscopyOperation m_VideoOperation;
 		private AstroImage m_AstroImage;
@@ -57,8 +62,8 @@ namespace Tangra.VideoOperations.Spectroscopy
 			nudNumberMeasurements.Value = Math.Min(200, nudNumberMeasurements.Maximum);
             nudAreaWing.Value = Math.Min(videoOperation.SpectraReaderHalfWidth, nudAreaWing.Maximum);
 			nudBackgroundWing.Value = Math.Min(videoOperation.SpectraReaderBackgroundHalfWidth, nudBackgroundWing.Maximum);
-		    cbxBackgroundMethod.SelectedIndex = 0;
-	        cbxCombineMethod.SelectedIndex = 0;
+		    cbxBackgroundMethod.SelectedIndex = 1; /* Median */
+            cbxCombineMethod.SelectedIndex = 1; /* Median */
 
 	        m_Initialised = true;
         }
@@ -70,6 +75,8 @@ namespace Tangra.VideoOperations.Spectroscopy
 			BackgroundAreaWing = (int)nudBackgroundWing.Value;
             BackgroundMethod = (PixelCombineMethod)cbxBackgroundMethod.SelectedIndex;
 			FrameCombineMethod = (PixelCombineMethod)cbxCombineMethod.SelectedIndex;
+		    UseFineAdjustments = cbxFineAdjustments.Checked;
+		    UseLowPassFilter = cbxUseLowPassFilter.Checked;
 
 			DialogResult = DialogResult.OK;
 			Close();
