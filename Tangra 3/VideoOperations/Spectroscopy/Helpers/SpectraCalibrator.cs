@@ -65,6 +65,24 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
             return m_PixelNo1.HasValue && m_PixelNo2.HasValue;
         }
 
+		public SpectraCalibration ToSpectraCalibration()
+		{
+			if (IsCalibrated())
+			{
+				return new SpectraCalibration()
+				{
+					Pixel1 = m_PixelNo1.Value,
+					Pixel2 = m_PixelNo2.Value,
+					Wavelength1 = m_Wavelength1,
+					Wavelength2 = m_Wavelength2,
+					Dispersion = m_AperPixels,
+					ZeroPixel = m_ZeroPixelNo
+				};
+			}
+
+			return null;
+		}
+
         public float GetCalibrationScale()
         {
             return m_AperPixels;
@@ -78,9 +96,12 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 
         public float ResolveWavelength(int pixelNo)
         {
-            SpectraPoint point = m_MasterSpectra.Points.SingleOrDefault(x => x.PixelNo == pixelNo);
-            if (point != null)
-                return m_ZeroWavelength + (point.PixelNo - m_ZeroPixelNo) * m_AperPixels;
+	        if (IsCalibrated())
+	        {
+				SpectraPoint point = m_MasterSpectra.Points.SingleOrDefault(x => x.PixelNo == pixelNo);
+				if (point != null)
+					return m_ZeroWavelength + (point.PixelNo - m_ZeroPixelNo) * m_AperPixels;
+			}
 
             return float.NaN;
         }

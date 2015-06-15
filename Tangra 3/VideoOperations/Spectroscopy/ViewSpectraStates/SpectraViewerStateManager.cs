@@ -61,8 +61,8 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 			m_CurrentState = null;
 
 			m_CurrentState = new TNewState();
-            m_CurrentState.Initialise(this, m_View, m_SpectroscopyController);
 			m_CurrentState.SetMasterSpectra(m_MasterSpectra);
+            m_CurrentState.Initialise(this, m_View, m_SpectroscopyController);
 		}
 
 		internal void Redraw()

@@ -25,6 +25,7 @@ namespace Tangra.VideoOperations.Spectroscopy
             : this()
         {
             m_State = state;
+	        SelectedWaveLength = float.NaN;
         }
 
         private void UpdateCheckboxDerivedState(object sender, EventArgs e)
@@ -77,5 +78,11 @@ namespace Tangra.VideoOperations.Spectroscopy
         {
             Close();
         }
+
+		private void frmEnterWavelength_FormClosed(object sender, FormClosedEventArgs e)
+		{
+			if (float.IsNaN(SelectedWaveLength))
+				m_State.CalibrationPointSelectionCancelled();
+		}
     }
 }

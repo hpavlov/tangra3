@@ -460,5 +460,18 @@ namespace Tangra.Controller
             float waveLength = m_SpectraCalibrator.ResolveWavelength(pixelNo);
             m_ViewSpectraForm.DisplaySelectedDataPoint(pixelNo, waveLength);
         }
+
+	    internal void DeselectPixel()
+	    {
+		    m_ViewSpectraForm.ClearSelectedDataPoint();
+	    }
+
+	    internal SpectraCalibration GetSpectraCalibration()
+	    {
+		    if (IsCalibrated())
+			    return m_SpectraCalibrator.ToSpectraCalibration();
+
+		    return null;
+	    }
     }
 }

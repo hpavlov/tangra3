@@ -126,11 +126,6 @@ namespace Tangra.VideoOperations.Spectroscopy
 			m_StateManager.MouseUp(sender, e);
 		}
 
-        private void picSpectraGraph_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
-        {
-            m_StateManager.PreviewKeyDown(sender, e);
-        }
-
 		private void miSpectralCalibration_Click(object sender, EventArgs e)
 		{
 			m_StateManager.ChangeState<SpectraViewerStateCalibrate>();
@@ -138,15 +133,33 @@ namespace Tangra.VideoOperations.Spectroscopy
 
         internal void DisplaySelectedDataPoint(int pixelNo, float wavelength)
         {
-            label1.Text = pixelNo.ToString();
-            label2.Text = wavelength.ToString("0.0 A");
+            lblPixelNo.Text = pixelNo.ToString();
+
+	        if (!float.IsNaN(wavelength))
+	        {
+		        lblWavelength.Text = wavelength.ToString("0.0 A");
+		        lblWavelengthCaption.Visible = true;
+				lblWavelength.Visible = true;
+	        }
+	        else
+	        {
+				lblWavelengthCaption.Visible = false;
+				lblWavelength.Visible = false;
+			}
 
 	        SpectraPoint point = m_Spectra.Points.SingleOrDefault(x => x.PixelNo == pixelNo);
 	        if (point != null)
 	        {
-				label3.Text = point.RawValue.ToString("0.0");
+				lblPixelValue.Text = point.RawValue.ToString("0.0");
 	        }
+
+			gbSelection.Visible = true;
         }
+
+	    internal void ClearSelectedDataPoint()
+	    {
+		    gbSelection.Visible = false;
+	    }
 
         private void miShowCommonLines_CheckedChanged(object sender, EventArgs e)
         {
@@ -163,6 +176,11 @@ namespace Tangra.VideoOperations.Spectroscopy
 				float wavelength = calibrator.ResolveWavelength(point.PixelNo);
 				bld.AppendFormat("{0},{1}\r\n", wavelength, point.RawValue);
 			}
+		}
+
+		private void frmViewSpectra_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+		{
+			m_StateManager.PreviewKeyDown(sender, e);
 		}
     }
 }

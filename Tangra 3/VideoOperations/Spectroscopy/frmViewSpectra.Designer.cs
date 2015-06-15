@@ -30,10 +30,15 @@
         {
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmViewSpectra));
 			this.pnlBottom = new System.Windows.Forms.Panel();
-			this.gbxDispersion = new System.Windows.Forms.GroupBox();
-			this.lblDispersion = new System.Windows.Forms.Label();
+			this.gbSelection = new System.Windows.Forms.GroupBox();
+			this.lblWavelength = new System.Windows.Forms.Label();
+			this.lblWavelengthCaption = new System.Windows.Forms.Label();
+			this.lblPixelValue = new System.Windows.Forms.Label();
+			this.lblPixelNo = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
+			this.gbxDispersion = new System.Windows.Forms.GroupBox();
+			this.lblDispersion = new System.Windows.Forms.Label();
 			this.pnlClient = new System.Windows.Forms.Panel();
 			this.picSpectraGraph = new System.Windows.Forms.PictureBox();
 			this.picSpectra = new System.Windows.Forms.PictureBox();
@@ -41,17 +46,17 @@
 			this.miFile = new System.Windows.Forms.ToolStripMenuItem();
 			this.miLoadSpectra = new System.Windows.Forms.ToolStripMenuItem();
 			this.miSaveSpectra = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
+			this.miExport = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+			this.miCloseForm = new System.Windows.Forms.ToolStripMenuItem();
 			this.miData = new System.Windows.Forms.ToolStripMenuItem();
 			this.miSpectralCalibration = new System.Windows.Forms.ToolStripMenuItem();
 			this.miView = new System.Windows.Forms.ToolStripMenuItem();
 			this.miShowCommonLines = new System.Windows.Forms.ToolStripMenuItem();
 			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-			this.label3 = new System.Windows.Forms.Label();
-			this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
-			this.miCloseForm = new System.Windows.Forms.ToolStripMenuItem();
-			this.miExport = new System.Windows.Forms.ToolStripMenuItem();
-			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
 			this.pnlBottom.SuspendLayout();
+			this.gbSelection.SuspendLayout();
 			this.gbxDispersion.SuspendLayout();
 			this.pnlClient.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.picSpectraGraph)).BeginInit();
@@ -61,15 +66,83 @@
 			// 
 			// pnlBottom
 			// 
-			this.pnlBottom.Controls.Add(this.label3);
+			this.pnlBottom.Controls.Add(this.gbSelection);
 			this.pnlBottom.Controls.Add(this.gbxDispersion);
-			this.pnlBottom.Controls.Add(this.label2);
-			this.pnlBottom.Controls.Add(this.label1);
 			this.pnlBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
 			this.pnlBottom.Location = new System.Drawing.Point(0, 482);
 			this.pnlBottom.Name = "pnlBottom";
 			this.pnlBottom.Size = new System.Drawing.Size(807, 74);
 			this.pnlBottom.TabIndex = 1;
+			// 
+			// gbSelection
+			// 
+			this.gbSelection.Controls.Add(this.lblWavelength);
+			this.gbSelection.Controls.Add(this.lblWavelengthCaption);
+			this.gbSelection.Controls.Add(this.lblPixelValue);
+			this.gbSelection.Controls.Add(this.lblPixelNo);
+			this.gbSelection.Controls.Add(this.label2);
+			this.gbSelection.Controls.Add(this.label1);
+			this.gbSelection.Location = new System.Drawing.Point(12, 6);
+			this.gbSelection.Name = "gbSelection";
+			this.gbSelection.Size = new System.Drawing.Size(246, 61);
+			this.gbSelection.TabIndex = 4;
+			this.gbSelection.TabStop = false;
+			this.gbSelection.Text = "Selected Line";
+			this.gbSelection.Visible = false;
+			// 
+			// lblWavelength
+			// 
+			this.lblWavelength.AutoSize = true;
+			this.lblWavelength.ForeColor = System.Drawing.Color.Navy;
+			this.lblWavelength.Location = new System.Drawing.Point(176, 20);
+			this.lblWavelength.Name = "lblWavelength";
+			this.lblWavelength.Size = new System.Drawing.Size(0, 13);
+			this.lblWavelength.TabIndex = 8;
+			// 
+			// lblWavelengthCaption
+			// 
+			this.lblWavelengthCaption.AutoSize = true;
+			this.lblWavelengthCaption.Location = new System.Drawing.Point(107, 20);
+			this.lblWavelengthCaption.Name = "lblWavelengthCaption";
+			this.lblWavelengthCaption.Size = new System.Drawing.Size(68, 13);
+			this.lblWavelengthCaption.TabIndex = 7;
+			this.lblWavelengthCaption.Text = "Wavelength:";
+			// 
+			// lblPixelValue
+			// 
+			this.lblPixelValue.AutoSize = true;
+			this.lblPixelValue.ForeColor = System.Drawing.Color.Navy;
+			this.lblPixelValue.Location = new System.Drawing.Point(61, 38);
+			this.lblPixelValue.Name = "lblPixelValue";
+			this.lblPixelValue.Size = new System.Drawing.Size(0, 13);
+			this.lblPixelValue.TabIndex = 6;
+			// 
+			// lblPixelNo
+			// 
+			this.lblPixelNo.AutoSize = true;
+			this.lblPixelNo.ForeColor = System.Drawing.Color.Navy;
+			this.lblPixelNo.Location = new System.Drawing.Point(61, 21);
+			this.lblPixelNo.Name = "lblPixelNo";
+			this.lblPixelNo.Size = new System.Drawing.Size(0, 13);
+			this.lblPixelNo.TabIndex = 5;
+			// 
+			// label2
+			// 
+			this.label2.AutoSize = true;
+			this.label2.Location = new System.Drawing.Point(22, 38);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(37, 13);
+			this.label2.TabIndex = 1;
+			this.label2.Text = "Value:";
+			// 
+			// label1
+			// 
+			this.label1.AutoSize = true;
+			this.label1.Location = new System.Drawing.Point(27, 20);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(32, 13);
+			this.label1.TabIndex = 0;
+			this.label1.Text = "Pixel:";
 			// 
 			// gbxDispersion
 			// 
@@ -85,28 +158,11 @@
 			// lblDispersion
 			// 
 			this.lblDispersion.AutoSize = true;
+			this.lblDispersion.ForeColor = System.Drawing.Color.Navy;
 			this.lblDispersion.Location = new System.Drawing.Point(10, 20);
 			this.lblDispersion.Name = "lblDispersion";
 			this.lblDispersion.Size = new System.Drawing.Size(0, 13);
 			this.lblDispersion.TabIndex = 2;
-			// 
-			// label2
-			// 
-			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(193, 18);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(35, 13);
-			this.label2.TabIndex = 1;
-			this.label2.Text = "label2";
-			// 
-			// label1
-			// 
-			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(22, 18);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(35, 13);
-			this.label1.TabIndex = 0;
-			this.label1.Text = "label1";
 			// 
 			// pnlClient
 			// 
@@ -133,7 +189,6 @@
 			this.picSpectraGraph.MouseLeave += new System.EventHandler(this.picSpectraGraph_MouseLeave);
 			this.picSpectraGraph.MouseMove += new System.Windows.Forms.MouseEventHandler(this.picSpectraGraph_MouseMove);
 			this.picSpectraGraph.MouseUp += new System.Windows.Forms.MouseEventHandler(this.picSpectraGraph_MouseUp);
-			this.picSpectraGraph.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.picSpectraGraph_PreviewKeyDown);
 			// 
 			// picSpectra
 			// 
@@ -172,15 +227,38 @@
 			// miLoadSpectra
 			// 
 			this.miLoadSpectra.Name = "miLoadSpectra";
-			this.miLoadSpectra.Size = new System.Drawing.Size(152, 22);
+			this.miLoadSpectra.Size = new System.Drawing.Size(145, 22);
 			this.miLoadSpectra.Text = "&Load Spectra ";
 			// 
 			// miSaveSpectra
 			// 
 			this.miSaveSpectra.Name = "miSaveSpectra";
-			this.miSaveSpectra.Size = new System.Drawing.Size(152, 22);
+			this.miSaveSpectra.Size = new System.Drawing.Size(145, 22);
 			this.miSaveSpectra.Text = "&Save Spectra";
 			this.miSaveSpectra.Click += new System.EventHandler(this.miSaveSpectra_Click);
+			// 
+			// toolStripMenuItem1
+			// 
+			this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+			this.toolStripMenuItem1.Size = new System.Drawing.Size(142, 6);
+			// 
+			// miExport
+			// 
+			this.miExport.Name = "miExport";
+			this.miExport.Size = new System.Drawing.Size(145, 22);
+			this.miExport.Text = "Export";
+			this.miExport.Click += new System.EventHandler(this.miExport_Click);
+			// 
+			// toolStripSeparator1
+			// 
+			this.toolStripSeparator1.Name = "toolStripSeparator1";
+			this.toolStripSeparator1.Size = new System.Drawing.Size(142, 6);
+			// 
+			// miCloseForm
+			// 
+			this.miCloseForm.Name = "miCloseForm";
+			this.miCloseForm.Size = new System.Drawing.Size(145, 22);
+			this.miCloseForm.Text = "&Close";
 			// 
 			// miData
 			// 
@@ -213,38 +291,6 @@
 			this.miShowCommonLines.Text = "Show &Common Lines";
 			this.miShowCommonLines.CheckedChanged += new System.EventHandler(this.miShowCommonLines_CheckedChanged);
 			// 
-			// label3
-			// 
-			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(340, 18);
-			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(35, 13);
-			this.label3.TabIndex = 3;
-			this.label3.Text = "label3";
-			// 
-			// toolStripMenuItem1
-			// 
-			this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-			this.toolStripMenuItem1.Size = new System.Drawing.Size(149, 6);
-			// 
-			// miCloseForm
-			// 
-			this.miCloseForm.Name = "miCloseForm";
-			this.miCloseForm.Size = new System.Drawing.Size(152, 22);
-			this.miCloseForm.Text = "&Close";
-			// 
-			// miExport
-			// 
-			this.miExport.Name = "miExport";
-			this.miExport.Size = new System.Drawing.Size(152, 22);
-			this.miExport.Text = "Export";
-			this.miExport.Click += new System.EventHandler(this.miExport_Click);
-			// 
-			// toolStripSeparator1
-			// 
-			this.toolStripSeparator1.Name = "toolStripSeparator1";
-			this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
-			// 
 			// frmViewSpectra
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -257,9 +303,11 @@
 			this.Name = "frmViewSpectra";
 			this.Text = "Spectra Viewer";
 			this.Load += new System.EventHandler(this.frmViewSpectra_Load);
+			this.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.frmViewSpectra_PreviewKeyDown);
 			this.Resize += new System.EventHandler(this.frmViewSpectra_Resize);
 			this.pnlBottom.ResumeLayout(false);
-			this.pnlBottom.PerformLayout();
+			this.gbSelection.ResumeLayout(false);
+			this.gbSelection.PerformLayout();
 			this.gbxDispersion.ResumeLayout(false);
 			this.gbxDispersion.PerformLayout();
 			this.pnlClient.ResumeLayout(false);
@@ -286,15 +334,19 @@
 		private System.Windows.Forms.SaveFileDialog saveFileDialog;
 		private System.Windows.Forms.ToolStripMenuItem miData;
 		private System.Windows.Forms.ToolStripMenuItem miSpectralCalibration;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.GroupBox gbxDispersion;
         private System.Windows.Forms.Label lblDispersion;
-        private System.Windows.Forms.ToolStripMenuItem miShowCommonLines;
-		private System.Windows.Forms.Label label3;
+		private System.Windows.Forms.ToolStripMenuItem miShowCommonLines;
 		private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
 		private System.Windows.Forms.ToolStripMenuItem miCloseForm;
 		private System.Windows.Forms.ToolStripMenuItem miExport;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+		private System.Windows.Forms.GroupBox gbSelection;
+		private System.Windows.Forms.Label label2;
+		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.Label lblPixelValue;
+		private System.Windows.Forms.Label lblPixelNo;
+		private System.Windows.Forms.Label lblWavelength;
+		private System.Windows.Forms.Label lblWavelengthCaption;
     }
 }

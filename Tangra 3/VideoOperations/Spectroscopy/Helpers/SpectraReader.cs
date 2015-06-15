@@ -51,10 +51,18 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 			writer.Write(SmoothedValue);
 		}
 	}
+			
 
     public class MasterSpectra : Spectra
     {
         public int CombinedMeasurements;
+
+		public SpectraCalibration Calibration;
+
+		public bool IsCalibrated()
+		{
+			return Calibration != null;
+		}
 
 		private static int SERIALIZATION_VERSION = 1;
 
@@ -98,6 +106,45 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 	    }
     }
 
+	public class SpectraCalibration
+	{
+		public float Pixel1 { get; set; }
+		public float Pixel2 { get; set; }
+		public float Wavelength1 { get; set; }
+		public float Wavelength2 { get; set; }
+		public float Dispersion { get; set; }
+		public float ZeroPixel { get; set; }
+
+		private static int SERIALIZATION_VERSION = 1;
+
+		internal SpectraCalibration()
+		{ }
+
+		public SpectraCalibration(BinaryReader reader)
+		{
+			int version = reader.ReadInt32();
+
+			Pixel1 = reader.ReadSingle();
+			Pixel2 = reader.ReadSingle();
+			Wavelength1 = reader.ReadSingle();
+			Wavelength2 = reader.ReadSingle();
+			Dispersion = reader.ReadSingle();
+			ZeroPixel = reader.ReadSingle();
+		}
+
+		public void WriteTo(BinaryWriter writer)
+		{
+			writer.Write(SERIALIZATION_VERSION);
+
+			writer.Write(Pixel1);
+			writer.Write(Pixel2);
+			writer.Write(Wavelength1);
+			writer.Write(Wavelength2);
+			writer.Write(Dispersion);
+			writer.Write(ZeroPixel);
+		}
+	}
+
 	public class Spectra
 	{
 		public int SignalAreaWidth;
@@ -105,6 +152,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 		public uint MaxPixelValue;
 		public uint MaxSpectraValue;
 	    public int ZeroOrderPixelNo;
+
 		public List<SpectraPoint> Points = new List<SpectraPoint>();
 	}
 

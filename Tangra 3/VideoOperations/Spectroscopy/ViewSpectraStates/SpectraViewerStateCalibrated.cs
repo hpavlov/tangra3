@@ -19,6 +19,12 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 
             view.Cursor = Cursors.Arrow;
 
+	        if (!m_MasterSpectra.IsCalibrated())
+	        {
+		        m_MasterSpectra.Calibration = m_SpectroscopyController.GetSpectraCalibration();
+	        }
+			
+
             m_StateManager.Redraw();
         }
 
