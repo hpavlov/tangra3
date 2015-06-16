@@ -155,6 +155,7 @@ namespace Tangra.KweeVanWoerden
 					return;
 
 				bool useCurveFitting = frm.RunCurveFitting;
+                bool useFineGrainedBins = frm.UseFineGrainedBins;
 
                 if (frm.VariableStarIndex == 0)
                 {
@@ -169,7 +170,7 @@ namespace Tangra.KweeVanWoerden
                     dataBg = altMeasurements.Select(x => x.IsSuccessful ? (double)x.Background : double.NaN).ToArray();                    
                 }
 
-				DateTime[] timestamps = measurements.Select(x => x.Timestamp).ToArray();
+				List<DateTime> timestamps = measurements.Select(x => x.Timestamp).ToList();
 
 				hasReliableTimeBase = hasReliableTimeBase &&
 					timestamps[0].Date != DateTime.MinValue &&
@@ -189,10 +190,28 @@ namespace Tangra.KweeVanWoerden
                     }
 				}
 
-				double[] secondsFromUTMidnight = new double[timestamps.Length];
+                // Fill in missing timestamps when times are entered manually
+                if (!dataProvider.HasEmbeddedTimeStamps)
+                {
+                    int idx = 0;
+                    for (; idx < timestamps.Count / 2 && timestamps[idx] == DateTime.MinValue; idx++);
+                    int firstTimeStampIndex = idx;
+                    DateTime firstTimeStamp = timestamps[idx];
+
+                    idx = timestamps.Count - 1;
+                    for (; idx > timestamps.Count / 2 && timestamps[idx] == DateTime.MinValue; idx--) ;
+                    int lastTimeStampIndex = idx;
+                    DateTime lastTimeStamp = timestamps[idx];
+
+                    long ticksPerFrame = (lastTimeStamp.Ticks - firstTimeStamp.Ticks) / (lastTimeStampIndex - firstTimeStampIndex);
+                    for (int i = 0; i < timestamps.Count - 1; i++)
+                        timestamps[i] = firstTimeStamp.AddTicks(ticksPerFrame * (i - firstTimeStampIndex));
+                }
+
+				double[] secondsFromUTMidnight = new double[timestamps.Count];
 				long startFrameStartDayTicks = timestamps[0].Date.Ticks;
 
-				for (int i = 0; i < timestamps.Length; i++)
+                for (int i = 0; i < timestamps.Count; i++)
 				{
 					if (timestamps[i] != DateTime.MinValue)
 						secondsFromUTMidnight[i] = Math.Truncate(new TimeSpan(timestamps[i].Ticks - startFrameStartDayTicks).TotalSeconds * 10000) / 10000.0;
@@ -271,7 +290,7 @@ namespace Tangra.KweeVanWoerden
                         }
 
 
-                        result = Kwee_van_Woerden(times.Count, jdAtUtcMidnight, times.ToArray(), dataWithBgLst.ToArray(), dataBgLst.ToArray(), compDataWithBgLst.ToArray(), compBgLst.ToArray());
+                        result = Kwee_van_Woerden(times.Count, jdAtUtcMidnight, times.ToArray(), dataWithBgLst.ToArray(), dataBgLst.ToArray(), compDataWithBgLst.ToArray(), compBgLst.ToArray(), useFineGrainedBins);
 						polyResult = useCurveFitting
 							? PolynomialFit(times.Count, jdAtUtcMidnight, times.ToArray(), dataWithBgLst.ToArray(), dataBgLst.ToArray(), compDataWithBgLst.ToArray(), compBgLst.ToArray(), (int)result.Start_Light_Curve_Obs_Index, (int)result.Stop_Light_Curve_Obs_Index, result.Time_Of_Minimum)
 							: null;
@@ -364,7 +383,7 @@ namespace Tangra.KweeVanWoerden
 				}
 			}
 
-			KweeVanWoerdenResult result = Kwee_van_Woerden(dataPoints, jdAtUtcMidnight, times, varStar, varSky, compStar, compSky);
+			KweeVanWoerdenResult result = Kwee_van_Woerden(dataPoints, jdAtUtcMidnight, times, varStar, varSky, compStar, compSky, false);
 
             PolynomialFitResult polyResult = PolynomialFit(dataPoints, jdAtUtcMidnight, times, varStar, varSky, compStar, compSky, (int)result.Start_Light_Curve_Obs_Index, (int)result.Stop_Light_Curve_Obs_Index, result.Time_Of_Minimum);
 
@@ -530,9 +549,12 @@ namespace Tangra.KweeVanWoerden
 			return rv;
 		}
 
-		private KweeVanWoerdenResult Kwee_van_Woerden(long Number_Obs, double Time_First_JD, double[] SecondsFromTimeFirstJD, double[] Variable_Star_DN, double[] Variable_Sky_DN, double[] Comparison_Star_DN, double[] Comparison_Sky_DN)
+		private KweeVanWoerdenResult Kwee_van_Woerden(
+            long Number_Obs, double Time_First_JD, 
+            double[] SecondsFromTimeFirstJD, double[] Variable_Star_DN, double[] Variable_Sky_DN, double[] Comparison_Star_DN, double[] Comparison_Sky_DN,
+            bool fineGranedBins)
 		{
-			long BASE_NUMBER = 1000;
+            long BASE_NUMBER = fineGranedBins ? 1000 : 100;
 			/* Constant parameter */
 			long         Normal_Points = BASE_NUMBER + 1;         /* Number of evenly spaced data pairs used in the analysis */
 			long         Normal_Point_Middle;                     /* Index of the middle element of the normal point array */

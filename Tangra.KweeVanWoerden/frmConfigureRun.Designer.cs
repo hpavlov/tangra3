@@ -58,8 +58,10 @@
             this.btnCancel = new System.Windows.Forms.Button();
             this.cbsKvW = new System.Windows.Forms.CheckBox();
             this.cbxCurveFitting = new System.Windows.Forms.CheckBox();
+            this.rb100 = new System.Windows.Forms.RadioButton();
+            this.rb1000 = new System.Windows.Forms.RadioButton();
+            this.label1 = new System.Windows.Forms.Label();
             tbarFrom = new System.Windows.Forms.TrackBar();
-            ((System.ComponentModel.ISupportInitialize)(tbarFrom)).BeginInit();
             this.gbxVariable.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pb4)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pb3)).BeginInit();
@@ -72,18 +74,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.pb1c)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tbarTo)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picHistogram)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(tbarFrom)).BeginInit();
             this.SuspendLayout();
-            // 
-            // tbarFrom
-            // 
-            tbarFrom.LargeChange = 100;
-            tbarFrom.Location = new System.Drawing.Point(1, 197);
-            tbarFrom.Maximum = 256;
-            tbarFrom.Name = "tbarFrom";
-            tbarFrom.Size = new System.Drawing.Size(525, 42);
-            tbarFrom.SmallChange = 100;
-            tbarFrom.TabIndex = 18;
-            tbarFrom.ValueChanged += new System.EventHandler(this.DynamicRangeChanged);
             // 
             // gbxVariable
             // 
@@ -377,7 +369,7 @@
             this.cbsKvW.Checked = true;
             this.cbsKvW.CheckState = System.Windows.Forms.CheckState.Checked;
             this.cbsKvW.Enabled = false;
-            this.cbsKvW.Location = new System.Drawing.Point(340, 325);
+            this.cbsKvW.Location = new System.Drawing.Point(340, 338);
             this.cbsKvW.Name = "cbsKvW";
             this.cbsKvW.Size = new System.Drawing.Size(147, 17);
             this.cbsKvW.TabIndex = 22;
@@ -388,7 +380,7 @@
             // cbxCurveFitting
             // 
             this.cbxCurveFitting.AutoSize = true;
-            this.cbxCurveFitting.Location = new System.Drawing.Point(340, 345);
+            this.cbxCurveFitting.Location = new System.Drawing.Point(340, 358);
             this.cbxCurveFitting.Name = "cbxCurveFitting";
             this.cbxCurveFitting.Size = new System.Drawing.Size(108, 17);
             this.cbxCurveFitting.TabIndex = 23;
@@ -396,11 +388,56 @@
             this.cbxCurveFitting.UseVisualStyleBackColor = true;
             this.cbxCurveFitting.Visible = false;
             // 
+            // tbarFrom
+            // 
+            tbarFrom.LargeChange = 100;
+            tbarFrom.Location = new System.Drawing.Point(1, 197);
+            tbarFrom.Maximum = 256;
+            tbarFrom.Name = "tbarFrom";
+            tbarFrom.Size = new System.Drawing.Size(525, 42);
+            tbarFrom.SmallChange = 100;
+            tbarFrom.TabIndex = 18;
+            tbarFrom.ValueChanged += new System.EventHandler(this.DynamicRangeChanged);
+            // 
+            // rb100
+            // 
+            this.rb100.AutoSize = true;
+            this.rb100.Checked = true;
+            this.rb100.Location = new System.Drawing.Point(374, 313);
+            this.rb100.Name = "rb100";
+            this.rb100.Size = new System.Drawing.Size(43, 17);
+            this.rb100.TabIndex = 24;
+            this.rb100.TabStop = true;
+            this.rb100.Text = "100";
+            this.rb100.UseVisualStyleBackColor = true;
+            // 
+            // rb1000
+            // 
+            this.rb1000.AutoSize = true;
+            this.rb1000.Location = new System.Drawing.Point(423, 313);
+            this.rb1000.Name = "rb1000";
+            this.rb1000.Size = new System.Drawing.Size(49, 17);
+            this.rb1000.TabIndex = 25;
+            this.rb1000.Text = "1000";
+            this.rb1000.UseVisualStyleBackColor = true;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(338, 315);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(30, 13);
+            this.label1.TabIndex = 26;
+            this.label1.Text = "Bins:";
+            // 
             // frmConfigureRun
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(528, 412);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.rb1000);
+            this.Controls.Add(this.rb100);
             this.Controls.Add(this.cbxCurveFitting);
             this.Controls.Add(this.cbsKvW);
             this.Controls.Add(this.btnCancel);
@@ -421,7 +458,6 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Configure Reduction";
             this.Load += new System.EventHandler(this.frmConfigureRun_Load);
-            ((System.ComponentModel.ISupportInitialize)(tbarFrom)).EndInit();
             this.gbxVariable.ResumeLayout(false);
             this.gbxVariable.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pb4)).EndInit();
@@ -436,6 +472,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.pb1c)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.tbarTo)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.picHistogram)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(tbarFrom)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -472,5 +509,8 @@
         private System.Windows.Forms.PictureBox pb1c;
 		private System.Windows.Forms.CheckBox cbsKvW;
 		private System.Windows.Forms.CheckBox cbxCurveFitting;
+        private System.Windows.Forms.RadioButton rb100;
+        private System.Windows.Forms.RadioButton rb1000;
+        private System.Windows.Forms.Label label1;
     }
 }

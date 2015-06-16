@@ -28,6 +28,7 @@ namespace Tangra.KweeVanWoerden
 
 	    internal bool RunKvW = true;
 	    internal bool RunCurveFitting = false;
+        internal bool UseFineGrainedBins = false;
 
 	    private float[] m_DisplayData;
 
@@ -104,6 +105,7 @@ namespace Tangra.KweeVanWoerden
             IncludeDataFrom = 0;
             IncludeDataTo = m_DisplayData.Length - 1;
 
+            rb1000.Checked = TargetData.Length > 15000;
 	        DrawLightCurve();
         }
 
