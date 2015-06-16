@@ -109,3 +109,5 @@ _ReSharper.*
 /AdvLib.Core/.build-release
 /OcrTester/AutomatedTestingImages/testbed
 /OcrTester/AutomatedTestingImages/New
+/Tangra Releases
+/Tangra 3/lib/mathnet-numerics-3.7.0
