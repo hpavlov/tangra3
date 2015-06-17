@@ -22,11 +22,14 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 	        if (!m_MasterSpectra.IsCalibrated())
 	        {
 		        m_MasterSpectra.Calibration = m_SpectroscopyController.GetSpectraCalibration();
+                m_SpectroscopyController.GetSpectraCalibrator().PopulateWaveLengths(m_MasterSpectra);
 	        }
 			
 
             m_StateManager.Redraw();
         }
+
+        private static Pen s_SelectedLinePen = new Pen(Color.BlueViolet);
 
         public override void MouseClick(object sender, MouseEventArgs e)
         {
@@ -64,7 +67,12 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
             if (m_SelectedPoint != null)
             {
                 float x1 = m_StateManager.GetMouseXFromSpectraPixel(m_SelectedPoint.PixelNo);
-                g.DrawLine(Pens.BlueViolet, x1, 0, x1, m_View.Height);
+                float y1 = m_StateManager.YMin;
+                float y2 = m_StateManager.YMax;
+                g.DrawLine(s_SelectedLinePen, x1, y1, x1, y2);
+
+                if (Math.Abs(y2 - m_View.Height) > 10)
+                    g.DrawLine(s_SelectedLinePen, x1, m_View.Height - 10, x1, m_View.Height);
             }
         }
     }

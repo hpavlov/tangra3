@@ -355,7 +355,8 @@ namespace Tangra.Controller
             m_SpectraCalibrator = new SpectraCalibrator(masterSpectra);
 
 			m_ViewSpectraForm.SetMasterSpectra(masterSpectra);
-			m_ViewSpectraForm.Show();
+	        m_ViewSpectraForm.StartPosition = FormStartPosition.CenterParent;
+			m_ViewSpectraForm.Show(m_MainFormView);
 	    }
 
 	    public void EnsureViewSpectraFormClosed()

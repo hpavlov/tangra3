@@ -110,5 +110,13 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
         {
             return (int)Math.Round(m_ZeroPixelNo + (wavelength - m_ZeroWavelength)/m_AperPixels); 
         }
+
+        public void PopulateWaveLengths(Spectra spectra)
+        {
+            foreach (SpectraPoint point in spectra.Points)
+            {
+                point.Wavelength = ResolveWavelength(point.PixelNo);
+            }
+        }
     }
 }

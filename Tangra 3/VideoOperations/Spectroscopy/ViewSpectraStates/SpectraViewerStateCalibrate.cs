@@ -24,6 +24,9 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 			view.Cursor = Cursors.Arrow;
 		}
 
+	    private static Pen s_CalibrationLinePen = new Pen(Color.Green);
+        private static Pen s_ConfirmedCalibrationLinePen = new Pen(Color.FromArgb(90, 0, 127, 0));
+
         public override void Finalise()
         {
             if (m_frmEnterWavelength != null)
@@ -173,14 +176,14 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 			if (m_SelectedPoint != null)
 			{
 				float x1 = m_StateManager.GetMouseXFromSpectraPixel(m_SelectedPoint.PixelNo);
-				g.DrawLine(Pens.Green, x1, 0, x1, m_View.Height);
+                g.DrawLine(s_CalibrationLinePen, x1, 0, x1, m_View.Height);
 			}
 
 			if (m_FirstCalibrationPoint != null)
 			{
 
 				float x1 = m_StateManager.GetMouseXFromSpectraPixel(m_FirstCalibrationPoint.PixelNo);
-				g.DrawLine(Pens.Gray, x1, 0, x1, m_View.Height);
+                g.DrawLine(s_ConfirmedCalibrationLinePen, x1, 0, x1, m_View.Height);
 			}
 		}
 	}
