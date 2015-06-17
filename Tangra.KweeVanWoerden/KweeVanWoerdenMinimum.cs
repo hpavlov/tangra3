@@ -177,6 +177,18 @@ namespace Tangra.KweeVanWoerden
 					timestamps[measurements.Length - 1].Date != DateTime.MinValue &&
 					timestamps[0].Date.Ticks < timestamps[measurements.Length - 1].Ticks;
 
+				int numAvailableTimestamps = timestamps.Count(x => x != DateTime.MinValue && x != DateTime.MaxValue);
+				if (numAvailableTimestamps < 2)
+				{
+					MessageBox.Show(
+						m_TangraHost.ParentWindow,
+						"This light curve does not seem to have timestamps saved and cannot be processed.",
+						"Eclipsing Binaries Addin for Tangra",
+						MessageBoxButtons.OK,
+						MessageBoxIcon.Error);
+					return;
+				}
+
 				if (!hasReliableTimeBase)
 				{
                     if (MessageBox.Show(
@@ -204,7 +216,7 @@ namespace Tangra.KweeVanWoerden
                     DateTime lastTimeStamp = timestamps[idx];
 
                     long ticksPerFrame = (lastTimeStamp.Ticks - firstTimeStamp.Ticks) / (lastTimeStampIndex - firstTimeStampIndex);
-                    for (int i = 0; i < timestamps.Count - 1; i++)
+                    for (int i = 0; i < timestamps.Count; i++)
                         timestamps[i] = firstTimeStamp.AddTicks(ticksPerFrame * (i - firstTimeStampIndex));
                 }
 
@@ -672,7 +684,7 @@ namespace Tangra.KweeVanWoerden
                             emptyBins.Add(double.NaN);
                         }
                         double? nextBin = k == Normal_Points ? (double?)null : Luminosity_Normal[k];
-                        double? nextBin2 = k + 1 < Normal_Points ? (double?)null : Luminosity_Normal[k + 1];
+						double? nextBin2 = k + 1 < Normal_Points || k + 1 >= Luminosity_Normal.Length ? (double?)null : Luminosity_Normal[k + 1];
 
                         if ((prevBin == null && nextBin2 == null) || (prevBin2 == null && nextBin == null))
                         {

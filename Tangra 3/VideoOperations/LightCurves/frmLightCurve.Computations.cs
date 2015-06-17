@@ -1319,7 +1319,10 @@ namespace Tangra.VideoOperations.LightCurves
 			GetAOTAStarIndexes(out occultedStarIndex, out comp1Index, out comp2Index, out comp3Index);
 
 			if (m_LightCurveController.Context.Binning > 0)
-				return m_AllBinnedReadings[occultedStarIndex].Select(x => new SingleMeasurement(x, occultedStarIndex, x.BinMiddleFrameNo + (m_LightCurveController.Context.Binning / 2.0), m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
+			{
+				int totalBins = m_AllBinnedReadings[0].Count;
+				return m_AllBinnedReadings[occultedStarIndex].Select(x => new SingleMeasurement(x, occultedStarIndex, x.BinMiddleFrameNo + (m_LightCurveController.Context.Binning / 2.0), m_LCFile, m_TimestampDiscrepencyFlag, totalBins)).ToArray();
+			}
 			else
                 return m_LightCurveController.Context.AllReadings[occultedStarIndex].Select(x => new SingleMeasurement(x, x.CurrFrameNo, m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
 		}
@@ -1339,12 +1342,13 @@ namespace Tangra.VideoOperations.LightCurves
 			GetAOTAStarIndexes(out occultedStarIndex, out comp1Index, out comp2Index, out comp3Index);
 			if (m_LightCurveController.Context.Binning > 0)
 			{
+				int totalBins = m_AllBinnedReadings[0].Count;
 				if (comparisonObjectId == 0 && comp1Index > -1)
-					return m_AllBinnedReadings[comp1Index].Select(x => new SingleMeasurement(x, comp1Index, x.BinMiddleFrameNo + (m_LightCurveController.Context.Binning / 2.0), m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
+					return m_AllBinnedReadings[comp1Index].Select(x => new SingleMeasurement(x, comp1Index, x.BinMiddleFrameNo + (m_LightCurveController.Context.Binning / 2.0), m_LCFile, m_TimestampDiscrepencyFlag, totalBins)).ToArray();
 				else if (comparisonObjectId == 1 && comp2Index > -1)
-					return m_AllBinnedReadings[comp2Index].Select(x => new SingleMeasurement(x, comp2Index, x.BinMiddleFrameNo + (m_LightCurveController.Context.Binning / 2.0), m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
+					return m_AllBinnedReadings[comp2Index].Select(x => new SingleMeasurement(x, comp2Index, x.BinMiddleFrameNo + (m_LightCurveController.Context.Binning / 2.0), m_LCFile, m_TimestampDiscrepencyFlag, totalBins)).ToArray();
 				else if (comparisonObjectId == 2 && comp3Index > -1)
-					return m_AllBinnedReadings[comp3Index].Select(x => new SingleMeasurement(x, comp3Index, x.BinMiddleFrameNo + (m_LightCurveController.Context.Binning / 2.0), m_LCFile, m_TimestampDiscrepencyFlag)).ToArray();
+					return m_AllBinnedReadings[comp3Index].Select(x => new SingleMeasurement(x, comp3Index, x.BinMiddleFrameNo + (m_LightCurveController.Context.Binning / 2.0), m_LCFile, m_TimestampDiscrepencyFlag, totalBins)).ToArray();
 			}
 			else
 			{

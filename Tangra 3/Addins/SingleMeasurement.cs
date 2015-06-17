@@ -47,15 +47,16 @@ namespace Tangra.Addins
             IsSuccessful = lcMeasurement.IsSuccessfulReading;
 		}
 
-        internal SingleMeasurement(frmLightCurve.BinnedValue binnedMeasurement, int targetNo, double binMiddleFrameNo, LCFile lcFile, bool dontIncludeTimes)
+        internal SingleMeasurement(frmLightCurve.BinnedValue binnedMeasurement, int targetNo, double binMiddleFrameNo, LCFile lcFile, bool dontIncludeTimes, int totalBins)
 		{
 			CurrFrameNo = (int)binnedMeasurement.BinNo;
 			TargetNo = (byte)targetNo;
 			Measurement = binnedMeasurement.IsSuccessfulReading ? (float)binnedMeasurement.AdjustedValue : INVALID_MEASUREMENT_VALUE;
 			Background = binnedMeasurement.IsSuccessfulReading ? (float)binnedMeasurement.BackgroundValue : INVALID_MEASUREMENT_VALUE;
             string isCorrectedForInstrumentalDelay;
-            if (dontIncludeTimes || 
-                !lcFile.Footer.ReductionContext.HasEmbeddedTimeStamps /* If the times are entered by the user, only include the times for the frames enterred by the user*/)
+            if (dontIncludeTimes ||
+				/* If the times are entered by the user, only include the times for the first and last bin derived from the frame times enterred by the user*/
+				(!lcFile.Footer.ReductionContext.HasEmbeddedTimeStamps && binnedMeasurement.BinNo != 1 && binnedMeasurement.BinNo != totalBins))
             {
                 Timestamp = DateTime.MinValue;
                 isCorrectedForInstrumentalDelay = null;
