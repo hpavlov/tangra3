@@ -17,8 +17,20 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
         public float RawSignal;
         public float RawSignalPixelCount;
 		public float RawBackgroundPerPixel;
-        public float RawValue;
-		public float SmoothedValue;
+
+	    private float m_RawValue;
+        public float RawValue 
+        {
+            get { return m_RawValue; }
+            set
+            {
+                m_RawValue = value;
+                ProcessedValue = m_RawValue;
+            }
+        }
+	    public float SmoothedValue;
+
+        public float ProcessedValue;
 
 		private static int SERIALIZATION_VERSION = 1;
 

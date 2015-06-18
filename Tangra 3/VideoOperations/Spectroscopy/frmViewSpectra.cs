@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -9,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Tangra.Controller;
+using Tangra.Model.Helpers;
 using Tangra.VideoOperations.Spectroscopy.Helpers;
 using Tangra.VideoOperations.Spectroscopy.ViewSpectraStates;
 
@@ -182,5 +184,23 @@ namespace Tangra.VideoOperations.Spectroscopy
 		{
 			m_StateManager.PreviewKeyDown(sender, e);
 		}
+
+        private void ApplyLowPassFilterMenuItemClicked(object sender, EventArgs e)
+        {
+            var ctl = sender as ToolStripItem;
+            if (ctl != null)
+            {
+                try
+                {
+                    float fwhm = Convert.ToSingle(ctl.Tag);
+
+                    m_StateManager.ApplyGaussianBlur(fwhm);
+                }
+                catch (Exception ex)
+                {
+                    Trace.WriteLine(ex.GetFullStackTrace());
+                }
+            }
+        }
     }
 }

@@ -160,13 +160,13 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 
                 foreach (SpectraPoint point in m_MasterSpectra.Points)
 				{
-					byte clr = (byte)(Math.Max(0, Math.Min(255, Math.Round(point.RawValue * m_ColorCoeff))));
+					byte clr = (byte)(Math.Max(0, Math.Min(255, Math.Round(point.ProcessedValue * m_ColorCoeff))));
 					float x = xAxisOffset + xCoeff * (point.PixelNo - m_XOffset);
 					if (x >= 0)
 					{
 						g.FillRectangle(s_GreyBrushes[clr], x, 0, xCoeff, picSpectra.Height);
 
-						PointF graphPoint = new PointF(x, picSpectraGraph.Image.Height - BORDER_GAP - (float)Math.Round(point.RawValue * yCoeff) - yAxisOffset);
+                        PointF graphPoint = new PointF(x, picSpectraGraph.Image.Height - BORDER_GAP - (float)Math.Round(point.ProcessedValue * yCoeff) - yAxisOffset);
 						if (prevPoint != PointF.Empty)
 						{
                             if (!isCalibrated || (calibratedGraphArea.Contains(prevPoint) && calibratedGraphArea.Contains(graphPoint)))
@@ -324,6 +324,53 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
         {
             if (m_CurrentState != null)
                 m_CurrentState.PreviewKeyDown(sender, e);
+        }
+
+        private static float FWHM_COEFF = (float)(4 * Math.Log(2));
+
+        private float GetGaussianValue(float fwhm, float distance)
+        {
+            // FWHM * FWHM = 4 * (2 ln(2)) * c * c => 2*c*c = FWHM*FWHM / (4 * ln(2))
+            return (float)Math.Exp(-FWHM_COEFF * distance * distance / (fwhm * fwhm));
+        }
+
+        public void ApplyGaussianBlur(float fwhm)
+        {
+            if (Math.Abs(fwhm) < 0.0001 || float.IsNaN(fwhm))
+            {
+                foreach (SpectraPoint point in m_MasterSpectra.Points)
+                    point.ProcessedValue = point.RawValue;
+            }
+            else
+            {
+                float[] kernel = new float[21];
+                for (int i = 0; i < 10; i++)
+                {
+                    kernel[10 + i] = kernel[10 - i] = GetGaussianValue(fwhm, i);
+                }
+
+                for (int i = 0; i < m_MasterSpectra.Points.Count; i++)
+                {
+                    SpectraPoint point = m_MasterSpectra.Points[i];
+                    float sum = 0;
+                    float weight = 0;
+                    for (int j = -10; j <= 10; j++)
+                    {
+                        if (j + i > 0 && j + i < m_MasterSpectra.Points.Count - 1)
+                        {
+                            weight += kernel[j + 10];
+                            sum += kernel[j + 10] * m_MasterSpectra.Points[j + i].RawValue;
+                        }
+                    }
+
+                    if (weight > 0)
+                        point.ProcessedValue = sum / weight;
+                    else
+                        point.ProcessedValue = point.RawValue;
+                }
+            }
+
+            Redraw();
         }
 	}
 }
