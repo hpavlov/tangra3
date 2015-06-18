@@ -53,6 +53,7 @@ namespace Tangra.OCR
                 // Leave this to capture statistics
                 m_VideoController.RegisterExtractingOcrTimestamps();
 
+	        m_LatestFrameImage = data;
 
             // TODO: Add main OCR Implementation HERE
 

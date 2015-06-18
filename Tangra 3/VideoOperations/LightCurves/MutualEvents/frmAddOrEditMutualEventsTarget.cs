@@ -59,7 +59,6 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 	    private int m_AutoDoubleX2Start;
 	    private int m_AutoDoubleY2Start;
 
-        private TangraConfig.PreProcessingFilter SelectedFilter;
         private uint[,] m_ProcessingPixels;
         private byte[,] m_DisplayPixels;
         private LCStateMachine m_State;
@@ -440,20 +439,7 @@ namespace Tangra.VideoOperations.LightCurves.MutualEvents
 						Color pixelcolor = SystemColors.Control;
 
 						if (pixelValue < TangraConfig.Settings.Photometry.Saturation.Saturation8Bit)
-						{
-							if (SelectedFilter == TangraConfig.PreProcessingFilter.LowPassDifferenceFilter)
-							{
-								pixelcolor = Color.FromArgb(150 * pixelValue / peak, 150 * pixelValue / peak,
-															150 * pixelValue / peak);
-							}
-							else if (SelectedFilter == TangraConfig.PreProcessingFilter.LowPassFilter)
-							{
-								if (x >= 1 && x < AREA_SIDE && y >= 1 && y < AREA_SIDE)
-									pixelcolor = Color.FromArgb(pixelValue, pixelValue, pixelValue);
-							}
-							else
-								pixelcolor = Color.FromArgb(pixelValue, pixelValue, pixelValue);
-						}
+							pixelcolor = Color.FromArgb(pixelValue, pixelValue, pixelValue);
 						else
 							pixelcolor = TangraConfig.Settings.Color.Saturation;
 

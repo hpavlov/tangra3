@@ -354,12 +354,6 @@
     <Compile Include="VideoOperations\Astrometry\Engine\CalibrationContext.cs" />
     <Compile Include="VideoOperations\Astrometry\Engine\FieldSolveContext.cs" />
     <Compile Include="VideoOperations\Astrometry\Engine\PlateCalibration.cs" />
-    <Compile Include="VideoOperations\Astrometry\frmAdjustStarMap.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="VideoOperations\Astrometry\frmAdjustStarMap.Designer.cs">
-      <DependentUpon>frmAdjustStarMap.cs</DependentUpon>
-    </Compile>
     <Compile Include="VideoOperations\Astrometry\frmChooseCamera.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -940,9 +934,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ImageTools\frmIdentifyCalibrationStar.resx">
       <DependentUpon>frmIdentifyCalibrationStar.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="VideoOperations\Astrometry\frmAdjustStarMap.resx">
-      <DependentUpon>frmAdjustStarMap.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\Astrometry\frmChooseCamera.resx">
       <DependentUpon>frmChooseCamera.cs</DependentUpon>

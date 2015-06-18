@@ -46,8 +46,8 @@ namespace Tangra.ImageTools
 			ObjectSelected
 		}
 
-		private SelectObjectState m_State = SelectObjectState.NoObject;
-		private PlateConstStarPair m_Object;
+		protected SelectObjectState m_State;
+		protected PlateConstStarPair m_Object;
 
 		private AstrometricState m_AstrometricState;
 		private AstrometryController m_AstrometryController;

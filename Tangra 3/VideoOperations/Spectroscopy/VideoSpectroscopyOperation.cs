@@ -40,7 +40,6 @@ namespace Tangra.VideoOperations.Spectroscopy
         private int m_OriginalHeight;
         private RectangleF m_OriginalVideoFrame;
 
-	    private int m_MeasuredFrames;
 	    private int m_FramesToMeasure;
 	    private SpectraReader m_Reader;
 		private SpectroscopyStarTracker m_Tracker;
@@ -112,7 +111,6 @@ namespace Tangra.VideoOperations.Spectroscopy
         internal void StartMeasurements(int numMeasurements, int spectraReaderHalfWidth, int spectraReaderBackgroundHalfWidth, 
             PixelCombineMethod backgroundMethod, PixelCombineMethod frameCombineMethod, bool useFineAdjustments, bool useLowPassFilter)
 	    {
-		    m_MeasuredFrames = 0;
 			m_FramesToMeasure = numMeasurements;
 
 		    var starToTrack = new TrackedObjectConfig()

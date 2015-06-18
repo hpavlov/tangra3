@@ -410,7 +410,6 @@ namespace Tangra.ImageTools
 
 			int bytes;
 			int bytesPerPixel;
-			byte[] selectedPoints;
 			int selIdx;
 
 			Bitmap featureBitmap = new Bitmap(31 * 8, 31 * 8, PixelFormat.Format24bppRgb);

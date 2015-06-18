@@ -23,6 +23,7 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
         {
             m_PreProcessFrames = preProcessFrames;
 			m_Filter = filter;
+			m_Bpp = bpp;
         }
 
 		#region IFramePreProcessor Members

@@ -346,8 +346,6 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 		private float STELLAR_OBJECT_MIN_CERTAINTY;
 		private float GUIDING_STAR_MIN_CERTAINTY;
 
-		private bool m_IsFullDisappearance;
-
 		private List<TrackedObjectGroup> m_TrackedObjectGroups = new List<TrackedObjectGroup>();
 
 		internal MutualEventTracker(List<TrackedObjectConfig> measuringStars, bool isFullDisappearance)

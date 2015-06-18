@@ -136,8 +136,6 @@ namespace Tangra.VideoOperations.LightCurves
                 ((int)(ellapsedMinutes * 60) % 60).ToString().PadLeft(2, '0'));
         }
 
-        private SpinLock m_MutiCPULock;
-
         private void Worker(object state)
         {
             bool useLowPassDiff = Context.Filter == LightCurveContext.FilterType.LowPassDifference;

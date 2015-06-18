@@ -13,7 +13,6 @@ using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.Model.VideoOperations;
 using Tangra.OCR.IotaVtiOsdProcessor;
-using Tangra.PInvoke;
 
 namespace Tangra.OCR
 {

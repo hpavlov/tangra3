@@ -17,8 +17,7 @@ namespace Tangra.VideoOperations.Spectroscopy
 
 		internal int SpectraFileFormatVersion;
 
-		private static short LC_LAST_SUPPORTED_FILE_VERSION = 1;
-        private static short LC_FILE_VERSION = 1;
+        private static short SPECTRA_FILE_VERSION = 1;
 
 		public static void Save(string fileName, SpectraFileHeader header, MasterSpectra data)
 		{
@@ -26,7 +25,7 @@ namespace Tangra.VideoOperations.Spectroscopy
 			using (DeflateStream deflateStream = new DeflateStream(fileStr, CompressionMode.Compress, true))
 			using (BinaryWriter writer = new BinaryWriter(deflateStream))
             {
-                writer.Write(LC_FILE_VERSION);
+				writer.Write(SPECTRA_FILE_VERSION);
 
                 header.WriteTo(writer);
 
@@ -54,7 +53,7 @@ namespace Tangra.VideoOperations.Spectroscopy
             using (var reader = new BinaryReader(deflateStream))
             {
 	            short version = reader.ReadInt16();
-	            if (version > LC_FILE_VERSION)
+				if (version > SPECTRA_FILE_VERSION)
 	            {
 		            MessageBox.Show("This spectra file requires a newer version of Tangra.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
 		            return null;

@@ -71,11 +71,9 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
                 case NativeTrackerNotMeasuredReasons.ObjectCertaintyTooSmall:
                     return (uint)NotMeasuredReasons.ObjectCertaintyTooSmall;
-                    break;
 
                 case NativeTrackerNotMeasuredReasons.FWHMOutOfRange:
                     return (uint)NotMeasuredReasons.FWHMOutOfRange;
-                    break;
 
                 case NativeTrackerNotMeasuredReasons.ObjectTooElongated:
                     return (uint)NotMeasuredReasons.ObjectTooElongated;

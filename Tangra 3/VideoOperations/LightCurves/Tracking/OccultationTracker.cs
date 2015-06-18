@@ -488,22 +488,5 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                 AutoDiscoveredStars.Clear();
             }
         }
-
-        private class TrackedObjectPair
-        {
-            public TrackedObject TrackedObject1;
-            public TrackedObject TrackedObject2;
-        }
-
-        private class CandidateTriangle
-        {
-            public CandidatePair Pair1;
-            public CandidatePair Pair2;
-            public CandidatePair Pair3;
-            public int Weight
-            {
-                get { return Pair1.Weight + Pair2.Weight + Pair3.Weight;  }
-            }
-        }
     }
 }

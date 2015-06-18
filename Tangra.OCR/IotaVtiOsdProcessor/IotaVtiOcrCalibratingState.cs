@@ -23,12 +23,10 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 			Array.Copy(image, Image, image.Length);
 		}
 
-		public int FrameNo;
 		public bool IsOddField;
 
 		public int BlockWidth;
 		public int BlockHeight;
-		public int BlockOffsetX;
 		public int BlockOffsetY;
 		public int[] BlockOffsetsX = new int[IotaVtiOcrProcessor.MAX_POSITIONS];
 
@@ -693,13 +691,6 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 
 			for (; ; )
 			{
-				if (index == 0 && normalizedPositions[0].FrameNo != normalizedPositions[1].FrameNo)
-				{
-					Trace.Assert(false);
-					index++;
-					continue;
-				}
-
 				if (index == totalTimestamps - 1)
 					break;
 

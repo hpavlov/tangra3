@@ -269,7 +269,8 @@ namespace Tangra.VideoOperations.LightCurves
                     if (frm.ShowDialog(this) != DialogResult.OK)
                         return;
 
-                    m_ConfirmedDate = frm.SelectedDay.Value;
+					if (frm.SelectedDay.HasValue)
+						m_ConfirmedDate = frm.SelectedDay.Value;
                 }
             }
 

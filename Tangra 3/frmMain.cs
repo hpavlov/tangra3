@@ -176,7 +176,7 @@ namespace Tangra
 		private int m_CurrentFrameId = -1;
 		
 		private Stopwatch m_sw = new Stopwatch();
-		private volatile int m_RefreshFrameLockOwner;
+		private int m_RefreshFrameLockOwner;
 		private bool m_RefreshAtTheEndOfRenderFrame = false;
 		private SpinLock m_ReentrancyGuard = new SpinLock(true);
 

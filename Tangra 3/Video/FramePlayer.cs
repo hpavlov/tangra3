@@ -606,7 +606,6 @@ namespace Tangra.Video
 						Thread.Sleep(1);
 					}
 
-					bool taken = false;
 					lock (m_FrameBitmapLock)
 					{
 						try

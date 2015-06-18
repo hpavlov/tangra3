@@ -47,6 +47,8 @@ namespace Tangra.VideoOperations.Astrometry
 
 		private void ucCameraSettings_Load(object sender, EventArgs e)
 		{
+			if (DesignMode) return;
+
 			m_SelectedCamera = TangraConfig.Settings.PlateSolve.SelectedCameraModel;
 			ReloadCameras();
 

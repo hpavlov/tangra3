@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Tangra.Model.Config;
 
-namespace Tangra.PInvoke
+namespace Tangra.OCR
 {
 	public static class TangraCore
 	{
