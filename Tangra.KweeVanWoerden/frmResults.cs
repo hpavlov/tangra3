@@ -186,7 +186,7 @@ namespace Tangra.KweeVanWoerden
             frm.ShowDialog(this);
             if (!double.IsNaN(frm.TimeOfMinimumHJD))
             {
-                tbxT0HJD.Text = frm.TimeOfMinimumHJD.ToString();
+                tbxT0HJD.Text = Convert.ToString(frm.TimeOfMinimumHJD);
                 if (PolyResults != null)
                     tbxT0HJD_CF.Text = (frm.TimeCorrectionHJD + PolyResults.Time_Of_Minimum_JD).ToString();
 

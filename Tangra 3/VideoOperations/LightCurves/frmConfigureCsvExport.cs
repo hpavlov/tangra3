@@ -268,9 +268,10 @@ namespace Tangra.VideoOperations.LightCurves
                     frm.StartPosition = FormStartPosition.CenterParent;
                     if (frm.ShowDialog(this) != DialogResult.OK)
                         return;
+                    DateTime? selectedDate = frm.SelectedDay;
 
-					if (frm.SelectedDay.HasValue)
-						m_ConfirmedDate = frm.SelectedDay.Value;
+                    if (selectedDate.HasValue)
+                        m_ConfirmedDate = selectedDate.Value;
                 }
             }
 

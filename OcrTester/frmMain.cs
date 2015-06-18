@@ -27,8 +27,6 @@ namespace OcrTester
 		private Bitmap m_CurrentImage;
 		private Pixelmap m_Pixelmap;
         private IotaVtiOcrProcessor m_Processor;
-		private int m_Width = 0;
-		private int m_Height = 0;
 
 		public frmMain()
 		{

@@ -586,7 +586,7 @@ namespace Tangra.KweeVanWoerden
 			double       Luminosity_Faintest;                     /* Faintest normalized luminosity */
 			long         Luminosity_Faintest_Index;               /* Index of the faintest normalized luminosity */
 			long         Start_Light_Curve;                       /* Start element of normalized light curve to analyze */
-			long         Middle_Light_Curve;                      /* Middle element of normalized light curve to analyze */
+			//long         Middle_Light_Curve;                      /* Middle element of normalized light curve to analyze */
 			long         Stop_Light_Curve;                        /* Stop element of normalized light curve to analyze */
 			long         Start_Sum_Squares;                       /* Start element of the sum-of-squares array */
 			long         Stop_Sum_Squares;                        /* Stop element of the sum-of-squares array */
@@ -601,8 +601,8 @@ namespace Tangra.KweeVanWoerden
 			double       A, B, C;                                 /* Intermediate values for quadratic equation */
 			double       T0;                                      /* Time of symmetry */
 			double       T0_Uncertainty;                          /* Time of symmetry uncertainty */
-			double       Time_Of_Minimum;                         /* Time of minimum light */
-			double       Time_Of_Minimum_Uncertainty;             /* Time of minimum light uncertainty */
+			//double       Time_Of_Minimum;                         /* Time of minimum light */
+			//double       Time_Of_Minimum_Uncertainty;             /* Time of minimum light uncertainty */
 
 			/* Loop indices */
 			long         i, j;                                    /* Loop indices */

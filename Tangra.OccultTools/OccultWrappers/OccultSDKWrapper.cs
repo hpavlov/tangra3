@@ -69,8 +69,6 @@ namespace Tangra.OccultTools.OccultWrappers
 
             private static string s_IncompatibleVersionOfOccultErrorMessage = null;
 
-            private static bool s_NeedNewVersionOfTangra = false;
-
             public static string HasSupportedVersionOfOccult(string occultLocation)
             {
                 try
@@ -113,8 +111,6 @@ namespace Tangra.OccultTools.OccultWrappers
             {
                 if (AssemblyOccultUtilities == null)
                 {
-                    s_NeedNewVersionOfTangra = false;
-
                     string path = Path.Combine(occultLocation, "OccultUtilities.dll");
                     if (!File.Exists(path))
                     {
@@ -164,7 +160,6 @@ namespace Tangra.OccultTools.OccultWrappers
                                 if (requiredVersion > currentVersion)
                                 {
                                     s_IncompatibleVersionOfOccultErrorMessage = "Your version of Occult is newer than the version supported by Tangra3. Please update Tangra3 to use AOTA.";
-                                    s_NeedNewVersionOfTangra = true;
                                     return;
                                 }
                                 else if (requiredVersion < currentVersion)
@@ -194,7 +189,6 @@ namespace Tangra.OccultTools.OccultWrappers
                             if (supportedVersion < currOccultVersion)
                             {
                                 s_IncompatibleVersionOfOccultErrorMessage = "Your version of Occult  " + currOccultVersion.ToString() + " is newer than the version supported by Tangra3. Please update Tangra3 to use AOTA.";
-                                s_NeedNewVersionOfTangra = true;
                             }
                             else
                             {

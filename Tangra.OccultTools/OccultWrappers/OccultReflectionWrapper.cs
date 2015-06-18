@@ -65,8 +65,6 @@ namespace Tangra.OccultTools.OccultWrappers
             private static PropertyInfo AOTA_Version;
             private static PropertyInfo AOTA_ResultsAreAvailable;
 
-            private static BindingFlags OccultBindingFlags;
-
             private static bool? s_IsOccultSupported = null;
 
             private static object m_AotaInstance = null;

@@ -22,12 +22,10 @@ namespace OcrTester.IotaVtiOsdProcessor
 			Array.Copy(image, Image, image.Length);
 		}
 
-		public int FrameNo;
 		public bool IsOddField;
 
 		public int BlockWidth;
 		public int BlockHeight;
-		public int BlockOffsetX;
 		public int BlockOffsetY;
 		public int[] BlockOffsetsX = new int[IotaVtiOcrProcessor.MAX_POSITIONS];
 
@@ -430,7 +428,7 @@ namespace OcrTester.IotaVtiOsdProcessor
 
 			List<int> distinctPositions = confirmedBlockPositions.Distinct().ToList();
 			distinctPositions.Sort();
-			int idx = 0;
+
 			int posIdx = 0;
 			stateManager.BlockOffsetsX = new int[IotaVtiOcrProcessor.MAX_POSITIONS];
 			for (int i = 0; i < IotaVtiOcrProcessor.MAX_POSITIONS; i++)
@@ -672,13 +670,6 @@ namespace OcrTester.IotaVtiOsdProcessor
 
 			for (; ; )
 			{
-				if (index == 0 && normalizedPositions[0].FrameNo != normalizedPositions[1].FrameNo)
-				{
-					Trace.Assert(false);
-					index++;
-					continue;
-				}
-
 				if (index == totalTimestamps - 1)
 					break;
 
