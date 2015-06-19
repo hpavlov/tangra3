@@ -40,7 +40,6 @@ namespace Tangra.VideoOperations.Spectroscopy
         private int m_OriginalHeight;
         private RectangleF m_OriginalVideoFrame;
 
-	    private int m_FramesToMeasure;
 	    private SpectraReader m_Reader;
 		private SpectroscopyStarTracker m_Tracker;
 
@@ -48,13 +47,16 @@ namespace Tangra.VideoOperations.Spectroscopy
 		public IImagePixel SelectedStar { get; private set; }
         public Point SelectedAnglePoint { get; private set; }
         public double SelectedStarFWHM { get; private set; }
-		public int SpectraReaderHalfWidth { get; private set; }
-		public int SpectraReaderBackgroundHalfWidth { get; private set; }
-        private PixelCombineMethod m_BackgroundMethod;
-	    private PixelCombineMethod m_FrameCombineMethod;
-        private bool m_UseFineAdjustments;
+
+        public int MeasurementAreaWing { get; private set; }
+        public int BackgroundAreaWing { get; private set; }
+
         private List<Spectra> m_AllFramesSpectra = new List<Spectra>();
 	    private MasterSpectra m_MasterSpectra;
+
+        private int m_CurrentFrameNo;
+        private int? m_FirstMeasuredFrame;
+        private DateTime? m_FirstFrameTimeStamp;
 
 		private PSFFit m_SelectedStarGaussian;
 		public float SelectedStarBestAngle { get; private set; }
@@ -78,7 +80,7 @@ namespace Tangra.VideoOperations.Spectroscopy
                 {
                     if (m_ControlPanel == null)
                     {
-						m_ControlPanel = new ucSpectroscopy(this, (VideoController)videoContoller, framePlayer);
+						m_ControlPanel = new ucSpectroscopy(this, (VideoController)videoContoller, m_SpectroscopyController, framePlayer);
                     }
                 }
             }
@@ -108,10 +110,10 @@ namespace Tangra.VideoOperations.Spectroscopy
             
         }
 
-        internal void StartMeasurements(int numMeasurements, int spectraReaderHalfWidth, int spectraReaderBackgroundHalfWidth, 
-            PixelCombineMethod backgroundMethod, PixelCombineMethod frameCombineMethod, bool useFineAdjustments, bool useLowPassFilter)
+        internal void StartMeasurements()
 	    {
-			m_FramesToMeasure = numMeasurements;
+            MeasurementAreaWing = m_SpectroscopyController.SpectraReductionContext.MeasurementAreaWing;
+            BackgroundAreaWing = m_SpectroscopyController.SpectraReductionContext.BackgroundAreaWing;
 
 		    var starToTrack = new TrackedObjectConfig()
 		    {
@@ -129,26 +131,31 @@ namespace Tangra.VideoOperations.Spectroscopy
 
 			m_Tracker = new SpectroscopyStarTracker(starToTrack);
 
-	        SpectraReaderHalfWidth = spectraReaderHalfWidth;
-			SpectraReaderBackgroundHalfWidth = spectraReaderBackgroundHalfWidth;
-			m_OperationState = SpectroscopyState.RunningMeasurements;
-            m_BackgroundMethod = backgroundMethod;
-			m_FrameCombineMethod = frameCombineMethod;
-		    m_UseFineAdjustments = useFineAdjustments;
+            m_OperationState = SpectroscopyState.RunningMeasurements;
 	        m_AllFramesSpectra.Clear();
 
 			m_ControlPanel.MeasurementsStarted();
 
-            if (useLowPassFilter)
+
+            if (m_SpectroscopyController.SpectraReductionContext.UseLowPassFilter)
                 TangraCore.PreProcessors.AddDigitalFilter(TangraConfig.PreProcessingFilter.LowPassFilter);
 
+            m_FirstMeasuredFrame = null;
 			m_FramePlayer.Start(FramePlaySpeed.Fastest, null, 1);
 	    }
 
         public void NextFrame(int frameNo, MovementType movementType, bool isLastFrame, AstroImage astroImage, int firstFrameInIntegrationPeriod, string fileName)
         {
+            m_CurrentFrameNo = frameNo;
+
 	        if (m_OperationState == SpectroscopyState.RunningMeasurements)
 	        {
+                if (m_FirstMeasuredFrame == null)
+                {
+                    m_FirstMeasuredFrame = m_CurrentFrameNo;
+                    if (m_VideoController.HasEmbeddedTimeStamps()) m_FirstFrameTimeStamp = m_VideoController.GetCurrentFrameTime();
+                }
+
 		        m_Tracker.NextFrame(frameNo, astroImage);
 		        if (m_Tracker.IsTrackedSuccessfully)
 		        {
@@ -157,15 +164,31 @@ namespace Tangra.VideoOperations.Spectroscopy
 
                     m_Reader = new SpectraReader(astroImage, SelectedStarBestAngle);
 
-                    Spectra thisFrameSpectra = m_Reader.ReadSpectra(trackedStar.ThisFrameX, trackedStar.ThisFrameY, SpectraReaderHalfWidth, SpectraReaderBackgroundHalfWidth, m_BackgroundMethod);
+                    Spectra thisFrameSpectra = m_Reader.ReadSpectra(
+                        trackedStar.ThisFrameX, 
+                        trackedStar.ThisFrameY, 
+                        m_SpectroscopyController.SpectraReductionContext.MeasurementAreaWing, 
+                        m_SpectroscopyController.SpectraReductionContext.BackgroundAreaWing, 
+                        m_SpectroscopyController.SpectraReductionContext.BackgroundMethod);
+
 		            m_AllFramesSpectra.Add(thisFrameSpectra);
 		        }
 
-                if (isLastFrame || m_AllFramesSpectra.Count >= m_FramesToMeasure)
+                if (isLastFrame || m_AllFramesSpectra.Count >= m_SpectroscopyController.SpectraReductionContext.FramesToMeasure)
                 {
                     m_FramePlayer.Stop();
-					m_MasterSpectra = m_SpectroscopyController.ComputeResult(m_AllFramesSpectra, m_FrameCombineMethod, m_UseFineAdjustments);
+
+                    m_MasterSpectra = m_SpectroscopyController.ComputeResult(
+                        m_AllFramesSpectra, 
+                        m_SpectroscopyController.SpectraReductionContext.FrameCombineMethod,
+                        m_SpectroscopyController.SpectraReductionContext.UseFineAdjustments);
+
                     m_AllFramesSpectra.Clear();
+
+                    m_MasterSpectra.MeasurementInfo = m_SpectroscopyController.GetMeasurementInfo();
+                    m_MasterSpectra.MeasurementInfo.FirstMeasuredFrame = m_FirstMeasuredFrame.Value;
+                    m_MasterSpectra.MeasurementInfo.LastMeasuredFrame = m_CurrentFrameNo;
+
 					m_OperationState = SpectroscopyState.DisplayingMeasurements;
 	                m_ControlPanel.MeasurementsFinished();
 					DisplaySpectra();
@@ -205,8 +228,8 @@ namespace Tangra.VideoOperations.Spectroscopy
                 {
                     g.DrawEllipse(Pens.Aqua, (float)SelectedStar.XDouble - 5, (float)SelectedStar.YDouble - 5, 10, 10);
                     var mapper = new RotationMapper(m_OriginalWidth, m_OriginalHeight, SelectedStarBestAngle);
-                    float halfWidth = (float)SpectraReaderHalfWidth;
-                    float bgSide = (float)SpectraReaderBackgroundHalfWidth;
+                    float halfWidth = (float)MeasurementAreaWing;
+                    float bgSide = (float)BackgroundAreaWing;
 
                     PointF p0 = mapper.GetDestCoords((float)SelectedStar.XDouble, (float)SelectedStar.YDouble);
                     for (float i = p0.X - mapper.MaxDestDiagonal; i < p0.X + mapper.MaxDestDiagonal; i++)
@@ -233,8 +256,8 @@ namespace Tangra.VideoOperations.Spectroscopy
 
 		internal void UpdateMeasurementAreasDisplay(int signalAreaHalfWidth, int backgroundAreaHalfWidth)
 		{
-			SpectraReaderHalfWidth = signalAreaHalfWidth;
-			SpectraReaderBackgroundHalfWidth = backgroundAreaHalfWidth;
+			MeasurementAreaWing  = signalAreaHalfWidth;
+            BackgroundAreaWing = backgroundAreaHalfWidth;
 
 			m_VideoController.RedrawCurrentFrame(false, true);
 	    }
@@ -249,9 +272,9 @@ namespace Tangra.VideoOperations.Spectroscopy
                 {
                     SelectedStar = new ImagePixel(e.Gausian.XCenter, e.Gausian.YCenter);
                     SelectedStarFWHM = e.Gausian.FWHM;
-                    m_SelectedStarGaussian = e.Gausian;                    
-                    SpectraReaderHalfWidth = (int)Math.Ceiling(SelectedStarFWHM);
-                    SpectraReaderBackgroundHalfWidth = 2 * SpectraReaderHalfWidth;
+                    m_SelectedStarGaussian = e.Gausian;
+                    MeasurementAreaWing = (int)Math.Ceiling(SelectedStarFWHM);
+                    BackgroundAreaWing = 2 * MeasurementAreaWing;
 
                     SelectedAnglePoint = Point.Empty;
                     m_ControlPanel.ClearSpectra();
@@ -263,8 +286,8 @@ namespace Tangra.VideoOperations.Spectroscopy
                     SelectedStar = new ImagePixel(e.Gausian.XCenter, e.Gausian.YCenter);
                     SelectedStarFWHM = e.Gausian.FWHM;
                     m_SelectedStarGaussian = e.Gausian;
-                    SpectraReaderHalfWidth = (int)Math.Ceiling(SelectedStarFWHM);
-                    SpectraReaderBackgroundHalfWidth = 2 * SpectraReaderHalfWidth;
+                    MeasurementAreaWing = (int)Math.Ceiling(SelectedStarFWHM);
+                    BackgroundAreaWing = 2 * MeasurementAreaWing;
 
                     SetBestAngle(bestAngle);
                 }
@@ -292,7 +315,14 @@ namespace Tangra.VideoOperations.Spectroscopy
             m_OperationState = SpectroscopyState.StarConfirmed;
 
             var reader = new SpectraReader(m_VideoController.GetCurrentAstroImage(false), bestAngle);
-            Spectra spectra = reader.ReadSpectra((float)SelectedStar.XDouble, (float)SelectedStar.YDouble, SpectraReaderHalfWidth, SpectraReaderBackgroundHalfWidth, PixelCombineMethod.Average);
+
+            Spectra spectra = reader.ReadSpectra(
+                (float)SelectedStar.XDouble, 
+                (float)SelectedStar.YDouble,
+                MeasurementAreaWing,
+                BackgroundAreaWing, 
+                PixelCombineMethod.Average);
+
             m_ControlPanel.PreviewSpectra(spectra);
         }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,8 @@ using System.Windows.Forms;
 using Tangra.Helpers;
 using Tangra.Model.Astro;
 using Tangra.Model.Config;
+using Tangra.Model.Context;
+using Tangra.VideoOperations.LightCurves;
 using Tangra.VideoOperations.Spectroscopy;
 using Tangra.VideoOperations.Spectroscopy.Helpers;
 
@@ -24,12 +27,14 @@ namespace Tangra.Controller
         private SpectraCalibrator m_SpectraCalibrator;
         private MasterSpectra m_CurrentSpectra;
 
+        internal SpectraReductionContext SpectraReductionContext { get; private set; }
 
-		internal SpectroscopyController(Form mainFormView, VideoController videoController)
+        internal SpectroscopyController(Form mainFormView, VideoController videoController)
 		{
 			m_MainFormView = mainFormView;
 			m_VideoController = videoController;
 			m_ViewSpectraForm = null;
+            SpectraReductionContext = new SpectraReductionContext();
 		}
 
         internal float LocateSpectraAngle(PSFFit selectedStar, int? roughStartingAngle = null)
@@ -402,10 +407,46 @@ namespace Tangra.Controller
 
 		public SpectraFileHeader GetSpectraFileHeader()
 	    {
-		    return new SpectraFileHeader()
+		    var rv = new SpectraFileHeader()
 		    {
-			    PathToVideoFile = m_VideoController.CurrentVideoFileName
+			    PathToVideoFile = m_VideoController.CurrentVideoFileName,
+                Width = TangraContext.Current.FrameWidth,
+                Height = TangraContext.Current.FrameHeight,
+                BitPix = m_VideoController.VideoBitPix,
+                ObjectName = "",
+                Telescope =  "",
+                Instrument = "",
+                Recorder = "",
+                Observer = "",
+                RA = float.NaN,
+                DEC = float.NaN,
+                Longitude = float.NaN,
+                Latitude = float.NaN
 		    };
+
+		    VideoFileFormat fileFormat = m_VideoController.GetVideoFileFormat();
+            if (fileFormat == VideoFileFormat.AAV)
+            {
+                Dictionary<string, string> tags = m_VideoController.GetVideoFileTags();
+                tags.TryGetValue("ObjectName", out rv.ObjectName);
+                tags.TryGetValue("Telescope", out rv.Telescope);
+                tags.TryGetValue("Instrument", out rv.Instrument);
+                tags.TryGetValue("Recorder", out rv.Recorder);
+                tags.TryGetValue("Observer", out rv.Observer);
+
+                string ra, dec, lng, lat;
+                tags.TryGetValue("RA", out ra);
+                tags.TryGetValue("DEC", out dec);
+                tags.TryGetValue("Longitude", out lng);
+                tags.TryGetValue("Latitude", out lat);
+
+                if (!string.IsNullOrEmpty(ra)) float.TryParse(ra, NumberStyles.Float, CultureInfo.InvariantCulture, out rv.RA);
+                if (!string.IsNullOrEmpty(dec)) float.TryParse(ra, NumberStyles.Float, CultureInfo.InvariantCulture, out rv.DEC);
+                if (!string.IsNullOrEmpty(lng)) float.TryParse(ra, NumberStyles.Float, CultureInfo.InvariantCulture, out rv.Longitude);
+                if (!string.IsNullOrEmpty(lat)) float.TryParse(ra, NumberStyles.Float, CultureInfo.InvariantCulture, out rv.Latitude);                
+            }
+
+		    return rv;
 	    }
 
 	    public void LoadSpectraFile()
@@ -474,5 +515,19 @@ namespace Tangra.Controller
 
 		    return null;
 	    }
+
+        internal MeasurementInfo GetMeasurementInfo()
+        {
+            return new MeasurementInfo()
+            {
+               FramesToMeasure = SpectraReductionContext.FramesToMeasure,
+               MeasurementAreaWing = SpectraReductionContext.MeasurementAreaWing,
+               BackgroundAreaWing = SpectraReductionContext.BackgroundAreaWing,
+               BackgroundMethod = SpectraReductionContext.BackgroundMethod,
+               FrameCombineMethod = SpectraReductionContext.FrameCombineMethod,
+               UseFineAdjustments = SpectraReductionContext.UseFineAdjustments,
+               UseLowPassFilter = SpectraReductionContext.UseLowPassFilter
+            };
+        }
     }
 }

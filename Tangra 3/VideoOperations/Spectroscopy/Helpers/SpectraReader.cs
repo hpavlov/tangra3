@@ -70,6 +70,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
         public int CombinedMeasurements;
 
 		public SpectraCalibration Calibration;
+        public MeasurementInfo MeasurementInfo;
 
 		public bool IsCalibrated()
 		{
@@ -98,6 +99,10 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 				var point = new SpectraPoint(reader);
 				Points.Add(point);
 			}
+
+	        MeasurementInfo = new MeasurementInfo(reader);
+	        if (reader.ReadBoolean())
+	            Calibration = new SpectraCalibration(reader);
 	    }
 
 	    public void WriteTo(BinaryWriter writer)
@@ -115,6 +120,18 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 		    {
 				spectraPoint.WriteTo(writer);
 		    }
+
+            MeasurementInfo.WriteTo(writer);
+
+            if (Calibration == null)
+            {
+                writer.Write(false);
+            }
+            else
+            {
+                writer.Write(true);
+                Calibration.WriteTo(writer);    
+            }
 	    }
     }
 
@@ -156,6 +173,67 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 			writer.Write(ZeroPixel);
 		}
 	}
+
+    public class MeasurementInfo
+    {
+        // SpectraReductionContext items
+        public int FramesToMeasure { get; set; }
+        public int MeasurementAreaWing { get; set; }
+        public int BackgroundAreaWing { get; set; }
+        public PixelCombineMethod BackgroundMethod { get; set; }
+        public PixelCombineMethod FrameCombineMethod { get; set; }
+        public bool UseFineAdjustments { get; set; }
+        public bool UseLowPassFilter { get; set; }
+
+        // Other items
+        public int FirstMeasuredFrame;
+        public int LastMeasuredFrame;
+        public DateTime? FirstFrameTimeStamp;
+        public DateTime? LastFrameTimeStamp;
+
+        private static int SERIALIZATION_VERSION = 1;
+
+		internal MeasurementInfo()
+		{ }
+
+        public MeasurementInfo(BinaryReader reader)
+		{
+			int version = reader.ReadInt32();
+
+            FramesToMeasure = reader.ReadInt32();
+            MeasurementAreaWing = reader.ReadInt32();
+            BackgroundAreaWing = reader.ReadInt32();
+            BackgroundMethod = (PixelCombineMethod)reader.ReadInt32();
+            FrameCombineMethod = (PixelCombineMethod)reader.ReadInt32();
+            UseFineAdjustments = reader.ReadBoolean();
+            UseLowPassFilter = reader.ReadBoolean();
+            FirstMeasuredFrame = reader.ReadInt32();
+            LastMeasuredFrame = reader.ReadInt32();
+            bool hasFirstTimestamp = reader.ReadBoolean();
+            if (hasFirstTimestamp) FirstFrameTimeStamp = new DateTime(reader.ReadInt64());
+            bool hasLastTimestamp = reader.ReadBoolean();
+            if (hasLastTimestamp) LastFrameTimeStamp = new DateTime(reader.ReadInt64());
+		}
+
+		public void WriteTo(BinaryWriter writer)
+		{
+			writer.Write(SERIALIZATION_VERSION);
+
+            writer.Write(FramesToMeasure);
+            writer.Write(MeasurementAreaWing);
+            writer.Write(BackgroundAreaWing);
+            writer.Write((int)BackgroundMethod);
+            writer.Write((int)FrameCombineMethod);
+            writer.Write(UseFineAdjustments);
+            writer.Write(UseLowPassFilter);
+            writer.Write(FirstMeasuredFrame);
+            writer.Write(LastMeasuredFrame);
+		    writer.Write(FirstFrameTimeStamp.HasValue);
+            if (FirstFrameTimeStamp.HasValue) writer.Write(FirstFrameTimeStamp.Value.Ticks);
+            writer.Write(LastFrameTimeStamp.HasValue);
+            if (LastFrameTimeStamp.HasValue) writer.Write(LastFrameTimeStamp.Value.Ticks);
+		}
+    }
 
 	public class Spectra
 	{

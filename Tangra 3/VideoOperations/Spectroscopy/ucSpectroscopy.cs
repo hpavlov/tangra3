@@ -18,6 +18,7 @@ namespace Tangra.VideoOperations.Spectroscopy
     {
         private VideoSpectroscopyOperation m_VideoOperation;
 	    private VideoController m_VideoContoller;
+        private SpectroscopyController m_SpectroscopyController;
 	    private IFramePlayer m_FramePlayer;
 
 	    private static Pen[] m_GreyPens = new Pen[256];
@@ -37,12 +38,13 @@ namespace Tangra.VideoOperations.Spectroscopy
 	        picSpectra.Image = new Bitmap(picSpectra.Width, picSpectra.Height, PixelFormat.Format24bppRgb);
         }
 
-        public ucSpectroscopy(VideoSpectroscopyOperation videoOperation, VideoController videoContoller, IFramePlayer framePlayer)
+        public ucSpectroscopy(VideoSpectroscopyOperation videoOperation, VideoController videoContoller, SpectroscopyController spectroscopyController, IFramePlayer framePlayer)
             : this()
         {
             m_VideoOperation = videoOperation;
 	        m_FramePlayer = framePlayer;
 	        m_VideoContoller = videoContoller;
+            m_SpectroscopyController = spectroscopyController;
         }
 
         public void ClearSpectra()
@@ -97,7 +99,16 @@ namespace Tangra.VideoOperations.Spectroscopy
 			var frm = new frmRunMultiFrameSpectroscopy(m_FramePlayer, m_VideoOperation, m_VideoContoller.GetCurrentAstroImage(false));
 			if (m_VideoContoller.ShowDialog(frm) == DialogResult.OK)
 			{
-                m_VideoOperation.StartMeasurements(frm.NumberOfMeasurements, frm.MeasurementAreaWing, frm.BackgroundAreaWing, frm.BackgroundMethod, frm.FrameCombineMethod, frm.UseFineAdjustments, frm.UseLowPassFilter);
+                m_SpectroscopyController.SpectraReductionContext.Reset();
+			    m_SpectroscopyController.SpectraReductionContext.FramesToMeasure = frm.NumberOfMeasurements;
+			    m_SpectroscopyController.SpectraReductionContext.MeasurementAreaWing = frm.MeasurementAreaWing;
+                m_SpectroscopyController.SpectraReductionContext.BackgroundAreaWing = frm.BackgroundAreaWing;
+			    m_SpectroscopyController.SpectraReductionContext.BackgroundMethod = frm.BackgroundMethod;
+			    m_SpectroscopyController.SpectraReductionContext.FrameCombineMethod = frm.FrameCombineMethod;
+			    m_SpectroscopyController.SpectraReductionContext.UseFineAdjustments = frm.UseFineAdjustments;
+			    m_SpectroscopyController.SpectraReductionContext.UseLowPassFilter = frm.UseLowPassFilter;
+
+                m_VideoOperation.StartMeasurements();
 			}
 		}
 

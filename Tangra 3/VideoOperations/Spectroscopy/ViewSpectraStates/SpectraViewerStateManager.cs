@@ -84,7 +84,7 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 		    int pointToFit = masterSpectra.Points.Count - masterSpectra.ZeroOrderPixelNo - masterSpectra.Points[0].PixelNo;
             m_XCoeff = m_View.Width * 1.0f / pointToFit;
             m_XCoeffCalibrated = (m_View.Width - X_AXIS_WIDTH - BORDER_GAP) * 1.0f / pointToFit;
-			m_ColorCoeff = 255.0f / masterSpectra.MaxPixelValue;
+            m_ColorCoeff = 255.0f / masterSpectra.MaxSpectraValue;
 			m_YCoeff = (m_View.Height - 2 * BORDER_GAP) * 1.0f / masterSpectra.MaxSpectraValue;
 			m_YCoeffCalibrated = (m_View.Height - Y_AXIS_WIDTH - 2 * BORDER_GAP) * 1.0f / masterSpectra.MaxSpectraValue;
 		}

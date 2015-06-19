@@ -60,8 +60,8 @@ namespace Tangra.VideoOperations.Spectroscopy
 
 			nudNumberMeasurements.Maximum = framePlayer.Video.LastFrame - framePlayer.CurrentFrameIndex;
 			nudNumberMeasurements.Value = Math.Min(200, nudNumberMeasurements.Maximum);
-            nudAreaWing.Value = Math.Min(videoOperation.SpectraReaderHalfWidth, nudAreaWing.Maximum);
-			nudBackgroundWing.Value = Math.Min(videoOperation.SpectraReaderBackgroundHalfWidth, nudBackgroundWing.Maximum);
+            nudAreaWing.Value = Math.Min(videoOperation.MeasurementAreaWing, nudAreaWing.Maximum);
+            nudBackgroundWing.Value = Math.Min(videoOperation.BackgroundAreaWing, nudBackgroundWing.Maximum);
 		    cbxBackgroundMethod.SelectedIndex = 1; /* Median */
             cbxCombineMethod.SelectedIndex = 1; /* Median */
 

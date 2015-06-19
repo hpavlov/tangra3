@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -16,6 +17,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 using Tangra.Helpers;
+using Tangra.Model.Helpers;
 using Tangra.Video.FITS;
 using Tangra.Video.SER;
 using Tangra.VideoOperations.Astrometry;
@@ -2152,7 +2154,63 @@ namespace Tangra.Controller
             }
         }
 
-		private static Regex s_RegexSourceToFileFormat = new Regex("^(?<format>(ADV|AAV|AVI|SER|FITS))\\..+$");
+        private static string s_AngleParserRegex = @"[^\d \.]";
+
+	    internal Dictionary<string, string> GetVideoFileTags()
+	    {
+	        var rv = new Dictionary<string, string>();
+
+	        var aavStream = m_FramePlayer.Video as AstroDigitalVideoStream;
+            if (aavStream != null)
+            {
+                rv.Add("ObjectName", aavStream.GetFileTag("OBJECT"));
+                rv.Add("Telescope", aavStream.GetFileTag("TELESCOP"));
+                rv.Add("Instrument", aavStream.GetFileTag("CAMERA-MODEL"));
+                rv.Add("Recorder", aavStream.GetFileTag("RECORDER"));
+                rv.Add("Observer", aavStream.GetFileTag("OBSERVER"));
+
+                
+                try
+                {
+                    string raStr = aavStream.GetFileTag("RA_OBJ");
+                    double ra = AstroConvert.ToRightAcsension(Regex.Replace(raStr, s_AngleParserRegex, ""));
+                    rv.Add("RA", ra.ToString(CultureInfo.InvariantCulture));
+                }
+                catch
+                { }
+
+                try
+                {
+                    string deStr = aavStream.GetFileTag("DEC_OBJ");
+                    double dec = AstroConvert.ToDeclination(Regex.Replace(deStr, s_AngleParserRegex, ""));
+                    rv.Add("DEC", dec.ToString(CultureInfo.InvariantCulture));
+                }
+                catch
+                { }
+
+                try
+                {
+                    string lngStr = aavStream.GetFileTag("LONGITUDE");
+                    double lng = AstroConvert.ToDeclination(Regex.Replace(lngStr, s_AngleParserRegex, ""));
+                    rv.Add("Longitude", lng.ToString(CultureInfo.InvariantCulture));
+                }
+                catch
+                { }
+
+                try
+                {
+                    string latStr = aavStream.GetFileTag("LATITUDE");
+                    double lat = AstroConvert.ToDeclination(Regex.Replace(latStr, s_AngleParserRegex, ""));
+                    rv.Add("Latitude", lat.ToString(CultureInfo.InvariantCulture));
+                }
+                catch
+                { }               
+            }
+
+	        return rv;
+	    }
+
+	    private static Regex s_RegexSourceToFileFormat = new Regex("^(?<format>(ADV|AAV|AVI|SER|FITS))\\..+$");
 
 		/// <summary>
 		/// AVI|AAV|ADV|SER|FITS

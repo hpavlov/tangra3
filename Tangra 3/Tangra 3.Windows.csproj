@@ -240,6 +240,7 @@
     <Compile Include="Controller\LightCurveContext.cs" />
     <Compile Include="Controller\LightCurveController.cs" />
     <Compile Include="Controller\DarkFlatFrameController.cs" />
+    <Compile Include="Controller\SpectraReductionContext.cs" />
     <Compile Include="Controller\SpectroscopyController.cs" />
     <Compile Include="Controller\VideoController.cs" />
     <Compile Include="Controller\VideoOperationController.cs" />

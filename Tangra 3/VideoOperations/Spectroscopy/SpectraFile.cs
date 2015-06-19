@@ -82,20 +82,38 @@ namespace Tangra.VideoOperations.Spectroscopy
 		}
 
 		internal string PathToVideoFile;
+        internal string ObjectName;
+        internal string Telescope;
+        internal string Instrument;
+        internal string Recorder;
+        internal string Observer;
+        internal float RA;
+        internal float DEC;
+        internal float Longitude;
+        internal float Latitude;
+        internal int Width;
+        internal int Height;
+        internal int BitPix;
 
 		private static int SERIALIZATION_VERSION = 1;
-
-		internal SpectraFileHeader(
-			string pathToVideoFile)
-		{
-			PathToVideoFile = pathToVideoFile;
-		}
 
 		internal SpectraFileHeader(BinaryReader reader)
 		{
 			int version = reader.ReadInt32();
 
 			PathToVideoFile = reader.ReadString();
+            ObjectName = reader.ReadString();
+            Telescope = reader.ReadString();
+            Instrument = reader.ReadString();
+            Recorder = reader.ReadString();
+            Observer = reader.ReadString();
+            RA = reader.ReadSingle();
+            DEC = reader.ReadSingle();
+            Longitude = reader.ReadSingle();
+            Latitude = reader.ReadSingle();
+            Width = reader.ReadInt32();
+            Height = reader.ReadInt32();
+            BitPix = reader.ReadInt32();
 		}
 
 		internal void WriteTo(BinaryWriter writer)
@@ -103,6 +121,18 @@ namespace Tangra.VideoOperations.Spectroscopy
 			writer.Write(SERIALIZATION_VERSION);
 
 			writer.Write(PathToVideoFile);
+		    writer.Write(ObjectName);
+            writer.Write(Telescope);
+            writer.Write(Instrument);
+            writer.Write(Recorder);
+            writer.Write(Observer);
+            writer.Write(RA);
+            writer.Write(DEC);
+            writer.Write(Longitude);
+            writer.Write(Latitude);
+            writer.Write(Width);
+            writer.Write(Height);
+            writer.Write(BitPix);
 		}
 	}
 }
