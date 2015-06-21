@@ -52,12 +52,9 @@
             this.miCloseForm = new System.Windows.Forms.ToolStripMenuItem();
             this.miData = new System.Windows.Forms.ToolStripMenuItem();
             this.miSpectralCalibration = new System.Windows.Forms.ToolStripMenuItem();
-            this.miView = new System.Windows.Forms.ToolStripMenuItem();
-            this.miShowCommonLines = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.miProcessing = new System.Windows.Forms.ToolStripMenuItem();
             this.miLowPass = new System.Windows.Forms.ToolStripMenuItem();
-            this.miSpline = new System.Windows.Forms.ToolStripMenuItem();
+            this.miLPNone = new System.Windows.Forms.ToolStripMenuItem();
             this.miLP1_0 = new System.Windows.Forms.ToolStripMenuItem();
             this.miLP1_5 = new System.Windows.Forms.ToolStripMenuItem();
             this.miLP2_0 = new System.Windows.Forms.ToolStripMenuItem();
@@ -65,7 +62,10 @@
             this.miLP3_0 = new System.Windows.Forms.ToolStripMenuItem();
             this.miLP3_5 = new System.Windows.Forms.ToolStripMenuItem();
             this.miLP4_0 = new System.Windows.Forms.ToolStripMenuItem();
-            this.miLPNone = new System.Windows.Forms.ToolStripMenuItem();
+            this.miSpline = new System.Windows.Forms.ToolStripMenuItem();
+            this.miView = new System.Windows.Forms.ToolStripMenuItem();
+            this.miShowCommonLines = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.pnlBottom.SuspendLayout();
             this.gbSelection.SuspendLayout();
             this.gbxDispersion.SuspendLayout();
@@ -239,37 +239,37 @@
             // miLoadSpectra
             // 
             this.miLoadSpectra.Name = "miLoadSpectra";
-            this.miLoadSpectra.Size = new System.Drawing.Size(140, 22);
+            this.miLoadSpectra.Size = new System.Drawing.Size(152, 22);
             this.miLoadSpectra.Text = "&Load Spectra ";
             // 
             // miSaveSpectra
             // 
             this.miSaveSpectra.Name = "miSaveSpectra";
-            this.miSaveSpectra.Size = new System.Drawing.Size(140, 22);
+            this.miSaveSpectra.Size = new System.Drawing.Size(152, 22);
             this.miSaveSpectra.Text = "&Save Spectra";
             this.miSaveSpectra.Click += new System.EventHandler(this.miSaveSpectra_Click);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(137, 6);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(149, 6);
             // 
             // miExport
             // 
             this.miExport.Name = "miExport";
-            this.miExport.Size = new System.Drawing.Size(140, 22);
+            this.miExport.Size = new System.Drawing.Size(152, 22);
             this.miExport.Text = "Export";
             this.miExport.Click += new System.EventHandler(this.miExport_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(137, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
             // 
             // miCloseForm
             // 
             this.miCloseForm.Name = "miCloseForm";
-            this.miCloseForm.Size = new System.Drawing.Size(140, 22);
+            this.miCloseForm.Size = new System.Drawing.Size(152, 22);
             this.miCloseForm.Text = "&Close";
             // 
             // miData
@@ -287,22 +287,6 @@
             this.miSpectralCalibration.Size = new System.Drawing.Size(167, 22);
             this.miSpectralCalibration.Text = "Spectral &Calibration";
             this.miSpectralCalibration.Click += new System.EventHandler(this.miSpectralCalibration_Click);
-            // 
-            // miView
-            // 
-            this.miView.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.miShowCommonLines});
-            this.miView.Name = "miView";
-            this.miView.Size = new System.Drawing.Size(41, 20);
-            this.miView.Text = "&View";
-            // 
-            // miShowCommonLines
-            // 
-            this.miShowCommonLines.CheckOnClick = true;
-            this.miShowCommonLines.Name = "miShowCommonLines";
-            this.miShowCommonLines.Size = new System.Drawing.Size(171, 22);
-            this.miShowCommonLines.Text = "Show &Common Lines";
-            this.miShowCommonLines.CheckedChanged += new System.EventHandler(this.miShowCommonLines_CheckedChanged);
             // 
             // miProcessing
             // 
@@ -328,16 +312,18 @@
             this.miLowPass.Size = new System.Drawing.Size(167, 22);
             this.miLowPass.Text = "&Low Pass Filter";
             // 
-            // miSpline
+            // miLPNone
             // 
-            this.miSpline.Name = "miSpline";
-            this.miSpline.Size = new System.Drawing.Size(167, 22);
-            this.miSpline.Text = "&Spline Interpolation";
+            this.miLPNone.Name = "miLPNone";
+            this.miLPNone.Size = new System.Drawing.Size(135, 22);
+            this.miLPNone.Tag = "0";
+            this.miLPNone.Text = "None";
+            this.miLPNone.Click += new System.EventHandler(this.ApplyLowPassFilterMenuItemClicked);
             // 
             // miLP1_0
             // 
             this.miLP1_0.Name = "miLP1_0";
-            this.miLP1_0.Size = new System.Drawing.Size(152, 22);
+            this.miLP1_0.Size = new System.Drawing.Size(135, 22);
             this.miLP1_0.Tag = "1";
             this.miLP1_0.Text = "FWHM = 1";
             this.miLP1_0.Click += new System.EventHandler(this.ApplyLowPassFilterMenuItemClicked);
@@ -345,7 +331,7 @@
             // miLP1_5
             // 
             this.miLP1_5.Name = "miLP1_5";
-            this.miLP1_5.Size = new System.Drawing.Size(152, 22);
+            this.miLP1_5.Size = new System.Drawing.Size(135, 22);
             this.miLP1_5.Tag = "1.5";
             this.miLP1_5.Text = "FWHM = 1.5";
             this.miLP1_5.Click += new System.EventHandler(this.ApplyLowPassFilterMenuItemClicked);
@@ -353,7 +339,7 @@
             // miLP2_0
             // 
             this.miLP2_0.Name = "miLP2_0";
-            this.miLP2_0.Size = new System.Drawing.Size(152, 22);
+            this.miLP2_0.Size = new System.Drawing.Size(135, 22);
             this.miLP2_0.Tag = "2";
             this.miLP2_0.Text = "FWHM = 2";
             this.miLP2_0.Click += new System.EventHandler(this.ApplyLowPassFilterMenuItemClicked);
@@ -361,7 +347,7 @@
             // miLP2_5
             // 
             this.miLP2_5.Name = "miLP2_5";
-            this.miLP2_5.Size = new System.Drawing.Size(152, 22);
+            this.miLP2_5.Size = new System.Drawing.Size(135, 22);
             this.miLP2_5.Tag = "2.5";
             this.miLP2_5.Text = "FWHM = 2.5";
             this.miLP2_5.Click += new System.EventHandler(this.ApplyLowPassFilterMenuItemClicked);
@@ -369,7 +355,7 @@
             // miLP3_0
             // 
             this.miLP3_0.Name = "miLP3_0";
-            this.miLP3_0.Size = new System.Drawing.Size(152, 22);
+            this.miLP3_0.Size = new System.Drawing.Size(135, 22);
             this.miLP3_0.Tag = "3";
             this.miLP3_0.Text = "FWHM = 3";
             this.miLP3_0.Click += new System.EventHandler(this.ApplyLowPassFilterMenuItemClicked);
@@ -377,7 +363,7 @@
             // miLP3_5
             // 
             this.miLP3_5.Name = "miLP3_5";
-            this.miLP3_5.Size = new System.Drawing.Size(152, 22);
+            this.miLP3_5.Size = new System.Drawing.Size(135, 22);
             this.miLP3_5.Tag = "3.5";
             this.miLP3_5.Text = "FWHM = 3.5";
             this.miLP3_5.Click += new System.EventHandler(this.ApplyLowPassFilterMenuItemClicked);
@@ -385,18 +371,36 @@
             // miLP4_0
             // 
             this.miLP4_0.Name = "miLP4_0";
-            this.miLP4_0.Size = new System.Drawing.Size(152, 22);
+            this.miLP4_0.Size = new System.Drawing.Size(135, 22);
             this.miLP4_0.Tag = "4";
             this.miLP4_0.Text = "FWHM = 4.0";
             this.miLP4_0.Click += new System.EventHandler(this.ApplyLowPassFilterMenuItemClicked);
             // 
-            // miLPNone
+            // miSpline
             // 
-            this.miLPNone.Name = "miLPNone";
-            this.miLPNone.Size = new System.Drawing.Size(152, 22);
-            this.miLPNone.Tag = "0";
-            this.miLPNone.Text = "None";
-            this.miLPNone.Click += new System.EventHandler(this.ApplyLowPassFilterMenuItemClicked);
+            this.miSpline.Name = "miSpline";
+            this.miSpline.Size = new System.Drawing.Size(167, 22);
+            this.miSpline.Text = "&Spline Interpolation";
+            // 
+            // miView
+            // 
+            this.miView.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miShowCommonLines});
+            this.miView.Name = "miView";
+            this.miView.Size = new System.Drawing.Size(41, 20);
+            this.miView.Text = "&View";
+            // 
+            // miShowCommonLines
+            // 
+            this.miShowCommonLines.CheckOnClick = true;
+            this.miShowCommonLines.Name = "miShowCommonLines";
+            this.miShowCommonLines.Size = new System.Drawing.Size(171, 22);
+            this.miShowCommonLines.Text = "Show &Common Lines";
+            this.miShowCommonLines.CheckedChanged += new System.EventHandler(this.miShowCommonLines_CheckedChanged);
+            // 
+            // saveFileDialog
+            // 
+            this.saveFileDialog.Filter = "Tabular Spectra Format (*.dat)|*.dat";
             // 
             // frmViewSpectra
             // 

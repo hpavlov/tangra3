@@ -316,7 +316,21 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 
 				    if (m_SourceVideoFrame.Contains(xx, yy))
 				    {
-				        point.RawValue += m_Image.Pixelmap[xx, yy];
+				        float sum = 0;
+				        int numPoints = 0;
+				        for (float kx = -0.4f; kx < 0.5f; kx+=0.2f)
+                        for (float ky = -0.4f; ky < 0.5f; ky += 0.2f)
+                        {
+                            p = m_Mapper.GetSourceCoords(x + kx, p1.Y + ky + z);
+                            int xxx = (int)Math.Round(p.X);
+                            int yyy = (int)Math.Round(p.Y);
+                            if (m_SourceVideoFrame.Contains(xxx, yyy))
+                            {
+                                sum += m_Image.Pixelmap[xxx, yyy];
+                                numPoints++;
+                            }
+                        }
+                        point.RawValue += (sum / numPoints);
 				        point.RawSignalPixelCount++;
 				    }
 				}

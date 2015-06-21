@@ -170,14 +170,19 @@ namespace Tangra.VideoOperations.Spectroscopy
 
 		private void miExport_Click(object sender, EventArgs e)
 		{
-			SpectraCalibrator calibrator = m_SpectroscopyController.GetSpectraCalibrator();
-			var bld = new StringBuilder();
+            if (saveFileDialog.ShowDialog(this) == DialogResult.OK)
+            {
+                SpectraCalibrator calibrator = m_SpectroscopyController.GetSpectraCalibrator();
+                var bld = new StringBuilder();
 
-			foreach (SpectraPoint point in m_Spectra.Points)
-			{
-				float wavelength = calibrator.ResolveWavelength(point.PixelNo);
-				bld.AppendFormat("{0},{1}\r\n", wavelength, point.RawValue);
-			}
+                foreach (SpectraPoint point in m_Spectra.Points)
+                {
+                    float wavelength = calibrator.ResolveWavelength(point.PixelNo);
+                    bld.AppendFormat("{0},{1}\r\n", wavelength, point.RawValue);
+                }
+
+                File.WriteAllText(saveFileDialog.FileName, bld.ToString());
+            }
 		}
 
 		private void frmViewSpectra_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
