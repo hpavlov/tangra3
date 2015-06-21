@@ -25,9 +25,11 @@ namespace Tangra.VideoOperations.Spectroscopy
 		public PixelCombineMethod FrameCombineMethod { get; private set; }
         public bool UseFineAdjustments { get; private set; }
         public bool UseLowPassFilter { get; private set; }
+        public int? AlignmentAbsorptionLinePos { get; private set; }
 
 
 	    private bool m_Initialised = false;
+	    private int m_CurrentPageNo = 0;
 
 		private VideoSpectroscopyOperation m_VideoOperation;
 		private AstroImage m_AstroImage;
@@ -35,6 +37,12 @@ namespace Tangra.VideoOperations.Spectroscopy
 
 		private static Brush[] s_GreyBrushes = new Brush[256];
 		private static Color[] s_GreyColors = new Color[256];
+
+	    private SpectraReader m_SpectraReader;
+	    private Spectra m_Spectra;
+	    private RotationMapper m_Mapper;
+	    private PSFFit m_ZeroOrderPsf;
+	    private float? m_SelectedAlignLine;
 
 		static frmRunMultiFrameSpectroscopy()
 		{
@@ -49,7 +57,13 @@ namespace Tangra.VideoOperations.Spectroscopy
 		{
 			InitializeComponent();
 
+		    Width = 546;
+		    m_CurrentPageNo = 0;
+		    m_SelectedAlignLine = null;
+		    AlignmentAbsorptionLinePos = null;
+
 			picAreas.Image = new Bitmap(picAreas.Width, picAreas.Height, PixelFormat.Format24bppRgb);
+            picAlignTarget.Image = new Bitmap(picAlignTarget.Width, picAlignTarget.Height, PixelFormat.Format24bppRgb);
 		}
 
         public frmRunMultiFrameSpectroscopy(IFramePlayer framePlayer, VideoSpectroscopyOperation videoOperation, AstroImage astroImage)
@@ -70,21 +84,79 @@ namespace Tangra.VideoOperations.Spectroscopy
 
 		private void btnNext_Click(object sender, EventArgs e)
 		{
-			NumberOfMeasurements = (int)nudNumberMeasurements.Value;
-            MeasurementAreaWing = (int)nudAreaWing.Value;
-			BackgroundAreaWing = (int)nudBackgroundWing.Value;
-            BackgroundMethod = (PixelCombineMethod)cbxBackgroundMethod.SelectedIndex;
-			FrameCombineMethod = (PixelCombineMethod)cbxCombineMethod.SelectedIndex;
-		    UseFineAdjustments = cbxFineAdjustments.Checked;
-		    UseLowPassFilter = cbxUseLowPassFilter.Checked;
-
-			DialogResult = DialogResult.OK;
-			Close();
+            if (m_CurrentPageNo == 0)
+		        SwitchToMeasurementPage();
+            else if (m_CurrentPageNo == 1)
+                RunMeasurements();
 		}
+
+
+        private void btnPrevious_Click(object sender, EventArgs e)
+        {
+            if (m_CurrentPageNo == 1)
+                SwitchToAlignmentPage();
+            else
+            {
+                DialogResult = DialogResult.Cancel;
+                Close();
+            }
+        }
+
+        private void SwitchToMeasurementPage()
+        {
+            gbMeasurement.Top = 12;
+            gbMeasurement.Left = 12;
+            gbxAlignment.Visible = false;
+            gbMeasurement.Visible = true;
+            gbMeasurement.BringToFront();
+
+            m_CurrentPageNo = 1;
+            btnNext.Text = "Start";
+            btnPrevious.Text = "Previous";
+        }
+
+        private void SwitchToAlignmentPage()
+        {
+            gbxAlignment.Top = 12;
+            gbxAlignment.Left = 12;
+            gbMeasurement.Visible = false;
+            gbxAlignment.Visible = true;
+            gbxAlignment.BringToFront();
+
+            m_CurrentPageNo = 0;
+            btnNext.Text = "Next";
+            btnPrevious.Text = "Cancel";
+        }
+
+        private void RunMeasurements()
+        {
+            NumberOfMeasurements = (int)nudNumberMeasurements.Value;
+            MeasurementAreaWing = (int)nudAreaWing.Value;
+            BackgroundAreaWing = (int)nudBackgroundWing.Value;
+            BackgroundMethod = (PixelCombineMethod)cbxBackgroundMethod.SelectedIndex;
+            FrameCombineMethod = (PixelCombineMethod)cbxCombineMethod.SelectedIndex;
+            UseFineAdjustments = cbxFineAdjustments.Checked;
+            UseLowPassFilter = cbxUseLowPassFilter.Checked;
+            if (m_SelectedAlignLine.HasValue) AlignmentAbsorptionLinePos = (int)Math.Round(m_SelectedAlignLine.Value);
+
+            DialogResult = DialogResult.OK;
+            Close();
+        }
 
 		private void frmRunMultiFrameSpectroscopy_Load(object sender, EventArgs e)
 		{
+            IImagePixel starCenter = m_VideoOperation.SelectedStar;
+            m_SpectraReader = new SpectraReader(m_AstroImage, m_VideoOperation.SelectedStarBestAngle);
+            m_Spectra = m_SpectraReader.ReadSpectra((float)starCenter.XDouble, (float)starCenter.YDouble, (int)nudAreaWing.Value, (int)nudBackgroundWing.Value, PixelCombineMethod.Average);
+
+            m_Mapper = new RotationMapper(m_AstroImage.Width, m_AstroImage.Height, m_VideoOperation.SelectedStarBestAngle);
+
+		    uint[,] pixels = m_AstroImage.GetMeasurableAreaPixels(starCenter.X, starCenter.Y, 35);
+            m_ZeroOrderPsf = new PSFFit(starCenter.X, starCenter.Y);
+            m_ZeroOrderPsf.Fit(pixels);
+
 			PlotMeasurementAreas();
+		    PlotAlignTarget();
 		}
 
 		private void nudAreaWing_ValueChanged(object sender, EventArgs e)
@@ -109,31 +181,25 @@ namespace Tangra.VideoOperations.Spectroscopy
 		private int m_DestHorizontalPixelCount;
 		private int m_DestVerticalPixelCount;
 
-		private static int m_ZoomRatio = 2;
+		private static int m_ZoomRatio = 1;
 
 		private void PrepareRawImage()
 		{
 			m_ZoomedRawImage = new Bitmap(picAreas.Width, picAreas.Height, PixelFormat.Format24bppRgb);
-
-			IImagePixel starCenter = m_VideoOperation.SelectedStar;
-			var reader = new SpectraReader(m_AstroImage, m_VideoOperation.SelectedStarBestAngle);
-			Spectra spectra = reader.ReadSpectra((float)starCenter.XDouble, (float)starCenter.YDouble, (int)nudAreaWing.Value, (int)nudBackgroundWing.Value, PixelCombineMethod.Average);
-
-			var mapper = new RotationMapper(m_AstroImage.Width, m_AstroImage.Height, m_VideoOperation.SelectedStarBestAngle);
 			
 			// Find the peak to the right of the zero order image
-			PointF destCenter = mapper.GetDestCoords((float)starCenter.XDouble, (float)starCenter.YDouble);
-			int x0 = spectra.Points[0].PixelNo;
+            PointF destCenter = m_Mapper.GetDestCoords((float)m_VideoOperation.SelectedStar.XDouble, (float)m_VideoOperation.SelectedStar.YDouble);
+            int x0 = m_Spectra.Points[0].PixelNo;
 			float maxValue = float.MinValue;
 			int maxValuePixelNo = -1;
-			for (int i = (int)destCenter.X + 2 * (int)nudAreaWing.Value; i < mapper.MaxDestDiagonal; i++)
+            for (int i = (int)destCenter.X + 2 * (int)nudAreaWing.Value; i < m_Mapper.MaxDestDiagonal; i++)
 			{
 				int idx = i - x0;
-				if (idx >= 0 && idx < spectra.Points.Count)
+                if (idx >= 0 && idx < m_Spectra.Points.Count)
 				{
-					if (spectra.Points[idx].RawValue > maxValue)
+                    if (m_Spectra.Points[idx].RawValue > maxValue)
 					{
-						maxValue = spectra.Points[idx].RawValue;
+                        maxValue = m_Spectra.Points[idx].RawValue;
 						maxValuePixelNo = i;
 					}
 				}
@@ -150,7 +216,7 @@ namespace Tangra.VideoOperations.Spectroscopy
 			{
 				for (int y = -m_DestVerticalPixelCount; y <= m_DestVerticalPixelCount; y++)
 				{
-					PointF pt = mapper.GetSourceCoords(x, destCenter.Y + y);
+                    PointF pt = m_Mapper.GetSourceCoords(x, destCenter.Y + y);
 					if (imageRect.Contains(pt))
 					{
 						int x1 = (int)pt.X;
@@ -175,6 +241,7 @@ namespace Tangra.VideoOperations.Spectroscopy
 		}
 
 		private static Pen s_SpectraBackgroundPen = new Pen(Color.FromArgb(70, 255, 0, 0));
+        private static Pen s_SelectedAlignmentLinePen = new Pen(Color.FromArgb(70, 0, 255, 255));
 
 		private void PlotMeasurementAreas()
 		{
@@ -199,11 +266,55 @@ namespace Tangra.VideoOperations.Spectroscopy
 					g.DrawLine(s_SpectraBackgroundPen, 0, y3, m_ZoomedRawImage.Width, y3);
 					g.DrawLine(s_SpectraBackgroundPen, 0, y4, m_ZoomedRawImage.Width, y4);
 
+                    if (m_SelectedAlignLine.HasValue)
+                    {
+                        float xx = (m_SelectedAlignLine.Value - m_StartDestXValue) * m_ZoomRatio;
+                        g.DrawLine(s_SelectedAlignmentLinePen, xx, 0, xx, picAreas.Image.Height);
+                    }
+
 					g.Save();
 				}
 			}
 
 			picAreas.Invalidate();
 		}
-	}
+	
+        private void PlotAlignTarget()
+        {
+            if (rbAlignZeroOrder.Checked)
+                PlotZeroOrderPSF();
+
+        }
+
+        private void PlotZeroOrderPSF()
+        {
+            using (Graphics g = Graphics.FromImage(picAlignTarget.Image))
+            {
+                m_ZeroOrderPsf.DrawGraph(g, new Rectangle(0, 0, picAlignTarget.Width, picAlignTarget.Height), m_AstroImage.Pixelmap.BitPixCamera, m_AstroImage.Pixelmap.MaxSignalValue);
+                g.Save();
+            }
+
+            picAlignTarget.Invalidate();
+        }
+
+        private void picAreas_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (m_CurrentPageNo == 0 && !rbAlignZeroOrder.Checked)
+            {
+                int candiateLine = (int)Math.Round(m_StartDestXValue + e.X * 1.0 / m_ZoomRatio);
+                List<SpectraPoint> pointsInRegion = m_Spectra.Points.Where(x => Math.Abs(x.PixelNo - candiateLine) < 10).ToList();
+
+                float[] arrPixelNo = pointsInRegion.Select(x => (float)x.PixelNo).ToArray();
+                float[] arrPixelValues = pointsInRegion.Select(x => x.RawValue).ToArray();
+                Array.Sort(arrPixelValues, arrPixelNo);
+
+                if (rbAlignAbsorptionLine.Checked)
+                    m_SelectedAlignLine = arrPixelNo[0];
+                else if (rbAlignEmissionLine.Checked)
+                    m_SelectedAlignLine = arrPixelNo[arrPixelNo.Length - 1];
+
+                PlotMeasurementAreas();
+            }
+        }
+    }
 }

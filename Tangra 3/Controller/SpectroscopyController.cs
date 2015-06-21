@@ -183,10 +183,16 @@ namespace Tangra.Controller
 
             uint roughAngle = angles[359];
 
-            if (//pixAbove50Perc[358] * 2 > pixAbove50Perc[359] && // Second best should have a lot smaller score than the top one
-                Math.Abs((int)angles[358] - (int)angles[359]) != 1 && // or for large stars the two best can be sequential angles
-                !roughStartingAngle.HasValue) // unless the user provided the first rough approximation
-                return float.NaN;
+            if (pixAbove10Perc[358] * 2 < pixAbove10Perc[359])
+            {
+                // If second best at 10% id a lot smaller score than the top 10% scopem then this is it
+                roughAngle = angles10[359];
+            }
+            else
+            {
+                if (Math.Abs((int)angles[358] - (int)angles[359]) > 3)// or for large stars the two best can be sequential angles
+                    return float.NaN;
+            }
 
             uint bestSum = 0;
             float bestAngle = 0f;
@@ -221,7 +227,7 @@ namespace Tangra.Controller
             return bestAngle;
         }
 
-		internal MasterSpectra ComputeResult(List<Spectra> allFramesSpectra, PixelCombineMethod frameCombineMethod, bool useFineAdjustments)
+		internal MasterSpectra ComputeResult(List<Spectra> allFramesSpectra, PixelCombineMethod frameCombineMethod, bool useFineAdjustments, int? alignmentAbsorptionLinePos)
         {
 			var masterSpectra = new MasterSpectra();
 
@@ -242,6 +248,18 @@ namespace Tangra.Controller
 					for (int i = 1; i < allFramesSpectra.Count; i++)
 					{
 						Spectra nextSpectra = allFramesSpectra[i];
+
+                        int lineAlignOffset = 0;
+                        if (alignmentAbsorptionLinePos.HasValue)
+                        {
+                            int roughLinePos = nextSpectra.ZeroOrderPixelNo + alignmentAbsorptionLinePos.Value - masterSpectra.ZeroOrderPixelNo;
+                            List<SpectraPoint> pointsInRegion = nextSpectra.Points.Where(x => Math.Abs(x.PixelNo - roughLinePos) < 10).ToList();
+                            float[] arrPixelNo = pointsInRegion.Select(x => (float)x.PixelNo).ToArray();
+                            float[] arrPixelValues = pointsInRegion.Select(x => x.RawValue).ToArray();
+                            Array.Sort(arrPixelValues, arrPixelNo);
+                            lineAlignOffset = (int)arrPixelNo[0] - roughLinePos;
+                        }
+
 					    int bestOffset = 0;
 
                         if (useFineAdjustments)
@@ -253,7 +271,7 @@ namespace Tangra.Controller
                                 float currOffsetValue = 0;
                                 for (int j = 0; j < masterSpectra.Points.Count; j++)
                                 {
-                                    int indexNextSpectra = nextSpectra.ZeroOrderPixelNo - masterSpectra.ZeroOrderPixelNo + j + probeOffset;
+                                    int indexNextSpectra = nextSpectra.ZeroOrderPixelNo - masterSpectra.ZeroOrderPixelNo + j + probeOffset + lineAlignOffset;
                                     if (indexNextSpectra >= 0 && indexNextSpectra < nextSpectra.Points.Count)
                                     {
                                         currOffsetValue += Math.Abs(originalMasterPoints[j].RawValue - nextSpectra.Points[indexNextSpectra].RawValue);
@@ -270,7 +288,7 @@ namespace Tangra.Controller
 
                         for (int j = 0; j < masterSpectra.Points.Count; j++)
                         {
-                            int indexNextSpectra = nextSpectra.ZeroOrderPixelNo - masterSpectra.ZeroOrderPixelNo + j + bestOffset;
+                            int indexNextSpectra = nextSpectra.ZeroOrderPixelNo - masterSpectra.ZeroOrderPixelNo + j + bestOffset + lineAlignOffset;
                             if (indexNextSpectra >= 0 && indexNextSpectra < nextSpectra.Points.Count)
                             {
                                 masterSpectra.Points[j].RawValue += nextSpectra.Points[indexNextSpectra].RawValue;
@@ -300,6 +318,17 @@ namespace Tangra.Controller
 					{
 						Spectra nextSpectra = allFramesSpectra[i];
 
+                        int lineAlignOffset = 0;
+                        if (alignmentAbsorptionLinePos.HasValue)
+                        {
+                            int roughLinePos = nextSpectra.ZeroOrderPixelNo + alignmentAbsorptionLinePos.Value - masterSpectra.ZeroOrderPixelNo;
+                            List<SpectraPoint> pointsInRegion = nextSpectra.Points.Where(x => Math.Abs(x.PixelNo - roughLinePos) < 10).ToList();
+                            float[] arrPixelNo = pointsInRegion.Select(x => (float)x.PixelNo).ToArray();
+                            float[] arrPixelValues = pointsInRegion.Select(x => x.RawValue).ToArray();
+                            Array.Sort(arrPixelValues, arrPixelNo);
+                            lineAlignOffset = (int)arrPixelNo[0] - roughLinePos;
+                        }
+
                         int bestOffset = 0;
 
                         if (useFineAdjustments)
@@ -311,7 +340,7 @@ namespace Tangra.Controller
                                 float currOffsetValue = 0;
                                 for (int j = 0; j < masterSpectra.Points.Count; j++)
                                 {
-                                    int indexNextSpectra = nextSpectra.ZeroOrderPixelNo - masterSpectra.ZeroOrderPixelNo + j + probeOffset;
+                                    int indexNextSpectra = nextSpectra.ZeroOrderPixelNo - masterSpectra.ZeroOrderPixelNo + j + probeOffset + lineAlignOffset;
                                     if (indexNextSpectra >= 0 && indexNextSpectra < nextSpectra.Points.Count)
                                     {
                                         currOffsetValue += Math.Abs(originalMasterPoints[j].RawValue - nextSpectra.Points[indexNextSpectra].RawValue);
@@ -328,7 +357,7 @@ namespace Tangra.Controller
 
 						for (int j = 0; j < masterSpectra.Points.Count; j++)
 						{
-                            int indexNextSpectra = nextSpectra.ZeroOrderPixelNo - masterSpectra.ZeroOrderPixelNo + j + bestOffset;
+                            int indexNextSpectra = nextSpectra.ZeroOrderPixelNo - masterSpectra.ZeroOrderPixelNo + j + bestOffset + lineAlignOffset;
 							if (indexNextSpectra >= 0 && indexNextSpectra < nextSpectra.Points.Count)
 							{
 								valueLists[j].Add(nextSpectra.Points[indexNextSpectra].RawValue);

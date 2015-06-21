@@ -181,7 +181,8 @@ namespace Tangra.VideoOperations.Spectroscopy
                     m_MasterSpectra = m_SpectroscopyController.ComputeResult(
                         m_AllFramesSpectra, 
                         m_SpectroscopyController.SpectraReductionContext.FrameCombineMethod,
-                        m_SpectroscopyController.SpectraReductionContext.UseFineAdjustments);
+                        m_SpectroscopyController.SpectraReductionContext.UseFineAdjustments,
+                        m_SpectroscopyController.SpectraReductionContext.AlignmentAbsorptionLinePos);
 
                     m_AllFramesSpectra.Clear();
 
