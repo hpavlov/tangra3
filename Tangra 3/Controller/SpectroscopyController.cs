@@ -243,7 +243,9 @@ namespace Tangra.Controller
                 masterSpectra.SignalAreaWidth = allFramesSpectra[0].SignalAreaWidth;
                 masterSpectra.MaxPixelValue = allFramesSpectra[0].MaxPixelValue;
 				masterSpectra.MaxSpectraValue = allFramesSpectra[0].MaxSpectraValue;
-                masterSpectra.Points.AddRange(allFramesSpectra[0].Points);
+                for (int i = 0; i < allFramesSpectra[0].Points.Count; i++)
+                    masterSpectra.Points.Add(new SpectraPoint(allFramesSpectra[0].Points[i]));
+                
                 masterSpectra.CombinedMeasurements = 1;
 
                 var originalMasterPoints = new List<SpectraPoint>();

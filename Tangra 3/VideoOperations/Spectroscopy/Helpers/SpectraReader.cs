@@ -37,6 +37,17 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 		internal SpectraPoint()
 		{ }
 
+        internal SpectraPoint(SpectraPoint cloneFrom)
+        {
+            PixelNo = cloneFrom.PixelNo;
+            Wavelength = cloneFrom.Wavelength;
+            RawSignal = cloneFrom.RawSignal;
+            RawSignalPixelCount = cloneFrom.RawSignalPixelCount;
+            RawBackgroundPerPixel = cloneFrom.RawBackgroundPerPixel;
+            RawValue = cloneFrom.RawValue;
+            SmoothedValue = cloneFrom.SmoothedValue;
+        }
+
 		public SpectraPoint(BinaryReader reader)
 		{
 			int version = reader.ReadInt32();
