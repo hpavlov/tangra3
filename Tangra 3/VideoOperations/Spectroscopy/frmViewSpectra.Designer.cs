@@ -66,6 +66,8 @@
             this.miView = new System.Windows.Forms.ToolStripMenuItem();
             this.miShowCommonLines = new System.Windows.Forms.ToolStripMenuItem();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.hsbSlidingWindow = new System.Windows.Forms.HScrollBar();
+            this.cbxSlidingWindow = new System.Windows.Forms.CheckBox();
             this.pnlBottom.SuspendLayout();
             this.gbSelection.SuspendLayout();
             this.gbxDispersion.SuspendLayout();
@@ -77,6 +79,8 @@
             // 
             // pnlBottom
             // 
+            this.pnlBottom.Controls.Add(this.cbxSlidingWindow);
+            this.pnlBottom.Controls.Add(this.hsbSlidingWindow);
             this.pnlBottom.Controls.Add(this.gbSelection);
             this.pnlBottom.Controls.Add(this.gbxDispersion);
             this.pnlBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
@@ -402,6 +406,25 @@
             // 
             this.saveFileDialog.Filter = "Tabular Spectra Format (*.dat)|*.dat";
             // 
+            // hsbSlidingWindow
+            // 
+            this.hsbSlidingWindow.Location = new System.Drawing.Point(277, 10);
+            this.hsbSlidingWindow.Name = "hsbSlidingWindow";
+            this.hsbSlidingWindow.Size = new System.Drawing.Size(308, 16);
+            this.hsbSlidingWindow.TabIndex = 5;
+            this.hsbSlidingWindow.ValueChanged += new System.EventHandler(this.hsbSlidingWindow_ValueChanged);
+            // 
+            // cbxSlidingWindow
+            // 
+            this.cbxSlidingWindow.AutoSize = true;
+            this.cbxSlidingWindow.Location = new System.Drawing.Point(277, 30);
+            this.cbxSlidingWindow.Name = "cbxSlidingWindow";
+            this.cbxSlidingWindow.Size = new System.Drawing.Size(141, 17);
+            this.cbxSlidingWindow.TabIndex = 6;
+            this.cbxSlidingWindow.Text = "Stack in Sliding Window";
+            this.cbxSlidingWindow.UseVisualStyleBackColor = true;
+            this.cbxSlidingWindow.CheckedChanged += new System.EventHandler(this.cbxSlidingWindow_CheckedChanged);
+            // 
             // frmViewSpectra
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -417,6 +440,7 @@
             this.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.frmViewSpectra_PreviewKeyDown);
             this.Resize += new System.EventHandler(this.frmViewSpectra_Resize);
             this.pnlBottom.ResumeLayout(false);
+            this.pnlBottom.PerformLayout();
             this.gbSelection.ResumeLayout(false);
             this.gbSelection.PerformLayout();
             this.gbxDispersion.ResumeLayout(false);
@@ -470,5 +494,7 @@
         private System.Windows.Forms.ToolStripMenuItem miLP4_0;
         private System.Windows.Forms.ToolStripMenuItem miSpline;
         private System.Windows.Forms.ToolStripMenuItem miLPNone;
+        private System.Windows.Forms.HScrollBar hsbSlidingWindow;
+        private System.Windows.Forms.CheckBox cbxSlidingWindow;
     }
 }

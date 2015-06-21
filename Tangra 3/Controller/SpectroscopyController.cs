@@ -227,7 +227,13 @@ namespace Tangra.Controller
             return bestAngle;
         }
 
-		internal MasterSpectra ComputeResult(List<Spectra> allFramesSpectra, PixelCombineMethod frameCombineMethod, bool useFineAdjustments, int? alignmentAbsorptionLinePos)
+		internal MasterSpectra ComputeResult(
+            List<Spectra> allFramesSpectra, 
+            PixelCombineMethod frameCombineMethod, 
+            bool useFineAdjustments, 
+            int? alignmentAbsorptionLinePos,
+            int startingFrameIndex = 1,
+            int? frameCountToProcess = null)
         {
 			var masterSpectra = new MasterSpectra();
 
@@ -243,11 +249,15 @@ namespace Tangra.Controller
                 var originalMasterPoints = new List<SpectraPoint>();
                 originalMasterPoints.AddRange(masterSpectra.Points);
 
+                if (frameCountToProcess == null && startingFrameIndex == 1)
+                    frameCountToProcess = allFramesSpectra.Count;
+
 	            if (frameCombineMethod == PixelCombineMethod.Average)
 	            {
-					for (int i = 1; i < allFramesSpectra.Count; i++)
+                    for (int i = startingFrameIndex; i < startingFrameIndex + frameCountToProcess - 1; i++)
 					{
 						Spectra nextSpectra = allFramesSpectra[i];
+                        masterSpectra.RawMeasurements.Add(nextSpectra);
 
                         int lineAlignOffset = 0;
                         if (alignmentAbsorptionLinePos.HasValue)
@@ -308,15 +318,16 @@ namespace Tangra.Controller
 	            }
 				else if (frameCombineMethod == PixelCombineMethod.Median)
 				{
-					var valueLists = new List<float>[masterSpectra.Points.Count];
+                    var valueLists = new List<float>[masterSpectra.Points.Count];
 					for (int j = 0; j < masterSpectra.Points.Count; j++) valueLists[j] = new List<float>();
 
-					var signalLists = new List<float>[masterSpectra.Points.Count];
+                    var signalLists = new List<float>[masterSpectra.Points.Count];
 					for (int j = 0; j < masterSpectra.Points.Count; j++) signalLists[j] = new List<float>();
 
-					for (int i = 1; i < allFramesSpectra.Count; i++)
+                    for (int i = startingFrameIndex; i < startingFrameIndex + frameCountToProcess - 1; i++)
 					{
 						Spectra nextSpectra = allFramesSpectra[i];
+                        masterSpectra.RawMeasurements.Add(nextSpectra);
 
                         int lineAlignOffset = 0;
                         if (alignmentAbsorptionLinePos.HasValue)
@@ -555,7 +566,8 @@ namespace Tangra.Controller
                BackgroundMethod = SpectraReductionContext.BackgroundMethod,
                FrameCombineMethod = SpectraReductionContext.FrameCombineMethod,
                UseFineAdjustments = SpectraReductionContext.UseFineAdjustments,
-               UseLowPassFilter = SpectraReductionContext.UseLowPassFilter
+               UseLowPassFilter = SpectraReductionContext.UseLowPassFilter,
+               AlignmentAbsorptionLinePos = SpectraReductionContext.AlignmentAbsorptionLinePos
             };
         }
     }

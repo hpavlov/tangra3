@@ -43,6 +43,9 @@ namespace Tangra.VideoOperations.Spectroscopy
 	    {
 			m_Spectra = masterSpectra;
 			m_StateManager.SetMasterSpectra(masterSpectra);
+		    hsbSlidingWindow.Minimum = 0;
+		    hsbSlidingWindow.Maximum = m_Spectra.RawMeasurements.Count - 50;
+		    hsbSlidingWindow.Value = 0;
 	    }
 
         private void frmViewSpectra_Load(object sender, EventArgs e)
@@ -206,6 +209,37 @@ namespace Tangra.VideoOperations.Spectroscopy
                     Trace.WriteLine(ex.GetFullStackTrace());
                 }
             }
+        }
+
+        private void cbxSlidingWindow_CheckedChanged(object sender, EventArgs e)
+        {
+            if (cbxSlidingWindow.Checked)
+                DoNewMasterSpectraReduction();
+        }
+
+        private void DoNewMasterSpectraReduction()
+        {
+            MasterSpectra newSpectraReduction =
+                m_SpectroscopyController.ComputeResult(m_Spectra.RawMeasurements,
+                    m_Spectra.MeasurementInfo.FrameCombineMethod,
+                    m_Spectra.MeasurementInfo.UseFineAdjustments,
+                    m_Spectra.MeasurementInfo.AlignmentAbsorptionLinePos,
+                    hsbSlidingWindow.Value + 1,
+                    50);
+
+            newSpectraReduction.RawMeasurements.Clear();
+            newSpectraReduction.RawMeasurements.AddRange(m_Spectra.RawMeasurements);
+            newSpectraReduction.MeasurementInfo = m_Spectra.MeasurementInfo;
+            newSpectraReduction.Calibration = m_Spectra.Calibration;
+
+            m_Spectra = newSpectraReduction;
+            m_StateManager.SetMasterSpectra(newSpectraReduction);
+            PlotSpectra();
+        }
+
+        private void hsbSlidingWindow_ValueChanged(object sender, EventArgs e)
+        {
+            DoNewMasterSpectraReduction();
         }
     }
 }

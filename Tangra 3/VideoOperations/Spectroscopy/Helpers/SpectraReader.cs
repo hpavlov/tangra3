@@ -72,6 +72,8 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 		public SpectraCalibration Calibration;
         public MeasurementInfo MeasurementInfo;
 
+        public List<Spectra> RawMeasurements = new List<Spectra>();
+
 		public bool IsCalibrated()
 		{
 			return Calibration != null;
@@ -103,6 +105,26 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 	        MeasurementInfo = new MeasurementInfo(reader);
 	        if (reader.ReadBoolean())
 	            Calibration = new SpectraCalibration(reader);
+
+            int rawFramesCount = reader.ReadInt32();
+            for (int i = 0; i < rawFramesCount; i++)
+            {
+                var frameMeasurement = new Spectra();
+                RawMeasurements.Add(frameMeasurement);
+
+                frameMeasurement.SignalAreaWidth = reader.ReadInt32();
+                frameMeasurement.MaxPixelValue = reader.ReadUInt32();
+                frameMeasurement.MaxSpectraValue = reader.ReadUInt32();
+                frameMeasurement.ZeroOrderPixelNo = reader.ReadInt32();
+
+                int frameMeaCount = reader.ReadInt32();
+
+                for (int j = 0; j < frameMeaCount; j++)
+                {
+                    var point = new SpectraPoint(reader);
+                    frameMeasurement.Points.Add(point);
+                }
+            }
 	    }
 
 	    public void WriteTo(BinaryWriter writer)
@@ -132,6 +154,23 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
                 writer.Write(true);
                 Calibration.WriteTo(writer);    
             }
+
+            writer.Write(RawMeasurements.Count);
+            for (int i = 0; i < RawMeasurements.Count; i++)
+            {
+                Spectra frameSpectra = RawMeasurements[i];
+
+                writer.Write(frameSpectra.SignalAreaWidth);
+                writer.Write(frameSpectra.MaxPixelValue);
+                writer.Write(frameSpectra.MaxSpectraValue);
+                writer.Write(frameSpectra.ZeroOrderPixelNo);
+
+                writer.Write(frameSpectra.Points.Count);
+                foreach (var spectraPoint in frameSpectra.Points)
+                {
+                    spectraPoint.WriteTo(writer);
+                }
+	        }
 	    }
     }
 
@@ -184,6 +223,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
         public PixelCombineMethod FrameCombineMethod { get; set; }
         public bool UseFineAdjustments { get; set; }
         public bool UseLowPassFilter { get; set; }
+        public int? AlignmentAbsorptionLinePos { get; set; }
 
         // Other items
         public int FirstMeasuredFrame;
@@ -209,6 +249,8 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
             UseLowPassFilter = reader.ReadBoolean();
             FirstMeasuredFrame = reader.ReadInt32();
             LastMeasuredFrame = reader.ReadInt32();
+            bool hasAlignmentAbsorptionLinePos = reader.ReadBoolean();
+            if (hasAlignmentAbsorptionLinePos) AlignmentAbsorptionLinePos = reader.ReadInt32();
             bool hasFirstTimestamp = reader.ReadBoolean();
             if (hasFirstTimestamp) FirstFrameTimeStamp = new DateTime(reader.ReadInt64());
             bool hasLastTimestamp = reader.ReadBoolean();
@@ -228,6 +270,8 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
             writer.Write(UseLowPassFilter);
             writer.Write(FirstMeasuredFrame);
             writer.Write(LastMeasuredFrame);
+            writer.Write(AlignmentAbsorptionLinePos.HasValue);
+            if (AlignmentAbsorptionLinePos.HasValue) writer.Write(AlignmentAbsorptionLinePos.Value);
 		    writer.Write(FirstFrameTimeStamp.HasValue);
             if (FirstFrameTimeStamp.HasValue) writer.Write(FirstFrameTimeStamp.Value.Ticks);
             writer.Write(LastFrameTimeStamp.HasValue);
