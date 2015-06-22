@@ -261,10 +261,13 @@ namespace Tangra.Controller
 						Spectra nextSpectra = allFramesSpectra[i];
                         masterSpectra.RawMeasurements.Add(nextSpectra);
 
+						int nextSpectraFirstPixelNo = nextSpectra.Points[0].PixelNo;
+						int deltaIndex = nextSpectra.ZeroOrderPixelNo - masterSpectra.ZeroOrderPixelNo + masterSpectra.Points[0].PixelNo - nextSpectraFirstPixelNo;
+
                         int lineAlignOffset = 0;
                         if (alignmentAbsorptionLinePos.HasValue)
                         {
-                            int roughLinePos = nextSpectra.ZeroOrderPixelNo + alignmentAbsorptionLinePos.Value - masterSpectra.ZeroOrderPixelNo;
+							int roughLinePos = deltaIndex + alignmentAbsorptionLinePos.Value;
                             List<SpectraPoint> pointsInRegion = nextSpectra.Points.Where(x => Math.Abs(x.PixelNo - roughLinePos) < 10).ToList();
                             float[] arrPixelNo = pointsInRegion.Select(x => (float)x.PixelNo).ToArray();
                             float[] arrPixelValues = pointsInRegion.Select(x => x.RawValue).ToArray();
@@ -283,7 +286,7 @@ namespace Tangra.Controller
                                 float currOffsetValue = 0;
                                 for (int j = 0; j < masterSpectra.Points.Count; j++)
                                 {
-                                    int indexNextSpectra = nextSpectra.ZeroOrderPixelNo - masterSpectra.ZeroOrderPixelNo + j + probeOffset + lineAlignOffset;
+									int indexNextSpectra = deltaIndex + j + probeOffset + lineAlignOffset;
                                     if (indexNextSpectra >= 0 && indexNextSpectra < nextSpectra.Points.Count)
                                     {
                                         currOffsetValue += Math.Abs(originalMasterPoints[j].RawValue - nextSpectra.Points[indexNextSpectra].RawValue);
@@ -300,7 +303,7 @@ namespace Tangra.Controller
 
                         for (int j = 0; j < masterSpectra.Points.Count; j++)
                         {
-                            int indexNextSpectra = nextSpectra.ZeroOrderPixelNo - masterSpectra.ZeroOrderPixelNo + j + bestOffset + lineAlignOffset;
+							int indexNextSpectra = deltaIndex + j + bestOffset + lineAlignOffset;
                             if (indexNextSpectra >= 0 && indexNextSpectra < nextSpectra.Points.Count)
                             {
                                 masterSpectra.Points[j].RawValue += nextSpectra.Points[indexNextSpectra].RawValue;
@@ -331,10 +334,13 @@ namespace Tangra.Controller
 						Spectra nextSpectra = allFramesSpectra[i];
                         masterSpectra.RawMeasurements.Add(nextSpectra);
 
+						int nextSpectraFirstPixelNo = nextSpectra.Points[0].PixelNo;
+						int deltaIndex = nextSpectra.ZeroOrderPixelNo - masterSpectra.ZeroOrderPixelNo + masterSpectra.Points[0].PixelNo - nextSpectraFirstPixelNo;
+
                         int lineAlignOffset = 0;
                         if (alignmentAbsorptionLinePos.HasValue)
                         {
-                            int roughLinePos = nextSpectra.ZeroOrderPixelNo + alignmentAbsorptionLinePos.Value - masterSpectra.ZeroOrderPixelNo;
+							int roughLinePos = deltaIndex + alignmentAbsorptionLinePos.Value;
                             List<SpectraPoint> pointsInRegion = nextSpectra.Points.Where(x => Math.Abs(x.PixelNo - roughLinePos) < 10).ToList();
                             float[] arrPixelNo = pointsInRegion.Select(x => (float)x.PixelNo).ToArray();
                             float[] arrPixelValues = pointsInRegion.Select(x => x.RawValue).ToArray();
@@ -353,7 +359,7 @@ namespace Tangra.Controller
                                 float currOffsetValue = 0;
                                 for (int j = 0; j < masterSpectra.Points.Count; j++)
                                 {
-                                    int indexNextSpectra = nextSpectra.ZeroOrderPixelNo - masterSpectra.ZeroOrderPixelNo + j + probeOffset + lineAlignOffset;
+									int indexNextSpectra = deltaIndex + j + probeOffset + lineAlignOffset;
                                     if (indexNextSpectra >= 0 && indexNextSpectra < nextSpectra.Points.Count)
                                     {
                                         currOffsetValue += Math.Abs(originalMasterPoints[j].RawValue - nextSpectra.Points[indexNextSpectra].RawValue);
@@ -370,7 +376,7 @@ namespace Tangra.Controller
 
 						for (int j = 0; j < masterSpectra.Points.Count; j++)
 						{
-                            int indexNextSpectra = nextSpectra.ZeroOrderPixelNo - masterSpectra.ZeroOrderPixelNo + j + bestOffset + lineAlignOffset;
+							int indexNextSpectra = deltaIndex + j + bestOffset + lineAlignOffset;
 							if (indexNextSpectra >= 0 && indexNextSpectra < nextSpectra.Points.Count)
 							{
 								valueLists[j].Add(nextSpectra.Points[indexNextSpectra].RawValue);
