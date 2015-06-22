@@ -55,6 +55,9 @@ namespace Tangra.VideoOperations.Spectroscopy
                 calibrator.Reset();
                 calibrator.SetMarker((int)masterSpectra.Calibration.Pixel1, masterSpectra.Calibration.Wavelength1);
                 calibrator.SetMarker((int)masterSpectra.Calibration.Pixel2, masterSpectra.Calibration.Wavelength2);
+
+                if (masterSpectra.ProcessingInfo.GaussianBlur10Fwhm.HasValue)
+                    m_StateManager.ApplyGaussianBlur(masterSpectra.ProcessingInfo.GaussianBlur10Fwhm.Value / 10.0f);
             }
 	    }
 
@@ -71,7 +74,7 @@ namespace Tangra.VideoOperations.Spectroscopy
 			m_StateManager.DrawSpectra(picSpectra, picSpectraGraph);
 
 	        gbxDispersion.Visible = m_SpectroscopyController.IsCalibrated();
-	        lblDispersion.Text = m_SpectroscopyController.GetSpectraCalibrator().GetCalibrationScale().ToString("0.0 A/pixel");
+	        lblDispersion.Text = m_SpectroscopyController.GetSpectraCalibrator().GetCalibrationScale().ToString("0.00 A/pixel");
 	    }
 
 		private void frmViewSpectra_Resize(object sender, EventArgs e)
@@ -254,6 +257,40 @@ namespace Tangra.VideoOperations.Spectroscopy
         private void hsbSlidingWindow_ValueChanged(object sender, EventArgs e)
         {
             DoNewMasterSpectraReduction();
+        }
+
+        private void miLowPass_DropDownOpening(object sender, EventArgs e)
+        {
+            miLP1_0.Checked = false;
+            miLP1_5.Checked = false;
+            miLP2_0.Checked = false;
+            miLP2_5.Checked = false;
+            miLP3_0.Checked = false;
+            miLP3_5.Checked = false;
+            miLP4_0.Checked = false;
+            miLPNone.Checked = false;
+
+            // 'Check' the correct FWHM menu item
+            if (m_Spectra.ProcessingInfo.GaussianBlur10Fwhm.HasValue)
+            {
+                int fwhm10 = m_Spectra.ProcessingInfo.GaussianBlur10Fwhm.Value;
+                if (fwhm10 == 10)
+                    miLP1_0.Checked = true;
+                else if (fwhm10 == 15)
+                    miLP1_5.Checked = true;
+                else if (fwhm10 == 20)
+                    miLP2_0.Checked = true;
+                else if (fwhm10 == 25)
+                    miLP2_5.Checked = true;
+                else if (fwhm10 == 30)
+                    miLP3_0.Checked = true;
+                else if (fwhm10 == 35)
+                    miLP3_5.Checked = true;
+                else if (fwhm10 == 40)
+                    miLP4_0.Checked = true;
+            }
+            else
+                miLPNone.Checked = true;
         }
     }
 }

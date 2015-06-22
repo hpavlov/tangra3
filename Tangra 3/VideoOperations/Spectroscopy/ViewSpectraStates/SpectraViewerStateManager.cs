@@ -340,6 +340,8 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
             {
                 foreach (SpectraPoint point in m_MasterSpectra.Points)
                     point.ProcessedValue = point.RawValue;
+
+                m_MasterSpectra.ProcessingInfo.GaussianBlur10Fwhm = null;
             }
             else
             {
@@ -368,6 +370,8 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
                     else
                         point.ProcessedValue = point.RawValue;
                 }
+
+                m_MasterSpectra.ProcessingInfo.GaussianBlur10Fwhm = (int)Math.Round(fwhm * 10);
             }
 
             Redraw();

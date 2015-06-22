@@ -82,6 +82,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 
 		public SpectraCalibration Calibration;
         public MeasurementInfo MeasurementInfo;
+        public ProcessingInfo ProcessingInfo = new ProcessingInfo();
 
         public List<Spectra> RawMeasurements = new List<Spectra>();
 
@@ -136,6 +137,8 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
                     frameMeasurement.Points.Add(point);
                 }
             }
+
+	        ProcessingInfo = new ProcessingInfo(reader);
 	    }
 
 	    public void WriteTo(BinaryWriter writer)
@@ -182,6 +185,8 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
                     spectraPoint.WriteTo(writer);
                 }
 	        }
+
+	        ProcessingInfo.WriteTo(writer);
 	    }
     }
 
@@ -223,6 +228,36 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 			writer.Write(ZeroPixel);
 		}
 	}
+
+    public class ProcessingInfo
+    {
+        public int? GaussianBlur10Fwhm;
+
+        private static int SERIALIZATION_VERSION = 1;
+
+		internal ProcessingInfo()
+		{ }
+
+        public ProcessingInfo(BinaryReader reader)
+        {
+            int version = reader.ReadInt32();
+
+            if (reader.ReadBoolean())
+                GaussianBlur10Fwhm = reader.ReadInt32();
+            else
+                GaussianBlur10Fwhm = null;
+        }
+
+        public void WriteTo(BinaryWriter writer)
+        {
+            writer.Write(SERIALIZATION_VERSION);
+
+            writer.Write(GaussianBlur10Fwhm.HasValue);
+            if (GaussianBlur10Fwhm.HasValue) writer.Write(GaussianBlur10Fwhm.Value);
+        }
+
+    }
+
 
     public class MeasurementInfo
     {
