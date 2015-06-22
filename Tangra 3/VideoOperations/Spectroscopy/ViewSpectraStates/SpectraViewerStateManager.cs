@@ -18,7 +18,7 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 	    private frmViewSpectra m_frmViewSpectra;
 	    private SpectroscopyController m_SpectroscopyController;
 
-		public const int X_AXIS_WIDTH = 100;
+		public const int X_AXIS_WIDTH = 60;
 		public const int Y_AXIS_WIDTH = 50;
 		public const int BORDER_GAP = 10;
 
@@ -133,7 +133,7 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 		{
 			PointF prevPoint = PointF.Empty;
 			bool isCalibrated = m_SpectroscopyController.IsCalibrated();
-			int xAxisOffset = isCalibrated ? X_AXIS_WIDTH: 0;
+			int xAxisOffset = isCalibrated ? X_AXIS_WIDTH : 0;
 			int yAxisOffset = isCalibrated ? Y_AXIS_WIDTH : 0;
 			float xCoeff = isCalibrated ? m_XCoeffCalibrated : m_XCoeff;
 			float yCoeff = isCalibrated ? m_YCoeffCalibrated : m_YCoeff;
@@ -172,13 +172,6 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
                             if (!isCalibrated || (calibratedGraphArea.Contains(prevPoint) && calibratedGraphArea.Contains(graphPoint)))
                                 g2.DrawLine(s_SpectraPen, prevPoint, graphPoint);
 
-							//if (graphPoint.X > 0 && graphPoint.X < picSpectraGraph.Image.Width && graphPoint.Y > 0 &&
-							//	graphPoint.Y < picSpectraGraph.Image.Height &&
-							//	prevPoint.X > 0 && prevPoint.X < picSpectraGraph.Image.Width && prevPoint.Y > 0 &&
-							//	prevPoint.Y < picSpectraGraph.Image.Height)
-							//{
-							//	g2.DrawLine(s_SpectraPen, prevPoint, graphPoint);
-							//}
 						}
 						prevPoint = graphPoint;
 					}
@@ -188,7 +181,7 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 					m_CurrentState.PostDraw(g2);
 
 				if (isCalibrated)
-                    DrawAxis(g2, calibratedGraphArea);
+					DrawAxis(picSpectraGraph, g2, calibratedGraphArea);
 
 				g.Save();
 				g2.Save();
@@ -198,57 +191,92 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 			picSpectraGraph.Invalidate();
 		}
 
-		private void DrawAxis(Graphics g, RectangleF calibratedGraphArea)
+		private void DrawAxis(PictureBox picSpectraGraph, Graphics g, RectangleF calibratedGraphArea)
 		{
             g.DrawRectangle(s_GridLinesPen, calibratedGraphArea.Left, calibratedGraphArea.Top, calibratedGraphArea.Width, calibratedGraphArea.Height);
             g.DrawRectangle(s_GridLinesPen, calibratedGraphArea.Left, m_View.Height - 10, calibratedGraphArea.Width, m_View.Height);
 
 		    SpectraCalibrator calibrator = m_SpectroscopyController.GetSpectraCalibrator();
-
-            // TODO: Draw Y axis marks
-            //m_MasterSpectra.MaxSpectraValue
-
-            // Draw X axis marks, from 0, every 250 A with a label every 1000 A/2000 A
-            int pixel0 = calibrator.ResolvePixelNo(0);
-            int pixel1000 = calibrator.ResolvePixelNo(1000);
-		    float mousePosX0 = GetMouseXFromSpectraPixel(pixel0);
-            float mousePosX1000 = GetMouseXFromSpectraPixel(pixel1000);
-		    float scalePer1000 = (mousePosX1000 - mousePosX0);
-		    SizeF xLabelSize = g.MeasureString("9000xx", s_LegendFont);
-
-		    int labelIncrement = 1000;
-            if (xLabelSize.Width < scalePer1000 / 4)
-                labelIncrement = 250;
-            else if (xLabelSize.Width < scalePer1000 / 2)
-                labelIncrement = 500;
-            else if (xLabelSize.Width >= scalePer1000 / 2 && xLabelSize.Width < scalePer1000)
-                labelIncrement = 1000;
-            else if (xLabelSize.Width >= scalePer1000 && xLabelSize.Width < 2 * scalePer1000)
-                labelIncrement = 2000;
-
-		    float maxWaveLengthInSeries = m_MasterSpectra.Points[m_MasterSpectra.Points.Count - 1].Wavelength;
-		    int currWaveLength = 0;
-            float currXTickPos = GetMouseXFromSpectraPixel(calibrator.ResolvePixelNo(currWaveLength));
-		    do
-		    {
-		        int tickSize = currWaveLength%1000 == 0 ? 6 : 3;
-                g.DrawLine(s_GridLinesPen, currXTickPos, m_View.Height - 10, currXTickPos, m_View.Height - 10 - tickSize);
-                g.DrawLine(s_GridLinesPen, currXTickPos, YMax, currXTickPos, YMax + tickSize);
-                
-                if (currWaveLength % labelIncrement == 0)
-                {
-                    string labelText = currWaveLength.ToString(CultureInfo.CurrentCulture);
-                    xLabelSize = g.MeasureString(labelText, s_LegendFont);
-                    g.DrawString(labelText, s_LegendFont, s_LegendBrush, currXTickPos - (xLabelSize.Width / 2f), m_View.Height - 35);
-                }
-
-		        currWaveLength += 250;
-                currXTickPos = GetMouseXFromSpectraPixel(calibrator.ResolvePixelNo(currWaveLength));
-		    }
-            while (currXTickPos < calibratedGraphArea.Width + X_AXIS_WIDTH && currWaveLength < maxWaveLengthInSeries + 1);
+           
+			DrawXAxisMarks(g, calibratedGraphArea, calibrator);
+			DrawYAxisMarks(g, calibratedGraphArea, picSpectraGraph);
 		}
 
-        private void ShowCommonLines(Graphics g)
+		private void DrawXAxisMarks(Graphics g, RectangleF calibratedGraphArea, SpectraCalibrator calibrator)
+		{
+			// Draw X axis marks, from 0, every 250 A with a label every 1000 A/2000 A
+			int pixel0 = calibrator.ResolvePixelNo(0);
+			int pixel1000 = calibrator.ResolvePixelNo(1000);
+			float mousePosX0 = GetMouseXFromSpectraPixel(pixel0);
+			float mousePosX1000 = GetMouseXFromSpectraPixel(pixel1000);
+			float scalePer1000 = (mousePosX1000 - mousePosX0);
+			SizeF xLabelSize = g.MeasureString("9000xx", s_LegendFont);
+
+			int labelIncrement = 1000;
+			if (xLabelSize.Width < scalePer1000 / 4)
+				labelIncrement = 250;
+			else if (xLabelSize.Width < scalePer1000 / 2)
+				labelIncrement = 500;
+			else if (xLabelSize.Width >= scalePer1000 / 2 && xLabelSize.Width < scalePer1000)
+				labelIncrement = 1000;
+			else if (xLabelSize.Width >= scalePer1000 && xLabelSize.Width < 2 * scalePer1000)
+				labelIncrement = 2000;
+
+			float maxWaveLengthInSeries = m_MasterSpectra.Points[m_MasterSpectra.Points.Count - 1].Wavelength;
+			int currWaveLength = 0;
+			float currXTickPos = GetMouseXFromSpectraPixel(calibrator.ResolvePixelNo(currWaveLength));
+			do
+			{
+				int tickSize = currWaveLength % 1000 == 0 ? 6 : 3;
+				g.DrawLine(s_GridLinesPen, currXTickPos, m_View.Height - 10, currXTickPos, m_View.Height - 10 - tickSize);
+				g.DrawLine(s_GridLinesPen, currXTickPos, YMax, currXTickPos, YMax + tickSize);
+
+				if (currWaveLength % labelIncrement == 0)
+				{
+					string labelText = currWaveLength.ToString(CultureInfo.CurrentCulture);
+					xLabelSize = g.MeasureString(labelText, s_LegendFont);
+					g.DrawString(labelText, s_LegendFont, s_LegendBrush, currXTickPos - (xLabelSize.Width / 2f), m_View.Height - 35);
+				}
+
+				currWaveLength += 250;
+				currXTickPos = GetMouseXFromSpectraPixel(calibrator.ResolvePixelNo(currWaveLength));
+			}
+			while (currXTickPos < calibratedGraphArea.Width + X_AXIS_WIDTH && currWaveLength < maxWaveLengthInSeries + 1);
+		}
+
+		private void DrawYAxisMarks(Graphics g, RectangleF calibratedGraphArea, PictureBox picSpectraGraph)
+		{
+			float maxDisplayedValue = (calibratedGraphArea.Height - BORDER_GAP) / m_YCoeffCalibrated;
+			SizeF yLabelSize = g.MeasureString("9000xx", s_LegendFont);
+
+			int[] probeIntervals = new[] { 1, 2, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000, 100000, 250000, 500000 };
+
+			int probeInt = 100;
+			for(int i = 0; i < probeIntervals.Length; i++)
+			{
+				probeInt = probeIntervals[i];
+				float ticks = maxDisplayedValue / probeInt;
+				if (ticks > 5 && ticks < 15)
+				{
+					break;
+				}
+			}
+
+			float currYTickPos = 0;
+			int currYTickValue = 0;
+			do
+			{
+				currYTickPos = picSpectraGraph.Image.Height - BORDER_GAP - m_YCoeffCalibrated * currYTickValue - Y_AXIS_WIDTH;
+				string labelCaption = currYTickValue.ToString();
+				yLabelSize = g.MeasureString(labelCaption, s_LegendFont);
+				g.DrawLine(s_GridLinesPen, X_AXIS_WIDTH, currYTickPos, X_AXIS_WIDTH - 6, currYTickPos);
+				g.DrawString(labelCaption, s_LegendFont, s_LegendBrush, X_AXIS_WIDTH - 12 - yLabelSize.Width, currYTickPos - yLabelSize.Height / 2);
+				currYTickValue += probeInt;
+			} 
+			while (currYTickPos > BORDER_GAP && currYTickValue < maxDisplayedValue);
+		}
+
+		private void ShowCommonLines(Graphics g)
         {
             SpectraCalibrator calibrator = m_SpectroscopyController.GetSpectraCalibrator();
 
