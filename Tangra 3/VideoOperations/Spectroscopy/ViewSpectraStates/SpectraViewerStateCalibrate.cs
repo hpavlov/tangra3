@@ -154,6 +154,19 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 			m_StateManager.Redraw();
 		}
 
+		internal bool HasSelectedCalibrationPoints()
+		{
+			return m_SpectroscopyController.GetSpectraCalibrator().HasSelectedCalibrationPoints();
+		}
+
+		internal void ResetCalibration()
+		{
+			m_SpectroscopyController.GetSpectraCalibrator().Reset();
+
+			m_FirstCalibrationPoint = null;
+			CalibrationPointSelectionCancelled();
+		}
+
 		public override void PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
 		{
 			if (m_SelectedPoint != null)

@@ -41,6 +41,21 @@ namespace Tangra.VideoOperations.Spectroscopy
 	        m_VideoController = videoController;
 	    }
 
+		/// <summary>
+		/// Clean up any resources being used.
+		/// </summary>
+		/// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+		protected override void Dispose(bool disposing)
+		{
+			if (disposing && (components != null))
+			{
+				components.Dispose();
+			}
+			base.Dispose(disposing);
+
+			m_SpectroscopyController.OnSpectraViewerClosed();
+		}
+
 		internal void SetMasterSpectra(MasterSpectra masterSpectra)
 	    {
 			m_Spectra = masterSpectra;
@@ -49,6 +64,9 @@ namespace Tangra.VideoOperations.Spectroscopy
 		    hsbSlidingWindow.Maximum = Math.Max(1, m_Spectra.RawMeasurements.Count - 50);
 		    hsbSlidingWindow.Value = 0;
 
+			if (masterSpectra.ProcessingInfo.GaussianBlur10Fwhm.HasValue)
+				m_StateManager.ApplyGaussianBlur(masterSpectra.ProcessingInfo.GaussianBlur10Fwhm.Value / 10.0f);
+
             if (masterSpectra.IsCalibrated())
             {
                 SpectraCalibrator calibrator = m_SpectroscopyController.GetSpectraCalibrator();    
@@ -56,8 +74,7 @@ namespace Tangra.VideoOperations.Spectroscopy
                 calibrator.SetMarker((int)masterSpectra.Calibration.Pixel1, masterSpectra.Calibration.Wavelength1);
                 calibrator.SetMarker((int)masterSpectra.Calibration.Pixel2, masterSpectra.Calibration.Wavelength2);
 
-                if (masterSpectra.ProcessingInfo.GaussianBlur10Fwhm.HasValue)
-                    m_StateManager.ApplyGaussianBlur(masterSpectra.ProcessingInfo.GaussianBlur10Fwhm.Value / 10.0f);
+	            m_StateManager.ChangeState<SpectraViewerStateCalibrated>();
             }
 	    }
 

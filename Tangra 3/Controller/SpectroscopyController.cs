@@ -630,5 +630,10 @@ namespace Tangra.Controller
                AlignmentAbsorptionLinePos = SpectraReductionContext.AlignmentAbsorptionLinePos
             };
         }
+
+		public void OnSpectraViewerClosed()
+		{
+			m_VideoController.CloseOpenedVideoFile();
+		}
     }
 }

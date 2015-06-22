@@ -76,6 +76,11 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
             return m_PixelNo1.HasValue && m_PixelNo2.HasValue;
         }
 
+		public bool HasSelectedCalibrationPoints()
+		{
+			return m_PixelNo1.HasValue;
+		}
+
 		public SpectraCalibration ToSpectraCalibration()
 		{
 			if (IsCalibrated())

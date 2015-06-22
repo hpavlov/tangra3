@@ -97,5 +97,16 @@ namespace Tangra.VideoOperations.Spectroscopy
         {
             nudDispersion.Enabled = cbxSinglePoint.Checked;
         }
+
+		private void frmEnterWavelength_Shown(object sender, EventArgs e)
+		{
+			pnlOnePointCalibration.Visible = !m_State.HasSelectedCalibrationPoints();
+		}
+
+		private void btnReset_Click(object sender, EventArgs e)
+		{
+			m_State.ResetCalibration();
+			Close();
+		}
     }
 }
