@@ -41,6 +41,17 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
             }
         }
 
+        public void SetDispersion(float dispersion)
+        {
+            if (m_PixelNo1.HasValue)
+            {
+                m_PixelNo2 = m_PixelNo1.Value + 1000;
+                m_Wavelength2 = dispersion * 1000;
+
+                Calibrate();
+            }
+        }
+
         private void Calibrate()
         {
             if (m_PixelNo1.HasValue && m_PixelNo2.HasValue)

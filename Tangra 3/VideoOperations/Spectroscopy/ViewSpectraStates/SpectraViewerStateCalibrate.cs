@@ -139,6 +139,14 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 	        }
         }
 
+        internal void DispersionSelected(float dispersion)
+        {
+            m_SpectroscopyController.SetDispersion(dispersion);
+
+            if (m_SpectroscopyController.IsCalibrated())
+                m_StateManager.ChangeState<SpectraViewerStateCalibrated>();
+        }
+
 		internal void CalibrationPointSelectionCancelled()
 		{
 			m_SelectedPoint = null;

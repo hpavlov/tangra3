@@ -87,7 +87,7 @@ namespace Tangra.Controller
             return null;
         }
 
-        private bool TestWhetherVideoFileMatchesLcHeader(string fileName, LCMeasurementHeader header)
+        private static bool TestWhetherVideoFileMatchesLcHeader(string fileName, LCMeasurementHeader header)
         {
             //using (FramePlayer player = new FramePlayer())
             //{

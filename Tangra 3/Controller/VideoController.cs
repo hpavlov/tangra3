@@ -530,17 +530,17 @@ namespace Tangra.Controller
 
 	    public string CurrentVideoFileName
 	    {
-		    get { return m_FramePlayer.Video.FileName; }
+            get { return m_FramePlayer.Video == null ? null : m_FramePlayer.Video.FileName; }
 	    }
 
 		public string CurrentVideoFileType
 	    {
-		    get { return m_FramePlayer.Video.VideoFileType; }
+            get { return m_FramePlayer.Video == null ? null : m_FramePlayer.Video.VideoFileType; }
 	    }
 
 		public string CurrentVideoFileEngine
 		{
-			get { return m_FramePlayer.Video.Engine; }
+            get { return m_FramePlayer.Video == null ? null : m_FramePlayer.Video.Engine; }
 		}
 
 		public void SetupFrameIntegration(int framesToIntegrate, FrameIntegratingMode frameMode, PixelIntegrationType pixelIntegrationType)        
@@ -2279,5 +2279,23 @@ namespace Tangra.Controller
 		{
 			m_FramePlayer.RotateVideo(45);
 		}
+
+        public string GetVideoFileMatchingLcFile(string fileName, string searchPath)
+        {
+            if (File.Exists(fileName))
+                return fileName;
+
+
+            string nextGuess = Path.GetFullPath(Path.GetDirectoryName(searchPath) + "\\" + Path.GetFileName(fileName));
+            if (File.Exists(nextGuess))
+                return nextGuess;
+
+            nextGuess =
+                Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory + "\\" + Path.GetFileName(fileName));
+            if (File.Exists(nextGuess))
+                return nextGuess;
+
+            return null;
+        }
 	}
 }

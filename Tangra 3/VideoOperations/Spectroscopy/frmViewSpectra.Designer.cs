@@ -30,6 +30,8 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmViewSpectra));
             this.pnlBottom = new System.Windows.Forms.Panel();
+            this.cbxSlidingWindow = new System.Windows.Forms.CheckBox();
+            this.hsbSlidingWindow = new System.Windows.Forms.HScrollBar();
             this.gbSelection = new System.Windows.Forms.GroupBox();
             this.lblWavelength = new System.Windows.Forms.Label();
             this.lblWavelengthCaption = new System.Windows.Forms.Label();
@@ -66,8 +68,8 @@
             this.miView = new System.Windows.Forms.ToolStripMenuItem();
             this.miShowCommonLines = new System.Windows.Forms.ToolStripMenuItem();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.hsbSlidingWindow = new System.Windows.Forms.HScrollBar();
-            this.cbxSlidingWindow = new System.Windows.Forms.CheckBox();
+            this.exportFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.pnlBottom.SuspendLayout();
             this.gbSelection.SuspendLayout();
             this.gbxDispersion.SuspendLayout();
@@ -88,6 +90,28 @@
             this.pnlBottom.Name = "pnlBottom";
             this.pnlBottom.Size = new System.Drawing.Size(807, 74);
             this.pnlBottom.TabIndex = 1;
+            // 
+            // cbxSlidingWindow
+            // 
+            this.cbxSlidingWindow.AutoSize = true;
+            this.cbxSlidingWindow.Location = new System.Drawing.Point(277, 30);
+            this.cbxSlidingWindow.Name = "cbxSlidingWindow";
+            this.cbxSlidingWindow.Size = new System.Drawing.Size(141, 17);
+            this.cbxSlidingWindow.TabIndex = 6;
+            this.cbxSlidingWindow.Text = "Stack in Sliding Window";
+            this.cbxSlidingWindow.UseVisualStyleBackColor = true;
+            this.cbxSlidingWindow.Visible = false;
+            this.cbxSlidingWindow.CheckedChanged += new System.EventHandler(this.cbxSlidingWindow_CheckedChanged);
+            // 
+            // hsbSlidingWindow
+            // 
+            this.hsbSlidingWindow.Enabled = false;
+            this.hsbSlidingWindow.Location = new System.Drawing.Point(277, 10);
+            this.hsbSlidingWindow.Name = "hsbSlidingWindow";
+            this.hsbSlidingWindow.Size = new System.Drawing.Size(308, 16);
+            this.hsbSlidingWindow.TabIndex = 5;
+            this.hsbSlidingWindow.Visible = false;
+            this.hsbSlidingWindow.ValueChanged += new System.EventHandler(this.hsbSlidingWindow_ValueChanged);
             // 
             // gbSelection
             // 
@@ -243,37 +267,37 @@
             // miLoadSpectra
             // 
             this.miLoadSpectra.Name = "miLoadSpectra";
-            this.miLoadSpectra.Size = new System.Drawing.Size(152, 22);
+            this.miLoadSpectra.Size = new System.Drawing.Size(140, 22);
             this.miLoadSpectra.Text = "&Load Spectra ";
             // 
             // miSaveSpectra
             // 
             this.miSaveSpectra.Name = "miSaveSpectra";
-            this.miSaveSpectra.Size = new System.Drawing.Size(152, 22);
+            this.miSaveSpectra.Size = new System.Drawing.Size(140, 22);
             this.miSaveSpectra.Text = "&Save Spectra";
             this.miSaveSpectra.Click += new System.EventHandler(this.miSaveSpectra_Click);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(149, 6);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(137, 6);
             // 
             // miExport
             // 
             this.miExport.Name = "miExport";
-            this.miExport.Size = new System.Drawing.Size(152, 22);
+            this.miExport.Size = new System.Drawing.Size(140, 22);
             this.miExport.Text = "Export";
             this.miExport.Click += new System.EventHandler(this.miExport_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(137, 6);
             // 
             // miCloseForm
             // 
             this.miCloseForm.Name = "miCloseForm";
-            this.miCloseForm.Size = new System.Drawing.Size(152, 22);
+            this.miCloseForm.Size = new System.Drawing.Size(140, 22);
             this.miCloseForm.Text = "&Close";
             // 
             // miData
@@ -404,26 +428,15 @@
             // 
             // saveFileDialog
             // 
-            this.saveFileDialog.Filter = "Tabular Spectra Format (*.dat)|*.dat";
+            this.saveFileDialog.Filter = "Tangra Spectra (*.spectra)|*.spectra";
             // 
-            // hsbSlidingWindow
+            // exportFileDialog
             // 
-            this.hsbSlidingWindow.Location = new System.Drawing.Point(277, 10);
-            this.hsbSlidingWindow.Name = "hsbSlidingWindow";
-            this.hsbSlidingWindow.Size = new System.Drawing.Size(308, 16);
-            this.hsbSlidingWindow.TabIndex = 5;
-            this.hsbSlidingWindow.ValueChanged += new System.EventHandler(this.hsbSlidingWindow_ValueChanged);
+            this.exportFileDialog.Filter = "Tabular Spectra Format (*.dat)|*.dat";
             // 
-            // cbxSlidingWindow
+            // openFileDialog
             // 
-            this.cbxSlidingWindow.AutoSize = true;
-            this.cbxSlidingWindow.Location = new System.Drawing.Point(277, 30);
-            this.cbxSlidingWindow.Name = "cbxSlidingWindow";
-            this.cbxSlidingWindow.Size = new System.Drawing.Size(141, 17);
-            this.cbxSlidingWindow.TabIndex = 6;
-            this.cbxSlidingWindow.Text = "Stack in Sliding Window";
-            this.cbxSlidingWindow.UseVisualStyleBackColor = true;
-            this.cbxSlidingWindow.CheckedChanged += new System.EventHandler(this.cbxSlidingWindow_CheckedChanged);
+            this.openFileDialog.Filter = "Tangra Spectra (*.spectra)|*.spectra";
             // 
             // frmViewSpectra
             // 
@@ -496,5 +509,7 @@
         private System.Windows.Forms.ToolStripMenuItem miLPNone;
         private System.Windows.Forms.HScrollBar hsbSlidingWindow;
         private System.Windows.Forms.CheckBox cbxSlidingWindow;
+        private System.Windows.Forms.SaveFileDialog exportFileDialog;
+        private System.Windows.Forms.OpenFileDialog openFileDialog;
     }
 }

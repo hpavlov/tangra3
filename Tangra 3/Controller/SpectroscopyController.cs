@@ -258,6 +258,8 @@ namespace Tangra.Controller
 	            {
                     for (int i = startingFrameIndex; i < startingFrameIndex + frameCountToProcess - 1; i++)
 					{
+                        if (i < 0 || i > allFramesSpectra.Count - 1) continue;
+
 						Spectra nextSpectra = allFramesSpectra[i];
                         masterSpectra.RawMeasurements.Add(nextSpectra);
 
@@ -330,7 +332,9 @@ namespace Tangra.Controller
 					for (int j = 0; j < masterSpectra.Points.Count; j++) signalLists[j] = new List<float>();
 
                     for (int i = startingFrameIndex; i < startingFrameIndex + frameCountToProcess - 1; i++)
-					{
+                    {
+                        if (i < 0 || i > allFramesSpectra.Count - 1) continue;
+
 						Spectra nextSpectra = allFramesSpectra[i];
                         masterSpectra.RawMeasurements.Add(nextSpectra);
 
@@ -439,7 +443,7 @@ namespace Tangra.Controller
 	    {
 		    EnsureViewSpectraFormClosed();
 
-			m_ViewSpectraForm = new frmViewSpectra(this);
+			m_ViewSpectraForm = new frmViewSpectra(this, m_VideoController);
 	    }
 
 		public void ConfigureSaveSpectraFileDialog(SaveFileDialog saveFileDialog)
@@ -452,6 +456,17 @@ namespace Tangra.Controller
 			}
 			catch { /* In some rare cases m_VideoController.CurrentVideoFileName may throw an error. We want to ignore it. */ }
 	    }
+
+        public void ConfigureExportSpectraFileDialog(SaveFileDialog saveFileDialog, string videoFileName)
+        {
+            try
+            {
+                saveFileDialog.InitialDirectory = Path.GetDirectoryName(videoFileName);
+                saveFileDialog.Filter = "Tab-Separated Series (*.dat)|*.dat";
+                saveFileDialog.FileName = Path.ChangeExtension(Path.GetFileName(m_VideoController.CurrentVideoFileName), ".dat");
+            }
+            catch { /* In some rare cases m_VideoController.CurrentVideoFileName may throw an error. We want to ignore it. */ }
+        }
 
 		public SpectraFileHeader GetSpectraFileHeader()
 	    {
@@ -519,6 +534,37 @@ namespace Tangra.Controller
 				if (spectraFile != null)
 				{
 					DisplaySpectra(spectraFile.Data);
+
+                    string videoFile = m_VideoController.GetVideoFileMatchingLcFile(spectraFile.Header.PathToVideoFile, fileName);
+                    if (!string.IsNullOrEmpty(videoFile) &&
+                        File.Exists(videoFile))
+                    {
+                        if (m_VideoController.OpenVideoFile(videoFile))
+                        {
+                            TangraContext.Current.CanPlayVideo = false;
+                            m_VideoController.UpdateViews();
+                        }
+                    }
+                    else
+                    {
+                        // NOTE: No video file found, just show the saved averaged frame
+                        TangraContext.Current.Reset();
+
+                        //if (lcFile.Footer.AveragedFrameBytes != null)
+                        //{
+                        //    if (m_VideoController.SingleBitmapFile(lcFile))
+                        //    {
+                        //        TangraContext.Current.CanPlayVideo = false;
+                        //        m_VideoController.UpdateViews();
+
+                        //        PSFFit.SetDataRange(lcFile.Footer.DataBitPix, lcFile.Footer.DataAav16NormVal);
+                        //    }
+                        //}
+
+                        TangraContext.Current.CanPlayVideo = false;
+                        TangraContext.Current.CanScrollFrames = false;
+                        m_VideoController.UpdateViews();
+                    }
 				}
 
 		        RegisterRecentSpectraFile(fileName);
@@ -534,6 +580,12 @@ namespace Tangra.Controller
         {
             m_SpectraCalibrator.SetMarker(pixelNo, wavelength);
         }
+
+        internal void SetDispersion(float dispersion)
+        {
+            m_SpectraCalibrator.SetDispersion(dispersion);
+        }
+
 
         internal bool IsCalibrated()
         {

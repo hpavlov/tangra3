@@ -14,6 +14,8 @@ namespace Tangra.VideoOperations.Spectroscopy
     public partial class frmEnterWavelength : Form
     {
         public float SelectedWaveLength;
+        public float? SelectedDispersion;
+
         private SpectraViewerStateCalibrate m_State;
 
         public frmEnterWavelength()
@@ -26,6 +28,7 @@ namespace Tangra.VideoOperations.Spectroscopy
         {
             m_State = state;
 	        SelectedWaveLength = float.NaN;
+            SelectedDispersion = null;
         }
 
         private void UpdateCheckboxDerivedState(object sender, EventArgs e)
@@ -70,6 +73,11 @@ namespace Tangra.VideoOperations.Spectroscopy
             }
 
             m_State.CalibrationPointSelected(SelectedWaveLength);
+            if (cbxSinglePoint.Checked)
+            {
+                SelectedDispersion = (float) nudDispersion.Value;
+                m_State.DispersionSelected(SelectedDispersion.Value);
+            }
 
             Close();
         }
@@ -84,5 +92,10 @@ namespace Tangra.VideoOperations.Spectroscopy
 			if (float.IsNaN(SelectedWaveLength))
 				m_State.CalibrationPointSelectionCancelled();
 		}
+
+        private void cbxSinglePoint_CheckedChanged(object sender, EventArgs e)
+        {
+            nudDispersion.Enabled = cbxSinglePoint.Checked;
+        }
     }
 }

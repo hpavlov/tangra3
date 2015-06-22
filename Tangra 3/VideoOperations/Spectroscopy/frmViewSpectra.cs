@@ -21,6 +21,7 @@ namespace Tangra.VideoOperations.Spectroscopy
         private MasterSpectra m_Spectra;
 	    private SpectraFileHeader m_Header;
 	    private SpectroscopyController m_SpectroscopyController;
+        private VideoController m_VideoController;
 	    private SpectraViewerStateManager m_StateManager;
 
 	    public frmViewSpectra()
@@ -28,7 +29,7 @@ namespace Tangra.VideoOperations.Spectroscopy
 			InitializeComponent();
 	    }
 
-	    public frmViewSpectra(SpectroscopyController controller)
+        public frmViewSpectra(SpectroscopyController controller, VideoController videoController)
 			: this()
 	    {
 		    m_SpectroscopyController = controller;
@@ -37,15 +38,24 @@ namespace Tangra.VideoOperations.Spectroscopy
             picSpectra.Image = new Bitmap(picSpectra.Width, picSpectra.Height, PixelFormat.Format24bppRgb);
 
             m_StateManager = new SpectraViewerStateManager(m_SpectroscopyController, picSpectraGraph, this);
-        }
+	        m_VideoController = videoController;
+	    }
 
 		internal void SetMasterSpectra(MasterSpectra masterSpectra)
 	    {
 			m_Spectra = masterSpectra;
 			m_StateManager.SetMasterSpectra(masterSpectra);
 		    hsbSlidingWindow.Minimum = 0;
-		    hsbSlidingWindow.Maximum = m_Spectra.RawMeasurements.Count - 50;
+		    hsbSlidingWindow.Maximum = Math.Max(1, m_Spectra.RawMeasurements.Count - 50);
 		    hsbSlidingWindow.Value = 0;
+
+            if (masterSpectra.IsCalibrated())
+            {
+                SpectraCalibrator calibrator = m_SpectroscopyController.GetSpectraCalibrator();    
+                calibrator.Reset();
+                calibrator.SetMarker((int)masterSpectra.Calibration.Pixel1, masterSpectra.Calibration.Wavelength1);
+                calibrator.SetMarker((int)masterSpectra.Calibration.Pixel2, masterSpectra.Calibration.Wavelength2);
+            }
 	    }
 
         private void frmViewSpectra_Load(object sender, EventArgs e)
@@ -173,7 +183,9 @@ namespace Tangra.VideoOperations.Spectroscopy
 
 		private void miExport_Click(object sender, EventArgs e)
 		{
-            if (saveFileDialog.ShowDialog(this) == DialogResult.OK)
+            m_SpectroscopyController.ConfigureExportSpectraFileDialog(exportFileDialog, m_VideoController.CurrentVideoFileName);
+
+            if (exportFileDialog.ShowDialog(this) == DialogResult.OK)
             {
                 SpectraCalibrator calibrator = m_SpectroscopyController.GetSpectraCalibrator();
                 var bld = new StringBuilder();
@@ -181,10 +193,11 @@ namespace Tangra.VideoOperations.Spectroscopy
                 foreach (SpectraPoint point in m_Spectra.Points)
                 {
                     float wavelength = calibrator.ResolveWavelength(point.PixelNo);
-                    bld.AppendFormat("{0},{1}\r\n", wavelength, point.RawValue);
+                    if (wavelength < 0) continue;
+                    bld.AppendFormat("{0}\t{1}\r\n", wavelength, point.RawValue);
                 }
 
-                File.WriteAllText(saveFileDialog.FileName, bld.ToString());
+                File.WriteAllText(exportFileDialog.FileName, bld.ToString());
             }
 		}
 
@@ -213,6 +226,7 @@ namespace Tangra.VideoOperations.Spectroscopy
 
         private void cbxSlidingWindow_CheckedChanged(object sender, EventArgs e)
         {
+            hsbSlidingWindow.Enabled = cbxSlidingWindow.Checked;
             if (cbxSlidingWindow.Checked)
                 DoNewMasterSpectraReduction();
         }
