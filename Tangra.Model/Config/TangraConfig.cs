@@ -284,6 +284,7 @@ namespace Tangra.Model.Config
 		public GenericSettings Generic = new GenericSettings();
 		public SpecialSettings Special = new SpecialSettings();
 		public AstrometrySettings Astrometry = new AstrometrySettings();
+		public SpectroscopySettings Spectroscopy = new SpectroscopySettings();
 		public CatalogSettings StarCatalogue = new CatalogSettings();
 		public PlateSolveSettings PlateSolve = new PlateSolveSettings();
 		public UrlSettings Urls = new UrlSettings();
@@ -1136,6 +1137,40 @@ namespace Tangra.Model.Config
 			}
 		}
 
+		public class SpectroscopySettings
+		{
+			public class SpectraColors
+			{
+				[XmlIgnore]
+				public Color SpectraLine
+				{
+					get
+					{
+						return System.Drawing.Color.FromArgb(SpectraLineRGB);
+					}
+					set
+					{
+						SpectraLineRGB = value.ToArgb();
+					}
+				}
+
+				public int SpectraLineRGB = System.Drawing.Color.Aqua.ToArgb();
+			}
+
+			public SpectroscopyInstrument Instrument;
+			public int DefaultWavelengthCalibrationOrder;
+
+			public SpectraColors Colors;
+
+			public SpectroscopySettings()
+			{
+				Colors = new SpectraColors();
+
+				DefaultWavelengthCalibrationOrder = 1;
+				Instrument = SpectroscopyInstrument.Grating;
+			}
+		}
+
 		public class AstrometrySettings : IAstrometrySettings
 		{
 			public class ColorSettings
@@ -1815,6 +1850,11 @@ namespace Tangra.Model.Config
 		public class HelpSystemFlags
 		{
 			public bool DontShowCalibrationHelpFormAgain = false;
+		}
+
+		public enum SpectroscopyInstrument
+		{
+			Grating
 		}
 	}
 }

@@ -146,6 +146,18 @@
     <Compile Include="Config\frmTangraSettings.Designer.cs">
       <DependentUpon>frmTangraSettings.cs</DependentUpon>
     </Compile>
+    <Compile Include="Config\SettingPannels\ucCustomizeSpectroscopy.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucCustomizeSpectroscopy.Designer.cs">
+      <DependentUpon>ucCustomizeSpectroscopy.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucSpectroscopy.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucSpectroscopy.Designer.cs">
+      <DependentUpon>ucSpectroscopy.cs</DependentUpon>
+    </Compile>
     <Compile Include="Config\SettingPannels\ucAddins.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -857,6 +869,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Config\frmTangraSettings.resx">
       <DependentUpon>frmTangraSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Config\SettingPannels\ucCustomizeSpectroscopy.resx">
+      <DependentUpon>ucCustomizeSpectroscopy.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Config\SettingPannels\ucSpectroscopy.resx">
+      <DependentUpon>ucSpectroscopy.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Config\SettingPannels\ucAddins.resx">
       <DependentUpon>ucAddins.cs</DependentUpon>
