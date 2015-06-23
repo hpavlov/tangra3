@@ -95,6 +95,7 @@ namespace Tangra.VideoOperations.Spectroscopy
         internal int Height;
         internal int BitPix;
 		internal uint DataAav16NormVal;
+	    internal string SourceInfo;
 
 		private static int SERIALIZATION_VERSION = 1;
 
@@ -116,6 +117,7 @@ namespace Tangra.VideoOperations.Spectroscopy
             Height = reader.ReadInt32();
             BitPix = reader.ReadInt32();
 			DataAav16NormVal = reader.ReadUInt32();
+		    SourceInfo = reader.ReadString();
 		}
 
 		internal void WriteTo(BinaryWriter writer)
@@ -136,6 +138,7 @@ namespace Tangra.VideoOperations.Spectroscopy
             writer.Write(Height);
             writer.Write(BitPix);
 			writer.Write(DataAav16NormVal);
+            writer.Write(SourceInfo);
 		}
 	}
 }

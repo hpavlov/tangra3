@@ -41,21 +41,6 @@ namespace Tangra.VideoOperations.Spectroscopy
 	        m_VideoController = videoController;
 	    }
 
-		/// <summary>
-		/// Clean up any resources being used.
-		/// </summary>
-		/// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-		protected override void Dispose(bool disposing)
-		{
-			if (disposing && (components != null))
-			{
-				components.Dispose();
-			}
-			base.Dispose(disposing);
-
-			m_SpectroscopyController.OnSpectraViewerClosed();
-		}
-
 		internal void SetMasterSpectra(MasterSpectra masterSpectra)
 	    {
 			m_Spectra = masterSpectra;
@@ -308,6 +293,11 @@ namespace Tangra.VideoOperations.Spectroscopy
             }
             else
                 miLPNone.Checked = true;
+        }
+
+        private void frmViewSpectra_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            m_SpectroscopyController.OnSpectraViewerClosed();
         }
     }
 }

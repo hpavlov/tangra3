@@ -169,13 +169,15 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
                         PointF graphPoint = new PointF(x, picSpectraGraph.Image.Height - BORDER_GAP - (float)Math.Round(point.ProcessedValue * yCoeff) - yAxisOffset);
 						if (prevPoint != PointF.Empty)
 						{
-                            if (!isCalibrated || (calibratedGraphArea.Contains(prevPoint) && calibratedGraphArea.Contains(graphPoint)))
+                            if (!isCalibrated || (prevPoint.X > calibratedGraphArea.Left && prevPoint.X < calibratedGraphArea.Right && graphPoint.X > calibratedGraphArea.Left && graphPoint.X < calibratedGraphArea.Right))
                                 g2.DrawLine(s_SpectraPen, prevPoint, graphPoint);
 
 						}
 						prevPoint = graphPoint;
 					}
 				}
+
+                g2.FillRectangle(SystemBrushes.ControlDark, X_AXIS_WIDTH, 0, m_View.Width - X_AXIS_WIDTH - BORDER_GAP + 1, BORDER_GAP);
 
 				if (m_CurrentState != null)
 					m_CurrentState.PostDraw(g2);

@@ -1000,7 +1000,7 @@ namespace Tangra.Controller
 				// Don't integrate if the wind or shaking flag is set. Faint stars are unlikely to be seen anyway 
 				// with integration in a case of a good shake
 				return m_AstroImage;
-			};
+			}
         }
 
 		internal Pixelmap GetFrame(int frameId)

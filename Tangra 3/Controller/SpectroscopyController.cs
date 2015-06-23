@@ -477,6 +477,7 @@ namespace Tangra.Controller
                 Height = TangraContext.Current.FrameHeight,
                 BitPix = m_VideoController.VideoBitPix,
 				DataAav16NormVal = m_VideoController.VideoAav16NormVal,
+                SourceInfo = string.Format("Video ({0})", m_VideoController.CurrentVideoFileType),
                 ObjectName = "",
                 Telescope =  "",
                 Instrument = "",
@@ -543,7 +544,6 @@ namespace Tangra.Controller
                         if (m_VideoController.OpenVideoFile(videoFile))
                         {
                             TangraContext.Current.CanPlayVideo = false;
-                            m_VideoController.UpdateViews();
                         }
                     }
                     else
@@ -565,8 +565,11 @@ namespace Tangra.Controller
 
                         TangraContext.Current.CanPlayVideo = false;
                         TangraContext.Current.CanScrollFrames = false;
-                        m_VideoController.UpdateViews();
                     }
+
+                    TangraContext.Current.FileName = Path.GetFileName(fileName);
+                    TangraContext.Current.FileFormat = spectraFile.Header.SourceInfo;
+                    m_VideoController.UpdateViews();
 				}
 
 		        RegisterRecentSpectraFile(fileName);
