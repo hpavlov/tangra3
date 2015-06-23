@@ -34,6 +34,10 @@ namespace Tangra.Video
 			return new SingleBitmapFileFrameStream(bmp);
 		}
 
+		public SingleBitmapFileFrameStream(byte[] bitmapBytes, int width, int height)
+			: this(Pixelmap.ConstructBitmapFromBitmapPixels(bitmapBytes, width, height))
+		{ }
+
 		public SingleBitmapFileFrameStream(Bitmap bitmap)
 		{
             try

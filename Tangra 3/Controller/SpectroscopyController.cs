@@ -476,6 +476,7 @@ namespace Tangra.Controller
                 Width = TangraContext.Current.FrameWidth,
                 Height = TangraContext.Current.FrameHeight,
                 BitPix = m_VideoController.VideoBitPix,
+				DataAav16NormVal = m_VideoController.VideoAav16NormVal,
                 ObjectName = "",
                 Telescope =  "",
                 Instrument = "",
@@ -550,16 +551,17 @@ namespace Tangra.Controller
                         // NOTE: No video file found, just show the saved averaged frame
                         TangraContext.Current.Reset();
 
-                        //if (lcFile.Footer.AveragedFrameBytes != null)
-                        //{
-                        //    if (m_VideoController.SingleBitmapFile(lcFile))
-                        //    {
-                        //        TangraContext.Current.CanPlayVideo = false;
-                        //        m_VideoController.UpdateViews();
+						if (spectraFile.Data.MeasurementInfo.FrameBitmapPixels != null &&
+							spectraFile.Data.MeasurementInfo.FrameBitmapPixels.Length > 0)
+						{
+							if (m_VideoController.SingleBitmapFile(spectraFile.Data.MeasurementInfo.FrameBitmapPixels, spectraFile.Header.Width, spectraFile.Header.Height))
+							{
+								TangraContext.Current.CanPlayVideo = false;
+								m_VideoController.UpdateViews();
 
-                        //        PSFFit.SetDataRange(lcFile.Footer.DataBitPix, lcFile.Footer.DataAav16NormVal);
-                        //    }
-                        //}
+								PSFFit.SetDataRange(spectraFile.Header.BitPix, spectraFile.Header.DataAav16NormVal);
+							}
+						}
 
                         TangraContext.Current.CanPlayVideo = false;
                         TangraContext.Current.CanScrollFrames = false;
@@ -600,7 +602,7 @@ namespace Tangra.Controller
         internal void SelectPixel(int pixelNo)
         {
             float waveLength = m_SpectraCalibrator.ResolveWavelength(pixelNo);
-            m_ViewSpectraForm.DisplaySelectedDataPoint(pixelNo, waveLength);
+			m_ViewSpectraForm.DisplaySelectedDataPoint(pixelNo, waveLength);
         }
 
 	    internal void DeselectPixel()

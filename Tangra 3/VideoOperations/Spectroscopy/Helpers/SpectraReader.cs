@@ -276,6 +276,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
         public int LastMeasuredFrame;
         public DateTime? FirstFrameTimeStamp;
         public DateTime? LastFrameTimeStamp;
+	    public byte[] FrameBitmapPixels;
 
         private static int SERIALIZATION_VERSION = 1;
 
@@ -301,6 +302,10 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
             if (hasFirstTimestamp) FirstFrameTimeStamp = new DateTime(reader.ReadInt64());
             bool hasLastTimestamp = reader.ReadBoolean();
             if (hasLastTimestamp) LastFrameTimeStamp = new DateTime(reader.ReadInt64());
+
+	        int bytesToRead = reader.ReadInt32();
+			if (bytesToRead > 0)
+				FrameBitmapPixels = reader.ReadBytes(bytesToRead);
 		}
 
 		public void WriteTo(BinaryWriter writer)
@@ -322,6 +327,9 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
             if (FirstFrameTimeStamp.HasValue) writer.Write(FirstFrameTimeStamp.Value.Ticks);
             writer.Write(LastFrameTimeStamp.HasValue);
             if (LastFrameTimeStamp.HasValue) writer.Write(LastFrameTimeStamp.Value.Ticks);
+
+			writer.Write(FrameBitmapPixels.Length);
+			writer.Write(FrameBitmapPixels);
 		}
     }
 

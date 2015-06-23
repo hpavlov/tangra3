@@ -168,7 +168,7 @@ namespace Tangra.VideoOperations.Spectroscopy
 
         internal void DisplaySelectedDataPoint(int pixelNo, float wavelength)
         {
-            lblPixelNo.Text = pixelNo.ToString();
+            lblPixelNo.Text = (pixelNo - m_Spectra.ZeroOrderPixelNo).ToString();
 
 	        if (!float.IsNaN(wavelength))
 	        {

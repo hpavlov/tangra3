@@ -188,6 +188,13 @@ namespace Tangra.Controller
 				() => new SingleBitmapFileFrameStream(lcFile));
 		}
 
+		internal bool SingleBitmapFile(byte[] bitmapBytes, int width, int height)
+		{
+			return OpenVideoFileInternal(
+				null,
+				() => new SingleBitmapFileFrameStream(bitmapBytes, width, height));
+		}
+
 		public bool OpenFitsFileSequence(string folderName)
         {
             string[] fitsFiles = Directory.GetFiles(folderName, "*.fit*", SearchOption.TopDirectoryOnly);
