@@ -85,7 +85,7 @@ namespace Tangra.VideoOperations.Spectroscopy
 		    if (float.IsNaN(rms))
 			    lblRMS.Text = "";
 			else
-				lblRMS.Text = string.Format("RMS: {0}", rms.ToString("0.00"));
+				lblRMS.Text = string.Format("RMS: {0}", rms.ToString("0.0 A"));
 	    }
 
 		private void frmViewSpectra_Resize(object sender, EventArgs e)

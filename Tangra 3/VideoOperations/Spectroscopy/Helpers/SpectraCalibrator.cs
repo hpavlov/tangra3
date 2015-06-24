@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Model.Numerical;
 
 namespace Tangra.VideoOperations.Spectroscopy.Helpers
 {
@@ -20,29 +22,32 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
     {
 	    private MasterSpectra m_MasterSpectra;
 
-	    private int? m_PixelNo1;
-	    private float m_Wavelength1;
+        //private int? m_PixelNo1;
+        //private float m_Wavelength1;
 
-        private int? m_PixelNo2;
-        private float m_Wavelength2;
+        //private int? m_PixelNo2;
+        //private float m_Wavelength2;
 
-		private int? m_PixelNo3;
-		private float m_Wavelength3;
+        //private int? m_PixelNo3;
+        //private float m_Wavelength3;
 
-		private int? m_PixelNo4;
-		private float m_Wavelength4;
+        //private int? m_PixelNo4;
+        //private float m_Wavelength4;
 
-		private int? m_PixelNo5;
-		private float m_Wavelength5;
+        //private int? m_PixelNo5;
+        //private float m_Wavelength5;
 
-		private int? m_PixelNo6;
-		private float m_Wavelength6;
+        //private int? m_PixelNo6;
+        //private float m_Wavelength6;
 
-		private int? m_PixelNo7;
-		private float m_Wavelength7;
+        //private int? m_PixelNo7;
+        //private float m_Wavelength7;
 
-		private int? m_PixelNo8;
-		private float m_Wavelength8;
+        //private int? m_PixelNo8;
+        //private float m_Wavelength8;
+
+	    private int?[] m_PixelNos = new int?[8];
+        private float[] m_Wavelengths = new float[8];
 
 		private IWavelengthCalibration m_WavelengthCalibration;
 
@@ -54,97 +59,68 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 
 	    public void SetMarker(int pixelNo, float wavelength, bool attemptCalibration, int polynomialOrder)
         {
-            if (!m_PixelNo1.HasValue)
+            if (!m_PixelNos[0].HasValue)
             {
-                m_PixelNo1 = pixelNo;
-                m_Wavelength1 = wavelength;
+                m_PixelNos[0] = pixelNo;
+                m_Wavelengths[0] = wavelength;
             }
-            else if (!m_PixelNo2.HasValue && !IsRepeatedLine(pixelNo, wavelength, 2))
+            else if (!m_PixelNos[1].HasValue && !IsRepeatedLine(pixelNo, wavelength))
             {
-                m_PixelNo2 = pixelNo;
-                m_Wavelength2 = wavelength;
+                m_PixelNos[1] = pixelNo;
+                m_Wavelengths[1] = wavelength;
             }
-			else if (!m_PixelNo3.HasValue && !IsRepeatedLine(pixelNo, wavelength, 3))
+            else if (!m_PixelNos[2].HasValue && !IsRepeatedLine(pixelNo, wavelength))
 			{
-				m_PixelNo3 = pixelNo;
-				m_Wavelength3 = wavelength;
+                m_PixelNos[2] = pixelNo;
+                m_Wavelengths[2] = wavelength;
 			}
-			else if (!m_PixelNo4.HasValue && !IsRepeatedLine(pixelNo, wavelength, 4))
+            else if (!m_PixelNos[3].HasValue && !IsRepeatedLine(pixelNo, wavelength))
 			{
-				m_PixelNo4 = pixelNo;
-				m_Wavelength4 = wavelength;
+                m_PixelNos[3] = pixelNo;
+                m_Wavelengths[3] = wavelength;
 			}
-			else if (!m_PixelNo5.HasValue && !IsRepeatedLine(pixelNo, wavelength, 5))
+            else if (!m_PixelNos[4].HasValue && !IsRepeatedLine(pixelNo, wavelength))
 			{
-				m_PixelNo5 = pixelNo;
-				m_Wavelength5 = wavelength;
+                m_PixelNos[4] = pixelNo;
+                m_Wavelengths[4] = wavelength;
 			}
-			else if (!m_PixelNo6.HasValue && !IsRepeatedLine(pixelNo, wavelength, 6))
+            else if (!m_PixelNos[5].HasValue && !IsRepeatedLine(pixelNo, wavelength))
 			{
-				m_PixelNo6 = pixelNo;
-				m_Wavelength6 = wavelength;
+                m_PixelNos[5] = pixelNo;
+                m_Wavelengths[5] = wavelength;
 			}
-			else if (!m_PixelNo7.HasValue && !IsRepeatedLine(pixelNo, wavelength, 7))
+            else if (!m_PixelNos[6].HasValue && !IsRepeatedLine(pixelNo, wavelength))
 			{
-				m_PixelNo7 = pixelNo;
-				m_Wavelength7 = wavelength;
+                m_PixelNos[6] = pixelNo;
+                m_Wavelengths[6] = wavelength;
 			}
-			else if (!m_PixelNo8.HasValue && !IsRepeatedLine(pixelNo, wavelength, 8))
+            else if (!m_PixelNos[7].HasValue && !IsRepeatedLine(pixelNo, wavelength))
 			{
-				m_PixelNo8 = pixelNo;
-				m_Wavelength8 = wavelength;
+                m_PixelNos[7] = pixelNo;
+                m_Wavelengths[7] = wavelength;
 			}
 
 			if (attemptCalibration)
 				Calibrate(polynomialOrder);
         }
 
-		private bool IsRepeatedLine(int pixelNo, float wavelength, int index)
+		private bool IsRepeatedLine(int pixelNo, float wavelength)
 		{
-			if (index > 7)
-			{
-				if (m_PixelNo7.HasValue && (m_PixelNo7.Value == pixelNo || Math.Abs(m_Wavelength7- wavelength) > 0.1)) return true;
-
-				if (index > 6)
-				{
-					if (m_PixelNo6.HasValue && (m_PixelNo6.Value == pixelNo || Math.Abs(m_Wavelength6 - wavelength) > 0.1)) return true;
-
-					if (index > 5)
-					{
-						if (m_PixelNo5.HasValue && (m_PixelNo5.Value == pixelNo || Math.Abs(m_Wavelength5 - wavelength) > 0.1)) return true;
-
-						if (index > 4)
-						{
-							if (m_PixelNo4.HasValue && (m_PixelNo4.Value == pixelNo || Math.Abs(m_Wavelength4 - wavelength) > 0.1)) return true;
-
-							if (index > 3)
-							{
-								if (m_PixelNo3.HasValue && (m_PixelNo3.Value == pixelNo || Math.Abs(m_Wavelength3 - wavelength) > 0.1)) return true;
-
-								if (index > 2)
-								{
-									if (m_PixelNo2.HasValue && (m_PixelNo2.Value == pixelNo || Math.Abs(m_Wavelength2 - wavelength) > 0.1)) return true;
-
-									if (index > 1)
-									{
-										if (m_PixelNo1.HasValue && (m_PixelNo1.Value == pixelNo || Math.Abs(m_Wavelength1 - wavelength) > 0.1)) return true;
-									}
-								}
-							}
-						}
-					}
-				}
-			}
+		    for (int i = 0; i < 8; i++)
+		    {
+                if (m_PixelNos[i].HasValue && (m_PixelNos[i].Value == pixelNo || Math.Abs(m_Wavelengths[i] - wavelength) < 0.1))
+                    return true;
+		    }
 
 			return false;
 		}
 
         public void SetDispersion(float dispersion)
         {
-            if (m_PixelNo1.HasValue)
+            if (m_PixelNos[0].HasValue)
             {
-                m_PixelNo2 = m_PixelNo1.Value + 1000;
-                m_Wavelength2 = dispersion * 1000;
+                m_PixelNos[1] = m_PixelNos[0].Value + 1000;
+                m_Wavelengths[1] = dispersion * 1000;
 
                 Calibrate(1);
             }
@@ -154,14 +130,36 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
         {
 			if (polynomialOrder == 1)
 			{
-				if (m_PixelNo1.HasValue && m_PixelNo2.HasValue)
+                if (m_PixelNos[0].HasValue && m_PixelNos[1].HasValue && !m_PixelNos[2].HasValue)
 				{
 					var calibration = new LinearWavelengthCalibration();
-					calibration.Calibrate(m_PixelNo1.Value, m_PixelNo2.Value, m_Wavelength1, m_Wavelength2);
+                    calibration.Calibrate(m_PixelNos[0].Value, m_PixelNos[1].Value, m_Wavelengths[0], m_Wavelengths[1]);
 
 					m_WavelengthCalibration = calibration;
 				}				
 			}
+            else if (polynomialOrder == 2)
+            {
+                if (m_PixelNos[0].HasValue && m_PixelNos[1].HasValue && m_PixelNos[2].HasValue && !m_PixelNos[3].HasValue)
+                {
+                    var calibration = new QuadraticWavelengthCalibration();
+                    calibration.Calibrate(m_PixelNos[0].Value, m_PixelNos[1].Value, m_PixelNos[2].Value, m_Wavelengths[0], m_Wavelengths[1], m_Wavelengths[2]);
+
+                    m_WavelengthCalibration = calibration;
+                }
+                else if (m_PixelNos[0].HasValue && m_PixelNos[1].HasValue && m_PixelNos[2].HasValue && m_PixelNos[3].HasValue)
+                {
+                    var calibration = new QuadraticWavelengthRegressionCalibration();
+                    for (int i = 0; i < 8; i++)
+                    {
+                        if (m_PixelNos[i].HasValue)
+                            calibration.AddDataPoint(m_PixelNos[i].Value, m_Wavelengths[i]);
+                    }
+                    calibration.Calibrate();
+
+                    m_WavelengthCalibration = calibration;
+                }
+            }
 			else
 				MessageBox.Show("Calibration of this order hasn't been implemented yet");
         }
@@ -175,7 +173,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 
 		public bool HasSelectedCalibrationPoints()
 		{
-			return m_PixelNo1.HasValue;
+			return m_PixelNos[0].HasValue;
 		}
 
 		public SpectraCalibration ToSpectraCalibration()
@@ -212,14 +210,9 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 
         public void Reset()
         {
-            m_PixelNo1 = null;
-            m_PixelNo2 = null;
-			m_PixelNo3 = null;
-			m_PixelNo4 = null;
-			m_PixelNo5 = null;
-			m_PixelNo6 = null;
-			m_PixelNo7 = null;
-			m_PixelNo8 = null;
+            for (int i = 0; i < 8; i++)
+                m_PixelNos[i] = null;
+
 			m_WavelengthCalibration = null;
         }
 
@@ -251,7 +244,109 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
         }
     }
 
-	public class LinearWavelengthCalibration : IWavelengthCalibration
+    public class QuadraticWavelengthCalibration : IWavelengthCalibration
+    {
+        private int m_PixelNo1;
+        private int m_PixelNo2;
+        private int m_PixelNo3;
+        private float m_Wavelength1;
+        private float m_Wavelength2;
+        private float m_Wavelength3;
+
+        private float m_A;
+        private float m_B;
+        private float m_C;
+
+        public void Calibrate(int x1, int x2, int x3, float w1, float w2, float w3)
+        {
+            m_PixelNo1 = x1;
+            m_PixelNo2 = x2;
+            m_PixelNo3 = x3;
+            m_Wavelength1 = w1;
+            m_Wavelength2 = w2;
+            m_Wavelength3 = w3;
+
+
+            // x1 = a + b*w1 + c*w1*w1
+            // x2 = a + b*w2 + c*w2*w2
+            // x3 = a + b*w3 + c*w3*w3
+
+            // x1-x2 = b (w1 - w2) + c (w1*w1 - w2*w2)
+            // x2-x3 = b (w2 - w3) + c (w2*w2 - w3*w3)
+
+            //(x1-x2) / (w1 - w2) = b + c (w1*w1 - w2*w2) / (w1 - w2)
+            //(x2-x3) / (w2 - w3) = b + c (w2*w2 - w3*w3) / (w2 - w3)
+
+            //(x1-x2) / (w1 - w2) - (x2-x3) / (w2 - w3) = c[ ((w1*w1 - w2*w2) / (w1 - w2)) - ((w2*w2 - w3*w3) / (w2 - w3)) ]
+            // c = [(x1-x2) / (w1 - w2) - (x2-x3) / (w2 - w3)] / [ ((w1*w1 - w2*w2) / (w1 - w2)) - ((w2*w2 - w3*w3) / (w2 - w3)) ]
+
+            m_C = ((x1 - x2) / (w1 - w2) - (x2 - x3) / (w2 - w3)) / (((w1 * w1 - w2 * w2) / (w1 - w2)) - ((w2 * w2 - w3 * w3) / (w2 - w3)));
+
+            float b1 = (x1 - x2) / (w1 - w2) - m_C * (w1 * w1 - w2 * w2) / (w1 - w2);
+            float b2 = (x2 - x3) / (w2 - w3) - m_C * (w2 * w2 - w3 * w3) / (w2 - w3);
+            m_B = (b1 + b2) / 2f;
+
+            float a1 = x1 - m_B * w1 - m_C * w1 * w1;
+            float a2 = x2 - m_B * w2 - m_C * w2 * w2;
+            float a3 = x3 - m_B * w3 - m_C * w3 * w3;
+            m_A = (a1 + a2 + a3) / 3f;
+        }
+
+        public float ResolveWavelength(SpectraPoint point)
+        {
+            if (point != null)
+                return ResolveWavelength(point.PixelNo);
+            else
+                return float.NaN;
+        }
+
+        public float ResolveWavelength(int x)
+        {
+            float d = (float)Math.Sqrt(m_B * m_B - 4 * (m_A - x) * m_C);
+            float x1 = (-m_B + d) / (2 * m_C);
+            float x2 = (-m_B - d) / (2 * m_C);
+
+            if (x1 >= 0)
+                return (int)Math.Round(x1);
+            else
+                return (int)Math.Round(x2);
+        }
+
+        public int ResolvePixelNo(float wavelength)
+        {
+            return (int)Math.Round(m_A + m_B * wavelength + m_C * wavelength * wavelength);
+        }
+
+        public float GetCalibrationScale()
+        {
+            return 1f / m_B;
+        }
+
+        public int GetCalibrationOrder()
+        {
+            return 2;
+        }
+
+        public float GetCalibrationRMS()
+        {
+            return float.NaN;
+        }
+
+        public SpectraCalibration GetSpectraCalibration()
+        {
+            return new SpectraCalibration()
+            {
+                Pixel1 = m_PixelNo1,
+                Pixel2 = m_PixelNo2,
+                Wavelength1 = m_Wavelength1,
+                Wavelength2 = m_Wavelength2,
+                Dispersion = 1 / m_B,
+                ZeroPixel = m_A
+            };
+        }
+    }
+
+    public class LinearWavelengthCalibration : IWavelengthCalibration
 	{
 		private int m_PixelNo1;
 		private int m_PixelNo2;
@@ -323,4 +418,138 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 			};
 		}
 	}
+
+    public class QuadraticWavelengthRegressionCalibration : IWavelengthCalibration
+    {
+        private List<int> m_PixelNos = new List<int>();
+        private List<float> m_Wavelengths = new List<float>();
+
+        private float m_A;
+        private float m_B;
+        private float m_C;
+
+        public void AddDataPoint(int pixelNo, float wavelength)
+        {
+            m_PixelNos.Add(pixelNo);
+            m_Wavelengths.Add(wavelength);
+        }
+
+        public void Calibrate()
+        {
+            if (m_PixelNos.Count < 4)
+                throw new InvalidOperationException("Cannot get a fit from less than 4 points.");
+
+            SafeMatrix A = new SafeMatrix(m_PixelNos.Count, 3);
+            SafeMatrix X = new SafeMatrix(m_PixelNos.Count, 1);
+
+            for (int i = 0; i < m_PixelNos.Count; i++)
+            {
+                A[i, 0] = m_Wavelengths[i] * m_Wavelengths[i];
+                A[i, 1] = m_Wavelengths[i];
+                A[i, 2] = 1;
+
+                X[i, 0] = m_PixelNos[i];
+            }
+
+            SafeMatrix a_T = A.Transpose();
+            SafeMatrix aa = a_T * A;
+            SafeMatrix aa_inv = aa.Inverse();
+            SafeMatrix bx = (aa_inv * a_T) * X;
+
+            m_A = (float)bx[0, 0];
+            m_B = (float)bx[1, 0];
+            m_C = (float)bx[2, 0];   
+        }
+
+        public float ResolveWavelength(SpectraPoint point)
+        {
+            if (point != null)
+                return ResolveWavelength(point.PixelNo);
+            else
+                return float.NaN;
+        }
+
+        public float ResolveWavelength(int x)
+        {
+            float d = (float)Math.Sqrt(m_B * m_B - 4 * (m_C - x) * m_A);
+            float x1 = (-m_B + d) / (2 * m_A);
+            float x2 = (-m_B - d) / (2 * m_A);
+
+            if (x1 >= 0)
+                return (int)Math.Round(x1);
+            else
+                return (int)Math.Round(x2);
+        }
+
+        public int ResolvePixelNo(float wavelength)
+        {
+            return (int)Math.Round(ComputePixelNo(wavelength));
+        }
+
+        private float ComputePixelNo(float wavelength)
+        {
+            return m_A * wavelength * wavelength + m_B * wavelength + m_C;
+        }
+
+        public float GetCalibrationScale()
+        {
+            return 1f / m_B;
+        }
+
+        public int GetCalibrationOrder()
+        {
+            return 2;
+        }
+
+        public float GetCalibrationRMS()
+        {
+            EnsureResiduals();
+            return m_RMS / m_B;
+        }
+
+        private List<double> m_Residuals;
+        private float m_StdDev = float.NaN;
+        private float m_RMS = float.NaN;
+        private float m_ChiSquare = float.NaN;
+
+        private void EnsureResiduals()
+        {
+            if (m_Residuals == null)
+            {
+                m_Residuals = new List<double>();
+                m_StdDev = 0;
+
+                for (int i = 0; i < m_Wavelengths.Count; i++)
+                {
+                    double residual = m_PixelNos[i] - ComputePixelNo(m_Wavelengths[i]);
+                    m_Residuals.Add(residual);
+                    m_StdDev += (float)(residual * residual);
+                }
+
+                m_RMS = (float)Math.Sqrt(m_StdDev / m_Wavelengths.Count);
+                m_StdDev = (float)Math.Sqrt(m_StdDev / (m_Wavelengths.Count - 1));
+
+                m_ChiSquare = 0;
+                double stdsq = m_StdDev * m_StdDev;
+                for (int i = 0; i < m_Residuals.Count; i++)
+                {
+                    m_ChiSquare += (float)((m_Residuals[i] * m_Residuals[i]) / stdsq);
+                }
+                m_ChiSquare = m_ChiSquare / (m_Residuals.Count - 3);
+            }
+        }
+
+        public SpectraCalibration GetSpectraCalibration()
+        {
+            return new SpectraCalibration()
+            {
+                Pixel1 = m_PixelNos[0],
+                Pixel2 = m_PixelNos[1],
+                Wavelength1 = m_Wavelengths[0],
+                Wavelength2 = m_Wavelengths[1],
+                Dispersion = 1 / m_B,
+                ZeroPixel = m_C
+            };
+        }
+    }
 }
