@@ -310,7 +310,9 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 
                 }
 
-				g.DrawString(line.Designation != null ? string.Format("{0} ({1})", line.Element, line.Designation) : line.Element, s_LegendFont, s_KnownLineLabelBrush, x2 + 3, i * verticalSpacing + 2 * BORDER_GAP);
+				g.DrawString(line.Designation != null 
+                    ? string.Format("{0} ({1})", line.Element, line.Designation) 
+                    : line.Element, s_LegendFont, s_KnownLineLabelBrush, x2 + 3, i * verticalSpacing + 2 * BORDER_GAP);
             }
         }
 

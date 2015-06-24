@@ -73,12 +73,14 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
             {
                 CommonLines.Add(new LineEntry() { Designation = "G'", Element = "Hγ", FromWavelength = 4340.47f });
                 CommonLines.Add(new LineEntry() { Designation = "F", Element = "Hβ", FromWavelength = 4861.34f });
-				CommonLines.Add(new LineEntry() { Designation = "a, telluric", Element = "O²", FromWavelength = 6276.61f }); 
+				CommonLines.Add(new LineEntry() { Designation = "a, telluric", Element = "O²", FromWavelength = 6277.7f }); 
                 CommonLines.Add(new LineEntry() { Designation = "C", Element = "Hα", FromWavelength = 6562.81f });
-				CommonLines.Add(new LineEntry() { Designation = "B, telluric", Element = "O²", FromWavelength = 6867.19f });
-				CommonLines.Add(new LineEntry() { Designation = "telluric", Element = "H₂O", FromWavelength = 7180f, ToWavelength = 7396f, IsWideArea = true });
-                CommonLines.Add(new LineEntry() { Designation = "A", Element = "O²", FromWavelength = 7593.70f });
-				CommonLines.Add(new LineEntry() { Designation = "telluric", Element = "H₂O", FromWavelength = 8130f, ToWavelength = 8320f, IsWideArea = true });
+				CommonLines.Add(new LineEntry() { Designation = "B, telluric", Element = "O²", FromWavelength = 6869.0f });
+				CommonLines.Add(new LineEntry() { Designation = "telluric", Element = "H₂O", FromWavelength = 7160f, ToWavelength = 7396f, IsWideArea = true });
+                CommonLines.Add(new LineEntry() { Designation = "A", Element = "O²", FromWavelength = 7605.0f });
+				CommonLines.Add(new LineEntry() { Designation = "telluric", Element = "H₂O", FromWavelength = 8100f, ToWavelength = 8400f, IsWideArea = true });
+                CommonLines.Add(new LineEntry() { Designation = "telluric", Element = "H₂O", FromWavelength = 9200f, ToWavelength = 9700f, IsWideArea = true });
+                CommonLines.Add(new LineEntry() { Element = "Paδ", FromWavelength = 10049.3f });
             }
         }
     }
