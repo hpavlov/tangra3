@@ -72,7 +72,8 @@ namespace Tangra.VideoOperations.Spectroscopy
                 SelectedWaveLength = float.Parse(lvFraunhoferLines.SelectedItems[0].SubItems[2].Text, CultureInfo.InvariantCulture);
             }
 
-            m_State.CalibrationPointSelected(SelectedWaveLength);
+			m_State.CalibrationPointSelected(SelectedWaveLength, cbxCalibrate.Checked, (int)nudPolyOrder.Value);
+
             if (cbxSinglePoint.Checked)
             {
                 SelectedDispersion = (float) nudDispersion.Value;
@@ -100,13 +101,19 @@ namespace Tangra.VideoOperations.Spectroscopy
 
 		private void frmEnterWavelength_Shown(object sender, EventArgs e)
 		{
-			pnlOnePointCalibration.Visible = !m_State.HasSelectedCalibrationPoints();
+			pnlCalibration.Visible = m_State.HasSelectedCalibrationPoints();
+			pnlOnePointCalibration.Visible = !m_State.HasSelectedCalibrationPoints() && nudPolyOrder.Value == 1;
 		}
 
 		private void btnReset_Click(object sender, EventArgs e)
 		{
 			m_State.ResetCalibration();
 			Close();
+		}
+
+		private void nudPolyOrder_ValueChanged(object sender, EventArgs e)
+		{
+			pnlOnePointCalibration.Visible = !m_State.HasSelectedCalibrationPoints() && nudPolyOrder.Value == 1;
 		}
     }
 }

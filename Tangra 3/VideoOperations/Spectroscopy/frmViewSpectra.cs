@@ -56,10 +56,12 @@ namespace Tangra.VideoOperations.Spectroscopy
             {
                 SpectraCalibrator calibrator = m_SpectroscopyController.GetSpectraCalibrator();    
                 calibrator.Reset();
-                calibrator.SetMarker((int)masterSpectra.Calibration.Pixel1, masterSpectra.Calibration.Wavelength1);
-                calibrator.SetMarker((int)masterSpectra.Calibration.Pixel2, masterSpectra.Calibration.Wavelength2);
 
-	            m_StateManager.ChangeState<SpectraViewerStateCalibrated>();
+				// TODO: Initialize a clibrated state
+                //calibrator.SetMarker((int)masterSpectra.Calibration.Pixel1, masterSpectra.Calibration.Wavelength1);
+                //calibrator.SetMarker((int)masterSpectra.Calibration.Pixel2, masterSpectra.Calibration.Wavelength2);
+
+	            //m_StateManager.ChangeState<SpectraViewerStateCalibrated>();
             }
 	    }
 
@@ -75,8 +77,15 @@ namespace Tangra.VideoOperations.Spectroscopy
 	    {
 			m_StateManager.DrawSpectra(picSpectra, picSpectraGraph);
 
-	        gbxDispersion.Visible = m_SpectroscopyController.IsCalibrated();
-	        lblDispersion.Text = m_SpectroscopyController.GetSpectraCalibrator().GetCalibrationScale().ToString("0.00 A/pixel");
+	        gbxCalibration.Visible = m_SpectroscopyController.IsCalibrated();
+		    var calibraror = m_SpectroscopyController.GetSpectraCalibrator();
+	        lblDispersion.Text = string.Format("Dispersion: {0}", calibraror.GetCalibrationScale().ToString("0.00 A/pixel"));
+		    lblOrder.Text = string.Format("Order: {0}", calibraror.GetCalibrationOrder());
+		    float rms = calibraror.GetCalibrationRMS();
+		    if (float.IsNaN(rms))
+			    lblRMS.Text = "";
+			else
+				lblRMS.Text = string.Format("RMS: {0}", rms.ToString("0.00"));
 	    }
 
 		private void frmViewSpectra_Resize(object sender, EventArgs e)

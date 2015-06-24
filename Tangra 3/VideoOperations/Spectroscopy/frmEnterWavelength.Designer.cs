@@ -28,23 +28,23 @@
         /// </summary>
         private void InitializeComponent()
         {
-			System.Windows.Forms.ListViewItem listViewItem16 = new System.Windows.Forms.ListViewItem(new string[] {
+			System.Windows.Forms.ListViewItem listViewItem6 = new System.Windows.Forms.ListViewItem(new string[] {
             "A",
             "O2",
             "7593.7"}, -1);
-			System.Windows.Forms.ListViewItem listViewItem17 = new System.Windows.Forms.ListViewItem(new string[] {
+			System.Windows.Forms.ListViewItem listViewItem7 = new System.Windows.Forms.ListViewItem(new string[] {
             "B",
             "O2",
             "6867.2"}, -1);
-			System.Windows.Forms.ListViewItem listViewItem18 = new System.Windows.Forms.ListViewItem(new string[] {
+			System.Windows.Forms.ListViewItem listViewItem8 = new System.Windows.Forms.ListViewItem(new string[] {
             "C",
             "Hα",
             "6562.8"}, -1);
-			System.Windows.Forms.ListViewItem listViewItem19 = new System.Windows.Forms.ListViewItem(new string[] {
+			System.Windows.Forms.ListViewItem listViewItem9 = new System.Windows.Forms.ListViewItem(new string[] {
             "F",
             "Hβ",
             "4861.3"}, -1);
-			System.Windows.Forms.ListViewItem listViewItem20 = new System.Windows.Forms.ListViewItem(new string[] {
+			System.Windows.Forms.ListViewItem listViewItem10 = new System.Windows.Forms.ListViewItem(new string[] {
             "G\'",
             "Hγ",
             "4340.5"}, -1);
@@ -62,9 +62,15 @@
 			this.pnlOnePointCalibration = new System.Windows.Forms.Panel();
 			this.btnReset = new System.Windows.Forms.Button();
 			this.panel1 = new System.Windows.Forms.Panel();
+			this.cbxCalibrate = new System.Windows.Forms.CheckBox();
+			this.label1 = new System.Windows.Forms.Label();
+			this.nudPolyOrder = new System.Windows.Forms.NumericUpDown();
+			this.pnlCalibration = new System.Windows.Forms.Panel();
 			((System.ComponentModel.ISupportInitialize)(this.nudManualWavelength)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudDispersion)).BeginInit();
 			this.pnlOnePointCalibration.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.nudPolyOrder)).BeginInit();
+			this.pnlCalibration.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// nudManualWavelength
@@ -82,7 +88,7 @@
 			// 
 			// btnOK
 			// 
-			this.btnOK.Location = new System.Drawing.Point(166, 274);
+			this.btnOK.Location = new System.Drawing.Point(166, 299);
 			this.btnOK.Name = "btnOK";
 			this.btnOK.Size = new System.Drawing.Size(75, 23);
 			this.btnOK.TabIndex = 1;
@@ -93,7 +99,7 @@
 			// btnCancel
 			// 
 			this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.btnCancel.Location = new System.Drawing.Point(248, 274);
+			this.btnCancel.Location = new System.Drawing.Point(248, 299);
 			this.btnCancel.Name = "btnCancel";
 			this.btnCancel.Size = new System.Drawing.Size(75, 23);
 			this.btnCancel.TabIndex = 2;
@@ -110,11 +116,11 @@
 			this.lvFraunhoferLines.FullRowSelect = true;
 			this.lvFraunhoferLines.HideSelection = false;
 			this.lvFraunhoferLines.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem16,
-            listViewItem17,
-            listViewItem18,
-            listViewItem19,
-            listViewItem20});
+            listViewItem6,
+            listViewItem7,
+            listViewItem8,
+            listViewItem9,
+            listViewItem10});
 			this.lvFraunhoferLines.Location = new System.Drawing.Point(30, 35);
 			this.lvFraunhoferLines.Name = "lvFraunhoferLines";
 			this.lvFraunhoferLines.Size = new System.Drawing.Size(266, 112);
@@ -184,7 +190,7 @@
 			// 
 			this.pnlOnePointCalibration.Controls.Add(this.cbxSinglePoint);
 			this.pnlOnePointCalibration.Controls.Add(this.nudDispersion);
-			this.pnlOnePointCalibration.Location = new System.Drawing.Point(4, 227);
+			this.pnlOnePointCalibration.Location = new System.Drawing.Point(4, 256);
 			this.pnlOnePointCalibration.Name = "pnlOnePointCalibration";
 			this.pnlOnePointCalibration.Size = new System.Drawing.Size(261, 34);
 			this.pnlOnePointCalibration.TabIndex = 10;
@@ -192,7 +198,7 @@
 			// btnReset
 			// 
 			this.btnReset.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.btnReset.Location = new System.Drawing.Point(12, 274);
+			this.btnReset.Location = new System.Drawing.Point(12, 299);
 			this.btnReset.Name = "btnReset";
 			this.btnReset.Size = new System.Drawing.Size(75, 23);
 			this.btnReset.TabIndex = 11;
@@ -203,16 +209,70 @@
 			// panel1
 			// 
 			this.panel1.BackColor = System.Drawing.Color.Black;
-			this.panel1.Location = new System.Drawing.Point(13, 264);
+			this.panel1.Location = new System.Drawing.Point(13, 293);
 			this.panel1.Name = "panel1";
 			this.panel1.Size = new System.Drawing.Size(310, 1);
 			this.panel1.TabIndex = 12;
+			// 
+			// cbxCalibrate
+			// 
+			this.cbxCalibrate.AutoSize = true;
+			this.cbxCalibrate.Location = new System.Drawing.Point(166, 7);
+			this.cbxCalibrate.Name = "cbxCalibrate";
+			this.cbxCalibrate.Size = new System.Drawing.Size(67, 17);
+			this.cbxCalibrate.TabIndex = 13;
+			this.cbxCalibrate.Text = "Calibrate";
+			this.cbxCalibrate.UseVisualStyleBackColor = true;
+			// 
+			// label1
+			// 
+			this.label1.AutoSize = true;
+			this.label1.Location = new System.Drawing.Point(3, 8);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(86, 13);
+			this.label1.TabIndex = 15;
+			this.label1.Text = "Polynomial Order";
+			// 
+			// nudPolyOrder
+			// 
+			this.nudPolyOrder.Location = new System.Drawing.Point(95, 6);
+			this.nudPolyOrder.Maximum = new decimal(new int[] {
+            3,
+            0,
+            0,
+            0});
+			this.nudPolyOrder.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+			this.nudPolyOrder.Name = "nudPolyOrder";
+			this.nudPolyOrder.Size = new System.Drawing.Size(44, 20);
+			this.nudPolyOrder.TabIndex = 16;
+			this.nudPolyOrder.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+			this.nudPolyOrder.ValueChanged += new System.EventHandler(this.nudPolyOrder_ValueChanged);
+			// 
+			// pnlCalibration
+			// 
+			this.pnlCalibration.Controls.Add(this.label1);
+			this.pnlCalibration.Controls.Add(this.nudPolyOrder);
+			this.pnlCalibration.Controls.Add(this.cbxCalibrate);
+			this.pnlCalibration.Location = new System.Drawing.Point(4, 216);
+			this.pnlCalibration.Name = "pnlCalibration";
+			this.pnlCalibration.Size = new System.Drawing.Size(261, 31);
+			this.pnlCalibration.TabIndex = 17;
+			this.pnlCalibration.Visible = false;
 			// 
 			// frmEnterWavelength
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(335, 309);
+			this.ClientSize = new System.Drawing.Size(335, 329);
+			this.Controls.Add(this.pnlCalibration);
 			this.Controls.Add(this.panel1);
 			this.Controls.Add(this.btnReset);
 			this.Controls.Add(this.pnlOnePointCalibration);
@@ -233,6 +293,9 @@
 			((System.ComponentModel.ISupportInitialize)(this.nudDispersion)).EndInit();
 			this.pnlOnePointCalibration.ResumeLayout(false);
 			this.pnlOnePointCalibration.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.nudPolyOrder)).EndInit();
+			this.pnlCalibration.ResumeLayout(false);
+			this.pnlCalibration.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -254,5 +317,9 @@
         private System.Windows.Forms.Panel pnlOnePointCalibration;
 		private System.Windows.Forms.Button btnReset;
 		private System.Windows.Forms.Panel panel1;
+		private System.Windows.Forms.CheckBox cbxCalibrate;
+		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.NumericUpDown nudPolyOrder;
+		private System.Windows.Forms.Panel pnlCalibration;
     }
 }

@@ -12,7 +12,7 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 	public class SpectraViewerStateCalibrate : SpectraViewerStateBase
 	{
 		private SpectraPoint m_SelectedPoint;
-		private SpectraPoint m_FirstCalibrationPoint;
+		private List<SpectraPoint> m_MarkedCalibrationPoints = new List<SpectraPoint>();
         private frmEnterWavelength m_frmEnterWavelength = null;
 
 		private static int SEARCH_AREA_WING = 5;
@@ -124,15 +124,15 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 			}
         }
 
-        internal void CalibrationPointSelected(float selectedWaveLength)
+		internal void CalibrationPointSelected(float selectedWaveLength, bool attemptCalibration, int polynomialOrder)
         {
-            m_SpectroscopyController.SetMarker(m_SelectedPoint.PixelNo, selectedWaveLength);
+			m_SpectroscopyController.SetMarker(m_SelectedPoint.PixelNo, selectedWaveLength, attemptCalibration, polynomialOrder);
 
 	        if (m_SpectroscopyController.IsCalibrated())
 		        m_StateManager.ChangeState<SpectraViewerStateCalibrated>();
 	        else
 	        {
-		        m_FirstCalibrationPoint = m_SelectedPoint;
+				m_MarkedCalibrationPoints.Add(new SpectraPoint(m_SelectedPoint));
 		        m_SelectedPoint = null;
 
 				m_StateManager.Redraw();
@@ -163,7 +163,7 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 		{
 			m_SpectroscopyController.GetSpectraCalibrator().Reset();
 
-			m_FirstCalibrationPoint = null;
+			m_MarkedCalibrationPoints.Clear();
 			CalibrationPointSelectionCancelled();
 		}
 
@@ -200,10 +200,9 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
                 g.DrawLine(s_CalibrationLinePen, x1, 0, x1, m_View.Height);
 			}
 
-			if (m_FirstCalibrationPoint != null)
+			foreach (SpectraPoint point in m_MarkedCalibrationPoints)
 			{
-
-				float x1 = m_StateManager.GetMouseXFromSpectraPixel(m_FirstCalibrationPoint.PixelNo);
+				float x1 = m_StateManager.GetMouseXFromSpectraPixel(point.PixelNo);
                 g.DrawLine(s_ConfirmedCalibrationLinePen, x1, 0, x1, m_View.Height);
 			}
 		}
