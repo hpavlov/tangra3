@@ -586,9 +586,9 @@ namespace Tangra.Controller
             m_SpectraCalibrator.SetMarker(pixelNo, wavelength, attemptCalibration, polynomialOrder);
         }
 
-        internal void SetDispersion(float dispersion)
+        internal void SetFirstOrderDispersion(float dispersion)
         {
-            m_SpectraCalibrator.SetDispersion(dispersion);
+            m_SpectraCalibrator.SetFirstOrderDispersion(dispersion);
         }
 
 

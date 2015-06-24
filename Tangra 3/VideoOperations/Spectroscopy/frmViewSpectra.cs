@@ -79,13 +79,13 @@ namespace Tangra.VideoOperations.Spectroscopy
 
 	        gbxCalibration.Visible = m_SpectroscopyController.IsCalibrated();
 		    var calibraror = m_SpectroscopyController.GetSpectraCalibrator();
-	        lblDispersion.Text = string.Format("Dispersion: {0}", calibraror.GetCalibrationScale().ToString("0.00 A/pixel"));
+	        lblDispersion.Text = string.Format("Dispersion: {0}", calibraror.GetCalibrationScale().ToString("0.00 A/pix"));
 		    lblOrder.Text = string.Format("Order: {0}", calibraror.GetCalibrationOrder());
 		    float rms = calibraror.GetCalibrationRMS();
 		    if (float.IsNaN(rms))
 			    lblRMS.Text = "";
 			else
-				lblRMS.Text = string.Format("RMS: {0}", rms.ToString("0.0 A"));
+				lblRMS.Text = string.Format("RMS: {0}", rms.ToString("0.00 pix"));
 	    }
 
 		private void frmViewSpectra_Resize(object sender, EventArgs e)
