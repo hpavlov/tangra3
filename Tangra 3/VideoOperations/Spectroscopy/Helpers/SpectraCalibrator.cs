@@ -217,6 +217,56 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
                 point.Wavelength = ResolveWavelength(point.PixelNo);
             }
         }
+
+		public bool LoadCalibration(SpectraCalibration calibration)
+		{
+			LoadPoints(calibration);
+
+			switch (calibration.FitType)
+			{
+				case "LinearWavelengthCalibration":
+					m_WavelengthCalibration = new LinearWavelengthCalibration(calibration);
+					return true;
+
+				case "QuadraticWavelengthCalibration":
+					m_WavelengthCalibration = new QuadraticWavelengthCalibration(calibration);
+					return true;
+
+				case "LinearWavelengthRegressionCalibration":
+					m_WavelengthCalibration = new LinearWavelengthRegressionCalibration(calibration);
+					return true;
+
+				case "QuadraticWavelengthRegressionCalibration":
+					m_WavelengthCalibration = new QuadraticWavelengthRegressionCalibration(calibration);
+					return true;
+
+				case "CubicWavelengthRegressionCalibration":
+					m_WavelengthCalibration = new CubicWavelengthRegressionCalibration(calibration);
+					return true;
+			}
+
+			return false;
+		}
+
+		private void LoadPoints(SpectraCalibration props)
+	    {
+			int[] pixelsArr = new int[] { props.Pixel1, props.Pixel2, props.Pixel3, props.Pixel4, props.Pixel5, props.Pixel6, props.Pixel7, props.Pixel8 };
+			float[] wavelengthsArr = new float[] { props.Wavelength1, props.Wavelength2, props.Wavelength3, props.Wavelength4, props.Wavelength5, props.Wavelength6, props.Wavelength7, props.Wavelength8 };
+
+			for (int i = 0; i < 8; i++)
+			{
+				if (pixelsArr[i] != 0 && !float.IsNaN(wavelengthsArr[i]))
+				{
+					m_PixelNos[i] = pixelsArr[i];
+					m_Wavelengths[i] = wavelengthsArr[i];
+				}
+				else
+				{
+					m_PixelNos[i] = null;
+					m_Wavelengths[i] = float.NaN;
+				}
+			}
+	    }
     }
 
     internal class QuadraticWavelengthCalibration : IWavelengthCalibration
@@ -231,6 +281,9 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
         private float m_A;
         private float m_B;
         private float m_C;
+
+		public QuadraticWavelengthCalibration()
+		{ }
 
         public void Calibrate(int x1, int x2, int x3, float w1, float w2, float w3)
         {
@@ -302,9 +355,17 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
                 Wavelength1 = m_Wavelength1,
                 Wavelength2 = m_Wavelength2,
                 Dispersion = 1 / m_B,
-                ZeroPixel = m_A
-            };
-        }
+                ZeroPixel = m_A,
+				RMS = GetCalibrationRMS(),
+				PolynomialOrder = GetCalibrationOrder(),
+				FitType = this.GetType().Name
+			};
+		}
+
+	    public QuadraticWavelengthCalibration(SpectraCalibration props)
+	    {
+			Calibrate((int)props.Pixel1, (int)props.Pixel2, (int)props.Pixel3, props.Wavelength1, props.Wavelength2, props.Wavelength3);
+	    }
     }
 
     internal class LinearWavelengthCalibration : IWavelengthCalibration
@@ -316,6 +377,9 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 		private int m_ZeroPixelNo;
 		private float m_ZeroWavelength;
 		private float m_AperPixels;
+
+		public LinearWavelengthCalibration()
+		{ }
 
 		public void Calibrate(int pixel1, int pixel2, float wavelength1, float wavelength2)
 		{
@@ -375,9 +439,17 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 				Wavelength1 = m_Wavelength1,
 				Wavelength2 = m_Wavelength2,
 				Dispersion = m_AperPixels,
-				ZeroPixel = m_ZeroPixelNo
+				ZeroPixel = m_ZeroPixelNo,
+				RMS = GetCalibrationRMS(),
+				PolynomialOrder = GetCalibrationOrder(),
+				FitType = this.GetType().Name
 			};
 		}
+
+	    public LinearWavelengthCalibration(SpectraCalibration props)
+	    {
+			Calibrate((int)props.Pixel1, (int)props.Pixel2, props.Wavelength1, props.Wavelength2);
+	    }
 	}
 
     internal abstract class RegressionCalibrationBase
@@ -424,12 +496,160 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
                 m_ChiSquare = m_ChiSquare / (m_Residuals.Count - 3);
             }
         }
-    }
+
+		#region Loading and Saving of Pixels/Wavelength Arrays
+		protected void LoadPixels(SpectraCalibration props)
+	    {
+			int[] pixelsArr = new int[] { props.Pixel1, props.Pixel2, props.Pixel3, props.Pixel4, props.Pixel5, props.Pixel6, props.Pixel7, props.Pixel8 };
+			float[] wavelengthsArr = new float[] { props.Wavelength1, props.Wavelength2, props.Wavelength3, props.Wavelength4, props.Wavelength5, props.Wavelength6, props.Wavelength7, props.Wavelength8 };
+
+		    for (int i = 0; i < 8; i++)
+		    {
+				if (pixelsArr[i] != 0 && !float.IsNaN(wavelengthsArr[i]))
+				{
+					m_PixelNos.Add(pixelsArr[i]);
+					m_Wavelengths.Add(wavelengthsArr[i]);
+				}    
+		    }
+	    }
+
+		protected void SavePixels(SpectraCalibration props)
+	    {
+			if (m_PixelNos.Count > 0)
+			{
+				props.Pixel1 = m_PixelNos[0];
+				props.Wavelength1 = m_Wavelengths[0];
+
+				if (m_PixelNos.Count > 1)
+				{
+					props.Pixel2 = m_PixelNos[1];
+					props.Wavelength2 = m_Wavelengths[1];
+
+					if (m_PixelNos.Count > 2)
+					{
+						props.Pixel3 = m_PixelNos[2];
+						props.Wavelength3 = m_Wavelengths[2];
+
+						if (m_PixelNos.Count > 3)
+						{
+							props.Pixel4 = m_PixelNos[3];
+							props.Wavelength4 = m_Wavelengths[3];
+
+							if (m_PixelNos.Count > 4)
+							{
+								props.Pixel5 = m_PixelNos[4];
+								props.Wavelength5 = m_Wavelengths[4];
+
+								if (m_PixelNos.Count > 5)
+								{
+									props.Pixel6 = m_PixelNos[5];
+									props.Wavelength6 = m_Wavelengths[5];
+
+									if (m_PixelNos.Count > 6)
+									{
+										props.Pixel7 = m_PixelNos[6];
+										props.Wavelength7 = m_Wavelengths[6];
+
+										if (m_PixelNos.Count > 7)
+										{
+											props.Pixel8 = m_PixelNos[7];
+											props.Wavelength8 = m_Wavelengths[7];
+										}
+										else
+										{
+											props.Pixel8 = 0;
+											props.Wavelength8 = float.NaN;
+										}
+									}
+									else
+									{
+										props.Pixel7 = 0;
+										props.Pixel8 = 0;
+										props.Wavelength7 = float.NaN;
+										props.Wavelength8 = float.NaN;
+									}
+								}
+								else
+								{
+									props.Pixel6 = 0;
+									props.Pixel7 = 0;
+									props.Pixel8 = 0;
+									props.Wavelength6 = float.NaN;
+									props.Wavelength7 = float.NaN;
+									props.Wavelength8 = float.NaN;
+								}
+							}
+							else
+							{
+								props.Pixel5 = 0;
+								props.Pixel6 = 0;
+								props.Pixel7 = 0;
+								props.Pixel8 = 0;
+								props.Wavelength5 = float.NaN;
+								props.Wavelength6 = float.NaN;
+								props.Wavelength7 = float.NaN;
+								props.Wavelength8 = float.NaN;
+							}
+						}
+						else
+						{
+							props.Pixel4 = 0;
+							props.Pixel5 = 0;
+							props.Pixel6 = 0;
+							props.Pixel7 = 0;
+							props.Pixel8 = 0;
+							props.Wavelength4 = float.NaN;
+							props.Wavelength5 = float.NaN;
+							props.Wavelength6 = float.NaN;
+							props.Wavelength7 = float.NaN;
+							props.Wavelength8 = float.NaN;
+						}
+					}
+					else
+					{
+						props.Pixel3 = 0;
+						props.Pixel4 = 0;
+						props.Pixel5 = 0;
+						props.Pixel6 = 0;
+						props.Pixel7 = 0;
+						props.Pixel8 = 0;
+						props.Wavelength3 = float.NaN;
+						props.Wavelength4 = float.NaN;
+						props.Wavelength5 = float.NaN;
+						props.Wavelength6 = float.NaN;
+						props.Wavelength7 = float.NaN;
+						props.Wavelength8 = float.NaN;
+					}
+				}
+				else
+				{
+					props.Pixel2 = 0;
+					props.Pixel3 = 0;
+					props.Pixel4 = 0;
+					props.Pixel5 = 0;
+					props.Pixel6 = 0;
+					props.Pixel7 = 0;
+					props.Pixel8 = 0;
+					props.Wavelength2 = float.NaN;
+					props.Wavelength3 = float.NaN;
+					props.Wavelength4 = float.NaN;
+					props.Wavelength5 = float.NaN;
+					props.Wavelength6 = float.NaN;
+					props.Wavelength7 = float.NaN;
+					props.Wavelength8 = float.NaN;
+				}
+			}
+		}
+		#endregion
+	}
 
     internal class LinearWavelengthRegressionCalibration : RegressionCalibrationBase, IRegressionWavelengthCalibration, IWavelengthCalibration
     {
         private float m_A;
         private float m_B;
+
+		public LinearWavelengthRegressionCalibration()
+		{ }
 
         public void Calibrate()
         {
@@ -497,16 +717,30 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 
         public SpectraCalibration GetSpectraCalibration()
         {
-            return new SpectraCalibration()
+            var rv =  new SpectraCalibration()
             {
-                Pixel1 = m_PixelNos[0],
-                Pixel2 = m_PixelNos[1],
-                Wavelength1 = m_Wavelengths[0],
-                Wavelength2 = m_Wavelengths[1],
                 Dispersion = 1 / m_A,
-                ZeroPixel = m_B
-            };
-        }
+                ZeroPixel = m_B,
+				RMS = GetCalibrationRMS(),
+				PolynomialOrder = GetCalibrationOrder(),
+				FitType = this.GetType().Name,
+				A = m_A,
+				B = m_B
+			};
+
+			base.SavePixels(rv);
+
+			return rv;
+		}
+
+		public LinearWavelengthRegressionCalibration(SpectraCalibration props)
+		{
+			LoadPixels(props);
+			m_A = props.A;
+			m_B = props.B;
+			EnsureResiduals();
+			m_RMS = props.RMS;
+		}
     }
 
     internal class CubicWavelengthRegressionCalibration : RegressionCalibrationBase, IRegressionWavelengthCalibration, IWavelengthCalibration
@@ -515,6 +749,9 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
         private float m_B;
         private float m_C;
         private float m_D;
+
+		public CubicWavelengthRegressionCalibration()
+		{ }
 
         public void Calibrate()
         {
@@ -614,16 +851,34 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 
         public SpectraCalibration GetSpectraCalibration()
         {
-            return new SpectraCalibration()
+            var rv = new SpectraCalibration()
             {
-                Pixel1 = m_PixelNos[0],
-                Pixel2 = m_PixelNos[1],
-                Wavelength1 = m_Wavelengths[0],
-                Wavelength2 = m_Wavelengths[1],
                 Dispersion = 1 / m_C,
-                ZeroPixel = m_D
-            };
+                ZeroPixel = m_D,
+				RMS = GetCalibrationRMS(),
+				PolynomialOrder = GetCalibrationOrder(),
+				FitType = this.GetType().Name,
+				A = m_A,
+				B = m_B,
+				C = m_C,
+				D = m_D
+			};
+
+			base.SavePixels(rv);
+
+	        return rv;
         }
+
+		public CubicWavelengthRegressionCalibration(SpectraCalibration props)
+		{
+			LoadPixels(props);
+			m_A = props.A;
+			m_B = props.B;
+			m_C = props.C;
+			m_D = props.D;
+			EnsureResiduals();
+			m_RMS = props.RMS;
+		}
     }
 
     internal class QuadraticWavelengthRegressionCalibration : RegressionCalibrationBase, IRegressionWavelengthCalibration, IWavelengthCalibration
@@ -631,6 +886,9 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
         private float m_A;
         private float m_B;
         private float m_C;
+
+		public QuadraticWavelengthRegressionCalibration()
+		{ }
 
         public void Calibrate()
         {
@@ -707,15 +965,31 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 
         public SpectraCalibration GetSpectraCalibration()
         {
-            return new SpectraCalibration()
+            var rv = new SpectraCalibration()
             {
-                Pixel1 = m_PixelNos[0],
-                Pixel2 = m_PixelNos[1],
-                Wavelength1 = m_Wavelengths[0],
-                Wavelength2 = m_Wavelengths[1],
                 Dispersion = 1 / m_B,
-                ZeroPixel = m_C
-            };
+                ZeroPixel = m_C,
+				RMS = GetCalibrationRMS(),
+				PolynomialOrder = GetCalibrationOrder(),
+				FitType = this.GetType().Name,
+				A = m_A,
+				B = m_B,
+				C = m_C
+			};
+
+			base.SavePixels(rv);
+
+	        return rv;
         }
+
+		public QuadraticWavelengthRegressionCalibration(SpectraCalibration props)
+		{
+			LoadPixels(props);
+			m_A = props.A;
+			m_B = props.B;
+			m_C = props.C;
+			EnsureResiduals();
+			m_RMS = props.RMS;
+		}
     }
 }

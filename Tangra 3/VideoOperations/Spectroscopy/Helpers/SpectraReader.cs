@@ -192,28 +192,75 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 
 	public class SpectraCalibration
 	{
-		public float Pixel1 { get; set; }
-		public float Pixel2 { get; set; }
+		public int Pixel1 { get; set; }
+		public int Pixel2 { get; set; }
+		public int Pixel3 { get; set; }
+		public int Pixel4 { get; set; }
+		public int Pixel5 { get; set; }
+		public int Pixel6 { get; set; }
+		public int Pixel7 { get; set; }
+		public int Pixel8 { get; set; }
 		public float Wavelength1 { get; set; }
 		public float Wavelength2 { get; set; }
+		public float Wavelength3 { get; set; }
+		public float Wavelength4 { get; set; }
+		public float Wavelength5 { get; set; }
+		public float Wavelength6 { get; set; }
+		public float Wavelength7 { get; set; }
+		public float Wavelength8 { get; set; }
 		public float Dispersion { get; set; }
 		public float ZeroPixel { get; set; }
+		public float A { get; set; }
+		public float B { get; set; }
+		public float C { get; set; }
+		public float D { get; set; }
+		public int PolynomialOrder { get; set; }
+		public float RMS { get; set; }
+		public string FitType { get; set; }
 
 		private static int SERIALIZATION_VERSION = 1;
 
 		internal SpectraCalibration()
-		{ }
+		{
+			Wavelength1 = float.NaN;
+			Wavelength2 = float.NaN;
+			Wavelength3 = float.NaN;
+			Wavelength4 = float.NaN;
+			Wavelength5 = float.NaN;
+			Wavelength6 = float.NaN;
+			Wavelength7 = float.NaN;
+			Wavelength8 = float.NaN;
+		}
 
 		public SpectraCalibration(BinaryReader reader)
 		{
 			int version = reader.ReadInt32();
 
-			Pixel1 = reader.ReadSingle();
-			Pixel2 = reader.ReadSingle();
+			Pixel1 = reader.ReadInt32();
+			Pixel2 = reader.ReadInt32();
+			Pixel3 = reader.ReadInt32();
+			Pixel4 = reader.ReadInt32();
+			Pixel5 = reader.ReadInt32();
+			Pixel6 = reader.ReadInt32();
+			Pixel7 = reader.ReadInt32();
+			Pixel8 = reader.ReadInt32();
 			Wavelength1 = reader.ReadSingle();
 			Wavelength2 = reader.ReadSingle();
+			Wavelength3 = reader.ReadSingle();
+			Wavelength4 = reader.ReadSingle();
+			Wavelength5 = reader.ReadSingle();
+			Wavelength6 = reader.ReadSingle();
+			Wavelength7 = reader.ReadSingle();
+			Wavelength8 = reader.ReadSingle();
 			Dispersion = reader.ReadSingle();
 			ZeroPixel = reader.ReadSingle();
+			PolynomialOrder = reader.ReadInt32();
+			A = reader.ReadSingle();
+			B = reader.ReadSingle();
+			C = reader.ReadSingle();
+			D = reader.ReadSingle();
+			RMS = reader.ReadSingle();
+			FitType = reader.ReadString();
 		}
 
 		public void WriteTo(BinaryWriter writer)
@@ -222,10 +269,29 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 
 			writer.Write(Pixel1);
 			writer.Write(Pixel2);
+			writer.Write(Pixel3);
+			writer.Write(Pixel4);
+			writer.Write(Pixel5);
+			writer.Write(Pixel6);
+			writer.Write(Pixel7);
+			writer.Write(Pixel8);
 			writer.Write(Wavelength1);
 			writer.Write(Wavelength2);
+			writer.Write(Wavelength3);
+			writer.Write(Wavelength4);
+			writer.Write(Wavelength5);
+			writer.Write(Wavelength6);
+			writer.Write(Wavelength7);
+			writer.Write(Wavelength8);
 			writer.Write(Dispersion);
 			writer.Write(ZeroPixel);
+			writer.Write(PolynomialOrder);
+			writer.Write(A);
+			writer.Write(B);
+			writer.Write(C);
+			writer.Write(D);
+			writer.Write(RMS);
+			writer.Write(FitType);
 		}
 	}
 

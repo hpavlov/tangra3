@@ -57,11 +57,10 @@ namespace Tangra.VideoOperations.Spectroscopy
                 SpectraCalibrator calibrator = m_SpectroscopyController.GetSpectraCalibrator();    
                 calibrator.Reset();
 
-				// TODO: Initialize a clibrated state
-                //calibrator.SetMarker((int)masterSpectra.Calibration.Pixel1, masterSpectra.Calibration.Wavelength1);
-                //calibrator.SetMarker((int)masterSpectra.Calibration.Pixel2, masterSpectra.Calibration.Wavelength2);
-
-	            //m_StateManager.ChangeState<SpectraViewerStateCalibrated>();
+	            if (calibrator.LoadCalibration(masterSpectra.Calibration))
+	            {
+					m_StateManager.ChangeState<SpectraViewerStateCalibrated>();    
+	            }
             }
 	    }
 
