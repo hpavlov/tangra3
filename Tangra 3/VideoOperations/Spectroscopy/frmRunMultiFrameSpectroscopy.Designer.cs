@@ -41,6 +41,7 @@
 			this.label1 = new System.Windows.Forms.Label();
 			this.cbxBackgroundMethod = new System.Windows.Forms.ComboBox();
 			this.label5 = new System.Windows.Forms.Label();
+			this.ucFrameInterval = new Tangra.VideoOperations.Astrometry.ucFrameInterval();
 			this.label3 = new System.Windows.Forms.Label();
 			this.nudNumberMeasurements = new System.Windows.Forms.NumericUpDown();
 			this.picAreas = new System.Windows.Forms.PictureBox();
@@ -53,7 +54,6 @@
 			this.rbAlignAbsorptionLine = new System.Windows.Forms.RadioButton();
 			this.picAlignTarget = new System.Windows.Forms.PictureBox();
 			this.cbxFineAdjustments = new System.Windows.Forms.CheckBox();
-			this.ucFrameInterval = new Tangra.VideoOperations.Astrometry.ucFrameInterval();
 			this.gbMeasurement.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nudBackgroundWing)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudAreaWing)).BeginInit();
@@ -221,6 +221,14 @@
 			this.label5.TabIndex = 26;
 			this.label5.Text = "Combine";
 			// 
+			// ucFrameInterval
+			// 
+			this.ucFrameInterval.Location = new System.Drawing.Point(16, 57);
+			this.ucFrameInterval.Name = "ucFrameInterval";
+			this.ucFrameInterval.Size = new System.Drawing.Size(179, 27);
+			this.ucFrameInterval.TabIndex = 23;
+			this.ucFrameInterval.Value = 1;
+			// 
 			// label3
 			// 
 			this.label3.AutoSize = true;
@@ -350,20 +358,14 @@
 			// cbxFineAdjustments
 			// 
 			this.cbxFineAdjustments.AutoSize = true;
+			this.cbxFineAdjustments.Checked = true;
+			this.cbxFineAdjustments.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.cbxFineAdjustments.Location = new System.Drawing.Point(16, 176);
 			this.cbxFineAdjustments.Name = "cbxFineAdjustments";
 			this.cbxFineAdjustments.Size = new System.Drawing.Size(128, 17);
 			this.cbxFineAdjustments.TabIndex = 37;
 			this.cbxFineAdjustments.Text = "Use Fine Adjustments";
 			this.cbxFineAdjustments.UseVisualStyleBackColor = true;
-			// 
-			// ucFrameInterval
-			// 
-			this.ucFrameInterval.Location = new System.Drawing.Point(16, 57);
-			this.ucFrameInterval.Name = "ucFrameInterval";
-			this.ucFrameInterval.Size = new System.Drawing.Size(179, 27);
-			this.ucFrameInterval.TabIndex = 23;
-			this.ucFrameInterval.Value = 1;
 			// 
 			// frmRunMultiFrameSpectroscopy
 			// 

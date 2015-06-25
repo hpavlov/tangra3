@@ -281,8 +281,8 @@ namespace Tangra.VideoOperations.Spectroscopy
                     SelectedStar = new ImagePixel(e.Gausian.XCenter, e.Gausian.YCenter);
                     SelectedStarFWHM = e.Gausian.FWHM;
                     m_SelectedStarGaussian = e.Gausian;
-                    MeasurementAreaWing = (int)Math.Ceiling(SelectedStarFWHM);
-                    BackgroundAreaWing = 2 * MeasurementAreaWing;
+                    MeasurementAreaWing = (int)(2 * Math.Ceiling(SelectedStarFWHM));
+                    BackgroundAreaWing = MeasurementAreaWing;
 
                     SelectedAnglePoint = Point.Empty;
                     m_ControlPanel.ClearSpectra();
@@ -294,8 +294,8 @@ namespace Tangra.VideoOperations.Spectroscopy
                     SelectedStar = new ImagePixel(e.Gausian.XCenter, e.Gausian.YCenter);
                     SelectedStarFWHM = e.Gausian.FWHM;
                     m_SelectedStarGaussian = e.Gausian;
-                    MeasurementAreaWing = (int)Math.Ceiling(SelectedStarFWHM);
-                    BackgroundAreaWing = 2 * MeasurementAreaWing;
+					MeasurementAreaWing = (int)(2 * Math.Ceiling(SelectedStarFWHM));
+					BackgroundAreaWing = MeasurementAreaWing;
 
                     SetBestAngle(bestAngle);
                 }
