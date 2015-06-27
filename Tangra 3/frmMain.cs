@@ -1257,19 +1257,31 @@ namespace Tangra
 				m_VideoController.StepForward();
 			}
 
-			//if (ChooseCalibratedConfigurationDialog(debugMode))
-			//{
-			//	m_VideoController.ChangeImageTool(new SelectAstrometricObjectTool(m_AstrometryController, m_VideoController));
 
-            m_VideoController.ActivateOperation<VideoSpectroscopyOperation>(m_SpectroscopyController, debugMode);
+			if (ChooseWavelengthCalibration(debugMode))
+			{
+				//	m_VideoController.ChangeImageTool(new SelectAstrometricObjectTool(m_AstrometryController, m_VideoController));
 
-			TangraContext.Current.CanPlayVideo = false;
-			m_VideoController.UpdateViews();
+				m_VideoController.ActivateOperation<VideoSpectroscopyOperation>(m_SpectroscopyController, debugMode);
 
-			//	return true;
-			//}
+				TangraContext.Current.CanPlayVideo = false;
+				m_VideoController.UpdateViews();
+
+				return true;
+			}
 
 			return false;
+		}
+
+		private bool ChooseWavelengthCalibration(bool debugMode)
+		{
+			var frmCamera = new frmChooseConfiguration(TangraContext.Current.FrameWidth, TangraContext.Current.FrameHeight, m_VideoController.VideoBitPix);
+			if (frmCamera.ShowDialog(this) == DialogResult.Cancel)
+			{
+				return false;
+			}
+
+			return true;
 		}
 
 		private void miOpenSpectra_Click(object sender, EventArgs e)

@@ -60,5 +60,7 @@
 		#endregion
 
 		private ucChooseCalibratedConfiguration ucCameraSettings1;
+
+
 	}
 }

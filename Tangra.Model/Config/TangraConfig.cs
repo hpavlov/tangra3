@@ -633,6 +633,8 @@ namespace Tangra.Model.Config
 	        public double AstrMinMag;
 	        public double AstrMaxMag;
 	        public int AstrSearchTypeIndex;
+
+	        public string SpectroscopyWavelengthConfigurationname;
         }
 
         public class SameSizeApertureConfig
@@ -1162,12 +1164,34 @@ namespace Tangra.Model.Config
 
 			public SpectraColors Colors;
 
+			public List<PersistedConfiguration> PersistedConfigurations = new List<PersistedConfiguration>();
+
 			public SpectroscopySettings()
 			{
 				Colors = new SpectraColors();
 
 				DefaultWavelengthCalibrationOrder = 1;
 				Instrument = SpectroscopyInstrument.Grating;
+
+				
+			}
+
+			public class PersistedConfiguration
+			{
+				public string Name;
+				public int Width;
+				public int Height;
+				public int Order;
+				public float RMS;
+				public float A;
+				public float B;
+				public float C;
+				public float D;
+
+				public override string ToString()
+				{
+					return Name;
+				}
 			}
 		}
 

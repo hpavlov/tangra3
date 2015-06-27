@@ -333,6 +333,18 @@
       <DependentUpon>frmLongRunningOperation.cs</DependentUpon>
     </Compile>
     <Compile Include="Helpers\LongOperationsManager.cs" />
+    <Compile Include="VideoOperations\Spectroscopy\frmChooseConfiguration.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\frmChooseConfiguration.Designer.cs">
+      <DependentUpon>frmChooseConfiguration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\frmEditWavelengthConfigName.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\frmEditWavelengthConfigName.Designer.cs">
+      <DependentUpon>frmEditWavelengthConfigName.cs</DependentUpon>
+    </Compile>
     <Compile Include="VideoOperations\Spectroscopy\frmEnterWavelength.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -1026,6 +1038,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\LightCurves\ucCorrSelection.resx">
       <DependentUpon>ucCorrSelection.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Spectroscopy\frmChooseConfiguration.resx">
+      <DependentUpon>frmChooseConfiguration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Spectroscopy\frmEditWavelengthConfigName.resx">
+      <DependentUpon>frmEditWavelengthConfigName.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\Spectroscopy\frmEnterWavelength.resx">
       <DependentUpon>frmEnterWavelength.cs</DependentUpon>
