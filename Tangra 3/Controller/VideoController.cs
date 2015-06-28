@@ -2275,9 +2275,13 @@ namespace Tangra.Controller
 				AstroAnalogueVideoNormaliseNtpDataIfNeeded(out oneSigma);
 			}
 
-			if (frameState.CentralExposureTime != DateTime.MaxValue &&
+            if (frameState.HasValidTimeStamp &&
+                frameState.CentralExposureTime != DateTime.MaxValue &&
 			    frameState.CentralExposureTime != DateTime.MinValue)
 				return frameState.CentralExposureTime;
+
+            if (frameState.HasValidNtpTimeStamp)
+                return frameState.EndFrameNtpTime;
 
 			return null;
 		}

@@ -206,6 +206,8 @@ namespace Tangra.VideoOperations.Spectroscopy
                 SpectraCalibrator calibrator = m_SpectroscopyController.GetSpectraCalibrator();
                 var bld = new StringBuilder();
 
+                m_SpectroscopyController.AddDatExportHeader(bld, m_Spectra);
+
                 foreach (SpectraPoint point in m_Spectra.Points)
                 {
                     float wavelength = calibrator.ResolveWavelength(point.PixelNo);

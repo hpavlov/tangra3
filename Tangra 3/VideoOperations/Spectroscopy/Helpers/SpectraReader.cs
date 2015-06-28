@@ -343,6 +343,8 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
         public DateTime? FirstFrameTimeStamp;
         public DateTime? LastFrameTimeStamp;
 	    public byte[] FrameBitmapPixels;
+        public float Gain;
+        public float ExposureSeconds;
 
         private static int SERIALIZATION_VERSION = 1;
 
@@ -372,6 +374,9 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 	        int bytesToRead = reader.ReadInt32();
 			if (bytesToRead > 0)
 				FrameBitmapPixels = reader.ReadBytes(bytesToRead);
+
+            Gain = reader.ReadSingle();
+            ExposureSeconds = reader.ReadSingle();
 		}
 
 		public void WriteTo(BinaryWriter writer)
@@ -396,6 +401,8 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 
 			writer.Write(FrameBitmapPixels.Length);
 			writer.Write(FrameBitmapPixels);
+		    writer.Write(Gain);
+            writer.Write(ExposureSeconds);
 		}
     }
 

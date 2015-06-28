@@ -139,6 +139,7 @@
     <Compile Include="Helpers\AstroConvert.cs" />
     <Compile Include="Helpers\DebugContext.cs" />
     <Compile Include="Helpers\Extensions.cs" />
+    <Compile Include="Helpers\JulianDayHelper.cs" />
     <Compile Include="Helpers\PositionMemento.cs" />
     <Compile Include="Helpers\TangraCore.cs" />
     <Compile Include="Helpers\ThreadingHelper.cs" />

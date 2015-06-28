@@ -657,6 +657,13 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
             }
         }
 
+        protected float CalculateDispersion()
+        {
+            float pixel0 = ComputePixelNo(0);
+            float pixel10000 = ComputePixelNo(10000);
+            return 10000.0f / (pixel10000 - pixel0);
+        }
+
 		#region Loading and Saving of Pixels/Wavelength Arrays
 		protected void LoadPixels(SpectraCalibration props)
 	    {
@@ -879,7 +886,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
         {
             var rv =  new SpectraCalibration()
             {
-                Dispersion = 1 / m_A,
+                Dispersion = CalculateDispersion(),
                 ZeroPixel = m_B,
 				RMS = GetCalibrationRMS(),
 				PolynomialOrder = GetCalibrationOrder(),
@@ -1013,7 +1020,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
         {
             var rv = new SpectraCalibration()
             {
-                Dispersion = 1 / m_C,
+                Dispersion = CalculateDispersion(),
                 ZeroPixel = m_D,
 				RMS = GetCalibrationRMS(),
 				PolynomialOrder = GetCalibrationOrder(),
@@ -1127,7 +1134,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
         {
             var rv = new SpectraCalibration()
             {
-                Dispersion = 1 / m_B,
+                Dispersion = CalculateDispersion(),
                 ZeroPixel = m_C,
 				RMS = GetCalibrationRMS(),
 				PolynomialOrder = GetCalibrationOrder(),

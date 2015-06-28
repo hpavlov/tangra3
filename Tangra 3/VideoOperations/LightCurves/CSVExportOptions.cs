@@ -142,18 +142,11 @@ namespace Tangra.VideoOperations.LightCurves
                 if (FistMeasurementDay.HasValue && FistMeasurementTimeStamp.HasValue)
                     time = FirstConfirmedMeasurementTimeStamp.AddTicks(time.Ticks - FistMeasurementTimeStamp.Value.Ticks);
 
-                double jd = JDUtcAtDate(time);
+                double jd = JulianDayHelper.JDUtcAtDate(time);
                 return jd.ToString(GetDecimalDaysTimeFormat(timePrecisionSec), CultureInfo.InvariantCulture);
             }
             else
                 throw new ArgumentOutOfRangeException();
-        }
-
-        private double JDUtcAtDate(DateTime date)
-        {
-            double tNow = (double)date.Ticks - 6.30822816E+17;	// .NET ticks at 01-Jan-2000T00:00:00
-            double j = 2451544.5 + (tNow / 8.64E+11);		// Tick difference to days difference
-            return j;
         }
 
         public string FormatPhotometricValueHeaderForObject(int objectNo, bool onlyExportSignalMunusBg, bool binning)

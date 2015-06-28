@@ -197,6 +197,10 @@ namespace Tangra.VideoOperations.Spectroscopy
 					if (m_VideoController.HasEmbeddedTimeStamps())
 						m_MasterSpectra.MeasurementInfo.LastFrameTimeStamp = m_VideoController.GetCurrentFrameTime();
 
+                    FrameStateData frameStatus = m_VideoController.GetCurrentFrameState();
+                    m_MasterSpectra.MeasurementInfo.Gain = frameStatus.Gain;
+                    m_MasterSpectra.MeasurementInfo.ExposureSeconds = frameStatus.ExposureInMilliseconds/1000.0f;
+
 					m_MasterSpectra.MeasurementInfo.FrameBitmapPixels = m_FrameBitmapPixels;
 
 					m_OperationState = SpectroscopyState.DisplayingMeasurements;
