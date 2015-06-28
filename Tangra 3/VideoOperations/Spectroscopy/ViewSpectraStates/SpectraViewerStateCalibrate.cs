@@ -128,15 +128,18 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
         {
 			m_SpectroscopyController.SetMarker(m_SelectedPoint.PixelNo, selectedWaveLength, attemptCalibration, polynomialOrder);
 
-	        if (m_SpectroscopyController.IsCalibrated())
+		    if (m_SpectroscopyController.IsCalibrated())
+		    {
+		        m_SpectroscopyController.SaveCalibratedConfiguration();
 		        m_StateManager.ChangeState<SpectraViewerStateCalibrated>();
-	        else
-	        {
-				m_MarkedCalibrationPoints.Add(new SpectraPoint(m_SelectedPoint));
+		    }
+		    else
+		    {
+		        m_MarkedCalibrationPoints.Add(new SpectraPoint(m_SelectedPoint));
 		        m_SelectedPoint = null;
 
-				m_StateManager.Redraw();
-	        }
+		        m_StateManager.Redraw();
+		    }
         }
 
         internal void DispersionSelected(float dispersion)

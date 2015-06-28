@@ -26,6 +26,7 @@ namespace Tangra.Controller
 		private Form m_MainFormView;
         private SpectraCalibrator m_SpectraCalibrator;
         private MasterSpectra m_CurrentSpectra;
+        private TangraConfig.PersistedConfiguration m_Configuration;
 
         internal SpectraReductionContext SpectraReductionContext { get; private set; }
 
@@ -36,6 +37,22 @@ namespace Tangra.Controller
 			m_ViewSpectraForm = null;
             SpectraReductionContext = new SpectraReductionContext();
 		}
+
+        internal bool HasCalibratedConfiguration()
+        {
+            return m_Configuration != null && m_Configuration.IsCalibrated;
+        }
+
+        internal bool ScaleSpectraByZeroOrderImagePosition()
+        {
+            if (m_CurrentSpectra != null && m_Configuration != null && m_Configuration.IsCalibrated)
+            {
+                m_SpectraCalibrator = new SpectraCalibrator(m_CurrentSpectra);
+                return m_SpectraCalibrator.LoadCalibration(m_Configuration);
+            }
+
+            return false;
+        }
 
         internal float LocateSpectraAngle(PSFFit selectedStar, int? roughStartingAngle = null)
         {
@@ -404,11 +421,12 @@ namespace Tangra.Controller
 			return masterSpectra;
         }
 
-	    internal void DisplaySpectra(MasterSpectra masterSpectra)
+        internal void DisplaySpectra(MasterSpectra masterSpectra, TangraConfig.PersistedConfiguration configuration)
 	    {
 		    EnsureViewSpectraForm();
 
 	        m_CurrentSpectra = masterSpectra;
+            m_Configuration = configuration;
             m_SpectraCalibrator = new SpectraCalibrator(masterSpectra);
 
 			m_ViewSpectraForm.SetMasterSpectra(masterSpectra);
@@ -535,7 +553,8 @@ namespace Tangra.Controller
 				SpectraFile spectraFile = SpectraFile.Load(fileName);
 				if (spectraFile != null)
 				{
-					DisplaySpectra(spectraFile.Data);
+                    // TODO: Choose configuration ?? 
+					DisplaySpectra(spectraFile.Data, null);
 
                     string videoFile = m_VideoController.GetVideoFileMatchingLcFile(spectraFile.Header.PathToVideoFile, fileName);
                     if (!string.IsNullOrEmpty(videoFile) &&
@@ -640,5 +659,27 @@ namespace Tangra.Controller
 		{
 			m_VideoController.CloseOpenedVideoFile();
 		}
+
+        internal void SaveCalibratedConfiguration()
+        {
+            if (m_Configuration != null && !m_Configuration.IsCalibrated)
+            {
+                SpectraCalibration calibration = GetSpectraCalibration();
+                TangraConfig.PersistedConfiguration persistedConfiguration = TangraConfig.Settings.Spectroscopy.PersistedConfigurations.SingleOrDefault(x => x.Name == m_Configuration.Name);
+                if (persistedConfiguration != null)
+                {
+                    persistedConfiguration.A = calibration.A;
+                    persistedConfiguration.B = calibration.B;
+                    persistedConfiguration.C = calibration.C;
+                    persistedConfiguration.D = calibration.D;
+                    persistedConfiguration.RMS = calibration.RMS;
+                    persistedConfiguration.Order = calibration.PolynomialOrder;
+                    persistedConfiguration.Dispersion = calibration.Dispersion;
+                    persistedConfiguration.IsCalibrated = true;
+
+                    TangraConfig.Settings.Save();
+                }
+            }
+        }
     }
 }

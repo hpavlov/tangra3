@@ -58,10 +58,13 @@ namespace Tangra.VideoOperations.Spectroscopy
                 calibrator.Reset();
 
 	            if (calibrator.LoadCalibration(masterSpectra.Calibration))
-	            {
 					m_StateManager.ChangeState<SpectraViewerStateCalibrated>();    
-	            }
             }
+            else if (m_SpectroscopyController.HasCalibratedConfiguration())
+            {
+                if (m_SpectroscopyController.ScaleSpectraByZeroOrderImagePosition())
+                    m_StateManager.ChangeState<SpectraViewerStateCalibrated>();    
+	        }
 	    }
 
         private void frmViewSpectra_Load(object sender, EventArgs e)
@@ -163,7 +166,7 @@ namespace Tangra.VideoOperations.Spectroscopy
         {
             lblPixelNo.Text = (pixelNo - m_Spectra.ZeroOrderPixelNo).ToString();
 
-	        if (!float.IsNaN(wavelength))
+            if (!float.IsNaN(wavelength) && pixelNo >= m_Spectra.ZeroOrderPixelNo)
 	        {
 		        lblWavelength.Text = wavelength.ToString("0.0 A");
 		        lblWavelengthCaption.Visible = true;

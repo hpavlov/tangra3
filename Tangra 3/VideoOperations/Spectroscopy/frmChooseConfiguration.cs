@@ -21,7 +21,12 @@ namespace Tangra.VideoOperations.Spectroscopy
 		private int m_Width;
 		private int m_Height;
 
-		private TangraConfig.SpectroscopySettings.PersistedConfiguration m_SelectedConfiguration;
+		private TangraConfig.PersistedConfiguration m_SelectedConfiguration;
+
+	    public TangraConfig.PersistedConfiguration SelectedConfiguration
+	    {
+            get { return m_SelectedConfiguration; }
+	    }
 
 		public frmChooseConfiguration()
 		{
@@ -41,6 +46,8 @@ namespace Tangra.VideoOperations.Spectroscopy
 		private void LoadConfigurations()
 		{
 			cbxSavedConfigurations.Items.Clear();
+		    pnlCalibrated.Visible = false;
+            pnlNotCalibrated.Visible = false;
 
 			var compatibleConfigurations = TangraConfig.Settings.Spectroscopy.PersistedConfigurations.Where(x => x.Width == m_Width && x.Height == m_Height);
 
@@ -65,6 +72,12 @@ namespace Tangra.VideoOperations.Spectroscopy
 
 		private void btnOK_Click(object sender, EventArgs e)
 		{
+            if (m_SelectedConfiguration == null)
+            {
+                MessageBox.Show("Please select a configuration or create a new one.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
 			TangraConfig.Settings.LastUsed.SpectroscopyWavelengthConfigurationname = m_SelectedConfiguration.Name;
 			TangraConfig.Settings.Save();	
 
@@ -74,9 +87,43 @@ namespace Tangra.VideoOperations.Spectroscopy
 
 		private void cbxSavedConfigurations_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			var selectedConfig = cbxSavedConfigurations.SelectedItem as TangraConfig.SpectroscopySettings.PersistedConfiguration;
-			if (selectedConfig != null)
-				m_SelectedConfiguration = selectedConfig;
+            pnlCalibrated.Visible = false;
+            pnlNotCalibrated.Visible = false;
+
+			var selectedConfig = cbxSavedConfigurations.SelectedItem as TangraConfig.PersistedConfiguration;
+		    if (selectedConfig != null)
+		    {
+		        m_SelectedConfiguration = selectedConfig;
+                if (selectedConfig.IsCalibrated)
+                {
+                    lblDispersion.Text = string.Format("{0} A/pix", selectedConfig.Dispersion.ToString("0.00"));
+                    lblRMS.Text = string.Format("{0} pix", selectedConfig.RMS.ToString("0.00"));
+                    switch (selectedConfig.Order)
+                    {
+                        case 2:
+                            lblCalibratedCaption.Text = "2-nd Order Polynomial Calibration";
+                            break;
+
+                        case 3:
+                            lblCalibratedCaption.Text = "3-rd Order Polynomial Calibration";
+                            break;
+
+                        default:
+                            lblCalibratedCaption.Text = "1-st Order Polynomial Calibration";
+                            break;
+                    }
+
+                    pnlCalibrated.Visible = true;
+                    pnlNotCalibrated.Visible = false;
+                    pnlNotCalibrated.SendToBack();
+                }
+                else
+                {
+                    pnlNotCalibrated.Visible = true;
+                    pnlCalibrated.Visible = false;
+                    pnlCalibrated.SendToBack();
+                }
+		    }
 		}
 
 		private void btnEdit_Click(object sender, EventArgs e)
@@ -88,5 +135,24 @@ namespace Tangra.VideoOperations.Spectroscopy
 				LoadConfigurations();
 			}
 		}
+
+        private void btnDelConfig_Click(object sender, EventArgs e)
+        {
+            var selectedConfig = cbxSavedConfigurations.SelectedItem as TangraConfig.PersistedConfiguration;
+
+		    if (selectedConfig != null)
+            {
+                if (MessageBox.Show(this,
+                    string.Format("Are you sure you want to delete '{0}'", selectedConfig.Name),
+                    "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
+                {
+                    TangraConfig.Settings.Spectroscopy.PersistedConfigurations.RemoveAll(x => x.Name == selectedConfig.Name);
+                    TangraConfig.Settings.Save();
+
+                    m_SelectedConfiguration = null;
+                    LoadConfigurations();
+                }
+            }
+        }
 	}
 }

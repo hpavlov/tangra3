@@ -33,6 +33,7 @@ namespace Tangra.VideoOperations.Spectroscopy
         private VideoController m_VideoController;
 	    private IFramePlayer m_FramePlayer;
         private SpectroscopyController m_SpectroscopyController;
+        private TangraConfig.PersistedConfiguration m_Configuration;
         private ucSpectroscopy m_ControlPanel = null;
         private object m_SyncRoot = new object();
 
@@ -63,10 +64,11 @@ namespace Tangra.VideoOperations.Spectroscopy
 		public float SelectedStarBestAngle { get; private set; }
 
         public VideoSpectroscopyOperation()
-        { } 
+        { }
 
-        public VideoSpectroscopyOperation(SpectroscopyController spectroscopyController, bool debugMode)
+        public VideoSpectroscopyOperation(SpectroscopyController spectroscopyController, TangraConfig.PersistedConfiguration configuration, bool debugMode)
         {
+            m_Configuration = configuration;
             m_SpectroscopyController = spectroscopyController;
         }
 
@@ -206,7 +208,7 @@ namespace Tangra.VideoOperations.Spectroscopy
 
 	    internal void DisplaySpectra()
 	    {
-			m_SpectroscopyController.DisplaySpectra(m_MasterSpectra);
+            m_SpectroscopyController.DisplaySpectra(m_MasterSpectra, m_Configuration);
 	    }
 
         public void ImageToolChanged(ImageTool newTool, ImageTool oldTool)

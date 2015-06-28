@@ -22,20 +22,20 @@ namespace Tangra.VideoOperations.Spectroscopy
 {
 	public partial class frmEditWavelengthConfigName : Form
 	{
-		private TangraConfig.SpectroscopySettings.PersistedConfiguration m_Config;
+		private TangraConfig.PersistedConfiguration m_Config;
 		private bool m_New = false;
 		private int m_FrameWidth;
 		private int m_FrameHeight;
 		private string m_OriginalName;
 		private bool m_UpdateCoefficients;
 
-		internal TangraConfig.SpectroscopySettings.PersistedConfiguration Config
+		internal TangraConfig.PersistedConfiguration Config
 		{
 			get { return m_Config; }
 		}
 
 		public frmEditWavelengthConfigName(
-			TangraConfig.SpectroscopySettings.PersistedConfiguration config,
+			TangraConfig.PersistedConfiguration config,
 			int frameWidth,
 			int frameHeight)
 		{
@@ -46,7 +46,7 @@ namespace Tangra.VideoOperations.Spectroscopy
 
 			if (config == null)
 			{
-				config = new TangraConfig.SpectroscopySettings.PersistedConfiguration { Width = frameWidth, Height = frameHeight };
+				config = new TangraConfig.PersistedConfiguration { Width = frameWidth, Height = frameHeight };
 				tbxConfigName.Enabled = true;
 				m_New = true;
 				Height = 260;

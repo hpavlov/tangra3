@@ -1139,6 +1139,26 @@ namespace Tangra.Model.Config
 			}
 		}
 
+        public class PersistedConfiguration
+        {
+            public string Name;
+            public int Width;
+            public int Height;
+            public int Order;
+            public float Dispersion;
+            public float RMS;
+            public float A;
+            public float B;
+            public float C;
+            public float D;
+            public bool IsCalibrated;
+
+            public override string ToString()
+            {
+                return Name;
+            }
+        }
+
 		public class SpectroscopySettings
 		{
 			public class SpectraColors
@@ -1174,24 +1194,6 @@ namespace Tangra.Model.Config
 				Instrument = SpectroscopyInstrument.Grating;
 
 				
-			}
-
-			public class PersistedConfiguration
-			{
-				public string Name;
-				public int Width;
-				public int Height;
-				public int Order;
-				public float RMS;
-				public float A;
-				public float B;
-				public float C;
-				public float D;
-
-				public override string ToString()
-				{
-					return Name;
-				}
 			}
 		}
 

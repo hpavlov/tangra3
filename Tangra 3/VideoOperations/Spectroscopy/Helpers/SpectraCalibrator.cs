@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Model.Config;
 using Tangra.Model.Numerical;
 
 namespace Tangra.VideoOperations.Spectroscopy.Helpers
@@ -218,6 +219,29 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
             }
         }
 
+        public bool LoadCalibration(TangraConfig.PersistedConfiguration configuration)
+        {
+            float maxVal = m_MasterSpectra.Points.Max(x => x.RawValue);
+            SpectraPoint peakPoint = m_MasterSpectra.Points.SingleOrDefault(x => Math.Abs(maxVal - x.RawValue) < 0.00001);
+            if (peakPoint != null)
+            {
+                switch (configuration.Order)
+                {
+                    case 1:
+                        break;
+
+                    case 2:
+                        m_WavelengthCalibration = new QuadraticWavelengthCalibration(configuration.A, configuration.B, peakPoint.PixelNo, configuration.RMS);
+                        return true;
+
+                    case 3:
+                        break;
+                }                
+            }
+
+            return false;
+        }
+
 		public bool LoadCalibration(SpectraCalibration calibration)
 		{
 			LoadPoints(calibration);
@@ -366,6 +390,13 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 	    {
 			Calibrate((int)props.Pixel1, (int)props.Pixel2, (int)props.Pixel3, props.Wavelength1, props.Wavelength2, props.Wavelength3);
 	    }
+
+        public QuadraticWavelengthCalibration(float a, float b, float c, float rms)
+        {
+            m_A = c;
+            m_B = b;
+            m_C = a;
+        }
     }
 
     internal class LinearWavelengthCalibration : IWavelengthCalibration
