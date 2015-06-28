@@ -40,11 +40,11 @@
             this.label11 = new System.Windows.Forms.Label();
             this.cbxSavedConfigurations = new System.Windows.Forms.ComboBox();
             this.pnlCalibrated = new System.Windows.Forms.Panel();
-            this.lblCalibratedCaption = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.lblDispersion = new System.Windows.Forms.Label();
             this.lblRMS = new System.Windows.Forms.Label();
+            this.lblDispersion = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.lblCalibratedCaption = new System.Windows.Forms.Label();
             this.pnlNotCalibrated.SuspendLayout();
             this.pnlCalibrated.SuspendLayout();
             this.SuspendLayout();
@@ -163,34 +163,15 @@
             this.pnlCalibrated.TabIndex = 85;
             this.pnlCalibrated.Visible = false;
             // 
-            // lblCalibratedCaption
+            // lblRMS
             // 
-            this.lblCalibratedCaption.AutoSize = true;
-            this.lblCalibratedCaption.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblCalibratedCaption.ForeColor = System.Drawing.Color.Navy;
-            this.lblCalibratedCaption.Location = new System.Drawing.Point(3, 2);
-            this.lblCalibratedCaption.Name = "lblCalibratedCaption";
-            this.lblCalibratedCaption.Size = new System.Drawing.Size(195, 13);
-            this.lblCalibratedCaption.TabIndex = 53;
-            this.lblCalibratedCaption.Text = "2-nd Order Polynomial Calibration";
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(24, 27);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(62, 13);
-            this.label1.TabIndex = 54;
-            this.label1.Text = "Dispersion: ";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(49, 46);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(34, 13);
-            this.label3.TabIndex = 55;
-            this.label3.Text = "RMS:";
+            this.lblRMS.AutoSize = true;
+            this.lblRMS.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblRMS.Location = new System.Drawing.Point(83, 46);
+            this.lblRMS.Name = "lblRMS";
+            this.lblRMS.Size = new System.Drawing.Size(52, 13);
+            this.lblRMS.TabIndex = 87;
+            this.lblRMS.Text = "0.45 pix";
             // 
             // lblDispersion
             // 
@@ -202,15 +183,34 @@
             this.lblDispersion.TabIndex = 86;
             this.lblDispersion.Text = "18.21 A/pix";
             // 
-            // lblRMS
+            // label3
             // 
-            this.lblRMS.AutoSize = true;
-            this.lblRMS.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblRMS.Location = new System.Drawing.Point(83, 46);
-            this.lblRMS.Name = "lblRMS";
-            this.lblRMS.Size = new System.Drawing.Size(52, 13);
-            this.lblRMS.TabIndex = 87;
-            this.lblRMS.Text = "0.45 pix";
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(49, 46);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(34, 13);
+            this.label3.TabIndex = 55;
+            this.label3.Text = "RMS:";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(24, 27);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(62, 13);
+            this.label1.TabIndex = 54;
+            this.label1.Text = "Dispersion: ";
+            // 
+            // lblCalibratedCaption
+            // 
+            this.lblCalibratedCaption.AutoSize = true;
+            this.lblCalibratedCaption.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.lblCalibratedCaption.ForeColor = System.Drawing.Color.Navy;
+            this.lblCalibratedCaption.Location = new System.Drawing.Point(3, 2);
+            this.lblCalibratedCaption.Name = "lblCalibratedCaption";
+            this.lblCalibratedCaption.Size = new System.Drawing.Size(195, 13);
+            this.lblCalibratedCaption.TabIndex = 53;
+            this.lblCalibratedCaption.Text = "2-nd Order Polynomial Calibration";
             // 
             // frmChooseConfiguration
             // 

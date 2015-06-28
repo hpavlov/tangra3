@@ -97,7 +97,11 @@ namespace Tangra.VideoOperations.Spectroscopy
                 if (selectedConfig.IsCalibrated)
                 {
                     lblDispersion.Text = string.Format("{0} A/pix", selectedConfig.Dispersion.ToString("0.00"));
-                    lblRMS.Text = string.Format("{0} pix", selectedConfig.RMS.ToString("0.00"));
+                    if (float.IsNaN(selectedConfig.RMS))
+                        lblRMS.Text = "N/A";
+                    else
+                        lblRMS.Text = string.Format("{0} pix", selectedConfig.RMS.ToString("0.00"));
+
                     switch (selectedConfig.Order)
                     {
                         case 2:

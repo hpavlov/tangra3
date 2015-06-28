@@ -228,14 +228,16 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
                 switch (configuration.Order)
                 {
                     case 1:
-                        break;
+                        m_WavelengthCalibration = new LinearWavelengthCalibration(configuration.A, peakPoint.PixelNo, configuration.RMS);
+                        return true;
 
                     case 2:
                         m_WavelengthCalibration = new QuadraticWavelengthCalibration(configuration.A, configuration.B, peakPoint.PixelNo, configuration.RMS);
                         return true;
 
                     case 3:
-                        break;
+                        m_WavelengthCalibration = new CubicWavelengthCalibration(configuration.A, configuration.B, configuration.C, peakPoint.PixelNo, configuration.RMS);
+                        return true;
                 }                
             }
 
@@ -267,6 +269,10 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 				case "CubicWavelengthRegressionCalibration":
 					m_WavelengthCalibration = new CubicWavelengthRegressionCalibration(calibration);
 					return true;
+
+                case "CubicWavelengthCalibration":
+                    m_WavelengthCalibration = new CubicWavelengthCalibration(calibration);
+                    return true;
 			}
 
 			return false;
@@ -291,6 +297,114 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 				}
 			}
 	    }
+    }
+
+    internal class CubicWavelengthCalibration : IWavelengthCalibration
+    {
+        private float m_A;
+        private float m_B;
+        private float m_C;
+        private float m_D;
+        private float m_RMS;
+
+        public CubicWavelengthCalibration()
+		{ }
+
+        public CubicWavelengthCalibration(SpectraCalibration calibration)
+            : this(calibration.A, calibration.B, calibration.C, calibration.D, calibration.RMS)
+        { }
+
+        public CubicWavelengthCalibration(float a, float b, float c, float d, float rms)
+        {
+            m_A = a;
+            m_B = b;
+            m_C = c;
+            m_D = d;
+            m_RMS = rms;
+        }
+
+        public float ResolveWavelength(SpectraPoint point)
+        {
+            if (point != null)
+                return ResolveWavelength(point.PixelNo);
+            else
+                return float.NaN;
+        }
+
+        public float ResolveWavelength(int x)
+        {
+            float a = m_B / m_A;
+            float b = m_C / m_A;
+            float c = (m_D - x) / m_A;
+
+            float Q = (a * a - 3 * b) / 9;
+            float R = (2 * a * a * a - 9 * a * b + 27 * c) / 54;
+
+
+            if (R * R < Q * Q * Q)
+            {
+                float tita = (float)Math.Acos(R / Math.Sqrt(Q * Q * Q));
+                float rQ = (float)Math.Sqrt(Q);
+
+                float[] warr = new float[3];
+                warr[0] = (float)(-2 * rQ * Math.Cos(tita / 3) - a / 3);
+                warr[1] = (float)(-2 * rQ * Math.Cos((tita + 2 * Math.PI) / 3) - a / 3);
+                warr[2] = (float)(-2 * rQ * Math.Cos((tita - 2 * Math.PI) / 3) - a / 3);
+
+                float[] warr_abs = new float[3];
+                warr_abs[0] = Math.Abs(warr[0]);
+                warr_abs[1] = Math.Abs(warr[1]);
+                warr_abs[2] = Math.Abs(warr[2]);
+
+                Array.Sort(warr_abs, warr);
+
+                return warr[0];
+            }
+
+            return float.NaN;
+        }
+
+        public int ResolvePixelNo(float wavelength)
+        {
+            return (int)Math.Round(ComputePixelNo(wavelength));
+        }
+
+        protected float ComputePixelNo(float wavelength)
+        {
+            return m_A * wavelength * wavelength * wavelength + m_B * wavelength * wavelength + m_C * wavelength + m_D;
+        }
+
+        public float GetCalibrationScale()
+        {
+            return 1f / m_C;
+        }
+
+        public int GetCalibrationOrder()
+        {
+            return 3;
+        }
+
+
+        public float GetCalibrationRMS()
+        {
+            return m_RMS;
+        }
+
+        public SpectraCalibration GetSpectraCalibration()
+        {
+            return new SpectraCalibration()
+            {
+                Dispersion = 1 / m_C,
+                ZeroPixel = m_D,
+                RMS = GetCalibrationRMS(),
+                PolynomialOrder = GetCalibrationOrder(),
+                FitType = this.GetType().Name,
+                A = m_A,
+                B = m_B,
+                C = m_C,
+                D = m_D
+            };
+        }
     }
 
     internal class QuadraticWavelengthCalibration : IWavelengthCalibration
@@ -412,6 +526,19 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 		public LinearWavelengthCalibration()
 		{ }
 
+        public LinearWavelengthCalibration(float a, float b, float rms)
+        {
+            m_ZeroPixelNo = (int)Math.Round(b);
+
+            m_Wavelength1 = m_ZeroWavelength = 0;
+            m_PixelNo1 = m_ZeroPixelNo;
+            
+            m_Wavelength2 = 5000;
+            m_PixelNo2 = (int)Math.Round(m_Wavelength2 * a + b);
+
+            m_AperPixels = (m_Wavelength2 - m_Wavelength1) / (m_PixelNo2 - m_PixelNo1);
+        }
+
 		public void Calibrate(int pixel1, int pixel2, float wavelength1, float wavelength2)
 		{
 			m_PixelNo1 = pixel1;
@@ -473,7 +600,9 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 				ZeroPixel = m_ZeroPixelNo,
 				RMS = GetCalibrationRMS(),
 				PolynomialOrder = GetCalibrationOrder(),
-				FitType = this.GetType().Name
+				FitType = this.GetType().Name,
+                A = 1 / m_AperPixels,
+                B = m_ZeroPixelNo
 			};
 		}
 
