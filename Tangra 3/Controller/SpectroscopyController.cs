@@ -601,9 +601,9 @@ namespace Tangra.Controller
             m_VideoController.RegisterRecentFile(RecentFileType.Spectra, fileName);
         }
 
-        internal void SetMarker(int pixelNo, float wavelength, bool attemptCalibration, int polynomialOrder)
+        internal void SetMarker(float pixelPos, float wavelength, bool attemptCalibration, int polynomialOrder)
         {
-            m_SpectraCalibrator.SetMarker(pixelNo, wavelength, attemptCalibration, polynomialOrder);
+			m_SpectraCalibrator.SetMarker(pixelPos, wavelength, attemptCalibration, polynomialOrder);
         }
 
         internal void SetFirstOrderDispersion(float dispersion)

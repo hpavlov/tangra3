@@ -192,14 +192,14 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 
 	public class SpectraCalibration
 	{
-		public int Pixel1 { get; set; }
-		public int Pixel2 { get; set; }
-		public int Pixel3 { get; set; }
-		public int Pixel4 { get; set; }
-		public int Pixel5 { get; set; }
-		public int Pixel6 { get; set; }
-		public int Pixel7 { get; set; }
-		public int Pixel8 { get; set; }
+		public float Pixel1 { get; set; }
+		public float Pixel2 { get; set; }
+		public float Pixel3 { get; set; }
+		public float Pixel4 { get; set; }
+		public float Pixel5 { get; set; }
+		public float Pixel6 { get; set; }
+		public float Pixel7 { get; set; }
+		public float Pixel8 { get; set; }
 		public float Wavelength1 { get; set; }
 		public float Wavelength2 { get; set; }
 		public float Wavelength3 { get; set; }
@@ -230,20 +230,28 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 			Wavelength6 = float.NaN;
 			Wavelength7 = float.NaN;
 			Wavelength8 = float.NaN;
+			Pixel1 = float.NaN;
+			Pixel2 = float.NaN;
+			Pixel3 = float.NaN;
+			Pixel4 = float.NaN;
+			Pixel5 = float.NaN;
+			Pixel6 = float.NaN;
+			Pixel7 = float.NaN;
+			Pixel8 = float.NaN;
 		}
 
 		public SpectraCalibration(BinaryReader reader)
 		{
 			int version = reader.ReadInt32();
 
-			Pixel1 = reader.ReadInt32();
-			Pixel2 = reader.ReadInt32();
-			Pixel3 = reader.ReadInt32();
-			Pixel4 = reader.ReadInt32();
-			Pixel5 = reader.ReadInt32();
-			Pixel6 = reader.ReadInt32();
-			Pixel7 = reader.ReadInt32();
-			Pixel8 = reader.ReadInt32();
+			Pixel1 = reader.ReadSingle();
+			Pixel2 = reader.ReadSingle();
+			Pixel3 = reader.ReadSingle();
+			Pixel4 = reader.ReadSingle();
+			Pixel5 = reader.ReadSingle();
+			Pixel6 = reader.ReadSingle();
+			Pixel7 = reader.ReadSingle();
+			Pixel8 = reader.ReadSingle();
 			Wavelength1 = reader.ReadSingle();
 			Wavelength2 = reader.ReadSingle();
 			Wavelength3 = reader.ReadSingle();
