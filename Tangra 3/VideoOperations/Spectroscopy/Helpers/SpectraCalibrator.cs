@@ -1160,4 +1160,68 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 			m_RMS = props.RMS;
 		}
     }
+
+	internal class MinimaFinder : RegressionCalibrationBase
+	{
+		private float m_A;
+		private float m_B;
+		private float m_C;
+
+		public MinimaFinder()
+		{ }
+
+		public void Calibrate()
+		{
+			if (m_PixelPos.Count < 5)
+				throw new InvalidOperationException("Cannot get a fit from less than 4 points.");
+
+			var A = new SafeMatrix(m_PixelPos.Count, 3);
+			var X = new SafeMatrix(m_PixelPos.Count, 1);
+
+			for (int i = 0; i < m_PixelPos.Count; i++)
+			{
+				A[i, 0] = m_Wavelengths[i] * m_Wavelengths[i];
+				A[i, 1] = m_Wavelengths[i];
+				A[i, 2] = 1;
+
+				X[i, 0] = m_PixelPos[i];
+			}
+
+			SafeMatrix a_T = A.Transpose();
+			SafeMatrix aa = a_T * A;
+			SafeMatrix aa_inv = aa.Inverse();
+			SafeMatrix bx = (aa_inv * a_T) * X;
+
+			m_A = (float)bx[0, 0];
+			m_B = (float)bx[1, 0];
+			m_C = (float)bx[2, 0];
+
+			EnsureResiduals();
+		}
+
+		public float GetMinimaCloseTo(int x0)
+		{
+			return (float)-m_B / (2 * m_A);
+			//// Two minimas are found by solving the first derivative quadratic equation
+			//// y(x) = A * X^3 + B * X^2 + C * X + D   => y'(x) = (3*A) * X^2 + (2*B) * X + C => a = 3 * A; b = 2 * B; c = C
+			//double discr = 4 * m_B * m_B - 4 * 3 * m_A * m_C;
+			//if (discr > 0)
+			//{
+			//	double xx1 = (-m_B + Math.Sqrt(discr)) / (2 * 3 * m_A);
+			//	double xx2 = (-m_B - Math.Sqrt(discr)) / (2 * 3 * m_A);
+
+			//	if (Math.Abs(xx1 - x0) < Math.Abs(xx2 - x0))
+			//		return (float)xx1;
+			//	else
+			//		return (float)xx2;
+			//}
+
+			//return float.NaN;
+		}
+
+		protected override float ComputePixelNo(float wavelength)
+		{
+			return m_A * wavelength * wavelength + m_B * wavelength + m_C;
+		}
+	}
 }

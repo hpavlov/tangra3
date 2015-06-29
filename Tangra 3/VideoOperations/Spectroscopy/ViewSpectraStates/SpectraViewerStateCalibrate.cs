@@ -12,6 +12,7 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 	public class SpectraViewerStateCalibrate : SpectraViewerStateBase
 	{
 		private SpectraPoint m_SelectedPoint;
+		private float m_SelectedPointPos;
 		private List<SpectraPoint> m_MarkedCalibrationPoints = new List<SpectraPoint>();
         private frmEnterWavelength m_frmEnterWavelength = null;
 
@@ -60,6 +61,8 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 
             if (m_SelectedPoint != null)
             {
+				m_SelectedPointPos = m_SelectedPoint.PixelNo;
+
                 if (Control.ModifierKeys != Keys.Control)
                 {
                     // Find the local maximum or minimum
@@ -88,7 +91,19 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 						m_SelectedPoint = m_MasterSpectra.Points.Single(x => x.PixelNo == minPixelNo);
 					else if (maxPixelNo != m_SelectedPoint.PixelNo && maxPixelNo > m_SelectedPoint.PixelNo - SEARCH_AREA_WING && maxPixelNo < m_SelectedPoint.PixelNo + SEARCH_AREA_WING)
 						m_SelectedPoint = m_MasterSpectra.Points.Single(x => x.PixelNo == maxPixelNo);
+
+
+					// NOTE: Doing a 2-nd order polynomial fit to find the sub-pixel location of the minima
+					var cal = new MinimaFinder();
+					pointsInArea = m_MasterSpectra.Points.Where(x => x.PixelNo >= m_SelectedPoint.PixelNo - SEARCH_AREA_WING && x.PixelNo <= m_SelectedPoint.PixelNo + SEARCH_AREA_WING).ToList();
+					foreach (SpectraPoint point in pointsInArea) cal.AddDataPoint(point.RawSignal, point.PixelNo);
+	                cal.Calibrate();
+	                m_SelectedPointPos = cal.GetMinimaCloseTo(m_SelectedPoint.PixelNo);
+
+					if (float.IsNaN(m_SelectedPointPos))
+						m_SelectedPointPos = m_SelectedPoint.PixelNo;
                 }
+
 
                 m_StateManager.Redraw();
 				m_SpectroscopyController.SelectPixel(m_SelectedPoint.PixelNo);
@@ -126,7 +141,7 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 
 		internal void CalibrationPointSelected(float selectedWaveLength, bool attemptCalibration, int polynomialOrder)
         {
-			m_SpectroscopyController.SetMarker(m_SelectedPoint.PixelNo, selectedWaveLength, attemptCalibration, polynomialOrder);
+			m_SpectroscopyController.SetMarker(m_SelectedPointPos, selectedWaveLength, attemptCalibration, polynomialOrder);
 
 		    if (m_SpectroscopyController.IsCalibrated())
 		    {
