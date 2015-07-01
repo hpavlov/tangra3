@@ -104,7 +104,8 @@ namespace Tangra.Config.SettingPannels
 			this.cbxOnOpenOperation.Items.AddRange(new object[] {
             "Do nothing",
             "Reduce a light curve",
-            "Run astrometry"});
+            "Run astrometry",
+            "Reduce a spectra"});
 			this.cbxOnOpenOperation.Location = new System.Drawing.Point(6, 19);
 			this.cbxOnOpenOperation.Name = "cbxOnOpenOperation";
 			this.cbxOnOpenOperation.Size = new System.Drawing.Size(193, 21);

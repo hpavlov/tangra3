@@ -547,7 +547,8 @@ namespace Tangra.Model.Config
 		{
 			DoNothing = 0,
 			StartLightCurveReduction = 1,
-			Astrometry = 2
+			Astrometry = 2,
+			Spectroscopy = 3
 		}
 
 		public enum PerformanceQuality

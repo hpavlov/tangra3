@@ -440,6 +440,10 @@ namespace Tangra
 			{
 				return StartAstrometry(false);
 			}
+			else if (TangraConfig.Settings.Generic.OnOpenOperation == TangraConfig.OnOpenOperation.Spectroscopy)
+			{
+				return StartSpectroscopy(false);
+			}
 
 			// NOTE: If no operation is selected, then set the default Arrow tool
 			m_VideoController.SelectImageTool<ArrowTool>();
