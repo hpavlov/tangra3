@@ -93,15 +93,20 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 						m_SelectedPoint = m_MasterSpectra.Points.Single(x => x.PixelNo == maxPixelNo);
 
 
-					// NOTE: Doing a 2-nd order polynomial fit to find the sub-pixel location of the minima
-					var cal = new MinimaFinder();
-					pointsInArea = m_MasterSpectra.Points.Where(x => x.PixelNo >= m_SelectedPoint.PixelNo - SEARCH_AREA_WING && x.PixelNo <= m_SelectedPoint.PixelNo + SEARCH_AREA_WING).ToList();
-					foreach (SpectraPoint point in pointsInArea) cal.AddDataPoint(point.RawSignal, point.PixelNo);
-	                cal.Calibrate();
-	                m_SelectedPointPos = cal.GetMinimaCloseTo(m_SelectedPoint.PixelNo);
+                    if (Control.ModifierKeys == Keys.Shift)
+                    {
+                        // NOTE: Doing a 2-nd order polynomial fit to find the sub-pixel location of the minima
+                        var cal = new MinimaFinder();
+                        pointsInArea = m_MasterSpectra.Points.Where(x => x.PixelNo >= m_SelectedPoint.PixelNo - SEARCH_AREA_WING && x.PixelNo <= m_SelectedPoint.PixelNo + SEARCH_AREA_WING).ToList();
+                        foreach (SpectraPoint point in pointsInArea) cal.AddDataPoint(point.RawSignal, point.PixelNo);
+                        cal.Calibrate();
+                        m_SelectedPointPos = cal.GetMinimaCloseTo(m_SelectedPoint.PixelNo);
 
-					if (float.IsNaN(m_SelectedPointPos))
-						m_SelectedPointPos = m_SelectedPoint.PixelNo;
+                        if (float.IsNaN(m_SelectedPointPos))
+                            m_SelectedPointPos = m_SelectedPoint.PixelNo;
+                    }
+                    else
+                        m_SelectedPointPos = m_SelectedPoint.PixelNo;
                 }
 
 

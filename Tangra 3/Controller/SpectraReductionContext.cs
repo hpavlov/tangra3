@@ -11,11 +11,13 @@ namespace Tangra.Controller
         public int FramesToMeasure { get; set; }
         public int MeasurementAreaWing { get; set; }
         public int BackgroundAreaWing { get; set; }
+        public int BackgroundAreaGap { get; set; }
         public PixelCombineMethod BackgroundMethod { get; set; }
         public PixelCombineMethod FrameCombineMethod { get; set; }
         public bool UseFineAdjustments { get; set; }
         public bool UseLowPassFilter { get; set; }
         public int? AlignmentAbsorptionLinePos { get; set; }
+        public float PixelValueCoefficient { get; set; }
 
         public void Reset()
         {

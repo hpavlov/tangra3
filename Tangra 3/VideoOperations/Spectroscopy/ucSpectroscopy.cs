@@ -103,7 +103,9 @@ namespace Tangra.VideoOperations.Spectroscopy
 			    m_SpectroscopyController.SpectraReductionContext.FramesToMeasure = frm.NumberOfMeasurements;
 			    m_SpectroscopyController.SpectraReductionContext.MeasurementAreaWing = frm.MeasurementAreaWing;
                 m_SpectroscopyController.SpectraReductionContext.BackgroundAreaWing = frm.BackgroundAreaWing;
+                m_SpectroscopyController.SpectraReductionContext.BackgroundAreaGap = frm.BackgroundAreaGap;
 			    m_SpectroscopyController.SpectraReductionContext.BackgroundMethod = frm.BackgroundMethod;
+			    m_SpectroscopyController.SpectraReductionContext.PixelValueCoefficient = frm.PixelValueCoefficient;
 			    m_SpectroscopyController.SpectraReductionContext.FrameCombineMethod = frm.FrameCombineMethod;
 			    m_SpectroscopyController.SpectraReductionContext.UseFineAdjustments = frm.UseFineAdjustments;
 			    m_SpectroscopyController.SpectraReductionContext.UseLowPassFilter = frm.UseLowPassFilter;

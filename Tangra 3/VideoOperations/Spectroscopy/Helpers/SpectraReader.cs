@@ -418,6 +418,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 	{
 		public int SignalAreaWidth;
 		public int BackgroundAreaHalfWidth;
+        public int BackgroundAreaGap;
 		public uint MaxPixelValue;
 		public uint MaxSpectraValue;
 	    public int ZeroOrderPixelNo;
@@ -437,23 +438,26 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 		private RotationMapper m_Mapper;
 		private RectangleF m_SourceVideoFrame;
 
-	    private uint[] m_BgValues;
-		private uint[] m_BgPixelCount;
-		private List<uint>[] m_BgValuesList;
+        private float[] m_BgValues;
+        private uint[] m_BgPixelCount;
+		private List<float>[] m_BgValuesList;
+        private float m_PixelValueCoeff = 1;
 
-		public SpectraReader(AstroImage image, float angleDegrees)
+		public SpectraReader(AstroImage image, float angleDegrees, float pixelValueCoefficient)
 		{
 			m_Image = image;
 			m_Mapper = new RotationMapper(image.Width, image.Height, angleDegrees);
 			m_SourceVideoFrame = new RectangleF(0, 0, image.Width, image.Height);
+            m_PixelValueCoeff = pixelValueCoefficient;
 		}
 
-		public Spectra ReadSpectra(float x0, float y0, int halfWidth, int bgHalfWidth, PixelCombineMethod bgMethod)
+        public Spectra ReadSpectra(float x0, float y0, int halfWidth, int bgHalfWidth, int bgGap, PixelCombineMethod bgMethod)
 		{
 			var rv = new Spectra()
 			{
 				SignalAreaWidth = 2 * halfWidth,
 				BackgroundAreaHalfWidth = bgHalfWidth,
+                BackgroundAreaGap = bgGap,
                 MaxPixelValue = (uint)(2 * halfWidth) * m_Image.Pixelmap.MaxSignalValue
 			};
 
@@ -476,9 +480,9 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 				}
 			}
 
-			m_BgValues = new uint[xTo - xFrom + 1];
-			m_BgPixelCount = new uint[xTo - xFrom + 1];
-			m_BgValuesList = new List<uint>[xTo - xFrom + 1];
+			m_BgValues = new float[xTo - xFrom + 1];
+            m_BgPixelCount = new uint[xTo - xFrom + 1];
+            m_BgValuesList = new List<float>[xTo - xFrom + 1];
 
 			// Get all readings in the range
 			for (int x = xFrom; x <= xTo; x++)
@@ -505,7 +509,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
                             int yyy = (int)Math.Round(p.Y);
                             if (m_SourceVideoFrame.Contains(xxx, yyy))
                             {
-                                sum += m_Image.Pixelmap[xxx, yyy];
+                                sum += (m_Image.Pixelmap[xxx, yyy] * m_PixelValueCoeff);
                                 numPoints++;
                             }
                         }
@@ -520,11 +524,11 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 				#region Reads background 
                 if (bgMethod == PixelCombineMethod.Average)
 				{
-					ReadAverageBackgroundForPixelIndex(halfWidth, bgHalfWidth, x, p1.Y, x - xFrom);
+                    ReadAverageBackgroundForPixelIndex(halfWidth, bgHalfWidth, bgGap, x, p1.Y, x - xFrom);
 				}
 				else if (bgMethod == PixelCombineMethod.Median)
 				{
-					ReadMedianBackgroundForPixelIndex(halfWidth, bgHalfWidth, x, p1.Y, x - xFrom);
+                    ReadMedianBackgroundForPixelIndex(halfWidth, bgHalfWidth, bgGap, x, p1.Y, x - xFrom);
 				}
 
 				#endregion
@@ -553,7 +557,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 
 		private float GetMedianBackgroundValue(int pixelNo, int xFrom, int xTo, int horizontalSpan)
 		{
-			var allAreaBgPixels = new List<uint>();
+			var allAreaBgPixels = new List<float>();
 			int idxFrom = Math.Max(xFrom, pixelNo - horizontalSpan);
 			int idxTo = Math.Min(xTo, pixelNo + horizontalSpan);
 
@@ -585,68 +589,77 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 				: bgSum / pixCount;
 		}
 
-		private void ReadMedianBackgroundForPixelIndex(int halfWidth, int bgHalfWidth, float x1, float y1, int index)
+        private void ReadMedianBackgroundForPixelIndex(int halfWidth, int bgHalfWidth, int bgGap, float x1, float y1, int index)
 		{
-			var allBgPixels = new List<uint>();
+			var allBgPixels = new List<float>();
 
-			for (int z = -bgHalfWidth - halfWidth; z < -halfWidth; z++)
-			{
-				PointF p = m_Mapper.GetSourceCoords(x1, y1 + z);
-				int xx = (int)Math.Round(p.X);
-				int yy = (int)Math.Round(p.Y);
+            int x1int = (int) x1;
 
-				if (m_SourceVideoFrame.Contains(xx, yy))
-				{
-					allBgPixels.Add(m_Image.Pixelmap[xx, yy]);
-				}
-			}
+            for (int x = x1int - bgHalfWidth; x <= x1int + bgHalfWidth; x++)
+            {
+                for (int z = -bgHalfWidth - bgGap - halfWidth; z < -halfWidth - bgGap; z++)
+                {
+                    PointF p = m_Mapper.GetSourceCoords(x, y1 + z);
+                    int xx = (int) Math.Round(p.X);
+                    int yy = (int) Math.Round(p.Y);
 
-			for (int z = halfWidth + 1; z <= halfWidth + bgHalfWidth; z++)
-			{
-				PointF p = m_Mapper.GetSourceCoords(x1, y1 + z);
-				int xx = (int)Math.Round(p.X);
-				int yy = (int)Math.Round(p.Y);
+                    if (m_SourceVideoFrame.Contains(xx, yy))
+                    {
+                        allBgPixels.Add((m_Image.Pixelmap[xx, yy]*m_PixelValueCoeff));
+                    }
+                }
 
-				if (m_SourceVideoFrame.Contains(xx, yy))
-				{
-					allBgPixels.Add(m_Image.Pixelmap[xx, yy]);
-				}
-			}
+                for (int z = halfWidth + bgGap + 1; z <= halfWidth + bgGap + bgHalfWidth; z++)
+                {
+                    PointF p = m_Mapper.GetSourceCoords(x, y1 + z);
+                    int xx = (int) Math.Round(p.X);
+                    int yy = (int) Math.Round(p.Y);
 
-			m_BgValuesList[index] = allBgPixels;
+                    if (m_SourceVideoFrame.Contains(xx, yy))
+                    {
+                        allBgPixels.Add((m_Image.Pixelmap[xx, yy]*m_PixelValueCoeff));
+                    }
+                }
+            }
+
+            m_BgValuesList[index] = allBgPixels;
 			m_BgPixelCount[index] = 1;
 		}
 
-		private void ReadAverageBackgroundForPixelIndex(int halfWidth, int bgHalfWidth, float x1, float y1, int index)
+        private void ReadAverageBackgroundForPixelIndex(int halfWidth, int bgHalfWidth, int bgGap, float x1, float y1, int index)
 		{
-			uint bgValue = 0;
-			uint bgPixelCount = 0;
+			float bgValue = 0;
+            uint bgPixelCount = 0;
+            int x1int = (int) x1;
 
-			for (int z = - bgHalfWidth - halfWidth; z < -halfWidth; z++)
-			{
-				PointF p = m_Mapper.GetSourceCoords(x1, y1 + z);
-				int xx = (int)Math.Round(p.X);
-				int yy = (int)Math.Round(p.Y);
+            for (int x = x1int - bgHalfWidth; x <= x1int + bgHalfWidth; x++)
+            {
+                for (int z = -bgHalfWidth - halfWidth - bgGap; z < -halfWidth - bgGap; z++)
+                {
+                    PointF p = m_Mapper.GetSourceCoords(x, y1 + z);
+                    int xx = (int)Math.Round(p.X);
+                    int yy = (int)Math.Round(p.Y);
 
-				if (m_SourceVideoFrame.Contains(xx, yy))
-				{
-					bgValue += m_Image.Pixelmap[xx, yy];
-					bgPixelCount++;
-				}
-			}
+                    if (m_SourceVideoFrame.Contains(xx, yy))
+                    {
+                        bgValue += (m_Image.Pixelmap[xx, yy] * m_PixelValueCoeff);
+                        bgPixelCount++;
+                    }
+                }
 
-			for (int z = halfWidth + 1; z <= halfWidth + bgHalfWidth; z++)
-			{
-				PointF p = m_Mapper.GetSourceCoords(x1, y1 + z);
-				int xx = (int)Math.Round(p.X);
-				int yy = (int)Math.Round(p.Y);
+                for (int z = halfWidth + bgGap + 1; z <= halfWidth + bgGap + bgHalfWidth; z++)
+                {
+                    PointF p = m_Mapper.GetSourceCoords(x, y1 + z);
+                    int xx = (int)Math.Round(p.X);
+                    int yy = (int)Math.Round(p.Y);
 
-				if (m_SourceVideoFrame.Contains(xx, yy))
-				{
-					bgValue += m_Image.Pixelmap[xx, yy];
-					bgPixelCount++;
-				}
-			}
+                    if (m_SourceVideoFrame.Contains(xx, yy))
+                    {
+                        bgValue += (m_Image.Pixelmap[xx, yy] * m_PixelValueCoeff);
+                        bgPixelCount++;
+                    }
+                }
+            }
 
 			m_BgValues[index] = bgValue;
 			m_BgPixelCount[index] = bgPixelCount;

@@ -16,84 +16,91 @@ using Tangra.VideoOperations.Spectroscopy.Helpers;
 
 namespace Tangra.VideoOperations.Spectroscopy
 {
-	public partial class frmRunMultiFrameSpectroscopy : Form
-	{
-		public int NumberOfMeasurements { get; private set; }
+    public partial class frmRunMultiFrameSpectroscopy : Form
+    {
+        public int NumberOfMeasurements { get; private set; }
         public int MeasurementAreaWing { get; private set; }
-		public int BackgroundAreaWing { get; private set; }
-	    public PixelCombineMethod BackgroundMethod { get; private set; }
-		public PixelCombineMethod FrameCombineMethod { get; private set; }
+        public int BackgroundAreaWing { get; private set; }
+        public int BackgroundAreaGap { get; private set; }
+        public float PixelValueCoefficient { get; private set; }
+        public PixelCombineMethod BackgroundMethod { get; private set; }
+        public PixelCombineMethod FrameCombineMethod { get; private set; }
         public bool UseFineAdjustments { get; private set; }
         public bool UseLowPassFilter { get; private set; }
         public int? AlignmentAbsorptionLinePos { get; private set; }
 
 
-	    private bool m_Initialised = false;
-	    private int m_CurrentPageNo = 0;
+        private bool m_Initialised = false;
+        private int m_CurrentPageNo = 0;
 
-		private VideoSpectroscopyOperation m_VideoOperation;
-		private AstroImage m_AstroImage;
-		private Bitmap m_ZoomedRawImage = null;
+        private VideoSpectroscopyOperation m_VideoOperation;
+        private AstroImage m_AstroImage;
+        private Bitmap m_ZoomedRawImage = null;
 
-		private static Brush[] s_GreyBrushes = new Brush[256];
-		private static Color[] s_GreyColors = new Color[256];
+        private static Brush[] s_GreyBrushes = new Brush[256];
+        private static Color[] s_GreyColors = new Color[256];
 
-	    private SpectraReader m_SpectraReader;
-	    private Spectra m_Spectra;
-	    private RotationMapper m_Mapper;
-	    private PSFFit m_ZeroOrderPsf;
-	    private float? m_SelectedAlignLine;
+        private SpectraReader m_SpectraReader;
+        private Spectra m_Spectra;
+        private RotationMapper m_Mapper;
+        private PSFFit m_ZeroOrderPsf;
+        private float? m_SelectedAlignLine;
 
-		static frmRunMultiFrameSpectroscopy()
-		{
-			for (int i = 0; i < 256; i++)
-			{
-				s_GreyBrushes[i] = new SolidBrush(Color.FromArgb(0, i, i, i));
-				s_GreyColors[i] = Color.FromArgb(0, i, i, i);
-			}
-		}
-
-		public frmRunMultiFrameSpectroscopy()
-		{
-			InitializeComponent();
-
-		    Width = 546;
-		    m_CurrentPageNo = 0;
-		    m_SelectedAlignLine = null;
-		    AlignmentAbsorptionLinePos = null;
-
-			picAreas.Image = new Bitmap(picAreas.Width, picAreas.Height, PixelFormat.Format24bppRgb);
-            picAlignTarget.Image = new Bitmap(picAlignTarget.Width, picAlignTarget.Height, PixelFormat.Format24bppRgb);
-		}
-
-        public frmRunMultiFrameSpectroscopy(IFramePlayer framePlayer, VideoSpectroscopyOperation videoOperation, AstroImage astroImage)
-			: this()
+        static frmRunMultiFrameSpectroscopy()
         {
-	        m_VideoOperation = videoOperation;
-	        m_AstroImage = astroImage;
-
-			nudNumberMeasurements.Maximum = framePlayer.Video.LastFrame - framePlayer.CurrentFrameIndex;
-			nudNumberMeasurements.Value = Math.Min(200, nudNumberMeasurements.Maximum);
-            nudAreaWing.Value = Math.Min(videoOperation.MeasurementAreaWing, nudAreaWing.Maximum);
-            nudBackgroundWing.Value = Math.Min(videoOperation.BackgroundAreaWing, nudBackgroundWing.Maximum);
-		    cbxBackgroundMethod.SelectedIndex = 1; /* Median */
-            cbxCombineMethod.SelectedIndex = 1; /* Median */
-
-	        m_Initialised = true;
+            for (int i = 0; i < 256; i++)
+            {
+                s_GreyBrushes[i] = new SolidBrush(Color.FromArgb(0, i, i, i));
+                s_GreyColors[i] = Color.FromArgb(0, i, i, i);
+            }
         }
 
-		private void btnNext_Click(object sender, EventArgs e)
-		{
+        public frmRunMultiFrameSpectroscopy()
+        {
+            InitializeComponent();
+
+            Width = 546;
+            m_CurrentPageNo = 0;
+            PixelValueCoefficient = 1;
+            m_SelectedAlignLine = null;
+            AlignmentAbsorptionLinePos = null;
+
+            picAreas.Image = new Bitmap(picAreas.Width, picAreas.Height, PixelFormat.Format24bppRgb);
+            picAlignTarget.Image = new Bitmap(picAlignTarget.Width, picAlignTarget.Height, PixelFormat.Format24bppRgb);
+        }
+
+        public frmRunMultiFrameSpectroscopy(IFramePlayer framePlayer, VideoSpectroscopyOperation videoOperation, AstroImage astroImage)
+            : this()
+        {
+            m_VideoOperation = videoOperation;
+            m_AstroImage = astroImage;
+
+            nudNumberMeasurements.Maximum = framePlayer.Video.LastFrame - framePlayer.CurrentFrameIndex;
+            nudNumberMeasurements.Value = Math.Min(200, nudNumberMeasurements.Maximum);
+            nudAreaWing.Value = Math.Min(videoOperation.MeasurementAreaWing, nudAreaWing.Maximum);
+            nudBackgroundWing.Value = Math.Min(videoOperation.BackgroundAreaWing, nudBackgroundWing.Maximum);
+            cbxBackgroundMethod.SelectedIndex = 1; /* Median */
+            cbxCombineMethod.SelectedIndex = 1; /* Median */
+
+            m_Initialised = true;
+        }
+
+        private void btnNext_Click(object sender, EventArgs e)
+        {
             if (m_CurrentPageNo == 0)
-		        SwitchToMeasurementPage();
+                SwitchToMeasurementPage();
             else if (m_CurrentPageNo == 1)
+                SwitchToNormalisationPage();
+            else if (m_CurrentPageNo == 2)
                 RunMeasurements();
-		}
+        }
 
 
         private void btnPrevious_Click(object sender, EventArgs e)
         {
-            if (m_CurrentPageNo == 1)
+            if (m_CurrentPageNo == 2)
+                SwitchToMeasurementPage();
+            else if (m_CurrentPageNo == 1)
                 SwitchToAlignmentPage();
             else
             {
@@ -107,11 +114,12 @@ namespace Tangra.VideoOperations.Spectroscopy
             gbMeasurement.Top = 12;
             gbMeasurement.Left = 12;
             gbxAlignment.Visible = false;
+            gbNormalisation.Visible = false;
             gbMeasurement.Visible = true;
             gbMeasurement.BringToFront();
 
             m_CurrentPageNo = 1;
-            btnNext.Text = "Start";
+            btnNext.Text = "Next";
             btnPrevious.Text = "Previous";
         }
 
@@ -120,6 +128,7 @@ namespace Tangra.VideoOperations.Spectroscopy
             gbxAlignment.Top = 12;
             gbxAlignment.Left = 12;
             gbMeasurement.Visible = false;
+            gbNormalisation.Visible = false;
             gbxAlignment.Visible = true;
             gbxAlignment.BringToFront();
 
@@ -128,11 +137,33 @@ namespace Tangra.VideoOperations.Spectroscopy
             btnPrevious.Text = "Cancel";
         }
 
+        private void SwitchToNormalisationPage()
+        {
+            gbNormalisation.Top = 12;
+            gbNormalisation.Left = 12;
+            gbxAlignment.Visible = false;
+            gbMeasurement.Visible = false;
+            gbNormalisation.Visible = true;
+            gbNormalisation.BringToFront();
+
+            m_CurrentPageNo = 2;
+            btnNext.Text = "Start";
+            btnPrevious.Text = "Previous";
+        }
+
+
         private void RunMeasurements()
         {
             NumberOfMeasurements = (int)nudNumberMeasurements.Value;
             MeasurementAreaWing = (int)nudAreaWing.Value;
             BackgroundAreaWing = (int)nudBackgroundWing.Value;
+            BackgroundAreaGap = (int)nudBackgroundGap.Value;
+
+            if (cbxNormalisation.Checked)
+                PixelValueCoefficient = (float)nudMultiplier.Value / (float)nudDivisor.Value;
+            else
+                PixelValueCoefficient = 1;
+
             BackgroundMethod = (PixelCombineMethod)cbxBackgroundMethod.SelectedIndex;
             FrameCombineMethod = (PixelCombineMethod)cbxCombineMethod.SelectedIndex;
             UseFineAdjustments = cbxFineAdjustments.Checked;
@@ -146,8 +177,8 @@ namespace Tangra.VideoOperations.Spectroscopy
 		private void frmRunMultiFrameSpectroscopy_Load(object sender, EventArgs e)
 		{
             IImagePixel starCenter = m_VideoOperation.SelectedStar;
-            m_SpectraReader = new SpectraReader(m_AstroImage, m_VideoOperation.SelectedStarBestAngle);
-            m_Spectra = m_SpectraReader.ReadSpectra((float)starCenter.XDouble, (float)starCenter.YDouble, (int)nudAreaWing.Value, (int)nudBackgroundWing.Value, PixelCombineMethod.Average);
+            m_SpectraReader = new SpectraReader(m_AstroImage, m_VideoOperation.SelectedStarBestAngle, 1);
+            m_Spectra = m_SpectraReader.ReadSpectra((float)starCenter.XDouble, (float)starCenter.YDouble, (int)nudAreaWing.Value, (int)nudBackgroundWing.Value, (int)nudBackgroundGap.Value, PixelCombineMethod.Average);
 
             m_Mapper = new RotationMapper(m_AstroImage.Width, m_AstroImage.Height, m_VideoOperation.SelectedStarBestAngle);
 
@@ -157,24 +188,28 @@ namespace Tangra.VideoOperations.Spectroscopy
 
 			PlotMeasurementAreas();
 		    PlotAlignTarget();
+
+		    nudDivisor.Value = m_AstroImage.Pixelmap.MaxSignalValue;
+		    nudMultiplier.Value = 1024;
 		}
+
+        private void UpdateMeasurementAreasDisplay()
+        {
+            if (m_Initialised)
+            {
+                m_VideoOperation.UpdateMeasurementAreasDisplay((int)nudAreaWing.Value, (int)nudBackgroundWing.Value, (int)nudBackgroundGap.Value);
+                PlotMeasurementAreas();
+            }
+        }
 
 		private void nudAreaWing_ValueChanged(object sender, EventArgs e)
 		{
-			if (m_Initialised)
-			{
-				m_VideoOperation.UpdateMeasurementAreasDisplay((int)nudAreaWing.Value, (int)nudBackgroundWing.Value);
-				PlotMeasurementAreas();
-			}
+		    UpdateMeasurementAreasDisplay();
 		}
 
 		private void nudBackgroundWing_ValueChanged(object sender, EventArgs e)
 		{
-			if (m_Initialised)
-			{
-				m_VideoOperation.UpdateMeasurementAreasDisplay((int)nudAreaWing.Value, (int)nudBackgroundWing.Value);
-				PlotMeasurementAreas();
-			}
+            UpdateMeasurementAreasDisplay();
 		}
 
 		private int m_StartDestXValue;
@@ -260,11 +295,18 @@ namespace Tangra.VideoOperations.Spectroscopy
 					g.DrawLine(Pens.Red, 0, y1, m_ZoomedRawImage.Width, y1);
 					g.DrawLine(Pens.Red, 0, y2, m_ZoomedRawImage.Width, y2);
 
-					float y3 = (float)((int)nudAreaWing.Value + (int)nudBackgroundWing.Value + m_DestVerticalPixelCount) * m_ZoomRatio - m_ZoomRatio / 2.0f;
-					float y4 = (float)((int)-nudAreaWing.Value - (int)nudBackgroundWing.Value + m_DestVerticalPixelCount) * m_ZoomRatio + m_ZoomRatio / 2.0f;
+                    float y3 = (float)((int)nudAreaWing.Value + (int)nudBackgroundGap.Value + m_DestVerticalPixelCount) * m_ZoomRatio - m_ZoomRatio / 2.0f;
+                    float y4 = (float)((int)-nudAreaWing.Value - (int)nudBackgroundGap.Value + m_DestVerticalPixelCount) * m_ZoomRatio + m_ZoomRatio / 2.0f;
 
 					g.DrawLine(s_SpectraBackgroundPen, 0, y3, m_ZoomedRawImage.Width, y3);
 					g.DrawLine(s_SpectraBackgroundPen, 0, y4, m_ZoomedRawImage.Width, y4);
+
+                    float y5 = (float)((int)nudAreaWing.Value + (int)nudBackgroundWing.Value + (int)nudBackgroundGap.Value + m_DestVerticalPixelCount) * m_ZoomRatio - m_ZoomRatio / 2.0f;
+                    float y6 = (float)((int)-nudAreaWing.Value - (int)nudBackgroundWing.Value - (int)nudBackgroundGap.Value + m_DestVerticalPixelCount) * m_ZoomRatio + m_ZoomRatio / 2.0f;
+
+                    g.DrawLine(s_SpectraBackgroundPen, 0, y5, m_ZoomedRawImage.Width, y5);
+                    g.DrawLine(s_SpectraBackgroundPen, 0, y6, m_ZoomedRawImage.Width, y6);
+
 
                     if (m_SelectedAlignLine.HasValue)
                     {
@@ -315,6 +357,11 @@ namespace Tangra.VideoOperations.Spectroscopy
 
                 PlotMeasurementAreas();
             }
+        }
+
+        private void nudBackgroundGap_ValueChanged(object sender, EventArgs e)
+        {
+            UpdateMeasurementAreasDisplay();
         }
     }
 }
