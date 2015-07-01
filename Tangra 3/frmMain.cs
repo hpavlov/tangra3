@@ -527,6 +527,7 @@ namespace Tangra
 
 			var frmSettings = new frmTangraSettings(
 				null,
+				null,
 				m_VideoController.AdvStatusPopupFormCustomizer,
 				m_VideoController.AavStatusPopupFormCustomizer,
 				m_AddinsController,

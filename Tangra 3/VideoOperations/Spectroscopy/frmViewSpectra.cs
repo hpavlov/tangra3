@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Tangra.Controller;
+using Tangra.Model.Config;
 using Tangra.Model.Helpers;
 using Tangra.VideoOperations.Spectroscopy.Helpers;
 using Tangra.VideoOperations.Spectroscopy.ViewSpectraStates;
@@ -23,6 +24,7 @@ namespace Tangra.VideoOperations.Spectroscopy
 	    private SpectroscopyController m_SpectroscopyController;
         private VideoController m_VideoController;
 	    private SpectraViewerStateManager m_StateManager;
+		private TangraConfig.SpectraViewDisplaySettings m_DisplaySettings = new TangraConfig.SpectraViewDisplaySettings();
 
 	    public frmViewSpectra()
 	    {
@@ -36,6 +38,9 @@ namespace Tangra.VideoOperations.Spectroscopy
 		    
             picSpectraGraph.Image = new Bitmap(picSpectraGraph.Width, picSpectraGraph.Height, PixelFormat.Format24bppRgb);
             picSpectra.Image = new Bitmap(picSpectra.Width, picSpectra.Height, PixelFormat.Format24bppRgb);
+
+			m_DisplaySettings.Load();
+			m_DisplaySettings.Initialize();
 
             m_StateManager = new SpectraViewerStateManager(m_SpectroscopyController, picSpectraGraph, this);
 	        m_VideoController = videoController;
@@ -77,7 +82,7 @@ namespace Tangra.VideoOperations.Spectroscopy
 
 	    internal void PlotSpectra()
 	    {
-			m_StateManager.DrawSpectra(picSpectra, picSpectraGraph);
+			m_StateManager.DrawSpectra(picSpectra, picSpectraGraph, m_DisplaySettings);
 
 	        gbxCalibration.Visible = m_SpectroscopyController.IsCalibrated();
 		    var calibraror = m_SpectroscopyController.GetSpectraCalibrator();
@@ -312,5 +317,17 @@ namespace Tangra.VideoOperations.Spectroscopy
         {
             m_SpectroscopyController.OnSpectraViewerClosed();
         }
+
+		private void miDisplaySettings_Click(object sender, EventArgs e)
+		{
+			frmSpectraViewSettings frm = new frmSpectraViewSettings(m_DisplaySettings, this);
+			frm.ShowDialog(this);
+		}
+
+	    internal void RedrawPlot()
+	    {
+			PlotSpectra();
+			Application.DoEvents();
+	    }
     }
 }

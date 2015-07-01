@@ -1,43 +1,32 @@
-﻿using System;
+﻿/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
 using System.Data;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Tangra.Model.Config;
 
-namespace Tangra.Config.SettingPannels
+namespace Tangra.VideoOperations.Spectroscopy
 {
-	public partial class ucCustomizeSpectroscopy : SettingsPannel
-	{
-		private ISpectraViewFormCustomizer m_SpectraViewCustomizer;
+    public partial class frmSpectraViewSettings : Form
+    {
 		private TangraConfig.SpectraViewDisplaySettings m_DisplaySettings;
-		private bool m_DontApplySettingsBack;
+        private frmViewSpectra m_frmSpectraView;
+        private bool m_DontApplySettingsBack = true;
 
-		public ucCustomizeSpectroscopy()
-		{
-			InitializeComponent();
-		}
+		public frmSpectraViewSettings(TangraConfig.SpectraViewDisplaySettings displaySettings, frmViewSpectra frmSpectraView)
+        {
+            InitializeComponent();
 
-		public void SetSpectraViewFormCustomizer(ISpectraViewFormCustomizer spectraViewCustomizer)
-		{
-			m_SpectraViewCustomizer = spectraViewCustomizer;
-			if (spectraViewCustomizer != null)
-			{
-				m_DisplaySettings = spectraViewCustomizer.FormDisplaySettings;
-			}
-			else
-			{
-				m_DisplaySettings = new TangraConfig.SpectraViewDisplaySettings();
-				m_DisplaySettings.Load();
-				m_DisplaySettings.Initialize();
-			}
-		}
+            m_frmSpectraView = frmSpectraView;
+            m_DisplaySettings = displaySettings;
 
-		public override void LoadSettings()
-		{
 			m_DontApplySettingsBack = true;
 			try
 			{
@@ -50,16 +39,17 @@ namespace Tangra.Config.SettingPannels
 			{
 				m_DontApplySettingsBack = false;
 			}
-		}
+        }
 
-		public override void SaveSettings()
-		{
-			base.SaveSettings();
-
-			ApplyValuesNoSave();
+        private void btnOk_Click(object sender, EventArgs e)
+        {
+            ApplyValuesNoSave();
 
 			m_DisplaySettings.Save();
-		}
+
+            DialogResult = DialogResult.OK;
+            Close();
+        }
 
 		private void ApplyValuesNoSave()
 		{
@@ -71,17 +61,12 @@ namespace Tangra.Config.SettingPannels
 			m_DisplaySettings.Initialize(); 
 		}
 
-		public override void Reset()
-		{
-			Preview();
-		}
 
 		private void Preview()
 		{
 			ApplyValuesNoSave();
 
-			if (m_SpectraViewCustomizer != null)
-				m_SpectraViewCustomizer.RedrawPlot();
+			m_frmSpectraView.RedrawPlot();
 		}
 
 		private void SelectedColorChanged(object sender, EventArgs e)
@@ -94,5 +79,5 @@ namespace Tangra.Config.SettingPannels
 			if (!m_DontApplySettingsBack)
 				Preview();
 		}
-	}
+    }
 }

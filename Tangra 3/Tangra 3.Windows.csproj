@@ -351,6 +351,12 @@
     <Compile Include="VideoOperations\Spectroscopy\frmEnterWavelength.Designer.cs">
       <DependentUpon>frmEnterWavelength.cs</DependentUpon>
     </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\frmSpectraViewSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\frmSpectraViewSettings.Designer.cs">
+      <DependentUpon>frmSpectraViewSettings.cs</DependentUpon>
+    </Compile>
     <Compile Include="VideoOperations\Spectroscopy\frmViewSpectra.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -1047,6 +1053,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\Spectroscopy\frmEnterWavelength.resx">
       <DependentUpon>frmEnterWavelength.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Spectroscopy\frmSpectraViewSettings.resx">
+      <DependentUpon>frmSpectraViewSettings.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\Spectroscopy\frmRunMultiFrameSpectroscopy.resx">
       <DependentUpon>frmRunMultiFrameSpectroscopy.cs</DependentUpon>

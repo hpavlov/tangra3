@@ -40,6 +40,7 @@ namespace Tangra.Config
 
 		public frmTangraSettings(
             ILightCurveFormCustomizer lightCurveCustomizer, 
+			ISpectraViewFormCustomizer spectraViewCustomizer,
             IAdvStatusPopupFormCustomizer advPopupCustomizer, 
             IAavStatusPopupFormCustomizer aavPopupCustomizer,
             AddinsController addinsController,
@@ -61,6 +62,10 @@ namespace Tangra.Config
 			ucCustomizeLightCurveViewer lightCurvesColoursPanel = m_PropertyPages.Select(kvp => kvp.Value).FirstOrDefault(x => x is ucCustomizeLightCurveViewer) as ucCustomizeLightCurveViewer;
 			if (lightCurvesColoursPanel != null)
 			    lightCurvesColoursPanel.SetLightCurveFormCustomizer(lightCurveCustomizer);
+
+			ucCustomizeSpectroscopy spectroscopyColoursPanel = m_PropertyPages.Select(kvp => kvp.Value).FirstOrDefault(x => x is ucCustomizeSpectroscopy) as ucCustomizeSpectroscopy;
+			if (spectroscopyColoursPanel != null)
+				spectroscopyColoursPanel.SetSpectraViewFormCustomizer(spectraViewCustomizer);
 
 			ucADVSVideo12bit AdvsVideo12bitPanel = m_PropertyPages.Select(kvp => kvp.Value).FirstOrDefault(x => x is ucADVSVideo12bit) as ucADVSVideo12bit;
 			if (AdvsVideo12bitPanel != null)

@@ -21,6 +21,12 @@ namespace Tangra.Model.Config
 		void RedrawPlot();
 	}
 
+	public interface ISpectraViewFormCustomizer
+	{
+		TangraConfig.SpectraViewDisplaySettings FormDisplaySettings { get; }
+		void RedrawPlot();
+	}
+
 	public interface IAdvStatusPopupFormCustomizer
 	{
 		void UpdateSettings(AdvsSettings advSettings);
@@ -1140,6 +1146,67 @@ namespace Tangra.Model.Config
 			}
 		}
 
+		public class SpectraViewDisplaySettings
+		{
+			public Color SpectraLineColor;
+			public Color LegendColor;
+			public Color GridLinesColor;
+			public Color KnownLineColor;
+
+			public Font LabelsFont = new Font(FontFamily.GenericMonospace, 9);
+			public Font LegendFont = new Font(FontFamily.GenericSansSerif, 8, FontStyle.Bold);
+
+			public Brush[] GreyBrushes = new Brush[256];			
+			public Brush LegendBrush;
+			public Pen KnownLinePen;
+			public Brush KnownLineBrush;
+			public Pen GridLinesPen;
+			public Pen SpectraPen;
+			public Brush KnownLineLabelBrush;
+
+			public void Load()
+			{
+				SpectraLineColor = TangraConfig.Settings.Spectroscopy.Colors.SpectraLineColor;
+				LegendColor = TangraConfig.Settings.Spectroscopy.Colors.LegendColor;
+				GridLinesColor = TangraConfig.Settings.Spectroscopy.Colors.GridLinesColor;
+				KnownLineColor = TangraConfig.Settings.Spectroscopy.Colors.KnownLineColor;
+			}
+
+			public void Save()
+			{
+				TangraConfig.Settings.Spectroscopy.Colors.SpectraLineColor = SpectraLineColor;
+				TangraConfig.Settings.Spectroscopy.Colors.LegendColor = LegendColor;
+				TangraConfig.Settings.Spectroscopy.Colors.GridLinesColor = GridLinesColor;
+				TangraConfig.Settings.Spectroscopy.Colors.KnownLineColor = KnownLineColor;
+
+				TangraConfig.Settings.Save();
+			}
+
+			public void Initialize()
+			{
+				if (LegendBrush != null) LegendBrush.Dispose();
+				LegendBrush = new SolidBrush(LegendColor);
+
+				if (SpectraPen != null) SpectraPen.Dispose();
+				SpectraPen = new Pen(SpectraLineColor);
+
+				if (KnownLinePen != null) KnownLinePen.Dispose();
+				KnownLinePen = new Pen(System.Drawing.Color.FromArgb(60, KnownLineColor.R, KnownLineColor.G, KnownLineColor.B));
+
+				if (KnownLineBrush != null) KnownLineBrush.Dispose();
+				KnownLineBrush = new SolidBrush(System.Drawing.Color.FromArgb(60, KnownLineColor.R, KnownLineColor.G, KnownLineColor.B));
+
+				if (KnownLineLabelBrush != null) KnownLineLabelBrush.Dispose();
+				KnownLineLabelBrush = new SolidBrush(KnownLineColor);
+
+				for (int i = 0; i < 256; i++)
+				{
+					if (GreyBrushes[i] != null) GreyBrushes[i].Dispose();
+					GreyBrushes[i] = new SolidBrush(System.Drawing.Color.FromArgb(i, i, i));
+				}		
+			}
+		}
+
         public class PersistedConfiguration
         {
             public string Name;
@@ -1165,7 +1232,7 @@ namespace Tangra.Model.Config
 			public class SpectraColors
 			{
 				[XmlIgnore]
-				public Color SpectraLine
+				public Color SpectraLineColor
 				{
 					get
 					{
@@ -1177,7 +1244,49 @@ namespace Tangra.Model.Config
 					}
 				}
 
+				[XmlIgnore]
+				public Color LegendColor
+				{
+					get
+					{
+						return System.Drawing.Color.FromArgb(LegendColorRGB);
+					}
+					set
+					{
+						LegendColorRGB = value.ToArgb();
+					}
+				}
+
+				[XmlIgnore]
+				public Color GridLinesColor
+				{
+					get
+					{
+						return System.Drawing.Color.FromArgb(GridLinesColorRGB);
+					}
+					set
+					{
+						GridLinesColorRGB = value.ToArgb();
+					}
+				}
+
+				[XmlIgnore]
+				public Color KnownLineColor
+				{
+					get
+					{
+						return System.Drawing.Color.FromArgb(KnownLineColorRGB);
+					}
+					set
+					{
+						KnownLineColorRGB = value.ToArgb();
+					}
+				}
+
 				public int SpectraLineRGB = System.Drawing.Color.Aqua.ToArgb();
+				public int LegendColorRGB = System.Drawing.Color.White.ToArgb();
+				public int GridLinesColorRGB = System.Drawing.Color.FromArgb(180, 180, 180).ToArgb();
+				public int KnownLineColorRGB = System.Drawing.Color.Blue.ToArgb();
 			}
 
 			public SpectroscopyInstrument Instrument;
