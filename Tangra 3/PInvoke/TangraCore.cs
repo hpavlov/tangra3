@@ -198,6 +198,11 @@ namespace Tangra.PInvoke
 			}
 		}
 
+        public bool HasNtpTimeStamp
+        {
+            get { return EndFrameNtpTimeStampMillisecondsHi != 0 && EndFrameNtpTimeStampMillisecondsLo != 0; }
+        }
+
 		public DateTime EndExposureNtpTimeStamp
 		{
 			get

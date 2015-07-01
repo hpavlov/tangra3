@@ -282,6 +282,14 @@ namespace Tangra.Video
 				TangraCore.BitmapSplitFieldsOSD(rawBitmapBytes, m_OsdFirstLine, m_OsdLastLine);
 			}
 
+            if (frameInfo.HasNtpTimeStamp && m_CurrentFrameInfo.Exposure10thMs == 0 &&
+                index + 1 < m_FirstFrame + m_CountFrames)
+            {
+                TangraCore.ADVGetFrameStatusChannel(index + 1, frameInfo, gpsFix, userCommand, systemError);
+                if (frameInfo.HasNtpTimeStamp)
+                    m_CurrentFrameInfo.Exposure10thMs = (int)Math.Round(new TimeSpan(frameInfo.EndExposureNtpTimeStamp.Ticks - m_CurrentFrameInfo.EndExposureNtpTimeStamp.Ticks).TotalMilliseconds * 10); 
+            }
+
 			using (MemoryStream memStr = new MemoryStream(rawBitmapBytes))
 			{
 			    Bitmap displayBitmap;
