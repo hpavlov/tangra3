@@ -2161,7 +2161,7 @@ namespace Tangra.Controller
             }
         }
 
-        private static string s_AngleParserRegex = @"[^\d \.]";
+        private static string s_AngleParserRegex = @"[^\d \.\-\+]";
 
 	    internal Dictionary<string, string> GetVideoFileTags()
 	    {

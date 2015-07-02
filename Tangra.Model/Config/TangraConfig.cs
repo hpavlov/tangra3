@@ -1190,6 +1190,9 @@ namespace Tangra.Model.Config
 				if (SpectraPen != null) SpectraPen.Dispose();
 				SpectraPen = new Pen(SpectraLineColor);
 
+                if (GridLinesPen != null) GridLinesPen.Dispose();
+                GridLinesPen = new Pen(GridLinesColor);
+
 				if (KnownLinePen != null) KnownLinePen.Dispose();
 				KnownLinePen = new Pen(System.Drawing.Color.FromArgb(60, KnownLineColor.R, KnownLineColor.G, KnownLineColor.B));
 
