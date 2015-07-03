@@ -11,6 +11,7 @@ using System.Text;
 using System.Windows.Forms;
 using Tangra.Controller;
 using Tangra.Model.Config;
+using Tangra.Model.Context;
 using Tangra.Model.Helpers;
 using Tangra.VideoOperations.Spectroscopy.Helpers;
 using Tangra.VideoOperations.Spectroscopy.ViewSpectraStates;
@@ -160,11 +161,6 @@ namespace Tangra.VideoOperations.Spectroscopy
 		private void picSpectraGraph_MouseUp(object sender, MouseEventArgs e)
 		{
 			m_StateManager.MouseUp(sender, e);
-		}
-
-		private void miSpectralCalibration_Click(object sender, EventArgs e)
-		{
-			m_StateManager.ChangeState<SpectraViewerStateCalibrate>();
 		}
 
         internal void DisplaySelectedDataPoint(int pixelNo, float wavelength)
@@ -329,5 +325,27 @@ namespace Tangra.VideoOperations.Spectroscopy
 			PlotSpectra();
 			Application.DoEvents();
 	    }
+
+		private void miRecalibrateManually_Click(object sender, EventArgs e)
+		{
+			m_Spectra.Calibration = null;
+			m_Spectra.Points.ForEach(x => x.Wavelength = float.NaN);
+			m_SpectroscopyController.GetSpectraCalibrator().Reset();
+			m_StateManager.ChangeState<SpectraViewerStateCalibrate>();
+			RedrawPlot();
+		}
+
+		private void miApplySavedCalibration_Click(object sender, EventArgs e)
+		{
+			var frmCamera = new frmChooseConfiguration(TangraContext.Current.FrameWidth, TangraContext.Current.FrameHeight, m_VideoController.VideoBitPix);
+			if (frmCamera.ShowDialog(this) == DialogResult.OK)
+			{
+				m_Spectra.Points.ForEach(x => x.Wavelength = float.NaN);
+				m_SpectroscopyController.GetSpectraCalibrator().Reset();
+				m_SpectroscopyController.GetSpectraCalibrator().LoadCalibration(frmCamera.SelectedConfiguration);
+				m_StateManager.ChangeState<SpectraViewerStateCalibrated>();
+				RedrawPlot();
+			}
+		}
     }
 }

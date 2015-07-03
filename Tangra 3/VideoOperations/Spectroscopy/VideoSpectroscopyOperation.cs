@@ -162,6 +162,7 @@ namespace Tangra.VideoOperations.Spectroscopy
                 {
                     m_FirstMeasuredFrame = m_CurrentFrameNo;
                     if (m_VideoController.HasEmbeddedTimeStamps()) m_FirstFrameTimeStamp = m_VideoController.GetCurrentFrameTime();
+					else if (m_VideoController.HasSystemTimeStamps()) m_FirstFrameTimeStamp = m_VideoController.GetCurrentFrameTime();
 	                m_FrameBitmapPixels = astroImage.Pixelmap.DisplayBitmapPixels;
                 }
 
@@ -195,17 +196,19 @@ namespace Tangra.VideoOperations.Spectroscopy
                         m_SpectroscopyController.SpectraReductionContext.AlignmentAbsorptionLinePos);
 
                     m_AllFramesSpectra.Clear();
-
+					
                     m_MasterSpectra.MeasurementInfo = m_SpectroscopyController.GetMeasurementInfo();
                     m_MasterSpectra.MeasurementInfo.FirstMeasuredFrame = m_FirstMeasuredFrame.Value;
                     m_MasterSpectra.MeasurementInfo.LastMeasuredFrame = m_CurrentFrameNo;
 					m_MasterSpectra.MeasurementInfo.FirstFrameTimeStamp = m_FirstFrameTimeStamp;
 					if (m_VideoController.HasEmbeddedTimeStamps())
 						m_MasterSpectra.MeasurementInfo.LastFrameTimeStamp = m_VideoController.GetCurrentFrameTime();
+					else if (m_VideoController.HasSystemTimeStamps())
+						m_MasterSpectra.MeasurementInfo.LastFrameTimeStamp = m_VideoController.GetCurrentFrameTime();
 
                     FrameStateData frameStatus = m_VideoController.GetCurrentFrameState();
                     m_MasterSpectra.MeasurementInfo.Gain = frameStatus.Gain;
-                    m_MasterSpectra.MeasurementInfo.ExposureSeconds = frameStatus.ExposureInMilliseconds/1000.0f;
+                    m_MasterSpectra.MeasurementInfo.ExposureSeconds = m_SpectroscopyController.SpectraReductionContext.ExposureSeconds;
 
 					m_MasterSpectra.MeasurementInfo.FrameBitmapPixels = m_FrameBitmapPixels;
 

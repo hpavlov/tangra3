@@ -71,6 +71,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
         {
             lock (s_SyncLock)
             {
+				CommonLines.Add(new LineEntry() { Designation = "h", Element = "Hδ", FromWavelength = 4101.75f });
                 CommonLines.Add(new LineEntry() { Designation = "G'", Element = "Hγ", FromWavelength = 4340.47f });
                 CommonLines.Add(new LineEntry() { Designation = "F", Element = "Hβ", FromWavelength = 4861.34f });
 				CommonLines.Add(new LineEntry() { Designation = "a, telluric", Element = "O²", FromWavelength = 6277.7f }); 

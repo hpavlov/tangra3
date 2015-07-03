@@ -707,6 +707,11 @@ namespace Tangra.Controller
 				   (IsFitsSequence && ((FITSFileSequenceStream)m_FramePlayer.Video).HasUTCTimeStamps);
 		}
 
+		public bool HasSystemTimeStamps()
+		{
+			return IsAstroDigitalVideo || IsAstroAnalogueVideo;
+		}
+
 		public bool IsPlainAviVideo
 		{
 			get
@@ -2282,6 +2287,9 @@ namespace Tangra.Controller
 
             if (frameState.HasValidNtpTimeStamp)
                 return frameState.EndFrameNtpTime;
+
+			if (frameState.HasValidSystemTimeStamp)
+				return frameState.SystemTime;
 
 			return null;
 		}

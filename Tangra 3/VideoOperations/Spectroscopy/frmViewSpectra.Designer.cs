@@ -56,6 +56,8 @@
 			this.miCloseForm = new System.Windows.Forms.ToolStripMenuItem();
 			this.miData = new System.Windows.Forms.ToolStripMenuItem();
 			this.miSpectralCalibration = new System.Windows.Forms.ToolStripMenuItem();
+			this.miRecalibrateManually = new System.Windows.Forms.ToolStripMenuItem();
+			this.miApplySavedCalibration = new System.Windows.Forms.ToolStripMenuItem();
 			this.miProcessing = new System.Windows.Forms.ToolStripMenuItem();
 			this.miLowPass = new System.Windows.Forms.ToolStripMenuItem();
 			this.miLPNone = new System.Windows.Forms.ToolStripMenuItem();
@@ -67,13 +69,13 @@
 			this.miLP3_5 = new System.Windows.Forms.ToolStripMenuItem();
 			this.miLP4_0 = new System.Windows.Forms.ToolStripMenuItem();
 			this.miSpline = new System.Windows.Forms.ToolStripMenuItem();
+			this.miCustomize = new System.Windows.Forms.ToolStripMenuItem();
+			this.miDisplaySettings = new System.Windows.Forms.ToolStripMenuItem();
 			this.miView = new System.Windows.Forms.ToolStripMenuItem();
 			this.miShowCommonLines = new System.Windows.Forms.ToolStripMenuItem();
 			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
 			this.exportFileDialog = new System.Windows.Forms.SaveFileDialog();
 			this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
-			this.miCustomize = new System.Windows.Forms.ToolStripMenuItem();
-			this.miDisplaySettings = new System.Windows.Forms.ToolStripMenuItem();
 			this.pnlBottom.SuspendLayout();
 			this.gbSelection.SuspendLayout();
 			this.gbxCalibration.SuspendLayout();
@@ -339,10 +341,26 @@
 			// 
 			// miSpectralCalibration
 			// 
+			this.miSpectralCalibration.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miRecalibrateManually,
+            this.miApplySavedCalibration});
 			this.miSpectralCalibration.Name = "miSpectralCalibration";
 			this.miSpectralCalibration.Size = new System.Drawing.Size(167, 22);
 			this.miSpectralCalibration.Text = "Spectral &Calibration";
-			this.miSpectralCalibration.Click += new System.EventHandler(this.miSpectralCalibration_Click);
+			// 
+			// miRecalibrateManually
+			// 
+			this.miRecalibrateManually.Name = "miRecalibrateManually";
+			this.miRecalibrateManually.Size = new System.Drawing.Size(202, 22);
+			this.miRecalibrateManually.Text = "&Recalibrate Manually";
+			this.miRecalibrateManually.Click += new System.EventHandler(this.miRecalibrateManually_Click);
+			// 
+			// miApplySavedCalibration
+			// 
+			this.miApplySavedCalibration.Name = "miApplySavedCalibration";
+			this.miApplySavedCalibration.Size = new System.Drawing.Size(202, 22);
+			this.miApplySavedCalibration.Text = "Apply &Saved Configuration";
+			this.miApplySavedCalibration.Click += new System.EventHandler(this.miApplySavedCalibration_Click);
 			// 
 			// miProcessing
 			// 
@@ -439,6 +457,21 @@
 			this.miSpline.Size = new System.Drawing.Size(167, 22);
 			this.miSpline.Text = "&Spline Interpolation";
 			// 
+			// miCustomize
+			// 
+			this.miCustomize.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miDisplaySettings});
+			this.miCustomize.Name = "miCustomize";
+			this.miCustomize.Size = new System.Drawing.Size(68, 20);
+			this.miCustomize.Text = "&Customize";
+			// 
+			// miDisplaySettings
+			// 
+			this.miDisplaySettings.Name = "miDisplaySettings";
+			this.miDisplaySettings.Size = new System.Drawing.Size(150, 22);
+			this.miDisplaySettings.Text = "&Display Settings";
+			this.miDisplaySettings.Click += new System.EventHandler(this.miDisplaySettings_Click);
+			// 
 			// miView
 			// 
 			this.miView.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -466,21 +499,6 @@
 			// openFileDialog
 			// 
 			this.openFileDialog.Filter = "Tangra Spectra (*.spectra)|*.spectra";
-			// 
-			// miCustomize
-			// 
-			this.miCustomize.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.miDisplaySettings});
-			this.miCustomize.Name = "miCustomize";
-			this.miCustomize.Size = new System.Drawing.Size(68, 20);
-			this.miCustomize.Text = "&Customize";
-			// 
-			// miDisplaySettings
-			// 
-			this.miDisplaySettings.Name = "miDisplaySettings";
-			this.miDisplaySettings.Size = new System.Drawing.Size(152, 22);
-			this.miDisplaySettings.Text = "&Display Settings";
-			this.miDisplaySettings.Click += new System.EventHandler(this.miDisplaySettings_Click);
 			// 
 			// frmViewSpectra
 			// 
@@ -560,5 +578,7 @@
 		private System.Windows.Forms.Label lblRMS;
 		private System.Windows.Forms.ToolStripMenuItem miCustomize;
 		private System.Windows.Forms.ToolStripMenuItem miDisplaySettings;
+		private System.Windows.Forms.ToolStripMenuItem miRecalibrateManually;
+		private System.Windows.Forms.ToolStripMenuItem miApplySavedCalibration;
     }
 }

@@ -110,6 +110,7 @@ namespace Tangra.VideoOperations.Spectroscopy
 			    m_SpectroscopyController.SpectraReductionContext.UseFineAdjustments = frm.UseFineAdjustments;
 			    m_SpectroscopyController.SpectraReductionContext.UseLowPassFilter = frm.UseLowPassFilter;
                 m_SpectroscopyController.SpectraReductionContext.AlignmentAbsorptionLinePos = frm.AlignmentAbsorptionLinePos;
+				m_SpectroscopyController.SpectraReductionContext.ExposureSeconds = frm.ExposureSeconds;
 
                 m_VideoOperation.StartMeasurements();
 			}

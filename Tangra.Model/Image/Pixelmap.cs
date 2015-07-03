@@ -112,7 +112,10 @@ namespace Tangra.Model.Image
 
         public void SetMaxSignalValue(uint aav16NormalValue)
         {
-            m_MaxSignalValue = aav16NormalValue;
+	        if (aav16NormalValue > 0)
+		        m_MaxSignalValue = aav16NormalValue;
+	        else
+		        m_MaxSignalValue = null;
         }
 
         public uint MaxSignalValue

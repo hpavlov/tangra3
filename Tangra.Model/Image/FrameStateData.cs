@@ -52,6 +52,14 @@ namespace Tangra.Model.Image
 			}
 		}
 
+		public bool HasValidSystemTimeStamp
+		{
+			get
+			{
+				return SystemTime != DateTime.MinValue && SystemTime.Ticks != 633979008000000000;
+			}
+		}
+
 	    public bool IsGainKnown
 	    {
 	        get

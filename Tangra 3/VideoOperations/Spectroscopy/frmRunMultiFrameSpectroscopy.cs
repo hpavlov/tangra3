@@ -7,6 +7,7 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Helpers;
 using Tangra.Model.Astro;
 using Tangra.Model.Config;
 using Tangra.Model.Image;
@@ -28,9 +29,10 @@ namespace Tangra.VideoOperations.Spectroscopy
         public bool UseFineAdjustments { get; private set; }
         public bool UseLowPassFilter { get; private set; }
         public int? AlignmentAbsorptionLinePos { get; private set; }
+		public float ExposureSeconds { get; private set; }
 
 
-        private bool m_Initialised = false;
+	    private bool m_Initialised = false;
         private int m_CurrentPageNo = 0;
 
         private VideoSpectroscopyOperation m_VideoOperation;
@@ -64,6 +66,7 @@ namespace Tangra.VideoOperations.Spectroscopy
             PixelValueCoefficient = 1;
             m_SelectedAlignLine = null;
             AlignmentAbsorptionLinePos = null;
+	        ExposureSeconds = 0;
 
             picAreas.Image = new Bitmap(picAreas.Width, picAreas.Height, PixelFormat.Format24bppRgb);
             picAlignTarget.Image = new Bitmap(picAlignTarget.Width, picAlignTarget.Height, PixelFormat.Format24bppRgb);
@@ -76,11 +79,12 @@ namespace Tangra.VideoOperations.Spectroscopy
             m_AstroImage = astroImage;
 
             nudNumberMeasurements.Maximum = framePlayer.Video.LastFrame - framePlayer.CurrentFrameIndex;
-            nudNumberMeasurements.Value = Math.Min(200, nudNumberMeasurements.Maximum);
-            nudAreaWing.Value = Math.Min(videoOperation.MeasurementAreaWing, nudAreaWing.Maximum);
-            nudBackgroundWing.Value = Math.Min(videoOperation.BackgroundAreaWing, nudBackgroundWing.Maximum);
+            nudNumberMeasurements.SetNUDValue(Math.Min(200, nudNumberMeasurements.Maximum));
+            nudAreaWing.SetNUDValue(Math.Min(videoOperation.MeasurementAreaWing, nudAreaWing.Maximum));
+            nudBackgroundWing.SetNUDValue(Math.Min(videoOperation.BackgroundAreaWing, nudBackgroundWing.Maximum));
             cbxBackgroundMethod.SelectedIndex = 1; /* Median */
             cbxCombineMethod.SelectedIndex = 1; /* Median */
+			nudExposureSec.SetNUDValue(astroImage.Pixelmap.FrameState.ExposureInMilliseconds / 1000.0f);
 
             m_Initialised = true;
         }
@@ -154,10 +158,18 @@ namespace Tangra.VideoOperations.Spectroscopy
 
         private void RunMeasurements()
         {
+	        if (nudExposureSec.Value < 0.001M)
+	        {
+		        MessageBox.Show(this, "Please specify a non zero exposure", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+		        nudExposureSec.Focus();
+		        return;
+	        }
+
             NumberOfMeasurements = (int)nudNumberMeasurements.Value;
             MeasurementAreaWing = (int)nudAreaWing.Value;
             BackgroundAreaWing = (int)nudBackgroundWing.Value;
             BackgroundAreaGap = (int)nudBackgroundGap.Value;
+	        ExposureSeconds = (float)nudExposureSec.Value;
 
             if (cbxNormalisation.Checked)
                 PixelValueCoefficient = (float)nudMultiplier.Value / (float)nudDivisor.Value;
@@ -189,7 +201,7 @@ namespace Tangra.VideoOperations.Spectroscopy
 			PlotMeasurementAreas();
 		    PlotAlignTarget();
 
-		    nudDivisor.Value = m_AstroImage.Pixelmap.MaxSignalValue;
+		    nudDivisor.SetNUDValue((decimal)m_AstroImage.Pixelmap.MaxSignalValue);
 		    nudMultiplier.Value = 1024;
 		}
 
