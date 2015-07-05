@@ -95,6 +95,8 @@ namespace Tangra.Video
 
 		private AdvFrameInfo m_CurrentFrameInfo;
 
+	    private object m_SyncLock = new object();
+
 		private AstroDigitalVideoStream(string fileName, ref AdvEquipmentInfo equipmentInfo, ref GeoLocationInfo geoLocation)
 		{
 			CheckAdvFileFormat(fileName, ref equipmentInfo, ref geoLocation);
@@ -243,7 +245,10 @@ namespace Tangra.Video
 			byte[] userCommand = new byte[256 * 16];
 			byte[] systemError = new byte[256 * 16];
 
-			TangraCore.ADVGetFrameStatusChannel(index, frameInfo, gpsFix, userCommand, systemError);
+            lock (m_SyncLock)
+            {
+                TangraCore.ADVGetFrameStatusChannel(index, frameInfo, gpsFix, userCommand, systemError);    
+            }
 
 			var rv = new AdvFrameInfo(frameInfo)
 			{
@@ -270,9 +275,12 @@ namespace Tangra.Video
 			byte[] userCommand = new byte[256 * 16];
 			byte[] systemError = new byte[256 * 16];
 
-            TangraCore.ADVGetFrame(index, pixels, unprocessedPixels, rawBitmapBytes, displayBitmapBytes, frameInfo, gpsFix, userCommand, systemError);
+		    lock (m_SyncLock)
+		    {
+		        TangraCore.ADVGetFrame(index, pixels, unprocessedPixels, rawBitmapBytes, displayBitmapBytes, frameInfo, gpsFix, userCommand, systemError);
+		    }
 
-			m_CurrentFrameInfo = new AdvFrameInfo(frameInfo);
+		    m_CurrentFrameInfo = new AdvFrameInfo(frameInfo);
 			m_CurrentFrameInfo.UserCommandString = AdvFrameInfo.GetStringFromBytes(userCommand);
 			m_CurrentFrameInfo.SystemErrorString = AdvFrameInfo.GetStringFromBytes(systemError);
 			m_CurrentFrameInfo.GPSFixString = AdvFrameInfo.GetStringFromBytes(gpsFix);
@@ -285,7 +293,10 @@ namespace Tangra.Video
             if (frameInfo.HasNtpTimeStamp && m_CurrentFrameInfo.Exposure10thMs == 0 &&
                 index + 1 < m_FirstFrame + m_CountFrames)
             {
-                TangraCore.ADVGetFrameStatusChannel(index + 1, frameInfo, gpsFix, userCommand, systemError);
+                lock (m_SyncLock)
+                {
+                    TangraCore.ADVGetFrameStatusChannel(index + 1, frameInfo, gpsFix, userCommand, systemError);
+                }
                 if (frameInfo.HasNtpTimeStamp)
                     m_CurrentFrameInfo.Exposure10thMs = (int)Math.Round(new TimeSpan(frameInfo.EndExposureNtpTimeStamp.Ticks - m_CurrentFrameInfo.EndExposureNtpTimeStamp.Ticks).TotalMilliseconds * 10); 
             }
@@ -341,9 +352,12 @@ namespace Tangra.Video
 			byte[] userCommand = new byte[256 * 16];
 			byte[] systemError = new byte[256 * 16];
 
-			TangraCore.ADVGetFrameStatusChannel(index, frameInfo, gpsFix, userCommand, systemError);
+		    lock (m_SyncLock)
+		    {
+		        TangraCore.ADVGetFrameStatusChannel(index, frameInfo, gpsFix, userCommand, systemError);
+		    }
 
-			var frameStatusChannel = new AdvFrameInfo(frameInfo);
+		    var frameStatusChannel = new AdvFrameInfo(frameInfo);
 			frameStatusChannel.UserCommandString = AdvFrameInfo.GetStringFromBytes(userCommand);
 			frameStatusChannel.SystemErrorString = AdvFrameInfo.GetStringFromBytes(systemError);
 			frameStatusChannel.GPSFixString = AdvFrameInfo.GetStringFromBytes(gpsFix);
@@ -532,9 +546,12 @@ namespace Tangra.Video
 			byte[] rawBitmapBytes = new byte[(m_Width * m_Height * 3) + 40 + 14 + 1];
 			var frameInfo = new AdvFrameInfoNative();
 
-            TangraCore.ADVGetIntegratedFrame(startFrameNo, actualFramesToIntegrate, isSlidingIntegration, isMedianAveraging, pixels, unprocessedPixels, rawBitmapBytes, displayBitmapBytes, frameInfo);
+		    lock (m_SyncLock)
+		    {
+		        TangraCore.ADVGetIntegratedFrame(startFrameNo, actualFramesToIntegrate, isSlidingIntegration, isMedianAveraging, pixels, unprocessedPixels, rawBitmapBytes, displayBitmapBytes, frameInfo);
+		    }
 
-			m_CurrentFrameInfo = new AdvFrameInfo(frameInfo);
+		    m_CurrentFrameInfo = new AdvFrameInfo(frameInfo);
 
 			using (MemoryStream memStr = new MemoryStream(rawBitmapBytes))
 			{
