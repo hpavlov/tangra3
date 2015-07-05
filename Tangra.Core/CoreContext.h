@@ -63,7 +63,7 @@ HRESULT Set8BitColourChannel(long colourChannel)
 	return S_OK;
 };
 
-DLL_PUBLIC int GetProductVersion()
+DLL_PUBLIC long GetProductVersion()
 {
 	return (VERSION_MAJOR << 28) + (VERSION_MINOR << 16) + VERSION_REVISION;
 }

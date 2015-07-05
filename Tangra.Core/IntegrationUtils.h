@@ -12,12 +12,12 @@ extern "C"
 {
 #endif
 
-DLL_PUBLIC void IntergationManagerStartNew(int width, int height, bool isMedianAveraging);
+DLL_PUBLIC void IntergationManagerStartNew(long width, long height, bool isMedianAveraging);
 DLL_PUBLIC void IntegrationManagerAddFrame(unsigned long* framePixels);
-DLL_PUBLIC void IntegrationManagerAddFrameEx(unsigned long* framePixels, bool isLittleEndian, int bpp);
+DLL_PUBLIC void IntegrationManagerAddFrameEx(unsigned long* framePixels, bool isLittleEndian, long bpp);
 DLL_PUBLIC void IntegrationManagerProduceIntegratedFrame(unsigned long* framePixels);
 DLL_PUBLIC void IntegrationManagerFreeResources();
-DLL_PUBLIC int IntegrationManagerGetFirstFrameToIntegrate(int producedFirstFrame, int frameCount, bool isSlidingIntegration);
+DLL_PUBLIC long IntegrationManagerGetFirstFrameToIntegrate(long producedFirstFrame, long frameCount, bool isSlidingIntegration);
 
 #ifdef __cplusplus
 } // __cplusplus defined.

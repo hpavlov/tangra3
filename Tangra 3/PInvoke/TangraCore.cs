@@ -313,23 +313,23 @@ namespace Tangra.PInvoke
 		internal const string LIBRARY_TANGRA_CORE = "TangraCore";
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-		//HRESULT ADVOpenFile(char* fileName, AdvLib::AdvFileInfo* fileInfo);
+        // DLL_PUBLIC HRESULT ADVOpenFile(char* fileName, AdvLib::AdvFileInfo* fileInfo);
 		public static extern int ADVOpenFile(string fileName, [In, Out] ref AdvFileInfo fileInfo);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-		//HRESULT ADVCloseFile();
+        // DLL_PUBLIC HRESULT ADVCloseFile();
 		public static extern int ADVCloseFile();
 				
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-        //HRESULT ADVGetFrame(int frameNo, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapPixels, BYTE* bitmapBytes, AdvLib::AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError);
+        // DLL_PUBLIC HRESULT ADVGetFrame(long frameNo, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapPixels, BYTE* bitmapBytes, AdvLib::AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError);
         public static extern int ADVGetFrame(int frameNo, [In, Out] uint[] pixels, [In, Out] uint[] originalPixels, [In, Out] byte[] bitmapBytes, [In, Out] byte[] bitmapDisplayBytes, [In, Out] AdvFrameInfoNative frameInfo, [In, Out] byte[] gpsFix, [In, Out] byte[] userCommand, [In, Out] byte[] systemError);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-        //HRESULT ADVGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapBytes, BYTE* bitmapDisplayBytes, AdvLib::AdvFrameInfo* frameInfo);
+        // DLL_PUBLIC HRESULT ADVGetIntegratedFrame(long startFrameNo, long framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapBytes, BYTE* bitmapDisplayBytes, AdvLib::AdvFrameInfo* frameInfo);
         public static extern int ADVGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, [Out] uint[] pixels, [In, Out] uint[] originalPixels, [Out] byte[] bitmapBytes, [Out] byte[] bitmapDisplayBytes, [In, Out] AdvFrameInfoNative frameInfo);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-		//HRESULT ADVGetFrameStatusChannel(int frameNo, AdvLib::AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError);
+        // DLL_PUBLIC HRESULT ADVGetFrameStatusChannel(long frameNo, AdvLib::AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError);
 		public static extern int ADVGetFrameStatusChannel(int frameNo, [In, Out] AdvFrameInfoNative frameInfo, [In, Out] byte[] gpsFix, [In, Out] byte[] userCommand, [In, Out] byte[] systemError);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
@@ -338,11 +338,11 @@ namespace Tangra.PInvoke
 
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-		//HRESULT GetBitmapPixels(long width, long height, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, bool isLittleEndian, int bpp);
-		public static extern int GetBitmapPixels(int width, int height, [In] uint[] pixels, [In, Out] byte[] bitmapBytes, [In, Out] byte[] bitmapDisplayBytes, bool isLittleEndian, int dataBpp, uint normVal);
+        // DLL_PUBLIC HRESULT GetBitmapPixels(long width, long height, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, bool isLittleEndian, int bpp, unsigned long normVal);
+		public static extern int GetBitmapPixels(int width, int height, [In] uint[] pixels, [In, Out] byte[] bitmapBytes, [In, Out] byte[] bitmapDisplayBytes, bool isLittleEndian, ushort dataBpp, uint normVal);
 		
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-		//DLL_PUBLIC HRESULT GetBitmapPixels(BYTE* bitmapPixels, long firstOsdLine, long lastOsdLine);
+        // DLL_PUBLIC HRESULT BitmapSplitFieldsOSD(BYTE* bitmapPixels, long firstOsdLine, long lastOsdLine);
 		public static extern int BitmapSplitFieldsOSD([In, Out] byte[] bitmapBytes, int firstOsdLine, int lastOsdLine);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
@@ -350,25 +350,25 @@ namespace Tangra.PInvoke
 		private static extern int GetProductVersion();
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-		//DLL_PUBLIC HRESULT Lagarith16Decompress(long width, long height, unsigned char* compressedBytes, unsigned char* decompressedBytes);
+        // DLL_PUBLIC HRESULT Lagarith16Decompress(long width, long height, unsigned char* compressedBytes, unsigned char* decompressedBytes);
 		private static extern int Lagarith16Decompress(int width, int height, [In] byte[] compressedBytes, [In, Out] byte[] decompressedBytes);
 
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-		//HRESULT SEROpenFile(char* fileName, AdvLib::AdvFileInfo* fileInfo);
+        // DLL_PUBLIC HRESULT SEROpenFile(char* fileName, SerLib::SerFileInfo* fileInfo, char* observer, char* instrument, char* telescope, bool checkMagic);
 		public static extern int SEROpenFile(string fileName, [In, Out] ref SerFileInfo fileInfo, [In, Out] byte[] observer, [In, Out] byte[] instrument, [In, Out] byte[] telescope, bool checkMagic);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-		//HRESULT SERCloseFile();
+        // DLL_PUBLIC HRESULT SERCloseFile();
 		public static extern int SERCloseFile();
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-        //HRESULT SERGetFrame(int frameNo, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapPixels, BYTE* bitmapBytes, SerLib::SerFrameInfo* frameInfo);
-        public static extern int SERGetFrame(int frameNo, [In, Out] uint[] pixels, [In, Out] uint[] originalPixels, [In, Out] byte[] bitmapBytes, [In, Out] byte[] bitmapDisplayBytes, int cameraBitPix, [In, Out] ref SerNativeFrameInfo frameInfo);
+        // DLL_PUBLIC HRESULT SERGetFrame(long frameNo, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapPixels, BYTE* bitmapBytes, unsigned int cameraBitPix, SerLib::SerFrameInfo* frameInfo);		
+        public static extern int SERGetFrame(int frameNo, [In, Out] uint[] pixels, [In, Out] uint[] originalPixels, [In, Out] byte[] bitmapBytes, [In, Out] byte[] bitmapDisplayBytes, ushort cameraBitPix, [In, Out] ref SerNativeFrameInfo frameInfo);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-        //HRESULT SERGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapBytes, BYTE* bitmapDisplayBytes, AdvLib::AdvFrameInfo* frameInfo);
-        public static extern int SERGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, [Out] uint[] pixels, [In, Out] uint[] originalPixels, [Out] byte[] bitmapBytes, [Out] byte[] bitmapDisplayBytes, int cameraBitPix, [In, Out] ref SerNativeFrameInfo frameInfo);
+        // DLL_PUBLIC HRESULT SERGetIntegratedFrame(long startFrameNo, long framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapBytes, BYTE* bitmapDisplayBytes, unsigned int cameraBitPix, SerLib::SerFrameInfo* frameInfo);
+        public static extern int SERGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, [Out] uint[] pixels, [In, Out] uint[] originalPixels, [Out] byte[] bitmapBytes, [Out] byte[] bitmapDisplayBytes, ushort cameraBitPix, [In, Out] ref SerNativeFrameInfo frameInfo);
 
 
 		public static string GetTangraCoreVersion()

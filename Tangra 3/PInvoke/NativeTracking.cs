@@ -182,35 +182,35 @@ namespace Tangra.PInvoke
 		private const string LIBRARY_TANGRA_CORE = "TangraCore";
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-		// DLL_PUBLIC long TrackerSettings(double maxElongation, double minFWHM, double maxFWHM, double minCertainty);
+        // DLL_PUBLIC long TrackerSettings(double maxElongation, double minFWHM, double maxFWHM, double minCertainty);
 		private static extern int TrackerSettings(double maxElongation, double minFWHM, double maxFWHM, double minCertainty);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-		// DLL_PUBLIC long TrackerNewConfiguration(long width, long height, long numTrackedObjects, bool isFullDisappearance, PSFFittingDataRange dataRange);
-		private static extern int TrackerNewConfiguration(int width, int height, int numTrackedObjects, bool isFullDisappearance, PSFFittingDataRange dataRange, uint maxPixelValue);
+        // DLL_PUBLIC long TrackerNewConfiguration(long width, long height, long numTrackedObjects, bool isFullDisappearance, PSFFittingDataRange dataRange, unsigned int maxPixelValue);
+		private static extern int TrackerNewConfiguration(int width, int height, int numTrackedObjects, bool isFullDisappearance, PSFFittingDataRange dataRange, ushort maxPixelValue);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-		// DLL_PUBLIC long TrackerNextFrame(long frameId, unsigned long* pixels);
+        // DLL_PUBLIC long TrackerNextFrame(long frameId, unsigned long* pixels);
 		private static extern int TrackerNextFrame(int frameId, [In, Out] uint[] pixels);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-		// DLL_PUBLIC long TrackerConfigureObject(long objectId, bool isFixedAperture, bool isOccultedStar, double startingX, double startingY, double apertureInPixels);
+        // DLL_PUBLIC long TrackerConfigureObject(long objectId, bool isFixedAperture, bool isOccultedStar, double startingX, double startingY, double apertureInPixels);
 		private static extern int TrackerConfigureObject(int objectId, bool isFixedAperture, bool isOccultedStar, double startingX, double startingY, double apertureInPixels);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-		// DLL_PUBLIC long TrackerGetTargetState(long objectId, NativeTrackedObjectInfo* trackingInfo, NativePsfFitInfo* psfInfo, double* residuals);
+        // DLL_PUBLIC long TrackerGetTargetState(long objectId, NativeTrackedObjectInfo* trackingInfo, NativePsfFitInfo* psfInfo, double* residuals);
 		private static extern int TrackerGetTargetState(int objectId, [In, Out] NativeTrackedObjectInfo trackingInfo, [In, Out] NativePsfFitInfo psfInfo, [In, Out] double[] residuals);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-		//DLL_PUBLIC void ConfigureSaturationLevels(unsigned long saturation8Bit, unsigned long saturation12Bit, unsigned long saturation14Bit, unsigned long saturation16Bit);
+        // DLL_PUBLIC void ConfigureSaturationLevels(unsigned long saturation8Bit, unsigned long saturation12Bit, unsigned long saturation14Bit, unsigned long saturation16Bit);
 		private static extern int ConfigureSaturationLevels(uint saturation8Bit, uint saturation12Bit, uint saturation14Bit, uint saturation16Bit);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-		//DLL_PUBLIC long TrackerInitialiseNewTracking();
+        // DLL_PUBLIC long TrackerInitialiseNewTracking();
 		private static extern int TrackerInitialiseNewTracking();
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-		//DLL_PUBLIC long TrackerDoManualFrameCorrection(long objectId, long deltaX, long deltaY);
+        // DLL_PUBLIC long TrackerDoManualFrameCorrection(long objectId, long deltaX, long deltaY);
 		private static extern int TrackerDoManualFrameCorrection(int objectId, int deltaX, int deltaY);
 
 		internal static void ConfigureNativeTracker()
@@ -230,7 +230,7 @@ namespace Tangra.PInvoke
 
 		private static int s_NumTrackedObjects;
 
-		internal static void InitNewTracker(int width, int height, int numTrackedObjects, bool isFullDisappearance, PSFFittingDataRange dataRange, uint maxPixelValue)
+		internal static void InitNewTracker(int width, int height, int numTrackedObjects, bool isFullDisappearance, PSFFittingDataRange dataRange, ushort maxPixelValue)
 		{
             int rv = TrackerNewConfiguration(width, height, numTrackedObjects, isFullDisappearance, dataRange, maxPixelValue);
 

@@ -127,7 +127,7 @@ void SerFile::CloseFile()
 	}
 }
 
-HRESULT SerFile::GetFrame(int frameNo, unsigned long* pixels, int cameraBitPix, SerLib::SerFrameInfo* frameInfo)
+HRESULT SerFile::GetFrame(long frameNo, unsigned long* pixels, unsigned int cameraBitPix, SerLib::SerFrameInfo* frameInfo)
 {
 	if (frameNo >=0 && frameNo < m_CountFrames) {
 		__int64 imagePosition = (__int64)178 + (__int64)frameNo * (__int64)m_RawFrameSize;
@@ -157,7 +157,7 @@ HRESULT SerFile::GetFrame(int frameNo, unsigned long* pixels, int cameraBitPix, 
 	return E_FAIL;
 }
 
-HRESULT SerFile::ProcessRawFrame(unsigned long* pixels, int cameraBitPix)
+HRESULT SerFile::ProcessRawFrame(unsigned long* pixels, unsigned int cameraBitPix)
 {
 	if (m_NumPlanes = 1) {
 		if (m_BytesPerPixel == 1) {
@@ -211,7 +211,7 @@ HRESULT SERCloseFile()
 	return S_OK;
 }
 
-HRESULT SERGetFrame(int frameNo, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapPixels, BYTE* bitmapBytes, int cameraBitPix, SerLib::SerFrameInfo* frameInfo)
+HRESULT SERGetFrame(long frameNo, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapPixels, BYTE* bitmapBytes, unsigned int cameraBitPix, SerLib::SerFrameInfo* frameInfo)
 {
 	if (NULL != m_SerFile) {
 		if (cameraBitPix == 0) cameraBitPix = m_SerFile->Bpp;
@@ -251,11 +251,11 @@ HRESULT SERGetFrame(int frameNo, unsigned long* pixels, unsigned long* originalP
 	return E_FAIL;
 }
 
-HRESULT SERGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapBytes, BYTE* bitmapDisplayBytes, int cameraBitPix, SerLib::SerFrameInfo* frameInfo)
+HRESULT SERGetIntegratedFrame(long startFrameNo, long framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapBytes, BYTE* bitmapDisplayBytes, unsigned int cameraBitPix, SerLib::SerFrameInfo* frameInfo)
 {
 	if (NULL != m_SerFile) {
 		HRESULT rv;
-		int firstFrameToIntegrate = IntegrationManagerGetFirstFrameToIntegrate(startFrameNo, framesToIntegrate, isSlidingIntegration);
+		long firstFrameToIntegrate = IntegrationManagerGetFirstFrameToIntegrate(startFrameNo, framesToIntegrate, isSlidingIntegration);
 		IntergationManagerStartNew(m_SerFile->Width, m_SerFile->Height, isMedianAveraging);
 
 		SerLib::SerFrameInfo firstFrameInfo;
@@ -263,7 +263,7 @@ HRESULT SERGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSl
 
 		if (cameraBitPix == 0) cameraBitPix = m_SerFile->Bpp;
 
-		for(int idx = 0; idx < framesToIntegrate; idx++) {
+		for(long idx = 0; idx < framesToIntegrate; idx++) {
 			SerLib::SerFrameInfo* singleFrameInfo = idx == 0 ? &firstFrameInfo : &lastFrameInfo;
 
 			rv = m_SerFile->GetFrame(firstFrameToIntegrate + idx, pixels, cameraBitPix, singleFrameInfo);

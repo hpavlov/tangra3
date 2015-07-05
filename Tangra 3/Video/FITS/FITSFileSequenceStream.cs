@@ -123,7 +123,7 @@ namespace Tangra.Video.FITS
 
             TangraCore.PreProcessors.ApplyPreProcessingPixelsOnly(flatPixelsCopy, Width, Height, BitPix, 0 /* No normal value for FITS files */, exposure.HasValue ? (float)exposure.Value : 0);
 
-            TangraCore.GetBitmapPixels(Width, Height, flatPixelsCopy, rawBitmapBytes, displayBitmapBytes, true, BitPix, 0);
+            TangraCore.GetBitmapPixels(Width, Height, flatPixelsCopy, rawBitmapBytes, displayBitmapBytes, true, (ushort)BitPix, 0);
 
             Bitmap displayBitmap = Pixelmap.ConstructBitmapFromBitmapPixels(displayBitmapBytes, Width, Height);
 

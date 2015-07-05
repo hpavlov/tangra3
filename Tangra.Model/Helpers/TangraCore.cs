@@ -13,29 +13,29 @@ namespace Tangra.Model.Helpers
 		internal const string LIBRARY_TANGRA_CORE = "TangraCore";
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-		//void SolveLinearSystem(double* a, long aRows, long aCols, double* x, long xRows, long xCols, double y)
+        //DLL_PUBLIC void SolveLinearSystem(double* a, long aRows, long aCols, double* x, long xRows, long xCols, double* y);
 		public static extern void SolveLinearSystem([In] double[] A, int aRows, int aCols, [In] double[] X, int xRows, int xCols, [In, Out] double[] Y);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-		//void SolveLinearSystemFast(double* a, double* x, long numEquations, double* y);
+        //DLL_PUBLIC void SolveLinearSystemFast(double* a, double* x, long numEquations, double* y);
 		public static extern void SolveLinearSystemFast([In] double[] A, [In] double[] X, int numEquations, [In, Out] double[] Y);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-		//void LinearSystemFastInitialiseSolution(long numVariables, long maxEquations);
+        //DLL_PUBLIC void LinearSystemFastInitialiseSolution(long numVariables, long maxEquations);
 		public static extern void LinearSystemFastInitialiseSolution(int numVariables, int maxEquations);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-		//void DoNonLinearPfsFit(unsigned long* intensity, const long squareSize, const long saturation, bool* isSolved, double* iBackground, double* iStarMax, double* x0, double* y0, double* r0, double* residuals);
+        //DLL_PUBLIC void DoNonLinearPfsFit(unsigned long* intensity, const long squareSize, const long saturation, bool* isSolved, double* iBackground, double* iStarMax, double* x0, double* y0, double* r0, double* residuals);
 		public static extern void DoNonLinearPfsFit(
 			[In] uint[] intensity, int squareSize, int saturation,
 			[In, Out] ref bool isSolved, [In, Out] ref double iBackground, [In, Out] ref double iStarMax, [In, Out] ref double x0, [In, Out] ref double y0, [In, Out] ref double r0, [In, Out] double[] residuals);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-		//HRESULT RotateFrame(long width, long height, double angleDegrees, unsigned long* originalPixels, long destWidth, long destHeight, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, int dataBpp, unsigned long normalisationValue)
+        //DLL_PUBLIC HRESULT RotateFrame(long width, long height, double angleDegrees, unsigned long* originalPixels, long destWidth, long destHeight, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, int dataBpp, unsigned long normalisationValue);
 		public static extern int RotateFrame(int width, int height, double angleDegrees, [In, Out] uint[] originalPixels, int destWidth, int destHeight, [In, Out] uint[] pixels, [In, Out] byte[] bitmapBytes, [In, Out] byte[] bitmapDisplayBytes, short dataBpp, uint normalisationValue);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-		//HRESULT GetRotatedFrameDimentions(long width, long height, double angleDegrees, long* newWidth, long* newHeight);
+        //DLL_PUBLIC HRESULT GetRotatedFrameDimentions(long width, long height, double angleDegrees, long* newWidth, long* newHeight);
 		public static extern int GetRotatedFrameDimentions(int width, int height, double angleDegrees, [In, Out] ref int newWidth, [In, Out] ref int newHeight);
 
 		public static SafeMatrix SolveLinearSystem(SafeMatrix A, SafeMatrix X)

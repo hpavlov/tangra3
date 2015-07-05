@@ -158,7 +158,7 @@ namespace Tangra.Video.SER
 
 			var frameInfo = new SerNativeFrameInfo();
 
-            TangraCore.SERGetFrame(index, pixels, unprocessedPixels, rawBitmapBytes, displayBitmapBytes, BitPix, ref frameInfo);
+            TangraCore.SERGetFrame(index, pixels, unprocessedPixels, rawBitmapBytes, displayBitmapBytes, (ushort)BitPix, ref frameInfo);
 
 			m_CurrentFrameInfo = new SerFrameInfo(frameInfo);
 
@@ -215,7 +215,7 @@ namespace Tangra.Video.SER
 			byte[] rawBitmapBytes = new byte[(Width * Height * 3) + 40 + 14 + 1];
 			var frameInfo = new SerNativeFrameInfo();
 
-            TangraCore.SERGetIntegratedFrame(startFrameNo, actualFramesToIntegrate, isSlidingIntegration, isMedianAveraging, pixels, unprocessedPixels, rawBitmapBytes, displayBitmapBytes, BitPix, ref frameInfo);
+            TangraCore.SERGetIntegratedFrame(startFrameNo, actualFramesToIntegrate, isSlidingIntegration, isMedianAveraging, pixels, unprocessedPixels, rawBitmapBytes, displayBitmapBytes, (ushort)BitPix, ref frameInfo);
 
 			m_CurrentFrameInfo = new SerFrameInfo(frameInfo);
 

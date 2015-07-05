@@ -67,7 +67,7 @@ HRESULT ADVGetFileTag(char* fileTagName, char* fileTagValue)
 	return S_OK;
 }
 
-HRESULT ADVGetFramePixels(int frameNo, unsigned long* pixels, AdvLib::AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError)
+HRESULT ADVGetFramePixels(long frameNo, unsigned long* pixels, AdvLib::AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError)
 {
 	if (frameNo < g_TangraAdvFile->TotalNumberOfFrames)
     {
@@ -134,7 +134,7 @@ HRESULT ADVGetFramePixels(int frameNo, unsigned long* pixels, AdvLib::AdvFrameIn
 	return E_FAIL;
 }
 
-HRESULT ADVGetFrame(int frameNo, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapPixels, BYTE* bitmapBytes, AdvLib::AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError)
+HRESULT ADVGetFrame(long frameNo, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapPixels, BYTE* bitmapBytes, AdvLib::AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError)
 {
 	HRESULT rv = ADVGetFramePixels(frameNo, pixels, frameInfo, gpsFix, userCommand, systemError);
 	if (SUCCEEDED(rv))
@@ -163,26 +163,26 @@ HRESULT ADVGetFrame(int frameNo, unsigned long* pixels, unsigned long* originalP
 	return rv;
 }
 
-HRESULT ADVGetFrameStatusChannel(int frameNo, AdvLib::AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError)
+HRESULT ADVGetFrameStatusChannel(long frameNo, AdvLib::AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError)
 {
 	g_TangraAdvFile->GetFrameStatusSectionData(frameNo, frameInfo, gpsFix, userCommand, systemError);
 	
 	return S_OK;
 }
 
-HRESULT ADVGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapBytes, BYTE* bitmapDisplayBytes, AdvLib::AdvFrameInfo* frameInfo)
+HRESULT ADVGetIntegratedFrame(long startFrameNo, long framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapBytes, BYTE* bitmapDisplayBytes, AdvLib::AdvFrameInfo* frameInfo)
 {
 	HRESULT rv;
-	int firstFrameToIntegrate = IntegrationManagerGetFirstFrameToIntegrate(startFrameNo, framesToIntegrate, isSlidingIntegration);
+	long firstFrameToIntegrate = IntegrationManagerGetFirstFrameToIntegrate(startFrameNo, framesToIntegrate, isSlidingIntegration);
 	IntergationManagerStartNew(g_TangraAdvFile->ImageSection->Width, g_TangraAdvFile->ImageSection->Height, isMedianAveraging);
 
 	AdvLib::AdvFrameInfo firstFrameInfo;
 	AdvLib::AdvFrameInfo lastFrameInfo;
 	long totalExposure10thMs = 0;
 	
-	int idxOfFrameInfo = framesToIntegrate / 2;
+	long idxOfFrameInfo = framesToIntegrate / 2;
 
-	for(int idx = 0; idx < framesToIntegrate; idx++)
+	for(long idx = 0; idx < framesToIntegrate; idx++)
 	{
 		AdvLib::AdvFrameInfo* singleFrameInfo = idx == 0 ? &firstFrameInfo : &lastFrameInfo;
 		
@@ -245,7 +245,7 @@ HRESULT ADVGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSl
 	return GetBitmapPixels(g_TangraAdvFile->ImageSection->Width, g_TangraAdvFile->ImageSection->Height, pixels, bitmapBytes, bitmapDisplayBytes, false, g_TangraAdvFile->ImageSection->DataBpp, g_TangraAdvFile->ImageSection->NormalisationValue);
 }
 
-HRESULT ADVGetFrame2(int frameNo, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
+HRESULT ADVGetFrame2(long frameNo, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
 {
 	AdvLib::AdvFrameInfo* frameInfo = new AdvLib::AdvFrameInfo();
 	ADVGetFrame(frameNo, pixels, originalPixels, bitmapPixels, bitmapBytes, frameInfo, NULL, NULL, NULL);
