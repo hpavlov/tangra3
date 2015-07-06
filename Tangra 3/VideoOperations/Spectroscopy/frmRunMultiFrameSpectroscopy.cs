@@ -287,9 +287,6 @@ namespace Tangra.VideoOperations.Spectroscopy
 			}
 		}
 
-		private static Pen s_SpectraBackgroundPen = new Pen(Color.FromArgb(70, 255, 0, 0));
-        private static Pen s_SelectedAlignmentLinePen = new Pen(Color.FromArgb(70, 0, 255, 255));
-
 		private void PlotMeasurementAreas()
 		{
 			if (m_ZoomedRawImage == null)
@@ -304,26 +301,25 @@ namespace Tangra.VideoOperations.Spectroscopy
 					float y1 = (float)((int)nudAreaWing.Value + m_DestVerticalPixelCount) * m_ZoomRatio - m_ZoomRatio / 2.0f;
 					float y2 = (float)((int)-nudAreaWing.Value + m_DestVerticalPixelCount) * m_ZoomRatio + m_ZoomRatio / 2.0f;
 
-					g.DrawLine(Pens.Red, 0, y1, m_ZoomedRawImage.Width, y1);
-					g.DrawLine(Pens.Red, 0, y2, m_ZoomedRawImage.Width, y2);
+					g.DrawLine(m_VideoOperation.DisplaySettings.SpectraAperturePen, 0, y1, m_ZoomedRawImage.Width, y1);
+					g.DrawLine(m_VideoOperation.DisplaySettings.SpectraAperturePen, 0, y2, m_ZoomedRawImage.Width, y2);
 
                     float y3 = (float)((int)nudAreaWing.Value + (int)nudBackgroundGap.Value + m_DestVerticalPixelCount) * m_ZoomRatio - m_ZoomRatio / 2.0f;
                     float y4 = (float)((int)-nudAreaWing.Value - (int)nudBackgroundGap.Value + m_DestVerticalPixelCount) * m_ZoomRatio + m_ZoomRatio / 2.0f;
 
-					g.DrawLine(s_SpectraBackgroundPen, 0, y3, m_ZoomedRawImage.Width, y3);
-					g.DrawLine(s_SpectraBackgroundPen, 0, y4, m_ZoomedRawImage.Width, y4);
+					g.DrawLine(m_VideoOperation.DisplaySettings.SpectraBackgroundPen, 0, y3, m_ZoomedRawImage.Width, y3);
+					g.DrawLine(m_VideoOperation.DisplaySettings.SpectraBackgroundPen, 0, y4, m_ZoomedRawImage.Width, y4);
 
                     float y5 = (float)((int)nudAreaWing.Value + (int)nudBackgroundWing.Value + (int)nudBackgroundGap.Value + m_DestVerticalPixelCount) * m_ZoomRatio - m_ZoomRatio / 2.0f;
                     float y6 = (float)((int)-nudAreaWing.Value - (int)nudBackgroundWing.Value - (int)nudBackgroundGap.Value + m_DestVerticalPixelCount) * m_ZoomRatio + m_ZoomRatio / 2.0f;
 
-                    g.DrawLine(s_SpectraBackgroundPen, 0, y5, m_ZoomedRawImage.Width, y5);
-                    g.DrawLine(s_SpectraBackgroundPen, 0, y6, m_ZoomedRawImage.Width, y6);
-
+					g.DrawLine(m_VideoOperation.DisplaySettings.SpectraBackgroundPen, 0, y5, m_ZoomedRawImage.Width, y5);
+					g.DrawLine(m_VideoOperation.DisplaySettings.SpectraBackgroundPen, 0, y6, m_ZoomedRawImage.Width, y6);
 
                     if (m_SelectedAlignLine.HasValue)
                     {
                         float xx = (m_SelectedAlignLine.Value - m_StartDestXValue) * m_ZoomRatio;
-                        g.DrawLine(s_SelectedAlignmentLinePen, xx, 0, xx, picAreas.Image.Height);
+						g.DrawLine(m_VideoOperation.DisplaySettings.SpectraPen, xx, 0, xx, picAreas.Image.Height);
                     }
 
 					g.Save();

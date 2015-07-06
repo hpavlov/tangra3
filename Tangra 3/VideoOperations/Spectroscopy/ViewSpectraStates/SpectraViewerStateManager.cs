@@ -114,7 +114,7 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
             Redraw();
         }
 
-		public void DrawSpectra(PictureBox picSpectra, PictureBox picSpectraGraph, TangraConfig.SpectraViewDisplaySettings displaySettings)
+		public void DrawSpectra(PictureBox picSpectra, PictureBox picSpectraGraph, bool drawPixels, TangraConfig.SpectraViewDisplaySettings displaySettings)
 		{
 			PointF prevPoint = PointF.Empty;
 			bool isCalibrated = m_SpectroscopyController.IsCalibrated();
@@ -122,6 +122,11 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 			int yAxisOffset = isCalibrated ? Y_AXIS_WIDTH : 0;
 			float xCoeff = isCalibrated ? m_XCoeffCalibrated : m_XCoeff;
 			float yCoeff = isCalibrated ? m_YCoeffCalibrated : m_YCoeff;
+
+			int pixelArrWidth = m_MasterSpectra.Pixels.GetLength(0);
+			int pixelArrHeight = m_MasterSpectra.Pixels.GetLength(1);
+			float xCoeffPixels = picSpectra.Image.Width  * 1f / pixelArrWidth;
+			float yCoeffPixels = picSpectra.Image.Height  * 1f / pixelArrHeight;
 
 			using (Graphics g = Graphics.FromImage(picSpectra.Image))
 			using (Graphics g2 = Graphics.FromImage(picSpectraGraph.Image))
@@ -143,13 +148,26 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 
                 RectangleF calibratedGraphArea = new RectangleF(X_AXIS_WIDTH, BORDER_GAP, m_View.Width - X_AXIS_WIDTH - BORDER_GAP, m_View.Height - Y_AXIS_WIDTH - BORDER_GAP);
 
-                foreach (SpectraPoint point in m_MasterSpectra.Points)
+				for (int i = 0; i < m_MasterSpectra.Points.Count; i++)
 				{
+					SpectraPoint point = m_MasterSpectra.Points[i];
+
 					byte clr = (byte)(Math.Max(0, Math.Min(255, Math.Round(point.ProcessedValue * m_ColorCoeff))));
 					float x = xAxisOffset + xCoeff * (point.PixelNo - m_XOffset);
 					if (x >= 0)
 					{
-						g.FillRectangle(displaySettings.GreyBrushes[clr], x, 0, xCoeff, picSpectra.Height);
+						if (drawPixels)
+						{
+							for (int y = 0; y < pixelArrHeight; y++)
+							{
+								byte pixClr = (byte)(Math.Max(0, Math.Min(255, Math.Round(m_MasterSpectra.Pixels[i, y] * m_ColorCoeff))));
+								float xx = xAxisOffset + i * xCoeffPixels;
+								float yy = y * yCoeffPixels;
+								g.FillRectangle(displaySettings.GreyBrushes[pixClr], xx, yy, 1, 1);
+							}
+						}
+						else
+							g.FillRectangle(displaySettings.GreyBrushes[clr], x, 0, xCoeff, picSpectra.Height);
 
                         PointF graphPoint = new PointF(x, picSpectraGraph.Image.Height - BORDER_GAP - (float)Math.Round(point.ProcessedValue * yCoeff) - yAxisOffset);
 						if (prevPoint != PointF.Empty)

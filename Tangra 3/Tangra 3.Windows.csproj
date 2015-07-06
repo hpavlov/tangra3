@@ -363,6 +363,12 @@
     <Compile Include="VideoOperations\Spectroscopy\frmViewSpectra.Designer.cs">
       <DependentUpon>frmViewSpectra.cs</DependentUpon>
     </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\Helpers\frmStackedPixels.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\Helpers\frmStackedPixels.Designer.cs">
+      <DependentUpon>frmStackedPixels.cs</DependentUpon>
+    </Compile>
     <Compile Include="VideoOperations\Spectroscopy\Helpers\RotationMapper.cs" />
     <Compile Include="Helpers\ShellHelper.cs" />
     <Compile Include="Helpers\TangraFileAssociations.cs" />
@@ -1062,6 +1068,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\Spectroscopy\frmViewSpectra.resx">
       <DependentUpon>frmViewSpectra.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Spectroscopy\Helpers\frmStackedPixels.resx">
+      <DependentUpon>frmStackedPixels.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\Spectroscopy\ucSpectroscopy.resx">
       <DependentUpon>ucSpectroscopy.cs</DependentUpon>

@@ -1152,6 +1152,7 @@ namespace Tangra.Model.Config
 			public Color LegendColor;
 			public Color GridLinesColor;
 			public Color KnownLineColor;
+			public Color SpectraApertureColor;
 
 			public Font LabelsFont = new Font(FontFamily.GenericMonospace, 9);
 			public Font LegendFont = new Font(FontFamily.GenericSansSerif, 8, FontStyle.Bold);
@@ -1164,12 +1165,16 @@ namespace Tangra.Model.Config
 			public Pen SpectraPen;
 			public Brush KnownLineLabelBrush;
 
+			public Pen SpectraAperturePen;
+			public Pen SpectraBackgroundPen;
+
 			public void Load()
 			{
 				SpectraLineColor = TangraConfig.Settings.Spectroscopy.Colors.SpectraLineColor;
 				LegendColor = TangraConfig.Settings.Spectroscopy.Colors.LegendColor;
 				GridLinesColor = TangraConfig.Settings.Spectroscopy.Colors.GridLinesColor;
 				KnownLineColor = TangraConfig.Settings.Spectroscopy.Colors.KnownLineColor;
+				SpectraApertureColor = TangraConfig.Settings.Spectroscopy.Colors.SpectraApertureColor;
 			}
 
 			public void Save()
@@ -1178,6 +1183,7 @@ namespace Tangra.Model.Config
 				TangraConfig.Settings.Spectroscopy.Colors.LegendColor = LegendColor;
 				TangraConfig.Settings.Spectroscopy.Colors.GridLinesColor = GridLinesColor;
 				TangraConfig.Settings.Spectroscopy.Colors.KnownLineColor = KnownLineColor;
+				TangraConfig.Settings.Spectroscopy.Colors.SpectraApertureColor = SpectraApertureColor;
 
 				TangraConfig.Settings.Save();
 			}
@@ -1201,6 +1207,12 @@ namespace Tangra.Model.Config
 
 				if (KnownLineLabelBrush != null) KnownLineLabelBrush.Dispose();
 				KnownLineLabelBrush = new SolidBrush(KnownLineColor);
+
+				if (SpectraAperturePen != null) SpectraAperturePen.Dispose();
+				SpectraAperturePen = new Pen(SpectraApertureColor);
+
+				if (SpectraBackgroundPen != null) SpectraBackgroundPen.Dispose();
+				SpectraBackgroundPen = new Pen(System.Drawing.Color.FromArgb(70, SpectraApertureColor.R, SpectraApertureColor.G, SpectraApertureColor.B));
 
 				for (int i = 0; i < 256; i++)
 				{
@@ -1286,10 +1298,24 @@ namespace Tangra.Model.Config
 					}
 				}
 
+				[XmlIgnore]
+				public Color SpectraApertureColor
+				{
+					get
+					{
+						return System.Drawing.Color.FromArgb(SpectraApertureColorRGB);
+					}
+					set
+					{
+						SpectraApertureColorRGB = value.ToArgb();
+					}
+				}
+
 				public int SpectraLineRGB = System.Drawing.Color.Aqua.ToArgb();
 				public int LegendColorRGB = System.Drawing.Color.White.ToArgb();
 				public int GridLinesColorRGB = System.Drawing.Color.FromArgb(180, 180, 180).ToArgb();
 				public int KnownLineColorRGB = System.Drawing.Color.Blue.ToArgb();
+				public int SpectraApertureColorRGB = System.Drawing.Color.Red.ToArgb();
 			}
 
 			public SpectroscopyInstrument Instrument;

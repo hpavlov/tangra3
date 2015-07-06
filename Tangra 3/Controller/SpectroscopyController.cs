@@ -29,6 +29,13 @@ namespace Tangra.Controller
         private MasterSpectra m_CurrentSpectra;
         private TangraConfig.PersistedConfiguration m_Configuration;
 
+		private TangraConfig.SpectraViewDisplaySettings m_DisplaySettings;
+
+		public TangraConfig.SpectraViewDisplaySettings DisplaySettings
+		{
+			get { return m_DisplaySettings; }
+		}
+
         internal SpectraReductionContext SpectraReductionContext { get; private set; }
 
         internal SpectroscopyController(Form mainFormView, VideoController videoController)
@@ -37,6 +44,10 @@ namespace Tangra.Controller
 			m_VideoController = videoController;
 			m_ViewSpectraForm = null;
             SpectraReductionContext = new SpectraReductionContext();
+
+			m_DisplaySettings = new TangraConfig.SpectraViewDisplaySettings();
+			m_DisplaySettings.Load();
+			m_DisplaySettings.Initialize();
 		}
 
         internal bool HasCalibratedConfiguration()
@@ -259,11 +270,17 @@ namespace Tangra.Controller
             {
                 masterSpectra.ZeroOrderPixelNo = allFramesSpectra[0].ZeroOrderPixelNo;
                 masterSpectra.SignalAreaWidth = allFramesSpectra[0].SignalAreaWidth;
+				masterSpectra.BackgroundAreaHalfWidth = allFramesSpectra[0].BackgroundAreaHalfWidth;
+				masterSpectra.BackgroundAreaGap = allFramesSpectra[0].BackgroundAreaGap;
                 masterSpectra.MaxPixelValue = allFramesSpectra[0].MaxPixelValue;
 				masterSpectra.MaxSpectraValue = allFramesSpectra[0].MaxSpectraValue;
                 for (int i = 0; i < allFramesSpectra[0].Points.Count; i++)
                     masterSpectra.Points.Add(new SpectraPoint(allFramesSpectra[0].Points[i]));
-                
+
+	            int pixelArrWidth = allFramesSpectra[0].Pixels.GetLength(0);
+				int pixelArrHeight = allFramesSpectra[0].Pixels.GetLength(1);
+
+				masterSpectra.InitialisePixelArray(pixelArrWidth);
                 masterSpectra.CombinedMeasurements = 1;
 
                 var originalMasterPoints = new List<SpectraPoint>();
@@ -329,6 +346,11 @@ namespace Tangra.Controller
                                 masterSpectra.Points[j].RawValue += nextSpectra.Points[indexNextSpectra].RawValue;
                                 masterSpectra.Points[j].RawSignal += nextSpectra.Points[indexNextSpectra].RawSignal;
                                 masterSpectra.Points[j].RawSignalPixelCount += nextSpectra.Points[indexNextSpectra].RawSignalPixelCount;
+
+								for (int h = 0; h < pixelArrHeight; h++)
+								{
+									masterSpectra.Pixels[j, h] += nextSpectra.Pixels[indexNextSpectra, h];
+								}
                             }
                         }
 					}
@@ -336,9 +358,17 @@ namespace Tangra.Controller
 					// Normalize per row width
 					for (int i = 0; i < masterSpectra.Points.Count; i++)
 					{
-						masterSpectra.Points[i].RawValue = masterSpectra.Points[i].RawSignalPixelCount == 0 
-							? 0 
-							: masterSpectra.Points[i].RawValue * masterSpectra.SignalAreaWidth / masterSpectra.Points[i].RawSignalPixelCount;
+						if (Math.Abs(masterSpectra.Points[i].RawSignalPixelCount) < 0.0001)
+						{
+							masterSpectra.Points[i].RawValue = 0;
+							for (int h = 0; h < pixelArrHeight; h++) masterSpectra.Pixels[i, h] = 0;
+						}
+						else
+						{
+							masterSpectra.Points[i].RawValue = masterSpectra.Points[i].RawValue * masterSpectra.SignalAreaWidth / masterSpectra.Points[i].RawSignalPixelCount;
+							for (int h = 0; h < pixelArrHeight; h++) masterSpectra.Pixels[i, h] /= masterSpectra.Points[i].RawSignalPixelCount;
+						}
+						
 					}
 	            }
 				else if (frameCombineMethod == PixelCombineMethod.Median)
@@ -403,6 +433,11 @@ namespace Tangra.Controller
 							{
 								valueLists[j].Add(nextSpectra.Points[indexNextSpectra].RawValue);
 								signalLists[j].Add(nextSpectra.Points[indexNextSpectra].RawValue);
+
+								for (int h = 0; h < pixelArrHeight; h++)
+								{
+									masterSpectra.Pixels[j, h] += nextSpectra.Pixels[indexNextSpectra, h];
+								}
 							}
 						}
 					}
@@ -415,6 +450,11 @@ namespace Tangra.Controller
 						masterSpectra.Points[i].RawValue = valueLists[i].Count == 0 ? 0 : valueLists[i][valueLists[i].Count / 2];
 						masterSpectra.Points[i].RawSignal = signalLists[i].Count == 0 ? 0 : signalLists[i][signalLists[i].Count / 2];
 						masterSpectra.Points[i].RawSignalPixelCount = signalLists[i].Count;
+
+						if (Math.Abs(masterSpectra.Points[i].RawSignalPixelCount) < 0.0001)
+							for (int h = 0; h < pixelArrHeight; h++) masterSpectra.Pixels[i, h] = 0;
+						else
+							for (int h = 0; h < pixelArrHeight; h++) masterSpectra.Pixels[i, h] /= masterSpectra.Points[i].RawSignalPixelCount;
 					}
 				}
             }
@@ -422,9 +462,9 @@ namespace Tangra.Controller
 			return masterSpectra;
         }
 
-        internal void DisplaySpectra(MasterSpectra masterSpectra, TangraConfig.PersistedConfiguration configuration)
+		internal void DisplaySpectra(MasterSpectra masterSpectra, TangraConfig.PersistedConfiguration configuration, TangraConfig.SpectraViewDisplaySettings displaySettings)
 	    {
-		    EnsureViewSpectraForm();
+			EnsureViewSpectraForm(displaySettings);
 
 	        m_CurrentSpectra = masterSpectra;
             m_Configuration = configuration;
@@ -458,11 +498,11 @@ namespace Tangra.Controller
 			}
 	    }
 
-	    public void EnsureViewSpectraForm()
+	    public void EnsureViewSpectraForm(TangraConfig.SpectraViewDisplaySettings displaySettings)
 	    {
 		    EnsureViewSpectraFormClosed();
 
-			m_ViewSpectraForm = new frmViewSpectra(this, m_VideoController);
+			m_ViewSpectraForm = new frmViewSpectra(this, m_VideoController, displaySettings);
 	    }
 
 		public void ConfigureSaveSpectraFileDialog(SaveFileDialog saveFileDialog)
@@ -555,7 +595,7 @@ namespace Tangra.Controller
 				if (spectraFile != null)
 				{
                     // TODO: Choose configuration ?? 
-					DisplaySpectra(spectraFile.Data, null);
+					DisplaySpectra(spectraFile.Data, null, m_DisplaySettings);
 
                     string videoFile = m_VideoController.GetVideoFileMatchingLcFile(spectraFile.Header.PathToVideoFile, fileName);
                     if (!string.IsNullOrEmpty(videoFile) &&
@@ -648,6 +688,7 @@ namespace Tangra.Controller
                FramesToMeasure = SpectraReductionContext.FramesToMeasure,
                MeasurementAreaWing = SpectraReductionContext.MeasurementAreaWing,
                BackgroundAreaWing = SpectraReductionContext.BackgroundAreaWing,
+			   BackgroundAreaGap = SpectraReductionContext.BackgroundAreaGap,
                BackgroundMethod = SpectraReductionContext.BackgroundMethod,
                FrameCombineMethod = SpectraReductionContext.FrameCombineMethod,
                UseFineAdjustments = SpectraReductionContext.UseFineAdjustments,

@@ -339,6 +339,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
         public int FramesToMeasure { get; set; }
         public int MeasurementAreaWing { get; set; }
         public int BackgroundAreaWing { get; set; }
+		public int BackgroundAreaGap { get; set; }
         public PixelCombineMethod BackgroundMethod { get; set; }
         public PixelCombineMethod FrameCombineMethod { get; set; }
         public bool UseFineAdjustments { get; set; }
@@ -366,6 +367,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
             FramesToMeasure = reader.ReadInt32();
             MeasurementAreaWing = reader.ReadInt32();
             BackgroundAreaWing = reader.ReadInt32();
+			BackgroundAreaGap = reader.ReadInt32();
             BackgroundMethod = (PixelCombineMethod)reader.ReadInt32();
             FrameCombineMethod = (PixelCombineMethod)reader.ReadInt32();
             UseFineAdjustments = reader.ReadBoolean();
@@ -394,6 +396,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
             writer.Write(FramesToMeasure);
             writer.Write(MeasurementAreaWing);
             writer.Write(BackgroundAreaWing);
+			writer.Write(BackgroundAreaGap);
             writer.Write((int)BackgroundMethod);
             writer.Write((int)FrameCombineMethod);
             writer.Write(UseFineAdjustments);
@@ -424,6 +427,13 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 	    public int ZeroOrderPixelNo;
 
 		public List<SpectraPoint> Points = new List<SpectraPoint>();
+
+		public float[,] Pixels;
+
+		public void InitialisePixelArray(int width)
+		{
+			Pixels = new float[width, SignalAreaWidth + 2 * BackgroundAreaHalfWidth + 2 * BackgroundAreaGap];
+		}
 	}
 
 	public enum PixelCombineMethod
@@ -483,6 +493,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 			m_BgValues = new float[xTo - xFrom + 1];
             m_BgPixelCount = new uint[xTo - xFrom + 1];
             m_BgValuesList = new List<float>[xTo - xFrom + 1];
+			rv.InitialisePixelArray(xTo - xFrom + 1);
 
 			// Get all readings in the range
 			for (int x = xFrom; x <= xTo; x++)
@@ -513,8 +524,10 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
                                 numPoints++;
                             }
                         }
-                        point.RawValue += (sum / numPoints);
+					    float destPixVal = (sum/numPoints); 
+                        point.RawValue += destPixVal;
 				        point.RawSignalPixelCount++;
+						rv.Pixels[x - xFrom, z + bgHalfWidth + bgGap + halfWidth - 1] = destPixVal;
 				    }
 				}
 

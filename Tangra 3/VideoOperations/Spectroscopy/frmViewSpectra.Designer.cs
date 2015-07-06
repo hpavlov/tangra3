@@ -76,6 +76,7 @@
 			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
 			this.exportFileDialog = new System.Windows.Forms.SaveFileDialog();
 			this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
+			this.miViewStackedPixels = new System.Windows.Forms.ToolStripMenuItem();
 			this.pnlBottom.SuspendLayout();
 			this.gbSelection.SuspendLayout();
 			this.gbxCalibration.SuspendLayout();
@@ -297,37 +298,37 @@
 			// miLoadSpectra
 			// 
 			this.miLoadSpectra.Name = "miLoadSpectra";
-			this.miLoadSpectra.Size = new System.Drawing.Size(140, 22);
+			this.miLoadSpectra.Size = new System.Drawing.Size(152, 22);
 			this.miLoadSpectra.Text = "&Load Spectra ";
 			// 
 			// miSaveSpectra
 			// 
 			this.miSaveSpectra.Name = "miSaveSpectra";
-			this.miSaveSpectra.Size = new System.Drawing.Size(140, 22);
+			this.miSaveSpectra.Size = new System.Drawing.Size(152, 22);
 			this.miSaveSpectra.Text = "&Save Spectra";
 			this.miSaveSpectra.Click += new System.EventHandler(this.miSaveSpectra_Click);
 			// 
 			// toolStripMenuItem1
 			// 
 			this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-			this.toolStripMenuItem1.Size = new System.Drawing.Size(137, 6);
+			this.toolStripMenuItem1.Size = new System.Drawing.Size(149, 6);
 			// 
 			// miExport
 			// 
 			this.miExport.Name = "miExport";
-			this.miExport.Size = new System.Drawing.Size(140, 22);
+			this.miExport.Size = new System.Drawing.Size(152, 22);
 			this.miExport.Text = "Export";
 			this.miExport.Click += new System.EventHandler(this.miExport_Click);
 			// 
 			// toolStripSeparator1
 			// 
 			this.toolStripSeparator1.Name = "toolStripSeparator1";
-			this.toolStripSeparator1.Size = new System.Drawing.Size(137, 6);
+			this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
 			// 
 			// miCloseForm
 			// 
 			this.miCloseForm.Name = "miCloseForm";
-			this.miCloseForm.Size = new System.Drawing.Size(140, 22);
+			this.miCloseForm.Size = new System.Drawing.Size(152, 22);
 			this.miCloseForm.Text = "&Close";
 			// 
 			// miData
@@ -475,7 +476,8 @@
 			// miView
 			// 
 			this.miView.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.miShowCommonLines});
+            this.miShowCommonLines,
+            this.miViewStackedPixels});
 			this.miView.Name = "miView";
 			this.miView.Size = new System.Drawing.Size(41, 20);
 			this.miView.Text = "&View";
@@ -499,6 +501,13 @@
 			// openFileDialog
 			// 
 			this.openFileDialog.Filter = "Tangra Spectra (*.spectra)|*.spectra";
+			// 
+			// miViewStackedPixels
+			// 
+			this.miViewStackedPixels.Name = "miViewStackedPixels";
+			this.miViewStackedPixels.Size = new System.Drawing.Size(171, 22);
+			this.miViewStackedPixels.Text = "View Stacked &Pixels";
+			this.miViewStackedPixels.Click += new System.EventHandler(this.miViewStackedPixels_Click);
 			// 
 			// frmViewSpectra
 			// 
@@ -580,5 +589,6 @@
 		private System.Windows.Forms.ToolStripMenuItem miDisplaySettings;
 		private System.Windows.Forms.ToolStripMenuItem miRecalibrateManually;
 		private System.Windows.Forms.ToolStripMenuItem miApplySavedCalibration;
+		private System.Windows.Forms.ToolStripMenuItem miViewStackedPixels;
     }
 }

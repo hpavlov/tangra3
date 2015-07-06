@@ -13,6 +13,7 @@ using Tangra.Controller;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
 using Tangra.Model.Helpers;
+using Tangra.Video.AstroDigitalVideo;
 using Tangra.VideoOperations.Spectroscopy.Helpers;
 using Tangra.VideoOperations.Spectroscopy.ViewSpectraStates;
 
@@ -25,23 +26,22 @@ namespace Tangra.VideoOperations.Spectroscopy
 	    private SpectroscopyController m_SpectroscopyController;
         private VideoController m_VideoController;
 	    private SpectraViewerStateManager m_StateManager;
-		private TangraConfig.SpectraViewDisplaySettings m_DisplaySettings = new TangraConfig.SpectraViewDisplaySettings();
+	    private TangraConfig.SpectraViewDisplaySettings m_DisplaySettings;
+	    private bool m_PlotPixels = false;
 
 	    public frmViewSpectra()
 	    {
 			InitializeComponent();
 	    }
 
-        public frmViewSpectra(SpectroscopyController controller, VideoController videoController)
+        public frmViewSpectra(SpectroscopyController controller, VideoController videoController, TangraConfig.SpectraViewDisplaySettings displaySettings)
 			: this()
 	    {
 		    m_SpectroscopyController = controller;
+			m_DisplaySettings = displaySettings;
 		    
             picSpectraGraph.Image = new Bitmap(picSpectraGraph.Width, picSpectraGraph.Height, PixelFormat.Format24bppRgb);
             picSpectra.Image = new Bitmap(picSpectra.Width, picSpectra.Height, PixelFormat.Format24bppRgb);
-
-			m_DisplaySettings.Load();
-			m_DisplaySettings.Initialize();
 
             m_StateManager = new SpectraViewerStateManager(m_SpectroscopyController, picSpectraGraph, this);
 	        m_VideoController = videoController;
@@ -83,7 +83,7 @@ namespace Tangra.VideoOperations.Spectroscopy
 
 	    internal void PlotSpectra()
 	    {
-			m_StateManager.DrawSpectra(picSpectra, picSpectraGraph, m_DisplaySettings);
+			m_StateManager.DrawSpectra(picSpectra, picSpectraGraph, m_PlotPixels, m_DisplaySettings);
 
 	        gbxCalibration.Visible = m_SpectroscopyController.IsCalibrated();
 		    var calibraror = m_SpectroscopyController.GetSpectraCalibrator();
@@ -346,6 +346,58 @@ namespace Tangra.VideoOperations.Spectroscopy
 				m_StateManager.ChangeState<SpectraViewerStateCalibrated>();
 				RedrawPlot();
 			}
+		}
+
+		private void DisplayModeChanged(object sender, EventArgs e)
+		{
+			m_PlotPixels = true;
+			RedrawPlot();
+		}
+
+		private void miSavePixels_Click(object sender, EventArgs e)
+		{
+
+
+		}
+
+		private void miViewStackedPixels_Click(object sender, EventArgs e)
+		{
+			int width = m_Spectra.Pixels.GetLength(0);
+			int height = m_Spectra.Pixels.GetLength(1);
+			float maxVal = 1;
+			for (int x = 0; x < width; x++)
+			for (int y = 0; y < height; y++)
+			{
+				if (m_Spectra.Pixels[x, y] > maxVal) maxVal = m_Spectra.Pixels[x, y];
+			}
+
+			var bmp = new Bitmap(width, height, PixelFormat.Format24bppRgb);
+			for (int x = 0; x < width; x++)
+			for (int y = 0; y < height; y++)
+			{
+				byte clr = (byte)Math.Round(255.0 * m_Spectra.Pixels[x, y] / maxVal);
+				bmp.SetPixel(x, y, Color.FromArgb(clr, clr, clr));
+			}
+
+			using (Graphics g = Graphics.FromImage(bmp))
+			{
+				g.DrawLine(m_DisplaySettings.SpectraBackgroundPen, 0, m_Spectra.MeasurementInfo.BackgroundAreaWing, width, m_Spectra.MeasurementInfo.BackgroundAreaWing);
+				g.DrawLine(m_DisplaySettings.SpectraAperturePen, 0, 
+					m_Spectra.MeasurementInfo.BackgroundAreaWing + m_Spectra.MeasurementInfo.BackgroundAreaGap, width,
+					m_Spectra.MeasurementInfo.BackgroundAreaWing + m_Spectra.MeasurementInfo.BackgroundAreaGap);
+				g.DrawLine(m_DisplaySettings.SpectraAperturePen, 0,
+					m_Spectra.MeasurementInfo.BackgroundAreaWing + m_Spectra.MeasurementInfo.BackgroundAreaGap + 2 * m_Spectra.MeasurementInfo.MeasurementAreaWing, width,
+					m_Spectra.MeasurementInfo.BackgroundAreaWing + m_Spectra.MeasurementInfo.BackgroundAreaGap + 2 * m_Spectra.MeasurementInfo.MeasurementAreaWing);
+				g.DrawLine(m_DisplaySettings.SpectraBackgroundPen, 0,
+					m_Spectra.MeasurementInfo.BackgroundAreaWing + 2 * m_Spectra.MeasurementInfo.BackgroundAreaGap + 2 * m_Spectra.MeasurementInfo.MeasurementAreaWing, width,
+					m_Spectra.MeasurementInfo.BackgroundAreaWing + 2 * m_Spectra.MeasurementInfo.BackgroundAreaGap + 2 * m_Spectra.MeasurementInfo.MeasurementAreaWing);								
+
+				g.Save();
+			}
+
+			var frm = new frmStackedPixels();
+			frm.DisplayBitmap(bmp);
+			frm.Show(this);
 		}
     }
 }

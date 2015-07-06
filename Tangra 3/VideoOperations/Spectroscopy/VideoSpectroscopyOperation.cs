@@ -106,6 +106,11 @@ namespace Tangra.VideoOperations.Spectroscopy
             return true;
         }
 
+	    public TangraConfig.SpectraViewDisplaySettings DisplaySettings
+	    {
+		    get { return m_SpectroscopyController.DisplaySettings; }
+	    }
+
         public void FinalizeOperation()
         {
             
@@ -221,7 +226,7 @@ namespace Tangra.VideoOperations.Spectroscopy
 
 	    internal void DisplaySpectra()
 	    {
-            m_SpectroscopyController.DisplaySpectra(m_MasterSpectra, m_Configuration);
+			m_SpectroscopyController.DisplaySpectra(m_MasterSpectra, m_Configuration, m_SpectroscopyController.DisplaySettings);
 	    }
 
         public void ImageToolChanged(ImageTool newTool, ImageTool oldTool)
@@ -234,8 +239,7 @@ namespace Tangra.VideoOperations.Spectroscopy
             
         }
 
-	    private static Pen s_SpectraAreaPen = Pens.Red;
-		private static Pen s_SpectraBackgroundPen = new Pen(Color.FromArgb(70, 255, 0, 0));
+	    
 
         public void PostDraw(Graphics g)
         {
@@ -260,27 +264,27 @@ namespace Tangra.VideoOperations.Spectroscopy
                     {
                         PointF p1 = mapper.GetSourceCoords(i, p0.Y - halfWidth);
                         PointF p2 = mapper.GetSourceCoords(i + 1, p0.Y - halfWidth);
-                        if (m_OriginalVideoFrame.Contains(p1) && m_OriginalVideoFrame.Contains(p2)) g.DrawLine(s_SpectraAreaPen, p1, p2);
+						if (m_OriginalVideoFrame.Contains(p1) && m_OriginalVideoFrame.Contains(p2)) g.DrawLine(m_SpectroscopyController.DisplaySettings.SpectraAperturePen, p1, p2);
 
                         PointF p3 = mapper.GetSourceCoords(i, p0.Y + halfWidth);
                         PointF p4 = mapper.GetSourceCoords(i + 1, p0.Y + halfWidth);
-                        if (m_OriginalVideoFrame.Contains(p3) && m_OriginalVideoFrame.Contains(p4)) g.DrawLine(s_SpectraAreaPen, p3, p4);
+						if (m_OriginalVideoFrame.Contains(p3) && m_OriginalVideoFrame.Contains(p4)) g.DrawLine(m_SpectroscopyController.DisplaySettings.SpectraAperturePen, p3, p4);
 
                         p1 = mapper.GetSourceCoords(i, p0.Y - halfWidth - bgGap);
                         p2 = mapper.GetSourceCoords(i + 1, p0.Y - halfWidth - bgGap);
-                        if (m_OriginalVideoFrame.Contains(p1) && m_OriginalVideoFrame.Contains(p2)) g.DrawLine(s_SpectraBackgroundPen, p1, p2);
+						if (m_OriginalVideoFrame.Contains(p1) && m_OriginalVideoFrame.Contains(p2)) g.DrawLine(m_SpectroscopyController.DisplaySettings.SpectraBackgroundPen, p1, p2);
 
                         p3 = mapper.GetSourceCoords(i, p0.Y + halfWidth + bgGap);
                         p4 = mapper.GetSourceCoords(i + 1, p0.Y + halfWidth + bgGap);
-                        if (m_OriginalVideoFrame.Contains(p3) && m_OriginalVideoFrame.Contains(p4)) g.DrawLine(s_SpectraBackgroundPen, p3, p4);
+						if (m_OriginalVideoFrame.Contains(p3) && m_OriginalVideoFrame.Contains(p4)) g.DrawLine(m_SpectroscopyController.DisplaySettings.SpectraBackgroundPen, p3, p4);
 
                         p1 = mapper.GetSourceCoords(i, p0.Y - halfWidth - bgSide - bgGap);
                         p2 = mapper.GetSourceCoords(i + 1, p0.Y - halfWidth - bgSide - bgGap);
-                        if (m_OriginalVideoFrame.Contains(p1) && m_OriginalVideoFrame.Contains(p2)) g.DrawLine(s_SpectraBackgroundPen, p1, p2);
+						if (m_OriginalVideoFrame.Contains(p1) && m_OriginalVideoFrame.Contains(p2)) g.DrawLine(m_SpectroscopyController.DisplaySettings.SpectraBackgroundPen, p1, p2);
 
                         p3 = mapper.GetSourceCoords(i, p0.Y + halfWidth + bgSide + bgGap);
                         p4 = mapper.GetSourceCoords(i + 1, p0.Y + halfWidth + bgSide + bgGap);
-                        if (m_OriginalVideoFrame.Contains(p3) && m_OriginalVideoFrame.Contains(p4)) g.DrawLine(s_SpectraBackgroundPen, p3, p4);
+						if (m_OriginalVideoFrame.Contains(p3) && m_OriginalVideoFrame.Contains(p4)) g.DrawLine(m_SpectroscopyController.DisplaySettings.SpectraBackgroundPen, p3, p4);
                     }                    
                 }
             }
