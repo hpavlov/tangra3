@@ -26,11 +26,14 @@ namespace Tangra.Config.SettingPannels
 			rbOrder2.Checked = TangraConfig.Settings.Spectroscopy.DefaultWavelengthCalibrationOrder == 2;
 			rbOrder3.Checked = TangraConfig.Settings.Spectroscopy.DefaultWavelengthCalibrationOrder == 3;
 
+		    cbxAllowNegativeValues.Checked = TangraConfig.Settings.Spectroscopy.AllowNegativeValues;
+
 		}
 
 		public override void SaveSettings()
 		{
 			TangraConfig.Settings.Spectroscopy.Instrument = (TangraConfig.SpectroscopyInstrument)cbxInstrumentType.SelectedIndex;
+		    TangraConfig.Settings.Spectroscopy.AllowNegativeValues = cbxAllowNegativeValues.Checked;
 			if (rbOrder1.Checked)
 				TangraConfig.Settings.Spectroscopy.DefaultWavelengthCalibrationOrder = 1;
 			else if (rbOrder2.Checked)

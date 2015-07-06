@@ -1167,6 +1167,7 @@ namespace Tangra.Model.Config
 
 			public Pen SpectraAperturePen;
 			public Pen SpectraBackgroundPen;
+            public Pen SpectraBackgroundFadedPen;
 
 			public void Load()
 			{
@@ -1213,6 +1214,10 @@ namespace Tangra.Model.Config
 
 				if (SpectraBackgroundPen != null) SpectraBackgroundPen.Dispose();
 				SpectraBackgroundPen = new Pen(System.Drawing.Color.FromArgb(70, SpectraApertureColor.R, SpectraApertureColor.G, SpectraApertureColor.B));
+
+                if (SpectraBackgroundFadedPen != null) SpectraBackgroundFadedPen.Dispose();
+                SpectraBackgroundFadedPen = new Pen(System.Drawing.Color.FromArgb(30, SpectraApertureColor.R, SpectraApertureColor.G, SpectraApertureColor.B));
+                
 
 				for (int i = 0; i < 256; i++)
 				{
@@ -1320,6 +1325,7 @@ namespace Tangra.Model.Config
 
 			public SpectroscopyInstrument Instrument;
 			public int DefaultWavelengthCalibrationOrder;
+		    public bool AllowNegativeValues;
 
 			public SpectraColors Colors;
 
@@ -1331,8 +1337,8 @@ namespace Tangra.Model.Config
 
 				DefaultWavelengthCalibrationOrder = 1;
 				Instrument = SpectroscopyInstrument.Grating;
+			    AllowNegativeValues = true;
 
-				
 			}
 		}
 

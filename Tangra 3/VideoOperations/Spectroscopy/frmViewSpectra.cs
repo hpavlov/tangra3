@@ -381,14 +381,14 @@ namespace Tangra.VideoOperations.Spectroscopy
 
 			using (Graphics g = Graphics.FromImage(bmp))
 			{
-				g.DrawLine(m_DisplaySettings.SpectraBackgroundPen, 0, m_Spectra.MeasurementInfo.BackgroundAreaWing, width, m_Spectra.MeasurementInfo.BackgroundAreaWing);
-				g.DrawLine(m_DisplaySettings.SpectraAperturePen, 0, 
+                g.DrawLine(m_DisplaySettings.SpectraBackgroundFadedPen, 0, m_Spectra.MeasurementInfo.BackgroundAreaWing, width, m_Spectra.MeasurementInfo.BackgroundAreaWing);
+                g.DrawLine(m_DisplaySettings.SpectraBackgroundFadedPen, 0, 
 					m_Spectra.MeasurementInfo.BackgroundAreaWing + m_Spectra.MeasurementInfo.BackgroundAreaGap, width,
 					m_Spectra.MeasurementInfo.BackgroundAreaWing + m_Spectra.MeasurementInfo.BackgroundAreaGap);
-				g.DrawLine(m_DisplaySettings.SpectraAperturePen, 0,
+                g.DrawLine(m_DisplaySettings.SpectraBackgroundFadedPen, 0,
 					m_Spectra.MeasurementInfo.BackgroundAreaWing + m_Spectra.MeasurementInfo.BackgroundAreaGap + 2 * m_Spectra.MeasurementInfo.MeasurementAreaWing, width,
 					m_Spectra.MeasurementInfo.BackgroundAreaWing + m_Spectra.MeasurementInfo.BackgroundAreaGap + 2 * m_Spectra.MeasurementInfo.MeasurementAreaWing);
-				g.DrawLine(m_DisplaySettings.SpectraBackgroundPen, 0,
+                g.DrawLine(m_DisplaySettings.SpectraBackgroundFadedPen, 0,
 					m_Spectra.MeasurementInfo.BackgroundAreaWing + 2 * m_Spectra.MeasurementInfo.BackgroundAreaGap + 2 * m_Spectra.MeasurementInfo.MeasurementAreaWing, width,
 					m_Spectra.MeasurementInfo.BackgroundAreaWing + 2 * m_Spectra.MeasurementInfo.BackgroundAreaGap + 2 * m_Spectra.MeasurementInfo.MeasurementAreaWing);								
 

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using Tangra.Helpers;
 using Tangra.Model.Astro;
+using Tangra.Model.Config;
 
 namespace Tangra.VideoOperations.Spectroscopy.Helpers
 {
@@ -114,6 +115,15 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 				Points.Add(point);
 			}
 
+            int width = reader.ReadInt32();
+            int height = reader.ReadInt32();
+	        Pixels = new float[width,height];
+            for (int x = 0; x < width; x++)
+            for (int y = 0; y < height; y++)
+            {
+                Pixels[x, y] = reader.ReadSingle();
+            }
+
 	        MeasurementInfo = new MeasurementInfo(reader);
 	        if (reader.ReadBoolean())
 	            Calibration = new SpectraCalibration(reader);
@@ -156,6 +166,16 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 		    {
 				spectraPoint.WriteTo(writer);
 		    }
+
+	        int width = Pixels.GetLength(0);
+            int height = Pixels.GetLength(1);
+            writer.Write(width);
+            writer.Write(height);
+            for (int x = 0; x < width; x++)
+            for (int y = 0; y < height; y++)
+            {
+                writer.Write(Pixels[x, y]);
+            }
 
             MeasurementInfo.WriteTo(writer);
 
@@ -543,13 +563,14 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 				{
                     ReadMedianBackgroundForPixelIndex(halfWidth, bgHalfWidth, bgGap, x, p1.Y, x - xFrom);
 				}
-
 				#endregion
 			}
 
 			// Apply background
-			foreach(SpectraPoint point in rv.Points)
-			{
+            for (int i = 0; i < rv.Points.Count; i++)
+            {
+                SpectraPoint point = rv.Points[i];
+
                 if (bgMethod == PixelCombineMethod.Average)
 				{
 					point.RawBackgroundPerPixel = GetAverageBackgroundValue(point.PixelNo, xFrom, xTo, bgHalfWidth);
@@ -559,8 +580,16 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 					point.RawBackgroundPerPixel = GetMedianBackgroundValue(point.PixelNo, xFrom, xTo, bgHalfWidth);
 				}
 
+                for (int z = -halfWidth - bgGap - bgHalfWidth + 1; z < -halfWidth - bgGap; z++)
+                    rv.Pixels[i, z + bgHalfWidth + bgGap + halfWidth - 1] = point.RawBackgroundPerPixel;
+
+                for (int z = halfWidth + bgGap + 1; z < halfWidth + bgGap + bgHalfWidth + 1; z++)
+                    rv.Pixels[i, z + bgHalfWidth + bgGap + halfWidth - 1] = point.RawBackgroundPerPixel;
+
 				point.RawValue -= point.RawBackgroundPerPixel * point.RawSignalPixelCount;
-				if (point.RawValue < 0) point.RawValue = 0;
+
+                if (point.RawValue < 0 && !TangraConfig.Settings.Spectroscopy.AllowNegativeValues)
+				    point.RawValue = 0;
 			}
 
 			rv.MaxSpectraValue = (uint)Math.Ceiling(rv.Points.Where(x => x.PixelNo > rv.ZeroOrderPixelNo + 20).Select(x => x.RawValue).Max());
