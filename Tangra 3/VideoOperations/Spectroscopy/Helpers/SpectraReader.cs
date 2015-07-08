@@ -488,7 +488,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 				SignalAreaWidth = 2 * halfWidth,
 				BackgroundAreaHalfWidth = bgHalfWidth,
                 BackgroundAreaGap = bgGap,
-                MaxPixelValue = (uint)(2 * halfWidth) * m_Image.Pixelmap.MaxSignalValue
+                MaxPixelValue = m_Image.Pixelmap.MaxSignalValue
 			};
 
 			int xFrom = int.MaxValue;

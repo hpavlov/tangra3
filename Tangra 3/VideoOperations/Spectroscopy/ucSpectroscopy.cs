@@ -62,13 +62,13 @@ namespace Tangra.VideoOperations.Spectroscopy
 
 		    int xOffset = spectra.ZeroOrderPixelNo - 10;
             float xCoeff = picSpectra.Width * 1.0f / spectra.Points.Count;
-			float colorCoeff = 256.0f / spectra.MaxPixelValue;
+			float colorCoeff = 255.0f / spectra.MaxSpectraValue;
 
 			using (Graphics g = Graphics.FromImage(picSpectra.Image))
 			{
 				foreach (SpectraPoint point in spectra.Points)
 				{
-					byte clr = (byte)(Math.Round(point.RawValue * colorCoeff));
+					byte clr = (byte)(Math.Min(255, Math.Round(point.RawValue * colorCoeff)));
 					float x = xCoeff * (point.PixelNo - xOffset);
                     if (x >= 0)
                     {

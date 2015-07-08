@@ -20,10 +20,12 @@ namespace Tangra.Helpers
 		public static string PGID_LC_FILE = "Tangra Light Curve";
 		public static string PGID_AAV_FILE = "Astro Analogue Video";
 		public static string PGID_ADV_FILE = "Astro Digital Video";
+		public static string PGID_SPECTRA_FILE = "Tangra Spectra";
 
 		public static string PGID_LC_FILE_EXT = ".lc";
 		public static string PGID_AAV_FILE_EXT = ".aav";
 		public static string PGID_ADV_FILE_EXT = ".adv";
+		public static string PGID_SPECTRA_FILE_EXT = ".spectra";
 
 		public static string COMMAND_LINE_ASSOCIATE = "tangra-file-assoc";
 
@@ -45,8 +47,9 @@ namespace Tangra.Helpers
 				bool lcRegistered = m_AssociationManager.CheckAssociation(PGID_LC_FILE, PGID_LC_FILE_EXT).Length == 0;
 				bool aavRegistered = m_AssociationManager.CheckAssociation(PGID_AAV_FILE, PGID_AAV_FILE_EXT).Length == 0;
 				bool advRegistered = m_AssociationManager.CheckAssociation(PGID_ADV_FILE, PGID_ADV_FILE_EXT).Length == 0;
+				bool spectraRegistered = m_AssociationManager.CheckAssociation(PGID_SPECTRA_FILE, PGID_SPECTRA_FILE_EXT).Length == 0;
 
-				Registered = lcRegistered && aavRegistered && advRegistered;
+				Registered = lcRegistered && aavRegistered && advRegistered && spectraRegistered;
 
 				CheckCompleted = true;
 			}
@@ -89,6 +92,12 @@ namespace Tangra.Helpers
 				    Process.GetCurrentProcess().Modules[0].FileName),
 				    PGID_ADV_FILE_EXT,
 				    new ProgramIcon(string.Format("\"{0}\"", Process.GetCurrentProcess().Modules[0].FileName), 3));
+
+				m_AssociationManager.Associate(
+					PGID_SPECTRA_FILE, string.Format("\"{0}\" \"%L\"",
+					Process.GetCurrentProcess().Modules[0].FileName),
+					PGID_SPECTRA_FILE_EXT,
+					new ProgramIcon(string.Format("\"{0}\"", Process.GetCurrentProcess().Modules[0].FileName), 4));
             }
             catch (SecurityException sex)
             {

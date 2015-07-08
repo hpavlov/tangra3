@@ -1221,6 +1221,7 @@
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
+    <None Include="img\spectra_logo.bmp" />
     <Content Include="license.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -1264,7 +1265,7 @@
     </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>"$(SolutionDir)Resources\InsertIcons.exe" "$(TargetPath)" "$(ProjectDir)img\lc_logo.ico";"$(ProjectDir)img\aav_file.ico";"$(ProjectDir)img\adv_file.ico"
+    <PostBuildEvent>"$(SolutionDir)Resources\InsertIcons.exe" "$(TargetPath)" "$(ProjectDir)img\lc_logo.ico";"$(ProjectDir)img\aav_file.ico";"$(ProjectDir)img\adv_file.ico";"$(ProjectDir)img\spectra_logo.ico"
 xcopy "$(ProjectDir)WindowsFiles\$(ConfigurationName)" "$(TargetDir)" /Y
 </PostBuildEvent>
   </PropertyGroup>
