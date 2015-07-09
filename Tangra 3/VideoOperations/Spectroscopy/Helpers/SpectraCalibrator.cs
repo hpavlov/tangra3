@@ -117,13 +117,24 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
             {
 				if (!float.IsNaN(m_PixelPos[0]) && !float.IsNaN(m_PixelPos[1]) && !float.IsNaN(m_PixelPos[2]) && !float.IsNaN(m_PixelPos[3]) && float.IsNaN(m_PixelPos[4]))
                 {
-                    MessageBox.Show("Not implemented yet");
+                    MessageBox.Show("At least 5 poins are required for a 3-rd order fit.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
 				else if (!float.IsNaN(m_PixelPos[0]) && !float.IsNaN(m_PixelPos[1]) && !float.IsNaN(m_PixelPos[2]) && !float.IsNaN(m_PixelPos[3]) && !float.IsNaN(m_PixelPos[4]))
                 {
                     CalibrateWithRegression<CubicWavelengthRegressionCalibration>();
                 }
             }
+			else if (polynomialOrder == 4)
+			{
+				if (!float.IsNaN(m_PixelPos[0]) && !float.IsNaN(m_PixelPos[1]) && !float.IsNaN(m_PixelPos[2]) && !float.IsNaN(m_PixelPos[3]) && !float.IsNaN(m_PixelPos[4]) && float.IsNaN(m_PixelPos[5]))
+				{
+					MessageBox.Show("At least 6 poins are required for a 4-rd order fit.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				}
+				else if (!float.IsNaN(m_PixelPos[0]) && !float.IsNaN(m_PixelPos[1]) && !float.IsNaN(m_PixelPos[2]) && !float.IsNaN(m_PixelPos[3]) && !float.IsNaN(m_PixelPos[4]) && !float.IsNaN(m_PixelPos[5]))
+				{
+					CalibrateWithRegression<QuarticWavelengthRegressionCalibration>();
+				}
+			}
 
             else
                 MessageBox.Show("Calibration of this order hasn't been implemented yet");
@@ -270,6 +281,10 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 				case "CubicWavelengthRegressionCalibration":
 					m_WavelengthCalibration = new CubicWavelengthRegressionCalibration(calibration);
 					return true;
+
+				case "QuarticWavelengthRegressionCalibration":
+					m_WavelengthCalibration = new QuarticWavelengthRegressionCalibration(calibration);
+					return true;					
 
                 case "CubicWavelengthCalibration":
                     m_WavelengthCalibration = new CubicWavelengthCalibration(calibration);
@@ -822,7 +837,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
         public void Calibrate()
         {
 			if (m_PixelPos.Count < 3)
-                throw new InvalidOperationException("Cannot get a fit from less than 4 points.");
+                throw new InvalidOperationException("Cannot get a fit from less than 3 points.");
 
 			var A = new SafeMatrix(m_PixelPos.Count, 2);
 			var X = new SafeMatrix(m_PixelPos.Count, 1);
@@ -911,6 +926,152 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 		}
     }
 
+	internal class QuarticWavelengthRegressionCalibration : RegressionCalibrationBase, IRegressionWavelengthCalibration, IWavelengthCalibration
+	{
+		private float m_A;
+		private float m_B;
+		private float m_C;
+		private float m_D;
+		private float m_E;
+
+		public QuarticWavelengthRegressionCalibration()
+		{ }
+
+		public void Calibrate()
+		{
+			if (m_PixelPos.Count < 6)
+				throw new InvalidOperationException("Cannot get a fit from less than 6 points.");
+
+			var A = new SafeMatrix(m_PixelPos.Count, 6);
+			var X = new SafeMatrix(m_PixelPos.Count, 1);
+
+			for (int i = 0; i < m_PixelPos.Count; i++)
+			{
+				A[i, 0] = m_Wavelengths[i] * m_Wavelengths[i] * m_Wavelengths[i] * m_Wavelengths[i];
+				A[i, 1] = m_Wavelengths[i] * m_Wavelengths[i] * m_Wavelengths[i];
+				A[i, 2] = m_Wavelengths[i] * m_Wavelengths[i];
+				A[i, 3] = m_Wavelengths[i];
+				A[i, 4] = 1;
+
+				X[i, 0] = m_PixelPos[i];
+			}
+
+			SafeMatrix a_T = A.Transpose();
+			SafeMatrix aa = a_T * A;
+			SafeMatrix aa_inv = aa.Inverse();
+			SafeMatrix bx = (aa_inv * a_T) * X;
+
+			m_A = (float)bx[0, 0];
+			m_B = (float)bx[1, 0];
+			m_C = (float)bx[2, 0];
+			m_D = (float)bx[3, 0];
+			m_E = (float)bx[4, 0];
+		}
+
+		public float ResolveWavelength(SpectraPoint point)
+		{
+			if (point != null)
+				return ResolveWavelength(point.PixelNo);
+			else
+				return float.NaN;
+		}
+
+		public float ResolveWavelength(int x)
+		{
+			float p = (8 * m_A * m_C - 3 * m_B * m_B) / (8 * m_A* m_A);
+			float q = (m_B * m_B * m_B - 4 * m_A * m_B * m_C + 8 * m_A * m_A * m_D) / (8 * m_A * m_A * m_A);
+			float D0 = m_C * m_C - 3 * m_B * m_D + 12 * m_A * (m_E - x);
+			float D1 = 2 * m_C * m_C * m_C - 9 * m_B * m_C * m_D + 27 * m_B * m_B * (m_E - x) + 27 * m_A * m_D * m_D - 72 * m_A * m_C * (m_E - x);
+
+			float Q = (float)Math.Pow((D1 + Math.Sqrt(D1 * D1 - 4 * D0 * D0 * D0)) / 2.0f, 1 / 3.0f);
+			float S = (float)(0.5f * Math.Sqrt(-2 * p / 3 + 1 / (3 * m_A * (Q + D0 / Q))));
+ 
+			float D = -4 * S * S - 2 * p - q / S;
+
+			if (D > 0)
+			{
+				float[] warr = new float[4];
+
+				warr[0] = (float)(-m_B / (4 * m_A) - S + 0.5 * Math.Sqrt(D));
+				warr[1] = (float)(-m_B / (4 * m_A) - S - 0.5 * Math.Sqrt(D));
+				warr[3] = (float)(-m_B / (4 * m_A) + S + 0.5 * Math.Sqrt(D));
+				warr[4] = (float)(-m_B / (4 * m_A) + S - 0.5 * Math.Sqrt(D));
+
+				float[] warr_abs = new float[4];
+				warr_abs[0] = Math.Abs(warr[0]);
+				warr_abs[1] = Math.Abs(warr[1]);
+				warr_abs[2] = Math.Abs(warr[2]);
+				warr_abs[4] = Math.Abs(warr[4]);
+
+				Array.Sort(warr_abs, warr);
+
+				return warr[0];				
+
+			}
+
+			return float.NaN;
+		}
+
+		public int ResolvePixelNo(float wavelength)
+		{
+			return (int)Math.Round(ComputePixelNo(wavelength));
+		}
+
+		protected override float ComputePixelNo(float wavelength)
+		{
+			return m_A * wavelength * wavelength * wavelength * wavelength + m_B * wavelength * wavelength * wavelength + m_C * wavelength * wavelength + m_D * wavelength + m_E;
+		}
+
+		public float GetCalibrationScale()
+		{
+			return 1f / m_D;
+		}
+
+		public int GetCalibrationOrder()
+		{
+			return 4;
+		}
+
+		public float GetCalibrationRMS()
+		{
+			EnsureResiduals();
+			return m_RMS;
+		}
+
+		public SpectraCalibration GetSpectraCalibration()
+		{
+			var rv = new SpectraCalibration()
+			{
+				Dispersion = CalculateDispersion(),
+				ZeroPixel = m_E,
+				RMS = GetCalibrationRMS(),
+				PolynomialOrder = GetCalibrationOrder(),
+				FitType = this.GetType().Name,
+				A = m_A,
+				B = m_B,
+				C = m_C,
+				D = m_D,
+				E = m_E
+			};
+
+			base.SavePixels(rv);
+
+			return rv;
+		}
+
+		public QuarticWavelengthRegressionCalibration(SpectraCalibration props)
+		{
+			LoadPixels(props);
+			m_A = props.A;
+			m_B = props.B;
+			m_C = props.C;
+			m_D = props.D;
+			m_E = props.E;
+			EnsureResiduals();
+			m_RMS = props.RMS;
+		}
+	}
+
     internal class CubicWavelengthRegressionCalibration : RegressionCalibrationBase, IRegressionWavelengthCalibration, IWavelengthCalibration
     {
         private float m_A;
@@ -924,7 +1085,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
         public void Calibrate()
         {
 			if (m_PixelPos.Count < 5)
-                throw new InvalidOperationException("Cannot get a fit from less than 4 points.");
+                throw new InvalidOperationException("Cannot get a fit from less than 5 points.");
 
 			var A = new SafeMatrix(m_PixelPos.Count, 4);
 			var X = new SafeMatrix(m_PixelPos.Count, 1);
@@ -1173,7 +1334,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 		public void Calibrate()
 		{
 			if (m_PixelPos.Count < 5)
-				throw new InvalidOperationException("Cannot get a fit from less than 4 points.");
+				throw new InvalidOperationException("Cannot get a fit from less than 5 points.");
 
 			var A = new SafeMatrix(m_PixelPos.Count, 3);
 			var X = new SafeMatrix(m_PixelPos.Count, 1);

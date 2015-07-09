@@ -242,7 +242,7 @@
 			// 
 			this.nudPolyOrder.Location = new System.Drawing.Point(95, 6);
 			this.nudPolyOrder.Maximum = new decimal(new int[] {
-            3,
+            4,
             0,
             0,
             0});

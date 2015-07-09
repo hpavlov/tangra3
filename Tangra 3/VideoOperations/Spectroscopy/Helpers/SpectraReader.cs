@@ -234,6 +234,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 		public float B { get; set; }
 		public float C { get; set; }
 		public float D { get; set; }
+		public float E { get; set; }
 		public int PolynomialOrder { get; set; }
 		public float RMS { get; set; }
 		public string FitType { get; set; }
@@ -287,6 +288,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 			B = reader.ReadSingle();
 			C = reader.ReadSingle();
 			D = reader.ReadSingle();
+			E = reader.ReadSingle();
 			RMS = reader.ReadSingle();
 			FitType = reader.ReadString();
 		}
@@ -318,6 +320,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 			writer.Write(B);
 			writer.Write(C);
 			writer.Write(D);
+			writer.Write(E);
 			writer.Write(RMS);
 			writer.Write(FitType);
 		}
