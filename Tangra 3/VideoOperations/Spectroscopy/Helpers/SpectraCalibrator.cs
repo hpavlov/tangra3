@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Tangra.Model.Config;
+using Tangra.Model.Helpers;
 using Tangra.Model.Numerical;
 
 namespace Tangra.VideoOperations.Spectroscopy.Helpers
@@ -135,7 +136,6 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 					CalibrateWithRegression<QuarticWavelengthRegressionCalibration>();
 				}
 			}
-
             else
                 MessageBox.Show("Calibration of this order hasn't been implemented yet");
         }
@@ -148,11 +148,20 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 				if (!float.IsNaN(m_PixelPos[i]))
 					calibration.AddDataPoint(m_PixelPos[i], m_Wavelengths[i]);
             }
-            calibration.Calibrate();
 
-            m_WavelengthCalibration = calibration;
+	        try
+	        {
+				calibration.Calibrate();
+	        }
+	        catch (Exception ex)
+	        {
+		        Trace.WriteLine(ex.GetFullStackTrace());
+				MessageBox.Show("Calibration failed. Try a lower order polynomial.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+		        return;
+	        }
+
+			m_WavelengthCalibration = calibration;
         }
-		
 
         public bool IsCalibrated()
         {

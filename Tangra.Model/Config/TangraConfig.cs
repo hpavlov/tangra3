@@ -1153,6 +1153,7 @@ namespace Tangra.Model.Config
 			public Color GridLinesColor;
 			public Color KnownLineColor;
 			public Color SpectraApertureColor;
+			public Color PlotBackgroundColor;
 
 			public Font LabelsFont = new Font(FontFamily.GenericMonospace, 9);
 			public Font LegendFont = new Font(FontFamily.GenericSansSerif, 8, FontStyle.Bold);
@@ -1176,6 +1177,7 @@ namespace Tangra.Model.Config
 				GridLinesColor = TangraConfig.Settings.Spectroscopy.Colors.GridLinesColor;
 				KnownLineColor = TangraConfig.Settings.Spectroscopy.Colors.KnownLineColor;
 				SpectraApertureColor = TangraConfig.Settings.Spectroscopy.Colors.SpectraApertureColor;
+				PlotBackgroundColor = TangraConfig.Settings.Spectroscopy.Colors.PlotBackgroundColor;
 			}
 
 			public void Save()
@@ -1185,6 +1187,7 @@ namespace Tangra.Model.Config
 				TangraConfig.Settings.Spectroscopy.Colors.GridLinesColor = GridLinesColor;
 				TangraConfig.Settings.Spectroscopy.Colors.KnownLineColor = KnownLineColor;
 				TangraConfig.Settings.Spectroscopy.Colors.SpectraApertureColor = SpectraApertureColor;
+				TangraConfig.Settings.Spectroscopy.Colors.PlotBackgroundColor = PlotBackgroundColor; 
 
 				TangraConfig.Settings.Save();
 			}
@@ -1316,11 +1319,25 @@ namespace Tangra.Model.Config
 					}
 				}
 
+				[XmlIgnore]
+				public Color PlotBackgroundColor
+				{
+					get
+					{
+						return System.Drawing.Color.FromArgb(PlotBackgroundColorRGB);
+					}
+					set
+					{
+						PlotBackgroundColorRGB = value.ToArgb();
+					}
+				}
+
 				public int SpectraLineRGB = System.Drawing.Color.Aqua.ToArgb();
 				public int LegendColorRGB = System.Drawing.Color.White.ToArgb();
 				public int GridLinesColorRGB = System.Drawing.Color.FromArgb(180, 180, 180).ToArgb();
 				public int KnownLineColorRGB = System.Drawing.Color.Blue.ToArgb();
 				public int SpectraApertureColorRGB = System.Drawing.Color.Red.ToArgb();
+				public int PlotBackgroundColorRGB = SystemColors.ControlDark.ToArgb();
 			}
 
 			public SpectroscopyInstrument Instrument;

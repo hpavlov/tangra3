@@ -131,7 +131,7 @@ namespace Tangra.VideoOperations.Spectroscopy.ViewSpectraStates
 			using (Graphics g = Graphics.FromImage(picSpectra.Image))
 			using (Graphics g2 = Graphics.FromImage(picSpectraGraph.Image))
 			{
-                g2.Clear(SystemColors.ControlDark);
+                g2.Clear(displaySettings.PlotBackgroundColor);
 
 				if (m_CurrentState != null)
 					m_CurrentState.PreDraw(g2);

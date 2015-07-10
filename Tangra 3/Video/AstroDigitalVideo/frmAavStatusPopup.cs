@@ -84,13 +84,17 @@ namespace Tangra.Video.AstroDigitalVideo
                 else if (m_FrameState.NumberStackedFrames.HasValue && m_FrameState.NumberStackedFrames.Value > 0)
                 {
                     string timestamp = string.Format("Exposure Duration: x{0} stack", m_FrameState.NumberStackedFrames.Value.ToString("0"));
-                    if (m_FrameState.HasValidNtpTimeStamp && m_FrameState.ExposureInMilliseconds > 0) timestamp += string.Format(" (NTP: {0} ms)", m_FrameState.ExposureInMilliseconds.ToString("0"));
+                    if (m_FrameState.ExposureInMilliseconds > 0) 
+						timestamp += string.Format(" ({0} ms)", m_FrameState.ExposureInMilliseconds.ToString("0"));
+
                     statusText.AppendLine(timestamp);
                 }
                 else if (m_FrameState.NumberIntegratedFrames.HasValue && m_FrameState.NumberIntegratedFrames.Value > 0)
                 {
                     string timestamp = string.Format("Exposure Duration: x{0} integration", m_FrameState.NumberIntegratedFrames.Value.ToString("0"));
-                    if (m_FrameState.HasValidNtpTimeStamp && m_FrameState.ExposureInMilliseconds > 0) timestamp += string.Format(" (NTP: {0} ms)", m_FrameState.ExposureInMilliseconds.ToString("0"));
+					if (m_FrameState.ExposureInMilliseconds > 0)
+						timestamp += string.Format(" ({0} ms)", m_FrameState.ExposureInMilliseconds.ToString("0"));
+
                     statusText.AppendLine(timestamp);
                 }
                 else

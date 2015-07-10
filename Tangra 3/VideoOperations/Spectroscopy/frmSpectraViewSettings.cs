@@ -34,6 +34,8 @@ namespace Tangra.VideoOperations.Spectroscopy
 				ucColorPickerKnownLine.SelectedColor = m_DisplaySettings.KnownLineColor;
 				ucColorPickerGridLines.SelectedColor = m_DisplaySettings.GridLinesColor;
 				ucColorPickerGridLegend.SelectedColor = m_DisplaySettings.LegendColor;
+				ucColorPickerAperture.SelectedColor = m_DisplaySettings.SpectraApertureColor;
+				ucColorPickerBackground.SelectedColor = m_DisplaySettings.PlotBackgroundColor;
 			}
 			finally
 			{
@@ -57,6 +59,8 @@ namespace Tangra.VideoOperations.Spectroscopy
 			m_DisplaySettings.KnownLineColor = ucColorPickerKnownLine.SelectedColor;
 			m_DisplaySettings.GridLinesColor = ucColorPickerGridLines.SelectedColor;
 			m_DisplaySettings.LegendColor = ucColorPickerGridLegend.SelectedColor;
+			m_DisplaySettings.SpectraApertureColor = ucColorPickerAperture.SelectedColor;
+			m_DisplaySettings.PlotBackgroundColor = ucColorPickerBackground.SelectedColor;
 
 			m_DisplaySettings.Initialize(); 
 		}
@@ -75,6 +79,8 @@ namespace Tangra.VideoOperations.Spectroscopy
 			m_DisplaySettings.KnownLineColor = ucColorPickerKnownLine.SelectedColor;
 			m_DisplaySettings.GridLinesColor = ucColorPickerGridLines.SelectedColor;
 			m_DisplaySettings.LegendColor = ucColorPickerGridLegend.SelectedColor;
+			m_DisplaySettings.SpectraApertureColor = ucColorPickerAperture.SelectedColor;
+			m_DisplaySettings.PlotBackgroundColor = ucColorPickerBackground.SelectedColor;
 
 			if (!m_DontApplySettingsBack)
 				Preview();

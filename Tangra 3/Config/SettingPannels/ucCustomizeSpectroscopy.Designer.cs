@@ -29,6 +29,10 @@
 		private void InitializeComponent()
 		{
 			this.groupBox6 = new System.Windows.Forms.GroupBox();
+			this.label5 = new System.Windows.Forms.Label();
+			this.ucColorPickerBackground = new Tangra.Controls.ucColorPicker();
+			this.label4 = new System.Windows.Forms.Label();
+			this.ucColorPickerAperture = new Tangra.Controls.ucColorPicker();
 			this.label3 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
 			this.ucColorPickerGridLegend = new Tangra.Controls.ucColorPicker();
@@ -37,13 +41,13 @@
 			this.ucColorPickerKnownLine = new Tangra.Controls.ucColorPicker();
 			this.label39 = new System.Windows.Forms.Label();
 			this.ucColorPickerReferenceStar = new Tangra.Controls.ucColorPicker();
-			this.label4 = new System.Windows.Forms.Label();
-			this.ucColorPickerAperture = new Tangra.Controls.ucColorPicker();
 			this.groupBox6.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// groupBox6
 			// 
+			this.groupBox6.Controls.Add(this.label5);
+			this.groupBox6.Controls.Add(this.ucColorPickerBackground);
 			this.groupBox6.Controls.Add(this.label4);
 			this.groupBox6.Controls.Add(this.ucColorPickerAperture);
 			this.groupBox6.Controls.Add(this.label3);
@@ -56,15 +60,56 @@
 			this.groupBox6.Controls.Add(this.ucColorPickerReferenceStar);
 			this.groupBox6.Location = new System.Drawing.Point(3, 3);
 			this.groupBox6.Name = "groupBox6";
-			this.groupBox6.Size = new System.Drawing.Size(215, 205);
+			this.groupBox6.Size = new System.Drawing.Size(218, 233);
 			this.groupBox6.TabIndex = 28;
 			this.groupBox6.TabStop = false;
 			this.groupBox6.Text = "Colours - Spectroscopy";
 			// 
+			// label5
+			// 
+			this.label5.AutoSize = true;
+			this.label5.Location = new System.Drawing.Point(68, 29);
+			this.label5.Name = "label5";
+			this.label5.Size = new System.Drawing.Size(87, 13);
+			this.label5.TabIndex = 11;
+			this.label5.Text = "Grid Background";
+			// 
+			// ucColorPickerBackground
+			// 
+			this.ucColorPickerBackground.AutoSize = true;
+			this.ucColorPickerBackground.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.ucColorPickerBackground.BackColor = System.Drawing.SystemColors.Control;
+			this.ucColorPickerBackground.Location = new System.Drawing.Point(6, 22);
+			this.ucColorPickerBackground.Name = "ucColorPickerBackground";
+			this.ucColorPickerBackground.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
+			this.ucColorPickerBackground.Size = new System.Drawing.Size(60, 26);
+			this.ucColorPickerBackground.TabIndex = 10;
+			this.ucColorPickerBackground.SelectedColorChanged += new System.EventHandler(this.SelectedColorChanged);
+			// 
+			// label4
+			// 
+			this.label4.AutoSize = true;
+			this.label4.Location = new System.Drawing.Point(68, 125);
+			this.label4.Name = "label4";
+			this.label4.Size = new System.Drawing.Size(87, 13);
+			this.label4.TabIndex = 9;
+			this.label4.Text = "Spectra Aperture";
+			// 
+			// ucColorPickerAperture
+			// 
+			this.ucColorPickerAperture.AutoSize = true;
+			this.ucColorPickerAperture.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.ucColorPickerAperture.BackColor = System.Drawing.SystemColors.Control;
+			this.ucColorPickerAperture.Location = new System.Drawing.Point(6, 117);
+			this.ucColorPickerAperture.Name = "ucColorPickerAperture";
+			this.ucColorPickerAperture.SelectedColor = System.Drawing.Color.Red;
+			this.ucColorPickerAperture.Size = new System.Drawing.Size(60, 26);
+			this.ucColorPickerAperture.TabIndex = 8;
+			// 
 			// label3
 			// 
 			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(71, 166);
+			this.label3.Location = new System.Drawing.Point(68, 187);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(65, 13);
 			this.label3.TabIndex = 7;
@@ -73,7 +118,7 @@
 			// label2
 			// 
 			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(71, 135);
+			this.label2.Location = new System.Drawing.Point(68, 156);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(54, 13);
 			this.label2.TabIndex = 6;
@@ -84,7 +129,7 @@
 			this.ucColorPickerGridLegend.AutoSize = true;
 			this.ucColorPickerGridLegend.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.ucColorPickerGridLegend.BackColor = System.Drawing.SystemColors.Control;
-			this.ucColorPickerGridLegend.Location = new System.Drawing.Point(9, 160);
+			this.ucColorPickerGridLegend.Location = new System.Drawing.Point(6, 181);
 			this.ucColorPickerGridLegend.Name = "ucColorPickerGridLegend";
 			this.ucColorPickerGridLegend.SelectedColor = System.Drawing.Color.White;
 			this.ucColorPickerGridLegend.Size = new System.Drawing.Size(60, 26);
@@ -94,7 +139,7 @@
 			// label1
 			// 
 			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(71, 72);
+			this.label1.Location = new System.Drawing.Point(68, 93);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(103, 13);
 			this.label1.TabIndex = 4;
@@ -105,7 +150,7 @@
 			this.ucColorPickerGridLines.AutoSize = true;
 			this.ucColorPickerGridLines.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.ucColorPickerGridLines.BackColor = System.Drawing.SystemColors.Control;
-			this.ucColorPickerGridLines.Location = new System.Drawing.Point(9, 128);
+			this.ucColorPickerGridLines.Location = new System.Drawing.Point(6, 149);
 			this.ucColorPickerGridLines.Name = "ucColorPickerGridLines";
 			this.ucColorPickerGridLines.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
 			this.ucColorPickerGridLines.Size = new System.Drawing.Size(60, 26);
@@ -117,7 +162,7 @@
 			this.ucColorPickerKnownLine.AutoSize = true;
 			this.ucColorPickerKnownLine.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.ucColorPickerKnownLine.BackColor = System.Drawing.SystemColors.Control;
-			this.ucColorPickerKnownLine.Location = new System.Drawing.Point(9, 65);
+			this.ucColorPickerKnownLine.Location = new System.Drawing.Point(6, 86);
 			this.ucColorPickerKnownLine.Name = "ucColorPickerKnownLine";
 			this.ucColorPickerKnownLine.SelectedColor = System.Drawing.Color.Blue;
 			this.ucColorPickerKnownLine.Size = new System.Drawing.Size(60, 26);
@@ -127,7 +172,7 @@
 			// label39
 			// 
 			this.label39.AutoSize = true;
-			this.label39.Location = new System.Drawing.Point(71, 39);
+			this.label39.Location = new System.Drawing.Point(68, 60);
 			this.label39.Name = "label39";
 			this.label39.Size = new System.Drawing.Size(65, 13);
 			this.label39.TabIndex = 1;
@@ -138,32 +183,12 @@
 			this.ucColorPickerReferenceStar.AutoSize = true;
 			this.ucColorPickerReferenceStar.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.ucColorPickerReferenceStar.BackColor = System.Drawing.SystemColors.Control;
-			this.ucColorPickerReferenceStar.Location = new System.Drawing.Point(9, 33);
+			this.ucColorPickerReferenceStar.Location = new System.Drawing.Point(6, 54);
 			this.ucColorPickerReferenceStar.Name = "ucColorPickerReferenceStar";
 			this.ucColorPickerReferenceStar.SelectedColor = System.Drawing.Color.Aqua;
 			this.ucColorPickerReferenceStar.Size = new System.Drawing.Size(60, 26);
 			this.ucColorPickerReferenceStar.TabIndex = 0;
 			this.ucColorPickerReferenceStar.SelectedColorChanged += new System.EventHandler(this.SelectedColorChanged);
-			// 
-			// label4
-			// 
-			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(71, 104);
-			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(87, 13);
-			this.label4.TabIndex = 9;
-			this.label4.Text = "Spectra Aperture";
-			// 
-			// ucColorPickerAperture
-			// 
-			this.ucColorPickerAperture.AutoSize = true;
-			this.ucColorPickerAperture.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.ucColorPickerAperture.BackColor = System.Drawing.SystemColors.Control;
-			this.ucColorPickerAperture.Location = new System.Drawing.Point(9, 96);
-			this.ucColorPickerAperture.Name = "ucColorPickerAperture";
-			this.ucColorPickerAperture.SelectedColor = System.Drawing.Color.Red;
-			this.ucColorPickerAperture.Size = new System.Drawing.Size(60, 26);
-			this.ucColorPickerAperture.TabIndex = 8;
 			// 
 			// ucCustomizeSpectroscopy
 			// 
@@ -191,5 +216,7 @@
 		private Controls.ucColorPicker ucColorPickerGridLegend;
 		private System.Windows.Forms.Label label4;
 		private Controls.ucColorPicker ucColorPickerAperture;
+		private System.Windows.Forms.Label label5;
+		private Controls.ucColorPicker ucColorPickerBackground;
 	}
 }

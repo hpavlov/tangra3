@@ -460,8 +460,10 @@ namespace Tangra.Video
 				if (m_UseNtpTimeAsCentralExposureTime)
 				{
 					rv.CentralExposureTime = ComputeCentralExposureTimeFromNtpTime(frameNo, m_CurrentFrameInfo.EndExposureNtpTimeStamp);
-					rv.ExposureInMilliseconds = (float)(1000 / m_FrameRate);
 				}
+
+				if (m_FrameRate > 0)
+					rv.ExposureInMilliseconds = (float)(1000 / m_FrameRate);
 
 				if (m_UsesNtpTimestamps && !OcrDataAvailable && m_UseNtpTimeAsCentralExposureTime)
 					AddExtraNtpDebugTimes(ref rv, m_CurrentFrameInfo);
@@ -521,8 +523,10 @@ namespace Tangra.Video
 				if (m_UseNtpTimeAsCentralExposureTime)
 				{
 					rv.CentralExposureTime = ComputeCentralExposureTimeFromNtpTime(frameIndex, frameInfo.EndExposureNtpTimeStamp);
-					rv.ExposureInMilliseconds = (float)(1000 / m_FrameRate);
 				}
+
+				if (m_FrameRate > 0)
+					rv.ExposureInMilliseconds = (float)(1000 / m_FrameRate);
 
 				if (m_UsesNtpTimestamps && !OcrDataAvailable && m_UseNtpTimeAsCentralExposureTime)
 					AddExtraNtpDebugTimes(ref rv, frameInfo);

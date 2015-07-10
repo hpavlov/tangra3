@@ -46,6 +46,7 @@ namespace Tangra.Config.SettingPannels
 				ucColorPickerGridLines.SelectedColor = m_DisplaySettings.GridLinesColor;
 				ucColorPickerGridLegend.SelectedColor = m_DisplaySettings.LegendColor;
 				ucColorPickerAperture.SelectedColor = m_DisplaySettings.SpectraApertureColor;
+				ucColorPickerBackground.SelectedColor = m_DisplaySettings.PlotBackgroundColor;
 			}
 			finally
 			{
@@ -69,6 +70,7 @@ namespace Tangra.Config.SettingPannels
 			m_DisplaySettings.GridLinesColor = ucColorPickerGridLines.SelectedColor;
 			m_DisplaySettings.LegendColor = ucColorPickerGridLegend.SelectedColor;
 			m_DisplaySettings.SpectraApertureColor = ucColorPickerAperture.SelectedColor;
+			m_DisplaySettings.PlotBackgroundColor = ucColorPickerBackground.SelectedColor;
 
 			m_DisplaySettings.Initialize(); 
 		}

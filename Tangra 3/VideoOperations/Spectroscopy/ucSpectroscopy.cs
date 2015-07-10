@@ -68,7 +68,7 @@ namespace Tangra.VideoOperations.Spectroscopy
 			{
 				foreach (SpectraPoint point in spectra.Points)
 				{
-					byte clr = (byte)(Math.Min(255, Math.Round(point.RawValue * colorCoeff)));
+					byte clr = (byte)(Math.Min(255, Math.Max(0, Math.Round(point.RawValue * colorCoeff))));
 					float x = xCoeff * (point.PixelNo - xOffset);
                     if (x >= 0)
                     {
