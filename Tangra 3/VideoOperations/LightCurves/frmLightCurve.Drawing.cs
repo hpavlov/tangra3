@@ -629,7 +629,7 @@ namespace Tangra.VideoOperations.LightCurves
                     {
                         DateTime? frame2 = m_Header.GetFrameTime(i + 1);
 
-                        if (frame1.HasValue && frame2.HasValue)
+                        if (frame1.HasValue && frame2.HasValue && frame1.Value != DateTime.MinValue && frame2.Value != DateTime.MinValue)
                         {
                             if (((int)(new TimeSpan(frame2.Value.Ticks - frame2.Value.Date.Ticks).TotalSeconds / interval) >
                                 (int)(new TimeSpan(frame1.Value.Ticks - frame1.Value.Date.Ticks).TotalSeconds / interval)) ||
@@ -765,7 +765,7 @@ namespace Tangra.VideoOperations.LightCurves
                     {
                         DateTime? frame2 = m_LCFile.Header.GetFrameTime(i + 1);
 
-                        if (frame1.HasValue && frame2.HasValue)
+                        if (frame1.HasValue && frame2.HasValue && frame1.Value != DateTime.MinValue && frame2.Value != DateTime.MinValue)
                         {
                             if (((int)(new TimeSpan(frame2.Value.Ticks - frame2.Value.Date.Ticks).TotalSeconds/interval) >
                                 (int)(new TimeSpan(frame1.Value.Ticks - frame1.Value.Date.Ticks).TotalSeconds/interval)) ||

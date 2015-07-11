@@ -147,7 +147,9 @@ namespace Tangra.Controller
                     else
                     {
                         // NOTE: No video file found, just show the saved averaged frame
+                        bool oldCanProcessLightCurvePixels = TangraContext.Current.CanProcessLightCurvePixels;
                         TangraContext.Current.Reset();
+                        TangraContext.Current.CanProcessLightCurvePixels = oldCanProcessLightCurvePixels;
 
                         if (lcFile.Footer.AveragedFrameBytes != null)
                         {
