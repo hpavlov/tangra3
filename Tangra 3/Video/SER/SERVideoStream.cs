@@ -89,9 +89,9 @@ namespace Tangra.Video.SER
 				m_FileInfo.SequenceStartTimeHi != 0 && 
 				m_FileInfo.SequenceStartTimeHi >> 0x1F == 0;
 
-			// There is a lot of details about deriving UTC mid-frame timestamps from the embedded timestamps in a SER file
-			// At this point this hasn't been done. If it is requested then it can be implemented
-			HasUTCTimeStamps = false;
+            HasUTCTimeStamps =
+                m_FileInfo.SequenceStartTimeUTCHi != 0 &&
+                m_FileInfo.SequenceStartTimeUTCHi >> 0x1F == 0;
 		}
 
 		public string Observer { get; private set; }
@@ -180,7 +180,8 @@ namespace Tangra.Video.SER
 			    rv.UnprocessedPixels = unprocessedPixels;
 				rv.FrameState = new FrameStateData()
 				{
-					SystemTime = m_CurrentFrameInfo.TimeStamp
+					SystemTime = m_CurrentFrameInfo.TimeStamp,
+                    CentralExposureTime = m_CurrentFrameInfo.TimeStampUtc
 				};
 
 				return rv;

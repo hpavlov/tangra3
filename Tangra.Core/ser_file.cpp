@@ -145,9 +145,15 @@ HRESULT SerFile::GetFrame(long frameNo, unsigned long* pixels, unsigned int came
 				fread(&frameInfo->TimeStamp64, 8, 1, m_File);
 				frameInfo->TimeStampLo = frameInfo->TimeStamp64 & 0xFFFFFFFF;
 				frameInfo->TimeStampHi = frameInfo->TimeStamp64 >> 32;
+				
+				fread(&frameInfo->TimeStampUtc64, 8, 1, m_File);
+				frameInfo->TimeStampUtcLo = frameInfo->TimeStamp64 & 0xFFFFFFFF;
+				frameInfo->TimeStampUtcHi = frameInfo->TimeStamp64 >> 32;
 			} else {
 				frameInfo->TimeStampLo = 0;
 				frameInfo->TimeStampHi = 0;
+				frameInfo->TimeStampUtcLo = 0;
+				frameInfo->TimeStampUtcHi = 0;				
 			}
 		}
 

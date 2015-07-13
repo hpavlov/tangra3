@@ -288,11 +288,14 @@ namespace Tangra.PInvoke
 	{
 		public int TimeStampLo;
 		public int TimeStampHi;
+        public int TimeStampUtcLo;
+        public int TimeStampUtcHi;
 	};
 
 	public class SerFrameInfo
 	{
 		public DateTime TimeStamp { get; private set; }
+        public DateTime TimeStampUtc { get; private set; }
 
 		internal SerFrameInfo(SerNativeFrameInfo nativeInfo)
 		{
@@ -304,6 +307,16 @@ namespace Tangra.PInvoke
             {
                 Trace.WriteLine(aex);
                 TimeStamp = DateTime.MinValue;
+            }
+
+            try
+            {
+                TimeStampUtc = new DateTime((long)nativeInfo.TimeStampLo + ((long)nativeInfo.TimeStampHi << 32));
+            }
+            catch (ArgumentOutOfRangeException aex)
+            {
+                Trace.WriteLine(aex);
+                TimeStampUtc = DateTime.MinValue;
             }
 		}
 	}

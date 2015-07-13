@@ -35,6 +35,10 @@ namespace Tangra.Video.SER
 
 			cbxBitPix.Items.Clear();
 
+            bool hasEmbeddedTimeStamps =
+                info.SequenceStartTimeUTCHi != 0 &&
+                info.SequenceStartTimeUTCHi >> 0x1F == 0;
+
 			if (info.PixelDepthPerPlane == 8)
 			{
 				cbxBitPix.Items.Add("8");
@@ -55,6 +59,7 @@ namespace Tangra.Video.SER
 			}
 
 			nudFrameRate.SetNUDValue(TangraConfig.Settings.LastUsed.SerFileLastFrameRate);
+		    pnlFrameRate.Visible = !hasEmbeddedTimeStamps;
 		}
 
 		private void btnOK_Click(object sender, EventArgs e)

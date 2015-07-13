@@ -48,8 +48,11 @@ namespace SerLib
 	{
 		long TimeStampLo;
 		long TimeStampHi;
+		long TimeStampUtcLo;
+		long TimeStampUtcHi;		
 		// NOTE: This is not marshalled back to the .NET structure
 		unsigned __int64 TimeStamp64;
+		unsigned __int64 TimeStampUtc64;
 	};
 	
 	class SerFile {
