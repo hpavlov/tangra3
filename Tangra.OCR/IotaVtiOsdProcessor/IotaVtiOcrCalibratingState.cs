@@ -245,16 +245,16 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 				stateManager.BlockOffsetYEven = m_CalibratedPositons.Where(x => !x.IsOddField).MostCommonValue(x => x.BlockOffsetY);
 
 				var normalizedPositions = new List<CalibratedBlockPosition>();
-
-				if (CalibrateFrameNumberBlockPositions(stateManager, stateManager.IsTvSafeModeGuess, out normalizedPositions) &&
-					RecognizedTimestampsConsistent(stateManager, normalizedPositions))
+				bool swapped;
+				if (CalibrateFrameNumberBlockPositions(stateManager, stateManager.IsTvSafeModeGuess, out normalizedPositions, out swapped) &&
+					RecognizedTimestampsConsistent(stateManager, normalizedPositions, swapped))
 				{
 					stateManager.ChangeState<IotaVtiOcrCalibratedState>();
 					stateManager.Process(stateManager.CurrentImage, stateManager.CurrentImageWidth, stateManager.CurrentImageHeight, graphics, frameNo, isOddField);
 					return;
 				}
-				else if (CalibrateFrameNumberBlockPositions(stateManager, !stateManager.IsTvSafeModeGuess, out normalizedPositions) &&
-					RecognizedTimestampsConsistent(stateManager, normalizedPositions))
+				else if (CalibrateFrameNumberBlockPositions(stateManager, !stateManager.IsTvSafeModeGuess, out normalizedPositions, out swapped) &&
+					RecognizedTimestampsConsistent(stateManager, normalizedPositions, swapped))
 				{
 					stateManager.ChangeState<IotaVtiOcrCalibratedState>();
 					stateManager.Process(stateManager.CurrentImage, stateManager.CurrentImageWidth, stateManager.CurrentImageHeight, graphics, frameNo, isOddField);
@@ -317,7 +317,7 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 			return bestStartPosition;
 		}
 
-		private bool CalibrateFrameNumberBlockPositions(IotaVtiOcrProcessor stateManager, bool tvSafeMode, out List<CalibratedBlockPosition> normalizedPositions)
+		private bool CalibrateFrameNumberBlockPositions(IotaVtiOcrProcessor stateManager, bool tvSafeMode, out List<CalibratedBlockPosition> normalizedPositions, out bool swapped)
 		{
 			try
 			{
@@ -333,7 +333,7 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 					foreach (CalibratedBlockPosition blockPosition in m_CalibratedPositons)
 						blockPosition.PrepareLastTwoDigitsFromTheFrameNumber(stateManager, last, secondLast);
 
-					if (DigitPatternsRecognized(stateManager, out normalizedPositions))
+					if (DigitPatternsRecognized(stateManager, out normalizedPositions, out swapped))
 					{
 						stateManager.LastBlockOffsetsX = last;
 						stateManager.SecondLastBlockOffsetsX = secondLast;
@@ -349,6 +349,7 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 			}
 
 			normalizedPositions = new List<CalibratedBlockPosition>();
+			swapped = false;
 			return false;
 		}
 
@@ -494,7 +495,7 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 			}
 		}
 
-		private bool DigitPatternsRecognized(IotaVtiOcrProcessor stateManager, out List<CalibratedBlockPosition> normalizedPositions)
+		private bool DigitPatternsRecognized(IotaVtiOcrProcessor stateManager, out List<CalibratedBlockPosition> normalizedPositions, out bool swapped)
 		{
 			normalizedPositions = new List<CalibratedBlockPosition>();
 			Trace.Assert(m_CalibratedPositons.Count == 10);
@@ -513,7 +514,7 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 			int forwardChangeIndex = forwardDiffs.FindIndex(x => x == 1);
 			int backwardChangeIndex = backwardDiffs.FindIndex(x => x == 0);
 
-			bool swapped = false;
+			swapped = false;
 			bool isMatch = forwardChangeIndex == backwardChangeIndex &&
 						   forwardDiffs.FindIndex(forwardChangeIndex, x => x == 0) == -1 &&
 						   backwardDiffs.FindIndex(backwardChangeIndex, x => x == 1) == -1;
@@ -683,7 +684,7 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 			stateManager.ThreeEightXorPatternFactor = numDifferentPixels;
 		}
 
-		private bool RecognizedTimestampsConsistent(IotaVtiOcrProcessor stateManager, List<CalibratedBlockPosition> normalizedPositions)
+		private bool RecognizedTimestampsConsistent(IotaVtiOcrProcessor stateManager, List<CalibratedBlockPosition> normalizedPositions, bool swapped)
 		{
 			var allTimeStamps = new List<IotaVtiTimeStamp>();
 			int index = 0;
@@ -747,7 +748,7 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 			else
 				stateManager.VideoFormat = null;
 
-		    stateManager.EvenBeforeOdd = fieldDurationMS > 0;
+			stateManager.EvenBeforeOdd = swapped;
 
 			return true;
 		}
