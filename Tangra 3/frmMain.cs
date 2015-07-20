@@ -40,6 +40,7 @@ using Tangra.VideoOperations.Astrometry.Engine;
 using Tangra.VideoOperations.LightCurves;
 using Tangra.VideoOperations.MakeDarkFlatField;
 using Tangra.VideoOperations.Spectroscopy;
+using Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration;
 using Tangra.VideoTools;
 using Tangra.View;
 using nom.tam.fits;
@@ -1293,6 +1294,12 @@ namespace Tangra
 		private void miOpenSpectra_Click(object sender, EventArgs e)
 		{
 			m_SpectroscopyController.LoadSpectraFile();
+		}
+
+		private void miAbsoluteFlux_Click(object sender, EventArgs e)
+		{
+			var frmAbsFlux = new frmAbsFlux();
+			frmAbsFlux.ShowDialog(this);
 		}
 	}
 }

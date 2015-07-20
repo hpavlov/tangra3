@@ -14,6 +14,7 @@ using Tangra.Helpers;
 [assembly: AssemblyTitle("Tangra 3")]
 [assembly: AssemblyDescription(
 	"Tangra 3 - software package for astronomical video data reduction is maintained by Hristo Pavlov.\r\n\r\n" + 
+	"Project contributors: Hristo Pavlov, Anthony Mallamma\r\n\r\n" +
 	"Tangra 3 uses a number of open source and/or free components which may have their respective copyright owners.\r\n\r\n" +
 	"CCharpFITS is a C# port of Tom McGlynn's nom.tam.fits Java package, initially ported by  Samuel Carliles. " +
     "nom.tam.fits is Copyright by Thomas McGlynn 1997-2007; " +
@@ -21,7 +22,7 @@ using Tangra.Helpers;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Hristo Pavlov")]
 [assembly: AssemblyProduct("Tangra")]
-[assembly: AssemblyCopyright("Tangra is developed in 2012-2015 by Hristo Pavlov")]
+[assembly: AssemblyCopyright("Tangra is developed in 2012-2015 by Hristo Pavlov and other contributors")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

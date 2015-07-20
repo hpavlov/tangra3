@@ -333,6 +333,13 @@
       <DependentUpon>frmLongRunningOperation.cs</DependentUpon>
     </Compile>
     <Compile Include="Helpers\LongOperationsManager.cs" />
+    <Compile Include="VideoOperations\Spectroscopy\AbsFluxCalibration\frmAbsFlux.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\AbsFluxCalibration\frmAbsFlux.Designer.cs">
+      <DependentUpon>frmAbsFlux.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\AbsFluxCalibration\SpectraFileUIWrapper.cs" />
     <Compile Include="VideoOperations\Spectroscopy\frmChooseConfiguration.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -1051,6 +1058,9 @@
     <EmbeddedResource Include="VideoOperations\LightCurves\ucCorrSelection.resx">
       <DependentUpon>ucCorrSelection.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Spectroscopy\AbsFluxCalibration\frmAbsFlux.resx">
+      <DependentUpon>frmAbsFlux.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\Spectroscopy\frmChooseConfiguration.resx">
       <DependentUpon>frmChooseConfiguration.cs</DependentUpon>
     </EmbeddedResource>
@@ -1206,6 +1216,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <None Include="Service References\TangraService\ErrorReports1.wsdl" />
+    <None Include="VideoOperations\Spectroscopy\AbsFluxCalibration\ReferenceCode\AbsFlux.f90" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

@@ -724,6 +724,22 @@ namespace Tangra.Controller
             }
         }
 
+		internal string ExportToDat(MasterSpectra spectra)
+	    {
+			SpectraCalibrator calibrator = GetSpectraCalibrator();
+			var bld = new StringBuilder();
+
+			AddDatExportHeader(bld, spectra);
+
+			foreach (SpectraPoint point in spectra.Points)
+			{
+				float wavelength = calibrator.ResolveWavelength(point.PixelNo);
+				if (wavelength < 0) continue;
+				bld.AppendFormat("{0}\t{1}\r\n", wavelength, point.RawValue);
+			}
+
+			return bld.ToString();
+	    }
 
         internal void AddDatExportHeader(StringBuilder output, MasterSpectra spectra)
         {

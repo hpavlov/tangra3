@@ -204,19 +204,9 @@ namespace Tangra.VideoOperations.Spectroscopy
 
             if (exportFileDialog.ShowDialog(this) == DialogResult.OK)
             {
-                SpectraCalibrator calibrator = m_SpectroscopyController.GetSpectraCalibrator();
-                var bld = new StringBuilder();
+				string exportedString = m_SpectroscopyController.ExportToDat(m_Spectra);
 
-                m_SpectroscopyController.AddDatExportHeader(bld, m_Spectra);
-
-                foreach (SpectraPoint point in m_Spectra.Points)
-                {
-                    float wavelength = calibrator.ResolveWavelength(point.PixelNo);
-                    if (wavelength < 0) continue;
-                    bld.AppendFormat("{0}\t{1}\r\n", wavelength, point.RawValue);
-                }
-
-                File.WriteAllText(exportFileDialog.FileName, bld.ToString());
+				File.WriteAllText(exportFileDialog.FileName, exportedString);
             }
 		}
 
