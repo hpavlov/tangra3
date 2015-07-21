@@ -50,7 +50,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			if (openFileDialog.ShowDialog(this) == DialogResult.OK)
 			{
 				string fileExt = Path.GetExtension(openFileDialog.FileName);
-				if (!SpectraFileUIWrapper.IsFileTypeSupported(fileExt))
+				if (!ExportedSpectraUIWrapper.IsFileTypeSupported(fileExt))
 				{
 					MessageBox.Show(
 						string.Format("{0} files are not supported.", fileExt), 
@@ -65,13 +65,13 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 				{
 					int addedFiles = 0;
 
-					string[] files1 = Directory.GetFiles(filePath, "*.spectra");
+					string[] files1 = Directory.GetFiles(filePath, "*.dat");
 
 					lbAvailableFiles.Tag = filePath;
 					lbAvailableFiles.Items.Clear();
 					foreach (string fileName in files1)
 					{
-						var wrapper = new SpectraFileUIWrapper(fileName);
+						var wrapper = new ExportedSpectraUIWrapper(fileName);
 						if (wrapper.ContainsWavelengthData)
 						{
 							lbAvailableFiles.Items.Add(wrapper);
@@ -79,12 +79,12 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 						}
 					}
 
-					if (fileExt != null && !".spectra".Equals(fileExt, StringComparison.InvariantCultureIgnoreCase))
+					if (fileExt != null && !".dat".Equals(fileExt, StringComparison.InvariantCultureIgnoreCase))
 					{
 						files1 = Directory.GetFiles(filePath, string.Format("*.{0}", fileExt.TrimStart('.')));
 						foreach (string fileName in files1)
 						{
-							var wrapper = new SpectraFileUIWrapper(fileName);
+							var wrapper = new ExportedSpectraUIWrapper(fileName);
 							if (wrapper.ContainsWavelengthData)
 							{
 								lbAvailableFiles.Items.Add(wrapper);

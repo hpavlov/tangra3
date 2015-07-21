@@ -13,5 +13,11 @@ namespace Tangra.Model.Helpers
             double j = 2451544.5 + (tNow / 8.64E+11);		// Tick difference to days difference
             return j;
         }
+
+	    public static DateTime DateTimeAtJD(double jd)
+	    {
+		    long ticks = (long)Math.Round(6.30822816E+17 + (jd - 2451544.5)*8.64E+11);
+		    return new DateTime(ticks);
+	    }
     }
 }

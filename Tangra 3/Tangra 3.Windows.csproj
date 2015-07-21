@@ -333,13 +333,14 @@
       <DependentUpon>frmLongRunningOperation.cs</DependentUpon>
     </Compile>
     <Compile Include="Helpers\LongOperationsManager.cs" />
+    <Compile Include="VideoOperations\Spectroscopy\AbsFluxCalibration\AbsFluxCalibrator.cs" />
     <Compile Include="VideoOperations\Spectroscopy\AbsFluxCalibration\frmAbsFlux.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="VideoOperations\Spectroscopy\AbsFluxCalibration\frmAbsFlux.Designer.cs">
       <DependentUpon>frmAbsFlux.cs</DependentUpon>
     </Compile>
-    <Compile Include="VideoOperations\Spectroscopy\AbsFluxCalibration\SpectraFileUIWrapper.cs" />
+    <Compile Include="VideoOperations\Spectroscopy\AbsFluxCalibration\ExportedSpectraUIWrapper.cs" />
     <Compile Include="VideoOperations\Spectroscopy\frmChooseConfiguration.cs">
       <SubType>Form</SubType>
     </Compile>
