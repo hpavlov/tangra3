@@ -142,6 +142,20 @@ void AdvStatusSection::GetDataFromDataBytes(unsigned char* data, int sectionData
 			
 			statusData+=5;			
 		}
+		else if (strcmp("Temperature", tagName) == 0)
+		{
+			unsigned char  b1 = *(statusData + 1);
+			unsigned char  b2 = *(statusData + 2);
+			unsigned char  b3 = *(statusData + 3);
+			unsigned char  b4 = *(statusData + 4);
+
+			unsigned int value = (unsigned int)(((int)b4 << 24) + ((int)b3 << 16) + ((int)b2 << 8) + (int)b1);
+			float fVal = IntToFloat(value);
+
+			frameInfo->Temperature = fVal;
+			
+			statusData+=5;			
+		}
 		else if (strcmp("Shutter", tagName) == 0)
 		{
 			unsigned char  b1 = *(statusData + 1);

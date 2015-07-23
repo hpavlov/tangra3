@@ -44,7 +44,7 @@ struct AdvFrameInfo
 	long EndSecondaryTimeStampHi;
 	long EndSecondaryTimeStampLo;
 	long NtpTimeStampError;
-
+	float Temperature;
 };
 
 

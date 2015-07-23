@@ -15,6 +15,7 @@ namespace Tangra.Model.Image
 		public float ExposureInMilliseconds;
 		public float Gamma;
 		public float Gain;
+		public float Temperature;
 		public float Offset;
 		public string Messages;
 		public int NumberSatellites;

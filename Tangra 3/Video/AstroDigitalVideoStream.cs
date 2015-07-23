@@ -439,6 +439,7 @@ namespace Tangra.Video
 
 				rv.Gain = m_CurrentFrameInfo.Gain;
 				rv.Gamma = m_CurrentFrameInfo.Gamma;
+				rv.Temperature = m_CurrentFrameInfo.Temperature;
 				rv.Offset = m_CurrentFrameInfo.Offset;
 
 				rv.NumberSatellites = m_CurrentFrameInfo.GPSTrackedSattelites;
@@ -502,6 +503,7 @@ namespace Tangra.Video
 
 				rv.Gain = frameInfo.Gain;
 				rv.Gamma = frameInfo.Gamma;
+				rv.Temperature = frameInfo.Temperature;
 				rv.Offset = frameInfo.Offset;
 
 				rv.NumberSatellites = frameInfo.GPSTrackedSattelites;

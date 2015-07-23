@@ -33,6 +33,7 @@ namespace Tangra.PInvoke
 			Exposure10thMs = copyFrom.Exposure10thMs;
 			Gamma = copyFrom.Gamma;
 			Gain = copyFrom.Gain;
+			Temperature = copyFrom.Temperature;
 			Shutter = copyFrom.Shutter;
 			Offset = copyFrom.Offset;
 			SystemTimeLo = copyFrom.SystemTimeLo;
@@ -160,6 +161,8 @@ namespace Tangra.PInvoke
 		public uint EndFrameSecondaryTimeStampMillisecondsHi;
 		[FieldOffset(76)]
 		public int NtpTimeStampError;
+		[FieldOffset(80)]
+		public float Temperature;
 
 		public DateTime MiddleExposureTimeStamp
 		{

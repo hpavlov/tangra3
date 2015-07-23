@@ -51,6 +51,7 @@ namespace Tangra.Config.SettingPannels
 			cbxAdvsPopupAlmanac.Checked = TangraConfig.Settings.AAV.Popup_Almanac;
 			cbxAdvsPopupGain.Checked = TangraConfig.Settings.AAV.Popup_Gain;
 			cbxAdvsPopupGamma.Checked = TangraConfig.Settings.AAV.Popup_Gamma;
+			cbxAdvsPopupTemperature.Checked = TangraConfig.Settings.AAV.Popup_Temperature;
 
 			cbxAavSplitFieldsOSD.Checked = TangraConfig.Settings.AAV.SplitFieldsOSD;
 
@@ -75,6 +76,7 @@ namespace Tangra.Config.SettingPannels
 			TangraConfig.Settings.AAV.Popup_Almanac = cbxAdvsPopupAlmanac.Checked;
 	        TangraConfig.Settings.AAV.Popup_Gain = cbxAdvsPopupGain.Checked;
 	        TangraConfig.Settings.AAV.Popup_Gamma = cbxAdvsPopupGamma.Checked;
+	        TangraConfig.Settings.AAV.Popup_Temperature = cbxAdvsPopupTemperature.Checked;
 
 			TangraConfig.Settings.AAV.SplitFieldsOSD = cbxAavSplitFieldsOSD.Checked;
 
@@ -103,6 +105,7 @@ namespace Tangra.Config.SettingPannels
 				Popup_Almanac = cbxAdvsPopupAlmanac.Checked,
 				Popup_Gain = cbxAdvsPopupGain.Checked,
 				Popup_Gamma = cbxAdvsPopupGamma.Checked,
+				Popup_Temperature = cbxAdvsPopupTemperature.Checked,
 				SplitFieldsOSD = cbxAavSplitFieldsOSD.Checked,
 			};
 

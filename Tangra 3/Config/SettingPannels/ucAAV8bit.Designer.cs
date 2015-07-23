@@ -56,6 +56,7 @@
 			this.cbxNtpDebugFlag = new System.Windows.Forms.CheckBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.cbxNtpUsageType = new System.Windows.Forms.ComboBox();
+			this.cbxAdvsPopupTemperature = new System.Windows.Forms.CheckBox();
 			this.groupControl1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nudSaturation8bit)).BeginInit();
 			this.groupControl2.SuspendLayout();
@@ -131,7 +132,7 @@
 			this.groupControl2.Controls.Add(this.cbxAdvsOsdTimeStamp);
 			this.groupControl2.Location = new System.Drawing.Point(3, 104);
 			this.groupControl2.Name = "groupControl2";
-			this.groupControl2.Size = new System.Drawing.Size(207, 206);
+			this.groupControl2.Size = new System.Drawing.Size(207, 145);
 			this.groupControl2.TabIndex = 44;
 			this.groupControl2.TabStop = false;
 			this.groupControl2.Text = "On Screen Display (Overlay)";
@@ -170,6 +171,7 @@
 			// 
 			// groupControl3
 			// 
+			this.groupControl3.Controls.Add(this.cbxAdvsPopupTemperature);
 			this.groupControl3.Controls.Add(this.cbxAdvsPopupGamma);
 			this.groupControl3.Controls.Add(this.cbxAdvsPopupNTPTime);
 			this.groupControl3.Controls.Add(this.cbxAdvsPopupExposure);
@@ -181,7 +183,7 @@
 			this.groupControl3.Controls.Add(this.cbxAdvsPopupTimeStamp);
 			this.groupControl3.Location = new System.Drawing.Point(216, 3);
 			this.groupControl3.Name = "groupControl3";
-			this.groupControl3.Size = new System.Drawing.Size(208, 246);
+			this.groupControl3.Size = new System.Drawing.Size(208, 305);
 			this.groupControl3.TabIndex = 45;
 			this.groupControl3.TabStop = false;
 			this.groupControl3.Text = "Frame Details Display (Pop-up)";
@@ -197,7 +199,7 @@
 			// 
 			// cbxAdvsPopupNTPTime
 			// 
-			this.cbxAdvsPopupNTPTime.Location = new System.Drawing.Point(14, 197);
+			this.cbxAdvsPopupNTPTime.Location = new System.Drawing.Point(14, 222);
 			this.cbxAdvsPopupNTPTime.Name = "cbxAdvsPopupNTPTime";
 			this.cbxAdvsPopupNTPTime.Size = new System.Drawing.Size(120, 19);
 			this.cbxAdvsPopupNTPTime.TabIndex = 53;
@@ -224,7 +226,7 @@
 			// 
 			// cbxAdvsPopupGPSFix
 			// 
-			this.cbxAdvsPopupGPSFix.Location = new System.Drawing.Point(14, 172);
+			this.cbxAdvsPopupGPSFix.Location = new System.Drawing.Point(14, 197);
 			this.cbxAdvsPopupGPSFix.Name = "cbxAdvsPopupGPSFix";
 			this.cbxAdvsPopupGPSFix.Size = new System.Drawing.Size(120, 19);
 			this.cbxAdvsPopupGPSFix.TabIndex = 51;
@@ -233,7 +235,7 @@
 			// 
 			// cbxAdvsPopupAlmanac
 			// 
-			this.cbxAdvsPopupAlmanac.Location = new System.Drawing.Point(14, 147);
+			this.cbxAdvsPopupAlmanac.Location = new System.Drawing.Point(14, 172);
 			this.cbxAdvsPopupAlmanac.Name = "cbxAdvsPopupAlmanac";
 			this.cbxAdvsPopupAlmanac.Size = new System.Drawing.Size(120, 19);
 			this.cbxAdvsPopupAlmanac.TabIndex = 50;
@@ -242,7 +244,7 @@
 			// 
 			// cbxAdvsPopupSatellites
 			// 
-			this.cbxAdvsPopupSatellites.Location = new System.Drawing.Point(14, 124);
+			this.cbxAdvsPopupSatellites.Location = new System.Drawing.Point(14, 149);
 			this.cbxAdvsPopupSatellites.Name = "cbxAdvsPopupSatellites";
 			this.cbxAdvsPopupSatellites.Size = new System.Drawing.Size(120, 19);
 			this.cbxAdvsPopupSatellites.TabIndex = 49;
@@ -251,7 +253,7 @@
 			// 
 			// cbxAdvsPopupSystemTime
 			// 
-			this.cbxAdvsPopupSystemTime.Location = new System.Drawing.Point(14, 222);
+			this.cbxAdvsPopupSystemTime.Location = new System.Drawing.Point(14, 247);
 			this.cbxAdvsPopupSystemTime.Name = "cbxAdvsPopupSystemTime";
 			this.cbxAdvsPopupSystemTime.Size = new System.Drawing.Size(120, 19);
 			this.cbxAdvsPopupSystemTime.TabIndex = 47;
@@ -281,7 +283,7 @@
 			// groupBox1
 			// 
 			this.groupBox1.Controls.Add(this.cbxAavSplitFieldsOSD);
-			this.groupBox1.Location = new System.Drawing.Point(216, 255);
+			this.groupBox1.Location = new System.Drawing.Point(3, 252);
 			this.groupBox1.Name = "groupBox1";
 			this.groupBox1.Size = new System.Drawing.Size(207, 56);
 			this.groupBox1.TabIndex = 49;
@@ -325,6 +327,14 @@
 			this.cbxNtpUsageType.Name = "cbxNtpUsageType";
 			this.cbxNtpUsageType.Size = new System.Drawing.Size(80, 21);
 			this.cbxNtpUsageType.TabIndex = 52;
+			// 
+			// cbxAdvsPopupTemperature
+			// 
+			this.cbxAdvsPopupTemperature.Location = new System.Drawing.Point(14, 124);
+			this.cbxAdvsPopupTemperature.Name = "cbxAdvsPopupTemperature";
+			this.cbxAdvsPopupTemperature.Size = new System.Drawing.Size(120, 19);
+			this.cbxAdvsPopupTemperature.TabIndex = 56;
+			this.cbxAdvsPopupTemperature.Text = "Temperature";
 			// 
 			// ucAAV8bit
 			// 
@@ -381,6 +391,7 @@
 		private System.Windows.Forms.CheckBox cbxAdvsPopupGain;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.ComboBox cbxNtpUsageType;
+		private System.Windows.Forms.CheckBox cbxAdvsPopupTemperature;
 
 	}
 }

@@ -114,6 +114,11 @@ namespace Tangra.Video.AstroDigitalVideo
 							? string.Format("Gamma: {0}", m_FrameState.Gamma.ToString("0.000"))
 							: "Gamma: Unknown");
 
+			if (m_AavSettings.Popup_Temperature)
+				statusText.AppendLine(m_FrameState.Temperature > 0
+							? string.Format("Temperature: {0}", m_FrameState.Temperature.ToString("0.0"))
+							: "Temperature: Unknown");
+
 			if (m_AavSettings.Popup_Gain || m_AavSettings.Popup_Gamma)
 				statusText.AppendLine();
 

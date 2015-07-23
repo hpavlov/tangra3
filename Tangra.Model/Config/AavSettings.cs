@@ -22,6 +22,7 @@ namespace Tangra.Model.Config
 
 		public bool Popup_Gain = true;
 		public bool Popup_Gamma = true;
+		public bool Popup_Temperature = true;
 
 		public bool Popup_SystemTime = true;
 		public bool Popup_Satellites = false;
