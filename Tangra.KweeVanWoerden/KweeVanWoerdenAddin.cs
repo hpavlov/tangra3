@@ -114,7 +114,7 @@ namespace Tangra.KweeVanWoerden
 
 		public string Url
 		{
-			get { return "http://www.hristopavlov.net/tangra3/addins"; }
+            get { return "http://www.hristopavlov.net/tangra3/eb.html"; }
 		}
 
 		public ITangraAddinAction[] GetAddinActions()
