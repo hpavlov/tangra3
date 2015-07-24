@@ -23,6 +23,8 @@ namespace Tangra.VideoOperations.Spectroscopy
 
 	    private static Pen[] m_GreyPens = new Pen[256];
 
+	    private bool m_IsMeasuring = false;
+
 	    static ucSpectroscopy()
 	    {
 		    for (int i = 0; i < 256; i++)
@@ -84,18 +86,28 @@ namespace Tangra.VideoOperations.Spectroscopy
 
 	    public void MeasurementsStarted()
 	    {
-			btnMeasure.Enabled = false;
+		    m_IsMeasuring = true;
+			btnMeasure.Text = "Stop Measurement";
 	    }
 
 	    public void MeasurementsFinished()
 	    {
-			btnMeasure.Visible = false;
+			m_IsMeasuring = false;
+		    btnMeasure.Enabled = false;
+			btnMeasure.Text = "";
+
 		    btnShowSpectra.Visible = true;
 		    btnShowSpectra.BringToFront();
 	    }
 
 		private void btnMeasure_Click(object sender, EventArgs e)
 		{
+			if (m_IsMeasuring)
+			{
+				m_VideoOperation.StopMeasurements();
+				return;
+			}
+
 			var frm = new frmRunMultiFrameSpectroscopy(m_FramePlayer, m_VideoOperation, m_VideoContoller.GetCurrentAstroImage(false));
 			if (m_VideoContoller.ShowDialog(frm) == DialogResult.OK)
 			{

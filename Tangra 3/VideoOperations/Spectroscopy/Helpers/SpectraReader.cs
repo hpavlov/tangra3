@@ -83,6 +83,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 
 		public SpectraCalibration Calibration;
         public MeasurementInfo MeasurementInfo;
+		public ObservationInfo ObservationInfo;
         public ProcessingInfo ProcessingInfo = new ProcessingInfo();
 
         public List<Spectra> RawMeasurements = new List<Spectra>();
@@ -149,6 +150,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
             }
 
 	        ProcessingInfo = new ProcessingInfo(reader);
+		    ObservationInfo = new ObservationInfo(reader);
 	    }
 
 	    public void WriteTo(BinaryWriter writer)
@@ -207,6 +209,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 	        }
 
 	        ProcessingInfo.WriteTo(writer);
+			ObservationInfo.WriteTo(writer);
 	    }
     }
 
@@ -355,6 +358,88 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 
     }
 
+	public class ObservationInfo
+	{
+		private static int SERIALIZATION_VERSION = 1;
+
+		private Dictionary<string, string> m_Properties = new Dictionary<string, string>();
+		private Dictionary<string, string> m_PropertyComments = new Dictionary<string, string>();
+
+		public void AddProperty(string name, string value, string comment = null)
+		{
+			m_Properties[name] = value;
+			m_PropertyComments[name] = comment;
+		}
+
+		public void Reset()
+		{
+			m_Properties.Clear();
+			m_PropertyComments.Clear();
+		}
+
+		public bool IsEmpty
+		{
+			get { return m_Properties.Count == 0; }
+		}
+
+		public string[] GetPropertyNames()
+		{
+			return m_Properties.Keys.ToArray();
+		}
+
+
+		public string GetProperty(string name)
+		{
+			string value;
+			if (m_Properties.TryGetValue(name, out value))
+				return value;
+
+			return null;
+		}
+
+		public string GetPropertyComment(string name)
+		{
+			string value;
+			if (m_PropertyComments.TryGetValue(name, out value))
+				return value;
+
+			return null;
+		}
+
+		internal ObservationInfo()
+		{ }
+
+		public ObservationInfo(BinaryReader reader)
+		{
+			int version = reader.ReadInt32();
+
+			int numProps = reader.ReadInt32();
+
+			for (int i = 0; i < numProps; i++)
+			{
+				string name = reader.ReadString();
+				string value = reader.ReadString();
+				string comment = reader.ReadString();
+
+				AddProperty(name, value, comment);
+			}
+		}
+
+		public void WriteTo(BinaryWriter writer)
+		{
+			writer.Write(SERIALIZATION_VERSION);
+
+			int numPros = m_Properties.Count;
+			writer.Write(numPros);
+
+			foreach (string key in m_Properties.Keys)
+			{
+				writer.Write(key);
+				writer.Write(m_Properties[key]);
+				writer.Write(m_PropertyComments[key]);
+			}
+		}
+	}
 
     public class MeasurementInfo
     {

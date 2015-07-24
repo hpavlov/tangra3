@@ -64,6 +64,7 @@ namespace Tangra.VideoOperations.Spectroscopy
 
 		private PSFFit m_SelectedStarGaussian;
 		public float SelectedStarBestAngle { get; private set; }
+	    private bool m_CancelMeasurementsRequested = false;
 
         public VideoSpectroscopyOperation()
         { }
@@ -154,10 +155,16 @@ namespace Tangra.VideoOperations.Spectroscopy
                 TangraCore.PreProcessors.AddDigitalFilter(TangraConfig.PreProcessingFilter.LowPassFilter);
 
             m_FirstMeasuredFrame = null;
+	        m_CancelMeasurementsRequested = false;
 			m_FramePlayer.Start(FramePlaySpeed.Fastest, null, 1);
 	    }
 
-        public void NextFrame(int frameNo, MovementType movementType, bool isLastFrame, AstroImage astroImage, int firstFrameInIntegrationPeriod, string fileName)
+	    internal void StopMeasurements()
+	    {
+		    m_CancelMeasurementsRequested = true;
+	    }
+
+	    public void NextFrame(int frameNo, MovementType movementType, bool isLastFrame, AstroImage astroImage, int firstFrameInIntegrationPeriod, string fileName)
         {
             m_CurrentFrameNo = frameNo;
 
@@ -190,7 +197,7 @@ namespace Tangra.VideoOperations.Spectroscopy
 		            m_AllFramesSpectra.Add(thisFrameSpectra);
 		        }
 
-                if (isLastFrame || m_AllFramesSpectra.Count >= m_SpectroscopyController.SpectraReductionContext.FramesToMeasure)
+				if (isLastFrame || m_CancelMeasurementsRequested || m_AllFramesSpectra.Count >= m_SpectroscopyController.SpectraReductionContext.FramesToMeasure)
                 {
                     m_FramePlayer.Stop();
 
@@ -217,10 +224,14 @@ namespace Tangra.VideoOperations.Spectroscopy
 
 					m_MasterSpectra.MeasurementInfo.FrameBitmapPixels = m_FrameBitmapPixels;
 
+	                m_SpectroscopyController.PopulateMasterSpectraObservationDetails(m_MasterSpectra);
+
 					m_OperationState = SpectroscopyState.DisplayingMeasurements;
 	                m_ControlPanel.MeasurementsFinished();
 					DisplaySpectra();
                 }
+
+		        Application.DoEvents();
 	        }
         }
 

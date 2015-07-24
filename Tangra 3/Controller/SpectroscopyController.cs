@@ -741,74 +741,97 @@ namespace Tangra.Controller
 			return bld.ToString();
 	    }
 
+		internal void PopulateMasterSpectraObservationDetails(MasterSpectra spectra)
+	    {
+			var dict = m_VideoController.GetVideoFileTags();
+
+			float lng = float.NaN;
+			float lat = float.NaN;
+			float ra = float.NaN;
+			float dec = float.NaN;
+			DateTime? centralTime = null;
+
+			if (spectra.ObservationInfo == null) spectra.ObservationInfo = new ObservationInfo();
+			spectra.ObservationInfo.Reset();
+
+			if (dict.ContainsKey("Longitude"))
+			{
+				if (float.TryParse(dict["Longitude"], NumberStyles.Float, CultureInfo.InvariantCulture, out lng))
+					spectra.ObservationInfo.AddProperty("Longitude", lng.ToString("0.0000", CultureInfo.InvariantCulture));
+			}
+			if (dict.ContainsKey("Latitude"))
+			{
+				if (float.TryParse(dict["Latitude"], NumberStyles.Float, CultureInfo.InvariantCulture, out lat))
+					spectra.ObservationInfo.AddProperty("Latitude", lat.ToString("0.0000", CultureInfo.InvariantCulture));
+			}
+			if (dict.ContainsKey("RA"))
+			{
+				if (float.TryParse(dict["RA"], NumberStyles.Float, CultureInfo.InvariantCulture, out ra))
+					spectra.ObservationInfo.AddProperty("RA", ra.ToString("0.0000", CultureInfo.InvariantCulture), "hours");
+			}
+			if (dict.ContainsKey("DEC"))
+			{
+				if (float.TryParse(dict["DEC"], NumberStyles.Float, CultureInfo.InvariantCulture, out dec))
+					spectra.ObservationInfo.AddProperty("DEC", dec.ToString("0.0000", CultureInfo.InvariantCulture), "degrees");
+			}
+			if (spectra.MeasurementInfo.FirstFrameTimeStamp.HasValue && spectra.MeasurementInfo.LastFrameTimeStamp.HasValue)
+			{
+				centralTime = new DateTime((spectra.MeasurementInfo.FirstFrameTimeStamp.Value.Ticks + spectra.MeasurementInfo.LastFrameTimeStamp.Value.Ticks) / 2);
+				double jd = JulianDayHelper.JDUtcAtDate(centralTime.Value);
+				spectra.ObservationInfo.AddProperty("JD", jd.ToString("0.00000", CultureInfo.InvariantCulture), "UT");
+			}
+
+			if (!float.IsNaN(lng) && !float.IsNaN(lat) && !float.IsNaN(ra) && !float.IsNaN(dec) && centralTime.HasValue)
+			{
+				var extCalc = new AtmosphericExtinctionCalculator(ra, dec, lng, lat, 0);
+				double airMass;
+				double altitudeDeg;
+				extCalc.CalculateExtinction(centralTime.Value, out altitudeDeg, out airMass);
+
+				spectra.ObservationInfo.AddProperty("X", airMass.ToString("0.000", CultureInfo.InvariantCulture), "air mass");
+			}
+
+			if (!float.IsNaN(spectra.MeasurementInfo.Gain)) spectra.ObservationInfo.AddProperty("Gain", spectra.MeasurementInfo.Gain.ToString("0.0", CultureInfo.InvariantCulture), "dB");
+			if (!float.IsNaN(spectra.MeasurementInfo.ExposureSeconds)) spectra.ObservationInfo.AddProperty("Exposure", spectra.MeasurementInfo.ExposureSeconds.ToString("0.000", CultureInfo.InvariantCulture), "sec");
+
+			if (dict.ContainsKey("ObjectName")) spectra.ObservationInfo.AddProperty("Target", dict["ObjectName"]);
+			if (dict.ContainsKey("Instrument")) spectra.ObservationInfo.AddProperty("Camera", dict["Instrument"]);
+			if (dict.ContainsKey("Telescope")) spectra.ObservationInfo.AddProperty("Telescope", dict["Telescope"]);
+			if (dict.ContainsKey("Recorder")) spectra.ObservationInfo.AddProperty("Recorder", dict["Recorder"]);
+			if (dict.ContainsKey("Observer")) spectra.ObservationInfo.AddProperty("Observer", dict["Observer"]);
+
+			if (spectra.IsCalibrated())
+			{
+				if (spectra.Calibration.PolynomialOrder == 1)
+					spectra.ObservationInfo.AddProperty("WavelengthCalibration", string.Format("1-st order[{0},{1}]", spectra.Calibration.A, spectra.Calibration.B));
+				else if (spectra.Calibration.PolynomialOrder == 2)
+					spectra.ObservationInfo.AddProperty("WavelengthCalibration", string.Format("2-nd order[{0},{1},{2}]", spectra.Calibration.A, spectra.Calibration.B, spectra.Calibration.C));
+				else if (spectra.Calibration.PolynomialOrder == 3)
+					spectra.ObservationInfo.AddProperty("WavelengthCalibration", string.Format("3-rd order[{0},{1},{2},{3}]", spectra.Calibration.A, spectra.Calibration.B, spectra.Calibration.C, spectra.Calibration.D));
+				else if (spectra.Calibration.PolynomialOrder == 4)
+					spectra.ObservationInfo.AddProperty("WavelengthCalibration", string.Format("4-th order[{0},{1},{2},{3},{4}]", spectra.Calibration.A, spectra.Calibration.B, spectra.Calibration.C, spectra.Calibration.D, spectra.Calibration.E));
+
+				spectra.ObservationInfo.AddProperty("Dispersion", spectra.Calibration.Dispersion.ToString("0.00", CultureInfo.InvariantCulture), "A/pix");
+			}		    
+	    }
+
         internal void AddDatExportHeader(StringBuilder output, MasterSpectra spectra)
         {
-            var dict = m_VideoController.GetVideoFileTags();
-            
-            float lng = float.NaN;
-            float lat = float.NaN;
-            float ra = float.NaN;
-            float dec = float.NaN;
-            DateTime? centralTime = null;
+			if (spectra.ObservationInfo.IsEmpty)
+				PopulateMasterSpectraObservationDetails(spectra);
 
-            if (dict.ContainsKey("Longitude"))
-            {
-                if (float.TryParse(dict["Longitude"], NumberStyles.Float, CultureInfo.InvariantCulture, out lng))
-                    output.AppendFormat("# Longitude={0}\r\n", lng.ToString("0.0000", CultureInfo.InvariantCulture));
-            }
-            if (dict.ContainsKey("Latitude"))
-            {
-                if (float.TryParse(dict["Latitude"], NumberStyles.Float, CultureInfo.InvariantCulture, out lat))
-                    output.AppendFormat("# Latitude={0}\r\n", lat.ToString("0.0000", CultureInfo.InvariantCulture));
-            }
-            if (dict.ContainsKey("RA"))
-            {
-                if (float.TryParse(dict["RA"], NumberStyles.Float, CultureInfo.InvariantCulture, out ra))
-                    output.AppendFormat("# RA={0} # hours\r\n", ra.ToString("0.0000", CultureInfo.InvariantCulture));
-            }
-            if (dict.ContainsKey("DEC"))
-            {
-                if (float.TryParse(dict["DEC"], NumberStyles.Float, CultureInfo.InvariantCulture, out dec))
-                    output.AppendFormat("# DEC={0} # degrees\r\n", dec.ToString("0.0000", CultureInfo.InvariantCulture));
-            }
-            if (spectra.MeasurementInfo.FirstFrameTimeStamp.HasValue && spectra.MeasurementInfo.LastFrameTimeStamp.HasValue)
-            {
-                centralTime = new DateTime((spectra.MeasurementInfo.FirstFrameTimeStamp.Value.Ticks + spectra.MeasurementInfo.LastFrameTimeStamp.Value.Ticks) / 2);
-                double jd = JulianDayHelper.JDUtcAtDate(centralTime.Value);
-                output.AppendFormat("# JD={0} # UT\r\n", jd.ToString("0.00000", CultureInfo.InvariantCulture));
-            }
+	        string[] propNames = spectra.ObservationInfo.GetPropertyNames();
 
-            if (!float.IsNaN(lng) && !float.IsNaN(lat) && !float.IsNaN(ra) && !float.IsNaN(dec) && centralTime.HasValue)
-            {
-                var extCalc = new AtmosphericExtinctionCalculator(ra, dec, lng, lat, 0);
-                double airMass;
-                double altitudeDeg;
-                extCalc.CalculateExtinction(centralTime.Value, out altitudeDeg, out airMass);
+	        foreach (string name in propNames)
+	        {
+		        string value = spectra.ObservationInfo.GetProperty(name);
+				string comment = spectra.ObservationInfo.GetPropertyComment(name);
 
-                output.AppendFormat("# Z={0} # air mass\r\n", airMass.ToString("0.000", CultureInfo.InvariantCulture));
-            }
-
-            if (!float.IsNaN(spectra.MeasurementInfo.Gain)) output.AppendFormat("# Gain={0} # dB\r\n", spectra.MeasurementInfo.Gain.ToString("0.0", CultureInfo.InvariantCulture));
-            if (!float.IsNaN(spectra.MeasurementInfo.ExposureSeconds)) output.AppendFormat("# Exposure={0} # sec\r\n", spectra.MeasurementInfo.ExposureSeconds.ToString("0.00", CultureInfo.InvariantCulture));
-
-            if (dict.ContainsKey("ObjectName")) output.AppendFormat("# Target={0}\r\n", dict["ObjectName"]);
-            if (dict.ContainsKey("Instrument")) output.AppendFormat("# Camera={0}\r\n", dict["Instrument"]);
-            if (dict.ContainsKey("Telescope")) output.AppendFormat("# Telescope={0}\r\n", dict["Telescope"]);
-            if (dict.ContainsKey("Recorder")) output.AppendFormat("# Recorder={0}\r\n", dict["Recorder"]);
-            if (dict.ContainsKey("Observer")) output.AppendFormat("# Observer={0}\r\n", dict["Observer"]);
-
-            if (spectra.IsCalibrated())
-            {
-                if (spectra.Calibration.PolynomialOrder == 1)
-                    output.AppendFormat("# WavelengthCalibration=1-st order[{0},{1}]\r\n", spectra.Calibration.A, spectra.Calibration.B);
-                else if (spectra.Calibration.PolynomialOrder == 2)
-                    output.AppendFormat("# WavelengthCalibration=2-nd order[{0},{1},{2}]\r\n", spectra.Calibration.A, spectra.Calibration.B, spectra.Calibration.C);
-                else if (spectra.Calibration.PolynomialOrder == 3)
-                    output.AppendFormat("# WavelengthCalibration=3-rd order[{0},{1},{2},{3}]\r\n", spectra.Calibration.A, spectra.Calibration.B, spectra.Calibration.C, spectra.Calibration.D);
-
-                output.AppendFormat("# Dispersion={0} # A/pix\r\n", spectra.Calibration.Dispersion.ToString("0.00", CultureInfo.InvariantCulture));
-            }
-
+				if (!string.IsNullOrEmpty(comment))
+					output.AppendFormat("# {0}={1} #{2}\r\n", name, value, comment);
+				else
+					output.AppendFormat("# {0}={1}\r\n", name, value);
+	        }
             output.AppendLine();
         }
     }
