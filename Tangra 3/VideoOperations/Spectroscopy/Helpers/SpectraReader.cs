@@ -367,8 +367,13 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 
 		public void AddProperty(string name, string value, string comment = null)
 		{
-			m_Properties[name] = value;
-			m_PropertyComments[name] = comment;
+            if (string.IsNullOrEmpty(name)) throw new ArgumentException("name");
+
+            if (comment == null) comment = string.Empty;
+            if (value == null) value = string.Empty;
+
+            m_Properties[name] = value;		    
+		    m_PropertyComments[name] = comment;
 		}
 
 		public void Reset()
@@ -435,7 +440,7 @@ namespace Tangra.VideoOperations.Spectroscopy.Helpers
 			foreach (string key in m_Properties.Keys)
 			{
 				writer.Write(key);
-				writer.Write(m_Properties[key]);
+                writer.Write(m_Properties[key]);
 				writer.Write(m_PropertyComments[key]);
 			}
 		}

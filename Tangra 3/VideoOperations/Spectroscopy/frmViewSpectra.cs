@@ -389,5 +389,10 @@ namespace Tangra.VideoOperations.Spectroscopy
 			frm.DisplayBitmap(bmp);
 			frm.Show(this);
 		}
+
+        private void miLoadSpectra_Click(object sender, EventArgs e)
+        {
+            m_SpectroscopyController.LoadSpectraFile();
+        }
     }
 }
