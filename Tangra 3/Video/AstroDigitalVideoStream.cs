@@ -596,7 +596,8 @@ namespace Tangra.Video
                 {
                     m_OcrDataAvailable = false;
 
-                    for (int i = m_FirstFrame; i < m_FirstFrame + m_CountFrames; i++)
+                    // Checking the first up to 1000 frames for embedded timestamp. If none found then assume no embedded timestamps are available
+                    for (int i = m_FirstFrame; i < m_FirstFrame + Math.Min(1000, m_CountFrames); i++)
                     {
                         FrameStateData stateChannel = GetFrameStatusChannel(i);
                         if (stateChannel.CentralExposureTime.Ticks != MISSING_TIMESTAMP_TICKS)
