@@ -12,7 +12,7 @@ using Tangra.Model.Helpers;
 
 namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 {
-	internal class ExportedSpectraUIWrapper
+	internal class AbsFluxInputFile
 	{
 		private float m_Longitude;
 		private float m_Latitude;
@@ -26,14 +26,16 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 		private float m_Dispersion;
 		private string m_Target;
 
-
 		private string m_FileName;
 		private string m_FileExt;
 		private SpectraFile m_SpectraFile;
 
+		private List<double> m_Wavelengths = new List<double>();
+		private List<double> m_Fluxes = new List<double>();
+
 		private bool m_ContainsWavelengthData;
 
-		public ExportedSpectraUIWrapper(string filePath)
+		public AbsFluxInputFile(string filePath)
 		{
 			m_FileName = Path.GetFileName(filePath);
 			m_FileExt = Path.GetExtension(filePath);
@@ -45,6 +47,11 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 		public bool ContainsWavelengthData
 		{
 			get { return m_ContainsWavelengthData; }
+		}
+
+		public string FileName
+		{
+			get { return m_FileName; }
 		}
 
 		public override string ToString()
@@ -72,16 +79,35 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 
 			var lines = new List<string>(File.ReadAllLines(filePath));
 
-			string[] headerLines = lines.Where(x => x.StartsWith("#")).ToArray();
-			foreach (string headerLine in headerLines)
+			char[] WV_FLX_SEP = " \t".ToCharArray(); 
+			for (int i = 0; i < lines.Count; i++)
 			{
-				Match match = s_HeaderRegex.Match(headerLine);
-				if (match.Success && match.Groups["HdrName"] != null && match.Groups["HdrValue"] != null)
+				string line = lines[i];
+				if (line.StartsWith("#"))
 				{
-					string headerName = match.Groups["HdrName"].Value.ToUpper();
-					string headerValue = match.Groups["HdrValue"].Value;
+					Match match = s_HeaderRegex.Match(line);
+					if (match.Success && match.Groups["HdrName"] != null && match.Groups["HdrValue"] != null)
+					{
+						string headerName = match.Groups["HdrName"].Value.ToUpper();
+						string headerValue = match.Groups["HdrValue"].Value;
 
-					SetHeader(headerName, headerValue);
+						SetHeader(headerName, headerValue);
+					}
+				}
+				else
+				{
+					string[] waveFluxPair = line.Split(WV_FLX_SEP, StringSplitOptions.RemoveEmptyEntries);
+					if (waveFluxPair.Length == 2)
+					{
+						double wavelength;
+						double flux;
+						if (double.TryParse(waveFluxPair[0], NumberStyles.Float, CultureInfo.InvariantCulture, out wavelength) &&
+							double.TryParse(waveFluxPair[1], NumberStyles.Float, CultureInfo.InvariantCulture, out flux))
+						{
+							m_Wavelengths.Add(wavelength);
+							m_Fluxes.Add(flux);			
+						}
+					}
 				}
 			}
 
@@ -91,13 +117,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 				return;
 			}
 
-			m_ContainsWavelengthData = true;
-
-			//0.03497931	10225.38
-			//10.62753	10177.19
-			//21.21906	9708.325
-
-			// TODO: Read exported values
+			m_ContainsWavelengthData = m_Wavelengths.Count > 0;
 		}
 		
 		private void SetHeader(string name, string value)
@@ -107,7 +127,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			//# RA=2.3958 # hours
 			//# DEC=-50.9320 # degrees
 			//# JD=2457206.23238 # UT
-			//# Z=1.459 # air mass
+			//# X=1.459 # air mass
 			//# Gain=34.0 # dB
 			//# Exposure=1.00 # sec
 			//# Target=HD 14943
@@ -127,7 +147,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 				if (float.TryParse(value, out m_JD))
 					m_EpochUT = JulianDayHelper.DateTimeAtJD(m_JD);
 			}
-			else if (name == "Z") float.TryParse(value, out m_AirMass);
+			else if (name == "X") float.TryParse(value, out m_AirMass);
 			else if (name == "GAIN") float.TryParse(value, out m_Gain);
 			else if (name == "EXPOSURE") float.TryParse(value, out m_Exposure);
 			else if (name == "TARGET") m_Target = value;

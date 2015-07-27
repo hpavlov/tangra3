@@ -1343,6 +1343,9 @@ namespace Tangra.Model.Config
 			public SpectroscopyInstrument Instrument;
 			public int DefaultWavelengthCalibrationOrder;
 		    public bool AllowNegativeValues;
+			public int MinWavelength;
+			public int MaxWavelength;
+			public int AbsFluxResolution;
 
 			public SpectraColors Colors;
 
@@ -1356,6 +1359,9 @@ namespace Tangra.Model.Config
 				Instrument = SpectroscopyInstrument.Grating;
 			    AllowNegativeValues = true;
 
+				MinWavelength = 3000;
+				MaxWavelength = 10000;
+				AbsFluxResolution = 50;
 			}
 		}
 

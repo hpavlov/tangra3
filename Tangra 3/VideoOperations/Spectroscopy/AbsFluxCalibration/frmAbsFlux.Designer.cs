@@ -76,6 +76,7 @@
 			this.lbAvailableFiles.Name = "lbAvailableFiles";
 			this.lbAvailableFiles.Size = new System.Drawing.Size(184, 225);
 			this.lbAvailableFiles.TabIndex = 3;
+			this.lbAvailableFiles.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.lbAvailableFiles_MouseDoubleClick);
 			// 
 			// lblAvailableSpectraTitle
 			// 

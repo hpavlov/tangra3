@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -50,7 +51,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			if (openFileDialog.ShowDialog(this) == DialogResult.OK)
 			{
 				string fileExt = Path.GetExtension(openFileDialog.FileName);
-				if (!ExportedSpectraUIWrapper.IsFileTypeSupported(fileExt))
+				if (!AbsFluxInputFile.IsFileTypeSupported(fileExt))
 				{
 					MessageBox.Show(
 						string.Format("{0} files are not supported.", fileExt), 
@@ -69,14 +70,22 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 
 					lbAvailableFiles.Tag = filePath;
 					lbAvailableFiles.Items.Clear();
-					foreach (string fileName in files1)
+					Cursor = Cursors.WaitCursor;
+					try
 					{
-						var wrapper = new ExportedSpectraUIWrapper(fileName);
-						if (wrapper.ContainsWavelengthData)
+						foreach (string fileName in files1)
 						{
-							lbAvailableFiles.Items.Add(wrapper);
-							addedFiles++;
+							var inputFile = new AbsFluxInputFile(fileName);
+							if (inputFile.ContainsWavelengthData)
+							{
+								lbAvailableFiles.Items.Add(inputFile);
+								addedFiles++;
+							}
 						}
+					}
+					finally
+					{
+						Cursor = Cursors.Default;	
 					}
 
 					if (fileExt != null && !".dat".Equals(fileExt, StringComparison.InvariantCultureIgnoreCase))
@@ -84,7 +93,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 						files1 = Directory.GetFiles(filePath, string.Format("*.{0}", fileExt.TrimStart('.')));
 						foreach (string fileName in files1)
 						{
-							var wrapper = new ExportedSpectraUIWrapper(fileName);
+							var wrapper = new AbsFluxInputFile(fileName);
 							if (wrapper.ContainsWavelengthData)
 							{
 								lbAvailableFiles.Items.Add(wrapper);
@@ -102,6 +111,23 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 						MessageBox.Show("None of the files in the selected location contain wavelength calibrated data.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				}
 			}
+		}
+
+		private void lbAvailableFiles_MouseDoubleClick(object sender, MouseEventArgs e)
+		{
+			var selectedFile = lbAvailableFiles.SelectedItem as AbsFluxInputFile;
+			if (selectedFile != null)
+			{
+				IncludeInputFile(selectedFile);
+			}
+		}
+
+		private void IncludeInputFile(AbsFluxInputFile inputFile)
+		{
+			var spectra = new AbsFluxSpectra(inputFile);
+
+			lbIncludedSpecta.Items.Add(spectra);
+			lbAvailableFiles.Items.Remove(inputFile);
 		}
 	}
 }

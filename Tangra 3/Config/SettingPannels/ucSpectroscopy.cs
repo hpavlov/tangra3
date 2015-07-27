@@ -28,6 +28,9 @@ namespace Tangra.Config.SettingPannels
 
 		    cbxAllowNegativeValues.Checked = TangraConfig.Settings.Spectroscopy.AllowNegativeValues;
 
+			nudMinWavelength.SetNUDValue(TangraConfig.Settings.Spectroscopy.MinWavelength);
+			nudMaxWavelength.SetNUDValue(TangraConfig.Settings.Spectroscopy.MaxWavelength);
+			nudResolution.SetNUDValue(TangraConfig.Settings.Spectroscopy.AbsFluxResolution);
 		}
 
 		public override void SaveSettings()
@@ -40,6 +43,10 @@ namespace Tangra.Config.SettingPannels
 				TangraConfig.Settings.Spectroscopy.DefaultWavelengthCalibrationOrder = 2;
 			else if (rbOrder3.Checked)
 				TangraConfig.Settings.Spectroscopy.DefaultWavelengthCalibrationOrder = 3;
+
+			TangraConfig.Settings.Spectroscopy.MinWavelength = (int)nudMinWavelength.Value;
+			TangraConfig.Settings.Spectroscopy.MaxWavelength = (int)nudMaxWavelength.Value;
+			TangraConfig.Settings.Spectroscopy.AbsFluxResolution = (int)nudResolution.Value;
 		}
 	}
 }
