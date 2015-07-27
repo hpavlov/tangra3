@@ -14,49 +14,46 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 {
 	internal class AbsFluxInputFile
 	{
-		private float m_Longitude;
-		private float m_Latitude;
-		private float m_RAHours;
-		private float m_DEDeg;
+		public float Longitude { get; private set; }
+		public float Latitude { get; private set; }
+		public float RAHours { get; private set; }
+		public float DEDeg { get; private set; }
 		private float m_JD;
 		private DateTime m_EpochUT;
-		private float m_AirMass;
+		public float AirMass { get; private set; }
 		private float m_Gain;
-		private float m_Exposure;
+		public float Exposure { get; private set; }
 		private float m_Dispersion;
 		private string m_Target;
 
-		private string m_FileName;
+		public string FullPath { get; private set; }
+		public string FileName { get; private set; }
 		private string m_FileExt;
 		private SpectraFile m_SpectraFile;
 
 		private List<double> m_Wavelengths = new List<double>();
 		private List<double> m_Fluxes = new List<double>();
 
-		private bool m_ContainsWavelengthData;
+		public bool ContainsWavelengthData { get; private set; }
 
 		public AbsFluxInputFile(string filePath)
 		{
-			m_FileName = Path.GetFileName(filePath);
+			FullPath = filePath;
+			FileName = Path.GetFileName(filePath);
 			m_FileExt = Path.GetExtension(filePath);
-			m_ContainsWavelengthData = false;
+			ContainsWavelengthData = false;
 			if (IsFileTypeSupported(m_FileExt))
 				LoadSupportedFile(filePath);
 		}
 
-		public bool ContainsWavelengthData
+		public DateTime Epoch
 		{
-			get { return m_ContainsWavelengthData; }
-		}
-
-		public string FileName
-		{
-			get { return m_FileName; }
+			get { return m_EpochUT; }
 		}
 
 		public override string ToString()
 		{
-			return m_FileName;
+			return FileName;
 		}
 
 		private void LoadSupportedFile(string filePath)
@@ -72,10 +69,13 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 
 		private void LoadExportedSpectraFile(string filePath)
 		{
-			m_AirMass = float.NaN;
-			m_Exposure = float.NaN;
-			m_RAHours = float.NaN;
-			m_DEDeg = float.NaN;
+			AirMass = float.NaN;
+			Exposure = float.NaN;
+			RAHours = float.NaN;
+			DEDeg = float.NaN;
+			Longitude = float.NaN;
+			Latitude = float.NaN;
+			m_EpochUT = DateTime.MinValue;
 
 			var lines = new List<string>(File.ReadAllLines(filePath));
 
@@ -111,13 +111,13 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 				}
 			}
 
-			if (float.IsNaN(m_Exposure) || float.IsNaN(m_RAHours) || float.IsNaN(m_DEDeg))
+			if (float.IsNaN(Exposure) || float.IsNaN(RAHours) || float.IsNaN(DEDeg))
 			{
 
 				return;
 			}
 
-			m_ContainsWavelengthData = m_Wavelengths.Count > 0;
+			ContainsWavelengthData = m_Wavelengths.Count > 0;
 		}
 		
 		private void SetHeader(string name, string value)
@@ -138,18 +138,37 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			//# WavelengthCalibration=3-rd order[-3.069448E-13,3.490942E-07,0.09728059,37.99137]
 			//# Dispersion=9.93 # A/pix
 
-			if (name == "LONGITUDE") float.TryParse(value, out m_Longitude);
-			else if (name == "LATITUDE") float.TryParse(value, out m_Latitude);
-			else if (name == "RA") float.TryParse(value, out m_RAHours);
-			else if (name == "DEC") float.TryParse(value, out m_DEDeg);
+			float floatVal;
+			if (name == "LONGITUDE")
+			{
+				if (float.TryParse(value, out floatVal)) Longitude = floatVal;
+			}
+			else if (name == "LATITUDE")
+			{
+				if (float.TryParse(value, out floatVal)) Latitude = floatVal;
+			}
+			else if (name == "RA")
+			{
+				if (float.TryParse(value, out floatVal)) RAHours = floatVal;
+			}
+			else if (name == "DEC")
+			{
+				if (float.TryParse(value, out floatVal)) DEDeg = floatVal;
+			}
 			else if (name == "JD")
 			{
 				if (float.TryParse(value, out m_JD))
 					m_EpochUT = JulianDayHelper.DateTimeAtJD(m_JD);
 			}
-			else if (name == "X") float.TryParse(value, out m_AirMass);
+			else if (name == "X")
+			{
+				if (float.TryParse(value, out floatVal)) AirMass = floatVal;
+			}
 			else if (name == "GAIN") float.TryParse(value, out m_Gain);
-			else if (name == "EXPOSURE") float.TryParse(value, out m_Exposure);
+			else if (name == "EXPOSURE")
+			{
+				if (float.TryParse(value, out floatVal)) Exposure = floatVal;
+			}
 			else if (name == "TARGET") m_Target = value;
 			else if (name == "DISPERSION") float.TryParse(value, out m_Dispersion);
 		}
@@ -161,7 +180,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 				m_SpectraFile = SpectraFile.Load(filePath);
 				if (m_SpectraFile.Data.IsCalibrated())
 				{
-					m_ContainsWavelengthData = true;
+					ContainsWavelengthData = true;
 
 					// TODO: Do an automtic spectra export
 					//m_SpectraFile.Data.Export

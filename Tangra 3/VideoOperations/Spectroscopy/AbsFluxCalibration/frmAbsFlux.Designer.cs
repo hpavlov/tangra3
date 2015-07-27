@@ -28,6 +28,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
+			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmAbsFlux));
 			this.pnlFiles = new System.Windows.Forms.Panel();
 			this.btnBrowseFiles = new System.Windows.Forms.Button();
@@ -40,9 +41,12 @@
 			this.picPlot = new System.Windows.Forms.PictureBox();
 			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
 			this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
+			this.ctxMenuIncludedSpectra = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.miExcludeSpectra = new System.Windows.Forms.ToolStripMenuItem();
 			this.pnlFiles.SuspendLayout();
 			this.pnlClient.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.picPlot)).BeginInit();
+			this.ctxMenuIncludedSpectra.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// pnlFiles
@@ -100,11 +104,13 @@
 			// 
 			// lbIncludedSpecta
 			// 
+			this.lbIncludedSpecta.ContextMenuStrip = this.ctxMenuIncludedSpectra;
 			this.lbIncludedSpecta.FormattingEnabled = true;
 			this.lbIncludedSpecta.Location = new System.Drawing.Point(10, 31);
 			this.lbIncludedSpecta.Name = "lbIncludedSpecta";
 			this.lbIncludedSpecta.Size = new System.Drawing.Size(187, 154);
 			this.lbIncludedSpecta.TabIndex = 0;
+			this.lbIncludedSpecta.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.lbIncludedSpecta_ItemCheck);
 			// 
 			// pnlDetail
 			// 
@@ -146,6 +152,21 @@
 			this.openFileDialog.Filter = "Tangra Exports (*.dat)|*.dat|All Files (*.*)|*.*";
 			this.openFileDialog.Title = "Select Spectra File to Add All Files from Same Location";
 			// 
+			// ctxMenuIncludedSpectra
+			// 
+			this.ctxMenuIncludedSpectra.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miExcludeSpectra});
+			this.ctxMenuIncludedSpectra.Name = "ctxMenuIncludedSpectra";
+			this.ctxMenuIncludedSpectra.Size = new System.Drawing.Size(153, 48);
+			this.ctxMenuIncludedSpectra.Opening += new System.ComponentModel.CancelEventHandler(this.ctxMenuIncludedSpectra_Opening);
+			// 
+			// miExcludeSpectra
+			// 
+			this.miExcludeSpectra.Name = "miExcludeSpectra";
+			this.miExcludeSpectra.Size = new System.Drawing.Size(152, 22);
+			this.miExcludeSpectra.Text = "&Exclude Spectra";
+			this.miExcludeSpectra.Click += new System.EventHandler(this.miExcludeSpectra_Click);
+			// 
 			// frmAbsFlux
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -164,6 +185,7 @@
 			this.pnlFiles.PerformLayout();
 			this.pnlClient.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.picPlot)).EndInit();
+			this.ctxMenuIncludedSpectra.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -182,5 +204,7 @@
 		private System.Windows.Forms.Label lblAvailableSpectraTitle;
 		private System.Windows.Forms.PictureBox picPlot;
 		private System.Windows.Forms.OpenFileDialog openFileDialog;
+		private System.Windows.Forms.ContextMenuStrip ctxMenuIncludedSpectra;
+		private System.Windows.Forms.ToolStripMenuItem miExcludeSpectra;
 	}
 }
