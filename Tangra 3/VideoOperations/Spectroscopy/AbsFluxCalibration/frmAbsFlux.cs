@@ -4,10 +4,16 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Helpers;
+using Tangra.Model.Helpers;
+using nom.tam.fits;
+using nom.tam.util;
 
 namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 {
@@ -199,5 +205,176 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 				//       Then add the spectra to the calibration if all defined okay
 			}
 		}
+
+        #region Reference Code for Building the CalSpec.db
+        private void BuildCalSpecDb()
+        {
+            var db = new CalSpecDatabase();
+            Fits fitsFile = new Fits();
+            int totalBad = 0;
+            string[] lines2 = File.ReadAllLines(@"Z:\CALSPEC\AbsFlux-TangraStars2.csv");
+            for (int i = 1; i < lines2.Length; i++)
+            {
+                string[] tokens = lines2[i].Split(',');
+
+                string calSpecId = tokens[0].Trim();
+                string RA_FK5_Hours = tokens[1].Trim();
+                string DEG_FK5_Deg = tokens[2].Trim();
+                string pmRA = tokens[3].Trim();
+                string pmDec = tokens[4].Trim();
+                string specType = tokens[5].Trim();
+                string magV = tokens[6].Trim();
+                string magBV = tokens[7].Trim();
+                string absFluxId = tokens[8].Trim();
+                string stisFlag = tokens[9].Trim();
+                string fitsFilePath = tokens[10].Trim();
+                string tyc2 = tokens[11].Trim();
+                string ucac4 = tokens[12].Trim();
+
+                if (!string.IsNullOrEmpty(pmRA) && !string.IsNullOrEmpty(pmDec))
+                {
+                    var star = new CalSpecStar()
+                    {
+                        CalSpecStarId = calSpecId,
+                        AbsFluxStarId = absFluxId,
+                        STIS_Flag = stisFlag,
+                        FITS_File = fitsFilePath,
+                        TYC2 = tyc2,
+                        U4 = ucac4,
+                        pmRA = float.Parse(pmRA),
+                        pmDE = float.Parse(pmDec),
+                        MagV = float.Parse(magV),
+                        MagBV = float.Parse(magBV),
+                        SpecType = specType,
+                        RA_J2000_Hours = (float)AstroConvert.ToRightAcsension(RA_FK5_Hours),
+                        DE_J2000_Deg = (float)AstroConvert.ToDeclination(DEG_FK5_Deg)
+                    };
+
+                    string filePath = Path.GetFullPath(@"Z:\CALSPEC\current_calspec\" + fitsFilePath);
+
+                    using (var bf = new BufferedFile(filePath, FileAccess.Read, FileShare.ReadWrite))
+                    {
+                        fitsFile.Read(bf);
+
+                        BasicHDU imageHDU = fitsFile.GetHDU(1);
+
+                        var table = (ColumnTable)imageHDU.Data.DataArray;
+                        double[] wavelengths = (double[])table.Columns[0];
+                        float[] fluxes = (float[])table.Columns[1];
+                        short[] goodnessFlags = (short[])table.Columns[5];
+
+                        for (int j = 0; j < fluxes.Length; j++)
+                        {
+                            if (wavelengths[j] < 3000) continue;
+                            if (wavelengths[j] > 10120) break;
+
+                            if (goodnessFlags[j] != 0)
+                                star.DataPoints.Add((float)wavelengths[j], fluxes[j]);
+                            else
+                                totalBad++;
+                        }
+                    }
+
+                    db.Stars.Add(star);
+                }
+            }
+
+            using (var compressedStream = new FileStream(@"Z:\CALSPEC\current_calspec\tangra.db", FileMode.CreateNew, FileAccess.Write))
+            using (var deflateStream = new DeflateStream(compressedStream, CompressionMode.Compress, true))
+            {
+                using (var writer = new BinaryWriter(deflateStream))
+                {
+                    db.Serialize(writer);
+                }
+            }
+
+            using (var compressedStream = new FileStream(@"Z:\CALSPEC\current_calspec\tangra.db", FileMode.Open, FileAccess.Read))
+            using (var deflateStream = new DeflateStream(compressedStream, CompressionMode.Decompress, true))
+            {
+                using (var reader = new BinaryReader(deflateStream))
+                {
+                    var db2 = new CalSpecDatabase(reader);
+                    Trace.WriteLine(db2.Stars.Count);
+                }
+            }
+
+            MessageBox.Show(totalBad.ToString() + " bad entries excluded.");
+
+            string[] fitsFiles = Directory.GetFiles(@"Z:\CALSPEC\current_calspec", "*.fit");
+
+            var dist = new Dictionary<int, int>();
+            foreach (string filePath in fitsFiles)
+            {
+                using (var bf = new BufferedFile(filePath, FileAccess.Read, FileShare.ReadWrite))
+                {
+                    fitsFile.Read(bf);
+
+                    var bld = new StringBuilder();
+
+                    BasicHDU headerHDU = fitsFile.GetHDU(0);
+                    BasicHDU imageHDU = fitsFile.GetHDU(1);
+
+                    for (int i = 0; i < headerHDU.Header.NumberOfCards; i++)
+                    {
+                        string cardString = headerHDU.Header.GetCard(i);
+                        bld.AppendFormat("# {0}\r\n", cardString);
+                    }
+
+                    for (int i = 0; i < imageHDU.Header.NumberOfCards; i++)
+                    {
+                        string cardString = imageHDU.Header.GetCard(i);
+                        bld.AppendFormat("# {0}\r\n", cardString);
+                    }
+
+                    var table = (ColumnTable)imageHDU.Data.DataArray;
+                    double[] wavelengths = (double[])table.Columns[0];
+                    float[] fluxes = (float[])table.Columns[1];
+                    float[] col2 = (float[])table.Columns[2];
+                    float[] col3 = (float[])table.Columns[3];
+                    float[] col4 = (float[])table.Columns[4];
+                    short[] goodnessFlags = (short[])table.Columns[5];
+                    float[] exposures = (float[])table.Columns[6];
+
+                    for (int i = 0; i < fluxes.Length; i++)
+                    {
+                        if (wavelengths[i] < 2000) continue;
+                        if (wavelengths[i] > 15000) break;
+
+                        bld.Append(wavelengths[i].ToString().PadLeft(20));
+                        bld.Append(fluxes[i].ToString().PadLeft(20));
+                        bld.Append(col2[i].ToString().PadLeft(20));
+                        bld.Append(col3[i].ToString().PadLeft(20));
+                        bld.Append(col4[i].ToString().PadLeft(20));
+                        bld.Append(goodnessFlags[i].ToString().PadLeft(15));
+                        bld.Append(exposures[i].ToString().PadLeft(15));
+                        bld.AppendLine();
+
+                        int expMS = (int)Math.Round(exposures[i] * 1000);
+                        if (!dist.ContainsKey(expMS)) dist.Add(expMS, 0);
+                        dist[expMS]++;
+
+                    }
+
+                    string outFileName = Path.ChangeExtension(filePath, ".txt");
+                    File.WriteAllText(outFileName, bld.ToString());
+                }
+            }
+
+            var output = new StringBuilder();
+            foreach (int key in dist.Keys)
+            {
+                output.AppendFormat("{0}s = {1}\r\n", (key / 1000.0).ToString("0.0"), dist[key]);
+            }
+            MessageBox.Show(output.ToString());
+        }
+
+        private void TestEmbeddedData()
+        {
+            foreach (CalSpecStar star in CalSpecDatabase.Instance.Stars)
+            {
+                Trace.WriteLine(star.AbsFluxStarId);
+            }
+        }
+        #endregion
 	}
 }

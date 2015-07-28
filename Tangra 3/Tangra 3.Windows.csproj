@@ -335,6 +335,7 @@
     <Compile Include="Helpers\LongOperationsManager.cs" />
     <Compile Include="VideoOperations\Spectroscopy\AbsFluxCalibration\AbsFluxCalibrator.cs" />
     <Compile Include="VideoOperations\Spectroscopy\AbsFluxCalibration\AbsFluxSpectra.cs" />
+    <Compile Include="VideoOperations\Spectroscopy\AbsFluxCalibration\CalSpecDatabase.cs" />
     <Compile Include="VideoOperations\Spectroscopy\AbsFluxCalibration\frmAbsFlux.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -1218,6 +1219,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <None Include="Service References\TangraService\ErrorReports1.wsdl" />
+    <EmbeddedResource Include="VideoOperations\Spectroscopy\AbsFluxCalibration\CalSpec.db" />
     <None Include="VideoOperations\Spectroscopy\AbsFluxCalibration\ReferenceCode\AbsFlux.f90" />
   </ItemGroup>
   <ItemGroup />
