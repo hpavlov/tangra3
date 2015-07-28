@@ -49,11 +49,18 @@ namespace SerLib
 		long TimeStampLo;
 		long TimeStampHi;
 		long TimeStampUtcLo;
-		long TimeStampUtcHi;		
-		// NOTE: This is not marshalled back to the .NET structure
+		long TimeStampUtcHi;
 		unsigned __int64 TimeStamp64;
 		unsigned __int64 TimeStampUtc64;
 	};
+	
+	struct MarshalledSerFrameInfo
+	{
+		long TimeStampLo;
+		long TimeStampHi;
+		long TimeStampUtcLo;
+		long TimeStampUtcHi;
+	};	
 	
 	class SerFile {
 		private:
@@ -97,8 +104,8 @@ extern "C"
 
 DLL_PUBLIC HRESULT SEROpenFile(char* fileName, SerLib::SerFileInfo* fileInfo, char* observer, char* instrument, char* telescope, bool checkMagic);
 DLL_PUBLIC HRESULT SERCloseFile();
-DLL_PUBLIC HRESULT SERGetFrame(long frameNo, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapPixels, BYTE* bitmapBytes, unsigned int cameraBitPix, SerLib::SerFrameInfo* frameInfo);		
-DLL_PUBLIC HRESULT SERGetIntegratedFrame(long startFrameNo, long framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapBytes, BYTE* bitmapDisplayBytes, unsigned int cameraBitPix, SerLib::SerFrameInfo* frameInfo);
+DLL_PUBLIC HRESULT SERGetFrame(long frameNo, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapPixels, BYTE* bitmapBytes, unsigned int cameraBitPix, SerLib::MarshalledSerFrameInfo* frameInfo);		
+DLL_PUBLIC HRESULT SERGetIntegratedFrame(long startFrameNo, long framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapBytes, BYTE* bitmapDisplayBytes, unsigned int cameraBitPix, SerLib::MarshalledSerFrameInfo* frameInfo);
 		
 #ifdef __cplusplus
 } // __cplusplus defined.
