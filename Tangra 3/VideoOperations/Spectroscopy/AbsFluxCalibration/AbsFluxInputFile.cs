@@ -18,7 +18,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 		public float Latitude { get; private set; }
 		public float RAHours { get; private set; }
 		public float DEDeg { get; private set; }
-		private float m_JD;
+		private double m_JD;
 		private DateTime m_EpochUT;
 		public float AirMass { get; private set; }
 		private float m_Gain;
@@ -168,7 +168,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			}
 			else if (name == "JD")
 			{
-				if (float.TryParse(value, out m_JD))
+				if (double.TryParse(value, out m_JD))
 					m_EpochUT = JulianDayHelper.DateTimeAtJD(m_JD);
 			}
 			else if (name == "X")

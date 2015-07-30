@@ -12,9 +12,14 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 	{
 		public int WavelengthFrom { get; set; }
 		public int WavelengthBinSize { get; set; }
+		public int DataFromWavelength { get; set; }
+		public int DataToWavelength { get; set; }
 		public List<double> ObservedFluxes = new List<double>();
 		public List<double> AbsoluteFluxes = new List<double>();
 		public List<double> DeltaMagnitiudes = new List<double>();
+		public List<double> ResolvedWavelengths = new List<double>();
+		public List<double> Residuals = new List<double>();
+		public List<double> ResidualPercentage = new List<double>();
 
 		private static Regex STAR_DESIGNATION_REGEX = new Regex("(HD|BD|HIP|TYC)[\\d\\s\\-\\+_]+");
 
@@ -23,6 +28,11 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 		public AbsFluxInputFile InputFile { get; private set; }
 		public CalSpecStar m_CalSpecStar;
 		public bool IsComplete { get; private set; }
+
+		public bool IsStandard
+		{
+			get { return m_CalSpecStar != null; }
+		}
 
 		internal AbsFluxSpectra(AbsFluxInputFile inputFile)
 		{
@@ -61,11 +71,16 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 				}
 			}
 
-			if (inputFile.Epoch > DateTime.MinValue)
-				m_DisplayName += inputFile.Epoch.ToString(" (HH:mm UT)");
+			if (inputFile.Epoch > DateTime.MinValue && !float.IsNaN(inputFile.Exposure))
+				m_DisplayName += string.Format(" ({0}, {1}s)", inputFile.Epoch.ToString("HH:mm"), inputFile.Exposure.ToString("0.00"));
+			else if (inputFile.Epoch > DateTime.MinValue)
+				m_DisplayName += string.Format(" ({0})", inputFile.Epoch.ToString("HH:mm"));
 
 			if (string.IsNullOrEmpty(m_DisplayName))
 				m_DisplayName = Path.GetFileNameWithoutExtension(inputFile.FileName);
+
+			DataFromWavelength = (int)Math.Ceiling(inputFile.Wavelengths[0]);
+			DataFromWavelength = (int)Math.Floor(inputFile.Wavelengths[inputFile.Wavelengths.Count - 1]);
 		}
 
 		public override string ToString()
@@ -83,12 +98,12 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			WavelengthFrom = fromWavelength;
 			WavelengthBinSize = step;
 
-			RescaleData(fromWavelength, toWavelength, step, InputFile.Wavelengths, InputFile.Fluxes, ObservedFluxes);
+			RescaleData(fromWavelength, toWavelength, step, InputFile.Wavelengths, InputFile.Fluxes, ObservedFluxes, ResolvedWavelengths);
 			if (m_CalSpecStar != null)
 			{
 				List<double> absWavelengths = m_CalSpecStar.DataPoints.Keys.ToList();
 				List<double> absFluxes = m_CalSpecStar.DataPoints.Values.ToList();
-				RescaleData(fromWavelength, toWavelength, step, absWavelengths, absFluxes, AbsoluteFluxes);
+				RescaleData(fromWavelength, toWavelength, step, absWavelengths, absFluxes, AbsoluteFluxes, null);
 
 				DeltaMagnitiudes.Clear();
 				double exposure = InputFile.Exposure;
@@ -107,7 +122,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			return (float)Math.Exp(-FWHM_COEFF * distance * distance / (fwhm * fwhm));
 		}
 
-		private static void RescaleData(int fromWavelength, int toWavelength, int step, List<double> wavelengths, List<double> fluxes, List<double> rescaledFluxes)
+		private static void RescaleData(int fromWavelength, int toWavelength, int step, List<double> wavelengths, List<double> fluxes, List<double> rescaledFluxes, List<double> resolvedWavelengths)
 		{
 			// Blurring: 
 			// 1) Find the number of original datapoints in resolution/blur interval
@@ -134,12 +149,20 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 
 			rescaledFluxes.Clear();
 			rescaledFluxes.AddRange(new double[totalPoints]);
+			
+			if (resolvedWavelengths != null)
+			{
+				resolvedWavelengths.Clear();
+				resolvedWavelengths.AddRange(new double[totalPoints]);				
+			}
 
 			for (int i = 0; i < totalPoints; i++)
 			{
 				float midWvL = fromWavelength + (i + 0.5f) * step;
 				int binFromWvL = fromWavelength + i * step;
 				int binToWvL = fromWavelength + (i + 1) * step;
+
+				if (resolvedWavelengths != null) resolvedWavelengths[i] = midWvL;
 
 				if (binFromWvL < firstDataWaveLength || binFromWvL > lastDataWaveLength)
 				{
