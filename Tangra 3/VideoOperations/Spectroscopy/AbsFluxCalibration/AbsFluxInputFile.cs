@@ -24,7 +24,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 		private float m_Gain;
 		public float Exposure { get; private set; }
 		private float m_Dispersion;
-		private string m_Target;
+		public string Target { get; private set; }
 
 		public string FullPath { get; private set; }
 		public string FileName { get; private set; }
@@ -51,6 +51,16 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			get { return m_EpochUT; }
 		}
 
+		public List<double> Wavelengths
+		{
+			get { return m_Wavelengths; }
+		}
+
+		public List<double> Fluxes
+		{
+			get { return m_Fluxes; }
+		}
+
 		public override string ToString()
 		{
 			return FileName;
@@ -75,6 +85,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			DEDeg = float.NaN;
 			Longitude = float.NaN;
 			Latitude = float.NaN;
+			Target = null;
 			m_EpochUT = DateTime.MinValue;
 
 			var lines = new List<string>(File.ReadAllLines(filePath));
@@ -169,7 +180,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			{
 				if (float.TryParse(value, out floatVal)) Exposure = floatVal;
 			}
-			else if (name == "TARGET") m_Target = value;
+			else if (name == "TARGET") Target = value;
 			else if (name == "DISPERSION") float.TryParse(value, out m_Dispersion);
 		}
 

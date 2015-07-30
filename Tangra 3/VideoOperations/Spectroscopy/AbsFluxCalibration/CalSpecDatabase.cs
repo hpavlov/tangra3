@@ -87,7 +87,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
         public string STIS_Flag;
         public string FITS_File;
 
-        public Dictionary<float, float> DataPoints = new Dictionary<float, float>();
+		public Dictionary<double, double> DataPoints = new Dictionary<double, double>();
 
         internal  CalSpecStar()
         { }
@@ -135,10 +135,10 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
             writer.Write(FITS_File);
 
             writer.Write(DataPoints.Count);
-            foreach (float key in DataPoints.Keys)
+            foreach (double key in DataPoints.Keys)
             {
-                writer.Write(key);
-                writer.Write(DataPoints[key]);
+				writer.Write((float)key);
+                writer.Write((float)DataPoints[key]);
             }
         }
     }

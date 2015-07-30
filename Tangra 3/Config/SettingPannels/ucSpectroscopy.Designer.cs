@@ -37,20 +37,20 @@
 			this.label49 = new System.Windows.Forms.Label();
 			this.cbxAllowNegativeValues = new System.Windows.Forms.CheckBox();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
-			this.label1 = new System.Windows.Forms.Label();
-			this.label2 = new System.Windows.Forms.Label();
-			this.label3 = new System.Windows.Forms.Label();
-			this.nudMinWavelength = new System.Windows.Forms.NumericUpDown();
-			this.nudMaxWavelength = new System.Windows.Forms.NumericUpDown();
-			this.nudResolution = new System.Windows.Forms.NumericUpDown();
-			this.label4 = new System.Windows.Forms.Label();
-			this.label5 = new System.Windows.Forms.Label();
 			this.label6 = new System.Windows.Forms.Label();
+			this.label5 = new System.Windows.Forms.Label();
+			this.label4 = new System.Windows.Forms.Label();
+			this.nudResolution = new System.Windows.Forms.NumericUpDown();
+			this.nudMaxWavelength = new System.Windows.Forms.NumericUpDown();
+			this.nudMinWavelength = new System.Windows.Forms.NumericUpDown();
+			this.label3 = new System.Windows.Forms.Label();
+			this.label2 = new System.Windows.Forms.Label();
+			this.label1 = new System.Windows.Forms.Label();
 			this.groupBox8.SuspendLayout();
 			this.groupBox1.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.nudMinWavelength)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.nudMaxWavelength)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudResolution)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudMaxWavelength)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudMinWavelength)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// groupBox8
@@ -155,76 +155,32 @@
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Absolute Flux Calibration";
 			// 
-			// label1
+			// label6
 			// 
-			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(46, 83);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(60, 13);
-			this.label1.TabIndex = 10;
-			this.label1.Text = "Resolution:";
+			this.label6.AutoSize = true;
+			this.label6.Location = new System.Drawing.Point(181, 85);
+			this.label6.Name = "label6";
+			this.label6.Size = new System.Drawing.Size(14, 13);
+			this.label6.TabIndex = 19;
+			this.label6.Text = "A";
 			// 
-			// label2
+			// label5
 			// 
-			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(21, 35);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(88, 13);
-			this.label2.TabIndex = 11;
-			this.label2.Text = "Min Wavelength:";
+			this.label5.AutoSize = true;
+			this.label5.Location = new System.Drawing.Point(181, 62);
+			this.label5.Name = "label5";
+			this.label5.Size = new System.Drawing.Size(14, 13);
+			this.label5.TabIndex = 18;
+			this.label5.Text = "A";
 			// 
-			// label3
+			// label4
 			// 
-			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(18, 60);
-			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(91, 13);
-			this.label3.TabIndex = 12;
-			this.label3.Text = "Max Wavelength:";
-			// 
-			// nudMinWavelength
-			// 
-			this.nudMinWavelength.Location = new System.Drawing.Point(116, 32);
-			this.nudMinWavelength.Maximum = new decimal(new int[] {
-            15000,
-            0,
-            0,
-            0});
-			this.nudMinWavelength.Minimum = new decimal(new int[] {
-            2000,
-            0,
-            0,
-            0});
-			this.nudMinWavelength.Name = "nudMinWavelength";
-			this.nudMinWavelength.Size = new System.Drawing.Size(64, 20);
-			this.nudMinWavelength.TabIndex = 13;
-			this.nudMinWavelength.Value = new decimal(new int[] {
-            3000,
-            0,
-            0,
-            0});
-			// 
-			// nudMaxWavelength
-			// 
-			this.nudMaxWavelength.Location = new System.Drawing.Point(116, 57);
-			this.nudMaxWavelength.Maximum = new decimal(new int[] {
-            15000,
-            0,
-            0,
-            0});
-			this.nudMaxWavelength.Minimum = new decimal(new int[] {
-            2000,
-            0,
-            0,
-            0});
-			this.nudMaxWavelength.Name = "nudMaxWavelength";
-			this.nudMaxWavelength.Size = new System.Drawing.Size(64, 20);
-			this.nudMaxWavelength.TabIndex = 14;
-			this.nudMaxWavelength.Value = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
+			this.label4.AutoSize = true;
+			this.label4.Location = new System.Drawing.Point(181, 36);
+			this.label4.Name = "label4";
+			this.label4.Size = new System.Drawing.Size(14, 13);
+			this.label4.TabIndex = 17;
+			this.label4.Text = "A";
 			// 
 			// nudResolution
 			// 
@@ -248,32 +204,76 @@
             0,
             0});
 			// 
-			// label4
+			// nudMaxWavelength
 			// 
-			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(181, 36);
-			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(14, 13);
-			this.label4.TabIndex = 17;
-			this.label4.Text = "A";
+			this.nudMaxWavelength.Location = new System.Drawing.Point(116, 57);
+			this.nudMaxWavelength.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+			this.nudMaxWavelength.Minimum = new decimal(new int[] {
+            3000,
+            0,
+            0,
+            0});
+			this.nudMaxWavelength.Name = "nudMaxWavelength";
+			this.nudMaxWavelength.Size = new System.Drawing.Size(64, 20);
+			this.nudMaxWavelength.TabIndex = 14;
+			this.nudMaxWavelength.Value = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
 			// 
-			// label5
+			// nudMinWavelength
 			// 
-			this.label5.AutoSize = true;
-			this.label5.Location = new System.Drawing.Point(181, 62);
-			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(14, 13);
-			this.label5.TabIndex = 18;
-			this.label5.Text = "A";
+			this.nudMinWavelength.Location = new System.Drawing.Point(116, 32);
+			this.nudMinWavelength.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+			this.nudMinWavelength.Minimum = new decimal(new int[] {
+            3000,
+            0,
+            0,
+            0});
+			this.nudMinWavelength.Name = "nudMinWavelength";
+			this.nudMinWavelength.Size = new System.Drawing.Size(64, 20);
+			this.nudMinWavelength.TabIndex = 13;
+			this.nudMinWavelength.Value = new decimal(new int[] {
+            3000,
+            0,
+            0,
+            0});
 			// 
-			// label6
+			// label3
 			// 
-			this.label6.AutoSize = true;
-			this.label6.Location = new System.Drawing.Point(181, 85);
-			this.label6.Name = "label6";
-			this.label6.Size = new System.Drawing.Size(14, 13);
-			this.label6.TabIndex = 19;
-			this.label6.Text = "A";
+			this.label3.AutoSize = true;
+			this.label3.Location = new System.Drawing.Point(18, 60);
+			this.label3.Name = "label3";
+			this.label3.Size = new System.Drawing.Size(91, 13);
+			this.label3.TabIndex = 12;
+			this.label3.Text = "Max Wavelength:";
+			// 
+			// label2
+			// 
+			this.label2.AutoSize = true;
+			this.label2.Location = new System.Drawing.Point(21, 35);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(88, 13);
+			this.label2.TabIndex = 11;
+			this.label2.Text = "Min Wavelength:";
+			// 
+			// label1
+			// 
+			this.label1.AutoSize = true;
+			this.label1.Location = new System.Drawing.Point(46, 83);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(60, 13);
+			this.label1.TabIndex = 10;
+			this.label1.Text = "Resolution:";
 			// 
 			// ucSpectroscopy
 			// 
@@ -290,9 +290,9 @@
 			this.groupBox8.PerformLayout();
 			this.groupBox1.ResumeLayout(false);
 			this.groupBox1.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.nudMinWavelength)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.nudMaxWavelength)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudResolution)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudMaxWavelength)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudMinWavelength)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
