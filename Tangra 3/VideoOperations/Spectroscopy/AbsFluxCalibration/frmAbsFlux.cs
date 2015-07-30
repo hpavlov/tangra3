@@ -207,6 +207,81 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 		}
 
         #region Reference Code for Building the CalSpec.db
+        private void BuildAbsFlux()
+        {
+            Fits fitsFile = new Fits();
+
+            var indexFile = new StringBuilder();
+            indexFile.AppendLine("BD and HD CALSPEC stars with STIS fluxes between 3000 and 10000 Angstroms");
+            indexFile.AppendLine("Name            FK5_Coordinates_J2000      Type    Mag    B-V   File_Name");
+
+            foreach (CalSpecStar star in CalSpecDatabase.Instance.Stars)
+            {
+                if (star.AbsFluxStarId.StartsWith("TYC")) continue;
+                string modifiedId = star.AbsFluxStarId.Replace(" ", "_");
+                if (modifiedId.Length < 10) modifiedId += "_";
+                while (modifiedId.Length < 10)
+                {
+                    int firstUnderScorePos = modifiedId.IndexOf("_");
+                    modifiedId = modifiedId.Substring(0, firstUnderScorePos) + "_" + modifiedId.Substring(firstUnderScorePos);
+                }
+                string raStr = AstroConvert.ToStringValue(star.RA_J2000_Hours, "HH MM SS.TTT");
+                string deStr = AstroConvert.ToStringValue(star.DE_J2000_Deg, "+DD MM SS.TT");
+                string dataFileName = Path.GetFileNameWithoutExtension(star.FITS_File) + "_t1.txt";
+                string line = string.Format("{0}{1} {2}    {3}{4}  {5}  {6}\r\n",
+                    modifiedId.PadRight(14), raStr, deStr, 
+                    star.SpecType.PadRight(7), 
+                    star.MagV.ToString("0.00").PadLeft(5),
+                    star.MagBV.ToString("0.00").PadLeft(5),
+                    dataFileName);
+                indexFile.Append(line);
+
+                string filePath = Path.GetFullPath(@"Z:\CALSPEC\current_calspec\" + star.FITS_File);
+
+                using (var bf = new BufferedFile(filePath, FileAccess.Read, FileShare.ReadWrite))
+                {
+                    fitsFile.Read(bf);
+
+                    BasicHDU imageHDU = fitsFile.GetHDU(1);
+
+                    var table = (ColumnTable) imageHDU.Data.DataArray;
+                    double[] wavelengths = (double[])table.Columns[0];
+                    float[] fluxes = (float[])table.Columns[1];
+                    float[] col2 = (float[])table.Columns[2];
+                    float[] col3 = (float[])table.Columns[3];
+                    float[] col4 = (float[])table.Columns[4];
+                    short[] goodnessFlags = (short[])table.Columns[5];
+                    float[] exposures = (float[])table.Columns[6];
+
+                    var dataFile = new StringBuilder();
+                    dataFile.AppendLine("      WAVELENGTH          FLUX     STATERROR      SYSERROR         FWHM     DATAQUAL      TOTEXP");
+                    dataFile.AppendLine("              1D            1E            1E            1E           1E           1I          1E");
+                    dataFile.AppendLine("       ANGSTROMS          FLAM          FLAM          FLAM    ANGSTROMS         NONE         SEC");
+
+                    for (int j = 0; j < fluxes.Length; j++)
+                    {
+                        if (wavelengths[j] < 3000) continue;
+                        if (wavelengths[j] > 10120) break;
+
+                        string dataLine = string.Format("{0}{1}{2}{3}{4}            {5}{6}",
+                            ((int)Math.Round(wavelengths[j])).ToString().PadLeft(16),
+                            fluxes[j].ToString("E4").PadLeft(14),
+                            col2[j].ToString("E4").PadLeft(14),
+                            col3[j].ToString("E4").PadLeft(14),
+                            col4[j].ToString("#.0").PadLeft(13),
+                            goodnessFlags[j].ToString(),
+                            exposures[j].ToString("E1").PadLeft(12));
+
+                        dataFile.AppendLine(dataLine);
+                    }
+
+                    File.WriteAllText(@"Z:\AbsFlux\v2\" + dataFileName, dataFile.ToString());
+                }
+                
+            }
+            File.WriteAllText(@"Z:\AbsFlux\v2\AbsFluxCALSPECstars.txt", indexFile.ToString());
+        }
+
         private void BuildCalSpecDb()
         {
             var db = new CalSpecDatabase();
@@ -376,5 +451,20 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
             }
         }
         #endregion
+
+        private void miBuildCalSpecDB_Click(object sender, EventArgs e)
+        {
+            BuildCalSpecDb();
+        }
+
+        private void miTestCalSpecDB_Click(object sender, EventArgs e)
+        {
+            TestEmbeddedData();
+        }
+
+        private void miExportAbsFluxFiles_Click(object sender, EventArgs e)
+        {
+            BuildAbsFlux();
+        }
 	}
 }
