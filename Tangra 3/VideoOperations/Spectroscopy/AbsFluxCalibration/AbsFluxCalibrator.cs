@@ -118,19 +118,32 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 				{
 					standards[j].Residuals.Clear();
 					standards[j].ResidualPercentage.Clear();
+					standards[j].ResidualPercentageFlux.Clear();
+					standards[j].ResidualPercentageObsFlux.Clear();
+
 					for (int i = 0; i < standards[0].DeltaMagnitiudes.Count; i++)
 					{
-						// DeltaM = KE * AirMass + KS
-						double residualOC = standards[j].DeltaMagnitiudes[i] - m_ExtinctionCoefficients[i] * standards[j].InputFile.AirMass - m_SensitivityCoefficients[i];
+						// DeltaM = KE * AirMass + KS = -2.5 * Math.Log10((ObservedFluxes[i] / exposure) / AbsoluteFluxes[i])
+						double calculatedDeltaMag = m_ExtinctionCoefficients[i] * standards[j].InputFile.AirMass + m_SensitivityCoefficients[i];
+						double calculatedFluxRatio = Math.Pow(10, calculatedDeltaMag / -2.5);
+						double calculatedAbsoluteFlux = (standards[j].ObservedFluxes[i] / standards[j].InputFile.Exposure) / calculatedFluxRatio;
+						double calculatedObservedFlux = standards[j].AbsoluteFluxes[i] * calculatedFluxRatio * standards[j].InputFile.Exposure;
 
-						standards[j].Residuals.Add(residualOC);
-						standards[j].ResidualPercentage.Add(100 * residualOC / standards[j].DeltaMagnitiudes[i]);
+						double residualAbsoluteFluxOC = standards[j].AbsoluteFluxes[i] - calculatedAbsoluteFlux;
+
+						standards[j].Residuals.Add(residualAbsoluteFluxOC);
+						standards[j].ResidualPercentage.Add(100 * (calculatedDeltaMag - standards[j].DeltaMagnitiudes[i]) / standards[j].DeltaMagnitiudes[i]);
+						standards[j].ResidualPercentageFlux.Add(100 * residualAbsoluteFluxOC / standards[j].AbsoluteFluxes[i]);
+						standards[j].ResidualPercentageObsFlux.Add(100 * (standards[j].ObservedFluxes[i] - calculatedObservedFlux) / standards[j].ObservedFluxes[i]);
 					}
 
-					Trace.WriteLine(string.Format("{0}[{1} sec]: {2}%", 
+					Trace.WriteLine(string.Format("{0}[{1} sec, {2}]: {3}%, AbsFlux: {4}%, ObsFlux: {5}%", 
 						standards[j].ToString(),
-						standards[j].InputFile.Exposure.ToString("0.00"), 
-						standards[j].ResidualPercentage.Where(x => !double.IsNaN(x)).ToList().Median().ToString("0.0")));
+						standards[j].InputFile.Exposure.ToString("0.00"),
+						standards[j].InputFile.AirMass.ToString("0.000"), 
+						standards[j].ResidualPercentage.Where(x => !double.IsNaN(x)).ToList().Median().ToString("0.0"),
+						standards[j].ResidualPercentageFlux.Where(x => !double.IsNaN(x)).ToList().Median().ToString("0.0"),
+						standards[j].ResidualPercentageObsFlux.Where(x => !double.IsNaN(x)).ToList().Median().ToString("0.0")));
 				}
 
 				IsCalibrated = true;

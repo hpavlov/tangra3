@@ -20,6 +20,8 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 		public List<double> ResolvedWavelengths = new List<double>();
 		public List<double> Residuals = new List<double>();
 		public List<double> ResidualPercentage = new List<double>();
+		public List<double> ResidualPercentageFlux = new List<double>();
+		public List<double> ResidualPercentageObsFlux = new List<double>();
 
 		private static Regex STAR_DESIGNATION_REGEX = new Regex("(HD|BD|HIP|TYC)[\\d\\s\\-\\+_]+");
 
@@ -71,10 +73,8 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 				}
 			}
 
-			if (inputFile.Epoch > DateTime.MinValue && !float.IsNaN(inputFile.Exposure))
-				m_DisplayName += string.Format(" ({0}, {1}s)", inputFile.Epoch.ToString("HH:mm"), inputFile.Exposure.ToString("0.00"));
-			else if (inputFile.Epoch > DateTime.MinValue)
-				m_DisplayName += string.Format(" ({0})", inputFile.Epoch.ToString("HH:mm"));
+			if (inputFile.Epoch > DateTime.MinValue)
+				m_DisplayName += string.Format(" ({0} UT)", inputFile.Epoch.ToString("HH:mm"));
 
 			if (string.IsNullOrEmpty(m_DisplayName))
 				m_DisplayName = Path.GetFileNameWithoutExtension(inputFile.FileName);
@@ -109,7 +109,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 				double exposure = InputFile.Exposure;
 				for (int i = 0; i < ObservedFluxes.Count; i++)
 				{
-					DeltaMagnitiudes.Add(-2.5 * Math.Log10((ObservedFluxes[i] / exposure)) / AbsoluteFluxes[i]);
+					DeltaMagnitiudes.Add(-2.5 * Math.Log10((ObservedFluxes[i] / exposure) / AbsoluteFluxes[i]));
 				}
 			}
 		}
