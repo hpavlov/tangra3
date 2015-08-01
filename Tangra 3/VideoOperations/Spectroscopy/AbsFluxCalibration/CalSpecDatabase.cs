@@ -52,7 +52,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
                     {
                         if (s_Instance == null)
                         {
-                           using(Stream compressedStream = AssemblyHelper.GetEmbededResourceStreamThatClientMustDispose("Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration", "CalSpec.db"))
+                            using (Stream compressedStream = AssemblyHelper.GetEmbededResourceStreamThatClientMustDispose("Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration.Standards", "CalSpec.db"))
                            using (var deflateStream = new DeflateStream(compressedStream, CompressionMode.Decompress, true))
                            {
                                using (var reader = new BinaryReader(deflateStream))
@@ -77,12 +77,12 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
         public string AbsFluxStarId;
         public string TYC2;
         public string U4;
-        public float RA_J2000_Hours;
-        public float DE_J2000_Deg;
-        public float pmRA;
-        public float pmDE;
-        public float MagV;
-        public float MagBV;
+        public double RA_J2000_Hours;
+        public double DE_J2000_Deg;
+        public double pmRA;
+        public double pmDE;
+        public double MagV;
+        public double MagBV;
         public string SpecType;
         public string STIS_Flag;
         public string FITS_File;
@@ -98,12 +98,12 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
             AbsFluxStarId = reader.ReadString();
             TYC2 = reader.ReadString();
             U4 = reader.ReadString();
-            RA_J2000_Hours = reader.ReadSingle();
-            DE_J2000_Deg = reader.ReadSingle();
-            pmRA = reader.ReadSingle();
-            pmDE = reader.ReadSingle();
-            MagV = reader.ReadSingle();
-            MagBV = reader.ReadSingle();
+            RA_J2000_Hours = reader.ReadDouble();
+            DE_J2000_Deg = reader.ReadDouble();
+            pmRA = reader.ReadDouble();
+            pmDE = reader.ReadDouble();
+            MagV = reader.ReadDouble();
+            MagBV = reader.ReadDouble();
             SpecType = reader.ReadString();
             STIS_Flag = reader.ReadString();
             FITS_File = reader.ReadString();
@@ -112,8 +112,8 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
             DataPoints.Clear();
             for (int i = 0; i < cnt; i++)
             {
-                float wavelength = reader.ReadSingle();
-                float flux = reader.ReadSingle();
+                double wavelength = reader.ReadDouble();
+                double flux = reader.ReadDouble();
                 DataPoints.Add(wavelength, flux);
             }
         }
@@ -137,8 +137,8 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
             writer.Write(DataPoints.Count);
             foreach (double key in DataPoints.Keys)
             {
-				writer.Write((float)key);
-                writer.Write((float)DataPoints[key]);
+				writer.Write(key);
+                writer.Write(DataPoints[key]);
             }
         }
     }

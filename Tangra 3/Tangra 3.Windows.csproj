@@ -1219,8 +1219,9 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <None Include="Service References\TangraService\ErrorReports1.wsdl" />
-    <EmbeddedResource Include="VideoOperations\Spectroscopy\AbsFluxCalibration\CalSpec.db" />
     <None Include="VideoOperations\Spectroscopy\AbsFluxCalibration\ReferenceCode\AbsFlux.f90" />
+    <None Include="VideoOperations\Spectroscopy\AbsFluxCalibration\Standards\AbsFlux-TangraStars.csv" />
+    <EmbeddedResource Include="VideoOperations\Spectroscopy\AbsFluxCalibration\Standards\CalSpec.db" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

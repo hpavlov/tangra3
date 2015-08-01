@@ -209,8 +209,6 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
         #region Reference Code for Building the CalSpec.db
         private void BuildAbsFlux()
         {
-            Fits fitsFile = new Fits();
-
             var indexFile = new StringBuilder();
             indexFile.AppendLine("BD and HD CALSPEC stars with STIS fluxes between 3000 and 10000 Angstroms");
             indexFile.AppendLine("Name            FK5_Coordinates_J2000      Type    Mag    B-V   File_Name");
@@ -238,8 +236,11 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 
                 string filePath = Path.GetFullPath(@"Z:\CALSPEC\current_calspec\" + star.FITS_File);
 
+                double wavelengthFrom = star.DataPoints.Keys.Min();
+                double wavelengthTo = star.DataPoints.Keys.Max();
                 using (var bf = new BufferedFile(filePath, FileAccess.Read, FileShare.ReadWrite))
                 {
+                    var fitsFile = new Fits();
                     fitsFile.Read(bf);
 
                     BasicHDU imageHDU = fitsFile.GetHDU(1);
@@ -260,8 +261,8 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 
                     for (int j = 0; j < fluxes.Length; j++)
                     {
-                        if (wavelengths[j] < 3000) continue;
-                        if (wavelengths[j] > 10120) break;
+                        if (wavelengths[j] < wavelengthFrom) continue;
+                        if (wavelengths[j] > wavelengthTo) break;
 
                         string dataLine = string.Format("{0}{1}{2}{3}{4}            {5}{6}",
                             ((int)Math.Round(wavelengths[j])).ToString().PadLeft(16),
@@ -275,19 +276,20 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
                         dataFile.AppendLine(dataLine);
                     }
 
-                    File.WriteAllText(@"Z:\AbsFlux\v2\" + dataFileName, dataFile.ToString());
+                    fitsFile.Close();
+
+                    File.WriteAllText(@"Z:\AbsFlux\v3\" + dataFileName, dataFile.ToString());
                 }
                 
             }
-            File.WriteAllText(@"Z:\AbsFlux\v2\AbsFluxCALSPECstars.txt", indexFile.ToString());
+            File.WriteAllText(@"Z:\AbsFlux\v3\AbsFluxCALSPECstars.txt", indexFile.ToString());
         }
 
         private void BuildCalSpecDb()
         {
             var db = new CalSpecDatabase();
-            Fits fitsFile = new Fits();
             int totalBad = 0;
-            string[] lines2 = File.ReadAllLines(@"Z:\CALSPEC\AbsFlux-TangraStars2.csv");
+            string[] lines2 = File.ReadAllLines(@"F:\WORK\tangra3\Tangra 3\VideoOperations\Spectroscopy\AbsFluxCalibration\Standards\AbsFlux-TangraStars.csv");
             for (int i = 1; i < lines2.Length; i++)
             {
                 string[] tokens = lines2[i].Split(',');
@@ -303,8 +305,10 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
                 string absFluxId = tokens[8].Trim();
                 string stisFlag = tokens[9].Trim();
                 string fitsFilePath = tokens[10].Trim();
-                string tyc2 = tokens[11].Trim();
-                string ucac4 = tokens[12].Trim();
+                int stisFrom = int.Parse(tokens[11].Trim());
+                int stisTo = int.Parse(tokens[12].Trim());
+                string tyc2 = tokens[13].Trim();
+                string ucac4 = tokens[14].Trim();
 
                 if (!string.IsNullOrEmpty(pmRA) && !string.IsNullOrEmpty(pmDec))
                 {
@@ -316,19 +320,20 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
                         FITS_File = fitsFilePath,
                         TYC2 = tyc2,
                         U4 = ucac4,
-                        pmRA = float.Parse(pmRA),
-                        pmDE = float.Parse(pmDec),
-                        MagV = float.Parse(magV),
-                        MagBV = float.Parse(magBV),
+                        pmRA = double.Parse(pmRA),
+                        pmDE = double.Parse(pmDec),
+                        MagV = double.Parse(magV),
+                        MagBV = double.Parse(magBV),
                         SpecType = specType,
-                        RA_J2000_Hours = (float)AstroConvert.ToRightAcsension(RA_FK5_Hours),
-                        DE_J2000_Deg = (float)AstroConvert.ToDeclination(DEG_FK5_Deg)
+                        RA_J2000_Hours = AstroConvert.ToRightAcsension(RA_FK5_Hours),
+                        DE_J2000_Deg = AstroConvert.ToDeclination(DEG_FK5_Deg)
                     };
 
                     string filePath = Path.GetFullPath(@"Z:\CALSPEC\current_calspec\" + fitsFilePath);
 
                     using (var bf = new BufferedFile(filePath, FileAccess.Read, FileShare.ReadWrite))
                     {
+                        var fitsFile = new Fits();
                         fitsFile.Read(bf);
 
                         BasicHDU imageHDU = fitsFile.GetHDU(1);
@@ -340,21 +345,22 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 
                         for (int j = 0; j < fluxes.Length; j++)
                         {
-                            if (wavelengths[j] < 3000) continue;
-                            if (wavelengths[j] > 10120) break;
+                            if (wavelengths[j] < stisFrom) continue;
+                            if (wavelengths[j] > stisTo) break;
 
                             if (goodnessFlags[j] != 0)
-                                star.DataPoints.Add((float)wavelengths[j], fluxes[j]);
+                                star.DataPoints.Add(wavelengths[j], fluxes[j]);
                             else
                                 totalBad++;
                         }
+                        fitsFile.Close();
                     }
 
                     db.Stars.Add(star);
                 }
             }
 
-            using (var compressedStream = new FileStream(@"Z:\CALSPEC\current_calspec\tangra.db", FileMode.CreateNew, FileAccess.Write))
+            using (var compressedStream = new FileStream(@"F:\WORK\tangra3\Tangra 3\VideoOperations\Spectroscopy\AbsFluxCalibration\Standards\CalSpec.db", FileMode.CreateNew, FileAccess.Write))
             using (var deflateStream = new DeflateStream(compressedStream, CompressionMode.Compress, true))
             {
                 using (var writer = new BinaryWriter(deflateStream))
@@ -363,7 +369,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
                 }
             }
 
-            using (var compressedStream = new FileStream(@"Z:\CALSPEC\current_calspec\tangra.db", FileMode.Open, FileAccess.Read))
+            using (var compressedStream = new FileStream(@"F:\WORK\tangra3\Tangra 3\VideoOperations\Spectroscopy\AbsFluxCalibration\Standards\CalSpec.db", FileMode.Open, FileAccess.Read))
             using (var deflateStream = new DeflateStream(compressedStream, CompressionMode.Decompress, true))
             {
                 using (var reader = new BinaryReader(deflateStream))
@@ -382,6 +388,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
             {
                 using (var bf = new BufferedFile(filePath, FileAccess.Read, FileShare.ReadWrite))
                 {
+                    var fitsFile = new Fits();
                     fitsFile.Read(bf);
 
                     var bld = new StringBuilder();
@@ -402,36 +409,42 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
                     }
 
                     var table = (ColumnTable)imageHDU.Data.DataArray;
-                    double[] wavelengths = (double[])table.Columns[0];
-                    float[] fluxes = (float[])table.Columns[1];
-                    float[] col2 = (float[])table.Columns[2];
-                    float[] col3 = (float[])table.Columns[3];
-                    float[] col4 = (float[])table.Columns[4];
-                    short[] goodnessFlags = (short[])table.Columns[5];
-                    float[] exposures = (float[])table.Columns[6];
-
-                    for (int i = 0; i < fluxes.Length; i++)
+                    if (table.Columns.Length == 7 &&
+                        table.Columns[0] is double[] && table.Columns[1] is float[] && table.Columns[2] is float[] && table.Columns[3] is float[] &&
+                        table.Columns[4] is float[] && table.Columns[5] is short[] && table.Columns[6] is float[])
                     {
-                        if (wavelengths[i] < 2000) continue;
-                        if (wavelengths[i] > 15000) break;
+                        double[] wavelengths = (double[])table.Columns[0];
+                        float[] fluxes = (float[])table.Columns[1];
+                        float[] col2 = (float[])table.Columns[2];
+                        float[] col3 = (float[])table.Columns[3];
+                        float[] col4 = (float[])table.Columns[4];
+                        short[] goodnessFlags = (short[])table.Columns[5];
+                        float[] exposures = (float[])table.Columns[6];
 
-                        bld.Append(wavelengths[i].ToString().PadLeft(20));
-                        bld.Append(fluxes[i].ToString().PadLeft(20));
-                        bld.Append(col2[i].ToString().PadLeft(20));
-                        bld.Append(col3[i].ToString().PadLeft(20));
-                        bld.Append(col4[i].ToString().PadLeft(20));
-                        bld.Append(goodnessFlags[i].ToString().PadLeft(15));
-                        bld.Append(exposures[i].ToString().PadLeft(15));
-                        bld.AppendLine();
+                        for (int i = 0; i < fluxes.Length; i++)
+                        {
+                            if (wavelengths[i] < 2000) continue;
+                            if (wavelengths[i] > 15000) break;
 
-                        int expMS = (int)Math.Round(exposures[i] * 1000);
-                        if (!dist.ContainsKey(expMS)) dist.Add(expMS, 0);
-                        dist[expMS]++;
+                            bld.Append(wavelengths[i].ToString().PadLeft(20));
+                            bld.Append(fluxes[i].ToString().PadLeft(20));
+                            bld.Append(col2[i].ToString().PadLeft(20));
+                            bld.Append(col3[i].ToString().PadLeft(20));
+                            bld.Append(col4[i].ToString().PadLeft(20));
+                            bld.Append(goodnessFlags[i].ToString().PadLeft(15));
+                            bld.Append(exposures[i].ToString().PadLeft(15));
+                            bld.AppendLine();
 
+                            int expMS = (int)Math.Round(exposures[i] * 1000);
+                            if (!dist.ContainsKey(expMS)) dist.Add(expMS, 0);
+                            dist[expMS]++;
+
+                        }                        
                     }
 
                     string outFileName = Path.ChangeExtension(filePath, ".txt");
                     File.WriteAllText(outFileName, bld.ToString());
+                    fitsFile.Close();
                 }
             }
 

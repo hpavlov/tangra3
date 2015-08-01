@@ -42,11 +42,11 @@
             this.pnlClient = new System.Windows.Forms.Panel();
             this.picPlot = new System.Windows.Forms.PictureBox();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-            this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.miMaintenance = new System.Windows.Forms.ToolStripMenuItem();
             this.miBuildCalSpecDB = new System.Windows.Forms.ToolStripMenuItem();
             this.miTestCalSpecDB = new System.Windows.Forms.ToolStripMenuItem();
             this.miExportAbsFluxFiles = new System.Windows.Forms.ToolStripMenuItem();
+            this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.pnlFiles.SuspendLayout();
             this.ctxMenuIncludedSpectra.SuspendLayout();
             this.pnlClient.SuspendLayout();
@@ -168,12 +168,6 @@
             this.menuStrip1.TabIndex = 3;
             this.menuStrip1.Text = "menuStrip1";
             // 
-            // openFileDialog
-            // 
-            this.openFileDialog.DefaultExt = "spectra";
-            this.openFileDialog.Filter = "Tangra Exports (*.dat)|*.dat|All Files (*.*)|*.*";
-            this.openFileDialog.Title = "Select Spectra File to Add All Files from Same Location";
-            // 
             // miMaintenance
             // 
             this.miMaintenance.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -205,6 +199,12 @@
             this.miExportAbsFluxFiles.Size = new System.Drawing.Size(180, 22);
             this.miExportAbsFluxFiles.Text = "Export AbsFlux Fomat";
             this.miExportAbsFluxFiles.Click += new System.EventHandler(this.miExportAbsFluxFiles_Click);
+            // 
+            // openFileDialog
+            // 
+            this.openFileDialog.DefaultExt = "spectra";
+            this.openFileDialog.Filter = "Tangra Exports (*.dat)|*.dat|All Files (*.*)|*.*";
+            this.openFileDialog.Title = "Select Spectra File to Add All Files from Same Location";
             // 
             // frmAbsFlux
             // 
