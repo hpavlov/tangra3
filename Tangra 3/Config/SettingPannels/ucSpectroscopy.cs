@@ -31,6 +31,11 @@ namespace Tangra.Config.SettingPannels
 			nudMinWavelength.SetNUDValue(TangraConfig.Settings.Spectroscopy.MinWavelength);
 			nudMaxWavelength.SetNUDValue(TangraConfig.Settings.Spectroscopy.MaxWavelength);
 			nudResolution.SetNUDValue(TangraConfig.Settings.Spectroscopy.AbsFluxResolution);
+
+			if (TangraConfig.Settings.Spectroscopy.Sampling == TangraConfig.AbsFluxSampling.GaussianSmoothingAndBinning)
+				rbGaussSampling.Checked = true;
+			else if (TangraConfig.Settings.Spectroscopy.Sampling == TangraConfig.AbsFluxSampling.LaGrangeInterpolation)
+				rbLaGrangeSampling.Checked = true;
 		}
 
 		public override void SaveSettings()
@@ -47,6 +52,11 @@ namespace Tangra.Config.SettingPannels
 			TangraConfig.Settings.Spectroscopy.MinWavelength = (int)nudMinWavelength.Value;
 			TangraConfig.Settings.Spectroscopy.MaxWavelength = (int)nudMaxWavelength.Value;
 			TangraConfig.Settings.Spectroscopy.AbsFluxResolution = (int)nudResolution.Value;
+
+			if (rbGaussSampling.Checked)
+				TangraConfig.Settings.Spectroscopy.Sampling = TangraConfig.AbsFluxSampling.GaussianSmoothingAndBinning;
+			else if (rbLaGrangeSampling.Checked)
+				TangraConfig.Settings.Spectroscopy.Sampling = TangraConfig.AbsFluxSampling.LaGrangeInterpolation;
 		}
 	}
 }

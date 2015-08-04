@@ -1299,7 +1299,7 @@ namespace Tangra
 		private void miAbsoluteFlux_Click(object sender, EventArgs e)
 		{
 			var frmAbsFlux = new frmAbsFlux(m_SpectroscopyController.DisplaySettings);
-			frmAbsFlux.ShowDialog(this);
+			frmAbsFlux.Show(this);
 		}
 	}
 }

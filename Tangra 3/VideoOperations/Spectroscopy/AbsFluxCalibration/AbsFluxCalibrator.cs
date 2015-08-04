@@ -21,6 +21,15 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 
 		private List<AbsFluxSpectra> m_SpectraList = new List<AbsFluxSpectra>();
 
+		public int NumSpectra { get { return m_SpectraList.Count; } }
+
+		public double Bias(int number)
+		{
+			var spectra = m_SpectraList.SingleOrDefault(x => x.Number == number);
+			if (spectra != null) return spectra.AverageBiasPercentage;
+			else return double.NaN;
+		}
+
 		internal AbsFluxCalibrator()
 		{
 			FromWavelength = TangraConfig.Settings.Spectroscopy.MinWavelength;
@@ -29,12 +38,22 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			IsCalibrated = false;
 		}
 
+		private void AssignNumbers()
+		{
+			for (int i = 0; i < m_SpectraList.Count; i++)
+			{
+				m_SpectraList[i].Number = i + 1;
+			}	
+		}
+
 		internal void AddSpectra(AbsFluxSpectra spectra)
 		{
 			if (!m_SpectraList.Any(x => x.FullFilePath.Equals(spectra.FullFilePath, StringComparison.InvariantCultureIgnoreCase)))
 			{
 				spectra.RescaleToResolution(FromWavelength, ToWavelength, WavelengthBinSize);
 				m_SpectraList.Add(spectra);
+
+				AssignNumbers();
 
 				if (m_SpectraList.Count(x => x.IsComplete && x.IsStandard) > 2)
 				{
@@ -50,6 +69,8 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 		internal void RemoveSpectra(AbsFluxSpectra spectra)
 		{
 			m_SpectraList.RemoveAll(x => x.FullFilePath.Equals(spectra.FullFilePath, StringComparison.InvariantCultureIgnoreCase));
+
+			AssignNumbers();
 
 			if (m_SpectraList.Count(x => x.IsComplete && x.IsStandard) > 2)
 			{
@@ -154,7 +175,10 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			}			
 		}
 
-		private const int PADDING = 10; 
+		private const int PADDING = 10;
+		private const int LONG_MARK = 6;
+		private const int SHORT_MARK = 3;
+
 		internal void PlotCalibration(Graphics g, int width, int height, int topHeaderHeight, TangraConfig.SpectraViewDisplaySettings displaySetting)
 		{
 			List<AbsFluxSpectra> plotObjects = m_SpectraList.Where(x => x.IsComplete).ToList();
@@ -173,8 +197,9 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			SizeF size = g.MeasureString("1.3E-12", displaySetting.LegendFont);
 			float X_AXIS_LEGEND_HEIGHT = size.Height * 1.5f;
 			float Y_AXIS_LEGEND_WIDTH = size.Width * 1.5f;
+
 			// Scale 
-			float scaleY = (float)((height - topHeaderHeight - 2 * PADDING - X_AXIS_LEGEND_HEIGHT) / maxFlux);
+			float scaleY = (float)((height - topHeaderHeight - 2 * PADDING - X_AXIS_LEGEND_HEIGHT - LONG_MARK) / maxFlux);
 			float scaleX = ((width - 2 * PADDING - Y_AXIS_LEGEND_WIDTH) * 1.0f / (ToWavelength - FromWavelength));
 
 
@@ -191,6 +216,15 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 				prevPoint = PointF.Empty;
 				prevPointO = PointF.Empty;
 
+				int objIndex = plotObjects[j].Number - 1;
+				Pen absFluxPen = objIndex >= 0 && objIndex < displaySetting.AbsFluxPen.Length
+					? displaySetting.AbsFluxPen[objIndex]
+					: displaySetting.AbsFluxPenDefault;
+
+				Pen absFluxObsPen = objIndex >= 0 && objIndex < displaySetting.AbsFluxObsPen.Length
+					? displaySetting.AbsFluxObsPen[objIndex]
+					: displaySetting.AbsFluxObsPenDefault;
+
 				for (int i = 0; i < plotObjects[j].AbsoluteFluxes.Count; i++)
 				{
 					double flux = plotObjects[j].AbsoluteFluxes[i];
@@ -202,12 +236,15 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 						float x = (float)(PADDING + Y_AXIS_LEGEND_WIDTH + (wavelength - FromWavelength) * scaleX);
 						float y = (float)(height - PADDING - X_AXIS_LEGEND_HEIGHT - flux * scaleY);
 						float yO = (float)(height - PADDING - X_AXIS_LEGEND_HEIGHT - fluxObs * scaleY);
+
 						var thisPoint = new PointF(x, y);
 						var thisPointO = new PointF(x, yO);
+	
 						if (prevPoint != Point.Empty)
-							g.DrawLine(displaySetting.KnownLinePen, prevPoint, thisPoint);
+							g.DrawLine(absFluxPen, prevPoint, thisPoint);
+
 						if (prevPointO != Point.Empty)
-							g.DrawLine(displaySetting.SpectraPen, prevPointO, thisPointO);
+							g.DrawLine(absFluxObsPen, prevPointO, thisPointO);
 
 						prevPoint = thisPoint;
 						prevPointO = thisPointO;
@@ -251,18 +288,18 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 				//if (tickPos < topHeaderHeight + PADDING) continue;
 				if (tickPos > height - X_AXIS_LEGEND_HEIGHT - PADDING) continue;
 
-				g.DrawLine(displaySetting.GridLinesPen, x0, tickPos, x0 + 6, tickPos);
-				g.DrawLine(displaySetting.GridLinesPen, x1, tickPos, x1 - 6, tickPos);
+				g.DrawLine(displaySetting.GridLinesPen, x0, tickPos, x0 + LONG_MARK, tickPos);
+				g.DrawLine(displaySetting.GridLinesPen, x1, tickPos, x1 - LONG_MARK, tickPos);
 
-				g.DrawString(markStr, displaySetting.LegendFont, displaySetting.LegendBrush, x0 - size.Width - 6, tickPos - size.Height / 2.0f);
+				g.DrawString(markStr, displaySetting.LegendFont, displaySetting.LegendBrush, x0 - size.Width - LONG_MARK, tickPos - size.Height / 2.0f);
 			}
 
 			for (double f = 0; f < maxFlux; f += MINOR_TICK_INTERVAL)
 			{
 				float tickPos = (float)(height - PADDING - X_AXIS_LEGEND_HEIGHT - f * scaleY);
 
-				g.DrawLine(displaySetting.GridLinesPen, x0, tickPos, x0 + 3, tickPos);
-				g.DrawLine(displaySetting.GridLinesPen, x1, tickPos, x1 - 3, tickPos);
+				g.DrawLine(displaySetting.GridLinesPen, x0, tickPos, x0 + SHORT_MARK, tickPos);
+				g.DrawLine(displaySetting.GridLinesPen, x1, tickPos, x1 - SHORT_MARK, tickPos);
 			}
 		}
 
@@ -295,10 +332,10 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 				if (tickPos - size.Width / 2.0f < PADDING + Y_AXIS_LEGEND_WIDTH) continue;
 				if (tickPos + size.Width / 2.0f > width - PADDING) break;
 
-				g.DrawLine(displaySetting.GridLinesPen, tickPos, y0, tickPos, y0 - 6);
-				g.DrawLine(displaySetting.GridLinesPen, tickPos, y1, tickPos, y1 + 6);
+				g.DrawLine(displaySetting.GridLinesPen, tickPos, y0, tickPos, y0 - LONG_MARK);
+				g.DrawLine(displaySetting.GridLinesPen, tickPos, y1, tickPos, y1 + LONG_MARK);
 
-				g.DrawString(markStr, displaySetting.LegendFont, displaySetting.LegendBrush, tickPos - size.Width / 2.0f, y0 + 6);
+				g.DrawString(markStr, displaySetting.LegendFont, displaySetting.LegendBrush, tickPos - size.Width / 2.0f, y0 + LONG_MARK);
 			}
 
 			for (int w = INTERVAL * ((FromWavelength / INTERVAL) - 1); w < ToWavelength + INTERVAL; w += MINOR_TICK_INTERVAL)
@@ -310,8 +347,8 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 				if (tickPos < PADDING + Y_AXIS_LEGEND_WIDTH) continue;
 				if (tickPos > width - PADDING) break;
 
-				g.DrawLine(displaySetting.GridLinesPen, tickPos, y0, tickPos, y0 - 3);
-				g.DrawLine(displaySetting.GridLinesPen, tickPos, y1, tickPos, y1 + 3);
+				g.DrawLine(displaySetting.GridLinesPen, tickPos, y0, tickPos, y0 - SHORT_MARK);
+				g.DrawLine(displaySetting.GridLinesPen, tickPos, y1, tickPos, y1 + SHORT_MARK);
 			}
 		}
 	}

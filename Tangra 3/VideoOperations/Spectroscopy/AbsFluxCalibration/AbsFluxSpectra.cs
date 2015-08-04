@@ -31,6 +31,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 		public AbsFluxInputFile InputFile { get; private set; }
 		public CalSpecStar m_CalSpecStar;
 		public bool IsComplete { get; private set; }
+		public int Number;
 
 		public bool IsStandard
 		{
@@ -80,13 +81,14 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			if (string.IsNullOrEmpty(m_DisplayName))
 				m_DisplayName = Path.GetFileNameWithoutExtension(inputFile.FileName);
 
+
 			DataFromWavelength = (int)Math.Ceiling(inputFile.Wavelengths[0]);
 			DataFromWavelength = (int)Math.Floor(inputFile.Wavelengths[inputFile.Wavelengths.Count - 1]);
 		}
 
 		public override string ToString()
 		{
-			return m_DisplayName ?? InputFile.FileName;
+			return string.Format("{0}.{1}", Number, m_DisplayName ?? InputFile.FileName);
 		}
 
 		public string FullFilePath

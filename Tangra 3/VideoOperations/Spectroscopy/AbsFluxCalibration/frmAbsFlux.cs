@@ -152,11 +152,13 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 		{
 			var spectra = new AbsFluxSpectra(inputFile);
 
-			lbIncludedSpecta.Items.Add(spectra);
-			lbAvailableFiles.Items.Remove(inputFile);
-
 			if (spectra.IsComplete)
 			{
+				m_AbsFluxCalibrator.AddSpectra(spectra);
+
+				lbIncludedSpecta.Items.Add(spectra);
+				lbAvailableFiles.Items.Remove(inputFile);
+
 				lbIncludedSpecta.ItemCheck -= lbIncludedSpecta_ItemCheck;
 				try
 				{
@@ -166,8 +168,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 				{
 					lbIncludedSpecta.ItemCheck += lbIncludedSpecta_ItemCheck;	
 				}
-				
-				m_AbsFluxCalibrator.AddSpectra(spectra);
+								
 				PlotCalibration();
 			}
 		}
@@ -177,10 +178,11 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			var selectedSpectra = lbIncludedSpecta.SelectedItem as AbsFluxSpectra;
 			if (selectedSpectra != null)
 			{
+				m_AbsFluxCalibrator.RemoveSpectra(selectedSpectra);
+
 				lbIncludedSpecta.Items.Remove(selectedSpectra);
 				lbAvailableFiles.Items.Add(selectedSpectra.InputFile);
 
-				m_AbsFluxCalibrator.RemoveSpectra(selectedSpectra);
 				PlotCalibration();
 			}
 		}
@@ -508,7 +510,36 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 				}
 			}
 
+			for (int i = 1; i < 10; i++) ShowHideSpectraLegend(i);
+
 			picPlot.Invalidate();
+		}
+
+		private void ShowHideSpectraLegend(int number)
+		{
+			if (number > 0 && number < 10)
+			{
+				bool visible = false;
+
+				var objLabls = new Label[] { lblObj1, lblObj2, lblObj3, lblObj4, lblObj5, lblObj6, lblObj7, lblObj8, lblObj9 };
+
+				if (number <= m_AbsFluxCalibrator.NumSpectra)
+				{
+					double bias = m_AbsFluxCalibrator.Bias(number);
+					if (!double.IsNaN(bias))
+						objLabls[number - 1].Text = (bias < 0 ? "-" : "+") + Math.Abs(bias).ToString("0.0 %");
+					else
+						objLabls[number - 1].Text = "NaN";
+
+					visible = m_AbsFluxCalibrator.IsCalibrated;
+				}
+
+				string tag = (100 + number).ToString();
+				foreach (Control ctl in pnlDetail.Controls)
+				{
+					if (Convert.ToString(ctl.Tag) == tag) ctl.Visible = visible;
+				}
+			}
 		}
 
 		private void picPlot_Resize(object sender, EventArgs e)
@@ -523,6 +554,11 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 
 			picPlot.Image = new Bitmap(picPlot.Width, picPlot.Height, PixelFormat.Format24bppRgb);
 			PlotCalibration();
+		}
+
+		private void label1_Click(object sender, EventArgs e)
+		{
+
 		}
 	}
 }

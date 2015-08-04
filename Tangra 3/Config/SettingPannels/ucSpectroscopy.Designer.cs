@@ -46,6 +46,9 @@
 			this.label3 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
+			this.rbGaussSampling = new System.Windows.Forms.RadioButton();
+			this.label7 = new System.Windows.Forms.Label();
+			this.rbLaGrangeSampling = new System.Windows.Forms.RadioButton();
 			this.groupBox8.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nudResolution)).BeginInit();
@@ -139,6 +142,9 @@
 			// 
 			// groupBox1
 			// 
+			this.groupBox1.Controls.Add(this.rbLaGrangeSampling);
+			this.groupBox1.Controls.Add(this.label7);
+			this.groupBox1.Controls.Add(this.rbGaussSampling);
 			this.groupBox1.Controls.Add(this.label6);
 			this.groupBox1.Controls.Add(this.label5);
 			this.groupBox1.Controls.Add(this.label4);
@@ -150,7 +156,7 @@
 			this.groupBox1.Controls.Add(this.label1);
 			this.groupBox1.Location = new System.Drawing.Point(240, 48);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(231, 136);
+			this.groupBox1.Size = new System.Drawing.Size(231, 214);
 			this.groupBox1.TabIndex = 34;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Absolute Flux Calibration";
@@ -275,6 +281,37 @@
 			this.label1.TabIndex = 10;
 			this.label1.Text = "Resolution:";
 			// 
+			// rbGaussSampling
+			// 
+			this.rbGaussSampling.AutoSize = true;
+			this.rbGaussSampling.Checked = true;
+			this.rbGaussSampling.Location = new System.Drawing.Point(38, 149);
+			this.rbGaussSampling.Name = "rbGaussSampling";
+			this.rbGaussSampling.Size = new System.Drawing.Size(181, 17);
+			this.rbGaussSampling.TabIndex = 20;
+			this.rbGaussSampling.TabStop = true;
+			this.rbGaussSampling.Text = "Gaussian Smoothing and Binning";
+			this.rbGaussSampling.UseVisualStyleBackColor = true;
+			// 
+			// label7
+			// 
+			this.label7.AutoSize = true;
+			this.label7.Location = new System.Drawing.Point(21, 123);
+			this.label7.Name = "label7";
+			this.label7.Size = new System.Drawing.Size(120, 13);
+			this.label7.TabIndex = 20;
+			this.label7.Text = "Sampling for Calibration:";
+			// 
+			// rbLaGrangeSampling
+			// 
+			this.rbLaGrangeSampling.AutoSize = true;
+			this.rbLaGrangeSampling.Location = new System.Drawing.Point(38, 172);
+			this.rbLaGrangeSampling.Name = "rbLaGrangeSampling";
+			this.rbLaGrangeSampling.Size = new System.Drawing.Size(136, 17);
+			this.rbLaGrangeSampling.TabIndex = 21;
+			this.rbLaGrangeSampling.Text = "La Grange Interpolation";
+			this.rbLaGrangeSampling.UseVisualStyleBackColor = true;
+			// 
 			// ucSpectroscopy
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -318,5 +355,8 @@
 		private System.Windows.Forms.Label label5;
 		private System.Windows.Forms.Label label4;
 		private System.Windows.Forms.NumericUpDown nudResolution;
+		private System.Windows.Forms.RadioButton rbLaGrangeSampling;
+		private System.Windows.Forms.Label label7;
+		private System.Windows.Forms.RadioButton rbGaussSampling;
 	}
 }

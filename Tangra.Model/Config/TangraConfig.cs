@@ -1170,6 +1170,13 @@ namespace Tangra.Model.Config
 			public Pen SpectraBackgroundPen;
             public Pen SpectraBackgroundFadedPen;
 
+			public Color[] AbsFluxColor;
+			public Pen[] AbsFluxPen;
+			public Pen[] AbsFluxObsPen;
+			public Color AbsFluxDefaultColor;
+			public Pen AbsFluxPenDefault;
+			public Pen AbsFluxObsPenDefault;
+
 			public void Load()
 			{
 				SpectraLineColor = TangraConfig.Settings.Spectroscopy.Colors.SpectraLineColor;
@@ -1221,12 +1228,45 @@ namespace Tangra.Model.Config
                 if (SpectraBackgroundFadedPen != null) SpectraBackgroundFadedPen.Dispose();
                 SpectraBackgroundFadedPen = new Pen(System.Drawing.Color.FromArgb(30, SpectraApertureColor.R, SpectraApertureColor.G, SpectraApertureColor.B));
                 
-
 				for (int i = 0; i < 256; i++)
 				{
 					if (GreyBrushes[i] != null) GreyBrushes[i].Dispose();
 					GreyBrushes[i] = new SolidBrush(System.Drawing.Color.FromArgb(i, i, i));
-				}		
+				}
+
+				if (AbsFluxPen != null && AbsFluxPen.Length > 0)
+					for (int i = 0; i < AbsFluxPen.Length; i++) if (AbsFluxPen[i] != null) AbsFluxPen[i].Dispose();
+
+				if (AbsFluxObsPen != null && AbsFluxObsPen.Length > 0)
+					for (int i = 0; i < AbsFluxObsPen.Length; i++) if (AbsFluxObsPen[i] != null) AbsFluxObsPen[i].Dispose();
+
+				if (AbsFluxPenDefault != null) AbsFluxPenDefault.Dispose();
+				if (AbsFluxObsPenDefault != null) AbsFluxObsPenDefault.Dispose();
+
+				AbsFluxColor = new Color[9];
+				AbsFluxPen = new Pen[9];
+				AbsFluxObsPen = new Pen[9];
+
+				AbsFluxColor[0] = System.Drawing.Color.Lime;
+				AbsFluxColor[1] = System.Drawing.Color.Aqua;
+				AbsFluxColor[2] = System.Drawing.Color.Yellow;
+				AbsFluxColor[3] = System.Drawing.Color.Fuchsia;
+				AbsFluxColor[4] = System.Drawing.Color.FromArgb(255, 128, 0);
+				AbsFluxColor[5] = System.Drawing.Color.Blue;
+				AbsFluxColor[6] = System.Drawing.Color.Green;
+				AbsFluxColor[7] = System.Drawing.Color.FromArgb(64, 64, 64);
+				AbsFluxColor[8] = System.Drawing.Color.Red;
+				AbsFluxDefaultColor = System.Drawing.Color.Purple;
+
+				for (int i = 0; i < 9; i++)
+				{
+					AbsFluxObsPen[i] = new Pen(AbsFluxColor[i]);
+					AbsFluxPen[i] = new Pen(System.Drawing.Color.FromArgb(70, AbsFluxColor[i]));
+				}
+
+				AbsFluxObsPenDefault = new Pen(AbsFluxDefaultColor);
+				AbsFluxPenDefault = new Pen(System.Drawing.Color.FromArgb(70, AbsFluxDefaultColor));
+
 			}
 		}
 
@@ -1346,6 +1386,7 @@ namespace Tangra.Model.Config
 			public int MinWavelength;
 			public int MaxWavelength;
 			public int AbsFluxResolution;
+			public AbsFluxSampling Sampling;
 
 			public SpectraColors Colors;
 
@@ -1362,6 +1403,7 @@ namespace Tangra.Model.Config
 				MinWavelength = 3000;
 				MaxWavelength = 10000;
 				AbsFluxResolution = 50;
+				Sampling = AbsFluxSampling.GaussianSmoothingAndBinning;
 			}
 		}
 
@@ -2049,6 +2091,12 @@ namespace Tangra.Model.Config
 		public enum SpectroscopyInstrument
 		{
 			Grating
+		}
+
+		public enum AbsFluxSampling
+		{
+			GaussianSmoothingAndBinning,
+			LaGrangeInterpolation
 		}
 	}
 }
