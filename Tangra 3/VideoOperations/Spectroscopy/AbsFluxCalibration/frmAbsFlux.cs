@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
@@ -11,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Tangra.Helpers;
+using Tangra.Model.Config;
 using Tangra.Model.Helpers;
 using nom.tam.fits;
 using nom.tam.util;
@@ -21,10 +23,18 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 	{
 		private bool m_NewlyOpened = false;
 		private AbsFluxCalibrator m_AbsFluxCalibrator;
+		private TangraConfig.SpectraViewDisplaySettings m_DisplaySetting;
+
 
 		public frmAbsFlux()
 		{
 			InitializeComponent();
+		}
+
+		public frmAbsFlux(TangraConfig.SpectraViewDisplaySettings displaySetting)
+			: this()
+		{
+			m_DisplaySetting = displaySetting;
 
 			m_NewlyOpened = true;
 			m_AbsFluxCalibrator = new AbsFluxCalibrator();
@@ -34,7 +44,8 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 
 		private void frmAbsFlux_Load(object sender, EventArgs e)
 		{
-
+			picPlot.Image = new Bitmap(picPlot.Width, picPlot.Height, PixelFormat.Format24bppRgb);
+			PlotCalibration();
 		}
 
 		private void UpdateUIState()
@@ -157,6 +168,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 				}
 				
 				m_AbsFluxCalibrator.AddSpectra(spectra);
+				PlotCalibration();
 			}
 		}
 
@@ -169,6 +181,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 				lbAvailableFiles.Items.Add(selectedSpectra.InputFile);
 
 				m_AbsFluxCalibrator.RemoveSpectra(selectedSpectra);
+				PlotCalibration();
 			}
 		}
 
@@ -185,6 +198,8 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 				{
 					TryAddSpectraToCalibrator(selectedSpectra, true);
 				}
+
+				PlotCalibration();
 			}
 		}
 
@@ -204,6 +219,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 				// TODO: Ask user to provide missing data (object coordinates, identification, site location, exposure, etc)
 				//       Then add the spectra to the calibration if all defined okay
 			}
+			PlotCalibration();
 		}
 
         #region Reference Code for Building the CalSpec.db
@@ -479,5 +495,34 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
         {
             BuildAbsFlux();
         }
+
+		private void PlotCalibration()
+		{			
+			using (Graphics g = Graphics.FromImage(picPlot.Image))
+			{
+				g.Clear(m_DisplaySetting.PlotBackgroundColor);
+
+				if (m_AbsFluxCalibrator.IsCalibrated)
+				{
+					m_AbsFluxCalibrator.PlotCalibration(g, picPlot.Image.Width, picPlot.Image.Height, menuStrip1.Height, m_DisplaySetting);
+				}
+			}
+
+			picPlot.Invalidate();
+		}
+
+		private void picPlot_Resize(object sender, EventArgs e)
+		{
+			resizeTimer.Enabled = false;
+			resizeTimer.Enabled = true;
+		}
+
+		private void resizeTimer_Tick(object sender, EventArgs e)
+		{
+			resizeTimer.Enabled = false;
+
+			picPlot.Image = new Bitmap(picPlot.Width, picPlot.Height, PixelFormat.Format24bppRgb);
+			PlotCalibration();
+		}
 	}
 }

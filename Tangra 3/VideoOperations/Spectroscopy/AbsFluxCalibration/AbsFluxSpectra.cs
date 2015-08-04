@@ -22,6 +22,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 		public List<double> ResidualPercentage = new List<double>();
 		public List<double> ResidualPercentageFlux = new List<double>();
 		public List<double> ResidualPercentageObsFlux = new List<double>();
+		public double AverageBiasPercentage { get; set; }
 
 		private static Regex STAR_DESIGNATION_REGEX = new Regex("(HD|BD|HIP|TYC)[\\d\\s\\-\\+_]+");
 
