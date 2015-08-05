@@ -11,6 +11,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 	internal class AbsFluxSpectra
 	{
 		public int WavelengthFrom { get; set; }
+		public int WavelengthTo { get; set; }
 		public int WavelengthBinSize { get; set; }
 		public int DataFromWavelength { get; set; }
 		public int DataToWavelength { get; set; }
@@ -98,15 +99,16 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 
 		internal void RescaleToResolution(int fromWavelength, int toWavelength, int step)
 		{
-			WavelengthFrom = fromWavelength;
+			WavelengthFrom = fromWavelength - (int)Math.Ceiling(step / 2.0);
 			WavelengthBinSize = step;
+			WavelengthTo = toWavelength + (int) Math.Ceiling(step/2.0);
 
-			RescaleData(fromWavelength, toWavelength, step, InputFile.Wavelengths, InputFile.Fluxes, ObservedFluxes, ResolvedWavelengths);
+			RescaleData(WavelengthFrom, WavelengthTo, WavelengthBinSize, InputFile.Wavelengths, InputFile.Fluxes, ObservedFluxes, ResolvedWavelengths);
 			if (m_CalSpecStar != null)
 			{
 				List<double> absWavelengths = m_CalSpecStar.DataPoints.Keys.ToList();
 				List<double> absFluxes = m_CalSpecStar.DataPoints.Values.ToList();
-				RescaleData(fromWavelength, toWavelength, step, absWavelengths, absFluxes, AbsoluteFluxes, null);
+				RescaleData(WavelengthFrom, WavelengthTo, WavelengthBinSize, absWavelengths, absFluxes, AbsoluteFluxes, null);
 
 				DeltaMagnitiudes.Clear();
 				double exposure = InputFile.Exposure;

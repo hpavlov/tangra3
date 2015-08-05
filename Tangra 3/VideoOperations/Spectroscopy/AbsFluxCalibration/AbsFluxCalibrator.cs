@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Text;
 using Tangra.Helpers;
@@ -152,7 +153,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 						double calculatedAbsoluteFlux = (standards[j].ObservedFluxes[i] / standards[j].InputFile.Exposure) / calculatedFluxRatio;
 						double calculatedObservedFlux = standards[j].AbsoluteFluxes[i] * calculatedFluxRatio * standards[j].InputFile.Exposure;
 
-						double residualAbsoluteFluxOC = standards[j].AbsoluteFluxes[i] - calculatedAbsoluteFlux;
+						double residualAbsoluteFluxOC = calculatedAbsoluteFlux - standards[j].AbsoluteFluxes[i];
 
 						standards[j].Residuals.Add(residualAbsoluteFluxOC);
 						standards[j].ResidualPercentage.Add(100 * (calculatedDeltaMag - standards[j].DeltaMagnitiudes[i]) / standards[j].DeltaMagnitiudes[i]);
@@ -328,7 +329,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 				if (w < FromWavelength) continue;
 				string markStr = w.ToString();
 				size = g.MeasureString(markStr, displaySetting.LegendFont);
-				float tickPos = (float)(PADDING + (w - FromWavelength) * scaleX);
+				float tickPos = (float)(PADDING + Y_AXIS_LEGEND_WIDTH + (w - FromWavelength) * scaleX);
 				if (tickPos - size.Width / 2.0f < PADDING + Y_AXIS_LEGEND_WIDTH) continue;
 				if (tickPos + size.Width / 2.0f > width - PADDING) break;
 
@@ -343,7 +344,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 				if (w < FromWavelength) continue;
 				if (w % INTERVAL == 0) continue;
 
-				float tickPos = (PADDING + (w - FromWavelength) * scaleX);
+				float tickPos = (PADDING + Y_AXIS_LEGEND_WIDTH + (w - FromWavelength) * scaleX);
 				if (tickPos < PADDING + Y_AXIS_LEGEND_WIDTH) continue;
 				if (tickPos > width - PADDING) break;
 

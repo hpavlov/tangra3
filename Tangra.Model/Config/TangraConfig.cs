@@ -1169,6 +1169,7 @@ namespace Tangra.Model.Config
 			public Pen SpectraAperturePen;
 			public Pen SpectraBackgroundPen;
             public Pen SpectraBackgroundFadedPen;
+			public Pen PlotBackgroundPen;
 
 			public Color[] AbsFluxColor;
 			public Pen[] AbsFluxPen;
@@ -1227,7 +1228,10 @@ namespace Tangra.Model.Config
 
                 if (SpectraBackgroundFadedPen != null) SpectraBackgroundFadedPen.Dispose();
                 SpectraBackgroundFadedPen = new Pen(System.Drawing.Color.FromArgb(30, SpectraApertureColor.R, SpectraApertureColor.G, SpectraApertureColor.B));
-                
+
+				if (PlotBackgroundPen != null) PlotBackgroundPen.Dispose();
+				PlotBackgroundPen = new Pen(PlotBackgroundColor);
+
 				for (int i = 0; i < 256; i++)
 				{
 					if (GreyBrushes[i] != null) GreyBrushes[i].Dispose();
@@ -1261,11 +1265,11 @@ namespace Tangra.Model.Config
 				for (int i = 0; i < 9; i++)
 				{
 					AbsFluxObsPen[i] = new Pen(AbsFluxColor[i]);
-					AbsFluxPen[i] = new Pen(System.Drawing.Color.FromArgb(70, AbsFluxColor[i]));
+					AbsFluxPen[i] = new Pen(System.Drawing.Color.FromArgb(100, AbsFluxColor[i]));
 				}
 
 				AbsFluxObsPenDefault = new Pen(AbsFluxDefaultColor);
-				AbsFluxPenDefault = new Pen(System.Drawing.Color.FromArgb(70, AbsFluxDefaultColor));
+				AbsFluxPenDefault = new Pen(System.Drawing.Color.FromArgb(100, AbsFluxDefaultColor));
 
 			}
 		}
