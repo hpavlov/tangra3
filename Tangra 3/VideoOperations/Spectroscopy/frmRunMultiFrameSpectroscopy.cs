@@ -27,7 +27,6 @@ namespace Tangra.VideoOperations.Spectroscopy
         public PixelCombineMethod BackgroundMethod { get; private set; }
         public PixelCombineMethod FrameCombineMethod { get; private set; }
         public bool UseFineAdjustments { get; private set; }
-        public bool UseLowPassFilter { get; private set; }
         public int? AlignmentAbsorptionLinePos { get; private set; }
 		public float ExposureSeconds { get; private set; }
 
@@ -179,7 +178,6 @@ namespace Tangra.VideoOperations.Spectroscopy
             BackgroundMethod = (PixelCombineMethod)cbxBackgroundMethod.SelectedIndex;
             FrameCombineMethod = (PixelCombineMethod)cbxCombineMethod.SelectedIndex;
             UseFineAdjustments = cbxFineAdjustments.Checked;
-            UseLowPassFilter = cbxUseLowPassFilter.Checked;
             if (m_SelectedAlignLine.HasValue) AlignmentAbsorptionLinePos = (int)Math.Round(m_SelectedAlignLine.Value);
 
             DialogResult = DialogResult.OK;
@@ -197,6 +195,7 @@ namespace Tangra.VideoOperations.Spectroscopy
 		    uint[,] pixels = m_AstroImage.GetMeasurableAreaPixels(starCenter.X, starCenter.Y, 35);
             m_ZeroOrderPsf = new PSFFit(starCenter.X, starCenter.Y);
             m_ZeroOrderPsf.Fit(pixels);
+		    m_Spectra.ZeroOrderFWHM = (float)m_ZeroOrderPsf.FWHM;
 
 			PlotMeasurementAreas();
 		    PlotAlignTarget();
@@ -370,6 +369,12 @@ namespace Tangra.VideoOperations.Spectroscopy
         private void nudBackgroundGap_ValueChanged(object sender, EventArgs e)
         {
             UpdateMeasurementAreasDisplay();
+        }
+
+        private void cbxNormalisation_CheckedChanged(object sender, EventArgs e)
+        {
+            nudDivisor.Enabled = cbxNormalisation.Checked;
+            nudMultiplier.Enabled = cbxNormalisation.Checked;
         }
     }
 }

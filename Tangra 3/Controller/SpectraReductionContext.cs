@@ -15,12 +15,11 @@ namespace Tangra.Controller
         public PixelCombineMethod BackgroundMethod { get; set; }
         public PixelCombineMethod FrameCombineMethod { get; set; }
         public bool UseFineAdjustments { get; set; }
-        public bool UseLowPassFilter { get; set; }
         public int? AlignmentAbsorptionLinePos { get; set; }
         public float PixelValueCoefficient { get; set; }
 	    public float ExposureSeconds { get; set; }
 
-	    public void Reset()
+        public void Reset()
         {
             
         }

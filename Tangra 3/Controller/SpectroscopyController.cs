@@ -269,6 +269,7 @@ namespace Tangra.Controller
             if (allFramesSpectra.Count > 0)
             {
                 masterSpectra.ZeroOrderPixelNo = allFramesSpectra[0].ZeroOrderPixelNo;
+                masterSpectra.ZeroOrderFWHM = allFramesSpectra[0].ZeroOrderFWHM;
                 masterSpectra.SignalAreaWidth = allFramesSpectra[0].SignalAreaWidth;
 				masterSpectra.BackgroundAreaHalfWidth = allFramesSpectra[0].BackgroundAreaHalfWidth;
 				masterSpectra.BackgroundAreaGap = allFramesSpectra[0].BackgroundAreaGap;
@@ -291,12 +292,20 @@ namespace Tangra.Controller
 
 	            if (frameCombineMethod == PixelCombineMethod.Average)
 	            {
+	                float fwhmSum = 0;
+	                int fwhmCount = 0;
+
                     for (int i = startingFrameIndex; i < startingFrameIndex + frameCountToProcess - 1; i++)
 					{
                         if (i < 0 || i > allFramesSpectra.Count - 1) continue;
 
 						Spectra nextSpectra = allFramesSpectra[i];
                         masterSpectra.RawMeasurements.Add(nextSpectra);
+                        if (!float.IsNaN(nextSpectra.ZeroOrderFWHM))
+                        {
+                            fwhmSum += nextSpectra.ZeroOrderFWHM;
+                            fwhmCount++;
+                        }
 
 						int nextSpectraFirstPixelNo = nextSpectra.Points[0].PixelNo;
 						int deltaIndex = nextSpectra.ZeroOrderPixelNo - masterSpectra.ZeroOrderPixelNo + masterSpectra.Points[0].PixelNo - nextSpectraFirstPixelNo;
@@ -355,6 +364,8 @@ namespace Tangra.Controller
                         }
 					}
 
+                    masterSpectra.ZeroOrderFWHM = fwhmSum / fwhmCount;
+
 					// Normalize per row width
 					for (int i = 0; i < masterSpectra.Points.Count; i++)
 					{
@@ -378,6 +389,9 @@ namespace Tangra.Controller
 
                     var signalLists = new List<float>[masterSpectra.Points.Count];
 					for (int j = 0; j < masterSpectra.Points.Count; j++) signalLists[j] = new List<float>();
+
+                    var fwhmList = new List<float>();
+                    for (int j = 0; j < masterSpectra.Points.Count; j++) fwhmList.Add(float.NaN);
 
                     for (int i = startingFrameIndex; i < startingFrameIndex + frameCountToProcess - 1; i++)
                     {
@@ -428,6 +442,8 @@ namespace Tangra.Controller
 
 						for (int j = 0; j < masterSpectra.Points.Count; j++)
 						{
+                            fwhmList[j] = nextSpectra.ZeroOrderFWHM;
+
 							int indexNextSpectra = deltaIndex + j + bestOffset + lineAlignOffset;
 							if (indexNextSpectra >= 0 && indexNextSpectra < nextSpectra.Points.Count)
 							{
@@ -442,6 +458,9 @@ namespace Tangra.Controller
 						}
 					}
 
+				    fwhmList.Sort();
+                    masterSpectra.ZeroOrderFWHM = fwhmList.Count == 0 ? float.NaN : fwhmList[fwhmList.Count / 2];
+                    
 					for (int i = 0; i < masterSpectra.Points.Count; i++)
 					{
 						valueLists[i].Sort();
@@ -692,7 +711,6 @@ namespace Tangra.Controller
                BackgroundMethod = SpectraReductionContext.BackgroundMethod,
                FrameCombineMethod = SpectraReductionContext.FrameCombineMethod,
                UseFineAdjustments = SpectraReductionContext.UseFineAdjustments,
-               UseLowPassFilter = SpectraReductionContext.UseLowPassFilter,
                AlignmentAbsorptionLinePos = SpectraReductionContext.AlignmentAbsorptionLinePos
             };
         }
@@ -791,6 +809,8 @@ namespace Tangra.Controller
 				spectra.ObservationInfo.AddProperty("X", airMass.ToString("0.000", CultureInfo.InvariantCulture), "air mass");
 			}
 
+            if (!float.IsNaN(spectra.ZeroOrderFWHM)) spectra.ObservationInfo.AddProperty("FWHM", spectra.ZeroOrderFWHM.ToString("0.00"), "zero order image FWHM");
+
 			if (!float.IsNaN(spectra.MeasurementInfo.Gain)) spectra.ObservationInfo.AddProperty("Gain", spectra.MeasurementInfo.Gain.ToString("0.0", CultureInfo.InvariantCulture), "dB");
 			if (!float.IsNaN(spectra.MeasurementInfo.ExposureSeconds)) spectra.ObservationInfo.AddProperty("Exposure", spectra.MeasurementInfo.ExposureSeconds.ToString("0.000", CultureInfo.InvariantCulture), "sec");
 
@@ -812,7 +832,7 @@ namespace Tangra.Controller
 					spectra.ObservationInfo.AddProperty("WavelengthCalibration", string.Format("4-th order[{0},{1},{2},{3},{4}]", spectra.Calibration.A, spectra.Calibration.B, spectra.Calibration.C, spectra.Calibration.D, spectra.Calibration.E));
 
 				spectra.ObservationInfo.AddProperty("Dispersion", spectra.Calibration.Dispersion.ToString("0.00", CultureInfo.InvariantCulture), "A/pix");
-			}		    
+			}
 	    }
 
         internal void AddDatExportHeader(StringBuilder output, MasterSpectra spectra)

@@ -150,10 +150,6 @@ namespace Tangra.VideoOperations.Spectroscopy
 
 			m_ControlPanel.MeasurementsStarted();
 
-
-            if (m_SpectroscopyController.SpectraReductionContext.UseLowPassFilter)
-                TangraCore.PreProcessors.AddDigitalFilter(TangraConfig.PreProcessingFilter.LowPassFilter);
-
             m_FirstMeasuredFrame = null;
 	        m_CancelMeasurementsRequested = false;
 			m_FramePlayer.Start(FramePlaySpeed.Fastest, null, 1);
@@ -193,6 +189,8 @@ namespace Tangra.VideoOperations.Spectroscopy
                         m_SpectroscopyController.SpectraReductionContext.BackgroundAreaWing, 
                         m_SpectroscopyController.SpectraReductionContext.BackgroundAreaGap,
                         m_SpectroscopyController.SpectraReductionContext.BackgroundMethod);
+
+                    thisFrameSpectra.ZeroOrderFWHM = trackedStar.PSFFit != null ? (float)trackedStar.PSFFit.FWHM : float.NaN;
 
 		            m_AllFramesSpectra.Add(thisFrameSpectra);
 		        }
