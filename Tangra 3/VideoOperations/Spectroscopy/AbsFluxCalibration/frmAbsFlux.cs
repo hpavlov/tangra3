@@ -194,11 +194,11 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			{
 				if (e.CurrentValue == CheckState.Checked && e.NewValue == CheckState.Unchecked)
 				{
-					m_AbsFluxCalibrator.RemoveSpectra(selectedSpectra);
+					m_AbsFluxCalibrator.PlotSpectra(selectedSpectra, false);
 				}
 				else if (e.CurrentValue == CheckState.Unchecked && e.NewValue == CheckState.Checked)
 				{
-					TryAddSpectraToCalibrator(selectedSpectra, true);
+					m_AbsFluxCalibrator.PlotSpectra(selectedSpectra, true);
 				}
 
 				PlotCalibration();
@@ -559,6 +559,22 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 		private void label1_Click(object sender, EventArgs e)
 		{
 
+		}
+
+		private void miAbsoluteFlux_Click(object sender, EventArgs e)
+		{
+			m_AbsFluxCalibrator.PlotContext.ObservedFlux = false;
+			miAbsoluteFlux.Checked = true;
+			miObservedFlux.Checked = false;
+			PlotCalibration();
+		}
+
+		private void miObservedFlux_Click(object sender, EventArgs e)
+		{
+			m_AbsFluxCalibrator.PlotContext.ObservedFlux = true;
+			miAbsoluteFlux.Checked = false;
+			miObservedFlux.Checked = true;
+			PlotCalibration();
 		}
 	}
 }

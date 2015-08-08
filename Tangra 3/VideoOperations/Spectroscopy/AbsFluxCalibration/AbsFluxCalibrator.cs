@@ -12,6 +12,11 @@ using Tangra.Model.Numerical;
 
 namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 {
+	public class PlotContext
+	{
+		internal bool ObservedFlux;
+	}
+
 	public class AbsFluxCalibrator
 	{
 		public int FromWavelength { get; private set; }
@@ -19,6 +24,8 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 		public int WavelengthBinSize { get; private set; }
 
 		public bool IsCalibrated { get; private set; }
+
+		internal PlotContext PlotContext = new PlotContext();
 
 		private List<AbsFluxSpectra> m_SpectraList = new List<AbsFluxSpectra>();
 
@@ -84,6 +91,11 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			}
 		}
 
+		internal void PlotSpectra(AbsFluxSpectra spectra, bool plot)
+		{
+			spectra.PlotSpectra = plot;
+		}
+
 		private List<double> m_ExtinctionCoefficients = new List<double>();
 		private List<double> m_SensitivityCoefficients = new List<double>();
 		private List<double> m_Wavelengths = new List<double>();
@@ -106,6 +118,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 
 					bool containsNaNs = false;
 
+					// Delta_Mag = A * X + B = Ke * X + Ks 
 					for (int j = 0; j < numEquations; j++)
 					{
 						A[j, 0] = standards[j].InputFile.AirMass;
@@ -143,7 +156,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 					standards[j].Residuals.Clear();
 					standards[j].ResidualPercentage.Clear();
 					standards[j].ResidualPercentageFlux.Clear();
-					standards[j].ResidualPercentageObsFlux.Clear();
+					standards[j].ResidualObsFlux.Clear();
 
 					for (int i = 0; i < standards[0].DeltaMagnitiudes.Count; i++)
 					{
@@ -158,18 +171,17 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 						standards[j].Residuals.Add(residualAbsoluteFluxOC);
 						standards[j].ResidualPercentage.Add(100 * (calculatedDeltaMag - standards[j].DeltaMagnitiudes[i]) / standards[j].DeltaMagnitiudes[i]);
 						standards[j].ResidualPercentageFlux.Add(100 * residualAbsoluteFluxOC / standards[j].AbsoluteFluxes[i]);
-						standards[j].ResidualPercentageObsFlux.Add(100 * (standards[j].ObservedFluxes[i] - calculatedObservedFlux) / standards[j].ObservedFluxes[i]);
+						standards[j].ResidualObsFlux.Add(calculatedObservedFlux - standards[j].ObservedFluxes[i]);
 					}
 
 					standards[j].AverageBiasPercentage = standards[j].ResidualPercentageFlux.Where(x => !double.IsNaN(x)).ToList().Average() / 100;
 
-					Trace.WriteLine(string.Format("{0}[{1} sec, {2}]: {3}%, AbsFlux: {4}%, ObsFlux: {5}%", 
+					Trace.WriteLine(string.Format("{0}[{1} sec, {2}]: {3}%, AbsFlux: {4}%", 
 						standards[j].ToString(),
 						standards[j].InputFile.Exposure.ToString("0.00"),
 						standards[j].InputFile.AirMass.ToString("0.000"),
 						standards[j].AverageBiasPercentage.ToString("0.0"),
-						standards[j].ResidualPercentageFlux.Where(x => !double.IsNaN(x)).ToList().Median().ToString("0.0"),
-						standards[j].ResidualPercentageObsFlux.Where(x => !double.IsNaN(x)).ToList().Median().ToString("0.0")));
+						standards[j].ResidualPercentageFlux.Where(x => !double.IsNaN(x)).ToList().Median().ToString("0.0")));
 				}
 
 				IsCalibrated = true;
@@ -182,15 +194,30 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 
 		internal void PlotCalibration(Graphics g, int width, int height, int topHeaderHeight, TangraConfig.SpectraViewDisplaySettings displaySetting)
 		{
-			List<AbsFluxSpectra> plotObjects = m_SpectraList.Where(x => x.IsComplete).ToList();
+			List<AbsFluxSpectra> plotObjects = m_SpectraList.Where(x => x.IsComplete && x.PlotSpectra).ToList();
 
 			double maxFlux = double.MinValue;
 
+			Func<int, List<double>> fluxFunc;
+			Func<int, List<double>> fluxResidualFunc;
+			if (PlotContext.ObservedFlux)
+			{
+				fluxFunc = x => plotObjects[x].ObservedFluxes;
+				fluxResidualFunc = x => plotObjects[x].Residuals;
+			}
+			else
+			{
+				fluxFunc = x => plotObjects[x].AbsoluteFluxes;
+				fluxResidualFunc = x => plotObjects[x].Residuals;
+			}
+
 			for (int j = 0; j < plotObjects.Count; j++)
 			{
-				double max = plotObjects[j].AbsoluteFluxes.Max();
+				double max = fluxFunc(j).Max();
 				if (plotObjects[j].IsStandard && plotObjects[j].AverageBiasPercentage < 0)
-					maxFlux = maxFlux*(1 + Math.Abs(plotObjects[j].AverageBiasPercentage));
+					max = max * (1 + Math.Abs(plotObjects[j].AverageBiasPercentage));
+				else if (plotObjects[j].IsStandard && plotObjects[j].AverageBiasPercentage > 0)
+					max = max * (1 + Math.Abs(plotObjects[j].AverageBiasPercentage));
 
 				if (max > maxFlux) maxFlux = max;
 			}
@@ -226,11 +253,11 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 					? displaySetting.AbsFluxObsPen[objIndex]
 					: displaySetting.AbsFluxObsPenDefault;
 
-				for (int i = 0; i < plotObjects[j].AbsoluteFluxes.Count; i++)
+				for (int i = 0; i < fluxFunc(j).Count; i++)
 				{
-					double flux = plotObjects[j].AbsoluteFluxes[i];
+					double flux = fluxFunc(j)[i];
 					double wavelength = plotObjects[j].ResolvedWavelengths[i];
-					double fluxObs = plotObjects[j].AbsoluteFluxes[i] - plotObjects[j].Residuals[i];
+					double fluxObs = fluxFunc(j)[i] - fluxResidualFunc(j)[i];
 
 					if (wavelength >= FromWavelength && wavelength <= ToWavelength && !double.IsNaN(flux) && !double.IsNaN(fluxObs))
 					{
@@ -254,7 +281,9 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			}
 
 			DrawXAxis(g, scaleX, width, Y_AXIS_LEGEND_WIDTH, height - X_AXIS_LEGEND_HEIGHT - PADDING, PADDING + topHeaderHeight, displaySetting);
-			DrawYAxis(g, scaleY, height, X_AXIS_LEGEND_HEIGHT, topHeaderHeight, PADDING + Y_AXIS_LEGEND_WIDTH, width - PADDING, maxFlux, displaySetting);
+
+			if (!PlotContext.ObservedFlux)
+				DrawYAxis(g, scaleY, height, X_AXIS_LEGEND_HEIGHT, topHeaderHeight, PADDING + Y_AXIS_LEGEND_WIDTH, width - PADDING, maxFlux, displaySetting);
 		}
 
 		private void DrawYAxis(Graphics g, float scaleY, int height, float X_AXIS_LEGEND_HEIGHT, int topHeaderHeight, float x0, float x1, double maxFlux, TangraConfig.SpectraViewDisplaySettings displaySetting)

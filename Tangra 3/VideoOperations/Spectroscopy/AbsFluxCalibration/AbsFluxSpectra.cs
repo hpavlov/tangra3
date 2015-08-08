@@ -20,9 +20,9 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 		public List<double> DeltaMagnitiudes = new List<double>();
 		public List<double> ResolvedWavelengths = new List<double>();
 		public List<double> Residuals = new List<double>();
+		public List<double> ResidualObsFlux = new List<double>();
 		public List<double> ResidualPercentage = new List<double>();
-		public List<double> ResidualPercentageFlux = new List<double>();
-		public List<double> ResidualPercentageObsFlux = new List<double>();
+		public List<double> ResidualPercentageFlux = new List<double>();		
 		public double AverageBiasPercentage { get; set; }
 
 		private static Regex STAR_DESIGNATION_REGEX = new Regex("(HD|BD|HIP|TYC)[\\d\\s\\-\\+_]+");
@@ -33,6 +33,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 		public CalSpecStar m_CalSpecStar;
 		public bool IsComplete { get; private set; }
 		public int Number;
+		public bool PlotSpectra;
 
 		public bool IsStandard
 		{
@@ -72,7 +73,8 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 					m_CalSpecStar = standardsInOneDegreeRadius[0];
 					m_DisplayName = m_CalSpecStar.AbsFluxStarId;
 
-					IsComplete = true;	
+					IsComplete = true;
+					PlotSpectra = true;
 				}
 			}
 
