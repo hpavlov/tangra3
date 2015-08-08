@@ -117,42 +117,4 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <metadata name="ctxMenuIncludedSpectra.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>250, 17</value>
-  </metadata>
-  <metadata name="menuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>17, 17</value>
-  </metadata>
-  <metadata name="openFileDialog.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>126, 17</value>
-  </metadata>
-  <metadata name="resizeTimer.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>424, 17</value>
-  </metadata>
-  <metadata name="saveFileDialog.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>533, 17</value>
-  </metadata>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        AAABAAIAEBAQAAAABAAoAQAAJgAAACAgEAAAAAQA6AIAAE4BAAAoAAAAEAAAACAAAAABAAQAAAAAAIAA
-        AAAAAAAAAAAAABAAAAAQAAAAAAAAAAAAgAAAgAAAAICAAIAAAACAAIAAgIAAAICAgADAwMAAAAD/AAD/
-        AAAA//8A/wAAAP8A/wD//wAA////AHiIiIiIiIiHiHd3d3d3d4iHd3d3d3d3eId3d3iHd3d4h3iHeId4
-        h3iHeId4h3iHeId4h3iHeId4h3iHeId4h3iHeId4h3iHeId3d3iHd3d4h3d3iIh3d3iHd4iHeIh3eId4
-        h3d3eId4h3h3d3d3h3iId3d3d3d3iHiIiIiIiIiHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgAAAAgAAAAQAAAAAEABAAAAAAAAAIAAAAA
-        AAAAAAAAEAAAABAAAAAAAAAAAACAAACAAAAAgIAAgAAAAIAAgACAgAAAgICAAMDAwAAAAP8AAP8AAAD/
-        /wD/AAAA/wD/AP//AAD///8AeIiIiIiIiIiIiIiIiIiIh4iIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiI
-        iIiIiIiIiIh3d3d3d3d3d3d3d3eIiIiHd3d3d3d3d3d3d3d3eIiIh3d3d3d3iId3d3d3d3iIiId3d3d3
-        d4iHd3d3d3d4iIiHd3iId3eIh3d3iId3eIiIh3d4iHd3iId3d4iHd3iIiId3eIh3d4iHd3eIh3d4iIiH
-        d3iId3eIh3d3iId3eIiIh3d4iHd3iId3d4iHd3iIiId3eIh3d4iHd3eIh3d4iIiHd3iId3eIh3d3iId3
-        eIiIh3d4iHd3iId3d4iHd3iIiId3eIh3d4iHd3eIh3d4iIiHd3iId3eIh3d3iId3eIiIh3d4iHd3iId3
-        d4iHd3iIiId3eIh3d4iHd3eIh3d4iIiHd3d3d3iIiHd3d3d3eIiIh3d3d3eIiIiHd3d3d3iIiId3d3eI
-        iIiIiId3d3d4iIiHd3d4iIh3eIiId3d3eIiIh3d3iIiHd3eIiId3d3iIiId3iIiHd3d3eIiIh3d4iIiH
-        eIiId3d3d3d4iIh3eIiIh3eIh3d3d3d3d4iHd3iIiId3d3d3d3d3d3d3d3d4iIiHd3d3d3d3d3d3d3d3
-        eIiIiHd3d3d3d3d3d3d3d4iIiIiIiIiIiIiIiIiIiIiIiHiIiIiIiIiIiIiIiIiIiIcAAAAAAAAAAAAA
-        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==
-</value>
-  </data>
 </root>

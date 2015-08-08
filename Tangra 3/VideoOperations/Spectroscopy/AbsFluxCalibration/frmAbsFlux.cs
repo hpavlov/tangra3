@@ -138,8 +138,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			var selectedFile = lbAvailableFiles.SelectedItem as AbsFluxInputFile;
 			if (selectedFile != null)
 			{
-				if (lbIncludedSpecta.Items.Cast<AbsFluxSpectra>()
-						.Any(x => x.FullFilePath.Equals(selectedFile.FullPath, StringComparison.InvariantCultureIgnoreCase)))
+				if (lbIncludedSpecta.Items.Cast<AbsFluxSpectra>().Any(x => x.FullFilePath.Equals(selectedFile.FullPath, StringComparison.InvariantCultureIgnoreCase)))
 				{
 					MessageBox.Show(string.Format("The file '{0}' has been already included.", selectedFile.FullPath), "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				}
@@ -151,6 +150,13 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 		private void IncludeInputFile(AbsFluxInputFile inputFile)
 		{
 			var spectra = new AbsFluxSpectra(inputFile);
+
+            if (!spectra.IsComplete)
+            {
+                var frm = new frmCompleteSpectra(spectra);
+                if (frm.ShowDialog(this) == DialogResult.Cancel)
+                    return;
+            }
 
 			if (spectra.IsComplete)
 			{
@@ -556,11 +562,6 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			PlotCalibration();
 		}
 
-		private void label1_Click(object sender, EventArgs e)
-		{
-
-		}
-
 		private void miAbsoluteFlux_Click(object sender, EventArgs e)
 		{
 			m_AbsFluxCalibrator.PlotContext.ObservedFlux = false;
@@ -576,5 +577,18 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			miObservedFlux.Checked = true;
 			PlotCalibration();
 		}
+
+        private void miAbsFluxProgramStars_Click(object sender, EventArgs e)
+        {
+            if (m_AbsFluxCalibrator.IsCalibrated)
+            {
+                if (saveFileDialog.ShowDialog(this) == DialogResult.OK)
+                {
+                    m_AbsFluxCalibrator.ExportProgramStarsData(saveFileDialog.FileName);
+                }
+            }
+            else
+                MessageBox.Show(this, "Not calibrated", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
 	}
 }

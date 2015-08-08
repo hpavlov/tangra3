@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Security.AccessControl;
 using System.Security.Principal;
@@ -184,7 +185,25 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 						standards[j].ResidualPercentageFlux.Where(x => !double.IsNaN(x)).ToList().Median().ToString("0.0")));
 				}
 
-				IsCalibrated = true;
+                #region Compute absolute fluxes of program objects
+                List<AbsFluxSpectra> programStars = m_SpectraList.Where(x => x.IsComplete && !x.IsStandard).ToList();
+
+                for (int j = 0; j < programStars.Count; j++)
+                {
+                    programStars[j].AbsoluteFluxes = new List<double>();
+
+                    for (int i = 0; i < standards[0].DeltaMagnitiudes.Count; i++)
+			        {
+                        // DeltaM = KE * AirMass + KS = -2.5 * Math.Log10((ObservedFluxes[i] / exposure) / AbsoluteFluxes[i])
+                        double calculatedDeltaMag = m_ExtinctionCoefficients[i] * programStars[j].InputFile.AirMass + m_SensitivityCoefficients[i];
+                        double calculatedFluxRatio = Math.Pow(10, calculatedDeltaMag / -2.5);
+                        double calculatedAbsoluteFlux = (programStars[j].ObservedFluxes[i] / programStars[j].InputFile.Exposure) / calculatedFluxRatio;
+			            programStars[j].AbsoluteFluxes.Add(calculatedAbsoluteFlux);
+			        }
+                }
+                #endregion
+
+                IsCalibrated = true;
 			}			
 		}
 
@@ -222,9 +241,17 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 				if (max > maxFlux) maxFlux = max;
 			}
 
-			SizeF size = g.MeasureString("1.3E-12", displaySetting.LegendFont);
-			float X_AXIS_LEGEND_HEIGHT = size.Height * 1.5f;
-			float Y_AXIS_LEGEND_WIDTH = size.Width * 1.5f;
+            SizeF size = g.MeasureString("1234", displaySetting.LegendFont);
+
+            float X_AXIS_LEGEND_HEIGHT = size.Height * 1.5f;
+
+            double yInterval;
+            double yMinorTickInterval;
+		    string labelFormat;
+            ComputeYAxisLabelScale(g, height, X_AXIS_LEGEND_HEIGHT, topHeaderHeight, maxFlux, displaySetting, out yInterval, out yMinorTickInterval, out labelFormat);
+            size = g.MeasureString(((int)maxFlux).ToString(labelFormat), displaySetting.LegendFont);
+
+		    float Y_AXIS_LEGEND_WIDTH = size.Width * 1.5f;
 
 			// Scale 
 			float scaleY = (float)((height - topHeaderHeight - 2 * PADDING - X_AXIS_LEGEND_HEIGHT - LONG_MARK) / maxFlux);
@@ -257,65 +284,100 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 				{
 					double flux = fluxFunc(j)[i];
 					double wavelength = plotObjects[j].ResolvedWavelengths[i];
-					double fluxObs = fluxFunc(j)[i] - fluxResidualFunc(j)[i];
 
-					if (wavelength >= FromWavelength && wavelength <= ToWavelength && !double.IsNaN(flux) && !double.IsNaN(fluxObs))
+					if (wavelength >= FromWavelength && wavelength <= ToWavelength && !double.IsNaN(flux))
 					{
 						float x = (float)(PADDING + Y_AXIS_LEGEND_WIDTH + (wavelength - FromWavelength) * scaleX);
 						float y = (float)(height - PADDING - X_AXIS_LEGEND_HEIGHT - flux * scaleY);
-						float yO = (float)(height - PADDING - X_AXIS_LEGEND_HEIGHT - fluxObs * scaleY);
 
 						var thisPoint = new PointF(x, y);
-						var thisPointO = new PointF(x, yO);
 	
 						if (prevPoint != Point.Empty)
 							g.DrawLine(absFluxPen, prevPoint, thisPoint);
 
-						if (prevPointO != Point.Empty)
-							g.DrawLine(absFluxObsPen, prevPointO, thisPointO);
-
 						prevPoint = thisPoint;
-						prevPointO = thisPointO;
+
+                        if (plotObjects[j].IsStandard)
+                        {
+                            double fluxObs = fluxFunc(j)[i] - fluxResidualFunc(j)[i];
+
+                            if (!double.IsNaN(fluxObs))
+                            {
+                                float yO = (float)(height - PADDING - X_AXIS_LEGEND_HEIGHT - fluxObs * scaleY);
+                                var thisPointO = new PointF(x, yO);
+                                if (prevPointO != Point.Empty)
+                                    g.DrawLine(absFluxObsPen, prevPointO, thisPointO);
+                                prevPointO = thisPointO;
+                            }                            
+                        }
 					}
 				}
 			}
 
 			DrawXAxis(g, scaleX, width, Y_AXIS_LEGEND_WIDTH, height - X_AXIS_LEGEND_HEIGHT - PADDING, PADDING + topHeaderHeight, displaySetting);
-
-			if (!PlotContext.ObservedFlux)
-				DrawYAxis(g, scaleY, height, X_AXIS_LEGEND_HEIGHT, topHeaderHeight, PADDING + Y_AXIS_LEGEND_WIDTH, width - PADDING, maxFlux, displaySetting);
+			DrawYAxis(g, scaleY, height, X_AXIS_LEGEND_HEIGHT, PADDING + Y_AXIS_LEGEND_WIDTH, width - PADDING, maxFlux, yInterval, yMinorTickInterval, labelFormat, displaySetting);
 		}
 
-		private void DrawYAxis(Graphics g, float scaleY, int height, float X_AXIS_LEGEND_HEIGHT, int topHeaderHeight, float x0, float x1, double maxFlux, TangraConfig.SpectraViewDisplaySettings displaySetting)
+        private void ComputeYAxisLabelScale(Graphics g, int height, float X_AXIS_LEGEND_HEIGHT, int topHeaderHeight, double maxFlux, TangraConfig.SpectraViewDisplaySettings displaySetting, out double interval, out double minorTickInterval, out string labelFormat)
+        {
+            float verticalSpace = height - 2 * PADDING - X_AXIS_LEGEND_HEIGHT - topHeaderHeight;
+
+            var probeIntervals = new List<decimal>();
+            var minorTicks = new List<decimal>();
+
+            if (PlotContext.ObservedFlux)
+            {
+                int maxPower = (int) Math.Ceiling(Math.Log10(maxFlux));
+
+                for (int i = 0; i <= maxPower; i++)
+                {
+                    int factor = (int) Math.Round(Math.Pow(10, i));
+                    probeIntervals.Add(1*factor);
+                    probeIntervals.Add(2*factor);
+                    probeIntervals.Add(5*factor);
+
+                    int factorMinorTick = (int) Math.Round(Math.Pow(10, i - 1));
+                    minorTicks.Add(2*factorMinorTick);
+                    minorTicks.Add(5*factorMinorTick);
+                    minorTicks.Add(10*factorMinorTick);
+                }
+                labelFormat = "";
+            }
+            else
+            {
+                probeIntervals.AddRange(new[] { 2E-16M, 5E-16M, 1E-15M, 2E-15M, 5E-15M, 5E-14M, 2E-14M, 5E-14M, 1E-13M, 2E-13M, 5E-13M, 1E-12M, 2E-12M, 5E-12M, 1E-11M});
+                minorTicks.AddRange(new decimal[] { 1E-15M, 2E-15M, 5E-15M, 1E-14M, 2E-14M, 5E-14M, 1E-13M, 2E-13M, 5E-13M, 1E-12M, 2E-12M, 5E-12M, 1E-11M, 2E-11M, 5E-11M });
+                labelFormat = "E1";
+            }
+
+            SizeF size = g.MeasureString("1234", displaySetting.LegendFont);
+
+            interval = 0;
+            minorTickInterval = 0;
+
+            for (int i = 0; i < probeIntervals.Count; i++)
+            {
+                interval = (double)probeIntervals[i];
+                minorTickInterval = (double)minorTicks[i];
+                int numTicks = (int)Math.Ceiling(maxFlux / interval);
+                if (size.Height * 3f * numTicks < verticalSpace)
+                {
+                    break;
+                }
+            }
+        }
+
+        private void DrawYAxis(Graphics g, float scaleY, int height, float X_AXIS_LEGEND_HEIGHT, float x0, float x1, double maxFlux, double interval, double minorTicksinterval, string labelFormat, TangraConfig.SpectraViewDisplaySettings displaySetting)
 		{
-			float verticalSpace = height - 2 * PADDING - X_AXIS_LEGEND_HEIGHT - topHeaderHeight;
-
-			decimal[] minorTicks = new[] { 2E-16M, 5E-16M, 1E-15M, 2E-15M, 5E-15M, 5E-14M, 2E-14M, 5E-14M, 1E-13M, 2E-13M, 5E-13M, 1E-12M, 2E-12M, 5E-12M, 1E-11M };
-			decimal[] yInterval = new decimal[] { 1E-15M, 2E-15M, 5E-15M, 1E-14M, 2E-14M, 5E-14M, 1E-13M, 2E-13M, 5E-13M, 1E-12M, 2E-12M, 5E-12M, 1E-11M, 2E-11M, 5E-11M };
-			SizeF size = g.MeasureString("1E-14", displaySetting.LegendFont);
-			double INTERVAL = 5E-12;
-			double MINOR_TICK_INTERVAL = 5E-13;
-			for (int i = 0; i < yInterval.Length; i++)
-			{
-				INTERVAL = (double)yInterval[i];
-				MINOR_TICK_INTERVAL = (double)minorTicks[i];
-				int numTicks = (int)Math.Ceiling(maxFlux / INTERVAL);
-				if (size.Height * 3f * numTicks < verticalSpace)
-				{
-					break;
-				}
-			}
-
 			bool zeroMark = true;
-			for (double f = 0; f < maxFlux; f += INTERVAL)
+            for (double f = 0; f < maxFlux; f += interval)
 			{
-				string markStr = zeroMark ? "0" : f.ToString("E1");
+				string markStr = zeroMark ? "0" : f.ToString(labelFormat);
 				
 				zeroMark = false;
 
-				size = g.MeasureString(markStr, displaySetting.LegendFont);
+                SizeF size = g.MeasureString(markStr, displaySetting.LegendFont);
 				float tickPos = (float)(height - PADDING - X_AXIS_LEGEND_HEIGHT - f * scaleY);
-				//if (tickPos < topHeaderHeight + PADDING) continue;
 				if (tickPos > height - X_AXIS_LEGEND_HEIGHT - PADDING) continue;
 
 				g.DrawLine(displaySetting.GridLinesPen, x0, tickPos, x0 + LONG_MARK, tickPos);
@@ -324,7 +386,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 				g.DrawString(markStr, displaySetting.LegendFont, displaySetting.LegendBrush, x0 - size.Width - LONG_MARK, tickPos - size.Height / 2.0f);
 			}
 
-			for (double f = 0; f < maxFlux; f += MINOR_TICK_INTERVAL)
+            for (double f = 0; f < maxFlux; f += minorTicksinterval)
 			{
 				float tickPos = (float)(height - PADDING - X_AXIS_LEGEND_HEIGHT - f * scaleY);
 
@@ -381,5 +443,29 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 				g.DrawLine(displaySetting.GridLinesPen, tickPos, y1, tickPos, y1 + SHORT_MARK);
 			}
 		}
+
+        public void ExportProgramStarsData(string fileName)
+        {
+            if (IsCalibrated)
+            {
+                var output = new StringBuilder();
+                var programSpectras = m_SpectraList.Where(x => x.m_CalSpecStar == null).ToList();
+
+                for (int i = 0; i < m_SpectraList[0].ResolvedWavelengths.Count; i++)
+                {
+                    double w = m_SpectraList[0].ResolvedWavelengths[i];
+                    output.Append(w.ToString());
+
+                    for (int j = 0; j < programSpectras.Count; j++)
+                    {
+                        output.Append(",");
+                        output.Append(programSpectras[j].AbsoluteFluxes[i].ToString());
+                    }
+                    output.AppendLine();
+                }
+
+                File.WriteAllText(fileName, output.ToString());
+            }
+        }
 	}
 }

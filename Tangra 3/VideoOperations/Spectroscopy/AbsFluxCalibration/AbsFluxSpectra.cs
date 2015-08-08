@@ -34,11 +34,22 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 		public bool IsComplete { get; private set; }
 		public int Number;
 		public bool PlotSpectra;
+        public bool HasObjectCoordinates { get; private set; }
+        public bool HasObservationTime { get; private set; }
 
-		public bool IsStandard
+	    public bool IsStandard
 		{
 			get { return m_CalSpecStar != null; }
 		}
+
+        internal void SetAsProgramStar()
+        {
+            if (HasObjectCoordinates &&
+                HasObservationTime)
+            {
+                IsComplete = true;
+            }
+        }
 
 		internal AbsFluxSpectra(AbsFluxInputFile inputFile)
 		{
@@ -62,9 +73,12 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 				}				
 			}
 
-			if (inputFile.Epoch != DateTime.MinValue &&
-			    !float.IsNaN(inputFile.Latitude) && !float.IsNaN(inputFile.Longitude) &&
-				!float.IsNaN(inputFile.RAHours) && !float.IsNaN(inputFile.DEDeg))
+		    HasObjectCoordinates = !float.IsNaN(inputFile.Latitude) && !float.IsNaN(inputFile.Longitude) &&
+		                           !float.IsNaN(inputFile.RAHours) && !float.IsNaN(inputFile.DEDeg);
+
+		    HasObservationTime = inputFile.Epoch != DateTime.MinValue;
+
+            if (HasObservationTime && HasObjectCoordinates)
 			{
 				// If we have the center of the field saved in the export then identify the standard star by the position
 				List<CalSpecStar> standardsInOneDegreeRadius = CalSpecDatabase.Instance.Stars.Where(x => AngleUtility.Elongation(x.RA_J2000_Hours * 15, x.DE_J2000_Deg, InputFile.RAHours * 15, InputFile.DEDeg) < 1).ToList();
