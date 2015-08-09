@@ -52,7 +52,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
                     {
                         if (s_Instance == null)
                         {
-                            using (Stream compressedStream = AssemblyHelper.GetEmbededResourceStreamThatClientMustDispose("Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration.Standards", "CalSpec.db"))
+                           using (Stream compressedStream = AssemblyHelper.GetEmbededResourceStreamThatClientMustDispose("Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration.Standards", "CalSpec.db"))
                            using (var deflateStream = new DeflateStream(compressedStream, CompressionMode.Decompress, true))
                            {
                                using (var reader = new BinaryReader(deflateStream))

@@ -1146,6 +1146,17 @@ namespace Tangra.Model.Config
 			}
 		}
 
+		public enum ColourPalette
+		{
+			Pastel,
+			Intense1,
+			Intense2,
+			Broad,
+			Rainbow1,
+			Rainbow2,
+			Contrast
+		}
+
 		public class SpectraViewDisplaySettings
 		{
 			public Color SpectraLineColor;
@@ -1154,6 +1165,8 @@ namespace Tangra.Model.Config
 			public Color KnownLineColor;
 			public Color SpectraApertureColor;
 			public Color PlotBackgroundColor;
+
+			public ColourPalette AbsFluxPlotPalette;
 
 			public Font LabelsFont = new Font(FontFamily.GenericMonospace, 9);
 			public Font LegendFont = new Font(FontFamily.GenericSansSerif, 8, FontStyle.Bold);
@@ -1186,6 +1199,7 @@ namespace Tangra.Model.Config
 				KnownLineColor = TangraConfig.Settings.Spectroscopy.Colors.KnownLineColor;
 				SpectraApertureColor = TangraConfig.Settings.Spectroscopy.Colors.SpectraApertureColor;
 				PlotBackgroundColor = TangraConfig.Settings.Spectroscopy.Colors.PlotBackgroundColor;
+				AbsFluxPlotPalette = TangraConfig.Settings.Spectroscopy.Colors.AbsFluxPlotPalette;
 			}
 
 			public void Save()
@@ -1195,7 +1209,8 @@ namespace Tangra.Model.Config
 				TangraConfig.Settings.Spectroscopy.Colors.GridLinesColor = GridLinesColor;
 				TangraConfig.Settings.Spectroscopy.Colors.KnownLineColor = KnownLineColor;
 				TangraConfig.Settings.Spectroscopy.Colors.SpectraApertureColor = SpectraApertureColor;
-				TangraConfig.Settings.Spectroscopy.Colors.PlotBackgroundColor = PlotBackgroundColor; 
+				TangraConfig.Settings.Spectroscopy.Colors.PlotBackgroundColor = PlotBackgroundColor;
+				TangraConfig.Settings.Spectroscopy.Colors.AbsFluxPlotPalette = AbsFluxPlotPalette; 
 
 				TangraConfig.Settings.Save();
 			}
@@ -1247,22 +1262,149 @@ namespace Tangra.Model.Config
 				if (AbsFluxPenDefault != null) AbsFluxPenDefault.Dispose();
 				if (AbsFluxObsPenDefault != null) AbsFluxObsPenDefault.Dispose();
 
-				AbsFluxColor = new Color[9];
-				AbsFluxPen = new Pen[9];
-				AbsFluxObsPen = new Pen[9];
+				AbsFluxColor = new Color[15];
+				AbsFluxPen = new Pen[15];
+				AbsFluxObsPen = new Pen[15];
 
-				AbsFluxColor[0] = System.Drawing.Color.Lime;
-				AbsFluxColor[1] = System.Drawing.Color.Aqua;
-				AbsFluxColor[2] = System.Drawing.Color.Yellow;
-				AbsFluxColor[3] = System.Drawing.Color.Fuchsia;
-				AbsFluxColor[4] = System.Drawing.Color.FromArgb(255, 128, 0);
-				AbsFluxColor[5] = System.Drawing.Color.Blue;
-				AbsFluxColor[6] = System.Drawing.Color.Green;
-				AbsFluxColor[7] = System.Drawing.Color.FromArgb(64, 64, 64);
-				AbsFluxColor[8] = System.Drawing.Color.Red;
+				// http://tools.medialab.sciences-po.fr/iwanthue/
+
+				if (AbsFluxPlotPalette == ColourPalette.Intense1)
+				{
+					// INTENSE 1
+					AbsFluxColor[0] = System.Drawing.Color.FromArgb(35, 119, 7);
+					AbsFluxColor[1] = System.Drawing.Color.FromArgb(114, 58, 147);
+					AbsFluxColor[2] = System.Drawing.Color.FromArgb(227, 58, 14);
+					AbsFluxColor[3] = System.Drawing.Color.FromArgb(101, 28, 7);
+					AbsFluxColor[4] = System.Drawing.Color.FromArgb(223, 158, 198);
+					AbsFluxColor[5] = System.Drawing.Color.FromArgb(38, 93, 69);
+					AbsFluxColor[6] = System.Drawing.Color.FromArgb(189, 174, 63);
+					AbsFluxColor[7] = System.Drawing.Color.FromArgb(244, 79, 105);
+					AbsFluxColor[8] = System.Drawing.Color.FromArgb(95, 198, 132);
+					AbsFluxColor[9] = System.Drawing.Color.FromArgb(10, 90, 157);
+					AbsFluxColor[10] = System.Drawing.Color.FromArgb(245, 140, 98);
+					AbsFluxColor[11] = System.Drawing.Color.FromArgb(156, 166, 244);
+					AbsFluxColor[12] = System.Drawing.Color.FromArgb(57, 70, 6);
+					AbsFluxColor[13] = System.Drawing.Color.FromArgb(168, 34, 8);
+					AbsFluxColor[14] = System.Drawing.Color.FromArgb(254, 110, 42);					
+				}
+				else if (AbsFluxPlotPalette == ColourPalette.Pastel)
+				{
+					// PASTEL
+					AbsFluxColor[0] = System.Drawing.Color.FromArgb(151, 185, 152);
+					AbsFluxColor[1] = System.Drawing.Color.FromArgb(228, 252, 130);
+					AbsFluxColor[2] = System.Drawing.Color.FromArgb(236, 214, 249);
+					AbsFluxColor[3] = System.Drawing.Color.FromArgb(229, 152, 139);
+					AbsFluxColor[4] = System.Drawing.Color.FromArgb(202, 179, 106);
+					AbsFluxColor[5] = System.Drawing.Color.FromArgb(135, 213, 236);
+					AbsFluxColor[6] = System.Drawing.Color.FromArgb(247, 213, 177);
+					AbsFluxColor[7] = System.Drawing.Color.FromArgb(160, 188, 100);
+					AbsFluxColor[8] = System.Drawing.Color.FromArgb(206, 171, 167);
+					AbsFluxColor[9] = System.Drawing.Color.FromArgb(255, 222, 219);
+					AbsFluxColor[10] = System.Drawing.Color.FromArgb(214, 161, 118);
+					AbsFluxColor[11] = System.Drawing.Color.FromArgb(173, 181, 224);
+					AbsFluxColor[12] = System.Drawing.Color.FromArgb(242, 207, 109);
+					AbsFluxColor[13] = System.Drawing.Color.FromArgb(239, 240, 206);
+					AbsFluxColor[14] = System.Drawing.Color.FromArgb(129, 194, 202);					
+				}
+				else if (AbsFluxPlotPalette == ColourPalette.Intense2)
+				{
+					// INTENSE 2
+					AbsFluxColor[0] = System.Drawing.Color.FromArgb(208, 26, 107);
+					AbsFluxColor[1] = System.Drawing.Color.FromArgb(20, 201, 130);
+					AbsFluxColor[2] = System.Drawing.Color.FromArgb(213, 158, 28);
+					AbsFluxColor[3] = System.Drawing.Color.FromArgb(44, 105, 183);
+					AbsFluxColor[4] = System.Drawing.Color.FromArgb(227, 81, 255);
+					AbsFluxColor[5] = System.Drawing.Color.FromArgb(108, 27, 12);
+					AbsFluxColor[6] = System.Drawing.Color.FromArgb(46, 107, 88);
+					AbsFluxColor[7] = System.Drawing.Color.FromArgb(235, 33, 53);
+					AbsFluxColor[8] = System.Drawing.Color.FromArgb(61, 64, 90);
+					AbsFluxColor[9] = System.Drawing.Color.FromArgb(190, 158, 98);
+					AbsFluxColor[10] = System.Drawing.Color.FromArgb(149, 59, 179);
+					AbsFluxColor[11] = System.Drawing.Color.FromArgb(254, 140, 251);
+					AbsFluxColor[12] = System.Drawing.Color.FromArgb(150, 151, 255);
+					AbsFluxColor[13] = System.Drawing.Color.FromArgb(243, 130, 37);
+					AbsFluxColor[14] = System.Drawing.Color.FromArgb(15, 94, 127);
+				}
+				else if (AbsFluxPlotPalette == ColourPalette.Broad)
+				{
+					// BROAD
+					AbsFluxColor[0] = System.Drawing.Color.FromArgb(76, 0, 76);
+					AbsFluxColor[1] = System.Drawing.Color.FromArgb(162, 0, 162);
+					AbsFluxColor[2] = System.Drawing.Color.FromArgb(247, 0, 247);
+					AbsFluxColor[3] = System.Drawing.Color.FromArgb(140, 0, 255);
+					AbsFluxColor[4] = System.Drawing.Color.FromArgb(0, 0, 223);
+					AbsFluxColor[5] = System.Drawing.Color.FromArgb(0, 27, 164);
+					AbsFluxColor[6] = System.Drawing.Color.FromArgb(0, 141, 210);
+					AbsFluxColor[7] = System.Drawing.Color.FromArgb(0, 255, 255);
+					AbsFluxColor[8] = System.Drawing.Color.FromArgb(0, 164, 73);
+					AbsFluxColor[9] = System.Drawing.Color.FromArgb(73, 164, 0);
+					AbsFluxColor[10] = System.Drawing.Color.FromArgb(195, 225, 0);
+					AbsFluxColor[11] = System.Drawing.Color.FromArgb(255, 195, 0);
+					AbsFluxColor[12] = System.Drawing.Color.FromArgb(255, 73, 0);
+					AbsFluxColor[13] = System.Drawing.Color.FromArgb(212, 0, 0);
+					AbsFluxColor[14] = System.Drawing.Color.FromArgb(102, 0, 0);
+				}
+				else if (AbsFluxPlotPalette == ColourPalette.Rainbow1)
+				{
+					// RAINBOW 1
+					AbsFluxColor[0] = System.Drawing.Color.FromArgb(0, 0, 127);
+					AbsFluxColor[1] = System.Drawing.Color.FromArgb(127, 0, 182);
+					AbsFluxColor[2] = System.Drawing.Color.FromArgb(102, 0, 226);
+					AbsFluxColor[3] = System.Drawing.Color.FromArgb(0, 17, 255);
+					AbsFluxColor[4] = System.Drawing.Color.FromArgb(0, 107, 255);
+					AbsFluxColor[5] = System.Drawing.Color.FromArgb(0, 197, 255);
+					AbsFluxColor[6] = System.Drawing.Color.FromArgb(26, 251, 229);
+					AbsFluxColor[7] = System.Drawing.Color.FromArgb(91, 252, 164);
+					AbsFluxColor[8] = System.Drawing.Color.FromArgb(157, 254, 98);
+					AbsFluxColor[9] = System.Drawing.Color.FromArgb(223, 255, 32);
+					AbsFluxColor[10] = System.Drawing.Color.FromArgb(249, 208, 6);
+					AbsFluxColor[11] = System.Drawing.Color.FromArgb(252, 131, 3);
+					AbsFluxColor[12] = System.Drawing.Color.FromArgb(254, 53, 1);
+					AbsFluxColor[13] = System.Drawing.Color.FromArgb(226, 5, 0);
+					AbsFluxColor[14] = System.Drawing.Color.FromArgb(153, 0, 0);
+				}
+				else if (AbsFluxPlotPalette == ColourPalette.Rainbow2)
+				{
+					// RAINBOW 2
+					AbsFluxColor[0] = System.Drawing.Color.FromArgb(204, 0, 255);
+					AbsFluxColor[1] = System.Drawing.Color.FromArgb(113, 36, 255);
+					AbsFluxColor[2] = System.Drawing.Color.FromArgb(68, 73, 227);
+					AbsFluxColor[3] = System.Drawing.Color.FromArgb(54, 111, 180);
+					AbsFluxColor[4] = System.Drawing.Color.FromArgb(40, 148, 134);
+					AbsFluxColor[5] = System.Drawing.Color.FromArgb(26, 186, 87);
+					AbsFluxColor[6] = System.Drawing.Color.FromArgb(12, 223, 40);
+					AbsFluxColor[7] = System.Drawing.Color.FromArgb(127, 255, 0);
+					AbsFluxColor[8] = System.Drawing.Color.FromArgb(255, 182, 0);
+					AbsFluxColor[9] = System.Drawing.Color.FromArgb(255, 109, 0);
+					AbsFluxColor[10] = System.Drawing.Color.FromArgb(255, 36, 0);
+					AbsFluxColor[11] = System.Drawing.Color.FromArgb(219, 0, 0);
+					AbsFluxColor[12] = System.Drawing.Color.FromArgb(175, 73, 73);
+					AbsFluxColor[13] = System.Drawing.Color.FromArgb(182, 146, 146);
+					AbsFluxColor[14] = System.Drawing.Color.FromArgb(255, 191, 191);
+				}
+				else
+				{
+					// CONTRAST
+					AbsFluxColor[0] = System.Drawing.Color.Lime;
+					AbsFluxColor[1] = System.Drawing.Color.Aqua;
+					AbsFluxColor[2] = System.Drawing.Color.Yellow;
+					AbsFluxColor[3] = System.Drawing.Color.Fuchsia;
+					AbsFluxColor[4] = System.Drawing.Color.FromArgb(255, 128, 0);
+					AbsFluxColor[5] = System.Drawing.Color.Blue;
+					AbsFluxColor[6] = System.Drawing.Color.Green;
+					AbsFluxColor[7] = System.Drawing.Color.FromArgb(64, 64, 64);
+					AbsFluxColor[8] = System.Drawing.Color.Red;
+					AbsFluxColor[9] = System.Drawing.Color.GreenYellow;
+					AbsFluxColor[10] = System.Drawing.Color.Salmon;
+					AbsFluxColor[11] = System.Drawing.Color.SlateBlue;
+					AbsFluxColor[12] = System.Drawing.Color.Honeydew;
+					AbsFluxColor[13] = System.Drawing.Color.MistyRose;
+					AbsFluxColor[14] = System.Drawing.Color.RosyBrown;
+				}
+
 				AbsFluxDefaultColor = System.Drawing.Color.Purple;
 
-				for (int i = 0; i < 9; i++)
+				for (int i = 0; i < 15; i++)
 				{
 					AbsFluxObsPen[i] = new Pen(AbsFluxColor[i]);
 					AbsFluxPen[i] = new Pen(System.Drawing.Color.FromArgb(100, AbsFluxColor[i]));
@@ -1382,6 +1524,7 @@ namespace Tangra.Model.Config
 				public int KnownLineColorRGB = System.Drawing.Color.Blue.ToArgb();
 				public int SpectraApertureColorRGB = System.Drawing.Color.Red.ToArgb();
 				public int PlotBackgroundColorRGB = SystemColors.ControlDark.ToArgb();
+				public ColourPalette AbsFluxPlotPalette = ColourPalette.Rainbow2;
 			}
 
 			public SpectroscopyInstrument Instrument;

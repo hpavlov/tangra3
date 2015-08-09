@@ -113,18 +113,18 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			get { return InputFile.FullPath; }			
 		}
 
-		internal void RescaleToResolution(int fromWavelength, int toWavelength, int step)
+		internal void RescaleToResolution(int fromWavelength, int toWavelength, int step, bool useBlurring)
 		{
 			WavelengthFrom = fromWavelength - (int)Math.Ceiling(step / 2.0);
 			WavelengthBinSize = step;
 			WavelengthTo = toWavelength + (int) Math.Ceiling(step/2.0);
 
-			RescaleData(WavelengthFrom, WavelengthTo, WavelengthBinSize, InputFile.Wavelengths, InputFile.Fluxes, ObservedFluxes, ResolvedWavelengths);
+			RescaleData(WavelengthFrom, WavelengthTo, WavelengthBinSize, useBlurring, InputFile.Wavelengths, InputFile.Fluxes, ObservedFluxes, ResolvedWavelengths);
 			if (m_CalSpecStar != null)
 			{
 				List<double> absWavelengths = m_CalSpecStar.DataPoints.Keys.ToList();
 				List<double> absFluxes = m_CalSpecStar.DataPoints.Values.ToList();
-				RescaleData(WavelengthFrom, WavelengthTo, WavelengthBinSize, absWavelengths, absFluxes, AbsoluteFluxes, null);
+				RescaleData(WavelengthFrom, WavelengthTo, WavelengthBinSize, useBlurring, absWavelengths, absFluxes, AbsoluteFluxes, null);
 
 				DeltaMagnitiudes.Clear();
 				double exposure = InputFile.Exposure;
@@ -143,7 +143,9 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			return (float)Math.Exp(-FWHM_COEFF * distance * distance / (fwhm * fwhm));
 		}
 
-		private static void RescaleData(int fromWavelength, int toWavelength, int step, List<double> wavelengths, List<double> fluxes, List<double> rescaledFluxes, List<double> resolvedWavelengths)
+		private static void RescaleData(
+			int fromWavelength, int toWavelength, int step, bool useBlurring,
+			List<double> wavelengths, List<double> fluxes, List<double> rescaledFluxes, List<double> resolvedWavelengths)
 		{
 			// Blurring: 
 			// 1) Find the number of original datapoints in resolution/blur interval
@@ -203,26 +205,33 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 					double sum = 0;
 					double weight = 0;
 
-					for (int k = j - binSize; k <= j + binSize; k++)
+					if (useBlurring)
 					{
-						if (k > 0 && k < wavelengths.Count - 1)
+						for (int k = j - binSize; k <= j + binSize; k++)
 						{
-							weight += kernel[k - j + binSize];
-							sum += kernel[k - j + binSize] * fluxes[k];
+							if (k > 0 && k < wavelengths.Count - 1)
+							{
+								weight += kernel[k - j + binSize];
+								sum += kernel[k - j + binSize] * fluxes[k];
+							}
 						}
+
+						double blurredFlux = 0;
+
+						if (weight > 0)
+							blurredFlux = sum / weight;
+						else
+							blurredFlux = fluxes[j];
+
+						partFluxes.Add(blurredFlux);						
 					}
-
-					double blurredFlux = 0;
-
-					if (weight > 0)
-						blurredFlux = sum / weight;
 					else
-						blurredFlux = fluxes[j];
-
-					partFluxes.Add(blurredFlux);
+					{
+						partFluxes.Add(fluxes[j]);
+					}
 				}
 
-				rescaledFluxes[i] = partFluxes.Any() ? partFluxes.Average() : 0;
+				rescaledFluxes[i] = partFluxes.Any() ? partFluxes.Average() : double.NaN;
 			}
 
 		}

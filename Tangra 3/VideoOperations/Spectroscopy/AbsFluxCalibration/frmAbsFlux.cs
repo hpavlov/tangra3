@@ -516,18 +516,19 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 				}
 			}
 
-			for (int i = 1; i < 10; i++) ShowHideSpectraLegend(i);
+			for (int i = 1; i < 16; i++) ShowHideSpectraLegend(i);
 
 			picPlot.Invalidate();
 		}
 
 		private void ShowHideSpectraLegend(int number)
 		{
-			if (number > 0 && number < 10)
+			var objLabls = new Label[] { lblObj1, lblObj2, lblObj3, lblObj4, lblObj5, lblObj6, lblObj7, lblObj8, lblObj9, lblObj10, lblObj11, lblObj12, lblObj13, lblObj14, lblObj15 };
+			var objPicBoxes = new PictureBox[] { pbox1, pbox2, pbox3, pbox4, pbox5, pbox6, pbox7, pbox8, pbox9, pbox10, pbox11, pbox12, pbox13, pbox14, pbox15 };
+
+			if (number > 0 && number < 16)
 			{
 				bool visible = false;
-
-				var objLabls = new Label[] { lblObj1, lblObj2, lblObj3, lblObj4, lblObj5, lblObj6, lblObj7, lblObj8, lblObj9 };
 
 				if (number <= m_AbsFluxCalibrator.NumSpectra)
 				{
@@ -538,6 +539,11 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 						objLabls[number - 1].Text = "NaN";
 
 					visible = m_AbsFluxCalibrator.IsCalibrated;
+				}
+
+				if (visible)
+				{
+					objPicBoxes[number - 1].BackColor = m_DisplaySetting.AbsFluxColor[number - 1];
 				}
 
 				string tag = (100 + number).ToString();
@@ -590,5 +596,15 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
             else
                 MessageBox.Show(this, "Not calibrated", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
+
+		private void miProcessing_Click(object sender, EventArgs e)
+		{
+			var frmProcessing = new frmConfigureProcessing(m_AbsFluxCalibrator.Context);
+			if (frmProcessing.ShowDialog(this) == DialogResult.OK)
+			{
+				m_AbsFluxCalibrator.SetCalibrationContext(frmProcessing.Context);
+				PlotCalibration();
+			}
+		}
 	}
 }

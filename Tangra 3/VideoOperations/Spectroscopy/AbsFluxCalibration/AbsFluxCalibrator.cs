@@ -15,18 +15,23 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 {
 	public class PlotContext
 	{
-		internal bool ObservedFlux;
+		public bool ObservedFlux;
+	}
+
+	public class CalibrationContext
+	{
+		public int FromWavelength;
+		public int ToWavelength;
+		public int WavelengthBinSize;
+		public bool UseBlurring;
 	}
 
 	public class AbsFluxCalibrator
 	{
-		public int FromWavelength { get; private set; }
-		public int ToWavelength { get; private set; }
-		public int WavelengthBinSize { get; private set; }
-
 		public bool IsCalibrated { get; private set; }
 
 		internal PlotContext PlotContext = new PlotContext();
+		internal CalibrationContext Context = new CalibrationContext();
 
 		private List<AbsFluxSpectra> m_SpectraList = new List<AbsFluxSpectra>();
 
@@ -41,9 +46,10 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 
 		internal AbsFluxCalibrator()
 		{
-			FromWavelength = TangraConfig.Settings.Spectroscopy.MinWavelength;
-			ToWavelength = TangraConfig.Settings.Spectroscopy.MaxWavelength;
-			WavelengthBinSize = TangraConfig.Settings.Spectroscopy.AbsFluxResolution;
+			Context.FromWavelength = TangraConfig.Settings.Spectroscopy.MinWavelength;
+			Context.ToWavelength = TangraConfig.Settings.Spectroscopy.MaxWavelength;
+			Context.WavelengthBinSize = TangraConfig.Settings.Spectroscopy.AbsFluxResolution;
+
 			IsCalibrated = false;
 		}
 
@@ -59,7 +65,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 		{
 			if (!m_SpectraList.Any(x => x.FullFilePath.Equals(spectra.FullFilePath, StringComparison.InvariantCultureIgnoreCase)))
 			{
-				spectra.RescaleToResolution(FromWavelength, ToWavelength, WavelengthBinSize);
+				spectra.RescaleToResolution(Context.FromWavelength, Context.ToWavelength, Context.WavelengthBinSize, Context.UseBlurring);
 				m_SpectraList.Add(spectra);
 
 				AssignNumbers();
@@ -95,6 +101,16 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 		internal void PlotSpectra(AbsFluxSpectra spectra, bool plot)
 		{
 			spectra.PlotSpectra = plot;
+		}
+
+		internal void SetCalibrationContext(CalibrationContext context)
+		{
+			Context = context;
+			foreach (AbsFluxSpectra spectra in m_SpectraList)
+			{
+				spectra.RescaleToResolution(Context.FromWavelength, Context.ToWavelength, Context.WavelengthBinSize, Context.UseBlurring);
+			}
+			Calibrate();
 		}
 
 		private List<double> m_ExtinctionCoefficients = new List<double>();
@@ -255,7 +271,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 
 			// Scale 
 			float scaleY = (float)((height - topHeaderHeight - 2 * PADDING - X_AXIS_LEGEND_HEIGHT - LONG_MARK) / maxFlux);
-			float scaleX = ((width - 2 * PADDING - Y_AXIS_LEGEND_WIDTH) * 1.0f / (ToWavelength - FromWavelength));
+			float scaleX = ((width - 2 * PADDING - Y_AXIS_LEGEND_WIDTH) * 1.0f / (Context.ToWavelength - Context.FromWavelength));
 
 
 			g.DrawRectangle(displaySetting.GridLinesPen, 
@@ -285,9 +301,9 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 					double flux = fluxFunc(j)[i];
 					double wavelength = plotObjects[j].ResolvedWavelengths[i];
 
-					if (wavelength >= FromWavelength && wavelength <= ToWavelength && !double.IsNaN(flux))
+					if (wavelength >= Context.FromWavelength && wavelength <= Context.ToWavelength && !double.IsNaN(flux))
 					{
-						float x = (float)(PADDING + Y_AXIS_LEGEND_WIDTH + (wavelength - FromWavelength) * scaleX);
+						float x = (float)(PADDING + Y_AXIS_LEGEND_WIDTH + (wavelength - Context.FromWavelength) * scaleX);
 						float y = (float)(height - PADDING - X_AXIS_LEGEND_HEIGHT - flux * scaleY);
 
 						var thisPoint = new PointF(x, y);
@@ -408,19 +424,19 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			{
 				INTERVAL = xInterval[i];
 				MINOR_TICK_INTERVAL = minorTicks[i];
-				int numTicks = (ToWavelength - FromWavelength) / INTERVAL;
+				int numTicks = (Context.ToWavelength - Context.FromWavelength) / INTERVAL;
 				if (size.Width * 1.3f * numTicks < horizontalSpace)
 				{
 					break;
 				}
 			}
 
-			for (int w = INTERVAL * ((FromWavelength / INTERVAL) - 1); w < ToWavelength + INTERVAL; w += INTERVAL)
+			for (int w = INTERVAL * ((Context.FromWavelength / INTERVAL) - 1); w < Context.ToWavelength + INTERVAL; w += INTERVAL)
 			{
-				if (w < FromWavelength) continue;
+				if (w < Context.FromWavelength) continue;
 				string markStr = w.ToString();
 				size = g.MeasureString(markStr, displaySetting.LegendFont);
-				float tickPos = (float)(PADDING + Y_AXIS_LEGEND_WIDTH + (w - FromWavelength) * scaleX);
+				float tickPos = (float)(PADDING + Y_AXIS_LEGEND_WIDTH + (w - Context.FromWavelength) * scaleX);
 				if (tickPos - size.Width / 2.0f < PADDING + Y_AXIS_LEGEND_WIDTH) continue;
 				if (tickPos + size.Width / 2.0f > width - PADDING) break;
 
@@ -430,12 +446,12 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 				g.DrawString(markStr, displaySetting.LegendFont, displaySetting.LegendBrush, tickPos - size.Width / 2.0f, y0 + LONG_MARK);
 			}
 
-			for (int w = INTERVAL * ((FromWavelength / INTERVAL) - 1); w < ToWavelength + INTERVAL; w += MINOR_TICK_INTERVAL)
+			for (int w = INTERVAL * ((Context.FromWavelength / INTERVAL) - 1); w < Context.ToWavelength + INTERVAL; w += MINOR_TICK_INTERVAL)
 			{
-				if (w < FromWavelength) continue;
+				if (w < Context.FromWavelength) continue;
 				if (w % INTERVAL == 0) continue;
 
-				float tickPos = (PADDING + Y_AXIS_LEGEND_WIDTH + (w - FromWavelength) * scaleX);
+				float tickPos = (PADDING + Y_AXIS_LEGEND_WIDTH + (w - Context.FromWavelength) * scaleX);
 				if (tickPos < PADDING + Y_AXIS_LEGEND_WIDTH) continue;
 				if (tickPos > width - PADDING) break;
 
