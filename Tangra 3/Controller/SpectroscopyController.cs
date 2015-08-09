@@ -481,7 +481,7 @@ namespace Tangra.Controller
 			return masterSpectra;
         }
 
-		internal void DisplaySpectra(MasterSpectra masterSpectra, TangraConfig.PersistedConfiguration configuration, TangraConfig.SpectraViewDisplaySettings displaySettings)
+		internal void DisplaySpectra(MasterSpectra masterSpectra, TangraConfig.PersistedConfiguration configuration, TangraConfig.SpectraViewDisplaySettings displaySettings, string fileName = null)
 	    {
 			EnsureViewSpectraForm(displaySettings);
 
@@ -489,7 +489,7 @@ namespace Tangra.Controller
             m_Configuration = configuration;
             m_SpectraCalibrator = new SpectraCalibrator(masterSpectra);
 
-			m_ViewSpectraForm.SetMasterSpectra(masterSpectra);
+            m_ViewSpectraForm.SetMasterSpectra(masterSpectra, fileName);
 	        m_ViewSpectraForm.StartPosition = FormStartPosition.CenterParent;
 			m_ViewSpectraForm.Show(m_MainFormView);
 	    }
@@ -613,8 +613,7 @@ namespace Tangra.Controller
 				SpectraFile spectraFile = SpectraFile.Load(fileName);
 				if (spectraFile != null)
 				{
-                    // TODO: Choose configuration ?? 
-					DisplaySpectra(spectraFile.Data, null, m_DisplaySettings);
+                    DisplaySpectra(spectraFile.Data, null, m_DisplaySettings, fileName);
 
                     string videoFile = m_VideoController.GetVideoFileMatchingLcFile(spectraFile.Header.PathToVideoFile, fileName);
                     if (!string.IsNullOrEmpty(videoFile) &&

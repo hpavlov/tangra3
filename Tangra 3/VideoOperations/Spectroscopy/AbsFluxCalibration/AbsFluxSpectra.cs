@@ -48,6 +48,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
                 HasObservationTime)
             {
                 IsComplete = true;
+                PlotSpectra = true;
             }
         }
 

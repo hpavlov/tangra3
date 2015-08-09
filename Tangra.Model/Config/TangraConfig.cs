@@ -1406,12 +1406,12 @@ namespace Tangra.Model.Config
 
 				for (int i = 0; i < 15; i++)
 				{
-					AbsFluxObsPen[i] = new Pen(AbsFluxColor[i]);
-					AbsFluxPen[i] = new Pen(System.Drawing.Color.FromArgb(100, AbsFluxColor[i]));
+					AbsFluxObsPen[i] = new Pen(System.Drawing.Color.FromArgb(100, AbsFluxColor[i]));
+                    AbsFluxPen[i] = new Pen(AbsFluxColor[i]);
 				}
 
-				AbsFluxObsPenDefault = new Pen(AbsFluxDefaultColor);
-				AbsFluxPenDefault = new Pen(System.Drawing.Color.FromArgb(100, AbsFluxDefaultColor));
+				AbsFluxObsPenDefault = new Pen(System.Drawing.Color.FromArgb(100, AbsFluxDefaultColor));
+                AbsFluxPenDefault = new Pen(AbsFluxDefaultColor);
 
 			}
 		}

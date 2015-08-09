@@ -47,7 +47,7 @@ namespace Tangra.VideoOperations.Spectroscopy
 	        m_VideoController = videoController;
 	    }
 
-		internal void SetMasterSpectra(MasterSpectra masterSpectra)
+		internal void SetMasterSpectra(MasterSpectra masterSpectra, string fileName)
 	    {
 			m_Spectra = masterSpectra;
 			m_StateManager.SetMasterSpectra(masterSpectra);
@@ -71,6 +71,11 @@ namespace Tangra.VideoOperations.Spectroscopy
                 if (m_SpectroscopyController.ScaleSpectraByZeroOrderImagePosition())
                     m_StateManager.ChangeState<SpectraViewerStateCalibrated>();    
 	        }
+
+		    if (fileName != null)
+                Text = string.Format("Spectra Viewer - {0}", Path.GetFileName(fileName));
+		    else
+		        Text = "Spectra Viewer";
 	    }
 
         private void frmViewSpectra_Load(object sender, EventArgs e)
