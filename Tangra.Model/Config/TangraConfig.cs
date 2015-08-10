@@ -1524,7 +1524,7 @@ namespace Tangra.Model.Config
 				public int KnownLineColorRGB = System.Drawing.Color.Blue.ToArgb();
 				public int SpectraApertureColorRGB = System.Drawing.Color.Red.ToArgb();
 				public int PlotBackgroundColorRGB = SystemColors.ControlDark.ToArgb();
-				public ColourPalette AbsFluxPlotPalette = ColourPalette.Rainbow2;
+				public ColourPalette AbsFluxPlotPalette = ColourPalette.Contrast;
 			}
 
 			public SpectroscopyInstrument Instrument;

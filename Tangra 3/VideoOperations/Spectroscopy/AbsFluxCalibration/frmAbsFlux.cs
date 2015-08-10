@@ -606,5 +606,38 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 				PlotCalibration();
 			}
 		}
+
+		private void OnColourPaletteClicked(object sender, EventArgs e)
+		{
+			var mi = sender as ToolStripMenuItem;
+			if (mi != null)
+			{
+				var palette = (TangraConfig.ColourPalette)Convert.ToInt32(mi.Tag);
+
+				m_DisplaySetting.AbsFluxPlotPalette = palette;
+				m_DisplaySetting.Initialize();
+				PlotCalibration();
+
+				CheckSelectedPaletteMenuItem(m_DisplaySetting.AbsFluxPlotPalette);
+			}
+		}
+
+		private void CheckSelectedPaletteMenuItem(TangraConfig.ColourPalette selectedPalette)
+		{
+			foreach (var item in miColourPalette.DropDownItems)
+			{
+				var mi = item as ToolStripMenuItem;
+				if (mi != null)
+				{
+					mi.Checked = selectedPalette == (TangraConfig.ColourPalette) Convert.ToInt32(mi.Tag);
+				}
+				
+			}
+		}
+
+		private void miColourPalette_DropDownOpening(object sender, EventArgs e)
+		{
+			CheckSelectedPaletteMenuItem(m_DisplaySetting.AbsFluxPlotPalette);
+		}
 	}
 }

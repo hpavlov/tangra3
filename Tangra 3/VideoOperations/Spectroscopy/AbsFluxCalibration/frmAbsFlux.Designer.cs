@@ -39,6 +39,24 @@
 			this.ctxMenuIncludedSpectra = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.miExcludeSpectra = new System.Windows.Forms.ToolStripMenuItem();
 			this.pnlDetail = new System.Windows.Forms.Panel();
+			this.lblObj15 = new System.Windows.Forms.Label();
+			this.label8 = new System.Windows.Forms.Label();
+			this.pbox15 = new System.Windows.Forms.PictureBox();
+			this.lblObj14 = new System.Windows.Forms.Label();
+			this.label10 = new System.Windows.Forms.Label();
+			this.pbox14 = new System.Windows.Forms.PictureBox();
+			this.lblObj13 = new System.Windows.Forms.Label();
+			this.label12 = new System.Windows.Forms.Label();
+			this.pbox13 = new System.Windows.Forms.PictureBox();
+			this.lblObj12 = new System.Windows.Forms.Label();
+			this.label2 = new System.Windows.Forms.Label();
+			this.pbox12 = new System.Windows.Forms.PictureBox();
+			this.lblObj11 = new System.Windows.Forms.Label();
+			this.label4 = new System.Windows.Forms.Label();
+			this.pbox11 = new System.Windows.Forms.PictureBox();
+			this.lblObj10 = new System.Windows.Forms.Label();
+			this.label6 = new System.Windows.Forms.Label();
+			this.pbox10 = new System.Windows.Forms.PictureBox();
 			this.lblObj9 = new System.Windows.Forms.Label();
 			this.lbl9 = new System.Windows.Forms.Label();
 			this.pbox9 = new System.Windows.Forms.PictureBox();
@@ -83,27 +101,23 @@
 			this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
 			this.resizeTimer = new System.Windows.Forms.Timer(this.components);
 			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-			this.lblObj12 = new System.Windows.Forms.Label();
-			this.label2 = new System.Windows.Forms.Label();
-			this.pbox12 = new System.Windows.Forms.PictureBox();
-			this.lblObj11 = new System.Windows.Forms.Label();
-			this.label4 = new System.Windows.Forms.Label();
-			this.pbox11 = new System.Windows.Forms.PictureBox();
-			this.lblObj10 = new System.Windows.Forms.Label();
-			this.label6 = new System.Windows.Forms.Label();
-			this.pbox10 = new System.Windows.Forms.PictureBox();
-			this.lblObj15 = new System.Windows.Forms.Label();
-			this.label8 = new System.Windows.Forms.Label();
-			this.pbox15 = new System.Windows.Forms.PictureBox();
-			this.lblObj14 = new System.Windows.Forms.Label();
-			this.label10 = new System.Windows.Forms.Label();
-			this.pbox14 = new System.Windows.Forms.PictureBox();
-			this.lblObj13 = new System.Windows.Forms.Label();
-			this.label12 = new System.Windows.Forms.Label();
-			this.pbox13 = new System.Windows.Forms.PictureBox();
+			this.miColourPalette = new System.Windows.Forms.ToolStripMenuItem();
+			this.miPastel = new System.Windows.Forms.ToolStripMenuItem();
+			this.miIntense1 = new System.Windows.Forms.ToolStripMenuItem();
+			this.miIntense2 = new System.Windows.Forms.ToolStripMenuItem();
+			this.miBroad = new System.Windows.Forms.ToolStripMenuItem();
+			this.miRainbow1 = new System.Windows.Forms.ToolStripMenuItem();
+			this.miRainbow2 = new System.Windows.Forms.ToolStripMenuItem();
+			this.miContrast = new System.Windows.Forms.ToolStripMenuItem();
 			this.pnlFiles.SuspendLayout();
 			this.ctxMenuIncludedSpectra.SuspendLayout();
 			this.pnlDetail.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.pbox15)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.pbox14)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.pbox13)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.pbox12)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.pbox11)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.pbox10)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.pbox9)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.pbox8)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.pbox7)).BeginInit();
@@ -116,12 +130,6 @@
 			this.pnlClient.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.picPlot)).BeginInit();
 			this.menuStrip1.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.pbox12)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.pbox11)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.pbox10)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.pbox15)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.pbox14)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.pbox13)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// pnlFiles
@@ -254,6 +262,210 @@
 			this.pnlDetail.Name = "pnlDetail";
 			this.pnlDetail.Size = new System.Drawing.Size(598, 71);
 			this.pnlDetail.TabIndex = 1;
+			// 
+			// lblObj15
+			// 
+			this.lblObj15.AutoSize = true;
+			this.lblObj15.Location = new System.Drawing.Point(392, 50);
+			this.lblObj15.Name = "lblObj15";
+			this.lblObj15.Size = new System.Drawing.Size(36, 13);
+			this.lblObj15.TabIndex = 44;
+			this.lblObj15.Tag = "115";
+			this.lblObj15.Text = "-6.5 %";
+			this.lblObj15.Visible = false;
+			// 
+			// label8
+			// 
+			this.label8.Location = new System.Drawing.Point(353, 50);
+			this.label8.Name = "label8";
+			this.label8.Size = new System.Drawing.Size(22, 13);
+			this.label8.TabIndex = 43;
+			this.label8.Tag = "115";
+			this.label8.Text = "15.";
+			this.label8.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.label8.Visible = false;
+			// 
+			// pbox15
+			// 
+			this.pbox15.BackColor = System.Drawing.Color.Red;
+			this.pbox15.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.pbox15.Location = new System.Drawing.Point(377, 50);
+			this.pbox15.Name = "pbox15";
+			this.pbox15.Size = new System.Drawing.Size(14, 13);
+			this.pbox15.TabIndex = 42;
+			this.pbox15.TabStop = false;
+			this.pbox15.Tag = "115";
+			this.pbox15.Visible = false;
+			// 
+			// lblObj14
+			// 
+			this.lblObj14.AutoSize = true;
+			this.lblObj14.Location = new System.Drawing.Point(392, 31);
+			this.lblObj14.Name = "lblObj14";
+			this.lblObj14.Size = new System.Drawing.Size(36, 13);
+			this.lblObj14.TabIndex = 41;
+			this.lblObj14.Tag = "114";
+			this.lblObj14.Text = "-6.5 %";
+			this.lblObj14.Visible = false;
+			// 
+			// label10
+			// 
+			this.label10.Location = new System.Drawing.Point(353, 31);
+			this.label10.Name = "label10";
+			this.label10.Size = new System.Drawing.Size(22, 13);
+			this.label10.TabIndex = 40;
+			this.label10.Tag = "114";
+			this.label10.Text = "14.";
+			this.label10.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.label10.Visible = false;
+			// 
+			// pbox14
+			// 
+			this.pbox14.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+			this.pbox14.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.pbox14.Location = new System.Drawing.Point(377, 31);
+			this.pbox14.Name = "pbox14";
+			this.pbox14.Size = new System.Drawing.Size(14, 13);
+			this.pbox14.TabIndex = 39;
+			this.pbox14.TabStop = false;
+			this.pbox14.Tag = "114";
+			this.pbox14.Visible = false;
+			// 
+			// lblObj13
+			// 
+			this.lblObj13.AutoSize = true;
+			this.lblObj13.Location = new System.Drawing.Point(392, 12);
+			this.lblObj13.Name = "lblObj13";
+			this.lblObj13.Size = new System.Drawing.Size(36, 13);
+			this.lblObj13.TabIndex = 38;
+			this.lblObj13.Tag = "113";
+			this.lblObj13.Text = "-6.5 %";
+			this.lblObj13.Visible = false;
+			// 
+			// label12
+			// 
+			this.label12.Location = new System.Drawing.Point(353, 12);
+			this.label12.Name = "label12";
+			this.label12.Size = new System.Drawing.Size(22, 13);
+			this.label12.TabIndex = 37;
+			this.label12.Tag = "113";
+			this.label12.Text = "13.";
+			this.label12.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.label12.Visible = false;
+			// 
+			// pbox13
+			// 
+			this.pbox13.BackColor = System.Drawing.Color.Green;
+			this.pbox13.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.pbox13.Location = new System.Drawing.Point(377, 12);
+			this.pbox13.Name = "pbox13";
+			this.pbox13.Size = new System.Drawing.Size(14, 13);
+			this.pbox13.TabIndex = 36;
+			this.pbox13.TabStop = false;
+			this.pbox13.Tag = "113";
+			this.pbox13.Visible = false;
+			// 
+			// lblObj12
+			// 
+			this.lblObj12.AutoSize = true;
+			this.lblObj12.Location = new System.Drawing.Point(298, 50);
+			this.lblObj12.Name = "lblObj12";
+			this.lblObj12.Size = new System.Drawing.Size(36, 13);
+			this.lblObj12.TabIndex = 35;
+			this.lblObj12.Tag = "112";
+			this.lblObj12.Text = "-6.5 %";
+			this.lblObj12.Visible = false;
+			// 
+			// label2
+			// 
+			this.label2.Location = new System.Drawing.Point(259, 50);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(22, 13);
+			this.label2.TabIndex = 34;
+			this.label2.Tag = "112";
+			this.label2.Text = "12.";
+			this.label2.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.label2.Visible = false;
+			// 
+			// pbox12
+			// 
+			this.pbox12.BackColor = System.Drawing.Color.Red;
+			this.pbox12.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.pbox12.Location = new System.Drawing.Point(283, 50);
+			this.pbox12.Name = "pbox12";
+			this.pbox12.Size = new System.Drawing.Size(14, 13);
+			this.pbox12.TabIndex = 33;
+			this.pbox12.TabStop = false;
+			this.pbox12.Tag = "112";
+			this.pbox12.Visible = false;
+			// 
+			// lblObj11
+			// 
+			this.lblObj11.AutoSize = true;
+			this.lblObj11.Location = new System.Drawing.Point(298, 31);
+			this.lblObj11.Name = "lblObj11";
+			this.lblObj11.Size = new System.Drawing.Size(36, 13);
+			this.lblObj11.TabIndex = 32;
+			this.lblObj11.Tag = "111";
+			this.lblObj11.Text = "-6.5 %";
+			this.lblObj11.Visible = false;
+			// 
+			// label4
+			// 
+			this.label4.Location = new System.Drawing.Point(259, 31);
+			this.label4.Name = "label4";
+			this.label4.Size = new System.Drawing.Size(22, 13);
+			this.label4.TabIndex = 31;
+			this.label4.Tag = "111";
+			this.label4.Text = "11.";
+			this.label4.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.label4.Visible = false;
+			// 
+			// pbox11
+			// 
+			this.pbox11.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+			this.pbox11.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.pbox11.Location = new System.Drawing.Point(283, 31);
+			this.pbox11.Name = "pbox11";
+			this.pbox11.Size = new System.Drawing.Size(14, 13);
+			this.pbox11.TabIndex = 30;
+			this.pbox11.TabStop = false;
+			this.pbox11.Tag = "111";
+			this.pbox11.Visible = false;
+			// 
+			// lblObj10
+			// 
+			this.lblObj10.AutoSize = true;
+			this.lblObj10.Location = new System.Drawing.Point(298, 12);
+			this.lblObj10.Name = "lblObj10";
+			this.lblObj10.Size = new System.Drawing.Size(36, 13);
+			this.lblObj10.TabIndex = 29;
+			this.lblObj10.Tag = "110";
+			this.lblObj10.Text = "-6.5 %";
+			this.lblObj10.Visible = false;
+			// 
+			// label6
+			// 
+			this.label6.Location = new System.Drawing.Point(259, 12);
+			this.label6.Name = "label6";
+			this.label6.Size = new System.Drawing.Size(22, 13);
+			this.label6.TabIndex = 28;
+			this.label6.Tag = "110";
+			this.label6.Text = "10.";
+			this.label6.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.label6.Visible = false;
+			// 
+			// pbox10
+			// 
+			this.pbox10.BackColor = System.Drawing.Color.Green;
+			this.pbox10.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.pbox10.Location = new System.Drawing.Point(283, 12);
+			this.pbox10.Name = "pbox10";
+			this.pbox10.Size = new System.Drawing.Size(14, 13);
+			this.pbox10.TabIndex = 27;
+			this.pbox10.TabStop = false;
+			this.pbox10.Tag = "110";
+			this.pbox10.Visible = false;
 			// 
 			// lblObj9
 			// 
@@ -597,6 +809,7 @@
 			// 
 			this.miConfigure.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.miPlot,
+            this.miColourPalette,
             this.miProcessing});
 			this.miConfigure.Name = "miConfigure";
 			this.miConfigure.Size = new System.Drawing.Size(66, 20);
@@ -608,7 +821,7 @@
             this.miAbsoluteFlux,
             this.miObservedFlux});
 			this.miPlot.Name = "miPlot";
-			this.miPlot.Size = new System.Drawing.Size(125, 22);
+			this.miPlot.Size = new System.Drawing.Size(152, 22);
 			this.miPlot.Text = "&Series Plot";
 			// 
 			// miAbsoluteFlux
@@ -616,21 +829,21 @@
 			this.miAbsoluteFlux.Checked = true;
 			this.miAbsoluteFlux.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.miAbsoluteFlux.Name = "miAbsoluteFlux";
-			this.miAbsoluteFlux.Size = new System.Drawing.Size(144, 22);
+			this.miAbsoluteFlux.Size = new System.Drawing.Size(152, 22);
 			this.miAbsoluteFlux.Text = "&Absolute Flux";
 			this.miAbsoluteFlux.Click += new System.EventHandler(this.miAbsoluteFlux_Click);
 			// 
 			// miObservedFlux
 			// 
 			this.miObservedFlux.Name = "miObservedFlux";
-			this.miObservedFlux.Size = new System.Drawing.Size(144, 22);
+			this.miObservedFlux.Size = new System.Drawing.Size(152, 22);
 			this.miObservedFlux.Text = "&Observed Fulx";
 			this.miObservedFlux.Click += new System.EventHandler(this.miObservedFlux_Click);
 			// 
 			// miProcessing
 			// 
 			this.miProcessing.Name = "miProcessing";
-			this.miProcessing.Size = new System.Drawing.Size(125, 22);
+			this.miProcessing.Size = new System.Drawing.Size(152, 22);
 			this.miProcessing.Text = "&Processing";
 			this.miProcessing.Click += new System.EventHandler(this.miProcessing_Click);
 			// 
@@ -697,209 +910,76 @@
 			this.saveFileDialog.DefaultExt = "csv";
 			this.saveFileDialog.Filter = "Comma Separated Values (*.csv)|*.csv|All Files (*.*)|*.*";
 			// 
-			// lblObj12
+			// miColourPalette
 			// 
-			this.lblObj12.AutoSize = true;
-			this.lblObj12.Location = new System.Drawing.Point(298, 50);
-			this.lblObj12.Name = "lblObj12";
-			this.lblObj12.Size = new System.Drawing.Size(36, 13);
-			this.lblObj12.TabIndex = 35;
-			this.lblObj12.Tag = "112";
-			this.lblObj12.Text = "-6.5 %";
-			this.lblObj12.Visible = false;
+			this.miColourPalette.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miPastel,
+            this.miIntense1,
+            this.miIntense2,
+            this.miBroad,
+            this.miRainbow1,
+            this.miRainbow2,
+            this.miContrast});
+			this.miColourPalette.Name = "miColourPalette";
+			this.miColourPalette.Size = new System.Drawing.Size(152, 22);
+			this.miColourPalette.Text = "&Colour Palette";
+			this.miColourPalette.DropDownOpening += new System.EventHandler(this.miColourPalette_DropDownOpening);
 			// 
-			// label2
+			// miPastel
 			// 
-			this.label2.Location = new System.Drawing.Point(259, 50);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(22, 13);
-			this.label2.TabIndex = 34;
-			this.label2.Tag = "112";
-			this.label2.Text = "12.";
-			this.label2.TextAlign = System.Drawing.ContentAlignment.TopRight;
-			this.label2.Visible = false;
+			this.miPastel.Name = "miPastel";
+			this.miPastel.Size = new System.Drawing.Size(152, 22);
+			this.miPastel.Tag = "0";
+			this.miPastel.Text = "Pastel";
+			this.miPastel.Click += new System.EventHandler(this.OnColourPaletteClicked);
 			// 
-			// pbox12
+			// miIntense1
 			// 
-			this.pbox12.BackColor = System.Drawing.Color.Red;
-			this.pbox12.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.pbox12.Location = new System.Drawing.Point(283, 50);
-			this.pbox12.Name = "pbox12";
-			this.pbox12.Size = new System.Drawing.Size(14, 13);
-			this.pbox12.TabIndex = 33;
-			this.pbox12.TabStop = false;
-			this.pbox12.Tag = "112";
-			this.pbox12.Visible = false;
+			this.miIntense1.Name = "miIntense1";
+			this.miIntense1.Size = new System.Drawing.Size(152, 22);
+			this.miIntense1.Tag = "1";
+			this.miIntense1.Text = "Intense 1";
+			this.miIntense1.Click += new System.EventHandler(this.OnColourPaletteClicked);
 			// 
-			// lblObj11
+			// miIntense2
 			// 
-			this.lblObj11.AutoSize = true;
-			this.lblObj11.Location = new System.Drawing.Point(298, 31);
-			this.lblObj11.Name = "lblObj11";
-			this.lblObj11.Size = new System.Drawing.Size(36, 13);
-			this.lblObj11.TabIndex = 32;
-			this.lblObj11.Tag = "111";
-			this.lblObj11.Text = "-6.5 %";
-			this.lblObj11.Visible = false;
+			this.miIntense2.Name = "miIntense2";
+			this.miIntense2.Size = new System.Drawing.Size(152, 22);
+			this.miIntense2.Tag = "2";
+			this.miIntense2.Text = "Intense 2";
+			this.miIntense2.Click += new System.EventHandler(this.OnColourPaletteClicked);
 			// 
-			// label4
+			// miBroad
 			// 
-			this.label4.Location = new System.Drawing.Point(259, 31);
-			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(22, 13);
-			this.label4.TabIndex = 31;
-			this.label4.Tag = "111";
-			this.label4.Text = "11.";
-			this.label4.TextAlign = System.Drawing.ContentAlignment.TopRight;
-			this.label4.Visible = false;
+			this.miBroad.Name = "miBroad";
+			this.miBroad.Size = new System.Drawing.Size(152, 22);
+			this.miBroad.Tag = "3";
+			this.miBroad.Text = "Broad";
+			this.miBroad.Click += new System.EventHandler(this.OnColourPaletteClicked);
 			// 
-			// pbox11
+			// miRainbow1
 			// 
-			this.pbox11.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-			this.pbox11.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.pbox11.Location = new System.Drawing.Point(283, 31);
-			this.pbox11.Name = "pbox11";
-			this.pbox11.Size = new System.Drawing.Size(14, 13);
-			this.pbox11.TabIndex = 30;
-			this.pbox11.TabStop = false;
-			this.pbox11.Tag = "111";
-			this.pbox11.Visible = false;
+			this.miRainbow1.Name = "miRainbow1";
+			this.miRainbow1.Size = new System.Drawing.Size(152, 22);
+			this.miRainbow1.Tag = "4";
+			this.miRainbow1.Text = "Rainbow 1";
+			this.miRainbow1.Click += new System.EventHandler(this.OnColourPaletteClicked);
 			// 
-			// lblObj10
+			// miRainbow2
 			// 
-			this.lblObj10.AutoSize = true;
-			this.lblObj10.Location = new System.Drawing.Point(298, 12);
-			this.lblObj10.Name = "lblObj10";
-			this.lblObj10.Size = new System.Drawing.Size(36, 13);
-			this.lblObj10.TabIndex = 29;
-			this.lblObj10.Tag = "110";
-			this.lblObj10.Text = "-6.5 %";
-			this.lblObj10.Visible = false;
+			this.miRainbow2.Name = "miRainbow2";
+			this.miRainbow2.Size = new System.Drawing.Size(152, 22);
+			this.miRainbow2.Tag = "5";
+			this.miRainbow2.Text = "Rainbow 2";
+			this.miRainbow2.Click += new System.EventHandler(this.OnColourPaletteClicked);
 			// 
-			// label6
+			// miContrast
 			// 
-			this.label6.Location = new System.Drawing.Point(259, 12);
-			this.label6.Name = "label6";
-			this.label6.Size = new System.Drawing.Size(22, 13);
-			this.label6.TabIndex = 28;
-			this.label6.Tag = "110";
-			this.label6.Text = "10.";
-			this.label6.TextAlign = System.Drawing.ContentAlignment.TopRight;
-			this.label6.Visible = false;
-			// 
-			// pbox10
-			// 
-			this.pbox10.BackColor = System.Drawing.Color.Green;
-			this.pbox10.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.pbox10.Location = new System.Drawing.Point(283, 12);
-			this.pbox10.Name = "pbox10";
-			this.pbox10.Size = new System.Drawing.Size(14, 13);
-			this.pbox10.TabIndex = 27;
-			this.pbox10.TabStop = false;
-			this.pbox10.Tag = "110";
-			this.pbox10.Visible = false;
-			// 
-			// lblObj15
-			// 
-			this.lblObj15.AutoSize = true;
-			this.lblObj15.Location = new System.Drawing.Point(392, 50);
-			this.lblObj15.Name = "lblObj15";
-			this.lblObj15.Size = new System.Drawing.Size(36, 13);
-			this.lblObj15.TabIndex = 44;
-			this.lblObj15.Tag = "115";
-			this.lblObj15.Text = "-6.5 %";
-			this.lblObj15.Visible = false;
-			// 
-			// label8
-			// 
-			this.label8.Location = new System.Drawing.Point(353, 50);
-			this.label8.Name = "label8";
-			this.label8.Size = new System.Drawing.Size(22, 13);
-			this.label8.TabIndex = 43;
-			this.label8.Tag = "115";
-			this.label8.Text = "15.";
-			this.label8.TextAlign = System.Drawing.ContentAlignment.TopRight;
-			this.label8.Visible = false;
-			// 
-			// pbox15
-			// 
-			this.pbox15.BackColor = System.Drawing.Color.Red;
-			this.pbox15.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.pbox15.Location = new System.Drawing.Point(377, 50);
-			this.pbox15.Name = "pbox15";
-			this.pbox15.Size = new System.Drawing.Size(14, 13);
-			this.pbox15.TabIndex = 42;
-			this.pbox15.TabStop = false;
-			this.pbox15.Tag = "115";
-			this.pbox15.Visible = false;
-			// 
-			// lblObj14
-			// 
-			this.lblObj14.AutoSize = true;
-			this.lblObj14.Location = new System.Drawing.Point(392, 31);
-			this.lblObj14.Name = "lblObj14";
-			this.lblObj14.Size = new System.Drawing.Size(36, 13);
-			this.lblObj14.TabIndex = 41;
-			this.lblObj14.Tag = "114";
-			this.lblObj14.Text = "-6.5 %";
-			this.lblObj14.Visible = false;
-			// 
-			// label10
-			// 
-			this.label10.Location = new System.Drawing.Point(353, 31);
-			this.label10.Name = "label10";
-			this.label10.Size = new System.Drawing.Size(22, 13);
-			this.label10.TabIndex = 40;
-			this.label10.Tag = "114";
-			this.label10.Text = "14.";
-			this.label10.TextAlign = System.Drawing.ContentAlignment.TopRight;
-			this.label10.Visible = false;
-			// 
-			// pbox14
-			// 
-			this.pbox14.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-			this.pbox14.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.pbox14.Location = new System.Drawing.Point(377, 31);
-			this.pbox14.Name = "pbox14";
-			this.pbox14.Size = new System.Drawing.Size(14, 13);
-			this.pbox14.TabIndex = 39;
-			this.pbox14.TabStop = false;
-			this.pbox14.Tag = "114";
-			this.pbox14.Visible = false;
-			// 
-			// lblObj13
-			// 
-			this.lblObj13.AutoSize = true;
-			this.lblObj13.Location = new System.Drawing.Point(392, 12);
-			this.lblObj13.Name = "lblObj13";
-			this.lblObj13.Size = new System.Drawing.Size(36, 13);
-			this.lblObj13.TabIndex = 38;
-			this.lblObj13.Tag = "113";
-			this.lblObj13.Text = "-6.5 %";
-			this.lblObj13.Visible = false;
-			// 
-			// label12
-			// 
-			this.label12.Location = new System.Drawing.Point(353, 12);
-			this.label12.Name = "label12";
-			this.label12.Size = new System.Drawing.Size(22, 13);
-			this.label12.TabIndex = 37;
-			this.label12.Tag = "113";
-			this.label12.Text = "13.";
-			this.label12.TextAlign = System.Drawing.ContentAlignment.TopRight;
-			this.label12.Visible = false;
-			// 
-			// pbox13
-			// 
-			this.pbox13.BackColor = System.Drawing.Color.Green;
-			this.pbox13.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.pbox13.Location = new System.Drawing.Point(377, 12);
-			this.pbox13.Name = "pbox13";
-			this.pbox13.Size = new System.Drawing.Size(14, 13);
-			this.pbox13.TabIndex = 36;
-			this.pbox13.TabStop = false;
-			this.pbox13.Tag = "113";
-			this.pbox13.Visible = false;
+			this.miContrast.Name = "miContrast";
+			this.miContrast.Size = new System.Drawing.Size(152, 22);
+			this.miContrast.Tag = "6";
+			this.miContrast.Text = "Contrast";
+			this.miContrast.Click += new System.EventHandler(this.OnColourPaletteClicked);
 			// 
 			// frmAbsFlux
 			// 
@@ -920,6 +1000,12 @@
 			this.ctxMenuIncludedSpectra.ResumeLayout(false);
 			this.pnlDetail.ResumeLayout(false);
 			this.pnlDetail.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.pbox15)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.pbox14)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.pbox13)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.pbox12)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.pbox11)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.pbox10)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.pbox9)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.pbox8)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.pbox7)).EndInit();
@@ -933,12 +1019,6 @@
 			((System.ComponentModel.ISupportInitialize)(this.picPlot)).EndInit();
 			this.menuStrip1.ResumeLayout(false);
 			this.menuStrip1.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.pbox12)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.pbox11)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.pbox10)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.pbox15)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.pbox14)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.pbox13)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -1017,5 +1097,13 @@
 		private System.Windows.Forms.Label lblObj10;
 		private System.Windows.Forms.Label label6;
 		private System.Windows.Forms.PictureBox pbox10;
+		private System.Windows.Forms.ToolStripMenuItem miColourPalette;
+		private System.Windows.Forms.ToolStripMenuItem miPastel;
+		private System.Windows.Forms.ToolStripMenuItem miIntense1;
+		private System.Windows.Forms.ToolStripMenuItem miIntense2;
+		private System.Windows.Forms.ToolStripMenuItem miBroad;
+		private System.Windows.Forms.ToolStripMenuItem miRainbow1;
+		private System.Windows.Forms.ToolStripMenuItem miRainbow2;
+		private System.Windows.Forms.ToolStripMenuItem miContrast;
 	}
 }

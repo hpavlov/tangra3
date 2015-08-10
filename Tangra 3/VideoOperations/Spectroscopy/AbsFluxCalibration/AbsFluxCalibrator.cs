@@ -51,6 +51,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			Context.WavelengthBinSize = TangraConfig.Settings.Spectroscopy.AbsFluxResolution;
 
 			IsCalibrated = false;
+			FIT_METHOD = LinearFitMethod.Fast;
 		}
 
 		private void AssignNumbers()
@@ -117,6 +118,39 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 		private List<double> m_SensitivityCoefficients = new List<double>();
 		private List<double> m_Wavelengths = new List<double>();
 
+		private void LinearFit_Fast(List<double> airmasses, List<double> magnitudes, out double Intercept, out double Slope)
+		{
+			double sumX = 0;
+			double sumY = 0;
+			double sumX2 = 0;
+			double sumY2 = 0;
+			double sumXY = 0;
+
+			for (int i = 0; i < airmasses.Count; i++)
+			{
+				sumX = sumX + airmasses[i];
+				sumY = sumY + magnitudes[i];
+				sumX2 = sumX2 + airmasses[i] * airmasses[i];
+				sumY2 = sumY2 + magnitudes[i] * magnitudes[i];
+				sumXY = sumXY + airmasses[i] * magnitudes[i];
+			}
+
+			double delta = airmasses.Count * sumX2 - sumX * sumX;
+			Intercept = (sumX2*sumY  - sumX*sumXY) / delta;
+			Slope = (sumXY*airmasses.Count - sumX*sumY)/delta;
+			double varnce = (sumY2 + Intercept * Intercept * airmasses.Count + Slope * Slope * sumX2 - 2.0 * (Intercept*sumY + Slope*sumXY - Intercept*Slope*sumX) ) / (airmasses.Count - 2.0);
+			double Intercept_Uncertainty = Math.Sqrt(varnce * sumX2 / delta);
+			double Slope_Uncertainty = Math.Sqrt(varnce * airmasses.Count / delta);
+		}
+
+		internal enum LinearFitMethod
+		{
+			LinearAlgebra,
+			Fast
+		}
+
+		private LinearFitMethod FIT_METHOD;
+
 		private void Calibrate()
 		{
 			List<AbsFluxSpectra> standards = m_SpectraList.Where(x => x.IsComplete && x.IsStandard).ToList();
@@ -128,44 +162,81 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 
 			if (numEquations > 2)
 			{
+				var airmasses = new List<double>();
+				var magnitudes = new List<double>();
+
 				for (int i = 0; i < standards[0].DeltaMagnitiudes.Count; i++)
 				{
-					var A = new SafeMatrix(numEquations, 2);
-					var X = new SafeMatrix(numEquations, 1);
-
-					bool containsNaNs = false;
-
-					// Delta_Mag = A * X + B = Ke * X + Ks 
-					for (int j = 0; j < numEquations; j++)
+					if (FIT_METHOD == LinearFitMethod.LinearAlgebra)
 					{
-						A[j, 0] = standards[j].InputFile.AirMass;
-						A[j, 1] = 1;
+						var A = new SafeMatrix(numEquations, 2);
+						var X = new SafeMatrix(numEquations, 1);
 
-						double deltaMag = standards[j].DeltaMagnitiudes[i];
-						X[j, 0] = deltaMag;
-						if (double.IsNaN(deltaMag)) containsNaNs = true;
+						bool containsNaNs = false;
+
+						// Delta_Mag = A * X + B = Ke * X + Ks 
+						for (int j = 0; j < numEquations; j++)
+						{
+							A[j, 0] = standards[j].InputFile.AirMass;
+							A[j, 1] = 1;
+
+							double deltaMag = standards[j].DeltaMagnitiudes[i];
+							X[j, 0] = deltaMag;
+							if (double.IsNaN(deltaMag)) containsNaNs = true;
+						}
+
+						m_Wavelengths.Add(standards[0].ResolvedWavelengths[i]);
+						if (!containsNaNs)
+						{
+							SafeMatrix a_T = A.Transpose();
+							SafeMatrix aa = a_T * A;
+							SafeMatrix aa_inv = aa.Inverse();
+							SafeMatrix bx = (aa_inv * a_T) * X;
+
+							float ke = (float)bx[0, 0];
+							float ks = (float)bx[1, 0];
+
+							m_ExtinctionCoefficients.Add(ke);
+							m_SensitivityCoefficients.Add(ks);
+						}
+						else
+						{
+							m_ExtinctionCoefficients.Add(double.NaN);
+							m_SensitivityCoefficients.Add(double.NaN);
+						}
 					}
-
-					m_Wavelengths.Add(standards[0].ResolvedWavelengths[i]);
-					if (!containsNaNs)
+					else if (FIT_METHOD == LinearFitMethod.Fast)
 					{
-						SafeMatrix a_T = A.Transpose();
-						SafeMatrix aa = a_T*A;
-						SafeMatrix aa_inv = aa.Inverse();
-						SafeMatrix bx = (aa_inv*a_T)*X;
+						bool containsNaNs = false;
+						airmasses.Clear();
+						magnitudes.Clear();
+						double Intercept;
+						double Slope;
+						for (int j = 0; j < numEquations; j++)
+						{
+							airmasses.Add(standards[j].InputFile.AirMass);
 
-						float ke = (float) bx[0, 0];
-						float ks = (float) bx[1, 0];
+							double deltaMag = standards[j].DeltaMagnitiudes[i];
+							if (double.IsNaN(deltaMag)) containsNaNs = true;
+							magnitudes.Add(deltaMag);
+						}
 
-						m_ExtinctionCoefficients.Add(ke);
-						m_SensitivityCoefficients.Add(ks);
+						LinearFit_Fast(airmasses, magnitudes, out Intercept, out Slope);
+
+						if (!containsNaNs)
+						{
+							m_ExtinctionCoefficients.Add((float)Slope);
+							m_SensitivityCoefficients.Add((float)Intercept);
+						}
+						else
+						{
+							m_ExtinctionCoefficients.Add(double.NaN);
+							m_SensitivityCoefficients.Add(double.NaN);
+						}
 					}
-					else
-					{
-						m_ExtinctionCoefficients.Add(double.NaN);
-						m_SensitivityCoefficients.Add(double.NaN);						
-					}
-				}
+						
+				}					
+
 
 				Trace.WriteLine("------------------------------------------");
 				for (int j = 0; j < numEquations; j++)
