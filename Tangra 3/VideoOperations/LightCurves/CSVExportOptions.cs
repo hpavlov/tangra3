@@ -24,6 +24,8 @@ namespace Tangra.VideoOperations.LightCurves
     {
         public TimeFormat TimeFormat { get; set; }
 
+        public bool ExcelFriendly { get; set; }
+
         public PhotometricFormat PhotometricFormat { get; set; }
 
 		public int Spacing { get; set; }
@@ -130,7 +132,8 @@ namespace Tangra.VideoOperations.LightCurves
         {
             if (TimeFormat == TimeFormat.String)
             {
-				return time.ToString(GetStringTimeFormat(timePrecisionSec, false), CultureInfo.InvariantCulture);
+                var timeString = time.ToString(GetStringTimeFormat(timePrecisionSec, false), CultureInfo.InvariantCulture);
+                return ExcelFriendly ? string.Format("[{0}]", timeString) : timeString;
             }
             else if (TimeFormat == TimeFormat.DecimalDays)
             {

@@ -179,6 +179,8 @@ namespace Tangra.VideoOperations.LightCurves
             else if (rbDecimalDays.Checked) rv.TimeFormat = TimeFormat.DecimalDays;
             else if (rbJulianDays.Checked) rv.TimeFormat = TimeFormat.DecimalJulianDays;
 
+            rv.ExcelFriendly = cbExcelFriendly.Checked;
+
             if (rbFlux.Checked) rv.PhotometricFormat = PhotometricFormat.RelativeFlux;
             else if (rbMagnitude.Checked) rv.PhotometricFormat = PhotometricFormat.Magnitudes;
 
@@ -377,6 +379,16 @@ namespace Tangra.VideoOperations.LightCurves
             DialogResult = DialogResult.OK;
 
             Close();
+        }
+
+        private void cbExcelFriendly_CheckedChanged(object sender, EventArgs e)
+        {
+            rbTimeString.Text = cbExcelFriendly.Checked ? "Text Value - [HH:mm:ss.fff]" : "Text Value - HH:mm:ss.fff";
+        }
+
+        private void rbTimeString_CheckedChanged(object sender, EventArgs e)
+        {
+            cbExcelFriendly.Enabled = rbTimeString.Checked;
         }
     }
 }
