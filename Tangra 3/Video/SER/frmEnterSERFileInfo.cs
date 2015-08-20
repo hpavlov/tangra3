@@ -29,6 +29,8 @@ namespace Tangra.Video.SER
 
 		internal int NormVal = 0;
 
+		internal SerUseTimeStamp UseEmbeddedTimeStamps;
+
 		public frmEnterSERFileInfo(SerFileInfo info)
 		{
 			InitializeComponent();
@@ -60,12 +62,15 @@ namespace Tangra.Video.SER
 
 			nudFrameRate.SetNUDValue(TangraConfig.Settings.LastUsed.SerFileLastFrameRate);
 		    pnlFrameRate.Visible = !hasEmbeddedTimeStamps;
+			cbxTimeSource.SelectedIndex = hasEmbeddedTimeStamps ? 1 : 0;
+			if (!hasEmbeddedTimeStamps) cbxTimeSource.Enabled = false;
 		}
 
 		private void btnOK_Click(object sender, EventArgs e)
 		{
 			FrameRate = (double) nudFrameRate.Value;
 			BitPix = Convert.ToInt32(cbxBitPix.SelectedItem);
+			UseEmbeddedTimeStamps = (SerUseTimeStamp) cbxTimeSource.SelectedIndex;
 
 			TangraConfig.Settings.LastUsed.SerFileLastBitPix = BitPix;
 			TangraConfig.Settings.LastUsed.SerFileLastFrameRate = FrameRate;

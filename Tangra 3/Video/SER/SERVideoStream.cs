@@ -27,6 +27,13 @@ namespace Tangra.Video.SER
 		public string Telescope;
 	}
 
+	public enum SerUseTimeStamp
+	{
+		None,
+		UtcTime,
+		LocalTime
+	}
+
 	public class SERVideoStream : IFrameStream
 	{
 		public static SERVideoStream OpenFile(string fileName, IWin32Window parentForm, out SerEquipmentInfo equipmentInfo)
@@ -48,7 +55,7 @@ namespace Tangra.Video.SER
 			{
 				TangraCore.SERCloseFile();
 
-				var rv = new SERVideoStream(fileName, frmInfo.FrameRate, frmInfo.BitPix);
+				var rv = new SERVideoStream(fileName, frmInfo.FrameRate, frmInfo.BitPix, frmInfo.UseEmbeddedTimeStamps);
 
 				equipmentInfo.Instrument = rv.Instrument;
 				equipmentInfo.Observer = rv.Observer;
@@ -62,10 +69,11 @@ namespace Tangra.Video.SER
 
 		private SerFileInfo m_FileInfo;
 		private string m_FileName;
+		private SerUseTimeStamp m_UseTimeStamp;
 
 		private SerFrameInfo m_CurrentFrameInfo;
 
-		private SERVideoStream(string fileName, double frameRate, int cameraBitPix)
+		private SERVideoStream(string fileName, double frameRate, int cameraBitPix, SerUseTimeStamp useTimeStamp)
 		{
 			m_FileInfo = new SerFileInfo();
 
@@ -80,18 +88,27 @@ namespace Tangra.Video.SER
 			BitPix = cameraBitPix;
 			FrameRate = frameRate;
 			MillisecondsPerFrame = 1000 / frameRate;
+			m_UseTimeStamp = useTimeStamp;
 
 			Observer = Encoding.UTF8.GetString(observer).Trim();
 			Instrument = Encoding.UTF8.GetString(instrument).Trim();
 			Telescope = Encoding.UTF8.GetString(telescope).Trim();
 
-			HasTimeStamps =
-				m_FileInfo.SequenceStartTimeHi != 0 && 
-				m_FileInfo.SequenceStartTimeHi >> 0x1F == 0;
+			if (useTimeStamp != SerUseTimeStamp.None)
+			{
+				HasTimeStamps =
+					m_FileInfo.SequenceStartTimeHi != 0 &&
+					m_FileInfo.SequenceStartTimeHi >> 0x1F == 0;
 
-            HasUTCTimeStamps =
-                m_FileInfo.SequenceStartTimeUTCHi != 0 &&
-                m_FileInfo.SequenceStartTimeUTCHi >> 0x1F == 0;
+				HasUTCTimeStamps =
+					m_FileInfo.SequenceStartTimeUTCHi != 0 &&
+					m_FileInfo.SequenceStartTimeUTCHi >> 0x1F == 0;				
+			}
+			else
+			{
+				HasTimeStamps = false;
+				HasUTCTimeStamps = false;
+			}
 		}
 
 		public string Observer { get; private set; }
@@ -180,9 +197,13 @@ namespace Tangra.Video.SER
 			    rv.UnprocessedPixels = unprocessedPixels;
 				rv.FrameState = new FrameStateData()
 				{
-					SystemTime = m_CurrentFrameInfo.TimeStamp,
-                    CentralExposureTime = m_CurrentFrameInfo.TimeStampUtc
+					SystemTime = m_CurrentFrameInfo.TimeStamp
 				};
+
+				if (m_UseTimeStamp != SerUseTimeStamp.None)
+					rv.FrameState.CentralExposureTime = m_UseTimeStamp == SerUseTimeStamp.UtcTime
+						? m_CurrentFrameInfo.TimeStampUtc
+						: m_CurrentFrameInfo.TimeStamp;
 
 				return rv;
 			}
