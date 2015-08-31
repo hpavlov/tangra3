@@ -1277,13 +1277,15 @@ namespace Tangra.VideoOperations.LightCurves
 				m_StackedAstroImage.Width,
 				m_StackedAstroImage.Height,
 				LightCurveReductionContext.Instance.LightCurveReductionType,
+				m_VideoController.GetVideoFileFormat(),
 				m_StateMachine.MeasuringStars,
 				out usedTrackerType);
 
 			LightCurveReductionContext.Instance.UsedTracker = usedTrackerType;
-	        TangraContext.Current.CrashReportInfo.Tracker = usedTrackerType;           
+	        TangraContext.Current.CrashReportInfo.Tracker = usedTrackerType;
 
-			m_Tracker.InitializeNewTracking();
+	        if (!m_Tracker.InitializeNewTracking(m_VideoController.GetCurrentAstroImage(false)))
+		        return;
 
 	        for (int i = 0; i < 4; i++)
 	        {

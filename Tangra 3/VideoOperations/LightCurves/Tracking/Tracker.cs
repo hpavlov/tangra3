@@ -72,9 +72,10 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             RefinedFWHM = new float[trackedObjects.Count];
         }
 
-        public virtual void InitializeNewTracking()
+		public virtual bool InitializeNewTracking(IAstroImage astroImage)
         {
             m_Refining = true;
+			return true;
         }
 
         internal bool IsLocateFirstObject(TrackedObjectConfig objectConfig)

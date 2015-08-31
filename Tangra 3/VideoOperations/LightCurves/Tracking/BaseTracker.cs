@@ -58,7 +58,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			}
 		}
 
-		public void InitializeNewTracking()
+		public bool InitializeNewTracking(IAstroImage astroImage)
 		{
 			RefinedAverageFWHM = float.NaN;
 			MedianValue = uint.MinValue;
@@ -82,6 +82,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 			// No preliminary refining used by the AdHockTracker
 			RefiningPercentageWorkLeft = 0;
+			return true;
 		}
 
 		public List<ITrackedObject> TrackedObjects

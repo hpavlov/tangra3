@@ -72,7 +72,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 		public bool IsTrackedSuccessfully { get; private set; }
 
-		public void InitializeNewTracking()
+		public bool InitializeNewTracking(IAstroImage astroImage)
 		{
 		    NativeTracking.InitialiseNewTracking();
 
@@ -80,6 +80,8 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             MedianValue = uint.MinValue;
 
 		    m_NativeTrackedObject.ForEach(x => x.InitializeNewTracking());
+
+			return true;
 		}
 
 		public List<ITrackedObject> TrackedObjects

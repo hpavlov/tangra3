@@ -16,7 +16,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 	public interface ITracker
 	{
 		bool IsTrackedSuccessfully { get; }
-		void InitializeNewTracking();
+		bool InitializeNewTracking(IAstroImage astroImage);
 		List<ITrackedObject> TrackedObjects { get; }
 		float RefinedAverageFWHM { get; }
 		float[] RefinedFWHM { get; }

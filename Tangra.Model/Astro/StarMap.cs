@@ -70,7 +70,7 @@ namespace Tangra.Model.Astro
 		}
 
 		public int FindBestMap(
-			StarMapInternalConfig config, AstroImage image, 
+			StarMapInternalConfig config, AstroImage image,
 			Rectangle osdFrameToExclude, Rectangle frameToInclude, bool limitByInclusion)
 		{
 			m_Config = config;
@@ -86,10 +86,18 @@ namespace Tangra.Model.Astro
 			m_FrameToInclude = frameToInclude;
 			m_LimitByInclusion = limitByInclusion;
 
-			m_AverageBackgroundNoise = m_Pixelmap.MaxSignalValue;
 			int optimumStarsInField = config.OptimumStarsInField ?? (int)TangraConfig.Settings.Astrometry.PyramidOptimumStarsToMatch;
+			uint maxSignalValue = config.CustomMaxSignalValue ?? m_Pixelmap.MaxSignalValue;
+			
+			m_AverageBackgroundNoise = maxSignalValue;
+			
+			int MIN_INTENSITY = config.IsFITSFile ? 1 : 5;
+			int MAX_INTENSITY = config.IsFITSFile ? 1000 : 100;
+			int INTENSITY_LARGE_STEP = config.IsFITSFile ? 50 : 5;
+			int INTENSITY_SMALL_STEP = config.IsFITSFile ? 2 : 5;
+			if (config.CustomOptimumStarsValue.HasValue) optimumStarsInField = config.CustomOptimumStarsValue.Value;
 
-			double snRatio = 0.15;
+			double snRatio = config.IsFITSFile ? 0.005 : 0.15;
 			try
 			{
 				int featuresThisRun = 0;
@@ -98,16 +106,18 @@ namespace Tangra.Model.Astro
 
 				List<StarMapFeature> bestMapFeatures = new List<StarMapFeature>();
 
-				int intensity = 100;
+				int intensity = MAX_INTENSITY;
 				int tolerance = config.StarMapperTolerance;
 				InitCreateMap();
 				do
 				{
-					intensity -= 5;
-                    uint backgroundThreshold = (uint)Math.Round(m_Pixelmap.MaxSignalValue * (intensity / 100.0));
+					if (intensity > 2 * INTENSITY_LARGE_STEP) intensity -= INTENSITY_LARGE_STEP;
+					else intensity -= INTENSITY_SMALL_STEP;
+
+					uint backgroundThreshold = (uint)Math.Round(maxSignalValue * (intensity * 1.0 / MAX_INTENSITY));
 
 					if (backgroundThreshold < config.MinStarMapThreashold) break;
-                    if (backgroundThreshold < snRatio * (m_Pixelmap.MaxSignalValue - m_AverageBackgroundNoise)) break;
+					if (backgroundThreshold < snRatio * (maxSignalValue - m_AverageBackgroundNoise)) break;
 
 					try
 					{
@@ -115,9 +125,9 @@ namespace Tangra.Model.Astro
 					}
 					catch (StarMapException)
 					{
-                        backgroundThreshold = (uint)Math.Round(m_Pixelmap.MaxSignalValue * (intensity + 5 / 100.0));
-                        snRatio = (double)(backgroundThreshold - 1.0) / (m_Pixelmap.MaxSignalValue - m_AverageBackgroundNoise);
-						intensity += 10;
+						backgroundThreshold = (uint)Math.Round(maxSignalValue * ((intensity + INTENSITY_LARGE_STEP) * 1.0 / MAX_INTENSITY));
+						snRatio = (double)(backgroundThreshold - 1.0) / (maxSignalValue - m_AverageBackgroundNoise);
+						intensity += 2 * INTENSITY_LARGE_STEP;
 						continue;
 					}
 
@@ -186,7 +196,7 @@ namespace Tangra.Model.Astro
 
 					m_NoiseLevel = backgroundThreshold;
 				}
-				while (intensity > 5);
+				while (intensity > MIN_INTENSITY);
 
 				if (m_ForceStellarObjectRequirements) 
 					ApplyPSFExclusionRulesToFeatures();				

@@ -38,12 +38,16 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             LocateFirstObjects.Add(OccultedStar);
         }
 
-        public override void InitializeNewTracking()
-        {
-            base.InitializeNewTracking();
-
-            m_RefiningFramesLeft = TangraConfig.Settings.Tracking.RefiningFrames;
-        }
+		public override bool InitializeNewTracking(IAstroImage astroImage)
+		{
+			if (base.InitializeNewTracking(astroImage))
+			{
+				m_RefiningFramesLeft = TangraConfig.Settings.Tracking.RefiningFrames;
+				return true;
+			}
+			else
+				return false;
+		}
 
 		public override void BeginMeasurements(IAstroImage astroImage)
 		{

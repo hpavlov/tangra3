@@ -20,12 +20,39 @@ namespace Tangra.Model.Config
 
 			MaxPixelsInFeature = 160;
 			OptimumStarsInField = null;
+
+			CustomMaxSignalValue = null;
+			CustomOptimumStarsValue = null;
+			IsFITSFile = false;
+
+		}
+
+		public StarMapInternalConfig(StarMapInternalConfig cloneFrom)
+		{
+			MaxStarsInField = cloneFrom.MaxStarsInField;
+			MinStarsInField = cloneFrom.MinStarsInField;
+
+			StarMapperTolerance = cloneFrom.StarMapperTolerance;
+			MinStarMapThreashold = cloneFrom.MinStarMapThreashold;
+			FeatureSearchRadius = cloneFrom.FeatureSearchRadius;
+
+			MaxPixelsInFeature = cloneFrom.MaxPixelsInFeature;
+			OptimumStarsInField = cloneFrom.OptimumStarsInField;
+
+			CustomMaxSignalValue = cloneFrom.CustomMaxSignalValue;
+			IsFITSFile = cloneFrom.IsFITSFile;
 		}
 
 		private StarMapInternalConfig()
 		{
 			Reset();
 		}
+
+		public uint? CustomMaxSignalValue { get; set; }
+
+		public	int? CustomOptimumStarsValue { get; set; }
+
+		public bool IsFITSFile { get; set; }
 
 		/// <summary>
 		/// The star mapping will not return a successful map if less that this number of features is found

@@ -24,7 +24,8 @@ namespace Tangra.VideoOperations.LightCurves
         MutualEvent,
         Asteroidal,
         TotalLunarDisappearance,
-		TotalLunarReppearance
+		TotalLunarReppearance,
+		VariableStarOrTransit
     }
 
 	public enum ReductionSubType

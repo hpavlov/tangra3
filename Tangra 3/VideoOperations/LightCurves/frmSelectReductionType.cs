@@ -130,12 +130,6 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void btnOK_Click(object sender, EventArgs e)
         {
-			if (rbLunarOccultation.Checked)
-			{
-				MessageBox.Show("Lunar Occultations will be supported soon.");
-				return;
-			}
-
 			if (rbMutualEvent.Checked)
 			{
 				if (!rbMutualEcl.Checked && !rbMutualOcc.Checked)
@@ -160,6 +154,8 @@ namespace Tangra.VideoOperations.LightCurves
 
 			if (rbAsteroidal.Checked)
 				LightCurveReductionContext.Instance.LightCurveReductionType = LightCurveReductionType.Asteroidal;
+	        else if (rbVariableOrTransit.Checked)
+				LightCurveReductionContext.Instance.LightCurveReductionType = LightCurveReductionType.VariableStarOrTransit;
 			else if (rbMutualEvent.Checked)
 			{
 				LightCurveReductionContext.Instance.LightCurveReductionType = LightCurveReductionType.MutualEvent;
@@ -451,5 +447,16 @@ namespace Tangra.VideoOperations.LightCurves
             if (!m_VideoContoller.SupportsSoftwareIntegration)
                 tabsOptions.TabPages.Remove(tabIntegration);
         }
+
+		private void rbVariableOrTransit_CheckedChanged(object sender, EventArgs e)
+		{
+			if (rbVariableOrTransit.Checked)
+			{
+				cbxFullDisappearance.Enabled = false;
+				cbxFullDisappearance.Checked = false;
+			}
+			else
+				cbxFullDisappearance.Enabled = true;
+		}
     }
 }

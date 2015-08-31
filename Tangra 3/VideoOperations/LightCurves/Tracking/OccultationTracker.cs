@@ -26,12 +26,17 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             : base(measuringStars)
         { }
 
-        public override void InitializeNewTracking()
-        {
-            base.InitializeNewTracking();
+		public override bool InitializeNewTracking(IAstroImage astroImage)
+		{
+			if (base.InitializeNewTracking(astroImage))
+			{
+				m_RefiningFramesLeft = TangraConfig.Settings.Tracking.RefiningFrames;
 
-            m_RefiningFramesLeft = TangraConfig.Settings.Tracking.RefiningFrames;
-        }
+				return true;
+			}
+			else
+				return false;
+		}
 
 		public override void BeginMeasurements(IAstroImage astroImage)
 		{

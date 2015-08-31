@@ -14,7 +14,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 {
     internal static class TrackerFactory
     {
-		public static ITracker CreateTracker(int imageWidth, int imageHeight, LightCurveReductionType lightCurveReductionType, List<TrackedObjectConfig> measuringStars, out string usedTrackerType)
+		public static ITracker CreateTracker(int imageWidth, int imageHeight, LightCurveReductionType lightCurveReductionType, VideoFileFormat fileFormat, List<TrackedObjectConfig> measuringStars, out string usedTrackerType)
         {
             // NOTE: Figure out what tracker to create based on the type of event, number of objects and their intensity
             bool createRefiningTracker = TangraConfig.Settings.Tracking.SelectedEngine == TangraConfig.TrackingEngine.TrackingWithRefining;
@@ -31,9 +31,17 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                 }
             }
 
-            if (lightCurveReductionType == LightCurveReductionType.Asteroidal)
+			bool createFITSFileTracker = lightCurveReductionType == LightCurveReductionType.VariableStarOrTransit &&
+			                             fileFormat == VideoFileFormat.FITS;
+
+			if (lightCurveReductionType == LightCurveReductionType.Asteroidal || lightCurveReductionType == LightCurveReductionType.VariableStarOrTransit)
             {
-	            if (createRefiningTracker)
+				if (createFITSFileTracker && lightCurveReductionType == LightCurveReductionType.VariableStarOrTransit)
+	            {
+					usedTrackerType = "Star field tracker";
+					return new StarFieldTracker(measuringStars);		            
+	            }
+	            else if (createRefiningTracker)
 	            {
 		            if (measuringStars.Count == 1)
 		            {
