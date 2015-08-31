@@ -149,7 +149,7 @@ namespace Tangra.VideoOperations.Astrometry
 			else
 			{
 				DateTime? timeStamp = m_VideoController.GetCurrentFrameTime();
-				if (timeStamp != null)
+				if (timeStamp != null && timeStamp != DateTime.MinValue)
 					ucUtcTimePicker.DateTimeUtc = timeStamp.Value;
 			}
         }
@@ -200,7 +200,7 @@ namespace Tangra.VideoOperations.Astrometry
 				cbxFrameTimeType.Enabled = false;
 
 				DateTime? timeStamp = m_VideoController.GetCurrentFrameTime();
-				if (timeStamp != null)
+				if (timeStamp != null && timeStamp != DateTime.MinValue)
 				{
 					DateTime timestamp = timeStamp.Value;
 					if (m_VideoFileFormat == VideoFileFormat.AAV)

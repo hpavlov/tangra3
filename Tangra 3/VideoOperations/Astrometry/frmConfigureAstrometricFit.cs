@@ -76,7 +76,7 @@ namespace Tangra.VideoOperations.Astrometry
 			utcTime.OnDateTimeChanged += new EventHandler<DateTimeChangeEventArgs>(ucTime_OnDateTimeChanged);
 
 			DateTime? timeStamp = videoController.GetCurrentFrameTime();
-			if (timeStamp != null)
+			if (timeStamp != null && timeStamp != DateTime.MinValue)
 				utcTime.DateTimeUtc = timeStamp.Value;
 			else
 				utcTime.DateTimeUtc = TangraConfig.Settings.LastUsed.LastAstrometryUTCDate;

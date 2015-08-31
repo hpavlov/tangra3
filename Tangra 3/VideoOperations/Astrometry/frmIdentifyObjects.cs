@@ -53,7 +53,7 @@ namespace Tangra.VideoOperations.Astrometry
 			pnlEnterTime.Visible = true;
 
 			DateTime? timeStamp = videoController.GetCurrentFrameTime();
-			if (timeStamp != null)
+			if (timeStamp != null && timeStamp != DateTime.MinValue)
 			{
 				dtTime.Value = timeStamp.Value;
 				dtDate.Value = timeStamp.Value;
