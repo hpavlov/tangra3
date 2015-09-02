@@ -23,6 +23,9 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 		private Dictionary<int, List<double>> m_TrackedObjectsPivotDistancesX = new Dictionary<int, List<double>>();
 		private Dictionary<int, List<double>> m_TrackedObjectsPivotDistancesY = new Dictionary<int, List<double>>();
 
+		private List<List<double>> m_TargetPivotDistancesListX = new List<List<double>>();
+		private List<List<double>> m_TargetPivotDistancesListY = new List<List<double>>();
+
 		private float m_FWHMAverage;
 		private float m_FWHM1;
 		private float m_FWHM2;
@@ -126,7 +129,10 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 				{
 					SetTargetFWHM(i, (float)fit.FWHM);
 				}
-			}			
+			}
+		
+			m_TargetPivotDistancesListX.Clear();
+			m_TargetPivotDistancesListY.Clear();
 
 			return true;
 		}
@@ -235,6 +241,8 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
 				for (int i = 0; i < m_TrackedObjects.Count; i++)
 				{
+					((TrackedObject)m_TrackedObjects[i]).NewFrame();
+
 					var xVals = new List<double>();
 					var yVals = new List<double>();
 					foreach (int key in pivotMap.Keys)
@@ -251,7 +259,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 					double sigmaY = Math.Sqrt(yVals.Select(y => (y - y0)*(y - y0)).Sum()) / (yVals.Count - 1);
 
 					if (!double.IsNaN(x0) && !double.IsNaN(y0) && xVals.Count > 1 &&
-					    (sigmaX > m_FWHMAverage || sigmaY > m_FWHMAverage))
+						(sigmaX > m_FWHMAverage || sigmaY > m_FWHMAverage))
 					{
 						// Some of the pivots may have been misidentified. Remove all entries with too large residuals and try again
 						xVals.RemoveAll(x => Math.Abs(x - x0) > sigmaX);
@@ -267,7 +275,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 						}
 					}
 
-					if (!double.IsNaN(x0) && !double.IsNaN(y0) && xVals.Count > 1 && 
+					if (!double.IsNaN(x0) && !double.IsNaN(y0) && xVals.Count > 1 &&
 						(sigmaX > m_FWHMAverage || sigmaY > m_FWHMAverage))
 					{
 						// There is something really wrong about this. Reject the position and fail the frame
@@ -280,9 +288,10 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 						fit.Fit(data);
 
 						if (fit.IsSolved)
-						{
-							m_TrackedObjects[i].LastKnownGoodPosition = new ImagePixel(fit.XCenter, fit.YCenter);
+						{							
 							m_TrackedObjects[i].SetIsTracked(true, NotMeasuredReasons.TrackedSuccessfully, new ImagePixel(fit.XCenter, fit.YCenter), fit.Certainty);
+							((TrackedObject)m_TrackedObjects[i]).ThisFrameX = (float)fit.XCenter;
+							((TrackedObject)m_TrackedObjects[i]).ThisFrameY = (float)fit.YCenter;
 							((TrackedObjectBase)m_TrackedObjects[i]).PSFFit = fit;
 							identifiedObjects++;
 						}
@@ -294,11 +303,51 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 				}
 
 				m_IsTrackedSuccessfully = identifiedObjects == m_TrackedObjects.Count;
+
+				if (m_IsTrackedSuccessfully)
+					UpdatePivotDistances(starMap, pivotMap);
+			}
+		}
+
+		private int MAX_DIST_HISTORY = 10;
+
+		private void UpdatePivotDistances(StarMap starMap, Dictionary<int, int> pivotMap)
+		{
+			// Remove distance records that are too old
+			while (m_TargetPivotDistancesListX.Count >= MAX_DIST_HISTORY) m_TargetPivotDistancesListX.RemoveAt(0);
+			while (m_TargetPivotDistancesListY.Count >= MAX_DIST_HISTORY) m_TargetPivotDistancesListY.RemoveAt(0);
+
+			// Add the new distance recods
+			for (int i = 0; i < m_TrackedObjects.Count; i++)
+			{
+				var targetXDistList = new List<double>();
+				var targetYDistList = new List<double>();
+
+				m_TargetPivotDistancesListX.Add(targetXDistList);
+				m_TargetPivotDistancesListY.Add(targetYDistList);
+
+				for (int j = 0; j < pivotMap.Count; j++)
+				{
+					targetXDistList.Add(m_TrackedObjects[i].Center.XDouble - starMap.Features[pivotMap[j]].GetCenter().XDouble);
+					targetYDistList.Add(m_TrackedObjects[i].Center.YDouble - starMap.Features[pivotMap[j]].GetCenter().YDouble);
+				}
+			}
+
+			// Calcluate the new median and set the current values
+			for (int i = 0; i < m_TrackedObjects.Count; i++)
+			{
+				// Updating the distances is important for a slow field rotation. However this may break the
+				// tracking of some of the pivots are not recognized correctly. No updates for now.
+
+				// TODO: Implement this once the pivot identification has been made very reliable
 			}
 		}
 
 		private Dictionary<int, int> IdentifyPivots(List<List<double>> unorderedPivotDistances)
 		{
+			// TODO: This should be done based on the Pyramid recognition used for Astrometry 
+			//       rather than distance comparison only
+
 			var rv = new Dictionary<int, int>();
 
 			var stats = new Dictionary<int, List<int>>();
