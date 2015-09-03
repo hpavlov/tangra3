@@ -318,7 +318,7 @@ namespace Tangra.Model.Config
 				else if (bpp == 16)
 				{
 				    if (maxSignalValue > 0 && maxSignalValue != uint.MinValue && maxSignalValue != uint.MaxValue)
-				        return maxSignalValue;
+				        return (uint)(0.95 * maxSignalValue); // 95% of max signal value
                     else
 				        return Saturation16Bit;
 				}

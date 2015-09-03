@@ -118,11 +118,13 @@ namespace Tangra.Astrometry
 			m_B = b;
 			m_C = c;
 
+            uint saturatedValue = TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(m_BitPix, astroImage.Pixelmap.MaxSignalValue);
+
 			m_Measurer = new MeasurementsHelper(
 				m_BitPix,
 				m_PhotometryBackgroundMethod, 
 				TangraConfig.Settings.Photometry.SubPixelSquareSize,
-                astroImage.Pixelmap.MaxSignalValue);
+                saturatedValue);
 
 			m_Measurer.SetCoreProperties(
 				TangraConfig.Settings.Photometry.AnnulusInnerRadius,
@@ -486,7 +488,7 @@ namespace Tangra.Astrometry
 
 						gaussians.Add(record.PsfFit);
 						stars.Add(record.Star);
-						saturatedFlags.Add(measurer.HasSaturatedPixels);
+						saturatedFlags.Add(measurer.HasSaturatedPixels || record.PsfFit.IMax >= measurer.SaturationValue);
 					}
 				}
 

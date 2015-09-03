@@ -144,6 +144,11 @@ namespace Tangra.Model.Image
             get { return m_TotalPixels; }
         }
 
+        public uint SaturationValue
+        {
+            get { return m_SaturationValue; }
+        }
+
         public uint[,] PixelData
         {
             get { return m_PixelData; }
