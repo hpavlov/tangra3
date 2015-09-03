@@ -56,20 +56,17 @@ long PreProcessingClearAll()
 	s_PreProcessingFilter = ppfNoFilter;
 	g_EncodingGamma = 1;
 
-	if (NULL != g_BiasFramePixelsCopy)
-	{
+	if (NULL != g_BiasFramePixelsCopy) {
 		delete g_BiasFramePixelsCopy;
 		g_BiasFramePixelsCopy = NULL;
 	}
 
-	if (NULL != g_DarkFramePixelsCopy)
-	{
+	if (NULL != g_DarkFramePixelsCopy) {
 		delete g_DarkFramePixelsCopy;
 		g_DarkFramePixelsCopy = NULL;
 	}
 
-	if (NULL != g_FlatFramePixelsCopy)
-	{
+	if (NULL != g_FlatFramePixelsCopy) {
 		delete g_FlatFramePixelsCopy;
 		g_FlatFramePixelsCopy = NULL;
 	}
@@ -91,8 +88,7 @@ long PreProcessingUsesPreProcessing(bool* usesPreProcessing)
 
 long PreProcessingGetConfig(PreProcessingType* preProcessingType, unsigned int* fromValue, unsigned int* toValue, long* brigtness, long* contrast, PreProcessingFilter* filter, float* gamma, unsigned int* darkPixelsCount, unsigned int* flatPixelsCount, unsigned int* biasPixelsCount, RotateFlipType* rotateFlipType)
 {
-	if (g_UsesPreProcessing)
-	{
+	if (g_UsesPreProcessing) {
 		*preProcessingType = s_PreProcessingType;
 		*rotateFlipType = g_RotateFlipType;
 		*fromValue = g_PreProcessingFromValue;
@@ -152,7 +148,7 @@ long PreProcessingAddGammaCorrection(float gamma)
 {
 	g_EncodingGamma = gamma;
 	g_UsesPreProcessing = g_UsesPreProcessing || ABS(g_EncodingGamma - 1.0f) > 0.01;
-	
+
 	return S_OK;
 }
 
@@ -160,40 +156,37 @@ long PreProcessingAddFlipAndRotation(enum RotateFlipType rotateFlipType)
 {
 	g_RotateFlipType = rotateFlipType;
 	g_UsesPreProcessing = true;
-	
-	return S_OK;	
+
+	return S_OK;
 }
 
 long PreProcessingAddDarkFrame(float* darkFramePixels, unsigned long pixelsCount, float exposureSeconds, bool isBiasCorrected, bool isSameExposure)
 {
-	if (NULL != g_DarkFramePixelsCopy)
-	{
+	if (NULL != g_DarkFramePixelsCopy) {
 		delete g_DarkFramePixelsCopy;
 		g_DarkFramePixelsCopy = NULL;
 	}
 
 	long bytesCount = pixelsCount * sizeof(float);
-	
+
 	g_DarkFramePixelsCopy = (float*)malloc(bytesCount);
 	memcpy(g_DarkFramePixelsCopy, darkFramePixels, bytesCount);
 	g_DarkFramePixelsCount = pixelsCount;
 	g_DarkFrameExposure = exposureSeconds;
 	g_DarkFrameIsBiasCorrected = isBiasCorrected;
 	g_IsSameExposureDarkFrame = isSameExposure;
-	
-	if (!isBiasCorrected && isSameExposure)
-	{
+
+	if (!isBiasCorrected && isSameExposure) {
 		// If we are loading a same exposure Dark frame that already has bias in it, then remove the currently loaded bias frame
-		
+
 		g_BiasFramePixelsCount = 0;
-		
-		if (NULL != g_BiasFramePixelsCopy)
-		{
+
+		if (NULL != g_BiasFramePixelsCopy) {
 			delete g_BiasFramePixelsCopy;
 			g_BiasFramePixelsCopy = NULL;
-		}		
+		}
 	}
-	
+
 	g_UsesPreProcessing = true;
 
 	return S_OK;
@@ -201,14 +194,13 @@ long PreProcessingAddDarkFrame(float* darkFramePixels, unsigned long pixelsCount
 
 long PreProcessingAddBiasFrame(float* biasFramePixels, unsigned long pixelsCount)
 {
-	if (NULL != g_BiasFramePixelsCopy)
-	{
+	if (NULL != g_BiasFramePixelsCopy) {
 		delete g_BiasFramePixelsCopy;
 		g_BiasFramePixelsCopy = NULL;
 	}
 
 	long bytesCount = pixelsCount * sizeof(float);
-	
+
 	g_BiasFramePixelsCopy = (float*)malloc(bytesCount);
 	memcpy(g_BiasFramePixelsCopy, biasFramePixels, bytesCount);
 	g_BiasFramePixelsCount = pixelsCount;
@@ -220,8 +212,7 @@ long PreProcessingAddBiasFrame(float* biasFramePixels, unsigned long pixelsCount
 
 long PreProcessingAddFlatFrame(float* flatFramePixels, unsigned long pixelsCount, float flatFrameMedian)
 {
-	if (NULL != g_FlatFramePixelsCopy)
-	{
+	if (NULL != g_FlatFramePixelsCopy) {
 		delete g_FlatFramePixelsCopy;
 		g_FlatFramePixelsCopy = NULL;
 	}
@@ -257,59 +248,49 @@ long ApplyPreProcessing(unsigned long* pixels, long width, long height, int bpp,
 
 long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal, float exposureSeconds)
 {
+	// To achieve correct photometry gamma needs to be applied before darks and flats. 
 	// Use the following order when applying pre-processing
-	// (1) Bias/Dark/Flat
-	// (2) Stretch/Clip/Brightness
-	// (3) Gamma
+	// (1) Gamma
+	// (2) Bias/Dark/Flat (Same gamma should have been applied when generating the Bias/Dark/Flat)
+	// (3) Stretch/Clip/Brightness
 
 	long rv = S_OK;
 
-	if (NULL != g_BiasFramePixelsCopy || NULL != g_DarkFramePixelsCopy || NULL != g_FlatFramePixelsCopy)
-	{
-		rv = PreProcessingApplyBiasDarkFlatFrame(
-			pixels, width, height, bpp, normVal,
-			g_BiasFramePixelsCopy, g_DarkFramePixelsCopy, g_FlatFramePixelsCopy, 
-			exposureSeconds, g_DarkFrameExposure, g_DarkFrameIsBiasCorrected, g_IsSameExposureDarkFrame, g_FlatFrameMedian);
-			
-		if (rv != S_OK) return rv;
-	}
-
-	if (g_RotateFlipType > RotateNoneFlipNone)
-	{
-		rv = PreProcessingFlipRotate(pixels, width, height, bpp, g_RotateFlipType); 
+	if (ABS(g_EncodingGamma - 1.0f) > 0.01) {
+		rv = PreProcessingGamma(pixels, width, height, bpp, normVal, g_EncodingGamma);
 		if (rv != S_OK) return rv;
 	}
 	
-	if (s_PreProcessingType == pptpStretching)
-	{
+	if (NULL != g_BiasFramePixelsCopy || NULL != g_DarkFramePixelsCopy || NULL != g_FlatFramePixelsCopy) {
+		rv = PreProcessingApplyBiasDarkFlatFrame(
+		         pixels, width, height, bpp, normVal,
+		         g_BiasFramePixelsCopy, g_DarkFramePixelsCopy, g_FlatFramePixelsCopy,
+		         exposureSeconds, g_DarkFrameExposure, g_DarkFrameIsBiasCorrected, g_IsSameExposureDarkFrame, g_FlatFrameMedian);
+
+		if (rv != S_OK) return rv;
+	}
+
+	if (g_RotateFlipType > RotateNoneFlipNone) {
+		rv = PreProcessingFlipRotate(pixels, width, height, bpp, g_RotateFlipType);
+		if (rv != S_OK) return rv;
+	}
+
+	if (s_PreProcessingType == pptpStretching) {
 		rv = PreProcessingStretch(pixels, width, height, bpp, normVal, g_PreProcessingFromValue, g_PreProcessingToValue);
 		if (rv != S_OK) return rv;
-	}
-	else if (s_PreProcessingType == pptpClipping)
-	{
+	} else if (s_PreProcessingType == pptpClipping) {
 		rv = PreProcessingClip(pixels, width, height, bpp, normVal, g_PreProcessingFromValue, g_PreProcessingToValue);
 		if (rv != S_OK) return rv;
-	}
-	else if (s_PreProcessingType == pptpBrightnessContrast)
-	{
+	} else if (s_PreProcessingType == pptpBrightnessContrast) {
 		rv = PreProcessingBrightnessContrast(pixels, width, height, bpp, normVal, g_PreProcessingBrigtness, g_PreProcessingContrast);
 		if (rv != S_OK) return rv;
 	}
 
-	if (s_PreProcessingFilter == ppfLowPassFilter)
-	{
+	if (s_PreProcessingFilter == ppfLowPassFilter) {
 		rv = PreProcessingLowPassFilter(pixels, width, height, bpp, normVal);
 		if (rv != S_OK) return rv;
-	}
-	else if (s_PreProcessingFilter == ppfLowPassDifferenceFilter)
-	{
+	} else if (s_PreProcessingFilter == ppfLowPassDifferenceFilter) {
 		rv = PreProcessingLowPassDifferenceFilter(pixels, width, height, bpp, normVal);
-		if (rv != S_OK) return rv;
-	}
-	
-	if (ABS(g_EncodingGamma - 1.0f) > 0.01)
-	{
-		rv = PreProcessingGamma(pixels, width, height, bpp, normVal, g_EncodingGamma);
 		if (rv != S_OK) return rv;
 	}
 

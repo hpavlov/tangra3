@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -73,7 +74,7 @@ namespace Tangra.Controller
 								MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                             return false;
-						}
+						}						
 
 						bool isFloatingPointImage = false;
 						Array dataArray = (Array)imageHDU.Data.DataArray;
@@ -94,6 +95,34 @@ namespace Tangra.Controller
 							if (m_VideoController.ShowMessageBox(
 								"Selected image data type may not be compatible with the currently loaded video. Do you wish to continue?", "Tangra",
 								MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.No)
+							{
+								return false;
+							}
+						}
+
+						float usedEncodingGamma = float.NaN;
+						string usedGammaString = null;
+						HeaderCard tangraGammaCard = imageHDU.Header.FindCard("TANGAMMA");
+						if (tangraGammaCard != null &&
+						    float.TryParse(tangraGammaCard.Value, NumberStyles.Number, CultureInfo.InvariantCulture, out usedEncodingGamma))
+						{
+							usedGammaString = usedEncodingGamma.ToString("0.0000", CultureInfo.InvariantCulture);
+						}
+
+						string gammaUsageError = null;
+						string currGammaString = TangraConfig.Settings.Generic.ReverseGammaCorrection
+							? TangraConfig.Settings.Photometry.EncodingGamma.ToString("0.0000", CultureInfo.InvariantCulture)
+							: null;
+						if (TangraConfig.Settings.Generic.ReverseGammaCorrection && currGammaString != null)
+							gammaUsageError = string.Format("Selected image hasn't been Gamma corrected while the current video uses a gamma of {0}.", currGammaString);
+						else if (!TangraConfig.Settings.Generic.ReverseGammaCorrection && usedGammaString != null)
+							gammaUsageError = string.Format("Selected image has been corrected for Gamma of {0} while the current video doesn't use gamma correction.", usedGammaString);
+						else if (TangraConfig.Settings.Generic.ReverseGammaCorrection && string.Equals(currGammaString, usedGammaString))
+							gammaUsageError = string.Format("Selected image has been corrected for Gamma of {0} while the current video uses a gamma of {1}.", usedGammaString, currGammaString);
+
+						if (gammaUsageError != null)
+						{
+							if (m_VideoController.ShowMessageBox(gammaUsageError + " Do you wish to continue?", "Tangra", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.No)
 							{
 								return false;
 							}

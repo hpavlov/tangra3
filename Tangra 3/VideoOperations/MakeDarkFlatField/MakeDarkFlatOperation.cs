@@ -164,6 +164,8 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
 
                             hdr.AddValue("SNAPSHOT", m_NumFrames.ToString(), null);
                             hdr.AddValue("TANGRAVE", string.Format("{0} v{1}", VersionHelper.AssemblyProduct, VersionHelper.AssemblyFileVersion), null);
+							if (TangraConfig.Settings.Generic.ReverseGammaCorrection)
+								hdr.AddValue("TANGAMMA", TangraConfig.Settings.Photometry.EncodingGamma.ToString("0.0000", CultureInfo.InvariantCulture), null);
 
 						    f.AddHDU(imageHDU);
 
