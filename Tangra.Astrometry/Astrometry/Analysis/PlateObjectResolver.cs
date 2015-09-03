@@ -114,6 +114,7 @@ namespace Tangra.Astrometry.Analysis
 				m_AstrometryController,
 				m_VideoController,
 				m_Image.Pixelmap.BitPixCamera,
+                m_Image.Pixelmap.MaxSignalValue,
 				m_Astrometry.FitInfo,
 				photometryReductionMethod,
 				psfQuadrature,

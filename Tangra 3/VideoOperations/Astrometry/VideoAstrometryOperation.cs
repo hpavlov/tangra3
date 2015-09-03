@@ -554,6 +554,7 @@ namespace Tangra.VideoOperations.Astrometry
 						m_AstrometryController,
 						m_VideoController,
 						m_AstroImage.Pixelmap.BitPixCamera,
+                        m_AstroImage.Pixelmap.MaxSignalValue,
 						m_AstrometricFit.FitInfo,
 						m_MeasurementContext == null
 							? TangraConfig.PhotometryReductionMethod.AperturePhotometry

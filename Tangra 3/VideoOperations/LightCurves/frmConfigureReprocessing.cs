@@ -62,7 +62,7 @@ namespace Tangra.VideoOperations.LightCurves
 			nudAperture3.Maximum = maxApertureSize;
         	nudAperture4.Maximum = maxApertureSize;
 
-            m_Saturation = TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(context.BitPix);
+            m_Saturation = TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(context.BitPix, context.MaxPixelValue);
 
 			if (TangraContext.Current.CanProcessLightCurvePixels)
 				SetupControls();
@@ -172,7 +172,7 @@ namespace Tangra.VideoOperations.LightCurves
                 m_Context.BitPix,
                 m_Context.BackgroundMethod,
 				TangraConfig.Settings.Photometry.SubPixelSquareSize,
-                TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(m_Context.BitPix));
+                TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(m_Context.BitPix, m_Context.MaxPixelValue));
 
             for (int i = 0; i < m_Header.ObjectCount; i++)
             {

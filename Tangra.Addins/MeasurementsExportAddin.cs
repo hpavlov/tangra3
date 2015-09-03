@@ -104,7 +104,7 @@ namespace Tangra.Addins
 			if (m_MeasurementsPerStar.Count > 0)
 			{
 				var output = new StringBuilder();
-				output.Append(string.Format("Star No, RA Deg (J2000), DE Deg (J2000), Catalog Mag ({0}), Average Intencity, Error, Median Intencity, Error, Average PSF Amplitude, Error, Median PSF Amplitude, Error, All Frames, Saturated Frames, Excluded Frames\r\n", type.ToString()));
+				output.Append(string.Format("Star No, RA Deg (J2000), DE Deg (J2000), Catalog Mag ({0}), B-V, Sloan r', Average Intencity, Error, Median Intencity, Error, Average PSF Amplitude, Error, Median PSF Amplitude, Error, All Frames, Saturated Frames, Excluded Frames\r\n", type.ToString()));
 
 				foreach (ulong starNo in m_MeasurementsPerStar.Keys)
 				{
@@ -146,8 +146,16 @@ namespace Tangra.Addins
 					else if (type == ExportMagType.K) exportMag = catStar.MagK;
 					else
 						exportMag = catStar.Mag;
+
+				    string bvColour = null;
+                    string sloanR = null;
+				    if (apassData != null)
+				    {
+				        if (!float.IsNaN(apassData.r)) sloanR = apassData.r.ToString("0.000");
+                        if (!float.IsNaN(apassData.B) && !float.IsNaN(apassData.V)) bvColour = (apassData.B - apassData.V).ToString("0.000");
+				    }
 		
-					output.AppendFormat("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}, {12}, {13}, {14}\r\n", starNo, catStar.RAJ2000Deg, catStar.DEJ2000Deg, exportMag,
+					output.AppendFormat("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}, {12}, {13}, {14}, {15}, {16}\r\n", starNo, catStar.RAJ2000Deg, catStar.DEJ2000Deg, exportMag, bvColour, sloanR,
 							average, averageError, median, medianError, averageAmp, averageAmpError, medianAmp, medianAmpError, allMea, allSaturated, allHighRes);
 				}
 

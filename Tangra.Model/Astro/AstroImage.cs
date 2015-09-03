@@ -285,7 +285,7 @@ namespace Tangra.Model.Astro
             if (y0 > height - 16) y0 = height - 16;
             Bitmap featureBitmap = new Bitmap(31 * 8, 31 * 8, PixelFormat.Format24bppRgb);
 
-            uint saturationLevel = saturationLevels.GetSaturationForBpp(m_Pixelmap.BitPixCamera);
+            uint saturationLevel = saturationLevels.GetSaturationForBpp(m_Pixelmap.BitPixCamera, m_Pixelmap.MaxSignalValue);
 
 			BitmapData zoomedData = featureBitmap.LockBits(new Rectangle(0, 0, 31 * 8, 31 * 8), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
             try

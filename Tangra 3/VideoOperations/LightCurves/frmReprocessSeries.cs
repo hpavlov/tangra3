@@ -147,7 +147,7 @@ namespace Tangra.VideoOperations.LightCurves
                  Context.BitPix,
                  Context.BackgroundMethod,
 				 TangraConfig.Settings.Photometry.SubPixelSquareSize,
-                 TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(Context.BitPix));
+                 TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(Context.BitPix, Context.MaxPixelValue));
 
             measurer.SetCoreProperties(
                 TangraConfig.Settings.Photometry.AnnulusInnerRadius,

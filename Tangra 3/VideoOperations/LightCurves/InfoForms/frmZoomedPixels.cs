@@ -47,7 +47,7 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 			m_DisplaySettings = displaySettings;
 			m_LightcurveController = lightcurveController;
 
-			m_Saturation = TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(context.BitPix);
+            m_Saturation = TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(context.BitPix, context.MaxPixelValue);
 
 			picTarget1Pixels.Image = new Bitmap(picTarget1Pixels.Width, picTarget1Pixels.Height);
 			picTarget2Pixels.Image = new Bitmap(picTarget2Pixels.Width, picTarget2Pixels.Height);

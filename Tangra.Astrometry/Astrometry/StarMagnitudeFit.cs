@@ -122,7 +122,7 @@ namespace Tangra.Astrometry
 				m_BitPix,
 				m_PhotometryBackgroundMethod, 
 				TangraConfig.Settings.Photometry.SubPixelSquareSize,
-                TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(bitPix));
+                astroImage.Pixelmap.MaxSignalValue);
 
 			m_Measurer.SetCoreProperties(
 				TangraConfig.Settings.Photometry.AnnulusInnerRadius,
@@ -354,6 +354,7 @@ namespace Tangra.Astrometry
 			IAstrometryController astrometryController,
 			IVideoController videoController,
 			int bitPix,
+            uint maxSignalValue,
 			FitInfo astrometricFit,
 			TangraConfig.PhotometryReductionMethod photometryReductionMethod,
 			TangraConfig.PsfQuadrature psfQuadrature,
@@ -368,11 +369,13 @@ namespace Tangra.Astrometry
 			int? annulusMinPixels,
 			ref float empericalPSFR0)
 		{
+            uint saturatedValue = TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(bitPix, maxSignalValue);
+
 			MeasurementsHelper measurer = new MeasurementsHelper(
 				bitPix,
 				photometryBackgroundMethod,
 				TangraConfig.Settings.Photometry.SubPixelSquareSize,
-                TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(bitPix));
+                saturatedValue);
 
 			measurer.SetCoreProperties(
 				annulusInnerRadius ?? TangraConfig.Settings.Photometry.AnnulusInnerRadius,
@@ -399,7 +402,6 @@ namespace Tangra.Astrometry
 			bool limitByInclusion = astrometryController.LimitByInclusion;
 
 			int matSize = CorePhotometrySettings.Default.MatrixSizeForCalibratedPhotometry;
-			uint saturatedValue = TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(bitPix);
 
 			double a = double.NaN;
 			double b = double.NaN;

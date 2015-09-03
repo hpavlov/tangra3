@@ -308,7 +308,7 @@ namespace Tangra.VideoOperations.LightCurves
                     rbGuidingStar.Text = "Guiding Star";
 
                     // There are no stars that are bright enough. Simply let the user do what they want, but still try to default to a sensible aperture size
-					MeasurementsHelper measurement = ReduceLightCurveOperation.DoConfiguredMeasurement(m_ProcessingPixels, m_Aperture.Value, m_AstroImage.Pixelmap.BitPixCamera, 3.0, ref matirxSize);
+					MeasurementsHelper measurement = ReduceLightCurveOperation.DoConfiguredMeasurement(m_ProcessingPixels, m_Aperture.Value, m_AstroImage.Pixelmap.BitPixCamera, m_AstroImage.Pixelmap.MaxSignalValue, 3.0, ref matirxSize);
 
 	                if (measurement.FoundBestPSFFit != null &&
 	                    measurement.FoundBestPSFFit.IsSolved &&
@@ -335,7 +335,7 @@ namespace Tangra.VideoOperations.LightCurves
 
                     for (int i = 0; i < 2; i++)
                     {
-						MeasurementsHelper measurement = ReduceLightCurveOperation.DoConfiguredMeasurement(m_ProcessingPixels, m_Aperture.Value, m_AstroImage.Pixelmap.BitPixCamera, bestFindTolerance, ref matirxSize);
+                        MeasurementsHelper measurement = ReduceLightCurveOperation.DoConfiguredMeasurement(m_ProcessingPixels, m_Aperture.Value, m_AstroImage.Pixelmap.BitPixCamera, m_AstroImage.Pixelmap.MaxSignalValue, bestFindTolerance, ref matirxSize);
                         if (measurement != null && matirxSize != -1)
                         {
                             if (matirxSize < 5)

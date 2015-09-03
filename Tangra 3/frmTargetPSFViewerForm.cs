@@ -346,7 +346,7 @@ namespace Tangra
                                 m_VideoController.VideoBitPix,
                                 m_BackgroundMethod,
                                 TangraConfig.Settings.Photometry.SubPixelSquareSize,
-                                TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(m_VideoController.VideoBitPix));
+                                TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(m_VideoController.VideoBitPix, m_VideoController.VideoAav16NormVal));
 
             m_Measurer.SetCoreProperties(
                 TangraConfig.Settings.Photometry.AnnulusInnerRadius,

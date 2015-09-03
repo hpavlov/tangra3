@@ -307,7 +307,7 @@ namespace Tangra.Model.Config
 			public uint Saturation14Bit = 16000;
 			public uint Saturation16Bit = 65000;
 
-			public uint GetSaturationForBpp(int bpp)
+			public uint GetSaturationForBpp(int bpp, uint maxSignalValue)
 			{
 				if (bpp == 8)
 					return Saturation8Bit;
@@ -316,9 +316,14 @@ namespace Tangra.Model.Config
 				else if (bpp == 14)
 					return Saturation14Bit;
 				else if (bpp == 16)
-					return Saturation16Bit;
+				{
+				    if (maxSignalValue > 0 && maxSignalValue != uint.MinValue && maxSignalValue != uint.MaxValue)
+				        return maxSignalValue;
+                    else
+				        return Saturation16Bit;
+				}
 
-				return (uint)((1 << bpp) - 1);
+			    return (uint)((1 << bpp) - 1);
 			}
 		}
 

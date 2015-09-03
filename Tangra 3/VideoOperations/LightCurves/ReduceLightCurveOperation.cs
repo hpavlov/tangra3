@@ -220,7 +220,7 @@ namespace Tangra.VideoOperations.LightCurves
 								m_VideoController.VideoBitPix,
 								LightCurveReductionContext.Instance.NoiseMethod,
 								TangraConfig.Settings.Photometry.SubPixelSquareSize,
-								TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(m_VideoController.VideoBitPix));
+                                TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(m_VideoController.VideoBitPix, m_VideoController.VideoAav16NormVal));
 
 			m_Measurer.SetCoreProperties(
 				TangraConfig.Settings.Photometry.AnnulusInnerRadius,
@@ -1150,13 +1150,13 @@ namespace Tangra.VideoOperations.LightCurves
             get { return m_Refining; }
         }
 
-		public static MeasurementsHelper DoConfiguredMeasurement(uint[,] matrix, float aperture, int bitPixCamera, double bestFindTolerance, ref int matrixSize)
+		public static MeasurementsHelper DoConfiguredMeasurement(uint[,] matrix, float aperture, int bitPixCamera, uint maxSignalValue, double bestFindTolerance, ref int matrixSize)
         {
             var measurer = new MeasurementsHelper(
                             bitPixCamera,
 							TangraConfig.BackgroundMethod.BackgroundMedian /* We always use Background Median for configuration measurements. */,
 							TangraConfig.Settings.Photometry.SubPixelSquareSize,
-                            TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(bitPixCamera));
+                            TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(bitPixCamera, maxSignalValue));
 
             measurer.SetCoreProperties(
                     TangraConfig.Settings.Photometry.AnnulusInnerRadius,
