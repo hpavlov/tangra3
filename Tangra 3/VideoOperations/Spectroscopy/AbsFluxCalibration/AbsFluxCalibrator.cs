@@ -264,12 +264,13 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 
 					standards[j].AverageBiasPercentage = standards[j].ResidualPercentageFlux.Where(x => !double.IsNaN(x)).ToList().Average() / 100;
 
-					Trace.WriteLine(string.Format("{0}[{1} sec, {2}]: {3}%, AbsFlux: {4}%", 
+					Trace.WriteLine(string.Format("{0}[{1} sec, {2}]: {3}%, AbsFlux: {4}%, Mag: {5}", 
 						standards[j].ToString(),
 						standards[j].InputFile.Exposure.ToString("0.00"),
 						standards[j].InputFile.AirMass.ToString("0.000"),
 						standards[j].AverageBiasPercentage.ToString("0.0"),
-						standards[j].ResidualPercentageFlux.Where(x => !double.IsNaN(x)).ToList().Median().ToString("0.0")));
+						standards[j].ResidualPercentageFlux.Where(x => !double.IsNaN(x)).ToList().Median().ToString("0.0"),
+                        standards[j].m_CalSpecStar.MagV.ToString("0.000")));
 				}
 
                 #region Compute absolute fluxes of program objects
