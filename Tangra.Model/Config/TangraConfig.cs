@@ -646,6 +646,10 @@ namespace Tangra.Model.Config
 	        public double AstrMaxMag;
 	        public int AstrSearchTypeIndex;
 
+            public float? AstrometryMagFitAperture = null;
+            public float? AstrometryMagFitGap = null;
+            public float? AstrometryMagFitAnnulus = null;
+
 	        public string SpectroscopyWavelengthConfigurationname;
         }
 

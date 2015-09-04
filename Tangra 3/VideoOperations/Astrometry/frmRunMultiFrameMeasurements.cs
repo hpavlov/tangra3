@@ -73,19 +73,25 @@ namespace Tangra.VideoOperations.Astrometry
 			SetComboboxIndexFromBackgroundMethod(TangraConfig.Settings.LastUsed.AstrometryPhotometryBackgroundMethod);
 			cbxFitMagnitudes.Checked = TangraConfig.Settings.LastUsed.AstrometryFitMagnitudes;
 
-			if (TangraConfig.Settings.Photometry.SignalApertureUnitDefault == TangraConfig.SignalApertureUnit.FWHM)
-			{
-				if (AstrometryContext.Current.CurrentPhotometricFit != null &&
-					AstrometryContext.Current.CurrentPhotometricFit.PSFGaussians.Count > 3)
-				{
-					double medianFwhm = AstrometryContext.Current.CurrentPhotometricFit.PSFGaussians.Select(x => x.FWHM).ToList().Median();
-					nudAperture.Value = (decimal)(medianFwhm * TangraConfig.Settings.Photometry.DefaultSignalAperture);
-				}
-				else
-					nudAperture.Value = 4;
-			}
-			else
-				nudAperture.Value = (decimal)TangraConfig.Settings.Photometry.DefaultSignalAperture;
+
+            if (TangraConfig.Settings.LastUsed.AstrometryMagFitAperture.HasValue &&
+                TangraConfig.Settings.LastUsed.AstrometryMagFitGap.HasValue &&
+                TangraConfig.Settings.LastUsed.AstrometryMagFitAnnulus.HasValue)
+            {
+                nudAperture.ValueChanged -= nudAperture_ValueChanged;
+                try
+                {
+                    nudAperture.SetNUDValue(TangraConfig.Settings.LastUsed.AstrometryMagFitAperture.Value);
+                    nudGap.SetNUDValue(TangraConfig.Settings.LastUsed.AstrometryMagFitGap.Value);
+                    nudAnnulus.SetNUDValue(TangraConfig.Settings.LastUsed.AstrometryMagFitAnnulus.Value);
+                }
+                finally
+                {
+                    nudAperture.ValueChanged += nudAperture_ValueChanged;
+                }
+            }
+            else
+                ResetAperture();
 
 			cbxOutputMagBand.SelectedIndex = (int)TangraConfig.Settings.Astrometry.DefaultMagOutputBand;
             
@@ -120,6 +126,23 @@ namespace Tangra.VideoOperations.Astrometry
 
 	        m_Initialised = true;
 		}
+
+	    private void ResetAperture()
+	    {
+            if (TangraConfig.Settings.Photometry.SignalApertureUnitDefault == TangraConfig.SignalApertureUnit.FWHM)
+            {
+                if (AstrometryContext.Current.CurrentPhotometricFit != null &&
+                    AstrometryContext.Current.CurrentPhotometricFit.PSFGaussians.Count > 3)
+                {
+                    double medianFwhm = AstrometryContext.Current.CurrentPhotometricFit.PSFGaussians.Select(x => x.FWHM).ToList().Median();
+                    nudAperture.Value = (decimal)(medianFwhm * TangraConfig.Settings.Photometry.DefaultSignalAperture);
+                }
+                else
+                    nudAperture.Value = 4;
+            }
+            else
+                nudAperture.Value = (decimal)TangraConfig.Settings.Photometry.DefaultSignalAperture;
+	    }
 
         internal class AddinActionEntry
         {
@@ -366,6 +389,13 @@ namespace Tangra.VideoOperations.Astrometry
 			TangraConfig.Settings.LastUsed.AstrometryPhotometryBackgroundMethod = ComboboxIndexToBackgroundMethod();
 			TangraConfig.Settings.LastUsed.AstrometryFitMagnitudes = cbxFitMagnitudes.Checked;
 			TangraConfig.Settings.LastUsed.LastAstrometryUTCDate = ucUtcTimePicker.DateTimeUtc;
+
+		    if (cbxFitMagnitudes.Checked)
+		    {
+		        TangraConfig.Settings.LastUsed.AstrometryMagFitAperture = (float)nudAperture.Value;
+                TangraConfig.Settings.LastUsed.AstrometryMagFitGap = (float)nudGap.Value;
+                TangraConfig.Settings.LastUsed.AstrometryMagFitAnnulus = (float)nudAnnulus.Value;
+		    }
 			TangraConfig.Settings.Save();
 
 			m_VideoAstrometry.StartAstrometricMeasurements(new ucAstrometryObjectInfo.StartAstrometricMeasurementsEventArgs(m_MeasurementContext));
@@ -748,5 +778,11 @@ namespace Tangra.VideoOperations.Astrometry
 		{
 			PlotAperturePreview();
 		}
+
+        private void btnResetApertures_Click(object sender, EventArgs e)
+        {
+            ResetAperture();
+        }
+
 	}
 }

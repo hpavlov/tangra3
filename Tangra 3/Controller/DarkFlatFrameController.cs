@@ -113,11 +113,11 @@ namespace Tangra.Controller
 						string currGammaString = TangraConfig.Settings.Generic.ReverseGammaCorrection
 							? TangraConfig.Settings.Photometry.EncodingGamma.ToString("0.0000", CultureInfo.InvariantCulture)
 							: null;
-						if (TangraConfig.Settings.Generic.ReverseGammaCorrection && currGammaString != null)
+                        if (TangraConfig.Settings.Generic.ReverseGammaCorrection && currGammaString != null && usedGammaString == null)
 							gammaUsageError = string.Format("Selected image hasn't been Gamma corrected while the current video uses a gamma of {0}.", currGammaString);
-						else if (!TangraConfig.Settings.Generic.ReverseGammaCorrection && usedGammaString != null)
+                        else if (!TangraConfig.Settings.Generic.ReverseGammaCorrection && usedGammaString != null && currGammaString == null)
 							gammaUsageError = string.Format("Selected image has been corrected for Gamma of {0} while the current video doesn't use gamma correction.", usedGammaString);
-						else if (TangraConfig.Settings.Generic.ReverseGammaCorrection && string.Equals(currGammaString, usedGammaString))
+						else if (TangraConfig.Settings.Generic.ReverseGammaCorrection && !string.Equals(currGammaString, usedGammaString))
 							gammaUsageError = string.Format("Selected image has been corrected for Gamma of {0} while the current video uses a gamma of {1}.", usedGammaString, currGammaString);
 
 						if (gammaUsageError != null)
