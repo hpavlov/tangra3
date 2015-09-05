@@ -176,11 +176,11 @@ namespace Tangra.VideoTools
 
 			if (modelConfig.FlickeringStdDev > 0)
 			{
-				I1 = (int)Math.Round(Random(I1, modelConfig.FlickeringStdDev));
-				I2 = (int)Math.Round(Random(I2, modelConfig.FlickeringStdDev));
-				I3 = (int)Math.Round(Random(I3, modelConfig.FlickeringStdDev));
-				I4 = (int)Math.Round(Random(I4, modelConfig.FlickeringStdDev));
-				I5 = (int)Math.Round(Random(I5, modelConfig.FlickeringStdDev));
+                I1 = (int)Math.Round(VideoModelUtils.Random(I1, modelConfig.FlickeringStdDev));
+                I2 = (int)Math.Round(VideoModelUtils.Random(I2, modelConfig.FlickeringStdDev));
+                I3 = (int)Math.Round(VideoModelUtils.Random(I3, modelConfig.FlickeringStdDev));
+                I4 = (int)Math.Round(VideoModelUtils.Random(I4, modelConfig.FlickeringStdDev));
+                I5 = (int)Math.Round(VideoModelUtils.Random(I5, modelConfig.FlickeringStdDev));
 			}
 
 			int[,] simulatedBackground = new int[300,200];
@@ -198,13 +198,13 @@ namespace Tangra.VideoTools
 					simulatedBackground = m_BgModelGen.GenerateBackground(modelConfig.PolyBgOrder, modelConfig.PolyBgFreq, modelConfig.PolyBgShift, modelConfig.TotalFrames * percentDone, 110, 100, 35);
 				}
 
-				GenerateNoise(bmp, simulatedBackground, modelConfig.NoiseMean, modelConfig.NoiseStdDev);
+                VideoModelUtils.GenerateNoise(bmp, simulatedBackground, modelConfig.NoiseMean, modelConfig.NoiseStdDev);
 
-				GenerateStar(bmp, 25, 160, (float)fwhm1, I1);
-				if (modelConfig.SimulateStar2) GenerateStar(bmp, 75, 160, (float)fwhm1, I2);
-				if (modelConfig.SimulateStar3) GenerateStar(bmp, 125, 160, (float)fwhm1, I3);
-				if (modelConfig.SimulateStar4) GenerateStar(bmp, 175, 160, (float)fwhm1, I4);
-				if (modelConfig.SimulateStar5) GenerateStar(bmp, 225, 160, (float)fwhm1, I5);
+                VideoModelUtils.GenerateStar(bmp, 25, 160, (float)fwhm1, I1);
+                if (modelConfig.SimulateStar2) VideoModelUtils.GenerateStar(bmp, 75, 160, (float)fwhm1, I2);
+                if (modelConfig.SimulateStar3) VideoModelUtils.GenerateStar(bmp, 125, 160, (float)fwhm1, I3);
+                if (modelConfig.SimulateStar4) VideoModelUtils.GenerateStar(bmp, 175, 160, (float)fwhm1, I4);
+                if (modelConfig.SimulateStar5) VideoModelUtils.GenerateStar(bmp, 225, 160, (float)fwhm1, I5);
 
 				if (modelConfig.SimulatePassBy)
 				{
@@ -216,9 +216,9 @@ namespace Tangra.VideoTools
 						int lastOccFrame = (modelConfig.TotalFrames / 2) - 1;
 						isOcculted = frameNo >= firstOccFrame && frameNo <= lastOccFrame;
 					}
-					if (!isOcculted) GenerateStar(bmp, 110, 100, fwhm_pb1, IPB1);
+                    if (!isOcculted) VideoModelUtils.GenerateStar(bmp, 110, 100, fwhm_pb1, IPB1);
 
-					GenerateStar(bmp, 110 + (float)modelConfig.PassByDist, (float)(100 - maxVerticaldistance + (2 * maxVerticaldistance) * percentDone), fwhm_pb2, IPB2);
+                    VideoModelUtils.GenerateStar(bmp, 110 + (float)modelConfig.PassByDist, (float)(100 - maxVerticaldistance + (2 * maxVerticaldistance) * percentDone), fwhm_pb2, IPB2);
 				}
 
 				AddOnScreenText(bmp, modelConfig);
@@ -238,108 +238,6 @@ namespace Tangra.VideoTools
 				if (instructions != null) g.DrawString(instructions, s_SmallFont, Brushes.LightGray, 0, 100);
 				g.Save();
 			}	
-		}
-
-		private RNGCryptoServiceProvider cryptoRand = new RNGCryptoServiceProvider();		
-
-		private double Random(double mean, double stdDev)
-		{
-			if (Math.Abs(stdDev) < 0.5) return mean;
-
-			byte[] twoBytes = new byte[2];
-			cryptoRand.GetBytes(twoBytes);
-			double u1 = twoBytes[0] * 1.0 / 0xFF; //these are uniform(0,1) random doubles
-			if (u1 == 0) u1 = 1; // corner case handling to avoid Log(0)
-			double u2 = twoBytes[1] * 1.0 / 0xFF;
-			double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2); //random normal(0,1)
-			double randNormal = mean + stdDev * randStdNormal; //random normal(mean,stdDev^2)
-			return randNormal;
-		}
-
-		private void GenerateNoise(Bitmap bmp, int[,] simulatedBackground, int mean, int stdDev)
-		{
-			BitmapData bmData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
-
-			int stride = bmData.Stride;
-			System.IntPtr Scan0 = bmData.Scan0;
-			unsafe
-			{
-				byte* p = (byte*)(void*)Scan0;
-
-				int nOffset = stride - bmp.Width * 3;
-
-				for (int y = 0; y < bmp.Height; ++y)
-				{
-					for (int x = 0; x < bmp.Width; ++x)
-					{
-					    double bgPixel = Math.Min(255, Math.Max(0, simulatedBackground[x, y] + Math.Abs(Random(mean, stdDev))));
-                        byte val = (byte)Math.Round(bgPixel);
-
-						p[0] = val;
-						p[1] = val;
-						p[2] = val;
-
-						p += 3;
-					}
-					p += nOffset;
-				}
-			}
-
-			bmp.UnlockBits(bmData);
-		}
-
-		private void GenerateStar(Bitmap bmp, float x0, float y0, float fwhm, float iMax)
-		{
-			double r0 = fwhm / (2 * Math.Sqrt(Math.Log(2)));
-			int maxPsfModelDist = (int)(6 * fwhm);
-
-			// GDI+ still lies to us - the return format is BGR, NOT RGB.
-			BitmapData bmData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
-
-			int stride = bmData.Stride;
-			System.IntPtr Scan0 = bmData.Scan0;
-			unsafe
-			{
-				byte* p = (byte*)(void*)Scan0;
-
-				int nOffset = stride - bmp.Width * 3;
-
-				for (int y = 0; y < bmp.Height; ++y)
-				{
-					for (int x = 0; x < bmp.Width; ++x)
-					{
-						if (Math.Abs(x - x0) < maxPsfModelDist && Math.Abs(y - y0) < maxPsfModelDist)
-						{
-							int counter = 0;
-							double sum = 0;
-							for (double dx = -0.5; dx < 0.5; dx += 0.1)
-							{
-								for (double dy = -0.5; dy < 0.5; dy += 0.1)
-								{
-									double thisVal = Math.Min(255, Math.Max(0, iMax * Math.Exp(-((x + dx - x0) * (x + dx - x0) + (y + dy - y0) * (y + dy - y0)) / (r0 * r0))));
-									sum += thisVal;
-									counter++;
-								}
-							}
-
-							int val = (int)Math.Round(sum / counter);
-
-							int p1 = p[0] + val;
-							int p2 = p[1] + val;
-							int p3 = p[2] + val;
-
-							p[0] = (byte)Math.Min(255, Math.Max(0, p1));
-							p[1] = (byte)Math.Min(255, Math.Max(0, p2));
-							p[2] = (byte)Math.Min(255, Math.Max(0, p3));
-						}
-
-						p += 3;
-					}
-					p += nOffset;
-				}
-			}
-
-			bmp.UnlockBits(bmData);
 		}
 
 		private void btnGenerateVideo_Click(object sender, EventArgs e)

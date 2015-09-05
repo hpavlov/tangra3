@@ -10,7 +10,7 @@ using Tangra.Model.Helpers;
 
 namespace Tangra.Astrometry
 {
-	internal static class TangentPlane
+	public static class TangentPlane
 	{
 		public static void CelestialToTangent(double raDeg, double deDeg, double ra0Deg, double de0Deg, out double X, out double Y)
 		{

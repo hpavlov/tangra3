@@ -111,6 +111,26 @@ namespace Tangra.Astrometry
 			return null;
 		}
 
+	    public static PlateConstantsFit ConstructLinearConstantsFit(
+            double a, double b, double c, double d, double e, double f, 
+            double a1, double b1, double c1, double d1, double e1, double f1)
+	    {
+	        PlateConstantsLinearFit linearFit = new PlateConstantsLinearFit(new List<PlateConstStarPair>());
+	        linearFit.Const_A = a;
+            linearFit.Const_B = b;
+            linearFit.Const_C = c;
+            linearFit.Const_D = d;
+            linearFit.Const_E = e;
+            linearFit.Const_F = f;
+            linearFit.Const_A1 = a1;
+            linearFit.Const_B1 = b1;
+            linearFit.Const_C1 = c1;
+            linearFit.Const_D1 = d1;
+            linearFit.Const_E1 = e1;
+            linearFit.Const_F1 = f1;
+	        return linearFit;
+	    }
+
 		private bool LeastSquareSolve(double ra0Deg, double de0Deg, int minNumberOfStars)
 		{
 			int[] NUM_CONSTANTS = new int[] { 3, 6, 10 };

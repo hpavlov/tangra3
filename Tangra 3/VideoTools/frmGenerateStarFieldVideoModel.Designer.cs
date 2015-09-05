@@ -76,6 +76,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.nudTotalFrames = new System.Windows.Forms.NumericUpDown();
+            this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.pnlConfig.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudFrameHeight)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudFrameWidth)).BeginInit();
@@ -109,6 +110,7 @@
             this.btnGenerateVideo.TabIndex = 14;
             this.btnGenerateVideo.Text = "Generate Video";
             this.btnGenerateVideo.UseVisualStyleBackColor = true;
+            this.btnGenerateVideo.Click += new System.EventHandler(this.btnGenerateVideo_Click);
             // 
             // pnlConfig
             // 
@@ -424,8 +426,8 @@
             this.cbxPhotometricFilter.Items.AddRange(new object[] {
             "B",
             "V",
-            "r\'",
             "g\'",
+            "r\'",
             "i\'"});
             this.cbxPhotometricFilter.Location = new System.Drawing.Point(331, 256);
             this.cbxPhotometricFilter.Name = "cbxPhotometricFilter";
@@ -447,7 +449,7 @@
             this.tbxDE.Name = "tbxDE";
             this.tbxDE.Size = new System.Drawing.Size(100, 20);
             this.tbxDE.TabIndex = 59;
-            this.tbxDE.Text = "-19 54 30";
+            this.tbxDE.Text = "-19 44 05";
             // 
             // tbxRA
             // 
@@ -683,7 +685,7 @@
             this.nudTotalFrames.Size = new System.Drawing.Size(55, 20);
             this.nudTotalFrames.TabIndex = 35;
             this.nudTotalFrames.Value = new decimal(new int[] {
-            120,
+            10,
             0,
             0,
             0});
@@ -771,5 +773,6 @@
         private System.Windows.Forms.NumericUpDown nudPlateFocLength;
         private System.Windows.Forms.NumericUpDown nudPlatePixHeight;
         private System.Windows.Forms.NumericUpDown nudPlatePixWidth;
+        private System.Windows.Forms.SaveFileDialog saveFileDialog;
     }
 }

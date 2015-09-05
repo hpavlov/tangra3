@@ -85,6 +85,9 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AdvLib">
+      <HintPath>lib\AdvLib.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Management" />
@@ -606,6 +609,7 @@
     <Compile Include="VideoOperations\Spectroscopy\ViewSpectraStates\SpectraViewerStateCalibrate.cs" />
     <Compile Include="VideoOperations\Spectroscopy\ViewSpectraStates\SpectraViewerStateCalibrated.cs" />
     <Compile Include="VideoOperations\Spectroscopy\ViewSpectraStates\SpectraViewerStateManager.cs" />
+    <Compile Include="VideoTools\AavFileCreator.cs" />
     <Compile Include="VideoTools\BackgroundModelGenerator.cs" />
     <Compile Include="VideoTools\frmDefineDisplayDynamicRange.cs">
       <SubType>Form</SubType>
@@ -637,6 +641,7 @@
     <Compile Include="VideoTools\frmGenerateStarFieldVideoModel.Designer.cs">
       <DependentUpon>frmGenerateStarFieldVideoModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="VideoTools\VideoModelUtils.cs" />
     <Compile Include="Video\AstroDigitalVideo\frmBuildingNtpTimebase.cs">
       <SubType>Form</SubType>
     </Compile>
