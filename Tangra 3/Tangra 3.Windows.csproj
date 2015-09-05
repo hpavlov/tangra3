@@ -625,11 +625,17 @@
     <Compile Include="VideoTools\frmGenerate3DPolyBackground.Designer.cs">
       <DependentUpon>frmGenerate3DPolyBackground.cs</DependentUpon>
     </Compile>
-    <Compile Include="VideoTools\frmGenerateVideoModel.cs">
+    <Compile Include="VideoTools\frmGenerateOccultationVideoModel.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="VideoTools\frmGenerateVideoModel.Designer.cs">
-      <DependentUpon>frmGenerateVideoModel.cs</DependentUpon>
+    <Compile Include="VideoTools\frmGenerateOccultationVideoModel.Designer.cs">
+      <DependentUpon>frmGenerateOccultationVideoModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoTools\frmGenerateStarFieldVideoModel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoTools\frmGenerateStarFieldVideoModel.Designer.cs">
+      <DependentUpon>frmGenerateStarFieldVideoModel.cs</DependentUpon>
     </Compile>
     <Compile Include="Video\AstroDigitalVideo\frmBuildingNtpTimebase.cs">
       <SubType>Form</SubType>
@@ -1116,8 +1122,11 @@
     <EmbeddedResource Include="VideoTools\frmGenerate3DPolyBackground.resx">
       <DependentUpon>frmGenerate3DPolyBackground.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="VideoTools\frmGenerateVideoModel.resx">
-      <DependentUpon>frmGenerateVideoModel.cs</DependentUpon>
+    <EmbeddedResource Include="VideoTools\frmGenerateOccultationVideoModel.resx">
+      <DependentUpon>frmGenerateOccultationVideoModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoTools\frmGenerateStarFieldVideoModel.resx">
+      <DependentUpon>frmGenerateStarFieldVideoModel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Video\AstroDigitalVideo\frmBuildingNtpTimebase.resx">
       <DependentUpon>frmBuildingNtpTimebase.cs</DependentUpon>

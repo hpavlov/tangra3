@@ -519,7 +519,7 @@ namespace Tangra
 			ShowSettings(false);
 		}
 
-		internal void ShowSettings(bool showCatalogRequiredHint = false, bool showLocationRequiredHint = false)
+        internal void ShowSettings(bool showCatalogRequiredHint = false, bool showLocationRequiredHint = false, bool showUCAC4RequiredHint = false)
 		{
 			IAddinContainer lightCurveAddinContainer = m_LightCurveController.LightCurveFormAddinContainer;
 			IAddinContainer[] addinContainers = lightCurveAddinContainer != null
@@ -537,6 +537,7 @@ namespace Tangra
 
 			frmSettings.StartPosition = FormStartPosition.CenterParent;
 			frmSettings.ShowCatalogRequiredHint = showCatalogRequiredHint;
+            frmSettings.ShowUCAC4RequiredHint = showUCAC4RequiredHint;
 			frmSettings.ShowLocationRequiredHint = showLocationRequiredHint;
 			if (frmSettings.ShowDialog(this) == DialogResult.OK)
 			{
@@ -1043,13 +1044,7 @@ namespace Tangra
 		{
 			if (e.Data.GetDataPresent(DataFormats.FileDrop))
 				e.Effect = DragDropEffects.Copy;
-		}
-
-		private void miVideoModelling_Click(object sender, EventArgs e)
-		{
-			var frm = new frmGenerateVideoModel();
-			frm.ShowDialog(this);
-		}
+        }
 
 		private void miFileInfo_Click(object sender, EventArgs e)
 		{
@@ -1101,11 +1096,6 @@ namespace Tangra
         {
 			ShellHelper.OpenUrl("https://groups.yahoo.com/neo/groups/Tangra/info");
         }
-
-		private void miAstrometry_Click(object sender, EventArgs e)
-		{
-
-		}
 
 		private void miAstrometry_MouseDown(object sender, MouseEventArgs e)
 		{
@@ -1301,5 +1291,26 @@ namespace Tangra
 			var frmAbsFlux = new frmAbsFlux(m_SpectroscopyController.DisplaySettings);
 			frmAbsFlux.Show(this);
 		}
+
+        private void miOccultationVideoModeling_Click(object sender, EventArgs e)
+        {
+            var frm = new frmGenerateOccultationVideoModel();
+            frm.ShowDialog(this);
+        }
+
+        private void miStarFieldVideoModelling_Click(object sender, EventArgs e)
+        {
+            StarCatalogueFacade facade = new StarCatalogueFacade(TangraConfig.Settings.StarCatalogue);
+            if (TangraConfig.Settings.StarCatalogue.Catalog != TangraConfig.StarCatalog.UCAC4 || IsAstrometryUnconfigured(facade))
+            {
+                ShowSettings(false, false, true);
+
+                if (TangraConfig.Settings.StarCatalogue.Catalog != TangraConfig.StarCatalog.UCAC4 || IsAstrometryUnconfigured(facade))
+                    return;
+            }
+
+            var frm = new frmGenerateStarFieldVideoModel();
+            frm.ShowDialog(this);
+        }
 	}
 }

@@ -36,6 +36,7 @@ namespace Tangra.Config
 		private ucStarCatalogues m_ucStarCatalogues;
 
 		public bool ShowCatalogRequiredHint = false;
+	    public bool ShowUCAC4RequiredHint = false;
 		public bool ShowLocationRequiredHint = false;
 
 		public frmTangraSettings(
@@ -207,6 +208,30 @@ namespace Tangra.Config
 
 				tvSettings.SelectedNode = tvSettings.Nodes["ndCatalogues"];
 			}
+            else if (ShowUCAC4RequiredHint)
+            {
+                tvSettings.SelectedNode = tvSettings.Nodes["ndCatalogues"];
+
+                if (TangraConfig.Settings.StarCatalogue.Catalog != TangraConfig.StarCatalog.UCAC4)
+                {
+                    MessageBox.Show("Modelling star field video requires UCAC4 to be configured as the star catalogue.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    m_ucStarCatalogues.cbxCatalogue.Focus();
+                }
+                else
+                {
+                    var catalogValidator = new StarCatalogueFacade(TangraConfig.Settings.StarCatalogue);
+
+                    if (!catalogValidator.VerifyCurrentCatalogue(TangraConfig.Settings.StarCatalogue.Catalog, ref TangraConfig.Settings.StarCatalogue.CatalogLocation))
+                    {
+                        tvSettings.SelectedNode = tvSettings.Nodes["ndCatalogues"];
+
+                        MessageBox.Show("The current star catalog location is invalid.", "Star Catalog Invalid", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        m_ucStarCatalogues.tbxCatalogueLocation.Focus();
+                        m_ucStarCatalogues.tbxCatalogueLocation.SelectAll();
+
+                    }
+                }
+            }
 			else
 				tvSettings.SelectedNode = tvSettings.Nodes["ndGeneral"];
 		}

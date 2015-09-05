@@ -24,7 +24,7 @@ using Tangra.Video.AstroDigitalVideo;
 
 namespace Tangra.VideoTools
 {
-	public partial class frmGenerateVideoModel : Form
+	public partial class frmGenerateOccultationVideoModel : Form
 	{
 		internal class ModelConfig
 		{
@@ -68,7 +68,7 @@ namespace Tangra.VideoTools
 
 		private BackgroundModelGenerator m_BgModelGen;
 
-		public frmGenerateVideoModel()
+		public frmGenerateOccultationVideoModel()
 		{
 			InitializeComponent();
 
