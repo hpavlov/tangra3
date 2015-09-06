@@ -34,16 +34,16 @@ namespace Tangra.VideoTools
             s_FirstRecordedFrameTimestamp = 0;
             s_Width = width;
             s_Height = width;
-            s_IntegrationRate = width;
+            s_IntegrationRate = integrationRate;
 
             AdvLib.AdvAddFileTag("AAVR-SOFTWARE-VERSION", "1.0");
             AdvLib.AdvAddFileTag("RECORDER", "Tangra Video Model Simulator");
             AdvLib.AdvAddFileTag("FSTF-TYPE", "AAV");
             AdvLib.AdvAddFileTag("AAV-VERSION", "1");
 
-            AdvLib.AdvAddFileTag("GRABBER", "Simulated");
+            AdvLib.AdvAddFileTag("GRABBER", "");
             AdvLib.AdvAddFileTag("VIDEO-MODE", string.Format("{0}x{1}@25fps", width, height));
-            AdvLib.AdvAddFileTag("CAMERA-MODEL", "Simulated");
+            AdvLib.AdvAddFileTag("CAMERA-MODEL", "");
             AdvLib.AdvAddFileTag("CAMERA-BITPIX", "8");
 
             AdvLib.AdvAddFileTag("FRAME-COMBINING", "Binning");
@@ -51,12 +51,7 @@ namespace Tangra.VideoTools
             AdvLib.AdvAddFileTag("OSD-FIRST-LINE", (height - 3).ToString());
             AdvLib.AdvAddFileTag("OSD-LAST-LINE", (height - 1).ToString());
 
-
-            //if (NO_INTEGRATION_STACK_RATE > 0)
-            //{
-            //    sprintf(&buffer[0], "%d", NO_INTEGRATION_STACK_RATE);
-            //    AdvLib.AdvAddFileTag("FRAME-STACKING-RATE", &buffer[0]);
-            //}
+            AdvLib.AdvAddFileTag("FRAME-STACKING-RATE", integrationRate.ToString());
 
             float effectiveIntegrationRate = 25.0f / integrationRate;
             AdvLib.AdvAddFileTag("EFFECTIVE-FRAME-RATE", effectiveIntegrationRate.ToString("0.00000"));
@@ -65,6 +60,9 @@ namespace Tangra.VideoTools
             AdvLib.AdvAddFileTag("NATIVE-VIDEO-STANDARD", "PAL");
 
             AdvLib.AdvAddFileTag("CAPHNTP-TIMING-CORRECTION", "0");
+
+            AdvLib.AdvAddFileTag("BITPIX", "16");
+            AdvLib.AdvAddFileTag("AAV16-NORMVAL", (255 * integrationRate).ToString());
 
             AdvLib.AdvDefineImageSection((ushort)width, (ushort)height, 16);
             AdvLib.AdvAddOrUpdateImageSectionTag("IMAGE-BYTE-ORDER", "LITTLE-ENDIAN");
@@ -97,11 +95,16 @@ namespace Tangra.VideoTools
 
             AdvLib.AdvBeginFrame(timeStamp, elapsedTimeMilliseconds, exposureIn10thMilliseconds);
 
+            AdvLib.AdvFrameAddStatusTag16(STATUS_TAG_NUMBER_INTEGRATED_FRAMES, (ushort)s_IntegrationRate);
+
             ulong currentSystemTime = (ulong)WindowsTicksToAavTicks(DateTime.Now.Ticks);
             AdvLib.AdvFrameAddStatusTag64(STATUS_TAG_SYSTEM_TIME, currentSystemTime);
-            AdvLib.AdvFrameAddStatusTag16(STATUS_TAG_NUMBER_INTEGRATED_FRAMES, (ushort)s_IntegrationRate);
-            AdvLib.AdvFrameAddStatusTag64(STATUS_TAG_START_FRAME_ID, (ulong)WindowsTicksToAavTicks(startTimeStamp.Ticks));
-            AdvLib.AdvFrameAddStatusTag64(STATUS_TAG_END_FRAME_ID, (ulong)WindowsTicksToAavTicks(endTimeStamp.Ticks));
+
+            AdvLib.AdvFrameAddStatusTag64(STATUS_TAG_NTP_START_TIMESTAMP, (ulong)WindowsTicksToAavTicks(startTimeStamp.Ticks));
+            AdvLib.AdvFrameAddStatusTag64(STATUS_TAG_NTP_END_TIMESTAMP, (ulong)WindowsTicksToAavTicks(endTimeStamp.Ticks));
+            AdvLib.AdvFrameAddStatusTag64(STATUS_TAG_NTP_TIME_ERROR, 320);
+
+            AdvLib.AdvFrameAddStatusTag(STATUS_TAG_EXPOSURE, string.Format("x{0}", s_IntegrationRate * 2));
 
             ushort[] pixels = new ushort[pixmap.Pixels.Length];
             for (int i = 0; i < pixmap.Pixels.Length; i++) pixels[i] = (ushort)pixmap.Pixels[i];

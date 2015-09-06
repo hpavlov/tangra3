@@ -77,6 +77,8 @@
             this.label1 = new System.Windows.Forms.Label();
             this.nudTotalFrames = new System.Windows.Forms.NumericUpDown();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.label25 = new System.Windows.Forms.Label();
+            this.nudLimitMag = new System.Windows.Forms.NumericUpDown();
             this.pnlConfig.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudFrameHeight)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudFrameWidth)).BeginInit();
@@ -91,6 +93,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudNoiseStdDev)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudNoiseMean)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudTotalFrames)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudLimitMag)).BeginInit();
             this.SuspendLayout();
             // 
             // pbar
@@ -114,6 +117,8 @@
             // 
             // pnlConfig
             // 
+            this.pnlConfig.Controls.Add(this.label25);
+            this.pnlConfig.Controls.Add(this.nudLimitMag);
             this.pnlConfig.Controls.Add(this.label26);
             this.pnlConfig.Controls.Add(this.nudFrameHeight);
             this.pnlConfig.Controls.Add(this.lblWidth);
@@ -339,9 +344,9 @@
             this.label16.AutoSize = true;
             this.label16.Location = new System.Drawing.Point(144, 103);
             this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(150, 13);
+            this.label16.Size = new System.Drawing.Size(79, 13);
             this.label16.TabIndex = 67;
-            this.label16.Text = "Saturation starts at magnitude:";
+            this.label16.Text = "Saturated mag:";
             // 
             // label18
             // 
@@ -355,7 +360,7 @@
             // nudFirstSaturatedMag
             // 
             this.nudFirstSaturatedMag.DecimalPlaces = 2;
-            this.nudFirstSaturatedMag.Location = new System.Drawing.Point(300, 100);
+            this.nudFirstSaturatedMag.Location = new System.Drawing.Point(224, 100);
             this.nudFirstSaturatedMag.Maximum = new decimal(new int[] {
             30,
             0,
@@ -449,7 +454,7 @@
             this.tbxDE.Name = "tbxDE";
             this.tbxDE.Size = new System.Drawing.Size(100, 20);
             this.tbxDE.TabIndex = 59;
-            this.tbxDE.Text = "-19 44 05";
+            this.tbxDE.Text = "-19 40 45";
             // 
             // tbxRA
             // 
@@ -457,7 +462,7 @@
             this.tbxRA.Name = "tbxRA";
             this.tbxRA.Size = new System.Drawing.Size(100, 20);
             this.tbxRA.TabIndex = 58;
-            this.tbxRA.Text = "18 54 34";
+            this.tbxRA.Text = "18 54 26";
             // 
             // label11
             // 
@@ -690,6 +695,33 @@
             0,
             0});
             // 
+            // label25
+            // 
+            this.label25.AutoSize = true;
+            this.label25.Location = new System.Drawing.Point(287, 103);
+            this.label25.Name = "label25";
+            this.label25.Size = new System.Drawing.Size(54, 13);
+            this.label25.TabIndex = 86;
+            this.label25.Text = "Limit mag:";
+            // 
+            // nudLimitMag
+            // 
+            this.nudLimitMag.DecimalPlaces = 2;
+            this.nudLimitMag.Location = new System.Drawing.Point(344, 100);
+            this.nudLimitMag.Maximum = new decimal(new int[] {
+            30,
+            0,
+            0,
+            0});
+            this.nudLimitMag.Name = "nudLimitMag";
+            this.nudLimitMag.Size = new System.Drawing.Size(52, 20);
+            this.nudLimitMag.TabIndex = 85;
+            this.nudLimitMag.Value = new decimal(new int[] {
+            1525,
+            0,
+            0,
+            131072});
+            // 
             // frmGenerateStarFieldVideoModel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -720,6 +752,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudNoiseStdDev)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudNoiseMean)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudTotalFrames)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudLimitMag)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -774,5 +807,7 @@
         private System.Windows.Forms.NumericUpDown nudPlatePixHeight;
         private System.Windows.Forms.NumericUpDown nudPlatePixWidth;
         private System.Windows.Forms.SaveFileDialog saveFileDialog;
+        private System.Windows.Forms.Label label25;
+        private System.Windows.Forms.NumericUpDown nudLimitMag;
     }
 }

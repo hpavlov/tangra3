@@ -49,6 +49,7 @@ namespace Tangra.VideoTools
             public int NoiseStdDev;
             public int FlickeringStdDev;
             public double BrighestUnsaturatedStarMag;
+            public double LimitStarMag;
             public double FWHM;
             public double RADeg2000;
             public double DEDeg2000;
@@ -147,6 +148,7 @@ namespace Tangra.VideoTools
                     FlickeringStdDev = (int)nudStarFlickering.Value,
                     FWHM = (double)nudStar1FWHM.Value,
                     BrighestUnsaturatedStarMag = (double)nudFirstSaturatedMag.Value,
+                    LimitStarMag = (double)nudLimitMag.Value,
                     RADeg2000 = m_RA * 15,
                     DEDeg2000 = m_DE,
                     PlatePixWidth = (double)nudPlatePixWidth.Value,
@@ -215,7 +217,7 @@ namespace Tangra.VideoTools
                 double fovDeg = AngleUtility.Elongation(0, 0, dxRad * 180 / Math.PI, dyRad * 180 / Math.PI);
 
                 var catFac = new StarCatalogueFacade(TangraConfig.Settings.StarCatalogue);
-                List<IStar> stars = catFac.GetStarsInRegion(m_RA * 15, m_DE, 2 * fovDeg, 20, 2000);
+                List<IStar> stars = catFac.GetStarsInRegion(m_RA * 15, m_DE, 2 * fovDeg, modelConfig.LimitStarMag, 2000);
 
                 // Hardcoded linear constants from real video
                 PlateConstantsFit plateConstants = PlateConstantsFit.ConstructLinearConstantsFit(
@@ -244,6 +246,8 @@ namespace Tangra.VideoTools
                     {
                         using (Pixelmap pixmap = new Pixelmap(modelConfig.FrameWidth, modelConfig.FrameHeight, bitPix, new uint[modelConfig.FrameWidth*modelConfig.FrameHeight], null, null))
                         {
+                            pixmap.SetMaxSignalValue((uint)(255 * modelConfig.Integration));
+
                             VideoModelUtils.GenerateNoise(pixmap, simulatedBackground, modelConfig.NoiseMean * modelConfig.Integration, modelConfig.NoiseStdDev * modelConfig.Integration);
                             GenerateFrame(plateConstants, pixmap, stars, modelConfig);
 
