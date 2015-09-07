@@ -243,7 +243,7 @@ namespace Tangra
 			m_InnerRadius = (float)(TangraConfig.Settings.Photometry.AnnulusInnerRadius * aperture);
 			m_OuterRadius = (float)Math.Sqrt(TangraConfig.Settings.Photometry.AnnulusMinPixels / Math.PI + m_InnerRadius * m_InnerRadius);
 
-			m_VideoController.RefreshCurrentFrame();
+			//m_VideoController.RefreshCurrentFrame();
         }
 
 		private void CalculateAndDisplayBackground(uint[,] backgroundPixels)
