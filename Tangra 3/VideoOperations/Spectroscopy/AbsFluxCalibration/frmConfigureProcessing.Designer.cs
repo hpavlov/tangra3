@@ -40,6 +40,10 @@
 			this.btnOK = new System.Windows.Forms.Button();
 			this.btnCancel = new System.Windows.Forms.Button();
 			this.cbxUseBlurring = new System.Windows.Forms.CheckBox();
+			this.rbLinear = new System.Windows.Forms.RadioButton();
+			this.rbNonLinearMag = new System.Windows.Forms.RadioButton();
+			this.rbNonLinearGain = new System.Windows.Forms.RadioButton();
+			this.label7 = new System.Windows.Forms.Label();
 			((System.ComponentModel.ISupportInitialize)(this.nudResolution)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudMaxWavelength)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudMinWavelength)).BeginInit();
@@ -188,18 +192,64 @@
 			// cbxUseBlurring
 			// 
 			this.cbxUseBlurring.AutoSize = true;
-			this.cbxUseBlurring.Location = new System.Drawing.Point(33, 136);
+			this.cbxUseBlurring.Location = new System.Drawing.Point(33, 108);
 			this.cbxUseBlurring.Name = "cbxUseBlurring";
 			this.cbxUseBlurring.Size = new System.Drawing.Size(83, 17);
 			this.cbxUseBlurring.TabIndex = 31;
 			this.cbxUseBlurring.Text = "Use Blurring";
 			this.cbxUseBlurring.UseVisualStyleBackColor = true;
 			// 
+			// rbLinear
+			// 
+			this.rbLinear.AutoSize = true;
+			this.rbLinear.Location = new System.Drawing.Point(51, 161);
+			this.rbLinear.Name = "rbLinear";
+			this.rbLinear.Size = new System.Drawing.Size(54, 17);
+			this.rbLinear.TabIndex = 32;
+			this.rbLinear.TabStop = true;
+			this.rbLinear.Text = "Linear";
+			this.rbLinear.UseVisualStyleBackColor = true;
+			// 
+			// rbNonLinearMag
+			// 
+			this.rbNonLinearMag.AutoSize = true;
+			this.rbNonLinearMag.Location = new System.Drawing.Point(51, 181);
+			this.rbNonLinearMag.Name = "rbNonLinearMag";
+			this.rbNonLinearMag.Size = new System.Drawing.Size(101, 17);
+			this.rbNonLinearMag.TabIndex = 33;
+			this.rbNonLinearMag.TabStop = true;
+			this.rbNonLinearMag.Text = "Non Linear Mag";
+			this.rbNonLinearMag.UseVisualStyleBackColor = true;
+			// 
+			// rbNonLinearGain
+			// 
+			this.rbNonLinearGain.AutoSize = true;
+			this.rbNonLinearGain.Location = new System.Drawing.Point(51, 203);
+			this.rbNonLinearGain.Name = "rbNonLinearGain";
+			this.rbNonLinearGain.Size = new System.Drawing.Size(102, 17);
+			this.rbNonLinearGain.TabIndex = 34;
+			this.rbNonLinearGain.TabStop = true;
+			this.rbNonLinearGain.Text = "Non Linear Gain";
+			this.rbNonLinearGain.UseVisualStyleBackColor = true;
+			// 
+			// label7
+			// 
+			this.label7.AutoSize = true;
+			this.label7.Location = new System.Drawing.Point(33, 142);
+			this.label7.Name = "label7";
+			this.label7.Size = new System.Drawing.Size(79, 13);
+			this.label7.TabIndex = 35;
+			this.label7.Text = "AbsFlux Model:";
+			// 
 			// frmConfigureProcessing
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(292, 273);
+			this.Controls.Add(this.label7);
+			this.Controls.Add(this.rbNonLinearGain);
+			this.Controls.Add(this.rbNonLinearMag);
+			this.Controls.Add(this.rbLinear);
 			this.Controls.Add(this.cbxUseBlurring);
 			this.Controls.Add(this.btnCancel);
 			this.Controls.Add(this.btnOK);
@@ -238,5 +288,9 @@
 		private System.Windows.Forms.Button btnOK;
 		private System.Windows.Forms.Button btnCancel;
 		private System.Windows.Forms.CheckBox cbxUseBlurring;
+		private System.Windows.Forms.RadioButton rbLinear;
+		private System.Windows.Forms.RadioButton rbNonLinearMag;
+		private System.Windows.Forms.RadioButton rbNonLinearGain;
+		private System.Windows.Forms.Label label7;
 	}
 }

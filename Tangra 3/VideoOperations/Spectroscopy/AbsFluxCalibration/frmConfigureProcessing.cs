@@ -28,6 +28,9 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			nudMaxWavelength.SetNUDValue(context.ToWavelength);
 			nudResolution.SetNUDValue(context.WavelengthBinSize);
 			cbxUseBlurring.Checked = context.UseBlurring;
+			rbNonLinearMag.Checked = Context.Model == AbsFluxModel.NonLinearMag;
+			rbNonLinearGain.Checked = Context.Model == AbsFluxModel.NonLinearGain;
+			rbLinear.Checked = Context.Model == AbsFluxModel.Linear;
 		}
 
 		private void btnOK_Click(object sender, EventArgs e)
@@ -36,6 +39,13 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			Context.ToWavelength = (int)nudMaxWavelength.Value;
 			Context.WavelengthBinSize = (int)nudResolution.Value;
 			Context.UseBlurring = cbxUseBlurring.Checked;
+
+			if (rbNonLinearMag.Checked)
+				Context.Model = AbsFluxModel.NonLinearMag;
+			else if (rbNonLinearGain.Checked)
+				Context.Model = AbsFluxModel.NonLinearGain;
+			else if (rbLinear.Checked)
+				Context.Model = AbsFluxModel.Linear;
 
 			DialogResult = DialogResult.OK;
 			Close();
