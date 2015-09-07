@@ -252,6 +252,19 @@ namespace Tangra.VideoTools
                             GenerateFrame(plateConstants, pixmap, stars, modelConfig);
 
                             DateTime startDT = zeroFrameDT.AddMilliseconds(40 * modelConfig.Integration * i);
+                            if (Math.Abs(modelConfig.LinearityCoefficient - 1) > 0.0001)
+                            {
+                                uint maxVal = pixmap.MaxSignalValue;
+                                double gammaCoeff = maxVal / Math.Pow((double)maxVal, modelConfig.LinearityCoefficient);
+                                for (int x = 0; x < pixmap.Width; x++)
+                                {
+                                    for (int y = 0; y < pixmap.Height; y++)
+                                    {
+                                        uint nonLinVal = (uint)Math.Round(gammaCoeff * Math.Pow(pixmap[x, y], modelConfig.LinearityCoefficient));
+                                        pixmap[x, y] = Math.Min(maxVal, Math.Max(0, nonLinVal));
+                                    }
+                                }
+                            }
                             AavFileCreator.AddVideoFrame(startDT, startDT.AddMilliseconds(40 * modelConfig.Integration), pixmap);
                         }
 
@@ -284,7 +297,7 @@ namespace Tangra.VideoTools
 
                 float iMax = ModelStarAmplitude(star, starMag, modelConfig);
                 
-                VideoModelUtils.GenerateStar(pixmap, (float)x, (float)y, (float)modelConfig.FWHM, iMax);
+                VideoModelUtils.GenerateStar(pixmap, (float)x, (float)y, (float)modelConfig.FWHM, iMax, 0 /*Use Gaussian */);
             }
         }
 

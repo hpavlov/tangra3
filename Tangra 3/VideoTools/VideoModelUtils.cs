@@ -129,12 +129,12 @@ namespace Tangra.VideoTools
             }
         }
 
-        public static void GenerateStar(Pixelmap pixelmap, float x0, float y0, float fwhm, float iMax)
+        public static void GenerateStar(Pixelmap pixelmap, float x0, float y0, float fwhm, float iMax, int psfModel)
         {
             double r0 = fwhm / (2 * Math.Sqrt(Math.Log(2)));
             int maxPsfModelDist = (int)(6 * fwhm);
             uint maxSignalValue = pixelmap.MaxSignalValue;
-
+            double fiveThirds = 5.0 / 3.0;
             for (int y = 0; y < pixelmap.Height; ++y)
             {
                 for (int x = 0; x < pixelmap.Width; ++x)
@@ -147,7 +147,13 @@ namespace Tangra.VideoTools
                         {
                             for (double dy = -0.5; dy < 0.5; dy += 0.1)
                             {
-                                double thisVal = Math.Min(maxSignalValue, Math.Max(0, iMax * Math.Exp(-((x + dx - x0) * (x + dx - x0) + (y + dy - y0) * (y + dy - y0)) / (r0 * r0))));
+                                double modelVal = 0;
+                                if (psfModel == 0) 
+                                    modelVal = iMax * Math.Exp(-((x + dx - x0) * (x + dx - x0) + (y + dy - y0) * (y + dy - y0)) / (r0 * r0));
+                                else if (psfModel == 1)
+                                    modelVal = iMax * Math.Exp(-(Math.Pow((x + dx - x0), fiveThirds) + Math.Pow((y + dy - y0), fiveThirds)) / (r0 * r0));
+
+                                double thisVal = Math.Min(maxSignalValue, Math.Max(0, modelVal));
                                 sum += thisVal;
                                 counter++;
                             }

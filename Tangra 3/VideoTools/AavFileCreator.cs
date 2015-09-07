@@ -102,7 +102,7 @@ namespace Tangra.VideoTools
 
             AdvLib.AdvFrameAddStatusTag64(STATUS_TAG_NTP_START_TIMESTAMP, (ulong)WindowsTicksToAavTicks(startTimeStamp.Ticks));
             AdvLib.AdvFrameAddStatusTag64(STATUS_TAG_NTP_END_TIMESTAMP, (ulong)WindowsTicksToAavTicks(endTimeStamp.Ticks));
-            AdvLib.AdvFrameAddStatusTag64(STATUS_TAG_NTP_TIME_ERROR, 320);
+            AdvLib.AdvFrameAddStatusTag16(STATUS_TAG_NTP_TIME_ERROR, 320);
 
             AdvLib.AdvFrameAddStatusTag(STATUS_TAG_EXPOSURE, string.Format("x{0}", s_IntegrationRate * 2));
 
