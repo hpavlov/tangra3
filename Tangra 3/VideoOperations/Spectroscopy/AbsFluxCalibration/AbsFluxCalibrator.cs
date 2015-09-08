@@ -174,141 +174,10 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 
 			if (numEquations > 2)
 			{
-				var airmasses = new List<double>();
-				var magnitudes = new List<double>();
-
-				for (int i = 0; i < standards[0].DeltaMagnitiudes.Count; i++)
-				{
-					if (FIT_METHOD == LinearFitMethod.LinearAlgebra)
-					{
-						if (Context.Model == AbsFluxModel.Linear || Context.Model == AbsFluxModel.NonLinearGain)
-						{
-							var A = new SafeMatrix(numEquations, 2);
-							var X = new SafeMatrix(numEquations, 1);
-
-							bool containsNaNs = false;
-
-							// Delta_Mag = A * X + B = Ke * X + Ks 
-							for (int j = 0; j < numEquations; j++)
-							{
-								A[j, 0] = standards[j].InputFile.AirMass;
-								A[j, 1] = 1;
-
-								double deltaMag = standards[j].DeltaMagnitiudes[i];
-								X[j, 0] = deltaMag;
-								if (double.IsNaN(deltaMag)) containsNaNs = true;
-							}
-
-							m_Wavelengths.Add(standards[0].ResolvedWavelengths[i]);
-							if (!containsNaNs)
-							{
-								SafeMatrix a_T = A.Transpose();
-								SafeMatrix aa = a_T * A;
-								SafeMatrix aa_inv = aa.Inverse();
-								SafeMatrix bx = (aa_inv * a_T) * X;
-
-								float ke = (float)bx[0, 0];
-								float ks = (float)bx[1, 0];
-
-								m_MagnitudeCoefficients.Add(1);
-								m_ExtinctionCoefficients.Add(ke);
-								m_SensitivityCoefficients.Add(ks);
-							}
-							else
-							{
-								m_MagnitudeCoefficients.Add(double.NaN);
-								m_ExtinctionCoefficients.Add(double.NaN);
-								m_SensitivityCoefficients.Add(double.NaN);
-							}
-
-						}
-						else if (Context.Model == AbsFluxModel.NonLinearMag)
-						{
-							var A = new SafeMatrix(numEquations, 3);
-							var X = new SafeMatrix(numEquations, 1);
-
-							bool containsNaNs = false;
-
-							// MagAbs = A * MagInst + B * X + C = Km * MagInst + Ke * X + Ks
-							for (int j = 0; j < numEquations; j++)
-							{
-								A[j, 0] = -2.5 * Math.Log10(standards[j].ObservedFluxes[i] / standards[j].InputFile.Exposure);
-								A[j, 1] = standards[j].InputFile.AirMass;
-								A[j, 2] = 1;
-
-								double absMag = -2.5 * Math.Log10(standards[j].AbsoluteFluxes[i]);
-								X[j, 0] = absMag;
-								if (double.IsNaN(absMag) || double.IsNaN(A[j, 0])) containsNaNs = true;
-							}
-
-							m_Wavelengths.Add(standards[0].ResolvedWavelengths[i]);
-							if (!containsNaNs)
-							{
-								SafeMatrix a_T = A.Transpose();
-								SafeMatrix aa = a_T * A;
-								SafeMatrix aa_inv = aa.Inverse();
-								SafeMatrix bx = (aa_inv * a_T) * X;
-
-								float km = (float)bx[0, 0];
-								float ke = (float)bx[1, 0];
-								float ks = (float)bx[2, 0];
-
-								m_MagnitudeCoefficients.Add(km);
-								m_ExtinctionCoefficients.Add(ke);
-								m_SensitivityCoefficients.Add(ks);
-							}
-							else
-							{
-								m_MagnitudeCoefficients.Add(double.NaN);
-								m_ExtinctionCoefficients.Add(double.NaN);
-								m_SensitivityCoefficients.Add(double.NaN);
-							}
-						}
-					}
-					else if (FIT_METHOD == LinearFitMethod.Fast)
-					{
-						bool containsNaNs = false;
-						airmasses.Clear();
-						magnitudes.Clear();
-						double Intercept;
-						double Slope;
-						for (int j = 0; j < numEquations; j++)
-						{
-							airmasses.Add(standards[j].InputFile.AirMass);
-
-							double deltaMag = standards[j].DeltaMagnitiudes[i];
-							if (double.IsNaN(deltaMag)) containsNaNs = true;
-							magnitudes.Add(deltaMag);
-						}
-
-						LinearFit_Fast(airmasses, magnitudes, out Intercept, out Slope);
-
-						if (!containsNaNs)
-						{
-							m_MagnitudeCoefficients.Add(1);
-							m_ExtinctionCoefficients.Add((float)Slope);
-							m_SensitivityCoefficients.Add((float)Intercept);
-						}
-						else
-						{
-							m_MagnitudeCoefficients.Add(double.NaN);
-							m_ExtinctionCoefficients.Add(double.NaN);
-							m_SensitivityCoefficients.Add(double.NaN);
-						}
-					}
-						
-				}
-
-				if (Context.Model == AbsFluxModel.NonLinearGain)
-				{
-					// TODO: Solve AbsMag = A * ObsMag + B
-
-					// TODO: Recompute DeltaMag as (AbsMag - A * ObsMag)
-
-					// TODO: Do another linear fit
-				}
+				CalibrateModelInternal(standards);
 
 				Trace.WriteLine("------------------------------------------");
+
 				for (int j = 0; j < numEquations; j++)
 				{
 					standards[j].Residuals.Clear();
@@ -333,7 +202,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 							standards[j].ResidualPercentageFlux.Add(100 * residualAbsoluteFluxOC / standards[j].AbsoluteFluxes[i]);
 							standards[j].ResidualObsFlux.Add(calculatedObservedFlux - standards[j].ObservedFluxes[i]);
 						}
-						else if (Context.Model == AbsFluxModel.NonLinearMag)
+						else if (Context.Model == AbsFluxModel.NonLinearMag || Context.Model == AbsFluxModel.NonLinearGain)
 						{
 							// AbsM = -2.5 * KM * Math.Log10((ObservedFluxes[i] / exposure)) + KE * AirMass + KS = -2.5 * Math.Log10(AbsoluteFluxes[i])
 							double calculatedAbsMag = 
@@ -382,7 +251,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 							double calculatedAbsoluteFlux = (programStars[j].ObservedFluxes[i] / programStars[j].InputFile.Exposure) / calculatedFluxRatio;
 							programStars[j].AbsoluteFluxes.Add(calculatedAbsoluteFlux);
 				        }
-						else if (Context.Model == AbsFluxModel.NonLinearMag)
+						else if (Context.Model == AbsFluxModel.NonLinearMag || Context.Model == AbsFluxModel.NonLinearGain)
 				        {
 							// AbsM = -2.5 * KM * Math.Log10((ObservedFluxes[i] / exposure)) + KE * AirMass + KS = -2.5 * Math.Log10(AbsoluteFluxes[i])
 							double calculatedAbsMag =
@@ -399,7 +268,168 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
                 #endregion
 
                 IsCalibrated = true;
-			}			
+			}
+		}
+
+		private void CalibrateModelInternal(List<AbsFluxSpectra> standards)
+		{
+			if (Context.Model == AbsFluxModel.Linear)
+			{
+				if (FIT_METHOD == LinearFitMethod.LinearAlgebra)
+					CalibrateLinearModelInternal(standards);
+				else if (FIT_METHOD == LinearFitMethod.Fast)
+					CalibrateLinearModelInternalFast(standards);
+			}
+			else if (Context.Model == AbsFluxModel.NonLinearMag)
+				CalibrateNonLinearMagModelInternal(standards);
+			else if (Context.Model == AbsFluxModel.NonLinearGain)
+				CalibrateNonLinearGainModelInternal(standards);
+		}
+
+		private void CalibrateNonLinearMagModelInternal(List<AbsFluxSpectra> standards)
+		{
+			m_MagnitudeCoefficients.Clear();
+			m_ExtinctionCoefficients.Clear();
+			m_SensitivityCoefficients.Clear();
+			m_Wavelengths.Clear();
+
+			for (int i = 0; i < standards[0].DeltaMagnitiudes.Count; i++)
+			{
+				var A = new SafeMatrix(standards.Count, 3);
+				var X = new SafeMatrix(standards.Count, 1);
+
+				bool containsNaNs = false;
+
+				// MagAbs = A * MagInst + B * X + C = Km * MagInst + Ke * X + Ks
+				for (int j = 0; j < standards.Count; j++)
+				{
+					A[j, 0] = -2.5 * Math.Log10(standards[j].ObservedFluxes[i] / standards[j].InputFile.Exposure);
+					A[j, 1] = standards[j].InputFile.AirMass;
+					A[j, 2] = 1;
+
+					double absMag = -2.5 * Math.Log10(standards[j].AbsoluteFluxes[i]);
+					X[j, 0] = absMag;
+					if (double.IsNaN(absMag) || double.IsNaN(A[j, 0])) containsNaNs = true;
+				}
+
+				m_Wavelengths.Add(standards[0].ResolvedWavelengths[i]);
+				if (!containsNaNs)
+				{
+					SafeMatrix a_T = A.Transpose();
+					SafeMatrix aa = a_T * A;
+					SafeMatrix aa_inv = aa.Inverse();
+					SafeMatrix bx = (aa_inv * a_T) * X;
+
+					float km = (float)bx[0, 0];
+					float ke = (float)bx[1, 0];
+					float ks = (float)bx[2, 0];
+
+					m_MagnitudeCoefficients.Add(km);
+					m_ExtinctionCoefficients.Add(ke);
+					m_SensitivityCoefficients.Add(ks);
+				}
+				else
+				{
+					m_MagnitudeCoefficients.Add(double.NaN);
+					m_ExtinctionCoefficients.Add(double.NaN);
+					m_SensitivityCoefficients.Add(double.NaN);
+				}
+			}
+		}
+
+		private void CalibrateLinearModelInternalFast(List<AbsFluxSpectra> standards)
+		{
+			var airmasses = new List<double>();
+			var magnitudes = new List<double>();
+
+			for (int i = 0; i < standards[0].DeltaMagnitiudes.Count; i++)
+			{
+				bool containsNaNs = false;
+				airmasses.Clear();
+				magnitudes.Clear();
+				double Intercept;
+				double Slope;
+				for (int j = 0; j < standards.Count; j++)
+				{
+					airmasses.Add(standards[j].InputFile.AirMass);
+
+					double deltaMag = standards[j].DeltaMagnitiudes[i];
+					if (double.IsNaN(deltaMag)) containsNaNs = true;
+					magnitudes.Add(deltaMag);
+				}
+
+				LinearFit_Fast(airmasses, magnitudes, out Intercept, out Slope);
+
+				if (!containsNaNs)
+				{
+					m_MagnitudeCoefficients.Add(1);
+					m_ExtinctionCoefficients.Add((float)Slope);
+					m_SensitivityCoefficients.Add((float)Intercept);
+				}
+				else
+				{
+					m_MagnitudeCoefficients.Add(double.NaN);
+					m_ExtinctionCoefficients.Add(double.NaN);
+					m_SensitivityCoefficients.Add(double.NaN);
+				}
+			}
+		}
+
+		private void CalibrateLinearModelInternal(List<AbsFluxSpectra> standards)
+		{
+			m_MagnitudeCoefficients.Clear();
+			m_ExtinctionCoefficients.Clear();
+			m_SensitivityCoefficients.Clear();
+			m_Wavelengths.Clear();
+
+			for (int i = 0; i < standards[0].DeltaMagnitiudes.Count; i++)
+			{
+				var A = new SafeMatrix(standards.Count, 2);
+				var X = new SafeMatrix(standards.Count, 1);
+
+				bool containsNaNs = false;
+
+				// Delta_Mag = A * X + B = Ke * X + Ks 
+				for (int j = 0; j < standards.Count; j++)
+				{
+					A[j, 0] = standards[j].InputFile.AirMass;
+					A[j, 1] = 1;
+
+					double deltaMag = standards[j].DeltaMagnitiudes[i];
+					X[j, 0] = deltaMag;
+					if (double.IsNaN(deltaMag)) containsNaNs = true;
+				}
+
+				m_Wavelengths.Add(standards[0].ResolvedWavelengths[i]);
+				if (!containsNaNs)
+				{
+					SafeMatrix a_T = A.Transpose();
+					SafeMatrix aa = a_T * A;
+					SafeMatrix aa_inv = aa.Inverse();
+					SafeMatrix bx = (aa_inv * a_T) * X;
+
+					float ke = (float)bx[0, 0];
+					float ks = (float)bx[1, 0];
+
+					m_MagnitudeCoefficients.Add(1);
+					m_ExtinctionCoefficients.Add(ke);
+					m_SensitivityCoefficients.Add(ks);
+				}
+				else
+				{
+					m_MagnitudeCoefficients.Add(double.NaN);
+					m_ExtinctionCoefficients.Add(double.NaN);
+					m_SensitivityCoefficients.Add(double.NaN);
+				}
+			}
+		}
+
+		private void CalibrateNonLinearGainModelInternal(List<AbsFluxSpectra> standards)
+		{
+			CalibrateNonLinearMagModelInternal(standards);
+
+			double medianKM = m_ExtinctionCoefficients.Median();
+			m_ExtinctionCoefficients = m_ExtinctionCoefficients.Select(x => medianKM).ToList();
 		}
 
 		private const int PADDING = 10;
