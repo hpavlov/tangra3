@@ -571,14 +571,14 @@ void BuildGammaTableForBpp(int bpp, unsigned long normVal, float gamma)
 		GetMinMaxValuesForBpp(bpp, normVal, &minValue, &maxValue);
 
 		float decodingGamma = 1.0f / gamma;
-		float gammaPixelConvCoeff = maxValue / pow(maxValue, decodingGamma);
+		float gammaPixelConvCoeff = (float)maxValue / pow((float)maxValue, decodingGamma);
 
 		s_GammaTable = (unsigned int*)malloc((maxValue + 1) * sizeof(unsigned int));
 
 		unsigned int* itt = s_GammaTable;
 
 		for (int idx = 0; idx <= maxValue; idx++) {
-			float conversionValue =  gammaPixelConvCoeff * pow(idx, decodingGamma);
+			float conversionValue =  gammaPixelConvCoeff * pow((float)idx, decodingGamma);
 			if (conversionValue + 0.5 >= maxValue)
 				*itt = maxValue;
 			else if (conversionValue + 0.5 < minValue)
