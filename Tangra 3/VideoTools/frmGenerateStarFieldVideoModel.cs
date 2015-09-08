@@ -215,8 +215,7 @@ namespace Tangra.VideoTools
             try
             {
                 ModelConfig modelConfig = (ModelConfig)state;
-                int bitPix = modelConfig.IsAAVFile ? 16 : 8;
-
+                
                 modelConfig.MaxPixelValue = modelConfig.IsAAVFile ? (uint)modelConfig.Integration * 255 : 255;
 
                 double dxRad = modelConfig.FrameWidth * modelConfig.PlatePixWidth / (modelConfig.PlateFocLength * 1000.0);
@@ -226,61 +225,109 @@ namespace Tangra.VideoTools
                 var catFac = new StarCatalogueFacade(TangraConfig.Settings.StarCatalogue);
                 List<IStar> stars = catFac.GetStarsInRegion(m_RA * 15, m_DE, 2 * fovDeg, modelConfig.LimitStarMag, 2000);
 
-                AavFileCreator.CloseFile();
-                AavFileCreator.StartNewFile(modelConfig.FileName, modelConfig.FrameWidth, modelConfig.FrameHeight, modelConfig.Integration);
-                try
-                {
-                    //Pixelmap pixmap = new Pixelmap(modelConfig.FrameWidth, modelConfig.FrameHeight, bitPix, new uint[modelConfig.FrameWidth * modelConfig.FrameHeight], null, null);
-                    //AddOnScreenText(bmp, modelConfig, "The simulated video stars from the next frame");
-                    //TangraVideo.AddAviVideoFrame(pixmap, modelConfig.Gamma, null);
-
-                    int[,] simulatedBackground = new int[modelConfig.FrameWidth, modelConfig.FrameHeight];
-                    for (int x = 0; x < modelConfig.FrameWidth; x++)
-                        for (int y = 0; y < modelConfig.FrameHeight; y++)
-                        {
-                            simulatedBackground[x, y] = 0;
-                        }
-                    DateTime zeroFrameDT = DateTime.UtcNow;
-
-                    for (int i = 0; i <= modelConfig.TotalFrames; i++)
-                    {
-                        using (Pixelmap pixmap = new Pixelmap(modelConfig.FrameWidth, modelConfig.FrameHeight, bitPix, new uint[modelConfig.FrameWidth*modelConfig.FrameHeight], null, null))
-                        {
-                            pixmap.SetMaxSignalValue((uint)(255 * modelConfig.Integration));
-
-                            VideoModelUtils.GenerateNoise(pixmap, simulatedBackground, modelConfig.NoiseMean * modelConfig.Integration, modelConfig.NoiseStdDev * modelConfig.Integration);
-                            GenerateFrame(pixmap, stars, modelConfig);
-
-                            DateTime startDT = zeroFrameDT.AddMilliseconds(40 * modelConfig.Integration * i);
-                            if (Math.Abs(modelConfig.LinearityCoefficient - 1) > 0.0001)
-                            {
-                                uint maxVal = pixmap.MaxSignalValue;
-                                double gammaCoeff = maxVal / Math.Pow((double)maxVal, modelConfig.LinearityCoefficient);
-                                for (int x = 0; x < pixmap.Width; x++)
-                                {
-                                    for (int y = 0; y < pixmap.Height; y++)
-                                    {
-                                        uint nonLinVal = (uint)Math.Round(gammaCoeff * Math.Pow(pixmap[x, y], modelConfig.LinearityCoefficient));
-                                        pixmap[x, y] = Math.Min(maxVal, Math.Max(0, nonLinVal));
-                                    }
-                                }
-                            }
-                            AavFileCreator.AddVideoFrame(startDT, startDT.AddMilliseconds(40 * modelConfig.Integration), pixmap);
-                        }
-
-                        InvokeUpdateUI(2, (int)(100.0 * i / modelConfig.TotalFrames), true);
-                    }
-                }
-                finally
-                {
-                    AavFileCreator.CloseFile();
-                }
+				if (modelConfig.IsAAVFile)
+					GenerateAAVVideo(modelConfig, stars);
+				else
+					GenerateAVIVideo(modelConfig, stars);
             }
             finally
             {
                 InvokeUpdateUI(2, 100, false);
             }
         }
+
+		private void GenerateAVIVideo(ModelConfig modelConfig, List<IStar> stars)
+	    {
+			TangraVideo.CloseAviFile();
+			TangraVideo.StartNewAviFile(modelConfig.FileName, modelConfig.FrameWidth, modelConfig.FrameHeight, 8, 25, false);
+
+			try
+			{
+				//Pixelmap pixmap = new Pixelmap(modelConfig.FrameWidth, modelConfig.FrameHeight, bitPix, new uint[modelConfig.FrameWidth * modelConfig.FrameHeight], null, null);
+				//AddOnScreenText(bmp, modelConfig, "The simulated video stars from the next frame");
+				//TangraVideo.AddAviVideoFrame(pixmap, modelConfig.Gamma, null);
+
+				int[,] simulatedBackground = new int[modelConfig.FrameWidth, modelConfig.FrameHeight];
+				for (int x = 0; x < modelConfig.FrameWidth; x++)
+					for (int y = 0; y < modelConfig.FrameHeight; y++)
+					{
+						simulatedBackground[x, y] = 0;
+					}
+
+				for (int i = 0; i <= modelConfig.TotalFrames; i++)
+				{
+					using (Pixelmap pixmap = new Pixelmap(modelConfig.FrameWidth, modelConfig.FrameHeight, 16, new uint[modelConfig.FrameWidth * modelConfig.FrameHeight], null, null))
+					{
+						pixmap.SetMaxSignalValue((uint)(255 * modelConfig.Integration));
+
+						VideoModelUtils.GenerateNoise(pixmap, simulatedBackground, modelConfig.NoiseMean * modelConfig.Integration, modelConfig.NoiseStdDev * modelConfig.Integration);
+						GenerateFrame(pixmap, stars, modelConfig);
+
+						TangraVideo.AddAviVideoFrame(pixmap, modelConfig.LinearityCoefficient, (int)pixmap.MaxSignalValue);
+					}
+
+					InvokeUpdateUI(2, (int)(100.0 * i / modelConfig.TotalFrames), true);
+				}
+			}
+			finally
+			{
+				TangraVideo.CloseAviFile();
+			}
+	    }
+
+		private void GenerateAAVVideo(ModelConfig modelConfig, List<IStar> stars)
+	    {
+			AavFileCreator.CloseFile();
+			AavFileCreator.StartNewFile(modelConfig.FileName, modelConfig.FrameWidth, modelConfig.FrameHeight, modelConfig.Integration);
+
+			try
+			{
+				//Pixelmap pixmap = new Pixelmap(modelConfig.FrameWidth, modelConfig.FrameHeight, bitPix, new uint[modelConfig.FrameWidth * modelConfig.FrameHeight], null, null);
+				//AddOnScreenText(bmp, modelConfig, "The simulated video stars from the next frame");
+				//TangraVideo.AddAviVideoFrame(pixmap, modelConfig.Gamma, null);
+
+				int[,] simulatedBackground = new int[modelConfig.FrameWidth, modelConfig.FrameHeight];
+				for (int x = 0; x < modelConfig.FrameWidth; x++)
+					for (int y = 0; y < modelConfig.FrameHeight; y++)
+					{
+						simulatedBackground[x, y] = 0;
+					}
+				DateTime zeroFrameDT = DateTime.UtcNow;
+
+				for (int i = 0; i <= modelConfig.TotalFrames; i++)
+				{
+					using (Pixelmap pixmap = new Pixelmap(modelConfig.FrameWidth, modelConfig.FrameHeight, 16, new uint[modelConfig.FrameWidth * modelConfig.FrameHeight], null, null))
+					{
+						pixmap.SetMaxSignalValue((uint)(255 * modelConfig.Integration));
+
+						VideoModelUtils.GenerateNoise(pixmap, simulatedBackground, modelConfig.NoiseMean * modelConfig.Integration, modelConfig.NoiseStdDev * modelConfig.Integration);
+						GenerateFrame(pixmap, stars, modelConfig);
+
+						DateTime startDT = zeroFrameDT.AddMilliseconds(40 * modelConfig.Integration * i);
+						if (Math.Abs(modelConfig.LinearityCoefficient - 1) > 0.0001)
+						{
+							uint maxVal = pixmap.MaxSignalValue;
+							double gammaCoeff = maxVal / Math.Pow((double)maxVal, modelConfig.LinearityCoefficient);
+							for (int x = 0; x < pixmap.Width; x++)
+							{
+								for (int y = 0; y < pixmap.Height; y++)
+								{
+									uint nonLinVal = (uint)Math.Round(gammaCoeff * Math.Pow(pixmap[x, y], modelConfig.LinearityCoefficient));
+									pixmap[x, y] = Math.Min(maxVal, Math.Max(0, nonLinVal));
+								}
+							}
+						}
+						AavFileCreator.AddVideoFrame(startDT, startDT.AddMilliseconds(40 * modelConfig.Integration), pixmap);
+					}
+
+					InvokeUpdateUI(2, (int)(100.0 * i / modelConfig.TotalFrames), true);
+				}
+			}
+			finally
+			{
+				AavFileCreator.CloseFile();
+			}
+	    }
 
 		private void GetOnPlateCoordinates(double raDeg, double deDeg, ModelConfig modelConfig, out double x, out double y)
 	    {
