@@ -24,6 +24,18 @@ namespace Tangra.Astrometry
 		private AstroPlate m_Image;
 		private string m_InfoString;
 
+		public TangentalTransRotAstrometry(double cellWidth, double cellHeight, double focalLength, double RA0Deg, double DE0Deg, double EtaDeg)
+		{
+			EtaRadians = EtaDeg * Math.PI / 180;
+			this.m_RA0Deg = RA0Deg;
+			this.m_DE0Deg = DE0Deg;
+
+			this.cellWidth = cellWidth;
+			this.cellHeight = cellHeight;
+			this.focalLength = focalLength;
+			m_InfoString = string.Format("Tangental [{0}; {1}; {2}]", cellWidth.ToString("0.00"), cellHeight.ToString("0.00"), focalLength.ToString("0.0"));
+		}
+
 		public TangentalTransRotAstrometry(AstroPlate image, double RA0Deg, double DE0Deg, double EtaDeg)
 		{
 			m_Image = image;
