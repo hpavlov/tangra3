@@ -139,7 +139,8 @@ HRESULT ADVGetFrame(long frameNo, unsigned long* pixels, unsigned long* original
 	HRESULT rv = ADVGetFramePixels(frameNo, pixels, frameInfo, gpsFix, userCommand, systemError);
 	if (SUCCEEDED(rv))
 	{
-		if (g_UsesPreProcessing) 
+		if (g_UsesPreProcessing && 
+		    frameInfo->IntegratedFrames > 0 /*Not the first/last control frame*/) 
 		{
 			memcpy(originalPixels, pixels, g_TangraAdvFile->ImageSection->Width * g_TangraAdvFile->ImageSection->Height * sizeof(unsigned long));
 			

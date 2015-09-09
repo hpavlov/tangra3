@@ -326,8 +326,6 @@ HRESULT GetPixelMapBits(BYTE* pDIB, long* width, long* height, DWORD imageSize, 
 
 HRESULT GetPixelMapBitsAndHBitmap(BYTE* pDIB, long* width, long* height, DWORD imageSize, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, HBITMAP hBitmap)
 {
-	//OutputDebugString("GetPixelMapBitsAndHBitmap.214");
-
 	BITMAPINFOHEADER bih;
 	memmove(&bih.biSize, pDIB, sizeof(BITMAPINFOHEADER));
 
@@ -553,12 +551,14 @@ void GetMinMaxValuesForBpp(int bpp, unsigned long normVal, int* minValue, int* m
 }
 
 int s_GammaTableBpp = 0;
+int s_GammaTableNormVal = 0;
 float s_GammaTableEncodingGamma = 1.0f;
 unsigned int* s_GammaTable = NULL;
 
 void BuildGammaTableForBpp(int bpp, unsigned long normVal, float gamma)
 {
 	if (s_GammaTableBpp != bpp ||
+		s_GammaTableNormVal != normVal ||
 	    ABS(s_GammaTableEncodingGamma - gamma) >= 0.01) {
 		if (NULL != s_GammaTable) {
 			delete s_GammaTable;
@@ -590,6 +590,7 @@ void BuildGammaTableForBpp(int bpp, unsigned long normVal, float gamma)
 		}
 
 		s_GammaTableBpp = bpp;
+		s_GammaTableNormVal = normVal;
 		s_GammaTableEncodingGamma = gamma;
 	}
 }
