@@ -39,6 +39,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 		public int WavelengthBinSize;
 		public bool UseBlurring;
 		public AbsFluxModel Model;
+		public bool UseFwhmNormalisation;
 	}
 
 	public class AbsFluxCalibrator
@@ -82,7 +83,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 		{
 			if (!m_SpectraList.Any(x => x.FullFilePath.Equals(spectra.FullFilePath, StringComparison.InvariantCultureIgnoreCase)))
 			{
-				spectra.RescaleToResolution(Context.FromWavelength, Context.ToWavelength, Context.WavelengthBinSize, Context.UseBlurring);
+				spectra.RescaleToResolution(Context.FromWavelength, Context.ToWavelength, Context.WavelengthBinSize, Context.UseBlurring, Context.UseFwhmNormalisation);
 				m_SpectraList.Add(spectra);
 
 				AssignNumbers();
@@ -125,7 +126,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			Context = context;
 			foreach (AbsFluxSpectra spectra in m_SpectraList)
 			{
-				spectra.RescaleToResolution(Context.FromWavelength, Context.ToWavelength, Context.WavelengthBinSize, Context.UseBlurring);
+				spectra.RescaleToResolution(Context.FromWavelength, Context.ToWavelength, Context.WavelengthBinSize, Context.UseBlurring, Context.UseFwhmNormalisation);
 			}
 			Calibrate();
 		}

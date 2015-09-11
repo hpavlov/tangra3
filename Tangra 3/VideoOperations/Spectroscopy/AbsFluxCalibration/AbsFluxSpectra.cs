@@ -114,7 +114,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			get { return InputFile.FullPath; }			
 		}
 
-		internal void RescaleToResolution(int fromWavelength, int toWavelength, int step, bool useBlurring)
+		internal void RescaleToResolution(int fromWavelength, int toWavelength, int step, bool useBlurring, bool useFwhmNormalisation)
 		{
 			WavelengthFrom = fromWavelength - (int)Math.Ceiling(step / 2.0);
 			WavelengthBinSize = step;
@@ -129,9 +129,13 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 
 				DeltaMagnitiudes.Clear();
 				double exposure = InputFile.Exposure;
+				double fwhm = !float.IsNaN(InputFile.FHWM) ? InputFile.FHWM : 1;
 				for (int i = 0; i < ObservedFluxes.Count; i++)
 				{
-					DeltaMagnitiudes.Add(-2.5 * Math.Log10((ObservedFluxes[i] / exposure) / AbsoluteFluxes[i]));
+					if (useFwhmNormalisation)
+						DeltaMagnitiudes.Add(-2.5 * Math.Log10((ObservedFluxes[i] / (exposure * fwhm)) / AbsoluteFluxes[i]));
+					else
+						DeltaMagnitiudes.Add(-2.5 * Math.Log10((ObservedFluxes[i] / exposure) / AbsoluteFluxes[i]));
 				}
 			}
 		}

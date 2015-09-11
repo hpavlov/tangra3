@@ -21,6 +21,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 		private double m_JD;
 		private DateTime m_EpochUT;
 		public float AirMass { get; private set; }
+		public float FHWM { get; private set; }
 		private float m_Gain;
 		public float Exposure { get; private set; }
 		private float m_Dispersion;
@@ -80,6 +81,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 		private void LoadExportedSpectraFile(string filePath)
 		{
 			AirMass = float.NaN;
+			FHWM = float.NaN;
 			Exposure = float.NaN;
 			RAHours = float.NaN;
 			DEDeg = float.NaN;
@@ -174,6 +176,10 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			else if (name == "X")
 			{
 				if (float.TryParse(value, out floatVal)) AirMass = floatVal;
+			}
+			else if (name == "FWHM")
+			{
+				if (float.TryParse(value, out floatVal)) FHWM = floatVal;
 			}
 			else if (name == "GAIN") float.TryParse(value, out m_Gain);
 			else if (name == "EXPOSURE")

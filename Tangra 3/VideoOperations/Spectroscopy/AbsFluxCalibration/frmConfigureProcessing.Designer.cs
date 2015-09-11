@@ -44,6 +44,7 @@
 			this.rbNonLinearMag = new System.Windows.Forms.RadioButton();
 			this.rbNonLinearGain = new System.Windows.Forms.RadioButton();
 			this.label7 = new System.Windows.Forms.Label();
+			this.cbxFWHMNormalisation = new System.Windows.Forms.CheckBox();
 			((System.ComponentModel.ISupportInitialize)(this.nudResolution)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudMaxWavelength)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudMinWavelength)).BeginInit();
@@ -241,11 +242,22 @@
 			this.label7.TabIndex = 35;
 			this.label7.Text = "AbsFlux Model:";
 			// 
+			// cbxFWHMNormalisation
+			// 
+			this.cbxFWHMNormalisation.AutoSize = true;
+			this.cbxFWHMNormalisation.Location = new System.Drawing.Point(128, 108);
+			this.cbxFWHMNormalisation.Name = "cbxFWHMNormalisation";
+			this.cbxFWHMNormalisation.Size = new System.Drawing.Size(148, 17);
+			this.cbxFWHMNormalisation.TabIndex = 36;
+			this.cbxFWHMNormalisation.Text = "Use FWHM Normalisation";
+			this.cbxFWHMNormalisation.UseVisualStyleBackColor = true;
+			// 
 			// frmConfigureProcessing
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(292, 273);
+			this.Controls.Add(this.cbxFWHMNormalisation);
 			this.Controls.Add(this.label7);
 			this.Controls.Add(this.rbNonLinearGain);
 			this.Controls.Add(this.rbNonLinearMag);
@@ -292,5 +304,6 @@
 		private System.Windows.Forms.RadioButton rbNonLinearMag;
 		private System.Windows.Forms.RadioButton rbNonLinearGain;
 		private System.Windows.Forms.Label label7;
+		private System.Windows.Forms.CheckBox cbxFWHMNormalisation;
 	}
 }
