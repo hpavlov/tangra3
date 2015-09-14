@@ -16,10 +16,12 @@ using Tangra.Model.Config;
 using Tangra.Model.Context;
 using Tangra.Model.Helpers;
 using Tangra.Model.Image;
+using Tangra.Model.VideoOperations;
 using Tangra.PInvoke;
 using Tangra.StarCatalogues;
 using Tangra.StarCatalogues.UCAC4;
 using Tangra.VideoOperations.Astrometry;
+using Tangra.VideoOperations.MakeDarkFlatField;
 
 namespace Tangra.VideoTools
 {
@@ -45,6 +47,7 @@ namespace Tangra.VideoTools
             public int FrameWidth;
             public int FrameHeight;
             public int NoiseMean;
+	        public int DarkFrameMean;
             public uint MaxPixelValue;
             public int NoiseStdDev;
             public int FlickeringStdDev;
@@ -70,13 +73,23 @@ namespace Tangra.VideoTools
         }
 
 
-        public frmGenerateStarFieldVideoModel()
-        {
-            InitializeComponent();
+	    private int[,] m_SimulatedDarkFrame;
+	    private IVideoController m_VideoController;
+
+	    public frmGenerateStarFieldVideoModel()
+	    {
+		    InitializeComponent();
+	    }
+
+	    public frmGenerateStarFieldVideoModel(IVideoController videoController)
+			: this()
+	    {
+		    m_VideoController = videoController;
 
             cbxVideoFormat.SelectedIndex = 0;
             cbxAAVIntegration.SelectedIndex = 5;
             cbxPhotometricFilter.SelectedIndex = 3;
+	        m_SimulatedDarkFrame = null;
         }
 
         private void cbxVideoFormat_SelectedIndexChanged(object sender, EventArgs e)
@@ -159,7 +172,8 @@ namespace Tangra.VideoTools
                     PlateFocLength = (double)nudPlateFocLength.Value,
                     PhotometricFilter = (ModelledFilter)cbxPhotometricFilter.SelectedIndex,
                     BVSlope = (double)nudBVSlope.Value,
-                    LinearityCoefficient = (double)nudNonLinearity.Value
+                    LinearityCoefficient = (double)nudNonLinearity.Value,
+					DarkFrameMean = cbxProduceDark.Checked ? (int)nudDarkMean.Value : 0 
                 };
 
 				config.PlateRotAngleRadians = (double)nudPlateRotation.Value * Math.PI / 180.0; 
@@ -229,6 +243,27 @@ namespace Tangra.VideoTools
 					GenerateAAVVideo(modelConfig, stars);
 				else
 					GenerateAVIVideo(modelConfig, stars);
+
+				if (modelConfig.DarkFrameMean > 0 && cbxPhotometricFilter != null)
+				{
+					// Save the dark frame 
+					float[,] averagedFrame = new float[modelConfig.FrameWidth, modelConfig.FrameHeight];
+					for (int x = 0; x < modelConfig.FrameWidth; x++)
+					for (int y = 0; y < modelConfig.FrameHeight; y++)
+					{
+						averagedFrame[x, y] = m_SimulatedDarkFrame[x, y];
+					}
+
+					string fileName = null;
+					if (m_VideoController.ShowSaveFileDialog(
+						"Save Simulated Dark fame",
+						"FITS Image (*.fit)|*.fit",
+						ref fileName, this) == DialogResult.OK)
+					{
+						MakeDarkFlatOperation.SaveDarkOrFlatFrame("", modelConfig.FrameWidth, modelConfig.FrameHeight, string.Format("Simulated dark frame from Mean {0} +/- 1", modelConfig.DarkFrameMean), averagedFrame, 0, modelConfig.TotalFrames);
+					}
+					
+				}
             }
             finally
             {
@@ -247,20 +282,31 @@ namespace Tangra.VideoTools
 				//AddOnScreenText(bmp, modelConfig, "The simulated video stars from the next frame");
 				//TangraVideo.AddAviVideoFrame(pixmap, modelConfig.Gamma, null);
 
-				int[,] simulatedBackground = new int[modelConfig.FrameWidth, modelConfig.FrameHeight];
+				uint maxSignalValue = (uint)(255 * modelConfig.Integration);
+
+				Random rndGen = new Random((int)DateTime.Now.Ticks);
+				m_SimulatedDarkFrame = new int[modelConfig.FrameWidth, modelConfig.FrameHeight];
 				for (int x = 0; x < modelConfig.FrameWidth; x++)
 					for (int y = 0; y < modelConfig.FrameHeight; y++)
 					{
-						simulatedBackground[x, y] = 0;
+						if (modelConfig.DarkFrameMean > 0)
+						{
+							double randomPeak = rndGen.Next(0, 100) == 66 ? 255 : 0;
+							double darkPixel = Math.Abs(VideoModelUtils.Random((modelConfig.DarkFrameMean + randomPeak)* modelConfig.Integration, 1));
+							double bgPixel = Math.Min(maxSignalValue, Math.Max(0, darkPixel));
+							m_SimulatedDarkFrame[x, y] = (int)bgPixel;
+						}
+						else
+							m_SimulatedDarkFrame[x, y] = 0;
 					}
 
 				for (int i = 0; i <= modelConfig.TotalFrames; i++)
 				{
 					using (Pixelmap pixmap = new Pixelmap(modelConfig.FrameWidth, modelConfig.FrameHeight, 16, new uint[modelConfig.FrameWidth * modelConfig.FrameHeight], null, null))
 					{
-						pixmap.SetMaxSignalValue((uint)(255 * modelConfig.Integration));
+						pixmap.SetMaxSignalValue(maxSignalValue);
 
-						VideoModelUtils.GenerateNoise(pixmap, simulatedBackground, modelConfig.NoiseMean * modelConfig.Integration, modelConfig.NoiseStdDev * modelConfig.Integration);
+						VideoModelUtils.GenerateNoise(pixmap, m_SimulatedDarkFrame, modelConfig.NoiseMean * modelConfig.Integration, modelConfig.NoiseStdDev * modelConfig.Integration);
 						GenerateFrame(pixmap, stars, modelConfig);
 
 						TangraVideo.AddAviVideoFrame(pixmap, modelConfig.LinearityCoefficient, (int)pixmap.MaxSignalValue);
@@ -285,22 +331,33 @@ namespace Tangra.VideoTools
 				//Pixelmap pixmap = new Pixelmap(modelConfig.FrameWidth, modelConfig.FrameHeight, bitPix, new uint[modelConfig.FrameWidth * modelConfig.FrameHeight], null, null);
 				//AddOnScreenText(bmp, modelConfig, "The simulated video stars from the next frame");
 				//TangraVideo.AddAviVideoFrame(pixmap, modelConfig.Gamma, null);
+				DateTime zeroFrameDT = DateTime.UtcNow;
 
-				int[,] simulatedBackground = new int[modelConfig.FrameWidth, modelConfig.FrameHeight];
+				uint maxSignalValue = (uint)(255 * modelConfig.Integration);
+
+				Random rndGen = new Random((int)DateTime.Now.Ticks);
+				m_SimulatedDarkFrame = new int[modelConfig.FrameWidth, modelConfig.FrameHeight];
 				for (int x = 0; x < modelConfig.FrameWidth; x++)
 					for (int y = 0; y < modelConfig.FrameHeight; y++)
 					{
-						simulatedBackground[x, y] = 0;
+						if (modelConfig.DarkFrameMean > 0)
+						{
+							double randomPeak = rndGen.Next(0, 100) == 66 ? 255 : 0;
+							double darkPixel = Math.Abs(VideoModelUtils.Random((modelConfig.DarkFrameMean + randomPeak) * modelConfig.Integration, 1));
+							double bgPixel = Math.Min(maxSignalValue, Math.Max(0, darkPixel));
+							m_SimulatedDarkFrame[x, y] = (int)bgPixel;
+						}
+						else
+							m_SimulatedDarkFrame[x, y] = 0;
 					}
-				DateTime zeroFrameDT = DateTime.UtcNow;
 
 				for (int i = 0; i <= modelConfig.TotalFrames; i++)
 				{
 					using (Pixelmap pixmap = new Pixelmap(modelConfig.FrameWidth, modelConfig.FrameHeight, 16, new uint[modelConfig.FrameWidth * modelConfig.FrameHeight], null, null))
 					{
-						pixmap.SetMaxSignalValue((uint)(255 * modelConfig.Integration));
+						pixmap.SetMaxSignalValue(maxSignalValue);
 
-						VideoModelUtils.GenerateNoise(pixmap, simulatedBackground, modelConfig.NoiseMean * modelConfig.Integration, modelConfig.NoiseStdDev * modelConfig.Integration);
+						VideoModelUtils.GenerateNoise(pixmap, m_SimulatedDarkFrame, modelConfig.NoiseMean * modelConfig.Integration, modelConfig.NoiseStdDev * modelConfig.Integration);
 						GenerateFrame(pixmap, stars, modelConfig);
 
 						DateTime startDT = zeroFrameDT.AddMilliseconds(40 * modelConfig.Integration * i);
@@ -379,7 +436,7 @@ namespace Tangra.VideoTools
                 }
             }
 
-            return (float)((double)(modelConfig.MaxPixelValue - modelConfig.NoiseMean * modelConfig.Integration) / Math.Pow(10, (starMag - modelConfig.BrighestUnsaturatedStarMag) / 2.5));
+            return (float)((double)(modelConfig.MaxPixelValue - (modelConfig.NoiseMean + modelConfig.DarkFrameMean) * modelConfig.Integration) / Math.Pow(10, (starMag - modelConfig.BrighestUnsaturatedStarMag) / 2.5));
         }
 
         private float GetStarMag(IStar star, ModelledFilter filter)
@@ -426,5 +483,10 @@ namespace Tangra.VideoTools
 
             return (float)star.Mag;
         }
+
+		private void cbxProduceDark_CheckedChanged(object sender, EventArgs e)
+		{
+			nudDarkMean.Enabled = cbxProduceDark.Checked;
+		}
     }
 }

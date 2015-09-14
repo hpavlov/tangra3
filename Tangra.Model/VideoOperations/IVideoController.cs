@@ -15,7 +15,7 @@ namespace Tangra.Model.VideoOperations
         
 		DialogResult ShowMessageBox(string message, string title, MessageBoxButtons buttons, MessageBoxIcon icon);
 		DialogResult ShowMessageBox(string message, string title, MessageBoxButtons buttons, MessageBoxIcon icon, MessageBoxDefaultButton defaultButton);
-		DialogResult ShowSaveFileDialog(string title, string filter, ref string fileName);
+		DialogResult ShowSaveFileDialog(string title, string filter, ref string fileName, IWin32Window ownerWindow = null);
 		DialogResult ShowOpenFileDialog(string title, string filter, out string fileName);
         
 		void UpdateViews();

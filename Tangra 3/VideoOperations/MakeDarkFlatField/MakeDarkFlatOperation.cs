@@ -138,43 +138,9 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
 							"FITS Image (*.fit)|*.fit", 
 							ref fileName) == DialogResult.OK)
 						{
-							Fits f = new Fits();
-								
-							object data = SaveImageData(m_AveragedData); 
-
-							BasicHDU imageHDU = Fits.MakeHDU(data);
-
-							nom.tam.fits.Header hdr = imageHDU.Header;
-							hdr.AddValue("SIMPLE", "T", null);
-
-							hdr.AddValue("BITPIX", -32 /* Floating Point Data*/, null);
-							hdr.AddValue("NAXIS", 2, null);
-							hdr.AddValue("NAXIS1", currPixelmap.Width, null);
-							hdr.AddValue("NAXIS2", currPixelmap.Height, null);
-
 							string notes = string.Format("{0} generated from {1}", m_FrameType.ToString(), Path.GetFileNameWithoutExtension(m_VideoController.CurrentVideoFileName));
-							if (notes.Length > HeaderCard.MAX_VALUE_LENGTH) notes = notes.Substring(0, HeaderCard.MAX_VALUE_LENGTH);
-							hdr.AddValue("NOTES", notes, null);
 
-						    if (m_ExposureSeconds > 0)
-						    {
-						        hdr.AddValue("EXPOSURE", m_ExposureSeconds.ToString("0.000", CultureInfo.InvariantCulture), null);
-                                hdr.AddValue("EXPTIME", m_ExposureSeconds.ToString("0.000", CultureInfo.InvariantCulture), null);
-						    }
-
-                            hdr.AddValue("SNAPSHOT", m_NumFrames.ToString(), null);
-                            hdr.AddValue("TANGRAVE", string.Format("{0} v{1}", VersionHelper.AssemblyProduct, VersionHelper.AssemblyFileVersion), null);
-							if (TangraConfig.Settings.Generic.ReverseGammaCorrection)
-								hdr.AddValue("TANGAMMA", TangraConfig.Settings.Photometry.EncodingGamma.ToString("0.0000", CultureInfo.InvariantCulture), null);
-
-						    f.AddHDU(imageHDU);
-
-							// Write a FITS file.
-							using (BufferedFile bf = new BufferedFile(fileName, FileAccess.ReadWrite, FileShare.ReadWrite))
-							{
-								f.Write(bf);
-								bf.Flush();
-							}
+							SaveDarkOrFlatFrame(fileName, currPixelmap.Width, currPixelmap.Height, notes, m_AveragedData, m_ExposureSeconds, m_NumFrames);
 						}
 
 						m_Running = false;
@@ -189,17 +155,58 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
             }
         }
 
-		private float[][] SaveImageData(float[,] data)
+		internal static void SaveDarkOrFlatFrame(string fileName, int width, int height, string notes, float[,] averagedData, float exposureSeconds, int numFrames)
 		{
-			float[][] bimg = new float[m_CurrentAstroImage.Height][];
+			Fits f = new Fits();
 
-			for (int y = 0; y < m_CurrentAstroImage.Height; y++)
+			object data = SaveImageData(width, height, averagedData);
+
+			BasicHDU imageHDU = Fits.MakeHDU(data);
+
+			nom.tam.fits.Header hdr = imageHDU.Header;
+			hdr.AddValue("SIMPLE", "T", null);
+
+			hdr.AddValue("BITPIX", -32 /* Floating Point Data*/, null);
+			hdr.AddValue("NAXIS", 2, null);
+			hdr.AddValue("NAXIS1", width, null);
+			hdr.AddValue("NAXIS2", height, null);
+
+			
+			if (notes.Length > HeaderCard.MAX_VALUE_LENGTH) notes = notes.Substring(0, HeaderCard.MAX_VALUE_LENGTH);
+			hdr.AddValue("NOTES", notes, null);
+
+			if (exposureSeconds > 0)
 			{
-				bimg[y] = new float[m_CurrentAstroImage.Width];
+				hdr.AddValue("EXPOSURE", exposureSeconds.ToString("0.000", CultureInfo.InvariantCulture), null);
+				hdr.AddValue("EXPTIME", exposureSeconds.ToString("0.000", CultureInfo.InvariantCulture), null);
+			}
 
-				for (int x = 0; x < m_CurrentAstroImage.Width; x++)
+			hdr.AddValue("SNAPSHOT", numFrames.ToString(), null);
+			hdr.AddValue("TANGRAVE", string.Format("{0} v{1}", VersionHelper.AssemblyProduct, VersionHelper.AssemblyFileVersion), null);
+			if (TangraConfig.Settings.Generic.ReverseGammaCorrection)
+				hdr.AddValue("TANGAMMA", TangraConfig.Settings.Photometry.EncodingGamma.ToString("0.0000", CultureInfo.InvariantCulture), null);
+
+			f.AddHDU(imageHDU);
+
+			// Write a FITS file.
+			using (BufferedFile bf = new BufferedFile(fileName, FileAccess.ReadWrite, FileShare.ReadWrite))
+			{
+				f.Write(bf);
+				bf.Flush();
+			}
+	    }
+
+		private static float[][] SaveImageData(int width, int height, float[,] data)
+		{
+			float[][] bimg = new float[height][];
+
+			for (int y = 0; y < height; y++)
+			{
+				bimg[y] = new float[width];
+
+				for (int x = 0; x < width; x++)
 				{
-                    bimg[y][x] = (float)Math.Max(0, data[x, m_CurrentAstroImage.Height - y - 1]);
+                    bimg[y][x] = (float)Math.Max(0, data[x, height - y - 1]);
 				}
 			}
 

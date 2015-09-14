@@ -32,6 +32,13 @@
 			this.pbar = new System.Windows.Forms.ProgressBar();
 			this.btnGenerateVideo = new System.Windows.Forms.Button();
 			this.pnlConfig = new System.Windows.Forms.Panel();
+			this.label30 = new System.Windows.Forms.Label();
+			this.nudPlateRotation = new System.Windows.Forms.NumericUpDown();
+			this.label29 = new System.Windows.Forms.Label();
+			this.nudMatrixHeight = new System.Windows.Forms.NumericUpDown();
+			this.label28 = new System.Windows.Forms.Label();
+			this.nudMatrixWidth = new System.Windows.Forms.NumericUpDown();
+			this.label27 = new System.Windows.Forms.Label();
 			this.label25 = new System.Windows.Forms.Label();
 			this.nudLimitMag = new System.Windows.Forms.NumericUpDown();
 			this.label26 = new System.Windows.Forms.Label();
@@ -79,14 +86,12 @@
 			this.label1 = new System.Windows.Forms.Label();
 			this.nudTotalFrames = new System.Windows.Forms.NumericUpDown();
 			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-			this.label27 = new System.Windows.Forms.Label();
-			this.nudMatrixWidth = new System.Windows.Forms.NumericUpDown();
-			this.nudMatrixHeight = new System.Windows.Forms.NumericUpDown();
-			this.label28 = new System.Windows.Forms.Label();
-			this.label29 = new System.Windows.Forms.Label();
-			this.nudPlateRotation = new System.Windows.Forms.NumericUpDown();
-			this.label30 = new System.Windows.Forms.Label();
+			this.cbxProduceDark = new System.Windows.Forms.CheckBox();
+			this.nudDarkMean = new System.Windows.Forms.NumericUpDown();
 			this.pnlConfig.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.nudPlateRotation)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudMatrixHeight)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudMatrixWidth)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudLimitMag)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudFrameHeight)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudFrameWidth)).BeginInit();
@@ -101,9 +106,7 @@
 			((System.ComponentModel.ISupportInitialize)(this.nudNoiseStdDev)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudNoiseMean)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudTotalFrames)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.nudMatrixWidth)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.nudMatrixHeight)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.nudPlateRotation)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudDarkMean)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// pbar
@@ -127,6 +130,8 @@
 			// 
 			// pnlConfig
 			// 
+			this.pnlConfig.Controls.Add(this.nudDarkMean);
+			this.pnlConfig.Controls.Add(this.cbxProduceDark);
 			this.pnlConfig.Controls.Add(this.label30);
 			this.pnlConfig.Controls.Add(this.nudPlateRotation);
 			this.pnlConfig.Controls.Add(this.label29);
@@ -184,6 +189,104 @@
 			this.pnlConfig.Name = "pnlConfig";
 			this.pnlConfig.Size = new System.Drawing.Size(401, 335);
 			this.pnlConfig.TabIndex = 16;
+			// 
+			// label30
+			// 
+			this.label30.AutoSize = true;
+			this.label30.Location = new System.Drawing.Point(251, 184);
+			this.label30.Name = "label30";
+			this.label30.Size = new System.Drawing.Size(25, 13);
+			this.label30.TabIndex = 93;
+			this.label30.Text = "deg";
+			// 
+			// nudPlateRotation
+			// 
+			this.nudPlateRotation.DecimalPlaces = 1;
+			this.nudPlateRotation.Location = new System.Drawing.Point(200, 182);
+			this.nudPlateRotation.Maximum = new decimal(new int[] {
+            360,
+            0,
+            0,
+            0});
+			this.nudPlateRotation.Name = "nudPlateRotation";
+			this.nudPlateRotation.Size = new System.Drawing.Size(51, 20);
+			this.nudPlateRotation.TabIndex = 92;
+			this.nudPlateRotation.Value = new decimal(new int[] {
+            180,
+            0,
+            0,
+            0});
+			// 
+			// label29
+			// 
+			this.label29.AutoSize = true;
+			this.label29.Location = new System.Drawing.Point(119, 184);
+			this.label29.Name = "label29";
+			this.label29.Size = new System.Drawing.Size(80, 13);
+			this.label29.TabIndex = 91;
+			this.label29.Text = "Rotation Angle:";
+			// 
+			// nudMatrixHeight
+			// 
+			this.nudMatrixHeight.Location = new System.Drawing.Point(80, 233);
+			this.nudMatrixHeight.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+			this.nudMatrixHeight.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+			this.nudMatrixHeight.Name = "nudMatrixHeight";
+			this.nudMatrixHeight.Size = new System.Drawing.Size(43, 20);
+			this.nudMatrixHeight.TabIndex = 90;
+			this.nudMatrixHeight.Value = new decimal(new int[] {
+            582,
+            0,
+            0,
+            0});
+			// 
+			// label28
+			// 
+			this.label28.AutoSize = true;
+			this.label28.Location = new System.Drawing.Point(12, 237);
+			this.label28.Name = "label28";
+			this.label28.Size = new System.Drawing.Size(66, 13);
+			this.label28.TabIndex = 89;
+			this.label28.Text = "CCD Height:";
+			// 
+			// nudMatrixWidth
+			// 
+			this.nudMatrixWidth.Location = new System.Drawing.Point(80, 211);
+			this.nudMatrixWidth.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+			this.nudMatrixWidth.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+			this.nudMatrixWidth.Name = "nudMatrixWidth";
+			this.nudMatrixWidth.Size = new System.Drawing.Size(43, 20);
+			this.nudMatrixWidth.TabIndex = 88;
+			this.nudMatrixWidth.Value = new decimal(new int[] {
+            752,
+            0,
+            0,
+            0});
+			// 
+			// label27
+			// 
+			this.label27.AutoSize = true;
+			this.label27.Location = new System.Drawing.Point(15, 215);
+			this.label27.Name = "label27";
+			this.label27.Size = new System.Drawing.Size(63, 13);
+			this.label27.TabIndex = 87;
+			this.label27.Text = "CCD Width:";
 			// 
 			// label25
 			// 
@@ -478,7 +581,7 @@
             "g\'",
             "r\'",
             "i\'"});
-			this.cbxPhotometricFilter.Location = new System.Drawing.Point(304, 291);
+			this.cbxPhotometricFilter.Location = new System.Drawing.Point(305, 280);
 			this.cbxPhotometricFilter.Name = "cbxPhotometricFilter";
 			this.cbxPhotometricFilter.Size = new System.Drawing.Size(62, 21);
 			this.cbxPhotometricFilter.TabIndex = 61;
@@ -486,7 +589,7 @@
 			// label12
 			// 
 			this.label12.AutoSize = true;
-			this.label12.Location = new System.Drawing.Point(209, 294);
+			this.label12.Location = new System.Drawing.Point(210, 283);
 			this.label12.Name = "label12";
 			this.label12.Size = new System.Drawing.Size(91, 13);
 			this.label12.TabIndex = 60;
@@ -694,7 +797,7 @@
 			this.nudNoiseMean.Size = new System.Drawing.Size(41, 20);
 			this.nudNoiseMean.TabIndex = 39;
 			this.nudNoiseMean.Value = new decimal(new int[] {
-            15,
+            25,
             0,
             0,
             0});
@@ -739,103 +842,38 @@
             0,
             0});
 			// 
-			// label27
+			// cbxProduceDark
 			// 
-			this.label27.AutoSize = true;
-			this.label27.Location = new System.Drawing.Point(15, 215);
-			this.label27.Name = "label27";
-			this.label27.Size = new System.Drawing.Size(63, 13);
-			this.label27.TabIndex = 87;
-			this.label27.Text = "CCD Width:";
+			this.cbxProduceDark.AutoSize = true;
+			this.cbxProduceDark.Location = new System.Drawing.Point(212, 308);
+			this.cbxProduceDark.Name = "cbxProduceDark";
+			this.cbxProduceDark.Size = new System.Drawing.Size(92, 17);
+			this.cbxProduceDark.TabIndex = 94;
+			this.cbxProduceDark.Text = "Produce Dark";
+			this.cbxProduceDark.UseVisualStyleBackColor = true;
+			this.cbxProduceDark.CheckedChanged += new System.EventHandler(this.cbxProduceDark_CheckedChanged);
 			// 
-			// nudMatrixWidth
+			// nudDarkMean
 			// 
-			this.nudMatrixWidth.Location = new System.Drawing.Point(80, 211);
-			this.nudMatrixWidth.Maximum = new decimal(new int[] {
-            10000,
+			this.nudDarkMean.Location = new System.Drawing.Point(305, 307);
+			this.nudDarkMean.Maximum = new decimal(new int[] {
+            255,
             0,
             0,
             0});
-			this.nudMatrixWidth.Minimum = new decimal(new int[] {
+			this.nudDarkMean.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-			this.nudMatrixWidth.Name = "nudMatrixWidth";
-			this.nudMatrixWidth.Size = new System.Drawing.Size(43, 20);
-			this.nudMatrixWidth.TabIndex = 88;
-			this.nudMatrixWidth.Value = new decimal(new int[] {
-            752,
+			this.nudDarkMean.Name = "nudDarkMean";
+			this.nudDarkMean.Size = new System.Drawing.Size(41, 20);
+			this.nudDarkMean.TabIndex = 95;
+			this.nudDarkMean.Value = new decimal(new int[] {
+            6,
             0,
             0,
             0});
-			// 
-			// nudMatrixHeight
-			// 
-			this.nudMatrixHeight.Location = new System.Drawing.Point(80, 233);
-			this.nudMatrixHeight.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-			this.nudMatrixHeight.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-			this.nudMatrixHeight.Name = "nudMatrixHeight";
-			this.nudMatrixHeight.Size = new System.Drawing.Size(43, 20);
-			this.nudMatrixHeight.TabIndex = 90;
-			this.nudMatrixHeight.Value = new decimal(new int[] {
-            582,
-            0,
-            0,
-            0});
-			// 
-			// label28
-			// 
-			this.label28.AutoSize = true;
-			this.label28.Location = new System.Drawing.Point(12, 237);
-			this.label28.Name = "label28";
-			this.label28.Size = new System.Drawing.Size(66, 13);
-			this.label28.TabIndex = 89;
-			this.label28.Text = "CCD Height:";
-			// 
-			// label29
-			// 
-			this.label29.AutoSize = true;
-			this.label29.Location = new System.Drawing.Point(119, 184);
-			this.label29.Name = "label29";
-			this.label29.Size = new System.Drawing.Size(80, 13);
-			this.label29.TabIndex = 91;
-			this.label29.Text = "Rotation Angle:";
-			// 
-			// nudPlateRotation
-			// 
-			this.nudPlateRotation.DecimalPlaces = 1;
-			this.nudPlateRotation.Location = new System.Drawing.Point(200, 182);
-			this.nudPlateRotation.Maximum = new decimal(new int[] {
-            360,
-            0,
-            0,
-            0});
-			this.nudPlateRotation.Name = "nudPlateRotation";
-			this.nudPlateRotation.Size = new System.Drawing.Size(51, 20);
-			this.nudPlateRotation.TabIndex = 92;
-			this.nudPlateRotation.Value = new decimal(new int[] {
-            180,
-            0,
-            0,
-            0});
-			// 
-			// label30
-			// 
-			this.label30.AutoSize = true;
-			this.label30.Location = new System.Drawing.Point(251, 184);
-			this.label30.Name = "label30";
-			this.label30.Size = new System.Drawing.Size(25, 13);
-			this.label30.TabIndex = 93;
-			this.label30.Text = "deg";
 			// 
 			// frmGenerateStarFieldVideoModel
 			// 
@@ -854,6 +892,9 @@
 			this.Text = "Controlled Star Field Model Video Generation";
 			this.pnlConfig.ResumeLayout(false);
 			this.pnlConfig.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.nudPlateRotation)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudMatrixHeight)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudMatrixWidth)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudLimitMag)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudFrameHeight)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudFrameWidth)).EndInit();
@@ -868,9 +909,7 @@
 			((System.ComponentModel.ISupportInitialize)(this.nudNoiseStdDev)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudNoiseMean)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudTotalFrames)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.nudMatrixWidth)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.nudMatrixHeight)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.nudPlateRotation)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.nudDarkMean)).EndInit();
 			this.ResumeLayout(false);
 
         }
@@ -934,5 +973,7 @@
 		private System.Windows.Forms.Label label30;
 		private System.Windows.Forms.NumericUpDown nudPlateRotation;
 		private System.Windows.Forms.Label label29;
+		private System.Windows.Forms.NumericUpDown nudDarkMean;
+		private System.Windows.Forms.CheckBox cbxProduceDark;
     }
 }

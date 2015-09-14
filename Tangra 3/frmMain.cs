@@ -1309,7 +1309,7 @@ namespace Tangra
                     return;
             }
 
-            var frm = new frmGenerateStarFieldVideoModel();
+            var frm = new frmGenerateStarFieldVideoModel(m_VideoController);
             frm.ShowDialog(this);
         }
 	}

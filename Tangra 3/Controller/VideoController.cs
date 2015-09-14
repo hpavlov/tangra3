@@ -1880,7 +1880,7 @@ namespace Tangra.Controller
             frm.Show(m_MainFormView);
         }
 
-		public DialogResult ShowSaveFileDialog(string title, string filter, ref string fileName)
+		public DialogResult ShowSaveFileDialog(string title, string filter, ref string fileName, IWin32Window ownerWindow = null)
 		{
 			var sfd = new SaveFileDialog()
 			{
@@ -1889,7 +1889,7 @@ namespace Tangra.Controller
 				Filter = filter				
 			};
 
-			DialogResult rv = sfd.ShowDialog(m_MainFormView);
+			DialogResult rv = sfd.ShowDialog(ownerWindow ?? m_MainFormView);
 
 			fileName = sfd.FileName;
 			return rv;
