@@ -55,17 +55,20 @@ namespace MagnitudeFitter
 					}
 
 					RecalculateFit();
+                    RecalculateFixedColourIndexFit();
 				}
 			}
 		}
 
 		private void RecalculateFit()
 		{
+		    int totalMeasuredFrames = m_Exports.SelectMany(x => x.Entries).Select(x => x.MeasuredFrames).ToList().Median();
+
 			List<TangraExportEntry> datapoints = m_Exports
 				.SelectMany(x => x.Entries)
 				.Where(x =>
-					!float.IsNaN(x.APASS_Sloan_r) && Math.Abs(x.APASS_Sloan_r) > 0.00001 && !float.IsNaN(x.MedianIntensity) && 
-					!float.IsNaN(x.MedianIntensity) && !float.IsNaN(x.APASS_BV_Colour) && x.APASS_Sloan_r > 12.4)
+					!float.IsNaN(x.APASS_Sloan_r) && Math.Abs(x.APASS_Sloan_r) > 0.00001 && !float.IsNaN(x.MedianIntensity) &&
+                    !float.IsNaN(x.MedianIntensity) && !float.IsNaN(x.APASS_BV_Colour) && x.MeasuredFrames > 0.95 * totalMeasuredFrames && x.SaturatedFrames  == 0)
 				.ToList();
 
 			for (int i = 0; i < datapoints.Count; i++)
@@ -131,6 +134,77 @@ namespace MagnitudeFitter
 
 			PlotData(datapoints, Ka, Kb, Kc);
 		}
+
+        private void RecalculateFixedColourIndexFit()
+        {
+            int totalMeasuredFrames = m_Exports.SelectMany(x => x.Entries).Select(x => x.MeasuredFrames).ToList().Median();
+
+            List<TangraExportEntry> datapoints = m_Exports
+                .SelectMany(x => x.Entries)
+                .Where(x =>
+                    !float.IsNaN(x.APASS_Sloan_r) && Math.Abs(x.APASS_Sloan_r) > 0.00001 && !float.IsNaN(x.MedianIntensity) &&
+                    !float.IsNaN(x.MedianIntensity) && !float.IsNaN(x.APASS_BV_Colour) && x.MeasuredFrames > 0.95 * totalMeasuredFrames && x.SaturatedFrames == 0)
+                .ToList();
+
+            for (int i = 0; i < datapoints.Count; i++)
+            {
+                datapoints[i].InstrMag = -2.5 * Math.Log10(datapoints[i].MedianIntensity) + 32 - datapoints[i].APASS_BV_Colour * (0.0612);
+                datapoints[i].InstrMagErr = Math.Abs(-2.5 * Math.Log10((datapoints[i].MedianIntensity + datapoints[i].MedianIntensityError) / datapoints[i].MedianIntensity));
+            }
+
+            datapoints = datapoints.Where(x => x.InstrMagErr < 0.2).ToList();
+
+            if (datapoints.Count < 4) return;
+
+            double variance = 0;
+            double Ka = 0;
+            double Kb = 0;
+
+            int MAX_ITTER = 2;
+            for (int itt = 0; itt <= MAX_ITTER; itt++)
+            {
+                SafeMatrix A = new SafeMatrix(datapoints.Count, 2);
+                SafeMatrix X = new SafeMatrix(datapoints.Count, 1);
+
+                int idx = 0;
+                for (int i = 0; i < datapoints.Count; i++)
+                {
+                    A[idx, 0] = datapoints[i].InstrMag;
+                    A[idx, 1] = 1;
+
+                    X[idx, 0] = datapoints[i].APASS_Sloan_r;
+
+                    idx++;
+                }
+
+                SafeMatrix a_T = A.Transpose();
+                SafeMatrix aa = a_T * A;
+                SafeMatrix aa_inv = aa.Inverse();
+                SafeMatrix bx = (aa_inv * a_T) * X;
+
+                Ka = bx[0, 0];
+                Kb = bx[1, 0];
+
+                double resSum = 0;
+                for (int i = 0; i < datapoints.Count; i++)
+                {
+                    double computedMag = Ka * datapoints[i].InstrMag + Kb;
+
+                    double diff = computedMag - datapoints[i].APASS_Sloan_r;
+
+                    resSum += diff * diff;
+                    datapoints[i].Residual = diff;
+                }
+
+                variance = Math.Sqrt(resSum / datapoints.Count);
+
+                if (itt < MAX_ITTER)
+                    datapoints.RemoveAll(x => Math.Abs(x.Residual) > 2 * variance || Math.Abs(x.Residual) > 0.2);
+            }
+
+            Trace.WriteLine(string.Format("r' + 0.025 * (B-V) +  = {0} * M + {1} +/- {2}", Ka.ToString("0.0000"), Kb.ToString("0.0000"), variance.ToString("0.00")));
+        }
+
 
 		private void PlotData(List<TangraExportEntry> datapoints, double a, double b, double c)
 		{

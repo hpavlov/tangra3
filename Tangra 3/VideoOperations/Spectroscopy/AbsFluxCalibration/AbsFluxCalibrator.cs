@@ -65,10 +65,11 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			Context.FromWavelength = TangraConfig.Settings.Spectroscopy.MinWavelength;
 			Context.ToWavelength = TangraConfig.Settings.Spectroscopy.MaxWavelength;
 			Context.WavelengthBinSize = TangraConfig.Settings.Spectroscopy.AbsFluxResolution;
-			Context.Model = AbsFluxModel.NonLinearMag;
+			Context.Model = AbsFluxModel.Linear;
+		    Context.UseFwhmNormalisation = true;
+            FIT_METHOD = LinearFitMethod.LinearAlgebra;
 
 			IsCalibrated = false;
-			FIT_METHOD = LinearFitMethod.LinearAlgebra;
 		}
 
 		private void AssignNumbers()
@@ -193,8 +194,12 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 							// DeltaM = KE * AirMass + KS = -2.5 * Math.Log10((ObservedFluxes[i] / exposure) / AbsoluteFluxes[i])
 							double calculatedDeltaMag = m_ExtinctionCoefficients[i] * standards[j].InputFile.AirMass + m_SensitivityCoefficients[i];
 							double calculatedFluxRatio = Math.Pow(10, calculatedDeltaMag / -2.5);
-							double calculatedAbsoluteFlux = (standards[j].ObservedFluxes[i] / standards[j].InputFile.Exposure) / calculatedFluxRatio;
-							double calculatedObservedFlux = standards[j].AbsoluteFluxes[i] * calculatedFluxRatio * standards[j].InputFile.Exposure;
+						    
+                            double exposure = standards[j].InputFile.Exposure;
+                            if (Context.UseFwhmNormalisation && !float.IsNaN(standards[j].InputFile.FHWM)) exposure *= standards[j].InputFile.FHWM;
+
+                            double calculatedAbsoluteFlux = (standards[j].ObservedFluxes[i] / exposure) / calculatedFluxRatio;
+                            double calculatedObservedFlux = standards[j].AbsoluteFluxes[i] * calculatedFluxRatio * exposure;
 
 							double residualAbsoluteFluxOC = calculatedAbsoluteFlux - standards[j].AbsoluteFluxes[i];
 
@@ -249,7 +254,11 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 							// DeltaM = KE * AirMass + KS = -2.5 * Math.Log10((ObservedFluxes[i] / exposure) / AbsoluteFluxes[i])
 							double calculatedDeltaMag = m_ExtinctionCoefficients[i] * programStars[j].InputFile.AirMass + m_SensitivityCoefficients[i];
 							double calculatedFluxRatio = Math.Pow(10, calculatedDeltaMag / -2.5);
-							double calculatedAbsoluteFlux = (programStars[j].ObservedFluxes[i] / programStars[j].InputFile.Exposure) / calculatedFluxRatio;
+                            
+                            double exposure = programStars[j].InputFile.Exposure;
+                            if (Context.UseFwhmNormalisation && !float.IsNaN(programStars[j].InputFile.FHWM)) exposure *= programStars[j].InputFile.FHWM;
+
+                            double calculatedAbsoluteFlux = (programStars[j].ObservedFluxes[i] / exposure) / calculatedFluxRatio;
 							programStars[j].AbsoluteFluxes.Add(calculatedAbsoluteFlux);
 				        }
 						else if (Context.Model == AbsFluxModel.NonLinearMag || Context.Model == AbsFluxModel.NonLinearGain)

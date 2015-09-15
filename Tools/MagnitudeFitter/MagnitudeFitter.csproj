@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Engine\Extensions.cs" />
     <Compile Include="Engine\TangraCsvExport.cs" />
     <Compile Include="Engine\TangraExportEntry.cs" />
     <Compile Include="frmMain.cs">
