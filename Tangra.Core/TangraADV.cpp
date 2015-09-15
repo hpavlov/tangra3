@@ -20,6 +20,7 @@ unsigned long* prevFramePixels;
 Compressor* m_Lagarith16Decompressor = NULL;
 long m_CurrentLagarithWidth = 0;
 long m_CurrentLagaritHeight = 0; 
+bool g_IsAAV = false;
 
 void EnsureAdvFileClosed()
 {
@@ -34,6 +35,8 @@ void EnsureAdvFileClosed()
 		delete prevFramePixels;
 		prevFramePixels = NULL;
 	}
+	
+	g_IsAAV = false;
 }
 
 HRESULT ADVOpenFile(char* fileName, AdvLib::AdvFileInfo* fileInfo)
@@ -44,6 +47,7 @@ HRESULT ADVOpenFile(char* fileName, AdvLib::AdvFileInfo* fileInfo)
 	g_TangraAdvFile = new AdvLib::AdvFile();
 	g_TangraAdvFile->OpenFile(fileName, fileInfo);
 
+	g_IsAAV = g_TangraAdvFile->IsAAV();
 	g_MaxFrameBufferSize = g_TangraAdvFile->ImageSection->MaxFrameBufferSize() * 2 /*MaxBuff is calculated for ushorts*/;
 
 	prevFrameNo = -1;
@@ -140,7 +144,7 @@ HRESULT ADVGetFrame(long frameNo, unsigned long* pixels, unsigned long* original
 	if (SUCCEEDED(rv))
 	{
 		if (g_UsesPreProcessing && 
-		    frameInfo->IntegratedFrames > 0 /*Not the first/last control frame*/) 
+		    (!g_IsAAV || frameInfo->IntegratedFrames > 0) /*Not the first/last AAV control frame*/) 
 		{
 			memcpy(originalPixels, pixels, g_TangraAdvFile->ImageSection->Width * g_TangraAdvFile->ImageSection->Height * sizeof(unsigned long));
 			

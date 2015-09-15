@@ -6,6 +6,8 @@
 
 #include "cross_platform.h"
 
+extern bool g_IsAAV;
+
 /* Make sure functions are exported with C linkage under C++ compilers. */
 #ifdef __cplusplus
 extern "C"

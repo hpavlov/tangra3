@@ -55,6 +55,7 @@ namespace AdvLib
 			unsigned char *m_FrameBytes;
 			unsigned int m_FrameBufferIndex; 
 			unsigned int m_ElapedTime;
+			bool m_IsAAV;
 						
 			void InitFileState();
 		public:
@@ -68,6 +69,7 @@ namespace AdvLib
 			void GetFrameStatusSectionData(int frameId, AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError);		
 			
 			void GetFileTag(const char* fileTagName, char* fileTagValue);
+			bool IsAAV();
 		};
 
 }

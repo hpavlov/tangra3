@@ -69,6 +69,8 @@ unsigned char CURRENT_DATAFORMAT_VERSION = 1;
 
 void AdvFile::OpenFile(const char* fileName, AdvFileInfo* fileInfo)
 {
+	m_IsAAV = false;
+	
 	m_File = fopen(fileName, "rb");
 
 	unsigned int buffInt;
@@ -170,7 +172,7 @@ void AdvFile::OpenFile(const char* fileName, AdvFileInfo* fileInfo)
 			
 	char fileTagValue[256];
 	GetFileTag("FSTF-TYPE", &fileTagValue[0]);
-	bool isAAVFile = strcmp(fileTagValue, "AAV") == 0;	
+	bool isAAVFile = strcmp(fileTagValue, "AAV") == 0;		
 	GetFileTag("OCR-ENGINE", &fileTagValue[0]);
 	bool hasAAVEmbeddedTimestamps = strlen(fileTagValue) > 0;
 	GetFileTag("EFFECTIVE-FRAME-RATE", &fileTagValue[0]);
@@ -194,13 +196,19 @@ void AdvFile::OpenFile(const char* fileName, AdvFileInfo* fileInfo)
 	fileInfo->CountFrames = TotalNumberOfFrames;
 	fileInfo->Height = ImageSection->Height;
 	fileInfo->Width = ImageSection->Width;
-	
+
+	m_IsAAV = isAAVFile;	
 	if (isAAVFile)
 		// For AAV files read the frame rate from the AAV file header	
 		fileInfo->FrameRate = effectiveFrameRate;
 	else
 		// For ADV files and for AAV files that have embedded timestamps, the framerate will be ignored
 		fileInfo->FrameRate = 0; // This is variable
+}
+
+bool AdvFile::IsAAV()
+{
+	return m_IsAAV;
 }
 
 void AdvFile::GetFileTag(const char* fileTagName, char* fileTagValue)
