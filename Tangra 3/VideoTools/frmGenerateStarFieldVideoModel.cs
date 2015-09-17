@@ -222,7 +222,32 @@ namespace Tangra.VideoTools
             { }
         }
 
-        private void GenerateSimulatedVideo(object state)
+	    private delegate void SaveDarkFrameDelegate(ModelConfig modelConfig, float[,] averagedFrame);
+
+		private void SaveDarkFrame(ModelConfig modelConfig, float[,] averagedFrame)
+	    {
+			string fileName = null;
+			if (m_VideoController.ShowSaveFileDialog(
+				"Save Simulated Dark fame",
+				"FITS Image (*.fit)|*.fit",
+				ref fileName, this) == DialogResult.OK)
+			{
+				MakeDarkFlatOperation.SaveDarkOrFlatFrame(fileName, modelConfig.FrameWidth, modelConfig.FrameHeight, string.Format("Simulated dark frame from Mean {0} +/- 1", modelConfig.DarkFrameMean), averagedFrame, 0, modelConfig.TotalFrames);
+			}
+
+	    }
+
+	    private void InvokeSaveDarkFrame(ModelConfig modelConfig, float[,] averagedFrame)
+	    {
+			try
+			{
+				Invoke(new SaveDarkFrameDelegate(SaveDarkFrame), new object[] { modelConfig, averagedFrame });
+			}
+			catch (InvalidOperationException)
+			{ }
+	    }
+
+	    private void GenerateSimulatedVideo(object state)
         {
             InvokeUpdateUI(2, 0, true);
 
@@ -254,15 +279,7 @@ namespace Tangra.VideoTools
 						averagedFrame[x, y] = m_SimulatedDarkFrame[x, y];
 					}
 
-					string fileName = null;
-					if (m_VideoController.ShowSaveFileDialog(
-						"Save Simulated Dark fame",
-						"FITS Image (*.fit)|*.fit",
-						ref fileName, this) == DialogResult.OK)
-					{
-						MakeDarkFlatOperation.SaveDarkOrFlatFrame("", modelConfig.FrameWidth, modelConfig.FrameHeight, string.Format("Simulated dark frame from Mean {0} +/- 1", modelConfig.DarkFrameMean), averagedFrame, 0, modelConfig.TotalFrames);
-					}
-					
+					InvokeSaveDarkFrame(modelConfig, averagedFrame);
 				}
             }
             finally
