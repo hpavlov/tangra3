@@ -198,15 +198,9 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 							double calculatedFluxRatio = Math.Pow(10, calculatedDeltaMag / -2.5);
 						    
                             double exposure = standards[j].InputFile.Exposure;
-                            if (Context.UseFwhmNormalisation && !float.IsNaN(standards[j].InputFile.FHWM)) exposure *= standards[j].InputFile.FHWM;
 
                             double calculatedAbsoluteFlux = (standards[j].ObservedFluxes[i] / exposure) / calculatedFluxRatio;
                             double calculatedObservedFlux = standards[j].AbsoluteFluxes[i] * calculatedFluxRatio * exposure;
-						    if (Context.UseNonLinearityNormalisation && !float.IsNaN(standards[j].InputFile.MagCoeff))
-						    {
-                                calculatedAbsoluteFlux = (Math.Pow(standards[j].ObservedFluxes[i], standards[j].InputFile.MagCoeff) / exposure) / calculatedFluxRatio;
-                                calculatedObservedFlux = Math.Pow(standards[j].AbsoluteFluxes[i] * calculatedFluxRatio * exposure, 1 / standards[j].InputFile.MagCoeff);
-						    }
 
 							double residualAbsoluteFluxOC = calculatedAbsoluteFlux - standards[j].AbsoluteFluxes[i];
 
@@ -263,12 +257,8 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 							double calculatedFluxRatio = Math.Pow(10, calculatedDeltaMag / -2.5);
                             
                             double exposure = programStars[j].InputFile.Exposure;
-                            if (Context.UseFwhmNormalisation && !float.IsNaN(programStars[j].InputFile.FHWM)) exposure *= programStars[j].InputFile.FHWM;
 
                             double calculatedAbsoluteFlux = (programStars[j].ObservedFluxes[i] / exposure) / calculatedFluxRatio;
-
-                            if (Context.UseNonLinearityNormalisation && !float.IsNaN(programStars[j].InputFile.MagCoeff))
-                                calculatedAbsoluteFlux = (Math.Pow(programStars[j].ObservedFluxes[i], programStars[j].InputFile.MagCoeff)  / exposure) / calculatedFluxRatio;
 
 							programStars[j].AbsoluteFluxes.Add(calculatedAbsoluteFlux);
 				        }

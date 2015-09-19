@@ -120,25 +120,23 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			WavelengthBinSize = step;
 			WavelengthTo = toWavelength + (int) Math.Ceiling(step/2.0);
 
-			RescaleData(WavelengthFrom, WavelengthTo, WavelengthBinSize, useBlurring, InputFile.Wavelengths, InputFile.Fluxes, ObservedFluxes, ResolvedWavelengths);
+			double fwhmCoeff = useFwhmNormalisation && !float.IsNaN(InputFile.FHWM) ? (Math.Sqrt(-0.5 * Math.Log10(0.5)) / InputFile.FHWM) : double.NaN;
+			double nonLinearityCoeff = useNonLinearityNormalisation && !float.IsNaN(InputFile.MagCoeff) ? InputFile.MagCoeff : double.NaN;
+
+
+			RescaleData(WavelengthFrom, WavelengthTo, WavelengthBinSize, useBlurring, fwhmCoeff, nonLinearityCoeff, InputFile.Wavelengths, InputFile.Fluxes, ObservedFluxes, ResolvedWavelengths);
 			if (m_CalSpecStar != null)
 			{
 				List<double> absWavelengths = m_CalSpecStar.DataPoints.Keys.ToList();
 				List<double> absFluxes = m_CalSpecStar.DataPoints.Values.ToList();
-				RescaleData(WavelengthFrom, WavelengthTo, WavelengthBinSize, useBlurring, absWavelengths, absFluxes, AbsoluteFluxes, null);
+				RescaleData(WavelengthFrom, WavelengthTo, WavelengthBinSize, useBlurring, double.NaN, double.NaN, absWavelengths, absFluxes, AbsoluteFluxes, null);
 
 				DeltaMagnitiudes.Clear();
 				double exposure = InputFile.Exposure;
-				double fwhm = !float.IsNaN(InputFile.FHWM) ? InputFile.FHWM : 1;
-                double nonLinearityCoeff = !float.IsNaN(InputFile.MagCoeff) ? InputFile.MagCoeff : 1;
+
 				for (int i = 0; i < ObservedFluxes.Count; i++)
 				{
-					if (useFwhmNormalisation)
-						DeltaMagnitiudes.Add(-2.5 * Math.Log10((ObservedFluxes[i] / (exposure * fwhm)) / AbsoluteFluxes[i]));
-                    else if (useNonLinearityNormalisation)
-                        DeltaMagnitiudes.Add(-2.5 * Math.Log10((Math.Pow(ObservedFluxes[i], nonLinearityCoeff) / exposure) / AbsoluteFluxes[i]));
-					else
-						DeltaMagnitiudes.Add(-2.5 * Math.Log10((ObservedFluxes[i] / exposure) / AbsoluteFluxes[i]));
+					DeltaMagnitiudes.Add(-2.5 * Math.Log10((ObservedFluxes[i] / exposure) / AbsoluteFluxes[i]));
 				}
 			}
 		}
@@ -152,9 +150,12 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 		}
 
 		private static void RescaleData(
-			int fromWavelength, int toWavelength, int step, bool useBlurring,
+			int fromWavelength, int toWavelength, int step, bool useBlurring, double fwhmCoeff, double nonLinearityCoeff,
 			List<double> wavelengths, List<double> fluxes, List<double> rescaledFluxes, List<double> resolvedWavelengths)
 		{
+			bool useFwhmNormalisation = !double.IsNaN(fwhmCoeff);
+			bool useNonLinearityNormalisation = !double.IsNaN(nonLinearityCoeff);
+
 			// Blurring: 
 			// 1) Find the number of original datapoints in resolution/blur interval
 			// 2) Use this number as a kernel for Gaussian blur of all participating data points
@@ -231,7 +232,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 						else
 							blurredFlux = fluxes[j];
 
-						partFluxes.Add(blurredFlux);						
+						partFluxes.Add(blurredFlux);
 					}
 					else
 					{
@@ -239,9 +240,15 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 					}
 				}
 
-				rescaledFluxes[i] = partFluxes.Any() ? partFluxes.Average() : double.NaN;
-			}
+				double rescaledValue = partFluxes.Any() ? partFluxes.Average() : double.NaN;
 
+				if (useFwhmNormalisation)
+					rescaledValue = rescaledValue * fwhmCoeff;
+				if (useNonLinearityNormalisation)
+					rescaledValue = Math.Pow(rescaledValue, nonLinearityCoeff);
+				
+				rescaledFluxes[i] = rescaledValue;
+			}
 		}
 	}
 }
