@@ -40,6 +40,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 		public bool UseBlurring;
 		public AbsFluxModel Model;
 		public bool UseFwhmNormalisation;
+	    public bool UseNonLinearityNormalisation;
 	}
 
 	public class AbsFluxCalibrator
@@ -66,7 +67,8 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			Context.ToWavelength = TangraConfig.Settings.Spectroscopy.MaxWavelength;
 			Context.WavelengthBinSize = TangraConfig.Settings.Spectroscopy.AbsFluxResolution;
 			Context.Model = AbsFluxModel.Linear;
-		    Context.UseFwhmNormalisation = true;
+		    Context.UseFwhmNormalisation = false;
+		    Context.UseNonLinearityNormalisation = true;
             FIT_METHOD = LinearFitMethod.LinearAlgebra;
 
 			IsCalibrated = false;
@@ -84,7 +86,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 		{
 			if (!m_SpectraList.Any(x => x.FullFilePath.Equals(spectra.FullFilePath, StringComparison.InvariantCultureIgnoreCase)))
 			{
-				spectra.RescaleToResolution(Context.FromWavelength, Context.ToWavelength, Context.WavelengthBinSize, Context.UseBlurring, Context.UseFwhmNormalisation);
+                spectra.RescaleToResolution(Context.FromWavelength, Context.ToWavelength, Context.WavelengthBinSize, Context.UseBlurring, Context.UseFwhmNormalisation, Context.UseNonLinearityNormalisation);
 				m_SpectraList.Add(spectra);
 
 				AssignNumbers();
@@ -127,7 +129,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			Context = context;
 			foreach (AbsFluxSpectra spectra in m_SpectraList)
 			{
-				spectra.RescaleToResolution(Context.FromWavelength, Context.ToWavelength, Context.WavelengthBinSize, Context.UseBlurring, Context.UseFwhmNormalisation);
+                spectra.RescaleToResolution(Context.FromWavelength, Context.ToWavelength, Context.WavelengthBinSize, Context.UseBlurring, Context.UseFwhmNormalisation, Context.UseNonLinearityNormalisation);
 			}
 			Calibrate();
 		}
@@ -200,6 +202,11 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 
                             double calculatedAbsoluteFlux = (standards[j].ObservedFluxes[i] / exposure) / calculatedFluxRatio;
                             double calculatedObservedFlux = standards[j].AbsoluteFluxes[i] * calculatedFluxRatio * exposure;
+						    if (Context.UseNonLinearityNormalisation && !float.IsNaN(standards[j].InputFile.MagCoeff))
+						    {
+                                calculatedAbsoluteFlux = (Math.Pow(standards[j].ObservedFluxes[i], standards[j].InputFile.MagCoeff) / exposure) / calculatedFluxRatio;
+                                calculatedObservedFlux = Math.Pow(standards[j].AbsoluteFluxes[i] * calculatedFluxRatio * exposure, 1 / standards[j].InputFile.MagCoeff);
+						    }
 
 							double residualAbsoluteFluxOC = calculatedAbsoluteFlux - standards[j].AbsoluteFluxes[i];
 
@@ -259,6 +266,10 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
                             if (Context.UseFwhmNormalisation && !float.IsNaN(programStars[j].InputFile.FHWM)) exposure *= programStars[j].InputFile.FHWM;
 
                             double calculatedAbsoluteFlux = (programStars[j].ObservedFluxes[i] / exposure) / calculatedFluxRatio;
+
+                            if (Context.UseNonLinearityNormalisation && !float.IsNaN(programStars[j].InputFile.MagCoeff))
+                                calculatedAbsoluteFlux = (Math.Pow(programStars[j].ObservedFluxes[i], programStars[j].InputFile.MagCoeff)  / exposure) / calculatedFluxRatio;
+
 							programStars[j].AbsoluteFluxes.Add(calculatedAbsoluteFlux);
 				        }
 						else if (Context.Model == AbsFluxModel.NonLinearMag || Context.Model == AbsFluxModel.NonLinearGain)

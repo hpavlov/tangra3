@@ -146,9 +146,10 @@ namespace MagnitudeFitter
                     !float.IsNaN(x.MedianIntensity) && !float.IsNaN(x.APASS_BV_Colour) && x.MeasuredFrames > 0.95 * totalMeasuredFrames && x.SaturatedFrames == 0)
                 .ToList();
 
+            float FIXED_COLOUR_COEFF = 0.0375f;
             for (int i = 0; i < datapoints.Count; i++)
             {
-                datapoints[i].InstrMag = -2.5 * Math.Log10(datapoints[i].MedianIntensity) + 32 - datapoints[i].APASS_BV_Colour * (0.0612);
+                datapoints[i].InstrMag = -2.5 * Math.Log10(datapoints[i].MedianIntensity) + 32 - datapoints[i].APASS_BV_Colour * FIXED_COLOUR_COEFF;
                 datapoints[i].InstrMagErr = Math.Abs(-2.5 * Math.Log10((datapoints[i].MedianIntensity + datapoints[i].MedianIntensityError) / datapoints[i].MedianIntensity));
             }
 
@@ -202,7 +203,7 @@ namespace MagnitudeFitter
                     datapoints.RemoveAll(x => Math.Abs(x.Residual) > 2 * variance || Math.Abs(x.Residual) > 0.2);
             }
 
-            Trace.WriteLine(string.Format("r' + 0.025 * (B-V) +  = {0} * M + {1} +/- {2}", Ka.ToString("0.0000"), Kb.ToString("0.0000"), variance.ToString("0.00")));
+            Trace.WriteLine(string.Format("r' + {3} * (B-V) +  = {0} * M + {1} +/- {2}", Ka.ToString("0.0000"), Kb.ToString("0.0000"), variance.ToString("0.00"), FIXED_COLOUR_COEFF.ToString("0.00000")));
         }
 
 

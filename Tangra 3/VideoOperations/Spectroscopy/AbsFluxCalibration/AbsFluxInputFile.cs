@@ -22,6 +22,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 		private DateTime m_EpochUT;
 		public float AirMass { get; private set; }
 		public float FHWM { get; private set; }
+        public float MagCoeff { get; private set; }
 		private float m_Gain;
 		public float Exposure { get; private set; }
 		private float m_Dispersion;
@@ -89,6 +90,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			Latitude = float.NaN;
 			Target = null;
 			m_EpochUT = DateTime.MinValue;
+		    MagCoeff = 1;
 
 			var lines = new List<string>(File.ReadAllLines(filePath));
 
@@ -181,6 +183,10 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			{
 				if (float.TryParse(value, out floatVal)) FHWM = floatVal;
 			}
+            else if (name == "MAGCOEFF")
+            {
+                if (float.TryParse(value, out floatVal)) MagCoeff = floatVal;
+            }
 			else if (name == "GAIN") float.TryParse(value, out m_Gain);
 			else if (name == "EXPOSURE")
 			{
