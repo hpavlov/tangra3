@@ -47,6 +47,12 @@
     <Compile Include="Engine\Extensions.cs" />
     <Compile Include="Engine\TangraCsvExport.cs" />
     <Compile Include="Engine\TangraExportEntry.cs" />
+    <Compile Include="frmConfigureFit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmConfigureFit.Designer.cs">
+      <DependentUpon>frmConfigureFit.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmMain.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -55,6 +61,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="frmConfigureFit.resx">
+      <DependentUpon>frmConfigureFit.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmMain.resx">
       <DependentUpon>frmMain.cs</DependentUpon>
     </EmbeddedResource>

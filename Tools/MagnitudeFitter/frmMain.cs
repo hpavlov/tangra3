@@ -18,7 +18,9 @@ namespace MagnitudeFitter
 	public partial class frmMain : Form
 	{
 		private List<TangraCsvExport> m_Exports = new List<TangraCsvExport>();
- 
+
+	    private double m_FixedColourCoeff = 0.050;
+
 		public frmMain()
 		{
 			InitializeComponent();
@@ -146,7 +148,7 @@ namespace MagnitudeFitter
                     !float.IsNaN(x.MedianIntensity) && !float.IsNaN(x.APASS_BV_Colour) && x.MeasuredFrames > 0.95 * totalMeasuredFrames && x.SaturatedFrames == 0)
                 .ToList();
 
-            float FIXED_COLOUR_COEFF = 0.0375f;
+            float FIXED_COLOUR_COEFF = (float)m_FixedColourCoeff;
             for (int i = 0; i < datapoints.Count; i++)
             {
                 datapoints[i].InstrMag = -2.5 * Math.Log10(datapoints[i].MedianIntensity) + 32 - datapoints[i].APASS_BV_Colour * FIXED_COLOUR_COEFF;
@@ -262,5 +264,17 @@ namespace MagnitudeFitter
 			pictureBox.Invalidate();
 			pictureBox.Update();
 		}
+
+        private void miConfigureFit_Click(object sender, EventArgs e)
+        {
+            var frm = new frmConfigureFit();
+            frm.FixedColourCoeff = m_FixedColourCoeff;
+            if (frm.ShowDialog(this) == DialogResult.OK)
+            {
+                m_FixedColourCoeff = frm.FixedColourCoeff;
+                RecalculateFit();
+                RecalculateFixedColourIndexFit();
+            }
+        }
 	}
 }
