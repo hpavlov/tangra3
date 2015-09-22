@@ -654,6 +654,16 @@ namespace Tangra.PInvoke
 	    public ushort BiasFrameBytes;
 		public TangraConfig.PreProcessingFilter Filter;
 		public RotateFlipType RotateFlipType;
+
+	    public bool HasMoreThanDarkFlatOrGamma
+	    {
+	        get
+	        {
+	            return PreProcessing && (
+	                PreProcessingType != PreProcessingType.None ||
+	                Filter != TangraConfig.PreProcessingFilter.NoFilter);
+	        }
+	    }
 	}
 
 	

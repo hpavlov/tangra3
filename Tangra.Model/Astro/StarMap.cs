@@ -131,6 +131,12 @@ namespace Tangra.Model.Astro
 						continue;
 					}
 
+					if (m_Features.Count > 2.5 * optimumStarsInField)
+					{
+						m_Features.Sort((x, y) => y.PixelCount.CompareTo(x.PixelCount));
+						m_Features = m_Features.Take(2 * optimumStarsInField).ToList();
+					}
+
 					featuresLastRun = featuresThisRun;
 					featuresThisRun = m_Features.Count;
 

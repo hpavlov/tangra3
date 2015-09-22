@@ -438,12 +438,18 @@ namespace Tangra.VideoOperations.Astrometry
 
             if (TangraCore.PreProcessors.UsesPreProcessing())
             {
-                // Make sure we are using the unprocessed pixels to build the starmap for astrometry
-                Pixelmap unprocessPixelmap = new Pixelmap(astroImage.Pixelmap.Width, astroImage.Pixelmap.Height,
-                                                          astroImage.Pixelmap.BitPixCamera, astroImage.Pixelmap.UnprocessedPixels,
-                                                          null, null);
-                unprocessPixelmap.SetMaxSignalValue(astroImage.Pixelmap.MaxSignalValue);
-                noPreProcImage = new AstroImage(unprocessPixelmap);                
+                PreProcessingInfo preProcessingInfo;
+                TangraCore.PreProcessors.PreProcessingGetConfig(out preProcessingInfo);
+
+                if (preProcessingInfo.HasMoreThanDarkFlatOrGamma)
+                {
+                    // Make sure we are using the unprocessed pixels to build the starmap for astrometry
+                    Pixelmap unprocessPixelmap = new Pixelmap(astroImage.Pixelmap.Width, astroImage.Pixelmap.Height,
+                                                              astroImage.Pixelmap.BitPixCamera, astroImage.Pixelmap.UnprocessedPixels,
+                                                              null, null);
+                    unprocessPixelmap.SetMaxSignalValue(astroImage.Pixelmap.MaxSignalValue);
+                    noPreProcImage = new AstroImage(unprocessPixelmap);
+                }
             }
 
 			starMap.FindBestMap(
