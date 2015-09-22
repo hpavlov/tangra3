@@ -36,6 +36,10 @@
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.pictureBox = new System.Windows.Forms.PictureBox();
             this.miConfigureFit = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.miConfigurePlot = new System.Windows.Forms.ToolStripMenuItem();
+            this.miColourPlot = new System.Windows.Forms.ToolStripMenuItem();
+            this.miFixedColourPlot = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
             this.SuspendLayout();
@@ -54,7 +58,9 @@
             // 
             this.miFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.miOpenExports,
+            this.toolStripSeparator1,
             this.miConfigureFit,
+            this.miConfigurePlot,
             this.toolStripMenuItem1,
             this.miExit});
             this.miFile.Name = "miFile";
@@ -99,6 +105,38 @@
             this.miConfigureFit.Text = "Configure Fit";
             this.miConfigureFit.Click += new System.EventHandler(this.miConfigureFit_Click);
             // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
+            // 
+            // miConfigurePlot
+            // 
+            this.miConfigurePlot.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miFixedColourPlot,
+            this.miColourPlot});
+            this.miConfigurePlot.Name = "miConfigurePlot";
+            this.miConfigurePlot.Size = new System.Drawing.Size(152, 22);
+            this.miConfigurePlot.Text = "Configure Plot";
+            // 
+            // miColourPlot
+            // 
+            this.miColourPlot.Checked = true;
+            this.miColourPlot.CheckOnClick = true;
+            this.miColourPlot.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.miColourPlot.Name = "miColourPlot";
+            this.miColourPlot.Size = new System.Drawing.Size(155, 22);
+            this.miColourPlot.Text = "Colour Fit Plot";
+            this.miColourPlot.CheckedChanged += new System.EventHandler(this.miColourPlot_CheckedChanged);
+            // 
+            // miFixedColourPlot
+            // 
+            this.miFixedColourPlot.CheckOnClick = true;
+            this.miFixedColourPlot.Name = "miFixedColourPlot";
+            this.miFixedColourPlot.Size = new System.Drawing.Size(155, 22);
+            this.miFixedColourPlot.Text = "Fixed Colour Plot";
+            this.miFixedColourPlot.CheckedChanged += new System.EventHandler(this.miColourPlot_CheckedChanged);
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -128,6 +166,10 @@
 		private System.Windows.Forms.OpenFileDialog openFileDialog;
         private System.Windows.Forms.PictureBox pictureBox;
         private System.Windows.Forms.ToolStripMenuItem miConfigureFit;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem miConfigurePlot;
+        private System.Windows.Forms.ToolStripMenuItem miColourPlot;
+        private System.Windows.Forms.ToolStripMenuItem miFixedColourPlot;
 	}
 }
 
