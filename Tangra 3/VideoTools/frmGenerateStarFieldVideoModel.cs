@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
@@ -12,11 +13,14 @@ using System.Windows.Forms;
 using Tangra.Astrometry;
 using Tangra.Astrometry.Recognition;
 using Tangra.Helpers;
+using Tangra.Model.Astro;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
 using Tangra.Model.Helpers;
 using Tangra.Model.Image;
+using Tangra.Model.Numerical;
 using Tangra.Model.VideoOperations;
+using Tangra.Photometry;
 using Tangra.PInvoke;
 using Tangra.StarCatalogues;
 using Tangra.StarCatalogues.UCAC4;
@@ -65,6 +69,7 @@ namespace Tangra.VideoTools
             public ModelledFilter PhotometricFilter;
             public double BVSlope;
             public double LinearityCoefficient;
+			public bool CheckMagnitudes;
 
             public string InfoLine1;
             public string InfoLine2;
@@ -173,7 +178,8 @@ namespace Tangra.VideoTools
                     PhotometricFilter = (ModelledFilter)cbxPhotometricFilter.SelectedIndex,
                     BVSlope = (double)nudBVSlope.Value,
                     LinearityCoefficient = (double)nudNonLinearity.Value,
-					DarkFrameMean = cbxProduceDark.Checked ? (int)nudDarkMean.Value : 0 
+					DarkFrameMean = cbxProduceDark.Checked ? (int)nudDarkMean.Value : 0,
+					CheckMagnitudes = cbxCheckMagnitudes.Checked
                 };
 
 				config.PlateRotAngleRadians = (double)nudPlateRotation.Value * Math.PI / 180.0; 
@@ -293,6 +299,8 @@ namespace Tangra.VideoTools
 			TangraVideo.CloseAviFile();
 			TangraVideo.StartNewAviFile(modelConfig.FileName, modelConfig.FrameWidth, modelConfig.FrameHeight, 8, 25, false);
 
+			m_MagnitudeToPeakDict = null;
+
 			try
 			{
 				//Pixelmap pixmap = new Pixelmap(modelConfig.FrameWidth, modelConfig.FrameHeight, bitPix, new uint[modelConfig.FrameWidth * modelConfig.FrameHeight], null, null);
@@ -342,6 +350,8 @@ namespace Tangra.VideoTools
 	    {
 			AavFileCreator.CloseFile();
 			AavFileCreator.StartNewFile(modelConfig.FileName, modelConfig.FrameWidth, modelConfig.FrameHeight, modelConfig.Integration);
+
+			m_MagnitudeToPeakDict = null;
 
 			try
 			{
@@ -420,8 +430,26 @@ namespace Tangra.VideoTools
 			y = (modelConfig.FrameHeight / 2) + mtxY * modelConfig.MatrixToImageScaleY;
 	    }
 
+		private const float APERTURE = 6.0f;
+		private const float GAP = 4.0f;
+		private const float ANNULUS = 19.0f;
+
         private void GenerateFrame(Pixelmap pixmap, List<IStar> stars, ModelConfig modelConfig)
         {
+			var mea = new MeasurementsHelper(
+				pixmap.BitPixCamera, 
+				TangraConfig.BackgroundMethod.BackgroundMedian, 
+				TangraConfig.Settings.Photometry.SubPixelSquareSize,
+				TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(pixmap.BitPixCamera, pixmap.MaxSignalValue));
+
+			float apertureSize = APERTURE;
+			float annulusInnerRadius = (GAP + APERTURE) / APERTURE;
+			int annulusMinPixels = (int)(Math.PI * (Math.Pow(ANNULUS + GAP + APERTURE, 2) - Math.Pow(GAP + APERTURE, 2)));
+
+			mea.SetCoreProperties(annulusInnerRadius, annulusMinPixels, CorePhotometrySettings.Default.RejectionBackgroundPixelsStdDev, 2 /* TODO: This must be configurable */);
+
+	        var measurements = new Dictionary<IStar, double>();
+
             foreach (IStar star in stars)
             {
                 double x, y;
@@ -433,13 +461,132 @@ namespace Tangra.VideoTools
 
                 float starMag = GetStarMag(star, modelConfig.PhotometricFilter);
 
-                float iMax = ModelStarAmplitude(star, starMag, modelConfig);
+				float iMax = ModelStarAmplitude(star, starMag, modelConfig, pixmap.BitPixCamera, pixmap.MaxSignalValue);
                 
                 VideoModelUtils.GenerateStar(pixmap, (float)x, (float)y, (float)modelConfig.FWHM, iMax, 0 /*Use Gaussian */);
+
+	            if (modelConfig.CheckMagnitudes)
+	            {
+					var image = new AstroImage(pixmap);
+					uint[,] data = image.GetMeasurableAreaPixels((int)x, (int)y, 17);
+					uint[,] backgroundPixels = image.GetMeasurableAreaPixels((int)x, (int)y, 35);
+
+					PSFFit fit = new PSFFit((int) x, (int) y);
+					fit.Fit(data);
+
+					var result = mea.MeasureObject(new ImagePixel(x, y), data, backgroundPixels, pixmap.BitPixCamera,
+						TangraConfig.PreProcessingFilter.NoFilter,
+						TangraConfig.PhotometryReductionMethod.AperturePhotometry, TangraConfig.PsfQuadrature.NumericalInAperture,
+						TangraConfig.PsfFittingMethod.DirectNonLinearFit,
+						apertureSize, modelConfig.FWHM, (float)modelConfig.FWHM,
+						new FakeIMeasuredObject(fit), 
+						null, null,
+						false);
+
+					if (result == NotMeasuredReasons.TrackedSuccessfully && !mea.HasSaturatedPixels)
+					{
+						// Add value for fitting
+						measurements.Add(star, mea.TotalReading - mea.TotalBackground);
+					}
+	            }
             }
+
+	        if (modelConfig.CheckMagnitudes)
+				CalculateGagnitudeFit(measurements, modelConfig.BVSlope);
         }
 
-        private float ModelStarAmplitude(IStar star, float starMag, ModelConfig modelConfig)
+	    internal class MagFitEntry
+	    {
+		    public double MedianIntensity;
+		    public double MedianIntensityError;
+			public double APASS_BV_Colour;
+		    public double APASS_Sloan_r;
+			public double InstrMag;
+			public double InstrMagErr;
+		    public double Residual;
+	    }
+
+		private void CalculateGagnitudeFit(Dictionary<IStar, double> measurements, double fixedColourCoeff)
+	    {
+			List<MagFitEntry> datapoints  = new List<MagFitEntry>();
+
+			foreach (IStar star in measurements.Keys)
+			{
+				UCAC4Entry ucac4 = (UCAC4Entry) star;
+				if (!double.IsNaN(ucac4.Mag_r) && Math.Abs(ucac4.Mag_r) > 0.00001 && !double.IsNaN(ucac4.MagB) && !double.IsNaN(ucac4.MagV))
+				{
+					datapoints.Add(new MagFitEntry()
+					{
+						APASS_Sloan_r = ucac4.Mag_r,
+						APASS_BV_Colour = ucac4.MagB - ucac4.MagV,
+						MedianIntensity = measurements[star],
+						MedianIntensityError = 0.05 * measurements[star]
+					});
+				}
+			}
+
+			float FIXED_COLOUR_COEFF = (float)fixedColourCoeff;
+			for (int i = 0; i < datapoints.Count; i++)
+			{
+				datapoints[i].InstrMag = -2.5 * Math.Log10(datapoints[i].MedianIntensity) + 32 - datapoints[i].APASS_BV_Colour * FIXED_COLOUR_COEFF;
+				datapoints[i].InstrMagErr = Math.Abs(-2.5 * Math.Log10((datapoints[i].MedianIntensity + datapoints[i].MedianIntensityError) / datapoints[i].MedianIntensity));
+			}
+
+			datapoints = datapoints.Where(x => !double.IsNaN(x.InstrMag) && x.InstrMagErr < 0.2).ToList();
+
+			if (datapoints.Count < 4) return;
+
+			double variance = 0;
+			double Ka = 0;
+			double Kb = 0;
+
+			int MAX_ITTER = 2;
+			for (int itt = 0; itt <= MAX_ITTER; itt++)
+			{
+				SafeMatrix A = new SafeMatrix(datapoints.Count, 2);
+				SafeMatrix X = new SafeMatrix(datapoints.Count, 1);
+
+				int idx = 0;
+				for (int i = 0; i < datapoints.Count; i++)
+				{
+					A[idx, 0] = datapoints[i].InstrMag;
+					A[idx, 1] = 1;
+
+					X[idx, 0] = datapoints[i].APASS_Sloan_r;
+
+					idx++;
+				}
+
+				SafeMatrix a_T = A.Transpose();
+				SafeMatrix aa = a_T * A;
+				SafeMatrix aa_inv = aa.Inverse();
+				SafeMatrix bx = (aa_inv * a_T) * X;
+
+				Ka = bx[0, 0];
+				Kb = bx[1, 0];
+
+				double resSum = 0;
+				for (int i = 0; i < datapoints.Count; i++)
+				{
+					double computedMag = Ka * datapoints[i].InstrMag + Kb;
+
+					double diff = computedMag - datapoints[i].APASS_Sloan_r;
+
+					resSum += diff * diff;
+					datapoints[i].Residual = diff;
+				}
+
+				variance = Math.Sqrt(resSum / datapoints.Count);
+
+				if (itt < MAX_ITTER)
+					datapoints.RemoveAll(x => Math.Abs(x.Residual) > 2 * variance || Math.Abs(x.Residual) > 0.2);
+			}
+
+			Trace.WriteLine(string.Format("r' + {3} * (B-V) +  = {0} * M + {1} +/- {2}", Ka.ToString("0.0000"), Kb.ToString("0.0000"), variance.ToString("0.00"), FIXED_COLOUR_COEFF.ToString("0.00000")));
+
+	    }
+
+        private float ModelStarAmplitude(IStar star, float starMag, ModelConfig modelConfig, int bitPix, uint maxSignalValue)
         {
             if (Math.Abs(modelConfig.BVSlope) > 0.001)
             {
@@ -453,8 +600,91 @@ namespace Tangra.VideoTools
                 }
             }
 
-            return (float)((double)(modelConfig.MaxPixelValue - (modelConfig.NoiseMean + modelConfig.DarkFrameMean) * modelConfig.Integration) / Math.Pow(10, (starMag - modelConfig.BrighestUnsaturatedStarMag) / 2.5));
+			InitStarAmplitudeModelling(modelConfig, 0.02f, bitPix, maxSignalValue);
+	        double starMagPeak = ModelStarAmplitudePeak(modelConfig, starMag);
+
+			return (float)starMagPeak;
         }
+
+	    private Dictionary<double, int> m_MagnitudeToPeakDict = null;
+	    private List<double> m_MagnitudeToPeakMags = null;
+		private List<int> m_MagnitudeToPeakPeaks = null;
+
+		private double ModelStarAmplitudePeak(ModelConfig modelConfig, double starMag)
+	    {
+			for (int i = 0; i < m_MagnitudeToPeakMags.Count - 1; i++)
+			{
+				if (m_MagnitudeToPeakMags[i] < starMag && m_MagnitudeToPeakMags[i + 1] > starMag)
+				{
+					double interval = Math.Pow(10, m_MagnitudeToPeakMags[i + 1] - m_MagnitudeToPeakMags[i]);
+
+					return m_MagnitudeToPeakPeaks[i + 1] + Math.Log10(Math.Pow(10, starMag - m_MagnitudeToPeakMags[i]) * interval) * (m_MagnitudeToPeakPeaks[i] - m_MagnitudeToPeakPeaks[i + 1]);
+				}
+			}
+
+			return double.NaN;
+	    }
+
+		private void InitStarAmplitudeModelling(ModelConfig modelConfig, float accuracy, int bitPix, uint maxSignalValue)
+		{
+			if (m_MagnitudeToPeakDict != null) 
+				return;
+
+			m_MagnitudeToPeakDict = new Dictionary<double, int>();
+			m_MagnitudeToPeakMags = new List<double>();
+			m_MagnitudeToPeakPeaks = new List<int>();
+
+			var mea = new MeasurementsHelper(
+				bitPix, 
+				TangraConfig.BackgroundMethod.BackgroundMedian, 
+				TangraConfig.Settings.Photometry.SubPixelSquareSize,
+				TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(bitPix, maxSignalValue));
+
+			float apertureSize = APERTURE;
+			float annulusInnerRadius = (GAP + APERTURE) / APERTURE;
+			int annulusMinPixels = (int)(Math.PI * (Math.Pow(ANNULUS + GAP + APERTURE, 2) - Math.Pow(GAP + APERTURE, 2)));
+
+			mea.SetCoreProperties(annulusInnerRadius, annulusMinPixels, CorePhotometrySettings.Default.RejectionBackgroundPixelsStdDev, 2 /* TODO: This must be configurable */);
+
+			int peak = (int)(maxSignalValue - (modelConfig.NoiseMean + modelConfig.DarkFrameMean) * modelConfig.Integration);
+			int TOTAL_STEPS = 30;
+			double step = Math.Log10(peak) / TOTAL_STEPS;
+			double zeroMag = double.NaN;
+			for (int ii = 0; ii < TOTAL_STEPS; ii++)
+			{
+				int amplitude = (int)Math.Round(Math.Pow(10, Math.Log10(peak) - ii * step));
+				Pixelmap pixmap = new Pixelmap(64, 64, bitPix, new uint[64 * 64], null, null);
+				VideoModelUtils.GenerateStar(pixmap, 32, 32, (float)modelConfig.FWHM, amplitude, 0 /* Gaussian */);
+				PSFFit fit = new PSFFit(32, 32);
+				AstroImage img = new AstroImage(pixmap);
+				uint[,] data = img.GetMeasurableAreaPixels(32, 32, 17);
+				uint[,] backgroundPixels = img.GetMeasurableAreaPixels(32, 32, 35);
+
+				fit.Fit(data);
+
+				var result = mea.MeasureObject(new ImagePixel(32, 32), data, backgroundPixels, pixmap.BitPixCamera,
+					TangraConfig.PreProcessingFilter.NoFilter,
+					TangraConfig.PhotometryReductionMethod.AperturePhotometry, TangraConfig.PsfQuadrature.NumericalInAperture,
+					TangraConfig.PsfFittingMethod.DirectNonLinearFit,
+					apertureSize, modelConfig.FWHM, (float)modelConfig.FWHM,
+					new FakeIMeasuredObject(fit),
+					null, null,
+					false);
+
+				if (result == NotMeasuredReasons.TrackedSuccessfully && !mea.HasSaturatedPixels)
+				{
+					// Add value for fitting
+					double measurement = mea.TotalReading - mea.TotalBackground;
+					if (double.IsNaN(zeroMag))
+						zeroMag = modelConfig.BrighestUnsaturatedStarMag + 2.5 * Math.Log10(measurement);
+					double magnitude = -2.5 * Math.Log10(measurement) + zeroMag;
+
+					m_MagnitudeToPeakDict[magnitude] = amplitude;
+					m_MagnitudeToPeakMags.Add(magnitude);
+					m_MagnitudeToPeakPeaks.Add(amplitude);
+				}
+			}
+	    }
 
         private float GetStarMag(IStar star, ModelledFilter filter)
         {

@@ -32,6 +32,8 @@
 			this.pbar = new System.Windows.Forms.ProgressBar();
 			this.btnGenerateVideo = new System.Windows.Forms.Button();
 			this.pnlConfig = new System.Windows.Forms.Panel();
+			this.nudDarkMean = new System.Windows.Forms.NumericUpDown();
+			this.cbxProduceDark = new System.Windows.Forms.CheckBox();
 			this.label30 = new System.Windows.Forms.Label();
 			this.nudPlateRotation = new System.Windows.Forms.NumericUpDown();
 			this.label29 = new System.Windows.Forms.Label();
@@ -86,9 +88,9 @@
 			this.label1 = new System.Windows.Forms.Label();
 			this.nudTotalFrames = new System.Windows.Forms.NumericUpDown();
 			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-			this.cbxProduceDark = new System.Windows.Forms.CheckBox();
-			this.nudDarkMean = new System.Windows.Forms.NumericUpDown();
+			this.cbxCheckMagnitudes = new System.Windows.Forms.CheckBox();
 			this.pnlConfig.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.nudDarkMean)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudPlateRotation)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudMatrixHeight)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudMatrixWidth)).BeginInit();
@@ -106,7 +108,6 @@
 			((System.ComponentModel.ISupportInitialize)(this.nudNoiseStdDev)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudNoiseMean)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudTotalFrames)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.nudDarkMean)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// pbar
@@ -130,6 +131,7 @@
 			// 
 			// pnlConfig
 			// 
+			this.pnlConfig.Controls.Add(this.cbxCheckMagnitudes);
 			this.pnlConfig.Controls.Add(this.nudDarkMean);
 			this.pnlConfig.Controls.Add(this.cbxProduceDark);
 			this.pnlConfig.Controls.Add(this.label30);
@@ -189,6 +191,39 @@
 			this.pnlConfig.Name = "pnlConfig";
 			this.pnlConfig.Size = new System.Drawing.Size(401, 335);
 			this.pnlConfig.TabIndex = 16;
+			// 
+			// nudDarkMean
+			// 
+			this.nudDarkMean.Location = new System.Drawing.Point(305, 294);
+			this.nudDarkMean.Maximum = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
+			this.nudDarkMean.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+			this.nudDarkMean.Name = "nudDarkMean";
+			this.nudDarkMean.Size = new System.Drawing.Size(41, 20);
+			this.nudDarkMean.TabIndex = 95;
+			this.nudDarkMean.Value = new decimal(new int[] {
+            6,
+            0,
+            0,
+            0});
+			// 
+			// cbxProduceDark
+			// 
+			this.cbxProduceDark.AutoSize = true;
+			this.cbxProduceDark.Location = new System.Drawing.Point(212, 295);
+			this.cbxProduceDark.Name = "cbxProduceDark";
+			this.cbxProduceDark.Size = new System.Drawing.Size(92, 17);
+			this.cbxProduceDark.TabIndex = 94;
+			this.cbxProduceDark.Text = "Produce Dark";
+			this.cbxProduceDark.UseVisualStyleBackColor = true;
+			this.cbxProduceDark.CheckedChanged += new System.EventHandler(this.cbxProduceDark_CheckedChanged);
 			// 
 			// label30
 			// 
@@ -525,7 +560,7 @@
 			// nudNonLinearity
 			// 
 			this.nudNonLinearity.DecimalPlaces = 4;
-			this.nudNonLinearity.Location = new System.Drawing.Point(136, 304);
+			this.nudNonLinearity.Location = new System.Drawing.Point(136, 291);
 			this.nudNonLinearity.Maximum = new decimal(new int[] {
             2,
             0,
@@ -543,7 +578,7 @@
 			// label14
 			// 
 			this.label14.AutoSize = true;
-			this.label14.Location = new System.Drawing.Point(9, 306);
+			this.label14.Location = new System.Drawing.Point(9, 293);
 			this.label14.Name = "label14";
 			this.label14.Size = new System.Drawing.Size(118, 13);
 			this.label14.TabIndex = 64;
@@ -552,7 +587,7 @@
 			// nudBVSlope
 			// 
 			this.nudBVSlope.DecimalPlaces = 4;
-			this.nudBVSlope.Location = new System.Drawing.Point(136, 280);
+			this.nudBVSlope.Location = new System.Drawing.Point(136, 267);
 			this.nudBVSlope.Maximum = new decimal(new int[] {
             10,
             0,
@@ -565,7 +600,7 @@
 			// label13
 			// 
 			this.label13.AutoSize = true;
-			this.label13.Location = new System.Drawing.Point(21, 283);
+			this.label13.Location = new System.Drawing.Point(21, 270);
 			this.label13.Name = "label13";
 			this.label13.Size = new System.Drawing.Size(109, 13);
 			this.label13.TabIndex = 62;
@@ -581,7 +616,7 @@
             "g\'",
             "r\'",
             "i\'"});
-			this.cbxPhotometricFilter.Location = new System.Drawing.Point(305, 280);
+			this.cbxPhotometricFilter.Location = new System.Drawing.Point(305, 267);
 			this.cbxPhotometricFilter.Name = "cbxPhotometricFilter";
 			this.cbxPhotometricFilter.Size = new System.Drawing.Size(62, 21);
 			this.cbxPhotometricFilter.TabIndex = 61;
@@ -589,7 +624,7 @@
 			// label12
 			// 
 			this.label12.AutoSize = true;
-			this.label12.Location = new System.Drawing.Point(210, 283);
+			this.label12.Location = new System.Drawing.Point(210, 270);
 			this.label12.Name = "label12";
 			this.label12.Size = new System.Drawing.Size(91, 13);
 			this.label12.TabIndex = 60;
@@ -842,38 +877,15 @@
             0,
             0});
 			// 
-			// cbxProduceDark
+			// cbxCheckMagnitudes
 			// 
-			this.cbxProduceDark.AutoSize = true;
-			this.cbxProduceDark.Location = new System.Drawing.Point(212, 308);
-			this.cbxProduceDark.Name = "cbxProduceDark";
-			this.cbxProduceDark.Size = new System.Drawing.Size(92, 17);
-			this.cbxProduceDark.TabIndex = 94;
-			this.cbxProduceDark.Text = "Produce Dark";
-			this.cbxProduceDark.UseVisualStyleBackColor = true;
-			this.cbxProduceDark.CheckedChanged += new System.EventHandler(this.cbxProduceDark_CheckedChanged);
-			// 
-			// nudDarkMean
-			// 
-			this.nudDarkMean.Location = new System.Drawing.Point(305, 307);
-			this.nudDarkMean.Maximum = new decimal(new int[] {
-            255,
-            0,
-            0,
-            0});
-			this.nudDarkMean.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-			this.nudDarkMean.Name = "nudDarkMean";
-			this.nudDarkMean.Size = new System.Drawing.Size(41, 20);
-			this.nudDarkMean.TabIndex = 95;
-			this.nudDarkMean.Value = new decimal(new int[] {
-            6,
-            0,
-            0,
-            0});
+			this.cbxCheckMagnitudes.AutoSize = true;
+			this.cbxCheckMagnitudes.Location = new System.Drawing.Point(135, 315);
+			this.cbxCheckMagnitudes.Name = "cbxCheckMagnitudes";
+			this.cbxCheckMagnitudes.Size = new System.Drawing.Size(52, 17);
+			this.cbxCheckMagnitudes.TabIndex = 17;
+			this.cbxCheckMagnitudes.Text = "Verify";
+			this.cbxCheckMagnitudes.UseVisualStyleBackColor = true;
 			// 
 			// frmGenerateStarFieldVideoModel
 			// 
@@ -892,6 +904,7 @@
 			this.Text = "Controlled Star Field Model Video Generation";
 			this.pnlConfig.ResumeLayout(false);
 			this.pnlConfig.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.nudDarkMean)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudPlateRotation)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudMatrixHeight)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudMatrixWidth)).EndInit();
@@ -909,7 +922,6 @@
 			((System.ComponentModel.ISupportInitialize)(this.nudNoiseStdDev)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudNoiseMean)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nudTotalFrames)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.nudDarkMean)).EndInit();
 			this.ResumeLayout(false);
 
         }
@@ -975,5 +987,6 @@
 		private System.Windows.Forms.Label label29;
 		private System.Windows.Forms.NumericUpDown nudDarkMean;
 		private System.Windows.Forms.CheckBox cbxProduceDark;
+		private System.Windows.Forms.CheckBox cbxCheckMagnitudes;
     }
 }
