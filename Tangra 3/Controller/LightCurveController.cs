@@ -62,6 +62,8 @@ namespace Tangra.Controller
 
             if (openFileDialog.ShowDialog(m_MainFormView) == DialogResult.OK)
             {
+				m_VideoController.CloseOpenedVideoFile();
+
                 OpenLcFile(openFileDialog.FileName);
             }
         }

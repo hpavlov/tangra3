@@ -11,6 +11,7 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Helpers;
 using Tangra.Model.Astro;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
@@ -61,7 +62,7 @@ namespace Tangra.VideoOperations.LightCurves
             {
                 nudFrameNo.Minimum = m_VideoStream.FirstFrame;
                 nudFrameNo.Maximum = m_VideoStream.LastFrame;
-				nudFrameNo.Value = currentFrameNo;
+				nudFrameNo.SetNUDValue(currentFrameNo);
             }
 
             picHistogram.Image = new Bitmap(picHistogram.Width, picHistogram.Height);
