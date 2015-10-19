@@ -15,8 +15,8 @@ namespace Tangra.OCR
 	internal class IotaVtiOcrCorrector
 	{
 		private int m_PrevFrameNo;
-		private long m_PrevOddTicks;
-		private long m_PrevEvenTicks;
+		internal long m_PrevOddTicks;
+		internal long m_PrevEvenTicks;
 		private long m_PrevOddFieldNo;
 		private long m_PrevEvenFieldNo;
 		private IotaVtiTimeStamp m_PrevOddFieldOSD;

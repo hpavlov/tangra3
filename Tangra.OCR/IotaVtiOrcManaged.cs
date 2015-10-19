@@ -33,7 +33,7 @@ namespace Tangra.OCR
 		private int m_FieldAreaWidth;
 
 		private bool m_TVSafeModeGuess;
-        private IotaVtiOcrProcessor m_Processor;
+        internal IotaVtiOcrProcessor m_Processor;
 
 		private Dictionary<string, uint[]> m_CalibrationImages = new Dictionary<string, uint[]>();
 		private List<string> m_CalibrationErrors = new List<string>(); 
@@ -42,7 +42,7 @@ namespace Tangra.OCR
 
 		private bool m_ForceErrorReport;
 
-		private IotaVtiOcrCorrector m_Corrector = new IotaVtiOcrCorrector();
+		internal IotaVtiOcrCorrector m_Corrector = new IotaVtiOcrCorrector();
 
 		public string NameAndVersion()
 		{
@@ -623,7 +623,7 @@ namespace Tangra.OCR
             return m_LatestFrameImage;
         }
 	     
-        private DateTime ExtractDateTime(int frameNo, IotaVtiTimeStamp oddFieldOSD, IotaVtiTimeStamp evenFieldOSD)
+        internal DateTime ExtractDateTime(int frameNo, IotaVtiTimeStamp oddFieldOSD, IotaVtiTimeStamp evenFieldOSD)
         {
             bool failedValidation = false;
             string failedReason = null;
