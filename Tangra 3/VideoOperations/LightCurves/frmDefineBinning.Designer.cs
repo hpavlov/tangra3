@@ -54,6 +54,11 @@
             // nudNumFramesToBin
             // 
             this.nudNumFramesToBin.Location = new System.Drawing.Point(54, 16);
+            this.nudNumFramesToBin.Maximum = new decimal(new int[] {
+            1024,
+            0,
+            0,
+            0});
             this.nudNumFramesToBin.Name = "nudNumFramesToBin";
             this.nudNumFramesToBin.Size = new System.Drawing.Size(52, 20);
             this.nudNumFramesToBin.TabIndex = 8;
