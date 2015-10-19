@@ -462,6 +462,8 @@ namespace Tangra.VideoTools
                 float starMag = GetStarMag(star, modelConfig.PhotometricFilter);
 
 				float iMax = ModelStarAmplitude(star, starMag, modelConfig, pixmap.BitPixCamera, pixmap.MaxSignalValue);
+
+                //TODO: Model the amplitude for 6px aperture rather than using a PSF amplitude
                 
                 VideoModelUtils.GenerateStar(pixmap, (float)x, (float)y, (float)modelConfig.FWHM, iMax, 0 /*Use Gaussian */);
 
