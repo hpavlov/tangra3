@@ -70,6 +70,7 @@ namespace Tangra.VideoTools
             public double BVSlope;
             public double LinearityCoefficient;
 			public bool CheckMagnitudes;
+            public bool PSFMagnitudeModelling;
 
             public string InfoLine1;
             public string InfoLine2;
@@ -179,7 +180,8 @@ namespace Tangra.VideoTools
                     BVSlope = (double)nudBVSlope.Value,
                     LinearityCoefficient = (double)nudNonLinearity.Value,
 					DarkFrameMean = cbxProduceDark.Checked ? (int)nudDarkMean.Value : 0,
-					CheckMagnitudes = cbxCheckMagnitudes.Checked
+					CheckMagnitudes = cbxCheckMagnitudes.Checked,
+                    PSFMagnitudeModelling = cbxPSFStarModelling.Checked
                 };
 
 				config.PlateRotAngleRadians = (double)nudPlateRotation.Value * Math.PI / 180.0; 
@@ -460,37 +462,37 @@ namespace Tangra.VideoTools
                     continue;
 
                 float starMag = GetStarMag(star, modelConfig.PhotometricFilter);
+                float iMax = ModelStarAmplitude(star, starMag, modelConfig, pixmap.BitPixCamera, pixmap.MaxSignalValue);
 
-				float iMax = ModelStarAmplitude(star, starMag, modelConfig, pixmap.BitPixCamera, pixmap.MaxSignalValue);
+                if (!float.IsNaN(iMax))
+                {
+                    VideoModelUtils.GenerateStar(pixmap, (float)x, (float)y, (float)modelConfig.FWHM, iMax, 0 /*Use Gaussian */);
 
-                //TODO: Model the amplitude for 6px aperture rather than using a PSF amplitude
-                
-                VideoModelUtils.GenerateStar(pixmap, (float)x, (float)y, (float)modelConfig.FWHM, iMax, 0 /*Use Gaussian */);
+                    if (modelConfig.CheckMagnitudes)
+                    {
+                        var image = new AstroImage(pixmap);
+                        uint[,] data = image.GetMeasurableAreaPixels((int)x, (int)y, 17);
+                        uint[,] backgroundPixels = image.GetMeasurableAreaPixels((int)x, (int)y, 35);
 
-	            if (modelConfig.CheckMagnitudes)
-	            {
-					var image = new AstroImage(pixmap);
-					uint[,] data = image.GetMeasurableAreaPixels((int)x, (int)y, 17);
-					uint[,] backgroundPixels = image.GetMeasurableAreaPixels((int)x, (int)y, 35);
+                        PSFFit fit = new PSFFit((int)x, (int)y);
+                        fit.Fit(data);
 
-					PSFFit fit = new PSFFit((int) x, (int) y);
-					fit.Fit(data);
+                        var result = mea.MeasureObject(new ImagePixel(x, y), data, backgroundPixels, pixmap.BitPixCamera,
+                            TangraConfig.PreProcessingFilter.NoFilter,
+                            TangraConfig.PhotometryReductionMethod.AperturePhotometry, TangraConfig.PsfQuadrature.NumericalInAperture,
+                            TangraConfig.PsfFittingMethod.DirectNonLinearFit,
+                            apertureSize, modelConfig.FWHM, (float)modelConfig.FWHM,
+                            new FakeIMeasuredObject(fit),
+                            null, null,
+                            false);
 
-					var result = mea.MeasureObject(new ImagePixel(x, y), data, backgroundPixels, pixmap.BitPixCamera,
-						TangraConfig.PreProcessingFilter.NoFilter,
-						TangraConfig.PhotometryReductionMethod.AperturePhotometry, TangraConfig.PsfQuadrature.NumericalInAperture,
-						TangraConfig.PsfFittingMethod.DirectNonLinearFit,
-						apertureSize, modelConfig.FWHM, (float)modelConfig.FWHM,
-						new FakeIMeasuredObject(fit), 
-						null, null,
-						false);
-
-					if (result == NotMeasuredReasons.TrackedSuccessfully && !mea.HasSaturatedPixels)
-					{
-						// Add value for fitting
-						measurements.Add(star, mea.TotalReading - mea.TotalBackground);
-					}
-	            }
+                        if (result == NotMeasuredReasons.TrackedSuccessfully && !mea.HasSaturatedPixels)
+                        {
+                            // Add value for fitting
+                            measurements.Add(star, mea.TotalReading - mea.TotalBackground);
+                        }
+                    }
+                }
             }
 
 	        if (modelConfig.CheckMagnitudes)
@@ -602,10 +604,14 @@ namespace Tangra.VideoTools
                 }
             }
 
-			InitStarAmplitudeModelling(modelConfig, 0.02f, bitPix, maxSignalValue);
-	        double starMagPeak = ModelStarAmplitudePeak(modelConfig, starMag);
-
-			return (float)starMagPeak;
+            if (modelConfig.PSFMagnitudeModelling)
+                return (float)((double)(modelConfig.MaxPixelValue - (modelConfig.NoiseMean + modelConfig.DarkFrameMean) * modelConfig.Integration) / Math.Pow(10, (starMag - modelConfig.BrighestUnsaturatedStarMag) / 2.5));
+            else
+            {
+                InitStarAmplitudeModelling(modelConfig, 0.02f, bitPix, maxSignalValue);
+                double starMagPeak = ModelStarAmplitudePeak(modelConfig, starMag);
+                return (float)starMagPeak;
+            }
         }
 
 	    private Dictionary<double, int> m_MagnitudeToPeakDict = null;
@@ -649,7 +655,7 @@ namespace Tangra.VideoTools
 			mea.SetCoreProperties(annulusInnerRadius, annulusMinPixels, CorePhotometrySettings.Default.RejectionBackgroundPixelsStdDev, 2 /* TODO: This must be configurable */);
 
 			int peak = (int)(maxSignalValue - (modelConfig.NoiseMean + modelConfig.DarkFrameMean) * modelConfig.Integration);
-			int TOTAL_STEPS = 30;
+			int TOTAL_STEPS = 100;
 			double step = Math.Log10(peak) / TOTAL_STEPS;
 			double zeroMag = double.NaN;
 			for (int ii = 0; ii < TOTAL_STEPS; ii++)
