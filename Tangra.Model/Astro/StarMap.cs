@@ -86,7 +86,7 @@ namespace Tangra.Model.Astro
 			m_FrameToInclude = frameToInclude;
 			m_LimitByInclusion = limitByInclusion;
 
-			int optimumStarsInField = config.OptimumStarsInField ?? (int)TangraConfig.Settings.Astrometry.PyramidOptimumStarsToMatch;
+			int optimumStarsInField = config.OptimumStarsInField ?? (TangraConfig.Settings != null ? (int)TangraConfig.Settings.Astrometry.PyramidOptimumStarsToMatch : 25);
 			uint maxSignalValue = config.CustomMaxSignalValue ?? m_Pixelmap.MaxSignalValue;
 			
 			m_AverageBackgroundNoise = maxSignalValue;

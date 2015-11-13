@@ -188,7 +188,7 @@ namespace Tangra.Config
 				{
 					var catalogValidator = new StarCatalogueFacade(TangraConfig.Settings.StarCatalogue);
 
-					if (!catalogValidator.VerifyCurrentCatalogue(TangraConfig.Settings.StarCatalogue.Catalog, ref TangraConfig.Settings.StarCatalogue.CatalogLocation))
+                    if (!StarCatalogueFacade.VerifyCurrentCatalogue(TangraConfig.Settings.StarCatalogue.Catalog, ref TangraConfig.Settings.StarCatalogue.CatalogLocation))
 					{
 						tvSettings.SelectedNode = tvSettings.Nodes["ndCatalogues"];
 
@@ -221,7 +221,7 @@ namespace Tangra.Config
                 {
                     var catalogValidator = new StarCatalogueFacade(TangraConfig.Settings.StarCatalogue);
 
-                    if (!catalogValidator.VerifyCurrentCatalogue(TangraConfig.Settings.StarCatalogue.Catalog, ref TangraConfig.Settings.StarCatalogue.CatalogLocation))
+                    if (!StarCatalogueFacade.VerifyCurrentCatalogue(TangraConfig.Settings.StarCatalogue.Catalog, ref TangraConfig.Settings.StarCatalogue.CatalogLocation))
                     {
                         tvSettings.SelectedNode = tvSettings.Nodes["ndCatalogues"];
 

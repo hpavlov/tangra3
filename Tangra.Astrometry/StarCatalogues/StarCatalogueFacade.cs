@@ -127,7 +127,12 @@ namespace Tangra.Astrometry.Recognition
             return double.NaN;
         }
 
-		public bool IsValidCatalogLocation(TangraConfig.StarCatalog catalog, ref string folderPath)
+        bool ICatalogValidator.IsValidCatalogLocation(TangraConfig.StarCatalog catalog, ref string folderPath)
+        {
+            return IsValidCatalogLocation(catalog, ref folderPath);
+        }
+
+	    public static bool IsValidCatalogLocation(TangraConfig.StarCatalog catalog, ref string folderPath)
 		{
 			if (catalog == TangraConfig.StarCatalog.UCAC2)
 				return UCAC2Catalogue.IsValidCatalogLocation(ref folderPath);
@@ -143,7 +148,12 @@ namespace Tangra.Astrometry.Recognition
 			return false;
 		}
 
-		public bool VerifyCurrentCatalogue(TangraConfig.StarCatalog catalog, ref string path)
+        bool ICatalogValidator.VerifyCurrentCatalogue(TangraConfig.StarCatalog catalog, ref string path)
+        {
+            return VerifyCurrentCatalogue(catalog, ref path);
+        }
+
+	    public static bool VerifyCurrentCatalogue(TangraConfig.StarCatalog catalog, ref string path)
 		{
 			if (catalog == TangraConfig.StarCatalog.UCAC2)
 			{
@@ -182,7 +192,12 @@ namespace Tangra.Astrometry.Recognition
 			return true;
 		}
 
-		public object[] MagnitudeBandsForCatalog(TangraConfig.StarCatalog catalog)
+        object[] ICatalogValidator.MagnitudeBandsForCatalog(TangraConfig.StarCatalog catalog)
+        {
+            return MagnitudeBandsForCatalog(catalog);
+        }
+
+	    public static object[] MagnitudeBandsForCatalog(TangraConfig.StarCatalog catalog)
 		{
 			if (catalog == TangraConfig.StarCatalog.UCAC2)
 				return UCAC2Catalogue.CatalogMagnitudeBands;
