@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -109,5 +110,25 @@ namespace Tangra.Model.Helpers
 
 			return data[data.Count / 2];
 		}
+
+        public static bool TraceError(this TraceLevel traceLevel)
+        {
+            return (int)traceLevel >= 1;
+        }
+
+        public static bool TraceWarning(this TraceLevel traceLevel)
+        {
+            return (int)traceLevel >= 2;
+        }
+
+        public static bool TraceInfo(this TraceLevel traceLevel)
+        {
+            return (int) traceLevel >= 3;
+        }
+
+        public static bool TraceVerbose(this TraceLevel traceLevel)
+        {
+            return (int)traceLevel == 4;
+        }
     }
 }

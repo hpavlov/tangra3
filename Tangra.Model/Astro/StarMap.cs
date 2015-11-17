@@ -13,6 +13,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using Tangra.Model.Astro;
 using Tangra.Model.Config;
+using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 
 
@@ -213,10 +214,11 @@ namespace Tangra.Model.Astro
 			{
 				m_PerformanceWatch.Stop();
 
-				Trace.WriteLine(string.Format("StarMapGen: {0} ms, {1} features, {2} generations (tolerance = {3})",
-					m_PerformanceWatch.ElapsedMilliseconds,
-					m_Features.Count, m_Features.Count > 0 ? m_Features[0].Generation : 0,
-					config.StarMapperTolerance));
+                if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+				    Trace.WriteLine(string.Format("StarMapGen: {0} ms, {1} features, {2} generations (tolerance = {3})",
+					    m_PerformanceWatch.ElapsedMilliseconds,
+					    m_Features.Count, m_Features.Count > 0 ? m_Features[0].Generation : 0,
+					    config.StarMapperTolerance));
 
 				int lastGenMin = int.MaxValue;
 				int thisGenMin = int.MaxValue;

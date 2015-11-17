@@ -327,9 +327,11 @@ namespace Tangra.VideoOperations.Astrometry
 
             float epoch = Context.UtcTime.Year + Context.UtcTime.DayOfYear / 365.25f;
 
-            Trace.WriteLine(string.Format("Loading stars in region ({0}, {1})",
-                                          AstroConvert.ToStringValue(Context.RADeg / 15, "REC"),
-                                          AstroConvert.ToStringValue(Context.DEDeg, "DEC")));
+
+            if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceInfo())
+                Trace.WriteLine(string.Format("Loading stars in region ({0}, {1})",
+                                              AstroConvert.ToStringValue(Context.RADeg / 15, "REC"),
+                                              AstroConvert.ToStringValue(Context.DEDeg, "DEC")));
 
             var facade = new StarCatalogueFacade(TangraConfig.Settings.StarCatalogue);
             m_CatalogueStars = facade.GetStarsInRegion(

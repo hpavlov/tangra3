@@ -176,17 +176,20 @@ namespace Tangra.Astrometry.Recognition
 			finally
 			{
 				sw.Stop();
-				Trace.WriteLine(string.Format(
-					"Building pyramid pairs from a total of {0} stars. Time taken: {1:0}ms", 
-					m_CelestialAllStars.Count, sw.ElapsedMilliseconds));
+
+                if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+				    Trace.WriteLine(string.Format(
+					    "Building pyramid pairs from a total of {0} stars. Time taken: {1:0}ms", 
+					    m_CelestialAllStars.Count, sw.ElapsedMilliseconds));
 
 				if (m_Distributor != null)
 				{
-					Trace.WriteLine(string.Format(
-						"{0} stars used in {1} zones and {2} pairs.",
-						m_StarsDistanceCache.Count,
-						m_Distributor.Areas.Count,
-						m_DistancesByMagnitude.Count));					
+                    if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+					    Trace.WriteLine(string.Format(
+						    "{0} stars used in {1} zones and {2} pairs.",
+						    m_StarsDistanceCache.Count,
+						    m_Distributor.Areas.Count,
+						    m_DistancesByMagnitude.Count));
 				}
 			}
         }
@@ -257,12 +260,13 @@ namespace Tangra.Astrometry.Recognition
                     Trace.Assert(star != null, string.Format("Debug Star {0} not found in the pyramid stars!", starNo));
                 }
 
-                Trace.WriteLine(
-					string.Format("DEBUG ALIGN: {0} out of {1} Debug Stars found among the pyramid stars ({2})",
-					pyramidStarsLocated, resolvedDebugStarsNos.Count,
-					resolvedDebugStarsNos.Count > 1 
-						? resolvedDebugStarsNos.Select(s => s.ToString()).Aggregate((a, b) => string.Concat(a, " ", b))
-						: ""));
+                if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+                    Trace.WriteLine(
+					    string.Format("DEBUG ALIGN: {0} out of {1} Debug Stars found among the pyramid stars ({2})",
+					    pyramidStarsLocated, resolvedDebugStarsNos.Count,
+					    resolvedDebugStarsNos.Count > 1 
+						    ? resolvedDebugStarsNos.Select(s => s.ToString()).Aggregate((a, b) => string.Concat(a, " ", b))
+						    : ""));
             }
 
 			// Start building the pairs
@@ -499,8 +503,9 @@ namespace Tangra.Astrometry.Recognition
 			{
 				int allResolved = m_CelestialAllStars.Count((star) => DebugResolvedStars.ContainsValue(star.StarNo));
 				int allPyramidResolved = m_CelestialPyramidStars.Count((star) => DebugResolvedStars.ContainsValue(star.StarNo));
-				Trace.WriteLine(string.Format("Resolved: {2}; All: {3}; Pyramid: {4}; AllResolved:{0}; PyramidResolved:{1}",
-					allResolved, allPyramidResolved, DebugResolvedStars.Count, m_CelestialAllStars.Count, m_CelestialPyramidStars.Count));
+                if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceInfo())
+				    Trace.WriteLine(string.Format("Resolved: {2}; All: {3}; Pyramid: {4}; AllResolved:{0}; PyramidResolved:{1}",
+					    allResolved, allPyramidResolved, DebugResolvedStars.Count, m_CelestialAllStars.Count, m_CelestialPyramidStars.Count));
 			}
 
 			// TODO: After a successful fit, use the LimitReferenceStarDetection to find the faintest detectable star
@@ -518,7 +523,8 @@ namespace Tangra.Astrometry.Recognition
 			// The distance base "Pyramid" matching only uses limited number of stars
 			m_CelestialPyramidStars = m_CelestialAllStars.FindAll((star) => star.Mag >= m_PyramidMinMag && star.Mag <= m_PyramidMaxMag);
 
-			Trace.WriteLine(string.Format("Building Pyramid Alignment Dataset of {0}/{1} stars in range {2}m - {3}m", m_CelestialPyramidStars.Count, m_CelestialAllStars.Count, m_PyramidMinMag.ToString("0.0"), m_PyramidMaxMag.ToString("0.0")));
+            if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+			    Trace.WriteLine(string.Format("Building Pyramid Alignment Dataset of {0}/{1} stars in range {2}m - {3}m", m_CelestialPyramidStars.Count, m_CelestialAllStars.Count, m_PyramidMinMag.ToString("0.0"), m_PyramidMaxMag.ToString("0.0")));
 
 			m_Distances.Clear();
 			m_Entries.Clear();
@@ -692,7 +698,8 @@ namespace Tangra.Astrometry.Recognition
 					{						
 						m_CelestialPyramidStars = m_CelestialAllStars;
 
-						Trace.WriteLine(string.Format("Now using all {0} loaded stars as alignment stars", m_CelestialPyramidStars.Count));
+                        if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+						    Trace.WriteLine(string.Format("Now using all {0} loaded stars as alignment stars", m_CelestialPyramidStars.Count));
 					}
 					else
 					{
@@ -700,7 +707,8 @@ namespace Tangra.Astrometry.Recognition
 							.Where(s => s.Mag <= m_DetectedLimitingMagnitude)
 							.ToList();
 
-						Trace.WriteLine(string.Format("Limitting alignment stars to {0} start up to mag {1:0.0}", m_CelestialPyramidStars.Count, m_DetectedLimitingMagnitude));
+                        if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+						    Trace.WriteLine(string.Format("Limitting alignment stars to {0} start up to mag {1:0.0}", m_CelestialPyramidStars.Count, m_DetectedLimitingMagnitude));
 					}
 					InitializePyramidMatching();
 				}				
@@ -871,11 +879,13 @@ namespace Tangra.Astrometry.Recognition
 
 #if DEBUG
                                 jkEntry = m_Entries[bestKId];
-                                Debug.WriteLine(
-                                    string.Format("3-rd star match failed by {0}\" ({1}, {2}, {3}) -> ({4}: {5}, {6}); [{7},{8}]",
-                                    bestDiff, i, j, k,
-                                    foundIdx0, needIdx1, needIdx2,
-                                    jkEntry.Star1.StarNo, jkEntry.Star2.StarNo));
+
+                                if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+                                    Debug.WriteLine(
+                                        string.Format("3-rd star match failed by {0}\" ({1}, {2}, {3}) -> ({4}: {5}, {6}); [{7},{8}]",
+                                        bestDiff, i, j, k,
+                                        foundIdx0, needIdx1, needIdx2,
+                                        jkEntry.Star1.StarNo, jkEntry.Star2.StarNo));
 #endif
 				}
 			}
@@ -1882,7 +1892,8 @@ namespace Tangra.Astrometry.Recognition
 					}
 				}
 
-				Debug.WriteLine(string.Format("Attempting DistanceBasedContext.LeastSquareFittedAstrometry ({0}={1}; {2}={3}; {4}={5})", i, iStarNo, j, jStarNo, k, kStarNo));
+                if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+				    Debug.WriteLine(string.Format("Attempting DistanceBasedContext.LeastSquareFittedAstrometry ({0}={1}; {2}={3}; {4}={5})", i, iStarNo, j, jStarNo, k, kStarNo));
 				
                 return SolveStarPairs(
 					starMap, m_MatchedPairs, m_MatchedFeatureIdToStarIdIndexes, pair_i, pair_j, pair_k,					
@@ -1905,13 +1916,17 @@ namespace Tangra.Astrometry.Recognition
                     {
                         if (m_MatchedFeatureIdToStarIdIndexes[featureId] == star.StarNo)
                         {
-#if DEBUG 
-                Debug 
+                            if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+                            {
+#if DEBUG
+                                Debug
 #endif
 #if PYRAMID_DEBUG
-                Trace 
+                                Trace 
 #endif
-                            .WriteLine(string.Format("({0}, {1}) - StarNo: {2}; FeatureId: {3}", pixel.X, pixel.Y, star.StarNo, featureId));
+                                .WriteLine(string.Format("({0}, {1}) - StarNo: {2}; FeatureId: {3}", pixel.X, pixel.Y, star.StarNo, featureId));
+                            }
+
                             break;
                         }
                     }
@@ -1963,7 +1978,8 @@ namespace Tangra.Astrometry.Recognition
 			{
 				if (coarseFit.IsSingularity)
 				{
-					Trace.WriteLine("ThreeStarFit.Var1 - Singularity");
+                    if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+					    Trace.WriteLine("ThreeStarFit.Var1 - Singularity");
 
 					Dictionary<ImagePixel, IStar> threeStarDict = new Dictionary<ImagePixel, IStar>();
 					threeStarDict.Add(ImagePixel.CreateImagePixelWithFeatureId(0, 255, pair_i.XImage, pair_i.YImage), pair_i.Star);
@@ -1977,7 +1993,8 @@ namespace Tangra.Astrometry.Recognition
 					{
 						if (pyramidLog != null) pyramidLog.FailureReason = PyramidEntryFailureReason.ThreeStarFitFailed;
 
-						Trace.WriteLine("ThreeStarFit.Var2 - Failed");
+                        if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+						    Trace.WriteLine("ThreeStarFit.Var2 - Failed");
 						return null;						
 					}
 					else
@@ -1990,7 +2007,8 @@ namespace Tangra.Astrometry.Recognition
 				{
 					if (pyramidLog != null) pyramidLog.FailureReason = PyramidEntryFailureReason.ThreeStarFitFailed;
 
-					Trace.WriteLine("ThreeStarFit.Var1 - Failed");
+                    if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+					    Trace.WriteLine("ThreeStarFit.Var1 - Failed");
 					return null;					
 				}
 			}
@@ -2003,14 +2021,17 @@ namespace Tangra.Astrometry.Recognition
 			
 
 #if DEBUG || PYRAMID_DEBUG
-            foreach (int key in matchedFeatureIdToStarIdIndexes.Keys)
+		    if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+		    {
+                foreach (int key in matchedFeatureIdToStarIdIndexes.Keys)
 #if PYRAMID_DEBUG
-                Trace
+                    Trace
 #else
-                Debug
+                    Debug
 #endif
                     .WriteLine(string.Format("Star({0}) -> Feature({1})", matchedFeatureIdToStarIdIndexes[key], key));
 #endif
+		    }
 
 			PlateConstantsSolver solver = new PlateConstantsSolver(m_PlateConfig);
 			solver.InitPlateSolution(RA0Deg, DE0Deg);
@@ -2035,7 +2056,8 @@ namespace Tangra.Astrometry.Recognition
 			{
 				if (pyramidLog != null) pyramidLog.RegisterLinearFit(leastSquareFittedAstrometry);
 
-				Trace.WriteLine("Checking possible solution. ");
+                if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+				    Trace.WriteLine("Checking possible solution. ");
 
 				List<ulong> usedStarIds = leastSquareFittedAstrometry.FitInfo.AllStarPairs
 					.Where(p => p.FitInfo.UsedInSolution)
@@ -2068,9 +2090,10 @@ namespace Tangra.Astrometry.Recognition
 				{
 					if (pyramidLog != null) pyramidLog.FailureReason = PyramidEntryFailureReason.SecondLargestResidualIsTooLarge;
 
-					Trace.WriteLine(string.Format(
-						"Failing preliminary solution because the second largest residual {0}\" is larger than {1}px",
-						secondLargeResidual.ToString("0.0"), CorePyramidConfig.Default.MaxAllowedResidualInPixelsInSuccessfulFit));
+                    if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+					    Trace.WriteLine(string.Format(
+						    "Failing preliminary solution because the second largest residual {0}\" is larger than {1}px",
+						    secondLargeResidual.ToString("0.0"), CorePyramidConfig.Default.MaxAllowedResidualInPixelsInSuccessfulFit));
 
 					return null;
 				}
@@ -2081,9 +2104,10 @@ namespace Tangra.Astrometry.Recognition
 					{
 						if (pyramidLog != null) pyramidLog.FailureReason = PyramidEntryFailureReason.InsufficientStarsForCalibration;
 
-						Trace.WriteLine(string.Format(
-						"Failing preliminary solution because on {0} stars are used but {1} are required as a minimum for calibration.",
-						usedStars, CorePyramidConfig.Default.MinMatchedStarsForCalibration));
+                        if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+						    Trace.WriteLine(string.Format(
+						    "Failing preliminary solution because on {0} stars are used but {1} are required as a minimum for calibration.",
+						    usedStars, CorePyramidConfig.Default.MinMatchedStarsForCalibration));
 
 						return null;
 					}
@@ -2177,20 +2201,24 @@ namespace Tangra.Astrometry.Recognition
 			{
 				if (pyramidLog != null) pyramidLog.FailureReason = PyramidEntryFailureReason.LinearFitFailed;
 
-				Debug.WriteLine("DistanceBasedContext.LeastSquareFittedAstrometry Failed!");
+			    if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+			    {
+                    Debug.WriteLine("DistanceBasedContext.LeastSquareFittedAstrometry Failed!");
 
-				foreach (PlateConstStarPair pair in solver.Pairs)
-				{
+                    foreach (PlateConstStarPair pair in solver.Pairs)
+                    {
 #if PYRAMID_DEBUG
-                    Trace
+                        Trace
 #else
-					Debug
+                        Debug
 #endif
-.WriteLine(string.Format("{0} ({1}) -> Residuals: {2}\", {3}\"", pair.StarNo,
-												  pair.FitInfo.UsedInSolution ? "Included" : "Excluded",
-												  pair.FitInfo.ResidualRAArcSec.ToString("0.00"),
-												  pair.FitInfo.ResidualDEArcSec.ToString("0.00")));
-				}
+                        .WriteLine(string.Format("{0} ({1}) -> Residuals: {2}\", {3}\"", pair.StarNo,
+                                                      pair.FitInfo.UsedInSolution ? "Included" : "Excluded",
+                                                      pair.FitInfo.ResidualRAArcSec.ToString("0.00"),
+                                                      pair.FitInfo.ResidualDEArcSec.ToString("0.00")));
+                    }
+
+			    }
 			}
 
 			if (leastSquareFittedAstrometry != null)
@@ -2327,7 +2355,8 @@ namespace Tangra.Astrometry.Recognition
 
 						if (timeTaken.ElapsedMilliseconds > m_Settings.PyramidTimeoutInSeconds * 1000)
 						{
-                            Trace.WriteLine(string.Format("Timeout of {0}sec reached at {1}-{2}-{3}", m_Settings.PyramidTimeoutInSeconds, i, j, k));
+                            if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceError())
+                                Trace.WriteLine(string.Format("Timeout of {0}sec reached at {1}-{2}-{3}", m_Settings.PyramidTimeoutInSeconds, i, j, k));
 							return false;
 						}
 
@@ -2380,7 +2409,8 @@ namespace Tangra.Astrometry.Recognition
 #if ASTROMETRY_DEBUG
 						improvementLog.Fail(SolutionImprovementFailureReason.FailedToImproveSolution);
 #endif
-						Trace.WriteLine("Failing potential fit because the improved solultion is NULL.");
+                        if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+						    Trace.WriteLine("Failing potential fit because the improved solultion is NULL.");
 					
 						// Check for a false negative
 						double? deltaArcSec = null;
@@ -2397,7 +2427,9 @@ namespace Tangra.Astrometry.Recognition
 
 							if (deltaPixels < 5)
 							{
-								Trace.WriteLine(string.Format("DEBUG ALIGN: False negative alignment on {0}-{1}-{2}", i, j, k));
+                                if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+								    Trace.WriteLine(string.Format("DEBUG ALIGN: False negative alignment on {0}-{1}-{2}", i, j, k));
+
 								Trace.Assert(false, "False Negative!");
 								SaveAlignImage(fit.FitInfo.AllStarPairs, i, j, k, false);
 								return false;
@@ -2423,7 +2455,9 @@ namespace Tangra.Astrometry.Recognition
 #if ASTROMETRY_DEBUG
 						improvementLog.Fail(SolutionImprovementFailureReason.LessThanFourStars);
 #endif
-						Trace.WriteLine("Failing potential fit because there are less than 4 included stars in the improved solultion .");
+                        if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+						    Trace.WriteLine("Failing potential fit because there are less than 4 included stars in the improved solultion .");
+
 						return false;
 					}
 
@@ -2436,7 +2470,9 @@ namespace Tangra.Astrometry.Recognition
 #if ASTROMETRY_DEBUG
 						improvementLog.Fail(SolutionImprovementFailureReason.TooManyUncertainStars);
 #endif
-						Trace.WriteLine(string.Format("Failing potential fit because there are {0} out of {1} uncertain stars in the improved solution.", uncertainStars, allPairsInTheFrame.Count));
+                        if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+						    Trace.WriteLine(string.Format("Failing potential fit because there are {0} out of {1} uncertain stars in the improved solution.", uncertainStars, allPairsInTheFrame.Count));
+
 						return false;
 					}
 
@@ -2447,7 +2483,9 @@ namespace Tangra.Astrometry.Recognition
 #if ASTROMETRY_DEBUG
 						improvementLog.Fail(SolutionImprovementFailureReason.TooManyExcludedStars);
 #endif
-						Trace.WriteLine(string.Format("Failing potential fit because there are {0} out of {1} excluded stars in the improved solultion.", excludedStars, allPairsInTheFrame.Count));
+                        if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+						    Trace.WriteLine(string.Format("Failing potential fit because there are {0} out of {1} excluded stars in the improved solultion.", excludedStars, allPairsInTheFrame.Count));
+
 						return false;
 					}
 
@@ -2463,7 +2501,8 @@ namespace Tangra.Astrometry.Recognition
 #if ASTROMETRY_DEBUG
 						improvementLog.Fail(SolutionImprovementFailureReason.MaxCoreMeanResidualTooHigh);
 #endif
-						Trace.WriteLine(string.Format("Failing potential fit because the average residual of {0}\" is larger than {1} px", averageResidual.ToString("0.00"), CorePyramidConfig.Default.MaxMeanResidualInPixelsInSuccessfulFit.ToString("0.0")));
+                        if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+						    Trace.WriteLine(string.Format("Failing potential fit because the average residual of {0}\" is larger than {1} px", averageResidual.ToString("0.00"), CorePyramidConfig.Default.MaxMeanResidualInPixelsInSuccessfulFit.ToString("0.0")));
 
 						return false;						
 					}
@@ -2503,7 +2542,8 @@ namespace Tangra.Astrometry.Recognition
 						
 							InitializePyramidMatching();
 
-							Trace.WriteLine(string.Format("Limiting reference star magnitude estimated as {0:0.0}", limitingMag));
+                            if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+							    Trace.WriteLine(string.Format("Limiting reference star magnitude estimated as {0:0.0}", limitingMag));
 						}
 					}
 					else if (m_DetermineAutoLimitMagnitude)
@@ -2561,15 +2601,17 @@ namespace Tangra.Astrometry.Recognition
 								if (deltaPixels > 1)
 								{
 									Trace.Assert(false, "False Positive!");
-									Trace.WriteLine(string.Format("DEBUG ALIGN: False positive alignment on {0}-{1}-{2}", i, j, k));
+                                    if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+									    Trace.WriteLine(string.Format("DEBUG ALIGN: False positive alignment on {0}-{1}-{2}", i, j, k));
 									return false;
 								}
 							}
 
-							Trace.WriteLine(string.Format(
-								"DEBUG ALIGN: Successful alignment on {0}-{1}-{2}{4}. Remaining combinations: {3}",
-								i, j, k, m_DebugTripples.Count,
-								deltaArcSec.HasValue ? string.Format(" ({0:0.000}mas Diff)", 1000 * deltaArcSec.Value) : ""));
+                            if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+							    Trace.WriteLine(string.Format(
+								    "DEBUG ALIGN: Successful alignment on {0}-{1}-{2}{4}. Remaining combinations: {3}",
+								    i, j, k, m_DebugTripples.Count,
+								    deltaArcSec.HasValue ? string.Format(" ({0:0.000}mas Diff)", 1000 * deltaArcSec.Value) : ""));
 
 							m_DebugTripples.Remove(tripple);
 
@@ -2580,7 +2622,9 @@ namespace Tangra.Astrometry.Recognition
 						}
 						else
 						{
-							Trace.WriteLine(string.Format("DEBUG ALIGN: Unexpected alignment on {0}-{1}-{2}", i, j, k));
+                            if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+							    Trace.WriteLine(string.Format("DEBUG ALIGN: Unexpected alignment on {0}-{1}-{2}", i, j, k));
+
 							return false;
 						}
 					}
@@ -2588,7 +2632,9 @@ namespace Tangra.Astrometry.Recognition
 				}
 			}
 
-			Trace.WriteLine("Failing potential fit because there is no solution or it hasn't been fitted using least squares.");
+            if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+			    Trace.WriteLine("Failing potential fit because there is no solution or it hasn't been fitted using least squares.");
+
 			return false;
 		}
 
@@ -2830,7 +2876,9 @@ namespace Tangra.Astrometry.Recognition
                     int nonIncludedConsideredStars = consideredStars.Count(s => s.Mag <= maxIncludedMag) - usedStarPairs.Count;
                     if (nonIncludedConsideredStars > CorePyramidConfig.Default.MaxFWHMExcludedImprovemntStarsCoeff * usedStarPairs.Count)
                     {
-						Trace.WriteLine(string.Format("Considered stars down to mag {0:0.00}: {1}. Attempted stars: {2}, Coeff: {3:0.00}", maxIncludedMag, nonIncludedConsideredStars + m_SolutionSolver.Pairs.Count, m_SolutionSolver.Pairs.Count, nonIncludedConsideredStars / m_SolutionSolver.Pairs.Count));
+                        if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceWarning())
+						    Trace.WriteLine(string.Format("Considered stars down to mag {0:0.00}: {1}. Attempted stars: {2}, Coeff: {3:0.00}", maxIncludedMag, nonIncludedConsideredStars + m_SolutionSolver.Pairs.Count, m_SolutionSolver.Pairs.Count, nonIncludedConsideredStars / m_SolutionSolver.Pairs.Count));
+
 						m_ImprovedSolution = null;
 						return;
 					}
@@ -2857,7 +2905,9 @@ namespace Tangra.Astrometry.Recognition
 
                             if (Math.Pow(10, reg.StdDev) > CorePyramidConfig.Default.MagFitTestMaxStdDev || reg.A > CorePyramidConfig.Default.MagFitTestMaxInclination)
                             {
-                                Trace.WriteLine(string.Format("Intensity(Log10(Magntude)) = {1} * x + {2}, StdDev = {0:0.0000}, ChiSquare = {3:0.000}", Math.Pow(10, reg.StdDev), reg.A, reg.B, reg.ChiSquare));
+                                if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+                                    Trace.WriteLine(string.Format("Intensity(Log10(Magntude)) = {1} * x + {2}, StdDev = {0:0.0000}, ChiSquare = {3:0.000}", Math.Pow(10, reg.StdDev), reg.A, reg.B, reg.ChiSquare));
+
                                 m_ImprovedSolution = null;
                                 return;
                             }                            

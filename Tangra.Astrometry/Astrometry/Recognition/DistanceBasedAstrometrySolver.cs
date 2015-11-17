@@ -10,6 +10,7 @@ using System.Text;
 using Tangra.Astrometry.Recognition.Logging;
 using Tangra.Model.Astro;
 using Tangra.Model.Config;
+using Tangra.Model.Helpers;
 using Tangra.Model.VideoOperations;
 using Tangra.StarCatalogues;
 
@@ -239,7 +240,8 @@ namespace Tangra.Astrometry.Recognition
 						}
 						else
 						{
-							Trace.WriteLine("No Solution.");
+                            if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceInfo())
+							    Trace.WriteLine("No Solution.");
 						}
 					}
 					finally
@@ -317,22 +319,27 @@ namespace Tangra.Astrometry.Recognition
 				m_PerformanceWatch.Stop();
 
 				if (m_Solution != null)
-					Trace.WriteLine(string.Format(
-						"Pyramid Match Successful: {0} ms, {1} stars total, aligned on {2} stars, {3} stars matched. Combination: {4}",
-						m_PerformanceWatch.ElapsedMilliseconds, m_CelestialStars.Count,
-						alignmentResult != null ? (alignmentResult.Solution as LeastSquareFittedAstrometry).FitInfo.NumberOfStarsUnsedInSolution() : 0,
-						improvedSolution != null ? improvedSolution.FitInfo.NumberOfStarsUnsedInSolution().ToString() : "N/A",
-						alignmentResult != null ? alignmentResult.MatchedTriangle : null));
+                {
+                    if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceError())
+					    Trace.WriteLine(string.Format(
+						    "Pyramid Match Successful: {0} ms, {1} stars total, aligned on {2} stars, {3} stars matched. Combination: {4}",
+						    m_PerformanceWatch.ElapsedMilliseconds, m_CelestialStars.Count,
+						    alignmentResult != null ? (alignmentResult.Solution as LeastSquareFittedAstrometry).FitInfo.NumberOfStarsUnsedInSolution() : 0,
+						    improvedSolution != null ? improvedSolution.FitInfo.NumberOfStarsUnsedInSolution().ToString() : "N/A",
+						    alignmentResult != null ? alignmentResult.MatchedTriangle : null));
+                }
 				else
 				{
-					Trace.WriteLine(string.Format("Pyramid Match Failed: {0} ms, {1} stars total, NO MATCH",
-					                              m_PerformanceWatch.ElapsedMilliseconds, m_CelestialStars.Count));
+                    if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceError())
+					    Trace.WriteLine(string.Format("Pyramid Match Failed: {0} ms, {1} stars total, NO MATCH",
+					                                  m_PerformanceWatch.ElapsedMilliseconds, m_CelestialStars.Count));
 
 					if (Context.DebugResolvedStars != null)
 					{
 						foreach(DistanceBasedContext.DebugTripple tripple in Context.m_DebugTripples)
 						{
-							Trace.WriteLine(string.Format("DEBUG ALIGN: Missed alignment on {0}-{1}-{2}", tripple.Id1, tripple.Id2, tripple.Id3));							
+                            if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+							    Trace.WriteLine(string.Format("DEBUG ALIGN: Missed alignment on {0}-{1}-{2}", tripple.Id1, tripple.Id2, tripple.Id3));
 						}
 					}
 				}

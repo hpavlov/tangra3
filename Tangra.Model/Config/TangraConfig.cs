@@ -299,6 +299,7 @@ namespace Tangra.Model.Config
 	    public LastUsedSettings LastUsed = new LastUsedSettings();
 
 		public TuningSettings Tuning = new TuningSettings();
+        public TraceLevelSettings TraceLevels = new TraceLevelSettings();
 
 		public class SaturationSettings
 		{
@@ -474,6 +475,11 @@ namespace Tangra.Model.Config
 			public OCRMode OcrMode = OCRMode.Mixed;
 			public PSFFittingMode PsfMode = PSFFittingMode.NativeMatrixManagedFitting;
 		}
+
+        public class TraceLevelSettings
+	    {
+            public TraceLevel PlateSolving = TraceLevel.Verbose;
+	    }
 
 		public class SpecialSettings
 		{
