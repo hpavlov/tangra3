@@ -166,6 +166,7 @@ namespace Tangra.Model.Config
 	}
 	
 	[XmlRoot("Tangra3Config")]
+    [Serializable]
 	public class TangraConfig
 	{
 		public static TangraConfig Settings;
@@ -301,6 +302,7 @@ namespace Tangra.Model.Config
 		public TuningSettings Tuning = new TuningSettings();
         public TraceLevelSettings TraceLevels = new TraceLevelSettings();
 
+        [Serializable]
 		public class SaturationSettings
 		{
 			public byte Saturation8Bit = 250;
@@ -382,11 +384,13 @@ namespace Tangra.Model.Config
 			Analytical
 		}
 
+        [Serializable]
 		public class Background3DPolynomialSettings
 		{
 			public int Order = 2;
 		}
 
+        [Serializable]
 		public class PhotometrySettings
 		{
 			public PhotometrySettings()
@@ -436,6 +440,7 @@ namespace Tangra.Model.Config
 			AdHocTracking
 		}
 
+        [Serializable]
 		public class TrackingSettings
 		{
 			public byte RefiningFrames = 8;
@@ -470,17 +475,20 @@ namespace Tangra.Model.Config
 			Mixed
 		}
 
+        [Serializable]
 		public class TuningSettings
 		{
 			public OCRMode OcrMode = OCRMode.Mixed;
 			public PSFFittingMode PsfMode = PSFFittingMode.NativeMatrixManagedFitting;
 		}
 
+        [Serializable]
         public class TraceLevelSettings
 	    {
             public TraceLevel PlateSolving = TraceLevel.Verbose;
 	    }
 
+        [Serializable]
 		public class SpecialSettings
 		{
 			public int AboveMedianThreasholdForGuiding = 50;
@@ -587,6 +595,7 @@ namespace Tangra.Model.Config
 			DontExportEventTimes
 		}
 
+        [Serializable]
 		public class GenericSettings
 		{
 			public bool RunVideosOnFastestSpeed = true;
@@ -620,6 +629,7 @@ namespace Tangra.Model.Config
 			public double Latitude = double.NaN;
 		}
 
+        [Serializable]
         public class LastUsedSettings
         {
             public bool AdvancedLightCurveSettings = false;
@@ -659,6 +669,7 @@ namespace Tangra.Model.Config
 	        public string SpectroscopyWavelengthConfigurationname;
         }
 
+        [Serializable]
         public class SameSizeApertureConfig
         {
             public float Value;
@@ -685,6 +696,7 @@ namespace Tangra.Model.Config
             }
         }
 
+        [Serializable]
 		public class Colors
 		{
 			[XmlIgnore]
@@ -902,6 +914,7 @@ namespace Tangra.Model.Config
 			Custom
 		}
 
+        [Serializable]
 		public class LightCurvesDisplaySettings
 		{
 			public Color BackgroundColor;
@@ -1172,6 +1185,7 @@ namespace Tangra.Model.Config
 			Contrast
 		}
 
+        [Serializable]
 		public class SpectraViewDisplaySettings
 		{
 			public Color SpectraLineColor;
@@ -1431,6 +1445,7 @@ namespace Tangra.Model.Config
 			}
 		}
 
+        [Serializable]
         public class PersistedConfiguration
         {
             public string Name;
@@ -1451,8 +1466,10 @@ namespace Tangra.Model.Config
             }
         }
 
+        [Serializable]
 		public class SpectroscopySettings
 		{
+            [Serializable]
 			public class SpectraColors
 			{
 				[XmlIgnore]
@@ -1569,8 +1586,10 @@ namespace Tangra.Model.Config
 			}
 		}
 
+        [Serializable]
 		public class AstrometrySettings : IAstrometrySettings
 		{
+            [Serializable]
 			public class ColorSettings
 			{
 				[XmlIgnore]
@@ -1757,6 +1776,7 @@ namespace Tangra.Model.Config
 			public string MPCObservatoryCode { get; set; }
 		}
 
+        [Serializable]
 		public class UrlSettings
 		{
 			public UrlSettings()
@@ -1772,6 +1792,7 @@ namespace Tangra.Model.Config
 			public string MPCEphe2ServiceUrl;
 		}
 
+        [Serializable]
 		public class StarIDSettings
 		{
 			public double RAHours = double.NaN;
@@ -1782,6 +1803,7 @@ namespace Tangra.Model.Config
 			public string DatabaseName = string.Empty;
 		}
 
+        [Serializable]
 		public class PlateSolveSettings : IEqualityComparer<VideoCamera>
 		{
 			public StarIDSettings StarIDSettings = new StarIDSettings();
@@ -1912,6 +1934,7 @@ namespace Tangra.Model.Config
 			}
 		}
 
+        [Serializable]
 		public class PersistedPlateConstants
 		{
 			public string ScopeRecoderConfig;
@@ -1939,6 +1962,7 @@ namespace Tangra.Model.Config
 			SLOAN_g
 		}
 
+        [Serializable]
 		public class ScopeRecorderConfiguration
 		{
             protected static double MIN_KIWI_X_PERC = 0; //0.08183;
@@ -2008,6 +2032,7 @@ namespace Tangra.Model.Config
             }
 		}
 
+        [Serializable]
 		public class ConfigurationLimitingMagnitudes
 		{
 			public List<string> Keys = new List<string>();
@@ -2042,6 +2067,7 @@ namespace Tangra.Model.Config
 			}
 		}
 
+        [Serializable]
 		public class ConfigurationRawFrameSizes
 		{
 			public List<string> Keys = new List<string>();
@@ -2092,6 +2118,7 @@ namespace Tangra.Model.Config
 			UCAC4 = 5
 		}
 
+        [Serializable]
 		public class CatalogSettings
 		{
 			public StarCatalog Catalog = StarCatalog.NotSpecified;

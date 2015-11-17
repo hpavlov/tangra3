@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Tangra.Astrometry.Recognition;
+using Tangra.Model.Config;
 using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.Model.Numerical;
@@ -165,7 +166,9 @@ namespace Tangra.Astrometry
 			// Insufficient stars to solve the plate
 			if (numStars < minNumberOfStars)
 			{
-				Debug.WriteLine(string.Format("Insufficient number of stars to do a fit. At least {0} stars requested.", minNumberOfStars));
+                if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+				    Debug.WriteLine(string.Format("Insufficient number of stars to do a fit. At least {0} stars requested.", minNumberOfStars));
+
 				return false;
 			}
 

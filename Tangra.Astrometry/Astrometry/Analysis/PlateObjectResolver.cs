@@ -131,7 +131,8 @@ namespace Tangra.Astrometry.Analysis
 			m_BackgroundFlux = m_MagnitudeFit.GetBackgroundIntencity();
 			m_BackgroundMag = m_MagnitudeFit.GetMagnitudeForIntencity(m_BackgroundFlux);
 
-			Trace.WriteLine(string.Format("Plate FWHM: {0}", 2 * Math.Sqrt(Math.Log(2)) * r0));
+            if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+			    Trace.WriteLine(string.Format("Plate FWHM: {0}", 2 * Math.Sqrt(Math.Log(2)) * r0));
 
 			PeakPixelResolver resolver = new PeakPixelResolver(m_Image);
 			resolver.ResolvePeakPixels(osdRectangleToExclude, rectToInclude, limitByInclusion, objectResolverSettings.ExcludeEdgeAreaPixels, objectResolverSettings.MinDistanceBetweenPeakPixels);
@@ -178,8 +179,10 @@ namespace Tangra.Astrometry.Analysis
 							if (objectResolverSettings.MaxStarMatchMagDif >= Math.Abs(magnitude - star.Mag))
 							{
 								// The star is identified. Do we care more?
-								Trace.WriteLine(string.Format("STAR ({0}, {1}) No -> {2}; Mag -> {3} (Expected: {4}); R0 = {5}",
-									x, y, star.StarNo, magnitude.ToString("0.00"), star.Mag.ToString("0.00"), fit.R0.ToString("0.0")));
+                                if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+								    Trace.WriteLine(string.Format("STAR ({0}, {1}) No -> {2}; Mag -> {3} (Expected: {4}); R0 = {5}",
+									    x, y, star.StarNo, magnitude.ToString("0.00"), star.Mag.ToString("0.00"), fit.R0.ToString("0.0")));
+
 								identifiedMagnitudes.Add(magnitude);
 								identifiedR0s.Add(fit.R0);
 								m_IdentifiedObjects.Add(fit, star);
@@ -219,17 +222,21 @@ namespace Tangra.Astrometry.Analysis
 				identifiedMagnitudes.Sort();
 				double maxStarMag = identifiedMagnitudes[Math.Max(0, (int)Math.Truncate(0.9 * identifiedMagnitudes.Count))];
 
-				Trace.WriteLine(string.Format("Max Star Mag: {0}; R0 ({1}, {2})", maxStarMag.ToString("0.00"), minR0.ToString("0.0"), maxR0.ToString("0.0")));
+                if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+				    Trace.WriteLine(string.Format("Max Star Mag: {0}; R0 ({1}, {2})", maxStarMag.ToString("0.00"), minR0.ToString("0.0"), maxR0.ToString("0.0")));
 
 				// NOTE: The R0 exclusion may ignore bright comets !
 				m_UnknownObjects = m_UidentifiedObjects
 					.Where(p => p.Value < maxStarMag && p.Key.R0 >= minR0 && p.Key.R0 <= maxR0)
 					.ToDictionary(p => p.Key, p => p.Value);
 
-				foreach (PSFFit obj in m_UnknownObjects.Keys)
-				{
-					Trace.WriteLine(string.Format("UNK: ({0}, {1}) Mag -> {2}; R0 = {3}", obj.XCenter.ToString("0.0"), obj.YCenter.ToString("0.0"), m_UnknownObjects[obj].ToString("0.00"), obj.R0.ToString("0.0")));
-				}
+			    if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+			    {
+                    foreach (PSFFit obj in m_UnknownObjects.Keys)
+                    {
+                        Trace.WriteLine(string.Format("UNK: ({0}, {1}) Mag -> {2}; R0 = {3}", obj.XCenter.ToString("0.0"), obj.YCenter.ToString("0.0"), m_UnknownObjects[obj].ToString("0.00"), obj.R0.ToString("0.0")));
+                    }
+			    }
 			}
 
 			Bitmap bitmap = m_Image.Pixelmap.CreateDisplayBitmapDoNotDispose();
