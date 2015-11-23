@@ -68,7 +68,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			Context.WavelengthBinSize = TangraConfig.Settings.Spectroscopy.AbsFluxResolution;
 			Context.Model = AbsFluxModel.Linear;
 		    Context.UseFwhmNormalisation = false;
-		    Context.UseNonLinearityNormalisation = true;
+		    Context.UseNonLinearityNormalisation = false;
             FIT_METHOD = LinearFitMethod.LinearAlgebra;
 
 			IsCalibrated = false;
@@ -686,6 +686,14 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
             {
                 var output = new StringBuilder();
                 var programSpectras = m_SpectraList.Where(x => x.m_CalSpecStar == null).ToList();
+
+                output.Append("Wavelength");
+                for (int j = 0; j < programSpectras.Count; j++)
+                {
+                    output.Append(",");
+                    output.Append(programSpectras[j].ToString());
+                }
+                output.AppendLine();
 
                 for (int i = 0; i < m_SpectraList[0].ResolvedWavelengths.Count; i++)
                 {
