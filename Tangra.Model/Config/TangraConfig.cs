@@ -1579,9 +1579,9 @@ namespace Tangra.Model.Config
 				Instrument = SpectroscopyInstrument.Grating;
 			    AllowNegativeValues = true;
 
-				MinWavelength = 3000;
-				MaxWavelength = 10000;
-				AbsFluxResolution = 50;
+				MinWavelength = 4000;
+				MaxWavelength = 8000;
+				AbsFluxResolution = 10;
 				Sampling = AbsFluxSampling.GaussianSmoothingAndBinning;
 			}
 		}
@@ -1786,10 +1786,12 @@ namespace Tangra.Model.Config
 
 			public void SetDefaults()
 			{
-				MPCEphe2ServiceUrl = "http://scully.cfa.harvard.edu/cgi-bin/mpeph2.cgi";
+                MPCEphe2ServiceUrl = "http://www.minorplanetcenter.net/cgi-bin/mpeph2.cgi";
+                MPCheckServiceUrl = "http://www.minorplanetcenter.net/cgi-bin/mpcheck.cgi";
 			}
 
 			public string MPCEphe2ServiceUrl;
+            public string MPCheckServiceUrl;
 		}
 
         [Serializable]

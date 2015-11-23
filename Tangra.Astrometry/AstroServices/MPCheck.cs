@@ -11,6 +11,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Text;
+using Tangra.Model.Config;
 using Tangra.Model.Helpers;
 
 namespace Tangra.AstroServices
@@ -24,7 +25,7 @@ namespace Tangra.AstroServices
 
 			string requestUrl =
 				string.Format(
-                    "http://mpcapp1.cfa.harvard.edu/cgi-bin/mpcheck.cgi?year={0}&month={1}&day={2}&which=pos&ra={3}&decl={4}&TextArea=&radius={5}&limit={6}&oc={7}&sort=d&mot=h&tmot=s&pdes=u&needed=f&ps=n&type=p",
+                    TangraConfig.Settings.Urls.MPCheckServiceUrl + "?year={0}&month={1}&day={2}&which=pos&ra={3}&decl={4}&TextArea=&radius={5}&limit={6}&oc={7}&sort=d&mot=h&tmot=s&pdes=u&needed=f&ps=n&type=p",
 					utcDate.Year, utcDate.Month, dayPart.ToString("0.000"),
 					AstroConvert.ToStringValue(raDeg / 15.0, "HH MM SS"),
 					AstroConvert.ToStringValue(deDeg, "+DD MM SS"),
