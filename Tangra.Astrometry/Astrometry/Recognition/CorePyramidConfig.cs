@@ -122,6 +122,8 @@ namespace Tangra.Astrometry.Recognition
 		// This is to exlude wrong star mapping due to a coarse preliminary fit in crowded areas
 		public int CalibrationFirstPlateSolveLimitMagnitude = 12;
 
+        public bool AttempDoubleSolutionImprovement = false;
+
 
 		public void Reset()
 		{
@@ -136,6 +138,7 @@ namespace Tangra.Astrometry.Recognition
 
 			MinPercentage100BrighterUnfitFeatures = 60;
 			MinPercentage75BrighterUnfitFeatures = 45;
+		    AttempDoubleSolutionImprovement = false;
 		}
 	}
 }

@@ -1982,9 +1982,22 @@ namespace Tangra.Astrometry.Recognition
 					    Trace.WriteLine("ThreeStarFit.Var1 - Singularity");
 
 					Dictionary<ImagePixel, IStar> threeStarDict = new Dictionary<ImagePixel, IStar>();
-					threeStarDict.Add(ImagePixel.CreateImagePixelWithFeatureId(0, 255, pair_i.XImage, pair_i.YImage), pair_i.Star);
-					threeStarDict.Add(ImagePixel.CreateImagePixelWithFeatureId(1, 255, pair_j.XImage, pair_j.YImage), pair_j.Star);
-					threeStarDict.Add(ImagePixel.CreateImagePixelWithFeatureId(2, 255, pair_k.XImage, pair_k.YImage), pair_k.Star);
+
+				    try
+				    {
+                        threeStarDict.Add(ImagePixel.CreateImagePixelWithFeatureId(0, 255, pair_i.XImage, pair_i.YImage), pair_i.Star);
+                        threeStarDict.Add(ImagePixel.CreateImagePixelWithFeatureId(1, 255, pair_j.XImage, pair_j.YImage), pair_j.Star);
+                        threeStarDict.Add(ImagePixel.CreateImagePixelWithFeatureId(2, 255, pair_k.XImage, pair_k.YImage), pair_k.Star);
+				    }
+                    catch(ArgumentException)
+                    {
+                        if (pyramidLog != null) pyramidLog.FailureReason = PyramidEntryFailureReason.ThreeStarFitFailed;
+
+                        if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+                            Trace.WriteLine("ThreeStarFit.Var2 - Failed with ArgumentException");
+
+                        return null;
+                    }
 
 					DirectTransRotAstrometry threeStarSolution = 
 						DirectTransRotAstrometry.SolveByThreeStars(m_PlateConfig, threeStarDict, 2);
@@ -2402,7 +2415,15 @@ namespace Tangra.Astrometry.Recognition
                     SolutionImprovementEntry improvementLog = new SolutionImprovementEntry(fit, i, j, k);
 					AstrometricFitDebugger.RegisterSolutionToImprove(improvementLog);
 #endif
-					ImproveSolution(fit);
+					ImproveSolution(fit, 1);
+
+				    if (m_ImprovedSolution != null && CorePyramidConfig.Default.AttempDoubleSolutionImprovement)
+				    {
+                        if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceInfo())
+                            Trace.WriteLine("Attempting double solution improvement.");
+
+				        ImproveSolution(m_ImprovedSolution, 2);
+				    }
 
 					if (m_ImprovedSolution == null)
 					{
@@ -2770,7 +2791,7 @@ namespace Tangra.Astrometry.Recognition
 			return stars[stars.Count / 2].Mag;
 		}
 
-		private void ImproveSolution(LeastSquareFittedAstrometry fit)
+        private void ImproveSolution(LeastSquareFittedAstrometry fit, double coeff)
 		{
 			m_SolutionSolver = new PlateConstantsSolver(m_PlateConfig);
 
@@ -2819,13 +2840,13 @@ namespace Tangra.Astrometry.Recognition
 					//pixel = m_StarMap.GetCentroid((int)x, (int)y, (int)Math.Ceiling(m_Settings.SearchArea));
 				}
 
-				if (pixel != null && 
-					psfFit.Certainty >= CorePyramidConfig.Default.MinDetectionLimitForSolutionImprovement)
+				if (pixel != null &&
+                    psfFit.Certainty >= CorePyramidConfig.Default.MinDetectionLimitForSolutionImprovement / coeff)
 				{
 					consideredStars.Add(star);
 
 					double distance = fit.GetDistanceInArcSec(pixel.XDouble, pixel.YDouble, x, y);
-					if (distance < CorePyramidConfig.Default.MaxPreliminaryResidualForSolutionImprovement)
+                    if (distance < CorePyramidConfig.Default.MaxPreliminaryResidualForSolutionImprovement / coeff)
 					{
 #if ASTROMETRY_DEBUG
 						Trace.Assert(!double.IsNaN(pixel.XDouble));
@@ -2859,6 +2880,12 @@ namespace Tangra.Astrometry.Recognition
 			if (m_ImprovedSolution != null)
 			{
 				m_ImprovedSolution.FitInfo.FittedFocalLength = ffl;
+
+                if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceInfo())
+                    Trace.WriteLine(string.Format("Improved solution: {0} considered stars, UsedInSolution: {1}, ExcludedForHighResidual: {2}", 
+                        m_ImprovedSolution.FitInfo.AllStarPairs.Count(), 
+                        m_ImprovedSolution.FitInfo.AllStarPairs.Count(x => x.FitInfo.UsedInSolution),
+                        m_ImprovedSolution.FitInfo.AllStarPairs.Count(x => x.FitInfo.ExcludedForHighResidual)));
 
 				// Fit was successful, exclude all unused non stellar objects so they 
 				// don't interfere with the included/excluded stars improved solution tests
