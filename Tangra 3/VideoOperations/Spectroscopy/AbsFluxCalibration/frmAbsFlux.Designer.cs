@@ -91,6 +91,14 @@
 			this.miPlot = new System.Windows.Forms.ToolStripMenuItem();
 			this.miAbsoluteFlux = new System.Windows.Forms.ToolStripMenuItem();
 			this.miObservedFlux = new System.Windows.Forms.ToolStripMenuItem();
+			this.miColourPalette = new System.Windows.Forms.ToolStripMenuItem();
+			this.miPastel = new System.Windows.Forms.ToolStripMenuItem();
+			this.miIntense1 = new System.Windows.Forms.ToolStripMenuItem();
+			this.miIntense2 = new System.Windows.Forms.ToolStripMenuItem();
+			this.miBroad = new System.Windows.Forms.ToolStripMenuItem();
+			this.miRainbow1 = new System.Windows.Forms.ToolStripMenuItem();
+			this.miRainbow2 = new System.Windows.Forms.ToolStripMenuItem();
+			this.miContrast = new System.Windows.Forms.ToolStripMenuItem();
 			this.miProcessing = new System.Windows.Forms.ToolStripMenuItem();
 			this.miExport = new System.Windows.Forms.ToolStripMenuItem();
 			this.miAbsFluxProgramStars = new System.Windows.Forms.ToolStripMenuItem();
@@ -101,14 +109,7 @@
 			this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
 			this.resizeTimer = new System.Windows.Forms.Timer(this.components);
 			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-			this.miColourPalette = new System.Windows.Forms.ToolStripMenuItem();
-			this.miPastel = new System.Windows.Forms.ToolStripMenuItem();
-			this.miIntense1 = new System.Windows.Forms.ToolStripMenuItem();
-			this.miIntense2 = new System.Windows.Forms.ToolStripMenuItem();
-			this.miBroad = new System.Windows.Forms.ToolStripMenuItem();
-			this.miRainbow1 = new System.Windows.Forms.ToolStripMenuItem();
-			this.miRainbow2 = new System.Windows.Forms.ToolStripMenuItem();
-			this.miContrast = new System.Windows.Forms.ToolStripMenuItem();
+			this.miBuildFilterResponseDB = new System.Windows.Forms.ToolStripMenuItem();
 			this.pnlFiles.SuspendLayout();
 			this.ctxMenuIncludedSpectra.SuspendLayout();
 			this.pnlDetail.SuspendLayout();
@@ -829,16 +830,87 @@
 			this.miAbsoluteFlux.Checked = true;
 			this.miAbsoluteFlux.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.miAbsoluteFlux.Name = "miAbsoluteFlux";
-			this.miAbsoluteFlux.Size = new System.Drawing.Size(152, 22);
+			this.miAbsoluteFlux.Size = new System.Drawing.Size(144, 22);
 			this.miAbsoluteFlux.Text = "&Absolute Flux";
 			this.miAbsoluteFlux.Click += new System.EventHandler(this.miAbsoluteFlux_Click);
 			// 
 			// miObservedFlux
 			// 
 			this.miObservedFlux.Name = "miObservedFlux";
-			this.miObservedFlux.Size = new System.Drawing.Size(152, 22);
+			this.miObservedFlux.Size = new System.Drawing.Size(144, 22);
 			this.miObservedFlux.Text = "&Observed Fulx";
 			this.miObservedFlux.Click += new System.EventHandler(this.miObservedFlux_Click);
+			// 
+			// miColourPalette
+			// 
+			this.miColourPalette.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miPastel,
+            this.miIntense1,
+            this.miIntense2,
+            this.miBroad,
+            this.miRainbow1,
+            this.miRainbow2,
+            this.miContrast});
+			this.miColourPalette.Name = "miColourPalette";
+			this.miColourPalette.Size = new System.Drawing.Size(152, 22);
+			this.miColourPalette.Text = "&Colour Palette";
+			this.miColourPalette.DropDownOpening += new System.EventHandler(this.miColourPalette_DropDownOpening);
+			// 
+			// miPastel
+			// 
+			this.miPastel.Name = "miPastel";
+			this.miPastel.Size = new System.Drawing.Size(124, 22);
+			this.miPastel.Tag = "0";
+			this.miPastel.Text = "Pastel";
+			this.miPastel.Click += new System.EventHandler(this.OnColourPaletteClicked);
+			// 
+			// miIntense1
+			// 
+			this.miIntense1.Name = "miIntense1";
+			this.miIntense1.Size = new System.Drawing.Size(124, 22);
+			this.miIntense1.Tag = "1";
+			this.miIntense1.Text = "Intense 1";
+			this.miIntense1.Click += new System.EventHandler(this.OnColourPaletteClicked);
+			// 
+			// miIntense2
+			// 
+			this.miIntense2.Name = "miIntense2";
+			this.miIntense2.Size = new System.Drawing.Size(124, 22);
+			this.miIntense2.Tag = "2";
+			this.miIntense2.Text = "Intense 2";
+			this.miIntense2.Click += new System.EventHandler(this.OnColourPaletteClicked);
+			// 
+			// miBroad
+			// 
+			this.miBroad.Name = "miBroad";
+			this.miBroad.Size = new System.Drawing.Size(124, 22);
+			this.miBroad.Tag = "3";
+			this.miBroad.Text = "Broad";
+			this.miBroad.Click += new System.EventHandler(this.OnColourPaletteClicked);
+			// 
+			// miRainbow1
+			// 
+			this.miRainbow1.Name = "miRainbow1";
+			this.miRainbow1.Size = new System.Drawing.Size(124, 22);
+			this.miRainbow1.Tag = "4";
+			this.miRainbow1.Text = "Rainbow 1";
+			this.miRainbow1.Click += new System.EventHandler(this.OnColourPaletteClicked);
+			// 
+			// miRainbow2
+			// 
+			this.miRainbow2.Name = "miRainbow2";
+			this.miRainbow2.Size = new System.Drawing.Size(124, 22);
+			this.miRainbow2.Tag = "5";
+			this.miRainbow2.Text = "Rainbow 2";
+			this.miRainbow2.Click += new System.EventHandler(this.OnColourPaletteClicked);
+			// 
+			// miContrast
+			// 
+			this.miContrast.Name = "miContrast";
+			this.miContrast.Size = new System.Drawing.Size(124, 22);
+			this.miContrast.Tag = "6";
+			this.miContrast.Text = "Contrast";
+			this.miContrast.Click += new System.EventHandler(this.OnColourPaletteClicked);
 			// 
 			// miProcessing
 			// 
@@ -850,7 +922,8 @@
 			// miExport
 			// 
 			this.miExport.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.miAbsFluxProgramStars});
+            this.miAbsFluxProgramStars,
+            this.miBuildFilterResponseDB});
 			this.miExport.Name = "miExport";
 			this.miExport.Size = new System.Drawing.Size(51, 20);
 			this.miExport.Text = "Export";
@@ -910,76 +983,13 @@
 			this.saveFileDialog.DefaultExt = "csv";
 			this.saveFileDialog.Filter = "Comma Separated Values (*.csv)|*.csv|All Files (*.*)|*.*";
 			// 
-			// miColourPalette
+			// miBuildFilterResponseDB
 			// 
-			this.miColourPalette.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.miPastel,
-            this.miIntense1,
-            this.miIntense2,
-            this.miBroad,
-            this.miRainbow1,
-            this.miRainbow2,
-            this.miContrast});
-			this.miColourPalette.Name = "miColourPalette";
-			this.miColourPalette.Size = new System.Drawing.Size(152, 22);
-			this.miColourPalette.Text = "&Colour Palette";
-			this.miColourPalette.DropDownOpening += new System.EventHandler(this.miColourPalette_DropDownOpening);
-			// 
-			// miPastel
-			// 
-			this.miPastel.Name = "miPastel";
-			this.miPastel.Size = new System.Drawing.Size(152, 22);
-			this.miPastel.Tag = "0";
-			this.miPastel.Text = "Pastel";
-			this.miPastel.Click += new System.EventHandler(this.OnColourPaletteClicked);
-			// 
-			// miIntense1
-			// 
-			this.miIntense1.Name = "miIntense1";
-			this.miIntense1.Size = new System.Drawing.Size(152, 22);
-			this.miIntense1.Tag = "1";
-			this.miIntense1.Text = "Intense 1";
-			this.miIntense1.Click += new System.EventHandler(this.OnColourPaletteClicked);
-			// 
-			// miIntense2
-			// 
-			this.miIntense2.Name = "miIntense2";
-			this.miIntense2.Size = new System.Drawing.Size(152, 22);
-			this.miIntense2.Tag = "2";
-			this.miIntense2.Text = "Intense 2";
-			this.miIntense2.Click += new System.EventHandler(this.OnColourPaletteClicked);
-			// 
-			// miBroad
-			// 
-			this.miBroad.Name = "miBroad";
-			this.miBroad.Size = new System.Drawing.Size(152, 22);
-			this.miBroad.Tag = "3";
-			this.miBroad.Text = "Broad";
-			this.miBroad.Click += new System.EventHandler(this.OnColourPaletteClicked);
-			// 
-			// miRainbow1
-			// 
-			this.miRainbow1.Name = "miRainbow1";
-			this.miRainbow1.Size = new System.Drawing.Size(152, 22);
-			this.miRainbow1.Tag = "4";
-			this.miRainbow1.Text = "Rainbow 1";
-			this.miRainbow1.Click += new System.EventHandler(this.OnColourPaletteClicked);
-			// 
-			// miRainbow2
-			// 
-			this.miRainbow2.Name = "miRainbow2";
-			this.miRainbow2.Size = new System.Drawing.Size(152, 22);
-			this.miRainbow2.Tag = "5";
-			this.miRainbow2.Text = "Rainbow 2";
-			this.miRainbow2.Click += new System.EventHandler(this.OnColourPaletteClicked);
-			// 
-			// miContrast
-			// 
-			this.miContrast.Name = "miContrast";
-			this.miContrast.Size = new System.Drawing.Size(152, 22);
-			this.miContrast.Tag = "6";
-			this.miContrast.Text = "Contrast";
-			this.miContrast.Click += new System.EventHandler(this.OnColourPaletteClicked);
+			this.miBuildFilterResponseDB.Name = "miBuildFilterResponseDB";
+			this.miBuildFilterResponseDB.Size = new System.Drawing.Size(216, 22);
+			this.miBuildFilterResponseDB.Text = "Build Filter Response DB";
+			this.miBuildFilterResponseDB.Visible = false;
+			this.miBuildFilterResponseDB.Click += new System.EventHandler(this.miBuildFilterResponseDB_Click);
 			// 
 			// frmAbsFlux
 			// 
@@ -1105,5 +1115,6 @@
 		private System.Windows.Forms.ToolStripMenuItem miRainbow1;
 		private System.Windows.Forms.ToolStripMenuItem miRainbow2;
 		private System.Windows.Forms.ToolStripMenuItem miContrast;
+		private System.Windows.Forms.ToolStripMenuItem miBuildFilterResponseDB;
 	}
 }

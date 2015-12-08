@@ -16,6 +16,7 @@ using Tangra.Model.Config;
 using Tangra.Model.Helpers;
 using nom.tam.fits;
 using nom.tam.util;
+using Tangra.VideoOperations.Spectroscopy.FilterResponses;
 
 namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 {
@@ -639,5 +640,98 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 		{
 			CheckSelectedPaletteMenuItem(m_DisplaySetting.AbsFluxPlotPalette);
 		}
+
+		#region Build Filter Response DB
+		private Dictionary<int, double> ParseBesselFile(string filePath)
+		{
+			var rv = new Dictionary<int, double>();
+
+			var lines = File.ReadAllLines(filePath);
+			foreach (string line in lines)
+			{
+				if (line.Length == 0 || "0123456789".IndexOf(line[0]) == -1)
+					continue;
+
+				string[] tokens = line.Split("\t".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+				if (tokens.Length == 2)
+				{
+					int length = (int) Math.Round(double.Parse(tokens[0])*10);
+					double response = double.Parse(tokens[1])/100;
+
+					if (response > 0.0005)
+						rv.Add(length, response);
+				}
+			}
+
+			return rv;
+		}
+
+		private Dictionary<int, double> ParseSloanCorrFile(string filePath)
+		{
+			var rv = new Dictionary<int, double>();
+
+			var lines = File.ReadAllLines(filePath);
+			foreach (string line in lines)
+			{
+				var line1 = line.TrimStart(' ');
+
+				if (line1.Length == 0 || "0123456789".IndexOf(line1[0]) == -1)
+					continue;
+
+				string[] tokens = line1.Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+				if (tokens.Length == 2)
+				{
+					int length = (int)Math.Round(double.Parse(tokens[0]));
+					double response = double.Parse(tokens[1]);
+
+					if (response > 0.0005)
+						rv.Add(length, response);
+				}
+			}
+
+			return rv;
+		}
+
+		private void miBuildFilterResponseDB_Click(object sender, EventArgs e)
+		{
+			var pathV = Path.GetFullPath(@"..\..\VideoOperations\Spectroscopy\FilterResponses\Bessel_V-1.txt");
+			var pathB = Path.GetFullPath(@"..\..\VideoOperations\Spectroscopy\FilterResponses\Bessel_B-1.txt");
+			var pathR = Path.GetFullPath(@"..\..\VideoOperations\Spectroscopy\FilterResponses\Bessel_R-1.txt");
+			var pathU = Path.GetFullPath(@"..\..\VideoOperations\Spectroscopy\FilterResponses\Bessel_U-1.txt");
+			var pathI = Path.GetFullPath(@"..\..\VideoOperations\Spectroscopy\FilterResponses\Bessel_I-1.txt");
+
+			var path_u = Path.GetFullPath(@"..\..\VideoOperations\Spectroscopy\FilterResponses\corr_u7605a.txt");
+			var path_g = Path.GetFullPath(@"..\..\VideoOperations\Spectroscopy\FilterResponses\corr_G7604B.txt");
+			var path_r = Path.GetFullPath(@"..\..\VideoOperations\Spectroscopy\FilterResponses\corr_R7601SA.txt");
+			var path_i = Path.GetFullPath(@"..\..\VideoOperations\Spectroscopy\FilterResponses\corr_I7604B.txt");
+			var path_z = Path.GetFullPath(@"..\..\VideoOperations\Spectroscopy\FilterResponses\corr_Z7603B.txt");
+
+			var db = new FilterResponseDatabase();
+
+			db.Johnson_V = new FilterResponse() { Designation = "V" };
+			db.Johnson_V.Response = ParseBesselFile(pathV);
+			db.Johnson_B = new FilterResponse() { Designation = "B" };
+			db.Johnson_B.Response = ParseBesselFile(pathB);
+			db.Johnson_R = new FilterResponse() { Designation = "R" };
+			db.Johnson_R.Response = ParseBesselFile(pathR);
+			db.Johnson_U = new FilterResponse() { Designation = "U" };
+			db.Johnson_U.Response = ParseBesselFile(pathU);
+			db.Johnson_I = new FilterResponse() { Designation = "I" };
+			db.Johnson_I.Response = ParseBesselFile(pathI);
+
+			db.SLOAN_u = new FilterResponse() { Designation = "u'" };
+			db.SLOAN_u.Response = ParseSloanCorrFile(path_u);
+			db.SLOAN_g = new FilterResponse() { Designation = "g'" };
+			db.SLOAN_g.Response = ParseSloanCorrFile(path_g);
+			db.SLOAN_r = new FilterResponse() { Designation = "r'" };
+			db.SLOAN_r.Response = ParseSloanCorrFile(path_r);
+			db.SLOAN_i = new FilterResponse() { Designation = "i'" };
+			db.SLOAN_i.Response = ParseSloanCorrFile(path_i);
+			db.SLOAN_z = new FilterResponse() { Designation = "z'" };
+			db.SLOAN_z.Response = ParseSloanCorrFile(path_z);
+
+			db.Save(Path.GetFullPath(@"..\..\..\VideoOperations\Spectroscopy\FilterResponses\FilterResponseDb.dat"));
+		}
+		#endregion
 	}
 }

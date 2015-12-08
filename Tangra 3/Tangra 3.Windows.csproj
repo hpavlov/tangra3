@@ -359,6 +359,7 @@
     <Compile Include="VideoOperations\Spectroscopy\AbsFluxCalibration\frmConfigureProcessing.Designer.cs">
       <DependentUpon>frmConfigureProcessing.cs</DependentUpon>
     </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\FilterResponses\FilterResponseDatabase.cs" />
     <Compile Include="VideoOperations\Spectroscopy\frmChooseConfiguration.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -1255,6 +1256,7 @@
     <None Include="VideoOperations\Spectroscopy\AbsFluxCalibration\ReferenceCode\AbsFlux.f90" />
     <None Include="VideoOperations\Spectroscopy\AbsFluxCalibration\Standards\AbsFlux-TangraStars.csv" />
     <EmbeddedResource Include="VideoOperations\Spectroscopy\AbsFluxCalibration\Standards\CalSpec.db" />
+    <EmbeddedResource Include="VideoOperations\Spectroscopy\FilterResponses\FilterResponseDb.dat" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
