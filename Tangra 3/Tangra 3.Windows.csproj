@@ -353,6 +353,12 @@
     <Compile Include="VideoOperations\Spectroscopy\AbsFluxCalibration\frmCompleteSpectra.Designer.cs">
       <DependentUpon>frmCompleteSpectra.cs</DependentUpon>
     </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\AbsFluxCalibration\frmConfigureAbsFluxExport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\AbsFluxCalibration\frmConfigureAbsFluxExport.Designer.cs">
+      <DependentUpon>frmConfigureAbsFluxExport.cs</DependentUpon>
+    </Compile>
     <Compile Include="VideoOperations\Spectroscopy\AbsFluxCalibration\frmConfigureProcessing.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -360,6 +366,7 @@
       <DependentUpon>frmConfigureProcessing.cs</DependentUpon>
     </Compile>
     <Compile Include="VideoOperations\Spectroscopy\FilterResponses\FilterResponseDatabase.cs" />
+    <Compile Include="VideoOperations\Spectroscopy\FilterResponses\SyntheticMagnitudeProducer.cs" />
     <Compile Include="VideoOperations\Spectroscopy\frmChooseConfiguration.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -1091,6 +1098,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\Spectroscopy\AbsFluxCalibration\frmCompleteSpectra.resx">
       <DependentUpon>frmCompleteSpectra.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Spectroscopy\AbsFluxCalibration\frmConfigureAbsFluxExport.resx">
+      <DependentUpon>frmConfigureAbsFluxExport.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\Spectroscopy\AbsFluxCalibration\frmConfigureProcessing.resx">
       <DependentUpon>frmConfigureProcessing.cs</DependentUpon>
