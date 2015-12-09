@@ -688,6 +688,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
                 var output = new StringBuilder();
 
                 var programSpectras = m_SpectraList.Where(x => x.m_CalSpecStar == null).ToList();
+				var standardSpectras = m_SpectraList.Where(x => x.m_CalSpecStar != null).ToList();
 
                 output.Append("Wavelength");
                 for (int j = 0; j < programSpectras.Count; j++)
@@ -700,7 +701,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 				if (exportedMags != ExportedMags.None)
 				{
 					var syntheticMagnitudeProducer = new SyntheticMagnitudeProducer();
-					syntheticMagnitudeProducer.ExportMagnitudes(exportedMags, programSpectras, output);
+					syntheticMagnitudeProducer.ExportMagnitudes(exportedMags, programSpectras, standardSpectras, output);
 	            }
 
                 for (int i = 0; i < m_SpectraList[0].ResolvedWavelengths.Count; i++)
