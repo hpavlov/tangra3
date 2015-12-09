@@ -106,10 +106,11 @@
 			this.miBuildCalSpecDB = new System.Windows.Forms.ToolStripMenuItem();
 			this.miTestCalSpecDB = new System.Windows.Forms.ToolStripMenuItem();
 			this.miExportAbsFluxFiles = new System.Windows.Forms.ToolStripMenuItem();
+			this.miBuildFilterResponseDB = new System.Windows.Forms.ToolStripMenuItem();
+			this.miCalculateCalSpecMagnitudes = new System.Windows.Forms.ToolStripMenuItem();
 			this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
 			this.resizeTimer = new System.Windows.Forms.Timer(this.components);
 			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-			this.miBuildFilterResponseDB = new System.Windows.Forms.ToolStripMenuItem();
 			this.pnlFiles.SuspendLayout();
 			this.ctxMenuIncludedSpectra.SuspendLayout();
 			this.pnlDetail.SuspendLayout();
@@ -822,7 +823,7 @@
             this.miAbsoluteFlux,
             this.miObservedFlux});
 			this.miPlot.Name = "miPlot";
-			this.miPlot.Size = new System.Drawing.Size(152, 22);
+			this.miPlot.Size = new System.Drawing.Size(142, 22);
 			this.miPlot.Text = "&Series Plot";
 			// 
 			// miAbsoluteFlux
@@ -852,7 +853,7 @@
             this.miRainbow2,
             this.miContrast});
 			this.miColourPalette.Name = "miColourPalette";
-			this.miColourPalette.Size = new System.Drawing.Size(152, 22);
+			this.miColourPalette.Size = new System.Drawing.Size(142, 22);
 			this.miColourPalette.Text = "&Colour Palette";
 			this.miColourPalette.DropDownOpening += new System.EventHandler(this.miColourPalette_DropDownOpening);
 			// 
@@ -915,15 +916,14 @@
 			// miProcessing
 			// 
 			this.miProcessing.Name = "miProcessing";
-			this.miProcessing.Size = new System.Drawing.Size(152, 22);
+			this.miProcessing.Size = new System.Drawing.Size(142, 22);
 			this.miProcessing.Text = "&Processing";
 			this.miProcessing.Click += new System.EventHandler(this.miProcessing_Click);
 			// 
 			// miExport
 			// 
 			this.miExport.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.miAbsFluxProgramStars,
-            this.miBuildFilterResponseDB});
+            this.miAbsFluxProgramStars});
 			this.miExport.Name = "miExport";
 			this.miExport.Size = new System.Drawing.Size(51, 20);
 			this.miExport.Text = "Export";
@@ -940,32 +940,47 @@
 			this.miMaintenance.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.miBuildCalSpecDB,
             this.miTestCalSpecDB,
-            this.miExportAbsFluxFiles});
+            this.miExportAbsFluxFiles,
+            this.miBuildFilterResponseDB,
+            this.miCalculateCalSpecMagnitudes});
 			this.miMaintenance.Name = "miMaintenance";
 			this.miMaintenance.Size = new System.Drawing.Size(80, 20);
 			this.miMaintenance.Text = "&Maintenance";
-			this.miMaintenance.Visible = false;
 			// 
 			// miBuildCalSpecDB
 			// 
 			this.miBuildCalSpecDB.Name = "miBuildCalSpecDB";
-			this.miBuildCalSpecDB.Size = new System.Drawing.Size(180, 22);
+			this.miBuildCalSpecDB.Size = new System.Drawing.Size(215, 22);
 			this.miBuildCalSpecDB.Text = "Build CalSpec DB";
 			this.miBuildCalSpecDB.Click += new System.EventHandler(this.miBuildCalSpecDB_Click);
 			// 
 			// miTestCalSpecDB
 			// 
 			this.miTestCalSpecDB.Name = "miTestCalSpecDB";
-			this.miTestCalSpecDB.Size = new System.Drawing.Size(180, 22);
+			this.miTestCalSpecDB.Size = new System.Drawing.Size(215, 22);
 			this.miTestCalSpecDB.Text = "Test CalSpec DB";
 			this.miTestCalSpecDB.Click += new System.EventHandler(this.miTestCalSpecDB_Click);
 			// 
 			// miExportAbsFluxFiles
 			// 
 			this.miExportAbsFluxFiles.Name = "miExportAbsFluxFiles";
-			this.miExportAbsFluxFiles.Size = new System.Drawing.Size(180, 22);
+			this.miExportAbsFluxFiles.Size = new System.Drawing.Size(215, 22);
 			this.miExportAbsFluxFiles.Text = "Export AbsFlux Fomat";
 			this.miExportAbsFluxFiles.Click += new System.EventHandler(this.miExportAbsFluxFiles_Click);
+			// 
+			// miBuildFilterResponseDB
+			// 
+			this.miBuildFilterResponseDB.Name = "miBuildFilterResponseDB";
+			this.miBuildFilterResponseDB.Size = new System.Drawing.Size(215, 22);
+			this.miBuildFilterResponseDB.Text = "Build Filter Response DB";
+			this.miBuildFilterResponseDB.Click += new System.EventHandler(this.miBuildFilterResponseDB_Click);
+			// 
+			// miCalculateCalSpecMagnitudes
+			// 
+			this.miCalculateCalSpecMagnitudes.Name = "miCalculateCalSpecMagnitudes";
+			this.miCalculateCalSpecMagnitudes.Size = new System.Drawing.Size(215, 22);
+			this.miCalculateCalSpecMagnitudes.Text = "Populate CalSpec Magnitudes";
+			this.miCalculateCalSpecMagnitudes.Click += new System.EventHandler(this.miCalculateCalSpecMagnitudes_Click);
 			// 
 			// openFileDialog
 			// 
@@ -982,14 +997,6 @@
 			// 
 			this.saveFileDialog.DefaultExt = "csv";
 			this.saveFileDialog.Filter = "Comma Separated Values (*.csv)|*.csv|All Files (*.*)|*.*";
-			// 
-			// miBuildFilterResponseDB
-			// 
-			this.miBuildFilterResponseDB.Name = "miBuildFilterResponseDB";
-			this.miBuildFilterResponseDB.Size = new System.Drawing.Size(216, 22);
-			this.miBuildFilterResponseDB.Text = "Build Filter Response DB";
-			this.miBuildFilterResponseDB.Visible = false;
-			this.miBuildFilterResponseDB.Click += new System.EventHandler(this.miBuildFilterResponseDB_Click);
 			// 
 			// frmAbsFlux
 			// 
@@ -1116,5 +1123,6 @@
 		private System.Windows.Forms.ToolStripMenuItem miRainbow2;
 		private System.Windows.Forms.ToolStripMenuItem miContrast;
 		private System.Windows.Forms.ToolStripMenuItem miBuildFilterResponseDB;
+		private System.Windows.Forms.ToolStripMenuItem miCalculateCalSpecMagnitudes;
 	}
 }

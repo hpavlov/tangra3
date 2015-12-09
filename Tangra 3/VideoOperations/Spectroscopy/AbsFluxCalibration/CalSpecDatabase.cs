@@ -81,7 +81,12 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
         public double DE_J2000_Deg;
         public double pmRA;
         public double pmDE;
-        public double MagV;
+        public double MagB;
+		public double MagV;
+		public double MagR;
+		public double Mag_g;
+		public double Mag_r;
+		public double Mag_i;
         public double MagBV;
         public string SpecType;
         public string STIS_Flag;

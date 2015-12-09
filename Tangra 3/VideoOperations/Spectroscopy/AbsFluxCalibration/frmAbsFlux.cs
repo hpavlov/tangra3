@@ -16,6 +16,8 @@ using Tangra.Model.Config;
 using Tangra.Model.Helpers;
 using nom.tam.fits;
 using nom.tam.util;
+using Tangra.Astrometry.Recognition;
+using Tangra.StarCatalogues.UCAC4;
 using Tangra.VideoOperations.Spectroscopy.FilterResponses;
 
 namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
@@ -488,7 +490,138 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
                 Trace.WriteLine(star.AbsFluxStarId);
             }
         }
+
+		private void miCalculateCalSpecMagnitudes_Click(object sender, EventArgs e)
+		{
+			var ucac4 = new UCAC4Catalogue(@"D:\Hristo\UCAC4\u4b");
+			foreach (CalSpecStar star in CalSpecDatabase.Instance.Stars)
+			{
+				var starsInRegion = ucac4.GetStarsInRegion(star.RA_J2000_Hours * 15, star.DE_J2000_Deg, 0.5, 20, 2000);
+				var ucac4Star = starsInRegion.FirstOrDefault(x => x.GetStarDesignation(0).Replace("-0", "-") == star.U4) as UCAC4Entry;
+				if (ucac4Star != null)
+				{
+					star.MagB = ucac4Star.MagB;
+					if (!double.IsNaN(ucac4Star.MagV))
+					{
+						star.MagV = ucac4Star.MagV;
+						if (!double.IsNaN(ucac4Star.MagB))
+							star.MagBV = star.MagB - star.MagV;
+					}
+					star.MagR = ucac4Star.MagR;
+					star.Mag_g = ucac4Star.Mag_g;
+					star.Mag_r = ucac4Star.Mag_r;
+					star.Mag_i = ucac4Star.Mag_i;
+				}
+
+				Trace.WriteLine(string.Format("{0}: {1} {2} {3} {4} {5} {6}", star.CalSpecStarId,
+					star.MagB.ToString("0.000"), star.MagV.ToString("0.000"), star.MagR.ToString("0.000"),
+					star.Mag_g.ToString("0.000"), star.Mag_r.ToString("0.000"), star.Mag_i.ToString("0.000")));
+			}
+
+			//using (var compressedStream = new FileStream(@"D:\Hristo\Tangra3\Tangra 3\VideoOperations\Spectroscopy\AbsFluxCalibration\Standards\CalSpec_wMags.db", FileMode.CreateNew, FileAccess.Write))
+			//using (var deflateStream = new DeflateStream(compressedStream, CompressionMode.Compress, true))
+			//{
+			//	using (var writer = new BinaryWriter(deflateStream))
+			//	{
+			//		CalSpecDatabase.Instance.Serialize(writer);
+			//	}
+			//}
+
+		}
         #endregion
+
+		#region Build Filter Response DB
+		private Dictionary<int, double> ParseBesselFile(string filePath)
+		{
+			var rv = new Dictionary<int, double>();
+
+			var lines = File.ReadAllLines(filePath);
+			foreach (string line in lines)
+			{
+				if (line.Length == 0 || "0123456789".IndexOf(line[0]) == -1)
+					continue;
+
+				string[] tokens = line.Split("\t".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+				if (tokens.Length == 2)
+				{
+					int length = (int)Math.Round(double.Parse(tokens[0]) * 10);
+					double response = double.Parse(tokens[1]) / 100;
+
+					if (response > 0.0005)
+						rv.Add(length, response);
+				}
+			}
+
+			return rv;
+		}
+
+		private Dictionary<int, double> ParseSloanCorrFile(string filePath)
+		{
+			var rv = new Dictionary<int, double>();
+
+			var lines = File.ReadAllLines(filePath);
+			foreach (string line in lines)
+			{
+				var line1 = line.TrimStart(' ');
+
+				if (line1.Length == 0 || "0123456789".IndexOf(line1[0]) == -1)
+					continue;
+
+				string[] tokens = line1.Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+				if (tokens.Length == 2)
+				{
+					int length = (int)Math.Round(double.Parse(tokens[0]));
+					double response = double.Parse(tokens[1]);
+
+					if (response > 0.0005)
+						rv.Add(length, response);
+				}
+			}
+
+			return rv;
+		}
+
+		private void miBuildFilterResponseDB_Click(object sender, EventArgs e)
+		{
+			var pathV = Path.GetFullPath(@"..\..\VideoOperations\Spectroscopy\FilterResponses\Bessel_V-1.txt");
+			var pathB = Path.GetFullPath(@"..\..\VideoOperations\Spectroscopy\FilterResponses\Bessel_B-1.txt");
+			var pathR = Path.GetFullPath(@"..\..\VideoOperations\Spectroscopy\FilterResponses\Bessel_R-1.txt");
+			var pathU = Path.GetFullPath(@"..\..\VideoOperations\Spectroscopy\FilterResponses\Bessel_U-1.txt");
+			var pathI = Path.GetFullPath(@"..\..\VideoOperations\Spectroscopy\FilterResponses\Bessel_I-1.txt");
+
+			var path_u = Path.GetFullPath(@"..\..\VideoOperations\Spectroscopy\FilterResponses\corr_u7605a.txt");
+			var path_g = Path.GetFullPath(@"..\..\VideoOperations\Spectroscopy\FilterResponses\corr_G7604B.txt");
+			var path_r = Path.GetFullPath(@"..\..\VideoOperations\Spectroscopy\FilterResponses\corr_R7601SA.txt");
+			var path_i = Path.GetFullPath(@"..\..\VideoOperations\Spectroscopy\FilterResponses\corr_I7604B.txt");
+			var path_z = Path.GetFullPath(@"..\..\VideoOperations\Spectroscopy\FilterResponses\corr_Z7603B.txt");
+
+			var db = new FilterResponseDatabase();
+
+			db.Johnson_V = new FilterResponse() { Designation = "V" };
+			db.Johnson_V.Response = ParseBesselFile(pathV);
+			db.Johnson_B = new FilterResponse() { Designation = "B" };
+			db.Johnson_B.Response = ParseBesselFile(pathB);
+			db.Johnson_R = new FilterResponse() { Designation = "R" };
+			db.Johnson_R.Response = ParseBesselFile(pathR);
+			db.Johnson_U = new FilterResponse() { Designation = "U" };
+			db.Johnson_U.Response = ParseBesselFile(pathU);
+			db.Johnson_I = new FilterResponse() { Designation = "I" };
+			db.Johnson_I.Response = ParseBesselFile(pathI);
+
+			db.SLOAN_u = new FilterResponse() { Designation = "u'" };
+			db.SLOAN_u.Response = ParseSloanCorrFile(path_u);
+			db.SLOAN_g = new FilterResponse() { Designation = "g'" };
+			db.SLOAN_g.Response = ParseSloanCorrFile(path_g);
+			db.SLOAN_r = new FilterResponse() { Designation = "r'" };
+			db.SLOAN_r.Response = ParseSloanCorrFile(path_r);
+			db.SLOAN_i = new FilterResponse() { Designation = "i'" };
+			db.SLOAN_i.Response = ParseSloanCorrFile(path_i);
+			db.SLOAN_z = new FilterResponse() { Designation = "z'" };
+			db.SLOAN_z.Response = ParseSloanCorrFile(path_z);
+
+			db.Save(Path.GetFullPath(@"..\..\..\VideoOperations\Spectroscopy\FilterResponses\FilterResponseDb.dat"));
+		}
+		#endregion
 
         private void miBuildCalSpecDB_Click(object sender, EventArgs e)
         {
@@ -645,97 +778,5 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			CheckSelectedPaletteMenuItem(m_DisplaySetting.AbsFluxPlotPalette);
 		}
 
-		#region Build Filter Response DB
-		private Dictionary<int, double> ParseBesselFile(string filePath)
-		{
-			var rv = new Dictionary<int, double>();
-
-			var lines = File.ReadAllLines(filePath);
-			foreach (string line in lines)
-			{
-				if (line.Length == 0 || "0123456789".IndexOf(line[0]) == -1)
-					continue;
-
-				string[] tokens = line.Split("\t".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-				if (tokens.Length == 2)
-				{
-					int length = (int) Math.Round(double.Parse(tokens[0])*10);
-					double response = double.Parse(tokens[1])/100;
-
-					if (response > 0.0005)
-						rv.Add(length, response);
-				}
-			}
-
-			return rv;
-		}
-
-		private Dictionary<int, double> ParseSloanCorrFile(string filePath)
-		{
-			var rv = new Dictionary<int, double>();
-
-			var lines = File.ReadAllLines(filePath);
-			foreach (string line in lines)
-			{
-				var line1 = line.TrimStart(' ');
-
-				if (line1.Length == 0 || "0123456789".IndexOf(line1[0]) == -1)
-					continue;
-
-				string[] tokens = line1.Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-				if (tokens.Length == 2)
-				{
-					int length = (int)Math.Round(double.Parse(tokens[0]));
-					double response = double.Parse(tokens[1]);
-
-					if (response > 0.0005)
-						rv.Add(length, response);
-				}
-			}
-
-			return rv;
-		}
-
-		private void miBuildFilterResponseDB_Click(object sender, EventArgs e)
-		{
-			var pathV = Path.GetFullPath(@"..\..\VideoOperations\Spectroscopy\FilterResponses\Bessel_V-1.txt");
-			var pathB = Path.GetFullPath(@"..\..\VideoOperations\Spectroscopy\FilterResponses\Bessel_B-1.txt");
-			var pathR = Path.GetFullPath(@"..\..\VideoOperations\Spectroscopy\FilterResponses\Bessel_R-1.txt");
-			var pathU = Path.GetFullPath(@"..\..\VideoOperations\Spectroscopy\FilterResponses\Bessel_U-1.txt");
-			var pathI = Path.GetFullPath(@"..\..\VideoOperations\Spectroscopy\FilterResponses\Bessel_I-1.txt");
-
-			var path_u = Path.GetFullPath(@"..\..\VideoOperations\Spectroscopy\FilterResponses\corr_u7605a.txt");
-			var path_g = Path.GetFullPath(@"..\..\VideoOperations\Spectroscopy\FilterResponses\corr_G7604B.txt");
-			var path_r = Path.GetFullPath(@"..\..\VideoOperations\Spectroscopy\FilterResponses\corr_R7601SA.txt");
-			var path_i = Path.GetFullPath(@"..\..\VideoOperations\Spectroscopy\FilterResponses\corr_I7604B.txt");
-			var path_z = Path.GetFullPath(@"..\..\VideoOperations\Spectroscopy\FilterResponses\corr_Z7603B.txt");
-
-			var db = new FilterResponseDatabase();
-
-			db.Johnson_V = new FilterResponse() { Designation = "V" };
-			db.Johnson_V.Response = ParseBesselFile(pathV);
-			db.Johnson_B = new FilterResponse() { Designation = "B" };
-			db.Johnson_B.Response = ParseBesselFile(pathB);
-			db.Johnson_R = new FilterResponse() { Designation = "R" };
-			db.Johnson_R.Response = ParseBesselFile(pathR);
-			db.Johnson_U = new FilterResponse() { Designation = "U" };
-			db.Johnson_U.Response = ParseBesselFile(pathU);
-			db.Johnson_I = new FilterResponse() { Designation = "I" };
-			db.Johnson_I.Response = ParseBesselFile(pathI);
-
-			db.SLOAN_u = new FilterResponse() { Designation = "u'" };
-			db.SLOAN_u.Response = ParseSloanCorrFile(path_u);
-			db.SLOAN_g = new FilterResponse() { Designation = "g'" };
-			db.SLOAN_g.Response = ParseSloanCorrFile(path_g);
-			db.SLOAN_r = new FilterResponse() { Designation = "r'" };
-			db.SLOAN_r.Response = ParseSloanCorrFile(path_r);
-			db.SLOAN_i = new FilterResponse() { Designation = "i'" };
-			db.SLOAN_i.Response = ParseSloanCorrFile(path_i);
-			db.SLOAN_z = new FilterResponse() { Designation = "z'" };
-			db.SLOAN_z.Response = ParseSloanCorrFile(path_z);
-
-			db.Save(Path.GetFullPath(@"..\..\..\VideoOperations\Spectroscopy\FilterResponses\FilterResponseDb.dat"));
-		}
-		#endregion
 	}
 }
