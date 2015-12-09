@@ -589,10 +589,14 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
         {
             if (m_AbsFluxCalibrator.IsCalibrated)
             {
-                if (saveFileDialog.ShowDialog(this) == DialogResult.OK)
-                {
-                    m_AbsFluxCalibrator.ExportProgramStarsData(saveFileDialog.FileName);
-                }
+				var frmExportConfig = new frmConfigureAbsFluxExport();
+				if (frmExportConfig.ShowDialog(this) == DialogResult.OK)
+	            {
+					if (saveFileDialog.ShowDialog(this) == DialogResult.OK)
+					{
+						m_AbsFluxCalibrator.ExportProgramStarsData(saveFileDialog.FileName, frmExportConfig.SelectedExportMags);
+					}
+				}
             }
             else
                 MessageBox.Show(this, "Not calibrated", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);

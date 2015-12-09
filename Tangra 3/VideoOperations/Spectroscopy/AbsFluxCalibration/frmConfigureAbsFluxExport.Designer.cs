@@ -30,18 +30,18 @@
 		{
 			this.cbxExpostSyntheticMags = new System.Windows.Forms.CheckBox();
 			this.gbxMagConfig = new System.Windows.Forms.GroupBox();
-			this.cb_U = new System.Windows.Forms.CheckBox();
-			this.cb_V = new System.Windows.Forms.CheckBox();
-			this.cb_B = new System.Windows.Forms.CheckBox();
-			this.cb_R = new System.Windows.Forms.CheckBox();
-			this.cb_I = new System.Windows.Forms.CheckBox();
 			this.cb_Sloan_z = new System.Windows.Forms.CheckBox();
 			this.cb_Sloan_i = new System.Windows.Forms.CheckBox();
 			this.cb_Sloan_g = new System.Windows.Forms.CheckBox();
 			this.cb_Sloan_r = new System.Windows.Forms.CheckBox();
 			this.cb_Sloan_u = new System.Windows.Forms.CheckBox();
-			this.button1 = new System.Windows.Forms.Button();
-			this.button2 = new System.Windows.Forms.Button();
+			this.cb_I = new System.Windows.Forms.CheckBox();
+			this.cb_R = new System.Windows.Forms.CheckBox();
+			this.cb_B = new System.Windows.Forms.CheckBox();
+			this.cb_V = new System.Windows.Forms.CheckBox();
+			this.cb_U = new System.Windows.Forms.CheckBox();
+			this.btnOK = new System.Windows.Forms.Button();
+			this.btnCancel = new System.Windows.Forms.Button();
 			this.gbxMagConfig.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -74,56 +74,6 @@
 			this.gbxMagConfig.Size = new System.Drawing.Size(217, 91);
 			this.gbxMagConfig.TabIndex = 1;
 			this.gbxMagConfig.TabStop = false;
-			// 
-			// cb_U
-			// 
-			this.cb_U.AutoSize = true;
-			this.cb_U.Location = new System.Drawing.Point(16, 20);
-			this.cb_U.Name = "cb_U";
-			this.cb_U.Size = new System.Drawing.Size(34, 17);
-			this.cb_U.TabIndex = 0;
-			this.cb_U.Text = "U";
-			this.cb_U.UseVisualStyleBackColor = true;
-			// 
-			// cb_V
-			// 
-			this.cb_V.AutoSize = true;
-			this.cb_V.Location = new System.Drawing.Point(95, 20);
-			this.cb_V.Name = "cb_V";
-			this.cb_V.Size = new System.Drawing.Size(33, 17);
-			this.cb_V.TabIndex = 1;
-			this.cb_V.Text = "V";
-			this.cb_V.UseVisualStyleBackColor = true;
-			// 
-			// cb_B
-			// 
-			this.cb_B.AutoSize = true;
-			this.cb_B.Location = new System.Drawing.Point(56, 20);
-			this.cb_B.Name = "cb_B";
-			this.cb_B.Size = new System.Drawing.Size(33, 17);
-			this.cb_B.TabIndex = 2;
-			this.cb_B.Text = "B";
-			this.cb_B.UseVisualStyleBackColor = true;
-			// 
-			// cb_R
-			// 
-			this.cb_R.AutoSize = true;
-			this.cb_R.Location = new System.Drawing.Point(134, 20);
-			this.cb_R.Name = "cb_R";
-			this.cb_R.Size = new System.Drawing.Size(34, 17);
-			this.cb_R.TabIndex = 3;
-			this.cb_R.Text = "R";
-			this.cb_R.UseVisualStyleBackColor = true;
-			// 
-			// cb_I
-			// 
-			this.cb_I.AutoSize = true;
-			this.cb_I.Location = new System.Drawing.Point(174, 20);
-			this.cb_I.Name = "cb_I";
-			this.cb_I.Size = new System.Drawing.Size(29, 17);
-			this.cb_I.TabIndex = 4;
-			this.cb_I.Text = "I";
-			this.cb_I.UseVisualStyleBackColor = true;
 			// 
 			// cb_Sloan_z
 			// 
@@ -175,32 +125,83 @@
 			this.cb_Sloan_u.Text = "u\'";
 			this.cb_Sloan_u.UseVisualStyleBackColor = true;
 			// 
-			// button1
+			// cb_I
 			// 
-			this.button1.Location = new System.Drawing.Point(61, 152);
-			this.button1.Name = "button1";
-			this.button1.Size = new System.Drawing.Size(75, 23);
-			this.button1.TabIndex = 2;
-			this.button1.Text = "OK";
-			this.button1.UseVisualStyleBackColor = true;
+			this.cb_I.AutoSize = true;
+			this.cb_I.Location = new System.Drawing.Point(174, 20);
+			this.cb_I.Name = "cb_I";
+			this.cb_I.Size = new System.Drawing.Size(29, 17);
+			this.cb_I.TabIndex = 4;
+			this.cb_I.Text = "I";
+			this.cb_I.UseVisualStyleBackColor = true;
 			// 
-			// button2
+			// cb_R
 			// 
-			this.button2.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.button2.Location = new System.Drawing.Point(142, 152);
-			this.button2.Name = "button2";
-			this.button2.Size = new System.Drawing.Size(75, 23);
-			this.button2.TabIndex = 3;
-			this.button2.Text = "Cancel";
-			this.button2.UseVisualStyleBackColor = true;
+			this.cb_R.AutoSize = true;
+			this.cb_R.Location = new System.Drawing.Point(134, 20);
+			this.cb_R.Name = "cb_R";
+			this.cb_R.Size = new System.Drawing.Size(34, 17);
+			this.cb_R.TabIndex = 3;
+			this.cb_R.Text = "R";
+			this.cb_R.UseVisualStyleBackColor = true;
+			// 
+			// cb_B
+			// 
+			this.cb_B.AutoSize = true;
+			this.cb_B.Location = new System.Drawing.Point(56, 20);
+			this.cb_B.Name = "cb_B";
+			this.cb_B.Size = new System.Drawing.Size(33, 17);
+			this.cb_B.TabIndex = 2;
+			this.cb_B.Text = "B";
+			this.cb_B.UseVisualStyleBackColor = true;
+			// 
+			// cb_V
+			// 
+			this.cb_V.AutoSize = true;
+			this.cb_V.Location = new System.Drawing.Point(95, 20);
+			this.cb_V.Name = "cb_V";
+			this.cb_V.Size = new System.Drawing.Size(33, 17);
+			this.cb_V.TabIndex = 1;
+			this.cb_V.Text = "V";
+			this.cb_V.UseVisualStyleBackColor = true;
+			// 
+			// cb_U
+			// 
+			this.cb_U.AutoSize = true;
+			this.cb_U.Location = new System.Drawing.Point(16, 20);
+			this.cb_U.Name = "cb_U";
+			this.cb_U.Size = new System.Drawing.Size(34, 17);
+			this.cb_U.TabIndex = 0;
+			this.cb_U.Text = "U";
+			this.cb_U.UseVisualStyleBackColor = true;
+			// 
+			// btnOK
+			// 
+			this.btnOK.Location = new System.Drawing.Point(61, 152);
+			this.btnOK.Name = "btnOK";
+			this.btnOK.Size = new System.Drawing.Size(75, 23);
+			this.btnOK.TabIndex = 2;
+			this.btnOK.Text = "OK";
+			this.btnOK.UseVisualStyleBackColor = true;
+			this.btnOK.Click += new System.EventHandler(this.btnOK_Click);
+			// 
+			// btnCancel
+			// 
+			this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+			this.btnCancel.Location = new System.Drawing.Point(142, 152);
+			this.btnCancel.Name = "btnCancel";
+			this.btnCancel.Size = new System.Drawing.Size(75, 23);
+			this.btnCancel.TabIndex = 3;
+			this.btnCancel.Text = "Cancel";
+			this.btnCancel.UseVisualStyleBackColor = true;
 			// 
 			// frmConfigureAbsFluxExport
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(266, 190);
-			this.Controls.Add(this.button2);
-			this.Controls.Add(this.button1);
+			this.Controls.Add(this.btnCancel);
+			this.Controls.Add(this.btnOK);
 			this.Controls.Add(this.gbxMagConfig);
 			this.Controls.Add(this.cbxExpostSyntheticMags);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
@@ -227,7 +228,7 @@
 		private System.Windows.Forms.CheckBox cb_B;
 		private System.Windows.Forms.CheckBox cb_V;
 		private System.Windows.Forms.CheckBox cb_U;
-		private System.Windows.Forms.Button button1;
-		private System.Windows.Forms.Button button2;
+		private System.Windows.Forms.Button btnOK;
+		private System.Windows.Forms.Button btnCancel;
 	}
 }

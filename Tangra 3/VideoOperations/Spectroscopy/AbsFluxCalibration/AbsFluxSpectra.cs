@@ -104,6 +104,42 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			DataFromWavelength = (int)Math.Floor(inputFile.Wavelengths[inputFile.Wavelengths.Count - 1]);
 		}
 
+		private AbsFluxSpectra()
+		{ }
+
+		internal AbsFluxSpectra Clone()
+		{
+			var rv = new AbsFluxSpectra();
+
+			rv.m_ExtractedStarName = m_ExtractedStarName;
+			rv.m_DisplayName = m_DisplayName;
+
+			rv.WavelengthFrom = WavelengthFrom;
+			rv.WavelengthTo = WavelengthTo;
+			rv.WavelengthBinSize = WavelengthBinSize;
+			rv.DataFromWavelength = DataFromWavelength;
+			rv.DataToWavelength = DataToWavelength;
+			rv.ObservedFluxes.AddRange(ObservedFluxes);
+			rv.AbsoluteFluxes.AddRange(AbsoluteFluxes);
+			rv.DeltaMagnitiudes.AddRange(DeltaMagnitiudes);
+			rv.ResolvedWavelengths.AddRange(ResolvedWavelengths);
+			rv.Residuals.AddRange(Residuals);
+			rv.ResidualObsFlux.AddRange(ResidualObsFlux);
+			rv.ResidualPercentage.AddRange(ResidualPercentage);
+			rv.ResidualPercentageFlux.AddRange(ResidualPercentageFlux);
+			rv.AverageBiasPercentage = AverageBiasPercentage;
+
+			rv.InputFile = InputFile;
+			rv.m_CalSpecStar = m_CalSpecStar;
+			rv.IsComplete = IsComplete;
+			rv.Number = Number;
+			rv.PlotSpectra = PlotSpectra;
+			rv.HasObjectCoordinates = HasObjectCoordinates;
+			rv.HasObservationTime = HasObservationTime;
+
+			return rv;
+		}
+
 		public override string ToString()
 		{
 			return string.Format("{0}.{1}", Number, m_DisplayName ?? InputFile.FileName);

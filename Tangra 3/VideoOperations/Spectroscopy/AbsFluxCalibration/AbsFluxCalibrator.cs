@@ -10,6 +10,7 @@ using System.Text;
 using Tangra.Helpers;
 using Tangra.Model.Config;
 using Tangra.Model.Numerical;
+using Tangra.VideoOperations.Spectroscopy.FilterResponses;
 
 namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 {
@@ -680,11 +681,12 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 			}
 		}
 
-        public void ExportProgramStarsData(string fileName)
+        public void ExportProgramStarsData(string fileName, ExportedMags exportedMags)
         {
             if (IsCalibrated)
             {
                 var output = new StringBuilder();
+
                 var programSpectras = m_SpectraList.Where(x => x.m_CalSpecStar == null).ToList();
 
                 output.Append("Wavelength");
@@ -694,6 +696,12 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
                     output.Append(programSpectras[j].ToString());
                 }
                 output.AppendLine();
+
+				if (exportedMags != ExportedMags.None)
+				{
+					var syntheticMagnitudeProducer = new SyntheticMagnitudeProducer();
+					syntheticMagnitudeProducer.ExportMagnitudes(exportedMags, programSpectras, output);
+	            }
 
                 for (int i = 0; i < m_SpectraList[0].ResolvedWavelengths.Count; i++)
                 {
