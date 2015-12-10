@@ -10,25 +10,18 @@ namespace Tangra.VideoOperations.Spectroscopy.FilterResponses
 	public enum ExportedMags
 	{
 		None = 0,
-		Johnson_U = 1,
-		Johnson_B = 2,
-		Johnson_V = 4,
-		Johnson_R = 8,
-		Johnson_I = 16,
-		Sloan_u = 32,
-		Sloan_g = 64,
-		Sloan_r = 128,
-		Sloan_i = 256,
-		Sloan_z = 512
+		Johnson_B = 1,
+		Johnson_V = 2,
+		Johnson_R = 4,
+		Sloan_g = 8,
+		Sloan_r = 16,
+		Sloan_i = 32
 	}
 
 	internal class SyntheticMagnitudeProducer
 	{
 		internal void ExportMagnitudes(ExportedMags mags, List<AbsFluxSpectra> spectra, List<AbsFluxSpectra> standardSpectras, StringBuilder output)
 		{
-			if ((mags & ExportedMags.Johnson_U) == ExportedMags.Johnson_U)
-				ExportMagnitudes(FilterResponseDatabase.Instance.Johnson_U, spectra, standardSpectras, output);
-
 			if ((mags & ExportedMags.Johnson_B) == ExportedMags.Johnson_B)
 				ExportMagnitudes(FilterResponseDatabase.Instance.Johnson_B, spectra, standardSpectras, output);
 
@@ -38,12 +31,6 @@ namespace Tangra.VideoOperations.Spectroscopy.FilterResponses
 			if ((mags & ExportedMags.Johnson_R) == ExportedMags.Johnson_R)
 				ExportMagnitudes(FilterResponseDatabase.Instance.Johnson_R, spectra, standardSpectras, output);
 
-			if ((mags & ExportedMags.Johnson_I) == ExportedMags.Johnson_I)
-				ExportMagnitudes(FilterResponseDatabase.Instance.Johnson_I, spectra, standardSpectras, output);
-
-			if ((mags & ExportedMags.Sloan_u) == ExportedMags.Sloan_u)
-				ExportMagnitudes(FilterResponseDatabase.Instance.SLOAN_u, spectra, standardSpectras, output);
-
 			if ((mags & ExportedMags.Sloan_g) == ExportedMags.Sloan_g)
 				ExportMagnitudes(FilterResponseDatabase.Instance.SLOAN_g, spectra, standardSpectras, output);
 
@@ -52,9 +39,6 @@ namespace Tangra.VideoOperations.Spectroscopy.FilterResponses
 
 			if ((mags & ExportedMags.Sloan_i) == ExportedMags.Sloan_i)
 				ExportMagnitudes(FilterResponseDatabase.Instance.SLOAN_i, spectra, standardSpectras, output);
-
-			if ((mags & ExportedMags.Sloan_z) == ExportedMags.Sloan_z)
-				ExportMagnitudes(FilterResponseDatabase.Instance.SLOAN_z, spectra, standardSpectras, output);
 		}
 
 		private void ExportMagnitudes(FilterResponse filterResponse, List<AbsFluxSpectra> spectra, List<AbsFluxSpectra> standardSpectras, StringBuilder output)
@@ -75,6 +59,26 @@ namespace Tangra.VideoOperations.Spectroscopy.FilterResponses
 		private Dictionary<double, double> m_SynthetizedReferneceFluxMagnitudes = new Dictionary<double, double>();
 		private double m_AverageAbsFluxFitMagError;
 
+		private double GetReferenceMagnitude(FilterResponse filterResponse, CalSpecStar star)
+		{
+			switch (filterResponse.Band)
+			{
+				case PhotometricBand.B:
+					return star.MagB;
+				case PhotometricBand.V:
+					return star.MagV;
+				case PhotometricBand.R:
+					return star.MagR;
+				case PhotometricBand.Sloan_g:
+					return star.Mag_g;
+				case PhotometricBand.Sloan_r:
+					return star.Mag_r;
+				case PhotometricBand.Sloan_i:
+					return star.Mag_i;
+				default:
+					return star.MagV;
+			}
+		}
 		private void EnsureReferenceSums(FilterResponse filterResponse, List<AbsFluxSpectra> standardSpectras)
 		{
 			m_SynthetizedReferneceFluxMagnitudes.Clear();
@@ -112,11 +116,11 @@ namespace Tangra.VideoOperations.Spectroscopy.FilterResponses
 
 				standardAbsFluxFitMagErrors.Add(Math.Abs(Math.Log10((referenceSum + residualSum)/referenceSum)));
 
-				m_SynthetizedReferneceFluxMagnitudes.Add(referenceSum, star.MagV /*TODO: Get other magnitides from UCAC4*/);
+				m_SynthetizedReferneceFluxMagnitudes.Add(referenceSum, GetReferenceMagnitude(filterResponse, star));
 			}
 
 			// NOTE: Is this a good way to estimate the error?
-			m_AverageAbsFluxFitMagError = standardAbsFluxFitMagErrors.Average();
+			m_AverageAbsFluxFitMagError = standardAbsFluxFitMagErrors.Average(); // / Math.Sqrt(standardAbsFluxFitMagErrors.Count);
 		}
 
 		private double ComputeSyntheticMag(FilterResponse filterResponse, AbsFluxSpectra spectra, out double magError)
@@ -141,7 +145,13 @@ namespace Tangra.VideoOperations.Spectroscopy.FilterResponses
 				allMags.Add(mag);
 			}
 
+			// First itteration
 			double averageMag = allMags.Average();
+			double threeSigma = 3 * Math.Sqrt(allMags.Select(x => (averageMag - x) * (averageMag - x)).Sum()) / (allMags.Count - 1);
+			allMags = allMags.Where(x => (Math.Abs(x - averageMag) <= threeSigma)).ToList();
+
+			// Second itteration after removing outliers
+			averageMag = allMags.Average();
 			magError = m_AverageAbsFluxFitMagError + Math.Sqrt(allMags.Select(x => (averageMag - x) * (averageMag - x)).Sum()) / (allMags.Count - 1);
 			return averageMag;
 		}

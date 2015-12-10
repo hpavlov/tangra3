@@ -109,6 +109,11 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
             pmDE = reader.ReadDouble();
             MagV = reader.ReadDouble();
             MagBV = reader.ReadDouble();
+			MagB = reader.ReadDouble();
+			MagR = reader.ReadDouble();
+			Mag_g = reader.ReadDouble();
+			Mag_r = reader.ReadDouble();
+			Mag_i = reader.ReadDouble();
             SpecType = reader.ReadString();
             STIS_Flag = reader.ReadString();
             FITS_File = reader.ReadString();
@@ -135,6 +140,11 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
             writer.Write(pmDE);
             writer.Write(MagV);
             writer.Write(MagBV);
+			writer.Write(MagB);
+			writer.Write(MagR);
+			writer.Write(Mag_g);
+			writer.Write(Mag_r);
+			writer.Write(Mag_i);
             writer.Write(SpecType);
             writer.Write(STIS_Flag);
             writer.Write(FITS_File);

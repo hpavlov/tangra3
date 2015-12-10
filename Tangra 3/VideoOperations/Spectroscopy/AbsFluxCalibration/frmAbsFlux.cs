@@ -500,13 +500,18 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 				var ucac4Star = starsInRegion.FirstOrDefault(x => x.GetStarDesignation(0).Replace("-0", "-") == star.U4) as UCAC4Entry;
 				if (ucac4Star != null)
 				{
-					star.MagB = ucac4Star.MagB;
 					if (!double.IsNaN(ucac4Star.MagV))
 					{
 						star.MagV = ucac4Star.MagV;
 						if (!double.IsNaN(ucac4Star.MagB))
 							star.MagBV = star.MagB - star.MagV;
 					}
+
+					if (!double.IsNaN(ucac4Star.MagB))
+						star.MagB = ucac4Star.MagB;
+					else
+						star.MagB = star.MagBV + star.MagV;
+					
 					star.MagR = ucac4Star.MagR;
 					star.Mag_g = ucac4Star.Mag_g;
 					star.Mag_r = ucac4Star.Mag_r;
@@ -518,14 +523,14 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 					star.Mag_g.ToString("0.000"), star.Mag_r.ToString("0.000"), star.Mag_i.ToString("0.000")));
 			}
 
-			//using (var compressedStream = new FileStream(@"D:\Hristo\Tangra3\Tangra 3\VideoOperations\Spectroscopy\AbsFluxCalibration\Standards\CalSpec_wMags.db", FileMode.CreateNew, FileAccess.Write))
-			//using (var deflateStream = new DeflateStream(compressedStream, CompressionMode.Compress, true))
-			//{
-			//	using (var writer = new BinaryWriter(deflateStream))
-			//	{
-			//		CalSpecDatabase.Instance.Serialize(writer);
-			//	}
-			//}
+			using (var compressedStream = new FileStream(@"D:\Hristo\Tangra3\Tangra 3\VideoOperations\Spectroscopy\AbsFluxCalibration\Standards\CalSpec_wMags.db", FileMode.CreateNew, FileAccess.Write))
+			using (var deflateStream = new DeflateStream(compressedStream, CompressionMode.Compress, true))
+			{
+				using (var writer = new BinaryWriter(deflateStream))
+				{
+					CalSpecDatabase.Instance.Serialize(writer);
+				}
+			}
 
 		}
         #endregion
@@ -723,6 +728,7 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
             if (m_AbsFluxCalibrator.IsCalibrated)
             {
 				var frmExportConfig = new frmConfigureAbsFluxExport();
+				frmExportConfig.StartPosition = FormStartPosition.CenterParent;
 				if (frmExportConfig.ShowDialog(this) == DialogResult.OK)
 	            {
 					if (saveFileDialog.ShowDialog(this) == DialogResult.OK)

@@ -30,16 +30,12 @@ namespace Tangra.VideoOperations.Spectroscopy.AbsFluxCalibration
 
 			if (cbxExpostSyntheticMags.Checked)
 			{
-				if (cb_U.Checked) SelectedExportMags |= ExportedMags.Johnson_U;
 				if (cb_B.Checked) SelectedExportMags |= ExportedMags.Johnson_B;
 				if (cb_V.Checked) SelectedExportMags |= ExportedMags.Johnson_V;
 				if (cb_R.Checked) SelectedExportMags |= ExportedMags.Johnson_R;
-				if (cb_I.Checked) SelectedExportMags |= ExportedMags.Johnson_I;
-				if (cb_Sloan_u.Checked) SelectedExportMags |= ExportedMags.Sloan_u;
 				if (cb_Sloan_g.Checked) SelectedExportMags |= ExportedMags.Sloan_g;
 				if (cb_Sloan_r.Checked) SelectedExportMags |= ExportedMags.Sloan_r;
 				if (cb_Sloan_i.Checked) SelectedExportMags |= ExportedMags.Sloan_i;
-				if (cb_Sloan_z.Checked) SelectedExportMags |= ExportedMags.Sloan_z;
 			}
 
 			DialogResult = DialogResult.OK;

@@ -9,10 +9,43 @@ using Tangra.Model.Helpers;
 
 namespace Tangra.VideoOperations.Spectroscopy.FilterResponses
 {
+	public enum PhotometricBand
+	{
+		Unknown,
+		U,
+		B,
+		V,
+		I,
+		R,
+		Sloan_u,
+		Sloan_g,
+		Sloan_r,
+		Sloan_i,
+		Sloan_z
+	}
+
 	public class FilterResponse
 	{
 		public string Designation;
 		public Dictionary<int, double> Response = new Dictionary<int, double>();
+
+		public PhotometricBand Band
+		{
+			get
+			{
+				if (Designation == "U") return PhotometricBand.U;
+				if (Designation == "B") return PhotometricBand.B;
+				if (Designation == "V") return PhotometricBand.V;
+				if (Designation == "R") return PhotometricBand.R;
+				if (Designation == "I") return PhotometricBand.I;
+				if (Designation == "u'") return PhotometricBand.Sloan_u;
+				if (Designation == "g'") return PhotometricBand.Sloan_g;
+				if (Designation == "r'") return PhotometricBand.Sloan_r;
+				if (Designation == "i'") return PhotometricBand.Sloan_i;
+				if (Designation == "z'") return PhotometricBand.Sloan_z;
+				return PhotometricBand.Unknown;
+			}
+		}
 	}
 
 	public class FilterResponseDatabase
