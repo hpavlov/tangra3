@@ -51,7 +51,7 @@ namespace Tangra.VideoOperations.Spectroscopy.FilterResponses
 				output.Append(",");
 				double magError;
 				double syntheticMag = ComputeSyntheticMag(filterResponse, spectra[j], out magError);
-				output.Append(syntheticMag.ToString("0.00") + " +/- " + magError.ToString("0.00"));
+				output.Append(syntheticMag.ToString("0.000") + " +/- " + magError.ToString("0.000"));
 			}
 			output.AppendLine();
 		}
