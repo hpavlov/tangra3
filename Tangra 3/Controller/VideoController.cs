@@ -211,21 +211,39 @@ namespace Tangra.Controller
                 frm.ShowDialog(m_MainForm);
                 fitsFiles = frm.GetSortedFiles();
 
-                return OpenVideoFileInternal(
-                    folderName,
-                    () =>
-                    {
-                        bool hasNegativePixels;
-                        FITSFileSequenceStream stream = FITSFileSequenceStream.OpenFolder(fitsFiles, false, out hasNegativePixels);
+	            try
+	            {
+					return OpenVideoFileInternal(
+						folderName,
+						() =>
+						{
+							bool hasNegativePixels;
+							FITSFileSequenceStream stream = FITSFileSequenceStream.OpenFolder(fitsFiles, false, out hasNegativePixels);
 
-                        if (hasNegativePixels && CheckWithUserAboutNegativePixels())
-                        {
-                            stream = FITSFileSequenceStream.OpenFolder(fitsFiles, true, out hasNegativePixels);
-                        }
+							if (hasNegativePixels && CheckWithUserAboutNegativePixels())
+							{
+								stream = FITSFileSequenceStream.OpenFolder(fitsFiles, true, out hasNegativePixels);
+							}
 
-                        return stream;
-                    });
-            }
+							return stream;
+						});
+ 
+	            }
+	            catch (Exception ex)
+	            {
+		            Trace.WriteLine(ex.GetFullStackTrace());
+
+					MessageBox.Show(
+						m_MainForm,
+						"Error opening FITS files: " + ex.Message,
+						"Tangra",
+						MessageBoxButtons.OK,
+						MessageBoxIcon.Error,
+						MessageBoxDefaultButton.Button1);
+
+		            return false;
+	            }
+           }
         }
 
 		public bool OpenBitmapFileSequence(string folderName)
@@ -289,12 +307,30 @@ namespace Tangra.Controller
                         }
                         else if (fileExtension == ".fit" || fileExtension == ".fits")
                         {
-                            bool hasNegativePixels;
-                            frameStream = SingleFITSFileFrameStream.OpenFile(fileName, false, out hasNegativePixels);
-                            if (hasNegativePixels && CheckWithUserAboutNegativePixels())
-                            {
-                                frameStream = SingleFITSFileFrameStream.OpenFile(fileName, true, out hasNegativePixels);    
-                            }
+	                        try
+	                        {
+								bool hasNegativePixels;
+								frameStream = SingleFITSFileFrameStream.OpenFile(fileName, false, out hasNegativePixels);
+								if (hasNegativePixels && CheckWithUserAboutNegativePixels())
+								{
+									frameStream = SingleFITSFileFrameStream.OpenFile(fileName, true, out hasNegativePixels);
+								}
+
+	                        }
+							catch (Exception ex)
+							{
+								Trace.WriteLine(ex.GetFullStackTrace());
+
+								MessageBox.Show(
+									m_MainForm,
+									"Error opening FITS file: " + ex.Message,
+									"Tangra",
+									MessageBoxButtons.OK,
+									MessageBoxIcon.Error,
+									MessageBoxDefaultButton.Button1);
+
+								return null;
+							}
                         }
                         else
                         {

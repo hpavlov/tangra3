@@ -152,14 +152,37 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 				m_RefIndex = 4;
 			}
 
-			if (m_RefIndex != 1)
-				nudMag1.Value = (decimal)(m_RefMag - 2.5 * Math.Log10(Math.Max(1, m_Intensities[0]) / m_RefIntensity));
-			if (m_Intensities.Length > 1 && m_RefIndex != 2)
-				nudMag2.Value = (decimal)(m_RefMag - 2.5 * Math.Log10(Math.Max(1, m_Intensities[1]) / m_RefIntensity));
-			if (m_Intensities.Length > 2 && m_RefIndex != 3)
-				nudMag3.Value = (decimal)(m_RefMag - 2.5 * Math.Log10(Math.Max(1, m_Intensities[2]) / m_RefIntensity));
-			if (m_Intensities.Length > 3 && m_RefIndex != 4)
-				nudMag4.Value = (decimal)(m_RefMag - 2.5 * Math.Log10(Math.Max(1, m_Intensities[3]) / m_RefIntensity));
+			try
+			{
+				if (m_RefIndex != 1)
+					nudMag1.Value = (decimal)(m_RefMag - 2.5 * Math.Log10(Math.Max(1, m_Intensities[0]) / m_RefIntensity));
+			}
+			catch (OverflowException)
+			{ }
+
+			try
+			{
+				if (m_Intensities.Length > 1 && m_RefIndex != 2)
+					nudMag2.Value = (decimal)(m_RefMag - 2.5 * Math.Log10(Math.Max(1, m_Intensities[1]) / m_RefIntensity));
+			}
+			catch (OverflowException)
+			{ }
+
+			try
+			{
+				if (m_Intensities.Length > 2 && m_RefIndex != 3)
+					nudMag3.Value = (decimal)(m_RefMag - 2.5 * Math.Log10(Math.Max(1, m_Intensities[2]) / m_RefIntensity));
+			}
+			catch (OverflowException)
+			{ }
+
+			try
+			{
+				if (m_Intensities.Length > 3 && m_RefIndex != 4)
+					nudMag4.Value = (decimal)(m_RefMag - 2.5 * Math.Log10(Math.Max(1, m_Intensities[3]) / m_RefIntensity));
+			}
+			catch (OverflowException)
+			{ }
 		}
 
 		private void ReferenceMagnitudeChanged(object sender, EventArgs e)
