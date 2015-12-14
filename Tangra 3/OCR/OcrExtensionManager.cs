@@ -26,7 +26,7 @@ namespace Tangra.OCR
         {
             var supported = new List<object>();
             supported.Add("IOTA-VTI");
-            supported.Add("KIWI-OSD");
+            //supported.Add("KIWI-OSD");
 
             List<ITangraAddin> addins;
             List<ITangraAddinAction> actions = m_AddinsController.GetTimestampOcrActions(out addins);

@@ -783,6 +783,7 @@ namespace Tangra.Controller
 				return 
 					IsPlainAviVideo || 
 					IsAstroAnalogueVideoWithNtpTimestampsInNtpDebugMode ||
+					(m_FramePlayer.IsAstroAnalogueVideo && m_FramePlayer.AstroAnalogueVideoIntegratedAAVFrames == 1) ||
 					m_FramePlayer.Video.Engine == BMPFileSequenceStream.ENGINE;
 			}
 		}
