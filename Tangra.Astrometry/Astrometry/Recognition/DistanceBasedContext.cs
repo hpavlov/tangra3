@@ -2043,10 +2043,10 @@ namespace Tangra.Astrometry.Recognition
                     Debug
 #endif
                     .WriteLine(string.Format("Star({0}) -> Feature({1})", matchedFeatureIdToStarIdIndexes[key], key));
-#endif
 		    }
+#endif
 
-			PlateConstantsSolver solver = new PlateConstantsSolver(m_PlateConfig);
+            PlateConstantsSolver solver = new PlateConstantsSolver(m_PlateConfig);
 			solver.InitPlateSolution(RA0Deg, DE0Deg);
 			foreach (ImagePixel feature in matchedPairs.Keys)
 				solver.AddStar(feature, matchedPairs[feature]);
