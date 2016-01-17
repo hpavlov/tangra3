@@ -166,6 +166,38 @@ HRESULT SerFile::GetFrame(long frameNo, unsigned long* pixels, unsigned int came
 	return E_FAIL;
 }
 
+HRESULT SerFile::GetFrameInfo(long frameNo, SerLib::SerFrameInfo* frameInfo)
+{
+	if (frameNo >=0 && frameNo < m_CountFrames) {
+
+		if (HasTimeStamps) {
+			__int64 timestampPosition = m_TimeStampStartOffset + (__int64)(frameNo * 8);
+
+			advfsetpos(m_File, &timestampPosition);
+
+			unsigned __int64 timeStamp64;
+			unsigned __int64 timeStampUtc64;
+
+			fread(&timeStamp64, 8, 1, m_File);
+			frameInfo->TimeStampLo = timeStamp64 & 0xFFFFFFFF;
+			frameInfo->TimeStampHi = timeStamp64 >> 32;
+			
+			fread(&timeStampUtc64, 8, 1, m_File);
+			frameInfo->TimeStampUtcLo = timeStampUtc64 & 0xFFFFFFFF;
+			frameInfo->TimeStampUtcHi = timeStampUtc64 >> 32;
+		} else {
+			frameInfo->TimeStampLo = 0;
+			frameInfo->TimeStampHi = 0;
+			frameInfo->TimeStampUtcLo = 0;
+			frameInfo->TimeStampUtcHi = 0;				
+		}		
+
+		return S_OK;
+	}
+
+	return E_FAIL;	
+}
+
 HRESULT SerFile::ProcessRawFrame(unsigned long* pixels, unsigned int cameraBitPix)
 {
 	if (m_NumPlanes = 1) {
@@ -262,6 +294,22 @@ HRESULT SERGetFrame(long frameNo, unsigned long* pixels, unsigned long* original
 		return rv;
 	}
 
+	return E_FAIL;
+}
+
+HRESULT SERGetFrameInfo(long frameNo, SerLib::MarshalledSerFrameInfo* marshalledFrameInfo)
+{
+	if (NULL != m_SerFile) {
+		SerLib::SerFrameInfo frameInfo;
+		HRESULT rv = m_SerFile->GetFrameInfo(frameNo, &frameInfo);
+		marshalledFrameInfo->TimeStampLo = frameInfo.TimeStampLo;
+		marshalledFrameInfo->TimeStampHi = frameInfo.TimeStampHi;
+		marshalledFrameInfo->TimeStampUtcLo = frameInfo.TimeStampUtcLo;
+		marshalledFrameInfo->TimeStampUtcHi = frameInfo.TimeStampUtcHi;
+		
+		return rv;
+	}
+	
 	return E_FAIL;
 }
 

@@ -87,4 +87,5 @@ EXPORTS
 	SEROpenFile
 	SERCloseFile
 	SERGetFrame
+	SERGetFrameInfo
 	SERGetIntegratedFrame

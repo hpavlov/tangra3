@@ -61,6 +61,12 @@ namespace Tangra.Video.SER
 				equipmentInfo.Observer = rv.Observer;
 				equipmentInfo.Telescope = rv.Telescope;
 
+			    if (rv.HasTimeStamps || rv.HasUTCTimeStamps)
+			    {
+			        // TODO: Verify the integrity of the timestamps
+                    var frmCheckTS = new frmCheckTimeStampsIntegrity(rv);
+			        frmCheckTS.ShowDialog(parentForm);
+			    }
 				return rv;
 			}
 			return null;
@@ -209,7 +215,16 @@ namespace Tangra.Video.SER
 			}
 		}
 
-		public int RecommendedBufferSize
+        public SerFrameInfo SerFrameInfoOnly(int index)
+	    {
+            var frameInfo = new SerNativeFrameInfo();
+
+            TangraCore.SERGetFrameInfo(index, ref frameInfo);
+
+            return new SerFrameInfo(frameInfo);
+	    }
+
+	    public int RecommendedBufferSize
 		{
             get { return Math.Min(8, CountFrames); }
 		}

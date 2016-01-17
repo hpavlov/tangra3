@@ -386,6 +386,9 @@ namespace Tangra.PInvoke
         // DLL_PUBLIC HRESULT SERGetIntegratedFrame(long startFrameNo, long framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapBytes, BYTE* bitmapDisplayBytes, unsigned int cameraBitPix, SerLib::SerFrameInfo* frameInfo);
         public static extern int SERGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, [Out] uint[] pixels, [In, Out] uint[] originalPixels, [Out] byte[] bitmapBytes, [Out] byte[] bitmapDisplayBytes, ushort cameraBitPix, [In, Out] ref SerNativeFrameInfo frameInfo);
 
+        [DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+        // DLL_PUBLIC HRESULT SERGetFrameInfo(long frameNo, SerLib::SerFrameInfo* frameInfo);
+        public static extern int SERGetFrameInfo(int frameNo, [In, Out] ref SerNativeFrameInfo frameInfo);
 
 		public static string GetTangraCoreVersion()
 		{

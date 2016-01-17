@@ -93,6 +93,7 @@ namespace SerLib
 			void OpenFile(const char* filePath, SerLib::SerFileInfo* fileInfo, char* observer, char* instrument, char* telescope, bool checkMagic);
 			void CloseFile();
 			HRESULT GetFrame(long frameNo, unsigned long* pixels, unsigned int cameraBitPix, SerLib::SerFrameInfo* frameInfo);
+			HRESULT GetFrameInfo(long frameNo, SerLib::SerFrameInfo* frameInfo);
 	};
 }
 
@@ -106,6 +107,7 @@ DLL_PUBLIC HRESULT SEROpenFile(char* fileName, SerLib::SerFileInfo* fileInfo, ch
 DLL_PUBLIC HRESULT SERCloseFile();
 DLL_PUBLIC HRESULT SERGetFrame(long frameNo, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapPixels, BYTE* bitmapBytes, unsigned int cameraBitPix, SerLib::MarshalledSerFrameInfo* frameInfo);		
 DLL_PUBLIC HRESULT SERGetIntegratedFrame(long startFrameNo, long framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapBytes, BYTE* bitmapDisplayBytes, unsigned int cameraBitPix, SerLib::MarshalledSerFrameInfo* frameInfo);
+DLL_PUBLIC HRESULT SERGetFrameInfo(long frameNo, SerLib::MarshalledSerFrameInfo* frameInfo);
 		
 #ifdef __cplusplus
 } // __cplusplus defined.
