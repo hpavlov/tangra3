@@ -31,7 +31,7 @@ namespace Tangra.Video.SER
 
 		internal SerUseTimeStamp UseEmbeddedTimeStamps;
 
-		public frmEnterSERFileInfo(SerFileInfo info)
+		public frmEnterSERFileInfo(SerFileInfo info, bool hasFireCaptureTimestamps)
 		{
 			InitializeComponent();
 
@@ -62,8 +62,17 @@ namespace Tangra.Video.SER
 
 			nudFrameRate.SetNUDValue(TangraConfig.Settings.LastUsed.SerFileLastFrameRate);
 		    pnlFrameRate.Visible = !hasEmbeddedTimeStamps;
-			cbxTimeSource.SelectedIndex = hasEmbeddedTimeStamps ? 1 : 0;
-			if (!hasEmbeddedTimeStamps) cbxTimeSource.Enabled = false;
+
+		    if (hasFireCaptureTimestamps)
+		    {
+		        cbxTimeSource.Items.Add("FireCapture Log File");
+                cbxTimeSource.SelectedIndex = cbxTimeSource.Items.Count - 1;
+		    }
+		    else
+		    {
+                cbxTimeSource.SelectedIndex = hasEmbeddedTimeStamps ? 1 : 0;
+                if (!hasEmbeddedTimeStamps) cbxTimeSource.Enabled = false;
+            }
 		}
 
 		private void btnOK_Click(object sender, EventArgs e)

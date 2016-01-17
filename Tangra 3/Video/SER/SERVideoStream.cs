@@ -6,9 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Tangra.Helpers;
 using Tangra.Model.Config;
@@ -31,7 +33,8 @@ namespace Tangra.Video.SER
 	{
 		None,
 		UtcTime,
-		LocalTime
+		LocalTime,
+        FireCaptureLog
 	}
 
 	public class SERVideoStream : IFrameStream
@@ -47,15 +50,50 @@ namespace Tangra.Video.SER
 
 			TangraCore.SEROpenFile(fileName, ref fileInfo, observer, instrument, telescope, false);
 
+		    string fireCaptureLogFileName = Path.ChangeExtension(fileName, ".txt");
+		    var fireCaptureTimeStamps = new Dictionary<int, DateTime>();
+		    if (File.Exists(fireCaptureLogFileName))
+		    {
+                string[] fireCaptureLogLines = File.ReadAllLines(fireCaptureLogFileName);
+                fireCaptureLogLines = fireCaptureLogLines.Where(x => x != null && x.StartsWith("Frame ")).ToArray();
+		        if (fireCaptureLogLines.Any())
+		        {
+		            // Parse FireCapture timestamps
+		            Regex timestampRegEx = new Regex(@"Frame (\d+):\s+(UT)?\s+(\d\d\d\d\d\d)\s+(\d\d\d\d\d\d)\.(\d+)");
+		            foreach (string line in fireCaptureLogLines)
+		            {
+		                Match match = timestampRegEx.Match(line);
+		                if (match.Success)
+		                {
+		                    string frameNo = match.Groups[1].Value;
+                            bool isUT = match.Groups[2].Value == "UT";
+                            string ddmmyy = match.Groups[isUT ? 3 : 2].Value;
+                            string hhmmss = match.Groups[isUT ? 4 : 3].Value;
+                            double fffff = double.Parse("0." + match.Groups[isUT ? 5 : 4].Value, CultureInfo.InvariantCulture);
+
+		                    DateTime dt = new DateTime(
+		                        2000 + int.Parse(ddmmyy.Substring(4, 2)),
+		                        int.Parse(ddmmyy.Substring(2, 2)),
+		                        int.Parse(ddmmyy.Substring(0, 2)),
+		                        int.Parse(hhmmss.Substring(0, 2)),
+		                        int.Parse(hhmmss.Substring(2, 2)),
+		                        int.Parse(hhmmss.Substring(4, 2))).AddMilliseconds(fffff * 1000);
+
+		                    fireCaptureTimeStamps.Add(int.Parse(frameNo), dt);
+		                }
+		            }
+		        }
+		    }
+
 			UsageStats.Instance.ProcessedSerFiles++;
 			UsageStats.Instance.Save();
 
-			var frmInfo = new frmEnterSERFileInfo(fileInfo);
+            var frmInfo = new frmEnterSERFileInfo(fileInfo, fireCaptureTimeStamps.Count > 0);
 			if (frmInfo.ShowDialog(parentForm) == DialogResult.OK)
 			{
 				TangraCore.SERCloseFile();
 
-				var rv = new SERVideoStream(fileName, frmInfo.FrameRate, frmInfo.BitPix, frmInfo.UseEmbeddedTimeStamps);
+                var rv = new SERVideoStream(fileName, frmInfo.FrameRate, frmInfo.BitPix, frmInfo.UseEmbeddedTimeStamps, fireCaptureTimeStamps);
 
 				equipmentInfo.Instrument = rv.Instrument;
 				equipmentInfo.Observer = rv.Observer;
@@ -63,7 +101,6 @@ namespace Tangra.Video.SER
 
 			    if (rv.HasTimeStamps || rv.HasUTCTimeStamps)
 			    {
-			        // TODO: Verify the integrity of the timestamps
                     var frmCheckTS = new frmCheckTimeStampsIntegrity(rv);
 			        frmCheckTS.ShowDialog(parentForm);
 			    }
@@ -78,8 +115,9 @@ namespace Tangra.Video.SER
 		private SerUseTimeStamp m_UseTimeStamp;
 
 		private SerFrameInfo m_CurrentFrameInfo;
+	    private Dictionary<int, DateTime> m_FireCaptureTimeStamps;
 
-		private SERVideoStream(string fileName, double frameRate, int cameraBitPix, SerUseTimeStamp useTimeStamp)
+        private SERVideoStream(string fileName, double frameRate, int cameraBitPix, SerUseTimeStamp useTimeStamp, Dictionary<int, DateTime> fireCaptureTimeStamps)
 		{
 			m_FileInfo = new SerFileInfo();
 
@@ -95,25 +133,30 @@ namespace Tangra.Video.SER
 			FrameRate = frameRate;
 			MillisecondsPerFrame = 1000 / frameRate;
 			m_UseTimeStamp = useTimeStamp;
+            m_FireCaptureTimeStamps = fireCaptureTimeStamps;
 
 			Observer = Encoding.UTF8.GetString(observer).Trim();
 			Instrument = Encoding.UTF8.GetString(instrument).Trim();
 			Telescope = Encoding.UTF8.GetString(telescope).Trim();
 
+            HasTimeStamps = false;
+            HasUTCTimeStamps = false;
+            HasFireCaptureTimeStamps = false;
+
 			if (useTimeStamp != SerUseTimeStamp.None)
 			{
-				HasTimeStamps =
-					m_FileInfo.SequenceStartTimeHi != 0 &&
-					m_FileInfo.SequenceStartTimeHi >> 0x1F == 0;
+			    HasFireCaptureTimeStamps = useTimeStamp == SerUseTimeStamp.FireCaptureLog;
 
-				HasUTCTimeStamps =
-					m_FileInfo.SequenceStartTimeUTCHi != 0 &&
-					m_FileInfo.SequenceStartTimeUTCHi >> 0x1F == 0;				
-			}
-			else
-			{
-				HasTimeStamps = false;
-				HasUTCTimeStamps = false;
+			    if (!HasFireCaptureTimeStamps)
+			    {
+                    HasTimeStamps =
+                        m_FileInfo.SequenceStartTimeHi != 0 &&
+                        m_FileInfo.SequenceStartTimeHi >> 0x1F == 0;
+
+                    HasUTCTimeStamps =
+                        m_FileInfo.SequenceStartTimeUTCHi != 0 &&
+                        m_FileInfo.SequenceStartTimeUTCHi >> 0x1F == 0;
+			    }
 			}
 		}
 
@@ -126,6 +169,8 @@ namespace Tangra.Video.SER
 		public bool HasTimeStamps { get; private set; }
 
 		public bool HasUTCTimeStamps { get; private set; }
+
+        public bool HasFireCaptureTimeStamps { get; private set; }
 
 		public DateTime SequenceStartTime
 		{
@@ -206,10 +251,21 @@ namespace Tangra.Video.SER
 					SystemTime = m_CurrentFrameInfo.TimeStamp
 				};
 
-				if (m_UseTimeStamp != SerUseTimeStamp.None)
-					rv.FrameState.CentralExposureTime = m_UseTimeStamp == SerUseTimeStamp.UtcTime
-						? m_CurrentFrameInfo.TimeStampUtc
-						: m_CurrentFrameInfo.TimeStamp;
+			    if (m_UseTimeStamp != SerUseTimeStamp.None)
+			    {
+			        if (m_UseTimeStamp == SerUseTimeStamp.FireCaptureLog)
+			        {
+			            DateTime dt;
+			            if (m_FireCaptureTimeStamps.TryGetValue(1 + index, out dt))
+			                rv.FrameState.CentralExposureTime = dt;
+			        }
+			        else
+			        {
+                        rv.FrameState.CentralExposureTime = m_UseTimeStamp == SerUseTimeStamp.UtcTime
+                            ? m_CurrentFrameInfo.TimeStampUtc
+                            : m_CurrentFrameInfo.TimeStamp;
+			        }
+			    }
 
 				return rv;
 			}

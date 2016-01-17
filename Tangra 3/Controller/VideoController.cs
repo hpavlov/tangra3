@@ -739,7 +739,7 @@ namespace Tangra.Controller
 		{
 			return IsAstroDigitalVideo ||
 			       (IsAstroAnalogueVideo && AstroAnalogueVideoHasOcrOrNtpData) ||
-				   (IsSerVideo && ((SERVideoStream)m_FramePlayer.Video).HasUTCTimeStamps) ||
+                   (IsSerVideo && (((SERVideoStream)m_FramePlayer.Video).HasUTCTimeStamps || ((SERVideoStream)m_FramePlayer.Video).HasFireCaptureTimeStamps)) ||
 				   (IsFitsSequence && ((FITSFileSequenceStream)m_FramePlayer.Video).HasUTCTimeStamps);
 		}
 
