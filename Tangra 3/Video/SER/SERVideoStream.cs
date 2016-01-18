@@ -99,7 +99,7 @@ namespace Tangra.Video.SER
 				equipmentInfo.Observer = rv.Observer;
 				equipmentInfo.Telescope = rv.Telescope;
 
-			    if (rv.HasTimeStamps || rv.HasUTCTimeStamps)
+			    if (rv.HasTimeStamps || rv.HasUTCTimeStamps || rv.HasFireCaptureTimeStamps)
 			    {
                     var frmCheckTS = new frmCheckTimeStampsIntegrity(rv);
 			        frmCheckTS.ShowDialog(parentForm);
@@ -273,11 +273,22 @@ namespace Tangra.Video.SER
 
         public SerFrameInfo SerFrameInfoOnly(int index)
 	    {
-            var frameInfo = new SerNativeFrameInfo();
+            if (m_UseTimeStamp == SerUseTimeStamp.FireCaptureLog)
+            {
+                DateTime dt;
+                if (m_FireCaptureTimeStamps.TryGetValue(1 + index, out dt))
+                    return new SerFrameInfo(dt);
+                    
+                return new SerFrameInfo(DateTime.MinValue);
+            }
+            else
+            {
+                var frameInfo = new SerNativeFrameInfo();
 
-            TangraCore.SERGetFrameInfo(index, ref frameInfo);
+                TangraCore.SERGetFrameInfo(index, ref frameInfo);
 
-            return new SerFrameInfo(frameInfo);
+                return new SerFrameInfo(frameInfo);
+            }
 	    }
 
 	    public int RecommendedBufferSize

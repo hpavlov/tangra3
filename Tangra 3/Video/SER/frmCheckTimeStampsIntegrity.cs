@@ -45,8 +45,8 @@ namespace Tangra.Video.SER
                     if (ts.TotalMilliseconds < 0)
                     {
                         MessageBox.Show(
-                            this, 
-                            string.Format("Bad timestamp at frame {0}. The timestamp jumps backwards.", i),
+                            this,
+                            string.Format("Bad " + (m_Stream.HasFireCaptureTimeStamps ? "FireCapture log " : "") + "timestamp at frame {0}. The timestamp jumps backwards.", i),
                             "SER Timestamp Error",
                             MessageBoxButtons.OK,
                             MessageBoxIcon.Error);

@@ -300,6 +300,12 @@ namespace Tangra.PInvoke
 		public DateTime TimeStamp { get; private set; }
         public DateTime TimeStampUtc { get; private set; }
 
+	    internal SerFrameInfo(DateTime fireCaptureTimeStamp)
+	    {
+	        TimeStamp = fireCaptureTimeStamp;
+            TimeStampUtc = fireCaptureTimeStamp;
+	    }
+
 		internal SerFrameInfo(SerNativeFrameInfo nativeInfo)
 		{
 		    try
