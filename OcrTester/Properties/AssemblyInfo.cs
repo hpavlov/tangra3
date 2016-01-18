@@ -15,7 +15,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("OcrTester")]
-[assembly: AssemblyCopyright("Copyright © Hristo Pavlov 2013-2015")]
+[assembly: AssemblyCopyright("Copyright © Hristo Pavlov 2013-2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

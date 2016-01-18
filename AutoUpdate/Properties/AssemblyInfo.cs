@@ -14,7 +14,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Hristo Pavlov")]
 [assembly: AssemblyProduct("Tangra3 Auto Update")]
-[assembly: AssemblyCopyright("Copyright © Hristo Pavlov 2013-2015")]
+[assembly: AssemblyCopyright("Copyright © Hristo Pavlov 2013-2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
