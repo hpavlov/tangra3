@@ -1852,7 +1852,7 @@ namespace Tangra.VideoOperations.LightCurves
         private long prevFrameId;
         public void SaveEmbeddedOrORCedTimeStamp(int frameNo)
         {
-            if (m_VideoController.HasAstroImageState && !m_VideoController.IsAstroAnalogueVideoWithNtpTimestampsInNtpDebugMode)
+            if (m_VideoController.HasAstroImageState && m_TimestampOCR == null && !m_VideoController.IsAstroAnalogueVideoWithNtpTimestampsInNtpDebugMode)
 			{
                 if (m_VideoController.HasEmbeddedTimeStamps())
                 {
