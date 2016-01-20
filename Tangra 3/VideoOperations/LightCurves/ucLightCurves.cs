@@ -93,23 +93,31 @@ namespace Tangra.VideoOperations.LightCurves
             return "N/A";
         }
 
-		private string GetReductionTypeDisplayName(LightCurveReductionType reductionType)
+		private string GetReductionTypeDisplayName(LightCurveReductionType reductionType, ReductionSubType subType)
 		{
 			switch (reductionType)
 			{
 				case LightCurveReductionType.Asteroidal:
 					return "Asteroidal";
 				case LightCurveReductionType.MutualEvent:
-					return "Mutual";
+				{
+					if (subType == ReductionSubType.Eclipse)
+						return "Mutual Eclipse";
+					if (subType == ReductionSubType.Occultation)
+						return "Mutual Occultation";
+					break;
+				}
 				case LightCurveReductionType.TotalLunarDisappearance:
 					return "Total Lunar (D)";
 				case LightCurveReductionType.TotalLunarReppearance:
 					return "Total Lunar (R)";
+				case LightCurveReductionType.LunarGrazingOccultation:
+					return "Lunar Graze";
 				case LightCurveReductionType.UntrackedMeasurement:
 					return "Untracked";
 			}
 
-			return "N/A";			
+			return "N/A";
 		}
 
         internal void UpdateState()
@@ -182,7 +190,7 @@ namespace Tangra.VideoOperations.LightCurves
 
                     lblSignalMethod.Text = GetReductionMethodDisplayName(LightCurveReductionContext.Instance.ReductionMethod);
                     lblBackgroundMethod.Text = GetNoiseMethodDisplayName(LightCurveReductionContext.Instance.NoiseMethod);
-					lblMeasurementType.Text = GetReductionTypeDisplayName(LightCurveReductionContext.Instance.LightCurveReductionType);
+					lblMeasurementType.Text = GetReductionTypeDisplayName(LightCurveReductionContext.Instance.LightCurveReductionType, LightCurveReductionContext.Instance.LightCurveReductionSubType);
 
                     TangraContext.Current.CanScrollFrames = true;
                     m_VideoController.UpdateViews();

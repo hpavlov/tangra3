@@ -1583,7 +1583,7 @@ namespace Tangra.VideoOperations.LightCurves
 				UsageStats.Instance.TrackedMutualEvents++;
 			else if (file.Header.ReductionType == LightCurveReductionType.UntrackedMeasurement)
 				UsageStats.Instance.UntrackedMeasurements++;
-			else if (file.Header.ReductionType == LightCurveReductionType.TotalLunarDisappearance || file.Header.ReductionType == LightCurveReductionType.TotalLunarReppearance)
+			else if (file.Header.ReductionType == LightCurveReductionType.TotalLunarDisappearance || file.Header.ReductionType == LightCurveReductionType.TotalLunarReppearance || file.Header.ReductionType == LightCurveReductionType.LunarGrazingOccultation)
 				UsageStats.Instance.TotalLunarMeasurements++;
 
 			if (TangraConfig.Settings.Tracking.SelectedEngine == TangraConfig.TrackingEngine.TrackingWithRefining)

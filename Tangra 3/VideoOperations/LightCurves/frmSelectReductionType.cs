@@ -137,7 +137,15 @@ namespace Tangra.VideoOperations.LightCurves
 					MessageBox.Show(this, "Please select if this is an Occultation or Eclipse.", "Question", MessageBoxButtons.OK, MessageBoxIcon.Question);
 					return;
 				}
+			}
 
+			if (rbLunarEvent.Checked)
+			{
+				if (!rbLunarD.Checked && !rbLunarR.Checked && !rbLunarGraze.Checked)
+				{
+					MessageBox.Show(this, "Please select the type of Lunar Occultation - Total Disappearance, Total Reapearance or a Grazing Occultation.", "Question", MessageBoxButtons.OK, MessageBoxIcon.Question);
+					return;
+				}
 			}
 
 			LightCurveReductionContext.Instance.DigitalFilter = (TangraConfig.PreProcessingFilter)cbxDigitalFilter.SelectedIndex;
@@ -162,6 +170,17 @@ namespace Tangra.VideoOperations.LightCurves
 				LightCurveReductionContext.Instance.LightCurveReductionSubType = rbMutualOcc.Checked
 					                                                                 ? ReductionSubType.Occultation
 					                                                                 : ReductionSubType.Eclipse;
+			}
+			else if (rbLunarEvent.Checked)
+			{
+				if (rbLunarD.Checked)
+					LightCurveReductionContext.Instance.LightCurveReductionType = LightCurveReductionType.TotalLunarDisappearance;
+				else if (rbLunarR.Checked)
+					LightCurveReductionContext.Instance.LightCurveReductionType = LightCurveReductionType.TotalLunarReppearance;
+				else if (rbLunarGraze.Checked)
+					LightCurveReductionContext.Instance.LightCurveReductionType = LightCurveReductionType.LunarGrazingOccultation;
+				else
+					throw new IndexOutOfRangeException();
 			}
 			else
 				LightCurveReductionContext.Instance.LightCurveReductionType = LightCurveReductionType.UntrackedMeasurement;
@@ -452,11 +471,75 @@ namespace Tangra.VideoOperations.LightCurves
 		{
 			if (rbVariableOrTransit.Checked)
 			{
-				cbxFullDisappearance.Enabled = false;
-				cbxFullDisappearance.Checked = false;
+				m_AutoCheck = true;
+				try
+				{
+					cbxFullDisappearance.Checked = false;
+					cbxFullDisappearance.Enabled = false;
+				}
+				finally
+				{
+					m_AutoCheck = false;
+				}
 			}
 			else
-				cbxFullDisappearance.Enabled = true;
+			{
+				m_AutoCheck = true;
+				try
+				{
+					cbxFullDisappearance.Checked = m_UserCheckedFullDisapearance;
+					cbxFullDisappearance.Enabled = true;
+				}
+				finally
+				{
+					m_AutoCheck = false;
+				}
+			}
+		}
+
+	    private bool m_UserCheckedFullDisapearance = false;
+	    private bool m_AutoCheck = false;
+		private void rbLunarEvent_CheckedChanged(object sender, EventArgs e)
+		{
+			if (rbLunarEvent.Checked)
+			{
+				rbLunarD.Checked = false;
+				rbLunarR.Checked = false;
+				rbLunarGraze.Checked = false;
+				pnlLunarType.Visible = true;
+
+				m_AutoCheck = true;
+				try
+				{
+					cbxFullDisappearance.Checked = true;
+					cbxFullDisappearance.Enabled = false;
+				}
+				finally
+				{
+					m_AutoCheck = false;
+				}
+			}
+			else
+			{
+				pnlLunarType.Visible = false;
+
+				m_AutoCheck = true;
+				try
+				{
+					cbxFullDisappearance.Checked = m_UserCheckedFullDisapearance;
+					cbxFullDisappearance.Enabled = true;
+				}
+				finally
+				{
+					m_AutoCheck = false;
+				}
+			}
+		}
+
+		private void cbxFullDisappearance_CheckedChanged(object sender, EventArgs e)
+		{
+			if (!m_AutoCheck)
+				m_UserCheckedFullDisapearance = cbxFullDisappearance.Checked;
 		}
     }
 }
