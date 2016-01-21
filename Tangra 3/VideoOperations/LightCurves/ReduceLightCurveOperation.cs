@@ -1205,6 +1205,9 @@ namespace Tangra.VideoOperations.LightCurves
             m_StateMachine.SelectedMeasuringStar = -1;
             m_StateMachine.SelectedObject = null;
 
+			// Lunar reappearances are measured backwards
+			m_VideoController.InitializePlayingDirection(LightCurveReductionContext.Instance.LightCurveReductionType == LightCurveReductionType.TotalLunarReppearance);
+
             m_ControlPanel.BeginConfiguration(m_StateMachine, m_VideoController);
 
             m_VideoController.StatusChanged("Configuring");
@@ -1317,7 +1320,7 @@ namespace Tangra.VideoOperations.LightCurves
 				m_VideoController.UpdateViews();
 			}
 			else
-                m_VideoController.PlayVideo(m_CurrFrameNo > -1 ? (int?)m_CurrFrameNo : null);
+                m_VideoController.PlayVideo(m_CurrFrameNo > -1 ? (int?)m_CurrFrameNo : null, 1);
         }
 
         private void InitializeTimestampOCR()
@@ -1493,7 +1496,7 @@ namespace Tangra.VideoOperations.LightCurves
 		        m_ManualTrackingDeltaY[i] = 0;
 	        }
 
-			m_VideoController.PlayVideo(continueAtFrame);
+			m_VideoController.PlayVideo(continueAtFrame, 1);
 
 			m_VideoController.StatusChanged("Measuring");
 

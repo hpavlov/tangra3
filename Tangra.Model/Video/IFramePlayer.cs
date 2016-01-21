@@ -96,6 +96,7 @@ namespace Tangra.Model.Video
 	    string AstroVideoCameraModel { get; }
 		string AstroVideoNativeVideoStandard { get; }
 		GeoLocationInfo GeoLocation { get; }
+		bool InitializePlayingDirection(bool runBackwards);
 		void Start(FramePlaySpeed mode, int? startAtFrame, uint step);
 		void Stop();
 		void StepForward();

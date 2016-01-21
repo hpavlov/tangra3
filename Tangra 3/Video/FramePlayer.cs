@@ -96,6 +96,30 @@ namespace Tangra.Video
 			m_CurrentFrameIndex = m_VideoStream.FirstFrame - 1;
 			m_FramesToIntegrate = 0;
 			m_FrameIntegration = FrameIntegratingMode.NoIntegration;
+			m_PlayBackwards = false;
+		}
+
+		private bool m_PlayBackwards = false;
+
+		public bool InitializePlayingDirection(bool runBackwards)
+		{
+			if (m_PlayBackwards != runBackwards)
+			{
+				m_PlayBackwards = runBackwards;
+				return true;
+			};
+
+			return false;
+		}
+
+		private int CurrentDirectionAwareFrameIndex
+		{
+			get { return m_PlayBackwards ? m_VideoStream.LastFrame - m_CurrentFrameIndex : m_CurrentFrameIndex; }
+		}
+
+		private int GetDirectionAwareFrameIndex(int forwardFrameIndex)
+		{
+			return m_PlayBackwards ? m_VideoStream.LastFrame - forwardFrameIndex : forwardFrameIndex; 
 		}
 
 		public void CloseVideo()
@@ -203,7 +227,7 @@ namespace Tangra.Video
 				var advStream = m_VideoStream as AstroDigitalVideoStream;
 				if (advStream != null)
 				{
-					AdvFrameInfo currStatusChannel = advStream.GetStatusChannel(m_CurrentFrameIndex);
+					AdvFrameInfo currStatusChannel = advStream.GetStatusChannel(CurrentDirectionAwareFrameIndex);
 					if (currStatusChannel.HasTimeStamp)
 					{
 						int targetFrame = m_CurrentFrameIndex + 1;
@@ -285,9 +309,9 @@ namespace Tangra.Video
 				try
 				{
                     if (noIntegrate || !m_VideoStream.SupportsSoftwareIntegration)
-						currentBitmap = m_VideoStream.GetPixelmap(frameNo);
+						currentBitmap = m_VideoStream.GetPixelmap(GetDirectionAwareFrameIndex(frameNo));
 					else
-						currentBitmap = m_VideoStream.GetIntegratedFrame(frameNo, m_FramesToIntegrate,
+						currentBitmap = m_VideoStream.GetIntegratedFrame(GetDirectionAwareFrameIndex(frameNo), m_FramesToIntegrate,
 						                                                 m_FrameIntegration == FrameIntegratingMode.SlidingAverage,
 						                                                 m_PixelIntegrationMode == PixelIntegrationType.Median);
 				}
@@ -303,7 +327,7 @@ namespace Tangra.Video
         public Pixelmap GetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging)
         {
 			return m_VideoStream != null
-				? m_VideoStream.GetIntegratedFrame(startFrameNo, framesToIntegrate, isSlidingIntegration, isMedianAveraging)
+				? m_VideoStream.GetIntegratedFrame(GetDirectionAwareFrameIndex(startFrameNo), framesToIntegrate, isSlidingIntegration, isMedianAveraging)
 				: null;
         }
 
@@ -342,7 +366,7 @@ namespace Tangra.Video
 				AstroDigitalVideoStream advStream = m_VideoStream as AstroDigitalVideoStream;
 				if (advStream != null)
 				{
-					AdvFrameInfo currStatusChannel = advStream.GetStatusChannel(m_CurrentFrameIndex);
+					AdvFrameInfo currStatusChannel = advStream.GetStatusChannel(CurrentDirectionAwareFrameIndex);
 					if (currStatusChannel.HasTimeStamp)
 					{
 						int targetFrame = m_CurrentFrameIndex - 1;
@@ -398,7 +422,7 @@ namespace Tangra.Video
 
                 if (m_FrameIntegration == FrameIntegratingMode.NoIntegration || !m_VideoStream.SupportsSoftwareIntegration)
 				{
-					currentBitmap = m_VideoStream.GetPixelmap(m_CurrentFrameIndex);
+					currentBitmap = m_VideoStream.GetPixelmap(CurrentDirectionAwareFrameIndex);
 				}
 				else if (m_FrameIntegration == FrameIntegratingMode.SlidingAverage)
 				{
@@ -411,7 +435,7 @@ namespace Tangra.Video
 				else
 				    throw new NotSupportedException();
 
-                string frameFileName = m_VideoStream.SupportsFrameFileNames ? m_VideoStream.GetFrameFileName(m_CurrentFrameIndex) : null;
+				string frameFileName = m_VideoStream.SupportsFrameFileNames ? m_VideoStream.GetFrameFileName(CurrentDirectionAwareFrameIndex) : null;
 
                 DisplayCurrentFrameInternal(movementType, currentBitmap, frameFileName);
 			}
@@ -421,8 +445,8 @@ namespace Tangra.Video
         {
             if (m_VideoStream != null)
             {
-                Pixelmap currentBitmap = m_VideoStream.GetPixelmap(m_CurrentFrameIndex);
-                string frameFileName = m_VideoStream.SupportsFrameFileNames ? m_VideoStream.GetFrameFileName(m_CurrentFrameIndex) : null;
+				Pixelmap currentBitmap = m_VideoStream.GetPixelmap(CurrentDirectionAwareFrameIndex);
+				string frameFileName = m_VideoStream.SupportsFrameFileNames ? m_VideoStream.GetFrameFileName(CurrentDirectionAwareFrameIndex) : null;
 
                 DisplayCurrentFrameInternal(movementType, currentBitmap, frameFileName);
             }
@@ -510,7 +534,7 @@ namespace Tangra.Video
 		{
             if (m_IsRunning && !m_StopRequestReceived)
             {
-                Pixelmap bmp = m_VideoStream.GetPixelmap(nextFrameIdToBuffer);
+                Pixelmap bmp = m_VideoStream.GetPixelmap(GetDirectionAwareFrameIndex(nextFrameIdToBuffer));
 
                 if (bmp != null) 
 				{
@@ -521,7 +545,7 @@ namespace Tangra.Video
 						    FrameNo = nextFrameIdToBuffer,
 						    FirstFrameInIntegrationPeriod = nextFrameIdToBuffer,
 						    Image = bmp,
-                            FrameFileName = m_VideoStream.SupportsFrameFileNames ? m_VideoStream.GetFrameFileName(nextFrameIdToBuffer) : null
+							FrameFileName = m_VideoStream.SupportsFrameFileNames ? m_VideoStream.GetFrameFileName(GetDirectionAwareFrameIndex(nextFrameIdToBuffer)) : null
 					    };
 
 					    m_FramesBufferQueue.Enqueue(bufferedFrame);
@@ -689,8 +713,8 @@ namespace Tangra.Video
 					if (m_MillisecondsPerFrame != 0)
 						sw.Start();
 
-					Pixelmap currentPixelmap = m_VideoStream != null ? m_VideoStream.GetPixelmap(m_CurrentFrameIndex) : null;
-                    string frameFileName = m_VideoStream != null && m_VideoStream.SupportsFrameFileNames ? m_VideoStream.GetFrameFileName(m_CurrentFrameIndex) : null;
+					Pixelmap currentPixelmap = m_VideoStream != null ? m_VideoStream.GetPixelmap(CurrentDirectionAwareFrameIndex) : null;
+					string frameFileName = m_VideoStream != null && m_VideoStream.SupportsFrameFileNames ? m_VideoStream.GetFrameFileName(CurrentDirectionAwareFrameIndex) : null;
 
 					int msToWait = -1;
 					if (m_MillisecondsPerFrame != 0)
