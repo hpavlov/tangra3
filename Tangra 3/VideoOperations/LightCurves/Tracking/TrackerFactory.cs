@@ -39,7 +39,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 				if (createFITSFileTracker && lightCurveReductionType == LightCurveReductionType.VariableStarOrTransit)
 	            {
 					usedTrackerType = "Star field tracker";
-					return new StarFieldTracker(measuringStars);		            
+					return new StarFieldTracker(measuringStars);
 	            }
 	            else if (createRefiningTracker)
 	            {
@@ -95,11 +95,18 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 						return new SimplifiedTracker(measuringStars);
 				}
 			}
+			else if (lightCurveReductionType == LightCurveReductionType.TotalLunarDisappearance || 
+				lightCurveReductionType == LightCurveReductionType.TotalLunarReppearance ||
+				lightCurveReductionType == LightCurveReductionType.LunarGrazingOccultation)
+            {
+				usedTrackerType = "Lunar Occuration Tracker";
+				return new LunarOccultationTracker(measuringStars);
+			}
             else if (lightCurveReductionType == LightCurveReductionType.UntrackedMeasurement)
             {
 	            usedTrackerType = "Untracked";
                 return new UntrackedTracker(measuringStars);
-            }			
+            }
 
 			throw new NotSupportedException();
         }

@@ -86,6 +86,8 @@ namespace Tangra.VideoOperations.LightCurves
                     return "Background Mode";
                 case TangraConfig.BackgroundMethod.PSFBackground:
                     return "PSF Background";
+				case TangraConfig.BackgroundMethod.BackgroundMedian:
+					return "Median Background";
                 case TangraConfig.BackgroundMethod.Background3DPolynomial:
                     return "3D-Polynomial Fit";
             }
@@ -515,6 +517,18 @@ namespace Tangra.VideoOperations.LightCurves
 					"No 'Occulted Star' is selected", "Error", 
 					MessageBoxButtons.OK, 
 					MessageBoxIcon.Error);
+				return;
+			}
+
+			if ((LightCurveReductionContext.Instance.LightCurveReductionType == LightCurveReductionType.LunarGrazingOccultation ||
+				LightCurveReductionContext.Instance.LightCurveReductionType == LightCurveReductionType.TotalLunarDisappearance ||
+				LightCurveReductionContext.Instance.LightCurveReductionType == LightCurveReductionType.TotalLunarReppearance) &&
+				m_StateMachine.MeasuringStars.Count > 1)
+			{
+				m_VideoController.ShowMessageBox(
+					  "Only an 'Occulted Star' must be selected for Lunar Events", "Error",
+					  MessageBoxButtons.OK,
+					  MessageBoxIcon.Error);
 				return;
 			}
 

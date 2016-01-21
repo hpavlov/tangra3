@@ -254,6 +254,21 @@ namespace Tangra.VideoOperations.LightCurves
 
 			LightCurveReductionContext.Instance.SaveTrackingSession = false;
 
+	        if (rbLunarEvent.Checked)
+	        {
+		        // NOTE: The photometry/background methods used for Lunar Occultations always default to Aperture Photomtry + Median Background
+
+				if (LightCurveReductionContext.Instance.ReductionMethod != TangraConfig.PhotometryReductionMethod.AperturePhotometry ||
+					LightCurveReductionContext.Instance.NoiseMethod != TangraConfig.BackgroundMethod.BackgroundMedian)
+				{
+					MessageBox.Show(
+						"Lunar occultations can be only used with aperture photometry and median background. The reduction and/or background methods have been changed accordingly.",
+						"Settings changed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+				}
+
+				LightCurveReductionContext.Instance.ReductionMethod = TangraConfig.PhotometryReductionMethod.AperturePhotometry;
+		        LightCurveReductionContext.Instance.NoiseMethod = TangraConfig.BackgroundMethod.BackgroundMedian;
+	        }
 			if (rbMutualEvent.Checked)
 	        {
 				TangraConfig.Settings.LastUsed.MutualReductionType = ComboboxIndexToPhotometryReductionMethod();
@@ -263,7 +278,7 @@ namespace Tangra.VideoOperations.LightCurves
 	        else
 	        {
 				TangraConfig.Settings.LastUsed.AsteroidalReductionType = ComboboxIndexToPhotometryReductionMethod();
-				TangraConfig.Settings.LastUsed.AsteroidalBackgroundReductionMethod = ComboboxIndexToBackgroundMethod();		        
+				TangraConfig.Settings.LastUsed.AsteroidalBackgroundReductionMethod = ComboboxIndexToBackgroundMethod();
 	        }
 			TangraConfig.Settings.LastUsed.AdvancedLightCurveSettings = m_MoreEnabled;
 			TangraConfig.Settings.Save();

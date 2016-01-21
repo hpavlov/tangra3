@@ -336,6 +336,7 @@
       <DependentUpon>frmLongRunningOperation.cs</DependentUpon>
     </Compile>
     <Compile Include="Helpers\LongOperationsManager.cs" />
+    <Compile Include="VideoOperations\LightCurves\Tracking\LunarOccultationTracker.cs" />
     <Compile Include="VideoOperations\LightCurves\Tracking\StarFieldTracker.cs" />
     <Compile Include="VideoOperations\Spectroscopy\AbsFluxCalibration\AbsFluxCalibrator.cs" />
     <Compile Include="VideoOperations\Spectroscopy\AbsFluxCalibration\AbsFluxSpectra.cs" />
