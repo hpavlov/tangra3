@@ -406,8 +406,8 @@ namespace Tangra.VideoOperations.LightCurves
 		    backwardsFile.Header.SecondTimedFrameTime = firstTime;
 
 		    int maxFrame = (int)backwardsFile.Header.MaxFrame;
-			backwardsFile.Header.MaxFrame = (uint)(lastFrameInVideoFile - backwardsFile.Header.MinFrame);
-			backwardsFile.Header.MinFrame = (uint)(lastFrameInVideoFile - maxFrame);
+            backwardsFile.Header.MaxFrame = (uint)(lastFrameInVideoFile - 1 - backwardsFile.Header.MinFrame);
+            backwardsFile.Header.MinFrame = (uint)(lastFrameInVideoFile - 1 - maxFrame);
 		    backwardsFile.Header.ReverseTotalTimeStapmedTime();
 
 			// Update measurement frame ids and reverse order
@@ -419,7 +419,7 @@ namespace Tangra.VideoOperations.LightCurves
 				for (int i = 0; i < objMeas.Count; i++)
 				{
 					var clone = objMeas[i].Clone();
-					clone.CurrFrameNo = (uint) lastFrameInVideoFile - clone.CurrFrameNo;
+                    clone.CurrFrameNo = (uint)lastFrameInVideoFile - 1 - clone.CurrFrameNo;
 					meas.Insert(0, clone);
 				}
 				updatedMeas.Add(meas);

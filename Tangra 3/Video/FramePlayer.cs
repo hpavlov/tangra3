@@ -534,7 +534,9 @@ namespace Tangra.Video
 		{
             if (m_IsRunning && !m_StopRequestReceived)
             {
-                Pixelmap bmp = m_VideoStream.GetPixelmap(GetDirectionAwareFrameIndex(nextFrameIdToBuffer));
+                int directionAwareFrameId = GetDirectionAwareFrameIndex(nextFrameIdToBuffer);
+
+                Pixelmap bmp = m_VideoStream.GetPixelmap(directionAwareFrameId);
 
                 if (bmp != null) 
 				{
@@ -545,7 +547,7 @@ namespace Tangra.Video
 						    FrameNo = nextFrameIdToBuffer,
 						    FirstFrameInIntegrationPeriod = nextFrameIdToBuffer,
 						    Image = bmp,
-							FrameFileName = m_VideoStream.SupportsFrameFileNames ? m_VideoStream.GetFrameFileName(GetDirectionAwareFrameIndex(nextFrameIdToBuffer)) : null
+							FrameFileName = m_VideoStream.SupportsFrameFileNames ? m_VideoStream.GetFrameFileName(directionAwareFrameId) : null
 					    };
 
 					    m_FramesBufferQueue.Enqueue(bufferedFrame);
