@@ -344,7 +344,8 @@ namespace Tangra.VideoOperations.LightCurves
                                 LCFile.NewOnTheFlyOutputFile(
                                     m_VideoController.CurrentVideoFileName,
                                     string.Format("Video ({0})", m_VideoController.CurrentVideoFileType),
-                                    (byte)m_Tracker.TrackedObjects.Count, (float)m_Tracker.PositionTolerance);
+                                    (byte)m_Tracker.TrackedObjects.Count, (float)m_Tracker.PositionTolerance,
+									LightCurveReductionContext.Instance.LightCurveReductionType == LightCurveReductionType.TotalLunarReppearance);
 
                                 m_MinFrame = uint.MaxValue;
                                 m_MaxFrame = uint.MinValue;
@@ -1633,6 +1634,8 @@ namespace Tangra.VideoOperations.LightCurves
 
 			m_StateMachine.ChangeState(LightCurvesState.Viewing);
 
+			m_VideoController.InitializePlayingDirection(false);
+
 			DoShowLightCurve(file);
 
 			m_ControlPanel.SetupLCFileInfo(m_LightCurveController.LcFile);
@@ -1729,7 +1732,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 			// The actual integration could even be of PAL or NTSC frames
 
-			TimeSpan ts = new TimeSpan(m_EndFrameTime.Ticks - m_StartFrameTime.Ticks);
+			TimeSpan ts = new TimeSpan(Math.Abs(m_EndFrameTime.Ticks - m_StartFrameTime.Ticks)/*Taking ABS to handle backwards measuring*/);
 			double videoTimeInSecPAL = totalIntegratedFrames / 25.0;
 			double videoTimeInSecNTSC = totalIntegratedFrames / 29.97;
 
@@ -1774,7 +1777,7 @@ namespace Tangra.VideoOperations.LightCurves
 								   ? "PAL"
 								   : "NTSC";
 
-			TimeSpan ts = new TimeSpan(m_EndFrameTime.Ticks - m_StartFrameTime.Ticks);
+			TimeSpan ts = new TimeSpan(Math.Abs(m_EndFrameTime.Ticks - m_StartFrameTime.Ticks)/*Taking ABS to handle backwards measuring*/);
 			double videoTimeInSec = (m_EndTimeFrame - m_StartTimeFrame) / acceptedVideoFrameRate;
 
 			if (m_VideoController.IsPlainAviVideo && (videoTimeInSec < 0 || Math.Abs((videoTimeInSec - ts.TotalSeconds) * 1000) > TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMs))

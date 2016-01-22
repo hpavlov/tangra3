@@ -264,8 +264,9 @@ namespace Tangra.VideoOperations.LightCurves
         private static FileStream s_OnTheFlyFile;
         private static BinaryWriter s_OnTheFlyWriter;
         private static int[] s_NumMeasurements = new int[4];
+	    private static bool s_IsBackwardsMeasuredFile = false;
 
-        public static void NewOnTheFlyOutputFile(string pathToVideoFile, string sourceInfo, byte numberOfTargets, float positionTolerance)
+        public static void NewOnTheFlyOutputFile(string pathToVideoFile, string sourceInfo, byte numberOfTargets, float positionTolerance, bool isBackwardsMeasuredFile)
         {
             if (s_OnTheFlyFile != null)
                 s_OnTheFlyFile.Close();
@@ -299,6 +300,8 @@ namespace Tangra.VideoOperations.LightCurves
 
             s_OnTheFlyWriter.Write(header.ObjectCount);
             s_OnTheFlyWriter.Write(s_NumMeasurements[0]);
+
+	        s_IsBackwardsMeasuredFile = isBackwardsMeasuredFile;
         }
 
         private static T[] EmptyArray<T>(int count)
@@ -317,6 +320,13 @@ namespace Tangra.VideoOperations.LightCurves
 				s_NumMeasurements[measurement.TargetNo]++;
 			}
         }
+
+		public static void SaveOnTheFlyFrameTiming(LCFrameTiming frameTiming)
+		{
+			//Trace.WriteLine(string.Format("LCFile::SaveOnTheFlyFrameTiming({0})", frameTiming.FrameMidTime.ToString("HH:mm:ss.fff")));
+
+			frameTiming.WriteTo(s_OnTheFlyWriter);
+		}
 
         public static LCFile FlushOnTheFlyOutputFile(LCMeasurementHeader header, LCMeasurementFooter footer, VideoController videoController) 
         {
@@ -365,6 +375,12 @@ namespace Tangra.VideoOperations.LightCurves
 					}
 
 					File.Delete(s_OnTheFlyFileName);
+
+					if (s_IsBackwardsMeasuredFile)
+					{
+						// Reverse a backwards measured file
+						ReverseBackwardMeasuredFile(s_OnTheFlyZippedFileName);
+					}
 				}
 				finally
 				{
@@ -375,12 +391,41 @@ namespace Tangra.VideoOperations.LightCurves
 			return LCFile.Load(s_OnTheFlyZippedFileName, videoController);
         }
 
-		public static void SaveOnTheFlyFrameTiming(LCFrameTiming frameTiming)
-		{
-			//Trace.WriteLine(string.Format("LCFile::SaveOnTheFlyFrameTiming({0})", frameTiming.FrameMidTime.ToString("HH:mm:ss.fff")));
+	    private static void ReverseBackwardMeasuredFile(string fileName)
+	    {
+		    LCFile backwardsFile = Load(fileName, null);
 
-			frameTiming.WriteTo(s_OnTheFlyWriter);
-		}
+			// Swap the first/last times frames
+		    int lastFrameInVideoFile = backwardsFile.Header.CountFrames - backwardsFile.Header.FirstFrameInVideoFile;
+		    int firstTimeFrameNo = backwardsFile.Header.FirstTimedFrameNo;
+		    DateTime firstTime = backwardsFile.Header.FirstTimedFrameTime;
+
+			backwardsFile.Header.FirstTimedFrameNo = lastFrameInVideoFile - backwardsFile.Header.LastTimedFrameNo - 1;
+			backwardsFile.Header.FirstTimedFrameTime = backwardsFile.Header.SecondTimedFrameTime;
+			backwardsFile.Header.LastTimedFrameNo = lastFrameInVideoFile - firstTimeFrameNo - 1;
+		    backwardsFile.Header.SecondTimedFrameTime = firstTime;
+
+		    int maxFrame = (int)backwardsFile.Header.MaxFrame;
+			backwardsFile.Header.MaxFrame = (uint)(lastFrameInVideoFile - backwardsFile.Header.MinFrame);
+			backwardsFile.Header.MinFrame = (uint)(lastFrameInVideoFile - maxFrame);
+		    backwardsFile.Header.ReverseTotalTimeStapmedTime();
+
+			// Update measurement frame ids and reverse order
+		    List<List<LCMeasurement>> updatedMeas = new List<List<LCMeasurement>>();
+		    foreach (var objMeas in backwardsFile.Data)
+		    {
+			    var meas = new List<LCMeasurement>();
+				for (int i = 0; i < objMeas.Count; i++)
+				{
+					var clone = objMeas[i].Clone();
+					clone.CurrFrameNo = (uint) lastFrameInVideoFile - clone.CurrFrameNo;
+					meas.Insert(0, clone);
+				}
+				updatedMeas.Add(meas);
+		    }
+
+			Save(fileName, backwardsFile.Header, updatedMeas, backwardsFile.FrameTiming, backwardsFile.Footer);
+	    }
 
         internal DateTime GetTimeForFrame(double frameNo)
         {
@@ -1180,6 +1225,11 @@ namespace Tangra.VideoOperations.LightCurves
 
         private TimeSpan TotalTimeStapmedTime;
 
+	    internal void ReverseTotalTimeStapmedTime()
+	    {
+			TotalTimeStapmedTime = new TimeSpan(-1 * TotalTimeStapmedTime.Ticks);
+	    }
+
     	internal MeasurementTimingType TimingType;
 
         internal double GetAbsoluteTimeDeltaInMilliseconds(out string videoSystem)
@@ -1189,7 +1239,7 @@ namespace Tangra.VideoOperations.LightCurves
             double assumedFrameRate = FramesPerSecond;
             videoSystem = null;
 
-			if (SourceInfo.Contains("(AAV.8)"))
+			if (SourceInfo.Contains("(AAV."))
 			{
 				assumedFrameRate  = ComputedFramesPerSecond;
 				videoSystem = "AAV";
