@@ -411,7 +411,8 @@ namespace Tangra.VideoOperations.LightCurves
 		    backwardsFile.Header.ReverseTotalTimeStapmedTime();
 
 			// Update measurement frame ids and reverse order
-		    List<List<LCMeasurement>> updatedMeas = new List<List<LCMeasurement>>();
+		    var updatedMeas = new List<List<LCMeasurement>>();
+	        var updatedTimings = new List<LCFrameTiming>();
 		    foreach (var objMeas in backwardsFile.Data)
 		    {
 			    var meas = new List<LCMeasurement>();
@@ -423,8 +424,12 @@ namespace Tangra.VideoOperations.LightCurves
 				}
 				updatedMeas.Add(meas);
 		    }
+	        foreach (var frameTiming in backwardsFile.FrameTiming)
+	        {
+	            updatedTimings.Insert(0, frameTiming.Clone());
+	        }
 
-			Save(fileName, backwardsFile.Header, updatedMeas, backwardsFile.FrameTiming, backwardsFile.Footer);
+            Save(fileName, backwardsFile.Header, updatedMeas, updatedTimings, backwardsFile.Footer);
 	    }
 
         internal DateTime GetTimeForFrame(double frameNo)
@@ -711,7 +716,6 @@ namespace Tangra.VideoOperations.LightCurves
 			}
 		}
 
-
 		internal void WriteTo(BinaryWriter writer)
 		{
 			writer.Write(SERIALIZATION_VERSION);
@@ -742,6 +746,18 @@ namespace Tangra.VideoOperations.LightCurves
 				writer.Write(FrameMidTimeNTPTangra.Value.Ticks);
 			}
 		}
+
+	    public LCFrameTiming Clone()
+	    {
+            LCFrameTiming clone = new LCFrameTiming();
+            clone.FrameMidTime = this.FrameMidTime;
+            clone.FrameDurationInMilliseconds = this.FrameDurationInMilliseconds;
+            clone.OCRedPixels = this.OCRedPixels;
+            clone.FrameMidTimeNTPRaw = this.FrameMidTimeNTPRaw;
+            clone.FrameMidTimeWindowsRaw = this.FrameMidTimeWindowsRaw;
+            clone.FrameMidTimeNTPTangra = this.FrameMidTimeNTPTangra;
+	        return clone;
+	    }
 	}
 
     internal enum ProcessingType
@@ -877,6 +893,7 @@ namespace Tangra.VideoOperations.LightCurves
             LCMeasurement clone = new LCMeasurement();
             clone.CurrFrameNo = this.CurrFrameNo;
             clone.TargetNo = this.TargetNo;
+            clone.TotalReading = this.TotalReading;
             clone.TotalBackground = this.TotalBackground;
             clone.Flags = this.Flags;
         	clone.FlagsDWORD = this.FlagsDWORD;

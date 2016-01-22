@@ -1206,12 +1206,22 @@ namespace Tangra.VideoOperations.LightCurves
             m_StateMachine.SelectedMeasuringStar = -1;
             m_StateMachine.SelectedObject = null;
 
-			// Lunar reappearances are measured backwards
-			m_VideoController.InitializePlayingDirection(LightCurveReductionContext.Instance.LightCurveReductionType == LightCurveReductionType.TotalLunarReppearance);
-
             m_ControlPanel.BeginConfiguration(m_StateMachine, m_VideoController);
 
             m_VideoController.StatusChanged("Configuring");
+
+            // Lunar reappearances are measured backwards
+            bool isLunarR = LightCurveReductionContext.Instance.LightCurveReductionType == LightCurveReductionType.TotalLunarReppearance;
+            if (isLunarR)
+            {
+                m_VideoController.ShowMessageBox(
+                    "To help with the tracking of a Lunar Reappearance Tangra will run the video in reverse direction.\r\n\r\n " +
+                    "Please select the already reapeared star that you would like to measure.",
+                    "Information",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+            }
+            m_VideoController.InitializePlayingDirection(isLunarR);
         }
 
         public void StartOver()

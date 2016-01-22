@@ -126,6 +126,8 @@ namespace Tangra.VideoOperations.LightCurves
         {
             this.BackColor = SystemColors.Control;
 
+            if (m_StateMachine == null) return;
+
             if (m_StateMachine.CurrentState == LightCurvesState.SelectTrackingStars ||
                 m_StateMachine.CurrentState == LightCurvesState.SelectMeasuringStars)
             {
@@ -520,10 +522,11 @@ namespace Tangra.VideoOperations.LightCurves
 				return;
 			}
 
-			if ((LightCurveReductionContext.Instance.LightCurveReductionType == LightCurveReductionType.LunarGrazingOccultation ||
+            bool isLunarEvent = LightCurveReductionContext.Instance.LightCurveReductionType == LightCurveReductionType.LunarGrazingOccultation ||
 				LightCurveReductionContext.Instance.LightCurveReductionType == LightCurveReductionType.TotalLunarDisappearance ||
-				LightCurveReductionContext.Instance.LightCurveReductionType == LightCurveReductionType.TotalLunarReppearance) &&
-				m_StateMachine.MeasuringStars.Count > 1)
+				LightCurveReductionContext.Instance.LightCurveReductionType == LightCurveReductionType.TotalLunarReppearance;
+
+			if (isLunarEvent && m_StateMachine.MeasuringStars.Count > 1)
 			{
 				m_VideoController.ShowMessageBox(
 					  "Only an 'Occulted Star' must be selected for Lunar Events", "Error",
@@ -562,40 +565,45 @@ namespace Tangra.VideoOperations.LightCurves
                 LightCurveReductionContext.Instance.ReductionMethod = TangraConfig.PhotometryReductionMethod.PsfPhotometry;
             }
 
-			int numberGuidingStars = m_StateMachine.MeasuringStars.Count(t => t.TrackingType == TrackingType.GuidingStar);
-			int numberComparisonStars = m_StateMachine.MeasuringStars.Count(t => t.TrackingType == TrackingType.ComparisonStar);
-			bool warnedAboutGuidingStars = false;
-
-			if (occultedStar.AutoStarsInArea.Count != 1 ||
-				occultedStar.IsWeakSignalObject)
-			{
-				// If this is a user defined position or not the only bright star in the region, we 
-				// require at least one guiding star before we can start
-				if (numberGuidingStars == 0)
-				{
-					warnedAboutGuidingStars = true;
-					if (m_VideoController.ShowMessageBox(
-						"It seems that the occulted star is not very bright. For best tracking results it is recommended to select as many 'Guiding Stars' as possible.\r\n\r\nYou may also consider using software integration if there are no bright stars in the video." +
-						"\r\n\r\nWould you like to continue anyway without a 'Guiding Star'?",
-						"Warning",
-						MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.No)
-					{
-						return;
-					}
-				}
-			}
-
-            if (!warnedAboutGuidingStars &&
-                numberGuidingStars < numberComparisonStars)
+            if (!isLunarEvent)
             {
-                warnedAboutGuidingStars = true;
-                if (m_VideoController.ShowMessageBox(
-                        "It seems that you may have too few 'Guiding Stars'. For best results it is recommended to use as many 'Guiding Stars' as possible.\r\n\r\nYou should also consider using software integration if there are no bright stars in the video." +
-                        "\r\n\r\nWould you like to continue anyway?",
-                        "Warning",
-                        MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.No)
+                // Guiding stars checks are only applicable to non Lunar events
+
+                int numberGuidingStars = m_StateMachine.MeasuringStars.Count(t => t.TrackingType == TrackingType.GuidingStar);
+                int numberComparisonStars = m_StateMachine.MeasuringStars.Count(t => t.TrackingType == TrackingType.ComparisonStar);
+                bool warnedAboutGuidingStars = false;
+
+                if (occultedStar.AutoStarsInArea.Count != 1 ||
+                    occultedStar.IsWeakSignalObject)
                 {
-                    return;
+                    // If this is a user defined position or not the only bright star in the region, we 
+                    // require at least one guiding star before we can start
+                    if (numberGuidingStars == 0)
+                    {
+                        warnedAboutGuidingStars = true;
+                        if (m_VideoController.ShowMessageBox(
+                            "It seems that the occulted star is not very bright. For best tracking results it is recommended to select as many 'Guiding Stars' as possible.\r\n\r\nYou may also consider using software integration if there are no bright stars in the video." +
+                            "\r\n\r\nWould you like to continue anyway without a 'Guiding Star'?",
+                            "Warning",
+                            MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.No)
+                        {
+                            return;
+                        }
+                    }
+                }
+
+                if (!warnedAboutGuidingStars &&
+                    numberGuidingStars < numberComparisonStars)
+                {
+                    warnedAboutGuidingStars = true;
+                    if (m_VideoController.ShowMessageBox(
+                            "It seems that you may have too few 'Guiding Stars'. For best results it is recommended to use as many 'Guiding Stars' as possible.\r\n\r\nYou should also consider using software integration if there are no bright stars in the video." +
+                            "\r\n\r\nWould you like to continue anyway?",
+                            "Warning",
+                            MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.No)
+                    {
+                        return;
+                    }
                 }
             }
 

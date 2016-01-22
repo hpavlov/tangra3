@@ -904,8 +904,11 @@ namespace Tangra.Controller
 
 		public void InitializePlayingDirection(bool playBackwards)
 		{
-			if (m_FramePlayer.InitializePlayingDirection(playBackwards))
-				RedrawCurrentFrame(false, true);
+		    if (m_FramePlayer.InitializePlayingDirection(playBackwards))
+		    {
+		        RedrawCurrentFrame(false, true);
+                RefreshCurrentFrame();
+		    }
 		}
 
 		public void PlayVideo(int? startAtFrame = null, uint step = 1)
