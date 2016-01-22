@@ -1378,7 +1378,14 @@ namespace Tangra.VideoOperations.LightCurves
 
 					if (m_TimestampOCR.RequiresCalibration)
 					{
-                        Pixelmap frame = m_VideoController.GetFrame(m_VideoController.CurrentFrameIndex);
+					    // NOTE: If we are measuring the video backwards the OCR will need to be intialized forward (i.e. double backwards)
+                        bool measuringBackwards = LightCurveReductionContext.Instance.LightCurveReductionType == LightCurveReductionType.TotalLunarReppearance;
+
+					    int firstCalibrationFrame = measuringBackwards 
+                            ? Math.Min(m_VideoController.CurrentFrameIndex + 30, m_VideoController.VideoLastFrame)
+					        : m_VideoController.CurrentFrameIndex;
+
+                        Pixelmap frame = m_VideoController.GetFrame(firstCalibrationFrame);
                         m_TimestampOCR.ProcessCalibrationFrame(m_VideoController.CurrentFrameIndex, frame.Pixels);
 
 						bool isCalibrated = true;
@@ -1390,29 +1397,48 @@ namespace Tangra.VideoOperations.LightCurves
 							FileProgressManager.BeginFileOperation(maxCalibrationFieldsToAttempt);
 							try
 							{
-								for (int i = m_VideoController.CurrentFrameIndex + 1; i < m_VideoController.VideoLastFrame; i++)
-								{
-									frame = m_VideoController.GetFrame(i);
-									isCalibrated = m_TimestampOCR.ProcessCalibrationFrame(i, frame.Pixels);
+							    var processingMethod = new Func<int, bool>(delegate(int i)
+							    {
+                                    frame = m_VideoController.GetFrame(i);
+                                    isCalibrated = m_TimestampOCR.ProcessCalibrationFrame(i, frame.Pixels);
 
-									if (m_TimestampOCR.InitiazliationError != null)
-									{
-										// This doesn't like like what the OCR engine is expecting. Abort ....
-										m_TimestampOCR = null;
-										m_NumberFailedOcredVtiOsdFrames++;
-										return;
-									}
+                                    if (m_TimestampOCR.InitiazliationError != null)
+                                    {
+                                        // This doesn't like like what the OCR engine is expecting. Abort ....
+                                        m_TimestampOCR = null;
+                                        m_NumberFailedOcredVtiOsdFrames++;
+                                        return false;
+                                    }
 
-									calibrationFramesProcessed++;
+                                    calibrationFramesProcessed++;
 
-									FileProgressManager.FileOperationProgress(calibrationFramesProcessed);
+                                    FileProgressManager.FileOperationProgress(calibrationFramesProcessed);
 
-									if (isCalibrated)
-										break;
+                                    if (isCalibrated)
+                                        return true;
 
-									if (calibrationFramesProcessed > maxCalibrationFieldsToAttempt)
-										break;
-								}
+                                    if (calibrationFramesProcessed > maxCalibrationFieldsToAttempt)
+                                        return true;
+
+                                    return false;
+							    });
+
+							    if (measuringBackwards)
+							    {
+                                    for (int i = firstCalibrationFrame - 1; i > m_VideoController.CurrentFrameIndex; i--)
+                                    {
+                                        if (processingMethod(i))
+                                            break;
+                                    }
+							    }
+							    else
+							    {
+                                    for (int i = firstCalibrationFrame + 1; i < m_VideoController.VideoLastFrame; i++)
+							        {
+							            if (processingMethod(i))
+							                break;
+							        }
+							    }
 							}
 							finally
 							{
