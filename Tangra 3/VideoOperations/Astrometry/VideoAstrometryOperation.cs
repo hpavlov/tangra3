@@ -67,6 +67,7 @@ namespace Tangra.VideoOperations.Astrometry
 		private MeasurementContext m_MeasurementContext;
 
 		private bool m_DebugMode;
+		private bool m_MovingToFirstIntegratedFrameFlag = false;
 
 		private List<ITangraAddinAction> m_AstrometryAddinActions = new List<ITangraAddinAction>();
 		private List<ITangraAddin> m_AstrometryAddins = new List<ITangraAddin>();
@@ -188,6 +189,11 @@ namespace Tangra.VideoOperations.Astrometry
 			}
 			else
 				return false;
+		}
+
+		internal void MovingToFirstIntegratedFrame()
+		{
+			m_MovingToFirstIntegratedFrameFlag = true;
 		}
 
 		internal void StartAstrometricMeasurements(ucAstrometryObjectInfo.StartAstrometricMeasurementsEventArgs e)
@@ -471,7 +477,7 @@ namespace Tangra.VideoOperations.Astrometry
 			Profiler.Instance.StartTimer("MATCH");
 #endif
 
-			if (movementType != MovementType.Step && movementType != MovementType.StepBackwards)
+			if (movementType != MovementType.Step && movementType != MovementType.StepBackwards && !m_MovingToFirstIntegratedFrameFlag)
 			{
 				// NOTE: This will also reset the full range of stars
 				m_DistBasedMatcher = null;
@@ -479,6 +485,8 @@ namespace Tangra.VideoOperations.Astrometry
 			}
 
 			EnsureDistBasedMatcher();
+
+			m_MovingToFirstIntegratedFrameFlag = false;
 
 			m_DistBasedMatcher.InitNewFrame(m_StarMap);
 			m_CurrentMatchResult = m_DistBasedMatcher.PerformMatch(out m_AstrometricFit);

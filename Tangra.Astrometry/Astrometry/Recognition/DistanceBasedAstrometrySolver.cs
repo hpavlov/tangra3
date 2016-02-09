@@ -128,10 +128,10 @@ namespace Tangra.Astrometry.Recognition
 #endif
 		}
 
-        public void InitNewFrame(IStarMap imageFeatures, LeastSquareFittedAstrometry previousSolution = null)
+        public void InitNewFrame(IStarMap imageFeatures)
         {
             m_StarMap = imageFeatures;
-            m_Solution = previousSolution;
+			// NOTE: The m_Solution will be reused until the DistanceBasedAstrometrySolver is recreated
         }
 
 		public class PyramidDebugContext

@@ -589,6 +589,7 @@ namespace Tangra.VideoOperations.Astrometry
 			{
 				if (frm.IntegratedFrames != null)
 				{
+					m_VideoAstrometry.MovingToFirstIntegratedFrame();
 					cbxInstDelayMode.SelectedIndex = 0; // Set delay type to automatic
 					nudIntegratedFrames.SetNUDValue(frm.IntegratedFrames.Interval);
 					m_VideoController.MoveToFrame(frm.IntegratedFrames.StartingAtFrame);
