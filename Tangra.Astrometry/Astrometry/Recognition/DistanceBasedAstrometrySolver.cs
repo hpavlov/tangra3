@@ -173,6 +173,11 @@ namespace Tangra.Astrometry.Recognition
             m_PyramidMaxMag = maxMag;
         }
 
+		public void SetManuallyIdentifiedHints(Dictionary<PSFFit, IStar> manuallyIdentifiedStars)
+		{
+			// TODO: Save the stars and use them during the plate solving as a hint
+		}
+
 		public PerformMatchResult PerformMatch(out LeastSquareFittedAstrometry improvedSolution)
 		{
 			LeastSquareFittedAstrometry distanceBasedSolution;

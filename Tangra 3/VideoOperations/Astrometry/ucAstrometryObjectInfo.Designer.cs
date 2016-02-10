@@ -74,8 +74,10 @@
 			this.label7 = new System.Windows.Forms.Label();
 			this.pnlAstrometry = new System.Windows.Forms.Panel();
 			this.pnlFitSuccessful = new System.Windows.Forms.Panel();
+			this.btnManuallyIdentifyStar = new System.Windows.Forms.Button();
 			this.btnResolveObjects = new System.Windows.Forms.Button();
 			this.pnlFitFailed = new System.Windows.Forms.Panel();
+			this.btnManuallyIdentifyStar2 = new System.Windows.Forms.Button();
 			this.linkCommonIssues1 = new System.Windows.Forms.LinkLabel();
 			this.btnSendErrorFit = new System.Windows.Forms.Button();
 			this.linkCommonIssues2 = new System.Windows.Forms.LinkLabel();
@@ -386,7 +388,7 @@
 			this.btnIdentify.Name = "btnIdentify";
 			this.btnIdentify.Size = new System.Drawing.Size(162, 23);
 			this.btnIdentify.TabIndex = 20;
-			this.btnIdentify.Text = "Identify Objects";
+			this.btnIdentify.Text = "Check For Known Objects";
 			this.btnIdentify.UseVisualStyleBackColor = true;
 			this.btnIdentify.Click += new System.EventHandler(this.btnIdentify_Click);
 			// 
@@ -686,23 +688,34 @@
 			this.pnlAstrometry.Controls.Add(this.pnlFitFailed);
 			this.pnlAstrometry.Location = new System.Drawing.Point(261, 4);
 			this.pnlAstrometry.Name = "pnlAstrometry";
-			this.pnlAstrometry.Size = new System.Drawing.Size(248, 314);
+			this.pnlAstrometry.Size = new System.Drawing.Size(248, 329);
 			this.pnlAstrometry.TabIndex = 23;
 			this.pnlAstrometry.Visible = false;
 			// 
 			// pnlFitSuccessful
 			// 
+			this.pnlFitSuccessful.Controls.Add(this.btnManuallyIdentifyStar);
 			this.pnlFitSuccessful.Controls.Add(this.btnResolveObjects);
 			this.pnlFitSuccessful.Controls.Add(this.pnlFitInfo);
 			this.pnlFitSuccessful.Controls.Add(this.btnIdentify);
 			this.pnlFitSuccessful.Location = new System.Drawing.Point(6, 2);
 			this.pnlFitSuccessful.Name = "pnlFitSuccessful";
-			this.pnlFitSuccessful.Size = new System.Drawing.Size(182, 178);
+			this.pnlFitSuccessful.Size = new System.Drawing.Size(182, 206);
 			this.pnlFitSuccessful.TabIndex = 21;
+			// 
+			// btnManuallyIdentifyStar
+			// 
+			this.btnManuallyIdentifyStar.Location = new System.Drawing.Point(3, 147);
+			this.btnManuallyIdentifyStar.Name = "btnManuallyIdentifyStar";
+			this.btnManuallyIdentifyStar.Size = new System.Drawing.Size(162, 23);
+			this.btnManuallyIdentifyStar.TabIndex = 22;
+			this.btnManuallyIdentifyStar.Text = "Manually Identify Star";
+			this.btnManuallyIdentifyStar.UseVisualStyleBackColor = true;
+			this.btnManuallyIdentifyStar.Click += new System.EventHandler(this.btnManuallyIdentifyStar_Click);
 			// 
 			// btnResolveObjects
 			// 
-			this.btnResolveObjects.Location = new System.Drawing.Point(3, 151);
+			this.btnResolveObjects.Location = new System.Drawing.Point(3, 174);
 			this.btnResolveObjects.Name = "btnResolveObjects";
 			this.btnResolveObjects.Size = new System.Drawing.Size(162, 23);
 			this.btnResolveObjects.TabIndex = 21;
@@ -712,6 +725,7 @@
 			// 
 			// pnlFitFailed
 			// 
+			this.pnlFitFailed.Controls.Add(this.btnManuallyIdentifyStar2);
 			this.pnlFitFailed.Controls.Add(this.linkCommonIssues1);
 			this.pnlFitFailed.Controls.Add(this.btnSendErrorFit);
 			this.pnlFitFailed.Controls.Add(this.linkCommonIssues2);
@@ -720,13 +734,23 @@
 			this.pnlFitFailed.Controls.Add(this.lblNoFit);
 			this.pnlFitFailed.Location = new System.Drawing.Point(6, 9);
 			this.pnlFitFailed.Name = "pnlFitFailed";
-			this.pnlFitFailed.Size = new System.Drawing.Size(214, 291);
+			this.pnlFitFailed.Size = new System.Drawing.Size(214, 317);
 			this.pnlFitFailed.TabIndex = 19;
+			// 
+			// btnManuallyIdentifyStar2
+			// 
+			this.btnManuallyIdentifyStar2.Location = new System.Drawing.Point(3, 164);
+			this.btnManuallyIdentifyStar2.Name = "btnManuallyIdentifyStar2";
+			this.btnManuallyIdentifyStar2.Size = new System.Drawing.Size(211, 23);
+			this.btnManuallyIdentifyStar2.TabIndex = 24;
+			this.btnManuallyIdentifyStar2.Text = "Manually Identify Star";
+			this.btnManuallyIdentifyStar2.UseVisualStyleBackColor = true;
+			this.btnManuallyIdentifyStar2.Click += new System.EventHandler(this.btnManuallyIdentifyStar2_Click);
 			// 
 			// linkCommonIssues1
 			// 
 			this.linkCommonIssues1.AutoSize = true;
-			this.linkCommonIssues1.Location = new System.Drawing.Point(136, 167);
+			this.linkCommonIssues1.Location = new System.Drawing.Point(136, 207);
 			this.linkCommonIssues1.Name = "linkCommonIssues1";
 			this.linkCommonIssues1.Size = new System.Drawing.Size(47, 13);
 			this.linkCommonIssues1.TabIndex = 23;
@@ -737,7 +761,7 @@
 			// btnSendErrorFit
 			// 
 			this.btnSendErrorFit.BackColor = System.Drawing.Color.MistyRose;
-			this.btnSendErrorFit.Location = new System.Drawing.Point(0, 258);
+			this.btnSendErrorFit.Location = new System.Drawing.Point(3, 293);
 			this.btnSendErrorFit.Name = "btnSendErrorFit";
 			this.btnSendErrorFit.Size = new System.Drawing.Size(211, 23);
 			this.btnSendErrorFit.TabIndex = 19;
@@ -748,7 +772,7 @@
 			// linkCommonIssues2
 			// 
 			this.linkCommonIssues2.AutoSize = true;
-			this.linkCommonIssues2.Location = new System.Drawing.Point(7, 183);
+			this.linkCommonIssues2.Location = new System.Drawing.Point(7, 223);
 			this.linkCommonIssues2.Name = "linkCommonIssues2";
 			this.linkCommonIssues2.Size = new System.Drawing.Size(138, 13);
 			this.linkCommonIssues2.TabIndex = 22;
@@ -770,7 +794,7 @@
 			// 
 			this.label5.Location = new System.Drawing.Point(7, 25);
 			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(205, 230);
+			this.label5.Size = new System.Drawing.Size(205, 262);
 			this.label5.TabIndex = 20;
 			this.label5.Text = resources.GetString("label5.Text");
 			// 
@@ -937,5 +961,7 @@
         private System.Windows.Forms.LinkLabel linkCommonIssues2;
 		private System.Windows.Forms.Button btnSaveUnitTestData;
 		private System.Windows.Forms.SaveFileDialog saveUnitTestDataFileDialog;
+		private System.Windows.Forms.Button btnManuallyIdentifyStar;
+		private System.Windows.Forms.Button btnManuallyIdentifyStar2;
 	}
 }

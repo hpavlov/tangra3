@@ -746,7 +746,7 @@ namespace Tangra
         private void pictureBox_MouseClick(object sender, MouseEventArgs e)
         {
 	        Point loc = pictureBox.GetImageLocation(e.Location);
-			m_VideoController.MouseClick(loc);
+			m_VideoController.MouseClick(loc, e);
         }
 
         private void pictureBox_MouseDoubleClick(object sender, MouseEventArgs e)

@@ -153,9 +153,20 @@ namespace Tangra.Controller
 		{
 			get { return AstrometryContext.Current.RectToInclude; }
 		}
+
 		public bool LimitByInclusion
 		{
 			get { return AstrometryContext.Current.LimitByInclusion; }
+		}
+
+		public void SetManuallyIdentifyStarState(bool enable)
+		{
+			m_Operation.SetManuallyIdentifyStarState(enable);
+		}
+
+		public void TriggerPlateReSolve()
+		{
+			m_Operation.TriggerPlateReSolve();
 		}
 	}
 }

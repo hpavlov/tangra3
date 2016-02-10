@@ -14,6 +14,7 @@ using Tangra.ImageTools;
 using Tangra.Model.Astro;
 using Tangra.Model.Config;
 using Tangra.Model.Helpers;
+using Tangra.StarCatalogues;
 using Tangra.VideoOperations.Astrometry.Engine;
 using Tangra.VideoOperations.LightCurves;
 
@@ -178,5 +179,11 @@ namespace Tangra.VideoOperations.Astrometry
 		internal SelectedObject SelectedObject;
 
 		internal bool ObjectToMeasureSelected = false;
+
+		internal bool ManualStarIdentificationMode = false;
+
+		internal Dictionary<PSFFit, IStar> ManuallyIdentifiedStars = new Dictionary<PSFFit, IStar>();
+
+		internal List<IStar> CatalogueStars;
 	}
 }

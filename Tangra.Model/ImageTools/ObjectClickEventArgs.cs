@@ -16,14 +16,16 @@ namespace Tangra.Model.ImageTools
         public readonly PSFFit Gausian;
         public readonly bool Shift;
         public readonly bool Control;
+	    public readonly MouseEventArgs MouseEventArgs;
 
-        public ObjectClickEventArgs(ImagePixel pixel, PSFFit gausian, Point location, bool shiftHeld, bool ctrlHeld)
+		public ObjectClickEventArgs(ImagePixel pixel, PSFFit gausian, Point location, bool shiftHeld, bool ctrlHeld, MouseEventArgs mouseEventArgs)
         {
             ClickLocation = location;
             Pixel = pixel;
             Gausian = gausian;
             Shift = shiftHeld;
             Control = ctrlHeld;
+			MouseEventArgs = mouseEventArgs;
         }
     }
 }

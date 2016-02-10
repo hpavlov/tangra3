@@ -84,9 +84,9 @@ namespace Tangra.ImageTools
 
 			bool nearbyStarFound = false;
 
-			AstrometricState astrometryTracker = AstrometryContext.Current.AstrometricState;
-			if (astrometryTracker != null &&
-				astrometryTracker.AstrometricFit != null)
+			AstrometricState state = AstrometryContext.Current.AstrometricState;
+			if (state != null &&
+				state.AstrometricFit != null)
 			{
 				for (int radius = 1; radius < 8; radius++)
 				{
@@ -94,7 +94,7 @@ namespace Tangra.ImageTools
 					if (centroid == null) continue;
 
 
-					foreach (PlateConstStarPair star in astrometryTracker.AstrometricFit.FitInfo.AllStarPairs)
+					foreach (PlateConstStarPair star in state.AstrometricFit.FitInfo.AllStarPairs)
 					{
 						if (Math.Abs(star.x - centroid.XDouble) < radius &&
 							Math.Abs(star.y - centroid.YDouble) < radius)
@@ -117,12 +117,12 @@ namespace Tangra.ImageTools
 					m_State = SelectObjectState.ObjectLocked;
 
 
-				m_VideoController.SetPictureBoxCursor(nearbyStarFound ? Cursors.Hand : Cursors.Default);
+				m_VideoController.SetPictureBoxCursor(nearbyStarFound ? Cursors.Hand : (state.ManualStarIdentificationMode ?  Cursors.Cross : Cursors.Default));
 
 				if (m_AstrometricState.MeasuringState == AstrometryInFramesState.Ready)
 				{
 					double ra, de;
-					astrometryTracker.AstrometricFit.GetRADEFromImageCoords(location.X, location.Y, out ra, out de);
+					state.AstrometricFit.GetRADEFromImageCoords(location.X, location.Y, out ra, out de);
 
 					string moreInfo = string.Format("RA={0} DE={1}", AstroConvert.ToStringValue(ra / 15, "HHhMMmSS.Ts"), AstroConvert.ToStringValue(de, "+DD°MM'SS\""));
 					m_VideoController.DisplayCursorPositionDetails(location, moreInfo);
@@ -132,9 +132,29 @@ namespace Tangra.ImageTools
 
 		public override void MouseClick(ObjectClickEventArgs e)
 		{
+			if (e.MouseEventArgs.Button == MouseButtons.Right && m_AstrometricState.ManualStarIdentificationMode)
+			{
+				m_AstrometryController.SetManuallyIdentifyStarState(false);
+			}
+
 			if (e.Pixel != null)
 			{
-				if (m_AstrometricState.MeasuringState != AstrometryInFramesState.RunningMeasurements)
+				if (m_AstrometricState.MeasuringState == AstrometryInFramesState.Ready 
+					&& m_AstrometricState.ManualStarIdentificationMode 
+					&& AstrometryContext.Current.FieldSolveContext.CatalogueStars != null 
+					&& AstrometryContext.Current.FieldSolveContext.CatalogueStars.Count > 3)
+				{
+					
+					var frmIdentifyCalibrationStar = new frmIdentifyCalibrationStar(AstrometryContext.Current.FieldSolveContext.CatalogueStars, m_AstrometricState.ManuallyIdentifiedStars, false);
+					DialogResult res = m_VideoController.ShowDialog(frmIdentifyCalibrationStar);
+					if (res == DialogResult.OK && frmIdentifyCalibrationStar.SelectedStar != null)
+					{
+						m_AstrometricState.ManuallyIdentifiedStars.Add(e.Gausian, frmIdentifyCalibrationStar.SelectedStar);
+						m_AstrometryController.TriggerPlateReSolve();
+					}
+					m_AstrometryController.SetManuallyIdentifyStarState(false);
+				}
+				else if (m_AstrometricState.MeasuringState != AstrometryInFramesState.RunningMeasurements)
 				{
 					AstrometricState astrometryTracker = AstrometryContext.Current.AstrometricState;
 					if (astrometryTracker != null &&

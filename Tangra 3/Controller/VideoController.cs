@@ -1771,7 +1771,7 @@ namespace Tangra.Controller
 
 	    public ImagePixel ZoomedCenter = new ImagePixel(-1, -1);
 
-        public void MouseClick(Point location)
+		public void MouseClick(Point location, MouseEventArgs e)
         {
             bool shiftHeld = Control.ModifierKeys == Keys.Shift;
             bool controlHeld = Control.ModifierKeys == Keys.Control;
@@ -1803,8 +1803,12 @@ namespace Tangra.Controller
             }
 
             var args = new ObjectClickEventArgs(
-                pixel, m_TargetPsfFit, location,
-                Control.ModifierKeys == Keys.Shift, Control.ModifierKeys == Keys.Control);
+                pixel, 
+				m_TargetPsfFit, 
+				location,
+                Control.ModifierKeys == Keys.Shift, 
+				Control.ModifierKeys == Keys.Control,
+				e);
 
 	        bool drawStandardZoomImade = true;
 			

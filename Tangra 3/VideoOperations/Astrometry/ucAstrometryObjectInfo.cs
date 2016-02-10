@@ -1671,5 +1671,21 @@ namespace Tangra.VideoOperations.Astrometry
 				}				
 			}
 		}
+
+		private void btnManuallyIdentifyStar_Click(object sender, EventArgs e)
+		{
+			m_AstrometryController.SetManuallyIdentifyStarState(true);
+		}
+
+		private void btnManuallyIdentifyStar2_Click(object sender, EventArgs e)
+		{
+			m_AstrometryController.SetManuallyIdentifyStarState(true);
+		}
+
+		internal void SettManuallyIdentifyStarButtonPressed(bool pressed)
+		{
+			btnManuallyIdentifyStar.Enabled = !pressed;
+			btnManuallyIdentifyStar2.Enabled = !pressed;
+		}
 	}
 }

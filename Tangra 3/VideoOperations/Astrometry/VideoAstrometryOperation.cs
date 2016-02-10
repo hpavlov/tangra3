@@ -379,6 +379,17 @@ namespace Tangra.VideoOperations.Astrometry
 			}
 		}
 
+		public void SetManuallyIdentifyStarState(bool enable)
+		{
+			m_AstrometricState.ManualStarIdentificationMode = enable;
+			m_ViewControl.SettManuallyIdentifyStarButtonPressed(enable);
+		}
+
+		public void TriggerPlateReSolve()
+		{
+			m_VideoController.RefreshCurrentFrame();
+		}
+
 		void m_ViewControl_OnStopMeasurementCommand(object sender, EventArgs e)
 		{
 			m_AstrometricState.MeasuringState = AstrometryInFramesState.Ready;
@@ -489,6 +500,7 @@ namespace Tangra.VideoOperations.Astrometry
 			m_MovingToFirstIntegratedFrameFlag = false;
 
 			m_DistBasedMatcher.InitNewFrame(m_StarMap);
+			if (m_AstrometricState.ManualStarIdentificationMode) m_DistBasedMatcher.SetManuallyIdentifiedHints(m_AstrometricState.ManuallyIdentifiedStars);
 			m_CurrentMatchResult = m_DistBasedMatcher.PerformMatch(out m_AstrometricFit);
 
 			if (m_CurrentMatchResult == PerformMatchResult.FieldAlignmentFailed ||

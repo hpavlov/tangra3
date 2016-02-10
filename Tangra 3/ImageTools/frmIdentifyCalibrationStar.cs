@@ -28,7 +28,7 @@ namespace Tangra.ImageTools
 			InitializeComponent();
 		}
 
-		public frmIdentifyCalibrationStar(List<IStar> stars, Dictionary<PSFFit, IStar> selectedStars)
+		public frmIdentifyCalibrationStar(List<IStar> stars, Dictionary<PSFFit, IStar> selectedStars, bool calibration = true)
 			: this()
 		{
 			m_Stars = new List<IStar>();
@@ -43,7 +43,9 @@ namespace Tangra.ImageTools
 
 			lblIdentifiedStarNo.Text = selectedStars.Count.ToString();
 
-			PopulateFilteredStars(null);			
+			PopulateFilteredStars(null);
+
+			Text = calibration ? "Identify Calibration Star" : "Manually Identify Star";
 		}
 
 		private string NormStarNo(string starNo)

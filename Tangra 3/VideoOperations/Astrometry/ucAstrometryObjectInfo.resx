@@ -120,7 +120,10 @@
   <data name="label5.Text" xml:space="preserve">
     <value>    Tangra failed to recognize the field. This may be an indication of wrongly idenfitied field center, wrong calibration or incorrectly entered date and time when identifying by an object in the field.
 
-    To try a different field center try the button below
+    You can try some recovery operations from the buttons below
+
+
+
 
 
 
