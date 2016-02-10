@@ -195,6 +195,8 @@ namespace Tangra.Model.Config
 
         public string BuildObservationASCIILine()
         {
+			// TODO (from Davide): The MPC obs file for 2010 RF12 was not formatted correctly, a 0 was missing before 8 in the date.
+			// Moreover, since you time precision is high, there is a space to remove between date and RA.
             return m_Designation_1_12 + m_NewDiscoveryFlag_13 + m_Note1_14 + m_Note2_15 + m_TimeString_16_32 + m_RAString_33_44 + m_DEString_45_56 +
                    m_Reserved_57_64 + m_Magnitude_65_70 + m_MagnitudeBand_71 + m_Reserved_72_77 + m_ObsCode_78_80;
         }
