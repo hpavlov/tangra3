@@ -175,7 +175,13 @@ namespace Tangra.Astrometry.Recognition
 
 		public void SetManuallyIdentifiedHints(Dictionary<PSFFit, IStar> manuallyIdentifiedStars)
 		{
-			// TODO: Save the stars and use them during the plate solving as a hint
+			m_ManualStarMatch = new Dictionary<StarMapFeature, IStar>();
+			foreach (PSFFit fit in manuallyIdentifiedStars.Keys)
+			{
+				StarMapFeature feature = m_StarMap.GetFeatureInRadius((int)fit.XCenter, (int)fit.YCenter, 2);
+				if (feature != null && !m_ManualStarMatch.ContainsKey(feature))
+					m_ManualStarMatch.Add(feature, manuallyIdentifiedStars[fit]);
+			}
 		}
 
 		public PerformMatchResult PerformMatch(out LeastSquareFittedAstrometry improvedSolution)
@@ -311,6 +317,9 @@ namespace Tangra.Astrometry.Recognition
 					// No need to keep the debug log any longer when the fit is successful
 					AstrometricFitDebugger.Reset();
 #endif
+				if (m_Solution != null) 
+					// Clear manually identified starting position in a case of a successful plate solve
+					m_ManualStarMatch = null;
 
 				return m_Solution != null
 					? PerformMatchResult.FitSucceessfull

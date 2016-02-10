@@ -1277,6 +1277,21 @@ namespace Tangra.Astrometry.Recognition
 			List<DistanceEntry> ijCandidates = m_DistancesByMagnitude
 				.Where(e => e.DistanceArcSec > dijMin && e.DistanceArcSec < dijMax).ToList();
 
+			if (m_ManualPairs != null && m_ManualPairs.Count < 3)
+			{
+				if (m_ManualPairs.Count == 1)
+				{
+					ulong starNo = m_ManualPairs.Values.ToList()[0].StarNo;
+					ijCandidates.RemoveAll(x => x.Star1.StarNo != starNo && x.Star2.StarNo != starNo);
+				}
+				else if (m_ManualPairs.Count == 2)
+				{
+					ulong starNo1 = m_ManualPairs.Values.ToList()[0].StarNo;
+					ulong starNo2 = m_ManualPairs.Values.ToList()[1].StarNo;
+					ijCandidates.RemoveAll(x => x.Star1.StarNo != starNo1 && x.Star2.StarNo != starNo1);
+					ijCandidates.RemoveAll(x => x.Star1.StarNo != starNo2 && x.Star2.StarNo != starNo2);
+				}
+			}
 
 			bool debugFieldIdentified = true;
 			bool debug = false;
@@ -2325,82 +2340,131 @@ namespace Tangra.Astrometry.Recognition
 //#endif
 //            }
 
+			if (m_ManualPairs != null && m_ManualPairs.Count < 3)
+			{
+				if (m_ManualPairs.Count == 1)
+				{
+					int fixedFeatureId = m_ManualPairs.Keys.ToList()[0].FeatureId;
+					for (int k = 2; k <= n; k++)
+					{
+						for (int j = 1; j < k; j++)
+						{
+							var rv = CheckCombination(fixedFeatureId, j, k, starMap, toleranceInArcSec, callback, callbackWithRatios,
+								timeTaken, ref counter, ref delayWarningSent, maxCombinationsBeforeFail, total, n);
+							if (rv != null) return rv.Value;
+						}
+					}
+				}
+				else if (m_ManualPairs.Count == 2)
+				{
+					int fixedFeatureId1 = m_ManualPairs.Keys.ToList()[0].FeatureId;
+					int fixedFeatureId2 = m_ManualPairs.Keys.ToList()[1].FeatureId;
+					for (int k = 1; k <= n; k++)
+					{
+						var rv = CheckCombination(fixedFeatureId1, fixedFeatureId2, k, starMap, toleranceInArcSec, callback, callbackWithRatios,
+							timeTaken, ref counter, ref delayWarningSent, maxCombinationsBeforeFail, total, n);
+						if (rv != null) return rv.Value;
+					}
+				}
+			}
+
 		    for (int k = 3; k <= n; k++)
 			{
 				for (int j = 2; j < k; j++)
 				{
 					for (int i = 1; i < j; i++)
 					{
-						counter++;
-
-						if (DebugResolvedStars != null)
-						{
-							if (!DebugResolvedStars.ContainsKey(i)) continue;
-							if (!DebugResolvedStars.ContainsKey(j)) continue;
-							if (!DebugResolvedStars.ContainsKey(k)) continue;
-
-							if (DebugExcludeStars != null)
-							{
-								if (DebugExcludeStars.ContainsKey(i)) continue;
-								if (DebugExcludeStars.ContainsKey(j)) continue;
-								if (DebugExcludeStars.ContainsKey(k)) continue;
-							}
-						}
-#if PYRAMID_DEBUG
-                        Trace.WriteLine(string.Format("Trying triangle {0}-{1}-{2}", i, j, k));
-#endif					
-
-						if (counter >= maxCombinationsBeforeFail)
-							return false;
-
-						if (m_AbortSearch) return false;
-
-						if (counter % 5000 == 0)
-							m_AstrometryController.SendNotification(new OperationNotifications(NotificationType.SearchProgressed, null));
-
-						if (!delayWarningSent &&
-							timeTaken.ElapsedMilliseconds > m_Settings.PyramidTimeoutInSeconds * 100 && 
-							timeTaken.ElapsedMilliseconds > 5000 )
-						{
-							m_AstrometryController.SendNotification(new OperationNotifications(NotificationType.SearchTakingLonger, timeTaken.ElapsedMilliseconds));
-							delayWarningSent = true;
-						}
-
-						if (timeTaken.ElapsedMilliseconds > m_Settings.PyramidTimeoutInSeconds * 1000)
-						{
-                            if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceError())
-                                Trace.WriteLine(string.Format("Timeout of {0}sec reached at {1}-{2}-{3}", m_Settings.PyramidTimeoutInSeconds, i, j, k));
-							return false;
-						}
-
-						if (callbackWithRatios != null)
-						{
-							if (CheckTriangleWithRatios(starMap, callbackWithRatios, i, j, k, toleranceInArcSec))
-							{
-								if (ImproveAndRetestSolution(i, j, k))
-								{
-									m_MatchedTriangle = string.Format("{0}-{1}-{2}:{5}:[{3}/{4}]", i, j, k, counter, total, n);
-									return true;
-								}
-							}
-								
-						}
-						else
-						{
-							if (CheckTriangle(starMap, callback, i, j, k, toleranceInArcSec))
-							{
-                                if (ImproveAndRetestSolution(i, j, k))
-								{
-									m_MatchedTriangle = string.Format("{0}-{1}-{2}:{5}:[{3}/{4}]", i, j, k, counter, total, n);
-									return true;
-								}
-							}
-						}
+						var rv = CheckCombination(i, j, k, starMap, toleranceInArcSec, callback, callbackWithRatios, 
+							timeTaken, ref counter, ref delayWarningSent, maxCombinationsBeforeFail, total, n);
+						if (rv != null) return rv.Value;
 					}
 				}
 			}
 
 			return false;
+		}
+
+		private bool? CheckCombination(int i, int j, int k, 
+			IStarMap starMap,
+			double toleranceInArcSec,
+			CheckTriangleCallback callback,
+			CheckTriangleWithRatiosCallback callbackWithRatios,
+			Stopwatch timeTaken,
+			ref int counter,
+			ref bool delayWarningSent,
+			int maxCombinationsBeforeFail,
+			int total,
+			int n)
+		{
+			if (i == j || i == k || j == k) return null;
+
+			counter++;
+
+			if (DebugResolvedStars != null)
+			{
+				if (!DebugResolvedStars.ContainsKey(i)) return null;
+				if (!DebugResolvedStars.ContainsKey(j)) return null;
+				if (!DebugResolvedStars.ContainsKey(k)) return null;
+
+				if (DebugExcludeStars != null)
+				{
+					if (DebugExcludeStars.ContainsKey(i)) return null;
+					if (DebugExcludeStars.ContainsKey(j)) return null;
+					if (DebugExcludeStars.ContainsKey(k)) return null;
+				}
+			}
+#if PYRAMID_DEBUG
+                        Trace.WriteLine(string.Format("Trying triangle {0}-{1}-{2}", i, j, k));
+#endif
+
+			if (counter >= maxCombinationsBeforeFail)
+				return false;
+
+			if (m_AbortSearch) return false;
+
+			if (counter % 5000 == 0)
+				m_AstrometryController.SendNotification(new OperationNotifications(NotificationType.SearchProgressed, null));
+
+			if (!delayWarningSent &&
+				timeTaken.ElapsedMilliseconds > m_Settings.PyramidTimeoutInSeconds * 100 &&
+				timeTaken.ElapsedMilliseconds > 5000)
+			{
+				m_AstrometryController.SendNotification(new OperationNotifications(NotificationType.SearchTakingLonger, timeTaken.ElapsedMilliseconds));
+				delayWarningSent = true;
+			}
+
+			if (timeTaken.ElapsedMilliseconds > m_Settings.PyramidTimeoutInSeconds * 1000)
+			{
+				if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceError())
+					Trace.WriteLine(string.Format("Timeout of {0}sec reached at {1}-{2}-{3}", m_Settings.PyramidTimeoutInSeconds, i, j, k));
+				return false;
+			}
+
+			if (callbackWithRatios != null)
+			{
+				if (CheckTriangleWithRatios(starMap, callbackWithRatios, i, j, k, toleranceInArcSec))
+				{
+					if (ImproveAndRetestSolution(i, j, k))
+					{
+						m_MatchedTriangle = string.Format("{0}-{1}-{2}:{5}:[{3}/{4}]", i, j, k, counter, total, n);
+						return true;
+					}
+				}
+
+			}
+			else
+			{
+				if (CheckTriangle(starMap, callback, i, j, k, toleranceInArcSec))
+				{
+					if (ImproveAndRetestSolution(i, j, k))
+					{
+						m_MatchedTriangle = string.Format("{0}-{1}-{2}:{5}:[{3}/{4}]", i, j, k, counter, total, n);
+						return true;
+					}
+				}
+			}
+
+			return null;
 		}
 
 		private bool ImproveAndRetestSolution(int i, int j, int k)

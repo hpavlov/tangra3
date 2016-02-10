@@ -26,7 +26,8 @@ namespace Tangra.VideoOperations.Astrometry
 		Ready,
 		RunningMeasurements,
 		Aborting,
-		Paused
+		Paused,
+		FitFailed
 	}
 
 	internal class SingleMultiFrameMeasurement

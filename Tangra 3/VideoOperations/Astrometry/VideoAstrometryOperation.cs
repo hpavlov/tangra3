@@ -520,7 +520,7 @@ namespace Tangra.VideoOperations.Astrometry
 					}
 
 					m_ViewControl.FitFailed();
-
+					m_AstrometricState.MeasuringState = AstrometryInFramesState.FitFailed;
 					return;
 				}
 			}
@@ -629,6 +629,7 @@ namespace Tangra.VideoOperations.Astrometry
 			{
 				m_VideoController.StatusChanged("No Fit");
 				m_AstrometricState.AstrometricFit = null;
+				m_AstrometricState.MeasuringState = AstrometryInFramesState.FitFailed;
 			}
 
 			
