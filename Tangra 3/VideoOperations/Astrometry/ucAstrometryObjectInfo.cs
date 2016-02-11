@@ -198,6 +198,8 @@ namespace Tangra.VideoOperations.Astrometry
 				pnlSwitchControl.Visible = true;
 
 				btnStop.Visible = false;
+				btnIdentify.Visible = false;
+				btnManuallyIdentifyStar.Visible = false;
 			}
 			else
 			{
@@ -266,6 +268,8 @@ namespace Tangra.VideoOperations.Astrometry
 
 			lblAlpha.Visible = false;
 			lblDelta.Visible = false;
+			lblRate.Visible = false;
+			lblRateVal.Visible = false;
 
 			m_MPCDE = double.NaN;
 			m_MPCRAHours = double.NaN;
@@ -1090,6 +1094,14 @@ namespace Tangra.VideoOperations.Astrometry
 					}
 
 					regression.Solve();
+
+					var firstPos = measurements[rv.EarliestFrame];
+					var lastPos = measurements[rv.LatestFrame];
+					double distanceArcSec = AngleUtility.Elongation(firstPos.RADeg, firstPos.DEDeg, lastPos.RADeg, lastPos.DEDeg) * 3600;
+					var firstTime = GetTimeForFrame(meaValues.Context, rv.EarliestFrame, meaValues.FirstVideoFrame);
+					var lastTime = GetTimeForFrame(meaValues.Context, rv.LatestFrame, meaValues.FirstVideoFrame);
+					double elapsedSec = new TimeSpan(lastTime.UT.Ticks - firstTime.UT.Ticks).TotalSeconds;
+					m_MotionRate = distanceArcSec / elapsedSec;
 				}
 			}
 
@@ -1363,8 +1375,8 @@ namespace Tangra.VideoOperations.Astrometry
 			if (!double.IsNaN(m_MPCDE) && !double.IsNaN(m_MPCRAHours))
 			{
 			    int precision = 1000000;
-			    string format = "0.000000";
-				// TODO: Different ways of getting the time based on the different expected motion type !
+			    string format = "00.000000";
+				// TODO: Different ways of getting the time based on the different expected motion type?
 
 			    DisplayMeaMag();
 
@@ -1380,7 +1392,7 @@ namespace Tangra.VideoOperations.Astrometry
 
 							m_MPCTimePrecission = TimeSpan.FromSeconds((latestFrame - earliestFrame)/m_MeasurementContext.FrameRate);
 						    precision = 100000;
-                            format = "0.00000";
+                            format = "00.00000";
 						}
 						break;
 
@@ -1389,9 +1401,12 @@ namespace Tangra.VideoOperations.Astrometry
 							// Don't forget to add the video normal position flag in the OBS file
 							// Expect elongated images and apply instrumental delay corrections
 
-							// NOTE: Nothing to do here, times have been already computed
+							lblRate.Visible = true;
+							lblRateVal.Visible = true;
+							lblRateVal.Text = string.Format("{0:F2}\"/s", m_MotionRate);
+
                             precision = 1000000;
-                            format = "0.000000";
+                            format = "00.000000";
 						}
 						break;
 
@@ -1400,9 +1415,12 @@ namespace Tangra.VideoOperations.Astrometry
 							// Don't forget to add the video normal position flag in the OBS file
 							// Expect elongated images and apply instrumental delay corrections
 
-							// NOTE: Nothing to do here, times have been already computed
+							lblRate.Visible = true;
+							lblRateVal.Visible = true;
+							lblRateVal.Text = string.Format("{0:F2}\"/s", m_MotionRate);
+
                             precision = 1000000;
-                            format = "0.000000";
+                            format = "00.000000";
 						}
 						break;
 
@@ -1453,6 +1471,7 @@ namespace Tangra.VideoOperations.Astrometry
 	    private MagnitudeBand m_MPCMagBand;
 		private bool m_MPCIsVideoNormalPosition;
 	    private string m_MPCObjectDesignation;
+		private double m_MotionRate;
 
 		private string m_FolderName;
 

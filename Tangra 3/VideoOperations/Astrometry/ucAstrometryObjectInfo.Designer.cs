@@ -89,6 +89,8 @@
 			this.btnShowMesaurements = new System.Windows.Forms.Button();
 			this.pnlSwitchControl = new System.Windows.Forms.Panel();
 			this.saveUnitTestDataFileDialog = new System.Windows.Forms.SaveFileDialog();
+			this.lblRateVal = new System.Windows.Forms.Label();
+			this.lblRate = new System.Windows.Forms.Label();
 			this.pnlMeasurements.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.pnlRASeries)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.pnlDESeries)).BeginInit();
@@ -283,6 +285,8 @@
 			// 
 			// pnlEndAstrometry
 			// 
+			this.pnlEndAstrometry.Controls.Add(this.lblRateVal);
+			this.pnlEndAstrometry.Controls.Add(this.lblRate);
 			this.pnlEndAstrometry.Controls.Add(this.lblMeaMag);
 			this.pnlEndAstrometry.Controls.Add(this.lblTimeValue);
 			this.pnlEndAstrometry.Controls.Add(this.lblM);
@@ -852,6 +856,29 @@
 			this.saveUnitTestDataFileDialog.DefaultExt = "obs";
 			this.saveUnitTestDataFileDialog.Filter = "Zip Files (*.zip)|*.zip|All Files (*.*)|*.*";
 			// 
+			// lblRateVal
+			// 
+			this.lblRateVal.AutoSize = true;
+			this.lblRateVal.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+			this.lblRateVal.Location = new System.Drawing.Point(167, 28);
+			this.lblRateVal.Name = "lblRateVal";
+			this.lblRateVal.Size = new System.Drawing.Size(57, 13);
+			this.lblRateVal.TabIndex = 27;
+			this.lblRateVal.Text = "02.13\"/s";
+			this.lblRateVal.Visible = false;
+			// 
+			// lblRate
+			// 
+			this.lblRate.AutoSize = true;
+			this.lblRate.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+			this.lblRate.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+			this.lblRate.Location = new System.Drawing.Point(123, 28);
+			this.lblRate.Name = "lblRate";
+			this.lblRate.Size = new System.Drawing.Size(44, 13);
+			this.lblRate.TabIndex = 28;
+			this.lblRate.Text = "rate = ";
+			this.lblRate.Visible = false;
+			// 
 			// ucAstrometryObjectInfo
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -963,5 +990,7 @@
 		private System.Windows.Forms.SaveFileDialog saveUnitTestDataFileDialog;
 		private System.Windows.Forms.Button btnManuallyIdentifyStar;
 		private System.Windows.Forms.Button btnManuallyIdentifyStar2;
+		private System.Windows.Forms.Label lblRateVal;
+		private System.Windows.Forms.Label lblRate;
 	}
 }
