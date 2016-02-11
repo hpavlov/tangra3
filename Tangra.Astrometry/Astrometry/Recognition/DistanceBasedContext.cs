@@ -1186,6 +1186,9 @@ namespace Tangra.Astrometry.Recognition
 			List<DistanceEntry> ijCandidates = m_DistancesByMagnitude
                 .Where(e => e.DistanceArcSec > dij - toleranceInArcSec && e.DistanceArcSec < dij + toleranceInArcSec).ToList();
 
+            if (m_ManualPairs != null && m_ManualPairs.Count < 3)
+                LimitIJtoManualPairs(ijCandidates);
+
 			foreach (DistanceEntry ijEntry in ijCandidates)
 			{
 				List<DistanceEntry> ikCandidates = m_DistancesByMagnitude
@@ -1265,6 +1268,21 @@ namespace Tangra.Astrometry.Recognition
 			return false;
 		}
 
+        private void LimitIJtoManualPairs(List<DistanceEntry> ijCandidates)
+	    {
+            if (m_ManualPairs.Count == 1)
+            {
+                ulong starNo = m_ManualPairs.Values.ToList()[0].StarNo;
+                ijCandidates.RemoveAll(x => x.Star1.StarNo != starNo && x.Star2.StarNo != starNo);
+            }
+            else if (m_ManualPairs.Count == 2)
+            {
+                ulong starNo1 = m_ManualPairs.Values.ToList()[0].StarNo;
+                ulong starNo2 = m_ManualPairs.Values.ToList()[1].StarNo;
+                ijCandidates.RemoveAll(x => x.Star1.StarNo != starNo1 && x.Star2.StarNo != starNo1);
+                ijCandidates.RemoveAll(x => x.Star1.StarNo != starNo2 && x.Star2.StarNo != starNo2);
+            }
+	    }
 		private bool CheckTrianglesWithRatiosByMagnitude(int i, int j, int k, ImagePixel iCenter, ImagePixel jCenter, ImagePixel kCenter, double toleranceInArcSec)
 		{
 			double dijMax = m_PlateConfig.GetDistanceInArcSec(iCenter.XDouble, iCenter.YDouble, jCenter.XDouble, jCenter.YDouble, (1 - m_Settings.PyramidFocalLengthAllowance) * m_PlateConfig.EffectiveFocalLength);
@@ -1277,21 +1295,8 @@ namespace Tangra.Astrometry.Recognition
 			List<DistanceEntry> ijCandidates = m_DistancesByMagnitude
 				.Where(e => e.DistanceArcSec > dijMin && e.DistanceArcSec < dijMax).ToList();
 
-			if (m_ManualPairs != null && m_ManualPairs.Count < 3)
-			{
-				if (m_ManualPairs.Count == 1)
-				{
-					ulong starNo = m_ManualPairs.Values.ToList()[0].StarNo;
-					ijCandidates.RemoveAll(x => x.Star1.StarNo != starNo && x.Star2.StarNo != starNo);
-				}
-				else if (m_ManualPairs.Count == 2)
-				{
-					ulong starNo1 = m_ManualPairs.Values.ToList()[0].StarNo;
-					ulong starNo2 = m_ManualPairs.Values.ToList()[1].StarNo;
-					ijCandidates.RemoveAll(x => x.Star1.StarNo != starNo1 && x.Star2.StarNo != starNo1);
-					ijCandidates.RemoveAll(x => x.Star1.StarNo != starNo2 && x.Star2.StarNo != starNo2);
-				}
-			}
+		    if (m_ManualPairs != null && m_ManualPairs.Count < 3) 
+                LimitIJtoManualPairs(ijCandidates);
 
 			bool debugFieldIdentified = true;
 			bool debug = false;

@@ -184,7 +184,5 @@ namespace Tangra.VideoOperations.Astrometry
 		internal bool ManualStarIdentificationMode = false;
 
 		internal Dictionary<PSFFit, IStar> ManuallyIdentifiedStars = new Dictionary<PSFFit, IStar>();
-
-		internal List<IStar> CatalogueStars;
 	}
 }
