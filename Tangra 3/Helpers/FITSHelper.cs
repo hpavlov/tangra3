@@ -108,49 +108,47 @@ namespace Tangra.Helpers
             if (exposureCard == null) exposureCard = header.FindCard("EXPTIME");
             if (exposureCard == null) exposureCard = header.FindCard("RAWTIME");
             if (exposureCard != null && !string.IsNullOrWhiteSpace(exposureCard.Value))
-            {
                 fitsExposure = double.Parse(exposureCard.Value.Trim(), CultureInfo.InvariantCulture);
 
-                string dateTimeStr = null;
-                HeaderCard timeCard = header.FindCard("TIMEOBS");
-                HeaderCard dateCard;
-                if (timeCard != null)
-                {
-                    dateCard = header.FindCard("DATEOBS");
-                    if (dateCard != null)
-                        dateTimeStr = string.Format("{0}T{1}", dateCard.Value, timeCard.Value);
-                }
+            string dateTimeStr = null;
+            HeaderCard timeCard = header.FindCard("TIMEOBS");
+            HeaderCard dateCard;
+            if (timeCard != null)
+            {
+                dateCard = header.FindCard("DATEOBS");
+                if (dateCard != null)
+                    dateTimeStr = string.Format("{0}T{1}", dateCard.Value, timeCard.Value);
+            }
+            else
+            {
+                dateCard = header.FindCard("DATE-OBS");
+                timeCard = header.FindCard("TIME-OBS");
+                if (timeCard != null && dateCard != null)
+                    dateTimeStr = string.Format("{0}T{1}", dateCard.Value, timeCard.Value);
+                else if (dateCard != null)
+                    dateTimeStr = dateCard.Value;
                 else
                 {
-                    dateCard = header.FindCard("DATE-OBS");
-                    timeCard = header.FindCard("TIME-OBS");
-                    if (timeCard != null && dateCard != null)
-                        dateTimeStr = string.Format("{0}T{1}", dateCard.Value, timeCard.Value);
-                    else if (dateCard != null)
-                        dateTimeStr = dateCard.Value;
-                    else
+                    timeCard = header.FindCard("MIDPOINT");
+                    if (timeCard != null)
                     {
-                        timeCard = header.FindCard("MIDPOINT");
-                        if (timeCard != null)
-                        {
-                            dateTimeStr = timeCard.Value;
-                            isMidPoint = true;
-                        }
+                        dateTimeStr = timeCard.Value;
+                        isMidPoint = true;
                     }
                 }
+            }
 
-                if (!string.IsNullOrWhiteSpace(dateTimeStr))
+            if (!string.IsNullOrWhiteSpace(dateTimeStr))
+            {
+                Match regexMatch = FITS_DATE_REGEX.Match(dateTimeStr);
+                if (regexMatch.Success)
                 {
-                    Match regexMatch = FITS_DATE_REGEX.Match(dateTimeStr);
-                    if (regexMatch.Success)
-                    {
-                        DateTime startObs = DateTime.Parse(regexMatch.Groups["DateStr"].Value.Trim(), CultureInfo.InvariantCulture);
-                        // DATE-OBS is the start of the observation, unless given in "MIDPOINT"
-                        if (!isMidPoint)
-                            return startObs.AddSeconds(fitsExposure.Value/2.0);
-                        else
-                            return startObs;
-                    }
+                    DateTime startObs = DateTime.Parse(regexMatch.Groups["DateStr"].Value.Trim(), CultureInfo.InvariantCulture);
+                    // DATE-OBS is the start of the observation, unless given in "MIDPOINT"
+                    if (!isMidPoint && fitsExposure.HasValue)
+                        return startObs.AddSeconds(fitsExposure.Value / 2.0);
+                    else
+                        return startObs;
                 }
             }
 
