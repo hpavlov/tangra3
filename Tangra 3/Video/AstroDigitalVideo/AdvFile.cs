@@ -589,10 +589,10 @@ namespace Tangra.Video.AstroDigitalVideo
 				catch
 				{ }
 
-				if (isAavFile && m_Index.Index[lastFrame].ElapsedTime.Ticks == 0 && double.IsNaN(effFrameDuration))
+                if (isAavFile && m_Index.Index[lastFrame].ElapsedTime.Ticks == 0 && (double.IsNaN(effFrameDuration) || double.IsInfinity(effFrameDuration)))
 				{
 					MessageBox.Show(
-						"This AAV video format is too old and cannot be converted to AVI", 
+						"This AAV video format is too old or the AAV file is corrupted. It cannot be converted to AVI", 
 						"Tangra 3", 
 						MessageBoxButtons.OK, 
 						MessageBoxIcon.Error);
