@@ -196,8 +196,19 @@ namespace Tangra.Controller
 		}
 
 		public bool OpenFitsFileSequence(string folderName)
-        {
-            string[] fitsFiles = Directory.GetFiles(folderName, "*.fit*", SearchOption.TopDirectoryOnly);
+		{
+		    string[] fitsFiles = null;
+		    try
+		    {
+		        fitsFiles = Directory.GetFiles(folderName, "*.fit*", SearchOption.TopDirectoryOnly);
+		    }
+		    catch (Exception ex)
+		    {
+		        Trace.WriteLine(ex.GetFullStackTrace());
+                ShowMessageBox("Please specify a valid folder path. '" + folderName + "' appears to be invalid.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+		    }
+
             if (fitsFiles.Length == 0)
             {
                 ShowMessageBox("No FITS files found inside " + folderName, "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);

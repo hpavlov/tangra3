@@ -1055,14 +1055,21 @@ namespace Tangra
         {
 	        var frm = new frmChooseFitsFolder();
 	        frm.tbxFolderPath.Text = TangraConfig.Settings.LastUsed.FitsSeqenceLastFolderLocation;
-			if (frm.ShowDialog(this) == DialogResult.OK)
+            bool retry = true;
+            while (retry)
             {
-                if (m_VideoController.OpenFitsFileSequence(frm.tbxFolderPath.Text) ||
-					(Control.ModifierKeys == Keys.Control && m_VideoController.OpenBitmapFileSequence(frm.tbxFolderPath.Text)))
+                retry = false;
+                if (frm.ShowDialog(this) == DialogResult.OK)
                 {
-					TangraConfig.Settings.LastUsed.FitsSeqenceLastFolderLocation = frm.tbxFolderPath.Text;
+                    if (m_VideoController.OpenFitsFileSequence(frm.tbxFolderPath.Text) ||
+                        (Control.ModifierKeys == Keys.Control && m_VideoController.OpenBitmapFileSequence(frm.tbxFolderPath.Text)))
+                    {
+                        TangraConfig.Settings.LastUsed.FitsSeqenceLastFolderLocation = frm.tbxFolderPath.Text;
 
-	                SelectVideoOperation();
+                        SelectVideoOperation();
+                    }
+                    else
+                        retry = true;
                 }
             }
         }
