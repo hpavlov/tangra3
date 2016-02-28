@@ -445,7 +445,7 @@ namespace Tangra.Video.AstroDigitalVideo
             {
                 MessageBox.Show(
                     this,
-                    "Please note than some of the codecs on the system may be working correctly with this Tangra conversion to AVI.",
+                    "Please note than some of the codecs on the system may not be working correctly with this conversion to AVI by Tangra.",
                     "Tangra",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Warning);
