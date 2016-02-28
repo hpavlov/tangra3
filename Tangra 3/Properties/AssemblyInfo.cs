@@ -49,5 +49,5 @@ using Tangra.Helpers;
 [assembly: ReleaseDate("2016-01-22")]
 //[assembly: BetaReleaseAttribute()]
 [assembly: TangraCoreVersionRequired("3.0.105")]
-[assembly: TangraVideoVersionRequired("3.0.27")]
+[assembly: TangraVideoVersionRequired("3.0.28")]
 

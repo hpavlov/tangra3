@@ -106,7 +106,7 @@ HRESULT OpenAviFile(const char* fileName, VideoFileInfo* fileInfo)
 				fileInfo->Height = lpFormat.biHeight;
 				fileInfo->BitmapImageSize= lpFormat.biSizeImage;
 				fileInfo->FrameRate = (float)streamInfo.dwRate / (float)streamInfo.dwScale;
-				strncpy(fileInfo->EngineBuffer, "VWF\0", 4);
+				strncpy_s(fileInfo->EngineBuffer, "VWF\0", 4);
 				fileInfo->VideoFileTypeBuffer[0] = (lpFormat.biCompression >> 24) & 0xFF;
 				fileInfo->VideoFileTypeBuffer[1] = (lpFormat.biCompression >> 16) & 0xFF;
 				fileInfo->VideoFileTypeBuffer[2] = (lpFormat.biCompression >> 8) & 0xFF;
@@ -298,9 +298,12 @@ HRESULT SetAviFileCompression(HBITMAP* bmp)
 {
 	AVICOMPRESSOPTIONS opts; 
 	ZeroMemory(&opts,sizeof(opts));
-	// Use uncompressed by default
-	opts.fccHandler= mmioFOURCC('D','I','B',' '); //0x20424944
-	opts.dwFlags = AVICOMPRESSF_VALID;
+	// Use uncompressed by default (unless user selects the compression)
+	if (!s_ShowCompressionDialog)
+	{
+		opts.fccHandler= mmioFOURCC('D','I','B',' '); //0x20424944
+		opts.dwFlags = AVICOMPRESSF_VALID;
+	}
 
 	HRESULT rv = s_AviFile->compression(*bmp, &opts, s_ShowCompressionDialog, 0);
 	
@@ -327,6 +330,96 @@ HRESULT TangraGetLastAviFileError(char* szErrorMessage)
 	return S_OK;
 }
 
+long ABS(long x)
+{
+	if (x < 0)
+		return -x;
+	return x;
+}
+
+BYTE* GetBitmapPixels(long width, long height, long* pixels, int bpp)
+{
+	BYTE* bitmapPixels = (BYTE*)malloc(sizeof(BYTE) * ((width * height * 3) + 40 + 14 + 1));
+	BYTE* bitmapPixelsStartPtr = bitmapPixels;
+
+	BYTE* pp = bitmapPixels;
+
+	// define the bitmap information header
+	BITMAPINFOHEADER bih;
+	bih.biSize = sizeof(BITMAPINFOHEADER);
+	bih.biPlanes = 1;
+	bih.biBitCount = 24;                          // 24-bit
+	bih.biCompression = BI_RGB;                   // no compression
+	bih.biSizeImage = width * ABS(height) * 3;    // width * height * (RGB bytes)
+	bih.biXPelsPerMeter = 0;
+	bih.biYPelsPerMeter = 0;
+	bih.biClrUsed = 0;
+	bih.biClrImportant = 0;
+	bih.biWidth = width;                          // bitmap width
+	bih.biHeight = height;                        // bitmap height
+
+	// and BitmapInfo variable-length UDT
+	BYTE memBitmapInfo[40];
+	memmove(memBitmapInfo, &bih, sizeof(bih));
+
+	BITMAPFILEHEADER bfh;
+	bfh.bfType=19778;    //BM header
+	bfh.bfSize=55 + bih.biSizeImage;
+	bfh.bfReserved1=0;
+	bfh.bfReserved2=0;
+	bfh.bfOffBits=sizeof(BITMAPINFOHEADER) + sizeof(BITMAPFILEHEADER); //54
+
+	// Copy the display bitmap including the header
+	memmove(bitmapPixels, &bfh, sizeof(bfh));
+	memmove(bitmapPixels + sizeof(bfh), &memBitmapInfo, sizeof(memBitmapInfo));
+
+	bitmapPixels = bitmapPixels + sizeof(bfh) + sizeof(memBitmapInfo);
+
+	long currLinePos = 0;
+	int length = width * height;
+	bitmapPixels+=3 * (length + width);
+
+	int shiftVal = 0;
+	if (bpp == 8) shiftVal = 0;
+	else if (bpp == 9) shiftVal = 1;
+	else if (bpp == 10) shiftVal = 2;
+	else if (bpp == 11) shiftVal = 3;
+	else if (bpp == 12) shiftVal = 4;
+	else if (bpp == 13) shiftVal = 5;
+	else if (bpp == 14) shiftVal = 6;
+	else if (bpp == 15) shiftVal = 7;
+	else if (bpp == 16) shiftVal = 8;
+
+	int total = width * height;
+	while(total--) {
+		if (currLinePos == 0) {
+			currLinePos = width;
+			bitmapPixels-=6*width;
+		};
+
+		unsigned int val = *pixels;
+		pixels++;
+
+		unsigned int dblVal;
+		if (bpp == 8) {
+			dblVal = val;
+		} else {
+			dblVal = val >> shiftVal;
+		}
+
+
+		BYTE btVal = (BYTE)(dblVal & 0xFF);
+
+		*bitmapPixels = btVal;
+		*(bitmapPixels + 1) = btVal;
+		*(bitmapPixels + 2) = btVal;
+		bitmapPixels+=3;
+
+		currLinePos--;
+	}
+
+	return bitmapPixelsStartPtr;
+}
 
 BYTE* BuildBitmap(long width, long height, long bpp, long* pixels)
 {
@@ -410,11 +503,12 @@ HRESULT TangraAviFileAddFrame(long* pixels)
 {
 	HRESULT rv = S_OK;
 
-	BYTE* bitmapPixels = BuildBitmap(s_AviFrameWidth, s_AviFrameHeight, s_AviFrameBpp, pixels);
+	BYTE* bitmapPixels = GetBitmapPixels(s_AviFrameWidth, s_AviFrameHeight, pixels, s_AviFrameBpp);
 	
 	if(s_pStream)
 	{
-		s_pStream->Revert();
+		s_pStream->Release();
+		::CreateStreamOnHGlobal(NULL, TRUE, &s_pStream);
 
 		rv = s_pStream->Write(&bitmapPixels[0], ULONG(sizeof(BYTE) * ((s_AviFrameWidth * s_AviFrameHeight * 3) + 40 + 14 + 1)), NULL);
 		if(rv == S_OK)

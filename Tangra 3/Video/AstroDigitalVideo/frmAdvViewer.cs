@@ -441,6 +441,16 @@ namespace Tangra.Video.AstroDigitalVideo
                 return;
             }
 
+            if (cbxSpecifyCodec.Checked)
+            {
+                MessageBox.Show(
+                    this,
+                    "Please note than some of the codecs on the system may be working correctly with this Tangra conversion to AVI.",
+                    "Tangra",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+            }
+
             if (saveAviFileDialog.ShowDialog(this) == DialogResult.OK)
             {
                 double msPerFrame = cbxFrameRate.SelectedIndex == 0 ? 40 : 33.37;
@@ -463,7 +473,7 @@ namespace Tangra.Video.AstroDigitalVideo
                         saveAviFileDialog.FileName, 
                         (int)nudAviFirstFrame.Value, 
                         (int)nudAviLastFrame.Value,
-                        false,
+                        cbxSpecifyCodec.Checked,
                         msPerFrame,
                         addedGamma,
                         AdvToAviConverter.VideoForWindowsAviSaver));

@@ -351,12 +351,15 @@ namespace Tangra.PInvoke
             Trace.WriteLine(error, "VideoNativeException");
         }
 
-        public static void StartNewAviFile(string fileName, int width, int height, int bpp, double fps, bool showCompressionDialog)
+        public static bool StartNewAviFile(string fileName, int width, int height, int bpp, double fps, bool showCompressionDialog)
         {
             if (TangraCreateNewAviFile(fileName, width, height, bpp, fps, showCompressionDialog) != 0)
             {
                 TraceLastNativeError();
+                return false;
             }
+
+            return true;
         }
 
 		private static int s_BitPixTableBitPixVal = 0;
@@ -365,7 +368,7 @@ namespace Tangra.PInvoke
 		private static double s_GammaTableGammaVal = double.MaxValue;
 		private static int[] s_GammaTable = new int[256];
 
-        public static void AddAviVideoFrame(Pixelmap pixmap, double addedGamma, int? adv16NormalisationValue)
+        public static bool AddAviVideoFrame(Pixelmap pixmap, double addedGamma, int? adv16NormalisationValue)
         {
             int[,] pixels = new int[pixmap.Height, pixmap.Width];
 			bool usesGamma = Math.Abs(addedGamma - 1) > 0.01;
@@ -420,7 +423,10 @@ namespace Tangra.PInvoke
             if (TangraAviFileAddFrame(pixels) != 0)
             {
                 TraceLastNativeError();
+                return false;
             }
+
+            return true;
         }
 
         public static void CloseAviFile()

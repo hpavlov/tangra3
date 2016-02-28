@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 using Tangra.Model.Image;
 using Tangra.PInvoke;
 
@@ -16,8 +17,8 @@ namespace Tangra.Video.AstroDigitalVideo
     internal interface IAviSaver
     {
         void CloseAviFile();
-        void StartNewAviFile(string fileName, int width, int height, int bpp, double fps, bool tryCodec);
-        void AddAviVideoFrame(Pixelmap pixmap, double addedGamma, int? adv16NormalisationValue);
+        bool StartNewAviFile(string fileName, int width, int height, int bpp, double fps, bool tryCodec);
+        bool AddAviVideoFrame(Pixelmap pixmap, double addedGamma, int? adv16NormalisationValue);
     }
 
     internal class AdvToAviConverterFactory
@@ -46,12 +47,12 @@ namespace Tangra.Video.AstroDigitalVideo
             throw new NotImplementedException();
         }
 
-        public void StartNewAviFile(string fileName, int width, int height, int bpp, double fps, bool tryCodec)
+        public bool StartNewAviFile(string fileName, int width, int height, int bpp, double fps, bool tryCodec)
         {
             throw new NotImplementedException();
         }
 
-        public void AddAviVideoFrame(Pixelmap pixmap, double addedGamma, int? adv16NormalisationValue)
+        public bool AddAviVideoFrame(Pixelmap pixmap, double addedGamma, int? adv16NormalisationValue)
         {
             throw new NotImplementedException();
         }
@@ -65,14 +66,24 @@ namespace Tangra.Video.AstroDigitalVideo
             TangraVideo.CloseAviFile();
         }
 
-        public void StartNewAviFile(string fileName, int width, int height, int bpp, double fps, bool tryCodec)
+        public bool StartNewAviFile(string fileName, int width, int height, int bpp, double fps, bool tryCodec)
         {
-            TangraVideo.StartNewAviFile(fileName, width, height, bpp, fps, tryCodec);
+            if (!TangraVideo.StartNewAviFile(fileName, width, height, bpp, fps, tryCodec))
+            {
+                MessageBox.Show("There was an error calling AddAviVideoFrame:\r\n\r\n" + TangraVideo.GetLastAviErrorMessage(), "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+            return true;
         }
 
-        public void AddAviVideoFrame(Pixelmap pixmap, double addedGamma, int? adv16NormalisationValue)
+        public bool AddAviVideoFrame(Pixelmap pixmap, double addedGamma, int? adv16NormalisationValue)
         {
-            TangraVideo.AddAviVideoFrame(pixmap, addedGamma, adv16NormalisationValue);
+            if (!TangraVideo.AddAviVideoFrame(pixmap, addedGamma, adv16NormalisationValue))
+            {
+                MessageBox.Show("There was an error calling AddAviVideoFrame:\r\n\r\n" + TangraVideo.GetLastAviErrorMessage(), "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+            return true;
         }
     }
 }

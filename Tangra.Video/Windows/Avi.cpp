@@ -186,6 +186,14 @@ HRESULT Avi::compression(HBITMAP const& bmp, AVICOMPRESSOPTIONS *opts, bool Show
 		::AVISaveOptionsFree(1,aopts);
 		printf("Avi::compression after AVISaveOptionsFree\n");
 
+		DIBSECTION dibs;
+        printf("Avi::compression going to GetObject\n");
+        if ( !::GetObject(bmp, sizeof(dibs), &dibs))
+		{
+            printf("GetObject: %s\n", GetLastError());
+            return -1;
+		}
+
 		hr = ::AVIStreamSetFormat(au->psCompressed, 0, &dibs.dsBmih, dibs.dsBmih.biSize+dibs.dsBmih.biClrUsed*sizeof(RGBQUAD));
 		if( hr != AVIERR_OK ) {
 			au->iserr=true; 

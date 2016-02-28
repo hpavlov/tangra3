@@ -575,7 +575,11 @@ namespace Tangra.Video.AstroDigitalVideo
             IAviSaver saver = AdvToAviConverterFactory.CreateConverter(converter);
 
             saver.CloseAviFile();
-            saver.StartNewAviFile(fileName, (int)ImageSection.Width, (int)ImageSection.Height, 8, 25, tryCodec);
+            if (!saver.StartNewAviFile(fileName, (int) ImageSection.Width, (int) ImageSection.Height, 8, 25, tryCodec))
+            {
+                progressCallback(100, 0);
+                return false;
+            }
 			try
 			{
 			    int aviFrameNo = 0;
@@ -641,7 +645,11 @@ namespace Tangra.Video.AstroDigitalVideo
 
 						while (aviFrameNo < lastRepeatedAviFrameNo)
 						{
-                            saver.AddAviVideoFrame(pixmap, addedGamma, ImageSection.Adv16NormalisationValue);
+						    if (!saver.AddAviVideoFrame(pixmap, addedGamma, ImageSection.Adv16NormalisationValue))
+						    {
+                                progressCallback(100, 0);
+                                return false;
+						    }
 							aviFrameNo++;
 						}
 

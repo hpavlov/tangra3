@@ -139,7 +139,7 @@ HRESULT TangraDirectShow::DirectShowOpenFile(LPCTSTR fileName, VideoFileInfo* fi
 				m_Height *= -1;
 			}
 
-			strncpy(fileInfo->EngineBuffer, "DirectShow\0", 11);
+			strncpy_s(fileInfo->EngineBuffer, "DirectShow\0", 11);
 			fileInfo->VideoFileTypeBuffer[0] = (pVih->bmiHeader.biCompression >> 24) & 0xFF;
 			fileInfo->VideoFileTypeBuffer[1] = (pVih->bmiHeader.biCompression >> 16) & 0xFF;
 			fileInfo->VideoFileTypeBuffer[2] = (pVih->bmiHeader.biCompression >> 8) & 0xFF;
@@ -165,10 +165,11 @@ HRESULT TangraDirectShow::DirectShowOpenFile(LPCTSTR fileName, VideoFileInfo* fi
 	m_FrameRateMS = 1000.0 / frameRate;
 	m_MediaDet->get_StreamLength(&m_ClipLength);
 
-	fileInfo->FrameRate = frameRate;
+	fileInfo->FrameRate = (float)frameRate;
 	fileInfo->CountFrames = (UINT)( (m_ClipLength*1000) / m_FrameRateMS ); // Number of frames
 
 	hr = m_MediaDet->GetBitmapBits(0, &m_FrameDataSize, NULL, m_Width, m_Height);
+	return hr;
 }
 
 
@@ -176,7 +177,6 @@ HRESULT TangraDirectShow::DirectShowGetFrame(long frameNo, unsigned long* pixels
 {
 	// Find the required buffer size.
 	HRESULT hr = 1; //Only important if !mFrameDataSize, so make default 1
-	double frameno;
 
 	if (SUCCEEDED(hr)) 
 	{
@@ -208,7 +208,6 @@ HRESULT TangraDirectShow::DirectShowGetFramePixels(long frameNo, unsigned long* 
 {
 	// Find the required buffer size.
 	HRESULT hr = 1; //Only important if !mFrameDataSize, so make default 1
-	double frameno;
 
 	if(!m_FrameDataSize){
 		hr = m_MediaDet->GetBitmapBits(0, &m_FrameDataSize, NULL, m_Width, m_Height);
