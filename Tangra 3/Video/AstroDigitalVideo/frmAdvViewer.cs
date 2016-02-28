@@ -337,7 +337,7 @@ namespace Tangra.Video.AstroDigitalVideo
 
         private void SaveAsAviFileWorker(object state)
         {
-            Tuple<string, int, int, bool, double, double> cropFileCfg = (Tuple<string, int, int, bool, double, double>)state;
+            Tuple<string, int, int, bool, double, double, AdvToAviConverter> cropFileCfg = (Tuple<string, int, int, bool, double, double, AdvToAviConverter>)state;
 
             InvokeUpdateUI(2, 0, true);
 
@@ -347,6 +347,7 @@ namespace Tangra.Video.AstroDigitalVideo
                     cropFileCfg.Item1,
                     cropFileCfg.Item2,
                     cropFileCfg.Item3,
+                    cropFileCfg.Item7,
                     cropFileCfg.Item4,
                     cropFileCfg.Item5,
                     cropFileCfg.Item6,
@@ -457,14 +458,15 @@ namespace Tangra.Video.AstroDigitalVideo
 				UsageStats.Instance.Save();
 
                 ThreadPool.QueueUserWorkItem(
-                    new WaitCallback(SaveAsAviFileWorker), 
-                    new Tuple<string, int, int, bool, double, double>(
+                    new WaitCallback(SaveAsAviFileWorker),
+                    new Tuple<string, int, int, bool, double, double, AdvToAviConverter>(
                         saveAviFileDialog.FileName, 
                         (int)nudAviFirstFrame.Value, 
                         (int)nudAviLastFrame.Value,
                         false,
                         msPerFrame,
-                        addedGamma));
+                        addedGamma,
+                        AdvToAviConverter.VideoForWindowsAviSaver));
             }
         }
 
