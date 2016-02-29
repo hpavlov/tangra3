@@ -507,8 +507,8 @@ HRESULT TangraAviFileAddFrame(long* pixels)
 	
 	if(s_pStream)
 	{
-		s_pStream->Release();
-		::CreateStreamOnHGlobal(NULL, TRUE, &s_pStream);
+		LARGE_INTEGER ZERO_POS = { 0 };
+		s_pStream->Seek(ZERO_POS, 0, NULL); 
 
 		rv = s_pStream->Write(&bitmapPixels[0], ULONG(sizeof(BYTE) * ((s_AviFrameWidth * s_AviFrameHeight * 3) + 40 + 14 + 1)), NULL);
 		if(rv == S_OK)
