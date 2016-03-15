@@ -56,6 +56,7 @@ DLL_PUBLIC long PreProcessingAddClipping(unsigned int  fromValue, unsigned int  
 DLL_PUBLIC long PreProcessingAddBrightnessContrast(long brigtness, long contrast);
 DLL_PUBLIC long PreProcessingAddDigitalFilter(enum PreProcessingFilter filter);
 DLL_PUBLIC long PreProcessingAddGammaCorrection(float gamma);
+DLL_PUBLIC long PreProcessingAddCameraResponseCorrection(int knownCameraResponse);
 DLL_PUBLIC long PreProcessingAddDarkFrame(float* darkFramePixels, unsigned long pixelsCount, float exposureSeconds, bool isBiasCorrected, bool isSameExposure);
 DLL_PUBLIC long PreProcessingAddFlatFrame(float* flatFramePixels, unsigned long pixelsCount, float flatFrameMedian);
 DLL_PUBLIC long PreProcessingAddBiasFrame(float* biasFramePixels, unsigned long pixelsCount);
@@ -69,6 +70,7 @@ DLL_PUBLIC long PreProcessingGetConfig(
 	long* contrast, 
 	PreProcessingFilter* filter, 
 	float* gamma, 
+	int* reversedCameraResponse,
 	unsigned int* darkPixelsCount, 
 	unsigned int* flatPixelsCount,
 	unsigned int* biasPixelsCount,

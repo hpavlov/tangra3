@@ -770,6 +770,13 @@ HRESULT PreProcessingGamma(unsigned long* pixels, long width, long height, int b
 	return S_OK;
 }
 
+DLL_PUBLIC HRESULT PreProcessingReverseCameraResponse(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal, int knownCameraResponse)
+{
+	// TODO:
+	
+	return E_NOTIMPL;
+}
+
 HRESULT PreProcessingApplyBiasDarkFlatFrame(
     unsigned long* pixels, long width, long height, int bpp, unsigned long normVal,
     float* biasPixels, float* darkPixels, float* flatPixels, 

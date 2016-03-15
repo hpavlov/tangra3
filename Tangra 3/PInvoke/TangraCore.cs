@@ -428,6 +428,9 @@ namespace Tangra.PInvoke
 			private static extern int PreProcessingAddGammaCorrection(float encodingGamma);
 
 			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+			private static extern int PreProcessingAddCameraResponseCorrection(int knownCameraResponse);
+
+			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
             private static extern int PreProcessingAddDarkFrame(float[] darkFramePixels, uint pixelsCount, float exposureSeconds, bool isBiasCorrected, bool isSameExposure);
 
 			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
@@ -451,6 +454,7 @@ namespace Tangra.PInvoke
 					[In, Out] ref int contrast,
 					[In, Out] ref TangraConfig.PreProcessingFilter filter,
 					[In, Out] ref float gamma,
+					[In, Out] ref int reversedCameraResponse,
 					[In, Out] ref ushort darkPixelsCount,
 					[In, Out] ref ushort flatPixelsCount,
                     [In, Out] ref ushort biasPixelsCount,
@@ -498,7 +502,7 @@ namespace Tangra.PInvoke
 
 			public static void AddCameraResponseCorrection(TangraConfig.KnownCameraResponse cameraResponse)
 			{
-				throw new NotImplementedException();
+				PreProcessingAddCameraResponseCorrection((int)cameraResponse);
 			}
 
 			public static void AddFlipAndRotation(RotateFlipType rotateFlipType)
@@ -584,12 +588,13 @@ namespace Tangra.PInvoke
 					int contrast = 0;
 					TangraConfig.PreProcessingFilter filter = 0;
 					float gamma = 0;
+					int reversedCameraResponse = 0;
 					ushort darkPixelsCount = 0;
 					ushort flatPixelsCount = 0;
 				    ushort biasPixelsCount = 0;
 					RotateFlipType rotateFlipType = 0;
 
-					PreProcessingGetConfig(ref preProcessingType, ref fromValue, ref toValue, ref brigtness, ref contrast, ref filter, ref gamma, ref darkPixelsCount, ref flatPixelsCount, ref biasPixelsCount, ref rotateFlipType);
+					PreProcessingGetConfig(ref preProcessingType, ref fromValue, ref toValue, ref brigtness, ref contrast, ref filter, ref gamma, ref reversedCameraResponse, ref darkPixelsCount, ref flatPixelsCount, ref biasPixelsCount, ref rotateFlipType);
 
 					preProcessingInfo.PreProcessingType = preProcessingType;
 					preProcessingInfo.RotateFlipType = rotateFlipType;
@@ -611,6 +616,7 @@ namespace Tangra.PInvoke
 					}
 
 					preProcessingInfo.GammaCorrection = gamma;
+					preProcessingInfo.ReversedCameraResponse = (TangraConfig.KnownCameraResponse)reversedCameraResponse;
 					preProcessingInfo.Filter = filter;
 					preProcessingInfo.DarkFrameBytes = darkPixelsCount;
 					preProcessingInfo.FlatFrameBytes = flatPixelsCount;
@@ -663,6 +669,7 @@ namespace Tangra.PInvoke
 		public int Brigtness;
 		public int Contrast;
 		public float GammaCorrection;
+		public TangraConfig.KnownCameraResponse ReversedCameraResponse;
 		public ushort DarkFrameBytes;
 		public ushort FlatFrameBytes;
 	    public ushort BiasFrameBytes;

@@ -15,6 +15,7 @@ unsigned int  g_PreProcessingToValue;
 long g_PreProcessingBrigtness;
 long g_PreProcessingContrast;
 float g_EncodingGamma;
+int g_KnownCameraResponse;
 bool g_UsesPreProcessing = false;
 
 float* g_DarkFramePixelsCopy = NULL;
@@ -55,6 +56,7 @@ long PreProcessingClearAll()
 
 	s_PreProcessingFilter = ppfNoFilter;
 	g_EncodingGamma = 1;
+	g_KnownCameraResponse = 0;
 
 	if (NULL != g_BiasFramePixelsCopy) {
 		delete g_BiasFramePixelsCopy;
@@ -86,7 +88,7 @@ long PreProcessingUsesPreProcessing(bool* usesPreProcessing)
 	return S_OK;
 }
 
-long PreProcessingGetConfig(PreProcessingType* preProcessingType, unsigned int* fromValue, unsigned int* toValue, long* brigtness, long* contrast, PreProcessingFilter* filter, float* gamma, unsigned int* darkPixelsCount, unsigned int* flatPixelsCount, unsigned int* biasPixelsCount, RotateFlipType* rotateFlipType)
+long PreProcessingGetConfig(PreProcessingType* preProcessingType, unsigned int* fromValue, unsigned int* toValue, long* brigtness, long* contrast, PreProcessingFilter* filter, float* gamma, int* reversedCameraResponse, unsigned int* darkPixelsCount, unsigned int* flatPixelsCount, unsigned int* biasPixelsCount, RotateFlipType* rotateFlipType)
 {
 	if (g_UsesPreProcessing) {
 		*preProcessingType = s_PreProcessingType;
@@ -101,6 +103,7 @@ long PreProcessingGetConfig(PreProcessingType* preProcessingType, unsigned int* 
 
 		*filter = s_PreProcessingFilter;
 		*gamma = g_EncodingGamma;
+		*reversedCameraResponse = ABS(g_EncodingGamma - 1.0f) < 0.01 ? g_KnownCameraResponse : 0;
 	}
 
 	return S_OK;
@@ -148,6 +151,14 @@ long PreProcessingAddGammaCorrection(float gamma)
 {
 	g_EncodingGamma = gamma;
 	g_UsesPreProcessing = g_UsesPreProcessing || ABS(g_EncodingGamma - 1.0f) > 0.01;
+
+	return S_OK;
+}
+
+long PreProcessingAddCameraResponseCorrection(int knownCameraResponse)
+{
+	g_KnownCameraResponse = knownCameraResponse;
+	g_UsesPreProcessing = g_UsesPreProcessing || g_KnownCameraResponse > 0;
 
 	return S_OK;
 }
@@ -258,6 +269,11 @@ long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height
 
 	if (ABS(g_EncodingGamma - 1.0f) > 0.01) {
 		rv = PreProcessingGamma(pixels, width, height, bpp, normVal, g_EncodingGamma);
+		if (rv != S_OK) return rv;
+	}
+	else if (g_KnownCameraResponse > 0)
+	{
+		rv = PreProcessingReverseCameraResponse(pixels, width, height, bpp, normVal, g_KnownCameraResponse);
 		if (rv != S_OK) return rv;
 	}
 	

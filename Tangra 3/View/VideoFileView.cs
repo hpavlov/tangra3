@@ -158,6 +158,11 @@ namespace Tangra.View
 					preProcessingInfoStr += string.Format("|G{0}", preProcessingInfo.GammaCorrection.ToString("0.00"));
 					preProcessingInfoTooltip += string.Format("Reversing encoding Gamma of {0}\r\n", preProcessingInfo.GammaCorrection.ToString("0.00"));
 				}
+				if (preProcessingInfo.ReversedCameraResponse != TangraConfig.KnownCameraResponse.Undefined)
+				{
+					preProcessingInfoStr += string.Format("|REV:{0}", preProcessingInfo.ReversedCameraResponse.ToString());
+					preProcessingInfoTooltip += string.Format("Reversing camera response for {0}\r\n", preProcessingInfo.ReversedCameraResponse.ToString());
+				}
 
                 if (preProcessingInfo.BiasFrameBytes > 0) preProcessingInfoStr += "|BIAS";
 				if (preProcessingInfo.DarkFrameBytes > 0) preProcessingInfoStr += "|DARK";
