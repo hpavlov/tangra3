@@ -23,13 +23,18 @@ namespace Tangra.Config.SettingPannels
 		}
 
 		private bool m_GammaWillChange;
+		private bool m_CameraResponseReverseWillChange;
 
 		public override void LoadSettings()
 		{
 			nudGamma.SetNUDValue((decimal)TangraConfig.Settings.Photometry.RememberedEncodingGammaNotForDirectUse);
-			cbxGammaTheFullFrame.Checked = TangraConfig.Settings.Generic.ReverseGammaCorrection;			
+			cbxGammaTheFullFrame.Checked = TangraConfig.Settings.Generic.ReverseGammaCorrection;		
+	
+			cbxKnownResponse.SetCBXIndex((int)TangraConfig.Settings.Photometry.KnownCameraResponse);
+			cbxCameraResponseFullFrame.Checked = TangraConfig.Settings.Generic.ReverseCameraResponse;
 
 			m_GammaWillChange = false;
+			m_CameraResponseReverseWillChange = false;
 
 			UpdateControlState();
 		}
@@ -53,12 +58,27 @@ namespace Tangra.Config.SettingPannels
 				TangraConfig.Settings.Generic.ReverseGammaCorrection = false;
 				TangraConfig.Settings.Photometry.EncodingGamma = 1;
 			}
+
+			if (cbxCameraResponseFullFrame.Checked)
+			{
+				m_CameraResponseReverseWillChange = (int)TangraConfig.Settings.Photometry.KnownCameraResponse != cbxKnownResponse.SelectedIndex;
+				TangraConfig.Settings.Generic.ReverseCameraResponse = true;
+				TangraConfig.Settings.Photometry.KnownCameraResponse = (TangraConfig.KnownCameraResponse)cbxKnownResponse.SelectedIndex;
+			}
+			else
+			{
+				m_CameraResponseReverseWillChange = false;
+				TangraConfig.Settings.Generic.ReverseCameraResponse = false;
+			}
 		}
 
 		public override void OnPostSaveSettings()
 		{
 			if (m_GammaWillChange)
 				NotificationManager.Instance.NotifyGammaChanged();
+
+			if (m_CameraResponseReverseWillChange)
+				NotificationManager.Instance.CameraResponseReverseChanged();
 		}
 
 		private void cbxGammaTheFullFrame_CheckedChanged(object sender, EventArgs e)
@@ -69,11 +89,18 @@ namespace Tangra.Config.SettingPannels
 		private void UpdateControlState()
 		{
 			pnlEnterGammaValue.Enabled = cbxGammaTheFullFrame.Checked;
+			pnlChooseKnownResponse.Enabled = cbxCameraResponseFullFrame.Checked;
 		}
 
 		public override void Reset()
 		{		
 			NotificationManager.Instance.NotifyGammaChanged();
+			NotificationManager.Instance.CameraResponseReverseChanged();
+		}
+
+		private void cbxCameraResponseFullFrame_CheckedChanged(object sender, EventArgs e)
+		{
+			UpdateControlState();
 		}
 	}
 }

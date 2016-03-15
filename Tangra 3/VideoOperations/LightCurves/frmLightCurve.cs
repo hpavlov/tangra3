@@ -137,9 +137,9 @@ namespace Tangra.VideoOperations.LightCurves
 		private void UpdateFormTitle()
 		{
 			Text = string.Format(
-				  "{0} - {1}, {2}{3}{4}",
+				  "{0} - {1}, {2}{3}{4}{5}",
 				  m_LCFilePath != null ? Path.GetFileName(m_LCFilePath) : "Light Curve",
-				  ExplainSignalMethod(), ExplainBackgroundMethod(), ExplainDigitalFilter(), ExplainGamma()); 
+				  ExplainSignalMethod(), ExplainBackgroundMethod(), ExplainDigitalFilter(), ExplainGamma(), ExplainReverseCameraResponse()); 
 		}
 
 		private string ExplainSignalMethod()
@@ -213,6 +213,14 @@ namespace Tangra.VideoOperations.LightCurves
 				return string.Format(", Gamma = {0}", m_LightCurveController.Context.EncodingGamma.ToString("0.00"));
 		}
 
+		private string ExplainReverseCameraResponse()
+		{
+			if (m_LightCurveController.Context.ReverseCameraResponse == TangraConfig.KnownCameraResponse.Undefined)
+				return "";
+			else
+				return string.Format(", Linearize {0}", m_LightCurveController.Context.ReverseCameraResponse.ToString());
+		}
+
 		internal void SetNewLcFile(LCFile lcFile)
 		{
 			m_LCFile = lcFile;
@@ -280,6 +288,7 @@ namespace Tangra.VideoOperations.LightCurves
                                               ? m_Footer.ProcessedWithTangraConfig.Photometry.UserSpecifiedFWHM
                                               : float.NaN;
             m_LightCurveController.Context.EncodingGamma = m_Footer.ProcessedWithTangraConfig.Photometry.EncodingGamma;
+			m_LightCurveController.Context.ReverseCameraResponse = m_Footer.ProcessedWithTangraConfig.Photometry.KnownCameraResponse;
 
 			m_LightCurveController.Context.UseClipping = m_Footer.ReductionContext.UseClipping;
 			m_LightCurveController.Context.UseStretching = m_Footer.ReductionContext.UseStretching;
@@ -1555,9 +1564,9 @@ namespace Tangra.VideoOperations.LightCurves
 				g.DrawImage(Properties.Resources.lc_logo, new Point(m_MinX + 6, m_MinY - logoWidth - 6));
 
 				string legend = string.Format(
-					  "{0} - {1}, {2}{3}{4}",
+					  "{0} - {1}, {2}{3}{4}{5}",
 					  m_LCFilePath != null ? Path.GetFileName(m_LCFilePath) : "Light Curve",
-					  ExplainSignalMethod(), ExplainBackgroundMethod(), ExplainDigitalFilter(), ExplainGamma());
+					  ExplainSignalMethod(), ExplainBackgroundMethod(), ExplainDigitalFilter(), ExplainGamma(), ExplainReverseCameraResponse());
 
 				SizeF labelSize = g.MeasureString(legend, s_AxisFont);
 				float x = m_MinX + logoWidth + 12;

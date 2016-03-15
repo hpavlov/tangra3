@@ -417,6 +417,27 @@ namespace Tangra.Controller
 			}
 		}
 
+		private TangraConfig.KnownCameraResponse m_ReverseCameraResponse;
+		public TangraConfig.KnownCameraResponse ReverseCameraResponse
+		{
+			get { return m_ReverseCameraResponse; }
+			set
+			{
+				if (m_ReverseCameraResponse != value)
+				{
+					m_ReverseCameraResponse = value;
+
+					// TODO: Build a decoding matrix, in conjuction with Gamma??
+					m_Dirty = true;
+
+					m_RequiresFullReprocessing = true;
+
+					throw new NotImplementedException();
+
+				}
+			}
+		}
+
 		public bool UseClipping;
 		public bool UseStretching;
 		public bool UseBrightnessContrast;

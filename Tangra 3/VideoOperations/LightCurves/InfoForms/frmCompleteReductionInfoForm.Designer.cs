@@ -78,10 +78,12 @@
 			this.lblFieldRotation = new System.Windows.Forms.Label();
 			this.label18 = new System.Windows.Forms.Label();
 			this.dgvLCFileInfo = new System.Windows.Forms.DataGridView();
-			this.lCFileTagValuePairBindingSource = new System.Windows.Forms.BindingSource(this.components);
-			this.btnShowAll = new System.Windows.Forms.Button();
 			this.propertyDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.valueDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.lCFileTagValuePairBindingSource = new System.Windows.Forms.BindingSource(this.components);
+			this.btnShowAll = new System.Windows.Forms.Button();
+			this.lblReversedCameraResponse = new System.Windows.Forms.Label();
+			this.label20 = new System.Windows.Forms.Label();
 			this.pnlIntegration.SuspendLayout();
 			this.pnlReProcess.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.dgvLCFileInfo)).BeginInit();
@@ -202,7 +204,7 @@
 			this.pnlIntegration.Controls.Add(this.lblPixelIntegration);
 			this.pnlIntegration.Controls.Add(this.label12);
 			this.pnlIntegration.Controls.Add(this.lblIntegratedFrames);
-			this.pnlIntegration.Location = new System.Drawing.Point(30, 194);
+			this.pnlIntegration.Location = new System.Drawing.Point(30, 210);
 			this.pnlIntegration.Name = "pnlIntegration";
 			this.pnlIntegration.Size = new System.Drawing.Size(178, 35);
 			this.pnlIntegration.TabIndex = 41;
@@ -247,7 +249,7 @@
 			// lblIntegration
 			// 
 			this.lblIntegration.AutoSize = true;
-			this.lblIntegration.Location = new System.Drawing.Point(147, 179);
+			this.lblIntegration.Location = new System.Drawing.Point(147, 195);
 			this.lblIntegration.Name = "lblIntegration";
 			this.lblIntegration.Size = new System.Drawing.Size(21, 13);
 			this.lblIntegration.TabIndex = 40;
@@ -256,7 +258,7 @@
 			// label11
 			// 
 			this.label11.AutoSize = true;
-			this.label11.Location = new System.Drawing.Point(78, 179);
+			this.label11.Location = new System.Drawing.Point(78, 195);
 			this.label11.Name = "label11";
 			this.label11.Size = new System.Drawing.Size(63, 13);
 			this.label11.TabIndex = 39;
@@ -373,7 +375,7 @@
 			// lblFirstTime
 			// 
 			this.lblFirstTime.AutoSize = true;
-			this.lblFirstTime.Location = new System.Drawing.Point(147, 254);
+			this.lblFirstTime.Location = new System.Drawing.Point(147, 270);
 			this.lblFirstTime.Name = "lblFirstTime";
 			this.lblFirstTime.Size = new System.Drawing.Size(25, 13);
 			this.lblFirstTime.TabIndex = 49;
@@ -382,7 +384,7 @@
 			// label17
 			// 
 			this.label17.AutoSize = true;
-			this.label17.Location = new System.Drawing.Point(82, 254);
+			this.label17.Location = new System.Drawing.Point(82, 270);
 			this.label17.Name = "label17";
 			this.label17.Size = new System.Drawing.Size(58, 13);
 			this.label17.TabIndex = 48;
@@ -391,7 +393,7 @@
 			// lblFirstTimedFrame
 			// 
 			this.lblFirstTimedFrame.AutoSize = true;
-			this.lblFirstTimedFrame.Location = new System.Drawing.Point(147, 236);
+			this.lblFirstTimedFrame.Location = new System.Drawing.Point(147, 252);
 			this.lblFirstTimedFrame.Name = "lblFirstTimedFrame";
 			this.lblFirstTimedFrame.Size = new System.Drawing.Size(31, 13);
 			this.lblFirstTimedFrame.TabIndex = 47;
@@ -400,7 +402,7 @@
 			// label19
 			// 
 			this.label19.AutoSize = true;
-			this.label19.Location = new System.Drawing.Point(44, 236);
+			this.label19.Location = new System.Drawing.Point(44, 252);
 			this.label19.Name = "label19";
 			this.label19.Size = new System.Drawing.Size(96, 13);
 			this.label19.TabIndex = 46;
@@ -409,7 +411,7 @@
 			// lblSecondTime
 			// 
 			this.lblSecondTime.AutoSize = true;
-			this.lblSecondTime.Location = new System.Drawing.Point(147, 291);
+			this.lblSecondTime.Location = new System.Drawing.Point(147, 307);
 			this.lblSecondTime.Name = "lblSecondTime";
 			this.lblSecondTime.Size = new System.Drawing.Size(25, 13);
 			this.lblSecondTime.TabIndex = 53;
@@ -418,7 +420,7 @@
 			// label21
 			// 
 			this.label21.AutoSize = true;
-			this.label21.Location = new System.Drawing.Point(65, 291);
+			this.label21.Location = new System.Drawing.Point(65, 307);
 			this.label21.Name = "label21";
 			this.label21.Size = new System.Drawing.Size(76, 13);
 			this.label21.TabIndex = 52;
@@ -427,7 +429,7 @@
 			// lblSecondTimedFrame
 			// 
 			this.lblSecondTimedFrame.AutoSize = true;
-			this.lblSecondTimedFrame.Location = new System.Drawing.Point(147, 273);
+			this.lblSecondTimedFrame.Location = new System.Drawing.Point(147, 289);
 			this.lblSecondTimedFrame.Name = "lblSecondTimedFrame";
 			this.lblSecondTimedFrame.Size = new System.Drawing.Size(31, 13);
 			this.lblSecondTimedFrame.TabIndex = 51;
@@ -436,7 +438,7 @@
 			// label23
 			// 
 			this.label23.AutoSize = true;
-			this.label23.Location = new System.Drawing.Point(27, 273);
+			this.label23.Location = new System.Drawing.Point(27, 289);
 			this.label23.Name = "label23";
 			this.label23.Size = new System.Drawing.Size(114, 13);
 			this.label23.TabIndex = 50;
@@ -544,20 +546,6 @@
 			this.dgvLCFileInfo.TabIndex = 63;
 			this.dgvLCFileInfo.Visible = false;
 			// 
-			// lCFileTagValuePairBindingSource
-			// 
-			this.lCFileTagValuePairBindingSource.DataSource = typeof(Tangra.VideoOperations.LightCurves.InfoForms.LCFileTagValuePair);
-			// 
-			// btnShowAll
-			// 
-			this.btnShowAll.Location = new System.Drawing.Point(231, 279);
-			this.btnShowAll.Name = "btnShowAll";
-			this.btnShowAll.Size = new System.Drawing.Size(123, 23);
-			this.btnShowAll.TabIndex = 64;
-			this.btnShowAll.Text = "Show All";
-			this.btnShowAll.UseVisualStyleBackColor = true;
-			this.btnShowAll.Click += new System.EventHandler(this.btnShowAll_Click);
-			// 
 			// propertyDataGridViewTextBoxColumn
 			// 
 			this.propertyDataGridViewTextBoxColumn.DataPropertyName = "Property";
@@ -574,11 +562,45 @@
 			this.valueDataGridViewTextBoxColumn.ReadOnly = true;
 			this.valueDataGridViewTextBoxColumn.Width = 170;
 			// 
+			// lCFileTagValuePairBindingSource
+			// 
+			this.lCFileTagValuePairBindingSource.DataSource = typeof(Tangra.VideoOperations.LightCurves.InfoForms.LCFileTagValuePair);
+			// 
+			// btnShowAll
+			// 
+			this.btnShowAll.Location = new System.Drawing.Point(231, 279);
+			this.btnShowAll.Name = "btnShowAll";
+			this.btnShowAll.Size = new System.Drawing.Size(123, 23);
+			this.btnShowAll.TabIndex = 64;
+			this.btnShowAll.Text = "Show All";
+			this.btnShowAll.UseVisualStyleBackColor = true;
+			this.btnShowAll.Click += new System.EventHandler(this.btnShowAll_Click);
+			// 
+			// lblReversedCameraResponse
+			// 
+			this.lblReversedCameraResponse.AutoSize = true;
+			this.lblReversedCameraResponse.Location = new System.Drawing.Point(147, 177);
+			this.lblReversedCameraResponse.Name = "lblReversedCameraResponse";
+			this.lblReversedCameraResponse.Size = new System.Drawing.Size(56, 13);
+			this.lblReversedCameraResponse.TabIndex = 66;
+			this.lblReversedCameraResponse.Text = "Undefined";
+			// 
+			// label20
+			// 
+			this.label20.AutoSize = true;
+			this.label20.Location = new System.Drawing.Point(17, 177);
+			this.label20.Name = "label20";
+			this.label20.Size = new System.Drawing.Size(122, 13);
+			this.label20.TabIndex = 65;
+			this.label20.Text = "Corrected for Response:";
+			// 
 			// frmCompleteReductionInfoForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(533, 352);
+			this.Controls.Add(this.lblReversedCameraResponse);
+			this.Controls.Add(this.label20);
 			this.Controls.Add(this.btnShowAll);
 			this.Controls.Add(this.lblFieldRotation);
 			this.Controls.Add(this.label18);
@@ -689,5 +711,7 @@
 		private System.Windows.Forms.Button btnShowAll;
 		private System.Windows.Forms.DataGridViewTextBoxColumn propertyDataGridViewTextBoxColumn;
 		private System.Windows.Forms.DataGridViewTextBoxColumn valueDataGridViewTextBoxColumn;
+		private System.Windows.Forms.Label lblReversedCameraResponse;
+		private System.Windows.Forms.Label label20;
 	}
 }

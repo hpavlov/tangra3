@@ -92,6 +92,7 @@ namespace Tangra.Helpers
 		public int SoftwareIntegrationUsed { get; set; }
 		public int PreProcessingUsed { get; set; }
 		public int ReverseGammaUsed { get; set; }
+		public int ReverseCameraResponseUsed { get; set; }
 		public int DigitalFilterUsed { get; set; }
 		public int AperturePhotometry { get; set; }
 		public int PSFPhotometryUsed { get; set; }

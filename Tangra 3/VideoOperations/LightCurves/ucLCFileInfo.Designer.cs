@@ -51,6 +51,8 @@
 			this.btnShowFields = new System.Windows.Forms.Button();
 			this.lblTracker = new System.Windows.Forms.Label();
 			this.lblTrackerLabel = new System.Windows.Forms.Label();
+			this.lblReversedCameraResponse = new System.Windows.Forms.Label();
+			this.label9 = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -164,7 +166,7 @@
 			// lblIntegration
 			// 
 			this.lblIntegration.AutoSize = true;
-			this.lblIntegration.Location = new System.Drawing.Point(130, 170);
+			this.lblIntegration.Location = new System.Drawing.Point(130, 189);
 			this.lblIntegration.Name = "lblIntegration";
 			this.lblIntegration.Size = new System.Drawing.Size(21, 13);
 			this.lblIntegration.TabIndex = 19;
@@ -173,7 +175,7 @@
 			// label11
 			// 
 			this.label11.AutoSize = true;
-			this.label11.Location = new System.Drawing.Point(61, 170);
+			this.label11.Location = new System.Drawing.Point(61, 189);
 			this.label11.Name = "label11";
 			this.label11.Size = new System.Drawing.Size(63, 13);
 			this.label11.TabIndex = 18;
@@ -218,7 +220,7 @@
 			// lblPreProcessing
 			// 
 			this.lblPreProcessing.AutoSize = true;
-			this.lblPreProcessing.Location = new System.Drawing.Point(130, 188);
+			this.lblPreProcessing.Location = new System.Drawing.Point(130, 207);
 			this.lblPreProcessing.Name = "lblPreProcessing";
 			this.lblPreProcessing.Size = new System.Drawing.Size(21, 13);
 			this.lblPreProcessing.TabIndex = 33;
@@ -227,7 +229,7 @@
 			// label8
 			// 
 			this.label8.AutoSize = true;
-			this.label8.Location = new System.Drawing.Point(40, 188);
+			this.label8.Location = new System.Drawing.Point(40, 207);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(84, 13);
 			this.label8.TabIndex = 32;
@@ -235,7 +237,7 @@
 			// 
 			// btnShowFields
 			// 
-			this.btnShowFields.Location = new System.Drawing.Point(13, 242);
+			this.btnShowFields.Location = new System.Drawing.Point(13, 248);
 			this.btnShowFields.Name = "btnShowFields";
 			this.btnShowFields.Size = new System.Drawing.Size(103, 23);
 			this.btnShowFields.TabIndex = 41;
@@ -245,7 +247,7 @@
 			// lblTracker
 			// 
 			this.lblTracker.AutoSize = true;
-			this.lblTracker.Location = new System.Drawing.Point(130, 207);
+			this.lblTracker.Location = new System.Drawing.Point(130, 226);
 			this.lblTracker.Name = "lblTracker";
 			this.lblTracker.Size = new System.Drawing.Size(0, 13);
 			this.lblTracker.TabIndex = 43;
@@ -253,17 +255,37 @@
 			// lblTrackerLabel
 			// 
 			this.lblTrackerLabel.AutoSize = true;
-			this.lblTrackerLabel.Location = new System.Drawing.Point(69, 207);
+			this.lblTrackerLabel.Location = new System.Drawing.Point(69, 226);
 			this.lblTrackerLabel.Name = "lblTrackerLabel";
 			this.lblTrackerLabel.Size = new System.Drawing.Size(55, 13);
 			this.lblTrackerLabel.TabIndex = 42;
 			this.lblTrackerLabel.Text = "Tracking: ";
+			// 
+			// lblReversedCameraResponse
+			// 
+			this.lblReversedCameraResponse.AutoSize = true;
+			this.lblReversedCameraResponse.Location = new System.Drawing.Point(130, 170);
+			this.lblReversedCameraResponse.Name = "lblReversedCameraResponse";
+			this.lblReversedCameraResponse.Size = new System.Drawing.Size(53, 13);
+			this.lblReversedCameraResponse.TabIndex = 45;
+			this.lblReversedCameraResponse.Text = "Unknown";
+			// 
+			// label9
+			// 
+			this.label9.AutoSize = true;
+			this.label9.Location = new System.Drawing.Point(0, 170);
+			this.label9.Name = "label9";
+			this.label9.Size = new System.Drawing.Size(125, 13);
+			this.label9.TabIndex = 44;
+			this.label9.Text = "Corrected for Response: ";
 			// 
 			// ucLCFileInfo
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.SystemColors.Control;
+			this.Controls.Add(this.lblReversedCameraResponse);
+			this.Controls.Add(this.label9);
 			this.Controls.Add(this.lblTracker);
 			this.Controls.Add(this.lblTrackerLabel);
 			this.Controls.Add(this.btnShowFields);
@@ -319,5 +341,7 @@
 		private System.Windows.Forms.Button btnShowFields;
 		private System.Windows.Forms.Label lblTracker;
 		private System.Windows.Forms.Label lblTrackerLabel;
+		private System.Windows.Forms.Label lblReversedCameraResponse;
+		private System.Windows.Forms.Label label9;
     }
 }

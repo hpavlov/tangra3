@@ -81,6 +81,10 @@ namespace Tangra.VideoOperations.LightCurves
 				? "No" 
 				: m_lcFile.Footer.ProcessedWithTangraConfig.Photometry.EncodingGamma.ToString("0.00");
 
+			lblReversedCameraResponse.Text = m_lcFile.Footer.ProcessedWithTangraConfig.Photometry.KnownCameraResponse == 0
+				? "No"
+				: m_lcFile.Footer.ProcessedWithTangraConfig.Photometry.KnownCameraResponse.ToString();
+
         	bool preProcessing = m_lcFile.Footer.ReductionContext.UseStretching ||
         	                     m_lcFile.Footer.ReductionContext.UseClipping ||
         	                     m_lcFile.Footer.ReductionContext.UseBrightnessContrast;

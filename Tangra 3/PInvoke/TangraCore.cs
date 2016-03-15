@@ -496,6 +496,11 @@ namespace Tangra.PInvoke
                 PreProcessingAddGammaCorrection(encodingGamma);
 			}
 
+			public static void AddCameraResponseCorrection(TangraConfig.KnownCameraResponse cameraResponse)
+			{
+				throw new NotImplementedException();
+			}
+
 			public static void AddFlipAndRotation(RotateFlipType rotateFlipType)
 			{
 				PreProcessingAddFlipAndRotation((int)rotateFlipType);

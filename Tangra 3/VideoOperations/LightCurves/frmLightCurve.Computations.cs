@@ -931,12 +931,12 @@ namespace Tangra.VideoOperations.LightCurves
             else if (!string.IsNullOrEmpty(m_LightCurveController.Context.InstrumentalDelayConfigName) && m_LightCurveController.Context.TimingType != MeasurementTimingType.UserEnteredFrameReferences)
                 instrumentalDelayStatus = "Applied";
 
-            output.Append("Reversed Gamma, Colour, Measured Band, Integration, Digital Filter, Signal Method, Background Method, Instrumental Delay Corrections, Camera, AAV Integration, First Frame, Last Frame");
+            output.Append("Reversed Gamma, Colour, Measured Band, Integration, Digital Filter, Signal Method, Background Method, Instrumental Delay Corrections, Camera, AAV Integration, First Frame, Last Frame, Reversed Camera Response");
             if (addPSFReductionDetails) output.Append(", PSF Fitting");
             if (addPSFAverageModelDetails) output.Append(", Modeled FWHM, Average FWHM");
             if (options.PhotometricFormat == PhotometricFormat.Magnitudes) output.Append(", Zero Magnitude");
             output.AppendLine();
-            output.AppendFormat("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11}", 
+            output.AppendFormat("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12}", 
                 m_LightCurveController.Context.EncodingGamma.ToString("0.00"),
                 m_Footer.ReductionContext.IsColourVideo ? "yes" : "no", 
                 m_Footer.ReductionContext.ColourChannel,
@@ -950,7 +950,8 @@ namespace Tangra.VideoOperations.LightCurves
                 !string.IsNullOrEmpty(m_LightCurveController.Context.CameraName) ?  m_LightCurveController.Context.CameraName : m_LightCurveController.Context.InstrumentalDelayConfigName,
                 m_LightCurveController.Context.AAVFrameIntegration == -1 ? "" : m_LightCurveController.Context.AAVFrameIntegration.ToString(),
                 m_LightCurveController.Context.MinFrame,
-                m_LightCurveController.Context.MaxFrame);
+                m_LightCurveController.Context.MaxFrame,
+				m_LightCurveController.Context.ReverseCameraResponse == TangraConfig.KnownCameraResponse.Undefined ? "" : m_LightCurveController.Context.ReverseCameraResponse.ToString());
 
             if (addPSFReductionDetails) output.AppendFormat(",{0}", m_LightCurveController.Context.PsfFittingMethod);
             if (addPSFAverageModelDetails) output.AppendFormat(",{0},{1}", float.IsNaN(m_LightCurveController.Context.ManualAverageFWHM) ? "auto" : "manual", !float.IsNaN(m_LightCurveController.Context.ManualAverageFWHM) ? m_LightCurveController.Context.ManualAverageFWHM.ToString("0.00") : m_Footer.RefinedAverageFWHM.ToString("0.00"));

@@ -1641,6 +1641,7 @@ namespace Tangra.VideoOperations.LightCurves
 			if (file.Footer.ReductionContext.NumberFramesToIntegrate > 1) UsageStats.Instance.SoftwareIntegrationUsed++;
 
 			if (Math.Abs(TangraConfig.Settings.Photometry.EncodingGamma - 1) > 0.01) UsageStats.Instance.ReverseGammaUsed++;
+			if (TangraConfig.Settings.Photometry.KnownCameraResponse != TangraConfig.KnownCameraResponse.Undefined) UsageStats.Instance.ReverseCameraResponseUsed++;
 
 			if (file.Footer.ReductionContext.UseClipping || file.Footer.ReductionContext.UseStretching || file.Footer.ReductionContext.UseBrightnessContrast)
 				UsageStats.Instance.PreProcessingUsed++;

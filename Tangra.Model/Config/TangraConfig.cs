@@ -384,6 +384,12 @@ namespace Tangra.Model.Config
 			Analytical
 		}
 
+		public enum KnownCameraResponse
+		{
+			Undefined = 0,
+			Wat910HXBD = 1
+		}
+
         [Serializable]
 		public class Background3DPolynomialSettings
 		{
@@ -406,6 +412,8 @@ namespace Tangra.Model.Config
 			public float RememberedEncodingGammaNotForDirectUse = 1.0f;
 
 			public float EncodingGamma = 1.0f;
+
+			public KnownCameraResponse KnownCameraResponse = KnownCameraResponse.Undefined;
 
 			public ColourChannel ColourChannel = ColourChannel.Red;
 
@@ -605,6 +613,7 @@ namespace Tangra.Model.Config
 			public bool ShowCursorPosition = false;
 			public PerformanceQuality PerformanceQuality;
 			public bool ReverseGammaCorrection = false;
+			public bool ReverseCameraResponse = false;
 			public int AviRenderingEngineIndex = 1;
 
 			public bool AcceptBetaUpdates = false;

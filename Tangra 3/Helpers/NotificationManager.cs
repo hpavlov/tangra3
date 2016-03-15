@@ -49,6 +49,11 @@ namespace Tangra.Helpers
 			TangraCore.PreProcessors.AddGammaCorrection(TangraConfig.Settings.Photometry.EncodingGamma);
 		}
 
+		public void CameraResponseReverseChanged()
+		{
+			TangraCore.PreProcessors.AddCameraResponseCorrection(TangraConfig.Settings.Photometry.KnownCameraResponse);
+		}
+
         public void NotifyFileProgressManagerBeginFileOperation(int maxSteps)
         {
 	        if (m_VideoController != null)

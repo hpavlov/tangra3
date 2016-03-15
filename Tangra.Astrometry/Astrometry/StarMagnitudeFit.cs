@@ -45,6 +45,7 @@ namespace Tangra.Astrometry
 		private double m_B;
 		private double m_C;
 		private float m_EncodingGamma;
+		private TangraConfig.KnownCameraResponse m_ReverseCameraResponse;
 		private double m_Sigma;
 		private double m_MinRes;
 		private double m_MaxRes;
@@ -76,7 +77,7 @@ namespace Tangra.Astrometry
 			List<PSFFit> psfGaussians,
 			List<double> profileFittedAmplitudes,
 			List<bool> saturatedFlags,
-			double a, double b, double c, float encodingGamma, int excludedStars,
+			double a, double b, double c, float encodingGamma, TangraConfig.KnownCameraResponse reverseCameraResponse, int excludedStars,
 			TangraConfig.PreProcessingFilter filter, double empericalFWHM, 
 			TangraConfig.PhotometryReductionMethod photometryReductionMethod, 
 			TangraConfig.BackgroundMethod photometryBackgroundMethod,
@@ -92,6 +93,7 @@ namespace Tangra.Astrometry
 			m_StarNumbers = starNumbers;
 			m_PSFGaussians = psfGaussians;
 			m_EncodingGamma = encodingGamma;
+			m_ReverseCameraResponse = reverseCameraResponse;
 			m_ExcludedStars = excludedStars;
 			m_SaturatedFlags = saturatedFlags;
 			m_ProfileFittedAmplitudes = profileFittedAmplitudes;
@@ -220,6 +222,11 @@ namespace Tangra.Astrometry
 		public float EncodingGamma
 		{
 			get { return m_EncodingGamma; }
+		}
+
+		public TangraConfig.KnownCameraResponse ReverseCameraResponse
+		{
+			get { return m_ReverseCameraResponse; }
 		}
 
 		public double GetMagnitudeForIntencity(double intencity)
@@ -366,6 +373,7 @@ namespace Tangra.Astrometry
 			List<IStar> catalogueStars,
             Guid magnitudeBandId,
 			float encodingGamma,
+			TangraConfig.KnownCameraResponse reverseCameraResponse,
 			float? aperture,
 			float? annulusInnerRadius,
 			int? annulusMinPixels,
@@ -612,8 +620,8 @@ namespace Tangra.Astrometry
 			return new StarMagnitudeFit(
 				currentAstroImage,
 				bitPix,
-				intencities, magnitudes, colours, stars, gaussians, new List<double>(), 
-				saturatedFlags, a, b, c, encodingGamma, excludedStars, filter, empericalFWHM, 
+				intencities, magnitudes, colours, stars, gaussians, new List<double>(),
+				saturatedFlags, a, b, c, encodingGamma, reverseCameraResponse, excludedStars, filter, empericalFWHM, 
 				photometryReductionMethod, photometryBackgroundMethod, psfQuadrature, psfFittingMethod);
 		}
 

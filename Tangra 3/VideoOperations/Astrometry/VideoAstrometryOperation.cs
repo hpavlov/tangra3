@@ -598,6 +598,7 @@ namespace Tangra.VideoOperations.Astrometry
 							? Guid.Empty
 							: m_MeasurementContext.PhotometryCatalogBandId,
 						TangraConfig.Settings.Photometry.EncodingGamma,
+						TangraConfig.Settings.Photometry.KnownCameraResponse,
 						m_MeasurementContext != null ? m_MeasurementContext.ApertureSize : (float?)null,
 						m_MeasurementContext != null ? m_MeasurementContext.AnnulusInnerRadius : (float?)null,
 						m_MeasurementContext != null ? m_MeasurementContext.AnnulusMinPixels : (int?)null,

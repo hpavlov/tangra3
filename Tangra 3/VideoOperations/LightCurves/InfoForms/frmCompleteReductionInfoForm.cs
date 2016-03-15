@@ -89,6 +89,10 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 				? "No"
 				: m_lcFile.Footer.ProcessedWithTangraConfig.Photometry.EncodingGamma.ToString("0.00");
 
+			lblReversedCameraResponse.Text = m_lcFile.Footer.ProcessedWithTangraConfig.Photometry.KnownCameraResponse == 0
+				? "No"
+				: m_lcFile.Footer.ProcessedWithTangraConfig.Photometry.KnownCameraResponse.ToString();
+
 			lblWind.Text = m_lcFile.Footer.ReductionContext.WindOrShaking ? "Yes" : "No";
 			lblFullD.Text = m_lcFile.Footer.ReductionContext.FullDisappearance ? "Yes" : "No";
 			lblFlickering.Text = m_lcFile.Footer.ReductionContext.HighFlickeringOrLargeStars ? "Yes" : "No";

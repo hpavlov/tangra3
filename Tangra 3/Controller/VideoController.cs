@@ -383,6 +383,7 @@ namespace Tangra.Controller
 
 			TangraCore.PreProcessors.ClearAll();
 			TangraCore.PreProcessors.AddGammaCorrection(TangraConfig.Settings.Photometry.EncodingGamma);
+			TangraCore.PreProcessors.AddCameraResponseCorrection(TangraConfig.Settings.Photometry.KnownCameraResponse);
 
 			IFrameStream frameStream = frameStreamFactoryMethod();
 

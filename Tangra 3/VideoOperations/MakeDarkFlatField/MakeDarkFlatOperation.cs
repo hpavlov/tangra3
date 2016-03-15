@@ -185,6 +185,8 @@ namespace Tangra.VideoOperations.MakeDarkFlatField
 			hdr.AddValue("TANGRAVE", string.Format("{0} v{1}", VersionHelper.AssemblyProduct, VersionHelper.AssemblyFileVersion), null);
 			if (TangraConfig.Settings.Generic.ReverseGammaCorrection)
 				hdr.AddValue("TANGAMMA", TangraConfig.Settings.Photometry.EncodingGamma.ToString("0.0000", CultureInfo.InvariantCulture), null);
+			if (TangraConfig.Settings.Generic.ReverseCameraResponse)
+				hdr.AddValue("TANCMRSP", ((int)TangraConfig.Settings.Photometry.KnownCameraResponse).ToString(CultureInfo.InvariantCulture), null);
 
 			f.AddHDU(imageHDU);
 

@@ -183,6 +183,11 @@ namespace Tangra.VideoOperations
 					TangraCore.PreProcessors.AddGammaCorrection(TangraConfig.Settings.Photometry.EncodingGamma);
 				}
 
+				if (TangraConfig.Settings.Photometry.KnownCameraResponse != TangraConfig.KnownCameraResponse.Undefined)
+				{
+					TangraCore.PreProcessors.AddCameraResponseCorrection(TangraConfig.Settings.Photometry.KnownCameraResponse);
+				}
+
 				//if (VideoContext.Current.DarkFrameBytes != null)
 				//{
 				//    Core.PreProcessors.AddDarkFrame(VideoContext.Current.DarkFrameBytes);

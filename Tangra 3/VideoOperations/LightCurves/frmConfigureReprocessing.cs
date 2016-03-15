@@ -13,6 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Tangra.Controller;
+using Tangra.Helpers;
 using Tangra.Model.Astro;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
@@ -54,6 +55,7 @@ namespace Tangra.VideoOperations.LightCurves
 	        SetComboboxIndexFromPsfQuadratureMethod(m_Context.PsfQuadratureMethod);
         	cbxDigitalFilter.SelectedIndex = (int)m_Context.Filter;
         	nudGamma.Value = (decimal)m_Context.EncodingGamma;
+			cbxKnownResponse.SetCBXIndex((int)m_Context.ReverseCameraResponse);
 
 			int maxApertureSize = m_Footer.ReductionContext.GetMaxApertureSize();
 
@@ -539,6 +541,7 @@ namespace Tangra.VideoOperations.LightCurves
 			m_Context.PsfQuadratureMethod = ComboboxIndexToPsfQuadratureMethod();
 			m_Context.Filter = (LightCurveContext.FilterType)cbxDigitalFilter.SelectedIndex;
 			m_Context.EncodingGamma = (double)nudGamma.Value;
+			m_Context.ReverseCameraResponse = (TangraConfig.KnownCameraResponse)cbxKnownResponse.SelectedIndex;
             m_Context.PsfFittingMethod = TangraConfig.Settings.Photometry.PsfFittingMethod;
 
             DialogResult = DialogResult.OK;

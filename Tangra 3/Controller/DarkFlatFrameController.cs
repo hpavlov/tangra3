@@ -128,6 +128,36 @@ namespace Tangra.Controller
 							}
 						}
 
+						TangraConfig.KnownCameraResponse usedCameraResponse = TangraConfig.KnownCameraResponse.Undefined;
+						string usedCameraResponseString = null;
+						int usedCameraResponseInt = 0;
+						HeaderCard tangraCamResponseCard = imageHDU.Header.FindCard("TANCMRSP");
+						if (tangraCamResponseCard != null &&
+							int.TryParse(tangraCamResponseCard.Value, NumberStyles.Number, CultureInfo.InvariantCulture, out usedCameraResponseInt))
+						{
+							usedCameraResponse = (TangraConfig.KnownCameraResponse) usedCameraResponseInt;
+							usedCameraResponseString = usedCameraResponse.ToString();
+						}
+
+						string cameraResponseUsageError = null;
+						string currCameraResponseString = TangraConfig.Settings.Generic.ReverseCameraResponse
+							? TangraConfig.Settings.Photometry.KnownCameraResponse.ToString()
+							: null;
+						if (TangraConfig.Settings.Generic.ReverseCameraResponse && currCameraResponseString != null && usedCameraResponseString == null)
+							cameraResponseUsageError = string.Format("Selected image hasn't been corrected for camera reponse while the current video uses a camera response correction for {0}.", currCameraResponseString);
+						else if (!TangraConfig.Settings.Generic.ReverseCameraResponse && usedCameraResponseString != null && currCameraResponseString == null)
+							cameraResponseUsageError = string.Format("Selected image has been corrected for camera response of {0} while the current video doesn't use camera response correction.", usedCameraResponseString);
+						else if (TangraConfig.Settings.Generic.ReverseCameraResponse && !string.Equals(currCameraResponseString, usedCameraResponseString))
+							cameraResponseUsageError = string.Format("Selected image has been corrected for camera reponse of {0} while the current video uses a camera response correction for {1}.", usedCameraResponseString, currCameraResponseString);
+
+						if (cameraResponseUsageError != null)
+						{
+							if (m_VideoController.ShowMessageBox(cameraResponseUsageError + " Do you wish to continue?", "Tangra", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.No)
+							{
+								return false;
+							}
+						}
+
 						return true;
 					});
 

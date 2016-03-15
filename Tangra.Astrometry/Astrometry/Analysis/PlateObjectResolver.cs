@@ -124,6 +124,7 @@ namespace Tangra.Astrometry.Analysis
 				m_Stars,
 				magnitudeBandId,
 				1.0f,
+				TangraConfig.KnownCameraResponse.Undefined,
 				null, null, null,
 				ref r0);
 
