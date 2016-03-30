@@ -28,10 +28,11 @@ namespace Tangra.Config.SettingPannels
 		public override void LoadSettings()
 		{
 			nudGamma.SetNUDValue((decimal)TangraConfig.Settings.Photometry.RememberedEncodingGammaNotForDirectUse);
-			cbxGammaTheFullFrame.Checked = TangraConfig.Settings.Generic.ReverseGammaCorrection;		
+			cbxGammaTheFullFrame.Checked = TangraConfig.Settings.Generic.ReverseGammaCorrection;
 	
 			cbxKnownResponse.SetCBXIndex((int)TangraConfig.Settings.Photometry.KnownCameraResponse);
 			cbxCameraResponseFullFrame.Checked = TangraConfig.Settings.Generic.ReverseCameraResponse;
+            DeserializeCameraResponseParameters(TangraConfig.Settings.Photometry.KnownCameraResponseParams);
 
 			m_GammaWillChange = false;
 			m_CameraResponseReverseWillChange = false;
@@ -39,9 +40,27 @@ namespace Tangra.Config.SettingPannels
 			UpdateControlState();
 		}
 
-		public override void SaveSettings()
+	    public override bool ValidateSettings()
+	    {
+	        if (cbxCameraResponseFullFrame.Checked && cbxKnownResponse.SelectedIndex < 1)
+	        {
+                cbxKnownResponse.Focus();
+
+                MessageBox.Show(
+                    this,
+                    "Please select a camera response model",
+                    "Tangra",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                return false;
+	        }
+
+            return true;
+	    }
+
+	    public override void SaveSettings()
 		{
-			TangraConfig.Settings.Photometry.RememberedEncodingGammaNotForDirectUse = (float)nudGamma.Value;			
+			TangraConfig.Settings.Photometry.RememberedEncodingGammaNotForDirectUse = (float)nudGamma.Value;
 
 			if (cbxGammaTheFullFrame.Checked)
 			{
@@ -64,11 +83,13 @@ namespace Tangra.Config.SettingPannels
 				m_CameraResponseReverseWillChange = (int)TangraConfig.Settings.Photometry.KnownCameraResponse != cbxKnownResponse.SelectedIndex;
 				TangraConfig.Settings.Generic.ReverseCameraResponse = true;
 				TangraConfig.Settings.Photometry.KnownCameraResponse = (TangraConfig.KnownCameraResponse)cbxKnownResponse.SelectedIndex;
+			    TangraConfig.Settings.Photometry.KnownCameraResponseParams = SerializeCameraResponseParameters();
 			}
 			else
 			{
 				m_CameraResponseReverseWillChange = false;
 				TangraConfig.Settings.Generic.ReverseCameraResponse = false;
+                TangraConfig.Settings.Photometry.KnownCameraResponse = TangraConfig.KnownCameraResponse.Undefined;
 			}
 		}
 
@@ -90,6 +111,7 @@ namespace Tangra.Config.SettingPannels
 		{
 			pnlEnterGammaValue.Enabled = cbxGammaTheFullFrame.Checked;
 			pnlChooseKnownResponse.Enabled = cbxCameraResponseFullFrame.Checked;
+            pnlWAT910Response.Visible = cbxKnownResponse.SelectedIndex == 1 && cbxCameraResponseFullFrame.Checked;
 		}
 
 		public override void Reset()
@@ -102,5 +124,44 @@ namespace Tangra.Config.SettingPannels
 		{
 			UpdateControlState();
 		}
+
+        private void cbxKnownResponse_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            UpdateControlState();
+        }
+
+	    private int[] SerializeCameraResponseParameters()
+	    {
+            // At the moment we only support the WAT-910BD dual knee model
+	        var rv = new int[9];
+	        rv[0] = (int)nud910F0.Value;
+            rv[1] = (int)nud910F1.Value;
+            rv[2] = (int)nud910F2.Value;
+            rv[3] = (int)nud910F3.Value;
+            rv[4] = (int)nud910V0.Value;
+            rv[5] = (int)nud910V1.Value;
+            rv[6] = (int)nud910V2.Value;
+            rv[7] = (int)nud910V3.Value;
+            rv[8] = (int)nud910Max.Value;
+            return rv;
+	    }
+
+	    private void DeserializeCameraResponseParameters(int[] valueArray)
+	    {
+            // At the moment we only support the WAT-910BD dual knee model
+	        if (valueArray != null && valueArray.Length == 9)
+	        {
+	            nud910F0.SetNUDValue(valueArray[0]);
+                nud910F1.SetNUDValue(valueArray[1]);
+                nud910F2.SetNUDValue(valueArray[2]);
+                nud910F3.SetNUDValue(valueArray[3]);
+                nud910V0.SetNUDValue(valueArray[4]);
+                nud910V1.SetNUDValue(valueArray[5]);
+                nud910V2.SetNUDValue(valueArray[6]);
+                nud910V3.SetNUDValue(valueArray[7]);
+                nud910Max.SetNUDValue(valueArray[8]);
+	        }
+	    }
+	    
 	}
 }

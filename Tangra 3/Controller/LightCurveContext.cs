@@ -432,7 +432,7 @@ namespace Tangra.Controller
 
 					m_RequiresFullReprocessing = true;
 
-					throw new NotImplementedException();
+					//throw new NotImplementedException();
 
 				}
 			}

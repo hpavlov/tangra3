@@ -387,6 +387,8 @@ namespace Tangra.Model.Config
 		public enum KnownCameraResponse
 		{
 			Undefined = 0,
+
+            [Description("910HX")]
 			Wat910HXBD = 1
 		}
 
@@ -414,6 +416,7 @@ namespace Tangra.Model.Config
 			public float EncodingGamma = 1.0f;
 
 			public KnownCameraResponse KnownCameraResponse = KnownCameraResponse.Undefined;
+            public int[] KnownCameraResponseParams = null;
 
 			public ColourChannel ColourChannel = ColourChannel.Red;
 

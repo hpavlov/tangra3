@@ -185,7 +185,7 @@ namespace Tangra.VideoOperations
 
 				if (TangraConfig.Settings.Photometry.KnownCameraResponse != TangraConfig.KnownCameraResponse.Undefined)
 				{
-					TangraCore.PreProcessors.AddCameraResponseCorrection(TangraConfig.Settings.Photometry.KnownCameraResponse);
+                    TangraCore.PreProcessors.AddCameraResponseCorrection(TangraConfig.Settings.Photometry.KnownCameraResponse, TangraConfig.Settings.Photometry.KnownCameraResponseParams);
 				}
 
 				//if (VideoContext.Current.DarkFrameBytes != null)

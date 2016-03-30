@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using Tangra.Helpers;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
+using Tangra.Model.Helpers;
 using Tangra.Model.Video;
 using Tangra.PInvoke;
 using Tangra.Video;
@@ -160,7 +161,7 @@ namespace Tangra.View
 				}
 				if (preProcessingInfo.ReversedCameraResponse != TangraConfig.KnownCameraResponse.Undefined)
 				{
-					preProcessingInfoStr += string.Format("|REV:{0}", preProcessingInfo.ReversedCameraResponse.ToString());
+                    preProcessingInfoStr += string.Format("|REV:{0}", preProcessingInfo.ReversedCameraResponse.GetEnumDescription());
 					preProcessingInfoTooltip += string.Format("Reversing camera response for {0}\r\n", preProcessingInfo.ReversedCameraResponse.ToString());
 				}
 

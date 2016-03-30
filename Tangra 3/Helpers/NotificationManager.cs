@@ -51,7 +51,7 @@ namespace Tangra.Helpers
 
 		public void CameraResponseReverseChanged()
 		{
-			TangraCore.PreProcessors.AddCameraResponseCorrection(TangraConfig.Settings.Photometry.KnownCameraResponse);
+            TangraCore.PreProcessors.AddCameraResponseCorrection(TangraConfig.Settings.Photometry.KnownCameraResponse, TangraConfig.Settings.Photometry.KnownCameraResponseParams);
 		}
 
         public void NotifyFileProgressManagerBeginFileOperation(int maxSteps)

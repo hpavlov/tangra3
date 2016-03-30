@@ -29,7 +29,7 @@ DLL_PUBLIC HRESULT PreProcessingStretch(unsigned long* pixels, long width, long 
 DLL_PUBLIC HRESULT PreProcessingClip(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal, int fromValue, int toValue);
 DLL_PUBLIC HRESULT PreProcessingBrightnessContrast(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal, long brightness, long cotrast);
 DLL_PUBLIC HRESULT PreProcessingGamma(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal, float gamma);
-DLL_PUBLIC HRESULT PreProcessingReverseCameraResponse(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal, int knownCameraResponse);
+DLL_PUBLIC HRESULT PreProcessingReverseCameraResponse(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal, int knownCameraResponse, int* knownCameraResponseParams);
 DLL_PUBLIC HRESULT PreProcessingApplyBiasDarkFlatFrame(
 	unsigned long* pixels,
 	long width, 

@@ -16,6 +16,7 @@ long g_PreProcessingBrigtness;
 long g_PreProcessingContrast;
 float g_EncodingGamma;
 int g_KnownCameraResponse;
+int g_KnownCameraResponseParams[16];
 bool g_UsesPreProcessing = false;
 
 float* g_DarkFramePixelsCopy = NULL;
@@ -155,11 +156,26 @@ long PreProcessingAddGammaCorrection(float gamma)
 	return S_OK;
 }
 
-long PreProcessingAddCameraResponseCorrection(int knownCameraResponse)
+long PreProcessingAddCameraResponseCorrection(int knownCameraResponse, int* responseParams)
 {
 	g_KnownCameraResponse = knownCameraResponse;
 	g_UsesPreProcessing = g_UsesPreProcessing || g_KnownCameraResponse > 0;
 
+	if (knownCameraResponse == 1)
+	{
+		g_KnownCameraResponseParams[0] = rand(); // Random number to correspond to the current param configuration being set (as)
+		
+		// WAT-910BD dual knee mode - 9 parameter
+		g_KnownCameraResponseParams[1] = *responseParams;
+		g_KnownCameraResponseParams[2] = *(responseParams + 1);
+		g_KnownCameraResponseParams[3] = *(responseParams + 2);
+		g_KnownCameraResponseParams[4] = *(responseParams + 3);
+		g_KnownCameraResponseParams[5] = *(responseParams + 4);
+		g_KnownCameraResponseParams[6] = *(responseParams + 5);
+		g_KnownCameraResponseParams[7] = *(responseParams + 6);
+		g_KnownCameraResponseParams[8] = *(responseParams + 7);
+		g_KnownCameraResponseParams[9] = *(responseParams + 8);
+	}
 	return S_OK;
 }
 
@@ -273,7 +289,7 @@ long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height
 	}
 	else if (g_KnownCameraResponse > 0)
 	{
-		rv = PreProcessingReverseCameraResponse(pixels, width, height, bpp, normVal, g_KnownCameraResponse);
+		rv = PreProcessingReverseCameraResponse(pixels, width, height, bpp, normVal, g_KnownCameraResponse, g_KnownCameraResponseParams);
 		if (rv != S_OK) return rv;
 	}
 	

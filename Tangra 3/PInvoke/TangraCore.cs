@@ -428,7 +428,7 @@ namespace Tangra.PInvoke
 			private static extern int PreProcessingAddGammaCorrection(float encodingGamma);
 
 			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-			private static extern int PreProcessingAddCameraResponseCorrection(int knownCameraResponse);
+			private static extern int PreProcessingAddCameraResponseCorrection(int knownCameraResponse, int[] responseParams);
 
 			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
             private static extern int PreProcessingAddDarkFrame(float[] darkFramePixels, uint pixelsCount, float exposureSeconds, bool isBiasCorrected, bool isSameExposure);
@@ -500,9 +500,9 @@ namespace Tangra.PInvoke
                 PreProcessingAddGammaCorrection(encodingGamma);
 			}
 
-			public static void AddCameraResponseCorrection(TangraConfig.KnownCameraResponse cameraResponse)
+			public static void AddCameraResponseCorrection(TangraConfig.KnownCameraResponse cameraResponse, int[] responseParams)
 			{
-				PreProcessingAddCameraResponseCorrection((int)cameraResponse);
+                PreProcessingAddCameraResponseCorrection((int)cameraResponse, responseParams);
 			}
 
 			public static void AddFlipAndRotation(RotateFlipType rotateFlipType)

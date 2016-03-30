@@ -595,6 +595,96 @@ void BuildGammaTableForBpp(int bpp, unsigned long normVal, float gamma)
 	}
 }
 
+int s_CameraResponseTableBpp = 0;
+int s_CameraResponseNormVal = 0;
+int s_CameraResponseKnownCamera = 0;
+int s_CameraResponseKnownParamsThumbprint = 0;
+unsigned int* s_CameraResponseTable = NULL;
+
+void BuildCameraResponseTableForBpp(int knownCameraResponse, int bpp, unsigned long normVal, int* knownCameraResponseParams)
+{
+	if (s_CameraResponseTableBpp != bpp ||
+		s_CameraResponseNormVal != normVal ||
+	    s_CameraResponseKnownCamera != knownCameraResponse || 
+		s_CameraResponseKnownParamsThumbprint != *knownCameraResponseParams) {
+			
+		if (NULL != s_CameraResponseTable) {
+			delete s_CameraResponseTable;
+			s_CameraResponseTable = NULL;
+		}
+
+		int minValue;
+		int maxValue;		
+
+		float a, b, a1, b1, a2, b2, a3, b3;
+		float v0, v1, v2, v3, f0, f1, f2, f3;
+		
+		GetMinMaxValuesForBpp(bpp, normVal, &minValue, &maxValue);
+		
+		int dynamicRange = (maxValue - minValue);
+		
+		if (knownCameraResponse == 1)
+		{	
+			float MAX_PIX = *(knownCameraResponseParams + 9) * dynamicRange / 255.0;
+			f0 = *(knownCameraResponseParams + 1); 
+			f1 = *(knownCameraResponseParams + 2); 
+			f2 = *(knownCameraResponseParams + 3); 
+			f3 = *(knownCameraResponseParams + 4);
+			v0 = *(knownCameraResponseParams + 5); 
+			v1 = *(knownCameraResponseParams + 6); 
+			v2 = *(knownCameraResponseParams + 7); 
+			v3 = *(knownCameraResponseParams + 8);
+			
+			v0 = MAX_PIX * v0 / v3; v1 = MAX_PIX * v1 / v3; v2 = MAX_PIX * v2 / v3; v3 = MAX_PIX;
+			
+			a = (v3-v0) / (f3-f0);
+			b = v0 - a * f0;
+			a1 = (v1-v0) / (f1-f0);
+			b1 = v0 - a1 * f0;
+			a2 = (v2-v1) / (f2-f1);
+			b2 = v1 - a2 * f1;		
+			a3 = (v3-v2) / (f3-f2);
+			b3 = v2 - a3 * f2;
+		}
+
+		s_CameraResponseTable = (unsigned int*)malloc((maxValue + 1) * sizeof(unsigned int));
+
+		unsigned int* itt = s_CameraResponseTable;
+
+		for (int idx = 0; idx <= maxValue; idx++) {
+			
+			float conversionValue = 0;
+			
+			if (knownCameraResponse == 1)
+			{
+				// WAT-910HX/BD dual knee model Response Reversal
+				
+				// TODO:Implement a single knee model
+				
+				if (idx	<= v1) conversionValue = (float)((idx - b1) / a1);
+				else if (idx <= v2) conversionValue = (float)((idx - b2) / a2);
+				else conversionValue = (float)((idx - b3) / a3);			
+				
+				conversionValue = a * conversionValue + b;
+			}
+			
+			if (conversionValue + 0.5 >= maxValue)
+				*itt = maxValue;
+			else if (conversionValue + 0.5 < minValue)
+				*itt = minValue;
+			else
+				*itt = (unsigned int)(conversionValue + 0.5); // rounded to nearest int
+
+			itt++;
+		}
+
+		s_CameraResponseTableBpp = bpp;
+		s_CameraResponseNormVal = normVal;
+		s_CameraResponseKnownCamera = knownCameraResponse;
+		s_CameraResponseKnownParamsThumbprint = *knownCameraResponseParams;
+	}
+}
+
 HRESULT PreProcessingFlipRotate(unsigned long* pixels, long width, long height, int bpp, enum RotateFlipType flipRotateType)
 {
 	if (flipRotateType == 0) {
@@ -770,11 +860,25 @@ HRESULT PreProcessingGamma(unsigned long* pixels, long width, long height, int b
 	return S_OK;
 }
 
-DLL_PUBLIC HRESULT PreProcessingReverseCameraResponse(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal, int knownCameraResponse)
+DLL_PUBLIC HRESULT PreProcessingReverseCameraResponse(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal, int knownCameraResponse, int* knownCameraResponseParams)
 {
-	// TODO:
+	int minValue, maxValue;
+	GetMinMaxValuesForBpp(bpp, normVal, &minValue, &maxValue);
 	
-	return E_NOTIMPL;
+	if (knownCameraResponse == 1)
+	{
+		BuildCameraResponseTableForBpp(knownCameraResponse, bpp, normVal, knownCameraResponseParams);
+
+		long totalPixels = width * height;
+		unsigned long* pPixels = pixels;
+
+		while(totalPixels--) {
+			*pPixels = *(s_CameraResponseTable + *pPixels);
+			pPixels++;
+		}		
+	}
+	
+	return S_OK;
 }
 
 HRESULT PreProcessingApplyBiasDarkFlatFrame(
