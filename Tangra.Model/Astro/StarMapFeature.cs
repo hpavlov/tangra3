@@ -133,6 +133,11 @@ namespace Tangra.Model.Astro
 			}
 		}
 
+		public int MaxBrightnessPixels
+		{
+			get { return m_MaxBrightnessPixels; }
+		}
+
 		private uint m_Intencity = UInt32.MaxValue;
 		public uint Intensity
 		{

@@ -336,12 +336,15 @@ namespace Tangra.Astrometry.Recognition
 				if (m_Solution != null)
                 {
                     if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceError())
-					    Trace.WriteLine(string.Format(
-						    "Pyramid Match Successful: {0} ms, {1} stars total, aligned on {2} stars, {3} stars matched. Combination: {4}",
-						    m_PerformanceWatch.ElapsedMilliseconds, m_CelestialStars.Count,
-						    alignmentResult != null ? (alignmentResult.Solution as LeastSquareFittedAstrometry).FitInfo.NumberOfStarsUnsedInSolution() : 0,
-						    improvedSolution != null ? improvedSolution.FitInfo.NumberOfStarsUnsedInSolution().ToString() : "N/A",
-						    alignmentResult != null ? alignmentResult.MatchedTriangle : null));
+                    {
+                        Trace.WriteLine(string.Format(
+                            "Pyramid Match Successful: {0} ms, {1} stars total, aligned on {2} stars, {3} stars matched {4}. Combination: {5}",
+                            m_PerformanceWatch.ElapsedMilliseconds, m_CelestialStars.Count,
+                            alignmentResult != null ? (alignmentResult.Solution as LeastSquareFittedAstrometry).FitInfo.NumberOfStarsUnsedInSolution() : 0,
+                            improvedSolution != null ? improvedSolution.FitInfo.NumberOfStarsUnsedInSolution().ToString() : "N/A",
+                            improvedSolution != null ? string.Format(" ({0}-{1} mag)", Context.ImprovedSolutionIncludedMinMag.ToString("0.00"), Context.ImprovedSolutionIncludedMaxMag.ToString("0.00")) : null,
+                            alignmentResult != null ? alignmentResult.MatchedTriangle : null));   
+                    }
                 }
 				else
 				{
