@@ -22,28 +22,28 @@ namespace Tangra.Model.Astro
 
     public static class StarFinder
     {
-        public static List<PSFFit> GetStarsInArea(ref uint[,] data, int bpp, uint noiseValue)
+        public static List<PSFFit> GetStarsInArea(ref uint[,] data, int bpp, uint maxSignalValue, uint noiseValue)
         {
-            return GetStarsInArea(ref data, bpp, noiseValue, TangraConfig.PreProcessingFilter.NoFilter);
+            return GetStarsInArea(ref data, bpp, maxSignalValue, noiseValue, TangraConfig.PreProcessingFilter.NoFilter);
         }
 
-        public static List<PSFFit> GetStarsInArea(ref uint[,] data, int bpp, uint noiseValue, TangraConfig.PreProcessingFilter filter)
+        public static List<PSFFit> GetStarsInArea(ref uint[,] data, int bpp, uint maxSignalValue, uint noiseValue, TangraConfig.PreProcessingFilter filter)
         {
-            return GetStarsInArea(ref data, bpp, noiseValue, filter, null, null);
+            return GetStarsInArea(ref data, bpp, maxSignalValue, noiseValue, filter, null, null);
         }
 
         internal static List<PSFFit> GetStarsInArea(
-            ref uint[,] data, int bpp, uint noiseValue, TangraConfig.PreProcessingFilter filter,
+            ref uint[,] data, int bpp, uint maxSignalValue, uint noiseValue, TangraConfig.PreProcessingFilter filter,
             List<PotentialStarStruct> allPotentialStars,
             List<PSFFit> allFoundStars)
         {
             uint ABOVE_NOISE_LEVEL_REQUIRED = TangraConfig.Settings.Special.StarFinderAboveNoiseLevel;
             double MIN_DISTANCE = TangraConfig.Settings.Special.StarFinderMinSeparation;
-            return GetStarsInArea(ref data, bpp, filter, allPotentialStars, allFoundStars, noiseValue + ABOVE_NOISE_LEVEL_REQUIRED, MIN_DISTANCE);
+            return GetStarsInArea(ref data, bpp, maxSignalValue, filter, allPotentialStars, allFoundStars, noiseValue + ABOVE_NOISE_LEVEL_REQUIRED, MIN_DISTANCE);
         }
 
         internal static List<PotentialStarStruct> GetPeakPixelsInArea(
-            uint[,] data, out uint[,] lpdData, int bpp, uint aboveNoiseLevelRequired,
+            uint[,] data, out uint[,] lpdData, int bpp, uint maxSignalValue, uint aboveNoiseLevelRequired,
             double minDistanceInPixels, bool useLPDFilter, Rectangle excludeArea)
         {
 
@@ -51,7 +51,7 @@ namespace Tangra.Model.Astro
                 lpdData = ImageFilters.LowPassDifferenceFilter(data, bpp, false);
             else
                 lpdData = data;
-
+            
             int nWidth = lpdData.GetLength(0);
             int nHeight = lpdData.GetLength(1);
 
@@ -96,7 +96,7 @@ namespace Tangra.Model.Astro
             if (useLPDFilter)
                 CheckAllPixels(lpdData, nWidth, nHeight, aboveNoiseLevelRequired, excludeArea, examinePixelCallback);
             else
-                CheckPixelsFromBrightToFaint(lpdData, nWidth, nHeight, bpp, aboveNoiseLevelRequired, excludeArea, examinePixelCallback);
+                CheckPixelsFromBrightToFaint(lpdData, nWidth, nHeight, bpp, maxSignalValue, aboveNoiseLevelRequired, excludeArea, examinePixelCallback);
 
             return potentialStars;
         }
@@ -132,17 +132,18 @@ namespace Tangra.Model.Astro
 
         }
 
-        private static void CheckPixelsFromBrightToFaint(uint[,] data, int nWidth, int nHeight, int bpp, uint aboveNoiseLevelRequired, Rectangle excludeArea, ExaminePeakPixelCandidate callback)
+        private static void CheckPixelsFromBrightToFaint(
+            uint[,] data, int nWidth, int nHeight, int bpp, uint maxSignalValue, uint aboveNoiseLevelRequired, Rectangle excludeArea, ExaminePeakPixelCandidate callback)
         {
             bool excludeAreaDefined = Rectangle.Empty != excludeArea;
 
 	        int includsionCheckStep = 10;
 			if (bpp == 12) includsionCheckStep = 50;
 			else if (bpp == 14) includsionCheckStep = 60;
+            else if (bpp == 16) includsionCheckStep = 100;
 
 	        int maxPixelValue = 255;
-			if (bpp == 12) maxPixelValue = 0xFFF;
-			else if (bpp == 14) maxPixelValue = 0x3FFF;
+			if (bpp > 8) maxPixelValue = (int)maxSignalValue;
 
 			int currInclusionLimit = maxPixelValue - includsionCheckStep + 1;
 
@@ -177,19 +178,19 @@ namespace Tangra.Model.Astro
         }
 
         internal static List<PSFFit> GetStarsInArea(
-            ref uint[,] data, int bpp, TangraConfig.PreProcessingFilter filter,
+            ref uint[,] data, int bpp, uint maxSignalValue, TangraConfig.PreProcessingFilter filter,
             List<PotentialStarStruct> allPotentialStars,
             List<PSFFit> allFoundStars,
             uint aboveNoiseLevelRequired, double minDistanceInPixels)
         {
-            return GetStarsInArea(ref data, bpp, filter, allPotentialStars,
+            return GetStarsInArea(ref data, bpp, maxSignalValue, filter, allPotentialStars,
                 allFoundStars, aboveNoiseLevelRequired, minDistanceInPixels, filter == TangraConfig.PreProcessingFilter.LowPassDifferenceFilter, Rectangle.Empty, null);
         }
 
         public delegate void FilterPotentialStars(List<PotentialStarStruct> peakPixels);
 
         public static List<PSFFit> GetStarsInArea(
-            ref uint[,] data, int bpp, TangraConfig.PreProcessingFilter filter,
+            ref uint[,] data, int bpp, uint maxSignalValue, TangraConfig.PreProcessingFilter filter,
             List<PotentialStarStruct> allPotentialStars,
             List<PSFFit> allFoundStars,
             uint aboveNoiseLevelRequired, double minDistanceInPixels,
@@ -205,7 +206,7 @@ namespace Tangra.Model.Astro
             sw.Start();
             uint[,] lpdData;
             List<PotentialStarStruct> potentialStars = GetPeakPixelsInArea(
-                data, out lpdData, bpp, aboveNoiseLevelRequired, minDistanceInPixels, useLPDFilter, excludeArea);
+                data, out lpdData, bpp, maxSignalValue, aboveNoiseLevelRequired, minDistanceInPixels, useLPDFilter, excludeArea);
 
             if (filterCallback != null) filterCallback(potentialStars);
             sw.Stop();

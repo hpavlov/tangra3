@@ -23,6 +23,8 @@ namespace Tangra.Model.Astro
 		int Width { get; }
 		int Height { get; }
 		uint[] GetPixelmapPixels();
+	    int BitPix { get; }
+        uint MaxSignalValue { get; }
 	}
 
 	public class AstroImage : IAstroImage
@@ -67,6 +69,16 @@ namespace Tangra.Model.Astro
         {
             get { return m_Pixelmap; }
         }
+
+	    public int BitPix
+	    {
+	        get { return m_Pixelmap.BitPixCamera; }
+	    }
+
+	    public uint MaxSignalValue
+	    {
+	        get { return m_Pixelmap.MaxSignalValue; }
+	    }
 
 		public uint[,] GetPixelsCopy()
 		{

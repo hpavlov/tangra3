@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -38,6 +40,14 @@ namespace Tangra.Video.FITS
             return m_FitsFiles;
         }
 
+        public string ErrorMessage { get; private set; }
+
+        internal class FitsFileFormatInfoRecord
+        {
+            public string FirstFile;
+            public int NumFiles;
+        }
+
         private void frmSortFitsFiles_Shown(object sender, EventArgs e)
         {
             m_FitsHeaders = new Header[m_FitsFiles.Length];
@@ -47,12 +57,26 @@ namespace Tangra.Video.FITS
             pbar.Maximum = m_FitsFiles.Length;
             pbar.Value = 0;
 
+            var fileSizeInfo = new Dictionary<string, FitsFileFormatInfoRecord>();
+
             for (int i = 0; i < m_FitsFiles.Length; i++)
             {
                 using (BufferedFile bf = new BufferedFile(m_FitsFiles[i], FileAccess.Read, FileShare.ReadWrite))
                 {
                     Header hdr = Header.ReadHeader(bf);
                     m_FitsHeaders[i] = hdr;
+
+                    int numAxis = -1;
+                    int width = -1;
+                    int height = -1;
+                    int.TryParse(hdr.FindCard("NAXIS") != null ? hdr.FindCard("NAXIS").Value : "0", out numAxis);
+                    int.TryParse(hdr.FindCard("NAXIS1") != null ? hdr.FindCard("NAXIS1").Value : "0", out width);
+                    int.TryParse(hdr.FindCard("NAXIS2") != null ? hdr.FindCard("NAXIS2").Value : "0", out height);
+                    string format = String.Format("{0} x {1}", width, height);
+                    if (fileSizeInfo.ContainsKey(format))
+                        fileSizeInfo[format].NumFiles++;
+                    else
+                        fileSizeInfo.Add(format, new FitsFileFormatInfoRecord { FirstFile = Path.GetFileName(m_FitsFiles[i]), NumFiles = 1 });
 
                     bool isMidPoint;
                     double? fitsExposure;
@@ -72,6 +96,19 @@ namespace Tangra.Video.FITS
             pbar.Value = pbar.Minimum;
             Application.DoEvents();
 
+            if (fileSizeInfo.Count > 1)
+            {
+                var errorInfo = new StringBuilder();
+                foreach (string key in fileSizeInfo.Keys)
+                {
+                    if (fileSizeInfo[key].NumFiles > 1)
+                        errorInfo.AppendFormat("'{1}' and {2} other files: {0}\r\n", key, fileSizeInfo[key].FirstFile, fileSizeInfo[key].NumFiles - 1);
+                    else
+                        errorInfo.AppendFormat("'{1}' (single file): {0}\r\n", key, fileSizeInfo[key].FirstFile);
+                }
+                ErrorMessage = string.Format("Cannot load FITS file sequence because there are files with different image dimentions:\r\n\r\n{0}\r\n\r\nPlease ensure that all files in the directory have the same dimention (number of axis).", errorInfo.ToString());
+
+            }
             timer1.Enabled = true;
         }
 

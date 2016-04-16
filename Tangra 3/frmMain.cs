@@ -1066,6 +1066,12 @@ namespace Tangra
                     {
                         TangraConfig.Settings.LastUsed.FitsSeqenceLastFolderLocation = frm.tbxFolderPath.Text;
 
+                        if (tsmiDynamic.Checked)
+                        {
+                            var frmDynRange = new frmDefineDisplayDynamicRange(m_VideoController);
+                            frmDynRange.ShowDialog(this);
+                        }
+
                         SelectVideoOperation();
                     }
                     else

@@ -282,6 +282,7 @@ namespace Tangra.VideoOperations.LightCurves
                 m_AutoStarsInLargerArea = StarFinder.GetStarsInArea(
                     ref autoStarsPixels,
                     m_AstroImage.Pixelmap.BitPixCamera,
+                    m_AstroImage.Pixelmap.MaxSignalValue,
                     m_AstroImage.MedianNoise,
                     LightCurveReductionContext.Instance.DigitalFilter);
 

@@ -220,6 +220,12 @@ namespace Tangra.Controller
                 frm.SetFiles(fitsFiles);
                 frm.StartPosition = FormStartPosition.CenterParent;
                 frm.ShowDialog(m_MainForm);
+                if (!string.IsNullOrWhiteSpace(frm.ErrorMessage))
+                {
+                    ShowMessageBox(frm.ErrorMessage, "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
+
                 fitsFiles = frm.GetSortedFiles();
 
 	            try

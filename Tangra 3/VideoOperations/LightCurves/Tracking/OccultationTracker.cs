@@ -200,7 +200,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 				List<PotentialStarStruct> peakPixels = new List<PotentialStarStruct>();
 				AutoDiscoveredStars.Clear();
 				AutoDiscoveredStars = StarFinder.GetStarsInArea(
-					ref pixels, 8, TangraConfig.PreProcessingFilter.NoFilter, peakPixels, null,
+                    ref pixels, astroImage.BitPix, astroImage.MaxSignalValue, TangraConfig.PreProcessingFilter.NoFilter, peakPixels, null,
 					(uint)Math.Round(TangraConfig.Settings.Special.LostTrackingMinSignalCoeff * m_MinLocateSignal),
 					TangraConfig.Settings.Special.LostTrackingMinDistance, false,
 					LightCurveReductionContext.Instance.OSDFrame, ReducePeakPixels);
