@@ -953,8 +953,6 @@ namespace Tangra.Controller
 			OnVideoPlayerStopped();
 
 			m_VideoFileView.Update();
-
-            TangraContext.Current.OperationInProgress = false;
 		}
 
 	    private bool savedCanScrollFramesStateOnVideoStarted = false;
@@ -968,6 +966,7 @@ namespace Tangra.Controller
 		private void OnVideoPlayerStopped()
 		{
 			TangraContext.Current.CanScrollFrames = savedCanScrollFramesStateOnVideoStarted;
+            TangraContext.Current.OperationInProgress = false;
 		}
 
 		public void RefreshCurrentFrame()
