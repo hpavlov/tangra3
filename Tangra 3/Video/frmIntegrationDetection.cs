@@ -434,7 +434,7 @@ namespace Tangra.Video
 						for (int i = 1; i < guesses.Count; i++)
 						{
 							if (guesses[i].Interval != 2 * prevInterval ||
-								firstFrame != guesses[i].StartingAtFrame)
+                                Math.Abs(firstFrame - guesses[i].StartingAtFrame) % prevInterval != 0)
 							{
 								isResonance = false;
 								break;
