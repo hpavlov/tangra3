@@ -2674,7 +2674,32 @@ namespace Tangra.Astrometry.Recognition
 						}
 					}
 
-					if (DebugResolvedStars != null)
+
+                    // Check how many of the considered stars, brighter than the detected limiting magnitude were note used in the solution
+				    int detectedStars = 0;
+                    int consideredStars = 0;
+                    double checkMag = ImprovedSolutionIncludedMaxMag;
+				    foreach (IStar catStar in ConsideredStars)
+				    {
+                        if (catStar.Mag < checkMag)
+				        {
+                            double x, y;
+                            m_ImprovedSolution.GetImageCoordsFromRADE(catStar.RADeg, catStar.DEDeg, out x, out y);
+                            if (x > 0 && y > 0 && x < m_PlateConfig.ImageWidth && y < m_PlateConfig.ImageHeight)
+                            {
+                                consideredStars++;
+                                if (m_ImprovedSolution.FitInfo.AllStarPairs.FirstOrDefault(s => s.StarNo == catStar.StarNo) != null)
+                                    detectedStars++;
+                            }				            
+				        }				        
+				    }
+                    double detectedConsideredStarsPercentage = 1.0 * detectedStars/consideredStars;
+                    if (detectedConsideredStarsPercentage < 0.25)
+				    {
+				        return false;
+				    }
+
+				    if (DebugResolvedStars != null)
 					{
 						DebugTripple tripple = m_DebugTripples.FirstOrDefault(t =>
 							(t.Id1 == i && t.Id2 == j && t.Id3 == k) ||
@@ -2956,30 +2981,32 @@ namespace Tangra.Astrometry.Recognition
 
 			double ffl = fit.FitInfo.FittedFocalLength;
 			m_ImprovedSolution = m_SolutionSolver.SolveWithLinearRegression(m_Settings, out m_FirstImprovedSolution);
-			if (m_ImprovedSolution != null && m_ImprovedSolution.FitInfo.AllStarPairs.Count < 12)
-	        {
-				// Attempt to reject errorous solutions with small number of fitted stars 
-		        int totalMatched = 0;
-		        var largeFeatures = m_StarMap.Features.Where(x => x.MaxBrightnessPixels > 1).ToList();
-		        if (largeFeatures.Count > 5)
-		        {					
-					foreach (var feature in largeFeatures)
-					{
-						var ftrCenter = feature.GetCenter();
-						// TODO: PFS Fit on the feature?
-						var matchedFittedStar = m_ImprovedSolution.FitInfo.AllStarPairs.FirstOrDefault(
-							x => Math.Sqrt(Math.Pow(x.x - ftrCenter.XDouble, 2) + Math.Pow(x.x - ftrCenter.XDouble, 2)) < 2);
-						if (matchedFittedStar != null) totalMatched++;
-					}
+            if (m_ImprovedSolution != null && m_ImprovedSolution.FitInfo.AllStarPairs.Count < 12)
+            {
+                // Attempt to reject errorous solutions with small number of fitted stars 
+                int totalMatched = 0;
+                var largeFeatures = m_StarMap.Features.Where(x => x.MaxBrightnessPixels > 1).ToList();
+                if (largeFeatures.Count > 5)
+                {
+                    foreach (var feature in largeFeatures)
+                    {
+                        var ftrCenter = feature.GetCenter();
+                        // TODO: PFS Fit on the feature?
+                        var matchedFittedStar = m_ImprovedSolution.FitInfo.AllStarPairs.FirstOrDefault(
+                            x =>
+                                Math.Sqrt(Math.Pow(x.x - ftrCenter.XDouble, 2) + Math.Pow(x.x - ftrCenter.XDouble, 2)) <
+                                2);
+                        if (matchedFittedStar != null) totalMatched++;
+                    }
 
-					double percentLargeFeaturesMatched = 1.0 * totalMatched / largeFeatures.Count;
-			        if (percentLargeFeaturesMatched < 0.75)
+                    double percentLargeFeaturesMatched = 1.0*totalMatched/largeFeatures.Count;
+                    if (percentLargeFeaturesMatched < 0.75)
                         // At least 75% of the bright features from the video need to be matched to stars for the solution to be accepted
-				        m_ImprovedSolution = null;
-		        }
-	        }
-
-	        if (m_ImprovedSolution != null)
+                        m_ImprovedSolution = null;
+                }
+            }
+            
+            if (m_ImprovedSolution != null)
 			{
 				m_ImprovedSolution.FitInfo.FittedFocalLength = ffl;
 
