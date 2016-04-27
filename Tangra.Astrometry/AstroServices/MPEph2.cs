@@ -106,6 +106,16 @@ namespace Tangra.AstroServices
 			public double DEDeg { get; set; }
 			public string ObjectName { get; set; }
 			public double Mag { get; set; }
+
+            public bool IsCheckedAgainstSolvedPlate { get; set; }
+
+            public void MarkCheckedAgainstSolvedPlate(double raHours, double deDeg)
+            {
+                IsCheckedAgainstSolvedPlate = true;
+                RAHours = raHours;
+                DEDeg = deDeg;
+            }
+
 		}
 
 		internal static class MPEph2ResponseParser

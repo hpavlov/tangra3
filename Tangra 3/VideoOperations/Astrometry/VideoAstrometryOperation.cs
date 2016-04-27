@@ -29,6 +29,7 @@ using Tangra.SDK;
 using Tangra.StarCatalogues;
 using Tangra.VideoOperations.Astrometry.Engine;
 using Tangra.PInvoke;
+using Tangra.VideoOperations.LightCurves.Tracking;
 
 namespace Tangra.VideoOperations.Astrometry
 {
@@ -678,7 +679,67 @@ namespace Tangra.VideoOperations.Astrometry
 
 			AstrometryContext.Current.CurrentAstrometricFit = m_AstrometricFit;
 			AstrometryContext.Current.CurrentPhotometricFit = m_PhotometricFit;
+
+		    LocateOnlineObjectsToStars();
 		}
+
+	    private void LocateOnlineObjectsToStars()
+	    {
+            #region Draw all identified objects
+
+            if (m_AstrometricFit != null && 
+                m_AstrometricState != null &&
+                m_AstrometricState.IdentifiedObjects.Count > 0)
+            {
+                foreach (IIdentifiedObject entry in m_AstrometricState.IdentifiedObjects)
+                {
+                    if (entry.IsCheckedAgainstSolvedPlate) continue;
+
+                    double x, y;
+                    m_AstrometricFit.GetImageCoordsFromRADE(entry.RAHours * 15.0, entry.DEDeg, out x, out y);
+                    if (x > 0 && y > 0 && x < m_AstroImage.Width && y < m_AstroImage.Height)
+                    {
+                        var objectImagePixel = new ImagePixel(x, y);
+
+                        //var distancesList = new List<double>();
+                        //var starNos = new List<ulong>();
+
+                        //foreach (var pair in m_AstrometricFit.FitInfo.AllStarPairs)
+                        //{
+                        //    double distPix = Math.Sqrt((pair.x - x)*(pair.x - x) + (pair.y - y)*(pair.y - y));
+
+                        //    distancesList.Add(distPix);
+                        //    starNos.Add(pair.StarNo);
+                        //}
+
+                        //var distansesArr = distancesList.ToArray();
+                        //var starNosArray = starNos.ToArray();
+
+                        //Array.Sort(distansesArr, starNosArray);
+
+                        var closeByFeatures = m_StarMap.Features.Where(
+                            f =>
+                                f.GetCenter().DistanceTo(objectImagePixel) <
+                                CoreAstrometrySettings.Default.OnlineObjectIdentificationArea).ToList();
+
+                        closeByFeatures.RemoveAll(f => m_AstrometricFit.FitInfo.AllStarPairs.Exists(fi => fi.FeatureId == f.FeatureId));
+
+                        if (closeByFeatures.Any())
+                        {
+                            closeByFeatures.Sort((f, g) => f.GetCenter().DistanceTo(objectImagePixel).CompareTo(g.GetCenter().DistanceTo(objectImagePixel)));
+                            var identifiedFeature = closeByFeatures.First();
+
+                            double raDeg, deDeg;
+                            m_AstrometricFit.GetRADEFromImageCoords(identifiedFeature.GetCenter().X, identifiedFeature.GetCenter().Y, out raDeg, out deDeg);
+                            entry.MarkCheckedAgainstSolvedPlate(raDeg / 15.0, deDeg);
+                        }
+                        
+                    }
+                }
+            }
+
+            #endregion
+	    }
 
 		private void MeasurePositionInFrames(int frameNo)
 		{

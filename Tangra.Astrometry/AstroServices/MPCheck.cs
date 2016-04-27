@@ -123,6 +123,8 @@ namespace Tangra.AstroServices
         double RAHours { get; }
         double DEDeg { get; }
         double Mag { get; }
+        bool IsCheckedAgainstSolvedPlate { get; }
+        void MarkCheckedAgainstSolvedPlate(double raDeg, double deDeg);
     }
 
 	public class MPCheckEntry : IIdentifiedObject
@@ -131,6 +133,15 @@ namespace Tangra.AstroServices
 		public double RAHours { get; set; }
 		public double DEDeg { get; set; }
 		public double Mag { get; set; }
+
+        public bool IsCheckedAgainstSolvedPlate { get; set; }
+
+	    public void MarkCheckedAgainstSolvedPlate(double raHours, double deDeg)
+	    {
+	        IsCheckedAgainstSolvedPlate = true;
+	        RAHours = raHours;
+	        DEDeg = deDeg;
+	    }
 	}
 
 }

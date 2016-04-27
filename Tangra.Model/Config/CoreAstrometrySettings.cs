@@ -21,5 +21,7 @@ namespace Tangra.Model.Config
 
 	    public double SearchArea = 10;
 
+	    public int OnlineObjectIdentificationArea = 20; // pixels
+
 	}
 }
