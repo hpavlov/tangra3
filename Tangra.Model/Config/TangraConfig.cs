@@ -1687,7 +1687,7 @@ namespace Tangra.Model.Config
 
 				MinimumNumberOfStars = 7;
 				MaximumNumberOfStars = 100;
-				MaxResidual = 1.0;
+                MaxResidualInPixels = 1.0;
 				MaximumPSFElongation = 35;
 
 				AlignmentMethod = FieldAlignmentMethod.Pyramid;
@@ -1716,7 +1716,7 @@ namespace Tangra.Model.Config
 				clone.Method = this.Method;
 				clone.MinimumNumberOfStars = this.MinimumNumberOfStars;
 				clone.MaximumNumberOfStars = this.MaximumNumberOfStars;
-				clone.MaxResidual = this.MaxResidual;
+                clone.MaxResidualInPixels = this.MaxResidualInPixels;
 				clone.AlignmentMethod = this.AlignmentMethod;
 #pragma warning disable 612,618
 				clone.PyramidDistanceTolerance = this.PyramidDistanceTolerance;
@@ -1754,11 +1754,11 @@ namespace Tangra.Model.Config
 
 			public int MaximumPSFElongation { get; set; }
 
-			public double MaxResidual { get; set; }
+			public double MaxResidualInPixels { get; set; }
 
 			public double MaxPreliminaryResidual
 			{
-				get { return MaxResidual * 6.0; }
+                get { return MaxResidualInPixels * 6.0; }
 			}
 
 			public FieldAlignmentMethod AlignmentMethod { get; set; }

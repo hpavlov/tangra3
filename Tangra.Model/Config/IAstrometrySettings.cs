@@ -25,7 +25,7 @@ namespace Tangra.Model.Config
 		AstrometricMethod Method { get; }
 		int MinimumNumberOfStars { get; }
 		int MaximumNumberOfStars { get; }
-		double MaxResidual { get; }
+        double MaxResidualInPixels { get; }
 
 		FieldAlignmentMethod AlignmentMethod { get; }
        	double MaxPreliminaryResidual { get; }

@@ -96,7 +96,7 @@ namespace Tangra.Astrometry.Recognition
 			IAstrometryController astrometryController,
 			AstroPlate plateConfigs,
 			IAstrometrySettings settings,
-			double maxLeastSquareResidual,
+			double maxLeastSquareResidualInPixels,
 			double minMag,
 			double maxMag)
 		{
@@ -109,7 +109,7 @@ namespace Tangra.Astrometry.Recognition
 			m_MinMag = minMag;
 			m_MaxMag = maxMag;
 
-			m_MaxLeastSquareResidual = maxLeastSquareResidual;
+            m_MaxLeastSquareResidual = maxLeastSquareResidualInPixels * Math.Max(plateConfigs.EffectivePixelWidth, plateConfigs.EffectivePixelHeight);
 			m_AstrometryController = astrometryController;
 
 			m_AstrometryController.Subscribe(this, typeof(OperationNotifications));

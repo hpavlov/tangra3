@@ -353,7 +353,7 @@ namespace Tangra.ImageTools
 			m_CalibrationContext.PlateConfig = m_Image;
 
 			TangraConfig.AstrometrySettings calibrationSettings = TangraConfig.Settings.Astrometry.Clone();
-			calibrationSettings.MaxResidual = CorePyramidConfig.Default.CalibrationMaxResidual;
+            calibrationSettings.MaxResidualInPixels = CorePyramidConfig.Default.CalibrationMaxResidualInPixels;
 			calibrationSettings.PyramidDistanceToleranceInPixels = CorePyramidConfig.Default.CalibrationPyramidDistanceToleranceInPixels;
 			calibrationSettings.MinimumNumberOfStars = CorePyramidConfig.Default.CalibrationNumberOfStars;
 			m_PlateCalibrator = new PlateCalibration(m_CalibrationContext, calibrationSettings, m_AstrometryController);

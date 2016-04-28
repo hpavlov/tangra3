@@ -110,7 +110,7 @@ namespace Tangra.Astrometry.Recognition
 
 			m_AstrometryController = astrometryController;
 
-			Context = new DistanceBasedContext(astrometryController, plateConfig, fitSettings, fitSettings.MaxResidual, m_AstrometryMinMag, m_AstrometryMaxMag);
+            Context = new DistanceBasedContext(astrometryController, plateConfig, fitSettings, fitSettings.MaxResidualInPixels, m_AstrometryMinMag, m_AstrometryMaxMag);
 		}
 
 		public void InitNewMatch(IStarMap imageFeatures, PyramidMatchType matchType)

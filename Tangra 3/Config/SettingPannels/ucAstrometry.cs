@@ -24,7 +24,7 @@ namespace Tangra.Config.SettingPannels
 			nudAstrMinimumStars.SetNUDValue(TangraConfig.Settings.Astrometry.MinimumNumberOfStars);
 			nudAstrMaximumStars.SetNUDValue(TangraConfig.Settings.Astrometry.MaximumNumberOfStars);
 			nudMaxElongation.SetNUDValue((decimal)TangraConfig.Settings.Astrometry.MaximumPSFElongation);
-			nudAstrMaxResidual.SetNUDValue((decimal)TangraConfig.Settings.Astrometry.MaxResidual);
+            nudAstrMaxResidual.SetNUDValue((decimal)TangraConfig.Settings.Astrometry.MaxResidualInPixels);
 			cbForceStellarObjectRequirements.Checked = TangraConfig.Settings.Astrometry.PyramidRemoveNonStellarObject;
 
 			nudAstrDistTolerance.SetNUDValue((decimal)TangraConfig.Settings.Astrometry.PyramidDistanceToleranceInPixels);
@@ -47,7 +47,7 @@ namespace Tangra.Config.SettingPannels
 			TangraConfig.Settings.Astrometry.MinimumNumberOfStars = (int)nudAstrMinimumStars.Value;
 			TangraConfig.Settings.Astrometry.MaximumNumberOfStars = (int)nudAstrMaximumStars.Value;
 			TangraConfig.Settings.Astrometry.MaximumPSFElongation = (int)nudMaxElongation.Value;
-			TangraConfig.Settings.Astrometry.MaxResidual = (double)nudAstrMaxResidual.Value;
+            TangraConfig.Settings.Astrometry.MaxResidualInPixels = (double)nudAstrMaxResidual.Value;
 			TangraConfig.Settings.Astrometry.PyramidRemoveNonStellarObject = cbForceStellarObjectRequirements.Checked;
 
 			TangraConfig.Settings.Astrometry.PyramidDistanceToleranceInPixels = (double)nudAstrDistTolerance.Value;

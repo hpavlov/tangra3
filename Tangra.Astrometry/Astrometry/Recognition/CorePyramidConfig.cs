@@ -100,9 +100,9 @@ namespace Tangra.Astrometry.Recognition
 
 
 		/// <summary>
-		/// The max IAstrometricSettings.MaxResidual when doing calibration
+        /// The max IAstrometricSettings.MaxResidualInPixels when doing calibration
 		/// </summary>
-		public double CalibrationMaxResidual = 3.0;
+		public double CalibrationMaxResidualInPixels = 3.0;
 
 		/// <summary>
 		/// The max IAstrometricSettings.PyramidDistanceTolerance when doing calibration
