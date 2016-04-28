@@ -51,15 +51,19 @@ namespace Tangra.AstroServices
 				int startIdx = responseString.IndexOf("<pre>");
 				int endIdx = responseString.IndexOf("</pre>");
 
-				List<MPCheckEntry> parsedData = ParseMPCheckResponse(responseString.Substring(startIdx + 5, endIdx - startIdx - 5));
+			    if (startIdx > -1)
+			    {
+                    List<MPCheckEntry> parsedData = ParseMPCheckResponse(responseString.Substring(startIdx + 5, endIdx - startIdx - 5));
 
-				return parsedData;
+                    return parsedData;			        
+			    }
 			}
 			catch (Exception ex)
 			{
 				Trace.WriteLine(ex.ToString());
-				return null;
 			}
+
+            return new List<MPCheckEntry>();
 		}
 
 		private static List<MPCheckEntry> ParseMPCheckResponse(string preTagContent)

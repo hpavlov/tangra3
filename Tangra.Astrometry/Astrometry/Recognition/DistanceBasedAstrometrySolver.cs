@@ -238,7 +238,7 @@ namespace Tangra.Astrometry.Recognition
 					!m_FitSettings.PyramidForceFixedFocalLength &&
 					!m_IsCalibration)
 				{
-					m_AstrometryController.NotifyBeginLongOperation("Determining focal length ...");
+					m_AstrometryController.NotifyBeginLongOperation("Performing a plate solve ...");
 					try
 					{
 						// If this is the first fit, then fit a focal length 
