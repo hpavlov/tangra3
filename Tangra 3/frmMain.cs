@@ -1204,7 +1204,7 @@ namespace Tangra
 
 				TangraContext.Current.CanChangeTool = true;
 
-				if (frmCamera.IsNewConfiguration)
+                if (frmCamera.IsNewConfiguration && frmCamera.SolvePlateConstantsNow)
 				{
 					// This will create a default configurations
 					Rectangle defaultRect = AstrometryContext.Current.RectToInclude;
