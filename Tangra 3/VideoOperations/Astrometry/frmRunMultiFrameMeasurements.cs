@@ -33,6 +33,7 @@ namespace Tangra.VideoOperations.Astrometry
 		private MeasurementContext m_MeasurementContext;
 	    private FieldSolveContext m_FieldSolveContext;
 		private VideoController m_VideoController;
+	    private AstrometryController m_AstrometryController;
 		private AddinsController m_AddinsController;
 
         private List<ITangraAddinAction> m_AstrometryAddinActions = new List<ITangraAddinAction>();
@@ -45,8 +46,14 @@ namespace Tangra.VideoOperations.Astrometry
 		private bool m_Initialised;
 
         internal frmRunMultiFrameMeasurements(
-			VideoController videoController, AddinsController addinsController, VideoAstrometryOperation astrometry, MeasurementContext measurementContext, FieldSolveContext fieldSolveContext,
-            out List<ITangraAddinAction> astrometryAddinActions, out List<ITangraAddin> astrometryAddins)
+			VideoController videoController, 
+            AstrometryController astrometryController,
+            AddinsController addinsController, 
+            VideoAstrometryOperation astrometry, 
+            MeasurementContext measurementContext, 
+            FieldSolveContext fieldSolveContext,
+            out List<ITangraAddinAction> astrometryAddinActions, 
+            out List<ITangraAddin> astrometryAddins)
 		{
 			InitializeComponent();
 
@@ -54,6 +61,7 @@ namespace Tangra.VideoOperations.Astrometry
 
 			m_VideoController = videoController;
 	        m_AddinsController = addinsController;
+            m_AstrometryController = astrometryController;
 
 			m_VideoAstrometry = astrometry;
 			m_MeasurementContext = measurementContext;
@@ -353,7 +361,13 @@ namespace Tangra.VideoOperations.Astrometry
             }
             #endregion
 
-            m_MeasurementContext.MaxStdDev = (double)nudMaxStdDev.Value;
+		    var plateConfig = m_AstrometryController.GetCurrentAstroPlate();
+
+            double pixArcsecFactor = plateConfig.GetDistanceInArcSec(
+                    plateConfig.CenterXImage, plateConfig.CenterYImage,
+                    plateConfig.CenterXImage + 1, plateConfig.CenterYImage + 1);
+
+            m_MeasurementContext.MaxStdDev = pixArcsecFactor * (double)nudMaxStdDev.Value;
 			m_MeasurementContext.FrameInterval = ucFrameInterval.Value;
 			m_MeasurementContext.FirstFrameUtcTime = ucUtcTimePicker.DateTimeUtc;
 			m_MeasurementContext.PerformPhotometricFit = cbxFitMagnitudes.Checked;
@@ -516,10 +530,10 @@ namespace Tangra.VideoOperations.Astrometry
 			cbxSignalType.Visible = cbxExpectedMotion.SelectedIndex == 2;
 
 			if (cbxExpectedMotion.SelectedIndex == 0)
-				nudMaxStdDev.Value = 0.5M;
+				nudMaxStdDev.Value = 0.3M;
 			else
-				// 1" tolerance for tast motion 
-				nudMaxStdDev.Value = 1.0M;
+				// 0.5px tolerance for tast motion 
+				nudMaxStdDev.Value = 0.5M;
 		}
 
 		private void cbxInstDelayUnit_SelectedIndexChanged(object sender, EventArgs e)

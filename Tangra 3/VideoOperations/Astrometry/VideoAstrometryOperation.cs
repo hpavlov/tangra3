@@ -29,6 +29,7 @@ using Tangra.SDK;
 using Tangra.StarCatalogues;
 using Tangra.VideoOperations.Astrometry.Engine;
 using Tangra.PInvoke;
+using Tangra.VideoOperations.Astrometry.Tracking;
 using Tangra.VideoOperations.LightCurves.Tracking;
 
 namespace Tangra.VideoOperations.Astrometry
@@ -262,7 +263,7 @@ namespace Tangra.VideoOperations.Astrometry
 		{
 			m_UserObject = e.Context.ObjectToMeasure;
 
-			frmRunMultiFrameMeasurements frm = new frmRunMultiFrameMeasurements(m_VideoController, m_AddinsController, this, e.Context, m_Context, out m_AstrometryAddinActions, out m_AstrometryAddins);
+			frmRunMultiFrameMeasurements frm = new frmRunMultiFrameMeasurements(m_VideoController, m_AstrometryController, m_AddinsController, this, e.Context, m_Context, out m_AstrometryAddinActions, out m_AstrometryAddins);
 			m_VideoController.ShowDialog(frm);
 		}
 
@@ -401,6 +402,8 @@ namespace Tangra.VideoOperations.Astrometry
 
 			foreach (ITangraAddin addin in m_AstrometryAddins)
 				addin.OnEventNotification(AddinFiredEventType.EndMultiFrameAstrometry);
+
+		    m_AstrometryTracker = null;
 		}
 
 		public void FinalizeOperation()
@@ -741,85 +744,76 @@ namespace Tangra.VideoOperations.Astrometry
             #endregion
 	    }
 
+	    private IAstrometryTracker m_AstrometryTracker;
+
 		private void MeasurePositionInFrames(int frameNo)
 		{
 			if (m_AstrometricFit != null &&
 				m_AstrometricState.ObjectToMeasure != null)
 			{
-				if (m_AstrometricFit.StdDevRAArcSec <= m_MeasurementContext.MaxStdDev &&
-					m_AstrometricFit.StdDevDEArcSec <= m_MeasurementContext.MaxStdDev)
-				{
-					ImagePixel centroid = AstrometryContext.Current.StarMap.GetCentroid(
-						(int)m_AstrometricState.ObjectToMeasure.X0,
-						(int)m_AstrometricState.ObjectToMeasure.Y0,
-						CoreAstrometrySettings.Default.PreMeasureSearchCentroidRadius);
+			    EnsureAstrometryTracker();
 
-					// TODO: Check signal detection setting ??
-					if (centroid != null)
-					{
-						PSFFit psfFit;
-						AstrometryContext.Current.StarMap.GetPSFFit(
-							centroid.X, centroid.Y, PSFFittingMethod.NonLinearFit, out psfFit);
+                if (m_AstrometricFit.StdDevRAArcSec <= m_MeasurementContext.MaxStdDev &&
+                    m_AstrometricFit.StdDevDEArcSec <= m_MeasurementContext.MaxStdDev)
+			    {
+                    m_AstrometryTracker.NextFrame(frameNo, m_AstroImage, m_StarMap, m_AstrometricFit);
 
-						if (psfFit != null)
-						{
-							double ra, de;
-							m_AstrometricFit.GetRADEFromImageCoords(psfFit.XCenter, psfFit.YCenter, out ra, out de);
+                    if (m_AstrometryTracker.IsTrackedSuccessfully)
+                    {
+                        Trace.WriteLine(string.Format(
+                            "Measuring Astometry in frame: RA = {0}; DE = {1}; Std.Dev = {2}\"; {3}\"",
+                            AstroConvert.ToStringValue(m_AstrometryTracker.TrackedObject.RAHours, "HH MM SS.TT"),
+                            AstroConvert.ToStringValue(m_AstrometryTracker.TrackedObject.DEDeg, "+DD MM SS.T"),
+                            m_AstrometricFit.StdDevRAArcSec,
+                            m_AstrometricFit.StdDevDEArcSec));
 
-							double maxPosDiffArcSec =
-									m_AstrometricFit.GetDistanceInArcSec(m_AstrometricFit.Image.CenterXImage, m_AstrometricFit.Image.CenterYImage,
-									m_AstrometricFit.Image.CenterXImage + CoreAstrometrySettings.Default.PreMeasureSearchCentroidRadius, m_AstrometricFit.Image.CenterYImage);
+                        m_AstrometricState.ObjectToMeasure.X0 = (float)m_AstrometryTracker.TrackedObject.PSFFit.XCenter;
+                        m_AstrometricState.ObjectToMeasure.Y0 = (float)m_AstrometryTracker.TrackedObject.PSFFit.YCenter;
+                        m_AstrometricState.ObjectToMeasure.RADeg = m_AstrometryTracker.TrackedObject.RAHours * 15;
+                        m_AstrometricState.ObjectToMeasure.DEDeg = m_AstrometryTracker.TrackedObject.DEDeg;
+                        m_AstrometricState.ObjectToMeasure.Gaussian = m_AstrometryTracker.TrackedObject.PSFFit;
+                        m_AstrometricState.ObjectToMeasure.AstrometricFit = m_AstrometricFit;
 
-							if (!double.IsNaN(m_AstrometricState.ObjectToMeasure.RADeg))
-							{
-								double posDif = 3600 * AngleUtility.Elongation(m_AstrometricState.ObjectToMeasure.RADeg, m_AstrometricState.ObjectToMeasure.DEDeg, ra, de);
-								if (posDif > maxPosDiffArcSec)
-								{
-									// NOTE: Not a valid measurement
-									Trace.WriteLine(string.Format("The target position is too far from the last measured position", posDif));
-									return;
-								}
-							}
+                        var measurement = new SingleMultiFrameMeasurement();
+                        measurement.FrameNo = frameNo;
+                        measurement.RADeg = m_AstrometryTracker.TrackedObject.RAHours * 15;
+                        measurement.DEDeg = m_AstrometryTracker.TrackedObject.DEDeg;
+                        measurement.StdDevRAArcSec = m_AstrometricFit.StdDevRAArcSec;
+                        measurement.StdDevDEArcSec = m_AstrometricFit.StdDevDEArcSec;
+                        measurement.AstrometricFit = m_AstrometricFit;
+                        measurement.Gaussian = m_AstrometryTracker.TrackedObject.PSFFit;
 
-							Trace.WriteLine(string.Format(
-								"Measuring Astometry in frame: RA = {0}; DE = {1}; Std.Dev = {2}\"; {3}\"",
-								AstroConvert.ToStringValue(ra / 15.0, "HH MM SS.TT"),
-								AstroConvert.ToStringValue(de, "+DD MM SS.T"),
-								m_AstrometricFit.StdDevRAArcSec,
-								m_AstrometricFit.StdDevDEArcSec));
+                        if (m_PhotometricFit != null)
+                        {
+                            bool isSaturated;
+                            double I = AstrometryContext.Current.CurrentPhotometricFit.GetIntencity(new ImagePixel(255, m_AstrometryTracker.TrackedObject.PSFFit.XCenter, m_AstrometryTracker.TrackedObject.PSFFit.YCenter), out isSaturated);
+                            double mag = AstrometryContext.Current.CurrentPhotometricFit.GetMagnitudeForIntencity(I);
+                            measurement.Mag = mag;
+                        }
+                        else
+                            measurement.Mag = double.NaN;
 
-							m_AstrometricState.ObjectToMeasure.X0 = (float)psfFit.XCenter;
-							m_AstrometricState.ObjectToMeasure.Y0 = (float)psfFit.YCenter;
-							m_AstrometricState.ObjectToMeasure.RADeg = ra;
-							m_AstrometricState.ObjectToMeasure.DEDeg = de;
-							m_AstrometricState.ObjectToMeasure.Gaussian = psfFit;
-							m_AstrometricState.ObjectToMeasure.AstrometricFit = m_AstrometricFit;
-
-							SingleMultiFrameMeasurement measurement = new SingleMultiFrameMeasurement();
-							measurement.FrameNo = frameNo;
-							measurement.RADeg = ra;
-							measurement.DEDeg = de;
-							measurement.StdDevRAArcSec = m_AstrometricFit.StdDevRAArcSec;
-							measurement.StdDevDEArcSec = m_AstrometricFit.StdDevDEArcSec;
-							measurement.AstrometricFit = m_AstrometricFit;
-							measurement.Gaussian = psfFit;
-
-							if (m_PhotometricFit != null)
-							{
-								bool isSaturated;
-								double I = AstrometryContext.Current.CurrentPhotometricFit.GetIntencity(new ImagePixel(255, psfFit.XCenter, psfFit.YCenter), out isSaturated);
-								double mag = AstrometryContext.Current.CurrentPhotometricFit.GetMagnitudeForIntencity(I);
-								measurement.Mag = mag;
-							}
-							else
-								measurement.Mag = double.NaN;
-
-							m_AstrometricState.Measurements.Add(measurement);
-						}
-					}
-				}
+                        m_AstrometricState.Measurements.Add(measurement);
+                    }
+			    }
 			}
 		}
+
+	    private void EnsureAstrometryTracker()
+	    {
+            if (m_AstrometryTracker == null)
+            {
+                m_AstrometryTracker = new FastAsteroidTracker();
+                m_AstrometryTracker.InitializeNewTracking(m_AstroImage, new TrackedAstrometricObjectConfig()
+                {
+                    Gaussian = m_AstrometricState.ObjectToMeasure.Gaussian,
+                    StartingX = m_AstrometricState.ObjectToMeasure.X0,
+                    StartingY = m_AstrometricState.ObjectToMeasure.Y0,
+                    RADeg = m_AstrometricState.ObjectToMeasure.RADeg,
+                    DEDeg = m_AstrometricState.ObjectToMeasure.DEDeg
+                });
+            }
+	    }
 
 		private void ExecuteAstrometryAddins()
 		{

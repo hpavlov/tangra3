@@ -128,7 +128,10 @@ namespace Tangra.Astrometry
 
 		public LeastSquareFittedAstrometry SolveWithLinearRegression(IAstrometrySettings settings, out LeastSquareFittedAstrometry firstFit)
 		{
-            double maxResidual = settings.MaxResidualInPixels * Math.Max(m_PlateConfig.EffectivePixelWidth, m_PlateConfig.EffectivePixelHeight);
+            double maxResidual = m_PlateConfig.GetDistanceInArcSec(
+                    m_PlateConfig.CenterXImage, m_PlateConfig.CenterYImage,
+                    m_PlateConfig.CenterXImage + settings.MaxResidualInPixels, m_PlateConfig.CenterYImage + settings.MaxResidualInPixels);
+
 			if (m_Pairs.Count < CorePyramidConfig.Default.MinStarsForImprovementForThreshold)
 			{
 				double minResidual = m_PlateConfig.GetDistanceInArcSec(

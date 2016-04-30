@@ -529,11 +529,11 @@ namespace Tangra.VideoOperations.Astrometry
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(292, 133);
+            this.label2.Location = new System.Drawing.Point(292, 136);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(12, 13);
+            this.label2.Size = new System.Drawing.Size(18, 13);
             this.label2.TabIndex = 18;
-            this.label2.Text = "\"";
+            this.label2.Text = "px";
             // 
             // nudMaxStdDev
             // 
@@ -875,9 +875,9 @@ namespace Tangra.VideoOperations.Astrometry
             // gbConfig
             // 
             this.gbConfig.Controls.Add(this.pnlTime);
-            this.gbConfig.Controls.Add(this.pnlAddins);
             this.gbConfig.Controls.Add(this.pnlAstrometry);
             this.gbConfig.Controls.Add(this.pnlPhotometry);
+            this.gbConfig.Controls.Add(this.pnlAddins);
             this.gbConfig.Location = new System.Drawing.Point(13, 13);
             this.gbConfig.Name = "gbConfig";
             this.gbConfig.Size = new System.Drawing.Size(441, 282);
