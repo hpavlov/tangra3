@@ -14,7 +14,7 @@ using Tangra.Helpers;
 [assembly: AssemblyTitle("Tangra 3")]
 [assembly: AssemblyDescription(
 	"Tangra 3 - software package for astronomical video data reduction is maintained by Hristo Pavlov.\r\n\r\n" + 
-	"Project contributors: Hristo Pavlov, Anthony Mallamma\r\n\r\n" +
+	"Project contributors: Hristo Pavlov, Anthony Mallama\r\n\r\n" +
 	"Tangra 3 uses a number of open source and/or free components which may have their respective copyright owners.\r\n\r\n" +
 	"CCharpFITS is a C# port of Tom McGlynn's nom.tam.fits Java package, initially ported by  Samuel Carliles. " +
     "nom.tam.fits is Copyright by Thomas McGlynn 1997-2007; " +
@@ -46,8 +46,9 @@ using Tangra.Helpers;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("3.5.0.7")]
 [assembly: AssemblyFileVersion("3.5.7")]
-//[assembly: ReleaseDate("2016-02-29")]
+[assembly: ReleaseDate("2016-05-01")]
 [assembly: BetaReleaseAttribute()]
 [assembly: TangraCoreVersionRequired("3.0.107")]
 [assembly: TangraVideoVersionRequired("3.0.28")]
-
+[assembly: TangraVideoLinuxVersionRequiredAttribute("3.0.11")]
+[assembly: TangraVideoOSXVersionRequiredAttribute("3.0.15")]

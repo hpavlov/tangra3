@@ -90,24 +90,29 @@ namespace Tangra
 		{
 			string action = Environment.GetCommandLineArgs().Length > 1 ? Environment.GetCommandLineArgs()[1].Trim('"') : null;
 
-			bool isRegisterAssociationsCommand = TangraFileAssociations.COMMAND_LINE_ASSOCIATE.Equals(action, StringComparison.InvariantCultureIgnoreCase);
+		    if (CurrentOS.IsWindows)
+		    {
+                bool isRegisterAssociationsCommand = TangraFileAssociations.COMMAND_LINE_ASSOCIATE.Equals(action, StringComparison.InvariantCultureIgnoreCase);
 
-			try
-			{
-				var fileAssociation = new TangraFileAssociations();
-				if (!fileAssociation.Registered || isRegisterAssociationsCommand)
-				{
-					fileAssociation.Associate(false);
-				}
-			}
-			catch (Exception ex)
-			{
-				if (isRegisterAssociationsCommand)
-					Trace.WriteLine(ex.GetFullStackTrace());
-			}
+                try
+                {
+                    var fileAssociation = new TangraFileAssociations();
+                    if (!fileAssociation.Registered || isRegisterAssociationsCommand)
+                    {
+                        fileAssociation.Associate(false);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    if (isRegisterAssociationsCommand)
+                        Trace.WriteLine(ex.GetFullStackTrace());
+                }
 
 
-			return isRegisterAssociationsCommand;
+                return isRegisterAssociationsCommand;
+		    }
+            else
+		        return true;
 		}
 
 		static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
@@ -119,6 +124,8 @@ namespace Tangra
 		{
             TangraCoreVersionRequiredAttribute minCoreVersionRequired = ((TangraCoreVersionRequiredAttribute)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(TangraCoreVersionRequiredAttribute), false)[0]);
             TangraVideoVersionRequiredAttribute minVideoVersionRequired = ((TangraVideoVersionRequiredAttribute)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(TangraVideoVersionRequiredAttribute), false)[0]);
+            TangraVideoLinuxVersionRequiredAttribute minVideoLinuxVersionRequired = ((TangraVideoLinuxVersionRequiredAttribute)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(TangraVideoLinuxVersionRequiredAttribute), false)[0]);
+            TangraVideoOSXVersionRequiredAttribute minVideoOSXVersionRequired = ((TangraVideoOSXVersionRequiredAttribute)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(TangraVideoOSXVersionRequiredAttribute), false)[0]);
 
 			string engineVersion = TangraCore.GetTangraCoreVersion();
 			Trace.WriteLine(string.Format("Tangra Core v{0}", engineVersion));
@@ -130,9 +137,20 @@ namespace Tangra
 			engineVersion = TangraVideo.GetVideoEngineVersion();
 			Trace.WriteLine(string.Format("Tangra Video Engine v{0}", engineVersion));
 
-            if (minVideoVersionRequired != null && !minVideoVersionRequired.IsReqiredVersion(engineVersion))
+            if (CurrentOS.IsWindows)
             {
-                MessageBox.Show("Your installation of Tangra3 desn't have the latest version of TangraVideo.dll. Please check for updates.", "Tangra 3", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                if (minVideoVersionRequired != null && !minVideoVersionRequired.IsReqiredVersion(engineVersion))
+                    MessageBox.Show("Your installation of Tangra3 desn't have the latest version of TangraVideo.dll. Please check for updates.", "Tangra 3", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            else if (CurrentOS.IsMac)
+            {
+                if (minVideoOSXVersionRequired != null && !minVideoOSXVersionRequired.IsReqiredVersion(engineVersion))
+                    MessageBox.Show("Your installation of Tangra3 desn't have the latest version of TangraVideo.dll. Please check for updates.", "Tangra 3", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            else
+            {
+                if (minVideoLinuxVersionRequired != null && !minVideoLinuxVersionRequired.IsReqiredVersion(engineVersion))
+                    MessageBox.Show("Your installation of Tangra3 desn't have the latest version of TangraVideo.dll. Please check for updates.", "Tangra 3", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 		}
 

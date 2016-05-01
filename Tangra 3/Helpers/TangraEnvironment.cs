@@ -227,4 +227,20 @@ namespace Tangra.Helpers
             base(minimumVersionRequired)
         { }
     }
+
+    [AttributeUsage(AttributeTargets.Assembly)]
+    public class TangraVideoLinuxVersionRequiredAttribute : MinimumVersionRequiredAttribute
+    {
+        public TangraVideoLinuxVersionRequiredAttribute(string minimumVersionRequired) :
+            base(minimumVersionRequired)
+        { }
+    }
+
+    [AttributeUsage(AttributeTargets.Assembly)]
+    public class TangraVideoOSXVersionRequiredAttribute : MinimumVersionRequiredAttribute
+    {
+        public TangraVideoOSXVersionRequiredAttribute(string minimumVersionRequired) :
+            base(minimumVersionRequired)
+        { }
+    }
 }

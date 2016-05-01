@@ -60,6 +60,8 @@
             this.miRepairAdvFile = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripSeparator();
             this.miVideoModelling = new System.Windows.Forms.ToolStripMenuItem();
+            this.miOccultationVideoModeling = new System.Windows.Forms.ToolStripMenuItem();
+            this.miStarFieldVideoModelling = new System.Windows.Forms.ToolStripMenuItem();
             this.miSettings = new System.Windows.Forms.ToolStripMenuItem();
             this.miHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.miOnlineHelp = new System.Windows.Forms.ToolStripMenuItem();
@@ -92,13 +94,17 @@
             this.pnlNewVersionAvailable = new System.Windows.Forms.ToolStripStatusLabel();
             this.panelRight = new System.Windows.Forms.Panel();
             this.pnlControlerPanel = new System.Windows.Forms.Panel();
+            this.zoomedImage = new System.Windows.Forms.PictureBox();
             this.panelVideo = new System.Windows.Forms.Panel();
+            this.pictureBox = new Tangra.Controls.ImagePanel();
             this.pnlPlayControls = new System.Windows.Forms.Panel();
             this.pnlPlayButtons = new System.Windows.Forms.Panel();
             this.btnJumpTo = new System.Windows.Forms.Button();
             this.btn1SecMinus = new System.Windows.Forms.Button();
             this.btn10SecMinus = new System.Windows.Forms.Button();
+            this.btnPlay = new System.Windows.Forms.Button();
             this.btn10SecPlus = new System.Windows.Forms.Button();
+            this.btnStop = new System.Windows.Forms.Button();
             this.btn1FrPlus = new System.Windows.Forms.Button();
             this.btn1SecPlus = new System.Windows.Forms.Button();
             this.btn1FrMinus = new System.Windows.Forms.Button();
@@ -108,19 +114,13 @@
             this.openAdvFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.saveFrameDialog = new System.Windows.Forms.SaveFileDialog();
             this.timerCommandArgs = new System.Windows.Forms.Timer(this.components);
-            this.miOccultationVideoModeling = new System.Windows.Forms.ToolStripMenuItem();
-            this.miStarFieldVideoModelling = new System.Windows.Forms.ToolStripMenuItem();
-            this.btnPlay = new System.Windows.Forms.Button();
-            this.btnStop = new System.Windows.Forms.Button();
-            this.zoomedImage = new System.Windows.Forms.PictureBox();
-            this.pictureBox = new Tangra.Controls.ImagePanel();
             this.mainMenu.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.panelRight.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.zoomedImage)).BeginInit();
             this.panelVideo.SuspendLayout();
             this.pnlPlayControls.SuspendLayout();
             this.pnlPlayButtons.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.zoomedImage)).BeginInit();
             this.SuspendLayout();
             // 
             // mainMenu
@@ -135,7 +135,7 @@
             this.miHelp});
             this.mainMenu.Location = new System.Drawing.Point(0, 0);
             this.mainMenu.Name = "mainMenu";
-            this.mainMenu.Size = new System.Drawing.Size(861, 24);
+            this.mainMenu.Size = new System.Drawing.Size(1289, 24);
             this.mainMenu.TabIndex = 0;
             this.mainMenu.DragDrop += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragDrop);
             this.mainMenu.DragEnter += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragEnter);
@@ -460,6 +460,20 @@
             this.miVideoModelling.Size = new System.Drawing.Size(167, 22);
             this.miVideoModelling.Text = "Video &Modelling";
             // 
+            // miOccultationVideoModeling
+            // 
+            this.miOccultationVideoModeling.Name = "miOccultationVideoModeling";
+            this.miOccultationVideoModeling.Size = new System.Drawing.Size(204, 22);
+            this.miOccultationVideoModeling.Text = "&Occultation Video Modelling";
+            this.miOccultationVideoModeling.Click += new System.EventHandler(this.miOccultationVideoModeling_Click);
+            // 
+            // miStarFieldVideoModelling
+            // 
+            this.miStarFieldVideoModelling.Name = "miStarFieldVideoModelling";
+            this.miStarFieldVideoModelling.Size = new System.Drawing.Size(204, 22);
+            this.miStarFieldVideoModelling.Text = "&Star Field Video Modelling";
+            this.miStarFieldVideoModelling.Click += new System.EventHandler(this.miStarFieldVideoModelling_Click);
+            // 
             // miSettings
             // 
             this.miSettings.Name = "miSettings";
@@ -538,7 +552,7 @@
             this.pnlNewVersionAvailable});
             this.statusStrip.Location = new System.Drawing.Point(0, 594);
             this.statusStrip.Name = "statusStrip";
-            this.statusStrip.Size = new System.Drawing.Size(861, 24);
+            this.statusStrip.Size = new System.Drawing.Size(1289, 24);
             this.statusStrip.TabIndex = 1;
             // 
             // tsProgessBar
@@ -742,7 +756,7 @@
             this.panelRight.Controls.Add(this.pnlControlerPanel);
             this.panelRight.Controls.Add(this.zoomedImage);
             this.panelRight.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panelRight.Location = new System.Drawing.Point(607, 24);
+            this.panelRight.Location = new System.Drawing.Point(1035, 24);
             this.panelRight.Name = "panelRight";
             this.panelRight.Size = new System.Drawing.Size(254, 570);
             this.panelRight.TabIndex = 3;
@@ -759,6 +773,17 @@
             this.pnlControlerPanel.Size = new System.Drawing.Size(249, 310);
             this.pnlControlerPanel.TabIndex = 10;
             // 
+            // zoomedImage
+            // 
+            this.zoomedImage.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.zoomedImage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.zoomedImage.Location = new System.Drawing.Point(3, 3);
+            this.zoomedImage.Name = "zoomedImage";
+            this.zoomedImage.Size = new System.Drawing.Size(248, 248);
+            this.zoomedImage.TabIndex = 1;
+            this.zoomedImage.TabStop = false;
+            this.zoomedImage.MouseMove += new System.Windows.Forms.MouseEventHandler(this.zoomedImage_MouseMove);
+            // 
             // panelVideo
             // 
             this.panelVideo.Controls.Add(this.pictureBox);
@@ -766,8 +791,29 @@
             this.panelVideo.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelVideo.Location = new System.Drawing.Point(0, 24);
             this.panelVideo.Name = "panelVideo";
-            this.panelVideo.Size = new System.Drawing.Size(607, 570);
+            this.panelVideo.Size = new System.Drawing.Size(1035, 570);
             this.panelVideo.TabIndex = 4;
+            // 
+            // pictureBox
+            // 
+            this.pictureBox.AllowDrop = true;
+            this.pictureBox.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.pictureBox.CanvasSize = new System.Drawing.Size(60, 40);
+            this.pictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBox.Image = null;
+            this.pictureBox.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
+            this.pictureBox.Location = new System.Drawing.Point(0, 0);
+            this.pictureBox.Name = "pictureBox";
+            this.pictureBox.Size = new System.Drawing.Size(1035, 503);
+            this.pictureBox.TabIndex = 2;
+            this.pictureBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragDrop);
+            this.pictureBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragEnter);
+            this.pictureBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseClick);
+            this.pictureBox.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDoubleClick);
+            this.pictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDown);
+            this.pictureBox.MouseLeave += new System.EventHandler(this.pictureBox_MouseLeave);
+            this.pictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseMove);
+            this.pictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseUp);
             // 
             // pnlPlayControls
             // 
@@ -776,7 +822,7 @@
             this.pnlPlayControls.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.pnlPlayControls.Location = new System.Drawing.Point(0, 503);
             this.pnlPlayControls.Name = "pnlPlayControls";
-            this.pnlPlayControls.Size = new System.Drawing.Size(607, 67);
+            this.pnlPlayControls.Size = new System.Drawing.Size(1035, 67);
             this.pnlPlayControls.TabIndex = 0;
             // 
             // pnlPlayButtons
@@ -828,6 +874,17 @@
             this.btn10SecMinus.UseVisualStyleBackColor = false;
             this.btn10SecMinus.Click += new System.EventHandler(this.btn10SecMinus_Click);
             // 
+            // btnPlay
+            // 
+            this.btnPlay.BackColor = System.Drawing.SystemColors.Control;
+            this.btnPlay.Image = global::Tangra.Properties.Resources.play24;
+            this.btnPlay.Location = new System.Drawing.Point(156, 3);
+            this.btnPlay.Name = "btnPlay";
+            this.btnPlay.Size = new System.Drawing.Size(32, 29);
+            this.btnPlay.TabIndex = 4;
+            this.btnPlay.UseVisualStyleBackColor = false;
+            this.btnPlay.Click += new System.EventHandler(this.btnPlay_Click);
+            // 
             // btn10SecPlus
             // 
             this.btn10SecPlus.BackColor = System.Drawing.SystemColors.Control;
@@ -838,6 +895,17 @@
             this.btn10SecPlus.Text = "10sec+";
             this.btn10SecPlus.UseVisualStyleBackColor = false;
             this.btn10SecPlus.Click += new System.EventHandler(this.btn10SecPlus_Click);
+            // 
+            // btnStop
+            // 
+            this.btnStop.BackColor = System.Drawing.SystemColors.Control;
+            this.btnStop.Image = global::Tangra.Properties.Resources.stop24;
+            this.btnStop.Location = new System.Drawing.Point(194, 3);
+            this.btnStop.Name = "btnStop";
+            this.btnStop.Size = new System.Drawing.Size(32, 29);
+            this.btnStop.TabIndex = 5;
+            this.btnStop.UseVisualStyleBackColor = false;
+            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
             // 
             // btn1FrPlus
             // 
@@ -880,7 +948,7 @@
             this.scrollBarFrames.Location = new System.Drawing.Point(11, 7);
             this.scrollBarFrames.Maximum = 1000;
             this.scrollBarFrames.Name = "scrollBarFrames";
-            this.scrollBarFrames.Size = new System.Drawing.Size(583, 16);
+            this.scrollBarFrames.Size = new System.Drawing.Size(1011, 16);
             this.scrollBarFrames.TabIndex = 11;
             this.scrollBarFrames.Scroll += new System.Windows.Forms.ScrollEventHandler(this.scrollBarFrames_Scroll);
             // 
@@ -904,81 +972,13 @@
             // 
             this.timerCommandArgs.Tick += new System.EventHandler(this.timerCommandArgs_Tick);
             // 
-            // miOccultationVideoModeling
-            // 
-            this.miOccultationVideoModeling.Name = "miOccultationVideoModeling";
-            this.miOccultationVideoModeling.Size = new System.Drawing.Size(204, 22);
-            this.miOccultationVideoModeling.Text = "&Occultation Video Modelling";
-            this.miOccultationVideoModeling.Click += new System.EventHandler(this.miOccultationVideoModeling_Click);
-            // 
-            // miStarFieldVideoModelling
-            // 
-            this.miStarFieldVideoModelling.Name = "miStarFieldVideoModelling";
-            this.miStarFieldVideoModelling.Size = new System.Drawing.Size(204, 22);
-            this.miStarFieldVideoModelling.Text = "&Star Field Video Modelling";
-            this.miStarFieldVideoModelling.Click += new System.EventHandler(this.miStarFieldVideoModelling_Click);
-            // 
-            // btnPlay
-            // 
-            this.btnPlay.BackColor = System.Drawing.SystemColors.Control;
-            this.btnPlay.Image = global::Tangra.Properties.Resources.play24;
-            this.btnPlay.Location = new System.Drawing.Point(156, 3);
-            this.btnPlay.Name = "btnPlay";
-            this.btnPlay.Size = new System.Drawing.Size(32, 29);
-            this.btnPlay.TabIndex = 4;
-            this.btnPlay.UseVisualStyleBackColor = false;
-            this.btnPlay.Click += new System.EventHandler(this.btnPlay_Click);
-            // 
-            // btnStop
-            // 
-            this.btnStop.BackColor = System.Drawing.SystemColors.Control;
-            this.btnStop.Image = global::Tangra.Properties.Resources.stop24;
-            this.btnStop.Location = new System.Drawing.Point(194, 3);
-            this.btnStop.Name = "btnStop";
-            this.btnStop.Size = new System.Drawing.Size(32, 29);
-            this.btnStop.TabIndex = 5;
-            this.btnStop.UseVisualStyleBackColor = false;
-            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
-            // 
-            // zoomedImage
-            // 
-            this.zoomedImage.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.zoomedImage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.zoomedImage.Location = new System.Drawing.Point(3, 3);
-            this.zoomedImage.Name = "zoomedImage";
-            this.zoomedImage.Size = new System.Drawing.Size(248, 248);
-            this.zoomedImage.TabIndex = 1;
-            this.zoomedImage.TabStop = false;
-            this.zoomedImage.MouseMove += new System.Windows.Forms.MouseEventHandler(this.zoomedImage_MouseMove);
-            // 
-            // pictureBox
-            // 
-            this.pictureBox.AllowDrop = true;
-            this.pictureBox.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.pictureBox.CanvasSize = new System.Drawing.Size(60, 40);
-            this.pictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBox.Image = null;
-            this.pictureBox.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
-            this.pictureBox.Location = new System.Drawing.Point(0, 0);
-            this.pictureBox.Name = "pictureBox";
-            this.pictureBox.Size = new System.Drawing.Size(607, 503);
-            this.pictureBox.TabIndex = 2;
-            this.pictureBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragDrop);
-            this.pictureBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragEnter);
-            this.pictureBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseClick);
-            this.pictureBox.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDoubleClick);
-            this.pictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDown);
-            this.pictureBox.MouseLeave += new System.EventHandler(this.pictureBox_MouseLeave);
-            this.pictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseMove);
-            this.pictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseUp);
-            // 
             // frmMain
             // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(861, 618);
+            this.ClientSize = new System.Drawing.Size(1289, 618);
             this.Controls.Add(this.panelVideo);
             this.Controls.Add(this.panelRight);
             this.Controls.Add(this.statusStrip);
@@ -1000,10 +1000,10 @@
             this.statusStrip.ResumeLayout(false);
             this.statusStrip.PerformLayout();
             this.panelRight.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.zoomedImage)).EndInit();
             this.panelVideo.ResumeLayout(false);
             this.pnlPlayControls.ResumeLayout(false);
             this.pnlPlayButtons.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.zoomedImage)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 

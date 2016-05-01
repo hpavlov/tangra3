@@ -982,7 +982,7 @@ namespace Tangra
 		{
 			PlatformID platform = Environment.OSVersion.Platform;
 			if (platform == PlatformID.Win32Windows || platform == PlatformID.Win32NT || platform == PlatformID.Win32S)
-			{				
+			{
 				pnlNewVersionAvailable.Enabled = false;
 				pnlNewVersionAvailable.IsLink = false;
 				pnlNewVersionAvailable.Tag = pnlNewVersionAvailable.Text;

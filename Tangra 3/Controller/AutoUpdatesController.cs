@@ -41,13 +41,27 @@ namespace Tangra.Controller
 			{
 				m_MainFrom.pnlNewVersionAvailable.Visible = true;
 				m_ShowNegativeResultMessage = false;
-				m_MainFrom.pnlNewVersionAvailable.Text = "New version of Tangra is available. Click here to upgrade.";
+                PlatformID platform = Environment.OSVersion.Platform;
+
+                if (platform == PlatformID.Win32Windows || platform == PlatformID.Win32NT || platform == PlatformID.Win32S)
+				    m_MainFrom.pnlNewVersionAvailable.Text = "New version of Tangra is available. Click here to upgrade.";
+                else
+                    // Room available on Lunix/OSX for for label is too small
+                    m_MainFrom.pnlNewVersionAvailable.Text = "New version of Tangra is available.";
+
 				m_MainFrom.pnlNewVersionAvailable.LinkColor = Color.Lime;
 			}
 			else if (eventCode == MSG_ID_NEW_TANGRA3_ADDIN_UPDATE_AVAILABLE)
 			{
 				m_MainFrom.pnlNewVersionAvailable.Visible = true;
-				m_MainFrom.pnlNewVersionAvailable.Text = "New add-in version is available. Click here to upgrade.";
+                PlatformID platform = Environment.OSVersion.Platform;
+
+                if (platform == PlatformID.Win32Windows || platform == PlatformID.Win32NT || platform == PlatformID.Win32S)
+                    m_MainFrom.pnlNewVersionAvailable.Text = "New add-in version is available. Click here to upgrade.";
+                else
+                    // Room available on Lunix/OSX for for label is too small
+                    m_MainFrom.pnlNewVersionAvailable.Text = "New add-in version is available.";
+
 				m_MainFrom.pnlNewVersionAvailable.LinkColor = Color.Cyan;
 				m_ShowNegativeResultMessage = false;
 			}
@@ -339,15 +353,18 @@ namespace Tangra.Controller
 						int Version = int.Parse(updateNode.Attributes["Version"].Value);
 						if (latestVersion < Version)
 						{
-#if WIN32
-							Trace.WriteLine("Update location: " + updateUri.ToString());
-                            Trace.WriteLine("Current version: " + latestVersion.ToString());
-                            Trace.WriteLine("New version: " + Version.ToString());
-#else
-                            Console.WriteLine("Update location: " + updateUri.ToString());
-                            Console.WriteLine("Current version: " + latestVersion.ToString());
-                            Console.WriteLine("New version: " + Version.ToString());
-#endif
+						    if (CurrentOS.IsWindows)
+						    {
+						        Trace.WriteLine("Update location: " + updateUri.ToString());
+						        Trace.WriteLine("Current version: " + latestVersion.ToString());
+						        Trace.WriteLine("New version: " + Version.ToString());
+						    }
+						    else
+						    {
+                                Console.WriteLine("Update location: " + updateUri.ToString());
+                                Console.WriteLine("Current version: " + latestVersion.ToString());
+                                Console.WriteLine("New version: " + Version.ToString());
+                            }
 
 #if WIN32
 							XmlNode tangra3UpdateNode = xmlDoc.SelectSingleNode("/Tangra3/AutoUpdate");
