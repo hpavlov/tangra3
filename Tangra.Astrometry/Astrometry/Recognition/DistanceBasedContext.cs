@@ -2078,10 +2078,15 @@ namespace Tangra.Astrometry.Recognition
 
             PlateConstantsSolver solver = new PlateConstantsSolver(m_PlateConfig);
 			solver.InitPlateSolution(RA0Deg, DE0Deg);
-			foreach (ImagePixel feature in matchedPairs.Keys)
-				solver.AddStar(feature, matchedPairs[feature]);
+		    foreach (ImagePixel feature in matchedPairs.Keys)
+		    {
+		        IStar star = matchedPairs[feature];
+		        var kvp = matchedFeatureIdToStarIdIndexes.Single(x => x.Value == star.StarNo);
+		        int featureId = kvp.Key;
+                solver.AddStar(feature, star, featureId);
+		    }
 
-			LeastSquareFittedAstrometry leastSquareFittedAstrometry = null;
+		    LeastSquareFittedAstrometry leastSquareFittedAstrometry = null;
 			LeastSquareFittedAstrometry firstFit = null;
 			try
 			{

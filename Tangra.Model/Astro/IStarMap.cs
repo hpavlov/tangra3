@@ -23,6 +23,7 @@ namespace Tangra.Model.Astro
 		StarMapFeature this[int x, int y] { get; }
 
 		StarMapFeature GetFeatureInRadius(int x, int y, int radius);
+        List<StarMapFeature> GetFeaturesInRadius(int x, int y, int radius);
 		ImagePixel GetCentroid(int x, int y, int radius);
 		ImagePixel GetPSFFit(int x, int y, PSFFittingMethod method);
 		ImagePixel GetPSFFit(int x, int y, PSFFittingMethod method, out PSFFit psfFit);

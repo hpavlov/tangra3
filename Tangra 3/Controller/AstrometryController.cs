@@ -10,9 +10,11 @@ using Tangra.ImageTools;
 using Tangra.Model.Astro;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
+using Tangra.Model.Image;
 using Tangra.Model.VideoOperations;
 using Tangra.VideoOperations.Astrometry;
 using Tangra.VideoOperations.Astrometry.Engine;
+using Tangra.VideoOperations.LightCurves;
 
 namespace Tangra.Controller
 {
@@ -168,5 +170,117 @@ namespace Tangra.Controller
 		{
 			m_Operation.TriggerPlateReSolve();
 		}
+
+        internal class FrameTime
+        {
+            public int RequestedFrameNo;
+            public int ResolvedFrameNo;
+            public DateTime UT;
+            public double ClosestNormalFrameNo;
+            public DateTime ClosestNormalFrameTime;
+            public int ClosestNormalIntervalFirstFrameNo;
+            public int ClosestNormalIntervalLastFrameNo;
+        }
+
+        internal FrameTime GetTimeForFrame(MeasurementContext context, int frameNumber, int firstVideoFrame)
+        {
+            var rv = new FrameTime();
+            rv.RequestedFrameNo = frameNumber;
+
+            double instrumentalDelayFrames = 0;
+            double instrumentalDelaySeconds = 0;
+
+            if (context.InstrumentalDelayUnits == InstrumentalDelayUnits.Frames)
+                instrumentalDelayFrames = context.InstrumentalDelay;
+            else if (context.InstrumentalDelayUnits == InstrumentalDelayUnits.Seconds)
+                instrumentalDelaySeconds = context.InstrumentalDelay;
+
+            int precision = 1000000;
+            double sigma = 0.000005;
+            if (context.FrameTimeType == FrameTimeType.NonIntegratedFrameTime)
+            {
+                if (context.VideoFileFormat == VideoFileFormat.AVI)
+                {
+                    // No integration is used, directly derive the time and apply instrumental delay
+                    rv.ResolvedFrameNo = frameNumber - firstVideoFrame;
+                    rv.UT =
+                        context.FirstFrameUtcTime.AddSeconds(
+                        ((frameNumber - context.FirstFrameId - instrumentalDelayFrames) / context.FrameRate) - instrumentalDelaySeconds);
+                }
+                else
+                {
+                    rv.ResolvedFrameNo = frameNumber;
+
+                    FrameStateData frameState = m_VideoController.GetFrameStateData(frameNumber);
+                    rv.UT = frameState.CentralExposureTime;
+
+                    // Convert Central time to the timestamp of the end of the first field
+                    rv.UT = rv.UT.AddMilliseconds(-0.5 * frameState.ExposureInMilliseconds);
+
+                    if (context.NativeVideoFormat == "PAL") rv.UT = rv.UT.AddMilliseconds(20);
+                    else if (context.NativeVideoFormat == "NTSC") rv.UT = rv.UT.AddMilliseconds(16.68);
+
+                    if (context.AavStackedMode)
+                    {
+                        // TODO: Apply instrumental delay for Aav Stacked Frames
+                        rv.UT = rv.UT.AddSeconds(-1 * instrumentalDelaySeconds);
+                    }
+                    else
+                    {
+                        // Then apply instrumental delay
+                        rv.UT = rv.UT.AddSeconds(-1 * instrumentalDelaySeconds);
+                    }
+                }
+            }
+            else
+            {
+                // Integration was used. Find the integrated frame no
+                int integratedFrameNo = frameNumber - firstVideoFrame;
+
+                double deltaMiddleFrame = 0;
+                if (context.IntegratedFramesCount > 1)
+                    deltaMiddleFrame = (context.IntegratedFramesCount / 2) - 0.5;
+
+                // The instrumental delay is always from the timestamp of the first frame of the integrated interval
+
+                rv.ResolvedFrameNo = integratedFrameNo;
+
+                rv.UT =
+                    context.FirstFrameUtcTime.AddSeconds(
+                    ((integratedFrameNo - deltaMiddleFrame - context.FirstFrameId - instrumentalDelayFrames) / context.FrameRate) - instrumentalDelaySeconds);
+            }
+
+            if (context.MovementExpectation == MovementExpectation.Slow)
+            {
+                precision = 100000;
+                sigma = 0.000005;
+            }
+            else
+            {
+                precision = 1000000;
+                sigma = 0.0000005;
+            }
+
+            double utTime = (rv.UT.Hour + rv.UT.Minute / 60.0 + (rv.UT.Second + (rv.UT.Millisecond / 1000.0)) / 3600.0) / 24;
+
+
+            double roundedTime = Math.Truncate(Math.Round(utTime * precision)) / precision;
+
+            rv.ClosestNormalFrameTime = new DateTime(rv.UT.Year, rv.UT.Month, rv.UT.Day).AddDays(roundedTime);
+
+            TimeSpan delta = new TimeSpan(rv.ClosestNormalFrameTime.Ticks - rv.UT.Ticks);
+            rv.ClosestNormalFrameNo = rv.ResolvedFrameNo + (delta.TotalSeconds * context.FrameRate);
+
+            double framesEachSide = sigma * 24 * 3600 * context.FrameRate;
+            rv.ClosestNormalIntervalFirstFrameNo = (int)Math.Floor(rv.ClosestNormalFrameNo - framesEachSide);
+            rv.ClosestNormalIntervalLastFrameNo = (int)Math.Ceiling(rv.ClosestNormalFrameNo + framesEachSide);
+
+            //Trace.WriteLine(string.Format("{0} / {1}; {2} / {3}; {4} / {5}", 
+            //    roundedTime.ToString("0.00000"), utTime, 
+            //    rv.ClosestNormalFrameNo, rv.ResolvedFrameNo,
+            //    rv.UT.ToString("HH:mm:ss.fff"), rv.ClosestNormalFrameTime.ToString("HH:mm:ss.fff")));
+
+            return rv;
+        }
 	}
 }

@@ -803,7 +803,11 @@ namespace Tangra.VideoOperations.Astrometry
 	    {
             if (m_AstrometryTracker == null)
             {
-                m_AstrometryTracker = new FastAsteroidTracker();
+                if (m_MeasurementContext.MovementExpectation == MovementExpectation.Slow)
+                    m_AstrometryTracker = new SlowMotionTracker();
+                else
+                    m_AstrometryTracker = new FastAsteroidTracker(m_AstrometryController, m_MeasurementContext);
+
                 m_AstrometryTracker.InitializeNewTracking(m_AstroImage, new TrackedAstrometricObjectConfig()
                 {
                     Gaussian = m_AstrometricState.ObjectToMeasure.Gaussian,

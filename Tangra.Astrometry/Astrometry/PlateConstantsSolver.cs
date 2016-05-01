@@ -76,7 +76,13 @@ namespace Tangra.Astrometry
 			AddStar(plateStar, celestialPyramidStarEntry, null);
 		}
 
-		public void AddStar(ImagePixel plateStar, IStar celestialPyramidStarEntry, StarMapFeature feature)
+        public void AddStar(ImagePixel plateStar, IStar celestialPyramidStarEntry, int featureId)
+        {
+            var starPair = AddStar(plateStar, celestialPyramidStarEntry, null);
+            starPair.FeatureId = featureId;
+        }
+
+        public PlateConstStarPair AddStar(ImagePixel plateStar, IStar celestialPyramidStarEntry, StarMapFeature feature)
 		{
 			double detectionCertainty = plateStar.SignalNoise;
 
@@ -99,6 +105,8 @@ namespace Tangra.Astrometry
 			starPair.FeatureId = feature != null ? feature.FeatureId : -1;
 			starPair.RADeg = celestialPyramidStarEntry.RADeg;
 			starPair.DEDeg = celestialPyramidStarEntry.DEDeg;
+
+		    return starPair;
 		}
 
 		private PlateConstStarPair AddStar(double x, double RADeg, double y, double DE, double mag, int intensity, double detectionCertainty, bool isSaturated)

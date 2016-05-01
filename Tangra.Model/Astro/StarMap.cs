@@ -656,6 +656,37 @@ namespace Tangra.Model.Astro
 			return brightestFeature;
 		}
 
+	    public List<StarMapFeature> GetFeaturesInRadius(int x0, int y0, int radius)
+	    {
+            var rv = new List<StarMapFeature>();
+
+            for (int i = -radius; i <= radius; i++)
+            {
+                for (int j = -radius; j <= radius; j++)
+                {
+                    int y = y0 + i;
+                    int x = x0 + j;
+                    if (x < 0 || x > m_FullWidth) continue;
+                    if (y < 0 || y > m_FullHeight) continue;
+
+                    ulong key = (ulong)(y * m_Pixelmap.Width + x);
+
+                    foreach (StarMapFeature feature in m_Features)
+                    {
+                        if (rv.IndexOf(feature) != -1) continue;
+
+                        if (feature.m_Pixels.ContainsKey(key))
+                        {
+                            rv.Add(feature);
+                            continue;
+                        }
+                    }
+                }
+            }
+
+	        return rv;
+	    }
+
 		public Pixelmap GetPixelmap()
 		{
 			return m_Pixelmap;

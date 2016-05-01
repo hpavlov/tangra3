@@ -342,6 +342,7 @@
     <Compile Include="Helpers\LongOperationsManager.cs" />
     <Compile Include="VideoOperations\Astrometry\Tracking\FastAsteroidTracker.cs" />
     <Compile Include="VideoOperations\Astrometry\Tracking\IAstrometryTracker.cs" />
+    <Compile Include="VideoOperations\Astrometry\Tracking\SlowMotionTracker.cs" />
     <Compile Include="VideoOperations\LightCurves\Tracking\LunarOccultationTracker.cs" />
     <Compile Include="VideoOperations\LightCurves\Tracking\StarFieldTracker.cs" />
     <Compile Include="VideoOperations\Spectroscopy\AbsFluxCalibration\AbsFluxCalibrator.cs" />
