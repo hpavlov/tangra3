@@ -114,3 +114,9 @@ _ReSharper.*
 /Tangra 3/lib/MFSamples-2015-07
 /Tangra 3/lib/MFLibv3_0
 /OcrTester/AutomatedTestingImages/New Reports
+/Tangra.Video/Linux/Release
+/Virtual Machines
+/Tangra.Video/Linux/TangraVideo_Linux.mk
+/Tangra.Video/Linux/TangraVideo_Linux.txt
+/Tangra.Core/TangraCore_Linux.mk
+/Tangra.Core/TangraCore_Linux.txt
