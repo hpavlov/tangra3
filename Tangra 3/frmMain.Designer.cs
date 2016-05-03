@@ -96,7 +96,6 @@
             this.pnlControlerPanel = new System.Windows.Forms.Panel();
             this.zoomedImage = new System.Windows.Forms.PictureBox();
             this.panelVideo = new System.Windows.Forms.Panel();
-            this.pictureBox = new Tangra.Controls.ImagePanel();
             this.pnlPlayControls = new System.Windows.Forms.Panel();
             this.pnlPlayButtons = new System.Windows.Forms.Panel();
             this.btnJumpTo = new System.Windows.Forms.Button();
@@ -114,6 +113,7 @@
             this.openAdvFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.saveFrameDialog = new System.Windows.Forms.SaveFileDialog();
             this.timerCommandArgs = new System.Windows.Forms.Timer(this.components);
+            this.pictureBox = new Tangra.Controls.ImagePanel();
             this.mainMenu.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.panelRight.SuspendLayout();
@@ -135,7 +135,7 @@
             this.miHelp});
             this.mainMenu.Location = new System.Drawing.Point(0, 0);
             this.mainMenu.Name = "mainMenu";
-            this.mainMenu.Size = new System.Drawing.Size(1289, 24);
+            this.mainMenu.Size = new System.Drawing.Size(836, 24);
             this.mainMenu.TabIndex = 0;
             this.mainMenu.DragDrop += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragDrop);
             this.mainMenu.DragEnter += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragEnter);
@@ -552,7 +552,7 @@
             this.pnlNewVersionAvailable});
             this.statusStrip.Location = new System.Drawing.Point(0, 594);
             this.statusStrip.Name = "statusStrip";
-            this.statusStrip.Size = new System.Drawing.Size(1289, 24);
+            this.statusStrip.Size = new System.Drawing.Size(836, 24);
             this.statusStrip.TabIndex = 1;
             // 
             // tsProgessBar
@@ -756,7 +756,7 @@
             this.panelRight.Controls.Add(this.pnlControlerPanel);
             this.panelRight.Controls.Add(this.zoomedImage);
             this.panelRight.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panelRight.Location = new System.Drawing.Point(1035, 24);
+            this.panelRight.Location = new System.Drawing.Point(582, 24);
             this.panelRight.Name = "panelRight";
             this.panelRight.Size = new System.Drawing.Size(254, 570);
             this.panelRight.TabIndex = 3;
@@ -791,29 +791,8 @@
             this.panelVideo.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelVideo.Location = new System.Drawing.Point(0, 24);
             this.panelVideo.Name = "panelVideo";
-            this.panelVideo.Size = new System.Drawing.Size(1035, 570);
+            this.panelVideo.Size = new System.Drawing.Size(582, 570);
             this.panelVideo.TabIndex = 4;
-            // 
-            // pictureBox
-            // 
-            this.pictureBox.AllowDrop = true;
-            this.pictureBox.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.pictureBox.CanvasSize = new System.Drawing.Size(60, 40);
-            this.pictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBox.Image = null;
-            this.pictureBox.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
-            this.pictureBox.Location = new System.Drawing.Point(0, 0);
-            this.pictureBox.Name = "pictureBox";
-            this.pictureBox.Size = new System.Drawing.Size(1035, 503);
-            this.pictureBox.TabIndex = 2;
-            this.pictureBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragDrop);
-            this.pictureBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragEnter);
-            this.pictureBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseClick);
-            this.pictureBox.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDoubleClick);
-            this.pictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDown);
-            this.pictureBox.MouseLeave += new System.EventHandler(this.pictureBox_MouseLeave);
-            this.pictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseMove);
-            this.pictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseUp);
             // 
             // pnlPlayControls
             // 
@@ -822,7 +801,7 @@
             this.pnlPlayControls.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.pnlPlayControls.Location = new System.Drawing.Point(0, 503);
             this.pnlPlayControls.Name = "pnlPlayControls";
-            this.pnlPlayControls.Size = new System.Drawing.Size(1035, 67);
+            this.pnlPlayControls.Size = new System.Drawing.Size(582, 67);
             this.pnlPlayControls.TabIndex = 0;
             // 
             // pnlPlayButtons
@@ -948,7 +927,7 @@
             this.scrollBarFrames.Location = new System.Drawing.Point(11, 7);
             this.scrollBarFrames.Maximum = 1000;
             this.scrollBarFrames.Name = "scrollBarFrames";
-            this.scrollBarFrames.Size = new System.Drawing.Size(1011, 16);
+            this.scrollBarFrames.Size = new System.Drawing.Size(558, 16);
             this.scrollBarFrames.TabIndex = 11;
             this.scrollBarFrames.Scroll += new System.Windows.Forms.ScrollEventHandler(this.scrollBarFrames_Scroll);
             // 
@@ -972,13 +951,34 @@
             // 
             this.timerCommandArgs.Tick += new System.EventHandler(this.timerCommandArgs_Tick);
             // 
+            // pictureBox
+            // 
+            this.pictureBox.AllowDrop = true;
+            this.pictureBox.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.pictureBox.CanvasSize = new System.Drawing.Size(60, 40);
+            this.pictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBox.Image = null;
+            this.pictureBox.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
+            this.pictureBox.Location = new System.Drawing.Point(0, 0);
+            this.pictureBox.Name = "pictureBox";
+            this.pictureBox.Size = new System.Drawing.Size(582, 503);
+            this.pictureBox.TabIndex = 2;
+            this.pictureBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragDrop);
+            this.pictureBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragEnter);
+            this.pictureBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseClick);
+            this.pictureBox.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDoubleClick);
+            this.pictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDown);
+            this.pictureBox.MouseLeave += new System.EventHandler(this.pictureBox_MouseLeave);
+            this.pictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseMove);
+            this.pictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseUp);
+            // 
             // frmMain
             // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(1289, 618);
+            this.ClientSize = new System.Drawing.Size(836, 618);
             this.Controls.Add(this.panelVideo);
             this.Controls.Add(this.panelRight);
             this.Controls.Add(this.statusStrip);

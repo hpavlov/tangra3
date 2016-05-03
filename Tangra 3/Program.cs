@@ -116,7 +116,7 @@ namespace Tangra
 #endif
             }
             else
-		        return true;
+                return false;
 		}
 
 		static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
