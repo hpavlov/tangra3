@@ -1706,6 +1706,7 @@ namespace Tangra.Model.Config
 
 				PyramidFocalLengthAllowance = 0.05;
 				PyramidTimeoutInSeconds = 60;
+			    PyramidNumberOfPivots = 3;
 			}
 
 			public AstrometrySettings Clone()
@@ -1731,6 +1732,7 @@ namespace Tangra.Model.Config
 				clone.MaxReferenceStarFWHM = this.MaxReferenceStarFWHM;
 				clone.MaximumPSFElongation = this.MaximumPSFElongation;
 				clone.PyramidRemoveNonStellarObject = this.PyramidRemoveNonStellarObject;
+			    clone.PyramidNumberOfPivots = this.PyramidNumberOfPivots;
 				return clone;
 			}
 
@@ -1775,8 +1777,9 @@ namespace Tangra.Model.Config
 			public double MinReferenceStarFWHM { get; set; }
 			public double MaxReferenceStarFWHM { get; set; }
 			public bool PyramidRemoveNonStellarObject { get; set; }
+            public int PyramidNumberOfPivots { get; set; }
 
-			public double PyramidFocalLengthAllowance { get; set; }
+            public double PyramidFocalLengthAllowance { get; set; }
 			public bool PyramidForceFixedFocalLength
 			{
 				get { return PyramidFocalLengthAllowance <= 0; }

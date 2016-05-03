@@ -1071,34 +1071,34 @@ namespace Tangra.Astrometry.Recognition
 
 					double djk = m_PlateConfig.GetDistanceInArcSec(jCenter.XDouble, jCenter.YDouble, kCenter.XDouble, kCenter.YDouble, fittedFocalLength);
 
-                    ulong foundIdx0 = uint.MaxValue;
+                    ulong iStarNo = uint.MaxValue;
                     ulong needIdx1 = uint.MaxValue;
                     ulong needIdx2 = uint.MaxValue;
 					if (ikEntry.Star1.StarNo == ijEntry.Star1.StarNo)
 					{
 						// ik_1 = ij_1 = (i)
-						foundIdx0 = ikEntry.Star1.StarNo;
+						iStarNo = ikEntry.Star1.StarNo;
 						needIdx1 = ikEntry.Star2.StarNo;
 						needIdx2 = ijEntry.Star2.StarNo;
 					}
 					else if (ikEntry.Star1.StarNo == ijEntry.Star2.StarNo)
 					{
 						// ik_1 = ij_2 = (i)
-						foundIdx0 = ikEntry.Star1.StarNo;
+						iStarNo = ikEntry.Star1.StarNo;
 						needIdx1 = ikEntry.Star2.StarNo; // (k)
 						needIdx2 = ijEntry.Star1.StarNo; // (j)
 					}
 					else if (ikEntry.Star2.StarNo == ijEntry.Star1.StarNo)
 					{
 						// ik_2 = ij_1 = (i)
-						foundIdx0 = ikEntry.Star2.StarNo;
+						iStarNo = ikEntry.Star2.StarNo;
 						needIdx1 = ikEntry.Star1.StarNo; // (k)
 						needIdx2 = ijEntry.Star2.StarNo; // (j)
 					}
 					else if (ikEntry.Star2.StarNo == ijEntry.Star2.StarNo)
 					{
 						// ik_2 = ij_2 = (i)
-						foundIdx0 = ikEntry.Star2.StarNo;
+						iStarNo = ikEntry.Star2.StarNo;
 						needIdx1 = ikEntry.Star1.StarNo; // (k)
 						needIdx2 = ijEntry.Star1.StarNo; // (j)
 					}
@@ -1131,6 +1131,9 @@ namespace Tangra.Astrometry.Recognition
 
                     if (jkEntry != null)
                     {
+                        ulong jStarNo = ulong.MinValue;
+                        ulong kStarNo = ulong.MinValue;
+
                         if (jkEntry.DistanceArcSec + toleranceInArcSec < djkMin) continue;
                         if (jkEntry.DistanceArcSec - toleranceInArcSec > djkMax) continue;
 
@@ -1142,18 +1145,76 @@ namespace Tangra.Astrometry.Recognition
                         {
 							
                             m_Solution = IsSuccessfulMatch(m_StarMap, i, j, k, ijEntry, ikEntry, jkEntry,
-														   foundIdx0, needIdx1, needIdx2, fittedFocalLength, true, toleranceInArcSec);
-                            if (m_Solution != null)
-                                return true;
+														   iStarNo, needIdx1, needIdx2, fittedFocalLength, true, toleranceInArcSec);
+                            if (m_Solution == null)
+                                continue;
+
+                            jStarNo = needIdx1;
+                            kStarNo = needIdx2;
                         }
 
                         if (jkEntry.Star1.StarNo == needIdx2 &&
                             jkEntry.Star2.StarNo == needIdx1)
                         {
                             m_Solution = IsSuccessfulMatch(m_StarMap, i, j, k, ijEntry, ikEntry, jkEntry,
-														   foundIdx0, needIdx1, needIdx2, fittedFocalLength, true, toleranceInArcSec);
-                            if (m_Solution != null)
+														   iStarNo, needIdx1, needIdx2, fittedFocalLength, true, toleranceInArcSec);
+                            if (m_Solution == null)
+                                continue;
+
+                            jStarNo = needIdx2;
+                            kStarNo = needIdx1;
+                        }
+
+                        if (m_Solution != null)
+                        {
+                            if (TangraConfig.Settings.Astrometry.PyramidNumberOfPivots == 3)
+                                // Exist the initial alignment with only 3 candidate pivots
                                 return true;
+
+                            for (int l = 0; l < m_StarMap.Features.Count; l++)
+                            {
+                                var piramid = m_StarMap.Features[l];
+                                if (piramid.FeatureId == i || piramid.FeatureId == j || piramid.FeatureId == k)
+                                    continue;
+
+                                var lCenter = piramid.GetCenter();
+
+                                // NOTE: Continue until a set of distances is found in the cache for the 4-th pivot
+                                double dli = m_PlateConfig.GetDistanceInArcSec(lCenter.XDouble, lCenter.YDouble, iCenter.XDouble, iCenter.YDouble, fittedFocalLength);
+                                double dlj = m_PlateConfig.GetDistanceInArcSec(lCenter.XDouble, lCenter.YDouble, jCenter.XDouble, jCenter.YDouble, fittedFocalLength);
+                                double dlk = m_PlateConfig.GetDistanceInArcSec(lCenter.XDouble, lCenter.YDouble, kCenter.XDouble, kCenter.YDouble, fittedFocalLength);
+
+                                List<DistanceEntry> ilCandidates = m_DistancesByMagnitude
+                                    .Where(e =>
+                                        (e.Star1.StarNo == iStarNo || e.Star2.StarNo == iStarNo) &&
+                                        e.DistanceArcSec < dli + toleranceInArcSec && e.DistanceArcSec > dli - toleranceInArcSec)
+                                    .ToList();
+
+                                foreach (var cand_il in ilCandidates)
+                                {
+                                    var lStar = cand_il.Star1.StarNo == iStarNo ? cand_il.Star2 : cand_il.Star1;
+
+                                    List<DistanceEntry> jlCandidates = m_DistancesByMagnitude
+                                    .Where(e =>
+                                        ((e.Star1.StarNo == jStarNo && e.Star2.StarNo == lStar.StarNo) ||
+                                         (e.Star1.StarNo == lStar.StarNo && e.Star2.StarNo == jStarNo)) &&
+                                        e.DistanceArcSec < dlj + toleranceInArcSec && e.DistanceArcSec > dlj - toleranceInArcSec)
+                                    .ToList();
+
+                                    List<DistanceEntry> klCandidates = m_DistancesByMagnitude
+                                        .Where(e =>
+                                            ((e.Star1.StarNo == kStarNo && e.Star2.StarNo == lStar.StarNo) ||
+                                             (e.Star1.StarNo == lStar.StarNo && e.Star2.StarNo == kStarNo)) &&
+                                            e.DistanceArcSec < dlk + toleranceInArcSec && e.DistanceArcSec > dlk - toleranceInArcSec)
+                                        .ToList();
+
+                                    if (jlCandidates.Count > 0 && klCandidates.Count > 0)
+                                    {
+                                        if (klCandidates.Count > 0)
+                                            return true;
+                                    }
+                                }
+                            }
                         }
                     }
 //#if DEBUG
@@ -1407,34 +1468,35 @@ namespace Tangra.Astrometry.Recognition
 
 						double djk = m_PlateConfig.GetDistanceInArcSec(jCenter.XDouble, jCenter.YDouble, kCenter.XDouble, kCenter.YDouble, fittedFocalLength);
 
-                        ulong foundIdx0 = uint.MaxValue;
+                        ulong iStarNo = uint.MaxValue;
                         ulong needIdx1 = uint.MaxValue;
                         ulong needIdx2 = uint.MaxValue;
+
 						if (ikEntry.Star1.StarNo == ijEntry.Star1.StarNo)
 						{
 							// ik_1 = ij_1 = (i)
-							foundIdx0 = ikEntry.Star1.StarNo;
+							iStarNo = ikEntry.Star1.StarNo;
 							needIdx1 = ikEntry.Star2.StarNo;
 							needIdx2 = ijEntry.Star2.StarNo;
 						}
 						else if (ikEntry.Star1.StarNo == ijEntry.Star2.StarNo)
 						{
 							// ik_1 = ij_2 = (i)
-							foundIdx0 = ikEntry.Star1.StarNo;
+							iStarNo = ikEntry.Star1.StarNo;
 							needIdx1 = ikEntry.Star2.StarNo; // (k)
 							needIdx2 = ijEntry.Star1.StarNo; // (j)
 						}
 						else if (ikEntry.Star2.StarNo == ijEntry.Star1.StarNo)
 						{
 							// ik_2 = ij_1 = (i)
-							foundIdx0 = ikEntry.Star2.StarNo;
+							iStarNo = ikEntry.Star2.StarNo;
 							needIdx1 = ikEntry.Star1.StarNo; // (k)
 							needIdx2 = ijEntry.Star2.StarNo; // (j)
 						}
 						else if (ikEntry.Star2.StarNo == ijEntry.Star2.StarNo)
 						{
 							// ik_2 = ij_2 = (i)
-							foundIdx0 = ikEntry.Star2.StarNo;
+							iStarNo = ikEntry.Star2.StarNo;
 							needIdx1 = ikEntry.Star1.StarNo; // (k)
 							needIdx2 = ijEntry.Star1.StarNo; // (j)
 						}
@@ -1457,6 +1519,9 @@ namespace Tangra.Astrometry.Recognition
 
 						if (jkEntry != null)
 						{
+                            ulong jStarNo = uint.MaxValue;
+                            ulong kStarNo = uint.MaxValue;
+                        
 							if (jkEntry.DistanceArcSec + toleranceInArcSec < djkMin)
 							{
 								Trace.Assert(!debugTrippleFound);
@@ -1484,29 +1549,90 @@ namespace Tangra.Astrometry.Recognition
 							{
 
 								m_Solution = IsSuccessfulMatch(m_StarMap, i, j, k, ijEntry, ikEntry, jkEntry,
-															   foundIdx0, needIdx1, needIdx2, fittedFocalLength, true, toleranceInArcSec);
-								if (m_Solution != null)
-								{
-									debugFieldIdentified = true;
-									return true;
-								}
-								else
-									Trace.Assert(!debugTrippleFound);
+															   iStarNo, needIdx1, needIdx2, fittedFocalLength, true, toleranceInArcSec);
+							    if (m_Solution != null)
+							    {
+							        jStarNo = needIdx1;
+							        kStarNo = needIdx2;
+							        debugFieldIdentified = true;
+							    }
+							    else
+							    {
+                                    Trace.Assert(!debugTrippleFound);
+                                    continue;
+							    }
+									
 							}
 
 							if (jkEntry.Star1.StarNo == needIdx2 &&
 								jkEntry.Star2.StarNo == needIdx1)
 							{
 								m_Solution = IsSuccessfulMatch(m_StarMap, i, j, k, ijEntry, ikEntry, jkEntry,
-															   foundIdx0, needIdx1, needIdx2, fittedFocalLength, true, toleranceInArcSec);
-								if (m_Solution != null)
-								{
-									debugFieldIdentified = true;
-									return true;
-								}
-								else
-									Trace.Assert(!debugTrippleFound);
+															   iStarNo, needIdx1, needIdx2, fittedFocalLength, true, toleranceInArcSec);
+							    if (m_Solution != null)
+							    {
+							        jStarNo = needIdx2;
+							        kStarNo = needIdx1;
+							        debugFieldIdentified = true;
+							    }
+							    else
+							    {
+                                    Trace.Assert(!debugTrippleFound);
+							        continue;
+							    }
 							}
+
+						    if (m_Solution != null)
+						    {
+						        if (TangraConfig.Settings.Astrometry.PyramidNumberOfPivots == 3)
+                                    // Exist the initial alignment with only 3 candidate pivots
+						            return true;
+
+                                for (int l = 0; l < m_StarMap.Features.Count; l++)
+                                {
+                                    var piramid = m_StarMap.Features[l];
+                                    if (piramid.FeatureId == i || piramid.FeatureId == j || piramid.FeatureId == k)
+                                        continue;
+
+                                    var lCenter = piramid.GetCenter();
+
+                                    // NOTE: Continue until a set of distances is found in the cache for the 4-th pivot
+                                    double dli = m_PlateConfig.GetDistanceInArcSec(lCenter.XDouble, lCenter.YDouble, iCenter.XDouble, iCenter.YDouble, fittedFocalLength);
+                                    double dlj = m_PlateConfig.GetDistanceInArcSec(lCenter.XDouble, lCenter.YDouble, jCenter.XDouble, jCenter.YDouble, fittedFocalLength);
+                                    double dlk = m_PlateConfig.GetDistanceInArcSec(lCenter.XDouble, lCenter.YDouble, kCenter.XDouble, kCenter.YDouble, fittedFocalLength);
+
+                                    List<DistanceEntry> ilCandidates = m_DistancesByMagnitude
+						                .Where(e =>
+							                (e.Star1.StarNo == iStarNo || e.Star2.StarNo == iStarNo) &&
+                                            e.DistanceArcSec < dli + toleranceInArcSec && e.DistanceArcSec > dli - toleranceInArcSec)
+						                .ToList();
+
+                                    foreach (var cand_il in ilCandidates)
+                                    {
+                                        var lStar = cand_il.Star1.StarNo == iStarNo ? cand_il.Star2 : cand_il.Star1;
+
+                                        List<DistanceEntry> jlCandidates = m_DistancesByMagnitude
+                                        .Where(e =>
+                                            ((e.Star1.StarNo == jStarNo && e.Star2.StarNo == lStar.StarNo) ||
+                                             (e.Star1.StarNo == lStar.StarNo && e.Star2.StarNo == jStarNo)) &&
+                                            e.DistanceArcSec < dlj + toleranceInArcSec && e.DistanceArcSec > dlj - toleranceInArcSec)
+                                        .ToList();
+
+                                        List<DistanceEntry> klCandidates = m_DistancesByMagnitude
+                                            .Where(e =>
+                                                ((e.Star1.StarNo == kStarNo && e.Star2.StarNo == lStar.StarNo) ||
+                                                 (e.Star1.StarNo == lStar.StarNo && e.Star2.StarNo == kStarNo)) &&
+                                                e.DistanceArcSec < dlk + toleranceInArcSec && e.DistanceArcSec > dlk - toleranceInArcSec)
+                                            .ToList();
+
+                                        if (jlCandidates.Count > 0 && klCandidates.Count > 0)
+                                        {
+                                            if (klCandidates.Count > 0)
+                                                return true;        
+                                        }
+                                    }                                    
+                                }
+						    }
 						}
 					}
 				}
