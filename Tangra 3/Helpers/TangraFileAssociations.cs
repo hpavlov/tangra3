@@ -15,6 +15,7 @@ using Tangra.Model.Helpers;
 
 namespace Tangra.Helpers
 {
+#if WIN32
 	public class TangraFileAssociations
 	{
 		public static string PGID_LC_FILE = "Tangra Light Curve";
@@ -110,4 +111,5 @@ namespace Tangra.Helpers
             }
 		}
 	}
+#endif
 }

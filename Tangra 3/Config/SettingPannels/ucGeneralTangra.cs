@@ -54,6 +54,7 @@ namespace Tangra.Config.SettingPannels
 		{
 			if (CurrentOS.IsWindows)
 			{
+                #if WIN32
 				btnAssociateFiles.Visible = true;
 				btnAssociateFiles.Enabled = true;
 				var fileAssociation = new TangraFileAssociations();
@@ -75,13 +76,15 @@ namespace Tangra.Config.SettingPannels
 
 				if (fileAssociation.CanRegisterWithoutElevation)
 					btnAssociateFiles.Tag = fileAssociation;
-			}
+                #endif
+            }
 			else
-				btnAssociateFiles.Visible = false;			
+				btnAssociateFiles.Visible = false;
 		}
 
 		private void btnAssociateFiles_Click(object sender, EventArgs e)
 		{
+#if WIN32
 			TangraFileAssociations fileAssocHelper = btnAssociateFiles.Tag as TangraFileAssociations;
 			if (fileAssocHelper != null)
 			{
@@ -116,6 +119,7 @@ namespace Tangra.Config.SettingPannels
 					UpdateFileAssociationsButtonState();
 				}				
 			}
+#endif
 		}
 	}
 }

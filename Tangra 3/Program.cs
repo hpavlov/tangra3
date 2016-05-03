@@ -92,6 +92,7 @@ namespace Tangra
 
 		    if (CurrentOS.IsWindows)
 		    {
+#if WIN32
                 bool isRegisterAssociationsCommand = TangraFileAssociations.COMMAND_LINE_ASSOCIATE.Equals(action, StringComparison.InvariantCultureIgnoreCase);
 
                 try
@@ -110,7 +111,10 @@ namespace Tangra
 
 
                 return isRegisterAssociationsCommand;
-		    }
+#else
+		        return false;
+#endif
+            }
             else
 		        return true;
 		}
