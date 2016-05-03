@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -10,6 +10,8 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Tangra</RootNamespace>
     <AssemblyName>Tangra</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -17,19 +19,19 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;__linux__</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <ConsolePause>false</ConsolePause>
-    <EnvironmentVariables>
-      <EnvironmentVariables>
-        <Variable name="LD_LIBRARY_PATH" value="." />
-      </EnvironmentVariables>
-    </EnvironmentVariables>
-    <PlatformTarget>x86</PlatformTarget>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="AfterBuild" />
+      </CustomCommands>
+    </CustomCommands>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -37,12 +39,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <EnvironmentVariables>
-      <EnvironmentVariables>
-        <Variable name="LD_LIBRARY_PATH" value="." />
-      </EnvironmentVariables>
-    </EnvironmentVariables>
-    <PlatformTarget>x86</PlatformTarget>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>Tangra.Program</StartupObject>
@@ -50,25 +47,186 @@
   <PropertyGroup>
     <ApplicationIcon>tangra-big.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+    <WarningLevel>4</WarningLevel>
+    <Optimize>false</Optimize>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="AfterBuild" />
+      </CustomCommands>
+    </CustomCommands>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE;WIN32</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release - Non Windows|x86'">
+    <OutputPath>bin\Release - Non Windows\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Optimize>true</Optimize>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release - Non Windows|x64'">
+    <OutputPath>bin\x64\Release - Non Windows\</OutputPath>
+    <DefineConstants>TRACE;__linux__</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Optimize>true</Optimize>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;__linux__</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Optimize>true</Optimize>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release - Non Windows|AnyCPU'">
+    <OutputPath>bin\Release - Non Windows\</OutputPath>
+    <DefineConstants>TRACE;__linux__</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Optimize>true</Optimize>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AdvLib">
+      <HintPath>lib\AdvLib.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="DirectShowLib-2005">
+      <HintPath>lib\DirectShowLib-2005.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="3rdParty\FileAssociation\AssociationManager.cs" />
+    <Compile Include="3rdParty\FileAssociation\FileAssociationInfo.cs" />
+    <Compile Include="3rdParty\FileAssociation\ProgramAssociationInfo.cs" />
+    <Compile Include="3rdParty\FileAssociation\ProgramIcon.cs" />
+    <Compile Include="3rdParty\FileAssociation\ProgramVerb.cs" />
+    <Compile Include="3rdParty\FileAssociation\RegistryException.cs" />
+    <Compile Include="3rdParty\FileAssociation\RegistryWrapper.cs" />
+    <Compile Include="3rdParty\FileAssociation\ShellNotification.cs" />
+    <Compile Include="Addins\Addin.cs" />
+    <Compile Include="Addins\AddinManager.cs" />
+    <Compile Include="Addins\AddinTrackingHandler.cs" />
+    <Compile Include="Addins\AstrometricSolutionImpl.cs" />
+    <Compile Include="Addins\frmConfirmIntegrationRate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Addins\frmConfirmIntegrationRate.Designer.cs">
+      <DependentUpon>frmConfirmIntegrationRate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Addins\MarshalByRefAstrometryProvider.cs" />
+    <Compile Include="Addins\MarshalByRefLightCurveDataProvider.cs" />
+    <Compile Include="Addins\SettingsStorageProvider.cs" />
+    <Compile Include="Addins\SingleMeasurement.cs" />
+    <Compile Include="Addins\TangraDrawingSettings.cs" />
+    <Compile Include="Addins\TangraHostDelegate.cs" />
+    <Compile Include="Config\frmChooseFirstTimeOcrSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Config\frmChooseFirstTimeOcrSettings.Designer.cs">
+      <DependentUpon>frmChooseFirstTimeOcrSettings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Config\frmInstDelayConfigChooser.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Config\frmInstDelayConfigChooser.Designer.cs">
+      <DependentUpon>frmInstDelayConfigChooser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Config\frmMPCObserver.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Config\frmMPCObserver.Designer.cs">
+      <DependentUpon>frmMPCObserver.cs</DependentUpon>
+    </Compile>
     <Compile Include="Config\frmTangraSettings.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Config\frmTangraSettings.Designer.cs">
       <DependentUpon>frmTangraSettings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucCustomizeSpectroscopy.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucCustomizeSpectroscopy.Designer.cs">
+      <DependentUpon>ucCustomizeSpectroscopy.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucSpectroscopy.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucSpectroscopy.Designer.cs">
+      <DependentUpon>ucSpectroscopy.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucAddins.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucAddins.Designer.cs">
+      <DependentUpon>ucAddins.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucAstrometry.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucAstrometry.Designer.cs">
+      <DependentUpon>ucAstrometry.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucCompatibility.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucCompatibility.Designer.cs">
+      <DependentUpon>ucCompatibility.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucAAV8bit.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucAAV8bit.Designer.cs">
+      <DependentUpon>ucAAV8bit.cs</DependentUpon>
     </Compile>
     <Compile Include="Config\SettingPannels\SettingsPannel.cs">
       <SubType>UserControl</SubType>
@@ -84,6 +242,12 @@
     </Compile>
     <Compile Include="Config\SettingPannels\ucAnalogueVideo8bit.Designer.cs">
       <DependentUpon>ucAnalogueVideo8bit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucCustomizeAstrometry.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucCustomizeAstrometry.Designer.cs">
+      <DependentUpon>ucCustomizeAstrometry.cs</DependentUpon>
     </Compile>
     <Compile Include="Config\SettingPannels\ucCustomizeLightCurves.cs">
       <SubType>UserControl</SubType>
@@ -115,15 +279,30 @@
     <Compile Include="Config\SettingPannels\ucPhotometry.Designer.cs">
       <DependentUpon>ucPhotometry.cs</DependentUpon>
     </Compile>
+    <Compile Include="Config\SettingPannels\ucStarCatalogues.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucStarCatalogues.Designer.cs">
+      <DependentUpon>ucStarCatalogues.cs</DependentUpon>
+    </Compile>
     <Compile Include="Config\SettingPannels\ucTracking.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Config\SettingPannels\ucTracking.Designer.cs">
       <DependentUpon>ucTracking.cs</DependentUpon>
     </Compile>
+    <Compile Include="Config\InstrumentalDelayConfigManager.cs" />
+    <Compile Include="Controller\AstrometryController.cs" />
+    <Compile Include="Controller\AutoUpdatesController.cs" />
+    <Compile Include="Controller\IRequiresAddinsController.cs" />
+    <Compile Include="Controller\LightCurveContext.cs" />
     <Compile Include="Controller\LightCurveController.cs" />
+    <Compile Include="Controller\DarkFlatFrameController.cs" />
+    <Compile Include="Controller\SpectraReductionContext.cs" />
+    <Compile Include="Controller\SpectroscopyController.cs" />
     <Compile Include="Controller\VideoController.cs" />
     <Compile Include="Controller\VideoOperationController.cs" />
+    <Compile Include="Controller\AddinsController.cs" />
     <Compile Include="Controls\SmoothPanel.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -133,11 +312,11 @@
     <Compile Include="Controls\ucColorPicker.Designer.cs">
       <DependentUpon>ucColorPicker.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controls\ucUtcTimePicker.cs">
+    <Compile Include="Controls\ucImagePanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\ucUtcTimePicker.Designer.cs">
-      <DependentUpon>ucUtcTimePicker.cs</DependentUpon>
+    <Compile Include="Controls\ucImagePanel.Designer.cs">
+      <DependentUpon>ucImagePanel.cs</DependentUpon>
     </Compile>
     <Compile Include="frmAbout.cs">
       <SubType>Form</SubType>
@@ -151,17 +330,17 @@
     <Compile Include="frmFITSHeader.Designer.cs">
       <DependentUpon>frmFITSHeader.cs</DependentUpon>
     </Compile>
+    <Compile Include="frmContributorsCall.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmContributorsCall.Designer.cs">
+      <DependentUpon>frmContributorsCall.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmMain.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmMain.Designer.cs">
       <DependentUpon>frmMain.cs</DependentUpon>
-    </Compile>
-    <Compile Include="frmSplashScreen.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmSplashScreen.Designer.cs">
-      <DependentUpon>frmSplashScreen.cs</DependentUpon>
     </Compile>
     <Compile Include="frmSystemInfo.cs">
       <SubType>Form</SubType>
@@ -182,13 +361,353 @@
       <DependentUpon>frmUnhandledException.cs</DependentUpon>
     </Compile>
     <Compile Include="Helpers\ApplicationSettingsSerializer.cs" />
+    <Compile Include="Helpers\AtmosphericExtinctionCalculator.cs" />
+    <Compile Include="Helpers\CrossPlaform.cs" />
     <Compile Include="Helpers\DuplicateFrameAvoider.cs" />
     <Compile Include="Helpers\Extensions.cs" />
+    <Compile Include="Helpers\FITSHelper.cs" />
+    <Compile Include="Helpers\frmChooseFitsFolder.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Helpers\frmChooseFitsFolder.Designer.cs">
+      <DependentUpon>frmChooseFitsFolder.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Helpers\frmLongRunningOperation.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Helpers\frmLongRunningOperation.Designer.cs">
+      <DependentUpon>frmLongRunningOperation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Helpers\LongOperationsManager.cs" />
+    <Compile Include="VideoOperations\LightCurves\Tracking\LunarOccultationTracker.cs" />
+    <Compile Include="VideoOperations\LightCurves\Tracking\StarFieldTracker.cs" />
+    <Compile Include="VideoOperations\Spectroscopy\AbsFluxCalibration\AbsFluxCalibrator.cs" />
+    <Compile Include="VideoOperations\Spectroscopy\AbsFluxCalibration\AbsFluxSpectra.cs" />
+    <Compile Include="VideoOperations\Spectroscopy\AbsFluxCalibration\CalSpecDatabase.cs" />
+    <Compile Include="VideoOperations\Spectroscopy\AbsFluxCalibration\frmAbsFlux.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\AbsFluxCalibration\frmAbsFlux.Designer.cs">
+      <DependentUpon>frmAbsFlux.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\AbsFluxCalibration\AbsFluxInputFile.cs" />
+    <Compile Include="VideoOperations\Spectroscopy\AbsFluxCalibration\frmCompleteSpectra.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\AbsFluxCalibration\frmCompleteSpectra.Designer.cs">
+      <DependentUpon>frmCompleteSpectra.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\AbsFluxCalibration\frmConfigureAbsFluxExport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\AbsFluxCalibration\frmConfigureAbsFluxExport.Designer.cs">
+      <DependentUpon>frmConfigureAbsFluxExport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\AbsFluxCalibration\frmConfigureProcessing.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\AbsFluxCalibration\frmConfigureProcessing.Designer.cs">
+      <DependentUpon>frmConfigureProcessing.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\FilterResponses\FilterResponseDatabase.cs" />
+    <Compile Include="VideoOperations\Spectroscopy\FilterResponses\SyntheticMagnitudeProducer.cs" />
+    <Compile Include="VideoOperations\Spectroscopy\frmChooseConfiguration.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\frmChooseConfiguration.Designer.cs">
+      <DependentUpon>frmChooseConfiguration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\frmEditWavelengthConfigName.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\frmEditWavelengthConfigName.Designer.cs">
+      <DependentUpon>frmEditWavelengthConfigName.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\frmEnterWavelength.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\frmEnterWavelength.Designer.cs">
+      <DependentUpon>frmEnterWavelength.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\frmSpectraViewSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\frmSpectraViewSettings.Designer.cs">
+      <DependentUpon>frmSpectraViewSettings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\frmViewSpectra.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\frmViewSpectra.Designer.cs">
+      <DependentUpon>frmViewSpectra.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\Helpers\frmStackedPixels.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\Helpers\frmStackedPixels.Designer.cs">
+      <DependentUpon>frmStackedPixels.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\Helpers\RotationMapper.cs" />
+    <Compile Include="Helpers\ShellHelper.cs" />
+    <Compile Include="Helpers\TangraFileAssociations.cs" />
+    <Compile Include="Helpers\UsageStats.cs" />
+    <Compile Include="Helpers\VersionHelper.cs" />
+    <Compile Include="Helpers\WindowsHelpers.cs" />
+    <Compile Include="ImageTools\CalibrationToolBase.cs" />
+    <Compile Include="ImageTools\FrameSizer.cs" />
+    <Compile Include="ImageTools\frmIdentifyCalibrationStar.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ImageTools\frmIdentifyCalibrationStar.Designer.cs">
+      <DependentUpon>frmIdentifyCalibrationStar.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ImageTools\OSDExcluder.cs" />
+    <Compile Include="ImageTools\PlateCalibrationTool.cs" />
+    <Compile Include="ImageTools\SelectAstrometricObjectTool.cs" />
+    <Compile Include="Model\CoordsAndLocation.cs" />
+    <Compile Include="VideoOperations\Astrometry\AstrometricState.cs" />
+    <Compile Include="VideoOperations\Astrometry\Engine\AstrometryContext.cs" />
+    <Compile Include="VideoOperations\Astrometry\Engine\CalibrationContext.cs" />
+    <Compile Include="VideoOperations\Astrometry\Engine\FieldSolveContext.cs" />
+    <Compile Include="VideoOperations\Astrometry\Engine\PlateCalibration.cs" />
+    <Compile Include="VideoOperations\Astrometry\frmChooseCamera.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\frmChooseCamera.Designer.cs">
+      <DependentUpon>frmChooseCamera.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\frmConfigureAstrometricFit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\frmConfigureAstrometricFit.Designer.cs">
+      <DependentUpon>frmConfigureAstrometricFit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\frmEditCamera.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\frmEditCamera.Designer.cs">
+      <DependentUpon>frmEditCamera.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\frmEditConfigName.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\frmEditConfigName.Designer.cs">
+      <DependentUpon>frmEditConfigName.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\frmFirstTimeCalibrationRequired.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\frmFirstTimeCalibrationRequired.Designer.cs">
+      <DependentUpon>frmFirstTimeCalibrationRequired.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\frmIdentifyObjects.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\frmIdentifyObjects.Designer.cs">
+      <DependentUpon>frmIdentifyObjects.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\frmRunMultiFrameMeasurements.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\frmRunMultiFrameMeasurements.Designer.cs">
+      <DependentUpon>frmRunMultiFrameMeasurements.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\frmSolveConfiguration.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\frmSolveConfiguration.Designer.cs">
+      <DependentUpon>frmSolveConfiguration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\frmTypeStarNumber.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\frmTypeStarNumber.Designer.cs">
+      <DependentUpon>frmTypeStarNumber.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\MPCReport\frmChooseMPCObject.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\MPCReport\frmChooseMPCObject.Designer.cs">
+      <DependentUpon>frmChooseMPCObject.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\MPCReport\frmChooseReportFile.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\MPCReport\frmChooseReportFile.Designer.cs">
+      <DependentUpon>frmChooseReportFile.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\MPCReport\frmDisplayMPCReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\MPCReport\frmDisplayMPCReport.Designer.cs">
+      <DependentUpon>frmDisplayMPCReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\MPCReport\MPCReportFile.cs" />
+    <Compile Include="VideoOperations\Astrometry\ucAstrometryObjectInfo.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\ucAstrometryObjectInfo.Designer.cs">
+      <DependentUpon>ucAstrometryObjectInfo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\ucCalibrationPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\ucCalibrationPanel.Designer.cs">
+      <DependentUpon>ucCalibrationPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\ucChooseCalibratedConfiguration.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\ucChooseCalibratedConfiguration.Designer.cs">
+      <DependentUpon>ucChooseCalibratedConfiguration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\ucFrameInterval.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\ucFrameInterval.Designer.cs">
+      <DependentUpon>ucFrameInterval.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\ucManualFit.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\ucManualFit.Designer.cs">
+      <DependentUpon>ucManualFit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\VideoAstrometryOperation.cs" />
+    <Compile Include="VideoOperations\LightCurves\CSVExportOptions.cs" />
+    <Compile Include="VideoOperations\LightCurves\frmConfigureCsvExport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\frmConfigureCsvExport.Designer.cs">
+      <DependentUpon>frmConfigureCsvExport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\frmConfirmDay.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\frmConfirmDay.Designer.cs">
+      <DependentUpon>frmConfirmDay.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\frmDefineBinning.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\frmDefineBinning.Designer.cs">
+      <DependentUpon>frmDefineBinning.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\frmLcFileLoadOptions.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\frmLcFileLoadOptions.Designer.cs">
+      <DependentUpon>frmLcFileLoadOptions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\Helpers\frmOCRTooManyErrorsReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\Helpers\frmOCRTooManyErrorsReport.Designer.cs">
+      <DependentUpon>frmOCRTooManyErrorsReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\Helpers\frmSetLightCurveTitle.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\Helpers\frmSetLightCurveTitle.Designer.cs">
+      <DependentUpon>frmSetLightCurveTitle.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\Helpers\LCFileImagePixelProvider.cs" />
+    <Compile Include="VideoOperations\LightCurves\InfoForms\frmSetReferenceMag.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\InfoForms\frmSetReferenceMag.Designer.cs">
+      <DependentUpon>frmSetReferenceMag.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\InfoForms\LCFileTagValuePair.cs" />
+    <Compile Include="VideoOperations\LightCurves\InfoForms\MagnitudeConverter.cs" />
+    <Compile Include="VideoOperations\LightCurves\MutualEvents\frmAddOrEditMutualEventsTarget.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\MutualEvents\frmAddOrEditMutualEventsTarget.Designer.cs">
+      <DependentUpon>frmAddOrEditMutualEventsTarget.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\Report\frmChooseTimesToReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\Report\frmChooseTimesToReport.Designer.cs">
+      <DependentUpon>frmChooseTimesToReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\Tracking\MutualEventTracker.cs" />
+    <Compile Include="VideoOperations\LightCurves\ucCorrSelection.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\ucCorrSelection.Designer.cs">
+      <DependentUpon>ucCorrSelection.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\frmRunMultiFrameSpectroscopy.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\frmRunMultiFrameSpectroscopy.Designer.cs">
+      <DependentUpon>frmRunMultiFrameSpectroscopy.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\Helpers\SpectraCalibrator.cs" />
+    <Compile Include="VideoOperations\Spectroscopy\Helpers\SpectraLineLibrary.cs" />
+    <Compile Include="VideoOperations\Spectroscopy\Helpers\SpectraReader.cs" />
+    <Compile Include="VideoOperations\Spectroscopy\SpectraFile.cs" />
+    <Compile Include="VideoOperations\Spectroscopy\Tracking\SpectroscopyStarTracker.cs" />
+    <Compile Include="VideoOperations\Spectroscopy\ucSpectroscopy.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\ucSpectroscopy.Designer.cs">
+      <DependentUpon>ucSpectroscopy.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\Spectroscopy\VideoSpectroscopyOperation.cs" />
+    <Compile Include="VideoOperations\Spectroscopy\ViewSpectraStates\SpectraViewerStateBase.cs" />
+    <Compile Include="VideoOperations\Spectroscopy\ViewSpectraStates\SpectraViewerStateCalibrate.cs" />
+    <Compile Include="VideoOperations\Spectroscopy\ViewSpectraStates\SpectraViewerStateCalibrated.cs" />
+    <Compile Include="VideoOperations\Spectroscopy\ViewSpectraStates\SpectraViewerStateManager.cs" />
+    <Compile Include="VideoTools\AavFileCreator.cs" />
+    <Compile Include="VideoTools\BackgroundModelGenerator.cs" />
+    <Compile Include="VideoTools\frmDefineDisplayDynamicRange.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoTools\frmDefineDisplayDynamicRange.Designer.cs">
+      <DependentUpon>frmDefineDisplayDynamicRange.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoTools\frmFileInformation.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoTools\frmFileInformation.Designer.cs">
+      <DependentUpon>frmFileInformation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoTools\frmGenerate3DPolyBackground.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoTools\frmGenerate3DPolyBackground.Designer.cs">
+      <DependentUpon>frmGenerate3DPolyBackground.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoTools\frmGenerateOccultationVideoModel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoTools\frmGenerateOccultationVideoModel.Designer.cs">
+      <DependentUpon>frmGenerateOccultationVideoModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoTools\frmGenerateStarFieldVideoModel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoTools\frmGenerateStarFieldVideoModel.Designer.cs">
+      <DependentUpon>frmGenerateStarFieldVideoModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoTools\VideoModelUtils.cs" />
+    <Compile Include="Video\AstroDigitalVideo\AdvToAviConverter.cs" />
+    <Compile Include="Video\AstroDigitalVideo\frmBuildingNtpTimebase.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Video\AstroDigitalVideo\frmBuildingNtpTimebase.Designer.cs">
+      <DependentUpon>frmBuildingNtpTimebase.cs</DependentUpon>
+    </Compile>
     <Compile Include="Helpers\NotificationManager.cs" />
     <Compile Include="Helpers\TangraEnvironment.cs" />
+    <Compile Include="Helpers\ZipUnzip.cs" />
     <Compile Include="ImageTools\ArrowTool.cs" />
     <Compile Include="ImageTools\CorrectTrackingTool.cs" />
-    <Compile Include="OCR\ITimestampOcr.cs" />
+    <Compile Include="OCR\OcrExtensionManager.cs" />
+    <Compile Include="PInvoke\NativeTracking.cs" />
     <Compile Include="PInvoke\TangraCore.cs" />
     <Compile Include="PInvoke\TangraVideo.cs" />
     <Compile Include="Program.cs" />
@@ -200,12 +719,26 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
     <Compile Include="VideoOperations\FrameAdjustmentsPreview.cs" />
+    <Compile Include="VideoOperations\frmChooseOcrEngine.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\frmChooseOcrEngine.Designer.cs">
+      <DependentUpon>frmChooseOcrEngine.cs</DependentUpon>
+    </Compile>
     <Compile Include="VideoOperations\frmFullSizePreview.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="VideoOperations\frmFullSizePreview.Designer.cs">
       <DependentUpon>frmFullSizePreview.cs</DependentUpon>
     </Compile>
+    <Compile Include="VideoOperations\frmOsdOcrCalibrationFailure.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\frmOsdOcrCalibrationFailure.Designer.cs">
+      <DependentUpon>frmOsdOcrCalibrationFailure.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\AdjustApertures\AdjustAperturesController.cs" />
+    <Compile Include="VideoOperations\LightCurves\AdjustApertures\AdjustAperturesViewModel.cs" />
     <Compile Include="VideoOperations\LightCurves\AveragedFrame.cs" />
     <Compile Include="VideoOperations\LightCurves\DisplayBitmapConverter.cs" />
     <Compile Include="VideoOperations\LightCurves\frmAddOrEditSingleTarget.cs">
@@ -214,17 +747,17 @@
     <Compile Include="VideoOperations\LightCurves\frmAddOrEditSingleTarget.Designer.cs">
       <DependentUpon>frmAddOrEditSingleTarget.cs</DependentUpon>
     </Compile>
+    <Compile Include="VideoOperations\LightCurves\AdjustApertures\frmAdjustApertures.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\AdjustApertures\frmAdjustApertures.Designer.cs">
+      <DependentUpon>frmAdjustApertures.cs</DependentUpon>
+    </Compile>
     <Compile Include="VideoOperations\LightCurves\frmConfigureReprocessing.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="VideoOperations\LightCurves\frmConfigureReprocessing.Designer.cs">
       <DependentUpon>frmConfigureReprocessing.cs</DependentUpon>
-    </Compile>
-    <Compile Include="VideoOperations\LightCurves\frmCustomBinning.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="VideoOperations\LightCurves\frmCustomBinning.Designer.cs">
-      <DependentUpon>frmCustomBinning.cs</DependentUpon>
     </Compile>
     <Compile Include="VideoOperations\LightCurves\frmEditLcDataSeries.cs">
       <SubType>Form</SubType>
@@ -314,10 +847,19 @@
     <Compile Include="VideoOperations\LightCurves\LightCurveReductionContext.cs" />
     <Compile Include="VideoOperations\LightCurves\Measurements\GroupMeasurer.cs" />
     <Compile Include="VideoOperations\LightCurves\ReduceLightCurveOperation.cs" />
+    <Compile Include="Helpers\OccultWatcherHelper.cs" />
+    <Compile Include="VideoOperations\LightCurves\Report\EventTimesReport.cs" />
+    <Compile Include="VideoOperations\LightCurves\Tracking\BaseTracker.cs" />
+    <Compile Include="VideoOperations\LightCurves\Tracking\FailedDistanceLogger.cs" />
+    <Compile Include="VideoOperations\LightCurves\Tracking\ITracker.cs" />
+    <Compile Include="VideoOperations\LightCurves\Tracking\NativeSimplifiedTracker.cs" />
+    <Compile Include="VideoOperations\LightCurves\Tracking\NativeTrackedObject.cs" />
     <Compile Include="VideoOperations\LightCurves\Tracking\OccultationTracker.cs" />
     <Compile Include="VideoOperations\LightCurves\Tracking\OneStarTracker.cs" />
+    <Compile Include="VideoOperations\LightCurves\Tracking\SimplifiedTracker.cs" />
     <Compile Include="VideoOperations\LightCurves\Tracking\TrackedObject.cs" />
     <Compile Include="VideoOperations\LightCurves\Tracking\TrackedObjectConfig.cs" />
+    <Compile Include="VideoOperations\LightCurves\Tracking\TrackedObjectLight.cs" />
     <Compile Include="VideoOperations\LightCurves\Tracking\Tracker.cs" />
     <Compile Include="VideoOperations\LightCurves\Tracking\TrackerFactory.cs" />
     <Compile Include="VideoOperations\LightCurves\Tracking\UntrackedTracker.cs" />
@@ -339,17 +881,29 @@
     <Compile Include="VideoOperations\LightCurves\ucPreProcessing.Designer.cs">
       <DependentUpon>ucPreProcessing.cs</DependentUpon>
     </Compile>
+    <Compile Include="VideoOperations\MakeDarkFlatField\MakeDarkFlatOperation.cs" />
+    <Compile Include="VideoOperations\MakeDarkFlatField\ucMakeDarkFlatField.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\MakeDarkFlatField\ucMakeDarkFlatField.Designer.cs">
+      <DependentUpon>ucMakeDarkFlatField.cs</DependentUpon>
+    </Compile>
     <Compile Include="Video\AstroDigitalVideoStream.cs" />
     <Compile Include="Video\AstroDigitalVideo\AdvFile.cs" />
     <Compile Include="Video\AstroDigitalVideo\AdvFramesIndex.cs" />
     <Compile Include="Video\AstroDigitalVideo\AdvImageLayout.cs" />
     <Compile Include="Video\AstroDigitalVideo\AdvImageSection.cs" />
-    <Compile Include="Video\AstroDigitalVideo\AdvLib.cs" />
     <Compile Include="Video\AstroDigitalVideo\AdvOverlayManager.cs" />
     <Compile Include="Video\AstroDigitalVideo\AdvSectionFactory.cs" />
     <Compile Include="Video\AstroDigitalVideo\AdvStatusSection.cs" />
     <Compile Include="Video\AstroDigitalVideo\AdvTags.cs" />
     <Compile Include="Video\AstroDigitalVideo\Compression\QuickLZ.cs" />
+    <Compile Include="Video\AstroDigitalVideo\frmAavStatusPopup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Video\AstroDigitalVideo\frmAavStatusPopup.Designer.cs">
+      <DependentUpon>frmAavStatusPopup.cs</DependentUpon>
+    </Compile>
     <Compile Include="Video\AstroDigitalVideo\frmAdvIndexRebuilder.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -370,6 +924,42 @@
     </Compile>
     <Compile Include="Video\AstroDigitalVideo\Interfaces.cs" />
     <Compile Include="Video\AstroDigitalVideo\UI\AdvTagValuePair.cs" />
+    <Compile Include="Video\BMPFileSequenceStream.cs" />
+    <Compile Include="Video\FITS\FITSFileSequenceStream.cs" />
+    <Compile Include="Video\FITS\frmSortFitsFiles.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Video\FITS\frmSortFitsFiles.Designer.cs">
+      <DependentUpon>frmSortFitsFiles.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Video\frmIntegrationDetection.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Video\frmIntegrationDetection.Designer.cs">
+      <DependentUpon>frmIntegrationDetection.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Video\FITS\IFITSStream.cs" />
+    <Compile Include="Video\RotatedVideoStream.cs" />
+    <Compile Include="Video\SER\frmCheckTimeStampsIntegrity.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Video\SER\frmCheckTimeStampsIntegrity.Designer.cs">
+      <DependentUpon>frmCheckTimeStampsIntegrity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Video\SER\SERVideoStream.cs" />
+    <Compile Include="Video\SER\frmEnterSERFileInfo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Video\SER\frmEnterSERFileInfo.Designer.cs">
+      <DependentUpon>frmEnterSERFileInfo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Video\SER\frmSerStatusPopup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Video\SER\frmSerStatusPopup.Designer.cs">
+      <DependentUpon>frmSerStatusPopup.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Video\FITS\SingleFITSFileFrameStream.cs" />
     <Compile Include="Video\FramePlayer.cs" />
     <Compile Include="Video\frmJumpToFrame.cs">
       <SubType>Form</SubType>
@@ -379,16 +969,50 @@
     </Compile>
     <Compile Include="Video\SingleBitmapFileFrameStream.cs" />
     <Compile Include="Video\VideoStream.cs" />
+    <Compile Include="View\ImageToolView.cs" />
     <Compile Include="View\VideoFileView.cs" />
     <Compile Include="View\ZoomedImageView.cs" />
+    <EmbeddedResource Include="Addins\frmConfirmIntegrationRate.resx">
+      <DependentUpon>frmConfirmIntegrationRate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Config\frmChooseFirstTimeOcrSettings.resx">
+      <DependentUpon>frmChooseFirstTimeOcrSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Config\frmInstDelayConfigChooser.resx">
+      <DependentUpon>frmInstDelayConfigChooser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Config\frmMPCObserver.resx">
+      <DependentUpon>frmMPCObserver.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Config\frmTangraSettings.resx">
       <DependentUpon>frmTangraSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Config\SettingPannels\ucCustomizeSpectroscopy.resx">
+      <DependentUpon>ucCustomizeSpectroscopy.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Config\SettingPannels\ucSpectroscopy.resx">
+      <DependentUpon>ucSpectroscopy.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Config\SettingPannels\ucAddins.resx">
+      <DependentUpon>ucAddins.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Config\SettingPannels\ucAstrometry.resx">
+      <DependentUpon>ucAstrometry.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Config\SettingPannels\ucCompatibility.resx">
+      <DependentUpon>ucCompatibility.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Config\SettingPannels\ucAAV8bit.resx">
+      <DependentUpon>ucAAV8bit.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Config\SettingPannels\ucADVSVideo12bit.resx">
       <DependentUpon>ucADVSVideo12bit.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Config\SettingPannels\ucAnalogueVideo8bit.resx">
       <DependentUpon>ucAnalogueVideo8bit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Config\SettingPannels\ucCustomizeAstrometry.resx">
+      <DependentUpon>ucCustomizeAstrometry.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Config\SettingPannels\ucCustomizeLightCurves.resx">
       <DependentUpon>ucCustomizeLightCurves.cs</DependentUpon>
@@ -405,14 +1029,17 @@
     <EmbeddedResource Include="Config\SettingPannels\ucPhotometry.resx">
       <DependentUpon>ucPhotometry.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Config\SettingPannels\ucStarCatalogues.resx">
+      <DependentUpon>ucStarCatalogues.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Config\SettingPannels\ucTracking.resx">
       <DependentUpon>ucTracking.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\ucColorPicker.resx">
       <DependentUpon>ucColorPicker.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Controls\ucUtcTimePicker.resx">
-      <DependentUpon>ucUtcTimePicker.cs</DependentUpon>
+    <EmbeddedResource Include="Controls\ucImagePanel.resx">
+      <DependentUpon>ucImagePanel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmAbout.resx">
       <DependentUpon>frmAbout.cs</DependentUpon>
@@ -420,20 +1047,156 @@
     <EmbeddedResource Include="frmFITSHeader.resx">
       <DependentUpon>frmFITSHeader.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="frmContributorsCall.resx">
+      <DependentUpon>frmContributorsCall.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmMain.resx">
       <DependentUpon>frmMain.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmSplashScreen.resx">
-      <DependentUpon>frmSplashScreen.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmSystemInfo.resx">
       <DependentUpon>frmSystemInfo.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmTargetPSFViewerForm.resx">
       <DependentUpon>frmTargetPSFViewerForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="frmUnhandledException.resx">
       <DependentUpon>frmUnhandledException.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Helpers\frmChooseFitsFolder.resx">
+      <DependentUpon>frmChooseFitsFolder.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Helpers\frmLongRunningOperation.resx">
+      <DependentUpon>frmLongRunningOperation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ImageTools\frmIdentifyCalibrationStar.resx">
+      <DependentUpon>frmIdentifyCalibrationStar.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Astrometry\frmChooseCamera.resx">
+      <DependentUpon>frmChooseCamera.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Astrometry\frmConfigureAstrometricFit.resx">
+      <DependentUpon>frmConfigureAstrometricFit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Astrometry\frmEditCamera.resx">
+      <DependentUpon>frmEditCamera.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Astrometry\frmEditConfigName.resx">
+      <DependentUpon>frmEditConfigName.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Astrometry\frmFirstTimeCalibrationRequired.resx">
+      <DependentUpon>frmFirstTimeCalibrationRequired.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Astrometry\frmIdentifyObjects.resx">
+      <DependentUpon>frmIdentifyObjects.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Astrometry\frmRunMultiFrameMeasurements.resx">
+      <DependentUpon>frmRunMultiFrameMeasurements.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Astrometry\frmSolveConfiguration.resx">
+      <DependentUpon>frmSolveConfiguration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Astrometry\MPCReport\frmChooseMPCObject.resx">
+      <DependentUpon>frmChooseMPCObject.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Astrometry\MPCReport\frmChooseReportFile.resx">
+      <DependentUpon>frmChooseReportFile.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Astrometry\MPCReport\frmDisplayMPCReport.resx">
+      <DependentUpon>frmDisplayMPCReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Astrometry\ucAstrometryObjectInfo.resx">
+      <DependentUpon>ucAstrometryObjectInfo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Astrometry\ucCalibrationPanel.resx">
+      <DependentUpon>ucCalibrationPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Astrometry\ucChooseCalibratedConfiguration.resx">
+      <DependentUpon>ucChooseCalibratedConfiguration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\frmConfigureCsvExport.resx">
+      <DependentUpon>frmConfigureCsvExport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\frmConfirmDay.resx">
+      <DependentUpon>frmConfirmDay.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\frmDefineBinning.resx">
+      <DependentUpon>frmDefineBinning.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\frmLcFileLoadOptions.resx">
+      <DependentUpon>frmLcFileLoadOptions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\Helpers\frmOCRTooManyErrorsReport.resx">
+      <DependentUpon>frmOCRTooManyErrorsReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\Helpers\frmSetLightCurveTitle.resx">
+      <DependentUpon>frmSetLightCurveTitle.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\InfoForms\frmSetReferenceMag.resx">
+      <DependentUpon>frmSetReferenceMag.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\MutualEvents\frmAddOrEditMutualEventsTarget.resx">
+      <DependentUpon>frmAddOrEditMutualEventsTarget.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\Report\frmChooseTimesToReport.resx">
+      <DependentUpon>frmChooseTimesToReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\ucCorrSelection.resx">
+      <DependentUpon>ucCorrSelection.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Spectroscopy\AbsFluxCalibration\frmAbsFlux.resx">
+      <DependentUpon>frmAbsFlux.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Spectroscopy\AbsFluxCalibration\frmCompleteSpectra.resx">
+      <DependentUpon>frmCompleteSpectra.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Spectroscopy\AbsFluxCalibration\frmConfigureAbsFluxExport.resx">
+      <DependentUpon>frmConfigureAbsFluxExport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Spectroscopy\AbsFluxCalibration\frmConfigureProcessing.resx">
+      <DependentUpon>frmConfigureProcessing.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Spectroscopy\frmChooseConfiguration.resx">
+      <DependentUpon>frmChooseConfiguration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Spectroscopy\frmEditWavelengthConfigName.resx">
+      <DependentUpon>frmEditWavelengthConfigName.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Spectroscopy\frmEnterWavelength.resx">
+      <DependentUpon>frmEnterWavelength.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Spectroscopy\frmSpectraViewSettings.resx">
+      <DependentUpon>frmSpectraViewSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Spectroscopy\frmRunMultiFrameSpectroscopy.resx">
+      <DependentUpon>frmRunMultiFrameSpectroscopy.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Spectroscopy\frmViewSpectra.resx">
+      <DependentUpon>frmViewSpectra.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Spectroscopy\Helpers\frmStackedPixels.resx">
+      <DependentUpon>frmStackedPixels.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Spectroscopy\ucSpectroscopy.resx">
+      <DependentUpon>ucSpectroscopy.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoTools\frmDefineDisplayDynamicRange.resx">
+      <DependentUpon>frmDefineDisplayDynamicRange.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoTools\frmFileInformation.resx">
+      <DependentUpon>frmFileInformation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoTools\frmGenerate3DPolyBackground.resx">
+      <DependentUpon>frmGenerate3DPolyBackground.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoTools\frmGenerateOccultationVideoModel.resx">
+      <DependentUpon>frmGenerateOccultationVideoModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoTools\frmGenerateStarFieldVideoModel.resx">
+      <DependentUpon>frmGenerateStarFieldVideoModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Video\AstroDigitalVideo\frmBuildingNtpTimebase.resx">
+      <DependentUpon>frmBuildingNtpTimebase.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -445,17 +1208,23 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="VideoOperations\frmChooseOcrEngine.resx">
+      <DependentUpon>frmChooseOcrEngine.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\frmFullSizePreview.resx">
       <DependentUpon>frmFullSizePreview.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\frmOsdOcrCalibrationFailure.resx">
+      <DependentUpon>frmOsdOcrCalibrationFailure.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\LightCurves\frmAddOrEditSingleTarget.resx">
       <DependentUpon>frmAddOrEditSingleTarget.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\AdjustApertures\frmAdjustApertures.resx">
+      <DependentUpon>frmAdjustApertures.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\LightCurves\frmConfigureReprocessing.resx">
       <DependentUpon>frmConfigureReprocessing.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="VideoOperations\LightCurves\frmCustomBinning.resx">
-      <DependentUpon>frmCustomBinning.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\LightCurves\frmEditLcDataSeries.resx">
       <DependentUpon>frmEditLcDataSeries.cs</DependentUpon>
@@ -499,6 +1268,12 @@
     <EmbeddedResource Include="VideoOperations\LightCurves\ucPreProcessing.resx">
       <DependentUpon>ucPreProcessing.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\MakeDarkFlatField\ucMakeDarkFlatField.resx">
+      <DependentUpon>ucMakeDarkFlatField.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Video\AstroDigitalVideo\frmAavStatusPopup.resx">
+      <DependentUpon>frmAavStatusPopup.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Video\AstroDigitalVideo\frmAdvIndexRebuilder.resx">
       <DependentUpon>frmAdvIndexRebuilder.cs</DependentUpon>
     </EmbeddedResource>
@@ -508,11 +1283,30 @@
     <EmbeddedResource Include="Video\AstroDigitalVideo\frmAdvViewer.resx">
       <DependentUpon>frmAdvViewer.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Video\FITS\frmSortFitsFiles.resx">
+      <DependentUpon>frmSortFitsFiles.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Video\frmIntegrationDetection.resx">
+      <DependentUpon>frmIntegrationDetection.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Video\frmJumpToFrame.resx">
       <DependentUpon>frmJumpToFrame.cs</DependentUpon>
     </EmbeddedResource>
-    <None Include="app.config" />
+    <EmbeddedResource Include="Video\SER\frmCheckTimeStampsIntegrity.resx">
+      <DependentUpon>frmCheckTimeStampsIntegrity.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Video\SER\frmEnterSERFileInfo.resx">
+      <DependentUpon>frmEnterSERFileInfo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Video\SER\frmSerStatusPopup.resx">
+      <DependentUpon>frmSerStatusPopup.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Properties\DataSources\Tangra.VideoOperations.LightCurves.InfoForms.LCFileTagValuePair.datasource" />
     <None Include="Properties\DataSources\Tangra.VideoOperations.LightCurves.LCFileSeriesEntry.datasource" />
+    <None Include="Properties\DataSources\Tangra.VideoTools.TagValuePair.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -522,13 +1316,13 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="Service References\TangraService\ErrorReports.wsdl" />
-    <None Include="LinuxFiles\app.config" />
+    <None Include="Service References\TangraService\ErrorReports1.wsdl" />
+    <None Include="VideoOperations\Spectroscopy\AbsFluxCalibration\ReferenceCode\AbsFlux.f90" />
+    <None Include="VideoOperations\Spectroscopy\AbsFluxCalibration\Standards\AbsFlux-TangraStars.csv" />
+    <EmbeddedResource Include="VideoOperations\Spectroscopy\AbsFluxCalibration\Standards\CalSpec.db" />
+    <EmbeddedResource Include="VideoOperations\Spectroscopy\FilterResponses\FilterResponseDb.dat" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Model\" />
-    <Folder Include="Task\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="img\aboutbox4.bmp" />
     <None Include="img\lc_logo.bmp" />
@@ -536,23 +1330,43 @@
     <None Include="Resources\Cursor_11.cur" />
     <None Include="Resources\Cursor_51.cur" />
     <None Include="Resources\Cursor_181.cur" />
-    <None Include="Service References\TangraService\ErrorReports.disco" />
     <None Include="Service References\TangraService\configuration91.svcinfo" />
     <None Include="Service References\TangraService\configuration.svcinfo" />
     <None Include="Service References\TangraService\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
-    <Content Include="LinuxFiles\libTangraCore.so">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <None Include="img\spectra_logo.bmp" />
+    <Content Include="license.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="LinuxFiles\libTangraVideo.so">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <None Include="Service References\TangraService\ErrorReports1.disco" />
+    <Content Include="TODO-List.txt" />
     <None Include="img\stop24.bmp" />
     <None Include="img\play24.bmp" />
-    <None Include="img\aboutbox.bmp" />
     <Content Include="tangra-big.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CSharpFITS\CSharpFITS.csproj">
+      <Project>{93C93A99-D18F-495E-8AC9-6B6F6F7F273E}</Project>
+      <Name>CSharpFITS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tangra.Astrometry\Tangra.Astrometry.csproj">
+      <Project>{DD1AEA51-7B2F-483E-B2D2-A892762A405C}</Project>
+      <Name>Tangra.Astrometry</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tangra.Model\Tangra.Model.csproj">
+      <Project>{70BBC9A7-7DD9-4A4D-B972-6665C65875C6}</Project>
+      <Name>Tangra.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tangra.OCR\Tangra.OCR.csproj">
+      <Project>{06024BC0-0061-4902-8C50-4EAB7913C8AA}</Project>
+      <Name>Tangra.OCR</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tangra.SDK\Tangra.SDK.csproj">
+      <Project>{BEA778EE-F0BE-49F3-BEE4-0B8ED2D778F9}</Project>
+      <Name>Tangra.SDK</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
@@ -562,8 +1376,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>xcopy "$(SolutionDir)Tangra.Core\$(ConfigurationName)\TangraCore.dll" "$(TargetDir)" /y
-xcopy "$(SolutionDir)Tangra.Video\Windows\$(ConfigurationName)\TangraVideo.dll" "$(TargetDir)" /y</PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -572,18 +1386,4 @@ xcopy "$(SolutionDir)Tangra.Video\Windows\$(ConfigurationName)\TangraVideo.dll" 
   <Target Name="AfterBuild">
   </Target>
   -->
-  <ItemGroup>
-    <ProjectReference Include="..\Tangra.Model\Tangra.Model.csproj">
-      <Project>{70BBC9A7-7DD9-4A4D-B972-6665C65875C6}</Project>
-      <Name>Tangra.Model</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\CSharpFITS\CSharpFITS.csproj">
-      <Project>{93C93A99-D18F-495E-8AC9-6B6F6F7F273E}</Project>
-      <Name>CSharpFITS</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Tangra.SDK\Tangra.SDK.csproj">
-      <Project>{77CCC7AE-FF0D-4FDE-B8C4-94C39585BAA6}</Project>
-      <Name>Tangra.SDK</Name>
-    </ProjectReference>
-  </ItemGroup>
 </Project>

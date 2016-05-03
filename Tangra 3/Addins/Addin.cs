@@ -33,12 +33,14 @@ namespace Tangra.Addins
             string[] tokens = fullTypeName.Split(new char[] { ',' }, 2);
             m_AssemblyName = new AssemblyName(tokens[1]);
 
+			#if WIN32
             if (TangraConfig.Settings.Generic.AddinIsolationLevel == TangraConfig.IsolationLevel.AppDomain)
             {
                 LoadAddinInAppDomain(tokens[1], tokens[0], addinManager);
             }
             else
             {
+			#endif
                 m_HostDomain = null;
                 string fullName = string.Format("{0}//{1}.dll", AddinManager.ADDINS_DIRECTORY, m_AssemblyName.Name);
 	            AppDomain.CurrentDomain.AssemblyResolve += m_HostDomain_AssemblyResolve; 
@@ -46,9 +48,12 @@ namespace Tangra.Addins
                 Type type = asm.GetType(tokens[0]);
                 m_Instance = (ITangraAddin) Activator.CreateInstance(type, new object[] {});
 				m_Instance.Initialise(new TangraHostDelegate(tokens[0], addinManager));
+			#if WIN32
             }
+			#endif
 		}
 
+		#if WIN32
         private void LoadAddinInAppDomain(string assemblyName, string typeName, AddinManager addinManager)
         {
             var appSetup = new AppDomainSetup()
@@ -91,6 +96,7 @@ namespace Tangra.Addins
                 }
             }
         }
+		#endif
 
 		public XmlSerializer CreateXmlSettingsSerializer(Type settingsType)
 		{
