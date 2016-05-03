@@ -54,6 +54,7 @@ _ReSharper.*
 /Tangra.Video/Windows/Debug
 /Tangra.Video/Windows/Release
 /Tangra.Video/Windows/ipch
+/Tangra.Video/Linux/lib/libTangraCore.so
 
 /Tangra 3.Windows.suo
 
@@ -120,3 +121,5 @@ _ReSharper.*
 /Tangra.Video/Linux/TangraVideo_Linux.txt
 /Tangra.Core/TangraCore_Linux.mk
 /Tangra.Core/TangraCore_Linux.txt
+Tangra 3.Linux.userprefs
+/Tangra.Video/Linux/lib/libTangraCore.so

@@ -93,7 +93,7 @@
       </PreBuild>
       <PostBuild>
         <Command Enabled="yes">rm -f ../../Tangra\ 3/bin/Release/libTangraVideo.so</Command>
-        <Command Enabled="yes">cp Release/libTangraVideo.so ../../Tangra\ 3/bin/Release/</Command>
+        <Command Enabled="yes">cp Release/libTangraVideo.so ../../Tangra\ 3/bin/Release\ -\ Non\ Windows/</Command>
       </PostBuild>
       <CustomBuild Enabled="no">
         <RebuildCommand/>
