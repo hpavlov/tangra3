@@ -646,12 +646,20 @@ namespace Tangra.VideoOperations.LightCurves
 				Update();
 
 				Cursor = Cursors.WaitCursor;
-				try
-				{
-					LCFile.Save(saveFileDialog.FileName, m_Header, m_LightCurveController.Context.AllReadings, m_FrameTiming, m_Footer);
-					m_LCFilePath = saveFileDialog.FileName;
-					m_LightCurveController.RegisterRecentFile(RecentFileType.LightCurve, saveFileDialog.FileName);
-				}
+			    try
+			    {
+			        LCFile.Save(saveFileDialog.FileName, m_Header, m_LightCurveController.Context.AllReadings, m_FrameTiming, m_Footer);
+			        m_LCFilePath = saveFileDialog.FileName;
+			        m_LightCurveController.RegisterRecentFile(RecentFileType.LightCurve, saveFileDialog.FileName);
+			    }
+			    catch (IOException ioex)
+			    {
+                    m_LightCurveController.ShowMessageBox("Error saving .lc file:\r\n\r\n" + ioex.Message, "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+			    }
+			    catch (UnauthorizedAccessException ex)
+			    {
+                    m_LightCurveController.ShowMessageBox("Error saving .lc file:\r\n\r\n" + ex.Message, "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+			    }
 				finally
 				{
 					Cursor = Cursors.Default;
