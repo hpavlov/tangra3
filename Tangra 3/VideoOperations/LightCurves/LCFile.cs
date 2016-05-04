@@ -24,6 +24,7 @@ using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.Model.VideoOperations;
 using Tangra.OCR;
+using Tangra.Video.SER;
 using Tangra.VideoOperations.LightCurves.Report;
 using Tangra.VideoOperations.LightCurves.Tracking;
 
@@ -289,7 +290,7 @@ namespace Tangra.VideoOperations.LightCurves
             s_OnTheFlyWriter = new BinaryWriter(s_OnTheFlyFile);
 
             LCMeasurementHeader header = new LCMeasurementHeader(
-                pathToVideoFile, sourceInfo , - 1, 0, 0, 0, 0, 0, 0, numberOfTargets, LightCurveReductionType.UntrackedMeasurement, MeasurementTimingType.UserEnteredFrameReferences,   0, 0,
+                pathToVideoFile, sourceInfo , - 1, 0, 0, 0, 0, 0, 0, numberOfTargets, LightCurveReductionType.UntrackedMeasurement, MeasurementTimingType.UserEnteredFrameReferences, SerUseTimeStamp.None,  0, 0,
                 EmptyArray<int>(numberOfTargets), EmptyArray<float>(numberOfTargets), EmptyArray<bool>(numberOfTargets), EmptyArray<int>(numberOfTargets), positionTolerance);
 
             s_NumMeasurements[0] = 0; s_NumMeasurements[1] = 0; s_NumMeasurements[2] = 0; s_NumMeasurements[3] = 0;
@@ -1248,6 +1249,7 @@ namespace Tangra.VideoOperations.LightCurves
 	    }
 
     	internal MeasurementTimingType TimingType;
+        internal SerUseTimeStamp SerTimingType;
 
         internal double GetAbsoluteTimeDeltaInMilliseconds(out string videoSystem)
         {
@@ -1816,14 +1818,14 @@ namespace Tangra.VideoOperations.LightCurves
 
         internal double ReferenceIntensity;
 
-        private static int SERIALIZATION_VERSION = 6;
+        private static int SERIALIZATION_VERSION = 7;
 
         internal LCMeasurementHeader(
             string pathToVideoFile, string sourceInfo,
             int firstFrameNo, int framesCount, double framesPerSecond,
             uint minFrame, uint maxFrame,
             uint measuredFrames, uint measurementInterval, byte objectCount,
-			LightCurveReductionType reductionType, MeasurementTimingType timingType, int backgroundType, int filterType,
+            LightCurveReductionType reductionType, MeasurementTimingType timingType, SerUseTimeStamp serTimingType, int backgroundType, int filterType,
             int[] psfFitMatrixSizes, float[] measurementApertures, bool[] fixedApertureFlags, int[] psfGroupIds, float positionTolerance)
         {
             m_FramesPerSecond = 25;
@@ -1874,6 +1876,7 @@ namespace Tangra.VideoOperations.LightCurves
             }
 
 			TimingType = timingType;
+            SerTimingType = serTimingType;
 			LcFile = null;
 
 			PsfGroupIds = psfGroupIds;
@@ -1935,6 +1938,7 @@ namespace Tangra.VideoOperations.LightCurves
 			ReferenceMagnitudes = new double[ObjectCount];
 			for (int i = 0; i < ReferenceMagnitudes.Length; i++) ReferenceMagnitudes[i] = double.NaN;
             ReferenceIntensity = double.NaN;
+            SerTimingType = SerUseTimeStamp.None;
 
             if (version > 1)
             {
@@ -1963,6 +1967,11 @@ namespace Tangra.VideoOperations.LightCurves
 						    if (version > 5)
 						    {
                                 ReferenceIntensity = reader.ReadDouble();
+
+						        if (version > 6)
+						        {
+						            SerTimingType = (SerUseTimeStamp) reader.ReadInt32();
+						        }
 						    }
 						}
 					}
@@ -2038,6 +2047,9 @@ namespace Tangra.VideoOperations.LightCurves
 
             // VERSION 6 Data
             writer.Write(ReferenceIntensity);
+
+            // VERSION 7 Data
+            writer.Write((int)SerTimingType);
         }
     }
 

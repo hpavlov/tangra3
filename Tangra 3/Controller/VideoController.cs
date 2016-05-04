@@ -43,6 +43,13 @@ using Cursor = System.Windows.Forms.Cursor;
 
 namespace Tangra.Controller
 {
+    public class TangraOpenFileArgs
+    {
+        public double FrameRate { get; set; }
+        public int BitPix { get; set; }
+        public SerUseTimeStamp SerTiming { get; set; }
+    }
+
 	public class VideoController : IDisposable, IVideoFrameRenderer, IVideoController, IImagePixelProvider
 	{
 		private VideoFileView m_VideoFileView;
@@ -282,7 +289,7 @@ namespace Tangra.Controller
 			}
 		}
 
-	    public bool OpenVideoFile(string fileName)
+	    public bool OpenVideoFile(string fileName, TangraOpenFileArgs args = null)
 	    {
 			string fileExtension = Path.GetExtension(fileName);
 
@@ -311,7 +318,7 @@ namespace Tangra.Controller
                         else if (fileExtension == ".ser")
                         {
                             SerEquipmentInfo equipmentInfo;
-                            frameStream = SERVideoStream.OpenFile(fileName, m_MainForm, out equipmentInfo);
+                            frameStream = SERVideoStream.OpenFile(fileName, m_MainForm, args, out equipmentInfo);
                             if (frameStream != null)
                             {
                                 TangraContext.Current.IsSerFile = true;
@@ -603,6 +610,18 @@ namespace Tangra.Controller
 		{
             get { return m_FramePlayer.Video == null ? null : m_FramePlayer.Video.Engine; }
 		}
+
+        public SerUseTimeStamp GetSerTimingType()
+        {
+            if (m_FramePlayer.Video.Engine == "SER")
+            {
+                var serPlayer = m_FramePlayer.Video as SERVideoStream;
+                if (serPlayer != null)
+                    return serPlayer.UseTimeStamp;
+            }
+
+            return SerUseTimeStamp.None;
+        }
 
 		public void SetupFrameIntegration(int framesToIntegrate, FrameIntegratingMode frameMode, PixelIntegrationType pixelIntegrationType)        
 		{

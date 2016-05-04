@@ -31,6 +31,7 @@ using Tangra.VideoOperations.LightCurves.Measurements;
 using Tangra.VideoOperations.LightCurves.MutualEvents;
 using Tangra.VideoOperations.LightCurves.Tracking;
 using Tangra.Resources;
+using Tangra.Video.SER;
 
 
 namespace Tangra.VideoOperations.LightCurves
@@ -2142,6 +2143,10 @@ namespace Tangra.VideoOperations.LightCurves
 			else if (m_TimestampOCR != null)
 				measurementTimingType = MeasurementTimingType.OCRedTimeForEachFrame;
 
+            SerUseTimeStamp serTimingType = SerUseTimeStamp.None;
+            if (m_VideoController.IsSerVideo)
+                serTimingType = m_VideoController.GetSerTimingType();
+
 			LCMeasurementHeader finalHeader = new LCMeasurementHeader(
 				m_VideoController.CurrentVideoFileName,
 				string.Format("Video ({0})", m_VideoController.CurrentVideoFileType),
@@ -2155,6 +2160,7 @@ namespace Tangra.VideoOperations.LightCurves
 				(byte)m_Tracker.TrackedObjects.Count,
 				LightCurveReductionContext.Instance.LightCurveReductionType,
 				measurementTimingType,
+                serTimingType,
 				(int)LightCurveReductionContext.Instance.NoiseMethod,
 				(int)LightCurveReductionContext.Instance.DigitalFilter,
 				matrixSizes.ToArray(), apertures.ToArray(), fixedFlags.ToArray(), psfGroupIds.ToArray(), (float)m_Tracker.PositionTolerance);

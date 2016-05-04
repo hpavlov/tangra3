@@ -140,7 +140,7 @@ namespace Tangra.Controller
                     if (!string.IsNullOrEmpty(videoFile) &&
                         File.Exists(videoFile))
                     {
-                        if (m_VideoController.OpenVideoFile(videoFile))
+                        if (m_VideoController.OpenVideoFile(videoFile, new TangraOpenFileArgs { FrameRate = lcFile.Header.FramesPerSecond, BitPix = lcFile.Footer.DataBitPix, SerTiming = lcFile.Header.SerTimingType }))
                         {
                             TangraContext.Current.CanPlayVideo = false;
                             m_VideoController.UpdateViews();

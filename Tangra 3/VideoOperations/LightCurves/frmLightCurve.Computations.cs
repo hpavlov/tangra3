@@ -24,6 +24,7 @@ using Tangra.Model.Numerical;
 using Tangra.Model.Video;
 using Tangra.Model.VideoOperations;
 using Tangra.SDK;
+using Tangra.Video.SER;
 using Tangra.VideoOperations.LightCurves.InfoForms;
 using Tangra.VideoOperations.LightCurves.Report;
 using Tangra.VideoOperations.LightCurves.Tracking;
@@ -919,7 +920,9 @@ namespace Tangra.VideoOperations.LightCurves
 
             output.AppendLine();
             output.Append(m_Header.PathToVideoFile); output.AppendLine();
-            output.AppendFormat("{0} {1}", m_Header.ReductionType, m_Header.SourceInfo); output.AppendLine();
+            string timeSource = m_Header.TimingType.ToString();
+            if (m_Header.SerTimingType != SerUseTimeStamp.None) timeSource += string.Format("({0})", m_Header.SerTimingType);
+            output.AppendFormat("{0} {1}, Time: {2}", m_Header.ReductionType, m_Header.SourceInfo, timeSource); output.AppendLine();
             output.AppendLine();output.AppendLine();
             bool addPSFReductionDetails = m_LightCurveController.Context.SignalMethod != TangraConfig.PhotometryReductionMethod.AperturePhotometry;
             bool addPSFAverageModelDetails = addPSFReductionDetails && m_LightCurveController.Context.PsfFittingMethod == TangraConfig.PsfFittingMethod.LinearFitOfAveragedModel;
