@@ -135,7 +135,9 @@ namespace Tangra
 			Trace.WriteLine(string.Format("Tangra Core v{0}", engineVersion));
             if (minCoreVersionRequired != null && !minCoreVersionRequired.IsReqiredVersion(engineVersion))
             {
-                MessageBox.Show("Your installation of Tangra3 desn't have the latest version of TangraCore.dll. Please check for updates.","Tangra 3", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                string fileName = CurrentOS.IsWindows ? "TangraCore.dll" : (CurrentOS.IsMac ? "libTangraCore.dylib" : "libTangraCore.so");
+
+                MessageBox.Show(string.Format("Your installation of Tangra3 desn't have the latest version of {0}. Please check for updates.", fileName), "Tangra 3", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 
 			engineVersion = TangraVideo.GetVideoEngineVersion();
@@ -149,12 +151,12 @@ namespace Tangra
             else if (CurrentOS.IsMac)
             {
                 if (minVideoOSXVersionRequired != null && !minVideoOSXVersionRequired.IsReqiredVersion(engineVersion))
-                    MessageBox.Show("Your installation of Tangra3 desn't have the latest version of TangraVideo.dll. Please check for updates.", "Tangra 3", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Your installation of Tangra3 desn't have the latest version of libTangraVideo.dylib. Please check for updates.", "Tangra 3", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             else
             {
                 if (minVideoLinuxVersionRequired != null && !minVideoLinuxVersionRequired.IsReqiredVersion(engineVersion))
-                    MessageBox.Show("Your installation of Tangra3 desn't have the latest version of TangraVideo.dll. Please check for updates.", "Tangra 3", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Your installation of Tangra3 desn't have the latest version of libTangraVideo.so. Please check for updates.", "Tangra 3", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 		}
 
