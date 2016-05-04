@@ -89,6 +89,7 @@
       </Debugger>
       <PreBuild>
         <Command Enabled="yes">rm -f lib/libTangraCore.so</Command>
+        <Command Enabled="yes">mkdir -p lib</Command>
         <Command Enabled="yes">cp ../../Tangra.Core/Release/libTangraCore.so lib/</Command>
       </PreBuild>
       <PostBuild>
