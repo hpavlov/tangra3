@@ -171,7 +171,17 @@ namespace Tangra.Addins
 
         void IAddinManager.PositionToFrame(int frameNo)
         {
-            m_VideoController.MoveToFrame(frameNo);
+            if (frameNo >= m_VideoController.VideoFirstFrame && frameNo <= m_VideoController.VideoLastFrame)
+            {
+                m_VideoController.MoveToFrame(frameNo);
+            }
+            else
+                m_VideoController.ShowMessageBox(
+                    string.Format("Tangra received a command from an Add-in to position to frame {0} however this is outside the allowed range of [{1}, {2}] for this video. Please report this problem to the Add-in author.", 
+                        frameNo, m_VideoController.VideoFirstFrame, m_VideoController.VideoLastFrame),
+                    "Tangra", 
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Error);
         }
 	}
 }
