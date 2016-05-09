@@ -232,7 +232,7 @@ namespace Tangra.VideoOperations.Astrometry
 			distMatch.SetMinMaxMagOfStarsForPyramidAlignment(7, pyramidLimitMag);
 			Trace.WriteLine(string.Format("Stars for alignment in range: 7.0 - {0} mag", pyramidLimitMag.ToString("0.0")));
 
-			distMatch.InitNewMatch(m_Context.StarMap, PyramidMatchType.PlateSolve);
+			distMatch.InitNewMatch(m_Context.StarMap, PyramidMatchType.PlateSolve, null);
 
 #if ASTROMETRY_DEBUG
             Dictionary<int, ulong> debugInfo = new Dictionary<int, ulong>();

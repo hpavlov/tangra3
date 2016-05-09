@@ -113,15 +113,18 @@ namespace Tangra.Astrometry.Recognition
             Context = new DistanceBasedContext(astrometryController, plateConfig, fitSettings, fitSettings.MaxResidualInPixels, m_AstrometryMinMag, m_AstrometryMaxMag);
 		}
 
-		public void InitNewMatch(IStarMap imageFeatures, PyramidMatchType matchType)
+		public void InitNewMatch(IStarMap imageFeatures, PyramidMatchType matchType, Dictionary<PSFFit, IStar> manualStars)
 		{
 			m_StarMap = imageFeatures;
+
+            if (manualStars != null)
+                SetManuallyIdentifiedHints(manualStars);
 
 			matchType = PyramidMatchType.PlateSolve;
 
 			m_IsCalibration = matchType == PyramidMatchType.ConfigCalibration;
 
-			Context.Initialize(m_CelestialStars, m_PyramidMinMag, m_PyramidMaxMag, m_IsCalibration, m_DetermineAutoLimitMagnitude);
+            Context.Initialize(m_CelestialStars, m_PyramidMinMag, m_PyramidMaxMag, m_IsCalibration, m_DetermineAutoLimitMagnitude, m_ManualStarMatch);
 
 #if ASTROMETRY_DEBUG
 			AstrometricFitDebugger.Init(m_FitSettings, m_PyramidMinMag, m_PyramidMaxMag, m_AstrometryMinMag, m_AstrometryMaxMag);
@@ -220,7 +223,8 @@ namespace Tangra.Astrometry.Recognition
 #endif
 				}
 
-				if (!m_IsCalibration &&
+				if (m_Solution == null && 
+                    !m_IsCalibration &&
 				    m_ManualStarMatch != null)
 				{
 					// Try using the manual star match

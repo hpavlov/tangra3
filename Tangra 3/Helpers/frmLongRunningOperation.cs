@@ -42,18 +42,26 @@ namespace Tangra.Helpers
 		{
 			m_ParentForm = parentForm;
 		}
+
 		public void BeginOperation(string message)
 		{
 			lblStatus.Text = message;
 
 			if (!this.Visible) this.Show(m_ParentForm);
+            refreshTimer.Enabled = true;
 			Refresh();
 		}
 
 		public void EndOperation()
 		{
 			if (this.Visible) this.Hide();
+		    refreshTimer.Enabled = false;
 			Refresh();
 		}
+
+        private void refreshTimer_Tick(object sender, EventArgs e)
+        {
+            Refresh();
+        }
 	}
 }

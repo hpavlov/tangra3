@@ -423,8 +423,8 @@ namespace Tangra.VideoOperations.Astrometry
 
 				m_DistBasedMatcher.SetMinMaxMagOfStarsForAstrometry(m_Context.PyramidMinMag, m_Context.LimitMagn);
 				m_DistBasedMatcher.SetMinMaxMagOfStarsForPyramidAlignment(m_Context.PyramidMinMag, m_Context.PyramidMaxMag);
-
-				m_DistBasedMatcher.InitNewMatch(m_StarMap, PyramidMatchType.PlateSolve);
+                
+				m_DistBasedMatcher.InitNewMatch(m_StarMap, PyramidMatchType.PlateSolve, m_AstrometricState.ManualStarIdentificationMode ? m_AstrometricState.ManuallyIdentifiedStars : null);
 			}
 		}
 
@@ -492,7 +492,7 @@ namespace Tangra.VideoOperations.Astrometry
 			Profiler.Instance.StartTimer("MATCH");
 #endif
 
-			if (movementType != MovementType.Step && movementType != MovementType.StepBackwards && !m_MovingToFirstIntegratedFrameFlag)
+			if (movementType == MovementType.Jump || m_MovingToFirstIntegratedFrameFlag)
 			{
 				// NOTE: This will also reset the full range of stars
 				m_DistBasedMatcher = null;
@@ -504,7 +504,13 @@ namespace Tangra.VideoOperations.Astrometry
 			m_MovingToFirstIntegratedFrameFlag = false;
 
 			m_DistBasedMatcher.InitNewFrame(m_StarMap);
-			if (m_AstrometricState.ManualStarIdentificationMode) m_DistBasedMatcher.SetManuallyIdentifiedHints(m_AstrometricState.ManuallyIdentifiedStars);
+			
+            if (m_AstrometricState.ManualStarIdentificationMode) 
+                m_DistBasedMatcher.SetManuallyIdentifiedHints(m_AstrometricState.ManuallyIdentifiedStars);
+            else
+                // Clear out the manually set stars if we are not in manual mode so they are not drawn 
+                m_DistBasedMatcher.SetManuallyIdentifiedHints(new Dictionary<PSFFit, IStar>());
+
 			m_CurrentMatchResult = m_DistBasedMatcher.PerformMatch(out m_AstrometricFit);
 
 			if (m_CurrentMatchResult == PerformMatchResult.FieldAlignmentFailed ||

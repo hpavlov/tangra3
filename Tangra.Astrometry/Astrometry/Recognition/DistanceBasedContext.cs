@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Data.OleDb;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -174,12 +175,17 @@ namespace Tangra.Astrometry.Recognition
             			: DebugResolvedStars
             			  	.Where(kvp => DebugExcludeStars == null || !DebugExcludeStars.ContainsKey(kvp.Key))
             			  	.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
- 
+
+                List<ulong> alwaysIncludeStars = null;
+                if (m_ManualPairs != null && m_ManualPairs.Count > 0)
+                    alwaysIncludeStars = m_ManualPairs.Values.Select(x => x.StarNo).ToList();
+
                 m_Distributor = BuildPyramidMatchingByMagnitude(
                     m_CelestialPyramidStars, 
                     m_PlateConfig,
 					m_Settings,
 					debugResolvesdStarsWithAppliedExclusions,
+                    alwaysIncludeStars,
                     out m_DistancesByMagnitude, 
                     out m_StarsDistanceCache);
             }
@@ -222,6 +228,7 @@ namespace Tangra.Astrometry.Recognition
 			AstroPlate image, 
 			IAstrometrySettings settings,
             Dictionary<int, ulong> debugResolvedStarsWithAppliedExclusions,
+            List<ulong> alwaysIncludeStars,
             out List<DistanceEntry> distancesByMagnitude,
             out Dictionary<ulong, Dictionary<ulonglong, DistanceEntry>> starsDistanceCache)
 		{
@@ -246,7 +253,7 @@ namespace Tangra.Astrometry.Recognition
 
 			distributor = new PyramidStarsDensityDistributor(pyramidStars, image, settings);
             distributor.DebugResolvedStarsWithAppliedExclusions = debugResolvedStarsWithAppliedExclusions;
-            distributor.Initialize();
+            distributor.Initialize(alwaysIncludeStars);
 
             distancesByMagnitude.Clear();
             starsDistanceCache.Clear();
@@ -280,7 +287,7 @@ namespace Tangra.Astrometry.Recognition
             }
 
 			// Start building the pairs
-			for (int j = 2; j < n; j++)
+			for (int j = 0; j < n; j++)
 			{
                 IStar jStar = pyramidStars[j];
                 if (!distributor.CheckStar(jStar))
@@ -295,7 +302,7 @@ namespace Tangra.Astrometry.Recognition
                     continue;
                 }
 
-				for (int i = 1; i < j; i++)
+				for (int i = j + 1; i < n; i++)
 				{
                     IStar iStar = pyramidStars[i];
 						
@@ -485,7 +492,8 @@ namespace Tangra.Astrometry.Recognition
 			double pyramidMinMag, 
 			double pyramidMaxMag,
 			bool isCalibration,
-			bool determineAutoLimitMagnitude)
+			bool determineAutoLimitMagnitude,
+            Dictionary<StarMapFeature, IStar> manualPairs)
 		{
 #if ASTROMETRY_DEBUG
 			Trace.Assert(allCelestialStars != null);
@@ -499,10 +507,12 @@ namespace Tangra.Astrometry.Recognition
 
 		    m_CelestialPyramidStars = m_CelestialAllStars;
 
-			InitializePyramidMatching();
+            m_ManualPairs = manualPairs;
+
+            InitializePyramidMatching();
 		}
 
-		private void InitializePyramidMatching()
+        private void InitializePyramidMatching()
 		{
 			if (CoreAstrometrySettings.Default.UseQuickAlign)
 				BuildPyramidMatchingByMagnitude();
@@ -1257,7 +1267,7 @@ namespace Tangra.Astrometry.Recognition
 			List<DistanceEntry> ijCandidates = m_DistancesByMagnitude
                 .Where(e => e.DistanceArcSec > dij - toleranceInArcSec && e.DistanceArcSec < dij + toleranceInArcSec).ToList();
 
-            if (m_ManualPairs != null && m_ManualPairs.Count < 3)
+            if (m_ManualPairs != null && m_ManualPairs.Count <= 3)
                 LimitIJtoManualPairs(ijCandidates);
 
 			foreach (DistanceEntry ijEntry in ijCandidates)
@@ -1339,6 +1349,17 @@ namespace Tangra.Astrometry.Recognition
 			return false;
 		}
 
+        private void LimitIKtoManualPairs(List<DistanceEntry> ijCandidates)
+        {
+            if (m_ManualPairs.Count == 3)
+            {
+                ulong starNo1 = m_ManualPairs.Values.ToList()[0].StarNo;
+                ulong starNo3 = m_ManualPairs.Values.ToList()[2].StarNo;
+                ijCandidates.RemoveAll(x => x.Star1.StarNo != starNo1 && x.Star2.StarNo != starNo1);
+                ijCandidates.RemoveAll(x => x.Star1.StarNo != starNo3 && x.Star2.StarNo != starNo3);
+            }
+        }
+
         private void LimitIJtoManualPairs(List<DistanceEntry> ijCandidates)
 	    {
             if (m_ManualPairs.Count == 1)
@@ -1346,7 +1367,7 @@ namespace Tangra.Astrometry.Recognition
                 ulong starNo = m_ManualPairs.Values.ToList()[0].StarNo;
                 ijCandidates.RemoveAll(x => x.Star1.StarNo != starNo && x.Star2.StarNo != starNo);
             }
-            else if (m_ManualPairs.Count == 2)
+            else if (m_ManualPairs.Count >= 2)
             {
                 ulong starNo1 = m_ManualPairs.Values.ToList()[0].StarNo;
                 ulong starNo2 = m_ManualPairs.Values.ToList()[1].StarNo;
@@ -1366,7 +1387,7 @@ namespace Tangra.Astrometry.Recognition
 			List<DistanceEntry> ijCandidates = m_DistancesByMagnitude
 				.Where(e => e.DistanceArcSec > dijMin && e.DistanceArcSec < dijMax).ToList();
 
-		    if (m_ManualPairs != null && m_ManualPairs.Count < 3) 
+		    if (m_ManualPairs != null && m_ManualPairs.Count <= 3) 
                 LimitIJtoManualPairs(ijCandidates);
 
 			bool debugFieldIdentified = true;
@@ -1417,6 +1438,9 @@ namespace Tangra.Astrometry.Recognition
 							 e.Star1.StarNo == ijEntry.Star2.StarNo || e.Star2.StarNo == ijEntry.Star2.StarNo) &&
 							 e.DistanceArcSec > dikMin && e.DistanceArcSec < dikMax)
 						.ToList();
+
+                    if (m_ManualPairs != null && m_ManualPairs.Count == 3)
+                        LimitIKtoManualPairs(ikCandidates);
 
 					if (debug && (
 							(debugiStarNo == ijEntry.Star1.StarNo && debugjStarNo == ijEntry.Star2.StarNo) ||
@@ -2486,16 +2510,16 @@ namespace Tangra.Astrometry.Recognition
 //#endif
 //            }
 
-			if (m_ManualPairs != null && m_ManualPairs.Count < 3)
+			if (m_ManualPairs != null && m_ManualPairs.Count <= 3)
 			{
 				if (m_ManualPairs.Count == 1)
 				{
-					int fixedFeatureId = m_ManualPairs.Keys.ToList()[0].FeatureId;
+                    int fixedFeatureIndex = m_ManualPairs.Keys.ToList()[0].FeatureId + 1;
 					for (int k = 2; k <= n; k++)
 					{
 						for (int j = 1; j < k; j++)
 						{
-							var rv = CheckCombination(fixedFeatureId, j, k, starMap, toleranceInArcSec, callback, callbackWithRatios,
+                            var rv = CheckCombination(fixedFeatureIndex, j, k, starMap, toleranceInArcSec, callback, callbackWithRatios,
 								timeTaken, ref counter, ref delayWarningSent, maxCombinationsBeforeFail, total, n);
 							if (rv != null) return rv.Value;
 						}
@@ -2503,15 +2527,45 @@ namespace Tangra.Astrometry.Recognition
 				}
 				else if (m_ManualPairs.Count == 2)
 				{
-					int fixedFeatureId1 = m_ManualPairs.Keys.ToList()[0].FeatureId;
-					int fixedFeatureId2 = m_ManualPairs.Keys.ToList()[1].FeatureId;
+					int fixedFeatureIndex1 = m_ManualPairs.Keys.ToList()[0].FeatureId + 1;
+                    int fixedFeatureIndex2 = m_ManualPairs.Keys.ToList()[1].FeatureId + 1;
 					for (int k = 1; k <= n; k++)
 					{
-						var rv = CheckCombination(fixedFeatureId1, fixedFeatureId2, k, starMap, toleranceInArcSec, callback, callbackWithRatios,
+                        var rv = CheckCombination(fixedFeatureIndex1, fixedFeatureIndex2, k, starMap, toleranceInArcSec, callback, callbackWithRatios,
 							timeTaken, ref counter, ref delayWarningSent, maxCombinationsBeforeFail, total, n);
 						if (rv != null) return rv.Value;
 					}
 				}
+                else if (m_ManualPairs.Count == 3)
+                {
+                    var m_FeatureId_i = m_ManualPairs.Keys.ToList()[0].FeatureId;
+                    var m_FeatureId_j = m_ManualPairs.Keys.ToList()[1].FeatureId;
+                    var m_FeatureId_k = m_ManualPairs.Keys.ToList()[2].FeatureId;
+                    ulong starNo1 = m_ManualPairs.Values.ToList()[0].StarNo;
+                    ulong starNo2 = m_ManualPairs.Values.ToList()[1].StarNo;
+                    ulong starNo3 = m_ManualPairs.Values.ToList()[2].StarNo;
+
+                    int fixedFeatureIndex1 = m_FeatureId_i + 1;
+                    int fixedFeatureIndex2 = m_FeatureId_j + 1;
+                    int fixedFeatureIndex3 = m_FeatureId_k + 1;
+
+
+                    var ijEntry = m_DistancesByMagnitude.FirstOrDefault(x => (x.Star1.StarNo == starNo1 && x.Star2.StarNo == starNo2) || (x.Star1.StarNo == starNo2 && x.Star2.StarNo == starNo1));
+                    var ikEntry = m_DistancesByMagnitude.FirstOrDefault(x => (x.Star1.StarNo == starNo1 && x.Star2.StarNo == starNo3) || (x.Star1.StarNo == starNo3 && x.Star2.StarNo == starNo1));
+                    var jkEntry = m_DistancesByMagnitude.FirstOrDefault(x => (x.Star1.StarNo == starNo3 && x.Star2.StarNo == starNo2) || (x.Star1.StarNo == starNo2 && x.Star2.StarNo == starNo3));
+
+                    m_Solution = IsSuccessfulMatch(m_StarMap, fixedFeatureIndex1, fixedFeatureIndex2, fixedFeatureIndex3, ijEntry, ikEntry, jkEntry,
+                               starNo1, starNo2, starNo3, toleranceInArcSec);
+
+                    if (m_Solution != null)
+                    {
+                        if (ImproveAndRetestSolution(fixedFeatureIndex1, fixedFeatureIndex2, fixedFeatureIndex3))
+                        {
+                            m_MatchedTriangle = string.Format("{0}-{1}-{2}:{5}:[{3}/{4}]", fixedFeatureIndex1, fixedFeatureIndex2, fixedFeatureIndex3, counter, total, n);
+                            return true;
+                        }
+                    }
+                }
 			}
 
 		    for (int k = 3; k <= n; k++)

@@ -222,7 +222,15 @@ namespace Tangra.ImageTools
 				g.DrawLine(Pens.Yellow, x0, y0 - 13, x0, y0 - 4);
 				g.DrawLine(Pens.Yellow, x0, y0 + 13, x0, y0 + 4);
 			}
-		}
 
+            if (m_AstrometricState.ManualStarIdentificationMode && m_AstrometricState.ManuallyIdentifiedStars != null)
+		    {
+		        foreach (var psf in m_AstrometricState.ManuallyIdentifiedStars.Keys)
+		        {
+                    g.DrawEllipse(Pens.DarkRed, (float)psf.XCenter - 7, (float)psf.YCenter - 7, 2 * 7, 2 * 7);
+                    g.DrawEllipse(Pens.DarkRed, (float)psf.XCenter - 7 - 2, (float)psf.YCenter - 7 - 2, 2 * 7 + 4, 2 * 7 + 4);	            
+		        }
+		    }
+		}
 	}
 }
