@@ -2270,7 +2270,7 @@ namespace Tangra.Astrometry.Recognition
 
 				List<double> residuals = 
 					leastSquareFittedAstrometry.FitInfo.AllStarPairs
-						.Where(p => p.FitInfo.ExcludedForHighResidual)
+						.Where(p => !p.FitInfo.ExcludedForHighResidual)
 						.Select(p => p.FitInfo.ResidualArcSec)
 						.ToList();
 
