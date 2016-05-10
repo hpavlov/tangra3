@@ -100,6 +100,13 @@ namespace Tangra.Model.Config
 
         public void SetMagnitude(double mag, MagnitudeBand magBand)
         {
+            if (double.IsNaN(mag) || double.IsInfinity(mag))
+            {
+                m_Magnitude_65_70 = "     ";
+                m_MagnitudeBand_71 = " ";
+                return;
+            }
+
 			m_Magnitude_65_70 = (mag.ToString("0.0", CultureInfo.InvariantCulture).PadLeft(4) + " ").Substring(0, 5);
             switch(magBand)
             {

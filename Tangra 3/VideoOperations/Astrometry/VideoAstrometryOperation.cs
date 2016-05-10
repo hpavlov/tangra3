@@ -492,7 +492,7 @@ namespace Tangra.VideoOperations.Astrometry
 			Profiler.Instance.StartTimer("MATCH");
 #endif
 
-			if (movementType == MovementType.Jump || m_MovingToFirstIntegratedFrameFlag)
+			if (movementType == MovementType.Jump && !m_MovingToFirstIntegratedFrameFlag)
 			{
 				// NOTE: This will also reset the full range of stars
 				m_DistBasedMatcher = null;

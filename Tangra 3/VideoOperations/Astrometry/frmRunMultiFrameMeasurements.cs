@@ -306,6 +306,15 @@ namespace Tangra.VideoOperations.Astrometry
 						}
 					}
 
+				    if (cbxInstDelayCamera.SelectedIndex == 0 && cbxInstDelayMode.SelectedIndex == 0)
+				    {
+                        MessageBox.Show(this,
+                                "Please configure the instrumental delay manually by selecting 'Manual' mode and then choose the camera model or configure the instrumental delay in seconds directly.",
+                                "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+
+                        return;
+				    }
+
 					ucFrameInterval.Recalculate();
 				}
 

@@ -90,7 +90,7 @@ namespace Tangra.Model.Config
 
 		public void NewRecentFile(RecentFileType recentFilesGroup, string filePath)
 		{
-			if (Lists[recentFilesGroup].IndexOf(filePath) != -1)
+			while (Lists[recentFilesGroup].IndexOf(filePath) != -1)
 				Lists[recentFilesGroup].Remove(filePath);
 
 			Lists[recentFilesGroup].Insert(0, filePath);

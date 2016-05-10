@@ -82,7 +82,6 @@ namespace Tangra.VideoOperations.Astrometry.MPCReport
 			{
 				ReportFileName = selectedObsFile.FilePath;
 				TangraConfig.Settings.RecentFiles.NewRecentFile(RecentFileType.MPCReport, ReportFileName);
-				TangraConfig.Settings.RecentFiles.Lists[RecentFileType.MPCReport].Insert(0, ReportFileName);
 				TangraConfig.Settings.Save();
 			}
 

@@ -55,9 +55,9 @@ namespace Tangra.VideoOperations.Astrometry
 
 	internal enum MovementExpectation
 	{
-		Slow,  // < 2.0"/min
-		SlowFlyby, // (2.0"/min, 20.0"/min)
-		FastFlyby // > 20"/min
+		Slow,  // < 0.2"/min
+		SlowFlyby, // (0.2"/min, 200.0"/min)
+		FastFlyby // > 200"/min
 	}
 
 	internal enum ObjectExposureQuality

@@ -489,14 +489,19 @@ namespace Tangra.Astrometry
 					double intensity = measurer.TotalReading - measurer.TotalBackground;
 					if (intensity > 0)
 					{
-						intencities.Add(intensity);
-						
-						magnitudes.Add(record.Star.GetMagnitudeForBand(magnitudeBandId));
-						colours.Add(record.Star.MagJ - record.Star.MagK);
+					    var mag = record.Star.GetMagnitudeForBand(magnitudeBandId);
+					    var clr = record.Star.MagJ - record.Star.MagK;
 
-						gaussians.Add(record.PsfFit);
-						stars.Add(record.Star);
-						saturatedFlags.Add(measurer.HasSaturatedPixels || record.PsfFit.IMax >= measurer.SaturationValue);
+                        if (!double.IsNaN(mag) && !double.IsNaN(clr) && !double.IsInfinity(mag) && !double.IsInfinity(clr))
+					    {
+                            intencities.Add(intensity);
+                            magnitudes.Add(record.Star.GetMagnitudeForBand(magnitudeBandId));
+                            colours.Add(record.Star.MagJ - record.Star.MagK);
+
+                            gaussians.Add(record.PsfFit);
+                            stars.Add(record.Star);
+                            saturatedFlags.Add(measurer.HasSaturatedPixels || record.PsfFit.IMax >= measurer.SaturationValue);					        
+					    }
 					}
 				}
 
