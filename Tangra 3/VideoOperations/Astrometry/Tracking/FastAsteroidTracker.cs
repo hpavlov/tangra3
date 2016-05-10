@@ -5,10 +5,12 @@ using System.Linq;
 using System.Text;
 using Tangra.Astrometry;
 using Tangra.Controller;
+using Tangra.Helpers;
 using Tangra.Model.Astro;
 using Tangra.Model.Config;
 using Tangra.Model.Helpers;
 using Tangra.Model.Image;
+using Tangra.Model.Numerical;
 using Tangra.VideoOperations.Astrometry.Engine;
 using Tangra.VideoOperations.LightCurves.Tracking;
 
@@ -26,6 +28,7 @@ namespace Tangra.VideoOperations.Astrometry.Tracking
         private List<double> m_PastFramePosX = new List<double>();
         private List<double> m_PastFramePosY = new List<double>();
         private List<long> m_PastFrameTimes = new List<long>();
+        private List<int> m_PastFrameNos = new List<int>();
 
         internal FastAsteroidTracker(AstrometryController astrometryController, MeasurementContext measurementContext)
         {
@@ -46,6 +49,7 @@ namespace Tangra.VideoOperations.Astrometry.Tracking
             };
 
             m_RepeatedIntergationPositions = m_MeasurementContext.IntegratedFramesCount / m_MeasurementContext.FrameInterval;
+            if (m_RepeatedIntergationPositions == 0) m_RepeatedIntergationPositions = 1;
 
             return true;
         }
@@ -66,11 +70,9 @@ namespace Tangra.VideoOperations.Astrometry.Tracking
 
             PSFFit psfFit = null;
 
-            var frameTime = m_AstrometryController.GetTimeForFrame(m_MeasurementContext, frameNo, frameNo);
-
-            if (m_RepeatedIntergationPositions * 4 > m_PastFrameTimes.Count)
+            if (m_RepeatedIntergationPositions * 4 < m_PastFrameNos.Count)
             {
-                var expectedPos = GetExpectedPosition(frameTime.UT.Ticks);
+                var expectedPos = GetExpectedPosition(frameNo);
                 if (expectedPos != null)
                     AstrometryContext.Current.StarMap.GetPSFFit(expectedPos.X, expectedPos.Y, PSFFittingMethod.NonLinearFit, out psfFit);
             }
@@ -130,16 +132,86 @@ namespace Tangra.VideoOperations.Astrometry.Tracking
                 IsTrackedSuccessfully = true;
             }
 
-            m_PastFramePosX.Add(psfFit != null ? psfFit.XCenter : -1);
-            m_PastFramePosY.Add(psfFit != null ? psfFit.YCenter : -1);
-            m_PastFrameTimes.Add(frameTime.UT.Ticks); 
+            if (psfFit != null && psfFit.XCenter > 0 && psfFit.YCenter > 0)
+            {
+                m_PastFramePosX.Add(psfFit.XCenter);
+                m_PastFramePosY.Add(psfFit.YCenter);
+                m_PastFrameNos.Add(frameNo);                
+            }
         }
 
-        private ImagePixel GetExpectedPosition(long ticks)
+        private ImagePixel GetExpectedPosition(int frameNo)
         {
-            // TODO: Implement this. Check for Position (-1, -1) and exclude from calculations
-            //       Group by m_RepeatedIntergationPositions measurements and average position. See what to do with time of group measurements
-            return null;
+            ImagePixel rv = null;
+
+            var intervalValues = new Dictionary<int, List<ImagePixel>>();
+            var intervalMedians = new Dictionary<int, ImagePixel>();
+
+            int earliestFrame = m_PastFrameNos[0];
+            for (int i = 0; i < m_PastFrameNos.Count; i++)
+            {
+                int integrationInterval = (m_PastFrameNos[i] - earliestFrame) / m_MeasurementContext.IntegratedFramesCount;
+
+                List<ImagePixel> intPoints;
+                if (!intervalValues.TryGetValue(integrationInterval, out intPoints))
+                {
+                    intPoints = new List<ImagePixel>();
+                    intervalValues.Add(integrationInterval, intPoints);
+                }
+
+                intPoints.Add(new ImagePixel(m_PastFramePosX[i], m_PastFramePosY[i]));
+            }
+
+            var calcBucketX = new List<double>();
+            var calcBucketY = new List<double>();
+            foreach (int key in intervalValues.Keys)
+            {
+                calcBucketX.Clear();
+                calcBucketY.Clear();
+
+                intervalValues[key].ForEach(v =>
+                {
+                    calcBucketX.Add(v.XDouble);
+                    calcBucketY.Add(v.YDouble);
+                });
+
+                double xMed = calcBucketX.Median();
+                double yMed = calcBucketY.Median();
+
+                intervalMedians.Add(key, new ImagePixel(xMed, yMed));
+            }
+
+            var xMotion = new LinearRegression();
+            var yMotion = new LinearRegression();
+
+            foreach (int intInt in intervalMedians.Keys)
+            {
+                long t = intInt;
+                double x = intervalMedians[intInt].XDouble;
+                double y = intervalMedians[intInt].YDouble;
+                if (x > 0 && y > 0)
+                {
+                    xMotion.AddDataPoint(t, x);
+                    yMotion.AddDataPoint(t, y);
+                }
+            }
+
+            try
+            {
+                xMotion.Solve();
+                yMotion.Solve();
+
+                int currIntInterval = (frameNo - earliestFrame) / m_MeasurementContext.IntegratedFramesCount;
+
+                rv = new ImagePixel(xMotion.ComputeY(currIntInterval), yMotion.ComputeY(currIntInterval));
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex.GetFullStackTrace());
+            }
+
+            return rv;
+            
         }
 
         public void BeginMeasurements(IAstroImage astroImage)
