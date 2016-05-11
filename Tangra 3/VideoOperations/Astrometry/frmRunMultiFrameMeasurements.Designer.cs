@@ -841,8 +841,8 @@ namespace Tangra.VideoOperations.Astrometry
             this.cbxExpectedMotion.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxExpectedMotion.FormattingEnabled = true;
             this.cbxExpectedMotion.Items.AddRange(new object[] {
-            "Slow (< 0.2 \"/min)",
-            "Slow Flyby (0.2\"/min -> 200.0 \"/min)",
+            "Slow (< 2 \"/min)",
+            "Slow Flyby (2\"/min -> 200.0 \"/min)",
             "Fast Flyby (> 200.0\"/min)"});
             this.cbxExpectedMotion.Location = new System.Drawing.Point(105, 12);
             this.cbxExpectedMotion.Name = "cbxExpectedMotion";

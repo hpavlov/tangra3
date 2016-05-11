@@ -2879,7 +2879,7 @@ namespace Tangra.Astrometry.Recognition
 				        }				        
 				    }
                     double detectedConsideredStarsPercentage = 1.0 * detectedStars/consideredStars;
-                    if (detectedConsideredStarsPercentage < 0.25)
+                    if (detectedConsideredStarsPercentage < 0.25 && detectedStars < 25)
 				    {
 				        return false;
 				    }
