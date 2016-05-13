@@ -142,19 +142,12 @@ HRESULT SerFile::GetFrame(long frameNo, unsigned long* pixels, unsigned int came
 
 				advfsetpos(m_File, &timestampPosition);
 
-				unsigned __int64 timeStamp64;
 				unsigned __int64 timeStampUtc64;
 
-				fread(&timeStamp64, 8, 1, m_File);
-				frameInfo->TimeStampLo = timeStamp64 & 0xFFFFFFFF;
-				frameInfo->TimeStampHi = timeStamp64 >> 32;
-				
 				fread(&timeStampUtc64, 8, 1, m_File);
 				frameInfo->TimeStampUtcLo = timeStampUtc64 & 0xFFFFFFFF;
 				frameInfo->TimeStampUtcHi = timeStampUtc64 >> 32;
 			} else {
-				frameInfo->TimeStampLo = 0;
-				frameInfo->TimeStampHi = 0;
 				frameInfo->TimeStampUtcLo = 0;
 				frameInfo->TimeStampUtcHi = 0;				
 			}
@@ -175,19 +168,12 @@ HRESULT SerFile::GetFrameInfo(long frameNo, SerLib::SerFrameInfo* frameInfo)
 
 			advfsetpos(m_File, &timestampPosition);
 
-			unsigned __int64 timeStamp64;
 			unsigned __int64 timeStampUtc64;
 
-			fread(&timeStamp64, 8, 1, m_File);
-			frameInfo->TimeStampLo = timeStamp64 & 0xFFFFFFFF;
-			frameInfo->TimeStampHi = timeStamp64 >> 32;
-			
 			fread(&timeStampUtc64, 8, 1, m_File);
 			frameInfo->TimeStampUtcLo = timeStampUtc64 & 0xFFFFFFFF;
 			frameInfo->TimeStampUtcHi = timeStampUtc64 >> 32;
 		} else {
-			frameInfo->TimeStampLo = 0;
-			frameInfo->TimeStampHi = 0;
 			frameInfo->TimeStampUtcLo = 0;
 			frameInfo->TimeStampUtcHi = 0;				
 		}		
@@ -259,8 +245,6 @@ HRESULT SERGetFrame(long frameNo, unsigned long* pixels, unsigned long* original
 
 		SerLib::SerFrameInfo frameInfo;
 		HRESULT rv = m_SerFile->GetFrame(frameNo, pixels, cameraBitPix, &frameInfo);
-		marshalledFrameInfo->TimeStampLo = frameInfo.TimeStampLo;
-		marshalledFrameInfo->TimeStampHi = frameInfo.TimeStampHi;
 		marshalledFrameInfo->TimeStampUtcLo = frameInfo.TimeStampUtcLo;
 		marshalledFrameInfo->TimeStampUtcHi = frameInfo.TimeStampUtcHi;
 
@@ -302,8 +286,6 @@ HRESULT SERGetFrameInfo(long frameNo, SerLib::MarshalledSerFrameInfo* marshalled
 	if (NULL != m_SerFile) {
 		SerLib::SerFrameInfo frameInfo;
 		HRESULT rv = m_SerFile->GetFrameInfo(frameNo, &frameInfo);
-		marshalledFrameInfo->TimeStampLo = frameInfo.TimeStampLo;
-		marshalledFrameInfo->TimeStampHi = frameInfo.TimeStampHi;
 		marshalledFrameInfo->TimeStampUtcLo = frameInfo.TimeStampUtcLo;
 		marshalledFrameInfo->TimeStampUtcHi = frameInfo.TimeStampUtcHi;
 		
@@ -359,11 +341,7 @@ HRESULT SERGetIntegratedFrame(long startFrameNo, long framesToIntegrate, bool is
 		IntegrationManagerProduceIntegratedFrame(pixels);
 		IntegrationManagerFreeResources();
 
-		if (m_SerFile->HasTimeStamps) {
-			unsigned __int64 timeStamp64 = GetUInt64Average(firstFrameInfo.TimeStamp64, lastFrameInfo.TimeStamp64);
-			frameInfo->TimeStampLo = timeStamp64 & 0xFFFFFFFF;
-			frameInfo->TimeStampHi = timeStamp64 >> 32;
-			
+		if (m_SerFile->HasTimeStamps) {		
 			unsigned __int64 timeStampUtc64 = GetUInt64Average(firstFrameInfo.TimeStampUtc64, lastFrameInfo.TimeStampUtc64);
 			frameInfo->TimeStampUtcLo= timeStampUtc64 & 0xFFFFFFFF;
 			frameInfo->TimeStampUtcHi = timeStampUtc64 >> 32;

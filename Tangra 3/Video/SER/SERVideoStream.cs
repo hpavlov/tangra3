@@ -34,7 +34,6 @@ namespace Tangra.Video.SER
 	{
 		None,
 		SerEmbeddedUtcTime,
-		SerEmbeddedLocalTime,
         FireCaptureLog
 	}
 
@@ -265,7 +264,7 @@ namespace Tangra.Video.SER
 			    rv.UnprocessedPixels = unprocessedPixels;
 				rv.FrameState = new FrameStateData()
 				{
-					SystemTime = m_CurrentFrameInfo.TimeStamp
+                    SystemTime = m_CurrentFrameInfo.TimeStampUtc
 				};
 
 			    if (UseTimeStamp != SerUseTimeStamp.None)
@@ -276,11 +275,9 @@ namespace Tangra.Video.SER
 			            if (m_FireCaptureTimeStamps.TryGetValue(1 + index, out dt))
 			                rv.FrameState.CentralExposureTime = dt;
 			        }
-			        else
+                    else if (UseTimeStamp == SerUseTimeStamp.SerEmbeddedUtcTime)
 			        {
-                        rv.FrameState.CentralExposureTime = UseTimeStamp == SerUseTimeStamp.SerEmbeddedUtcTime
-                            ? m_CurrentFrameInfo.TimeStampUtc
-                            : m_CurrentFrameInfo.TimeStamp;
+                        rv.FrameState.CentralExposureTime = m_CurrentFrameInfo.TimeStampUtc;
 			        }
 			    }
 
@@ -348,7 +345,7 @@ namespace Tangra.Video.SER
                 rv.UnprocessedPixels = unprocessedPixels;
 				rv.FrameState = new FrameStateData()
 				{
-					SystemTime = m_CurrentFrameInfo.TimeStamp
+					SystemTime = m_CurrentFrameInfo.TimeStampUtc
 				};
 
 				return rv;

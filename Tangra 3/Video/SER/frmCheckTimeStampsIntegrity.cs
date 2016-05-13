@@ -40,7 +40,7 @@ namespace Tangra.Video.SER
                 TimeSpan tsUtc;
                 if (prevFrameInfo != null)
                 {
-                    ts = new TimeSpan(frameInfo.TimeStamp.Ticks - prevFrameInfo.TimeStamp.Ticks);
+                    ts = new TimeSpan(frameInfo.TimeStampUtc.Ticks - prevFrameInfo.TimeStampUtc.Ticks);
 
                     if (ts.TotalMilliseconds < 0)
                     {

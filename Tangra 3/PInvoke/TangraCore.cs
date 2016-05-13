@@ -289,38 +289,24 @@ namespace Tangra.PInvoke
 	[StructLayout(LayoutKind.Sequential)]
 	public struct SerNativeFrameInfo
 	{
-		public int TimeStampLo;
-		public int TimeStampHi;
         public int TimeStampUtcLo;
         public int TimeStampUtcHi;
 	};
 
 	public class SerFrameInfo
 	{
-		public DateTime TimeStamp { get; private set; }
         public DateTime TimeStampUtc { get; private set; }
 
 	    internal SerFrameInfo(DateTime fireCaptureTimeStamp)
 	    {
-	        TimeStamp = fireCaptureTimeStamp;
             TimeStampUtc = fireCaptureTimeStamp;
 	    }
 
 		internal SerFrameInfo(SerNativeFrameInfo nativeInfo)
 		{
-		    try
-		    {
-                TimeStamp = new DateTime((long)nativeInfo.TimeStampLo + ((long)nativeInfo.TimeStampHi << 32));
-		    }
-            catch (ArgumentOutOfRangeException aex)
-            {
-                Trace.WriteLine(aex);
-                TimeStamp = DateTime.MinValue;
-            }
-
             try
             {
-                TimeStampUtc = new DateTime((long)nativeInfo.TimeStampLo + ((long)nativeInfo.TimeStampHi << 32));
+                TimeStampUtc = new DateTime((long)(uint)nativeInfo.TimeStampUtcLo + ((long)(uint)nativeInfo.TimeStampUtcHi << 32));
             }
             catch (ArgumentOutOfRangeException aex)
             {

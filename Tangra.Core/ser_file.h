@@ -46,18 +46,13 @@ namespace SerLib
 	
 	struct SerFrameInfo
 	{
-		long TimeStampLo;
-		long TimeStampHi;
 		long TimeStampUtcLo;
 		long TimeStampUtcHi;
-		unsigned __int64 TimeStamp64;
 		unsigned __int64 TimeStampUtc64;
 	};
 	
 	struct MarshalledSerFrameInfo
 	{
-		long TimeStampLo;
-		long TimeStampHi;
 		long TimeStampUtcLo;
 		long TimeStampUtcHi;
 	};	
