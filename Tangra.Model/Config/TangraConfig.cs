@@ -114,7 +114,7 @@ namespace Tangra.Model.Config
 				int listId = 0;
 				if (tokens.Length == 2 && int.TryParse(tokens[0], out listId))
 				{
-					Lists[(RecentFileType)listId].Add(tokens[1].Trim());
+                    Lists[(RecentFileType)listId].Add(tokens[1].Replace('*', '=').Trim());
 				}
 			}
 		}
@@ -127,7 +127,7 @@ namespace Tangra.Model.Config
 			{
 				foreach (string fileName in Lists[key])
 				{
-					output.Append(string.Format("{0}={1}\n", (int)key, fileName));
+					output.Append(string.Format("{0}={1}\n", (int)key, fileName.Replace('=','*')));
 				}				
 			}
 
