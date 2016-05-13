@@ -33,7 +33,7 @@ namespace Tangra.Video.SER
 
 			var statusText = new StringBuilder();
 
-			statusText.AppendLine(string.Format("System Time: {0}", m_FrameState.SystemTime.ToString("dd MMM yyyy HH:mm:ss.fff")));
+			statusText.AppendLine(string.Format("Time Stamp: {0}", m_FrameState.SystemTime.ToString("dd MMM yyyy HH:mm:ss.fff")));
 
 			lblStatusCombined.Text = statusText.ToString();
 		}

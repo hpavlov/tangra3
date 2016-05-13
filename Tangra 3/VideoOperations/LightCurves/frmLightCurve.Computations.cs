@@ -908,6 +908,18 @@ namespace Tangra.VideoOperations.LightCurves
 			}
 		}
 
+        private string TranslateTimingType(MeasurementTimingType timingType)
+        {
+            if (timingType == MeasurementTimingType.UserEnteredFrameReferences)
+                return "User Entered Timestamps";
+            else if (timingType == MeasurementTimingType.OCRedTimeForEachFrame)
+                return "OCR-ed Timestamps";
+            else if (timingType == MeasurementTimingType.EmbeddedTimeForEachFrame)
+                return "Timestamp Saving During Recording";
+            else
+                return timingType.ToString();
+        }
+
         private void CSVExportAddCommonHeader(StringBuilder output, CSVExportOptions options, bool binning)
         {
             Version ver = Assembly.GetExecutingAssembly().GetName().Version;
@@ -920,8 +932,8 @@ namespace Tangra.VideoOperations.LightCurves
 
             output.AppendLine();
             output.Append(m_Header.PathToVideoFile); output.AppendLine();
-            string timeSource = m_Header.TimingType.ToString();
-            if (m_Header.SerTimingType != SerUseTimeStamp.None) timeSource += string.Format("({0})", m_Header.SerTimingType);
+            string timeSource = TranslateTimingType(m_Header.TimingType);
+            if (m_Header.SerTimingType != SerUseTimeStamp.None) timeSource += string.Format(" ({0})", m_Header.SerTimingType);
             output.AppendFormat("{0} {1}, Time: {2}", m_Header.ReductionType, m_Header.SourceInfo, timeSource); output.AppendLine();
             output.AppendLine();output.AppendLine();
             bool addPSFReductionDetails = m_LightCurveController.Context.SignalMethod != TangraConfig.PhotometryReductionMethod.AperturePhotometry;

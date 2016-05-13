@@ -28,40 +28,40 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.btnCopy = new System.Windows.Forms.Button();
-			this.lblStatusCombined = new System.Windows.Forms.Label();
-			this.SuspendLayout();
-			// 
-			// btnCopy
-			// 
-			this.btnCopy.Location = new System.Drawing.Point(64, 53);
-			this.btnCopy.Name = "btnCopy";
-			this.btnCopy.Size = new System.Drawing.Size(75, 23);
-			this.btnCopy.TabIndex = 20;
-			this.btnCopy.Text = "Copy";
-			this.btnCopy.Click += new System.EventHandler(this.btnCopy_Click);
-			// 
-			// lblStatusCombined
-			// 
-			this.lblStatusCombined.AutoSize = true;
-			this.lblStatusCombined.Location = new System.Drawing.Point(12, 9);
-			this.lblStatusCombined.Name = "lblStatusCombined";
-			this.lblStatusCombined.Size = new System.Drawing.Size(180, 13);
-			this.lblStatusCombined.TabIndex = 19;
-			this.lblStatusCombined.Text = "System Time: 12 Dec 2011 10:45:00\r\n";
-			// 
-			// frmSerStatusPopup
-			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(211, 87);
-			this.Controls.Add(this.btnCopy);
-			this.Controls.Add(this.lblStatusCombined);
-			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-			this.Name = "frmSerStatusPopup";
-			this.Text = "Ser File Timestamp";
-			this.ResumeLayout(false);
-			this.PerformLayout();
+            this.btnCopy = new System.Windows.Forms.Button();
+            this.lblStatusCombined = new System.Windows.Forms.Label();
+            this.SuspendLayout();
+            // 
+            // btnCopy
+            // 
+            this.btnCopy.Location = new System.Drawing.Point(64, 53);
+            this.btnCopy.Name = "btnCopy";
+            this.btnCopy.Size = new System.Drawing.Size(75, 23);
+            this.btnCopy.TabIndex = 20;
+            this.btnCopy.Text = "Copy";
+            this.btnCopy.Click += new System.EventHandler(this.btnCopy_Click);
+            // 
+            // lblStatusCombined
+            // 
+            this.lblStatusCombined.AutoSize = true;
+            this.lblStatusCombined.Location = new System.Drawing.Point(12, 9);
+            this.lblStatusCombined.Name = "lblStatusCombined";
+            this.lblStatusCombined.Size = new System.Drawing.Size(176, 13);
+            this.lblStatusCombined.TabIndex = 19;
+            this.lblStatusCombined.Text = "Time Stamp: 12 Dec 2011 10:45:00\r\n";
+            // 
+            // frmSerStatusPopup
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(211, 87);
+            this.Controls.Add(this.btnCopy);
+            this.Controls.Add(this.lblStatusCombined);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.Name = "frmSerStatusPopup";
+            this.Text = "Ser File Timestamp";
+            this.ResumeLayout(false);
+            this.PerformLayout();
 
 		}
 
