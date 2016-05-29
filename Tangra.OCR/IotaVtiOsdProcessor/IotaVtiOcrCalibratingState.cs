@@ -8,7 +8,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.OCR.IotaVtiOsdProcessor;
