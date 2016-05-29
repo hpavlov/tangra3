@@ -335,6 +335,7 @@ namespace Tangra.Video.AstroDigitalVideo
 			}
 		}
 
+#if WIN32
         private void SaveAsAviFileWorker(object state)
         {
             Tuple<string, int, int, bool, double, double, AdvToAviConverter> cropFileCfg = (Tuple<string, int, int, bool, double, double, AdvToAviConverter>)state;
@@ -361,7 +362,7 @@ namespace Tangra.Video.AstroDigitalVideo
                 InvokeUpdateUI(2, 100, false);
             }
         }
-
+#endif
 		private void ExportToCSVWorker(object state)
 		{
 			Tuple<string, int, int> cropFileCfg = (Tuple<string, int, int>)state;
@@ -428,6 +429,7 @@ namespace Tangra.Video.AstroDigitalVideo
 
         private void btnSaveAsAVI_Click(object sender, EventArgs e)
         {
+#if WIN32
             if (nudCropLastFrame.Value < nudCropFirstFrame.Value)
             {
                 MessageBox.Show(
@@ -478,6 +480,7 @@ namespace Tangra.Video.AstroDigitalVideo
                         addedGamma,
                         AdvToAviConverter.VideoForWindowsAviSaver));
             }
+#endif
         }
 
 		private void btnSaveAsCSV_Click(object sender, EventArgs e)
