@@ -32,14 +32,14 @@ typedef void* HBITMAP;
 #pragma pack(1)
 typedef struct tagBITMAPINFOHEADER {
   DWORD biSize;
-  LONG  biWidth;
-  LONG  biHeight;
+  int  biWidth;
+  int  biHeight;
   WORD  biPlanes;
   WORD  biBitCount;
   DWORD biCompression;
   DWORD biSizeImage;
-  LONG  biXPelsPerMeter;
-  LONG  biYPelsPerMeter;
+  int  biXPelsPerMeter;
+  int  biYPelsPerMeter;
   DWORD biClrUsed;
   DWORD biClrImportant;
 } BITMAPINFOHEADER, *PBITMAPINFOHEADER;
@@ -55,8 +55,8 @@ typedef struct tagBITMAPFILEHEADER {
 } BITMAPFILEHEADER, *PBITMAPFILEHEADER;
 #pragma pack()
 
-typedef long long __int64;
-typedef unsigned long long __uint64;
+typedef int long __int64;
+typedef unsigned int long __uint64;
 
 #else
 

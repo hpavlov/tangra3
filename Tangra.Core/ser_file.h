@@ -30,55 +30,55 @@ namespace SerLib
 	
 	struct SerFileInfo
 	{
-		long CameraId;
-		long ColourId;
-		long LittleEndian;
-		long Width;
-		long Height;
-		long PixelDepthPerPlane;
-		long CountFrames;
-		long SequenceStartTimeLo;
-		long SequenceStartTimeHi;
-		long SequenceStartTimeUTCLo;
-		long SequenceStartTimeUTCHi;
-		unsigned long NormalisationValue;
+		int CameraId;
+		int ColourId;
+		int LittleEndian;
+		int Width;
+		int Height;
+		int PixelDepthPerPlane;
+		int CountFrames;
+		int SequenceStartTimeLo;
+		int SequenceStartTimeHi;
+		int SequenceStartTimeUTCLo;
+		int SequenceStartTimeUTCHi;
+		unsigned int NormalisationValue;
 	};
 	
 	struct SerFrameInfo
 	{
-		long TimeStampUtcLo;
-		long TimeStampUtcHi;
+		int TimeStampUtcLo;
+		int TimeStampUtcHi;
 		unsigned __int64 TimeStampUtc64;
 	};
 	
 	struct MarshalledSerFrameInfo
 	{
-		long TimeStampUtcLo;
-		long TimeStampUtcHi;
+		int TimeStampUtcLo;
+		int TimeStampUtcHi;
 	};	
 	
 	class SerFile {
 		private:
 			char* m_Telescope;
 			FILE* m_File;
-			long m_ColourId;
-			long m_NumPlanes;
-			long m_BytesPerPixel;
-			long m_PixelsPerFrame;
-			long m_CountFrames;
+			int m_ColourId;
+			int m_NumPlanes;
+			int m_BytesPerPixel;
+			int m_PixelsPerFrame;
+			int m_CountFrames;
 			__int64 m_TimeStampStartOffset;
 		
 		private:
 			unsigned char* m_RawFrameBuffer;
-			long m_RawFrameSize;
-			HRESULT ProcessRawFrame(unsigned long* pixels, unsigned int cameraBitPix);
+			int m_RawFrameSize;
+			HRESULT ProcessRawFrame(unsigned int* pixels, unsigned int cameraBitPix);
 			
 		public:
-			long Width;
-			long Height;
-			long Bpp;
+			int Width;
+			int Height;
+			int Bpp;
 			bool LittleEndian;
-			long NormalisationValue;
+			int NormalisationValue;
 			bool HasTimeStamps;
 		
 		public:
@@ -87,8 +87,8 @@ namespace SerLib
 			
 			void OpenFile(const char* filePath, SerLib::SerFileInfo* fileInfo, char* observer, char* instrument, char* telescope, bool checkMagic);
 			void CloseFile();
-			HRESULT GetFrame(long frameNo, unsigned long* pixels, unsigned int cameraBitPix, SerLib::SerFrameInfo* frameInfo);
-			HRESULT GetFrameInfo(long frameNo, SerLib::SerFrameInfo* frameInfo);
+			HRESULT GetFrame(int frameNo, unsigned int* pixels, unsigned int cameraBitPix, SerLib::SerFrameInfo* frameInfo);
+			HRESULT GetFrameInfo(int frameNo, SerLib::SerFrameInfo* frameInfo);
 	};
 }
 
@@ -100,9 +100,9 @@ extern "C"
 
 DLL_PUBLIC HRESULT SEROpenFile(char* fileName, SerLib::SerFileInfo* fileInfo, char* observer, char* instrument, char* telescope, bool checkMagic);
 DLL_PUBLIC HRESULT SERCloseFile();
-DLL_PUBLIC HRESULT SERGetFrame(long frameNo, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapPixels, BYTE* bitmapBytes, unsigned int cameraBitPix, SerLib::MarshalledSerFrameInfo* frameInfo);		
-DLL_PUBLIC HRESULT SERGetIntegratedFrame(long startFrameNo, long framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapBytes, BYTE* bitmapDisplayBytes, unsigned int cameraBitPix, SerLib::MarshalledSerFrameInfo* frameInfo);
-DLL_PUBLIC HRESULT SERGetFrameInfo(long frameNo, SerLib::MarshalledSerFrameInfo* frameInfo);
+DLL_PUBLIC HRESULT SERGetFrame(int frameNo, unsigned int* pixels, unsigned int* originalPixels, BYTE* bitmapPixels, BYTE* bitmapBytes, unsigned int cameraBitPix, SerLib::MarshalledSerFrameInfo* frameInfo);		
+DLL_PUBLIC HRESULT SERGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned int* pixels, unsigned int* originalPixels, BYTE* bitmapBytes, BYTE* bitmapDisplayBytes, unsigned int cameraBitPix, SerLib::MarshalledSerFrameInfo* frameInfo);
+DLL_PUBLIC HRESULT SERGetFrameInfo(int frameNo, SerLib::MarshalledSerFrameInfo* frameInfo);
 		
 #ifdef __cplusplus
 } // __cplusplus defined.

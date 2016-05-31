@@ -12,7 +12,7 @@ static double MAX_FWHM;
 static double MIN_CERTAINTY;
 
 
-TrackedObject::TrackedObject(long objectId, bool isFixedAperture, bool isOccultedStar, double startingX, double startingY, double apertureInPixels, PSFFittingDataRange dataRange, unsigned int maxPixelValue)
+TrackedObject::TrackedObject(int objectId, bool isFixedAperture, bool isOccultedStar, double startingX, double startingY, double apertureInPixels, PSFFittingDataRange dataRange, unsigned int maxPixelValue)
 {
 	ObjectId = objectId;
 	IsFixedAperture = isFixedAperture;
@@ -46,8 +46,8 @@ void TrackedObject::InitialiseNewTracking()
 {
 	CenterXDouble = StartingX;
 	CenterYDouble = StartingY;
-	CenterX = (long)(StartingX + 0.5); // rounding
-	CenterY = (long)(StartingY + 0.5); // rounding
+	CenterX = (int)(StartingX + 0.5); // rounding
+	CenterY = (int)(StartingY + 0.5); // rounding
 	
 	LastKnownGoodPositionXDouble = CenterXDouble;
 	LastKnownGoodPositionYDouble = CenterYDouble;
@@ -64,15 +64,15 @@ void TrackedObject::SetIsTracked(bool isLocated, NotMeasuredReasons reason, doub
 		CenterXDouble = x;
 		CenterYDouble = y;
 		LastKnownGoodPsfCertainty = certainty;
-		CenterX = (long)(x + 0.5); // rounding
-		CenterY = (long)(y + 0.5); // rounding
+		CenterX = (int)(x + 0.5); // rounding
+		CenterY = (int)(y + 0.5); // rounding
 	}
 
 	IsLocated = isLocated;
 	TrackingFlags = (unsigned int)reason;
 }
 
-SimplifiedTracker::SimplifiedTracker(long width, long height, long numTrackedObjects, bool isFullDisappearance, PSFFittingDataRange dataRange, unsigned int maxPixelValue)
+SimplifiedTracker::SimplifiedTracker(int width, int height, int numTrackedObjects, bool isFullDisappearance, PSFFittingDataRange dataRange, unsigned int maxPixelValue)
 {
 	m_Width = width;
 	m_Height = height;
@@ -85,7 +85,7 @@ SimplifiedTracker::SimplifiedTracker(long width, long height, long numTrackedObj
 	for(int i = 0; i < numTrackedObjects; i ++)
 		m_TrackedObjects[i] = NULL;	
 		
-	m_AreaPixels = (unsigned long*)malloc(sizeof(unsigned long) * MAX_MATRIX_SIZE * MAX_MATRIX_SIZE);		
+	m_AreaPixels = (unsigned int*)malloc(sizeof(unsigned int) * MAX_MATRIX_SIZE * MAX_MATRIX_SIZE);		
 }
 
 SimplifiedTracker::~SimplifiedTracker()
@@ -109,7 +109,7 @@ SimplifiedTracker::~SimplifiedTracker()
 	}	
 }
 
-void SimplifiedTracker::ConfigureObject(long objectId, bool isFixedAperture, bool isOccultedStar, double startingX, double startingY, double apertureInPixels)
+void SimplifiedTracker::ConfigureObject(int objectId, bool isFixedAperture, bool isOccultedStar, double startingX, double startingY, double apertureInPixels)
 {
 	if (objectId >=0 && objectId < m_NumTrackedObjects)
 		m_TrackedObjects[objectId] = new TrackedObject(objectId, isFixedAperture, isOccultedStar, startingX, startingY, apertureInPixels, m_DataRange, m_MaxPixelValue);
@@ -127,7 +127,7 @@ void SimplifiedTracker::InitialiseNewTracking()
 		m_TrackedObjects[i]->InitialiseNewTracking();
 }
 
-bool SimplifiedTracker::DoManualFrameCorrection(long objectId, long deltaX, long deltaY)
+bool SimplifiedTracker::DoManualFrameCorrection(int objectId, int deltaX, int deltaY)
 {
 	for (int i = 0; i < m_NumTrackedObjects; i++)
 	{
@@ -147,17 +147,17 @@ bool SimplifiedTracker::IsTrackedSuccessfully()
 	return this->m_IsTrackedSuccessfully;
 }
 
-unsigned long* SimplifiedTracker::GetPixelsArea(unsigned long* pixels, long centerX, long centerY, long squareWidth)
+unsigned int* SimplifiedTracker::GetPixelsArea(unsigned int* pixels, int centerX, int centerY, int squareWidth)
 {
-	long x0 = centerX;
-	long y0 = centerY;
+	int x0 = centerX;
+	int y0 = centerY;
 
-	long halfWidth = squareWidth / 2;
+	int halfWidth = squareWidth / 2;
 
-	for (long x = x0 - halfWidth; x <= x0 + halfWidth; x++)
-		for (long y = y0 - halfWidth; y <= y0 + halfWidth; y++)
+	for (int x = x0 - halfWidth; x <= x0 + halfWidth; x++)
+		for (int y = y0 - halfWidth; y <= y0 + halfWidth; y++)
 		{
-			unsigned long pixelVal = 0;
+			unsigned int pixelVal = 0;
 
 			if (x >= 0 && x < m_Width && y >= 0 & y < m_Height)
 			{
@@ -171,7 +171,7 @@ unsigned long* SimplifiedTracker::GetPixelsArea(unsigned long* pixels, long cent
 }
 
 /*
-unsigned long* SimplifiedTracker::GetPixelsArea(unsigned long* pixels, long centerX, long centerY, long squareWidth)
+unsigned int* SimplifiedTracker::GetPixelsArea(unsigned int* pixels, int centerX, int centerY, int squareWidth)
 {
 	long halfWidth = squareWidth / 2;
 	int areaLine = 0;
@@ -193,7 +193,7 @@ unsigned long* SimplifiedTracker::GetPixelsArea(unsigned long* pixels, long cent
 	return m_AreaPixels;
 }*/
 
-void SimplifiedTracker::NextFrame(int frameNo, unsigned long* pixels)
+void SimplifiedTracker::NextFrame(int frameNo, unsigned int* pixels)
 {
 	m_IsTrackedSuccessfully = false;
 
@@ -210,7 +210,7 @@ void SimplifiedTracker::NextFrame(int frameNo, unsigned long* pixels)
 		}
 		else
 		{
-			unsigned long* areaPixels = GetPixelsArea(pixels, trackedObject->CenterX, trackedObject->CenterY, 17);
+			unsigned int* areaPixels = GetPixelsArea(pixels, trackedObject->CenterX, trackedObject->CenterY, 17);
 			
 			trackedObject->UseCurrentPsfFit = false;
 			trackedObject->CurrentPsfFit->Fit(trackedObject->CenterX, trackedObject->CenterY, areaPixels, 17);
@@ -287,14 +287,14 @@ void SimplifiedTracker::NextFrame(int frameNo, unsigned long* pixels)
 			}
 			else if (trackedObject->IsOccultedStar && m_IsFullDisappearance)
 			{
-				long x = (long)(x_double + 0.5); // rounded
-				long y = (long)(y_double + 0.5); // rounded
+				int x = (int)(x_double + 0.5); // rounded
+				int y = (int)(y_double + 0.5); // rounded
 
-				long matrixSize = (long)(trackedObject->ApertureInPixels * 1.5 + 0.5); // rounded
+				int matrixSize = (int)(trackedObject->ApertureInPixels * 1.5 + 0.5); // rounded
 				if (matrixSize % 2 == 0) matrixSize++;
 				if (matrixSize > 17) matrixSize = 17;
 
-				unsigned long* areaPixels = GetPixelsArea(pixels, x, y, matrixSize);
+				unsigned int* areaPixels = GetPixelsArea(pixels, x, y, matrixSize);
 
 				trackedObject->UseCurrentPsfFit = false;
 				
@@ -314,7 +314,7 @@ void SimplifiedTracker::NextFrame(int frameNo, unsigned long* pixels)
 	m_IsTrackedSuccessfully = atLeastOneObjectLocated;
 }
 
-long SimplifiedTracker::TrackerGetTargetState(long objectId, NativeTrackedObjectInfo* trackingInfo, NativePsfFitInfo* psfInfo, double* residuals)
+int SimplifiedTracker::TrackerGetTargetState(int objectId, NativeTrackedObjectInfo* trackingInfo, NativePsfFitInfo* psfInfo, double* residuals)
 {
 	if (objectId < 0 || objectId >= m_NumTrackedObjects)
 		return E_FAIL;
@@ -353,7 +353,7 @@ long SimplifiedTracker::TrackerGetTargetState(long objectId, NativeTrackedObject
 
 static SimplifiedTracker* s_Tracker;
 
-long TrackerSettings(double maxElongation, double minFWHM, double maxFWHM, double minCertainty)
+int TrackerSettings(double maxElongation, double minFWHM, double maxFWHM, double minCertainty)
 {
 	MAX_ELONGATION = maxElongation;
 	MIN_FWHM = minFWHM;
@@ -366,7 +366,7 @@ long TrackerSettings(double maxElongation, double minFWHM, double maxFWHM, doubl
 	return S_OK;
 }
 
-long TrackerNewConfiguration(long width, long height, long numTrackedObjects, bool isFullDisappearance, PSFFittingDataRange dataRange, unsigned int maxPixelValue)
+int TrackerNewConfiguration(int width, int height, int numTrackedObjects, bool isFullDisappearance, PSFFittingDataRange dataRange, unsigned int maxPixelValue)
 {
 	if (NULL != s_Tracker)
 	{
@@ -379,7 +379,7 @@ long TrackerNewConfiguration(long width, long height, long numTrackedObjects, bo
 	return S_OK;
 }
 
-long TrackerConfigureObject(long objectId, bool isFixedAperture, bool isOccultedStar, double startingX, double startingY, double apertureInPixels)
+int TrackerConfigureObject(int objectId, bool isFixedAperture, bool isOccultedStar, double startingX, double startingY, double apertureInPixels)
 {
 	if (NULL != s_Tracker)
 	{
@@ -390,7 +390,7 @@ long TrackerConfigureObject(long objectId, bool isFixedAperture, bool isOcculted
 	return E_POINTER;
 }
 
-long TrackerInitialiseNewTracking()
+int TrackerInitialiseNewTracking()
 {
 	if (NULL != s_Tracker)
 	{
@@ -401,7 +401,7 @@ long TrackerInitialiseNewTracking()
 	return -2;	
 }
 
-long TrackerNextFrame(long frameId, unsigned long* pixels)
+int TrackerNextFrame(int frameId, unsigned int* pixels)
 {
 	if (NULL != s_Tracker)
 	{
@@ -412,7 +412,7 @@ long TrackerNextFrame(long frameId, unsigned long* pixels)
 	return -2;
 }
 
-long TrackerDoManualFrameCorrection(long objectId, long deltaX, long deltaY)
+int TrackerDoManualFrameCorrection(int objectId, int deltaX, int deltaY)
 {
 	if (NULL != s_Tracker) 
 	{
@@ -421,7 +421,7 @@ long TrackerDoManualFrameCorrection(long objectId, long deltaX, long deltaY)
 
 	return -2;	
 }
-long TrackerGetTargetState(long objectId, NativeTrackedObjectInfo* trackingInfo, NativePsfFitInfo* psfInfo, double* residuals)
+int TrackerGetTargetState(int objectId, NativeTrackedObjectInfo* trackingInfo, NativePsfFitInfo* psfInfo, double* residuals)
 {
 	if (NULL != s_Tracker)
 	{

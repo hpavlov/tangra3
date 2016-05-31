@@ -7,7 +7,7 @@
 #include <cmath>
 #include "Tangra.Math.h"
 
-PsfFit::PsfFit(long xCenter, long yCenter, PSFFittingDataRange dataRange, unsigned int maxPixelValue)
+PsfFit::PsfFit(int xCenter, int yCenter, PSFFittingDataRange dataRange, unsigned int maxPixelValue)
 {
 	this->FittingMethod = NonLinearFit;
 	
@@ -98,23 +98,23 @@ double PsfFit::YCenter()
 	return m_yCenter + m_Y0 - m_HalfWidth;
 }
 
-long PsfFit::MatrixSize()
+int PsfFit::MatrixSize()
 {
 	return m_MatrixSize;
 }
 
-long PsfFit::X0()
+int PsfFit::X0()
 {
-	long xInx = (long) round(m_X0);
+	int xInx = (int) round(m_X0);
 	if (xInx < 0) xInx = 0;
 	if (xInx >= m_MatrixSize) xInx = m_MatrixSize - 1;
 
 	return xInx;
 }
 
-long PsfFit::Y0()
+int PsfFit::Y0()
 {
-	long yInx = (long)round(m_Y0);
+	int yInx = (int)round(m_Y0);
 	if (yInx < 0) yInx = 0;
 	if (yInx >= m_MatrixSize) yInx = m_MatrixSize - 1;
 
@@ -141,7 +141,7 @@ double PsfFit::IMax()
 	return m_IBackground + m_IStarMax;
 }
 
-unsigned long PsfFit::Brightness()
+unsigned int PsfFit::Brightness()
 {
 	return (unsigned long)round(IMax() - I0());
 }
@@ -177,7 +177,7 @@ double PsfFit::GetPSFValueInternalAsymetric(double x, double y)
 	return m_IBackground + m_IStarMax * exp(-(x - m_X0) * (x - m_X0) / (RX0 * RX0) + (y - m_Y0) * (y - m_Y0) / (RY0 * RY0));
 }
 
-void PsfFit::Fit(long xCenter, long yCenter, unsigned long* intensity, long width)
+void PsfFit::Fit(int xCenter, int yCenter, unsigned int* intensity, int width)
 {
 	m_xCenter = xCenter;
 	m_yCenter = yCenter;
@@ -186,7 +186,7 @@ void PsfFit::Fit(long xCenter, long yCenter, unsigned long* intensity, long widt
 	Fit(intensity, width);
 }
 
-void PsfFit::Fit(unsigned long* intensity, long width)
+void PsfFit::Fit(unsigned int* intensity, int width)
 {
 	m_IsSolved = false;
 	
@@ -198,7 +198,7 @@ void PsfFit::Fit(unsigned long* intensity, long width)
 		DoLinearFitOfAveragedModel(intensity, width);
 }
 
-void PsfFit::DoNonLinearFit(unsigned long* intensity, long width)
+void PsfFit::DoNonLinearFit(unsigned int* intensity, int width)
 {
 	bool isSolved;
 	double iBackground;
@@ -222,17 +222,17 @@ void PsfFit::DoNonLinearFit(unsigned long* intensity, long width)
 	R0 = r0;
 }
 
-void PsfFit::DoNonLinearAsymetricFit(unsigned long* intensity, long width)
+void PsfFit::DoNonLinearAsymetricFit(unsigned int* intensity, int width)
 {
 	
 }
 
-void PsfFit::DoLinearFitOfAveragedModel(unsigned long* intensity, long width)
+void PsfFit::DoLinearFitOfAveragedModel(unsigned int* intensity, int width)
 {
 	
 }
 
-void PsfFit::CopyResiduals(double* buffer, long matrixSize)
+void PsfFit::CopyResiduals(double* buffer, int matrixSize)
 {
 	memcpy(buffer, m_Residuals, matrixSize * matrixSize * sizeof(double));
 }

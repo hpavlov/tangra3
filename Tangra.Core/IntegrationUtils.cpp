@@ -10,14 +10,14 @@
 #include <algorithm>
 
 double* s_IntegratedValues = NULL;
-std::vector< std::vector<unsigned long>* > s_MedianPixelLists;
+std::vector< std::vector<unsigned int>* > s_MedianPixelLists;
 
 bool s_IsMedianAveraging;
-long s_Width;
-long s_Height;
-long s_FrameCount;
+int s_Width;
+int s_Height;
+int s_FrameCount;
 
-long IntegrationManagerGetFirstFrameToIntegrate(long producedFirstFrame, long frameCount, bool isSlidingIntegration)
+int IntegrationManagerGetFirstFrameToIntegrate(int producedFirstFrame, int frameCount, bool isSlidingIntegration)
 {
 	if (isSlidingIntegration)
 	{
@@ -30,7 +30,7 @@ long IntegrationManagerGetFirstFrameToIntegrate(long producedFirstFrame, long fr
 	}
 }
 
-void IntergationManagerStartNew(long width, long height, bool isMedianAveraging)
+void IntergationManagerStartNew(int width, int height, bool isMedianAveraging)
 {
 	s_IntegratedValues = (double*)malloc(width * height * sizeof(double));
 	memset(s_IntegratedValues, 0, width * height * sizeof(double));
@@ -43,31 +43,31 @@ void IntergationManagerStartNew(long width, long height, bool isMedianAveraging)
 	if (isMedianAveraging)
 	{
 		s_MedianPixelLists.clear();
-		for(long i = 0; i < width * height; i++)
+		for(int i = 0; i < width * height; i++)
 		{
-			s_MedianPixelLists.push_back(new std::vector<unsigned long>());
+			s_MedianPixelLists.push_back(new std::vector<unsigned int>());
 		}
 	}
 }
 
-void IntegrationManagerAddFrame(unsigned long* framePixels)
+void IntegrationManagerAddFrame(unsigned int* framePixels)
 {
 	double* pIntegrated = s_IntegratedValues;
-	unsigned long* pPixels = framePixels;
+	unsigned int* pPixels = framePixels;
 
 	if (!s_IsMedianAveraging)
 	{
-		for(long x = 0; x < s_Width; x++)
-		for(long y = 0; y < s_Height; y++)
+		for(int x = 0; x < s_Width; x++)
+		for(int y = 0; y < s_Height; y++)
 		{
 			*pIntegrated++ += *pPixels++;
 		}
 	}
 	else
 	{
-		long idx = -1;
-		for(long x = 0; x < s_Width; x++)
-		for(long y = 0; y < s_Height; y++)
+		int idx = -1;
+		for(int x = 0; x < s_Width; x++)
+		for(int y = 0; y < s_Height; y++)
 		{
 			s_MedianPixelLists[++idx]->push_back(*pPixels++);
 		}		
@@ -77,20 +77,20 @@ void IntegrationManagerAddFrame(unsigned long* framePixels)
 }
 
 
-void IntegrationManagerAddFrameEx(unsigned long* framePixels, bool isLittleEndian, long bpp)
+void IntegrationManagerAddFrameEx(unsigned int* framePixels, bool isLittleEndian, int bpp)
 {
 	double* pIntegrated = s_IntegratedValues;
-	unsigned long* pPixels = framePixels;
+	unsigned int* pPixels = framePixels;
 
 	if (!s_IsMedianAveraging)
 	{
-		for(long x = 0; x < s_Width; x++)
-		for(long y = 0; y < s_Height; y++)
+		for(int x = 0; x < s_Width; x++)
+		for(int y = 0; y < s_Height; y++)
 		{
 			if (isLittleEndian)
 			{
-				unsigned long littleEndianValue = *pPixels++;
-				unsigned long bigEndianValue = 0;
+				unsigned int littleEndianValue = *pPixels++;
+				unsigned int bigEndianValue = 0;
 				if (bpp == 16)
 				{
 					bigEndianValue = ((littleEndianValue & 0xFF) << 8) + ((littleEndianValue & 0xFF00) >> 8);
@@ -109,15 +109,15 @@ void IntegrationManagerAddFrameEx(unsigned long* framePixels, bool isLittleEndia
 	}
 	else
 	{
-		long idx = -1;
-		for(long x = 0; x < s_Width; x++)
-		for(long y = 0; y < s_Height; y++)
+		int idx = -1;
+		for(int x = 0; x < s_Width; x++)
+		for(int y = 0; y < s_Height; y++)
 		{
-			unsigned long pixelValue;
+			unsigned int pixelValue;
 			if (isLittleEndian)
 			{
-				unsigned long littleEndianValue = *pPixels++;
-				unsigned long bigEndianValue = 0;
+				unsigned int littleEndianValue = *pPixels++;
+				unsigned int bigEndianValue = 0;
 				if (bpp == 16)
 				{
 					bigEndianValue = ((littleEndianValue & 0xFF) << 8) + ((littleEndianValue & 0xFF00) >> 8);
@@ -140,19 +140,19 @@ void IntegrationManagerAddFrameEx(unsigned long* framePixels, bool isLittleEndia
 	s_FrameCount++;
 }
 
-void IntegrationManagerProduceIntegratedFrame(unsigned long* framePixels)
+void IntegrationManagerProduceIntegratedFrame(unsigned int* framePixels)
 {
 	double* pIntegrated = s_IntegratedValues;
-	unsigned long* pPixels = framePixels;
+	unsigned int* pPixels = framePixels;
 
 	if (!s_IsMedianAveraging)
 	{
 		if (s_FrameCount > 0)
 		{
-			for(long x = 0; x < s_Width; x++)
-			for(long y = 0; y < s_Height; y++)
+			for(int x = 0; x < s_Width; x++)
+			for(int y = 0; y < s_Height; y++)
 			{
-				*pPixels++ = (unsigned long)(*pIntegrated++ / s_FrameCount);
+				*pPixels++ = (unsigned int)(*pIntegrated++ / s_FrameCount);
 			}
 		}
 	}
@@ -160,15 +160,15 @@ void IntegrationManagerProduceIntegratedFrame(unsigned long* framePixels)
 	{
 		if (s_FrameCount > 0)
 		{
-			long idx = -1;
-			for(long x = 0; x < s_Width; x++)
-			for(long y = 0; y < s_Height; y++)
+			int idx = -1;
+			for(int x = 0; x < s_Width; x++)
+			for(int y = 0; y < s_Height; y++)
 			{
 				idx++;
-				std::vector<unsigned long>* pixelsVec = s_MedianPixelLists[idx];
+				std::vector<unsigned int>* pixelsVec = s_MedianPixelLists[idx];
 				size_t n = pixelsVec->size() / 2;
 				std::nth_element(pixelsVec->begin(), pixelsVec->begin() + n, pixelsVec->end());
-				unsigned long median = (*pixelsVec)[n];				
+				unsigned int median = (*pixelsVec)[n];				
 				*pPixels++ = median;
 			}
 		}			
@@ -182,7 +182,7 @@ void IntegrationManagerFreeResources()
 
 	s_IntegratedValues = NULL;
 	
-	for(long i = 0; i < s_MedianPixelLists.size(); i++)
+	for(int i = 0; i < s_MedianPixelLists.size(); i++)
 	{
 		delete s_MedianPixelLists[i];
 		s_MedianPixelLists[i] = NULL;

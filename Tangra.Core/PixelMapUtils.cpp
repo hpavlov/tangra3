@@ -12,18 +12,18 @@
 #include <algorithm>
 
 
-void CopyPixelsFromFormat16BPP(BYTE* pDIB, BITMAPINFOHEADER bih, long compression, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
+void CopyPixelsFromFormat16BPP(BYTE* pDIB, BITMAPINFOHEADER bih, int compression, unsigned int* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
 {
-	long length = (bih.biWidth * bih.biHeight);
+	int length = (bih.biWidth * bih.biHeight);
 	BYTE* src = pDIB + sizeof(BITMAPINFOHEADER);
 
 	unsigned int lineWidth = ((bih.biWidth * 16 / 8) + 3) & ~3;
 
-	for (long y = bih.biHeight - 1; y >= 0; y--) {
-		unsigned long* rowPixels = pixels + y * bih.biWidth;
+	for (int y = bih.biHeight - 1; y >= 0; y--) {
+		unsigned int* rowPixels = pixels + y * bih.biWidth;
 		BYTE* rowBitmapPixels = bitmapBytes + y * bih.biWidth;
 
-		for(long x = 0; x < bih.biWidth; x++) {
+		for(int x = 0; x < bih.biWidth; x++) {
 			BYTE val;
 			unsigned char red;
 			unsigned char green;
@@ -54,7 +54,7 @@ void CopyPixelsFromFormat16BPP(BYTE* pDIB, BITMAPINFOHEADER bih, long compressio
 				val = (unsigned char)(.299 * red + .587 * green + .114 * blue);
 			}
 
-			*rowPixels++= (unsigned long)val;
+			*rowPixels++= (unsigned int)val;
 			*rowBitmapPixels++=val;
 
 			*bitmapPixels++=val;
@@ -64,17 +64,17 @@ void CopyPixelsFromFormat16BPP(BYTE* pDIB, BITMAPINFOHEADER bih, long compressio
 	}
 }
 
-void CopyPixelsFromFormat16BPP(BYTE* pDIB, long width, long height, long compression, unsigned long* pixels)
+void CopyPixelsFromFormat16BPP(BYTE* pDIB, int width, int height, int compression, unsigned int* pixels)
 {
-	long length = width * height;
+	int length = width * height;
 	BYTE* src = pDIB + sizeof(BITMAPINFOHEADER);
 
 	unsigned int lineWidth = ((width * 16 / 8) + 3) & ~3;
 
-	for (long y = height - 1; y >= 0; y--) {
-		unsigned long* rowPixels = pixels + y * width;
+	for (int y = height - 1; y >= 0; y--) {
+		unsigned int* rowPixels = pixels + y * width;
 
-		for(long x = 0; x < width; x++) {
+		for(int x = 0; x < width; x++) {
 			BYTE val;
 			unsigned char red;
 			unsigned char green;
@@ -105,42 +105,42 @@ void CopyPixelsFromFormat16BPP(BYTE* pDIB, long width, long height, long compres
 				val = (unsigned char)(.299 * red + .587 * green + .114 * blue);
 			}
 
-			*rowPixels++= (unsigned long)val;
+			*rowPixels++= (unsigned int)val;
 		}
 	}
 }
 
-void CopyPixelsFromFormat8BPP(BYTE* pDIB, BITMAPINFOHEADER bih, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
+void CopyPixelsFromFormat8BPP(BYTE* pDIB, BITMAPINFOHEADER bih, unsigned int* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
 {
 	//PixelFormat.Format8bppIndexed
 
-	long length = (bih.biWidth * bih.biHeight);
+	int length = (bih.biWidth * bih.biHeight);
 	BYTE* src = pDIB + sizeof(BITMAPINFOHEADER);
 }
 
-void CopyPixelsFromFormat4BPP(BYTE* pDIB, BITMAPINFOHEADER bih, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
+void CopyPixelsFromFormat4BPP(BYTE* pDIB, BITMAPINFOHEADER bih, unsigned int* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
 {
 	//PixelFormat.Format4bppIndexed
 
-	long length = (bih.biWidth * bih.biHeight);
+	int length = (bih.biWidth * bih.biHeight);
 	BYTE* src = pDIB + sizeof(BITMAPINFOHEADER);
 }
 
-void CopyPixelsInTriplets(BYTE* pDIB, BITMAPINFOHEADER bih, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
+void CopyPixelsInTriplets(BYTE* pDIB, BITMAPINFOHEADER bih, unsigned int* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
 {
-	long bytesPerPixel = bih.biBitCount / 8;
-	long length = (bih.biWidth * bih.biHeight);
+	int bytesPerPixel = bih.biBitCount / 8;
+	int length = (bih.biWidth * bih.biHeight);
 	BYTE* src = pDIB + sizeof(BITMAPINFOHEADER);
 
-	long width = bih.biWidth;
-	long currLinePos = 0;
+	int width = bih.biWidth;
+	int currLinePos = 0;
 	pixels+=length + width;
 	bitmapBytes+=length + width;
 
 	BYTE val1, val2, val3, val4;
-	unsigned long b12, b23, b34;
+	unsigned int b12, b23, b34;
 
-	unsigned long *lsrc = (unsigned long *)src;
+	unsigned int *lsrc = (unsigned int *)src;
 	size_t triplets = length >> 2;
 	while (triplets--) {
 		b12 = *lsrc++;
@@ -226,19 +226,19 @@ void CopyPixelsInTriplets(BYTE* pDIB, BITMAPINFOHEADER bih, unsigned long* pixel
 	}
 }
 
-void CopyPixelsInTriplets(BYTE* pDIB, long width, long height, unsigned long* pixels)
+void CopyPixelsInTriplets(BYTE* pDIB, int width, int height, unsigned int* pixels)
 {
-	long bytesPerPixel = 3;
-	long length = (width * height);
+	int bytesPerPixel = 3;
+	int length = (width * height);
 	BYTE* src = pDIB + sizeof(BITMAPINFOHEADER);
 
-	long currLinePos = 0;
+	int currLinePos = 0;
 	pixels+=length + width;
 
 	BYTE val1, val2, val3, val4;
-	unsigned long b12, b23, b34;
+	unsigned int b12, b23, b34;
 
-	unsigned long *lsrc = (unsigned long *)src;
+	unsigned int *lsrc = (unsigned int *)src;
 	size_t triplets = length >> 2;
 	while (triplets--) {
 		b12 = *lsrc++;
@@ -305,7 +305,7 @@ void CopyPixelsInTriplets(BYTE* pDIB, long width, long height, unsigned long* pi
 }
 
 
-HRESULT GetPixelMapPixelsOnly(BYTE* pDIB, long width, long height, unsigned long* pixels)
+HRESULT GetPixelMapPixelsOnly(BYTE* pDIB, int width, int height, unsigned int* pixels)
 {
 	BITMAPINFOHEADER bih;
 	memmove(&bih.biSize, pDIB, sizeof(BITMAPINFOHEADER));
@@ -318,13 +318,13 @@ HRESULT GetPixelMapPixelsOnly(BYTE* pDIB, long width, long height, unsigned long
 	return S_OK;
 }
 
-HRESULT GetPixelMapBits(BYTE* pDIB, long* width, long* height, DWORD imageSize, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
+HRESULT GetPixelMapBits(BYTE* pDIB,int* width,int* height, DWORD imageSize, unsigned int* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
 {
 	HBITMAP hBitmap = NULL;
 	return GetPixelMapBitsAndHBitmap(pDIB, width, height, imageSize, pixels, bitmapPixels, bitmapBytes, hBitmap);
 }
 
-HRESULT GetPixelMapBitsAndHBitmap(BYTE* pDIB, long* width, long* height, DWORD imageSize, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, HBITMAP hBitmap)
+HRESULT GetPixelMapBitsAndHBitmap(BYTE* pDIB,int* width,int* height, DWORD imageSize, unsigned int* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, HBITMAP hBitmap)
 {
 	BITMAPINFOHEADER bih;
 	memmove(&bih.biSize, pDIB, sizeof(BITMAPINFOHEADER));
@@ -378,7 +378,7 @@ HRESULT GetPixelMapBitsAndHBitmap(BYTE* pDIB, long* width, long* height, DWORD i
 }
 
 
-HRESULT GetBitmapPixels(long width, long height, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, bool isLittleEndian, int bpp, unsigned long normVal)
+HRESULT GetBitmapPixels(int width, int height, unsigned int* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, bool isLittleEndian, int bpp, unsigned int normVal)
 {
 	BYTE* pp = bitmapPixels;
 
@@ -413,7 +413,7 @@ HRESULT GetBitmapPixels(long width, long height, unsigned long* pixels, BYTE* bi
 
 	bitmapPixels = bitmapPixels + sizeof(bfh) + sizeof(memBitmapInfo);
 
-	long currLinePos = 0;
+	int currLinePos = 0;
 	int length = width * height;
 	bitmapPixels+=3 * (length + width);
 
@@ -463,7 +463,7 @@ HRESULT GetBitmapPixels(long width, long height, unsigned long* pixels, BYTE* bi
 	return S_OK;
 }
 
-long GetNewLinePosition(long line, long firstOsdLine, long lastOsdLine)
+int GetNewLinePosition(int line, int firstOsdLine, int lastOsdLine)
 {
 	if (line < firstOsdLine || line > lastOsdLine)
 		return -1;
@@ -471,7 +471,7 @@ long GetNewLinePosition(long line, long firstOsdLine, long lastOsdLine)
 		return firstOsdLine + ((line - firstOsdLine) / 2) + ((line - 1) % 2) * ((lastOsdLine - firstOsdLine) / 2);
 }
 
-HRESULT BitmapSplitFieldsOSD(BYTE* bitmapPixels, long firstOsdLine, long lastOsdLine)
+HRESULT BitmapSplitFieldsOSD(BYTE* bitmapPixels, int firstOsdLine, int lastOsdLine)
 {
 	BITMAPINFOHEADER bih;
 	memmove(&bih, bitmapPixels + sizeof(BITMAPFILEHEADER), sizeof(bih));
@@ -488,8 +488,8 @@ HRESULT BitmapSplitFieldsOSD(BYTE* bitmapPixels, long firstOsdLine, long lastOsd
 	BYTE* buffer1 = (BYTE*)malloc(stride);
 	BYTE* buffer2 = (BYTE*)malloc(stride);
 
-	long a = bih.biHeight;
-	long b = -1;
+	int a = bih.biHeight;
+	int b = -1;
 
 	bool* movedLines = (bool*)malloc(lastOsdLine - firstOsdLine);
 
@@ -533,7 +533,7 @@ HRESULT BitmapSplitFieldsOSD(BYTE* bitmapPixels, long firstOsdLine, long lastOsd
 	return S_OK;
 }
 
-void GetMinMaxValuesForBpp(int bpp, unsigned long normVal, int* minValue, int* maxValue)
+void GetMinMaxValuesForBpp(int bpp, unsigned int normVal, int* minValue, int* maxValue)
 {
 	*minValue = 0;
 	*maxValue = 0;
@@ -555,7 +555,7 @@ int s_GammaTableNormVal = 0;
 float s_GammaTableEncodingGamma = 1.0f;
 unsigned int* s_GammaTable = NULL;
 
-void BuildGammaTableForBpp(int bpp, unsigned long normVal, float gamma)
+void BuildGammaTableForBpp(int bpp, unsigned int normVal, float gamma)
 {
 	if (s_GammaTableBpp != bpp ||
 		s_GammaTableNormVal != normVal ||
@@ -601,7 +601,7 @@ int s_CameraResponseKnownCamera = 0;
 int s_CameraResponseKnownParamsThumbprint = 0;
 unsigned int* s_CameraResponseTable = NULL;
 
-void BuildCameraResponseTableForBpp(int knownCameraResponse, int bpp, unsigned long normVal, int* knownCameraResponseParams)
+void BuildCameraResponseTableForBpp(int knownCameraResponse, int bpp, unsigned int normVal, int* knownCameraResponseParams)
 {
 	if (s_CameraResponseTableBpp != bpp ||
 		s_CameraResponseNormVal != normVal ||
@@ -685,7 +685,7 @@ void BuildCameraResponseTableForBpp(int knownCameraResponse, int bpp, unsigned l
 	}
 }
 
-HRESULT PreProcessingFlipRotate(unsigned long* pixels, long width, long height, int bpp, enum RotateFlipType flipRotateType)
+HRESULT PreProcessingFlipRotate(unsigned int* pixels, int width, int height, int bpp, enum RotateFlipType flipRotateType)
 {
 	if (flipRotateType == 0) {
 		//Rotate180FlipXY = 0,
@@ -701,9 +701,9 @@ HRESULT PreProcessingFlipRotate(unsigned long* pixels, long width, long height, 
 		//Rotate180FlipNone = 2,
 		//RotateNoneFlipXY = 2,
 
-		for	(long x = 0; x < width / 2; x ++) {
-			for	(long y = 0; y < height; y ++) {
-				unsigned long tmp = pixels[width * y + x];
+		for	(int x = 0; x < width / 2; x ++) {
+			for	(int y = 0; y < height; y ++) {
+				unsigned int tmp = pixels[width * y + x];
 				pixels[width * y + x] = pixels[width * (height - 1 - y) + (width - 1 - x)];
 				pixels[width * (height - 1 - y) + (width - 1 - x)] = tmp;
 			}
@@ -717,9 +717,9 @@ HRESULT PreProcessingFlipRotate(unsigned long* pixels, long width, long height, 
 		//DRotate180FlipY = 4,
 		//RotateNoneFlipX = 4,
 
-		for	(long x = 0; x < width / 2; x ++) {
-			for	(long y = 0; y < height; y ++) {
-				unsigned long tmp = pixels[width * y + x];
+		for	(int x = 0; x < width / 2; x ++) {
+			for	(int y = 0; y < height; y ++) {
+				unsigned int tmp = pixels[width * y + x];
 				pixels[width * y + x] = pixels[width * y + (width - 1 - x)];
 				pixels[width * y + (width - 1 - x)] = tmp;
 			}
@@ -733,9 +733,9 @@ HRESULT PreProcessingFlipRotate(unsigned long* pixels, long width, long height, 
 		//Rotate180FlipX = 6,
 		//RotateNoneFlipY = 6,
 
-		for	(long y = 0; y < height / 2; y ++) {
-			for	(long x = 0; x < width; x ++) {
-				unsigned long tmp = pixels[width * y + x];
+		for	(int y = 0; y < height / 2; y ++) {
+			for	(int x = 0; x < width; x ++) {
+				unsigned int tmp = pixels[width * y + x];
 				pixels[width * y + x] = pixels[width * (height - 1 - y) + x];
 				pixels[width * (height - 1 - y) + x] = tmp;
 			}
@@ -750,7 +750,7 @@ HRESULT PreProcessingFlipRotate(unsigned long* pixels, long width, long height, 
 	return S_OK;
 }
 
-HRESULT PreProcessingStretch(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal, int fromValue, int toValue)
+HRESULT PreProcessingStretch(unsigned int* pixels, int width, int height, int bpp, unsigned int normVal, int fromValue, int toValue)
 {
 	int minValue, maxValue;
 	GetMinMaxValuesForBpp(bpp, normVal, &minValue, &maxValue);
@@ -758,8 +758,8 @@ HRESULT PreProcessingStretch(unsigned long* pixels, long width, long height, int
 	if (fromValue < minValue) fromValue = minValue;
 	if (toValue > maxValue) toValue = maxValue;
 
-	long totalPixels = width * height;
-	unsigned long* pPixels = pixels;
+	int totalPixels = width * height;
+	unsigned int* pPixels = pixels;
 	float coeff = ((float)(maxValue - minValue)) / (toValue - fromValue);
 
 	while(totalPixels--) {
@@ -771,7 +771,7 @@ HRESULT PreProcessingStretch(unsigned long* pixels, long width, long height, int
 			float newValue = coeff * (*pPixels - fromValue);
 			if (newValue < minValue) newValue = minValue;
 			if (newValue > maxValue) newValue = maxValue;
-			*pPixels = (long)newValue;
+			*pPixels = (int)newValue;
 		}
 		pPixels++;
 	}
@@ -779,7 +779,7 @@ HRESULT PreProcessingStretch(unsigned long* pixels, long width, long height, int
 	return S_OK;
 }
 
-HRESULT PreProcessingClip(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal, int fromValue, int toValue)
+HRESULT PreProcessingClip(unsigned int* pixels, int width, int height, int bpp, unsigned int normVal, int fromValue, int toValue)
 {
 	int minValue, maxValue;
 	GetMinMaxValuesForBpp(bpp, normVal, &minValue, &maxValue);
@@ -787,8 +787,8 @@ HRESULT PreProcessingClip(unsigned long* pixels, long width, long height, int bp
 	if (fromValue < minValue) fromValue = minValue;
 	if (toValue > maxValue) toValue = maxValue;
 
-	long totalPixels = width * height;
-	unsigned long* pPixels = pixels;
+	int totalPixels = width * height;
+	unsigned int* pPixels = pixels;
 
 	while(totalPixels--) {
 		if (*pPixels < fromValue)
@@ -802,7 +802,7 @@ HRESULT PreProcessingClip(unsigned long* pixels, long width, long height, int bp
 	return S_OK;
 }
 
-HRESULT PreProcessingBrightnessContrast(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal, long brightness, long cotrast)
+HRESULT PreProcessingBrightnessContrast(unsigned int* pixels, int width, int height, int bpp, unsigned int normVal, int brightness, int cotrast)
 {
 	int minValue, maxValue;
 	GetMinMaxValuesForBpp(bpp, normVal, &minValue, &maxValue);
@@ -815,8 +815,8 @@ HRESULT PreProcessingBrightnessContrast(unsigned long* pixels, long width, long 
 	if (bpp == 14) bppBrightness *= 0x3F;
 	if (bpp == 16) bppBrightness *= 0xFF;
 
-	long totalPixels = width * height;
-	unsigned long* pPixels = pixels;
+	int totalPixels = width * height;
+	unsigned int* pPixels = pixels;
 
 	if (cotrast < -100) cotrast = -100;
 	if (cotrast > 100) cotrast = 100;
@@ -837,7 +837,7 @@ HRESULT PreProcessingBrightnessContrast(unsigned long* pixels, long width, long 
 		if (pixel < minValue) pixel = minValue;
 		if (pixel > maxValue) pixel = maxValue;
 
-		*pPixels = (long)pixel;
+		*pPixels = (int)pixel;
 
 		pPixels++;
 	}
@@ -845,12 +845,12 @@ HRESULT PreProcessingBrightnessContrast(unsigned long* pixels, long width, long 
 	return S_OK;
 }
 
-HRESULT PreProcessingGamma(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal, float gamma)
+HRESULT PreProcessingGamma(unsigned int* pixels, int width, int height, int bpp, unsigned int normVal, float gamma)
 {
 	BuildGammaTableForBpp(bpp, normVal, gamma);
 
-	long totalPixels = width * height;
-	unsigned long* pPixels = pixels;
+	int totalPixels = width * height;
+	unsigned int* pPixels = pixels;
 
 	while(totalPixels--) {
 		*pPixels = *(s_GammaTable + *pPixels);
@@ -860,7 +860,7 @@ HRESULT PreProcessingGamma(unsigned long* pixels, long width, long height, int b
 	return S_OK;
 }
 
-DLL_PUBLIC HRESULT PreProcessingReverseCameraResponse(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal, int knownCameraResponse, int* knownCameraResponseParams)
+DLL_PUBLIC HRESULT PreProcessingReverseCameraResponse(unsigned int* pixels, int width, int height, int bpp, unsigned int normVal, int knownCameraResponse, int* knownCameraResponseParams)
 {
 	int minValue, maxValue;
 	GetMinMaxValuesForBpp(bpp, normVal, &minValue, &maxValue);
@@ -869,8 +869,8 @@ DLL_PUBLIC HRESULT PreProcessingReverseCameraResponse(unsigned long* pixels, lon
 	{
 		BuildCameraResponseTableForBpp(knownCameraResponse, bpp, normVal, knownCameraResponseParams);
 
-		long totalPixels = width * height;
-		unsigned long* pPixels = pixels;
+		int totalPixels = width * height;
+		unsigned int* pPixels = pixels;
 
 		while(totalPixels--) {
 			*pPixels = *(s_CameraResponseTable + *pPixels);
@@ -882,15 +882,15 @@ DLL_PUBLIC HRESULT PreProcessingReverseCameraResponse(unsigned long* pixels, lon
 }
 
 HRESULT PreProcessingApplyBiasDarkFlatFrame(
-    unsigned long* pixels, long width, long height, int bpp, unsigned long normVal,
+    unsigned int* pixels, int width, int height, int bpp, unsigned int normVal,
     float* biasPixels, float* darkPixels, float* flatPixels, 
 	float scienseExposure, float darkExposure, bool darkFrameIsBiasCorrected, bool isSameExposureDarkFrame, float flatMedian)
 {
 	int minValue, maxValue;
 	GetMinMaxValuesForBpp(bpp, normVal, &minValue, &maxValue);
 
-	long totalPixels = width * height;
-	unsigned long* pPixels = pixels;
+	int totalPixels = width * height;
+	unsigned int* pPixels = pixels;
 	float* pBiasPixels = biasPixels;
 	float* pDarkPixels = darkPixels;
 	float* pFlatPixels = flatPixels;
@@ -929,12 +929,12 @@ HRESULT PreProcessingApplyBiasDarkFlatFrame(
 			
 		if (NULL != flatPixels) pixelValue = pixelValue * (double)flatMedian / *pFlatPixels;
 
-		if ((long)pixelValue > maxValue)
+		if ((int)pixelValue > maxValue)
 			*pPixels = maxValue;
-		else if ((long)pixelValue < minValue)
+		else if ((int)pixelValue < minValue)
 			*pPixels = minValue;
 		else
-			*pPixels = (unsigned long)(pixelValue + 0.5);
+			*pPixels = (unsigned int)(pixelValue + 0.5);
 
 		pPixels++;
 		
@@ -995,7 +995,7 @@ void EnsureConvMatrixConstantsInitialized()
 	}
 }
 
-void Conv3x3(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal, ConvMatrix* m)
+void Conv3x3(unsigned int* pixels, int width, int height, int bpp, unsigned int normVal, ConvMatrix* m)
 {
 	// Avoid divide by zero errors
 	if (0 == m->Factor)
@@ -1006,7 +1006,7 @@ void Conv3x3(unsigned long* pixels, long width, long height, int bpp, unsigned l
 
 	for (int y = 0; y < height - 2; ++y) {
 		for (int x = 0; x < width - 2; ++x) {
-			double dblPixel = (unsigned long)(
+			double dblPixel = (unsigned int)(
 			                      (
 			                          (
 			                              ((double)*(pixels + x + y * width) * m->TopLeft) +
@@ -1026,12 +1026,12 @@ void Conv3x3(unsigned long* pixels, long width, long height, int bpp, unsigned l
 			if (dblPixel > maxValue) dblPixel = maxValue;
 			if (dblPixel < minValue) dblPixel = minValue;
 
-			*(pixels + (x + 1) + (y  + 1) * width) = (unsigned long)dblPixel;
+			*(pixels + (x + 1) + (y  + 1) * width) = (unsigned int)dblPixel;
 		}
 	}
 }
 
-DLL_PUBLIC HRESULT PreProcessingLowPassFilter(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal)
+DLL_PUBLIC HRESULT PreProcessingLowPassFilter(unsigned int* pixels, int width, int height, int bpp, unsigned int normVal)
 {
 	Conv3x3(pixels, width, height, bpp, normVal, &LOW_PASS_FILTER_MATRIX);
 
@@ -1039,14 +1039,14 @@ DLL_PUBLIC HRESULT PreProcessingLowPassFilter(unsigned long* pixels, long width,
 }
 
 // TODO: Use STL collection that supports sorting!!!
-unsigned long g_Median5x5ValuesBuffer[25];
+unsigned int g_Median5x5ValuesBuffer[25];
 int g_IdxMedian5x5ValuesBuffer = 0;
-unsigned long* g_LowPassDataLPDBuffer = NULL;
+unsigned int* g_LowPassDataLPDBuffer = NULL;
 
-long g_LPDBufferWidth = -1;
-long g_LPDBufferHeight = -1;
+int g_LPDBufferWidth = -1;
+int g_LPDBufferHeight = -1;
 
-void InitializeLowPassDifferenceFilter(long width, long height)
+void InitializeLowPassDifferenceFilter(int width, int height)
 {
 	if (g_LPDBufferWidth != width ||
 	    g_LPDBufferHeight != height) {
@@ -1055,14 +1055,14 @@ void InitializeLowPassDifferenceFilter(long width, long height)
 			g_LowPassDataLPDBuffer = NULL;
 		}
 
-		g_LowPassDataLPDBuffer = (unsigned long*)malloc(width * height * sizeof(unsigned long));
+		g_LowPassDataLPDBuffer = (unsigned int*)malloc(width * height * sizeof(unsigned int));
 
 		g_LPDBufferWidth = width;
 		g_LPDBufferHeight = height;
 	}
 }
 
-void AddValueForMedianComp(unsigned long val)
+void AddValueForMedianComp(unsigned int val)
 {
 	g_Median5x5ValuesBuffer[g_IdxMedian5x5ValuesBuffer] = val;
 	g_IdxMedian5x5ValuesBuffer++;
@@ -1073,9 +1073,9 @@ void ClearMedian5x5ValuesBuffer()
 	g_IdxMedian5x5ValuesBuffer = 0;
 }
 
-unsigned long GetMedianValueFromBuffer()
+unsigned int GetMedianValueFromBuffer()
 {
-	unsigned long median = 0;
+	unsigned int median = 0;
 
 	std::sort(g_Median5x5ValuesBuffer, g_Median5x5ValuesBuffer + g_IdxMedian5x5ValuesBuffer + 1);
 
@@ -1083,20 +1083,20 @@ unsigned long GetMedianValueFromBuffer()
 	if ((g_IdxMedian5x5ValuesBuffer + 1) % 2 == 1)
 		median = g_Median5x5ValuesBuffer[middleCal];
 	else if (g_IdxMedian5x5ValuesBuffer > 1)
-		median = (unsigned long)(((float)g_Median5x5ValuesBuffer[middleCal] + (float)g_Median5x5ValuesBuffer[middleCal - 1]) / 2.0);
+		median = (unsigned int)(((float)g_Median5x5ValuesBuffer[middleCal] + (float)g_Median5x5ValuesBuffer[middleCal - 1]) / 2.0);
 	else if (g_IdxMedian5x5ValuesBuffer == 1)
 		median = g_Median5x5ValuesBuffer[0];
 
 	return median;
 }
 
-DLL_PUBLIC HRESULT PreProcessingLowPassDifferenceFilter(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal)
+DLL_PUBLIC HRESULT PreProcessingLowPassDifferenceFilter(unsigned int* pixels, int width, int height, int bpp, unsigned int normVal)
 {
 	InitializeLowPassDifferenceFilter(width, height);
 
-	unsigned long* lowPassData = g_LowPassDataLPDBuffer;
+	unsigned int* lowPassData = g_LowPassDataLPDBuffer;
 
-	memcpy(lowPassData, pixels, width * height * sizeof(unsigned long));
+	memcpy(lowPassData, pixels, width * height * sizeof(unsigned int));
 
 	Conv3x3(lowPassData, width, height, bpp, normVal, &LOW_PASS_FILTER_MATRIX);
 
@@ -1139,12 +1139,12 @@ DLL_PUBLIC HRESULT PreProcessingLowPassDifferenceFilter(unsigned long* pixels, l
 				if (y + 2 < height) AddValueForMedianComp(lowPassData[x + 2 + (y + 2)*width]);
 			}
 
-			unsigned long medianValue = GetMedianValueFromBuffer();
+			unsigned int medianValue = GetMedianValueFromBuffer();
 
 			if (medianValue > lowPassData[x + y*width])
 				pixels[x + y*width] = 0;
 			else
-				pixels[x + y*width] = (unsigned long)(lowPassData[x + y*width] - medianValue);
+				pixels[x + y*width] = (unsigned int)(lowPassData[x + y*width] - medianValue);
 		}
 	}
 
@@ -1152,7 +1152,7 @@ DLL_PUBLIC HRESULT PreProcessingLowPassDifferenceFilter(unsigned long* pixels, l
 }
 
 
-HRESULT GetRotatedFrameDimentions(long width, long height, double angleDegrees, long* newWidth, long* newHeight)
+HRESULT GetRotatedFrameDimentions(int width, int height, double angleDegrees,int* newWidth,int* newHeight)
 {
 	float radians=(3.1416925*angleDegrees)/180; 
 
@@ -1180,7 +1180,7 @@ HRESULT GetRotatedFrameDimentions(long width, long height, double angleDegrees, 
 	return S_OK;
 }
 
-HRESULT RotateFrame(long width, long height, double angleDegrees, unsigned long* originalPixels, long destWidth, long destHeight, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, int dataBpp, unsigned long normalisationValue)
+HRESULT RotateFrame(int width, int height, double angleDegrees, unsigned int* originalPixels, int destWidth, int destHeight, unsigned int* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, int dataBpp, unsigned int normalisationValue)
 {
 	// http://docs.opencv.org/doc/tutorials/imgproc/imgtrans/warp_affine/warp_affine.html?highlight=warpaffine
 	// http://stackoverflow.com/questions/2278414/rotating-an-image-in-c-c
@@ -1236,7 +1236,7 @@ __uint64 GetUInt64Average(__uint64 a, __uint64 b)
 	return (a >> 1) + (b >> 1) + (a & b & 0x1);
 };
 
-__uint64 GetUInt64Average(unsigned long aLo, unsigned long aHi, unsigned long bLo, unsigned long bHi)
+__uint64 GetUInt64Average(unsigned int aLo, unsigned int aHi, unsigned int bLo, unsigned int bHi)
 {
 	return GetUInt64Average(((__uint64)aHi) << 32 + (__uint64)aLo, ((__uint64)bHi) << 32 + (__uint64)bLo);
 };

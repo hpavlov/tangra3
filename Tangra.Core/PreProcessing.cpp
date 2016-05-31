@@ -12,8 +12,8 @@ PreProcessingFilter s_PreProcessingFilter;
 RotateFlipType g_RotateFlipType;
 unsigned int  g_PreProcessingFromValue;
 unsigned int  g_PreProcessingToValue;
-long g_PreProcessingBrigtness;
-long g_PreProcessingContrast;
+int g_PreProcessingBrigtness;
+int g_PreProcessingContrast;
 float g_EncodingGamma;
 int g_KnownCameraResponse;
 int g_KnownCameraResponseParams[16];
@@ -42,7 +42,7 @@ bool UsesPreProcessing()
 	return g_UsesPreProcessing;
 }
 
-long PreProcessingClearAll()
+int PreProcessingClearAll()
 {
 	s_PreProcessingType = pptpNone;
 	g_RotateFlipType = RotateNoneFlipNone;
@@ -82,14 +82,14 @@ long PreProcessingClearAll()
 	return S_OK;
 }
 
-long PreProcessingUsesPreProcessing(bool* usesPreProcessing)
+int PreProcessingUsesPreProcessing(bool* usesPreProcessing)
 {
 	*usesPreProcessing = g_UsesPreProcessing;
 
 	return S_OK;
 }
 
-long PreProcessingGetConfig(PreProcessingType* preProcessingType, unsigned int* fromValue, unsigned int* toValue, long* brigtness, long* contrast, PreProcessingFilter* filter, float* gamma, int* reversedCameraResponse, unsigned int* darkPixelsCount, unsigned int* flatPixelsCount, unsigned int* biasPixelsCount, RotateFlipType* rotateFlipType)
+int PreProcessingGetConfig(PreProcessingType* preProcessingType, unsigned int* fromValue, unsigned int* toValue,int* brigtness,int* contrast, PreProcessingFilter* filter, float* gamma, int* reversedCameraResponse, unsigned int* darkPixelsCount, unsigned int* flatPixelsCount, unsigned int* biasPixelsCount, RotateFlipType* rotateFlipType)
 {
 	if (g_UsesPreProcessing) {
 		*preProcessingType = s_PreProcessingType;
@@ -110,7 +110,7 @@ long PreProcessingGetConfig(PreProcessingType* preProcessingType, unsigned int* 
 	return S_OK;
 }
 
-long PreProcessingAddStretching(unsigned int fromValue, unsigned int toValue)
+int PreProcessingAddStretching(unsigned int fromValue, unsigned int toValue)
 {
 	s_PreProcessingType = pptpStretching;
 	g_PreProcessingFromValue = fromValue;
@@ -120,7 +120,7 @@ long PreProcessingAddStretching(unsigned int fromValue, unsigned int toValue)
 	return S_OK;
 }
 
-long PreProcessingAddClipping(unsigned int  fromValue, unsigned int  toValue)
+int PreProcessingAddClipping(unsigned int  fromValue, unsigned int  toValue)
 {
 	s_PreProcessingType = pptpClipping;
 	g_PreProcessingFromValue = fromValue;
@@ -130,7 +130,7 @@ long PreProcessingAddClipping(unsigned int  fromValue, unsigned int  toValue)
 	return S_OK;
 }
 
-long PreProcessingAddBrightnessContrast(long brigtness, long contrast)
+int PreProcessingAddBrightnessContrast(int brigtness, int contrast)
 {
 	s_PreProcessingType = pptpBrightnessContrast;
 	g_PreProcessingBrigtness = brigtness;
@@ -140,7 +140,7 @@ long PreProcessingAddBrightnessContrast(long brigtness, long contrast)
 	return S_OK;
 }
 
-long PreProcessingAddDigitalFilter(enum PreProcessingFilter filter)
+int PreProcessingAddDigitalFilter(enum PreProcessingFilter filter)
 {
 	s_PreProcessingFilter = filter;
 	g_UsesPreProcessing = true;
@@ -148,7 +148,7 @@ long PreProcessingAddDigitalFilter(enum PreProcessingFilter filter)
 	return S_OK;
 }
 
-long PreProcessingAddGammaCorrection(float gamma)
+int PreProcessingAddGammaCorrection(float gamma)
 {
 	g_EncodingGamma = gamma;
 	g_UsesPreProcessing = g_UsesPreProcessing || ABS(g_EncodingGamma - 1.0f) > 0.01;
@@ -156,7 +156,7 @@ long PreProcessingAddGammaCorrection(float gamma)
 	return S_OK;
 }
 
-long PreProcessingAddCameraResponseCorrection(int knownCameraResponse, int* responseParams)
+int PreProcessingAddCameraResponseCorrection(int knownCameraResponse, int* responseParams)
 {
 	g_KnownCameraResponse = knownCameraResponse;
 	g_UsesPreProcessing = g_UsesPreProcessing || g_KnownCameraResponse > 0;
@@ -179,7 +179,7 @@ long PreProcessingAddCameraResponseCorrection(int knownCameraResponse, int* resp
 	return S_OK;
 }
 
-long PreProcessingAddFlipAndRotation(enum RotateFlipType rotateFlipType)
+int PreProcessingAddFlipAndRotation(enum RotateFlipType rotateFlipType)
 {
 	g_RotateFlipType = rotateFlipType;
 	g_UsesPreProcessing = true;
@@ -187,14 +187,14 @@ long PreProcessingAddFlipAndRotation(enum RotateFlipType rotateFlipType)
 	return S_OK;
 }
 
-long PreProcessingAddDarkFrame(float* darkFramePixels, unsigned long pixelsCount, float exposureSeconds, bool isBiasCorrected, bool isSameExposure)
+int PreProcessingAddDarkFrame(float* darkFramePixels, unsigned int pixelsCount, float exposureSeconds, bool isBiasCorrected, bool isSameExposure)
 {
 	if (NULL != g_DarkFramePixelsCopy) {
 		delete g_DarkFramePixelsCopy;
 		g_DarkFramePixelsCopy = NULL;
 	}
 
-	long bytesCount = pixelsCount * sizeof(float);
+	int bytesCount = pixelsCount * sizeof(float);
 
 	g_DarkFramePixelsCopy = (float*)malloc(bytesCount);
 	memcpy(g_DarkFramePixelsCopy, darkFramePixels, bytesCount);
@@ -219,14 +219,14 @@ long PreProcessingAddDarkFrame(float* darkFramePixels, unsigned long pixelsCount
 	return S_OK;
 }
 
-long PreProcessingAddBiasFrame(float* biasFramePixels, unsigned long pixelsCount)
+int PreProcessingAddBiasFrame(float* biasFramePixels, unsigned int pixelsCount)
 {
 	if (NULL != g_BiasFramePixelsCopy) {
 		delete g_BiasFramePixelsCopy;
 		g_BiasFramePixelsCopy = NULL;
 	}
 
-	long bytesCount = pixelsCount * sizeof(float);
+	int bytesCount = pixelsCount * sizeof(float);
 
 	g_BiasFramePixelsCopy = (float*)malloc(bytesCount);
 	memcpy(g_BiasFramePixelsCopy, biasFramePixels, bytesCount);
@@ -237,14 +237,14 @@ long PreProcessingAddBiasFrame(float* biasFramePixels, unsigned long pixelsCount
 	return S_OK;
 }
 
-long PreProcessingAddFlatFrame(float* flatFramePixels, unsigned long pixelsCount, float flatFrameMedian)
+int PreProcessingAddFlatFrame(float* flatFramePixels, unsigned int pixelsCount, float flatFrameMedian)
 {
 	if (NULL != g_FlatFramePixelsCopy) {
 		delete g_FlatFramePixelsCopy;
 		g_FlatFramePixelsCopy = NULL;
 	}
 
-	long bytesCount = pixelsCount * sizeof(float);
+	int bytesCount = pixelsCount * sizeof(float);
 
 	g_FlatFramePixelsCopy = (float*)malloc(bytesCount);
 	memcpy(g_FlatFramePixelsCopy, flatFramePixels, bytesCount);
@@ -257,23 +257,23 @@ long PreProcessingAddFlatFrame(float* flatFramePixels, unsigned long pixelsCount
 }
 
 
-long ApplyPreProcessingWithNormalValue(unsigned long* pixels, long width, long height, int bpp, float exposureSeconds, unsigned long normVal, BYTE* bitmapPixels, BYTE* bitmapBytes)
+int ApplyPreProcessingWithNormalValue(unsigned int* pixels, int width, int height, int bpp, float exposureSeconds, unsigned int normVal, BYTE* bitmapPixels, BYTE* bitmapBytes)
 {
-	long rv = ApplyPreProcessingPixelsOnly(pixels, width, height, bpp, normVal, exposureSeconds);
+	int rv = ApplyPreProcessingPixelsOnly(pixels, width, height, bpp, normVal, exposureSeconds);
 	if (!SUCCEEDED(rv)) return rv;
 
 	return GetBitmapPixels(width, height, pixels, bitmapPixels, bitmapBytes, false, bpp, normVal);
 }
 
-long ApplyPreProcessing(unsigned long* pixels, long width, long height, int bpp, float exposureSeconds, BYTE* bitmapPixels, BYTE* bitmapBytes)
+int ApplyPreProcessing(unsigned int* pixels, int width, int height, int bpp, float exposureSeconds, BYTE* bitmapPixels, BYTE* bitmapBytes)
 {
-	long rv = ApplyPreProcessingPixelsOnly(pixels, width, height, bpp, 0, exposureSeconds);
+	int rv = ApplyPreProcessingPixelsOnly(pixels, width, height, bpp, 0, exposureSeconds);
 	if (!SUCCEEDED(rv)) return rv;
 
 	return GetBitmapPixels(width, height, pixels, bitmapPixels, bitmapBytes, false, bpp, 0);
 }
 
-long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal, float exposureSeconds)
+int ApplyPreProcessingPixelsOnly(unsigned int* pixels, int width, int height, int bpp, unsigned int normVal, float exposureSeconds)
 {
 	// To achieve correct photometry gamma needs to be applied before darks and flats. 
 	// Use the following order when applying pre-processing
@@ -281,7 +281,7 @@ long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height
 	// (2) Bias/Dark/Flat (Same gamma should have been applied when generating the Bias/Dark/Flat)
 	// (3) Stretch/Clip/Brightness
 
-	long rv = S_OK;
+	int rv = S_OK;
 
 	if (ABS(g_EncodingGamma - 1.0f) > 0.01) {
 		rv = PreProcessingGamma(pixels, width, height, bpp, normVal, g_EncodingGamma);

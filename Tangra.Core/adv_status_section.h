@@ -21,29 +21,29 @@ namespace AdvLib
 	
 struct AdvFrameInfo
 {	
-	long StartTimeStampLo;
-	long StartTimeStampHi;
-	long Exposure10thMs;
+	int StartTimeStampLo;
+	int StartTimeStampHi;
+	int Exposure10thMs;
 	float Gamma;
 	float Gain;
 	float Shutter;
 	float Offset;
-	long SystemTimeLo;
-	long SystemTimeHi;
+	int SystemTimeLo;
+	int SystemTimeHi;
 	unsigned char GPSTrackedSattelites;
 	unsigned char GPSAlmanacStatus;
 	unsigned char GPSFixStatus;
 	char GPSAlmanacOffset;
-	long VideoCameraFrameIdLo;
-	long VideoCameraFrameIdHi;
-	long HardwareTimerFrameIdLo;
-	long HardwareTimerFrameIdHi;
-	long IntegratedFrames;
-	long EndNtpTimeStampLo;
-	long EndNtpTimeStampHi;
-	long EndSecondaryTimeStampHi;
-	long EndSecondaryTimeStampLo;
-	long NtpTimeStampError;
+	int VideoCameraFrameIdLo;
+	int VideoCameraFrameIdHi;
+	int HardwareTimerFrameIdLo;
+	int HardwareTimerFrameIdHi;
+	int IntegratedFrames;
+	int EndNtpTimeStampLo;
+	int EndNtpTimeStampHi;
+	int EndSecondaryTimeStampHi;
+	int EndSecondaryTimeStampLo;
+	int NtpTimeStampError;
 	float Temperature;
 };
 

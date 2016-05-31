@@ -127,7 +127,7 @@ void SerFile::CloseFile()
 	}
 }
 
-HRESULT SerFile::GetFrame(long frameNo, unsigned long* pixels, unsigned int cameraBitPix, SerLib::SerFrameInfo* frameInfo)
+HRESULT SerFile::GetFrame(int frameNo, unsigned int* pixels, unsigned int cameraBitPix, SerLib::SerFrameInfo* frameInfo)
 {
 	if (frameNo >=0 && frameNo < m_CountFrames) {
 		__int64 imagePosition = (__int64)178 + (__int64)frameNo * (__int64)m_RawFrameSize;
@@ -159,7 +159,7 @@ HRESULT SerFile::GetFrame(long frameNo, unsigned long* pixels, unsigned int came
 	return E_FAIL;
 }
 
-HRESULT SerFile::GetFrameInfo(long frameNo, SerLib::SerFrameInfo* frameInfo)
+HRESULT SerFile::GetFrameInfo(int frameNo, SerLib::SerFrameInfo* frameInfo)
 {
 	if (frameNo >=0 && frameNo < m_CountFrames) {
 
@@ -184,7 +184,7 @@ HRESULT SerFile::GetFrameInfo(long frameNo, SerLib::SerFrameInfo* frameInfo)
 	return E_FAIL;	
 }
 
-HRESULT SerFile::ProcessRawFrame(unsigned long* pixels, unsigned int cameraBitPix)
+HRESULT SerFile::ProcessRawFrame(unsigned int* pixels, unsigned int cameraBitPix)
 {
 	if (m_NumPlanes = 1) {
 		if (m_BytesPerPixel == 1) {
@@ -238,7 +238,7 @@ HRESULT SERCloseFile()
 	return S_OK;
 }
 
-HRESULT SERGetFrame(long frameNo, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapPixels, BYTE* bitmapBytes, unsigned int cameraBitPix, SerLib::MarshalledSerFrameInfo* marshalledFrameInfo)
+HRESULT SERGetFrame(int frameNo, unsigned int* pixels, unsigned int* originalPixels, BYTE* bitmapPixels, BYTE* bitmapBytes, unsigned int cameraBitPix, SerLib::MarshalledSerFrameInfo* marshalledFrameInfo)
 {
 	if (NULL != m_SerFile) {
 		if (cameraBitPix == 0) cameraBitPix = m_SerFile->Bpp;
@@ -251,7 +251,7 @@ HRESULT SERGetFrame(long frameNo, unsigned long* pixels, unsigned long* original
 		if (SUCCEEDED(rv)) {
 			if (g_UsesPreProcessing)
 			{
-				memcpy(originalPixels, pixels, m_SerFile->Width * m_SerFile->Height * sizeof(unsigned long));
+				memcpy(originalPixels, pixels, m_SerFile->Width * m_SerFile->Height * sizeof(unsigned int));
 				
 				return ApplyPreProcessingWithNormalValue(
 					pixels, 
@@ -281,7 +281,7 @@ HRESULT SERGetFrame(long frameNo, unsigned long* pixels, unsigned long* original
 	return E_FAIL;
 }
 
-HRESULT SERGetFrameInfo(long frameNo, SerLib::MarshalledSerFrameInfo* marshalledFrameInfo)
+HRESULT SERGetFrameInfo(int frameNo, SerLib::MarshalledSerFrameInfo* marshalledFrameInfo)
 {
 	if (NULL != m_SerFile) {
 		SerLib::SerFrameInfo frameInfo;
@@ -295,11 +295,11 @@ HRESULT SERGetFrameInfo(long frameNo, SerLib::MarshalledSerFrameInfo* marshalled
 	return E_FAIL;
 }
 
-HRESULT SERGetIntegratedFrame(long startFrameNo, long framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapBytes, BYTE* bitmapDisplayBytes, unsigned int cameraBitPix, SerLib::MarshalledSerFrameInfo* frameInfo)
+HRESULT SERGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned int* pixels, unsigned int* originalPixels, BYTE* bitmapBytes, BYTE* bitmapDisplayBytes, unsigned int cameraBitPix, SerLib::MarshalledSerFrameInfo* frameInfo)
 {
 	if (NULL != m_SerFile) {
 		HRESULT rv;
-		long firstFrameToIntegrate = IntegrationManagerGetFirstFrameToIntegrate(startFrameNo, framesToIntegrate, isSlidingIntegration);
+		int firstFrameToIntegrate = IntegrationManagerGetFirstFrameToIntegrate(startFrameNo, framesToIntegrate, isSlidingIntegration);
 		IntergationManagerStartNew(m_SerFile->Width, m_SerFile->Height, isMedianAveraging);
 
 		SerLib::SerFrameInfo firstFrameInfo;
@@ -307,7 +307,7 @@ HRESULT SERGetIntegratedFrame(long startFrameNo, long framesToIntegrate, bool is
 
 		if (cameraBitPix == 0) cameraBitPix = m_SerFile->Bpp;
 
-		for(long idx = 0; idx < framesToIntegrate; idx++) {
+		for(int idx = 0; idx < framesToIntegrate; idx++) {
 			SerLib::SerFrameInfo* singleFrameInfo = idx == 0 ? &firstFrameInfo : &lastFrameInfo;
 
 			rv = m_SerFile->GetFrame(firstFrameToIntegrate + idx, pixels, cameraBitPix, singleFrameInfo);
@@ -319,7 +319,7 @@ HRESULT SERGetIntegratedFrame(long startFrameNo, long framesToIntegrate, bool is
 
 			if (g_UsesPreProcessing) 
 			{
-				memcpy(originalPixels, pixels, m_SerFile->Width * m_SerFile->Height * sizeof(unsigned long));
+				memcpy(originalPixels, pixels, m_SerFile->Width * m_SerFile->Height * sizeof(unsigned int));
 			
 				rv = ApplyPreProcessingPixelsOnly(
 					pixels, 

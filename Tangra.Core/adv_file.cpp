@@ -227,13 +227,13 @@ void AdvFile::GetFrameImageSectionHeader(int frameId, unsigned char* layoutId, e
 	advfsetpos(m_File, &indexEntry->FrameOffset);
 
 
-	long frameDataMagic;
+	int frameDataMagic;
 	fread(&frameDataMagic, 4, 1, m_File);
 
 	if (frameDataMagic == 0xEE0122FF)
 	{
 		// Skip 16 bytes forward
-		long ignoredValue;
+		int ignoredValue;
 		fread(&ignoredValue, 4, 1, m_File);
 		fread(&ignoredValue, 4, 1, m_File);
 		fread(&ignoredValue, 4, 1, m_File);
@@ -249,13 +249,13 @@ void AdvFile::GetFrameImageSectionHeader(int frameId, unsigned char* layoutId, e
 	}
 }
 
-void AdvFile::GetFrameSectionData(int frameId, unsigned long* prevFrame, unsigned long* pixels, AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError)
+void AdvFile::GetFrameSectionData(int frameId, unsigned int* prevFrame, unsigned int* pixels, AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError)
 {
 	 AdvLib::IndexEntry* indexEntry = m_Index->GetIndexForFrame(frameId);
 
 	advfsetpos(m_File, &indexEntry->FrameOffset);
 
-	long frameDataMagic;
+	int frameDataMagic;
 	fread(&frameDataMagic, 4, 1, m_File);
 
 	if (frameDataMagic == 0xEE0122FF)
@@ -287,7 +287,7 @@ void AdvFile::GetFrameStatusSectionData(int frameId, AdvFrameInfo* frameInfo, ch
 
 	advfsetpos(m_File, &indexEntry->FrameOffset);
 
-	long frameDataMagic;
+	int frameDataMagic;
 	fread(&frameDataMagic, 4, 1, m_File);
 
 	if (frameDataMagic == 0xEE0122FF)

@@ -24,13 +24,13 @@ enum PSFFittingDataRange {
 class PsfFit
 {
 private:
-	long m_xCenter;
-	long m_yCenter;
+	int m_xCenter;
+	int m_yCenter;
 
-	long m_HalfWidth;
-	long m_MatrixSize;
+	int m_HalfWidth;
+	int m_MatrixSize;
 	bool m_IsSolved;
-	long m_Saturation;
+	int m_Saturation;
 
 	double m_X0;
 	double m_Y0;
@@ -45,15 +45,15 @@ private:
 	double GetPSFValueInternal(double x, double y);
 	double GetPSFValueInternalAsymetric(double x, double y);
 
-	void DoNonLinearFit(unsigned long* intensity, long width);
-	void DoNonLinearAsymetricFit(unsigned long* intensity, long width);
-	void DoLinearFitOfAveragedModel(unsigned long* intensity, long width);
+	void DoNonLinearFit(unsigned int* intensity, int width);
+	void DoNonLinearAsymetricFit(unsigned int* intensity, int width);
+	void DoLinearFitOfAveragedModel(unsigned int* intensity, int width);
 	
 	void SetDataRange(PSFFittingDataRange dataRange, unsigned int maxPixelValue);
 
 public:
 	PsfFit(PSFFittingDataRange dataRange, unsigned int maxPixelValue);
-	PsfFit(long xCenter, long yCenter, PSFFittingDataRange dataRange, unsigned int maxPixelValue);
+	PsfFit(int xCenter, int yCenter, PSFFittingDataRange dataRange, unsigned int maxPixelValue);
 	~PsfFit();
 
 	PSFFittingMethod FittingMethod;
@@ -67,23 +67,23 @@ public:
 	double XCenter();
 	double YCenter();
 
-	long MatrixSize();
-	long X0();
-	long Y0();
+	int MatrixSize();
+	int X0();
+	int Y0();
 	double X0_Matrix();
 	double Y0_Matrix();
 	double I0();
 	double IMax();
 
-	unsigned long Brightness();
+	unsigned int Brightness();
 	double FWHM();
 	double ElongationPercentage();
 
 	double Certainty();
 
-	void Fit(unsigned long* intensity, long width);
-	void Fit(long xCenter, long yCenter, unsigned long* intensity, long width);
-	void CopyResiduals(double* buffer, long matrixSize);
+	void Fit(unsigned int* intensity, int width);
+	void Fit(int xCenter, int yCenter, unsigned int* intensity, int width);
+	void CopyResiduals(double* buffer, int matrixSize);
 };
 
 #endif // PSFFIT_H

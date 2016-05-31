@@ -14,19 +14,19 @@ private:
 	
 public:
 	double* Elements;
-	long RowCount;
-	long ColumnCount;
-	long MatrixSize;
+	int RowCount;
+	int ColumnCount;
+	int MatrixSize;
 	
 
-	SafeMatrix(long rows, long columns);
-	SafeMatrix(double* values, long rows, long columns);
+	SafeMatrix(int rows, int columns);
+	SafeMatrix(double* values, int rows, int columns);
 	
 	~SafeMatrix();
 	
 	
-	double GetValueAt(long row, long col);
-	void SetValueAt(long row, long col, double value);
+	double GetValueAt(int row, int col);
+	void SetValueAt(int row, int col, double value);
 	bool IsSquare();
 	
 	SafeMatrix* Clone();
@@ -50,7 +50,7 @@ extern "C"
 {
 #endif
 
-DLL_PUBLIC void SolveLinearSystem(double* a, long aRows, long aCols, double* x, long xRows, long xCols, double* y);
+DLL_PUBLIC void SolveLinearSystem(double* a, int aRows, int aCols, double* x, int xRows, int xCols, double* y);
 
 #ifdef __cplusplus
 } // __cplusplus defined.

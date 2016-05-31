@@ -57,10 +57,10 @@ public:
 	double StartingX;
 	double StartingY;
 	double ApertureInPixels;
-	long ObjectId;
+	int ObjectId;
 	
-	long CenterX;
-	long CenterY;
+	int CenterX;
+	int CenterY;
 	double CenterXDouble;
 	double CenterYDouble;
 	bool IsLocated;
@@ -73,7 +73,7 @@ public:
 	PsfFit* CurrentPsfFit;
 	bool UseCurrentPsfFit;
 	
-	TrackedObject(long objectId, bool isFixedAperture, bool isOccultedStar, double startingX, double startingY, double apertureInPixels, PSFFittingDataRange dataRange, unsigned int maxPixelValue);
+	TrackedObject(int objectId, bool isFixedAperture, bool isOccultedStar, double startingX, double startingY, double apertureInPixels, PSFFittingDataRange dataRange, unsigned int maxPixelValue);
 	~TrackedObject();
 	
 	void NextFrame();
@@ -85,31 +85,31 @@ public:
 class SimplifiedTracker
 {
 private:
-	long m_Width;
-	long m_Height;
-	long m_NumTrackedObjects;	
+	int m_Width;
+	int m_Height;
+	int m_NumTrackedObjects;	
 	bool m_IsFullDisappearance;
 	
 	bool m_IsTrackedSuccessfully;
 	TrackedObject** m_TrackedObjects;
-	unsigned long* m_AreaPixels;
+	unsigned int* m_AreaPixels;
 	
 	PSFFittingDataRange m_DataRange;
 	unsigned int m_MaxPixelValue;
 	
-	unsigned long* GetPixelsArea(unsigned long* pixels, long centerX, long centerY, long squareWidth);
+	unsigned int* GetPixelsArea(unsigned int* pixels, int centerX, int centerY, int squareWidth);
 	
 public:
-	SimplifiedTracker(long width, long height, long numTrackedObjects, bool isFullDisappearance, PSFFittingDataRange dataRange, unsigned int maxPixelValue);
+	SimplifiedTracker(int width, int height, int numTrackedObjects, bool isFullDisappearance, PSFFittingDataRange dataRange, unsigned int maxPixelValue);
 	~SimplifiedTracker();
 	
-	void ConfigureObject(long objectId, bool isFixedAperture, bool isOccultedStar, double startingX, double startingY, double apertureInPixels);
+	void ConfigureObject(int objectId, bool isFixedAperture, bool isOccultedStar, double startingX, double startingY, double apertureInPixels);
 	void UpdatePsfFittingMethod();
 	void InitialiseNewTracking();
-	void NextFrame(int frameNo, unsigned long* pixels);
-	long TrackerGetTargetState(long objectId, NativeTrackedObjectInfo* trackingInfo, NativePsfFitInfo* psfInfo, double* residuals);
+	void NextFrame(int frameNo, unsigned int* pixels);
+	int TrackerGetTargetState(int objectId, NativeTrackedObjectInfo* trackingInfo, NativePsfFitInfo* psfInfo, double* residuals);
 	bool IsTrackedSuccessfully();
-	bool DoManualFrameCorrection(long objectId, long deltaX, long deltaY);
+	bool DoManualFrameCorrection(int objectId, int deltaX, int deltaY);
 };
 
 /* Make sure functions are exported with C linkage under C++ compilers. */
@@ -118,13 +118,13 @@ extern "C"
 {
 #endif
 
-DLL_PUBLIC long TrackerSettings(double maxElongation, double minFWHM, double maxFWHM, double minCertainty);
-DLL_PUBLIC long TrackerNewConfiguration(long width, long height, long numTrackedObjects, bool isFullDisappearance, PSFFittingDataRange dataRange, unsigned int maxPixelValue);
-DLL_PUBLIC long TrackerConfigureObject(long objectId, bool isFixedAperture, bool isOccultedStar, double startingX, double startingY, double apertureInPixels);
-DLL_PUBLIC long TrackerNextFrame(long frameId, unsigned long* pixels);
-DLL_PUBLIC long TrackerGetTargetState(long objectId, NativeTrackedObjectInfo* trackingInfo, NativePsfFitInfo* psfInfo, double* residuals);
-DLL_PUBLIC long TrackerInitialiseNewTracking();
-DLL_PUBLIC long TrackerDoManualFrameCorrection(long objectId, long deltaX, long deltaY);
+DLL_PUBLIC int TrackerSettings(double maxElongation, double minFWHM, double maxFWHM, double minCertainty);
+DLL_PUBLIC int TrackerNewConfiguration(int width, int height, int numTrackedObjects, bool isFullDisappearance, PSFFittingDataRange dataRange, unsigned int maxPixelValue);
+DLL_PUBLIC int TrackerConfigureObject(int objectId, bool isFixedAperture, bool isOccultedStar, double startingX, double startingY, double apertureInPixels);
+DLL_PUBLIC int TrackerNextFrame(int frameId, unsigned int* pixels);
+DLL_PUBLIC int TrackerGetTargetState(int objectId, NativeTrackedObjectInfo* trackingInfo, NativePsfFitInfo* psfInfo, double* residuals);
+DLL_PUBLIC int TrackerInitialiseNewTracking();
+DLL_PUBLIC int TrackerDoManualFrameCorrection(int objectId, int deltaX, int deltaY);
 
 #ifdef __cplusplus
 } // __cplusplus defined.

@@ -10,12 +10,12 @@
 #include <string.h>
 #include <cmath>
 
-unsigned long SATURATION_8BIT = 250;
-unsigned long SATURATION_12BIT = 4000;
-unsigned long SATURATION_14BIT = 16000;
-unsigned long SATURATION_16BIT = 65000;
+unsigned int SATURATION_8BIT = 250;
+unsigned int SATURATION_12BIT = 4000;
+unsigned int SATURATION_14BIT = 16000;
+unsigned int SATURATION_16BIT = 65000;
 
-static double DotBuffer(double* bufferV, const int vRow, double* bufferW, const int wCol, const long vColsCount, const long wRowsCount, const long wColsCount)
+static double DotBuffer(double* bufferV, const int vRow, double* bufferW, const int wCol, const int vColsCount, const int wRowsCount, const int wColsCount)
 {
 	if (vColsCount != wRowsCount)
 		return 0;
@@ -29,7 +29,7 @@ static double DotBuffer(double* bufferV, const int vRow, double* bufferW, const 
 	return buf;
 }
 
-static bool CrossInBuffer(double* bufferA, double* bufferB, double* bufferC, const long aRowsCount, const long aColsCount, const long bRowsCount, const long bColsCount)
+static bool CrossInBuffer(double* bufferA, double* bufferB, double* bufferC, const int aRowsCount, const int aColsCount, const int bRowsCount, const int bColsCount)
 {
 	if (aColsCount != bRowsCount)
 		return false;
@@ -173,12 +173,12 @@ double* m_PsfBuffers = NULL;
 double* m_PsfMatrixA = NULL;
 double* m_PsfMatrixX = NULL;
 double* m_PsfMatrixY = NULL;
-long s_NumVariables;
-long s_MaxEquations;
-long s_FullWidth;
+int s_NumVariables;
+int s_MaxEquations;
+int s_FullWidth;
 
 
-void EnsureLinearSystemSolutionBuffers(long numVariables)
+void EnsureLinearSystemSolutionBuffers(int numVariables)
 {
 	if (numVariables == s_NumVariables && NULL != s_TransponseBuffer)
 		return;
@@ -186,11 +186,11 @@ void EnsureLinearSystemSolutionBuffers(long numVariables)
 	LinearSystemFastInitialiseSolution(numVariables, 35 * 35);
 }
 		
-void LinearSystemFastInitialiseSolution(long numVariables, long maxEquations)
+void LinearSystemFastInitialiseSolution(int numVariables, int maxEquations)
 {
 	s_NumVariables = numVariables;
 	s_MaxEquations = maxEquations;
-	s_FullWidth = 1 + (long)sqrt(maxEquations);
+	s_FullWidth = 1 + (int)sqrt(maxEquations);
 	
 	if (NULL != s_TransponseBuffer)
 	{
@@ -257,7 +257,7 @@ void LinearSystemFastInitialiseSolution(long numVariables, long maxEquations)
 	m_PsfMatrixY = (double*)malloc(numVariables * sizeof(double));
 }
 
-void SolveLinearSystemFast(double* a, double* x, long numEquations, double* y)
+void SolveLinearSystemFast(double* a, double* x, int numEquations, double* y)
 {
 	TransposeInBuffer(a, numEquations, s_NumVariables, s_TransponseBuffer);
 	
@@ -277,16 +277,16 @@ void SolveLinearSystemFast(double* a, double* x, long numEquations, double* y)
 #define NUMBER_ITERATIONS 10
 
 void DoNonLinearPfsFit(
-	unsigned long* intensity, const long squareSize, const long saturation, 
+	unsigned int* intensity, const int squareSize, const int saturation, 
 	bool* isSolved, double*	iBackground, double* iStarMax, double*	x0, double*	y0, double*	r0, double* residuals)
 {
 	*isSolved = false;
 
-	long full_width = (int) squareSize;
+	int full_width = (int) squareSize;
 	
-	long half_width = full_width/2;
+	int half_width = full_width/2;
 
-	long nonSaturatedPixels = 0;
+	int nonSaturatedPixels = 0;
 
 	*iBackground = 0;
 	*r0 = 4.0;
@@ -295,16 +295,16 @@ void DoNonLinearPfsFit(
 	double found_x = half_width;
 	double found_y = half_width;
 	
-	for (long iter = NUMBER_ITERATIONS; iter > 0; iter--)
+	for (int iter = NUMBER_ITERATIONS; iter > 0; iter--)
 	{
 		if (iter == NUMBER_ITERATIONS)
 		{
-			unsigned long zval = 0;
+			unsigned int zval = 0;
 
 			*iBackground = 0.0; // assume no backgnd intensity at first... 
-			for (long i = 0; i < full_width; i++)
+			for (int i = 0; i < full_width; i++)
 			{
-				for (long j = 0; j < full_width; j++)
+				for (int j = 0; j < full_width; j++)
 				{
 					if (intensity[i + full_width * j] > zval) zval = intensity[i + full_width * j];
 					if (intensity[i + full_width * j] < saturation) nonSaturatedPixels++;
@@ -320,7 +320,7 @@ void DoNonLinearPfsFit(
 
 		double r0_squared = (*r0) * (*r0);
 
-		for (long i = 0; i < full_width; i++)
+		for (int i = 0; i < full_width; i++)
 		{
 			dx[i] = (double) i - found_x;
 			fx[i] = exp(-dx[i]*dx[i]/r0_squared);
@@ -329,11 +329,11 @@ void DoNonLinearPfsFit(
 		}
 
 		int index = -1;
-		for (long i = 0; i < full_width; i++)
+		for (int i = 0; i < full_width; i++)
 		{
-			for (long j = 0; j < full_width; j++)
+			for (int j = 0; j < full_width; j++)
 			{
-				unsigned long zval = intensity[i + full_width * j];
+				unsigned int zval = intensity[i + full_width * j];
 
 				if (zval < saturation)
 				{
@@ -399,7 +399,7 @@ void DoNonLinearPfsFit(
 }
 
 
-void ConfigureSaturationLevels(unsigned long saturation8Bit, unsigned long saturation12Bit, unsigned long saturation14Bit, unsigned long saturation16Bit)
+void ConfigureSaturationLevels(unsigned int saturation8Bit, unsigned int saturation12Bit, unsigned int saturation14Bit, unsigned int saturation16Bit)
 {
 	SATURATION_8BIT = saturation8Bit;
 	SATURATION_12BIT = saturation12Bit;

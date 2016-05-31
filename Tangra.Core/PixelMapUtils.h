@@ -14,41 +14,41 @@ extern "C"
 {
 #endif
 
-DLL_PUBLIC HRESULT GetPixelMapBits(BYTE* pDIB, long* width, long* height, DWORD imageSize, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes);
-DLL_PUBLIC HRESULT GetPixelMapBitsAndHBitmap(BYTE* pDIB, long* width, long* height, DWORD imageSize, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, HBITMAP hBitmap);
+DLL_PUBLIC HRESULT GetPixelMapBits(BYTE* pDIB,int* width,int* height, DWORD imageSize, unsigned int* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes);
+DLL_PUBLIC HRESULT GetPixelMapBitsAndHBitmap(BYTE* pDIB,int* width,int* height, DWORD imageSize, unsigned int* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, HBITMAP hBitmap);
 
 // Only returns the pixelmap pixels, does not create the bitmap structures
-DLL_PUBLIC HRESULT GetPixelMapPixelsOnly(BYTE* pDIB, long width, long height, unsigned long* pixels);
-DLL_PUBLIC HRESULT GetBitmapPixels(long width, long height, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, bool isLittleEndian, int bpp, unsigned long normVal);
-DLL_PUBLIC HRESULT BitmapSplitFieldsOSD(BYTE* bitmapPixels, long firstOsdLine, long lastOsdLine);
+DLL_PUBLIC HRESULT GetPixelMapPixelsOnly(BYTE* pDIB, int width, int height, unsigned int* pixels);
+DLL_PUBLIC HRESULT GetBitmapPixels(int width, int height, unsigned int* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, bool isLittleEndian, int bpp, unsigned int normVal);
+DLL_PUBLIC HRESULT BitmapSplitFieldsOSD(BYTE* bitmapPixels, int firstOsdLine, int lastOsdLine);
 
 
 // Pre-Processing 
-DLL_PUBLIC HRESULT PreProcessingFlipRotate(unsigned long* pixels, long width, long height, int bpp, enum RotateFlipType flipRotateType);
-DLL_PUBLIC HRESULT PreProcessingStretch(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal, int fromValue, int toValue);
-DLL_PUBLIC HRESULT PreProcessingClip(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal, int fromValue, int toValue);
-DLL_PUBLIC HRESULT PreProcessingBrightnessContrast(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal, long brightness, long cotrast);
-DLL_PUBLIC HRESULT PreProcessingGamma(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal, float gamma);
-DLL_PUBLIC HRESULT PreProcessingReverseCameraResponse(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal, int knownCameraResponse, int* knownCameraResponseParams);
+DLL_PUBLIC HRESULT PreProcessingFlipRotate(unsigned int* pixels, int width, int height, int bpp, enum RotateFlipType flipRotateType);
+DLL_PUBLIC HRESULT PreProcessingStretch(unsigned int* pixels, int width, int height, int bpp, unsigned int normVal, int fromValue, int toValue);
+DLL_PUBLIC HRESULT PreProcessingClip(unsigned int* pixels, int width, int height, int bpp, unsigned int normVal, int fromValue, int toValue);
+DLL_PUBLIC HRESULT PreProcessingBrightnessContrast(unsigned int* pixels, int width, int height, int bpp, unsigned int normVal, int brightness, int cotrast);
+DLL_PUBLIC HRESULT PreProcessingGamma(unsigned int* pixels, int width, int height, int bpp, unsigned int normVal, float gamma);
+DLL_PUBLIC HRESULT PreProcessingReverseCameraResponse(unsigned int* pixels, int width, int height, int bpp, unsigned int normVal, int knownCameraResponse, int* knownCameraResponseParams);
 DLL_PUBLIC HRESULT PreProcessingApplyBiasDarkFlatFrame(
-	unsigned long* pixels,
-	long width, 
-	long height, 
+	unsigned int* pixels,
+	int width, 
+	int height, 
 	int bpp, 
-	unsigned long normVal,
+	unsigned int normVal,
 	float* biasPixels, float* darkPixels, float* flatPixels, 
 	float scienseExposure, float darkExposure, bool darkFrameIsBiasCorrected, bool isSameExposureDarkFrame, float flatMedian);
-DLL_PUBLIC HRESULT PreProcessingLowPassFilter(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal);
-DLL_PUBLIC HRESULT PreProcessingLowPassDifferenceFilter(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal);
+DLL_PUBLIC HRESULT PreProcessingLowPassFilter(unsigned int* pixels, int width, int height, int bpp, unsigned int normVal);
+DLL_PUBLIC HRESULT PreProcessingLowPassDifferenceFilter(unsigned int* pixels, int width, int height, int bpp, unsigned int normVal);
 
-DLL_PUBLIC HRESULT GetRotatedFrameDimentions(long width, long height, double angleDegrees, long* newWidth, long* newHeight);
-DLL_PUBLIC HRESULT RotateFrame(long width, long height, double angleDegrees, unsigned long* originalPixels, long destWidth, long destHeight, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, int dataBpp, unsigned long normalisationValue);
+DLL_PUBLIC HRESULT GetRotatedFrameDimentions(int width, int height, double angleDegrees,int* newWidth,int* newHeight);
+DLL_PUBLIC HRESULT RotateFrame(int width, int height, double angleDegrees, unsigned int* originalPixels, int destWidth, int destHeight, unsigned int* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, int dataBpp, unsigned int normalisationValue);
 
 #ifdef __cplusplus
 } // __cplusplus defined.
 #endif
 
 __uint64 GetUInt64Average(__uint64 a, __uint64 b);
-__uint64 GetUInt64Average(unsigned long aLo, unsigned long aHi, unsigned long bLo, unsigned long bHi);
+__uint64 GetUInt64Average(unsigned int aLo, unsigned int aHi, unsigned int bLo, unsigned int bHi);
 
 #endif

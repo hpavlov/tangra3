@@ -59,8 +59,8 @@ void AdvStatusSection::GetDataFromDataBytes(unsigned char* data, int sectionData
 			unsigned char  b7 = *(statusData + 7);
 			unsigned char  b8 = *(statusData + 8);
 
-			long valLo = (long)(((long)b4 << 24) + ((long)b3 << 16) + ((long)b2 << 8) + (long)b1);
-			long valHi = (long)(((long)b8 << 24) + ((long)b7 << 16) + ((long)b6 << 8) + (long)b5);
+			int valLo = (int)(((int)b4 << 24) + ((int)b3 << 16) + ((int)b2 << 8) + (int)b1);
+			int valHi = (int)(((int)b8 << 24) + ((int)b7 << 16) + ((int)b6 << 8) + (int)b5);
 			
 			if (strcmp("SystemTime", tagName) == 0)
 			{
@@ -85,7 +85,7 @@ void AdvStatusSection::GetDataFromDataBytes(unsigned char* data, int sectionData
 			unsigned char  b1 = *(statusData + 1);
 			unsigned char  b2 = *(statusData + 2);
 
-			long value = (long)(((long)b2 << 8) + (long)b1);
+			int value = (int)(((int)b2 << 8) + (int)b1);
 			
 			frameInfo->NtpTimeStampError = value;
 			statusData+=3;
@@ -189,7 +189,7 @@ void AdvStatusSection::GetDataFromDataBytes(unsigned char* data, int sectionData
 			unsigned char  b1 = *(statusData + 1);
 			unsigned char  b2 = *(statusData + 2);
 			
-			long shortVal = (long)(((long)b2 << 8) + (long)b1);
+			int shortVal = (int)(((int)b2 << 8) + (int)b1);
 			
 			frameInfo->IntegratedFrames = shortVal;
 			
@@ -206,8 +206,8 @@ void AdvStatusSection::GetDataFromDataBytes(unsigned char* data, int sectionData
 			unsigned char  b7 = *(statusData + 7);
 			unsigned char  b8 = *(statusData + 8);
 
-			long valLo = (long)(((long)b4 << 24) + ((long)b3 << 16) + ((long)b2 << 8) + (long)b1);
-			long valHi = (long)(((long)b8 << 24) + ((long)b7 << 16) + ((long)b6 << 8) + (long)b5);
+			int valLo = (int)(((int)b4 << 24) + ((int)b3 << 16) + ((int)b2 << 8) + (int)b1);
+			int valHi = (int)(((int)b8 << 24) + ((int)b7 << 16) + ((int)b6 << 8) + (int)b5);
 
 			if (strcmp("VideoCameraFrameId", tagName) == 0)
 			{

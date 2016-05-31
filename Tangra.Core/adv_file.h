@@ -24,12 +24,12 @@ namespace AdvLib
 {
 	struct AdvFileInfo
 	{
-		long Width;
-		long Height;
+		int Width;
+		int Height;
 		float FrameRate;
-		long CountFrames;
-		long Bpp;
-		unsigned long Aav16NormVal;
+		int CountFrames;
+		int Bpp;
+		unsigned int Aav16NormVal;
 	};
 	
 
@@ -39,7 +39,7 @@ namespace AdvLib
 			AdvLib::AdvStatusSection* StatusSection;
 			
 			// OpenFile Properties
-			long TotalNumberOfFrames;
+			int TotalNumberOfFrames;
 
 		protected:
 			AdvLib::AdvFramesIndex* m_Index;
@@ -50,7 +50,7 @@ namespace AdvLib
 			AdvLib::AdvImageLayout* m_CurrentImageLayout;
 			fpos_t m_NewFrameOffset;
 			unsigned int m_FrameNo;
-			long m_FirstFrameTime;
+			int m_FirstFrameTime;
 
 			unsigned char *m_FrameBytes;
 			unsigned int m_FrameBufferIndex; 
@@ -65,7 +65,7 @@ namespace AdvLib
 			void OpenFile(const char* fileName, AdvFileInfo* fileInfo);
 			
 			void GetFrameImageSectionHeader(int frameId, unsigned char* layoutId, enum GetByteMode* mode);
-			void GetFrameSectionData(int frameId, unsigned long* prevFrame, unsigned long* pixels, AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError);
+			void GetFrameSectionData(int frameId, unsigned int* prevFrame, unsigned int* pixels, AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError);
 			void GetFrameStatusSectionData(int frameId, AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError);		
 			
 			void GetFileTag(const char* fileTagName, char* fileTagValue);

@@ -9,7 +9,7 @@
 #include <string.h>
 #include <cmath>
 
-SafeMatrix::SafeMatrix(long rows, long columns)	
+SafeMatrix::SafeMatrix(int rows, int columns)	
 {
 	Elements = (double*)malloc(sizeof(double) * rows * columns);
 	m_ElementsBufferAllocated = true;
@@ -19,7 +19,7 @@ SafeMatrix::SafeMatrix(long rows, long columns)
 	MatrixSize = columns * rows;
 }
 
-SafeMatrix::SafeMatrix(double* values, long rows, long columns)
+SafeMatrix::SafeMatrix(double* values, int rows, int columns)
 {
 	Elements = values;
 	m_ElementsBufferAllocated = false;
@@ -36,12 +36,12 @@ SafeMatrix::~SafeMatrix()
 	Elements = NULL;
 }
 
-double SafeMatrix::GetValueAt(long row, long col)
+double SafeMatrix::GetValueAt(int row, int col)
 {
 	return *(Elements + col * RowCount + row);
 }
 
-void SafeMatrix::SetValueAt(long row, long col, double value)
+void SafeMatrix::SetValueAt(int row, int col, double value)
 {
 	*(Elements + col * RowCount + row) = value;
 }
@@ -241,7 +241,7 @@ SafeMatrix* SafeMatrix::Inverse()
 }
 
 
-void SolveLinearSystem(double* a, long aRows, long aCols, double* x, long xRows, long xCols, double* y)
+void SolveLinearSystem(double* a, int aRows, int aCols, double* x, int xRows, int xCols, double* y)
 {
 	//SafeMatrix a_T = A.Transpose();
 	//SafeMatrix aa = a_T*A;

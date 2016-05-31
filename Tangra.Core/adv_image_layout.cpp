@@ -305,7 +305,7 @@ unsigned int WordSignMask(int bit)
 }
 
 
-void AdvImageLayout::GetDataFromDataBytes(enum GetByteMode mode, unsigned char* data, unsigned long* prevFrame, unsigned long* pixels, int sectionDataLength, int startOffset)
+void AdvImageLayout::GetDataFromDataBytes(enum GetByteMode mode, unsigned char* data, unsigned int* prevFrame, unsigned int* pixels, int sectionDataLength, int startOffset)
 {
 	unsigned char* layoutData;
 	
@@ -322,7 +322,7 @@ void AdvImageLayout::GetDataFromDataBytes(enum GetByteMode mode, unsigned char* 
 	}
 	else  if (0 == strcmp(Compression, "LAGARITH16"))
 	{		
-		long size = m_Lagarith16Decompressor->DecompressData((char*)(data + startOffset), (unsigned short*)m_DecompressedPixels);
+		int size = m_Lagarith16Decompressor->DecompressData((char*)(data + startOffset), (unsigned short*)m_DecompressedPixels);
 		layoutData = (unsigned char*)m_DecompressedPixels;
 	}
 
@@ -348,16 +348,16 @@ void AdvImageLayout::GetDataFromDataBytes(enum GetByteMode mode, unsigned char* 
 			GetPixelsFrom8BitByteArrayRawLayout(layoutData, prevFrame, pixels, &readIndex, &crcOkay);
 	}
 }
-void AdvImageLayout::GetPixelsFrom8BitByteArrayDiffCorrLayout(unsigned char* layoutData, unsigned long* prevFrame, unsigned long* pixelsOut, int* readIndex, bool* crcOkay)
+void AdvImageLayout::GetPixelsFrom8BitByteArrayDiffCorrLayout(unsigned char* layoutData, unsigned int* prevFrame, unsigned int* pixelsOut, int* readIndex, bool* crcOkay)
 {
     return;
 }
 
-void AdvImageLayout::GetPixelsFrom8BitByteArrayRawLayout(unsigned char* layoutData, unsigned long* prevFrame, unsigned long* pixelsOut, int* readIndex, bool* crcOkay)
+void AdvImageLayout::GetPixelsFrom8BitByteArrayRawLayout(unsigned char* layoutData, unsigned int* prevFrame, unsigned int* pixelsOut, int* readIndex, bool* crcOkay)
 {
 	if (DataBpp == 8)
 	{		
-		unsigned long* pPixelsOut = pixelsOut;
+		unsigned int* pPixelsOut = pixelsOut;
 		for (int y = 0; y < Height; ++y)
 		{
 			for (int x = 0; x < Width; ++x)
@@ -382,11 +382,11 @@ void AdvImageLayout::GetPixelsFrom8BitByteArrayRawLayout(unsigned char* layoutDa
 		*crcOkay = true;
 }
 
-void AdvImageLayout::GetPixelsFrom16BitByteArrayRawLayout(unsigned char* layoutData, unsigned long* prevFrame, unsigned long* pixelsOut, int* readIndex, bool* crcOkay)
+void AdvImageLayout::GetPixelsFrom16BitByteArrayRawLayout(unsigned char* layoutData, unsigned int* prevFrame, unsigned int* pixelsOut, int* readIndex, bool* crcOkay)
 {
 	if (DataBpp == 12 || DataBpp == 14 || DataBpp == 16)
 	{		
-		unsigned long* pPixelsOut = pixelsOut;
+		unsigned int* pPixelsOut = pixelsOut;
 		bool isLittleEndian = m_ImageSection->ByteOrder == LittleEndian;
 		bool convertTo12Bit = m_ImageSection->DynaBits == 16 && m_ImageSection->DataBpp == 12;
 		bool convertTo14Bit = m_ImageSection->DynaBits == 16 &&m_ImageSection->DataBpp == 14;
@@ -432,7 +432,7 @@ unsigned int AdvImageLayout::ComputePixelsCRC32(unsigned short* pixels)
 	return compute_crc32((unsigned char*)pixels, 2 * Height * Width);
 }
 
-void AdvImageLayout::GetPixelsFrom12BitByteArray(unsigned char* layoutData, unsigned long* prevFrame, unsigned long* pixelsOut, enum GetByteMode mode, int* readIndex, bool* crcOkay)
+void AdvImageLayout::GetPixelsFrom12BitByteArray(unsigned char* layoutData, unsigned int* prevFrame, unsigned int* pixelsOut, enum GetByteMode mode, int* readIndex, bool* crcOkay)
 {
 	bool isLittleEndian = m_ImageSection->ByteOrder == LittleEndian;
 	bool convertTo12Bit = m_ImageSection->DataBpp == 12;	
@@ -440,7 +440,7 @@ void AdvImageLayout::GetPixelsFrom12BitByteArray(unsigned char* layoutData, unsi
 
 	bool isDiffCorrFrame = mode == DiffCorrBytes;
 
-	unsigned long* pPrevFrame = prevFrame;
+	unsigned int* pPrevFrame = prevFrame;
 
 	int counter = 0;
 	for (int y = 0; y < Height; ++y)
@@ -533,7 +533,7 @@ void AdvImageLayout::GetPixelsFrom12BitByteArray(unsigned char* layoutData, unsi
     return;
 }
 
-void AdvImageLayout::GetPixelsFrom16BitByteArrayDiffCorrLayout(unsigned char* layoutData, unsigned long* prevFrame, unsigned long* pixelsOut, int* readIndex, bool* crcOkay)
+void AdvImageLayout::GetPixelsFrom16BitByteArrayDiffCorrLayout(unsigned char* layoutData, unsigned int* prevFrame, unsigned int* pixelsOut, int* readIndex, bool* crcOkay)
 {
     return;
 }

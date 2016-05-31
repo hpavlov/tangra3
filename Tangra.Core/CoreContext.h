@@ -56,7 +56,7 @@ HRESULT InitTangraCore()
 	return S_OK;
 };
 
-HRESULT Set8BitColourChannel(long colourChannel)
+HRESULT Set8BitColourChannel(int colourChannel)
 {
 	s_COLOR_CHANNEL = colourChannel;
 

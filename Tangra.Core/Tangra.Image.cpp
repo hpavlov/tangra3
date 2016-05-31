@@ -9,7 +9,7 @@
 #include <algorithm>
 #include <stack>
 
-unsigned long GetMaxValueForBitPix(long bpp)
+unsigned int GetMaxValueForBitPix(int bpp)
 {
  if (bpp == 8)
 	return 0xFF;
@@ -23,16 +23,16 @@ unsigned long GetMaxValueForBitPix(long bpp)
 	return 0xFFFFFFFF;
 }
 
-HRESULT Convolution(unsigned long* data, long bpp, long width, long height, const double* convMatrix, bool cutEdges, bool calculateAverage, unsigned long* average)
+HRESULT Convolution(unsigned int* data, int bpp, int width, int height, const double* convMatrix, bool cutEdges, bool calculateAverage, unsigned int* average)
 {
 	if (width > MAX_CONVOLUTION_WIDTH || width > MAX_CONVOLUTION_WIDTH)
 		return E_FAIL;
 		
 	//uint[] result = new uint[cutEdges ? (width - 1) * (height - 1) : data.Length];
 
-	unsigned long maxValue = GetMaxValueForBitPix(bpp);
+	unsigned int maxValue = GetMaxValueForBitPix(bpp);
 
-	long nPixel;
+	int nPixel;
 	double Pixel;
 	double sum = 0;
 	const double FOUR_PIXEL_FACTOR = 9.0 / 4.0;
@@ -178,7 +178,7 @@ HRESULT Convolution(unsigned long* data, long bpp, long width, long height, cons
 											(data[x + 1 + (y + 1) * width] * convBottomRight));						
 			}
 
-			nPixel = (unsigned long)round(Pixel);
+			nPixel = (unsigned int)round(Pixel);
 			
 			if (cutEdges)
 			{
@@ -187,7 +187,7 @@ HRESULT Convolution(unsigned long* data, long bpp, long width, long height, cons
 				else if (nPixel > maxValue)
 					RESULT_BUFFER[(x - 1) + (y - 1) * width] = maxValue;
 				else
-					RESULT_BUFFER[(x - 1) + (y - 1) * width] = (unsigned long)nPixel;
+					RESULT_BUFFER[(x - 1) + (y - 1) * width] = (unsigned int)nPixel;
 
 				if (calculateAverage)
 					sum += RESULT_BUFFER[(x - 1) + (y - 1) * width];
@@ -199,7 +199,7 @@ HRESULT Convolution(unsigned long* data, long bpp, long width, long height, cons
 				else if (nPixel > maxValue)
 					RESULT_BUFFER[x + y * width] = maxValue;
 				else
-					RESULT_BUFFER[x + y * width] = (unsigned long)nPixel;
+					RESULT_BUFFER[x + y * width] = (unsigned int)nPixel;
 
 				if (calculateAverage)
 					sum += RESULT_BUFFER[x + y * width];						
@@ -207,52 +207,52 @@ HRESULT Convolution(unsigned long* data, long bpp, long width, long height, cons
 		}
 	}
 
-	long totalPixels = cutEdges ? (width - 1) * (height - 1) : width * height;
+	int totalPixels = cutEdges ? (width - 1) * (height - 1) : width * height;
 	
 	if (calculateAverage)
-		*average = (unsigned long)round(sum / totalPixels);
+		*average = (unsigned int)round(sum / totalPixels);
 
-	memcpy(&data[0], &RESULT_BUFFER[0], totalPixels * sizeof(unsigned long));
+	memcpy(&data[0], &RESULT_BUFFER[0], totalPixels * sizeof(unsigned int));
 	
 	return S_OK;	
 }
 
-void Convolution_GaussianBlur(unsigned long* pixels, long bpp, long width, long height)
+void Convolution_GaussianBlur(unsigned int* pixels, int bpp, int width, int height)
 {
 	Convolution(pixels, bpp, width, height, GAUSSIAN_BLUR_MATRIX, false, false, NULL);
 }
 
-void Convolution_Sharpen(unsigned long* pixels, long bpp, long width, long height, unsigned long* average)
+void Convolution_Sharpen(unsigned int* pixels, int bpp, int width, int height, unsigned int* average)
 {
 	Convolution(pixels, bpp, width, height, SHARPEN_MATRIX, false, true, average);
 }
 
-void Convolution_Denoise(unsigned long* pixels, long bpp, long width, long height, unsigned long* average, bool cutEdges)
+void Convolution_Denoise(unsigned int* pixels, int bpp, int width, int height, unsigned int* average, bool cutEdges)
 {
 	Convolution(pixels, bpp, width, height, DENOISE_MATRIX, cutEdges, true, average);
 }
 
-long* s_CheckedPixels = NULL;
-long s_ChunkDenoiseIndex;
-long s_ChunkDenoiseWidth;
-long s_ChunkDenoiseHeight;
-long s_ChunkDenoiseMaxIndex;
-long* s_ObjectPixelsIndex = NULL;
-long s_ObjectPixelsCount;
-long s_ObjectPixelsXFrom;
-long s_ObjectPixelsXTo;
-long s_ObjectPixelsYFrom;
-long s_ObjectPixelsYTo;
-long s_MaxLowerBoundNoiseChunkPixels;
-long s_MinUpperBoundNoiseChunkPixels;
-long s_MinLowerBoundNoiseChunkHeight;
-long s_MaxUpperBoundNoiseChunkWidth;
-std::stack<long> s_ObjectPixelsPath;
+int* s_CheckedPixels = NULL;
+int s_ChunkDenoiseIndex;
+int s_ChunkDenoiseWidth;
+int s_ChunkDenoiseHeight;
+int s_ChunkDenoiseMaxIndex;
+int* s_ObjectPixelsIndex = NULL;
+int s_ObjectPixelsCount;
+int s_ObjectPixelsXFrom;
+int s_ObjectPixelsXTo;
+int s_ObjectPixelsYFrom;
+int s_ObjectPixelsYTo;
+int s_MaxLowerBoundNoiseChunkPixels;
+int s_MinUpperBoundNoiseChunkPixels;
+int s_MinLowerBoundNoiseChunkHeight;
+int s_MaxUpperBoundNoiseChunkWidth;
+std::stack<int> s_ObjectPixelsPath;
 
-void SetObjectPixelsXFromTo(long pixelIndex)
+void SetObjectPixelsXFromTo(int pixelIndex)
 {
-	long width = pixelIndex % s_ChunkDenoiseWidth;
-	long height = pixelIndex / s_ChunkDenoiseWidth;
+	int width = pixelIndex % s_ChunkDenoiseWidth;
+	int height = pixelIndex / s_ChunkDenoiseWidth;
 	
 	if (s_ObjectPixelsXFrom > width) s_ObjectPixelsXFrom = width;
 	if (s_ObjectPixelsXTo < width) s_ObjectPixelsXTo = width;
@@ -260,7 +260,7 @@ void SetObjectPixelsXFromTo(long pixelIndex)
 	if (s_ObjectPixelsYTo < height) s_ObjectPixelsYTo = height;	
 }
 			
-void EnsureChunkDenoiseBuffers(long width, long height)
+void EnsureChunkDenoiseBuffers(int width, int height)
 {
 	if (s_ChunkDenoiseWidth != width || s_ChunkDenoiseHeight != height)
 	{
@@ -279,16 +279,16 @@ void EnsureChunkDenoiseBuffers(long width, long height)
 		s_ChunkDenoiseWidth = width;
 		s_ChunkDenoiseHeight = height;
 		s_ChunkDenoiseMaxIndex = width * height;		
-		s_CheckedPixels = (long*)malloc(sizeof(long) * s_ChunkDenoiseMaxIndex);
-		s_ObjectPixelsIndex = (long*)malloc(sizeof(long) * s_ChunkDenoiseMaxIndex);
+		s_CheckedPixels = (int*)malloc(sizeof(int) * s_ChunkDenoiseMaxIndex);
+		s_ObjectPixelsIndex = (int*)malloc(sizeof(int) * s_ChunkDenoiseMaxIndex);
 		
 		// The max noise chink part to be removed is 50% of the pixels in "1".
 		// This value is determined experimentally and varied based on the area hight
        // Block(22x16), AreaHeight(20) -> '1' is 70 pixels (50% = 35 pixels)
-		s_MaxLowerBoundNoiseChunkPixels = (long)round(35.0 * height / 20);
+		s_MaxLowerBoundNoiseChunkPixels = (int)round(35.0 * height / 20);
 		// The min noise chunk is 80% of a fully black square
-		s_MinUpperBoundNoiseChunkPixels = (long)round(0.8 * width * height);
-		s_MinLowerBoundNoiseChunkHeight = (long)round(0.5 * (height - 4));
+		s_MinUpperBoundNoiseChunkPixels = (int)round(0.8 * width * height);
+		s_MinLowerBoundNoiseChunkHeight = (int)round(0.5 * (height - 4));
 		s_MaxUpperBoundNoiseChunkWidth = height + 4;
 	}
 }
@@ -300,7 +300,7 @@ void EnsureChunkDenoiseBuffers(long width, long height)
 #define WENT_DOWN 4
 #define CHECKED 5
 
-long FindNextObjectPixel(unsigned long* pixels, unsigned long onColour)
+int FindNextObjectPixel(unsigned int* pixels, unsigned int onColour)
 {
 	while (s_ChunkDenoiseIndex < s_ChunkDenoiseMaxIndex - 1)
 	{
@@ -317,13 +317,13 @@ long FindNextObjectPixel(unsigned long* pixels, unsigned long onColour)
 	return -1;	
 }
 
-bool ProcessNoiseObjectPixel(unsigned long* pixels, long* pixelRef, unsigned long onColour)
+bool ProcessNoiseObjectPixel(unsigned int* pixels,int* pixelRef, unsigned int onColour)
 {
-	long pixel = *pixelRef;
-	long x = pixel % s_ChunkDenoiseWidth;
-	long y = pixel / s_ChunkDenoiseWidth;
-	long width = s_ChunkDenoiseWidth;
-	long nextPixel;
+	int pixel = *pixelRef;
+	int x = pixel % s_ChunkDenoiseWidth;
+	int y = pixel / s_ChunkDenoiseWidth;
+	int width = s_ChunkDenoiseWidth;
+	int nextPixel;
 
 	if (s_CheckedPixels[pixel] == UNCHECKED)
 	{
@@ -457,7 +457,7 @@ bool CurrentObjectChunkIsNoise()
 		(s_ObjectPixelsXTo - s_ObjectPixelsXFrom) > s_MaxUpperBoundNoiseChunkWidth;
 }
 
-long CheckAndRemoveNoiseObjectAsNecessary(unsigned long* pixels, long firstPixel, unsigned long onColour, unsigned long offColour)
+int CheckAndRemoveNoiseObjectAsNecessary(unsigned int* pixels, int firstPixel, unsigned int onColour, unsigned int offColour)
 {
 	s_ObjectPixelsCount = 0;
 	s_ObjectPixelsXFrom = 0xFFFF;
@@ -467,7 +467,7 @@ long CheckAndRemoveNoiseObjectAsNecessary(unsigned long* pixels, long firstPixel
 	while(!s_ObjectPixelsPath.empty()) s_ObjectPixelsPath.pop();
 	s_ObjectPixelsPath.push(firstPixel);
 
-	long currPixel = firstPixel;
+	int currPixel = firstPixel;
 
 	s_ObjectPixelsIndex[s_ObjectPixelsCount] = firstPixel;
 	s_ObjectPixelsCount++;
@@ -485,18 +485,18 @@ long CheckAndRemoveNoiseObjectAsNecessary(unsigned long* pixels, long firstPixel
 	}	
 }
 
-HRESULT LargeChunkDenoise(unsigned long* pixels, long width, long height, unsigned long onColour, unsigned long offColour)
+HRESULT LargeChunkDenoise(unsigned int* pixels, int width, int height, unsigned int onColour, unsigned int offColour)
 {
 	EnsureChunkDenoiseBuffers(width, height);
 	
 	s_ObjectPixelsCount = -1;
 	s_ChunkDenoiseIndex = -1;
 	
-	memset(s_CheckedPixels, 0, s_ChunkDenoiseMaxIndex * sizeof(long));
+	memset(s_CheckedPixels, 0, s_ChunkDenoiseMaxIndex * sizeof(int));
 	
 	do
 	{
-		long nextObjectPixelId = FindNextObjectPixel(pixels, onColour);
+		int nextObjectPixelId = FindNextObjectPixel(pixels, onColour);
 
 		if (nextObjectPixelId != -1)
 			CheckAndRemoveNoiseObjectAsNecessary(pixels, nextObjectPixelId, onColour, offColour);
@@ -507,35 +507,35 @@ HRESULT LargeChunkDenoise(unsigned long* pixels, long width, long height, unsign
 	while (true);	
 }
 
-HRESULT PrepareImageForOCR(unsigned long* pixels, long bpp, long width, long height)
+HRESULT PrepareImageForOCR(unsigned int* pixels, int bpp, int width, int height)
 {
-	long size = width * height;
+	int size = width * height;
 	
 	// Dark median correct
-	std::vector<unsigned long> pixelsVec;
+	std::vector<unsigned int> pixelsVec;
 	pixelsVec.insert(pixelsVec.end(), &pixels[0], &pixels[size]);
 	size_t n = pixelsVec.size() / 2;
     std::nth_element(pixelsVec.begin(), pixelsVec.begin() + n, pixelsVec.end());
-    long median = pixelsVec[n];
+    int median = pixelsVec[n];
 	
 	for (int i = 0; i < size; i++)
 	{
-		long darkCorrectedValue = (long) pixels[i] - (int) median;
+		int darkCorrectedValue = (int) pixels[i] - (int) median;
 		if (darkCorrectedValue < 0) darkCorrectedValue = 0;
-		pixels[i] = (unsigned long) darkCorrectedValue;
+		pixels[i] = (unsigned int) darkCorrectedValue;
 	}
 
 	// Blur
 	Convolution_GaussianBlur(pixels, 8, width, height);
 	
 	// Sharpen
-	unsigned long average = 128;
+	unsigned int average = 128;
 	Convolution_Sharpen(pixels, 8, width, height, &average);
 
 	// Binerize and Inverse
 	for (int i = 0; i < size; i++)
 	{
-		pixels[i] = pixels[i] > average ? (unsigned long)0 : (unsigned long)255;
+		pixels[i] = pixels[i] > average ? (unsigned int)0 : (unsigned int)255;
 	}
 	
 	// Denoise
@@ -545,7 +545,7 @@ HRESULT PrepareImageForOCR(unsigned long* pixels, long bpp, long width, long hei
 	// Binerize again (after the Denise)
 	for (int i = 0; i < size; i++)
 	{
-		pixels[i] = pixels[i] < 127 ? (unsigned long)0 : (unsigned long)255;
+		pixels[i] = pixels[i] < 127 ? (unsigned int)0 : (unsigned int)255;
 	}
 	
 	LargeChunkDenoise(pixels, width, height, 0, 255);
@@ -553,24 +553,24 @@ HRESULT PrepareImageForOCR(unsigned long* pixels, long bpp, long width, long hei
 	return S_OK;
 }
 
-HRESULT PrepareImageForOCRSingleStep(unsigned long* pixels, long bpp, long width, long height, long stepNo, unsigned long* average)
+HRESULT PrepareImageForOCRSingleStep(unsigned int* pixels, int bpp, int width, int height, int stepNo, unsigned int* average)
 {
-	long size = width * height;
+	int size = width * height;
 	
 	if (stepNo == 0)
 	{
 		// Dark median correct
-		std::vector<unsigned long> pixelsVec;
+		std::vector<unsigned int> pixelsVec;
 		pixelsVec.insert(pixelsVec.end(), &pixels[0], &pixels[size]);
 		size_t n = pixelsVec.size() / 2;
 		std::nth_element(pixelsVec.begin(), pixelsVec.begin() + n, pixelsVec.end());
-		long median = pixelsVec[n];
+		int median = pixelsVec[n];
 		
 		for (int i = 0; i < size; i++)
 		{
-			long darkCorrectedValue = (long) pixels[i] - (int) median;
+			int darkCorrectedValue = (int) pixels[i] - (int) median;
 			if (darkCorrectedValue < 0) darkCorrectedValue = 0;
-			pixels[i] = (unsigned long) darkCorrectedValue;
+			pixels[i] = (unsigned int) darkCorrectedValue;
 		}
 	}
 
@@ -591,7 +591,7 @@ HRESULT PrepareImageForOCRSingleStep(unsigned long* pixels, long bpp, long width
 		// Binerize and Inverse
 		for (int i = 0; i < size; i++)
 		{
-			pixels[i] = pixels[i] > *average ? (unsigned long)0 : (unsigned long)255;
+			pixels[i] = pixels[i] > *average ? (unsigned int)0 : (unsigned int)255;
 		}		
 	}
 	
@@ -608,7 +608,7 @@ HRESULT PrepareImageForOCRSingleStep(unsigned long* pixels, long bpp, long width
 		// Binerize again (after the Denise)
 		for (int i = 0; i < size; i++)
 		{
-			pixels[i] = pixels[i] < 127 ? (unsigned long)0 : (unsigned long)255;
+			pixels[i] = pixels[i] < 127 ? (unsigned int)0 : (unsigned int)255;
 		}		
 	}
 	

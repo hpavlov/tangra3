@@ -50,24 +50,24 @@ extern "C"
 #endif
 
 DLL_PUBLIC bool UsesPreProcessing();
-DLL_PUBLIC long PreProcessingClearAll();
-DLL_PUBLIC long PreProcessingAddStretching(unsigned int fromValue, unsigned int toValue);
-DLL_PUBLIC long PreProcessingAddClipping(unsigned int  fromValue, unsigned int  toValue);
-DLL_PUBLIC long PreProcessingAddBrightnessContrast(long brigtness, long contrast);
-DLL_PUBLIC long PreProcessingAddDigitalFilter(enum PreProcessingFilter filter);
-DLL_PUBLIC long PreProcessingAddGammaCorrection(float gamma);
-DLL_PUBLIC long PreProcessingAddCameraResponseCorrection(int knownCameraResponse, int* responseParams);
-DLL_PUBLIC long PreProcessingAddDarkFrame(float* darkFramePixels, unsigned long pixelsCount, float exposureSeconds, bool isBiasCorrected, bool isSameExposure);
-DLL_PUBLIC long PreProcessingAddFlatFrame(float* flatFramePixels, unsigned long pixelsCount, float flatFrameMedian);
-DLL_PUBLIC long PreProcessingAddBiasFrame(float* biasFramePixels, unsigned long pixelsCount);
-DLL_PUBLIC long PreProcessingAddFlipAndRotation(enum RotateFlipType rotateFlipType);
-DLL_PUBLIC long PreProcessingUsesPreProcessing(bool* usesPreProcessing);
-DLL_PUBLIC long PreProcessingGetConfig(
+DLL_PUBLIC int PreProcessingClearAll();
+DLL_PUBLIC int PreProcessingAddStretching(unsigned int fromValue, unsigned int toValue);
+DLL_PUBLIC int PreProcessingAddClipping(unsigned int  fromValue, unsigned int  toValue);
+DLL_PUBLIC int PreProcessingAddBrightnessContrast(int brigtness, int contrast);
+DLL_PUBLIC int PreProcessingAddDigitalFilter(enum PreProcessingFilter filter);
+DLL_PUBLIC int PreProcessingAddGammaCorrection(float gamma);
+DLL_PUBLIC int PreProcessingAddCameraResponseCorrection(int knownCameraResponse, int* responseParams);
+DLL_PUBLIC int PreProcessingAddDarkFrame(float* darkFramePixels, unsigned int pixelsCount, float exposureSeconds, bool isBiasCorrected, bool isSameExposure);
+DLL_PUBLIC int PreProcessingAddFlatFrame(float* flatFramePixels, unsigned int pixelsCount, float flatFrameMedian);
+DLL_PUBLIC int PreProcessingAddBiasFrame(float* biasFramePixels, unsigned int pixelsCount);
+DLL_PUBLIC int PreProcessingAddFlipAndRotation(enum RotateFlipType rotateFlipType);
+DLL_PUBLIC int PreProcessingUsesPreProcessing(bool* usesPreProcessing);
+DLL_PUBLIC int PreProcessingGetConfig(
 	PreProcessingType* preProcessingType, 
 	unsigned int* fromValue, 
 	unsigned int* toValue, 
-	long* brigtness, 
-	long* contrast, 
+	int* brigtness, 
+	int* contrast, 
 	PreProcessingFilter* filter, 
 	float* gamma, 
 	int* reversedCameraResponse,
@@ -76,9 +76,9 @@ DLL_PUBLIC long PreProcessingGetConfig(
 	unsigned int* biasPixelsCount,
 	RotateFlipType* rotateFlipType);
 	
-DLL_PUBLIC long ApplyPreProcessingPixelsOnly(unsigned long* pixels, long width, long height, int bpp, unsigned long normVal, float exposureSeconds);
-DLL_PUBLIC long ApplyPreProcessing(unsigned long* pixels, long width, long height, int bpp, float exposureSeconds, BYTE* bitmapPixels, BYTE* bitmapBytes);
-long ApplyPreProcessingWithNormalValue(unsigned long* pixels, long width, long height, int bpp, float exposureSeconds, unsigned long normVal, BYTE* bitmapPixels, BYTE* bitmapBytes);
+DLL_PUBLIC int ApplyPreProcessingPixelsOnly(unsigned int* pixels, int width, int height, int bpp, unsigned int normVal, float exposureSeconds);
+DLL_PUBLIC int ApplyPreProcessing(unsigned int* pixels, int width, int height, int bpp, float exposureSeconds, BYTE* bitmapPixels, BYTE* bitmapBytes);
+int ApplyPreProcessingWithNormalValue(unsigned int* pixels, int width, int height, int bpp, float exposureSeconds, unsigned int normVal, BYTE* bitmapPixels, BYTE* bitmapBytes);
 
 #ifdef __cplusplus
 } // __cplusplus defined.

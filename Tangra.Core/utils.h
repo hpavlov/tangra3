@@ -52,7 +52,7 @@ enum ImageByteOrder
 void crc32_init(void);
 unsigned int compute_crc32(unsigned char *data, int len);
 
-long DateTimeToAdvTicks(int year, int month, int day, int hour, int minute, int sec, int ms);
-void AdvTicksToDateTime(long ticks, int *year, int *month, int *day, int *hour, int *minute, int *sec, int *ms);
+int DateTimeToAdvTicks(int year, int month, int day, int hour, int minute, int sec, int ms);
+void AdvTicksToDateTime(int ticks, int *year, int *month, int *day, int *hour, int *minute, int *sec, int *ms);
 
 #endif // UTILS_H

@@ -32,7 +32,7 @@ class AdvImageSection {
 		unsigned int Height;
 		unsigned char DataBpp;
 		unsigned char DynaBits;
-		unsigned long NormalisationValue;
+		unsigned int NormalisationValue;
 		ImageByteOrder ByteOrder;
 		bool UsesCRC;
 
@@ -45,7 +45,7 @@ class AdvImageSection {
 		int MaxFrameBufferSize();
 
 		AdvImageLayout* GetImageLayoutById(unsigned char layoutId);
-		void GetDataFromDataBytes(unsigned char* data, unsigned long* prevFrame, unsigned long* pixels, int sectionDataLength, int startOffset);
+		void GetDataFromDataBytes(unsigned char* data, unsigned int* prevFrame, unsigned int* pixels, int sectionDataLength, int startOffset);
 };
 
 }

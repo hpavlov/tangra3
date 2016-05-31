@@ -84,7 +84,7 @@ unsigned int compute_crc32(unsigned char *data, int len)
     return ~result;
 }
 
-long DateTimeToAdvTicks(int year, int month, int day, int hour, int minute, int sec, int ms)
+int DateTimeToAdvTicks(int year, int month, int day, int hour, int minute, int sec, int ms)
 {
 	// the miliseconds since 1 Jan 2000, 00:00:00.000 (negative vaslues are before 2000)
 	//struct tm *timeinfo;
@@ -117,10 +117,10 @@ long DateTimeToAdvTicks(int year, int month, int day, int hour, int minute, int 
 	
 	double diff = difftime(userTime, TIME_ADV_ZERO);
 	
-	return 1000 * (long)(diff) + ms;
+	return 1000 * (int)(diff) + ms;
 }
 
-void AdvTicksToDateTime(long ticks, int *year, int *month, int *day, int *hour, int *minute, int *sec, int *ms)
+void AdvTicksToDateTime(int ticks, int *year, int *month, int *day, int *hour, int *minute, int *sec, int *ms)
 {
 	// the miliseconds since 1 Jan 2000, 00:00:00.000 (negative vaslues are before 2000)
 }

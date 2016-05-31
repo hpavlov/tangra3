@@ -149,7 +149,7 @@ AdvImageSection::AdvImageSection(FILE* pFile)
 	}
 }
 
-void AdvImageSection::GetDataFromDataBytes(unsigned char* data, unsigned long* prevFrame, unsigned long* pixels, int sectionDataLength, int startOffset)
+void AdvImageSection::GetDataFromDataBytes(unsigned char* data, unsigned int* prevFrame, unsigned int* pixels, int sectionDataLength, int startOffset)
 {
 	unsigned char* sectionData = data + startOffset;
 	unsigned char layoutId = *sectionData;
