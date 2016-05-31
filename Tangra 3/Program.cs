@@ -132,7 +132,12 @@ namespace Tangra
             TangraVideoOSXVersionRequiredAttribute minVideoOSXVersionRequired = ((TangraVideoOSXVersionRequiredAttribute)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(TangraVideoOSXVersionRequiredAttribute), false)[0]);
 
 			string engineVersion = TangraCore.GetTangraCoreVersion();
-			Trace.WriteLine(string.Format("Tangra Core v{0}", engineVersion));
+		    int engineBitness = TangraCore.GetTangraCoreBitness();
+            if (engineBitness > 0)
+                Trace.WriteLine(string.Format("Tangra Core v{0} ({1} bit)", engineVersion, engineBitness));
+            else
+                Trace.WriteLine(string.Format("Tangra Core v{0})", engineVersion));
+
             if (minCoreVersionRequired != null && !minCoreVersionRequired.IsReqiredVersion(engineVersion))
             {
                 string fileName = CurrentOS.IsWindows ? "TangraCore.dll" : (CurrentOS.IsMac ? "libTangraCore.dylib" : "libTangraCore.so");

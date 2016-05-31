@@ -63,9 +63,14 @@ HRESULT Set8BitColourChannel(long colourChannel)
 	return S_OK;
 };
 
-DLL_PUBLIC long GetProductVersion()
+DLL_PUBLIC int GetProductVersion()
 {
 	return (VERSION_MAJOR << 28) + (VERSION_MINOR << 16) + VERSION_REVISION;
+}
+
+DLL_PUBLIC int GetProductBitness()
+{
+	return sizeof(long) * 8;
 }
 
 #ifdef __cplusplus

@@ -24,6 +24,18 @@ namespace Tangra.Helpers
             }
         }
 
+        public static string GetTangraCoreBitness
+        {
+            get
+            {
+                int bitness = TangraCore.GetTangraCoreBitness();
+                if (bitness > 0)
+                    return string.Format("({0} bit)", bitness);
+                else
+                    return string.Empty;
+            }
+        }
+
         public static string TangraVideoEngineVersion
         {
             get

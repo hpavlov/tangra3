@@ -357,6 +357,10 @@ namespace Tangra.PInvoke
 		//HRESULT GetVersion();
 		private static extern int GetProductVersion();
 
+        [DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+        //HRESULT GetProductBitness();
+        private static extern int GetProductBitness();
+
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
         // DLL_PUBLIC HRESULT Lagarith16Decompress(long width, long height, unsigned char* compressedBytes, unsigned char* decompressedBytes);
 		private static extern int Lagarith16Decompress(int width, int height, [In] byte[] compressedBytes, [In, Out] byte[] decompressedBytes);
@@ -392,6 +396,14 @@ namespace Tangra.PInvoke
 
 			return string.Format("{0}.{1}.{2}", major, minor, revision);
 		}
+
+        public static int GetTangraCoreBitness()
+        {
+            if (GetProductVersion() <= 805306476)
+                return 0;
+            else
+                return GetProductBitness();
+        }
 
 		public static class PreProcessors
 		{
