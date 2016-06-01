@@ -2443,7 +2443,10 @@ namespace Tangra.VideoOperations.LightCurves
 
 		private void frmLightCurve_Shown(object sender, EventArgs e)
 		{
-			miOutlierRemoval.Checked = m_LightCurveController.Context.OutlierRemoval;
+            if (m_LightCurveController.Context != null)
+            {
+                miOutlierRemoval.Checked = m_LightCurveController.Context.OutlierRemoval;
+            }
             yAxisLabelsToolStripMenuItem.Visible = TangraConfig.Settings.Special.AllowLCMagnitudeDisplay;
 		}
 
