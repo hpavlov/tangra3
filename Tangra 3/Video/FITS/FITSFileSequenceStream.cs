@@ -143,7 +143,7 @@ namespace Tangra.Video.FITS
 
         public int RecommendedBufferSize
         {
-            get { return 1; }
+            get { return Math.Min(8, CountFrames); }
         }
 
         public bool SupportsSoftwareIntegration
