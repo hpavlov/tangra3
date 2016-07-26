@@ -393,8 +393,8 @@ namespace Tangra.PInvoke
 	[StructLayout(LayoutKind.Sequential)]
 	public struct SerNativeFrameInfo
 	{
-        public int TimeStampUtcLo;
-        public int TimeStampUtcHi;
+        public uint TimeStampUtcLo;
+        public uint TimeStampUtcHi;
 	};
 
 	public class SerFrameInfo

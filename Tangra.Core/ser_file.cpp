@@ -147,9 +147,11 @@ HRESULT SerFile::GetFrame(int frameNo, unsigned int* pixels, unsigned int camera
 				fread(&timeStampUtc64, 8, 1, m_File);
 				frameInfo->TimeStampUtcLo = timeStampUtc64 & 0xFFFFFFFF;
 				frameInfo->TimeStampUtcHi = timeStampUtc64 >> 32;
+				frameInfo->TimeStampUtc64 = timeStampUtc64;
 			} else {
 				frameInfo->TimeStampUtcLo = 0;
-				frameInfo->TimeStampUtcHi = 0;				
+				frameInfo->TimeStampUtcHi = 0;
+				frameInfo->TimeStampUtc64 = 0;
 			}
 		}
 
@@ -173,10 +175,12 @@ HRESULT SerFile::GetFrameInfo(int frameNo, SerLib::SerFrameInfo* frameInfo)
 			fread(&timeStampUtc64, 8, 1, m_File);
 			frameInfo->TimeStampUtcLo = timeStampUtc64 & 0xFFFFFFFF;
 			frameInfo->TimeStampUtcHi = timeStampUtc64 >> 32;
+			frameInfo->TimeStampUtc64 = timeStampUtc64;
 		} else {
 			frameInfo->TimeStampUtcLo = 0;
-			frameInfo->TimeStampUtcHi = 0;				
-		}		
+			frameInfo->TimeStampUtcHi = 0;
+			frameInfo->TimeStampUtc64 = 0;
+		}
 
 		return S_OK;
 	}
