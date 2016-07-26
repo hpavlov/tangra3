@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <strings.h>
 #include <cstring>
+#include "adv2_error_codes.h"
 
 #ifndef _WIN32
 
@@ -70,6 +71,19 @@ typedef unsigned __int64 __uint64;
 
 int advfsetpos(FILE* file, const __int64* pos);
 
+FILE* advfopen(const char* fileName, const char* modes);
+size_t advfwrite(const void* pData, size_t size, size_t count, FILE* file);
+void advfread(void* pData, size_t size, size_t count, FILE* file);
+void advfgetpos64(FILE* file, __int64* pos);
+int advfsetpos64(FILE* file, const __int64* pos);
+int advfsetpos64(FILE* file, const __int64* pos, int origin);
+int advfseek(FILE* stream, __int64 off, int whence);
+int advfclose(FILE* file);
+int advfflush(FILE* file);
+
+__int64 advgetclockresolution();
+__int64 advgetclockticks();
+
 #if defined _WIN32 || defined __CYGWIN__
   /*
   #ifdef BUILDING_DLL
@@ -100,5 +114,11 @@ int advfsetpos(FILE* file, const __int64* pos);
 
 float ABS(float x);
 
+#if __GNUC__
+#define strcpy_s(x, y, z) strcpy(x, z)
+#define strncpy_s(x, y, z, t) strcpy(x, z)
+#define _snprintf_s(x, y, z, t) snprintf(x, y, z, t);
+void fopen_s(FILE **f, const char *name, const char *mode);
+#endif
 
 #endif // CROSSPLATFORM_H

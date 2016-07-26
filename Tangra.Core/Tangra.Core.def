@@ -18,6 +18,15 @@ EXPORTS
 	ADVGetFileTag
 	Lagarith16Decompress
 
+	; ADV2 Exports
+	ADV2GetFormatVersion
+	ADV2OpenFile
+	ADV2CloseFile
+	ADV2GetFrame
+	ADV2GetFramePixels
+	ADV2GetFrameStatusChannel
+	ADV2GetFileTag
+
 	; Video and Image Config
 	InitTangraCore
 	Set8BitColourChannel

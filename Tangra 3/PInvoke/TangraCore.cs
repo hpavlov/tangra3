@@ -24,6 +24,31 @@ namespace Tangra.PInvoke
 		public uint Aav16NormVal;
 	};
 
+    [StructLayout(LayoutKind.Sequential)]
+    public struct Adv2FileInfo
+    {
+        public int Width;
+        public int Height;
+        public int CountMaintFrames;
+        public int CountCalibrationFrames;
+        public int DataBpp;
+        public int MaxPixelValue;
+        public long MainClockFrequency;
+        public int MainStreamAccuracy;
+        public long CalibrationClockFrequency;
+        public int CalibrationStreamAccuracy;
+        public byte MainStreamTagsCount;
+        public byte CalibrationStreamTagsCount;
+        public byte SystemMetadataTagsCount;
+        public byte UserMetadataTagsCount;
+        public long UtcTimestampAccuracyInNanoseconds;
+        public bool IsColourImage;
+        public int ImageLayoutsCount;
+        public int StatusTagsCount;
+        public int ImageSectionTagsCount;
+        public int ErrorStatusTagId;
+    };
+
 	public class AdvFrameInfo : AdvFrameInfoNative
 	{
 		public AdvFrameInfo(AdvFrameInfoNative copyFrom)
@@ -269,6 +294,85 @@ namespace Tangra.PInvoke
 		}
 	}
 
+    [StructLayout(LayoutKind.Explicit)]
+    public class Adv2FrameInfoNative
+    {
+        protected static DateTime REFERENCE_DATETIME = new DateTime(2010, 1, 1, 0, 0, 0, 0);
+
+        public Adv2FrameInfoNative()
+        {
+            StartTicksLo = 0;
+            StartTicksHi = 0;
+            EndTicksLo = 0;
+            EndTicksHi = 0;
+
+            UtcTimestampLo = 0;
+            UtcTimestampHi = 0;
+            Exposure = 0;
+
+            Gamma = 0f;
+            Gain = 0f;
+            Shutter = 0f;
+            Offset = 0f;
+
+            GPSTrackedSattelites = 0;
+            GPSAlmanacStatus = 0;
+            GPSFixStatus = 0;
+            GPSAlmanacOffset = 0;
+
+            VideoCameraFrameIdLo = 0;
+            VideoCameraFrameIdHi = 0;
+            HardwareTimerFrameIdLo = 0;
+            HardwareTimerFrameIdHi = 0;
+
+            SystemTimestampLo = 0;
+            SystemTimestampHi = 0;
+        }
+
+        [FieldOffset(0)]
+        public uint StartTicksLo;
+        [FieldOffset(4)]
+        public uint StartTicksHi;
+        [FieldOffset(8)]
+        public uint EndTicksLo;
+        [FieldOffset(12)]
+        public uint EndTicksHi;
+        [FieldOffset(16)]
+        public uint UtcTimestampLo;
+        [FieldOffset(20)]
+        public uint UtcTimestampHi;
+        [FieldOffset(24)]
+        public uint Exposure;
+        [FieldOffset(28)]
+        public float Gamma;
+        [FieldOffset(32)]
+        public float Gain;
+        [FieldOffset(36)]
+        public float Shutter;
+        [FieldOffset(40)]
+        public float Offset;
+        [FieldOffset(44)]
+        public byte GPSTrackedSattelites;
+        [FieldOffset(45)]
+        public byte GPSAlmanacStatus;
+        [FieldOffset(46)]
+        public byte GPSFixStatus;
+        [FieldOffset(47)]
+        public byte GPSAlmanacOffset;
+        [FieldOffset(48)]
+        public uint VideoCameraFrameIdLo;
+        [FieldOffset(52)]
+        public uint VideoCameraFrameIdHi;
+        [FieldOffset(56)]
+        public uint HardwareTimerFrameIdLo;
+        [FieldOffset(60)]
+        public uint HardwareTimerFrameIdHi;
+        [FieldOffset(64)]
+        public uint SystemTimestampLo;
+        [FieldOffset(68)]
+        public uint SystemTimestampHi;
+    }
+
 	[StructLayout(LayoutKind.Sequential)]
 	public struct SerFileInfo
 	{
@@ -344,6 +448,30 @@ namespace Tangra.PInvoke
 		//HRESULT ADVGetFileTag(char* tagName, char* tagValue);
 		public static extern int ADVGetFileTag(string tagName, [In, Out] byte[] tagValue);
 
+
+        [DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+        //ADVRESULT ADV2GetFormatVersion(char* fileName);
+        public static extern int ADV2GetFormatVersion(string fileName);
+
+        [DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+        //ADVRESULT ADV2OpenFile(char* fileName, AdvLib::AdvFileInfo* fileInfo);
+        public static extern int ADV2OpenFile(string fileName, [In, Out] ref Adv2FileInfo fileInfo);
+
+        [DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+        //ADVRESULT ADV2CloseFile();
+        public static extern int ADV2CloseFile();
+
+        [DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+        //ADVRESULT ADV2GetFrame(int frameNo, unsigned int* pixels, unsigned int* originalPixels, BYTE* bitmapPixels, BYTE* bitmapBytes, AdvLib2::AdvFrameInfo* frameInfo);
+        public static extern int ADV2GetFrame(int frameNo, [In, Out] uint[] pixels, [In, Out] uint[] originalPixels, [In, Out] byte[] bitmapBytes, [In, Out] byte[] bitmapDisplayBytes, [In, Out] Adv2FrameInfoNative frameInfo);
+
+        [DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+        //ADVRESULT ADV2GetFrameStatusChannel(long frameNo, AdvLib::AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError);
+        public static extern int ADV2GetFrameStatusChannel(int frameNo, [In, Out] AdvFrameInfoNative frameInfo, [In, Out] byte[] gpsFix, [In, Out] byte[] userCommand, [In, Out] byte[] systemError);
+
+        [DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+        //ADVRESULT ADV2GetFileTag(char* tagName, char* tagValue);
+        public static extern int ADV2GetFileTag(string tagName, [In, Out] byte[] tagValue);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
         // DLL_PUBLIC HRESULT GetBitmapPixels(long width, long height, unsigned long* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, bool isLittleEndian, int bpp, unsigned long normVal);

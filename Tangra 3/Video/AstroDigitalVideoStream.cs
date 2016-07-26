@@ -43,13 +43,19 @@ namespace Tangra.Video
 
 	public class AstroDigitalVideoStream : IFrameStream
 	{
-		public static AstroDigitalVideoStream OpenFile(string fileName, out AdvEquipmentInfo equipmentInfo, out GeoLocationInfo geoLocation)
+        public static IFrameStream OpenFile(string fileName, out AdvEquipmentInfo equipmentInfo, out GeoLocationInfo geoLocation)
 		{
             equipmentInfo = new AdvEquipmentInfo();
 			geoLocation = new GeoLocationInfo();
 			try
 			{
-				var rv = new AstroDigitalVideoStream(fileName, ref equipmentInfo, ref geoLocation);
+                int version = TangraCore.ADV2GetFormatVersion(fileName);
+
+                IFrameStream rv;
+                if (version == 1)
+                    rv = new AstroDigitalVideoStream(fileName, ref equipmentInfo, ref geoLocation);
+                else
+                    rv = AstroDigitalVideoStreamV2.OpenFile(fileName, out equipmentInfo, out geoLocation);
 
                 TangraContext.Current.RenderingEngine = equipmentInfo.Engine == "AAV" ? "AstroAnalogueVideo" : "AstroDigitalVideo";
 

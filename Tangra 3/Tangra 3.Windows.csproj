@@ -658,6 +658,7 @@
       <DependentUpon>frmGenerateStarFieldVideoModel.cs</DependentUpon>
     </Compile>
     <Compile Include="VideoTools\VideoModelUtils.cs" />
+    <Compile Include="Video\AstroDigitalVideoStreamV2.cs" />
     <Compile Include="Video\AstroDigitalVideo\AdvToAviConverter.cs" />
     <Compile Include="Video\AstroDigitalVideo\frmBuildingNtpTimebase.cs">
       <SubType>Form</SubType>

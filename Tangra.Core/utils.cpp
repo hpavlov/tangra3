@@ -6,6 +6,7 @@
 #include "stdlib.h"
 #include "strings.h"
 #include <time.h>
+#include "cross_platform.h"
 
 
 char* ReadString(FILE* pFile)
@@ -29,6 +30,26 @@ void WriteString(FILE* pFile, const char* str)
 	
 	fwrite(&len, 1, 1, pFile);
 	fputs(str, pFile);
+}
+
+char* ReadUTF8String(FILE* pFile)
+{
+	unsigned short len;
+	
+	advfread(&len, 2, 1, pFile);
+	char* str = (char*)malloc(len + 1);
+	advfread(&str[0], len, 1, pFile);
+	*(str + len) = 0;
+	return str;
+}
+
+void WriteUTF8String(FILE* pFile, const char* str)
+{
+	unsigned short len;
+	len = static_cast<char>(strlen(str));
+	
+	advfwrite(&len, 2, 1, pFile);
+	advfwrite(&str[0], len, 1, pFile);
 }
 
 void DbgPrintBytes(unsigned char *bytes, int maxLen)

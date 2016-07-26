@@ -7,6 +7,7 @@
 #include "string"
 
 #include "adv_file.h"
+#include "adv2_file.h"
 #include "IntegrationUtils.h"
 #include "PreProcessing.h"
 #include "TangraADV.h"
@@ -21,6 +22,9 @@ Compressor* m_Lagarith16Decompressor = NULL;
 int m_CurrentLagarithWidth = 0;
 int m_CurrentLagaritHeight = 0; 
 bool g_IsAAV = false;
+
+char* g_CurrentAdvFile;
+AdvLib2::Adv2File* g_TangraAdv2File;
 
 void EnsureAdvFileClosed()
 {
@@ -274,4 +278,133 @@ HRESULT Lagarith16Decompress(int width, int height, unsigned char* compressedByt
 	m_Lagarith16Decompressor->DecompressData(compressedBytes, (unsigned short*)decompressedBytes);
 	
 	return S_OK;
+}
+
+ADVRESULT ADV2GetFormatVersion(char* fileName)
+{
+	FILE* probe = advfopen(fileName, "rb");
+	if (probe == 0) return E_FAIL;
+	
+	unsigned int buffInt;
+	unsigned char buffChar;
+
+	advfread(&buffInt, 4, 1, probe);
+	advfread(&buffChar, 1, 1, probe);
+	advfclose(probe);	
+	
+	if (buffInt != 0x46545346) return E_FAIL;
+	return (unsigned int)buffChar;
+}
+
+ADVRESULT ADV2OpenFile(char* fileName, AdvLib2::AdvFileInfo* fileInfo)
+{
+	if (nullptr != g_TangraAdv2File)
+	{
+		delete g_TangraAdv2File;
+		g_TangraAdv2File = nullptr;
+	}
+	
+	int len = (int)strlen(fileName);
+	if (len > 0)
+	{
+		g_CurrentAdvFile = new char[len + 1];
+		strncpy_s(g_CurrentAdvFile, len + 1, fileName, len + 1);
+	
+		g_TangraAdv2File = new AdvLib2::Adv2File();
+		int res = !g_TangraAdv2File->LoadFile(fileName, fileInfo);
+		if (res < 0)
+		{
+			delete g_TangraAdv2File;
+			g_TangraAdv2File = nullptr;
+			return res;
+		}
+	}
+	
+	return S_OK;
+}
+
+ADVRESULT ADV2CloseFile()
+{
+	if (nullptr != g_TangraAdv2File)
+	{
+		g_TangraAdv2File->CloseFile();
+		delete g_TangraAdv2File;
+		g_TangraAdv2File = nullptr;
+	}
+
+	if (nullptr != g_CurrentAdvFile)
+	{
+		delete g_CurrentAdvFile;
+		g_CurrentAdvFile = nullptr;
+	}
+	
+	return S_OK;
+}
+
+ADVRESULT ADV2GetFrame(int frameNo, unsigned int* pixels, unsigned int* originalPixels, BYTE* bitmapPixels, BYTE* bitmapBytes, AdvLib2::AdvFrameInfo* frameInfo)
+{
+	int errMsgLen;
+	HRESULT rv = ADV2GetFramePixels(frameNo, pixels, frameInfo, &errMsgLen);
+	if (SUCCEEDED(rv))
+	{
+		if (g_UsesPreProcessing) 
+		{
+			memcpy(originalPixels, pixels, g_TangraAdv2File->ImageSection->Width * g_TangraAdv2File->ImageSection->Height * sizeof(unsigned int));
+			
+			float exposureSeconds = frameInfo->Exposure / 10000.0;
+			
+			return ApplyPreProcessingWithNormalValue(
+				pixels, g_TangraAdv2File->ImageSection->Width, g_TangraAdv2File->ImageSection->Height, g_TangraAdv2File->ImageSection->DataBpp, exposureSeconds,
+				g_TangraAdv2File->ImageSection->MaxPixelValue, bitmapPixels, bitmapBytes);
+				
+		}
+		else
+			return GetBitmapPixels(
+				g_TangraAdv2File->ImageSection->Width, 
+				g_TangraAdv2File->ImageSection->Height, 
+				pixels, 
+				bitmapPixels, 
+				bitmapBytes, 
+				g_TangraAdv2File->ImageSection->ByteOrder == LittleEndian, 
+				g_TangraAdv2File->ImageSection->DataBpp, 
+				g_TangraAdv2File->ImageSection->MaxPixelValue);
+	}
+	
+	return rv;
+}
+
+ADVRESULT ADV2GetFramePixels(int frameNo, unsigned int* pixels, AdvLib2::AdvFrameInfo* frameInfo, int* systemErrorLen)
+{
+	if (g_TangraAdv2File == nullptr)
+		return E_ADV_NOFILE;
+
+	if (g_TangraAdv2File->ImageSection == nullptr)
+		return E_ADV_IMAGE_SECTION_UNDEFINED;
+
+	if (frameNo >= g_TangraAdv2File->TotalNumberOfMainFrames)
+		return E_FAIL;
+
+	unsigned char layoutId;
+	enum GetByteMode byteMode;
+
+	g_TangraAdv2File->GetFrameImageSectionHeader(0, frameNo, &layoutId, &byteMode);
+
+	AdvLib2::Adv2ImageLayout* layout;
+	ADVRESULT rv = g_TangraAdv2File->ImageSection->GetImageLayoutById(layoutId, &layout);
+	if (rv != S_OK) 
+		return rv;
+
+	g_TangraAdv2File->GetFrameSectionData(0, frameNo, pixels, frameInfo, systemErrorLen);
+
+	return S_OK;
+}
+
+ADVRESULT ADV2GetFrameStatusChannel(int frameNo, AdvLib2::AdvFrameInfo* frameInfo)
+{
+	return E_NOTIMPL;
+}
+
+ADVRESULT ADV2GetFileTag(char* fileTagName, char* fileTagValue)
+{
+	return E_NOTIMPL;
 }

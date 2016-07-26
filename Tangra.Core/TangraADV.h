@@ -5,6 +5,7 @@
 #pragma once
 
 #include "cross_platform.h"
+#include "adv2_error_codes.h"
 
 extern bool g_IsAAV;
 
@@ -23,6 +24,14 @@ DLL_PUBLIC HRESULT ADVGetFramePixels(int frameNo, unsigned int* pixels, AdvLib::
 DLL_PUBLIC HRESULT ADVGetFrameStatusChannel(int frameNo, AdvLib::AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError);
 DLL_PUBLIC HRESULT ADVGetFileTag(char* fileTagName, char* fileTagValue);
 DLL_PUBLIC HRESULT Lagarith16Decompress(int width, int height, unsigned char* compressedBytes, unsigned char* decompressedBytes);
+
+DLL_PUBLIC ADVRESULT ADV2GetFormatVersion(char* fileName);
+DLL_PUBLIC ADVRESULT ADV2OpenFile(char* fileName, AdvLib2::AdvFileInfo* fileInfo);
+DLL_PUBLIC ADVRESULT ADV2CloseFile();
+DLL_PUBLIC ADVRESULT ADV2GetFrame(int frameNo, unsigned int* pixels, unsigned int* originalPixels, BYTE* bitmapPixels, BYTE* bitmapBytes, AdvLib2::AdvFrameInfo* frameInfo);
+DLL_PUBLIC ADVRESULT ADV2GetFramePixels(int frameNo, unsigned int* pixels, AdvLib2::AdvFrameInfo* frameInfo, int* systemErrorLen);
+DLL_PUBLIC ADVRESULT ADV2GetFrameStatusChannel(int frameNo, AdvLib2::AdvFrameInfo* frameInfo);
+DLL_PUBLIC ADVRESULT ADV2GetFileTag(char* fileTagName, char* fileTagValue);
 
 #ifdef __cplusplus
 } // __cplusplus defined.
