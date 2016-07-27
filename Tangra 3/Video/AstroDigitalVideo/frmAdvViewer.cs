@@ -33,7 +33,7 @@ namespace Tangra.Video.AstroDigitalVideo
 		private AdvStatusData m_CurrentStatusData;
 	    private bool m_IsAavFile = false;
 
-		public frmAdvViewer(string fileName)
+	    public frmAdvViewer(string fileName)
 		{
 			InitializeComponent();
 
@@ -48,7 +48,7 @@ namespace Tangra.Video.AstroDigitalVideo
 			if (m_AdvFile.IsCorrupted)
 				MessageBox.Show(
 					this,
-					"This is not an ADV/AAV file or it is corrupted. Try using [Tools] -> [ADV/AAV Tools] -> [Repair ADV/AAV File] to repair it.",
+					"This is not a V1 ADV/AAV file or it is corrupted. Try using [Tools] -> [ADV/AAV Tools] -> [Repair ADV/AAV File] to repair it.",
 					"Tangra",
 					MessageBoxButtons.OK,
 					MessageBoxIcon.Error);

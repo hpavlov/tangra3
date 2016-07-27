@@ -660,6 +660,12 @@
     <Compile Include="VideoTools\VideoModelUtils.cs" />
     <Compile Include="Video\AstroDigitalVideoStreamV2.cs" />
     <Compile Include="Video\AstroDigitalVideo\AdvToAviConverter.cs" />
+    <Compile Include="Video\AstroDigitalVideo\frmAdv2Viewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Video\AstroDigitalVideo\frmAdv2Viewer.Designer.cs">
+      <DependentUpon>frmAdv2Viewer.cs</DependentUpon>
+    </Compile>
     <Compile Include="Video\AstroDigitalVideo\frmBuildingNtpTimebase.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -1159,6 +1165,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="VideoTools\frmGenerateStarFieldVideoModel.resx">
       <DependentUpon>frmGenerateStarFieldVideoModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Video\AstroDigitalVideo\frmAdv2Viewer.resx">
+      <DependentUpon>frmAdv2Viewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Video\AstroDigitalVideo\frmBuildingNtpTimebase.resx">
       <DependentUpon>frmBuildingNtpTimebase.cs</DependentUpon>

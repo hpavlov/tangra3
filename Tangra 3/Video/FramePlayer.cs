@@ -793,7 +793,9 @@ namespace Tangra.Video
 		{
 			get
 			{
-				return m_VideoStream is AstroDigitalVideoStream && ((AstroDigitalVideoStream)m_VideoStream).Engine == "ADV";
+				return 
+                    (m_VideoStream is AstroDigitalVideoStream && ((AstroDigitalVideoStream)m_VideoStream).Engine == "ADV") ||
+                    m_VideoStream is AstroDigitalVideoStreamV2;
 			}
 		}
 

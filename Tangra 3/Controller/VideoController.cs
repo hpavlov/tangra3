@@ -1594,18 +1594,31 @@ namespace Tangra.Controller
 
 			if (TangraContext.Current.HasVideoLoaded && (m_FramePlayer.IsAstroDigitalVideo || m_FramePlayer.IsAstroAnalogueVideo))
 			{
-				var viewer = new frmAdvViewer(m_FramePlayer.Video.FileName);
-				viewer.Show(m_MainFormView);
+                ChooseAdvViewerForFileVersion(m_FramePlayer.Video.FileName);
 			}
             else
 			{
 			    if (m_MainForm.openAdvFileDialog.ShowDialog(m_MainFormView) == DialogResult.OK)
 			    {
-                    var viewer = new frmAdvViewer(m_MainForm.openAdvFileDialog.FileName);
-                    viewer.Show(m_MainFormView);
+                    ChooseAdvViewerForFileVersion(m_MainForm.openAdvFileDialog.FileName);
 			    }
 			}
 		}
+
+	    private void ChooseAdvViewerForFileVersion(string fileName)
+	    {
+	        int fileVersion = TangraCore.ADV2GetFormatVersion(fileName);
+	        if (fileVersion == 1)
+	        {
+                var viewer = new frmAdvViewer(fileName);
+	            viewer.Show(m_MainFormView);
+	        }
+            else if (fileVersion == 2)
+            {
+                var viewer = new frmAdv2Viewer(fileName);
+                viewer.Show(m_MainFormView);
+            }
+	    }
 
 		public void RepairAdvFile(string fileName)
 		{

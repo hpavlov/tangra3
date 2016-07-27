@@ -85,7 +85,7 @@ namespace Tangra.Video.AstroDigitalVideo
 			rv.m_FileReader = fileReader;
 			rv.m_FileName = fileName;
 
-			if (dataFormatVer >= 1)
+			if (dataFormatVer == 1)
 			{
 				byte sectionsCount = fileReader.ReadByte();
 
