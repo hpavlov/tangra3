@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using Tangra.PInvoke;
 
 namespace Tangra.Video.AstroDigitalVideo
 {
@@ -46,13 +47,38 @@ namespace Tangra.Video.AstroDigitalVideo
 		private void actionTimer_Tick(object sender, EventArgs e)
 		{
 			actionTimer.Enabled = false;
-			ProcessAdvFile();
+		    if (!ProcessAdvFile())
+		    {
+                try
+                {
+                    Invoke(new Action(() =>
+                    {
+                        DialogResult = DialogResult.Cancel;
+                        Close();  
+                    }));
+                }
+                catch (InvalidOperationException)
+                { }
+		    }            
 		}
 
-		private void ProcessAdvFile()
+		private bool ProcessAdvFile()
 		{
 			try
 			{
+                int fileVersion = TangraCore.ADV2GetFormatVersion(m_FileName);
+                if (fileVersion != 1)
+                {
+                    MessageBox.Show(
+                        this,
+                        string.Format("ADV repair hasn't been implememted for ADV Version {0}. Cannot continue with file '{1}'", fileVersion, Path.GetFileName(m_FileName)),
+                        "Tangra",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+
+                    return false;
+                }
+
 				m_AdvFile = AdvFile.OpenFile(m_FileName);
 				if (!m_AdvFile.IsCorrupted)
 				{
@@ -63,12 +89,12 @@ namespace Tangra.Video.AstroDigitalVideo
 						MessageBoxButtons.OK,
 						MessageBoxIcon.Information);
 
-					DialogResult = DialogResult.Cancel;
-					Close();
+                    return false;
 				}
 
 				m_CalcThread = new Thread(RepairAdvFile);
 				m_CalcThread.Start();
+			    return true;
 			}
 			catch (Exception ex)
 			{
@@ -79,8 +105,7 @@ namespace Tangra.Video.AstroDigitalVideo
 					MessageBoxButtons.OK,
 					MessageBoxIcon.Error);
 				
-				DialogResult = DialogResult.Abort;
-				Close();
+			    return false;
 			}
 		}
 

@@ -364,8 +364,8 @@ namespace Tangra.PInvoke
 
 		private static int s_BitPixTableBitPixVal = 0;
 	    private static double s_BitPixTableMaxVal = 0.0;
-        private static int[] s_BitPixTable = new int[ushort.MaxValue];
-		private static double s_GammaTableGammaVal = double.MaxValue;
+        private static int[] s_BitPixTable = new int[ushort.MaxValue + 1];
+		private static double s_GammaTableGammaVal = double.MaxValue + 1;
 		private static int[] s_GammaTable = new int[256];
 
         public static bool AddAviVideoFrame(Pixelmap pixmap, double addedGamma, int? adv16NormalisationValue)

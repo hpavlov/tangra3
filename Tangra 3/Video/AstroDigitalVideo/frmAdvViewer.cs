@@ -403,12 +403,14 @@ namespace Tangra.Video.AstroDigitalVideo
                 pbar.Visible = true;
 				pnlCropChooseFrames.Enabled = false;
                 pnlToAviConfig.Enabled = false;
+                pnlToCSVConfig.Enabled = false;
 			}
             else if (!show && pbar.Visible)
 			{
                 pbar.Visible = false;
 				pnlCropChooseFrames.Enabled = true;
                 pnlToAviConfig.Enabled = true;
+                pnlToCSVConfig.Enabled = true;
 			}
 
             pbar.Update();
@@ -430,7 +432,7 @@ namespace Tangra.Video.AstroDigitalVideo
         private void btnSaveAsAVI_Click(object sender, EventArgs e)
         {
 #if WIN32
-            if (nudCropLastFrame.Value < nudCropFirstFrame.Value)
+            if (nudAviLastFrame.Value < nudAviFirstFrame.Value)
             {
                 MessageBox.Show(
                     this,
@@ -439,7 +441,7 @@ namespace Tangra.Video.AstroDigitalVideo
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
 
-                nudCropLastFrame.Focus();
+                nudAviLastFrame.Focus();
                 return;
             }
 
@@ -485,7 +487,7 @@ namespace Tangra.Video.AstroDigitalVideo
 
 		private void btnSaveAsCSV_Click(object sender, EventArgs e)
 		{
-			if (nudCropLastFrame.Value < nudCropFirstFrame.Value)
+            if (nudCsvLastFrame.Value < nudCsvFirstFrame.Value)
 			{
 				MessageBox.Show(
 					this,
@@ -494,7 +496,7 @@ namespace Tangra.Video.AstroDigitalVideo
 					MessageBoxButtons.OK,
 					MessageBoxIcon.Error);
 
-				nudCropLastFrame.Focus();
+                nudCsvLastFrame.Focus();
 				return;
 			}
 

@@ -98,7 +98,7 @@
             this.tabTools = new System.Windows.Forms.TabPage();
             this.gbxConvertToCSV = new System.Windows.Forms.GroupBox();
             this.pbar3 = new System.Windows.Forms.ProgressBar();
-            this.panel1 = new System.Windows.Forms.Panel();
+            this.pnlToCSVConfig = new System.Windows.Forms.Panel();
             this.btnSaveAsCSV = new System.Windows.Forms.Button();
             this.nudCsvFirstFrame = new System.Windows.Forms.NumericUpDown();
             this.label26 = new System.Windows.Forms.Label();
@@ -107,6 +107,7 @@
             this.gbxConvertToAVI = new System.Windows.Forms.GroupBox();
             this.pbar2 = new System.Windows.Forms.ProgressBar();
             this.pnlToAviConfig = new System.Windows.Forms.Panel();
+            this.cbxSpecifyCodec = new System.Windows.Forms.CheckBox();
             this.cbxAddedGamma = new System.Windows.Forms.ComboBox();
             this.label23 = new System.Windows.Forms.Label();
             this.label22 = new System.Windows.Forms.Label();
@@ -127,7 +128,6 @@
             this.timerScrolling = new System.Windows.Forms.Timer(this.components);
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.saveAviFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.cbxSpecifyCodec = new System.Windows.Forms.CheckBox();
             this.tabControl.SuspendLayout();
             this.tpTags.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvFileTags)).BeginInit();
@@ -142,7 +142,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.picSmallImage)).BeginInit();
             this.tabTools.SuspendLayout();
             this.gbxConvertToCSV.SuspendLayout();
-            this.panel1.SuspendLayout();
+            this.pnlToCSVConfig.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudCsvFirstFrame)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudCsvLastFrame)).BeginInit();
             this.gbxConvertToAVI.SuspendLayout();
@@ -827,7 +827,7 @@
             // gbxConvertToCSV
             // 
             this.gbxConvertToCSV.Controls.Add(this.pbar3);
-            this.gbxConvertToCSV.Controls.Add(this.panel1);
+            this.gbxConvertToCSV.Controls.Add(this.pnlToCSVConfig);
             this.gbxConvertToCSV.Location = new System.Drawing.Point(6, 280);
             this.gbxConvertToCSV.Name = "gbxConvertToCSV";
             this.gbxConvertToCSV.Size = new System.Drawing.Size(666, 128);
@@ -844,17 +844,17 @@
             this.pbar3.TabIndex = 8;
             this.pbar3.Visible = false;
             // 
-            // panel1
+            // pnlToCSVConfig
             // 
-            this.panel1.Controls.Add(this.btnSaveAsCSV);
-            this.panel1.Controls.Add(this.nudCsvFirstFrame);
-            this.panel1.Controls.Add(this.label26);
-            this.panel1.Controls.Add(this.nudCsvLastFrame);
-            this.panel1.Controls.Add(this.label27);
-            this.panel1.Location = new System.Drawing.Point(6, 19);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(613, 64);
-            this.panel1.TabIndex = 7;
+            this.pnlToCSVConfig.Controls.Add(this.btnSaveAsCSV);
+            this.pnlToCSVConfig.Controls.Add(this.nudCsvFirstFrame);
+            this.pnlToCSVConfig.Controls.Add(this.label26);
+            this.pnlToCSVConfig.Controls.Add(this.nudCsvLastFrame);
+            this.pnlToCSVConfig.Controls.Add(this.label27);
+            this.pnlToCSVConfig.Location = new System.Drawing.Point(6, 19);
+            this.pnlToCSVConfig.Name = "pnlToCSVConfig";
+            this.pnlToCSVConfig.Size = new System.Drawing.Size(613, 64);
+            this.pnlToCSVConfig.TabIndex = 7;
             // 
             // btnSaveAsCSV
             // 
@@ -934,6 +934,16 @@
             this.pnlToAviConfig.Name = "pnlToAviConfig";
             this.pnlToAviConfig.Size = new System.Drawing.Size(613, 64);
             this.pnlToAviConfig.TabIndex = 7;
+            // 
+            // cbxSpecifyCodec
+            // 
+            this.cbxSpecifyCodec.AutoSize = true;
+            this.cbxSpecifyCodec.Location = new System.Drawing.Point(371, 43);
+            this.cbxSpecifyCodec.Name = "cbxSpecifyCodec";
+            this.cbxSpecifyCodec.Size = new System.Drawing.Size(95, 17);
+            this.cbxSpecifyCodec.TabIndex = 11;
+            this.cbxSpecifyCodec.Text = "Specify Codec";
+            this.cbxSpecifyCodec.UseVisualStyleBackColor = true;
             // 
             // cbxAddedGamma
             // 
@@ -1113,16 +1123,6 @@
             this.saveAviFileDialog.Filter = "AVI Files (*.avi)|*.avi|All Files (*.*)|*.*";
             this.saveAviFileDialog.Title = "Save file as ...";
             // 
-            // cbxSpecifyCodec
-            // 
-            this.cbxSpecifyCodec.AutoSize = true;
-            this.cbxSpecifyCodec.Location = new System.Drawing.Point(371, 43);
-            this.cbxSpecifyCodec.Name = "cbxSpecifyCodec";
-            this.cbxSpecifyCodec.Size = new System.Drawing.Size(95, 17);
-            this.cbxSpecifyCodec.TabIndex = 11;
-            this.cbxSpecifyCodec.Text = "Specify Codec";
-            this.cbxSpecifyCodec.UseVisualStyleBackColor = true;
-            // 
             // frmAdvViewer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1154,8 +1154,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.picSmallImage)).EndInit();
             this.tabTools.ResumeLayout(false);
             this.gbxConvertToCSV.ResumeLayout(false);
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
+            this.pnlToCSVConfig.ResumeLayout(false);
+            this.pnlToCSVConfig.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudCsvFirstFrame)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudCsvLastFrame)).EndInit();
             this.gbxConvertToAVI.ResumeLayout(false);
@@ -1265,7 +1265,7 @@
 		private System.Windows.Forms.ComboBox cbxFrameRate;
 		private System.Windows.Forms.GroupBox gbxConvertToCSV;
 		private System.Windows.Forms.ProgressBar pbar3;
-		private System.Windows.Forms.Panel panel1;
+		private System.Windows.Forms.Panel pnlToCSVConfig;
 		private System.Windows.Forms.Button btnSaveAsCSV;
 		private System.Windows.Forms.NumericUpDown nudCsvFirstFrame;
 		private System.Windows.Forms.Label label26;
