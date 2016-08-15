@@ -1,0 +1,267 @@
+﻿Tangra3 Release Notes
+---------------------
+
+Unreleased
+-------------------
+- Added release notes.
+- Implemented support for ADV format version 2.
+
+v3.5.8 (2016-07-01)
+-------------------
+- Updated the Linux distributions to work on Ubuntu versions 10, 12 and 14.
+
+v3.5.7 (2016-05-13)
+-------------------
+- A number of fixes related to working with SER file timestamps.
+- Significant performance improvements to Astrometry. Added fast asteroid motion tracker.
+- Improvements to UI experience on Linux.
+- Improvements to light curve reduction from series of FITS images.
+- Implemented a "Reverse Camera Response" function to reverse non-linear camera response (such as WAT-910 unmodified cameras).
+
+v3.5.6 (2016-02-29)
+-------------------
+- Fixed the AAV-to-AVI and ADV-to-AVI video conversion. Now also allowing the usage of codecs.
+- Now showing warning messages if FITS files opened in a sequence have a missing exposure header.
+- Fixes a bug in the formatting of MPC observation files.
+- Implemented a "Manually Identify Star" when automatic plate-solve fails during Astrometry.
+
+v3.5.5 (2016-01-22)
+-------------------
+- Made the OCR-ing of IOTA-VTI timestamp to work when video is measured backwards (for Lunar reappearances).
+- Improvements to measuring Lunar Occultations.
+
+v3.5.4 (2016-01-18)
+-------------------
+- Now timing for SER files can be read from the FireCapture log files.
+- Implemented embedded timestamp integrity check for SER files.
+
+v3.5.3 (2015-12-17)
+-------------------
+- Enabled OCR reading for AAV videos with x1 integration.
+- Implemented synthetic magnitudes calculations in various filters from CalSpec stars spectroscopic observations.
+- Updated MPC web service default URLs.
+- Significant improvements to AbsFlux calibration.
+- Implemented video modelling of real star fields (to be used for examining non-linearity and its correction).
+
+v3.5.2 (2015-09-04)
+-------------------
+- Implemented FITS frame tracking which allows for displacement between consecutive images.
+- Users can now pick which timestamps from SER files should be used for timing.
+- Implemented AbsFlux calibration for CalSpec spectroscopy.
+
+v3.5.1 (2015-07-28)
+-------------------
+- Fixed a problem that could lead to incorrect reading of SER files embedded timestamps.
+- Improvements to processing AAV files with only NTP timestamps.
+
+v3.5.0 (2015-07-24)
+-------------------
+- Implemented video spectroscopy reduction.
+- Numerous big fixes and small improvements.
+- Improved display of AAV status channels.
+
+v3.4.8 (2015-06-02)
+-------------------
+- Fixed a crash when opening an .lc file.
+
+v3.4.7 (2015-06-01)
+-------------------
+- Support for FITS files with negative pixels.
+- Improved the processing of very large .lc files.
+
+v3.4.6 (2015-05-06)
+-------------------
+- Made it possible to set a title of a light curve.
+- Improved handling of NTP timestamps.
+- Made it possible to skip a chunk 10 frames when correcting from lost tracking.
+- Fixed a problem when reading the TV-Safe IOTA-VTI timestamps.
+
+v3.4.5 (2015-04-18)
+-------------------
+- Fixed a bug in the AAV files astrometry.
+
+v3.4.4 (2015-04-04)
+-------------------
+- Fixed a problem with CSV export of binned data.
+
+v3.4.3 (2015-03-27)
+-------------------
+- Implemented fast motion astrometry for AAV files.
+- Made it possible to configure a gap and annulus size for photometric measurements during astrometry.
+
+v3.4.2 (2015-03-23)
+-------------------
+- Tracking improvements for large defocused stars.
+- Made the add-in upgrades to appear distinct from main Tangra upgrades.
+- Added support for applying non-bias subtracted dark frame with longer exposure than the science frame.
+- Performance improvements to pre-processing (dark/flat/brightness/contrast/etc).
+- Improvements to the Target PSF Viewer.
+
+v3.4.1 (2015-03-16)
+-------------------
+- Added support for correcting for Bias, Darks and Flats.
+- Fixed and issue where NTSC frames would be skipped from measurement when DirectShow is used.
+- Implemented Astrometry in Tangra 3 (ported from Tangra 1.4).
+
+v3.4.0
+------
+(never released)
+
+
+v3.3.8 (2015-03-08)
+-------------------
+- Fixed the instrumental delay correction of stacked AAV videos.
+
+v3.3.7 (2015-02-27)
+-------------------
+- Fixed an issue where the horizontal time axis of a light curve displays incorrectly close to the UTC date change.
+- Fixed a crash when processing SER files
+
+v3.3.6 (2015-02-16)
+-------------------
+- Fixed the precision of the timestamps exported to CSV files in case of binning.
+- Implemented "Spacing" and explicitly selected "Signal-minus-Background" CSV export for non-binned data.
+
+v3.3.5 (2015-02-11)
+-------------------
+- Fixed a broken detection of lost tracking immediately after entering measurement mode.
+- Fixed a problem where negative flux will be exported as very large positive numbers to CSV format.
+
+v3.3.4 (2015-02-10)
+-------------------
+- Released an Eclipsing Binary adding with a Kwee-VanWoerden implementation.
+- Fixed a crash with some FITS files with padding.
+- Fixed upside-down displayed FITS images.
+- FITS sequence images are now ordered by timestamp not file name.
+- Made it possible to manually set a the Valid/Invalid flag of each measured data point.
+- Fixed a problem where the very first and very last video frame may not be measured.
+
+v3.3.3 (2015-01-29)
+-------------------
+- Fixed a crash in pixel distribution calculation of 16-bit AAV files.
+- Renamed the display name of "VideoForWindows" to "VideoForWindows (2Gb Limit)" to imply the file size limit.
+- Now suggesting to submit an OCR error report if there were more than 8 error readings.
+- Implemented automatic selection of dynamic range display mode for FITS images upon opening.
+- Fixed an IOTA-VTI OCR problem where the timestamp recognition will break when the number of digits of the frame number increases.
+
+v3.3.2 (2015-01-16)
+-------------------
+- Fixed a crash in working with PSFs.
+
+v3.3.1 (2015-01-11)
+-------------------
+- Made sure the CSV export will always use dots are decimal separator regardless of local regional settings 
+- Implemented manual corrections for the new Native Tracker
+- Fixed a problem where very short ADV exposures (0.1 ms) could cause a 0 ms frame duration to be saved in the light curve.
+- Now by default the apertures of all measured objects will be the same.
+- Video modeling will use the same FWHM for all stars regardless of their brightness.
+
+v3.3.0
+------
+(never released)
+
+v3.2.3 (2015-01-08)
+-------------------
+- Made it possible the light curve to also display time on the X-axis.
+
+v3.2.2 (2015-01-04)
+-------------------
+- Made it possible to export magnitudes and atmospheric extinction to CSV.
+- Fixed broken timestamp CSV export in some cases.
+
+v3.2.1 (2015-01-01)
+-------------------
+- Made it possible to display detailed information about the original measured video when viewing an .lc file.
+
+v3.2.0
+------
+(never released)
+
+v3.1.18 (2014-12-30)
+--------------------
+- Support for AAV files with NTP timestamps.
+- Made the timestamp export to CSV files customizable.
+- Fixed a crash that could happen sometimes when pressing "Finish Measurements".
+
+v3.1.17 (2014-12-26)
+--------------------
+- A number of bugfixes including one to the Simplified Tracking.
+
+v3.1.16 (2014-12-24)
+--------------------
+- Update the Occult Add-in related to the recent update of AOTA.
+- Improved the error reporting.
+- Fixed an issue with FITS files that contain 16-bit data.
+
+v3.1.15 (2014-12-19)
+--------------------
+- Improvements to Mutual Events Tracker.
+- Fixed a problem when using very large SER files.
+
+v3.1.14 (2014-12-13)
+--------------------
+- Fixes to ADV and AAV timestamps which could be sent to AOTA as blanks or without instrumental delays.
+- Improvements to the Tangra-AOTA interaction.
+
+v3.1.13 (2014-11-25)
+--------------------
+- Fixed a problem with rounding of timestamps when exporting binned ADV measurements.
+
+v3.1.12 (2014-11-05)
+--------------------
+- Changed the license to MPL 2.0.
+- Improvements to the Add-in settings form.
+
+v3.1.11 (2014-10-20)
+--------------------
+- Fixed a couple of submitted error reports.
+
+v3.1.10 (2014-07-28)
+--------------------
+- Added inverted and hue intensity mode with the custom dynamic range display mode.
+- Fixed a dark/flat frame generation problem for videos with bit depth of more than 8 bit.
+
+v3.1.9 (2014-07-20)
+-------------------
+- Fixed a display issue with the circled object in the zoomed image. 
+- Improvement to the OCR correction engine to be tolerant to 1 ms difference due to rounding.
+
+v3.1.8 (2014-07-19)
+-------------------
+- Added support for a "Custom Dynamic Range" display mode.
+- Fixed a problem with FITS files parsing where signed numbers are not correctly converted to unsigned.
+
+v3.1.7 (2014-07-14)
+-------------------
+- Now extracting timestamps from FITS files and remembering the last opened FITS file location.
+
+v3.1.6 (2014-07-13)
+-------------------
+- Bugfixes
+
+v3.1.5 (2014-07-09)
+-------------------
+- A fix to the OCR engine that was preventing OCR-ing when the computed video field was exactly 0.1 ms off (presumably due to rounding issues in IOTA-VTI).
+
+v3.1.4 (2014-07-08)
+-------------------
+- Fixed two issues with the measurements related to centring of aperture and handling of 12-bit videos.
+
+v3.1.3 (2014-07-02)
+-------------------
+- Bugfixes
+
+v3.1.2 (2014-06-29)
+-------------------
+- Added support for processing a sequence of FITS files.
+- Added support for SER files.
+
+...
+
+v3.0.85 (2014-05-03)
+- First official public non-BETA release of Tangra 3.
+
+...
+
+v3.0.0 (2012-12-26)
+- First cross-platform build of the Tangra 3 project.

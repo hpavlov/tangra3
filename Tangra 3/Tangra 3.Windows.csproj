@@ -1316,6 +1316,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="Service References\TangraService\ErrorReports1.disco" />
+    <Content Include="ReleaseNotes.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="TODO-List.txt" />
     <None Include="img\stop24.bmp" />
     <None Include="img\play24.bmp" />

@@ -402,6 +402,15 @@ namespace Tangra
 					timerCommandArgs.Enabled = true;
 				}
 			}
+
+            int currVersion = m_AutoUpdatesController.CurrentlyInstalledTangra3Version();
+		    if (TangraConfig.Settings.LastUsed.ReleaseNotesDisplayedForVersion < currVersion)
+		    {
+                DisplayReleaseNotes();
+
+		        TangraConfig.Settings.LastUsed.ReleaseNotesDisplayedForVersion = currVersion;
+                TangraConfig.Settings.Save();
+		    }
 		}
 
 		private void timerCommandArgs_Tick(object sender, EventArgs e)
@@ -1325,5 +1334,19 @@ namespace Tangra
             var frm = new frmGenerateStarFieldVideoModel(m_VideoController);
             frm.ShowDialog(this);
         }
+
+        private void miReleaseNotes_Click(object sender, EventArgs e)
+        {
+            DisplayReleaseNotes();
+        }
+
+	    private void DisplayReleaseNotes()
+	    {
+            string filePath = Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory + @"\ReleaseNotes.txt");
+            if (File.Exists(filePath))
+                Process.Start(filePath);
+            else
+                MessageBox.Show("Could not find: " + filePath, "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+	    }
 	}
 }

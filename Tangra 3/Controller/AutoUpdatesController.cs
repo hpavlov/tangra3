@@ -441,7 +441,7 @@ namespace Tangra.Controller
 			return rv;
 		}
 
-		private int CurrentlyInstalledTangra3Version()
+		public int CurrentlyInstalledTangra3Version()
 		{
 			try
 			{

@@ -679,6 +679,8 @@ namespace Tangra.Model.Config
             public float? AstrometryMagFitAnnulus = null;
 
 	        public string SpectroscopyWavelengthConfigurationname;
+
+            public int ReleaseNotesDisplayedForVersion = 0;
         }
 
         [Serializable]

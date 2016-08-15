@@ -66,11 +66,11 @@ namespace Tangra.Helpers
 
 			    uint bzero = 0;
                 HeaderCard bZeroCard = imageHDU.Header.FindCard("BZERO");
-			    if (bZeroCard != null)
+                if (bZeroCard != null && !string.IsNullOrWhiteSpace(bZeroCard.Value))
 			    {
                     try
                     {
-                        bzero = (uint)double.Parse(bZeroCard.Value);
+                        bzero = (uint)double.Parse(bZeroCard.Value.Replace(',', '.'));
                     }
                     catch
 			        { }
@@ -108,7 +108,14 @@ namespace Tangra.Helpers
             if (exposureCard == null) exposureCard = header.FindCard("EXPTIME");
             if (exposureCard == null) exposureCard = header.FindCard("RAWTIME");
             if (exposureCard != null && !string.IsNullOrWhiteSpace(exposureCard.Value))
-                fitsExposure = double.Parse(exposureCard.Value.Trim(), CultureInfo.InvariantCulture);
+            {
+                double doubleNum;
+                if (double.TryParse(exposureCard.Value.Trim().Replace(',', '.'), NumberStyles.Number, CultureInfo.InvariantCulture, out doubleNum))
+                    fitsExposure = doubleNum;
+                else
+                    throw new FormatException(string.Format("Cannot parse FITS exposure '{0}' as a floating point number.", exposureCard.Value));
+            }
+                
 
             string dateTimeStr = null;
             HeaderCard timeCard = header.FindCard("TIMEOBS");
@@ -317,7 +324,7 @@ namespace Tangra.Helpers
 					dataRow = (short[]) dataRowObject;
 					dataType = typeof (short);
 				}
-				else if (dataRowObject is Array)
+                else if (dataRowObject is Array)
 				{
 					Array arr = (Array) dataRowObject;
 					dataRow = new short[arr.Length];

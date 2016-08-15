@@ -1098,7 +1098,10 @@ namespace Tangra.Model.Astro
 			else if (bpp == 12) maxZ = 4096.0;
 			else if (bpp == 16 && NormVal > 0) maxZ = NormVal;
 			else if (bpp == 16 && NormVal == 0) maxZ = 65535.0;
-			
+
+		    if (double.IsNaN(m_X0) || double.IsNaN(m_Y0))
+                return;
+
 			maxZ = Math.Min(maxZ, GetPSFValueInternal(m_X0, m_Y0) + 5);
 
             int totalSteps = 100;
