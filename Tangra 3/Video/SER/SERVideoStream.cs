@@ -348,6 +348,32 @@ namespace Tangra.Video.SER
 					SystemTime = m_CurrentFrameInfo.TimeStampUtc
 				};
 
+                if (UseTimeStamp != SerUseTimeStamp.None)
+                {
+                    if (UseTimeStamp == SerUseTimeStamp.FireCaptureLog)
+                    {
+                        DateTime dt, dt2;
+                        if (actualFramesToIntegrate % 2 == 0 && actualFramesToIntegrate > 1)
+                        {
+                            if (
+                                m_FireCaptureTimeStamps.TryGetValue(startFrameNo + actualFramesToIntegrate/2, out dt) &&
+                                m_FireCaptureTimeStamps.TryGetValue(1 + startFrameNo + actualFramesToIntegrate/2, out dt2))
+                            {
+                                rv.FrameState.CentralExposureTime = dt.AddTicks((dt2 - dt).Ticks/2);
+                            }
+                        }
+                        else
+                        {
+                            if (m_FireCaptureTimeStamps.TryGetValue(1 + startFrameNo + actualFramesToIntegrate / 2, out dt))
+                                rv.FrameState.CentralExposureTime = dt;                            
+                        }
+                    }
+                    else if (UseTimeStamp == SerUseTimeStamp.SerEmbeddedUtcTime)
+                    {
+                        rv.FrameState.CentralExposureTime = m_CurrentFrameInfo.TimeStampUtc;
+                    }
+                }
+
 				return rv;
 			}
 		}
