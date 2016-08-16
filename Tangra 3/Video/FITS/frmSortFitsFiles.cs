@@ -19,6 +19,7 @@ namespace Tangra.Video.FITS
         private string[] m_FitsFiles;
         private Header[] m_FitsHeaders;
         private DateTime?[] m_FitsTimestamps;
+        private bool m_SortedByTimeStamp = false;
 
         private int m_FilesWithoutExposure = 0;
         private int m_FilesWithExposure = 0;
@@ -35,8 +36,17 @@ namespace Tangra.Video.FITS
 
         internal string[] GetSortedFiles()
         {
-            Array.Sort(m_FitsTimestamps, m_FitsFiles);
-            return m_FitsFiles;
+            if (m_SortedByTimeStamp)
+            {
+                Array.Sort(m_FitsTimestamps, m_FitsFiles);
+                return m_FitsFiles;                
+            }
+            else
+            {
+                List<string> byFileNameList = new List<string>(m_FitsFiles);
+                byFileNameList.Sort();
+                return byFileNameList.ToArray();
+            }
         }
 
         public string ErrorMessage { get; private set; }
@@ -114,8 +124,12 @@ namespace Tangra.Video.FITS
         private void timer1_Tick(object sender, EventArgs e)
         {
             timer1.Enabled = false;
+            m_SortedByTimeStamp = true;
             if (m_FilesWithExposure == 0 && m_FilesWithoutExposure > 0)
-                MessageBox.Show("None of the FITS files have a saved exposure (checked headers: EXPOSURE, EXPTIME and RAWTIME). Please treat the reported timestamps with suspicion.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            {
+                MessageBox.Show("None of the FITS files have a saved exposure and they have been ordered by file name!", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                m_SortedByTimeStamp = false;
+            }
             else if (m_FilesWithExposure > 0 && m_FilesWithoutExposure > 0)
                 MessageBox.Show(string.Format("{0} out of {1} of the FITS files have a missing exposure (checked headers: EXPOSURE, EXPTIME and RAWTIME). Please treat the reported timestamps with suspicion and expect inconsistencies.", m_FilesWithoutExposure, m_FilesWithoutExposure + m_FilesWithExposure), "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
