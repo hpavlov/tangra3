@@ -827,8 +827,8 @@ namespace Tangra
 		{
 			if (m_VideoContext.Pixelmap != null)
 			{
-				saveFrameDialog.Filter = "Comma separated values (*.csv)|*.csv";
-				saveFrameDialog.DefaultExt = "csv";
+				saveFrameDialog.Filter = "Comma separated values (*.txt)|*.txt";
+				saveFrameDialog.DefaultExt = "txt";
 
 				if (saveFrameDialog.ShowDialog(this) == DialogResult.OK)
 				{

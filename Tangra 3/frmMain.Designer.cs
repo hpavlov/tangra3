@@ -67,6 +67,7 @@
             this.miOnlineHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.miYahooGroup = new System.Windows.Forms.ToolStripMenuItem();
             this.miCheckForUpdates = new System.Windows.Forms.ToolStripMenuItem();
+            this.miReleaseNotes = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this.miCallForContributions = new System.Windows.Forms.ToolStripMenuItem();
             this.miAbout = new System.Windows.Forms.ToolStripMenuItem();
@@ -96,6 +97,7 @@
             this.pnlControlerPanel = new System.Windows.Forms.Panel();
             this.zoomedImage = new System.Windows.Forms.PictureBox();
             this.panelVideo = new System.Windows.Forms.Panel();
+            this.pictureBox = new Tangra.Controls.ImagePanel();
             this.pnlPlayControls = new System.Windows.Forms.Panel();
             this.pnlPlayButtons = new System.Windows.Forms.Panel();
             this.btnJumpTo = new System.Windows.Forms.Button();
@@ -113,8 +115,6 @@
             this.openAdvFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.saveFrameDialog = new System.Windows.Forms.SaveFileDialog();
             this.timerCommandArgs = new System.Windows.Forms.Timer(this.components);
-            this.pictureBox = new Tangra.Controls.ImagePanel();
-            this.miReleaseNotes = new System.Windows.Forms.ToolStripMenuItem();
             this.mainMenu.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.panelRight.SuspendLayout();
@@ -250,33 +250,33 @@
             // miExportToFits
             // 
             this.miExportToFits.Name = "miExportToFits";
-            this.miExportToFits.Size = new System.Drawing.Size(149, 22);
+            this.miExportToFits.Size = new System.Drawing.Size(168, 22);
             this.miExportToFits.Text = "Export to &FITS";
             this.miExportToFits.Click += new System.EventHandler(this.miExportToFits_Click);
             // 
             // miExportToBMP
             // 
             this.miExportToBMP.Name = "miExportToBMP";
-            this.miExportToBMP.Size = new System.Drawing.Size(149, 22);
+            this.miExportToBMP.Size = new System.Drawing.Size(168, 22);
             this.miExportToBMP.Text = "Export to &BMP";
             this.miExportToBMP.Click += new System.EventHandler(this.miExportToBMP_Click);
             // 
             // miExportToCSV
             // 
             this.miExportToCSV.Name = "miExportToCSV";
-            this.miExportToCSV.Size = new System.Drawing.Size(149, 22);
-            this.miExportToCSV.Text = "Export to &CSV";
+            this.miExportToCSV.Size = new System.Drawing.Size(168, 22);
+            this.miExportToCSV.Text = "Save &Pixels as CSV";
             this.miExportToCSV.Click += new System.EventHandler(this.miExportToCSV_Click);
             // 
             // toolStripMenuItem4
             // 
             this.toolStripMenuItem4.Name = "toolStripMenuItem4";
-            this.toolStripMenuItem4.Size = new System.Drawing.Size(146, 6);
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(165, 6);
             // 
             // miShowFields
             // 
             this.miShowFields.Name = "miShowFields";
-            this.miShowFields.Size = new System.Drawing.Size(149, 22);
+            this.miShowFields.Size = new System.Drawing.Size(168, 22);
             this.miShowFields.Text = "Show Fie&lds";
             this.miShowFields.Click += new System.EventHandler(this.miShowFields_Click);
             // 
@@ -516,6 +516,13 @@
             this.miCheckForUpdates.Size = new System.Drawing.Size(188, 22);
             this.miCheckForUpdates.Text = "Check for &Updates";
             this.miCheckForUpdates.Click += new System.EventHandler(this.miCheckForUpdates_Click);
+            // 
+            // miReleaseNotes
+            // 
+            this.miReleaseNotes.Name = "miReleaseNotes";
+            this.miReleaseNotes.Size = new System.Drawing.Size(188, 22);
+            this.miReleaseNotes.Text = "Latest &Release Notes";
+            this.miReleaseNotes.Click += new System.EventHandler(this.miReleaseNotes_Click);
             // 
             // toolStripMenuItem1
             // 
@@ -796,6 +803,27 @@
             this.panelVideo.Size = new System.Drawing.Size(582, 570);
             this.panelVideo.TabIndex = 4;
             // 
+            // pictureBox
+            // 
+            this.pictureBox.AllowDrop = true;
+            this.pictureBox.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.pictureBox.CanvasSize = new System.Drawing.Size(60, 40);
+            this.pictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBox.Image = null;
+            this.pictureBox.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
+            this.pictureBox.Location = new System.Drawing.Point(0, 0);
+            this.pictureBox.Name = "pictureBox";
+            this.pictureBox.Size = new System.Drawing.Size(582, 503);
+            this.pictureBox.TabIndex = 2;
+            this.pictureBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragDrop);
+            this.pictureBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragEnter);
+            this.pictureBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseClick);
+            this.pictureBox.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDoubleClick);
+            this.pictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDown);
+            this.pictureBox.MouseLeave += new System.EventHandler(this.pictureBox_MouseLeave);
+            this.pictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseMove);
+            this.pictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseUp);
+            // 
             // pnlPlayControls
             // 
             this.pnlPlayControls.Controls.Add(this.pnlPlayButtons);
@@ -952,34 +980,6 @@
             // timerCommandArgs
             // 
             this.timerCommandArgs.Tick += new System.EventHandler(this.timerCommandArgs_Tick);
-            // 
-            // pictureBox
-            // 
-            this.pictureBox.AllowDrop = true;
-            this.pictureBox.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.pictureBox.CanvasSize = new System.Drawing.Size(60, 40);
-            this.pictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBox.Image = null;
-            this.pictureBox.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
-            this.pictureBox.Location = new System.Drawing.Point(0, 0);
-            this.pictureBox.Name = "pictureBox";
-            this.pictureBox.Size = new System.Drawing.Size(582, 503);
-            this.pictureBox.TabIndex = 2;
-            this.pictureBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragDrop);
-            this.pictureBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragEnter);
-            this.pictureBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseClick);
-            this.pictureBox.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDoubleClick);
-            this.pictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDown);
-            this.pictureBox.MouseLeave += new System.EventHandler(this.pictureBox_MouseLeave);
-            this.pictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseMove);
-            this.pictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseUp);
-            // 
-            // miReleaseNotes
-            // 
-            this.miReleaseNotes.Name = "miReleaseNotes";
-            this.miReleaseNotes.Size = new System.Drawing.Size(188, 22);
-            this.miReleaseNotes.Text = "Latest &Release Notes";
-            this.miReleaseNotes.Click += new System.EventHandler(this.miReleaseNotes_Click);
             // 
             // frmMain
             // 
