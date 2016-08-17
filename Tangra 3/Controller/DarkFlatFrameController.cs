@@ -56,6 +56,7 @@ namespace Tangra.Controller
 
 				bool loaded = FITSHelper.LoadFloatingPointFitsFile(
 					fileName,
+                    null,
                     zeroOutNegativePixels,
 					out pixels,
 					out medianValue,

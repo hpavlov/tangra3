@@ -17,6 +17,7 @@ using Tangra.Model.Image;
 using Tangra.PInvoke;
 using nom.tam.fits;
 using nom.tam.util;
+using Tangra.Video.FITS;
 
 namespace Tangra.Helpers
 {
@@ -26,24 +27,24 @@ namespace Tangra.Helpers
 
         internal delegate void LoadFitsDataCallback<TData>(Array dataArray, int height, int width, double bzero, out TData[,] pixels, out TData medianValue, out Type pixelDataType, out bool hasNegPix);
 
-        public static bool LoadFloatingPointFitsFile(string fileName, bool zeroOutNegativePixels, out float[,] pixels, out float medianValue, out Type pixelDataType, out float exposureSeconds, out bool hasNegativePixels, CheckOpenedFitsFileCallback callback)
+        public static bool LoadFloatingPointFitsFile(string fileName, FITSTimeStampReader timeStampReader, bool zeroOutNegativePixels, out float[,] pixels, out float medianValue, out Type pixelDataType, out float exposureSeconds, out bool hasNegativePixels, CheckOpenedFitsFileCallback callback)
 		{
-            return LoadFitsFileInternal<float>(fileName, out pixels, out medianValue, out pixelDataType, out exposureSeconds, out hasNegativePixels, callback, (Array dataArray, int height, int width, double bzero, out float[,] ppx, out float median, out Type dataType, out bool hasNegPix) =>
+            return LoadFitsFileInternal<float>(fileName, timeStampReader, out pixels, out medianValue, out pixelDataType, out exposureSeconds, out hasNegativePixels, callback, (Array dataArray, int height, int width, double bzero, out float[,] ppx, out float median, out Type dataType, out bool hasNegPix) =>
 			{
                 ppx = LoadFloatImageData(dataArray, zeroOutNegativePixels, height, width, (float)bzero, out median, out dataType, out hasNegPix);
 			});
 		}
 
-        public static bool Load16BitFitsFile(string fileName, bool zeroOutNegativePixels, out uint[,] pixels, out uint medianValue, out Type pixelDataType, out bool hasNegativePixels, CheckOpenedFitsFileCallback callback)
+        public static bool Load16BitFitsFile(string fileName, FITSTimeStampReader timeStampReader, bool zeroOutNegativePixels, out uint[,] pixels, out uint medianValue, out Type pixelDataType, out bool hasNegativePixels, CheckOpenedFitsFileCallback callback)
 		{
 		    float exposureSeconds;
-            return LoadFitsFileInternal<uint>(fileName, out pixels, out medianValue, out pixelDataType, out exposureSeconds, out hasNegativePixels, callback, (Array dataArray, int height, int width, double bzero, out uint[,] ppx, out uint median, out Type dataType, out bool hasNegPix) =>
+            return LoadFitsFileInternal<uint>(fileName, timeStampReader, out pixels, out medianValue, out pixelDataType, out exposureSeconds, out hasNegativePixels, callback, (Array dataArray, int height, int width, double bzero, out uint[,] ppx, out uint median, out Type dataType, out bool hasNegPix) =>
 				{
                     ppx = Load16BitImageData(dataArray, zeroOutNegativePixels, height, width, (uint)bzero, out median, out dataType, out hasNegPix);
 				});
 		}
 
-        private static bool LoadFitsFileInternal<TData>(string fileName, out TData[,] pixels, out TData medianValue, out Type pixelDataType, out float frameExposure, out bool hasNegativePixels, CheckOpenedFitsFileCallback callback, LoadFitsDataCallback<TData> loadDataCallback)
+        private static bool LoadFitsFileInternal<TData>(string fileName, FITSTimeStampReader timeStampReader, out TData[,] pixels, out TData medianValue, out Type pixelDataType, out float frameExposure, out bool hasNegativePixels, CheckOpenedFitsFileCallback callback, LoadFitsDataCallback<TData> loadDataCallback)
 		{
 			Fits fitsFile = new Fits();
 
@@ -81,7 +82,7 @@ namespace Tangra.Helpers
                 double? fitsExposure = null;
                 try
                 {
-                    ParseExposure(imageHDU.Header, out isMidPoint, out fitsExposure);                    
+                    ParseExposure(imageHDU.Header, timeStampReader, out isMidPoint, out fitsExposure);
                 }
                 catch (Exception ex)
                 {
@@ -95,7 +96,15 @@ namespace Tangra.Helpers
 			}
 		}
 
-        public static DateTime? ParseExposure(Header header, out bool isMidPoint, out double? fitsExposure)
+	    public static DateTime? ParseExposure(Header header, FITSTimeStampReader timeStampReader, out bool isMidPoint, out double? fitsExposure)
+	    {
+	        if (timeStampReader == null)
+                return ParseExposureInternal(header, out isMidPoint, out fitsExposure);
+            else
+                return timeStampReader.ParseExposure(header, out isMidPoint, out fitsExposure);
+	    }
+
+	    private static DateTime? ParseExposureInternal(Header header, out bool isMidPoint, out double? fitsExposure)
         {
             // FITS Card definitions taken from here:
             // http://www.cyanogen.com/help/maximdl/FITS_File_Header_Definitions.htm
@@ -164,7 +173,7 @@ namespace Tangra.Helpers
 
 		private static Regex FITS_DATE_REGEX = new Regex("(?<DateStr>\\d\\d\\d\\d\\-\\d\\d\\-\\d\\dT\\d\\d:\\d\\d:\\d\\d(\\.\\d+)?)");
         public static void Load16BitFitsFile(
-            string fileName, bool zeroOutNegativePixels, out uint[] pixelsFlat, out int width, out int height, out int bpp, out DateTime? timestamp, 
+            string fileName, FITSTimeStampReader timeStampReader, bool zeroOutNegativePixels, out uint[] pixelsFlat, out int width, out int height, out int bpp, out DateTime? timestamp, 
             out double? exposure, out uint minPixelValue, out uint maxPixelValue, out bool hasNegativePixels)
 		{
 			int pixWidth = 0;
@@ -180,6 +189,7 @@ namespace Tangra.Helpers
 
 			Load16BitFitsFile(
 				fileName,
+                timeStampReader,
                 zeroOutNegativePixels,
 				out pixels,
 				out medianValue,
@@ -194,7 +204,7 @@ namespace Tangra.Helpers
 					try
 					{
 						bool isMidPoint = false;
-                        fitsTimestamp = ParseExposure(imageHDU.Header, out isMidPoint, out fitsExposure);
+                        fitsTimestamp = ParseExposure(imageHDU.Header, timeStampReader, out isMidPoint, out fitsExposure);
 					    
 					}
 					catch (Exception ex)

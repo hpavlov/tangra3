@@ -241,11 +241,11 @@ namespace Tangra.Controller
 						() =>
 						{
 							bool hasNegativePixels;
-							FITSFileSequenceStream stream = FITSFileSequenceStream.OpenFolder(fitsFiles, false, out hasNegativePixels);
+							FITSFileSequenceStream stream = FITSFileSequenceStream.OpenFolder(fitsFiles, frm.TimeStampReader, false, out hasNegativePixels);
 
 							if (hasNegativePixels && CheckWithUserAboutNegativePixels())
 							{
-								stream = FITSFileSequenceStream.OpenFolder(fitsFiles, true, out hasNegativePixels);
+                                stream = FITSFileSequenceStream.OpenFolder(fitsFiles, frm.TimeStampReader, true, out hasNegativePixels);
 							}
 
 							return stream;

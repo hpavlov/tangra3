@@ -106,6 +106,7 @@ namespace Tangra.Helpers
             {
                 if (owNotified)
                 {
+                    // TODO: Display additional information about the event such as: Asteroid, Times, ETC
                     MessageBox.Show(
                         parentForm,
                         "The light curve analysis results have been saved and made available for the OccultWatcher IOTA Reporting Add-in.\r\n\r\nRight click in OccultWatcher on the corresponding event and choose 'Report Observation'. Once you have submitted your report press 'Prefill Report File' to pre-populate your report with the information made available by Tangra.",

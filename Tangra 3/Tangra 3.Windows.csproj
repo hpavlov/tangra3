@@ -898,6 +898,13 @@
     <Compile Include="Video\AstroDigitalVideo\UI\AdvTagValuePair.cs" />
     <Compile Include="Video\BMPFileSequenceStream.cs" />
     <Compile Include="Video\FITS\FITSFileSequenceStream.cs" />
+    <Compile Include="Video\FITS\FITSTimeStampReader.cs" />
+    <Compile Include="Video\FITS\frmChooseTimeHeaders.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Video\FITS\frmChooseTimeHeaders.Designer.cs">
+      <DependentUpon>frmChooseTimeHeaders.cs</DependentUpon>
+    </Compile>
     <Compile Include="Video\FITS\frmSortFitsFiles.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -1257,6 +1264,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Video\AstroDigitalVideo\frmAdvViewer.resx">
       <DependentUpon>frmAdvViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Video\FITS\frmChooseTimeHeaders.resx">
+      <DependentUpon>frmChooseTimeHeaders.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Video\FITS\frmSortFitsFiles.resx">
       <DependentUpon>frmSortFitsFiles.cs</DependentUpon>

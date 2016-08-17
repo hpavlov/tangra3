@@ -639,6 +639,8 @@ namespace Tangra.Model.Config
 
 			public double Longitude = double.NaN;
 			public double Latitude = double.NaN;
+
+            public string[] CustomFITSTimeStampFormats = new string[0];
 		}
 
         [Serializable]
@@ -657,6 +659,7 @@ namespace Tangra.Model.Config
 
             public List<SameSizeApertureConfig> SameSizeApertures = new List<SameSizeApertureConfig>();
 	        public string FitsSeqenceLastFolderLocation;
+            public string FitsTimestampFormat;
 	        public string EmailAddressForErrorReporting;
 
 	        public double FocalLength;
