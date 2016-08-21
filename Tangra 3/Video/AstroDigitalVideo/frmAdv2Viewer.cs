@@ -848,13 +848,19 @@ namespace Tangra.Video.AstroDigitalVideo
                     return false;
                 }
 
+                if (MessageBox.Show(
+                    this,
+                    "Please note that the AVI export is doing resampling of the original video which will typically cause frames to duplicated and/or dropped.\r\n\r\nThis export function is meant to be used for video streaming (i.e. sharing the video for viewing on the Internet) and should not be used to convert the video to another format for measuring in another software. If you want to measure the video in another software either measure it directly as ADV/AAV file (if supported) or export it to a FITS file sequence from the main file menu and measure the FITS images.\r\n\r\nDo you wish to continue?",
+                    "Tangra",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning) != DialogResult.Yes)
+                    return false;
+
                 progressCallback(5, 0);
 
                 for (int i = firstFrame; i <= lastFrame; i++)
                 {
                     AdvIndexEntry frame = isCalibrationStream ? m_AdvFile.CalibrationIndex[i] : m_AdvFile.MainIndex[i];
-
-                    Bitmap currentBitmap;
 
                     AdvFrameInfo frameInfo = null;
                     uint[] pixels = null;
