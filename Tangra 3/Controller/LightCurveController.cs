@@ -115,7 +115,7 @@ namespace Tangra.Controller
 			{
 				if (MessageBox.Show(
 					m_MainFormView,
-					string.Format("Opening this file will require at least {0}Gb of free memory. Do you wish to continue?", (Math.Ceiling(expectedMemoryMbNeeded/512.0)/2).ToString("0.0")),
+					string.Format("It appears that you may be running in a low memory conditions and opening this file will require at least {0}Gb of free memory. Do you wish to continue?", (Math.Ceiling(expectedMemoryMbNeeded/512.0)/2).ToString("0.0")),
 					"Warning",
 					MessageBoxButtons.YesNo,
 					MessageBoxIcon.Warning) == DialogResult.No)

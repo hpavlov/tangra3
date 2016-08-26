@@ -123,10 +123,12 @@ namespace Tangra.VideoOperations.LightCurves
 				else if (bitPix == 14)
 					return new FourteenBitDisplayBitmapConverter();
 				else if (bitPix == 16)
-					return new SixteenBitDisplayBitmapConverter(maxPixelValue);				
+					return new SixteenBitDisplayBitmapConverter(maxPixelValue);
+                else
+                    throw new NotSupportedException(string.Format("Cannot create a display bitmap converter for {0} bit data", bitPix));
             }
 
-            throw new NotImplementedException();
+            throw new NotSupportedException(string.Format("Cannot create a display bitmap converter for '{0}'", config));
         }
     }
 }
