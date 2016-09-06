@@ -415,23 +415,32 @@ namespace Tangra.OCR
 
 	        if (bestBottomPosition - bestTopPosition < 10 || bestBottomPosition - bestTopPosition > 60)
 	        {
-				if (m_ForceErrorReport)
-				{
-					if (m_ForceErrorReport &&
-						!m_CalibrationImages.ContainsKey("LocateTimestampPositionOrg.bmp"))
-					{
-						uint[] pixelsOriginal = new uint[data.Length];
-						Array.Copy(data, pixelsOriginal, data.Length);
-						m_CalibrationImages.Add("LocateTimestampPositionOrg.bmp", pixelsOriginal);
+                bool tryBestTopAndLastLine = m_InitializationData.FrameHeight - bestTopPosition > 10 && m_InitializationData.FrameHeight - bestTopPosition < 60;
 
-						uint[] pixelsPreProcessed = new uint[data.Length];
-						Array.Copy(preProcessedPixels, pixelsPreProcessed, data.Length);
-						m_CalibrationImages.Add("LocateTimestampPositionProcessed.bmp", pixelsPreProcessed);
-					}					
-				}
+	            if (tryBestTopAndLastLine)
+	            {
+	                bestBottomPosition = m_InitializationData.FrameHeight - 1;
+	            }
+	            else
+	            {
+                    if (m_ForceErrorReport)
+                    {
+                        if (m_ForceErrorReport &&
+                            !m_CalibrationImages.ContainsKey("LocateTimestampPositionOrg.bmp"))
+                        {
+                            uint[] pixelsOriginal = new uint[data.Length];
+                            Array.Copy(data, pixelsOriginal, data.Length);
+                            m_CalibrationImages.Add("LocateTimestampPositionOrg.bmp", pixelsOriginal);
 
-				InitiazliationError = "Cannot locate the OSD timestamp on the frame.";
-		        return false;
+                            uint[] pixelsPreProcessed = new uint[data.Length];
+                            Array.Copy(preProcessedPixels, pixelsPreProcessed, data.Length);
+                            m_CalibrationImages.Add("LocateTimestampPositionProcessed.bmp", pixelsPreProcessed);
+                        }
+                    }
+
+                    InitiazliationError = "Cannot locate the OSD timestamp on the frame.";
+                    return false;
+	            }
 	        }
 
 	        m_FromLine = bestTopPosition - 10;

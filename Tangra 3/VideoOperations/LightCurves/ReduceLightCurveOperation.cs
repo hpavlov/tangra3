@@ -1400,6 +1400,9 @@ namespace Tangra.VideoOperations.LightCurves
 							{
 							    var processingMethod = new Func<int, bool>(delegate(int i)
 							    {
+							        if (m_TimestampOCR == null)
+							            return false;
+
                                     frame = m_VideoController.GetFrame(i);
                                     isCalibrated = m_TimestampOCR.ProcessCalibrationFrame(i, frame.Pixels);
 
@@ -1799,8 +1802,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 	    public DialogResult CheckPALOrNTSCRate()
 		{
-			if ((m_VideoController.VideoFrameRate < 24.0 && m_VideoController.VideoFrameRate > 26.0) ||
-				(m_VideoController.VideoFrameRate < 29.0 && m_VideoController.VideoFrameRate > 31.0))
+			if (m_VideoController.VideoFrameRate < 24.0 || m_VideoController.VideoFrameRate > 31.0)
 			{
 				MessageBox.Show(
 					string.Format("This video has an unusual frame rate of {0}. Tangra cannot run internal checks for the correctness of the entered frame times.", m_VideoController.VideoFrameRate.ToString("0.00")),
@@ -1811,9 +1813,10 @@ namespace Tangra.VideoOperations.LightCurves
 			double acceptedVideoFrameRate = m_VideoController.VideoFrameRate > 24.0 && m_VideoController.VideoFrameRate < 26.0
 												? 25.0 /* PAL */
 												: 29.97 /* NTSC */;
-			string videoType = m_VideoController.VideoFrameRate > 24.0 && m_VideoController.VideoFrameRate < 26.0
-								   ? "PAL"
-								   : "NTSC";
+
+	        string videoType = "Unusual Framerate";
+            if (m_VideoController.VideoFrameRate > 24.0 && m_VideoController.VideoFrameRate < 26.0) videoType = "PAL";
+            else if (m_VideoController.VideoFrameRate > 29.0 && m_VideoController.VideoFrameRate < 31.0) videoType = "NTSC";
 
 			TimeSpan ts = new TimeSpan(Math.Abs(m_EndFrameTime.Ticks - m_StartFrameTime.Ticks)/*Taking ABS to handle backwards measuring*/);
 			double videoTimeInSec = (m_EndTimeFrame - m_StartTimeFrame) / acceptedVideoFrameRate;
