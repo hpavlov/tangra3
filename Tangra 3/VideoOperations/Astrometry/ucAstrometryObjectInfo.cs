@@ -24,6 +24,7 @@ using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.Model.Numerical;
 using Tangra.Model.VideoOperations;
+using Tangra.MotionFitting;
 using Tangra.StarCatalogues;
 using Tangra.VideoOperations.Astrometry.Engine;
 using Tangra.VideoOperations.Astrometry.MPCReport;
@@ -104,6 +105,8 @@ namespace Tangra.VideoOperations.Astrometry
 
 		private Bitmap m_RAImage;
 		private Bitmap m_DEImage;
+
+	    private FlyByMotionFitter m_FlyByMotionFitter = new FlyByMotionFitter();
 
 		public ucAstrometryObjectInfo()
 		{
@@ -571,20 +574,25 @@ namespace Tangra.VideoOperations.Astrometry
 						curr += (1 / 3600.0);
 					}
 
-					var meaVals = new MeasurementValues
+					var meaContext = new FlybyMeasurementContext
 					{
-						Context = m_MeasurementContext,
 						UserMidValue = m_UserRAMid,
 						UserMidFrame = m_UserFrame,
 						MaxStdDev = m_MeasurementContext.MaxStdDev/3600.0,
-						MinValue = m_MinRA,
-						IncludedPen = Pens.SkyBlue,
-						ExcludedPen = Pens.Tomato,
-						AveragePen = s_RAAveragePen,
                         FirstVideoFrame = m_VideoController.VideoFirstFrame,
 						MinFrameNo = minFrame,
 						MaxFrameNo = maxFrame
 					};
+
+				    var fittingContext = m_MeasurementContext.ToFittingContext();
+
+                    var plottingContext = new FlybyPlottingContext
+                    {
+                        MinValue = m_MinRA,
+                        IncludedPen = Pens.SkyBlue,
+                        ExcludedPen = Pens.Tomato,
+                        AveragePen = s_RAAveragePen,
+                    };
 		
 					#region Compute the RA or DE value at the middle of the interval
 
@@ -602,22 +610,23 @@ namespace Tangra.VideoOperations.Astrometry
 					switch (m_MeasurementContext.MovementExpectation)
 					{
 						case MovementExpectation.Slow:
-							retVal = FitAndPlotSlowMotion(
-										m_AllMeasurements, meaVals, processingValueCallback,
-										g, xScale, yScale, m_RAImage.Width);
+                            retVal = m_FlyByMotionFitter.FitAndPlotSlowMotion(
+										m_AllMeasurements, meaContext, processingValueCallback,
+                                        g, plottingContext, xScale, yScale, m_RAImage.Width);
 							break;
 
 						case MovementExpectation.SlowFlyby:
-							retVal = FitAndPlotSlowFlyby(
-										m_AllMeasurements, meaVals, processingValueCallback,
-										g, xScale, yScale, m_RAImage.Width, m_RAImage.Height);
-
+					        double motionRate;
+							retVal = m_FlyByMotionFitter.FitAndPlotSlowFlyby(
+                                        m_AllMeasurements, meaContext, fittingContext, FittingValue.RA, (frameId) => m_VideoController.GetFrameStateData(frameId),
+                                        g, plottingContext, xScale, yScale, m_RAImage.Width, m_RAImage.Height, out motionRate);
+					        m_MotionRate = motionRate;
 							break;
 
 						case MovementExpectation.FastFlyby:
-							retVal = FitAndPlotFastFlyby(
-										m_AllMeasurements, meaVals, processingValueCallback,
-										g, xScale, yScale, m_RAImage.Width, m_RAImage.Height);
+                            retVal = m_FlyByMotionFitter.FitAndPlotFastFlyby(
+                                        m_AllMeasurements, meaContext, fittingContext, FittingValue.RA, (frameId) => m_VideoController.GetFrameStateData(frameId),
+                                        g, plottingContext, xScale, yScale, m_RAImage.Width, m_RAImage.Height, out motionRate);
 
 							break;
 
@@ -685,20 +694,25 @@ namespace Tangra.VideoOperations.Astrometry
 						curr += (1 / 3600.0);
 					}
 
-					var meaVals = new MeasurementValues 
-					{ 
-						Context = m_MeasurementContext,
+					var meaContext = new FlybyMeasurementContext 
+					{
 						UserMidValue = m_UserDEMid,
 						UserMidFrame = m_UserFrame,
 						MaxStdDev = m_MeasurementContext.MaxStdDev / 3600.0,
-						MinValue = m_MinDE,
-						IncludedPen = Pens.LimeGreen,
-						ExcludedPen = Pens.Tomato,
-						AveragePen = s_DEAveragePen,
                         FirstVideoFrame = m_VideoController.VideoFirstFrame,
 						MinFrameNo = minFrame,
 						MaxFrameNo = maxFrame
 					};
+
+				    var plottingContext = new FlybyPlottingContext()
+				    {
+				        MinValue = m_MinDE,
+				        IncludedPen = Pens.LimeGreen,
+				        ExcludedPen = Pens.Tomato,
+				        AveragePen = s_DEAveragePen,
+				    };
+
+				    var fittingContext = m_MeasurementContext.ToFittingContext();
 		
 					#region Compute the RA or DE value at the middle of the interval
 
@@ -715,23 +729,24 @@ namespace Tangra.VideoOperations.Astrometry
 					switch (m_MeasurementContext.MovementExpectation)
 					{
 						case MovementExpectation.Slow:
-							retVal = FitAndPlotSlowMotion(
-								m_AllMeasurements, meaVals, processingValueCallback, 
-								g, xScale, yScale, m_DEImage.Width);
+                            retVal = m_FlyByMotionFitter.FitAndPlotSlowMotion(
+								m_AllMeasurements, meaContext, processingValueCallback,
+                                g, plottingContext, xScale, yScale, m_DEImage.Width);
 
 							break;
 
 						case MovementExpectation.SlowFlyby:
-							retVal = FitAndPlotSlowFlyby(
-								m_AllMeasurements, meaVals, processingValueCallback,
-								g, xScale, yScale, m_DEImage.Width, m_RAImage.Height);
-
+					        double motionRate;
+                            retVal = m_FlyByMotionFitter.FitAndPlotSlowFlyby(
+                                m_AllMeasurements, meaContext, fittingContext, FittingValue.DEC, (frameId) => m_VideoController.GetFrameStateData(frameId),
+								g, plottingContext, xScale, yScale, m_DEImage.Width, m_RAImage.Height, out motionRate);
+					        m_MotionRate = motionRate;
 							break;
 
 						case MovementExpectation.FastFlyby:
-							retVal = FitAndPlotFastFlyby(
-								m_AllMeasurements, meaVals, processingValueCallback,
-								g, xScale, yScale, m_DEImage.Width, m_RAImage.Height);
+                            retVal = m_FlyByMotionFitter.FitAndPlotFastFlyby(
+                                m_AllMeasurements, meaContext, fittingContext, FittingValue.DEC, (frameId) => m_VideoController.GetFrameStateData(frameId),
+                                g, plottingContext, xScale, yScale, m_DEImage.Width, m_RAImage.Height, out motionRate);
 
 							break;
 						default:
@@ -767,391 +782,6 @@ namespace Tangra.VideoOperations.Astrometry
 
             return retVal;
 		}
-
-		#region RA/DE Computation
-
-		private class ProcessingValues
-		{
-			public double Value;
-			public double StdDev;
-		}
-
-		private class MeasurementValues
-		{
-			public MeasurementContext Context;
-			public double MaxStdDev;
-			public double UserMidValue;
-			public int UserMidFrame;
-			public double MinValue;
-			public Pen IncludedPen;
-			public Pen ExcludedPen;
-			public Pen AveragePen;
-		    public int FirstVideoFrame;
-			public int MinFrameNo;
-			public int MaxFrameNo;
-		}
-
-		private class ProcessingReturnValues
-		{
-			public int EarliestFrame;
-			public int LatestFrame;
-			public double FittedValue;
-			public DateTime FittedValueTime;
-			public bool IsVideoNormalPosition;
-		    public double FittedNormalFrame;
-		}
-
-		private delegate ProcessingValues GetProcessingValueCallback(SingleMultiFrameMeasurement measurement);
-
-
-		private static ProcessingReturnValues FitAndPlotSlowMotion(
-			Dictionary<int, SingleMultiFrameMeasurement> measurements,
-			MeasurementValues meaValues, 
-			GetProcessingValueCallback getValueCallback, 
-			Graphics g, float xScale, float yScale, int imageWidth)
-		{
-			// Compute median, use median based exclusion rules
-			// Report the median position for the time at the middle of the measured interval 
-			// Do not expect elongated image (no corrections from the exposure)
-			// May apply instrumental delay corrections for the frame time
-
-			var rv = new ProcessingReturnValues();
-
-			double sum = 0;
-			double userSum = 0;
-			double stdDevUserSum = 0;
-			int numFramesUser = 0;
-
-			double userMidFrom = meaValues.UserMidValue - meaValues.MaxStdDev;
-			double userMidTo = meaValues.UserMidValue + meaValues.MaxStdDev;
-
-			rv.EarliestFrame = int.MaxValue;
-			rv.LatestFrame = int.MinValue;
-
-			List<double> medianList = new List<double>();
-			foreach (SingleMultiFrameMeasurement measurement in measurements.Values)
-			{
-				float x = (measurement.FrameNo - meaValues.MinFrameNo) * xScale + 5;
-				ProcessingValues val = getValueCallback(measurement);
-				double valueFrom = val.Value - val.StdDev;
-				double valueTo = val.Value + val.StdDev;
-
-				float yFrom = (float)(valueFrom - meaValues.MinValue) * yScale + 5;
-				float yTo = (float)(valueTo - meaValues.MinValue) * yScale + 5;
-
-				sum += val.Value;
-
-				Pen mPen = meaValues.IncludedPen;
-				if (!double.IsNaN(meaValues.UserMidValue))
-				{
-					if ((valueFrom >= userMidFrom && valueFrom <= userMidTo) ||
-						(valueTo >= userMidFrom && valueTo <= userMidTo))
-					{
-						numFramesUser++;
-						userSum += val.Value;
-						medianList.Add(val.Value);
-						stdDevUserSum += val.StdDev * val.StdDev;
-						if (rv.EarliestFrame > measurement.FrameNo) rv.EarliestFrame = measurement.FrameNo;
-						if (rv.LatestFrame < measurement.FrameNo) rv.LatestFrame = measurement.FrameNo;
-					}
-					else
-						mPen = meaValues.ExcludedPen;
-				}
-
-
-				g.DrawLine(mPen, x, yFrom, x, yTo);
-				g.DrawLine(mPen, x - 1, yFrom, x + 1, yFrom);
-				g.DrawLine(mPen, x - 1, yTo, x + 1, yTo);
-			}
-
-			if (!double.IsNaN(meaValues.UserMidValue) && numFramesUser > 0)
-			{
-				double average = userSum / numFramesUser;
-				double err = Math.Sqrt(stdDevUserSum) / (numFramesUser - 1);
-				float yAve = (float)(average - meaValues.MinValue) * yScale + 5;
-				g.DrawLine(meaValues.AveragePen, 5, yAve - 1, imageWidth - 5, yAve - 1);
-				g.DrawLine(meaValues.AveragePen, 5, yAve, imageWidth - 5, yAve);
-				g.DrawLine(meaValues.AveragePen, 5, yAve + 1, imageWidth - 5, yAve + 1);
-
-				float yMin = (float)(userMidFrom - meaValues.MinValue) * yScale + 5;
-				float yMax = (float)(userMidTo - meaValues.MinValue) * yScale + 5;
-				g.DrawLine(meaValues.AveragePen, 5, yMin, imageWidth - 5, yMin);
-				g.DrawLine(meaValues.AveragePen, 5, yMax, imageWidth - 5, yMax);
-
-				double median = 0;
-				medianList.Sort();
-				if (numFramesUser % 2 == 1)
-					median = medianList[numFramesUser / 2];
-				else
-					median = (medianList[numFramesUser / 2] + medianList[(numFramesUser / 2) - 1]) / 2;
-
-				Trace.WriteLine(string.Format("{0}; Included: {1}; Average: {2}; Median: {3}", 
-					meaValues.UserMidValue.ToString("0.00000"),
-					numFramesUser, AstroConvert.ToStringValue(average, "+HH MM SS.T"), 
-					AstroConvert.ToStringValue(median, "+HH MM SS.T")));
-
-				rv.FittedValue = median;
-				rv.IsVideoNormalPosition = false;
-			}
-			else
-			{
-				double average = sum / measurements.Count;
-				float yAve = (float)(average - meaValues.MinValue) * yScale + 5;
-				g.DrawLine(Pens.WhiteSmoke, 5, yAve, imageWidth - 5, yAve);
-
-				rv.FittedValue = double.NaN;
-			}
-
-			return rv;
-		}
-
-		private static Brush s_NormalTimeIntervalHighlightBrush = new SolidBrush(Color.FromArgb(143, 142, 112));
-
-		private ProcessingReturnValues FitAndPlotSlowFlyby(
-			Dictionary<int, SingleMultiFrameMeasurement> measurements,
-			MeasurementValues meaValues,
-			GetProcessingValueCallback getValueCallback,
-			Graphics g, float xScale, float yScale, int imageWidth, int imageHight)
-		{
-			// Do linear regression, use residual based exclusion rules
-			// Report the interpolated position at the middle of the measured interva
-			// Don't forget to add the video normal position flag in the OBS file
-			// Expect elongated images and apply instrumental delay corrections
-
-			var rv = new ProcessingReturnValues();
-
-			int numFramesUser = 0;
-
-			rv.EarliestFrame = int.MaxValue;
-			rv.LatestFrame = int.MinValue;
-
-			Dictionary<int, List<double>> intervalValues = new Dictionary<int, List<double>>();
-			Dictionary<double, double> intervalMedians = new Dictionary<double, double>();
-
-			LinearRegression regression = null;
-			if (measurements.Values.Count > 1)
-			{
-				rv.EarliestFrame = measurements.Values.Select(m => m.FrameNo).Min();
-				rv.LatestFrame = measurements.Values.Select(m => m.FrameNo).Max();
-				
-				foreach (SingleMultiFrameMeasurement measurement in measurements.Values)
-				{
-					int integrationInterval = (measurement.FrameNo - rv.EarliestFrame) / meaValues.Context.IntegratedFramesCount;
-
-					List<double> intPoints;
-					if (!intervalValues.TryGetValue(integrationInterval, out intPoints))
-					{
-						intPoints = new List<double>();
-						intervalValues.Add(integrationInterval, intPoints);
-					}
-
-					ProcessingValues val = getValueCallback(measurement);
-					intPoints.Add(val.Value);
-				}
-
-				if (intervalValues.Count > 2)
-				{
-					regression = new LinearRegression();
-
-					foreach(int integratedFrameNo in intervalValues.Keys)
-					{
-						List<double> data = intervalValues[integratedFrameNo];
-						data.Sort();
-
-						double median = data.Count%2 == 1
-						        ? data[data.Count/2]
-						        : (data[data.Count/2] + data[(data.Count/2) - 1])/2.0;
-
-						// Assign the data point to the middle of the integration interval (using frame numbers)
-						//
-						// |--|--|--|--|--|--|--|--|
-						// |           |           |
-						//
-						// Because the time associated with the first frame is the middle of the frame, but the 
-						// time associated in the middle of the interval is the end of the field then the correction
-						// is (N / 2) - 0.5 frames
-
-						double dataPointFrameNo = 
-							rv.EarliestFrame + 
-							meaValues.Context.IntegratedFramesCount * integratedFrameNo 
-							+ (meaValues.Context.IntegratedFramesCount / 2)
-							- 0.5;
-
-						intervalMedians.Add(dataPointFrameNo, median);
-						regression.AddDataPoint(dataPointFrameNo, median);	
-					}
-
-					regression.Solve();
-
-					var firstPos = measurements[rv.EarliestFrame];
-					var lastPos = measurements[rv.LatestFrame];
-					double distanceArcSec = AngleUtility.Elongation(firstPos.RADeg, firstPos.DEDeg, lastPos.RADeg, lastPos.DEDeg) * 3600;
-					var firstTime = m_AstrometryController.GetTimeForFrame(meaValues.Context, rv.EarliestFrame, meaValues.FirstVideoFrame);
-                    var lastTime = m_AstrometryController.GetTimeForFrame(meaValues.Context, rv.LatestFrame, meaValues.FirstVideoFrame);
-					double elapsedSec = new TimeSpan(lastTime.UT.Ticks - firstTime.UT.Ticks).TotalSeconds;
-					m_MotionRate = distanceArcSec / elapsedSec;
-				}
-			}
-
-			AstrometryController.FrameTime resolvedTime = null;
-			if (int.MinValue != meaValues.UserMidFrame)
-			{
-				// Find the closest video 'normal' MPC time and compute the frame number for it
-				// Now compute the RA/DE for the computed 'normal' frame
-                resolvedTime = m_AstrometryController.GetTimeForFrame(meaValues.Context, meaValues.UserMidFrame, meaValues.FirstVideoFrame);
-
-				float xPosBeg = (float)(resolvedTime.ClosestNormalIntervalFirstFrameNo - rv.EarliestFrame) * xScale + 5;
-				float xPosEnd = (float)(resolvedTime.ClosestNormalIntervalLastFrameNo - rv.EarliestFrame) * xScale + 5;
-
-				g.FillRectangle(s_NormalTimeIntervalHighlightBrush, xPosBeg, 1, (xPosEnd - xPosBeg), imageHight - 2);
-			}
-
-			Dictionary<double, double> secondPassData = new Dictionary<double, double>();
-
-		    int minFrameId = measurements.Keys.Min();
-
-			foreach (SingleMultiFrameMeasurement measurement in measurements.Values)
-			{
-                float x = (measurement.FrameNo - minFrameId) * xScale + 5;
-
-				ProcessingValues val = getValueCallback(measurement);
-	
-				double valueFrom = val.Value - val.StdDev;
-				double valueTo = val.Value + val.StdDev;
-
-				float yFrom = (float)(valueFrom - meaValues.MinValue) * yScale + 5;
-				float yTo = (float)(valueTo - meaValues.MinValue) * yScale + 5;
-
-				g.DrawLine(meaValues.IncludedPen, x, yFrom, x, yTo);
-				g.DrawLine(meaValues.IncludedPen, x - 1, yFrom, x + 1, yFrom);
-				g.DrawLine(meaValues.IncludedPen, x - 1, yTo, x + 1, yTo);
-			}
-
-			foreach(double integrFrameNo in intervalMedians.Keys)
-			{
-				double val = intervalMedians[integrFrameNo];
-
-				double fittedValAtFrame = regression != null
-					? regression.ComputeY(integrFrameNo)
-					: double.NaN;
-
-				bool included = Math.Abs(fittedValAtFrame - val) < 3 * regression.StdDev;
-
-				if (meaValues.Context.IntegratedFramesCount > 1)
-				{
-					Pen mPen = included ? meaValues.IncludedPen : meaValues.ExcludedPen;
-
-					float x = (float)(integrFrameNo - minFrameId) * xScale + 5;
-					float y = (float)(val - meaValues.MinValue) * yScale + 5;
-
-					g.DrawEllipse(mPen, x - 3, y - 3, 6, 6);
-					g.DrawLine(mPen, x - 5, y - 5, x + 5, y + 5);
-					g.DrawLine(mPen, x + 5, y - 5, x - 5, y + 5);					
-				}
-
-				if (included) secondPassData.Add(integrFrameNo, val);
-			}
-
-			#region Second Pass
-			regression = null;
-			if (secondPassData.Count > 2)
-			{
-				regression = new LinearRegression();
-				foreach (double frameNo in secondPassData.Keys)
-				{
-					regression.AddDataPoint(frameNo, secondPassData[frameNo]);
-				}
-				regression.Solve();
-			}
-			#endregion
-
-			if (regression != null)
-			{
-                double leftFittedVal = regression.ComputeY(rv.EarliestFrame);
-                double rightFittedVal = regression.ComputeY(rv.LatestFrame);
-
-                double err = 3 * regression.StdDev;
-
-                float leftAve = (float)(leftFittedVal - meaValues.MinValue) * yScale + 5;
-                float rightAve = (float)(rightFittedVal - meaValues.MinValue) * yScale + 5;
-                float leftX = 5 + (float)(rv.EarliestFrame - rv.EarliestFrame) * xScale;
-                float rightX = 5 + (float)(rv.LatestFrame - rv.EarliestFrame) * xScale;
-
-                g.DrawLine(meaValues.AveragePen, leftX, leftAve - 1, rightX, rightAve - 1);
-                g.DrawLine(meaValues.AveragePen, leftX, leftAve, rightX, rightAve);
-                g.DrawLine(meaValues.AveragePen, leftX, leftAve + 1, rightX, rightAve + 1);                    
-
-				float leftMin = (float)(leftFittedVal - err - meaValues.MinValue) * yScale + 5;
-				float leftMax = (float)(leftFittedVal + err - meaValues.MinValue) * yScale + 5;
-				float rightMin = (float)(rightFittedVal - err - meaValues.MinValue) * yScale + 5;
-				float rightMax = (float)(rightFittedVal + err - meaValues.MinValue) * yScale + 5;
-
-                g.DrawLine(meaValues.AveragePen, leftX, leftMin, rightX, rightMin);
-                g.DrawLine(meaValues.AveragePen, leftX, leftMax, rightX, rightMax);
-
-				if (int.MinValue != meaValues.UserMidFrame && 
-					resolvedTime != null)
-				{
-					// Find the closest video 'normal' MPC time and compute the frame number for it
-					// Now compute the RA/DE for the computed 'normal' frame
-					
-					double fittedValueAtMiddleFrame = regression.ComputeY(resolvedTime.ClosestNormalFrameNo);
-
-					Trace.WriteLine(string.Format("{0}; Included: {1}; Normal Frame No: {2}; Fitted Val: {3}",
-						meaValues.UserMidValue.ToString("0.00000"),
-						numFramesUser, resolvedTime.ClosestNormalFrameNo,
-						AstroConvert.ToStringValue(fittedValueAtMiddleFrame, "+HH MM SS.T")));
-
-					// Report the interpolated position at the middle of the measured interval
-					// Don't forget to add the video normal position flag in the OBS file
-					// Expect elongated images and apply instrumental delay corrections
-
-					rv.FittedValue = fittedValueAtMiddleFrame;
-					rv.FittedValueTime = resolvedTime.ClosestNormalFrameTime;
-					rv.IsVideoNormalPosition = true;
-				    rv.FittedNormalFrame = resolvedTime.ClosestNormalFrameNo;
-
-					// Plot the frame
-					float xPos = (float)(resolvedTime.ClosestNormalFrameNo- rv.EarliestFrame) * xScale + 5;
-					float yPos = (float)(rv.FittedValue - meaValues.MinValue) * yScale + 5; 
-					g.DrawLine(Pens.Yellow, xPos, 1, xPos, imageHight - 2);
-					g.FillEllipse(Brushes.Yellow, xPos - 3, yPos - 3, 6, 6);
-					
-				}
-				else
-					rv.FittedValue = double.NaN;
-			}
-			else
-				rv.FittedValue = double.NaN;
-
-			return rv;
-		}
-
-		private ProcessingReturnValues FitAndPlotFastFlyby(Dictionary<int, SingleMultiFrameMeasurement> measurements,
-			MeasurementValues meaValues,
-			GetProcessingValueCallback getValueCallback,
-			Graphics g, float xScale, float yScale, int imageWidth, int imageHeight)
-		{
-			// Do linear regression, use residual based exclusion rules
-			// Two possible modes: (A) non trailed and (B) trailed images
-			// A) Non Trailed Images
-			// Report interpolated times for video normal position [How to use the MPC page for this?]
-			// Don't forget to add the video normal position flag in the OBS file
-			// Expect elongated images and apply instrumental delay corrections (in both integrated and non integrated modes)
-			// B) Trailed Images
-			// TODO: R&D Required
-
-			if (meaValues.Context.ObjectExposureQuality == ObjectExposureQuality.GoodSignal)
-			{
-				return FitAndPlotSlowFlyby(measurements, meaValues, getValueCallback, g, xScale, yScale, imageWidth, imageHeight);
-			}
-			else
-			{
-				MessageBox.Show("This operation is currently not suppored.");
-				return new ProcessingReturnValues();
-			}
-		}
-		#endregion
 
 		private void DisplayMeaMag()
         {

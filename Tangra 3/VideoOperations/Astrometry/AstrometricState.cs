@@ -14,6 +14,8 @@ using Tangra.ImageTools;
 using Tangra.Model.Astro;
 using Tangra.Model.Config;
 using Tangra.Model.Helpers;
+using Tangra.Model.Video;
+using Tangra.MotionFitting;
 using Tangra.StarCatalogues;
 using Tangra.VideoOperations.Astrometry.Engine;
 using Tangra.VideoOperations.LightCurves;
@@ -30,18 +32,6 @@ namespace Tangra.VideoOperations.Astrometry
 		FitFailed
 	}
 
-	internal class SingleMultiFrameMeasurement
-	{
-		internal double RADeg { get; set; }
-		internal double DEDeg { get; set; }
-        internal double Mag { get; set; }
-		internal double StdDevRAArcSec { get; set; }
-		internal double StdDevDEArcSec { get; set; }
-		internal LeastSquareFittedAstrometry AstrometricFit { get; set; }
-		internal PSFFit Gaussian { get; set; }
-		internal int FrameNo { get; set; }
-	}
-
 	internal class UserObjectContext
 	{
 		internal double RADeg { get; set; }
@@ -51,32 +41,6 @@ namespace Tangra.VideoOperations.Astrometry
 
 		internal PSFFit Gaussian { get; set; }
 		internal LeastSquareFittedAstrometry AstrometricFit { get; set; }
-	}
-
-	internal enum MovementExpectation
-	{
-		Slow,  // < 2"/min
-		SlowFlyby, // (2"/min, 200.0"/min)
-		FastFlyby // > 200"/min
-	}
-
-	internal enum ObjectExposureQuality
-	{
-		GoodSignal,
-		Underexposed,
-		Trailed
-	}
-
-	internal enum FrameTimeType
-	{
-		NonIntegratedFrameTime,
-		TimeStampOfFirstIntegratedFrame
-	}
-
-	internal enum InstrumentalDelayUnits
-	{
-		Frames,
-		Seconds
 	}
 
 	internal class MeasurementContext
@@ -115,6 +79,25 @@ namespace Tangra.VideoOperations.Astrometry
 		internal bool AavIntegration { get; set; }
 		internal VideoFileFormat VideoFileFormat { get; set; }
         internal string NativeVideoFormat { get; set; }
+
+	    internal FittingContext ToFittingContext()
+	    {
+	        return new FittingContext()
+	        {
+	            FirstFrameUtcTime = this.FirstFrameUtcTime,
+	            FirstFrameId = this.FirstFrameId,
+	            FrameRate = this.FrameRate,
+	            MovementExpectation = this.MovementExpectation,
+	            FrameTimeType = this.FrameTimeType,
+	            InstrumentalDelay = this.InstrumentalDelay,
+	            InstrumentalDelayUnits = this.InstrumentalDelayUnits,
+	            IntegratedFramesCount = this.IntegratedFramesCount,
+	            AavStackedMode = this.AavStackedMode,
+	            VideoFileFormat = this.VideoFileFormat,
+	            NativeVideoFormat = this.NativeVideoFormat,
+	            ObjectExposureQuality = this.ObjectExposureQuality
+	        };
+	    }
 	}
 
 	public class AstrometricState

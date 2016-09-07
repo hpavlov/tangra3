@@ -19,6 +19,8 @@ using Tangra.Model.Astro;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
 using Tangra.Model.Image;
+using Tangra.Model.Video;
+using Tangra.MotionFitting;
 using Tangra.SDK;
 using Tangra.StarCatalogues;
 using Tangra.Video;

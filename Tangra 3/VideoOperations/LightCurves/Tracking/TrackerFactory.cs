@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Tangra.Model.Config;
+using Tangra.Model.Video;
 using Tangra.VideoOperations.LightCurves;
 using Tangra.VideoOperations.LightCurves.Tracking;
 

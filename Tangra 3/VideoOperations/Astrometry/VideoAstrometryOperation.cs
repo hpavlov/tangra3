@@ -25,6 +25,7 @@ using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.Model.Video;
 using Tangra.Model.VideoOperations;
+using Tangra.MotionFitting;
 using Tangra.SDK;
 using Tangra.StarCatalogues;
 using Tangra.VideoOperations.Astrometry.Engine;
@@ -786,8 +787,8 @@ namespace Tangra.VideoOperations.Astrometry
                         measurement.DEDeg = m_AstrometryTracker.TrackedObject.DEDeg;
                         measurement.StdDevRAArcSec = m_AstrometricFit.StdDevRAArcSec;
                         measurement.StdDevDEArcSec = m_AstrometricFit.StdDevDEArcSec;
-                        measurement.AstrometricFit = m_AstrometricFit;
-                        measurement.Gaussian = m_AstrometryTracker.TrackedObject.PSFFit;
+                        //measurement.AstrometricFit = m_AstrometricFit;
+                        //measurement.Gaussian = m_AstrometryTracker.TrackedObject.PSFFit;
 
                         if (m_PhotometricFit != null)
                         {

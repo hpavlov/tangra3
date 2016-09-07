@@ -22,6 +22,7 @@ using Tangra.Model.Config;
 using Tangra.Model.Context;
 using Tangra.Model.Helpers;
 using Tangra.Model.Image;
+using Tangra.Model.Video;
 using Tangra.Model.VideoOperations;
 using Tangra.OCR;
 using Tangra.Video.SER;
@@ -30,16 +31,6 @@ using Tangra.VideoOperations.LightCurves.Tracking;
 
 namespace Tangra.VideoOperations.LightCurves
 {
-	public enum VideoFileFormat
-	{
-		Unknown = 0,
-		ADV,
-		AAV,
-		AVI,
-		SER,
-		FITS
-	}
-
     internal class LCFile
     {
         internal LCMeasurementHeader Header;

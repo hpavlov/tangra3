@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Model.Video;
 using Tangra.Video;
 using Tangra.VideoOperations.LightCurves.Helpers;
 

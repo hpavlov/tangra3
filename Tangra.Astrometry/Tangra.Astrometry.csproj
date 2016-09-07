@@ -187,6 +187,7 @@
     <Compile Include="Astrometry\Recognition\Logging\AstrometricFitDebugger.cs" />
     <Compile Include="Astrometry\Recognition\PyramidStarsDensityDistributor.cs" />
     <Compile Include="Astrometry\Recognition\ulonglong.cs" />
+    <Compile Include="MotionFitting\FlyByMotionFitter.cs" />
     <Compile Include="StarCatalogues\PPMXL\PPMXLCatalogue.cs" />
     <Compile Include="StarCatalogues\PPMXL\PPMXLEntry.cs" />
     <Compile Include="StarCatalogues\PPMXL\PPMXLFileIterator.cs" />
@@ -218,6 +219,7 @@
     <Compile Include="StarCatalogues\UCAC4\UCAC4Entry.cs" />
     <Compile Include="StarCatalogues\UCAC4\UCAC4FileIterator.cs" />
     <Compile Include="StarCatalogues\UCAC4\UCAC4Index.cs" />
+    <Compile Include="Tests\MotionFitting\TestFlyByMotionFitter.cs" />
     <Compile Include="Tests\TestPsfFit.cs" />
     <Compile Include="Tests\StarCatalogues\TestPPMXL.cs" />
     <Compile Include="Tests\StarCatalogues\TestUCAC3.cs" />
@@ -245,6 +247,9 @@
       <Project>{70bbc9a7-7dd9-4a4d-b972-6665c65875c6}</Project>
       <Name>Tangra.Model</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Tests\MotionFitting\TestCasesData\TestCase1.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

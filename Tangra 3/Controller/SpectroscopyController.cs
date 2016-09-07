@@ -12,6 +12,7 @@ using Tangra.Model.Astro;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
 using Tangra.Model.Helpers;
+using Tangra.Model.Video;
 using Tangra.VideoOperations.LightCurves;
 using Tangra.VideoOperations.Spectroscopy;
 using Tangra.VideoOperations.Spectroscopy.Helpers;
