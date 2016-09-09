@@ -85,7 +85,7 @@ namespace Tangra.VideoOperations.Astrometry
 	        return new FittingContext()
 	        {
 	            FirstFrameUtcTime = this.FirstFrameUtcTime,
-	            FirstFrameId = this.FirstFrameId,
+	            FirstFrameIdInIntegrationPeroid = this.FirstFrameId,
 	            FrameRate = this.FrameRate,
 	            MovementExpectation = this.MovementExpectation,
 	            FrameTimeType = this.FrameTimeType,

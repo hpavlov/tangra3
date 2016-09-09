@@ -43,7 +43,7 @@ namespace Tangra.MotionFitting
     public class FittingContext
     {
         public DateTime FirstFrameUtcTime { get; set; }
-        public int FirstFrameId { get; set; }
+        public int FirstFrameIdInIntegrationPeroid { get; set; }
         public double FrameRate { get; set; }
         public MovementExpectation MovementExpectation { get; set; }
         public FrameTimeType FrameTimeType { get; set; }
@@ -150,7 +150,7 @@ namespace Tangra.MotionFitting
                     rv.ResolvedFrameNo = frameNumber - firstVideoFrame;
                     rv.UT =
                         context.FirstFrameUtcTime.AddSeconds(
-                        ((frameNumber - context.FirstFrameId - instrumentalDelayFrames) / context.FrameRate) - instrumentalDelaySeconds);
+                        ((frameNumber - context.FirstFrameIdInIntegrationPeroid - instrumentalDelayFrames) / context.FrameRate) - instrumentalDelaySeconds);
                 }
                 else
                 {
@@ -183,7 +183,8 @@ namespace Tangra.MotionFitting
 
                 double deltaMiddleFrame = 0;
                 if (context.IntegratedFramesCount > 1)
-                    deltaMiddleFrame = (context.IntegratedFramesCount / 2) - 0.5;
+                    deltaMiddleFrame = (context.IntegratedFramesCount / 2) - 0.5 
+                        /* This 0.5 frame correction is only used for the 'visual' mapping between where the user clicked and what is the most 'logical' normal frame to where they clicked */;
 
                 // The instrumental delay is always from the timestamp of the first frame of the integrated interval
 
@@ -191,7 +192,7 @@ namespace Tangra.MotionFitting
 
                 rv.UT =
                     context.FirstFrameUtcTime.AddSeconds(
-                    ((integratedFrameNo - deltaMiddleFrame - context.FirstFrameId - instrumentalDelayFrames) / context.FrameRate) - instrumentalDelaySeconds);
+                    ((integratedFrameNo - deltaMiddleFrame - context.FirstFrameIdInIntegrationPeroid - instrumentalDelayFrames) / context.FrameRate) - instrumentalDelaySeconds);
             }
 
             if (context.MovementExpectation == MovementExpectation.Slow)
