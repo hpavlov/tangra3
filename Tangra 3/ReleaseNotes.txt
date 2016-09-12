@@ -5,6 +5,7 @@ Unreleased
 -------------------
 - Added release notes.
 - Implemented support for ADV format version 2.
+- Fixed a bias in flyby astrometry happening when measuring only 1 or 2 frames per integration interval.
 
 v3.5.8 (2016-07-01)
 -------------------

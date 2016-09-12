@@ -297,7 +297,7 @@ namespace Tangra.MotionFitting
 
                 foreach (SingleMultiFrameMeasurement measurement in measurements.Values)
                 {
-                    int integrationInterval = (measurement.FrameNo - rv.EarliestFrame) / fittingContext.IntegratedFramesCount;
+                    int integrationInterval = (measurement.FrameNo - fittingContext.FirstFrameIdInIntegrationPeroid) / fittingContext.IntegratedFramesCount;
 
                     List<double> intPoints;
                     if (!intervalValues.TryGetValue(integrationInterval, out intPoints))

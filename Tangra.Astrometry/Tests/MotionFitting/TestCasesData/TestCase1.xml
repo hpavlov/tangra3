@@ -2,24 +2,24 @@
 <FlybyTestCase>
   <TestCaseConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <Motion>SlowFlyby</Motion>
-    <RAHours>01 13 35.02</RAHours>
-    <DEDeg>-32 17 06.5</DEDeg>
-    <MPCTimeString>2010 10 17.482201</MPCTimeString>
-    <Rate>0.27</Rate>
+    <RAHours>01 13 35.03</RAHours>
+    <DEDeg>-32 17 06.6</DEDeg>
+    <MPCTimeString>2010 10 17.482208</MPCTimeString>
+    <Rate>0.16</Rate>
   </TestCaseConfiguration>
-  
+
   <FlybyMeasurementContext xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <MaxStdDev>0.0002878603907713096</MaxStdDev>
-    <UserMidValue>18.39589792902656</UserMidValue>
-    <UserMidFrame>11</UserMidFrame>
+    <UserMidValue>18.395981948570366</UserMidValue>
+    <UserMidFrame>25</UserMidFrame>
     <FirstVideoFrame>0</FirstVideoFrame>
-    <MinFrameNo>10</MinFrameNo>
-    <MaxFrameNo>98</MaxFrameNo>
+    <MinFrameNo>25</MinFrameNo>
+    <MaxFrameNo>74</MaxFrameNo>
   </FlybyMeasurementContext>
-  
+
   <FittingContext xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-    <FirstFrameUtcTime>2010-10-17T11:34:22.741</FirstFrameUtcTime>
-    <FirstFrameId>9</FirstFrameId>
+    <FirstFrameUtcTime>2010-10-17T11:34:23.381</FirstFrameUtcTime>
+    <FirstFrameIdInIntegrationPeroid>25</FirstFrameIdInIntegrationPeroid>
     <FrameRate>25</FrameRate>
     <MovementExpectation>SlowFlyby</MovementExpectation>
     <FrameTimeType>TimeStampOfFirstIntegratedFrame</FrameTimeType>
@@ -30,411 +30,507 @@
     <VideoFileFormat>AVI</VideoFileFormat>
     <ObjectExposureQuality>GoodSignal</ObjectExposureQuality>
   </FittingContext>
+
   <Mesurements>
 
-    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.39587277384242</RADeg>
-      <DEDeg>-32.285134011945907</DEDeg>
-      <Mag>12.026169218359796</Mag>
-      <StdDevRAArcSec>0.4742248229954576</StdDevRAArcSec>
-      <StdDevDEArcSec>0.23849614340573516</StdDevDEArcSec>
-      <FrameNo>10</FrameNo>
-    </SingleMultiFrameMeasurement>
 
     <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.396005213301624</RADeg>
-      <DEDeg>-32.285053929710223</DEDeg>
-      <Mag>11.829720489643114</Mag>
-      <StdDevRAArcSec>0.78494738857723578</StdDevRAArcSec>
-      <StdDevDEArcSec>0.4275359755784891</StdDevDEArcSec>
-      <FrameNo>12</FrameNo>
+      <RADeg>18.395947385751224</RADeg>
+      <DEDeg>-32.285144862995992</DEDeg>
+      <Mag>11.967181579427386</Mag>
+      <StdDevRAArcSec>0.51445405568013713</StdDevRAArcSec>
+      <StdDevDEArcSec>0.27770685093874381</StdDevDEArcSec>
+      <FrameNo>25</FrameNo>
     </SingleMultiFrameMeasurement>
 
-    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.395908406382908</RADeg>
-      <DEDeg>-32.285138492820927</DEDeg>
-      <Mag>11.973743274882498</Mag>
-      <StdDevRAArcSec>0.34765077459378696</StdDevRAArcSec>
-      <StdDevDEArcSec>0.23008562912951167</StdDevDEArcSec>
-      <FrameNo>14</FrameNo>
-    </SingleMultiFrameMeasurement>
 
     <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.395916312237844</RADeg>
-      <DEDeg>-32.285128723967276</DEDeg>
-      <Mag>11.817134968846666</Mag>
-      <StdDevRAArcSec>0.29162272282070839</StdDevRAArcSec>
-      <StdDevDEArcSec>0.24424779684069969</StdDevDEArcSec>
-      <FrameNo>16</FrameNo>
-    </SingleMultiFrameMeasurement>
-
-    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.3959054330227</RADeg>
-      <DEDeg>-32.285131512243304</DEDeg>
-      <Mag>11.656583356084198</Mag>
-      <StdDevRAArcSec>0.52811205333801781</StdDevRAArcSec>
-      <StdDevDEArcSec>0.51638356897521032</StdDevDEArcSec>
-      <FrameNo>18</FrameNo>
-    </SingleMultiFrameMeasurement>
-
-    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.39590630050904</RADeg>
-      <DEDeg>-32.285144184704144</DEDeg>
-      <Mag>11.896894703788409</Mag>
-      <StdDevRAArcSec>0.37157085231394615</StdDevRAArcSec>
-      <StdDevDEArcSec>0.20871983405604766</StdDevDEArcSec>
-      <FrameNo>20</FrameNo>
-    </SingleMultiFrameMeasurement>
-
-    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.396008361420279</RADeg>
-      <DEDeg>-32.285057722598239</DEDeg>
-      <Mag>11.728886031757545</Mag>
-      <StdDevRAArcSec>0.69098107147466969</StdDevRAArcSec>
-      <StdDevDEArcSec>0.47036741392209724</StdDevDEArcSec>
-      <FrameNo>22</FrameNo>
-    </SingleMultiFrameMeasurement>
-
-    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.395891474304918</RADeg>
-      <DEDeg>-32.285143218206017</DEDeg>
-      <Mag>11.910661248168744</Mag>
-      <StdDevRAArcSec>0.41482638084287027</StdDevRAArcSec>
-      <StdDevDEArcSec>0.23906095901919264</StdDevDEArcSec>
-      <FrameNo>24</FrameNo>
-    </SingleMultiFrameMeasurement>
-
-    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.39599986003104</RADeg>
-      <DEDeg>-32.285230701539476</DEDeg>
-      <Mag>12.22977624996679</Mag>
-      <StdDevRAArcSec>0.40497180030457258</StdDevRAArcSec>
-      <StdDevDEArcSec>0.34282965460957904</StdDevDEArcSec>
+      <RADeg>18.395966855034356</RADeg>
+      <DEDeg>-32.285159667372383</DEDeg>
+      <Mag>12.229095540644574</Mag>
+      <StdDevRAArcSec>0.40339138384739875</StdDevRAArcSec>
+      <StdDevDEArcSec>0.30695537995543082</StdDevDEArcSec>
       <FrameNo>26</FrameNo>
     </SingleMultiFrameMeasurement>
 
+
     <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.395955698242329</RADeg>
-      <DEDeg>-32.285232382895579</DEDeg>
-      <Mag>12.191011095393293</Mag>
-      <StdDevRAArcSec>0.35335551308336788</StdDevRAArcSec>
-      <StdDevDEArcSec>0.26972550570972403</StdDevDEArcSec>
+      <RADeg>18.395995623088531</RADeg>
+      <DEDeg>-32.285097976213954</DEDeg>
+      <Mag>12.306595434557115</Mag>
+      <StdDevRAArcSec>0.40379254592675096</StdDevRAArcSec>
+      <StdDevDEArcSec>0.56803909107685946</StdDevDEArcSec>
+      <FrameNo>27</FrameNo>
+    </SingleMultiFrameMeasurement>
+
+
+    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <RADeg>18.3959397477534</RADeg>
+      <DEDeg>-32.285167277340214</DEDeg>
+      <Mag>12.193549745701482</Mag>
+      <StdDevRAArcSec>0.33752769746027139</StdDevRAArcSec>
+      <StdDevDEArcSec>0.22067697698378905</StdDevDEArcSec>
       <FrameNo>28</FrameNo>
     </SingleMultiFrameMeasurement>
 
+
     <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.395947411945254</RADeg>
-      <DEDeg>-32.285257286392358</DEDeg>
-      <Mag>12.510979231343445</Mag>
-      <StdDevRAArcSec>0.40107468736290608</StdDevRAArcSec>
-      <StdDevDEArcSec>0.44724376087166551</StdDevDEArcSec>
+      <RADeg>18.395977402599573</RADeg>
+      <DEDeg>-32.285116041648436</DEDeg>
+      <Mag>11.695874508317466</Mag>
+      <StdDevRAArcSec>0.60492112648949625</StdDevRAArcSec>
+      <StdDevDEArcSec>0.31992065843355261</StdDevDEArcSec>
+      <FrameNo>29</FrameNo>
+    </SingleMultiFrameMeasurement>
+
+
+    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <RADeg>18.395957816028297</RADeg>
+      <DEDeg>-32.285144786316494</DEDeg>
+      <Mag>12.480398835151288</Mag>
+      <StdDevRAArcSec>0.38690922681868817</StdDevRAArcSec>
+      <StdDevDEArcSec>0.37531956284620038</StdDevDEArcSec>
       <FrameNo>30</FrameNo>
     </SingleMultiFrameMeasurement>
 
+
     <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.395972564967956</RADeg>
-      <DEDeg>-32.28520903713401</DEDeg>
-      <Mag>12.300212297883636</Mag>
-      <StdDevRAArcSec>0.3628111777713518</StdDevRAArcSec>
-      <StdDevDEArcSec>0.25504887922120373</StdDevDEArcSec>
+      <RADeg>18.395955891544098</RADeg>
+      <DEDeg>-32.285174584666159</DEDeg>
+      <Mag>12.200803462428189</Mag>
+      <StdDevRAArcSec>0.35596818906678035</StdDevRAArcSec>
+      <StdDevDEArcSec>0.2575459227279982</StdDevDEArcSec>
+      <FrameNo>31</FrameNo>
+    </SingleMultiFrameMeasurement>
+
+
+    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <RADeg>18.395959677018485</RADeg>
+      <DEDeg>-32.2851111062802</DEDeg>
+      <Mag>12.290308012839612</Mag>
+      <StdDevRAArcSec>0.35531018174307577</StdDevRAArcSec>
+      <StdDevDEArcSec>0.74925419697184836</StdDevDEArcSec>
       <FrameNo>32</FrameNo>
     </SingleMultiFrameMeasurement>
 
+
     <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.395954250525921</RADeg>
-      <DEDeg>-32.28528991905025</DEDeg>
-      <Mag>12.383272380992644</Mag>
-      <StdDevRAArcSec>0.37759069002123957</StdDevRAArcSec>
-      <StdDevDEArcSec>0.64440607292810037</StdDevDEArcSec>
+      <RADeg>18.395942687631695</RADeg>
+      <DEDeg>-32.28521584139704</DEDeg>
+      <Mag>12.18771992591401</Mag>
+      <StdDevRAArcSec>0.35982507814920017</StdDevRAArcSec>
+      <StdDevDEArcSec>0.23310534247191891</StdDevDEArcSec>
+      <FrameNo>33</FrameNo>
+    </SingleMultiFrameMeasurement>
+
+
+    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <RADeg>18.395953219049687</RADeg>
+      <DEDeg>-32.285155118183752</DEDeg>
+      <Mag>12.330892147170802</Mag>
+      <StdDevRAArcSec>0.536049638662163</StdDevRAArcSec>
+      <StdDevDEArcSec>0.54719303123551888</StdDevDEArcSec>
       <FrameNo>34</FrameNo>
     </SingleMultiFrameMeasurement>
 
+
     <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.395970325895359</RADeg>
-      <DEDeg>-32.285218565111627</DEDeg>
-      <Mag>12.027603258394814</Mag>
-      <StdDevRAArcSec>0.36356407192281892</StdDevRAArcSec>
-      <StdDevDEArcSec>0.25984445763317809</StdDevDEArcSec>
+      <RADeg>18.395961405672079</RADeg>
+      <DEDeg>-32.285152587225838</DEDeg>
+      <Mag>12.269275704806713</Mag>
+      <StdDevRAArcSec>0.30835681061243647</StdDevRAArcSec>
+      <StdDevDEArcSec>0.35757957595803719</StdDevDEArcSec>
+      <FrameNo>35</FrameNo>
+    </SingleMultiFrameMeasurement>
+
+
+    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <RADeg>18.395936505596374</RADeg>
+      <DEDeg>-32.285206359850811</DEDeg>
+      <Mag>12.036576145638248</Mag>
+      <StdDevRAArcSec>0.33010040588293715</StdDevRAArcSec>
+      <StdDevDEArcSec>0.24331199642834586</StdDevDEArcSec>
       <FrameNo>36</FrameNo>
     </SingleMultiFrameMeasurement>
 
+
     <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.395913300907498</RADeg>
-      <DEDeg>-32.285223236751214</DEDeg>
-      <Mag>12.12906094864336</Mag>
-      <StdDevRAArcSec>0.39405394980955033</StdDevRAArcSec>
-      <StdDevDEArcSec>0.387529019114141</StdDevDEArcSec>
+      <RADeg>18.395979225642083</RADeg>
+      <DEDeg>-32.285157670186059</DEDeg>
+      <Mag>12.299353399887128</Mag>
+      <StdDevRAArcSec>0.29109697062138651</StdDevRAArcSec>
+      <StdDevDEArcSec>0.37349114492893964</StdDevDEArcSec>
+      <FrameNo>37</FrameNo>
+    </SingleMultiFrameMeasurement>
+
+
+    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <RADeg>18.395933466452828</RADeg>
+      <DEDeg>-32.285174252143328</DEDeg>
+      <Mag>12.084575613600679</Mag>
+      <StdDevRAArcSec>0.53732417033770674</StdDevRAArcSec>
+      <StdDevDEArcSec>0.40699421491669074</StdDevDEArcSec>
       <FrameNo>38</FrameNo>
     </SingleMultiFrameMeasurement>
 
+
     <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.395981206183635</RADeg>
-      <DEDeg>-32.285199109097576</DEDeg>
-      <Mag>12.365337453160128</Mag>
-      <StdDevRAArcSec>0.39233066241102427</StdDevRAArcSec>
-      <StdDevDEArcSec>0.34251456841148076</StdDevDEArcSec>
+      <RADeg>18.395960063058272</RADeg>
+      <DEDeg>-32.285146620889485</DEDeg>
+      <Mag>12.173332184657788</Mag>
+      <StdDevRAArcSec>0.4702935113089502</StdDevRAArcSec>
+      <StdDevDEArcSec>0.31979341813580225</StdDevDEArcSec>
+      <FrameNo>39</FrameNo>
+    </SingleMultiFrameMeasurement>
+
+
+    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <RADeg>18.396004554881603</RADeg>
+      <DEDeg>-32.285203732284785</DEDeg>
+      <Mag>12.368894538251373</Mag>
+      <StdDevRAArcSec>0.376024286809767</StdDevRAArcSec>
+      <StdDevDEArcSec>0.36599497551263732</StdDevDEArcSec>
       <FrameNo>40</FrameNo>
     </SingleMultiFrameMeasurement>
 
+
     <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.395919641065202</RADeg>
-      <DEDeg>-32.285174550785477</DEDeg>
-      <Mag>12.17382215012708</Mag>
-      <StdDevRAArcSec>0.22653215686419365</StdDevRAArcSec>
-      <StdDevDEArcSec>0.23819373679202618</StdDevDEArcSec>
+      <RADeg>18.395899941792258</RADeg>
+      <DEDeg>-32.285146702693943</DEDeg>
+      <Mag>12.001566988625211</Mag>
+      <StdDevRAArcSec>0.29272374028244419</StdDevRAArcSec>
+      <StdDevDEArcSec>0.30713988405407633</StdDevDEArcSec>
+      <FrameNo>41</FrameNo>
+    </SingleMultiFrameMeasurement>
+
+
+    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <RADeg>18.395850860263995</RADeg>
+      <DEDeg>-32.285151722165217</DEDeg>
+      <Mag>12.153531868167338</Mag>
+      <StdDevRAArcSec>0.3539341657627964</StdDevRAArcSec>
+      <StdDevDEArcSec>0.27809636821247</StdDevDEArcSec>
       <FrameNo>42</FrameNo>
     </SingleMultiFrameMeasurement>
 
+
     <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.395927453057492</RADeg>
-      <DEDeg>-32.285210484607525</DEDeg>
-      <Mag>12.101105889302387</Mag>
-      <StdDevRAArcSec>0.21868955016225725</StdDevRAArcSec>
-      <StdDevDEArcSec>0.33881353207983134</StdDevDEArcSec>
+      <RADeg>18.395856515938306</RADeg>
+      <DEDeg>-32.2852063271707</DEDeg>
+      <Mag>11.974899118472079</Mag>
+      <StdDevRAArcSec>0.46244937608792747</StdDevRAArcSec>
+      <StdDevDEArcSec>0.30670676627593874</StdDevDEArcSec>
+      <FrameNo>43</FrameNo>
+    </SingleMultiFrameMeasurement>
+
+
+    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <RADeg>18.395850758087612</RADeg>
+      <DEDeg>-32.285242764549871</DEDeg>
+      <Mag>12.104046638899693</Mag>
+      <StdDevRAArcSec>0.47189126279691535</StdDevRAArcSec>
+      <StdDevDEArcSec>0.48243659412052325</StdDevDEArcSec>
       <FrameNo>44</FrameNo>
     </SingleMultiFrameMeasurement>
 
+
     <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.395941078371024</RADeg>
-      <DEDeg>-32.285202852736084</DEDeg>
-      <Mag>11.981007286165113</Mag>
-      <StdDevRAArcSec>0.2116694574392286</StdDevRAArcSec>
-      <StdDevDEArcSec>0.26859439415589037</StdDevDEArcSec>
+      <RADeg>18.395855533462523</RADeg>
+      <DEDeg>-32.28518235746278</DEDeg>
+      <Mag>12.034318791426548</Mag>
+      <StdDevRAArcSec>0.42157159124673244</StdDevRAArcSec>
+      <StdDevDEArcSec>0.27491189498113139</StdDevDEArcSec>
+      <FrameNo>45</FrameNo>
+    </SingleMultiFrameMeasurement>
+
+
+    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <RADeg>18.395841307548771</RADeg>
+      <DEDeg>-32.285224735994113</DEDeg>
+      <Mag>12.067740746008623</Mag>
+      <StdDevRAArcSec>0.44194998973665006</StdDevRAArcSec>
+      <StdDevDEArcSec>0.3774075422557468</StdDevDEArcSec>
       <FrameNo>46</FrameNo>
     </SingleMultiFrameMeasurement>
 
+
     <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.39592756346017</RADeg>
-      <DEDeg>-32.285207230124982</DEDeg>
-      <Mag>12.246065855259749</Mag>
-      <StdDevRAArcSec>0.25485750593424472</StdDevRAArcSec>
-      <StdDevDEArcSec>0.26753739174355973</StdDevDEArcSec>
+      <RADeg>18.395848334449997</RADeg>
+      <DEDeg>-32.285227804848077</DEDeg>
+      <Mag>11.974013338693363</Mag>
+      <StdDevRAArcSec>0.437068190994206</StdDevRAArcSec>
+      <StdDevDEArcSec>0.34498468287637724</StdDevDEArcSec>
+      <FrameNo>47</FrameNo>
+    </SingleMultiFrameMeasurement>
+
+
+    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <RADeg>18.395913022734387</RADeg>
+      <DEDeg>-32.285162522970069</DEDeg>
+      <Mag>12.16060465725465</Mag>
+      <StdDevRAArcSec>0.29653826778339631</StdDevRAArcSec>
+      <StdDevDEArcSec>0.55574905571988076</StdDevDEArcSec>
       <FrameNo>48</FrameNo>
     </SingleMultiFrameMeasurement>
 
+
     <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.395921615762195</RADeg>
-      <DEDeg>-32.285155142709314</DEDeg>
-      <Mag>12.144170274756037</Mag>
-      <StdDevRAArcSec>0.21681289248638866</StdDevRAArcSec>
-      <StdDevDEArcSec>0.23116040743710065</StdDevDEArcSec>
+      <RADeg>18.395843355741</RADeg>
+      <DEDeg>-32.285223237905747</DEDeg>
+      <Mag>12.005580878770592</Mag>
+      <StdDevRAArcSec>0.4088114372564472</StdDevRAArcSec>
+      <StdDevDEArcSec>0.39446376295432528</StdDevDEArcSec>
+      <FrameNo>49</FrameNo>
+    </SingleMultiFrameMeasurement>
+
+
+    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <RADeg>18.395810117705977</RADeg>
+      <DEDeg>-32.285170996247643</DEDeg>
+      <Mag>12.150390700923374</Mag>
+      <StdDevRAArcSec>0.47927743307463472</StdDevRAArcSec>
+      <StdDevDEArcSec>0.3317189612340955</StdDevDEArcSec>
       <FrameNo>50</FrameNo>
     </SingleMultiFrameMeasurement>
 
+
     <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.395866783498533</RADeg>
-      <DEDeg>-32.285180038473612</DEDeg>
-      <Mag>11.867380746698062</Mag>
-      <StdDevRAArcSec>0.42111532474419217</StdDevRAArcSec>
-      <StdDevDEArcSec>0.18007556642412861</StdDevDEArcSec>
+      <RADeg>18.39585005402289</RADeg>
+      <DEDeg>-32.285208621413041</DEDeg>
+      <Mag>12.058506811079989</Mag>
+      <StdDevRAArcSec>0.38910728072284534</StdDevRAArcSec>
+      <StdDevDEArcSec>0.37553191499484562</StdDevDEArcSec>
+      <FrameNo>51</FrameNo>
+    </SingleMultiFrameMeasurement>
+
+
+    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <RADeg>18.395839669368293</RADeg>
+      <DEDeg>-32.285187396398413</DEDeg>
+      <Mag>11.993818305070731</Mag>
+      <StdDevRAArcSec>0.43899527617329132</StdDevRAArcSec>
+      <StdDevDEArcSec>0.30211556008762375</StdDevDEArcSec>
       <FrameNo>52</FrameNo>
     </SingleMultiFrameMeasurement>
 
+
     <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.395928066177955</RADeg>
-      <DEDeg>-32.285185987700459</DEDeg>
-      <Mag>11.923254018623481</Mag>
-      <StdDevRAArcSec>0.23073644103862084</StdDevRAArcSec>
-      <StdDevDEArcSec>0.24906660791276655</StdDevDEArcSec>
+      <RADeg>18.395832395797392</RADeg>
+      <DEDeg>-32.285206007898061</DEDeg>
+      <Mag>12.123294491667986</Mag>
+      <StdDevRAArcSec>0.53162705754057382</StdDevRAArcSec>
+      <StdDevDEArcSec>0.30185114361510013</StdDevDEArcSec>
+      <FrameNo>53</FrameNo>
+    </SingleMultiFrameMeasurement>
+
+
+    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <RADeg>18.3958349313123</RADeg>
+      <DEDeg>-32.28522928144298</DEDeg>
+      <Mag>12.034010773173819</Mag>
+      <StdDevRAArcSec>0.42005009718902858</StdDevRAArcSec>
+      <StdDevDEArcSec>0.34109749115859378</StdDevDEArcSec>
       <FrameNo>54</FrameNo>
     </SingleMultiFrameMeasurement>
 
+
     <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.395930558069097</RADeg>
-      <DEDeg>-32.285147809232122</DEDeg>
-      <Mag>12.101266081442</Mag>
-      <StdDevRAArcSec>0.24908876798587948</StdDevRAArcSec>
-      <StdDevDEArcSec>0.26936232507169422</StdDevDEArcSec>
+      <RADeg>18.395815721118485</RADeg>
+      <DEDeg>-32.285196338509948</DEDeg>
+      <Mag>11.952912668041181</Mag>
+      <StdDevRAArcSec>0.59971445660577793</StdDevRAArcSec>
+      <StdDevDEArcSec>0.59052107855105673</StdDevDEArcSec>
+      <FrameNo>55</FrameNo>
+    </SingleMultiFrameMeasurement>
+
+
+    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <RADeg>18.395823869689668</RADeg>
+      <DEDeg>-32.28515315249787</DEDeg>
+      <Mag>12.090721304503132</Mag>
+      <StdDevRAArcSec>0.5008199721532649</StdDevRAArcSec>
+      <StdDevDEArcSec>0.25747941180479483</StdDevDEArcSec>
       <FrameNo>56</FrameNo>
     </SingleMultiFrameMeasurement>
 
+
     <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.395980232420889</RADeg>
-      <DEDeg>-32.285202340371136</DEDeg>
-      <Mag>12.266551839154207</Mag>
-      <StdDevRAArcSec>0.27548608007298808</StdDevRAArcSec>
-      <StdDevDEArcSec>0.25430521651503346</StdDevDEArcSec>
+      <RADeg>18.396041536913355</RADeg>
+      <DEDeg>-32.285226816343027</DEDeg>
+      <Mag>12.152611316065061</Mag>
+      <StdDevRAArcSec>0.23323059998740658</StdDevRAArcSec>
+      <StdDevDEArcSec>0.36843186961919733</StdDevDEArcSec>
+      <FrameNo>57</FrameNo>
+    </SingleMultiFrameMeasurement>
+
+
+    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <RADeg>18.395992514065483</RADeg>
+      <DEDeg>-32.285232227622977</DEDeg>
+      <Mag>12.189575744989709</Mag>
+      <StdDevRAArcSec>0.420363984498884</StdDevRAArcSec>
+      <StdDevDEArcSec>0.43060449315329385</StdDevDEArcSec>
       <FrameNo>58</FrameNo>
     </SingleMultiFrameMeasurement>
 
+
     <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.395963777857379</RADeg>
-      <DEDeg>-32.2851903539354</DEDeg>
-      <Mag>12.271359245310475</Mag>
-      <StdDevRAArcSec>0.34595513029964919</StdDevRAArcSec>
-      <StdDevDEArcSec>0.35217595284820974</StdDevDEArcSec>
+      <RADeg>18.396049869339553</RADeg>
+      <DEDeg>-32.285266953142177</DEDeg>
+      <Mag>12.038440923382204</Mag>
+      <StdDevRAArcSec>0.37948514214158169</StdDevRAArcSec>
+      <StdDevDEArcSec>0.581721936253571</StdDevDEArcSec>
+      <FrameNo>59</FrameNo>
+    </SingleMultiFrameMeasurement>
+
+
+    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <RADeg>18.396059387187943</RADeg>
+      <DEDeg>-32.285189865894537</DEDeg>
+      <Mag>12.181090276408334</Mag>
+      <StdDevRAArcSec>0.13161333527515973</StdDevRAArcSec>
+      <StdDevDEArcSec>0.35468331031998074</StdDevDEArcSec>
       <FrameNo>60</FrameNo>
     </SingleMultiFrameMeasurement>
 
+
     <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.39596398456484</RADeg>
-      <DEDeg>-32.28523176620746</DEDeg>
-      <Mag>12.082099495101737</Mag>
-      <StdDevRAArcSec>0.38741131745133178</StdDevRAArcSec>
-      <StdDevDEArcSec>0.42334295475455735</StdDevDEArcSec>
+      <RADeg>18.39601270563649</RADeg>
+      <DEDeg>-32.285202286145093</DEDeg>
+      <Mag>12.161942973632343</Mag>
+      <StdDevRAArcSec>0.31723239999499275</StdDevRAArcSec>
+      <StdDevDEArcSec>0.29249760840381062</StdDevDEArcSec>
+      <FrameNo>61</FrameNo>
+    </SingleMultiFrameMeasurement>
+
+
+    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <RADeg>18.395997049754605</RADeg>
+      <DEDeg>-32.285229688257871</DEDeg>
+      <Mag>12.077993252132675</Mag>
+      <StdDevRAArcSec>0.45155212498773195</StdDevRAArcSec>
+      <StdDevDEArcSec>0.470364213759276</StdDevDEArcSec>
       <FrameNo>62</FrameNo>
     </SingleMultiFrameMeasurement>
 
+
     <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.395964527260396</RADeg>
-      <DEDeg>-32.285220627102987</DEDeg>
-      <Mag>12.156433306892421</Mag>
-      <StdDevRAArcSec>0.326565124947243</StdDevRAArcSec>
-      <StdDevDEArcSec>0.37927116020551638</StdDevDEArcSec>
+      <RADeg>18.396026709041838</RADeg>
+      <DEDeg>-32.285189514995849</DEDeg>
+      <Mag>12.099862833970104</Mag>
+      <StdDevRAArcSec>0.27765616070755478</StdDevRAArcSec>
+      <StdDevDEArcSec>0.25562696366984072</StdDevDEArcSec>
+      <FrameNo>63</FrameNo>
+    </SingleMultiFrameMeasurement>
+
+
+    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <RADeg>18.396007843448814</RADeg>
+      <DEDeg>-32.285253691757248</DEDeg>
+      <Mag>12.141006065782833</Mag>
+      <StdDevRAArcSec>0.2955664446765639</StdDevRAArcSec>
+      <StdDevDEArcSec>0.40522389639241435</StdDevDEArcSec>
       <FrameNo>64</FrameNo>
     </SingleMultiFrameMeasurement>
 
+
     <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.396015051263937</RADeg>
-      <DEDeg>-32.285290300122035</DEDeg>
-      <Mag>12.010782080914359</Mag>
-      <StdDevRAArcSec>0.2958918050318175</StdDevRAArcSec>
-      <StdDevDEArcSec>0.603001677611477</StdDevDEArcSec>
+      <RADeg>18.395913353453732</RADeg>
+      <DEDeg>-32.285233125229745</DEDeg>
+      <Mag>12.200060886768689</Mag>
+      <StdDevRAArcSec>0.5952642862050801</StdDevRAArcSec>
+      <StdDevDEArcSec>0.32310907268286149</StdDevDEArcSec>
+      <FrameNo>65</FrameNo>
+    </SingleMultiFrameMeasurement>
+
+
+    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <RADeg>18.396037273861161</RADeg>
+      <DEDeg>-32.285295072422734</DEDeg>
+      <Mag>11.996576372765185</Mag>
+      <StdDevRAArcSec>0.42794318453756258</StdDevRAArcSec>
+      <StdDevDEArcSec>0.61509876710244649</StdDevDEArcSec>
       <FrameNo>66</FrameNo>
     </SingleMultiFrameMeasurement>
 
+
     <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.395978934017734</RADeg>
-      <DEDeg>-32.285260002185773</DEDeg>
-      <Mag>12.13239328018954</Mag>
-      <StdDevRAArcSec>0.37512032089918074</StdDevRAArcSec>
-      <StdDevDEArcSec>0.34260870878453187</StdDevDEArcSec>
+      <RADeg>18.396022022607486</RADeg>
+      <DEDeg>-32.285169808397946</DEDeg>
+      <Mag>12.167461520924602</Mag>
+      <StdDevRAArcSec>0.57461357314198314</StdDevRAArcSec>
+      <StdDevDEArcSec>0.39654317367254804</StdDevDEArcSec>
+      <FrameNo>67</FrameNo>
+    </SingleMultiFrameMeasurement>
+
+
+    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <RADeg>18.396028001937967</RADeg>
+      <DEDeg>-32.285267991162549</DEDeg>
+      <Mag>12.174524290342198</Mag>
+      <StdDevRAArcSec>0.2769173008148163</StdDevRAArcSec>
+      <StdDevDEArcSec>0.36916730301655548</StdDevDEArcSec>
       <FrameNo>68</FrameNo>
     </SingleMultiFrameMeasurement>
 
+
     <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.395950108483987</RADeg>
-      <DEDeg>-32.285163485249704</DEDeg>
-      <Mag>12.247571457456864</Mag>
-      <StdDevRAArcSec>0.40407125009743339</StdDevRAArcSec>
-      <StdDevDEArcSec>0.37867625534349048</StdDevDEArcSec>
+      <RADeg>18.3960142418924</RADeg>
+      <DEDeg>-32.285183852840525</DEDeg>
+      <Mag>12.070924617256104</Mag>
+      <StdDevRAArcSec>0.41266375848207165</StdDevRAArcSec>
+      <StdDevDEArcSec>0.38137200079480649</StdDevDEArcSec>
+      <FrameNo>69</FrameNo>
+    </SingleMultiFrameMeasurement>
+
+
+    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <RADeg>18.39602227578554</RADeg>
+      <DEDeg>-32.285209648360976</DEDeg>
+      <Mag>12.228381243786103</Mag>
+      <StdDevRAArcSec>0.27231923832666288</StdDevRAArcSec>
+      <StdDevDEArcSec>0.40177584633995311</StdDevDEArcSec>
       <FrameNo>70</FrameNo>
     </SingleMultiFrameMeasurement>
 
+
     <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.39595152389591</RADeg>
-      <DEDeg>-32.2851962769034</DEDeg>
-      <Mag>12.335234741754366</Mag>
-      <StdDevRAArcSec>0.39017241563584965</StdDevRAArcSec>
-      <StdDevDEArcSec>0.21503283803616713</StdDevDEArcSec>
+      <RADeg>18.39601274199169</RADeg>
+      <DEDeg>-32.285184338817309</DEDeg>
+      <Mag>12.044726275048483</Mag>
+      <StdDevRAArcSec>0.35723429981423943</StdDevRAArcSec>
+      <StdDevDEArcSec>0.30263220690903797</StdDevDEArcSec>
+      <FrameNo>71</FrameNo>
+    </SingleMultiFrameMeasurement>
+
+
+    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <RADeg>18.396000569154054</RADeg>
+      <DEDeg>-32.285216741748158</DEDeg>
+      <Mag>12.255205638241632</Mag>
+      <StdDevRAArcSec>0.38271376007682539</StdDevRAArcSec>
+      <StdDevDEArcSec>0.25185260530599712</StdDevDEArcSec>
       <FrameNo>72</FrameNo>
     </SingleMultiFrameMeasurement>
 
+
     <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.395906256956216</RADeg>
-      <DEDeg>-32.2851845577222</DEDeg>
-      <Mag>12.10651206933837</Mag>
-      <StdDevRAArcSec>0.41912680897767407</StdDevRAArcSec>
-      <StdDevDEArcSec>0.33379566614734679</StdDevDEArcSec>
+      <RADeg>18.39587041041381</RADeg>
+      <DEDeg>-32.285215323121896</DEDeg>
+      <Mag>12.098317464241196</Mag>
+      <StdDevRAArcSec>0.65974902047700468</StdDevRAArcSec>
+      <StdDevDEArcSec>0.505507412941889</StdDevDEArcSec>
+      <FrameNo>73</FrameNo>
+    </SingleMultiFrameMeasurement>
+
+
+    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <RADeg>18.395847690234035</RADeg>
+      <DEDeg>-32.285116983966667</DEDeg>
+      <Mag>12.135329196427199</Mag>
+      <StdDevRAArcSec>0.58731081742122426</StdDevRAArcSec>
+      <StdDevDEArcSec>0.46262318462520907</StdDevDEArcSec>
       <FrameNo>74</FrameNo>
-    </SingleMultiFrameMeasurement>
-
-    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.395897088932784</RADeg>
-      <DEDeg>-32.285230067290982</DEDeg>
-      <Mag>12.210838796956155</Mag>
-      <StdDevRAArcSec>0.41552615315709862</StdDevRAArcSec>
-      <StdDevDEArcSec>0.29965509518513889</StdDevDEArcSec>
-      <FrameNo>76</FrameNo>
-    </SingleMultiFrameMeasurement>
-
-    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.395918743589313</RADeg>
-      <DEDeg>-32.285153001548018</DEDeg>
-      <Mag>12.194281640807576</Mag>
-      <StdDevRAArcSec>0.40071911528739268</StdDevRAArcSec>
-      <StdDevDEArcSec>0.35349002143373304</StdDevDEArcSec>
-      <FrameNo>78</FrameNo>
-    </SingleMultiFrameMeasurement>
-
-    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.395905600562259</RADeg>
-      <DEDeg>-32.285213083261951</DEDeg>
-      <Mag>12.112838208783167</Mag>
-      <StdDevRAArcSec>0.40001572697385679</StdDevRAArcSec>
-      <StdDevDEArcSec>0.32709971740462734</StdDevDEArcSec>
-      <FrameNo>80</FrameNo>
-    </SingleMultiFrameMeasurement>
-
-    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.395903057417495</RADeg>
-      <DEDeg>-32.28518797565949</DEDeg>
-      <Mag>12.014598785486866</Mag>
-      <StdDevRAArcSec>0.48467067405686914</StdDevRAArcSec>
-      <StdDevDEArcSec>0.346646414352034</StdDevDEArcSec>
-      <FrameNo>82</FrameNo>
-    </SingleMultiFrameMeasurement>
-
-    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.395910352903083</RADeg>
-      <DEDeg>-32.285137673992132</DEDeg>
-      <Mag>12.044275757039237</Mag>
-      <StdDevRAArcSec>0.49752477690544239</StdDevRAArcSec>
-      <StdDevDEArcSec>0.35061111342008605</StdDevDEArcSec>
-      <FrameNo>84</FrameNo>
-    </SingleMultiFrameMeasurement>
-
-    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.395901806504952</RADeg>
-      <DEDeg>-32.285192756313862</DEDeg>
-      <Mag>12.091376429902569</Mag>
-      <StdDevRAArcSec>0.49498212658295021</StdDevRAArcSec>
-      <StdDevDEArcSec>0.307937940603383</StdDevDEArcSec>
-      <FrameNo>86</FrameNo>
-    </SingleMultiFrameMeasurement>
-
-    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.395898159421378</RADeg>
-      <DEDeg>-32.2851896858295</DEDeg>
-      <Mag>12.182919805334837</Mag>
-      <StdDevRAArcSec>0.417045280281576</StdDevRAArcSec>
-      <StdDevDEArcSec>0.34477391602459911</StdDevDEArcSec>
-      <FrameNo>88</FrameNo>
-    </SingleMultiFrameMeasurement>
-
-    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.39584503247729</RADeg>
-      <DEDeg>-32.285293545052546</DEDeg>
-      <Mag>12.383079030524726</Mag>
-      <StdDevRAArcSec>0.5560378180896236</StdDevRAArcSec>
-      <StdDevDEArcSec>0.35211413178876988</StdDevDEArcSec>
-      <FrameNo>90</FrameNo>
-    </SingleMultiFrameMeasurement>
-
-    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.395966706308339</RADeg>
-      <DEDeg>-32.285195154948561</DEDeg>
-      <Mag>12.378515630993384</Mag>
-      <StdDevRAArcSec>0.61522358304979974</StdDevRAArcSec>
-      <StdDevDEArcSec>0.27397785941044572</StdDevDEArcSec>
-      <FrameNo>92</FrameNo>
-    </SingleMultiFrameMeasurement>
-
-    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.395839133805222</RADeg>
-      <DEDeg>-32.28516568089303</DEDeg>
-      <Mag>12.282152652244651</Mag>
-      <StdDevRAArcSec>0.61064854132637747</StdDevRAArcSec>
-      <StdDevDEArcSec>0.25390278980509196</StdDevDEArcSec>
-      <FrameNo>94</FrameNo>
-    </SingleMultiFrameMeasurement>
-
-    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.395956626588571</RADeg>
-      <DEDeg>-32.285294298630134</DEDeg>
-      <Mag>12.190501770535633</Mag>
-      <StdDevRAArcSec>0.54195162792851326</StdDevRAArcSec>
-      <StdDevDEArcSec>0.46424187820521723</StdDevDEArcSec>
-      <FrameNo>96</FrameNo>
-    </SingleMultiFrameMeasurement>
-
-    <SingleMultiFrameMeasurement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <RADeg>18.395939861373083</RADeg>
-      <DEDeg>-32.285395645802424</DEDeg>
-      <Mag>12.360054399881779</Mag>
-      <StdDevRAArcSec>0.59911347640508583</StdDevRAArcSec>
-      <StdDevDEArcSec>0.7093628727755571</StdDevDEArcSec>
-      <FrameNo>98</FrameNo>
     </SingleMultiFrameMeasurement>
   </Mesurements>
 </FlybyTestCase>
