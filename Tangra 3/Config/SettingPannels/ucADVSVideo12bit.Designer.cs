@@ -43,8 +43,6 @@
             this.cbxAdvsOsdSystemInfo = new System.Windows.Forms.CheckBox();
             this.cbxAdvsOsdCameraInfo = new System.Windows.Forms.CheckBox();
             this.cbxAdvsOsdMessages = new System.Windows.Forms.CheckBox();
-            this.cbxAdvsOsdGamma = new System.Windows.Forms.CheckBox();
-            this.cbxAdvsOsdGain = new System.Windows.Forms.CheckBox();
             this.cbxAdvsOsdTimeStamp = new System.Windows.Forms.CheckBox();
             this.groupControl3 = new System.Windows.Forms.GroupBox();
             this.cbxAdvsPopupVideoCameraFrameId = new System.Windows.Forms.CheckBox();
@@ -57,6 +55,7 @@
             this.cbxAdvsPopupGamma = new System.Windows.Forms.CheckBox();
             this.cbxAdvsPopupGain = new System.Windows.Forms.CheckBox();
             this.cbxAdvsPopupTimeStamp = new System.Windows.Forms.CheckBox();
+            this.cbxAdvsOsdObjName = new System.Windows.Forms.CheckBox();
             this.groupControl1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudSaturation16bit)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudSaturation14bit)).BeginInit();
@@ -193,12 +192,11 @@
             // 
             // groupControl2
             // 
+            this.groupControl2.Controls.Add(this.cbxAdvsOsdObjName);
             this.groupControl2.Controls.Add(this.cbxAdvsOsdGeoLocation);
             this.groupControl2.Controls.Add(this.cbxAdvsOsdSystemInfo);
             this.groupControl2.Controls.Add(this.cbxAdvsOsdCameraInfo);
             this.groupControl2.Controls.Add(this.cbxAdvsOsdMessages);
-            this.groupControl2.Controls.Add(this.cbxAdvsOsdGamma);
-            this.groupControl2.Controls.Add(this.cbxAdvsOsdGain);
             this.groupControl2.Controls.Add(this.cbxAdvsOsdTimeStamp);
             this.groupControl2.Location = new System.Drawing.Point(3, 140);
             this.groupControl2.Name = "groupControl2";
@@ -209,7 +207,7 @@
             // 
             // cbxAdvsOsdGeoLocation
             // 
-            this.cbxAdvsOsdGeoLocation.Location = new System.Drawing.Point(14, 167);
+            this.cbxAdvsOsdGeoLocation.Location = new System.Drawing.Point(14, 117);
             this.cbxAdvsOsdGeoLocation.Name = "cbxAdvsOsdGeoLocation";
             this.cbxAdvsOsdGeoLocation.Size = new System.Drawing.Size(120, 19);
             this.cbxAdvsOsdGeoLocation.TabIndex = 50;
@@ -217,7 +215,7 @@
             // 
             // cbxAdvsOsdSystemInfo
             // 
-            this.cbxAdvsOsdSystemInfo.Location = new System.Drawing.Point(14, 145);
+            this.cbxAdvsOsdSystemInfo.Location = new System.Drawing.Point(14, 95);
             this.cbxAdvsOsdSystemInfo.Name = "cbxAdvsOsdSystemInfo";
             this.cbxAdvsOsdSystemInfo.Size = new System.Drawing.Size(120, 19);
             this.cbxAdvsOsdSystemInfo.TabIndex = 49;
@@ -225,7 +223,7 @@
             // 
             // cbxAdvsOsdCameraInfo
             // 
-            this.cbxAdvsOsdCameraInfo.Location = new System.Drawing.Point(14, 123);
+            this.cbxAdvsOsdCameraInfo.Location = new System.Drawing.Point(14, 73);
             this.cbxAdvsOsdCameraInfo.Name = "cbxAdvsOsdCameraInfo";
             this.cbxAdvsOsdCameraInfo.Size = new System.Drawing.Size(120, 19);
             this.cbxAdvsOsdCameraInfo.TabIndex = 48;
@@ -233,27 +231,11 @@
             // 
             // cbxAdvsOsdMessages
             // 
-            this.cbxAdvsOsdMessages.Location = new System.Drawing.Point(14, 98);
+            this.cbxAdvsOsdMessages.Location = new System.Drawing.Point(14, 48);
             this.cbxAdvsOsdMessages.Name = "cbxAdvsOsdMessages";
             this.cbxAdvsOsdMessages.Size = new System.Drawing.Size(120, 19);
             this.cbxAdvsOsdMessages.TabIndex = 47;
             this.cbxAdvsOsdMessages.Text = "Messages";
-            // 
-            // cbxAdvsOsdGamma
-            // 
-            this.cbxAdvsOsdGamma.Location = new System.Drawing.Point(14, 74);
-            this.cbxAdvsOsdGamma.Name = "cbxAdvsOsdGamma";
-            this.cbxAdvsOsdGamma.Size = new System.Drawing.Size(120, 19);
-            this.cbxAdvsOsdGamma.TabIndex = 46;
-            this.cbxAdvsOsdGamma.Text = "Gamma";
-            // 
-            // cbxAdvsOsdGain
-            // 
-            this.cbxAdvsOsdGain.Location = new System.Drawing.Point(14, 50);
-            this.cbxAdvsOsdGain.Name = "cbxAdvsOsdGain";
-            this.cbxAdvsOsdGain.Size = new System.Drawing.Size(120, 19);
-            this.cbxAdvsOsdGain.TabIndex = 45;
-            this.cbxAdvsOsdGain.Text = "Gain";
             // 
             // cbxAdvsOsdTimeStamp
             // 
@@ -372,6 +354,14 @@
             this.cbxAdvsPopupTimeStamp.Text = "Central Exposure Time";
             this.cbxAdvsPopupTimeStamp.CheckedChanged += new System.EventHandler(this.OnAdvPopupSettingChanged);
             // 
+            // cbxAdvsOsdObjName
+            // 
+            this.cbxAdvsOsdObjName.Location = new System.Drawing.Point(14, 139);
+            this.cbxAdvsOsdObjName.Name = "cbxAdvsOsdObjName";
+            this.cbxAdvsOsdObjName.Size = new System.Drawing.Size(120, 19);
+            this.cbxAdvsOsdObjName.TabIndex = 51;
+            this.cbxAdvsOsdObjName.Text = "Observed Object";
+            // 
             // ucADVSVideo12bit
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -398,11 +388,9 @@
 		private System.Windows.Forms.GroupBox groupControl1;
 		private System.Windows.Forms.NumericUpDown nudSaturation12bit;
 		private System.Windows.Forms.Label label1;
-		private System.Windows.Forms.GroupBox groupControl2;
-		private System.Windows.Forms.CheckBox cbxAdvsOsdGain;
+        private System.Windows.Forms.GroupBox groupControl2;
 		private System.Windows.Forms.CheckBox cbxAdvsOsdTimeStamp;
-		private System.Windows.Forms.CheckBox cbxAdvsOsdMessages;
-		private System.Windows.Forms.CheckBox cbxAdvsOsdGamma;
+        private System.Windows.Forms.CheckBox cbxAdvsOsdMessages;
 		private System.Windows.Forms.GroupBox groupControl3;
 		private System.Windows.Forms.CheckBox cbxAdvsPopupGPSFix;
 		private System.Windows.Forms.CheckBox cbxAdvsPopupAlmanac;
@@ -424,6 +412,7 @@
 		private System.Windows.Forms.LinkLabel linkLabelADVS;
 		private System.Windows.Forms.NumericUpDown nudSaturation16bit;
 		private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.CheckBox cbxAdvsOsdObjName;
 
 	}
 }

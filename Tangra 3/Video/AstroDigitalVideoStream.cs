@@ -30,7 +30,7 @@ namespace Tangra.Video
 		{ }
 	}
 
-    public class AdvEquipmentInfo
+    public class AdvFileMetadataInfo
     {
         public string Recorder;
         public string AdvrVersion;
@@ -39,13 +39,14 @@ namespace Tangra.Video
         public string SensorInfo;
         public string Engine;
 	    public bool HasNTPTimeStamps;
+        public string ObjectName;
     }
 
 	public class AstroDigitalVideoStream : IFrameStream
 	{
-        public static IFrameStream OpenFile(string fileName, out AdvEquipmentInfo equipmentInfo, out GeoLocationInfo geoLocation)
+        public static IFrameStream OpenFile(string fileName, out AdvFileMetadataInfo fileMetadataInfo, out GeoLocationInfo geoLocation)
 		{
-            equipmentInfo = new AdvEquipmentInfo();
+            fileMetadataInfo = new AdvFileMetadataInfo();
 			geoLocation = new GeoLocationInfo();
 			try
 			{
@@ -53,13 +54,13 @@ namespace Tangra.Video
 
                 IFrameStream rv;
                 if (version == 1)
-                    rv = new AstroDigitalVideoStream(fileName, ref equipmentInfo, ref geoLocation);
+                    rv = new AstroDigitalVideoStream(fileName, ref fileMetadataInfo, ref geoLocation);
                 else
-                    rv = AstroDigitalVideoStreamV2.OpenFile(fileName, out equipmentInfo, out geoLocation);
+                    rv = AstroDigitalVideoStreamV2.OpenFile(fileName, out fileMetadataInfo, out geoLocation);
 
-                TangraContext.Current.RenderingEngine = equipmentInfo.Engine == "AAV" ? "AstroAnalogueVideo" : "AstroDigitalVideo";
+                TangraContext.Current.RenderingEngine = fileMetadataInfo.Engine == "AAV" ? "AstroAnalogueVideo" : "AstroDigitalVideo";
 
-				if (equipmentInfo.Engine == "AAV")
+				if (fileMetadataInfo.Engine == "AAV")
 					UsageStats.Instance.ProcessedAavFiles++;
 				else
                     UsageStats.Instance.ProcessedAdvFiles++;
@@ -103,9 +104,9 @@ namespace Tangra.Video
 
 	    private object m_SyncLock = new object();
 
-		private AstroDigitalVideoStream(string fileName, ref AdvEquipmentInfo equipmentInfo, ref GeoLocationInfo geoLocation)
+		private AstroDigitalVideoStream(string fileName, ref AdvFileMetadataInfo fileMetadataInfo, ref GeoLocationInfo geoLocation)
 		{
-			CheckAdvFileFormat(fileName, ref equipmentInfo, ref geoLocation);
+			CheckAdvFileFormat(fileName, ref fileMetadataInfo, ref geoLocation);
 
 			m_FileName = fileName;
 			var fileInfo = new AdvFileInfo();
@@ -138,9 +139,9 @@ namespace Tangra.Video
 				m_AlmanacOffsetLastFrame = 0;
 			}
 
-		    m_Engine = equipmentInfo.Engine;
-			m_CameraModel = equipmentInfo.Camera;
-			m_UsesNtpTimestamps = equipmentInfo.HasNTPTimeStamps;
+		    m_Engine = fileMetadataInfo.Engine;
+			m_CameraModel = fileMetadataInfo.Camera;
+			m_UsesNtpTimestamps = fileMetadataInfo.HasNTPTimeStamps;
 
 			if (m_Engine == "AAV")
 			{
@@ -754,26 +755,28 @@ namespace Tangra.Video
 			get { return geoLocation; }
 		}
 
-        private void CheckAdvFileFormat(string fileName, ref AdvEquipmentInfo equipmentInfo, ref GeoLocationInfo geoLocation)
+        private void CheckAdvFileFormat(string fileName, ref AdvFileMetadataInfo fileMetadataInfo, ref GeoLocationInfo geoLocation)
 		{
 			AdvFile advFile = AdvFile.OpenFile(fileName);
 
 			CheckAdvFileFormatInternal(advFile);
 
-            equipmentInfo.Recorder = advFile.AdvFileTags["RECORDER"];
-            equipmentInfo.Camera = advFile.AdvFileTags["CAMERA-MODEL"];
-            equipmentInfo.Engine = advFile.AdvFileTags["FSTF-TYPE"];
+            fileMetadataInfo.Recorder = advFile.AdvFileTags["RECORDER"];
+            fileMetadataInfo.Camera = advFile.AdvFileTags["CAMERA-MODEL"];
+            fileMetadataInfo.Engine = advFile.AdvFileTags["FSTF-TYPE"];
 
-            engine = equipmentInfo.Engine;
+            engine = fileMetadataInfo.Engine;
 
             if (engine == "ADV")
             {
-				advFile.AdvFileTags.TryGetValue("ADVR-SOFTWARE-VERSION", out equipmentInfo.AdvrVersion);
-				if (string.IsNullOrWhiteSpace(equipmentInfo.AdvrVersion))
-					advFile.AdvFileTags.TryGetValue("RECORDER-SOFTWARE-VERSION", out equipmentInfo.AdvrVersion);
+				advFile.AdvFileTags.TryGetValue("ADVR-SOFTWARE-VERSION", out fileMetadataInfo.AdvrVersion);
+				if (string.IsNullOrWhiteSpace(fileMetadataInfo.AdvrVersion))
+					advFile.AdvFileTags.TryGetValue("RECORDER-SOFTWARE-VERSION", out fileMetadataInfo.AdvrVersion);
 
-				advFile.AdvFileTags.TryGetValue("HTCC-FIRMWARE-VERSION", out equipmentInfo.HtccFirmareVersion);
-                equipmentInfo.SensorInfo = advFile.AdvFileTags["CAMERA-SENSOR-INFO"];
+				advFile.AdvFileTags.TryGetValue("HTCC-FIRMWARE-VERSION", out fileMetadataInfo.HtccFirmareVersion);
+                fileMetadataInfo.SensorInfo = advFile.AdvFileTags["CAMERA-SENSOR-INFO"];
+
+                advFile.AdvFileTags.TryGetValue("OBJNAME", out fileMetadataInfo.ObjectName);
 
                 advFile.AdvFileTags.TryGetValue("LONGITUDE-WGS84", out geoLocation.Longitude);
                 advFile.AdvFileTags.TryGetValue("LATITUDE-WGS84", out geoLocation.Latitude);
@@ -796,8 +799,9 @@ namespace Tangra.Video
 	            if (advFile.AdvFileTags.TryGetValue("CAPHNTP-TIMING-CORRECTION", out sCorr) &&
 	                int.TryParse(sCorr, out iCorr))
 	            {
-					equipmentInfo.HasNTPTimeStamps = true;
+					fileMetadataInfo.HasNTPTimeStamps = true;
 	            }
+                advFile.AdvFileTags.TryGetValue("OBJECT", out fileMetadataInfo.ObjectName);
             }
 
             this.geoLocation = new GeoLocationInfo(geoLocation);

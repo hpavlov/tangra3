@@ -17,17 +17,17 @@ namespace Tangra.Video
 {
     public class AstroDigitalVideoStreamV2 : IFrameStream
     {
-        public static IFrameStream OpenFile(string fileName, out AdvEquipmentInfo equipmentInfo, out GeoLocationInfo geoLocation)
+        public static IFrameStream OpenFile(string fileName, out AdvFileMetadataInfo fileMetadataInfo, out GeoLocationInfo geoLocation)
         {
-            equipmentInfo = new AdvEquipmentInfo();
+            fileMetadataInfo = new AdvFileMetadataInfo();
             geoLocation = new GeoLocationInfo();
             try
             {
-                IFrameStream rv = new AstroDigitalVideoStreamV2(fileName, ref equipmentInfo, ref geoLocation);
+                IFrameStream rv = new AstroDigitalVideoStreamV2(fileName, ref fileMetadataInfo, ref geoLocation);
 
-                TangraContext.Current.RenderingEngine = equipmentInfo.Engine == "AAV" ? "AstroAnalogueVideo" : "AstroDigitalVideo";
+                TangraContext.Current.RenderingEngine = fileMetadataInfo.Engine == "AAV" ? "AstroAnalogueVideo" : "AstroDigitalVideo";
 
-                if (equipmentInfo.Engine == "AAV")
+                if (fileMetadataInfo.Engine == "AAV")
                     UsageStats.Instance.ProcessedAavFiles++;
                 else
                     UsageStats.Instance.ProcessedAdvFiles++;
@@ -57,9 +57,9 @@ namespace Tangra.Video
 
         private object m_SyncLock = new object();
 
-        private AstroDigitalVideoStreamV2(string fileName, ref AdvEquipmentInfo equipmentInfo, ref GeoLocationInfo geoLocation)
+        private AstroDigitalVideoStreamV2(string fileName, ref AdvFileMetadataInfo fileMetadataInfo, ref GeoLocationInfo geoLocation)
         {
-            //CheckAdvFileFormat(fileName, ref equipmentInfo, ref geoLocation);
+            //CheckAdvFileFormat(fileName, ref fileMetadataInfo, ref geoLocation);
 
             m_FileName = fileName;
             var fileInfo = new Adv2FileInfo();
@@ -77,6 +77,24 @@ namespace Tangra.Video
             m_FrameRate = 0;
 
             m_Engine = "ADV2";
+
+            fileMetadataInfo.Recorder = GetFileTag("RECORDER-SOFTWARE");
+            fileMetadataInfo.Camera = GetFileTag("CAMERA-MODEL");
+            fileMetadataInfo.Engine = GetFileTag("FSTF-TYPE");
+
+            fileMetadataInfo.AdvrVersion = GetFileTag("RECORDER-SOFTWARE-VERSION");
+            fileMetadataInfo.SensorInfo = GetFileTag("CAMERA-SENSOR-INFO");
+
+            fileMetadataInfo.ObjectName = GetFileTag("OBJNAME");
+        }
+
+        public string GetFileTag(string tagName)
+        {
+            byte[] tagValue = new byte[256 * 2];
+
+            TangraCore.ADV2GetFileTag(tagName, tagValue);
+
+            return AdvFrameInfo.GetStringFromBytes(tagValue);
         }
 
         public int Width

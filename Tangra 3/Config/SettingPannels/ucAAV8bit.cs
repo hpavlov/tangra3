@@ -42,6 +42,7 @@ namespace Tangra.Config.SettingPannels
 			cbxAdvsOsdMessages.Checked = TangraConfig.Settings.AAV.Overlay_AllMessages;
             cbxAdvsOsdCameraInfo.Checked = TangraConfig.Settings.AAV.Overlay_CameraInfo;
             cbxAdvsOsdSystemInfo.Checked = TangraConfig.Settings.AAV.Overlay_AdvsInfo;
+            cbxAdvsOsdObjectName.Checked = TangraConfig.Settings.AAV.Overlay_ObjectName;
 
 			cbxAdvsPopupTimeStamp.Checked = TangraConfig.Settings.AAV.Popup_Timestamp;
             cbxAdvsPopupExposure.Checked = TangraConfig.Settings.AAV.Popup_Exposure;
@@ -67,6 +68,7 @@ namespace Tangra.Config.SettingPannels
 			TangraConfig.Settings.AAV.Overlay_AllMessages = cbxAdvsOsdMessages.Checked;
             TangraConfig.Settings.AAV.Overlay_CameraInfo = cbxAdvsOsdCameraInfo.Checked;
             TangraConfig.Settings.AAV.Overlay_AdvsInfo = cbxAdvsOsdSystemInfo.Checked;
+            TangraConfig.Settings.AAV.Overlay_ObjectName = cbxAdvsOsdObjectName.Checked;
 
 			TangraConfig.Settings.AAV.Popup_Timestamp = cbxAdvsPopupTimeStamp.Checked;
             TangraConfig.Settings.AAV.Popup_Exposure = cbxAdvsPopupExposure.Checked;

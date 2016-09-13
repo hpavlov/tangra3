@@ -41,8 +41,7 @@ namespace Tangra.Config.SettingPannels
 			nudSaturation16bit.SetNUDValue((int)TangraConfig.Settings.Photometry.Saturation.Saturation16Bit);
 
 			cbxAdvsOsdTimeStamp.Checked = TangraConfig.Settings.ADVS.OverlayTimestamp;
-			cbxAdvsOsdGamma.Checked = TangraConfig.Settings.ADVS.OverlayGamma;
-			cbxAdvsOsdGain.Checked = TangraConfig.Settings.ADVS.OverlayGain;
+            cbxAdvsOsdObjName.Checked = TangraConfig.Settings.ADVS.OverlayObjectName;
 			cbxAdvsOsdMessages.Checked = TangraConfig.Settings.ADVS.OverlayAllMessages;
             cbxAdvsOsdCameraInfo.Checked = TangraConfig.Settings.ADVS.OverlayCameraInfo;
             cbxAdvsOsdSystemInfo.Checked = TangraConfig.Settings.ADVS.OverlayAdvsInfo;
@@ -67,8 +66,7 @@ namespace Tangra.Config.SettingPannels
 			TangraConfig.Settings.Photometry.Saturation.Saturation16Bit = (uint)nudSaturation16bit.Value;
 
         	TangraConfig.Settings.ADVS.OverlayTimestamp = cbxAdvsOsdTimeStamp.Checked;
-			TangraConfig.Settings.ADVS.OverlayGamma = cbxAdvsOsdGamma.Checked;
-			TangraConfig.Settings.ADVS.OverlayGain = cbxAdvsOsdGain.Checked;
+            TangraConfig.Settings.ADVS.OverlayObjectName = cbxAdvsOsdObjName.Checked;
 			TangraConfig.Settings.ADVS.OverlayAllMessages = cbxAdvsOsdMessages.Checked;
             TangraConfig.Settings.ADVS.OverlayCameraInfo = cbxAdvsOsdCameraInfo.Checked;
             TangraConfig.Settings.ADVS.OverlayAdvsInfo = cbxAdvsOsdSystemInfo.Checked;

@@ -16,6 +16,7 @@ namespace Tangra.Model.Config
 		public bool Overlay_AllMessages = true;
 		public bool Overlay_CameraInfo = true;
 		public bool Overlay_AdvsInfo = true;
+        public bool Overlay_ObjectName = true;
 
 		public bool Popup_Timestamp = false;
 		public bool Popup_Exposure = false;

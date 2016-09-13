@@ -305,13 +305,13 @@ namespace Tangra.Controller
                     {
                         if (fileExtension == ".adv" || fileExtension == ".aav")
                         {
-                            AdvEquipmentInfo equipmentInfo;
+                            AdvFileMetadataInfo fileMetadataInfo;
                             GeoLocationInfo geoLocation;
-                            frameStream = AstroDigitalVideoStream.OpenFile(fileName, out equipmentInfo, out geoLocation);
+                            frameStream = AstroDigitalVideoStream.OpenFile(fileName, out fileMetadataInfo, out geoLocation);
                             if (frameStream != null)
                             {
                                 TangraContext.Current.UsingADV = true;
-                                m_OverlayManager.InitAdvFile(equipmentInfo, geoLocation, frameStream.FirstFrame);
+                                m_OverlayManager.InitAdvFile(fileMetadataInfo, geoLocation, frameStream.FirstFrame);
                             }
                         }
                         else if (fileExtension == ".ser")

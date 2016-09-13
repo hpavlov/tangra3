@@ -13,12 +13,11 @@ namespace Tangra.Model.Config
 	{
 		public bool OverlayTimestamp = false;
 
-		public bool OverlayGain;
-		public bool OverlayGamma;
 		public bool OverlayAllMessages = true;
         public bool OverlayCameraInfo = true;
 	    public bool OverlayAdvsInfo = false;
 		public bool OverlayGeoLocation = true;
+	    public bool OverlayObjectName = true;
 
 		public bool PopupTimestamp = true;
 		public bool PopupExposure = true;
