@@ -762,8 +762,8 @@ Global
 		{5DD2E70B-5955-4CEB-987C-695853F026CD}.Release - Non Windows|x86.ActiveCfg = Release|Any CPU
 		{5DD2E70B-5955-4CEB-987C-695853F026CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5DD2E70B-5955-4CEB-987C-695853F026CD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5DD2E70B-5955-4CEB-987C-695853F026CD}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{5DD2E70B-5955-4CEB-987C-695853F026CD}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{5DD2E70B-5955-4CEB-987C-695853F026CD}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{5DD2E70B-5955-4CEB-987C-695853F026CD}.Release|Mixed Platforms.Build.0 = Release|x86
 		{5DD2E70B-5955-4CEB-987C-695853F026CD}.Release|Win32.ActiveCfg = Release|Any CPU
 		{5DD2E70B-5955-4CEB-987C-695853F026CD}.Release|x64.ActiveCfg = Release|Any CPU
 		{5DD2E70B-5955-4CEB-987C-695853F026CD}.Release|x86.ActiveCfg = Release|Any CPU

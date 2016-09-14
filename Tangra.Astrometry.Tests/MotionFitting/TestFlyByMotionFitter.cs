@@ -65,7 +65,7 @@ namespace Tangra.Tests.MotionFitting
             var rv = new TestCaseData();
 
             Assembly assembly = Assembly.GetExecutingAssembly();
-            using (Stream str = assembly.GetManifestResourceStream(string.Format("Tangra.Tests.MotionFitting.TestCasesData.TestCase{0}.xml", testCaseId)))
+            using (Stream str = assembly.GetManifestResourceStream(string.Format("Tangra.Astrometry.Tests.MotionFitting.TestCasesData.TestCase{0}.xml", testCaseId)))
             using (TextReader rdr = new StreamReader(str))
             {
                 string xmlStr = rdr.ReadToEnd();
