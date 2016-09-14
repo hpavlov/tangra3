@@ -2857,34 +2857,67 @@ namespace Tangra.Astrometry.Recognition
 								InitializePyramidMatching();
 							}
 						}
-					}
+                    }
 
-
-                    // Check how many of the considered stars, brighter than the detected limiting magnitude were note used in the solution
-				    int detectedStars = 0;
+                    #region Check how many of the considered stars, brighter than the detected limiting magnitude were not used in the solution
+                    int detectedStars = 0;
                     int consideredStars = 0;
+                    int missingStars = 0;
                     double checkMag = ImprovedSolutionIncludedMaxMag;
+				    
+                    double minDetectionCertaintyUsedInSolution = m_ImprovedSolution.FitInfo.AllStarPairs.Where(x => x.FitInfo.UsedInSolution).Min(x => x.DetectionCertainty);
+				    if (TangraConfig.Settings.Astrometry.DetectionLimit < minDetectionCertaintyUsedInSolution)
+				        minDetectionCertaintyUsedInSolution = TangraConfig.Settings.Astrometry.DetectionLimit;
+
 				    foreach (IStar catStar in ConsideredStars)
 				    {
-                        if (catStar.Mag < checkMag)
+                        double x, y;
+				        m_ImprovedSolution.GetImageCoordsFromRADE(catStar.RADeg, catStar.DEDeg, out x, out y);
+				        if (x > 0 && y > 0 && x < m_PlateConfig.ImageWidth && y < m_PlateConfig.ImageHeight)
 				        {
-                            double x, y;
-                            m_ImprovedSolution.GetImageCoordsFromRADE(catStar.RADeg, catStar.DEDeg, out x, out y);
-                            if (x > 0 && y > 0 && x < m_PlateConfig.ImageWidth && y < m_PlateConfig.ImageHeight)
-                            {
-                                consideredStars++;
-                                if (m_ImprovedSolution.FitInfo.AllStarPairs.FirstOrDefault(s => s.StarNo == catStar.StarNo) != null)
-                                    detectedStars++;
-                            }				            
-				        }				        
-				    }
-                    double detectedConsideredStarsPercentage = 1.0 * detectedStars/consideredStars;
-                    if (detectedConsideredStarsPercentage < 0.25 && detectedStars < 25)
-				    {
-				        return false;
-				    }
+				            if (catStar.Mag < checkMag)
+				            {
+				                if (m_StarMap.GetFeatureInRadius((int) x, (int) y, 2) == null)
+				                {
+                                    // Brighter star not in the solition. Is there actually a star there
+                                    PSFFit psfFit;
+                                    m_StarMap.GetPSFFit((int)x, (int)y, PSFFittingMethod.NonLinearFit, out psfFit);
 
-				    if (DebugResolvedStars != null)
+				                    if (psfFit != null && psfFit.IsSolved &&
+				                        psfFit.Certainty > minDetectionCertaintyUsedInSolution)
+				                    {
+				                        consideredStars++;
+				                    }
+				                    else
+				                        missingStars++;
+				                }
+                                else
+				                    consideredStars++;
+
+				                if (m_ImprovedSolution.FitInfo.AllStarPairs.FirstOrDefault(s => s.StarNo == catStar.StarNo) != null)
+				                    detectedStars++;
+				            }
+				        }
+				    }
+				    if (detectedStars < 25)
+				    {
+                        if (missingStars > detectedStars || missingStars > consideredStars / 2)
+				            return false;
+
+                        double detectedConsideredStarsPercentage = 1.0 * detectedStars/(consideredStars + missingStars);
+
+				        if (detectedConsideredStarsPercentage < 0.50 && consideredStars > 2 * detectedStars)
+				        {
+				            return false;
+				        }
+				        if (detectedConsideredStarsPercentage < 0.25 && consideredStars > 10)
+				        {
+				            return false;
+				        }
+                    }
+                    #endregion
+
+                    if (DebugResolvedStars != null)
 					{
 						DebugTripple tripple = m_DebugTripples.FirstOrDefault(t =>
 							(t.Id1 == i && t.Id2 == j && t.Id3 == k) ||
