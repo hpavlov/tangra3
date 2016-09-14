@@ -83,7 +83,7 @@ namespace Tangra.Tests.MotionFitting
                 foreach (XmlElement node in xmlDoc.DocumentElement["Mesurements"])
                 {
                     rv.Measurements.Add((SingleMultiFrameMeasurement)smfmSer.Deserialize(new StringReader(node.OuterXml)));
-                }                
+                }
             }
 
             return rv;
@@ -107,9 +107,14 @@ namespace Tangra.Tests.MotionFitting
                     FittingValue.RA,
                     null, null, null, 0, 0, 0, 0, out motionRate);
 
-                Assert.AreEqual(data.TestConfig.RA * 15.0, raFit.FittedValue, 0.1 / 3600);
+                Assert.AreEqual(data.TestConfig.RA * 15.0 * 3600, raFit.FittedValue * 3600, 0.1);
                 Assert.AreEqual(data.TestConfig.Rate, motionRate, 0.01);
-                Assert.AreEqual(data.TestConfig.Time.Ticks, raFit.FittedValueTime.Ticks, TimeSpan.FromDays(0.0000001).Ticks);
+
+                TimeSpan timeDiff = data.TestConfig.Time - raFit.FittedValueTime;
+                Assert.AreEqual(0, timeDiff.TotalMilliseconds, 0.5,
+                    string.Format("Normal Time Difference. Expected: {0:0.0000000}, Actual: {1:0.0000000}",
+                        GetFractionalDays(data.TestConfig.Time),
+                        GetFractionalDays(raFit.FittedValueTime)));
 
                 var deFit = fitter.FitAndPlotSlowFlyby(
                     data.Measurements.ToDictionary(x => x.FrameNo, y => y),
@@ -118,7 +123,91 @@ namespace Tangra.Tests.MotionFitting
                     FittingValue.DEC,
                     null, null, null, 0, 0, 0, 0, out motionRate);
 
-                Assert.AreEqual(data.TestConfig.DE, deFit.FittedValue, 0.1 / 3600);
+                Assert.AreEqual(data.TestConfig.DE * 3600, deFit.FittedValue * 3600, 0.1);
+
+                #region Derive motion rate, coordinates on the first frame and compute expected position at returned normal time
+                double ra0 = 0;
+                double de0 = 0;
+                int count = 0;
+                int frameIdFromIntPeriodOfMinFrame = (data.MeasurementContext.MinFrameNo - data.FittingContext.FirstFrameIdInIntegrationPeroid) % data.FittingContext.IntegratedFramesCount;
+                int lastFrameIdFromFirstIntPeriod = data.MeasurementContext.MinFrameNo - frameIdFromIntPeriodOfMinFrame + data.FittingContext.IntegratedFramesCount;
+                for (int i = 0; i < data.FittingContext.IntegratedFramesCount - frameIdFromIntPeriodOfMinFrame; i++)
+                {
+                    if (data.Measurements[i].FrameNo <= lastFrameIdFromFirstIntPeriod)
+                    {
+                        ra0 += data.Measurements[i].RADeg;
+                        de0 += data.Measurements[i].DEDeg;
+                        count++;
+                    }
+                }
+                // Use Mean rather than Median
+                ra0 /= count;
+                de0 /= count;
+                double ra1 = 0;
+                double de1 = 0;
+                int count1 = 0;
+                double ra2 = 0;
+                double de2 = 0;
+                int count2 = 0;
+                int? lastIntervalId = null;
+                int? secondLastIntervalId = null;
+                for (int i = data.Measurements.Count - 1; i >= 0; i--)
+                {
+                    int interval = (data.Measurements[i].FrameNo - data.FittingContext.FirstFrameIdInIntegrationPeroid) / data.FittingContext.IntegratedFramesCount;
+                    if (lastIntervalId == null || lastIntervalId.Value == interval)
+                    {
+                        ra1 += data.Measurements[i].RADeg;
+                        de1 += data.Measurements[i].DEDeg;
+                        lastIntervalId = interval;
+                        count1++;
+                    }
+                    else if (secondLastIntervalId == null || secondLastIntervalId.Value == interval)
+                    {
+                        ra2 += data.Measurements[i].RADeg;
+                        de2 += data.Measurements[i].DEDeg;
+                        secondLastIntervalId = interval;
+                        count2++;
+                    }
+                    else
+                        break;
+                }
+
+                if (lastIntervalId != null && secondLastIntervalId != null)
+                {
+                    ra1 /= count1;
+                    de1 /= count1;
+                    ra2 /= count2;
+                    de2 /= count2;
+                    int numIntervals = lastIntervalId.Value - (data.MeasurementContext.MinFrameNo - data.FittingContext.FirstFrameIdInIntegrationPeroid) / data.FittingContext.IntegratedFramesCount;
+                    if (count2 > count1)
+                    {
+                        ra1 = ra2;
+                        de1 = de2;
+                        numIntervals = secondLastIntervalId.Value - (data.MeasurementContext.MinFrameNo - data.FittingContext.FirstFrameIdInIntegrationPeroid) / data.FittingContext.IntegratedFramesCount;
+                    }
+                    double secondsDiff = numIntervals * data.FittingContext.IntegratedFramesCount * (1.0 / data.FittingContext.FrameRate);
+
+                    double raRateArcSecPerSec = (ra1 - ra0) * 3600 / secondsDiff;
+                    double deRateArcSecPerSec = (de1 - de0) * 3600 / secondsDiff;
+
+                    TimeSpan diffNormalMinusStartTime = raFit.FittedValueTime - data.FittingContext.FirstFrameUtcTime.AddSeconds(-1 * data.FittingContext.InstrumentalDelay);
+                    double raAtNormalTimeArcSec = ra0 * 3600 + raRateArcSecPerSec * diffNormalMinusStartTime.TotalSeconds;
+                    double deAtNormalTimeArcSec = de0 * 3600 + deRateArcSecPerSec * diffNormalMinusStartTime.TotalSeconds;
+
+                    double fittedRaArcSec = raFit.FittedValue * 3600;
+                    double fittedDecArcSec = deFit.FittedValue * 3600;
+
+                    Trace.WriteLine(string.Format("RA-Diff={0}\", DEC-Diff-{1}\"", Math.Abs(raAtNormalTimeArcSec - fittedRaArcSec), Math.Abs(deAtNormalTimeArcSec - fittedDecArcSec)));
+
+                    // TODO: Improve this to have more meaningful sigmas for asserting equal results
+
+                    double oneSigmaRA = Math.Sqrt(data.Measurements.Sum(x => x.StdDevRAArcSec * x.StdDevRAArcSec) / data.Measurements.Count);
+                    double oneSigmaDE = Math.Sqrt(data.Measurements.Sum(x => x.StdDevDEArcSec * x.StdDevDEArcSec) / data.Measurements.Count);
+
+                    Assert.AreEqual(raAtNormalTimeArcSec, fittedRaArcSec, oneSigmaRA);
+                    Assert.AreEqual(deAtNormalTimeArcSec, fittedDecArcSec, oneSigmaDE);
+                }
+                #endregion
             }
         }
 
@@ -144,9 +233,19 @@ namespace Tangra.Tests.MotionFitting
         [TestCase(16, 16, 25.0, 0.35, false, 13)]
         [TestCase(16, 16, 25.0, 0.35, false, 14)]
         [TestCase(16, 16, 25.0, 0.35, false, 15)]
+        [TestCase(16, 16, 29.97, 0.29, false, null)]
+        [TestCase(16, 8, 29.97, 0.29, false, null)]
+        [TestCase(16, 4, 29.97, 0.29, false, null)]
+        [TestCase(16, 2, 29.97, 0.29, false, null)]
+        [TestCase(16, 1, 29.97, 0.29, false, null)]
+        [TestCase(2, 2, 25.0, 0.07, false, null)]
+        [TestCase(4, 4, 25.0, 0.11, false, null)]
+        [TestCase(8, 8, 25.0, 0.19, false, null)]
+        [TestCase(32, 32, 25.0, 0.67, false, null)]
+        [TestCase(64, 64, 25.0, 1.31, false, null)]
+        [TestCase(128, 128, 25.0, 2.59, false, null)]
         public void TestInstrumentalDelayInAVI(int integratedFrames, int measureFramesPerInterval, double frameRate, double instrumentalDelaySec, bool missFirstFrame, int? clickedFrameIndex)
         {
-            // Simulated x16 frame integration with WAT-120N+ (PAL) - 0.35 sec Instrumental Delay
             // Simulated 10 integrated frames with integration starting at frame 100
             // Simulated motion in RA with rate 2.34567s per minute
             // Simulated motion in DEC with rate 34.5678" per minute
