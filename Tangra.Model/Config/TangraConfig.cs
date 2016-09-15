@@ -302,6 +302,8 @@ namespace Tangra.Model.Config
 		public TuningSettings Tuning = new TuningSettings();
         public TraceLevelSettings TraceLevels = new TraceLevelSettings();
 
+        public RecentFITSFieldConfigSettings RecentFITSFieldConfig = new RecentFITSFieldConfigSettings();
+
         [Serializable]
 		public class SaturationSettings
 		{
@@ -2309,5 +2311,70 @@ namespace Tangra.Model.Config
 			GaussianSmoothingAndBinning,
 			LaGrangeInterpolation
 		}
+
+        public enum ExposureUnit
+        {
+            Seconds,
+            Milliseconds,
+            Microseconds,
+            Nanoseconds,
+            Minutes,
+            Hours,
+            Days
+        }
+
+        public enum TimeStampType
+        {
+            StartExposure,
+            MidExposure,
+            EndExposure
+        }
+
+        public class FITSFieldConfig
+        {
+            public string ExposureHeader;
+            public ExposureUnit ExposureUnit;
+            public string TimeStampHeader;
+            public string TimeStampFormat;
+            public TimeStampType TimeStampType;
+            public string TimeStamp2Header;
+            public string TimeStamp2Format;
+            public bool IsTimeStampAndExposure;
+            public string FileHash;
+        }
+
+	    public class RecentFITSFieldConfigSettings
+	    {
+	        public List<FITSFieldConfig> Items = new List<FITSFieldConfig>();
+
+	        public void Register(FITSFieldConfig config)
+	        {
+	            foreach (var item in Items)
+	            {
+	                if (IsSameConfig(item, config))
+	                {
+	                    item.FileHash = config.FileHash;
+	                    return;
+	                }
+	            }
+
+                while (Items.Count > 10) Items.RemoveAt(Items.Count - 1);
+
+	            Items.Add(config);
+	        }
+
+            private bool IsSameConfig(FITSFieldConfig item1, FITSFieldConfig item2)
+            {
+                return
+                    item1.IsTimeStampAndExposure == item2.IsTimeStampAndExposure &&
+                    string.Equals(item1.ExposureHeader, item2.ExposureHeader, StringComparison.Ordinal) &&
+                    string.Equals(item1.TimeStampFormat, item2.TimeStampFormat, StringComparison.Ordinal) &&
+                    string.Equals(item1.TimeStampHeader, item2.TimeStampHeader, StringComparison.Ordinal) &&
+                    string.Equals(item1.TimeStamp2Format, item2.TimeStamp2Format, StringComparison.Ordinal) &&
+                    string.Equals(item1.TimeStamp2Header, item2.TimeStamp2Header, StringComparison.Ordinal) &&
+                    item1.TimeStampType == item2.TimeStampType &&
+                    item1.ExposureUnit == item2.ExposureUnit;
+            }
+	    }
 	}
 }

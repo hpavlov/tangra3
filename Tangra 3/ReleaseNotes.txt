@@ -1,12 +1,13 @@
 ﻿Tangra3 Release Notes
 ---------------------
 
-Unreleased
+v3.6.0 Unreleased
 -------------------
 - Added release notes.
-- Implemented support for ADV format version 2.
+- Implemented support for ADV format version 2 (INCOMPLETE).
 - Fixed a bias in flyby astrometry happening when measuring only 1 or 2 frames per integration interval.
 - Observed object name recorded in AAV/ADV files is now displayed on the screen.
+- Support for working with FITS sequences with non-standard headers for timestamp and exposure.
 
 v3.5.8 (2016-07-01)
 -------------------

@@ -1074,6 +1074,7 @@ namespace Tangra
                         (Control.ModifierKeys == Keys.Control && m_VideoController.OpenBitmapFileSequence(frm.tbxFolderPath.Text)))
                     {
                         TangraConfig.Settings.LastUsed.FitsSeqenceLastFolderLocation = frm.tbxFolderPath.Text;
+                        TangraConfig.Settings.Save();
 
                         if (tsmiDynamic.Checked)
                         {

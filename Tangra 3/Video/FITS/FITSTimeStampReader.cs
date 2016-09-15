@@ -4,73 +4,26 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using nom.tam.fits;
+using Tangra.Model.Config;
 
 namespace Tangra.Video.FITS
 {
-    public enum ExposureUnit
-    {
-        Seconds,
-        Milliseconds,
-        Microseconds,
-        Nanoseconds,
-        Minutes,
-        Hours,
-        Days
-    }
-
-    public enum TimeStampType
-    {
-        StartExposure,
-        MidExposure,
-        EndExposure
-    }
-
     public class FITSTimeStampReader
     {
-        private string m_ExposureHeader;
-        private ExposureUnit m_ExposureUnit;
-        private string m_TimeStampHeader;
-        private string m_TimeStampFormat;
-        private TimeStampType m_TimeStampType;
-        private string m_TimeStamp2Header;
-        private string m_TimeStamp2Format;
+        private TangraConfig.FITSFieldConfig m_Config;
 
-        private bool m_IsStartEndTimeStampParsing = false;
-
-        public FITSTimeStampReader(string exposureHeader, ExposureUnit exposureUnit, string timeStampHeader, string timeStampFormat, TimeStampType timeStampType)
+        public FITSTimeStampReader(TangraConfig.FITSFieldConfig config)
         {
-            m_IsStartEndTimeStampParsing = false;
-
-            m_ExposureHeader = exposureHeader;
-            m_ExposureUnit = exposureUnit;
-            m_TimeStampHeader = timeStampHeader;
-            m_TimeStampFormat = timeStampFormat;
-            m_TimeStampType = timeStampType;
-        }
-
-        public FITSTimeStampReader(string startTimeStampHeader, string startTimeStampFormat, string endTimeStampHeader, string endTimeStampFormat)
-        {
-            m_IsStartEndTimeStampParsing = true;
-
-            m_TimeStampHeader = startTimeStampHeader;
-            m_TimeStampFormat = startTimeStampFormat;
-            m_TimeStampType = TimeStampType.StartExposure;
-            m_TimeStamp2Header = endTimeStampHeader;
-            m_TimeStamp2Format = endTimeStampFormat;
+            m_Config = config;
         }
 
         private DateTime? ParseExposureCase1(Header header, out bool isMidPoint, out double? fitsExposure)
         {
-            throw new NotImplementedException();
-        }
-
-        private DateTime? ParseExposureCase2(Header header, out bool isMidPoint, out double? fitsExposure)
-        {
             isMidPoint = true;
             fitsExposure = null;
 
-            var timeStampCard = header.FindCard(m_TimeStampHeader);
-            var exposureCard = header.FindCard(m_ExposureHeader);
+            var timeStampCard = header.FindCard(m_Config.TimeStampHeader);
+            var exposureCard = header.FindCard(m_Config.ExposureHeader);
             if (timeStampCard != null && exposureCard != null)
             {
                 double parsedExposure;
@@ -78,12 +31,12 @@ namespace Tangra.Video.FITS
                     fitsExposure = ConvertExposureInSeconds(parsedExposure);
 
                 DateTime parsedTimeStamp;
-                if (DateTime.TryParseExact(timeStampCard.Value, m_TimeStampFormat, CultureInfo.InvariantCulture,
+                if (DateTime.TryParseExact(timeStampCard.Value, m_Config.TimeStampFormat, CultureInfo.InvariantCulture,
                     DateTimeStyles.AssumeUniversal, out parsedTimeStamp))
                 {
-                    switch (m_TimeStampType)
+                    switch (m_Config.TimeStampType)
                     {
-                        case TimeStampType.StartExposure:
+                        case TangraConfig.TimeStampType.StartExposure:
                             if (fitsExposure != null)
                             {
                                 isMidPoint = true;
@@ -92,11 +45,11 @@ namespace Tangra.Video.FITS
                             else
                                 return parsedTimeStamp;
 
-                        case TimeStampType.MidExposure:
+                        case TangraConfig.TimeStampType.MidExposure:
                             isMidPoint = true;
                             return parsedTimeStamp;
 
-                        case TimeStampType.EndExposure:
+                        case TangraConfig.TimeStampType.EndExposure:
                             if (fitsExposure != null)
                             {
                                 isMidPoint = true;
@@ -111,32 +64,38 @@ namespace Tangra.Video.FITS
             return null;
         }
 
+        private DateTime? ParseExposureCase2(Header header, out bool isMidPoint, out double? fitsExposure)
+        {
+            throw new NotImplementedException();
+        }
+
         private double ConvertExposureInSeconds(double exposure)
         {
-            switch (m_ExposureUnit)
+            switch (m_Config.ExposureUnit)
             {
-                case ExposureUnit.Nanoseconds:
+                case TangraConfig.ExposureUnit.Nanoseconds:
                     return exposure * 1E-09;
-                case ExposureUnit.Microseconds:
+                case TangraConfig.ExposureUnit.Microseconds:
                     return exposure * 1E-06;
-                case ExposureUnit.Milliseconds:
+                case TangraConfig.ExposureUnit.Milliseconds:
                     return exposure * 1E-03;
-                case ExposureUnit.Seconds:
+                case TangraConfig.ExposureUnit.Seconds:
                     return exposure;
-                case ExposureUnit.Minutes:
+                case TangraConfig.ExposureUnit.Minutes:
                     return exposure * 60;
-                case ExposureUnit.Hours:
+                case TangraConfig.ExposureUnit.Hours:
                     return exposure * 3600;
-                case ExposureUnit.Days:
+                case TangraConfig.ExposureUnit.Days:
                     return exposure * 24 * 3600;
                 default:
-                    throw new ArgumentOutOfRangeException(string.Format("Unsupported FITS ExposureUnit: '{0}'.", m_ExposureUnit));
+                    throw new ArgumentOutOfRangeException(string.Format("Unsupported FITS ExposureUnit: '{0}'.", m_Config.ExposureUnit));
             }
         }
 
+
         public DateTime? ParseExposure(Header header, out bool isMidPoint, out double? fitsExposure)
         {
-            if (m_IsStartEndTimeStampParsing)
+            if (m_Config.IsTimeStampAndExposure)
                 return ParseExposureCase1(header, out isMidPoint, out fitsExposure);
             else
                 return ParseExposureCase2(header, out isMidPoint, out fitsExposure);

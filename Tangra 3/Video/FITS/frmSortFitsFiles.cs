@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
 using nom.tam.fits;
@@ -23,6 +24,24 @@ namespace Tangra.Video.FITS
 
         private int m_FilesWithoutExposure = 0;
         private int m_FilesWithExposure = 0;
+
+        private string m_OrderedFitsFileHash;
+
+        private string GetOrderedFitsFileHash()
+        {
+            if (m_OrderedFitsFileHash == null)
+            {
+                var hasher = new SHA1CryptoServiceProvider();
+                hasher.Initialize();
+                var orderedFilesByName = new List<string>(m_FitsFiles);
+                orderedFilesByName.Sort();
+                byte[] combinedFileNamesBytes = Encoding.UTF8.GetBytes(string.Join("|", orderedFilesByName));
+                var hash = hasher.ComputeHash(combinedFileNamesBytes, 0, combinedFileNamesBytes.Length);
+                m_OrderedFitsFileHash = Convert.ToBase64String(hash);
+            }
+
+            return m_OrderedFitsFileHash;
+        }
 
         public frmSortFitsFiles()
         {
@@ -96,7 +115,7 @@ namespace Tangra.Video.FITS
 
                     if (i == 0 && (!fitsExposure.HasValue || !timestamp.HasValue))
                     {
-                        var frm = new frmChooseTimeHeaders(hdr);
+                        var frm = new frmChooseTimeHeaders(hdr, GetOrderedFitsFileHash());
                         if (frm.ShowDialog(this) == DialogResult.OK)
                         {
                             TimeStampReader = frm.TimeStampReader;

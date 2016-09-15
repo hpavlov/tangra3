@@ -16,29 +16,36 @@ namespace Tangra.Video.FITS
     public partial class frmChooseTimeHeaders : Form
     {
         internal FITSTimeStampReader TimeStampReader;
+        private List<HeaderEntry> m_AllCards = new List<HeaderEntry>();
+ 
+        private string m_FilesHash;
 
         public frmChooseTimeHeaders()
         {
             InitializeComponent();
         }
 
-        public frmChooseTimeHeaders(Header hdr)
+        public frmChooseTimeHeaders(Header hdr, string filesHash)
             : this()
         {
+            m_FilesHash = filesHash;
+
             var cursor = hdr.GetCursor();
             while (cursor.MoveNext())
             {
                 var card = hdr.FindCard((string)cursor.Key);
                 if (card != null)
                 {
-                    cbxTimeStamp.Items.Add(new HeaderEntry(card));
-                    cbxTimeStamp2.Items.Add(new HeaderEntry(card));
-                    cbxExposure.Items.Add(new HeaderEntry(card));
+                    m_AllCards.Add(new HeaderEntry(card));                   
                 }
             }
 
+            cbxTimeStamp.Items.AddRange(m_AllCards.ToArray());
+            cbxTimeStamp2.Items.AddRange(m_AllCards.ToArray());
+            cbxExposure.Items.AddRange(m_AllCards.ToArray());
+
             cbxExposureUnits.Items.Clear();
-            cbxExposureUnits.Items.AddRange(Enum.GetNames(typeof(ExposureUnit)));
+            cbxExposureUnits.Items.AddRange(Enum.GetNames(typeof(TangraConfig.ExposureUnit)));
 
             cbxTimestampType.SelectedIndex = 0;
             cbxExposureUnits.SelectedIndex = 0;
@@ -72,6 +79,8 @@ namespace Tangra.Video.FITS
                 cbxTimeStampFormat.SelectedIndex = 0;
                 cbxTimeStamp2Format.SelectedIndex = 0;
             }
+
+            TryIdentifyPreviousConfigApplyingForCurrentFiles();
         }
 
         public class HeaderEntry
@@ -124,6 +133,19 @@ namespace Tangra.Video.FITS
 
         private bool m_TimeStampMappingValid = false;
 
+        private bool VerifyTimeStamp(string value, string format)
+        {
+            try
+            {
+                var parsedTimestamp = DateTime.ParseExact(value, format, CultureInfo.InvariantCulture);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         private void VerifyTimeStamp()
         {
             m_TimeStampMappingValid = false;
@@ -132,13 +154,7 @@ namespace Tangra.Video.FITS
             {
                 string value = entry.Card.Value;
                 string format = cbxTimeStampFormat.Text;
-                try
-                {
-                    var parsedTimestamp = DateTime.ParseExact(value, format, CultureInfo.InvariantCulture);
-                    m_TimeStampMappingValid = true;
-                }
-                catch
-                { }
+                m_TimeStampMappingValid = VerifyTimeStamp(value, format);
             }
 
             if (m_TimeStampMappingValid)
@@ -157,13 +173,7 @@ namespace Tangra.Video.FITS
             {
                 string value = entry.Card.Value;
                 string format = cbxTimeStamp2Format.Text;
-                try
-                {
-                    var parsedTimestamp = DateTime.ParseExact(value, format, CultureInfo.InvariantCulture);
-                    m_TimeStamp2MappingValid = true;
-                }
-                catch
-                { }
+                m_TimeStamp2MappingValid = VerifyTimeStamp(value, format);
             }
 
             if (m_TimeStamp2MappingValid)
@@ -174,6 +184,19 @@ namespace Tangra.Video.FITS
 
         private bool m_ExposureValid = false;
 
+        private bool VerifyExposure(string value)
+        {
+            try
+            {
+                var parsedValue = double.Parse(value, CultureInfo.InvariantCulture);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         private void VerifyExposure()
         {
             m_ExposureValid = false;
@@ -181,19 +204,93 @@ namespace Tangra.Video.FITS
             if (entry != null)
             {
                 string value = entry.Card.Value;
-                try
-                {
-                    var parsedValue = double.Parse(value, CultureInfo.InvariantCulture);
-                    m_ExposureValid = true;
-                }
-                catch
-                { }
+                m_ExposureValid = VerifyExposure(value);
             }
 
             if (m_ExposureValid)
                 pbxExposureOK.BringToFront();
             else
                 pbxExposureWarning.BringToFront();
+        }
+
+        void TryIdentifyPreviousConfigApplyingForCurrentFiles()
+        {
+            if (TangraConfig.Settings.RecentFITSFieldConfig.Items.Count > 0)
+            {
+                var sameHashConfig = TangraConfig.Settings.RecentFITSFieldConfig.Items.FirstOrDefault(x => x.FileHash == m_FilesHash);
+                if (sameHashConfig != null && RecentFITSConfigMatches(sameHashConfig))
+                {
+                    UseRecentFITSConfig(sameHashConfig);
+                    return;
+                }
+
+                foreach (var config in TangraConfig.Settings.RecentFITSFieldConfig.Items)
+                {
+                    if (RecentFITSConfigMatches(config))
+                    {
+                        UseRecentFITSConfig(config);
+                        return;
+                    }
+                }
+            }
+        }
+
+        private bool RecentFITSConfigMatches(TangraConfig.FITSFieldConfig config)
+        {
+            if (config.IsTimeStampAndExposure)
+            {
+                var exposureCard = m_AllCards.FirstOrDefault(x => x.Card.Key == config.ExposureHeader);
+                var timestampCard = m_AllCards.FirstOrDefault(x => x.Card.Key == config.TimeStampHeader);
+
+                if (exposureCard != null && timestampCard != null)
+                {
+                    return 
+                        VerifyExposure(exposureCard.Card.Value) &&
+                        VerifyTimeStamp(timestampCard.Card.Value, config.TimeStampFormat);
+                }
+                else
+                    return false;
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        private void UseRecentFITSConfig(TangraConfig.FITSFieldConfig config)
+        {
+            for (int i = 0; i < cbxTimeStamp.Items.Count; i++)
+            {
+                if (((HeaderEntry) cbxTimeStamp.Items[i]).Card.Key == config.TimeStampHeader)
+                {
+                    cbxTimeStamp.SelectedIndex = i;
+                    break;
+                }
+            }
+
+            for (int i = 0; i < cbxExposure.Items.Count; i++)
+            {
+                if (((HeaderEntry)cbxExposure.Items[i]).Card.Key == config.ExposureHeader)
+                {
+                    cbxExposure.SelectedIndex = i;
+                    break;
+                }
+            }
+
+            cbxTimeStampFormat.SelectedIndex = cbxTimeStampFormat.Items.IndexOf(config.TimeStampFormat);
+            if (cbxTimeStampFormat.SelectedIndex == -1)
+                cbxTimeStampFormat.Text = config.TimeStampFormat;
+
+            if (config.FileHash == m_FilesHash)
+            {
+                cbxExposureUnits.SelectedIndex = (int)config.ExposureUnit;
+                cbxTimestampType.SelectedIndex = (int)config.TimeStampType;
+            }
+            else
+            {
+                cbxExposureUnits.SelectedIndex = -1;
+                cbxTimestampType.SelectedIndex = -1;
+            }
         }
 
         private void cbxTimeStampFormat_SelectedIndexChanged(object sender, EventArgs e)
@@ -232,7 +329,22 @@ namespace Tangra.Video.FITS
                     return;
                 }
 
-                TimeStampReader = new FITSTimeStampReader(cbxExposure.Text, (ExposureUnit)cbxExposureUnits.SelectedIndex, cbxTimeStamp.Text, cbxTimeStampFormat.Text, (TimeStampType)cbxTimestampType.SelectedIndex);
+                var config = new TangraConfig.FITSFieldConfig()
+                {
+                    ExposureHeader = cbxExposure.Text,
+                    ExposureUnit = (TangraConfig.ExposureUnit) cbxExposureUnits.SelectedIndex,
+                    TimeStampType = (TangraConfig.TimeStampType) cbxTimestampType.SelectedIndex,
+                    TimeStampHeader = cbxTimeStamp.Text,
+                    TimeStampFormat = cbxTimeStampFormat.Text,
+                    IsTimeStampAndExposure = true
+                };
+
+                TimeStampReader = new FITSTimeStampReader(config);
+
+                config.FileHash = m_FilesHash;
+                TangraConfig.Settings.RecentFITSFieldConfig.Register(config);
+                TangraConfig.Settings.Save();
+
                 DialogResult = DialogResult.OK;
                 Close();
             }
@@ -250,7 +362,21 @@ namespace Tangra.Video.FITS
                     return;
                 }
 
-                TimeStampReader = new FITSTimeStampReader(cbxTimeStamp.Text, cbxTimeStampFormat.Text, cbxTimeStamp2.Text, cbxTimeStamp2Format.Text);
+                var config = new TangraConfig.FITSFieldConfig()
+                {
+                    TimeStampHeader = cbxTimeStamp.Text,
+                    TimeStampFormat = cbxTimeStampFormat.Text,
+                    TimeStamp2Header = cbxTimeStamp2.Text,
+                    TimeStamp2Format = cbxTimeStamp2Format.Text,
+                    IsTimeStampAndExposure = false
+                };
+
+                TimeStampReader = new FITSTimeStampReader(config);
+
+                config.FileHash = m_FilesHash;
+                TangraConfig.Settings.RecentFITSFieldConfig.Register(config);
+                TangraConfig.Settings.Save();
+
                 DialogResult = DialogResult.OK;
                 Close();
             }
