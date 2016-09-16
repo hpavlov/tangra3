@@ -6,16 +6,19 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Adv;
 using Tangra.Helpers;
 using Tangra.Model.Context;
-using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.Model.Video;
 using Tangra.PInvoke;
+using Tangra.Video.AstroDigitalVideo;
+using AdvFrameInfo = Tangra.PInvoke.AdvFrameInfo;
+using Extensions = Tangra.Model.Helpers.Extensions;
 
 namespace Tangra.Video
 {
-    public class AstroDigitalVideoStreamV2 : IFrameStream
+    public class AstroDigitalVideoStreamV2 : IFrameStream, IDisposable
     {
         public static IFrameStream OpenFile(string fileName, out AdvFileMetadataInfo fileMetadataInfo, out GeoLocationInfo geoLocation)
         {
@@ -55,6 +58,8 @@ namespace Tangra.Video
         private uint m_Aav16NormVal;
         private string m_Engine;
 
+        private AdvFile2 m_AdvFile;
+
         private object m_SyncLock = new object();
 
         private AstroDigitalVideoStreamV2(string fileName, ref AdvFileMetadataInfo fileMetadataInfo, ref GeoLocationInfo geoLocation)
@@ -62,17 +67,16 @@ namespace Tangra.Video
             //CheckAdvFileFormat(fileName, ref fileMetadataInfo, ref geoLocation);
 
             m_FileName = fileName;
-            var fileInfo = new Adv2FileInfo();
-
-            TangraCore.ADV2OpenFile(fileName, ref fileInfo);
-
+            
+            m_AdvFile = new AdvFile2(fileName);
+            
             m_FirstFrame = 0;
-            m_CountFrames = fileInfo.CountMaintFrames;
+            m_CountFrames = m_AdvFile.MainSteamInfo.FrameCount;
 
-            m_BitPix = fileInfo.DataBpp;
-            m_Width = fileInfo.Width;
-            m_Height = fileInfo.Height;
-            m_Aav16NormVal = (uint)fileInfo.MaxPixelValue;
+            m_BitPix = m_AdvFile.DataBpp;
+            m_Width = m_AdvFile.Width;
+            m_Height = m_AdvFile.Height;
+            m_Aav16NormVal = (uint)m_AdvFile.MaxPixelValue;
 
             m_FrameRate = 0;
 
@@ -90,11 +94,11 @@ namespace Tangra.Video
 
         public string GetFileTag(string tagName)
         {
-            byte[] tagValue = new byte[256 * 2];
+            string tagValue;
+            if (m_AdvFile.SystemMetadataTags.TryGetValue(tagName, out tagValue))
+                return tagValue;
 
-            TangraCore.ADV2GetFileTag(tagName, tagValue);
-
-            return AdvFrameInfo.GetStringFromBytes(tagValue);
+            return null;
         }
 
         public int Width
@@ -139,37 +143,131 @@ namespace Tangra.Video
 
         public Pixelmap GetPixelmap(int index)
         {
-            uint[] pixels = new uint[m_Width * m_Height];
+            uint[] pixels;
             uint[] unprocessedPixels = new uint[m_Width * m_Height];
             byte[] displayBitmapBytes = new byte[m_Width * m_Height];
             byte[] rawBitmapBytes = new byte[(m_Width * m_Height * 3) + 40 + 14 + 1];
-            var frameInfo = new Adv2FrameInfoNative();
-
+            
+            Adv.AdvFrameInfo advFrameInfo;
             lock (m_SyncLock)
             {
-                TangraCore.ADV2GetFrame(index, pixels, unprocessedPixels, rawBitmapBytes, displayBitmapBytes, frameInfo);
+                pixels = m_AdvFile.GetMainFramePixels((uint)index, out advFrameInfo);
+
+                if (unprocessedPixels.Length != pixels.Length) 
+                    throw new ApplicationException("ADV Buffer Error");
+
+                Array.Copy(pixels, unprocessedPixels, pixels.Length);
             }
 
-            using (MemoryStream memStr = new MemoryStream(rawBitmapBytes))
+            TangraCore.PreProcessors.ApplyPreProcessingPixelsOnly(pixels, m_Width, m_Height, m_BitPix, m_Aav16NormVal,(float)(advFrameInfo.UtcExposureMilliseconds / 1000.0));
+
+            TangraCore.GetBitmapPixels(Width, Height, pixels, rawBitmapBytes, displayBitmapBytes, true, (ushort)BitPix, 0);
+
+            Bitmap displayBitmap = Pixelmap.ConstructBitmapFromBitmapPixels(displayBitmapBytes, Width, Height);
+
+            Pixelmap rv = new Pixelmap(Width, Height, BitPix, pixels, displayBitmap, displayBitmapBytes);
+            rv.SetMaxSignalValue(m_Aav16NormVal);
+            rv.FrameState = GetCurrentFrameState(advFrameInfo);
+            rv.UnprocessedPixels = pixels;
+            return rv;
+        }
+
+        private FrameStateData GetCurrentFrameState(Adv.AdvFrameInfo frameInfo)
+        {
+            if (frameInfo != null)
             {
-                Bitmap displayBitmap;
+                var rv = new FrameStateData();
+                rv.VideoCameraFrameId = (long)frameInfo.VideoCameraFrameId;
+                rv.CentralExposureTime = frameInfo.UtcMidExposureTime;
+                rv.SystemTime = frameInfo.SystemTimestamp;
 
-                try
-                {
-                    displayBitmap = (Bitmap)Bitmap.FromStream(memStr);
-                }
-                catch (Exception ex)
-                {
-                    Trace.WriteLine(ex.GetFullStackTrace());
-                    displayBitmap = new Bitmap(m_Width, m_Height);
-                }
+                rv.ExposureInMilliseconds = frameInfo.Exposure / 10.0f;
 
-                var rv = new Pixelmap(m_Width, m_Height, m_BitPix, pixels, displayBitmap, displayBitmapBytes);
-                rv.SetMaxSignalValue(m_Aav16NormVal);
-                //rv.FrameState = GetCurrentFrameState(index);
-                rv.UnprocessedPixels = unprocessedPixels;
+                rv.NumberIntegratedFrames = 0;
+                rv.NumberStackedFrames = 0;
+
+                int almanacStatus = frameInfo.GPSAlmanacStatus;
+                int almanacOffset = frameInfo.GPSAlmanacOffset;
+
+                //if (!frameInfo.AlmanacStatusIsGood && m_AlamanacOffsetLastFrameIsGood)
+                //{
+                //    // When the current almanac is not good, but last frame is, then apply the known almanac offset automatically
+                //    almanacOffset = m_AlmanacOffsetLastFrame;
+                //    rv.CentralExposureTime = rv.CentralExposureTime.AddSeconds(m_AlmanacOffsetLastFrame);
+                //    almanacStatus = 2; // Certain
+                //}
+
+                rv.Gain = frameInfo.Gain;
+                rv.Gamma = frameInfo.Gamma;
+                //rv.Temperature = frameInfo.Temperature;
+                rv.Offset = frameInfo.Offset;
+
+                rv.NumberSatellites = frameInfo.GPSTrackedSattelites;
+
+                rv.AlmanacStatus = AdvStatusValuesHelper.TranslateGpsAlmanacStatus(almanacStatus);
+
+                rv.AlmanacOffset = AdvStatusValuesHelper.TranslateGpsAlmanacOffset(almanacStatus, almanacOffset, almanacStatus > 0);
+
+                rv.GPSFixStatus = frameInfo.GPSFixStatus.ToString("#");
+
+                rv.Messages = string.Empty;
+
+                if (frameInfo.HasErrorMessage)
+                    rv.Messages = Convert.ToString(frameInfo.Status["Error"]);
+
                 return rv;
             }
+            else
+                return new FrameStateData();
+        }
+        
+        private FrameStateData GetCurrentFrameState(Adv2FrameInfoNative frameInfo)
+        {
+            if (frameInfo != null)
+            {
+                var rv = new FrameStateData();
+                rv.VideoCameraFrameId = frameInfo.VideoCameraFrameId;
+                rv.CentralExposureTime = frameInfo.MiddleExposureTimeStamp;
+                rv.SystemTime = frameInfo.SystemTime;
+
+                rv.ExposureInMilliseconds = frameInfo.Exposure / 10.0f;
+
+                rv.NumberIntegratedFrames = 0;
+                rv.NumberStackedFrames = 0;
+
+                int almanacStatus = frameInfo.GPSAlmanacStatus;
+                int almanacOffset = frameInfo.GetSignedAlamancOffset();
+
+                //if (!frameInfo.AlmanacStatusIsGood && m_AlamanacOffsetLastFrameIsGood)
+                //{
+                //    // When the current almanac is not good, but last frame is, then apply the known almanac offset automatically
+                //    almanacOffset = m_AlmanacOffsetLastFrame;
+                //    rv.CentralExposureTime = rv.CentralExposureTime.AddSeconds(m_AlmanacOffsetLastFrame);
+                //    almanacStatus = 2; // Certain
+                //}
+
+                rv.Gain = frameInfo.Gain;
+                rv.Gamma = frameInfo.Gamma;
+                //rv.Temperature = frameInfo.Temperature;
+                rv.Offset = frameInfo.Offset;
+
+                rv.NumberSatellites = frameInfo.GPSTrackedSattelites;
+
+                rv.AlmanacStatus = AdvStatusValuesHelper.TranslateGpsAlmanacStatus(almanacStatus);
+
+                rv.AlmanacOffset = AdvStatusValuesHelper.TranslateGpsAlmanacOffset(almanacStatus, almanacOffset, almanacStatus > 0);
+
+                rv.GPSFixStatus = frameInfo.GPSFixStatus.ToString("#");
+
+                rv.Messages = string.Empty; // TODO: This is currently not coming through
+
+                if (m_FrameRate > 0)
+                    rv.ExposureInMilliseconds = (float)(1000 / m_FrameRate);
+
+                return rv;
+            }
+            else
+                return new FrameStateData();
         }
 
         public Pixelmap GetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging)
@@ -215,6 +313,15 @@ namespace Tangra.Video
         public bool SupportsFrameFileNames
         {
             get { return false; }
+        }
+
+        public void Dispose()
+        {
+            if (m_AdvFile != null)
+            {
+                m_AdvFile.Close();
+                m_AdvFile = null;
+            }
         }
     }
 }

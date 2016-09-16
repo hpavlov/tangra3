@@ -127,12 +127,14 @@ namespace Tangra.Video.AstroDigitalVideo
                 pnlCalibrCropControls.Visible = true;
                 rbCalibrStrToAVI.Enabled = true;
                 rbCalibStrToCSV.Enabled = true;
+                rbCalibrationStream.Enabled = true;
             }
             else
             {
                 pnlCalibrCropControls.Visible = false;
                 rbCalibrStrToAVI.Enabled = false;
                 rbCalibStrToCSV.Enabled = false;
+                rbCalibrationStream.Enabled = false;
             }
 
             cbxFrameRate.SelectedIndex = 0;

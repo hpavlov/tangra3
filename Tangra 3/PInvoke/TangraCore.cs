@@ -371,6 +371,68 @@ namespace Tangra.PInvoke
         public uint SystemTimestampLo;
         [FieldOffset(68)]
         public uint SystemTimestampHi;
+
+        public DateTime MiddleExposureTimeStamp
+        {
+            get
+            {
+                long millisecondsElapsed = (((long)UtcTimestampHi) << 32) + (long)UtcTimestampLo;
+                try
+                {
+                    return REFERENCE_DATETIME.AddMilliseconds(millisecondsElapsed);
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    return REFERENCE_DATETIME;
+                }
+            }
+        }
+
+        public DateTime SystemTime
+        {
+            get
+            {
+                long millisecondsElapsed = (((long)SystemTimestampHi) << 32) + (long)SystemTimestampLo;
+                try
+                {
+                    return REFERENCE_DATETIME.AddMilliseconds(millisecondsElapsed);
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    return REFERENCE_DATETIME;
+                }
+            }
+        }
+
+        public long VideoCameraFrameId
+        {
+            get
+            {
+                return (((long)VideoCameraFrameIdHi) << 32) + (long)VideoCameraFrameIdLo;
+            }
+        }
+
+        public long HardwareTimerFrameId
+        {
+            get
+            {
+                return (((long)HardwareTimerFrameIdHi) << 32) + (long)HardwareTimerFrameIdLo;
+            }
+        }
+
+        public short GetSignedAlamancOffset()
+        {
+            short signedOffset = GPSAlmanacOffset;
+            if ((GPSAlmanacOffset & 0x80) == 0x80)
+                signedOffset = (short)(GPSAlmanacOffset + (0xFF << 8));
+
+            return signedOffset;
+        }
+
+        public bool AlmanacStatusIsGood
+        {
+            get { return GPSAlmanacStatus != 0x00; }
+        }
     }
 
 	[StructLayout(LayoutKind.Sequential)]
@@ -453,22 +515,27 @@ namespace Tangra.PInvoke
         //ADVRESULT ADV2GetFormatVersion(char* fileName);
         public static extern int ADV2GetFormatVersion(string fileName);
 
+        [Obsolete("Use AdvLib.Adv2File")]
         [DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
         //ADVRESULT ADV2OpenFile(char* fileName, AdvLib::AdvFileInfo* fileInfo);
         public static extern int ADV2OpenFile(string fileName, [In, Out] ref Adv2FileInfo fileInfo);
 
+        [Obsolete("Use AdvLib.Adv2File")]
         [DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
         //ADVRESULT ADV2CloseFile();
         public static extern int ADV2CloseFile();
 
+        [Obsolete("Use AdvLib.Adv2File")]
         [DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
         //ADVRESULT ADV2GetFrame(int frameNo, unsigned int* pixels, unsigned int* originalPixels, BYTE* bitmapPixels, BYTE* bitmapBytes, AdvLib2::AdvFrameInfo* frameInfo);
         public static extern int ADV2GetFrame(int frameNo, [In, Out] uint[] pixels, [In, Out] uint[] originalPixels, [In, Out] byte[] bitmapBytes, [In, Out] byte[] bitmapDisplayBytes, [In, Out] Adv2FrameInfoNative frameInfo);
 
+        [Obsolete("Use AdvLib.Adv2File")]
         [DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
         //ADVRESULT ADV2GetFrameStatusChannel(long frameNo, AdvLib::AdvFrameInfo* frameInfo, char* gpsFix, char* userCommand, char* systemError);
         public static extern int ADV2GetFrameStatusChannel(int frameNo, [In, Out] AdvFrameInfoNative frameInfo, [In, Out] byte[] gpsFix, [In, Out] byte[] userCommand, [In, Out] byte[] systemError);
 
+        [Obsolete("Use AdvLib.Adv2File")]
         [DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
         //ADVRESULT ADV2GetFileTag(char* tagName, char* tagValue);
         public static extern int ADV2GetFileTag(string tagName, [In, Out] byte[] tagValue);
