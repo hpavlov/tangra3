@@ -63,6 +63,10 @@ namespace Tangra.Video.AstroDigitalVideo
             {
                 bindingList.Add(new AdvTagValuePair() { Tag = key, Value = m_AdvFile.SystemMetadataTags[key] });
             }
+            foreach (string key in m_AdvFile.UserMetadataTags.Keys)
+            {
+                bindingList.Add(new AdvTagValuePair() { Tag = key, Value = m_AdvFile.UserMetadataTags[key] });
+            }
             dgvFileTags.DataSource = bindingList;
 
             var bindingListMainTags = new List<AdvTagValuePair>();
