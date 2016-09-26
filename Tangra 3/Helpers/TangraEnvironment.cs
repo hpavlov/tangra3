@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using Adv;
 using Tangra.PInvoke;
 
 namespace Tangra.Helpers
@@ -41,6 +42,14 @@ namespace Tangra.Helpers
             get
             {
                 return TangraVideo.GetVideoEngineVersion();
+            }
+        }
+
+        public static string AdvLibVersion
+        {
+            get
+            {
+                return AdvLib.GetLibraryVersion();
             }
         }
     }

@@ -62,7 +62,11 @@ namespace Tangra
 	        if (monoVersion != null)
 				clrVersion += string.Format("\r\nMono Version {0}", monoVersion);
 
-            string componentVersions = string.Format("Tangra Core v{0} {1}\r\nTangra Video Engine v{2}", TangraEnvironment.TangraCoreVersion, TangraEnvironment.GetTangraCoreBitness, TangraEnvironment.TangraVideoEngineVersion);
+            string componentVersions = string.Format("Tangra Core v{0} {1}\r\nTangra Video Engine v{2}\r\nAdvLib v{3}", 
+                TangraEnvironment.TangraCoreVersion, 
+                TangraEnvironment.GetTangraCoreBitness, 
+                TangraEnvironment.TangraVideoEngineVersion,
+                TangraEnvironment.AdvLibVersion);
 
             return string.Format("{0}\r\nOS: {1}\r\nPlatform: {2}\r\nRuntime: {3}\r\n{4}",
                 productName, platformName, platformVersion, clrVersion, componentVersions);            
