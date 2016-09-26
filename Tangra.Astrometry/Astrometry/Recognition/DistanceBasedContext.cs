@@ -89,12 +89,12 @@ namespace Tangra.Astrometry.Recognition
 
 		private IStarMap m_StarMap;
 
-		private IAstrometryController m_AstrometryController;
+        private IOperationNotifier m_OperationNotifier;
 
 		private bool m_IsCalibration = false;
 
 		public DistanceBasedContext(
-			IAstrometryController astrometryController,
+            IOperationNotifier operationNotifier,
 			AstroPlate plateConfigs,
 			IAstrometrySettings settings,
 			double maxLeastSquareResidualInPixels,
@@ -111,9 +111,9 @@ namespace Tangra.Astrometry.Recognition
 			m_MaxMag = maxMag;
 
             m_MaxLeastSquareResidual = maxLeastSquareResidualInPixels * Math.Max(plateConfigs.EffectivePixelWidth, plateConfigs.EffectivePixelHeight);
-			m_AstrometryController = astrometryController;
+            m_OperationNotifier = operationNotifier;
 
-			m_AstrometryController.Subscribe(this, typeof(OperationNotifications));
+            m_OperationNotifier.Subscribe(this, typeof(OperationNotifications));
 		}
 
 		internal Dictionary<long, double> FeaturesDistanceCache
@@ -737,7 +737,7 @@ namespace Tangra.Astrometry.Recognition
 			m_AbortSearch = false;
 			try
 			{
-				m_AstrometryController.SendNotification(new OperationNotifications(NotificationType.SearchStarted, null));
+                m_OperationNotifier.SendNotification(new OperationNotifications(NotificationType.SearchStarted, null));
 			
 				if (CorePyramidConfig.Default.ForceAlwaysUsePyramidWithRatios ||
 					fitFocalLength)
@@ -781,7 +781,7 @@ namespace Tangra.Astrometry.Recognition
 			}
 			finally
 			{
-				m_AstrometryController.SendNotification(new OperationNotifications(NotificationType.SearchFinished, null));
+                m_OperationNotifier.SendNotification(new OperationNotifications(NotificationType.SearchFinished, null));
 			}
 		}
 
@@ -2623,13 +2623,13 @@ namespace Tangra.Astrometry.Recognition
 			if (m_AbortSearch) return false;
 
 			if (counter % 5000 == 0)
-				m_AstrometryController.SendNotification(new OperationNotifications(NotificationType.SearchProgressed, null));
+                m_OperationNotifier.SendNotification(new OperationNotifications(NotificationType.SearchProgressed, null));
 
 			if (!delayWarningSent &&
 				timeTaken.ElapsedMilliseconds > m_Settings.PyramidTimeoutInSeconds * 100 &&
 				timeTaken.ElapsedMilliseconds > 5000)
 			{
-				m_AstrometryController.SendNotification(new OperationNotifications(NotificationType.SearchTakingLonger, timeTaken.ElapsedMilliseconds));
+                m_OperationNotifier.SendNotification(new OperationNotifications(NotificationType.SearchTakingLonger, timeTaken.ElapsedMilliseconds));
 				delayWarningSent = true;
 			}
 
@@ -3544,7 +3544,7 @@ namespace Tangra.Astrometry.Recognition
 
 		public void Dispose()
 		{
-			m_AstrometryController.Unsubscribe(this);
+            m_OperationNotifier.Unsubscribe(this);
 		}
 
 		#endregion

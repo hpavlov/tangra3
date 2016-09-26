@@ -170,6 +170,7 @@
     <Compile Include="Astrometry\Analysis\PeakPixelResolver.cs" />
     <Compile Include="Astrometry\Analysis\PlateObjectResolver.cs" />
     <Compile Include="Astrometry\DirectTransRotAstrometry.cs" />
+    <Compile Include="Astrometry\ExportModels.cs" />
     <Compile Include="Astrometry\FocalLengthFit.cs" />
     <Compile Include="Astrometry\IAstrometricFit.cs" />
     <Compile Include="Astrometry\LeastSquareFittedAstrometry.cs" />

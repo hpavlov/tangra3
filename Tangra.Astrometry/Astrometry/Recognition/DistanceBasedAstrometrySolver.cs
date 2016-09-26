@@ -87,7 +87,7 @@ namespace Tangra.Astrometry.Recognition
 
 		private bool m_IsCalibration = false;
 
-		private IAstrometryController m_AstrometryController;
+        private IOperationNotifier m_OperationNotifier;
 
 		public bool SearchAborted
 		{
@@ -97,7 +97,7 @@ namespace Tangra.Astrometry.Recognition
 		private bool m_DetermineAutoLimitMagnitude;
 
 		public DistanceBasedAstrometrySolver(
-			IAstrometryController astrometryController,
+            IOperationNotifier operationNotifier,
 			AstroPlate plateConfig, 
 			IAstrometrySettings fitSettings, 
 			List<IStar> celestialStars,
@@ -108,9 +108,9 @@ namespace Tangra.Astrometry.Recognition
 			m_CelestialStars = celestialStars;
 			m_DetermineAutoLimitMagnitude = determineAutoLimitMagnitude;
 
-			m_AstrometryController = astrometryController;
+            m_OperationNotifier = operationNotifier;
 
-            Context = new DistanceBasedContext(astrometryController, plateConfig, fitSettings, fitSettings.MaxResidualInPixels, m_AstrometryMinMag, m_AstrometryMaxMag);
+            Context = new DistanceBasedContext(operationNotifier, plateConfig, fitSettings, fitSettings.MaxResidualInPixels, m_AstrometryMinMag, m_AstrometryMaxMag);
 		}
 
 		public void InitNewMatch(IStarMap imageFeatures, PyramidMatchType matchType, Dictionary<PSFFit, IStar> manualStars)
@@ -242,7 +242,7 @@ namespace Tangra.Astrometry.Recognition
 					!m_FitSettings.PyramidForceFixedFocalLength &&
 					!m_IsCalibration)
 				{
-					m_AstrometryController.NotifyBeginLongOperation("Performing a plate solve ...");
+                    m_OperationNotifier.NotifyBeginLongOperation("Performing a plate solve ...");
 					try
 					{
 						// If this is the first fit, then fit a focal length 
@@ -262,7 +262,7 @@ namespace Tangra.Astrometry.Recognition
 					}
 					finally
 					{
-						m_AstrometryController.NotifyEndLongOperation();
+                        m_OperationNotifier.NotifyEndLongOperation();
 					}
 #if UNIT_TESTS
 					Flags.RatioBasedFocalLengthFitAttempted = true;

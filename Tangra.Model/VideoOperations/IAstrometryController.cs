@@ -14,13 +14,17 @@ namespace Tangra.Model.VideoOperations
 		void ReceieveMessage(object notification);
 	}
 
-	public interface IAstrometryController
+    public interface IOperationNotifier
+    {
+        void Subscribe(INotificationReceiver receiver, Type notificationType);
+        void Unsubscribe(INotificationReceiver receiver);
+        void SendNotification(object notification);
+        void NotifyBeginLongOperation(string description);
+        void NotifyEndLongOperation();
+    }
+
+    public interface IAstrometryController : IOperationNotifier
 	{
-		void Subscribe(INotificationReceiver receiver, Type notificationType);
-		void Unsubscribe(INotificationReceiver receiver);
-		void SendNotification(object notification);
-		void NotifyBeginLongOperation(string description);
-		void NotifyEndLongOperation();
 		Rectangle OSDRectToExclude { get; }
 		Rectangle RectToInclude { get; }
 		bool LimitByInclusion { get; }

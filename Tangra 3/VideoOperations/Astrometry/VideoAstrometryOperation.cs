@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 using Tangra.Addins;
 using Tangra.AstroServices;
 using Tangra.Astrometry;
@@ -110,6 +111,8 @@ namespace Tangra.VideoOperations.Astrometry
 
 		private static Font s_StarInfoFont = new Font(FontFamily.GenericSerif, 7);
 		private static Font s_UserObjectFont = new Font(FontFamily.GenericSerif, 10);
+
+	    private bool m_TestExport = false;
 
 		public VideoAstrometryOperation()
 		{ }
@@ -516,6 +519,34 @@ namespace Tangra.VideoOperations.Astrometry
                 m_DistBasedMatcher.SetManuallyIdentifiedHints(new Dictionary<PSFFit, IStar>());
 
 			m_CurrentMatchResult = m_DistBasedMatcher.PerformMatch(out m_AstrometricFit);
+
+		    if (m_TestExport)
+		    {
+		        var testConfig = new PlateSolveTesterConfig()
+		        {
+		            OSDRectToExclude = new Rect()
+		            {
+		                X = AstrometryContext.Current.OSDRectToExclude.X,
+		                Y = AstrometryContext.Current.OSDRectToExclude.Y,
+		                Width = AstrometryContext.Current.OSDRectToExclude.Width,
+		                Height = AstrometryContext.Current.OSDRectToExclude.Height
+		            },
+		            RectToInclude = new Rect()
+		            {
+		                X = AstrometryContext.Current.RectToInclude.X,
+		                Y = AstrometryContext.Current.RectToInclude.Y,
+		                Width = AstrometryContext.Current.RectToInclude.Width,
+		                Height = AstrometryContext.Current.RectToInclude.Height
+		            },
+		            LimitByInclusion = AstrometryContext.Current.LimitByInclusion
+		        };
+
+		        XmlSerializer ser = new XmlSerializer(typeof (PlateSolveTesterConfig));
+		        var outBuff = new StringBuilder();
+                var stringWriter = new StringWriter(outBuff);
+		        ser.Serialize(stringWriter, testConfig);
+		        Trace.WriteLine(outBuff.ToString());
+		    }
 
 			if (m_CurrentMatchResult == PerformMatchResult.FieldAlignmentFailed ||
 				m_CurrentMatchResult == PerformMatchResult.FitImprovementFailed ||
