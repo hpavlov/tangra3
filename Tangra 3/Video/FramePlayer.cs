@@ -335,6 +335,8 @@ namespace Tangra.Video
 		{
 			if (m_VideoStream is AstroDigitalVideoStream)
 				return ((AstroDigitalVideoStream) m_VideoStream).GetFrameStatusChannel(index);
+            else if (m_VideoStream is AstroDigitalVideoStreamV2)
+                return ((AstroDigitalVideoStreamV2)m_VideoStream).GetFrameStatusChannel(index);
 			else
 				return new FrameStateData();
 		}
@@ -803,9 +805,12 @@ namespace Tangra.Video
 		{
 			get
 			{
-				return m_VideoStream != null
-					       ? ((AstroDigitalVideoStream) m_VideoStream).GeoLocation
-					       : null;
+                if (m_VideoStream is AstroDigitalVideoStream)
+                    return ((AstroDigitalVideoStream) m_VideoStream).GeoLocation;
+                else if (m_VideoStream is AstroDigitalVideoStreamV2)
+                    return ((AstroDigitalVideoStreamV2)m_VideoStream).GeoLocation;
+
+				return null;
 			}
 		}
 
@@ -863,10 +868,15 @@ namespace Tangra.Video
 		{
 			get
 			{
-				if (IsAstroAnalogueVideo || IsAstroDigitalVideo)
-					return ((AstroDigitalVideoStream) m_VideoStream).CameraModel;
-				else
-					return null;
+			    if (IsAstroAnalogueVideo || IsAstroDigitalVideo)
+			    {
+			        if (m_VideoStream is AstroDigitalVideoStream)
+			            return ((AstroDigitalVideoStream) m_VideoStream).CameraModel;
+			        else
+                        return ((AstroDigitalVideoStreamV2)m_VideoStream).CameraModel;
+			    }
+			    else
+			        return null;
 			}
 		}
 

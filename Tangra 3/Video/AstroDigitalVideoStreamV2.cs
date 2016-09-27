@@ -62,6 +62,13 @@ namespace Tangra.Video
 
         private object m_SyncLock = new object();
 
+        private GeoLocationInfo geoLocation;
+
+        public GeoLocationInfo GeoLocation
+        {
+            get { return geoLocation; }
+        }
+
         private AstroDigitalVideoStreamV2(string fileName, ref AdvFileMetadataInfo fileMetadataInfo, ref GeoLocationInfo geoLocation)
         {
             //CheckAdvFileFormat(fileName, ref fileMetadataInfo, ref geoLocation);
@@ -83,13 +90,20 @@ namespace Tangra.Video
             m_Engine = "ADV2";
 
             fileMetadataInfo.Recorder = GetFileTag("RECORDER-SOFTWARE");
-            fileMetadataInfo.Camera = GetFileTag("CAMERA-MODEL");
+            CameraModel = fileMetadataInfo.Camera = GetFileTag("CAMERA-MODEL");
             fileMetadataInfo.Engine = GetFileTag("FSTF-TYPE");
 
             fileMetadataInfo.AdvrVersion = GetFileTag("RECORDER-SOFTWARE-VERSION");
             fileMetadataInfo.SensorInfo = GetFileTag("CAMERA-SENSOR-INFO");
 
             fileMetadataInfo.ObjectName = GetFileTag("OBJNAME");
+
+            this.geoLocation = new GeoLocationInfo()
+            {
+                //TODO
+            };
+
+            geoLocation = this.geoLocation;
         }
 
         public string GetFileTag(string tagName)
@@ -220,54 +234,19 @@ namespace Tangra.Video
             else
                 return new FrameStateData();
         }
-        
-        private FrameStateData GetCurrentFrameState(Adv2FrameInfoNative frameInfo)
+
+        public FrameStateData GetFrameStatusChannel(int index)
         {
-            if (frameInfo != null)
+            if (index >= m_FirstFrame + m_CountFrames)
+                throw new ApplicationException("Invalid frame position: " + index);
+
+            Adv.AdvFrameInfo advFrameInfo;
+            lock (m_SyncLock)
             {
-                var rv = new FrameStateData();
-                rv.VideoCameraFrameId = frameInfo.VideoCameraFrameId;
-                rv.CentralExposureTime = frameInfo.MiddleExposureTimeStamp;
-                rv.SystemTime = frameInfo.SystemTime;
-
-                rv.ExposureInMilliseconds = frameInfo.Exposure / 10.0f;
-
-                rv.NumberIntegratedFrames = 0;
-                rv.NumberStackedFrames = 0;
-
-                int almanacStatus = frameInfo.GPSAlmanacStatus;
-                int almanacOffset = frameInfo.GetSignedAlamancOffset();
-
-                //if (!frameInfo.AlmanacStatusIsGood && m_AlamanacOffsetLastFrameIsGood)
-                //{
-                //    // When the current almanac is not good, but last frame is, then apply the known almanac offset automatically
-                //    almanacOffset = m_AlmanacOffsetLastFrame;
-                //    rv.CentralExposureTime = rv.CentralExposureTime.AddSeconds(m_AlmanacOffsetLastFrame);
-                //    almanacStatus = 2; // Certain
-                //}
-
-                rv.Gain = frameInfo.Gain;
-                rv.Gamma = frameInfo.Gamma;
-                //rv.Temperature = frameInfo.Temperature;
-                rv.Offset = frameInfo.Offset;
-
-                rv.NumberSatellites = frameInfo.GPSTrackedSattelites;
-
-                rv.AlmanacStatus = AdvStatusValuesHelper.TranslateGpsAlmanacStatus(almanacStatus);
-
-                rv.AlmanacOffset = AdvStatusValuesHelper.TranslateGpsAlmanacOffset(almanacStatus, almanacOffset, almanacStatus > 0);
-
-                rv.GPSFixStatus = frameInfo.GPSFixStatus.ToString("#");
-
-                rv.Messages = string.Empty; // TODO: This is currently not coming through
-
-                if (m_FrameRate > 0)
-                    rv.ExposureInMilliseconds = (float)(1000 / m_FrameRate);
-
-                return rv;
+                m_AdvFile.GetMainFramePixels((uint) index, out advFrameInfo);
             }
-            else
-                return new FrameStateData();
+
+            return GetCurrentFrameState(advFrameInfo);
         }
 
         public Pixelmap GetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging)
@@ -314,6 +293,8 @@ namespace Tangra.Video
         {
             get { return false; }
         }
+
+        public string CameraModel { get; private set; }
 
         public void Dispose()
         {
