@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
 using nom.tam.fits;
@@ -19,6 +20,7 @@ namespace Tangra.Video.FITS
         private List<HeaderEntry> m_AllCards = new List<HeaderEntry>();
  
         private string m_FilesHash;
+        private string m_CardNamesHash;
 
         public frmChooseTimeHeaders()
         {
@@ -30,6 +32,10 @@ namespace Tangra.Video.FITS
         {
             m_FilesHash = filesHash;
 
+            var hasher = new SHA1CryptoServiceProvider();
+            hasher.Initialize();
+            var orderedCardNames = new List<string>();
+
             var cursor = hdr.GetCursor();
             while (cursor.MoveNext())
             {
@@ -38,7 +44,13 @@ namespace Tangra.Video.FITS
                 {
                     m_AllCards.Add(new HeaderEntry(card));                   
                 }
+                orderedCardNames.Add((string) cursor.Key);
             }
+
+            orderedCardNames.Sort();
+            byte[] combinedCardNamesBytes = Encoding.UTF8.GetBytes(string.Join("|", orderedCardNames));
+            var hash = hasher.ComputeHash(combinedCardNamesBytes, 0, combinedCardNamesBytes.Length);
+            m_CardNamesHash = Convert.ToBase64String(hash);
 
             cbxTimeStamp.Items.AddRange(m_AllCards.ToArray());
             cbxTimeStamp2.Items.AddRange(m_AllCards.ToArray());
@@ -281,7 +293,7 @@ namespace Tangra.Video.FITS
             if (cbxTimeStampFormat.SelectedIndex == -1)
                 cbxTimeStampFormat.Text = config.TimeStampFormat;
 
-            if (config.FileHash == m_FilesHash)
+            if (config.FileHash == m_FilesHash || m_CardNamesHash == config.CardNamesHash)
             {
                 cbxExposureUnits.SelectedIndex = (int)config.ExposureUnit;
                 cbxTimestampType.SelectedIndex = (int)config.TimeStampType;
@@ -329,6 +341,20 @@ namespace Tangra.Video.FITS
                     return;
                 }
 
+                if (cbxExposureUnits.SelectedIndex == -1)
+                {
+                    MessageBox.Show("Please choose exposure units.");
+                    cbxExposureUnits.Focus();
+                    return;                    
+                }
+
+                if (cbxTimestampType.SelectedIndex == -1)
+                {
+                    MessageBox.Show("Please choose timestamp type.");
+                    cbxTimestampType.Focus();
+                    return;
+                }
+
                 var config = new TangraConfig.FITSFieldConfig()
                 {
                     ExposureHeader = cbxExposure.Text,
@@ -342,6 +368,7 @@ namespace Tangra.Video.FITS
                 TimeStampReader = new FITSTimeStampReader(config);
 
                 config.FileHash = m_FilesHash;
+                config.CardNamesHash = m_CardNamesHash;
                 TangraConfig.Settings.RecentFITSFieldConfig.Register(config);
                 TangraConfig.Settings.Save();
 
@@ -374,6 +401,7 @@ namespace Tangra.Video.FITS
                 TimeStampReader = new FITSTimeStampReader(config);
 
                 config.FileHash = m_FilesHash;
+                config.CardNamesHash = m_CardNamesHash;
                 TangraConfig.Settings.RecentFITSFieldConfig.Register(config);
                 TangraConfig.Settings.Save();
 

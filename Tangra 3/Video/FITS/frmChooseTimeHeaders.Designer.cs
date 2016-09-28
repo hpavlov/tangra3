@@ -97,6 +97,7 @@
             // rbStartEndTimestamp
             // 
             this.rbStartEndTimestamp.AutoSize = true;
+            this.rbStartEndTimestamp.Enabled = false;
             this.rbStartEndTimestamp.Location = new System.Drawing.Point(215, 22);
             this.rbStartEndTimestamp.Name = "rbStartEndTimestamp";
             this.rbStartEndTimestamp.Size = new System.Drawing.Size(137, 17);

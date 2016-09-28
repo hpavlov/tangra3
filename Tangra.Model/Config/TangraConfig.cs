@@ -2341,6 +2341,7 @@ namespace Tangra.Model.Config
             public string TimeStamp2Format;
             public bool IsTimeStampAndExposure;
             public string FileHash;
+            public string CardNamesHash;
         }
 
 	    public class RecentFITSFieldConfigSettings
@@ -2354,6 +2355,7 @@ namespace Tangra.Model.Config
 	                if (IsSameConfig(item, config))
 	                {
 	                    item.FileHash = config.FileHash;
+                        item.CardNamesHash = config.CardNamesHash;
 	                    return;
 	                }
 	            }
