@@ -92,44 +92,51 @@ namespace Tangra.Video.FITS
 
             for (int i = 0; i < m_FitsFiles.Length; i++)
             {
-                using (BufferedFile bf = new BufferedFile(m_FitsFiles[i], FileAccess.Read, FileShare.ReadWrite))
+                try
                 {
-                    Header hdr = Header.ReadHeader(bf);
-                    m_FitsHeaders[i] = hdr;
-
-                    int numAxis = -1;
-                    int width = -1;
-                    int height = -1;
-                    int.TryParse(hdr.FindCard("NAXIS") != null ? hdr.FindCard("NAXIS").Value : "0", out numAxis);
-                    int.TryParse(hdr.FindCard("NAXIS1") != null ? hdr.FindCard("NAXIS1").Value : "0", out width);
-                    int.TryParse(hdr.FindCard("NAXIS2") != null ? hdr.FindCard("NAXIS2").Value : "0", out height);
-                    string format = String.Format("{0} x {1}", width, height);
-                    if (fileSizeInfo.ContainsKey(format))
-                        fileSizeInfo[format].NumFiles++;
-                    else
-                        fileSizeInfo.Add(format, new FitsFileFormatInfoRecord { FirstFile = Path.GetFileName(m_FitsFiles[i]), NumFiles = 1 });
-
-                    bool isMidPoint;
-                    double? fitsExposure;
-                    DateTime? timestamp = FITSHelper.ParseExposure(hdr, TimeStampReader, out isMidPoint, out fitsExposure);
-
-                    if (i == 0 && (!fitsExposure.HasValue || !timestamp.HasValue))
+                    using (BufferedFile bf = new BufferedFile(m_FitsFiles[i], FileAccess.Read, FileShare.ReadWrite))
                     {
-                        var frm = new frmChooseTimeHeaders(hdr, GetOrderedFitsFileHash());
-                        if (frm.ShowDialog(this) == DialogResult.OK)
+                        Header hdr = Header.ReadHeader(bf);
+                        m_FitsHeaders[i] = hdr;
+
+                        int numAxis = -1;
+                        int width = -1;
+                        int height = -1;
+                        int.TryParse(hdr.FindCard("NAXIS") != null ? hdr.FindCard("NAXIS").Value : "0", out numAxis);
+                        int.TryParse(hdr.FindCard("NAXIS1") != null ? hdr.FindCard("NAXIS1").Value : "0", out width);
+                        int.TryParse(hdr.FindCard("NAXIS2") != null ? hdr.FindCard("NAXIS2").Value : "0", out height);
+                        string format = String.Format("{0} x {1}", width, height);
+                        if (fileSizeInfo.ContainsKey(format))
+                            fileSizeInfo[format].NumFiles++;
+                        else
+                            fileSizeInfo.Add(format, new FitsFileFormatInfoRecord { FirstFile = Path.GetFileName(m_FitsFiles[i]), NumFiles = 1 });
+
+                        bool isMidPoint;
+                        double? fitsExposure;
+                        DateTime? timestamp = FITSHelper.ParseExposure(hdr, TimeStampReader, out isMidPoint, out fitsExposure);
+
+                        if (i == 0 && (!fitsExposure.HasValue || !timestamp.HasValue))
                         {
-                            TimeStampReader = frm.TimeStampReader;
+                            var frm = new frmChooseTimeHeaders(hdr, GetOrderedFitsFileHash());
+                            if (frm.ShowDialog(this) == DialogResult.OK)
+                            {
+                                TimeStampReader = frm.TimeStampReader;
+                            }
+
+                            timestamp = FITSHelper.ParseExposure(hdr, TimeStampReader, out isMidPoint, out fitsExposure);
                         }
 
-                        timestamp = FITSHelper.ParseExposure(hdr, TimeStampReader, out isMidPoint, out fitsExposure);
+                        m_FitsTimestamps[i] = timestamp;
+
+                        if (fitsExposure.HasValue)
+                            m_FilesWithExposure++;
+                        else
+                            m_FilesWithoutExposure++;
                     }
-
-                    m_FitsTimestamps[i] = timestamp;
-
-                    if (fitsExposure.HasValue)
-                        m_FilesWithExposure++;
-                    else
-                        m_FilesWithoutExposure++;
+                }
+                catch (Exception ex)
+                {
+                    throw new ApplicationException(string.Format("Error processing FITS files: {0}", m_FitsFiles[i]), ex);
                 }
 
                 pbar.Value = i;

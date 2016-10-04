@@ -334,6 +334,23 @@ namespace Tangra.Helpers
 					dataRow = (short[]) dataRowObject;
 					dataType = typeof (short);
 				}
+                else if (dataRowObject is float[])
+                {
+                    dataType = typeof(float);
+                    Array arr = (Array)dataRowObject;
+                    dataRow = new short[arr.Length];
+                    for (int i = 0; i < arr.Length; i++)
+                    {
+                        float pixelVal = (float)arr.GetValue(i);
+
+                        if (pixelVal >= short.MaxValue)
+                            dataRow[i] = short.MaxValue;
+                        else if (pixelVal <= short.MinValue)
+                            dataRow[i] = short.MinValue;
+                        else
+                            dataRow[i] = (short)Convert.ToInt32(pixelVal);
+                    }
+                }
                 else if (dataRowObject is Array)
 				{
 					Array arr = (Array) dataRowObject;
@@ -341,7 +358,15 @@ namespace Tangra.Helpers
 					for (int i = 0; i < arr.Length; i++)
 					{
 						if (dataType == null) dataType = arr.GetValue(i).GetType();
-						dataRow[i] = (short) Convert.ToInt32(arr.GetValue(i));
+					    object pixelVal = arr.GetValue(i);
+
+					    double dblVal = Convert.ToDouble(pixelVal);
+					    if (dblVal >= short.MaxValue)
+					        dataRow[i] = short.MaxValue;
+                        else if (dblVal <= short.MinValue)
+                            dataRow[i] = short.MinValue;
+                        else
+                            dataRow[i] = (short)Convert.ToInt32(pixelVal);
 					}
 				}
 				else
