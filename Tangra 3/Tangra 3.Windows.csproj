@@ -634,6 +634,12 @@
     <Compile Include="VideoTools\frmDefineDisplayDynamicRange.Designer.cs">
       <DependentUpon>frmDefineDisplayDynamicRange.cs</DependentUpon>
     </Compile>
+    <Compile Include="VideoTools\frmExportVideoToFITS.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoTools\frmExportVideoToFITS.Designer.cs">
+      <DependentUpon>frmExportVideoToFITS.cs</DependentUpon>
+    </Compile>
     <Compile Include="VideoTools\frmFileInformation.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -1161,6 +1167,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="VideoTools\frmDefineDisplayDynamicRange.resx">
       <DependentUpon>frmDefineDisplayDynamicRange.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoTools\frmExportVideoToFITS.resx">
+      <DependentUpon>frmExportVideoToFITS.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VideoTools\frmFileInformation.resx">
       <DependentUpon>frmFileInformation.cs</DependentUpon>

@@ -203,6 +203,8 @@ namespace Tangra.Controller
 
 		public bool OpenFitsFileSequence(string folderName)
 		{
+            TangraContext.Current.IsFitsStream = false;
+
 		    string[] fitsFiles = null;
 		    try
 		    {
@@ -248,6 +250,7 @@ namespace Tangra.Controller
                                 stream = FITSFileSequenceStream.OpenFolder(fitsFiles, frm.TimeStampReader, true, out hasNegativePixels);
 							}
 
+                            TangraContext.Current.IsFitsStream = true;
 							return stream;
 						});
  
@@ -385,6 +388,7 @@ namespace Tangra.Controller
 		{
 			TangraContext.Current.UsingADV = false;
 			TangraContext.Current.IsSerFile = false;
+		    TangraContext.Current.IsFitsStream = false;
 			TangraContext.Current.FileName = null;
 			TangraContext.Current.FileFormat = null;
 			TangraContext.Current.HasVideoLoaded = false;

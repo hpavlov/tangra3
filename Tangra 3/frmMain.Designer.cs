@@ -97,7 +97,6 @@
             this.pnlControlerPanel = new System.Windows.Forms.Panel();
             this.zoomedImage = new System.Windows.Forms.PictureBox();
             this.panelVideo = new System.Windows.Forms.Panel();
-            this.pictureBox = new Tangra.Controls.ImagePanel();
             this.pnlPlayControls = new System.Windows.Forms.Panel();
             this.pnlPlayButtons = new System.Windows.Forms.Panel();
             this.btnJumpTo = new System.Windows.Forms.Button();
@@ -115,6 +114,9 @@
             this.openAdvFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.saveFrameDialog = new System.Windows.Forms.SaveFileDialog();
             this.timerCommandArgs = new System.Windows.Forms.Timer(this.components);
+            this.pictureBox = new Tangra.Controls.ImagePanel();
+            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+            this.miExportVideoToFITS = new System.Windows.Forms.ToolStripMenuItem();
             this.mainMenu.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.panelRight.SuspendLayout();
@@ -154,6 +156,8 @@
             this.miOpenSpectra,
             this.miRecentSpectras,
             this.toolStripSeparator4,
+            this.miExportVideoToFITS,
+            this.toolStripSeparator5,
             this.miFileInfo,
             this.miExit});
             this.miFile.Name = "miFile";
@@ -232,7 +236,7 @@
             // 
             this.miExit.Name = "miExit";
             this.miExit.Size = new System.Drawing.Size(214, 22);
-            this.miExit.Text = "&Exit";
+            this.miExit.Text = "E&xit";
             this.miExit.Click += new System.EventHandler(this.miExit_Click);
             // 
             // miFrameActions
@@ -803,27 +807,6 @@
             this.panelVideo.Size = new System.Drawing.Size(582, 570);
             this.panelVideo.TabIndex = 4;
             // 
-            // pictureBox
-            // 
-            this.pictureBox.AllowDrop = true;
-            this.pictureBox.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.pictureBox.CanvasSize = new System.Drawing.Size(60, 40);
-            this.pictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBox.Image = null;
-            this.pictureBox.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
-            this.pictureBox.Location = new System.Drawing.Point(0, 0);
-            this.pictureBox.Name = "pictureBox";
-            this.pictureBox.Size = new System.Drawing.Size(582, 503);
-            this.pictureBox.TabIndex = 2;
-            this.pictureBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragDrop);
-            this.pictureBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragEnter);
-            this.pictureBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseClick);
-            this.pictureBox.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDoubleClick);
-            this.pictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDown);
-            this.pictureBox.MouseLeave += new System.EventHandler(this.pictureBox_MouseLeave);
-            this.pictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseMove);
-            this.pictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseUp);
-            // 
             // pnlPlayControls
             // 
             this.pnlPlayControls.Controls.Add(this.pnlPlayButtons);
@@ -981,6 +964,39 @@
             // 
             this.timerCommandArgs.Tick += new System.EventHandler(this.timerCommandArgs_Tick);
             // 
+            // pictureBox
+            // 
+            this.pictureBox.AllowDrop = true;
+            this.pictureBox.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.pictureBox.CanvasSize = new System.Drawing.Size(60, 40);
+            this.pictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBox.Image = null;
+            this.pictureBox.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
+            this.pictureBox.Location = new System.Drawing.Point(0, 0);
+            this.pictureBox.Name = "pictureBox";
+            this.pictureBox.Size = new System.Drawing.Size(582, 503);
+            this.pictureBox.TabIndex = 2;
+            this.pictureBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragDrop);
+            this.pictureBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.FileSystemFileDragEnter);
+            this.pictureBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseClick);
+            this.pictureBox.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDoubleClick);
+            this.pictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDown);
+            this.pictureBox.MouseLeave += new System.EventHandler(this.pictureBox_MouseLeave);
+            this.pictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseMove);
+            this.pictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseUp);
+            // 
+            // toolStripSeparator5
+            // 
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(211, 6);
+            // 
+            // miExportVideoToFITS
+            // 
+            this.miExportVideoToFITS.Name = "miExportVideoToFITS";
+            this.miExportVideoToFITS.Size = new System.Drawing.Size(214, 22);
+            this.miExportVideoToFITS.Text = "&Export Video to FITS";
+            this.miExportVideoToFITS.Click += new System.EventHandler(this.miExportVideoToFITS_Click);
+            // 
             // frmMain
             // 
             this.AllowDrop = true;
@@ -1118,6 +1134,8 @@
         private System.Windows.Forms.ToolStripMenuItem miOccultationVideoModeling;
         private System.Windows.Forms.ToolStripMenuItem miStarFieldVideoModelling;
         private System.Windows.Forms.ToolStripMenuItem miReleaseNotes;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
+        protected internal System.Windows.Forms.ToolStripMenuItem miExportVideoToFITS;
 	}
 }
 

@@ -1349,5 +1349,11 @@ namespace Tangra
             else
                 MessageBox.Show("Could not find: " + filePath, "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
 	    }
+
+        private void miExportVideoToFITS_Click(object sender, EventArgs e)
+        {
+            var frm = new frmExportVideoToFITS(m_VideoController);
+            frm.ShowDialog(this);
+        }
 	}
 }
