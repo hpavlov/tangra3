@@ -256,6 +256,7 @@
     <Compile Include="Config\InstrumentalDelayConfigManager.cs" />
     <Compile Include="Controller\AstrometryController.cs" />
     <Compile Include="Controller\AutoUpdatesController.cs" />
+    <Compile Include="Controller\ConvertVideoToFitsController.cs" />
     <Compile Include="Controller\IRequiresAddinsController.cs" />
     <Compile Include="Controller\LightCurveContext.cs" />
     <Compile Include="Controller\LightCurveController.cs" />
@@ -341,9 +342,17 @@
       <DependentUpon>frmLongRunningOperation.cs</DependentUpon>
     </Compile>
     <Compile Include="Helpers\LongOperationsManager.cs" />
+    <Compile Include="ImageTools\RoiSelector.cs" />
     <Compile Include="VideoOperations\Astrometry\Tracking\FastAsteroidTracker.cs" />
     <Compile Include="VideoOperations\Astrometry\Tracking\IAstrometryTracker.cs" />
     <Compile Include="VideoOperations\Astrometry\Tracking\SlowMotionTracker.cs" />
+    <Compile Include="VideoOperations\ConvertVideoToFits\ConvertVideoToFitsOperation.cs" />
+    <Compile Include="VideoOperations\ConvertVideoToFits\ucConvertVideoToFits.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\ConvertVideoToFits\ucConvertVideoToFits.Designer.cs">
+      <DependentUpon>ucConvertVideoToFits.cs</DependentUpon>
+    </Compile>
     <Compile Include="VideoOperations\LightCurves\Tracking\LunarOccultationTracker.cs" />
     <Compile Include="VideoOperations\LightCurves\Tracking\StarFieldTracker.cs" />
     <Compile Include="VideoOperations\Spectroscopy\AbsFluxCalibration\AbsFluxCalibrator.cs" />
@@ -633,12 +642,6 @@
     </Compile>
     <Compile Include="VideoTools\frmDefineDisplayDynamicRange.Designer.cs">
       <DependentUpon>frmDefineDisplayDynamicRange.cs</DependentUpon>
-    </Compile>
-    <Compile Include="VideoTools\frmExportVideoToFITS.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="VideoTools\frmExportVideoToFITS.Designer.cs">
-      <DependentUpon>frmExportVideoToFITS.cs</DependentUpon>
     </Compile>
     <Compile Include="VideoTools\frmFileInformation.cs">
       <SubType>Form</SubType>
@@ -1099,6 +1102,9 @@
     <EmbeddedResource Include="VideoOperations\Astrometry\ucChooseCalibratedConfiguration.resx">
       <DependentUpon>ucChooseCalibratedConfiguration.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\ConvertVideoToFits\ucConvertVideoToFits.resx">
+      <DependentUpon>ucConvertVideoToFits.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\LightCurves\frmConfigureCsvExport.resx">
       <DependentUpon>frmConfigureCsvExport.cs</DependentUpon>
     </EmbeddedResource>
@@ -1167,9 +1173,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="VideoTools\frmDefineDisplayDynamicRange.resx">
       <DependentUpon>frmDefineDisplayDynamicRange.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="VideoTools\frmExportVideoToFITS.resx">
-      <DependentUpon>frmExportVideoToFITS.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VideoTools\frmFileInformation.resx">
       <DependentUpon>frmFileInformation.cs</DependentUpon>

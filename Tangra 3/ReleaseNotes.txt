@@ -9,6 +9,7 @@ v3.6.0 Unreleased
 - Observed object name recorded in AAV/ADV files is now displayed on the screen.
 - Support for working with FITS sequences with non-standard headers for timestamp and exposure.
 - Improvements to default dynamic range selection when working with FITS files.
+- Implemented export of videos, incuding AAV/ADV, to a FITS sequence.
 
 v3.5.8 (2016-07-01)
 -------------------

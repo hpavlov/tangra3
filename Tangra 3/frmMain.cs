@@ -45,6 +45,7 @@ using Tangra.VideoTools;
 using Tangra.View;
 using nom.tam.fits;
 using nom.tam.util;
+using Tangra.VideoOperations.ConvertVideoToFits;
 
 namespace Tangra
 {
@@ -55,6 +56,7 @@ namespace Tangra
 		private AstrometryController m_AstrometryController;
 	    private SpectroscopyController m_SpectroscopyController;
 		private DarkFlatFrameController m_MakeDarkFlatController;
+        private ConvertVideoToFitsController m_ConvertVideoToFitsController;
 		private AutoUpdatesController m_AutoUpdatesController;
 		private AddinsController m_AddinsController;
         private OcrExtensionManager m_OcrExtensionManager;
@@ -84,6 +86,7 @@ namespace Tangra
 
             m_LightCurveController = new LightCurveController(this, m_VideoController, m_AddinsController, m_OcrExtensionManager);
 			m_MakeDarkFlatController = new DarkFlatFrameController(this, m_VideoController);
+            m_ConvertVideoToFitsController = new ConvertVideoToFitsController(this, m_VideoController);
 			m_AstrometryController = new AstrometryController(m_VideoController, m_LongOperationsManager);
 		    m_SpectroscopyController = new SpectroscopyController(this, m_VideoController);
 			m_AutoUpdatesController = new AutoUpdatesController(this, m_VideoController);
@@ -1352,8 +1355,10 @@ namespace Tangra
 
         private void miExportVideoToFITS_Click(object sender, EventArgs e)
         {
-            var frm = new frmExportVideoToFITS(m_VideoController);
-            frm.ShowDialog(this);
+            m_VideoController.ActivateOperation<ConvertVideoToFitsOperation>(m_ConvertVideoToFitsController);
+            m_VideoController.ChangeImageTool(new RoiSelector(m_VideoController));
+            m_VideoController.SetPictureBoxCursor(Cursors.Arrow);
+            m_VideoController.RefreshCurrentFrame();
         }
 	}
 }
