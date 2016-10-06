@@ -1355,7 +1355,7 @@ namespace Tangra
 
         private void miExportVideoToFITS_Click(object sender, EventArgs e)
         {
-            m_VideoController.ActivateOperation<ConvertVideoToFitsOperation>(m_ConvertVideoToFitsController);
+            m_VideoController.ActivateOperation<ConvertVideoToFitsOperation>(m_ConvertVideoToFitsController, m_OcrExtensionManager, false);
             m_VideoController.ChangeImageTool(new RoiSelector(m_VideoController));
             m_VideoController.SetPictureBoxCursor(Cursors.Arrow);
             m_VideoController.RefreshCurrentFrame();
