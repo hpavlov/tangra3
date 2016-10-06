@@ -39,18 +39,20 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             this.nudLastFrame = new System.Windows.Forms.NumericUpDown();
             this.label27 = new System.Windows.Forms.Label();
             this.btnCancel = new System.Windows.Forms.Button();
-            this.pbar1 = new System.Windows.Forms.ProgressBar();
+            this.pbar = new System.Windows.Forms.ProgressBar();
             this.btnExport = new System.Windows.Forms.Button();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.gbxFormat = new System.Windows.Forms.GroupBox();
+            this.gbxFrameSize = new System.Windows.Forms.GroupBox();
             this.rbFullFrame = new System.Windows.Forms.RadioButton();
             this.rbROI = new System.Windows.Forms.RadioButton();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.gbxSection = new System.Windows.Forms.GroupBox();
+            this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
             ((System.ComponentModel.ISupportInitialize)(this.nudFirstFrame)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudLastFrame)).BeginInit();
-            this.groupBox1.SuspendLayout();
-            this.groupBox2.SuspendLayout();
-            this.groupBox3.SuspendLayout();
+            this.gbxFormat.SuspendLayout();
+            this.gbxFrameSize.SuspendLayout();
+            this.gbxSection.SuspendLayout();
             this.SuspendLayout();
             // 
             // rbCube
@@ -111,52 +113,53 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             // btnCancel
             // 
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(116, 258);
+            this.btnCancel.Location = new System.Drawing.Point(126, 258);
             this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(93, 23);
+            this.btnCancel.Size = new System.Drawing.Size(101, 23);
             this.btnCancel.TabIndex = 27;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             // 
-            // pbar1
+            // pbar
             // 
-            this.pbar1.Location = new System.Drawing.Point(13, 292);
-            this.pbar1.Name = "pbar1";
-            this.pbar1.Size = new System.Drawing.Size(196, 15);
-            this.pbar1.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
-            this.pbar1.TabIndex = 28;
-            this.pbar1.Visible = false;
+            this.pbar.Location = new System.Drawing.Point(13, 292);
+            this.pbar.Name = "pbar";
+            this.pbar.Size = new System.Drawing.Size(214, 15);
+            this.pbar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+            this.pbar.TabIndex = 28;
+            this.pbar.Visible = false;
             // 
             // btnExport
             // 
             this.btnExport.Location = new System.Drawing.Point(13, 258);
             this.btnExport.Name = "btnExport";
-            this.btnExport.Size = new System.Drawing.Size(93, 23);
+            this.btnExport.Size = new System.Drawing.Size(101, 23);
             this.btnExport.TabIndex = 26;
             this.btnExport.Text = "Export";
             this.btnExport.UseVisualStyleBackColor = true;
+            this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
             // 
-            // groupBox1
+            // gbxFormat
             // 
-            this.groupBox1.Controls.Add(this.rbSequence);
-            this.groupBox1.Controls.Add(this.rbCube);
-            this.groupBox1.Location = new System.Drawing.Point(9, 0);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(196, 78);
-            this.groupBox1.TabIndex = 29;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Export Format";
+            this.gbxFormat.Controls.Add(this.rbSequence);
+            this.gbxFormat.Controls.Add(this.rbCube);
+            this.gbxFormat.Location = new System.Drawing.Point(9, 0);
+            this.gbxFormat.Name = "gbxFormat";
+            this.gbxFormat.Size = new System.Drawing.Size(218, 78);
+            this.gbxFormat.TabIndex = 29;
+            this.gbxFormat.TabStop = false;
+            this.gbxFormat.Text = "Export Format";
             // 
-            // groupBox2
+            // gbxFrameSize
             // 
-            this.groupBox2.Controls.Add(this.rbFullFrame);
-            this.groupBox2.Controls.Add(this.rbROI);
-            this.groupBox2.Location = new System.Drawing.Point(11, 84);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(196, 78);
-            this.groupBox2.TabIndex = 30;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Frame Size";
+            this.gbxFrameSize.Controls.Add(this.rbFullFrame);
+            this.gbxFrameSize.Controls.Add(this.rbROI);
+            this.gbxFrameSize.Location = new System.Drawing.Point(11, 84);
+            this.gbxFrameSize.Name = "gbxFrameSize";
+            this.gbxFrameSize.Size = new System.Drawing.Size(216, 78);
+            this.gbxFrameSize.TabIndex = 30;
+            this.gbxFrameSize.TabStop = false;
+            this.gbxFrameSize.Text = "Frame Size";
             // 
             // rbFullFrame
             // 
@@ -181,39 +184,43 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             this.rbROI.UseVisualStyleBackColor = true;
             this.rbROI.CheckedChanged += new System.EventHandler(this.rbROI_CheckedChanged);
             // 
-            // groupBox3
+            // gbxSection
             // 
-            this.groupBox3.Controls.Add(this.nudFirstFrame);
-            this.groupBox3.Controls.Add(this.label27);
-            this.groupBox3.Controls.Add(this.nudLastFrame);
-            this.groupBox3.Controls.Add(this.label26);
-            this.groupBox3.Location = new System.Drawing.Point(13, 168);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(196, 78);
-            this.groupBox3.TabIndex = 31;
-            this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Export Section";
+            this.gbxSection.Controls.Add(this.nudFirstFrame);
+            this.gbxSection.Controls.Add(this.label27);
+            this.gbxSection.Controls.Add(this.nudLastFrame);
+            this.gbxSection.Controls.Add(this.label26);
+            this.gbxSection.Location = new System.Drawing.Point(13, 168);
+            this.gbxSection.Name = "gbxSection";
+            this.gbxSection.Size = new System.Drawing.Size(214, 78);
+            this.gbxSection.TabIndex = 31;
+            this.gbxSection.TabStop = false;
+            this.gbxSection.Text = "Export Section";
+            // 
+            // saveFileDialog
+            // 
+            this.saveFileDialog.DefaultExt = "fits";
             // 
             // ucConvertVideoToFits
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.groupBox3);
-            this.Controls.Add(this.groupBox2);
-            this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.gbxSection);
+            this.Controls.Add(this.gbxFrameSize);
+            this.Controls.Add(this.gbxFormat);
             this.Controls.Add(this.btnCancel);
-            this.Controls.Add(this.pbar1);
+            this.Controls.Add(this.pbar);
             this.Controls.Add(this.btnExport);
             this.Name = "ucConvertVideoToFits";
-            this.Size = new System.Drawing.Size(224, 320);
+            this.Size = new System.Drawing.Size(259, 336);
             ((System.ComponentModel.ISupportInitialize)(this.nudFirstFrame)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudLastFrame)).EndInit();
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
-            this.groupBox2.ResumeLayout(false);
-            this.groupBox2.PerformLayout();
-            this.groupBox3.ResumeLayout(false);
-            this.groupBox3.PerformLayout();
+            this.gbxFormat.ResumeLayout(false);
+            this.gbxFormat.PerformLayout();
+            this.gbxFrameSize.ResumeLayout(false);
+            this.gbxFrameSize.PerformLayout();
+            this.gbxSection.ResumeLayout(false);
+            this.gbxSection.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -227,12 +234,14 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
         private System.Windows.Forms.NumericUpDown nudLastFrame;
         private System.Windows.Forms.Label label27;
         private System.Windows.Forms.Button btnCancel;
-        private System.Windows.Forms.ProgressBar pbar1;
+        private System.Windows.Forms.ProgressBar pbar;
         private System.Windows.Forms.Button btnExport;
-        private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.GroupBox gbxFormat;
+        private System.Windows.Forms.GroupBox gbxFrameSize;
         private System.Windows.Forms.RadioButton rbFullFrame;
         private System.Windows.Forms.RadioButton rbROI;
-        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.GroupBox gbxSection;
+        private System.Windows.Forms.SaveFileDialog saveFileDialog;
+        private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog;
     }
 }

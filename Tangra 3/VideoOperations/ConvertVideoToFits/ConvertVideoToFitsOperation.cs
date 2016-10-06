@@ -75,12 +75,39 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
         public void PlayerStarted()
         { }
 
+        private int m_FirstFrame;        
+        private int m_LastFrame;
+
         public void NextFrame(int frameNo, MovementType movementType, bool isLastFrame, AstroImage astroImage, int firstFrameInIntegrationPeriod, string fileName)
         {
             if (m_Status == ConvertVideoToFitsState.Configuring)
             {
                 m_ControlPanel.UpdateStartFrame(frameNo);
             }
+            else if (m_Status == ConvertVideoToFitsState.Converting)
+            {
+                m_ControlPanel.UpdateProgress(frameNo);
+                m_ConvertVideoToFitsController.ProcessFrame(frameNo, astroImage);
+
+                if (isLastFrame || m_LastFrame == frameNo)
+                {
+                    m_ConvertVideoToFitsController.FinishExport();
+                    m_ControlPanel.ExportFinished();
+                }
+
+                if (m_LastFrame == frameNo)
+                    m_VideoController.StopVideo();
+            }
+        }
+
+        internal void StartExport(string fileName, bool fitsCube, int firstFrame, int lastFrame, Rectangle roi)
+        {
+            m_Status = ConvertVideoToFitsState.Converting;
+            m_FirstFrame = firstFrame;
+            m_LastFrame = lastFrame;
+            m_ConvertVideoToFitsController.StartExport(fileName, fitsCube, roi);
+
+            m_VideoController.PlayVideo(m_FirstFrame);
         }
 
         public void ImageToolChanged(ImageTool newTool, ImageTool oldTool)
