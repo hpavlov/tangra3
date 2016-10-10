@@ -219,6 +219,18 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
 					return;
 				}
 
+			    if (ucUtcTime.DateTimeUtc.Date == DateTime.Now.Date)
+			    {
+			        if (m_VideoController.ShowMessageBox(
+                        "The date component is also exported into the FITS header. Please ensure that the selected date it correct. Press OK to contrinue or Cancel to go back and change the date.", 
+                        "Tangra",
+                        MessageBoxButtons.OKCancel,
+                        MessageBoxIcon.Warning) == DialogResult.Cancel)
+			        {
+			            return;
+			        }
+			    }
+
 				m_FirstTimeFrame = m_CurrFrameNo;
 				m_FirstTimeSet = true;
 

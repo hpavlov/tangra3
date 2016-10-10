@@ -12,6 +12,7 @@ using Tangra.Helpers;
 using Tangra.Model.Astro;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
+using Tangra.VideoOperations.LightCurves;
 
 namespace Tangra.Controller
 {
@@ -27,13 +28,22 @@ namespace Tangra.Controller
         private string m_FolderName;
         private bool m_FitsCube;
 
+        private string m_DateObsComment;
+        private string m_TimeObsComment;
+        private string m_Note;
+
         public ConvertVideoToFitsController(Form mainFormView, VideoController videoController)
 		{
 			m_MainFormView = mainFormView;
 			m_VideoController = videoController;
+
+            m_Note = string.Format("Converted by Tangra from video file in {0} format.", videoController.GetVideoFileFormat());
+            if (m_Note.Length > HeaderCard.MAX_VALUE_LENGTH) m_Note = m_Note.Substring(0, HeaderCard.MAX_VALUE_LENGTH);
+            m_DateObsComment = "Date (yyyy-MM-dd)";
+            m_TimeObsComment = "Time (HH:mm:ss.fff)";
 		}
 
-        internal void StartExport(string fileName, bool fitsCube, Rectangle roi)
+        internal void StartExport(string fileName, bool fitsCube, Rectangle roi, UsedTimeBase timeBase, bool usesOCR)
         {
             m_FrameWidth = TangraContext.Current.FrameWidth;
             m_FrameHeight = TangraContext.Current.FrameHeight;
@@ -50,7 +60,30 @@ namespace Tangra.Controller
                     Directory.CreateDirectory(m_FolderName);
             }
 
-            // TODO: Start recording the file
+            if (m_UsesROI)
+            {
+                m_Note += string.Format(" RIO from original frame: x={0}, y={1}, w={2}, h ={3}.", roi.Left, roi.Top, roi.Width, roi.Height);
+                if (m_Note.Length > HeaderCard.MAX_VALUE_LENGTH) m_Note = m_Note.Substring(0, HeaderCard.MAX_VALUE_LENGTH);                
+            }
+
+            if (timeBase == UsedTimeBase.UserEnterred)
+            {
+                m_DateObsComment = "Date based on user entered VTI-OSD of a reference frame (yyyy-MM-dd)";
+                m_TimeObsComment = "Time based on user entered VTI-OSD of a reference frame (HH:mm:ss.fff)";
+            }
+            else if (timeBase == UsedTimeBase.EmbeddedTimeStamp)
+            {
+                if (usesOCR)
+                {
+                    m_DateObsComment = "Date based on the ORC-ed VTI-OSD timestamp of the frame (yyyy-MM-dd)";
+                    m_TimeObsComment = "Time based on the ORC-ed VTI-OSD timestamp of the frame (HH:mm:ss.fff)";                    
+                }
+                else
+                {
+                    m_DateObsComment = "Date of the frame as saved by the video recorder (yyyy-MM-dd)";
+                    m_TimeObsComment = "Time of the frame as saved by the video recorder (HH:mm:ss.fff)";
+                }
+            }
         }
 
         internal void ProcessFrame(int frameNo, AstroImage astroImage, DateTime timeStamp, float exposureSeconds)
@@ -64,15 +97,15 @@ namespace Tangra.Controller
                 {
                     for (int x = 0; x < m_RegionOfInterest.Width; x++)
                     {
-                        subpixels[y * m_RegionOfInterest.Height + x] = astroImage.Pixelmap.Pixels[(m_RegionOfInterest.Height + y)*m_FrameWidth + m_RegionOfInterest.Width + x];
+                        subpixels[y * m_RegionOfInterest.Width + x] = astroImage.Pixelmap.Pixels[(m_RegionOfInterest.Top + y) * m_FrameWidth + m_RegionOfInterest.Left + x];
                     }
                 }
 
-                SaveFitsFrame(fileName, m_RegionOfInterest.Width, m_RegionOfInterest.Height, "", subpixels, timeStamp, exposureSeconds);
+                SaveFitsFrame(fileName, m_RegionOfInterest.Width, m_RegionOfInterest.Height, subpixels, timeStamp, exposureSeconds);
             }
             else
             {
-                SaveFitsFrame(fileName, m_RegionOfInterest.Width, m_RegionOfInterest.Height, "", astroImage.Pixelmap.Pixels, timeStamp, exposureSeconds);
+                SaveFitsFrame(fileName, m_RegionOfInterest.Width, m_RegionOfInterest.Height, astroImage.Pixelmap.Pixels, timeStamp, exposureSeconds);
             }            
         }
 
@@ -93,7 +126,7 @@ namespace Tangra.Controller
             return bimg;
         }
 
-        internal static void SaveFitsFrame(string fileName, int width, int height, string notes, uint[] framePixels, DateTime timeStamp, float exposureSeconds)
+        internal void SaveFitsFrame(string fileName, int width, int height, uint[] framePixels, DateTime timeStamp, float exposureSeconds)
         {
             Fits f = new Fits();
 
@@ -109,17 +142,17 @@ namespace Tangra.Controller
             hdr.AddValue("NAXIS1", width, null);
             hdr.AddValue("NAXIS2", height, null);
 
-
-            //if (notes.Length > HeaderCard.MAX_VALUE_LENGTH) notes = notes.Substring(0, HeaderCard.MAX_VALUE_LENGTH);
-            //hdr.AddValue("NOTES", notes, null);
+            hdr.AddValue("NOTES", m_Note, null);
 
             if (exposureSeconds > 0)
             {
-                hdr.AddValue("EXPOSURE", exposureSeconds.ToString("0.000", CultureInfo.InvariantCulture), null);
-                hdr.AddValue("EXPTIME", exposureSeconds.ToString("0.000", CultureInfo.InvariantCulture), null);
+                hdr.AddValue("EXPOSURE", exposureSeconds.ToString("0.000", CultureInfo.InvariantCulture), "Exposure, seconds");
             }
 
-            hdr.AddValue("TANGRAVE", string.Format("{0} v{1}", VersionHelper.AssemblyProduct, VersionHelper.AssemblyFileVersion), null);
+            hdr.AddValue("DATEOBS", timeStamp.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), m_DateObsComment);
+            hdr.AddValue("TIMEOBS", timeStamp.ToString("HH:mm:ss.fff", CultureInfo.InvariantCulture), m_TimeObsComment);
+
+            hdr.AddValue("TANGRAVE", string.Format("{0} v{1}", VersionHelper.AssemblyProduct, VersionHelper.AssemblyFileVersion), "Tangra version");
 
             f.AddHDU(imageHDU);
 

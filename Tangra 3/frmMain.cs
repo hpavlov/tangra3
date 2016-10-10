@@ -1073,6 +1073,8 @@ namespace Tangra
                 retry = false;
                 if (frm.ShowDialog(this) == DialogResult.OK)
                 {
+                    m_VideoController.CloseOpenedVideoFile();
+
                     if (m_VideoController.OpenFitsFileSequence(frm.tbxFolderPath.Text) ||
                         (Control.ModifierKeys == Keys.Control && m_VideoController.OpenBitmapFileSequence(frm.tbxFolderPath.Text)))
                     {

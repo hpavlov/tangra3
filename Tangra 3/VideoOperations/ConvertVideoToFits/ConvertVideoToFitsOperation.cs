@@ -26,7 +26,8 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
     {
         Configuring,
         EnteringTimes,
-        Converting
+        Converting,
+        Finished
     }
 
     public class ConvertVideoToFitsOperation : VideoOperationBase, IVideoOperation
@@ -127,6 +128,7 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
                     else
                     {
                         timestamp = m_StartFrameTime.AddTicks((long)(frameNo - m_StartTimeFrame) * (m_EndFrameTime.Ticks - m_StartFrameTime.Ticks) / (m_EndTimeFrame - m_StartTimeFrame));
+                        exposureSeconds = (float)(new TimeSpan((m_EndFrameTime.Ticks - m_StartFrameTime.Ticks) / (m_EndTimeFrame - m_StartTimeFrame)).TotalSeconds);
                     }
                 }
 
@@ -136,6 +138,7 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
                 {
                     m_ConvertVideoToFitsController.FinishExport();
                     m_ControlPanel.ExportFinished();
+                    m_Status = ConvertVideoToFitsState.Finished;
                 }
 
                 if (m_LastFrame == frameNo)
@@ -148,7 +151,7 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             m_Status = ConvertVideoToFitsState.Converting;
             m_FirstFrame = firstFrame;
             m_LastFrame = lastFrame;
-            m_ConvertVideoToFitsController.StartExport(fileName, fitsCube, roi);
+            m_ConvertVideoToFitsController.StartExport(fileName, fitsCube, roi, timeBase, m_TimestampOCR != null);
 
             m_VideoController.PlayVideo(m_FirstFrame);
         }
