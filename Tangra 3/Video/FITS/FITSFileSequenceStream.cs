@@ -8,8 +8,10 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using nom.tam.fits;
 using Tangra.Helpers;
 using Tangra.Model.Config;
+using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.Model.Video;
 using Tangra.PInvoke;
@@ -54,7 +56,7 @@ namespace Tangra.Video.FITS
             uint minPixelValue;
             uint maxPixelValue;
 
-            FITSHelper.Load16BitFitsFile(m_FitsFilesList[0], m_TimeStampReader, zeroOutNegativeValues, out pixelsFlat, out width, out height, out bpp, out timestamp, out exposure, out minPixelValue, out maxPixelValue, out hasNegativePixels);
+            FITSHelper.Load16BitFitsFile(m_FitsFilesList[0], m_TimeStampReader, zeroOutNegativeValues, null, out pixelsFlat, out width, out height, out bpp, out timestamp, out exposure, out minPixelValue, out maxPixelValue, out hasNegativePixels);
 
             m_MinPixelValueFirstImage = minPixelValue;
             m_MaxPixelValueFirstImage = maxPixelValue;
@@ -115,7 +117,20 @@ namespace Tangra.Video.FITS
             uint maxPixelValue;
             bool hasNegativePixels;
 
-            FITSHelper.Load16BitFitsFile(m_FitsFilesList[index], m_TimeStampReader, m_ZeroOutNegativePixels, out pixelsFlat, out width, out height, out bpp, out timestamp, out exposure, out minPixelValue, out maxPixelValue, out hasNegativePixels);
+            var cards = new Dictionary<string, string>();
+
+            FITSHelper.Load16BitFitsFile(m_FitsFilesList[index], m_TimeStampReader, m_ZeroOutNegativePixels,
+                (hdu) =>
+                {
+                    var cursor = hdu.Header.GetCursor();
+                    while (cursor.MoveNext())
+                    {
+                        HeaderCard card = hdu.Header.FindCard((string)cursor.Key);
+                        if (card != null && !string.IsNullOrWhiteSpace(card.Key) && card.Key != "END")
+                            cards.Add(card.Key, card.Value);                        
+                    }
+                },
+                out pixelsFlat, out width, out height, out bpp, out timestamp, out exposure, out minPixelValue, out maxPixelValue, out hasNegativePixels);
 
             byte[] displayBitmapBytes = new byte[Width * Height];
             byte[] rawBitmapBytes = new byte[(Width * Height * 3) + 40 + 14 + 1];
@@ -133,12 +148,13 @@ namespace Tangra.Video.FITS
 
 			if (HasUTCTimeStamps)
 			{
-				rv.FrameState = new FrameStateData()
-				{
-					CentralExposureTime = timestamp.HasValue ? timestamp.Value : DateTime.MinValue,
-					ExposureInMilliseconds = exposure.HasValue ? (float)(exposure.Value * 1000.0) : 0
-				};
+			    rv.FrameState.CentralExposureTime = timestamp.HasValue ? timestamp.Value : DateTime.MinValue;
+				rv.FrameState.ExposureInMilliseconds = exposure.HasValue ? (float)(exposure.Value * 1000.0) : 0;
 			}
+
+            rv.FrameState.AdditionalProperties = new SafeDictionary<string, object>();
+            foreach (string key in cards.Keys)
+                rv.FrameState.AdditionalProperties.Add(key, cards[key]);
 
             return rv;
         }

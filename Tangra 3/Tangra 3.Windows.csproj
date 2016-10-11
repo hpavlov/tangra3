@@ -914,6 +914,12 @@
     <Compile Include="Video\FITS\frmChooseTimeHeaders.Designer.cs">
       <DependentUpon>frmChooseTimeHeaders.cs</DependentUpon>
     </Compile>
+    <Compile Include="Video\FITS\frmFitsHeaderPopup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Video\FITS\frmFitsHeaderPopup.Designer.cs">
+      <DependentUpon>frmFitsHeaderPopup.cs</DependentUpon>
+    </Compile>
     <Compile Include="Video\FITS\frmSortFitsFiles.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -1279,6 +1285,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Video\FITS\frmChooseTimeHeaders.resx">
       <DependentUpon>frmChooseTimeHeaders.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Video\FITS\frmFitsHeaderPopup.resx">
+      <DependentUpon>frmFitsHeaderPopup.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Video\FITS\frmSortFitsFiles.resx">
       <DependentUpon>frmSortFitsFiles.cs</DependentUpon>

@@ -56,7 +56,7 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
 
             if (state == ConvertVideoToFitsState.Configuring)
             {
-                nudFirstFrame.Value = frameNo;
+                nudFirstFrame.SetNUDValue(frameNo);
             }
             else if (state == ConvertVideoToFitsState.Converting)
             {
@@ -225,7 +225,8 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
                         "The date component is also exported into the FITS header. Please ensure that the selected date it correct. Press OK to contrinue or Cancel to go back and change the date.", 
                         "Tangra",
                         MessageBoxButtons.OKCancel,
-                        MessageBoxIcon.Warning) == DialogResult.Cancel)
+                        MessageBoxIcon.Warning,
+                        MessageBoxDefaultButton.Button2) == DialogResult.Cancel)
 			        {
 			            return;
 			        }

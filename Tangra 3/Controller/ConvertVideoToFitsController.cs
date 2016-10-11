@@ -36,11 +36,6 @@ namespace Tangra.Controller
 		{
 			m_MainFormView = mainFormView;
 			m_VideoController = videoController;
-
-            m_Note = string.Format("Converted by Tangra from video file in {0} format.", videoController.GetVideoFileFormat());
-            if (m_Note.Length > HeaderCard.MAX_VALUE_LENGTH) m_Note = m_Note.Substring(0, HeaderCard.MAX_VALUE_LENGTH);
-            m_DateObsComment = "Date (yyyy-MM-dd)";
-            m_TimeObsComment = "Time (HH:mm:ss.fff)";
 		}
 
         internal void StartExport(string fileName, bool fitsCube, Rectangle roi, UsedTimeBase timeBase, bool usesOCR)
@@ -60,9 +55,14 @@ namespace Tangra.Controller
                     Directory.CreateDirectory(m_FolderName);
             }
 
+            m_Note = string.Format("Converted from {0} file.", m_VideoController.GetVideoFileFormat());
+            if (m_Note.Length > HeaderCard.MAX_VALUE_LENGTH) m_Note = m_Note.Substring(0, HeaderCard.MAX_VALUE_LENGTH);
+            m_DateObsComment = "Date (yyyy-MM-dd)";
+            m_TimeObsComment = "Time (HH:mm:ss.fff)";
+
             if (m_UsesROI)
             {
-                m_Note += string.Format(" RIO from original frame: x={0}, y={1}, w={2}, h ={3}.", roi.Left, roi.Top, roi.Width, roi.Height);
+                m_Note += string.Format(" Selected RIO: ({0},{1},{2},{3})", roi.Left, roi.Top, roi.Right, roi.Bottom);
                 if (m_Note.Length > HeaderCard.MAX_VALUE_LENGTH) m_Note = m_Note.Substring(0, HeaderCard.MAX_VALUE_LENGTH);                
             }
 
@@ -145,9 +145,7 @@ namespace Tangra.Controller
             hdr.AddValue("NOTES", m_Note, null);
 
             if (exposureSeconds > 0)
-            {
                 hdr.AddValue("EXPOSURE", exposureSeconds.ToString("0.000", CultureInfo.InvariantCulture), "Exposure, seconds");
-            }
 
             hdr.AddValue("DATEOBS", timeStamp.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), m_DateObsComment);
             hdr.AddValue("TIMEOBS", timeStamp.ToString("HH:mm:ss.fff", CultureInfo.InvariantCulture), m_TimeObsComment);

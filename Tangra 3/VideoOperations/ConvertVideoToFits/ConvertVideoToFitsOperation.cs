@@ -92,6 +92,7 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
 
         private int m_FirstFrame;        
         private int m_LastFrame;
+        private DateTime? m_PrevOCRedTimeStamp = null;
 
         public void NextFrame(int frameNo, MovementType movementType, bool isLastFrame, AstroImage astroImage, int firstFrameInIntegrationPeriod, string fileName)
         {
@@ -118,12 +119,16 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
                     }
 
                     timestamp = m_OCRedTimeStamp;
+                    if (m_PrevOCRedTimeStamp.HasValue)
+                        exposureSeconds = (float)new TimeSpan(timestamp.Ticks - m_PrevOCRedTimeStamp.Value.Ticks).TotalSeconds;
+                    m_PrevOCRedTimeStamp = timestamp;
                 }
                 else
                 {
                     if (m_VideoController.HasEmbeddedTimeStamps())
                     {
                         timestamp = astroImage.Pixelmap.FrameState.CentralExposureTime;
+                        exposureSeconds = astroImage.Pixelmap.FrameState.ExposureInMilliseconds / 1000.0f;
                     }
                     else
                     {
@@ -139,6 +144,7 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
                     m_ConvertVideoToFitsController.FinishExport();
                     m_ControlPanel.ExportFinished();
                     m_Status = ConvertVideoToFitsState.Finished;
+                    m_VideoController.ShowMessageBox("Export completed.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
 
                 if (m_LastFrame == frameNo)

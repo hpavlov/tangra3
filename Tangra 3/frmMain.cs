@@ -670,6 +670,10 @@ namespace Tangra
 			{
 				m_VideoController.ToggleSerStatusForm();
 			}
+            else if (m_VideoController.IsFitsSequence)
+            {
+                m_VideoController.ToggleFitsStatusForm();
+            }
 		}
 
         private void miTargetPSFViewer_Click(object sender, EventArgs e)
@@ -888,6 +892,9 @@ namespace Tangra
 			if (tsmiDynamic.Checked)
 			{
 				var frm = new frmDefineDisplayDynamicRange(m_VideoController);
+                frm.StartPosition = FormStartPosition.Manual;
+                frm.Left = Left + pictureBox.Width + 10;
+                frm.Top = Top + (Height - frm.Height) / 2;
 				frm.ShowDialog(this);
 			}
 		}
@@ -1084,6 +1091,9 @@ namespace Tangra
                         if (tsmiDynamic.Checked)
                         {
                             var frmDynRange = new frmDefineDisplayDynamicRange(m_VideoController);
+                            frmDynRange.StartPosition = FormStartPosition.Manual;
+                            frmDynRange.Left = Left + pictureBox.Width + 10;
+                            frmDynRange.Top = Top + (Height - frm.Height) / 2;
                             frmDynRange.ShowDialog(this);
                         }
 

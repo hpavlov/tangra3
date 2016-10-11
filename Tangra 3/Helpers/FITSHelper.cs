@@ -173,7 +173,8 @@ namespace Tangra.Helpers
 
 		private static Regex FITS_DATE_REGEX = new Regex("(?<DateStr>\\d\\d\\d\\d\\-\\d\\d\\-\\d\\dT\\d\\d:\\d\\d:\\d\\d(\\.\\d+)?)");
         public static void Load16BitFitsFile(
-            string fileName, FITSTimeStampReader timeStampReader, bool zeroOutNegativePixels, out uint[] pixelsFlat, out int width, out int height, out int bpp, out DateTime? timestamp, 
+            string fileName, FITSTimeStampReader timeStampReader, bool zeroOutNegativePixels, Action<BasicHDU> fitsFileLoadedCallback,
+            out uint[] pixelsFlat, out int width, out int height, out int bpp, out DateTime? timestamp, 
             out double? exposure, out uint minPixelValue, out uint maxPixelValue, out bool hasNegativePixels)
 		{
 			int pixWidth = 0;
@@ -204,13 +205,15 @@ namespace Tangra.Helpers
 					try
 					{
 						bool isMidPoint = false;
-                        fitsTimestamp = ParseExposure(imageHDU.Header, timeStampReader, out isMidPoint, out fitsExposure);
-					    
+                        fitsTimestamp = ParseExposure(imageHDU.Header, timeStampReader, out isMidPoint, out fitsExposure);					    
 					}
 					catch (Exception ex)
 					{
 						Trace.WriteLine(ex.ToString());
 					}
+
+				    if (fitsFileLoadedCallback != null)
+				        fitsFileLoadedCallback(imageHDU);
 
 					return true;
 				}

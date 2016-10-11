@@ -65,6 +65,7 @@ namespace Tangra.Controller
 		private frmAdvStatusPopup m_AdvStatusForm;
 	    private frmAavStatusPopup m_AavStatusForm;
 	    private frmSerStatusPopup m_SerStatusForm;
+	    private frmFitsHeaderPopup m_FitsStatusForm;
 	    private frmTargetPSFViewerForm m_TargetPSFViewerForm;
 
 		private AdvOverlayManager m_OverlayManager = new AdvOverlayManager();
@@ -497,6 +498,14 @@ namespace Tangra.Controller
 				{
 					ToggleAstroVideoStatusForm(true);
 				}
+                else if (IsSerVideo && !IsSerStatusFormVisible)
+                {
+                    ToggleSerStatusForm(true);
+                }
+                else if (IsFitsSequence && !IsFitsStatusFormVisible)
+                {
+                    ToggleFitsStatusForm(true);
+                }
 
 				if (!string.IsNullOrEmpty(fileName))
 					RegisterRecentFile(RecentFileType.Video, fileName);
@@ -536,6 +545,9 @@ namespace Tangra.Controller
 
 			if (m_SerStatusForm != null && m_SerStatusForm.Visible)
 				m_SerStatusForm.ShowStatus(m_FrameState);
+
+            if (m_FitsStatusForm != null && m_FitsStatusForm.Visible)
+                m_FitsStatusForm.ShowStatus(m_FrameState);
 
 	        if (!isOldFrameRefreshed)
 	        {
@@ -1409,6 +1421,11 @@ namespace Tangra.Controller
 			ToggleSerStatusForm(false);
 		}
 
+	    public void ToggleFitsStatusForm()
+	    {
+            ToggleFitsStatusForm(false);
+	    }
+
 		private void HideAdvStatusForm()
 		{
 			if (m_AdvStatusForm != null && m_AdvStatusForm.Visible)
@@ -1426,6 +1443,12 @@ namespace Tangra.Controller
 			if (m_SerStatusForm != null && m_SerStatusForm.Visible)
 				m_SerStatusForm.Hide();
 		}
+
+	    private void HideFitsStatusForm()
+	    {
+            if (m_FitsStatusForm != null && m_FitsStatusForm.Visible)
+                m_FitsStatusForm.Hide();	        
+	    }
 
 		private void ToggleAstroVideoStatusForm(bool forceShow)
 		{
@@ -1533,6 +1556,16 @@ namespace Tangra.Controller
 			}
 		}
 
+        private void PositionFitsStatusForm()
+        {
+            if (m_FitsStatusForm != null &&
+                m_FitsStatusForm.Visible)
+            {
+                m_FitsStatusForm.Left = m_MainFormView.Right;
+                m_FitsStatusForm.Top = m_MainFormView.Top;
+            }
+        }
+
 		private void ToggleSerStatusForm(bool forceShow)
 		{
 			HideSerStatusForm();
@@ -1569,6 +1602,43 @@ namespace Tangra.Controller
 				m_SerStatusForm.ShowStatus(m_FrameState);
 			}
 		}
+
+        private void ToggleFitsStatusForm(bool forceShow)
+        {
+            HideFitsStatusForm();
+
+            if (m_FitsStatusForm == null)
+            {
+                m_FitsStatusForm = new frmFitsHeaderPopup();
+                m_FitsStatusForm.Show(m_MainFormView);
+                PositionFitsStatusForm();
+                m_FitsStatusForm.ShowStatus(m_FrameState);
+            }
+            else if (!m_FitsStatusForm.Visible)
+            {
+                try
+                {
+                    m_FitsStatusForm.Show(m_MainFormView);
+                }
+                catch (ObjectDisposedException)
+                {
+                    m_FitsStatusForm = new frmFitsHeaderPopup();
+                    m_FitsStatusForm.Show(m_MainFormView);
+                }
+
+                PositionFitsStatusForm();
+                m_FitsStatusForm.ShowStatus(m_FrameState);
+            }
+            else if (!forceShow)
+            {
+                HideFitsStatusForm();
+            }
+            else
+            {
+                PositionFitsStatusForm();
+                m_FitsStatusForm.ShowStatus(m_FrameState);
+            }
+        }
 
         public void TogglePSFViewerForm()
         {
@@ -1670,6 +1740,7 @@ namespace Tangra.Controller
 			PositionAdvStatusForm();
             PositionAavStatusForm();
 		    PositionTargetPSFViewerForm();
+            PositionFitsStatusForm();
 		}
 
 		public bool IsAdvStatusFormVisible
@@ -1705,6 +1776,22 @@ namespace Tangra.Controller
                 return m_TargetPSFViewerForm != null && m_TargetPSFViewerForm.Visible;
             }
 	    }
+
+        public bool IsSerStatusFormVisible
+        {
+            get
+            {
+                return m_SerStatusForm != null && m_SerStatusForm.Visible;
+            }
+        }
+
+        public bool IsFitsStatusFormVisible
+        {
+            get
+            {
+                return m_FitsStatusForm != null && m_FitsStatusForm.Visible;
+            }
+        }
 
 		public ImageTool SelectImageTool<TImageTool>() where TImageTool : ImageTool, new()
         {
