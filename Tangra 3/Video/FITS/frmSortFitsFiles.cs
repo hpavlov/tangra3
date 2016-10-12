@@ -112,8 +112,16 @@ namespace Tangra.Video.FITS
                             fileSizeInfo.Add(format, new FitsFileFormatInfoRecord { FirstFile = Path.GetFileName(m_FitsFiles[i]), NumFiles = 1 });
 
                         bool isMidPoint;
-                        double? fitsExposure;
-                        DateTime? timestamp = FITSHelper.ParseExposure(hdr, TimeStampReader, out isMidPoint, out fitsExposure);
+                        double? fitsExposure = null;
+                        DateTime? timestamp = null;
+                        try
+                        {
+                            timestamp = FITSHelper.ParseExposure(hdr, TimeStampReader, out isMidPoint, out fitsExposure);
+                        }
+                        catch (Exception ex)
+                        {
+                            Trace.WriteLine(ex.ToString());
+                        }
 
                         if (i == 0 && (!fitsExposure.HasValue || !timestamp.HasValue))
                         {
@@ -123,7 +131,14 @@ namespace Tangra.Video.FITS
                                 TimeStampReader = frm.TimeStampReader;
                             }
 
-                            timestamp = FITSHelper.ParseExposure(hdr, TimeStampReader, out isMidPoint, out fitsExposure);
+                            try
+                            {
+                                timestamp = FITSHelper.ParseExposure(hdr, TimeStampReader, out isMidPoint, out fitsExposure);
+                            }
+                            catch (Exception ex)
+                            {
+                                Trace.WriteLine(ex.ToString());
+                            }
                         }
 
                         m_FitsTimestamps[i] = timestamp;
