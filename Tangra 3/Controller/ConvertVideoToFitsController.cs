@@ -62,7 +62,7 @@ namespace Tangra.Controller
 
             if (m_UsesROI)
             {
-                m_Note += string.Format(" Selected RIO: ({0},{1},{2},{3})", roi.Left, roi.Top, roi.Right, roi.Bottom);
+                m_Note += string.Format(" Selected ROI: ({0},{1},{2},{3})", roi.Left, roi.Top, roi.Right, roi.Bottom);
                 if (m_Note.Length > HeaderCard.MAX_VALUE_LENGTH) m_Note = m_Note.Substring(0, HeaderCard.MAX_VALUE_LENGTH);                
             }
 

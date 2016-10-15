@@ -107,7 +107,7 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
 
             if (rect.Width < 1 || rect.Height < 1)
             {
-                m_VideoController.ShowMessageBox("Error in RIO size.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                m_VideoController.ShowMessageBox("Error in ROI size.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
