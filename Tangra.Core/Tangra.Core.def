@@ -69,6 +69,8 @@ EXPORTS
 	UsesPreProcessing
 	GetProductVersion
 	GetProductBitness
+	SwapVideoFields
+	ShiftVideoFields
 	
 	; PSFFitting
 	SolveLinearSystem

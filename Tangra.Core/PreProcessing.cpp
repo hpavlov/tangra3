@@ -328,3 +328,14 @@ int ApplyPreProcessingPixelsOnly(unsigned int* pixels, int width, int height, in
 
 	return rv;
 }
+
+HRESULT SwapVideoFields(unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
+{
+	return E_NOTIMPL;
+}
+
+HRESULT ShiftVideoFields(unsigned long* pixels, unsigned long* originalPixels, unsigned long* pixels2, unsigned long* originalPixels2,BYTE* bitmapPixels, BYTE* bitmapBytes)
+{
+	return E_NOTIMPL;
+}
+

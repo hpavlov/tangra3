@@ -360,7 +360,20 @@ namespace Tangra.Controller
                         }
                         else
                         {
+                            ReInterlaceMode mode = ReInterlaceMode.None;
+
+                            if (TangraConfig.Settings.Generic.EnableFrameGrabberCorrections)
+                            {
+                                var frm = new frmAviLoadOptions();
+                                frm.ShowDialog(m_MainForm);
+
+                                mode = frm.ReInterlaceMode;
+                            }
+
                             frameStream = VideoStream.OpenFile(fileName);
+
+                            if (mode != ReInterlaceMode.None)
+                                frameStream = ReInterlacingVideoStream.Create(frameStream, mode);
                         }
 
                         return frameStream;
