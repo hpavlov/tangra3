@@ -541,7 +541,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 				m_VideoController.ShowMessageBox(
 					"Tangra cannot complete this measurement because two of the objects are too close.\r\n\r\n " +
-					"To continue you need to:\r\n\r\n1) Use Aperture Photometry \r\n2) Use Manually Positioned aperture for one of the two close objects",
+					"To continue you need to:\r\n\r\n1) Use Aperture Photometry \r\n2) Use 'Fixed - Manually Positioned' aperture for one of the two close objects",
 					"Error",
 					MessageBoxButtons.OK,
 					MessageBoxIcon.Error);
