@@ -15,7 +15,7 @@ extern "C"
 #endif
 
 DLL_PUBLIC HRESULT GetPixelMapBits(BYTE* pDIB,int* width,int* height, DWORD imageSize, unsigned int* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes);
-DLL_PUBLIC HRESULT GetPixelMapBitsAndHBitmap(BYTE* pDIB,int* width,int* height, DWORD imageSize, unsigned int* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, HBITMAP hBitmap);
+DLL_PUBLIC HRESULT GetPixelMapBitsAndHBitmap(BYTE* pDIB,int* width, int* height, DWORD imageSize, unsigned int* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, HBITMAP hBitmap);
 
 // Only returns the pixelmap pixels, does not create the bitmap structures
 DLL_PUBLIC HRESULT GetPixelMapPixelsOnly(BYTE* pDIB, int width, int height, unsigned int* pixels);

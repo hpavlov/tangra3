@@ -329,13 +329,51 @@ int ApplyPreProcessingPixelsOnly(unsigned int* pixels, int width, int height, in
 	return rv;
 }
 
-HRESULT SwapVideoFields(unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapPixels, BYTE* bitmapBytes)
+HRESULT SwapVideoFields(unsigned int* pixels, unsigned int* originalPixels, int width, int height, BYTE* bitmapPixels, BYTE* bitmapBytes)
 {
-	return E_NOTIMPL;
+	HRESULT rv = S_OK;
+
+	unsigned int buffer[width];
+	
+	for(int k=0; k<height/2;k++) 
+	{ 
+		int y1 = 2 * k;
+		int y2 = 2 * k + 1;
+		memcpy(&buffer[0], &pixels[y1 * width], width * sizeof(unsigned int));
+		memcpy(&pixels[y1 * width], &pixels[y2 * width], width * sizeof(unsigned int));
+		memcpy(&pixels[y2 * width], &buffer[0], width * sizeof(unsigned int));
+		
+		memcpy(&buffer[0], &originalPixels[y1 * width], width * sizeof(unsigned int));
+		memcpy(&originalPixels[y1 * width], &originalPixels[y2 * width], width * sizeof(unsigned int));
+		memcpy(&originalPixels[y2 * width], &buffer[0], width * sizeof(unsigned int));		
+	}
+			
+	return GetBitmapPixels(
+			   width,
+			   height,
+			   pixels,
+			   bitmapPixels,
+			   bitmapBytes,
+			   true, 8, 0);
 }
 
-HRESULT ShiftVideoFields(unsigned long* pixels, unsigned long* originalPixels, unsigned long* pixels2, unsigned long* originalPixels2,BYTE* bitmapPixels, BYTE* bitmapBytes)
+HRESULT ShiftVideoFields(unsigned int* pixels, unsigned int* originalPixels, unsigned int* pixels2, unsigned int* originalPixels2, int width, int height, int fldIdx, BYTE* bitmapPixels, BYTE* bitmapBytes)
 {
-	return E_NOTIMPL;
+	HRESULT rv = S_OK;
+	
+	for(int k=0; k<height/2;k++) 
+	{ 
+		int yCpy = 2 * k + (fldIdx % 2);
+		memcpy(&pixels[yCpy * width], &pixels2[yCpy * width], width * sizeof(unsigned int));	
+		memcpy(&originalPixels[yCpy * width], &originalPixels2[yCpy * width], width * sizeof(unsigned int));
+	}
+	
+	return GetBitmapPixels(
+			   width,
+			   height,
+			   pixels,
+			   bitmapPixels,
+			   bitmapBytes,
+			   true, 8, 0);	
 }
 

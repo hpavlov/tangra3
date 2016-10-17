@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using Tangra.Model.Context;
 using Tangra.Model.Image;
 using Tangra.Model.Video;
 using Tangra.PInvoke;
@@ -27,6 +28,10 @@ namespace Tangra.Video
         {
             m_BaseStream = baseStream;
             m_Mode = mode;
+            if (mode == ReInterlaceMode.SwapFields)
+                TangraContext.Current.ReInterlacingMode = "FieldSwap";
+            else if (mode == ReInterlaceMode.ShiftOneField)
+                TangraContext.Current.ReInterlacingMode = "FieldShift";
         }
 
         private IFrameStream m_BaseStream;
@@ -84,6 +89,11 @@ namespace Tangra.Video
             get { return m_BaseStream.MillisecondsPerFrame; }
         }
 
+        private int m_LastPrevFrameId = -1;
+        private uint[] m_LastPrevFramePixels = null;
+        private uint[] m_LastPrevFrameOriginalPixels = null;
+        private byte[] m_LastPrevFrameBitmapBytes = null;
+
         public Pixelmap GetPixelmap(int index)
         {
             if (index < FirstFrame) index = FirstFrame;
@@ -100,15 +110,13 @@ namespace Tangra.Video
                 
                 byte[] bitmapPixels = new byte[Width * Height * 3 + 40 + 14 + 1];
 
-                TangraCore.SwapVideoFields(pixels, originalPixels, bitmapPixels, bitmapBytes);
+                TangraCore.SwapVideoFields(pixels, originalPixels, Width, Height, bitmapPixels, bitmapBytes);
 
                 videoFrame = Pixelmap.ConstructBitmapFromBitmapPixels(bitmapBytes, Width, Height);
 
                 var rv = new Pixelmap(Width, Height, 8, pixels, videoFrame, bitmapBytes);
                 rv.UnprocessedPixels = originalPixels;
                 return rv;
-                
-
             }
             else if (m_Mode == ReInterlaceMode.ShiftOneField)
             {
@@ -117,12 +125,25 @@ namespace Tangra.Video
                 Bitmap videoFrame2;
                 byte[] bitmapBytes2;
 
-                TangraVideo.GetFrame(index, out pixels, out originalPixels, out videoFrame, out bitmapBytes);
+                if (m_LastPrevFrameId == index)
+                {
+                    pixels = m_LastPrevFramePixels;
+                    originalPixels = m_LastPrevFrameOriginalPixels;
+                    bitmapBytes = m_LastPrevFrameBitmapBytes;
+                }
+                else
+                    TangraVideo.GetFrame(index, out pixels, out originalPixels, out videoFrame, out bitmapBytes);
+
                 TangraVideo.GetFrame(index + 1, out pixels2, out originalPixels2, out videoFrame2, out bitmapBytes2);
+
+                m_LastPrevFrameId = index + 1;
+                m_LastPrevFramePixels = pixels2;
+                m_LastPrevFrameOriginalPixels = originalPixels2;
+                m_LastPrevFrameBitmapBytes = bitmapBytes2;
 
                 byte[] bitmapPixels = new byte[Width * Height * 3 + 40 + 14 + 1];
 
-                TangraCore.ShiftVideoFields(pixels, originalPixels, pixels2, originalPixels2, bitmapPixels, bitmapBytes);
+                TangraCore.ShiftVideoFields(pixels, originalPixels, pixels2, originalPixels2, Width, Height, 0, bitmapPixels, bitmapBytes);
 
                 videoFrame = Pixelmap.ConstructBitmapFromBitmapPixels(bitmapBytes, Width, Height);
 
@@ -146,7 +167,7 @@ namespace Tangra.Video
 
         public string VideoFileType
         {
-            get { return m_BaseStream.VideoFileType+ string.Format("+{0}", m_Mode == ReInterlaceMode.SwapFields ? "FieldSwap" : "FieldShift"); }
+            get { return m_BaseStream.VideoFileType; }
         }
 
         public Pixelmap GetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging)

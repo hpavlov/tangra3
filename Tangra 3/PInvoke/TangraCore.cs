@@ -582,12 +582,12 @@ namespace Tangra.PInvoke
         public static extern int SERGetFrameInfo(int frameNo, [In, Out] ref SerNativeFrameInfo frameInfo);
 
         [DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-        // DLL_PUBLIC HRESULT SwapVideoFields(unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapPixels, BYTE* bitmapBytes);		
-        public static extern int SwapVideoFields([In, Out] uint[] pixels, [In, Out] uint[] originalPixels, [In, Out] byte[] bitmapBytes, [In, Out] byte[] bitmapDisplayBytes);
+        // DLL_PUBLIC HRESULT SwapVideoFields(unsigned int* pixels, unsigned int* originalPixels, int width, int height, BYTE* bitmapPixels, BYTE* bitmapBytes);		
+        public static extern int SwapVideoFields([In, Out] uint[] pixels, [In, Out] uint[] originalPixels, int width, int height, [In, Out] byte[] bitmapBytes, [In, Out] byte[] bitmapDisplayBytes);
 
         [DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-        // DLL_PUBLIC HRESULT ShiftVideoFields(unsigned long* pixels, unsigned long* originalPixels, unsigned long* pixels2, unsigned long* originalPixels2,BYTE* bitmapPixels, BYTE* bitmapBytes);		
-        public static extern int ShiftVideoFields([In, Out] uint[] pixels, [In, Out] uint[] originalPixels, [In] uint[] pixels2, [In] uint[] originalPixels2, [In, Out] byte[] bitmapBytes, [In, Out] byte[] bitmapDisplayBytes);
+        // DLL_PUBLIC HRESULT ShiftVideoFields(unsigned int* pixels, unsigned int* originalPixels, unsigned int* pixels2, unsigned int* originalPixels2, int width, int height, int fldIdx, BYTE* bitmapPixels, BYTE* bitmapBytes);		
+        public static extern int ShiftVideoFields([In, Out] uint[] pixels, [In, Out] uint[] originalPixels, [In, Out] uint[] pixels2, [In] uint[] originalPixels2, int width, int height, int fldIdx, [In, Out] byte[] bitmapBytes, [In, Out] byte[] bitmapDisplayBytes);
 
 		public static string GetTangraCoreVersion()
 		{

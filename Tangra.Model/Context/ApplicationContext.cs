@@ -96,6 +96,7 @@ namespace Tangra.Model.Context
         public CrashReportInfo CrashReportInfo;
 
 	    public string RenderingEngine;
+	    public string ReInterlacingMode;
 
 		private bool m_RestartRequest = false;
 		public bool HasRestartRequest()
@@ -152,6 +153,7 @@ namespace Tangra.Model.Context
 		    CanLoadBiasFrame = false;
 
 		    RenderingEngine = null;
+            ReInterlacingMode = null;
 
 	        OcrErrors = 0;
             OcrExtractingTimestamps = false;

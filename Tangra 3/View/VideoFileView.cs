@@ -135,22 +135,30 @@ namespace Tangra.View
 			PreProcessingInfo preProcessingInfo;
 			TangraCore.PreProcessors.PreProcessingGetConfig(out preProcessingInfo);
 
-			if (preProcessingInfo != null && preProcessingInfo.PreProcessing)
-			{
-				string preProcessingInfoStr = string.Empty;
-				string preProcessingInfoTooltip = string.Empty;
+            string preProcessingInfoStr = string.Empty;
+            string preProcessingInfoTooltip = string.Empty;
+		    bool usesReInterlacing = !string.IsNullOrEmpty(TangraContext.Current.ReInterlacingMode);
+		    if (usesReInterlacing)
+		    {
+		        preProcessingInfoStr = TangraContext.Current.ReInterlacingMode;
+                preProcessingInfoTooltip += string.Format("Using {0} Re-Interlacing\r\n", TangraContext.Current.ReInterlacingMode);
+		    }
+
+		    if (preProcessingInfo != null && preProcessingInfo.PreProcessing)
+			{				
+				
 				switch (preProcessingInfo.PreProcessingType)
 				{
 					case PreProcessingType.BrightnessContrast:
-						preProcessingInfoStr += string.Format("B{0}:C{1}", preProcessingInfo.Brigtness, preProcessingInfo.Contrast);
+						preProcessingInfoStr += string.Format("|B{0}:C{1}", preProcessingInfo.Brigtness, preProcessingInfo.Contrast);
 						preProcessingInfoTooltip += string.Format("Using Brightness of {0} and Contrast of {1}\r\n", preProcessingInfo.Brigtness, preProcessingInfo.Contrast);
 						break;
 					case PreProcessingType.Clipping:
-						preProcessingInfoStr += string.Format("C{0}-{1}", preProcessingInfo.ClippingFrom, preProcessingInfo.ClippingTo);
+						preProcessingInfoStr += string.Format("|C{0}-{1}", preProcessingInfo.ClippingFrom, preProcessingInfo.ClippingTo);
 						preProcessingInfoTooltip += string.Format("Using Clipping from {0} to {1}\r\n", preProcessingInfo.ClippingFrom, preProcessingInfo.ClippingTo);
 						break;
 					case PreProcessingType.Stretching:
-						preProcessingInfoStr += string.Format("S{0}-{1}", preProcessingInfo.StretchingFrom, preProcessingInfo.StretchingTo);
+						preProcessingInfoStr += string.Format("|S{0}-{1}", preProcessingInfo.StretchingFrom, preProcessingInfo.StretchingTo);
 						preProcessingInfoTooltip += string.Format("Using Stretching from {0} to {1}\r\n", preProcessingInfo.StretchingFrom, preProcessingInfo.StretchingTo);
 						break;
 				}
@@ -183,14 +191,17 @@ namespace Tangra.View
 						preProcessingInfoTooltip += "Using Low Pass Difference (LPD) filter\r\n";
 					}
 				}
-
-				m_MainForm.ssPreProcessing.Text = preProcessingInfoStr.TrimStart('|');
-				m_MainForm.ssPreProcessing.ToolTipText = preProcessingInfoTooltip;
-				m_MainForm.ssPreProcessing.Visible = true;
 			}
-			else
+
+            if (!string.IsNullOrWhiteSpace(preProcessingInfoStr))
+		    {
+                m_MainForm.ssPreProcessing.Text = preProcessingInfoStr.TrimStart('|');
+                m_MainForm.ssPreProcessing.ToolTipText = preProcessingInfoTooltip;
+                m_MainForm.ssPreProcessing.Visible = true;
+		    }
+            else
 			{
-				m_MainForm.ssPreProcessing.Visible = false;
+                m_MainForm.ssPreProcessing.Visible = false;
 			}
 
 			m_MainForm.ssSoftwareIntegration.Text = string.Format("Integrating {0} frames", TangraContext.Current.NumberFramesToIntegrate);

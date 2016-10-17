@@ -80,8 +80,8 @@ DLL_PUBLIC int ApplyPreProcessingPixelsOnly(unsigned int* pixels, int width, int
 DLL_PUBLIC int ApplyPreProcessing(unsigned int* pixels, int width, int height, int bpp, float exposureSeconds, BYTE* bitmapPixels, BYTE* bitmapBytes);
 int ApplyPreProcessingWithNormalValue(unsigned int* pixels, int width, int height, int bpp, float exposureSeconds, unsigned int normVal, BYTE* bitmapPixels, BYTE* bitmapBytes);
 
-DLL_PUBLIC HRESULT SwapVideoFields(unsigned long* pixels, unsigned long* originalPixels, BYTE* bitmapPixels, BYTE* bitmapBytes);		
-DLL_PUBLIC HRESULT ShiftVideoFields(unsigned long* pixels, unsigned long* originalPixels, unsigned long* pixels2, unsigned long* originalPixels2,BYTE* bitmapPixels, BYTE* bitmapBytes);		
+DLL_PUBLIC HRESULT SwapVideoFields(unsigned int* pixels, unsigned int* originalPixels, int width, int height, BYTE* bitmapPixels, BYTE* bitmapBytes);		
+DLL_PUBLIC HRESULT ShiftVideoFields(unsigned int* pixels, unsigned int* originalPixels, unsigned int* pixels2, unsigned int* originalPixels2, int width, int height, int fldIdx, BYTE* bitmapPixels, BYTE* bitmapBytes);		
 
 #ifdef __cplusplus
 } // __cplusplus defined.
