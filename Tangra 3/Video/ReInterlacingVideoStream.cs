@@ -14,7 +14,8 @@ namespace Tangra.Video
     {
         None,
         SwapFields,
-        ShiftOneField
+        ShiftOneField,
+        SwapAndShiftOneField
     }
 
     public class ReInterlacingVideoStream : IFrameStream, IDisposable
@@ -31,11 +32,20 @@ namespace Tangra.Video
             if (mode == ReInterlaceMode.SwapFields)
                 TangraContext.Current.ReInterlacingMode = "FieldSwap";
             else if (mode == ReInterlaceMode.ShiftOneField)
+            {
                 TangraContext.Current.ReInterlacingMode = "FieldShift";
+                m_ShiftMode = 0;
+            }
+            else if (mode == ReInterlaceMode.SwapAndShiftOneField)
+            {
+                TangraContext.Current.ReInterlacingMode = "FieldSwapAndShift";
+                m_ShiftMode = 1;
+            }
         }
 
         private IFrameStream m_BaseStream;
         private ReInterlaceMode m_Mode;
+        private int m_ShiftMode = 0;
 
         public int Width
         {
@@ -61,7 +71,7 @@ namespace Tangra.Video
         {
             get
             {
-                if (m_Mode == ReInterlaceMode.ShiftOneField)
+                if (m_Mode == ReInterlaceMode.ShiftOneField || m_Mode == ReInterlaceMode.SwapAndShiftOneField)
                     return m_BaseStream.LastFrame - 1;
                 else
                     return m_BaseStream.LastFrame;
@@ -72,7 +82,7 @@ namespace Tangra.Video
         {
             get
             {
-                if (m_Mode == ReInterlaceMode.ShiftOneField)
+                if (m_Mode == ReInterlaceMode.ShiftOneField || m_Mode == ReInterlaceMode.SwapAndShiftOneField)
                     return m_BaseStream.CountFrames - 1;
                 else
                     return m_BaseStream.CountFrames;
@@ -118,7 +128,7 @@ namespace Tangra.Video
                 rv.UnprocessedPixels = originalPixels;
                 return rv;
             }
-            else if (m_Mode == ReInterlaceMode.ShiftOneField)
+            else if (m_Mode == ReInterlaceMode.ShiftOneField || m_Mode == ReInterlaceMode.SwapAndShiftOneField)
             {
                 uint[] pixels2;
                 uint[] originalPixels2;
@@ -143,7 +153,7 @@ namespace Tangra.Video
 
                 byte[] bitmapPixels = new byte[Width * Height * 3 + 40 + 14 + 1];
 
-                TangraCore.ShiftVideoFields(pixels, originalPixels, pixels2, originalPixels2, Width, Height, 0, bitmapPixels, bitmapBytes);
+                TangraCore.ShiftVideoFields(pixels, originalPixels, pixels2, originalPixels2, Width, Height, m_ShiftMode, bitmapPixels, bitmapBytes);
 
                 videoFrame = Pixelmap.ConstructBitmapFromBitmapPixels(bitmapBytes, Width, Height);
 

@@ -41,6 +41,8 @@ namespace Tangra.Video
                 ReInterlaceMode = ReInterlaceMode.SwapFields;
             else if (rbReInterlaceShiftForward.Checked)
                 ReInterlaceMode = ReInterlaceMode.ShiftOneField;
+            else if (rbReInterlaceShiftAndSwap.Checked)
+                ReInterlaceMode = ReInterlaceMode.SwapAndShiftOneField;
 
             DialogResult = DialogResult.OK;
             Close();

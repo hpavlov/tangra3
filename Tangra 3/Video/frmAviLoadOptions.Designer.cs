@@ -36,6 +36,7 @@
             this.rbReInterlaceShiftForward = new System.Windows.Forms.RadioButton();
             this.rbReInterlaceNon = new System.Windows.Forms.RadioButton();
             this.rbReInterlaceSwapFields = new System.Windows.Forms.RadioButton();
+            this.rbReInterlaceShiftAndSwap = new System.Windows.Forms.RadioButton();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -59,7 +60,7 @@
             // 
             // btnOK
             // 
-            this.btnOK.Location = new System.Drawing.Point(128, 199);
+            this.btnOK.Location = new System.Drawing.Point(165, 221);
             this.btnOK.Name = "btnOK";
             this.btnOK.Size = new System.Drawing.Size(91, 23);
             this.btnOK.TabIndex = 47;
@@ -74,18 +75,19 @@
             this.groupBox1.Controls.Add(this.cbxRenderingEngineAttemptOrder);
             this.groupBox1.Location = new System.Drawing.Point(7, 4);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(212, 189);
+            this.groupBox1.Size = new System.Drawing.Size(249, 211);
             this.groupBox1.TabIndex = 48;
             this.groupBox1.TabStop = false;
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.rbReInterlaceShiftAndSwap);
             this.groupBox2.Controls.Add(this.rbReInterlaceShiftForward);
             this.groupBox2.Controls.Add(this.rbReInterlaceNon);
             this.groupBox2.Controls.Add(this.rbReInterlaceSwapFields);
             this.groupBox2.Location = new System.Drawing.Point(11, 78);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(190, 100);
+            this.groupBox2.Size = new System.Drawing.Size(232, 127);
             this.groupBox2.TabIndex = 47;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Frame Grabbing Corrections";
@@ -122,11 +124,21 @@
             this.rbReInterlaceSwapFields.Text = "Swap Even and Odd Fields";
             this.rbReInterlaceSwapFields.UseVisualStyleBackColor = true;
             // 
+            // rbReInterlaceShiftAndSwap
+            // 
+            this.rbReInterlaceShiftAndSwap.AutoSize = true;
+            this.rbReInterlaceShiftAndSwap.Location = new System.Drawing.Point(24, 93);
+            this.rbReInterlaceShiftAndSwap.Name = "rbReInterlaceShiftAndSwap";
+            this.rbReInterlaceShiftAndSwap.Size = new System.Drawing.Size(186, 17);
+            this.rbReInterlaceShiftAndSwap.TabIndex = 50;
+            this.rbReInterlaceShiftAndSwap.Text = "Swap and Shift One Field Forward";
+            this.rbReInterlaceShiftAndSwap.UseVisualStyleBackColor = true;
+            // 
             // frmAviLoadOptions
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(224, 228);
+            this.ClientSize = new System.Drawing.Size(268, 256);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.btnOK);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
@@ -152,5 +164,6 @@
         private System.Windows.Forms.RadioButton rbReInterlaceShiftForward;
         private System.Windows.Forms.RadioButton rbReInterlaceNon;
         private System.Windows.Forms.RadioButton rbReInterlaceSwapFields;
+        private System.Windows.Forms.RadioButton rbReInterlaceShiftAndSwap;
     }
 }
