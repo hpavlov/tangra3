@@ -106,6 +106,7 @@ namespace Tangra.AstroServices
 			public double DEDeg { get; set; }
 			public string ObjectName { get; set; }
 			public double Mag { get; set; }
+            public double SkyMotion { get; set; }
 
             public bool IsCheckedAgainstSolvedPlate { get; set; }
 
@@ -165,6 +166,7 @@ namespace Tangra.AstroServices
 					retVal.RAHours = AstroConvert.ToRightAcsension(line.Substring(18, 10).Trim());
 					retVal.DEDeg = AstroConvert.ToDeclination(line.Substring(29, 9).Trim());
 					retVal.Mag = double.Parse(line.Substring(69, 4).Trim(), CultureInfo.InvariantCulture);
+                    retVal.SkyMotion = double.Parse(line.Substring(74, 7).Trim(), CultureInfo.InvariantCulture);
 
 					return retVal;
 				}

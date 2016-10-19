@@ -23,7 +23,7 @@ namespace Tangra.VideoOperations.Astrometry
 	public partial class frmIdentifyObjects : Form
 	{
 		private IAstrometricFit m_Fit;
-		private double m_Fov;
+		private double m_FovArcMin;
 		private DateTime m_UtcTime;
 		private double m_MagLimit;
 		private string m_ObsCode;
@@ -40,11 +40,11 @@ namespace Tangra.VideoOperations.Astrometry
             InitializeComponent();
         }
 
-		internal frmIdentifyObjects(IAstrometricFit fit, VideoController videoController, double fov, DateTime utcTime, double magLimit, string obsCode)
+		internal frmIdentifyObjects(IAstrometricFit fit, VideoController videoController, double fovArcMin, DateTime utcTime, double magLimit, string obsCode)
             : this()
 		{
 			m_Fit = fit;
-			m_Fov = fov;
+            m_FovArcMin = fovArcMin;
 			m_UtcTime = utcTime;
 			m_MagLimit = magLimit;
 			m_ObsCode = obsCode;
@@ -129,7 +129,7 @@ namespace Tangra.VideoOperations.Astrometry
                 }
                 else
                 {
-                    IdentifiedObjects = MPCheck.CheckRegion(m_UtcTime, m_Fit.RA0Deg, m_Fit.DE0Deg, m_Fov, m_MagLimit, string.IsNullOrEmpty(m_ObsCode) ? "500" : m_ObsCode);
+                    IdentifiedObjects = MPCheck.CheckRegion(m_UtcTime, m_Fit.RA0Deg, m_Fit.DE0Deg, m_FovArcMin, m_MagLimit, string.IsNullOrEmpty(m_ObsCode) ? "500" : m_ObsCode);
 
                     
                     // MPCheck is a low positional precision service. Check each object position with the more accurate MPEph2 service

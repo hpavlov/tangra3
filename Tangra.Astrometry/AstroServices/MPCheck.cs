@@ -19,7 +19,7 @@ namespace Tangra.AstroServices
 	public class MPCheck
 	{
 		public static List<MPCheckEntry> CheckRegion(
-			DateTime utcDate, double raDeg, double deDeg, double radiusArcSec, double magLimit, string observatoryCode)
+			DateTime utcDate, double raDeg, double deDeg, double radiusArcMin, double magLimit, string observatoryCode)
 		{
 			double dayPart = utcDate.Day + (utcDate.Hour + utcDate.Minute / 60.0 + (utcDate.Second + (utcDate.Millisecond / 1000.0)) / 3600.0) / 24.0;
 
@@ -29,7 +29,7 @@ namespace Tangra.AstroServices
 					utcDate.Year, utcDate.Month, dayPart.ToString("0.000"),
 					AstroConvert.ToStringValue(raDeg / 15.0, "HH MM SS"),
 					AstroConvert.ToStringValue(deDeg, "+DD MM SS"),
-					radiusArcSec.ToString("0"),
+                    radiusArcMin.ToString("0"),
 					magLimit.ToString("0.0"),
 					observatoryCode);
 
