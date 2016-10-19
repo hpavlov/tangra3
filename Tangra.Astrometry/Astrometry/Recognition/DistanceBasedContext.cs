@@ -1377,6 +1377,8 @@ namespace Tangra.Astrometry.Recognition
 	    }
 		private bool CheckTrianglesWithRatiosByMagnitude(int i, int j, int k, ImagePixel iCenter, ImagePixel jCenter, ImagePixel kCenter, double toleranceInArcSec)
 		{
+		    if (iCenter == null || jCenter == null || kCenter == null) return false;
+
 			double dijMax = m_PlateConfig.GetDistanceInArcSec(iCenter.XDouble, iCenter.YDouble, jCenter.XDouble, jCenter.YDouble, (1 - m_Settings.PyramidFocalLengthAllowance) * m_PlateConfig.EffectiveFocalLength);
             double dijMin = m_PlateConfig.GetDistanceInArcSec(iCenter.XDouble, iCenter.YDouble, jCenter.XDouble, jCenter.YDouble, (1 + m_Settings.PyramidFocalLengthAllowance) * m_PlateConfig.EffectiveFocalLength);
             double dikMax = m_PlateConfig.GetDistanceInArcSec(iCenter.XDouble, iCenter.YDouble, kCenter.XDouble, kCenter.YDouble, (1 - m_Settings.PyramidFocalLengthAllowance) * m_PlateConfig.EffectiveFocalLength);
