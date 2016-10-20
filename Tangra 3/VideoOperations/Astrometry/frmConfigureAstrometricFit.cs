@@ -76,11 +76,20 @@ namespace Tangra.VideoOperations.Astrometry
 			utcTime.OnDateTimeChanged += new EventHandler<DateTimeChangeEventArgs>(ucTime_OnDateTimeChanged);
 
 			DateTime? timeStamp = videoController.GetCurrentFrameTime();
-			if (timeStamp != null && timeStamp != DateTime.MinValue)
-				utcTime.DateTimeUtc = timeStamp.Value;
-			else
-				utcTime.DateTimeUtc = TangraConfig.Settings.LastUsed.LastAstrometryUTCDate;
-			DisplayEnterTimePage();
+		    if (timeStamp != null && timeStamp != DateTime.MinValue)
+		    {
+		        if (timeStamp.Value.Year == 1)
+		        {
+                    // OCR-ed timestamp that doesn't contain a year
+                    utcTime.DateTimeUtc = TangraConfig.Settings.LastUsed.LastAstrometryUTCDate.Date.AddDays(timeStamp.Value.TimeOfDay.TotalDays);
+		            lblOCRTimeWarning.Visible = true;
+		        }
+		        else
+		            utcTime.DateTimeUtc = timeStamp.Value;
+		    }
+		    else
+		        utcTime.DateTimeUtc = TangraConfig.Settings.LastUsed.LastAstrometryUTCDate;
+		    DisplayEnterTimePage();
 
 			UpdateErrorInDeg();
 

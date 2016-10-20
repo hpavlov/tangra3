@@ -155,6 +155,11 @@ namespace Tangra.VideoOperations.Astrometry
 		{
 			m_Image = m_AstrometryController.GetCurrentAstroPlate();
 
+            m_VideoController.InitializeTimestampOCR();
+            if (m_VideoController.HasTimestampOCR())
+                // If OCR engine has been initialized then redraw the frame to show the boxes around the numbers
+                m_VideoController.RedrawCurrentFrame(false);
+
 			frmConfigureAstrometricFit frmFieldSolve = new frmConfigureAstrometricFit(m_VideoController, m_Image);
 			if (m_VideoController.ShowDialog(frmFieldSolve) == DialogResult.OK)
 			{
@@ -821,6 +826,17 @@ namespace Tangra.VideoOperations.Astrometry
                         measurement.DEDeg = m_AstrometryTracker.TrackedObject.DEDeg;
                         measurement.StdDevRAArcSec = m_AstrometricFit.StdDevRAArcSec;
                         measurement.StdDevDEArcSec = m_AstrometricFit.StdDevDEArcSec;
+                        if (m_VideoController.HasTimestampOCR())
+                        {
+                            measurement.OCRedTimeStamp = m_VideoController.OCRTimestamp();
+				            double milisecondsDiff =
+                                (frameNo - AstrometryContext.Current.FieldSolveContext.FrameNoOfUtcTime) * 1000.0 / m_VideoController.VideoFrameRate;
+                            var calcTime =  AstrometryContext.Current.FieldSolveContext.UtcTime.AddMilliseconds(milisecondsDiff);
+                            if (m_VideoController.AssertOCRTimestamp(calcTime, false))
+                            {
+                                TangraContext.Current.AstrometryOCRFrameDiscrepencies++;
+                            }
+                        }
                         //measurement.AstrometricFit = m_AstrometricFit;
                         //measurement.Gaussian = m_AstrometryTracker.TrackedObject.PSFFit;
 

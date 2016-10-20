@@ -769,6 +769,31 @@ namespace Tangra.Controller
             return ocredTimeStamp;
 	    }
 
+        public bool AssertOCRTimestamp(DateTime calculatedTimeStamp, bool showPopUp)
+        {
+            string errorMessage = null;
+            DateTime ocrTimeStamp = OCRTimestamp();
+            if (ocrTimeStamp == DateTime.MinValue)
+                errorMessage = string.Format("Could not read the timestamp of the current frame id: {0}", m_CurrentFrameId);
+            else
+            {
+                var span = ocrTimeStamp.TimeOfDay - calculatedTimeStamp.TimeOfDay;
+                if (span.TotalMilliseconds > 2)
+                    errorMessage = string.Format("The OCR-ed and calculated timestamp for the current frame {0} differs by {1:0.0}ms.\r\n\r\nOCRed time: {2}, Calculated time: {3}.\r\n\r\nThis could indicate dropped frames!",
+                        m_CurrentFrameId, span.TotalMilliseconds, ocrTimeStamp.TimeOfDay, calculatedTimeStamp.TimeOfDay);
+            }
+
+            if (errorMessage != null)
+            {
+                Trace.WriteLine(errorMessage);
+                if (showPopUp)
+                    ShowMessageBox("OCR Timestamp Error:\r\n\r\n" + errorMessage, "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                return true;
+            }
+            return false;
+        }
+
 		internal void RegisterRecentFile(RecentFileType type, string fileName)
 		{
 			TangraConfig.Settings.RecentFiles.NewRecentFile(type, fileName);
@@ -2499,6 +2524,7 @@ namespace Tangra.Controller
             if (!TangraContext.Current.OcrExtractingTimestamps)
             {
                 TangraContext.Current.OcrErrors = 0;
+                TangraContext.Current.AstrometryOCRFrameDiscrepencies = 0;
                 TangraContext.Current.OcrExtractingTimestamps = true;
                 m_VideoFileView.Update();
             }

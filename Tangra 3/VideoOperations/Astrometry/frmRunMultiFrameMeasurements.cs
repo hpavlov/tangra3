@@ -178,7 +178,9 @@ namespace Tangra.VideoOperations.Astrometry
 					(m_VideoController.CurrentFrameIndex - AstrometryContext.Current.FieldSolveContext.FrameNoOfUtcTime) * 1000.0 / m_VideoController.VideoFrameRate;
 
 				ucUtcTimePicker.DateTimeUtc = AstrometryContext.Current.FieldSolveContext.UtcTime.AddMilliseconds(milisecondsDiff);
-			}
+			    if (m_VideoController.HasTimestampOCR())
+                    m_VideoController.AssertOCRTimestamp(ucUtcTimePicker.DateTimeUtc, true);
+            }
 			else
 			{
 				DateTime? timeStamp = m_VideoController.GetCurrentFrameTime();

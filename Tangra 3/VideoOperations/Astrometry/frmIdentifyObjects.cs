@@ -52,19 +52,27 @@ namespace Tangra.VideoOperations.Astrometry
 			pnlProgress.Visible = false;
 			pnlEnterTime.Visible = true;
 
-			DateTime? timeStamp = videoController.GetCurrentFrameTime();
-			if (timeStamp != null && timeStamp != DateTime.MinValue)
-			{
-				dtTime.Value = timeStamp.Value;
-				dtDate.Value = timeStamp.Value;
-			}
-			else
-			{
-				DateTime dt = TangraConfig.Settings.LastUsed.LastIdentifyObjectsDate;
-				if (dt == DateTime.MinValue) dt = DateTime.Now.ToUniversalTime();
-				dtTime.Value = dt;
-				dtDate.Value = dt;
-			}
+		    if (m_UtcTime != DateTime.MinValue && m_UtcTime.Year != 1)
+		    {
+                dtTime.Value = m_UtcTime;
+                dtDate.Value = m_UtcTime;
+		    }
+		    else
+		    {
+                DateTime? timeStamp = videoController.GetCurrentFrameTime();
+                if (timeStamp != null && timeStamp != DateTime.MinValue && timeStamp.Value.Year != 1 /* Has a day component */)
+                {
+                    dtTime.Value = timeStamp.Value;
+                    dtDate.Value = timeStamp.Value;
+                }
+                else
+                {
+                    DateTime dt = TangraConfig.Settings.LastUsed.LastIdentifyObjectsDate;
+                    if (dt == DateTime.MinValue) dt = DateTime.Now.ToUniversalTime();
+                    dtTime.Value = dt;
+                    dtDate.Value = dt;
+                }
+            }
 		}
 
         internal frmIdentifyObjects(string objectDesignation, DateTime utcTime, string obsCode)

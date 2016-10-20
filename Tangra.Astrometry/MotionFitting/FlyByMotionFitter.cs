@@ -64,6 +64,7 @@ namespace Tangra.MotionFitting
         public double StdDevRAArcSec { get; set; }
         public double StdDevDEArcSec { get; set; }
         public int FrameNo { get; set; }
+        public DateTime? OCRedTimeStamp { get; set; }
     }
 
     public class ProcessingValues
@@ -328,7 +329,7 @@ namespace Tangra.MotionFitting
                         // |           |           |
                         //
                         // Because the time associated with the first frame is the middle of the frame, but the 
-                        // time associated in the middle of the interval is the end of the field then the correction
+                        // time associated with the middle of the interval is the end of the field then the correction
                         // is (N / 2) - 0.5 frames
 
                         double dataPointFrameNo =

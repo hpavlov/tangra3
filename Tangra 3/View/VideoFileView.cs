@@ -219,6 +219,10 @@ namespace Tangra.View
                 m_MainForm.ssOCR.ForeColor = Color.Green;
                 m_MainForm.ssOCR.Text = "OCR";
             }
+
+            m_MainForm.tslblRecDbg.Visible = TangraContext.Current.AstrometryOCRFrameDiscrepencies > 0;
+		    if (TangraContext.Current.AstrometryOCRFrameDiscrepencies > 0)
+		        m_MainForm.tslblRecDbg.Text = string.Format("{0} TimeStamp Problems", TangraContext.Current.AstrometryOCRFrameDiscrepencies);
 		}
 
 		public void UpdateVideoSizeAndLengthControls()
