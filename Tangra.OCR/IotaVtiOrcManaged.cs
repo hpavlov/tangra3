@@ -68,14 +68,6 @@ namespace Tangra.OCR
 			get { return m_InitializationData; }
 		}
 
-		public void RefiningFrame(uint[] data, float refiningPercentageLeft)
-		{ }
-
-		public void PrepareForMeasurements(uint[] data)
-		{
-			
-		}
-
 		private void DebugPrepareOsdArea(uint[] dataIn, uint[] dataOut, int width, int height)
 		{
 			// NOTE: Because of different rounding in C++ and C# there may be a difference of "1" between pixels
@@ -313,18 +305,9 @@ namespace Tangra.OCR
             }
         }
 
-	    public bool RequiresConfiguring
-		{
-			get { return false; }
-		}
-
 		public bool RequiresCalibration
 		{
 			get { return true; }
-		}
-
-		public void TryToAutoConfigure(uint[] data)
-		{
 		}
 
 		private void LocateTopAndBottomLineOfTimestamp(uint[] preProcessedPixels, int imageWidth, int fromHeight, int toHeight, out int bestTopPosition, out int bestBottomPosition)

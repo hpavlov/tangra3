@@ -41,7 +41,7 @@ namespace Tangra.Model.Image
         {
             get
             {
-                return CentralExposureTime.Ticks != 633979008000000000;        
+                return CentralExposureTime != DateTime.MinValue && CentralExposureTime.Ticks != 633979008000000000;        
             }            
         }
 
@@ -49,7 +49,7 @@ namespace Tangra.Model.Image
 		{
 			get
 			{
-				return EndFrameNtpTime.Ticks != 633979008000000000;
+                return EndFrameNtpTime != DateTime.MinValue && EndFrameNtpTime.Ticks != 633979008000000000;
 			}
 		}
 

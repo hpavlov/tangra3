@@ -35,14 +35,12 @@ namespace Tangra.Controller
 		private LCFile m_lcFile = null;
 
 		private LightCurveContext m_Context;
-        private OcrExtensionManager m_OcrExtensionManager;
 
-        public LightCurveController(Form mainFormView, VideoController videoController, AddinsController addinsController, OcrExtensionManager ocrExtensionManager)
+        public LightCurveController(Form mainFormView, VideoController videoController, AddinsController addinsController)
         {
             m_MainFormView = mainFormView;
             m_VideoController = videoController;
 			m_AddinsController = addinsController;
-            m_OcrExtensionManager = ocrExtensionManager;
 
             m_LightCurveForm = null;
         }
@@ -133,7 +131,7 @@ namespace Tangra.Controller
                 lcFile = LCFile.Load(fileName, m_VideoController);
                 if (lcFile != null)
                 {
-                    ReduceLightCurveOperation operation = (ReduceLightCurveOperation)m_VideoController.SetOperation<ReduceLightCurveOperation>(this, m_OcrExtensionManager, false);
+                    ReduceLightCurveOperation operation = (ReduceLightCurveOperation)m_VideoController.SetOperation<ReduceLightCurveOperation>(this, false);
                     operation.SetLCFile(lcFile);
 
                     string videoFile = GetVideoFileMatchingLcFile(lcFile, fileName);

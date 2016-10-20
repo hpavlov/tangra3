@@ -12,6 +12,7 @@ using System.Text;
 using System.Windows.Forms;
 using Tangra.Config;
 using Tangra.Config.SettingPannels;
+using Tangra.Controller;
 using Tangra.Helpers;
 using Tangra.Model.Config;
 using Tangra.OCR;
@@ -21,7 +22,7 @@ namespace Tangra.Config.SettingPannels
 {
 	public partial class ucAnalogueVideo8bit : SettingsPannel
 	{
-        private OcrExtensionManager m_OcrExtensionManager;
+        private VideoController m_VideoController;
 
 	    public ucAnalogueVideo8bit()
 	    {
@@ -33,10 +34,10 @@ namespace Tangra.Config.SettingPannels
             cbxRenderingEngineAttemptOrder.Items.AddRange(availableRenderingEngines);
 	    }
 
-        public ucAnalogueVideo8bit(OcrExtensionManager ocrExtensionManager)
+        public ucAnalogueVideo8bit(VideoController videoController)
             : this()
 	    {
-            m_OcrExtensionManager = ocrExtensionManager;
+            m_VideoController = videoController;
 	    }
 
 		public override void LoadSettings()
@@ -53,7 +54,7 @@ namespace Tangra.Config.SettingPannels
             cbxEnableFrameGrabberCorrections.Checked = TangraConfig.Settings.Generic.EnableFrameGrabberCorrections;
 			cbxOcrAskEveryTime.Checked = TangraConfig.Settings.Generic.OcrAskEveryTime;
 
-            m_OcrExtensionManager.LoadAvailableOcrEngines(cbxOcrEngine);
+            m_VideoController.LoadAvailableOcrEngines(cbxOcrEngine);
 
 			pnlOsdOcr.Enabled = cbxEnableOsdOcr.Checked;			
 		}

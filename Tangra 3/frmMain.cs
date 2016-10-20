@@ -59,7 +59,6 @@ namespace Tangra
         private ConvertVideoToFitsController m_ConvertVideoToFitsController;
 		private AutoUpdatesController m_AutoUpdatesController;
 		private AddinsController m_AddinsController;
-        private OcrExtensionManager m_OcrExtensionManager;
 
 		private VideoFileView m_VideoFileView;
 		private ImageToolView m_ImageToolView;
@@ -80,11 +79,11 @@ namespace Tangra
 
 			m_VideoController = new VideoController(this, m_VideoFileView, m_ZoomedImageView, m_ImageToolView, pnlControlerPanel);
 			m_AddinsController = new AddinsController(this, m_VideoController);
-            m_OcrExtensionManager = new OcrExtensionManager(m_AddinsController);
+            m_VideoController.OcrExtensionManager = new OcrExtensionManager(m_AddinsController);
 
 			m_LongOperationsManager = new LongOperationsManager(this, m_VideoController);
 
-            m_LightCurveController = new LightCurveController(this, m_VideoController, m_AddinsController, m_OcrExtensionManager);
+            m_LightCurveController = new LightCurveController(this, m_VideoController, m_AddinsController);
 			m_MakeDarkFlatController = new DarkFlatFrameController(this, m_VideoController);
             m_ConvertVideoToFitsController = new ConvertVideoToFitsController(this, m_VideoController);
 			m_AstrometryController = new AstrometryController(m_VideoController, m_LongOperationsManager);
@@ -321,7 +320,7 @@ namespace Tangra
             bool isNewFrame = m_CurrentFrameId != frameContext.CurrentFrameIndex;
 			m_CurrentFrameId = frameContext.CurrentFrameIndex;
 
-			m_VideoController.SetImage(currentPixelmap, frameContext, !isNewFrame && frameContext.MovementType == MovementType.Refresh);
+            m_VideoController.SetImage(currentPixelmap, m_CurrentFrameId, frameContext, !isNewFrame && frameContext.MovementType == MovementType.Refresh);
 
 			ssFrameNo.Text = string.Format("Frame: {0}", frameContext.CurrentFrameIndex);
 
@@ -443,7 +442,7 @@ namespace Tangra
             if (TangraConfig.Settings.Generic.OnOpenOperation == TangraConfig.OnOpenOperation.StartLightCurveReduction)
             {
 
-                if (m_VideoController.ActivateOperation<ReduceLightCurveOperation>(m_LightCurveController, m_OcrExtensionManager, false))
+                if (m_VideoController.ActivateOperation<ReduceLightCurveOperation>(m_LightCurveController, false))
 				{
 					m_VideoController.RefreshCurrentFrame();
 					return true;
@@ -545,7 +544,7 @@ namespace Tangra
 				m_VideoController.AavStatusPopupFormCustomizer,
 				m_AddinsController,
 				addinContainers,
-                m_OcrExtensionManager);
+                m_VideoController);
 
 			frmSettings.StartPosition = FormStartPosition.CenterParent;
 			frmSettings.ShowCatalogRequiredHint = showCatalogRequiredHint;
@@ -1035,7 +1034,7 @@ namespace Tangra
 		private void miReduceLightCurve_MouseDown(object sender, MouseEventArgs e)
 		{
 			bool debugMode = e.Button == MouseButtons.Middle;
-            m_VideoController.ActivateOperation<ReduceLightCurveOperation>(m_LightCurveController, m_OcrExtensionManager, debugMode);
+            m_VideoController.ActivateOperation<ReduceLightCurveOperation>(m_LightCurveController, debugMode);
 		}
 
 		private void FileSystemFileDragDrop(object sender, DragEventArgs e)
@@ -1367,7 +1366,7 @@ namespace Tangra
 
         private void miExportVideoToFITS_Click(object sender, EventArgs e)
         {
-            m_VideoController.ActivateOperation<ConvertVideoToFitsOperation>(m_ConvertVideoToFitsController, m_OcrExtensionManager, false);
+            m_VideoController.ActivateOperation<ConvertVideoToFitsOperation>(m_ConvertVideoToFitsController, false);
             m_VideoController.ChangeImageTool(new RoiSelector(m_VideoController));
             m_VideoController.SetPictureBoxCursor(Cursors.Arrow);
             m_VideoController.RefreshCurrentFrame();

@@ -2081,7 +2081,7 @@ namespace Tangra.VideoOperations.LightCurves
             LightCurveReductionContext reductionContext, 
             List<TrackedObjectConfig> trackedObjectConfigs,
             ITracker tracker,
-            ITimestampOcr timestampOCR,
+            string timestampOCRVersion,
             Dictionary<int, long> thumbPrintDict,
 			Dictionary<int, float> instrumentalDelayConfig,
 			string instrumentalDelayConfigName,
@@ -2105,7 +2105,7 @@ namespace Tangra.VideoOperations.LightCurves
             TrackedObjects = trackedObjectConfigs;
 
             RefinedAverageFWHM = tracker.RefinedAverageFWHM;
-            TimestampOCR = timestampOCR != null ? timestampOCR.NameAndVersion() : string.Empty;
+            TimestampOCR = timestampOCRVersion;
             ThumbPrintDict = thumbPrintDict;
 			InstrumentalDelayConfig = instrumentalDelayConfig;
 	        InstrumentalDelayConfigName = instrumentalDelayConfigName ?? string.Empty;

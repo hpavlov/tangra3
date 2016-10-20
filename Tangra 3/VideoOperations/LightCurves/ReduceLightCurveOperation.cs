@@ -81,7 +81,6 @@ namespace Tangra.VideoOperations.LightCurves
         internal int m_MeasurementInterval;
         internal float m_AverageFWHM;
 
-        private ITimestampOcr m_TimestampOCR;
         private DateTime m_OCRedTimeStamp;
 
 	    private string m_InstumentalDelaySelectedCamera;
@@ -99,13 +98,10 @@ namespace Tangra.VideoOperations.LightCurves
 
         private MeasuringZoomImageType MeasuringZoomImageType = MeasuringZoomImageType.Stripe;
 	    private LightCurveController m_LightCurveController;
-        private OcrExtensionManager m_OcrExtensionManager;
 
 	    private LCFile m_LoadedLcFile;
 
 		private int m_NumberFramesWithBadTracking;
-		private int m_NumberOcredVtiOsdFrames;
-		private int m_NumberFailedOcredVtiOsdFrames;
 
 	    private TangraConfig.LightCurvesDisplaySettings m_DisplaySettings;
 
@@ -116,10 +112,9 @@ namespace Tangra.VideoOperations.LightCurves
 			Debug.Assert(false, "This constructor should not be called.");
 		}
 
-        internal ReduceLightCurveOperation(LightCurveController lightCurveController, OcrExtensionManager ocrExtensionManager, bool debugMode)
+        internal ReduceLightCurveOperation(LightCurveController lightCurveController, bool debugMode)
 		{
 			m_LightCurveController = lightCurveController;
-            m_OcrExtensionManager = ocrExtensionManager;
 			m_DebugMode = debugMode;
 
 			m_DisplaySettings = new TangraConfig.LightCurvesDisplaySettings();
@@ -155,8 +150,6 @@ namespace Tangra.VideoOperations.LightCurves
         public bool InitializeOperation(IVideoController videoContoller, Panel controlPanel, IFramePlayer framePlayer, Form topForm)
         {
 	        m_NumberFramesWithBadTracking = 0;
-			m_NumberOcredVtiOsdFrames = 0;
-			m_NumberFailedOcredVtiOsdFrames = 0;
 
             m_VideoController = (VideoController)videoContoller;
 	        m_ControlPanelHolder = controlPanel;
@@ -268,32 +261,10 @@ namespace Tangra.VideoOperations.LightCurves
                 if (frameNo != m_StateMachine.SelectedObjectFrameNo) m_StateMachine.SelectedObject = null;
             }
 
-            uint[] osdPixels = null;
             if (m_Refining || m_Measuring)
             {
-				if (m_TimestampOCR != null)
-				{
-					osdPixels = m_AstroImage.GetPixelmapPixels();
-
-					if (m_TimestampOCR.RequiresConfiguring)
-						m_TimestampOCR.TryToAutoConfigure(osdPixels);
-
-					if (!m_TimestampOCR.RequiresConfiguring)
-					{
-						if (m_Refining && m_Tracker.RefiningPercentageWorkLeft > 0)
-							m_TimestampOCR.RefiningFrame(osdPixels, m_Tracker.RefiningPercentageWorkLeft);
-						else
-							if (!m_TimestampOCR.ExtractTime(frameNo, osdPixels, out m_OCRedTimeStamp))
-							{
-								m_OCRedTimeStamp = DateTime.MinValue;
-								m_NumberFailedOcredVtiOsdFrames++;
-							}
-							else
-							{
-								m_NumberOcredVtiOsdFrames++;
-							}
-					}
-				}
+                if (m_VideoController.HasTimestampOCR() && !m_Refining)
+                    m_OCRedTimeStamp = m_VideoController.OCRTimestamp();				
 
                 if (m_VideoController.IsAstroAnalogueVideo && frameNo == 0)
                 {
@@ -354,9 +325,6 @@ namespace Tangra.VideoOperations.LightCurves
                                 m_FirstMeasuredFrame = frameNo;
 
                                 m_AverageFWHM = astroImage.GetAverageFWHM();
-
-                                if (m_TimestampOCR != null && osdPixels != null)
-                                    m_TimestampOCR.PrepareForMeasurements(osdPixels);
 
                                 m_VideoController.StatusChanged("Measuring");
                             }
@@ -554,12 +522,6 @@ namespace Tangra.VideoOperations.LightCurves
 							}							
 						}
                     }
-
-					if (m_TimestampOCR != null)
-					{
-						// Plot the positions of the timestamp blocks
-						m_TimestampOCR.DrawLegend(g);
-					}
                 }
                 else if (m_Refining)
                 {
@@ -1308,9 +1270,9 @@ namespace Tangra.VideoOperations.LightCurves
 		        m_ManualTrackingDeltaY[i] = 0;
 	        }
 
-            InitializeTimestampOCR();
+            m_VideoController.InitializeTimestampOCR();
 
-			if (m_TimestampOCR != null || m_VideoController.HasEmbeddedTimeStamps())
+            if (m_VideoController.HasTimestampOCR() || m_VideoController.HasEmbeddedTimeStamps())
 				LightCurveReductionContext.Instance.HasEmbeddedTimeStamps = true;
 			else
 				LightCurveReductionContext.Instance.HasEmbeddedTimeStamps = false;
@@ -1334,153 +1296,6 @@ namespace Tangra.VideoOperations.LightCurves
 			else
                 m_VideoController.PlayVideo(m_CurrFrameNo > -1 ? (int?)m_CurrFrameNo : null, 1);
         }
-
-        private void InitializeTimestampOCR()
-		{
-			m_TimestampOCR = null;
-
-			if (m_VideoController.IsVideoWithVtiOsdTimeStamp &&
-				(TangraConfig.Settings.Generic.OsdOcrEnabled || TangraConfig.Settings.Generic.OcrAskEveryTime))
-			{
-				bool forceSaveErrorReport = false;
-
-				if (TangraConfig.Settings.Generic.OcrAskEveryTime)
-				{
-                    var frm = new frmChooseOcrEngine(m_OcrExtensionManager);
-					frm.StartPosition = FormStartPosition.CenterParent;
-					frm.ShowForceErrorReportOption = m_DebugMode;
-					if (m_VideoController.ShowDialog(frm) == DialogResult.Cancel ||
-						!TangraConfig.Settings.Generic.OsdOcrEnabled)
-						return;
-
-					forceSaveErrorReport = frm.ForceErrorReport;
-				}
-
-                m_TimestampOCR = m_OcrExtensionManager.GetCurrentOcr();
-
-				if (m_TimestampOCR != null)
-				{
-					var data = new TimestampOCRData();
-					data.FrameWidth = TangraContext.Current.FrameWidth;
-					data.FrameHeight = TangraContext.Current.FrameHeight;
-					data.OSDFrame = LightCurveReductionContext.Instance.OSDFrame;
-					data.VideoFrameRate = (float)m_VideoController.VideoFrameRate;
-					data.ForceErrorReport = forceSaveErrorReport;
-
-					m_TimestampOCR.Initialize(data, m_VideoController, 
-#if WIN32
-                        (int)TangraConfig.Settings.Tuning.OcrMode
-#else
-                        (int)TangraConfig.OCRMode.FullyManaged
-#endif
-                        );
-
-					int maxCalibrationFieldsToAttempt = TangraConfig.Settings.Generic.MaxCalibrationFieldsToAttempt;
-
-					if (m_TimestampOCR.RequiresCalibration)
-					{
-					    // NOTE: If we are measuring the video backwards the OCR will need to be intialized forward (i.e. double backwards)
-                        bool measuringBackwards = LightCurveReductionContext.Instance.LightCurveReductionType == LightCurveReductionType.TotalLunarReppearance;
-
-					    int firstCalibrationFrame = measuringBackwards 
-                            ? Math.Min(m_VideoController.CurrentFrameIndex + 30, m_VideoController.VideoLastFrame)
-					        : m_VideoController.CurrentFrameIndex;
-
-                        Pixelmap frame = m_VideoController.GetFrame(firstCalibrationFrame);
-                        m_TimestampOCR.ProcessCalibrationFrame(m_VideoController.CurrentFrameIndex, frame.Pixels);
-
-						bool isCalibrated = true;
-
-						if (m_TimestampOCR.InitiazliationError == null)
-						{
-							int calibrationFramesProcessed = 0;
-							m_VideoController.StatusChanged("Calibrating OCR");
-							FileProgressManager.BeginFileOperation(maxCalibrationFieldsToAttempt);
-							try
-							{
-							    var processingMethod = new Func<int, bool>(delegate(int i)
-							    {
-							        if (m_TimestampOCR == null)
-							            return false;
-
-                                    frame = m_VideoController.GetFrame(i);
-                                    isCalibrated = m_TimestampOCR.ProcessCalibrationFrame(i, frame.Pixels);
-
-                                    if (m_TimestampOCR.InitiazliationError != null)
-                                    {
-                                        // This doesn't like like what the OCR engine is expecting. Abort ....
-                                        m_TimestampOCR = null;
-                                        m_NumberFailedOcredVtiOsdFrames++;
-                                        return false;
-                                    }
-
-                                    calibrationFramesProcessed++;
-
-                                    FileProgressManager.FileOperationProgress(calibrationFramesProcessed);
-
-                                    if (isCalibrated)
-                                        return true;
-
-                                    if (calibrationFramesProcessed > maxCalibrationFieldsToAttempt)
-                                        return true;
-
-                                    return false;
-							    });
-
-							    if (measuringBackwards)
-							    {
-                                    for (int i = firstCalibrationFrame - 1; i > m_VideoController.CurrentFrameIndex; i--)
-                                    {
-                                        if (processingMethod(i))
-                                            break;
-                                    }
-							    }
-							    else
-							    {
-                                    for (int i = firstCalibrationFrame + 1; i < m_VideoController.VideoLastFrame; i++)
-							        {
-							            if (processingMethod(i))
-							                break;
-							        }
-							    }
-							}
-							finally
-							{
-								FileProgressManager.EndFileOperation();
-							}
-						}
-
-						if (forceSaveErrorReport || !isCalibrated)
-						{
-							var frmReport = new frmOsdOcrCalibrationFailure();
-							frmReport.StartPosition = FormStartPosition.CenterParent;
-							frmReport.TimestampOCR = m_TimestampOCR;
-							frmReport.ForcedErrorReport = forceSaveErrorReport;
-
-							if (frmReport.CanSendReport())
-								m_VideoController.ShowDialog(frmReport);
-
-							m_TimestampOCR = null;
-						}
-						else if (m_TimestampOCR != null)
-						{
-						    if (m_TimestampOCR.InitiazliationError != null)
-						    {
-								m_NumberFailedOcredVtiOsdFrames++;
-
-						        m_VideoController.ShowMessageBox(
-						            m_TimestampOCR.InitiazliationError,
-						            "Error reading OSD timestamp",
-						            MessageBoxButtons.OK,
-						            MessageBoxIcon.Error);
-
-                                m_TimestampOCR = null;
-						    }
-						}
-					}
-				}
-			}
-		}
 
         public void EnsureStackedAstroImage()
         {
@@ -1663,8 +1478,7 @@ namespace Tangra.VideoOperations.LightCurves
 			UsageStats.Instance.TrackedFrames += file.Header.CountFrames;
 
 			UsageStats.Instance.FramesWithBadTracking += m_NumberFramesWithBadTracking;
-			UsageStats.Instance.FramesIOTATimeStampRead += m_NumberOcredVtiOsdFrames;
-			UsageStats.Instance.FramesIOTATimeStampReadingErrored += m_NumberFailedOcredVtiOsdFrames;
+            m_VideoController.UpdateOCRStatistics();
 
 			UsageStats.Instance.Save();
 
@@ -1682,31 +1496,7 @@ namespace Tangra.VideoOperations.LightCurves
 			m_ControlPanel.SetupLCFileInfo(m_LightCurveController.LcFile);
 			m_ControlPanel.UpdateState();
 
-			if (TangraContext.Current.OcrErrors > 8)
-			{
-				var frm = new frmOCRTooManyErrorsReport();
-				frm.OCRErrors = TangraContext.Current.OcrErrors;
-
-				if (m_VideoController.ShowDialog(frm) == DialogResult.OK)
-				{
-					var images = m_TimestampOCR.GetCalibrationReportImages();
-					bool reportSendingErrored = false;
-					try
-					{
-						frmOsdOcrCalibrationFailure.SendOcrErrorReport(m_TimestampOCR, images, null, frm.tbxEmail.Text);
-					}
-					catch (Exception ex)
-					{
-						m_LightCurveController.ShowMessageBox("Error submitting report: " + ex.Message, "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
-						reportSendingErrored = true;
-					}
-					finally
-					{
-						if (!reportSendingErrored)
-							MessageBox.Show("The error report was submitted successfully.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Information);
-					}
-				}
-			}
+            m_VideoController.SubmitOCRErrorsIfAny();
         }
 
         public void InitGetStartTime()
@@ -1899,7 +1689,7 @@ namespace Tangra.VideoOperations.LightCurves
         private long prevFrameId;
         public void SaveEmbeddedOrORCedTimeStamp(int frameNo)
         {
-            if (m_VideoController.HasAstroImageState && m_TimestampOCR == null && !m_VideoController.IsAstroAnalogueVideoWithNtpTimestampsInNtpDebugMode)
+            if (m_VideoController.HasAstroImageState && !m_VideoController.HasTimestampOCR() && !m_VideoController.IsAstroAnalogueVideoWithNtpTimestampsInNtpDebugMode)
 			{
                 if (m_VideoController.HasEmbeddedTimeStamps())
                 {
@@ -1916,7 +1706,7 @@ namespace Tangra.VideoOperations.LightCurves
                     // Nothing to save
                 }
 			}
-			else if (m_TimestampOCR != null)
+			else if (m_VideoController.HasTimestampOCR())
 			{
 				int frameDuration = (int)Math.Round(1000.0/m_VideoController.VideoFrameRate /*MillisecondsPerFrame*/);
 				var frameTime = new LCFrameTiming(m_OCRedTimeStamp, frameDuration);
@@ -2143,7 +1933,7 @@ namespace Tangra.VideoOperations.LightCurves
 			MeasurementTimingType measurementTimingType = MeasurementTimingType.UserEnteredFrameReferences;
 			if (m_VideoController.HasEmbeddedTimeStamps())
 				measurementTimingType = MeasurementTimingType.EmbeddedTimeForEachFrame;
-			else if (m_TimestampOCR != null)
+			else if (m_VideoController.HasTimestampOCR())
 				measurementTimingType = MeasurementTimingType.OCRedTimeForEachFrame;
 
             SerUseTimeStamp serTimingType = SerUseTimeStamp.None;
@@ -2186,7 +1976,7 @@ namespace Tangra.VideoOperations.LightCurves
 				LightCurveReductionContext.Instance,
 				m_StateMachine.MeasuringStars,
 				m_Tracker,
-				m_TimestampOCR,
+                m_VideoController.GetTimestampOCRNameAndVersion(),
 				null,
 				m_InstumentalDelaySelectedConfig,
 				m_InstumentalDelaySelectedCamera,

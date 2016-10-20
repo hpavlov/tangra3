@@ -37,16 +37,6 @@ namespace Tangra.OCR
             m_VideoController = videoController;
         }
 
-        public void RefiningFrame(uint[] data, float refiningPercentageLeft)
-        {
-            // Not required
-        }
-
-        public void PrepareForMeasurements(uint[] data)
-        {
-            // Not required
-        }
-
         public bool ExtractTime(int frameNo, uint[] data, out DateTime time)
         {
             if (m_VideoController != null)
@@ -69,25 +59,12 @@ namespace Tangra.OCR
             return false;
         }
 
-        public bool RequiresConfiguring
-        {
-            get
-            {
-                return false;
-            }
-        }
-
         public bool RequiresCalibration
         {
             get
             {
                 return false;
             }
-        }
-
-        public void TryToAutoConfigure(uint[] data)
-        {
-            // Not required
         }
 
         public bool ProcessCalibrationFrame(int frameNo, uint[] data)
