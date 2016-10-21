@@ -33,12 +33,12 @@ namespace Tangra.Video
 			pnlResult.Visible = false;
 			pnlResult.SendToBack();
 		}
-
-		private void frmIntegrationDetection_Load(object sender, EventArgs e)
-		{
-			timer.Interval = 50;
-			timer.Enabled = true;
-		}
+		
+        private void frmIntegrationDetection_Shown(object sender, EventArgs e)
+        {
+            timer.Interval = 50;
+            timer.Enabled = true;
+        }
 
 		private void timer_Tick(object sender, EventArgs e)
 		{
@@ -286,8 +286,12 @@ namespace Tangra.Video
 			{
 				g.Clear(Color.WhiteSmoke);
 
+			    int prevGreenId = -1;
+			    float prevX = 0;
+			    int counter = -1;
 				foreach(int key in sigmas.Keys)
 				{
+				    counter++;
 					if (double.IsNaN(sigmas[key])) break;
 
 					float x = 5 + (float)((key - minX) * xScale);
@@ -296,6 +300,21 @@ namespace Tangra.Video
 
 					double residual = Math.Abs(m_Median - sigmas[key]);
 					Brush brush = residual < m_Variance ? Brushes.Red : Brushes.Green;
+				    if (residual > m_Variance)
+				    {
+				        if (prevGreenId != -1)
+				        {
+				            int interval = counter - prevGreenId;
+				            if (interval > 4)
+				            {
+				                var textSize = g.MeasureString(interval.ToString(), DefaultFont);
+                                g.DrawString(interval.ToString(), DefaultFont, Brushes.Black, (x2 + prevX - textSize.Width) / 2f, (float)(minY + 2));    
+				            }
+                            
+				        }
+				        prevGreenId = counter;
+				        prevX = x;
+				    }
 
 					g.FillRectangle(brush, x, picSigmas.Height - y - 4, x2 - x, y + 4);
 				}
@@ -328,9 +347,20 @@ namespace Tangra.Video
 			public string CertaintyText;
 		}
 
-		private PotentialIntegrationFit ComputeIntegration()
+	    private PotentialIntegrationFit ComputeIntegration()
+	    {
+            List<int> INTERVALS = new List<int>(new int[] { 2, 4, 8, 16, 32, 64, 128 });
+	        var result = ComputeIntegration(INTERVALS);
+            if (result != null)
+                return result;
+
+            List<int> ODD_INTERVALS_MINTRON = new List<int>(new int[] { 3, 6, 12, 24, 48 });
+            return ComputeIntegration(ODD_INTERVALS_MINTRON);
+	    }
+
+	    private PotentialIntegrationFit ComputeIntegration(List<int> probeIntervals)
 		{
-			List<int> INTERVALS = new List<int>(new int[] {2, 4, 8, 16, 32, 64, 128});
+			
 			var fitValues = new Dictionary<int, double>();
 			var fitFlags = new Dictionary<int, bool>();
             var fitAboveSigmaRatios = new Dictionary<int, double>();
@@ -338,7 +368,7 @@ namespace Tangra.Video
 			List<PotentialIntegrationFit> guessesMinFrame = new List<PotentialIntegrationFit>();
 			List<PotentialIntegrationFit> guessesMaxOffset = new List<PotentialIntegrationFit>();
 
-			foreach(int interval in INTERVALS)
+            foreach (int interval in probeIntervals)
 			{
 				fitValues.Clear();
 				fitFlags.Clear();
@@ -434,7 +464,7 @@ namespace Tangra.Video
 						for (int i = 1; i < guesses.Count; i++)
 						{
 							if (guesses[i].Interval != 2 * prevInterval ||
-                                Math.Abs(firstFrame - guesses[i].StartingAtFrame) % prevInterval != 0)
+                                Math.Abs(firstFrame - guesses[i].StartingAtFrame) % firstInterval != 0)
 							{
 								isResonance = false;
 								break;

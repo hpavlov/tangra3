@@ -185,7 +185,7 @@
             this.MinimizeBox = false;
             this.Name = "frmIntegrationDetection";
             this.Text = "Detecting Video Integration ...";
-            this.Load += new System.EventHandler(this.frmIntegrationDetection_Load);
+            this.Shown += new System.EventHandler(this.frmIntegrationDetection_Shown);
             ((System.ComponentModel.ISupportInitialize)(this.picFrameSpectrum)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.picSigmas)).EndInit();
             this.pnlResult.ResumeLayout(false);
