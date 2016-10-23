@@ -10,6 +10,7 @@ using Tangra.Model.Image;
 
 namespace Tangra.Model.Astro
 {
+    [Serializable]
 	public abstract class StarMapBase
 	{
 		protected Pixelmap m_Pixelmap;

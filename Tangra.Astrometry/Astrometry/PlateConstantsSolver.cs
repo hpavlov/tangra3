@@ -164,6 +164,7 @@ namespace Tangra.Astrometry
 
 		private LeastSquareFittedAstrometry SolveWithLinearRegression(FitOrder fitOrder, int minNumberOfStars, double maxResidual, bool upgradeIfPossible, out LeastSquareFittedAstrometry firstFit)
 		{
+		    bool failed = false;
 			try
 			{
 				PlateConstantsFit firstPlateConstantsFit = null;
@@ -218,7 +219,7 @@ namespace Tangra.Astrometry
 						return new LeastSquareFittedAstrometry(m_PlateConfig, m_Tangent_RA0, m_Tangent_DE0, bestFit);
 				}
 
-
+			    failed = true;
 				return null;
 			}
 			finally
@@ -238,6 +239,12 @@ namespace Tangra.Astrometry
 #endif
 					m_ExcludedForBadResiduals.Add(m_Pairs[i].StarNo, m_Pairs[i].FitInfo.ExcludedForHighResidual);
 				}
+
+			    if (failed)
+			    {
+                    if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceInfo())
+                        Trace.WriteLine(string.Format("Solution LeastSquareFit failed. {0} included stars, {1} excluded for high residuals.", m_IncludedInSolution.Count, m_ExcludedForBadResiduals.Count));
+			    }
 			}
 		}
 

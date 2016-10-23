@@ -98,15 +98,31 @@ namespace Tangra.Astrometry
 			if (fitOrder == FitOrder.Linear)
 			{
 				PlateConstantsLinearFit linearFit = new PlateConstantsLinearFit(pairs);
-				if (linearFit.LeastSquareSolve(ra0Deg, de0Deg, minNumberOfStars))
-					return linearFit;
+			    try
+			    {
+			        if (linearFit.LeastSquareSolve(ra0Deg, de0Deg, minNumberOfStars))
+			            return linearFit;
+			    }
+			    catch (Exception ex)
+			    {
+			        Trace.WriteLine("{0} exception during PlateConstantsFit.", ex.GetType().Name);
+			        return null;
+			    }
 			}
 
 			if (fitOrder == FitOrder.Quadratic)
 			{
 				PlateConstantsQadraticFit qadraticFit = new PlateConstantsQadraticFit(pairs);
-				if (qadraticFit.LeastSquareSolve(ra0Deg, de0Deg, minNumberOfStars))
-					return qadraticFit;
+			    try
+			    {
+                    if (qadraticFit.LeastSquareSolve(ra0Deg, de0Deg, minNumberOfStars))
+                        return qadraticFit;
+			    }
+			    catch (Exception ex)
+			    {
+                    Trace.WriteLine("{0} exception during PlateConstantsFit.", ex.GetType().Name);
+			        return null;
+			    }
 			}
 
 			return null;

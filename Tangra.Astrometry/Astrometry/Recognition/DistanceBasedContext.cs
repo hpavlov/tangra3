@@ -2903,17 +2903,27 @@ namespace Tangra.Astrometry.Recognition
 				    }
 				    if (detectedStars < 25)
 				    {
-                        if (missingStars > detectedStars || missingStars > consideredStars / 2)
+				        if (missingStars > detectedStars || missingStars > consideredStars/2)
+				        {
+                            if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+                                Trace.WriteLine(string.Format("Failing potential fit because {0} missing stars are more than {1} detected stars OR they are more than half of the {2} considered stars.", missingStars, detectedStars, consideredStars));
 				            return false;
+				        }
 
-                        double detectedConsideredStarsPercentage = 1.0 * detectedStars/(consideredStars + missingStars);
+				        double detectedConsideredStarsPercentage = 1.0 * detectedStars/(consideredStars + missingStars);
 
 				        if (detectedConsideredStarsPercentage < 0.50 && consideredStars > 2 * detectedStars)
 				        {
+                            if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+                                Trace.WriteLine(string.Format("Failing potential fit because the {0} detected considered stars are less than 50% and {1} considered stars are more than double the {2} detected stars.", detectedConsideredStarsPercentage, consideredStars, detectedStars));
+
 				            return false;
 				        }
 				        if (detectedConsideredStarsPercentage < 0.25 && consideredStars > 10)
 				        {
+                            if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+                                Trace.WriteLine(string.Format("Failing potential fit because the {0}% of detected considered stars are less than 25% and {1} considered stars are more than 10.", detectedConsideredStarsPercentage, consideredStars));
+
 				            return false;
 				        }
                     }
@@ -3201,36 +3211,40 @@ namespace Tangra.Astrometry.Recognition
 
 			double ffl = fit.FitInfo.FittedFocalLength;
 			m_ImprovedSolution = m_SolutionSolver.SolveWithLinearRegression(m_Settings, out m_FirstImprovedSolution);
-            if (m_ImprovedSolution != null && m_ImprovedSolution.FitInfo.AllStarPairs.Count < 12)
-            {
-                // Attempt to reject errorous solutions with small number of fitted stars 
-                int totalMatched = 0;
-                var largeFeatures = m_StarMap.Features.Where(x => x.MaxBrightnessPixels > 1).ToList();
-                if (largeFeatures.Count > 5)
-                {
-                    foreach (var feature in largeFeatures)
-                    {
-                        var ftrCenter = feature.GetCenter();
-                        // TODO: PFS Fit on the feature?
-                        var matchedFittedStar = m_ImprovedSolution.FitInfo.AllStarPairs.FirstOrDefault(
-                            x =>
-                                Math.Sqrt(Math.Pow(x.x - ftrCenter.XDouble, 2) + Math.Pow(x.x - ftrCenter.XDouble, 2)) <
-                                2);
-                        if (matchedFittedStar != null) totalMatched++;
-                    }
+            //if (m_ImprovedSolution != null && m_ImprovedSolution.FitInfo.AllStarPairs.Count < 12)
+            //{
+            //    // Attempt to reject errorous solutions with small number of fitted stars 
+            //    int totalMatched = 0;
+            //    var largeFeatures = m_StarMap.Features.Where(x => x.MaxBrightnessPixels > 1).ToList();
+            //    if (largeFeatures.Count > 5)
+            //    {
+            //        foreach (var feature in largeFeatures)
+            //        {
+            //            var ftrCenter = feature.GetCenter();
+            //            // TODO: PFS Fit on the feature?
+            //            var matchedFittedStar = m_ImprovedSolution.FitInfo.AllStarPairs.FirstOrDefault(
+            //                x =>
+            //                    Math.Sqrt(Math.Pow(x.x - ftrCenter.XDouble, 2) + Math.Pow(x.x - ftrCenter.XDouble, 2)) <
+            //                    2);
+            //            if (matchedFittedStar != null) totalMatched++;
+            //        }
 
-                    double percentLargeFeaturesMatched = 1.0*totalMatched/largeFeatures.Count;
-                    if (percentLargeFeaturesMatched < 0.75)
-                        // At least 75% of the bright features from the video need to be matched to stars for the solution to be accepted
-                        m_ImprovedSolution = null;
-                }
-            }
+            //        double percentLargeFeaturesMatched = 1.0*totalMatched/largeFeatures.Count;
+            //        if (percentLargeFeaturesMatched < 0.75)
+            //        {
+            //            if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceInfo())
+            //                Trace.WriteLine(string.Format("Only {0:0.0}% ({1} features) of the large {2} features have been matched, where 75% is required.", percentLargeFeaturesMatched*100, totalMatched, largeFeatures.Count));
+            //            // At least 75% of the bright features from the video need to be matched to stars for the solution to be accepted
+            //            m_ImprovedSolution = null;
+            //        }
+            //    }
+            //}
             
             if (m_ImprovedSolution != null)
 			{
 				m_ImprovedSolution.FitInfo.FittedFocalLength = ffl;
 
-                if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceInfo())
+                if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceWarning())
                     Trace.WriteLine(string.Format("Improved solution: {0} considered stars, UsedInSolution: {1}, ExcludedForHighResidual: {2}", 
                         m_ImprovedSolution.FitInfo.AllStarPairs.Count(), 
                         m_ImprovedSolution.FitInfo.AllStarPairs.Count(x => x.FitInfo.UsedInSolution),
@@ -3253,7 +3267,12 @@ namespace Tangra.Astrometry.Recognition
                     if (nonIncludedConsideredStars > CorePyramidConfig.Default.MaxFWHMExcludedImprovemntStarsCoeff * usedStarPairs.Count)
                     {
                         if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceWarning())
-						    Trace.WriteLine(string.Format("Considered stars down to mag {0:0.00}: {1}. Attempted stars: {2}, Coeff: {3:0.00}", maxIncludedMag, nonIncludedConsideredStars + m_SolutionSolver.Pairs.Count, m_SolutionSolver.Pairs.Count, nonIncludedConsideredStars / m_SolutionSolver.Pairs.Count));
+						    Trace.WriteLine(string.Format("More than {0:0.0}% of the stars ({1} stars) down to mag {2:0.00} have not been matched. Attempted stars: {3}, Coeff: {4:0.00}", 
+                                CorePyramidConfig.Default.MaxFWHMExcludedImprovemntStarsCoeff * 100,
+                                nonIncludedConsideredStars,
+                                maxIncludedMag, 
+                                m_SolutionSolver.Pairs.Count, 
+                                nonIncludedConsideredStars / m_SolutionSolver.Pairs.Count));
 
 						m_ImprovedSolution = null;
 						return;
@@ -3281,8 +3300,8 @@ namespace Tangra.Astrometry.Recognition
 
                             if (Math.Pow(10, reg.StdDev) > CorePyramidConfig.Default.MagFitTestMaxStdDev || reg.A > CorePyramidConfig.Default.MagFitTestMaxInclination)
                             {
-                                if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
-                                    Trace.WriteLine(string.Format("Intensity(Log10(Magntude)) = {1} * x + {2}, StdDev = {0:0.0000}, ChiSquare = {3:0.000}", Math.Pow(10, reg.StdDev), reg.A, reg.B, reg.ChiSquare));
+                                if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceWarning())
+                                    Trace.WriteLine(string.Format("Failing solution for failed magnitude fit. Intensity(Log10(Magntude)) = {1} * x + {2}, StdDev = {0:0.0000}, ChiSquare = {3:0.000}", Math.Pow(10, reg.StdDev), reg.A, reg.B, reg.ChiSquare));
 
                                 m_ImprovedSolution = null;
                                 return;

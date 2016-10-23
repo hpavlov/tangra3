@@ -55,7 +55,7 @@ namespace Tangra.VideoOperations.Astrometry
 			tbxFocalLength.Text = TangraConfig.Settings.LastUsed.FocalLength.ToString("0");
 
 			DateTime? timeStamp = m_VideoController.GetCurrentFrameTime();
-			if (timeStamp != null && timeStamp != DateTime.MinValue)
+            if (timeStamp != null && timeStamp != DateTime.MinValue && timeStamp.Value.Year != 1)
 				dtpEpoch.Value = timeStamp.Value;
 		}
 

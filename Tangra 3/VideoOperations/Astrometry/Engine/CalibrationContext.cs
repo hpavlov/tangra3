@@ -41,7 +41,7 @@ namespace Tangra.VideoOperations.Astrometry.Engine
 
 		private static int SERIALIZATION_VERSION = 3;
 
-		public byte[] Serialize()
+		public byte[] Serialize()   
 		{
 			BinaryFormatter fmt = new BinaryFormatter();
 
