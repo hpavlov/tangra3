@@ -64,6 +64,11 @@ namespace Tangra.Controller
 
 		private IFramePlayer m_FramePlayer;
 
+	    public IFramePlayer FramePlayer
+	    {
+	        get { return m_FramePlayer; }
+	    }
+
 		private FrameStateData m_FrameState;
 
 		private frmAdvStatusPopup m_AdvStatusForm;
@@ -377,20 +382,8 @@ namespace Tangra.Controller
                         }
                         else
                         {
-                            ReInterlaceMode mode = ReInterlaceMode.None;
-
-                            if (TangraConfig.Settings.Generic.EnableFrameGrabberCorrections)
-                            {
-                                var frm = new frmAviLoadOptions();
-                                frm.ShowDialog(m_MainForm);
-
-                                mode = frm.ReInterlaceMode;
-                            }
-
                             frameStream = VideoStream.OpenFile(fileName);
-
-                            if (mode != ReInterlaceMode.None)
-                                frameStream = ReInterlacingVideoStream.Create(frameStream, mode);
+                            frameStream = ReInterlacingVideoStream.Create(frameStream, ReInterlaceMode.None);
                         }
 
                         return frameStream;

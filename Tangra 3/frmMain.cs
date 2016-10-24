@@ -1209,7 +1209,8 @@ namespace Tangra
 			if (!EnsureAstrometryConfiguration())
 				return false;
 
-            frmChooseCamera frmCamera = new frmChooseCamera(TangraContext.Current.FrameWidth, TangraContext.Current.FrameHeight, m_VideoController.VideoBitPix);
+            frmSelectInitialSettings frmCamera = new frmSelectInitialSettings(
+                TangraContext.Current.FrameWidth, TangraContext.Current.FrameHeight, m_VideoController, m_VideoController.FramePlayer);
 			if (frmCamera.ShowDialog(this) == DialogResult.Cancel)
 			{
 				return false;

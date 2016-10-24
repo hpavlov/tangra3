@@ -628,8 +628,6 @@ namespace Tangra.Model.Config
 			public bool UseInvertedDisplayMode = false;
 			public DisplayIntensifyMode UseDisplayIntensifyMode = DisplayIntensifyMode.Off;
 
-            public bool EnableFrameGrabberCorrections = false;
-
 			public bool OsdOcrEnabled = true;
 			public string OcrEngine = "IOTA-VTI";
 			public bool OcrAskEveryTime = false;

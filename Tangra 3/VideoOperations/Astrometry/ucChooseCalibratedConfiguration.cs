@@ -28,8 +28,6 @@ namespace Tangra.VideoOperations.Astrometry
 		private string m_SelectedCamera = null;
 		private string m_SelectedScopeRecorder = null;
 
-		private frmChooseCamera m_Form = null;
-
 		public ucChooseCalibratedConfiguration()
 		{
 			InitializeComponent();
@@ -39,11 +37,6 @@ namespace Tangra.VideoOperations.Astrometry
 
 		internal int FrameWidth;
 		internal int FrameHeight;
-
-		public void SetParentForm(frmChooseCamera form)
-		{
-			m_Form = form;
-		}
 
 		private void ucCameraSettings_Load(object sender, EventArgs e)
 		{
@@ -58,8 +51,6 @@ namespace Tangra.VideoOperations.Astrometry
 			gbxSolved.Visible = false;
 			pnlEditableConfigSettings.Visible = false;
 			pnlNotSolved.Visible = false;
-
-			SetFilterMode();
 
 			UpdateEnabledDisabledState();
 		}
@@ -96,12 +87,15 @@ namespace Tangra.VideoOperations.Astrometry
 			}
 		}
 
+        public event Action<bool> OnUpdateEnabledDisabledState;
+
 		private void UpdateEnabledDisabledState()
 		{
 			VideoCamera camera = cbxSavedCameras.SelectedItem as VideoCamera;
 			TangraConfig.ScopeRecorderConfiguration config = cbxSavedConfigurations.SelectedItem as TangraConfig.ScopeRecorderConfiguration;
 
-			btnOK.Enabled = camera != null && config != null;
+            if (OnUpdateEnabledDisabledState != null)
+                OnUpdateEnabledDisabledState.Invoke(camera != null && config != null);
 
 			if (camera != null && config != null)
 			{
@@ -299,21 +293,32 @@ namespace Tangra.VideoOperations.Astrometry
 			}
 		}
 
-		private void btnOK_Click(object sender, EventArgs e)
-		{
-			VideoCamera camera = cbxSavedCameras.SelectedItem as VideoCamera;
-			TangraConfig.ScopeRecorderConfiguration config = cbxSavedConfigurations.SelectedItem as TangraConfig.ScopeRecorderConfiguration;
+        internal ChooseConfigurationResult VerifyCameraSettings()
+	    {
+            VideoCamera camera = cbxSavedCameras.SelectedItem as VideoCamera;
+            TangraConfig.ScopeRecorderConfiguration config = cbxSavedConfigurations.SelectedItem as TangraConfig.ScopeRecorderConfiguration;
 
-			if (camera != null && config != null)
-			{
-				Rectangle rawFrame = config.RawFrameSizes[camera.Model];
-				if (rawFrame == Rectangle.Empty)
-				{
-					rawFrame = new Rectangle(0, 0, FrameWidth, FrameHeight);
-					config.RawFrameSizes[camera.Model] = rawFrame;
-				}
+            if (camera != null && config != null)
+            {
+                if (cbxRecalibrate.Checked)
+                {
+                    return new ChooseConfigurationResult()
+                    {
+                        SolvePlateConstantsNow = true,
+                        SelectedCameraModel = camera.Model,
+                        SelectedConfigName = config.Title,
+                        Recalibrate = true
+                    };
+                }
 
-                m_LimitingMagnitudeChanged |= config.LimitingMagnitudes[camera.Model] != (double)nudLimitMagnitude.Value; 
+                Rectangle rawFrame = config.RawFrameSizes[camera.Model];
+                if (rawFrame == Rectangle.Empty)
+                {
+                    rawFrame = new Rectangle(0, 0, FrameWidth, FrameHeight);
+                    config.RawFrameSizes[camera.Model] = rawFrame;
+                }
+
+                m_LimitingMagnitudeChanged |= config.LimitingMagnitudes[camera.Model] != (double)nudLimitMagnitude.Value;
                 config.LimitingMagnitudes[camera.Model] = (double)nudLimitMagnitude.Value;
                 if (m_LimitingMagnitudeChanged && config.LimitingMagnitudes[camera.Model] < 13)
                 {
@@ -326,54 +331,45 @@ namespace Tangra.VideoOperations.Astrometry
 
                 TangraConfig.Settings.Save();
 
-				if (rawFrame.Height != FrameHeight ||
-					rawFrame.Width != FrameWidth)
-				{
-					MessageBox.Show(
-						"The opened video frame size is incompatible with the selected configuration. May be " +
-						"the recording equipment is different? Please create a new configuration.",
-						"Wrong Configuration", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                if (rawFrame.Height != FrameHeight ||
+                    rawFrame.Width != FrameWidth)
+                {
+                    MessageBox.Show(
+                        "The opened video frame size is incompatible with the selected configuration. May be " +
+                        "the recording equipment is different? Please create a new configuration.",
+                        "Wrong Configuration", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-					cbxSavedConfigurations.Focus();
-					return;
-				}
-				else if (rawFrame == Rectangle.Empty)
-				{
-					// This is an existing configuration with no parameters for this frame size, so create one 
-					config.RawFrameSizes[camera.Model] = new Rectangle(0, 0, FrameWidth, FrameHeight);
-				}
+                    cbxSavedConfigurations.Focus();
+                    return null;
+                }
+                else if (rawFrame == Rectangle.Empty)
+                {
+                    // This is an existing configuration with no parameters for this frame size, so create one 
+                    config.RawFrameSizes[camera.Model] = new Rectangle(0, 0, FrameWidth, FrameHeight);
+                }
 
-				m_Form.IsNewConfiguration = config.IsNew;
-				m_Form.SolvePlateConstantsNow = cbxSolveConstantsNow.Checked;
+                var rv = new ChooseConfigurationResult()
+                {
+                    IsNew = config.IsNew,
+                    SolvePlateConstantsNow = cbxSolveConstantsNow.Checked,
+                    SelectedCameraModel = camera.Model,
+                    SelectedConfigName = config.Title
+                };
 
-				TangraConfig.Settings.PlateSolve.SelectedCameraModel = camera.Model;
-				TangraConfig.Settings.PlateSolve.SelectedScopeRecorder = config.Title;
-				TangraConfig.Settings.PlateSolve.UseLowPassForAstrometry = miLowPass.Checked;
-				TangraConfig.Settings.Save();
+                return rv;
+            }
 
-				m_Form.DialogResult = DialogResult.OK;
-				m_Form.Close();
-			}
-		}
+	        return null;
+	    }
 
-
-		private void btnRecalibrate_Click(object sender, EventArgs e)
-		{
-			VideoCamera camera = cbxSavedCameras.SelectedItem as VideoCamera;
-			TangraConfig.ScopeRecorderConfiguration config = cbxSavedConfigurations.SelectedItem as TangraConfig.ScopeRecorderConfiguration;
-
-			if (camera != null && config != null)
-			{
-				m_Form.SolvePlateConstantsNow = true;
-
-				TangraConfig.Settings.PlateSolve.SelectedCameraModel = camera.Model;
-				TangraConfig.Settings.PlateSolve.SelectedScopeRecorder = config.Title;
-				TangraConfig.Settings.Save();
-
-				m_Form.DialogResult = DialogResult.OK;
-				m_Form.Close();
-			}
-		}
+	    public class ChooseConfigurationResult
+	    {
+	        public bool IsNew;
+	        public bool Recalibrate;
+	        public bool SolvePlateConstantsNow;
+            public string SelectedConfigName;
+            public string SelectedCameraModel;
+	    }
 
 		private void btnEditConfiguration_Click(object sender, EventArgs e)
 		{
@@ -443,62 +439,6 @@ namespace Tangra.VideoOperations.Astrometry
 		private void cbxFlipHorizontally_CheckedChanged(object sender, EventArgs e)
 		{
 			UpdateCurrentConfigValues();
-		}
-
-		private void btnPreProcessingFilter_Click(object sender, EventArgs e)
-		{
-			contextMenuFilter.Show(
-				btnPreProcessingFilter,
-				new Point(0, 0),
-				ToolStripDropDownDirection.BelowRight);
-		}
-
-		private void contextMenuFilter_Opening(object sender, CancelEventArgs e)
-		{
-			if (AstrometryContext.Current.FieldSolveContext.UseFilter == TangraConfig.PreProcessingFilter.NoFilter)
-				miNoFilter.Checked = true;
-			else if (AstrometryContext.Current.FieldSolveContext.UseFilter == TangraConfig.PreProcessingFilter.LowPassFilter)
-				miLowPass.Checked = true;
-		}
-
-		private bool m_NoFilterSetting = false;
-
-		private void miFilter_CheckedChanged(object sender, EventArgs e)
-		{
-			if (m_NoFilterSetting) return;
-
-			ToolStripMenuItem clickedItem = sender as ToolStripMenuItem;
-			if (clickedItem == miNoFilter)
-				AstrometryContext.Current.FieldSolveContext.UseFilter = TangraConfig.PreProcessingFilter.NoFilter;
-			else if (clickedItem == miLowPass)
-				AstrometryContext.Current.FieldSolveContext.UseFilter = TangraConfig.PreProcessingFilter.LowPassFilter;
-
-			SetFilterMode();
-		}
-
-		private void SetFilterMode()
-		{
-			m_NoFilterSetting = true;
-			try
-			{
-				miNoFilter.Checked = false;
-				miLowPass.Checked = false;
-
-				if (AstrometryContext.Current.FieldSolveContext.UseFilter == TangraConfig.PreProcessingFilter.NoFilter)
-				{
-					btnPreProcessingFilter.Text = "No Filter";
-					miNoFilter.Checked = true;
-				}
-				else if (AstrometryContext.Current.FieldSolveContext.UseFilter == TangraConfig.PreProcessingFilter.LowPassFilter)
-				{
-					btnPreProcessingFilter.Text = "Low-Pass Filter";
-					miLowPass.Checked = true;
-				}
-			}
-			finally
-			{
-				m_NoFilterSetting = false;
-			}
 		}
 
 		private void linkLblAboutCalibration_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)

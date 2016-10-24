@@ -4,21 +4,16 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
-using System.Data;
 using System.Drawing.Imaging;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using Tangra.Helpers;
-using Tangra.Model.Astro;
 using Tangra.Model.Config;
-using Tangra.Model.Context;
 using Tangra.Model.Video;
-using Tangra.Video;
+using Tangra.VideoOperations;
 
-namespace Tangra.VideoOperations.LightCurves
+namespace Tangra.VideoTools
 {
     public partial class ucPreProcessing : UserControl
     {

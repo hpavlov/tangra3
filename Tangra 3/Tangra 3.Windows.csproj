@@ -444,11 +444,11 @@
     <Compile Include="VideoOperations\Astrometry\Engine\CalibrationContext.cs" />
     <Compile Include="VideoOperations\Astrometry\Engine\FieldSolveContext.cs" />
     <Compile Include="VideoOperations\Astrometry\Engine\PlateCalibration.cs" />
-    <Compile Include="VideoOperations\Astrometry\frmChooseCamera.cs">
+    <Compile Include="VideoOperations\Astrometry\frmSelectInitialSettings.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="VideoOperations\Astrometry\frmChooseCamera.Designer.cs">
-      <DependentUpon>frmChooseCamera.cs</DependentUpon>
+    <Compile Include="VideoOperations\Astrometry\frmSelectInitialSettings.Designer.cs">
+      <DependentUpon>frmSelectInitialSettings.cs</DependentUpon>
     </Compile>
     <Compile Include="VideoOperations\Astrometry\frmConfigureAstrometricFit.cs">
       <SubType>Form</SubType>
@@ -667,6 +667,12 @@
     <Compile Include="VideoTools\frmGenerateStarFieldVideoModel.Designer.cs">
       <DependentUpon>frmGenerateStarFieldVideoModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="VideoTools\ucImageDefectSettings.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="VideoTools\ucImageDefectSettings.Designer.cs">
+      <DependentUpon>ucImageDefectSettings.cs</DependentUpon>
+    </Compile>
     <Compile Include="VideoTools\VideoModelUtils.cs" />
     <Compile Include="Video\AstroDigitalVideoStreamV2.cs" />
     <Compile Include="Video\AstroDigitalVideo\AdvToAviConverter.cs" />
@@ -856,10 +862,10 @@
     <Compile Include="VideoOperations\LightCurves\ucLightCurves.Designer.cs">
       <DependentUpon>ucLightCurves.cs</DependentUpon>
     </Compile>
-    <Compile Include="VideoOperations\LightCurves\ucPreProcessing.cs">
+    <Compile Include="VideoTools\ucPreProcessing.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="VideoOperations\LightCurves\ucPreProcessing.Designer.cs">
+    <Compile Include="VideoTools\ucPreProcessing.Designer.cs">
       <DependentUpon>ucPreProcessing.cs</DependentUpon>
     </Compile>
     <Compile Include="VideoOperations\MakeDarkFlatField\MakeDarkFlatOperation.cs" />
@@ -925,12 +931,6 @@
     </Compile>
     <Compile Include="Video\FITS\frmSortFitsFiles.Designer.cs">
       <DependentUpon>frmSortFitsFiles.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Video\frmAviLoadOptions.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Video\frmAviLoadOptions.Designer.cs">
-      <DependentUpon>frmAviLoadOptions.cs</DependentUpon>
     </Compile>
     <Compile Include="Video\frmIntegrationDetection.cs">
       <SubType>Form</SubType>
@@ -1073,8 +1073,8 @@
     <EmbeddedResource Include="ImageTools\frmIdentifyCalibrationStar.resx">
       <DependentUpon>frmIdentifyCalibrationStar.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="VideoOperations\Astrometry\frmChooseCamera.resx">
-      <DependentUpon>frmChooseCamera.cs</DependentUpon>
+    <EmbeddedResource Include="VideoOperations\Astrometry\frmSelectInitialSettings.resx">
+      <DependentUpon>frmSelectInitialSettings.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\Astrometry\frmConfigureAstrometricFit.resx">
       <DependentUpon>frmConfigureAstrometricFit.cs</DependentUpon>
@@ -1199,6 +1199,9 @@
     <EmbeddedResource Include="VideoTools\frmGenerateStarFieldVideoModel.resx">
       <DependentUpon>frmGenerateStarFieldVideoModel.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="VideoTools\ucImageDefectSettings.resx">
+      <DependentUpon>ucImageDefectSettings.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Video\AstroDigitalVideo\frmAdv2Viewer.resx">
       <DependentUpon>frmAdv2Viewer.cs</DependentUpon>
     </EmbeddedResource>
@@ -1272,7 +1275,7 @@
     <EmbeddedResource Include="VideoOperations\LightCurves\ucLightCurves.resx">
       <DependentUpon>ucLightCurves.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="VideoOperations\LightCurves\ucPreProcessing.resx">
+    <EmbeddedResource Include="VideoTools\ucPreProcessing.resx">
       <DependentUpon>ucPreProcessing.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\MakeDarkFlatField\ucMakeDarkFlatField.resx">
@@ -1298,9 +1301,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Video\FITS\frmSortFitsFiles.resx">
       <DependentUpon>frmSortFitsFiles.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Video\frmAviLoadOptions.resx">
-      <DependentUpon>frmAviLoadOptions.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Video\frmIntegrationDetection.resx">
       <DependentUpon>frmIntegrationDetection.cs</DependentUpon>

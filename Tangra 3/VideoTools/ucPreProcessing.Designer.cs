@@ -1,4 +1,4 @@
-﻿namespace Tangra.VideoOperations.LightCurves
+﻿namespace Tangra.VideoTools
 {
     partial class ucPreProcessing
     {

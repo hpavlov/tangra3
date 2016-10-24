@@ -13,6 +13,7 @@ using Tangra.Model.Image;
 using Tangra.Model.Video;
 using Tangra.Model.VideoOperations;
 using Tangra.PInvoke;
+using Tangra.Video;
 
 namespace Tangra.VideoOperations
 {
@@ -32,6 +33,8 @@ namespace Tangra.VideoOperations
 		private bool m_UseStretching = false;
 
 		private bool m_UseIntegration = false;
+        private bool m_UseReInterlacedMode = false;
+	    private bool m_UseHotPixelCorrection = false;
 
 		private int m_FramesToIntegrate;
 		private FrameIntegratingMode m_IntegrationMode;
@@ -147,6 +150,20 @@ namespace Tangra.VideoOperations
 			Update();
 		}
 
+	    public void ReInterlace(ReInterlaceMode newMode)
+	    {
+            m_UseReInterlacedMode = newMode != ReInterlaceMode.None;
+
+            Update();
+	    }
+
+	    public void CorrectHotPixels(bool hotPixelCorrection)
+	    {
+            m_UseHotPixelCorrection = hotPixelCorrection;
+
+            Update();
+	    }
+
 		private Pixelmap m_CurrFrame = null;
 
 		internal void Update()
@@ -154,7 +171,9 @@ namespace Tangra.VideoOperations
 			if (m_UseIntegration ||
 			    m_UseClipping ||
 			    m_UseStretching ||
-			    m_UseBrightnessContrast)
+			    m_UseBrightnessContrast ||
+                m_UseReInterlacedMode ||
+                m_UseHotPixelCorrection)
 			{
 
 
@@ -209,6 +228,11 @@ namespace Tangra.VideoOperations
 
 				if (m_CurrFrame != null)
 				{
+				    if (m_UseHotPixelCorrection)
+				    {
+				        // TODO: Do a hot pixel correction, for now in Managed Land    
+				    }
+
 					frmFullSizePreview.EnsureFullPreviewVisible(m_CurrFrame, ParentForm);
 					frmFullSizePreview.Update(m_CurrFrame);
 				}

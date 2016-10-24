@@ -39,7 +39,6 @@
             this.cbxRenderingEngineAttemptOrder = new System.Windows.Forms.ComboBox();
             this.nudSaturation8bit = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
-            this.cbxEnableFrameGrabberCorrections = new System.Windows.Forms.CheckBox();
             this.groupControl1.SuspendLayout();
             this.pnlOsdOcr.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudSaturation8bit)).BeginInit();
@@ -65,7 +64,6 @@
             // 
             // groupControl1
             // 
-            this.groupControl1.Controls.Add(this.cbxEnableFrameGrabberCorrections);
             this.groupControl1.Controls.Add(this.pnlOsdOcr);
             this.groupControl1.Controls.Add(this.cbxEnableOsdOcr);
             this.groupControl1.Controls.Add(this.cbxColourChannel);
@@ -85,7 +83,7 @@
             // 
             this.pnlOsdOcr.Controls.Add(this.cbxOcrAskEveryTime);
             this.pnlOsdOcr.Controls.Add(this.cbxOcrEngine);
-            this.pnlOsdOcr.Location = new System.Drawing.Point(6, 236);
+            this.pnlOsdOcr.Location = new System.Drawing.Point(6, 207);
             this.pnlOsdOcr.Name = "pnlOsdOcr";
             this.pnlOsdOcr.Size = new System.Drawing.Size(229, 79);
             this.pnlOsdOcr.TabIndex = 52;
@@ -113,7 +111,7 @@
             // cbxEnableOsdOcr
             // 
             this.cbxEnableOsdOcr.AutoSize = true;
-            this.cbxEnableOsdOcr.Location = new System.Drawing.Point(16, 213);
+            this.cbxEnableOsdOcr.Location = new System.Drawing.Point(16, 184);
             this.cbxEnableOsdOcr.Name = "cbxEnableOsdOcr";
             this.cbxEnableOsdOcr.Size = new System.Drawing.Size(192, 17);
             this.cbxEnableOsdOcr.TabIndex = 43;
@@ -163,16 +161,6 @@
             this.label1.TabIndex = 43;
             this.label1.Text = "Saturation Level:";
             // 
-            // cbxEnableFrameGrabberCorrections
-            // 
-            this.cbxEnableFrameGrabberCorrections.AutoSize = true;
-            this.cbxEnableFrameGrabberCorrections.Location = new System.Drawing.Point(18, 178);
-            this.cbxEnableFrameGrabberCorrections.Name = "cbxEnableFrameGrabberCorrections";
-            this.cbxEnableFrameGrabberCorrections.Size = new System.Drawing.Size(190, 17);
-            this.cbxEnableFrameGrabberCorrections.TabIndex = 53;
-            this.cbxEnableFrameGrabberCorrections.Text = "Enable Frame Grabber corecctions";
-            this.cbxEnableFrameGrabberCorrections.UseVisualStyleBackColor = true;
-            // 
             // ucAnalogueVideo8bit
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -202,7 +190,6 @@
 		private System.Windows.Forms.CheckBox cbxEnableOsdOcr;
 		private System.Windows.Forms.Panel pnlOsdOcr;
 		private System.Windows.Forms.ComboBox cbxOcrEngine;
-		private System.Windows.Forms.CheckBox cbxOcrAskEveryTime;
-        private System.Windows.Forms.CheckBox cbxEnableFrameGrabberCorrections;
+        private System.Windows.Forms.CheckBox cbxOcrAskEveryTime;
 	}
 }

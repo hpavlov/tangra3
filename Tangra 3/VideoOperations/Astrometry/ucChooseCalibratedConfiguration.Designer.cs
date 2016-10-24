@@ -36,8 +36,6 @@
             this.label11 = new System.Windows.Forms.Label();
             this.btnDelete = new System.Windows.Forms.Button();
             this.btnNew = new System.Windows.Forms.Button();
-            this.btnCancel = new System.Windows.Forms.Button();
-            this.btnOK = new System.Windows.Forms.Button();
             this.cbxSavedConfigurations = new System.Windows.Forms.ComboBox();
             this.label10 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
@@ -66,7 +64,6 @@
             this.lblConfigAreaInfo = new System.Windows.Forms.Label();
             this.label17 = new System.Windows.Forms.Label();
             this.label15 = new System.Windows.Forms.Label();
-            this.btnRecalibrate = new System.Windows.Forms.Button();
             this.label12 = new System.Windows.Forms.Label();
             this.tbxSolvedCellX = new System.Windows.Forms.TextBox();
             this.tbxSolvedCellY = new System.Windows.Forms.TextBox();
@@ -80,17 +77,13 @@
             this.nudLimitMagnitude = new System.Windows.Forms.NumericUpDown();
             this.lblLimitingMagnitude = new System.Windows.Forms.Label();
             this.pnlEditableConfigSettings = new System.Windows.Forms.Panel();
-            this.btnPreProcessingFilter = new System.Windows.Forms.Button();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.contextMenuFilter = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.miNoFilter = new System.Windows.Forms.ToolStripMenuItem();
-            this.miLowPass = new System.Windows.Forms.ToolStripMenuItem();
+            this.cbxRecalibrate = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.pnlNotSolved.SuspendLayout();
             this.gbxSolved.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudLimitMagnitude)).BeginInit();
             this.pnlEditableConfigSettings.SuspendLayout();
-            this.contextMenuFilter.SuspendLayout();
             this.SuspendLayout();
             // 
             // cbxSolveConstantsNow
@@ -151,26 +144,6 @@
             this.btnNew.Text = "New";
             this.btnNew.UseVisualStyleBackColor = true;
             this.btnNew.Click += new System.EventHandler(this.btnNew_Click);
-            // 
-            // btnCancel
-            // 
-            this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(306, 320);
-            this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(92, 32);
-            this.btnCancel.TabIndex = 44;
-            this.btnCancel.Text = "Cancel";
-            this.btnCancel.UseVisualStyleBackColor = true;
-            // 
-            // btnOK
-            // 
-            this.btnOK.Location = new System.Drawing.Point(207, 320);
-            this.btnOK.Name = "btnOK";
-            this.btnOK.Size = new System.Drawing.Size(93, 32);
-            this.btnOK.TabIndex = 43;
-            this.btnOK.Text = "OK";
-            this.btnOK.UseVisualStyleBackColor = true;
-            this.btnOK.Click += new System.EventHandler(this.btnOK_Click);
             // 
             // cbxSavedConfigurations
             // 
@@ -415,10 +388,10 @@
             // 
             // gbxSolved
             // 
+            this.gbxSolved.Controls.Add(this.cbxRecalibrate);
             this.gbxSolved.Controls.Add(this.lblConfigAreaInfo);
             this.gbxSolved.Controls.Add(this.label17);
             this.gbxSolved.Controls.Add(this.label15);
-            this.gbxSolved.Controls.Add(this.btnRecalibrate);
             this.gbxSolved.Controls.Add(this.label12);
             this.gbxSolved.Controls.Add(this.tbxSolvedCellX);
             this.gbxSolved.Controls.Add(this.tbxSolvedFocalLength);
@@ -461,16 +434,6 @@
             this.label15.Size = new System.Drawing.Size(15, 13);
             this.label15.TabIndex = 41;
             this.label15.Text = "m";
-            // 
-            // btnRecalibrate
-            // 
-            this.btnRecalibrate.Location = new System.Drawing.Point(258, 46);
-            this.btnRecalibrate.Name = "btnRecalibrate";
-            this.btnRecalibrate.Size = new System.Drawing.Size(69, 23);
-            this.btnRecalibrate.TabIndex = 66;
-            this.btnRecalibrate.Text = "Recalibrate";
-            this.btnRecalibrate.UseVisualStyleBackColor = true;
-            this.btnRecalibrate.Click += new System.EventHandler(this.btnRecalibrate_Click);
             // 
             // label12
             // 
@@ -612,50 +575,21 @@
             this.pnlEditableConfigSettings.Size = new System.Drawing.Size(383, 35);
             this.pnlEditableConfigSettings.TabIndex = 74;
             // 
-            // btnPreProcessingFilter
+            // cbxRecalibrate
             // 
-            this.btnPreProcessingFilter.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.btnPreProcessingFilter.Location = new System.Drawing.Point(13, 328);
-            this.btnPreProcessingFilter.Name = "btnPreProcessingFilter";
-            this.btnPreProcessingFilter.Size = new System.Drawing.Size(132, 21);
-            this.btnPreProcessingFilter.TabIndex = 75;
-            this.btnPreProcessingFilter.Text = "Low Pass Diff Filter";
-            this.btnPreProcessingFilter.UseVisualStyleBackColor = true;
-            this.btnPreProcessingFilter.Click += new System.EventHandler(this.btnPreProcessingFilter_Click);
-            // 
-            // contextMenuFilter
-            // 
-            this.contextMenuFilter.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.miNoFilter,
-            this.miLowPass});
-            this.contextMenuFilter.Name = "contextMenuFilter";
-            this.contextMenuFilter.Size = new System.Drawing.Size(147, 48);
-            this.contextMenuFilter.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuFilter_Opening);
-            // 
-            // miNoFilter
-            // 
-            this.miNoFilter.Checked = true;
-            this.miNoFilter.CheckOnClick = true;
-            this.miNoFilter.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.miNoFilter.Name = "miNoFilter";
-            this.miNoFilter.Size = new System.Drawing.Size(146, 22);
-            this.miNoFilter.Text = "&No Filter";
-            this.miNoFilter.CheckedChanged += new System.EventHandler(this.miFilter_CheckedChanged);
-            // 
-            // miLowPass
-            // 
-            this.miLowPass.CheckOnClick = true;
-            this.miLowPass.Name = "miLowPass";
-            this.miLowPass.Size = new System.Drawing.Size(146, 22);
-            this.miLowPass.Text = "&Low-Pass Filter";
-            this.miLowPass.CheckedChanged += new System.EventHandler(this.miFilter_CheckedChanged);
+            this.cbxRecalibrate.AutoSize = true;
+            this.cbxRecalibrate.Location = new System.Drawing.Point(258, 50);
+            this.cbxRecalibrate.Name = "cbxRecalibrate";
+            this.cbxRecalibrate.Size = new System.Drawing.Size(80, 17);
+            this.cbxRecalibrate.TabIndex = 73;
+            this.cbxRecalibrate.Text = "Recalibrate";
+            this.cbxRecalibrate.UseVisualStyleBackColor = true;
             // 
             // ucChooseCalibratedConfiguration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.pnlEditableConfigSettings);
-            this.Controls.Add(this.btnPreProcessingFilter);
             this.Controls.Add(this.btnEditCamera);
             this.Controls.Add(this.btnEdit);
             this.Controls.Add(this.groupBox1);
@@ -665,13 +599,11 @@
             this.Controls.Add(this.btnDelete);
             this.Controls.Add(this.btnNew);
             this.Controls.Add(this.cbxSavedConfigurations);
-            this.Controls.Add(this.btnCancel);
-            this.Controls.Add(this.btnOK);
             this.Controls.Add(this.cbxSavedCameras);
             this.Controls.Add(this.gbxSolved);
             this.Controls.Add(this.pnlNotSolved);
             this.Name = "ucChooseCalibratedConfiguration";
-            this.Size = new System.Drawing.Size(410, 366);
+            this.Size = new System.Drawing.Size(410, 326);
             this.Load += new System.EventHandler(this.ucCameraSettings_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
@@ -682,7 +614,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudLimitMagnitude)).EndInit();
             this.pnlEditableConfigSettings.ResumeLayout(false);
             this.pnlEditableConfigSettings.PerformLayout();
-            this.contextMenuFilter.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -692,8 +623,7 @@
 
 
 		private System.Windows.Forms.CheckBox cbxSolveConstantsNow;
-		private System.Windows.Forms.Label label20;
-		private System.Windows.Forms.Button btnRecalibrate;
+        private System.Windows.Forms.Label label20;
 		private System.Windows.Forms.Label label12;
 		private System.Windows.Forms.TextBox tbxSolvedCellX;
         private System.Windows.Forms.Panel pnlEditableConfigSettings;
@@ -704,13 +634,9 @@
 		private System.Windows.Forms.Label label18;
 		private System.Windows.Forms.Label label21;
 		private System.Windows.Forms.Label label19;
-		private System.Windows.Forms.LinkLabel linkLblAboutCalibration;
-		private System.Windows.Forms.Button btnPreProcessingFilter;
+        private System.Windows.Forms.LinkLabel linkLblAboutCalibration;
 		private System.Windows.Forms.Button btnEdit;
-		private System.Windows.Forms.Panel pnlNotSolved;
-		private System.Windows.Forms.ContextMenuStrip contextMenuFilter;
-		private System.Windows.Forms.ToolStripMenuItem miNoFilter;
-		private System.Windows.Forms.ToolStripMenuItem miLowPass;
+        private System.Windows.Forms.Panel pnlNotSolved;
 		private System.Windows.Forms.ToolTip toolTip;
 		private System.Windows.Forms.TextBox tbxSolvedFocalLength;
 		private System.Windows.Forms.GroupBox gbxSolved;
@@ -739,12 +665,11 @@
 		private System.Windows.Forms.Label label11;
 		private System.Windows.Forms.Button btnDelete;
 		private System.Windows.Forms.Button btnNew;
-		private System.Windows.Forms.ComboBox cbxSavedConfigurations;
-		private System.Windows.Forms.Button btnCancel;
-		private System.Windows.Forms.Button btnOK;
+        private System.Windows.Forms.ComboBox cbxSavedConfigurations;
 		private System.Windows.Forms.ComboBox cbxSavedCameras;
 		private System.Windows.Forms.Label lblConfigAreaInfo;
         protected internal System.Windows.Forms.CheckBox cbxFlipHorizontally;
         protected internal System.Windows.Forms.CheckBox cbxFlipVertically;
+        protected internal System.Windows.Forms.CheckBox cbxRecalibrate;
 	}
 }

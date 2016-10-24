@@ -51,7 +51,6 @@ namespace Tangra.Config.SettingPannels
 			cbxColourChannel.SetCBXIndex((int)TangraConfig.Settings.Photometry.ColourChannel);
 
 			cbxEnableOsdOcr.Checked = TangraConfig.Settings.Generic.OsdOcrEnabled;
-            cbxEnableFrameGrabberCorrections.Checked = TangraConfig.Settings.Generic.EnableFrameGrabberCorrections;
 			cbxOcrAskEveryTime.Checked = TangraConfig.Settings.Generic.OcrAskEveryTime;
 
             m_VideoController.LoadAvailableOcrEngines(cbxOcrEngine);
@@ -67,8 +66,6 @@ namespace Tangra.Config.SettingPannels
 			TangraConfig.Settings.Generic.OsdOcrEnabled = cbxEnableOsdOcr.Checked;
 			TangraConfig.Settings.Generic.OcrEngine = cbxOcrEngine.Text;
 			TangraConfig.Settings.Generic.OcrAskEveryTime = cbxOcrAskEveryTime.Checked;
-
-            TangraConfig.Settings.Generic.EnableFrameGrabberCorrections = cbxEnableFrameGrabberCorrections.Checked;
 
 			if (!TangraConfig.Settings.Generic.OcrInitialSetupCompleted &&
 			    (TangraConfig.Settings.Generic.OsdOcrEnabled == false || TangraConfig.Settings.Generic.OcrAskEveryTime == true))

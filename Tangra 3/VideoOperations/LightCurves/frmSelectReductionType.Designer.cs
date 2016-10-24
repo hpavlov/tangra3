@@ -1,3 +1,5 @@
+using Tangra.VideoTools;
+
 namespace Tangra.VideoOperations.LightCurves
 {
     partial class frmSelectReductionType
@@ -75,7 +77,7 @@ namespace Tangra.VideoOperations.LightCurves
             this.cbxFullDisappearance = new System.Windows.Forms.CheckBox();
             this.cbxDriftTrough = new System.Windows.Forms.CheckBox();
             this.lblTrackingDescr = new System.Windows.Forms.Label();
-            this.ucStretching = new Tangra.VideoOperations.LightCurves.ucPreProcessing();
+            this.ucStretching = new ucPreProcessing();
             this.tabsOptions.SuspendLayout();
             this.tabGeneral.SuspendLayout();
             this.groupBox2.SuspendLayout();
