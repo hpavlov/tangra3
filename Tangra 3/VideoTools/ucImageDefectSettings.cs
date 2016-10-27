@@ -7,7 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Tangra.Controller;
+using Tangra.Model.Astro;
 using Tangra.Model.Config;
+using Tangra.Model.Image;
 using Tangra.Model.Video;
 using Tangra.Video;
 using Tangra.VideoOperations;
@@ -23,6 +25,29 @@ namespace Tangra.VideoTools
         public ucImageDefectSettings()
         {
             InitializeComponent();
+
+            frmFullSizePreview.OnDrawOverlays += frmFullSizePreview_OnDrawOverlays;
+            frmFullSizePreview.OnMouseClicked += frmFullSizePreview_OnMouseClicked;
+        }
+
+        /// <summary> 
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+
+            if (disposing)
+            {
+                frmFullSizePreview.OnMouseClicked -= frmFullSizePreview_OnMouseClicked;
+                frmFullSizePreview.OnDrawOverlays -= frmFullSizePreview_OnDrawOverlays;                
+            }
+            
+            base.Dispose(disposing);
         }
 
         public void Initialize(IFrameStream videoStream, int currentFrameNo)
@@ -34,6 +59,8 @@ namespace Tangra.VideoTools
 
             gbxInterlacedSettings.Enabled = m_ReInterlacedStream != null;
             rbReInterlaceNon.Checked = true;
+
+            tbDepth.Value = 20;
         }
 
         private void btnPreProcessingFilter_Click(object sender, EventArgs e)
@@ -111,9 +138,103 @@ namespace Tangra.VideoTools
             }
         }
 
+        public bool m_ExpectHotPixelDefinition = false;
+
         private void cbxUseHotPixelsCorrection_CheckedChanged(object sender, EventArgs e)
         {
-            FrameAdjustmentsPreview.Instance.CorrectHotPixels(cbxUseHotPixelsCorrection.Checked);
+            if (cbxUseHotPixelsCorrection.Checked)
+            {
+                HotPixelCorrector.Initialize();
+
+                FrameAdjustmentsPreview.Instance.ExpectHotPixelClick(true);
+
+                MessageBox.Show(ParentForm, 
+                    "Please select an existing hot pixel by clicking on it.",
+                    "Tangra", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                m_ExpectHotPixelDefinition = true;
+            }
+            else
+            {
+                m_ExpectHotPixelDefinition = false;
+                FrameAdjustmentsPreview.Instance.ExpectHotPixelClick(false);
+
+                HotPixelCorrector.Cleanup();
+            }
+
+            pnlHotPixelControls.Enabled = false;
+        }
+
+
+        void frmFullSizePreview_OnMouseClicked(MouseEventArgs e)
+        {
+            if (cbxUseHotPixelsCorrection.Checked && m_ExpectHotPixelDefinition && frmFullSizePreview.CurrFrame != null)
+            {
+                var pixels = frmFullSizePreview.CurrFrame.GetPixelsArea(e.X, e.Y, 35); 
+                PSFFit fit = new PSFFit(e.X, e.Y);
+                fit.Fit(pixels);
+                if (fit.IsSolved && fit.Certainty > 1 && fit.IMax > frmFullSizePreview.CurrFrame.MaxSignalValue/2.0)
+                {
+                    var sample = frmFullSizePreview.CurrFrame.GetPixelsArea((int) Math.Round(fit.XCenter), (int) Math.Round(fit.YCenter), 7);
+                    HotPixelCorrector.RegisterHotPixelSample(sample);
+
+                    m_ExpectHotPixelDefinition = false;
+                    FrameAdjustmentsPreview.Instance.ExpectHotPixelClick(false);
+                    pnlHotPixelControls.Enabled = true;
+
+                    HotPixelCorrector.LocateHotPixels(frmFullSizePreview.CurrFrame, Math.Max(0, tbDepth.Value));
+
+                    FrameAdjustmentsPreview.Instance.Update();
+                }
+                else
+                {
+                    MessageBox.Show(
+                        ParentForm, 
+                        "The location you clicked doesn't appear to contain a hot pixel. Please try again.\r\n\r\nIf necessary adjust the brightness and contrast of the image first.", 
+                        "Tangra", 
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        void frmFullSizePreview_OnDrawOverlays(Graphics g)
+        {
+            if (cbxUseHotPixelsCorrection.Checked)
+                HotPixelCorrector.DrawOverlay(g, Math.Max(1, tbDepth.Value), cbxPlotPeakPixels.Checked, rbHotPixelsPreviewRemove.Checked);                
+        }
+
+        private void ucImageDefectSettings_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void tbDepth_Scroll(object sender, EventArgs e)
+        {
+            int depth = tbDepth.Value;
+            if (depth > 0)
+            {
+                lblDepthValue.Text = depth.ToString();
+
+                HotPixelCorrector.LocateHotPixels(frmFullSizePreview.CurrFrame, depth);
+
+                FrameAdjustmentsPreview.Instance.Update();
+            }            
+        }
+
+        private void rbHotPixelsShowPositions_CheckedChanged(object sender, EventArgs e)
+        {
+            FrameAdjustmentsPreview.Instance.Update();
+        }
+
+        private void cbxPlotPeakPixels_CheckedChanged(object sender, EventArgs e)
+        {
+            FrameAdjustmentsPreview.Instance.Update();
+        }
+
+        private void rbHotPixelsPreviewRemove_CheckedChanged(object sender, EventArgs e)
+        {
+            FrameAdjustmentsPreview.Instance.RemoveHotPixels(rbHotPixelsPreviewRemove.Checked);
         }
     }
 }

@@ -18,6 +18,7 @@ using Tangra.Model.Config;
 using Tangra.Model.Image;
 using Tangra.Model.VideoOperations;
 using Tangra.VideoOperations.LightCurves;
+using Tangra.VideoTools;
 
 namespace Tangra
 {

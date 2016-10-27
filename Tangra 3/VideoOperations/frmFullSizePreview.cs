@@ -10,6 +10,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Model.Astro;
 using Tangra.Model.Image;
 
 namespace Tangra.VideoOperations
@@ -37,6 +38,10 @@ namespace Tangra.VideoOperations
 
 		private static frmFullSizePreview s_FullPreviewForm = null;
 		private static object s_SyncRoot = new object();
+        internal static AstroImage CurrFrame;
+
+	    public static event Action<Graphics> OnDrawOverlays;
+        public static event Action<MouseEventArgs> OnMouseClicked;
 
 		public static void EnsureFullPreviewVisible(Pixelmap currFrame, Form parentForm)
 		{
@@ -65,13 +70,30 @@ namespace Tangra.VideoOperations
 					s_FullPreviewForm.StartPosition = FormStartPosition.Manual;
 				}
 
-				s_FullPreviewForm.pictureBox.Image = currFrame.CreateDisplayBitmapDoNotDispose();
+			    s_FullPreviewForm.pictureBox.Image = GetPreviewImage(currFrame);
 
 				if (!s_FullPreviewForm.Visible) 
 					s_FullPreviewForm.Show(parentForm);
 				s_FullPreviewForm.Refresh();
 			}
 		}
+
+	    private static Bitmap GetPreviewImage(Pixelmap currFrame)
+	    {
+	        CurrFrame = new AstroImage(currFrame);
+            Bitmap image = currFrame.CreateDisplayBitmapDoNotDispose();
+
+	        if (OnDrawOverlays != null)
+	        {
+	            using (Graphics g = Graphics.FromImage(image))
+	            {
+	                OnDrawOverlays.Invoke(g);
+	                g.Save();
+	            }
+	        }
+
+	        return image;
+	    }
 
 		public static void EnsureFullPreviewHidden()
 		{
@@ -95,7 +117,7 @@ namespace Tangra.VideoOperations
 					if (s_FullPreviewForm != null)
 					{
 
-						s_FullPreviewForm.pictureBox.Image = currFrame.CreateDisplayBitmapDoNotDispose();
+						s_FullPreviewForm.pictureBox.Image = GetPreviewImage(currFrame);
 						s_FullPreviewForm.Refresh();
 					}
 				}
@@ -113,5 +135,22 @@ namespace Tangra.VideoOperations
 				}
 			}
 		}
+
+	    public static void SetCursor(Cursor cursor)
+	    {
+            lock (s_SyncRoot)
+            {
+                if (s_FullPreviewForm != null)
+                {
+                    s_FullPreviewForm.pictureBox.Cursor = cursor;
+                }
+            }
+	    }
+
+        private void pictureBox_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (OnMouseClicked != null)
+                OnMouseClicked.Invoke(e);
+        }
 	}
 }

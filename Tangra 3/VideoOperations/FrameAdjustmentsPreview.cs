@@ -14,6 +14,7 @@ using Tangra.Model.Video;
 using Tangra.Model.VideoOperations;
 using Tangra.PInvoke;
 using Tangra.Video;
+using Tangra.VideoTools;
 
 namespace Tangra.VideoOperations
 {
@@ -35,6 +36,7 @@ namespace Tangra.VideoOperations
 		private bool m_UseIntegration = false;
         private bool m_UseReInterlacedMode = false;
 	    private bool m_UseHotPixelCorrection = false;
+        private bool m_HotPixelConfiguration = false;
 
 		private int m_FramesToIntegrate;
 		private FrameIntegratingMode m_IntegrationMode;
@@ -157,12 +159,12 @@ namespace Tangra.VideoOperations
             Update();
 	    }
 
-	    public void CorrectHotPixels(bool hotPixelCorrection)
-	    {
-            m_UseHotPixelCorrection = hotPixelCorrection;
+        public void RemoveHotPixels(bool remove)
+        {
+            m_UseHotPixelCorrection = remove;
 
             Update();
-	    }
+        }
 
 		private Pixelmap m_CurrFrame = null;
 
@@ -173,10 +175,9 @@ namespace Tangra.VideoOperations
 			    m_UseStretching ||
 			    m_UseBrightnessContrast ||
                 m_UseReInterlacedMode ||
-                m_UseHotPixelCorrection)
+                m_UseHotPixelCorrection ||
+                m_HotPixelConfiguration)
 			{
-
-
 				if (m_UseIntegration)
 					m_VideoController.SetupFrameIntegration(m_FramesToIntegrate, m_IntegrationMode, m_IntegrationType);
 				else
@@ -230,7 +231,9 @@ namespace Tangra.VideoOperations
 				{
 				    if (m_UseHotPixelCorrection)
 				    {
-				        // TODO: Do a hot pixel correction, for now in Managed Land    
+				        // TODO: Do a hot pixel correction, for now in Managed Land   
+                        var corrected = HotPixelCorrector.CorrectHotPixels8BitManagedHack(m_CurrFrame);
+				        m_CurrFrame = corrected;
 				    }
 
 					frmFullSizePreview.EnsureFullPreviewVisible(m_CurrFrame, ParentForm);
@@ -254,5 +257,12 @@ namespace Tangra.VideoOperations
 		{
 			get { return m_CurrFrame; }
 		}
+
+	    public void ExpectHotPixelClick(bool expect)
+	    {
+            frmFullSizePreview.SetCursor(expect ? Cursors.Hand : Cursors.Default);
+	        m_HotPixelConfiguration = expect;
+	        Update();
+	    }
 	}
 }

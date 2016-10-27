@@ -42,6 +42,9 @@ namespace Tangra.Model.Image
 
     public class ConvMatrix5x5
     {
+        public int Factor = 1;
+        public int Offset = 0;
+
         public readonly float[,] Values;
 
         public ConvMatrix5x5(float[,] matrix)
@@ -318,7 +321,6 @@ namespace Tangra.Model.Image
 			return result;
 		}
 
-
         public static bool Conv5x5(Pixelmap image, ConvMatrix5x5 m)
         {
             throw new NotImplementedException();
@@ -453,7 +455,8 @@ namespace Tangra.Model.Image
 			else
 				return data;
 		}
-		public static bool LowPassDifference(Pixelmap image)
+		
+        public static bool LowPassDifference(Pixelmap image)
 		{
 			uint[,] pixels = GetPixelArray(image);
 
@@ -463,6 +466,82 @@ namespace Tangra.Model.Image
 
 			return true;
 		}
+
+	    public static bool MedianFilter5x5(Pixelmap image)
+	    {
+            var result = new Pixelmap(image.Width, image.Height, image.BitPixCamera, image.Pixels, image.DisplayBitmap, image.DisplayBitmapPixels);
+
+	        List<uint> block = new List<uint>();
+
+            for (int y = 2; y < image.Height - 3; ++y)
+            {
+                for (int x = 2; x < image.Width - 3; ++x)
+                {
+                    block.Clear();
+                    block.Add(image[x - 2, y - 2]);
+                    block.Add(image[x - 1, y - 2]);
+                    block.Add(image[x + 0, y - 2]);
+                    block.Add(image[x + 1, y - 2]);
+                    block.Add(image[x + 2, y - 2]);
+                    block.Add(image[x - 2, y - 1]);
+                    block.Add(image[x - 1, y - 1]);
+                    block.Add(image[x + 0, y - 1]);
+                    block.Add(image[x + 1, y - 1]);
+                    block.Add(image[x + 2, y - 1]);
+                    block.Add(image[x - 2, y + 0]);
+                    block.Add(image[x - 1, y + 0]);
+                    block.Add(image[x + 0, y + 0]);
+                    block.Add(image[x + 1, y + 0]);
+                    block.Add(image[x + 2, y + 0]);
+                    block.Add(image[x - 2, y + 1]);
+                    block.Add(image[x - 1, y + 1]);
+                    block.Add(image[x + 0, y + 1]);
+                    block.Add(image[x + 1, y + 1]);
+                    block.Add(image[x + 2, y + 1]);
+                    block.Add(image[x - 2, y + 2]);
+                    block.Add(image[x - 1, y + 2]);
+                    block.Add(image[x + 0, y + 2]);
+                    block.Add(image[x + 1, y + 2]);
+                    block.Add(image[x + 2, y + 2]);
+
+                    block.Sort();
+
+                    result[x, y] = block[12];
+                }
+            }
+
+            return true;
+	    }
+
+        public static bool MedianFilter3x3(Pixelmap image)
+        {
+            var result = new Pixelmap(image.Width, image.Height, image.BitPixCamera, image.Pixels, image.DisplayBitmap, image.DisplayBitmapPixels);
+
+            List<uint> block = new List<uint>();
+
+            for (int y = 1; y < image.Height - 2; ++y)
+            {
+                for (int x = 1; x < image.Width - 2; ++x)
+                {
+                    block.Clear();
+                    block.Add(image[x - 1, y - 1]);
+                    block.Add(image[x + 0, y - 1]);
+                    block.Add(image[x + 1, y - 1]);
+                    block.Add(image[x - 1, y + 0]);
+                    block.Add(image[x + 0, y + 0]);
+                    block.Add(image[x + 1, y + 0]);
+                    block.Add(image[x - 1, y + 1]);
+                    block.Add(image[x + 0, y + 1]);
+                    block.Add(image[x + 1, y + 1]);
+
+                    block.Sort();
+
+                    result[x, y] = block[4];
+                }
+            }
+
+            return true;
+        }
 
 		public static bool Brightness(Pixelmap image, int nBrightness)
 		{

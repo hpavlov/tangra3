@@ -667,6 +667,7 @@
     <Compile Include="VideoTools\frmGenerateStarFieldVideoModel.Designer.cs">
       <DependentUpon>frmGenerateStarFieldVideoModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="VideoTools\HotPixelCorrector.cs" />
     <Compile Include="VideoTools\ucImageDefectSettings.cs">
       <SubType>UserControl</SubType>
     </Compile>

@@ -500,6 +500,21 @@ namespace Tangra.Model.Image
 			return rv;
 		}
 
+        public static uint[] ConvertFromXYToFlatArray(uint[,] array, int width, int height)
+        {
+            var rv = new uint[width * height];
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    rv[x + (y * width)] = array[x, y];
+                }
+            }
+
+            return rv;
+        }
+
 		public void CopyPixelsFrom(uint[,] pixels, int bpp)
 		{
 			if (pixels.GetLength(0) != Width || pixels.GetLength(1) != Height)
