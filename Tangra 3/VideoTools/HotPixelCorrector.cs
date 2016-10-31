@@ -5,49 +5,13 @@ using System.Linq;
 using System.Text;
 using Tangra.Model.Astro;
 using Tangra.Model.Image;
+using Tangra.PInvoke;
 using Tangra.VideoOperations.LightCurves.Tracking;
 
 namespace Tangra.VideoTools
 {
     public static class HotPixelCorrector
     {
-        public static Pixelmap CorrectHotPixels8BitManagedHack(Pixelmap image)
-        {
-            if (s_TopCandidatesToTake > 0)
-            {
-                var hotPixelsList = s_Candidates.Take(s_TopCandidatesToTake);
-                var correctedPixels = image.GetPixelsCopy();
-                var lst = new List<uint>(image.Pixels);
-                lst.Sort();
-                uint imageMedian = lst[lst.Count / 2];
-
-                foreach (ImagePixel pixel in hotPixelsList)
-                {
-                    int xCorner = pixel.X - 4;
-                    int yCorner = pixel.Y - 4;
-                    var score = ScoreArea(correctedPixels, xCorner, yCorner);
-
-                    for (int x = 0; x < 7; x++)
-                    {
-                        for (int y = 0; y < 7; y++)
-                        {
-                            int x1 = x + score.Item2;
-                            int y1 = y + score.Item3;
-                            if (x1 >= 0 && x1 < 7 && y1 >= 0 && y1 < 7)
-                            {
-                                correctedPixels[x1 + xCorner, y1 + yCorner] = (uint)Math.Abs((int)correctedPixels[x1 + xCorner, y1 + yCorner] - (int)s_CombinedSample[x, y] + (int)imageMedian);
-                            }
-                        }
-                    }
-                }
-
-                var bmp = Pixelmap.ConstructBitmapFromBitmapPixels(Pixelmap.ConvertFromXYToFlatArray(correctedPixels, image.Width, image.Height), image.Width, image.Height);
-                return new Pixelmap(image.Width, image.Height, 8, image.Pixels, bmp, null);
-            }
-            else
-                return image;
-        }
-
         // TODO: Make those configurable 
         private static double PEAK_PIXEL_LEVEL_REQUIRED = 0.75;
 
@@ -75,12 +39,14 @@ namespace Tangra.VideoTools
         private static List<uint>[,] s_Samples = new List<uint>[7, 7];
         private static int s_NumSamplesCombined = 0;
         private static uint s_CombinedSampleMedian = 0;
+        private static uint s_MaxPixelValue = 0;
 
         private static uint[,] s_OriginalSample = new uint[7, 7];
         private static uint s_OriginalSampleMedian = 0;
 
-        public static void RegisterHotPixelSample(uint[,] area)
+        public static void RegisterHotPixelSample(uint[,] area, uint maxPixelValue)
         {
+            s_MaxPixelValue = maxPixelValue;
             bool isFirstSample = s_NumSamplesCombined == 0;
 
             var score = ScoreArea(area);
@@ -144,7 +110,7 @@ namespace Tangra.VideoTools
                 foreach (var pixel in allCenters)
                 {
                     var model = image.GetPixelsArea(pixel.X, pixel.Y, 7);
-                    RegisterHotPixelSample(model);
+                    RegisterHotPixelSample(model, image.Pixelmap.MaxSignalValue);
                 }
                 
                 rv = LocateHotPixels(image, s_CombinedSample, s_CombinedSampleMedian);
@@ -261,16 +227,33 @@ namespace Tangra.VideoTools
 
         }
 
+        private static bool m_ShowHotPixelPositions = false;
+
+        public static void ConfigurePreProcessing(bool removePixels)
+        {
+            m_ShowHotPixelPositions = !removePixels;
+
+            ReconfigurePreProcessing();
+        }
+
+        public static void ReconfigurePreProcessing()
+        {
+            if (!m_ShowHotPixelPositions)
+                TangraCore.PreProcessors.PreProcessingAddRemoveHotPixels(s_CombinedSample, s_Candidates.Take(s_TopCandidatesToTake).ToArray(), s_CombinedSampleMedian, s_MaxPixelValue);
+            else
+                TangraCore.PreProcessors.PreProcessingAddRemoveHotPixels(s_CombinedSample, new ImagePixel[0], 0, 0);            
+        }
+
         private static Font s_Font = new Font(FontFamily.GenericSansSerif, 6, FontStyle.Regular);
 
-        public static void DrawOverlay(Graphics g, int topNumCandidates, bool showPeakPixels, bool previewRemove)
+        public static void DrawOverlay(Graphics g, int topNumCandidates, bool showPeakPixels)
         {
             if (s_CandidateScores != null)
             {
                 s_TopCandidatesToTake = topNumCandidates;
 
                 var hotPixelsList = s_Candidates.Take(topNumCandidates);
-                if (!previewRemove)
+                if (m_ShowHotPixelPositions)
                 {
                     foreach (ImagePixel pixel in hotPixelsList)
                     {
@@ -285,7 +268,7 @@ namespace Tangra.VideoTools
                         ImagePixel pixel= s_Candidates[i];
                         g.DrawLine(Pens.Pink, pixel.X - 5, pixel.Y, pixel.X + 5, pixel.Y);
                         g.DrawLine(Pens.Pink, pixel.X, pixel.Y - 5, pixel.X, pixel.Y + 5);
-                        g.DrawString(s_CandidateScores[i].ToString("0.00"), s_Font, Brushes.Pink, pixel.X + 4, pixel.Y - 8);
+                        g.DrawString(s_CandidateScores[i].ToString("0.00"), s_Font, Brushes.Pink, pixel.X + 1, pixel.Y - 10);
                     }
                 }
             }

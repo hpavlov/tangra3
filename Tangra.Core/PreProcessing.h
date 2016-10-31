@@ -61,6 +61,7 @@ DLL_PUBLIC int PreProcessingAddDarkFrame(float* darkFramePixels, unsigned int pi
 DLL_PUBLIC int PreProcessingAddFlatFrame(float* flatFramePixels, unsigned int pixelsCount, float flatFrameMedian);
 DLL_PUBLIC int PreProcessingAddBiasFrame(float* biasFramePixels, unsigned int pixelsCount);
 DLL_PUBLIC int PreProcessingAddFlipAndRotation(enum RotateFlipType rotateFlipType);
+DLL_PUBLIC int PreProcessingAddRemoveHotPixels(unsigned int* model, unsigned int count, unsigned int* xVals, unsigned int* yVals, unsigned int imageMedian, unsigned int maxPixelValue);
 DLL_PUBLIC int PreProcessingUsesPreProcessing(bool* usesPreProcessing);
 DLL_PUBLIC int PreProcessingGetConfig(
 	PreProcessingType* preProcessingType, 
@@ -74,7 +75,8 @@ DLL_PUBLIC int PreProcessingGetConfig(
 	unsigned int* darkPixelsCount, 
 	unsigned int* flatPixelsCount,
 	unsigned int* biasPixelsCount,
-	RotateFlipType* rotateFlipType);
+	RotateFlipType* rotateFlipType,
+	unsigned int* hotPixelsPosCount);
 	
 DLL_PUBLIC int ApplyPreProcessingPixelsOnly(unsigned int* pixels, int width, int height, int bpp, unsigned int normVal, float exposureSeconds);
 DLL_PUBLIC int ApplyPreProcessing(unsigned int* pixels, int width, int height, int bpp, float exposureSeconds, BYTE* bitmapPixels, BYTE* bitmapBytes);
@@ -82,6 +84,7 @@ int ApplyPreProcessingWithNormalValue(unsigned int* pixels, int width, int heigh
 
 DLL_PUBLIC HRESULT SwapVideoFields(unsigned int* pixels, unsigned int* originalPixels, int width, int height, BYTE* bitmapPixels, BYTE* bitmapBytes);		
 DLL_PUBLIC HRESULT ShiftVideoFields(unsigned int* pixels, unsigned int* originalPixels, unsigned int* pixels2, unsigned int* originalPixels2, int width, int height, int fldIdx, BYTE* bitmapPixels, BYTE* bitmapBytes);		
+
 
 #ifdef __cplusplus
 } // __cplusplus defined.

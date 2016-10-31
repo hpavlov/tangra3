@@ -60,6 +60,7 @@ namespace Tangra.VideoTools
             gbxInterlacedSettings.Enabled = m_ReInterlacedStream != null;
             rbReInterlaceNon.Checked = true;
 
+            HotPixelCorrector.ConfigurePreProcessing(false);
             tbDepth.Value = 20;
         }
 
@@ -177,7 +178,7 @@ namespace Tangra.VideoTools
                 if (fit.IsSolved && fit.Certainty > 1 && fit.IMax > frmFullSizePreview.CurrFrame.MaxSignalValue/2.0)
                 {
                     var sample = frmFullSizePreview.CurrFrame.GetPixelsArea((int) Math.Round(fit.XCenter), (int) Math.Round(fit.YCenter), 7);
-                    HotPixelCorrector.RegisterHotPixelSample(sample);
+                    HotPixelCorrector.RegisterHotPixelSample(sample, frmFullSizePreview.CurrFrame.Pixelmap.MaxSignalValue);
 
                     m_ExpectHotPixelDefinition = false;
                     FrameAdjustmentsPreview.Instance.ExpectHotPixelClick(false);
@@ -201,7 +202,7 @@ namespace Tangra.VideoTools
         void frmFullSizePreview_OnDrawOverlays(Graphics g)
         {
             if (cbxUseHotPixelsCorrection.Checked)
-                HotPixelCorrector.DrawOverlay(g, Math.Max(1, tbDepth.Value), cbxPlotPeakPixels.Checked, rbHotPixelsPreviewRemove.Checked);                
+                HotPixelCorrector.DrawOverlay(g, Math.Max(1, tbDepth.Value), cbxPlotPeakPixels.Checked);                
         }
 
         private void ucImageDefectSettings_Load(object sender, EventArgs e)
@@ -235,6 +236,11 @@ namespace Tangra.VideoTools
         private void rbHotPixelsPreviewRemove_CheckedChanged(object sender, EventArgs e)
         {
             FrameAdjustmentsPreview.Instance.RemoveHotPixels(rbHotPixelsPreviewRemove.Checked);
+        }
+
+        internal void ApplyHotPixelSettings()
+        {
+            HotPixelCorrector.ConfigurePreProcessing(rbHotPixelsPreviewRemove.Checked);
         }
     }
 }

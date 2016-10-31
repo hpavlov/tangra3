@@ -68,6 +68,8 @@ namespace Tangra.VideoOperations.Astrometry
                 TangraConfig.Settings.PlateSolve.UseLowPassForAstrometry = ucImageDefectSettings1.miLowPass.Checked;
                 TangraConfig.Settings.Save();
 
+                ucImageDefectSettings1.ApplyHotPixelSettings();
+
                 m_VideoController.RefreshCurrentFrame();
 
                 DialogResult = DialogResult.OK;

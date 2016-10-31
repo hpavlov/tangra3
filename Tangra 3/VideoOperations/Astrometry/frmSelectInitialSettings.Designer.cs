@@ -33,13 +33,13 @@ namespace Tangra.VideoOperations.Astrometry
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmSelectInitialSettings));
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPlateSolving = new System.Windows.Forms.TabPage();
+            this.ucCameraSettings1 = new Tangra.VideoOperations.Astrometry.ucChooseCalibratedConfiguration();
             this.tabPreProcessing = new System.Windows.Forms.TabPage();
+            this.ucStretching = new Tangra.VideoTools.ucPreProcessing();
             this.tabDefectFixing = new System.Windows.Forms.TabPage();
+            this.ucImageDefectSettings1 = new Tangra.VideoTools.ucImageDefectSettings();
             this.btnOK = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
-            this.ucCameraSettings1 = new Tangra.VideoOperations.Astrometry.ucChooseCalibratedConfiguration();
-            this.ucStretching = new Tangra.VideoTools.ucPreProcessing();
-            this.ucImageDefectSettings1 = new Tangra.VideoTools.ucImageDefectSettings();
             this.tabControl1.SuspendLayout();
             this.tabPlateSolving.SuspendLayout();
             this.tabPreProcessing.SuspendLayout();
@@ -68,6 +68,13 @@ namespace Tangra.VideoOperations.Astrometry
             this.tabPlateSolving.Text = "Camera and Plate Solving";
             this.tabPlateSolving.UseVisualStyleBackColor = true;
             // 
+            // ucCameraSettings1
+            // 
+            this.ucCameraSettings1.Location = new System.Drawing.Point(-6, 0);
+            this.ucCameraSettings1.Name = "ucCameraSettings1";
+            this.ucCameraSettings1.Size = new System.Drawing.Size(414, 366);
+            this.ucCameraSettings1.TabIndex = 0;
+            // 
             // tabPreProcessing
             // 
             this.tabPreProcessing.Controls.Add(this.ucStretching);
@@ -79,6 +86,13 @@ namespace Tangra.VideoOperations.Astrometry
             this.tabPreProcessing.Text = "Pre-Processing";
             this.tabPreProcessing.UseVisualStyleBackColor = true;
             // 
+            // ucStretching
+            // 
+            this.ucStretching.Location = new System.Drawing.Point(6, 6);
+            this.ucStretching.Name = "ucStretching";
+            this.ucStretching.Size = new System.Drawing.Size(370, 221);
+            this.ucStretching.TabIndex = 1;
+            // 
             // tabDefectFixing
             // 
             this.tabDefectFixing.Controls.Add(this.ucImageDefectSettings1);
@@ -87,8 +101,15 @@ namespace Tangra.VideoOperations.Astrometry
             this.tabDefectFixing.Padding = new System.Windows.Forms.Padding(3);
             this.tabDefectFixing.Size = new System.Drawing.Size(405, 322);
             this.tabDefectFixing.TabIndex = 2;
-            this.tabDefectFixing.Text = "Image Defects";
+            this.tabDefectFixing.Text = "Defects Correction";
             this.tabDefectFixing.UseVisualStyleBackColor = true;
+            // 
+            // ucImageDefectSettings1
+            // 
+            this.ucImageDefectSettings1.Location = new System.Drawing.Point(6, 8);
+            this.ucImageDefectSettings1.Name = "ucImageDefectSettings1";
+            this.ucImageDefectSettings1.Size = new System.Drawing.Size(393, 308);
+            this.ucImageDefectSettings1.TabIndex = 0;
             // 
             // btnOK
             // 
@@ -109,27 +130,6 @@ namespace Tangra.VideoOperations.Astrometry
             this.btnCancel.TabIndex = 6;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
-            // 
-            // ucCameraSettings1
-            // 
-            this.ucCameraSettings1.Location = new System.Drawing.Point(-6, 0);
-            this.ucCameraSettings1.Name = "ucCameraSettings1";
-            this.ucCameraSettings1.Size = new System.Drawing.Size(414, 366);
-            this.ucCameraSettings1.TabIndex = 0;
-            // 
-            // ucStretching
-            // 
-            this.ucStretching.Location = new System.Drawing.Point(6, 6);
-            this.ucStretching.Name = "ucStretching";
-            this.ucStretching.Size = new System.Drawing.Size(370, 221);
-            this.ucStretching.TabIndex = 1;
-            // 
-            // ucImageDefectSettings1
-            // 
-            this.ucImageDefectSettings1.Location = new System.Drawing.Point(6, 8);
-            this.ucImageDefectSettings1.Name = "ucImageDefectSettings1";
-            this.ucImageDefectSettings1.Size = new System.Drawing.Size(393, 308);
-            this.ucImageDefectSettings1.TabIndex = 0;
             // 
             // frmSelectInitialSettings
             // 

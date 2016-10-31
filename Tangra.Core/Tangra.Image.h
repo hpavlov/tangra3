@@ -27,6 +27,7 @@ const double DENOISE_MATRIX[] = {
             1/9.0, 1/9.0, 1/9.0 };
 			
 void Convolution_GaussianBlur(unsigned int* pixels, int bpp, int width, int height);
+void Convolution_GaussianBlur_Area(unsigned int* pixels, unsigned int maxPixelValue, int x0, int y0, int areaWidth, int areaHeight, int width, int height);
 void Convolution_Sharpen(unsigned int* pixels, int bpp, int width, int height, unsigned int* average);
 void Convolution_Denoise(unsigned int* pixels, int bpp, int width, int height, unsigned int* average, bool cutEdges);
 

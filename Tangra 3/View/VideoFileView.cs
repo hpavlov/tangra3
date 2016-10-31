@@ -191,6 +191,11 @@ namespace Tangra.View
 						preProcessingInfoTooltip += "Using Low Pass Difference (LPD) filter\r\n";
 					}
 				}
+
+			    if (preProcessingInfo.HotPixelsPosCount > 0)
+			    {
+                    preProcessingInfoStr += string.Format("|HotPix:{0}", preProcessingInfo.HotPixelsPosCount);
+			    }
 			}
 
             if (!string.IsNullOrWhiteSpace(preProcessingInfoStr))

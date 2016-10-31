@@ -5,7 +5,7 @@
 #include "cross_platform.h"
 #include "PreProcessing.h"
 #include "PixelMapUtils.h"
-
+#include "HotPixelRemover.h"
 
 PreProcessingType s_PreProcessingType;
 PreProcessingFilter s_PreProcessingFilter;
@@ -18,6 +18,13 @@ float g_EncodingGamma;
 int g_KnownCameraResponse;
 int g_KnownCameraResponseParams[16];
 bool g_UsesPreProcessing = false;
+
+unsigned int g_HotPixelModel[49];
+unsigned int g_HotPixelsXPos[200];
+unsigned int g_HotPixelsYPos[200];
+int g_HotPixelsPosCount;
+unsigned int g_HotPixelsImageMedian;
+unsigned int g_HotPixelsMaxPixelValue;
 
 float* g_DarkFramePixelsCopy = NULL;
 float* g_FlatFramePixelsCopy = NULL;
@@ -53,6 +60,7 @@ int PreProcessingClearAll()
 	g_DarkFramePixelsCount = 0;
 	g_FlatFramePixelsCount = 0;
 	g_BiasFramePixelsCount = 0;
+	g_HotPixelsPosCount = 0;
 	g_UsesPreProcessing = false;
 
 	s_PreProcessingFilter = ppfNoFilter;
@@ -89,7 +97,7 @@ int PreProcessingUsesPreProcessing(bool* usesPreProcessing)
 	return S_OK;
 }
 
-int PreProcessingGetConfig(PreProcessingType* preProcessingType, unsigned int* fromValue, unsigned int* toValue,int* brigtness,int* contrast, PreProcessingFilter* filter, float* gamma, int* reversedCameraResponse, unsigned int* darkPixelsCount, unsigned int* flatPixelsCount, unsigned int* biasPixelsCount, RotateFlipType* rotateFlipType)
+int PreProcessingGetConfig(PreProcessingType* preProcessingType, unsigned int* fromValue, unsigned int* toValue,int* brigtness,int* contrast, PreProcessingFilter* filter, float* gamma, int* reversedCameraResponse, unsigned int* darkPixelsCount, unsigned int* flatPixelsCount, unsigned int* biasPixelsCount, RotateFlipType* rotateFlipType, unsigned int* hotPixelsPosCount)
 {
 	if (g_UsesPreProcessing) {
 		*preProcessingType = s_PreProcessingType;
@@ -105,6 +113,8 @@ int PreProcessingGetConfig(PreProcessingType* preProcessingType, unsigned int* f
 		*filter = s_PreProcessingFilter;
 		*gamma = g_EncodingGamma;
 		*reversedCameraResponse = ABS(g_EncodingGamma - 1.0f) < 0.01 ? g_KnownCameraResponse : 0;
+		
+		*hotPixelsPosCount = g_HotPixelsPosCount;
 	}
 
 	return S_OK;
@@ -256,6 +266,25 @@ int PreProcessingAddFlatFrame(float* flatFramePixels, unsigned int pixelsCount, 
 	return S_OK;
 }
 
+int PreProcessingAddRemoveHotPixels(unsigned int* model, unsigned int count, unsigned int* xVals, unsigned int* yVals, unsigned int imageMedian, unsigned int maxPixelValue)
+{
+	g_UsesPreProcessing = true;
+
+	for(int i = 0; i < 49; i++)
+		g_HotPixelModel[i] = model[i];
+	
+	g_HotPixelsPosCount = count;
+	g_HotPixelsImageMedian = imageMedian;
+	g_HotPixelsMaxPixelValue = maxPixelValue;
+	for (int i = 0; i < g_HotPixelsPosCount; i++)
+	{
+		g_HotPixelsXPos[i] = xVals[i];
+		g_HotPixelsYPos[i] = yVals[i];
+	}
+	
+	return S_OK;
+}
+
 
 int ApplyPreProcessingWithNormalValue(unsigned int* pixels, int width, int height, int bpp, float exposureSeconds, unsigned int normVal, BYTE* bitmapPixels, BYTE* bitmapBytes)
 {
@@ -325,7 +354,13 @@ int ApplyPreProcessingPixelsOnly(unsigned int* pixels, int width, int height, in
 		rv = PreProcessingLowPassDifferenceFilter(pixels, width, height, bpp, normVal);
 		if (rv != S_OK) return rv;
 	}
-
+	
+	if (g_HotPixelsPosCount > 0)
+	{
+		rv = PreProcessingRemoveHotPixels(pixels, width, height, g_HotPixelModel, g_HotPixelsPosCount, g_HotPixelsXPos, g_HotPixelsYPos, g_HotPixelsImageMedian, g_HotPixelsMaxPixelValue);
+		if (rv != S_OK) return rv;
+	}
+	
 	return rv;
 }
 

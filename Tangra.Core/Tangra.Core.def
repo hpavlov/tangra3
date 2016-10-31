@@ -52,7 +52,7 @@ EXPORTS
 	PreProcessingClip
 	PreProcessingBrightnessContrast
 	PreProcessingGamma
-
+	PreProcessingAddRemoveHotPixels
 
 	; Video Helpers
 	IntegrationManagerGetFirstFrameToIntegrate

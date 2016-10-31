@@ -163,6 +163,8 @@ namespace Tangra.VideoOperations
         {
             m_UseHotPixelCorrection = remove;
 
+            HotPixelCorrector.ConfigurePreProcessing(remove);
+
             Update();
         }
 
@@ -208,6 +210,8 @@ namespace Tangra.VideoOperations
                     TangraCore.PreProcessors.AddCameraResponseCorrection(TangraConfig.Settings.Photometry.KnownCameraResponse, TangraConfig.Settings.Photometry.KnownCameraResponseParams);
 				}
 
+			    HotPixelCorrector.ReconfigurePreProcessing();
+
 				//if (VideoContext.Current.DarkFrameBytes != null)
 				//{
 				//    Core.PreProcessors.AddDarkFrame(VideoContext.Current.DarkFrameBytes);
@@ -229,12 +233,12 @@ namespace Tangra.VideoOperations
 
 				if (m_CurrFrame != null)
 				{
-				    if (m_UseHotPixelCorrection)
-				    {
-				        // TODO: Do a hot pixel correction, for now in Managed Land   
-                        var corrected = HotPixelCorrector.CorrectHotPixels8BitManagedHack(m_CurrFrame);
-				        m_CurrFrame = corrected;
-				    }
+                    //if (m_UseHotPixelCorrection)
+                    //{
+                    //    // TODO: Do a hot pixel correction, for now in Managed Land   
+                    //    var corrected = HotPixelCorrector.CorrectHotPixels8BitManagedHack(m_CurrFrame);
+                    //    m_CurrFrame = corrected;
+                    //}
 
 					frmFullSizePreview.EnsureFullPreviewVisible(m_CurrFrame, ParentForm);
 					frmFullSizePreview.Update(m_CurrFrame);
