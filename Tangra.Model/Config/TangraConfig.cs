@@ -1714,6 +1714,7 @@ namespace Tangra.Model.Config
 				PyramidFocalLengthAllowance = 0.05;
 				PyramidTimeoutInSeconds = 60;
 			    PyramidNumberOfPivots = 3;
+			    SaveDebugOutput = false;
 			}
 
 			public AstrometrySettings Clone()
@@ -1796,6 +1797,8 @@ namespace Tangra.Model.Config
 
 			public bool UseMPCCode { get; set; }
 			public string MPCObservatoryCode { get; set; }
+
+            public bool SaveDebugOutput;
 		}
 
         [Serializable]

@@ -40,6 +40,7 @@ namespace Tangra.Config.SettingPannels
 			cbxMagBand.SetCBXIndex((int)TangraConfig.Settings.Astrometry.DefaultMagOutputBand);
 			nudMagResidual.SetNUDValue((decimal)TangraConfig.Settings.Photometry.MaxResidualStellarMags);
 			nudTargetVRColour.SetNUDValue((decimal)TangraConfig.Settings.Astrometry.AssumedTargetVRColour);
+            cbxDebugOutput.Checked = TangraConfig.Settings.Astrometry.SaveDebugOutput;
 		}
 
 		public override void SaveSettings()
@@ -65,6 +66,7 @@ namespace Tangra.Config.SettingPannels
 			TangraConfig.Settings.Astrometry.DefaultMagOutputBand = (TangraConfig.MagOutputBand)cbxMagBand.SelectedIndex;
 			TangraConfig.Settings.Photometry.MaxResidualStellarMags = (double)nudMagResidual.Value;
 			TangraConfig.Settings.Astrometry.AssumedTargetVRColour = (double)nudTargetVRColour.Value;
+            TangraConfig.Settings.Astrometry.SaveDebugOutput = cbxDebugOutput.Checked;
 		}
 	}
 }

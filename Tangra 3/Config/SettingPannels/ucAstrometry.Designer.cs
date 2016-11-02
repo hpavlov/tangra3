@@ -51,6 +51,8 @@
             this.label51 = new System.Windows.Forms.Label();
             this.nudAstrMaxResidual = new System.Windows.Forms.NumericUpDown();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.nudNumberOfPivots = new System.Windows.Forms.NumericUpDown();
             this.cbForceStellarObjectRequirements = new System.Windows.Forms.CheckBox();
             this.label61 = new System.Windows.Forms.Label();
             this.nudZoneStarIndex = new System.Windows.Forms.NumericUpDown();
@@ -74,8 +76,7 @@
             this.label57 = new System.Windows.Forms.Label();
             this.nudMagResidual = new System.Windows.Forms.NumericUpDown();
             this.label53 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.nudNumberOfPivots = new System.Windows.Forms.NumericUpDown();
+            this.cbxDebugOutput = new System.Windows.Forms.CheckBox();
             this.gbxStellarObjectRequirements.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudMaxElongation)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudLimitMagDetection)).BeginInit();
@@ -86,6 +87,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudAstrMinimumStars)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudAstrMaxResidual)).BeginInit();
             this.groupBox5.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudNumberOfPivots)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudZoneStarIndex)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudAstrAttemptTimeout)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudAstrFocLenVariation)).BeginInit();
@@ -94,7 +96,6 @@
             this.groupBox11.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudTargetVRColour)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMagResidual)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudNumberOfPivots)).BeginInit();
             this.SuspendLayout();
             // 
             // gbxStellarObjectRequirements
@@ -112,7 +113,7 @@
             this.gbxStellarObjectRequirements.Controls.Add(this.nudMinFWHM);
             this.gbxStellarObjectRequirements.Location = new System.Drawing.Point(3, 143);
             this.gbxStellarObjectRequirements.Name = "gbxStellarObjectRequirements";
-            this.gbxStellarObjectRequirements.Size = new System.Drawing.Size(225, 191);
+            this.gbxStellarObjectRequirements.Size = new System.Drawing.Size(225, 163);
             this.gbxStellarObjectRequirements.TabIndex = 33;
             this.gbxStellarObjectRequirements.TabStop = false;
             this.gbxStellarObjectRequirements.Text = "Stellar Object Checks";
@@ -460,6 +461,37 @@
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "Alignment Settings";
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(16, 98);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(88, 13);
+            this.label2.TabIndex = 33;
+            this.label2.Text = "Number of Pivots";
+            // 
+            // nudNumberOfPivots
+            // 
+            this.nudNumberOfPivots.Location = new System.Drawing.Point(155, 94);
+            this.nudNumberOfPivots.Maximum = new decimal(new int[] {
+            4,
+            0,
+            0,
+            0});
+            this.nudNumberOfPivots.Minimum = new decimal(new int[] {
+            3,
+            0,
+            0,
+            0});
+            this.nudNumberOfPivots.Name = "nudNumberOfPivots";
+            this.nudNumberOfPivots.Size = new System.Drawing.Size(47, 20);
+            this.nudNumberOfPivots.TabIndex = 32;
+            this.nudNumberOfPivots.Value = new decimal(new int[] {
+            4,
+            0,
+            0,
+            0});
+            // 
             // cbForceStellarObjectRequirements
             // 
             this.cbForceStellarObjectRequirements.AutoSize = true;
@@ -792,41 +824,21 @@
             this.label53.TabIndex = 34;
             this.label53.Text = "Output Band";
             // 
-            // label2
+            // cbxDebugOutput
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(16, 98);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(88, 13);
-            this.label2.TabIndex = 33;
-            this.label2.Text = "Number of Pivots";
-            // 
-            // nudNumberOfPivots
-            // 
-            this.nudNumberOfPivots.Location = new System.Drawing.Point(155, 94);
-            this.nudNumberOfPivots.Maximum = new decimal(new int[] {
-            4,
-            0,
-            0,
-            0});
-            this.nudNumberOfPivots.Minimum = new decimal(new int[] {
-            3,
-            0,
-            0,
-            0});
-            this.nudNumberOfPivots.Name = "nudNumberOfPivots";
-            this.nudNumberOfPivots.Size = new System.Drawing.Size(47, 20);
-            this.nudNumberOfPivots.TabIndex = 32;
-            this.nudNumberOfPivots.Value = new decimal(new int[] {
-            4,
-            0,
-            0,
-            0});
+            this.cbxDebugOutput.AutoSize = true;
+            this.cbxDebugOutput.Location = new System.Drawing.Point(3, 317);
+            this.cbxDebugOutput.Name = "cbxDebugOutput";
+            this.cbxDebugOutput.Size = new System.Drawing.Size(193, 17);
+            this.cbxDebugOutput.TabIndex = 35;
+            this.cbxDebugOutput.Text = "Enabled Debug Output (Advanced)";
+            this.cbxDebugOutput.UseVisualStyleBackColor = true;
             // 
             // ucAstrometry
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.cbxDebugOutput);
             this.Controls.Add(this.groupBox11);
             this.Controls.Add(this.gbxStellarObjectRequirements);
             this.Controls.Add(this.groupBox8);
@@ -846,6 +858,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudAstrMaxResidual)).EndInit();
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudNumberOfPivots)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudZoneStarIndex)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudAstrAttemptTimeout)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudAstrFocLenVariation)).EndInit();
@@ -855,8 +868,8 @@
             this.groupBox11.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudTargetVRColour)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMagResidual)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudNumberOfPivots)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
 		}
 
@@ -910,5 +923,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.NumericUpDown nudNumberOfPivots;
+        private System.Windows.Forms.CheckBox cbxDebugOutput;
 	}
 }

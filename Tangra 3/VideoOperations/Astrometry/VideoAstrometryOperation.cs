@@ -435,6 +435,8 @@ namespace Tangra.VideoOperations.Astrometry
 
 				m_DistBasedMatcher.SetMinMaxMagOfStarsForAstrometry(m_Context.PyramidMinMag, m_Context.LimitMagn);
 				m_DistBasedMatcher.SetMinMaxMagOfStarsForPyramidAlignment(m_Context.PyramidMinMag, m_Context.PyramidMaxMag);
+
+                m_DistBasedMatcher.SaveDebugOutput(TangraConfig.Settings.Astrometry.SaveDebugOutput);
                 
 				m_DistBasedMatcher.InitNewMatch(m_StarMap, PyramidMatchType.PlateSolve, m_AstrometricState.ManualStarIdentificationMode ? m_AstrometricState.ManuallyIdentifiedStars : null);
 			}
@@ -469,21 +471,6 @@ namespace Tangra.VideoOperations.Astrometry
 
 		    AstroImage noPreProcImage = astroImage;
 
-            if (TangraCore.PreProcessors.UsesPreProcessing())
-            {
-                PreProcessingInfo preProcessingInfo;
-                TangraCore.PreProcessors.PreProcessingGetConfig(out preProcessingInfo);
-
-                if (preProcessingInfo.HasMoreThanDarkFlatOrGamma)
-                {
-                    // Make sure we are using the unprocessed pixels to build the starmap for astrometry
-                    Pixelmap unprocessPixelmap = new Pixelmap(astroImage.Pixelmap.Width, astroImage.Pixelmap.Height,
-                                                              astroImage.Pixelmap.BitPixCamera, astroImage.Pixelmap.UnprocessedPixels,
-                                                              null, null);
-                    unprocessPixelmap.SetMaxSignalValue(astroImage.Pixelmap.MaxSignalValue);
-                    noPreProcImage = new AstroImage(unprocessPixelmap);
-                }
-            }
 
 			starMap.FindBestMap(
 				AstrometryContext.Current.StarMapConfig,

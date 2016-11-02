@@ -240,7 +240,7 @@ namespace Tangra.VideoTools
 
         internal void ApplyHotPixelSettings()
         {
-            HotPixelCorrector.ConfigurePreProcessing(rbHotPixelsPreviewRemove.Checked);
+            HotPixelCorrector.ConfigurePreProcessing(cbxUseHotPixelsCorrection.Checked);
         }
     }
 }

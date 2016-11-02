@@ -159,6 +159,11 @@ namespace Tangra.Astrometry.Recognition
 			Context.DebugExcludeCombinations = debugContext.ExcludeCombinations;
 		}
 
+	    public void SaveDebugOutput(bool enable)
+	    {
+	        Context.DebugSaveAlignImages = enable;
+	    }
+
 		public void SetManuallyMatchedPairs(Dictionary<StarMapFeature, IStar> manualFit)
 		{
 			m_ManualStarMatch = manualFit;
