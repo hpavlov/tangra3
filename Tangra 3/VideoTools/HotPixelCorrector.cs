@@ -238,7 +238,7 @@ namespace Tangra.VideoTools
 
         public static void ReconfigurePreProcessing()
         {
-            if (!m_ShowHotPixelPositions)
+            if (!m_ShowHotPixelPositions && s_Candidates != null)
                 TangraCore.PreProcessors.PreProcessingAddRemoveHotPixels(s_CombinedSample, s_Candidates.Take(s_TopCandidatesToTake).ToArray(), s_CombinedSampleMedian, s_MaxPixelValue);
             else
                 TangraCore.PreProcessors.PreProcessingAddRemoveHotPixels(s_CombinedSample, new ImagePixel[0], 0, 0);            
