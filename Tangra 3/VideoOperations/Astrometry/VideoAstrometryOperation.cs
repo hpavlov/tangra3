@@ -243,10 +243,9 @@ namespace Tangra.VideoOperations.Astrometry
                     addin.OnEventNotification(AddinFiredEventType.BeginMultiFrameAstrometry);
             }
 
-            MeasurePositionInFrames(m_CurrentFrameIndex);
             ExecuteAstrometryAddins();
 
-			m_VideoController.PlayVideo(null, (uint)m_MeasurementContext.FrameInterval);
+            m_VideoController.PlayVideo(m_CurrentFrameIndex, (uint)m_MeasurementContext.FrameInterval);
 		}
 
 		private void EnsureSwitchedToAstormetricFitView(Panel controlPanel)
