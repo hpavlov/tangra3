@@ -2545,7 +2545,10 @@ namespace Tangra.Controller
             if (!TangraContext.Current.OcrExtractingTimestamps)
             {
                 TangraContext.Current.OcrErrors = 0;
-                TangraContext.Current.AstrometryOCRFrameDiscrepencies = 0;
+                TangraContext.Current.AstrometryOCRFailedRead = 0;
+                TangraContext.Current.AstrometryOCRDroppedFrames = 0;
+                TangraContext.Current.AstrometryOCRDuplicatedFrames = 0;
+                TangraContext.Current.AstrometryOCRTimeErrors = 0; 
                 TangraContext.Current.OcrExtractingTimestamps = true;
                 m_VideoFileView.Update();
             }

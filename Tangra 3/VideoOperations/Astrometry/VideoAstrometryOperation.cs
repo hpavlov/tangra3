@@ -70,6 +70,8 @@ namespace Tangra.VideoOperations.Astrometry
 		private UserObjectContext m_UserObject;
 		private MeasurementContext m_MeasurementContext;
 
+	    private int m_LastOCRImpliedFrameNo;
+
 		private bool m_DebugMode;
 		private bool m_MovingToFirstIntegratedFrameFlag = false;
 
@@ -245,6 +247,7 @@ namespace Tangra.VideoOperations.Astrometry
 
             ExecuteAstrometryAddins();
 
+		    m_LastOCRImpliedFrameNo = m_CurrentFrameIndex;
             m_VideoController.PlayVideo(m_CurrentFrameIndex, (uint)m_MeasurementContext.FrameInterval);
 		}
 
@@ -815,16 +818,49 @@ namespace Tangra.VideoOperations.Astrometry
                         if (m_VideoController.HasTimestampOCR())
                         {
                             measurement.OCRedTimeStamp = m_VideoController.OCRTimestamp();
-				            double milisecondsDiff =
-                                (frameNo - AstrometryContext.Current.FieldSolveContext.FrameNoOfUtcTime) * 1000.0 / m_VideoController.VideoFrameRate;
-                            var calcTime =  AstrometryContext.Current.FieldSolveContext.UtcTime.AddMilliseconds(milisecondsDiff);
-                            if (m_VideoController.AssertOCRTimestamp(calcTime, false))
+                            if (measurement.OCRedTimeStamp != DateTime.MinValue)
                             {
-                                TangraContext.Current.AstrometryOCRFrameDiscrepencies++;
+                                double impliedFrameNo = AstrometryContext.Current.FieldSolveContext.FrameNoOfUtcTime + (measurement.OCRedTimeStamp.Value.TimeOfDay - AstrometryContext.Current.FieldSolveContext.UtcTime.TimeOfDay).TotalSeconds * m_VideoController.VideoFrameRate;
+                                if (Math.Abs((impliedFrameNo - (int) Math.Round(impliedFrameNo))*1000/m_VideoController.VideoFrameRate) > 2)
+                                {
+                                    // More than 2-ms discrepency is considered a timing error
+                                    TangraContext.Current.AstrometryOCRTimeErrors++;
+                                    measurement.FrameNo = m_LastOCRImpliedFrameNo + m_VideoController.FramePlayer.FrameStep;
+                                }
+                                else
+                                {
+                                    int impliedFrameNoInt = (int)Math.Round(impliedFrameNo);
+                                    if (impliedFrameNoInt != frameNo)
+                                    {
+                                        if (impliedFrameNoInt == frameNo - 1)
+                                        {
+                                            // Duplicated frame
+                                            TangraContext.Current.AstrometryOCRDuplicatedFrames++;
+                                        }
+                                        else if (impliedFrameNoInt == frameNo + 1)
+                                        {
+                                            // Dropped frame
+                                            TangraContext.Current.AstrometryOCRDroppedFrames++;
+                                        }
+                                        else if (impliedFrameNoInt < frameNo)
+                                            TangraContext.Current.AstrometryOCRDuplicatedFrames += frameNo - impliedFrameNoInt;
+                                        else if (impliedFrameNoInt > frameNo)
+                                            TangraContext.Current.AstrometryOCRDroppedFrames += impliedFrameNoInt - frameNo;
+                                    }
+
+                                    if (m_LastOCRImpliedFrameNo + m_VideoController.FramePlayer.FrameStep != impliedFrameNoInt)
+                                        TangraContext.Current.AstrometryOCRTimeErrors++;
+
+                                    measurement.FrameNo = impliedFrameNoInt;
+                                }
                             }
+                            else
+                            {
+                                TangraContext.Current.AstrometryOCRFailedRead++;
+                                measurement.FrameNo = m_LastOCRImpliedFrameNo + m_VideoController.FramePlayer.FrameStep;
+                            }
+                            m_LastOCRImpliedFrameNo = measurement.FrameNo;
                         }
-                        //measurement.AstrometricFit = m_AstrometricFit;
-                        //measurement.Gaussian = m_AstrometryTracker.TrackedObject.PSFFit;
 
                         if (m_PhotometricFit != null)
                         {

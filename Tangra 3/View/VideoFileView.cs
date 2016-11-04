@@ -225,9 +225,37 @@ namespace Tangra.View
                 m_MainForm.ssOCR.Text = "OCR";
             }
 
-            m_MainForm.tslblRecDbg.Visible = TangraContext.Current.AstrometryOCRFrameDiscrepencies > 0;
-		    if (TangraContext.Current.AstrometryOCRFrameDiscrepencies > 0)
-		        m_MainForm.tslblRecDbg.Text = string.Format("{0} TimeStamp Problems", TangraContext.Current.AstrometryOCRFrameDiscrepencies);
+            bool recDbgVisible =  
+                TangraContext.Current.AstrometryOCRFailedRead > 0 ||
+                TangraContext.Current.AstrometryOCRDroppedFrames > 0 ||
+                TangraContext.Current.AstrometryOCRDuplicatedFrames > 0 ||
+                TangraContext.Current.AstrometryOCRTimeErrors > 0;
+
+
+            m_MainForm.tslblRecDbg.Visible = recDbgVisible;
+		    if (recDbgVisible)
+		    {
+		        string dbgText;
+                if (TangraContext.Current.AstrometryOCRFailedRead > 0)
+		        {
+                    dbgText = string.Format("TimeStamp Errors. {0} Unread.", TangraContext.Current.AstrometryOCRFailedRead);
+		            m_MainForm.tslblRecDbg.ForeColor = Color.Red;
+		        }
+                else
+                {
+                    dbgText = "TimeStamp Warnings. ";
+                    m_MainForm.tslblRecDbg.ForeColor = Color.Orange;
+                }
+
+		        if (TangraContext.Current.AstrometryOCRTimeErrors > 0)
+		            dbgText += string.Format(" {0} Bad.", TangraContext.Current.AstrometryOCRTimeErrors);
+                if (TangraContext.Current.AstrometryOCRDroppedFrames > 0)
+                    dbgText += string.Format(" {0} Dropped.", TangraContext.Current.AstrometryOCRDroppedFrames);
+                if (TangraContext.Current.AstrometryOCRDuplicatedFrames > 0)
+                    dbgText += string.Format(" {0} Duplicated.", TangraContext.Current.AstrometryOCRDuplicatedFrames);
+
+                m_MainForm.tslblRecDbg.Text = dbgText;
+		    }		        
 		}
 
 		public void UpdateVideoSizeAndLengthControls()

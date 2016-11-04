@@ -92,7 +92,10 @@ namespace Tangra.Model.Context
 
 	    public int OcrErrors = 0;
         public bool OcrExtractingTimestamps = false;
-	    public int AstrometryOCRFrameDiscrepencies = 0;
+	    public int AstrometryOCRFailedRead = 0;
+        public int AstrometryOCRDroppedFrames = 0;
+        public int AstrometryOCRDuplicatedFrames = 0;
+        public int AstrometryOCRTimeErrors = 0;
 
         public CrashReportInfo CrashReportInfo;
 
@@ -158,7 +161,10 @@ namespace Tangra.Model.Context
 
 	        OcrErrors = 0;
             OcrExtractingTimestamps = false;
-		    AstrometryOCRFrameDiscrepencies = 0;
+		    AstrometryOCRFailedRead = 0;
+            AstrometryOCRDroppedFrames = 0;
+            AstrometryOCRDuplicatedFrames = 0;
+		    AstrometryOCRTimeErrors = 0;
 
 		    OperationInProgress = false;
 			CanProcessLightCurvePixels = false;
