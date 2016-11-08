@@ -5,9 +5,10 @@ v3.6.1 (UNRELEASED)
 -------------------
 - Made it possible to fix interlaced video field grabbing defects by swaping and/or shifting the video fields inside video frames.
 - IOTA-VTI timestamps can now also be read (OCR-ed) when doing astrometry.
+- Improvements to the IOTA-VTI timestamp reading that should produce less incorrectly read timestamps. 
 - Made the integration detection recognize Mintron's odd integration rates: x3, x6, x12, x24, ... 
 - Implemented hot pixel removal in the Astrometry module.
-- Made it possible to export every 2-nd, 4-th,..., 64-th frame in the 'Export Video to FITS' operation
+- Made it possible to export every 2-nd, 4-th,..., 64-th frame in the 'Export Video to FITS' operation.
 
 v3.6.0 (2016-10-11)
 -------------------

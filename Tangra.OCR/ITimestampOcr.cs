@@ -27,7 +27,7 @@ namespace Tangra.OCR
         string NameAndVersion();
         string OSDType();
         void Initialize(TimestampOCRData initializationData, IVideoController videoController, int performanceMode);
-        bool ExtractTime(int frameNo, uint[] data, out DateTime time);
+        bool ExtractTime(int frameNo, int frameStep, uint[] data, out DateTime time);
 
         bool RequiresCalibration { get; }
 

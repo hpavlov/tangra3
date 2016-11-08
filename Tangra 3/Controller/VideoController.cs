@@ -748,7 +748,7 @@ namespace Tangra.Controller
 
             var osdPixels = m_AstroImage.GetPixelmapPixels();
 
-            if (!m_TimestampOCR.ExtractTime(m_CurrentFrameId, osdPixels, out ocredTimeStamp))
+            if (!m_TimestampOCR.ExtractTime(m_CurrentFrameId, m_FramePlayer.FrameStep, osdPixels, out ocredTimeStamp))
             {
                 ocredTimeStamp = DateTime.MinValue;
                 m_NumberFailedOcredVtiOsdFrames++;
@@ -799,8 +799,10 @@ namespace Tangra.Controller
 		{
             m_AstroImage = new AstroImage(currentPixelmap);
             m_CurrentFrameContext = frameContext;
-            m_CurrentFrameId = currentFrameId;
+            
             m_CurrentOCRRedTimeStamp = null;
+            m_CurrentFrameId = currentFrameId;
+
             m_FrameState = currentPixelmap.FrameState;
 
 			if (m_AdvStatusForm != null && m_AdvStatusForm.Visible)

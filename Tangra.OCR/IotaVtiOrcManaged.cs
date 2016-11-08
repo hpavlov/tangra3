@@ -41,6 +41,7 @@ namespace Tangra.OCR
 		private bool m_UseNativePreProcessing;
 
 		private bool m_ForceErrorReport;
+	    private int m_FrameStep = -1;
 
 		internal IotaVtiOcrCorrector m_Corrector = new IotaVtiOcrCorrector();
 
@@ -61,6 +62,7 @@ namespace Tangra.OCR
             m_Processor = null;
 			m_UseNativePreProcessing = performanceMode > 0;
 			m_ForceErrorReport = initializationData.ForceErrorReport;
+		    m_FrameStep = -1;
 		}
 
 		public TimestampOCRData InitializationData
@@ -211,7 +213,7 @@ namespace Tangra.OCR
         }
 
 
-		public bool ExtractTime(int frameNo, uint[] data, out DateTime time)
+        public bool ExtractTime(int frameNo, int frameStep, uint[] data, out DateTime time)
 		{
             if (m_Processor.IsCalibrated)
             {
@@ -226,7 +228,7 @@ namespace Tangra.OCR
                 m_Processor.Process(m_EvenFieldPixelsPreProcessed, m_FieldAreaWidth, m_FieldAreaHeight, null, frameNo, false);
                 IotaVtiTimeStamp evenFieldOSD = m_Processor.CurrentOcredTimeStamp;
 
-                time = ExtractDateTime(frameNo, oddFieldOSD, evenFieldOSD);
+                time = ExtractDateTime(frameNo, frameStep, oddFieldOSD, evenFieldOSD);
             }
             else
                 time = DateTime.MinValue;
@@ -234,7 +236,7 @@ namespace Tangra.OCR
             return time != DateTime.MinValue;
 		}
 
-        public bool ExtractTime(int frameNo, uint[] oddPixels, uint[] evenPixels, int width, int height, out DateTime time)
+        public bool ExtractTime(int frameNo, int frameStep, uint[] oddPixels, uint[] evenPixels, int width, int height, out DateTime time)
 	    {
             if (m_Processor.IsCalibrated)
             {
@@ -244,7 +246,7 @@ namespace Tangra.OCR
                 m_Processor.Process(evenPixels, width, height, null, frameNo, false);
                 IotaVtiTimeStamp evenFieldOSD = m_Processor.CurrentOcredTimeStamp;
 
-                time = ExtractDateTime(frameNo, oddFieldOSD, evenFieldOSD);
+                time = ExtractDateTime(frameNo, frameStep, oddFieldOSD, evenFieldOSD);
             }
             else
                 time = DateTime.MinValue;
@@ -614,14 +616,20 @@ namespace Tangra.OCR
         {
             return m_LatestFrameImage;
         }
-	     
-        internal DateTime ExtractDateTime(int frameNo, IotaVtiTimeStamp oddFieldOSD, IotaVtiTimeStamp evenFieldOSD)
+
+        internal DateTime ExtractDateTime(int frameNo, int frameStep, IotaVtiTimeStamp oddFieldOSD, IotaVtiTimeStamp evenFieldOSD)
         {
             bool failedValidation = false;
             string failedReason = null;
 
 	        if (oddFieldOSD == null || evenFieldOSD == null)
 		        return DateTime.MinValue;
+
+            if (frameStep != m_FrameStep)
+            {
+                m_FrameStep = frameStep;
+                m_Corrector.Reset(m_Processor.VideoFormat);    
+            }            
 
             if (oddFieldOSD.FrameNumber != evenFieldOSD.FrameNumber - 1 &&
                 oddFieldOSD.FrameNumber != evenFieldOSD.FrameNumber + 1)
@@ -666,7 +674,7 @@ namespace Tangra.OCR
 				if (failedValidation)
 				{
 				    string correctionInfo;
-                    failedValidation = !m_Corrector.TryToCorrect(frameNo, oddFieldOSD, evenFieldOSD, m_Processor.EvenBeforeOdd, ref oddFieldTimestamp, ref evenFieldTimestamp, out correctionInfo);
+                    failedValidation = !m_Corrector.TryToCorrect(frameNo, frameStep, oddFieldOSD, evenFieldOSD, m_Processor.EvenBeforeOdd, ref oddFieldTimestamp, ref evenFieldTimestamp, out correctionInfo);
 				    failedReason += ". " + correctionInfo;
 				}
 

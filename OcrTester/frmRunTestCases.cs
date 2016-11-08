@@ -92,7 +92,7 @@ namespace OcrTester
                             }
 
                             DateTime dt;
-                            isSuccess = ocrEngine.ExtractTime(i / 2, pixelmapOdd.Pixels, pixelmapEven.Pixels, bmpOdd.Width, bmpOdd.Height, out dt);
+                            isSuccess = ocrEngine.ExtractTime(i / 2, 1, pixelmapOdd.Pixels, pixelmapEven.Pixels, bmpOdd.Width, bmpOdd.Height, out dt);
                             if (!isSuccess)
                                 break;
                         }
@@ -253,7 +253,7 @@ namespace OcrTester
 
             processor.m_Corrector.m_PrevEvenTicks = new DateTime(1, 1, 1, 3, 55, 24, 665).Ticks;
             processor.m_Corrector.m_PrevOddTicks = new DateTime(1, 1, 1, 3, 55, 24, 649).Ticks;
-            DateTime dateTime = processor.ExtractDateTime(724, new Tangra.OCR.IotaVtiOsdProcessor.IotaVtiTimeStamp(oddFieldOSD), new Tangra.OCR.IotaVtiOsdProcessor.IotaVtiTimeStamp(evenFieldOSD));
+            DateTime dateTime = processor.ExtractDateTime(724, 1, new Tangra.OCR.IotaVtiOsdProcessor.IotaVtiTimeStamp(oddFieldOSD), new Tangra.OCR.IotaVtiOsdProcessor.IotaVtiTimeStamp(evenFieldOSD));
         }
     }
 }

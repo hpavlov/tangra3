@@ -842,14 +842,15 @@ namespace Tangra.VideoOperations.Astrometry
                                             // Dropped frame
                                             TangraContext.Current.AstrometryOCRDroppedFrames++;
                                         }
-                                        else if (impliedFrameNoInt < frameNo)
-                                            TangraContext.Current.AstrometryOCRDuplicatedFrames += frameNo - impliedFrameNoInt;
-                                        else if (impliedFrameNoInt > frameNo)
-                                            TangraContext.Current.AstrometryOCRDroppedFrames += impliedFrameNoInt - frameNo;
+                                        else if (m_LastOCRImpliedFrameNo + m_VideoController.FramePlayer.FrameStep != impliedFrameNoInt)
+                                            TangraContext.Current.AstrometryOCRTimeErrors++;
                                     }
 
-                                    if (m_LastOCRImpliedFrameNo + m_VideoController.FramePlayer.FrameStep != impliedFrameNoInt)
-                                        TangraContext.Current.AstrometryOCRTimeErrors++;
+                                    if (m_AstrometricState.Measurements.Count == 0)
+                                    {
+                                        if (m_LastOCRImpliedFrameNo != impliedFrameNoInt)
+                                            TangraContext.Current.AstrometryOCRTimeErrors++;
+                                    }
 
                                     measurement.FrameNo = impliedFrameNoInt;
                                 }

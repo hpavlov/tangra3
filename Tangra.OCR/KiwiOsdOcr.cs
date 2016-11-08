@@ -37,7 +37,7 @@ namespace Tangra.OCR
             m_VideoController = videoController;
         }
 
-        public bool ExtractTime(int frameNo, uint[] data, out DateTime time)
+        public bool ExtractTime(int frameNo, int frameStep, uint[] data, out DateTime time)
         {
             if (m_VideoController != null)
                 // Leave this to capture statistics

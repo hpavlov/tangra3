@@ -192,11 +192,7 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 		public void SetOcredString(IotaVtiTimeStampStrings ocredValue)
 		{
 			CurrentOcredString = string.Format("{0}|{1}:{2}:{3}|{4} {5}|{6}", ocredValue.NumSat, ocredValue.HH, ocredValue.MM, ocredValue.SS, ocredValue.FFFF1, ocredValue.FFFF2, ocredValue.FRAMENO);
-
-			if (ocredValue.AllCharsPresent())
-				CurrentOcredTimeStamp = new IotaVtiTimeStamp(ocredValue);
-			else
-				CurrentOcredTimeStamp = null;
+			CurrentOcredTimeStamp = new IotaVtiTimeStamp(ocredValue);
 		}
 	}
 
