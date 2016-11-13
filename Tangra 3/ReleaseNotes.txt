@@ -1,7 +1,7 @@
 ﻿Tangra3 Release Notes
 ---------------------
 
-v3.6.1 (UNRELEASED)
+v3.6.1 (2016-11-13)
 -------------------
 - Made it possible to fix interlaced video field grabbing defects by swaping and/or shifting the video fields inside video frames.
 - IOTA-VTI timestamps can now also be read (OCR-ed) when doing astrometry.
