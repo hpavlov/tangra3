@@ -20,7 +20,7 @@ namespace Tangra.Video.FITS
 
         public void ShowStatus(FrameStateData frameState)
         {
-            var dataList = frameState.AdditionalProperties.Select(kvp => new TagValuePair(kvp.Key, Convert.ToString(kvp.Value))).ToList();
+            var dataList = frameState.AdditionalProperties != null ? frameState.AdditionalProperties.Select(kvp => new TagValuePair(kvp.Key, Convert.ToString(kvp.Value))).ToList() : null;
             dataGridView.DataSource = dataList;
         }
     }

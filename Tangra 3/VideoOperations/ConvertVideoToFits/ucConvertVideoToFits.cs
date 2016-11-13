@@ -48,6 +48,8 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             nudLastFrame.Minimum = videoController.VideoFirstFrame;
             nudLastFrame.Maximum = videoController.VideoLastFrame - 1;
             nudLastFrame.Value = nudLastFrame.Maximum;
+
+            cbxEveryFrame.SelectedIndex = 0;
         }
 
         internal void NextFrame(int frameNo, ConvertVideoToFitsState state)
@@ -100,10 +102,12 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
                 StartExport(UsedTimeBase.EmbeddedTimeStamp);
         }
 
+        private static int[] INDEX_TO_VAL_MAP = new int[] { 1, 2, 4, 8, 16, 32, 64 };
+
         private void StartExport(UsedTimeBase timeBase)
         {
             var roiSelector = m_VideoController.CurrentImageTool as RoiSelector;
-            Rectangle rect = roiSelector != null ? roiSelector.SelectedROI : new Rectangle(0, 0, TangraContext.Current.FrameWidth, TangraContext.Current.FrameHeight);
+            Rectangle rect = (rbROI.Checked && roiSelector != null) ? roiSelector.SelectedROI : new Rectangle(0, 0, TangraContext.Current.FrameWidth, TangraContext.Current.FrameHeight);
 
             if (rect.Width < 1 || rect.Height < 1)
             {
@@ -129,6 +133,7 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
                     rbCube.Checked,
                     (int)nudFirstFrame.Value,
                     (int)nudLastFrame.Value,
+                    INDEX_TO_VAL_MAP[cbxEveryFrame.SelectedIndex],
                     rect,
                     timeBase);
             }            
@@ -198,7 +203,7 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
 		private bool IsDuplicatedFrame(int frameId)
 		{
 			var avoider = new DuplicateFrameAvoider((VideoController)m_VideoController, frameId);
-			return avoider.IsDuplicatedFrame();			
+			return avoider.IsDuplicatedFrame();
 		}
 
 		private void ShowDuplicatedFrameMessage()

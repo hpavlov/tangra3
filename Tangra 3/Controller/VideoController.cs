@@ -2014,6 +2014,7 @@ namespace Tangra.Controller
 		{
 			PositionAdvStatusForm();
             PositionAavStatusForm();
+            PositionSerStatusForm();
 		    PositionTargetPSFViewerForm();
             PositionFitsStatusForm();
 		}
@@ -2201,6 +2202,30 @@ namespace Tangra.Controller
 				m_AavStatusForm = null;
 			}
 
+            try
+            {
+                if (m_SerStatusForm != null)
+                {
+                    m_SerStatusForm.Close();
+                }
+            }
+            finally
+            {
+                m_SerStatusForm = null;
+            }
+
+            try
+            {
+                if (m_FitsStatusForm != null)
+                {
+                    m_FitsStatusForm.Close();
+                }
+            }
+            finally
+            {
+                m_FitsStatusForm = null;
+            }
+
 			try
 			{
 				if (m_TargetPSFViewerForm != null)
@@ -2211,7 +2236,7 @@ namespace Tangra.Controller
 			finally
 			{
 				m_TargetPSFViewerForm = null;
-			}				
+			}
 		}
 
 	    public ImagePixel ZoomedCenter = new ImagePixel(-1, -1);

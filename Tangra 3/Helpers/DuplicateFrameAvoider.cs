@@ -18,6 +18,8 @@ namespace Tangra.Helpers
 	{
 		private VideoController m_VideoController;
 		private int m_FrameId;
+	    private bool m_IsFirstFrame;
+        private bool m_IsLastFrame;
 
 		private Random m_Randomizer = new Random(5123);
 
@@ -26,6 +28,8 @@ namespace Tangra.Helpers
 			m_VideoController = videoController;
 
 			m_FrameId = frameId;
+		    m_IsFirstFrame = frameId == videoController.VideoFirstFrame;
+            m_IsLastFrame = frameId == videoController.VideoLastFrame;
 		}
 
 		public bool IsDuplicatedFrame()
@@ -37,8 +41,8 @@ namespace Tangra.Helpers
 			try
 			{
 				return
-					ArePixelmapsTheSame(prevFrame, thisFrame) ||
-					ArePixelmapsTheSame(thisFrame, nextFrame);
+					(!m_IsFirstFrame && ArePixelmapsTheSame(prevFrame, thisFrame)) ||
+					(!m_IsLastFrame && ArePixelmapsTheSame(thisFrame, nextFrame));
 			}
 			finally
 			{

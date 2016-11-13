@@ -52,9 +52,12 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             this.btn1FrMinus = new System.Windows.Forms.Button();
             this.btn1FrPlus = new System.Windows.Forms.Button();
             this.btnShowFields = new System.Windows.Forms.Button();
+            this.btnNextTime = new System.Windows.Forms.Button();
             this.lblTimesHeader = new System.Windows.Forms.Label();
             this.ucUtcTime = new Tangra.Model.Controls.ucUtcTimePicker();
-            this.btnNextTime = new System.Windows.Forms.Button();
+            this.cbxEveryFrame = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.nudFirstFrame)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudLastFrame)).BeginInit();
             this.gbxFormat.SuspendLayout();
@@ -121,7 +124,7 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             // btnCancel
             // 
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(132, 258);
+            this.btnCancel.Location = new System.Drawing.Point(132, 284);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(106, 23);
             this.btnCancel.TabIndex = 27;
@@ -130,7 +133,7 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             // 
             // pbar
             // 
-            this.pbar.Location = new System.Drawing.Point(10, 292);
+            this.pbar.Location = new System.Drawing.Point(10, 318);
             this.pbar.Name = "pbar";
             this.pbar.Size = new System.Drawing.Size(228, 15);
             this.pbar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
@@ -139,7 +142,7 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             // 
             // btnExport
             // 
-            this.btnExport.Location = new System.Drawing.Point(10, 258);
+            this.btnExport.Location = new System.Drawing.Point(10, 284);
             this.btnExport.Name = "btnExport";
             this.btnExport.Size = new System.Drawing.Size(116, 23);
             this.btnExport.TabIndex = 26;
@@ -194,13 +197,16 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             // 
             // gbxSection
             // 
+            this.gbxSection.Controls.Add(this.label2);
+            this.gbxSection.Controls.Add(this.label1);
+            this.gbxSection.Controls.Add(this.cbxEveryFrame);
             this.gbxSection.Controls.Add(this.nudFirstFrame);
             this.gbxSection.Controls.Add(this.label27);
             this.gbxSection.Controls.Add(this.nudLastFrame);
             this.gbxSection.Controls.Add(this.label26);
             this.gbxSection.Location = new System.Drawing.Point(10, 168);
             this.gbxSection.Name = "gbxSection";
-            this.gbxSection.Size = new System.Drawing.Size(228, 78);
+            this.gbxSection.Size = new System.Drawing.Size(228, 105);
             this.gbxSection.TabIndex = 31;
             this.gbxSection.TabStop = false;
             this.gbxSection.Text = "Export Section";
@@ -217,7 +223,7 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             this.pnlEnterTimes.Controls.Add(this.btnNextTime);
             this.pnlEnterTimes.Controls.Add(this.lblTimesHeader);
             this.pnlEnterTimes.Controls.Add(this.ucUtcTime);
-            this.pnlEnterTimes.Location = new System.Drawing.Point(3, 250);
+            this.pnlEnterTimes.Location = new System.Drawing.Point(3, 278);
             this.pnlEnterTimes.Name = "pnlEnterTimes";
             this.pnlEnterTimes.Size = new System.Drawing.Size(246, 121);
             this.pnlEnterTimes.TabIndex = 33;
@@ -251,6 +257,15 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             this.btnShowFields.Text = "Show Fields";
             this.btnShowFields.Click += new System.EventHandler(this.btnShowFields_Click);
             // 
+            // btnNextTime
+            // 
+            this.btnNextTime.Location = new System.Drawing.Point(113, 59);
+            this.btnNextTime.Name = "btnNextTime";
+            this.btnNextTime.Size = new System.Drawing.Size(122, 23);
+            this.btnNextTime.TabIndex = 41;
+            this.btnNextTime.Text = "Next >>";
+            this.btnNextTime.Click += new System.EventHandler(this.btnNextTime_Click);
+            // 
             // lblTimesHeader
             // 
             this.lblTimesHeader.AutoSize = true;
@@ -270,14 +285,40 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             this.ucUtcTime.Size = new System.Drawing.Size(239, 26);
             this.ucUtcTime.TabIndex = 30;
             // 
-            // btnNextTime
+            // cbxEveryFrame
             // 
-            this.btnNextTime.Location = new System.Drawing.Point(113, 59);
-            this.btnNextTime.Name = "btnNextTime";
-            this.btnNextTime.Size = new System.Drawing.Size(122, 23);
-            this.btnNextTime.TabIndex = 41;
-            this.btnNextTime.Text = "Next >>";
-            this.btnNextTime.Click += new System.EventHandler(this.btnNextTime_Click);
+            this.cbxEveryFrame.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxEveryFrame.FormattingEnabled = true;
+            this.cbxEveryFrame.Items.AddRange(new object[] {
+            "every",
+            "every   2-nd",
+            "every   4-th",
+            "every   8-th",
+            "every 16-th",
+            "every 32-th",
+            "every 64-th"});
+            this.cbxEveryFrame.Location = new System.Drawing.Point(89, 74);
+            this.cbxEveryFrame.Name = "cbxEveryFrame";
+            this.cbxEveryFrame.Size = new System.Drawing.Size(80, 21);
+            this.cbxEveryFrame.TabIndex = 37;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(16, 77);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(37, 13);
+            this.label1.TabIndex = 38;
+            this.label1.Text = "Export";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(175, 77);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(33, 13);
+            this.label2.TabIndex = 39;
+            this.label2.Text = "frame";
             // 
             // ucConvertVideoToFits
             // 
@@ -291,7 +332,7 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             this.Controls.Add(this.pbar);
             this.Controls.Add(this.btnExport);
             this.Name = "ucConvertVideoToFits";
-            this.Size = new System.Drawing.Size(258, 407);
+            this.Size = new System.Drawing.Size(258, 449);
             ((System.ComponentModel.ISupportInitialize)(this.nudFirstFrame)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudLastFrame)).EndInit();
             this.gbxFormat.ResumeLayout(false);
@@ -331,5 +372,8 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
         private System.Windows.Forms.Button btnNextTime;
         private System.Windows.Forms.Label lblTimesHeader;
         private Model.Controls.ucUtcTimePicker ucUtcTime;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ComboBox cbxEveryFrame;
     }
 }

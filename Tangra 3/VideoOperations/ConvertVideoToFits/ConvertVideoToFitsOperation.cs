@@ -138,14 +138,14 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             }
         }
 
-        internal void StartExport(string fileName, bool fitsCube, int firstFrame, int lastFrame, Rectangle roi, UsedTimeBase timeBase)
+        internal void StartExport(string fileName, bool fitsCube, int firstFrame, int lastFrame, int step, Rectangle roi, UsedTimeBase timeBase)
         {
             m_Status = ConvertVideoToFitsState.Converting;
             m_FirstFrame = firstFrame;
             m_LastFrame = lastFrame;
             m_ConvertVideoToFitsController.StartExport(fileName, fitsCube, roi, timeBase, m_VideoController.HasTimestampOCR());
-            
-            m_VideoController.PlayVideo(m_FirstFrame);
+
+            m_VideoController.PlayVideo(m_FirstFrame, (uint)step);
         }
 
         private DateTime m_StartFrameTime;
