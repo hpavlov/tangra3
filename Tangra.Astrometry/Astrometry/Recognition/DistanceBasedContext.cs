@@ -3024,7 +3024,9 @@ namespace Tangra.Astrometry.Recognition
 
 							return distance < 3;
 						})
-						.SingleOrDefault();
+						.FirstOrDefault();
+
+				    if (feature == null) continue;
 
 					g.DrawString(
 						string.Format("{0}({1})", 
@@ -3052,7 +3054,10 @@ namespace Tangra.Astrometry.Recognition
 			    g.Save();
 			}
             
-			image.Save(Path.GetFullPath(EnsureDebugSessionDirectory() + string.Format(@"\AlignmentTest_{3}{0}-{1}-{2}.bmp", i, j, k, success ? "" : "Failed_")));			
+            string outFileName = Path.GetFullPath(EnsureDebugSessionDirectory() + string.Format(@"\AlignmentTest_{3}{0}-{1}-{2}.bmp", i, j, k, success ? "" : "Failed_"));
+            if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+                Trace.WriteLine(string.Format("Saving report file: {0}", outFileName));
+			image.Save(outFileName);			
 		}
 
 	    private string FormatPrintStarNo(ulong starNo)

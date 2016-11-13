@@ -747,7 +747,7 @@ namespace Tangra.VideoOperations.Astrometry
                             retVal = m_FlyByMotionFitter.FitAndPlotFastFlyby(
                                 m_AllMeasurements, meaContext, fittingContext, FittingValue.DEC, (frameId) => m_VideoController.GetFrameStateData(frameId),
                                 g, plottingContext, xScale, yScale, m_DEImage.Width, m_RAImage.Height, out motionRate);
-
+                            m_MotionRate = motionRate;
 							break;
 						default:
 							throw new IndexOutOfRangeException();
