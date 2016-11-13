@@ -2438,15 +2438,18 @@ namespace Tangra.Controller
 
         private T[][] SaveImageData<T>(Pixelmap pixelmap, SetFITSDataDelegate<T> setValue)
         {
-            T[][] bimg = new T[pixelmap.Height][];
+            int height = pixelmap.Height;
+            int width = pixelmap.Width;
 
-            for (int y = 0; y < pixelmap.Height; y++)
+            T[][] bimg = new T[height][];
+
+            for (int y = 0; y < height; y++)
             {
-                bimg[y] = new T[pixelmap.Width];
+                bimg[y] = new T[width];
 
-                for (int x = 0; x < pixelmap.Width; x++)
+                for (int x = 0; x < width; x++)
                 {
-                    bimg[y][x] = setValue(pixelmap[x, y]);
+                    bimg[y][x] = setValue(pixelmap[x, height - y - 1]);
                 }
             }
 
