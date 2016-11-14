@@ -668,11 +668,12 @@ namespace Tangra.VideoOperations.LightCurves
 
                 output.Append(string.Format("BinNo,Time ({0})", options.FormatTimeLabel()));
 
-				for (int j = 0; j < objCount; j++)
-                    output.Append(options.FormatPhotometricValueHeaderForObject(j + 1, false, true));
+			    for (int j = 0; j < objCount; j++)
+			    {
+			        output.Append(options.FormatPhotometricValueHeaderForObject(j + 1, false, true));
+			    }
 
-
-                bool isBadTime = false;
+			    bool isBadTime = false;
 			    double timePrecisionSec = 0;
 
                 double resolutionInSecs = m_LightCurveController.Context.Binning / (2.0 * m_Header.FramesPerSecond);
@@ -814,6 +815,11 @@ namespace Tangra.VideoOperations.LightCurves
                     output.Append(options.FormatPhotometricValueHeaderForObject(j + 1, options.ForceSignalMinusBackground, false));
 				}
 
+                for (int j = 0; j < objCount; j++)
+                {
+                    if (options.ExportObjectPosition) output.AppendFormat(",X ({0}) ,Y ({0})", j + 1);
+                }
+
 			    bool isBadTime = false;
                 double timePrecisionSec = 0;
 
@@ -882,6 +888,12 @@ namespace Tangra.VideoOperations.LightCurves
 						LCMeasurement reading = m_LightCurveController.Context.AllReadings[j][i];
 						output.Append(options.FormatPhotometricValue(reading.IsSuccessfulReading, (int)reading.TotalReading, (int)reading.TotalBackground, options.ForceSignalMinusBackground, false));
 					}
+
+                    for (int j = 0; j < objCount; j++)
+                    {
+                        LCMeasurement reading = m_LightCurveController.Context.AllReadings[j][i];
+                        if (options.ExportObjectPosition) output.AppendFormat(",{0},{1}", reading.X0.ToString("0.0"), reading.Y0.ToString("0.0"));
+                    }
 
                     if (options.PhotometricFormat == PhotometricFormat.Magnitudes && atmExtCalc != null &&
                         currFrameTime != DateTime.MinValue && currFrameTime != DateTime.MaxValue)

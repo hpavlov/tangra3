@@ -52,6 +52,7 @@ namespace Tangra.VideoOperations.LightCurves
         public double M0 { get; set; }
 
         public bool ExportAtmosphericExtinction { get; set; }
+        public bool ExportObjectPosition { get; set; }
 
         public double RAHours { get; set; }
         public double DEDeg { get; set; }

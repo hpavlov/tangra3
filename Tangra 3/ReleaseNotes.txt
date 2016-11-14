@@ -1,6 +1,10 @@
 ﻿Tangra3 Release Notes
 ---------------------
 
+v3.6.2 (UNRELEASED)
+-------------------
+- The X and Y coordinates of the measured objects can be optionally exported to CSV from a light curve.
+
 v3.6.1 (2016-11-13)
 -------------------
 - Made it possible to fix interlaced video field grabbing defects by swaping and/or shifting the video fields inside video frames.

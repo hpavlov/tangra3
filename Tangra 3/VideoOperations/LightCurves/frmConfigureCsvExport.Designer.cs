@@ -30,6 +30,7 @@
         {
             this.tabSettings = new System.Windows.Forms.TabControl();
             this.tabTime = new System.Windows.Forms.TabPage();
+            this.cbExcelFriendly = new System.Windows.Forms.CheckBox();
             this.label2 = new System.Windows.Forms.Label();
             this.rbJulianDays = new System.Windows.Forms.RadioButton();
             this.rbDecimalDays = new System.Windows.Forms.RadioButton();
@@ -72,7 +73,8 @@
             this.rbSeriesSAndB = new System.Windows.Forms.RadioButton();
             this.btnOK = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
-            this.cbExcelFriendly = new System.Windows.Forms.CheckBox();
+            this.tabMore = new System.Windows.Forms.TabPage();
+            this.cbxExportPositions = new System.Windows.Forms.CheckBox();
             this.tabSettings.SuspendLayout();
             this.tabTime.SuspendLayout();
             this.tabValues.SuspendLayout();
@@ -89,6 +91,7 @@
             this.pnlFlux.SuspendLayout();
             this.tabSeries.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudExportStartFromFrame)).BeginInit();
+            this.tabMore.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabSettings
@@ -96,6 +99,7 @@
             this.tabSettings.Controls.Add(this.tabTime);
             this.tabSettings.Controls.Add(this.tabValues);
             this.tabSettings.Controls.Add(this.tabSeries);
+            this.tabSettings.Controls.Add(this.tabMore);
             this.tabSettings.Location = new System.Drawing.Point(12, 12);
             this.tabSettings.Name = "tabSettings";
             this.tabSettings.SelectedIndex = 0;
@@ -116,6 +120,19 @@
             this.tabTime.TabIndex = 0;
             this.tabTime.Text = "Timestamps";
             this.tabTime.UseVisualStyleBackColor = true;
+            // 
+            // cbExcelFriendly
+            // 
+            this.cbExcelFriendly.AutoSize = true;
+            this.cbExcelFriendly.Checked = true;
+            this.cbExcelFriendly.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cbExcelFriendly.Location = new System.Drawing.Point(40, 53);
+            this.cbExcelFriendly.Name = "cbExcelFriendly";
+            this.cbExcelFriendly.Size = new System.Drawing.Size(91, 17);
+            this.cbExcelFriendly.TabIndex = 5;
+            this.cbExcelFriendly.Text = "Excel Friendly";
+            this.cbExcelFriendly.UseVisualStyleBackColor = true;
+            this.cbExcelFriendly.CheckedChanged += new System.EventHandler(this.cbExcelFriendly_CheckedChanged);
             // 
             // label2
             // 
@@ -581,18 +598,25 @@
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             // 
-            // cbExcelFriendly
+            // tabMore
             // 
-            this.cbExcelFriendly.AutoSize = true;
-            this.cbExcelFriendly.Checked = true;
-            this.cbExcelFriendly.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbExcelFriendly.Location = new System.Drawing.Point(40, 53);
-            this.cbExcelFriendly.Name = "cbExcelFriendly";
-            this.cbExcelFriendly.Size = new System.Drawing.Size(91, 17);
-            this.cbExcelFriendly.TabIndex = 5;
-            this.cbExcelFriendly.Text = "Excel Friendly";
-            this.cbExcelFriendly.UseVisualStyleBackColor = true;
-            this.cbExcelFriendly.CheckedChanged += new System.EventHandler(this.cbExcelFriendly_CheckedChanged);
+            this.tabMore.Controls.Add(this.cbxExportPositions);
+            this.tabMore.Location = new System.Drawing.Point(4, 22);
+            this.tabMore.Name = "tabMore";
+            this.tabMore.Size = new System.Drawing.Size(321, 180);
+            this.tabMore.TabIndex = 3;
+            this.tabMore.Text = "Others";
+            this.tabMore.UseVisualStyleBackColor = true;
+            // 
+            // cbxExportPositions
+            // 
+            this.cbxExportPositions.AutoSize = true;
+            this.cbxExportPositions.Location = new System.Drawing.Point(21, 18);
+            this.cbxExportPositions.Name = "cbxExportPositions";
+            this.cbxExportPositions.Size = new System.Drawing.Size(260, 17);
+            this.cbxExportPositions.TabIndex = 3;
+            this.cbxExportPositions.Text = "Export Object (X, Y) Positions in Non-Binned Data";
+            this.cbxExportPositions.UseVisualStyleBackColor = true;
             // 
             // frmConfigureCsvExport
             // 
@@ -629,6 +653,8 @@
             this.tabSeries.ResumeLayout(false);
             this.tabSeries.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudExportStartFromFrame)).EndInit();
+            this.tabMore.ResumeLayout(false);
+            this.tabMore.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -680,5 +706,7 @@
 		private System.Windows.Forms.NumericUpDown nudExportStartFromFrame;
 		private System.Windows.Forms.Label label9;
         private System.Windows.Forms.CheckBox cbExcelFriendly;
+        private System.Windows.Forms.TabPage tabMore;
+        private System.Windows.Forms.CheckBox cbxExportPositions;
     }
 }

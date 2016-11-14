@@ -143,7 +143,7 @@ namespace Tangra.Video.FITS
 
                         m_FitsTimestamps[i] = timestamp;
 
-                        if (fitsExposure.HasValue)
+                        if (timestamp != null && fitsExposure.HasValue)
                             m_FilesWithExposure++;
                         else
                             m_FilesWithoutExposure++;
