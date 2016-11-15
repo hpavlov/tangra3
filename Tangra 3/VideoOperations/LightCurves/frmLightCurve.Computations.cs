@@ -17,6 +17,7 @@ using Tangra.Addins;
 using Tangra.Config;
 using Tangra.Controller;
 using Tangra.Helpers;
+using Tangra.Model.Astro;
 using Tangra.Model.Config;
 using Tangra.Model.Helpers;
 using Tangra.Model.Image;
@@ -818,6 +819,7 @@ namespace Tangra.VideoOperations.LightCurves
                 for (int j = 0; j < objCount; j++)
                 {
                     if (options.ExportObjectPosition) output.AppendFormat(",X ({0}) ,Y ({0})", j + 1);
+                    if (options.ExportPsfParameters) output.AppendFormat(",PSF-I0 ({0}) ,PSF-FWHM ({0})", j + 1);
                 }
 
 			    bool isBadTime = false;
@@ -893,6 +895,27 @@ namespace Tangra.VideoOperations.LightCurves
                     {
                         LCMeasurement reading = m_LightCurveController.Context.AllReadings[j][i];
                         if (options.ExportObjectPosition) output.AppendFormat(",{0},{1}", reading.X0.ToString("0.0"), reading.Y0.ToString("0.0"));
+                        if (options.ExportPsfParameters)
+                        {
+                            if (reading.PsfFit == null)
+                            {
+                                int x0Int = (int)Math.Round(reading.X0);
+                                int y0Int = (int)Math.Round(reading.Y0);
+
+                                reading.PsfFit = new PSFFit(x0Int, y0Int);
+                                reading.PsfFit.FittingMethod = PSFFittingMethod.NonLinearFit;
+                                int pixelDataWidth = reading.PixelData.GetLength(0);
+                                int pixelDataHeight = reading.PixelData.GetLength(1);
+                                reading.PsfFit.Fit(
+                                    reading.PixelData,
+                                    m_LightCurveController.Context.ReProcessFitAreas[reading.TargetNo],
+                                    x0Int - reading.PixelDataX0 + (pixelDataWidth / 2) + 1,
+                                    y0Int - reading.PixelDataY0 + (pixelDataHeight / 2) + 1,
+                                    false);
+                            }
+
+                            output.AppendFormat(",{0},{1}", reading.PsfFit.I0.ToString("0.0"), reading.PsfFit.FWHM.ToString("0.000"));
+                        }
                     }
 
                     if (options.PhotometricFormat == PhotometricFormat.Magnitudes && atmExtCalc != null &&

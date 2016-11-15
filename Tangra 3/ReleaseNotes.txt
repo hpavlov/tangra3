@@ -3,7 +3,7 @@
 
 v3.6.2 (UNRELEASED)
 -------------------
-- The X and Y coordinates of the measured objects can be optionally exported to CSV from a light curve.
+- Made is possible to export additioanl parameters to CSV from a light curve, inclulding the X and Y coordinates, FWHM and PSF height of the measured objects. 
 
 v3.6.1 (2016-11-13)
 -------------------

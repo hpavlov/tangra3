@@ -53,6 +53,7 @@ namespace Tangra.VideoOperations.LightCurves
 
         public bool ExportAtmosphericExtinction { get; set; }
         public bool ExportObjectPosition { get; set; }
+        public bool ExportPsfParameters { get; set; }
 
         public double RAHours { get; set; }
         public double DEDeg { get; set; }

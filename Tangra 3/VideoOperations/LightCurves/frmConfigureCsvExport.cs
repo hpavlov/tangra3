@@ -136,11 +136,16 @@ namespace Tangra.VideoOperations.LightCurves
             {
                 cbxExportPositions.Checked = false;
                 cbxExportPositions.Enabled = false;
+                cbxExportFSPParameters.Checked = false;
+                cbxExportFSPParameters.Enabled = false;
             }
             else
+            {
                 cbxExportPositions.Enabled = true;
+                cbxExportFSPParameters.Enabled = true;
+            }
 
-			nudExportStartFromFrame.Minimum = LCFile.Header.MinFrame;
+            nudExportStartFromFrame.Minimum = LCFile.Header.MinFrame;
 			nudExportStartFromFrame.Maximum = LCFile.Header.MaxFrame - 1;
 			nudExportStartFromFrame.SetNUDValue((decimal)LCFile.Header.MinFrame);
         }
@@ -196,6 +201,7 @@ namespace Tangra.VideoOperations.LightCurves
 
             rv.ExportAtmosphericExtinction = cbxAtmExtExport.Checked;
             rv.ExportObjectPosition = cbxExportPositions.Checked;
+            rv.ExportPsfParameters = cbxExportFSPParameters.Checked;
             if (cbxAtmExtExport.Checked)
             {
                 rv.RAHours = m_RAHours;

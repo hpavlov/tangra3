@@ -75,6 +75,7 @@
             this.btnCancel = new System.Windows.Forms.Button();
             this.tabMore = new System.Windows.Forms.TabPage();
             this.cbxExportPositions = new System.Windows.Forms.CheckBox();
+            this.cbxExportFSPParameters = new System.Windows.Forms.CheckBox();
             this.tabSettings.SuspendLayout();
             this.tabTime.SuspendLayout();
             this.tabValues.SuspendLayout();
@@ -600,6 +601,7 @@
             // 
             // tabMore
             // 
+            this.tabMore.Controls.Add(this.cbxExportFSPParameters);
             this.tabMore.Controls.Add(this.cbxExportPositions);
             this.tabMore.Location = new System.Drawing.Point(4, 22);
             this.tabMore.Name = "tabMore";
@@ -617,6 +619,16 @@
             this.cbxExportPositions.TabIndex = 3;
             this.cbxExportPositions.Text = "Export Object (X, Y) Positions in Non-Binned Data";
             this.cbxExportPositions.UseVisualStyleBackColor = true;
+            // 
+            // cbxExportFSPParameters
+            // 
+            this.cbxExportFSPParameters.AutoSize = true;
+            this.cbxExportFSPParameters.Location = new System.Drawing.Point(21, 41);
+            this.cbxExportFSPParameters.Name = "cbxExportFSPParameters";
+            this.cbxExportFSPParameters.Size = new System.Drawing.Size(231, 17);
+            this.cbxExportFSPParameters.TabIndex = 4;
+            this.cbxExportFSPParameters.Text = "Export PSF Parameters in Non-Binned Data";
+            this.cbxExportFSPParameters.UseVisualStyleBackColor = true;
             // 
             // frmConfigureCsvExport
             // 
@@ -708,5 +720,6 @@
         private System.Windows.Forms.CheckBox cbExcelFriendly;
         private System.Windows.Forms.TabPage tabMore;
         private System.Windows.Forms.CheckBox cbxExportPositions;
+        private System.Windows.Forms.CheckBox cbxExportFSPParameters;
     }
 }
