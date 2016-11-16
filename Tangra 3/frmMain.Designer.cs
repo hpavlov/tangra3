@@ -29,6 +29,8 @@
             this.miOpenSpectra = new System.Windows.Forms.ToolStripMenuItem();
             this.miRecentSpectras = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.miExportVideoToFITS = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.miFileInfo = new System.Windows.Forms.ToolStripMenuItem();
             this.miExit = new System.Windows.Forms.ToolStripMenuItem();
             this.miFrameActions = new System.Windows.Forms.ToolStripMenuItem();
@@ -115,8 +117,7 @@
             this.saveFrameDialog = new System.Windows.Forms.SaveFileDialog();
             this.timerCommandArgs = new System.Windows.Forms.Timer(this.components);
             this.pictureBox = new Tangra.Controls.ImagePanel();
-            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
-            this.miExportVideoToFITS = new System.Windows.Forms.ToolStripMenuItem();
+            this.miIntegrationDetection = new System.Windows.Forms.ToolStripMenuItem();
             this.mainMenu.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.panelRight.SuspendLayout();
@@ -224,6 +225,18 @@
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
             this.toolStripSeparator4.Size = new System.Drawing.Size(211, 6);
+            // 
+            // miExportVideoToFITS
+            // 
+            this.miExportVideoToFITS.Name = "miExportVideoToFITS";
+            this.miExportVideoToFITS.Size = new System.Drawing.Size(214, 22);
+            this.miExportVideoToFITS.Text = "&Export Video to FITS";
+            this.miExportVideoToFITS.Click += new System.EventHandler(this.miExportVideoToFITS_Click);
+            // 
+            // toolStripSeparator5
+            // 
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(211, 6);
             // 
             // miFileInfo
             // 
@@ -384,6 +397,7 @@
             this.miTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.miTargetPSFViewer,
             this.miFrameStatusData,
+            this.miIntegrationDetection,
             this.toolStripMenuItem2,
             this.miSpectroscopyTools,
             this.aDVToolsToolStripMenuItem,
@@ -397,28 +411,28 @@
             // miTargetPSFViewer
             // 
             this.miTargetPSFViewer.Name = "miTargetPSFViewer";
-            this.miTargetPSFViewer.Size = new System.Drawing.Size(176, 22);
+            this.miTargetPSFViewer.Size = new System.Drawing.Size(219, 22);
             this.miTargetPSFViewer.Text = "&Target PSF Viewer";
             this.miTargetPSFViewer.Click += new System.EventHandler(this.miTargetPSFViewer_Click);
             // 
             // miFrameStatusData
             // 
             this.miFrameStatusData.Name = "miFrameStatusData";
-            this.miFrameStatusData.Size = new System.Drawing.Size(176, 22);
+            this.miFrameStatusData.Size = new System.Drawing.Size(219, 22);
             this.miFrameStatusData.Text = "Frame &Data Viewer";
             this.miFrameStatusData.Click += new System.EventHandler(this.miADVStatusData_Click);
             // 
             // toolStripMenuItem2
             // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(173, 6);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(216, 6);
             // 
             // miSpectroscopyTools
             // 
             this.miSpectroscopyTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.miAbsoluteFlux});
             this.miSpectroscopyTools.Name = "miSpectroscopyTools";
-            this.miSpectroscopyTools.Size = new System.Drawing.Size(176, 22);
+            this.miSpectroscopyTools.Size = new System.Drawing.Size(219, 22);
             this.miSpectroscopyTools.Text = "&Spectroscopy Tools";
             // 
             // miAbsoluteFlux
@@ -434,7 +448,7 @@
             this.miFSTSFileViewer,
             this.miRepairAdvFile});
             this.aDVToolsToolStripMenuItem.Name = "aDVToolsToolStripMenuItem";
-            this.aDVToolsToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
+            this.aDVToolsToolStripMenuItem.Size = new System.Drawing.Size(219, 22);
             this.aDVToolsToolStripMenuItem.Text = "&ADV/AAV Tools";
             // 
             // miFSTSFileViewer
@@ -454,7 +468,7 @@
             // toolStripMenuItem5
             // 
             this.toolStripMenuItem5.Name = "toolStripMenuItem5";
-            this.toolStripMenuItem5.Size = new System.Drawing.Size(173, 6);
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(216, 6);
             // 
             // miVideoModelling
             // 
@@ -462,7 +476,7 @@
             this.miOccultationVideoModeling,
             this.miStarFieldVideoModelling});
             this.miVideoModelling.Name = "miVideoModelling";
-            this.miVideoModelling.Size = new System.Drawing.Size(176, 22);
+            this.miVideoModelling.Size = new System.Drawing.Size(219, 22);
             this.miVideoModelling.Text = "Video &Modelling";
             // 
             // miOccultationVideoModeling
@@ -985,17 +999,12 @@
             this.pictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseMove);
             this.pictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseUp);
             // 
-            // toolStripSeparator5
+            // miIntegrationDetection
             // 
-            this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(211, 6);
-            // 
-            // miExportVideoToFITS
-            // 
-            this.miExportVideoToFITS.Name = "miExportVideoToFITS";
-            this.miExportVideoToFITS.Size = new System.Drawing.Size(214, 22);
-            this.miExportVideoToFITS.Text = "&Export Video to FITS";
-            this.miExportVideoToFITS.Click += new System.EventHandler(this.miExportVideoToFITS_Click);
+            this.miIntegrationDetection.Name = "miIntegrationDetection";
+            this.miIntegrationDetection.Size = new System.Drawing.Size(219, 22);
+            this.miIntegrationDetection.Text = "Video Integration Detection";
+            this.miIntegrationDetection.Click += new System.EventHandler(this.miIntegrationDetection_Click);
             // 
             // frmMain
             // 
@@ -1136,6 +1145,7 @@
         private System.Windows.Forms.ToolStripMenuItem miReleaseNotes;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
         protected internal System.Windows.Forms.ToolStripMenuItem miExportVideoToFITS;
+        protected internal System.Windows.Forms.ToolStripMenuItem miIntegrationDetection;
 	}
 }
 

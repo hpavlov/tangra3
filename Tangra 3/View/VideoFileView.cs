@@ -109,6 +109,7 @@ namespace Tangra.View
 			m_MainForm.miFrameStatusData.Enabled = TangraContext.Current.HasVideoLoaded && (TangraContext.Current.UsingADV || TangraContext.Current.IsSerFile);
 			m_MainForm.tsbtnIntensify.Visible = TangraContext.Current.HasVideoLoaded;
 			m_MainForm.miTargetPSFViewer.Enabled = TangraContext.Current.HasVideoLoaded;
+            m_MainForm.miIntegrationDetection.Enabled = TangraContext.Current.HasVideoLoaded && !TangraContext.Current.UsingADV && !TangraContext.Current.IsSerFile;
 
 		    m_MainForm.miFSTSFileViewer.Enabled = true;
 			m_MainForm.miFileInfo.Enabled = TangraContext.Current.HasAnyFileLoaded;

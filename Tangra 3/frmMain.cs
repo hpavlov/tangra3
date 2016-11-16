@@ -1372,5 +1372,12 @@ namespace Tangra
             m_VideoController.SetPictureBoxCursor(Cursors.Arrow);
             m_VideoController.RefreshCurrentFrame();
         }
+
+        private void miIntegrationDetection_Click(object sender, EventArgs e)
+        {
+            frmIntegrationDetection frm = new frmIntegrationDetection(m_VideoController, m_VideoController.CurrentFrameIndex);
+            frm.StartPosition = FormStartPosition.CenterParent;
+            frm.ShowDialog(this);
+        }
 	}
 }
