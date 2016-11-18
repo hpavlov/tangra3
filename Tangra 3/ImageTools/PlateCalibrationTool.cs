@@ -584,7 +584,10 @@ namespace Tangra.ImageTools
 			m_State = FittingsState.Fitting;
 			m_VideoController.SetPictureBoxCursor(Cursors.Arrow);
 
-			m_PlateCalibrator.PreliminaryFit = new DirectTransRotAstrometry(m_Image, m_RADegCenter, m_DEDegCenter, m_Eta, m_Aspect);
+            if (m_SolvedPlate != null && m_SolvedPlate is ThreeStarAstrometry)
+                m_PlateCalibrator.PreliminaryFit = m_SolvedPlate;
+            else
+                m_PlateCalibrator.PreliminaryFit = new DirectTransRotAstrometry(m_Image, m_RADegCenter, m_DEDegCenter, m_Eta, m_Aspect);
 
 			SolvePlateConstants(debug);
 		}

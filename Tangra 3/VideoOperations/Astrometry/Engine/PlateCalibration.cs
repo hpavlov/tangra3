@@ -111,9 +111,14 @@ namespace Tangra.VideoOperations.Astrometry
 				if (m_Context.FitExcludeArea.Contains((int)x, (int)y))
 					continue;
 
+                if (x < 0 || x > m_Context.PlateConfig.ImageWidth || y < 0 || y > m_Context.PlateConfig.ImageHeight)
+                    continue;
+
 				if (limitMag < star.Mag) continue;
 
 				StarMapFeature feature = m_Context.StarMap.GetFeatureInRadius((int)x, (int)y, searchDistance);
+
+                Trace.WriteLine(string.Format("Searching for {0} ({1:0.0} mag) at ({2:0.0},{3:0.0}).{4}Found!", star.GetStarDesignation(0), star.Mag, x, y, feature != null ? "" : "NOT "));
 
 				if (fineFit)
 				{

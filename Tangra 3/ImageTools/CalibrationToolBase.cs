@@ -600,19 +600,15 @@ namespace Tangra.ImageTools
                         }
                         else
                         {
-                            DirectTransRotAstrometry threeStarSolution = DirectTransRotAstrometry.SolveByThreeStars(m_Image, m_UserStarIdentification, m_Tolerance);
+                            ThreeStarAstrometry threeStarSolution = ThreeStarAstrometry.SolveByThreeStars(m_Image, m_UserStarIdentification, m_Tolerance);
                             if (threeStarSolution != null)
                             {
                                 m_SolvedPlate = threeStarSolution;
 
                                 m_PlatesolveController.UpdateFocalLength((int)Math.Round(threeStarSolution.Image.EffectiveFocalLength));
-                                m_PlatesolveController.UpdateAspect(threeStarSolution.Aspect);
-                                m_PlatesolveController.UpdateRotation((int)Math.Round(threeStarSolution.EtaDeg));
                                 m_RADegCenter = threeStarSolution.RA0Deg;
                                 m_DEDegCenter = threeStarSolution.DE0Deg;
                                 m_Image.EffectiveFocalLength = threeStarSolution.Image.EffectiveFocalLength;
-                                m_Eta = threeStarSolution.EtaDeg;
-                                m_Aspect = threeStarSolution.Aspect;
 
                                 m_UserStarIdentification.Clear();
 

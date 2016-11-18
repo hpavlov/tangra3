@@ -64,7 +64,9 @@ namespace Tangra.Astrometry
 			get { return m_Aspect; }
 		}
 
-		public AstroPlate Image
+	    public double Residual { get; set; }
+
+	    public AstroPlate Image
 		{
 			get { return m_Image; }
 		}
@@ -234,7 +236,7 @@ namespace Tangra.Astrometry
                 solution1.GetImageCoordsFromRADE(ra1, de1, out xx1, out yy1);
                 solution1.GetImageCoordsFromRADE(ra2, de2, out xx2, out yy2);
                 solution1.GetImageCoordsFromRADE(ra3, de3, out xx3, out yy3);
-                double residual1 = Math.Sqrt(
+                solution1.Residual = Math.Sqrt(
                     (x1 - xx1) * (x1 - xx1) + (y1 - yy1) * (y1 - yy1) +
                     (x2 - xx2) * (x2 - xx2) + (y2 - yy2) * (y2 - yy2) +
                     (x3 - xx3) * (x3 - xx3) + (y3 - yy3) * (y3 - yy3));
@@ -242,7 +244,7 @@ namespace Tangra.Astrometry
                 solution2.GetImageCoordsFromRADE(ra1, de1, out xx1, out yy1);
                 solution2.GetImageCoordsFromRADE(ra2, de2, out xx2, out yy2);
                 solution2.GetImageCoordsFromRADE(ra3, de3, out xx3, out yy3);
-                double residual2 = Math.Sqrt(
+                solution2.Residual = Math.Sqrt(
                     (x1 - xx1) * (x1 - xx1) + (y1 - yy1) * (y1 - yy1) +
                     (x2 - xx2) * (x2 - xx2) + (y2 - yy2) * (y2 - yy2) +
                     (x3 - xx3) * (x3 - xx3) + (y3 - yy3) * (y3 - yy3));
@@ -252,16 +254,16 @@ namespace Tangra.Astrometry
                 else if (tolerance == 3) maxResidual *= 2;
                 else if (tolerance == 4) maxResidual *= 3;
 
-                if (residual1 < residual2)
+                if (solution1.Residual < solution2.Residual)
                 {
-                    if (residual1 < maxResidual && aspect1 > 0)
+                    if (solution1.Residual < maxResidual && aspect1 > 0)
                         return solution1;
                 }
                 else
                 {
-                    if (residual2 < maxResidual && aspect2 > 0)
-                        return solution2;			
-                }		        
+                    if (solution2.Residual < maxResidual && aspect2 > 0)
+                        return solution2;
+                }
 		    }
 
 			return null;

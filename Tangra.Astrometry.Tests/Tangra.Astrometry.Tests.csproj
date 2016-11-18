@@ -61,6 +61,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Calibration\TestStar.cs" />
+    <Compile Include="Calibration\TestThreeStarFit.cs" />
     <Compile Include="MotionFitting\TestFlyByMotionFitter.cs" />
     <Compile Include="PlateSolve\PlateSolveTester.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
