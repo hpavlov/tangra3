@@ -262,10 +262,10 @@ namespace Tangra.VideoOperations
 			get { return m_CurrFrame; }
 		}
 
-	    public void ExpectHotPixelClick(bool expect)
+        public void ExpectHotPixelClick(bool expect, bool enabled)
 	    {
             frmFullSizePreview.SetCursor(expect ? Cursors.Hand : Cursors.Default);
-	        m_HotPixelConfiguration = expect;
+            m_HotPixelConfiguration = enabled;
 	        Update();
 	    }
 	}

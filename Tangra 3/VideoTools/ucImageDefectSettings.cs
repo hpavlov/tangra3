@@ -147,7 +147,7 @@ namespace Tangra.VideoTools
             {
                 HotPixelCorrector.Initialize();
 
-                FrameAdjustmentsPreview.Instance.ExpectHotPixelClick(true);
+                FrameAdjustmentsPreview.Instance.ExpectHotPixelClick(true, true);
 
                 MessageBox.Show(ParentForm, 
                     "Please select an existing hot pixel by clicking on it.",
@@ -159,7 +159,7 @@ namespace Tangra.VideoTools
             else
             {
                 m_ExpectHotPixelDefinition = false;
-                FrameAdjustmentsPreview.Instance.ExpectHotPixelClick(false);
+                FrameAdjustmentsPreview.Instance.ExpectHotPixelClick(false, false);
 
                 HotPixelCorrector.Cleanup();
             }
@@ -181,7 +181,7 @@ namespace Tangra.VideoTools
                     HotPixelCorrector.RegisterHotPixelSample(sample, frmFullSizePreview.CurrFrame.Pixelmap.MaxSignalValue);
 
                     m_ExpectHotPixelDefinition = false;
-                    FrameAdjustmentsPreview.Instance.ExpectHotPixelClick(false);
+                    FrameAdjustmentsPreview.Instance.ExpectHotPixelClick(false, true);
                     pnlHotPixelControls.Enabled = true;
 
                     HotPixelCorrector.LocateHotPixels(frmFullSizePreview.CurrFrame, Math.Max(0, tbDepth.Value));
