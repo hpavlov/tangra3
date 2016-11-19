@@ -124,7 +124,7 @@ namespace Tangra.Astrometry.Recognition
 
 			m_IsCalibration = matchType == PyramidMatchType.ConfigCalibration;
 
-            Context.Initialize(m_CelestialStars, m_PyramidMinMag, m_PyramidMaxMag, m_IsCalibration, m_DetermineAutoLimitMagnitude, m_ManualStarMatch);
+            Context.Initialize(m_CelestialStars, m_PyramidMinMag, m_PyramidMaxMag, m_DetermineAutoLimitMagnitude, m_ManualStarMatch);
 
 #if ASTROMETRY_DEBUG
 			AstrometricFitDebugger.Init(m_FitSettings, m_PyramidMinMag, m_PyramidMaxMag, m_AstrometryMinMag, m_AstrometryMaxMag);
@@ -219,7 +219,7 @@ namespace Tangra.Astrometry.Recognition
 				{
 					// Try using the cache from the last time
 					alignmentResult =
-						Context.DoFieldAlignment(m_StarMap, m_Solution.FitInfo, m_IsCalibration, false);
+						Context.DoFieldAlignment(m_StarMap, m_Solution.FitInfo, false);
 
 					m_Solution = GetSolution(alignmentResult);
 #if UNIT_TESTS
@@ -233,7 +233,7 @@ namespace Tangra.Astrometry.Recognition
 				    m_ManualStarMatch != null)
 				{
 					// Try using the manual star match
-					alignmentResult = Context.DoFieldAlignment(m_StarMap, m_ManualStarMatch, m_IsCalibration);
+					alignmentResult = Context.DoFieldAlignment(m_StarMap, m_ManualStarMatch);
 
 					m_Solution = GetSolution(alignmentResult);
 #if UNIT_TESTS
@@ -292,7 +292,7 @@ namespace Tangra.Astrometry.Recognition
 						}
 						else
 						{
-							alignmentResult = Context.DoFieldAlignment(m_StarMap, m_IsCalibration);
+							alignmentResult = Context.DoFieldAlignment(m_StarMap);
 
 							m_Solution = GetSolution(alignmentResult);
 #if UNIT_TESTS

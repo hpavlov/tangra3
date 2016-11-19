@@ -91,8 +91,6 @@ namespace Tangra.Astrometry.Recognition
 
         private IOperationNotifier m_OperationNotifier;
 
-		private bool m_IsCalibration = false;
-
 		public DistanceBasedContext(
             IOperationNotifier operationNotifier,
 			AstroPlate plateConfigs,
@@ -491,7 +489,6 @@ namespace Tangra.Astrometry.Recognition
 			List<IStar> allCelestialStars, 
 			double pyramidMinMag, 
 			double pyramidMaxMag,
-			bool isCalibration,
 			bool determineAutoLimitMagnitude,
             Dictionary<StarMapFeature, IStar> manualPairs)
 		{
@@ -500,7 +497,6 @@ namespace Tangra.Astrometry.Recognition
 #endif
 		    m_PyramidMinMag = pyramidMinMag;
             m_PyramidMaxMag = pyramidMaxMag;
-			m_IsCalibration = isCalibration;
 			m_DetermineAutoLimitMagnitude = determineAutoLimitMagnitude;
 
 			m_CelestialAllStars = allCelestialStars;
@@ -646,26 +642,26 @@ namespace Tangra.Astrometry.Recognition
 			#endregion			
 		}
 
-		internal FieldAlignmentResult DoFieldAlignment(IStarMap starMap, bool isCalibration)
+		internal FieldAlignmentResult DoFieldAlignment(IStarMap starMap)
 		{
-			return DoFieldAlignment(starMap, (FitInfo)null, isCalibration, false);
+			return DoFieldAlignment(starMap, (FitInfo)null, false);
 		}
 
-		internal FieldAlignmentResult DoFieldAlignment(IStarMap starMap, Dictionary<StarMapFeature, IStar> manualPairs, bool isCalibration)
+		internal FieldAlignmentResult DoFieldAlignment(IStarMap starMap, Dictionary<StarMapFeature, IStar> manualPairs)
 		{
 			m_ManualPairs = manualPairs;
-			return DoFieldAlignment(starMap, (FitInfo)null, isCalibration, false);
+			return DoFieldAlignment(starMap, (FitInfo)null, false);
 		}
 
 		internal FieldAlignmentResult DoFieldAlignment(IStarMap starMap, double fittedFocalLength)
 		{
 			m_PlateConfig.EffectiveFocalLength = fittedFocalLength;
-			return DoFieldAlignment(starMap, (FitInfo)null, false, false);
+			return DoFieldAlignment(starMap, (FitInfo)null, false);
 		}
 
 		internal FieldAlignmentResult DoFieldAlignmentFitFocalLength(IStarMap starMap)
 		{
-			return DoFieldAlignment(starMap, (FitInfo)null, false, true);
+			return DoFieldAlignment(starMap, (FitInfo)null, true);
 		}
 
 		internal class FieldAlignmentResult
@@ -681,7 +677,6 @@ namespace Tangra.Astrometry.Recognition
 		internal FieldAlignmentResult DoFieldAlignment(
 			IStarMap starMap, 
 			FitInfo previousFit, 
-			bool isCalibration, 
 			bool fitFocalLength)
 		{
 #if ASTROMETRY_DEBUG
@@ -689,7 +684,6 @@ namespace Tangra.Astrometry.Recognition
 			Trace.Assert(m_Settings.PyramidDistanceToleranceInPixels > 0);
 #endif
 			double toleranceInArcSec = m_PlateConfig.GetDistanceInArcSec(m_Settings.PyramidDistanceToleranceInPixels);
-			m_IsCalibration = isCalibration;
 			m_PreviousFit = previousFit;
 
 			m_FeaturesDistanceCache.Clear();
@@ -2151,7 +2145,8 @@ namespace Tangra.Astrometry.Recognition
 			ThreeStarFit.StarPair pair_j,
 			ThreeStarFit.StarPair pair_k,
 			double fittedFocalLength,
-			PyramidEntry pyramidLog)
+			PyramidEntry pyramidLog, 
+            int? minMatchedStars = null)
 		{
 			double RA0Deg, DE0Deg;
 
@@ -2298,9 +2293,9 @@ namespace Tangra.Astrometry.Recognition
 					return null;
 				}
 
-				if (m_IsCalibration)
+                if (minMatchedStars.HasValue)
 				{
-					if (usedStars < CorePyramidConfig.Default.MinMatchedStarsForCalibration)
+                    if (usedStars < minMatchedStars.Value)
 					{
 						if (pyramidLog != null) pyramidLog.FailureReason = PyramidEntryFailureReason.InsufficientStarsForCalibration;
 
@@ -2311,90 +2306,6 @@ namespace Tangra.Astrometry.Recognition
 
 						return null;
 					}
-				}
-				else
-				{
-//                    // If less than 7 stars have been matched, then do additional check to determine the fit goodness
-//                    if (usedStars < CorePyramidConfig.Default.MinMatchedStarsForCalibration)
-//                    {
-//                        Trace.WriteLine(string.Format("Less than {0} stars in a preliminary solution. It will be tested further.", CorePyramidConfig.Default.MinMatchedStarsForCalibration));
-
-//                        int faintestFittedFeature = int.MaxValue;
-//                        int brightestFittedFeature = int.MinValue;
-
-//                        foreach (int key in matchedFeatureIdToStarIdIndexes.Keys)
-//                        {
-//                            // Find the faintest mapped feature
-//                            StarMapFeature feature = starMap.GetFeatureById(key);
-//                            if (feature != null)
-//                            {
-//                                if (feature.Intensity < faintestFittedFeature)
-//                                    faintestFittedFeature = feature.Intensity;
-//                                if (feature.Intensity > brightestFittedFeature)
-//                                    brightestFittedFeature = feature.Intensity;
-//                            }
-//                        }
-
-//                        // Require at least 75% of the features brighter than the faintest resolved feature to be resolved as well.
-//                        int totalBrighter = 0;
-//                        int totalBrighterThan75PercentOfFaintest = 0;
-//                        float margin75Percen = brightestFittedFeature -
-//                                               0.75f * (brightestFittedFeature - faintestFittedFeature);
-//                        foreach (StarMapFeature feature in starMap.Features)
-//                        {
-//                            if (feature.Intensity > faintestFittedFeature)
-//                                totalBrighter++;
-
-//                            if (feature.Intensity > margin75Percen)
-//                                totalBrighterThan75PercentOfFaintest++;
-//                        }
-
-//                        if (totalBrighter > 0)
-//                        {
-//                            double unfitBrighterFeaturesPercentage = 100.0 *
-//                                                                     (totalBrighter -
-//                                                                      CorePyramidConfig.Default.
-//                                                                          BrighterUnfitFeaturesTolerance) /
-//                                                                     (matchedFeatureIdToStarIdIndexes.Keys.Count +
-//                                                                      totalBrighter);
-//                            double unfit75BrighterFeaturesPercentage = 100.0 *
-//                                                                       (totalBrighterThan75PercentOfFaintest -
-//                                                                        CorePyramidConfig.Default.
-//                                                                            BrighterUnfitFeaturesTolerance) /
-//                                                                       (matchedFeatureIdToStarIdIndexes.Keys.Count +
-//                                                                        totalBrighterThan75PercentOfFaintest);
-
-//                            if (unfit75BrighterFeaturesPercentage >
-//                                CorePyramidConfig.Default.MinPercentage75BrighterUnfitFeatures ||
-//                                unfitBrighterFeaturesPercentage >
-//                                CorePyramidConfig.Default.MinPercentage100BrighterUnfitFeatures)
-//                            {
-//#if PYRAMID_DEBUG
-//                                Trace.WriteLine(
-//                                    string.Format(
-//                                        "Failed. Unfit = {0}% , needs be < {1}%; Unfit = {2}% , needs be < {3}%;",
-//                                        unfitBrighterFeaturesPercentage.ToString("0.0"),
-//                                        CorePyramidConfig.Default.MinPercentage100BrighterUnfitFeatures,
-//                                        unfit75BrighterFeaturesPercentage.ToString("0.0"),
-//                                        CorePyramidConfig.Default.MinPercentage75BrighterUnfitFeatures));
-//#endif
-//                                if (pyramidLog != null)
-//                                {
-//                                    pyramidLog.FailBecauseOfTooFiewrightFeaturesResolved(usedStars);
-//                                    AstrometricFitDebugger.RegisterFailedPyramid(pyramidLog);
-//                                }
-
-//                                // NOTE: Fail the fit are there are too many bright unfit objects in the field !
-//                                Trace.WriteLine(string.Format("Total 100% Brighter Unfit Features: {0} ({1}%)",
-//                                                              totalBrighter, unfitBrighterFeaturesPercentage));
-//                                Trace.WriteLine(string.Format("Total 75% Brighter Unfit Features: {0} ({1}%)",
-//                                                              totalBrighterThan75PercentOfFaintest,
-//                                                              unfit75BrighterFeaturesPercentage));
-
-//                                return null;
-//                            }
-//                        }
-//                    }
 				}
 			}
 			else
@@ -2466,12 +2377,22 @@ namespace Tangra.Astrometry.Recognition
 			CheckTriangleCallback callback, 
 			CheckTriangleWithRatiosCallback callbackWithRatios)
 		{
-			if (m_PreviousFit != null &&
-				TryMatchingPairsFromPreviousFit(starMap))
+			if (m_PreviousFit != null)
 			{
-				// Successfull fit from star to feature matching inferred from the previous fit was successfull
-				if (ImproveAndRetestSolution(0, 0, 0))
-					return true;
+			    if (TryMatchingPairsFromPreviousFit(starMap))
+			    {
+                    // Successfull fit from star to feature matching inferred from the previous fit was successfull
+                    if (ImproveAndRetestSolution(0, 0, 0, true))
+                        return true;
+                    else
+                    {
+                        Trace.WriteLine("Could improve solution from previous fit");
+                    }
+			    }
+			    else
+			    {
+			        Trace.WriteLine("Could not match stars from previous fit");
+			    }
 			}
 
 			if (m_ManualPairs != null &&
@@ -2678,7 +2599,7 @@ namespace Tangra.Astrometry.Recognition
                 SaveAlignImage(fit.FitInfo.AllStarPairs, i, j, k, false, traceMessage);
 
         }
-		private bool ImproveAndRetestSolution(int i, int j, int k)
+		private bool ImproveAndRetestSolution(int i, int j, int k, bool fromPreviousFit = false)
 		{
 			if (m_Solution != null)
 			{
@@ -2907,7 +2828,7 @@ namespace Tangra.Astrometry.Recognition
 				            }
 				        }
 				    }
-				    if (detectedStars < 25)
+                    if (detectedStars < 25 && !fromPreviousFit)
 				    {
 				        if (missingStars > detectedStars || missingStars > consideredStars/2)
 				        {
@@ -3400,30 +3321,22 @@ namespace Tangra.Astrometry.Recognition
 			// Shortcurcuit to FeautreId - StarNo detection
 			if (matchedPairs.Count >= m_Settings.MinimumNumberOfStars)
 			{
-				bool oldIsCalibration = m_IsCalibration;
-				try
-				{
-					// When there was a previous fit and we have sufficient stars from the current star map
-					// then don't require % of the bright features to approve the solution. Do it as a calibration fit (not too precise)
-					m_IsCalibration = true;
-					LeastSquareFittedAstrometry fit = SolveStarPairs(
-						starMap, matchedPairs,
-						matchedFeatureIdToStarIdIndexes,
-						pairs[0], pairs[1], pairs[2], m_PreviousFit.FittedFocalLength, null);
+                // When there was a previous fit and we have sufficient stars from the current star map
+                // then don't require % of the bright features to approve the solution. Do it as a calibration fit (not too precise)
+                LeastSquareFittedAstrometry fit = SolveStarPairs(
+                    starMap, matchedPairs,
+                    matchedFeatureIdToStarIdIndexes,
+                    pairs[0], pairs[1], pairs[2], m_PreviousFit.FittedFocalLength, null, 
+                    TangraConfig.Settings.Astrometry.MinimumNumberOfStars);
 
-					if (fit != null)
-					{
-						m_Solution = fit;
-						m_MatchedPairs = matchedPairs;
-						m_MatchedFeatureIdToStarIdIndexes = matchedFeatureIdToStarIdIndexes;
-						return true;
-					}
-				}
-				finally
-				{
-					m_IsCalibration = oldIsCalibration;
-				}
-			}
+                if (fit != null)
+                {
+                    m_Solution = fit;
+                    m_MatchedPairs = matchedPairs;
+                    m_MatchedFeatureIdToStarIdIndexes = matchedFeatureIdToStarIdIndexes;
+                    return true;
+                }
+            }
 
 			return false;
 		}
@@ -3463,30 +3376,22 @@ namespace Tangra.Astrometry.Recognition
 
 			if (matchedPairs.Count >= m_Settings.MinimumNumberOfStars)
 			{
-				bool oldIsCalibration = m_IsCalibration;
-				try
-				{
-					// When there was a previous fit and we have sufficient stars from the current star map
-					// then don't require % of the bright features to approve the solution. Do it as a calibration fit (not too precise)
-					m_IsCalibration = true;
-					LeastSquareFittedAstrometry fit = SolveStarPairs(
-						starMap, matchedPairs,
-						matchedFeatureIdToStarIdIndexes,
-						pairs[0], pairs[1], pairs[2], m_PlateConfig.EffectiveFocalLength, null);
+                // When there was a previous fit and we have sufficient stars from the current star map
+                // then don't require % of the bright features to approve the solution. Do it as a calibration fit (not too precise)
+                LeastSquareFittedAstrometry fit = SolveStarPairs(
+                    starMap, matchedPairs,
+                    matchedFeatureIdToStarIdIndexes,
+                    pairs[0], pairs[1], pairs[2], m_PlateConfig.EffectiveFocalLength, null, 
+                    TangraConfig.Settings.Astrometry.MinimumNumberOfStars);
 
-					if (fit != null)
-					{
-						m_Solution = fit;
-						m_MatchedPairs = matchedPairs;
-						m_MatchedFeatureIdToStarIdIndexes = matchedFeatureIdToStarIdIndexes;
-						return true;
-					}
-				}
-				finally
-				{
-					m_IsCalibration = oldIsCalibration;
-				}
-			}
+                if (fit != null)
+                {
+                    m_Solution = fit;
+                    m_MatchedPairs = matchedPairs;
+                    m_MatchedFeatureIdToStarIdIndexes = matchedFeatureIdToStarIdIndexes;
+                    return true;
+                }
+            }
 
 			return false;
 		}
