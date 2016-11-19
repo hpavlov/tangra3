@@ -92,6 +92,21 @@ namespace Tangra.Model.Image
 
         private bool m_HasSaturatedPixels;
 
+        public TangraConfig.BackgroundMethod BackgroundMethod
+        {
+            get { return m_BackgroundMethod; }
+        }
+
+        public int NumberOfPixelsInBackgroundAperture
+        {
+            get { return m_NumberOfPixelsInBackgroundAperture; }
+        }
+
+        public uint SaturationLevel
+        {
+            get { return m_SaturationValue; }
+        }
+
         public PSFFit FoundBestPSFFit
         {
             get

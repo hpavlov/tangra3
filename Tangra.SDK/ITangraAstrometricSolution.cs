@@ -43,6 +43,33 @@ namespace Tangra.SDK
         ITangraCatalogStar CatalogStar { get; }
     }
 
+    public enum BackgroundMethod
+    {
+        Unknown,
+        AverageBackground,
+        BackgroundMode,
+        Background3DPolynomial,
+        PSFBackground,
+        BackgroundMedian
+    }
+
+    public enum PhotometryReductionMethod
+    {
+        Unknown,
+        AperturePhotometry,
+        PsfPhotometry,
+        OptimalExtraction
+    }
+
+    public interface ITangraStarMeasurementInfo
+    {
+        PhotometryReductionMethod MeaSignalMethod { get; }
+        BackgroundMethod MeaBackgroundMethod { get; }
+        float? MeaSingleApertureSize { get;  }
+        int MeaBackgroundPixelCount { get; }
+        uint MeaSaturationLevel { get;  }
+    }
+
     public interface ITangraCatalogStar
     {
         /// <summary>

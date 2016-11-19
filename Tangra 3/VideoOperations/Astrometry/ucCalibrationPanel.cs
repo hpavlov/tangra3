@@ -54,6 +54,7 @@ namespace Tangra.VideoOperations.Astrometry
 		    UpdateEnabledStateOfScrollControls();
 
 			m_InitialPixelmap = m_VideoController.GetCurrentAstroImage(false).Pixelmap;
+            m_VideoController.ApplyDisplayModeAdjustments(m_InitialPixelmap.DisplayBitmap, false, m_InitialPixelmap);
 
 			m_CalibrationTool.ActivateOsdAreaSizing();
 

@@ -82,7 +82,9 @@ namespace Tangra.Astrometry
 			TangraConfig.PhotometryReductionMethod photometryReductionMethod, 
 			TangraConfig.BackgroundMethod photometryBackgroundMethod,
 			TangraConfig.PsfQuadrature psfQuadrature,
-			TangraConfig.PsfFittingMethod psfFittingMethod)
+			TangraConfig.PsfFittingMethod psfFittingMethod,
+            MeasurementsHelper measurer,
+            float? aperture)
 		{
 			m_CurrentAstroImage = astroImage;
 			m_BitPix = bitPix;
@@ -120,19 +122,8 @@ namespace Tangra.Astrometry
 			m_B = b;
 			m_C = c;
 
-            uint saturatedValue = TangraConfig.Settings.Photometry.Saturation.GetSaturationForBpp(m_BitPix, astroImage.Pixelmap.MaxSignalValue);
-
-			m_Measurer = new MeasurementsHelper(
-				m_BitPix,
-				m_PhotometryBackgroundMethod, 
-				TangraConfig.Settings.Photometry.SubPixelSquareSize,
-                saturatedValue);
-
-			m_Measurer.SetCoreProperties(
-				TangraConfig.Settings.Photometry.AnnulusInnerRadius,
-				TangraConfig.Settings.Photometry.AnnulusMinPixels,
-                CorePhotometrySettings.Default.RejectionBackgroundPixelsStdDev,
-				2 /* TODO: This must be configurable */);
+            m_Measurer = measurer.Clone();
+            m_MeasurementAperture = aperture;
 
 			m_Sigma = 0;
 			m_MinRes = double.MaxValue;
@@ -224,6 +215,31 @@ namespace Tangra.Astrometry
 			get { return m_EncodingGamma; }
 		}
 
+	    public float? MeaSingleAperture
+	    {
+	        get { return m_MeasurementAperture; }
+	    }
+
+        public TangraConfig.PhotometryReductionMethod MeaSignalMethod
+	    {
+	        get { return  m_PhotometryReductionMethod; }
+	    }
+
+        public TangraConfig.BackgroundMethod MeaBackgroundMethod
+	    {
+	        get { return m_Measurer.BackgroundMethod; }
+	    }
+
+        public int MeaBackgroundPixelCount
+	    {
+	        get { return m_Measurer.NumberOfPixelsInBackgroundAperture; }
+	    }
+
+        public uint MeaSaturationLevel
+	    {
+	        get { return m_Measurer.SaturationLevel; }
+	    }
+
 		public TangraConfig.KnownCameraResponse ReverseCameraResponse
 		{
 			get { return m_ReverseCameraResponse; }
@@ -245,6 +261,8 @@ namespace Tangra.Astrometry
 		{
 			return fwhm * APERTURE_IN_FWHM + FIXED_APERTURE;
 		}
+
+	    private float? m_MeasurementAperture;
 
 		public double GetIntencity(ImagePixel center, out bool isSaturated)
 		{
@@ -275,7 +293,7 @@ namespace Tangra.Astrometry
 				m_PhotometryReductionMethod,
 				m_PsfQuadrature,
 				m_PsfFittingMethod,
-				(float)Aperture(fit.FWHM),
+				m_MeasurementAperture ?? (float)Aperture(fit.FWHM),
 				fit.FWHM,
 				(float)m_EmpericalFWHM,
 				new FakeIMeasuredObject(fit), 
@@ -626,8 +644,8 @@ namespace Tangra.Astrometry
 				currentAstroImage,
 				bitPix,
 				intencities, magnitudes, colours, stars, gaussians, new List<double>(),
-				saturatedFlags, a, b, c, encodingGamma, reverseCameraResponse, excludedStars, filter, empericalFWHM, 
-				photometryReductionMethod, photometryBackgroundMethod, psfQuadrature, psfFittingMethod);
+				saturatedFlags, a, b, c, encodingGamma, reverseCameraResponse, excludedStars, filter, empericalFWHM,
+                photometryReductionMethod, photometryBackgroundMethod, psfQuadrature, psfFittingMethod, measurer, aperture);
 		}
 
 		public static bool IsSaturated(uint[,] data, int matSize, uint saturatedValue)

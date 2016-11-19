@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Tangra.AstroServices;
 using Tangra.Astrometry;
+using Tangra.Model.Config;
 using Tangra.Model.Helpers;
 using Tangra.SDK;
 using Tangra.StarCatalogues;
@@ -192,6 +193,11 @@ namespace Tangra.Addins
 								int idx = photometry.StarNumbers.IndexOf(photometryStar);
 								star.Intensity = (float)photometry.Intencities[idx];
 								star.IsSaturated = photometry.SaturatedFlags[idx];
+                                star.MeaSignalMethod = ConvertSignalMethod(photometry.MeaSignalMethod);
+                                star.MeaBackgroundMethod = ConvertBackgroundMethod(photometry.MeaBackgroundMethod);
+                                star.MeaSingleApertureSize = photometry.MeaSingleAperture;
+                                star.MeaBackgroundPixelCount = photometry.MeaBackgroundPixelCount;
+                                star.MeaSaturationLevel = photometry.MeaSaturationLevel;
 							}
 						}
 
@@ -200,6 +206,41 @@ namespace Tangra.Addins
 				}
 			}
 		}
+
+	    private PhotometryReductionMethod ConvertSignalMethod(TangraConfig.PhotometryReductionMethod method)
+	    {
+	        switch (method)
+	        {
+	            case TangraConfig.PhotometryReductionMethod.AperturePhotometry:
+                    return PhotometryReductionMethod.AperturePhotometry;
+                case TangraConfig.PhotometryReductionMethod.PsfPhotometry:
+                    return PhotometryReductionMethod.PsfPhotometry;
+                case TangraConfig.PhotometryReductionMethod.OptimalExtraction:
+                    return PhotometryReductionMethod.OptimalExtraction;
+
+                default:
+	                return PhotometryReductionMethod.Unknown;
+	        }
+	    }
+
+        private BackgroundMethod ConvertBackgroundMethod(TangraConfig.BackgroundMethod method)
+        {
+            switch (method)
+            {
+                case TangraConfig.BackgroundMethod.AverageBackground:
+                    return BackgroundMethod.AverageBackground;
+                case TangraConfig.BackgroundMethod.BackgroundMedian:
+                    return BackgroundMethod.BackgroundMedian;
+                case TangraConfig.BackgroundMethod.BackgroundMode:
+                    return BackgroundMethod.BackgroundMode;
+                case TangraConfig.BackgroundMethod.PSFBackground:
+                    return BackgroundMethod.PSFBackground;
+                case TangraConfig.BackgroundMethod.Background3DPolynomial:
+                    return BackgroundMethod.Background3DPolynomial;
+                default:
+                    return BackgroundMethod.Unknown;
+            }
+        }
 
 		private List<TangraMatchedStarImpl> m_MatchedStarImpl;
 
@@ -226,7 +267,7 @@ namespace Tangra.Addins
         }
 
 		[Serializable]
-		internal class TangraMatchedStarImpl : ITangraMatchedStar
+        internal class TangraMatchedStarImpl : ITangraMatchedStar, ITangraStarMeasurementInfo
 		{
 			public float X { get; internal set; }
 			public float Y { get; internal set; }
@@ -242,6 +283,12 @@ namespace Tangra.Addins
 			public float Mag { get; internal set; }
 			public bool IsSaturated { get; internal set; }
 			public ITangraCatalogStar CatalogStar { get; internal set; }
+
+            public PhotometryReductionMethod MeaSignalMethod { get; internal set; }
+            public BackgroundMethod MeaBackgroundMethod { get; internal set; }
+            public float? MeaSingleApertureSize { get; internal set; }
+            public int MeaBackgroundPixelCount { get; internal set; }
+            public uint MeaSaturationLevel { get; internal set; }
 		}
 
 		[Serializable]
