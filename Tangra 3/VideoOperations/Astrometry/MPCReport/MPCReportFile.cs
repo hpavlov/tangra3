@@ -40,7 +40,7 @@ namespace Tangra.VideoOperations.Astrometry.MPCReport
 
             foreach(string line in allLines)
             {
-                if (line.Length > 3 && HEADER_TOKENS.IndexOf(line.Substring(0, 3)) == -1)
+                if (line.Length > 3 && (ObsLines.Count > 0 || HEADER_TOKENS.IndexOf(line.Substring(0, 3)) == -1))
                 {
                     // Parse observation line
                     MPCObsLine obsLine = MPCObsLine.Parse(line);
