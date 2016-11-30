@@ -17,6 +17,7 @@ namespace Tangra.Addins
 	{
 		private ITangraHost m_Host;
 		private MeasurementsExportAddin m_MeasurementsExportAddin;
+        private AstrometryExportAddin m_AstrometryExportAddin;
 
 		public void Initialise(ITangraHost host)
 		{
@@ -25,13 +26,18 @@ namespace Tangra.Addins
 			m_MeasurementsExportAddin = new MeasurementsExportAddin();
 			m_MeasurementsExportAddin.Initialise(m_Host);
 
+		    m_AstrometryExportAddin = new AstrometryExportAddin();
+            m_AstrometryExportAddin.Initialise(m_Host);
+
 			RemotingConfiguration.RegisterWellKnownServiceType(typeof(StandardTangraAddin), "StandardTangraAddin", WellKnownObjectMode.Singleton);
 			RemotingConfiguration.RegisterWellKnownServiceType(typeof(MeasurementsExportAddin), "MeasurementsExportAddin", WellKnownObjectMode.Singleton);
+            RemotingConfiguration.RegisterWellKnownServiceType(typeof(AstrometryExportAddin), "AstrometryExportAddin", WellKnownObjectMode.Singleton);
 		}
 
 		public void Finalise()
 		{
 			m_MeasurementsExportAddin.Finalise();
+            m_AstrometryExportAddin.Finalise();
 		}
 
 		public void Configure()
@@ -52,7 +58,7 @@ namespace Tangra.Addins
 
 		public string Version
 		{
-			get { return "1.0"; }
+			get { return "1.1"; }
 		}
 
 		public string Description
@@ -67,7 +73,7 @@ namespace Tangra.Addins
 
 		public ITangraAddinAction[] GetAddinActions()
 		{
-			return new ITangraAddinAction[] { m_MeasurementsExportAddin };
+			return new ITangraAddinAction[] { m_MeasurementsExportAddin, m_AstrometryExportAddin };
 		}
 
 		public void OnEventNotification(AddinFiredEventType eventType)
@@ -75,10 +81,12 @@ namespace Tangra.Addins
 			if (eventType == AddinFiredEventType.BeginMultiFrameAstrometry)
 			{
 				m_MeasurementsExportAddin.OnBeginMultiFrameAstrometry();
+                m_AstrometryExportAddin.OnBeginMultiFrameAstrometry();
 			}
 			else if (eventType == AddinFiredEventType.EndMultiFrameAstrometry)
 			{
 				m_MeasurementsExportAddin.OnEndMultiFrameAstrometry();
+                m_AstrometryExportAddin.OnEndMultiFrameAstrometry();
 			}
 		}
 	}

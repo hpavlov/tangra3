@@ -47,7 +47,7 @@ namespace Tangra.Addins
 
 		public string DisplayName
 		{
-			get { return "Measurements CSV Export"; }
+			get { return "Star Photometry CSV Export"; }
 		}
 
 		public AddinActionType ActionType

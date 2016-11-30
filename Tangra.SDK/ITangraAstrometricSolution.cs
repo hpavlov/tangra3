@@ -21,6 +21,11 @@ namespace Tangra.SDK
         List<ITangraMatchedStar> GetAllMatchedStars();
     }
 
+    public interface ITangraAstrometricSolution2
+    {
+        List<ITangraAstrometricMeasurement> GetAllMeasurements();
+    }
+
     public interface ITangraMatchedStar
     {
         float X { get; }
@@ -117,5 +122,16 @@ namespace Tangra.SDK
 
         //  I*1 1/100 mag  error of i magnitude from APASS         (14)
         float e_i { get; }
+    }
+
+    public interface ITangraAstrometricMeasurement
+    {
+        double RADeg { get; }
+        double DEDeg { get; }
+        double Mag { get; }
+        double StdDevRAArcSec { get; }
+        double StdDevDEArcSec { get; }
+        int FrameNo { get; }
+        DateTime? OCRedTimeStamp { get; }
     }
 }

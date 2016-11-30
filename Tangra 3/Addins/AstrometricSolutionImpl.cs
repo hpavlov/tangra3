@@ -17,7 +17,7 @@ using Tangra.VideoOperations.Astrometry.Engine;
 namespace Tangra.Addins
 {
 	[Serializable]
-	internal class AstrometricSolutionImpl : ITangraAstrometricSolution
+    internal class AstrometricSolutionImpl : ITangraAstrometricSolution, ITangraAstrometricSolution2
 	{
 		public string StarCatalog { get; internal set; }
 		public DateTime UtcTime { get; internal set; }
@@ -77,6 +77,25 @@ namespace Tangra.Addins
 					}
 				}
 			}
+
+		    m_MeasurementsImpl = new List<TangraAstrometricMeasurementImpl>();
+
+		    if (state.Measurements != null)
+		    {
+		        foreach (var mea in state.Measurements)
+		        {
+                    m_MeasurementsImpl.Add(new TangraAstrometricMeasurementImpl()
+                    {
+                        DEDeg = mea.DEDeg,
+                        RADeg = mea.RADeg,
+                        FrameNo = mea.FrameNo,
+                        StdDevDEArcSec = mea.StdDevDEArcSec,
+                        StdDevRAArcSec = mea.StdDevRAArcSec,
+                        OCRedTimeStamp = mea.OCRedTimeStamp,
+                        Mag = mea.Mag
+                    });
+		        }
+		    }
 
 			m_MatchedStarImpl = new List<TangraMatchedStarImpl>();
 
@@ -189,12 +208,22 @@ namespace Tangra.Addins
 			get { return m_MatchedStarImpl; }
 		}
 
+
+	    private List<TangraAstrometricMeasurementImpl> m_MeasurementsImpl;
+ 
 		public List<ITangraMatchedStar> GetAllMatchedStars()
 		{
 			return m_MatchedStarImpl
 				.Cast<ITangraMatchedStar>()
 				.ToList();
 		}
+
+        public List<ITangraAstrometricMeasurement> GetAllMeasurements()
+        {
+            return m_MeasurementsImpl
+                .Cast<ITangraAstrometricMeasurement>()
+                .ToList();
+        }
 
 		[Serializable]
 		internal class TangraMatchedStarImpl : ITangraMatchedStar
@@ -228,6 +257,18 @@ namespace Tangra.Addins
 			public float MagJ { get; internal set; }
 			public float MagK { get; internal set; }
 		}
+
+        [Serializable]
+	    internal class TangraAstrometricMeasurementImpl : ITangraAstrometricMeasurement
+	    {
+            public double RADeg { get; internal set; }
+            public double DEDeg { get; internal set; }
+            public double Mag { get; internal set; }
+            public double StdDevRAArcSec { get; internal set; }
+            public double StdDevDEArcSec { get; internal set; }
+            public int FrameNo { get; internal set; }
+            public DateTime? OCRedTimeStamp { get; internal set; }
+        }
 
 		[Serializable]
 		internal class TangraAPASSStar : TangraCatalogStarImpl, ITangraAPASSStarMagnitudes
