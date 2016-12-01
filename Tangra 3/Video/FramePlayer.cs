@@ -801,6 +801,15 @@ namespace Tangra.Video
 			}
 		}
 
+        public bool IsAviVideo
+        {
+            get
+            {
+                return
+                    m_VideoStream is VideoStream || m_VideoStream is ReInterlacingVideoStream;
+            }
+        }
+
 		public GeoLocationInfo GeoLocation
 		{
 			get

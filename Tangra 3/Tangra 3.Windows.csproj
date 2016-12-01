@@ -256,6 +256,7 @@
     <Compile Include="Config\InstrumentalDelayConfigManager.cs" />
     <Compile Include="Controller\AstrometryController.cs" />
     <Compile Include="Controller\AutoUpdatesController.cs" />
+    <Compile Include="Controller\ConvertVideoToAavController.cs" />
     <Compile Include="Controller\ConvertVideoToFitsController.cs" />
     <Compile Include="Controller\IRequiresAddinsController.cs" />
     <Compile Include="Controller\LightCurveContext.cs" />
@@ -346,6 +347,13 @@
     <Compile Include="VideoOperations\Astrometry\Tracking\FastAsteroidTracker.cs" />
     <Compile Include="VideoOperations\Astrometry\Tracking\IAstrometryTracker.cs" />
     <Compile Include="VideoOperations\Astrometry\Tracking\SlowMotionTracker.cs" />
+    <Compile Include="VideoOperations\ConvertVideoToAav\ConvertVideoToAavOperation.cs" />
+    <Compile Include="VideoOperations\ConvertVideoToAav\ucConvertVideoToAav.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\ConvertVideoToAav\ucConvertVideoToAav.Designer.cs">
+      <DependentUpon>ucConvertVideoToAav.cs</DependentUpon>
+    </Compile>
     <Compile Include="VideoOperations\ConvertVideoToFits\ConvertVideoToFitsOperation.cs" />
     <Compile Include="VideoOperations\ConvertVideoToFits\ucConvertVideoToFits.cs">
       <SubType>UserControl</SubType>
@@ -1115,6 +1123,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\Astrometry\ucChooseCalibratedConfiguration.resx">
       <DependentUpon>ucChooseCalibratedConfiguration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\ConvertVideoToAav\ucConvertVideoToAav.resx">
+      <DependentUpon>ucConvertVideoToAav.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\ConvertVideoToFits\ucConvertVideoToFits.resx">
       <DependentUpon>ucConvertVideoToFits.cs</DependentUpon>

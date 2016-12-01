@@ -58,6 +58,7 @@ namespace Tangra.Model.Context
 		public bool UsingADV = false;
 		public bool IsSerFile = false;
 	    public bool IsFitsStream = false;
+        public bool IsAviFile = false;
 
 		public bool RecordingDebugSession = false;
 
@@ -133,6 +134,7 @@ namespace Tangra.Model.Context
 			UsingADV = false;
 			IsSerFile = false;
             IsFitsStream = false;
+		    IsAviFile = false;
 			RecordingDebugSession = false;
 			UsingIntegration = false;
 

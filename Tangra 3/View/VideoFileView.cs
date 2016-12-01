@@ -81,6 +81,7 @@ namespace Tangra.View
 			m_MainForm.miExportToCSV.Enabled = TangraContext.Current.HasAnyFileLoaded;
 
             m_MainForm.miExportVideoToFITS.Enabled = TangraContext.Current.HasVideoLoaded && !TangraContext.Current.IsFitsStream;
+            m_MainForm.miConvertVideoToAAV.Enabled = TangraContext.Current.HasVideoLoaded && TangraContext.Current.IsAviFile;
 
 			m_MainForm.miReduceLightCurve.Enabled = TangraContext.Current.HasAnyFileLoaded && !TangraContext.Current.OperationInProgress;
             m_MainForm.miAstrometry.Enabled = TangraContext.Current.HasAnyFileLoaded && !TangraContext.Current.OperationInProgress;

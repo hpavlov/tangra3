@@ -45,6 +45,7 @@ using Tangra.VideoTools;
 using Tangra.View;
 using nom.tam.fits;
 using nom.tam.util;
+using Tangra.VideoOperations.ConvertVideoToAav;
 using Tangra.VideoOperations.ConvertVideoToFits;
 
 namespace Tangra
@@ -57,6 +58,7 @@ namespace Tangra
 	    private SpectroscopyController m_SpectroscopyController;
 		private DarkFlatFrameController m_MakeDarkFlatController;
         private ConvertVideoToFitsController m_ConvertVideoToFitsController;
+	    private ConvertVideoToAavController m_ConvertVideoToAavController;
 		private AutoUpdatesController m_AutoUpdatesController;
 		private AddinsController m_AddinsController;
 
@@ -86,6 +88,7 @@ namespace Tangra
             m_LightCurveController = new LightCurveController(this, m_VideoController, m_AddinsController);
 			m_MakeDarkFlatController = new DarkFlatFrameController(this, m_VideoController);
             m_ConvertVideoToFitsController = new ConvertVideoToFitsController(this, m_VideoController);
+            m_ConvertVideoToAavController = new ConvertVideoToAavController(this, m_VideoController);
 			m_AstrometryController = new AstrometryController(m_VideoController, m_LongOperationsManager);
 		    m_SpectroscopyController = new SpectroscopyController(this, m_VideoController);
 			m_AutoUpdatesController = new AutoUpdatesController(this, m_VideoController);
@@ -1387,6 +1390,12 @@ namespace Tangra
             frmIntegrationDetection frm = new frmIntegrationDetection(m_VideoController, m_VideoController.CurrentFrameIndex);
             frm.StartPosition = FormStartPosition.CenterParent;
             frm.ShowDialog(this);
+        }
+
+        private void miConvertVideoToAAV_Click(object sender, EventArgs e)
+        {
+            m_VideoController.ActivateOperation<ConvertVideoToAavOperation>(m_ConvertVideoToAavController, false);
+            m_VideoController.RefreshCurrentFrame();
         }
 	}
 }
