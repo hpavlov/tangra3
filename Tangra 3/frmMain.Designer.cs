@@ -230,7 +230,7 @@
             // 
             this.miExportVideoToFITS.Name = "miExportVideoToFITS";
             this.miExportVideoToFITS.Size = new System.Drawing.Size(214, 22);
-            this.miExportVideoToFITS.Text = "&Export Video to FITS";
+            this.miExportVideoToFITS.Text = "&Convert Video to FITS";
             this.miExportVideoToFITS.Click += new System.EventHandler(this.miExportVideoToFITS_Click);
             // 
             // toolStripSeparator5

@@ -46,6 +46,9 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             this.rbFullFrame = new System.Windows.Forms.RadioButton();
             this.rbROI = new System.Windows.Forms.RadioButton();
             this.gbxSection = new System.Windows.Forms.GroupBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.cbxEveryFrame = new System.Windows.Forms.ComboBox();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.pnlEnterTimes = new System.Windows.Forms.Panel();
@@ -55,9 +58,6 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             this.btnNextTime = new System.Windows.Forms.Button();
             this.lblTimesHeader = new System.Windows.Forms.Label();
             this.ucUtcTime = new Tangra.Model.Controls.ucUtcTimePicker();
-            this.cbxEveryFrame = new System.Windows.Forms.ComboBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.nudFirstFrame)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudLastFrame)).BeginInit();
             this.gbxFormat.SuspendLayout();
@@ -146,7 +146,7 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             this.btnExport.Name = "btnExport";
             this.btnExport.Size = new System.Drawing.Size(116, 23);
             this.btnExport.TabIndex = 26;
-            this.btnExport.Text = "Export";
+            this.btnExport.Text = "Convert";
             this.btnExport.UseVisualStyleBackColor = true;
             this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
             // 
@@ -159,7 +159,7 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             this.gbxFormat.Size = new System.Drawing.Size(228, 78);
             this.gbxFormat.TabIndex = 29;
             this.gbxFormat.TabStop = false;
-            this.gbxFormat.Text = "Export Format";
+            this.gbxFormat.Text = "Output Format";
             // 
             // gbxFrameSize
             // 
@@ -209,7 +209,42 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             this.gbxSection.Size = new System.Drawing.Size(228, 105);
             this.gbxSection.TabIndex = 31;
             this.gbxSection.TabStop = false;
-            this.gbxSection.Text = "Export Section";
+            this.gbxSection.Text = "Section";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(175, 77);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(33, 13);
+            this.label2.TabIndex = 39;
+            this.label2.Text = "frame";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(16, 77);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(44, 13);
+            this.label1.TabIndex = 38;
+            this.label1.Text = "Convert";
+            // 
+            // cbxEveryFrame
+            // 
+            this.cbxEveryFrame.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxEveryFrame.FormattingEnabled = true;
+            this.cbxEveryFrame.Items.AddRange(new object[] {
+            "every",
+            "every   2-nd",
+            "every   4-th",
+            "every   8-th",
+            "every 16-th",
+            "every 32-th",
+            "every 64-th"});
+            this.cbxEveryFrame.Location = new System.Drawing.Point(89, 74);
+            this.cbxEveryFrame.Name = "cbxEveryFrame";
+            this.cbxEveryFrame.Size = new System.Drawing.Size(80, 21);
+            this.cbxEveryFrame.TabIndex = 37;
             // 
             // saveFileDialog
             // 
@@ -284,41 +319,6 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             this.ucUtcTime.Name = "ucUtcTime";
             this.ucUtcTime.Size = new System.Drawing.Size(239, 26);
             this.ucUtcTime.TabIndex = 30;
-            // 
-            // cbxEveryFrame
-            // 
-            this.cbxEveryFrame.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxEveryFrame.FormattingEnabled = true;
-            this.cbxEveryFrame.Items.AddRange(new object[] {
-            "every",
-            "every   2-nd",
-            "every   4-th",
-            "every   8-th",
-            "every 16-th",
-            "every 32-th",
-            "every 64-th"});
-            this.cbxEveryFrame.Location = new System.Drawing.Point(89, 74);
-            this.cbxEveryFrame.Name = "cbxEveryFrame";
-            this.cbxEveryFrame.Size = new System.Drawing.Size(80, 21);
-            this.cbxEveryFrame.TabIndex = 37;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(16, 77);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(37, 13);
-            this.label1.TabIndex = 38;
-            this.label1.Text = "Export";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(175, 77);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(33, 13);
-            this.label2.TabIndex = 39;
-            this.label2.Text = "frame";
             // 
             // ucConvertVideoToFits
             // 
