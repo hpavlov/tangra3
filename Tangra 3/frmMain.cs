@@ -1359,10 +1359,19 @@ namespace Tangra
 	    private void DisplayReleaseNotes()
 	    {
             string filePath = Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory + @"\ReleaseNotes.txt");
-            if (File.Exists(filePath))
-                Process.Start(filePath);
-            else
-                MessageBox.Show("Could not find: " + filePath, "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+	        if (File.Exists(filePath))
+	        {
+	            try
+	            {
+                    Process.Start(filePath);
+	            }
+	            catch (Exception ex)
+	            {
+	                Trace.WriteLine(ex.GetFullStackTrace());
+	            }	            
+	        }
+	        else
+	            MessageBox.Show("Could not find: " + filePath, "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
 	    }
 
         private void miExportVideoToFITS_Click(object sender, EventArgs e)
