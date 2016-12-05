@@ -113,14 +113,29 @@ namespace Tangra.Video.AstroDigitalVideo
                 listItem.SubItems.Add(entry.Item3.ToString());
             }
 
-            rbMainStream.Checked = true;
+            if (m_AdvFile.MainSteamInfo.FrameCount > 0)
+            {
+                nudCropMainFirstFrame.Maximum = (int)m_AdvFile.MainSteamInfo.FrameCount - 1;
+                nudCropMainFirstFrame.Value = 0;
+                nudCropMainLastFrame.Maximum = (int)m_AdvFile.MainSteamInfo.FrameCount - 1;
+                nudCropMainLastFrame.Value = nudCropMainLastFrame.Maximum;
 
-            rbMainStrToAVI.Checked = true;
-            rbMainStrToCSV.Checked = true;
-            nudCropMainFirstFrame.Maximum = (int)m_AdvFile.MainSteamInfo.FrameCount - 1;
-            nudCropMainFirstFrame.Value = 0;
-            nudCropMainLastFrame.Maximum = (int)m_AdvFile.MainSteamInfo.FrameCount - 1;
-            nudCropMainLastFrame.Value = nudCropMainLastFrame.Maximum;
+                rbMainStream.Checked = true;
+                rbMainStrToAVI.Checked = true;
+                rbMainStrToCSV.Checked = true;
+            }
+            else
+            {
+                rbMainStrToAVI.Enabled = false;
+                rbMainStrToCSV.Enabled = false;
+                rbMainStream.Enabled = false;
+                rbMainStream.Checked = false;
+                rbMainStrToAVI.Checked = false;
+                rbMainStrToCSV.Checked = false;
+
+                nudCropMainFirstFrame.Enabled = false;
+                nudCropMainLastFrame.Enabled = false;
+            }
 
             if (m_AdvFile.CalibrationSteamInfo.FrameCount > 0)
             {
@@ -132,6 +147,13 @@ namespace Tangra.Video.AstroDigitalVideo
                 rbCalibrStrToAVI.Enabled = true;
                 rbCalibStrToCSV.Enabled = true;
                 rbCalibrationStream.Enabled = true;
+
+                if (m_AdvFile.MainSteamInfo.FrameCount == 0)
+                {
+                    rbCalibrStrToAVI.Checked = true;
+                    rbCalibStrToCSV.Checked = true;
+                    rbCalibrationStream.Checked = true;                   
+                }
             }
             else
             {
@@ -228,13 +250,6 @@ namespace Tangra.Video.AstroDigitalVideo
                     sbFrames.Minimum = 1;
                     sbFrames.Value = 1;
                     sbFrames.Enabled = true;
-
-                    nudCropMainFirstFrame.Value = 0;
-                    nudCropMainLastFrame.Value = m_AdvFile.MainSteamInfo.FrameCount - 1;
-                    nudAviFirstFrame.Value = 0;
-                    nudAviLastFrame.Value = m_AdvFile.MainSteamInfo.FrameCount - 1;
-                    nudCsvFirstFrame.Value = 0;
-                    nudCsvLastFrame.Value = m_AdvFile.MainSteamInfo.FrameCount - 1;
                 }
                 else
                 {
@@ -252,13 +267,6 @@ namespace Tangra.Video.AstroDigitalVideo
                     sbFrames.Minimum = 1;
                     sbFrames.Value = 1;
                     sbFrames.Enabled = true;
-
-                    nudCropMainFirstFrame.Value = 0;
-                    nudCropMainLastFrame.Value = m_AdvFile.CalibrationSteamInfo.FrameCount - 1;
-                    nudAviFirstFrame.Value = 0;
-                    nudAviLastFrame.Value = m_AdvFile.CalibrationSteamInfo.FrameCount - 1;
-                    nudCsvFirstFrame.Value = 0;
-                    nudCsvLastFrame.Value = m_AdvFile.CalibrationSteamInfo.FrameCount - 1;
                 }
                 else
                 {
@@ -402,7 +410,7 @@ namespace Tangra.Video.AstroDigitalVideo
                 nudAviLastFrame.Maximum = Math.Max(0, (int) m_AdvFile.MainSteamInfo.FrameCount - 1);
                 nudAviLastFrame.Value = nudAviFirstFrame.Maximum;
             }
-            else
+            else if (rbCalibrStrToAVI.Checked)
             {
                 nudAviFirstFrame.Maximum = Math.Max(0, (int)m_AdvFile.CalibrationSteamInfo.FrameCount - 1);
                 nudAviFirstFrame.Value = 0;
@@ -417,7 +425,7 @@ namespace Tangra.Video.AstroDigitalVideo
                 nudCsvLastFrame.Maximum = Math.Max(0, (int) m_AdvFile.MainSteamInfo.FrameCount - 1);
                 nudCsvLastFrame.Value = nudCsvFirstFrame.Maximum;
             }
-            else
+            else if (rbCalibStrToCSV.Checked)
             {
                 nudCsvFirstFrame.Maximum = Math.Max(0, (int)m_AdvFile.CalibrationSteamInfo.FrameCount - 1);
                 nudCsvFirstFrame.Value = 0;
