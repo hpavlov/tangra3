@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using Adv;
 using Tangra.Helpers;
+using Tangra.Model.Config;
 using Tangra.Model.Context;
 using Tangra.Model.Image;
 using Tangra.Model.Video;
@@ -57,6 +58,14 @@ namespace Tangra.Video
         private int m_BitPix;
         private uint m_Aav16NormVal;
         private string m_Engine;
+        private string m_VideoStandard;
+        private double m_NativeFrameRate;
+        private double m_EffectiveFrameRate;
+        private int m_IntegratedAAVFrames;
+        private int m_OsdFirstLine = 0;
+        private int m_OsdLastLine = 0;
+        private int m_StackingRate = 0;
+        private int? m_AAVVersion = null;
 
         private AdvFile2 m_AdvFile;
 
@@ -98,6 +107,30 @@ namespace Tangra.Video
 
             fileMetadataInfo.ObjectName = GetFileTag("OBJNAME");
 
+            int aavVersion;
+            if (int.TryParse(GetFileTag("AAV-VERSION"), out aavVersion))
+            {
+                m_AAVVersion = aavVersion;
+                m_VideoStandard = GetFileTag("NATIVE-VIDEO-STANDARD");
+                double.TryParse(GetFileTag("NATIVE-FRAME-RATE"), out m_NativeFrameRate);
+
+                int.TryParse(GetFileTag("OSD-FIRST-LINE"), out m_OsdFirstLine);
+                int.TryParse(GetFileTag("OSD-LAST-LINE"), out m_OsdLastLine);
+
+                if (m_OsdLastLine > m_Height) m_OsdLastLine = m_Height;
+                if (m_OsdFirstLine < 0) m_OsdFirstLine = 0;
+
+                m_IntegratedAAVFrames = -1;
+
+                if (double.TryParse(GetFileTag("EFFECTIVE-FRAME-RATE"), out m_EffectiveFrameRate) && m_NativeFrameRate != 0)
+                {
+                    m_IntegratedAAVFrames = (int)Math.Round(m_NativeFrameRate / m_EffectiveFrameRate);
+                }
+
+                int.TryParse(GetFileTag("FRAME-STACKING-RATE"), out m_StackingRate);
+                if (m_StackingRate == 1) m_StackingRate = 0; // Video stacked at x1 is a non-stacked video                
+            }
+
             this.geoLocation = new GeoLocationInfo()
             {
                 //TODO
@@ -110,6 +143,9 @@ namespace Tangra.Video
         {
             string tagValue;
             if (m_AdvFile.SystemMetadataTags.TryGetValue(tagName, out tagValue))
+                return tagValue;
+
+            if (m_AdvFile.UserMetadataTags.TryGetValue(tagName, out tagValue))
                 return tagValue;
 
             return null;
@@ -157,6 +193,9 @@ namespace Tangra.Video
 
         public Pixelmap GetPixelmap(int index)
         {
+            if (m_AdvFile.MainSteamInfo.FrameCount == 0) 
+                return null;
+
             uint[] pixels;
             uint[] unprocessedPixels = new uint[m_Width * m_Height];
             byte[] displayBitmapBytes = new byte[m_Width * m_Height];
@@ -177,7 +216,26 @@ namespace Tangra.Video
 
             TangraCore.GetBitmapPixels(Width, Height, pixels, rawBitmapBytes, displayBitmapBytes, true, (ushort)BitPix, 0);
 
-            Bitmap displayBitmap = Pixelmap.ConstructBitmapFromBitmapPixels(displayBitmapBytes, Width, Height);
+            Bitmap displayBitmap = null;
+
+            if (m_AAVVersion != null && m_IntegratedAAVFrames > 0 && TangraConfig.Settings.AAV.SplitFieldsOSD && m_OsdFirstLine * m_OsdLastLine != 0)
+            {
+                TangraCore.BitmapSplitFieldsOSD(rawBitmapBytes, m_OsdFirstLine, m_OsdLastLine);
+                using (MemoryStream memStr = new MemoryStream(rawBitmapBytes))
+                {
+                    try
+                    {
+                        displayBitmap = (Bitmap)Bitmap.FromStream(memStr);
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.WriteLine(ex.GetFullStackTrace());
+                        displayBitmap = new Bitmap(m_Width, m_Height);
+                    }
+                }
+            }
+            else
+                displayBitmap = Pixelmap.ConstructBitmapFromBitmapPixels(displayBitmapBytes, Width, Height);
 
             Pixelmap rv = new Pixelmap(Width, Height, BitPix, pixels, displayBitmap, displayBitmapBytes);
             rv.SetMaxSignalValue(m_Aav16NormVal);

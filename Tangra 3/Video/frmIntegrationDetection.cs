@@ -7,37 +7,55 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using Tangra.Controller;
 using Tangra.Model.Image;
 using Tangra.Model.Numerical;
+using Tangra.VideoTools;
 
 namespace Tangra.Video
 {
 	public partial class frmIntegrationDetection : Form
 	{
 		private IImagePixelProvider m_ImageProvider;
+	    private VideoController m_VideoController;
 
 		private List<List<AverageCalculator>> m_AverageCalculatorsPerFrame = new List<List<AverageCalculator>>();
 
 		private int m_StartFrameId;
 
-        public frmIntegrationDetection(IImagePixelProvider imageProvider, int startFrameId)
+        public frmIntegrationDetection(IImagePixelProvider imagePixelProvider, int startFrameId)
+	    {
+            InitializeComponent();
+
+            m_ImageProvider = imagePixelProvider;
+            m_StartFrameId = startFrameId;
+
+            picFrameSpectrum.Image = new Bitmap(picFrameSpectrum.Width, picFrameSpectrum.Height);
+            picSigmas.Image = new Bitmap(picSigmas.Width, picSigmas.Height);
+
+            pnlResult.Visible = false;
+            pnlResult.SendToBack();
+	    }
+
+	    public frmIntegrationDetection(VideoController videoController, int startFrameId)
+            : this(videoController as IImagePixelProvider, startFrameId)
 		{
-			InitializeComponent();
-
-			m_ImageProvider = imageProvider;
-			m_StartFrameId = startFrameId;
-
-			picFrameSpectrum.Image = new Bitmap(picFrameSpectrum.Width, picFrameSpectrum.Height);
-			picSigmas.Image = new Bitmap(picSigmas.Width, picSigmas.Height);
-
-			pnlResult.Visible = false;
-			pnlResult.SendToBack();
+            btnCorrectInterlaced.Visible = videoController.FramePlayer.Video is ReInterlacingVideoStream;
+            m_VideoController = videoController;
 		}
+
+	    private void StartMeasurements()
+	    {
+            pnlResult.Visible = false;
+            pnlResult.SendToBack();
+
+            timer.Interval = 50;
+            timer.Enabled = true;	        
+	    }
 		
         private void frmIntegrationDetection_Shown(object sender, EventArgs e)
         {
-            timer.Interval = 50;
-            timer.Enabled = true;
+            StartMeasurements();
         }
 
 		private void timer_Tick(object sender, EventArgs e)
@@ -622,6 +640,15 @@ namespace Tangra.Video
             {
                 DialogResult = DialogResult.OK;
                 Close();                
+            }
+        }
+
+        private void btnCorrectInterlaced_Click(object sender, EventArgs e)
+        {
+            var frm = new frmCorrectInterlacedDefects(m_VideoController);
+            if (frm.ShowDialog(this) == DialogResult.OK)
+            {
+                StartMeasurements();
             }
         }
 	}

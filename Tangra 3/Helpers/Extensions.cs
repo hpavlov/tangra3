@@ -147,7 +147,7 @@ namespace Tangra.Helpers
             }
         }
 
-        public static T Median<T>(this List<T> list)
+        public static T Median<T>(this IList<T> list)
         {
             if (list.Count == 0) return default(T);
             if (list.Count == 1) return list[0];

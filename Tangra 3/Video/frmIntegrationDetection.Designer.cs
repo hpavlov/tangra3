@@ -30,9 +30,7 @@
 		{
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmIntegrationDetection));
-            this.picFrameSpectrum = new System.Windows.Forms.PictureBox();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
-            this.picSigmas = new System.Windows.Forms.PictureBox();
             this.timer = new System.Windows.Forms.Timer(this.components);
             this.pnlResult = new System.Windows.Forms.Panel();
             this.btnReject = new System.Windows.Forms.Button();
@@ -43,18 +41,13 @@
             this.label2 = new System.Windows.Forms.Label();
             this.btnAccept = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
-            ((System.ComponentModel.ISupportInitialize)(this.picFrameSpectrum)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.picSigmas)).BeginInit();
+            this.picSigmas = new System.Windows.Forms.PictureBox();
+            this.picFrameSpectrum = new System.Windows.Forms.PictureBox();
+            this.btnCorrectInterlaced = new System.Windows.Forms.Button();
             this.pnlResult.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.picSigmas)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picFrameSpectrum)).BeginInit();
             this.SuspendLayout();
-            // 
-            // picFrameSpectrum
-            // 
-            this.picFrameSpectrum.Location = new System.Drawing.Point(12, 108);
-            this.picFrameSpectrum.Name = "picFrameSpectrum";
-            this.picFrameSpectrum.Size = new System.Drawing.Size(477, 66);
-            this.picFrameSpectrum.TabIndex = 2;
-            this.picFrameSpectrum.TabStop = false;
             // 
             // progressBar1
             // 
@@ -64,15 +57,6 @@
             this.progressBar1.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
             this.progressBar1.TabIndex = 3;
             // 
-            // picSigmas
-            // 
-            this.picSigmas.Location = new System.Drawing.Point(11, 12);
-            this.picSigmas.Name = "picSigmas";
-            this.picSigmas.Size = new System.Drawing.Size(478, 56);
-            this.picSigmas.TabIndex = 4;
-            this.picSigmas.TabStop = false;
-            this.picSigmas.MouseDown += new System.Windows.Forms.MouseEventHandler(this.picSigmas_MouseDown);
-            // 
             // timer
             // 
             this.timer.Interval = 1000;
@@ -80,6 +64,7 @@
             // 
             // pnlResult
             // 
+            this.pnlResult.Controls.Add(this.btnCorrectInterlaced);
             this.pnlResult.Controls.Add(this.btnReject);
             this.pnlResult.Controls.Add(this.lblCertainty);
             this.pnlResult.Controls.Add(this.lblStartingAt);
@@ -170,6 +155,33 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "Detected Integration:";
             // 
+            // picSigmas
+            // 
+            this.picSigmas.Location = new System.Drawing.Point(11, 12);
+            this.picSigmas.Name = "picSigmas";
+            this.picSigmas.Size = new System.Drawing.Size(478, 56);
+            this.picSigmas.TabIndex = 4;
+            this.picSigmas.TabStop = false;
+            this.picSigmas.MouseDown += new System.Windows.Forms.MouseEventHandler(this.picSigmas_MouseDown);
+            // 
+            // picFrameSpectrum
+            // 
+            this.picFrameSpectrum.Location = new System.Drawing.Point(12, 108);
+            this.picFrameSpectrum.Name = "picFrameSpectrum";
+            this.picFrameSpectrum.Size = new System.Drawing.Size(477, 66);
+            this.picFrameSpectrum.TabIndex = 2;
+            this.picFrameSpectrum.TabStop = false;
+            // 
+            // btnCorrectInterlaced
+            // 
+            this.btnCorrectInterlaced.Location = new System.Drawing.Point(332, 5);
+            this.btnCorrectInterlaced.Name = "btnCorrectInterlaced";
+            this.btnCorrectInterlaced.Size = new System.Drawing.Size(156, 23);
+            this.btnCorrectInterlaced.TabIndex = 8;
+            this.btnCorrectInterlaced.Text = "Correct Interlaced Defects";
+            this.btnCorrectInterlaced.UseVisualStyleBackColor = true;
+            this.btnCorrectInterlaced.Click += new System.EventHandler(this.btnCorrectInterlaced_Click);
+            // 
             // frmIntegrationDetection
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -186,10 +198,10 @@
             this.Name = "frmIntegrationDetection";
             this.Text = "Detecting Video Integration ...";
             this.Shown += new System.EventHandler(this.frmIntegrationDetection_Shown);
-            ((System.ComponentModel.ISupportInitialize)(this.picFrameSpectrum)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.picSigmas)).EndInit();
             this.pnlResult.ResumeLayout(false);
             this.pnlResult.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.picSigmas)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picFrameSpectrum)).EndInit();
             this.ResumeLayout(false);
 
 		}
@@ -209,5 +221,6 @@
 		private System.Windows.Forms.Button btnAccept;
 		private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btnReject;
+        private System.Windows.Forms.Button btnCorrectInterlaced;
 	}
 }

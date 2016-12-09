@@ -479,43 +479,12 @@ namespace Tangra.Controller
 
                 IFITSStream fitsSteream = m_FramePlayer.Video as IFITSStream;
                 if (fitsSteream != null)
-                {
-                    try
-                    {
-                        m_MainForm.Cursor = Cursors.WaitCursor;
-                        m_MainForm.Update();
-                        
-                        int dynamicValueFrom = (int)fitsSteream.MinPixelValue;
+                    SetFITSDynamicRange(fitsSteream, frameStream);
 
-                        for (double coeff = 0.05; coeff < 2.5; coeff += 0.05)
-                        {
-                            int dynamicValueTo = (int)(coeff * fitsSteream.MaxPixelValue + 0.95 * fitsSteream.MinPixelValue);
+                var adv2Stream = m_FramePlayer.Video as AstroDigitalVideoStreamV2;
+                if (adv2Stream != null)
+                    SetADV2DynamicRange(adv2Stream, frameStream);
 
-                            SetDisplayIntensifyMode(DisplayIntensifyMode.Dynamic, dynamicValueFrom, dynamicValueTo, false);
-
-                            var pixMap = m_FramePlayer.GetFrame(frameStream.FirstFrame, false);
-
-                            BitmapFilter.ApplyDynamicRange(pixMap.DisplayBitmap, pixMap, m_DynamicFromValue, m_DynamicToValue, m_DisplayInvertedMode, m_DisplayHueIntensityMode);
-
-                            var dynPixMap = Pixelmap.ConstructFromBitmap(pixMap.DisplayBitmap, TangraConfig.ColourChannel.Red);
-                            int sq = Math.Min(64, pixMap.Height / 3);
-                            double averagePixel = dynPixMap.DisplayBitmapPixels.Skip(pixMap.Width * sq).Take(sq * sq).Average(x => x);
-                            if (averagePixel > 50 && averagePixel < 150)
-                                break;
-                        }
-
-                        SetDisplayIntensifyMode(DisplayIntensifyMode.Dynamic, m_DynamicFromValue, m_DynamicToValue);
-
-                        m_MainForm.tsmiOff.Checked = false;
-                        m_MainForm.tsmiLo.Checked = false;
-                        m_MainForm.tsmiHigh.Checked = false;
-                        m_MainForm.tsmiDynamic.Checked = true;
-                    }
-                    finally
-                    {
-                        m_MainForm.Cursor = Cursors.Default;
-                    }
-                }
 
 				m_VideoFileView.Update();
 
@@ -548,6 +517,56 @@ namespace Tangra.Controller
 
 			return false;
 		}
+
+	    private void SetADV2DynamicRange(AstroDigitalVideoStreamV2 adv2Steream, IFrameStream frameStream)
+	    {
+            SetDisplayIntensifyMode(DisplayIntensifyMode.Dynamic, null, null);
+
+            m_MainForm.tsmiOff.Checked = false;
+            m_MainForm.tsmiLo.Checked = false;
+            m_MainForm.tsmiHigh.Checked = false;
+            m_MainForm.tsmiDynamic.Checked = true;
+	    }
+
+	    private void SetFITSDynamicRange(IFITSStream fitsSteream, IFrameStream frameStream)
+	    {
+	        try
+	        {
+	            m_MainForm.Cursor = Cursors.WaitCursor;
+	            m_MainForm.Update();
+
+	            int dynamicValueFrom = (int) fitsSteream.MinPixelValue;
+
+	            for (double coeff = 0.05; coeff < 2.5; coeff += 0.05)
+	            {
+	                int dynamicValueTo = (int) (coeff*fitsSteream.MaxPixelValue + 0.95*fitsSteream.MinPixelValue);
+
+	                SetDisplayIntensifyMode(DisplayIntensifyMode.Dynamic, dynamicValueFrom, dynamicValueTo, false);
+
+	                var pixMap = m_FramePlayer.GetFrame(frameStream.FirstFrame, false);
+
+	                BitmapFilter.ApplyDynamicRange(pixMap.DisplayBitmap, pixMap, m_DynamicFromValue, m_DynamicToValue,
+	                    m_DisplayInvertedMode, m_DisplayHueIntensityMode);
+
+	                var dynPixMap = Pixelmap.ConstructFromBitmap(pixMap.DisplayBitmap, TangraConfig.ColourChannel.Red);
+	                int sq = Math.Min(64, pixMap.Height/3);
+	                double averagePixel = dynPixMap.DisplayBitmapPixels.Skip(pixMap.Width*sq).Take(sq*sq).Average(x => x);
+	                if (averagePixel > 50 && averagePixel < 150)
+	                    break;
+	            }
+
+	            SetDisplayIntensifyMode(DisplayIntensifyMode.Dynamic, m_DynamicFromValue, m_DynamicToValue);
+
+	            m_MainForm.tsmiOff.Checked = false;
+	            m_MainForm.tsmiLo.Checked = false;
+	            m_MainForm.tsmiHigh.Checked = false;
+	            m_MainForm.tsmiDynamic.Checked = true;
+	        }
+	        finally
+	        {
+	            m_MainForm.Cursor = Cursors.Default;
+	        }
+	    }
 
 	    public void LoadAvailableOcrEngines(ComboBox cbxOcrEngine)
 	    {

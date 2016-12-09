@@ -20,6 +20,7 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
         private object m_SyncRoot = new object();
 
         private bool m_DebugMode;
+        private bool m_Converting;
 
         public ConvertVideoToAavOperation()
         {
@@ -51,6 +52,11 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
             controlPanel.Controls.Add(m_ControlPanel);
             m_ControlPanel.Dock = DockStyle.Fill;
 
+            TangraContext.Current.CanPlayVideo = false;
+            m_VideoController.UpdateViews();
+
+            m_Converting = false;
+
             return true;
         }
 
@@ -62,7 +68,28 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
 
         public void NextFrame(int frameNo, Model.Video.MovementType movementType, bool isLastFrame, Model.Astro.AstroImage astroImage, int firstFrameInIntegrationPeriod, string fileName)
         {
-           // TODO:
+            if (m_Converting)
+            {
+                m_ConvertVideoToAavController.ProcessFrame(frameNo, astroImage);
+
+                if (isLastFrame)
+                    m_ConvertVideoToAavController.FinishedConversion();
+            }
+        }
+
+        public void StartConversion(string fileName, int topVtiOsdRow, int bottomVtiOsdRow, int firstIntegrationFrameNo, int integrationInterval, string cameraModel, string sensorInfo)
+        {
+            m_Converting = true;
+
+            m_ConvertVideoToAavController.StartConversion(fileName, topVtiOsdRow, bottomVtiOsdRow, firstIntegrationFrameNo, integrationInterval, cameraModel, sensorInfo);
+
+            m_VideoController.PlayVideo();
+        }
+
+        public void CancelConversion()
+        {
+            m_ConvertVideoToAavController.FinishedConversion();
+            m_VideoController.StopVideo();
         }
 
         public void ImageToolChanged(ImageTool newTool, ImageTool oldTool)
@@ -75,8 +102,12 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
             //TODO:
         }
 
+        internal int PreserveVTIFirstRow;
+        internal int PreserveVTILastRow;
+
         public void PostDraw(Graphics g)
         {
+            g.DrawRectangle(Pens.Lime, 0, PreserveVTIFirstRow, TangraContext.Current.FrameWidth - 3, PreserveVTILastRow - PreserveVTIFirstRow - 3);
         }
 
         public bool HasCustomZoomImage
