@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using Adv;
@@ -56,7 +58,7 @@ namespace Tangra.Video
         private int m_CountFrames;
 
         private int m_BitPix;
-        private uint m_Aav16NormVal;
+        private uint m_MaxPixelValue;
         private string m_Engine;
         private string m_VideoStandard;
         private double m_NativeFrameRate;
@@ -92,7 +94,7 @@ namespace Tangra.Video
             m_BitPix = m_AdvFile.DataBpp;
             m_Width = m_AdvFile.Width;
             m_Height = m_AdvFile.Height;
-            m_Aav16NormVal = (uint)m_AdvFile.MaxPixelValue;
+            m_MaxPixelValue = (uint)m_AdvFile.MaxPixelValue;
 
             m_FrameRate = 0;
 
@@ -212,9 +214,9 @@ namespace Tangra.Video
                 Array.Copy(pixels, unprocessedPixels, pixels.Length);
             }
 
-            TangraCore.PreProcessors.ApplyPreProcessingPixelsOnly(pixels, m_Width, m_Height, m_BitPix, m_Aav16NormVal,(float)(advFrameInfo.UtcExposureMilliseconds / 1000.0));
+            TangraCore.PreProcessors.ApplyPreProcessingPixelsOnly(pixels, m_Width, m_Height, m_BitPix, m_MaxPixelValue,(float)(advFrameInfo.UtcExposureMilliseconds / 1000.0));
 
-            TangraCore.GetBitmapPixels(Width, Height, pixels, rawBitmapBytes, displayBitmapBytes, true, (ushort)BitPix, 0);
+            TangraCore.GetBitmapPixels(Width, Height, pixels, rawBitmapBytes, displayBitmapBytes, true, (ushort)BitPix, m_MaxPixelValue);
 
             Bitmap displayBitmap = null;
 
@@ -238,7 +240,7 @@ namespace Tangra.Video
                 displayBitmap = Pixelmap.ConstructBitmapFromBitmapPixels(displayBitmapBytes, Width, Height);
 
             Pixelmap rv = new Pixelmap(Width, Height, BitPix, pixels, displayBitmap, displayBitmapBytes);
-            rv.SetMaxSignalValue(m_Aav16NormVal);
+            rv.SetMaxSignalValue(m_MaxPixelValue);
             rv.FrameState = GetCurrentFrameState(advFrameInfo);
             rv.UnprocessedPixels = pixels;
             return rv;
@@ -339,7 +341,7 @@ namespace Tangra.Video
 
         public uint GetAav16NormVal()
         {
-            return m_Aav16NormVal;
+            return m_MaxPixelValue;
         }
 
         public bool SupportsSoftwareIntegration
