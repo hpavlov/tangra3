@@ -97,6 +97,7 @@ namespace Tangra.Model.Context
         public int AstrometryOCRDroppedFrames = 0;
         public int AstrometryOCRDuplicatedFrames = 0;
         public int AstrometryOCRTimeErrors = 0;
+	    public int AAVConvertErrors = 0;
 
         public CrashReportInfo CrashReportInfo;
 
@@ -167,6 +168,7 @@ namespace Tangra.Model.Context
             AstrometryOCRDroppedFrames = 0;
             AstrometryOCRDuplicatedFrames = 0;
 		    AstrometryOCRTimeErrors = 0;
+		    AAVConvertErrors = 0;
 
 		    OperationInProgress = false;
 			CanProcessLightCurvePixels = false;

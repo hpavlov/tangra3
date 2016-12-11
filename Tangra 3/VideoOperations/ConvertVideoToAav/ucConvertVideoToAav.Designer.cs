@@ -38,16 +38,16 @@
             this.btnCancel = new System.Windows.Forms.Button();
             this.gbxVTIPosition = new System.Windows.Forms.GroupBox();
             this.btnConfirmPosition = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
             this.nudPreserveVTIBottomRow = new System.Windows.Forms.NumericUpDown();
+            this.label1 = new System.Windows.Forms.Label();
             this.nudPreserveVTITopRow = new System.Windows.Forms.NumericUpDown();
+            this.label2 = new System.Windows.Forms.Label();
             this.gbxIntegrationRate = new System.Windows.Forms.GroupBox();
-            this.nudStartingAtFrame = new System.Windows.Forms.NumericUpDown();
-            this.label4 = new System.Windows.Forms.Label();
             this.lblFrames = new System.Windows.Forms.Label();
             this.nudIntegratedFrames = new System.Windows.Forms.NumericUpDown();
             this.lblIntegration = new System.Windows.Forms.Label();
+            this.nudStartingAtFrame = new System.Windows.Forms.NumericUpDown();
+            this.label4 = new System.Windows.Forms.Label();
             this.pbar = new System.Windows.Forms.ProgressBar();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.cbxCameraModel = new System.Windows.Forms.ComboBox();
@@ -62,8 +62,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudPreserveVTIBottomRow)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudPreserveVTITopRow)).BeginInit();
             this.gbxIntegrationRate.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudStartingAtFrame)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudIntegratedFrames)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudStartingAtFrame)).BeginInit();
             this.gbxCameraInfo.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -84,6 +84,7 @@
             // 
             this.nudFirstFrame.Location = new System.Drawing.Point(48, 23);
             this.nudFirstFrame.Name = "nudFirstFrame";
+            this.nudFirstFrame.ReadOnly = true;
             this.nudFirstFrame.Size = new System.Drawing.Size(55, 20);
             this.nudFirstFrame.TabIndex = 22;
             // 
@@ -163,24 +164,6 @@
             this.btnConfirmPosition.Text = "Confirm Position";
             this.btnConfirmPosition.Click += new System.EventHandler(this.btnConfirmPosition_Click);
             // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(11, 23);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(33, 13);
-            this.label1.TabIndex = 24;
-            this.label1.Text = "From:";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(117, 23);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(23, 13);
-            this.label2.TabIndex = 25;
-            this.label2.Text = "To:";
-            // 
             // nudPreserveVTIBottomRow
             // 
             this.nudPreserveVTIBottomRow.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
@@ -199,6 +182,15 @@
             0,
             0});
             this.nudPreserveVTIBottomRow.ValueChanged += new System.EventHandler(this.nudPreserveVTITopRow_ValueChanged);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(11, 23);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(33, 13);
+            this.label1.TabIndex = 24;
+            this.label1.Text = "From:";
             // 
             // nudPreserveVTITopRow
             // 
@@ -219,6 +211,15 @@
             0});
             this.nudPreserveVTITopRow.ValueChanged += new System.EventHandler(this.nudPreserveVTITopRow_ValueChanged);
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(117, 23);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(23, 13);
+            this.label2.TabIndex = 25;
+            this.label2.Text = "To:";
+            // 
             // gbxIntegrationRate
             // 
             this.gbxIntegrationRate.Controls.Add(this.lblFrames);
@@ -233,24 +234,6 @@
             this.gbxIntegrationRate.TabIndex = 49;
             this.gbxIntegrationRate.TabStop = false;
             this.gbxIntegrationRate.Text = "Integration Rate";
-            // 
-            // nudStartingAtFrame
-            // 
-            this.nudStartingAtFrame.Location = new System.Drawing.Point(75, 46);
-            this.nudStartingAtFrame.Name = "nudStartingAtFrame";
-            this.nudStartingAtFrame.ReadOnly = true;
-            this.nudStartingAtFrame.Size = new System.Drawing.Size(55, 20);
-            this.nudStartingAtFrame.TabIndex = 47;
-            this.nudStartingAtFrame.ValueChanged += new System.EventHandler(this.nudStartingAtFrame_ValueChanged);
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(13, 48);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(59, 13);
-            this.label4.TabIndex = 48;
-            this.label4.Text = "Starting At:";
             // 
             // lblFrames
             // 
@@ -292,6 +275,24 @@
             this.lblIntegration.Size = new System.Drawing.Size(60, 13);
             this.lblIntegration.TabIndex = 49;
             this.lblIntegration.Text = "Integration:";
+            // 
+            // nudStartingAtFrame
+            // 
+            this.nudStartingAtFrame.Location = new System.Drawing.Point(75, 46);
+            this.nudStartingAtFrame.Name = "nudStartingAtFrame";
+            this.nudStartingAtFrame.ReadOnly = true;
+            this.nudStartingAtFrame.Size = new System.Drawing.Size(55, 20);
+            this.nudStartingAtFrame.TabIndex = 47;
+            this.nudStartingAtFrame.ValueChanged += new System.EventHandler(this.nudStartingAtFrame_ValueChanged);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(13, 48);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(59, 13);
+            this.label4.TabIndex = 48;
+            this.label4.Text = "Starting At:";
             // 
             // pbar
             // 
@@ -388,8 +389,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudPreserveVTITopRow)).EndInit();
             this.gbxIntegrationRate.ResumeLayout(false);
             this.gbxIntegrationRate.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudStartingAtFrame)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudIntegratedFrames)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudStartingAtFrame)).EndInit();
             this.gbxCameraInfo.ResumeLayout(false);
             this.gbxCameraInfo.PerformLayout();
             this.ResumeLayout(false);

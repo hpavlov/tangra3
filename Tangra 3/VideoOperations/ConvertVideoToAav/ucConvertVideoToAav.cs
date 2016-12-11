@@ -265,8 +265,9 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
             {
                 btnConvert.Enabled = true;
                 btnDetectIntegrationRate.Enabled = false;
+                nudFirstFrame.Enabled = false;
                 gbxIntegrationRate.Enabled = false;
-                gbxCameraInfo.Visible = true;                
+                gbxCameraInfo.Visible = true;
             }
             else if (m_State == AavConfigState.Converting)
             {
@@ -372,8 +373,13 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
             m_State = AavConfigState.FinishedConverting;
             UpdateControlState();
 
-            m_Operation.CancelConversion();
+            m_Operation.EndConversion();
         }
 
+        internal void EndConversion()
+        {
+            m_State = AavConfigState.FinishedConverting;
+            UpdateControlState();
+        }
     }
 }

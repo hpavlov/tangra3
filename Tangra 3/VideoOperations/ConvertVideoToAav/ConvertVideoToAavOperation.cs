@@ -73,7 +73,10 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
                 m_ConvertVideoToAavController.ProcessFrame(frameNo, astroImage);
 
                 if (isLastFrame)
+                {
                     m_ConvertVideoToAavController.FinishedConversion();
+                    m_ControlPanel.EndConversion();
+                }
             }
         }
 
@@ -83,13 +86,14 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
 
             m_ConvertVideoToAavController.StartConversion(fileName, topVtiOsdRow, bottomVtiOsdRow, firstIntegrationFrameNo, integrationInterval, cameraModel, sensorInfo);
 
-            m_VideoController.PlayVideo();
+            m_VideoController.PlayVideo(firstIntegrationFrameNo);
         }
 
-        public void CancelConversion()
+        public void EndConversion()
         {
             m_ConvertVideoToAavController.FinishedConversion();
             m_VideoController.StopVideo();
+            m_ControlPanel.EndConversion();
         }
 
         public void ImageToolChanged(ImageTool newTool, ImageTool oldTool)

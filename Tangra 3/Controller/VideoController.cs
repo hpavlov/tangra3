@@ -2579,6 +2579,18 @@ namespace Tangra.Controller
             }
         }
 
+        public void RegisterAAVConversionError()
+        {
+            TangraContext.Current.AAVConvertErrors++;
+            m_VideoFileView.Update();
+        }
+
+        public void ClearAAVConversionErrors()
+        {
+            TangraContext.Current.AAVConvertErrors = 0;
+            m_VideoFileView.Update();
+        }
+
 		public void ShowFileInformation()
 		{
 			if (m_FramePlayer.Video != null)

@@ -8,6 +8,7 @@ using Adv;
 using Tangra.Helpers;
 using Tangra.Model.Astro;
 using Tangra.Model.Context;
+using Tangra.Model.Image;
 using Tangra.Video.AstroDigitalVideo;
 
 namespace Tangra.Controller
@@ -46,6 +47,8 @@ namespace Tangra.Controller
 
         internal void StartConversion(string fileName, int topVtiOsdRow, int bottomVtiOsdRow, int firstIntegratedFrameId, int integrationInterval, string cameraModel, string sensorInfo)
         {
+            m_VideoController.ClearAAVConversionErrors();
+
             m_Width = m_VideoController.FramePlayer.Video.Width;
             m_Height = m_VideoController.FramePlayer.Video.Height;
 
@@ -94,7 +97,11 @@ namespace Tangra.Controller
             m_Recorder.FileMetaData.AddCalibrationStreamTag("OSD-FIRST-LINE", topVtiOsdRow.ToString());
             m_Recorder.FileMetaData.AddCalibrationStreamTag("OSD-LAST-LINE", bottomVtiOsdRow.ToString());
 
+            m_Recorder.StatusSectionConfig.RecordSystemErrors = true;
             m_Recorder.StatusSectionConfig.AddDefineTag("FRAME-TYPE", Adv2TagType.UTF8String);
+            m_Recorder.StatusSectionConfig.AddDefineTag("FRAMES-IN-INTERVAL", Adv2TagType.Int8);
+            m_Recorder.StatusSectionConfig.AddDefineTag("NOISE-SIGNATURES", Adv2TagType.UTF8String);
+            m_Recorder.StatusSectionConfig.AddDefineTag("ORIGINAL-FRAME-ID", Adv2TagType.Int32);
 
             m_Recorder.StartRecordingNewFile(m_FileName, 0, true);
             
@@ -104,18 +111,29 @@ namespace Tangra.Controller
                 m_VideoController.SetPictureBoxCursor(Cursors.WaitCursor);
                 m_VideoController.NotifyFileProgress(-1, 16);
 
+                Pixelmap frame;
+                ushort[] pixels;
+
                 for (int i = currFrame; i < Math.Min(currFrame + 16, m_VideoController.VideoLastFrame); i++)
                 {
-                    var frame = m_VideoController.GetFrame(i);
+                    frame = m_VideoController.GetFrame(i);
 
-                    ushort[] pixels = frame.Pixels.Select(x => (ushort)(integrationInterval * x)).ToArray();
+                    pixels = frame.Pixels.Select(x => (ushort)(integrationInterval * x)).ToArray();
                     m_Recorder.AddCalibrationFrame(pixels, true,
                         PreferredCompression.Lagarith16,
-                        new AdvRecorder.AdvStatusEntry() { AdditionalStatusTags = new[] { "VTI-OSD-CALIBRATION" } },
+                        new AdvRecorder.AdvStatusEntry() { AdditionalStatusTags = new[] { "VTI-OSD-CALIBRATION", (object)(byte)0, string.Empty, (object)i } },
                         Adv.AdvImageData.PixelDepth16Bit);
 
                     m_VideoController.NotifyFileProgress(i - currFrame, 16);
                 }
+
+                frame = m_VideoController.GetFrame(m_FirstIntegrationPeriodStartFrameId);
+
+                pixels = frame.Pixels.Select(x => (ushort)(integrationInterval * x)).ToArray();
+                m_Recorder.AddCalibrationFrame(pixels, true,
+                    PreferredCompression.Lagarith16,
+                    new AdvRecorder.AdvStatusEntry() { AdditionalStatusTags = new[] { "FIELD-CALIBRATION", (object)(byte)0, string.Empty, (object)m_FirstIntegrationPeriodStartFrameId } },
+                    Adv.AdvImageData.PixelDepth16Bit);
             }
             finally
             {
@@ -142,22 +160,88 @@ namespace Tangra.Controller
                     sigmaSum += Math.Abs(m_ThisPixels[x, y] - m_PrevPixels[x, y]) / 2.0;
                 }
 
+            if (frameNo == m_FirstIntegrationPeriodStartFrameId)
+                return false;
+
             m_SigmaDict[frameNo] = sigmaSum / 1024;
 
-            if (frameNo == m_FirstIntegrationPeriodStartFrameId)
-                return true;
-                        
-            // TODO: Check the sigma pattern to determine if this is a new integration period
-            // TODO: Cross-Check against m_NextExpectedIntegrationPeriodStartFrameId
 
-            if (frameNo >= m_NextExpectedIntegrationPeriodStartFrameId)
+            List<double> vals = m_SigmaDict.Values.Where(v => !double.IsNaN(v)).ToList();
+
+            vals.Sort();
+
+            double median = vals.Count % 2 == 1
+                ? vals[vals.Count / 2]
+                : (vals[vals.Count / 2] + vals[(vals.Count / 2) - 1]) / 2;
+
+            List<double> residuals = vals.Select(v => Math.Abs(median - v)).ToList();
+
+            double variance = residuals.Select(r => r * r).Sum();
+            if (residuals.Count > 1)
             {
-                while (frameNo >= m_NextExpectedIntegrationPeriodStartFrameId)
-                    m_NextExpectedIntegrationPeriodStartFrameId += m_IntegrationPeriod;
-
-                return true;
+                variance = Math.Sqrt(variance / (residuals.Count - 1));
             }
+            else
+                variance = double.NaN;
+
+            if (frameNo > m_FirstIntegrationPeriodStartFrameId + 2*m_IntegrationPeriod)
+            {
+                double residual = Math.Abs(median - m_SigmaDict[frameNo]);
+                if (residual > variance)
+                {
+                    if (frameNo < m_NextExpectedIntegrationPeriodStartFrameId)
+                    {
+                        // New early integration period. This can be right if:
+                        // 1) The old expected intergation frame has a smaller residual than this one
+                        // 2) The next new frame under the new conditions passes the condition for a new integration frame
+                        var nextExpectedResidual = GetFutureFrameNoisePatternResidual(m_NextExpectedIntegrationPeriodStartFrameId, median);
+                        var nextNewExpectedResidual = GetFutureFrameNoisePatternResidual(frameNo + m_IntegrationPeriod, median);
+
+                        if (nextExpectedResidual < residual && nextNewExpectedResidual > variance)
+                        {
+                            m_NextExpectedIntegrationPeriodStartFrameId = frameNo + m_IntegrationPeriod;
+                            return true;
+                        }
+                    }
+                    else if (frameNo == m_NextExpectedIntegrationPeriodStartFrameId)
+                    {
+                        m_NextExpectedIntegrationPeriodStartFrameId = frameNo + m_IntegrationPeriod;
+                        return true;
+                    }
+                }
+            }
+            else
+            {
+                // NOTE: First 2 integration periods should have been identified correctly from the integration detection
+                //       so for them only we don't apply the noise pattern check to allow it to get some more datapoints
+                if (frameNo >= m_NextExpectedIntegrationPeriodStartFrameId)
+                {
+                    while (frameNo >= m_NextExpectedIntegrationPeriodStartFrameId)
+                        m_NextExpectedIntegrationPeriodStartFrameId += m_IntegrationPeriod;
+
+                    return true;
+                }
+            }
+
             return false;
+        }
+
+        private double GetFutureFrameNoisePatternResidual(int futureFrameNo, double median)
+        {
+            var prevImage = m_VideoController.GetFrame(futureFrameNo - 1);
+            var thisImage = m_VideoController.GetFrame(futureFrameNo);
+
+            double sigmaSum = 0;
+
+            for (int x = 0; x < 32; x++)
+                for (int y = 0; y < 32; y++)
+                {
+                    sigmaSum += Math.Abs((int)thisImage.Pixels[(x + m_TestRect.Left) + (y + m_TestRect.Top) * m_Width] - (int)prevImage.Pixels[(x + m_TestRect.Left) + (y + m_TestRect.Top) * m_Width]) / 2.0;
+                }
+
+            sigmaSum /= 1024;
+
+            return Math.Abs(median - sigmaSum);
         }
 
         private int m_FramesSoFar;
@@ -166,9 +250,31 @@ namespace Tangra.Controller
             bool isNewIntegrationPeroiod = IsNewIntegrationPeriod(frameNo, image);
             if (isNewIntegrationPeroiod)
             {
+                string errors = null;
+                if (m_FramesSoFar != m_IntegrationPeriod)
+                {
+                    m_VideoController.RegisterAAVConversionError();
+
+                    // Normalize the value during  the conversion
+                    for (int i = 0; i < m_CurrAavFramePixels.Length; i++)
+                        m_CurrAavFramePixels[i] = (ushort)Math.Round(m_CurrAavFramePixels[i] * 1.0 * m_IntegrationPeriod / m_FramesSoFar);
+
+                    errors = string.Format("{0} frames detected in the current interval", m_FramesSoFar);
+                }
+
+                string noiseSignatures = string.Empty;
+                if (m_SigmaDict.Count >= m_IntegrationPeriod)
+                {
+                    for (int i = frameNo - m_IntegrationPeriod + 1; i <= frameNo; i++)
+                    {
+                        if (m_SigmaDict.ContainsKey(i))
+                            noiseSignatures += string.Format("{0}={1:0.00};", i, m_SigmaDict[i]);
+                    }
+                }
+
                 m_Recorder.AddVideoFrame(m_CurrAavFramePixels, true,
                     PreferredCompression.Lagarith16,
-                    new AdvRecorder.AdvStatusEntry() { AdditionalStatusTags = new[] { "DATA" } },
+                    new AdvRecorder.AdvStatusEntry() { SystemErrors = errors, AdditionalStatusTags = new[] { "DATA", (object)(byte)m_FramesSoFar, noiseSignatures, (object)(int)0 } },
                     Adv.AdvImageData.PixelDepth16Bit);
 
                 for (int i = 0; i < m_CurrAavFramePixels.Length; i++) 
@@ -177,6 +283,8 @@ namespace Tangra.Controller
                 m_FramesSoFar = 0;
             }
 
+            bool copyAllOsdLines = isNewIntegrationPeroiod || frameNo == m_FirstIntegrationPeriodStartFrameId;
+
             for (int y = 0; y < m_Height; y++)
             {
                 bool scale = false;
@@ -184,8 +292,9 @@ namespace Tangra.Controller
                 {
                     // NOTE: For first new frame - copy all lines
                     //       For any other frame - copy even lines
-                    if (!isNewIntegrationPeroiod && (y % 2) == 1) 
+                    if (!copyAllOsdLines && (y % 2) == 1) 
                         continue;
+
                     scale = true;
                 }
 

@@ -231,7 +231,8 @@ namespace Tangra.View
                 TangraContext.Current.AstrometryOCRFailedRead > 0 ||
                 TangraContext.Current.AstrometryOCRDroppedFrames > 0 ||
                 TangraContext.Current.AstrometryOCRDuplicatedFrames > 0 ||
-                TangraContext.Current.AstrometryOCRTimeErrors > 0;
+                TangraContext.Current.AstrometryOCRTimeErrors > 0 ||
+                TangraContext.Current.AAVConvertErrors > 0;
 
 
             m_MainForm.tslblRecDbg.Visible = recDbgVisible;
@@ -243,6 +244,11 @@ namespace Tangra.View
                     dbgText = string.Format("TimeStamp Errors. {0} Unread.", TangraContext.Current.AstrometryOCRFailedRead);
 		            m_MainForm.tslblRecDbg.ForeColor = Color.Red;
 		        }
+                else if (TangraContext.Current.AAVConvertErrors > 0)
+                {
+                    dbgText = string.Format(" {0} Bad AAV Intervals.", TangraContext.Current.AAVConvertErrors);
+                    m_MainForm.tslblRecDbg.ForeColor = Color.Red;
+                }
                 else
                 {
                     dbgText = "TimeStamp Warnings. ";
