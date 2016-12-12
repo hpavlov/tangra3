@@ -176,6 +176,8 @@ namespace Tangra.PInvoke
 
 		private static Font s_ErrorFont = new Font(FontFamily.GenericMonospace, 10, FontStyle.Regular);
 
+        private static object s_SyncRoot = new object();
+        
         public static void GetFrame(int frameNo, out uint[] pixels, out uint[] originalPixels, out Bitmap videoFrame, out byte[] bitmapBytes)
         {
             originalPixels = null;
@@ -191,22 +193,25 @@ namespace Tangra.PInvoke
 				int rv = -1;
                 try
                 {
-                    rv = TangraVideoGetFrame(frameNo, pixels, bitmapPixels, bitmapBytes);
+                    lock (s_SyncRoot)
+                    {
+                        rv = TangraVideoGetFrame(frameNo, pixels, bitmapPixels, bitmapBytes);
 
-					if (rv == 0)
-					{
-                        byte[] rawBitmapBytes = new byte[(width * height * 3) + 40 + 14 + 1];
+                        if (rv == 0)
+                        {
+                            byte[] rawBitmapBytes = new byte[(width * height * 3) + 40 + 14 + 1];
 
-                        Array.Copy(pixels, originalPixels, pixels.Length);
+                            Array.Copy(pixels, originalPixels, pixels.Length);
 
-                        TangraCore.PreProcessors.ApplyPreProcessingPixelsOnly(pixels, width, height, 8, 0 /* No normal value for FITS files */, 0 /* No exposure support for 8 bit darks. They must be same exposure */);
+                            TangraCore.PreProcessors.ApplyPreProcessingPixelsOnly(pixels, width, height, 8, 0 /* No normal value for FITS files */, 0 /* No exposure support for 8 bit darks. They must be same exposure */);
 
-						TangraCore.GetBitmapPixels(width, height, pixels, rawBitmapBytes, bitmapBytes, true, 8, 0);
+                            TangraCore.GetBitmapPixels(width, height, pixels, rawBitmapBytes, bitmapBytes, true, 8, 0);
 
-						videoFrame = Pixelmap.ConstructBitmapFromBitmapPixels(bitmapBytes, width, height);
-					}
-					else
-						throw new InvalidOperationException("The core returned an error when trying to get a frame. Error code: " + rv.ToString());
+                            videoFrame = Pixelmap.ConstructBitmapFromBitmapPixels(bitmapBytes, width, height);
+                        }
+                        else
+                            throw new InvalidOperationException("The core returned an error when trying to get a frame. Error code: " + rv.ToString());
+                    }
                 }
                 catch (Exception ex)
                 {
