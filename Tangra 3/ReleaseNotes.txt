@@ -7,6 +7,7 @@ v3.6.2 (UNRELEASED)
 - Made it possible to export astrometry in all measured frames to CSV.
 - Renamed 'Export Video to FITS' to 'Convert Video to FITS'
 - Implemented 'Convert Video to AAV' operation which detects the integration intervals and produces an AAV file from an AVI recorded with integrating camera.
+- Tangra can now work with 32-bit FITS files with pixel values larger than 65535. The pixels will be converted to 16-bit for use withint Tangra.
 
 v3.6.1 (2016-11-13)
 -------------------

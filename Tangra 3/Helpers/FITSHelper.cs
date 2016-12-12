@@ -228,7 +228,7 @@ namespace Tangra.Helpers
 
             maxPixelValue = 0;
             minPixelValue = uint.MaxValue;
-            uint mask = (uint)(((uint)1 << pixBpp) - 1);
+            uint mask = (uint)(((uint)1 << pixBpp) - 1);            
             if (pixelDataType == typeof (float) || pixelDataType == typeof (double))
             {
                 mask = 0;
@@ -253,8 +253,23 @@ namespace Tangra.Helpers
 				bpp = 12;
             else if (maxPixelValue < 16384)
 				bpp = 14;
-			else
-				bpp = pixBpp;
+            else if (maxPixelValue < 65535)
+                bpp = 16;
+            else
+            {
+                int shift = Math.Max(0, (int)Math.Ceiling(pixBpp / 16.0) - 1);
+
+                for (int y = 0; y < height; y++)
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        pixelsFlat[x + y * width] = pixelsFlat[x + y * width] >> shift;
+                    }
+                }
+
+                bpp = 16;
+            }
+				
 		}
 
         private static float[,] LoadFloatImageData(Array dataArray, bool zeroOutNegativePixels, int height, int width, float bzero, out float medianValue, out Type dataType, out bool hasNegPix)
