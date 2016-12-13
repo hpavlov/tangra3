@@ -8,6 +8,9 @@ v3.6.2 (UNRELEASED)
 - Renamed 'Export Video to FITS' to 'Convert Video to FITS'
 - Implemented 'Convert Video to AAV' operation which detects the integration intervals and produces an AAV file from an AVI recorded with integrating camera.
 - Tangra can now work with 32-bit FITS files with pixel values larger than 65535. The pixels will be converted to 16-bit for use withint Tangra.
+- Updated the Astrometric calibration to work with star fields that are near the pole.
+- Added 'Video Integration Detection' as an action under Tools.
+- Upgraded AdvLib (used for ADV and AAV videos) to version 2.0f
 
 v3.6.1 (2016-11-13)
 -------------------
