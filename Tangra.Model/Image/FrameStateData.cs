@@ -24,6 +24,7 @@ namespace Tangra.Model.Image
 		public string GPSFixStatus;
 		public int? NumberIntegratedFrames;
         public int? NumberStackedFrames;
+        public bool IsVtiOsdCalibrationFrame;
 
 		public Dictionary<string, object> AdditionalProperties;
 

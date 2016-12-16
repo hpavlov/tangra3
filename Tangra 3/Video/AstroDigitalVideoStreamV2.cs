@@ -127,10 +127,13 @@ namespace Tangra.Video
                 if (double.TryParse(GetFileTag("EFFECTIVE-FRAME-RATE"), out m_EffectiveFrameRate) && m_NativeFrameRate != 0)
                 {
                     m_IntegratedAAVFrames = (int)Math.Round(m_NativeFrameRate / m_EffectiveFrameRate);
+                    m_FrameRate = m_EffectiveFrameRate; // This is important for OCR-ing as the frame rate is used to derive the frame exposure
                 }
 
                 int.TryParse(GetFileTag("FRAME-STACKING-RATE"), out m_StackingRate);
-                if (m_StackingRate == 1) m_StackingRate = 0; // Video stacked at x1 is a non-stacked video                
+                if (m_StackingRate == 1) m_StackingRate = 0; // Video stacked at x1 is a non-stacked video  
+
+                m_Engine = string.Format("AAV{0}", aavVersion);
             }
 
             this.geoLocation = new GeoLocationInfo()
@@ -193,7 +196,17 @@ namespace Tangra.Video
             get { return (1000 / m_FrameRate); }
         }
 
+        public int IntegratedAAVFrames
+        {
+            get { return m_IntegratedAAVFrames; }
+        }
+
         public Pixelmap GetPixelmap(int index)
+        {
+            return GetPixelmap(index, 0);
+        }
+
+        public Pixelmap GetPixelmap(int index, int streamId)
         {
             if (m_AdvFile.MainSteamInfo.FrameCount == 0) 
                 return null;
@@ -206,7 +219,12 @@ namespace Tangra.Video
             Adv.AdvFrameInfo advFrameInfo;
             lock (m_SyncLock)
             {
-                pixels = m_AdvFile.GetMainFramePixels((uint)index, out advFrameInfo);
+                if (streamId == 0)
+                    pixels = m_AdvFile.GetMainFramePixels((uint)index, out advFrameInfo);
+                else if (streamId == 1)
+                    pixels = m_AdvFile.GetCalibrationFramePixels((uint)index, out advFrameInfo);
+                else
+                    throw new ArgumentOutOfRangeException("streamId");
 
                 if (unprocessedPixels.Length != pixels.Length) 
                     throw new ApplicationException("ADV Buffer Error");
@@ -288,6 +306,8 @@ namespace Tangra.Video
 
                 if (frameInfo.HasErrorMessage)
                     rv.Messages = Convert.ToString(frameInfo.Status["Error"]);
+
+                rv.IsVtiOsdCalibrationFrame = Convert.ToString(frameInfo.Status["FRAME-TYPE"]) == "VTI-OSD-CALIBRATION";
 
                 return rv;
             }

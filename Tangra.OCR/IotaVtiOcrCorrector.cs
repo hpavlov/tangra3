@@ -37,7 +37,7 @@ namespace Tangra.OCR
 			m_VideoFormat = videoFormat.Value;
 		}
 
-        public bool TryToCorrect(int frameNo, int frameStep, IotaVtiTimeStamp oddFieldOSD, IotaVtiTimeStamp evenFieldOSD, bool evenBeforeOdd, ref DateTime oddFieldTimestamp, ref DateTime evenFieldTimestamp, out string correctionDebugInfo)
+        public bool TryToCorrect(int frameNo, int frameStep, int? aavIntegratedFields, IotaVtiTimeStamp oddFieldOSD, IotaVtiTimeStamp evenFieldOSD, bool evenBeforeOdd, ref DateTime oddFieldTimestamp, ref DateTime evenFieldTimestamp, out string correctionDebugInfo)
 		{
             if (m_PrevFrameNo == -1 || m_PrevOddTicks == -1 || m_PrevEvenTicks == -1)
             {
@@ -65,7 +65,7 @@ namespace Tangra.OCR
 				
 				if (!IsFieldDurationOkay(fieldDuration))
 				{
-                    if (!TryCorrectTimestamp(m_PrevEvenTicks, oddFieldTimestamp, oddFieldOSD, frameStep))
+                    if (!TryCorrectTimestamp(m_PrevEvenTicks, oddFieldTimestamp, oddFieldOSD, frameStep, null))
 					{
 						Trace.WriteLine(correctionDebugInfo);
 						Trace.WriteLine("IOTA-VTI Correction Failed: Cannot correct field duration PrevEven -> CurrOdd.");
@@ -76,10 +76,11 @@ namespace Tangra.OCR
 				}
 
                 fieldDuration = Math.Abs(new TimeSpan(oddTimestampToCheck.Ticks - evenFieldTimestamp.Ticks).TotalMilliseconds);
+                if (aavIntegratedFields != null) fieldDuration = fieldDuration / (aavIntegratedFields.Value - 1);
 
 				if (!IsFieldDurationOkay(fieldDuration))
 				{
-                    if (!TryCorrectTimestamp(oddFieldTimestamp.Ticks, evenFieldTimestamp, evenFieldOSD, 1))
+                    if (!TryCorrectTimestamp(oddFieldTimestamp.Ticks, evenFieldTimestamp, evenFieldOSD, 1, aavIntegratedFields))
 				    {
                         Trace.WriteLine(correctionDebugInfo);
                         Trace.WriteLine("IOTA-VTI Correction Failed: Cannot correct field duration CurrOdd -> CurrEven.");
@@ -95,7 +96,7 @@ namespace Tangra.OCR
 
 				if (!IsFieldDurationOkay(fieldDuration))
 				{
-                    if (!TryCorrectTimestamp(m_PrevOddTicks, evenFieldTimestamp, evenFieldOSD, frameStep))
+                    if (!TryCorrectTimestamp(m_PrevOddTicks, evenFieldTimestamp, evenFieldOSD, frameStep, null))
 					{
 						Trace.WriteLine(correctionDebugInfo);
 						Trace.WriteLine("IOTA-VTI Correction Failed: Cannot correct field duration PrevOdd -> CurrEven.");
@@ -106,10 +107,11 @@ namespace Tangra.OCR
 				}
 
                 fieldDuration = Math.Abs(new TimeSpan(evenTimestampToCheck.Ticks - oddFieldTimestamp.Ticks).TotalMilliseconds);
+                if (aavIntegratedFields != null) fieldDuration = fieldDuration / (aavIntegratedFields.Value - 1);
 
 				if (!IsFieldDurationOkay(fieldDuration))
 				{
-                    if (!TryCorrectTimestamp(evenFieldTimestamp.Ticks, oddFieldTimestamp, oddFieldOSD, 1))
+                    if (!TryCorrectTimestamp(evenFieldTimestamp.Ticks, oddFieldTimestamp, oddFieldOSD, 1, aavIntegratedFields))
 				    {
                         Trace.WriteLine(correctionDebugInfo);
                         Trace.WriteLine("IOTA-VTI Correction Failed: Cannot correct field duration CurrEven -> CurrOdd.");
@@ -149,12 +151,13 @@ namespace Tangra.OCR
 			return true;
 		}
 
-        private bool TryCorrectTimestamp(long prevFieldTimestamp, DateTime fieldToCorrectTimestamp, IotaVtiTimeStamp fieldToCorrect, int frameStep)
+        private bool TryCorrectTimestamp(long prevFieldTimestamp, DateTime fieldToCorrectTimestamp, IotaVtiTimeStamp fieldToCorrect, int frameStep, int? aavIntegratedFields)
 		{
             double stepCorrection = frameStep > 1 ? ((20000 * (frameStep - 1) * (m_VideoFormat == VideoFormat.PAL ? IotaVtiOcrProcessor.FIELD_DURATION_PAL : IotaVtiOcrProcessor.FIELD_DURATION_NTSC))) : 0;
             double fieldDistance = (10000 * (m_VideoFormat == VideoFormat.PAL ? IotaVtiOcrProcessor.FIELD_DURATION_PAL : IotaVtiOcrProcessor.FIELD_DURATION_NTSC));
-			long expectedTimestamp = 
-				prevFieldTimestamp + (long)Math.Round(stepCorrection + fieldDistance);
+            double aavCorrection = aavIntegratedFields.HasValue ? (10000 * (aavIntegratedFields.Value - 2) * (m_VideoFormat == VideoFormat.PAL ? IotaVtiOcrProcessor.FIELD_DURATION_PAL : IotaVtiOcrProcessor.FIELD_DURATION_NTSC)) : 0;
+			long expectedTimestamp =
+                prevFieldTimestamp + (long)Math.Round(stepCorrection + fieldDistance + aavCorrection);
 
 			// NOTE: We ignore the last digit from the milliseconds when comparing this timestamps. While this allows for incorectly read 10th of milliseconds to be passed
 			//       unactioned, it doesn't create any timing or measurement issues

@@ -606,6 +606,7 @@ namespace Tangra.Controller
                     data.OSDFrame = LightCurveReductionContext.Instance.OSDFrame;
                     data.VideoFrameRate = (float)VideoFrameRate;
                     data.ForceErrorReport = forceSaveErrorReport;
+                    data.IntegratedAAVFrames = m_FramePlayer.IsAstroAnalogueVideoV2 ? ((AstroDigitalVideoStreamV2)m_FramePlayer.Video).IntegratedAAVFrames : 0;
 
                     m_TimestampOCR.Initialize(data, this,
 #if WIN32
@@ -624,10 +625,10 @@ namespace Tangra.Controller
 
                         int firstCalibrationFrame = measuringBackwards
                             ? Math.Min(CurrentFrameIndex + 30, VideoLastFrame)
-                            : CurrentFrameIndex;
+                            : (m_FramePlayer.IsAstroAnalogueVideoV2 ? 0 : CurrentFrameIndex);
 
-                        Pixelmap frame = GetFrame(firstCalibrationFrame);
-                        m_TimestampOCR.ProcessCalibrationFrame(CurrentFrameIndex, frame.Pixels);
+                        var pixels = GetOsdCalibrationFrame(firstCalibrationFrame);
+                        m_TimestampOCR.ProcessCalibrationFrame(CurrentFrameIndex, pixels);
 
                         bool isCalibrated = true;
 
@@ -643,8 +644,8 @@ namespace Tangra.Controller
                                     if (m_TimestampOCR == null)
                                         return false;
 
-                                    frame = GetFrame(i);
-                                    isCalibrated = m_TimestampOCR.ProcessCalibrationFrame(i, frame.Pixels);
+                                    pixels = GetOsdCalibrationFrame(i);
+                                    isCalibrated = m_TimestampOCR.ProcessCalibrationFrame(i, pixels);
 
                                     if (m_TimestampOCR.InitiazliationError != null)
                                     {
@@ -722,6 +723,44 @@ namespace Tangra.Controller
             }
         }
 
+	    private int m_vtiOsdAdjustment = 0;
+	    private uint[] GetOsdCalibrationFrame(int frameId)
+	    {
+	        if (m_FramePlayer.IsAstroAnalogueVideoV2)
+	        {
+	            Pixelmap pixelMap;
+	            do
+	            {
+                    pixelMap = ((AstroDigitalVideoStreamV2)m_FramePlayer.Video).GetPixelmap(frameId + m_vtiOsdAdjustment, 1);
+	                if (pixelMap != null)
+	                {
+	                    if (!pixelMap.FrameState.IsVtiOsdCalibrationFrame)
+	                    {
+	                        m_vtiOsdAdjustment++;
+	                    }
+	                    else
+	                    {
+	                        uint[] rv = pixelMap.Pixels;
+	                        if (pixelMap.MaxSignalValue > 0)
+	                        {
+	                            for (int i = 0; i < rv.Length; i++)
+	                            {
+	                                rv[i] = (uint) Math.Round(rv[i]*255.0/pixelMap.MaxSignalValue);
+	                            }	                
+	                        }
+	                        return rv;  	                    
+	                    }
+	                }
+
+                } 
+                while (pixelMap != null);
+
+	            return null;
+	        }
+            else
+                return GetFrame(frameId).Pixels;
+	    }
+
 	    public void SubmitOCRErrorsIfAny()
 	    {
             if (TangraContext.Current.OcrErrors > 8)
@@ -769,7 +808,7 @@ namespace Tangra.Controller
 
             DateTime ocredTimeStamp = DateTime.MinValue;
 
-            var osdPixels = m_AstroImage.GetPixelmapPixels();
+            var osdPixels = m_AstroImage.GetOcrPixels();
 
             if (!m_TimestampOCR.ExtractTime(m_CurrentFrameId, m_FramePlayer.FrameStep, osdPixels, out ocredTimeStamp))
             {
@@ -1166,6 +1205,7 @@ namespace Tangra.Controller
 					IsPlainAviVideo || 
 					IsAstroAnalogueVideoWithNtpTimestampsInNtpDebugMode ||
 					(m_FramePlayer.IsAstroAnalogueVideo && Math.Abs(m_FramePlayer.AstroAnalogueVideoIntegratedAAVFrames) == 1) ||
+                    m_FramePlayer.IsAstroAnalogueVideoV2 ||
 					m_FramePlayer.Video.Engine == BMPFileSequenceStream.ENGINE;
 			}
 		}

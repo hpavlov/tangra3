@@ -87,7 +87,8 @@ namespace Tangra.Model.Video
 		bool IsRunning { get; }
 		bool IsAstroDigitalVideo { get; }
 		bool IsAstroAnalogueVideo { get; }
-        bool IsAviVideo { get; }
+	    bool IsAstroAnalogueVideoV2 { get; }
+	    bool IsAviVideo { get; }
         bool AstroAnalogueVideoHasOcrData { get; }
 		bool AstroAnalogueVideoHasNtpData { get; }
 		int AstroAnalogueVideoNormaliseNtpDataIfNeeded(Action<int> progressCallback, out float oneSigmaError);

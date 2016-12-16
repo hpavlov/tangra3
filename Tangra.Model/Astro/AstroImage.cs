@@ -90,6 +90,21 @@ namespace Tangra.Model.Astro
 			return m_Pixelmap.Pixels;
 		}
 
+        public uint[] GetOcrPixels()
+        {
+            if (m_Pixelmap.MaxSignalValue != 0)
+            {
+                uint[] pixels = m_Pixelmap.Pixels;
+                for (int i = 0; i < pixels.Length; i++)
+                {
+                    pixels[i] = (uint)Math.Round(pixels[i] * 255.0 / m_Pixelmap.MaxSignalValue);
+                }
+                return pixels;
+            }
+            else
+                return m_Pixelmap.Pixels;
+        }
+
         private uint m_MedianNoise = UInt32.MaxValue;
         public uint MedianNoise
         {

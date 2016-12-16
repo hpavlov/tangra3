@@ -20,6 +20,7 @@ namespace Tangra.OCR
         public float VideoFrameRate;
         public string SourceInfo;
 	    public bool ForceErrorReport;
+        public int IntegratedAAVFrames;
     }
 
     public interface ITimestampOcr

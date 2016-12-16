@@ -263,9 +263,6 @@ namespace Tangra.VideoOperations.LightCurves
 
             if (m_Refining || m_Measuring)
             {
-                if (m_VideoController.HasTimestampOCR() && !m_Refining)
-                    m_OCRedTimeStamp = m_VideoController.OCRTimestamp();				
-
                 if (m_VideoController.IsAstroAnalogueVideo && frameNo == 0)
                 {
                     // Do not attempt refining on the first AAV frame as it has unique dynamic range and the refining is not going to work at all.
@@ -1709,6 +1706,7 @@ namespace Tangra.VideoOperations.LightCurves
 			else if (m_VideoController.HasTimestampOCR())
 			{
 				int frameDuration = (int)Math.Round(1000.0/m_VideoController.VideoFrameRate /*MillisecondsPerFrame*/);
+                m_OCRedTimeStamp = m_VideoController.OCRTimestamp();
 				var frameTime = new LCFrameTiming(m_OCRedTimeStamp, frameDuration);
 
                 if (m_VideoController.IsAstroAnalogueVideoWithNtpTimestampsInNtpDebugMode)

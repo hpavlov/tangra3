@@ -289,6 +289,7 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
         private void btnConfirmPosition_Click(object sender, EventArgs e)
         {
             m_State = AavConfigState.EnteringIntegrationRate;
+            nudFirstFrame.SetNUDValue(m_VideoController.CurrentFrameIndex);
             UpdateControlState();
         }
 
