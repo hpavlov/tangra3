@@ -1,7 +1,7 @@
 ﻿Tangra3 Release Notes
 ---------------------
 
-v3.6.2 (UNRELEASED)
+v3.6.2 (2016-12-17)
 -------------------
 - Made it possible to export additioanl parameters to CSV from a light curve, inclulding the X and Y coordinates, FWHM and PSF height of the measured objects. 
 - Made it possible to export astrometry in all measured frames to CSV.
