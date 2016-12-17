@@ -244,21 +244,21 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
             rb3.Checked = false;
             rb4.Checked = false;
 
-            if (m_Intensities.Length > 0 && !double.IsNaN(referenceMags[0]))
+            if (m_Intensities.Length > 0 && !double.IsNaN(referenceMags[0]) && !double.IsInfinity(referenceMags[0]))
             {
-                nudMag1.Value = (decimal)calculatedMags[0];
+                nudMag1.Value = Convert.ToDecimal(calculatedMags[0]);
             }
-            if (m_Intensities.Length > 1 && !double.IsNaN(referenceMags[1]))
+            if (m_Intensities.Length > 1 && !double.IsNaN(referenceMags[1]) && !double.IsInfinity(referenceMags[1]))
             {
-                nudMag2.Value = (decimal)calculatedMags[1];
+                nudMag2.Value = Convert.ToDecimal(calculatedMags[1]);
             }
-            if (m_Intensities.Length > 2 && !double.IsNaN(referenceMags[2]))
+            if (m_Intensities.Length > 2 && !double.IsNaN(referenceMags[2]) && !double.IsInfinity(referenceMags[2]))
             {
-                nudMag3.Value = (decimal)calculatedMags[2];
+                nudMag3.Value = Convert.ToDecimal(calculatedMags[2]);
             }
-            if (m_Intensities.Length > 3 && !double.IsNaN(referenceMags[3]))
+            if (m_Intensities.Length > 3 && !double.IsNaN(referenceMags[3]) && !double.IsInfinity(referenceMags[3]))
             {
-                nudMag4.Value = (decimal)calculatedMags[3];
+                nudMag4.Value = Convert.ToDecimal(calculatedMags[3]);
             }
 
             if (m_OccultedStarIndex == 0 && m_Intensities.Length > 0)
