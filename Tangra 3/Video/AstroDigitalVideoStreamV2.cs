@@ -336,7 +336,7 @@ namespace Tangra.Video
                 if (frameInfo.HasErrorMessage)
                     rv.Messages = Convert.ToString(frameInfo.Status["Error"]);
 
-                rv.IsVtiOsdCalibrationFrame = Convert.ToString(frameInfo.Status["FRAME-TYPE"]) == "VTI-OSD-CALIBRATION";
+                rv.IsVtiOsdCalibrationFrame = frameInfo.Status.ContainsKey("FRAME-TYPE") && Convert.ToString(frameInfo.Status["FRAME-TYPE"]) == "VTI-OSD-CALIBRATION";
 
                 return rv;
             }
