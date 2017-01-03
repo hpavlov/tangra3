@@ -146,7 +146,7 @@ namespace Tangra.ImageTools
 
 			if (e.Pixel != null)
 			{
-				if ((m_AstrometricState.MeasuringState == AstrometryInFramesState.Ready || m_AstrometricState.MeasuringState == AstrometryInFramesState.FitFailed)
+                if ((m_AstrometricState.MeasuringState == AstrometryInFramesState.Ready || m_AstrometricState.MatchResult != PerformMatchResult.FitSucceessfull)
 					&& m_AstrometricState.ManualStarIdentificationMode 
 					&& AstrometryContext.Current.FieldSolveContext.CatalogueStars != null 
 					&& AstrometryContext.Current.FieldSolveContext.CatalogueStars.Count > 3)

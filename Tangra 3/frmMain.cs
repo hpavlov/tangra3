@@ -356,11 +356,14 @@ namespace Tangra
 
 			m_VideoController.ApplyDisplayModeAdjustments(m_VideoContext.Pixelmap.DisplayBitmap, true, m_VideoContext.Pixelmap);
 
-			using (Graphics g = Graphics.FromImage(m_VideoContext.Pixelmap.DisplayBitmap))
-			{
-				m_VideoController.RunCustomRenderers(g);
-				g.Save();
-			}
+		    if (m_VideoController.HasCustomRenderers)
+		    {
+                using (Graphics g = Graphics.FromImage(m_VideoContext.Pixelmap.DisplayBitmap))
+                {
+                    m_VideoController.RunCustomRenderers(g);
+                    g.Save();
+                }
+		    }
 		}
 
 		#endregion

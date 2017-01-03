@@ -63,6 +63,7 @@ namespace Tangra.OCR
 			m_UseNativePreProcessing = performanceMode > 0;
 			m_ForceErrorReport = initializationData.ForceErrorReport;
 		    m_FrameStep = -1;
+            m_CalibrationImages.Clear();
 		}
 
 		public TimestampOCRData InitializationData

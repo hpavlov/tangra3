@@ -214,6 +214,13 @@ namespace Tangra.Astrometry.Recognition
 			m_PerformanceWatch.Start();
 			try
 			{
+                if (m_StarMap.FeaturesCount < TangraConfig.Settings.Astrometry.MinimumNumberOfStars)
+			    {
+			        distanceBasedSolution = null;
+			        solver = null;
+			        return PerformMatchResult.FieldAlignmentFailed;
+			    }
+
 				if (!m_IsCalibration &&
 				    m_Solution != null)
 				{
@@ -309,8 +316,8 @@ namespace Tangra.Astrometry.Recognition
 				{
 					distanceBasedSolution = (LeastSquareFittedAstrometry)alignmentResult.Solution;
 					improvedSolution = (LeastSquareFittedAstrometry)alignmentResult.ImprovedSolution;
-					m_Solution = GetSolution(alignmentResult);					
-					solver = alignmentResult.Solver;					
+					m_Solution = GetSolution(alignmentResult);
+					solver = alignmentResult.Solver;
 				}
 				else
 				{

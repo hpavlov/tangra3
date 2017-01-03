@@ -452,7 +452,7 @@ namespace Tangra.VideoOperations.Astrometry
 			m_IdentifiedObjects = null;
 			m_UnknownObjects = null;
 
-			m_AstroImage = astroImage;
+            m_AstroImage = new AstroImage(astroImage.Pixelmap, true);
 
 			if (m_AstrometricState.MeasuringState == AstrometryInFramesState.Aborting)
 				return;
@@ -471,12 +471,9 @@ namespace Tangra.VideoOperations.Astrometry
 					TangraConfig.Settings.Astrometry.MaximumPSFElongation,
 					TangraConfig.Settings.Astrometry.LimitReferenceStarDetection);
 
-		    AstroImage noPreProcImage = astroImage;
-
-
 			starMap.FindBestMap(
 				AstrometryContext.Current.StarMapConfig,
-                noPreProcImage,
+                m_AstroImage,
 				AstrometryContext.Current.OSDRectToExclude,
 				AstrometryContext.Current.RectToInclude,
 				AstrometryContext.Current.LimitByInclusion);
@@ -559,7 +556,7 @@ namespace Tangra.VideoOperations.Astrometry
 					}
 
 					m_ViewControl.FitFailed();
-					m_AstrometricState.MeasuringState = AstrometryInFramesState.FitFailed;
+                    m_AstrometricState.MatchResult = m_CurrentMatchResult;
 					return;
 				}
 			}
@@ -669,7 +666,7 @@ namespace Tangra.VideoOperations.Astrometry
 			{
 				m_VideoController.StatusChanged("No Fit");
 				m_AstrometricState.AstrometricFit = null;
-				m_AstrometricState.MeasuringState = AstrometryInFramesState.FitFailed;
+                m_AstrometricState.MatchResult = m_CurrentMatchResult;
 			}
 
 			

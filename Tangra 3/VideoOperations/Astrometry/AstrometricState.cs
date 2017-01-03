@@ -28,8 +28,7 @@ namespace Tangra.VideoOperations.Astrometry
 		Ready,
 		RunningMeasurements,
 		Aborting,
-		Paused,
-		FitFailed
+		Paused
 	}
 
 	internal class UserObjectContext
@@ -139,6 +138,7 @@ namespace Tangra.VideoOperations.Astrometry
 		public LeastSquareFittedAstrometry AstrometricFit { get; set; }
 
 		internal AstrometryInFramesState MeasuringState = AstrometryInFramesState.Ready;
+	    internal PerformMatchResult MatchResult;
 		internal UserObjectContext ObjectToMeasure;
 	    internal string IdentifiedObjectToMeasure;
 

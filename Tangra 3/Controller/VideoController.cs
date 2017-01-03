@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -481,11 +482,6 @@ namespace Tangra.Controller
                 if (fitsSteream != null)
                     SetFITSDynamicRange(fitsSteream, frameStream);
 
-                var adv2Stream = m_FramePlayer.Video as AstroDigitalVideoStreamV2;
-                if (adv2Stream != null)
-                    SetADV2DynamicRange(adv2Stream, frameStream);
-
-
 				m_VideoFileView.Update();
 
 				if (
@@ -517,16 +513,6 @@ namespace Tangra.Controller
 
 			return false;
 		}
-
-	    private void SetADV2DynamicRange(AstroDigitalVideoStreamV2 adv2Steream, IFrameStream frameStream)
-	    {
-            SetDisplayIntensifyMode(DisplayIntensifyMode.Dynamic, null, null);
-
-            m_MainForm.tsmiOff.Checked = false;
-            m_MainForm.tsmiLo.Checked = false;
-            m_MainForm.tsmiHigh.Checked = false;
-            m_MainForm.tsmiDynamic.Checked = true;
-	    }
 
 	    private void SetFITSDynamicRange(IFITSStream fitsSteream, IFrameStream frameStream)
 	    {
@@ -861,7 +847,7 @@ namespace Tangra.Controller
 		{
             m_AstroImage = new AstroImage(currentPixelmap);
             m_CurrentFrameContext = frameContext;
-            
+
             m_CurrentOCRRedTimeStamp = null;
             m_CurrentFrameId = currentFrameId;
 
@@ -1044,6 +1030,11 @@ namespace Tangra.Controller
                 m_TimestampOCR.DrawLegend(g);
         }
 
+	    internal bool HasCustomRenderers
+	    {
+	        get { return m_CustomOverlayRenderer != null && m_CurrentOperation == null; }
+	    }
+
 		internal void RunCustomRenderers(Graphics g)
 		{
 			if (m_CustomOverlayRenderer != null && m_CurrentOperation == null)
@@ -1153,12 +1144,12 @@ namespace Tangra.Controller
 
 	    public bool HasTimestampOCR()
 	    {
-            return m_TimestampOCR != null;    
+            return m_TimestampOCR != null;
 	    }
 
 		public bool HasEmbeddedTimeStamps()
 		{
-			return IsAstroDigitalVideo ||
+			return (IsAstroDigitalVideo && !IsAstroAnalogueVideo) ||
 			       (IsAstroAnalogueVideo && AstroAnalogueVideoHasOcrOrNtpData) ||
                    (IsSerVideo && (((SERVideoStream)m_FramePlayer.Video).HasUTCTimeStamps || ((SERVideoStream)m_FramePlayer.Video).HasFireCaptureTimeStamps)) ||
 				   (IsFitsSequence && ((FITSFileSequenceStream)m_FramePlayer.Video).HasUTCTimeStamps);
@@ -1499,6 +1490,8 @@ namespace Tangra.Controller
 			}
 			catch (ObjectDisposedException)
 			{ }
+            catch (InvalidAsynchronousStateException)
+            { }
 			catch (InvalidOperationException)
 			{ }
 
@@ -1530,6 +1523,8 @@ namespace Tangra.Controller
 			}
 			catch (ObjectDisposedException)
 			{ }
+            catch(InvalidAsynchronousStateException)
+            { }
 			catch (InvalidOperationException)
 			{ }
 
@@ -1555,6 +1550,8 @@ namespace Tangra.Controller
 			}
 			catch (ObjectDisposedException)
 			{ }
+            catch (InvalidAsynchronousStateException)
+            { }
 			catch (InvalidOperationException)
 			{ }
 		}
@@ -1575,7 +1572,7 @@ namespace Tangra.Controller
 					BitmapFilter.ApplyGamma(displayBitmap, m_DisplayIntensifyMode == DisplayIntensifyMode.Hi, m_DisplayInvertedMode, m_DisplayHueIntensityMode);
                 else if (m_DisplayInvertedMode || m_DisplayHueIntensityMode)
                     BitmapFilter.ProcessInvertAndHueIntensity(displayBitmap, m_DisplayInvertedMode, m_DisplayHueIntensityMode);
-            }            
+            }
         }
 
 

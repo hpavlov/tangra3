@@ -345,6 +345,8 @@ namespace Tangra.Config
                                 Properties.Settings.Default.TangraSettings = xmlString;
                                 Properties.Settings.Default.Save();
 
+                                TangraConfig.Load(ApplicationSettingsSerializer.Instance);
+
                                 MessageBox.Show(this, "Settings imported successfuly.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                                 Close();

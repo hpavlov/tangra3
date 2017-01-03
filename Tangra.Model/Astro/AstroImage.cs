@@ -38,18 +38,29 @@ namespace Tangra.Model.Astro
         protected int m_BitPix = 32;
         protected int m_BitPixCamera = 16;
 
-        public AstroImage(Pixelmap pixelmap)
-            : this(pixelmap, new Rectangle(0, 0, pixelmap.Width, pixelmap.Height))
+        public AstroImage(Pixelmap pixelmap, bool useUnprocessedPixels = false)
+            : this(pixelmap, new Rectangle(0, 0, pixelmap.Width, pixelmap.Height), useUnprocessedPixels)
         { }
 
-        public AstroImage(Pixelmap pixelmap, Rectangle processArea)
+        public AstroImage(Pixelmap pixelmap, Rectangle processArea, bool useUnprocessedPixels = false)
         {
-            m_Pixelmap = pixelmap;
+            if (useUnprocessedPixels)
+            {
+                m_Pixelmap = new Pixelmap(pixelmap.Width, pixelmap.Height, pixelmap.BitPixCamera, new uint[pixelmap.Pixels.Length], null, null);
+                m_Pixelmap.SetMaxSignalValue(pixelmap.MaxSignalValue);
+                for (int i = 0; i < pixelmap.Pixels.Length; i++)
+                {
+                    m_Pixelmap.Pixels[i] = pixelmap.UnprocessedPixels[i];
+                }
+            }
+            else
+                m_Pixelmap = pixelmap;
+
             m_Rect = processArea;
 
-            m_Width = pixelmap.Width;
-            m_Height = pixelmap.Height;
-            m_BitPix = pixelmap.BitPixCamera;
+            m_Width = m_Pixelmap.Width;
+            m_Height = m_Pixelmap.Height;
+            m_BitPix = m_Pixelmap.BitPixCamera;
 
             if (m_Rect.Width > m_Width) m_Rect.Width = m_Width;
             if (m_Rect.Height > m_Height) m_Rect.Height = m_Height;

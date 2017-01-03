@@ -65,7 +65,7 @@ namespace Tangra.OCR
 				
 				if (!IsFieldDurationOkay(fieldDuration))
 				{
-                    if (!TryCorrectTimestamp(m_PrevEvenTicks, oddFieldTimestamp, oddFieldOSD, frameStep, null))
+                    if (!TryCorrectTimestamp(m_PrevEvenTicks, oddFieldTimestamp, oddFieldOSD, frameStep, null, aavIntegratedFields != null))
 					{
 						Trace.WriteLine(correctionDebugInfo);
 						Trace.WriteLine("IOTA-VTI Correction Failed: Cannot correct field duration PrevEven -> CurrOdd.");
@@ -80,7 +80,7 @@ namespace Tangra.OCR
 
 				if (!IsFieldDurationOkay(fieldDuration))
 				{
-                    if (!TryCorrectTimestamp(oddFieldTimestamp.Ticks, evenFieldTimestamp, evenFieldOSD, 1, aavIntegratedFields))
+                    if (!TryCorrectTimestamp(oddFieldTimestamp.Ticks, evenFieldTimestamp, evenFieldOSD, 1, aavIntegratedFields, aavIntegratedFields != null))
 				    {
                         Trace.WriteLine(correctionDebugInfo);
                         Trace.WriteLine("IOTA-VTI Correction Failed: Cannot correct field duration CurrOdd -> CurrEven.");
@@ -96,7 +96,7 @@ namespace Tangra.OCR
 
 				if (!IsFieldDurationOkay(fieldDuration))
 				{
-                    if (!TryCorrectTimestamp(m_PrevOddTicks, evenFieldTimestamp, evenFieldOSD, frameStep, null))
+				    if (!TryCorrectTimestamp(m_PrevOddTicks, evenFieldTimestamp, evenFieldOSD, frameStep, null, aavIntegratedFields != null))
 					{
 						Trace.WriteLine(correctionDebugInfo);
 						Trace.WriteLine("IOTA-VTI Correction Failed: Cannot correct field duration PrevOdd -> CurrEven.");
@@ -111,7 +111,7 @@ namespace Tangra.OCR
 
 				if (!IsFieldDurationOkay(fieldDuration))
 				{
-                    if (!TryCorrectTimestamp(evenFieldTimestamp.Ticks, oddFieldTimestamp, oddFieldOSD, 1, aavIntegratedFields))
+                    if (!TryCorrectTimestamp(evenFieldTimestamp.Ticks, oddFieldTimestamp, oddFieldOSD, 1, aavIntegratedFields, aavIntegratedFields != null))
 				    {
                         Trace.WriteLine(correctionDebugInfo);
                         Trace.WriteLine("IOTA-VTI Correction Failed: Cannot correct field duration CurrEven -> CurrOdd.");
@@ -151,7 +151,7 @@ namespace Tangra.OCR
 			return true;
 		}
 
-        private bool TryCorrectTimestamp(long prevFieldTimestamp, DateTime fieldToCorrectTimestamp, IotaVtiTimeStamp fieldToCorrect, int frameStep, int? aavIntegratedFields)
+        private bool TryCorrectTimestamp(long prevFieldTimestamp, DateTime fieldToCorrectTimestamp, IotaVtiTimeStamp fieldToCorrect, int frameStep, int? aavIntegratedFields, bool isAav)
 		{
             double stepCorrection = frameStep > 1 ? ((20000 * (frameStep - 1) * (m_VideoFormat == VideoFormat.PAL ? IotaVtiOcrProcessor.FIELD_DURATION_PAL : IotaVtiOcrProcessor.FIELD_DURATION_NTSC))) : 0;
             double fieldDistance = (10000 * (m_VideoFormat == VideoFormat.PAL ? IotaVtiOcrProcessor.FIELD_DURATION_PAL : IotaVtiOcrProcessor.FIELD_DURATION_NTSC));
@@ -189,7 +189,8 @@ namespace Tangra.OCR
                 expectedDateTime = expectedDateTime.AddMilliseconds(1);
             }
 
-			if (numberDifferences <= TangraConfig.Settings.Generic.OcrMaxNumberErrorsToAutoCorrect)
+            if (numberDifferences <= TangraConfig.Settings.Generic.OcrMaxNumberErrorsToAutoCorrect || 
+                (isAav && fieldToCorrect.Milliseconds10 == 0) /* Duplicated video field in AAV */)
 			{
 				// We can correct the one or two offending characters
 

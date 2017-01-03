@@ -635,22 +635,25 @@ namespace Tangra.VideoOperations.Astrometry
 					}
 						
 					#endregion
-					
-					m_EarliestDEFrame = retVal.EarliestFrame;
-					m_LatestDEFrame = retVal.LatestFrame;
 
-					if (!double.IsNaN(retVal.FittedValue))
-					{
-						lblAstRA.Text = string.Format("{0}", AstroConvert.ToStringValue(retVal.FittedValue / 15, "HH MM SS.TT"));
-						lblAlpha.Visible = true;
-						m_RADeg = retVal.FittedValue;
-						m_MPCRAHours = m_RADeg / 15;
-						m_MPCTime = retVal.FittedValueTime;
-						m_MPCTimePrecission = TimeSpan.MinValue;
-						m_MPCIsVideoNormalPosition = retVal.IsVideoNormalPosition;
-					}
+				    if (retVal != null)
+				    {
+                        m_EarliestDEFrame = retVal.EarliestFrame;
+                        m_LatestDEFrame = retVal.LatestFrame;
 
-					CheckAndSetTimeAndMPCAdd();
+                        if (!double.IsNaN(retVal.FittedValue))
+                        {
+                            lblAstRA.Text = string.Format("{0}", AstroConvert.ToStringValue(retVal.FittedValue / 15, "HH MM SS.TT"));
+                            lblAlpha.Visible = true;
+                            m_RADeg = retVal.FittedValue;
+                            m_MPCRAHours = m_RADeg / 15;
+                            m_MPCTime = retVal.FittedValueTime;
+                            m_MPCTimePrecission = TimeSpan.MinValue;
+                            m_MPCIsVideoNormalPosition = retVal.IsVideoNormalPosition;
+                        }
+
+                        CheckAndSetTimeAndMPCAdd();
+				    }
 				}
 
 				g.DrawString("a", s_SymbolFont12, Brushes.Yellow, 5, 5);
@@ -755,21 +758,24 @@ namespace Tangra.VideoOperations.Astrometry
 						
 					#endregion
 
-					m_EarliestDEFrame = retVal.EarliestFrame;
-					m_LatestDEFrame = retVal.LatestFrame;
+				    if (retVal != null)
+				    {
+                        m_EarliestDEFrame = retVal.EarliestFrame;
+                        m_LatestDEFrame = retVal.LatestFrame;
 
-					if (!double.IsNaN(retVal.FittedValue))
-					{
-						lblAstDE.Text = AstroConvert.ToStringValue(retVal.FittedValue, "+DD MM SS.T");
-						lblDelta.Visible = true;
-						m_DEDeg = retVal.FittedValue;
-						m_MPCDE = m_DEDeg;
-						m_MPCTime = retVal.FittedValueTime;
-						m_MPCTimePrecission = TimeSpan.MinValue;
-						m_MPCIsVideoNormalPosition = retVal.IsVideoNormalPosition;
-					}
+                        if (!double.IsNaN(retVal.FittedValue))
+                        {
+                            lblAstDE.Text = AstroConvert.ToStringValue(retVal.FittedValue, "+DD MM SS.T");
+                            lblDelta.Visible = true;
+                            m_DEDeg = retVal.FittedValue;
+                            m_MPCDE = m_DEDeg;
+                            m_MPCTime = retVal.FittedValueTime;
+                            m_MPCTimePrecission = TimeSpan.MinValue;
+                            m_MPCIsVideoNormalPosition = retVal.IsVideoNormalPosition;
+                        }
 
-					CheckAndSetTimeAndMPCAdd();
+                        CheckAndSetTimeAndMPCAdd();
+				    }
 				}
 
 				g.DrawString("d", s_SymbolFont12, Brushes.Yellow, 5, 5);
