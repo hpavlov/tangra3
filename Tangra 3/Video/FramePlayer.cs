@@ -823,7 +823,15 @@ namespace Tangra.Video
 			}
 		}
 
-		public bool IsAstroAnalogueVideo
+	    public bool IsAstroAnalogueVideo
+	    {
+            get
+            {
+                return IsAstroAnalogueVideoV1 || IsAstroAnalogueVideoV2;
+            }
+	    }
+
+	    private bool IsAstroAnalogueVideoV1
 		{
 			get
 			{
@@ -843,7 +851,8 @@ namespace Tangra.Video
 	    {
 	        get
 	        {
-                return IsAstroAnalogueVideo && ((AstroDigitalVideoStream)m_VideoStream).OcrDataAvailable;
+                return 
+                    (IsAstroAnalogueVideoV1 && ((AstroDigitalVideoStream)m_VideoStream).OcrDataAvailable);
 	        }
 	    }
 
@@ -851,16 +860,18 @@ namespace Tangra.Video
 		{
 			get
 			{
-				return IsAstroAnalogueVideo && ((AstroDigitalVideoStream)m_VideoStream).NtpDataAvailable;
+				return 
+                    (IsAstroAnalogueVideoV1 && ((AstroDigitalVideoStream)m_VideoStream).NtpDataAvailable) ||
+                    (IsAstroAnalogueVideoV2 && ((AstroDigitalVideoStreamV2)m_VideoStream).NtpDataAvailable);
 			}
 		}
 
 		public int AstroAnalogueVideoNormaliseNtpDataIfNeeded(Action<int> progressCallback, out float oneSigmaError)
 		{
-			if (IsAstroAnalogueVideo)
-			{
+			if (IsAstroAnalogueVideoV1)
 				return ((AstroDigitalVideoStream)m_VideoStream).AstroAnalogueVideoNormaliseNtpDataIfNeeded(progressCallback, out oneSigmaError);
-			}
+            if (IsAstroAnalogueVideoV2)
+                return ((AstroDigitalVideoStreamV2)m_VideoStream).AstroAnalogueVideoNormaliseNtpDataIfNeeded(progressCallback, out oneSigmaError);
 			oneSigmaError = float.NaN;
 			return -1;
 		}
@@ -869,7 +880,11 @@ namespace Tangra.Video
 	    {
 	        get
 	        {
-                return IsAstroAnalogueVideo ? ((AstroDigitalVideoStream)m_VideoStream).IntegratedAAVFrames : -1;
+	            if (IsAstroAnalogueVideoV1)
+	                return ((AstroDigitalVideoStream) m_VideoStream).IntegratedAAVFrames;
+                if (IsAstroAnalogueVideoV2)
+                    return ((AstroDigitalVideoStreamV2)m_VideoStream).IntegratedAAVFrames;               
+                return -1;
 	        }
 	    }
 
@@ -877,7 +892,12 @@ namespace Tangra.Video
 	    {
 	        get
 	        {
-                return IsAstroAnalogueVideo ? ((AstroDigitalVideoStream)m_VideoStream).AAVStackingRate : 0;
+                if (IsAstroAnalogueVideoV1)
+                    return ((AstroDigitalVideoStream)m_VideoStream).AAVStackingRate;
+                if (IsAstroAnalogueVideoV2)
+                    return ((AstroDigitalVideoStreamV2)m_VideoStream).AAVStackingRate;   
+
+                return 0;
 	        }
 	    }        
 
@@ -901,10 +921,12 @@ namespace Tangra.Video
 		{
 			get
 			{
-				if (IsAstroAnalogueVideo)
+				if (IsAstroAnalogueVideoV1)
 					return ((AstroDigitalVideoStream)m_VideoStream).VideoStandard;
-				else
-					return null;
+                if (IsAstroAnalogueVideoV2)
+                    return ((AstroDigitalVideoStreamV2)m_VideoStream).VideoStandard;
+
+                return null;
 			}
 		}
 

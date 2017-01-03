@@ -158,6 +158,10 @@ namespace Tangra.SDK
         double Mag { get; }
         double StdDevRAArcSec { get; }
         double StdDevDEArcSec { get; }
+        double FWHMArcSec { get; }
+        double Detection { get; }
+        double Amplitude { get; }
+        double Variance { get; }
         int FrameNo { get; }
         DateTime? OCRedTimeStamp { get; }
     }

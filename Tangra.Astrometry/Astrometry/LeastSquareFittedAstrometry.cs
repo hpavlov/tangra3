@@ -107,7 +107,17 @@ namespace Tangra.Astrometry
 			m_SolvedConstants.GetImageCoordsFromTangentCoords(xTang, yTang, out x, out y);
 		}
 
-		public double GetDistanceInArcSec(double x1, double y1, double x2, double y2)
+	    public double GetDistanceInArcSec(double diagonalDistance)
+	    {
+            var side = diagonalDistance / Math.Sqrt(2);
+
+            double x0, y0;
+            GetImageCoordsFromRADE(m_RA0Deg, m_DE0Deg, out x0, out y0);
+
+	        return GetDistanceInArcSec(x0, y0, x0 + side, y0 + side);
+	    }
+
+	    public double GetDistanceInArcSec(double x1, double y1, double x2, double y2)
 		{
 			double ra1, de1, ra2, de2;
 			GetRADEFromImageCoords(x1, y1, out ra1, out de1);

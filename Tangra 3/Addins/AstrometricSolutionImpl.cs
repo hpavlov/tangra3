@@ -92,6 +92,10 @@ namespace Tangra.Addins
                         FrameNo = mea.FrameNo,
                         StdDevDEArcSec = mea.StdDevDEArcSec,
                         StdDevRAArcSec = mea.StdDevRAArcSec,
+                        FWHMArcSec = mea.FWHMArcSec,
+                        Detection = mea.Detection,
+                        Amplitude = mea.Amplitude,
+                        Variance = mea.Variance,
                         OCRedTimeStamp = mea.OCRedTimeStamp,
                         Mag = mea.Mag
                     });
@@ -313,6 +317,10 @@ namespace Tangra.Addins
             public double Mag { get; internal set; }
             public double StdDevRAArcSec { get; internal set; }
             public double StdDevDEArcSec { get; internal set; }
+            public double FWHMArcSec { get; internal set; }
+            public double Detection { get; internal set; }
+            public double Amplitude { get; internal set; }
+            public double Variance { get; internal set; }
             public int FrameNo { get; internal set; }
             public DateTime? OCRedTimeStamp { get; internal set; }
         }

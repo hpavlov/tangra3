@@ -62,14 +62,14 @@ namespace Tangra.Addins
             if (m_LastSolution != null)
             {
 				var output = new StringBuilder();
-				output.Append("FrameNo, TimeUTC, RADeg, DEDeg, StdDevRAArcSec, StdDevDEArcSec, Mag\r\n");
+                output.Append("FrameNo, TimeUTC, RADeg, DEDeg, Mag, StdDevRAArcSec, StdDevDEArcSec, FWHM, DetectionCertainty, PSFAmplitude\r\n");
 
                 var meaList = m_LastSolution.GetAllMeasurements();
                 foreach (var mea in meaList)
                 {
-                    output.AppendFormat("{0}, {1}, {2}, {3}, {4}, {5}, {6}\r\n", 
-                        mea.FrameNo, mea.OCRedTimeStamp.HasValue ? (double?)mea.OCRedTimeStamp.Value.TimeOfDay.TotalDays : null, 
-                        mea.RADeg, mea.DEDeg, mea.StdDevRAArcSec, mea.StdDevDEArcSec, mea.Mag);
+                    output.AppendFormat("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}\r\n", 
+                        mea.FrameNo, mea.OCRedTimeStamp.HasValue ? (double?)mea.OCRedTimeStamp.Value.TimeOfDay.TotalDays : null,
+                        mea.RADeg, mea.DEDeg, mea.Mag, mea.StdDevRAArcSec, mea.StdDevDEArcSec, mea.FWHMArcSec, mea.Detection, mea.Amplitude);
 				}
 
 				var dialog = new SaveFileDialog();

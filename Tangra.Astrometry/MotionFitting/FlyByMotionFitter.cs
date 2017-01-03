@@ -63,6 +63,10 @@ namespace Tangra.MotionFitting
         public double Mag { get; set; }
         public double StdDevRAArcSec { get; set; }
         public double StdDevDEArcSec { get; set; }
+        public double FWHMArcSec { get; set; }
+        public double Detection { get; set; }
+        public double Amplitude { get; set; }
+        public double Variance { get; set; }
         public int FrameNo { get; set; }
         public DateTime? OCRedTimeStamp { get; set; }
     }
@@ -124,9 +128,15 @@ namespace Tangra.MotionFitting
             public int ClosestNormalIntervalLastFrameNo;
         }
 
+        public class FrameTimeInfo
+        {
+            public DateTime CentralExposureTime;
+            public double ExposureInMilliseconds;
+        }
+
         internal delegate FrameTime GetTimeForFrameCallback(FittingContext context, int frameNumber, int firstVideoFrame);
 
-        public delegate FrameStateData GetFrameStateDataCallback(int frameId);
+        public delegate FrameTimeInfo GetFrameStateDataCallback(int frameId);
 
         private FrameTime GetTimeForFrame(FittingContext context, int frameNumber, int firstVideoFrame, GetFrameStateDataCallback getFrameStateData)
         {
@@ -157,7 +167,7 @@ namespace Tangra.MotionFitting
                 {
                     rv.ResolvedFrameNo = frameNumber;
 
-                    FrameStateData frameState = getFrameStateData(frameNumber);
+                    var frameState = getFrameStateData(frameNumber);
                     rv.UT = frameState.CentralExposureTime;
 
                     // Convert Central time to the timestamp of the end of the first field
@@ -240,280 +250,290 @@ namespace Tangra.MotionFitting
             Graphics g, FlybyPlottingContext plottingContext, float xScale, float yScale, int imageWidth, int imageHight,
             out double motionRate)
         {
-            #region Building Test Cases
-            if (m_DumpTestCaseData)
+            try
             {
-                var mvSer = new XmlSerializer(typeof(FlybyMeasurementContext));
-                var sb = new StringBuilder();
-                using (var wrt = new StringWriter(sb))
+                #region Building Test Cases
+                if (m_DumpTestCaseData)
                 {
-                    mvSer.Serialize(wrt, meaContext);    
-                }
-                Trace.WriteLine(sb.ToString());
-                var fcSer = new XmlSerializer(typeof(FittingContext));
-                sb.Clear();
-                using (var wrt = new StringWriter(sb))
-                {
-                    fcSer.Serialize(wrt, fittingContext);
-                }
-                Trace.WriteLine(sb.ToString());
-
-                var smfmSer = new XmlSerializer(typeof (SingleMultiFrameMeasurement));
-                foreach(int key in measurements.Keys)
-                {
+                    var mvSer = new XmlSerializer(typeof(FlybyMeasurementContext));
+                    var sb = new StringBuilder();
+                    using (var wrt = new StringWriter(sb))
+                    {
+                        mvSer.Serialize(wrt, meaContext);
+                    }
+                    Trace.WriteLine(sb.ToString());
+                    var fcSer = new XmlSerializer(typeof(FittingContext));
                     sb.Clear();
-                    using (var wrt2 = new StringWriter(sb))
+                    using (var wrt = new StringWriter(sb))
                     {
-                        smfmSer.Serialize(wrt2, measurements[key]);
-                        if (measurements[key].FrameNo != key)
-                            throw new InvalidOperationException();
-                        Trace.WriteLine(sb.ToString());
-                    }                    
-                }
-            }
-            #endregion
-
-            // Do linear regression, use residual based exclusion rules
-            // Report the interpolated position at the middle of the measured interva
-            // Don't forget to add the video normal position flag in the OBS file
-            // Expect elongated images and apply instrumental delay corrections
-
-            motionRate = double.NaN;
-
-            var rv = new ProcessingReturnValues();
-
-            int numFramesUser = 0;
-
-            rv.EarliestFrame = int.MaxValue;
-            rv.LatestFrame = int.MinValue;
-
-            Dictionary<int, List<double>> intervalValues = new Dictionary<int, List<double>>();
-            Dictionary<double, double> intervalMedians = new Dictionary<double, double>();
-
-            LinearRegression regression = null;
-            if (measurements.Values.Count > 1)
-            {
-                rv.EarliestFrame = measurements.Values.Select(m => m.FrameNo).Min();
-                rv.LatestFrame = measurements.Values.Select(m => m.FrameNo).Max();
-
-                foreach (SingleMultiFrameMeasurement measurement in measurements.Values)
-                {
-                    int integrationInterval = (measurement.FrameNo - fittingContext.FirstFrameIdInIntegrationPeroid) / fittingContext.IntegratedFramesCount;
-
-                    List<double> intPoints;
-                    if (!intervalValues.TryGetValue(integrationInterval, out intPoints))
-                    {
-                        intPoints = new List<double>();
-                        intervalValues.Add(integrationInterval, intPoints);
+                        fcSer.Serialize(wrt, fittingContext);
                     }
+                    Trace.WriteLine(sb.ToString());
 
-                    intPoints.Add(fittingValue == FittingValue.RA ? measurement.RADeg : measurement.DEDeg);
-                }
-
-                if (intervalValues.Count > 2)
-                {
-                    regression = new LinearRegression();
-
-                    foreach (int integratedFrameNo in intervalValues.Keys)
+                    var smfmSer = new XmlSerializer(typeof(SingleMultiFrameMeasurement));
+                    foreach (int key in measurements.Keys)
                     {
-                        List<double> data = intervalValues[integratedFrameNo];
-                        data.Sort();
-
-                        double median = data.Count % 2 == 1
-                                ? data[data.Count / 2]
-                                : (data[data.Count / 2] + data[(data.Count / 2) - 1]) / 2.0;
-
-                        // Assign the data point to the middle of the integration interval (using frame numbers)
-                        //
-                        // |--|--|--|--|--|--|--|--|
-                        // |           |           |
-                        //
-                        // Because the time associated with the first frame is the middle of the frame, but the 
-                        // time associated with the middle of the interval is the end of the field then the correction
-                        // is (N / 2) - 0.5 frames
-
-                        double dataPointFrameNo =
-                            rv.EarliestFrame +
-                            fittingContext.IntegratedFramesCount * integratedFrameNo
-                            + (fittingContext.IntegratedFramesCount / 2)
-                            - 0.5;
-
-                        intervalMedians.Add(dataPointFrameNo, median);
-                        regression.AddDataPoint(dataPointFrameNo, median);
-                    }
-
-                    regression.Solve();
-
-                    var firstPos = measurements[rv.EarliestFrame];
-                    var lastPos = measurements[rv.LatestFrame];
-                    double distanceArcSec = AngleUtility.Elongation(firstPos.RADeg, firstPos.DEDeg, lastPos.RADeg, lastPos.DEDeg) * 3600;
-                    var firstTime = GetTimeForFrame(fittingContext, rv.EarliestFrame, meaContext.FirstVideoFrame, getFrameStateDataCallback);
-                    var lastTime = GetTimeForFrame(fittingContext, rv.LatestFrame, meaContext.FirstVideoFrame, getFrameStateDataCallback);
-                    double elapsedSec = new TimeSpan(lastTime.UT.Ticks - firstTime.UT.Ticks).TotalSeconds;
-                    motionRate = distanceArcSec / elapsedSec;
-                }
-            }
-
-            FrameTime resolvedTime = null;
-            if (int.MinValue != meaContext.UserMidFrame)
-            {
-                // Find the closest video 'normal' MPC time and compute the frame number for it
-                // Now compute the RA/DE for the computed 'normal' frame
-                resolvedTime = GetTimeForFrame(fittingContext, meaContext.UserMidFrame, meaContext.FirstVideoFrame, getFrameStateDataCallback);
-
-                #region Plotting Code
-                if (g != null)
-                {
-                    float xPosBeg = (float)(resolvedTime.ClosestNormalIntervalFirstFrameNo - rv.EarliestFrame) * xScale + 5;
-                    float xPosEnd = (float)(resolvedTime.ClosestNormalIntervalLastFrameNo - rv.EarliestFrame) * xScale + 5;
-
-                    g.FillRectangle(s_NormalTimeIntervalHighlightBrush, xPosBeg, 1, (xPosEnd - xPosBeg), imageHight - 2);
-                }
-                #endregion
-            }
-
-            Dictionary<double, double> secondPassData = new Dictionary<double, double>();
-
-            int minFrameId = measurements.Keys.Min();
-
-            #region Plotting Code
-            if (g != null)
-            {
-                foreach (SingleMultiFrameMeasurement measurement in measurements.Values)
-                {
-                    float x = (measurement.FrameNo - minFrameId) * xScale + 5;
-
-                    ProcessingValues val = new ProcessingValues()
-                    {
-                        Value = fittingValue == FittingValue.RA ? measurement.RADeg : measurement.DEDeg,
-                        StdDev = fittingValue == FittingValue.RA ? measurement.StdDevRAArcSec / 3600.0 : measurement.StdDevDEArcSec / 3600.0
-                    };
-
-                    double valueFrom = val.Value - val.StdDev;
-                    double valueTo = val.Value + val.StdDev;
-
-                    float yFrom = (float)(valueFrom - plottingContext.MinValue) * yScale + 5;
-                    float yTo = (float)(valueTo - plottingContext.MinValue) * yScale + 5;
-
-                    g.DrawLine(plottingContext.IncludedPen, x, yFrom, x, yTo);
-                    g.DrawLine(plottingContext.IncludedPen, x - 1, yFrom, x + 1, yFrom);
-                    g.DrawLine(plottingContext.IncludedPen, x - 1, yTo, x + 1, yTo);
-                }
-            }
-            #endregion
-
-            foreach (double integrFrameNo in intervalMedians.Keys)
-            {
-                double val = intervalMedians[integrFrameNo];
-
-                double fittedValAtFrame = regression != null
-                    ? regression.ComputeY(integrFrameNo)
-                    : double.NaN;
-
-                bool included = Math.Abs(fittedValAtFrame - val) < 3 * regression.StdDev;
-
-                #region Plotting Code
-                if (g != null)
-                {
-                    if (fittingContext.IntegratedFramesCount > 1)
-                    {
-                        Pen mPen = included ? plottingContext.IncludedPen : plottingContext.ExcludedPen;
-
-                        float x = (float)(integrFrameNo - minFrameId) * xScale + 5;
-                        float y = (float)(val - plottingContext.MinValue) * yScale + 5;
-
-                        g.DrawEllipse(mPen, x - 3, y - 3, 6, 6);
-                        g.DrawLine(mPen, x - 5, y - 5, x + 5, y + 5);
-                        g.DrawLine(mPen, x + 5, y - 5, x - 5, y + 5);
+                        sb.Clear();
+                        using (var wrt2 = new StringWriter(sb))
+                        {
+                            smfmSer.Serialize(wrt2, measurements[key]);
+                            if (measurements[key].FrameNo != key)
+                                throw new InvalidOperationException();
+                            Trace.WriteLine(sb.ToString());
+                        }
                     }
                 }
                 #endregion
 
-                if (included) secondPassData.Add(integrFrameNo, val);
-            }
+                // Do linear regression, use residual based exclusion rules
+                // Report the interpolated position at the middle of the measured interva
+                // Don't forget to add the video normal position flag in the OBS file
+                // Expect elongated images and apply instrumental delay corrections
 
-            #region Second Pass
-            regression = null;
-            if (secondPassData.Count > 2)
-            {
-                regression = new LinearRegression();
-                foreach (double frameNo in secondPassData.Keys)
+                motionRate = double.NaN;
+
+                var rv = new ProcessingReturnValues();
+
+                int numFramesUser = 0;
+
+                rv.EarliestFrame = int.MaxValue;
+                rv.LatestFrame = int.MinValue;
+
+                Dictionary<int, List<double>> intervalValues = new Dictionary<int, List<double>>();
+                Dictionary<double, double> intervalMedians = new Dictionary<double, double>();
+
+                LinearRegression regression = null;
+                if (measurements.Values.Count > 1)
                 {
-                    regression.AddDataPoint(frameNo, secondPassData[frameNo]);
+                    rv.EarliestFrame = measurements.Values.Select(m => m.FrameNo).Min();
+                    rv.LatestFrame = measurements.Values.Select(m => m.FrameNo).Max();
+
+                    foreach (SingleMultiFrameMeasurement measurement in measurements.Values)
+                    {
+                        int integrationInterval = (measurement.FrameNo - fittingContext.FirstFrameIdInIntegrationPeroid) / fittingContext.IntegratedFramesCount;
+
+                        List<double> intPoints;
+                        if (!intervalValues.TryGetValue(integrationInterval, out intPoints))
+                        {
+                            intPoints = new List<double>();
+                            intervalValues.Add(integrationInterval, intPoints);
+                        }
+
+                        intPoints.Add(fittingValue == FittingValue.RA ? measurement.RADeg : measurement.DEDeg);
+                    }
+
+                    if (intervalValues.Count > 2)
+                    {
+                        regression = new LinearRegression();
+
+                        foreach (int integratedFrameNo in intervalValues.Keys)
+                        {
+                            List<double> data = intervalValues[integratedFrameNo];
+                            data.Sort();
+
+                            double median = data.Count % 2 == 1
+                                    ? data[data.Count / 2]
+                                    : (data[data.Count / 2] + data[(data.Count / 2) - 1]) / 2.0;
+
+                            // Assign the data point to the middle of the integration interval (using frame numbers)
+                            //
+                            // |--|--|--|--|--|--|--|--|
+                            // |           |           |
+                            //
+                            // Because the time associated with the first frame is the middle of the frame, but the 
+                            // time associated with the middle of the interval is the end of the field then the correction
+                            // is (N / 2) - 0.5 frames
+
+                            double dataPointFrameNo =
+                                rv.EarliestFrame +
+                                fittingContext.IntegratedFramesCount * integratedFrameNo
+                                + (fittingContext.IntegratedFramesCount / 2)
+                                - 0.5;
+
+                            intervalMedians.Add(dataPointFrameNo, median);
+                            regression.AddDataPoint(dataPointFrameNo, median);
+                        }
+
+                        regression.Solve();
+
+                        var firstPos = measurements[rv.EarliestFrame];
+                        var lastPos = measurements[rv.LatestFrame];
+                        double distanceArcSec = AngleUtility.Elongation(firstPos.RADeg, firstPos.DEDeg, lastPos.RADeg, lastPos.DEDeg) * 3600;
+                        var firstTime = GetTimeForFrame(fittingContext, rv.EarliestFrame, meaContext.FirstVideoFrame, getFrameStateDataCallback);
+                        var lastTime = GetTimeForFrame(fittingContext, rv.LatestFrame, meaContext.FirstVideoFrame, getFrameStateDataCallback);
+                        double elapsedSec = new TimeSpan(lastTime.UT.Ticks - firstTime.UT.Ticks).TotalSeconds;
+                        motionRate = distanceArcSec / elapsedSec;
+                    }
                 }
-                regression.Solve();
-            }
-            #endregion
 
-            if (regression != null)
-            {
-                #region Plotting Code
-                if (g != null)
-                {
-                    double leftFittedVal = regression.ComputeY(rv.EarliestFrame);
-                    double rightFittedVal = regression.ComputeY(rv.LatestFrame);
-
-                    double err = 3 * regression.StdDev;
-
-                    float leftAve = (float)(leftFittedVal - plottingContext.MinValue) * yScale + 5;
-                    float rightAve = (float)(rightFittedVal - plottingContext.MinValue) * yScale + 5;
-                    float leftX = 5 + (float)(rv.EarliestFrame - rv.EarliestFrame) * xScale;
-                    float rightX = 5 + (float)(rv.LatestFrame - rv.EarliestFrame) * xScale;
-
-                    g.DrawLine(plottingContext.AveragePen, leftX, leftAve - 1, rightX, rightAve - 1);
-                    g.DrawLine(plottingContext.AveragePen, leftX, leftAve, rightX, rightAve);
-                    g.DrawLine(plottingContext.AveragePen, leftX, leftAve + 1, rightX, rightAve + 1);
-
-                    float leftMin = (float)(leftFittedVal - err - plottingContext.MinValue) * yScale + 5;
-                    float leftMax = (float)(leftFittedVal + err - plottingContext.MinValue) * yScale + 5;
-                    float rightMin = (float)(rightFittedVal - err - plottingContext.MinValue) * yScale + 5;
-                    float rightMax = (float)(rightFittedVal + err - plottingContext.MinValue) * yScale + 5;
-
-                    g.DrawLine(plottingContext.AveragePen, leftX, leftMin, rightX, rightMin);
-                    g.DrawLine(plottingContext.AveragePen, leftX, leftMax, rightX, rightMax);
-                }
-                #endregion
-
-                if (int.MinValue != meaContext.UserMidFrame &&
-                    resolvedTime != null)
+                FrameTime resolvedTime = null;
+                if (int.MinValue != meaContext.UserMidFrame)
                 {
                     // Find the closest video 'normal' MPC time and compute the frame number for it
                     // Now compute the RA/DE for the computed 'normal' frame
-
-                    double fittedValueAtMiddleFrame = regression.ComputeY(resolvedTime.ClosestNormalFrameNo);
-
-                    Trace.WriteLine(string.Format("{0}; Included: {1}; Normal Frame No: {2}; Fitted Val: {3}",
-                        meaContext.UserMidValue.ToString("0.00000"),
-                        numFramesUser, resolvedTime.ClosestNormalFrameNo,
-                        AstroConvert.ToStringValue(fittedValueAtMiddleFrame, "+HH MM SS.T")));
-
-                    // Report the interpolated position at the middle of the measured interval
-                    // Don't forget to add the video normal position flag in the OBS file
-                    // Expect elongated images and apply instrumental delay corrections
-
-                    rv.FittedValue = fittedValueAtMiddleFrame;
-                    rv.FittedValueTime = resolvedTime.ClosestNormalFrameTime;
-                    rv.IsVideoNormalPosition = true;
-                    rv.FittedNormalFrame = resolvedTime.ClosestNormalFrameNo;
+                    resolvedTime = GetTimeForFrame(fittingContext, meaContext.UserMidFrame, meaContext.FirstVideoFrame, getFrameStateDataCallback);
 
                     #region Plotting Code
                     if (g != null)
                     {
-                        // Plot the frame
-                        float xPos = (float)(resolvedTime.ClosestNormalFrameNo - rv.EarliestFrame) * xScale + 5;
-                        float yPos = (float)(rv.FittedValue - plottingContext.MinValue) * yScale + 5;
-                        g.DrawLine(Pens.Yellow, xPos, 1, xPos, imageHight - 2);
-                        g.FillEllipse(Brushes.Yellow, xPos - 3, yPos - 3, 6, 6);                        
+                        float xPosBeg = (float)(resolvedTime.ClosestNormalIntervalFirstFrameNo - rv.EarliestFrame) * xScale + 5;
+                        float xPosEnd = (float)(resolvedTime.ClosestNormalIntervalLastFrameNo - rv.EarliestFrame) * xScale + 5;
+
+                        g.FillRectangle(s_NormalTimeIntervalHighlightBrush, xPosBeg, 1, (xPosEnd - xPosBeg), imageHight - 2);
                     }
                     #endregion
                 }
+
+                Dictionary<double, double> secondPassData = new Dictionary<double, double>();
+
+                int minFrameId = measurements.Keys.Min();
+
+                #region Plotting Code
+                if (g != null)
+                {
+                    foreach (SingleMultiFrameMeasurement measurement in measurements.Values)
+                    {
+                        float x = (measurement.FrameNo - minFrameId) * xScale + 5;
+
+                        ProcessingValues val = new ProcessingValues()
+                        {
+                            Value = fittingValue == FittingValue.RA ? measurement.RADeg : measurement.DEDeg,
+                            StdDev = fittingValue == FittingValue.RA ? measurement.StdDevRAArcSec / 3600.0 : measurement.StdDevDEArcSec / 3600.0
+                        };
+
+                        double valueFrom = val.Value - val.StdDev;
+                        double valueTo = val.Value + val.StdDev;
+
+                        float yFrom = (float)(valueFrom - plottingContext.MinValue) * yScale + 5;
+                        float yTo = (float)(valueTo - plottingContext.MinValue) * yScale + 5;
+
+                        g.DrawLine(plottingContext.IncludedPen, x, yFrom, x, yTo);
+                        g.DrawLine(plottingContext.IncludedPen, x - 1, yFrom, x + 1, yFrom);
+                        g.DrawLine(plottingContext.IncludedPen, x - 1, yTo, x + 1, yTo);
+                    }
+                }
+                #endregion
+
+                foreach (double integrFrameNo in intervalMedians.Keys)
+                {
+                    double val = intervalMedians[integrFrameNo];
+
+                    double fittedValAtFrame = regression != null
+                        ? regression.ComputeY(integrFrameNo)
+                        : double.NaN;
+
+                    bool included = Math.Abs(fittedValAtFrame - val) < 3 * regression.StdDev;
+
+                    #region Plotting Code
+                    if (g != null)
+                    {
+                        if (fittingContext.IntegratedFramesCount > 1)
+                        {
+                            Pen mPen = included ? plottingContext.IncludedPen : plottingContext.ExcludedPen;
+
+                            float x = (float)(integrFrameNo - minFrameId) * xScale + 5;
+                            float y = (float)(val - plottingContext.MinValue) * yScale + 5;
+
+                            g.DrawEllipse(mPen, x - 3, y - 3, 6, 6);
+                            g.DrawLine(mPen, x - 5, y - 5, x + 5, y + 5);
+                            g.DrawLine(mPen, x + 5, y - 5, x - 5, y + 5);
+                        }
+                    }
+                    #endregion
+
+                    if (included) secondPassData.Add(integrFrameNo, val);
+                }
+
+                #region Second Pass
+                regression = null;
+                if (secondPassData.Count > 2)
+                {
+                    regression = new LinearRegression();
+                    foreach (double frameNo in secondPassData.Keys)
+                    {
+                        regression.AddDataPoint(frameNo, secondPassData[frameNo]);
+                    }
+                    regression.Solve();
+                }
+                #endregion
+
+                if (regression != null)
+                {
+                    #region Plotting Code
+                    if (g != null)
+                    {
+                        double leftFittedVal = regression.ComputeY(rv.EarliestFrame);
+                        double rightFittedVal = regression.ComputeY(rv.LatestFrame);
+
+                        double err = 3 * regression.StdDev;
+
+                        float leftAve = (float)(leftFittedVal - plottingContext.MinValue) * yScale + 5;
+                        float rightAve = (float)(rightFittedVal - plottingContext.MinValue) * yScale + 5;
+                        float leftX = 5 + (float)(rv.EarliestFrame - rv.EarliestFrame) * xScale;
+                        float rightX = 5 + (float)(rv.LatestFrame - rv.EarliestFrame) * xScale;
+
+                        g.DrawLine(plottingContext.AveragePen, leftX, leftAve - 1, rightX, rightAve - 1);
+                        g.DrawLine(plottingContext.AveragePen, leftX, leftAve, rightX, rightAve);
+                        g.DrawLine(plottingContext.AveragePen, leftX, leftAve + 1, rightX, rightAve + 1);
+
+                        float leftMin = (float)(leftFittedVal - err - plottingContext.MinValue) * yScale + 5;
+                        float leftMax = (float)(leftFittedVal + err - plottingContext.MinValue) * yScale + 5;
+                        float rightMin = (float)(rightFittedVal - err - plottingContext.MinValue) * yScale + 5;
+                        float rightMax = (float)(rightFittedVal + err - plottingContext.MinValue) * yScale + 5;
+
+                        g.DrawLine(plottingContext.AveragePen, leftX, leftMin, rightX, rightMin);
+                        g.DrawLine(plottingContext.AveragePen, leftX, leftMax, rightX, rightMax);
+                    }
+                    #endregion
+
+                    if (int.MinValue != meaContext.UserMidFrame &&
+                        resolvedTime != null)
+                    {
+                        // Find the closest video 'normal' MPC time and compute the frame number for it
+                        // Now compute the RA/DE for the computed 'normal' frame
+
+                        double fittedValueAtMiddleFrame = regression.ComputeY(resolvedTime.ClosestNormalFrameNo);
+
+                        Trace.WriteLine(string.Format("{0}; Included: {1}; Normal Frame No: {2}; Fitted Val: {3} +/- {4:0.00}",
+                            meaContext.UserMidValue.ToString("0.00000"),
+                            numFramesUser, resolvedTime.ClosestNormalFrameNo,
+                            AstroConvert.ToStringValue(fittedValueAtMiddleFrame, "+HH MM SS.T"),
+                            regression.StdDev * 60 * 60));
+
+                        // Report the interpolated position at the middle of the measured interval
+                        // Don't forget to add the video normal position flag in the OBS file
+                        // Expect elongated images and apply instrumental delay corrections
+
+                        rv.FittedValue = fittedValueAtMiddleFrame;
+                        rv.FittedValueTime = resolvedTime.ClosestNormalFrameTime;
+                        rv.IsVideoNormalPosition = true;
+                        rv.FittedNormalFrame = resolvedTime.ClosestNormalFrameNo;
+
+                        #region Plotting Code
+                        if (g != null)
+                        {
+                            // Plot the frame
+                            float xPos = (float)(resolvedTime.ClosestNormalFrameNo - rv.EarliestFrame) * xScale + 5;
+                            float yPos = (float)(rv.FittedValue - plottingContext.MinValue) * yScale + 5;
+                            g.DrawLine(Pens.Yellow, xPos, 1, xPos, imageHight - 2);
+                            g.FillEllipse(Brushes.Yellow, xPos - 3, yPos - 3, 6, 6);
+                        }
+                        #endregion
+                    }
+                    else
+                        rv.FittedValue = double.NaN;
+                }
                 else
                     rv.FittedValue = double.NaN;
-            }
-            else
-                rv.FittedValue = double.NaN;
 
-            return rv;
+                return rv;
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex.GetFullStackTrace());
+                motionRate = 0;
+                return null;
+            }
         }
 
         public ProcessingReturnValues FitAndPlotSlowMotion(

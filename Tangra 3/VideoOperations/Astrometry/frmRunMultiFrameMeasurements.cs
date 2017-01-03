@@ -18,6 +18,7 @@ using Tangra.Helpers;
 using Tangra.Model.Astro;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
+using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.Model.Video;
 using Tangra.MotionFitting;
@@ -238,21 +239,31 @@ namespace Tangra.VideoOperations.Astrometry
 				if (timeStamp != null && timeStamp != DateTime.MinValue)
 				{
 					DateTime timestamp = timeStamp.Value;
-					if (m_VideoFileFormat == VideoFileFormat.AAV)
-					{
-						// Compute the first timestamp value
-						FrameStateData frameState = m_VideoController.GetCurrentFrameState();
-						timestamp = timestamp.AddMilliseconds(-0.5 * frameState.ExposureInMilliseconds);
 
-						m_NativeFormat = m_VideoController.GetVideoFormat(m_VideoFileFormat);
-                        if (m_NativeFormat == "PAL") timestamp = timestamp.AddMilliseconds(20);
-                        else if (m_NativeFormat == "NTSC") timestamp = timestamp.AddMilliseconds(16.68);
+                    if (m_VideoFileFormat.IsAAV())
+					{
+                        m_NativeFormat = m_VideoController.GetVideoFormat(m_VideoFileFormat);
+
+						// Compute the first timestamp value
+					    if (m_VideoController.HasTimestampOCR())
+					    {
+					        timestamp = m_FieldSolveContext.UtcTime.Date.Add(timestamp.TimeOfDay);
+					    }
+					    else
+					    {
+                            FrameStateData frameState = m_VideoController.GetCurrentFrameState();
+                            timestamp = timestamp.AddMilliseconds(-0.5 * frameState.ExposureInMilliseconds);
+
+                            if (m_NativeFormat == "PAL") timestamp = timestamp.AddMilliseconds(20);
+                            else if (m_NativeFormat == "NTSC") timestamp = timestamp.AddMilliseconds(16.68);
+					    }
 					}
+
 					ucUtcTimePicker.DateTimeUtc = timestamp;
 					ucUtcTimePicker.Enabled = false; // The video has embedded timestamp so the users should not enter times manually
 				}
 
-				if (m_VideoFileFormat == VideoFileFormat.AAV)
+                if (m_VideoFileFormat.IsAAV())
 				{
 					nudIntegratedFrames.Enabled = false;
 

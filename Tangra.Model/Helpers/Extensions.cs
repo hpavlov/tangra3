@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Xml.Serialization;
+using Tangra.Model.Video;
 
 namespace Tangra.Model.Helpers
 {
@@ -146,6 +147,13 @@ namespace Tangra.Model.Helpers
                 return attributes[0].Description;
             else
                 return value.ToString();
+        }
+
+        public static bool IsAAV(this VideoFileFormat format)
+        {
+            return 
+                format == VideoFileFormat.AAV || 
+                format == VideoFileFormat.AAV2;
         }
     }
 }

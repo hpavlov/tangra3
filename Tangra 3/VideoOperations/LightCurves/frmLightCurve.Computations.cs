@@ -1090,7 +1090,7 @@ namespace Tangra.VideoOperations.LightCurves
                     return "ADVS";
 				else if (videoSystem == VideoFileFormat.SER)
 					return "SER";
-                else if (videoSystem == VideoFileFormat.AAV)
+                else if (videoSystem.IsAAV())
                 {
                     if (videoFormat == "PAL" || videoFormat == "NTSC")
                         return string.Format("{0}-{1}", videoSystem, videoFormat);

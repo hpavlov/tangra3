@@ -569,7 +569,7 @@ namespace Tangra.Controller
 		    };
 
 		    VideoFileFormat fileFormat = m_VideoController.GetVideoFileFormat();
-            if (fileFormat == VideoFileFormat.AAV)
+            if (fileFormat.IsAAV())
             {
                 Dictionary<string, string> tags = m_VideoController.GetVideoFileTags();
                 tags.TryGetValue("ObjectName", out rv.ObjectName);

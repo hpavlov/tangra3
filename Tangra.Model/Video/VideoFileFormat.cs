@@ -12,6 +12,7 @@ namespace Tangra.Model.Video
         AAV,
         AVI,
         SER,
-        FITS
+        FITS,
+        AAV2
     }
 }

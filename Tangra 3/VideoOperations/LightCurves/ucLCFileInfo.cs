@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Model.Helpers;
 using Tangra.Model.Video;
 using Tangra.Model.VideoOperations;
 using Tangra.VideoOperations.LightCurves.InfoForms;
@@ -33,7 +34,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 			// Only analogue video (or derived from it) has fields
 			VideoFileFormat videoFileFormat = m_lcFile.Header.GetVideoFileFormat();
-			btnShowFields.Visible = videoFileFormat == VideoFileFormat.AVI || videoFileFormat == VideoFileFormat.AAV;
+            btnShowFields.Visible = videoFileFormat == VideoFileFormat.AVI || videoFileFormat.IsAAV();
 			m_ShowingFields = false;
         }
 

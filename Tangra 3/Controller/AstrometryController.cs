@@ -11,6 +11,7 @@ using Tangra.Model.Config;
 using Tangra.Model.Context;
 using Tangra.Model.Image;
 using Tangra.Model.VideoOperations;
+using Tangra.MotionFitting;
 using Tangra.VideoOperations.Astrometry;
 using Tangra.VideoOperations.Astrometry.Engine;
 using Tangra.VideoOperations.LightCurves;
@@ -169,5 +170,35 @@ namespace Tangra.Controller
 		{
 			m_Operation.TriggerPlateReSolve();
 		}
+
+        public FlyByMotionFitter.FrameTimeInfo GetFrameTimeInfo(int frameId)
+        {
+            if (m_VideoController.IsAstroAnalogueVideo && m_VideoController.HasTimestampOCR())
+            {
+                var exposure = m_VideoController.AstroAnalogueVideoIntegratedAAVFrames * m_VideoController.FramePlayer.Video.MillisecondsPerFrame;
+                var timestamp = m_VideoController.OCRTimestamp();
+                if (timestamp != DateTime.MinValue)
+                {
+                    timestamp = AstrometryContext.Current.FieldSolveContext.UtcTime.Date.Add(timestamp.TimeOfDay);
+                    timestamp = timestamp.AddMilliseconds(0.5 * exposure);
+                    var nativeFormat = m_VideoController.GetVideoFormat(m_VideoController.GetVideoFileFormat());
+                    if (nativeFormat == "PAL") timestamp = timestamp.AddMilliseconds(-20);
+                    else if (nativeFormat == "NTSC") timestamp = timestamp.AddMilliseconds(-16.68);
+                }
+
+                return new FlyByMotionFitter.FrameTimeInfo()
+                {
+                    CentralExposureTime = timestamp,
+                    ExposureInMilliseconds = exposure
+                };
+            }
+
+            var frameStateInfo = m_VideoController.GetFrameStateData(frameId);
+            return new FlyByMotionFitter.FrameTimeInfo()
+            {
+                CentralExposureTime = frameStateInfo.CentralExposureTime,
+                ExposureInMilliseconds = frameStateInfo.ExposureInMilliseconds
+            };
+        }
 	}
 }

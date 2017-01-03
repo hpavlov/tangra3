@@ -201,6 +201,35 @@ namespace Tangra.Video
             get { return m_IntegratedAAVFrames; }
         }
 
+        public int AAVStackingRate
+        {
+            get { return m_StackingRate; }
+        }
+
+        public bool NtpDataAvailable
+        {
+            get
+            {
+                // TODO: Implement this once there are sample AAVv2 videos with NTP timestamps
+                return false;
+            }
+        }
+
+        public int AstroAnalogueVideoNormaliseNtpDataIfNeeded(Action<int> progressCallback, out float oneSigmaError)
+        {
+            int ntpError = -1;
+            oneSigmaError = float.NaN;
+
+            // TODO: Implement this once there are sample AAVv2 videos with NTP timestamps
+            return ntpError;
+        }
+
+
+        public string VideoStandard
+        {
+            get { return m_VideoStandard; }
+        }
+
         public Pixelmap GetPixelmap(int index)
         {
             return GetPixelmap(index, 0);

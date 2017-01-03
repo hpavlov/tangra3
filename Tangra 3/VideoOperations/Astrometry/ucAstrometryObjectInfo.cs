@@ -618,14 +618,14 @@ namespace Tangra.VideoOperations.Astrometry
 						case MovementExpectation.SlowFlyby:
 					        double motionRate;
 							retVal = m_FlyByMotionFitter.FitAndPlotSlowFlyby(
-                                        m_AllMeasurements, meaContext, fittingContext, FittingValue.RA, (frameId) => m_VideoController.GetFrameStateData(frameId),
+                                        m_AllMeasurements, meaContext, fittingContext, FittingValue.RA, (frameId) => m_AstrometryController.GetFrameTimeInfo(frameId),
                                         g, plottingContext, xScale, yScale, m_RAImage.Width, m_RAImage.Height, out motionRate);
 					        m_MotionRate = motionRate;
 							break;
 
 						case MovementExpectation.FastFlyby:
                             retVal = m_FlyByMotionFitter.FitAndPlotFastFlyby(
-                                        m_AllMeasurements, meaContext, fittingContext, FittingValue.RA, (frameId) => m_VideoController.GetFrameStateData(frameId),
+                                        m_AllMeasurements, meaContext, fittingContext, FittingValue.RA, (frameId) => m_AstrometryController.GetFrameTimeInfo(frameId),
                                         g, plottingContext, xScale, yScale, m_RAImage.Width, m_RAImage.Height, out motionRate);
 
 							break;
@@ -738,14 +738,14 @@ namespace Tangra.VideoOperations.Astrometry
 						case MovementExpectation.SlowFlyby:
 					        double motionRate;
                             retVal = m_FlyByMotionFitter.FitAndPlotSlowFlyby(
-                                m_AllMeasurements, meaContext, fittingContext, FittingValue.DEC, (frameId) => m_VideoController.GetFrameStateData(frameId),
+                                m_AllMeasurements, meaContext, fittingContext, FittingValue.DEC, (frameId) => m_AstrometryController.GetFrameTimeInfo(frameId),
 								g, plottingContext, xScale, yScale, m_DEImage.Width, m_RAImage.Height, out motionRate);
 					        m_MotionRate = motionRate;
 							break;
 
 						case MovementExpectation.FastFlyby:
                             retVal = m_FlyByMotionFitter.FitAndPlotFastFlyby(
-                                m_AllMeasurements, meaContext, fittingContext, FittingValue.DEC, (frameId) => m_VideoController.GetFrameStateData(frameId),
+                                m_AllMeasurements, meaContext, fittingContext, FittingValue.DEC, (frameId) => m_AstrometryController.GetFrameTimeInfo(frameId),
                                 g, plottingContext, xScale, yScale, m_DEImage.Width, m_RAImage.Height, out motionRate);
                             m_MotionRate = motionRate;
 							break;

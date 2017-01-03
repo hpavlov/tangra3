@@ -1384,7 +1384,7 @@ namespace Tangra.VideoOperations.LightCurves
 		{
 			if (videoFileFormat == VideoFileFormat.ADV || videoFileFormat == VideoFileFormat.SER)
 				return "Digital";
-			if (videoFileFormat == VideoFileFormat.AAV && LcFile != null)
+            if (videoFileFormat.IsAAV() && LcFile != null)
 				return LcFile.Footer.AAVNativeVideoFormat;
 			else if (!double.IsNaN(ComputedFramesPerSecond))
 			{
