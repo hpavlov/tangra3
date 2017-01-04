@@ -170,17 +170,17 @@ namespace Tangra.Model.Config
         public void SetUncertainty(double? raUncertaintyArcSec, double? deUncertaintyArcSec)
 	    {
             if (raUncertaintyArcSec.HasValue && deUncertaintyArcSec.HasValue)
-                m_Uncertaity_81_90 = string.Format(" {0:00.0} {1:00.0}", Math.Min(99.9, raUncertaintyArcSec.Value), Math.Min(99.9, deUncertaintyArcSec.Value));
+                m_Uncertaity_81_90 = string.Format(" {0} {1}", Math.Min(99.9, raUncertaintyArcSec.Value).ToString("0.0").PadLeft(4), Math.Min(99.9, deUncertaintyArcSec.Value).ToString("0.0").PadLeft(4));
             else if (raUncertaintyArcSec.HasValue)
-                m_Uncertaity_81_90 = string.Format(" {0:00.0}     ", Math.Min(99.9, raUncertaintyArcSec.Value));
+                m_Uncertaity_81_90 = string.Format(" {0}     ", Math.Min(99.9, raUncertaintyArcSec.Value).ToString("0.0").PadLeft(4));
             else if (deUncertaintyArcSec.HasValue)
-                m_Uncertaity_81_90 = string.Format("      {0:00.0}", Math.Min(99.9, deUncertaintyArcSec.Value));
+                m_Uncertaity_81_90 = string.Format("      {0}", Math.Min(99.9, deUncertaintyArcSec.Value).ToString("0.0").PadLeft(4));
             else
                 m_Uncertaity_81_90 = "";
 	    }
 
         public void SetPosition(double raHours, double deDeg, DateTime utcTime, bool isVideoNormalPosition)
-		{
+        {
             double roundedTime = (utcTime.Hour + utcTime.Minute / 60.0 + (utcTime.Second + (utcTime.Millisecond / 1000.0))/ 3600.0) / 24;
             string format = "00.000000";
 

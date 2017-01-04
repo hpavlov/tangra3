@@ -349,20 +349,11 @@ namespace Tangra.MotionFitting
                         foreach (int integratedFrameNo in intervalValues.Keys)
                         {
                             Tuple<List<double>, List<double>> data = intervalValues[integratedFrameNo];
-                            
-                            // TODO: Calculate weighted median when more than one value in the interval
-                            
-                            var posArr = data.Item1.ToArray();
-                            var weightArr = data.Item2.ToArray();
-                            Array.Sort(posArr, weightArr);
 
-                            double median = posArr.Length % 2 == 1
-                                    ? posArr[posArr.Length / 2]
-                                    : (posArr[posArr.Length / 2] + posArr[(posArr.Length / 2) - 1]) / 2.0;
-                            
-                            double medianWeight = weightArr.Length % 2 == 1
-                                    ? weightArr[weightArr.Length / 2]
-                                    : (weightArr[weightArr.Length / 2] + weightArr[(weightArr.Length / 2) - 1]) / 2.0;
+                            double median;
+                            double medianWeight;
+
+                            WeightedMedian(data, out median, out medianWeight);
 
                             // Assign the data point to the middle of the integration interval (using frame numbers)
                             //
@@ -564,6 +555,52 @@ namespace Tangra.MotionFitting
                 Trace.WriteLine(ex.GetFullStackTrace());
                 motionRate = 0;
                 return null;
+            }
+        }
+
+        private void WeightedMedian(Tuple<List<double>, List<double>> data, out double median, out double medianWeight)
+        {
+            if (data.Item1.Count == 1)
+            {
+                median = data.Item1[0];
+                medianWeight = data.Item2[0];
+            }
+            else
+            {
+                var posArr = data.Item1.ToArray();
+                var weightArr = data.Item2.ToArray();
+                Array.Sort(posArr, weightArr);
+
+                double weightSum = weightArr.Sum();
+                double sumSoFar = 0;
+                for (int i = 0; i < weightArr.Length; i++)
+                {
+                    sumSoFar += weightArr[i] / weightSum;
+                    if (sumSoFar >= 0.5)
+                    {
+                        if (i > 0 && weightArr[i - 1] > weightArr[i])
+                        {
+                            // If the previous entry has higher weight, then use it 
+                            median = posArr[i - 1];
+                            medianWeight = weightArr[i - 1];
+                        }
+                        else
+                        {
+                            median = posArr[i];
+                            medianWeight = weightArr[i];
+                        }
+                        return;
+                    }
+                }
+
+                // Fallback. Should never hit here though.
+                median = posArr.Length % 2 == 1
+                        ? posArr[posArr.Length / 2]
+                        : (posArr[posArr.Length / 2] + posArr[(posArr.Length / 2) - 1]) / 2.0;
+
+                medianWeight = weightArr.Length % 2 == 1
+                        ? weightArr[weightArr.Length / 2]
+                        : (weightArr[weightArr.Length / 2] + weightArr[(weightArr.Length / 2) - 1]) / 2.0;
             }
         }
 
