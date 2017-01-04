@@ -74,8 +74,8 @@ namespace Tangra.VideoOperations.Astrometry.MPCReport
 
         public bool AddObservation(
 			string designation, double raHours, double deDeg, 
-			DateTime utcTime, TimeSpan timePrecision, double mag, 
-			MagnitudeBand band, bool isVideoNormalPosition)
+			DateTime utcTime, TimeSpan timePrecision, double mag,
+            MagnitudeBand band, bool isVideoNormalPosition, double? raUncertaintyArcSec, double? deUncertaintyArcSec)
 		{
 			lastObjectDesignation = designation;
 
@@ -83,6 +83,7 @@ namespace Tangra.VideoOperations.Astrometry.MPCReport
             obsLine.SetObject(designation);
             obsLine.SetPosition(raHours, deDeg, utcTime, isVideoNormalPosition);
             obsLine.SetMagnitude(mag, band);
+            obsLine.SetUncertainty(raUncertaintyArcSec, deUncertaintyArcSec);
 
             string newLine = obsLine.BuildObservationASCIILine();
             if (ObsLines.Exists(l => newLine.Equals(l.BuildObservationASCIILine(), StringComparison.Ordinal)))

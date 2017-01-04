@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using Tangra.Model.Config;
+using Tangra.Model.Context;
 using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.Model.Numerical;
@@ -89,6 +91,7 @@ namespace Tangra.MotionFitting
     {        
         public double MaxStdDev;
         public double UserMidValue;
+        public double ArsSecsInPixel;
         public int UserMidFrame;
         public int FirstVideoFrame;
         public int MinFrameNo;
@@ -100,6 +103,7 @@ namespace Tangra.MotionFitting
         public int EarliestFrame;
         public int LatestFrame;
         public double FittedValue;
+        public double FittedValueStdDevArcSec;
         public DateTime FittedValueTime;
         public bool IsVideoNormalPosition;
         public double FittedNormalFrame;
@@ -138,7 +142,7 @@ namespace Tangra.MotionFitting
 
         public delegate FrameTimeInfo GetFrameStateDataCallback(int frameId);
 
-        private FrameTime GetTimeForFrame(FittingContext context, int frameNumber, int firstVideoFrame, GetFrameStateDataCallback getFrameStateData)
+        private FrameTime GetTimeForFrame(FittingContext context, int frameNumber, int firstVideoFrame, GetFrameStateDataCallback getFrameStateData, DateTime? ocrTime)
         {
             var rv = new FrameTime();
             rv.RequestedFrameNo = frameNumber;
@@ -162,6 +166,12 @@ namespace Tangra.MotionFitting
                     rv.UT =
                         context.FirstFrameUtcTime.AddSeconds(
                         ((frameNumber - context.FirstFrameIdInIntegrationPeroid - instrumentalDelayFrames) / context.FrameRate) - instrumentalDelaySeconds);
+                }
+                else if (context.VideoFileFormat == VideoFileFormat.AAV2 && ocrTime.HasValue)
+                {
+                    rv.ResolvedFrameNo = frameNumber - firstVideoFrame;
+                    var dateTime = context.FirstFrameUtcTime.Date.Add(ocrTime.Value.TimeOfDay);
+                    rv.UT = dateTime.AddSeconds(-instrumentalDelayFrames/context.FrameRate-instrumentalDelaySeconds);
                 }
                 else
                 {
@@ -299,8 +309,9 @@ namespace Tangra.MotionFitting
                 rv.EarliestFrame = int.MaxValue;
                 rv.LatestFrame = int.MinValue;
 
-                Dictionary<int, List<double>> intervalValues = new Dictionary<int, List<double>>();
-                Dictionary<double, double> intervalMedians = new Dictionary<double, double>();
+                var intervalValues = new Dictionary<int, Tuple<List<double>, List<double>>>();
+                var intervalMedians = new Dictionary<double, double>();
+                var intervalWeights = new Dictionary<double, double>();
 
                 LinearRegression regression = null;
                 if (measurements.Values.Count > 1)
@@ -312,14 +323,23 @@ namespace Tangra.MotionFitting
                     {
                         int integrationInterval = (measurement.FrameNo - fittingContext.FirstFrameIdInIntegrationPeroid) / fittingContext.IntegratedFramesCount;
 
-                        List<double> intPoints;
+                        Tuple<List<double>,List<double>> intPoints;
                         if (!intervalValues.TryGetValue(integrationInterval, out intPoints))
                         {
-                            intPoints = new List<double>();
+                            intPoints = Tuple.Create(new List<double>(), new List<double>());
                             intervalValues.Add(integrationInterval, intPoints);
                         }
 
-                        intPoints.Add(fittingValue == FittingValue.RA ? measurement.RADeg : measurement.DEDeg);
+                        if (fittingValue == FittingValue.RA)
+                        {
+                            intPoints.Item1.Add(measurement.RADeg);
+                            intPoints.Item2.Add(measurement.Detection / (measurement.StdDevRAArcSec*measurement.StdDevRAArcSec));
+                        }
+                        else
+                        {
+                            intPoints.Item1.Add(measurement.DEDeg);
+                            intPoints.Item2.Add(measurement.Detection / (measurement.StdDevDEArcSec * measurement.StdDevDEArcSec));
+                        }
                     }
 
                     if (intervalValues.Count > 2)
@@ -328,12 +348,21 @@ namespace Tangra.MotionFitting
 
                         foreach (int integratedFrameNo in intervalValues.Keys)
                         {
-                            List<double> data = intervalValues[integratedFrameNo];
-                            data.Sort();
+                            Tuple<List<double>, List<double>> data = intervalValues[integratedFrameNo];
+                            
+                            // TODO: Calculate weighted median when more than one value in the interval
+                            
+                            var posArr = data.Item1.ToArray();
+                            var weightArr = data.Item2.ToArray();
+                            Array.Sort(posArr, weightArr);
 
-                            double median = data.Count % 2 == 1
-                                    ? data[data.Count / 2]
-                                    : (data[data.Count / 2] + data[(data.Count / 2) - 1]) / 2.0;
+                            double median = posArr.Length % 2 == 1
+                                    ? posArr[posArr.Length / 2]
+                                    : (posArr[posArr.Length / 2] + posArr[(posArr.Length / 2) - 1]) / 2.0;
+                            
+                            double medianWeight = weightArr.Length % 2 == 1
+                                    ? weightArr[weightArr.Length / 2]
+                                    : (weightArr[weightArr.Length / 2] + weightArr[(weightArr.Length / 2) - 1]) / 2.0;
 
                             // Assign the data point to the middle of the integration interval (using frame numbers)
                             //
@@ -351,7 +380,8 @@ namespace Tangra.MotionFitting
                                 - 0.5;
 
                             intervalMedians.Add(dataPointFrameNo, median);
-                            regression.AddDataPoint(dataPointFrameNo, median);
+                            intervalWeights.Add(dataPointFrameNo, medianWeight);
+                            regression.AddDataPoint(dataPointFrameNo, median, medianWeight);
                         }
 
                         regression.Solve();
@@ -359,8 +389,8 @@ namespace Tangra.MotionFitting
                         var firstPos = measurements[rv.EarliestFrame];
                         var lastPos = measurements[rv.LatestFrame];
                         double distanceArcSec = AngleUtility.Elongation(firstPos.RADeg, firstPos.DEDeg, lastPos.RADeg, lastPos.DEDeg) * 3600;
-                        var firstTime = GetTimeForFrame(fittingContext, rv.EarliestFrame, meaContext.FirstVideoFrame, getFrameStateDataCallback);
-                        var lastTime = GetTimeForFrame(fittingContext, rv.LatestFrame, meaContext.FirstVideoFrame, getFrameStateDataCallback);
+                        var firstTime = GetTimeForFrame(fittingContext, rv.EarliestFrame, meaContext.FirstVideoFrame, getFrameStateDataCallback, firstPos.OCRedTimeStamp);
+                        var lastTime = GetTimeForFrame(fittingContext, rv.LatestFrame, meaContext.FirstVideoFrame, getFrameStateDataCallback, lastPos.OCRedTimeStamp);
                         double elapsedSec = new TimeSpan(lastTime.UT.Ticks - firstTime.UT.Ticks).TotalSeconds;
                         motionRate = distanceArcSec / elapsedSec;
                     }
@@ -371,7 +401,7 @@ namespace Tangra.MotionFitting
                 {
                     // Find the closest video 'normal' MPC time and compute the frame number for it
                     // Now compute the RA/DE for the computed 'normal' frame
-                    resolvedTime = GetTimeForFrame(fittingContext, meaContext.UserMidFrame, meaContext.FirstVideoFrame, getFrameStateDataCallback);
+                    resolvedTime = GetTimeForFrame(fittingContext, meaContext.UserMidFrame, meaContext.FirstVideoFrame, getFrameStateDataCallback, measurements[meaContext.UserMidFrame].OCRedTimeStamp);
 
                     #region Plotting Code
                     if (g != null)
@@ -451,7 +481,7 @@ namespace Tangra.MotionFitting
                     regression = new LinearRegression();
                     foreach (double frameNo in secondPassData.Keys)
                     {
-                        regression.AddDataPoint(frameNo, secondPassData[frameNo]);
+                        regression.AddDataPoint(frameNo, secondPassData[frameNo], intervalWeights[frameNo]);
                     }
                     regression.Solve();
                 }
@@ -508,6 +538,7 @@ namespace Tangra.MotionFitting
                         rv.FittedValueTime = resolvedTime.ClosestNormalFrameTime;
                         rv.IsVideoNormalPosition = true;
                         rv.FittedNormalFrame = resolvedTime.ClosestNormalFrameNo;
+                        rv.FittedValueStdDevArcSec = regression.StdDev * 60 * 60;
 
                         #region Plotting Code
                         if (g != null)
@@ -623,6 +654,7 @@ namespace Tangra.MotionFitting
                     AstroConvert.ToStringValue(median, "+HH MM SS.T")));
 
                 rv.FittedValue = median;
+                rv.FittedValueStdDevArcSec = TangraConfig.Settings.Astrometry.AssumedPositionUncertaintyPixels * meaContext.ArsSecsInPixel;
                 rv.IsVideoNormalPosition = false;
             }
             else

@@ -1696,7 +1696,7 @@ namespace Tangra.Model.Config
 				MaximumNumberOfStars = 100;
                 MaxResidualInPixels = 1.0;
 				MaximumPSFElongation = 35;
-			    AssumedPositionUncertainty = 0.1; // pixels
+			    AssumedPositionUncertaintyPixels = 0.1; // pixels
 
 				AlignmentMethod = FieldAlignmentMethod.Pyramid;
 
@@ -1742,7 +1742,7 @@ namespace Tangra.Model.Config
 				clone.MaximumPSFElongation = this.MaximumPSFElongation;
 				clone.PyramidRemoveNonStellarObject = this.PyramidRemoveNonStellarObject;
 			    clone.PyramidNumberOfPivots = this.PyramidNumberOfPivots;
-			    clone.AssumedPositionUncertainty = this.AssumedPositionUncertainty;
+			    clone.AssumedPositionUncertaintyPixels = this.AssumedPositionUncertaintyPixels;
 				return clone;
 			}
 
@@ -1773,7 +1773,7 @@ namespace Tangra.Model.Config
                 get { return MaxResidualInPixels * 6.0; }
 			}
 
-            public double AssumedPositionUncertainty { get; set; }
+            public double AssumedPositionUncertaintyPixels { get; set; }
 
 			public FieldAlignmentMethod AlignmentMethod { get; set; }
 
@@ -1801,6 +1801,8 @@ namespace Tangra.Model.Config
 
 			public bool UseMPCCode { get; set; }
 			public string MPCObservatoryCode { get; set; }
+
+            public bool ExportUncertainties { get; set; }
 
             public bool SaveDebugOutput;
 		}

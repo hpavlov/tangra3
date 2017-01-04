@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using Tangra.Controller;
 using Tangra.Helpers;
 using Tangra.Model.Context;
+using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.MotionFitting;
 using Tangra.Properties;

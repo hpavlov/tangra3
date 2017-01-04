@@ -13,6 +13,7 @@ using System.Windows.Forms;
 using Tangra.Controller;
 using Tangra.Helpers;
 using Tangra.Model.Config;
+using Tangra.Model.Helpers;
 
 namespace Tangra.VideoOperations.LightCurves.InfoForms
 {

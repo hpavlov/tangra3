@@ -114,6 +114,17 @@ namespace Tangra.Model.Helpers
 			return data[data.Count / 2];
 		}
 
+        public static T Median<T>(this IList<T> list)
+        {
+            if (list.Count == 0) return default(T);
+            if (list.Count == 1) return list[0];
+
+            T[] copy = list.ToArray();
+            Array.Sort(copy);
+
+            return copy[copy.Length / 2];
+        }
+
         public static bool TraceError(this TraceLevel traceLevel)
         {
             return (int)traceLevel >= 1;

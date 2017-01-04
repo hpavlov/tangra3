@@ -55,6 +55,7 @@ namespace Tangra.Config.SettingPannels
 
 			rbMPCCode.Checked = TangraConfig.Settings.Astrometry.UseMPCCode;
 			tbxMPCCode.Text = TangraConfig.Settings.Astrometry.MPCObservatoryCode;
+		    cbxExportUncertainties.Checked = TangraConfig.Settings.Astrometry.ExportUncertainties;
 
 			if (double.IsNaN(TangraConfig.Settings.Generic.Latitude))
 			{
@@ -118,6 +119,8 @@ namespace Tangra.Config.SettingPannels
 				TangraConfig.Settings.StarCatalogue.CatalogLocation = tbxCatalogueLocation.Text;
 				TangraConfig.Settings.StarCatalogue.CatalogMagnitudeBandId = ((CatalogMagnitudeBand)cbxCatalogPhotometryBand.SelectedItem).Id;
 			}
+
+		    TangraConfig.Settings.Astrometry.ExportUncertainties = cbxExportUncertainties.Checked;
 
 			if (rbMPCCode.Checked)
 			{

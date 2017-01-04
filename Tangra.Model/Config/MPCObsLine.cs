@@ -84,6 +84,10 @@ namespace Tangra.Model.Config
         public string m_Reserved_72_77 = "      ";
 	    public string m_ObsCode_78_80 = "   ";
 
+        //1234567890
+        // 00.1 00.1                        
+        public string m_Uncertaity_81_90 = "";
+
         private MPCObsLine()
         { }
 
@@ -163,6 +167,18 @@ namespace Tangra.Model.Config
             else if (magType == CometMagnitudeType.Nucleus) m_MagnitudeBand_71 = "N";
         }
 
+        public void SetUncertainty(double? raUncertaintyArcSec, double? deUncertaintyArcSec)
+	    {
+            if (raUncertaintyArcSec.HasValue && deUncertaintyArcSec.HasValue)
+                m_Uncertaity_81_90 = string.Format(" {0:00.0} {1:00.0}", Math.Min(99.9, raUncertaintyArcSec.Value), Math.Min(99.9, deUncertaintyArcSec.Value));
+            else if (raUncertaintyArcSec.HasValue)
+                m_Uncertaity_81_90 = string.Format(" {0:00.0}     ", Math.Min(99.9, raUncertaintyArcSec.Value));
+            else if (deUncertaintyArcSec.HasValue)
+                m_Uncertaity_81_90 = string.Format("      {0:00.0}", Math.Min(99.9, deUncertaintyArcSec.Value));
+            else
+                m_Uncertaity_81_90 = "";
+	    }
+
         public void SetPosition(double raHours, double deDeg, DateTime utcTime, bool isVideoNormalPosition)
 		{
             double roundedTime = (utcTime.Hour + utcTime.Minute / 60.0 + (utcTime.Second + (utcTime.Millisecond / 1000.0))/ 3600.0) / 24;
@@ -203,7 +219,7 @@ namespace Tangra.Model.Config
         public string BuildObservationASCIILine()
         {
             return m_Designation_1_12 + m_NewDiscoveryFlag_13 + m_Note1_14 + m_Note2_15 + m_TimeString_16_32 + m_RAString_33_44 + m_DEString_45_56 +
-                   m_Reserved_57_64 + m_Magnitude_65_70 + m_MagnitudeBand_71 + m_Reserved_72_77 + m_ObsCode_78_80;
+                   m_Reserved_57_64 + m_Magnitude_65_70 + m_MagnitudeBand_71 + m_Reserved_72_77 + m_ObsCode_78_80 + m_Uncertaity_81_90;
         }
 
 		public DateTime GetObservationDateTime()

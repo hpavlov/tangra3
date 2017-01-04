@@ -580,6 +580,7 @@ namespace Tangra.VideoOperations.Astrometry
 						UserMidFrame = m_UserFrame,
 						MaxStdDev = m_MeasurementContext.MaxStdDev/3600.0,
                         FirstVideoFrame = m_VideoController.VideoFirstFrame,
+                        ArsSecsInPixel = m_AstrometryController.GetCurrentAstroPlate().GetDistanceInArcSec(0, 0, 1, 1),
 						MinFrameNo = minFrame,
 						MaxFrameNo = maxFrame
 					};
@@ -646,6 +647,8 @@ namespace Tangra.VideoOperations.Astrometry
                             lblAstRA.Text = string.Format("{0}", AstroConvert.ToStringValue(retVal.FittedValue / 15, "HH MM SS.TT"));
                             lblAlpha.Visible = true;
                             m_RADeg = retVal.FittedValue;
+                            m_RAStdDevArcSec = retVal.FittedValueStdDevArcSec;
+                            if (TangraConfig.Settings.Astrometry.ExportUncertainties) m_MPCRAUncertainty = retVal.FittedValueStdDevArcSec;
                             m_MPCRAHours = m_RADeg / 15;
                             m_MPCTime = retVal.FittedValueTime;
                             m_MPCTimePrecission = TimeSpan.MinValue;
@@ -768,6 +771,8 @@ namespace Tangra.VideoOperations.Astrometry
                             lblAstDE.Text = AstroConvert.ToStringValue(retVal.FittedValue, "+DD MM SS.T");
                             lblDelta.Visible = true;
                             m_DEDeg = retVal.FittedValue;
+                            m_DEStdDevArcSec = retVal.FittedValueStdDevArcSec;
+                            if (TangraConfig.Settings.Astrometry.ExportUncertainties) m_MPCDEUncertainty = retVal.FittedValueStdDevArcSec;
                             m_MPCDE = m_DEDeg;
                             m_MPCTime = retVal.FittedValueTime;
                             m_MPCTimePrecission = TimeSpan.MinValue;
@@ -987,11 +992,15 @@ namespace Tangra.VideoOperations.Astrometry
 
 		private double m_RADeg;
 		private double m_DEDeg;
+        private double m_RAStdDevArcSec;
+	    private double m_DEStdDevArcSec;
 		private DateTime m_MPCTime;
 	    private TimeSpan m_MPCTimePrecission;
         private double m_MPCRAHours;
         private double m_MPCDE;
 	    private double m_MPCMag;
+	    private double? m_MPCRAUncertainty;
+	    private double? m_MPCDEUncertainty;
 	    private MagnitudeBand m_MPCMagBand;
 		private bool m_MPCIsVideoNormalPosition;
 	    private string m_MPCObjectDesignation;
@@ -1095,7 +1104,7 @@ namespace Tangra.VideoOperations.Astrometry
             {
                 // Append the observation to the form
                 if (!m_CurrentReportFile.AddObservation(
-					m_MPCObjectDesignation, m_MPCRAHours, m_MPCDE, m_MPCTime, m_MPCTimePrecission, m_MPCMag, m_MPCMagBand, m_MPCIsVideoNormalPosition))
+                    m_MPCObjectDesignation, m_MPCRAHours, m_MPCDE, m_MPCTime, m_MPCTimePrecission, m_MPCMag, m_MPCMagBand, m_MPCIsVideoNormalPosition, m_MPCRAUncertainty, m_MPCDEUncertainty))
                     MessageBox.Show("Observation already added", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 else
                     m_CurrentReportFile.Save();

@@ -9,6 +9,7 @@ using System.Security.Principal;
 using System.Text;
 using Tangra.Helpers;
 using Tangra.Model.Config;
+using Tangra.Model.Helpers;
 using Tangra.Model.Numerical;
 using Tangra.VideoOperations.Spectroscopy.FilterResponses;
 

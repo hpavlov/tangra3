@@ -129,17 +129,6 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 
 	internal static class Extensions
 	{
-		public static T Median<T>(this IList<T> list)
-		{
-			if (list.Count == 0)
-				return default(T);
-
-			T[] arrayList = list.ToArray();
-			Array.Sort(arrayList);
-
-			return arrayList[list.Count / 2];
-		}
-
 		public static IValueType MostCommonValue<TModel, IValueType>(this IEnumerable<TModel> list, Expression<Func<TModel, IValueType>> expression)
 		{
 			var dict = new Dictionary<IValueType, int>();

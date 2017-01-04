@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using Tangra.Helpers;
 using Tangra.Model.Astro;
 using Tangra.Model.Config;
+using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.Model.VideoOperations;
 using Tangra.VideoOperations.Astrometry.Engine;

@@ -67,7 +67,7 @@ namespace Tangra.Model.Astro
 
 	public class PSFFit : PSFFitBase, IPSFFit, ITrackedObjectPsfFit
     {
-        private static double CERTAINTY_CONST = 0.5 / 0.03;
+        private static double CERTAINTY_CONST = 10.0 / 3.0;
 
         private static int NumberIterations = 10;
         private int m_xCenter;
@@ -293,11 +293,12 @@ namespace Tangra.Model.Astro
 
 		public double Certainty
 		{
-
 			get
 			{
-				// 0.03 = 0.5
-				return CERTAINTY_CONST * (m_IStarMax / (m_Saturation - I0)) / (5 * Math.Log10(FWHM));
+				var certainty = CERTAINTY_CONST * (m_IStarMax / (m_Saturation - I0)) / Math.Log10(FWHM);
+                // Making sure certainty is always positive by modifying values smaller than +0.01
+                if (certainty < 0.01) certainty = 0.01 * Math.Exp(certainty - 0.01);
+			    return certainty;
 			}
 		}
 
