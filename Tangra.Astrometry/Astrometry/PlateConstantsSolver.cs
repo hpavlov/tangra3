@@ -192,7 +192,7 @@ namespace Tangra.Astrometry
 						bestFit = LinearFitWithExcludingResiduals(FitOrder.Cubic, minNumberOfStars, maxResidual, out firstPlateConstantsFit);
 
 						if (bestFit != null)
-							numStars = bestFit.FitInfo.NumberOfStarsUnsedInSolution();
+							numStars = bestFit.FitInfo.NumberOfStarsUsedInSolution();
 						else
 							numStars = MIN_STARS_FOR_CUBIC_FIT - 1;
 					}
@@ -203,7 +203,7 @@ namespace Tangra.Astrometry
 						bestFit = LinearFitWithExcludingResiduals(FitOrder.Quadratic, minNumberOfStars, maxResidual, out firstPlateConstantsFit);
 
 						if (bestFit != null)
-							numStars = bestFit.FitInfo.NumberOfStarsUnsedInSolution();
+							numStars = bestFit.FitInfo.NumberOfStarsUsedInSolution();
 						else
 							numStars = MIN_STARS_FOR_QUADRATIC_FIT - 1;
 					}

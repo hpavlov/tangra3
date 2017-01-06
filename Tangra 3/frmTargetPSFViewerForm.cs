@@ -285,10 +285,10 @@ namespace Tangra
 				lblBackground.Text = background.ToString("0.0");
 				lblNoise.Text = noise.ToString("0.0");
 
-				if (m_PSFFit != null && noise != 0)
+				if (m_PSFFit != null)
 				{
-					double snr = (m_PSFFit.IMax - m_PSFFit.I0) / noise;
-					lblSNR.Text = snr.ToString("0.0");
+					double snr = m_PSFFit.GetSNR();
+                    lblSNR.Text = snr.ToString("0.0");
 				}
 				else
 					lblSNR.Text = "N/A";

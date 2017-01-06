@@ -29,7 +29,7 @@ namespace Tangra.Astrometry
 			get { return m_StarPairs; }
 		}
 
-		public int NumberOfStarsUnsedInSolution()
+		public int NumberOfStarsUsedInSolution()
 		{
 			int count = 0;
 			foreach (PlateConstStarPair star in m_StarPairs)

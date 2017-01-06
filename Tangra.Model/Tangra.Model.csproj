@@ -189,10 +189,12 @@
       <DependentUpon>frmPSFViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="Numerical\AverageCalculator.cs" />
+    <Compile Include="Numerical\GammaFunction.cs" />
     <Compile Include="Numerical\GaussianFit.cs" />
     <Compile Include="Numerical\Integration.cs" />
     <Compile Include="Numerical\LinearRegression.cs" />
     <Compile Include="Numerical\SafeMatrix.cs" />
+    <Compile Include="Numerical\TDistribution.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VideoOperations\CompositeFramePreProcessor.cs" />
     <Compile Include="VideoOperations\IAstrometryController.cs" />

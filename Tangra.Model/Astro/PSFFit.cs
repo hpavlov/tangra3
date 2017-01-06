@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading;
 using Tangra.Model.Config;
 using Tangra.Model.Helpers;
+using Tangra.Model.Image;
 using Tangra.Model.Numerical;
 
 namespace Tangra.Model.Astro
@@ -171,7 +172,10 @@ namespace Tangra.Model.Astro
 
         public double GetValue(double x, double y)
         {
-            return GetPSFValueInternal(x, y);
+            if (FittingMethod == PSFFittingMethod.NonLinearAsymetricFit)
+                return GetPSFValueInternalAsymetric(x, y);
+            else
+                return GetPSFValueInternal(x, y);
         }
 
         public double GetFittedBackgroundModelValue(double x, double y)
@@ -574,6 +578,7 @@ namespace Tangra.Model.Astro
 			m_X0 = x0;
 			m_Y0 = y0;
 			m_R0 = r0;
+            m_SNR = null;
 
 			for (int y = 0; y < intensity.GetLength(1); y++)
 			{
@@ -744,6 +749,7 @@ namespace Tangra.Model.Astro
                 m_X0 = found_x;
                 m_Y0 = found_y;
                 m_R0 = r0;
+                m_SNR = null;
 
                 m_Residuals = new double[full_width,full_width];
 
@@ -967,6 +973,7 @@ namespace Tangra.Model.Astro
 				m_R0 = double.NaN;
 				m_RX0 = rx0;
 				m_RY0 = ry0;
+                m_SNR = null;
 
 				m_Residuals = new double[full_width, full_width];
 
@@ -993,7 +1000,7 @@ namespace Tangra.Model.Astro
 
 		double ITrackedObjectPsfFit.GetPSFValueAt(double x, double y)
 		{
-			return GetPSFValueInternal(x, y);
+            return GetValue(x, y);
 		}
 		
 		double ITrackedObjectPsfFit.GetResidualAt(int x, int y)
@@ -1262,6 +1269,62 @@ namespace Tangra.Model.Astro
             return amplitude;
         }
 
+	    private double? m_SNR;
+	    public double GetSNR()
+	    {
+	        // Adopting the method of estimating the SNR used by Astrometrica here
+	        //--------------------------------------------------------------------
+	        // Herbert Raab: What I do in Astrometrica is sinly to calculate the Peak SNR from the value of the brightest pixel and the StdDev from the photometric annulus.
+	        // I do not use the PeakPSFAmplitude, as this value is very much variable for noisy sources, and most targets are faint and thus noisy. 
+	        // (For the same reason, I do simple aperture photometry, than do photometry by calculating the flux from the value of the volume of the PSF curve - 
+	        // it gives more consistent values on faint targets.)
+
+	        if (m_SNR.HasValue)
+	            return m_SNR.Value;
+
+	        double peakPixel = 0;
+            var bgValues = new List<double>();
+
+            int width = m_Residuals.GetLength(0);
+            int height = m_Residuals.GetLength(1);
+	        
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    double pixelValue = m_Residuals[x, y] + GetValue(x, y);
+                    bgValues.Add(pixelValue);
+
+                    double centerDistance = ImagePixel.ComputeDistance(x, m_X0, y, m_Y0);
+                    if (centerDistance < FWHM && pixelValue > peakPixel) peakPixel = pixelValue;                        
+                }
+            }
+
+	        double medianBackground;
+	        double stdDevNoise;
+
+	        for (int i = 0; i < 10; i++)
+	        {
+                medianBackground = bgValues.Median();
+                stdDevNoise = Math.Sqrt(bgValues.Select(x => (x - medianBackground) * (x - medianBackground)).Sum() / (bgValues.Count - 1));
+
+                int numRemoved = bgValues.RemoveAll(x => Math.Abs(x - medianBackground) > 3 * stdDevNoise);
+	            if (numRemoved == 0)
+	                break;
+	        }
+
+	        if (bgValues.Count > 2)
+	        {
+	            medianBackground = bgValues.Median();
+                stdDevNoise = Math.Sqrt(bgValues.Select(x => (x - medianBackground) * (x - medianBackground)).Sum() / (bgValues.Count - 1));
+                if (m_IStarMax > m_Saturation) peakPixel = m_IStarMax;
+                m_SNR = (peakPixel - medianBackground) / (3 * stdDevNoise);
+	        }
+            else
+                m_SNR = double.NaN;
+
+	        return m_SNR.Value;
+	    }
 
         #region Serialization
         private static byte STREAM_VERSION = 4;

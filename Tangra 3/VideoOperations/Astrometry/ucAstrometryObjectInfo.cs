@@ -170,6 +170,7 @@ namespace Tangra.VideoOperations.Astrometry
 			lblAverageTime.Visible = false;
 			lblAlpha.Visible = false;
 			lblDelta.Visible = false;
+            lblUncert.Visible = false;
 
 			m_MPCDE = double.NaN;
 			m_MPCRAHours = double.NaN;
@@ -271,6 +272,7 @@ namespace Tangra.VideoOperations.Astrometry
 
 			lblAlpha.Visible = false;
 			lblDelta.Visible = false;
+            lblUncert.Visible = false;
 			lblRate.Visible = false;
 			lblRateVal.Visible = false;
 
@@ -281,6 +283,7 @@ namespace Tangra.VideoOperations.Astrometry
 			lblAverageTime.Visible = false;
 			lblAstRA.Text = string.Empty;
 			lblAstDE.Text = string.Empty;
+            lblAstUncertainty.Text = string.Empty;
 		}
 
 		internal void PresentSelectedObject(SelectedObject objInfo)
@@ -369,6 +372,10 @@ namespace Tangra.VideoOperations.Astrometry
 				lblRA.Text = AstroConvert.ToStringValue(objInfo.RADeg / 15.0, "HH MM SS.TT");
 				lblDE.Text = AstroConvert.ToStringValue(objInfo.DEDeg, "+DD MM SS.T");
 
+                var cosDE = Math.Cos(objInfo.DEDeg * Math.PI / 180);
+                var stdDevSol = Math.Sqrt(objInfo.Solution.StdDevDEArcSec * objInfo.Solution.StdDevDEArcSec + objInfo.Solution.StdDevRAArcSec * objInfo.Solution.StdDevRAArcSec * cosDE * cosDE);
+                lblErrSol.Text = string.Format("{0:0.00}\"", stdDevSol / Math.Sqrt(objInfo.Solution.FitInfo.NumberOfStarsUsedInSolution()));
+
 				btnFramesAstrometry.Visible = !m_AstrometricState.ObjectToMeasureSelected;
 				if (!m_AstrometricState.ObjectToMeasureSelected)
 				{
@@ -393,12 +400,15 @@ namespace Tangra.VideoOperations.Astrometry
 					double certaintyRounded = Math.Round(objInfo.Gaussian.Certainty * 100) / 100.0;
 					lblMax.Text = certaintyRounded < 0 ? "N/A" : (certaintyRounded).ToString("0.00");
 					lblFWHM.Text = objInfo.Gaussian.FWHM.ToString("0.00");
+                    lblSNR.Text = objInfo.Gaussian.GetSNR().ToString("0.00");
 					pnlPSFInfo.Visible = true;
+                    lblErrPos.Text = string.Format("{0:0.00}\"", objInfo.Solution.GetDistanceInArcSec(objInfo.Gaussian.FWHM) / (2.355 * objInfo.Gaussian.GetSNR()));
 				}
 				else
 				{
 					pbPSFFit.Visible = false;
 					pnlPSFInfo.Visible = false;
+				    lblErrPos.Text = "N/A";
 				}
 
 				if (AstrometryContext.Current.CurrentPhotometricFit != null && objInfo.Pixel != null)
@@ -581,11 +591,14 @@ namespace Tangra.VideoOperations.Astrometry
 						MaxStdDev = m_MeasurementContext.MaxStdDev/3600.0,
                         FirstVideoFrame = m_VideoController.VideoFirstFrame,
                         ArsSecsInPixel = m_AstrometryController.GetCurrentAstroPlate().GetDistanceInArcSec(0, 0, 1, 1),
+                        MinPositionUncertaintyPixels = TangraConfig.Settings.Astrometry.AssumedPositionUncertaintyPixels,
 						MinFrameNo = minFrame,
 						MaxFrameNo = maxFrame
 					};
+ 
 
 				    var fittingContext = m_MeasurementContext.ToFittingContext();
+				    fittingContext.Weighting = WeightingMode.Detection;
 
                     var plottingContext = new FlybyPlottingContext
                     {
@@ -647,8 +660,10 @@ namespace Tangra.VideoOperations.Astrometry
                             lblAstRA.Text = string.Format("{0}", AstroConvert.ToStringValue(retVal.FittedValue / 15, "HH MM SS.TT"));
                             lblAlpha.Visible = true;
                             m_RADeg = retVal.FittedValue;
-                            m_RAStdDevArcSec = retVal.FittedValueStdDevArcSec;
-                            if (TangraConfig.Settings.Astrometry.ExportUncertainties) m_MPCRAUncertainty = retVal.FittedValueStdDevArcSec;
+                            m_RAUncertaintyArcSec = retVal.FittedValueUncertaintyArcSec;
+                            if (TangraConfig.Settings.Astrometry.ExportUncertainties) m_MPCRAUncertainty = retVal.FittedValueUncertaintyArcSec;
+                            lblAstUncertainty.Text = string.Format("({0:0.00}, {1:0.00})\"", m_RAUncertaintyArcSec * Math.Cos(m_DEDeg * Math.PI / 180), m_DEUncertaintyArcSec);
+                            lblUncert.Visible = true;
                             m_MPCRAHours = m_RADeg / 15;
                             m_MPCTime = retVal.FittedValueTime;
                             m_MPCTimePrecission = TimeSpan.MinValue;
@@ -771,8 +786,10 @@ namespace Tangra.VideoOperations.Astrometry
                             lblAstDE.Text = AstroConvert.ToStringValue(retVal.FittedValue, "+DD MM SS.T");
                             lblDelta.Visible = true;
                             m_DEDeg = retVal.FittedValue;
-                            m_DEStdDevArcSec = retVal.FittedValueStdDevArcSec;
-                            if (TangraConfig.Settings.Astrometry.ExportUncertainties) m_MPCDEUncertainty = retVal.FittedValueStdDevArcSec;
+                            m_DEUncertaintyArcSec = retVal.FittedValueUncertaintyArcSec;
+                            if (TangraConfig.Settings.Astrometry.ExportUncertainties) m_MPCDEUncertainty = retVal.FittedValueUncertaintyArcSec;
+                            lblAstUncertainty.Text = string.Format("({0:0.00}, {1:0.00})\"", m_RAUncertaintyArcSec * Math.Cos(m_DEDeg * Math.PI / 180), m_DEUncertaintyArcSec);
+                            lblUncert.Visible = true;
                             m_MPCDE = m_DEDeg;
                             m_MPCTime = retVal.FittedValueTime;
                             m_MPCTimePrecission = TimeSpan.MinValue;
@@ -992,8 +1009,8 @@ namespace Tangra.VideoOperations.Astrometry
 
 		private double m_RADeg;
 		private double m_DEDeg;
-        private double m_RAStdDevArcSec;
-	    private double m_DEStdDevArcSec;
+        private double m_RAUncertaintyArcSec;
+	    private double m_DEUncertaintyArcSec;
 		private DateTime m_MPCTime;
 	    private TimeSpan m_MPCTimePrecission;
         private double m_MPCRAHours;
@@ -1102,9 +1119,25 @@ namespace Tangra.VideoOperations.Astrometry
 
             if (m_CurrentReportFile != null)
             {
+                double? raUncertainty = m_MPCRAUncertainty;
+                double? deUncertainty = m_MPCDEUncertainty;
+                if (m_MPCRAUncertainty.HasValue && m_MPCDEUncertainty.HasValue)
+                {
+                    raUncertainty = m_MPCRAUncertainty.Value * Math.Cos(m_MPCDE * Math.PI / 180.0);
+                }
+
                 // Append the observation to the form
                 if (!m_CurrentReportFile.AddObservation(
-                    m_MPCObjectDesignation, m_MPCRAHours, m_MPCDE, m_MPCTime, m_MPCTimePrecission, m_MPCMag, m_MPCMagBand, m_MPCIsVideoNormalPosition, m_MPCRAUncertainty, m_MPCDEUncertainty))
+                        m_MPCObjectDesignation,
+                        m_MPCRAHours, 
+                        m_MPCDE, 
+                        m_MPCTime, 
+                        m_MPCTimePrecission, 
+                        m_MPCMag, 
+                        m_MPCMagBand, 
+                        m_MPCIsVideoNormalPosition,
+                        raUncertainty, 
+                        deUncertainty))
                     MessageBox.Show("Observation already added", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 else
                     m_CurrentReportFile.Save();
@@ -1238,6 +1271,6 @@ namespace Tangra.VideoOperations.Astrometry
 		{
 			btnManuallyIdentifyStar.Enabled = !pressed;
 			btnManuallyIdentifyStar2.Enabled = !pressed;
-		}
+        }
 	}
 }

@@ -42,6 +42,13 @@ namespace Tangra.MotionFitting
         Trailed
     }
 
+    public enum WeightingMode
+    {
+        None,
+        SNR,
+        Detection
+    }
+
     public class FittingContext
     {
         public DateTime FirstFrameUtcTime { get; set; }
@@ -56,6 +63,7 @@ namespace Tangra.MotionFitting
         public VideoFileFormat VideoFileFormat { get; set; }
         public string NativeVideoFormat { get; set; }
         public ObjectExposureQuality ObjectExposureQuality { get; set; }
+        public WeightingMode Weighting { get; set; }
     }
 
     public class SingleMultiFrameMeasurement
@@ -65,10 +73,11 @@ namespace Tangra.MotionFitting
         public double Mag { get; set; }
         public double StdDevRAArcSec { get; set; }
         public double StdDevDEArcSec { get; set; }
+        public double SolutionUncertaintyRACosDEArcSec { get; set; }
+        public double SolutionUncertaintyDEArcSec { get; set; }
         public double FWHMArcSec { get; set; }
         public double Detection { get; set; }
-        public double Amplitude { get; set; }
-        public double Variance { get; set; }
+        public double SNR { get; set; }
         public int FrameNo { get; set; }
         public DateTime? OCRedTimeStamp { get; set; }
     }
@@ -90,6 +99,7 @@ namespace Tangra.MotionFitting
     public class FlybyMeasurementContext
     {        
         public double MaxStdDev;
+        public double MinPositionUncertaintyPixels;
         public double UserMidValue;
         public double ArsSecsInPixel;
         public int UserMidFrame;
@@ -103,7 +113,7 @@ namespace Tangra.MotionFitting
         public int EarliestFrame;
         public int LatestFrame;
         public double FittedValue;
-        public double FittedValueStdDevArcSec;
+        public double FittedValueUncertaintyArcSec;
         public DateTime FittedValueTime;
         public bool IsVideoNormalPosition;
         public double FittedNormalFrame;
@@ -319,6 +329,8 @@ namespace Tangra.MotionFitting
                     rv.EarliestFrame = measurements.Values.Select(m => m.FrameNo).Min();
                     rv.LatestFrame = measurements.Values.Select(m => m.FrameNo).Max();
 
+                    var minUncertainty = meaContext.MinPositionUncertaintyPixels * meaContext.ArsSecsInPixel;
+
                     foreach (SingleMultiFrameMeasurement measurement in measurements.Values)
                     {
                         int integrationInterval = (measurement.FrameNo - fittingContext.FirstFrameIdInIntegrationPeroid) / fittingContext.IntegratedFramesCount;
@@ -333,12 +345,12 @@ namespace Tangra.MotionFitting
                         if (fittingValue == FittingValue.RA)
                         {
                             intPoints.Item1.Add(measurement.RADeg);
-                            intPoints.Item2.Add(measurement.Detection / (measurement.StdDevRAArcSec*measurement.StdDevRAArcSec));
+                            intPoints.Item2.Add(ComputePositionWeight(measurement.SolutionUncertaintyRACosDEArcSec, measurement, minUncertainty, fittingContext.Weighting));
                         }
                         else
                         {
                             intPoints.Item1.Add(measurement.DEDeg);
-                            intPoints.Item2.Add(measurement.Detection / (measurement.StdDevDEArcSec * measurement.StdDevDEArcSec));
+                            intPoints.Item2.Add(ComputePositionWeight(measurement.SolutionUncertaintyDEArcSec, measurement, minUncertainty, fittingContext.Weighting));
                         }
                     }
 
@@ -372,7 +384,10 @@ namespace Tangra.MotionFitting
 
                             intervalMedians.Add(dataPointFrameNo, median);
                             intervalWeights.Add(dataPointFrameNo, medianWeight);
-                            regression.AddDataPoint(dataPointFrameNo, median, medianWeight);
+                            if (fittingContext.Weighting != WeightingMode.None)
+                                regression.AddDataPoint(dataPointFrameNo, median, medianWeight);
+                            else
+                                regression.AddDataPoint(dataPointFrameNo, median);
                         }
 
                         regression.Solve();
@@ -472,7 +487,10 @@ namespace Tangra.MotionFitting
                     regression = new LinearRegression();
                     foreach (double frameNo in secondPassData.Keys)
                     {
-                        regression.AddDataPoint(frameNo, secondPassData[frameNo], intervalWeights[frameNo]);
+                        if (fittingContext.Weighting != WeightingMode.None)
+                            regression.AddDataPoint(frameNo, secondPassData[frameNo], intervalWeights[frameNo]);
+                        else
+                            regression.AddDataPoint(frameNo, secondPassData[frameNo]);
                     }
                     regression.Solve();
                 }
@@ -513,7 +531,8 @@ namespace Tangra.MotionFitting
                         // Find the closest video 'normal' MPC time and compute the frame number for it
                         // Now compute the RA/DE for the computed 'normal' frame
 
-                        double fittedValueAtMiddleFrame = regression.ComputeY(resolvedTime.ClosestNormalFrameNo);
+                        double fittedValueUncertainty;
+                        double fittedValueAtMiddleFrame = regression.ComputeYWithError(resolvedTime.ClosestNormalFrameNo, out fittedValueUncertainty);
 
                         Trace.WriteLine(string.Format("{0}; Included: {1}; Normal Frame No: {2}; Fitted Val: {3} +/- {4:0.00}",
                             meaContext.UserMidValue.ToString("0.00000"),
@@ -529,7 +548,7 @@ namespace Tangra.MotionFitting
                         rv.FittedValueTime = resolvedTime.ClosestNormalFrameTime;
                         rv.IsVideoNormalPosition = true;
                         rv.FittedNormalFrame = resolvedTime.ClosestNormalFrameNo;
-                        rv.FittedValueStdDevArcSec = regression.StdDev * 60 * 60;
+                        rv.FittedValueUncertaintyArcSec = fittedValueUncertainty * 60 * 60;
 
                         #region Plotting Code
                         if (g != null)
@@ -556,6 +575,24 @@ namespace Tangra.MotionFitting
                 motionRate = 0;
                 return null;
             }
+        }
+
+        private double ComputePositionWeight(double astrometricUncertaintyArcSec, SingleMultiFrameMeasurement measurement, double minUncertainty, WeightingMode mode)
+        {
+            if (mode == WeightingMode.SNR)
+            { 
+                // Positional uncertainty estimation by Neuschaefer and Windhorst 1994
+                var sigmaPosition = measurement.FWHMArcSec / (2.355 * measurement.SNR);
+                var combinedUncertainty = Math.Sqrt(sigmaPosition * sigmaPosition + astrometricUncertaintyArcSec * astrometricUncertaintyArcSec);
+                if (combinedUncertainty < minUncertainty) combinedUncertainty = minUncertainty;
+                return 1 / (combinedUncertainty * combinedUncertainty);                
+            }
+            else if (mode == WeightingMode.Detection)
+            {
+                return measurement.Detection / (astrometricUncertaintyArcSec * astrometricUncertaintyArcSec);
+            }
+
+            return 1;
         }
 
         private void WeightedMedian(Tuple<List<double>, List<double>> data, out double median, out double medianWeight)
@@ -678,6 +715,7 @@ namespace Tangra.MotionFitting
                 g.DrawLine(plottingContext.AveragePen, 5, yMin, imageWidth - 5, yMin);
                 g.DrawLine(plottingContext.AveragePen, 5, yMax, imageWidth - 5, yMax);
 
+                // TODO: Use weighted median
                 double median = 0;
                 medianList.Sort();
                 if (numFramesUser % 2 == 1)
@@ -691,7 +729,8 @@ namespace Tangra.MotionFitting
                     AstroConvert.ToStringValue(median, "+HH MM SS.T")));
 
                 rv.FittedValue = median;
-                rv.FittedValueStdDevArcSec = TangraConfig.Settings.Astrometry.AssumedPositionUncertaintyPixels * meaContext.ArsSecsInPixel;
+                // TODO: Use StdDev/SQRT(N)
+                rv.FittedValueUncertaintyArcSec = TangraConfig.Settings.Astrometry.AssumedPositionUncertaintyPixels * meaContext.ArsSecsInPixel;
                 rv.IsVideoNormalPosition = false;
             }
             else

@@ -26,6 +26,8 @@ namespace Tangra.Model.Numerical
             m_B = 0;
             m_Residuals = null;
             m_StdDev = double.NaN;
+            m_AverageSampleX = double.NaN;
+            s_TCoeff = double.NaN;
         }
 
         public void AddDataPoint(double x, double y)
@@ -125,6 +127,82 @@ namespace Tangra.Model.Numerical
         public double ComputeY(double x)
         {
             return m_A * x + m_B;
+        }
+
+        public double ComputeYWithError(double x, out double uncertainty, double confidenceIntervalPerc = 0.95)
+        {
+            EnsureErrorEstimationData();
+
+            var tDistCoeff = GetTDistributionCoeff(m_XValues.Count, 1 - confidenceIntervalPerc);
+
+            uncertainty = tDistCoeff * m_StdDev * Math.Sqrt((1.0 / m_XValues.Count) + m_XValues.Count * Math.Pow(x - m_AverageSampleX, 2) / m_SS);
+
+            return m_A * x + m_B;
+        }
+
+        private double m_AverageSampleX = double.NaN;
+        private double m_SS = double.NaN;
+        private static double s_TCoeff = double.NaN;
+        private static double s_TConfidence = 0;
+        private static int s_TDegFreedom = 0;
+
+        private static double GetTDistributionCoeff(int df, double a)
+        {
+            if (double.IsNaN(s_TCoeff) || Math.Abs(s_TConfidence - a) < 0.0001 || s_TDegFreedom != df)
+            {
+                s_TCoeff = TDistribution.CalculateCriticalValue(df, a, 0.0001);
+                s_TConfidence = a;
+                s_TDegFreedom = df;
+            }
+
+            return s_TCoeff;
+        }
+
+        private double GetTDistribution95CoeffFromTable()
+        {
+            if (double.IsNaN(s_TCoeff))
+            {
+                int df = m_XValues.Count - 2;
+                if (df >= 2000) 
+                    s_TCoeff = 1.960;
+                else if (s_T_Coeff_95.ContainsKey(df))
+                    s_TCoeff = s_T_Coeff_95[df];
+                else
+                {
+                    s_TCoeff = 2.000;
+                    var allKeys = s_T_Coeff_95.Keys.ToArray();
+                    for (int i = 30; i < s_T_Coeff_95.Count; i++)
+                    {
+                        if (df >= allKeys[i - 1] && df < allKeys[i])
+                        {
+                            s_TCoeff = s_T_Coeff_95[allKeys[i - 1]];
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return s_TCoeff;
+        }
+
+        private static Dictionary<int, double> s_T_Coeff_95 = new Dictionary<int, double>()
+        {
+            {1, 12.706}, {2, 4.303}, {3, 3.182}, {4, 2.776}, {5, 2.571}, {6, 2.447}, {7, 2.365}, {8, 2.306}, {9, 2.262}, {10, 2.228},
+            {11, 2.201}, {12, 2.179}, {13, 2.160}, {14, 2.145}, {15, 2.131}, {16, 2.120}, {17, 2.110}, {18, 2.101}, {19, 2.093}, {20, 2.086},
+            {21, 2.080}, {22, 2.074}, {23, 2.069}, {24, 2.064}, {25, 2.060}, {26, 2.056}, {27, 2.052}, {28, 2.048}, {29, 2.045}, {30, 2.042},
+            {60, 2.000}, {90, 1.987}, {120, 1.980}, {150, 1.976}, {180, 1.973}, {210, 1.971}, {240, 1.970}, {270, 1.969}, {300, 1.968}, {350, 1.967},
+            {400, 1.966}, {450, 1.965}, {550, 1.964}, {750, 1.963}, {1000, 1.962}, {2000, 1.960}
+        };
+
+        private void EnsureErrorEstimationData()
+        {
+            if (double.IsNaN(m_AverageSampleX))
+            {
+                m_AverageSampleX = m_XValues.Average();
+                m_SS = m_XValues.Count * m_XValues.Sum(x => x * x) - Math.Pow(m_XValues.Sum(), 2);
+            }
+
+            EnsureResiduals();
         }
 
         private List<double> m_Residuals;

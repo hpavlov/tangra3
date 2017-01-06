@@ -85,17 +85,19 @@ namespace Tangra.Addins
 		    {
 		        foreach (var mea in state.Measurements)
 		        {
+                    // Positional uncertainty estimation by Neuschaefer and Windhorst 1994
+                    double posUncertainty = mea.FWHMArcSec / (2.355 * mea.SNR);
+
                     m_MeasurementsImpl.Add(new TangraAstrometricMeasurementImpl()
                     {
                         DEDeg = mea.DEDeg,
                         RADeg = mea.RADeg,
                         FrameNo = mea.FrameNo,
-                        StdDevDEArcSec = mea.StdDevDEArcSec,
-                        StdDevRAArcSec = mea.StdDevRAArcSec,
+                        UncertaintyRACosDEArcSec = Math.Sqrt(mea.SolutionUncertaintyRACosDEArcSec * mea.SolutionUncertaintyRACosDEArcSec + posUncertainty * posUncertainty),
+                        UncertaintyDEArcSec = Math.Sqrt(mea.SolutionUncertaintyDEArcSec * mea.SolutionUncertaintyDEArcSec + posUncertainty * posUncertainty),
                         FWHMArcSec = mea.FWHMArcSec,
                         Detection = mea.Detection,
-                        Amplitude = mea.Amplitude,
-                        Variance = mea.Variance,
+                        SNR = mea.SNR,
                         OCRedTimeStamp = mea.OCRedTimeStamp,
                         Mag = mea.Mag
                     });
@@ -315,12 +317,11 @@ namespace Tangra.Addins
             public double RADeg { get; internal set; }
             public double DEDeg { get; internal set; }
             public double Mag { get; internal set; }
-            public double StdDevRAArcSec { get; internal set; }
-            public double StdDevDEArcSec { get; internal set; }
+            public double UncertaintyRACosDEArcSec { get; internal set; }
+            public double UncertaintyDEArcSec { get; internal set; }
             public double FWHMArcSec { get; internal set; }
             public double Detection { get; internal set; }
-            public double Amplitude { get; internal set; }
-            public double Variance { get; internal set; }
+            public double SNR { get; internal set; }
             public int FrameNo { get; internal set; }
             public DateTime? OCRedTimeStamp { get; internal set; }
         }

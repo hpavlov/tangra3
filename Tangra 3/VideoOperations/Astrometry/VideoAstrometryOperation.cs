@@ -593,7 +593,7 @@ namespace Tangra.VideoOperations.Astrometry
 
 				m_VideoController.StatusChanged(string.Format("{0} Fit ({1} Stars - {2}) ",
 					m_AstrometricFit.FitOrder,
-					m_AstrometricFit.FitInfo.NumberOfStarsUnsedInSolution(),
+					m_AstrometricFit.FitInfo.NumberOfStarsUsedInSolution(),
 					m_Context.StarCatalogueFacade.CatalogNETCode));
 
 
@@ -812,10 +812,13 @@ namespace Tangra.VideoOperations.Astrometry
                         measurement.DEDeg = m_AstrometryTracker.TrackedObject.DEDeg;
                         measurement.StdDevRAArcSec = m_AstrometricFit.StdDevRAArcSec;
                         measurement.StdDevDEArcSec = m_AstrometricFit.StdDevDEArcSec;
+                        var factor = Math.Sqrt(m_AstrometricFit.FitInfo.NumberOfStarsUsedInSolution());
+                        measurement.SolutionUncertaintyRACosDEArcSec = (m_AstrometricFit.StdDevRAArcSec * Math.Cos(m_AstrometryTracker.TrackedObject.DEDeg * Math.PI / 180.0)) / factor;
+                        measurement.SolutionUncertaintyDEArcSec = m_AstrometricFit.StdDevDEArcSec / factor;
                         measurement.FWHMArcSec = m_AstrometricFit.GetDistanceInArcSec(m_AstrometryTracker.TrackedObject.PSFFit.FWHM);
                         measurement.Detection = m_AstrometryTracker.TrackedObject.PSFFit.Certainty;
-                        measurement.Amplitude = m_AstrometryTracker.TrackedObject.PSFFit.IMax - m_AstrometryTracker.TrackedObject.PSFFit.I0;
-                        measurement.Variance = m_AstrometryTracker.TrackedObject.PSFFit.GetVariance();
+                        measurement.SNR = m_AstrometryTracker.TrackedObject.PSFFit.GetSNR();
+
                         if (m_VideoController.HasTimestampOCR())
                         {
                             measurement.OCRedTimeStamp = m_VideoController.OCRTimestamp();
