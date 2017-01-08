@@ -115,11 +115,12 @@
             // 
             // btnDetectIntegrationRate
             // 
-            this.btnDetectIntegrationRate.Location = new System.Drawing.Point(136, 43);
+            this.btnDetectIntegrationRate.Location = new System.Drawing.Point(11, 165);
             this.btnDetectIntegrationRate.Name = "btnDetectIntegrationRate";
-            this.btnDetectIntegrationRate.Size = new System.Drawing.Size(62, 23);
+            this.btnDetectIntegrationRate.Size = new System.Drawing.Size(155, 23);
             this.btnDetectIntegrationRate.TabIndex = 44;
-            this.btnDetectIntegrationRate.Text = "Detect";
+            this.btnDetectIntegrationRate.Text = "Detect Integration Rate";
+            this.btnDetectIntegrationRate.Visible = false;
             this.btnDetectIntegrationRate.Click += new System.EventHandler(this.btnDetectIntegrationRate_Click);
             // 
             // btnConvert
@@ -227,7 +228,6 @@
             this.gbxIntegrationRate.Controls.Add(this.lblIntegration);
             this.gbxIntegrationRate.Controls.Add(this.nudStartingAtFrame);
             this.gbxIntegrationRate.Controls.Add(this.label4);
-            this.gbxIntegrationRate.Controls.Add(this.btnDetectIntegrationRate);
             this.gbxIntegrationRate.Location = new System.Drawing.Point(11, 157);
             this.gbxIntegrationRate.Name = "gbxIntegrationRate";
             this.gbxIntegrationRate.Size = new System.Drawing.Size(212, 76);
@@ -375,6 +375,7 @@
             this.Controls.Add(this.gbxIntegrationRate);
             this.Controls.Add(this.gbxVTIPosition);
             this.Controls.Add(this.btnCancel);
+            this.Controls.Add(this.btnDetectIntegrationRate);
             this.Controls.Add(this.btnConvert);
             this.Controls.Add(this.gbxSection);
             this.Name = "ucConvertVideoToAav";

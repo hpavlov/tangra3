@@ -156,8 +156,8 @@ namespace Tangra.SDK
         double RADeg { get; }
         double DEDeg { get; }
         double Mag { get; }
-        double UncertaintyRACosDEArcSec { get; }
-        double UncertaintyDEArcSec { get; }
+        double SolutionUncertaintyRACosDEArcSec { get; }
+        double SolutionUncertaintyDEArcSec { get; }
         double FWHMArcSec { get; }
         double Detection { get; }
         double SNR { get; }

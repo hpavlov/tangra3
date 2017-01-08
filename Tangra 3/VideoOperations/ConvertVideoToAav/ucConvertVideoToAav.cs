@@ -22,7 +22,7 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
     public enum AavConfigState
     {
         ConfirmingVtiOsdPosition,
-        EnteringIntegrationRate,
+        DetectingIntegrationRate,
         ReadyToConvert,
         Converting,
         FinishedConverting
@@ -252,14 +252,12 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
                 pbar.Visible = false;
                 btnCancel.Enabled = false;
             }
-            else if (m_State == AavConfigState.EnteringIntegrationRate)
+            else if (m_State == AavConfigState.DetectingIntegrationRate)
             {
                 gbxVTIPosition.Enabled = false;
                 btnConfirmPosition.Enabled = false;
                 gbxSection.Visible = true;
-                gbxIntegrationRate.Visible = true;
                 btnDetectIntegrationRate.Visible = true;
-                btnDetectIntegrationRate.Enabled = true;
                 btnConvert.Enabled = false;
             }
             else if (m_State == AavConfigState.ReadyToConvert)
@@ -267,6 +265,7 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
                 btnConvert.Enabled = true;
                 btnDetectIntegrationRate.Enabled = false;
                 nudFirstFrame.Enabled = false;
+                gbxIntegrationRate.Visible = true;
                 gbxIntegrationRate.Enabled = false;
                 gbxCameraInfo.Visible = true;
             }
@@ -289,13 +288,16 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
 
         private void btnConfirmPosition_Click(object sender, EventArgs e)
         {
-            m_State = AavConfigState.EnteringIntegrationRate;
+            m_State = AavConfigState.DetectingIntegrationRate;
             nudFirstFrame.SetNUDValue(m_VideoController.CurrentFrameIndex);
             UpdateControlState();
         }
 
         private void nudPreserveVTITopRow_ValueChanged(object sender, EventArgs e)
         {
+            m_Operation.PreserveVTIFirstRow = (int)nudPreserveVTITopRow.Value;
+            m_Operation.PreserveVTILastRow = (int)nudPreserveVTIBottomRow.Value;
+
             m_VideoController.RefreshCurrentFrame();
         }
 

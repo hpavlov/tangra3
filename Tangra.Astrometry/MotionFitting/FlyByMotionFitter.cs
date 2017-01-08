@@ -577,19 +577,19 @@ namespace Tangra.MotionFitting
             }
         }
 
-        private double ComputePositionWeight(double astrometricUncertaintyArcSec, SingleMultiFrameMeasurement measurement, double minUncertainty, WeightingMode mode)
+        private double ComputePositionWeight(double solutionUncertaintyArcSec, SingleMultiFrameMeasurement measurement, double minUncertainty, WeightingMode mode)
         {
             if (mode == WeightingMode.SNR)
             { 
                 // Positional uncertainty estimation by Neuschaefer and Windhorst 1994
                 var sigmaPosition = measurement.FWHMArcSec / (2.355 * measurement.SNR);
-                var combinedUncertainty = Math.Sqrt(sigmaPosition * sigmaPosition + astrometricUncertaintyArcSec * astrometricUncertaintyArcSec);
+                var combinedUncertainty = Math.Sqrt(sigmaPosition * sigmaPosition + solutionUncertaintyArcSec * solutionUncertaintyArcSec);
                 if (combinedUncertainty < minUncertainty) combinedUncertainty = minUncertainty;
-                return 1 / (combinedUncertainty * combinedUncertainty);                
+                return 1 / (combinedUncertainty * combinedUncertainty);
             }
             else if (mode == WeightingMode.Detection)
             {
-                return measurement.Detection / (astrometricUncertaintyArcSec * astrometricUncertaintyArcSec);
+                return measurement.Detection / (solutionUncertaintyArcSec * solutionUncertaintyArcSec);
             }
 
             return 1;

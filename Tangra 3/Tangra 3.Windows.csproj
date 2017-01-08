@@ -343,6 +343,12 @@
       <DependentUpon>frmLongRunningOperation.cs</DependentUpon>
     </Compile>
     <Compile Include="Helpers\LongOperationsManager.cs" />
+    <Compile Include="ImageTools\frmIdentifiedStarAction.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ImageTools\frmIdentifiedStarAction.Designer.cs">
+      <DependentUpon>frmIdentifiedStarAction.cs</DependentUpon>
+    </Compile>
     <Compile Include="ImageTools\RoiSelector.cs" />
     <Compile Include="VideoOperations\Astrometry\Tracking\FastAsteroidTracker.cs" />
     <Compile Include="VideoOperations\Astrometry\Tracking\IAstrometryTracker.cs" />
@@ -1084,6 +1090,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Helpers\frmLongRunningOperation.resx">
       <DependentUpon>frmLongRunningOperation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ImageTools\frmIdentifiedStarAction.resx">
+      <DependentUpon>frmIdentifiedStarAction.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ImageTools\frmIdentifyCalibrationStar.resx">
       <DependentUpon>frmIdentifyCalibrationStar.cs</DependentUpon>

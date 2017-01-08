@@ -18,7 +18,7 @@ namespace Tangra.Controller
         private Form m_MainFormView;
         private VideoController m_VideoController;
         private string m_FileName;
-        private AdvRecorder m_Recorder = new AdvRecorder();
+        private AdvRecorder m_Recorder;
 
         private int m_MaxPixelValue;
         private int m_Width;
@@ -65,7 +65,9 @@ namespace Tangra.Controller
             m_IntegrationPeriod = integrationInterval;
             m_FirstIntegrationPeriodStartFrameId = firstIntegratedFrameId;
             m_NextExpectedIntegrationPeriodStartFrameId = firstIntegratedFrameId + integrationInterval;
+            m_FramesSoFar = 0;
 
+            m_Recorder = new AdvRecorder();
             m_Recorder.ImageConfig.SetImageParameters(
                 (ushort)m_Width,
                 (ushort)m_Height, 

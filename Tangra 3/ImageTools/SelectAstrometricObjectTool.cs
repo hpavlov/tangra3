@@ -157,14 +157,23 @@ namespace Tangra.ImageTools
 					if (res == DialogResult.Abort)
 					{
 						m_AstrometricState.ManuallyIdentifiedStars.Clear();
-						return;
+                        m_AstrometryController.SetManuallyIdentifyStarState(false);
 					}
 					else if (res == DialogResult.OK && frmIdentifyCalibrationStar.SelectedStar != null)
 					{
-						m_AstrometricState.ManuallyIdentifiedStars.Add(e.Gausian, frmIdentifyCalibrationStar.SelectedStar);
-						m_AstrometryController.TriggerPlateReSolve();
+                        var frmQuestion = new frmIdentifiedStarAction(m_AstrometricState);
+					    if (m_VideoController.ShowDialog(frmQuestion) == DialogResult.OK)
+					    {
+					        m_AstrometricState.ManuallyIdentifiedStars.Add(e.Gausian, frmIdentifyCalibrationStar.SelectedStar);
+					        m_AstrometryController.TriggerPlateReSolve();
+                            m_AstrometryController.SetManuallyIdentifyStarState(false);
+					    }
+					    else
+					    {
+                            m_AstrometricState.ManuallyIdentifiedStars.Add(e.Gausian, frmIdentifyCalibrationStar.SelectedStar);
+                            m_VideoController.RedrawCurrentFrame(false);
+					    }
 					}
-					m_AstrometryController.SetManuallyIdentifyStarState(false);
 				}
 				else if (m_AstrometricState.MeasuringState != AstrometryInFramesState.RunningMeasurements)
 				{

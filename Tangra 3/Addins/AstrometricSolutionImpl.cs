@@ -85,16 +85,13 @@ namespace Tangra.Addins
 		    {
 		        foreach (var mea in state.Measurements)
 		        {
-                    // Positional uncertainty estimation by Neuschaefer and Windhorst 1994
-                    double posUncertainty = mea.FWHMArcSec / (2.355 * mea.SNR);
-
                     m_MeasurementsImpl.Add(new TangraAstrometricMeasurementImpl()
                     {
                         DEDeg = mea.DEDeg,
                         RADeg = mea.RADeg,
                         FrameNo = mea.FrameNo,
-                        UncertaintyRACosDEArcSec = Math.Sqrt(mea.SolutionUncertaintyRACosDEArcSec * mea.SolutionUncertaintyRACosDEArcSec + posUncertainty * posUncertainty),
-                        UncertaintyDEArcSec = Math.Sqrt(mea.SolutionUncertaintyDEArcSec * mea.SolutionUncertaintyDEArcSec + posUncertainty * posUncertainty),
+                        SolutionUncertaintyRACosDEArcSec = mea.SolutionUncertaintyRACosDEArcSec,
+                        SolutionUncertaintyDEArcSec = mea.SolutionUncertaintyDEArcSec,
                         FWHMArcSec = mea.FWHMArcSec,
                         Detection = mea.Detection,
                         SNR = mea.SNR,
@@ -317,8 +314,8 @@ namespace Tangra.Addins
             public double RADeg { get; internal set; }
             public double DEDeg { get; internal set; }
             public double Mag { get; internal set; }
-            public double UncertaintyRACosDEArcSec { get; internal set; }
-            public double UncertaintyDEArcSec { get; internal set; }
+            public double SolutionUncertaintyRACosDEArcSec { get; internal set; }
+            public double SolutionUncertaintyDEArcSec { get; internal set; }
             public double FWHMArcSec { get; internal set; }
             public double Detection { get; internal set; }
             public double SNR { get; internal set; }
