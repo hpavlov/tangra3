@@ -526,7 +526,8 @@ namespace Tangra.VideoOperations.LightCurves
             double corrEndFirstField;
             double corrInstrumentalDelay;
             double corrTimestampHint;
-            if (GetInstrumentalDelayAtFrame(frameNo, out corrEndFirstField, out corrTimestampHint, out corrInstrumentalDelay))
+            int integratedFields;
+            if (GetInstrumentalDelayAtFrame(frameNo, out corrEndFirstField, out corrTimestampHint, out corrInstrumentalDelay, out integratedFields))
             {
                 return corrInstrumentalDelay;
             }
@@ -534,11 +535,12 @@ namespace Tangra.VideoOperations.LightCurves
             return 0;
         }
 
-        private bool GetInstrumentalDelayAtFrame(double frameNo, out double corrEndFirstField, out double corrTimestampHint, out double corrInstrumentalDelay)
+        private bool GetInstrumentalDelayAtFrame(double frameNo, out double corrEndFirstField, out double corrTimestampHint, out double corrInstrumentalDelay, out int integratedFields)
         {
             corrEndFirstField = 0;
             corrTimestampHint = 0;
             corrInstrumentalDelay = 0;
+            integratedFields = 0;
 
             int frameTimingIndex = (int)((uint)frameNo - Header.MinFrame);
 
@@ -560,7 +562,6 @@ namespace Tangra.VideoOperations.LightCurves
             if (intervalDuration > 0)
             {
                 double videoStandardFieldDurationSec = 0;
-                int integratedFields = 0;
 
                 double ntscCountedFrames = intervalDuration*29.97;
                 double palCountedFrames = intervalDuration*25.00;
@@ -583,8 +584,19 @@ namespace Tangra.VideoOperations.LightCurves
 
                 if (integratedFields > 0 && Footer.InstrumentalDelayConfig.ContainsKey(integratedFields / 2))
                 {
-                    // Apply correction: [FRAMETIME - ((1/2 * INTEGRATION PERIOD) - 1 FIELD) * (PAL or NTSC FrameRate) - GERHARD_CORRECTION(INTEGRATION PERIOD)]
-                    corrEndFirstField = -1 * (((integratedFields / 2) - 1) * videoStandardFieldDurationSec); // Half frame back sets us at the begining of the first field, then add 1 field to get to the end of the field
+                    bool isAAVOCR = Header.TimingType == MeasurementTimingType.OCRedTimeForEachFrame &&
+                                    Footer.AAVFrameIntegration > 1;
+
+                    if (!isAAVOCR)
+                    {
+                        // Apply correction: [FRAMETIME - ((1/2 * INTEGRATION PERIOD) - 1 FIELD) * (PAL or NTSC FrameRate) - GERHARD_CORRECTION(INTEGRATION PERIOD)]
+                        corrEndFirstField = -1 * (((integratedFields / 2) - 1) * videoStandardFieldDurationSec); // Half frame back sets us at the begining of the first field, then add 1 field to get to the end of the field                        
+                    }
+                    else
+                    {
+                        // In AAV OCR mode the timestamp that we have is already the end of the first video field so no correction required for that
+                        corrEndFirstField = 0;
+                    }
 
                     corrTimestampHint = corrEndFirstField;
 
@@ -616,7 +628,8 @@ namespace Tangra.VideoOperations.LightCurves
             double corrEndFirstField;
             double corrInstrumentalDelay;
 		    double corrTimestampHint;
-            if (GetInstrumentalDelayAtFrame(frameNo, out corrEndFirstField, out corrTimestampHint, out corrInstrumentalDelay))
+            int integratedFields;
+            if (GetInstrumentalDelayAtFrame(frameNo, out corrEndFirstField, out corrTimestampHint, out corrInstrumentalDelay, out integratedFields))
             {
                 DateTime endOfFirstField = rv.AddSeconds(corrTimestampHint);
                 rv = rv.AddSeconds(corrEndFirstField + corrInstrumentalDelay);
@@ -628,7 +641,7 @@ namespace Tangra.VideoOperations.LightCurves
 					prefix = "";
 
                 correctedForInstrumentalDelayMessage = string.Format(
-					"Instrumental delay has been applied to the times\r\n\r\nEnd of first field {0}timestamp: {1}", prefix, endOfFirstField.ToString("HH:mm:ss.fff"));
+                    "Instrumental delay for x{0} integrated frames has been applied to the times\r\n\r\nEnd of first field {1}timestamp: {2}", integratedFields / 2, prefix, endOfFirstField.ToString("HH:mm:ss.fff"));
 
                 if (Footer.AAVStackedFrameRate > 1)
                     correctedForInstrumentalDelayMessage += string.Format("\r\n\r\nThis is a non-integrated video stacked at x{0} frames", Footer.AAVStackedFrameRate);
