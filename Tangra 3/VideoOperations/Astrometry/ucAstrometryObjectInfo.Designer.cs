@@ -62,6 +62,10 @@
             this.label14 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
             this.pnlObject = new System.Windows.Forms.Panel();
+            this.lblErrSol = new System.Windows.Forms.Label();
+            this.label16 = new System.Windows.Forms.Label();
+            this.lblErrPos = new System.Windows.Forms.Label();
+            this.label15 = new System.Windows.Forms.Label();
             this.pbPSFFit = new System.Windows.Forms.PictureBox();
             this.lblMag = new System.Windows.Forms.Label();
             this.lblResDE = new System.Windows.Forms.Label();
@@ -95,10 +99,6 @@
             this.btnShowMesaurements = new System.Windows.Forms.Button();
             this.pnlSwitchControl = new System.Windows.Forms.Panel();
             this.saveUnitTestDataFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.lblErrPos = new System.Windows.Forms.Label();
-            this.label15 = new System.Windows.Forms.Label();
-            this.lblErrSol = new System.Windows.Forms.Label();
-            this.label16 = new System.Windows.Forms.Label();
             this.pnlMeasurements.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pnlRASeries)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pnlDESeries)).BeginInit();
@@ -315,7 +315,7 @@
             // 
             this.lblAstUncertainty.AutoSize = true;
             this.lblAstUncertainty.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblAstUncertainty.Location = new System.Drawing.Point(127, 22);
+            this.lblAstUncertainty.Location = new System.Drawing.Point(140, 22);
             this.lblAstUncertainty.Name = "lblAstUncertainty";
             this.lblAstUncertainty.Size = new System.Drawing.Size(79, 13);
             this.lblAstUncertainty.TabIndex = 29;
@@ -328,9 +328,9 @@
             this.lblUncert.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
             this.lblUncert.Location = new System.Drawing.Point(7, 22);
             this.lblUncert.Name = "lblUncert";
-            this.lblUncert.Size = new System.Drawing.Size(122, 13);
+            this.lblUncert.Size = new System.Drawing.Size(138, 13);
             this.lblUncert.TabIndex = 30;
-            this.lblUncert.Text = "Uncertainty [95%] = ";
+            this.lblUncert.Text = "Uncertainty [95% CI] = ";
             this.lblUncert.Visible = false;
             // 
             // lblRateVal
@@ -618,6 +618,42 @@
             this.pnlObject.Size = new System.Drawing.Size(252, 209);
             this.pnlObject.TabIndex = 22;
             this.pnlObject.Visible = false;
+            // 
+            // lblErrSol
+            // 
+            this.lblErrSol.AutoSize = true;
+            this.lblErrSol.Location = new System.Drawing.Point(54, 153);
+            this.lblErrSol.Name = "lblErrSol";
+            this.lblErrSol.Size = new System.Drawing.Size(34, 13);
+            this.lblErrSol.TabIndex = 20;
+            this.lblErrSol.Text = "214.5";
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(4, 153);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(50, 13);
+            this.label16.TabIndex = 19;
+            this.label16.Text = "Err.Sol = ";
+            // 
+            // lblErrPos
+            // 
+            this.lblErrPos.AutoSize = true;
+            this.lblErrPos.Location = new System.Drawing.Point(54, 139);
+            this.lblErrPos.Name = "lblErrPos";
+            this.lblErrPos.Size = new System.Drawing.Size(34, 13);
+            this.lblErrPos.TabIndex = 18;
+            this.lblErrPos.Text = "214.5";
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(4, 139);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(53, 13);
+            this.label15.TabIndex = 17;
+            this.label15.Text = "Err.Pos = ";
             // 
             // pbPSFFit
             // 
@@ -934,42 +970,6 @@
             // 
             this.saveUnitTestDataFileDialog.DefaultExt = "obs";
             this.saveUnitTestDataFileDialog.Filter = "Zip Files (*.zip)|*.zip|All Files (*.*)|*.*";
-            // 
-            // lblErrPos
-            // 
-            this.lblErrPos.AutoSize = true;
-            this.lblErrPos.Location = new System.Drawing.Point(54, 139);
-            this.lblErrPos.Name = "lblErrPos";
-            this.lblErrPos.Size = new System.Drawing.Size(34, 13);
-            this.lblErrPos.TabIndex = 18;
-            this.lblErrPos.Text = "214.5";
-            // 
-            // label15
-            // 
-            this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(4, 139);
-            this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(53, 13);
-            this.label15.TabIndex = 17;
-            this.label15.Text = "Err.Pos = ";
-            // 
-            // lblErrSol
-            // 
-            this.lblErrSol.AutoSize = true;
-            this.lblErrSol.Location = new System.Drawing.Point(54, 153);
-            this.lblErrSol.Name = "lblErrSol";
-            this.lblErrSol.Size = new System.Drawing.Size(34, 13);
-            this.lblErrSol.TabIndex = 20;
-            this.lblErrSol.Text = "214.5";
-            // 
-            // label16
-            // 
-            this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(4, 153);
-            this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(50, 13);
-            this.label16.TabIndex = 19;
-            this.label16.Text = "Err.Sol = ";
             // 
             // ucAstrometryObjectInfo
             // 

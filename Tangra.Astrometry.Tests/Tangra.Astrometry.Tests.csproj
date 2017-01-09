@@ -64,6 +64,7 @@
     <Compile Include="Calibration\TestStar.cs" />
     <Compile Include="Calibration\TestThreeStarFit.cs" />
     <Compile Include="MotionFitting\TestFlyByMotionFitter.cs" />
+    <Compile Include="MotionFitting\TestLinearRegression.cs" />
     <Compile Include="PlateSolve\PlateSolveTester.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StarCatalogues\TestPPMXL.cs" />

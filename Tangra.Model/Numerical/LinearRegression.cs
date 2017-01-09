@@ -14,6 +14,9 @@ namespace Tangra.Model.Numerical
 
         private double m_A = 0;
         private double m_B = 0;
+        private SafeMatrix m_CoVarianceMatrix = null;
+        private double m_B_Uncertainty = double.NaN;
+        private double m_A_Uncertainty = double.NaN;
 
         public LinearRegression()
         { }
@@ -26,7 +29,6 @@ namespace Tangra.Model.Numerical
             m_B = 0;
             m_Residuals = null;
             m_StdDev = double.NaN;
-            m_AverageSampleX = double.NaN;
             s_TCoeff = double.NaN;
         }
 
@@ -64,16 +66,16 @@ namespace Tangra.Model.Numerical
                 A[i, 0] = m_XValues[i];
                 A[i, 1] = 1;
 
-                X[i, 0] = m_YValues[i];                
+                X[i, 0] = m_YValues[i];
             }
 
             SafeMatrix a_T = A.Transpose();
             SafeMatrix aa = a_T * A;
-            SafeMatrix aa_inv = aa.Inverse();
+            SafeMatrix aa_inv = m_CoVarianceMatrix = aa.Inverse();
             SafeMatrix bx = (aa_inv * a_T) * X;
 
             m_A = bx[0, 0];
-            m_B = bx[1, 0];            
+            m_B = bx[1, 0];
         }
 
         public void SolveWithWeights()
@@ -102,7 +104,7 @@ namespace Tangra.Model.Numerical
 
             SafeMatrix a_T = A.Transpose();
             SafeMatrix aa = (a_T * W) * A;
-            SafeMatrix aa_inv = aa.Inverse();
+            SafeMatrix aa_inv = m_CoVarianceMatrix = aa.Inverse();
             SafeMatrix bx = ((aa_inv * a_T) * W) * X;
 
             m_A = bx[0, 0];
@@ -124,6 +126,21 @@ namespace Tangra.Model.Numerical
             get { return m_B; }
         }
 
+        public double Uncertainty_A
+        {
+            get { return m_A_Uncertainty; }
+        }
+
+        public double Uncertainty_B
+        {
+            get { return m_B_Uncertainty; }
+        }
+
+        public SafeMatrix CoVarianceMatrix
+        {
+            get { return m_CoVarianceMatrix; }
+        }
+
         public double ComputeY(double x)
         {
             return m_A * x + m_B;
@@ -131,7 +148,7 @@ namespace Tangra.Model.Numerical
 
         public double ComputeYWithError(double x, out double uncertainty, double confidenceIntervalPerc = 0.95)
         {
-            EnsureErrorEstimationData();
+            EnsureResiduals();
 
             var tDistCoeff = GetTDistributionCoeff(m_XValues.Count, 1 - confidenceIntervalPerc);
 
@@ -194,17 +211,6 @@ namespace Tangra.Model.Numerical
             {400, 1.966}, {450, 1.965}, {550, 1.964}, {750, 1.963}, {1000, 1.962}, {2000, 1.960}
         };
 
-        private void EnsureErrorEstimationData()
-        {
-            if (double.IsNaN(m_AverageSampleX))
-            {
-                m_AverageSampleX = m_XValues.Average();
-                m_SS = m_XValues.Count * m_XValues.Sum(x => x * x) - Math.Pow(m_XValues.Sum(), 2);
-            }
-
-            EnsureResiduals();
-        }
-
         private List<double> m_Residuals;
         private double m_StdDev = double.NaN;
         private double m_ChiSquare = double.NaN;
@@ -229,6 +235,11 @@ namespace Tangra.Model.Numerical
             }
         }
 
+        public IEnumerable<double> Residuals
+        {
+            get { return m_Residuals;}
+        }
+
         private void EnsureResiduals()
         {
             if (m_Residuals == null)
@@ -236,17 +247,26 @@ namespace Tangra.Model.Numerical
                 m_Residuals = new List<double>();
                 m_StdDev = 0;
                 bool hasWeights = m_Weights.Count > 0;
+                // http://files.eric.ed.gov/fulltext/ED282906.pdf
+                // TODO: Check page 18 of http://www.markirwin.net/stat149/Lecture/Lecture3.pdf
+                double weightScaler = hasWeights ? (m_Weights.Count/m_Weights.Sum()) : 1;
 
                 for (int i = 0; i < m_XValues.Count; i++)
                 {
                     double residual = m_YValues[i] - ComputeY(m_XValues[i]);
-                    if (hasWeights) residual *= m_Weights[i];
 
                     m_Residuals.Add(residual);
-                    m_StdDev += residual * residual;
+                    var resSq = residual * residual;
+                    if (hasWeights) resSq *= weightScaler * m_Weights[i];
+
+                    m_StdDev += resSq;
                 }
 
-                m_StdDev = Math.Sqrt(m_StdDev / (m_XValues.Count - 1));
+                var variance = hasWeights 
+                    ? m_StdDev / (m_Weights.Sum() - 2) 
+                    : m_StdDev / (m_XValues.Count - 2);
+
+                m_StdDev = Math.Sqrt(variance);
 
                 m_ChiSquare = 0;
                 double stdsq = m_StdDev * m_StdDev;
@@ -255,6 +275,14 @@ namespace Tangra.Model.Numerical
                     m_ChiSquare += (m_Residuals[i] * m_Residuals[i]) / stdsq;
                 }
                 m_ChiSquare = m_ChiSquare / (m_Residuals.Count - 3);
+
+                m_AverageSampleX = m_XValues.Average();
+
+                var sumSquares = m_XValues.Sum(x => x*x);
+                m_SS = m_XValues.Count * sumSquares - Math.Pow(m_XValues.Sum(), 2);
+
+                m_B_Uncertainty = Math.Sqrt(variance * sumSquares / m_SS);
+                m_A_Uncertainty = Math.Sqrt(variance * m_XValues.Count / m_SS);
             }
         }
     }
