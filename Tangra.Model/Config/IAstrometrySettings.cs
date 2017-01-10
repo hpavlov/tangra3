@@ -18,6 +18,13 @@ namespace Tangra.Model.Config
 		Pyramid
 	}
 
+    public enum WeightingMode
+    {
+        None,
+        SNR,
+        Detection
+    }
+
 	public interface IAstrometrySettings
 	{
 		double DetectionLimit { get; }

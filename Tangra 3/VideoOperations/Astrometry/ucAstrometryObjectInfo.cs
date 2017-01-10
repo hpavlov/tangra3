@@ -598,7 +598,7 @@ namespace Tangra.VideoOperations.Astrometry
  
 
 				    var fittingContext = m_MeasurementContext.ToFittingContext();
-				    fittingContext.Weighting = WeightingMode.Detection;
+				    fittingContext.Weighting = TangraConfig.Settings.Astrometry.MotionFitWeightingMode;
 
                     var plottingContext = new FlybyPlottingContext
                     {

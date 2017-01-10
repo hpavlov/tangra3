@@ -42,13 +42,6 @@ namespace Tangra.MotionFitting
         Trailed
     }
 
-    public enum WeightingMode
-    {
-        None,
-        SNR,
-        Detection
-    }
-
     public class FittingContext
     {
         public DateTime FirstFrameUtcTime { get; set; }

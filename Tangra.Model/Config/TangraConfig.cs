@@ -1699,6 +1699,7 @@ namespace Tangra.Model.Config
 			    AssumedPositionUncertaintyPixels = 0.1; // pixels
 
 				AlignmentMethod = FieldAlignmentMethod.Pyramid;
+                MotionFitWeightingMode = WeightingMode.SNR;
 
 #pragma warning disable 612,618
 				PyramidDistanceTolerance = 6;
@@ -1743,6 +1744,7 @@ namespace Tangra.Model.Config
 				clone.PyramidRemoveNonStellarObject = this.PyramidRemoveNonStellarObject;
 			    clone.PyramidNumberOfPivots = this.PyramidNumberOfPivots;
 			    clone.AssumedPositionUncertaintyPixels = this.AssumedPositionUncertaintyPixels;
+			    clone.MotionFitWeightingMode = this.MotionFitWeightingMode;
 				return clone;
 			}
 
@@ -1803,6 +1805,8 @@ namespace Tangra.Model.Config
 			public string MPCObservatoryCode { get; set; }
 
             public bool ExportUncertainties { get; set; }
+
+            public WeightingMode MotionFitWeightingMode { get; set; }
 
             public bool SaveDebugOutput;
 		}
