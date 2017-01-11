@@ -734,6 +734,7 @@ namespace Tangra.VideoOperations.Astrometry
 				    };
 
 				    var fittingContext = m_MeasurementContext.ToFittingContext();
+                    fittingContext.Weighting = TangraConfig.Settings.Astrometry.MotionFitWeightingMode;
 		
 					#region Compute the RA or DE value at the middle of the interval
 
