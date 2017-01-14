@@ -37,41 +37,6 @@ namespace Tangra.Config.SettingPannels
 				if (bnd != null)
 					cbxCatalogPhotometryBand.SelectedItem = bnd;
 			}
-
-			if (double.IsNaN(TangraConfig.Settings.Generic.Longitude))
-			{
-				cbxLongitude.SelectedIndex = -1;
-				tbxLongitude.Text = string.Empty;
-			}
-			else
-			{
-				double longNoSign = Math.Abs(TangraConfig.Settings.Generic.Longitude);
-				tbxLongitude.Text = AstroConvert.ToStringValue(longNoSign, "DD MM SS");
-				if (TangraConfig.Settings.Generic.Longitude < 0)
-					cbxLongitude.SelectedIndex = 1;
-				else
-					cbxLongitude.SelectedIndex = 0;
-			}
-
-			rbMPCCode.Checked = TangraConfig.Settings.Astrometry.UseMPCCode;
-			tbxMPCCode.Text = TangraConfig.Settings.Astrometry.MPCObservatoryCode;
-		    cbxExportUncertainties.Checked = TangraConfig.Settings.Astrometry.ExportUncertainties;
-
-			if (double.IsNaN(TangraConfig.Settings.Generic.Latitude))
-			{
-				cbxLatitude.SelectedIndex = -1;
-				tbxLatitude.Text = string.Empty;
-			}
-			else
-			{
-				double latNoSign = Math.Abs(TangraConfig.Settings.Generic.Latitude);
-				tbxLatitude.Text = AstroConvert.ToStringValue(latNoSign, "DD MM SS");
-				if (TangraConfig.Settings.Generic.Latitude < 0)
-					cbxLatitude.SelectedIndex = 1;
-				else
-					cbxLatitude.SelectedIndex = 0;
-			}
-			
 		}
 
 		public override bool ValidateSettings()
@@ -119,30 +84,6 @@ namespace Tangra.Config.SettingPannels
 				TangraConfig.Settings.StarCatalogue.CatalogLocation = tbxCatalogueLocation.Text;
 				TangraConfig.Settings.StarCatalogue.CatalogMagnitudeBandId = ((CatalogMagnitudeBand)cbxCatalogPhotometryBand.SelectedItem).Id;
 			}
-
-		    TangraConfig.Settings.Astrometry.ExportUncertainties = cbxExportUncertainties.Checked;
-
-			if (rbMPCCode.Checked)
-			{
-				TangraConfig.Settings.Astrometry.UseMPCCode = true;
-				TangraConfig.Settings.Astrometry.MPCObservatoryCode = tbxMPCCode.Text;
-			}
-			else
-			{
-				TangraConfig.Settings.Astrometry.UseMPCCode = false;
-				if (!string.IsNullOrEmpty(tbxLongitude.Text))
-				{
-					int sign = cbxLongitude.SelectedIndex == 1 ? -1 : 1;
-					TangraConfig.Settings.Generic.Longitude = sign * AstroConvert.ToDeclination(tbxLongitude.Text);
-				}
-
-				if (!string.IsNullOrEmpty(tbxLatitude.Text))
-				{
-					int sign = cbxLatitude.SelectedIndex == 1 ? -1 : 1;
-					TangraConfig.Settings.Generic.Latitude = sign * AstroConvert.ToDeclination(tbxLatitude.Text);
-				}
-			}
-
 		}
 
 		private void ProcessShowCatalogFlag()
@@ -214,12 +155,6 @@ namespace Tangra.Config.SettingPannels
 
 			if (cbxCatalogPhotometryBand.Items.Count > 0)
 				cbxCatalogPhotometryBand.SelectedIndex = 0;
-		}
-
-		private void rbCoordinates_CheckedChanged(object sender, EventArgs e)
-		{
-			pnlCoordinates.Enabled = rbCoordinates.Checked;
-			tbxMPCCode.Enabled = rbMPCCode.Checked;
 		}
 	}
 }

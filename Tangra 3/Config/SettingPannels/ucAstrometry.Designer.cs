@@ -28,18 +28,6 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-            this.gbxStellarObjectRequirements = new System.Windows.Forms.GroupBox();
-            this.label67 = new System.Windows.Forms.Label();
-            this.label66 = new System.Windows.Forms.Label();
-            this.nudMaxElongation = new System.Windows.Forms.NumericUpDown();
-            this.label63 = new System.Windows.Forms.Label();
-            this.nudLimitMagDetection = new System.Windows.Forms.NumericUpDown();
-            this.label65 = new System.Windows.Forms.Label();
-            this.label64 = new System.Windows.Forms.Label();
-            this.label50 = new System.Windows.Forms.Label();
-            this.nudMaxFWHM = new System.Windows.Forms.NumericUpDown();
-            this.label52 = new System.Windows.Forms.Label();
-            this.nudMinFWHM = new System.Windows.Forms.NumericUpDown();
             this.groupBox8 = new System.Windows.Forms.GroupBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label62 = new System.Windows.Forms.Label();
@@ -50,10 +38,12 @@
             this.nudAstrMinimumStars = new System.Windows.Forms.NumericUpDown();
             this.label51 = new System.Windows.Forms.Label();
             this.nudAstrMaxResidual = new System.Windows.Forms.NumericUpDown();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.nudAstrAssumedUncertainty = new System.Windows.Forms.NumericUpDown();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.label2 = new System.Windows.Forms.Label();
             this.nudNumberOfPivots = new System.Windows.Forms.NumericUpDown();
-            this.cbForceStellarObjectRequirements = new System.Windows.Forms.CheckBox();
             this.label61 = new System.Windows.Forms.Label();
             this.nudZoneStarIndex = new System.Windows.Forms.NumericUpDown();
             this.label55 = new System.Windows.Forms.Label();
@@ -77,18 +67,13 @@
             this.nudMagResidual = new System.Windows.Forms.NumericUpDown();
             this.label53 = new System.Windows.Forms.Label();
             this.cbxDebugOutput = new System.Windows.Forms.CheckBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.nudAstrAssumedUncertainty = new System.Windows.Forms.NumericUpDown();
-            this.gbxStellarObjectRequirements.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudMaxElongation)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudLimitMagDetection)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudMaxFWHM)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudMinFWHM)).BeginInit();
+            this.cbxExportUncertainties = new System.Windows.Forms.CheckBox();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox8.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudAstrMaximumStars)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudAstrMinimumStars)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudAstrMaxResidual)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudAstrAssumedUncertainty)).BeginInit();
             this.groupBox5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudNumberOfPivots)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudZoneStarIndex)).BeginInit();
@@ -99,203 +84,11 @@
             this.groupBox11.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudTargetVRColour)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMagResidual)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudAstrAssumedUncertainty)).BeginInit();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // gbxStellarObjectRequirements
-            // 
-            this.gbxStellarObjectRequirements.Controls.Add(this.label67);
-            this.gbxStellarObjectRequirements.Controls.Add(this.label66);
-            this.gbxStellarObjectRequirements.Controls.Add(this.nudMaxElongation);
-            this.gbxStellarObjectRequirements.Controls.Add(this.label63);
-            this.gbxStellarObjectRequirements.Controls.Add(this.nudLimitMagDetection);
-            this.gbxStellarObjectRequirements.Controls.Add(this.label65);
-            this.gbxStellarObjectRequirements.Controls.Add(this.label64);
-            this.gbxStellarObjectRequirements.Controls.Add(this.label50);
-            this.gbxStellarObjectRequirements.Controls.Add(this.nudMaxFWHM);
-            this.gbxStellarObjectRequirements.Controls.Add(this.label52);
-            this.gbxStellarObjectRequirements.Controls.Add(this.nudMinFWHM);
-            this.gbxStellarObjectRequirements.Location = new System.Drawing.Point(3, 165);
-            this.gbxStellarObjectRequirements.Name = "gbxStellarObjectRequirements";
-            this.gbxStellarObjectRequirements.Size = new System.Drawing.Size(225, 146);
-            this.gbxStellarObjectRequirements.TabIndex = 33;
-            this.gbxStellarObjectRequirements.TabStop = false;
-            this.gbxStellarObjectRequirements.Text = "Stellar Object Checks";
-            // 
-            // label67
-            // 
-            this.label67.AutoSize = true;
-            this.label67.Location = new System.Drawing.Point(192, 86);
-            this.label67.Name = "label67";
-            this.label67.Size = new System.Drawing.Size(15, 13);
-            this.label67.TabIndex = 17;
-            this.label67.Text = "%";
-            // 
-            // label66
-            // 
-            this.label66.AutoSize = true;
-            this.label66.Location = new System.Drawing.Point(6, 85);
-            this.label66.Name = "label66";
-            this.label66.Size = new System.Drawing.Size(127, 13);
-            this.label66.TabIndex = 16;
-            this.label66.Text = "Maximum PSF Elongation";
-            // 
-            // nudMaxElongation
-            // 
-            this.nudMaxElongation.Increment = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
-            this.nudMaxElongation.Location = new System.Drawing.Point(141, 83);
-            this.nudMaxElongation.Maximum = new decimal(new int[] {
-            300,
-            0,
-            0,
-            0});
-            this.nudMaxElongation.Minimum = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
-            this.nudMaxElongation.Name = "nudMaxElongation";
-            this.nudMaxElongation.Size = new System.Drawing.Size(50, 20);
-            this.nudMaxElongation.TabIndex = 15;
-            this.nudMaxElongation.Value = new decimal(new int[] {
-            25,
-            0,
-            0,
-            0});
-            // 
-            // label63
-            // 
-            this.label63.AutoSize = true;
-            this.label63.Location = new System.Drawing.Point(6, 113);
-            this.label63.Name = "label63";
-            this.label63.Size = new System.Drawing.Size(117, 13);
-            this.label63.TabIndex = 14;
-            this.label63.Text = "Min Detection Certainty";
-            // 
-            // nudLimitMagDetection
-            // 
-            this.nudLimitMagDetection.DecimalPlaces = 2;
-            this.nudLimitMagDetection.Increment = new decimal(new int[] {
-            5,
-            0,
-            0,
-            131072});
-            this.nudLimitMagDetection.Location = new System.Drawing.Point(141, 111);
-            this.nudLimitMagDetection.Maximum = new decimal(new int[] {
-            2,
-            0,
-            0,
-            0});
-            this.nudLimitMagDetection.Minimum = new decimal(new int[] {
-            10,
-            0,
-            0,
-            131072});
-            this.nudLimitMagDetection.Name = "nudLimitMagDetection";
-            this.nudLimitMagDetection.Size = new System.Drawing.Size(50, 20);
-            this.nudLimitMagDetection.TabIndex = 13;
-            this.nudLimitMagDetection.Value = new decimal(new int[] {
-            75,
-            0,
-            0,
-            131072});
-            // 
-            // label65
-            // 
-            this.label65.AutoSize = true;
-            this.label65.Location = new System.Drawing.Point(192, 61);
-            this.label65.Name = "label65";
-            this.label65.Size = new System.Drawing.Size(18, 13);
-            this.label65.TabIndex = 12;
-            this.label65.Text = "px";
-            // 
-            // label64
-            // 
-            this.label64.AutoSize = true;
-            this.label64.Location = new System.Drawing.Point(192, 32);
-            this.label64.Name = "label64";
-            this.label64.Size = new System.Drawing.Size(18, 13);
-            this.label64.TabIndex = 11;
-            this.label64.Text = "px";
-            // 
-            // label50
-            // 
-            this.label50.AutoSize = true;
-            this.label50.Location = new System.Drawing.Point(6, 56);
-            this.label50.Name = "label50";
-            this.label50.Size = new System.Drawing.Size(88, 13);
-            this.label50.TabIndex = 10;
-            this.label50.Text = "Maximum FWHM";
-            // 
-            // nudMaxFWHM
-            // 
-            this.nudMaxFWHM.DecimalPlaces = 1;
-            this.nudMaxFWHM.Increment = new decimal(new int[] {
-            2,
-            0,
-            0,
-            65536});
-            this.nudMaxFWHM.Location = new System.Drawing.Point(141, 54);
-            this.nudMaxFWHM.Maximum = new decimal(new int[] {
-            15,
-            0,
-            0,
-            0});
-            this.nudMaxFWHM.Name = "nudMaxFWHM";
-            this.nudMaxFWHM.Size = new System.Drawing.Size(50, 20);
-            this.nudMaxFWHM.TabIndex = 9;
-            this.nudMaxFWHM.Value = new decimal(new int[] {
-            6,
-            0,
-            0,
-            0});
-            // 
-            // label52
-            // 
-            this.label52.AutoSize = true;
-            this.label52.Location = new System.Drawing.Point(6, 29);
-            this.label52.Name = "label52";
-            this.label52.Size = new System.Drawing.Size(85, 13);
-            this.label52.TabIndex = 8;
-            this.label52.Text = "Minimum FWHM";
-            // 
-            // nudMinFWHM
-            // 
-            this.nudMinFWHM.DecimalPlaces = 1;
-            this.nudMinFWHM.Increment = new decimal(new int[] {
-            2,
-            0,
-            0,
-            65536});
-            this.nudMinFWHM.Location = new System.Drawing.Point(141, 27);
-            this.nudMinFWHM.Maximum = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
-            this.nudMinFWHM.Minimum = new decimal(new int[] {
-            2,
-            0,
-            0,
-            65536});
-            this.nudMinFWHM.Name = "nudMinFWHM";
-            this.nudMinFWHM.Size = new System.Drawing.Size(50, 20);
-            this.nudMinFWHM.TabIndex = 7;
-            this.nudMinFWHM.Value = new decimal(new int[] {
-            2,
-            0,
-            0,
-            0});
             // 
             // groupBox8
             // 
-            this.groupBox8.Controls.Add(this.label3);
-            this.groupBox8.Controls.Add(this.label4);
-            this.groupBox8.Controls.Add(this.nudAstrAssumedUncertainty);
             this.groupBox8.Controls.Add(this.label1);
             this.groupBox8.Controls.Add(this.label62);
             this.groupBox8.Controls.Add(this.cbxAstrFitMethod);
@@ -307,7 +100,7 @@
             this.groupBox8.Controls.Add(this.nudAstrMaxResidual);
             this.groupBox8.Location = new System.Drawing.Point(3, 3);
             this.groupBox8.Name = "groupBox8";
-            this.groupBox8.Size = new System.Drawing.Size(225, 156);
+            this.groupBox8.Size = new System.Drawing.Size(225, 134);
             this.groupBox8.TabIndex = 32;
             this.groupBox8.TabStop = false;
             this.groupBox8.Text = "Astrometric Fit";
@@ -443,11 +236,57 @@
             0,
             0});
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(201, 26);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(18, 13);
+            this.label3.TabIndex = 43;
+            this.label3.Text = "px";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(13, 23);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(131, 13);
+            this.label4.TabIndex = 42;
+            this.label4.Text = "Assumed Best Uncertainty";
+            // 
+            // nudAstrAssumedUncertainty
+            // 
+            this.nudAstrAssumedUncertainty.DecimalPlaces = 2;
+            this.nudAstrAssumedUncertainty.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            131072});
+            this.nudAstrAssumedUncertainty.Location = new System.Drawing.Point(149, 21);
+            this.nudAstrAssumedUncertainty.Maximum = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            this.nudAstrAssumedUncertainty.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            131072});
+            this.nudAstrAssumedUncertainty.Name = "nudAstrAssumedUncertainty";
+            this.nudAstrAssumedUncertainty.Size = new System.Drawing.Size(50, 20);
+            this.nudAstrAssumedUncertainty.TabIndex = 41;
+            this.nudAstrAssumedUncertainty.ThousandsSeparator = true;
+            this.nudAstrAssumedUncertainty.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            // 
             // groupBox5
             // 
             this.groupBox5.Controls.Add(this.label2);
             this.groupBox5.Controls.Add(this.nudNumberOfPivots);
-            this.groupBox5.Controls.Add(this.cbForceStellarObjectRequirements);
             this.groupBox5.Controls.Add(this.label61);
             this.groupBox5.Controls.Add(this.nudZoneStarIndex);
             this.groupBox5.Controls.Add(this.label55);
@@ -461,9 +300,9 @@
             this.groupBox5.Controls.Add(this.nudAstrOptimumStars);
             this.groupBox5.Controls.Add(this.label35);
             this.groupBox5.Controls.Add(this.nudAstrDistTolerance);
-            this.groupBox5.Location = new System.Drawing.Point(234, 3);
+            this.groupBox5.Location = new System.Drawing.Point(3, 143);
             this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(231, 209);
+            this.groupBox5.Size = new System.Drawing.Size(226, 180);
             this.groupBox5.TabIndex = 31;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "Alignment Settings";
@@ -479,7 +318,7 @@
             // 
             // nudNumberOfPivots
             // 
-            this.nudNumberOfPivots.Location = new System.Drawing.Point(155, 94);
+            this.nudNumberOfPivots.Location = new System.Drawing.Point(152, 94);
             this.nudNumberOfPivots.Maximum = new decimal(new int[] {
             4,
             0,
@@ -499,16 +338,6 @@
             0,
             0});
             // 
-            // cbForceStellarObjectRequirements
-            // 
-            this.cbForceStellarObjectRequirements.AutoSize = true;
-            this.cbForceStellarObjectRequirements.Location = new System.Drawing.Point(18, 126);
-            this.cbForceStellarObjectRequirements.Name = "cbForceStellarObjectRequirements";
-            this.cbForceStellarObjectRequirements.Size = new System.Drawing.Size(154, 17);
-            this.cbForceStellarObjectRequirements.TabIndex = 31;
-            this.cbForceStellarObjectRequirements.Text = "Filter out non stellar objects";
-            this.cbForceStellarObjectRequirements.UseVisualStyleBackColor = true;
-            // 
             // label61
             // 
             this.label61.AutoSize = true;
@@ -520,7 +349,7 @@
             // 
             // nudZoneStarIndex
             // 
-            this.nudZoneStarIndex.Location = new System.Drawing.Point(154, 68);
+            this.nudZoneStarIndex.Location = new System.Drawing.Point(151, 68);
             this.nudZoneStarIndex.Maximum = new decimal(new int[] {
             10,
             0,
@@ -543,7 +372,7 @@
             // label55
             // 
             this.label55.AutoSize = true;
-            this.label55.Location = new System.Drawing.Point(203, 182);
+            this.label55.Location = new System.Drawing.Point(201, 152);
             this.label55.Name = "label55";
             this.label55.Size = new System.Drawing.Size(24, 13);
             this.label55.TabIndex = 10;
@@ -552,7 +381,7 @@
             // label56
             // 
             this.label56.AutoSize = true;
-            this.label56.Location = new System.Drawing.Point(15, 182);
+            this.label56.Location = new System.Drawing.Point(16, 152);
             this.label56.Name = "label56";
             this.label56.Size = new System.Drawing.Size(84, 13);
             this.label56.TabIndex = 9;
@@ -565,7 +394,7 @@
             0,
             0,
             0});
-            this.nudAstrAttemptTimeout.Location = new System.Drawing.Point(154, 178);
+            this.nudAstrAttemptTimeout.Location = new System.Drawing.Point(152, 148);
             this.nudAstrAttemptTimeout.Maximum = new decimal(new int[] {
             999,
             0,
@@ -589,7 +418,7 @@
             // label46
             // 
             this.label46.AutoSize = true;
-            this.label46.Location = new System.Drawing.Point(201, 25);
+            this.label46.Location = new System.Drawing.Point(198, 25);
             this.label46.Name = "label46";
             this.label46.Size = new System.Drawing.Size(18, 13);
             this.label46.TabIndex = 7;
@@ -598,7 +427,7 @@
             // label45
             // 
             this.label45.AutoSize = true;
-            this.label45.Location = new System.Drawing.Point(203, 155);
+            this.label45.Location = new System.Drawing.Point(201, 125);
             this.label45.Name = "label45";
             this.label45.Size = new System.Drawing.Size(15, 13);
             this.label45.TabIndex = 6;
@@ -607,7 +436,7 @@
             // label44
             // 
             this.label44.AutoSize = true;
-            this.label44.Location = new System.Drawing.Point(15, 156);
+            this.label44.Location = new System.Drawing.Point(16, 126);
             this.label44.Name = "label44";
             this.label44.Size = new System.Drawing.Size(113, 13);
             this.label44.TabIndex = 5;
@@ -621,7 +450,7 @@
             0,
             0,
             65536});
-            this.nudAstrFocLenVariation.Location = new System.Drawing.Point(154, 152);
+            this.nudAstrFocLenVariation.Location = new System.Drawing.Point(152, 122);
             this.nudAstrFocLenVariation.Maximum = new decimal(new int[] {
             98,
             0,
@@ -647,7 +476,7 @@
             // 
             // nudAstrOptimumStars
             // 
-            this.nudAstrOptimumStars.Location = new System.Drawing.Point(154, 43);
+            this.nudAstrOptimumStars.Location = new System.Drawing.Point(151, 43);
             this.nudAstrOptimumStars.Minimum = new decimal(new int[] {
             5,
             0,
@@ -678,7 +507,7 @@
             0,
             0,
             65536});
-            this.nudAstrDistTolerance.Location = new System.Drawing.Point(154, 19);
+            this.nudAstrDistTolerance.Location = new System.Drawing.Point(151, 19);
             this.nudAstrDistTolerance.Maximum = new decimal(new int[] {
             16,
             0,
@@ -709,9 +538,9 @@
             this.groupBox11.Controls.Add(this.label57);
             this.groupBox11.Controls.Add(this.nudMagResidual);
             this.groupBox11.Controls.Add(this.label53);
-            this.groupBox11.Location = new System.Drawing.Point(235, 218);
+            this.groupBox11.Location = new System.Drawing.Point(234, 3);
             this.groupBox11.Name = "groupBox11";
-            this.groupBox11.Size = new System.Drawing.Size(226, 116);
+            this.groupBox11.Size = new System.Drawing.Size(231, 134);
             this.groupBox11.TabIndex = 34;
             this.groupBox11.TabStop = false;
             this.groupBox11.Text = "Calibrated Photometry";
@@ -834,82 +663,53 @@
             // cbxDebugOutput
             // 
             this.cbxDebugOutput.AutoSize = true;
-            this.cbxDebugOutput.Location = new System.Drawing.Point(3, 317);
+            this.cbxDebugOutput.Location = new System.Drawing.Point(16, 68);
             this.cbxDebugOutput.Name = "cbxDebugOutput";
-            this.cbxDebugOutput.Size = new System.Drawing.Size(193, 17);
+            this.cbxDebugOutput.Size = new System.Drawing.Size(125, 17);
             this.cbxDebugOutput.TabIndex = 35;
-            this.cbxDebugOutput.Text = "Enabled Debug Output (Advanced)";
+            this.cbxDebugOutput.Text = "Enable debug output";
             this.cbxDebugOutput.UseVisualStyleBackColor = true;
             // 
-            // label3
+            // cbxExportUncertainties
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(203, 134);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(18, 13);
-            this.label3.TabIndex = 43;
-            this.label3.Text = "px";
+            this.cbxExportUncertainties.AutoSize = true;
+            this.cbxExportUncertainties.Location = new System.Drawing.Point(16, 91);
+            this.cbxExportUncertainties.Name = "cbxExportUncertainties";
+            this.cbxExportUncertainties.Size = new System.Drawing.Size(188, 17);
+            this.cbxExportUncertainties.TabIndex = 50;
+            this.cbxExportUncertainties.Text = "Export in custom Astrometry format";
+            this.cbxExportUncertainties.UseVisualStyleBackColor = true;
             // 
-            // label4
+            // groupBox1
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(15, 131);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(107, 13);
-            this.label4.TabIndex = 42;
-            this.label4.Text = "Assumed Uncertainty";
-            // 
-            // nudAstrAssumedUncertainty
-            // 
-            this.nudAstrAssumedUncertainty.DecimalPlaces = 2;
-            this.nudAstrAssumedUncertainty.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            131072});
-            this.nudAstrAssumedUncertainty.Location = new System.Drawing.Point(151, 129);
-            this.nudAstrAssumedUncertainty.Maximum = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
-            this.nudAstrAssumedUncertainty.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            131072});
-            this.nudAstrAssumedUncertainty.Name = "nudAstrAssumedUncertainty";
-            this.nudAstrAssumedUncertainty.Size = new System.Drawing.Size(50, 20);
-            this.nudAstrAssumedUncertainty.TabIndex = 41;
-            this.nudAstrAssumedUncertainty.ThousandsSeparator = true;
-            this.nudAstrAssumedUncertainty.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            65536});
+            this.groupBox1.Controls.Add(this.label4);
+            this.groupBox1.Controls.Add(this.cbxExportUncertainties);
+            this.groupBox1.Controls.Add(this.nudAstrAssumedUncertainty);
+            this.groupBox1.Controls.Add(this.cbxDebugOutput);
+            this.groupBox1.Controls.Add(this.label3);
+            this.groupBox1.Location = new System.Drawing.Point(234, 143);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(231, 180);
+            this.groupBox1.TabIndex = 51;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Advanced";
             // 
             // ucAstrometry
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.cbxDebugOutput);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.groupBox11);
-            this.Controls.Add(this.gbxStellarObjectRequirements);
             this.Controls.Add(this.groupBox8);
             this.Controls.Add(this.groupBox5);
             this.Name = "ucAstrometry";
-            this.Size = new System.Drawing.Size(520, 481);
-            this.gbxStellarObjectRequirements.ResumeLayout(false);
-            this.gbxStellarObjectRequirements.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudMaxElongation)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudLimitMagDetection)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudMaxFWHM)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudMinFWHM)).EndInit();
+            this.Size = new System.Drawing.Size(850, 481);
             this.groupBox8.ResumeLayout(false);
             this.groupBox8.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudAstrMaximumStars)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudAstrMinimumStars)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudAstrMaxResidual)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudAstrAssumedUncertainty)).EndInit();
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudNumberOfPivots)).EndInit();
@@ -922,27 +722,15 @@
             this.groupBox11.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudTargetVRColour)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMagResidual)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudAstrAssumedUncertainty)).EndInit();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
 		}
 
 		#endregion
 
-		private System.Windows.Forms.GroupBox gbxStellarObjectRequirements;
-		private System.Windows.Forms.Label label67;
-		private System.Windows.Forms.Label label66;
-		private System.Windows.Forms.NumericUpDown nudMaxElongation;
-		private System.Windows.Forms.Label label63;
-		private System.Windows.Forms.NumericUpDown nudLimitMagDetection;
-		private System.Windows.Forms.Label label65;
-		private System.Windows.Forms.Label label64;
-		private System.Windows.Forms.Label label50;
-		private System.Windows.Forms.NumericUpDown nudMaxFWHM;
-		private System.Windows.Forms.Label label52;
-		private System.Windows.Forms.NumericUpDown nudMinFWHM;
-		private System.Windows.Forms.GroupBox groupBox8;
+        private System.Windows.Forms.GroupBox groupBox8;
 		private System.Windows.Forms.Label label62;
 		private System.Windows.Forms.ComboBox cbxAstrFitMethod;
 		private System.Windows.Forms.NumericUpDown nudAstrMaximumStars;
@@ -951,8 +739,7 @@
         private System.Windows.Forms.NumericUpDown nudAstrMinimumStars;
 		private System.Windows.Forms.Label label51;
 		private System.Windows.Forms.NumericUpDown nudAstrMaxResidual;
-		private System.Windows.Forms.GroupBox groupBox5;
-		private System.Windows.Forms.CheckBox cbForceStellarObjectRequirements;
+        private System.Windows.Forms.GroupBox groupBox5;
 		private System.Windows.Forms.Label label61;
 		private System.Windows.Forms.NumericUpDown nudZoneStarIndex;
 		private System.Windows.Forms.Label label55;
@@ -982,5 +769,7 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.NumericUpDown nudAstrAssumedUncertainty;
+        private System.Windows.Forms.CheckBox cbxExportUncertainties;
+        private System.Windows.Forms.GroupBox groupBox1;
 	}
 }

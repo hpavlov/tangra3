@@ -94,6 +94,8 @@ namespace Tangra.Config
 			m_PropertyPages.Add(13, new ucAstrometry());
 			m_ucStarCatalogues = new ucStarCatalogues(false);
 			m_PropertyPages.Add(14, m_ucStarCatalogues);
+            m_PropertyPages.Add(18, new ucStellarObjects());
+            m_PropertyPages.Add(19, new ucLocation());
 
 			m_PropertyPages.Add(6, new ucTracking());
 

@@ -154,6 +154,18 @@
     <Compile Include="Config\frmTangraSettings.Designer.cs">
       <DependentUpon>frmTangraSettings.cs</DependentUpon>
     </Compile>
+    <Compile Include="Config\SettingPannels\ucLocation.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucLocation.Designer.cs">
+      <DependentUpon>ucLocation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucStellarObjects.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucStellarObjects.Designer.cs">
+      <DependentUpon>ucStellarObjects.cs</DependentUpon>
+    </Compile>
     <Compile Include="Config\SettingPannels\ucCustomizeSpectroscopy.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -1008,6 +1020,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Config\frmTangraSettings.resx">
       <DependentUpon>frmTangraSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Config\SettingPannels\ucLocation.resx">
+      <DependentUpon>ucLocation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Config\SettingPannels\ucStellarObjects.resx">
+      <DependentUpon>ucStellarObjects.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Config\SettingPannels\ucCustomizeSpectroscopy.resx">
       <DependentUpon>ucCustomizeSpectroscopy.cs</DependentUpon>
