@@ -12,6 +12,7 @@ using System.Text;
 using System.Windows.Forms;
 using Tangra.Astrometry;
 using Tangra.Config;
+using Tangra.Helpers;
 using Tangra.Model.Config;
 using Tangra.Model.Video;
 
@@ -66,11 +67,13 @@ namespace Tangra.VideoOperations.Astrometry
 				Height = 260;
 				pnlSolvedPlateConf.Visible = false;
 				cbxEditConfig.Visible = false;
+			    pnlOSDAreaConf.Visible = false;
+			    cbxEditOSDArea.Visible = false;
 			}
 			else
 			{
 				tbxConfigName.Enabled = false;
-				Height = 324;
+                Height = 396;
 				pnlSolvedPlateConf.Visible = true;
 				cbxEditConfig.Visible = true;
 				if (pltConst != null)
@@ -81,11 +84,30 @@ namespace Tangra.VideoOperations.Astrometry
 				}
 			}
 
+            cbxAreaType.SelectedIndex = config.IsInclusionArea ? 1 : 0;
+            if (config.IsInclusionArea)
+                SetOSDDimentions(config.InclusionArea);
+            else
+                SetOSDDimentions(config.OSDExclusionArea);
+
 			m_Config = config;
 			m_Camera = camera;
 			tbxConfigName.Text = config.Title;
 			m_PltConst = pltConst;
 		}
+
+	    private void SetOSDDimentions(Rectangle rect)
+	    {
+            nudOSDLeft.SetNUDValue(rect.Left);
+            nudOSDTop.SetNUDValue(rect.Top);
+            nudOSDWidth.SetNUDValue(rect.Width);
+            nudOSDHeight.SetNUDValue(rect.Height);        
+	    }
+
+	    private Rectangle GetOSDDimentions()
+	    {
+            return new Rectangle((int)nudOSDLeft.Value, (int)nudOSDTop.Value, (int)nudOSDWidth.Value, (int)nudOSDHeight.Value);
+	    }
 
 		private void btnOK_Click(object sender, EventArgs e)
 		{
@@ -183,6 +205,15 @@ namespace Tangra.VideoOperations.Astrometry
 				}
 			}
 
+		    if (cbxEditOSDArea.Checked)
+		    {
+		        m_Config.IsInclusionArea = cbxAreaType.SelectedIndex == 1;
+		        if (cbxAreaType.SelectedIndex == 1)
+                    m_Config.InclusionArea = GetOSDDimentions();
+                else 
+                    m_Config.OSDExclusionArea = GetOSDDimentions();
+		    }
+
 			m_Config.Title = tbxConfigName.Text;
 
 			if (m_New)
@@ -210,5 +241,10 @@ namespace Tangra.VideoOperations.Astrometry
 		{
 			pnlSolvedPlateConf.Enabled = cbxEditConfig.Checked;
 		}
+
+        private void cbxEditOSDArea_CheckedChanged(object sender, EventArgs e)
+        {
+            pnlOSDAreaConf.Enabled = cbxEditOSDArea.Checked;
+        }
 	}
 }
