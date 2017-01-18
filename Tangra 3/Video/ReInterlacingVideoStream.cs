@@ -82,7 +82,10 @@ namespace Tangra.Video
 
         public int FirstFrame
         {
-            get { return m_BaseStream.BitPix; }
+            get
+            {
+                return m_BaseStream.FirstFrame;
+            }
         }
 
         public int LastFrame
