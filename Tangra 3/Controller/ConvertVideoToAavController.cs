@@ -23,6 +23,7 @@ namespace Tangra.Controller
         private int m_MaxPixelValue;
         private int m_Width;
         private int m_Height;
+        private int m_EndFieldParity = 1;
         private Rectangle m_TestRect;
 
         private int[,] m_PrevPixels = new int[32, 32];
@@ -45,12 +46,14 @@ namespace Tangra.Controller
             AdvError.ShowMessageBoxErrorMessage = true;
 		}
 
-        internal void StartConversion(string fileName, int topVtiOsdRow, int bottomVtiOsdRow, int firstIntegratedFrameId, int integrationInterval, string cameraModel, string sensorInfo)
+        internal void StartConversion(string fileName, int topVtiOsdRow, int bottomVtiOsdRow, int firstIntegratedFrameId, int integrationInterval, string cameraModel, string sensorInfo, bool swapTimestampFields)
         {
             m_VideoController.ClearAAVConversionErrors();
 
             m_Width = m_VideoController.FramePlayer.Video.Width;
             m_Height = m_VideoController.FramePlayer.Video.Height;
+
+            m_EndFieldParity = swapTimestampFields ? 0 : 1;
 
             m_TestRect = new Rectangle((m_Width / 2) - 16, (m_Height / 2) - 16, 32, 32);
 
@@ -293,8 +296,8 @@ namespace Tangra.Controller
                 if (y >= m_FirstVtiOsdLine && y <= m_LastVtiOsdLine)
                 {
                     // NOTE: For first new frame - copy all lines
-                    //       For any other frame - copy even lines
-                    if (!copyAllOsdLines && (y % 2) == 1) 
+                    //       For any other frame - copy even/odd lines only
+                    if (!copyAllOsdLines && (y % 2) == m_EndFieldParity) 
                         continue;
 
                     scale = true;

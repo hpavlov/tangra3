@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Data;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -268,6 +269,7 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
                 gbxIntegrationRate.Visible = true;
                 gbxIntegrationRate.Enabled = false;
                 gbxCameraInfo.Visible = true;
+                pnlFirstField.Visible = true;
             }
             else if (m_State == AavConfigState.Converting)
             {
@@ -276,6 +278,7 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
                 gbxSection.Enabled = false;
                 gbxIntegrationRate.Enabled = false;
                 gbxCameraInfo.Enabled = false;
+                pnlFirstField.Enabled = false;
                 btnDetectIntegrationRate.Enabled = false;
                 btnCancel.Enabled = true;
             }
@@ -315,6 +318,9 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
                     nudStartingAtFrame.SetNUDValue(frm.IntegratedFrames.StartingAtFrame);
 
                     m_State = AavConfigState.ReadyToConvert;
+                    var reinterlacedStream = m_VideoController.FramePlayer.Video as ReInterlacingVideoStream;
+                    if (reinterlacedStream != null && reinterlacedStream.Mode == ReInterlaceMode.SwapAndShiftOneField)
+                        rbFirstFieldTop.Checked = true;
                     UpdateControlState();
                 }
             }
@@ -355,6 +361,8 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
                 return;
             }
 
+            saveFileDialog.FileName = Path.GetFileName(Path.ChangeExtension(m_VideoController.CurrentVideoFileName, ".aav"));
+
             if (saveFileDialog.ShowDialog(this) == DialogResult.OK)
             {
                 m_State = AavConfigState.Converting;
@@ -368,7 +376,8 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
                     (int)nudStartingAtFrame.Value,
                     (int)nudIntegratedFrames.Value,
                     cbxCameraModel.Text,
-                    cbxSensorInfo.Text);
+                    cbxSensorInfo.Text,
+                    rbFirstFieldTop.Checked);
             }
         }
 

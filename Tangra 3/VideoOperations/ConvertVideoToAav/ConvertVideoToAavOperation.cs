@@ -80,11 +80,11 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
             }
         }
 
-        public void StartConversion(string fileName, int topVtiOsdRow, int bottomVtiOsdRow, int firstIntegrationFrameNo, int integrationInterval, string cameraModel, string sensorInfo)
+        public void StartConversion(string fileName, int topVtiOsdRow, int bottomVtiOsdRow, int firstIntegrationFrameNo, int integrationInterval, string cameraModel, string sensorInfo, bool swapTimestampFields)
         {
             m_Converting = true;
 
-            m_ConvertVideoToAavController.StartConversion(fileName, topVtiOsdRow, bottomVtiOsdRow, firstIntegrationFrameNo, integrationInterval, cameraModel, sensorInfo);
+            m_ConvertVideoToAavController.StartConversion(fileName, topVtiOsdRow, bottomVtiOsdRow, firstIntegrationFrameNo, integrationInterval, cameraModel, sensorInfo, swapTimestampFields);
 
             m_VideoController.PlayVideo(firstIntegrationFrameNo);
         }

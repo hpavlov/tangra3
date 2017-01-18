@@ -55,6 +55,10 @@
             this.gbxCameraInfo = new System.Windows.Forms.GroupBox();
             this.label5 = new System.Windows.Forms.Label();
             this.cbxSensorInfo = new System.Windows.Forms.ComboBox();
+            this.rbFirstFieldBottom = new System.Windows.Forms.RadioButton();
+            this.rbFirstFieldTop = new System.Windows.Forms.RadioButton();
+            this.label6 = new System.Windows.Forms.Label();
+            this.pnlFirstField = new System.Windows.Forms.Panel();
             this.gbxSection.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudFirstFrame)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudLastFrame)).BeginInit();
@@ -65,6 +69,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudIntegratedFrames)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudStartingAtFrame)).BeginInit();
             this.gbxCameraInfo.SuspendLayout();
+            this.pnlFirstField.SuspendLayout();
             this.SuspendLayout();
             // 
             // gbxSection
@@ -73,7 +78,7 @@
             this.gbxSection.Controls.Add(this.label27);
             this.gbxSection.Controls.Add(this.nudLastFrame);
             this.gbxSection.Controls.Add(this.label26);
-            this.gbxSection.Location = new System.Drawing.Point(11, 98);
+            this.gbxSection.Location = new System.Drawing.Point(11, 83);
             this.gbxSection.Name = "gbxSection";
             this.gbxSection.Size = new System.Drawing.Size(212, 53);
             this.gbxSection.TabIndex = 32;
@@ -115,7 +120,7 @@
             // 
             // btnDetectIntegrationRate
             // 
-            this.btnDetectIntegrationRate.Location = new System.Drawing.Point(11, 165);
+            this.btnDetectIntegrationRate.Location = new System.Drawing.Point(11, 150);
             this.btnDetectIntegrationRate.Name = "btnDetectIntegrationRate";
             this.btnDetectIntegrationRate.Size = new System.Drawing.Size(155, 23);
             this.btnDetectIntegrationRate.TabIndex = 44;
@@ -126,7 +131,7 @@
             // btnConvert
             // 
             this.btnConvert.Enabled = false;
-            this.btnConvert.Location = new System.Drawing.Point(11, 335);
+            this.btnConvert.Location = new System.Drawing.Point(11, 349);
             this.btnConvert.Name = "btnConvert";
             this.btnConvert.Size = new System.Drawing.Size(92, 23);
             this.btnConvert.TabIndex = 46;
@@ -135,7 +140,7 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(128, 335);
+            this.btnCancel.Location = new System.Drawing.Point(128, 349);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(92, 23);
             this.btnCancel.TabIndex = 47;
@@ -151,14 +156,14 @@
             this.gbxVTIPosition.Controls.Add(this.label2);
             this.gbxVTIPosition.Location = new System.Drawing.Point(11, 0);
             this.gbxVTIPosition.Name = "gbxVTIPosition";
-            this.gbxVTIPosition.Size = new System.Drawing.Size(212, 92);
+            this.gbxVTIPosition.Size = new System.Drawing.Size(212, 80);
             this.gbxVTIPosition.TabIndex = 48;
             this.gbxVTIPosition.TabStop = false;
             this.gbxVTIPosition.Text = "VTI-OSD Position";
             // 
             // btnConfirmPosition
             // 
-            this.btnConfirmPosition.Location = new System.Drawing.Point(16, 58);
+            this.btnConfirmPosition.Location = new System.Drawing.Point(16, 49);
             this.btnConfirmPosition.Name = "btnConfirmPosition";
             this.btnConfirmPosition.Size = new System.Drawing.Size(131, 23);
             this.btnConfirmPosition.TabIndex = 48;
@@ -228,7 +233,7 @@
             this.gbxIntegrationRate.Controls.Add(this.lblIntegration);
             this.gbxIntegrationRate.Controls.Add(this.nudStartingAtFrame);
             this.gbxIntegrationRate.Controls.Add(this.label4);
-            this.gbxIntegrationRate.Location = new System.Drawing.Point(11, 157);
+            this.gbxIntegrationRate.Location = new System.Drawing.Point(11, 142);
             this.gbxIntegrationRate.Name = "gbxIntegrationRate";
             this.gbxIntegrationRate.Size = new System.Drawing.Size(212, 76);
             this.gbxIntegrationRate.TabIndex = 49;
@@ -296,7 +301,7 @@
             // 
             // pbar
             // 
-            this.pbar.Location = new System.Drawing.Point(11, 315);
+            this.pbar.Location = new System.Drawing.Point(11, 329);
             this.pbar.Name = "pbar";
             this.pbar.Size = new System.Drawing.Size(212, 14);
             this.pbar.TabIndex = 50;
@@ -339,7 +344,7 @@
             this.gbxCameraInfo.Controls.Add(this.cbxSensorInfo);
             this.gbxCameraInfo.Controls.Add(this.label3);
             this.gbxCameraInfo.Controls.Add(this.cbxCameraModel);
-            this.gbxCameraInfo.Location = new System.Drawing.Point(11, 235);
+            this.gbxCameraInfo.Location = new System.Drawing.Point(11, 249);
             this.gbxCameraInfo.Name = "gbxCameraInfo";
             this.gbxCameraInfo.Size = new System.Drawing.Size(212, 74);
             this.gbxCameraInfo.TabIndex = 53;
@@ -366,10 +371,53 @@
             this.cbxSensorInfo.Size = new System.Drawing.Size(138, 21);
             this.cbxSensorInfo.TabIndex = 54;
             // 
+            // rbFirstFieldBottom
+            // 
+            this.rbFirstFieldBottom.AutoSize = true;
+            this.rbFirstFieldBottom.Checked = true;
+            this.rbFirstFieldBottom.Location = new System.Drawing.Point(133, 3);
+            this.rbFirstFieldBottom.Name = "rbFirstFieldBottom";
+            this.rbFirstFieldBottom.Size = new System.Drawing.Size(58, 17);
+            this.rbFirstFieldBottom.TabIndex = 26;
+            this.rbFirstFieldBottom.TabStop = true;
+            this.rbFirstFieldBottom.Text = "Bottom";
+            this.rbFirstFieldBottom.UseVisualStyleBackColor = true;
+            // 
+            // rbFirstFieldTop
+            // 
+            this.rbFirstFieldTop.AutoSize = true;
+            this.rbFirstFieldTop.Location = new System.Drawing.Point(85, 4);
+            this.rbFirstFieldTop.Name = "rbFirstFieldTop";
+            this.rbFirstFieldTop.Size = new System.Drawing.Size(44, 17);
+            this.rbFirstFieldTop.TabIndex = 25;
+            this.rbFirstFieldTop.Text = "Top";
+            this.rbFirstFieldTop.UseVisualStyleBackColor = true;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(7, 6);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(73, 13);
+            this.label6.TabIndex = 24;
+            this.label6.Text = "First field is at:";
+            // 
+            // pnlFirstField
+            // 
+            this.pnlFirstField.Controls.Add(this.rbFirstFieldBottom);
+            this.pnlFirstField.Controls.Add(this.label6);
+            this.pnlFirstField.Controls.Add(this.rbFirstFieldTop);
+            this.pnlFirstField.Location = new System.Drawing.Point(9, 219);
+            this.pnlFirstField.Name = "pnlFirstField";
+            this.pnlFirstField.Size = new System.Drawing.Size(214, 27);
+            this.pnlFirstField.TabIndex = 54;
+            this.pnlFirstField.Visible = false;
+            // 
             // ucConvertVideoToAav
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.pnlFirstField);
             this.Controls.Add(this.gbxCameraInfo);
             this.Controls.Add(this.pbar);
             this.Controls.Add(this.gbxIntegrationRate);
@@ -379,7 +427,7 @@
             this.Controls.Add(this.btnConvert);
             this.Controls.Add(this.gbxSection);
             this.Name = "ucConvertVideoToAav";
-            this.Size = new System.Drawing.Size(301, 437);
+            this.Size = new System.Drawing.Size(242, 390);
             this.gbxSection.ResumeLayout(false);
             this.gbxSection.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudFirstFrame)).EndInit();
@@ -394,6 +442,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudStartingAtFrame)).EndInit();
             this.gbxCameraInfo.ResumeLayout(false);
             this.gbxCameraInfo.PerformLayout();
+            this.pnlFirstField.ResumeLayout(false);
+            this.pnlFirstField.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -427,5 +477,9 @@
         private System.Windows.Forms.GroupBox gbxCameraInfo;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.ComboBox cbxSensorInfo;
+        private System.Windows.Forms.RadioButton rbFirstFieldBottom;
+        private System.Windows.Forms.RadioButton rbFirstFieldTop;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Panel pnlFirstField;
     }
 }

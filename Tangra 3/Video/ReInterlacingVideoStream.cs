@@ -33,9 +33,9 @@ namespace Tangra.Video
 
         public bool ChangeReInterlaceMode(ReInterlaceMode mode)
         {
-            if (m_Mode != mode)
+            if (Mode != mode)
             {
-                m_Mode = mode;
+                Mode = mode;
                 if (mode == ReInterlaceMode.SwapFields)
                     TangraContext.Current.ReInterlacingMode = "FieldSwap";
                 else if (mode == ReInterlaceMode.ShiftOneField)
@@ -62,7 +62,7 @@ namespace Tangra.Video
 
 
         private IFrameStream m_BaseStream;
-        private ReInterlaceMode m_Mode;
+        public ReInterlaceMode Mode { get; private set; }
         private int m_ShiftMode = 0;
 
         public int Width
@@ -92,7 +92,7 @@ namespace Tangra.Video
         {
             get
             {
-                if (m_Mode == ReInterlaceMode.ShiftOneField || m_Mode == ReInterlaceMode.SwapAndShiftOneField)
+                if (Mode == ReInterlaceMode.ShiftOneField || Mode == ReInterlaceMode.SwapAndShiftOneField)
                     return m_BaseStream.LastFrame - 1;
                 else
                     return m_BaseStream.LastFrame;
@@ -103,7 +103,7 @@ namespace Tangra.Video
         {
             get
             {
-                if (m_Mode == ReInterlaceMode.ShiftOneField || m_Mode == ReInterlaceMode.SwapAndShiftOneField)
+                if (Mode == ReInterlaceMode.ShiftOneField || Mode == ReInterlaceMode.SwapAndShiftOneField)
                     return m_BaseStream.CountFrames - 1;
                 else
                     return m_BaseStream.CountFrames;
@@ -135,7 +135,7 @@ namespace Tangra.Video
             Bitmap videoFrame;
             byte[] bitmapBytes;
 
-            if (m_Mode == ReInterlaceMode.SwapFields)
+            if (Mode == ReInterlaceMode.SwapFields)
             {
                 TangraVideo.GetFrame(index, out pixels, out originalPixels, out videoFrame, out bitmapBytes);
                 
@@ -149,7 +149,7 @@ namespace Tangra.Video
                 rv.UnprocessedPixels = originalPixels;
                 return rv;
             }
-            else if (m_Mode == ReInterlaceMode.ShiftOneField || m_Mode == ReInterlaceMode.SwapAndShiftOneField)
+            else if (Mode == ReInterlaceMode.ShiftOneField || Mode == ReInterlaceMode.SwapAndShiftOneField)
             {
                 uint[] pixels2;
                 uint[] originalPixels2;
@@ -182,7 +182,7 @@ namespace Tangra.Video
                 rv.UnprocessedPixels = originalPixels;
                 return rv;
             }
-            else if (m_Mode == ReInterlaceMode.None)
+            else if (Mode == ReInterlaceMode.None)
             {
                 return m_BaseStream.GetPixelmap(index);                 
             }
@@ -207,7 +207,7 @@ namespace Tangra.Video
 
         public Pixelmap GetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging)
         {
-            if (m_Mode == ReInterlaceMode.None)
+            if (Mode == ReInterlaceMode.None)
                 return m_BaseStream.GetIntegratedFrame(startFrameNo, framesToIntegrate, isSlidingIntegration, isMedianAveraging);
             else
                 throw new NotSupportedException();
@@ -230,7 +230,7 @@ namespace Tangra.Video
 
         public bool SupportsSoftwareIntegration
         {
-            get { return m_Mode == ReInterlaceMode.None; }
+            get { return Mode == ReInterlaceMode.None; }
         }
 
         public bool SupportsFrameFileNames
