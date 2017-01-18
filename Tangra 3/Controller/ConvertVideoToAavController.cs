@@ -53,7 +53,7 @@ namespace Tangra.Controller
             m_Width = m_VideoController.FramePlayer.Video.Width;
             m_Height = m_VideoController.FramePlayer.Video.Height;
 
-            m_EndFieldParity = swapTimestampFields ? 0 : 1;
+            m_EndFieldParity = swapTimestampFields ? 1 : 0;
 
             m_TestRect = new Rectangle((m_Width / 2) - 16, (m_Height / 2) - 16, 32, 32);
 

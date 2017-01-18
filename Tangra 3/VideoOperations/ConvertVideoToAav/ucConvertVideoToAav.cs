@@ -10,6 +10,7 @@ using System.Text;
 using System.Windows.Forms;
 using Tangra.Controller;
 using Tangra.Helpers;
+using Tangra.Model.Config;
 using Tangra.Model.Context;
 using Tangra.Model.Helpers;
 using Tangra.Model.Image;
@@ -80,6 +81,12 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
             var pixelMap = m_VideoController.GetCurrentAstroImage(false).Pixelmap;
             if (!LocateTimestampPosition(pixelMap.Pixels, pixelMap.Width, pixelMap.Height))
             {
+                var lastChoise = TangraConfig.Settings.AAV.GetLastOsdPositionForFrameSize(m_VideoController.FramePlayer.Video.Width, m_VideoController.FramePlayer.Video.Height);
+                if (lastChoise != null)
+                {
+                    nudPreserveVTITopRow.SetNUDValue(lastChoise.Item1);
+                    nudPreserveVTIBottomRow.SetNUDValue(lastChoise.Item2);
+                }
                 m_VideoController.ShowMessageBox("Cannot locate the VTI-OSD position. Please specify it manually.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -270,6 +277,7 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
                 gbxIntegrationRate.Enabled = false;
                 gbxCameraInfo.Visible = true;
                 pnlFirstField.Visible = true;
+                m_VideoController.RedrawCurrentFrame(true);
             }
             else if (m_State == AavConfigState.Converting)
             {
@@ -293,6 +301,14 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
         {
             m_State = AavConfigState.DetectingIntegrationRate;
             nudFirstFrame.SetNUDValue(m_VideoController.CurrentFrameIndex);
+
+            TangraConfig.Settings.AAV.RegisterOsdPosition(
+                m_VideoController.FramePlayer.Video.Width,
+                m_VideoController.FramePlayer.Video.Height,
+                (int)nudPreserveVTITopRow.Value,
+                (int)nudPreserveVTIBottomRow.Value);
+            TangraConfig.Settings.Save();
+
             UpdateControlState();
         }
 
@@ -319,8 +335,8 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
 
                     m_State = AavConfigState.ReadyToConvert;
                     var reinterlacedStream = m_VideoController.FramePlayer.Video as ReInterlacingVideoStream;
-                    if (reinterlacedStream != null && reinterlacedStream.Mode == ReInterlaceMode.SwapAndShiftOneField)
-                        rbFirstFieldTop.Checked = true;
+                    if (reinterlacedStream != null && (reinterlacedStream.Mode == ReInterlaceMode.ShiftOneField || reinterlacedStream.Mode == ReInterlaceMode.SwapFields))
+                        rbFirstFieldBottom.Checked = true;
                     UpdateControlState();
                 }
             }
@@ -377,7 +393,7 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
                     (int)nudIntegratedFrames.Value,
                     cbxCameraModel.Text,
                     cbxSensorInfo.Text,
-                    rbFirstFieldTop.Checked);
+                    rbFirstFieldBottom.Checked);
             }
         }
 

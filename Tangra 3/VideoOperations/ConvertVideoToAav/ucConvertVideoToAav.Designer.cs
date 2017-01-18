@@ -374,22 +374,22 @@
             // rbFirstFieldBottom
             // 
             this.rbFirstFieldBottom.AutoSize = true;
-            this.rbFirstFieldBottom.Checked = true;
             this.rbFirstFieldBottom.Location = new System.Drawing.Point(133, 3);
             this.rbFirstFieldBottom.Name = "rbFirstFieldBottom";
             this.rbFirstFieldBottom.Size = new System.Drawing.Size(58, 17);
             this.rbFirstFieldBottom.TabIndex = 26;
-            this.rbFirstFieldBottom.TabStop = true;
             this.rbFirstFieldBottom.Text = "Bottom";
             this.rbFirstFieldBottom.UseVisualStyleBackColor = true;
             // 
             // rbFirstFieldTop
             // 
             this.rbFirstFieldTop.AutoSize = true;
+            this.rbFirstFieldTop.Checked = true;
             this.rbFirstFieldTop.Location = new System.Drawing.Point(85, 4);
             this.rbFirstFieldTop.Name = "rbFirstFieldTop";
             this.rbFirstFieldTop.Size = new System.Drawing.Size(44, 17);
             this.rbFirstFieldTop.TabIndex = 25;
+            this.rbFirstFieldTop.TabStop = true;
             this.rbFirstFieldTop.Text = "Top";
             this.rbFirstFieldTop.UseVisualStyleBackColor = true;
             // 
@@ -398,9 +398,9 @@
             this.label6.AutoSize = true;
             this.label6.Location = new System.Drawing.Point(7, 6);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(73, 13);
+            this.label6.Size = new System.Drawing.Size(76, 13);
             this.label6.TabIndex = 24;
-            this.label6.Text = "First field is at:";
+            this.label6.Text = "First field is on:";
             // 
             // pnlFirstField
             // 
