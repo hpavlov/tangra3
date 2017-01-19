@@ -410,5 +410,12 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
             m_State = AavConfigState.FinishedConverting;
             UpdateControlState();
         }
+
+        internal void UpdateProgress(int currentFrame, int maxFrames)
+        {
+            pbar.Maximum = maxFrames;
+            pbar.Value = Math.Min(currentFrame, maxFrames);
+            pbar.Update();
+        }
     }
 }

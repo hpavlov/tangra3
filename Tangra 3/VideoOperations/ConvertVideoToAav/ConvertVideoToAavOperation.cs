@@ -77,6 +77,8 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
                     m_ConvertVideoToAavController.FinishedConversion();
                     m_ControlPanel.EndConversion();
                 }
+                else
+                    m_ControlPanel.UpdateProgress(frameNo, m_VideoController.VideoLastFrame);
             }
         }
 

@@ -304,6 +304,7 @@
             this.pbar.Location = new System.Drawing.Point(11, 329);
             this.pbar.Name = "pbar";
             this.pbar.Size = new System.Drawing.Size(212, 14);
+            this.pbar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             this.pbar.TabIndex = 50;
             // 
             // saveFileDialog
