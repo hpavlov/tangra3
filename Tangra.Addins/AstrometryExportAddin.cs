@@ -62,13 +62,13 @@ namespace Tangra.Addins
             if (m_LastSolution != null)
             {
 				var output = new StringBuilder();
-                output.Append("FrameNo, TimeUTC, RADeg, DEDeg, Mag, SolutionUncertaintyRA*Cos(DE)[arcsec], SolutionUncertaintyDE[arcsec], FWHM[arcsec], DetectionCertainty, SNR\r\n");
+                output.Append("FrameNo, TimeUTC(Uncorrected), RADeg, DEDeg, Mag, SolutionUncertaintyRA*Cos(DE)[arcsec], SolutionUncertaintyDE[arcsec], FWHM[arcsec], DetectionCertainty, SNR\r\n");
 
                 var meaList = m_LastSolution.GetAllMeasurements();
                 foreach (var mea in meaList)
                 {
                     output.AppendFormat("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}\r\n", 
-                        mea.FrameNo, mea.OCRedTimeStamp.HasValue ? (double?)mea.OCRedTimeStamp.Value.TimeOfDay.TotalDays : null,
+                        mea.FrameNo, mea.UncorrectedTimeStamp.HasValue ? (double?)mea.UncorrectedTimeStamp.Value.TimeOfDay.TotalDays : null,
                         mea.RADeg, mea.DEDeg, mea.Mag, mea.SolutionUncertaintyRACosDEArcSec, mea.SolutionUncertaintyDEArcSec, mea.FWHMArcSec, mea.Detection, mea.SNR);
 				}
 

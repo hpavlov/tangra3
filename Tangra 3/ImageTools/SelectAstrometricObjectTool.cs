@@ -198,7 +198,7 @@ namespace Tangra.ImageTools
 						m_AstrometryController.NewObjectSelected(objInfo);
 
 						m_SelectedObject = objInfo;
-						m_VideoController.RedrawCurrentFrame(false, true);
+						m_VideoController.RedrawCurrentFrame(false);
 					}
 				}
 			}

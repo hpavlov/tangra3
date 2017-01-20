@@ -162,6 +162,6 @@ namespace Tangra.SDK
         double Detection { get; }
         double SNR { get; }
         int FrameNo { get; }
-        DateTime? OCRedTimeStamp { get; }
+        DateTime? UncorrectedTimeStamp { get; }
     }
 }

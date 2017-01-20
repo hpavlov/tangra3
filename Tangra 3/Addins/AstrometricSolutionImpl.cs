@@ -95,7 +95,7 @@ namespace Tangra.Addins
                         FWHMArcSec = mea.FWHMArcSec,
                         Detection = mea.Detection,
                         SNR = mea.SNR,
-                        OCRedTimeStamp = mea.OCRedTimeStamp,
+                        UncorrectedTimeStamp = mea.OCRedTimeStamp ?? mea.CalculatedTimeStamp,
                         Mag = mea.Mag
                     });
 		        }
@@ -320,7 +320,7 @@ namespace Tangra.Addins
             public double Detection { get; internal set; }
             public double SNR { get; internal set; }
             public int FrameNo { get; internal set; }
-            public DateTime? OCRedTimeStamp { get; internal set; }
+            public DateTime? UncorrectedTimeStamp { get; internal set; }
         }
 
 		[Serializable]

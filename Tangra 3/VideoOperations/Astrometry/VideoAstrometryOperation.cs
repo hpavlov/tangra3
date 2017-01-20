@@ -824,16 +824,22 @@ namespace Tangra.VideoOperations.Astrometry
                             measurement.OCRedTimeStamp = m_VideoController.OCRTimestamp();
                             if (measurement.OCRedTimeStamp != DateTime.MinValue)
                             {
-                                double impliedFrameNo = AstrometryContext.Current.FieldSolveContext.FrameNoOfUtcTime + (measurement.OCRedTimeStamp.Value.TimeOfDay - AstrometryContext.Current.FieldSolveContext.UtcTime.TimeOfDay).TotalSeconds * m_VideoController.VideoFrameRate;
-                                if (Math.Abs((impliedFrameNo - (int) Math.Round(impliedFrameNo))*1000/m_VideoController.VideoFrameRate) > 2)
+                                double impliedFrameNo = AstrometryContext.Current.FieldSolveContext.FrameNoOfUtcTime +
+                                                        (measurement.OCRedTimeStamp.Value.TimeOfDay -
+                                                         AstrometryContext.Current.FieldSolveContext.UtcTime.TimeOfDay)
+                                                            .TotalSeconds*m_VideoController.VideoFrameRate;
+                                if (
+                                    Math.Abs((impliedFrameNo - (int) Math.Round(impliedFrameNo))*1000/
+                                             m_VideoController.VideoFrameRate) > 2)
                                 {
                                     // More than 2-ms discrepency is considered a timing error
                                     TangraContext.Current.AstrometryOCRTimeErrors++;
-                                    measurement.FrameNo = m_LastOCRImpliedFrameNo + m_VideoController.FramePlayer.FrameStep;
+                                    measurement.FrameNo = m_LastOCRImpliedFrameNo +
+                                                          m_VideoController.FramePlayer.FrameStep;
                                 }
                                 else
                                 {
-                                    int impliedFrameNoInt = (int)Math.Round(impliedFrameNo);
+                                    int impliedFrameNoInt = (int) Math.Round(impliedFrameNo);
                                     if (impliedFrameNoInt != frameNo)
                                     {
                                         if (impliedFrameNoInt == frameNo - 1)
@@ -846,7 +852,8 @@ namespace Tangra.VideoOperations.Astrometry
                                             // Dropped frame
                                             TangraContext.Current.AstrometryOCRDroppedFrames++;
                                         }
-                                        else if (m_LastOCRImpliedFrameNo + m_VideoController.FramePlayer.FrameStep != impliedFrameNoInt)
+                                        else if (m_LastOCRImpliedFrameNo + m_VideoController.FramePlayer.FrameStep !=
+                                                 impliedFrameNoInt)
                                             TangraContext.Current.AstrometryOCRTimeErrors++;
                                     }
 
@@ -865,6 +872,10 @@ namespace Tangra.VideoOperations.Astrometry
                                 measurement.FrameNo = m_LastOCRImpliedFrameNo + m_VideoController.FramePlayer.FrameStep;
                             }
                             m_LastOCRImpliedFrameNo = measurement.FrameNo;
+                        }
+                        else if (m_MeasurementContext.FirstFrameUtcTime != DateTime.MinValue)
+                        {
+                            measurement.CalculatedTimeStamp = m_MeasurementContext.FirstFrameUtcTime.AddSeconds((frameNo - m_MeasurementContext.FirstFrameId) * m_MeasurementContext.IntegratedExposureSeconds);
                         }
 
                         if (m_PhotometricFit != null)

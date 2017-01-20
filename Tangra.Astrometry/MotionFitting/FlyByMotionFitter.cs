@@ -73,6 +73,7 @@ namespace Tangra.MotionFitting
         public double SNR { get; set; }
         public int FrameNo { get; set; }
         public DateTime? OCRedTimeStamp { get; set; }
+        public DateTime? CalculatedTimeStamp { get; set; }
     }
 
     public class ProcessingValues

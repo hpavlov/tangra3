@@ -115,7 +115,7 @@ namespace Tangra.VideoOperations.Astrometry
             else
                 cbxCatalogPhotometryBand.SelectedIndex = 0;
 
-        	cbxExpectedMotion.SelectedIndex = 0;
+        	cbxExpectedMotion.SelectedIndex = 1;
         	cbxSignalType.Visible = false;
         	cbxSignalType.SelectedIndex = 0;
         	cbxFrameTimeType.SelectedIndex = 0;
@@ -416,6 +416,7 @@ namespace Tangra.VideoOperations.Astrometry
 			m_MeasurementContext.InstrumentalDelay = (double)nudInstrDelay.Value;
 			m_MeasurementContext.InstrumentalDelayUnits = (InstrumentalDelayUnits)cbxInstDelayUnit.SelectedIndex;
 			m_MeasurementContext.IntegratedFramesCount = m_AavIntegration ? 1 : (int)nudIntegratedFrames.Value;
+            m_MeasurementContext.IntegratedExposureSeconds = m_MeasurementContext.IntegratedFramesCount * 1000.0 / m_VideoController.VideoFrameRate;
 			m_MeasurementContext.AavIntegration = m_AavIntegration;
 			m_MeasurementContext.AavStackedMode = m_AavStacking;
 			m_MeasurementContext.VideoFileFormat = m_VideoFileFormat;

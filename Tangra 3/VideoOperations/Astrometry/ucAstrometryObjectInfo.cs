@@ -541,7 +541,11 @@ namespace Tangra.VideoOperations.Astrometry
 
 				OnStartMeasurementCommand(this,
 					new StartAstrometricMeasurementsEventArgs(
-						new MeasurementContext() { ObjectToMeasure = m_UserObject }));
+						new MeasurementContext()
+						{
+						    ObjectToMeasure = m_UserObject, 
+                            MovementExpectation = MovementExpectation.SlowFlyby
+						}));
 			}
 		}
 
