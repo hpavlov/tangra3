@@ -358,7 +358,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			{
 				List<double> testDistances = unorderedPivotDistances[i];
 
-				for (int j = 0; j < 10; j++)
+                for (int j = 0; j < Math.Min(10, m_PivotDistances.Count); j++)
 				{
 					List<double> pivotDistances = m_PivotDistances[j];
 
@@ -384,7 +384,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 				}
 			}
 
-			for (int i = 0; i < 10; i++)
+            for (int i = 0; i < Math.Min(10, stats.Count); i++)
 			{
 				int[] uniqueIDs = stats[i].Distinct().ToArray();
 				int[] occurances = new List<int>(uniqueIDs).ToArray();

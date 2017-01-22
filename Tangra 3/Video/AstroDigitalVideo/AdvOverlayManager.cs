@@ -83,7 +83,7 @@ namespace Tangra.Video.AstroDigitalVideo
 			{
 				string timeStampStr = state.HasValidTimeStamp
 						? string.Format("{0}.{1}", state.CentralExposureTime.ToString("dd MMM yyyy HH:mm:ss"), state.CentralExposureTime.Millisecond.ToString().PadLeft(3, '0'))
-						: "Timestamp Not Available";
+						: "Embedded Timestamp Not Found";
 				g.DrawString(timeStampStr, s_TimeStampFont, s_TimeStampBrush, m_XPos, currentImage.Height - m_YPosUpper);
 				g.Save();
 			}
@@ -177,7 +177,7 @@ namespace Tangra.Video.AstroDigitalVideo
 			{
 				string timeStampStr = state.HasValidTimeStamp
 						? string.Format("{0}.{1}", state.CentralExposureTime.ToString("dd MMM yyyy HH:mm:ss"), state.CentralExposureTime.Millisecond.ToString().PadLeft(3, '0'))
-						: "Timestamp Not Available";
+                        : "Embedded Timestamp Not Found";
 				g.DrawString(timeStampStr, s_TimeStampFont, s_TimeStampBrush, m_XPos, currentImage.Height - m_YPosUpper - 15);
 				g.Save();
 			}

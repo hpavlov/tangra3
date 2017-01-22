@@ -78,7 +78,7 @@ namespace Tangra.Video.AstroDigitalVideo
 				statusText.AppendLine(string.Format("Central Exposure Time: {0}",
                         m_FrameState.HasValidTimeStamp 
                             ? m_FrameState.CentralExposureTime.ToString("dd MMM yyyy HH:mm:ss.fff")
-                            : "Timestamp Not Available"));
+                            : "Embedded Timestamp Not Found"));
 
 			if (m_AdvSettings.PopupExposure)
                  statusText.AppendLine(m_FrameState.HasValidTimeStamp 
