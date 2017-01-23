@@ -1,6 +1,12 @@
 ﻿Tangra3 Release Notes
 ---------------------
 
+v3.6.3 (2017-01-23)
+-------------------
+- Improvements to Astrometry using AAV files
+- Improvements and bugfixes to the AVI-to-AAV file conversion
+- Implemented uncertainty estimation of the reduced astrometric positions
+
 v3.6.2 (2016-12-17)
 -------------------
 - Made it possible to export additioanl parameters to CSV from a light curve, inclulding the X and Y coordinates, FWHM and PSF height of the measured objects. 
