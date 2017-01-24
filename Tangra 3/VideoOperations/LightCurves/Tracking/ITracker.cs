@@ -74,6 +74,11 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 			return Math.Sqrt(Math.Pow(pixel1.XDouble - pixel2.XDouble, 2) + Math.Pow(pixel1.YDouble - pixel2.YDouble, 2));
 		}
 
+        public static double DistanceTo(this IImagePixel pixel1, double x, double y)
+        {
+            return Math.Sqrt(Math.Pow(pixel1.XDouble - x, 2) + Math.Pow(pixel1.YDouble - y, 2));
+        }
+
 		public static double DistanceTo(this PSFFit psf1, PSFFit psf2)
 		{
 			return Math.Sqrt(Math.Pow(psf1.XCenter - psf2.XCenter, 2) + Math.Pow(psf1.YCenter - psf2.YCenter, 2));

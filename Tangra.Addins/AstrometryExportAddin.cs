@@ -14,10 +14,12 @@ namespace Tangra.Addins
     public class AstrometryExportAddin : MarshalByRefObject, ITangraAddinAction
     {
         private ITangraHost m_Host;
+        private ITangraHost2 m_Host2;
 
         public void Initialise(ITangraHost host)
         {
             m_Host = host;
+            m_Host2 = host as ITangraHost2;
         }
 
         public void Finalise()
@@ -76,6 +78,9 @@ namespace Tangra.Addins
 				dialog.Filter = "Comma Separated Values (*.csv)|*.csv|All Files (*.*)|*.*";
 				dialog.DefaultExt = "csv";
 				dialog.Title = "Export Tangra Astrometry";
+
+                if (m_Host2 != null)
+                    dialog.FileName = Path.ChangeExtension(m_Host2.GetFileInfoProvider().FileName, ".csv");
 
 				if (dialog.ShowDialog(m_Host.ParentWindow) == DialogResult.OK)
 				{

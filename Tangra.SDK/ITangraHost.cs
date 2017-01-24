@@ -46,6 +46,11 @@ namespace Tangra.SDK
         ITangraAstrometricSolution GetCurrentFrameAstrometricSolution();
     }
 
+    public interface IFileInfoProvider
+    {
+        string FileName { get; }
+    }
+
 	public interface ITangraHost
 	{
 		ISettingsStorageProvider GetSettingsProvider();
@@ -54,8 +59,13 @@ namespace Tangra.SDK
 		IWin32Window ParentWindow { get; }
 	    void PositionToFrame(int frameNo);
 	}
- 
-	public interface ISingleMeasurement
+
+    public interface ITangraHost2
+    {
+        IFileInfoProvider GetFileInfoProvider();
+    }
+
+    public interface ISingleMeasurement
 	{
 		int CurrFrameNo { get; }
 		byte TargetNo { get; }

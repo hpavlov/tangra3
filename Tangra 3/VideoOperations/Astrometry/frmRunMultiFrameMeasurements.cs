@@ -173,7 +173,8 @@ namespace Tangra.VideoOperations.Astrometry
         private void SyncTimeStampControlWithExpectedFrameTime()
         {
 	        VideoFileFormat format = m_VideoController.GetVideoFileFormat();
-			if (format == VideoFileFormat.AVI)
+			if (format == VideoFileFormat.AVI ||
+                (format == VideoFileFormat.AAV2 && !m_VideoController.HasEmbeddedTimeStamps()))
 			{
 				double milisecondsDiff =
 					(m_VideoController.CurrentFrameIndex - AstrometryContext.Current.FieldSolveContext.FrameNoOfUtcTime) * 1000.0 / m_VideoController.VideoFrameRate;
@@ -416,7 +417,7 @@ namespace Tangra.VideoOperations.Astrometry
 			m_MeasurementContext.InstrumentalDelay = (double)nudInstrDelay.Value;
 			m_MeasurementContext.InstrumentalDelayUnits = (InstrumentalDelayUnits)cbxInstDelayUnit.SelectedIndex;
 			m_MeasurementContext.IntegratedFramesCount = m_AavIntegration ? 1 : (int)nudIntegratedFrames.Value;
-            m_MeasurementContext.IntegratedExposureSeconds = m_MeasurementContext.IntegratedFramesCount * 1000.0 / m_VideoController.VideoFrameRate;
+            m_MeasurementContext.IntegratedExposureSeconds = m_MeasurementContext.IntegratedFramesCount / m_VideoController.VideoFrameRate;
 			m_MeasurementContext.AavIntegration = m_AavIntegration;
 			m_MeasurementContext.AavStackedMode = m_AavStacking;
 			m_MeasurementContext.VideoFileFormat = m_VideoFileFormat;

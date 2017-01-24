@@ -27,8 +27,10 @@ namespace Tangra.Controller
 		private AddinManager m_AddinManager;
 	    private ILightCurveDataProvider m_LocalLightCurveDataProvider;
         private IAstrometryProvider m_LocalAstrometryProvider;
+        private IFileInfoProvider m_LocalFileInfoProvider;
         private MarshalByRefLightCurveDataProvider m_DelegatedLightCurveDataProvider;
         private MarshalByRefAstrometryProvider m_DelegatedAstrometryProvider;
+        private MarshalByRefFileInfoProvider m_DelegatedFileInfoProvider;
 
 		public AddinsController(frmMain mainFormView, VideoController videoController)
 		{
@@ -227,7 +229,13 @@ namespace Tangra.Controller
 			m_DelegatedAstrometryProvider = new MarshalByRefAstrometryProvider(m_LocalAstrometryProvider);
 			m_AddinManager.SetAstrometryProvider(m_DelegatedAstrometryProvider);
 		}
-        
+
+        internal void SetFileInfoProvider(IFileInfoProvider fileInfoProvider)
+        {
+            m_LocalFileInfoProvider = fileInfoProvider;
+            m_DelegatedFileInfoProvider = new MarshalByRefFileInfoProvider(m_LocalFileInfoProvider);
+            m_AddinManager.SetFileInfoProvider(m_DelegatedFileInfoProvider);
+        }
 
         public void FinaliseAddins()
         {

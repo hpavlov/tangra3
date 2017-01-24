@@ -11,6 +11,7 @@ using Tangra.Model.Config;
 using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.Model.Numerical;
+using Tangra.StarCatalogues;
 using Tangra.VideoOperations.Astrometry.Engine;
 using Tangra.VideoOperations.LightCurves.Tracking;
 
@@ -24,6 +25,8 @@ namespace Tangra.VideoOperations.Astrometry.Tracking
         private AstrometryController m_AstrometryController;
         private MeasurementContext m_MeasurementContext;
         private int m_RepeatedIntergationPositions = 1;
+        private double m_LastMovementPixels;
+        private List<IStar> m_LastFrameStars = new List<IStar>();
 
         private List<double> m_PastFramePosX = new List<double>();
         private List<double> m_PastFramePosY = new List<double>();
@@ -51,6 +54,8 @@ namespace Tangra.VideoOperations.Astrometry.Tracking
             m_RepeatedIntergationPositions = m_MeasurementContext.IntegratedFramesCount / m_MeasurementContext.FrameInterval;
             if (m_RepeatedIntergationPositions == 0) m_RepeatedIntergationPositions = 1;
 
+            m_LastMovementPixels = 0;
+
             return true;
         }
 
@@ -67,28 +72,59 @@ namespace Tangra.VideoOperations.Astrometry.Tracking
         public void NextFrame(int frameNo, IAstroImage astroImage, IStarMap starMap, LeastSquareFittedAstrometry astrometricFit)
         {
             IsTrackedSuccessfully = false;
+            int searchRadius = (int)Math.Ceiling(Math.Max(m_LastMovementPixels, CoreAstrometrySettings.Default.PreMeasureSearchCentroidRadius));
 
             PSFFit psfFit = null;
+            
+            int startingX = (int)TrackedObject.LastKnownX;
+            int startingY = (int)TrackedObject.LastKnownY;
 
             if (m_RepeatedIntergationPositions * 4 < m_PastFrameNos.Count)
             {
                 var expectedPos = GetExpectedPosition(frameNo);
                 if (expectedPos != null)
-                    AstrometryContext.Current.StarMap.GetPSFFit(expectedPos.X, expectedPos.Y, PSFFittingMethod.NonLinearFit, out psfFit);
+                {
+                    startingX = expectedPos.X;
+                    startingY = expectedPos.Y;
+                }
             }
 
-            if (psfFit == null)
-            {
-                var brightestFeature = starMap.GetFeatureInRadius((int)TrackedObject.LastKnownX, (int)TrackedObject.LastKnownY, CoreAstrometrySettings.Default.PreMeasureSearchCentroidRadius);
+            var nearbyFeatures = starMap.GetFeaturesInRadius(startingX, startingY, searchRadius).ToArray();
 
-                if (brightestFeature != null)
+            var nonStarNearbyFeature = new List<StarMapFeature>();
+            foreach (var feature in nearbyFeatures)
+            {
+                var center = feature.GetCenter();
+                var referenceStarFeatures = astrometricFit.FitInfo.AllStarPairs.Where(x => x.FitInfo.UsedInSolution).ToList();
+                var refStar = referenceStarFeatures.FirstOrDefault(s => Math.Sqrt((s.x - center.X) * (s.x - center.X) + (s.y - center.Y) * (s.y - center.Y)) < 2);
+
+                double raf, def;
+                astrometricFit.GetRADEFromImageCoords(center.XDouble, center.YDouble, out raf, out def);
+                var pastKnownStar = m_LastFrameStars.FirstOrDefault(s => AngleUtility.Elongation(s.RADeg, s.DEDeg, raf, def) * 3600.0 < 2);
+
+                if (refStar == null && pastKnownStar == null) nonStarNearbyFeature.Add(feature);
+            }
+
+            if (nonStarNearbyFeature.Count > 0)
+            {
+                StarMapFeature closestFeature = nonStarNearbyFeature[0];
+                var lastKnownCenter = new ImagePixel(TrackedObject.LastKnownX, TrackedObject.LastKnownY);
+                var smallestDistance = lastKnownCenter.DistanceTo(closestFeature.GetCenter());
+
+                for (int i = 1; i < nonStarNearbyFeature.Count; i++)
                 {
-                    var center = brightestFeature.GetCenter();
-                    var referenceStarFeatures = astrometricFit.FitInfo.AllStarPairs.Where(x => x.FitInfo.UsedInSolution).ToList();
-                    var refStar = referenceStarFeatures.FirstOrDefault(s => Math.Sqrt((s.x - center.X) * (s.x - center.X) + (s.y - center.Y) * (s.y - center.Y)) < 2);
-                    if (refStar == null)
-                        // The brightest feature is not a reference star, so we assume it is our object
-                        AstrometryContext.Current.StarMap.GetPSFFit(center.X, center.Y, PSFFittingMethod.NonLinearFit, out psfFit);
+                    var distance = lastKnownCenter.DistanceTo(nonStarNearbyFeature[i].GetCenter());
+                    if (distance < smallestDistance)
+                    {
+                        smallestDistance = distance;
+                        closestFeature = nonStarNearbyFeature[i];
+                    }
+                }
+
+                if (closestFeature != null)
+                {
+                    var center = closestFeature.GetCenter();
+                    AstrometryContext.Current.StarMap.GetPSFFit(center.X, center.Y, PSFFittingMethod.NonLinearFit, out psfFit);
                 }
             }
 
@@ -97,7 +133,7 @@ namespace Tangra.VideoOperations.Astrometry.Tracking
                 ImagePixel centroid = AstrometryContext.Current.StarMap.GetCentroid(
                     (int)TrackedObject.LastKnownX,
                     (int)TrackedObject.LastKnownY,
-                    CoreAstrometrySettings.Default.PreMeasureSearchCentroidRadius);
+                    searchRadius);
 
                 if (centroid != null)
                     AstrometryContext.Current.StarMap.GetPSFFit(centroid.X, centroid.Y, PSFFittingMethod.NonLinearFit, out psfFit);
@@ -110,7 +146,7 @@ namespace Tangra.VideoOperations.Astrometry.Tracking
 
                 double maxPosDiffArcSec =
                         astrometricFit.GetDistanceInArcSec(astrometricFit.Image.CenterXImage, astrometricFit.Image.CenterYImage,
-                        astrometricFit.Image.CenterXImage + CoreAstrometrySettings.Default.PreMeasureSearchCentroidRadius, astrometricFit.Image.CenterYImage);
+                        astrometricFit.Image.CenterXImage + Math.Max(m_LastMovementPixels, CoreAstrometrySettings.Default.MaxAllowedDefaultMotionInPixels), astrometricFit.Image.CenterYImage);
 
                 if (!double.IsNaN(TrackedObject.RAHours))
                 {
@@ -125,9 +161,21 @@ namespace Tangra.VideoOperations.Astrometry.Tracking
 
                 TrackedObject.RAHours = ra / 15.0;
                 TrackedObject.DEDeg = de;
+
+                if (TrackedObject.PSFFit != null)
+                {
+                    m_LastMovementPixels = 1.2 * ImagePixel.ComputeDistance(TrackedObject.LastKnownX, psfFit.XCenter, TrackedObject.LastKnownY, psfFit.YCenter);
+                }
                 TrackedObject.LastKnownX = psfFit.XCenter;
                 TrackedObject.LastKnownY = psfFit.YCenter;
                 TrackedObject.PSFFit = psfFit;
+
+                var lastKnownCenter = new ImagePixel(TrackedObject.LastKnownX, TrackedObject.LastKnownY);
+                var thisFrameStars = astrometricFit.FitInfo.AllStarPairs.Where(x => lastKnownCenter.DistanceTo(x.x, x.y) > 2 * psfFit.FWHM).ToList();
+                if (thisFrameStars.Count > 0)
+                {
+                    m_LastFrameStars = thisFrameStars.Select(x => new Star(x.StarNo, x.RADeg, x.DEDeg, x.Mag) as IStar).ToList();
+                }
 
                 IsTrackedSuccessfully = true;
             }
@@ -136,7 +184,7 @@ namespace Tangra.VideoOperations.Astrometry.Tracking
             {
                 m_PastFramePosX.Add(psfFit.XCenter);
                 m_PastFramePosY.Add(psfFit.YCenter);
-                m_PastFrameNos.Add(frameNo);                
+                m_PastFrameNos.Add(frameNo);
             }
         }
 

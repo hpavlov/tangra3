@@ -12,7 +12,7 @@ using Tangra.SDK;
 namespace Tangra.Addins
 {
 	[Serializable]
-	public class TangraHostDelegate : MarshalByRefObject, ITangraHost
+    public class TangraHostDelegate : MarshalByRefObject, ITangraHost, ITangraHost2
 	{
 		private string m_AddinTypeName;
 		private IAddinManager m_AddinManager;
@@ -50,11 +50,14 @@ namespace Tangra.Addins
             m_AddinManager.PositionToFrame(frameNo);
         }
 
-
-
         public IAstrometryProvider GetAstrometryProvider()
         {
             return m_AddinManager.AstrometryProvider;
+        }
+
+        public IFileInfoProvider GetFileInfoProvider()
+        {
+            return m_AddinManager.FileInfoProvider;
         }
     }
 }

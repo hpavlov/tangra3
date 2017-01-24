@@ -825,16 +825,14 @@ namespace Tangra.VideoOperations.Astrometry
 
                         if (m_VideoController.HasTimestampOCR())
                         {
-                            measurement.OCRedTimeStamp = m_VideoController.OCRTimestamp();
-                            if (measurement.OCRedTimeStamp != DateTime.MinValue)
+                            DateTime ocredTimeStamp = m_VideoController.OCRTimestamp();
+                            measurement.OCRedTimeStamp = ocredTimeStamp;
+                            if (ocredTimeStamp != DateTime.MinValue)
                             {
                                 double impliedFrameNo = AstrometryContext.Current.FieldSolveContext.FrameNoOfUtcTime +
-                                                        (measurement.OCRedTimeStamp.Value.TimeOfDay -
-                                                         AstrometryContext.Current.FieldSolveContext.UtcTime.TimeOfDay)
-                                                            .TotalSeconds*m_VideoController.VideoFrameRate;
+                                                        (ocredTimeStamp.TimeOfDay - AstrometryContext.Current.FieldSolveContext.UtcTime.TimeOfDay).TotalSeconds*m_VideoController.VideoFrameRate;
                                 if (
-                                    Math.Abs((impliedFrameNo - (int) Math.Round(impliedFrameNo))*1000/
-                                             m_VideoController.VideoFrameRate) > 2)
+                                    Math.Abs((impliedFrameNo - (int) Math.Round(impliedFrameNo))*1000/m_VideoController.VideoFrameRate) > 2)
                                 {
                                     // More than 2-ms discrepency is considered a timing error
                                     TangraContext.Current.AstrometryOCRTimeErrors++;

@@ -72,8 +72,13 @@ namespace Tangra.MotionFitting
         public double Detection { get; set; }
         public double SNR { get; set; }
         public int FrameNo { get; set; }
-        public DateTime? OCRedTimeStamp { get; set; }
-        public DateTime? CalculatedTimeStamp { get; set; }
+        public DateTime? OCRedTimeStamp { private get; set; }
+        public DateTime? CalculatedTimeStamp { private get; set; }
+
+        public DateTime? FrameTimeStamp
+        {
+            get { return OCRedTimeStamp ?? CalculatedTimeStamp; }
+        }
     }
 
     public class ProcessingValues
@@ -389,8 +394,8 @@ namespace Tangra.MotionFitting
                         var firstPos = measurements[rv.EarliestFrame];
                         var lastPos = measurements[rv.LatestFrame];
                         double distanceArcSec = AngleUtility.Elongation(firstPos.RADeg, firstPos.DEDeg, lastPos.RADeg, lastPos.DEDeg) * 3600;
-                        var firstTime = GetTimeForFrame(fittingContext, rv.EarliestFrame, meaContext.FirstVideoFrame, getFrameStateDataCallback, firstPos.OCRedTimeStamp);
-                        var lastTime = GetTimeForFrame(fittingContext, rv.LatestFrame, meaContext.FirstVideoFrame, getFrameStateDataCallback, lastPos.OCRedTimeStamp);
+                        var firstTime = GetTimeForFrame(fittingContext, rv.EarliestFrame, meaContext.FirstVideoFrame, getFrameStateDataCallback, firstPos.FrameTimeStamp);
+                        var lastTime = GetTimeForFrame(fittingContext, rv.LatestFrame, meaContext.FirstVideoFrame, getFrameStateDataCallback, lastPos.FrameTimeStamp);
                         double elapsedSec = new TimeSpan(lastTime.UT.Ticks - firstTime.UT.Ticks).TotalSeconds;
                         motionRate = distanceArcSec / elapsedSec;
                     }
@@ -401,7 +406,7 @@ namespace Tangra.MotionFitting
                 {
                     // Find the closest video 'normal' MPC time and compute the frame number for it
                     // Now compute the RA/DE for the computed 'normal' frame
-                    resolvedTime = GetTimeForFrame(fittingContext, meaContext.UserMidFrame, meaContext.FirstVideoFrame, getFrameStateDataCallback, measurements[meaContext.UserMidFrame].OCRedTimeStamp);
+                    resolvedTime = GetTimeForFrame(fittingContext, meaContext.UserMidFrame, meaContext.FirstVideoFrame, getFrameStateDataCallback, measurements[meaContext.UserMidFrame].FrameTimeStamp);
 
                     #region Plotting Code
                     if (g != null)

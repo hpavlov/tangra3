@@ -23,5 +23,7 @@ namespace Tangra.Model.Config
 
 	    public int OnlineObjectIdentificationArea = 20; // pixels
 
+        public int MaxAllowedDefaultMotionInPixels = 5;
+
 	}
 }

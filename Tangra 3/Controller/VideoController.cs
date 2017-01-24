@@ -35,6 +35,7 @@ using Tangra.Model.Video;
 using Tangra.Model.VideoOperations;
 using Tangra.OCR;
 using Tangra.PInvoke;
+using Tangra.SDK;
 using Tangra.Video;
 using Tangra.Video.AstroDigitalVideo;
 using Tangra.VideoOperations;
@@ -54,7 +55,7 @@ namespace Tangra.Controller
         public SerUseTimeStamp SerTiming { get; set; }
     }
 
-	public class VideoController : IDisposable, IVideoFrameRenderer, IVideoController, IImagePixelProvider
+	public class VideoController : IDisposable, IVideoFrameRenderer, IVideoController, IImagePixelProvider, IFileInfoProvider
 	{
 		private VideoFileView m_VideoFileView;
         private ZoomedImageView m_ZoomedImageView;
@@ -503,6 +504,7 @@ namespace Tangra.Controller
 					RegisterRecentFile(RecentFileType.Video, fileName);
 
 				m_ImageTool = ImageTool.SwitchTo<ArrowTool>(null, m_ImageToolView, m_ImageTool);
+                m_AddinsController.SetFileInfoProvider(this);
 
 				return true;
 			}
@@ -2924,5 +2926,10 @@ namespace Tangra.Controller
 
             return null;
         }
-	}
+
+        public string FileName
+        {
+            get { return TangraContext.Current.FileName; }
+        }
+    }
 }

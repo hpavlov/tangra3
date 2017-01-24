@@ -24,6 +24,7 @@ namespace Tangra.Addins
 		IWin32Window ParentWindow { get; }
 		ILightCurveDataProvider LightCurveDataProvider { get; }
         IAstrometryProvider AstrometryProvider { get; }
+        IFileInfoProvider FileInfoProvider { get; }
 	    void PositionToFrame(int frameNo);
 	}
 
@@ -55,6 +56,7 @@ namespace Tangra.Addins
         private VideoController m_VideoController;
 		private ILightCurveDataProvider m_lcDataProvider;
 	    private IAstrometryProvider m_astrometryProvider;
+	    private IFileInfoProvider m_fileInfoProvider;
 
 		internal RemotingClientSponsor RemotingClientSponsor = new RemotingClientSponsor();
 
@@ -154,6 +156,11 @@ namespace Tangra.Addins
             m_astrometryProvider = provider;
 		}
 
+        internal void SetFileInfoProvider(IFileInfoProvider fileInfoProvider)
+	    {
+	        m_fileInfoProvider = fileInfoProvider;
+	    }
+
 		IWin32Window IAddinManager.ParentWindow
 		{
 			get { return m_MainForm; }
@@ -167,6 +174,11 @@ namespace Tangra.Addins
 	    IAstrometryProvider IAddinManager.AstrometryProvider
 	    {
             get { return m_astrometryProvider; }
+	    }
+
+	    IFileInfoProvider IAddinManager.FileInfoProvider
+	    {
+            get { return m_fileInfoProvider; }
 	    }
 
         void IAddinManager.PositionToFrame(int frameNo)

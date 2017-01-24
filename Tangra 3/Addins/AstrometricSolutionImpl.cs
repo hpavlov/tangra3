@@ -95,7 +95,7 @@ namespace Tangra.Addins
                         FWHMArcSec = mea.FWHMArcSec,
                         Detection = mea.Detection,
                         SNR = mea.SNR,
-                        UncorrectedTimeStamp = mea.OCRedTimeStamp ?? mea.CalculatedTimeStamp,
+                        UncorrectedTimeStamp = mea.FrameTimeStamp,
                         Mag = mea.Mag
                     });
 		        }
