@@ -680,14 +680,18 @@ namespace Tangra.VideoOperations.Astrometry
 				if (m_AstrometricState.Measurements.Count >= m_MeasurementContext.MaxMeasurements ||
 					m_CurrentFrameIndex + m_MeasurementContext.FrameInterval > m_VideoController.VideoLastFrame)
 				{
-					m_VideoController.StopVideo();
 					isLastMeasurement = true;
 				}
-				else
-				{
-					MeasurePositionInFrames(frameNo);
-					ExecuteAstrometryAddins();
-				}
+
+				MeasurePositionInFrames(frameNo);
+				ExecuteAstrometryAddins();
+
+			    if (isLastMeasurement)
+			    {
+                    SingleMultiFrameMeasurement lastMeasurement = m_AstrometricState.Measurements[m_AstrometricState.Measurements.Count - 1];
+                    m_ViewControl.AddNewMeasurement(lastMeasurement);
+			        m_VideoController.StopVideo();
+			    }
 			}
 			else
 			{
