@@ -21,6 +21,8 @@ namespace Tangra.AstroServices
 		public static List<MPCheckEntry> CheckRegion(
 			DateTime utcDate, double raDeg, double deDeg, double radiusArcMin, double magLimit, string observatoryCode)
 		{
+            Trace.WriteLine(String.Format("Checking potential objects around RA:{0:0.0000}, DEC:{1:0.0000} at {2} UTC for observatory code {3})", raDeg / 15, deDeg, utcDate.ToString("yyyy-MMM-dd HH:mm:ss"), observatoryCode));
+
 			double dayPart = utcDate.Day + (utcDate.Hour + utcDate.Minute / 60.0 + (utcDate.Second + (utcDate.Millisecond / 1000.0)) / 3600.0) / 24.0;
 
 			string requestUrl =

@@ -115,6 +115,9 @@ namespace Tangra.VideoOperations.Astrometry
 		private static Font s_UserObjectFont = new Font(FontFamily.GenericSerif, 10);
 
 	    private bool m_TestExport = false;
+        
+	    private DateTime m_LastOCRTimeOfDay = DateTime.MinValue;
+	    private int m_DayChanges = 0;
 
 		public VideoAstrometryOperation()
 		{ }
@@ -231,11 +234,14 @@ namespace Tangra.VideoOperations.Astrometry
                         break;
                     }
                 }                
-            }
+            }   
 
 			m_AstrometricState.Measurements.Clear();
 			m_AstrometricState.MeasuringState = AstrometryInFramesState.RunningMeasurements;
 			m_ViewControl.FrameMeasurementStarted();
+
+            m_LastOCRTimeOfDay = m_MeasurementContext.FirstFrameUtcTime;
+	        m_DayChanges = 0;
 
             if (m_AstrometryAddins.Count > 0)
             {
@@ -684,14 +690,18 @@ namespace Tangra.VideoOperations.Astrometry
 				}
 
 				MeasurePositionInFrames(frameNo);
-				ExecuteAstrometryAddins();
-
-			    if (isLastMeasurement)
+			    
+                if (isLastMeasurement)
 			    {
                     SingleMultiFrameMeasurement lastMeasurement = m_AstrometricState.Measurements[m_AstrometricState.Measurements.Count - 1];
                     m_ViewControl.AddNewMeasurement(lastMeasurement);
-			        m_VideoController.StopVideo();
 			    }
+                
+                ExecuteAstrometryAddins();
+
+
+                if (isLastMeasurement)
+                    m_VideoController.StopVideo();
 			}
 			else
 			{
@@ -826,9 +836,20 @@ namespace Tangra.VideoOperations.Astrometry
                         if (m_VideoController.HasTimestampOCR())
                         {
                             DateTime ocredTimeStamp = m_VideoController.OCRTimestamp();
-                            measurement.OCRedTimeStamp = ocredTimeStamp;
+                            
                             if (ocredTimeStamp != DateTime.MinValue)
                             {
+                                if (m_LastOCRTimeOfDay != DateTime.MinValue &&
+                                    ocredTimeStamp.TimeOfDay < m_LastOCRTimeOfDay.TimeOfDay &&
+                                    ocredTimeStamp.Hour == 0 && ocredTimeStamp.Minute == 0)
+                                {
+                                    m_DayChanges++;
+                                }                                    
+
+                                m_LastOCRTimeOfDay = ocredTimeStamp;
+
+                                measurement.OCRedTimeStamp = m_MeasurementContext.FirstFrameUtcTime.Date.Add(ocredTimeStamp.TimeOfDay).AddDays(m_DayChanges);
+
                                 double impliedFrameNo = AstrometryContext.Current.FieldSolveContext.FrameNoOfUtcTime +
                                                         (ocredTimeStamp.TimeOfDay - AstrometryContext.Current.FieldSolveContext.UtcTime.TimeOfDay).TotalSeconds*m_VideoController.VideoFrameRate;
                                 if (
@@ -871,6 +892,7 @@ namespace Tangra.VideoOperations.Astrometry
                             else
                             {
                                 TangraContext.Current.AstrometryOCRFailedRead++;
+                                measurement.OCRedTimeStamp = null;
                                 measurement.FrameNo = m_LastOCRImpliedFrameNo + m_VideoController.FramePlayer.FrameStep;
                             }
                             m_LastOCRImpliedFrameNo = measurement.FrameNo;
@@ -903,7 +925,7 @@ namespace Tangra.VideoOperations.Astrometry
                 if (m_MeasurementContext.MovementExpectation == MovementExpectation.Slow)
                     m_AstrometryTracker = new SlowMotionTracker();
                 else
-                    m_AstrometryTracker = new FastAsteroidTracker(m_AstrometryController, m_MeasurementContext);
+                    m_AstrometryTracker = new FastMotionTracker(m_AstrometryController, m_MeasurementContext);
 
                 m_AstrometryTracker.InitializeNewTracking(m_AstroImage, new TrackedAstrometricObjectConfig()
                 {

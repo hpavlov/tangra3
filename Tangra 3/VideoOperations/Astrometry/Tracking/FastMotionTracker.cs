@@ -17,7 +17,7 @@ using Tangra.VideoOperations.LightCurves.Tracking;
 
 namespace Tangra.VideoOperations.Astrometry.Tracking
 {
-    public class FastAsteroidTracker : IAstrometryTracker
+    public class FastMotionTracker : IAstrometryTracker
     {
         public bool IsTrackedSuccessfully { get; private set; }
 
@@ -33,7 +33,7 @@ namespace Tangra.VideoOperations.Astrometry.Tracking
         private List<long> m_PastFrameTimes = new List<long>();
         private List<int> m_PastFrameNos = new List<int>();
 
-        internal FastAsteroidTracker(AstrometryController astrometryController, MeasurementContext measurementContext)
+        internal FastMotionTracker(AstrometryController astrometryController, MeasurementContext measurementContext)
         {
             m_AstrometryController = astrometryController;
             m_MeasurementContext = measurementContext;
@@ -130,10 +130,9 @@ namespace Tangra.VideoOperations.Astrometry.Tracking
 
             if (psfFit == null)
             {
-                ImagePixel centroid = AstrometryContext.Current.StarMap.GetCentroid(
-                    (int)TrackedObject.LastKnownX,
-                    (int)TrackedObject.LastKnownY,
-                    searchRadius);
+                // The expected location cannot be matched with any brighter feature so it is likely a faint object
+                // with no brighter objects around. Lets find the brightest (faint) object in the are and use it
+                ImagePixel centroid = AstrometryContext.Current.StarMap.GetCentroid(startingX, startingY, searchRadius);
 
                 if (centroid != null)
                     AstrometryContext.Current.StarMap.GetPSFFit(centroid.X, centroid.Y, PSFFittingMethod.NonLinearFit, out psfFit);

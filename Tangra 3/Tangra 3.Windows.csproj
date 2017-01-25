@@ -363,7 +363,7 @@
       <DependentUpon>frmIdentifiedStarAction.cs</DependentUpon>
     </Compile>
     <Compile Include="ImageTools\RoiSelector.cs" />
-    <Compile Include="VideoOperations\Astrometry\Tracking\FastAsteroidTracker.cs" />
+    <Compile Include="VideoOperations\Astrometry\Tracking\FastMotionTracker.cs" />
     <Compile Include="VideoOperations\Astrometry\Tracking\IAstrometryTracker.cs" />
     <Compile Include="VideoOperations\Astrometry\Tracking\SlowMotionTracker.cs" />
     <Compile Include="VideoOperations\ConvertVideoToAav\ConvertVideoToAavOperation.cs" />

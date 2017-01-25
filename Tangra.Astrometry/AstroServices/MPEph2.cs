@@ -20,6 +20,8 @@ namespace Tangra.AstroServices
 	{
 		public static MPEphEntry GetCoordinatesForSingleDate(double longitude, double latitude, string objectDesgn, DateTime utcTime)
 		{
+            Trace.WriteLine(String.Format("Checking {0} position at {1} UTC for location ({2:0.00000}, {3:0.00000})", objectDesgn, utcTime.ToString("yyyy-MMM-dd HH:mm:ss"), longitude, latitude));
+
 			double hourOfTheDay = utcTime.Hour + utcTime.Minute / 60.0 + (utcTime.Second + (utcTime.Millisecond / 1000.0)) / 3600.0;
             string postData =
 				string.Format("ty=e&TextArea={0}&d={1}&l=1&i=&u=d&uto={2}&c=&long={3}&lat={4}&alt=&raty=a&s=t&m=m&adir=S&oed=&e=-2&resoc=&tit=&bu=&ch=c&ce=f&js=f",
@@ -34,7 +36,9 @@ namespace Tangra.AstroServices
 
 		public static MPEphEntry GetCoordinatesForSingleDate(string observatoryCode, string objectDesgn, DateTime utcTime)
 		{
-			double hourOfTheDay = utcTime.Hour + utcTime.Minute / 60.0 + (utcTime.Second + (utcTime.Millisecond / 1000.0)) / 3600.0;
+		    Trace.WriteLine(String.Format("Checking {0} position at {1} UTC for observatory code {2}", objectDesgn, utcTime.ToString("yyyy-MMM-dd HH:mm:ss"), observatoryCode));
+			
+            double hourOfTheDay = utcTime.Hour + utcTime.Minute / 60.0 + (utcTime.Second + (utcTime.Millisecond / 1000.0)) / 3600.0;
             string postData =
 				string.Format("ty=e&TextArea={0}&d={1}&l=1&i=&u=d&uto={2}&c={3}&long=&lat=&alt=&raty=a&s=t&m=m&adir=S&oed=&e=-2&resoc=&tit=&bu=&ch=c&ce=f&js=f",
 					objectDesgn,

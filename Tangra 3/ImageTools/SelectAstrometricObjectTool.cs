@@ -171,7 +171,7 @@ namespace Tangra.ImageTools
 					    else
 					    {
                             m_AstrometricState.ManuallyIdentifiedStars.Add(e.Gausian, frmIdentifyCalibrationStar.SelectedStar);
-                            m_VideoController.RedrawCurrentFrame(false);
+                            m_VideoController.RedrawCurrentFrame(false, true);
 					    }
 					}
 				}
@@ -198,7 +198,7 @@ namespace Tangra.ImageTools
 						m_AstrometryController.NewObjectSelected(objInfo);
 
 						m_SelectedObject = objInfo;
-						m_VideoController.RedrawCurrentFrame(false);
+						m_VideoController.RedrawCurrentFrame(false, true);
 					}
 				}
 			}

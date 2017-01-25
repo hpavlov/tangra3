@@ -373,13 +373,13 @@ namespace Tangra.MotionFitting
                             //
                             // Because the time associated with the first frame is the middle of the frame, but the 
                             // time associated with the middle of the interval is the end of the field then the correction
-                            // is (N / 2) - 0.5 frames
+                            // is (N / 2) - 0.5 frames when integration is used or no correction when integration of x1 is used.
 
                             double dataPointFrameNo =
                                 rv.EarliestFrame +
                                 fittingContext.IntegratedFramesCount * integratedFrameNo
                                 + (fittingContext.IntegratedFramesCount / 2)
-                                - 0.5;
+                                - (fittingContext.IntegratedFramesCount > 1 ? 0.5 : 0);
 
                             intervalMedians.Add(dataPointFrameNo, median);
                             intervalWeights.Add(dataPointFrameNo, medianWeight);
