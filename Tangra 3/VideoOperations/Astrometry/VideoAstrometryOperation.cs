@@ -1128,7 +1128,7 @@ namespace Tangra.VideoOperations.Astrometry
 
 		public ITangraAstrometricSolution GetCurrentFrameAstrometricSolution()
 		{
-			return new AstrometricSolutionImpl(m_AstrometricFit, m_PhotometricFit, m_AstrometricState, m_Context);
+			return new AstrometricSolutionImpl(m_AstrometricFit, m_PhotometricFit, m_AstrometricState, m_Context, m_MeasurementContext);
 		}
 	}
 }

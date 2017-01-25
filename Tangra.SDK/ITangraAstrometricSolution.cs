@@ -24,6 +24,15 @@ namespace Tangra.SDK
     public interface ITangraAstrometricSolution2
     {
         List<ITangraAstrometricMeasurement> GetAllMeasurements();
+        double InstrumentalDelay { get; }
+        string InstrumentalDelayUnits { get; }
+        string FrameTimeType { get; }
+        int IntegratedFramesCount { get; }
+        double IntegratedExposureSeconds { get; }
+        bool AavIntegration { get; }
+        bool AavStackedMode { get; }
+		string VideoFileFormat { get; }
+        string NativeVideoFormat { get; }
     }
 
     public interface ITangraMatchedStar

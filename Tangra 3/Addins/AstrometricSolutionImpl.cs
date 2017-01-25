@@ -33,7 +33,7 @@ namespace Tangra.Addins
 
 		private TangraUserObjectImpl m_UserObject;
 
-		public AstrometricSolutionImpl(LeastSquareFittedAstrometry astrometry, StarMagnitudeFit photometry, AstrometricState state, FieldSolveContext fieldSolveContext)
+		public AstrometricSolutionImpl(LeastSquareFittedAstrometry astrometry, StarMagnitudeFit photometry, AstrometricState state, FieldSolveContext fieldSolveContext, MeasurementContext measurementContext)
 		{
 			StarCatalog = fieldSolveContext.StarCatalogueFacade.CatalogNETCode;
 			UtcTime = fieldSolveContext.UtcTime;
@@ -78,6 +78,16 @@ namespace Tangra.Addins
 					}
 				}
 			}
+
+		    InstrumentalDelay = measurementContext.InstrumentalDelay;
+            InstrumentalDelayUnits = measurementContext.InstrumentalDelayUnits.ToString();
+            FrameTimeType = measurementContext.FrameTimeType.ToString();
+            IntegratedFramesCount = measurementContext.IntegratedFramesCount;
+            IntegratedExposureSeconds = measurementContext.IntegratedExposureSeconds;
+            AavIntegration = measurementContext.AavIntegration;
+            AavStackedMode = measurementContext.AavStackedMode;
+            VideoFileFormat = measurementContext.VideoFileFormat.ToString();
+            NativeVideoFormat = measurementContext.NativeVideoFormat;
 
 		    m_MeasurementsImpl = new List<TangraAstrometricMeasurementImpl>();
 
@@ -254,7 +264,17 @@ namespace Tangra.Addins
 
 
 	    private List<TangraAstrometricMeasurementImpl> m_MeasurementsImpl;
- 
+
+	    public double InstrumentalDelay { get; private set; }
+        public string InstrumentalDelayUnits { get; private set; }
+        public string FrameTimeType { get; private set; }
+        public int IntegratedFramesCount { get; private set; }
+        public double IntegratedExposureSeconds { get; private set; }
+        public bool AavIntegration { get; private set; }
+        public bool AavStackedMode { get; private set; }
+        public string VideoFileFormat { get; private set; }
+        public string NativeVideoFormat { get; private set; }
+
 		public List<ITangraMatchedStar> GetAllMatchedStars()
 		{
 			return m_MatchedStarImpl

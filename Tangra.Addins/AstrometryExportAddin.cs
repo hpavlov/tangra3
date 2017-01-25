@@ -63,10 +63,24 @@ namespace Tangra.Addins
         {
             if (m_LastSolution != null)
             {
-				var output = new StringBuilder();
-                output.Append("FrameNo, TimeUTC(Uncorrected), RADeg, DEDeg, Mag, SolutionUncertaintyRA*Cos(DE)[arcsec], SolutionUncertaintyDE[arcsec], FWHM[arcsec], DetectionCertainty, SNR\r\n");
-
+                string fileName = m_Host2 != null ? m_Host2.GetFileInfoProvider().FileName : null;
                 var meaList = m_LastSolution.GetAllMeasurements();
+
+				var output = new StringBuilder();
+                output.AppendLine("Tangra Astrometry Export v1.0");
+                output.AppendLine("FilePath, Date, InstrumentalDelay, DelayUnits, IntegratedFrames, IntegratedExposure(sec), FrameTimeType, NativeVideoFormat");
+                output.AppendLine(string.Format("\"{0}\",{1},{2},{3},{4},{5},{6},{7}", 
+                    fileName, 
+                    meaList.Count > 0 && meaList[0].UncorrectedTimeStamp.HasValue ? meaList[0].UncorrectedTimeStamp.Value.ToString("yyyy-MM-dd") : null,
+                    m_LastSolution.InstrumentalDelay,
+                    m_LastSolution.InstrumentalDelayUnits,
+                    m_LastSolution.IntegratedFramesCount,
+                    m_LastSolution.IntegratedExposureSeconds,
+                    m_LastSolution.FrameTimeType,
+                    m_LastSolution.NativeVideoFormat));
+
+                output.Append("FrameNo, TimeUTC(Uncorrected), RADeg, DEDeg, Mag, SolutionUncertaintyRA*Cos(DE)[arcsec], SolutionUncertaintyDE[arcsec], FWHM[arcsec], DetectionCertainty, SNR\r\n");
+                
                 foreach (var mea in meaList)
                 {
                     output.AppendFormat("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}\r\n", 
@@ -79,8 +93,8 @@ namespace Tangra.Addins
 				dialog.DefaultExt = "csv";
 				dialog.Title = "Export Tangra Astrometry";
 
-                if (m_Host2 != null)
-                    dialog.FileName = Path.ChangeExtension(m_Host2.GetFileInfoProvider().FileName, ".csv");
+                if (fileName != null)
+                    dialog.FileName = Path.ChangeExtension(fileName, ".csv");
 
 				if (dialog.ShowDialog(m_Host.ParentWindow) == DialogResult.OK)
 				{
