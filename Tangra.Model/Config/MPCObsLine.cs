@@ -324,6 +324,9 @@ namespace Tangra.Model.Config
 
 		public static string GetObjectCode(string objectDesignation)
 		{
+		    if (objectDesignation == null)
+		        return null;
+
 			string parsedDesignation;
 			return GetObjectCode(objectDesignation, out parsedDesignation);
 		}

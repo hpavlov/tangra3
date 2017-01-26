@@ -68,8 +68,8 @@ namespace Tangra.Addins
 
 				var output = new StringBuilder();
                 output.AppendLine("Tangra Astrometry Export v1.0");
-                output.AppendLine("FilePath, Date, InstrumentalDelay, DelayUnits, IntegratedFrames, IntegratedExposure(sec), FrameTimeType, NativeVideoFormat");
-                output.AppendLine(string.Format("\"{0}\",{1},{2},{3},{4},{5},{6},{7}", 
+                output.AppendLine("FilePath, Date, InstrumentalDelay, DelayUnits, IntegratedFrames, IntegratedExposure(sec), FrameTimeType, NativeVideoFormat, ObservatoryCode, Object");
+                output.AppendLine(string.Format("\"{0}\",{1},{2},{3},{4},{5},{6},{7},{8},{9}", 
                     fileName, 
                     meaList.Count > 0 && meaList[0].UncorrectedTimeStamp.HasValue ? meaList[0].UncorrectedTimeStamp.Value.ToString("yyyy-MM-dd") : null,
                     m_LastSolution.InstrumentalDelay,
@@ -77,7 +77,9 @@ namespace Tangra.Addins
                     m_LastSolution.IntegratedFramesCount,
                     m_LastSolution.IntegratedExposureSeconds,
                     m_LastSolution.FrameTimeType,
-                    m_LastSolution.NativeVideoFormat));
+                    m_LastSolution.NativeVideoFormat,
+                    m_LastSolution.ObservatoryCode,
+                    m_LastSolution.ObjectDesignation));
 
                 output.Append("FrameNo, TimeUTC(Uncorrected), Timestamp, RADeg, DEDeg, Mag, SolutionUncertaintyRA*Cos(DE)[arcsec], SolutionUncertaintyDE[arcsec], FWHM[arcsec], DetectionCertainty, SNR\r\n");
                 

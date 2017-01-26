@@ -33,6 +33,8 @@ namespace Tangra.SDK
         bool AavStackedMode { get; }
 		string VideoFileFormat { get; }
         string NativeVideoFormat { get; }
+        string ObservatoryCode { get; }
+        string ObjectDesignation { get; }
     }
 
     public interface ITangraMatchedStar

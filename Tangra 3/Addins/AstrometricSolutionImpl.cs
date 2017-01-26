@@ -88,6 +88,12 @@ namespace Tangra.Addins
             AavStackedMode = measurementContext.AavStackedMode;
             VideoFileFormat = measurementContext.VideoFileFormat.ToString();
             NativeVideoFormat = measurementContext.NativeVideoFormat;
+            if (!string.IsNullOrEmpty(state.IdentifiedObjectToMeasure))
+                ObjectDesignation = MPCObsLine.GetObjectCode(state.IdentifiedObjectToMeasure);
+            else if (state.IdentifiedObjects != null && state.IdentifiedObjects.Count == 1)
+                ObjectDesignation = MPCObsLine.GetObjectCode(state.IdentifiedObjects[0].ObjectName);
+
+            ObservatoryCode = TangraConfig.Settings.Astrometry.MPCObservatoryCode;
 
 		    m_MeasurementsImpl = new List<TangraAstrometricMeasurementImpl>();
 
@@ -274,6 +280,8 @@ namespace Tangra.Addins
         public bool AavStackedMode { get; private set; }
         public string VideoFileFormat { get; private set; }
         public string NativeVideoFormat { get; private set; }
+        public string ObservatoryCode { get; private set; }
+        public string ObjectDesignation { get; private set; }
 
 		public List<ITangraMatchedStar> GetAllMatchedStars()
 		{
