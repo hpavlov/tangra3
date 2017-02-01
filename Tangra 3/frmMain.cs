@@ -45,6 +45,7 @@ using Tangra.VideoTools;
 using Tangra.View;
 using nom.tam.fits;
 using nom.tam.util;
+using Tangra.VideoOperations.Astrometry.MotionFitting;
 using Tangra.VideoOperations.ConvertVideoToAav;
 using Tangra.VideoOperations.ConvertVideoToFits;
 
@@ -1399,6 +1400,13 @@ namespace Tangra
         {
             m_VideoController.ActivateOperation<ConvertVideoToAavOperation>(m_ConvertVideoToAavController, false);
             m_VideoController.RefreshCurrentFrame();
+        }
+
+        private void miFastMotionFitting_Click(object sender, EventArgs e)
+        {
+            var frm = new frmAstrometryMotionFitting();
+            frm.StartPosition = FormStartPosition.CenterParent;
+            frm.Show(this);
         }
 	}
 }
