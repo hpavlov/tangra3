@@ -13,12 +13,12 @@ namespace Tangra.MotionFitting
         private const double SECONDS_IN_A_DAY = 60 * 60 * 24;
         private List<FastMotionChunkPositionExtractor> m_Chunks = new List<FastMotionChunkPositionExtractor>(); 
 
-        public void Calculate(IMeasurementPositionProvider provider, WeightingMode weighting, int numChunks, double outlierSigmaCoeff = 3.0)
+        public void Calculate(IMeasurementPositionProvider provider, WeightingMode weighting, int numChunks, double minPositionUncertaintyPixels, double outlierSigmaCoeff = 3.0)
         {
             if (provider != null)
             {
                 var allEntries = provider.Measurements.ToList();
-                var minUncertainty = provider.MinPositionUncertaintyPixels*provider.ArsSecsInPixel;
+                var minUncertainty = minPositionUncertaintyPixels * provider.ArsSecsInPixel;
                 double instDelayTimeOfDay = ((double) provider.InstrumentalDelaySec/SECONDS_IN_A_DAY);
 
                 int numEntriesPerChunk = allEntries.Count / numChunks;

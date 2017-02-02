@@ -91,7 +91,8 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
             m_PositionExtractor.Calculate(
                 m_DataProvider,
                 rbWeightingPosAstr.Checked ? WeightingMode.SNR : WeightingMode.None,
-                (int)nudMeaIntervals.Value);
+                (int)nudMeaIntervals.Value,
+                TangraConfig.Settings.Astrometry.AssumedPositionUncertaintyPixels);
         }
 
         private void OnWeightingChanged(object sender, EventArgs e)

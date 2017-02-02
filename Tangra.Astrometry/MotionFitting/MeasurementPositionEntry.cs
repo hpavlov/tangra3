@@ -8,6 +8,7 @@ namespace Tangra.MotionFitting
     public class MeasurementPositionEntry
     {
         public int FrameNo;
+        public string RawTimeStamp;
         public double TimeOfDayUTC;
         public double RADeg;
         public double DEDeg;
