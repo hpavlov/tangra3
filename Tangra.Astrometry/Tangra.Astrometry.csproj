@@ -189,7 +189,10 @@
     <Compile Include="Astrometry\Recognition\PyramidStarsDensityDistributor.cs" />
     <Compile Include="Astrometry\Recognition\ulonglong.cs" />
     <Compile Include="Astrometry\ThreeStarAstrometry.cs" />
+    <Compile Include="MotionFitting\FastMotionPositionExtractor.cs" />
     <Compile Include="MotionFitting\FlyByMotionFitter.cs" />
+    <Compile Include="MotionFitting\IMeasurementPositionProvider.cs" />
+    <Compile Include="MotionFitting\MeasurementPositionEntry.cs" />
     <Compile Include="StarCatalogues\PPMXL\PPMXLCatalogue.cs" />
     <Compile Include="StarCatalogues\PPMXL\PPMXLEntry.cs" />
     <Compile Include="StarCatalogues\PPMXL\PPMXLFileIterator.cs" />

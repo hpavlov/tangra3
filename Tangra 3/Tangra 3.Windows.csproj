@@ -370,9 +370,7 @@
     <Compile Include="VideoOperations\Astrometry\MotionFitting\frmAstrometryMotionFitting.Designer.cs">
       <DependentUpon>frmAstrometryMotionFitting.cs</DependentUpon>
     </Compile>
-    <Compile Include="VideoOperations\Astrometry\MotionFitting\IMeasurementPositionProvider.cs" />
     <Compile Include="VideoOperations\Astrometry\MotionFitting\MeasurementPositionCSVProvider.cs" />
-    <Compile Include="VideoOperations\Astrometry\MotionFitting\MeasurementPositionEntry.cs" />
     <Compile Include="VideoOperations\Astrometry\Tracking\FastMotionTracker.cs" />
     <Compile Include="VideoOperations\Astrometry\Tracking\IAstrometryTracker.cs" />
     <Compile Include="VideoOperations\Astrometry\Tracking\SlowMotionTracker.cs" />

@@ -333,6 +333,7 @@
             0,
             0,
             0});
+            this.nudMeaIntervals.ValueChanged += new System.EventHandler(this.OnChunkSizeChanged);
             // 
             // label7
             // 
@@ -352,6 +353,7 @@
             this.rbWeightingNone.TabIndex = 38;
             this.rbWeightingNone.Text = "None";
             this.rbWeightingNone.UseVisualStyleBackColor = true;
+            this.rbWeightingNone.CheckedChanged += new System.EventHandler(this.OnWeightingChanged);
             // 
             // rbWeightingPosAstr
             // 
@@ -364,6 +366,7 @@
             this.rbWeightingPosAstr.TabStop = true;
             this.rbWeightingPosAstr.Text = "StdDev(Plate Solve + Position)";
             this.rbWeightingPosAstr.UseVisualStyleBackColor = true;
+            this.rbWeightingPosAstr.CheckedChanged += new System.EventHandler(this.OnWeightingChanged);
             // 
             // openFileDialog1
             // 

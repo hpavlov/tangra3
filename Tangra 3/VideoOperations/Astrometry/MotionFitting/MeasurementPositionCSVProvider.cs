@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.VisualBasic.FileIO;
 using Tangra.Model.Helpers;
+using Tangra.MotionFitting;
 
 namespace Tangra.VideoOperations.Astrometry.MotionFitting
 {
@@ -22,6 +23,7 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                 bool headerRowPassed = false;
                 while (!parser.EndOfData)
                 {
+                    //TODO: Read config values from header
                     string[] fieldRow = parser.ReadFields();
                     if (!headerRowPassed)
                     {
@@ -40,7 +42,7 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                         if (!string.IsNullOrWhiteSpace(fieldRow[4])) entry.Mag = double.Parse(fieldRow[4]);
                         if (!string.IsNullOrWhiteSpace(fieldRow[5])) entry.SolutionUncertaintyRACosDEArcSec = double.Parse(fieldRow[5]);
                         if (!string.IsNullOrWhiteSpace(fieldRow[6])) entry.SolutionUncertaintyDEArcSec = double.Parse(fieldRow[6]);
-                        if (!string.IsNullOrWhiteSpace(fieldRow[7])) entry.FWHM = double.Parse(fieldRow[7]);
+                        if (!string.IsNullOrWhiteSpace(fieldRow[7])) entry.FWHMArcSec = double.Parse(fieldRow[7]);
                         if (!string.IsNullOrWhiteSpace(fieldRow[8])) entry.DetectionCertainty = double.Parse(fieldRow[8]);
                         if (!string.IsNullOrWhiteSpace(fieldRow[9])) entry.SNR = double.Parse(fieldRow[9]);
 
@@ -59,12 +61,21 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
             get { return m_Measurements; }
         }
 
+        public int NumberOfMeasurements
+        {
+            get { return m_Measurements.Count; }
+        }
+
         public string ObjectDesignation { get; private set; }
         
         public string ObservatoryCode { get; private set; }
         
         public DateTime ObservationDate { get; private set; }
 
-        public decimal InstrumentalDelay { get; private set; }
+        public decimal InstrumentalDelaySec { get; private set; }
+
+        public double MinPositionUncertaintyPixels { get; private set; }
+
+        public double ArsSecsInPixel { get; private set; }
     }
 }
