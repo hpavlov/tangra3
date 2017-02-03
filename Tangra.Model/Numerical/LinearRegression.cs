@@ -223,6 +223,21 @@ namespace Tangra.Model.Numerical
             get { return m_Residuals;}
         }
 
+        public IEnumerable<double> Weights
+        {
+            get { return m_Weights; }
+        }
+
+        public IEnumerable<double> XValues
+        {
+            get { return m_XValues; }
+        }
+
+        public IEnumerable<double> YValues
+        {
+            get { return m_YValues; }
+        }
+
         private void EnsureResiduals()
         {
             if (m_Residuals == null)

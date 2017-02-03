@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -64,7 +65,7 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
             if (lbAvailableFiles.SelectedIndex != -1)
             {
                 var entry = (AvailableFileEntry) lbAvailableFiles.SelectedItem;
-                if (ReferenceEquals(m_SelectedEntry, entry))
+                if (!ReferenceEquals(m_SelectedEntry, entry))
                 {
                     m_DataProvider = new MeasurementPositionCSVProvider(entry.FilePath);
                     m_SelectedEntry = entry;
@@ -88,11 +89,63 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
 
         private void Recalculate()
         {
-            m_PositionExtractor.Calculate(
-                m_DataProvider,
-                rbWeightingPosAstr.Checked ? WeightingMode.SNR : WeightingMode.None,
-                (int)nudMeaIntervals.Value,
-                TangraConfig.Settings.Astrometry.AssumedPositionUncertaintyPixels);
+            if (m_DataProvider != null)
+            {
+                m_PositionExtractor.Calculate(
+                    m_DataProvider,
+                    rbWeightingPosAstr.Checked ? WeightingMode.SNR : WeightingMode.None,
+                    (int)nudMeaIntervals.Value,
+                    cbxOutlierRemoval.Checked,
+                    TangraConfig.Settings.Astrometry.AssumedPositionUncertaintyPixels);
+
+                Replot();
+
+                var lines = m_PositionExtractor.ExtractPositions(tbxObsCode.Text, tbxObjectDesign.Text, dtpDate.Value.Date);
+                tbxMeasurements.Text = string.Join("\r\n", lines);
+            }
+        }
+
+        private void Replot()
+        {
+            if (m_DataProvider != null)
+            {
+                if (pboxRAPlot.Image == null || 
+                    pboxRAPlot.Image.Width != pboxRAPlot.Width ||
+                    pboxRAPlot.Image.Height != pboxRAPlot.Height)
+                {
+                    if (pboxRAPlot.Width != 0 && pboxRAPlot.Height != 0)
+                        pboxRAPlot.Image = new Bitmap(pboxRAPlot.Width, pboxRAPlot.Height, PixelFormat.Format24bppRgb);
+                }
+
+                if (pboxDECPlot.Image == null ||
+                    pboxDECPlot.Image.Width != pboxDECPlot.Width ||
+                    pboxDECPlot.Image.Height != pboxDECPlot.Height)
+                {
+                    if (pboxDECPlot.Width != 0 && pboxDECPlot.Height != 0)
+                        pboxDECPlot.Image = new Bitmap(pboxDECPlot.Width, pboxDECPlot.Height, PixelFormat.Format24bppRgb);
+                }
+
+                if (pboxRAPlot.Image != null)
+                {
+                    using (Graphics gra = Graphics.FromImage(pboxRAPlot.Image))
+                    {
+                        m_PositionExtractor.PlotRAFit(gra, pboxRAPlot.Image.Width, pboxRAPlot.Image.Height);
+                        gra.Save();
+                    }                    
+                }
+
+                if (pboxDECPlot.Image != null)
+                {
+                    using (Graphics gde = Graphics.FromImage(pboxDECPlot.Image))
+                    {
+                        m_PositionExtractor.PlotDECFit(gde, pboxDECPlot.Image.Width, pboxDECPlot.Image.Height);
+                        gde.Save();
+                    }
+                }
+
+                pboxRAPlot.Refresh();
+                pboxDECPlot.Refresh();
+            }
         }
 
         private void OnWeightingChanged(object sender, EventArgs e)
@@ -101,6 +154,19 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
         }
 
         private void OnChunkSizeChanged(object sender, EventArgs e)
+        {
+            Recalculate();
+        }
+
+        private void frmAstrometryMotionFitting_Resize(object sender, EventArgs e)
+        {
+            var halfWidth = pnlPlot.Width / 2;
+            pboxRAPlot.Width = halfWidth;
+
+            Replot();
+        }
+
+        private void cbxOutlierRemoval_CheckedChanged(object sender, EventArgs e)
         {
             Recalculate();
         }

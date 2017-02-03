@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using Tangra.Model.Config;
@@ -13,10 +14,13 @@ namespace Tangra.MotionFitting
         private const double SECONDS_IN_A_DAY = 60 * 60 * 24;
         private List<FastMotionChunkPositionExtractor> m_Chunks = new List<FastMotionChunkPositionExtractor>(); 
 
-        public void Calculate(IMeasurementPositionProvider provider, WeightingMode weighting, int numChunks, double minPositionUncertaintyPixels, double outlierSigmaCoeff = 3.0)
+        public void Calculate(IMeasurementPositionProvider provider, WeightingMode weighting, int numChunks, bool removeOutliers, double minPositionUncertaintyPixels, double outlierSigmaCoeff = 3.0)
         {
             if (provider != null)
             {
+                m_Chunks.Clear();
+                if (numChunks < 1) numChunks = 1;
+
                 var allEntries = provider.Measurements.ToList();
                 var minUncertainty = minPositionUncertaintyPixels * provider.ArsSecsInPixel;
                 double instDelayTimeOfDay = ((double) provider.InstrumentalDelaySec/SECONDS_IN_A_DAY);
@@ -31,12 +35,90 @@ namespace Tangra.MotionFitting
 
                     var chunkPosExtractor = new FastMotionChunkPositionExtractor(firstId, lastId);
                     var chunkEntries = allEntries.Skip(firstId).Take(lastId - firstId).ToArray();
-                    chunkPosExtractor.Calculate(chunkEntries, weighting, outlierSigmaCoeff, instDelayTimeOfDay, minUncertainty);
+                    chunkPosExtractor.Calculate(chunkEntries, weighting, removeOutliers, outlierSigmaCoeff, instDelayTimeOfDay, minUncertainty);
                     m_Chunks.Add(chunkPosExtractor);
                 }
             }
         }
-     }
+
+        public string[] ExtractPositions(string obsCode, string designation, DateTime obsDate)
+        {
+            var lines = new List<string>();
+
+            foreach (var chunk in m_Chunks)
+            {
+                double closestTimeOfDay = chunk.GetMidAreaTimeOfDay();
+
+                lines.Add(chunk.GetReportByTimeOfDay(closestTimeOfDay, obsCode, designation, obsDate));
+            }
+
+            return lines.ToArray();
+        }
+
+        public const int PADDING = 5;
+        public const int BORDER = 2;
+
+        public void PlotRAFit(Graphics g, int fullWidth, int fullHeight)
+        {
+            Plot(g, Pens.Lime, 
+                fullWidth, fullHeight, 
+                m_Chunks.Min(x => x.MinRADeg),
+                m_Chunks.Max(x => x.MaxRADeg),
+                (x) => x.RADeg, 
+                (x) => x.RAWeightDeg);
+        }
+
+        internal void Plot(Graphics g, Pen pen,
+            int fullWidth, int fullHeight, 
+            double minY, double maxY, 
+            Func<CalculatedEntry, double> getVal,
+            Func<CalculatedEntry, double> getWeight)
+        {
+            g.Clear(SystemColors.ControlDarkDark);
+
+            if (m_Chunks.Count == 0) return;
+
+            float clientAreaWidth = fullWidth - 2 * PADDING - 2 * BORDER;
+            float clientAreaHeight = fullHeight - 2 * PADDING - 2 * BORDER;
+
+            g.DrawRectangle(SystemPens.ControlDark, PADDING, PADDING, clientAreaWidth + 2 * BORDER, clientAreaHeight + 2 * BORDER);
+
+            double minX = m_Chunks.Min(x => x.MinTimeOfDayUTC);
+            double maxX = m_Chunks.Max(x => x.MaxTimeOfDayUTC);
+
+            float scaleX = (float)(clientAreaWidth / (maxX - minX));
+            float scaleY = (float)(clientAreaHeight / (maxY - minY));
+
+            foreach (var chunk in m_Chunks)
+            {
+                foreach (var entry in chunk.Entries)
+                {
+                    float x = (float)Math.Round(PADDING + BORDER + (scaleX * (entry.TimeOfDayUTC - minX)));
+                    float y = fullHeight - PADDING - BORDER - (float)(scaleY * (getVal(entry) - minY));
+
+                    g.DrawEllipse(pen, x - 1, y - 1, 2, 2);
+
+                    float yErr = (float)(scaleY * getWeight(entry));
+                    if (yErr > 0)
+                    {
+                        g.DrawLine(pen, x, y - yErr, x, y + yErr);
+                        g.DrawLine(pen, x - 1, y - yErr, x + 1, y - yErr);
+                        g.DrawLine(pen, x - 1, y + yErr, x + 1, y + yErr);
+                    }
+                }
+            }
+        }
+
+        public void PlotDECFit(Graphics g, int fullWidth, int fullHeight)
+        {
+            Plot(g, Pens.Aqua,
+                fullWidth, fullHeight,
+                m_Chunks.Min(x => x.MinDEDeg),
+                m_Chunks.Max(x => x.MaxDEDeg),
+                (x) => x.DEDeg,
+                (x) => x.DEWeightDeg);
+        }
+    }
 
     internal class FastMotionChunkPositionExtractor
     {
@@ -46,7 +128,9 @@ namespace Tangra.MotionFitting
         private LinearRegression m_RegressionRA;
         private LinearRegression m_RegressionDE;
 
-        private MeasurementPositionEntry[] m_Entries;
+        private double m_InstDelayTimeOfDay;
+
+        private List<MeasurementPositionEntry> m_Entries;
 
         public FastMotionChunkPositionExtractor(int firstEntryId, int lastEntryId)
         {
@@ -54,9 +138,9 @@ namespace Tangra.MotionFitting
             LastEntryId = lastEntryId;
         }
 
-        public void Calculate(MeasurementPositionEntry[] entries, WeightingMode weighting, double outlierSigmaCoeff, double instDelayTimeOfDay, double minUncertainty)
+        public void Calculate(MeasurementPositionEntry[] entries, WeightingMode weighting, bool removeOutliers, double outlierSigmaCoeff, double instDelayTimeOfDay, double minUncertainty)
         {
-            m_Entries = entries;
+            m_InstDelayTimeOfDay = instDelayTimeOfDay;
 
             var regRA = new LinearRegression();
             var regDE = new LinearRegression();
@@ -78,52 +162,57 @@ namespace Tangra.MotionFitting
                 }
             }
 
-            var secondPassEntriesRA = new List<MeasurementPositionEntry>();
-            var secondPassEntriesDE = new List<MeasurementPositionEntry>();
+            m_Entries = new List<MeasurementPositionEntry>();
 
             regRA.Solve();
             regDE.Solve();
 
-            var outlierLimitRA = regRA.StdDev * outlierSigmaCoeff;
-            var residualsRA = regRA.Residuals.ToArray();
-            var outlierLimitDE = regDE.StdDev * outlierSigmaCoeff;
-            var residualsDE = regDE.Residuals.ToArray();
-
-            for (int i = 0; i < entries.Length; i++)
+            if (removeOutliers)
             {
-                if (Math.Abs(residualsRA[i]) <= outlierLimitRA) secondPassEntriesRA.Add(entries[i]);
-                if (Math.Abs(residualsDE[i]) <= outlierLimitDE) secondPassEntriesDE.Add(entries[i]);
-            }
+                var outlierLimitRA = regRA.StdDev*outlierSigmaCoeff;
+                var residualsRA = regRA.Residuals.ToArray();
+                var outlierLimitDE = regDE.StdDev*outlierSigmaCoeff;
+                var residualsDE = regDE.Residuals.ToArray();
 
-            m_RegressionRA = new LinearRegression();
-            foreach (var entry in secondPassEntriesRA)
-            {
-                var midFrameTime = entry.TimeOfDayUTC - instDelayTimeOfDay;
-
-                if (weighting == WeightingMode.None)
-                    m_RegressionRA.AddDataPoint(midFrameTime, entry.RADeg);
-                else
+                for (int i = 0; i < entries.Length; i++)
                 {
-                    var weight = CalulateWeight(entry, entry.SolutionUncertaintyRACosDEArcSec, minUncertainty, weighting);
-                    m_RegressionRA.AddDataPoint(midFrameTime, entry.RADeg, weight);
+                    if (Math.Abs(residualsRA[i]) <= outlierLimitRA && Math.Abs(residualsDE[i]) <= outlierLimitDE)
+                        m_Entries.Add(entries[i]);
                 }
-            }
 
-            m_RegressionRA.Solve();
+                m_RegressionRA = new LinearRegression();
+                m_RegressionDE = new LinearRegression();
 
-            m_RegressionDE = new LinearRegression();
-            foreach (var entry in secondPassEntriesDE)
-            {
-                var midFrameTime = entry.TimeOfDayUTC - instDelayTimeOfDay;
-                if (weighting == WeightingMode.None)
-                    m_RegressionDE.AddDataPoint(midFrameTime, entry.DEDeg);
-                else
+                foreach (var entry in m_Entries)
                 {
-                    var weight = CalulateWeight(entry, entry.SolutionUncertaintyDEArcSec, minUncertainty, weighting);
-                    m_RegressionDE.AddDataPoint(midFrameTime, entry.DEDeg, weight);
+                    var midFrameTime = entry.TimeOfDayUTC - instDelayTimeOfDay;
+
+                    if (weighting == WeightingMode.None)
+                    {
+                        m_RegressionRA.AddDataPoint(midFrameTime, entry.RADeg);
+                        m_RegressionDE.AddDataPoint(midFrameTime, entry.DEDeg);
+                    }
+                    else
+                    {
+                        var weightRA = CalulateWeight(entry, entry.SolutionUncertaintyRACosDEArcSec, minUncertainty,
+                            weighting);
+                        m_RegressionRA.AddDataPoint(midFrameTime, entry.RADeg, weightRA);
+
+                        var weightDE = CalulateWeight(entry, entry.SolutionUncertaintyDEArcSec, minUncertainty,
+                            weighting);
+                        m_RegressionDE.AddDataPoint(midFrameTime, entry.DEDeg, weightDE);
+                    }
                 }
+
+                m_RegressionRA.Solve();
+                m_RegressionDE.Solve();
             }
-            m_RegressionDE.Solve();
+            else
+            {
+                m_RegressionRA = regRA;
+                m_RegressionDE = regDE;
+                m_Entries = entries.ToList();
+            }
         }
 
         private double CalulateWeight(MeasurementPositionEntry entry, double solutionUncertaintyArcSec, double minUncertainty, WeightingMode weighting)
@@ -144,7 +233,18 @@ namespace Tangra.MotionFitting
                 return 1;
         }
 
-        public string GetReportByTimeOfDay(double closestTimeOfDay, string obsCode, string designation, DateTime obsDate)
+        internal double GetMidAreaTimeOfDay()
+        {
+            if (m_Entries.Count == 0)
+                return 0;
+
+            if (m_Entries.Count == 1)
+                return m_Entries[0].TimeOfDayUTC;
+
+            return (m_Entries[0].TimeOfDayUTC + m_Entries[m_Entries.Count - 1].TimeOfDayUTC) / 2.0;
+        }
+
+        internal string GetReportByTimeOfDay(double closestTimeOfDay, string obsCode, string designation, DateTime obsDate)
         {
             MPCObsLine obsLine = new MPCObsLine(obsCode.Substring(0, 3).PadLeft(3));
             obsLine.SetObject(designation.PadLeft(12).Substring(0, 12));
@@ -172,5 +272,75 @@ namespace Tangra.MotionFitting
 
             return null;
         }
+
+        internal int NumDataPoints
+        {
+            get { return m_Entries.Count; }
+        }
+
+        internal double MinTimeOfDayUTC
+        {
+            get { return m_Entries[0].TimeOfDayUTC; }
+        }
+
+        internal double MaxTimeOfDayUTC
+        {
+            get { return m_Entries[m_Entries.Count - 1].TimeOfDayUTC; }
+        }
+
+        internal double MinRADeg
+        {
+            get { return m_Entries[0].RADeg; }
+        }
+
+        internal double MaxRADeg
+        {
+            get { return m_Entries[m_Entries.Count - 1].RADeg; }
+        }
+
+        internal double MinDEDeg
+        {
+            get { return m_Entries[0].DEDeg; }
+        }
+
+        internal double MaxDEDeg
+        {
+            get { return m_Entries[m_Entries.Count - 1].DEDeg; }
+        }
+
+        internal IEnumerable<CalculatedEntry> Entries
+        {
+            get
+            {
+                var weightsRA = m_RegressionRA.Weights.ToArray();
+                var weightsDE = m_RegressionDE.Weights.ToArray();
+
+                for (int i = 0; i < m_Entries.Count; i++)
+                {
+                    var entry = m_Entries[i];
+                    yield return new CalculatedEntry()
+                    {
+                        RADeg = entry.RADeg,
+                        DEDeg = entry.DEDeg,
+                        TimeOfDayUTC = entry.TimeOfDayUTC,
+                        RADegFitted = m_RegressionRA.ComputeY(entry.TimeOfDayUTC - m_InstDelayTimeOfDay),
+                        DEDegFitted = m_RegressionDE.ComputeY(entry.TimeOfDayUTC - m_InstDelayTimeOfDay),
+                        RAWeightDeg = weightsRA.Length > i ? weightsRA[i] / 3600.0 : 0,
+                        DEWeightDeg = weightsDE.Length > i ? weightsDE[i] / 3600.0 : 0,
+                    };
+                }
+            }
+        }
+    }
+
+    internal class CalculatedEntry
+    {
+        public double TimeOfDayUTC;
+        public double RADeg;
+        public double DEDeg;
+        public double RADegFitted;
+        public double DEDegFitted;
+        public double RAWeightDeg;
+        public double DEWeightDeg;
     }
 }
