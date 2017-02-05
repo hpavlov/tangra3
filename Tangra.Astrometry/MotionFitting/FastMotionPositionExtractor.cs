@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -14,7 +15,14 @@ namespace Tangra.MotionFitting
         private const double SECONDS_IN_A_DAY = 60 * 60 * 24;
         private List<FastMotionChunkPositionExtractor> m_Chunks = new List<FastMotionChunkPositionExtractor>(); 
 
-        public void Calculate(IMeasurementPositionProvider provider, WeightingMode weighting, int numChunks, bool removeOutliers, double minPositionUncertaintyPixels, double outlierSigmaCoeff = 3.0)
+        public void Calculate(
+            IMeasurementPositionProvider provider, 
+            WeightingMode weighting, 
+            int numChunks, 
+            bool removeOutliers, 
+            bool fitSameIncline, 
+            double minPositionUncertaintyPixels, 
+            double outlierSigmaCoeff = 3.0)
         {
             if (provider != null)
             {
@@ -34,7 +42,7 @@ namespace Tangra.MotionFitting
                     if (lastId > (numChunks - 1)*numEntriesPerChunk) lastId = allEntries.Count;
 
                     var chunkPosExtractor = new FastMotionChunkPositionExtractor(firstId, lastId);
-                    var chunkEntries = allEntries.Skip(firstId).Take(lastId - firstId).ToArray();
+                    var chunkEntries = allEntries.Skip(firstId).Take(lastId - firstId).Where(x => x.TimeOfDayUTC != 0).ToArray();
                     chunkPosExtractor.Calculate(chunkEntries, weighting, removeOutliers, outlierSigmaCoeff, instDelayTimeOfDay, minUncertainty);
                     m_Chunks.Add(chunkPosExtractor);
                 }
@@ -47,16 +55,16 @@ namespace Tangra.MotionFitting
 
             foreach (var chunk in m_Chunks)
             {
-                double closestTimeOfDay = chunk.GetMidAreaTimeOfDay();
-
-                lines.Add(chunk.GetReportByTimeOfDay(closestTimeOfDay, obsCode, designation, obsDate));
+                lines.Add(chunk.GetMidPointReport(obsCode, designation, obsDate));
             }
 
             return lines.ToArray();
         }
 
-        public const int PADDING = 5;
-        public const int BORDER = 2;
+        public const int PADDING_L = 15;
+        public const int PADDING_R = 5;
+        public const int BORDER = 7;
+        public const int TITLE_PADDING = 5;
 
         public void PlotRAFit(Graphics g, int fullWidth, int fullHeight)
         {
@@ -64,24 +72,32 @@ namespace Tangra.MotionFitting
                 fullWidth, fullHeight, 
                 m_Chunks.Min(x => x.MinRADeg),
                 m_Chunks.Max(x => x.MaxRADeg),
+                "RA",
+                m_Chunks.Average(x => x.InclinationRA),
                 (x) => x.RADeg, 
-                (x) => x.RAWeightDeg);
+                (x) => x.RAWeightDeg,
+                (x) => x.RADegFitted,
+                (c) => c.GetMidPointRAPosition());
         }
 
         internal void Plot(Graphics g, Pen pen,
             int fullWidth, int fullHeight, 
             double minY, double maxY, 
+            string motionName,
+            double aveIncl,
             Func<CalculatedEntry, double> getVal,
-            Func<CalculatedEntry, double> getWeight)
+            Func<CalculatedEntry, double> getWeight,
+            Func<CalculatedEntry, double> getCalcVal,
+            Func<FastMotionChunkPositionExtractor, double> getMidPointPos)
         {
             g.Clear(SystemColors.ControlDarkDark);
 
             if (m_Chunks.Count == 0) return;
 
-            float clientAreaWidth = fullWidth - 2 * PADDING - 2 * BORDER;
-            float clientAreaHeight = fullHeight - 2 * PADDING - 2 * BORDER;
+            float clientAreaWidth = fullWidth - PADDING_L - PADDING_R - 2 * BORDER;
+            float clientAreaHeight = fullHeight - PADDING_L - PADDING_R - 2 * BORDER;
 
-            g.DrawRectangle(SystemPens.ControlDark, PADDING, PADDING, clientAreaWidth + 2 * BORDER, clientAreaHeight + 2 * BORDER);
+            g.DrawRectangle(SystemPens.ControlDark, PADDING_L, PADDING_R, clientAreaWidth + 2 * BORDER, clientAreaHeight + 2 * BORDER);
 
             double minX = m_Chunks.Min(x => x.MinTimeOfDayUTC);
             double maxX = m_Chunks.Max(x => x.MaxTimeOfDayUTC);
@@ -89,13 +105,25 @@ namespace Tangra.MotionFitting
             float scaleX = (float)(clientAreaWidth / (maxX - minX));
             float scaleY = (float)(clientAreaHeight / (maxY - minY));
 
+            var repX = new List<double>();
+            var repY = new List<double>();
+
             foreach (var chunk in m_Chunks)
             {
+                double? startX = null;
+                double? startYCalc = null;
+                CalculatedEntry lastEntry = null;
                 foreach (var entry in chunk.Entries)
                 {
-                    float x = (float)Math.Round(PADDING + BORDER + (scaleX * (entry.TimeOfDayUTC - minX)));
-                    float y = fullHeight - PADDING - BORDER - (float)(scaleY * (getVal(entry) - minY));
+                    lastEntry = entry;
+                    float x = (float)Math.Round(PADDING_L + BORDER + (scaleX * (entry.TimeOfDayUTC - minX)));
+                    float y = fullHeight - PADDING_L - BORDER - (float)(scaleY * (getVal(entry) - minY));
 
+                    if (!startX.HasValue)
+                    {
+                        startX = entry.TimeOfDayUTC;
+                        startYCalc = getCalcVal(entry);
+                    }
                     g.DrawEllipse(pen, x - 1, y - 1, 2, 2);
 
                     float yErr = (float)(scaleY * getWeight(entry));
@@ -106,8 +134,99 @@ namespace Tangra.MotionFitting
                         g.DrawLine(pen, x - 1, y + yErr, x + 1, y + yErr);
                     }
                 }
+
+                // Plot fitted line
+                if (lastEntry != null)
+                {
+                    double endX = lastEntry.TimeOfDayUTC;
+                    double endYCalc = getCalcVal(lastEntry);
+
+                    float x1 = (float)Math.Round(PADDING_L + BORDER + (scaleX * (startX.Value - minX)));
+                    float y1 = fullHeight - PADDING_L - BORDER - (float)(scaleY * (startYCalc.Value - minY));
+                    float x2 = (float)Math.Round(PADDING_L + BORDER + (scaleX * (endX - minX)));
+                    float y2 = fullHeight - PADDING_L - BORDER - (float)(scaleY * (endYCalc - minY)); 
+                    
+                    g.DrawLine(Pens.Azure, x1, y1, x2, y2);
+                    g.DrawLine(Pens.Azure, x1, y1 + 1, x2, y2 + 1);
+
+                    double fittedY = getMidPointPos(chunk);
+                    double midX = chunk.GetMidPointDelayCorrectedTimeOfDay();
+                    float xf = (float)Math.Round(PADDING_L + BORDER + (scaleX * (midX - minX)));
+                    float yf = fullHeight - PADDING_L - BORDER - (float)(scaleY * (fittedY - minY));
+                    g.FillEllipse(Brushes.Azure, xf - 3, yf - 3, 7, 7);
+
+                    repX.Add(midX);
+                    repY.Add(fittedY);
+                }
             }
+
+            // Calculate the StdDev of linear motion from all reported points and draw it on the plot
+            if (repX.Count > 2)
+            {
+                var repReg = new LinearRegression();
+                for (int i = 0; i < repX.Count; i++)
+                {
+                    repReg.AddDataPoint(repX[i], repY[i]);
+                }
+
+                repReg.Solve();
+
+                double stdDevArcSec = repReg.StdDev * 3600.0;
+                string text = string.Format("{0} points StdDev: {1:0.00} arcsec", repX.Count, stdDevArcSec);
+                var szf = g.MeasureString(text, s_LegendFont);
+                bool topLeft = aveIncl > 0;
+                if (topLeft)
+                {
+                    g.FillRectangle(SystemBrushes.ControlDarkDark, PADDING_L + BORDER, PADDING_R + BORDER, szf.Width, szf.Height);
+                    g.DrawString(text, s_LegendFont, Brushes.Azure, PADDING_L + BORDER, PADDING_R + BORDER);
+                }
+                else
+                {
+                    g.FillRectangle(SystemBrushes.ControlDarkDark, fullWidth - PADDING_R - BORDER - szf.Width, PADDING_R + BORDER, szf.Width, szf.Height);
+                    g.DrawString(text, s_LegendFont, Brushes.Azure, fullWidth - PADDING_R - BORDER - szf.Width, PADDING_R + BORDER);
+                }
+            }
+
+            // Plot Axis Marks
+            var minYArcSec = (long)Math.Ceiling(minY * 3600);
+            var maxYArcSec = (long)Math.Floor(maxY * 3600);
+            for (long wholeArcSec = minYArcSec; wholeArcSec <= maxYArcSec; wholeArcSec++)
+            {
+                int len = 1;
+                if (wholeArcSec % 60 == 0) len = 5;
+                else if (wholeArcSec % 10 == 0) len = 3;
+
+                float y = fullHeight - PADDING_L - BORDER - (float)(scaleY * (wholeArcSec / 3600.0 - minY));
+                g.DrawLine(SystemPens.ControlDark, PADDING_L + 1, y, PADDING_L + 1 + len, y);
+                g.DrawLine(SystemPens.ControlDark, fullWidth - PADDING_R - 1, y, fullWidth - PADDING_R - 1 - len, y);
+            }
+            var minXSeconds = (long)Math.Ceiling(minX * SECONDS_IN_A_DAY);
+            var maxXSeconds = (long)Math.Floor(maxX * SECONDS_IN_A_DAY);
+            for (long wholeSeconds = minXSeconds; wholeSeconds <= maxXSeconds; wholeSeconds++)
+            {
+                int len = 1;
+                if (wholeSeconds % 60 == 0) len = 5;
+                else if (wholeSeconds % 10 == 0) len = 3;
+
+                float x = (float)Math.Round(PADDING_L + BORDER + (scaleX * (wholeSeconds / SECONDS_IN_A_DAY - minX)));
+                g.DrawLine(SystemPens.ControlDark, x, fullHeight - PADDING_L - 1, x, fullHeight - PADDING_L - 1 - len);
+                g.DrawLine(SystemPens.ControlDark, x, PADDING_R + 1, x, PADDING_R + 1 + len);
+            }
+
+            string axisText = "Time (sec)";
+            var axf = g.MeasureString(axisText, s_LegendFont);
+            g.DrawString(axisText, s_LegendFont, Brushes.Azure, new PointF(PADDING_L + (clientAreaWidth - axf.Width) / 2, fullHeight - axf.Height));
+
+            axisText = string.Format("Motion {0} (arcsec)", motionName);
+            axf = g.MeasureString(axisText, s_LegendFont);
+            s_VerticalDrawFormat.Alignment = StringAlignment.Far;
+            g.TranslateTransform(fullWidth, fullHeight );
+            g.RotateTransform(180);
+            g.DrawString(axisText, s_LegendFont, Brushes.Azure, new PointF(TITLE_PADDING + clientAreaWidth + axf.Height, (fullHeight + axf.Width) / 2), s_VerticalDrawFormat);
         }
+
+        private static Font s_LegendFont = new Font(FontFamily.GenericMonospace, 8, FontStyle.Regular);
+        private static StringFormat s_VerticalDrawFormat = new StringFormat(StringFormatFlags.DirectionVertical);
 
         public void PlotDECFit(Graphics g, int fullWidth, int fullHeight)
         {
@@ -115,8 +234,12 @@ namespace Tangra.MotionFitting
                 fullWidth, fullHeight,
                 m_Chunks.Min(x => x.MinDEDeg),
                 m_Chunks.Max(x => x.MaxDEDeg),
+                "DE",
+                m_Chunks.Average(x => x.InclinationDE),
                 (x) => x.DEDeg,
-                (x) => x.DEWeightDeg);
+                (x) => x.DEWeightDeg,
+                (x) => x.DEDegFitted,
+                (c) => c.GetMidPointDEPosition());
         }
     }
 
@@ -129,6 +252,7 @@ namespace Tangra.MotionFitting
         private LinearRegression m_RegressionDE;
 
         private double m_InstDelayTimeOfDay;
+        private WeightingMode m_Weighting;
 
         private List<MeasurementPositionEntry> m_Entries;
 
@@ -141,6 +265,7 @@ namespace Tangra.MotionFitting
         public void Calculate(MeasurementPositionEntry[] entries, WeightingMode weighting, bool removeOutliers, double outlierSigmaCoeff, double instDelayTimeOfDay, double minUncertainty)
         {
             m_InstDelayTimeOfDay = instDelayTimeOfDay;
+            m_Weighting = weighting;
 
             var regRA = new LinearRegression();
             var regDE = new LinearRegression();
@@ -233,19 +358,46 @@ namespace Tangra.MotionFitting
                 return 1;
         }
 
-        internal double GetMidAreaTimeOfDay()
+        internal double GetMidPointDelayCorrectedTimeOfDay()
         {
             if (m_Entries.Count == 0)
                 return 0;
 
             if (m_Entries.Count == 1)
-                return m_Entries[0].TimeOfDayUTC;
+                return m_Entries[0].TimeOfDayUTC - m_InstDelayTimeOfDay;
 
-            return (m_Entries[0].TimeOfDayUTC + m_Entries[m_Entries.Count - 1].TimeOfDayUTC) / 2.0;
+            return (m_Entries[0].TimeOfDayUTC + m_Entries[m_Entries.Count - 1].TimeOfDayUTC) / 2.0 - m_InstDelayTimeOfDay;
         }
 
-        internal string GetReportByTimeOfDay(double closestTimeOfDay, string obsCode, string designation, DateTime obsDate)
+        internal double GetMidPointRAPosition()
         {
+            double closestTimeOfDay = GetMidPointDelayCorrectedTimeOfDay();
+
+            if (m_RegressionRA != null)
+            {
+                var normalTime = double.Parse(closestTimeOfDay.ToString("0.000000"));
+                return m_RegressionRA.ComputeY(normalTime);
+            }
+
+            return 0;
+        }
+
+        internal double GetMidPointDEPosition()
+        {
+            double closestTimeOfDay = GetMidPointDelayCorrectedTimeOfDay();
+            if (m_RegressionDE != null)
+            {
+                var normalTime = double.Parse(closestTimeOfDay.ToString("0.000000"));
+                return m_RegressionDE.ComputeY(normalTime);
+            }
+
+            return 0;
+        }
+
+        internal string GetMidPointReport(string obsCode, string designation, DateTime obsDate)
+        {
+            double closestTimeOfDay = GetMidPointDelayCorrectedTimeOfDay();
+                
             MPCObsLine obsLine = new MPCObsLine(obsCode.Substring(0, 3).PadLeft(3));
             obsLine.SetObject(designation.PadLeft(12).Substring(0, 12));
 
@@ -288,24 +440,58 @@ namespace Tangra.MotionFitting
             get { return m_Entries[m_Entries.Count - 1].TimeOfDayUTC; }
         }
 
+        internal double InclinationRA
+        {
+            get { return m_RegressionRA.A;  }
+        }
+
+        internal double InclinationDE
+        {
+            get { return m_RegressionDE.A; }
+        }
+
         internal double MinRADeg
         {
-            get { return m_Entries[0].RADeg; }
+            get
+            {
+                if (m_Weighting == WeightingMode.None)
+                    return m_Entries.Min(x => x.RADeg);
+                else
+                    return m_Entries.Min(x => x.RADeg - Math.Sqrt(x.FWHMArcSec * x.FWHMArcSec / (2.355 * 2.355 * x.SNR * x.SNR) + x.SolutionUncertaintyRACosDEArcSec * x.SolutionUncertaintyRACosDEArcSec) / 3600.0);
+            }
         }
 
         internal double MaxRADeg
         {
-            get { return m_Entries[m_Entries.Count - 1].RADeg; }
+            get
+            {
+                if (m_Weighting == WeightingMode.None)
+                    return m_Entries.Max(x => x.RADeg);
+                else
+                    return m_Entries.Max(x => x.RADeg + Math.Sqrt(x.FWHMArcSec * x.FWHMArcSec / (2.355 * 2.355 * x.SNR * x.SNR) + x.SolutionUncertaintyRACosDEArcSec * x.SolutionUncertaintyRACosDEArcSec) / 3600.0);
+            }
         }
 
         internal double MinDEDeg
         {
-            get { return m_Entries[0].DEDeg; }
+            get
+            {
+                if (m_Weighting == WeightingMode.None)
+                    return m_Entries.Min(x => x.DEDeg);
+                else
+                    return m_Entries.Min(x => x.DEDeg - Math.Sqrt(x.FWHMArcSec * x.FWHMArcSec / (2.355 * 2.355 * x.SNR * x.SNR) + x.SolutionUncertaintyDEArcSec * x.SolutionUncertaintyDEArcSec) / 3600.0);
+            }
         }
 
         internal double MaxDEDeg
         {
-            get { return m_Entries[m_Entries.Count - 1].DEDeg; }
+            get
+            {
+                if (m_Weighting == WeightingMode.None)
+                    return m_Entries.Max(x => x.DEDeg);
+                else
+                    return m_Entries.Max(x => x.DEDeg + Math.Sqrt(x.FWHMArcSec * x.FWHMArcSec / (2.355 * 2.355 * x.SNR * x.SNR) + x.SolutionUncertaintyDEArcSec * x.SolutionUncertaintyDEArcSec) / 3600.0);
+            }
         }
 
         internal IEnumerable<CalculatedEntry> Entries
@@ -325,8 +511,8 @@ namespace Tangra.MotionFitting
                         TimeOfDayUTC = entry.TimeOfDayUTC,
                         RADegFitted = m_RegressionRA.ComputeY(entry.TimeOfDayUTC - m_InstDelayTimeOfDay),
                         DEDegFitted = m_RegressionDE.ComputeY(entry.TimeOfDayUTC - m_InstDelayTimeOfDay),
-                        RAWeightDeg = weightsRA.Length > i ? weightsRA[i] / 3600.0 : 0,
-                        DEWeightDeg = weightsDE.Length > i ? weightsDE[i] / 3600.0 : 0,
+                        RAWeightDeg = weightsRA.Length > i ? Math.Sqrt(1 / weightsRA[i]) / 3600.0 : 0,
+                        DEWeightDeg = weightsDE.Length > i ? Math.Sqrt(1 / weightsDE[i]) / 3600.0 : 0,
                     };
                 }
             }
@@ -335,6 +521,7 @@ namespace Tangra.MotionFitting
 
     internal class CalculatedEntry
     {
+        public bool IsFirstInSeries;
         public double TimeOfDayUTC;
         public double RADeg;
         public double DEDeg;

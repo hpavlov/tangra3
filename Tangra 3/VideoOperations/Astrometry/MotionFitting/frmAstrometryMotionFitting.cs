@@ -96,6 +96,7 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                     rbWeightingPosAstr.Checked ? WeightingMode.SNR : WeightingMode.None,
                     (int)nudMeaIntervals.Value,
                     cbxOutlierRemoval.Checked,
+                    cbxSameIncline.Checked,
                     TangraConfig.Settings.Astrometry.AssumedPositionUncertaintyPixels);
 
                 Replot();
@@ -167,6 +168,11 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
         }
 
         private void cbxOutlierRemoval_CheckedChanged(object sender, EventArgs e)
+        {
+            Recalculate();
+        }
+
+        private void cbxSameIncline_CheckedChanged(object sender, EventArgs e)
         {
             Recalculate();
         }
