@@ -36,6 +36,8 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
         public frmAstrometryMotionFitting()
         {
             InitializeComponent();
+
+            dtpDate.Value = DateTime.Today;
         }
 
         private void tsbtnOpenFile_Click(object sender, EventArgs e)
@@ -82,6 +84,9 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                     {
                         nudMeaIntervals.ValueChanged += OnChunkSizeChanged;
                     }
+
+                    cbxContraintPattern.SelectedIndex = 0;
+
                     Recalculate();
                 }
             }
@@ -96,7 +101,7 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                     rbWeightingPosAstr.Checked ? WeightingMode.SNR : WeightingMode.None,
                     (int)nudMeaIntervals.Value,
                     cbxOutlierRemoval.Checked,
-                    cbxSameIncline.Checked,
+                    cbxContraintPattern.SelectedIndex,
                     TangraConfig.Settings.Astrometry.AssumedPositionUncertaintyPixels);
 
                 Replot();
@@ -173,6 +178,10 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
         }
 
         private void cbxSameIncline_CheckedChanged(object sender, EventArgs e)
+        {
+        }
+
+        private void cbxContraintPattern_SelectedIndexChanged(object sender, EventArgs e)
         {
             Recalculate();
         }

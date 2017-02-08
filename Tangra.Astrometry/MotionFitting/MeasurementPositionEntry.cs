@@ -18,5 +18,7 @@ namespace Tangra.MotionFitting
         public double FWHMArcSec;
         public double DetectionCertainty;
         public double SNR;
+        public bool ConstraintPoint;
+        public bool MidConstraintPoint;
     }
 }

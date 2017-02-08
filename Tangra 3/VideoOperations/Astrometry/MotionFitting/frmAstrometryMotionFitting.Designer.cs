@@ -59,9 +59,10 @@
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.cbxOutlierRemoval = new System.Windows.Forms.CheckBox();
-            this.cbxSameIncline = new System.Windows.Forms.CheckBox();
             this.pnlExportOptions = new System.Windows.Forms.Panel();
             this.pnlReportHolder = new System.Windows.Forms.Panel();
+            this.label8 = new System.Windows.Forms.Label();
+            this.cbxContraintPattern = new System.Windows.Forms.ComboBox();
             this.toolStrip1.SuspendLayout();
             this.pnlFiles.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -130,7 +131,8 @@
             // groupBox1
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.groupBox1.Controls.Add(this.cbxSameIncline);
+            this.groupBox1.Controls.Add(this.cbxContraintPattern);
+            this.groupBox1.Controls.Add(this.label8);
             this.groupBox1.Controls.Add(this.cbxOutlierRemoval);
             this.groupBox1.Controls.Add(this.rbWeightingPosAstr);
             this.groupBox1.Controls.Add(this.rbWeightingNone);
@@ -160,7 +162,7 @@
             // rbWeightingNone
             // 
             this.rbWeightingNone.AutoSize = true;
-            this.rbWeightingNone.Location = new System.Drawing.Point(22, 113);
+            this.rbWeightingNone.Location = new System.Drawing.Point(22, 117);
             this.rbWeightingNone.Name = "rbWeightingNone";
             this.rbWeightingNone.Size = new System.Drawing.Size(51, 17);
             this.rbWeightingNone.TabIndex = 38;
@@ -171,7 +173,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(9, 93);
+            this.label7.Location = new System.Drawing.Point(9, 98);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(58, 13);
             this.label7.TabIndex = 37;
@@ -179,7 +181,7 @@
             // 
             // nudMeaIntervals
             // 
-            this.nudMeaIntervals.Location = new System.Drawing.Point(109, 23);
+            this.nudMeaIntervals.Location = new System.Drawing.Point(105, 23);
             this.nudMeaIntervals.Minimum = new decimal(new int[] {
             1,
             0,
@@ -198,7 +200,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(10, 26);
+            this.label6.Location = new System.Drawing.Point(7, 26);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(97, 13);
             this.label6.TabIndex = 35;
@@ -247,11 +249,6 @@
             this.nudInstDelaySec.Name = "nudInstDelaySec";
             this.nudInstDelaySec.Size = new System.Drawing.Size(49, 20);
             this.nudInstDelaySec.TabIndex = 35;
-            this.nudInstDelaySec.Value = new decimal(new int[] {
-            131,
-            0,
-            0,
-            131072});
             // 
             // label4
             // 
@@ -268,7 +265,6 @@
             this.tbxObjectDesign.Name = "tbxObjectDesign";
             this.tbxObjectDesign.Size = new System.Drawing.Size(85, 20);
             this.tbxObjectDesign.TabIndex = 33;
-            this.tbxObjectDesign.Text = "K10R12F";
             // 
             // dtpDate
             // 
@@ -277,7 +273,7 @@
             this.dtpDate.Name = "dtpDate";
             this.dtpDate.Size = new System.Drawing.Size(82, 20);
             this.dtpDate.TabIndex = 32;
-            this.dtpDate.Value = new System.DateTime(2010, 9, 8, 0, 0, 0, 0);
+            this.dtpDate.Value = new System.DateTime(2017, 2, 9, 17, 49, 22, 0);
             // 
             // tbxObsCode
             // 
@@ -285,7 +281,6 @@
             this.tbxObsCode.Name = "tbxObsCode";
             this.tbxObsCode.Size = new System.Drawing.Size(29, 20);
             this.tbxObsCode.TabIndex = 31;
-            this.tbxObsCode.Text = "E28";
             // 
             // lbAvailableFiles
             // 
@@ -376,24 +371,13 @@
             this.cbxOutlierRemoval.AutoSize = true;
             this.cbxOutlierRemoval.Checked = true;
             this.cbxOutlierRemoval.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbxOutlierRemoval.Location = new System.Drawing.Point(12, 67);
+            this.cbxOutlierRemoval.Location = new System.Drawing.Point(12, 78);
             this.cbxOutlierRemoval.Name = "cbxOutlierRemoval";
             this.cbxOutlierRemoval.Size = new System.Drawing.Size(104, 17);
             this.cbxOutlierRemoval.TabIndex = 40;
             this.cbxOutlierRemoval.Text = "Remove Outliers";
             this.cbxOutlierRemoval.UseVisualStyleBackColor = true;
             this.cbxOutlierRemoval.CheckedChanged += new System.EventHandler(this.cbxOutlierRemoval_CheckedChanged);
-            // 
-            // cbxSameIncline
-            // 
-            this.cbxSameIncline.AutoSize = true;
-            this.cbxSameIncline.Location = new System.Drawing.Point(12, 47);
-            this.cbxSameIncline.Name = "cbxSameIncline";
-            this.cbxSameIncline.Size = new System.Drawing.Size(87, 17);
-            this.cbxSameIncline.TabIndex = 41;
-            this.cbxSameIncline.Text = "Same Incline";
-            this.cbxSameIncline.UseVisualStyleBackColor = true;
-            this.cbxSameIncline.CheckedChanged += new System.EventHandler(this.cbxSameIncline_CheckedChanged);
             // 
             // pnlExportOptions
             // 
@@ -411,6 +395,30 @@
             this.pnlReportHolder.Name = "pnlReportHolder";
             this.pnlReportHolder.Size = new System.Drawing.Size(507, 79);
             this.pnlReportHolder.TabIndex = 2;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(10, 55);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(89, 13);
+            this.label8.TabIndex = 41;
+            this.label8.Text = "Constraint Points:";
+            // 
+            // cbxContraintPattern
+            // 
+            this.cbxContraintPattern.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxContraintPattern.FormattingEnabled = true;
+            this.cbxContraintPattern.Items.AddRange(new object[] {
+            "None",
+            "Pattern 1",
+            "Pattern 2",
+            "Pattern 3"});
+            this.cbxContraintPattern.Location = new System.Drawing.Point(103, 49);
+            this.cbxContraintPattern.Name = "cbxContraintPattern";
+            this.cbxContraintPattern.Size = new System.Drawing.Size(80, 21);
+            this.cbxContraintPattern.TabIndex = 42;
+            this.cbxContraintPattern.SelectedIndexChanged += new System.EventHandler(this.cbxContraintPattern_SelectedIndexChanged);
             // 
             // frmAstrometryMotionFitting
             // 
@@ -478,8 +486,9 @@
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.CheckBox cbxOutlierRemoval;
-        private System.Windows.Forms.CheckBox cbxSameIncline;
         private System.Windows.Forms.Panel pnlReportHolder;
         private System.Windows.Forms.Panel pnlExportOptions;
+        private System.Windows.Forms.ComboBox cbxContraintPattern;
+        private System.Windows.Forms.Label label8;
     }
 }

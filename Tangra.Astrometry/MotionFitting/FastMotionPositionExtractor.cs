@@ -1,6 +1,7 @@
 ﻿using System;
 using System.CodeDom;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -13,14 +14,16 @@ namespace Tangra.MotionFitting
     public class FastMotionPositionExtractor
     {
         private const double SECONDS_IN_A_DAY = 60 * 60 * 24;
-        private List<FastMotionChunkPositionExtractor> m_Chunks = new List<FastMotionChunkPositionExtractor>(); 
+        private List<FastMotionChunkPositionExtractor> m_Chunks = new List<FastMotionChunkPositionExtractor>();
+        private List<MeasurementPositionEntry> m_AllEntries;
+        private bool m_RemoveOutliers;
 
         public void Calculate(
             IMeasurementPositionProvider provider, 
             WeightingMode weighting, 
             int numChunks, 
             bool removeOutliers, 
-            bool fitSameIncline, 
+            int constraintPattern, 
             double minPositionUncertaintyPixels, 
             double outlierSigmaCoeff = 3.0)
         {
@@ -28,22 +31,102 @@ namespace Tangra.MotionFitting
             {
                 m_Chunks.Clear();
                 if (numChunks < 1) numChunks = 1;
+                m_RemoveOutliers = removeOutliers;
 
-                var allEntries = provider.Measurements.ToList();
+                m_AllEntries = provider.Measurements.Where(x => x.TimeOfDayUTC != 0).ToList();
+                m_AllEntries.ForEach(x =>
+                {
+                    x.ConstraintPoint = false;
+                    x.MidConstraintPoint = false;
+                });
+
                 var minUncertainty = minPositionUncertaintyPixels * provider.ArsSecsInPixel;
                 double instDelayTimeOfDay = ((double) provider.InstrumentalDelaySec/SECONDS_IN_A_DAY);
 
-                int numEntriesPerChunk = allEntries.Count / numChunks;
+                int defPoints = 0;
+                int numEntriesPerChunk = m_AllEntries.Count / numChunks;
+                int startMidConIdx = 0;
 
-                for (int i = 0; i < numChunks; i++)
+                switch (constraintPattern)
                 {
-                    int firstId = i * numEntriesPerChunk;
-                    int lastId = (i + 1) * numEntriesPerChunk  - 1;
-                    if (lastId > (numChunks - 1)*numEntriesPerChunk) lastId = allEntries.Count;
+                    case 1:
+                    case 2:
+                        defPoints = 3;
+                        numEntriesPerChunk = (m_AllEntries.Count - defPoints * 2 * numChunks) / numChunks;
+                        break;
+                    case 3:
+                        defPoints = 3;
+                        numEntriesPerChunk = (m_AllEntries.Count - defPoints * 2 * numChunks) / numChunks;
+                        startMidConIdx = (int)Math.Round((m_AllEntries.Count - defPoints * numChunks * 1.0) / 2.0);
+                        var midConstPoints = m_AllEntries.Skip(startMidConIdx).Take(defPoints * numChunks).ToList();
+                        midConstPoints.ForEach(x =>
+                        {
+                            x.ConstraintPoint = true;
+                            x.MidConstraintPoint = true;
+                        });
+                        break;
+                }
+
+                int lastChunkFill = (m_AllEntries.Count - defPoints * numChunks - 1) - ((numChunks) * numEntriesPerChunk - 1 + defPoints * numChunks);
+                for (int i = 0; i < numChunks; i++)
+                {                    
+                    int firstId = i * numEntriesPerChunk + defPoints * numChunks;
+                    int lastId = (i + 1) * numEntriesPerChunk - 1 + defPoints * numChunks;
+                    if (lastId > (numChunks - 1)*numEntriesPerChunk + defPoints*numChunks)
+                    {
+                        lastId = m_AllEntries.Count - defPoints * numChunks - 1;
+                    }
 
                     var chunkPosExtractor = new FastMotionChunkPositionExtractor(firstId, lastId);
-                    var chunkEntries = allEntries.Skip(firstId).Take(lastId - firstId).Where(x => x.TimeOfDayUTC != 0).ToArray();
-                    chunkPosExtractor.Calculate(chunkEntries, weighting, removeOutliers, outlierSigmaCoeff, instDelayTimeOfDay, minUncertainty);
+                    var chunkEntries = m_AllEntries.Skip(firstId).Take(lastId - firstId + 1).Where(x => !x.ConstraintPoint).ToList();
+                    
+                    
+                    if (constraintPattern == 1)
+                    {
+                        for (int j = 0; j < defPoints; j++)
+                        {
+                            var d1 = m_AllEntries[i * defPoints + j];
+                            d1.ConstraintPoint = true;
+                            chunkEntries.Insert(j, d1);
+                            var d2 = m_AllEntries[(numEntriesPerChunk + defPoints) * numChunks + i * defPoints + j + lastChunkFill];
+                            d2.ConstraintPoint = true;
+                            chunkEntries.Add(d2);
+                        }
+                    }
+                    else if (constraintPattern == 2)
+                    {
+                        for (int j = 0; j < defPoints; j++)
+                        {
+                            var d1 = m_AllEntries[i + numChunks * j];
+                            d1.ConstraintPoint = true;
+                            chunkEntries.Insert(j, d1);
+                            var d2 = m_AllEntries[(numEntriesPerChunk + defPoints) * numChunks + i + numChunks * j + lastChunkFill];
+                            d2.ConstraintPoint = true;
+                            chunkEntries.Add(d2);
+                        }
+                    }
+                    else if (constraintPattern == 3)
+                    {
+                        for (int j = 0; j < defPoints; j++)
+                        {
+                            var d1 = m_AllEntries[i + numChunks * j];
+                            d1.ConstraintPoint = true;
+                            chunkEntries.Insert(j, d1);
+                            var d3 = m_AllEntries[(numEntriesPerChunk + defPoints) * numChunks + i + numChunks * j + lastChunkFill];
+                            d3.ConstraintPoint = true;
+                            chunkEntries.Add(d3);
+                        }
+
+                        var midIdx = chunkEntries.Count / 2;
+                        for (int j = 0; j < defPoints; j++)
+                        {
+                            var d2 = m_AllEntries[startMidConIdx + i + numChunks * j];
+                            d2.ConstraintPoint = true;
+                            chunkEntries.Insert(midIdx + j, d2);
+                        }
+                    }
+
+                    chunkPosExtractor.Calculate(chunkEntries.ToArray(), weighting, removeOutliers, outlierSigmaCoeff, instDelayTimeOfDay, minUncertainty);
                     m_Chunks.Add(chunkPosExtractor);
                 }
             }
@@ -57,6 +140,9 @@ namespace Tangra.MotionFitting
             {
                 lines.Add(chunk.GetMidPointReport(obsCode, designation, obsDate));
             }
+
+            double combinedUncert = Math.Sqrt(m_Chunks.Sum(x => x.GetMidPointCombinedSQUncertainty())) * 3600.0;
+            Trace.WriteLine(string.Format("Combined total measurement uncertainty: {0} arcsec", combinedUncert));
 
             return lines.ToArray();
         }
@@ -108,6 +194,8 @@ namespace Tangra.MotionFitting
             var repX = new List<double>();
             var repY = new List<double>();
 
+            Pen constraintPen = new Pen(Color.FromArgb(100, pen.Color));
+            var allFrameNos = m_AllEntries.Select(x => x.FrameNo).ToList();
             foreach (var chunk in m_Chunks)
             {
                 double? startX = null;
@@ -115,24 +203,33 @@ namespace Tangra.MotionFitting
                 CalculatedEntry lastEntry = null;
                 foreach (var entry in chunk.Entries)
                 {
-                    lastEntry = entry;
+                    if (!entry.IsConstraintPoint) lastEntry = entry;
+
                     float x = (float)Math.Round(PADDING_L + BORDER + (scaleX * (entry.TimeOfDayUTC - minX)));
                     float y = fullHeight - PADDING_L - BORDER - (float)(scaleY * (getVal(entry) - minY));
 
-                    if (!startX.HasValue)
+                    if (!startX.HasValue && !entry.IsConstraintPoint)
                     {
                         startX = entry.TimeOfDayUTC;
                         startYCalc = getCalcVal(entry);
                     }
-                    g.DrawEllipse(pen, x - 1, y - 1, 2, 2);
+
+                    var entryPen = entry.IsConstraintPoint ? constraintPen : pen;
+
+                    g.DrawEllipse(entryPen, x - 1, y - 1, 2, 2);
 
                     float yErr = (float)(scaleY * getWeight(entry));
                     if (yErr > 0)
                     {
-                        g.DrawLine(pen, x, y - yErr, x, y + yErr);
-                        g.DrawLine(pen, x - 1, y - yErr, x + 1, y - yErr);
-                        g.DrawLine(pen, x - 1, y + yErr, x + 1, y + yErr);
+                        g.DrawLine(entryPen, x, y - yErr, x, y + yErr);
+                        g.DrawLine(entryPen, x - 1, y - yErr, x + 1, y - yErr);
+                        g.DrawLine(entryPen, x - 1, y + yErr, x + 1, y + yErr);
                     }
+
+                    if (allFrameNos.IndexOf(entry.FrameNo) == -1)
+                        Trace.WriteLine(string.Format("ERROR: Frame number {0} has been already used in another chunk!", entry.FrameNo));
+                    else
+                        allFrameNos.Remove(entry.FrameNo);
                 }
 
                 // Plot fitted line
@@ -160,6 +257,26 @@ namespace Tangra.MotionFitting
                 }
             }
 
+            int allRemovedOutliers = m_Chunks.Sum(x => x.RemovedOutliers);
+
+            // Plot total included points and outliers
+            string statsText = m_RemoveOutliers
+                ? string.Format("Included points: {0}, Excluded outliers: {1}", m_AllEntries.Count, allRemovedOutliers)
+                : string.Format("Included points: {0}", m_AllEntries.Count);
+
+            var szf = g.MeasureString(statsText, s_LegendFont);
+            bool topLeft = aveIncl > 0;
+            if (topLeft)
+            {
+                g.FillRectangle(SystemBrushes.ControlDarkDark, PADDING_L + BORDER, PADDING_R + BORDER, szf.Width, szf.Height);
+                g.DrawString(statsText, s_LegendFont, Brushes.Azure, PADDING_L + BORDER, PADDING_R + BORDER);
+            }
+            else
+            {
+                g.FillRectangle(SystemBrushes.ControlDarkDark, fullWidth - PADDING_R - BORDER - szf.Width, PADDING_R + BORDER, szf.Width, szf.Height);
+                g.DrawString(statsText, s_LegendFont, Brushes.Azure, fullWidth - PADDING_R - BORDER - szf.Width, PADDING_R + BORDER);
+            }
+
             // Calculate the StdDev of linear motion from all reported points and draw it on the plot
             if (repX.Count > 2)
             {
@@ -172,18 +289,17 @@ namespace Tangra.MotionFitting
                 repReg.Solve();
 
                 double stdDevArcSec = repReg.StdDev * 3600.0;
-                string text = string.Format("{0} points StdDev: {1:0.00} arcsec", repX.Count, stdDevArcSec);
-                var szf = g.MeasureString(text, s_LegendFont);
-                bool topLeft = aveIncl > 0;
+                string text = string.Format("StdDev from {0} measurements: {1:0.00} arcsec", repX.Count, stdDevArcSec);
+                szf = g.MeasureString(text, s_LegendFont);
                 if (topLeft)
                 {
-                    g.FillRectangle(SystemBrushes.ControlDarkDark, PADDING_L + BORDER, PADDING_R + BORDER, szf.Width, szf.Height);
-                    g.DrawString(text, s_LegendFont, Brushes.Azure, PADDING_L + BORDER, PADDING_R + BORDER);
+                    g.FillRectangle(SystemBrushes.ControlDarkDark, PADDING_L + BORDER, PADDING_R + BORDER + szf.Height + 2, szf.Width, szf.Height);
+                    g.DrawString(text, s_LegendFont, Brushes.Azure, PADDING_L + BORDER, PADDING_R + BORDER + szf.Height + 2);
                 }
                 else
                 {
-                    g.FillRectangle(SystemBrushes.ControlDarkDark, fullWidth - PADDING_R - BORDER - szf.Width, PADDING_R + BORDER, szf.Width, szf.Height);
-                    g.DrawString(text, s_LegendFont, Brushes.Azure, fullWidth - PADDING_R - BORDER - szf.Width, PADDING_R + BORDER);
+                    g.FillRectangle(SystemBrushes.ControlDarkDark, fullWidth - PADDING_R - BORDER - szf.Width, PADDING_R + BORDER + szf.Height + 2, szf.Width, szf.Height);
+                    g.DrawString(text, s_LegendFont, Brushes.Azure, fullWidth - PADDING_R - BORDER - szf.Width, PADDING_R + BORDER + szf.Height + 2);
                 }
             }
 
@@ -292,6 +408,8 @@ namespace Tangra.MotionFitting
             regRA.Solve();
             regDE.Solve();
 
+            RemovedOutliers = 0;
+
             if (removeOutliers)
             {
                 var outlierLimitRA = regRA.StdDev*outlierSigmaCoeff;
@@ -303,6 +421,8 @@ namespace Tangra.MotionFitting
                 {
                     if (Math.Abs(residualsRA[i]) <= outlierLimitRA && Math.Abs(residualsDE[i]) <= outlierLimitDE)
                         m_Entries.Add(entries[i]);
+                    else
+                        RemovedOutliers++;
                 }
 
                 m_RegressionRA = new LinearRegression();
@@ -366,7 +486,8 @@ namespace Tangra.MotionFitting
             if (m_Entries.Count == 1)
                 return m_Entries[0].TimeOfDayUTC - m_InstDelayTimeOfDay;
 
-            return (m_Entries[0].TimeOfDayUTC + m_Entries[m_Entries.Count - 1].TimeOfDayUTC) / 2.0 - m_InstDelayTimeOfDay;
+            var dataEntriesOnly = m_Entries.Where(x => !x.ConstraintPoint).ToList();
+            return (dataEntriesOnly[0].TimeOfDayUTC + dataEntriesOnly[dataEntriesOnly.Count - 1].TimeOfDayUTC) / 2.0 - m_InstDelayTimeOfDay;
         }
 
         internal double GetMidPointRAPosition()
@@ -394,11 +515,29 @@ namespace Tangra.MotionFitting
             return 0;
         }
 
+        internal double GetMidPointCombinedSQUncertainty()
+        {
+            double closestTimeOfDay = GetMidPointDelayCorrectedTimeOfDay();
+
+            if (m_RegressionRA != null && m_RegressionDE != null)
+            {
+                var normalTime = double.Parse(closestTimeOfDay.ToString("0.000000"));
+
+                double errRA, errDE;
+                m_RegressionRA.ComputeYWithError(normalTime, out errRA);
+                m_RegressionDE.ComputeYWithError(normalTime, out errDE);
+
+                return errRA * errRA + errDE * errDE;
+            }
+
+            return 0;
+        }
+
         internal string GetMidPointReport(string obsCode, string designation, DateTime obsDate)
         {
             double closestTimeOfDay = GetMidPointDelayCorrectedTimeOfDay();
-                
-            MPCObsLine obsLine = new MPCObsLine(obsCode.Substring(0, 3).PadLeft(3));
+
+            MPCObsLine obsLine = new MPCObsLine(obsCode.PadLeft(3).Substring(0, 3));
             obsLine.SetObject(designation.PadLeft(12).Substring(0, 12));
 
             if (m_RegressionRA != null && m_RegressionDE != null)
@@ -494,6 +633,8 @@ namespace Tangra.MotionFitting
             }
         }
 
+        internal int RemovedOutliers { get; private set; }
+
         internal IEnumerable<CalculatedEntry> Entries
         {
             get
@@ -506,9 +647,12 @@ namespace Tangra.MotionFitting
                     var entry = m_Entries[i];
                     yield return new CalculatedEntry()
                     {
+                        FrameNo = entry.FrameNo,
                         RADeg = entry.RADeg,
                         DEDeg = entry.DEDeg,
                         TimeOfDayUTC = entry.TimeOfDayUTC,
+                        IsConstraintPoint = entry.ConstraintPoint,
+                        IsMidConstraintPoint = entry.MidConstraintPoint,
                         RADegFitted = m_RegressionRA.ComputeY(entry.TimeOfDayUTC - m_InstDelayTimeOfDay),
                         DEDegFitted = m_RegressionDE.ComputeY(entry.TimeOfDayUTC - m_InstDelayTimeOfDay),
                         RAWeightDeg = weightsRA.Length > i ? Math.Sqrt(1 / weightsRA[i]) / 3600.0 : 0,
@@ -521,7 +665,10 @@ namespace Tangra.MotionFitting
 
     internal class CalculatedEntry
     {
+        public int FrameNo;
         public bool IsFirstInSeries;
+        public bool IsConstraintPoint;
+        public bool IsMidConstraintPoint;
         public double TimeOfDayUTC;
         public double RADeg;
         public double DEDeg;
