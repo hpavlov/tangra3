@@ -18,20 +18,20 @@ namespace Tangra.MotionFitting
         private List<MeasurementPositionEntry> m_AllEntries;
         private bool m_RemoveOutliers;
 
+
+
         public void Calculate(
             IMeasurementPositionProvider provider, 
-            WeightingMode weighting, 
-            int numChunks, 
-            bool removeOutliers, 
-            int constraintPattern, 
-            double minPositionUncertaintyPixels, 
+            ReductionSettings settings,
             double outlierSigmaCoeff = 3.0)
         {
             if (provider != null)
             {
                 m_Chunks.Clear();
+                int numChunks = settings.NumberOfChunks;
+
                 if (numChunks < 1) numChunks = 1;
-                m_RemoveOutliers = removeOutliers;
+                m_RemoveOutliers = settings.RemoveOutliers;
 
                 m_AllEntries = provider.Measurements.Where(x => x.TimeOfDayUTC != 0).ToList();
                 m_AllEntries.ForEach(x =>
@@ -40,14 +40,13 @@ namespace Tangra.MotionFitting
                     x.MidConstraintPoint = false;
                 });
 
-                var minUncertainty = minPositionUncertaintyPixels * provider.ArsSecsInPixel;
-                double instDelayTimeOfDay = ((double) provider.InstrumentalDelaySec/SECONDS_IN_A_DAY);
+                double instDelayTimeOfDay = ((double)settings.InstrumentalDelaySec / SECONDS_IN_A_DAY);
 
                 int defPoints = 0;
                 int numEntriesPerChunk = m_AllEntries.Count / numChunks;
                 int startMidConIdx = 0;
 
-                switch (constraintPattern)
+                switch (settings.ConstraintPattern)
                 {
                     case 1:
                     case 2:
@@ -79,9 +78,9 @@ namespace Tangra.MotionFitting
 
                     var chunkPosExtractor = new FastMotionChunkPositionExtractor(firstId, lastId);
                     var chunkEntries = m_AllEntries.Skip(firstId).Take(lastId - firstId + 1).Where(x => !x.ConstraintPoint).ToList();
-                    
-                    
-                    if (constraintPattern == 1)
+
+
+                    if (settings.ConstraintPattern == 1)
                     {
                         for (int j = 0; j < defPoints; j++)
                         {
@@ -93,7 +92,7 @@ namespace Tangra.MotionFitting
                             chunkEntries.Add(d2);
                         }
                     }
-                    else if (constraintPattern == 2)
+                    else if (settings.ConstraintPattern == 2)
                     {
                         for (int j = 0; j < defPoints; j++)
                         {
@@ -105,7 +104,7 @@ namespace Tangra.MotionFitting
                             chunkEntries.Add(d2);
                         }
                     }
-                    else if (constraintPattern == 3)
+                    else if (settings.ConstraintPattern == 3)
                     {
                         for (int j = 0; j < defPoints; j++)
                         {
@@ -126,8 +125,19 @@ namespace Tangra.MotionFitting
                         }
                     }
 
-                    chunkPosExtractor.Calculate(chunkEntries.ToArray(), weighting, removeOutliers, outlierSigmaCoeff, instDelayTimeOfDay, minUncertainty);
-                    m_Chunks.Add(chunkPosExtractor);
+                    if (chunkEntries.Count > 2)
+                    {
+                        chunkPosExtractor.Calculate(
+                            chunkEntries.ToArray(),
+                            settings.Weighting,
+                            settings.RemoveOutliers,
+                            outlierSigmaCoeff,
+                            instDelayTimeOfDay,
+                            settings.BestPositionUncertaintyArcSec,
+                            settings.FactorInPositionalUncertainty);
+
+                        m_Chunks.Add(chunkPosExtractor);
+                    }
                 }
             }
         }
@@ -147,6 +157,23 @@ namespace Tangra.MotionFitting
             return lines.ToArray();
         }
 
+        public void CalculateSingleMeasurement(double timeOfDay, out double raHours, out double deDeg, out double errRACosDEArcSec, out double errDEArcSec)
+        {
+            raHours = double.NaN;
+            deDeg = double.NaN;
+            errRACosDEArcSec = double.NaN;
+            errDEArcSec = double.NaN;
+
+            foreach (var chunk in m_Chunks)
+            {
+                if (chunk.MinTimeOfDayUTC <= timeOfDay && chunk.MaxTimeOfDayUTC >= timeOfDay)
+                {
+                    chunk.GetPosition(timeOfDay, out raHours, out errRACosDEArcSec, out deDeg, out errDEArcSec);
+                    return;
+                }
+            }
+        }
+
         public const int PADDING_L = 15;
         public const int PADDING_R = 5;
         public const int BORDER = 7;
@@ -154,16 +181,19 @@ namespace Tangra.MotionFitting
 
         public void PlotRAFit(Graphics g, int fullWidth, int fullHeight)
         {
-            Plot(g, Pens.Lime, 
-                fullWidth, fullHeight, 
-                m_Chunks.Min(x => x.MinRADeg),
-                m_Chunks.Max(x => x.MaxRADeg),
-                "RA",
-                m_Chunks.Average(x => x.InclinationRA),
-                (x) => x.RADeg, 
-                (x) => x.RAWeightDeg,
-                (x) => x.RADegFitted,
-                (c) => c.GetMidPointRAPosition());
+            if (m_Chunks.Count > 0)
+            {
+                Plot(g, Pens.Lime,
+                    fullWidth, fullHeight,
+                    m_Chunks.Min(x => x.MinRADeg),
+                    m_Chunks.Max(x => x.MaxRADeg),
+                    "RA",
+                    m_Chunks.Average(x => x.InclinationRA),
+                    (x) => x.RADeg,
+                    (x) => x.RAWeightDeg,
+                    (x) => x.RADegFitted,
+                    (c) => c.GetMidPointRAPosition());
+            }
         }
 
         internal void Plot(Graphics g, Pen pen,
@@ -346,16 +376,19 @@ namespace Tangra.MotionFitting
 
         public void PlotDECFit(Graphics g, int fullWidth, int fullHeight)
         {
-            Plot(g, Pens.Aqua,
-                fullWidth, fullHeight,
-                m_Chunks.Min(x => x.MinDEDeg),
-                m_Chunks.Max(x => x.MaxDEDeg),
-                "DE",
-                m_Chunks.Average(x => x.InclinationDE),
-                (x) => x.DEDeg,
-                (x) => x.DEWeightDeg,
-                (x) => x.DEDegFitted,
-                (c) => c.GetMidPointDEPosition());
+            if (m_Chunks.Count > 0)
+            {
+                Plot(g, Pens.Aqua,
+                    fullWidth, fullHeight,
+                    m_Chunks.Min(x => x.MinDEDeg),
+                    m_Chunks.Max(x => x.MaxDEDeg),
+                    "DE",
+                    m_Chunks.Average(x => x.InclinationDE),
+                    (x) => x.DEDeg,
+                    (x) => x.DEWeightDeg,
+                    (x) => x.DEDegFitted,
+                    (c) => c.GetMidPointDEPosition());
+            }
         }
     }
 
@@ -369,6 +402,7 @@ namespace Tangra.MotionFitting
 
         private double m_InstDelayTimeOfDay;
         private WeightingMode m_Weighting;
+        private double? m_PosUncertaintyMedArcSec;
 
         private List<MeasurementPositionEntry> m_Entries;
 
@@ -378,7 +412,7 @@ namespace Tangra.MotionFitting
             LastEntryId = lastEntryId;
         }
 
-        public void Calculate(MeasurementPositionEntry[] entries, WeightingMode weighting, bool removeOutliers, double outlierSigmaCoeff, double instDelayTimeOfDay, double minUncertainty)
+        public void Calculate(MeasurementPositionEntry[] entries, WeightingMode weighting, bool removeOutliers, double outlierSigmaCoeff, double instDelayTimeOfDay, double minUncertainty, bool includePositionalUncertainties)
         {
             m_InstDelayTimeOfDay = instDelayTimeOfDay;
             m_Weighting = weighting;
@@ -458,6 +492,21 @@ namespace Tangra.MotionFitting
                 m_RegressionDE = regDE;
                 m_Entries = entries.ToList();
             }
+
+            if (includePositionalUncertainties)
+            {
+                var posUncertaintyAveLst = new List<double>();
+                foreach (var entry in m_Entries)
+                {
+                    var posUncertainty = entry.FWHMArcSec / (2.355 * entry.SNR);
+                    posUncertaintyAveLst.Add(posUncertainty);
+                }
+                m_PosUncertaintyMedArcSec = posUncertaintyAveLst.Median() / Math.Sqrt(posUncertaintyAveLst.Count);
+            }
+            else
+            {
+                m_PosUncertaintyMedArcSec = null;
+            }
         }
 
         private double CalulateWeight(MeasurementPositionEntry entry, double solutionUncertaintyArcSec, double minUncertainty, WeightingMode weighting)
@@ -487,7 +536,10 @@ namespace Tangra.MotionFitting
                 return m_Entries[0].TimeOfDayUTC - m_InstDelayTimeOfDay;
 
             var dataEntriesOnly = m_Entries.Where(x => !x.ConstraintPoint).ToList();
-            return (dataEntriesOnly[0].TimeOfDayUTC + dataEntriesOnly[dataEntriesOnly.Count - 1].TimeOfDayUTC) / 2.0 - m_InstDelayTimeOfDay;
+            if (dataEntriesOnly.Count > 1)
+                return (dataEntriesOnly[0].TimeOfDayUTC + dataEntriesOnly[dataEntriesOnly.Count - 1].TimeOfDayUTC)/2.0 - m_InstDelayTimeOfDay;
+            else
+                return double.NaN;
         }
 
         internal double GetMidPointRAPosition()
@@ -513,6 +565,21 @@ namespace Tangra.MotionFitting
             }
 
             return 0;
+        }
+
+        internal void GetPosition(double timeOfDay, out double raHours, out double errRACosDEArcSec, out double deDeg, out double errDEArcSec)
+        {
+            raHours = m_RegressionRA.ComputeYWithError(timeOfDay, out errRACosDEArcSec) / 15.0;
+            deDeg = m_RegressionDE.ComputeYWithError(timeOfDay, out errDEArcSec);
+
+            errRACosDEArcSec *= Math.Cos(deDeg * Math.PI / 180) * 3600;
+            errDEArcSec *= 3600;
+
+            if (m_PosUncertaintyMedArcSec.HasValue)
+            {
+                errRACosDEArcSec = Math.Sqrt(errRACosDEArcSec * errRACosDEArcSec + m_PosUncertaintyMedArcSec.Value * m_PosUncertaintyMedArcSec.Value);
+                errDEArcSec = Math.Sqrt(errDEArcSec * errDEArcSec + m_PosUncertaintyMedArcSec.Value * m_PosUncertaintyMedArcSec.Value);
+            }
         }
 
         internal double GetMidPointCombinedSQUncertainty()
@@ -543,6 +610,7 @@ namespace Tangra.MotionFitting
             if (m_RegressionRA != null && m_RegressionDE != null)
             {
                 var normalTime = double.Parse(closestTimeOfDay.ToString("0.000000"));
+                if (double.IsNaN(normalTime) || double.IsInfinity(normalTime)) return null;
 
                 DateTime mpcTime = obsDate.Date.AddDays(normalTime);
                 double errRA, errDE;
@@ -551,6 +619,12 @@ namespace Tangra.MotionFitting
 
                 errRA *= Math.Cos(mpcDEDeg * Math.PI / 180) * 3600;
                 errDE *= 3600;
+
+                if (m_PosUncertaintyMedArcSec.HasValue)
+                {
+                    errRA = Math.Sqrt(errRA * errRA + m_PosUncertaintyMedArcSec.Value * m_PosUncertaintyMedArcSec.Value);
+                    errDE = Math.Sqrt(errDE * errDE + m_PosUncertaintyMedArcSec.Value * m_PosUncertaintyMedArcSec.Value);
+                }
 
                 var mag = m_Entries.Select(x => x.Mag).ToList().Median();
 

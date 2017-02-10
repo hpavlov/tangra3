@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Tangra.Model.Config;
+using Tangra.Model.Helpers;
 using Tangra.Model.Numerical;
 using Tangra.MotionFitting;
 
@@ -16,6 +17,8 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
 {
     public partial class frmAstrometryMotionFitting : Form
     {
+        public const decimal DEFAULT_ARCSEC_PER_PIXEL = 2.5M;
+
         internal class AvailableFileEntry
         {
             public string FilePath { get; private set; }
@@ -44,7 +47,13 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
         {
             if (openFileDialog1.ShowDialog(this) == DialogResult.OK)
             {
-                lbAvailableFiles.Items.Add(new AvailableFileEntry(openFileDialog1.FileName));
+                if (openFileDialog1.FileNames != null && openFileDialog1.FileNames.Length > 1)
+                {
+                    foreach (var fileName in openFileDialog1.FileNames)
+                        lbAvailableFiles.Items.Add(new AvailableFileEntry(fileName));
+                }
+                else
+                    lbAvailableFiles.Items.Add(new AvailableFileEntry(openFileDialog1.FileName));
             }
         }
 
@@ -72,17 +81,34 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                     m_DataProvider = new MeasurementPositionCSVProvider(entry.FilePath);
                     m_SelectedEntry = entry;
 
-
+                    nudPixelsPerArcSec.ValueChanged -= nudPixelsPerArcSec_ValueChanged;
+                    nudInstDelaySec.ValueChanged -= nudInstDelaySec_ValueChanged;
+                    dtpDate.ValueChanged -= dtpDate_ValueChanged;
+                    tbxObsCode.TextChanged -= tbxObsCode_TextChanged;
+                    tbxObjectDesign.TextChanged -= tbxObjectDesign_TextChanged;
                     nudMeaIntervals.ValueChanged -= OnChunkSizeChanged;
                     try
                     {
+                        tbxObjectDesign.Text = m_DataProvider.ObjectDesignation;
+                        tbxObsCode.Text = m_DataProvider.ObservatoryCode;
+                        if (m_DataProvider.ObservationDate.HasValue)
+                            dtpDate.Value = m_DataProvider.ObservationDate.Value;
+                        nudInstDelaySec.Value = m_DataProvider.InstrumentalDelaySec;
+                        nudPixelsPerArcSec.Value = m_DataProvider.ArsSecsInPixel > 0 ? (decimal)m_DataProvider.ArsSecsInPixel : DEFAULT_ARCSEC_PER_PIXEL;
+
                         int optimalChunks = m_DataProvider.NumberOfMeasurements / 50;
                         if (optimalChunks > 6) optimalChunks = 6;
+                        if (optimalChunks < 1) optimalChunks = 1;
                         nudMeaIntervals.Value = optimalChunks;
                     }
                     finally
                     {
                         nudMeaIntervals.ValueChanged += OnChunkSizeChanged;
+                        nudPixelsPerArcSec.ValueChanged += nudPixelsPerArcSec_ValueChanged;
+                        nudInstDelaySec.ValueChanged += nudInstDelaySec_ValueChanged;
+                        dtpDate.ValueChanged += dtpDate_ValueChanged;
+                        tbxObsCode.TextChanged += tbxObsCode_TextChanged;
+                        tbxObjectDesign.TextChanged += tbxObjectDesign_TextChanged;
                     }
 
                     cbxContraintPattern.SelectedIndex = 0;
@@ -96,13 +122,20 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
         {
             if (m_DataProvider != null)
             {
+                var settings = new ReductionSettings()
+                {
+                    InstrumentalDelaySec = nudInstDelaySec.Value,
+                    Weighting = rbWeightingPosAstr.Checked ? WeightingMode.SNR : WeightingMode.None,
+                    NumberOfChunks = (int)nudMeaIntervals.Value,
+                    RemoveOutliers = cbxOutlierRemoval.Checked,
+                    ConstraintPattern = cbxContraintPattern.SelectedIndex,
+                    BestPositionUncertaintyArcSec = TangraConfig.Settings.Astrometry.AssumedPositionUncertaintyPixels * (double)nudPixelsPerArcSec.Value,
+                    FactorInPositionalUncertainty = cbxFactorInPositionalUncertainty.Checked
+                };
+
                 m_PositionExtractor.Calculate(
                     m_DataProvider,
-                    rbWeightingPosAstr.Checked ? WeightingMode.SNR : WeightingMode.None,
-                    (int)nudMeaIntervals.Value,
-                    cbxOutlierRemoval.Checked,
-                    cbxContraintPattern.SelectedIndex,
-                    TangraConfig.Settings.Astrometry.AssumedPositionUncertaintyPixels);
+                    settings);
 
                 Replot();
 
@@ -177,13 +210,60 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
             Recalculate();
         }
 
-        private void cbxSameIncline_CheckedChanged(object sender, EventArgs e)
-        {
-        }
-
         private void cbxContraintPattern_SelectedIndexChanged(object sender, EventArgs e)
         {
             Recalculate();
+        }
+
+        private void cbxFactorInPositionalUncertainty_CheckedChanged(object sender, EventArgs e)
+        {
+            Recalculate();
+        }
+
+        private void nudPixelsPerArcSec_ValueChanged(object sender, EventArgs e)
+        {
+            Recalculate();
+        }
+
+        private void nudInstDelaySec_ValueChanged(object sender, EventArgs e)
+        {
+            Recalculate();
+        }
+
+        private void dtpDate_ValueChanged(object sender, EventArgs e)
+        {
+            Recalculate();
+        }
+
+        private void tbxObsCode_TextChanged(object sender, EventArgs e)
+        {
+            Recalculate();
+        }
+
+        private void tbxObjectDesign_TextChanged(object sender, EventArgs e)
+        {
+            Recalculate();
+        }
+
+        private void nudSinglePosMea_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyValue == 13 && m_PositionExtractor != null)
+            {
+                // Calculate single position
+                double raHours, deDeg, errRACosDEArcSec, errDEArcSec;
+                m_PositionExtractor.CalculateSingleMeasurement((double)nudSinglePosMea.Value, out raHours, out deDeg, out errRACosDEArcSec, out errDEArcSec);
+
+                if (!double.IsNaN(raHours))
+                {
+                    lblRA.Text = AstroConvert.ToStringValue(raHours, "HH MM SS.TT") + " +/-" + errRACosDEArcSec.ToString("0.00") + "\"";
+                    lblDE.Text = AstroConvert.ToStringValue(deDeg, "+HH MM SS.T") + " +/-" + errDEArcSec.ToString("0.00") + "\"";
+                }
+                else
+                {
+                    lblRA.Text = "";
+                    lblDE.Text = "";
+                }
+            }
         }
     }
 }

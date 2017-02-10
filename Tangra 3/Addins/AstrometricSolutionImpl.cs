@@ -48,6 +48,7 @@ namespace Tangra.Addins
 				ResolvedCenterDEDeg = (float)astrometry.DE0Deg;
 				StdDevRAArcSec = (float)astrometry.StdDevRAArcSec;
 				StdDevDEArcSec = (float)astrometry.StdDevDEArcSec;
+                ArsSecsInPixel = astrometry.GetDistanceInArcSec(0, 0, 1, 1);
 			}
 			else
 			{
@@ -55,6 +56,7 @@ namespace Tangra.Addins
 				ResolvedCenterDEDeg = float.NaN;
 				StdDevRAArcSec = float.NaN;
 				StdDevDEArcSec = float.NaN;
+			    ArsSecsInPixel = 0;
 			}
 
 			if (state.SelectedObject != null)
@@ -282,6 +284,7 @@ namespace Tangra.Addins
         public string NativeVideoFormat { get; private set; }
         public string ObservatoryCode { get; private set; }
         public string ObjectDesignation { get; private set; }
+        public double ArsSecsInPixel { get; private set; }
 
 		public List<ITangraMatchedStar> GetAllMatchedStars()
 		{

@@ -33,6 +33,8 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                 parser.TrimWhiteSpace = true;
                 bool headerRowPassed = false;
                 bool readExport10Header = false;
+                string[] headers = null;
+                string[] dataFields = null;
                 while (!parser.EndOfData)
                 {
                     string[] fieldRow = parser.ReadFields();
@@ -45,35 +47,37 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                         else if (fieldRow[0] == "FilePath")
                         {
                             readExport10Header = true;
+                            headers = fieldRow.ToArray();
                             continue;
                         }
                         else if (readExport10Header)
                         {
-                            // FilePath, Date, InstrumentalDelay, DelayUnits, IntegratedFrames, IntegratedExposure(sec), FrameTimeType, NativeVideoFormat
-                            // "2013 WT44a8.00.aav",2014-03-15,0.16,Seconds,1,0.32,NonIntegratedFrameTime,PAL
-                            m_FilePath = fieldRow[0];
-                            DateTime date;
-                            if (DateTime.TryParseExact(fieldRow[1], "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out date))
-                                ObservationDate = date;
-                            else
-                                ObservationDate = null;
+                            var headerDict = new Dictionary<string, string>();
+                            for (int i = 0; i < headers.Length; i++)
+                            {
+                                if (fieldRow.Length > i)
+                                    headerDict[headers[i].Trim()] = fieldRow[i].Trim();
+                            }
 
-                            double.TryParse(fieldRow[2], out m_InstrumentalDelay);
-                            m_DelayUnits = fieldRow[3];
-                            int.TryParse(fieldRow[4], out m_IntegratedFrames);
-                            double.TryParse(fieldRow[5], out m_IntegratedExposureSec);
-                            m_FrameTimeType = fieldRow[6];
-                            m_NativeVideoFormat = fieldRow[7];
-                            ObservatoryCode = fieldRow.Length > 8 ? fieldRow[8] : null;
-                            ObjectDesignation = fieldRow.Length > 9 ? fieldRow[9] : null;
+                            m_FilePath = GrabString(headerDict, "FilePath");
+                            ObservationDate = ParseDateTime(headerDict, "Date", "yyyy-MM-dd");
+                            m_InstrumentalDelay = ParseDouble(headerDict, "InstrumentalDelay");
+                            m_DelayUnits = GrabString(headerDict, "DelayUnits");
+                            m_IntegratedFrames = ParseInt(headerDict, "IntegratedFrames");
+                            m_IntegratedExposureSec = ParseDouble(headerDict, "IntegratedExposure(sec)");
+                            m_FrameTimeType = GrabString(headerDict, "FrameTimeType");
+                            m_NativeVideoFormat = GrabString(headerDict, "NativeVideoFormat");
+                            ObservatoryCode = GrabString(headerDict, "ObservatoryCode");
+                            ObjectDesignation = GrabString(headerDict, "Object");
 
-                            ArsSecsInPixel = 0;
-                            if (fieldRow.Length > 10)
+                            if (headerDict.ContainsKey("ArsSecsInPixel"))
                             {
                                 double arcSecInPix;
-                                if (double.TryParse(fieldRow[10], out arcSecInPix))
+                                if (double.TryParse(headerDict["ArsSecsInPixel"], out arcSecInPix))
                                     ArsSecsInPixel = arcSecInPix;
                             }
+                            else
+                                ArsSecsInPixel = 0;
 
                             IsTangraAstrometryExport = true;
                             readExport10Header = false;
@@ -82,6 +86,7 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                         else if (fieldRow[0] == "FrameNo")
                         {
                             headerRowPassed = true;
+                            dataFields = fieldRow.ToArray();
                             continue;
                         }
                     }
@@ -90,17 +95,24 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
 
                     try
                     {
-                        entry.FrameNo = int.Parse(fieldRow[0]);
-                        if (!string.IsNullOrWhiteSpace(fieldRow[1])) entry.TimeOfDayUTC = double.Parse(fieldRow[1]);
-                        entry.RawTimeStamp = fieldRow[2];
-                        if (!string.IsNullOrWhiteSpace(fieldRow[3])) entry.RADeg = double.Parse(fieldRow[3]);
-                        if (!string.IsNullOrWhiteSpace(fieldRow[4])) entry.DEDeg = double.Parse(fieldRow[4]);
-                        if (!string.IsNullOrWhiteSpace(fieldRow[5])) entry.Mag = double.Parse(fieldRow[5]);
-                        if (!string.IsNullOrWhiteSpace(fieldRow[6])) entry.SolutionUncertaintyRACosDEArcSec = double.Parse(fieldRow[6]);
-                        if (!string.IsNullOrWhiteSpace(fieldRow[7])) entry.SolutionUncertaintyDEArcSec = double.Parse(fieldRow[7]);
-                        if (!string.IsNullOrWhiteSpace(fieldRow[8])) entry.FWHMArcSec = double.Parse(fieldRow[8]);
-                        if (!string.IsNullOrWhiteSpace(fieldRow[9])) entry.DetectionCertainty = double.Parse(fieldRow[9]);
-                        if (!string.IsNullOrWhiteSpace(fieldRow[10])) entry.SNR = double.Parse(fieldRow[10]);
+                        var dataDict = new Dictionary<string, string>();
+                        for (int i = 0; i < dataFields.Length; i++)
+                        {
+                            if (fieldRow.Length > i)
+                                dataDict[dataFields[i].Trim()] = fieldRow[i].Trim();
+                        }
+
+                        entry.FrameNo = ParseInt(dataDict, "FrameNo");
+                        entry.TimeOfDayUTC = ParseDouble(dataDict, "TimeUTC(Uncorrected)");
+                        entry.RawTimeStamp = GrabString(dataDict, "Timestamp");
+                        entry.RADeg = ParseDouble(dataDict, "RADeg");
+                        entry.DEDeg = ParseDouble(dataDict, "DEDeg");
+                        entry.Mag = ParseDouble(dataDict, "Mag");
+                        entry.SolutionUncertaintyRACosDEArcSec = ParseDouble(dataDict, "SolutionUncertaintyRA*Cos(DE)[arcsec]");
+                        entry.SolutionUncertaintyDEArcSec = ParseDouble(dataDict, "SolutionUncertaintyDE[arcsec]");
+                        entry.FWHMArcSec = ParseDouble(dataDict, "FWHM[arcsec]");
+                        entry.DetectionCertainty = ParseDouble(dataDict, "DetectionCertainty");
+                        entry.SNR = ParseDouble(dataDict, "SNR");
 
                         m_Measurements.Add(entry);
                     }
@@ -110,6 +122,47 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                     }
                 }
             }
+        }
+
+        private static double ParseDouble(Dictionary<string, string> dict, string key, double defaultVal = 0)
+        {
+            if (dict.ContainsKey(key))
+            {
+                double dblVal;
+                if (double.TryParse(dict[key], out dblVal))
+                    return dblVal;
+            }
+
+            return defaultVal;
+        }
+
+        private static int ParseInt(Dictionary<string, string> dict, string key, int defaultVal = 0)
+        {
+            if (dict.ContainsKey(key))
+            {
+                int intVal;
+                if (int.TryParse(dict[key], out intVal))
+                    return intVal;
+            }
+
+            return defaultVal;
+        }
+
+        private static string GrabString(Dictionary<string, string> dict, string key, string defaultVal = null)
+        {
+            return dict.ContainsKey(key) ? dict[key] : defaultVal;
+        }
+
+        private static DateTime? ParseDateTime(Dictionary<string, string> dict, string key, string format)
+        {
+            if (dict.ContainsKey(key))
+            {
+                DateTime date;
+                if (DateTime.TryParseExact(dict[key], format, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out date))
+                    return date;
+            }
+
+            return null;
         }
 
         public IEnumerable<MeasurementPositionEntry> Measurements
@@ -132,13 +185,13 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
         {
             get
             {
-                if (m_DelayUnits == "seconds")
+                if ("seconds".Equals(m_DelayUnits, StringComparison.InvariantCultureIgnoreCase))
                     return (decimal) m_InstrumentalDelay;
-                else if (m_DelayUnits == "frames")
+                else if ("frames".Equals(m_DelayUnits, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    if (m_NativeVideoFormat == "PAL")
+                    if ("PAL".Equals(m_NativeVideoFormat, StringComparison.InvariantCultureIgnoreCase))
                         return (decimal)(0.04 * m_InstrumentalDelay);
-                    else if (m_NativeVideoFormat == "NTSC")
+                    else if ("NTSC".Equals(m_NativeVideoFormat, StringComparison.InvariantCultureIgnoreCase))
                         return (decimal)(0.0333667 * m_InstrumentalDelay);
                 }
                 

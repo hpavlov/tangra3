@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using Tangra.Model.Config;
 
 namespace Tangra.MotionFitting
 {
@@ -15,5 +16,16 @@ namespace Tangra.MotionFitting
         DateTime? ObservationDate { get; }
         decimal InstrumentalDelaySec { get; }
         double ArsSecsInPixel { get; }
+    }
+
+    public class ReductionSettings
+    {
+        public decimal InstrumentalDelaySec;
+        public WeightingMode Weighting;
+        public bool RemoveOutliers;
+        public int NumberOfChunks;
+        public int ConstraintPattern;
+        public double BestPositionUncertaintyArcSec;
+        public bool FactorInPositionalUncertainty;
     }
 }
