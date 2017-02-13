@@ -223,6 +223,7 @@ namespace Tangra.MotionFitting
 
             var repX = new List<double>();
             var repY = new List<double>();
+            double? motionRate = null;
 
             Pen constraintPen = new Pen(Color.FromArgb(100, pen.Color));
             var allFrameNos = m_AllEntries.Select(x => x.FrameNo).ToList();
@@ -284,6 +285,10 @@ namespace Tangra.MotionFitting
 
                     repX.Add(midX);
                     repY.Add(fittedY);
+
+                    var rate = Math.Abs((endYCalc - startYCalc.Value) * 3600.0 / ((endX - startX.Value) * SECONDS_IN_A_DAY));
+                    if (!motionRate.HasValue || motionRate.Value < rate)
+                        motionRate = rate;
                 }
             }
 
@@ -295,16 +300,30 @@ namespace Tangra.MotionFitting
                 : string.Format("Included points: {0}", m_AllEntries.Count);
 
             var szf = g.MeasureString(statsText, s_LegendFont);
+            string rateText = null;
+            SizeF rszf = SizeF.Empty;
+            if (motionRate.HasValue)
+            {
+                rateText = string.Format("Rate({0}): {1:0.00}\"/sec", motionName, motionRate.Value);
+                rszf = g.MeasureString(rateText, s_LegendFont);
+            }
+
             bool topLeft = aveIncl > 0;
             if (topLeft)
             {
                 g.FillRectangle(SystemBrushes.ControlDarkDark, PADDING_L + BORDER, PADDING_R + BORDER, szf.Width, szf.Height);
                 g.DrawString(statsText, s_LegendFont, Brushes.Azure, PADDING_L + BORDER, PADDING_R + BORDER);
+
+                g.FillRectangle(SystemBrushes.ControlDarkDark, fullWidth - PADDING_R - BORDER - rszf.Width, fullHeight - PADDING_L - BORDER - rszf.Height - 2, rszf.Width, rszf.Height);
+                g.DrawString(rateText, s_LegendFont, Brushes.Azure, fullWidth - PADDING_R - BORDER - rszf.Width, fullHeight - PADDING_L - BORDER - rszf.Height - 2);
             }
             else
             {
                 g.FillRectangle(SystemBrushes.ControlDarkDark, fullWidth - PADDING_R - BORDER - szf.Width, PADDING_R + BORDER, szf.Width, szf.Height);
                 g.DrawString(statsText, s_LegendFont, Brushes.Azure, fullWidth - PADDING_R - BORDER - szf.Width, PADDING_R + BORDER);
+
+                g.FillRectangle(SystemBrushes.ControlDarkDark, PADDING_L + BORDER, fullHeight - PADDING_L - BORDER - rszf.Height - 2, rszf.Width, rszf.Height);
+                g.DrawString(rateText, s_LegendFont, Brushes.Azure, PADDING_L + BORDER, fullHeight - PADDING_L - BORDER - rszf.Height - 2);
             }
 
             // Calculate the StdDev of linear motion from all reported points and draw it on the plot
@@ -321,6 +340,7 @@ namespace Tangra.MotionFitting
                 double stdDevArcSec = repReg.StdDev * 3600.0;
                 string text = string.Format("StdDev from {0} measurements: {1:0.00} arcsec", repX.Count, stdDevArcSec);
                 szf = g.MeasureString(text, s_LegendFont);
+
                 if (topLeft)
                 {
                     g.FillRectangle(SystemBrushes.ControlDarkDark, PADDING_L + BORDER, PADDING_R + BORDER + szf.Height + 2, szf.Width, szf.Height);
@@ -515,9 +535,10 @@ namespace Tangra.MotionFitting
             {
                 // Positional uncertainty estimation by Neuschaefer and Windhorst 1994
                 var sigmaPosition = entry.FWHMArcSec / (2.355 * entry.SNR);
-                var combinedUncertainty = Math.Sqrt(sigmaPosition * sigmaPosition + solutionUncertaintyArcSec * solutionUncertaintyArcSec);
-                if (combinedUncertainty < minUncertainty) combinedUncertainty = minUncertainty;
-                return 1 / (combinedUncertainty * combinedUncertainty);
+                return 1/(sigmaPosition * sigmaPosition + solutionUncertaintyArcSec * solutionUncertaintyArcSec);
+                //var combinedUncertainty = Math.Sqrt(sigmaPosition * sigmaPosition + solutionUncertaintyArcSec * solutionUncertaintyArcSec);
+                //if (combinedUncertainty < minUncertainty) combinedUncertainty = minUncertainty;
+                //return 1 / (combinedUncertainty * combinedUncertainty);
             }
             else if (weighting == WeightingMode.Detection)
             {
