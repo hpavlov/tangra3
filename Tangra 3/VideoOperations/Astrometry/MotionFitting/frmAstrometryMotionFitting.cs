@@ -91,7 +91,7 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                     {
                         tbxObjectDesign.Text = m_DataProvider.ObjectDesignation;
                         tbxObsCode.Text = m_DataProvider.ObservatoryCode;
-                        if (m_DataProvider.ObservationDate.HasValue)
+                        if (m_DataProvider.ObservationDate.HasValue && m_DataProvider.ObservationDate.Value != DateTime.MinValue)
                             dtpDate.Value = m_DataProvider.ObservationDate.Value;
                         nudInstDelaySec.Value = m_DataProvider.InstrumentalDelaySec;
                         nudPixelsPerArcSec.Value = m_DataProvider.ArsSecsInPixel > 0 ? (decimal)m_DataProvider.ArsSecsInPixel : DEFAULT_ARCSEC_PER_PIXEL;
