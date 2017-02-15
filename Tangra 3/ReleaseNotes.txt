@@ -2,6 +2,7 @@
 ---------------------
 vX.X.X (Unreleased)
 - Now the light curve and astrometry reductions will ensure the video is positioned at a non-duplicated frame before starting.
+- Fixed a crash when viewing ADV/AAV version 2 files bigger than 2Gb. Upgraded AdvLib to version 2.0g.
 
 v3.6.3 (2017-01-23)
 -------------------
