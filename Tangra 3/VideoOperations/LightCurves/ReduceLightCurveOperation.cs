@@ -154,6 +154,9 @@ namespace Tangra.VideoOperations.LightCurves
             m_VideoController = (VideoController)videoContoller;
 	        m_ControlPanelHolder = controlPanel;
 
+            if (!m_VideoController.EnsureNotADuplicatedFrame())
+                return false;
+
 			var configForm = new frmSelectReductionType(m_VideoController, framePlayer);
             if (configForm.ShowDialog(topForm) == DialogResult.OK)
             {

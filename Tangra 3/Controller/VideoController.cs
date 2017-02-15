@@ -2931,5 +2931,27 @@ namespace Tangra.Controller
         {
             get { return TangraContext.Current.FileName; }
         }
+
+	    public bool EnsureNotADuplicatedFrame()
+	    {
+            var dupFrameChecker = new DuplicateFrameAvoider(this, CurrentFrameIndex);
+            if (dupFrameChecker.IsDuplicatedFrame())
+            {
+                int nextFollowingGoodFrameId = dupFrameChecker.GetFirstGoodFrameId();
+
+                if (ShowMessageBox(
+                    string.Format("The current frame appears to be a duplicate. Press 'OK' for Tangra to move to the next good frame (Frame: {0})", nextFollowingGoodFrameId),
+                    "Tangra",
+                    MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.OK)
+                {
+                    MoveToFrame(nextFollowingGoodFrameId);
+                    return true;
+                }
+                else
+                    return false;
+            }
+
+	        return true;
+	    }
     }
 }

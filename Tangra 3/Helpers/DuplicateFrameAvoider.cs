@@ -115,7 +115,7 @@ namespace Tangra.Helpers
 					thisFrame = prevFrame;
 					probedFrame--;
 				}
-				while (thisFrame != null && prevFrame != null);
+                while (thisFrame != null && prevFrame != null && probedFrame > m_VideoController.VideoFirstFrame);
 
 			}
 			finally

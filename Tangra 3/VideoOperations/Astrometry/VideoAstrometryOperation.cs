@@ -133,9 +133,12 @@ namespace Tangra.VideoOperations.Astrometry
 
 		public bool InitializeOperation(IVideoController videoController, Panel controlPanel, IFramePlayer framePlayer, Form topForm)
 		{
-			m_VideoController = videoController as VideoController; // Hack
+			m_VideoController = (VideoController)videoController;
 			
 			m_ControlPanelHolder = controlPanel;
+
+            if (!m_VideoController.EnsureNotADuplicatedFrame())
+                return false;
 
 			m_AstrometricState.Measurements.Clear();
 			m_AstrometricState.MeasuringState = AstrometryInFramesState.AttemptingInitialFit;
