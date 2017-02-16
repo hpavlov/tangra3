@@ -179,7 +179,7 @@ namespace Tangra.Model.Config
                 m_Uncertaity_81_90 = "";
 	    }
 
-        public void SetPosition(double raHours, double deDeg, DateTime utcTime, bool isVideoNormalPosition)
+        public void SetPosition(double raHours, double deDeg, DateTime utcTime, bool isVideoNormalPosition, bool highPrecision = false)
         {
             double roundedTime = (utcTime.Hour + utcTime.Minute / 60.0 + (utcTime.Second + (utcTime.Millisecond / 1000.0))/ 3600.0) / 24;
             string format = "00.000000";
@@ -197,8 +197,16 @@ namespace Tangra.Model.Config
 
             m_TimeString_16_32 = (utcTime.ToString("yyyy MM ") + (utcTime.Day + roundedTime).ToString(format, CultureInfo.InvariantCulture)).PadRight(17).Substring(0, 17);
 
-            m_RAString_33_44 = AstroConvert.ToStringValue(raHours, "HH MM SS.TT").PadRight(12).Substring(0, 12);
-            m_DEString_45_56 = AstroConvert.ToStringValue(deDeg, "+HH MM SS.T").PadRight(12).Substring(0, 12);
+            if (highPrecision)
+            {
+                m_RAString_33_44 = AstroConvert.ToStringValue(raHours, "HH MM SS.TTT").PadRight(13).Substring(0, 13);
+                m_DEString_45_56 = AstroConvert.ToStringValue(deDeg, "+HH MM SS.TT").PadRight(13).Substring(0, 13);
+            }
+            else
+            {
+                m_RAString_33_44 = AstroConvert.ToStringValue(raHours, "HH MM SS.TT").PadRight(12).Substring(0, 12);
+                m_DEString_45_56 = AstroConvert.ToStringValue(deDeg, "+HH MM SS.T").PadRight(12).Substring(0, 12);                
+            }
 
             SetVideoNormalPosition(isVideoNormalPosition);
 		}

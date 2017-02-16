@@ -1806,6 +1806,8 @@ namespace Tangra.Model.Config
 
             public bool ExportUncertainties { get; set; }
 
+            public bool ExportHigherPositionAccuracy { get; set; }
+
             public WeightingMode MotionFitWeightingMode { get; set; }
 
             public bool SaveDebugOutput;

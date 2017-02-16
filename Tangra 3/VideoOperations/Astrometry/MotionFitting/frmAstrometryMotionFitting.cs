@@ -122,15 +122,20 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
         {
             if (m_DataProvider != null)
             {
+                WeightingMode mode = WeightingMode.None;
+                if (rbWeightingPosAstr.Checked) mode = WeightingMode.SNR;
+                else if (rbWeightingAstr.Checked) mode = WeightingMode.SolutionUncertainty;
+
                 var settings = new ReductionSettings()
                 {
                     InstrumentalDelaySec = nudInstDelaySec.Value,
-                    Weighting = rbWeightingPosAstr.Checked ? WeightingMode.SNR : WeightingMode.None,
+                    Weighting = mode,
                     NumberOfChunks = (int)nudMeaIntervals.Value,
                     RemoveOutliers = cbxOutlierRemoval.Checked,
                     ConstraintPattern = cbxContraintPattern.SelectedIndex,
                     BestPositionUncertaintyArcSec = TangraConfig.Settings.Astrometry.AssumedPositionUncertaintyPixels * (double)nudPixelsPerArcSec.Value,
-                    FactorInPositionalUncertainty = cbxFactorInPositionalUncertainty.Checked
+                    FactorInPositionalUncertainty = cbxFactorInPositionalUncertainty.Checked,
+                    OutliersSigmaThreashold = (double)nudSigmaExclusion.Value
                 };
 
                 m_PositionExtractor.Calculate(
@@ -207,6 +212,12 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
 
         private void cbxOutlierRemoval_CheckedChanged(object sender, EventArgs e)
         {
+            nudSigmaExclusion.Enabled = cbxOutlierRemoval.Checked;
+            Recalculate();
+        }
+
+        private void nudSigmaExclusion_ValueChanged(object sender, EventArgs e)
+        {
             Recalculate();
         }
 
@@ -265,5 +276,6 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                 }
             }
         }
+
     }
 }

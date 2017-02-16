@@ -38,6 +38,7 @@ namespace Tangra.Config.SettingPannels
 			nudTargetVRColour.SetNUDValue((decimal)TangraConfig.Settings.Astrometry.AssumedTargetVRColour);
             cbxDebugOutput.Checked = TangraConfig.Settings.Astrometry.SaveDebugOutput;
             cbxExportUncertainties.Checked = TangraConfig.Settings.Astrometry.ExportUncertainties;
+            cbxExportHigherPositionAccuracy.Checked = TangraConfig.Settings.Astrometry.ExportHigherPositionAccuracy;
 		}
 
 		public override void SaveSettings()
@@ -62,6 +63,7 @@ namespace Tangra.Config.SettingPannels
             TangraConfig.Settings.Astrometry.SaveDebugOutput = cbxDebugOutput.Checked;
 
             TangraConfig.Settings.Astrometry.ExportUncertainties = cbxExportUncertainties.Checked;
+            TangraConfig.Settings.Astrometry.ExportHigherPositionAccuracy = cbxExportHigherPositionAccuracy.Checked;
 		}
 	}
 }

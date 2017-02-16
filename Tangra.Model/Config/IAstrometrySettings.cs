@@ -22,7 +22,8 @@ namespace Tangra.Model.Config
     {
         None,
         SNR,
-        Detection
+        Detection,
+        SolutionUncertainty,
     }
 
 	public interface IAstrometrySettings

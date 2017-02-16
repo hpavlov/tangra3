@@ -576,22 +576,34 @@ namespace Tangra.MotionFitting
             }
         }
 
-        private double ComputePositionWeight(double solutionUncertaintyArcSec, SingleMultiFrameMeasurement measurement, double minUncertainty, WeightingMode mode)
+        public static double ComputeWeight(WeightingMode mode, double solutionUncertaintyArcSec, double fwhmArcSec, double snr, double detection, double minUncertainty)
         {
             if (mode == WeightingMode.SNR)
-            { 
+            {
                 // Positional uncertainty estimation by Neuschaefer and Windhorst 1994
-                var sigmaPosition = measurement.FWHMArcSec / (2.355 * measurement.SNR);
+                var sigmaPosition = fwhmArcSec / (2.355 * snr);
                 var combinedUncertainty = Math.Sqrt(sigmaPosition * sigmaPosition + solutionUncertaintyArcSec * solutionUncertaintyArcSec);
                 if (combinedUncertainty < minUncertainty) combinedUncertainty = minUncertainty;
                 return 1 / (combinedUncertainty * combinedUncertainty);
             }
+            else if (mode == WeightingMode.SolutionUncertainty)
+            {
+                if (solutionUncertaintyArcSec < minUncertainty)
+                    return 1 / (minUncertainty * minUncertainty);
+                else 
+                    return 1 / (solutionUncertaintyArcSec * solutionUncertaintyArcSec);
+            }
             else if (mode == WeightingMode.Detection)
             {
-                return measurement.Detection / (solutionUncertaintyArcSec * solutionUncertaintyArcSec);
+                return detection / (solutionUncertaintyArcSec * solutionUncertaintyArcSec);
             }
 
-            return 1;
+            return 1;            
+        }
+
+        private double ComputePositionWeight(double solutionUncertaintyArcSec, SingleMultiFrameMeasurement measurement, double minUncertainty, WeightingMode mode)
+        {
+            return FlyByMotionFitter.ComputeWeight(mode, solutionUncertaintyArcSec, measurement.FWHMArcSec, measurement.SNR, measurement.Detection, minUncertainty);
         }
 
         private void WeightedMedian(Tuple<List<double>, List<double>> data, out double median, out double medianWeight)

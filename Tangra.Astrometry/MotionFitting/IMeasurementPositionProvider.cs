@@ -23,6 +23,7 @@ namespace Tangra.MotionFitting
         public decimal InstrumentalDelaySec;
         public WeightingMode Weighting;
         public bool RemoveOutliers;
+        public double OutliersSigmaThreashold;
         public int NumberOfChunks;
         public int ConstraintPattern;
         public double BestPositionUncertaintyArcSec;

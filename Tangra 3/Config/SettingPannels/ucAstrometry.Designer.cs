@@ -69,6 +69,7 @@
             this.cbxDebugOutput = new System.Windows.Forms.CheckBox();
             this.cbxExportUncertainties = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.cbxExportHigherPositionAccuracy = new System.Windows.Forms.CheckBox();
             this.groupBox8.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudAstrMaximumStars)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudAstrMinimumStars)).BeginInit();
@@ -675,13 +676,14 @@
             this.cbxExportUncertainties.AutoSize = true;
             this.cbxExportUncertainties.Location = new System.Drawing.Point(16, 91);
             this.cbxExportUncertainties.Name = "cbxExportUncertainties";
-            this.cbxExportUncertainties.Size = new System.Drawing.Size(188, 17);
+            this.cbxExportUncertainties.Size = new System.Drawing.Size(119, 17);
             this.cbxExportUncertainties.TabIndex = 50;
-            this.cbxExportUncertainties.Text = "Export in custom Astrometry format";
+            this.cbxExportUncertainties.Text = "Export uncertainties";
             this.cbxExportUncertainties.UseVisualStyleBackColor = true;
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.cbxExportHigherPositionAccuracy);
             this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this.cbxExportUncertainties);
             this.groupBox1.Controls.Add(this.nudAstrAssumedUncertainty);
@@ -693,6 +695,16 @@
             this.groupBox1.TabIndex = 51;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Advanced";
+            // 
+            // cbxExportHigherPositionAccuracy
+            // 
+            this.cbxExportHigherPositionAccuracy.AutoSize = true;
+            this.cbxExportHigherPositionAccuracy.Location = new System.Drawing.Point(16, 114);
+            this.cbxExportHigherPositionAccuracy.Name = "cbxExportHigherPositionAccuracy";
+            this.cbxExportHigherPositionAccuracy.Size = new System.Drawing.Size(170, 17);
+            this.cbxExportHigherPositionAccuracy.TabIndex = 51;
+            this.cbxExportHigherPositionAccuracy.Text = "Export high accuracy positions";
+            this.cbxExportHigherPositionAccuracy.UseVisualStyleBackColor = true;
             // 
             // ucAstrometry
             // 
@@ -771,5 +783,6 @@
         private System.Windows.Forms.NumericUpDown nudAstrAssumedUncertainty;
         private System.Windows.Forms.CheckBox cbxExportUncertainties;
         private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.CheckBox cbxExportHigherPositionAccuracy;
 	}
 }

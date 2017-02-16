@@ -265,10 +265,32 @@ namespace Tangra.Model.Helpers
             else
                 dd = dd * sign;
 
-            if (format.IndexOf("TT") > -1 ||
+            if (format.IndexOf("TTTT") > -1 ||
+                format.IndexOf("TTT") > -1 || 
+                format.IndexOf("TT") > -1 ||
                 format.IndexOf("T") > -1)
             {
-                if (format.IndexOf("TT") > -1)
+                if (format.IndexOf("TTTT") > -1)
+                {
+                    int ttttdr = int.Parse((td * 10000).ToString("0000"));
+                    if (ttttdr == 10000)
+                    {
+                        ttttdr = 0;
+                        ss += 1;
+                    }
+                    format = format.Replace("TTTT", ttttdr.ToString("0000"));
+                }
+                else if (format.IndexOf("TTT") > -1)
+                {
+                    int tttdr = int.Parse((td * 1000).ToString("000"));
+                    if (tttdr == 1000)
+                    {
+                        tttdr = 0;
+                        ss += 1;
+                    }
+                    format = format.Replace("TTT", tttdr.ToString("000"));
+                }
+                else if (format.IndexOf("TT") > -1)
                 {
                     int ttdr = int.Parse((td * 100).ToString("00"));
                     if (ttdr == 100)
