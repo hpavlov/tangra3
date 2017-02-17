@@ -25,8 +25,10 @@ using Tangra.Model.Image;
 using Tangra.Model.Numerical;
 using Tangra.Model.VideoOperations;
 using Tangra.MotionFitting;
+using Tangra.SDK;
 using Tangra.StarCatalogues;
 using Tangra.VideoOperations.Astrometry.Engine;
+using Tangra.VideoOperations.Astrometry.MotionFitting;
 using Tangra.VideoOperations.Astrometry.MPCReport;
 using Tangra.VideoOperations.LightCurves;
 
@@ -246,10 +248,19 @@ namespace Tangra.VideoOperations.Astrometry
 			pnlSwitchControl.Visible = true;
 		}
 
-		internal void FrameMeasurementFinished()
+		internal void FrameMeasurementFinished(VideoAstrometryOperation operation)
 		{
 			pnlSwitchControl.Visible = true;
 			ShowMeasurementsView();
+
+		    if (m_MeasurementContext.MovementExpectation != MovementExpectation.Slow)
+		    {
+                var exportFile = AstrometryExporter.ExportAstrometry(operation.GetCurrentFrameAstrometricSolution() as ITangraAstrometricSolution2, m_VideoController);
+
+                var frm = new frmAstrometryMotionFitting(exportFile);
+                m_VideoController.ShowForm(frm);
+                frm.CalcFirstFile();		        
+		    }
 		}
 
 		private void InitNewMultiframeMeasurement()
@@ -871,6 +882,8 @@ namespace Tangra.VideoOperations.Astrometry
 
 		private void pnlRAChart_MouseClick(object sender, MouseEventArgs e)
 		{
+		    if (m_MeasurementContext.MovementExpectation != MovementExpectation.Slow) return;
+
 			float yScale = (pnlRASeries.Height - 10) / (float)(m_MaxRA - m_MinRA);
 			m_UserRAMid = m_MinRA + (e.Y - 5) / yScale;
 
@@ -897,6 +910,8 @@ namespace Tangra.VideoOperations.Astrometry
 
 		private void pnlDEChart_MouseClick(object sender, MouseEventArgs e)
 		{
+            if (m_MeasurementContext.MovementExpectation != MovementExpectation.Slow) return;
+
 			float yScale = (pnlDESeries.Height - 10) / (float)(m_MaxDE - m_MinDE);
 			m_UserDEMid = m_MinDE + (e.Y - 5) / yScale;
 

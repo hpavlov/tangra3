@@ -153,7 +153,7 @@
             this.pnlDESeries.Size = new System.Drawing.Size(247, 90);
             this.pnlDESeries.TabIndex = 22;
             this.pnlDESeries.TabStop = false;
-            this.pnlDESeries.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pnlDEChart_MouseClick);
+            this.pnlDESeries.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.pnlDEChart_MouseClick);
             // 
             // lblMeaMag
             // 

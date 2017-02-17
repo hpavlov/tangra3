@@ -43,6 +43,18 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
             dtpDate.Value = DateTime.Today;
         }
 
+        internal protected frmAstrometryMotionFitting(string fileName)
+            : this()
+        {
+            lbAvailableFiles.Items.Add(new AvailableFileEntry(fileName));
+        }
+
+        internal protected void CalcFirstFile()
+        {
+            if (lbAvailableFiles.Items.Count > 0)
+                lbAvailableFiles.SelectedIndex = 0;
+        }
+
         private void tsbtnOpenFile_Click(object sender, EventArgs e)
         {
             if (openFileDialog1.ShowDialog(this) == DialogResult.OK)

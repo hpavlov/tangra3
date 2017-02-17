@@ -79,7 +79,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AstrometryExportAddin.cs" />
     <Compile Include="frmConfigureAddin.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -421,7 +421,7 @@ namespace Tangra.VideoOperations.Astrometry
 
 			m_VideoController.StopVideo();
 
-			m_ViewControl.FrameMeasurementFinished();
+			m_ViewControl.FrameMeasurementFinished(this);
 
 			foreach (ITangraAddin addin in m_AstrometryAddins)
 				addin.OnEventNotification(AddinFiredEventType.EndMultiFrameAstrometry);
@@ -715,7 +715,7 @@ namespace Tangra.VideoOperations.Astrometry
 
 			if (isLastMeasurement)
 			{
-				m_ViewControl.FrameMeasurementFinished();
+                m_ViewControl.FrameMeasurementFinished(this);
 				m_AstrometricState.MeasuringState = AstrometryInFramesState.Ready;
 				foreach (ITangraAddin addin in m_AstrometryAddins)
 					addin.OnEventNotification(AddinFiredEventType.EndMultiFrameAstrometry);

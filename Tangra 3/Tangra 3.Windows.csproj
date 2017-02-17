@@ -364,6 +364,7 @@
       <DependentUpon>frmIdentifiedStarAction.cs</DependentUpon>
     </Compile>
     <Compile Include="ImageTools\RoiSelector.cs" />
+    <Compile Include="VideoOperations\Astrometry\MotionFitting\AstrometryExporter.cs" />
     <Compile Include="VideoOperations\Astrometry\MotionFitting\frmAstrometryMotionFitting.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -1398,7 +1399,9 @@
     <EmbeddedResource Include="VideoOperations\Spectroscopy\AbsFluxCalibration\Standards\CalSpec.db" />
     <EmbeddedResource Include="VideoOperations\Spectroscopy\FilterResponses\FilterResponseDb.dat" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Addins\System\" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="img\aboutbox4.bmp" />
     <None Include="img\lc_logo.bmp" />
