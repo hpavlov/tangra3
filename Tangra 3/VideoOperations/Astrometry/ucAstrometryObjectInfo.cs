@@ -295,6 +295,17 @@ namespace Tangra.VideoOperations.Astrometry
 			lblAstRA.Text = string.Empty;
 			lblAstDE.Text = string.Empty;
             lblAstUncertainty.Text = string.Empty;
+
+		    if (m_MeasurementContext.MovementExpectation == MovementExpectation.Slow)
+		    {
+                pnlDESeries.Cursor = Cursors.Hand;
+                pnlRASeries.Cursor = Cursors.Hand;
+		    }
+		    else
+		    {
+                pnlDESeries.Cursor = Cursors.Arrow;
+                pnlRASeries.Cursor = Cursors.Arrow;		        
+		    }
 		}
 
 		internal void PresentSelectedObject(SelectedObject objInfo)
@@ -736,9 +747,11 @@ namespace Tangra.VideoOperations.Astrometry
 						UserMidFrame = m_UserFrame,
 						MaxStdDev = m_MeasurementContext.MaxStdDev / 3600.0,
                         FirstVideoFrame = m_VideoController.VideoFirstFrame,
-						MinFrameNo = minFrame,
-						MaxFrameNo = maxFrame
-					};
+                        ArsSecsInPixel = m_AstrometryController.GetCurrentAstroPlate().GetDistanceInArcSec(0, 0, 1, 1),
+                        MinPositionUncertaintyPixels = TangraConfig.Settings.Astrometry.AssumedPositionUncertaintyPixels,
+                        MinFrameNo = minFrame,
+                        MaxFrameNo = maxFrame
+                    };
 
 				    var plottingContext = new FlybyPlottingContext()
 				    {
@@ -938,92 +951,70 @@ namespace Tangra.VideoOperations.Astrometry
 
 		private void CheckAndSetTimeAndMPCAdd()
 		{
-			if (!double.IsNaN(m_MPCDE) && !double.IsNaN(m_MPCRAHours))
-			{
-			    int precision = 1000000;
-			    string format = "00.000000";
-				// TODO: Different ways of getting the time based on the different expected motion type?
+		    switch (m_MeasurementContext.MovementExpectation)
+		    {
+		        case MovementExpectation.Slow:
+                    if (!double.IsNaN(m_MPCDE) && !double.IsNaN(m_MPCRAHours))
+                    {
+                        int precision = 1000000;
+                        string format = "00.000000";
 
-			    DisplayMeaMag();
+                        DisplayMeaMag();
 
-				switch (m_MeasurementContext.MovementExpectation)
-				{
-					case MovementExpectation.Slow:
-						{
-							int earliestFrame = Math.Min(m_EarliestRAFrame, m_EarliestDEFrame);
-							int latestFrame = Math.Max(m_LatestRAFrame, m_LatestDEFrame);
-							m_MPCTime =
-								m_MeasurementContext.FirstFrameUtcTime.AddSeconds(
-									((earliestFrame + latestFrame)/2 - m_MeasurementContext.FirstFrameId)/m_MeasurementContext.FrameRate);
+                        int earliestFrame = Math.Min(m_EarliestRAFrame, m_EarliestDEFrame);
+                        int latestFrame = Math.Max(m_LatestRAFrame, m_LatestDEFrame);
+                        m_MPCTime =
+                            m_MeasurementContext.FirstFrameUtcTime.AddSeconds(
+                                ((earliestFrame + latestFrame) / 2 - m_MeasurementContext.FirstFrameId) / m_MeasurementContext.FrameRate);
 
-							m_MPCTimePrecission = TimeSpan.FromSeconds((latestFrame - earliestFrame)/m_MeasurementContext.FrameRate);
-						    precision = 100000;
-                            format = "00.00000";
-						}
-						break;
+                        m_MPCTimePrecission = TimeSpan.FromSeconds((latestFrame - earliestFrame) / m_MeasurementContext.FrameRate);
+                        precision = 100000;
+                        format = "00.00000";
 
-					case MovementExpectation.SlowFlyby:
-						{
-							// Don't forget to add the video normal position flag in the OBS file
-							// Expect elongated images and apply instrumental delay corrections
+                        bool isNormalTime = m_MPCTimePrecission == TimeSpan.MinValue;
+                        decimal roundedError = isNormalTime ? 0 : (decimal)m_MPCTimePrecission.TotalDays;
+                        double roundedTime = (m_MPCTime.Hour + m_MPCTime.Minute / 60.0 + (m_MPCTime.Second + (m_MPCTime.Millisecond / 1000.0)) / 3600.0) / 24;
 
-							lblRate.Visible = true;
-							lblRateVal.Visible = true;
-							lblRateVal.Text = string.Format("{0:F2}\"/s", m_MotionRate);
+                        m_FolderName = m_MPCTime.ToString("yyyy-MM-") + (m_MPCTime.Day + roundedTime).ToString();
 
-                            precision = 1000000;
-                            format = "00.000000";
-						}
-						break;
+                        int power = 1;
+                        if (!isNormalTime)
+                        {
+                            while (roundedError < 1 && roundedError != 0)
+                            {
+                                roundedError = roundedError * 10;
+                                power *= 10;
+                            }
 
-					case MovementExpectation.FastFlyby:
-						{
-							// Don't forget to add the video normal position flag in the OBS file
-							// Expect elongated images and apply instrumental delay corrections
+                            if (power != 0)
+                                roundedError = Math.Truncate(Math.Round(roundedError)) / power;
+                        }
 
-							lblRate.Visible = true;
-							lblRateVal.Visible = true;
-							lblRateVal.Text = string.Format("{0:F2}\"/s", m_MotionRate);
+                        if (precision != 0)
+                            roundedTime = Math.Truncate(Math.Round(roundedTime * precision)) / precision;
 
-                            precision = 1000000;
-                            format = "00.000000";
-						}
-						break;
+                        lblTimeValue.Text = string.Format("{0} {1} {2}", m_MPCTime.ToString("yyyy MM"),
+                            (m_MPCTime.Day + roundedTime).ToString(format), isNormalTime ? "(normal)" : "");
 
-					default:
-						throw new IndexOutOfRangeException();
-				}
+                        lblTimeValue.Visible = true;
+                        lblAverageTime.Visible = true;
 
-				bool isNormalTime = m_MPCTimePrecission == TimeSpan.MinValue;
-                decimal roundedError = isNormalTime ? 0 : (decimal)m_MPCTimePrecission.TotalDays;
-                double roundedTime = (m_MPCTime.Hour + m_MPCTime.Minute / 60.0 + (m_MPCTime.Second + (m_MPCTime.Millisecond / 1000.0)) / 3600.0) / 24;
+                        btnAddToMCPReport.Enabled = true;
+                    }		            
+		            break;
 
-                m_FolderName = m_MPCTime.ToString("yyyy-MM-") + (m_MPCTime.Day + roundedTime).ToString();
+                case MovementExpectation.SlowFlyby:
+                case MovementExpectation.FastFlyby:
+                    {
+                        // Don't forget to add the video normal position flag in the OBS file
+                        // Expect elongated images and apply instrumental delay corrections
 
-                int power = 1;
-				if (!isNormalTime)
-				{
-                    while (roundedError < 1 && roundedError != 0)
-					{
-						roundedError = roundedError * 10;
-						power *= 10;
-					}
-
-                    if (power != 0)
-					    roundedError = Math.Truncate(Math.Round(roundedError)) / power;					
-				}
-
-                if (precision != 0)
-                    roundedTime = Math.Truncate(Math.Round(roundedTime * precision)) / precision;
-
-                lblTimeValue.Text = string.Format("{0} {1} {2}", m_MPCTime.ToString("yyyy MM"),
-                    (m_MPCTime.Day + roundedTime).ToString(format), isNormalTime ? "(normal)" : "");
-
-				lblTimeValue.Visible = true;
-				lblAverageTime.Visible = true;
-
-				btnAddToMCPReport.Enabled = true;				
-			}
+                        lblRate.Visible = true;
+                        lblRateVal.Visible = true;
+                        lblRateVal.Text = string.Format("{0:F2}\"/s", m_MotionRate);
+                    }
+                    break;
+		    };
 		}
 
 

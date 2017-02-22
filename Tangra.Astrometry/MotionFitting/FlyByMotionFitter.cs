@@ -677,6 +677,8 @@ namespace Tangra.MotionFitting
             rv.LatestFrame = int.MinValue;
 
             List<double> medianList = new List<double>();
+            List<double> medianWeightsList = new List<double>();
+            var minPosUncertaintyArcSec = TangraConfig.Settings.Astrometry.AssumedPositionUncertaintyPixels * meaContext.ArsSecsInPixel;
             foreach (SingleMultiFrameMeasurement measurement in measurements.Values)
             {
                 float x = (measurement.FrameNo - meaContext.MinFrameNo) * xScale + 5;
@@ -698,6 +700,8 @@ namespace Tangra.MotionFitting
                         numFramesUser++;
                         userSum += val.Value;
                         medianList.Add(val.Value);
+                        medianWeightsList.Add(ComputePositionWeight(val.StdDev, measurement, minPosUncertaintyArcSec, WeightingMode.SNR));
+ 
                         stdDevUserSum += val.StdDev * val.StdDev;
                         if (rv.EarliestFrame > measurement.FrameNo) rv.EarliestFrame = measurement.FrameNo;
                         if (rv.LatestFrame < measurement.FrameNo) rv.LatestFrame = measurement.FrameNo;
@@ -726,22 +730,25 @@ namespace Tangra.MotionFitting
                 g.DrawLine(plottingContext.AveragePen, 5, yMin, imageWidth - 5, yMin);
                 g.DrawLine(plottingContext.AveragePen, 5, yMax, imageWidth - 5, yMax);
 
-                // TODO: Use weighted median
-                double median = 0;
-                medianList.Sort();
-                if (numFramesUser % 2 == 1)
-                    median = medianList[numFramesUser / 2];
-                else
-                    median = (medianList[numFramesUser / 2] + medianList[(numFramesUser / 2) - 1]) / 2;
+                double median;
+                double medianWeight;
 
-                Trace.WriteLine(string.Format("{0}; Included: {1}; Average: {2}; Median: {3}",
+                WeightedMedian(Tuple.Create(medianList, medianWeightsList), out median, out medianWeight);
+
+                double standardMedian = medianList.Median();
+
+                Trace.WriteLine(string.Format("{0}; Included: {1}; Average: {2}; Wighted Median: {3}; Standard Median: {4}",
                     meaContext.UserMidValue.ToString("0.00000"),
-                    numFramesUser, AstroConvert.ToStringValue(average, "+HH MM SS.T"),
-                    AstroConvert.ToStringValue(median, "+HH MM SS.T")));
+                    numFramesUser, AstroConvert.ToStringValue(average, "+HH MM SS.TTT"),
+                    AstroConvert.ToStringValue(median, "+HH MM SS.TTT"),
+                    AstroConvert.ToStringValue(standardMedian, "+HH MM SS.TTT")));
 
                 rv.FittedValue = median;
-                // TODO: Use StdDev/SQRT(N)
-                rv.FittedValueUncertaintyArcSec = TangraConfig.Settings.Astrometry.AssumedPositionUncertaintyPixels * meaContext.ArsSecsInPixel;
+
+                var stdDevArcSec = 3600 * Math.Sqrt(medianList.Sum(x => (x - median) * (x - median)) / (medianList.Count - 1));
+                var tCoeff95 = TDistribution.CalculateCriticalValue(medianList.Count, (1 - 0.95), 0.0001);
+                var error95 = 1.253 * tCoeff95 * stdDevArcSec / Math.Sqrt(medianList.Count);
+                rv.FittedValueUncertaintyArcSec = error95;
                 rv.IsVideoNormalPosition = false;
             }
             else
