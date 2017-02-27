@@ -2038,7 +2038,14 @@ namespace Tangra.Controller
 
 			if (TangraContext.Current.HasVideoLoaded && (m_FramePlayer.IsAstroDigitalVideo || m_FramePlayer.IsAstroAnalogueVideo))
 			{
-                ChooseAdvViewerForFileVersion(m_FramePlayer.Video.FileName);
+			    if (ShowMessageBox("This operation will close the file opened in Tangra. Do you wish to continue?", "Tangra", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+			    {
+			        var fileName = m_FramePlayer.Video.FileName;
+
+                    CloseOpenedVideoFile();
+
+                    ChooseAdvViewerForFileVersion(fileName);			        
+			    }
 			}
             else
 			{
