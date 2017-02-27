@@ -34,15 +34,12 @@ namespace Tangra.VideoOperations.Astrometry
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.pnlKnownField = new System.Windows.Forms.Panel();
             this.lblErrorDegrees = new System.Windows.Forms.Label();
-            this.cbxDE = new Tangra.Model.Controls.PersistableDropDown();
-            this.cbxRA = new Tangra.Model.Controls.PersistableDropDown();
             this.nudError = new System.Windows.Forms.NumericUpDown();
             this.label5 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.pnlKnownObject = new System.Windows.Forms.Panel();
             this.label9 = new System.Windows.Forms.Label();
-            this.cbxObject = new Tangra.Model.Controls.PersistableDropDown();
             this.rbKnownObject = new System.Windows.Forms.RadioButton();
             this.rbKnownCenter = new System.Windows.Forms.RadioButton();
             this.btnCancel = new System.Windows.Forms.Button();
@@ -50,6 +47,7 @@ namespace Tangra.VideoOperations.Astrometry
             this.pnlObject = new System.Windows.Forms.Panel();
             this.pnlTime = new System.Windows.Forms.Panel();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.lblOCRTimeWarning = new System.Windows.Forms.Label();
             this.rbSelectedLimitMagnitude = new System.Windows.Forms.RadioButton();
             this.rbAutomaticLimitMagnitude = new System.Windows.Forms.RadioButton();
             this.pnlSelectedLimitMagnitude = new System.Windows.Forms.Panel();
@@ -60,7 +58,11 @@ namespace Tangra.VideoOperations.Astrometry
             this.btnCurrDateTime = new System.Windows.Forms.Button();
             this.label10 = new System.Windows.Forms.Label();
             this.utcTime = new Tangra.Model.Controls.ucUtcTimePicker();
-            this.lblOCRTimeWarning = new System.Windows.Forms.Label();
+            this.cbxDE = new Tangra.Model.Controls.PersistableDropDown();
+            this.cbxRA = new Tangra.Model.Controls.PersistableDropDown();
+            this.cbxObject = new Tangra.Model.Controls.PersistableDropDown();
+            this.label1 = new System.Windows.Forms.Label();
+            this.tbxObsCode = new System.Windows.Forms.TextBox();
             this.groupBox2.SuspendLayout();
             this.pnlKnownField.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudError)).BeginInit();
@@ -105,26 +107,6 @@ namespace Tangra.VideoOperations.Astrometry
             this.lblErrorDegrees.Name = "lblErrorDegrees";
             this.lblErrorDegrees.Size = new System.Drawing.Size(0, 13);
             this.lblErrorDegrees.TabIndex = 72;
-            // 
-            // cbxDE
-            // 
-            this.cbxDE.FormattingEnabled = true;
-            this.cbxDE.Location = new System.Drawing.Point(104, 32);
-            this.cbxDE.Name = "cbxDE";
-            this.cbxDE.PersistanceKey = "DE";
-            this.cbxDE.RegistryKey = "Software\\Tangra";
-            this.cbxDE.Size = new System.Drawing.Size(108, 21);
-            this.cbxDE.TabIndex = 71;
-            // 
-            // cbxRA
-            // 
-            this.cbxRA.FormattingEnabled = true;
-            this.cbxRA.Location = new System.Drawing.Point(104, 6);
-            this.cbxRA.Name = "cbxRA";
-            this.cbxRA.PersistanceKey = "RA";
-            this.cbxRA.RegistryKey = "Software\\Tangra";
-            this.cbxRA.Size = new System.Drawing.Size(108, 21);
-            this.cbxRA.TabIndex = 70;
             // 
             // nudError
             // 
@@ -184,12 +166,14 @@ namespace Tangra.VideoOperations.Astrometry
             // 
             // pnlKnownObject
             // 
+            this.pnlKnownObject.Controls.Add(this.tbxObsCode);
+            this.pnlKnownObject.Controls.Add(this.label1);
             this.pnlKnownObject.Controls.Add(this.label9);
             this.pnlKnownObject.Controls.Add(this.cbxObject);
             this.pnlKnownObject.Enabled = false;
             this.pnlKnownObject.Location = new System.Drawing.Point(31, 30);
             this.pnlKnownObject.Name = "pnlKnownObject";
-            this.pnlKnownObject.Size = new System.Drawing.Size(362, 39);
+            this.pnlKnownObject.Size = new System.Drawing.Size(362, 54);
             this.pnlKnownObject.TabIndex = 70;
             // 
             // label9
@@ -200,16 +184,6 @@ namespace Tangra.VideoOperations.Astrometry
             this.label9.Size = new System.Drawing.Size(154, 26);
             this.label9.TabIndex = 72;
             this.label9.Text = "e.g. 13203, 116P, C/2023 H3, \r\n        2000 CO101, CK06W030";
-            // 
-            // cbxObject
-            // 
-            this.cbxObject.FormattingEnabled = true;
-            this.cbxObject.Location = new System.Drawing.Point(3, 2);
-            this.cbxObject.Name = "cbxObject";
-            this.cbxObject.PersistanceKey = "Object";
-            this.cbxObject.RegistryKey = "Software\\Tangra";
-            this.cbxObject.Size = new System.Drawing.Size(129, 21);
-            this.cbxObject.TabIndex = 71;
             // 
             // rbKnownObject
             // 
@@ -259,7 +233,7 @@ namespace Tangra.VideoOperations.Astrometry
             this.pnlObject.Controls.Add(this.groupBox2);
             this.pnlObject.Location = new System.Drawing.Point(3, -1);
             this.pnlObject.Name = "pnlObject";
-            this.pnlObject.Size = new System.Drawing.Size(421, 218);
+            this.pnlObject.Size = new System.Drawing.Size(434, 216);
             this.pnlObject.TabIndex = 66;
             // 
             // pnlTime
@@ -286,6 +260,17 @@ namespace Tangra.VideoOperations.Astrometry
             this.groupBox4.Size = new System.Drawing.Size(406, 206);
             this.groupBox4.TabIndex = 73;
             this.groupBox4.TabStop = false;
+            // 
+            // lblOCRTimeWarning
+            // 
+            this.lblOCRTimeWarning.AutoSize = true;
+            this.lblOCRTimeWarning.ForeColor = System.Drawing.Color.Red;
+            this.lblOCRTimeWarning.Location = new System.Drawing.Point(14, 102);
+            this.lblOCRTimeWarning.Name = "lblOCRTimeWarning";
+            this.lblOCRTimeWarning.Size = new System.Drawing.Size(386, 13);
+            this.lblOCRTimeWarning.TabIndex = 81;
+            this.lblOCRTimeWarning.Text = "The time was read from the OSD timestamp. Please set the correct date above!!!";
+            this.lblOCRTimeWarning.Visible = false;
             // 
             // rbSelectedLimitMagnitude
             // 
@@ -399,22 +384,57 @@ namespace Tangra.VideoOperations.Astrometry
             this.utcTime.Size = new System.Drawing.Size(309, 34);
             this.utcTime.TabIndex = 0;
             // 
-            // lblOCRTimeWarning
+            // cbxDE
             // 
-            this.lblOCRTimeWarning.AutoSize = true;
-            this.lblOCRTimeWarning.ForeColor = System.Drawing.Color.Red;
-            this.lblOCRTimeWarning.Location = new System.Drawing.Point(14, 102);
-            this.lblOCRTimeWarning.Name = "lblOCRTimeWarning";
-            this.lblOCRTimeWarning.Size = new System.Drawing.Size(386, 13);
-            this.lblOCRTimeWarning.TabIndex = 81;
-            this.lblOCRTimeWarning.Text = "The time was read from the OSD timestamp. Please set the correct date above!!!";
-            this.lblOCRTimeWarning.Visible = false;
+            this.cbxDE.FormattingEnabled = true;
+            this.cbxDE.Location = new System.Drawing.Point(104, 32);
+            this.cbxDE.Name = "cbxDE";
+            this.cbxDE.PersistanceKey = "DE";
+            this.cbxDE.RegistryKey = "Software\\Tangra";
+            this.cbxDE.Size = new System.Drawing.Size(108, 21);
+            this.cbxDE.TabIndex = 71;
+            // 
+            // cbxRA
+            // 
+            this.cbxRA.FormattingEnabled = true;
+            this.cbxRA.Location = new System.Drawing.Point(104, 6);
+            this.cbxRA.Name = "cbxRA";
+            this.cbxRA.PersistanceKey = "RA";
+            this.cbxRA.RegistryKey = "Software\\Tangra";
+            this.cbxRA.Size = new System.Drawing.Size(108, 21);
+            this.cbxRA.TabIndex = 70;
+            // 
+            // cbxObject
+            // 
+            this.cbxObject.FormattingEnabled = true;
+            this.cbxObject.Location = new System.Drawing.Point(3, 2);
+            this.cbxObject.Name = "cbxObject";
+            this.cbxObject.PersistanceKey = "Object";
+            this.cbxObject.RegistryKey = "Software\\Tangra";
+            this.cbxObject.Size = new System.Drawing.Size(129, 21);
+            this.cbxObject.TabIndex = 71;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(4, 34);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(83, 13);
+            this.label1.TabIndex = 73;
+            this.label1.Text = "MPC Obs Code:";
+            // 
+            // tbxObsCode
+            // 
+            this.tbxObsCode.Location = new System.Drawing.Point(101, 31);
+            this.tbxObsCode.Name = "tbxObsCode";
+            this.tbxObsCode.Size = new System.Drawing.Size(31, 20);
+            this.tbxObsCode.TabIndex = 74;
             // 
             // frmConfigureAstrometricFit
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(426, 253);
+            this.ClientSize = new System.Drawing.Size(423, 253);
             this.Controls.Add(this.btnOK);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.pnlTime);
@@ -476,5 +496,7 @@ namespace Tangra.VideoOperations.Astrometry
 		private System.Windows.Forms.RadioButton rbAutomaticLimitMagnitude;
 		private System.Windows.Forms.Panel pnlSelectedLimitMagnitude;
         private System.Windows.Forms.Label lblOCRTimeWarning;
+        private System.Windows.Forms.TextBox tbxObsCode;
+        private System.Windows.Forms.Label label1;
 	}
 }

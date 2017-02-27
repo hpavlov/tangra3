@@ -95,7 +95,7 @@ namespace Tangra.Addins
             else if (state.IdentifiedObjects != null && state.IdentifiedObjects.Count == 1)
                 ObjectDesignation = MPCObsLine.GetObjectCode(state.IdentifiedObjects[0].ObjectName);
 
-            ObservatoryCode = TangraConfig.Settings.Astrometry.MPCObservatoryCode;
+            ObservatoryCode = fieldSolveContext.ObsCode;
 
 		    m_MeasurementsImpl = new List<TangraAstrometricMeasurementImpl>();
 

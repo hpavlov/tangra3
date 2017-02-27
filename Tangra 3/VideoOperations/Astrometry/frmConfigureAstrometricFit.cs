@@ -146,6 +146,7 @@ namespace Tangra.VideoOperations.Astrometry
 			btnCancel.Text = "<< Back";
             btnOK.Text = "OK";
 			pnlTime.Visible = false;
+		    tbxObsCode.Text = TangraConfig.Settings.Astrometry.MPCObservatoryCode;
 
 			pnlObject.Visible = true;
 			pnlObject.BringToFront();
@@ -225,7 +226,7 @@ namespace Tangra.VideoOperations.Astrometry
             m_RAHours = double.NaN;
             m_DEDeg = double.NaN;
 
-            Context.ObsCode = TangraConfig.Settings.Astrometry.MPCObservatoryCode;
+            Context.ObsCode = tbxObsCode.Text;
 
 			if (rbKnownCenter.Checked)
 			{
@@ -281,10 +282,8 @@ namespace Tangra.VideoOperations.Astrometry
 
                     if (TangraConfig.Settings.Astrometry.UseMPCCode)
                     {
-						Context.ObsCode = TangraConfig.Settings.Astrometry.MPCObservatoryCode;
-                        frm = new frmIdentifyObjects(
-                            cbxObject.Text, Context.UtcTime,
-							TangraConfig.Settings.Astrometry.MPCObservatoryCode);
+                        Context.ObsCode = tbxObsCode.Text;
+                        frm = new frmIdentifyObjects(cbxObject.Text, Context.UtcTime, Context.ObsCode);
                     }
                     else
                     {
