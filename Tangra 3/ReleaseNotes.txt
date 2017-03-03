@@ -1,14 +1,16 @@
 ﻿Tangra3 Release Notes
 ---------------------
 vX.X.X (Unreleased)
-- Now the light curve and astrometry reductions will ensure the video is positioned at a non-duplicated frame before starting.
+- A full rework of the fast motion astrometry which now reports uncertainty estimates and provides more control of the motion fitting.
+- Improved the x2 frames integration detection used in astrometry and AVI-to-AAV file conversion.
 - Fixed a crash when viewing ADV/AAV version 2 files bigger than 2Gb. Upgraded AdvLib to version 2.0g.
+- Now the light curve and astrometry reductions will ensure the video is positioned at a non-duplicated frame before the start of the reduction.
 
 v3.6.3 (2017-01-23)
 -------------------
-- Improvements to Astrometry using AAV files
-- Improvements and bugfixes to the AVI-to-AAV file conversion
-- Implemented uncertainty estimation of the reduced astrometric positions
+- Improvements to Astrometry using AAV files.
+- Improvements and bugfixes to the AVI-to-AAV file conversion.
+- Implemented uncertainty estimation of the reduced astrometric positions.
 
 v3.6.2 (2016-12-17)
 -------------------
@@ -19,7 +21,7 @@ v3.6.2 (2016-12-17)
 - Tangra can now work with 32-bit FITS files with pixel values larger than 65535. The pixels will be converted to 16-bit for use withint Tangra.
 - Updated the Astrometric calibration to work with star fields that are near the pole.
 - Added 'Video Integration Detection' as an action under Tools.
-- Upgraded AdvLib (used for ADV and AAV videos) to version 2.0f
+- Upgraded AdvLib (used for ADV and AAV videos) to version 2.0f.
 
 v3.6.1 (2016-11-13)
 -------------------

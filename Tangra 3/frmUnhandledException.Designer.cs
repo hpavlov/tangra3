@@ -131,9 +131,9 @@
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(399, 47);
             this.label5.TabIndex = 9;
-            this.label5.Text = "   Please know that many of the reported errors have been encounterned by users u" +
-    "sing an older version of the software where the reported problems have been alre" +
-    "ady fixed.";
+            this.label5.Text = "   Please know that many of the reported errors have been encountered by users us" +
+    "ing an older version of the software where the reported problems have been alrea" +
+    "dy fixed.";
             // 
             // label6
             // 
