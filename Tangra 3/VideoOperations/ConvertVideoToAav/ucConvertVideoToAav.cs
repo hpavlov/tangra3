@@ -391,6 +391,7 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
                     (int)nudPreserveVTIBottomRow.Value,
                     (int)nudStartingAtFrame.Value,
                     (int)nudIntegratedFrames.Value,
+                    (int)nudLastFrame.Value,
                     cbxCameraModel.Text,
                     cbxSensorInfo.Text,
                     rbFirstFieldBottom.Checked);
@@ -414,7 +415,7 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
         internal void UpdateProgress(int currentFrame, int maxFrames)
         {
             pbar.Maximum = maxFrames;
-            pbar.Value = Math.Min(currentFrame, maxFrames);
+            pbar.Value = Math.Max(pbar.Minimum, Math.Min(currentFrame, pbar.Maximum));
             pbar.Update();
         }
     }

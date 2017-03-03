@@ -21,6 +21,8 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
 
         private bool m_DebugMode;
         private bool m_Converting;
+        private int m_LastFrameNo;
+        private int m_FirstFrameNo;
 
         public ConvertVideoToAavOperation()
         {
@@ -72,19 +74,27 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
             {
                 m_ConvertVideoToAavController.ProcessFrame(frameNo, astroImage);
 
-                if (isLastFrame)
+                if (isLastFrame || frameNo > m_LastFrameNo)
                 {
                     m_ConvertVideoToAavController.FinishedConversion();
                     m_ControlPanel.EndConversion();
+
+                    m_VideoController.StopVideo();
+                    m_ControlPanel.UpdateProgress(m_LastFrameNo, m_LastFrameNo);
                 }
                 else
-                    m_ControlPanel.UpdateProgress(frameNo, m_VideoController.VideoLastFrame);
+                    m_ControlPanel.UpdateProgress(frameNo - m_FirstFrameNo, m_LastFrameNo);
             }
         }
 
-        public void StartConversion(string fileName, int topVtiOsdRow, int bottomVtiOsdRow, int firstIntegrationFrameNo, int integrationInterval, string cameraModel, string sensorInfo, bool swapTimestampFields)
+        public void StartConversion(
+            string fileName, int topVtiOsdRow, int bottomVtiOsdRow,
+            int firstIntegrationFrameNo, int integrationInterval, int lastFrameNo, 
+            string cameraModel, string sensorInfo, bool swapTimestampFields)
         {
             m_Converting = true;
+            m_LastFrameNo = lastFrameNo;
+            m_FirstFrameNo = firstIntegrationFrameNo;
 
             m_ConvertVideoToAavController.StartConversion(fileName, topVtiOsdRow, bottomVtiOsdRow, firstIntegrationFrameNo, integrationInterval, cameraModel, sensorInfo, swapTimestampFields);
 

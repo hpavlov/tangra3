@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using Tangra.Controller;
+using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.Model.Numerical;
 using Tangra.VideoTools;
@@ -378,87 +379,18 @@ namespace Tangra.Video
 
 	    private PotentialIntegrationFit ComputeIntegration(List<int> probeIntervals)
 		{
-			
-			var fitValues = new Dictionary<int, double>();
-			var fitFlags = new Dictionary<int, bool>();
-            var fitAboveSigmaRatios = new Dictionary<int, double>();
-
 			List<PotentialIntegrationFit> guessesMinFrame = new List<PotentialIntegrationFit>();
 			List<PotentialIntegrationFit> guessesMaxOffset = new List<PotentialIntegrationFit>();
 
             foreach (int interval in probeIntervals)
 			{
-				fitValues.Clear();
-				fitFlags.Clear();
-                fitAboveSigmaRatios.Clear();
-
-				for (int i = 0; i < interval; i++)
-				{
-					if (interval >= m_SigmaDict.Count) 
-						continue; // Not all have 128 measurements
-
-					int k = 0;
-					double fitVal = 0;
-					bool allAboveSigma = true;
-				    int aboveSigma = 0;
-				    double aboveSigmaRatio = 1;
-                    double aboveSigmaRatioSum = 0;
-					do
-					{
-                        double testVal = Math.Abs(m_SigmaDict[minX + i + k * interval] - m_Median);
-						fitVal += testVal;
-                        if (testVal >= m_Variance)
-                        {
-                            aboveSigma++;
-                            aboveSigmaRatioSum += m_SigmaDict[minX + i + k * interval] / m_Median;
-                        }
-						k++;
-					}
-					while (i + k * interval < m_SigmaDict.Count);
-
-                    // If more than all but 1 are above sigma this is a candidate
-					allAboveSigma = aboveSigma > 0 && aboveSigma + 1 >= k;
-                    aboveSigmaRatio = aboveSigma > 0 ? aboveSigmaRatioSum / aboveSigma : 0;
-
-					fitValues.Add(i, fitVal / k);
-					fitFlags.Add(i, allAboveSigma);
-                    fitAboveSigmaRatios.Add(i, aboveSigmaRatio);
-				}	
-
-				// Find the best guess for this interval
-
-				Dictionary<int, double> aboveSigmaFits = fitValues
-					.Where(kvp => fitFlags[kvp.Key])
-					.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-
-				if (aboveSigmaFits.Count > 0)
-				{
-					KeyValuePair<int, double> bestBet = aboveSigmaFits
-						.Where(kvp => kvp.Key == aboveSigmaFits.Keys.Min()).First();
-
-					// Potential ingtegration with interval [interval], starting at frame bestBet.Key and with fitted value of bestFit.Value
-					guessesMinFrame.Add(
-						new PotentialIntegrationFit()
-							{
-								StartingAtFrame = minX + bestBet.Key + 1,
-								Interval = interval,
-								Certainty = bestBet.Value,
-                                AboveSigmaRatio = fitAboveSigmaRatios[bestBet.Key]
-							});
-
-					bestBet = aboveSigmaFits
-						.Where(kvp => kvp.Value == aboveSigmaFits.Values.Max()).First();
-
-					// Potential ingtegration with interval [interval], starting at frame bestBet.Key and with fitted value of bestFit.Value
-					guessesMaxOffset.Add(
-						new PotentialIntegrationFit()
-						{
-							StartingAtFrame = minX + bestBet.Key + 1,
-							Interval = interval,
-							Certainty = bestBet.Value,
-                            AboveSigmaRatio = fitAboveSigmaRatios[bestBet.Key]
-						});
-				}
+			    if (interval == 2)
+			    {
+			        if (ProbeIntegration2Interval(guessesMinFrame, guessesMaxOffset))
+			            break;
+			    }
+			    else
+			        ProbeIntegrationInterval(interval, guessesMinFrame, guessesMaxOffset);
 			}
 
 			List<List<PotentialIntegrationFit>> guessesList = new List<List<PotentialIntegrationFit>>();
@@ -532,7 +464,136 @@ namespace Tangra.Video
 			return null;
 		}
 
-        private PotentialIntegrationFit SearchSmallerFit(PotentialIntegrationFit largestFit)
+	    private bool ProbeIntegration2Interval(List<PotentialIntegrationFit> guessesMinFrame, List<PotentialIntegrationFit> guessesMaxOffset)
+	    {
+            var oddSigmas = m_SigmaDict.Where(kvp => kvp.Key % 2 == 1).Select(kvp => kvp.Value).ToList();
+            var evenSigmas = m_SigmaDict.Where(kvp => kvp.Key % 2 == 0).Select(kvp => kvp.Value).ToList();
+
+	        var oddMedian = oddSigmas.Median();
+            var oddVariance = Math.Sqrt(oddSigmas.Sum(x => (x - oddMedian) * (x - oddMedian)) / (oddSigmas.Count - 1));
+
+            var evenMedian = evenSigmas.Median();
+            var evenVariance = Math.Sqrt(evenSigmas.Sum(x => (x - evenMedian) * (x - evenMedian)) / (evenSigmas.Count - 1));
+
+	        if (oddMedian > evenMedian)
+	        {
+	            // Could this be a x2 integration starting from an odd frame?
+	            if (oddMedian - 3 * oddVariance > evenMedian + 3 * evenVariance)
+	            {
+	                // Yes!
+	                var potentialFit = new PotentialIntegrationFit()
+	                {
+                        Interval = 2,
+                        StartingAtFrame = m_SigmaDict.Where(kvp => kvp.Key % 2 == 1).Min(kvp => kvp.Key) + 1,
+                        AboveSigmaRatio = oddSigmas.Sum() / (oddMedian * oddSigmas.Count),
+                        Certainty = 3,
+                        CertaintyText = "Average" 
+	                };
+
+	                guessesMinFrame.Add(potentialFit);
+	                guessesMaxOffset.Add(potentialFit);
+	                return true;
+	            }
+	        }
+            else if (oddMedian > evenMedian)
+            {
+                // Could this be a x2 integration starting from an even frame?
+                if (evenMedian - 3 * evenVariance > oddMedian + 3 * oddVariance)
+                {
+                    // Yes!
+                    var potentialFit = new PotentialIntegrationFit()
+                    {
+                        Interval = 2,
+                        StartingAtFrame = m_SigmaDict.Where(kvp => kvp.Key % 2 == 0).Min(kvp => kvp.Key) + 1,
+                        AboveSigmaRatio = evenSigmas.Sum() / (evenMedian * evenSigmas.Count),
+                        Certainty = 3,
+                        CertaintyText = "Average"
+                    };
+
+                    guessesMinFrame.Add(potentialFit);
+                    guessesMaxOffset.Add(potentialFit);
+                    return true;
+                }
+            }
+
+	        return false;
+	    }
+
+	    private void ProbeIntegrationInterval(int interval, List<PotentialIntegrationFit> guessesMinFrame, List<PotentialIntegrationFit> guessesMaxOffset)
+	    {
+	        var fitValues = new Dictionary<int, double>();
+	        var fitFlags = new Dictionary<int, bool>();
+	        var fitAboveSigmaRatios = new Dictionary<int, double>();
+
+	        for (int i = 0; i < interval; i++)
+	        {
+	            if (interval >= m_SigmaDict.Count)
+	                continue; // Not all have 128 measurements
+
+	            int k = 0;
+	            double fitVal = 0;
+	            bool allAboveSigma = true;
+	            int aboveSigma = 0;
+	            double aboveSigmaRatio = 1;
+	            double aboveSigmaRatioSum = 0;
+	            do
+	            {
+	                double testVal = Math.Abs(m_SigmaDict[minX + i + k*interval] - m_Median);
+	                fitVal += testVal;
+	                if (testVal >= m_Variance)
+	                {
+	                    aboveSigma++;
+	                    aboveSigmaRatioSum += m_SigmaDict[minX + i + k*interval]/m_Median;
+	                }
+	                k++;
+	            } while (i + k*interval < m_SigmaDict.Count);
+
+	            // If more than all but 1 are above sigma this is a candidate
+	            allAboveSigma = aboveSigma > 0 && aboveSigma + 1 >= k;
+	            aboveSigmaRatio = aboveSigma > 0 ? aboveSigmaRatioSum/aboveSigma : 0;
+
+	            fitValues.Add(i, fitVal/k);
+	            fitFlags.Add(i, allAboveSigma);
+	            fitAboveSigmaRatios.Add(i, aboveSigmaRatio);
+	        }
+
+	        // Find the best guess for this interval
+
+	        Dictionary<int, double> aboveSigmaFits = fitValues
+	            .Where(kvp => fitFlags[kvp.Key])
+	            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+	        if (aboveSigmaFits.Count > 0)
+	        {
+	            KeyValuePair<int, double> bestBet = aboveSigmaFits
+	                .Where(kvp => kvp.Key == aboveSigmaFits.Keys.Min()).First();
+
+	            // Potential ingtegration with interval [interval], starting at frame bestBet.Key and with fitted value of bestFit.Value
+	            guessesMinFrame.Add(
+	                new PotentialIntegrationFit()
+	                {
+	                    StartingAtFrame = minX + bestBet.Key + 1,
+	                    Interval = interval,
+	                    Certainty = bestBet.Value,
+	                    AboveSigmaRatio = fitAboveSigmaRatios[bestBet.Key]
+	                });
+
+	            bestBet = aboveSigmaFits
+	                .Where(kvp => kvp.Value == aboveSigmaFits.Values.Max()).First();
+
+	            // Potential ingtegration with interval [interval], starting at frame bestBet.Key and with fitted value of bestFit.Value
+	            guessesMaxOffset.Add(
+	                new PotentialIntegrationFit()
+	                {
+	                    StartingAtFrame = minX + bestBet.Key + 1,
+	                    Interval = interval,
+	                    Certainty = bestBet.Value,
+	                    AboveSigmaRatio = fitAboveSigmaRatios[bestBet.Key]
+	                });
+	        }
+	    }
+
+	    private PotentialIntegrationFit SearchSmallerFit(PotentialIntegrationFit largestFit)
         {
             int integration = largestFit.Interval / 2;
             List<PotentialIntegrationFit> smallerFitsToCheckFor = new List<PotentialIntegrationFit>();

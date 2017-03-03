@@ -8,6 +8,7 @@ using Adv;
 using Tangra.Helpers;
 using Tangra.Model.Astro;
 using Tangra.Model.Context;
+using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.Video.AstroDigitalVideo;
 
@@ -168,41 +169,97 @@ namespace Tangra.Controller
             if (frameNo == m_FirstIntegrationPeriodStartFrameId)
                 return false;
 
-            m_SigmaDict[frameNo] = sigmaSum / 1024;
+            var currVal = sigmaSum / 1024;
 
+            m_SigmaDict[frameNo] = currVal;
 
-            List<double> vals = m_SigmaDict.Values.Where(v => !double.IsNaN(v)).ToList();
+            var preIdentifiedPeriods = m_IntegrationPeriod == 2 ? 16 : 2;
 
-            vals.Sort();
-
-            double median = vals.Count % 2 == 1
-                ? vals[vals.Count / 2]
-                : (vals[vals.Count / 2] + vals[(vals.Count / 2) - 1]) / 2;
-
-            List<double> residuals = vals.Select(v => Math.Abs(median - v)).ToList();
-
-            double variance = residuals.Select(r => r * r).Sum();
-            if (residuals.Count > 1)
+            if (frameNo > m_FirstIntegrationPeriodStartFrameId + preIdentifiedPeriods * m_IntegrationPeriod)
             {
-                variance = Math.Sqrt(variance / (residuals.Count - 1));
-            }
-            else
-                variance = double.NaN;
-
-            if (frameNo > m_FirstIntegrationPeriodStartFrameId + 2*m_IntegrationPeriod)
-            {
-                double residual = Math.Abs(median - m_SigmaDict[frameNo]);
-                if (residual > variance)
+                if (m_IntegrationPeriod == 2)
                 {
-                    if (frameNo < m_NextExpectedIntegrationPeriodStartFrameId)
-                    {
-                        // New early integration period. This can be right if:
-                        // 1) The old expected intergation frame has a smaller residual than this one
-                        // 2) The next new frame under the new conditions passes the condition for a new integration frame
-                        var nextExpectedResidual = GetFutureFrameNoisePatternResidual(m_NextExpectedIntegrationPeriodStartFrameId, median);
-                        var nextNewExpectedResidual = GetFutureFrameNoisePatternResidual(frameNo + m_IntegrationPeriod, median);
+                    var evenData = m_SigmaDict.Where(kvp => kvp.Key % 2 == 0).Select(kvp => kvp.Value).ToList();
+                    var oddData = m_SigmaDict.Where(kvp => kvp.Key % 2 == 1).Select(kvp => kvp.Value).ToList();
 
-                        if (nextExpectedResidual < residual && nextNewExpectedResidual > variance)
+                    var medianEven = evenData.Median();
+                    var sigmaEven = Math.Sqrt(evenData.Sum(x => (x - medianEven) * (x - medianEven)) / (evenData.Count - 1));
+
+                    var medianOdd = oddData.Median();
+                    var sigmaOdd = Math.Sqrt(oddData.Sum(x => (x - medianOdd) * (x - medianOdd)) / (oddData.Count - 1));
+
+                    double hiMedian, loMedian, hiSigma, loSigma;
+                    if (medianEven > medianOdd)
+                    {
+                        hiMedian = medianEven;
+                        loMedian = medianOdd;
+                        hiSigma = sigmaEven;
+                        loSigma = sigmaOdd;
+                    }
+                    else
+                    {
+                        hiMedian = medianOdd;
+                        loMedian = medianEven;
+                        hiSigma = sigmaOdd;
+                        loSigma = sigmaEven;
+                    }
+
+                    bool newInterval;
+                    if (Math.Abs(hiMedian - currVal) < 3 * hiSigma && Math.Abs(loMedian - currVal) > 3 * loSigma)
+                        newInterval = true;
+                    else if (Math.Abs(hiMedian - currVal) > 3 * hiSigma && Math.Abs(loMedian - currVal) < 3 * loSigma)
+                        newInterval = false;
+                    else 
+                        newInterval = Math.Abs(hiMedian - currVal) < Math.Abs(loMedian - currVal);
+
+                    if (newInterval && frameNo != m_NextExpectedIntegrationPeriodStartFrameId)
+                        m_VideoController.RegisterAAVConversionError();
+                    else if (!newInterval && frameNo == m_NextExpectedIntegrationPeriodStartFrameId)
+                        m_VideoController.RegisterAAVConversionError();
+
+                    if (newInterval) 
+                        m_NextExpectedIntegrationPeriodStartFrameId = frameNo + m_IntegrationPeriod;
+
+                    return newInterval;
+                }
+                else
+                {
+                    List<double> vals = m_SigmaDict.Values.Where(v => !double.IsNaN(v)).ToList();
+
+                    vals.Sort();
+
+                    double median = vals.Count % 2 == 1
+                        ? vals[vals.Count / 2]
+                        : (vals[vals.Count / 2] + vals[(vals.Count / 2) - 1]) / 2;
+
+                    List<double> residuals = vals.Select(v => Math.Abs(median - v)).ToList();
+
+                    double variance = residuals.Select(r => r * r).Sum();
+                    if (residuals.Count > 1)
+                    {
+                        variance = Math.Sqrt(variance / (residuals.Count - 1));
+                    }
+                    else
+                        variance = double.NaN;
+
+                    double residual = Math.Abs(median - m_SigmaDict[frameNo]);
+                    if (residual > variance)
+                    {
+                        if (frameNo < m_NextExpectedIntegrationPeriodStartFrameId)
+                        {
+                            // New early integration period. This can be right if:
+                            // 1) The old expected intergation frame has a smaller residual than this one
+                            // 2) The next new frame under the new conditions passes the condition for a new integration frame
+                            var nextExpectedResidual = GetFutureFrameNoisePatternResidual(m_NextExpectedIntegrationPeriodStartFrameId, median);
+                            var nextNewExpectedResidual = GetFutureFrameNoisePatternResidual(frameNo + m_IntegrationPeriod, median);
+
+                            if (nextExpectedResidual < residual && nextNewExpectedResidual > variance)
+                            {
+                                m_NextExpectedIntegrationPeriodStartFrameId = frameNo + m_IntegrationPeriod;
+                                return true;
+                            }
+                        }
+                        else if (frameNo == m_NextExpectedIntegrationPeriodStartFrameId)
                         {
                             m_NextExpectedIntegrationPeriodStartFrameId = frameNo + m_IntegrationPeriod;
                             return true;
@@ -210,9 +267,18 @@ namespace Tangra.Controller
                     }
                     else if (frameNo == m_NextExpectedIntegrationPeriodStartFrameId)
                     {
-                        m_NextExpectedIntegrationPeriodStartFrameId = frameNo + m_IntegrationPeriod;
-                        return true;
-                    }
+                        // Unidentified integration period. Look at this further 
+                        var nextFrameResidual = GetFutureFrameNoisePatternResidual(frameNo + 1, median);
+                        var nextNewExpectedResidual = GetFutureFrameNoisePatternResidual(frameNo + m_IntegrationPeriod, median);
+
+                        if (nextFrameResidual < residual && nextNewExpectedResidual > variance)
+                        {
+                            return true;
+                        }
+
+                        m_VideoController.RegisterAAVConversionError();
+                        return false;
+                    }                    
                 }
             }
             else
