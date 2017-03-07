@@ -637,6 +637,7 @@ namespace Tangra.Model.Config
 			public int MaxCalibrationFieldsToAttempt = 25;
 
             public IsolationLevel AddinIsolationLevel = IsolationLevel.AppDomain;
+            public bool AddinDebugTraceEnabled = false;
 			public OWExportMode OWEventTimesExportMode = OWExportMode.AlwaysExportEventTimes;
 
 			public double Longitude = double.NaN;

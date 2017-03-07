@@ -78,12 +78,15 @@ namespace Tangra.Config.SettingPannels
             btnConfigure.Enabled = false;
 			btnReloadAddins.Visible = m_AddinsController.CanReloadAddins();
 	        btnUnloadAddins.Visible = m_AddinsController.CanUnloadAddins();
+
+            cbxEnableAddinDebugTracing.Checked = TangraConfig.Settings.Generic.AddinDebugTraceEnabled;
         }
 
         public override void SaveSettings()
         {
             TangraConfig.Settings.Generic.AddinIsolationLevel = (TangraConfig.IsolationLevel) cbxIsolationLevel.SelectedIndex;
 			TangraConfig.Settings.Generic.OWEventTimesExportMode = (TangraConfig.OWExportMode) cbxOwEventTimesExport.SelectedIndex;
+            TangraConfig.Settings.Generic.AddinDebugTraceEnabled = cbxEnableAddinDebugTracing.Checked;
         }
 
         private void lbxLoadedAddins_SelectedIndexChanged(object sender, EventArgs e)

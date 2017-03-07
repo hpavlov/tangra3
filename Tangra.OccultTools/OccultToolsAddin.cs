@@ -50,10 +50,15 @@ namespace Tangra.OccultTools
 		{
 			try
 			{
-				using (var rdr = new StringReader(serializedSettings))
-				{
-					return (OccultToolsAddinSettings)m_Serializer.Deserialize(rdr);
-				}
+			    if (!string.IsNullOrWhiteSpace(serializedSettings))
+			    {
+                    using (var rdr = new StringReader(serializedSettings))
+                    {
+                        return (OccultToolsAddinSettings)m_Serializer.Deserialize(rdr);
+                    }			        
+			    }
+                else
+                    return new OccultToolsAddinSettings();
 			}
 			catch (Exception ex)
 			{

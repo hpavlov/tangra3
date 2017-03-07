@@ -41,10 +41,15 @@ namespace Tangra.KweeVanWoerden
 		{
 			try
 			{
-				using (var rdr = new StringReader(serializedSettings))
-				{
-					return (KweeVanWoerdenAddinSettings)m_Serializer.Deserialize(rdr);
-				}
+			    if (!string.IsNullOrWhiteSpace(serializedSettings))
+			    {
+                    using (var rdr = new StringReader(serializedSettings))
+                    {
+                        return (KweeVanWoerdenAddinSettings)m_Serializer.Deserialize(rdr);
+                    }			        
+			    }
+                else
+                    return new KweeVanWoerdenAddinSettings();
 			}
 			catch (Exception ex)
 			{

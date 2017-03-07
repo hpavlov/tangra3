@@ -65,7 +65,8 @@ namespace Tangra.Addins
 			m_MainForm = mainForm;
             m_VideoController = videoController;
 
-			TrackingServices.RegisterTrackingHandler(new AddinTrackingHandler());
+            if (TangraConfig.Settings.Generic.AddinDebugTraceEnabled)
+			    TrackingServices.RegisterTrackingHandler(new AddinTrackingHandler());
 		}
 
 		public void LoadAddins()
@@ -115,7 +116,7 @@ namespace Tangra.Addins
 					}
 					catch (Exception ex)
 					{
-						Trace.WriteLine(ex.GetFullStackTrace());
+                        Trace.WriteLine(string.Format("'{0}' is not identified as an add-in: {1}", Path.GetFileName(asm), ex.GetType()));
 					}
 				}				
 			}

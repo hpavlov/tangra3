@@ -38,7 +38,10 @@ namespace Tangra.Addins
 		{
 			try
 			{
-				return (AllAddinSettings)m_AllSettingSerializer.Deserialize(new StringReader(Settings.Default.AddinSettings));
+                if (!string.IsNullOrWhiteSpace(Settings.Default.AddinSettings))
+				    return (AllAddinSettings)m_AllSettingSerializer.Deserialize(new StringReader(Settings.Default.AddinSettings));
+                else
+                    return new AllAddinSettings();
 			}
 			catch (Exception ex)
 			{
