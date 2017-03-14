@@ -273,7 +273,7 @@ namespace Tangra.Model.Numerical
 
                 m_MedianResidual = m_Residuals.Select(x => Math.Abs(x)).ToList().Median();
                 if (hasWeights)
-                    m_MedianResidual /= weightMeanScaler;
+                    m_MedianResidual /= Math.Sqrt(weightMeanScaler);
 
                 m_ChiSquare = 0;
                 double stdsq = m_StdDev * m_StdDev;

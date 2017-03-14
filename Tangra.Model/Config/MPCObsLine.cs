@@ -168,16 +168,16 @@ namespace Tangra.Model.Config
         }
 
         public void SetUncertainty(double? raUncertaintyArcSec, double? deUncertaintyArcSec)
-	    {
+        {
             if (raUncertaintyArcSec.HasValue && deUncertaintyArcSec.HasValue)
-                m_Uncertaity_81_90 = string.Format(" {0} {1}", Math.Min(9.9, raUncertaintyArcSec.Value).ToString("0.00").PadLeft(4), Math.Min(9.9, deUncertaintyArcSec.Value).ToString("0.00").PadLeft(4));
+                m_Uncertaity_81_90 = string.Format(" {0}  {1} ", Math.Min(9.9, raUncertaintyArcSec.Value).ToString("0.0").PadLeft(3), Math.Min(9.9, deUncertaintyArcSec.Value).ToString("0.0").PadLeft(3));
             else if (raUncertaintyArcSec.HasValue)
-                m_Uncertaity_81_90 = string.Format(" {0}     ", Math.Min(9.9, raUncertaintyArcSec.Value).ToString("0.00").PadLeft(4));
+                m_Uncertaity_81_90 = string.Format(" {0}      ", Math.Min(9.9, raUncertaintyArcSec.Value).ToString("0.0").PadLeft(3));
             else if (deUncertaintyArcSec.HasValue)
-                m_Uncertaity_81_90 = string.Format("      {0}", Math.Min(9.9, deUncertaintyArcSec.Value).ToString("0.00").PadLeft(4));
+                m_Uncertaity_81_90 = string.Format("       {0} ", Math.Min(9.9, deUncertaintyArcSec.Value).ToString("0.0").PadLeft(3));
             else
                 m_Uncertaity_81_90 = "";
-	    }
+        }
 
         public void SetPosition(double raHours, double deDeg, DateTime utcTime, bool isVideoNormalPosition, bool highPrecision = false)
         {

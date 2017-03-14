@@ -37,6 +37,7 @@
             this.nudPixelsPerArcSec = new System.Windows.Forms.NumericUpDown();
             this.label9 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.cbxUseMedianResidualUncertainty = new System.Windows.Forms.CheckBox();
             this.rbWeightingAstr = new System.Windows.Forms.RadioButton();
             this.label12 = new System.Windows.Forms.Label();
             this.nudSigmaExclusion = new System.Windows.Forms.NumericUpDown();
@@ -75,7 +76,6 @@
             this.nudSinglePosMea = new System.Windows.Forms.NumericUpDown();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.cbxUseMedianResidualUncertainty = new System.Windows.Forms.CheckBox();
             this.toolStrip1.SuspendLayout();
             this.pnlFiles.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudPixelsPerArcSec)).BeginInit();
@@ -202,6 +202,19 @@
             this.groupBox1.TabIndex = 40;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Reduction Settings";
+            // 
+            // cbxUseMedianResidualUncertainty
+            // 
+            this.cbxUseMedianResidualUncertainty.AutoSize = true;
+            this.cbxUseMedianResidualUncertainty.Checked = true;
+            this.cbxUseMedianResidualUncertainty.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cbxUseMedianResidualUncertainty.Location = new System.Drawing.Point(12, 114);
+            this.cbxUseMedianResidualUncertainty.Name = "cbxUseMedianResidualUncertainty";
+            this.cbxUseMedianResidualUncertainty.Size = new System.Drawing.Size(162, 17);
+            this.cbxUseMedianResidualUncertainty.TabIndex = 1;
+            this.cbxUseMedianResidualUncertainty.Text = "Median Residual Uncertainty";
+            this.cbxUseMedianResidualUncertainty.UseVisualStyleBackColor = true;
+            this.cbxUseMedianResidualUncertainty.CheckedChanged += new System.EventHandler(this.cbxUseMedianResidualUncertainty_CheckedChanged);
             // 
             // rbWeightingAstr
             // 
@@ -597,17 +610,6 @@
             this.openFileDialog1.DefaultExt = "*.csv";
             this.openFileDialog1.Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*";
             this.openFileDialog1.Multiselect = true;
-            // 
-            // cbxUseMedianResidualUncertainty
-            // 
-            this.cbxUseMedianResidualUncertainty.AutoSize = true;
-            this.cbxUseMedianResidualUncertainty.Location = new System.Drawing.Point(12, 114);
-            this.cbxUseMedianResidualUncertainty.Name = "cbxUseMedianResidualUncertainty";
-            this.cbxUseMedianResidualUncertainty.Size = new System.Drawing.Size(162, 17);
-            this.cbxUseMedianResidualUncertainty.TabIndex = 1;
-            this.cbxUseMedianResidualUncertainty.Text = "Median Residual Uncertainty";
-            this.cbxUseMedianResidualUncertainty.UseVisualStyleBackColor = true;
-            this.cbxUseMedianResidualUncertainty.CheckedChanged += new System.EventHandler(this.cbxUseMedianResidualUncertainty_CheckedChanged);
             // 
             // frmAstrometryMotionFitting
             // 

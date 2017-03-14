@@ -582,8 +582,8 @@ namespace Tangra.MotionFitting
             {
                 // Positional uncertainty estimation by Neuschaefer and Windhorst 1994
                 var sigmaPosition = fwhmArcSec / (2.355 * snr);
+                if (sigmaPosition < minUncertainty) sigmaPosition = minUncertainty;
                 var combinedUncertainty = Math.Sqrt(sigmaPosition * sigmaPosition + solutionUncertaintyArcSec * solutionUncertaintyArcSec);
-                if (combinedUncertainty < minUncertainty) combinedUncertainty = minUncertainty;
                 return 1 / (combinedUncertainty * combinedUncertainty);
             }
             else if (mode == WeightingMode.SolutionUncertainty)

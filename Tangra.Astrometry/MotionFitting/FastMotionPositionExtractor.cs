@@ -426,6 +426,7 @@ namespace Tangra.MotionFitting
         private WeightingMode m_Weighting;
         private double? m_PosUncertaintyMedArcSec;
         private bool m_UseMedianResidualUncertainty;
+        private double m_MinUncertainty;
 
         private List<MeasurementPositionEntry> m_Entries;
 
@@ -443,6 +444,7 @@ namespace Tangra.MotionFitting
             m_InstDelayTimeOfDay = instDelayTimeOfDay;
             m_Weighting = weighting;
             m_UseMedianResidualUncertainty = useMedianResidualUncertainty;
+            m_MinUncertainty = minUncertainty;
 
             var regRA = new LinearRegression();
             var regDE = new LinearRegression();
@@ -457,8 +459,8 @@ namespace Tangra.MotionFitting
                 }
                 else
                 {
-                    var weightRA = CalulateWeight(entry, entry.SolutionUncertaintyRACosDEArcSec, minUncertainty, weighting);
-                    var weightDE = CalulateWeight(entry, entry.SolutionUncertaintyDEArcSec, minUncertainty, weighting);
+                    var weightRA = CalulateWeight(entry, entry.SolutionUncertaintyRACosDEArcSec);
+                    var weightDE = CalulateWeight(entry, entry.SolutionUncertaintyDEArcSec);
                     regRA.AddDataPoint(midFrameTime, entry.RADeg, weightRA);
                     regDE.AddDataPoint(midFrameTime, entry.DEDeg, weightDE);
                 }
@@ -500,12 +502,10 @@ namespace Tangra.MotionFitting
                     }
                     else
                     {
-                        var weightRA = CalulateWeight(entry, entry.SolutionUncertaintyRACosDEArcSec, minUncertainty,
-                            weighting);
+                        var weightRA = CalulateWeight(entry, entry.SolutionUncertaintyRACosDEArcSec);
                         m_RegressionRA.AddDataPoint(midFrameTime, entry.RADeg, weightRA);
 
-                        var weightDE = CalulateWeight(entry, entry.SolutionUncertaintyDEArcSec, minUncertainty,
-                            weighting);
+                        var weightDE = CalulateWeight(entry, entry.SolutionUncertaintyDEArcSec);
                         m_RegressionDE.AddDataPoint(midFrameTime, entry.DEDeg, weightDE);
                     }
                 }
@@ -528,7 +528,9 @@ namespace Tangra.MotionFitting
                     var posUncertainty = entry.FWHMArcSec / (2.355 * entry.SNR);
                     posUncertaintyAveLst.Add(posUncertainty);
                 }
-                m_PosUncertaintyMedArcSec = posUncertaintyAveLst.Median() / Math.Sqrt(posUncertaintyAveLst.Count);
+                var posUncertaintyMedian = posUncertaintyAveLst.Median();
+                if (posUncertaintyMedian < m_MinUncertainty) posUncertaintyMedian = m_MinUncertainty;
+                m_PosUncertaintyMedArcSec = posUncertaintyMedian / Math.Sqrt(posUncertaintyAveLst.Count);
             }
             else
             {
@@ -536,9 +538,9 @@ namespace Tangra.MotionFitting
             }
         }
 
-        private double CalulateWeight(MeasurementPositionEntry entry, double solutionUncertaintyArcSec, double minUncertainty, WeightingMode weighting)
+        private double CalulateWeight(MeasurementPositionEntry entry, double solutionUncertaintyArcSec)
         {
-            return FlyByMotionFitter.ComputeWeight(weighting, solutionUncertaintyArcSec, entry.FWHMArcSec, entry.SNR, entry.DetectionCertainty, minUncertainty);
+            return FlyByMotionFitter.ComputeWeight(m_Weighting, solutionUncertaintyArcSec, entry.FWHMArcSec, entry.SNR, entry.DetectionCertainty, m_MinUncertainty);
         }
 
         internal double GetMidPointDelayCorrectedTimeOfDay()
