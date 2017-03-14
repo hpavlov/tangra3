@@ -25,6 +25,9 @@ namespace Tangra.Astrometry
 		public double m_StdDevRAArcSec;
 		public double m_StdDevDEArcSec;
 
+        public double m_UncertaintyRAArcSec;
+        public double m_UncertaintyDEArcSec;
+
 		private AstroPlate m_Image;
 		private PlateConstantsFit m_SolvedConstants;
 
@@ -43,6 +46,8 @@ namespace Tangra.Astrometry
 			m_StdDevRAArcSec = Math.Sqrt(solution.VarianceArcSecRA);
 			m_StdDevDEArcSec = Math.Sqrt(solution.VarianceArcSecDE);
 
+		    m_UncertaintyRAArcSec = solution.UncertaintyArcSecRA;
+            m_UncertaintyDEArcSec = solution.UncertaintyArcSecDE;
 		}
 
 		public FitOrder FitOrder
@@ -79,6 +84,16 @@ namespace Tangra.Astrometry
 		{
 			get { return m_StdDevDEArcSec; }
 		}
+
+        public double UncertaintyRAArcSec
+		{
+            get { return m_UncertaintyRAArcSec; }
+		}
+
+        public double UncertaintyDEArcSec
+        {
+            get { return m_UncertaintyDEArcSec; }
+        }
 
 		public AstroPlate Image
 		{

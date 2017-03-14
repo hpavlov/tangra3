@@ -69,6 +69,9 @@ namespace Tangra.Astrometry
 		internal double VarianceArcSecRA;
 		internal double VarianceArcSecDE;
 
+        internal double UncertaintyArcSecRA;
+        internal double UncertaintyArcSecDE;
+
 		public abstract void GetTangentCoordsFromImageCoords(double x, double y, out double xTang, out double yTang);
 		public abstract void GetImageCoordsFromTangentCoords(double xTang, double yTang, out double x, out double y);
 
@@ -210,6 +213,9 @@ namespace Tangra.Astrometry
 			double residualSumArcSecDE = 0;
 			int numResiduals = 0;
 
+		    var absResRAArcSec = new List<double>();
+            var absResDEArcSec = new List<double>();
+
 			for (int i = 0; i < m_StarPairs.Count; i++)
 			{
 				double computedXTang, computedYTang;
@@ -229,12 +235,17 @@ namespace Tangra.Astrometry
 				residualSum += Math.Abs(m_StarPairs[i].FitInfo.ResidualXTang * m_StarPairs[i].FitInfo.ResidualYTang);
 				residualSumArcSecRA += m_StarPairs[i].FitInfo.ResidualRAArcSec * m_StarPairs[i].FitInfo.ResidualRAArcSec;
 				residualSumArcSecDE += m_StarPairs[i].FitInfo.ResidualDEArcSec * m_StarPairs[i].FitInfo.ResidualDEArcSec;
+			    absResRAArcSec.Add(Math.Abs(m_StarPairs[i].FitInfo.ResidualRAArcSec));
+                absResDEArcSec.Add(Math.Abs(m_StarPairs[i].FitInfo.ResidualDEArcSec));
 			}
 
 			Variance = residualSum / (numResiduals - 1);
 			VarianceArcSecRA = residualSumArcSecRA / (numResiduals - 1);
 			VarianceArcSecDE = residualSumArcSecDE / (numResiduals - 1);
 
+            // Uncertainty based on Astrometrica's formula of median residual devided by SQRT(num stars)
+            UncertaintyArcSecRA = absResRAArcSec.Median() / Math.Sqrt(numResiduals);
+            UncertaintyArcSecDE = absResDEArcSec.Median() / Math.Sqrt(numResiduals);
 
 
 			return true;

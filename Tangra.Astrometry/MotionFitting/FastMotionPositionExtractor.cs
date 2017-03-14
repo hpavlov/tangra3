@@ -135,7 +135,8 @@ namespace Tangra.MotionFitting
                             m_OutliersSigmaThreashold,
                             instDelayTimeOfDay,
                             settings.BestPositionUncertaintyArcSec,
-                            settings.FactorInPositionalUncertainty);
+                            settings.FactorInPositionalUncertainty,
+                            settings.UseMedianResidualUncertainty);
 
                         m_Chunks.Add(chunkPosExtractor);
                     }
@@ -424,6 +425,7 @@ namespace Tangra.MotionFitting
         private double m_InstDelayTimeOfDay;
         private WeightingMode m_Weighting;
         private double? m_PosUncertaintyMedArcSec;
+        private bool m_UseMedianResidualUncertainty;
 
         private List<MeasurementPositionEntry> m_Entries;
 
@@ -433,10 +435,14 @@ namespace Tangra.MotionFitting
             LastEntryId = lastEntryId;
         }
 
-        public void Calculate(MeasurementPositionEntry[] entries, WeightingMode weighting, bool removeOutliers, double outlierSigmaCoeff, double instDelayTimeOfDay, double minUncertainty, bool includePositionalUncertainties)
+        public void Calculate(
+            MeasurementPositionEntry[] entries, WeightingMode weighting, bool removeOutliers, double outlierSigmaCoeff, 
+            double instDelayTimeOfDay, double minUncertainty,
+            bool includePositionalUncertainties, bool useMedianResidualUncertainty)
         {
             m_InstDelayTimeOfDay = instDelayTimeOfDay;
             m_Weighting = weighting;
+            m_UseMedianResidualUncertainty = useMedianResidualUncertainty;
 
             var regRA = new LinearRegression();
             var regDE = new LinearRegression();
@@ -577,8 +583,8 @@ namespace Tangra.MotionFitting
 
         internal void GetPosition(double timeOfDay, out double raHours, out double errRACosDEArcSec, out double deDeg, out double errDEArcSec)
         {
-            raHours = m_RegressionRA.ComputeYWithError(timeOfDay, out errRACosDEArcSec) / 15.0;
-            deDeg = m_RegressionDE.ComputeYWithError(timeOfDay, out errDEArcSec);
+            raHours = m_RegressionRA.ComputeYWithError(timeOfDay, out errRACosDEArcSec, m_UseMedianResidualUncertainty) / 15.0;
+            deDeg = m_RegressionDE.ComputeYWithError(timeOfDay, out errDEArcSec, m_UseMedianResidualUncertainty);
 
             errRACosDEArcSec *= Math.Cos(deDeg * Math.PI / 180) * 3600;
             errDEArcSec *= 3600;
@@ -599,8 +605,8 @@ namespace Tangra.MotionFitting
                 var normalTime = double.Parse(closestTimeOfDay.ToString("0.000000"));
 
                 double errRA, errDE;
-                m_RegressionRA.ComputeYWithError(normalTime, out errRA);
-                m_RegressionDE.ComputeYWithError(normalTime, out errDE);
+                m_RegressionRA.ComputeYWithError(normalTime, out errRA, m_UseMedianResidualUncertainty);
+                m_RegressionDE.ComputeYWithError(normalTime, out errDE, m_UseMedianResidualUncertainty);
 
                 return errRA * errRA + errDE * errDE;
             }
@@ -622,8 +628,8 @@ namespace Tangra.MotionFitting
 
                 DateTime mpcTime = obsDate.Date.AddDays(normalTime);
                 double errRA, errDE;
-                double mpcRAHours = m_RegressionRA.ComputeYWithError(normalTime, out errRA) / 15.0;
-                double mpcDEDeg = m_RegressionDE.ComputeYWithError(normalTime, out errDE);
+                double mpcRAHours = m_RegressionRA.ComputeYWithError(normalTime, out errRA, m_UseMedianResidualUncertainty) / 15.0;
+                double mpcDEDeg = m_RegressionDE.ComputeYWithError(normalTime, out errDE, m_UseMedianResidualUncertainty);
 
                 errRA *= Math.Cos(mpcDEDeg * Math.PI / 180) * 3600;
                 errDE *= 3600;

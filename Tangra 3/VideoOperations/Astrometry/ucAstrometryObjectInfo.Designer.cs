@@ -99,6 +99,10 @@
             this.btnShowMesaurements = new System.Windows.Forms.Button();
             this.pnlSwitchControl = new System.Windows.Forms.Panel();
             this.saveUnitTestDataFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.label9 = new System.Windows.Forms.Label();
+            this.lblUncertRA = new System.Windows.Forms.Label();
+            this.label18 = new System.Windows.Forms.Label();
+            this.lblUncertDE = new System.Windows.Forms.Label();
             this.pnlMeasurements.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pnlRASeries)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pnlDESeries)).BeginInit();
@@ -256,16 +260,16 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(3, 24);
+            this.label8.Location = new System.Drawing.Point(7, 24);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(76, 13);
+            this.label8.Size = new System.Drawing.Size(72, 13);
             this.label8.TabIndex = 16;
-            this.label8.Text = "Std.Dev DE = ";
+            this.label8.Text = "Uncert. RA = ";
             // 
             // lblStdDevRA
             // 
             this.lblStdDevRA.AutoSize = true;
-            this.lblStdDevRA.Location = new System.Drawing.Point(77, 6);
+            this.lblStdDevRA.Location = new System.Drawing.Point(76, 6);
             this.lblStdDevRA.Name = "lblStdDevRA";
             this.lblStdDevRA.Size = new System.Drawing.Size(34, 13);
             this.lblStdDevRA.TabIndex = 17;
@@ -274,7 +278,7 @@
             // lblStdDevDE
             // 
             this.lblStdDevDE.AutoSize = true;
-            this.lblStdDevDE.Location = new System.Drawing.Point(77, 24);
+            this.lblStdDevDE.Location = new System.Drawing.Point(139, 6);
             this.lblStdDevDE.Name = "lblStdDevDE";
             this.lblStdDevDE.Size = new System.Drawing.Size(34, 13);
             this.lblStdDevDE.TabIndex = 15;
@@ -453,6 +457,10 @@
             // 
             // pnlFitInfo
             // 
+            this.pnlFitInfo.Controls.Add(this.lblUncertDE);
+            this.pnlFitInfo.Controls.Add(this.label18);
+            this.pnlFitInfo.Controls.Add(this.lblUncertRA);
+            this.pnlFitInfo.Controls.Add(this.label9);
             this.pnlFitInfo.Controls.Add(this.label13);
             this.pnlFitInfo.Controls.Add(this.lblStdDevMag);
             this.pnlFitInfo.Controls.Add(this.label3);
@@ -465,7 +473,7 @@
             this.pnlFitInfo.Controls.Add(this.lblStdDevDE);
             this.pnlFitInfo.Location = new System.Drawing.Point(3, 3);
             this.pnlFitInfo.Name = "pnlFitInfo";
-            this.pnlFitInfo.Size = new System.Drawing.Size(162, 112);
+            this.pnlFitInfo.Size = new System.Drawing.Size(176, 112);
             this.pnlFitInfo.TabIndex = 19;
             // 
             // label13
@@ -971,6 +979,42 @@
             this.saveUnitTestDataFileDialog.DefaultExt = "obs";
             this.saveUnitTestDataFileDialog.Filter = "Zip Files (*.zip)|*.zip|All Files (*.*)|*.*";
             // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(111, 6);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(31, 13);
+            this.label9.TabIndex = 24;
+            this.label9.Text = "DE =";
+            // 
+            // lblUncertRA
+            // 
+            this.lblUncertRA.AutoSize = true;
+            this.lblUncertRA.Location = new System.Drawing.Point(76, 24);
+            this.lblUncertRA.Name = "lblUncertRA";
+            this.lblUncertRA.Size = new System.Drawing.Size(34, 13);
+            this.lblUncertRA.TabIndex = 25;
+            this.lblUncertRA.Text = "214.5";
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(111, 24);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(31, 13);
+            this.label18.TabIndex = 26;
+            this.label18.Text = "DE =";
+            // 
+            // lblUncertDE
+            // 
+            this.lblUncertDE.AutoSize = true;
+            this.lblUncertDE.Location = new System.Drawing.Point(139, 24);
+            this.lblUncertDE.Name = "lblUncertDE";
+            this.lblUncertDE.Size = new System.Drawing.Size(34, 13);
+            this.lblUncertDE.TabIndex = 27;
+            this.lblUncertDE.Text = "214.5";
+            // 
             // ucAstrometryObjectInfo
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1092,5 +1136,9 @@
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.Label lblErrPos;
         private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.Label lblUncertDE;
+        private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.Label lblUncertRA;
+        private System.Windows.Forms.Label label9;
 	}
 }

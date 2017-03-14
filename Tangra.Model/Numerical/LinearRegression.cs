@@ -154,13 +154,16 @@ namespace Tangra.Model.Numerical
             return m_A * x + m_B;
         }
 
-        public double ComputeYWithError(double x, out double uncertainty, double confidenceIntervalPerc = 0.95)
+        public double ComputeYWithError(double x, out double uncertainty, bool useMedianResidualUncertainty = false, double confidenceIntervalPerc = 0.95)
         {
             EnsureResiduals();
 
             var tDistCoeff = GetTDistributionCoeff(m_XValues.Count, 1 - confidenceIntervalPerc);
 
-            uncertainty = tDistCoeff * m_StdDev * Math.Sqrt((1.0 / m_XValues.Count) + m_XValues.Count * Math.Pow(x - m_AverageSampleX, 2) / m_SS);
+            if (useMedianResidualUncertainty)
+                uncertainty = tDistCoeff * m_MedianResidual / Math.Sqrt(m_Residuals.Count);
+            else
+                uncertainty = tDistCoeff * m_StdDev * Math.Sqrt((1.0 / m_XValues.Count) + m_XValues.Count * Math.Pow(x - m_AverageSampleX, 2) / m_SS);
 
             return m_A * x + m_B;
         }
@@ -187,6 +190,7 @@ namespace Tangra.Model.Numerical
         private double m_StdDev = double.NaN;
         private double m_StdDevUnscaled = double.NaN;
         private double m_ChiSquare = double.NaN;
+        private double m_MedianResidual = double.NaN;
 
         public double StdDev
         {
@@ -266,6 +270,10 @@ namespace Tangra.Model.Numerical
                 m_StdDevUnscaled = m_StdDev = Math.Sqrt(variance);
                 if (hasWeights)
                     m_StdDev = Math.Sqrt(variance/weightMeanScaler);
+
+                m_MedianResidual = m_Residuals.Select(x => Math.Abs(x)).ToList().Median();
+                if (hasWeights)
+                    m_MedianResidual /= weightMeanScaler;
 
                 m_ChiSquare = 0;
                 double stdsq = m_StdDev * m_StdDev;

@@ -147,6 +147,7 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                     ConstraintPattern = cbxContraintPattern.SelectedIndex,
                     BestPositionUncertaintyArcSec = TangraConfig.Settings.Astrometry.AssumedPositionUncertaintyPixels * (double)nudPixelsPerArcSec.Value,
                     FactorInPositionalUncertainty = cbxFactorInPositionalUncertainty.Checked,
+                    UseMedianResidualUncertainty = cbxUseMedianResidualUncertainty.Checked,
                     OutliersSigmaThreashold = (double)nudSigmaExclusion.Value
                 };
 
@@ -268,6 +269,11 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
             Recalculate();
         }
 
+        private void cbxUseMedianResidualUncertainty_CheckedChanged(object sender, EventArgs e)
+        {
+            Recalculate();
+        }
+
         private void nudSinglePosMea_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyValue == 13 && m_PositionExtractor != null)
@@ -288,6 +294,5 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                 }
             }
         }
-
     }
 }

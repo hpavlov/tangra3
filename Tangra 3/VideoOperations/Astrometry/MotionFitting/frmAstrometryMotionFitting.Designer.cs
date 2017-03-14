@@ -37,6 +37,9 @@
             this.nudPixelsPerArcSec = new System.Windows.Forms.NumericUpDown();
             this.label9 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.rbWeightingAstr = new System.Windows.Forms.RadioButton();
+            this.label12 = new System.Windows.Forms.Label();
+            this.nudSigmaExclusion = new System.Windows.Forms.NumericUpDown();
             this.cbxFactorInPositionalUncertainty = new System.Windows.Forms.CheckBox();
             this.cbxContraintPattern = new System.Windows.Forms.ComboBox();
             this.label8 = new System.Windows.Forms.Label();
@@ -72,13 +75,12 @@
             this.nudSinglePosMea = new System.Windows.Forms.NumericUpDown();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.nudSigmaExclusion = new System.Windows.Forms.NumericUpDown();
-            this.label12 = new System.Windows.Forms.Label();
-            this.rbWeightingAstr = new System.Windows.Forms.RadioButton();
+            this.cbxUseMedianResidualUncertainty = new System.Windows.Forms.CheckBox();
             this.toolStrip1.SuspendLayout();
             this.pnlFiles.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudPixelsPerArcSec)).BeginInit();
             this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudSigmaExclusion)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMeaIntervals)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudInstDelaySec)).BeginInit();
             this.pnlClient.SuspendLayout();
@@ -89,7 +91,6 @@
             this.pnlReportHolder.SuspendLayout();
             this.pnlExportOptions.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudSinglePosMea)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudSigmaExclusion)).BeginInit();
             this.SuspendLayout();
             // 
             // toolStrip1
@@ -150,7 +151,7 @@
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(165, 304);
+            this.label10.Location = new System.Drawing.Point(165, 288);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(39, 13);
             this.label10.TabIndex = 43;
@@ -159,7 +160,7 @@
             // nudPixelsPerArcSec
             // 
             this.nudPixelsPerArcSec.DecimalPlaces = 2;
-            this.nudPixelsPerArcSec.Location = new System.Drawing.Point(109, 302);
+            this.nudPixelsPerArcSec.Location = new System.Drawing.Point(109, 286);
             this.nudPixelsPerArcSec.Maximum = new decimal(new int[] {
             9,
             0,
@@ -173,7 +174,7 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(25, 304);
+            this.label9.Location = new System.Drawing.Point(25, 288);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(83, 13);
             this.label9.TabIndex = 41;
@@ -182,6 +183,7 @@
             // groupBox1
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.groupBox1.Controls.Add(this.cbxUseMedianResidualUncertainty);
             this.groupBox1.Controls.Add(this.rbWeightingAstr);
             this.groupBox1.Controls.Add(this.label12);
             this.groupBox1.Controls.Add(this.nudSigmaExclusion);
@@ -194,12 +196,57 @@
             this.groupBox1.Controls.Add(this.label7);
             this.groupBox1.Controls.Add(this.nudMeaIntervals);
             this.groupBox1.Controls.Add(this.label6);
-            this.groupBox1.Location = new System.Drawing.Point(6, 328);
+            this.groupBox1.Location = new System.Drawing.Point(6, 312);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(194, 198);
+            this.groupBox1.Size = new System.Drawing.Size(194, 214);
             this.groupBox1.TabIndex = 40;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Reduction Settings";
+            // 
+            // rbWeightingAstr
+            // 
+            this.rbWeightingAstr.AutoSize = true;
+            this.rbWeightingAstr.Location = new System.Drawing.Point(19, 172);
+            this.rbWeightingAstr.Name = "rbWeightingAstr";
+            this.rbWeightingAstr.Size = new System.Drawing.Size(124, 17);
+            this.rbWeightingAstr.TabIndex = 46;
+            this.rbWeightingAstr.Text = "StdDev (Plate Solve)";
+            this.rbWeightingAstr.UseVisualStyleBackColor = true;
+            this.rbWeightingAstr.CheckedChanged += new System.EventHandler(this.OnWeightingChanged);
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Font = new System.Drawing.Font("Symbol", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(2)));
+            this.label12.Location = new System.Drawing.Point(156, 79);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(13, 13);
+            this.label12.TabIndex = 45;
+            this.label12.Text = "s";
+            // 
+            // nudSigmaExclusion
+            // 
+            this.nudSigmaExclusion.DecimalPlaces = 1;
+            this.nudSigmaExclusion.Location = new System.Drawing.Point(115, 75);
+            this.nudSigmaExclusion.Maximum = new decimal(new int[] {
+            9,
+            0,
+            0,
+            0});
+            this.nudSigmaExclusion.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            this.nudSigmaExclusion.Name = "nudSigmaExclusion";
+            this.nudSigmaExclusion.Size = new System.Drawing.Size(39, 20);
+            this.nudSigmaExclusion.TabIndex = 44;
+            this.nudSigmaExclusion.Value = new decimal(new int[] {
+            3,
+            0,
+            0,
+            0});
+            this.nudSigmaExclusion.ValueChanged += new System.EventHandler(this.nudSigmaExclusion_ValueChanged);
             // 
             // cbxFactorInPositionalUncertainty
             // 
@@ -255,10 +302,11 @@
             // 
             this.rbWeightingPosAstr.AutoSize = true;
             this.rbWeightingPosAstr.Checked = true;
-            this.rbWeightingPosAstr.Location = new System.Drawing.Point(19, 173);
+            this.rbWeightingPosAstr.Location = new System.Drawing.Point(19, 190);
             this.rbWeightingPosAstr.Name = "rbWeightingPosAstr";
             this.rbWeightingPosAstr.Size = new System.Drawing.Size(173, 17);
             this.rbWeightingPosAstr.TabIndex = 39;
+            this.rbWeightingPosAstr.TabStop = true;
             this.rbWeightingPosAstr.Text = "StdDev (Plate Solve + Position)";
             this.rbWeightingPosAstr.UseVisualStyleBackColor = true;
             this.rbWeightingPosAstr.CheckedChanged += new System.EventHandler(this.OnWeightingChanged);
@@ -266,7 +314,7 @@
             // rbWeightingNone
             // 
             this.rbWeightingNone.AutoSize = true;
-            this.rbWeightingNone.Location = new System.Drawing.Point(19, 137);
+            this.rbWeightingNone.Location = new System.Drawing.Point(19, 154);
             this.rbWeightingNone.Name = "rbWeightingNone";
             this.rbWeightingNone.Size = new System.Drawing.Size(51, 17);
             this.rbWeightingNone.TabIndex = 38;
@@ -277,7 +325,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(9, 119);
+            this.label7.Location = new System.Drawing.Point(9, 136);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(58, 13);
             this.label7.TabIndex = 37;
@@ -313,7 +361,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(7, 253);
+            this.label3.Location = new System.Drawing.Point(7, 237);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(95, 13);
             this.label3.TabIndex = 39;
@@ -322,7 +370,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(7, 226);
+            this.label2.Location = new System.Drawing.Point(7, 210);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(93, 13);
             this.label2.TabIndex = 38;
@@ -331,7 +379,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(7, 201);
+            this.label1.Location = new System.Drawing.Point(7, 185);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(92, 13);
             this.label1.TabIndex = 37;
@@ -340,7 +388,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(166, 279);
+            this.label5.Location = new System.Drawing.Point(166, 263);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(24, 13);
             this.label5.TabIndex = 36;
@@ -349,7 +397,7 @@
             // nudInstDelaySec
             // 
             this.nudInstDelaySec.DecimalPlaces = 2;
-            this.nudInstDelaySec.Location = new System.Drawing.Point(109, 276);
+            this.nudInstDelaySec.Location = new System.Drawing.Point(109, 260);
             this.nudInstDelaySec.Name = "nudInstDelaySec";
             this.nudInstDelaySec.Size = new System.Drawing.Size(49, 20);
             this.nudInstDelaySec.TabIndex = 35;
@@ -358,7 +406,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(7, 279);
+            this.label4.Location = new System.Drawing.Point(7, 263);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(97, 13);
             this.label4.TabIndex = 34;
@@ -366,7 +414,7 @@
             // 
             // tbxObjectDesign
             // 
-            this.tbxObjectDesign.Location = new System.Drawing.Point(109, 198);
+            this.tbxObjectDesign.Location = new System.Drawing.Point(109, 182);
             this.tbxObjectDesign.Name = "tbxObjectDesign";
             this.tbxObjectDesign.Size = new System.Drawing.Size(85, 20);
             this.tbxObjectDesign.TabIndex = 33;
@@ -375,7 +423,7 @@
             // dtpDate
             // 
             this.dtpDate.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dtpDate.Location = new System.Drawing.Point(109, 224);
+            this.dtpDate.Location = new System.Drawing.Point(109, 208);
             this.dtpDate.Name = "dtpDate";
             this.dtpDate.Size = new System.Drawing.Size(82, 20);
             this.dtpDate.TabIndex = 32;
@@ -384,7 +432,7 @@
             // 
             // tbxObsCode
             // 
-            this.tbxObsCode.Location = new System.Drawing.Point(109, 250);
+            this.tbxObsCode.Location = new System.Drawing.Point(109, 234);
             this.tbxObsCode.Name = "tbxObsCode";
             this.tbxObsCode.Size = new System.Drawing.Size(29, 20);
             this.tbxObsCode.TabIndex = 31;
@@ -550,50 +598,16 @@
             this.openFileDialog1.Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*";
             this.openFileDialog1.Multiselect = true;
             // 
-            // nudSigmaExclusion
+            // cbxUseMedianResidualUncertainty
             // 
-            this.nudSigmaExclusion.DecimalPlaces = 1;
-            this.nudSigmaExclusion.Location = new System.Drawing.Point(115, 75);
-            this.nudSigmaExclusion.Maximum = new decimal(new int[] {
-            9,
-            0,
-            0,
-            0});
-            this.nudSigmaExclusion.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            65536});
-            this.nudSigmaExclusion.Name = "nudSigmaExclusion";
-            this.nudSigmaExclusion.Size = new System.Drawing.Size(39, 20);
-            this.nudSigmaExclusion.TabIndex = 44;
-            this.nudSigmaExclusion.Value = new decimal(new int[] {
-            3,
-            0,
-            0,
-            0});
-            this.nudSigmaExclusion.ValueChanged += new System.EventHandler(this.nudSigmaExclusion_ValueChanged);
-            // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Font = new System.Drawing.Font("Symbol", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(2)));
-            this.label12.Location = new System.Drawing.Point(156, 79);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(13, 13);
-            this.label12.TabIndex = 45;
-            this.label12.Text = "s";
-            // 
-            // rbWeightingAstr
-            // 
-            this.rbWeightingAstr.AutoSize = true;
-            this.rbWeightingAstr.Location = new System.Drawing.Point(19, 155);
-            this.rbWeightingAstr.Name = "rbWeightingAstr";
-            this.rbWeightingAstr.Size = new System.Drawing.Size(124, 17);
-            this.rbWeightingAstr.TabIndex = 46;
-            this.rbWeightingAstr.Text = "StdDev (Plate Solve)";
-            this.rbWeightingAstr.UseVisualStyleBackColor = true;
-            this.rbWeightingAstr.CheckedChanged += new System.EventHandler(this.OnWeightingChanged);
+            this.cbxUseMedianResidualUncertainty.AutoSize = true;
+            this.cbxUseMedianResidualUncertainty.Location = new System.Drawing.Point(12, 114);
+            this.cbxUseMedianResidualUncertainty.Name = "cbxUseMedianResidualUncertainty";
+            this.cbxUseMedianResidualUncertainty.Size = new System.Drawing.Size(162, 17);
+            this.cbxUseMedianResidualUncertainty.TabIndex = 1;
+            this.cbxUseMedianResidualUncertainty.Text = "Median Residual Uncertainty";
+            this.cbxUseMedianResidualUncertainty.UseVisualStyleBackColor = true;
+            this.cbxUseMedianResidualUncertainty.CheckedChanged += new System.EventHandler(this.cbxUseMedianResidualUncertainty_CheckedChanged);
             // 
             // frmAstrometryMotionFitting
             // 
@@ -616,6 +630,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudPixelsPerArcSec)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudSigmaExclusion)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMeaIntervals)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudInstDelaySec)).EndInit();
             this.pnlClient.ResumeLayout(false);
@@ -628,7 +643,6 @@
             this.pnlExportOptions.ResumeLayout(false);
             this.pnlExportOptions.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudSinglePosMea)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudSigmaExclusion)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -682,5 +696,6 @@
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.NumericUpDown nudSigmaExclusion;
         private System.Windows.Forms.RadioButton rbWeightingAstr;
+        private System.Windows.Forms.CheckBox cbxUseMedianResidualUncertainty;
     }
 }

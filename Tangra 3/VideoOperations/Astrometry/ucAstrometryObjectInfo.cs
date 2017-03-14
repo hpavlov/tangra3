@@ -486,6 +486,8 @@ namespace Tangra.VideoOperations.Astrometry
 			{
 				lblStdDevRA.Text = string.Format("{0}\"", fit.StdDevRAArcSec.ToString("0.00"));
 				lblStdDevDE.Text = string.Format("{0}\"", fit.StdDevDEArcSec.ToString("0.00"));
+                lblUncertRA.Text = string.Format("{0}\"", fit.UncertaintyRAArcSec.ToString("0.00"));
+                lblUncertDE.Text = string.Format("{0}\"", fit.UncertaintyDEArcSec.ToString("0.00"));
 
 				if (magFit != null)
 				{
