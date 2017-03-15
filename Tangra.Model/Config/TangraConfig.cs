@@ -1698,6 +1698,7 @@ namespace Tangra.Model.Config
                 MaxResidualInPixels = 1.0;
 				MaximumPSFElongation = 35;
 			    AssumedPositionUncertaintyPixels = 0.1; // pixels
+			    SmallestReportedUncertaintyArcSec = 0.1; // arcsec
 
 				AlignmentMethod = FieldAlignmentMethod.Pyramid;
                 MotionFitWeightingMode = WeightingMode.SNR;
@@ -1777,6 +1778,8 @@ namespace Tangra.Model.Config
 			}
 
             public double AssumedPositionUncertaintyPixels { get; set; }
+
+            public double SmallestReportedUncertaintyArcSec { get; set; }
 
 			public FieldAlignmentMethod AlignmentMethod { get; set; }
 

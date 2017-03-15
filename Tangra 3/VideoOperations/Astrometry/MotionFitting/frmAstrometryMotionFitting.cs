@@ -146,6 +146,7 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                     RemoveOutliers = cbxOutlierRemoval.Checked,
                     ConstraintPattern = cbxContraintPattern.SelectedIndex,
                     BestPositionUncertaintyArcSec = TangraConfig.Settings.Astrometry.AssumedPositionUncertaintyPixels * (double)nudPixelsPerArcSec.Value,
+                    SmallestReportedUncertaintyArcSec = TangraConfig.Settings.Astrometry.SmallestReportedUncertaintyArcSec,
                     FactorInPositionalUncertainty = cbxFactorInPositionalUncertainty.Checked,
                     UseMedianResidualUncertainty = cbxUseMedianResidualUncertainty.Checked,
                     OutliersSigmaThreashold = (double)nudSigmaExclusion.Value

@@ -27,6 +27,7 @@ namespace Tangra.MotionFitting
         public int NumberOfChunks;
         public int ConstraintPattern;
         public double BestPositionUncertaintyArcSec;
+        public double SmallestReportedUncertaintyArcSec;
         public bool FactorInPositionalUncertainty;
         public bool UseMedianResidualUncertainty;
     }

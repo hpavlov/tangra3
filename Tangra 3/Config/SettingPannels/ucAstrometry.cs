@@ -25,6 +25,7 @@ namespace Tangra.Config.SettingPannels
 			nudAstrMaximumStars.SetNUDValue(TangraConfig.Settings.Astrometry.MaximumNumberOfStars);
             nudAstrMaxResidual.SetNUDValue((decimal)TangraConfig.Settings.Astrometry.MaxResidualInPixels);
             nudAstrAssumedUncertainty.SetNUDValue((decimal)TangraConfig.Settings.Astrometry.AssumedPositionUncertaintyPixels);
+            nudAstrSmallestReportedUncertainty.SetNUDValue((decimal)TangraConfig.Settings.Astrometry.SmallestReportedUncertaintyArcSec);
             nudNumberOfPivots.SetNUDValue((decimal)TangraConfig.Settings.Astrometry.PyramidNumberOfPivots);
 
 			nudAstrDistTolerance.SetNUDValue((decimal)TangraConfig.Settings.Astrometry.PyramidDistanceToleranceInPixels);
@@ -48,6 +49,7 @@ namespace Tangra.Config.SettingPannels
 			TangraConfig.Settings.Astrometry.MaximumNumberOfStars = (int)nudAstrMaximumStars.Value;
             TangraConfig.Settings.Astrometry.MaxResidualInPixels = (double)nudAstrMaxResidual.Value;
             TangraConfig.Settings.Astrometry.AssumedPositionUncertaintyPixels = (double)nudAstrAssumedUncertainty.Value;
+            TangraConfig.Settings.Astrometry.SmallestReportedUncertaintyArcSec = (double)nudAstrSmallestReportedUncertainty.Value;
             TangraConfig.Settings.Astrometry.PyramidNumberOfPivots = (int)nudNumberOfPivots.Value;
 
 			TangraConfig.Settings.Astrometry.PyramidDistanceToleranceInPixels = (double)nudAstrDistTolerance.Value;

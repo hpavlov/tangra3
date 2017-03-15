@@ -70,6 +70,9 @@
             this.cbxExportUncertainties = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.cbxExportHigherPositionAccuracy = new System.Windows.Forms.CheckBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.nudAstrSmallestReportedUncertainty = new System.Windows.Forms.NumericUpDown();
+            this.label6 = new System.Windows.Forms.Label();
             this.groupBox8.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudAstrMaximumStars)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudAstrMinimumStars)).BeginInit();
@@ -86,6 +89,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudTargetVRColour)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMagResidual)).BeginInit();
             this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudAstrSmallestReportedUncertainty)).BeginInit();
             this.SuspendLayout();
             // 
             // groupBox8
@@ -240,7 +244,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(201, 26);
+            this.label3.Location = new System.Drawing.Point(205, 28);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(18, 13);
             this.label3.TabIndex = 43;
@@ -249,11 +253,11 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(13, 23);
+            this.label4.Location = new System.Drawing.Point(18, 26);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(131, 13);
+            this.label4.Size = new System.Drawing.Size(125, 13);
             this.label4.TabIndex = 42;
-            this.label4.Text = "Assumed Best Uncertainty";
+            this.label4.Text = "Best Position Uncertainty";
             // 
             // nudAstrAssumedUncertainty
             // 
@@ -263,7 +267,7 @@
             0,
             0,
             131072});
-            this.nudAstrAssumedUncertainty.Location = new System.Drawing.Point(149, 21);
+            this.nudAstrAssumedUncertainty.Location = new System.Drawing.Point(153, 23);
             this.nudAstrAssumedUncertainty.Maximum = new decimal(new int[] {
             5,
             0,
@@ -664,7 +668,7 @@
             // cbxDebugOutput
             // 
             this.cbxDebugOutput.AutoSize = true;
-            this.cbxDebugOutput.Location = new System.Drawing.Point(16, 68);
+            this.cbxDebugOutput.Location = new System.Drawing.Point(16, 84);
             this.cbxDebugOutput.Name = "cbxDebugOutput";
             this.cbxDebugOutput.Size = new System.Drawing.Size(125, 17);
             this.cbxDebugOutput.TabIndex = 35;
@@ -674,7 +678,7 @@
             // cbxExportUncertainties
             // 
             this.cbxExportUncertainties.AutoSize = true;
-            this.cbxExportUncertainties.Location = new System.Drawing.Point(16, 91);
+            this.cbxExportUncertainties.Location = new System.Drawing.Point(16, 107);
             this.cbxExportUncertainties.Name = "cbxExportUncertainties";
             this.cbxExportUncertainties.Size = new System.Drawing.Size(119, 17);
             this.cbxExportUncertainties.TabIndex = 50;
@@ -683,6 +687,9 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.label5);
+            this.groupBox1.Controls.Add(this.nudAstrSmallestReportedUncertainty);
+            this.groupBox1.Controls.Add(this.label6);
             this.groupBox1.Controls.Add(this.cbxExportHigherPositionAccuracy);
             this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this.cbxExportUncertainties);
@@ -699,12 +706,59 @@
             // cbxExportHigherPositionAccuracy
             // 
             this.cbxExportHigherPositionAccuracy.AutoSize = true;
-            this.cbxExportHigherPositionAccuracy.Location = new System.Drawing.Point(16, 114);
+            this.cbxExportHigherPositionAccuracy.Location = new System.Drawing.Point(16, 130);
             this.cbxExportHigherPositionAccuracy.Name = "cbxExportHigherPositionAccuracy";
             this.cbxExportHigherPositionAccuracy.Size = new System.Drawing.Size(170, 17);
             this.cbxExportHigherPositionAccuracy.TabIndex = 51;
             this.cbxExportHigherPositionAccuracy.Text = "Export high accuracy positions";
             this.cbxExportHigherPositionAccuracy.UseVisualStyleBackColor = true;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(18, 52);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(132, 13);
+            this.label5.TabIndex = 53;
+            this.label5.Text = "Reported Uncertainty Limit";
+            // 
+            // nudAstrSmallestReportedUncertainty
+            // 
+            this.nudAstrSmallestReportedUncertainty.DecimalPlaces = 2;
+            this.nudAstrSmallestReportedUncertainty.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            131072});
+            this.nudAstrSmallestReportedUncertainty.Location = new System.Drawing.Point(153, 49);
+            this.nudAstrSmallestReportedUncertainty.Maximum = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            this.nudAstrSmallestReportedUncertainty.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            131072});
+            this.nudAstrSmallestReportedUncertainty.Name = "nudAstrSmallestReportedUncertainty";
+            this.nudAstrSmallestReportedUncertainty.Size = new System.Drawing.Size(50, 20);
+            this.nudAstrSmallestReportedUncertainty.TabIndex = 52;
+            this.nudAstrSmallestReportedUncertainty.ThousandsSeparator = true;
+            this.nudAstrSmallestReportedUncertainty.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(205, 54);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(12, 13);
+            this.label6.TabIndex = 54;
+            this.label6.Text = "\"";
             // 
             // ucAstrometry
             // 
@@ -736,6 +790,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudMagResidual)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudAstrSmallestReportedUncertainty)).EndInit();
             this.ResumeLayout(false);
 
 		}
@@ -784,5 +839,8 @@
         private System.Windows.Forms.CheckBox cbxExportUncertainties;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.CheckBox cbxExportHigherPositionAccuracy;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.NumericUpDown nudAstrSmallestReportedUncertainty;
+        private System.Windows.Forms.Label label6;
 	}
 }

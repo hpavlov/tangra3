@@ -136,7 +136,8 @@ namespace Tangra.MotionFitting
                             instDelayTimeOfDay,
                             settings.BestPositionUncertaintyArcSec,
                             settings.FactorInPositionalUncertainty,
-                            settings.UseMedianResidualUncertainty);
+                            settings.UseMedianResidualUncertainty,
+                            settings.SmallestReportedUncertaintyArcSec);
 
                         m_Chunks.Add(chunkPosExtractor);
                     }
@@ -426,7 +427,8 @@ namespace Tangra.MotionFitting
         private WeightingMode m_Weighting;
         private double? m_PosUncertaintyMedArcSec;
         private bool m_UseMedianResidualUncertainty;
-        private double m_MinUncertainty;
+        private double m_SmallestReportedUncertaintyArcSec;
+        private double m_MinSinglePositionUncertainty;
 
         private List<MeasurementPositionEntry> m_Entries;
 
@@ -439,12 +441,14 @@ namespace Tangra.MotionFitting
         public void Calculate(
             MeasurementPositionEntry[] entries, WeightingMode weighting, bool removeOutliers, double outlierSigmaCoeff, 
             double instDelayTimeOfDay, double minUncertainty,
-            bool includePositionalUncertainties, bool useMedianResidualUncertainty)
+            bool includePositionalUncertainties, bool useMedianResidualUncertainty, double smallestReportedUncertaintyArcSec)
         {
             m_InstDelayTimeOfDay = instDelayTimeOfDay;
             m_Weighting = weighting;
             m_UseMedianResidualUncertainty = useMedianResidualUncertainty;
-            m_MinUncertainty = minUncertainty;
+            m_SmallestReportedUncertaintyArcSec = smallestReportedUncertaintyArcSec;
+
+            m_MinSinglePositionUncertainty = minUncertainty;
 
             var regRA = new LinearRegression();
             var regDE = new LinearRegression();
@@ -526,10 +530,10 @@ namespace Tangra.MotionFitting
                 foreach (var entry in m_Entries)
                 {
                     var posUncertainty = entry.FWHMArcSec / (2.355 * entry.SNR);
+                    if (posUncertainty < m_MinSinglePositionUncertainty) posUncertainty = m_MinSinglePositionUncertainty;
                     posUncertaintyAveLst.Add(posUncertainty);
                 }
-                var posUncertaintyMedian = posUncertaintyAveLst.Median();
-                if (posUncertaintyMedian < m_MinUncertainty) posUncertaintyMedian = m_MinUncertainty;
+                var posUncertaintyMedian = posUncertaintyAveLst.Median();                
                 m_PosUncertaintyMedArcSec = posUncertaintyMedian / Math.Sqrt(posUncertaintyAveLst.Count);
             }
             else
@@ -540,7 +544,7 @@ namespace Tangra.MotionFitting
 
         private double CalulateWeight(MeasurementPositionEntry entry, double solutionUncertaintyArcSec)
         {
-            return FlyByMotionFitter.ComputeWeight(m_Weighting, solutionUncertaintyArcSec, entry.FWHMArcSec, entry.SNR, entry.DetectionCertainty, m_MinUncertainty);
+            return FlyByMotionFitter.ComputeWeight(m_Weighting, solutionUncertaintyArcSec, entry.FWHMArcSec, entry.SNR, entry.DetectionCertainty, m_MinSinglePositionUncertainty);
         }
 
         internal double GetMidPointDelayCorrectedTimeOfDay()
@@ -596,6 +600,9 @@ namespace Tangra.MotionFitting
                 errRACosDEArcSec = Math.Sqrt(errRACosDEArcSec * errRACosDEArcSec + m_PosUncertaintyMedArcSec.Value * m_PosUncertaintyMedArcSec.Value);
                 errDEArcSec = Math.Sqrt(errDEArcSec * errDEArcSec + m_PosUncertaintyMedArcSec.Value * m_PosUncertaintyMedArcSec.Value);
             }
+
+            if (errRACosDEArcSec < m_SmallestReportedUncertaintyArcSec) errRACosDEArcSec = m_SmallestReportedUncertaintyArcSec;
+            if (errDEArcSec < m_SmallestReportedUncertaintyArcSec) errDEArcSec = m_SmallestReportedUncertaintyArcSec;
         }
 
         internal double GetMidPointCombinedSQUncertainty()
@@ -641,6 +648,9 @@ namespace Tangra.MotionFitting
                     errRA = Math.Sqrt(errRA * errRA + m_PosUncertaintyMedArcSec.Value * m_PosUncertaintyMedArcSec.Value);
                     errDE = Math.Sqrt(errDE * errDE + m_PosUncertaintyMedArcSec.Value * m_PosUncertaintyMedArcSec.Value);
                 }
+
+                if (errRA < m_SmallestReportedUncertaintyArcSec) errRA = m_SmallestReportedUncertaintyArcSec;
+                if (errDE < m_SmallestReportedUncertaintyArcSec) errDE = m_SmallestReportedUncertaintyArcSec;
 
                 var mag = m_Entries.Select(x => x.Mag).ToList().Median();
 
