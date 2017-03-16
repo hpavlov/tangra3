@@ -160,6 +160,19 @@ namespace Tangra.Model.Helpers
                 return value.ToString();
         }
 
+        public static IEnumerable<string> GetValuesDescription(this Type type)
+        {
+            var descrList = new List<string>();
+            foreach (var enumValue in Enum.GetValues(type))
+            {
+                var memInfo = type.GetMember(enumValue.ToString());
+                var attributes = memInfo[0].GetCustomAttributes(typeof(DescriptionAttribute), false);
+                var description = ((DescriptionAttribute)attributes[0]).Description;
+                descrList.Add(description);
+            }
+            return descrList;
+        }
+
         public static bool IsAAV(this VideoFileFormat format)
         {
             return 

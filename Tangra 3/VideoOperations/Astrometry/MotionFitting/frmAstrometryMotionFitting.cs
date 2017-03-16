@@ -41,7 +41,13 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
             InitializeComponent();
 
             dtpDate.Value = DateTime.Today;
+
+            cbxErrorMethod.Items.Clear();
+            foreach(var method in typeof(ErrorMethod).GetValuesDescription())
+                cbxErrorMethod.Items.Add(method);
+            cbxErrorMethod.SelectedIndex = 0;
         }
+
 
         internal protected frmAstrometryMotionFitting(string fileName)
             : this()
@@ -148,7 +154,7 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                     BestPositionUncertaintyArcSec = TangraConfig.Settings.Astrometry.AssumedPositionUncertaintyPixels * (double)nudPixelsPerArcSec.Value,
                     SmallestReportedUncertaintyArcSec = TangraConfig.Settings.Astrometry.SmallestReportedUncertaintyArcSec,
                     FactorInPositionalUncertainty = cbxFactorInPositionalUncertainty.Checked,
-                    UseMedianResidualUncertainty = cbxUseMedianResidualUncertainty.Checked,
+                    ErrorMethod = (ErrorMethod)cbxErrorMethod.SelectedIndex,
                     OutliersSigmaThreashold = (double)nudSigmaExclusion.Value
                 };
 
@@ -270,7 +276,7 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
             Recalculate();
         }
 
-        private void cbxUseMedianResidualUncertainty_CheckedChanged(object sender, EventArgs e)
+        private void cbxErrorMethod_SelectedIndexChanged(object sender, EventArgs e)
         {
             Recalculate();
         }

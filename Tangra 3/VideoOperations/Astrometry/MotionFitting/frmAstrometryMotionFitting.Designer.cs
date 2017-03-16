@@ -37,7 +37,6 @@
             this.nudPixelsPerArcSec = new System.Windows.Forms.NumericUpDown();
             this.label9 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.cbxUseMedianResidualUncertainty = new System.Windows.Forms.CheckBox();
             this.rbWeightingAstr = new System.Windows.Forms.RadioButton();
             this.label12 = new System.Windows.Forms.Label();
             this.nudSigmaExclusion = new System.Windows.Forms.NumericUpDown();
@@ -76,6 +75,8 @@
             this.nudSinglePosMea = new System.Windows.Forms.NumericUpDown();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.cbxErrorMethod = new System.Windows.Forms.ComboBox();
+            this.label13 = new System.Windows.Forms.Label();
             this.toolStrip1.SuspendLayout();
             this.pnlFiles.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudPixelsPerArcSec)).BeginInit();
@@ -183,7 +184,8 @@
             // groupBox1
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.groupBox1.Controls.Add(this.cbxUseMedianResidualUncertainty);
+            this.groupBox1.Controls.Add(this.cbxErrorMethod);
+            this.groupBox1.Controls.Add(this.label13);
             this.groupBox1.Controls.Add(this.rbWeightingAstr);
             this.groupBox1.Controls.Add(this.label12);
             this.groupBox1.Controls.Add(this.nudSigmaExclusion);
@@ -203,19 +205,6 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Reduction Settings";
             // 
-            // cbxUseMedianResidualUncertainty
-            // 
-            this.cbxUseMedianResidualUncertainty.AutoSize = true;
-            this.cbxUseMedianResidualUncertainty.Checked = true;
-            this.cbxUseMedianResidualUncertainty.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbxUseMedianResidualUncertainty.Location = new System.Drawing.Point(12, 114);
-            this.cbxUseMedianResidualUncertainty.Name = "cbxUseMedianResidualUncertainty";
-            this.cbxUseMedianResidualUncertainty.Size = new System.Drawing.Size(162, 17);
-            this.cbxUseMedianResidualUncertainty.TabIndex = 1;
-            this.cbxUseMedianResidualUncertainty.Text = "Median Residual Uncertainty";
-            this.cbxUseMedianResidualUncertainty.UseVisualStyleBackColor = true;
-            this.cbxUseMedianResidualUncertainty.CheckedChanged += new System.EventHandler(this.cbxUseMedianResidualUncertainty_CheckedChanged);
-            // 
             // rbWeightingAstr
             // 
             this.rbWeightingAstr.AutoSize = true;
@@ -231,7 +220,7 @@
             // 
             this.label12.AutoSize = true;
             this.label12.Font = new System.Drawing.Font("Symbol", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(2)));
-            this.label12.Location = new System.Drawing.Point(156, 79);
+            this.label12.Location = new System.Drawing.Point(156, 99);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(13, 13);
             this.label12.TabIndex = 45;
@@ -240,7 +229,7 @@
             // nudSigmaExclusion
             // 
             this.nudSigmaExclusion.DecimalPlaces = 1;
-            this.nudSigmaExclusion.Location = new System.Drawing.Point(115, 75);
+            this.nudSigmaExclusion.Location = new System.Drawing.Point(115, 95);
             this.nudSigmaExclusion.Maximum = new decimal(new int[] {
             9,
             0,
@@ -266,7 +255,7 @@
             this.cbxFactorInPositionalUncertainty.AutoSize = true;
             this.cbxFactorInPositionalUncertainty.Checked = true;
             this.cbxFactorInPositionalUncertainty.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbxFactorInPositionalUncertainty.Location = new System.Drawing.Point(12, 96);
+            this.cbxFactorInPositionalUncertainty.Location = new System.Drawing.Point(12, 116);
             this.cbxFactorInPositionalUncertainty.Name = "cbxFactorInPositionalUncertainty";
             this.cbxFactorInPositionalUncertainty.Size = new System.Drawing.Size(164, 17);
             this.cbxFactorInPositionalUncertainty.TabIndex = 43;
@@ -283,16 +272,16 @@
             "Pattern 1",
             "Pattern 2",
             "Pattern 3"});
-            this.cbxContraintPattern.Location = new System.Drawing.Point(103, 49);
+            this.cbxContraintPattern.Location = new System.Drawing.Point(103, 46);
             this.cbxContraintPattern.Name = "cbxContraintPattern";
-            this.cbxContraintPattern.Size = new System.Drawing.Size(80, 21);
+            this.cbxContraintPattern.Size = new System.Drawing.Size(82, 21);
             this.cbxContraintPattern.TabIndex = 42;
             this.cbxContraintPattern.SelectedIndexChanged += new System.EventHandler(this.cbxContraintPattern_SelectedIndexChanged);
             // 
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(10, 55);
+            this.label8.Location = new System.Drawing.Point(10, 50);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(89, 13);
             this.label8.TabIndex = 41;
@@ -303,7 +292,7 @@
             this.cbxOutlierRemoval.AutoSize = true;
             this.cbxOutlierRemoval.Checked = true;
             this.cbxOutlierRemoval.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbxOutlierRemoval.Location = new System.Drawing.Point(12, 78);
+            this.cbxOutlierRemoval.Location = new System.Drawing.Point(12, 98);
             this.cbxOutlierRemoval.Name = "cbxOutlierRemoval";
             this.cbxOutlierRemoval.Size = new System.Drawing.Size(104, 17);
             this.cbxOutlierRemoval.TabIndex = 40;
@@ -611,6 +600,30 @@
             this.openFileDialog1.Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*";
             this.openFileDialog1.Multiselect = true;
             // 
+            // cbxErrorMethod
+            // 
+            this.cbxErrorMethod.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxErrorMethod.FormattingEnabled = true;
+            this.cbxErrorMethod.Items.AddRange(new object[] {
+            "None",
+            "Pattern 1",
+            "Pattern 2",
+            "Pattern 3"});
+            this.cbxErrorMethod.Location = new System.Drawing.Point(84, 71);
+            this.cbxErrorMethod.Name = "cbxErrorMethod";
+            this.cbxErrorMethod.Size = new System.Drawing.Size(101, 21);
+            this.cbxErrorMethod.TabIndex = 48;
+            this.cbxErrorMethod.SelectedIndexChanged += new System.EventHandler(this.cbxErrorMethod_SelectedIndexChanged);
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(10, 75);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(73, 13);
+            this.label13.TabIndex = 47;
+            this.label13.Text = "Solution Error:";
+            // 
             // frmAstrometryMotionFitting
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -698,6 +711,7 @@
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.NumericUpDown nudSigmaExclusion;
         private System.Windows.Forms.RadioButton rbWeightingAstr;
-        private System.Windows.Forms.CheckBox cbxUseMedianResidualUncertainty;
+        private System.Windows.Forms.ComboBox cbxErrorMethod;
+        private System.Windows.Forms.Label label13;
     }
 }

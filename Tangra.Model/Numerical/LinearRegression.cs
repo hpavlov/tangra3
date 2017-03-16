@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -7,6 +8,22 @@ using Tangra.Model.Helpers;
 
 namespace Tangra.Model.Numerical
 {
+    public enum ErrorMethod
+    {
+        [Description("Interpolated")]
+        RegressionPropagated,
+        [Description("MeanRes/Sqrt(N)")]
+        MeanResidualSqrtN,
+        [Description("MedianRes/Sqrt(N)")]
+        MedianResidualSqrtN,
+        [Description("StdDev/Sqrt(N)")]
+        StdDevSqrtN,
+        [Description("StdDev/2")]
+        HalfStdDev,
+        [Description("None")]
+        None
+    }
+
     public class LinearRegression
     {
         private List<double> m_XValues = new List<double>();
@@ -154,16 +171,35 @@ namespace Tangra.Model.Numerical
             return m_A * x + m_B;
         }
 
-        public double ComputeYWithError(double x, out double uncertainty, bool useMedianResidualUncertainty = false, double confidenceIntervalPerc = 0.95)
+        public double ComputeYWithError(double x, out double uncertainty, ErrorMethod errorMethod = ErrorMethod.RegressionPropagated, double confidenceIntervalPerc = 0.95)
         {
             EnsureResiduals();
 
-            var tDistCoeff = GetTDistributionCoeff(m_XValues.Count, 1 - confidenceIntervalPerc);
-
-            if (useMedianResidualUncertainty)
-                uncertainty = tDistCoeff * m_MedianResidual / Math.Sqrt(m_Residuals.Count);
-            else
-                uncertainty = tDistCoeff * m_StdDev * Math.Sqrt((1.0 / m_XValues.Count) + m_XValues.Count * Math.Pow(x - m_AverageSampleX, 2) / m_SS);
+            switch (errorMethod)
+            {
+                case ErrorMethod.RegressionPropagated:
+                    var tDistCoeff = GetTDistributionCoeff(m_XValues.Count, 1 - confidenceIntervalPerc);
+                    uncertainty = tDistCoeff * m_StdDev * Math.Sqrt((1.0 / m_XValues.Count) + m_XValues.Count * Math.Pow(x - m_AverageSampleX, 2) / m_SS);
+                    break;
+                case ErrorMethod.MedianResidualSqrtN:
+                    uncertainty = m_MedianResidual / Math.Sqrt(m_Residuals.Count);
+                    break;
+                case ErrorMethod.MeanResidualSqrtN:
+                    uncertainty = m_MeanResidual / Math.Sqrt(m_Residuals.Count);
+                    break;
+                case ErrorMethod.StdDevSqrtN:
+                    uncertainty = m_StdDev / Math.Sqrt(m_Residuals.Count);
+                    break;
+                case ErrorMethod.HalfStdDev:
+                    uncertainty = m_StdDev / 2;
+                    break;
+                case ErrorMethod.None:
+                    uncertainty = 0;
+                    break;
+                default:
+                    uncertainty = m_StdDev;
+                    break;
+            }
 
             return m_A * x + m_B;
         }
@@ -191,6 +227,7 @@ namespace Tangra.Model.Numerical
         private double m_StdDevUnscaled = double.NaN;
         private double m_ChiSquare = double.NaN;
         private double m_MedianResidual = double.NaN;
+        private double m_MeanResidual = double.NaN;
 
         public double StdDev
         {
@@ -272,8 +309,12 @@ namespace Tangra.Model.Numerical
                     m_StdDev = Math.Sqrt(variance/weightMeanScaler);
 
                 m_MedianResidual = m_Residuals.Select(x => Math.Abs(x)).ToList().Median();
+                m_MeanResidual = m_Residuals.Select(x => Math.Abs(x)).Average();
                 if (hasWeights)
+                {
                     m_MedianResidual /= Math.Sqrt(weightMeanScaler);
+                    m_MeanResidual /= Math.Sqrt(weightMeanScaler);
+                }
 
                 m_ChiSquare = 0;
                 double stdsq = m_StdDev * m_StdDev;

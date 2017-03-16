@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Tangra.Model.Config;
+using Tangra.Model.Numerical;
 
 namespace Tangra.MotionFitting
 {
@@ -29,6 +30,6 @@ namespace Tangra.MotionFitting
         public double BestPositionUncertaintyArcSec;
         public double SmallestReportedUncertaintyArcSec;
         public bool FactorInPositionalUncertainty;
-        public bool UseMedianResidualUncertainty;
+        public ErrorMethod ErrorMethod;
     }
 }
