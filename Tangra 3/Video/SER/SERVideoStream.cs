@@ -325,7 +325,7 @@ namespace Tangra.Video.SER
 			if (startFrameNo < FirstFrame || startFrameNo > LastFrame)
 				throw new ApplicationException("Invalid frame position: " + startFrameNo);
 
-			int actualFramesToIntegrate = Math.Min(startFrameNo + framesToIntegrate, LastFrame - 1) - startFrameNo;
+			int actualFramesToIntegrate = Math.Max(1, Math.Min(startFrameNo + framesToIntegrate, LastFrame - 1) - startFrameNo);
 
 			uint[] pixels = new uint[Width * Height];
             uint[] unprocessedPixels = new uint[Width * Height];

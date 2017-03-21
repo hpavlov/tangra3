@@ -253,7 +253,7 @@ namespace Tangra.VideoOperations.Astrometry
 			pnlSwitchControl.Visible = true;
 			ShowMeasurementsView();
 
-		    if (m_MeasurementContext.MovementExpectation != MovementExpectation.Slow)
+            if (m_MeasurementContext != null && m_MeasurementContext.MovementExpectation != MovementExpectation.Slow)
 		    {
                 var exportFile = AstrometryExporter.ExportAstrometry(operation.GetCurrentFrameAstrometricSolution() as ITangraAstrometricSolution2, m_VideoController);
 

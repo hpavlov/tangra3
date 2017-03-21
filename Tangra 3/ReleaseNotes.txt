@@ -5,6 +5,7 @@ vX.X.X (Unreleased)
 - Improved the x2 frames integration detection used in astrometry and AVI-to-AAV file conversion.
 - Fixed a crash when viewing ADV/AAV version 2 files bigger than 2Gb. Upgraded AdvLib to version 2.0g.
 - Now the light curve and astrometry reductions will ensure the video is positioned at a non-duplicated frame before the start of the reduction.
+- Fixed a crash when using software integration with SER files.
 
 v3.6.3 (2017-01-23)
 -------------------
