@@ -601,14 +601,19 @@ namespace Tangra.ImageTools
 		private void SolvePlateConstants(bool debug)
 		{
 			m_LimitMag = CorePyramidConfig.Default.CalibrationFirstPlateSolveLimitMagnitude;
-			for (double maxMag = CorePyramidConfig.Default.CalibrationFirstPlateSolveLimitMagnitude; maxMag <= m_FieldSolveContext.LimitMagn; maxMag += 0.5)
-			{
-				int count = m_FieldSolveContext.CatalogueStars.Count(s => s.Mag < maxMag);
-				if (count > CorePyramidConfig.Default.CalibrationMaxStarsForAlignment)
-					break;
-				else
-					m_LimitMag = maxMag;
-			}
+		    if (m_LimitMag < m_FieldSolveContext.LimitMagn)
+		    {
+                for (double maxMag = CorePyramidConfig.Default.CalibrationFirstPlateSolveLimitMagnitude; maxMag <= m_FieldSolveContext.LimitMagn; maxMag += 0.5)
+                {
+                    int count = m_FieldSolveContext.CatalogueStars.Count(s => s.Mag < maxMag);
+                    if (count > CorePyramidConfig.Default.CalibrationMaxStarsForAlignment)
+                        break;
+                    else
+                        m_LimitMag = maxMag;
+                }		        
+		    }
+            else
+                m_LimitMag = m_FieldSolveContext.LimitMagn;
 
 			if (m_DebugMode && debug)
 			{

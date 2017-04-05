@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -27,16 +28,17 @@ namespace Tangra.Astrometry.Recognition
 		public List<DensityArea> Areas = new List<DensityArea>();
 	    internal double m_RA0Deg;
         internal double m_DE0Deg;
-
         internal Dictionary<int, ulong> DebugResolvedStarsWithAppliedExclusions;
 
-		public PyramidStarsDensityDistributor(List<IStar> stars, AstroPlate image, IAstrometrySettings settings)
+		public PyramidStarsDensityDistributor(List<IStar> stars, AstroPlate image, IAstrometrySettings settings, double ra0Deg, double de0Deg)
 		{
 			m_Stars = stars;
 			m_Image = image;
 			m_XAreaSideDeg = image.GetDistanceInArcSec(0, image.CenterYImage, image.CenterXImage, image.CenterYImage) / 3600.0;
 			m_YAreaSideDeg = image.GetDistanceInArcSec(image.CenterXImage, 0, image.CenterXImage, image.CenterYImage) / 3600.0;
 
+		    m_RA0Deg = ra0Deg;
+		    m_DE0Deg = de0Deg;
 			MAX_STARS_IN_AREA = settings.DistributionZoneStars;
 		}
 
@@ -50,33 +52,32 @@ namespace Tangra.Astrometry.Recognition
 					string.Format("There are {0} of the debug stars not found among the initial pyramid stars", missingstars.Count));
 			}
 
-			double minDE = double.MaxValue;
-			double maxDE = double.MinValue;
-			double minRA = double.MaxValue;
-			double maxRA = double.MinValue;
-			double averageRA = 0;
-			double averageDE = 0;
-			for (int i = 0; i < m_Stars.Count; i++)
-			{
-				IStar star = m_Stars[i];
-				if (star.RADeg > maxRA) maxRA = star.RADeg;
-				if (star.RADeg < minRA) minRA = star.RADeg;
-				if (star.DEDeg > maxDE) maxDE = star.DEDeg;
-				if (star.DEDeg < minDE) minDE = star.DEDeg;
+            if (alwaysIncludeStars != null && alwaysIncludeStars.Count > 0)
+            {
+                foreach(var starNo in alwaysIncludeStars.ToArray())
+                    if (m_Stars.FirstOrDefault(s => s.StarNo == starNo) == null)
+                    {
+                        Trace.WriteLine(string.Format("Cannot locate always include star {0}. Removing ...", starNo));
+                        alwaysIncludeStars.Remove(starNo);
+                    }
+            }
 
-				averageDE += star.DEDeg;
-				averageRA += star.RADeg;
-			}
+            double minDE = double.MaxValue;
+            double maxDE = double.MinValue;
+            double minRA = double.MaxValue;
+            double maxRA = double.MinValue;
+            for (int i = 0; i < m_Stars.Count; i++)
+            {
+                IStar star = m_Stars[i];
+                if (star.RADeg > maxRA) maxRA = star.RADeg;
+                if (star.RADeg < minRA) minRA = star.RADeg;
+                if (star.DEDeg > maxDE) maxDE = star.DEDeg;
+                if (star.DEDeg < minDE) minDE = star.DEDeg;
+            }
 
-			averageDE /= m_Stars.Count;
-			averageRA /= m_Stars.Count;
-
-            m_RA0Deg = averageRA;
-            m_DE0Deg = averageDE;
-
-			TangentalTransRotAstrometry astrometryBase = new TangentalTransRotAstrometry(m_Image, averageRA, averageDE, 0);
+            TangentalTransRotAstrometry astrometryBase = new TangentalTransRotAstrometry(m_Image, m_RA0Deg, m_DE0Deg, 0);
 			TangentalNormalizedDirectionAstrometry astrometry = new TangentalNormalizedDirectionAstrometry(astrometryBase);
-			DensityArea middleArea = new DensityArea(astrometry, MAX_STARS_IN_AREA, averageRA - m_XAreaSideDeg / 2, averageRA + m_XAreaSideDeg / 2, averageDE - m_YAreaSideDeg / 2, averageDE + m_YAreaSideDeg / 2, alwaysIncludeStars);
+            DensityArea middleArea = new DensityArea(astrometry, MAX_STARS_IN_AREA, m_RA0Deg - m_XAreaSideDeg / 2, m_RA0Deg + m_XAreaSideDeg / 2, m_DE0Deg - m_YAreaSideDeg / 2, m_DE0Deg + m_YAreaSideDeg / 2);
 		    middleArea.DebugResolvedStarsWithAppliedExclusions = DebugResolvedStarsWithAppliedExclusions;
 
 			double xSidePlatePix = Math.Abs(middleArea.XTo - middleArea.XFrom);
@@ -96,7 +97,7 @@ namespace Tangra.Astrometry.Recognition
 
 				foreach (DensityArea area in areasToCheckNow)
 				{
-					List<DensityArea> potentiallyNewAreas = GetSurroundingAreas(area, astrometry, xSidePlatePix, ySidePlatePix, alwaysIncludeStars);
+					List<DensityArea> potentiallyNewAreas = GetSurroundingAreas(area, astrometry, xSidePlatePix, ySidePlatePix);
 					foreach(DensityArea par in potentiallyNewAreas)
 					{
 						bool areadyAdded = Areas.Exists(a => a.ContainsPoint(par.XMiddle, par.YMiddle));
@@ -121,14 +122,23 @@ namespace Tangra.Astrometry.Recognition
 			while (areasToCheckFurther.Count > 0);
 
 			m_Stars.Sort((s1, s2) => s1.Mag.CompareTo(s2.Mag));
-            int maxStars = MAX_STARS_IN_AREA + (alwaysIncludeStars != null ? alwaysIncludeStars.Count : 0);
-            Areas.ForEach(a => 
+            var aiss = (alwaysIncludeStars != null && alwaysIncludeStars.Count > 0) ? m_Stars.Where(s => alwaysIncludeStars.Contains(s.StarNo)).ToArray() : new IStar[0]; 
+            Areas.ForEach(a =>
             {
                 foreach (var star in m_Stars)
                 {
                     a.CheckAndAddStar(star);
-                    if (a.IncludedStarNos.Count >= maxStars)
+                    if (a.IncludedStarNos.Count >= MAX_STARS_IN_AREA)
                         break;                    
+                }
+
+                foreach (var ais in aiss)
+                {
+                    if (a.CheckAndAddStar(ais))
+                    {
+                        if (!a.IncludedStarNos.Contains(ais.StarNo))
+                            a.IncludedStarNos.Add(ais.StarNo);
+                    }
                 }
            });
 		}
@@ -169,37 +179,35 @@ namespace Tangra.Astrometry.Recognition
             DensityArea middleArea, 
             TangentalNormalizedDirectionAstrometry astrometry, 
             double xSide, 
-            double ySide,
-            List<ulong> alwaysIncludeStars)
+            double ySide)
 		{
 			var rv = new List<DensityArea>();
 
 			// Top 3
-            rv.Add(ComputeAreaFromXYPixCoords(astrometry, middleArea.XFrom - xSide, middleArea.YFrom - ySide, middleArea.XFrom, middleArea.YFrom, alwaysIncludeStars));
-            rv.Add(ComputeAreaFromXYPixCoords(astrometry, middleArea.XFrom, middleArea.YFrom - ySide, middleArea.XTo, middleArea.YFrom, alwaysIncludeStars));
-            rv.Add(ComputeAreaFromXYPixCoords(astrometry, middleArea.XTo, middleArea.YFrom - ySide, middleArea.XTo + xSide, middleArea.YFrom, alwaysIncludeStars));
+            rv.Add(ComputeAreaFromXYPixCoords(astrometry, middleArea.XFrom - xSide, middleArea.YFrom - ySide, middleArea.XFrom, middleArea.YFrom));
+            rv.Add(ComputeAreaFromXYPixCoords(astrometry, middleArea.XFrom, middleArea.YFrom - ySide, middleArea.XTo, middleArea.YFrom));
+            rv.Add(ComputeAreaFromXYPixCoords(astrometry, middleArea.XTo, middleArea.YFrom - ySide, middleArea.XTo + xSide, middleArea.YFrom));
 
 			// Middle 2
-            rv.Add(ComputeAreaFromXYPixCoords(astrometry, middleArea.XFrom - xSide, middleArea.YFrom, middleArea.XFrom, middleArea.YTo, alwaysIncludeStars));
-            rv.Add(ComputeAreaFromXYPixCoords(astrometry, middleArea.XTo, middleArea.YFrom, middleArea.XTo + xSide, middleArea.YTo, alwaysIncludeStars));
+            rv.Add(ComputeAreaFromXYPixCoords(astrometry, middleArea.XFrom - xSide, middleArea.YFrom, middleArea.XFrom, middleArea.YTo));
+            rv.Add(ComputeAreaFromXYPixCoords(astrometry, middleArea.XTo, middleArea.YFrom, middleArea.XTo + xSide, middleArea.YTo));
 
 			// Bottom 3
-            rv.Add(ComputeAreaFromXYPixCoords(astrometry, middleArea.XFrom - xSide, middleArea.YTo, middleArea.XFrom, middleArea.YTo + ySide, alwaysIncludeStars));
-            rv.Add(ComputeAreaFromXYPixCoords(astrometry, middleArea.XFrom, middleArea.YTo, middleArea.XTo, middleArea.YTo + ySide, alwaysIncludeStars));
-            rv.Add(ComputeAreaFromXYPixCoords(astrometry, middleArea.XTo, middleArea.YTo, middleArea.XTo + xSide, middleArea.YTo + ySide, alwaysIncludeStars));
+            rv.Add(ComputeAreaFromXYPixCoords(astrometry, middleArea.XFrom - xSide, middleArea.YTo, middleArea.XFrom, middleArea.YTo + ySide));
+            rv.Add(ComputeAreaFromXYPixCoords(astrometry, middleArea.XFrom, middleArea.YTo, middleArea.XTo, middleArea.YTo + ySide));
+            rv.Add(ComputeAreaFromXYPixCoords(astrometry, middleArea.XTo, middleArea.YTo, middleArea.XTo + xSide, middleArea.YTo + ySide));
 			
 			return rv;
 		}
 
 		private DensityArea ComputeAreaFromXYPixCoords(
 			TangentalNormalizedDirectionAstrometry astrometry,
-			double x1, double y1, double x2, double y2,
-            List<ulong> alwaysIncludeStars)
+			double x1, double y1, double x2, double y2)
 		{
 			double ra1, de1, ra2, de2;
 			astrometry.GetRADEFromImageCoords(x1, y1, out ra1, out de1);
 			astrometry.GetRADEFromImageCoords(x2, y2, out ra2, out de2);
-            DensityArea area = new DensityArea(astrometry, MAX_STARS_IN_AREA, ra1, ra2, de1, de2, alwaysIncludeStars);
+            DensityArea area = new DensityArea(astrometry, MAX_STARS_IN_AREA, ra1, ra2, de1, de2);
 		    area.DebugResolvedStarsWithAppliedExclusions = DebugResolvedStarsWithAppliedExclusions;
 
 #if ASTROMETRY_DEBUG
@@ -244,7 +252,7 @@ namespace Tangra.Astrometry.Recognition
 		{
 			get
 			{
-			    return Areas.FirstOrDefault(a => a.MarkedStars < MAX_STARS_IN_AREA) == null;
+                return Areas.FirstOrDefault(a => a.MarkedStars < MAX_STARS_IN_AREA) == null;
 			}
 		}
 	}
@@ -273,7 +281,6 @@ namespace Tangra.Astrometry.Recognition
 		public double YTo { get { return m_YTo; } }
 
 		private int m_MaxStarsInArea;
-	    private List<ulong> m_AlwaysIncludeStars = new List<ulong>(); 
 
 		public double XMiddle { get { return (m_XFrom + m_XTo) / 2.0; } }
 		public double YMiddle { get { return (m_YFrom + m_YTo) / 2.0; } }
@@ -314,8 +321,7 @@ namespace Tangra.Astrometry.Recognition
 			double raFrom, 
 			double raTo, 
 			double deFrom, 
-			double deTo,
-            List<ulong> alwaysIncludeStars)
+			double deTo)
 		{
 			m_RAFrom = raFrom;
 			m_RATo = raTo;
@@ -325,7 +331,6 @@ namespace Tangra.Astrometry.Recognition
 			m_Astrometry = astrometry;
 
 			m_MaxStarsInArea = maxStarsInArea;
-		    if (alwaysIncludeStars != null) m_AlwaysIncludeStars.AddRange(alwaysIncludeStars);
 
 			double x1, y1, x2, y2;
 			astrometry.GetImageCoordsFromRADE(raFrom, deFrom, out x1, out y1);
@@ -342,20 +347,16 @@ namespace Tangra.Astrometry.Recognition
 #endif
 		}
 
-		public void CheckAndAddStar(IStar star)
+		public bool CheckAndAddStar(IStar star)
 		{
 			if (star.RADeg >= m_RAFrom && star.RADeg <= m_RATo &&
 				star.DEDeg >= m_DEFrom && star.DEDeg <= m_DETo)
-			{
+			{                
                 if (IncludedStarNos.Count < m_MaxStarsInArea)
                 {
                     IncludedStarNos.Add(star.StarNo);
                 }
-                else if (m_AlwaysIncludeStars.Any(x => x == star.StarNo))
-                {
-                    IncludedStarNos.Add(star.StarNo);
-                }
-                else
+                else 
                 {
                     if (DebugStarNosWithAppliedExclusions != null &&
                         DebugStarNosWithAppliedExclusions.Contains(star.StarNo))
@@ -364,7 +365,11 @@ namespace Tangra.Astrometry.Recognition
 							string.Format("Debug Star {0} not added as cap is reached in {1}.", star.StarNo, AreaId));
                     }
                 }
+
+			    return true;
 			}
+
+		    return false;
 		}
 
 		public bool MarkStar(IStar star)

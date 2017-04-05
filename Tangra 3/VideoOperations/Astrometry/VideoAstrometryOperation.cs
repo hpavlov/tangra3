@@ -412,7 +412,10 @@ namespace Tangra.VideoOperations.Astrometry
 
 		public void TriggerPlateReSolve()
 		{
-			m_VideoController.RefreshCurrentFrame();
+            // Clear the old matcher so it is re-initialized with new parameters
+		    m_DistBasedMatcher = null;
+			
+            m_VideoController.RefreshCurrentFrame();
 		}
 
 		void m_ViewControl_OnStopMeasurementCommand(object sender, EventArgs e)
@@ -442,7 +445,9 @@ namespace Tangra.VideoOperations.Astrometry
 		{
 			if (m_DistBasedMatcher == null)
 			{
-				m_DistBasedMatcher = new DistanceBasedAstrometrySolver(m_AstrometryController, m_Image, TangraConfig.Settings.Astrometry, m_CatalogueStars, m_Context.DetermineAutoLimitMagnitude);
+				m_DistBasedMatcher = new DistanceBasedAstrometrySolver(
+                    m_AstrometryController, m_Image, TangraConfig.Settings.Astrometry, m_CatalogueStars,
+                    m_Context.RADeg, m_Context.DEDeg, m_Context.DetermineAutoLimitMagnitude);
 
 				m_DistBasedMatcher.SetMinMaxMagOfStarsForAstrometry(m_Context.PyramidMinMag, m_Context.LimitMagn);
 				m_DistBasedMatcher.SetMinMaxMagOfStarsForPyramidAlignment(m_Context.PyramidMinMag, m_Context.PyramidMaxMag);

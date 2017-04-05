@@ -67,7 +67,10 @@ namespace Tangra.Astrometry.Tests.PlateSolve
                 new MockedOperationNotifier(),
                 config.PlateConfig, 
                 TangraConfig.Settings.Astrometry,
-                catalogueStars, config.DetermineAutoLimitMagnitude);
+                catalogueStars,
+                config.RADeg,
+                config.DEDeg,
+                config.DetermineAutoLimitMagnitude);
 
             distBasedMatcher.SetMinMaxMagOfStarsForAstrometry(config.PyramidMinMag, config.LimitMagn);
             distBasedMatcher.SetMinMaxMagOfStarsForPyramidAlignment(config.PyramidMinMag, config.PyramidMaxMag);

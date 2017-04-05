@@ -85,6 +85,8 @@ namespace Tangra.Astrometry.Recognition
 #endif
  List<IStar> m_CelestialPyramidStars;
 
+        private double m_RA0Deg;
+        private double m_DE0Deg;
 		private List<IStar> m_CelestialAllStars;
 
 		private IStarMap m_StarMap;
@@ -179,6 +181,7 @@ namespace Tangra.Astrometry.Recognition
                     alwaysIncludeStars = m_ManualPairs.Values.Select(x => x.StarNo).ToList();
 
                 m_Distributor = BuildPyramidMatchingByMagnitude(
+                    m_RA0Deg, m_DE0Deg,
                     m_CelestialPyramidStars, 
                     m_PlateConfig,
 					m_Settings,
@@ -222,6 +225,7 @@ namespace Tangra.Astrometry.Recognition
 		}
 
         public static PyramidStarsDensityDistributor BuildPyramidMatchingByMagnitude(
+            double ra0Deg, double de0Deg,
             List<IStar> pyramidStars, 
 			AstroPlate image, 
 			IAstrometrySettings settings,
@@ -249,7 +253,7 @@ namespace Tangra.Astrometry.Recognition
             int n = pyramidStars.Count;
             double maxFovInDeg = image.GetMaxFOVInArcSec() / 3600.0;
 
-			distributor = new PyramidStarsDensityDistributor(pyramidStars, image, settings);
+			distributor = new PyramidStarsDensityDistributor(pyramidStars, image, settings, ra0Deg, de0Deg);
             distributor.DebugResolvedStarsWithAppliedExclusions = debugResolvedStarsWithAppliedExclusions;
             distributor.Initialize(alwaysIncludeStars);
 
@@ -486,6 +490,7 @@ namespace Tangra.Astrometry.Recognition
         private double m_PyramidMaxMag;
 
 		internal void Initialize(
+            double ra0Deg, double de0Deg,
 			List<IStar> allCelestialStars, 
 			double pyramidMinMag, 
 			double pyramidMaxMag,
@@ -499,6 +504,9 @@ namespace Tangra.Astrometry.Recognition
             m_PyramidMaxMag = pyramidMaxMag;
 			m_DetermineAutoLimitMagnitude = determineAutoLimitMagnitude;
 
+
+		    m_RA0Deg = ra0Deg;
+		    m_DE0Deg = de0Deg;
 			m_CelestialAllStars = allCelestialStars;
 
 		    m_CelestialPyramidStars = m_CelestialAllStars;
@@ -2507,7 +2515,9 @@ namespace Tangra.Astrometry.Recognition
 			return false;
 		}
 
-		private bool? CheckCombination(int i, int j, int k, 
+	    internal string CurrentCombination { get; set; }
+
+	    private bool? CheckCombination(int i, int j, int k, 
 			IStarMap starMap,
 			double toleranceInArcSec,
 			CheckTriangleCallback callback,
@@ -2521,6 +2531,7 @@ namespace Tangra.Astrometry.Recognition
 		{
 			if (i == j || i == k || j == k) return null;
 
+	        CurrentCombination = string.Format("{0}-{1}-{2}", i, j, k);
 			counter++;
 
 			if (DebugResolvedStars != null)
@@ -3141,8 +3152,8 @@ namespace Tangra.Astrometry.Recognition
 				{
 					consideredStars.Add(star);
 
-					double distance = fit.GetDistanceInArcSec(pixel.XDouble, pixel.YDouble, x, y);
-                    if (distance < CorePyramidConfig.Default.MaxPreliminaryResidualForSolutionImprovement / coeff)
+					double distancePixels = fit.GetDistanceInPixels(pixel.XDouble, pixel.YDouble, x, y);
+                    if (distancePixels < CorePyramidConfig.Default.MaxPreliminaryResidualForSolutionImprovementInPixels / coeff)
 					{
 #if ASTROMETRY_DEBUG
 						Trace.Assert(!double.IsNaN(pixel.XDouble));

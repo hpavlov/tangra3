@@ -90,7 +90,20 @@ namespace Tangra.VideoOperations.Astrometry
 			try
 			{
 				foclen = double.Parse(tbxFocalLength.Text);
-				if (foclen < 100 || foclen > 100000) throw new FormatException();
+			    if (foclen < 30)
+			    {
+                    MessageBox.Show(this, "The current minimum supported focal length is 30mm", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    tbxFocalLength.Focus();
+                    tbxFocalLength.Select();
+                    return;
+			    }
+			    if (foclen > 100000)
+			    {
+                    MessageBox.Show(this, "The current maximum supported focal length is 100m", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    tbxFocalLength.Focus();
+                    tbxFocalLength.Select();
+                    return;
+			    }
 			}
 			catch
 			{

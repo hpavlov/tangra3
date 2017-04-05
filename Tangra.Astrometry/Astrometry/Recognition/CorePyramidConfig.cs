@@ -78,8 +78,13 @@ namespace Tangra.Astrometry.Recognition
 
 		public double MinDetectionLimitForSolutionImprovement = 0.25; /* This is a really low value that will exclude very noisy data */
 
-		public double MaxPreliminaryResidualForSolutionImprovement = 4 /* arcsec */;
+		public double MaxPreliminaryResidualForSolutionImprovementInPixels = 1.5 /* pixels */; 
 
+	    public double DefaultMinPyramidMagnitude = 4.0;  // Bright enough for large field of view
+	    public double DefaultMaxPyramidMagnitude = 12.0; // No too faint for a reasonable number of pairs to check
+
+        public double DefaultMinAstrometryMagnitude = 4.0;  // Bright enough for large field of view
+        public double DefaultMaxAstrometryMagnitude = 16.0;  // Generally matches the faintest magnitude in the supported astrometric catalogues
 
 	    public double MaxFWHMExcludedImprovemntStarsCoeff = 2.5; 
 

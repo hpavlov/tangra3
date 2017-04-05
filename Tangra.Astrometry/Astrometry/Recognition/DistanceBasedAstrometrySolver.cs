@@ -68,6 +68,8 @@ namespace Tangra.Astrometry.Recognition
 
 		private AstroPlate m_PlateConfig;
 		private IStarMap m_StarMap;
+	    private double m_RA0Deg;
+	    private double m_DE0Deg;
 		private List<IStar> m_CelestialStars;
 		private LeastSquareFittedAstrometry m_Solution;
 		private Dictionary<StarMapFeature, IStar> m_ManualStarMatch;
@@ -80,10 +82,10 @@ namespace Tangra.Astrometry.Recognition
 		private bool m_RatioBasedFittedFocalLengthIsDerived = false;
 		private double m_RatioBasedFittedFocalLength;
 
-        private double m_PyramidMinMag = 7.0;
-        private double m_PyramidMaxMag = 12.0;
-        private double m_AstrometryMinMag = 7.0;
-        private double m_AstrometryMaxMag = 16.0;
+        private double m_PyramidMinMag = CorePyramidConfig.Default.DefaultMinPyramidMagnitude;
+        private double m_PyramidMaxMag = CorePyramidConfig.Default.DefaultMaxPyramidMagnitude;
+        private double m_AstrometryMinMag = CorePyramidConfig.Default.DefaultMinAstrometryMagnitude;
+        private double m_AstrometryMaxMag = CorePyramidConfig.Default.DefaultMaxAstrometryMagnitude;
 
 		private bool m_IsCalibration = false;
 
@@ -101,11 +103,14 @@ namespace Tangra.Astrometry.Recognition
 			AstroPlate plateConfig, 
 			IAstrometrySettings fitSettings, 
 			List<IStar> celestialStars,
+            double ra0Deg, double de0Deg,
 			bool determineAutoLimitMagnitude)
 		{
 			m_PlateConfig = plateConfig;
 			m_FitSettings = fitSettings;
 			m_CelestialStars = celestialStars;
+		    m_RA0Deg = ra0Deg;
+		    m_DE0Deg = de0Deg;
 			m_DetermineAutoLimitMagnitude = determineAutoLimitMagnitude;
 
             m_OperationNotifier = operationNotifier;
@@ -124,7 +129,7 @@ namespace Tangra.Astrometry.Recognition
 
 			m_IsCalibration = matchType == PyramidMatchType.ConfigCalibration;
 
-            Context.Initialize(m_CelestialStars, m_PyramidMinMag, m_PyramidMaxMag, m_DetermineAutoLimitMagnitude, m_ManualStarMatch);
+            Context.Initialize(m_RA0Deg, m_DE0Deg, m_CelestialStars, m_PyramidMinMag, m_PyramidMaxMag, m_DetermineAutoLimitMagnitude, m_ManualStarMatch);
 
 #if ASTROMETRY_DEBUG
 			AstrometricFitDebugger.Init(m_FitSettings, m_PyramidMinMag, m_PyramidMaxMag, m_AstrometryMinMag, m_AstrometryMaxMag);
@@ -269,7 +274,7 @@ namespace Tangra.Astrometry.Recognition
 						else
 						{
                             if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceInfo())
-							    Trace.WriteLine("No Solution.");
+                                Trace.WriteLine(string.Format("No solution after reaching combination {0} with {1} features.", Context.CurrentCombination, m_StarMap.FeaturesCount));
 						}
 					}
 					finally

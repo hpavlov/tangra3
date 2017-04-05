@@ -27,12 +27,15 @@ namespace Tangra.Astrometry
         private double m_A0Rad;
         private double m_D0Rad;
 
+        public Dictionary<ImagePixel, IStar> UserStars = new Dictionary<ImagePixel, IStar>();
+
         public ThreeStarAstrometry(AstroPlate image, Dictionary<ImagePixel, IStar> userStarIdentification, int tolerance)
         {
             if (userStarIdentification.Count != 3) 
                 throw new InvalidOperationException();
 
             Image = image;
+            UserStars = userStarIdentification.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
             double a0 = userStarIdentification.Values.Average(x => x.RADeg) * DEG_TO_RAD;
             double d0 = userStarIdentification.Values.Average(x => x.DEDeg) * DEG_TO_RAD;

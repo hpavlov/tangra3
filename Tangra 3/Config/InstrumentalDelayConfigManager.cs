@@ -30,6 +30,7 @@ namespace Tangra.Config
 			Add_Mintron_NTSC_InstrumentalDelayConfig();
 			Add_PC165DNR_NTSC_InstrumentalDelayConfig();
 			Add_SCB2000N_NTSC_InstrumentalDelayConfig();
+		    Add_NonIntegratingCameras_InstrumentalDelayConfig();
 
 			s_SupportedCameras.Sort();
 		}
@@ -203,7 +204,34 @@ namespace Tangra.Config
 			delays.Add(256, -4.304f);
 		}
 
-		public static List<string> GetAvailableCameras()
+	    private static void Add_NonIntegratingCameras_InstrumentalDelayConfig()
+	    {
+            string MODEL = "WAT-902H2 (PAL or NTSC)";
+	        s_SupportedCameras.Add(MODEL);
+	        var delays = new Dictionary<int, float>();
+	        s_SupportedCamerasConfig.Add(MODEL, delays);
+
+	        delays.Add(1, 0.0f);
+
+            ////////////////////////////////
+            MODEL = "PC164C-EX2 (EIA)";
+	        s_SupportedCameras.Add(MODEL);
+	        delays = new Dictionary<int, float>();
+	        s_SupportedCamerasConfig.Add(MODEL, delays);
+
+	        delays.Add(1, 0.0f);
+
+
+            ////////////////////////////////
+            MODEL = "SK-1004XC/SO CCIR";
+	        s_SupportedCameras.Add(MODEL);
+	        delays = new Dictionary<int, float>();
+	        s_SupportedCamerasConfig.Add(MODEL, delays);
+
+	        delays.Add(1, 0.0f);
+	    }
+
+	    public static List<string> GetAvailableCameras()
 		{
 			return s_SupportedCameras;
 		}

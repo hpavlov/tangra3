@@ -145,7 +145,7 @@ namespace Tangra.Astrometry
 		{
 			double x1, y1, x2, y2;
 			GetImageCoordsFromRADE(m_RA0Deg, m_DE0Deg, out x1, out y1);
-			GetRADEFromImageCoords(m_RA0Deg, m_DE0Deg + distArcSec, out x2, out y2);
+            GetImageCoordsFromRADE(m_RA0Deg, m_DE0Deg + (distArcSec/3600), out x2, out y2);
 
 			return Math.Sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 		}

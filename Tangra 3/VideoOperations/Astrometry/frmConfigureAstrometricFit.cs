@@ -205,7 +205,7 @@ namespace Tangra.VideoOperations.Astrometry
 	            if (!CheckInputAndLoadStars())
 		            return;
 
-                Context.PyramidMinMag = 7;
+                Context.PyramidMinMag = CorePyramidConfig.Default.DefaultMinPyramidMagnitude;
                 Context.PyramidMaxMag = m_MaxRefValue;
 
                 SaveDefaults();

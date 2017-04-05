@@ -37,6 +37,8 @@
             this.nudPixelsPerArcSec = new System.Windows.Forms.NumericUpDown();
             this.label9 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.cbxErrorMethod = new System.Windows.Forms.ComboBox();
+            this.label13 = new System.Windows.Forms.Label();
             this.rbWeightingAstr = new System.Windows.Forms.RadioButton();
             this.label12 = new System.Windows.Forms.Label();
             this.nudSigmaExclusion = new System.Windows.Forms.NumericUpDown();
@@ -75,8 +77,6 @@
             this.nudSinglePosMea = new System.Windows.Forms.NumericUpDown();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.cbxErrorMethod = new System.Windows.Forms.ComboBox();
-            this.label13 = new System.Windows.Forms.Label();
             this.toolStrip1.SuspendLayout();
             this.pnlFiles.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudPixelsPerArcSec)).BeginInit();
@@ -162,11 +162,6 @@
             // 
             this.nudPixelsPerArcSec.DecimalPlaces = 2;
             this.nudPixelsPerArcSec.Location = new System.Drawing.Point(109, 286);
-            this.nudPixelsPerArcSec.Maximum = new decimal(new int[] {
-            9,
-            0,
-            0,
-            0});
             this.nudPixelsPerArcSec.Name = "nudPixelsPerArcSec";
             this.nudPixelsPerArcSec.Size = new System.Drawing.Size(49, 20);
             this.nudPixelsPerArcSec.TabIndex = 42;
@@ -204,6 +199,30 @@
             this.groupBox1.TabIndex = 40;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Reduction Settings";
+            // 
+            // cbxErrorMethod
+            // 
+            this.cbxErrorMethod.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxErrorMethod.FormattingEnabled = true;
+            this.cbxErrorMethod.Items.AddRange(new object[] {
+            "None",
+            "Pattern 1",
+            "Pattern 2",
+            "Pattern 3"});
+            this.cbxErrorMethod.Location = new System.Drawing.Point(84, 71);
+            this.cbxErrorMethod.Name = "cbxErrorMethod";
+            this.cbxErrorMethod.Size = new System.Drawing.Size(101, 21);
+            this.cbxErrorMethod.TabIndex = 48;
+            this.cbxErrorMethod.SelectedIndexChanged += new System.EventHandler(this.cbxErrorMethod_SelectedIndexChanged);
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(10, 75);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(73, 13);
+            this.label13.TabIndex = 47;
+            this.label13.Text = "Solution Error:";
             // 
             // rbWeightingAstr
             // 
@@ -336,6 +355,11 @@
             // nudMeaIntervals
             // 
             this.nudMeaIntervals.Location = new System.Drawing.Point(105, 23);
+            this.nudMeaIntervals.Maximum = new decimal(new int[] {
+            99,
+            0,
+            0,
+            0});
             this.nudMeaIntervals.Minimum = new decimal(new int[] {
             1,
             0,
@@ -599,30 +623,6 @@
             this.openFileDialog1.DefaultExt = "*.csv";
             this.openFileDialog1.Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*";
             this.openFileDialog1.Multiselect = true;
-            // 
-            // cbxErrorMethod
-            // 
-            this.cbxErrorMethod.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxErrorMethod.FormattingEnabled = true;
-            this.cbxErrorMethod.Items.AddRange(new object[] {
-            "None",
-            "Pattern 1",
-            "Pattern 2",
-            "Pattern 3"});
-            this.cbxErrorMethod.Location = new System.Drawing.Point(84, 71);
-            this.cbxErrorMethod.Name = "cbxErrorMethod";
-            this.cbxErrorMethod.Size = new System.Drawing.Size(101, 21);
-            this.cbxErrorMethod.TabIndex = 48;
-            this.cbxErrorMethod.SelectedIndexChanged += new System.EventHandler(this.cbxErrorMethod_SelectedIndexChanged);
-            // 
-            // label13
-            // 
-            this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(10, 75);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(73, 13);
-            this.label13.TabIndex = 47;
-            this.label13.Text = "Solution Error:";
             // 
             // frmAstrometryMotionFitting
             // 

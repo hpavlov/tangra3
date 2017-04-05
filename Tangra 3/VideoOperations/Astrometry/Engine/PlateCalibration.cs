@@ -229,15 +229,31 @@ namespace Tangra.VideoOperations.Astrometry
 				m_AstrometryController,
 				m_Context.PlateConfig, 
 				m_AstrometrySettings, 
-				m_Context.FieldSolveContext.CatalogueStars, 
+				m_Context.FieldSolveContext.CatalogueStars,
+                m_Context.FieldSolveContext.RADeg,
+                m_Context.FieldSolveContext.DEDeg,
 				m_Context.FieldSolveContext.DetermineAutoLimitMagnitude);
             
-            distMatch.SetMinMaxMagOfStarsForAstrometry(7, 18);
+            distMatch.SetMinMaxMagOfStarsForAstrometry(CorePyramidConfig.Default.DefaultMinAstrometryMagnitude, 18);
 
-			distMatch.SetMinMaxMagOfStarsForPyramidAlignment(7, pyramidLimitMag);
-			Trace.WriteLine(string.Format("Stars for alignment in range: 7.0 - {0} mag", pyramidLimitMag.ToString("0.0")));
+			distMatch.SetMinMaxMagOfStarsForPyramidAlignment(CorePyramidConfig.Default.DefaultMinPyramidMagnitude, pyramidLimitMag);
+            Trace.WriteLine(string.Format("Stars for alignment in range: {0:0.0} - {1:0.0} mag", CorePyramidConfig.Default.DefaultMinPyramidMagnitude, pyramidLimitMag));
 
-			distMatch.InitNewMatch(m_Context.StarMap, PyramidMatchType.PlateSolve, null);
+		    Dictionary<PSFFit, IStar> manualStars = null;
+            var threeStarFit = m_Context.PreliminaryFit as ThreeStarAstrometry;
+		    if (threeStarFit != null)
+		    {
+		        manualStars = new Dictionary<PSFFit, IStar>();
+		        foreach (var kvp in threeStarFit.UserStars)
+		        {
+		            PSFFit psfFit;
+		            m_Context.StarMap.GetPSFFit(kvp.Key.X, kvp.Key.Y, PSFFittingMethod.NonLinearFit, out psfFit);
+		            if (psfFit != null && psfFit.IsSolved)
+		                manualStars.Add(psfFit, kvp.Value);
+		        }
+		    }
+
+            distMatch.InitNewMatch(m_Context.StarMap, PyramidMatchType.PlateSolve, manualStars);
 
 #if ASTROMETRY_DEBUG
             Dictionary<int, ulong> debugInfo = new Dictionary<int, ulong>();
