@@ -35,7 +35,7 @@ namespace Tangra.SDK
         string NativeVideoFormat { get; }
         string ObservatoryCode { get; }
         string ObjectDesignation { get; }
-        double ArsSecsInPixel { get; }
+        double ArcSecsInPixel { get; }
     }
 
     public interface ITangraMatchedStar

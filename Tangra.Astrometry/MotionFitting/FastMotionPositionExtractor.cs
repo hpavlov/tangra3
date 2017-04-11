@@ -595,9 +595,10 @@ namespace Tangra.MotionFitting
             var raHoursCosDE = m_RegressionRA.ComputeYWithError(timeOfDay, out errRACosDEArcSec, m_ErrorMethod) / 15.0;
             deDeg = m_RegressionDE.ComputeYWithError(timeOfDay, out errDEArcSec, m_ErrorMethod);
 
-            raHours = raHoursCosDE / Math.Cos(deDeg * Math.PI / 180);
+            double cosDEFactor = Math.Cos(deDeg * Math.PI / 180);
+            raHours = raHoursCosDE / cosDEFactor;
 
-            errRACosDEArcSec *= 3600; // NOTE: Cos(DE) already factored in during the regression
+            errRACosDEArcSec *= cosDEFactor * 3600;
             errDEArcSec *= 3600;
 
             if (m_PosUncertaintyMedArcSec.HasValue)
@@ -645,9 +646,10 @@ namespace Tangra.MotionFitting
                 double raHoursCosDE = m_RegressionRA.ComputeYWithError(normalTime, out errRACosDE, m_ErrorMethod) / 15.0;
                 double mpcDEDeg = m_RegressionDE.ComputeYWithError(normalTime, out errDE, m_ErrorMethod);
 
-                double mpcRAHours = raHoursCosDE / Math.Cos(mpcDEDeg * Math.PI / 180);
+                double cosDEFactor = Math.Cos(mpcDEDeg * Math.PI / 180);
+                double mpcRAHours = raHoursCosDE / cosDEFactor;
 
-                errRACosDE *= 3600; // NOTE: Cos(DE) already factored in during the regression
+                errRACosDE *= cosDEFactor * 3600;
                 errDE *= 3600;
 
                 if (m_PosUncertaintyMedArcSec.HasValue)

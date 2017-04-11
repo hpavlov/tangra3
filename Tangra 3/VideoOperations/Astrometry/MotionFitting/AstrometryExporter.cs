@@ -31,7 +31,7 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                 solution.NativeVideoFormat,
                 solution.ObservatoryCode,
                 solution.ObjectDesignation,
-                solution.ArsSecsInPixel));
+                solution.ArcSecsInPixel));
 
             output.Append("FrameNo, TimeUTC(Uncorrected), Timestamp, RADeg, DEDeg, Mag, SolutionUncertaintyRA*Cos(DE)[arcsec], SolutionUncertaintyDE[arcsec], FWHM[arcsec], DetectionCertainty, SNR\r\n");
 

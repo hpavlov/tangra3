@@ -124,12 +124,8 @@ namespace Tangra.Astrometry
 
 	    public double GetDistanceInArcSec(double diagonalDistance)
 	    {
-            var side = diagonalDistance / Math.Sqrt(2);
-
-            double x0, y0;
-            GetImageCoordsFromRADE(m_RA0Deg, m_DE0Deg, out x0, out y0);
-
-	        return GetDistanceInArcSec(x0, y0, x0 + side, y0 + side);
+	        var oneArcSecInPixels = GetDistanceInPixels(1);
+            return diagonalDistance / oneArcSecInPixels;
 	    }
 
 	    public double GetDistanceInArcSec(double x1, double y1, double x2, double y2)
