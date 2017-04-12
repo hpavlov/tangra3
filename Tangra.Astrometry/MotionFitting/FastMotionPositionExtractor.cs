@@ -289,7 +289,7 @@ namespace Tangra.MotionFitting
                     g.FillEllipse(Brushes.Azure, xf - 3, yf - 3, 7, 7);
 
                     repX.Add(midX);
-                    repY.Add(fittedY * getFactor(lastEntry));
+                    repY.Add(fittedY);
 
                     var rate = Math.Abs((endYCalc - startYCalc.Value) * 3600.0 / ((endX - startX.Value) * SECONDS_IN_A_DAY));
                     if (!motionRate.HasValue || motionRate.Value < rate)
