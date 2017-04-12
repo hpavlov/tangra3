@@ -3,11 +3,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Diagnostics;
+using Tangra.Model.Helpers;
 using Tangra.SDK;
-using Tangra.VideoOperations.LightCurves;
 
 namespace Tangra.Addins
 {
@@ -116,9 +114,9 @@ namespace Tangra.Addins
 			{
                 m_DelegatedLocalProvider.SetFoundOccultationEvent(eventId, dFrame, rFrame, dFrameErrorMinus, dFrameErrorPlus, rFrameErrorMinus, rFrameErrorPlus, dTime, rTime, cameraDelaysKnownToAOTA);
 			}
-			catch
+			catch (Exception ex)
 			{
-				
+			    Trace.WriteLine(ex.GetFullStackTrace());
 			}
 		}
 
@@ -128,10 +126,10 @@ namespace Tangra.Addins
 			{
 				m_DelegatedLocalProvider.SetNoOccultationEvents();
 			}
-			catch
-			{
-
-			}
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex.GetFullStackTrace());
+            }
 		}
 
         public void SetTimeExtractionEngine(string engineAndVersion)
@@ -140,9 +138,9 @@ namespace Tangra.Addins
             {
                 m_DelegatedLocalProvider.SetTimeExtractionEngine(engineAndVersion);
             }
-            catch
+            catch (Exception ex)
             {
-
+                Trace.WriteLine(ex.GetFullStackTrace());
             }
         }
 
@@ -153,9 +151,9 @@ namespace Tangra.Addins
             {
                 m_DelegatedLocalProvider.FinishedLightCurveEventTimeExtraction();
             }
-            catch
+            catch (Exception ex)
             {
-
+                Trace.WriteLine(ex.GetFullStackTrace());
             }
         }
     }

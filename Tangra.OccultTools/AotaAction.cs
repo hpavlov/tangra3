@@ -4,11 +4,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 using Tangra.OccultTools.OccultWrappers;
 using Tangra.SDK;
 
@@ -89,6 +91,28 @@ namespace Tangra.OccultTools
 	        }
 	    }
 
+        private void TrySaveReport(string fullFileName, AotaReturnValue result)
+        {
+            if (result == null)
+            {
+                File.WriteAllText(fullFileName, "null");
+                return;
+            }
+
+            try
+            {
+                var xmlSer = new XmlSerializer(typeof(AotaReturnValue));
+                using (var fs = new FileStream(fullFileName, FileMode.Create, FileAccess.ReadWrite))
+                {
+                    xmlSer.Serialize(fs, result);
+                }
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex);
+            }
+        }
+
         public void OnAOTAFormClosing()
         {
             if (m_AOTAFormVisible)
@@ -96,6 +120,15 @@ namespace Tangra.OccultTools
                 ILightCurveDataProvider dataProvider = m_TangraHost.GetLightCurveDataProvider();
 
                 AotaReturnValue result = m_OccultWrapper.GetAOTAResult();
+
+                string directory = Path.GetDirectoryName(dataProvider.FileName);
+                if (directory != null)
+                {
+                    if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
+
+                    var debugFileName = Path.ChangeExtension(dataProvider.FileName, ".aota.xml");
+                    TrySaveReport(debugFileName, result);
+                }
 
                 if (result != null &&
                     result.AreResultsAvailable)
