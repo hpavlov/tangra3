@@ -44,9 +44,9 @@ using Tangra.Helpers;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("3.6.0.3")]
-[assembly: AssemblyFileVersion("3.6.3")]
-[assembly: ReleaseDate("2017-01-23")]
+[assembly: AssemblyVersion("3.6.0.4")]
+[assembly: AssemblyFileVersion("3.6.4")]
+[assembly: ReleaseDate("2017-04-12")]
 //[assembly: BetaReleaseAttribute()]
 [assembly: TangraCoreVersionRequired("3.0.112")]
 [assembly: TangraVideoVersionRequired("3.0.28")]
