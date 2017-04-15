@@ -190,12 +190,12 @@ namespace Tangra.MotionFitting
                     fullWidth, fullHeight,
                     m_Chunks.Min(x => x.MinRADeg),
                     m_Chunks.Max(x => x.MaxRADeg),
-                    "RA*Cos(DE)",
+                    "RA",
                     m_Chunks.Average(x => x.InclinationRA),
                     (x) => x.RADeg,
                     (x) => x.RAWeightDeg,
-                    (x) => x.RADegCosDEFitted / Math.Cos(x.DEDegFitted * Math.PI / 180),
-                    (c) => c.GetMidPointRACosDEPosition() / Math.Cos(c.GetMidPointDEPosition() * Math.PI / 180),
+                    (x) => x.RADegCosDEFitted,
+                    (c) => c.GetMidPointRAPosition(),
                     (x) => Math.Cos(x.DEDegFitted * Math.PI / 180));
             }
         }
@@ -209,7 +209,7 @@ namespace Tangra.MotionFitting
             Func<CalculatedEntry, double> getWeight,
             Func<CalculatedEntry, double> getCalcVal,
             Func<FastMotionChunkPositionExtractor, double> getMidPointPos,
-            Func<CalculatedEntry, double> getFactor)
+            Func<CalculatedEntry, double> rateCalcFactor)
         {
             g.Clear(SystemColors.ControlDarkDark);
 
@@ -293,7 +293,7 @@ namespace Tangra.MotionFitting
 
                     var rate = Math.Abs((endYCalc - startYCalc.Value) * 3600.0 / ((endX - startX.Value) * SECONDS_IN_A_DAY));
                     if (!motionRate.HasValue || motionRate.Value < rate)
-                        motionRate = rate * getFactor(lastEntry);
+                        motionRate = rate * rateCalcFactor(lastEntry);
                 }
             }
 
@@ -461,14 +461,14 @@ namespace Tangra.MotionFitting
                 var midFrameTime = entry.TimeOfDayUTC - instDelayTimeOfDay;
                 if (weighting == WeightingMode.None)
                 {
-                    regRA.AddDataPoint(midFrameTime, entry.RADeg * Math.Cos(Math.PI * entry.DEDeg / 180));
+                    regRA.AddDataPoint(midFrameTime, entry.RADeg);
                     regDE.AddDataPoint(midFrameTime, entry.DEDeg);
                 }
                 else
                 {
                     var weightRA = CalulateWeight(entry, entry.SolutionUncertaintyRACosDEArcSec);
                     var weightDE = CalulateWeight(entry, entry.SolutionUncertaintyDEArcSec);
-                    regRA.AddDataPoint(midFrameTime, entry.RADeg * Math.Cos(Math.PI * entry.DEDeg / 180), weightRA);
+                    regRA.AddDataPoint(midFrameTime, entry.RADeg, weightRA);
                     regDE.AddDataPoint(midFrameTime, entry.DEDeg, weightDE);
                 }
             }
@@ -504,13 +504,13 @@ namespace Tangra.MotionFitting
 
                     if (weighting == WeightingMode.None)
                     {
-                        m_RegressionRA.AddDataPoint(midFrameTime, entry.RADeg * Math.Cos(Math.PI * entry.DEDeg / 180));
+                        m_RegressionRA.AddDataPoint(midFrameTime, entry.RADeg);
                         m_RegressionDE.AddDataPoint(midFrameTime, entry.DEDeg);
                     }
                     else
                     {
                         var weightRA = CalulateWeight(entry, entry.SolutionUncertaintyRACosDEArcSec);
-                        m_RegressionRA.AddDataPoint(midFrameTime, entry.RADeg * Math.Cos(Math.PI * entry.DEDeg / 180), weightRA);
+                        m_RegressionRA.AddDataPoint(midFrameTime, entry.RADeg, weightRA);
 
                         var weightDE = CalulateWeight(entry, entry.SolutionUncertaintyDEArcSec);
                         m_RegressionDE.AddDataPoint(midFrameTime, entry.DEDeg, weightDE);
@@ -565,7 +565,7 @@ namespace Tangra.MotionFitting
                 return double.NaN;
         }
 
-        internal double GetMidPointRACosDEPosition()
+        internal double GetMidPointRAPosition()
         {
             double closestTimeOfDay = GetMidPointDelayCorrectedTimeOfDay();
 
@@ -592,13 +592,10 @@ namespace Tangra.MotionFitting
 
         internal void GetPosition(double timeOfDay, out double raHours, out double errRACosDEArcSec, out double deDeg, out double errDEArcSec)
         {
-            var raHoursCosDE = m_RegressionRA.ComputeYWithError(timeOfDay, out errRACosDEArcSec, m_ErrorMethod) / 15.0;
+            raHours = m_RegressionRA.ComputeYWithError(timeOfDay, out errRACosDEArcSec, m_ErrorMethod) / 15.0;
             deDeg = m_RegressionDE.ComputeYWithError(timeOfDay, out errDEArcSec, m_ErrorMethod);
 
-            double cosDEFactor = Math.Cos(deDeg * Math.PI / 180);
-            raHours = raHoursCosDE / cosDEFactor;
-
-            errRACosDEArcSec *= cosDEFactor * 3600;
+            errRACosDEArcSec *= Math.Cos(deDeg * Math.PI / 180) * 3600;
             errDEArcSec *= 3600;
 
             if (m_PosUncertaintyMedArcSec.HasValue)
@@ -642,14 +639,11 @@ namespace Tangra.MotionFitting
                 if (double.IsNaN(normalTime) || double.IsInfinity(normalTime)) return null;
 
                 DateTime mpcTime = obsDate.Date.AddDays(normalTime);
-                double errRACosDE, errDE;
-                double raHoursCosDE = m_RegressionRA.ComputeYWithError(normalTime, out errRACosDE, m_ErrorMethod) / 15.0;
+                double errRA, errDE;
+                double mpcRAHours = m_RegressionRA.ComputeYWithError(normalTime, out errRA, m_ErrorMethod) / 15.0;
                 double mpcDEDeg = m_RegressionDE.ComputeYWithError(normalTime, out errDE, m_ErrorMethod);
 
-                double cosDEFactor = Math.Cos(mpcDEDeg * Math.PI / 180);
-                double mpcRAHours = raHoursCosDE / cosDEFactor;
-
-                errRACosDE *= cosDEFactor * 3600;
+                var errRACosDE = errRA * Math.Cos(mpcDEDeg * Math.PI / 180) * 3600;
                 errDE *= 3600;
 
                 if (m_PosUncertaintyMedArcSec.HasValue)

@@ -118,6 +118,13 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                         if (optimalChunks > 6) optimalChunks = 6;
                         if (optimalChunks < 1) optimalChunks = 1;
                         nudMeaIntervals.Value = optimalChunks;
+
+                        if (cbxErrorMethod.SelectedIndex < 1 && m_DataProvider.Measurements.Count() < 10)
+                        {
+                            // For smaller number of measurements by default use a solution error of StdDev / 2
+                            // This appears to be working better
+                            cbxErrorMethod.SelectedIndex = (int) ErrorMethod.HalfStdDev;
+                        }
                     }
                     finally
                     {

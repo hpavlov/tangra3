@@ -63,6 +63,7 @@
   <ItemGroup>
     <Compile Include="Calibration\TestStar.cs" />
     <Compile Include="Calibration\TestThreeStarFit.cs" />
+    <Compile Include="MotionFitting\TestFastMotionFitter.cs" />
     <Compile Include="MotionFitting\TestFlyByMotionFitter.cs" />
     <Compile Include="MotionFitting\TestLinearRegression.cs" />
     <Compile Include="MotionFitting\TestTDistribution.cs" />
