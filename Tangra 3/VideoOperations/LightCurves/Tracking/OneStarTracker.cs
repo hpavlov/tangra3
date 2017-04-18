@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using Tangra.Model.Astro;
 using Tangra.Model.Config;
+using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.Model.Numerical;
 using Tangra.Model.VideoOperations;
@@ -21,6 +22,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
         private int m_RefiningFramesLeft = 0;
         private bool m_IsTrackedSuccessfully = false;
         private int m_FrameNo;
+        private int m_RefiningNumFrames = 9;
 
         private LinearRegression m_LinearFitX = new LinearRegression();
         private LinearRegression m_LinearFitY = new LinearRegression();
@@ -36,6 +38,8 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 
             // we want the occulted star to be in the locate fistr objects so the brightness fluctoation is determined 
             LocateFirstObjects.Add(OccultedStar);
+
+            m_RefiningNumFrames = LightCurveReductionContext.Instance.IsDriftThrough ? 30 : 10;
         }
 
 		public override bool InitializeNewTracking(IAstroImage astroImage)
@@ -145,7 +149,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                     //double brightnessFluctoation = (trackedObject.RefinedOrLastSignalLevel - gaussian.IMax + gaussian.I0) / trackedObject.RefinedOrLastSignalLevel;
                     double fluckDiff = Math.Abs(brightnessFluctoation) / m_AllowedSignalFluctoation;
 
-                    if (fluckDiff < 1 || LightCurveReductionContext.Instance.HighFlickeringOrLargeStars)
+                    if (fluckDiff < 1 || (LightCurveReductionContext.Instance.HighFlickeringOrLargeStars && !LightCurveReductionContext.Instance.FullDisappearance && !LightCurveReductionContext.Instance.IsDriftThrough))
                     {
                         OccultedStar.PSFFit = gaussian;
                         OccultedStar.ThisFrameX = (float)gaussian.XCenter;
@@ -166,7 +170,23 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 								? NotMeasuredReasons.TrackedSuccessfully
 								: NotMeasuredReasons.DistanceToleranceTooHighForNonFullDisappearingOccultedStar);
 
-						m_NotCertain = !OccultedStar.IsLocated;
+                        m_NotCertain = !OccultedStar.IsLocated;
+
+                        if (m_PreviousPositions.Count > 1 && LightCurveReductionContext.Instance.FullDisappearance && LightCurveReductionContext.Instance.IsDriftThrough)
+                        {
+                            var prevSignals = m_PreviousPositions.Select(x => x.Brightness).ToList();
+                            var prevSignalMedian = prevSignals.Median();
+                            var prevSignalSigma = Math.Sqrt(prevSignals.Sum(x => (x - prevSignalMedian)*(x - prevSignalMedian)) / (m_PreviousPositions.Count - 1));
+                            var bigBrightnessVariation = (Math.Abs(signal - prevSignalMedian) > prevSignalSigma);
+                            m_NotCertain = m_NotCertain || bigBrightnessVariation;
+                        }
+
+                        if (m_NotCertain)
+                        {
+                            OccultedStar.ThisFrameX = expectedX;
+                            OccultedStar.ThisFrameY = expectedY;
+                            OccultedStar.ThisFrameCertainty = (float)gaussian.Certainty;
+                        }
                     }
                 }
                 else
@@ -176,7 +196,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                     OccultedStar.ThisFrameCertainty = (float)gaussian.Certainty;
 
                     Trace.WriteLine(string.Format("Frame {0}: Cannot confirm target {1} [SingleStar]. Cannot solve second PSF", m_FrameNo, OccultedStar.TargetNo));
-					OccultedStar.SetIsLocated(false, NotMeasuredReasons.PSFFittingFailed);
+                    OccultedStar.SetIsLocated(false, NotMeasuredReasons.PSFFittingFailed);
                 }
             }
             else
@@ -186,13 +206,13 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
                 OccultedStar.ThisFrameCertainty = (float)gaussian.Certainty;
 
                 Trace.WriteLine(string.Format("Frame {0}: Cannot confirm target {1} [SingleStar]. Cannot solve first PSF", m_FrameNo, OccultedStar.TargetNo));
-				OccultedStar.SetIsLocated(false, NotMeasuredReasons.PSFFittingFailed);
+                OccultedStar.SetIsLocated(false, NotMeasuredReasons.PSFFittingFailed);
             }
         }
 
         private void AddPreviousPosition()
         {
-            while (m_PreviousPositions.Count > TangraConfig.Settings.Tracking.RefiningFrames)
+            while (m_PreviousPositions.Count > m_RefiningNumFrames)
             {
                 m_PreviousPositions.RemoveAt(0);
                 m_PreviousPositionFrameIds.RemoveAt(0);

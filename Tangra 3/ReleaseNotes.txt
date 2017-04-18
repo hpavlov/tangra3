@@ -8,6 +8,7 @@ v3.6.4 (2017-04-12)
 - Now the light curve and astrometry reductions will ensure the video is positioned at a non-duplicated frame before the start of the reduction.
 - Fixed a crash when using software integration with SER files.
 - Tangra will now save the raw report from AOTA in an .aota.xml file next to the Tangra .trep.xml report file.
+- Fixed the tracking of a single fully disappearing drift-through star
 
 v3.6.3 (2017-01-23)
 -------------------
