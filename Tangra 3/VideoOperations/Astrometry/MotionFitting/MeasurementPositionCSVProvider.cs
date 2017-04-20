@@ -69,6 +69,7 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                             m_NativeVideoFormat = GrabString(headerDict, "NativeVideoFormat");
                             ObservatoryCode = GrabString(headerDict, "ObservatoryCode");
                             ObjectDesignation = GrabString(headerDict, "Object");
+                            CatalogueCode = GrabString(headerDict, "CatalogueCode");
 
                             if (headerDict.ContainsKey("ArsSecsInPixel"))
                             {
@@ -178,6 +179,8 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
         public string ObjectDesignation { get; private set; }
         
         public string ObservatoryCode { get; private set; }
+
+        public string CatalogueCode { get; private set; }
         
         public DateTime? ObservationDate { get; private set; }
 

@@ -371,6 +371,12 @@
     <Compile Include="VideoOperations\Astrometry\MotionFitting\frmAstrometryMotionFitting.Designer.cs">
       <DependentUpon>frmAstrometryMotionFitting.cs</DependentUpon>
     </Compile>
+    <Compile Include="VideoOperations\Astrometry\MotionFitting\frmCalculatePositionForTimeOfDay.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\Astrometry\MotionFitting\frmCalculatePositionForTimeOfDay.Designer.cs">
+      <DependentUpon>frmCalculatePositionForTimeOfDay.cs</DependentUpon>
+    </Compile>
     <Compile Include="VideoOperations\Astrometry\MotionFitting\MeasurementPositionCSVProvider.cs" />
     <Compile Include="VideoOperations\Astrometry\Tracking\FastMotionTracker.cs" />
     <Compile Include="VideoOperations\Astrometry\Tracking\IAstrometryTracker.cs" />
@@ -1151,6 +1157,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\Astrometry\MotionFitting\frmAstrometryMotionFitting.resx">
       <DependentUpon>frmAstrometryMotionFitting.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\Astrometry\MotionFitting\frmCalculatePositionForTimeOfDay.resx">
+      <DependentUpon>frmCalculatePositionForTimeOfDay.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\Astrometry\MPCReport\frmChooseMPCObject.resx">
       <DependentUpon>frmChooseMPCObject.cs</DependentUpon>

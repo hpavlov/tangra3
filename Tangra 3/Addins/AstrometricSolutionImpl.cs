@@ -96,6 +96,7 @@ namespace Tangra.Addins
                 ObjectDesignation = MPCObsLine.GetObjectCode(state.IdentifiedObjects[0].ObjectName);
 
             ObservatoryCode = fieldSolveContext.ObsCode;
+		    CatalogueCode = measurementContext.StarCatalogueFacade.CatalogNETCode;
 
 		    m_MeasurementsImpl = new List<TangraAstrometricMeasurementImpl>();
 
@@ -285,6 +286,7 @@ namespace Tangra.Addins
         public string ObservatoryCode { get; private set; }
         public string ObjectDesignation { get; private set; }
         public double ArcSecsInPixel { get; private set; }
+        public string CatalogueCode { get; private set; }
 
 		public List<ITangraMatchedStar> GetAllMatchedStars()
 		{

@@ -18,8 +18,6 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ucAstrometryObjectInfo));
             this.lblObjectName = new System.Windows.Forms.Label();
             this.pnlMeasurements = new System.Windows.Forms.Panel();
-            this.pnlRASeries = new System.Windows.Forms.PictureBox();
-            this.pnlDESeries = new System.Windows.Forms.PictureBox();
             this.lblMeaMag = new System.Windows.Forms.Label();
             this.lblM = new System.Windows.Forms.Label();
             this.lblDelta = new System.Windows.Forms.Label();
@@ -48,6 +46,10 @@
             this.cbxShowLabels1 = new System.Windows.Forms.CheckBox();
             this.btnIdentify = new System.Windows.Forms.Button();
             this.pnlFitInfo = new System.Windows.Forms.Panel();
+            this.lblUncertDE = new System.Windows.Forms.Label();
+            this.label18 = new System.Windows.Forms.Label();
+            this.lblUncertRA = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
             this.lblStdDevMag = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -66,7 +68,6 @@
             this.label16 = new System.Windows.Forms.Label();
             this.lblErrPos = new System.Windows.Forms.Label();
             this.label15 = new System.Windows.Forms.Label();
-            this.pbPSFFit = new System.Windows.Forms.PictureBox();
             this.lblMag = new System.Windows.Forms.Label();
             this.lblResDE = new System.Windows.Forms.Label();
             this.lblResRA = new System.Windows.Forms.Label();
@@ -99,24 +100,28 @@
             this.btnShowMesaurements = new System.Windows.Forms.Button();
             this.pnlSwitchControl = new System.Windows.Forms.Panel();
             this.saveUnitTestDataFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.label9 = new System.Windows.Forms.Label();
-            this.lblUncertRA = new System.Windows.Forms.Label();
-            this.label18 = new System.Windows.Forms.Label();
-            this.lblUncertDE = new System.Windows.Forms.Label();
+            this.pbPSFFit = new System.Windows.Forms.PictureBox();
+            this.pnlRASeries = new System.Windows.Forms.PictureBox();
+            this.pnlDESeries = new System.Windows.Forms.PictureBox();
+            this.pnlEndAstrometryFlyby = new System.Windows.Forms.Panel();
+            this.label19 = new System.Windows.Forms.Label();
+            this.lblRateVal2 = new System.Windows.Forms.Label();
+            this.label21 = new System.Windows.Forms.Label();
             this.pnlMeasurements.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pnlRASeries)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pnlDESeries)).BeginInit();
             this.pnlEndAstrometry.SuspendLayout();
             this.pnlAstrometryControls.SuspendLayout();
             this.pnlStandardControls.SuspendLayout();
             this.pnlFitInfo.SuspendLayout();
             this.pnlPSFInfo.SuspendLayout();
             this.pnlObject.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pbPSFFit)).BeginInit();
             this.pnlAstrometry.SuspendLayout();
             this.pnlFitSuccessful.SuspendLayout();
             this.pnlFitFailed.SuspendLayout();
             this.pnlSwitchControl.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pbPSFFit)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pnlRASeries)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pnlDESeries)).BeginInit();
+            this.pnlEndAstrometryFlyby.SuspendLayout();
             this.SuspendLayout();
             // 
             // lblObjectName
@@ -136,28 +141,6 @@
             this.pnlMeasurements.Name = "pnlMeasurements";
             this.pnlMeasurements.Size = new System.Drawing.Size(253, 187);
             this.pnlMeasurements.TabIndex = 24;
-            // 
-            // pnlRASeries
-            // 
-            this.pnlRASeries.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pnlRASeries.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.pnlRASeries.Location = new System.Drawing.Point(2, 2);
-            this.pnlRASeries.Name = "pnlRASeries";
-            this.pnlRASeries.Size = new System.Drawing.Size(247, 90);
-            this.pnlRASeries.TabIndex = 22;
-            this.pnlRASeries.TabStop = false;
-            this.pnlRASeries.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pnlRAChart_MouseClick);
-            // 
-            // pnlDESeries
-            // 
-            this.pnlDESeries.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pnlDESeries.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.pnlDESeries.Location = new System.Drawing.Point(2, 93);
-            this.pnlDESeries.Name = "pnlDESeries";
-            this.pnlDESeries.Size = new System.Drawing.Size(247, 90);
-            this.pnlDESeries.TabIndex = 22;
-            this.pnlDESeries.TabStop = false;
-            this.pnlDESeries.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pnlDEChart_MouseClick);
             // 
             // lblMeaMag
             // 
@@ -310,7 +293,7 @@
             this.pnlEndAstrometry.Controls.Add(this.lblAstRA);
             this.pnlEndAstrometry.Controls.Add(this.lblAlpha);
             this.pnlEndAstrometry.Controls.Add(this.lblAstDE);
-            this.pnlEndAstrometry.Location = new System.Drawing.Point(4, -7);
+            this.pnlEndAstrometry.Location = new System.Drawing.Point(5, -4);
             this.pnlEndAstrometry.Name = "pnlEndAstrometry";
             this.pnlEndAstrometry.Size = new System.Drawing.Size(239, 105);
             this.pnlEndAstrometry.TabIndex = 23;
@@ -407,9 +390,10 @@
             // 
             this.pnlAstrometryControls.Controls.Add(this.pnlEndAstrometry);
             this.pnlAstrometryControls.Controls.Add(this.btnStop);
+            this.pnlAstrometryControls.Controls.Add(this.pnlEndAstrometryFlyby);
             this.pnlAstrometryControls.Location = new System.Drawing.Point(484, 193);
             this.pnlAstrometryControls.Name = "pnlAstrometryControls";
-            this.pnlAstrometryControls.Size = new System.Drawing.Size(247, 100);
+            this.pnlAstrometryControls.Size = new System.Drawing.Size(254, 107);
             this.pnlAstrometryControls.TabIndex = 26;
             // 
             // pnlStandardControls
@@ -475,6 +459,42 @@
             this.pnlFitInfo.Name = "pnlFitInfo";
             this.pnlFitInfo.Size = new System.Drawing.Size(176, 112);
             this.pnlFitInfo.TabIndex = 19;
+            // 
+            // lblUncertDE
+            // 
+            this.lblUncertDE.AutoSize = true;
+            this.lblUncertDE.Location = new System.Drawing.Point(139, 24);
+            this.lblUncertDE.Name = "lblUncertDE";
+            this.lblUncertDE.Size = new System.Drawing.Size(34, 13);
+            this.lblUncertDE.TabIndex = 27;
+            this.lblUncertDE.Text = "214.5";
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(111, 24);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(31, 13);
+            this.label18.TabIndex = 26;
+            this.label18.Text = "DE =";
+            // 
+            // lblUncertRA
+            // 
+            this.lblUncertRA.AutoSize = true;
+            this.lblUncertRA.Location = new System.Drawing.Point(76, 24);
+            this.lblUncertRA.Name = "lblUncertRA";
+            this.lblUncertRA.Size = new System.Drawing.Size(34, 13);
+            this.lblUncertRA.TabIndex = 25;
+            this.lblUncertRA.Text = "214.5";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(111, 6);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(31, 13);
+            this.label9.TabIndex = 24;
+            this.label9.Text = "DE =";
             // 
             // label13
             // 
@@ -662,15 +682,6 @@
             this.label15.Size = new System.Drawing.Size(53, 13);
             this.label15.TabIndex = 17;
             this.label15.Text = "Err.Pos = ";
-            // 
-            // pbPSFFit
-            // 
-            this.pbPSFFit.BackColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.pbPSFFit.Location = new System.Drawing.Point(126, 0);
-            this.pbPSFFit.Name = "pbPSFFit";
-            this.pbPSFFit.Size = new System.Drawing.Size(120, 150);
-            this.pbPSFFit.TabIndex = 16;
-            this.pbPSFFit.TabStop = false;
             // 
             // lblMag
             // 
@@ -979,41 +990,78 @@
             this.saveUnitTestDataFileDialog.DefaultExt = "obs";
             this.saveUnitTestDataFileDialog.Filter = "Zip Files (*.zip)|*.zip|All Files (*.*)|*.*";
             // 
-            // label9
+            // pbPSFFit
             // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(111, 6);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(31, 13);
-            this.label9.TabIndex = 24;
-            this.label9.Text = "DE =";
+            this.pbPSFFit.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.pbPSFFit.Location = new System.Drawing.Point(126, 0);
+            this.pbPSFFit.Name = "pbPSFFit";
+            this.pbPSFFit.Size = new System.Drawing.Size(120, 150);
+            this.pbPSFFit.TabIndex = 16;
+            this.pbPSFFit.TabStop = false;
             // 
-            // lblUncertRA
+            // pnlRASeries
             // 
-            this.lblUncertRA.AutoSize = true;
-            this.lblUncertRA.Location = new System.Drawing.Point(76, 24);
-            this.lblUncertRA.Name = "lblUncertRA";
-            this.lblUncertRA.Size = new System.Drawing.Size(34, 13);
-            this.lblUncertRA.TabIndex = 25;
-            this.lblUncertRA.Text = "214.5";
+            this.pnlRASeries.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.pnlRASeries.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.pnlRASeries.Location = new System.Drawing.Point(2, 2);
+            this.pnlRASeries.Name = "pnlRASeries";
+            this.pnlRASeries.Size = new System.Drawing.Size(247, 90);
+            this.pnlRASeries.TabIndex = 22;
+            this.pnlRASeries.TabStop = false;
+            this.pnlRASeries.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pnlRAChart_MouseClick);
             // 
-            // label18
+            // pnlDESeries
             // 
-            this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(111, 24);
-            this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(31, 13);
-            this.label18.TabIndex = 26;
-            this.label18.Text = "DE =";
+            this.pnlDESeries.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.pnlDESeries.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.pnlDESeries.Location = new System.Drawing.Point(2, 93);
+            this.pnlDESeries.Name = "pnlDESeries";
+            this.pnlDESeries.Size = new System.Drawing.Size(247, 90);
+            this.pnlDESeries.TabIndex = 22;
+            this.pnlDESeries.TabStop = false;
+            this.pnlDESeries.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pnlDEChart_MouseClick);
             // 
-            // lblUncertDE
+            // pnlEndAstrometryFlyby
             // 
-            this.lblUncertDE.AutoSize = true;
-            this.lblUncertDE.Location = new System.Drawing.Point(139, 24);
-            this.lblUncertDE.Name = "lblUncertDE";
-            this.lblUncertDE.Size = new System.Drawing.Size(34, 13);
-            this.lblUncertDE.TabIndex = 27;
-            this.lblUncertDE.Text = "214.5";
+            this.pnlEndAstrometryFlyby.Controls.Add(this.label19);
+            this.pnlEndAstrometryFlyby.Controls.Add(this.lblRateVal2);
+            this.pnlEndAstrometryFlyby.Controls.Add(this.label21);
+            this.pnlEndAstrometryFlyby.Location = new System.Drawing.Point(7, -2);
+            this.pnlEndAstrometryFlyby.Name = "pnlEndAstrometryFlyby";
+            this.pnlEndAstrometryFlyby.Size = new System.Drawing.Size(239, 92);
+            this.pnlEndAstrometryFlyby.TabIndex = 31;
+            // 
+            // label19
+            // 
+            this.label19.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label19.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.label19.Location = new System.Drawing.Point(3, 39);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(229, 56);
+            this.label19.TabIndex = 30;
+            this.label19.Text = "Reductions of objects with expected motion of a slow or fast flyby are further pr" +
+    "ocessed in the Fast Motion Astrometry form";
+            // 
+            // lblRateVal2
+            // 
+            this.lblRateVal2.AutoSize = true;
+            this.lblRateVal2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.lblRateVal2.Location = new System.Drawing.Point(53, 5);
+            this.lblRateVal2.Name = "lblRateVal2";
+            this.lblRateVal2.Size = new System.Drawing.Size(57, 13);
+            this.lblRateVal2.TabIndex = 27;
+            this.lblRateVal2.Text = "02.13\"/s";
+            // 
+            // label21
+            // 
+            this.label21.AutoSize = true;
+            this.label21.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label21.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.label21.Location = new System.Drawing.Point(9, 5);
+            this.label21.Name = "label21";
+            this.label21.Size = new System.Drawing.Size(44, 13);
+            this.label21.TabIndex = 28;
+            this.label21.Text = "rate = ";
             // 
             // ucAstrometryObjectInfo
             // 
@@ -1026,10 +1074,8 @@
             this.Controls.Add(this.pnlAstrometryControls);
             this.Controls.Add(this.pnlAstrometry);
             this.Name = "ucAstrometryObjectInfo";
-            this.Size = new System.Drawing.Size(761, 333);
+            this.Size = new System.Drawing.Size(754, 333);
             this.pnlMeasurements.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pnlRASeries)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pnlDESeries)).EndInit();
             this.pnlEndAstrometry.ResumeLayout(false);
             this.pnlEndAstrometry.PerformLayout();
             this.pnlAstrometryControls.ResumeLayout(false);
@@ -1041,12 +1087,16 @@
             this.pnlPSFInfo.PerformLayout();
             this.pnlObject.ResumeLayout(false);
             this.pnlObject.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pbPSFFit)).EndInit();
             this.pnlAstrometry.ResumeLayout(false);
             this.pnlFitSuccessful.ResumeLayout(false);
             this.pnlFitFailed.ResumeLayout(false);
             this.pnlFitFailed.PerformLayout();
             this.pnlSwitchControl.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pbPSFFit)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pnlRASeries)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pnlDESeries)).EndInit();
+            this.pnlEndAstrometryFlyby.ResumeLayout(false);
+            this.pnlEndAstrometryFlyby.PerformLayout();
             this.ResumeLayout(false);
 
 		}
@@ -1140,5 +1190,9 @@
         private System.Windows.Forms.Label label18;
         private System.Windows.Forms.Label lblUncertRA;
         private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Panel pnlEndAstrometryFlyby;
+        private System.Windows.Forms.Label label19;
+        private System.Windows.Forms.Label lblRateVal2;
+        private System.Windows.Forms.Label label21;
 	}
 }

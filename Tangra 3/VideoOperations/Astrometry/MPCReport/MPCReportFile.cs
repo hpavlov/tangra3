@@ -4,12 +4,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Tangra.Config;
 using Tangra.Model.Config;
+using Tangra.Model.Helpers;
 
 namespace Tangra.VideoOperations.Astrometry.MPCReport
 {
@@ -92,6 +94,26 @@ namespace Tangra.VideoOperations.Astrometry.MPCReport
             ObsLines.Add(obsLine);
             return true;
 		}
+
+	    public bool AddObservation(string reportLine)
+	    {
+	        try
+	        {
+	            if (reportLine.Length > 80) 
+                    reportLine = reportLine.Substring(0, 80);
+
+                var obsLine = MPCObsLine.Parse(reportLine);
+                if (obsLine != null)
+                    ObsLines.Add(obsLine);
+
+                return true;
+	        }
+	        catch (Exception ex)
+	        {
+	            Trace.WriteLine(ex.GetFullStackTrace());
+	            return false;
+	        }
+	    }
 
         public string ToAscii()
         {

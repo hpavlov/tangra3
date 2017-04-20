@@ -199,8 +199,20 @@ namespace Tangra.VideoOperations.Astrometry
 
 			if (endData)
 			{
-				pnlEndAstrometry.Visible = true;
-				btnAddToMCPReport.Enabled = false;
+			    if (m_MeasurementContext.MovementExpectation == MovementExpectation.Slow)
+			    {
+                    pnlEndAstrometry.Visible = true;
+                    pnlEndAstrometryFlyby.Visible = false;
+                    pnlEndAstrometry.BringToFront();
+			    }
+			    else
+			    {
+                    pnlEndAstrometry.Visible = false;
+                    pnlEndAstrometryFlyby.Visible = true;
+			        pnlEndAstrometryFlyby.BringToFront();
+			    }
+				
+                btnAddToMCPReport.Enabled = false;
 				pnlSwitchControl.Visible = true;
 
 				btnStop.Visible = false;
@@ -210,6 +222,7 @@ namespace Tangra.VideoOperations.Astrometry
 			else
 			{
 				pnlEndAstrometry.Visible = false;
+                pnlEndAstrometryFlyby.Visible = false;
 				btnStop.Visible = true;
 			}
 		}
@@ -1014,6 +1027,7 @@ namespace Tangra.VideoOperations.Astrometry
                         lblRate.Visible = true;
                         lblRateVal.Visible = true;
                         lblRateVal.Text = string.Format("{0:F2}\"/s", m_MotionRate);
+                        lblRateVal2.Text = string.Format("{0:F2}\"/s", m_MotionRate);
                     }
                     break;
 		    };

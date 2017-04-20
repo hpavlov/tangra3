@@ -36,6 +36,7 @@ namespace Tangra.SDK
         string ObservatoryCode { get; }
         string ObjectDesignation { get; }
         double ArcSecsInPixel { get; }
+        string CatalogueCode { get; }
     }
 
     public interface ITangraMatchedStar

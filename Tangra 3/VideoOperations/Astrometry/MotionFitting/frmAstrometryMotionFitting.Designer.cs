@@ -28,10 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmAstrometryMotionFitting));
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.tsbtnOpenDirectory = new System.Windows.Forms.ToolStripButton();
-            this.tsbtnOpenFile = new System.Windows.Forms.ToolStripButton();
             this.pnlFiles = new System.Windows.Forms.Panel();
             this.label10 = new System.Windows.Forms.Label();
             this.nudPixelsPerArcSec = new System.Windows.Forms.NumericUpDown();
@@ -64,19 +63,22 @@
             this.lblAvailableSpectraTitle = new System.Windows.Forms.Label();
             this.pnlClient = new System.Windows.Forms.Panel();
             this.pnlPlot = new System.Windows.Forms.Panel();
-            this.pboxDECPlot = new System.Windows.Forms.PictureBox();
-            this.pboxRAPlot = new System.Windows.Forms.PictureBox();
             this.pnlOutput = new System.Windows.Forms.Panel();
             this.pnlReportHolder = new System.Windows.Forms.Panel();
             this.tbxMeasurements = new System.Windows.Forms.TextBox();
             this.pnlExportOptions = new System.Windows.Forms.Panel();
-            this.label14 = new System.Windows.Forms.Label();
-            this.lblDE = new System.Windows.Forms.Label();
-            this.lblRA = new System.Windows.Forms.Label();
-            this.label11 = new System.Windows.Forms.Label();
-            this.nudSinglePosMea = new System.Windows.Forms.NumericUpDown();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.btnAddToMCPReport = new System.Windows.Forms.Button();
+            this.btnCalcPos = new System.Windows.Forms.Button();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.pboxDECPlot = new System.Windows.Forms.PictureBox();
+            this.pboxRAPlot = new System.Windows.Forms.PictureBox();
+            this.tsbtnOpenDirectory = new System.Windows.Forms.ToolStripButton();
+            this.tsbtnOpenFile = new System.Windows.Forms.ToolStripButton();
+            this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.label11 = new System.Windows.Forms.Label();
+            this.tbxNetCode = new System.Windows.Forms.TextBox();
             this.toolStrip1.SuspendLayout();
             this.pnlFiles.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudPixelsPerArcSec)).BeginInit();
@@ -86,12 +88,11 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudInstDelaySec)).BeginInit();
             this.pnlClient.SuspendLayout();
             this.pnlPlot.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pboxDECPlot)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pboxRAPlot)).BeginInit();
             this.pnlOutput.SuspendLayout();
             this.pnlReportHolder.SuspendLayout();
             this.pnlExportOptions.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudSinglePosMea)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pboxDECPlot)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pboxRAPlot)).BeginInit();
             this.SuspendLayout();
             // 
             // toolStrip1
@@ -104,26 +105,6 @@
             this.toolStrip1.Size = new System.Drawing.Size(872, 25);
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip1";
-            // 
-            // tsbtnOpenDirectory
-            // 
-            this.tsbtnOpenDirectory.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.tsbtnOpenDirectory.Image = ((System.Drawing.Image)(resources.GetObject("tsbtnOpenDirectory.Image")));
-            this.tsbtnOpenDirectory.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tsbtnOpenDirectory.Name = "tsbtnOpenDirectory";
-            this.tsbtnOpenDirectory.Size = new System.Drawing.Size(84, 22);
-            this.tsbtnOpenDirectory.Text = "Add Directory";
-            this.tsbtnOpenDirectory.Click += new System.EventHandler(this.tsbtnOpenDirectory_Click);
-            // 
-            // tsbtnOpenFile
-            // 
-            this.tsbtnOpenFile.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.tsbtnOpenFile.Image = ((System.Drawing.Image)(resources.GetObject("tsbtnOpenFile.Image")));
-            this.tsbtnOpenFile.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tsbtnOpenFile.Name = "tsbtnOpenFile";
-            this.tsbtnOpenFile.Size = new System.Drawing.Size(59, 22);
-            this.tsbtnOpenFile.Text = "Add Files";
-            this.tsbtnOpenFile.Click += new System.EventHandler(this.tsbtnOpenFile_Click);
             // 
             // pnlFiles
             // 
@@ -179,6 +160,7 @@
             // groupBox1
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.groupBox1.Controls.Add(this.btnCalcPos);
             this.groupBox1.Controls.Add(this.cbxErrorMethod);
             this.groupBox1.Controls.Add(this.label13);
             this.groupBox1.Controls.Add(this.rbWeightingAstr);
@@ -503,24 +485,6 @@
             this.pnlPlot.Size = new System.Drawing.Size(665, 452);
             this.pnlPlot.TabIndex = 2;
             // 
-            // pboxDECPlot
-            // 
-            this.pboxDECPlot.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pboxDECPlot.Location = new System.Drawing.Point(330, 0);
-            this.pboxDECPlot.Name = "pboxDECPlot";
-            this.pboxDECPlot.Size = new System.Drawing.Size(335, 452);
-            this.pboxDECPlot.TabIndex = 1;
-            this.pboxDECPlot.TabStop = false;
-            // 
-            // pboxRAPlot
-            // 
-            this.pboxRAPlot.Dock = System.Windows.Forms.DockStyle.Left;
-            this.pboxRAPlot.Location = new System.Drawing.Point(0, 0);
-            this.pboxRAPlot.Name = "pboxRAPlot";
-            this.pboxRAPlot.Size = new System.Drawing.Size(330, 452);
-            this.pboxRAPlot.TabIndex = 0;
-            this.pboxRAPlot.TabStop = false;
-            // 
             // pnlOutput
             // 
             this.pnlOutput.Controls.Add(this.pnlReportHolder);
@@ -554,75 +518,101 @@
             // 
             // pnlExportOptions
             // 
-            this.pnlExportOptions.Controls.Add(this.label14);
-            this.pnlExportOptions.Controls.Add(this.lblDE);
-            this.pnlExportOptions.Controls.Add(this.lblRA);
             this.pnlExportOptions.Controls.Add(this.label11);
-            this.pnlExportOptions.Controls.Add(this.nudSinglePosMea);
+            this.pnlExportOptions.Controls.Add(this.tbxNetCode);
+            this.pnlExportOptions.Controls.Add(this.btnAddToMCPReport);
             this.pnlExportOptions.Dock = System.Windows.Forms.DockStyle.Right;
             this.pnlExportOptions.Location = new System.Drawing.Point(505, 0);
             this.pnlExportOptions.Name = "pnlExportOptions";
             this.pnlExportOptions.Size = new System.Drawing.Size(160, 79);
             this.pnlExportOptions.TabIndex = 1;
             // 
-            // label14
-            // 
-            this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(6, 4);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(103, 13);
-            this.label14.TabIndex = 40;
-            this.label14.Text = "Single Measurement";
-            // 
-            // lblDE
-            // 
-            this.lblDE.AutoSize = true;
-            this.lblDE.Location = new System.Drawing.Point(12, 61);
-            this.lblDE.Name = "lblDE";
-            this.lblDE.Size = new System.Drawing.Size(0, 13);
-            this.lblDE.TabIndex = 39;
-            // 
-            // lblRA
-            // 
-            this.lblRA.AutoSize = true;
-            this.lblRA.Location = new System.Drawing.Point(12, 44);
-            this.lblRA.Name = "lblRA";
-            this.lblRA.Size = new System.Drawing.Size(0, 13);
-            this.lblRA.TabIndex = 38;
-            // 
-            // label11
-            // 
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(6, 23);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(67, 13);
-            this.label11.TabIndex = 37;
-            this.label11.Text = "Time of Day:";
-            // 
-            // nudSinglePosMea
-            // 
-            this.nudSinglePosMea.DecimalPlaces = 6;
-            this.nudSinglePosMea.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            393216});
-            this.nudSinglePosMea.Location = new System.Drawing.Point(79, 21);
-            this.nudSinglePosMea.Maximum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.nudSinglePosMea.Name = "nudSinglePosMea";
-            this.nudSinglePosMea.Size = new System.Drawing.Size(69, 20);
-            this.nudSinglePosMea.TabIndex = 36;
-            this.nudSinglePosMea.KeyDown += new System.Windows.Forms.KeyEventHandler(this.nudSinglePosMea_KeyDown);
-            // 
             // openFileDialog1
             // 
             this.openFileDialog1.DefaultExt = "*.csv";
             this.openFileDialog1.Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*";
             this.openFileDialog1.Multiselect = true;
+            // 
+            // btnAddToMCPReport
+            // 
+            this.btnAddToMCPReport.Location = new System.Drawing.Point(6, 49);
+            this.btnAddToMCPReport.Name = "btnAddToMCPReport";
+            this.btnAddToMCPReport.Size = new System.Drawing.Size(145, 23);
+            this.btnAddToMCPReport.TabIndex = 42;
+            this.btnAddToMCPReport.Text = "Add All To MPC Report File";
+            this.btnAddToMCPReport.UseVisualStyleBackColor = true;
+            this.btnAddToMCPReport.Click += new System.EventHandler(this.btnAddToMCPReport_Click);
+            // 
+            // btnCalcPos
+            // 
+            this.btnCalcPos.Location = new System.Drawing.Point(159, 23);
+            this.btnCalcPos.Name = "btnCalcPos";
+            this.btnCalcPos.Size = new System.Drawing.Size(26, 20);
+            this.btnCalcPos.TabIndex = 43;
+            this.btnCalcPos.Tag = "";
+            this.btnCalcPos.Text = "*";
+            this.toolTip1.SetToolTip(this.btnCalcPos, "Compute position for user specified Time of Day");
+            this.btnCalcPos.UseVisualStyleBackColor = true;
+            this.btnCalcPos.Click += new System.EventHandler(this.btnCalcPos_Click);
+            // 
+            // pboxDECPlot
+            // 
+            this.pboxDECPlot.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pboxDECPlot.Location = new System.Drawing.Point(330, 0);
+            this.pboxDECPlot.Name = "pboxDECPlot";
+            this.pboxDECPlot.Size = new System.Drawing.Size(335, 452);
+            this.pboxDECPlot.TabIndex = 1;
+            this.pboxDECPlot.TabStop = false;
+            // 
+            // pboxRAPlot
+            // 
+            this.pboxRAPlot.Dock = System.Windows.Forms.DockStyle.Left;
+            this.pboxRAPlot.Location = new System.Drawing.Point(0, 0);
+            this.pboxRAPlot.Name = "pboxRAPlot";
+            this.pboxRAPlot.Size = new System.Drawing.Size(330, 452);
+            this.pboxRAPlot.TabIndex = 0;
+            this.pboxRAPlot.TabStop = false;
+            // 
+            // tsbtnOpenDirectory
+            // 
+            this.tsbtnOpenDirectory.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.tsbtnOpenDirectory.Image = ((System.Drawing.Image)(resources.GetObject("tsbtnOpenDirectory.Image")));
+            this.tsbtnOpenDirectory.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsbtnOpenDirectory.Name = "tsbtnOpenDirectory";
+            this.tsbtnOpenDirectory.Size = new System.Drawing.Size(84, 22);
+            this.tsbtnOpenDirectory.Text = "Add Directory";
+            this.tsbtnOpenDirectory.Click += new System.EventHandler(this.tsbtnOpenDirectory_Click);
+            // 
+            // tsbtnOpenFile
+            // 
+            this.tsbtnOpenFile.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.tsbtnOpenFile.Image = ((System.Drawing.Image)(resources.GetObject("tsbtnOpenFile.Image")));
+            this.tsbtnOpenFile.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsbtnOpenFile.Name = "tsbtnOpenFile";
+            this.tsbtnOpenFile.Size = new System.Drawing.Size(59, 22);
+            this.tsbtnOpenFile.Text = "Add Files";
+            this.tsbtnOpenFile.Click += new System.EventHandler(this.tsbtnOpenFile_Click);
+            // 
+            // saveFileDialog
+            // 
+            this.saveFileDialog.DefaultExt = "obs";
+            this.saveFileDialog.Filter = "MPC Observation Reports (*.obs)|*.obs|All Files (*.*)|*.*";
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(6, 17);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(86, 13);
+            this.label11.TabIndex = 44;
+            this.label11.Text = "Catalogue Code:";
+            // 
+            // tbxNetCode
+            // 
+            this.tbxNetCode.Location = new System.Drawing.Point(98, 14);
+            this.tbxNetCode.Name = "tbxNetCode";
+            this.tbxNetCode.Size = new System.Drawing.Size(50, 20);
+            this.tbxNetCode.TabIndex = 43;
             // 
             // frmAstrometryMotionFitting
             // 
@@ -650,14 +640,13 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudInstDelaySec)).EndInit();
             this.pnlClient.ResumeLayout(false);
             this.pnlPlot.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pboxDECPlot)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pboxRAPlot)).EndInit();
             this.pnlOutput.ResumeLayout(false);
             this.pnlReportHolder.ResumeLayout(false);
             this.pnlReportHolder.PerformLayout();
             this.pnlExportOptions.ResumeLayout(false);
             this.pnlExportOptions.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudSinglePosMea)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pboxDECPlot)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pboxRAPlot)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -703,15 +692,16 @@
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.CheckBox cbxFactorInPositionalUncertainty;
-        private System.Windows.Forms.Label label11;
-        private System.Windows.Forms.NumericUpDown nudSinglePosMea;
-        private System.Windows.Forms.Label label14;
-        private System.Windows.Forms.Label lblDE;
-        private System.Windows.Forms.Label lblRA;
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.NumericUpDown nudSigmaExclusion;
         private System.Windows.Forms.RadioButton rbWeightingAstr;
         private System.Windows.Forms.ComboBox cbxErrorMethod;
         private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.Button btnAddToMCPReport;
+        private System.Windows.Forms.Button btnCalcPos;
+        private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.SaveFileDialog saveFileDialog;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.TextBox tbxNetCode;
     }
 }

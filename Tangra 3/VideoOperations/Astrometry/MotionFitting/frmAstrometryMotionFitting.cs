@@ -8,14 +8,17 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Config;
 using Tangra.Model.Config;
 using Tangra.Model.Helpers;
 using Tangra.Model.Numerical;
 using Tangra.MotionFitting;
+using Tangra.VideoOperations.Astrometry.Engine;
+using Tangra.VideoOperations.Astrometry.MPCReport;
 
 namespace Tangra.VideoOperations.Astrometry.MotionFitting
 {
-    public partial class frmAstrometryMotionFitting : Form
+    public partial class frmAstrometryMotionFitting : Form, IMPCReportFileManager
     {
         public const decimal DEFAULT_ARCSEC_PER_PIXEL = 2.5M;
 
@@ -109,6 +112,7 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                     {
                         tbxObjectDesign.Text = m_DataProvider.ObjectDesignation;
                         tbxObsCode.Text = m_DataProvider.ObservatoryCode;
+                        if (!string.IsNullOrWhiteSpace(m_DataProvider.CatalogueCode)) tbxNetCode.Text = m_DataProvider.CatalogueCode;
                         if (m_DataProvider.ObservationDate.HasValue && m_DataProvider.ObservationDate.Value != DateTime.MinValue)
                             dtpDate.Value = m_DataProvider.ObservationDate.Value;
                         nudInstDelaySec.Value = m_DataProvider.InstrumentalDelaySec;
@@ -288,25 +292,96 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
             Recalculate();
         }
 
-        private void nudSinglePosMea_KeyDown(object sender, KeyEventArgs e)
+        private void btnCalcPos_Click(object sender, EventArgs e)
         {
-            if (e.KeyValue == 13 && m_PositionExtractor != null)
+            if (m_PositionExtractor != null)
             {
-                // Calculate single position
-                double raHours, deDeg, errRACosDEArcSec, errDEArcSec;
-                m_PositionExtractor.CalculateSingleMeasurement((double)nudSinglePosMea.Value, out raHours, out deDeg, out errRACosDEArcSec, out errDEArcSec);
-
-                if (!double.IsNaN(raHours))
+                var frmToD = new frmCalculatePositionForTimeOfDay();
+                if (frmToD.ShowDialog(this) == DialogResult.OK)
                 {
-                    lblRA.Text = AstroConvert.ToStringValue(raHours, "HH MM SS.TT") + " +/-" + errRACosDEArcSec.ToString("0.00") + "\"";
-                    lblDE.Text = AstroConvert.ToStringValue(deDeg, "+HH MM SS.T") + " +/-" + errDEArcSec.ToString("0.00") + "\"";
+                    // Calculate single position
+                    string reportLine = m_PositionExtractor.CalculateSingleMeasurement(tbxObsCode.Text, tbxObjectDesign.Text, dtpDate.Value.Date, (double)frmToD.nudSinglePosMea.Value);
+                    if (!string.IsNullOrWhiteSpace(reportLine))
+                        tbxMeasurements.Text = tbxMeasurements.Text.TrimEnd("\r\n".ToCharArray()) + "\r\n" + reportLine;
+                }
+            }
+        }
+
+        private void btnAddToMCPReport_Click(object sender, EventArgs e)
+        {
+            if (tbxNetCode.Text.Trim().Length == 0)
+            {
+                MessageBox.Show(this, "Catalogue code must be specified.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                tbxNetCode.Focus();
+                return;
+            }
+
+            SaveToReportFile();
+        }
+
+        private MPCReportFile m_CurrentReportFile;
+
+        private void SaveToReportFile()
+        {
+            if (m_CurrentReportFile == null)
+            {
+                // Is there a report form currently opened? 
+                // If no then ask the user to append to an existing report or create a new one
+                frmChooseReportFile reportFileForm = new frmChooseReportFile();
+                if (reportFileForm.ShowDialog(this.ParentForm) != DialogResult.OK)
+                    return;
+
+                if (reportFileForm.IsNewReport)
+                {
+                    frmMPCObserver frmObserver = new frmMPCObserver(frmMPCObserver.MPCHeaderSettingsMode.NewMPCReport);
+                    if (frmObserver.ShowDialog(ParentForm) == DialogResult.Cancel)
+                        return;
+
+                    if (saveFileDialog.ShowDialog(ParentForm) != DialogResult.OK)
+                        return;
+
+                    MPCObsHeader header = frmObserver.Header;
+                    header.NET = tbxNetCode.Text;
+                    m_CurrentReportFile = new MPCReportFile(saveFileDialog.FileName, header);
+
+                    TangraConfig.Settings.RecentFiles.NewRecentFile(RecentFileType.MPCReport, saveFileDialog.FileName);
+                    TangraConfig.Settings.Save();
                 }
                 else
                 {
-                    lblRA.Text = "";
-                    lblDE.Text = "";
+                    m_CurrentReportFile = new MPCReportFile(reportFileForm.ReportFileName);
+
+                    if (m_CurrentReportFile.Header.NET != tbxNetCode.Text)
+                    {
+                        MessageBox.Show(
+                            string.Format("The selected observation file uses {0} rather than {1}. Pelase select a different observation file or change the used catalog.",
+                            m_CurrentReportFile.Header.NET, tbxNetCode.Text), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                        m_CurrentReportFile = null;
+                        return;
+                    }
                 }
             }
+
+            if (m_CurrentReportFile != null)
+            {
+                foreach (string line in tbxMeasurements.Lines)
+                {
+                    m_CurrentReportFile.AddObservation(line);
+                }
+
+                m_CurrentReportFile.Save();
+
+                m_CurrentReportFile.Present(this);
+
+                AstrometryContext.Current.CurrentReportFile = m_CurrentReportFile;
+            }
+        }
+
+        public void CloseReportFile()
+        {
+            m_CurrentReportFile = null;
+            AstrometryContext.Current.CurrentReportFile = null;
         }
     }
 }

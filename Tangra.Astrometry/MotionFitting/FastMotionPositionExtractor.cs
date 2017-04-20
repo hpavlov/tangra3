@@ -160,21 +160,17 @@ namespace Tangra.MotionFitting
             return lines.ToArray();
         }
 
-        public void CalculateSingleMeasurement(double timeOfDay, out double raHours, out double deDeg, out double errRACosDEArcSec, out double errDEArcSec)
+        public string CalculateSingleMeasurement(string obsCode, string designation, DateTime obsDate, double timeOfDay)
         {
-            raHours = double.NaN;
-            deDeg = double.NaN;
-            errRACosDEArcSec = double.NaN;
-            errDEArcSec = double.NaN;
-
             foreach (var chunk in m_Chunks)
             {
                 if (chunk.MinTimeOfDayUTCInstrDelayApplied <= timeOfDay && chunk.MaxTimeOfDayUTCInstrDelayApplied >= timeOfDay)
                 {
-                    chunk.GetPosition(timeOfDay, out raHours, out errRACosDEArcSec, out deDeg, out errDEArcSec);
-                    return;
+                    return chunk.GetReport(obsCode, designation, obsDate, timeOfDay);
                 }
             }
+
+            return null;
         }
 
         public const int PADDING_L = 15;
@@ -629,15 +625,20 @@ namespace Tangra.MotionFitting
         internal string GetMidPointReport(string obsCode, string designation, DateTime obsDate)
         {
             double closestTimeOfDay = GetMidPointDelayCorrectedTimeOfDay();
+            
+            var normalTime = double.Parse(closestTimeOfDay.ToString("0.000000"));
+            if (double.IsNaN(normalTime) || double.IsInfinity(normalTime)) return null;
 
+            return GetReport(obsCode, designation, obsDate, normalTime);
+        }
+
+        internal string GetReport(string obsCode, string designation, DateTime obsDate, double normalTime)
+        {
             MPCObsLine obsLine = new MPCObsLine(obsCode.PadLeft(3).Substring(0, 3));
             obsLine.SetObject(designation.PadLeft(12).Substring(0, 12));
 
             if (m_RegressionRA != null && m_RegressionDE != null)
             {
-                var normalTime = double.Parse(closestTimeOfDay.ToString("0.000000"));
-                if (double.IsNaN(normalTime) || double.IsInfinity(normalTime)) return null;
-
                 DateTime mpcTime = obsDate.Date.AddDays(normalTime);
                 double errRA, errDE;
                 double mpcRAHours = m_RegressionRA.ComputeYWithError(normalTime, out errRA, m_ErrorMethod) / 15.0;

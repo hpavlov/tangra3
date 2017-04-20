@@ -14,6 +14,7 @@ namespace Tangra.MotionFitting
         int NumberOfMeasurements { get; }
         string ObjectDesignation { get; }
         string ObservatoryCode { get; }
+        string CatalogueCode { get; }
         DateTime? ObservationDate { get; }
         decimal InstrumentalDelaySec { get; }
         double ArsSecsInPixel { get; }
