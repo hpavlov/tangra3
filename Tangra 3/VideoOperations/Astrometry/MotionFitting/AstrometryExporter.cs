@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -20,7 +21,7 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
             var output = new StringBuilder();
             output.AppendLine("Tangra Astrometry Export v1.0");
             output.AppendLine("FilePath, Date, InstrumentalDelay, DelayUnits, IntegratedFrames, IntegratedExposure(sec), FrameTimeType, NativeVideoFormat, ObservatoryCode, Object, ArsSecsInPixel, CatalogueCode");
-            output.AppendLine(string.Format("\"{0}\",{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11}",
+            output.AppendLine(string.Format(CultureInfo.InvariantCulture, "\"{0}\",{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11}",
                 fileName,
                 meaList.Count > 0 && meaList[0].UncorrectedTimeStamp.HasValue ? meaList[0].UncorrectedTimeStamp.Value.ToString("yyyy-MM-dd") : null,
                 solution.InstrumentalDelay,
@@ -38,7 +39,7 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
 
             foreach (var mea in meaList)
             {
-                output.AppendFormat("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}\r\n",
+                output.AppendFormat(CultureInfo.InvariantCulture, "{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}\r\n",
                     mea.FrameNo,
                     mea.UncorrectedTimeStamp.HasValue ? (double?)mea.UncorrectedTimeStamp.Value.TimeOfDay.TotalDays : null,
                     mea.UncorrectedTimeStamp.HasValue ? mea.UncorrectedTimeStamp.Value.ToString("[HH:mm:ss.fff]") : null,

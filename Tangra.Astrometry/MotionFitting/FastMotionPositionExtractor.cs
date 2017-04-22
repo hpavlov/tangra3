@@ -194,6 +194,10 @@ namespace Tangra.MotionFitting
                     (c) => c.GetMidPointRAPosition(),
                     (x) => Math.Cos(x.DEDegFitted * Math.PI / 180));
             }
+            else
+            {
+                g.Clear(SystemColors.ControlDarkDark);
+            }
         }
 
         internal void Plot(Graphics g, Pen pen,
@@ -410,6 +414,10 @@ namespace Tangra.MotionFitting
                     (x) => x.DEDegFitted,
                     (c) => c.GetMidPointDEPosition(),
                     (x) => 1);
+            }
+            else
+            {
+                g.Clear(SystemColors.ControlDarkDark);
             }
         }
     }

@@ -15,6 +15,7 @@ namespace Tangra.MotionFitting
         string ObjectDesignation { get; }
         string ObservatoryCode { get; }
         string CatalogueCode { get; }
+        bool Unmeasurable { get; }
         DateTime? ObservationDate { get; }
         decimal InstrumentalDelaySec { get; }
         double ArsSecsInPixel { get; }

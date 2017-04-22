@@ -1,7 +1,7 @@
 ﻿Tangra3 Release Notes
 ---------------------
 vNext (Unreleased)
-- Added a button to add astrometric positions to an MPC report to the Fast Motion Astrometry form as well.
+- Fixed critical usability issues with the fast motion astrometry
 - Improved the the VTI-OSD area selection when doing AVI-to-AAV file conversion. 
 
 v3.6.4 (2017-04-12)

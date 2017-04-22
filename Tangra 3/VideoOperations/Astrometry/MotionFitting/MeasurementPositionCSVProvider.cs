@@ -12,6 +12,8 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
 {
     public class MeasurementPositionCSVProvider : IMeasurementPositionProvider
     {
+        public static MeasurementPositionCSVProvider Empty = new MeasurementPositionCSVProvider();
+
         private List<MeasurementPositionEntry> m_Measurements = new List<MeasurementPositionEntry>();
 
         private string m_FilePath;
@@ -23,6 +25,9 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
         private string m_NativeVideoFormat;
 
         public bool IsTangraAstrometryExport { get; private set; }
+
+        private MeasurementPositionCSVProvider()
+        { }
 
         public MeasurementPositionCSVProvider(string fileName)
         {
@@ -70,6 +75,12 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                             ObservatoryCode = GrabString(headerDict, "ObservatoryCode");
                             ObjectDesignation = GrabString(headerDict, "Object");
                             CatalogueCode = GrabString(headerDict, "CatalogueCode");
+
+                            Unmeasurable = false;
+
+                            if (m_NativeVideoFormat == "AVI-Integrated")
+                                // Integrated video measured from the AVI file is not supported in the fast motion astrometry at the moment.
+                                Unmeasurable = true;
 
                             if (headerDict.ContainsKey("ArsSecsInPixel"))
                             {
@@ -130,7 +141,7 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
             if (dict.ContainsKey(key))
             {
                 double dblVal;
-                if (double.TryParse(dict[key], out dblVal))
+                if (double.TryParse(dict[key], NumberStyles.Float, CultureInfo.InvariantCulture, out dblVal))
                     return dblVal;
             }
 
@@ -142,7 +153,7 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
             if (dict.ContainsKey(key))
             {
                 int intVal;
-                if (int.TryParse(dict[key], out intVal))
+                if (int.TryParse(dict[key], NumberStyles.Integer, CultureInfo.InvariantCulture, out intVal))
                     return intVal;
             }
 
@@ -181,6 +192,8 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
         public string ObservatoryCode { get; private set; }
 
         public string CatalogueCode { get; private set; }
+
+        public bool Unmeasurable { get; private set; }
         
         public DateTime? ObservationDate { get; private set; }
 
@@ -196,6 +209,10 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                         return (decimal)(0.04 * m_InstrumentalDelay);
                     else if ("NTSC".Equals(m_NativeVideoFormat, StringComparison.InvariantCultureIgnoreCase))
                         return (decimal)(0.0333667 * m_InstrumentalDelay);
+                    else
+                    {
+                        return (decimal) (m_InstrumentalDelay * m_IntegratedExposureSec / m_IntegratedFrames);
+                    }
                 }
                 
                 return 0;

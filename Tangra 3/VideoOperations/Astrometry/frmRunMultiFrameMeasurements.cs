@@ -287,6 +287,9 @@ namespace Tangra.VideoOperations.Astrometry
 					}
 				}
 			}
+            else
+                // This will be set in the exported CSV file and will then be used to identify repeated measurements from integrated AAV files
+                m_NativeFormat = "AVI-Integrated";
 
 			activePage = 0;
 			DisplayActivePage();
@@ -329,6 +332,16 @@ namespace Tangra.VideoOperations.Astrometry
                                 "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Stop);
 
                         return;
+				    }
+
+                    if (nudIntegratedFrames.Value > 1 && m_VideoFileFormat == VideoFileFormat.AVI && (MovementExpectation)cbxExpectedMotion.SelectedIndex != MovementExpectation.Slow)
+				    {
+				        if (MessageBox.Show(this,
+				            "To measure AVI files recorded with integrated video cameras it is required the file format to be converted to AAV first using\r\n\r\nFile -> Convert Video to AAV\r\n\r\nfrom the Tangra's menu. Press 'Yes' to go back and then cancel the operation and convert the video to AAV format before measuring it again.\r\n\r\nIf you press 'No' the individual positions will be measured but Tangra will not be able to derive high precision astrometry from the fast motion.",
+				            "Tangra", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+				        {
+                            return;
+				        }
 				    }
 
 					ucFrameInterval.Recalculate();

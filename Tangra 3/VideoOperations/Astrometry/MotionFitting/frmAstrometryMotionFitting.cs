@@ -102,6 +102,15 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                     m_DataProvider = new MeasurementPositionCSVProvider(entry.FilePath);
                     m_SelectedEntry = entry;
 
+                    if (m_DataProvider.Unmeasurable)
+                    {
+                        MessageBox.Show(this, "This file cannot be processed by the Fast Motion Astrometry module.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        m_DataProvider = MeasurementPositionCSVProvider.Empty;
+                        lbAvailableFiles.SelectedIndex = -1;
+                        Recalculate();
+                        return;
+                    }
+
                     nudPixelsPerArcSec.ValueChanged -= nudPixelsPerArcSec_ValueChanged;
                     nudInstDelaySec.ValueChanged -= nudInstDelaySec_ValueChanged;
                     dtpDate.ValueChanged -= dtpDate_ValueChanged;
@@ -118,10 +127,7 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                         nudInstDelaySec.Value = m_DataProvider.InstrumentalDelaySec;
                         nudPixelsPerArcSec.Value = m_DataProvider.ArsSecsInPixel > 0 ? (decimal)m_DataProvider.ArsSecsInPixel : DEFAULT_ARCSEC_PER_PIXEL;
 
-                        int optimalChunks = m_DataProvider.NumberOfMeasurements / 50;
-                        if (optimalChunks > 6) optimalChunks = 6;
-                        if (optimalChunks < 1) optimalChunks = 1;
-                        nudMeaIntervals.Value = optimalChunks;
+                        nudMeaIntervals.Value = CalculateOptimalChunks(m_DataProvider.NumberOfMeasurements);
 
                         if (cbxErrorMethod.SelectedIndex < 1 && m_DataProvider.Measurements.Count() < 10)
                         {
@@ -145,6 +151,22 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                     Recalculate();
                 }
             }
+        }
+
+        private int CalculateOptimalChunks(int numberOfMeasurements)
+        {
+            if (numberOfMeasurements < 40)
+                return 1;
+            else if (numberOfMeasurements < 60)
+                return 2;
+            else if (numberOfMeasurements < 120)
+                return 3;
+            else if (numberOfMeasurements < 1000)
+                return 4;
+            else if (numberOfMeasurements < 1500)
+                return 5;
+            else 
+                return 6;
         }
 
         private void Recalculate()
