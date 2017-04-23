@@ -88,7 +88,7 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
         }
 
         public void StartConversion(
-            string fileName, int topVtiOsdRow, int bottomVtiOsdRow,
+            string fileName, int topVtiOsdRow, int bottomVtiOsdRow, int leftVtiOsdCol, int rightVtiOsdCol,
             int firstIntegrationFrameNo, int integrationInterval, int lastFrameNo, 
             string cameraModel, string sensorInfo, bool swapTimestampFields)
         {
@@ -96,7 +96,7 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
             m_LastFrameNo = lastFrameNo;
             m_FirstFrameNo = firstIntegrationFrameNo;
 
-            m_ConvertVideoToAavController.StartConversion(fileName, topVtiOsdRow, bottomVtiOsdRow, firstIntegrationFrameNo, integrationInterval, cameraModel, sensorInfo, swapTimestampFields);
+            m_ConvertVideoToAavController.StartConversion(fileName, topVtiOsdRow, bottomVtiOsdRow, leftVtiOsdCol, rightVtiOsdCol, firstIntegrationFrameNo, integrationInterval, cameraModel, sensorInfo, swapTimestampFields);
 
             m_VideoController.PlayVideo(firstIntegrationFrameNo);
         }
@@ -114,17 +114,10 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
         }
 
         public void PreDraw(Graphics g)
-        {
-            //TODO:
-        }
-
-        internal int PreserveVTIFirstRow;
-        internal int PreserveVTILastRow;
+        { }
 
         public void PostDraw(Graphics g)
-        {
-            g.DrawRectangle(Pens.Lime, 0, PreserveVTIFirstRow, TangraContext.Current.FrameWidth - 3, PreserveVTILastRow - PreserveVTIFirstRow - 3);
-        }
+        { }
 
         public bool HasCustomZoomImage
         {

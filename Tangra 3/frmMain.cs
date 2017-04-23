@@ -1398,7 +1398,15 @@ namespace Tangra
 
         private void miConvertVideoToAAV_Click(object sender, EventArgs e)
         {
+            var roiSelector = new RoiSelector(m_VideoController, "VTI-OSD Position");
+            roiSelector.DisplayTextOutside = true;
+            roiSelector.SetUserFrame(new Rectangle(0, TangraContext.Current.FrameHeight - 28, TangraContext.Current.FrameWidth, 28));
+
+            m_VideoController.ChangeImageTool(roiSelector);
+
             m_VideoController.ActivateOperation<ConvertVideoToAavOperation>(m_ConvertVideoToAavController, false);
+
+            m_VideoController.SetPictureBoxCursor(Cursors.Arrow);
             m_VideoController.RefreshCurrentFrame();
         }
 

@@ -48,7 +48,7 @@ namespace Tangra.Model.Config
 	            foreach (var key in m_OsdPositionsPerFrameSize.Keys)
 	            {
 	                var val = m_OsdPositionsPerFrameSize[key];
-	                output.AppendFormat("{0},{1};{2},{3}|", key.Item1, key.Item2, val.Item1, val.Item2);
+                    output.AppendFormat("{0},{1};{2},{3},{4},{5}|", key.Item1, key.Item2, val.Item1, val.Item2, val.Item3, val.Item4);
 	            }
 
 	            return output.ToString();
@@ -67,11 +67,11 @@ namespace Tangra.Model.Config
 	                    {
 	                        var keys = data[0].Split(',');
                             var vals = data[1].Split(',');
-	                        if (keys.Length == 2 && vals.Length == 2)
+	                        if (keys.Length == 2 && vals.Length == 4)
 	                        {
 	                            m_OsdPositionsPerFrameSize.Add(
                                     Tuple.Create(int.Parse(keys[0]), int.Parse(keys[1])),
-	                                Tuple.Create(int.Parse(vals[0]), int.Parse(vals[1])));
+                                    Tuple.Create(int.Parse(vals[0]), int.Parse(vals[1]), int.Parse(vals[2]), int.Parse(vals[3])));
 	                        }
 	                    }
 	                }
@@ -79,17 +79,17 @@ namespace Tangra.Model.Config
 	        }
 	    }
 
-        private Dictionary<Tuple<int, int>, Tuple<int, int>> m_OsdPositionsPerFrameSize = new Dictionary<Tuple<int, int>, Tuple<int, int>>();
- 
-	    public void RegisterOsdPosition(int width, int height, int osdTopLine, int osdBottomLine)
+        private Dictionary<Tuple<int, int>, Tuple<int, int, int, int>> m_OsdPositionsPerFrameSize = new Dictionary<Tuple<int, int>, Tuple<int, int, int, int>>();
+
+        public void RegisterOsdPosition(int width, int height, int osdTopLine, int osdBottomLine, int osdLeftLine, int osdRightLine)
 	    {
-	        m_OsdPositionsPerFrameSize[Tuple.Create(width, height)] = Tuple.Create(osdTopLine, osdBottomLine);
+            m_OsdPositionsPerFrameSize[Tuple.Create(width, height)] = Tuple.Create(osdTopLine, osdBottomLine, osdLeftLine, osdRightLine);
 	    }
 
-	    public Tuple<int, int> GetLastOsdPositionForFrameSize(int width, int height)
+        public Tuple<int, int, int, int> GetLastOsdPositionForFrameSize(int width, int height)
 	    {
 	        var key = Tuple.Create(width, height);
-	        Tuple<int, int> rv;
+            Tuple<int, int, int, int> rv;
 	        if (m_OsdPositionsPerFrameSize.TryGetValue(key, out rv))
 	            return rv;
 	        else

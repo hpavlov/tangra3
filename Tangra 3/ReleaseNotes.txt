@@ -2,6 +2,7 @@
 ---------------------
 vNext (Unreleased)
 - Added a button to add astrometric positions to an MPC report to the Fast Motion Astrometry form as well.
+- Improved the the VTI-OSD area selection when doing AVI-to-AAV file conversion. 
 
 v3.6.4 (2017-04-12)
 - A full rework of the fast motion astrometry which now reports uncertainty estimates and provides more control of the motion fitting.

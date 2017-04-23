@@ -38,10 +38,7 @@
             this.btnCancel = new System.Windows.Forms.Button();
             this.gbxVTIPosition = new System.Windows.Forms.GroupBox();
             this.btnConfirmPosition = new System.Windows.Forms.Button();
-            this.nudPreserveVTIBottomRow = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
-            this.nudPreserveVTITopRow = new System.Windows.Forms.NumericUpDown();
-            this.label2 = new System.Windows.Forms.Label();
             this.gbxIntegrationRate = new System.Windows.Forms.GroupBox();
             this.lblFrames = new System.Windows.Forms.Label();
             this.nudIntegratedFrames = new System.Windows.Forms.NumericUpDown();
@@ -63,8 +60,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudFirstFrame)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudLastFrame)).BeginInit();
             this.gbxVTIPosition.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudPreserveVTIBottomRow)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudPreserveVTITopRow)).BeginInit();
             this.gbxIntegrationRate.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudIntegratedFrames)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudStartingAtFrame)).BeginInit();
@@ -150,10 +145,7 @@
             // gbxVTIPosition
             // 
             this.gbxVTIPosition.Controls.Add(this.btnConfirmPosition);
-            this.gbxVTIPosition.Controls.Add(this.nudPreserveVTIBottomRow);
             this.gbxVTIPosition.Controls.Add(this.label1);
-            this.gbxVTIPosition.Controls.Add(this.nudPreserveVTITopRow);
-            this.gbxVTIPosition.Controls.Add(this.label2);
             this.gbxVTIPosition.Location = new System.Drawing.Point(11, 0);
             this.gbxVTIPosition.Name = "gbxVTIPosition";
             this.gbxVTIPosition.Size = new System.Drawing.Size(212, 80);
@@ -170,61 +162,14 @@
             this.btnConfirmPosition.Text = "Confirm Position";
             this.btnConfirmPosition.Click += new System.EventHandler(this.btnConfirmPosition_Click);
             // 
-            // nudPreserveVTIBottomRow
-            // 
-            this.nudPreserveVTIBottomRow.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.nudPreserveVTIBottomRow.Location = new System.Drawing.Point(143, 19);
-            this.nudPreserveVTIBottomRow.Maximum = new decimal(new int[] {
-            4096,
-            0,
-            0,
-            0});
-            this.nudPreserveVTIBottomRow.Name = "nudPreserveVTIBottomRow";
-            this.nudPreserveVTIBottomRow.Size = new System.Drawing.Size(55, 20);
-            this.nudPreserveVTIBottomRow.TabIndex = 50;
-            this.nudPreserveVTIBottomRow.Value = new decimal(new int[] {
-            32,
-            0,
-            0,
-            0});
-            this.nudPreserveVTIBottomRow.ValueChanged += new System.EventHandler(this.nudPreserveVTITopRow_ValueChanged);
-            // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(11, 23);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(33, 13);
+            this.label1.Size = new System.Drawing.Size(190, 13);
             this.label1.TabIndex = 24;
-            this.label1.Text = "From:";
-            // 
-            // nudPreserveVTITopRow
-            // 
-            this.nudPreserveVTITopRow.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.nudPreserveVTITopRow.Location = new System.Drawing.Point(48, 19);
-            this.nudPreserveVTITopRow.Maximum = new decimal(new int[] {
-            4096,
-            0,
-            0,
-            0});
-            this.nudPreserveVTITopRow.Name = "nudPreserveVTITopRow";
-            this.nudPreserveVTITopRow.Size = new System.Drawing.Size(55, 20);
-            this.nudPreserveVTITopRow.TabIndex = 49;
-            this.nudPreserveVTITopRow.Value = new decimal(new int[] {
-            542,
-            0,
-            0,
-            0});
-            this.nudPreserveVTITopRow.ValueChanged += new System.EventHandler(this.nudPreserveVTITopRow_ValueChanged);
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(117, 23);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(23, 13);
-            this.label2.TabIndex = 25;
-            this.label2.Text = "To:";
+            this.label1.Text = "Select the VTI-OSD position on the left";
             // 
             // gbxIntegrationRate
             // 
@@ -435,8 +380,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudLastFrame)).EndInit();
             this.gbxVTIPosition.ResumeLayout(false);
             this.gbxVTIPosition.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudPreserveVTIBottomRow)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudPreserveVTITopRow)).EndInit();
             this.gbxIntegrationRate.ResumeLayout(false);
             this.gbxIntegrationRate.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudIntegratedFrames)).EndInit();
@@ -462,9 +405,6 @@
         private System.Windows.Forms.GroupBox gbxVTIPosition;
         private System.Windows.Forms.Button btnConfirmPosition;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.NumericUpDown nudPreserveVTIBottomRow;
-        private System.Windows.Forms.NumericUpDown nudPreserveVTITopRow;
         private System.Windows.Forms.GroupBox gbxIntegrationRate;
         private System.Windows.Forms.NumericUpDown nudStartingAtFrame;
         private System.Windows.Forms.Label label4;

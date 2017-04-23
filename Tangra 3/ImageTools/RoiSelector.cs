@@ -36,7 +36,7 @@ namespace Tangra.ImageTools
         private static int s_FrameWidth = 3;
         private bool m_DraggingCorner;
 
-		private static string s_DisplayText = "ROI";
+		private string m_DisplayText;
         
         private Rectangle m_UserFrame;
 
@@ -50,6 +50,8 @@ namespace Tangra.ImageTools
             get { return m_UserFrame; }
         }
 
+        public bool DisplayTextOutside { get; set; }
+
         private bool m_Enabled;
 
         public bool Enabled
@@ -62,12 +64,25 @@ namespace Tangra.ImageTools
             }
         }
 
-        public RoiSelector(VideoController videoController)
+        private bool m_DisplayOnlyMode;
+
+        public bool DisplayOnlyMode
+        {
+            get { return m_DisplayOnlyMode; }
+            set
+            {
+                m_DisplayOnlyMode = value;
+                TriggerRedraw();
+            }
+        }
+
+        public RoiSelector(VideoController videoController, string displayText = "ROI")
 		{
 			m_VideoController = videoController;
+            m_DisplayText = displayText;
 		}
 
-		protected void SetUserFrame(Rectangle userFrame)
+		internal void SetUserFrame(Rectangle userFrame)
 		{
 			m_UserFrame.X = userFrame.X;
 			m_UserFrame.Y = userFrame.Y;
@@ -307,8 +322,21 @@ namespace Tangra.ImageTools
                 g.DrawRectangle(osdAreaPen, rect);
                 g.FillRectangle(new SolidBrush(Color.FromArgb(20, 0, 255, 0)), m_UserFrame);
 
-                g.DrawString(s_DisplayText, s_Font, osdAreaBrush, m_UserFrame.Left + 1, m_UserFrame.Top + 1);
+			    if (DisplayTextOutside)
+			    {
+                    SizeF size = g.MeasureString(m_DisplayText, s_Font);
+                    g.DrawString(m_DisplayText, s_Font, osdAreaBrush, m_UserFrame.Left + 1, m_UserFrame.Top + 1 - size.Height);
+			    }                    
+                else
+                    g.DrawString(m_DisplayText, s_Font, osdAreaBrush, m_UserFrame.Left + 1, m_UserFrame.Top + 1);
 			}
+            else if (m_DisplayOnlyMode && m_UserFrame != Rectangle.Empty)
+            {
+                Rectangle rect = m_UserFrame;
+                rect.Inflate(-1, -1);
+                g.DrawRectangle(Pens.Lime, rect);
+                g.FillRectangle(new SolidBrush(Color.FromArgb(20, 0, 255, 0)), m_UserFrame);
+            }
 		}
 
 		public override void MouseClick(ObjectClickEventArgs e)

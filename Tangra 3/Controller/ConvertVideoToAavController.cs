@@ -36,6 +36,8 @@ namespace Tangra.Controller
         private int m_IntegrationPeriod = 1;
         private int m_FirstVtiOsdLine = 0;
         private int m_LastVtiOsdLine = 0;
+        private int m_LeftVtiOsdCol = 0;
+        private int m_RightVtiOsdCol = 0;
 
         private ushort[] m_CurrAavFramePixels;
 
@@ -47,7 +49,7 @@ namespace Tangra.Controller
             AdvError.ShowMessageBoxErrorMessage = true;
 		}
 
-        internal void StartConversion(string fileName, int topVtiOsdRow, int bottomVtiOsdRow, int firstIntegratedFrameId, int integrationInterval, string cameraModel, string sensorInfo, bool swapTimestampFields)
+        internal void StartConversion(string fileName, int topVtiOsdRow, int bottomVtiOsdRow, int leftVtiOsdCol, int rightVtiOsdCol, int firstIntegratedFrameId, int integrationInterval, string cameraModel, string sensorInfo, bool swapTimestampFields)
         {
             m_VideoController.ClearAAVConversionErrors();
 
@@ -65,6 +67,8 @@ namespace Tangra.Controller
 
             m_FirstVtiOsdLine = topVtiOsdRow;
             m_LastVtiOsdLine = bottomVtiOsdRow;
+            m_LeftVtiOsdCol = leftVtiOsdCol;
+            m_RightVtiOsdCol = rightVtiOsdCol;
 
             m_IntegrationPeriod = integrationInterval;
             m_FirstIntegrationPeriodStartFrameId = firstIntegratedFrameId;
@@ -96,12 +100,16 @@ namespace Tangra.Controller
             m_Recorder.FileMetaData.AddUserTag("FRAME-COMBINING", "Binning");
             m_Recorder.FileMetaData.AddUserTag("OSD-FIRST-LINE", topVtiOsdRow.ToString());
             m_Recorder.FileMetaData.AddUserTag("OSD-LAST-LINE", bottomVtiOsdRow.ToString());
+            m_Recorder.FileMetaData.AddUserTag("OSD-LEFT-COLUMN", leftVtiOsdCol.ToString());
+            m_Recorder.FileMetaData.AddUserTag("OSD-RIGHT-COLUMN", rightVtiOsdCol.ToString());
             m_Recorder.FileMetaData.AddUserTag("AAV-VERSION", "2");
             m_Recorder.FileMetaData.AddUserTag("AAV16-NORMVAL", m_MaxPixelValue.ToString());
 
             m_Recorder.FileMetaData.AddCalibrationStreamTag("TYPE", "VTI-OSD-CALIBRATION");
             m_Recorder.FileMetaData.AddCalibrationStreamTag("OSD-FIRST-LINE", topVtiOsdRow.ToString());
             m_Recorder.FileMetaData.AddCalibrationStreamTag("OSD-LAST-LINE", bottomVtiOsdRow.ToString());
+            m_Recorder.FileMetaData.AddCalibrationStreamTag("OSD-LEFT-COLUMN", leftVtiOsdCol.ToString());
+            m_Recorder.FileMetaData.AddCalibrationStreamTag("OSD-RIGHT-COLUMN", rightVtiOsdCol.ToString());
 
             m_Recorder.StatusSectionConfig.RecordSystemErrors = true;
             m_Recorder.StatusSectionConfig.AddDefineTag("FRAME-TYPE", Adv2TagType.UTF8String);
@@ -358,19 +366,21 @@ namespace Tangra.Controller
 
             for (int y = 0; y < m_Height; y++)
             {
-                bool scale = false;
-                if (y >= m_FirstVtiOsdLine && y <= m_LastVtiOsdLine)
-                {
-                    // NOTE: For first new frame - copy all lines
-                    //       For any other frame - copy even/odd lines only
-                    if (!copyAllOsdLines && (y % 2) == m_EndFieldParity) 
-                        continue;
-
-                    scale = true;
-                }
-
                 for (int x = 0; x < m_Width; x++)
                 {
+                    bool scale = false;
+                    if (y >= m_FirstVtiOsdLine && y <= m_LastVtiOsdLine && x >= m_LeftVtiOsdCol && x <= m_RightVtiOsdCol)
+                    {
+                        // This is a location inside the VTI-OSD are that needs to be preserved 
+
+                        // NOTE: For first new frame - copy all lines
+                        //       For any other frame - copy even/odd lines only
+                        if (!copyAllOsdLines && (y % 2) == m_EndFieldParity)
+                            continue;
+
+                        scale = true;
+                    }
+
                     if (scale)
                         m_CurrAavFramePixels[y * m_Width + x] = (ushort)(m_IntegrationPeriod * image.Pixelmap[x, y]);
                     else

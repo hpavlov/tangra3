@@ -10,6 +10,7 @@ using System.Text;
 using System.Windows.Forms;
 using Tangra.Controller;
 using Tangra.Helpers;
+using Tangra.ImageTools;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
 using Tangra.Model.Helpers;
@@ -36,6 +37,7 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
         private VideoController m_VideoController;
 
         private AavConfigState m_State;
+        private RoiSelector m_RoiSelector;
 
         public ucConvertVideoToAav()
         {
@@ -47,6 +49,8 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
         {
             m_Operation = operation;
             m_VideoController = videoController;
+
+            m_RoiSelector = m_VideoController.CurrentImageTool as RoiSelector;
 
             nudFirstFrame.Minimum = videoController.VideoFirstFrame;
             nudFirstFrame.Maximum = videoController.VideoLastFrame - 1;
@@ -60,8 +64,6 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
             nudStartingAtFrame.Maximum = videoController.VideoLastFrame - 1;
             nudStartingAtFrame.Value = nudFirstFrame.Minimum;
 
-            UpdateVtiOsdPositions(TangraContext.Current.FrameHeight - 28, TangraContext.Current.FrameHeight);
-
             AutoDetectVTIOSDPosition();
 
             m_State = AavConfigState.ConfirmingVtiOsdPosition;
@@ -70,10 +72,8 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
 
         private void UpdateVtiOsdPositions(int fromLine, int toLine)
         {
-            nudPreserveVTITopRow.SetNUDValue(fromLine);
-            nudPreserveVTIBottomRow.SetNUDValue(toLine);
-            m_Operation.PreserveVTIFirstRow = (int)nudPreserveVTITopRow.Value;
-            m_Operation.PreserveVTILastRow = (int)nudPreserveVTIBottomRow.Value;
+            m_RoiSelector.SetUserFrame(new Rectangle(0, fromLine, TangraContext.Current.FrameWidth, toLine - fromLine));
+            m_VideoController.RefreshCurrentFrame();
         }
 
         private void AutoDetectVTIOSDPosition()
@@ -84,8 +84,8 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
                 var lastChoise = TangraConfig.Settings.AAV.GetLastOsdPositionForFrameSize(m_VideoController.FramePlayer.Video.Width, m_VideoController.FramePlayer.Video.Height);
                 if (lastChoise != null)
                 {
-                    nudPreserveVTITopRow.SetNUDValue(lastChoise.Item1);
-                    nudPreserveVTIBottomRow.SetNUDValue(lastChoise.Item2);
+                    m_RoiSelector.SetUserFrame(new Rectangle(lastChoise.Item3, lastChoise.Item1, lastChoise.Item4 - lastChoise.Item3, lastChoise.Item2 - lastChoise.Item1));
+                    m_VideoController.RefreshCurrentFrame();
                 }
                 m_VideoController.ShowMessageBox("Cannot locate the VTI-OSD position. Please specify it manually.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -259,6 +259,7 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
                 btnConvert.Enabled = false;
                 pbar.Visible = false;
                 btnCancel.Enabled = false;
+                m_RoiSelector.Enabled = true;
             }
             else if (m_State == AavConfigState.DetectingIntegrationRate)
             {
@@ -267,6 +268,8 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
                 gbxSection.Visible = true;
                 btnDetectIntegrationRate.Visible = true;
                 btnConvert.Enabled = false;
+                m_RoiSelector.Enabled = false;
+                m_RoiSelector.DisplayOnlyMode = true;
             }
             else if (m_State == AavConfigState.ReadyToConvert)
             {
@@ -277,6 +280,8 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
                 gbxIntegrationRate.Enabled = false;
                 gbxCameraInfo.Visible = true;
                 pnlFirstField.Visible = true;
+                m_RoiSelector.Enabled = false;
+                m_RoiSelector.DisplayOnlyMode = false;
                 m_VideoController.RedrawCurrentFrame(true);
             }
             else if (m_State == AavConfigState.Converting)
@@ -289,11 +294,15 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
                 pnlFirstField.Enabled = false;
                 btnDetectIntegrationRate.Enabled = false;
                 btnCancel.Enabled = true;
+                m_RoiSelector.Enabled = false;
+                m_RoiSelector.DisplayOnlyMode = false;
             }
             else if (m_State == AavConfigState.FinishedConverting)
             {
                 pbar.Value = pbar.Maximum;
                 btnCancel.Enabled = false;
+                m_RoiSelector.Enabled = false;
+                m_RoiSelector.DisplayOnlyMode = true;
             }
         }
 
@@ -302,22 +311,19 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
             m_State = AavConfigState.DetectingIntegrationRate;
             nudFirstFrame.SetNUDValue(m_VideoController.CurrentFrameIndex);
 
+            var vtiOsdPosition = m_RoiSelector.SelectedROI;
+
             TangraConfig.Settings.AAV.RegisterOsdPosition(
                 m_VideoController.FramePlayer.Video.Width,
                 m_VideoController.FramePlayer.Video.Height,
-                (int)nudPreserveVTITopRow.Value,
-                (int)nudPreserveVTIBottomRow.Value);
+                vtiOsdPosition.Top,
+                vtiOsdPosition.Bottom,
+                vtiOsdPosition.Left,
+                vtiOsdPosition.Right);
+
             TangraConfig.Settings.Save();
 
             UpdateControlState();
-        }
-
-        private void nudPreserveVTITopRow_ValueChanged(object sender, EventArgs e)
-        {
-            m_Operation.PreserveVTIFirstRow = (int)nudPreserveVTITopRow.Value;
-            m_Operation.PreserveVTILastRow = (int)nudPreserveVTIBottomRow.Value;
-
-            m_VideoController.RefreshCurrentFrame();
         }
 
         private void btnDetectIntegrationRate_Click(object sender, EventArgs e)
@@ -385,10 +391,15 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
                 UpdateControlState();
 
                 m_VideoController.MoveToFrame((int) nudFirstFrame.Value);
+
+                var vtiOsdPosition = m_RoiSelector.SelectedROI;
+
                 m_Operation.StartConversion(
-                    saveFileDialog.FileName, 
-                    (int)nudPreserveVTITopRow.Value,
-                    (int)nudPreserveVTIBottomRow.Value,
+                    saveFileDialog.FileName,
+                    vtiOsdPosition.Top,
+                    vtiOsdPosition.Bottom,
+                    vtiOsdPosition.Left,
+                    vtiOsdPosition.Right,
                     (int)nudStartingAtFrame.Value,
                     (int)nudIntegratedFrames.Value,
                     (int)nudLastFrame.Value,
