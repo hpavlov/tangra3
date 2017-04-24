@@ -105,7 +105,7 @@ namespace Tangra.Model.Astro
         {
             if (m_Pixelmap.MaxSignalValue != 0)
             {
-                uint[] pixels = m_Pixelmap.Pixels;
+                uint[] pixels = m_Pixelmap.Pixels.ToArray();
                 for (int i = 0; i < pixels.Length; i++)
                 {
                     pixels[i] = (uint)Math.Round(pixels[i] * 255.0 / m_Pixelmap.MaxSignalValue);
