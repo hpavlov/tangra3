@@ -1150,7 +1150,14 @@ namespace Tangra
 
 		private bool StartAstrometry(bool debugMode)
 		{
-			if (m_VideoController.GetVideoFileFormat() == VideoFileFormat.AAV &&
+		    var videoFileFormat = m_VideoController.GetVideoFileFormat();
+            if (videoFileFormat == VideoFileFormat.FITS)
+		    {
+		        MessageBox.Show("Astrometry is currently not supported for FITS files.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+		        return false;
+		    }
+
+            if (videoFileFormat == VideoFileFormat.AAV &&
 			    m_VideoController.CurrentFrameIndex == m_VideoController.VideoFirstFrame)
 			{
 				m_VideoController.StepForward();

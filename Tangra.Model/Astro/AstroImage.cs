@@ -48,9 +48,10 @@ namespace Tangra.Model.Astro
             {
                 m_Pixelmap = new Pixelmap(pixelmap.Width, pixelmap.Height, pixelmap.BitPixCamera, new uint[pixelmap.Pixels.Length], null, null);
                 m_Pixelmap.SetMaxSignalValue(pixelmap.MaxSignalValue);
+                var pixelsToCopy = pixelmap.UnprocessedPixels ?? pixelmap.Pixels;
                 for (int i = 0; i < pixelmap.Pixels.Length; i++)
                 {
-                    m_Pixelmap.Pixels[i] = pixelmap.UnprocessedPixels[i];
+                    m_Pixelmap.Pixels[i] = pixelsToCopy[i];
                 }
             }
             else

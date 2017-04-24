@@ -337,7 +337,7 @@ namespace Tangra.VideoOperations.Astrometry
                     if (nudIntegratedFrames.Value > 1 && m_VideoFileFormat == VideoFileFormat.AVI && (MovementExpectation)cbxExpectedMotion.SelectedIndex != MovementExpectation.Slow)
 				    {
 				        if (MessageBox.Show(this,
-				            "To measure AVI files recorded with integrated video cameras it is required the file format to be converted to AAV first using\r\n\r\nFile -> Convert Video to AAV\r\n\r\nfrom the Tangra's menu. Press 'Yes' to go back and then cancel the operation and convert the video to AAV format before measuring it again.\r\n\r\nIf you press 'No' the individual positions will be measured but Tangra will not be able to derive high precision astrometry from the fast motion.",
+				            "To measure AVI files of fly-bys recorded with integrated video cameras it is required the file format to be converted to AAV first using\r\n\r\nFile -> Convert Video to AAV\r\n\r\nfrom the Tangra's menu. Press 'Yes' to go back and then cancel the operation and convert the video to AAV format before measuring it again.\r\n\r\nIf you press 'No' the individual positions will be measured but Tangra will not be able to derive high precision astrometry from the fast motion.",
 				            "Tangra", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
 				        {
                             return;
