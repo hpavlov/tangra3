@@ -56,6 +56,7 @@
             this.rbFirstFieldTop = new System.Windows.Forms.RadioButton();
             this.label6 = new System.Windows.Forms.Label();
             this.pnlFirstField = new System.Windows.Forms.Panel();
+            this.btnUseIntegrationRate = new System.Windows.Forms.Button();
             this.gbxSection.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudFirstFrame)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudLastFrame)).BeginInit();
@@ -359,10 +360,21 @@
             this.pnlFirstField.TabIndex = 54;
             this.pnlFirstField.Visible = false;
             // 
+            // btnUseIntegrationRate
+            // 
+            this.btnUseIntegrationRate.Location = new System.Drawing.Point(11, 222);
+            this.btnUseIntegrationRate.Name = "btnUseIntegrationRate";
+            this.btnUseIntegrationRate.Size = new System.Drawing.Size(155, 23);
+            this.btnUseIntegrationRate.TabIndex = 55;
+            this.btnUseIntegrationRate.Text = "Use this Integration Rate";
+            this.btnUseIntegrationRate.Visible = false;
+            this.btnUseIntegrationRate.Click += new System.EventHandler(this.btnUseIntegrationRate_Click);
+            // 
             // ucConvertVideoToAav
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.btnUseIntegrationRate);
             this.Controls.Add(this.pnlFirstField);
             this.Controls.Add(this.gbxCameraInfo);
             this.Controls.Add(this.pbar);
@@ -373,7 +385,7 @@
             this.Controls.Add(this.btnConvert);
             this.Controls.Add(this.gbxSection);
             this.Name = "ucConvertVideoToAav";
-            this.Size = new System.Drawing.Size(242, 390);
+            this.Size = new System.Drawing.Size(590, 390);
             this.gbxSection.ResumeLayout(false);
             this.gbxSection.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudFirstFrame)).EndInit();
@@ -422,5 +434,6 @@
         private System.Windows.Forms.RadioButton rbFirstFieldTop;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Panel pnlFirstField;
+        private System.Windows.Forms.Button btnUseIntegrationRate;
     }
 }

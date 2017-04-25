@@ -38,6 +38,7 @@ namespace Tangra.Controller
         private int m_LastVtiOsdLine = 0;
         private int m_LeftVtiOsdCol = 0;
         private int m_RightVtiOsdCol = 0;
+        private bool m_DontValidateIntegrationIntervals;
 
         private ushort[] m_CurrAavFramePixels;
 
@@ -49,7 +50,10 @@ namespace Tangra.Controller
             AdvError.ShowMessageBoxErrorMessage = true;
 		}
 
-        internal void StartConversion(string fileName, int topVtiOsdRow, int bottomVtiOsdRow, int leftVtiOsdCol, int rightVtiOsdCol, int firstIntegratedFrameId, int integrationInterval, string cameraModel, string sensorInfo, bool swapTimestampFields)
+        internal void StartConversion(
+            string fileName, int topVtiOsdRow, int bottomVtiOsdRow, int leftVtiOsdCol, int rightVtiOsdCol, 
+            int firstIntegratedFrameId, int integrationInterval, string cameraModel, string sensorInfo,
+            bool swapTimestampFields, bool dontValidateIntegrationIntervals)
         {
             m_VideoController.ClearAAVConversionErrors();
 
@@ -72,6 +76,7 @@ namespace Tangra.Controller
 
             m_IntegrationPeriod = integrationInterval;
             m_FirstIntegrationPeriodStartFrameId = firstIntegratedFrameId;
+            m_DontValidateIntegrationIntervals = dontValidateIntegrationIntervals;
             m_NextExpectedIntegrationPeriodStartFrameId = firstIntegratedFrameId + integrationInterval;
             m_FramesSoFar = 0;
 
@@ -104,6 +109,7 @@ namespace Tangra.Controller
             m_Recorder.FileMetaData.AddUserTag("OSD-RIGHT-COLUMN", rightVtiOsdCol.ToString());
             m_Recorder.FileMetaData.AddUserTag("AAV-VERSION", "2");
             m_Recorder.FileMetaData.AddUserTag("AAV16-NORMVAL", m_MaxPixelValue.ToString());
+            m_Recorder.FileMetaData.AddUserTag("INTEGRATION-DETECTION", m_DontValidateIntegrationIntervals ? "Manual" : "Automatic");
 
             m_Recorder.FileMetaData.AddCalibrationStreamTag("TYPE", "VTI-OSD-CALIBRATION");
             m_Recorder.FileMetaData.AddCalibrationStreamTag("OSD-FIRST-LINE", topVtiOsdRow.ToString());
@@ -158,6 +164,23 @@ namespace Tangra.Controller
 
         private bool IsNewIntegrationPeriod(int frameNo, AstroImage image)
         {
+            if (m_DontValidateIntegrationIntervals)
+            {
+                if (frameNo == m_FirstIntegrationPeriodStartFrameId)
+                {
+                    m_NextExpectedIntegrationPeriodStartFrameId = frameNo + m_IntegrationPeriod;
+                    return false;
+                }
+
+                if (m_NextExpectedIntegrationPeriodStartFrameId == frameNo)
+                {
+                    m_NextExpectedIntegrationPeriodStartFrameId = frameNo + m_IntegrationPeriod;
+                    return true;
+                }
+
+                return false;
+            }
+
             for (int x = 0; x < 32; x++)
                 for (int y = 0; y < 32; y++)
                 {

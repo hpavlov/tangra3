@@ -26,6 +26,7 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
     {
         ConfirmingVtiOsdPosition,
         DetectingIntegrationRate,
+        ManualIntegrationRateEntry,
         ReadyToConvert,
         Converting,
         FinishedConverting
@@ -38,6 +39,7 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
 
         private AavConfigState m_State;
         private RoiSelector m_RoiSelector;
+        private bool m_ManualIntegrationConfig;
 
         public ucConvertVideoToAav()
         {
@@ -271,14 +273,35 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
                 m_RoiSelector.Enabled = false;
                 m_RoiSelector.DisplayOnlyMode = true;
             }
+            else if (m_State == AavConfigState.ManualIntegrationRateEntry)
+            {
+                btnConvert.Enabled = false;
+                btnUseIntegrationRate.Visible = true;
+                btnUseIntegrationRate.Enabled = true;
+                btnDetectIntegrationRate.Enabled = false;
+                nudFirstFrame.Enabled = false;
+                gbxIntegrationRate.Visible = true;
+                gbxIntegrationRate.Enabled = true;
+                nudIntegratedFrames.Enabled = true;
+                nudStartingAtFrame.Enabled = true;
+                nudIntegratedFrames.ReadOnly = false;
+                nudStartingAtFrame.ReadOnly = false;
+                m_RoiSelector.Enabled = false;
+                m_RoiSelector.DisplayOnlyMode = false;              
+            }
             else if (m_State == AavConfigState.ReadyToConvert)
             {
                 btnConvert.Enabled = true;
                 btnDetectIntegrationRate.Enabled = false;
+                btnUseIntegrationRate.Visible = false;
                 nudFirstFrame.Enabled = false;
                 gbxIntegrationRate.Visible = true;
                 gbxIntegrationRate.Enabled = false;
                 gbxCameraInfo.Visible = true;
+                nudIntegratedFrames.Enabled = false;
+                nudStartingAtFrame.Enabled = false;
+                nudIntegratedFrames.ReadOnly = true;
+                nudStartingAtFrame.ReadOnly = true;
                 pnlFirstField.Visible = true;
                 m_RoiSelector.Enabled = false;
                 m_RoiSelector.DisplayOnlyMode = false;
@@ -343,12 +366,18 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
                     var reinterlacedStream = m_VideoController.FramePlayer.Video as ReInterlacingVideoStream;
                     if (reinterlacedStream != null && (reinterlacedStream.Mode == ReInterlaceMode.ShiftOneField || reinterlacedStream.Mode == ReInterlaceMode.SwapFields))
                         rbFirstFieldBottom.Checked = true;
-                    UpdateControlState();
+                    UpdateControlState(); 
+                    return;
                 }
             }
-            else if (res == DialogResult.Cancel)
+
+            if (m_VideoController.ShowMessageBox(
+                "This must be an integrated video with consistent and known integration rate in order to convert it to AAV.\r\n\r\nTo enter manually the 'Starting At' frame and the 'Integration' rate press OK.\r\n\r\nPlease note that Tangra will not try to validate the values you entered.",
+                "Tangra", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.OK)
             {
-                m_VideoController.ShowMessageBox("This must be an integrated video with consistent and known integration rate in order to convert it to AAV.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                m_ManualIntegrationConfig = true;
+                m_State = AavConfigState.ManualIntegrationRateEntry;
+                UpdateControlState();
             }
         }
 
@@ -405,7 +434,8 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
                     (int)nudLastFrame.Value,
                     cbxCameraModel.Text,
                     cbxSensorInfo.Text,
-                    rbFirstFieldBottom.Checked);
+                    rbFirstFieldBottom.Checked,
+                    m_ManualIntegrationConfig);
             }
         }
 
@@ -421,6 +451,8 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
         {
             m_State = AavConfigState.FinishedConverting;
             UpdateControlState();
+
+            MessageBox.Show("AAV file convertion completed.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         internal void UpdateProgress(int currentFrame, int maxFrames)
@@ -428,6 +460,15 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
             pbar.Maximum = maxFrames;
             pbar.Value = Math.Max(pbar.Minimum, Math.Min(currentFrame, pbar.Maximum));
             pbar.Update();
+        }
+
+        private void btnUseIntegrationRate_Click(object sender, EventArgs e)
+        {
+            m_State = AavConfigState.ReadyToConvert;
+            var reinterlacedStream = m_VideoController.FramePlayer.Video as ReInterlacingVideoStream;
+            if (reinterlacedStream != null && (reinterlacedStream.Mode == ReInterlaceMode.ShiftOneField || reinterlacedStream.Mode == ReInterlaceMode.SwapFields))
+                rbFirstFieldBottom.Checked = true;
+            UpdateControlState(); 
         }
     }
 }
