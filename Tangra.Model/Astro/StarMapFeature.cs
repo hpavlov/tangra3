@@ -273,6 +273,9 @@ namespace Tangra.Model.Astro
 							m_Center = pixel;
 						}
 					}
+
+				    if (m_Center == null)
+                        m_Center = ImagePixel.CreateImagePixelWithFeatureId(this.FeatureId, (int)m_MaxBrightness, checkPixels.Average(x => x.XDouble), checkPixels.Average(x => x.YDouble));
 				}
 			}
 
