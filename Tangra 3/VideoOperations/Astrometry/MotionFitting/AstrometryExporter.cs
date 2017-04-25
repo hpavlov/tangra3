@@ -46,21 +46,37 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                     mea.RADeg, mea.DEDeg, mea.Mag, mea.SolutionUncertaintyRACosDEArcSec, mea.SolutionUncertaintyDEArcSec, mea.FWHMArcSec, mea.Detection, mea.SNR);
             }
 
-            if (videoController.ShowSaveFileDialog(
-                "Export Tangra Astrometry",
-                "Comma Separated Values (*.csv)|*.csv|All Files (*.*)|*.*",
-                ref fileName) == DialogResult.OK)
+            bool openFileImmediately = false;
+
+            for (;;)
             {
-                File.WriteAllText(fileName, output.ToString());
-                Process.Start(fileName);
-                return fileName;
+                if (videoController.ShowSaveFileDialog(
+                        "Export Tangra Astrometry",
+                        "Comma Separated Values (*.csv)|*.csv|All Files (*.*)|*.*",
+                        ref fileName) == DialogResult.OK)
+                {
+                    try
+                    {
+                        File.WriteAllText(fileName, output.ToString());
+                        openFileImmediately = true;
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Error saving file: " + ex.Message, "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+                else
+                {
+                    fileName = Path.ChangeExtension(Path.GetTempFileName(), ".csv");
+                    File.WriteAllText(fileName, output.ToString());
+                    break;
+                }
             }
-            else
-            {
-                fileName = Path.ChangeExtension(Path.GetTempFileName(), ".csv");
-                File.WriteAllText(fileName, output.ToString());
-                return fileName;
-            }
+
+            if (openFileImmediately) Process.Start(fileName);
+
+            return fileName;
         }
 
     }
