@@ -495,7 +495,7 @@ namespace Tangra.Video
 	                return true;
 	            }
 	        }
-            else if (oddMedian > evenMedian)
+            else if (evenMedian > oddMedian)
             {
                 // Could this be a x2 integration starting from an even frame?
                 if (evenMedian - 3 * evenVariance > oddMedian + 3 * oddVariance)
