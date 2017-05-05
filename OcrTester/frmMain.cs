@@ -220,5 +220,11 @@ namespace OcrTester
 			if (Directory.Exists(folder))
 				TestCaseHelper.RebuildImageSequence(folder);
 		}
+
+        private void btnNewDev_Click(object sender, EventArgs e)
+        {
+            var frm = new frmNewDev();
+            frm.Show(this);
+        }
 	}
 }

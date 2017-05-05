@@ -26,6 +26,7 @@ namespace Tangra.OCR
         {
             var supported = new List<object>();
             supported.Add("IOTA-VTI");
+            supported.Add("GPS-BOX-SPRITE");
             //supported.Add("KIWI-OSD");
 
             List<ITangraAddin> addins;
@@ -53,6 +54,9 @@ namespace Tangra.OCR
 
                 if (TangraConfig.Settings.Generic.OcrEngine.StartsWith("KIWI-OSD"))
                     return new KiwiOsdOcr();
+
+                if (TangraConfig.Settings.Generic.OcrEngine.StartsWith("GPS-BOX-SPRITE"))
+                    return new GpsBoxSpriteOcr();
 
                 List<ITangraAddin> addins;
                 List<ITangraAddinAction> actions = m_AddinsController.GetTimestampOcrActions(out addins);

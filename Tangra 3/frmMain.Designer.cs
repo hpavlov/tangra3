@@ -57,6 +57,8 @@
             this.miFrameStatusData = new System.Windows.Forms.ToolStripMenuItem();
             this.miIntegrationDetection = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
+            this.miAstrometryTools = new System.Windows.Forms.ToolStripMenuItem();
+            this.miFastMotionFitting = new System.Windows.Forms.ToolStripMenuItem();
             this.miSpectroscopyTools = new System.Windows.Forms.ToolStripMenuItem();
             this.miAbsoluteFlux = new System.Windows.Forms.ToolStripMenuItem();
             this.aDVToolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -99,6 +101,7 @@
             this.pnlNewVersionAvailable = new System.Windows.Forms.ToolStripStatusLabel();
             this.panelRight = new System.Windows.Forms.Panel();
             this.pnlControlerPanel = new System.Windows.Forms.Panel();
+            this.zoomedImage = new System.Windows.Forms.PictureBox();
             this.panelVideo = new System.Windows.Forms.Panel();
             this.pictureBox = new Tangra.Controls.ImagePanel();
             this.pnlPlayControls = new System.Windows.Forms.Panel();
@@ -106,7 +109,9 @@
             this.btnJumpTo = new System.Windows.Forms.Button();
             this.btn1SecMinus = new System.Windows.Forms.Button();
             this.btn10SecMinus = new System.Windows.Forms.Button();
+            this.btnPlay = new System.Windows.Forms.Button();
             this.btn10SecPlus = new System.Windows.Forms.Button();
+            this.btnStop = new System.Windows.Forms.Button();
             this.btn1FrPlus = new System.Windows.Forms.Button();
             this.btn1SecPlus = new System.Windows.Forms.Button();
             this.btn1FrMinus = new System.Windows.Forms.Button();
@@ -116,18 +121,14 @@
             this.openAdvFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.saveFrameDialog = new System.Windows.Forms.SaveFileDialog();
             this.timerCommandArgs = new System.Windows.Forms.Timer(this.components);
-            this.btnPlay = new System.Windows.Forms.Button();
-            this.btnStop = new System.Windows.Forms.Button();
-            this.zoomedImage = new System.Windows.Forms.PictureBox();
-            this.miAstrometryTools = new System.Windows.Forms.ToolStripMenuItem();
-            this.miFastMotionFitting = new System.Windows.Forms.ToolStripMenuItem();
+            this.miTimestampOCR = new System.Windows.Forms.ToolStripMenuItem();
             this.mainMenu.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.panelRight.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.zoomedImage)).BeginInit();
             this.panelVideo.SuspendLayout();
             this.pnlPlayControls.SuspendLayout();
             this.pnlPlayButtons.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.zoomedImage)).BeginInit();
             this.SuspendLayout();
             // 
             // mainMenu
@@ -409,6 +410,7 @@
             this.miTargetPSFViewer,
             this.miFrameStatusData,
             this.miIntegrationDetection,
+            this.miTimestampOCR,
             this.toolStripMenuItem2,
             this.miAstrometryTools,
             this.miSpectroscopyTools,
@@ -445,6 +447,21 @@
             // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
             this.toolStripMenuItem2.Size = new System.Drawing.Size(216, 6);
+            // 
+            // miAstrometryTools
+            // 
+            this.miAstrometryTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miFastMotionFitting});
+            this.miAstrometryTools.Name = "miAstrometryTools";
+            this.miAstrometryTools.Size = new System.Drawing.Size(219, 22);
+            this.miAstrometryTools.Text = "Astrometry Tools";
+            // 
+            // miFastMotionFitting
+            // 
+            this.miFastMotionFitting.Name = "miFastMotionFitting";
+            this.miFastMotionFitting.Size = new System.Drawing.Size(174, 22);
+            this.miFastMotionFitting.Text = "&Fast Motion Fitting";
+            this.miFastMotionFitting.Click += new System.EventHandler(this.miFastMotionFitting_Click);
             // 
             // miSpectroscopyTools
             // 
@@ -819,6 +836,17 @@
             this.pnlControlerPanel.Size = new System.Drawing.Size(249, 310);
             this.pnlControlerPanel.TabIndex = 10;
             // 
+            // zoomedImage
+            // 
+            this.zoomedImage.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.zoomedImage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.zoomedImage.Location = new System.Drawing.Point(3, 3);
+            this.zoomedImage.Name = "zoomedImage";
+            this.zoomedImage.Size = new System.Drawing.Size(248, 248);
+            this.zoomedImage.TabIndex = 1;
+            this.zoomedImage.TabStop = false;
+            this.zoomedImage.MouseMove += new System.Windows.Forms.MouseEventHandler(this.zoomedImage_MouseMove);
+            // 
             // panelVideo
             // 
             this.panelVideo.Controls.Add(this.pictureBox);
@@ -909,6 +937,17 @@
             this.btn10SecMinus.UseVisualStyleBackColor = false;
             this.btn10SecMinus.Click += new System.EventHandler(this.btn10SecMinus_Click);
             // 
+            // btnPlay
+            // 
+            this.btnPlay.BackColor = System.Drawing.SystemColors.Control;
+            this.btnPlay.Image = global::Tangra.Properties.Resources.play24;
+            this.btnPlay.Location = new System.Drawing.Point(156, 3);
+            this.btnPlay.Name = "btnPlay";
+            this.btnPlay.Size = new System.Drawing.Size(32, 29);
+            this.btnPlay.TabIndex = 4;
+            this.btnPlay.UseVisualStyleBackColor = false;
+            this.btnPlay.Click += new System.EventHandler(this.btnPlay_Click);
+            // 
             // btn10SecPlus
             // 
             this.btn10SecPlus.BackColor = System.Drawing.SystemColors.Control;
@@ -919,6 +958,17 @@
             this.btn10SecPlus.Text = "10sec+";
             this.btn10SecPlus.UseVisualStyleBackColor = false;
             this.btn10SecPlus.Click += new System.EventHandler(this.btn10SecPlus_Click);
+            // 
+            // btnStop
+            // 
+            this.btnStop.BackColor = System.Drawing.SystemColors.Control;
+            this.btnStop.Image = global::Tangra.Properties.Resources.stop24;
+            this.btnStop.Location = new System.Drawing.Point(194, 3);
+            this.btnStop.Name = "btnStop";
+            this.btnStop.Size = new System.Drawing.Size(32, 29);
+            this.btnStop.TabIndex = 5;
+            this.btnStop.UseVisualStyleBackColor = false;
+            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
             // 
             // btn1FrPlus
             // 
@@ -985,53 +1035,12 @@
             // 
             this.timerCommandArgs.Tick += new System.EventHandler(this.timerCommandArgs_Tick);
             // 
-            // btnPlay
+            // miTimestampOCR
             // 
-            this.btnPlay.BackColor = System.Drawing.SystemColors.Control;
-            this.btnPlay.Image = global::Tangra.Properties.Resources.play24;
-            this.btnPlay.Location = new System.Drawing.Point(156, 3);
-            this.btnPlay.Name = "btnPlay";
-            this.btnPlay.Size = new System.Drawing.Size(32, 29);
-            this.btnPlay.TabIndex = 4;
-            this.btnPlay.UseVisualStyleBackColor = false;
-            this.btnPlay.Click += new System.EventHandler(this.btnPlay_Click);
-            // 
-            // btnStop
-            // 
-            this.btnStop.BackColor = System.Drawing.SystemColors.Control;
-            this.btnStop.Image = global::Tangra.Properties.Resources.stop24;
-            this.btnStop.Location = new System.Drawing.Point(194, 3);
-            this.btnStop.Name = "btnStop";
-            this.btnStop.Size = new System.Drawing.Size(32, 29);
-            this.btnStop.TabIndex = 5;
-            this.btnStop.UseVisualStyleBackColor = false;
-            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
-            // 
-            // zoomedImage
-            // 
-            this.zoomedImage.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.zoomedImage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.zoomedImage.Location = new System.Drawing.Point(3, 3);
-            this.zoomedImage.Name = "zoomedImage";
-            this.zoomedImage.Size = new System.Drawing.Size(248, 248);
-            this.zoomedImage.TabIndex = 1;
-            this.zoomedImage.TabStop = false;
-            this.zoomedImage.MouseMove += new System.Windows.Forms.MouseEventHandler(this.zoomedImage_MouseMove);
-            // 
-            // miAstrometryTools
-            // 
-            this.miAstrometryTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.miFastMotionFitting});
-            this.miAstrometryTools.Name = "miAstrometryTools";
-            this.miAstrometryTools.Size = new System.Drawing.Size(219, 22);
-            this.miAstrometryTools.Text = "Astrometry Tools";
-            // 
-            // miFastMotionFitting
-            // 
-            this.miFastMotionFitting.Name = "miFastMotionFitting";
-            this.miFastMotionFitting.Size = new System.Drawing.Size(174, 22);
-            this.miFastMotionFitting.Text = "&Fast Motion Fitting";
-            this.miFastMotionFitting.Click += new System.EventHandler(this.miFastMotionFitting_Click);
+            this.miTimestampOCR.Name = "miTimestampOCR";
+            this.miTimestampOCR.Size = new System.Drawing.Size(219, 22);
+            this.miTimestampOCR.Text = "Timestamp OCR";
+            this.miTimestampOCR.Click += new System.EventHandler(this.miTimestampOCR_Click);
             // 
             // frmMain
             // 
@@ -1061,10 +1070,10 @@
             this.statusStrip.ResumeLayout(false);
             this.statusStrip.PerformLayout();
             this.panelRight.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.zoomedImage)).EndInit();
             this.panelVideo.ResumeLayout(false);
             this.pnlPlayControls.ResumeLayout(false);
             this.pnlPlayButtons.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.zoomedImage)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1176,6 +1185,7 @@
         protected internal System.Windows.Forms.ToolStripMenuItem miConvertVideoToAAV;
         private System.Windows.Forms.ToolStripMenuItem miAstrometryTools;
         private System.Windows.Forms.ToolStripMenuItem miFastMotionFitting;
+        protected internal System.Windows.Forms.ToolStripMenuItem miTimestampOCR;
 	}
 }
 

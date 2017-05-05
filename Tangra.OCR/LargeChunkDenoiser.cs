@@ -4,8 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Tangra.OCR
 {
@@ -35,13 +33,42 @@ namespace Tangra.OCR
 			public int ObjectPixelsXTo;
 			public Stack<int> ObjectPixelsPath;
 
-			public int MaxLowerBoundNoiseChunkPixels;
-			public int MinUpperBoundNoiseChunkPixels;
-			public int MinLowerBoundNoiseChunkHeight;
-			public int MaxUpperBoundNoiseChunkWidth;
+		    public IDenoiser Denoiser;
 		}
 
-        public static void Process(bool useNative, uint[] pixels, int width, int height)
+	    internal interface IDenoiser
+	    {
+	        bool IdentifyNoise(Context context);
+	    }
+
+        internal class LargeChunkDenoiseContext : IDenoiser
+	    {
+            public int MaxLowerBoundNoiseChunkPixels;
+            public int MinUpperBoundNoiseChunkPixels;
+            public int MinLowerBoundNoiseChunkHeight;
+            public int MaxUpperBoundNoiseChunkWidth;
+
+            public bool IdentifyNoise(Context context)
+            {
+                return
+                    context.ObjectPixelsCount < MaxLowerBoundNoiseChunkPixels ||
+                    context.ObjectPixelsCount > MinUpperBoundNoiseChunkPixels ||
+                    (context.ObjectPixelsYTo - context.ObjectPixelsYFrom) < MinLowerBoundNoiseChunkHeight ||
+                    (context.ObjectPixelsXTo - context.ObjectPixelsXFrom) > MaxUpperBoundNoiseChunkWidth;
+            }
+        }
+
+	    internal class SmallHeightDenoiseContext : IDenoiser
+	    {
+	        public int MaxNoiseChunkHeight;
+
+	        public bool IdentifyNoise(Context context)
+	        {
+	            return (context.ObjectPixelsYTo - context.ObjectPixelsYFrom) <= MaxNoiseChunkHeight;
+	        }
+	    }
+
+	    public static void Process(bool useNative, uint[] pixels, int width, int height)
         {
             if (useNative)
                 TangraCore.LargeChunkDenoise(pixels, width, height);
@@ -49,7 +76,27 @@ namespace Tangra.OCR
                 ProcessManaged(pixels, width, height, 0, 255);
         }
 
-		private static void ProcessManaged(uint[] pixels, int width, int height, uint onColour, uint offColour)
+
+	    private static void ProcessManaged(uint[] pixels, int width, int height, uint onColour, uint offColour)
+	    {
+            var denoiser = new LargeChunkDenoiseContext();
+            denoiser.MaxLowerBoundNoiseChunkPixels = (int)Math.Round(35.0 * height / 20);
+            denoiser.MinUpperBoundNoiseChunkPixels = 6 * denoiser.MaxLowerBoundNoiseChunkPixels;
+            denoiser.MinLowerBoundNoiseChunkHeight = (int)Math.Round(0.5 * (height - 4));
+            denoiser.MaxUpperBoundNoiseChunkWidth = height + 4;
+		    
+            RunManagedDenoiser(pixels, width, height, onColour, offColour, denoiser);
+	    }
+
+        public static void RemoveSmallHeightNoise(uint[] pixels, int width, int height, int maxNoiseHeight, uint onColour = 0, uint offColour = 255)
+        {
+            var denoiser = new SmallHeightDenoiseContext();
+            denoiser.MaxNoiseChunkHeight = maxNoiseHeight;
+
+            RunManagedDenoiser(pixels, width, height, onColour, offColour, denoiser);
+        }
+
+        private static void RunManagedDenoiser(uint[] pixels, int width, int height, uint onColour, uint offColour, IDenoiser denoiser)
 		{
 			var context = new Context()
 			{
@@ -69,10 +116,7 @@ namespace Tangra.OCR
 				ObjectPixelsPath = new Stack<int>()
 			};
 
-			context.MaxLowerBoundNoiseChunkPixels = (int)Math.Round(35.0 * height / 20);
-			context.MinUpperBoundNoiseChunkPixels = 6 * context.MaxLowerBoundNoiseChunkPixels;
-			context.MinLowerBoundNoiseChunkHeight = (int)Math.Round(0.5 *(height - 4));
-			context.MaxUpperBoundNoiseChunkWidth = height + 4;
+		    context.Denoiser = denoiser;
 
 			do
 			{
@@ -87,7 +131,7 @@ namespace Tangra.OCR
 			while (true);
 		}
 
-		private static int FindNextObjectPixel(Context context)
+	    private static int FindNextObjectPixel(Context context)
 		{
 			while (context.Index < context.MaxIndex - 1)
 			{
@@ -102,15 +146,6 @@ namespace Tangra.OCR
 			}
 
 			return -1;
-		}
-
-		private static bool CurrentObjectChunkIsNoise(Context context)
-		{
-			return
-				context.ObjectPixelsCount < context.MaxLowerBoundNoiseChunkPixels ||
-				context.ObjectPixelsCount > context.MinUpperBoundNoiseChunkPixels ||
-				(context.ObjectPixelsYTo - context.ObjectPixelsYFrom) < context.MinLowerBoundNoiseChunkHeight ||
-				(context.ObjectPixelsXTo - context.ObjectPixelsXFrom) > context.MaxUpperBoundNoiseChunkWidth;
 		}
 
 		private static void SetObjectPixelStats(Context context, int pixelIndex)
@@ -142,7 +177,7 @@ namespace Tangra.OCR
 			while (ProcessNoiseObjectPixel(context, ref currPixel))
 			{ }
 	
-			if (CurrentObjectChunkIsNoise(context))
+			if (context.Denoiser.IdentifyNoise(context))
 			{
 				for (int i = 0; i < context.ObjectPixelsCount; i++)
 				{
