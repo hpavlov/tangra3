@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -34,6 +36,7 @@ namespace Tangra.OCR
 
         private int m_ImageWidth;
         private int m_ImageHeight;
+        private int m_MinCalibrationFrames;
 
         public void Initialize(TimestampOCRData initializationData, IVideoController videoController, int performanceMode)
         {
@@ -43,6 +46,8 @@ namespace Tangra.OCR
 
             m_ImageWidth = initializationData.FrameWidth;
             m_ImageHeight = initializationData.FrameHeight;
+
+            m_MinCalibrationFrames = (int)Math.Ceiling(m_InitializationData.VideoFrameRate);
         }
 
         public bool ExtractTime(int frameNo, int frameStep, uint[] data, out DateTime time)
@@ -72,6 +77,11 @@ namespace Tangra.OCR
             get { return true; }
         }
 
+        private Tuple<int, int>[] m_OsdLineVerticals;
+        private Tuple<decimal, decimal>[] m_OsdBlocksLeftAndWidth;
+
+        private List<OcrCalibrationFrame> m_CalibrationFrames = new List<OcrCalibrationFrame>();
+ 
         public bool ProcessCalibrationFrame(int frameNo, uint[] data)
         {
             // If RequiresCalibration returns true, Tangra will be calling ProcessCalibrationFrame() either until
@@ -82,22 +92,128 @@ namespace Tangra.OCR
             // All images returned by GetCalibrationReportImages() and all errors returned by GetCalibrationErrors()
             // will be included in this error report. See the IotaVtiOcrManaged implementation for how to add calibration images to the dictionary
 
-            if (m_Processor == null)
-                TryInitializeProcessor(data);
 
-            if (m_Processor == null)
-                return false;
+            var calibFrame = ProcessCalibrationFrame(data, m_OsdLineVerticals, m_OsdBlocksLeftAndWidth);
+            m_CalibrationFrames.Add(calibFrame);
 
-            return true;
+            if (m_CalibrationFrames.Count > 1 && m_OsdLineVerticals == null)
+            {
+                var linesSoFar = m_CalibrationFrames.SelectMany(x => x.DetectedOsdLines);
+                var numOsdLinesTester = m_CalibrationFrames.Select(x => x.DetectedOsdLines.Length).ToList().GroupBy(x => x).ToDictionary(x => x.Key, y => y.ToArray());
+                var numOsdLines = numOsdLinesTester.Keys.Max();
+                if (numOsdLines > 1)
+                {
+                    // NOTE: At least 2 samples to decide on Top/Bottom line positions
+                    var medianConfig = DeterimineMedianOsdLinePositions(linesSoFar, numOsdLines);
+                    if (medianConfig.BoxTops.Length == numOsdLines && medianConfig.BoxBottoms.Length == numOsdLines)
+                    {
+                        var topsSorted = medianConfig.BoxTops.ToList();
+                        var bottomsSorted = medianConfig.BoxBottoms.ToList();
+                        topsSorted.Sort();                        
+                        bottomsSorted.Sort();
+
+                        m_OsdLineVerticals = new Tuple<int, int>[numOsdLines];
+                        for (int i = 0; i < numOsdLines; i++)
+                        {
+                            m_OsdLineVerticals[i] = Tuple.Create((int)topsSorted[i], (int)bottomsSorted[i]);
+                        }
+                    }                    
+                }
+            }
+
+            if (m_CalibrationFrames.Count > 4 && m_OsdLineVerticals != null && m_OsdBlocksLeftAndWidth == null)
+            {
+                // NOTE: At least 5 samples to decide on Left/Width of lines
+                var linesSoFar = m_CalibrationFrames.SelectMany(x => x.DetectedOsdLines).ToArray();
+                m_OsdBlocksLeftAndWidth = new Tuple<decimal, decimal>[m_OsdLineVerticals.Length];
+
+                for (int i = 0; i < m_OsdLineVerticals.Length; i++)
+                {
+                    var leftList = linesSoFar.Where(x => Math.Abs(x.Top - m_OsdLineVerticals[i].Item1) < 2).Select(x => x.Left).ToList();
+                    var widthList = linesSoFar.Where(x => Math.Abs(x.Top - m_OsdLineVerticals[i].Item1) < 2).Select(x => x.BoxWidth).ToList();
+
+                    if (leftList.Count > 4)
+                    {
+                        // Outlier handling. Remove the bigest and smallest values
+                        leftList.Sort();
+                        leftList = leftList.Skip(1).Take(leftList.Count - 2).ToList();
+
+                        widthList.Sort();
+                        widthList = widthList.Skip(1).Take(widthList.Count - 2).ToList();
+                    }
+                    var averageLeft = leftList.Average();
+                    var medianWidth = widthList.Median();
+
+                    var leftSigma = Math.Sqrt((double)leftList.Select(x => (x - averageLeft) * (x - averageLeft)).Sum() / (leftList.Count - 1));
+                    var widthSigma = Math.Sqrt((double)widthList.Select(x => (x - medianWidth) * (x - medianWidth)).Sum() / (leftList.Count - 1));
+
+                    if (leftSigma < 0.33 && widthSigma < 0.1)
+                    {
+                        m_OsdBlocksLeftAndWidth[i] = Tuple.Create(averageLeft, medianWidth);
+                    }
+                    else
+                    {
+                        // Failed to get the left/width for one of the lines
+                        m_OsdBlocksLeftAndWidth = null;
+                        break;
+                    }
+                }
+            }
+
+            if (m_OsdLineVerticals != null && m_OsdBlocksLeftAndWidth != null)
+            {
+                if (m_Processor == null)
+                    TryInitializeProcessor();
+                else
+                    m_Processor.ProcessCalibrationFrame(calibFrame);
+
+                if (m_Processor.IsCalibrated)
+                    return true;
+            }
+
+            if (m_CalibrationFrames.Count > m_MinCalibrationFrames + 5)
+            {
+                InitiazliationError = "Could not calibrate after the maximum calibration frames have been reached.";
+                return true;
+            }
+
+            return false;
         }
 
-        private uint[] PreProcessImageForOCR(uint[] data)
+        private uint[] PreProcessImageForOCR(uint[] data, int? topMostLine, int? bottomMostLine)
         {
-            string error = null;
-            var rv = PreProcessImageForOCR(data, m_InitializationData.FrameWidth, m_InitializationData.FrameHeight, ref error);
-            
-            if (error != null) InitiazliationError = error;
-            return rv;
+            if (topMostLine != null && bottomMostLine != null)
+            {
+                // NOTE: Top and bottom most lines are know. Only pre-process the video frame lines with the VTI-OSD
+                uint[] rv = new uint[data.Length];
+                int top = Math.Max(0, topMostLine.Value - 5);
+                int bottom = Math.Max(m_InitializationData.FrameHeight, bottomMostLine.Value + 5);
+                uint[] roi = new uint[m_InitializationData.FrameWidth * (bottom - top)];
+                int idx = 0;
+                for (int i = top * m_InitializationData.FrameWidth; i < bottom * m_InitializationData.FrameWidth; i++, idx++)
+                {
+                    roi[idx] = data[i];
+                }
+
+                string error = null;
+                idx = 0;
+                var pproc = PreProcessImageForOCR(roi, m_InitializationData.FrameWidth, bottom - top, ref error);
+                for (int i = top * m_InitializationData.FrameWidth; i < bottom * m_InitializationData.FrameWidth; i++, idx++)
+                {
+                    rv[i] = pproc[idx];
+                }
+
+                if (error != null) InitiazliationError = error;
+                return rv;
+            }
+            else
+            {
+                string error = null;
+                var rv = PreProcessImageForOCR(data, m_InitializationData.FrameWidth, m_InitializationData.FrameHeight, ref error);
+
+                if (error != null) InitiazliationError = error;
+                return rv;
+            }
         }
 
         public static void PrepareOsdArea(uint[] dataIn, uint[] dataOut, uint[] dataDebugNoLChD, int width, int height)
@@ -187,44 +303,128 @@ namespace Tangra.OCR
             return preProcessedPixels;
         }
 
-        private void TryInitializeProcessor(uint[] data)
+        private void TryInitializeProcessor()
         {
             InitiazliationError = null;
 
             if (m_Processor == null)
             {
-                var locatedLines = LocateTimestampPosition(data);
-                if (locatedLines != null)
+                if (m_OsdLineVerticals == null || m_OsdBlocksLeftAndWidth == null)
                 {
-                    // TODO: Identify the digit boxes configuration in regards to GPX Box Sprite OSD position and configuration
+                    InitiazliationError = "Cannot detect timestamp position.";
+                    return;
+                }
 
-
-                    //m_FieldAreaHeight = (m_ToLine - m_FromLine) / 2;
-                    //m_FieldAreaWidth = m_InitializationData.FrameWidth;
-                    //m_OddFieldPixels = new uint[m_InitializationData.FrameWidth * m_FieldAreaHeight];
-                    //m_EvenFieldPixels = new uint[m_InitializationData.FrameWidth * m_FieldAreaHeight];
-                    //m_OddFieldPixelsPreProcessed = new uint[m_InitializationData.FrameWidth * m_FieldAreaHeight];
-                    //m_EvenFieldPixelsPreProcessed = new uint[m_InitializationData.FrameWidth * m_FieldAreaHeight];
-                    //m_OddFieldPixelsDebugNoLChD = new uint[m_InitializationData.FrameWidth * m_FieldAreaHeight];
-                    //m_EvenFieldPixelsDebugNoLChD = new uint[m_InitializationData.FrameWidth * m_FieldAreaHeight];
-
-                    //m_InitializationData.OSDFrame.Width = m_FieldAreaWidth;
-                    //m_InitializationData.OSDFrame.Height = m_FieldAreaHeight;
-
-                    m_Processor = new GpsBoxSpriteOcrProcessor(locatedLines);
+                try
+                {
+                    m_Processor = new GpsBoxSpriteOcrProcessor(m_CalibrationFrames, m_OsdLineVerticals, m_OsdBlocksLeftAndWidth, m_ImageWidth, m_ImageHeight);
+                }
+                catch (Exception ex)
+                {
+                    m_Processor = null;
+                    InitiazliationError = ex.Message;
                 }
             }
         }
+        
+        private class OsdLinePositions
+        {
+            public decimal BoxHeight;
+            public decimal BoxWidth;
+            public decimal BoxLeft;
+            public decimal[] BoxTops;
+            public decimal[] BoxBottoms;
+        }
 
-        private List<OsdLineConfig> LocateTimestampPosition(uint[] rawData)
+        private OsdLinePositions DeterimineMedianOsdLinePositions(IEnumerable<OsdLineConfig> allLineConfigs, int numOsdLines)
+        {
+            var rv = new OsdLinePositions();
+
+            rv.BoxHeight = allLineConfigs.Select(x => x.BoxHeight).ToList().Median();
+            rv.BoxWidth = allLineConfigs.Select(x => x.BoxWidth).ToList().Median();
+
+            var topGroups = new Dictionary<decimal, List<decimal>>();
+            var bottomGroups = new Dictionary<decimal, List<decimal>>();
+            var leftGroups = new Dictionary<decimal, List<decimal>>();
+            foreach (var osdLineCfg in allLineConfigs)
+            {
+                var topList = new List<decimal>();
+                foreach (var key in topGroups.Keys)
+                {
+                    if (Math.Abs(key - osdLineCfg.Top) < rv.BoxHeight / 3)
+                    {
+                        topList = topGroups[key];
+                        topGroups.Remove(key);
+                        break;
+                    }
+                }
+
+                topList.Add(osdLineCfg.Top);
+                decimal newKey = topList.Median();
+                topGroups[newKey] = topList;
+
+                var bottomList = new List<decimal>();
+                foreach (var key in bottomGroups.Keys)
+                {
+                    if (Math.Abs(key - osdLineCfg.Bottom) < rv.BoxHeight / 3)
+                    {
+                        bottomList = bottomGroups[key];
+                        bottomGroups.Remove(key);
+                        break;
+                    }
+                }
+
+                bottomList.Add(osdLineCfg.Bottom);
+                newKey = bottomList.Median();
+                bottomGroups[newKey] = bottomList;
+
+                var leftList = new List<decimal>();
+                foreach (var key in leftGroups.Keys)
+                {
+                    if (Math.Abs(key - osdLineCfg.Left) < rv.BoxWidth / 3)
+                    {
+                        leftList = leftGroups[key];
+                        leftGroups.Remove(key);
+                        break;
+                    }
+                }
+
+                leftList.Add(osdLineCfg.Left);
+                newKey = leftList.Median();
+                leftGroups[newKey] = leftList;
+            }
+
+            rv.BoxLeft = leftGroups.Keys.Min();
+            var boxTops = new List<decimal>();
+            var topWeights = topGroups.Values.Select(x => x.Count).ToArray();
+            var topVals = topGroups.Keys.ToArray();
+            Array.Sort(topWeights, topVals);
+            for (int i = 1; i <= topVals.Length; i++)
+            {
+                var topVal = topVals[topVals.Length - i];
+                boxTops.Add(topVal);
+            }
+
+            var boxBottoms = new List<decimal>();
+            var bottomWeights = bottomGroups.Values.Select(x => x.Count).ToArray();
+            var bottomVals = bottomGroups.Keys.ToArray();
+            Array.Sort(bottomWeights, bottomVals);
+            for (int i = 1; i <= bottomVals.Length; i++)
+            {
+                var bottomVal = bottomVals[bottomVals.Length - i];
+                boxBottoms.Add(bottomVal);
+            }
+
+            rv.BoxTops = boxTops.ToArray();
+            rv.BoxBottoms = boxBottoms.ToArray();
+            return rv;
+        }
+
+        private Dictionary<int, List<Tuple<int, int>>> DetermineOsdLineVerticals(uint[] data, int minWhiteLevel)
         {
             var scoresTop = new List<int>();
             var scoresBottom = new List<int>();
             var scoreLines = new List<int>();
-
-            var data = PreProcessImageForOCR(rawData);
-
-            int minWhiteLevel = (int)((255 + data.Median())/ 2);
 
             for (int y = m_ImageHeight / 2; y < m_ImageHeight - 1; y++)
             {
@@ -317,57 +517,107 @@ namespace Tangra.OCR
             }
 
             var candidates = pairs.Where(kvp => kvp.Value.Count > 1).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-
-
-            var detectedOsdLines = new List<OsdLineConfig>();
-            var subPixelData = new SubPixelImage(data, m_ImageWidth, m_ImageHeight);
-
-            foreach (var pair in candidates.Values)
-            {
-                foreach (var ln in pair)
-                {
-                    var osdLineConfig = LocateCharacterPositionsOnALine(subPixelData, ln.Item1, ln.Item2, minWhiteLevel);
-                    if (osdLineConfig != null) detectedOsdLines.Add(osdLineConfig);
-                }
-            }
-
-            Dictionary<List<decimal>, List<OsdLineConfig>> weightedConfigs = new Dictionary<List<decimal>, List<OsdLineConfig>>();
-
-            // Combine osdPairs in buckets based on Top position and then pick the highest score ones
-            foreach (var cfg in detectedOsdLines)
-            {
-                var bucketKeys = new List<decimal>();
-                var bucketData = new List<OsdLineConfig>();
-
-                foreach (var keys in weightedConfigs.Keys)
-                {
-                    if (keys.Max(x => Math.Abs(cfg.Top - x)) < cfg.BoxWidth / 2)
-                    {
-                        bucketKeys = keys;
-                        bucketData = weightedConfigs[keys];
-                        break;
-                    }
-                }
-
-                bucketKeys.Add(cfg.Top);
-                bucketData.Add(cfg);
-                weightedConfigs[bucketKeys] = bucketData;
-            }
-
-            var selectedOsdLines = new List<OsdLineConfig>();
-            foreach (var kvp in weightedConfigs)
-            {
-                var maxScore = kvp.Value.Max(x => x.FullnessScore);
-                selectedOsdLines.Add(kvp.Value.FirstOrDefault(x => x.FullnessScore == maxScore));
-            }
-
-            return selectedOsdLines;
+            return candidates;
         }
 
-        private OsdLineConfig LocateCharacterPositionsOnALine(SubPixelImage subPixelData, int lineTop, int lineBottom, int minWhiteLevel)
+        private OcrCalibrationFrame ProcessCalibrationFrame(uint[] rawData, Tuple<int, int>[] osdLineVerticals, Tuple<decimal, decimal>[] osdLineLeftAndWidths)
         {
-            int m_MinBlockWidth = 5;
-            int m_MaxBlockWidth = 16;
+            int? topMostLine = null;
+            int? bottomMostLine = null;
+
+            if (osdLineVerticals != null && osdLineVerticals.Length > 0)
+            {
+                topMostLine = osdLineVerticals.Select(x => x.Item1).Min();
+                bottomMostLine = osdLineVerticals.Select(x => x.Item2).Max();
+            }
+
+            var data = PreProcessImageForOCR(rawData, topMostLine, bottomMostLine);
+
+            int minWhiteLevel = 127; //PreProcessed image will only have 0 and 255 pixels, so we always use 127 here
+
+            var subPixelData = new SubPixelImage(data, m_ImageWidth, m_ImageHeight);
+
+            var selectedOsdLines = new List<OsdLineConfig>();
+
+            if (osdLineVerticals == null || osdLineVerticals.Length == 0)
+            {
+                var detectedOsdLines = new List<OsdLineConfig>();            
+                var candidates = DetermineOsdLineVerticals(data, minWhiteLevel);
+
+                foreach (var pair in candidates.Values)
+                {
+                    var confirmedOsdLinesInFrame = new List<Tuple<decimal, decimal, decimal, decimal>>();
+                    foreach (var ln in pair)
+                    {
+                        var leftRightLocation = ConfirmOsdLinePresence(subPixelData, ln.Item1, ln.Item2, minWhiteLevel);
+                        if (leftRightLocation != null) confirmedOsdLinesInFrame.Add(Tuple.Create((decimal)ln.Item1, (decimal)ln.Item2, leftRightLocation.Item1, leftRightLocation.Item2));
+                    }
+                    if (confirmedOsdLinesInFrame.Count > 0)
+                    {
+                        var osdLineConfigs = RefineOsdLinePositions(subPixelData, confirmedOsdLinesInFrame.ToArray(), minWhiteLevel);
+                        if (osdLineConfigs != null) detectedOsdLines.AddRange(osdLineConfigs);
+                    }
+                }
+                Dictionary<List<decimal>, List<OsdLineConfig>> weightedConfigs = new Dictionary<List<decimal>, List<OsdLineConfig>>();
+
+                // Combine osdPairs in buckets based on Top position and then pick the highest score ones
+                foreach (var cfg in detectedOsdLines)
+                {
+                    var bucketKeys = new List<decimal>();
+                    var bucketData = new List<OsdLineConfig>();
+
+                    foreach (var keys in weightedConfigs.Keys)
+                    {
+                        if (keys.Max(x => Math.Abs(cfg.Top - x)) < cfg.BoxWidth / 2)
+                        {
+                            bucketKeys = keys;
+                            bucketData = weightedConfigs[keys];
+                            break;
+                        }
+                    }
+
+                    bucketKeys.Add(cfg.Top);
+                    bucketData.Add(cfg);
+                    weightedConfigs[bucketKeys] = bucketData;
+                }
+                
+                foreach (var kvp in weightedConfigs)
+                {
+                    var maxScore = kvp.Value.Max(x => x.FullnessScore);
+                    selectedOsdLines.Add(kvp.Value.FirstOrDefault(x => x.FullnessScore == maxScore));
+                }
+            }
+            else if (osdLineLeftAndWidths == null)
+            {
+                var confirmedOsdLinesInFrame = new List<Tuple<decimal, decimal, decimal, decimal>>();
+                foreach (var osdLine in osdLineVerticals)
+                {
+                    var leftRightLocation = ConfirmOsdLinePresence(subPixelData, osdLine.Item1, osdLine.Item2, minWhiteLevel);
+                    if (leftRightLocation != null) confirmedOsdLinesInFrame.Add(Tuple.Create((decimal)osdLine.Item1, (decimal)osdLine.Item2, leftRightLocation.Item1, leftRightLocation.Item2));
+                }
+                if (confirmedOsdLinesInFrame.Count > 0)
+                {
+                    var osdLineConfigs = RefineOsdLinePositions(subPixelData, confirmedOsdLinesInFrame.ToArray(), minWhiteLevel);
+                    if (osdLineConfigs != null) selectedOsdLines.AddRange(osdLineConfigs);                    
+                }
+            }
+            else
+            {
+                selectedOsdLines = new List<OsdLineConfig>();
+            }
+
+            return new OcrCalibrationFrame()
+            {
+                DetectedOsdLines = selectedOsdLines.ToArray(),
+                RawPixels = rawData,
+                ProcessedPixels = data
+            };
+        }
+
+        private Tuple<decimal, decimal> ConfirmOsdLinePresence(SubPixelImage subPixelData, int lineTop, int lineBottom, int minWhiteLevel)
+        {
+            int m_MinBlockWidth = MIN_BLOCK_WIDTH;
+            int m_MaxBlockWidth = MAX_BLOCK_WIDTH;
 
             int height = (lineBottom - lineTop);
 
@@ -375,71 +625,60 @@ namespace Tangra.OCR
             decimal minBlockWidth = Math.Max(m_MinBlockWidth, nomWidthFromHeight * 0.6M);
             decimal maxBlockWidth = Math.Min(m_MaxBlockWidth, nomWidthFromHeight * 1.3M);
 
-            int probeWidth = (int)(minBlockWidth / 2);
+            int probeWidth = (int)minBlockWidth;
 
             decimal startLeftPos = 0;
             decimal endRightPos = m_ImageWidth - maxBlockWidth - 1;
             #region Find start end horizontal lines
-            List<double> meas = new List<double>();
             for (int i = 0; i < m_ImageWidth - maxBlockWidth - probeWidth; i++)
             {
-                double lineSum = 0;
-                for (int y = lineTop; y < lineBottom; y++)
+                int conseqHorWhites = 0;
+                for (int j = i; j < i + probeWidth; j++)
                 {
-                    for (int j = i; j < i + probeWidth; j++)
+                    for (int y = lineTop; y < lineBottom; y++)
                     {
-                        lineSum += (double)subPixelData.GetWholePixelAt(j, y);
+                        if ((double)subPixelData.GetWholePixelAt(j, y) > minWhiteLevel)
+                        {
+                            conseqHorWhites++;
+                            break;
+                        }
                     }
                 }
 
-                if (i > 3 * minBlockWidth)
+                if (conseqHorWhites == probeWidth)
                 {
-                    var ave = meas.Average();
-                    var sigma = Math.Sqrt(meas.Select(x => (x - ave) * (x - ave)).Sum() / (meas.Count - 1));
-                    var adjMeas = meas.Where(x => x > ave - 3 * sigma).ToArray();
-                    ave = adjMeas.Length > 0 ? adjMeas.Average() : ave;
-                    sigma = Math.Sqrt(adjMeas.Select(x => (x - ave) * (x - ave)).Sum() / (adjMeas.Length - 1));
-                    if (lineSum > ave + 6 * sigma)
-                    {
-                        startLeftPos = i - (minBlockWidth / 2);
-                        break;
-                    }
+                    startLeftPos = i;
+                    break;
                 }
-
-                meas.Add(lineSum);
             }
 
-            meas.Clear();
             for (int i = 0; i < m_ImageWidth - maxBlockWidth - probeWidth; i++)
             {
-                double lineSum = 0;
-                for (int y = lineTop; y < lineBottom; y++)
+
+                int conseqHorWhites = 0;
+                for (int j = i; j < i + probeWidth; j++)
                 {
-                    for (int j = i; j < i + probeWidth; j++)
+                    for (int y = lineTop; y < lineBottom; y++)
                     {
-                        lineSum += (double)subPixelData.GetWholePixelAt(m_ImageWidth - j, y);
+                        if ((double)subPixelData.GetWholePixelAt(m_ImageWidth - j, y) > minWhiteLevel)
+                        {
+                            conseqHorWhites++;
+                            break;
+                        }
                     }
                 }
 
-                if (i > 3 * minBlockWidth)
+                if (conseqHorWhites == probeWidth)
                 {
-                    var ave = meas.Average();
-                    var sigma = Math.Sqrt(meas.Select(x => (x - ave) * (x - ave)).Sum() / (meas.Count - 1));
-                    var adjMeas = meas.Where(x => x > ave - 3 * sigma).ToArray();
-                    ave = adjMeas.Length > 0 ? adjMeas.Average() : ave;
-                    sigma = Math.Sqrt(adjMeas.Select(x => (x - ave) * (x - ave)).Sum() / (adjMeas.Length - 1));
-                    if (lineSum > ave + 3 * sigma)
-                    {
-                        endRightPos = m_ImageWidth - i + minBlockWidth;
-                        break;
-                    }
+                    endRightPos = m_ImageWidth - i + minBlockWidth;
+                    break;
                 }
-
-                meas.Add(lineSum);
             }
             #endregion
 
+            #region Reject cases where insufficient number of boxes with continous vertical white is detected
             // Find boxes with continous white points somewhere on the horizontal
+            // Consider more than one boxes to appear attached together without a gap
             List<Tuple<decimal, decimal>> boxes = new List<Tuple<decimal, decimal>>();
             bool brightPixelFound = false;
             decimal boxStart = -1;
@@ -468,8 +707,25 @@ namespace Tangra.OCR
                     if (brightPixelFound)
                     {
                         brightPixelFound = false;
-                        if (x - boxStart >= minBlockWidth && x - boxStart <= maxBlockWidth)
-                            boxes.Add(Tuple.Create(boxStart, x));
+                        var contWidth = x - boxStart;
+                        if (contWidth > maxBlockWidth)
+                        {
+                            var attachedBoxes = (int)(contWidth / nomWidthFromHeight);
+                            var aveWidth = contWidth / attachedBoxes;
+                            var rem = contWidth - (aveWidth * attachedBoxes);
+                            if (aveWidth >= minBlockWidth && rem < minBlockWidth / 3)
+                            {
+                                for (int i = 0; i < attachedBoxes; i++)
+                                {
+                                    boxes.Add(Tuple.Create(boxStart + i * aveWidth, x + i * aveWidth));
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (contWidth >= minBlockWidth)
+                                boxes.Add(Tuple.Create(boxStart, x));
+                        }
                     }
                 }
             }
@@ -484,63 +740,175 @@ namespace Tangra.OCR
             }
 
             if (lstWidths.Count == 0) return null;
+            #endregion
 
-            var widthAve = lstWidths.Average();
-            var boxesFrom = boxes.Select(x => x.Item1).Min();
-            var boxesTo = boxes.Select(x => x.Item1).Max();
-            var numBoxPositions = (int)Math.Round((boxesTo - boxesFrom) / widthAve);
+            return Tuple.Create(startLeftPos, endRightPos);
+        }
+
+        private decimal DetermineBlackToWhiteTransition(Dictionary<decimal, decimal> data)
+        {
+            var maxScore = data.Select(x => x.Value).Max();
+            var edgeScore = maxScore * PERCENT_WHITE_AT_EDGE_START; 
+            foreach (var kvp in data)
+            {
+                if (kvp.Value > edgeScore)
+                    return kvp.Key;
+            }
+            return data.ToArray()[data.Count / 2].Key;
+        }
+
+        private List<OsdLineConfig> RefineOsdLinePositions(SubPixelImage subPixelData, Tuple<decimal, decimal, decimal, decimal>[] osdLineConstraints, int minWhiteLevel)
+        {
+            var rv = new List<OsdLineConfig>();
+            
+            var lineScores = new Dictionary<decimal, decimal>();
+
+            // 1) Determine the top, bottom and right positions accurately for each osd line
+            foreach (var osdLine in osdLineConstraints)
+            {
+                decimal[] topBottomRough = new decimal[] { osdLine.Item1, osdLine.Item2 };
+                decimal[] topBottomFine = new decimal[] { osdLine.Item1, osdLine.Item2 };
+                int leftRnd = (int)Math.Ceiling(osdLine.Item3);
+                int rightRnd = (int)Math.Floor(osdLine.Item4);
+                
+                for (int i = 0; i < 2; i++)
+                {
+                    decimal horizontal = topBottomRough[i];
+                    int sign = i == 0 ? 1 : -1;
+                    Func<decimal, decimal, bool> checkCond = (x, y) =>
+                    {
+                        return (i == 0) ? x < y : x > y;
+                    };
+                    lineScores.Clear();
+                    for (decimal y = horizontal - 1 * sign; checkCond(y, horizontal + 1 * sign); y += 0.1m * sign)
+                    {
+                        decimal horScore = 0;
+                        for (int x = leftRnd; x <= rightRnd; x++)
+                        {
+                            horScore += subPixelData.GetWholePixelAt(x, y);
+                        }
+                        lineScores.Add(y, horScore);
+                    }
+
+                    topBottomFine[i] = DetermineBlackToWhiteTransition(lineScores);
+                }
+
+                decimal rightFine = osdLine.Item4;
+                lineScores.Clear();
+                for (decimal x = rightFine + 1; x > rightFine - 1; x -= 0.1m)
+                {
+                    decimal vertScore = 0;
+                    for (int y = (int)topBottomRough[0]; y <= (int)topBottomRough[1]; y++)
+                    {
+                        vertScore += subPixelData.GetWholePixelAt(x, y);
+                    }
+                    lineScores.Add(x, vertScore);
+                }
+                rightFine = DetermineBlackToWhiteTransition(lineScores);
+
+                var cfg = new OsdLineConfig()
+                {
+                    Top = topBottomFine[0],
+                    Bottom = topBottomFine[1],
+                    Right = rightFine
+                };
+                rv.Add(cfg);
+            }
+
+
+            // 2) Determine the left position accurately for all lines simultaneously
+            decimal leftFine = osdLineConstraints.Select(x => x.Item3).Average();
+            lineScores.Clear();
+            for (decimal x = leftFine - 1; x < leftFine + 1; x += 0.1m)
+            {
+                decimal vertScore = 0;
+                foreach (var osdLine in osdLineConstraints)
+                {
+                    for (int y = (int)osdLine.Item1; y <= (int)osdLine.Item2; y++)
+                    {
+                        vertScore += subPixelData.GetWholePixelAt(x, y);
+                    }
+                }
+                lineScores.Add(x, vertScore);
+            }
+            
+            leftFine = DetermineBlackToWhiteTransition(lineScores);
+            rv.ForEach(x => x.Left = leftFine);
+
+            // 3) Determine the best fitting box width for all lines
+            decimal heightAve = rv.Select(x => x.Bottom - x.Top).Average();
+            var lineLengths = rv.Select(x => x.Right - x.Left);
+            var widthAve = 13.0M * heightAve / 32.0M; // NOTE: Nominal ratio of 13x32 from a sample image
+            var arrScores = new decimal[40];
+            var arrWidths = new decimal[40];
+            var idx = 0;
+            for (decimal i = -2; i < 2; i+=0.1m)
+            {
+                var test = widthAve + i;
+                var score = lineLengths.Select(x => Math.Abs((x / test) - Math.Round(x / test))).Sum();
+                arrScores[idx] = score;
+                arrWidths[idx] = test;
+                idx++;
+            }
+            Array.Sort(arrScores, arrWidths);
+            widthAve = arrWidths[0];
 
             // Try to locate the gaps between
-            var data = new Dictionary<Tuple<decimal, decimal>, decimal>();
-            for (decimal width = widthAve - 2 * subPixelData.Step; width <= widthAve + 2 * subPixelData.Step; width += subPixelData.Step)
+            var data = new Dictionary<decimal, decimal>();
+            for (decimal width = widthAve - 2; width <= widthAve + 2; width += 0.1m)
             {
-                for (decimal startOffset = boxesFrom - 2 * subPixelData.Step; startOffset <= boxesFrom + 2 * subPixelData.Step; startOffset += subPixelData.Step)
+                decimal lineScore = 0;
+
+                foreach (var cfg in rv)
                 {
-                    decimal lineScore = 0;
+                    var boxesFrom = cfg.Left;
+                    var boxesTo = cfg.Right;
+                    var numBoxPositions = (int)Math.Round((boxesTo - boxesFrom) / width);
+
                     for (int i = 0; i < numBoxPositions; i++)
                     {
-                        decimal x = startOffset + i * width;
-                        for (int y = lineTop; y < lineBottom; y++)
+                        decimal x = cfg.Left + i * width;
+                        for (int y = (int)Math.Ceiling(cfg.Top); y < Math.Floor(cfg.Bottom); y++)
                         {
                             lineScore += subPixelData.GetWholePixelAt(x, y);
                         }
                     }
-
-                    data.Add(Tuple.Create(width, startOffset), lineScore);
                 }
+
+                data.Add(width, lineScore);
             }
 
             var arrKeys = data.Keys.ToArray();
             var arrWeights = data.Values.ToArray();
             Array.Sort(arrWeights, arrKeys);
 
-            decimal boxesLeft = arrKeys[0].Item2;
-            decimal boxWidth = Math.Round(arrKeys[0].Item1);
-            var fullness = new Dictionary<int, decimal>();
+            decimal boxesLeft = rv[0].Left;
+            decimal boxWidth = arrKeys[0];
 
-            for (int i = 0; i < (m_ImageWidth - boxesLeft) / boxWidth; i++)
+            foreach (var cfg in rv)
             {
-                decimal boxFullness = 0M;
-                for (int j = 0; j < boxWidth; j++)
+                cfg.BoxWidth = boxWidth;
+
+                var fullness = new Dictionary<int, decimal>();
+
+
+                for (int i = -1 * (int)(boxesLeft / boxWidth); i < (m_ImageWidth - boxesLeft) / boxWidth; i++)
                 {
-                    var x = boxesLeft + (i * boxWidth) + j;
-                    for (int y = lineTop; y < lineBottom; y++)
+                    decimal boxFullness = 0M;
+                    for (int j = 0; j < boxWidth; j++)
                     {
-                        boxFullness += subPixelData.GetWholePixelAt(x, y) > minWhiteLevel ? 1 : 0;
+                        var x = boxesLeft + (i * boxWidth) + j;
+                        for (decimal y = cfg.Top; y < cfg.Bottom; y++)
+                        {
+                            boxFullness += subPixelData.GetWholePixelAt(x, y) > minWhiteLevel ? 1 : 0;
+                        }
                     }
+                    fullness.Add(i, boxFullness / (boxWidth * (cfg.Bottom - cfg.Top)));
                 }
-                fullness.Add(i, boxFullness / (boxWidth * (lineBottom - lineTop)));
-            }
 
-            var rv = new OsdLineConfig()
-            {
-                Top = lineTop,
-                Bottom = lineBottom,
-                Left = arrKeys[0].Item2,
-                BoxWidth = arrKeys[0].Item1,
-                BoxIndexes = fullness.Where(kvp => kvp.Value > MIN_DIGIT_BOX_FULLNESS_PERCENTAGE).Select(kvp => kvp.Key).ToArray(),
-                FullnessScore = fullness.Where(kvp => kvp.Value > MIN_DIGIT_BOX_FULLNESS_PERCENTAGE).Select(kvp => kvp.Value).Sum()
-            };
+                cfg.BoxIndexes = fullness.Where(kvp => kvp.Value > MIN_DIGIT_BOX_FULLNESS_PERCENTAGE).Select(kvp => kvp.Key).ToArray();
+                cfg.FullnessScore = fullness.Where(kvp => kvp.Value > MIN_DIGIT_BOX_FULLNESS_PERCENTAGE).Select(kvp => kvp.Value).Sum();
+            }
 
             return rv;
         }
@@ -550,7 +918,11 @@ namespace Tangra.OCR
         private static int MAX_TOP_BOTTOM_EDGES_TO_CONSIDER = 15;
         private static int MIN_VIABLE_HEIGHT_PIXELS = 7;
         private static decimal MAX_GAP_PIXELS = 3.0M;
-        private static decimal MIN_DIGIT_BOX_FULLNESS_PERCENTAGE = 0.25M;
+        private static decimal MIN_DIGIT_BOX_FULLNESS_PERCENTAGE = 0.15M;
+        private static decimal PERCENT_WHITE_AT_EDGE_START = 0.35M;
+        private static int MIN_BLOCK_WIDTH = 5;
+        private static int MAX_BLOCK_WIDTH = 16;
+
 
         public Dictionary<string, uint[]> GetCalibrationReportImages()
         {
