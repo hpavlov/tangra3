@@ -50,26 +50,33 @@ namespace Tangra.OCR
             m_MinCalibrationFrames = (int)Math.Ceiling(m_InitializationData.VideoFrameRate);
         }
 
-        public bool ExtractTime(int frameNo, int frameStep, uint[] data, out DateTime time)
+        public bool ExtractTime(int frameNo, int frameStep, uint[] rawData, out DateTime time)
         {
             if (m_VideoController != null)
                 // Leave this to capture statistics
                 m_VideoController.RegisterExtractingOcrTimestamps();
 
-            m_LatestFrameImage = data;
+            m_LatestFrameImage = rawData;
 
-            // TODO: Add main OCR Implementation HERE
-
+            if (m_Processor != null)
+            {
+                var data = PreProcessImageForOCR(rawData, m_TopMostLine, m_BottomMostLine);
+                time = m_Processor.ExtractTime(frameNo, frameStep, data);
+            }
+            else
+                time = DateTime.MinValue;
 
             // NOTE: if there is an error extracting the timestamp then call m_VideoController.RegisterOcrError(); for Tangra to show a counter in the status bar with number of errors so far
             // NOTE: This dummy implementation simply marks all frames as OCR errors
-            if (m_VideoController != null)
-                m_VideoController.RegisterOcrError();
+            if (time == DateTime.MinValue)
+            {
+                if (m_VideoController != null)
+                    m_VideoController.RegisterOcrError();
+            }
 
             // NOTE: See IotaVtiOrcManaged.ExtractDateTime() for ideas about checking incorrectly extracted times and attempting to correct them.
 
-            time = DateTime.MinValue;
-            return false;
+            return time != DateTime.MinValue;
         }
 
         public bool RequiresCalibration
@@ -104,7 +111,7 @@ namespace Tangra.OCR
                 if (numOsdLines > 1)
                 {
                     // NOTE: At least 2 samples to decide on Top/Bottom line positions
-                    var medianConfig = DeterimineMedianOsdLinePositions(linesSoFar, numOsdLines);
+                    var medianConfig = DeterimineMedianOsdLinePositions(linesSoFar, ref numOsdLines);
                     if (medianConfig.BoxTops.Length == numOsdLines && medianConfig.BoxBottoms.Length == numOsdLines)
                     {
                         var topsSorted = medianConfig.BoxTops.ToList();
@@ -167,7 +174,7 @@ namespace Tangra.OCR
                 else
                     m_Processor.ProcessCalibrationFrame(calibFrame);
 
-                if (m_Processor.IsCalibrated)
+                if (m_Processor != null && m_Processor.IsCalibrated)
                     return true;
             }
 
@@ -317,7 +324,7 @@ namespace Tangra.OCR
 
                 try
                 {
-                    m_Processor = new GpsBoxSpriteOcrProcessor(m_CalibrationFrames, m_OsdLineVerticals, m_OsdBlocksLeftAndWidth, m_ImageWidth, m_ImageHeight);
+                    m_Processor = GpsBoxSpriteOcrProcessor.CreateAndCalibrateProcessor(m_CalibrationFrames, m_OsdLineVerticals, m_OsdBlocksLeftAndWidth, m_ImageWidth, m_ImageHeight);
                 }
                 catch (Exception ex)
                 {
@@ -336,7 +343,7 @@ namespace Tangra.OCR
             public decimal[] BoxBottoms;
         }
 
-        private OsdLinePositions DeterimineMedianOsdLinePositions(IEnumerable<OsdLineConfig> allLineConfigs, int numOsdLines)
+        private OsdLinePositions DeterimineMedianOsdLinePositions(IEnumerable<OsdLineConfig> allLineConfigs, ref int numOsdLines)
         {
             var rv = new OsdLinePositions();
 
@@ -398,18 +405,21 @@ namespace Tangra.OCR
             var boxTops = new List<decimal>();
             var topWeights = topGroups.Values.Select(x => x.Count).ToArray();
             var topVals = topGroups.Keys.ToArray();
+            var boxBottoms = new List<decimal>();
+            var bottomWeights = bottomGroups.Values.Select(x => x.Count).ToArray();
+            var bottomVals = bottomGroups.Keys.ToArray();
+
+            numOsdLines = Math.Min(Math.Min(topVals.Length, bottomVals.Length), numOsdLines);
+
             Array.Sort(topWeights, topVals);
-            for (int i = 1; i <= topVals.Length; i++)
+            for (int i = 1; i <= numOsdLines; i++)
             {
                 var topVal = topVals[topVals.Length - i];
                 boxTops.Add(topVal);
             }
 
-            var boxBottoms = new List<decimal>();
-            var bottomWeights = bottomGroups.Values.Select(x => x.Count).ToArray();
-            var bottomVals = bottomGroups.Keys.ToArray();
             Array.Sort(bottomWeights, bottomVals);
-            for (int i = 1; i <= bottomVals.Length; i++)
+            for (int i = 1; i <= numOsdLines; i++)
             {
                 var bottomVal = bottomVals[bottomVals.Length - i];
                 boxBottoms.Add(bottomVal);
@@ -520,18 +530,21 @@ namespace Tangra.OCR
             return candidates;
         }
 
+        private int? m_TopMostLine = null;
+        private int? m_BottomMostLine = null;
+
         private OcrCalibrationFrame ProcessCalibrationFrame(uint[] rawData, Tuple<int, int>[] osdLineVerticals, Tuple<decimal, decimal>[] osdLineLeftAndWidths)
         {
-            int? topMostLine = null;
-            int? bottomMostLine = null;
+            m_TopMostLine = null;
+            m_BottomMostLine = null;
 
             if (osdLineVerticals != null && osdLineVerticals.Length > 0)
             {
-                topMostLine = osdLineVerticals.Select(x => x.Item1).Min();
-                bottomMostLine = osdLineVerticals.Select(x => x.Item2).Max();
+                m_TopMostLine = osdLineVerticals.Select(x => x.Item1).Min();
+                m_BottomMostLine = osdLineVerticals.Select(x => x.Item2).Max();
             }
 
-            var data = PreProcessImageForOCR(rawData, topMostLine, bottomMostLine);
+            var data = PreProcessImageForOCR(rawData, m_TopMostLine, m_BottomMostLine);
 
             int minWhiteLevel = 127; //PreProcessed image will only have 0 and 255 pixels, so we always use 127 here
 

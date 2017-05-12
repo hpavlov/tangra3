@@ -68,7 +68,16 @@ namespace Tangra.OCR.GpsBoxSprite
         static int[] TWOLINE_LINE1_INDEXES = new int[] { 0, 1, 3, 4, 6, 7, 9, 10, 12, 13, 15, 16 };
         static int[] TWOLINE_LINE2_INDEXES = new int[] { 0, 1, 2, 3, 5, 9, 10, 11, 12, 14 };
 
-        public GpsBoxSpriteOcrProcessor(List<OcrCalibrationFrame> lineConfigs, Tuple<int, int>[] topBottoms, Tuple<decimal, decimal>[] leftWidths, int frameWidth, int frameHeight)
+        public static GpsBoxSpriteOcrProcessor CreateAndCalibrateProcessor(List<OcrCalibrationFrame> lineConfigs, Tuple<int, int>[] topBottoms, Tuple<decimal, decimal>[] leftWidths, int frameWidth, int frameHeight)
+        {
+            var processor = new GpsBoxSpriteOcrProcessor(lineConfigs, topBottoms, leftWidths, frameWidth, frameHeight);
+            if (processor.IsCalibrated)
+                return processor;
+
+            return null;
+        }
+
+        private GpsBoxSpriteOcrProcessor(List<OcrCalibrationFrame> lineConfigs, Tuple<int, int>[] topBottoms, Tuple<decimal, decimal>[] leftWidths, int frameWidth, int frameHeight)
         {
             m_FrameWidth = frameWidth;
             m_FrameHeight = frameHeight;
@@ -80,21 +89,49 @@ namespace Tangra.OCR.GpsBoxSprite
             }
             else
             {
-                throw new ApplicationException("Unrecognized OSD line layout.");
+                return;
             }
 
             var allBlocks = new List<Tuple<decimal[,], decimal[,]>>();
             foreach (var configFrame in lineConfigs)
             {
-                ExtractBlockNumbers(configFrame, allBlocks);
+                ExtractBlockNumbers(configFrame.ProcessedPixels, allBlocks);
             }
             CategorizeInitialBlocks(allBlocks);
             OCRBlockSignatures();
 
-            var bmp = GetBlockSignaturesImage();
-            bmp.Save(@"C:\Work\gbs.bmp");
+            foreach (var unrecSig in m_Signatures.Where(x => x.Digit == null))
+            {
+                var individChars = new List<int>();
+                if (unrecSig.AllBlocks.Count > 10)
+                {
+                    foreach (var block in unrecSig.AllBlocks)
+                    {
+                        var ocrRes = OCRBlockSignatureDigit(block, unrecSig.m_BlockWidth, unrecSig.m_BlockHeight);
+                        individChars.Add(ocrRes.Item1 ?? -1);
+                    }
+                    var dict = individChars.GroupBy(x => x).ToDictionary(x => x.Key, y => y.Count());
+                    var arrKeys = dict.Keys.ToArray();
+                    var arrVals = dict.Values.ToArray();
+                    Array.Sort(arrVals, arrKeys);
 
-            IsCalibrated = true;
+                    if (arrVals[arrVals.Length - 1] > 0.66*unrecSig.AllBlocks.Count)
+                    {
+                        unrecSig.Digit = arrKeys[arrKeys.Length - 1];
+                    }
+                }
+            }
+
+            if (m_Signatures.Count(x => x.Digit == null) < m_Signatures.Count * 0.06)
+            {
+                var dictChars = m_Signatures.Where(x => x.Digit != null).GroupBy(x => x.Digit).ToDictionary(x => x.Key, y => y.ToList());
+                IsCalibrated = dictChars.Keys.Min() == 0 && dictChars.Keys.Max() == 9 && dictChars.Keys.Count == 10;
+                if (IsCalibrated)
+                {
+                    // Remove the potentially bad matches from the signatures
+                    m_Signatures = m_Signatures.Where(x => x.Digit != null).ToList();
+                }
+            }
         }
 
         private void CategorizeInitialBlocks(List<Tuple<decimal[,], decimal[,]>> blocks)
@@ -188,31 +225,33 @@ namespace Tangra.OCR.GpsBoxSprite
             for (int i = 0; i < m_Signatures.Count; i++)
             {
                 var sig = m_Signatures[i];
-                var ocrRes = OCRBlockSignatureDigit(sig);
+                var ocrRes = OCRBlockSignatureDigit(sig.Signature, sig.m_BlockWidth, sig.m_BlockHeight);
                 sig.Digit = ocrRes.Item1;
                 sig.HFactors = ocrRes.Item2;
                 sig.VFactors = ocrRes.Item3;
             }
         }
 
-        private Tuple<int?, string, string> OCRBlockSignatureDigit(BlockSignature block)
+        private static int OCR_WHITE_LEVEL = 64; // ?? We are mostly interested in somewhat white spaces
+
+        private Tuple<int?, string, string> OCRBlockSignatureDigit(decimal[,] data, int width, int height)
         {
-            char[] horizontals = new char[block.m_BlockHeight];
-            char[] verticals = new char[block.m_BlockWidth];
+            char[] horizontals = new char[height];
+            char[] verticals = new char[width];
 
-            int[] midIndexes = block.m_BlockWidth % 2 == 0
-                ? new int[] {block.m_BlockWidth/2, (block.m_BlockWidth/2) - 1}
-                : new int[] {block.m_BlockWidth/2};
+            int[] midIndexes = width % 2 == 0
+                ? new int[] { width / 2, (width / 2) - 1 }
+                : new int[] { width / 2 };
 
-            int hor80Percent = (int)Math.Round(block.m_BlockWidth * 0.8);
-            int hor60Percent = (int)Math.Round(block.m_BlockWidth * 0.6);
-            int hor40Percent = (int)Math.Round(block.m_BlockWidth * 0.4);
-            for (int y = 0; y < block.m_BlockHeight; y++)
+            int hor80Percent = (int)Math.Round(width * 0.8);
+            int hor60Percent = (int)Math.Round(width * 0.6);
+            int hor40Percent = (int)Math.Round(width * 0.4);
+            for (int y = 0; y < height; y++)
             {
-                bool[] flags = new bool[block.m_BlockWidth];
-                for (int x = 0; x < block.m_BlockWidth; x++)
+                bool[] flags = new bool[width];
+                for (int x = 0; x < width; x++)
                 {
-                    bool isWhite = block.Signature[y, x] >= 64; // ?? We are mostly interested in somewhat white spaces
+                    bool isWhite = data[y, x] >= OCR_WHITE_LEVEL; 
                     flags[x] = isWhite;
                 }
 
@@ -241,7 +280,7 @@ namespace Tangra.OCR.GpsBoxSprite
                                     break;
                                 }
                             }
-                            for (int i = idx + 1; i < block.m_BlockWidth; i++)
+                            for (int i = idx + 1; i < width; i++)
                             {
                                 if (!flags[i]) numBlacks++;
                                 else
@@ -287,7 +326,7 @@ namespace Tangra.OCR.GpsBoxSprite
                                         break;
                                     }
                                 }
-                                for (int i = idx + 1; i < block.m_BlockWidth; i++)
+                                for (int i = idx + 1; i < width; i++)
                                 {
                                     if (flags[i]) numWhites++;
                                     else
@@ -298,7 +337,7 @@ namespace Tangra.OCR.GpsBoxSprite
                                 }
                                 if (blackOnLeft && blackOnRight && numWhite < hor40Percent)
                                 {
-                                    ch = 'I'; //small white space in the middle surrounded by black on the sides        
+                                    ch = 'I'; //small white space in the middle surrounded by black on the sides
                                 }
                             }
                         }
@@ -315,7 +354,7 @@ namespace Tangra.OCR.GpsBoxSprite
                             bool lookingForWhite = false;
                             bool failed = true;
                             int whiteBlocks = 0;
-                            for (int i = idx; i < block.m_BlockWidth - 1 /* allow the last char to be whatever */; i++)
+                            for (int i = idx; i < width - 1 /* allow the last char to be whatever */; i++)
                             {
                                 if (lookingForBlack)
                                 {
@@ -323,7 +362,7 @@ namespace Tangra.OCR.GpsBoxSprite
                                     {
                                         lookingForBlack = false;
                                         lookingForWhite = true;
-                                        failed = false;                                        
+                                        failed = false;
                                     }
                                     else
                                         whiteBlocks++;
@@ -334,12 +373,12 @@ namespace Tangra.OCR.GpsBoxSprite
                                     break;
                                 }
                             }
-                            if (!failed) ch = whiteBlocks <= hor40Percent ? '[' : 'W';                          
+                            if (!failed) ch = whiteBlocks <= hor40Percent ? '[' : 'W';
                         }
 
-                        if (ch == ' ' && flags[block.m_BlockWidth - 1] || flags[block.m_BlockWidth - 2])
+                        if (ch == ' ' && flags[width - 1] || flags[width - 2])
                         {
-                            int idx = flags[block.m_BlockWidth - 1] ? block.m_BlockWidth - 2 : block.m_BlockWidth - 3;
+                            int idx = flags[width - 1] ? width - 2 : width - 3;
                             bool lookingForBlack = true;
                             bool lookingForWhite = false;
                             bool failed = true;
@@ -365,11 +404,11 @@ namespace Tangra.OCR.GpsBoxSprite
                             }
                             if (!failed) ch = whiteBlocks <= hor40Percent ? ']' : 'W'; 
                         }
-                        
-                        if (ch == ' ' && (!flags[0] || !flags[1]) && (!flags[block.m_BlockWidth - 1] || !flags[block.m_BlockWidth - 2]))
+
+                        if (ch == ' ' && (!flags[0] || !flags[1]) && (!flags[width - 1] || !flags[width - 2]))
                         {
                             int startIdx = flags[0] ? 1 : 2;
-                            int endIdx = flags[block.m_BlockWidth - 1] ? block.m_BlockWidth - 2 : block.m_BlockWidth - 3;
+                            int endIdx = flags[width - 1] ? width - 2 : width - 3;
                             bool lookingForBlack = false;
                             bool lookingForWhite = true;
                             bool failed = true;
@@ -389,11 +428,11 @@ namespace Tangra.OCR.GpsBoxSprite
                                     else
                                     {
                                         failed = flags.Skip(i).Take(endIdx - i).Any(x => x);
-                                        break;                                        
+                                        break;
                                     }
                                 }
                             }
-                            if (!failed) ch = whiteBlocks <= hor40Percent ? 'I' : 'W'; 
+                            if (!failed) ch = whiteBlocks <= hor40Percent ? 'I' : 'W';
                         }
                     }
 
@@ -449,53 +488,11 @@ namespace Tangra.OCR.GpsBoxSprite
                 if (s_Regex6.IsMatch(tIWrO)) return 6;
                 if (s_Regex3.IsMatch(tIWrO)) return 3;
                 if (s_Regex2.IsMatch(tIWrO)) return 2;
-
-                // Non RegEx implementation - likely a lot faster
-                //if (tIWrO.Length > 2 && tIWrO[0] == 'o' && tIWrO[tIWrO.Length - 1] == 'o')
-                //{
-                //    if (tIWrO.Trim('o') == "" && tIWrO.Length > v40Percent)
-                //        return 0;
-                //    else if (tIWrO.Trim('o').Trim('W') == "")
-                //        return 8;
-
-                //    if (s_Regex9.IsMatch(tIWrO)) return 9;
-                //    if (s_Regex6.IsMatch(tIWrO)) return 6;
-                //    if (s_Regex3.IsMatch(tIWrO)) return 3;
-                //    if (s_Regex2.IsMatch(tIWrO)) return 2;
-                //}
-                //else
-                //{
-                //    var tIW_bO = tIWrO.TrimEnd('o');
-                //    if (tIW_bO.Length > 3 && tIW_bO[0] == '[' && tIW_bO[tIW_bO.Length - 1] == ']')
-                //    {
-                //        var test5 = tIW_bO.TrimStart('[').TrimEnd(']');
-                //        if (test5.Length > 0 && test5.Trim('W') == "")
-                //            return 5;
-                //    }
-
-                //    if (s_Regex9.IsMatch(tIWrO)) return 9;
-                //    if (s_Regex6.IsMatch(tIWrO)) return 6;
-                //    if (s_Regex3.IsMatch(tIWrO)) return 3;
-                //    if (s_Regex2.IsMatch(tIWrO)) return 2;
-                //}
             }
 
             if (s_Regex1.IsMatch(horizontals)) return 1;
             if (s_Regex7.IsMatch(horizontals)) return 7;
             if (s_Regex4.IsMatch(horizontals)) return 4;
-
-            // Non-RegEx method probably a lot faster
-            //string withoutTopW = horizontals.TrimStart(new char[] { 'W', ' ' }).TrimEnd(' ');
-            //if (withoutTopW.Trim(new char[] { 'I', '[', ']' }) == "")
-            //    return horizontals.IndexOf("W") == -1 ? 1 : 7;
-
-            //string withoutMidAndRightI = horizontals.Trim(new char[] { 'I', ']' });
-            //if (withoutMidAndRightI.Length > 2 && withoutMidAndRightI[0] == 'W' && withoutMidAndRightI[withoutMidAndRightI.Length - 1] == 'W')
-            //{
-            //    var tW = withoutMidAndRightI.Trim('W');
-            //    if (tW.Length > 0 && tW.Trim(new char[] { 'o', 'O' }) == "")
-            //        return 4;
-            //}
 
             return null;
         }
@@ -613,18 +610,106 @@ namespace Tangra.OCR.GpsBoxSprite
             m_Lines.Add(new GpsBoxSpriteLineOcr(topBottoms[1].Item1, topBottoms[1].Item2, leftWidths[1].Item1, leftWidths[1].Item2, TWOLINE_LINE2_INDEXES));
         }
 
-        private void ExtractBlockNumbers(OcrCalibrationFrame cfgFrame, List<Tuple<decimal[,], decimal[,]>> allBlocks)
+        private void ExtractBlockNumbers(uint[] processedPixels, List<Tuple<decimal[,], decimal[,]>> allBlocks)
         {
             foreach (var line in m_Lines)
             {
-                var lineBlocks = line.ExtractBlockNumbers(cfgFrame, m_FrameWidth, m_FrameHeight);
+                var lineBlocks = line.ExtractBlockNumbers(processedPixels, m_FrameWidth, m_FrameHeight);
                 allBlocks.AddRange(lineBlocks);
             }
         }
 
         public void ProcessCalibrationFrame(OcrCalibrationFrame frame)
         {
-            
+
+        }
+
+        public DateTime ExtractTime(int frameNo, int frameStep, uint[] processedPixels)
+        {
+            var oddFrameLines = new List<List<int?>>();
+            var evenFrameLines = new List<List<int?>>();
+
+            foreach (var line in m_Lines)
+            {
+                var oddDigits = new List<int?>();
+                var evenDigits = new List<int?>();
+                var lineBlocks = line.ExtractBlockNumbers(processedPixels, m_FrameWidth, m_FrameHeight);
+                foreach (var block in lineBlocks)
+                {
+                    var oddDigit = OCRBlockDigit(block.Item1, line.BlockIntWidth, line.BlockIntHeight);
+                    var evenDigit = OCRBlockDigit(block.Item1, line.BlockIntWidth, line.BlockIntHeight);
+
+                    oddDigits.Add(oddDigit);
+                    evenDigits.Add(evenDigit);
+                }
+
+                oddFrameLines.Add(oddDigits);
+                evenFrameLines.Add(evenDigits);
+            }
+
+            if (m_Lines.Count == 2)
+                return ExtractTwoLineLayoutTime(oddFrameLines, evenFrameLines);
+
+            return DateTime.MinValue;
+        }
+
+        private DateTime ExtractTwoLineLayoutTime(List<List<int?>> oddLines, List<List<int?>> evenLines)
+        {
+            var dateTimeEven = DateTime.MinValue;
+            var dateTimeOdd = DateTime.MinValue;
+
+            // TODO: Make this fail-safe and working even when some digits haven't been recognized or have been recognized incorrectly
+
+            if (oddLines[0].Count == 12 && evenLines[0].Count == 12 && oddLines[0].All(x => x.HasValue) && evenLines[0].All(x => x.HasValue))
+            {
+                dateTimeEven = new DateTime(evenLines[0][10].Value * 10 + evenLines[0][11].Value + 2000, evenLines[0][8].Value * 10 + evenLines[0][9].Value, evenLines[0][6].Value * 10 + evenLines[0][7].Value,
+                                            evenLines[0][0].Value * 10 + evenLines[0][1].Value, evenLines[0][2].Value * 10 + evenLines[0][3].Value, evenLines[0][4].Value * 10 + evenLines[0][5].Value);
+                dateTimeOdd = new DateTime(oddLines[0][10].Value * 10 + oddLines[0][11].Value + 2000, oddLines[0][8].Value * 10 + oddLines[0][9].Value, oddLines[0][6].Value * 10 + oddLines[0][7].Value,
+                                            oddLines[0][0].Value * 10 + oddLines[0][1].Value, oddLines[0][2].Value * 10 + oddLines[0][3].Value, oddLines[0][4].Value * 10 + oddLines[0][5].Value);
+
+                if (oddLines[1].Count == 10 && evenLines[1].Count == 10 && oddLines[1].All(x => x.HasValue) && evenLines[1].All(x => x.HasValue))
+                {
+                    // TODO: Add milliseconds
+                }
+            }
+
+            return dateTimeEven;
+        }
+
+        private int? OCRBlockDigit(decimal[,] pixels, int width, int height)
+        {
+            // 1) Find the closest signature
+            var diffs = m_Signatures.Select(x => Tuple.Create(ComputeBlockDifference(x.Signature, pixels), x.Digit));
+            var sigDiffs = diffs.Select(x => x.Item1).ToArray();
+            var sigDigits = diffs.Select(x => x.Item2).ToArray();
+            Array.Sort(sigDiffs, sigDigits);
+            var ocrDigitSig = sigDigits[0];
+            var ocrDigitSig2 = sigDigits[1];
+            var ocrDigitSig3 = sigDigits[2];
+
+            // 2) OCR the single block directly
+            var singleBlockOCR = OCRBlockSignatureDigit(pixels, width, height);
+            var ocrDigit = singleBlockOCR.Item1;
+
+            if (ocrDigitSig == ocrDigit)
+                return ocrDigit;
+
+            if (ocrDigitSig2 == ocrDigit)
+                return ocrDigit;
+
+            if (ocrDigitSig == ocrDigitSig2)
+                return ocrDigitSig;
+
+            if (ocrDigitSig == ocrDigitSig3)
+                return ocrDigitSig;
+
+            if (ocrDigitSig2 == ocrDigitSig3)
+                return ocrDigitSig2;
+
+            if (ocrDigit != null)
+                return ocrDigit;
+
+            return ocrDigitSig;
         }
 
         public void DrawLegend(Graphics graphics)

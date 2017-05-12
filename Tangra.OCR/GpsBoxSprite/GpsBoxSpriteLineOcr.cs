@@ -36,6 +36,9 @@ namespace Tangra.OCR.GpsBoxSprite
         private int[] m_BlockIndexes;
         private int m_BlockHeight;
 
+        internal int BlockIntWidth { get; private set; }
+        internal int BlockIntHeight { get; private set; }
+
         public GpsBoxSpriteLineOcr(int top, int bottom, decimal left, decimal blockWidth, int[] blockIndexes)
         {
             m_Top = top;
@@ -44,6 +47,9 @@ namespace Tangra.OCR.GpsBoxSprite
             m_Left = left;
             m_BlockWidth = blockWidth;
             m_BlockIndexes = blockIndexes;
+
+            BlockIntWidth = (int)Math.Ceiling(m_BlockWidth);
+            BlockIntHeight = (int)Math.Ceiling((m_Bottom - m_Top) / 2.0);
         }
 
         public GpsBoxSpriteLineOcr(OsdLineConfig lineConfig)
@@ -54,6 +60,9 @@ namespace Tangra.OCR.GpsBoxSprite
             m_BlockHeight = m_Bottom - m_Top + 1;
             m_Bottom = (int)lineConfig.Bottom;
             m_BlockIndexes = lineConfig.BoxIndexes;
+
+            BlockIntWidth = (int)Math.Ceiling(m_BlockWidth);
+            BlockIntHeight = (int)Math.Ceiling((m_Bottom - m_Top) / 2.0);
         }
 
         public void DrawLegend(Graphics graphics)
@@ -65,22 +74,22 @@ namespace Tangra.OCR.GpsBoxSprite
             }
         }
 
-        internal List<Tuple<decimal[,], decimal[,]>> ExtractBlockNumbers(OcrCalibrationFrame cfgFrame, int frameWidth, int frameHeight)
+        internal List<Tuple<decimal[,], decimal[,]>> ExtractBlockNumbers(uint[] processedPixels, int frameWidth, int frameHeight)
         {
             var rv = new List<Tuple<decimal[,], decimal[,]>>();
 
-            SubPixelImage subPixels = new SubPixelImage(cfgFrame.ProcessedPixels, frameWidth, frameHeight);
+            SubPixelImage subPixels = new SubPixelImage(processedPixels, frameWidth, frameHeight);
 
-            int blockIntWidth = (int) Math.Ceiling(m_BlockWidth);
-            int blockFieldHeight = (int)Math.Ceiling((m_Bottom - m_Top) / 2.0);
+            //int blockIntWidth = (int) Math.Ceiling(m_BlockWidth);
+            //int blockFieldHeight = (int)Math.Ceiling((m_Bottom - m_Top) / 2.0);
             foreach (var blockIndex in m_BlockIndexes)
             {
                 decimal x0 = m_Left + blockIndex * m_BlockWidth;
-                decimal[,] oddBlock = new decimal[blockFieldHeight, blockIntWidth];
-                decimal[,] evenBlock = new decimal[blockFieldHeight, blockIntWidth];
+                decimal[,] oddBlock = new decimal[BlockIntHeight, BlockIntWidth];
+                decimal[,] evenBlock = new decimal[BlockIntHeight, BlockIntWidth];
                 for (int y = m_Top; y < m_Bottom; y++)
                 {
-                    for (int x = 0; x < blockIntWidth; x++)
+                    for (int x = 0; x < BlockIntWidth; x++)
                     {
                         var pix = subPixels.GetWholePixelAt(x0 + x, y);
                         var fieldY = (y - m_Top) / 2;
