@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using Tangra.Model.Image;
 using Tangra.OCR.IotaVtiOsdProcessor;
+using Tangra.OCR.TimeExtraction;
 
 namespace Tangra.OCR.IotaVtiOsdProcessor
 {
@@ -16,8 +17,6 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 	{
 		internal const int MAX_POSITIONS = 29;
 		internal const int FIRST_FRAME_NO_DIGIT_POSITIONS = 22;
-		internal const float FIELD_DURATION_PAL = 20.00f;
-		internal const float FIELD_DURATION_NTSC = 16.68f;
 		internal const float COEFF_FIRST_FRAME_NO_DIGIT_POSITION = 555.0f / 720.0f;
 
 		public uint[] ZeroDigitPattern;

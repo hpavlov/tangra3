@@ -122,6 +122,20 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
         public int Milliseconds10 { get; private set; }
         public int FrameNumber { get; private set; }
 
+        public bool ContainsDate
+        {
+            get { return true; }
+        }
+
+        public int Year { get; private set; }
+        public int Month { get; private set; }
+        public int Day { get; private set; }
+
+        public bool ContainsFrameNumbers
+        {
+            get { return true; }
+        }
+
         public void Correct(int hours, int minutes, int seconds, int milliseconds10)
         {
             Hours = hours;
@@ -129,12 +143,6 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 			Seconds = seconds;
             Milliseconds10 = milliseconds10;
         }
-	}
-
-	internal enum VideoFormat
-	{
-		PAL,
-		NTSC
 	}
 
 	internal static class Extensions

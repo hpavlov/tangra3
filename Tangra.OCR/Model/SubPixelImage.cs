@@ -8,21 +8,11 @@ namespace Tangra.OCR.Model
 {
     public class SubPixelImage
     {
-        private int m_Factor = 5;
-        private decimal m_Step;
-        private int m_FactorSquare;
         private int m_Width;
         private int m_Height;
         private uint[] m_Pixels;
 
-        private SubPixelImage()
-        {
-            m_FactorSquare = m_Factor * m_Factor;
-            m_Step = 1.0M / m_Factor;
-        }
-
         public SubPixelImage(AstroImage image)
-            : this()
         {
             m_Width = image.Width;
             m_Height = image.Height;
@@ -30,7 +20,6 @@ namespace Tangra.OCR.Model
         }
 
         public SubPixelImage(uint[] pixels, int width, int height)
-            : this()
         {
             m_Width = width;
             m_Height = height;
@@ -45,11 +34,6 @@ namespace Tangra.OCR.Model
         public decimal Height
         {
             get { return m_Height; }
-        }
-
-        public decimal Step
-        {
-            get { return m_Step; }
         }
 
         public decimal GetWholePixelAt(decimal xf, decimal yf)

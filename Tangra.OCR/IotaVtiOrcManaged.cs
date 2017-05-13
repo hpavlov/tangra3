@@ -42,8 +42,6 @@ namespace Tangra.OCR
 		private bool m_UseNativePreProcessing;
 
 		private bool m_ForceErrorReport;
-        //private int m_FrameStep = -1;
-        //internal IotaVtiOcrCorrector m_Corrector = new IotaVtiOcrCorrector();
 
 	    private VtiTimeStampComposer m_TimeStampComposer;
 

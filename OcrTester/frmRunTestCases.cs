@@ -16,7 +16,6 @@ using OcrTester.IotaVtiOsdProcessor;
 using Tangra.Model.Config;
 using Tangra.Model.Image;
 using Tangra.OCR;
-using VideoFormat = Tangra.OCR.IotaVtiOsdProcessor.VideoFormat;
 
 namespace OcrTester
 {
@@ -244,12 +243,12 @@ namespace OcrTester
 
             //ORC ERR: FrameNo: 724, Odd Timestamp: 3:55:24.6819 141692, Even Timestamp: 3:55:24.6996 141693, NTSC field is not 16.68 ms. It is 18 ms. IOTA-VTI Correction Attempt for Frame 724. 03:55:24.6819 (141692) - 03:55:24.6996 (141693)
             
-            var processor = new IotaVtiOrcManaged();
-            processor.m_Processor = new Tangra.OCR.IotaVtiOsdProcessor.IotaVtiOcrProcessor(true);
-            processor.m_Processor.VideoFormat = VideoFormat.NTSC;
+            //var processor = new IotaVtiOrcManaged();
+            //processor.m_Processor = new Tangra.OCR.IotaVtiOsdProcessor.IotaVtiOcrProcessor(true);
+            //processor.m_Processor.VideoFormat = VideoFormat.NTSC;
 
-            var oddFieldOSD = new Tangra.OCR.IotaVtiOsdProcessor.IotaVtiTimeStampStrings() { HH = "3", MM = "55", SS = "24", FFFF1 = "6819", FFFF2 = "", FRAMENO = "141692", NumSat = '8' };
-            var evenFieldOSD = new Tangra.OCR.IotaVtiOsdProcessor.IotaVtiTimeStampStrings() { HH = "3", MM = "55", SS = "24", FFFF1 = "", FFFF2 = "6996", FRAMENO = "141693", NumSat = '8' };
+            //var oddFieldOSD = new Tangra.OCR.IotaVtiOsdProcessor.IotaVtiTimeStampStrings() { HH = "3", MM = "55", SS = "24", FFFF1 = "6819", FFFF2 = "", FRAMENO = "141692", NumSat = '8' };
+            //var evenFieldOSD = new Tangra.OCR.IotaVtiOsdProcessor.IotaVtiTimeStampStrings() { HH = "3", MM = "55", SS = "24", FFFF1 = "", FFFF2 = "6996", FRAMENO = "141693", NumSat = '8' };
 
             //processor.m_Corrector.m_PrevEvenTicks = new DateTime(1, 1, 1, 3, 55, 24, 665).Ticks;
             //processor.m_Corrector.m_PrevOddTicks = new DateTime(1, 1, 1, 3, 55, 24, 649).Ticks;

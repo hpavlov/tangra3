@@ -11,6 +11,7 @@ using System.Text;
 using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.OCR.IotaVtiOsdProcessor;
+using Tangra.OCR.TimeExtraction;
 
 namespace Tangra.OCR.IotaVtiOsdProcessor
 {
@@ -736,13 +737,13 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 
 				fieldDurationMS = (totalMillisecondsNext - totalMillisecondsThis) / 10f;
 
-				if (Math.Abs(Math.Abs(fieldDurationMS) - IotaVtiOcrProcessor.FIELD_DURATION_PAL) > 0.15 && Math.Abs(Math.Abs(fieldDurationMS) - IotaVtiOcrProcessor.FIELD_DURATION_NTSC) > 0.15)
+                if (Math.Abs(Math.Abs(fieldDurationMS) - VtiTimeStampComposer.FIELD_DURATION_PAL) > 0.15 && Math.Abs(Math.Abs(fieldDurationMS) - VtiTimeStampComposer.FIELD_DURATION_NTSC) > 0.15)
 					return false;
 			}
 
-			if (Math.Abs(Math.Abs(fieldDurationMS) - IotaVtiOcrProcessor.FIELD_DURATION_PAL) < 0.15)
+            if (Math.Abs(Math.Abs(fieldDurationMS) - VtiTimeStampComposer.FIELD_DURATION_PAL) < 0.15)
 				stateManager.VideoFormat = VideoFormat.PAL;
-			else if (Math.Abs(Math.Abs(fieldDurationMS) - IotaVtiOcrProcessor.FIELD_DURATION_NTSC) < 0.15)
+            else if (Math.Abs(Math.Abs(fieldDurationMS) - VtiTimeStampComposer.FIELD_DURATION_NTSC) < 0.15)
 				stateManager.VideoFormat = VideoFormat.NTSC;
 			else
 				stateManager.VideoFormat = null;

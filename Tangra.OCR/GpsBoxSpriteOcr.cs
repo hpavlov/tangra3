@@ -10,10 +10,11 @@ using Tangra.Model.Image;
 using Tangra.Model.VideoOperations;
 using Tangra.OCR.GpsBoxSprite;
 using Tangra.OCR.Model;
+using Tangra.OCR.TimeExtraction;
 
 namespace Tangra.OCR
 {
-    public class GpsBoxSpriteOcr : ITimestampOcr
+    public class GpsBoxSpriteOcr : ITimestampOcr, ICalibrationErrorProcessor
     {
         private IVideoController m_VideoController;
         private TimestampOCRData m_InitializationData;
@@ -23,6 +24,8 @@ namespace Tangra.OCR
         private uint[] m_LatestFrameImage;
 
         internal GpsBoxSpriteOcrProcessor m_Processor;
+
+        private VtiTimeStampComposer m_TimeStampComposer;
 
         public string NameAndVersion()
         {
@@ -52,29 +55,26 @@ namespace Tangra.OCR
 
         public bool ExtractTime(int frameNo, int frameStep, uint[] rawData, out DateTime time)
         {
-            if (m_VideoController != null)
-                // Leave this to capture statistics
-                m_VideoController.RegisterExtractingOcrTimestamps();
-
-            m_LatestFrameImage = rawData;
-
-            if (m_Processor != null)
+            if (m_Processor.IsCalibrated && m_TimeStampComposer != null)
             {
+                if (m_VideoController != null)
+                    m_VideoController.RegisterExtractingOcrTimestamps();
+
                 var data = PreProcessImageForOCR(rawData, m_TopMostLine, m_BottomMostLine);
-                time = m_Processor.ExtractTime(frameNo, frameStep, data);
+
+                m_Processor.Process(data, frameNo);
+                IVtiTimeStamp oddFieldOSD = m_Processor.CurrentOcredOddFieldTimeStamp;
+                IVtiTimeStamp evenFieldOSD = m_Processor.CurrentOcredEvenFieldTimeStamp;
+
+                if (m_InitializationData.IntegratedAAVFrames > 0)
+                    time = m_TimeStampComposer.ExtractAAVDateTime(frameNo, frameStep, oddFieldOSD, evenFieldOSD);
+                else
+                {
+                    time = m_TimeStampComposer.ExtractDateTime(frameNo, frameStep, oddFieldOSD, evenFieldOSD);
+                }
             }
             else
                 time = DateTime.MinValue;
-
-            // NOTE: if there is an error extracting the timestamp then call m_VideoController.RegisterOcrError(); for Tangra to show a counter in the status bar with number of errors so far
-            // NOTE: This dummy implementation simply marks all frames as OCR errors
-            if (time == DateTime.MinValue)
-            {
-                if (m_VideoController != null)
-                    m_VideoController.RegisterOcrError();
-            }
-
-            // NOTE: See IotaVtiOrcManaged.ExtractDateTime() for ideas about checking incorrectly extracted times and attempting to correct them.
 
             return time != DateTime.MinValue;
         }
@@ -149,14 +149,14 @@ namespace Tangra.OCR
                         widthList = widthList.Skip(1).Take(widthList.Count - 2).ToList();
                     }
                     var averageLeft = leftList.Average();
-                    var medianWidth = widthList.Median();
+                    var averageWidth = widthList.Average();
 
                     var leftSigma = Math.Sqrt((double)leftList.Select(x => (x - averageLeft) * (x - averageLeft)).Sum() / (leftList.Count - 1));
-                    var widthSigma = Math.Sqrt((double)widthList.Select(x => (x - medianWidth) * (x - medianWidth)).Sum() / (leftList.Count - 1));
+                    var widthSigma = Math.Sqrt((double)widthList.Select(x => (x - averageWidth) * (x - averageWidth)).Sum() / (leftList.Count - 1));
 
                     if (leftSigma < 0.33 && widthSigma < 0.1)
                     {
-                        m_OsdBlocksLeftAndWidth[i] = Tuple.Create(averageLeft, medianWidth);
+                        m_OsdBlocksLeftAndWidth[i] = Tuple.Create(averageLeft, averageWidth);
                     }
                     else
                     {
@@ -175,7 +175,11 @@ namespace Tangra.OCR
                     m_Processor.ProcessCalibrationFrame(calibFrame);
 
                 if (m_Processor != null && m_Processor.IsCalibrated)
+                {
+                    m_TimeStampComposer = new VtiTimeStampComposer(m_Processor.VideoFormat, m_InitializationData.IntegratedAAVFrames, m_Processor.EvenBeforeOdd, m_VideoController, this, () => m_Processor.CurrentImage);
                     return true;
+                }
+                    
             }
 
             if (m_CalibrationFrames.Count > m_MinCalibrationFrames + 5)
@@ -189,6 +193,8 @@ namespace Tangra.OCR
 
         private uint[] PreProcessImageForOCR(uint[] data, int? topMostLine, int? bottomMostLine)
         {
+            m_LatestFrameImage = data;
+
             if (topMostLine != null && bottomMostLine != null)
             {
                 // NOTE: Top and bottom most lines are know. Only pre-process the video frame lines with the VTI-OSD
@@ -324,7 +330,7 @@ namespace Tangra.OCR
 
                 try
                 {
-                    m_Processor = GpsBoxSpriteOcrProcessor.CreateAndCalibrateProcessor(m_CalibrationFrames, m_OsdLineVerticals, m_OsdBlocksLeftAndWidth, m_ImageWidth, m_ImageHeight);
+                    m_Processor = new GpsBoxSpriteOcrProcessor(m_CalibrationFrames, m_OsdLineVerticals, m_OsdBlocksLeftAndWidth, m_ImageWidth, m_ImageHeight);
                 }
                 catch (Exception ex)
                 {
@@ -793,7 +799,7 @@ namespace Tangra.OCR
                         return (i == 0) ? x < y : x > y;
                     };
                     lineScores.Clear();
-                    for (decimal y = horizontal - 1 * sign; checkCond(y, horizontal + 1 * sign); y += 0.1m * sign)
+                    for (decimal y = horizontal - 1 * sign; checkCond(y, horizontal + 1 * sign); y += 0.025m * sign)
                     {
                         decimal horScore = 0;
                         for (int x = leftRnd; x <= rightRnd; x++)
@@ -832,7 +838,7 @@ namespace Tangra.OCR
             // 2) Determine the left position accurately for all lines simultaneously
             decimal leftFine = osdLineConstraints.Select(x => x.Item3).Average();
             lineScores.Clear();
-            for (decimal x = leftFine - 1; x < leftFine + 1; x += 0.1m)
+            for (decimal x = leftFine - 1; x < leftFine + 1; x += 0.025m)
             {
                 decimal vertScore = 0;
                 foreach (var osdLine in osdLineConstraints)
@@ -868,7 +874,7 @@ namespace Tangra.OCR
 
             // Try to locate the gaps between
             var data = new Dictionary<decimal, decimal>();
-            for (decimal width = widthAve - 2; width <= widthAve + 2; width += 0.1m)
+            for (decimal width = widthAve - 2; width <= widthAve + 2; width += 0.025m)
             {
                 decimal lineScore = 0;
 
@@ -964,5 +970,20 @@ namespace Tangra.OCR
         }
 
         public string InitiazliationError { get; private set; }
+
+        public int ErrorCount
+        {
+            get { return m_CalibrationErrors.Count; }
+        }
+
+        public void AddErrorImage(string fileName, uint[] pixels)
+        {
+            m_CalibrationImages.Add(fileName, pixels);
+        }
+
+        public void AddErrorText(string error)
+        {
+            m_CalibrationErrors.Add(error);
+        }
     }
 }

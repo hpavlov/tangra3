@@ -18,6 +18,9 @@ namespace Tangra.OCR.TimeExtraction
 
     public class VtiTimeStampComposer
     {
+        internal const float FIELD_DURATION_PAL = 20.00f;
+        internal const float FIELD_DURATION_NTSC = 16.68f;
+
         private int m_FrameStep = -1;
         private bool m_EvenBeforeOdd;
         private VideoFormat? m_VideoFormat;
@@ -38,7 +41,7 @@ namespace Tangra.OCR.TimeExtraction
             m_Corrector.Reset(m_VideoFormat);
         }
 
-        internal DateTime ExtractDateTime(int frameNo, int frameStep, IVtiTimeStamp oddFieldOSD, IotaVtiTimeStamp evenFieldOSD)
+        internal DateTime ExtractDateTime(int frameNo, int frameStep, IVtiTimeStamp oddFieldOSD, IVtiTimeStamp evenFieldOSD)
         {
             bool failedValidation = false;
             string failedReason = null;
@@ -52,23 +55,32 @@ namespace Tangra.OCR.TimeExtraction
                 m_Corrector.Reset(m_VideoFormat);
             }
 
-            if (oddFieldOSD.FrameNumber != evenFieldOSD.FrameNumber - 1 &&
-                oddFieldOSD.FrameNumber != evenFieldOSD.FrameNumber + 1)
+            if (oddFieldOSD.ContainsFrameNumbers)
             {
-                // Video fields are not consequtive
-                failedValidation = true;
-                failedReason = "Video fields are not consequtive";
+                if (oddFieldOSD.FrameNumber != evenFieldOSD.FrameNumber - 1 &&
+                    oddFieldOSD.FrameNumber != evenFieldOSD.FrameNumber + 1)
+                {
+                    // Video fields are not consequtive
+                    failedValidation = true;
+                    failedReason = "Video fields are not consequtive";
+                }
             }
+            
 
             try
             {
-                DateTime oddFieldTimestamp = new DateTime(1, 1, 1, oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds).AddMilliseconds(Math.Min(10000, oddFieldOSD.Milliseconds10) / 10.0f);
-                DateTime evenFieldTimestamp = new DateTime(1, 1, 1, evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds).AddMilliseconds(Math.Min(10000, evenFieldOSD.Milliseconds10) / 10.0f);
+                DateTime oddFieldTimestamp = oddFieldOSD.ContainsDate
+                    ? new DateTime(oddFieldOSD.Year, oddFieldOSD.Month, oddFieldOSD.Day, oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds).AddMilliseconds(Math.Min(10000, oddFieldOSD.Milliseconds10) / 10.0f)
+                    : new DateTime(1, 1, 1, oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds).AddMilliseconds(Math.Min(10000, oddFieldOSD.Milliseconds10) / 10.0f);
+
+                DateTime evenFieldTimestamp = evenFieldOSD.ContainsDate 
+                    ?  new DateTime(evenFieldOSD.Year, evenFieldOSD.Month, evenFieldOSD.Day, evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds).AddMilliseconds(Math.Min(10000, evenFieldOSD.Milliseconds10) / 10.0f)
+                    :  new DateTime(1, 1, 1, evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds).AddMilliseconds(Math.Min(10000, evenFieldOSD.Milliseconds10) / 10.0f);
 
                 double fieldDuration = Math.Abs(new TimeSpan(oddFieldTimestamp.Ticks - evenFieldTimestamp.Ticks).TotalMilliseconds);
 
                 if (m_VideoFormat == VideoFormat.PAL &&
-                    (Math.Abs(fieldDuration - IotaVtiOcrProcessor.FIELD_DURATION_PAL) > 1.0))
+                    (Math.Abs(fieldDuration - FIELD_DURATION_PAL) > 1.0))
                 {
                     // PAL field is not 20 ms
                     failedValidation = true;
@@ -76,7 +88,7 @@ namespace Tangra.OCR.TimeExtraction
                 }
 
                 if (m_VideoFormat == VideoFormat.NTSC &&
-                    (Math.Abs(fieldDuration - IotaVtiOcrProcessor.FIELD_DURATION_NTSC) > 1.0))
+                    (Math.Abs(fieldDuration - FIELD_DURATION_NTSC) > 1.0))
                 {
                     // NTSC field is not 16.68 ms
                     failedValidation = true;
@@ -121,13 +133,25 @@ namespace Tangra.OCR.TimeExtraction
                 else
                     m_Corrector.RegisterSuccessfulTimestamp(frameNo, oddFieldOSD, evenFieldOSD, oddFieldTimestamp, evenFieldTimestamp);
 
-                if (oddFieldOSD.FrameNumber == evenFieldOSD.FrameNumber - 1)
+                if (oddFieldOSD.ContainsFrameNumbers)
                 {
-                    return failedValidation ? DateTime.MinValue : oddFieldTimestamp;
+                    if (oddFieldOSD.FrameNumber == evenFieldOSD.FrameNumber - 1)
+                    {
+                        return failedValidation ? DateTime.MinValue : oddFieldTimestamp;
+                    }
+                    else
+                    {
+                        return failedValidation ? DateTime.MinValue : evenFieldTimestamp;
+                    }
                 }
                 else
                 {
-                    return failedValidation ? DateTime.MinValue : evenFieldTimestamp;
+                    if (failedValidation) return DateTime.MinValue;
+
+                    if (m_EvenBeforeOdd)
+                        return evenFieldTimestamp;
+                    else 
+                        return oddFieldTimestamp;
                 }
             }
             catch (Exception ex)
@@ -138,7 +162,7 @@ namespace Tangra.OCR.TimeExtraction
             }
         }
 
-        internal DateTime ExtractAAVDateTime(int frameNo, int frameStep, IVtiTimeStamp oddFieldOSD, IotaVtiTimeStamp evenFieldOSD)
+        internal DateTime ExtractAAVDateTime(int frameNo, int frameStep, IVtiTimeStamp oddFieldOSD, IVtiTimeStamp evenFieldOSD)
         {
             bool failedValidation = false;
             string failedReason = null;
@@ -148,12 +172,15 @@ namespace Tangra.OCR.TimeExtraction
 
             int integratedAavFields = 2 * m_IntegratedAAVFrames;
 
-            if (oddFieldOSD.FrameNumber != evenFieldOSD.FrameNumber - integratedAavFields + 1 &&
-                oddFieldOSD.FrameNumber != evenFieldOSD.FrameNumber + integratedAavFields - 1)
+            if (oddFieldOSD.ContainsFrameNumbers)
             {
-                // Video fields are not consequtive
-                failedValidation = true;
-                failedReason = "Integration interval is incomplete";
+                if (oddFieldOSD.FrameNumber != evenFieldOSD.FrameNumber - integratedAavFields + 1 &&
+                    oddFieldOSD.FrameNumber != evenFieldOSD.FrameNumber + integratedAavFields - 1)
+                {
+                    // Video fields are not consequtive
+                    failedValidation = true;
+                    failedReason = "Integration interval is incomplete";
+                }                
             }
 
             try
@@ -170,8 +197,8 @@ namespace Tangra.OCR.TimeExtraction
                 {
                     if (m_VideoFormat == VideoFormat.PAL)
                     {
-                        var calcDuration = (integrationPeriodDuration + IotaVtiOcrProcessor.FIELD_DURATION_PAL) / integratedAavFields;
-                        if ((Math.Abs(calcDuration - IotaVtiOcrProcessor.FIELD_DURATION_PAL) > 1.0))
+                        var calcDuration = (integrationPeriodDuration + FIELD_DURATION_PAL) / integratedAavFields;
+                        if ((Math.Abs(calcDuration - FIELD_DURATION_PAL) > 1.0))
                         {
                             // PAL field is not 20 ms
                             failedValidation = true;
@@ -181,8 +208,8 @@ namespace Tangra.OCR.TimeExtraction
 
                     if (m_VideoFormat == VideoFormat.NTSC)
                     {
-                        var calcDuration = (integrationPeriodDuration + IotaVtiOcrProcessor.FIELD_DURATION_NTSC) / integratedAavFields;
-                        if (Math.Abs(calcDuration - IotaVtiOcrProcessor.FIELD_DURATION_NTSC) > 1.0)
+                        var calcDuration = (integrationPeriodDuration + FIELD_DURATION_NTSC) / integratedAavFields;
+                        if (Math.Abs(calcDuration - FIELD_DURATION_NTSC) > 1.0)
                         {
                             // NTSC field is not 16.68 ms
                             failedValidation = true;
@@ -220,13 +247,25 @@ namespace Tangra.OCR.TimeExtraction
                 else
                     m_Corrector.RegisterSuccessfulTimestamp(frameNo, oddFieldOSD, evenFieldOSD, oddFieldTimestamp, evenFieldTimestamp);
 
-                if (oddFieldOSD.FrameNumber == evenFieldOSD.FrameNumber - integratedAavFields + 1)
+                if (oddFieldOSD.ContainsFrameNumbers)
                 {
-                    return failedValidation ? DateTime.MinValue : oddFieldTimestamp;
+                    if (oddFieldOSD.FrameNumber == evenFieldOSD.FrameNumber - integratedAavFields + 1)
+                    {
+                        return failedValidation ? DateTime.MinValue : oddFieldTimestamp;
+                    }
+                    else
+                    {
+                        return failedValidation ? DateTime.MinValue : evenFieldTimestamp;
+                    }                    
                 }
                 else
                 {
-                    return failedValidation ? DateTime.MinValue : evenFieldTimestamp;
+                    if (failedValidation) return DateTime.MinValue;
+
+                    if (m_EvenBeforeOdd)
+                        return evenFieldTimestamp;
+                    else
+                        return oddFieldTimestamp;
                 }
             }
             catch (Exception ex)

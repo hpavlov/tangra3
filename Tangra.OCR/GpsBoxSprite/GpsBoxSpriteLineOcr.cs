@@ -80,8 +80,6 @@ namespace Tangra.OCR.GpsBoxSprite
 
             SubPixelImage subPixels = new SubPixelImage(processedPixels, frameWidth, frameHeight);
 
-            //int blockIntWidth = (int) Math.Ceiling(m_BlockWidth);
-            //int blockFieldHeight = (int)Math.Ceiling((m_Bottom - m_Top) / 2.0);
             foreach (var blockIndex in m_BlockIndexes)
             {
                 decimal x0 = m_Left + blockIndex * m_BlockWidth;
@@ -93,10 +91,10 @@ namespace Tangra.OCR.GpsBoxSprite
                     {
                         var pix = subPixels.GetWholePixelAt(x0 + x, y);
                         var fieldY = (y - m_Top) / 2;
-                        if (y % 2 == 1)
-                            oddBlock[fieldY, x] = pix;
-                        else
+                        if (y % 2 == 1) /* the firt line, line 0, is Odd line*/
                             evenBlock[fieldY, x] = pix;
+                        else
+                            oddBlock[fieldY, x] = pix;
                     }
                 }
 

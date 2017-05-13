@@ -22,7 +22,7 @@ namespace Tangra.OCR.TimeExtraction
 		private long m_PrevEvenFieldNo;
         private IVtiTimeStamp m_PrevOddFieldOSD;
         private IVtiTimeStamp m_PrevEvenFieldOSD;
-		private VideoFormat m_VideoFormat;
+		private VideoFormat? m_VideoFormat;
 
 		public void Reset(VideoFormat? videoFormat)
 		{
@@ -35,10 +35,10 @@ namespace Tangra.OCR.TimeExtraction
 			if (!videoFormat.HasValue)
 				throw new ArgumentException();
 
-			m_VideoFormat = videoFormat.Value;
+			m_VideoFormat = videoFormat;
 		}
 
-        public bool TryToCorrect(int frameNo, int frameStep, int? aavIntegratedFields, IVtiTimeStamp oddFieldOSD, IotaVtiTimeStamp evenFieldOSD, bool evenBeforeOdd, ref DateTime oddFieldTimestamp, ref DateTime evenFieldTimestamp, out string correctionDebugInfo)
+        public bool TryToCorrect(int frameNo, int frameStep, int? aavIntegratedFields, IVtiTimeStamp oddFieldOSD, IVtiTimeStamp evenFieldOSD, bool evenBeforeOdd, ref DateTime oddFieldTimestamp, ref DateTime evenFieldTimestamp, out string correctionDebugInfo)
 		{
             if (m_PrevFrameNo == -1 || m_PrevOddTicks == -1 || m_PrevEvenTicks == -1)
             {
@@ -53,8 +53,8 @@ namespace Tangra.OCR.TimeExtraction
                     frameStep);
 
             float knownFrameDuration = m_VideoFormat == VideoFormat.PAL
-                        ? 2 * IotaVtiOcrProcessor.FIELD_DURATION_PAL
-                        : 2 * IotaVtiOcrProcessor.FIELD_DURATION_NTSC;
+                        ? 2 * VtiTimeStampComposer.FIELD_DURATION_PAL
+                        : 2 * VtiTimeStampComposer.FIELD_DURATION_NTSC;
 
 			double fieldDuration;
 
@@ -154,9 +154,9 @@ namespace Tangra.OCR.TimeExtraction
 
         private bool TryCorrectTimestamp(long prevFieldTimestamp, DateTime fieldToCorrectTimestamp, IVtiTimeStamp fieldToCorrect, int frameStep, int? aavIntegratedFields, bool isAav)
 		{
-            double stepCorrection = frameStep > 1 ? ((20000 * (frameStep - 1) * (m_VideoFormat == VideoFormat.PAL ? IotaVtiOcrProcessor.FIELD_DURATION_PAL : IotaVtiOcrProcessor.FIELD_DURATION_NTSC))) : 0;
-            double fieldDistance = (10000 * (m_VideoFormat == VideoFormat.PAL ? IotaVtiOcrProcessor.FIELD_DURATION_PAL : IotaVtiOcrProcessor.FIELD_DURATION_NTSC));
-            double aavCorrection = aavIntegratedFields.HasValue ? (10000 * (aavIntegratedFields.Value - 2) * (m_VideoFormat == VideoFormat.PAL ? IotaVtiOcrProcessor.FIELD_DURATION_PAL : IotaVtiOcrProcessor.FIELD_DURATION_NTSC)) : 0;
+            double stepCorrection = frameStep > 1 ? ((20000 * (frameStep - 1) * (m_VideoFormat == VideoFormat.PAL ? VtiTimeStampComposer.FIELD_DURATION_PAL : VtiTimeStampComposer.FIELD_DURATION_NTSC))) : 0;
+            double fieldDistance = (10000 * (m_VideoFormat == VideoFormat.PAL ? VtiTimeStampComposer.FIELD_DURATION_PAL : VtiTimeStampComposer.FIELD_DURATION_NTSC));
+            double aavCorrection = aavIntegratedFields.HasValue ? (10000 * (aavIntegratedFields.Value - 2) * (m_VideoFormat == VideoFormat.PAL ? VtiTimeStampComposer.FIELD_DURATION_PAL : VtiTimeStampComposer.FIELD_DURATION_NTSC)) : 0;
 			long expectedTimestamp =
                 prevFieldTimestamp + (long)Math.Round(stepCorrection + fieldDistance + aavCorrection);
 
@@ -251,14 +251,14 @@ namespace Tangra.OCR.TimeExtraction
 		private bool IsFieldDurationOkay(double fieldDuration)
 		{
 			if (m_VideoFormat == VideoFormat.PAL &&
-				(Math.Abs(fieldDuration - IotaVtiOcrProcessor.FIELD_DURATION_PAL) > 1.0))
+                (Math.Abs(fieldDuration - VtiTimeStampComposer.FIELD_DURATION_PAL) > 1.0))
 			{
 				// PAL field is not 20ms
 				return false;
 			}
 
 			if (m_VideoFormat == VideoFormat.NTSC &&
-				(Math.Abs(fieldDuration - IotaVtiOcrProcessor.FIELD_DURATION_NTSC) > 1.0))
+                (Math.Abs(fieldDuration - VtiTimeStampComposer.FIELD_DURATION_NTSC) > 1.0))
 			{
 				// NTSC field is not 20ms
 				return false;

@@ -8,6 +8,8 @@ using System.Linq;
 using System.Security.Policy;
 using System.Text;
 using System.Text.RegularExpressions;
+using Tangra.OCR.IotaVtiOsdProcessor;
+using Tangra.OCR.TimeExtraction;
 
 namespace Tangra.OCR.GpsBoxSprite
 {
@@ -57,7 +59,9 @@ namespace Tangra.OCR.GpsBoxSprite
     public class GpsBoxSpriteOcrProcessor
     {
         private List<GpsBoxSpriteLineOcr> m_Lines = new List<GpsBoxSpriteLineOcr>();
-        private List<BlockSignature> m_Signatures = new List<BlockSignature>(); 
+        private List<BlockSignature> m_Signatures = new List<BlockSignature>();
+        private List<OcrCalibrationFrame> m_CalibrationFrames = new List<OcrCalibrationFrame>();
+        private List<Tuple<decimal[,], decimal[,]>> m_CalibrationBlocks = new List<Tuple<decimal[,], decimal[,]>>();
 
         private int m_FrameWidth;
         private int m_FrameHeight;
@@ -68,23 +72,14 @@ namespace Tangra.OCR.GpsBoxSprite
         static int[] TWOLINE_LINE1_INDEXES = new int[] { 0, 1, 3, 4, 6, 7, 9, 10, 12, 13, 15, 16 };
         static int[] TWOLINE_LINE2_INDEXES = new int[] { 0, 1, 2, 3, 5, 9, 10, 11, 12, 14 };
 
-        public static GpsBoxSpriteOcrProcessor CreateAndCalibrateProcessor(List<OcrCalibrationFrame> lineConfigs, Tuple<int, int>[] topBottoms, Tuple<decimal, decimal>[] leftWidths, int frameWidth, int frameHeight)
-        {
-            var processor = new GpsBoxSpriteOcrProcessor(lineConfigs, topBottoms, leftWidths, frameWidth, frameHeight);
-            if (processor.IsCalibrated)
-                return processor;
-
-            return null;
-        }
-
-        private GpsBoxSpriteOcrProcessor(List<OcrCalibrationFrame> lineConfigs, Tuple<int, int>[] topBottoms, Tuple<decimal, decimal>[] leftWidths, int frameWidth, int frameHeight)
+        public GpsBoxSpriteOcrProcessor(List<OcrCalibrationFrame> calibrationFrames, Tuple<int, int>[] topBottoms, Tuple<decimal, decimal>[] leftWidths, int frameWidth, int frameHeight)
         {
             m_FrameWidth = frameWidth;
             m_FrameHeight = frameHeight;
 
             if (topBottoms.Length == 2)
             {
-                if (IsToLineConfiguration(lineConfigs, topBottoms))
+                if (IsToLineConfiguration(calibrationFrames, topBottoms))
                     CreateTwoLineConfiguration(topBottoms, leftWidths);
             }
             else
@@ -92,14 +87,26 @@ namespace Tangra.OCR.GpsBoxSprite
                 return;
             }
 
-            var allBlocks = new List<Tuple<decimal[,], decimal[,]>>();
-            foreach (var configFrame in lineConfigs)
-            {
-                ExtractBlockNumbers(configFrame.ProcessedPixels, allBlocks);
-            }
-            CategorizeInitialBlocks(allBlocks);
-            OCRBlockSignatures();
+            m_CalibrationFrames.AddRange(calibrationFrames);
 
+            foreach (var configFrame in calibrationFrames)
+                ExtractBlockNumbers(configFrame.ProcessedPixels);
+
+
+            m_Signatures.Clear();
+            var allBlocks = m_CalibrationBlocks.Select(x => x.Item1).Union(m_CalibrationBlocks.Select(x => x.Item2)).ToList();
+            CategorizeInitialCalibrationBlocks(allBlocks);
+            AttemtCalibration();
+        }
+
+        private void AttemtCalibration()
+        {
+            OCRBlockSignatures();            
+            CheckSignaturesAndCompleteCalibrationIfPossible();
+        }
+
+        private void CheckSignaturesAndCompleteCalibrationIfPossible()
+        {
             foreach (var unrecSig in m_Signatures.Where(x => x.Digit == null))
             {
                 var individChars = new List<int>();
@@ -115,28 +122,107 @@ namespace Tangra.OCR.GpsBoxSprite
                     var arrVals = dict.Values.ToArray();
                     Array.Sort(arrVals, arrKeys);
 
-                    if (arrVals[arrVals.Length - 1] > 0.66*unrecSig.AllBlocks.Count)
+                    if (arrVals[arrVals.Length - 1] > 0.66 * unrecSig.AllBlocks.Count)
                     {
                         unrecSig.Digit = arrKeys[arrKeys.Length - 1];
                     }
                 }
             }
 
-            if (m_Signatures.Count(x => x.Digit == null) < m_Signatures.Count * 0.06)
+            var unrecSigPerc = m_Signatures.Count(x => x.Digit == null) * 100.0 / m_Signatures.Count;
+            if (unrecSigPerc < 6 /* 6 %*/)
             {
                 var dictChars = m_Signatures.Where(x => x.Digit != null).GroupBy(x => x.Digit).ToDictionary(x => x.Key, y => y.ToList());
-                IsCalibrated = dictChars.Keys.Min() == 0 && dictChars.Keys.Max() == 9 && dictChars.Keys.Count == 10;
-                if (IsCalibrated)
+                var sigLocated94Percent = dictChars.Keys.Min() >= 0 && dictChars.Keys.Count >= 9;
+                if (sigLocated94Percent)
                 {
                     // Remove the potentially bad matches from the signatures
                     m_Signatures = m_Signatures.Where(x => x.Digit != null).ToList();
+
+                    if (CompleteOcrCalibration())
+                    {
+                        IsCalibrated = true;
+                    }
+                }
+                else
+                {
+                    //GetBlockSignaturesImage().Save(@"C:\Work\gbs-debug.bmp");
                 }
             }
         }
 
-        private void CategorizeInitialBlocks(List<Tuple<decimal[,], decimal[,]>> blocks)
+        private bool CompleteOcrCalibration()
         {
-            var allBlocks = blocks.Select(x => x.Item1).Union(blocks.Select(x => x.Item2)).ToArray();
+            var allOCRedTimeStamps = new List<Tuple<GpxBoxSpriteVtiTimeStamp, GpxBoxSpriteVtiTimeStamp>>();
+            foreach (var frame in m_CalibrationFrames)
+            {
+                Process(frame.ProcessedPixels, -1);
+                allOCRedTimeStamps.Add(Tuple.Create(CurrentOcredOddFieldTimeStamp.Clone(), CurrentOcredEvenFieldTimeStamp.Clone()));
+            }
+
+            #region Determine Field Duration
+
+            var oddFieldDur = allOCRedTimeStamps.Select(x => Math.Abs(x.Item1.Milliseconds10First - x.Item1.Milliseconds10Second)).ToList();
+            var evenFieldDur = allOCRedTimeStamps.Select(x => Math.Abs(x.Item2.Milliseconds10First - x.Item2.Milliseconds10Second)).ToList();
+            var allFieldDur = new List<int>();
+            allFieldDur.AddRange(oddFieldDur);
+            allFieldDur.AddRange(evenFieldDur);
+
+            var dict = allFieldDur.ToLookup(x => x)
+                        .ToDictionary(x => x.Key, y => y.Count());
+
+            double fieldDurationMS = 0;
+            if (dict.Count == 1)
+            {
+                fieldDurationMS = dict.Keys.First() / 10.0;
+            }
+            else
+            {
+                var arrKeys = dict.Select(x => x.Key).ToArray();
+                var arrVals = dict.Select(x => x.Value).ToArray();
+                Array.Sort(arrVals, arrKeys);
+                fieldDurationMS = arrKeys[arrKeys.Length - 1] / 10.0;
+            }
+
+            if (Math.Abs(Math.Abs(fieldDurationMS) - VtiTimeStampComposer.FIELD_DURATION_PAL) < 0.15)
+                VideoFormat = TimeExtraction.VideoFormat.PAL;
+            else if (Math.Abs(Math.Abs(fieldDurationMS) - VtiTimeStampComposer.FIELD_DURATION_NTSC) < 0.15)
+                VideoFormat = TimeExtraction.VideoFormat.NTSC;
+            else
+                VideoFormat = null;
+            #endregion;
+
+            var lstSecMinFirst =
+                allOCRedTimeStamps.Select(
+                    x =>
+                        Math.Max(x.Item2.Milliseconds10First, x.Item2.Milliseconds10Second) -
+                        Math.Max(x.Item1.Milliseconds10First, x.Item1.Milliseconds10Second)).ToList();
+
+            int cntNegative = lstSecMinFirst.Count(x => x < 0);
+            int cntPositive = lstSecMinFirst.Count(x => x > 0);
+            int cntZeroes = lstSecMinFirst.Count(x => x == 0);
+
+            if (cntZeroes > cntNegative && cntZeroes > cntPositive)
+            {
+                // Duplicated fields or only a single timestamp in the video frame ??
+            }
+            else if (cntNegative > cntZeroes && cntNegative > cntPositive)
+            {
+                EvenBeforeOdd = true;
+            }
+
+            return true;
+        }
+
+        internal VideoFormat? VideoFormat { get; private set; }
+        
+        internal bool EvenBeforeOdd { get; private set; }
+
+        internal uint[] CurrentImage;
+
+        private void CategorizeInitialCalibrationBlocks(List<decimal[,]> allBlocksList)
+        {
+            var allBlocks = allBlocksList.ToArray();
             m_BlockHeight = allBlocks[0].GetLength(0);
             m_BlockWidth = allBlocks[0].GetLength(1);
 
@@ -220,6 +306,65 @@ namespace Tangra.OCR.GpsBoxSprite
             }
         }
 
+        private void CategorizeCalibrationBlocks(List<Tuple<decimal[,], decimal[,]>> blocks)
+        {
+            var allBlocks = blocks.Select(x => x.Item1).Union(m_CalibrationBlocks.Select(x => x.Item2)).ToArray();
+            m_BlockHeight = allBlocks[0].GetLength(0);
+            m_BlockWidth = allBlocks[0].GetLength(1);
+
+            var diffMatrixKeys = new List<Tuple<int, int>>();
+            var diffMatrix = new List<decimal>();
+
+            for (int i = 0; i < allBlocks.Length; i++)
+            {
+                for (int j = 0; j < m_Signatures.Count; j++)
+                {
+                    var diff = ComputeBlockDifference(allBlocks[i], m_Signatures[j].Signature);
+
+                    diffMatrixKeys.Add(Tuple.Create(i, j));
+                    diffMatrix.Add(diff);
+                }
+            }
+
+            var diffArr = diffMatrix.ToArray();
+            var diffKeys = diffMatrixKeys.ToArray();
+            Array.Sort(diffArr, diffKeys);
+
+            var unmatchedToSigIndexes = new List<int>();
+            var matchedToSigIndexes = new List<int>();
+            var sigIndexesToRecalc = new List<int>();
+            for (int i = 0; i < diffKeys.Length; i++)
+            {
+                var key = diffKeys[i];
+
+                if (diffArr[i] > 10 * 255)
+                {
+                    if (!unmatchedToSigIndexes.Contains(key.Item1))
+                        unmatchedToSigIndexes.Add(key.Item1);
+                    break; /* max diff of 10 pixels*/
+                }
+
+                if (!matchedToSigIndexes.Contains(key.Item1))
+                    matchedToSigIndexes.Add(key.Item1);
+
+                m_Signatures[key.Item2].AllBlocks.Add(allBlocks[key.Item1]);
+                if (!sigIndexesToRecalc.Contains(key.Item2)) sigIndexesToRecalc.Add(key.Item2);
+            }
+
+            foreach(var sigIndex in sigIndexesToRecalc)
+                m_Signatures[sigIndex].ComputeSignature();
+
+            var unmatched = unmatchedToSigIndexes.Where(x => !matchedToSigIndexes.Contains(x)).ToList();
+            if (unmatched.Count > 0)
+            {
+                var remaining = new List<decimal[,]>();
+                foreach (var idx in unmatched)
+                    remaining.Add(allBlocks[idx]);
+
+                CategorizeInitialCalibrationBlocks(remaining);
+            }
+        }
+
         private void OCRBlockSignatures()
         {
             for (int i = 0; i < m_Signatures.Count; i++)
@@ -271,7 +416,7 @@ namespace Tangra.OCR.GpsBoxSprite
                             int numBlacks = 1;
                             bool whiteOnLeft = false;
                             bool whiteOnRight = false;
-                            for (int i = idx - 1; i > 0; i--)
+                            for (int i = idx - 1; i > 0 + 1 /* need to me more than 1 pixel */; i--)
                             {
                                 if (!flags[i]) numBlacks++;
                                 else
@@ -280,7 +425,7 @@ namespace Tangra.OCR.GpsBoxSprite
                                     break;
                                 }
                             }
-                            for (int i = idx + 1; i < width; i++)
+                            for (int i = idx + 1; i < width - 1 /* need to me more than 1 pixel */; i++)
                             {
                                 if (!flags[i]) numBlacks++;
                                 else
@@ -438,7 +583,19 @@ namespace Tangra.OCR.GpsBoxSprite
 
                     if (ch == ' ')
                     {
-                        Trace.WriteLine(flags);
+                        var wbFlags = string.Join("", flags.Select(x => x ? 'w' : 'b'));
+                        var trimmedBs = wbFlags.Trim('b');
+                        if (trimmedBs.Length >= hor80Percent &&
+                            trimmedBs.Trim('w').Length > 0 &&
+                            trimmedBs.Trim('w').Trim('b').Length == 0)
+                        {
+                            ch = 'o';
+                        }
+                    }
+
+                    if (ch == ' ')
+                    {
+                        Trace.WriteLine(string.Format("Cannot match fill pattern: {0}", string.Join("", flags.Select(x => x ? 'w' : 'b'))));
                     }
                 }
                 horizontals[y] = ch;
@@ -460,7 +617,7 @@ namespace Tangra.OCR.GpsBoxSprite
         private Regex s_Regex0;
         private static Regex s_Regex5 = new Regex("^\\[+W+\\]+o*?$", RegexOptions.Compiled | RegexOptions.Singleline);
 
-        private static Regex s_Regex1 = new Regex("^[I\\[\\]]+W*?$", RegexOptions.Compiled | RegexOptions.Singleline);
+        private static Regex s_Regex1 = new Regex("^[I\\[\\]]+[IW]*?$", RegexOptions.Compiled | RegexOptions.Singleline);
         private static Regex s_Regex7 = new Regex("^W+\\]+[I\\[\\]]+$", RegexOptions.Compiled | RegexOptions.Singleline);
         private static Regex s_Regex4 = new Regex("^[\\]I]+W*o+W+[\\]I]+$", RegexOptions.Compiled | RegexOptions.Singleline);
 
@@ -610,22 +767,38 @@ namespace Tangra.OCR.GpsBoxSprite
             m_Lines.Add(new GpsBoxSpriteLineOcr(topBottoms[1].Item1, topBottoms[1].Item2, leftWidths[1].Item1, leftWidths[1].Item2, TWOLINE_LINE2_INDEXES));
         }
 
-        private void ExtractBlockNumbers(uint[] processedPixels, List<Tuple<decimal[,], decimal[,]>> allBlocks)
+        private List<Tuple<decimal[,], decimal[,]>> ExtractBlockNumbers(uint[] processedPixels)
         {
+            var rv = new List<Tuple<decimal[,], decimal[,]>>();
+
             foreach (var line in m_Lines)
             {
                 var lineBlocks = line.ExtractBlockNumbers(processedPixels, m_FrameWidth, m_FrameHeight);
-                allBlocks.AddRange(lineBlocks);
+                m_CalibrationBlocks.AddRange(lineBlocks);
+                rv.AddRange(lineBlocks);
             }
+
+            return rv;
         }
 
-        public void ProcessCalibrationFrame(OcrCalibrationFrame frame)
+        public void ProcessCalibrationFrame(OcrCalibrationFrame calibFrame)
         {
+            m_CalibrationFrames.Add(calibFrame);
 
+            var newBlocks = ExtractBlockNumbers(calibFrame.ProcessedPixels);
+
+            CategorizeCalibrationBlocks(newBlocks);
+            AttemtCalibration();
         }
 
-        public DateTime ExtractTime(int frameNo, int frameStep, uint[] processedPixels)
+        internal GpxBoxSpriteVtiTimeStamp CurrentOcredOddFieldTimeStamp { get; private set; }
+
+        internal GpxBoxSpriteVtiTimeStamp CurrentOcredEvenFieldTimeStamp { get; private set; }
+
+        public void Process(uint[] processedPixels, int frameNo)
         {
+            CurrentImage = processedPixels;
+
             var oddFrameLines = new List<List<int?>>();
             var evenFrameLines = new List<List<int?>>();
 
@@ -636,11 +809,12 @@ namespace Tangra.OCR.GpsBoxSprite
                 var lineBlocks = line.ExtractBlockNumbers(processedPixels, m_FrameWidth, m_FrameHeight);
                 foreach (var block in lineBlocks)
                 {
-                    var oddDigit = OCRBlockDigit(block.Item1, line.BlockIntWidth, line.BlockIntHeight);
-                    var evenDigit = OCRBlockDigit(block.Item1, line.BlockIntWidth, line.BlockIntHeight);
+                    var digit1 = OCRBlockDigit(block.Item1, line.BlockIntWidth, line.BlockIntHeight);
+                    var digit2 = OCRBlockDigit(block.Item2, line.BlockIntWidth, line.BlockIntHeight);
 
-                    oddDigits.Add(oddDigit);
-                    evenDigits.Add(evenDigit);
+                    // Note: EvenBeforeOdd is used later to determine the correct order
+                    oddDigits.Add(digit1);
+                    evenDigits.Add(digit2); 
                 }
 
                 oddFrameLines.Add(oddDigits);
@@ -648,32 +822,40 @@ namespace Tangra.OCR.GpsBoxSprite
             }
 
             if (m_Lines.Count == 2)
-                return ExtractTwoLineLayoutTime(oddFrameLines, evenFrameLines);
-
-            return DateTime.MinValue;
+                ExtractTwoLineLayoutTime(oddFrameLines, evenFrameLines);
         }
 
-        private DateTime ExtractTwoLineLayoutTime(List<List<int?>> oddLines, List<List<int?>> evenLines)
+        private int GetTwoDigitInteger(int? tens, int? ones)
         {
-            var dateTimeEven = DateTime.MinValue;
-            var dateTimeOdd = DateTime.MinValue;
+            return (tens ?? 0) * 10 + (ones ?? 0);
+        }
 
-            // TODO: Make this fail-safe and working even when some digits haven't been recognized or have been recognized incorrectly
-
-            if (oddLines[0].Count == 12 && evenLines[0].Count == 12 && oddLines[0].All(x => x.HasValue) && evenLines[0].All(x => x.HasValue))
+        private void ExtractTwoLineLayoutTime(List<List<int?>> oddLines, List<List<int?>> evenLines)
+        {
+            if (oddLines[0].Count == 12 && evenLines[0].Count == 12 &&
+                oddLines[1].Count == 10 && evenLines[1].Count == 10)
             {
-                dateTimeEven = new DateTime(evenLines[0][10].Value * 10 + evenLines[0][11].Value + 2000, evenLines[0][8].Value * 10 + evenLines[0][9].Value, evenLines[0][6].Value * 10 + evenLines[0][7].Value,
-                                            evenLines[0][0].Value * 10 + evenLines[0][1].Value, evenLines[0][2].Value * 10 + evenLines[0][3].Value, evenLines[0][4].Value * 10 + evenLines[0][5].Value);
-                dateTimeOdd = new DateTime(oddLines[0][10].Value * 10 + oddLines[0][11].Value + 2000, oddLines[0][8].Value * 10 + oddLines[0][9].Value, oddLines[0][6].Value * 10 + oddLines[0][7].Value,
-                                            oddLines[0][0].Value * 10 + oddLines[0][1].Value, oddLines[0][2].Value * 10 + oddLines[0][3].Value, oddLines[0][4].Value * 10 + oddLines[0][5].Value);
+                int yearOdd = GetTwoDigitInteger(oddLines[0][10], oddLines[0][11]) + 2000;
+                int monthOdd = GetTwoDigitInteger(oddLines[0][8], oddLines[0][9]);
+                int dayOdd = GetTwoDigitInteger(oddLines[0][6], oddLines[0][7]);
+                int hourOdd = GetTwoDigitInteger(oddLines[0][0], oddLines[0][1]);
+                int minOdd = GetTwoDigitInteger(oddLines[0][2], oddLines[0][3]);
+                int secOdd = GetTwoDigitInteger(oddLines[0][4], oddLines[0][5]);
+                int ms10Odd1 = (GetTwoDigitInteger(oddLines[1][0], oddLines[1][1]) * 100 + GetTwoDigitInteger(oddLines[1][2], oddLines[1][3])) * 10 + (oddLines[1][4] ?? 0);
+                int ms10Odd2 = (GetTwoDigitInteger(oddLines[1][5], oddLines[1][6]) * 100 + GetTwoDigitInteger(oddLines[1][7], oddLines[1][8])) * 10 + (oddLines[1][9] ?? 0);
 
-                if (oddLines[1].Count == 10 && evenLines[1].Count == 10 && oddLines[1].All(x => x.HasValue) && evenLines[1].All(x => x.HasValue))
-                {
-                    // TODO: Add milliseconds
-                }
+                int yearEven = GetTwoDigitInteger(evenLines[0][10], evenLines[0][11]) + 2000;
+                int monthEven = GetTwoDigitInteger(evenLines[0][8], evenLines[0][9]);
+                int dayEven = GetTwoDigitInteger(evenLines[0][6], evenLines[0][7]);
+                int hourEven = GetTwoDigitInteger(evenLines[0][0], evenLines[0][1]);
+                int minEven = GetTwoDigitInteger(evenLines[0][2], evenLines[0][3]);
+                int secEven = GetTwoDigitInteger(evenLines[0][4], evenLines[0][5]);
+                int ms10Even1 = (GetTwoDigitInteger(evenLines[1][0], evenLines[1][1]) * 100 + GetTwoDigitInteger(evenLines[1][2], evenLines[1][3])) * 10 + (evenLines[1][4] ?? 0);
+                int ms10Even2 = (GetTwoDigitInteger(evenLines[1][5], evenLines[1][6]) * 100 + GetTwoDigitInteger(evenLines[1][7], evenLines[1][8])) * 10 + (evenLines[1][9] ?? 0);
+
+                CurrentOcredOddFieldTimeStamp = new GpxBoxSpriteVtiTimeStamp(yearOdd, monthOdd, dayOdd, hourOdd, minOdd, secOdd, ms10Odd1, ms10Odd2);
+                CurrentOcredEvenFieldTimeStamp = new GpxBoxSpriteVtiTimeStamp(yearEven, monthEven, dayEven, hourEven, minEven, secEven, ms10Even1, ms10Even2);
             }
-
-            return dateTimeEven;
         }
 
         private int? OCRBlockDigit(decimal[,] pixels, int width, int height)
