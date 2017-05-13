@@ -81,7 +81,7 @@
     <Compile Include="GpsBoxSpriteOcr.cs" />
     <Compile Include="GpsBoxSprite\GpsBoxSpriteLineOcr.cs" />
     <Compile Include="GpsBoxSprite\GpsBoxSpriteOcrProcessor.cs" />
-    <Compile Include="IotaVtiOcrCorrector.cs" />
+    <Compile Include="TimeExtraction\OcrTimeStampCorrector.cs" />
     <Compile Include="IotaVtiOrcManaged.cs" />
     <Compile Include="IotaVtiOsdProcessor\IotaVtiOcrCalibratedState.cs" />
     <Compile Include="IotaVtiOsdProcessor\IotaVtiOcrCalibratingState.cs" />
@@ -93,6 +93,8 @@
     <Compile Include="Model\SubPixelImage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TangraCore.cs" />
+    <Compile Include="TimeExtraction\IVtiTimeStamp.cs" />
+    <Compile Include="TimeExtraction\VtiTimeStampComposer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tangra.Model\Tangra.Model.csproj">

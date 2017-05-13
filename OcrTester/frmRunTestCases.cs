@@ -251,9 +251,9 @@ namespace OcrTester
             var oddFieldOSD = new Tangra.OCR.IotaVtiOsdProcessor.IotaVtiTimeStampStrings() { HH = "3", MM = "55", SS = "24", FFFF1 = "6819", FFFF2 = "", FRAMENO = "141692", NumSat = '8' };
             var evenFieldOSD = new Tangra.OCR.IotaVtiOsdProcessor.IotaVtiTimeStampStrings() { HH = "3", MM = "55", SS = "24", FFFF1 = "", FFFF2 = "6996", FRAMENO = "141693", NumSat = '8' };
 
-            processor.m_Corrector.m_PrevEvenTicks = new DateTime(1, 1, 1, 3, 55, 24, 665).Ticks;
-            processor.m_Corrector.m_PrevOddTicks = new DateTime(1, 1, 1, 3, 55, 24, 649).Ticks;
-            DateTime dateTime = processor.ExtractDateTime(724, 1, new Tangra.OCR.IotaVtiOsdProcessor.IotaVtiTimeStamp(oddFieldOSD), new Tangra.OCR.IotaVtiOsdProcessor.IotaVtiTimeStamp(evenFieldOSD));
+            //processor.m_Corrector.m_PrevEvenTicks = new DateTime(1, 1, 1, 3, 55, 24, 665).Ticks;
+            //processor.m_Corrector.m_PrevOddTicks = new DateTime(1, 1, 1, 3, 55, 24, 649).Ticks;
+            //DateTime dateTime = processor.ExtractDateTime(724, 1, new Tangra.OCR.IotaVtiOsdProcessor.IotaVtiTimeStamp(oddFieldOSD), new Tangra.OCR.IotaVtiOsdProcessor.IotaVtiTimeStamp(evenFieldOSD));
         }
     }
 }

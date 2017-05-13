@@ -9,18 +9,19 @@ using System.Linq;
 using System.Text;
 using Tangra.Model.Config;
 using Tangra.OCR.IotaVtiOsdProcessor;
+using Tangra.OCR.TimeExtraction;
 
-namespace Tangra.OCR
+namespace Tangra.OCR.TimeExtraction
 {
-	internal class IotaVtiOcrCorrector
+	internal class OcrTimeStampCorrector
 	{
 		private int m_PrevFrameNo;
 		internal long m_PrevOddTicks;
 		internal long m_PrevEvenTicks;
 		private long m_PrevOddFieldNo;
 		private long m_PrevEvenFieldNo;
-		private IotaVtiTimeStamp m_PrevOddFieldOSD;
-		private IotaVtiTimeStamp m_PrevEvenFieldOSD;
+        private IVtiTimeStamp m_PrevOddFieldOSD;
+        private IVtiTimeStamp m_PrevEvenFieldOSD;
 		private VideoFormat m_VideoFormat;
 
 		public void Reset(VideoFormat? videoFormat)
@@ -37,7 +38,7 @@ namespace Tangra.OCR
 			m_VideoFormat = videoFormat.Value;
 		}
 
-        public bool TryToCorrect(int frameNo, int frameStep, int? aavIntegratedFields, IotaVtiTimeStamp oddFieldOSD, IotaVtiTimeStamp evenFieldOSD, bool evenBeforeOdd, ref DateTime oddFieldTimestamp, ref DateTime evenFieldTimestamp, out string correctionDebugInfo)
+        public bool TryToCorrect(int frameNo, int frameStep, int? aavIntegratedFields, IVtiTimeStamp oddFieldOSD, IotaVtiTimeStamp evenFieldOSD, bool evenBeforeOdd, ref DateTime oddFieldTimestamp, ref DateTime evenFieldTimestamp, out string correctionDebugInfo)
 		{
             if (m_PrevFrameNo == -1 || m_PrevOddTicks == -1 || m_PrevEvenTicks == -1)
             {
@@ -151,7 +152,7 @@ namespace Tangra.OCR
 			return true;
 		}
 
-        private bool TryCorrectTimestamp(long prevFieldTimestamp, DateTime fieldToCorrectTimestamp, IotaVtiTimeStamp fieldToCorrect, int frameStep, int? aavIntegratedFields, bool isAav)
+        private bool TryCorrectTimestamp(long prevFieldTimestamp, DateTime fieldToCorrectTimestamp, IVtiTimeStamp fieldToCorrect, int frameStep, int? aavIntegratedFields, bool isAav)
 		{
             double stepCorrection = frameStep > 1 ? ((20000 * (frameStep - 1) * (m_VideoFormat == VideoFormat.PAL ? IotaVtiOcrProcessor.FIELD_DURATION_PAL : IotaVtiOcrProcessor.FIELD_DURATION_NTSC))) : 0;
             double fieldDistance = (10000 * (m_VideoFormat == VideoFormat.PAL ? IotaVtiOcrProcessor.FIELD_DURATION_PAL : IotaVtiOcrProcessor.FIELD_DURATION_NTSC));
@@ -194,10 +195,7 @@ namespace Tangra.OCR
 			{
 				// We can correct the one or two offending characters
 
-				fieldToCorrect.Hours = expectedDateTime.Hour;
-				fieldToCorrect.Minutes = expectedDateTime.Minute;
-				fieldToCorrect.Seconds = expectedDateTime.Second;
-				fieldToCorrect.Milliseconds10 = (int)Math.Round((expectedDateTime.Ticks % 10000000) / 1000.0);
+			    fieldToCorrect.Correct(expectedDateTime.Hour, expectedDateTime.Minute, expectedDateTime.Second, (int) Math.Round((expectedDateTime.Ticks%10000000)/1000.0));
 
 				return true;
 			}
@@ -229,15 +227,15 @@ namespace Tangra.OCR
 			return new string(result);
 		}
 
-		public void RegisterSuccessfulTimestamp(int frameNo, IotaVtiTimeStamp oddFieldOSD, IotaVtiTimeStamp evenFieldOSD, DateTime oddFieldTimestamp, DateTime evenFieldTimestamp)
+        public void RegisterSuccessfulTimestamp(int frameNo, IVtiTimeStamp oddFieldOSD, IVtiTimeStamp evenFieldOSD, DateTime oddFieldTimestamp, DateTime evenFieldTimestamp)
 		{
 			m_PrevFrameNo = frameNo;
 			m_PrevOddTicks = oddFieldTimestamp.Ticks;
 			m_PrevEvenTicks = evenFieldTimestamp.Ticks;
 			m_PrevOddFieldNo = oddFieldOSD.FrameNumber;
 			m_PrevEvenFieldNo = evenFieldOSD.FrameNumber;
-			m_PrevOddFieldOSD = new IotaVtiTimeStamp(oddFieldOSD);
-			m_PrevEvenFieldOSD = new IotaVtiTimeStamp(evenFieldOSD);
+			m_PrevOddFieldOSD = new VtiTimeStamp(oddFieldOSD);
+			m_PrevEvenFieldOSD = new VtiTimeStamp(evenFieldOSD);
 		}
 
 		public bool OddEvenFieldDirectionIsKnown()

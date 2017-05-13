@@ -9,6 +9,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using Tangra.Model.Image;
+using Tangra.OCR.TimeExtraction;
 
 namespace Tangra.OCR.IotaVtiOsdProcessor
 {
@@ -92,16 +93,17 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 		}
 	}
 
-	internal class IotaVtiTimeStamp
+    internal class IotaVtiTimeStamp : IVtiTimeStamp
 	{
 		public IotaVtiTimeStamp(IotaVtiTimeStampStrings timeStampStrings)
 		{
 			int.TryParse(timeStampStrings.NumSat + "", out NumSat);
-            int.TryParse(timeStampStrings.HH, out Hours);
-            int.TryParse(timeStampStrings.MM, out Minutes);
-            int.TryParse(timeStampStrings.SS, out Seconds);
-			int.TryParse(timeStampStrings.FFFF1.Length == 4 ? timeStampStrings.FFFF1.Replace(' ', '0') : timeStampStrings.FFFF2.Replace(' ', '0'), out Milliseconds10);
-            int.TryParse(timeStampStrings.FRAMENO, out FrameNumber);
+		    int ival;
+            if (int.TryParse(timeStampStrings.HH, out ival)) Hours = ival;
+            if (int.TryParse(timeStampStrings.MM, out ival)) Minutes = ival;
+            if (int.TryParse(timeStampStrings.SS, out ival)) Seconds = ival;
+            if (int.TryParse(timeStampStrings.FFFF1.Length == 4 ? timeStampStrings.FFFF1.Replace(' ', '0') : timeStampStrings.FFFF2.Replace(' ', '0'), out ival)) Milliseconds10 = ival;
+            if (int.TryParse(timeStampStrings.FRAMENO, out ival)) FrameNumber = ival;
 		}
 
 		public IotaVtiTimeStamp(IotaVtiTimeStamp timeStamp)
@@ -114,11 +116,19 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 		}
 
 		public int NumSat;
-		public int Hours;
-		public int Minutes;
-		public int Seconds;
-		public int Milliseconds10;
-		public int FrameNumber;
+		public int Hours { get; private set; }
+        public int Minutes { get; private set; }
+        public int Seconds { get; private set; }
+        public int Milliseconds10 { get; private set; }
+        public int FrameNumber { get; private set; }
+
+        public void Correct(int hours, int minutes, int seconds, int milliseconds10)
+        {
+            Hours = hours;
+			Minutes = minutes;
+			Seconds = seconds;
+            Milliseconds10 = milliseconds10;
+        }
 	}
 
 	internal enum VideoFormat

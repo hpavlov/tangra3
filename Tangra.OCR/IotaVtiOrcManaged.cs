@@ -13,10 +13,11 @@ using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.Model.VideoOperations;
 using Tangra.OCR.IotaVtiOsdProcessor;
+using Tangra.OCR.TimeExtraction;
 
 namespace Tangra.OCR
 {
-	public class IotaVtiOrcManaged : ITimestampOcr
+    public class IotaVtiOrcManaged : ITimestampOcr, ICalibrationErrorProcessor
 	{
 	    private IVideoController m_VideoController;
 
@@ -41,9 +42,10 @@ namespace Tangra.OCR
 		private bool m_UseNativePreProcessing;
 
 		private bool m_ForceErrorReport;
-	    private int m_FrameStep = -1;
+        //private int m_FrameStep = -1;
+        //internal IotaVtiOcrCorrector m_Corrector = new IotaVtiOcrCorrector();
 
-		internal IotaVtiOcrCorrector m_Corrector = new IotaVtiOcrCorrector();
+	    private VtiTimeStampComposer m_TimeStampComposer;
 
 		public string NameAndVersion()
 		{
@@ -62,7 +64,6 @@ namespace Tangra.OCR
             m_Processor = null;
 			m_UseNativePreProcessing = performanceMode > 0;
 			m_ForceErrorReport = initializationData.ForceErrorReport;
-		    m_FrameStep = -1;
             m_CalibrationImages.Clear();
 		}
 
@@ -216,7 +217,7 @@ namespace Tangra.OCR
 
         public bool ExtractTime(int frameNo, int frameStep, uint[] data, out DateTime time)
 		{
-            if (m_Processor.IsCalibrated)
+            if (m_Processor.IsCalibrated && m_TimeStampComposer != null)
             {
                 if (m_VideoController != null)
                     m_VideoController.RegisterExtractingOcrTimestamps();
@@ -230,10 +231,10 @@ namespace Tangra.OCR
                 IotaVtiTimeStamp evenFieldOSD = m_Processor.CurrentOcredTimeStamp;
 
                 if (m_InitializationData.IntegratedAAVFrames > 0)
-                    time = ExtractAAVDateTime(frameNo, frameStep, oddFieldOSD, evenFieldOSD);
+                    time = m_TimeStampComposer.ExtractAAVDateTime(frameNo, frameStep, oddFieldOSD, evenFieldOSD);
                 else
                 {
-                    time = ExtractDateTime(frameNo, frameStep, oddFieldOSD, evenFieldOSD);
+                    time = m_TimeStampComposer.ExtractDateTime(frameNo, frameStep, oddFieldOSD, evenFieldOSD);
                 }
             }
             else
@@ -244,7 +245,7 @@ namespace Tangra.OCR
 
         public bool ExtractTime(int frameNo, int frameStep, uint[] oddPixels, uint[] evenPixels, int width, int height, out DateTime time)
 	    {
-            if (m_Processor.IsCalibrated)
+            if (m_Processor.IsCalibrated && m_TimeStampComposer != null)
             {
                 m_Processor.Process(oddPixels, width, height, null, frameNo, true);
                 IotaVtiTimeStamp oddFieldOSD = m_Processor.CurrentOcredTimeStamp;
@@ -252,7 +253,7 @@ namespace Tangra.OCR
                 m_Processor.Process(evenPixels, width, height, null, frameNo, false);
                 IotaVtiTimeStamp evenFieldOSD = m_Processor.CurrentOcredTimeStamp;
 
-                time = ExtractDateTime(frameNo, frameStep, oddFieldOSD, evenFieldOSD);
+                time = m_TimeStampComposer.ExtractDateTime(frameNo, frameStep, oddFieldOSD, evenFieldOSD);
             }
             else
                 time = DateTime.MinValue;
@@ -574,8 +575,10 @@ namespace Tangra.OCR
                 m_CalibrationImages.Add(string.Format(@"NLChD-{0}-odd.bmp", frameNo.ToString("0000000")), pixelsOddNoLChD);
             }
 
-			if (!wasCalibrated && m_Processor.IsCalibrated)
-				m_Corrector.Reset(m_Processor.VideoFormat);
+		    if (!wasCalibrated && m_Processor.IsCalibrated)
+		    {
+                m_TimeStampComposer = new VtiTimeStampComposer(m_Processor.VideoFormat, m_InitializationData.IntegratedAAVFrames, m_Processor.EvenBeforeOdd, m_VideoController, this, () => m_Processor.CurrentImage);
+		    }
 
 		    return m_Processor.IsCalibrated && !m_ForceErrorReport;
 		}
@@ -602,8 +605,10 @@ namespace Tangra.OCR
             if (!m_Processor.IsCalibrated)
                 m_Processor.Process(evenPixels, width, height, null, frameNo, false);
 
-			if (!wasCalibrated && m_Processor.IsCalibrated)
-				m_Corrector.Reset(m_Processor.VideoFormat);
+		    if (!wasCalibrated && m_Processor.IsCalibrated)
+		    {
+                m_TimeStampComposer = new VtiTimeStampComposer(m_Processor.VideoFormat, m_InitializationData.IntegratedAAVFrames, m_Processor.EvenBeforeOdd, m_VideoController, this, () => m_Processor.CurrentImage);
+		    }
 
             return m_Processor.IsCalibrated;
 	    }
@@ -621,205 +626,6 @@ namespace Tangra.OCR
         public uint[] GetLastUnmodifiedImage()
         {
             return m_LatestFrameImage;
-        }
-
-	    internal DateTime ExtractAAVDateTime(int frameNo, int frameStep, IotaVtiTimeStamp oddFieldOSD, IotaVtiTimeStamp evenFieldOSD)
-	    {
-            bool failedValidation = false;
-            string failedReason = null;
-
-	        if (oddFieldOSD == null || evenFieldOSD == null)
-		        return DateTime.MinValue;
-
-	        int integratedAavFields = 2 * m_InitializationData.IntegratedAAVFrames;
-
-            if (oddFieldOSD.FrameNumber != evenFieldOSD.FrameNumber - integratedAavFields + 1 &&
-                oddFieldOSD.FrameNumber != evenFieldOSD.FrameNumber + integratedAavFields - 1)
-            {
-                // Video fields are not consequtive
-                failedValidation = true;
-                failedReason = "Integration interval is incomplete";
-            }
-
-            try
-            {
-                //   | e               e |        |   o              o|
-                //   |.e.o|.e.o|.e.o|.e.o|        |.e.o|.e.o|.e.o|.e.o|
-
-                DateTime oddFieldTimestamp = new DateTime(1, 1, 1, oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds).AddMilliseconds(Math.Min(10000, oddFieldOSD.Milliseconds10) / 10.0f);
-                DateTime evenFieldTimestamp = new DateTime(1, 1, 1, evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds).AddMilliseconds(Math.Min(10000, evenFieldOSD.Milliseconds10) / 10.0f);
-
-                double integrationPeriodDuration = Math.Abs(new TimeSpan(oddFieldTimestamp.Ticks - evenFieldTimestamp.Ticks).TotalMilliseconds);
-
-                if (m_Processor.VideoFormat != null)
-                {
-                    if (m_Processor.VideoFormat.Value == VideoFormat.PAL)
-                    {
-                        var calcDuration = (integrationPeriodDuration + IotaVtiOcrProcessor.FIELD_DURATION_PAL) / integratedAavFields;
-                        if ((Math.Abs(calcDuration - IotaVtiOcrProcessor.FIELD_DURATION_PAL) > 1.0))
-                        {
-                            // PAL field is not 20 ms
-                            failedValidation = true;
-                            failedReason = string.Format("PAL field is not 20 ms. It is {0} ms", calcDuration);
-                        }
-                    }
-
-                    if (m_Processor.VideoFormat.Value == VideoFormat.NTSC)
-                    {
-                        var calcDuration = (integrationPeriodDuration + IotaVtiOcrProcessor.FIELD_DURATION_NTSC) / integratedAavFields;
-                        if (Math.Abs(calcDuration - IotaVtiOcrProcessor.FIELD_DURATION_NTSC) > 1.0)
-                        {
-                            // NTSC field is not 16.68 ms
-                            failedValidation = true;
-                            failedReason = string.Format("NTSC field is not 16.68 ms. It is {0} ms", calcDuration);
-                        }
-                    }                    
-                }
-
-                if (failedValidation)
-                {
-                    string correctionInfo;
-                    failedValidation = !m_Corrector.TryToCorrect(frameNo, frameStep, integratedAavFields, oddFieldOSD, evenFieldOSD, m_Processor.EvenBeforeOdd, ref oddFieldTimestamp, ref evenFieldTimestamp, out correctionInfo);
-                    failedReason += ". " + correctionInfo;
-                }
-
-                if (failedValidation)
-                {
-                    string errorText = string.Format("OCR ERR: FrameNo: {0}, Odd Timestamp: {1}:{2}:{3}.{4} {5}, Even Timestamp: {6}:{7}:{8}.{9} {10}, {11}",
-                        frameNo, oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds, oddFieldOSD.Milliseconds10, oddFieldOSD.FrameNumber,
-                        evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds, evenFieldOSD.Milliseconds10, evenFieldOSD.FrameNumber, failedReason);
-
-                    Trace.WriteLine(errorText);
-
-                    if (m_CalibrationErrors.Count < 16)
-                    {
-                        var copy = new List<uint>();
-                        copy.AddRange(m_Processor.CurrentImage);
-                        m_CalibrationImages.Add(string.Format("ocrerr_{0}.bmp", frameNo), copy.ToArray());
-                        m_CalibrationErrors.Add(errorText);
-                    }
-
-                    if (m_VideoController != null)
-                        m_VideoController.RegisterOcrError();
-                }
-                else
-                    m_Corrector.RegisterSuccessfulTimestamp(frameNo, oddFieldOSD, evenFieldOSD, oddFieldTimestamp, evenFieldTimestamp);
-
-                if (oddFieldOSD.FrameNumber == evenFieldOSD.FrameNumber - integratedAavFields + 1)
-                {
-                    return failedValidation ? DateTime.MinValue : oddFieldTimestamp;
-                }
-                else
-                {
-                    return failedValidation ? DateTime.MinValue : evenFieldTimestamp;
-                }
-            }
-            catch (Exception ex)
-            {
-                Trace.WriteLine(ex.GetFullStackTrace());
-
-                return DateTime.MinValue;
-            }
-	    }
-
-	    internal DateTime ExtractDateTime(int frameNo, int frameStep, IotaVtiTimeStamp oddFieldOSD, IotaVtiTimeStamp evenFieldOSD)
-        {
-            bool failedValidation = false;
-            string failedReason = null;
-
-	        if (oddFieldOSD == null || evenFieldOSD == null)
-		        return DateTime.MinValue;
-
-            if (frameStep != m_FrameStep)
-            {
-                m_FrameStep = frameStep;
-                m_Corrector.Reset(m_Processor.VideoFormat);    
-            }            
-
-            if (oddFieldOSD.FrameNumber != evenFieldOSD.FrameNumber - 1 &&
-                oddFieldOSD.FrameNumber != evenFieldOSD.FrameNumber + 1)
-            {
-                // Video fields are not consequtive
-                failedValidation = true;
-                failedReason = "Video fields are not consequtive";
-            }
-
-            try
-            {
-				DateTime oddFieldTimestamp = new DateTime(1, 1, 1, oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds).AddMilliseconds(Math.Min(10000, oddFieldOSD.Milliseconds10) / 10.0f);
-				DateTime evenFieldTimestamp = new DateTime(1, 1, 1, evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds).AddMilliseconds(Math.Min(10000, evenFieldOSD.Milliseconds10) / 10.0f);
-
-                double fieldDuration = Math.Abs(new TimeSpan(oddFieldTimestamp.Ticks - evenFieldTimestamp.Ticks).TotalMilliseconds);
-
-                if (m_Processor.VideoFormat.Value == VideoFormat.PAL &&
-                    (Math.Abs(fieldDuration - IotaVtiOcrProcessor.FIELD_DURATION_PAL) > 1.0))
-                {
-                    // PAL field is not 20 ms
-                    failedValidation = true;
-                    failedReason = string.Format("PAL field is not 20 ms. It is {0} ms", fieldDuration);
-                }
-
-                if (m_Processor.VideoFormat.Value == VideoFormat.NTSC &&
-                    (Math.Abs(fieldDuration - IotaVtiOcrProcessor.FIELD_DURATION_NTSC) > 1.0))
-                {
-                    // NTSC field is not 16.68 ms
-                    failedValidation = true;
-                    failedReason = string.Format("NTSC field is not 16.68 ms. It is {0} ms", fieldDuration);
-                }
-
-                int oddEvenFieldDirection = oddFieldTimestamp.Ticks - evenFieldTimestamp.Ticks < 0 ? -1 : 1;
-				if (m_Corrector.OddEvenFieldDirectionIsKnown() && 
-					oddEvenFieldDirection != m_Corrector.GetOddEvenFieldDirection())
-                {
-                    // Field timestamps are wrong have changed order (did they swap)?
-                    failedValidation = true;
-                    failedReason = "Field timestamps are wrong have changed order (did they swap)?";
-                }
-
-				if (failedValidation)
-				{
-				    string correctionInfo;
-                    failedValidation = !m_Corrector.TryToCorrect(frameNo, frameStep, null, oddFieldOSD, evenFieldOSD, m_Processor.EvenBeforeOdd, ref oddFieldTimestamp, ref evenFieldTimestamp, out correctionInfo);
-				    failedReason += ". " + correctionInfo;
-				}
-
-                if (failedValidation)
-                {
-					string errorText = string.Format("OCR ERR: FrameNo: {0}, Odd Timestamp: {1}:{2}:{3}.{4} {5}, Even Timestamp: {6}:{7}:{8}.{9} {10}, {11}",
-						frameNo, oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds, oddFieldOSD.Milliseconds10, oddFieldOSD.FrameNumber,
-                        evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds, evenFieldOSD.Milliseconds10, evenFieldOSD.FrameNumber, failedReason);
-
-	                Trace.WriteLine(errorText);
-
-					if (m_CalibrationErrors.Count < 16)
-					{
-					    var copy = new List<uint>();
-					    copy.AddRange(m_Processor.CurrentImage);
-                        m_CalibrationImages.Add(string.Format("ocrerr_{0}.bmp", frameNo), copy.ToArray());
-						m_CalibrationErrors.Add(errorText);
-					}
-
-	                if (m_VideoController != null)
-						m_VideoController.RegisterOcrError();
-                }
-                else
-                    m_Corrector.RegisterSuccessfulTimestamp(frameNo, oddFieldOSD, evenFieldOSD, oddFieldTimestamp, evenFieldTimestamp);
-
-                if (oddFieldOSD.FrameNumber == evenFieldOSD.FrameNumber - 1)
-                {
-                    return failedValidation ? DateTime.MinValue : oddFieldTimestamp;
-                }
-                else
-                {
-                    return failedValidation ? DateTime.MinValue : evenFieldTimestamp;
-                }
-            }
-            catch(Exception ex)
-            {
-                Trace.WriteLine(ex.GetFullStackTrace());
-
-                return DateTime.MinValue;
-            }
         }
 
 		public void DrawLegend(Graphics graphics)
@@ -853,5 +659,20 @@ namespace Tangra.OCR
 				
 			}
 		}
-	}
+
+        public int ErrorCount
+        {
+            get { return m_CalibrationErrors.Count; }
+        }
+
+        public void AddErrorImage(string fileName, uint[] pixels)
+        {
+            m_CalibrationImages.Add(fileName, pixels);
+        }
+
+        public void AddErrorText(string error)
+        {
+            m_CalibrationErrors.Add(error);
+        }
+    }
 }
