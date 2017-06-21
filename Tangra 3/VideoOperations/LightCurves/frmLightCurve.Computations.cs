@@ -975,18 +975,37 @@ namespace Tangra.VideoOperations.LightCurves
             bool addPSFAverageModelDetails = addPSFReductionDetails && m_LightCurveController.Context.PsfFittingMethod == TangraConfig.PsfFittingMethod.LinearFitOfAveragedModel;
             bool addIntegrationInfo = m_Footer.ReductionContext.FrameIntegratingMode != FrameIntegratingMode.NoIntegration;
 
+            var videoFileFormat = m_Header.GetVideoFileFormat();
+
             string instrumentalDelayStatus = "Not Applied";
             if (m_LightCurveController.Context.TimingType == MeasurementTimingType.EmbeddedTimeForEachFrame && m_LightCurveController.Context.InstrumentalDelayCorrectionsNotRequired)
                 instrumentalDelayStatus = "Not Required";
-            else if (!string.IsNullOrEmpty(m_LightCurveController.Context.InstrumentalDelayConfigName) && m_LightCurveController.Context.TimingType != MeasurementTimingType.UserEnteredFrameReferences)
-                instrumentalDelayStatus = "Applied";
+            else
+            {
+                var delaysApplied = m_Header.GetInstrumentalDelaysApplied(videoFileFormat.ToString());
+                switch (delaysApplied)
+                {
+                    case InstrumentalDelayStatus.NotRequired:
+                        instrumentalDelayStatus = "Not Required";
+                        break;
+                    case InstrumentalDelayStatus.Yes:
+                        instrumentalDelayStatus = "Applied";
+                        break;
+                    case InstrumentalDelayStatus.No:
+                        instrumentalDelayStatus = "Not Applied";
+                        break;
+                    default:
+                        instrumentalDelayStatus = "Unknown";
+                        break;
+                }
+            }
 
-            output.Append("Reversed Gamma, Colour, Measured Band, Integration, Digital Filter, Signal Method, Background Method, Instrumental Delay Corrections, Camera, AAV Integration, First Frame, Last Frame, Reversed Camera Response");
+            output.Append("Reversed Gamma, Colour, Measured Band, Integration, Digital Filter, Signal Method, Background Method, Instrumental Delay Corrections, Camera, AAV Integration, First Frame, Last Frame, Reversed Camera Response, Video File Format");
             if (addPSFReductionDetails) output.Append(", PSF Fitting");
             if (addPSFAverageModelDetails) output.Append(", Modeled FWHM, Average FWHM");
             if (options.PhotometricFormat == PhotometricFormat.Magnitudes) output.Append(", Zero Magnitude");
             output.AppendLine();
-            output.AppendFormat("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12}", 
+            output.AppendFormat("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13}", 
                 m_LightCurveController.Context.EncodingGamma.ToString("0.00"),
                 m_Footer.ReductionContext.IsColourVideo ? "yes" : "no", 
                 m_Footer.ReductionContext.ColourChannel,
@@ -1001,7 +1020,8 @@ namespace Tangra.VideoOperations.LightCurves
                 m_LightCurveController.Context.AAVFrameIntegration == -1 ? "" : m_LightCurveController.Context.AAVFrameIntegration.ToString(),
                 m_LightCurveController.Context.MinFrame,
                 m_LightCurveController.Context.MaxFrame,
-				m_LightCurveController.Context.ReverseCameraResponse == TangraConfig.KnownCameraResponse.Undefined ? "" : m_LightCurveController.Context.ReverseCameraResponse.ToString());
+				m_LightCurveController.Context.ReverseCameraResponse == TangraConfig.KnownCameraResponse.Undefined ? "" : m_LightCurveController.Context.ReverseCameraResponse.ToString(),
+                videoFileFormat);
 
             if (addPSFReductionDetails) output.AppendFormat(",{0}", m_LightCurveController.Context.PsfFittingMethod);
             if (addPSFAverageModelDetails) output.AppendFormat(",{0},{1}", float.IsNaN(m_LightCurveController.Context.ManualAverageFWHM) ? "auto" : "manual", !float.IsNaN(m_LightCurveController.Context.ManualAverageFWHM) ? m_LightCurveController.Context.ManualAverageFWHM.ToString("0.00") : m_Footer.RefinedAverageFWHM.ToString("0.00"));

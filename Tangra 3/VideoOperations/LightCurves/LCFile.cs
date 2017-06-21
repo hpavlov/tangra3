@@ -1425,7 +1425,7 @@ namespace Tangra.VideoOperations.LightCurves
 		{
 			if (videoFileFormat == "ADV")
 				return InstrumentalDelayStatus.NotRequired;
-			else if (videoFileFormat == "AAV")
+			else if (videoFileFormat == "AAV" || videoFileFormat == "AAV2")
 			{
 				if (LcFile != null && !string.IsNullOrEmpty(LcFile.Footer.InstrumentalDelayConfigName))
                     return InstrumentalDelayStatus.Yes;
