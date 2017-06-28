@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -114,7 +115,7 @@ namespace Tangra.Video
             {
                 m_AAVVersion = aavVersion;
                 m_VideoStandard = GetFileTag("NATIVE-VIDEO-STANDARD");
-                double.TryParse(GetFileTag("NATIVE-FRAME-RATE"), out m_NativeFrameRate);
+                double.TryParse(GetFileTag("NATIVE-FRAME-RATE"), NumberStyles.Float, CultureInfo.InvariantCulture, out m_NativeFrameRate);
 
                 int.TryParse(GetFileTag("OSD-FIRST-LINE"), out m_OsdFirstLine);
                 int.TryParse(GetFileTag("OSD-LAST-LINE"), out m_OsdLastLine);
@@ -124,7 +125,7 @@ namespace Tangra.Video
 
                 m_IntegratedAAVFrames = -1;
 
-                if (double.TryParse(GetFileTag("EFFECTIVE-FRAME-RATE"), out m_EffectiveFrameRate) && m_NativeFrameRate != 0)
+                if (double.TryParse(GetFileTag("EFFECTIVE-FRAME-RATE"), NumberStyles.Float, CultureInfo.InvariantCulture, out m_EffectiveFrameRate) && m_NativeFrameRate != 0)
                 {
                     m_IntegratedAAVFrames = (int)Math.Round(m_NativeFrameRate / m_EffectiveFrameRate);
                     m_FrameRate = m_EffectiveFrameRate; // This is important for OCR-ing as the frame rate is used to derive the frame exposure
