@@ -26,7 +26,7 @@ namespace Tangra.OCR
         {
             var supported = new List<object>();
             supported.Add("IOTA-VTI");
-            //supported.Add("GPS-BOX-SPRITE");
+            supported.Add("GPS-BOX-SPRITE");
             //supported.Add("KIWI-OSD");
 
             List<ITangraAddin> addins;
