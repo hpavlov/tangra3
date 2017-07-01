@@ -3290,11 +3290,24 @@ namespace Tangra.Astrometry.Recognition
 			Dictionary<ImagePixel, IStar> matchedPairs = new Dictionary<ImagePixel, IStar>();
             Dictionary<int, ulong> matchedFeatureIdToStarIdIndexes = new Dictionary<int, ulong>();
 
+            int matchingSearchDistance = Math.Max(3, (int)CoreAstrometrySettings.Default.SearchArea / 3);
 			int idx = 0;
 			foreach (PlateConstStarPair pair in m_PreviousFit.AllStarPairs)
 			{
 				if (pair.FitInfo.ExcludedForHighResidual) continue;
-                StarMapFeature ftr = starMap.GetFeatureInRadius((int)pair.x, (int)pair.y, (int)CoreAstrometrySettings.Default.SearchArea);
+                StarMapFeature ftr = starMap.GetFeatureInRadius((int)pair.x, (int)pair.y, matchingSearchDistance);
+			    if (ftr == null)
+			    {
+			        PSFFit psf;
+                    IImagePixel psfFitCenter = starMap.GetPSFFit((int) pair.x, (int) pair.y, PSFFittingMethod.NonLinearFit, out psf);
+                    if (psfFitCenter != null && psf != null &&
+                        Math.Sqrt(Math.Pow(psfFitCenter.XDouble - pair.x, 2) + Math.Pow(psfFitCenter.YDouble - pair.y, 2)) <= matchingSearchDistance &&
+                        psf.Certainty > CoreAstrometrySettings.Default.MinPreviousFramePlatesolveMatchingStarCertainty)
+			        {
+                        ftr = starMap.AppendFeature((int)pair.x, (int)pair.y);
+			        }
+			    }
+
 				if (ftr != null)
 				{
 					ImagePixel center = starMap.GetCentroid(

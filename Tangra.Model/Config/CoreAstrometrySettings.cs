@@ -25,5 +25,7 @@ namespace Tangra.Model.Config
 
         public int MaxAllowedDefaultMotionInPixels = 5;
 
+        public float MinPreviousFramePlatesolveMatchingStarCertainty = 0.2f;
+
 	}
 }

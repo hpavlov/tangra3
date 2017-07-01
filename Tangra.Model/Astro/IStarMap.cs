@@ -21,6 +21,7 @@ namespace Tangra.Model.Astro
 		List<StarMapFeature> Features { get; }
 		StarMapFeature GetFeatureById(int feautreId);
 		StarMapFeature this[int x, int y] { get; }
+        StarMapFeature AppendFeature(int x, int y);
 
 		StarMapFeature GetFeatureInRadius(int x, int y, int radius);
         List<StarMapFeature> GetFeaturesInRadius(int x, int y, int radius);

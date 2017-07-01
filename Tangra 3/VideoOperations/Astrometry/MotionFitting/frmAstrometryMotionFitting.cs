@@ -104,7 +104,7 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
 
                     if (m_DataProvider.Unmeasurable)
                     {
-                        MessageBox.Show(this, "This file cannot be processed by the Fast Motion Astrometry module.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show(this, "This file cannot be processed by the Fast Motion Astrometry module. Please use AAV files or AVI files for no-integration videos.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         m_DataProvider = MeasurementPositionCSVProvider.Empty;
                         lbAvailableFiles.SelectedIndex = -1;
                         Recalculate();

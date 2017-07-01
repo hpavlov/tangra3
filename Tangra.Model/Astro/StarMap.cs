@@ -435,6 +435,16 @@ namespace Tangra.Model.Astro
 			}
 		}
 
+	    public StarMapFeature AppendFeature(int x, int y)
+	    {
+            StarMapFeature feature = new StarMapFeature(m_FeatureId, m_Pixelmap.Width);
+
+            m_FeatureId++;
+            m_Features.Add(feature);
+
+	        return feature;
+	    }
+
 		public uint NoiseLevel
 		{
 			get { return m_NoiseLevel; }

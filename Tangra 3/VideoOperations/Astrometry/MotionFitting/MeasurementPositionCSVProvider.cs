@@ -78,7 +78,7 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
 
                             Unmeasurable = false;
 
-                            if (m_NativeVideoFormat == "AVI-Integrated")
+                            if (m_NativeVideoFormat == "AVI-Integrated" && m_IntegratedFrames != 1)
                                 // Integrated video measured from the AVI file is not supported in the fast motion astrometry at the moment.
                                 Unmeasurable = true;
 
