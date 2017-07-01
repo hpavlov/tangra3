@@ -1,8 +1,11 @@
 ﻿Tangra3 Release Notes
 ---------------------
-vNext (Unreleased)
+v3.6.6 (2017-07-01)
+- Significant improvements in the Astrometry module which makes the processing faster and more succesfull, particularly for fields with very few stars.
+- Fixed a regional settings problem when working with AAV.V2 videos.
+- Fixed a CSV export problem where incorrect 'Instrumental Delay Corrections' header was exported for AAV.V2 videos.
 - Made it possible to manually specify video integration settings when converting from AVI-to-AAV.
-- Fixed a problem that that was preventing a x2 frames integration to be detected when starting from even frame.
+- Fixed a problem that was preventing a x2 frames integration to be detected when starting from an even frame.
 
 v3.6.5 (2017-04-23)
 - Fixed critical usability issues with the fast motion astrometry.
