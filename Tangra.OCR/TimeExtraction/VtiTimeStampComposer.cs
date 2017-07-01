@@ -158,6 +158,9 @@ namespace Tangra.OCR.TimeExtraction
             {
                 Trace.WriteLine(ex.GetFullStackTrace());
 
+                if (m_VideoController != null)
+                    m_VideoController.RegisterOcrError();
+
                 return DateTime.MinValue;
             }
         }

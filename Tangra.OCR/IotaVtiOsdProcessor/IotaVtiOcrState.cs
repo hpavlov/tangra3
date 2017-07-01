@@ -124,7 +124,7 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 
         public bool ContainsDate
         {
-            get { return true; }
+            get { return false; }
         }
 
         public int Year { get; private set; }
