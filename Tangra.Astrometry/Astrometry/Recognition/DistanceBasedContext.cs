@@ -2935,61 +2935,66 @@ namespace Tangra.Astrometry.Recognition
 
         private void SaveAlignImage(List<PlateConstStarPair> pairs, int i, int j, int k, bool success, string traceMessage = null)
 		{
-            Bitmap image = (Bitmap)((m_StarMap as StarMap).GetDisplayBitmap()).Clone();
+            try
+            {
+                Bitmap image = (Bitmap)((m_StarMap as StarMap).GetDisplayBitmap()).Clone();
 
-            using (Graphics g = Graphics.FromImage(image))
-			{
-				foreach (PlateConstStarPair pair in pairs)
-				{
-					Pen pen = Pens.Gray;
-					if (pair.FitInfo.UsedInSolution) pen = Pens.Green;
-					if (pair.FitInfo.ExcludedForHighResidual) pen = Pens.Orange;
-					g.DrawEllipse(pen, (float)pair.x - 6f, (float)pair.y - 6f, 12, 12);
+                using (Graphics g = Graphics.FromImage(image))
+                {
+                    foreach (PlateConstStarPair pair in pairs)
+                    {
+                        Pen pen = Pens.Gray;
+                        if (pair.FitInfo.UsedInSolution) pen = Pens.Green;
+                        if (pair.FitInfo.ExcludedForHighResidual) pen = Pens.Orange;
+                        g.DrawEllipse(pen, (float)pair.x - 6f, (float)pair.y - 6f, 12, 12);
 
-					StarMapFeature feature = m_StarMap.Features
-						.Where(delegate(StarMapFeature f)
-						{
-							ImagePixel center = f.GetCenter();
-							double distance = Math.Sqrt(
-								(center.XDouble - pair.x) * (center.XDouble - pair.x) +
-								(center.YDouble - pair.y) * (center.YDouble - pair.y));
+                        StarMapFeature feature = m_StarMap.Features
+                            .Where(delegate(StarMapFeature f)
+                            {
+                                ImagePixel center = f.GetCenter();
+                                double distance = Math.Sqrt(
+                                    (center.XDouble - pair.x) * (center.XDouble - pair.x) +
+                                    (center.YDouble - pair.y) * (center.YDouble - pair.y));
 
-							return distance < 3;
-						})
-						.FirstOrDefault();
+                                return distance < 3;
+                            })
+                            .FirstOrDefault();
 
-				    if (feature == null) continue;
+                        if (feature == null) continue;
 
-					g.DrawString(
-						string.Format("{0}({1})", 
-							feature == null ? "?" : (feature.FeatureId + 1).ToString(), 
-							FormatPrintStarNo(pair.StarNo)),
-						s_DebugFont, Brushes.Yellow, (float)pair.x + 7f, (float)pair.y + 18f);
+                        g.DrawString(
+                            string.Format("{0}({1})",
+                                feature == null ? "?" : (feature.FeatureId + 1).ToString(),
+                                FormatPrintStarNo(pair.StarNo)),
+                            s_DebugFont, Brushes.Yellow, (float)pair.x + 7f, (float)pair.y + 18f);
 
-					if (feature != null)
-					{
-						if (feature.FeatureId == i - 1 || feature.FeatureId == j - 1 || feature.FeatureId == k - 1)
-						{
-							g.DrawEllipse(pen, (float)pair.x - 5f, (float)pair.y - 5f, 10, 10);
-							g.DrawEllipse(pen, (float)pair.x - 8f, (float)pair.y - 8f, 16, 16);
-						}
-					}
-				}
+                        if (feature != null)
+                        {
+                            if (feature.FeatureId == i - 1 || feature.FeatureId == j - 1 || feature.FeatureId == k - 1)
+                            {
+                                g.DrawEllipse(pen, (float)pair.x - 5f, (float)pair.y - 5f, 10, 10);
+                                g.DrawEllipse(pen, (float)pair.x - 8f, (float)pair.y - 8f, 16, 16);
+                            }
+                        }
+                    }
 
-			    if (traceMessage != null)
-			    {
-			        var txtSize = g.MeasureString(traceMessage, s_DebugFont);
-			        g.FillRectangle(Brushes.Black, 10, 10, txtSize.Width, txtSize.Height);
-			        g.DrawString(traceMessage, s_DebugFont, Brushes.Pink, 10, 10);
-			    }
+                    if (traceMessage != null)
+                    {
+                        var txtSize = g.MeasureString(traceMessage, s_DebugFont);
+                        g.FillRectangle(Brushes.Black, 10, 10, txtSize.Width, txtSize.Height);
+                        g.DrawString(traceMessage, s_DebugFont, Brushes.Pink, 10, 10);
+                    }
 
-			    g.Save();
-			}
-            
-            string outFileName = Path.GetFullPath(EnsureDebugSessionDirectory() + string.Format(@"\AlignmentTest_{3}{0}-{1}-{2}.bmp", i, j, k, success ? "" : "Failed_"));
-            if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
-                Trace.WriteLine(string.Format("Saving report file: {0}", outFileName));
-			image.Save(outFileName);			
+                    g.Save();
+                }
+
+                string outFileName = Path.GetFullPath(EnsureDebugSessionDirectory() + string.Format(@"\AlignmentTest_{3}{0}-{1}-{2}.bmp", i, j, k, success ? "" : "Failed_"));
+                if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
+                    Trace.WriteLine(string.Format("Saving report file: {0}", outFileName));
+                image.Save(outFileName);			
+            }
+            catch (Exception)
+            { }
 		}
 
 	    private string FormatPrintStarNo(ulong starNo)
