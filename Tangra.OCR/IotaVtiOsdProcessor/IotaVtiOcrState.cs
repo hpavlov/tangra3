@@ -143,6 +143,11 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 			Seconds = seconds;
             Milliseconds10 = milliseconds10;
         }
+
+        public void CorrectFrameNumber(int frameNo)
+        {
+            FrameNumber = frameNo;
+        }
 	}
 
 	internal static class Extensions

@@ -87,6 +87,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="UnitTests\TestOcrCorrector.cs" />
     <Compile Include="UnitTests\TestSubPixelImage.cs" />
     <Compile Include="frmMain.cs">
       <SubType>Form</SubType>

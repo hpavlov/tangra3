@@ -15,7 +15,7 @@ namespace Tangra.OCR.TimeExtraction
         void AddErrorImage(string fileName, uint[] pixels);
         void AddErrorText(string error);
     }
-
+    
     public class VtiTimeStampComposer
     {
         internal const float FIELD_DURATION_PAL = 20.00f;
@@ -129,6 +129,8 @@ namespace Tangra.OCR.TimeExtraction
 
                     if (m_VideoController != null)
                         m_VideoController.RegisterOcrError();
+
+                    m_Corrector.RegisterUnsuccessfulTimestamp(frameNo, fieldDuration, frameStep, null);
                 }
                 else
                     m_Corrector.RegisterSuccessfulTimestamp(frameNo, oddFieldOSD, evenFieldOSD, oddFieldTimestamp, evenFieldTimestamp);
@@ -195,31 +197,34 @@ namespace Tangra.OCR.TimeExtraction
                 DateTime evenFieldTimestamp = new DateTime(1, 1, 1, evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds).AddMilliseconds(Math.Min(10000, evenFieldOSD.Milliseconds10) / 10.0f);
 
                 double integrationPeriodDuration = Math.Abs(new TimeSpan(oddFieldTimestamp.Ticks - evenFieldTimestamp.Ticks).TotalMilliseconds);
-
+                double fieldDuration;
                 if (m_VideoFormat != null)
                 {
                     if (m_VideoFormat == VideoFormat.PAL)
                     {
-                        var calcDuration = (integrationPeriodDuration + FIELD_DURATION_PAL) / integratedAavFields;
-                        if ((Math.Abs(calcDuration - FIELD_DURATION_PAL) > 1.0))
+                        fieldDuration = (integrationPeriodDuration + FIELD_DURATION_PAL)/integratedAavFields;
+                        if ((Math.Abs(fieldDuration - FIELD_DURATION_PAL) > 1.0))
                         {
                             // PAL field is not 20 ms
                             failedValidation = true;
-                            failedReason = string.Format("PAL field is not 20 ms. It is {0} ms", calcDuration);
+                            failedReason = string.Format("PAL field is not 20 ms. It is {0} ms", fieldDuration);
                         }
                     }
-
-                    if (m_VideoFormat == VideoFormat.NTSC)
+                    else if (m_VideoFormat == VideoFormat.NTSC)
                     {
-                        var calcDuration = (integrationPeriodDuration + FIELD_DURATION_NTSC) / integratedAavFields;
-                        if (Math.Abs(calcDuration - FIELD_DURATION_NTSC) > 1.0)
+                        fieldDuration = (integrationPeriodDuration + FIELD_DURATION_NTSC)/integratedAavFields;
+                        if (Math.Abs(fieldDuration - FIELD_DURATION_NTSC) > 1.0)
                         {
                             // NTSC field is not 16.68 ms
                             failedValidation = true;
-                            failedReason = string.Format("NTSC field is not 16.68 ms. It is {0} ms", calcDuration);
+                            failedReason = string.Format("NTSC field is not 16.68 ms. It is {0} ms", fieldDuration);
                         }
                     }
+                    else
+                        throw new ApplicationException("AAV videos must be PAL or NTSC.");
                 }
+                else
+                    throw new ApplicationException("Cannot identify the native format of an AAV video.");
 
                 if (failedValidation)
                 {
@@ -246,6 +251,8 @@ namespace Tangra.OCR.TimeExtraction
 
                     if (m_VideoController != null)
                         m_VideoController.RegisterOcrError();
+
+                    m_Corrector.RegisterUnsuccessfulTimestamp(frameNo, fieldDuration, frameStep, integratedAavFields);
                 }
                 else
                     m_Corrector.RegisterSuccessfulTimestamp(frameNo, oddFieldOSD, evenFieldOSD, oddFieldTimestamp, evenFieldTimestamp);

@@ -25,6 +25,35 @@ namespace Tangra.OCR.TimeExtraction
         int Month { get; }
         int Day { get; }
         void Correct(int hours, int minutes, int seconds, int milliseconds10);
+        void CorrectFrameNumber(int frameNo);
+    }
+
+    public static class IVtiTimeStampExtensions
+    {
+        public static bool HoursMinSecMilliEquals(this IVtiTimeStamp x, IVtiTimeStamp y)
+        {
+            return x.Hours == y.Hours && x.Minutes == y.Minutes && x.Seconds == y.Seconds && x.Milliseconds10 == y.Milliseconds10;
+        }
+
+        public static string AsString(this IVtiTimeStamp x)
+        {
+            if (x.ContainsFrameNumbers)
+                return string.Format("{0}:{1}:{2} {3} FrmNo:{4}", x.Hours, x.Minutes, x.Seconds, x.Milliseconds10, x.FrameNumber);
+            else
+                return string.Format("{0}:{1}:{2} {3}", x.Hours, x.Minutes, x.Seconds, x.Milliseconds10);
+        }
+
+        public static long GetTicks(this IVtiTimeStamp x)
+        {
+            return new DateTime(Math.Max(1, x.Year), 1, 1)
+                .AddMonths(Math.Max(1, x.Month) - 1)
+                .AddDays(Math.Max(1, x.Day) - 1)
+                .AddHours(x.Hours)
+                .AddMinutes(x.Minutes)
+                .AddSeconds(x.Seconds)
+                .AddMilliseconds(x.Milliseconds10/10.0)
+                .Ticks;
+        }
     }
 
     public class VtiTimeStamp : IVtiTimeStamp
@@ -62,6 +91,12 @@ namespace Tangra.OCR.TimeExtraction
             Minutes = minutes;
             Seconds = seconds;
             Milliseconds10 = milliseconds10;
+        }
+
+        public void CorrectFrameNumber(int frameNo)
+        {
+            if (ContainsFrameNumbers)
+                FrameNumber = frameNo;
         }
     }
     	

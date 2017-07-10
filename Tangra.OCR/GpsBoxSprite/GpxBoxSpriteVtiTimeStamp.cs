@@ -60,5 +60,8 @@ namespace Tangra.OCR.GpsBoxSprite
             Seconds = seconds;
             Milliseconds10 = milliseconds10;
         }
+
+        public void CorrectFrameNumber(int frameNo)
+        { }
     }
 }

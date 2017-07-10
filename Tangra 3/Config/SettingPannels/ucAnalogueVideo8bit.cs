@@ -55,7 +55,8 @@ namespace Tangra.Config.SettingPannels
 
             m_VideoController.LoadAvailableOcrEngines(cbxOcrEngine);
 
-			pnlOsdOcr.Enabled = cbxEnableOsdOcr.Checked;			
+			pnlOsdOcr.Enabled = cbxEnableOsdOcr.Checked;
+            nudMaxAutocorrectDigits.SetNUDValue(TangraConfig.Settings.Generic.OcrMaxNumberDigitsToAutoCorrect);
 		}
 
 		public override void SaveSettings()
@@ -66,11 +67,12 @@ namespace Tangra.Config.SettingPannels
 			TangraConfig.Settings.Generic.OsdOcrEnabled = cbxEnableOsdOcr.Checked;
 			TangraConfig.Settings.Generic.OcrEngine = cbxOcrEngine.Text;
 			TangraConfig.Settings.Generic.OcrAskEveryTime = cbxOcrAskEveryTime.Checked;
+		    TangraConfig.Settings.Generic.OcrMaxNumberDigitsToAutoCorrect = (int)nudMaxAutocorrectDigits.Value;
 
 			if (!TangraConfig.Settings.Generic.OcrInitialSetupCompleted &&
 			    (TangraConfig.Settings.Generic.OsdOcrEnabled == false || TangraConfig.Settings.Generic.OcrAskEveryTime == true))
 			{
-				TangraConfig.Settings.Generic.OcrInitialSetupCompleted = true;
+				TangraConfig.Settings.Generic.OcrInitialSetupCompleted = true;                
 			}
 		}
 
