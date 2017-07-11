@@ -99,12 +99,39 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 		{
 			int.TryParse(timeStampStrings.NumSat + "", out NumSat);
 		    int ival;
-            if (int.TryParse(timeStampStrings.HH, out ival)) Hours = ival;
-            if (int.TryParse(timeStampStrings.MM, out ival)) Minutes = ival;
-            if (int.TryParse(timeStampStrings.SS, out ival)) Seconds = ival;
+            Hours = ParseTwoDigitOCRedNumber(timeStampStrings.HH);
+            Minutes = ParseTwoDigitOCRedNumber(timeStampStrings.MM);
+            Seconds = ParseTwoDigitOCRedNumber(timeStampStrings.SS);
             if (int.TryParse(timeStampStrings.FFFF1.Length == 4 ? timeStampStrings.FFFF1.Replace(' ', '0') : timeStampStrings.FFFF2.Replace(' ', '0'), out ival)) Milliseconds10 = ival;
-            if (int.TryParse(timeStampStrings.FRAMENO, out ival)) FrameNumber = ival;
+            if (int.TryParse(timeStampStrings.FRAMENO.Replace(' ', '0'), out ival)) FrameNumber = ival;
 		}
+
+        private int ParseTwoDigitOCRedNumber(string str)
+        {
+            if (str == null) return 0;
+            
+            if (str.Length != 2)
+            {
+                return ParseIntValue(str, 1);
+            }
+            else
+            {
+                if (str[1] == ' ')
+                    return ParseIntValue(str.Trim(), 10);
+                else
+                    return ParseIntValue(str.Trim(), 1);
+            }
+        }
+
+        private int ParseIntValue(string str, int multiplier)
+        {
+            int ival;
+
+            if (int.TryParse(str, out ival))
+                return multiplier * ival;
+            else
+                return 0; 
+        }
 
 		public IotaVtiTimeStamp(IotaVtiTimeStamp timeStamp)
 		{

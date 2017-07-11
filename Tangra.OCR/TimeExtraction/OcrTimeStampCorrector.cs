@@ -43,11 +43,13 @@ namespace Tangra.OCR.TimeExtraction
                 return false;
             }
 
-            correctionDebugInfo = string.Format("IOTA-VTI Correction Attempt for Frame {0}. {1:D2}:{2:D2}:{3:D2}.{4:D4} ({5}) - {6:D2}:{7:D2}:{8:D2}.{9:D4} ({10}). FrameStep: {11}", 
+            correctionDebugInfo = string.Format("IOTA-VTI Correction Attempt for Frame {0}. {1:D2}:{2:D2}:{3:D2}.{4:D4} ({5}) - {6:D2}:{7:D2}:{8:D2}.{9:D4} ({10}). FrameStep: {11}. Previous: {12:D2}:{13:D2}:{14:D2}.{15:D4} ({16}) - {17:D2}:{18:D2}:{19:D2}.{20:D4} ({21})", 
                     frameNo, 
                     oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds, oddFieldOSD.Milliseconds10, oddFieldOSD.FrameNumber,
                     evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds, evenFieldOSD.Milliseconds10, evenFieldOSD.FrameNumber,
-                    frameStep);
+                    frameStep,
+                    m_PrevOddFieldOSD.Hours, m_PrevOddFieldOSD.Minutes, m_PrevOddFieldOSD.Seconds, m_PrevOddFieldOSD.Milliseconds10, m_PrevOddFieldNo,
+                    m_PrevEvenFieldOSD.Hours, m_PrevEvenFieldOSD.Minutes, m_PrevEvenFieldOSD.Seconds, m_PrevEvenFieldOSD.Milliseconds10, m_PrevEvenFieldNo);
 
             float knownFrameDuration = m_VideoFormat == VideoFormat.PAL
                         ? 2 * VtiTimeStampComposer.FIELD_DURATION_PAL

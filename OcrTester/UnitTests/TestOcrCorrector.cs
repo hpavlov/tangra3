@@ -388,6 +388,41 @@ namespace OcrTester.UnitTests
             Assert.AreEqual(3, nfoOdd.FrameNumber);
             Assert.AreEqual(4, nfoEven.FrameNumber);
         }
+
+        [Test]
+        public void TestUserSubmittedFailedCorrections()
+        {
+            // TODO:
+            //ORC ERR: FrameNo: 227, Odd Timestamp: 3:55:8.995 140698, Even Timestamp: 3:55:8.1152 140699, NTSC field is not 16.68 ms. It is 15 ms. IOTA-VTI Correction Attempt for Frame 227. 03:55:08.0995 (140698) - 03:55:08.1152 (140699)
+            //ORC ERR: FrameNo: 228, Odd Timestamp: 3:55:8.1319 140700, Even Timestamp: 3:55:8.1496 140701, NTSC field is not 16.68 ms. It is 18 ms. IOTA-VTI Correction Attempt for Frame 228. 03:55:08.1319 (140700) - 03:55:08.1496 (140701)
+            //ORC ERR: FrameNo: 230, Odd Timestamp: 3:55:8.1996 140704, Even Timestamp: 3:55:8.2153 140705, NTSC field is not 16.68 ms. It is 15 ms. IOTA-VTI Correction Attempt for Frame 230. 03:55:08.1996 (140704) - 03:55:08.2153 (140705)
+            //ORC ERR: FrameNo: 231, Odd Timestamp: 3:55:8.2320 140706, Even Timestamp: 3:55:8.2497 140707, NTSC field is not 16.68 ms. It is 18 ms. IOTA-VTI Correction Attempt for Frame 231. 03:55:08.2320 (140706) - 03:55:08.2497 (140707)
+            //ORC ERR: FrameNo: 721, Odd Timestamp: 3:55:24.5818 141686, Even Timestamp: 3:55:24.5995 141687, NTSC field is not 16.68 ms. It is 18 ms. IOTA-VTI Correction Attempt for Frame 721. 03:55:24.5818 (141686) - 03:55:24.5995 (141687)
+            //ORC ERR: FrameNo: 724, Odd Timestamp: 3:55:24.6819 141692, Even Timestamp: 3:55:24.6996 141693, NTSC field is not 16.68 ms. It is 18 ms. IOTA-VTI Correction Attempt for Frame 724. 03:55:24.6819 (141692) - 03:55:24.6996 (141693)
+            //ORC ERR: FrameNo: 727, Odd Timestamp: 3:55:24.7820 141698, Even Timestamp: 3:55:24.7997 141699, NTSC field is not 16.68 ms. It is 18 ms. IOTA-VTI Correction Attempt for Frame 727. 03:55:24.7820 (141698) - 03:55:24.7997 (141699)
+            //ORC ERR: FrameNo: 730, Odd Timestamp: 3:55:24.8821 141704, Even Timestamp: 3:55:24.8998 141705, NTSC field is not 16.68 ms. It is 18 ms. IOTA-VTI Correction Attempt for Frame 730. 03:55:24.8821 (141704) - 03:55:24.8998 (141705)
+            //ORC ERR: FrameNo: 733, Odd Timestamp: 3:55:24.9822 141710, Even Timestamp: 3:55:24.9999 141711, NTSC field is not 16.68 ms. It is 18 ms. IOTA-VTI Correction Attempt for Frame 733. 03:55:24.9822 (141710) - 03:55:24.9999 (141711)
+            //ORC ERR: FrameNo: 1219, Odd Timestamp: 3:55:41.1995 142682, Even Timestamp: 3:55:41.2152 142683, NTSC field is not 16.68 ms. It is 15 ms. IOTA-VTI Correction Attempt for Frame 1219. 03:55:41.1995 (142682) - 03:55:41.2152 (142683)
+
+            //ORC ERR: FrameNo: 724, Odd Timestamp: 3:55:24.6819 141692, Even Timestamp: 3:55:24.6996 141693, NTSC field is not 16.68 ms. It is 18 ms. IOTA-VTI Correction Attempt for Frame 724. 03:55:24.6819 (141692) - 03:55:24.6996 (141693)
+
+            //OCR ERR: FrameNo: 3643, Odd Timestamp: 2:14:26.7739 207286, Even Timestamp: 2:14:26.7999 207287, PAL field is not 20 ms. It is 26 ms. IOTA-VTI Correction Attempt for Frame 3643. 02:14:26.7739 (207286) - 02:14:26.7999 (207287). FrameStep: 1
+            //OCR ERR: FrameNo: 3651, Odd Timestamp: 2:14:27.999 207302, Even Timestamp: 2:14:27.1139 207309, PAL field is not 20 ms. It is 14 ms. IOTA-VTI Correction Attempt for Frame 3651. 02:14:27.0999 (207302) - 02:14:27.1139 (207309). FrameStep: 1
+            //OCR ERR: FrameNo: 3653, Odd Timestamp: 2:14:27.1739 207306, Even Timestamp: 2:14:27.1999 207307, PAL field is not 20 ms. It is 26 ms. IOTA-VTI Correction Attempt for Frame 3653. 02:14:27.1739 (207306) - 02:14:27.1999 (207307). FrameStep: 1
+            //OCR ERR: FrameNo: 3663, Odd Timestamp: 2:14:27.5739 207326, Even Timestamp: 2:14:27.5999 207327, PAL field is not 20 ms. It is 26 ms. IOTA-VTI Correction Attempt for Frame 3663. 02:14:27.5739 (207326) - 02:14:27.5999 (207327). FrameStep: 1
+            //OCR ERR: FrameNo: 3666, Odd Timestamp: 2:14:27.6999 207332, Even Timestamp: 2:14:27.7139 207333, PAL field is not 20 ms. It is 14 ms. IOTA-VTI Correction Attempt for Frame 3666. 02:14:27.6999 (207332) - 02:14:27.7139 (207333). FrameStep: 1
+            //OCR ERR: FrameNo: 3668, Odd Timestamp: 2:14:27.7739 207336, Even Timestamp: 2:14:27.7999 207337, PAL field is not 20 ms. It is 26 ms. IOTA-VTI Correction Attempt for Frame 3668. 02:14:27.7739 (207336) - 02:14:27.7999 (207337). FrameStep: 1
+            //OCR ERR: FrameNo: 3673, Odd Timestamp: 2:14:27.9739 207346, Even Timestamp: 2:14:27.9999 207347, PAL field is not 20 ms. It is 26 ms. IOTA-VTI Correction Attempt for Frame 3673. 02:14:27.9739 (207346) - 02:14:27.9999 (207347). FrameStep: 1
+            //OCR ERR: FrameNo: 3674, Odd Timestamp: 2:14:28.139 207348, Even Timestamp: 2:14:28.939 207349, PAL field is not 20 ms. It is 80 ms. IOTA-VTI Correction Attempt for Frame 3674. 02:14:28.0139 (207348) - 02:14:28.0939 (207349). FrameStep: 1
+            //OCR ERR: FrameNo: 3676, Odd Timestamp: 2:14:28.999 207352, Even Timestamp: 2:14:28.1139 207353, PAL field is not 20 ms. It is 14 ms. IOTA-VTI Correction Attempt for Frame 3676. 02:14:28.0999 (207352) - 02:14:28.1139 (207353). FrameStep: 1
+            //OCR ERR: FrameNo: 3683, Odd Timestamp: 2:14:28.3739 207366, Even Timestamp: 2:14:28.3999 207367, PAL field is not 20 ms. It is 26 ms. IOTA-VTI Correction Attempt for Frame 3683. 02:14:28.3739 (207366) - 02:14:28.3999 (207367). FrameStep: 1
+            //OCR ERR: FrameNo: 3686, Odd Timestamp: 2:14:28.4999 207372, Even Timestamp: 2:14:28.5139 207373, PAL field is not 20 ms. It is 14 ms. IOTA-VTI Correction Attempt for Frame 3686. 02:14:28.4999 (207372) - 02:14:28.5139 (207373). FrameStep: 1
+            //OCR ERR: FrameNo: 3691, Odd Timestamp: 2:14:28.6999 207382, Even Timestamp: 2:14:28.7139 207383, PAL field is not 20 ms. It is 14 ms. IOTA-VTI Correction Attempt for Frame 3691. 02:14:28.6999 (207382) - 02:14:28.7139 (207383). FrameStep: 1
+            //OCR ERR: FrameNo: 3696, Odd Timestamp: 2:14:28.8999 207392, Even Timestamp: 2:14:28.9139 207399, PAL field is not 20 ms. It is 14 ms. IOTA-VTI Correction Attempt for Frame 3696. 02:14:28.8999 (207392) - 02:14:28.9139 (207399). FrameStep: 1
+            //OCR ERR: FrameNo: 3698, Odd Timestamp: 2:14:28.9739 207396, Even Timestamp: 2:14:28.9999 207397, PAL field is not 20 ms. It is 26 ms. IOTA-VTI Correction Attempt for Frame 3698. 02:14:28.9739 (207396) - 02:14:28.9999 (207397). FrameStep: 1
+            //OCR ERR: FrameNo: 3699, Odd Timestamp: 2:14:29.139 207398, Even Timestamp: 2:14:29.939 207399, PAL field is not 20 ms. It is 80 ms. IOTA-VTI Correction Attempt for Frame 3699. 02:14:29.0139 (207398) - 02:14:29.0939 (207399). FrameStep: 1
+            //OCR ERR: FrameNo: 3703, Odd Timestamp: 2:14:29.1739 207406, Even Timestamp: 2:14:29.1999 207407, PAL field is not 20 ms. It is 26 ms. IOTA-VTI Correction Attempt for Frame 3703. 02:14:29.1739 (207406) - 02:14:29.1999 (207407). FrameStep: 1
+        }
     }
 
     // TODO: Blank timestamp followed by incorrectly ORC-ed frame. Would that be causing a lot of wrong corrections?
