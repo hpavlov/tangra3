@@ -84,7 +84,7 @@ namespace Tangra.OCR.TimeExtraction
                 {
                     // PAL field is not 20 ms
                     failedValidation = true;
-                    failedReason = string.Format("PAL field is not 20 ms. It is {0} ms", fieldDuration);
+                    failedReason = string.Format("PAL field is not 20 ms. It is {0} ms. ", fieldDuration);
                 }
 
                 if (m_VideoFormat == VideoFormat.NTSC &&
@@ -92,7 +92,7 @@ namespace Tangra.OCR.TimeExtraction
                 {
                     // NTSC field is not 16.68 ms
                     failedValidation = true;
-                    failedReason = string.Format("NTSC field is not 16.68 ms. It is {0} ms", fieldDuration);
+                    failedReason = string.Format("NTSC field is not 16.68 ms. It is {0} ms. ", fieldDuration);
                 }
 
                 int oddEvenFieldDirection = oddFieldTimestamp.Ticks - evenFieldTimestamp.Ticks < 0 ? -1 : 1;
@@ -101,7 +101,13 @@ namespace Tangra.OCR.TimeExtraction
                 {
                     // Field timestamps are wrong have changed order (did they swap)?
                     failedValidation = true;
-                    failedReason = "Field timestamps are wrong have changed order (did they swap)?";
+                    failedReason += "Field timestamps are wrong have changed order (did they swap)? ";
+                }
+
+                if (Math.Max(m_Corrector.m_PrevOddTicks, m_Corrector.m_PrevEvenTicks) > Math.Min(oddFieldTimestamp.Ticks, evenFieldTimestamp.Ticks))
+                {
+                    failedValidation = true;
+                    failedReason += "Field timestamps are earlier than previous timestamps. ";
                 }
 
                 if (failedValidation)

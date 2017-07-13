@@ -70,13 +70,16 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 			var rv = new IotaVtiTimeStampStrings()
 			{
 				NumSat = char1,
-				HH = string.Format("{0}{1}", char3, char4).TrimEnd(),
-				MM = string.Format("{0}{1}", char6, char7).TrimEnd(),
-				SS = string.Format("{0}{1}", char9, char10).TrimEnd(),
-				FFFF1 = string.Format("{0}{1}{2}{3}", char12, char13, char14, char15).TrimEnd(),
-				FFFF2 = string.Format("{0}{1}{2}{3}", char17, char18, char19, char20).TrimEnd(),
+				HH = string.Format("{0}{1}", char3, char4),
+				MM = string.Format("{0}{1}", char6, char7),
+				SS = string.Format("{0}{1}", char9, char10),
+				FFFF1 = string.Format("{0}{1}{2}{3}", char12, char13, char14, char15),
+				FFFF2 = string.Format("{0}{1}{2}{3}", char17, char18, char19, char20),
 				FRAMENO = string.Format("{0}{1}{2}{3}{4}{5}{6}", char22, char23, char24, char25, char26, char27, char28).TrimEnd()
 			};
+
+		    if (string.IsNullOrWhiteSpace(rv.FFFF1)) rv.FFFF1 = "";
+            if (string.IsNullOrWhiteSpace(rv.FFFF2)) rv.FFFF2 = "";
 
 			return rv;
 		}

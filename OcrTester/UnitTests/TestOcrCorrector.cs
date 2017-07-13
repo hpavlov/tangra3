@@ -389,6 +389,40 @@ namespace OcrTester.UnitTests
             Assert.AreEqual(4, nfoEven.FrameNumber);
         }
 
+        
+        [Test]
+        [TestCase(true, false, 18, 25, 05, 088.7, 18, 2, 5, 808.6, null, "18:25:05.789", "18:25:05.809")]
+        [TestCase(true, true, 18, 2, 5, 808.6, 18, 25, 05, 088.7, null, "18:25:05.809", "18:25:05.789")]
+        public void TestTwoCorrectionsAtTheSameTime(
+            bool pal, bool evenBeforeOdd,
+            int oh, int om, int os, double oms,
+            int eh, int em, int es, double ems, int? aavIntFields,
+            string eof, string eef)
+        {
+            var corr = new OcrTimeStampCorrector();
+            corr.Reset(pal ? VideoFormat.PAL : VideoFormat.NTSC);
+
+            DateTime tsPrevOdd = new DateTime(01, 01, 01, 18, 25, 05).AddMilliseconds(evenBeforeOdd ? 769 : 749);
+            DateTime tsPrevEven = new DateTime(01, 01, 01, 18, 25, 05).AddMilliseconds(evenBeforeOdd ? 749 : 769);
+
+            corr.RegisterSuccessfulTimestamp(1,
+                MockIOTAVTITimeStamp(tsPrevOdd.Hour, tsPrevOdd.Minute, tsPrevOdd.Second, tsPrevOdd.Millisecond, evenBeforeOdd ? 1001 : 1000),
+                MockIOTAVTITimeStamp(tsPrevEven.Hour, tsPrevEven.Minute, tsPrevEven.Second, tsPrevEven.Millisecond, evenBeforeOdd ? 1000 : 1001),
+                tsPrevOdd, tsPrevEven);
+
+            DateTime tsOdd = new DateTime(01, 01, 01, oh, om, os).AddMilliseconds(oms);
+            DateTime tsEven = new DateTime(01, 01, 01, eh, em, es).AddMilliseconds(ems);
+            var nfoOdd = MockIOTAVTITimeStamp(tsOdd.Hour, tsOdd.Minute, tsOdd.Second, tsOdd.Millisecond, 0);
+            var nfoEven = MockIOTAVTITimeStamp(tsEven.Hour, tsEven.Minute, tsEven.Second, tsEven.Millisecond, 0);
+
+            string debugInfo;
+            bool corrected = corr.TryToCorrect(2, 1, aavIntFields, nfoOdd, nfoEven, evenBeforeOdd, ref tsOdd, ref tsEven, out debugInfo);
+
+            Assert.IsTrue(corrected);
+            Assert.AreEqual(eof, string.Format("{0:00}:{1:00}:{2:00}.{3:000}", nfoOdd.Hours, nfoOdd.Minutes, nfoOdd.Seconds, nfoOdd.Milliseconds10 / 10.0));
+            Assert.AreEqual(eef, string.Format("{0:00}:{1:00}:{2:00}.{3:000}", nfoEven.Hours, nfoEven.Minutes, nfoEven.Seconds, nfoEven.Milliseconds10 / 10.0));
+        }
+
         [Test]
         public void TestUserSubmittedFailedCorrections()
         {

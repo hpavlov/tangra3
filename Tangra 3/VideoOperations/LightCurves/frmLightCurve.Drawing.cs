@@ -649,7 +649,8 @@ namespace Tangra.VideoOperations.LightCurves
                             }
                         }
 
-                        frame1 = frame2;
+                        if (frame2 != null)
+                            frame1 = frame2;
                     }
 
                     g.DrawString("UT", s_AxisFont, m_DisplaySettings.LabelsBrush, m_MaxX, m_MaxY + 5);
@@ -782,7 +783,8 @@ namespace Tangra.VideoOperations.LightCurves
                             }
                         }
 
-                        frame1 = frame2;
+                        if (frame2 != null)
+                            frame1 = frame2;
                     }
 
                     g.DrawString("UT", s_AxisFont, m_DisplaySettings.LabelsBrush, m_MaxX, m_MaxY + 5);

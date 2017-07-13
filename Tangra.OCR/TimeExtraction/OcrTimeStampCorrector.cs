@@ -95,7 +95,7 @@ namespace Tangra.OCR.TimeExtraction
 
                     if (!IsFieldDurationOkay(fieldDuration))
                     {
-                        if (!TryCorrectTimestamp(oddFieldTimestamp.Ticks, evenFieldTimestamp, evenFieldOSD, 1, aavIntegratedFields, aavIntegratedFields != null))
+                        if (!TryCorrectTimestamp(oddTimestampToCheck.Ticks, evenFieldTimestamp, evenFieldOSD, 1, aavIntegratedFields, aavIntegratedFields != null))
                         {
                             Trace.WriteLine(correctionDebugInfo);
                             Trace.WriteLine("IOTA-VTI Correction Failed: Cannot correct field duration CurrOdd -> CurrEven.");
@@ -141,7 +141,7 @@ namespace Tangra.OCR.TimeExtraction
 
                     if (!IsFieldDurationOkay(fieldDuration))
                     {
-                        if (!TryCorrectTimestamp(evenFieldTimestamp.Ticks, oddFieldTimestamp, oddFieldOSD, 1, aavIntegratedFields, aavIntegratedFields != null))
+                        if (!TryCorrectTimestamp(evenTimestampToCheck.Ticks, oddFieldTimestamp, oddFieldOSD, 1, aavIntegratedFields, aavIntegratedFields != null))
                         {
                             Trace.WriteLine(correctionDebugInfo);
                             Trace.WriteLine("IOTA-VTI Correction Failed: Cannot correct field duration CurrEven -> CurrOdd.");
