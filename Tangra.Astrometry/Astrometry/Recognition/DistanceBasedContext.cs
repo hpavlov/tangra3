@@ -2933,10 +2933,14 @@ namespace Tangra.Astrometry.Recognition
 
 		private Font s_DebugFont = new Font(FontFamily.GenericSerif, 8);
 
+        [DebuggerStepThrough]
         private void SaveAlignImage(List<PlateConstStarPair> pairs, int i, int j, int k, bool success, string traceMessage = null)
 		{
             try
             {
+                if ((m_StarMap as StarMap).GetPixelmap().DisplayBitmap == null) 
+                    return;
+
                 Bitmap image = (Bitmap)((m_StarMap as StarMap).GetDisplayBitmap()).Clone();
 
                 using (Graphics g = Graphics.FromImage(image))
