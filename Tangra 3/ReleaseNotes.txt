@@ -3,6 +3,7 @@
 vNext (UNRELESED)
 - Fixed a problem where IOTA-VTI OCR would return the timestamp from the 'wrong' field if field numbers are not read correctly.
 - Improvements to the OCR error corrections for errors caused by star contamination or noise.
+- Tangra will use the user entered timestamp rather then AAV operating system frame time when doing Astrometry with AAV.V1 files. 
 
 v3.6.6 (2017-07-01)
 - Significant improvements in the Astrometry module which makes the processing faster and more succesfull, particularly for fields with very few stars.

@@ -174,6 +174,7 @@ namespace Tangra.VideoOperations.Astrometry
         {
 	        VideoFileFormat format = m_VideoController.GetVideoFileFormat();
 			if (format == VideoFileFormat.AVI ||
+                format == VideoFileFormat.AAV || /* Old AAV files with manually entered timestamps */
                 (format == VideoFileFormat.AAV2 && !m_VideoController.HasEmbeddedTimeStamps()))
 			{
 				double milisecondsDiff =

@@ -2895,18 +2895,15 @@ namespace Tangra.Controller
 			    frameState.CentralExposureTime != DateTime.MinValue)
 				return frameState.CentralExposureTime;
 
-            if (frameState.HasValidNtpTimeStamp)
-                return frameState.EndFrameNtpTime;
-
-			if (frameState.HasValidSystemTimeStamp)
-				return frameState.SystemTime;
-
 		    if (HasTimestampOCR())
 		    {
 		        var ocredTimestamp = OCRTimestamp();
 		        if (ocredTimestamp != DateTime.MinValue)
 		            return ocredTimestamp;
 		    }
+
+            if (frameState.HasValidNtpTimeStamp)
+                return frameState.EndFrameNtpTime;
 
 		    return null;
 		}
