@@ -6,6 +6,7 @@
 #include "PreProcessing.h"
 #include "PixelMapUtils.h"
 #include "HotPixelRemover.h"
+#include "PolygonMask.h"
 
 PreProcessingType s_PreProcessingType;
 PreProcessingFilter s_PreProcessingFilter;
@@ -25,6 +26,11 @@ unsigned int g_HotPixelsYPos[200];
 int g_HotPixelsPosCount;
 unsigned int g_HotPixelsImageMedian;
 unsigned int g_HotPixelsMaxPixelValue;
+
+unsigned int g_MaskCornerXPos[200];
+unsigned int g_MaskCornerYPos[200];
+int g_MaskCornersCount;
+unsigned int g_MaskCornerImageMedian;
 
 float* g_DarkFramePixelsCopy = NULL;
 float* g_FlatFramePixelsCopy = NULL;
@@ -285,6 +291,20 @@ int PreProcessingAddRemoveHotPixels(unsigned int* model, unsigned int count, uns
 	return S_OK;
 }
 
+int PreProcessingDefineMaskArea(int numPoints, unsigned int* xVals, unsigned int* yVals, unsigned int imageMedian)
+{
+	g_UsesPreProcessing = true;	
+	
+	g_MaskCornersCount = numPoints;
+	g_MaskCornerImageMedian = imageMedian;
+	for (int i = 0; i < g_MaskCornersCount; i++)
+	{
+		g_MaskCornerXPos[i] = xVals[i];
+		g_MaskCornerYPos[i] = yVals[i];
+	}
+	
+	return S_OK;
+}
 
 int ApplyPreProcessingWithNormalValue(unsigned int* pixels, int width, int height, int bpp, float exposureSeconds, unsigned int normVal, BYTE* bitmapPixels, BYTE* bitmapBytes)
 {
@@ -353,6 +373,12 @@ int ApplyPreProcessingPixelsOnly(unsigned int* pixels, int width, int height, in
 	} else if (s_PreProcessingFilter == ppfLowPassDifferenceFilter) {
 		rv = PreProcessingLowPassDifferenceFilter(pixels, width, height, bpp, normVal);
 		if (rv != S_OK) return rv;
+	}
+	
+	if (g_MaskCornersCount > 0)
+	{
+		rv = PreProcessingMaskOutArea(pixels, width, height, g_MaskCornerImageMedian, g_MaskCornersCount, g_MaskCornerXPos, g_MaskCornerYPos);
+		if (rv != S_OK) return rv;		
 	}
 	
 	if (g_HotPixelsPosCount > 0)

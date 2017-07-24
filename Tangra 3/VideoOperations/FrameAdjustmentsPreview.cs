@@ -37,6 +37,7 @@ namespace Tangra.VideoOperations
         private bool m_UseReInterlacedMode = false;
 	    private bool m_UseHotPixelCorrection = false;
         private bool m_HotPixelConfiguration = false;
+	    private bool m_MaskAreaConfiguration;
 
 		private int m_FramesToIntegrate;
 		private FrameIntegratingMode m_IntegrationMode;
@@ -178,7 +179,8 @@ namespace Tangra.VideoOperations
 			    m_UseBrightnessContrast ||
                 m_UseReInterlacedMode ||
                 m_UseHotPixelCorrection ||
-                m_HotPixelConfiguration)
+                m_HotPixelConfiguration ||
+                m_MaskAreaConfiguration)
 			{
 				if (m_UseIntegration)
 					m_VideoController.SetupFrameIntegration(m_FramesToIntegrate, m_IntegrationMode, m_IntegrationType);
@@ -211,6 +213,7 @@ namespace Tangra.VideoOperations
 				}
 
 			    HotPixelCorrector.ReconfigurePreProcessing();
+                MaskAreaSelector.ReconfigurePreProcessing();
 
 				//if (VideoContext.Current.DarkFrameBytes != null)
 				//{
@@ -233,13 +236,6 @@ namespace Tangra.VideoOperations
 
 				if (m_CurrFrame != null)
 				{
-                    //if (m_UseHotPixelCorrection)
-                    //{
-                    //    // TODO: Do a hot pixel correction, for now in Managed Land   
-                    //    var corrected = HotPixelCorrector.CorrectHotPixels8BitManagedHack(m_CurrFrame);
-                    //    m_CurrFrame = corrected;
-                    //}
-
 					frmFullSizePreview.EnsureFullPreviewVisible(m_CurrFrame, ParentForm);
 					frmFullSizePreview.Update(m_CurrFrame);
 				}
@@ -268,5 +264,12 @@ namespace Tangra.VideoOperations
             m_HotPixelConfiguration = enabled;
 	        Update();
 	    }
+
+        public void ExpectMaskAreaClick(bool expect, bool enabled)
+        {
+            frmFullSizePreview.SetCursor(expect ? Cursors.Hand : Cursors.Default);
+            m_MaskAreaConfiguration = enabled;
+            Update();
+        }
 	}
 }

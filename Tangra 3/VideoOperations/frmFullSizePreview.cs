@@ -42,6 +42,10 @@ namespace Tangra.VideoOperations
 
 	    public static event Action<Graphics> OnDrawOverlays;
         public static event Action<MouseEventArgs> OnMouseClicked;
+	    public static event Action<MouseEventArgs> OnMouseMoved;
+        public static event Action<MouseEventArgs> OnMouseDowned;
+	    public static event Action<MouseEventArgs> OnMouseUped;
+        public static event Action<KeyEventArgs> OnPreviewKeyDowned;
 
 		public static void EnsureFullPreviewVisible(Pixelmap currFrame, Form parentForm)
 		{
@@ -151,6 +155,41 @@ namespace Tangra.VideoOperations
         {
             if (OnMouseClicked != null)
                 OnMouseClicked.Invoke(e);
+        }
+
+        private void pictureBox_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (OnMouseMoved != null)
+                OnMouseMoved.Invoke(e);
+        }
+
+        private void pictureBox_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (OnMouseDowned != null)
+                OnMouseDowned.Invoke(e);
+        }
+
+        private void pictureBox_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (OnMouseUped != null)
+                OnMouseUped.Invoke(e);
+        }
+
+        private void pictureBox_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+
+        }
+
+        private void frmFullSizePreview_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (OnPreviewKeyDowned != null)
+                OnPreviewKeyDowned.Invoke(e);
+        }
+
+        private void frmFullSizePreview_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (OnPreviewKeyDowned != null)
+                OnPreviewKeyDowned.Invoke(e);
         }
 	}
 }

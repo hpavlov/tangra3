@@ -28,6 +28,10 @@ namespace Tangra.VideoTools
 
             frmFullSizePreview.OnDrawOverlays += frmFullSizePreview_OnDrawOverlays;
             frmFullSizePreview.OnMouseClicked += frmFullSizePreview_OnMouseClicked;
+            frmFullSizePreview.OnMouseDowned += frmFullSizePreview_OnMouseDowned;
+            frmFullSizePreview.OnMouseUped += frmFullSizePreview_OnMouseUped;
+            frmFullSizePreview.OnMouseMoved += frmFullSizePreview_OnMouseMoved;
+            frmFullSizePreview.OnPreviewKeyDowned += frmFullSizePreview_OnPreviewKeyDowned;
         }
 
         /// <summary> 
@@ -44,7 +48,11 @@ namespace Tangra.VideoTools
             if (disposing)
             {
                 frmFullSizePreview.OnMouseClicked -= frmFullSizePreview_OnMouseClicked;
-                frmFullSizePreview.OnDrawOverlays -= frmFullSizePreview_OnDrawOverlays;                
+                frmFullSizePreview.OnDrawOverlays -= frmFullSizePreview_OnDrawOverlays;
+                frmFullSizePreview.OnMouseUped -= frmFullSizePreview_OnMouseUped;
+                frmFullSizePreview.OnMouseDowned -= frmFullSizePreview_OnMouseDowned;
+                frmFullSizePreview.OnMouseMoved -= frmFullSizePreview_OnMouseMoved;
+                frmFullSizePreview.OnPreviewKeyDowned -= frmFullSizePreview_OnPreviewKeyDowned;
             }
             
             base.Dispose(disposing);
@@ -147,6 +155,7 @@ namespace Tangra.VideoTools
             {
                 HotPixelCorrector.Initialize();
 
+                FrameAdjustmentsPreview.Instance.ExpectMaskAreaClick(false, false);
                 FrameAdjustmentsPreview.Instance.ExpectHotPixelClick(true, true);
 
                 MessageBox.Show(ParentForm, 
@@ -167,42 +176,88 @@ namespace Tangra.VideoTools
             pnlHotPixelControls.Enabled = false;
         }
 
-
         void frmFullSizePreview_OnMouseClicked(MouseEventArgs e)
         {
             if (cbxUseHotPixelsCorrection.Checked && m_ExpectHotPixelDefinition && frmFullSizePreview.CurrFrame != null)
             {
-                var pixels = frmFullSizePreview.CurrFrame.GetPixelsArea(e.X, e.Y, 35); 
-                PSFFit fit = new PSFFit(e.X, e.Y);
-                fit.Fit(pixels);
-                if (fit.IsSolved && fit.Certainty > 1 && fit.IMax > frmFullSizePreview.CurrFrame.MaxSignalValue/2.0)
-                {
-                    var sample = frmFullSizePreview.CurrFrame.GetPixelsArea((int) Math.Round(fit.XCenter), (int) Math.Round(fit.YCenter), 7);
-                    HotPixelCorrector.RegisterHotPixelSample(sample, frmFullSizePreview.CurrFrame.Pixelmap.MaxSignalValue);
+                HandleHotPixelDefinitionClick(e);
+            }            
+        }
 
-                    m_ExpectHotPixelDefinition = false;
-                    FrameAdjustmentsPreview.Instance.ExpectHotPixelClick(false, true);
-                    pnlHotPixelControls.Enabled = true;
+        void frmFullSizePreview_OnMouseUped(MouseEventArgs e)
+        {
+            if (cbxMaskContamination.Checked && m_ExpectMaskAreaDefinition && frmFullSizePreview.CurrFrame != null)
+            {
+                MaskAreaSelector.OnMouseUp(e);
+                FrameAdjustmentsPreview.Instance.Update();
+            }
+        }
 
-                    HotPixelCorrector.LocateHotPixels(frmFullSizePreview.CurrFrame, Math.Max(0, tbDepth.Value));
+        void frmFullSizePreview_OnMouseDowned(MouseEventArgs e)
+        {
+            if (cbxMaskContamination.Checked && m_ExpectMaskAreaDefinition && frmFullSizePreview.CurrFrame != null)
+            {
+                MaskAreaSelector.OnMouseDown(e);
+                FrameAdjustmentsPreview.Instance.Update();
+            }
+        }
 
-                    FrameAdjustmentsPreview.Instance.Update();
-                }
-                else
-                {
-                    MessageBox.Show(
-                        ParentForm, 
-                        "The location you clicked doesn't appear to contain a hot pixel. Please try again.\r\n\r\nIf necessary adjust the brightness and contrast of the image first.", 
-                        "Tangra", 
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+        void frmFullSizePreview_OnMouseMoved(MouseEventArgs e)
+        {
+            if (cbxMaskContamination.Checked && m_ExpectMaskAreaDefinition && frmFullSizePreview.CurrFrame != null)
+            {
+                MaskAreaSelector.OnMouseMove(e);
+                FrameAdjustmentsPreview.Instance.Update();
+            }
+        }
+
+
+        void frmFullSizePreview_OnPreviewKeyDowned(KeyEventArgs e)
+        {
+            if (cbxMaskContamination.Checked && m_ExpectMaskAreaDefinition && frmFullSizePreview.CurrFrame != null)
+            {
+
+                MaskAreaSelector.OnPreviewKeyDown(e);
+                FrameAdjustmentsPreview.Instance.Update();
+            }
+        }
+
+
+        private void HandleHotPixelDefinitionClick(MouseEventArgs e)
+        {
+            var pixels = frmFullSizePreview.CurrFrame.GetPixelsArea(e.X, e.Y, 35);
+            PSFFit fit = new PSFFit(e.X, e.Y);
+            fit.Fit(pixels);
+            if (fit.IsSolved && fit.Certainty > 1 && fit.IMax > frmFullSizePreview.CurrFrame.MaxSignalValue / 2.0)
+            {
+                var sample = frmFullSizePreview.CurrFrame.GetPixelsArea((int)Math.Round(fit.XCenter), (int)Math.Round(fit.YCenter), 7);
+                HotPixelCorrector.RegisterHotPixelSample(sample, frmFullSizePreview.CurrFrame.Pixelmap.MaxSignalValue);
+
+                m_ExpectHotPixelDefinition = false;
+                FrameAdjustmentsPreview.Instance.ExpectHotPixelClick(false, true);
+                pnlHotPixelControls.Enabled = true;
+
+                HotPixelCorrector.LocateHotPixels(frmFullSizePreview.CurrFrame, Math.Max(0, tbDepth.Value));
+
+                FrameAdjustmentsPreview.Instance.Update();
+            }
+            else
+            {
+                MessageBox.Show(
+                    ParentForm,
+                    "The location you clicked doesn't appear to contain a hot pixel. Please try again.\r\n\r\nIf necessary adjust the brightness and contrast of the image first.",
+                    "Tangra",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         void frmFullSizePreview_OnDrawOverlays(Graphics g)
         {
             if (cbxUseHotPixelsCorrection.Checked)
-                HotPixelCorrector.DrawOverlay(g, Math.Max(1, tbDepth.Value), cbxPlotPeakPixels.Checked);                
+                HotPixelCorrector.DrawOverlay(g, Math.Max(1, tbDepth.Value), cbxPlotPeakPixels.Checked);
+
+            if (cbxMaskContamination.Checked)
+                MaskAreaSelector.DrawOverlay(g);
         }
 
         private void ucImageDefectSettings_Load(object sender, EventArgs e)
@@ -241,6 +296,33 @@ namespace Tangra.VideoTools
         internal void ApplyHotPixelSettings()
         {
             HotPixelCorrector.ConfigurePreProcessing(cbxUseHotPixelsCorrection.Checked);
+        }
+
+        private bool m_ExpectMaskAreaDefinition;
+
+        private void cbxMaskContamination_CheckedChanged(object sender, EventArgs e)
+        {
+            if (cbxMaskContamination.Checked)
+            {
+                FrameAdjustmentsPreview.Instance.ExpectHotPixelClick(false, false);
+                FrameAdjustmentsPreview.Instance.ExpectMaskAreaClick(true, true);
+
+                MessageBox.Show(ParentForm,
+                    "Please define the polygon area to mask out by selecting 4 or more corners finishing at the first corner.\r\n\r\n" +
+                    "Once the polygon is defined the corners can be dragged around to refine the area and new corners can be added while holding Shift.\r\n\r\n" +
+                    "Right-click to reset.",
+                    "Tangra",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                m_ExpectMaskAreaDefinition = true;
+
+                MaskAreaSelector.Initialize();
+            }
+            else
+            {
+                m_ExpectMaskAreaDefinition = false;
+                FrameAdjustmentsPreview.Instance.ExpectMaskAreaClick(false, false);
+            }
         }
     }
 }

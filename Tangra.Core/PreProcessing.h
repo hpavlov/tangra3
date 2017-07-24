@@ -62,6 +62,7 @@ DLL_PUBLIC int PreProcessingAddFlatFrame(float* flatFramePixels, unsigned int pi
 DLL_PUBLIC int PreProcessingAddBiasFrame(float* biasFramePixels, unsigned int pixelsCount);
 DLL_PUBLIC int PreProcessingAddFlipAndRotation(enum RotateFlipType rotateFlipType);
 DLL_PUBLIC int PreProcessingAddRemoveHotPixels(unsigned int* model, unsigned int count, unsigned int* xVals, unsigned int* yVals, unsigned int imageMedian, unsigned int maxPixelValue);
+DLL_PUBLIC int PreProcessingDefineMaskArea(int numPoints, unsigned int* xVals, unsigned int* yVals, unsigned int imageMedian);
 DLL_PUBLIC int PreProcessingUsesPreProcessing(bool* usesPreProcessing);
 DLL_PUBLIC int PreProcessingGetConfig(
 	PreProcessingType* preProcessingType, 

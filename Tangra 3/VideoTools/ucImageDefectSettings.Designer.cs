@@ -35,6 +35,7 @@
             this.cbxPlotPeakPixels = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
             this.lblDepthValue = new System.Windows.Forms.Label();
+            this.cbxMaskContamination = new System.Windows.Forms.CheckBox();
             this.gbxInterlacedSettings.SuspendLayout();
             this.contextMenuFilter.SuspendLayout();
             this.gbxHotPixels.SuspendLayout();
@@ -51,7 +52,7 @@
             this.gbxInterlacedSettings.Controls.Add(this.rbReInterlaceSwapFields);
             this.gbxInterlacedSettings.Location = new System.Drawing.Point(3, 3);
             this.gbxInterlacedSettings.Name = "gbxInterlacedSettings";
-            this.gbxInterlacedSettings.Size = new System.Drawing.Size(249, 135);
+            this.gbxInterlacedSettings.Size = new System.Drawing.Size(249, 121);
             this.gbxInterlacedSettings.TabIndex = 48;
             this.gbxInterlacedSettings.TabStop = false;
             this.gbxInterlacedSettings.Text = "Interlaced Video Frame Grabbing Corrections";
@@ -143,7 +144,7 @@
             // cbxUseHotPixelsCorrection
             // 
             this.cbxUseHotPixelsCorrection.AutoSize = true;
-            this.cbxUseHotPixelsCorrection.Location = new System.Drawing.Point(17, 144);
+            this.cbxUseHotPixelsCorrection.Location = new System.Drawing.Point(17, 135);
             this.cbxUseHotPixelsCorrection.Name = "cbxUseHotPixelsCorrection";
             this.cbxUseHotPixelsCorrection.Size = new System.Drawing.Size(124, 17);
             this.cbxUseHotPixelsCorrection.TabIndex = 79;
@@ -154,7 +155,7 @@
             // gbxHotPixels
             // 
             this.gbxHotPixels.Controls.Add(this.pnlHotPixelControls);
-            this.gbxHotPixels.Location = new System.Drawing.Point(3, 144);
+            this.gbxHotPixels.Location = new System.Drawing.Point(3, 135);
             this.gbxHotPixels.Name = "gbxHotPixels";
             this.gbxHotPixels.Size = new System.Drawing.Size(387, 129);
             this.gbxHotPixels.TabIndex = 80;
@@ -248,16 +249,28 @@
             this.lblDepthValue.TabIndex = 82;
             this.lblDepthValue.Text = "20";
             // 
+            // cbxMaskContamination
+            // 
+            this.cbxMaskContamination.AutoSize = true;
+            this.cbxMaskContamination.Location = new System.Drawing.Point(17, 278);
+            this.cbxMaskContamination.Name = "cbxMaskContamination";
+            this.cbxMaskContamination.Size = new System.Drawing.Size(149, 17);
+            this.cbxMaskContamination.TabIndex = 81;
+            this.cbxMaskContamination.Text = "Ignore Contaminated Area";
+            this.cbxMaskContamination.UseVisualStyleBackColor = true;
+            this.cbxMaskContamination.CheckedChanged += new System.EventHandler(this.cbxMaskContamination_CheckedChanged);
+            // 
             // ucImageDefectSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.cbxMaskContamination);
             this.Controls.Add(this.cbxUseHotPixelsCorrection);
             this.Controls.Add(this.gbxHotPixels);
             this.Controls.Add(this.btnPreProcessingFilter);
             this.Controls.Add(this.gbxInterlacedSettings);
             this.Name = "ucImageDefectSettings";
-            this.Size = new System.Drawing.Size(800, 289);
+            this.Size = new System.Drawing.Size(410, 329);
             this.Load += new System.EventHandler(this.ucImageDefectSettings_Load);
             this.gbxInterlacedSettings.ResumeLayout(false);
             this.gbxInterlacedSettings.PerformLayout();
@@ -294,5 +307,6 @@
         private System.Windows.Forms.CheckBox cbxPlotPeakPixels;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Panel pnlHotPixelControls;
+        private System.Windows.Forms.CheckBox cbxMaskContamination;
     }
 }

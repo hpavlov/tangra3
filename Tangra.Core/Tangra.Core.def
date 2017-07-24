@@ -53,6 +53,7 @@ EXPORTS
 	PreProcessingBrightnessContrast
 	PreProcessingGamma
 	PreProcessingAddRemoveHotPixels
+	PreProcessingDefineMaskArea
 
 	; Video Helpers
 	IntegrationManagerGetFirstFrameToIntegrate

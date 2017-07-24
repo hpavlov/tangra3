@@ -57,6 +57,7 @@
     <File Name="adv2_status_section.cpp"/>
     <File Name="adv_profiling.cpp"/>
     <File Name="HotPixelRemover.cpp"/>
+    <File Name="PolygonMask.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="include">
     <File Name="adv_file.h"/>
@@ -92,6 +93,7 @@
     <File Name="stdafx.h"/>
     <File Name="adv_profiling.h"/>
     <File Name="HotPixelRemover.h"/>
+    <File Name="PolygonMask.h"/>
   </VirtualDirectory>
   <Settings Type="Dynamic Library">
     <GlobalSettings>

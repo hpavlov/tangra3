@@ -31,6 +31,10 @@ namespace Tangra.VideoOperations
             this.pictureBox.TabIndex = 0;
             this.pictureBox.TabStop = false;
             this.pictureBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseClick);
+            this.pictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDown);
+            this.pictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseMove);
+            this.pictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseUp);
+            this.pictureBox.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.pictureBox_PreviewKeyDown);
             // 
             // frmFullSizePreview
             // 
@@ -42,6 +46,8 @@ namespace Tangra.VideoOperations
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "frmFullSizePreview";
             this.Text = "Full Size Preview";
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.frmFullSizePreview_KeyDown);
+            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.frmFullSizePreview_KeyUp);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).EndInit();
             this.ResumeLayout(false);
 

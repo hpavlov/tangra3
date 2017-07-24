@@ -650,6 +650,8 @@ namespace Tangra.PInvoke
 		    [DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
             private static extern int PreProcessingAddRemoveHotPixels(uint[] model, uint count, uint[] xVals, uint[] yVals, uint imageMedian, uint maxPixelValue);
 
+            [DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
+            public static extern int PreProcessingDefineMaskArea(int numPoints, [In] uint[] xVals, [In] uint[] yVals, uint imageMedian);
 
 			[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
 			private static extern int PreProcessingGetConfig(
