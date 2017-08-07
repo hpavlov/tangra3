@@ -306,23 +306,23 @@ int PreProcessingDefineMaskArea(int numPoints, unsigned int* xVals, unsigned int
 	return S_OK;
 }
 
-int ApplyPreProcessingWithNormalValue(unsigned int* pixels, int width, int height, int bpp, float exposureSeconds, unsigned int normVal, BYTE* bitmapPixels, BYTE* bitmapBytes)
+int ApplyPreProcessingWithNormalValue(unsigned int* originalPixels, unsigned int* pixels, int width, int height, int bpp, float exposureSeconds, unsigned int normVal, BYTE* bitmapPixels, BYTE* bitmapBytes)
 {
-	int rv = ApplyPreProcessingPixelsOnly(pixels, width, height, bpp, normVal, exposureSeconds);
+	int rv = ApplyPreProcessingPixelsOnly(originalPixels, pixels, width, height, bpp, normVal, exposureSeconds);
 	if (!SUCCEEDED(rv)) return rv;
 
 	return GetBitmapPixels(width, height, pixels, bitmapPixels, bitmapBytes, false, bpp, normVal);
 }
 
-int ApplyPreProcessing(unsigned int* pixels, int width, int height, int bpp, float exposureSeconds, BYTE* bitmapPixels, BYTE* bitmapBytes)
+int ApplyPreProcessing(unsigned int* originalPixels, unsigned int* pixels, int width, int height, int bpp, float exposureSeconds, BYTE* bitmapPixels, BYTE* bitmapBytes)
 {
-	int rv = ApplyPreProcessingPixelsOnly(pixels, width, height, bpp, 0, exposureSeconds);
+	int rv = ApplyPreProcessingPixelsOnly(originalPixels, pixels, width, height, bpp, 0, exposureSeconds);
 	if (!SUCCEEDED(rv)) return rv;
 
 	return GetBitmapPixels(width, height, pixels, bitmapPixels, bitmapBytes, false, bpp, 0);
 }
 
-int ApplyPreProcessingPixelsOnly(unsigned int* pixels, int width, int height, int bpp, unsigned int normVal, float exposureSeconds)
+int ApplyPreProcessingPixelsOnly(unsigned int* originalPixels, unsigned int* pixels, int width, int height, int bpp, unsigned int normVal, float exposureSeconds)
 {
 	// To achieve correct photometry gamma needs to be applied before darks and flats. 
 	// Use the following order when applying pre-processing
@@ -378,7 +378,11 @@ int ApplyPreProcessingPixelsOnly(unsigned int* pixels, int width, int height, in
 	if (g_MaskCornersCount > 0)
 	{
 		rv = PreProcessingMaskOutArea(pixels, width, height, g_MaskCornerImageMedian, g_MaskCornersCount, g_MaskCornerXPos, g_MaskCornerYPos);
-		if (rv != S_OK) return rv;		
+		if (rv != S_OK) return rv;	
+
+		// Area masking is applied to both original pixels and the pre-processed pixels copy
+		rv = PreProcessingMaskOutArea(originalPixels, width, height, g_MaskCornerImageMedian, g_MaskCornersCount, g_MaskCornerXPos, g_MaskCornerYPos);
+		if (rv != S_OK) return rv;
 	}
 	
 	if (g_HotPixelsPosCount > 0)

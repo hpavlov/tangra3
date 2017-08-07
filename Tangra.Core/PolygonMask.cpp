@@ -105,4 +105,6 @@ HRESULT PreProcessingMaskOutArea(unsigned int* pixels, int width, int height, un
 				pixels[y * width + x] = fillColour;
 		}
 	}
+	
+	return S_OK;
 }

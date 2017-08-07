@@ -258,7 +258,7 @@ HRESULT SERGetFrame(int frameNo, unsigned int* pixels, unsigned int* originalPix
 				memcpy(originalPixels, pixels, m_SerFile->Width * m_SerFile->Height * sizeof(unsigned int));
 				
 				return ApplyPreProcessingWithNormalValue(
-					pixels, 
+					originalPixels, pixels, 
 					m_SerFile->Width, 
 					m_SerFile->Height, 
 					cameraBitPix, 
@@ -326,7 +326,7 @@ HRESULT SERGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSl
 				memcpy(originalPixels, pixels, m_SerFile->Width * m_SerFile->Height * sizeof(unsigned int));
 			
 				rv = ApplyPreProcessingPixelsOnly(
-					pixels, 
+					originalPixels, pixels, 
 					m_SerFile->Width, 
 					m_SerFile->Height, 
 					cameraBitPix, 

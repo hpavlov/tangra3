@@ -138,14 +138,14 @@ namespace Tangra.Video.FITS
             uint[] flatPixelsCopy = new uint[pixelsFlat.Length];
             Array.Copy(pixelsFlat, flatPixelsCopy, pixelsFlat.Length);
 
-            TangraCore.PreProcessors.ApplyPreProcessingPixelsOnly(flatPixelsCopy, Width, Height, BitPix, 0 /* No normal value for FITS files */, exposure.HasValue ? (float)exposure.Value : 0);
+            TangraCore.PreProcessors.ApplyPreProcessingPixelsOnly(pixelsFlat, flatPixelsCopy, Width, Height, BitPix, 0 /* No normal value for FITS files */, exposure.HasValue ? (float)exposure.Value : 0);
 
             TangraCore.GetBitmapPixels(Width, Height, flatPixelsCopy, rawBitmapBytes, displayBitmapBytes, true, (ushort)BitPix, 0);
 
             Bitmap displayBitmap = Pixelmap.ConstructBitmapFromBitmapPixels(displayBitmapBytes, Width, Height);
 
             Pixelmap rv = new Pixelmap(Width, Height, BitPix, flatPixelsCopy, displayBitmap, displayBitmapBytes);
-
+            rv.UnprocessedPixels = pixelsFlat;
 			if (HasUTCTimeStamps)
 			{
 			    rv.FrameState.CentralExposureTime = timestamp.HasValue ? timestamp.Value : DateTime.MinValue;

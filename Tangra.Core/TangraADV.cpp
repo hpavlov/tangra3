@@ -153,7 +153,7 @@ HRESULT ADVGetFrame(int frameNo, unsigned int* pixels, unsigned int* originalPix
 			memcpy(originalPixels, pixels, g_TangraAdvFile->ImageSection->Width * g_TangraAdvFile->ImageSection->Height * sizeof(unsigned int));
 			
 			return ApplyPreProcessingWithNormalValue(
-				pixels, g_TangraAdvFile->ImageSection->Width, g_TangraAdvFile->ImageSection->Height, g_TangraAdvFile->ImageSection->DataBpp, frameInfo->Exposure10thMs / 10000.0,
+				originalPixels, pixels, g_TangraAdvFile->ImageSection->Width, g_TangraAdvFile->ImageSection->Height, g_TangraAdvFile->ImageSection->DataBpp, frameInfo->Exposure10thMs / 10000.0,
 				g_TangraAdvFile->ImageSection->NormalisationValue, bitmapPixels, bitmapBytes);
 				
 		}
@@ -210,7 +210,7 @@ HRESULT ADVGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSl
 			memcpy(originalPixels, pixels, g_TangraAdvFile->ImageSection->Width * g_TangraAdvFile->ImageSection->Height * sizeof(unsigned int));
 			
 			rv = ApplyPreProcessingPixelsOnly(
-				pixels, 
+				originalPixels, pixels, 
 				g_TangraAdvFile->ImageSection->Width, 
 				g_TangraAdvFile->ImageSection->Height, 
 				g_TangraAdvFile->ImageSection->DataBpp, 
@@ -354,7 +354,7 @@ ADVRESULT ADV2GetFrame(int frameNo, unsigned int* pixels, unsigned int* original
 			float exposureSeconds = frameInfo->Exposure / 10000.0;
 			
 			return ApplyPreProcessingWithNormalValue(
-				pixels, g_TangraAdv2File->ImageSection->Width, g_TangraAdv2File->ImageSection->Height, g_TangraAdv2File->ImageSection->DataBpp, exposureSeconds,
+				originalPixels, pixels, g_TangraAdv2File->ImageSection->Width, g_TangraAdv2File->ImageSection->Height, g_TangraAdv2File->ImageSection->DataBpp, exposureSeconds,
 				g_TangraAdv2File->ImageSection->MaxPixelValue, bitmapPixels, bitmapBytes);
 				
 		}

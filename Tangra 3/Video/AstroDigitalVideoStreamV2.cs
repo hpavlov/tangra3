@@ -262,7 +262,7 @@ namespace Tangra.Video
                 Array.Copy(pixels, unprocessedPixels, pixels.Length);
             }
 
-            TangraCore.PreProcessors.ApplyPreProcessingPixelsOnly(pixels, m_Width, m_Height, m_BitPix, m_MaxPixelValue,(float)(advFrameInfo.UtcExposureMilliseconds / 1000.0));
+            TangraCore.PreProcessors.ApplyPreProcessingPixelsOnly(unprocessedPixels, pixels, m_Width, m_Height, m_BitPix, m_MaxPixelValue, (float)(advFrameInfo.UtcExposureMilliseconds / 1000.0));
 
             TangraCore.GetBitmapPixels(Width, Height, pixels, rawBitmapBytes, displayBitmapBytes, true, (ushort)BitPix, m_MaxPixelValue);
 
@@ -290,7 +290,7 @@ namespace Tangra.Video
             Pixelmap rv = new Pixelmap(Width, Height, BitPix, pixels, displayBitmap, displayBitmapBytes);
             rv.SetMaxSignalValue(m_MaxPixelValue);
             rv.FrameState = GetCurrentFrameState(advFrameInfo);
-            rv.UnprocessedPixels = pixels;
+            rv.UnprocessedPixels = unprocessedPixels;
             return rv;
         }
 

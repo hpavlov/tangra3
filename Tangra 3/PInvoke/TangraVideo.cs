@@ -203,7 +203,7 @@ namespace Tangra.PInvoke
 
                             Array.Copy(pixels, originalPixels, pixels.Length);
 
-                            TangraCore.PreProcessors.ApplyPreProcessingPixelsOnly(pixels, width, height, 8, 0 /* No normal value for FITS files */, 0 /* No exposure support for 8 bit darks. They must be same exposure */);
+                            TangraCore.PreProcessors.ApplyPreProcessingPixelsOnly(originalPixels, pixels, width, height, 8, 0 /* No normal value for FITS files */, 0 /* No exposure support for 8 bit darks. They must be same exposure */);
 
                             TangraCore.GetBitmapPixels(width, height, pixels, rawBitmapBytes, bitmapBytes, true, 8, 0);
 
@@ -261,7 +261,7 @@ namespace Tangra.PInvoke
 
                 Array.Copy(pixels, originalPixels, pixels.Length);
 
-                TangraCore.PreProcessors.ApplyPreProcessingPixelsOnly(pixels, s_fileInfo.Width, s_fileInfo.Height, 8, 0 /* No normal value for FITS files */, 0 /* No exposure support for 8 bit darks. They must be same exposure */);
+                TangraCore.PreProcessors.ApplyPreProcessingPixelsOnly(originalPixels, pixels, s_fileInfo.Width, s_fileInfo.Height, 8, 0 /* No normal value for FITS files */, 0 /* No exposure support for 8 bit darks. They must be same exposure */);
 
 			}
 			else
@@ -286,7 +286,7 @@ namespace Tangra.PInvoke
 
                 Array.Copy(pixels, originalPixels, pixels.Length);
 
-                TangraCore.PreProcessors.ApplyPreProcessingPixelsOnly(pixels, s_fileInfo.Width, s_fileInfo.Height, 8, 0 /* No normal value for FITS files */, 0 /* No exposure support for 8 bit darks. They must be same exposure */);
+                TangraCore.PreProcessors.ApplyPreProcessingPixelsOnly(originalPixels, pixels, s_fileInfo.Width, s_fileInfo.Height, 8, 0 /* No normal value for FITS files */, 0 /* No exposure support for 8 bit darks. They must be same exposure */);
 
 				TangraCore.GetBitmapPixels(s_fileInfo.Width, s_fileInfo.Height, pixels, rawBitmapBytes, bitmapBytes, true, 8, 0);
 
