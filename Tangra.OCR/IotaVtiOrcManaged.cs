@@ -213,8 +213,10 @@ namespace Tangra.OCR
         }
 
 
-        public bool ExtractTime(int frameNo, int frameStep, uint[] data, out DateTime time)
-		{
+        public bool ExtractTime(int frameNo, int frameStep, uint[] data, bool debug, out DateTime time)
+        {
+            LastOddFieldOSD = null;
+
             if (m_Processor.IsCalibrated && m_TimeStampComposer != null)
             {
                 if (m_VideoController != null)
@@ -223,16 +225,21 @@ namespace Tangra.OCR
                 PrepareOsdVideoFields(data);
 
                 m_Processor.Process(m_OddFieldPixelsPreProcessed, m_FieldAreaWidth, m_FieldAreaHeight, null, frameNo, true);
-                IotaVtiTimeStamp oddFieldOSD = m_Processor.CurrentOcredTimeStamp;
+                LastOddFieldOSD = m_Processor.CurrentOcredTimeStamp;
 
                 m_Processor.Process(m_EvenFieldPixelsPreProcessed, m_FieldAreaWidth, m_FieldAreaHeight, null, frameNo, false);
-                IotaVtiTimeStamp evenFieldOSD = m_Processor.CurrentOcredTimeStamp;
+                LastEvenFieldOSD = m_Processor.CurrentOcredTimeStamp;
+                string failedReason;
 
                 if (m_InitializationData.IntegratedAAVFrames > 0)
-                    time = m_TimeStampComposer.ExtractAAVDateTime(frameNo, frameStep, oddFieldOSD, evenFieldOSD);
+                {
+                    time = m_TimeStampComposer.ExtractAAVDateTime(frameNo, frameStep, LastOddFieldOSD, LastEvenFieldOSD, out failedReason);
+                    LastFailedReason = failedReason;
+                }
                 else
                 {
-                    time = m_TimeStampComposer.ExtractDateTime(frameNo, frameStep, oddFieldOSD, evenFieldOSD);
+                    time = m_TimeStampComposer.ExtractDateTime(frameNo, frameStep, LastOddFieldOSD, LastEvenFieldOSD, out failedReason);
+                    LastFailedReason = failedReason;
                 }
             }
             else
@@ -241,17 +248,29 @@ namespace Tangra.OCR
             return time != DateTime.MinValue;
 		}
 
+        public IVtiTimeStamp LastOddFieldOSD { get; private set; }
+        public IVtiTimeStamp LastEvenFieldOSD { get; private set; }
+        public string LastFailedReason { get; private set; }
+
+        public Bitmap GetOCRDebugImage()
+        {
+            // TODO:
+            return null;
+        }
+
         public bool ExtractTime(int frameNo, int frameStep, uint[] oddPixels, uint[] evenPixels, int width, int height, out DateTime time)
 	    {
             if (m_Processor.IsCalibrated && m_TimeStampComposer != null)
             {
                 m_Processor.Process(oddPixels, width, height, null, frameNo, true);
-                IotaVtiTimeStamp oddFieldOSD = m_Processor.CurrentOcredTimeStamp;
+                LastOddFieldOSD = m_Processor.CurrentOcredTimeStamp;
 
                 m_Processor.Process(evenPixels, width, height, null, frameNo, false);
-                IotaVtiTimeStamp evenFieldOSD = m_Processor.CurrentOcredTimeStamp;
+                LastEvenFieldOSD = m_Processor.CurrentOcredTimeStamp;
+                string failedReason;
 
-                time = m_TimeStampComposer.ExtractDateTime(frameNo, frameStep, oddFieldOSD, evenFieldOSD);
+                time = m_TimeStampComposer.ExtractDateTime(frameNo, frameStep, LastOddFieldOSD, LastEvenFieldOSD, out failedReason);
+                LastFailedReason = failedReason;
             }
             else
                 time = DateTime.MinValue;

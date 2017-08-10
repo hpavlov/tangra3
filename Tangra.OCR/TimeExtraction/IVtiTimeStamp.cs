@@ -24,6 +24,7 @@ namespace Tangra.OCR.TimeExtraction
         int Year { get; }
         int Month { get; }
         int Day { get; }
+        string OcredCharacters { get; }
         void Correct(int hours, int minutes, int seconds, int milliseconds10);
         void CorrectFrameNumber(int frameNo);
     }
@@ -38,9 +39,17 @@ namespace Tangra.OCR.TimeExtraction
         public static string AsString(this IVtiTimeStamp x)
         {
             if (x.ContainsFrameNumbers)
-                return string.Format("{0}:{1}:{2} {3} FrmNo:{4}", x.Hours, x.Minutes, x.Seconds, x.Milliseconds10, x.FrameNumber);
+                return string.Format("{0:00}:{1:00}:{2:00}.{3:0000} FrmNo:{4}", x.Hours, x.Minutes, x.Seconds, x.Milliseconds10, x.FrameNumber);
             else
-                return string.Format("{0}:{1}:{2} {3}", x.Hours, x.Minutes, x.Seconds, x.Milliseconds10);
+                return string.Format("{0:00}:{1:00}:{2:00}.{3:0000}", x.Hours, x.Minutes, x.Seconds, x.Milliseconds10);
+        }
+
+        public static string AsFullString(this IVtiTimeStamp x)
+        {
+            if (x.ContainsDate)
+                return string.Format("{0}-{1:00}-{2:00} {3}", x.Year, x.Month, x.Day, x.AsString());
+            else
+                return x.AsString();
         }
 
         public static long GetTicks(this IVtiTimeStamp x)
@@ -84,6 +93,8 @@ namespace Tangra.OCR.TimeExtraction
         public int Year { get; private set; }
         public int Month { get; private set; }
         public int Day { get; private set; }
+
+        public string OcredCharacters { get; private set; }
 
         public void Correct(int hours, int minutes, int seconds, int milliseconds10)
         {

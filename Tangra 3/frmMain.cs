@@ -1429,8 +1429,13 @@ namespace Tangra
             m_VideoController.InitializeTimestampOCR();
 
             if (m_VideoController.HasTimestampOCR())
+            {
+                m_VideoController.DebugOCR = Control.ModifierKeys == Keys.Control;
+                m_VideoController.RegisterOverlayRenderer(m_VideoController.PrintOCRedTimeStamp);
+
                 // If OCR engine has been initialized then redraw the frame to show the boxes around the numbers
-                m_VideoController.RedrawCurrentFrame(false);
+                m_VideoController.RedrawCurrentFrame(false, true);
+            }
             else
                 MessageBox.Show("Could not initialize the timestamp OCR engine.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }

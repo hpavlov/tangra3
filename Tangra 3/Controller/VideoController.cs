@@ -34,6 +34,7 @@ using Tangra.Model.ImageTools;
 using Tangra.Model.Video;
 using Tangra.Model.VideoOperations;
 using Tangra.OCR;
+using Tangra.OCR.TimeExtraction;
 using Tangra.PInvoke;
 using Tangra.SDK;
 using Tangra.Video;
@@ -789,7 +790,7 @@ namespace Tangra.Controller
 	        return m_TimestampOCR != null ? m_TimestampOCR.NameAndVersion() : string.Empty;
 	    }
 
-        public DateTime OCRTimestamp()
+        public DateTime OCRTimestamp(bool debug = false)
         {
             if (m_CurrentOCRRedTimeStamp.HasValue)
                 return m_CurrentOCRRedTimeStamp.Value;
@@ -798,7 +799,7 @@ namespace Tangra.Controller
 
             var osdPixels = m_AstroImage.GetOcrPixels();
 
-            if (!m_TimestampOCR.ExtractTime(m_CurrentFrameId, m_FramePlayer.FrameStep, osdPixels, out ocredTimeStamp))
+            if (!m_TimestampOCR.ExtractTime(m_CurrentFrameId, m_FramePlayer.FrameStep, osdPixels, debug, out ocredTimeStamp))
             {
                 ocredTimeStamp = DateTime.MinValue;
                 m_NumberFailedOcredVtiOsdFrames++;
@@ -1032,6 +1033,71 @@ namespace Tangra.Controller
                 m_TimestampOCR.DrawLegend(g);
         }
 
+	    private static Font s_OCRPrintFont = new Font(FontFamily.GenericMonospace, 10);
+
+        internal void PrintOCRedTimeStamp(Graphics g)
+        {
+            if (m_TimestampOCR != null)
+            {
+                string output = m_TimestampOCR.OSDType();
+                var size = g.MeasureString(output, s_OCRPrintFont);
+                var vertPading = 2;
+                g.FillRectangle(Brushes.DarkSlateGray, m_AstroImage.Width - size.Width - 10, 10, size.Width, size.Height);
+                g.DrawString(output, s_OCRPrintFont, Brushes.Lime, m_AstroImage.Width - size.Width - 10, 10);
+
+                DateTime ocrTimeStamp = OCRTimestamp(DebugOCR);
+                output = string.Format("OCR: {0}", ocrTimeStamp.Year != 1 ? ocrTimeStamp.ToString("yyyy-MM-dd HH:mm:ss.fff") : ocrTimeStamp.ToString("HH:mm:ss.fff"));
+                size = g.MeasureString(output, s_OCRPrintFont);
+                g.FillRectangle(Brushes.DarkSlateGray, m_AstroImage.Width - size.Width - 10, 10 + size.Height + vertPading, size.Width, size.Height);
+                g.DrawString(output, s_OCRPrintFont, Brushes.Lime, m_AstroImage.Width - size.Width - 10, 10 + size.Height + vertPading);
+
+                if (m_TimestampOCR.LastOddFieldOSD != null)
+                {
+                    output = string.Format("Odd: {0}", m_TimestampOCR.LastOddFieldOSD.AsFullString());
+                    size = g.MeasureString(output, s_OCRPrintFont);
+                    g.FillRectangle(Brushes.DarkSlateGray, m_AstroImage.Width - size.Width - 10, 10 + 2 * (size.Height + vertPading), size.Width, size.Height);
+                    g.DrawString(output, s_OCRPrintFont, Brushes.Lime, m_AstroImage.Width - size.Width - 10, 10 + 2 * (size.Height + vertPading));
+
+                    output = string.Format("Odd OCR: {0}", m_TimestampOCR.LastOddFieldOSD.OcredCharacters);
+                    size = g.MeasureString(output, s_OCRPrintFont);
+                    g.FillRectangle(Brushes.DarkSlateGray, m_AstroImage.Width - size.Width - 10, 10 + 3 * (size.Height + vertPading), size.Width, size.Height);
+                    g.DrawString(output, s_OCRPrintFont, Brushes.Lime, m_AstroImage.Width - size.Width - 10, 10 + 3 * (size.Height + vertPading));
+                }
+
+                if (m_TimestampOCR.LastEvenFieldOSD != null)
+                {
+                    output = string.Format("Even: {0}", m_TimestampOCR.LastEvenFieldOSD.AsFullString());
+                    size = g.MeasureString(output, s_OCRPrintFont);
+                    g.FillRectangle(Brushes.DarkSlateGray, m_AstroImage.Width - size.Width - 10, 10 + 4 * (size.Height + vertPading), size.Width, size.Height);
+                    g.DrawString(output, s_OCRPrintFont, Brushes.Lime, m_AstroImage.Width - size.Width - 10, 10 + 4 * (size.Height + vertPading));
+
+                    output = string.Format("Even OCR: {0}", m_TimestampOCR.LastEvenFieldOSD.OcredCharacters);
+                    size = g.MeasureString(output, s_OCRPrintFont);
+                    g.FillRectangle(Brushes.DarkSlateGray, m_AstroImage.Width - size.Width - 10, 10 + 5 * (size.Height + vertPading), size.Width, size.Height);
+                    g.DrawString(output, s_OCRPrintFont, Brushes.Lime, m_AstroImage.Width - size.Width - 10, 10 + 5 * (size.Height + vertPading));                    
+                }
+
+                if (!string.IsNullOrWhiteSpace(m_TimestampOCR.LastFailedReason))
+                {
+                    var tokens = m_TimestampOCR.LastFailedReason.Split(".".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                    int i = 0;
+                    foreach(var token in tokens)
+                    {
+                        if (string.IsNullOrWhiteSpace(token)) continue;
+                        output = token;
+                        i++;
+                        size = g.MeasureString(output, s_OCRPrintFont);
+                        g.FillRectangle(Brushes.DarkSlateGray, m_AstroImage.Width - size.Width - 10, 10 + (6 + i) * (size.Height + vertPading), size.Width, size.Height);
+                        g.DrawString(output, s_OCRPrintFont, Brushes.Orange, m_AstroImage.Width - size.Width - 10, 10 + (6 + i) * (size.Height + vertPading));                                            
+                    }
+                }
+
+                var dbgImage = m_TimestampOCR.GetOCRDebugImage();
+                if (dbgImage != null)
+                    g.DrawImage(dbgImage, 10, 10);
+            }
+        }
+
 	    internal bool HasCustomRenderers
 	    {
 	        get { return m_CustomOverlayRenderer != null && m_CurrentOperation == null; }
@@ -1083,14 +1149,26 @@ namespace Tangra.Controller
                     m_MainForm.pictureBox.Image = m_AstroImage.Pixelmap.DisplayBitmap;
             }
 
-			if (!showFields)
-			{
-				using (Graphics g = Graphics.FromImage(m_MainForm.pictureBox.Image))
-				{
-					CompleteRenderFrame(g);
-					g.Save();
-				}
-			}
+		    if (!showFields)
+		    {
+		        using (Graphics g = Graphics.FromImage(m_MainForm.pictureBox.Image))
+		        {
+		            CompleteRenderFrame(g);
+		            g.Save();
+		        }
+		    }
+		    else
+		    {
+                // Still run custom renderers in Field mode. This is particularly useful for OCR troubleshooting
+                if (HasCustomRenderers)
+                {
+                    using (Graphics g = Graphics.FromImage(m_MainForm.pictureBox.Image))
+                    {
+                        RunCustomRenderers(g);
+                        g.Save();
+                    }
+                }                
+		    }
 
 			m_MainForm.pictureBox.Refresh();
 		}
@@ -2751,8 +2829,10 @@ namespace Tangra.Controller
 		}
 
 		public delegate void RenderOverlayCallback(Graphics g);
- 
-		internal void RegisterOverlayRenderer(RenderOverlayCallback callback)
+
+	    internal bool DebugOCR;
+
+	    internal void RegisterOverlayRenderer(RenderOverlayCallback callback)
 		{
 			m_CustomOverlayRenderer = callback;
 		}

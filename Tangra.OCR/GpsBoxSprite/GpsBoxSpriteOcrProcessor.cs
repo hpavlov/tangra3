@@ -8,6 +8,7 @@ using System.Linq;
 using System.Security.Policy;
 using System.Text;
 using System.Text.RegularExpressions;
+using Tangra.Model.Helpers;
 using Tangra.OCR.IotaVtiOsdProcessor;
 using Tangra.OCR.TimeExtraction;
 
@@ -156,7 +157,7 @@ namespace Tangra.OCR.GpsBoxSprite
             var allOCRedTimeStamps = new List<Tuple<GpxBoxSpriteVtiTimeStamp, GpxBoxSpriteVtiTimeStamp>>();
             foreach (var frame in m_CalibrationFrames)
             {
-                Process(frame.ProcessedPixels, -1);
+                Process(frame.ProcessedPixels, -1, false);
                 allOCRedTimeStamps.Add(Tuple.Create(CurrentOcredOddFieldTimeStamp.Clone(), CurrentOcredEvenFieldTimeStamp.Clone()));
             }
 
@@ -795,34 +796,97 @@ namespace Tangra.OCR.GpsBoxSprite
 
         internal GpxBoxSpriteVtiTimeStamp CurrentOcredEvenFieldTimeStamp { get; private set; }
 
-        public void Process(uint[] processedPixels, int frameNo)
+        private Bitmap _debugBitmap;
+
+        internal Bitmap GetDebugBitmap()
+        {
+            return _debugBitmap;
+        }
+
+        public void Process(uint[] processedPixels, int frameNo, bool debug)
         {
             CurrentImage = processedPixels;
 
             var oddFrameLines = new List<List<int?>>();
             var evenFrameLines = new List<List<int?>>();
 
-            foreach (var line in m_Lines)
+            _debugBitmap = null;
+            Graphics g = null;
+            int lineNo = 0;
+
+            var lineBlocks = m_Lines.Select(line => line.ExtractBlockNumbers(processedPixels, m_FrameWidth, m_FrameHeight)).ToArray();
+
+            for (int i = 0; i < m_Lines.Count; i++)
             {
+                var line = m_Lines[i];
                 var oddDigits = new List<int?>();
                 var evenDigits = new List<int?>();
-                var lineBlocks = line.ExtractBlockNumbers(processedPixels, m_FrameWidth, m_FrameHeight);
-                foreach (var block in lineBlocks)
+                
+
+                int blockNo = 0;
+                foreach (var block in lineBlocks[i])
                 {
+                    if (debug && _debugBitmap == null)
+                    {
+                        var maxWidthInBlocks = lineBlocks.Max(x => x.Count);
+                        _debugBitmap = new Bitmap(line.BlockIntWidth * maxWidthInBlocks, 2 * 2 * m_Lines.Count * line.BlockIntHeight, PixelFormat.Format24bppRgb);
+                        g = Graphics.FromImage(_debugBitmap);
+                    }
+
                     var digit1 = OCRBlockDigit(block.Item1, line.BlockIntWidth, line.BlockIntHeight);
                     var digit2 = OCRBlockDigit(block.Item2, line.BlockIntWidth, line.BlockIntHeight);
 
                     // Note: EvenBeforeOdd is used later to determine the correct order
                     oddDigits.Add(digit1);
-                    evenDigits.Add(digit2); 
+                    evenDigits.Add(digit2);
+
+                    if (debug)
+                    {
+                        AddOcrDebugDigit(g, block.Item1, digit1, lineNo, blockNo, 0);
+                        AddOcrDebugDigit(g, block.Item2, digit2, lineNo, blockNo, 1);
+                    }
+
+                    blockNo++;
                 }
+
+                lineNo++;
 
                 oddFrameLines.Add(oddDigits);
                 evenFrameLines.Add(evenDigits);
             }
 
+            if (debug)
+                g.Save();
+
             if (m_Lines.Count == 2)
                 ExtractTwoLineLayoutTime(oddFrameLines, evenFrameLines);
+        }
+
+        private static Pen[] s_Pens = Enumerable.Range(0, 256).Select(x => new Pen(Color.FromArgb(255, x, x, x))).ToArray();
+        private static Font s_Font = new Font(FontFamily.GenericMonospace, 8);
+
+        private void AddOcrDebugDigit(Graphics g, decimal[,] block, int? ocredDigit, int lineNo, int blockNo, int fieldNo)
+        {
+            try
+            {
+                int x0 = blockNo * m_BlockWidth;
+                int y0 = (4 * lineNo + 2 * fieldNo) * m_BlockHeight;
+
+                for (int y = 0; y < block.GetLength(0); y++)
+                {
+                    for (int x = 0; x < block.GetLength(1); x++)
+                    {
+                        byte pixel = (byte)block[y, x];
+                        g.DrawLine(s_Pens[pixel], x0 + x, y0 + y, x0 + x + 1, y0 + y);
+                    }
+                }
+
+                g.DrawString(ocredDigit.ToString(), s_Font, Brushes.Lime, x0, y0 + m_BlockHeight);
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex.GetFullStackTrace());
+            }
         }
 
         private int GetTwoDigitInteger(int? tens, int? ones)
@@ -844,6 +908,10 @@ namespace Tangra.OCR.GpsBoxSprite
                 int ms10Odd1 = (GetTwoDigitInteger(oddLines[1][0], oddLines[1][1]) * 100 + GetTwoDigitInteger(oddLines[1][2], oddLines[1][3])) * 10 + (oddLines[1][4] ?? 0);
                 int ms10Odd2 = (GetTwoDigitInteger(oddLines[1][5], oddLines[1][6]) * 100 + GetTwoDigitInteger(oddLines[1][7], oddLines[1][8])) * 10 + (oddLines[1][9] ?? 0);
 
+                string oddOcredChars = 
+                    string.Join("", oddLines[0].Select(x => x.HasValue ? x.Value.ToString() : " ")) + " " +
+                    string.Join("", oddLines[1].Select(x => x.HasValue ? x.Value.ToString() : " "));
+
                 int yearEven = GetTwoDigitInteger(evenLines[0][10], evenLines[0][11]) + 2000;
                 int monthEven = GetTwoDigitInteger(evenLines[0][8], evenLines[0][9]);
                 int dayEven = GetTwoDigitInteger(evenLines[0][6], evenLines[0][7]);
@@ -853,8 +921,12 @@ namespace Tangra.OCR.GpsBoxSprite
                 int ms10Even1 = (GetTwoDigitInteger(evenLines[1][0], evenLines[1][1]) * 100 + GetTwoDigitInteger(evenLines[1][2], evenLines[1][3])) * 10 + (evenLines[1][4] ?? 0);
                 int ms10Even2 = (GetTwoDigitInteger(evenLines[1][5], evenLines[1][6]) * 100 + GetTwoDigitInteger(evenLines[1][7], evenLines[1][8])) * 10 + (evenLines[1][9] ?? 0);
 
-                CurrentOcredOddFieldTimeStamp = new GpxBoxSpriteVtiTimeStamp(yearOdd, monthOdd, dayOdd, hourOdd, minOdd, secOdd, ms10Odd1, ms10Odd2);
-                CurrentOcredEvenFieldTimeStamp = new GpxBoxSpriteVtiTimeStamp(yearEven, monthEven, dayEven, hourEven, minEven, secEven, ms10Even1, ms10Even2);
+                string evenOcredChars =
+                    string.Join("", evenLines[0].Select(x => x.HasValue ? x.Value.ToString() : " ")) + " " +
+                    string.Join("", evenLines[1].Select(x => x.HasValue ? x.Value.ToString() : " "));
+
+                CurrentOcredOddFieldTimeStamp = new GpxBoxSpriteVtiTimeStamp(yearOdd, monthOdd, dayOdd, hourOdd, minOdd, secOdd, ms10Odd1, ms10Odd2, oddOcredChars);
+                CurrentOcredEvenFieldTimeStamp = new GpxBoxSpriteVtiTimeStamp(yearEven, monthEven, dayEven, hourEven, minEven, secEven, ms10Even1, ms10Even2, evenOcredChars);
             }
         }
 
@@ -873,6 +945,10 @@ namespace Tangra.OCR.GpsBoxSprite
             var singleBlockOCR = OCRBlockSignatureDigit(pixels, width, height);
             var ocrDigit = singleBlockOCR.Item1;
 
+            /* 
+             * NOTE: It seems that the direct block recognition works best
+             *       Signatures appear to be adding noise and sometimes lead to wrong recognition
+             *       
             if (ocrDigitSig == ocrDigit)
                 return ocrDigit;
 
@@ -886,7 +962,7 @@ namespace Tangra.OCR.GpsBoxSprite
                 return ocrDigitSig;
 
             if (ocrDigitSig2 == ocrDigitSig3)
-                return ocrDigitSig2;
+                return ocrDigitSig2; */
 
             if (ocrDigit != null)
                 return ocrDigit;

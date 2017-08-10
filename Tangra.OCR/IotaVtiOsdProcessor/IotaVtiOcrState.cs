@@ -104,7 +104,17 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
             Seconds = ParseTwoDigitOCRedNumber(timeStampStrings.SS);
             if (int.TryParse(timeStampStrings.FFFF1.Length == 4 ? timeStampStrings.FFFF1.Replace(' ', '0') : timeStampStrings.FFFF2.Replace(' ', '0'), out ival)) Milliseconds10 = ival;
             if (int.TryParse(timeStampStrings.FRAMENO.Replace(' ', '0'), out ival)) FrameNumber = ival;
+            OcredCharacters = string.Format("{0} {1}{2}{3} {4}{5} {6}", timeStampStrings.NumSat, timeStampStrings.HH, timeStampStrings.MM, timeStampStrings.SS, timeStampStrings.FFFF1, timeStampStrings.FFFF2, timeStampStrings.FRAMENO);
 		}
+
+        public IotaVtiTimeStamp(IotaVtiTimeStamp timeStamp)
+        {
+            Hours = timeStamp.Hours;
+            Minutes = timeStamp.Minutes;
+            Seconds = timeStamp.Seconds;
+            Milliseconds10 = timeStamp.Milliseconds10;
+            FrameNumber = timeStamp.FrameNumber;
+        }
 
         private int ParseTwoDigitOCRedNumber(string str)
         {
@@ -133,15 +143,6 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
                 return 0; 
         }
 
-		public IotaVtiTimeStamp(IotaVtiTimeStamp timeStamp)
-		{
-			Hours = timeStamp.Hours;
-			Minutes = timeStamp.Minutes;
-			Seconds = timeStamp.Seconds;
-			Milliseconds10 = timeStamp.Milliseconds10;
-			FrameNumber = timeStamp.FrameNumber;
-		}
-
 		public int NumSat;
 		public int Hours { get; private set; }
         public int Minutes { get; private set; }
@@ -157,6 +158,8 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
         public int Year { get; private set; }
         public int Month { get; private set; }
         public int Day { get; private set; }
+
+        public string OcredCharacters { get; private set; }
 
         public bool ContainsFrameNumbers
         {

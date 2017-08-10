@@ -41,10 +41,10 @@ namespace Tangra.OCR.TimeExtraction
             m_Corrector.Reset(m_VideoFormat);
         }
 
-        internal DateTime ExtractDateTime(int frameNo, int frameStep, IVtiTimeStamp oddFieldOSD, IVtiTimeStamp evenFieldOSD)
+        internal DateTime ExtractDateTime(int frameNo, int frameStep, IVtiTimeStamp oddFieldOSD, IVtiTimeStamp evenFieldOSD, out string failedReason)
         {
             bool failedValidation = false;
-            string failedReason = null;
+            failedReason = null;
 
             if (oddFieldOSD == null || evenFieldOSD == null)
                 return DateTime.MinValue;
@@ -155,6 +155,7 @@ namespace Tangra.OCR.TimeExtraction
                 else
                 {
                     if (failedValidation) return DateTime.MinValue;
+                    failedReason = null;
 
                     if (m_EvenBeforeOdd)
                         return evenFieldTimestamp;
@@ -173,10 +174,10 @@ namespace Tangra.OCR.TimeExtraction
             }
         }
 
-        internal DateTime ExtractAAVDateTime(int frameNo, int frameStep, IVtiTimeStamp oddFieldOSD, IVtiTimeStamp evenFieldOSD)
+        internal DateTime ExtractAAVDateTime(int frameNo, int frameStep, IVtiTimeStamp oddFieldOSD, IVtiTimeStamp evenFieldOSD, out string failedReason)
         {
             bool failedValidation = false;
-            string failedReason = null;
+            failedReason = null;
 
             if (oddFieldOSD == null || evenFieldOSD == null)
                 return DateTime.MinValue;

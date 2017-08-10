@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using Tangra.Model.Config;
 using Tangra.Model.VideoOperations;
+using Tangra.OCR.TimeExtraction;
 
 namespace Tangra.OCR
 {
@@ -37,8 +38,11 @@ namespace Tangra.OCR
             m_VideoController = videoController;
         }
 
-        public bool ExtractTime(int frameNo, int frameStep, uint[] data, out DateTime time)
+        public bool ExtractTime(int frameNo, int frameStep, uint[] data, bool debug, out DateTime time)
         {
+            LastOddFieldOSD = null;
+            LastEvenFieldOSD = null;
+
             if (m_VideoController != null)
                 // Leave this to capture statistics
                 m_VideoController.RegisterExtractingOcrTimestamps();
@@ -57,6 +61,16 @@ namespace Tangra.OCR
 
             time = DateTime.MinValue;
             return false;
+        }
+
+        public IVtiTimeStamp LastOddFieldOSD { get; private set; }
+        public IVtiTimeStamp LastEvenFieldOSD { get; private set; }
+        public string LastFailedReason { get; private set; }
+
+        public Bitmap GetOCRDebugImage()
+        {
+            // TODO:
+            return null;
         }
 
         public bool RequiresCalibration

@@ -53,8 +53,11 @@ namespace Tangra.OCR
             m_MinCalibrationFrames = (int)Math.Ceiling(m_InitializationData.VideoFrameRate);
         }
 
-        public bool ExtractTime(int frameNo, int frameStep, uint[] rawData, out DateTime time)
+        public bool ExtractTime(int frameNo, int frameStep, uint[] rawData, bool debug, out DateTime time)
         {
+            LastOddFieldOSD = null;
+            LastEvenFieldOSD = null;
+
             if (m_Processor.IsCalibrated && m_TimeStampComposer != null)
             {
                 if (m_VideoController != null)
@@ -62,21 +65,37 @@ namespace Tangra.OCR
 
                 var data = PreProcessImageForOCR(rawData, m_TopMostLine, m_BottomMostLine);
 
-                m_Processor.Process(data, frameNo);
-                IVtiTimeStamp oddFieldOSD = m_Processor.CurrentOcredOddFieldTimeStamp;
-                IVtiTimeStamp evenFieldOSD = m_Processor.CurrentOcredEvenFieldTimeStamp;
+                m_Processor.Process(data, frameNo, debug);
+                LastOddFieldOSD = m_Processor.CurrentOcredOddFieldTimeStamp;
+                LastEvenFieldOSD = m_Processor.CurrentOcredEvenFieldTimeStamp;
+                string failedReason;
 
                 if (m_InitializationData.IntegratedAAVFrames > 0)
-                    time = m_TimeStampComposer.ExtractAAVDateTime(frameNo, frameStep, oddFieldOSD, evenFieldOSD);
+                {
+                    time = m_TimeStampComposer.ExtractAAVDateTime(frameNo, frameStep, LastOddFieldOSD, LastEvenFieldOSD, out failedReason);
+                    LastFailedReason = failedReason;
+                }
                 else
                 {
-                    time = m_TimeStampComposer.ExtractDateTime(frameNo, frameStep, oddFieldOSD, evenFieldOSD);
+                    time = m_TimeStampComposer.ExtractDateTime(frameNo, frameStep, LastOddFieldOSD, LastEvenFieldOSD, out failedReason);
+                    LastFailedReason = failedReason;
                 }
             }
             else
                 time = DateTime.MinValue;
 
             return time != DateTime.MinValue;
+        }
+
+        public IVtiTimeStamp LastOddFieldOSD { get; private set; }
+        public IVtiTimeStamp LastEvenFieldOSD { get; private set; }
+        public string LastFailedReason { get; private set; }
+
+        public Bitmap GetOCRDebugImage()
+        {
+            return m_Processor != null 
+                ? m_Processor.GetDebugBitmap() 
+                : null;
         }
 
         public bool RequiresCalibration
@@ -978,7 +997,7 @@ namespace Tangra.OCR
 
         public void AddErrorImage(string fileName, uint[] pixels)
         {
-            m_CalibrationImages.Add(fileName, pixels);
+            m_CalibrationImages[fileName] = pixels;
         }
 
         public void AddErrorText(string error)

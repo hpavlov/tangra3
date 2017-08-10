@@ -8,7 +8,7 @@ namespace Tangra.OCR.GpsBoxSprite
 {
     public class GpxBoxSpriteVtiTimeStamp : IVtiTimeStamp
     {
-        internal GpxBoxSpriteVtiTimeStamp(int year, int month, int day, int hour, int min, int sec, int ms10First, int ms10Second)
+        internal GpxBoxSpriteVtiTimeStamp(int year, int month, int day, int hour, int min, int sec, int ms10First, int ms10Second, string ocredChars)
         {
             Year = year;
             Month = month;
@@ -19,11 +19,12 @@ namespace Tangra.OCR.GpsBoxSprite
             Milliseconds10First = ms10First;
             Milliseconds10Second = ms10Second;
             Milliseconds10 = ms10First > ms10Second ? ms10First : ms10Second;
+            OcredCharacters = ocredChars;
         }
 
         public GpxBoxSpriteVtiTimeStamp Clone()
         {
-            return new GpxBoxSpriteVtiTimeStamp(Year, Month, Day, Hours, Minutes, Seconds, Milliseconds10First, Milliseconds10Second);
+            return new GpxBoxSpriteVtiTimeStamp(Year, Month, Day, Hours, Minutes, Seconds, Milliseconds10First, Milliseconds10Second, OcredCharacters);
         }
 
         public bool ContainsFrameNumbers 
@@ -52,6 +53,8 @@ namespace Tangra.OCR.GpsBoxSprite
 
         public int Milliseconds10First { get; private set; }
         public int Milliseconds10Second { get; private set; }
+
+        public string OcredCharacters { get; private set; }
 
         public void Correct(int hours, int minutes, int seconds, int milliseconds10)
         {
