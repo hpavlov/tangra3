@@ -1426,11 +1426,13 @@ namespace Tangra
 
         private void miTimestampOCR_Click(object sender, EventArgs e)
         {
+            bool debugOCR = Control.ModifierKeys == Keys.Control;
+
             m_VideoController.InitializeTimestampOCR();
 
             if (m_VideoController.HasTimestampOCR())
             {
-                m_VideoController.DebugOCR = Control.ModifierKeys == Keys.Control;
+                m_VideoController.DebugOCR = debugOCR;
                 m_VideoController.RegisterOverlayRenderer(m_VideoController.PrintOCRedTimeStamp);
 
                 // If OCR engine has been initialized then redraw the frame to show the boxes around the numbers

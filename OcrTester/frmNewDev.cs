@@ -229,7 +229,7 @@ namespace OcrTester
             uint[] dataOut = new uint[m_InitialPixels.Length];
             uint[] dataDebugNoLChD = new uint[m_InitialPixels.Length];
             //GpsBoxSpriteOcr.PrepareOsdArea(m_InitialPixels, dataOut, dataDebugNoLChD, m_Image.Width, m_Image.Height);
-            var rv = GpsBoxSpriteOcr.PreProcessImageForOCR(m_InitialPixels, m_Image.Width, m_Image.Height, ref error);
+            var rv = GpsBoxSpriteOcr.PreProcessImageOSDForOCR(m_InitialPixels, m_Image.Width, m_Image.Height, 15, ref error);
             var bmp = Pixelmap.ConstructBitmapFrom8BitPixelmap(new Pixelmap(m_Image.Width, m_Image.Height, 8, rv, null, null));
             using (Graphics g = Graphics.FromImage(pictureBox1.Image))
             {

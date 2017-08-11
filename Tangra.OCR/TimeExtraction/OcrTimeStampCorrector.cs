@@ -43,13 +43,26 @@ namespace Tangra.OCR.TimeExtraction
                 return false;
             }
 
-            correctionDebugInfo = string.Format("IOTA-VTI Correction Attempt for Frame {0}. {1:D2}:{2:D2}:{3:D2}.{4:D4} ({5}) - {6:D2}:{7:D2}:{8:D2}.{9:D4} ({10}). FrameStep: {11}. Previous: {12:D2}:{13:D2}:{14:D2}.{15:D4} ({16}) - {17:D2}:{18:D2}:{19:D2}.{20:D4} ({21})", 
-                    frameNo, 
-                    oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds, oddFieldOSD.Milliseconds10, oddFieldOSD.FrameNumber,
-                    evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds, evenFieldOSD.Milliseconds10, evenFieldOSD.FrameNumber,
-                    frameStep,
-                    m_PrevOddFieldOSD.Hours, m_PrevOddFieldOSD.Minutes, m_PrevOddFieldOSD.Seconds, m_PrevOddFieldOSD.Milliseconds10, m_PrevOddFieldNo,
-                    m_PrevEvenFieldOSD.Hours, m_PrevEvenFieldOSD.Minutes, m_PrevEvenFieldOSD.Seconds, m_PrevEvenFieldOSD.Milliseconds10, m_PrevEvenFieldNo);
+            if (oddFieldOSD.ContainsDate)
+            {
+                correctionDebugInfo = string.Format("IOTA-VTI Correction Attempt for Frame {0}. {1:D4}-{2:D2}-{3:D2} {4:D2}:{5:D2}:{6:D2}.{7:D4} ({8}) - {9:D4}-{10:D2}-{11:D2} {12:D2}:{13:D2}:{14:D2}.{15:D4} ({16}). FrameStep: {17}. Previous: {18:D4}-{19:D2}-{20:D2} {21:D2}:{22:D2}:{23:D2}.{24:D4} ({25}) - {26:D4}-{27:D2}-{28:D2} {29:D2}:{30:D2}:{31:D2}.{32:D4} ({33})",
+                        frameNo,
+                        oddFieldOSD.Year, oddFieldOSD.Month, oddFieldOSD.Day, oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds, oddFieldOSD.Milliseconds10, oddFieldOSD.FrameNumber,
+                        evenFieldOSD.Year, evenFieldOSD.Month, evenFieldOSD.Day, evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds, evenFieldOSD.Milliseconds10, evenFieldOSD.FrameNumber,
+                        frameStep,
+                        m_PrevOddFieldOSD.Year, m_PrevOddFieldOSD.Month, m_PrevOddFieldOSD.Day, m_PrevOddFieldOSD.Hours, m_PrevOddFieldOSD.Minutes, m_PrevOddFieldOSD.Seconds, m_PrevOddFieldOSD.Milliseconds10, m_PrevOddFieldNo,
+                        m_PrevEvenFieldOSD.Year, m_PrevEvenFieldOSD.Month, m_PrevEvenFieldOSD.Day, m_PrevEvenFieldOSD.Hours, m_PrevEvenFieldOSD.Minutes, m_PrevEvenFieldOSD.Seconds, m_PrevEvenFieldOSD.Milliseconds10, m_PrevEvenFieldNo);
+            }
+            else
+            {
+                correctionDebugInfo = string.Format("IOTA-VTI Correction Attempt for Frame {0}. {1:D2}:{2:D2}:{3:D2}.{4:D4} ({5}) - {6:D2}:{7:D2}:{8:D2}.{9:D4} ({10}). FrameStep: {11}. Previous: {12:D2}:{13:D2}:{14:D2}.{15:D4} ({16}) - {17:D2}:{18:D2}:{19:D2}.{20:D4} ({21})",
+                        frameNo,
+                        oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds, oddFieldOSD.Milliseconds10, oddFieldOSD.FrameNumber,
+                        evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds, evenFieldOSD.Milliseconds10, evenFieldOSD.FrameNumber,
+                        frameStep,
+                        m_PrevOddFieldOSD.Hours, m_PrevOddFieldOSD.Minutes, m_PrevOddFieldOSD.Seconds, m_PrevOddFieldOSD.Milliseconds10, m_PrevOddFieldNo,
+                        m_PrevEvenFieldOSD.Hours, m_PrevEvenFieldOSD.Minutes, m_PrevEvenFieldOSD.Seconds, m_PrevEvenFieldOSD.Milliseconds10, m_PrevEvenFieldNo);                
+            }
 
             float knownFrameDuration = m_VideoFormat == VideoFormat.PAL
                         ? 2 * VtiTimeStampComposer.FIELD_DURATION_PAL
@@ -151,35 +164,46 @@ namespace Tangra.OCR.TimeExtraction
 			    }
 			}
 
-            var aavFrameNoCorr = aavIntegratedFields.HasValue ? (aavIntegratedFields.Value - 2) : 0;
+            if (oddFieldOSD.ContainsFrameNumbers)
+            {
+                var aavFrameNoCorr = aavIntegratedFields.HasValue ? (aavIntegratedFields.Value - 2) : 0;
 
-            if (!evenBeforeOdd)
-			{
-				if (m_PrevEvenFieldNo + 1 != oddFieldOSD.FrameNumber)
-				{
-				    oddFieldOSD.CorrectFrameNumber((int)(m_PrevEvenFieldNo + 1));
-				}
+                if (!evenBeforeOdd)
+                {
+                    if (m_PrevEvenFieldNo + 1 != oddFieldOSD.FrameNumber)
+                    {
+                        oddFieldOSD.CorrectFrameNumber((int)(m_PrevEvenFieldNo + 1));
+                    }
 
-                if (oddFieldOSD.FrameNumber + 1 + aavFrameNoCorr != evenFieldOSD.FrameNumber)
-				{
-                    evenFieldOSD.CorrectFrameNumber((int)(oddFieldOSD.FrameNumber + 1 + aavFrameNoCorr));
-				}
-			}
-			else
-			{
-                if (m_PrevOddFieldNo + 1 != evenFieldOSD.FrameNumber)
-				{
-                    evenFieldOSD.CorrectFrameNumber((int)(m_PrevOddFieldNo + 1));
-				}
+                    if (oddFieldOSD.FrameNumber + 1 + aavFrameNoCorr != evenFieldOSD.FrameNumber)
+                    {
+                        evenFieldOSD.CorrectFrameNumber((int)(oddFieldOSD.FrameNumber + 1 + aavFrameNoCorr));
+                    }
+                }
+                else
+                {
+                    if (m_PrevOddFieldNo + 1 != evenFieldOSD.FrameNumber)
+                    {
+                        evenFieldOSD.CorrectFrameNumber((int)(m_PrevOddFieldNo + 1));
+                    }
 
-                if (evenFieldOSD.FrameNumber + 1 + aavFrameNoCorr != oddFieldOSD.FrameNumber)
-				{
-                    oddFieldOSD.CorrectFrameNumber((int)(evenFieldOSD.FrameNumber + 1 + aavFrameNoCorr));
-				}
-			}
+                    if (evenFieldOSD.FrameNumber + 1 + aavFrameNoCorr != oddFieldOSD.FrameNumber)
+                    {
+                        oddFieldOSD.CorrectFrameNumber((int)(evenFieldOSD.FrameNumber + 1 + aavFrameNoCorr));
+                    }
+                }                
+            }
 
-			oddFieldTimestamp = new DateTime(1, 1, 1, oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds).AddMilliseconds(Math.Min(10000, oddFieldOSD.Milliseconds10) / 10.0f);
-			evenFieldTimestamp = new DateTime(1, 1, 1, evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds).AddMilliseconds(Math.Min(10000, evenFieldOSD.Milliseconds10) / 10.0f);
+            if (oddFieldOSD.ContainsDate)
+            {
+                oddFieldTimestamp = new DateTime(oddFieldOSD.Year, oddFieldOSD.Month, oddFieldOSD.Day, oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds).AddMilliseconds(Math.Min(10000, oddFieldOSD.Milliseconds10) / 10.0f);
+                evenFieldTimestamp = new DateTime(evenFieldOSD.Year, evenFieldOSD.Month, evenFieldOSD.Day, evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds).AddMilliseconds(Math.Min(10000, evenFieldOSD.Milliseconds10) / 10.0f);
+            }
+            else
+            {
+                oddFieldTimestamp = new DateTime(1, 1, 1, oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds).AddMilliseconds(Math.Min(10000, oddFieldOSD.Milliseconds10) / 10.0f);
+                evenFieldTimestamp = new DateTime(1, 1, 1, evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds).AddMilliseconds(Math.Min(10000, evenFieldOSD.Milliseconds10) / 10.0f);                
+            }
 
 			return true;
 		}
@@ -254,6 +278,8 @@ namespace Tangra.OCR.TimeExtraction
 
         private bool TryCorrectTimestamp(long prevFieldTimestamp, DateTime fieldToCorrectTimestamp, IVtiTimeStamp fieldToCorrect, int frameStep, int? aavIntegratedFields, bool isAav)
         {
+            string dateFormatComp = fieldToCorrect.ContainsDate ? "yyyy-MM-dd HH:mm:ss.fff" : "HH:mm:ss.fff";
+          
             double stepCorrection = frameStep > 1 ? ((20000 * (frameStep - 1) * (m_VideoFormat == VideoFormat.PAL ? VtiTimeStampComposer.FIELD_DURATION_PAL : VtiTimeStampComposer.FIELD_DURATION_NTSC))) : 0;
             double fieldDistance = (10000 * (m_VideoFormat == VideoFormat.PAL ? VtiTimeStampComposer.FIELD_DURATION_PAL : VtiTimeStampComposer.FIELD_DURATION_NTSC));
             double aavCorrection = aavIntegratedFields.HasValue ? (10000 * (aavIntegratedFields.Value - 2) * (m_VideoFormat == VideoFormat.PAL ? VtiTimeStampComposer.FIELD_DURATION_PAL : VtiTimeStampComposer.FIELD_DURATION_NTSC)) : 0;
@@ -266,10 +292,10 @@ namespace Tangra.OCR.TimeExtraction
 			// NOTE: We ignore the last digit from the milliseconds when comparing this timestamps. While this allows for incorectly read 10th of milliseconds to be passed
 			//       unactioned, it doesn't create any timing or measurement issues
 			DateTime expectedDateTime = new DateTime(expectedTimestamp);
-			string expectedTimestampString = expectedDateTime.ToString("HH:mm:ss.fff");
-            string expectedTimestampStringM1 = expectedDateTime.AddMilliseconds(-1).ToString("HH:mm:ss.fff");
-            string expectedTimestampStringP1 = expectedDateTime.AddMilliseconds(1).ToString("HH:mm:ss.fff");
-			string actualTimestampString = fieldToCorrectTimestamp.ToString("HH:mm:ss.fff");
+            string expectedTimestampString = expectedDateTime.ToString(dateFormatComp);
+            string expectedTimestampStringM1 = expectedDateTime.AddMilliseconds(-1).ToString(dateFormatComp);
+            string expectedTimestampStringP1 = expectedDateTime.AddMilliseconds(1).ToString(dateFormatComp);
+            string actualTimestampString = fieldToCorrectTimestamp.ToString(dateFormatComp);
 
 			string difference = XorStrings(expectedTimestampString, actualTimestampString);
 			long numberDifferences = difference.ToCharArray().Count(c => c != '\0');
@@ -298,7 +324,10 @@ namespace Tangra.OCR.TimeExtraction
 			{
 				// We can correct the one or two offending characters
 
-			    fieldToCorrect.Correct(expectedDateTime.Hour, expectedDateTime.Minute, expectedDateTime.Second, (int) Math.Round((expectedDateTime.Ticks%10000000)/1000.0));
+                if (fieldToCorrect.ContainsDate)
+                    fieldToCorrect.CorrectDate(expectedDateTime.Year, expectedDateTime.Month, expectedDateTime.Day);
+
+                fieldToCorrect.Correct(expectedDateTime.Hour, expectedDateTime.Minute, expectedDateTime.Second, (int) Math.Round((expectedDateTime.Ticks%10000000)/1000.0));
 
 				return true;
 			}

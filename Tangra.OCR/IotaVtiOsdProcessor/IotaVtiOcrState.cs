@@ -174,6 +174,11 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
             Milliseconds10 = milliseconds10;
         }
 
+        public void CorrectDate(int year, int month, int day)
+        {
+            
+        }
+
         public void CorrectFrameNumber(int frameNo)
         {
             FrameNumber = frameNo;

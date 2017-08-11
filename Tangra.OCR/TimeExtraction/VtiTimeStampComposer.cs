@@ -141,22 +141,18 @@ namespace Tangra.OCR.TimeExtraction
                 else
                     m_Corrector.RegisterSuccessfulTimestamp(frameNo, oddFieldOSD, evenFieldOSD, oddFieldTimestamp, evenFieldTimestamp);
 
+                if (failedValidation) return DateTime.MinValue;
+                failedReason = null;
+
                 if (oddFieldOSD.ContainsFrameNumbers)
                 {
                     if (oddFieldOSD.FrameNumber == evenFieldOSD.FrameNumber - 1)
-                    {
-                        return failedValidation ? DateTime.MinValue : oddFieldTimestamp;
-                    }
+                        return oddFieldTimestamp;
                     else
-                    {
-                        return failedValidation ? DateTime.MinValue : evenFieldTimestamp;
-                    }
+                        return evenFieldTimestamp;
                 }
                 else
                 {
-                    if (failedValidation) return DateTime.MinValue;
-                    failedReason = null;
-
                     if (m_EvenBeforeOdd)
                         return evenFieldTimestamp;
                     else 

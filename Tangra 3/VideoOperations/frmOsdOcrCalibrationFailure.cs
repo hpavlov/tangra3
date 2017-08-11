@@ -35,8 +35,11 @@ namespace Tangra.VideoOperations
 			set
 			{
 				m_TimestampOCR = value;
-				Images = m_TimestampOCR.GetCalibrationReportImages();
-			    LastUnmodifiedImage = m_TimestampOCR.GetLastUnmodifiedImage();
+			    if (m_TimestampOCR != null)
+			    {
+                    Images = m_TimestampOCR.GetCalibrationReportImages();
+                    LastUnmodifiedImage = m_TimestampOCR.GetLastUnmodifiedImage();			        
+			    }
 			}
 		}
 

@@ -26,6 +26,7 @@ namespace Tangra.OCR.TimeExtraction
         int Day { get; }
         string OcredCharacters { get; }
         void Correct(int hours, int minutes, int seconds, int milliseconds10);
+        void CorrectDate(int year, int month, int day);
         void CorrectFrameNumber(int frameNo);
     }
 
@@ -102,6 +103,13 @@ namespace Tangra.OCR.TimeExtraction
             Minutes = minutes;
             Seconds = seconds;
             Milliseconds10 = milliseconds10;
+        }
+
+        public void CorrectDate(int year, int month, int day)
+        {
+            Year = year;
+            Month = month;
+            Day = day;
         }
 
         public void CorrectFrameNumber(int frameNo)

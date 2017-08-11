@@ -127,6 +127,13 @@ namespace OcrTester.UnitTests
             Milliseconds10 = milliseconds10;
         }
 
+        public void CorrectDate(int year, int month, int day)
+        {
+            Year = year;
+            Month = month;
+            Day = day;
+        }
+
         public void CorrectFrameNumber(int frameNo)
         {
             FrameNumber = frameNo;

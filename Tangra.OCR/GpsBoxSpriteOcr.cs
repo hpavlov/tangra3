@@ -63,6 +63,8 @@ namespace Tangra.OCR
                 if (m_VideoController != null)
                     m_VideoController.RegisterExtractingOcrTimestamps();
 
+                // NOTE: Image needs to be split and processed separately, otherwise the 
+
                 var data = PreProcessImageForOCR(rawData, m_TopMostLine, m_BottomMostLine);
 
                 m_Processor.Process(data, frameNo, debug);
@@ -216,7 +218,7 @@ namespace Tangra.OCR
 
             if (topMostLine != null && bottomMostLine != null)
             {
-                // NOTE: Top and bottom most lines are know. Only pre-process the video frame lines with the VTI-OSD
+                // NOTE: Top and bottom most lines are known. Only pre-process the video frame lines with the VTI-OSD
                 uint[] rv = new uint[data.Length];
                 int top = Math.Max(0, topMostLine.Value - 5);
                 int bottom = Math.Max(m_InitializationData.FrameHeight, bottomMostLine.Value + 5);
@@ -227,9 +229,11 @@ namespace Tangra.OCR
                     roi[idx] = data[i];
                 }
 
+                var averageDetectedOsdHeight = m_OsdLineVerticals.Select(x => (x.Item2 - x.Item1)).Average();
+
                 string error = null;
                 idx = 0;
-                var pproc = PreProcessImageForOCR(roi, m_InitializationData.FrameWidth, bottom - top, ref error);
+                var pproc = PrepareOsdVideoFields(roi, m_InitializationData.FrameWidth, bottom - top, (int)Math.Round(0.8 * averageDetectedOsdHeight), ref error);
                 for (int i = top * m_InitializationData.FrameWidth; i < bottom * m_InitializationData.FrameWidth; i++, idx++)
                 {
                     rv[i] = pproc[idx];
@@ -241,7 +245,9 @@ namespace Tangra.OCR
             else
             {
                 string error = null;
-                var rv = PreProcessImageForOCR(data, m_InitializationData.FrameWidth, m_InitializationData.FrameHeight, ref error);
+                // Based on an experimentally determined nominal height of 15 pixels for a standard PAL frame height of 576
+                var expectedScaledOsdHeight = (int)Math.Round(15.0 * 576 / m_InitializationData.FrameHeight);
+                var rv = PreProcessImageOSDForOCR(data, m_InitializationData.FrameWidth, m_InitializationData.FrameHeight, expectedScaledOsdHeight, ref error);
 
                 if (error != null) InitiazliationError = error;
                 return rv;
@@ -291,7 +297,40 @@ namespace Tangra.OCR
             LargeChunkDenoiser.RemoveSmallHeightNoise(dataOut, width, height, 15);
         }
 
-        public static uint[] PreProcessImageForOCR(uint[] data, int width, int height, ref string error)
+        private uint[] PrepareOsdVideoFields(uint[] data, int width, int height, int minFrameOsdDigitHeight, ref string error)
+        {
+            // TODO: This is suboptimal. Need to make the OCR work with the two separate fields from the start
+            var fieldHeight = height / 2;
+            uint[] oddFieldPixels = new uint[width * fieldHeight];
+            uint[] evenFieldPixels = new uint[width * fieldHeight];
+            for (int y = 0; y < height; y++)
+            {
+                bool isOddLine = y % 2 == 0; // y is zero-based so odd/even calculations should be performed counting from zero
+                int lineNo = y / 2;
+                if (isOddLine)
+                    Array.Copy(data, y * width, oddFieldPixels, lineNo * width, width);
+                else
+                    Array.Copy(data, y * width, evenFieldPixels, lineNo * width, width);
+            }
+
+            var preProcessedOddPixels = PreProcessImageOSDForOCR(oddFieldPixels, width, fieldHeight, minFrameOsdDigitHeight / 2, ref error);
+            var preProcessedEvenPixels = PreProcessImageOSDForOCR(evenFieldPixels, width, fieldHeight, minFrameOsdDigitHeight / 2, ref error);
+
+            var preProcessedPixels = new uint[width * height];
+            for (int y = 0; y < height; y++)
+            {
+                bool isOddLine = (y - 1) % 2 == 1; // y is zero-based so odd/even calculations should be performed counting from zero
+                int lineNo = y / 2;
+                if (isOddLine)
+                    Array.Copy(preProcessedOddPixels, lineNo * width, preProcessedPixels, y * width, width);
+                else
+                    Array.Copy(preProcessedEvenPixels, lineNo * width, preProcessedPixels, y * width, width);
+            }
+
+            return preProcessedPixels;
+        }
+
+        public static uint[] PreProcessImageOSDForOCR(uint[] data, int width, int height, int maxNoiseHeight, ref string error)
         {
             uint[] preProcessedPixels = new uint[data.Length];
             Array.Copy(data, preProcessedPixels, data.Length);
@@ -327,7 +366,7 @@ namespace Tangra.OCR
                 preProcessedPixels[i] = denoised[i] < 127 ? (uint)0 : (uint)255;
             }
 
-            LargeChunkDenoiser.RemoveSmallHeightNoise(preProcessedPixels, width, height, 15);
+            LargeChunkDenoiser.RemoveSmallHeightNoise(preProcessedPixels, width, height, maxNoiseHeight);
             for (int i = 0; i < preProcessedPixels.Length; i++)
             {
                 preProcessedPixels[i] = preProcessedPixels[i] < 127 ? (uint)255 : (uint)0;

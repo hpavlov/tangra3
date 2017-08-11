@@ -925,8 +925,8 @@ namespace Tangra.OCR.GpsBoxSprite
                     string.Join("", evenLines[0].Select(x => x.HasValue ? x.Value.ToString() : " ")) + " " +
                     string.Join("", evenLines[1].Select(x => x.HasValue ? x.Value.ToString() : " "));
 
-                CurrentOcredOddFieldTimeStamp = new GpxBoxSpriteVtiTimeStamp(yearOdd, monthOdd, dayOdd, hourOdd, minOdd, secOdd, ms10Odd1, ms10Odd2, oddOcredChars);
-                CurrentOcredEvenFieldTimeStamp = new GpxBoxSpriteVtiTimeStamp(yearEven, monthEven, dayEven, hourEven, minEven, secEven, ms10Even1, ms10Even2, evenOcredChars);
+                CurrentOcredOddFieldTimeStamp = new GpxBoxSpriteVtiTimeStamp(yearOdd, monthOdd, dayOdd, hourOdd, minOdd, secOdd, ms10Odd1, ms10Odd2, oddOcredChars, !EvenBeforeOdd);
+                CurrentOcredEvenFieldTimeStamp = new GpxBoxSpriteVtiTimeStamp(yearEven, monthEven, dayEven, hourEven, minEven, secEven, ms10Even1, ms10Even2, evenOcredChars, EvenBeforeOdd);
             }
         }
 
