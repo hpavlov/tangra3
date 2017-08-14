@@ -18,7 +18,7 @@ namespace Tangra.OCR
         private IVideoController m_VideoController;
         private TimestampOCRData m_InitializationData;
 
-        private Dictionary<string, uint[]> m_CalibrationImages = new Dictionary<string, uint[]>();
+        private Dictionary<string, Tuple<uint[], int, int>> m_CalibrationImages = new Dictionary<string, Tuple<uint[], int, int>>();
         private List<string> m_CalibrationErrors = new List<string>();
         private uint[] m_LatestFrameImage;
 
@@ -69,8 +69,20 @@ namespace Tangra.OCR
 
         public Bitmap GetOCRDebugImage()
         {
-            // TODO:
+            // NOTE: Add images from current frame OCR for visual inspection if required
             return null;
+        }
+
+        public Bitmap GetOCRCalibrationDebugImage()
+        {
+            // NOTE: Add calibration signature images for visual inspection if required
+            return null;
+        }
+
+        public void PrepareFailedCalibrationReport()
+        {
+            // NOTE: Add calibration frames OSD position data here if required
+            // NOTE: Add signature images for visual inspection if required            
         }
 
         public bool RequiresCalibration
@@ -94,7 +106,7 @@ namespace Tangra.OCR
             return false;
         }
 
-        public Dictionary<string, uint[]> GetCalibrationReportImages()
+        public Dictionary<string, Tuple<uint[], int, int>> GetCalibrationReportImages()
         {
             return m_CalibrationImages;
         }

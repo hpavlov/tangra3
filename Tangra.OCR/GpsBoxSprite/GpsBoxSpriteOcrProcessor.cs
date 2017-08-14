@@ -8,7 +8,9 @@ using System.Linq;
 using System.Security.Policy;
 using System.Text;
 using System.Text.RegularExpressions;
+using Tangra.Model.Config;
 using Tangra.Model.Helpers;
+using Tangra.Model.Image;
 using Tangra.OCR.IotaVtiOsdProcessor;
 using Tangra.OCR.TimeExtraction;
 
@@ -73,6 +75,11 @@ namespace Tangra.OCR.GpsBoxSprite
         static int[] TWOLINE_LINE1_INDEXES = new int[] { 0, 1, 3, 4, 6, 7, 9, 10, 12, 13, 15, 16 };
         static int[] TWOLINE_LINE2_INDEXES = new int[] { 0, 1, 2, 3, 5, 9, 10, 11, 12, 14 };
 
+        static int MAX_UNRECOGNIZED_SIGNATURES_PERCENT = 8;
+        static int MIN_RECOGNIZED_DIGITS_ZERO_TO_NINE = 8;
+
+        private double m_UnrecognSignPerc = double.NaN;
+
         public GpsBoxSpriteOcrProcessor(List<OcrCalibrationFrame> calibrationFrames, Tuple<int, int>[] topBottoms, Tuple<decimal, decimal>[] leftWidths, int frameWidth, int frameHeight)
         {
             m_FrameWidth = frameWidth;
@@ -97,10 +104,10 @@ namespace Tangra.OCR.GpsBoxSprite
             m_Signatures.Clear();
             var allBlocks = m_CalibrationBlocks.Select(x => x.Item1).Union(m_CalibrationBlocks.Select(x => x.Item2)).ToList();
             CategorizeInitialCalibrationBlocks(allBlocks);
-            AttemtCalibration();
+            AttemptCalibration();
         }
 
-        private void AttemtCalibration()
+        private void AttemptCalibration()
         {
             OCRBlockSignatures();            
             CheckSignaturesAndCompleteCalibrationIfPossible();
@@ -130,11 +137,11 @@ namespace Tangra.OCR.GpsBoxSprite
                 }
             }
 
-            var unrecSigPerc = m_Signatures.Count(x => x.Digit == null) * 100.0 / m_Signatures.Count;
-            if (unrecSigPerc < 6 /* 6 %*/)
+            m_UnrecognSignPerc = m_Signatures.Count(x => x.Digit == null) * 100.0 / m_Signatures.Count;
+            if (m_UnrecognSignPerc < MAX_UNRECOGNIZED_SIGNATURES_PERCENT)
             {
                 var dictChars = m_Signatures.Where(x => x.Digit != null).GroupBy(x => x.Digit).ToDictionary(x => x.Key, y => y.ToList());
-                var sigLocated94Percent = dictChars.Keys.Min() >= 0 && dictChars.Keys.Count >= 9;
+                var sigLocated94Percent = dictChars.Keys.Min() >= 0 && dictChars.Keys.Count >= MIN_RECOGNIZED_DIGITS_ZERO_TO_NINE;
                 if (sigLocated94Percent)
                 {
                     // Remove the potentially bad matches from the signatures
@@ -205,7 +212,12 @@ namespace Tangra.OCR.GpsBoxSprite
 
             if (cntZeroes > cntNegative && cntZeroes > cntPositive)
             {
-                // Duplicated fields or only a single timestamp in the video frame ??
+                var numSameTS = allOCRedTimeStamps.Count(x => x.Item1.Milliseconds10First == x.Item2.Milliseconds10First);
+                if (numSameTS > allOCRedTimeStamps.Count/2)
+                {
+                    // Duplicated fields
+                    DuplicatedFields = true;
+                }
             }
             else if (cntNegative > cntZeroes && cntNegative > cntPositive)
             {
@@ -218,6 +230,8 @@ namespace Tangra.OCR.GpsBoxSprite
         internal VideoFormat? VideoFormat { get; private set; }
         
         internal bool EvenBeforeOdd { get; private set; }
+
+        internal bool DuplicatedFields { get; private set; }
 
         internal uint[] CurrentImage;
 
@@ -619,7 +633,7 @@ namespace Tangra.OCR.GpsBoxSprite
         private static Regex s_Regex5 = new Regex("^\\[+W+\\]+o*?$", RegexOptions.Compiled | RegexOptions.Singleline);
 
         private static Regex s_Regex1 = new Regex("^[I\\[\\]]+[IW]*?$", RegexOptions.Compiled | RegexOptions.Singleline);
-        private static Regex s_Regex7 = new Regex("^W+\\]+[I\\[\\]]+$", RegexOptions.Compiled | RegexOptions.Singleline);
+        private static Regex s_Regex7 = new Regex("^W+o*?\\]+[I\\[\\]]+$", RegexOptions.Compiled | RegexOptions.Singleline);
         private static Regex s_Regex4 = new Regex("^[\\]I]+W*o+W+[\\]I]+$", RegexOptions.Compiled | RegexOptions.Singleline);
 
         private int? OCRDigitBlock(string horizontals, string verticals)
@@ -696,6 +710,11 @@ namespace Tangra.OCR.GpsBoxSprite
             }
 
             return bmp;
+        }
+
+        internal void PrepareCalibrationFailedReport(ICalibrationErrorProcessor errorProcessor)
+        {
+            errorProcessor.AddErrorText(string.Format("{0:0.00}% of all signatures have been recognized.", 100 - m_UnrecognSignPerc));
         }
 
         private decimal ComputeBlockDifference(decimal[,] block1, decimal[,] block2)
@@ -789,7 +808,7 @@ namespace Tangra.OCR.GpsBoxSprite
             var newBlocks = ExtractBlockNumbers(calibFrame.ProcessedPixels);
 
             CategorizeCalibrationBlocks(newBlocks);
-            AttemtCalibration();
+            AttemptCalibration();
         }
 
         internal GpxBoxSpriteVtiTimeStamp CurrentOcredOddFieldTimeStamp { get; private set; }
@@ -881,7 +900,7 @@ namespace Tangra.OCR.GpsBoxSprite
                     }
                 }
 
-                g.DrawString(ocredDigit.ToString(), s_Font, Brushes.Lime, x0, y0 + m_BlockHeight);
+                g.DrawString(ocredDigit != -1 ? ocredDigit.ToString() : " ", s_Font, Brushes.Lime, x0, y0 + m_BlockHeight);
             }
             catch (Exception ex)
             {
@@ -908,9 +927,9 @@ namespace Tangra.OCR.GpsBoxSprite
                 int ms10Odd1 = (GetTwoDigitInteger(oddLines[1][0], oddLines[1][1]) * 100 + GetTwoDigitInteger(oddLines[1][2], oddLines[1][3])) * 10 + (oddLines[1][4] ?? 0);
                 int ms10Odd2 = (GetTwoDigitInteger(oddLines[1][5], oddLines[1][6]) * 100 + GetTwoDigitInteger(oddLines[1][7], oddLines[1][8])) * 10 + (oddLines[1][9] ?? 0);
 
-                string oddOcredChars = 
-                    string.Join("", oddLines[0].Select(x => x.HasValue ? x.Value.ToString() : " ")) + " " +
-                    string.Join("", oddLines[1].Select(x => x.HasValue ? x.Value.ToString() : " "));
+                string oddOcredChars =
+                    string.Join("", oddLines[0].Select(x => x.HasValue && x.Value != -1 ? x.Value.ToString() : " ")) + " " +
+                    string.Join("", oddLines[1].Select(x => x.HasValue && x.Value != -1 ? x.Value.ToString() : " "));
 
                 int yearEven = GetTwoDigitInteger(evenLines[0][10], evenLines[0][11]) + 2000;
                 int monthEven = GetTwoDigitInteger(evenLines[0][8], evenLines[0][9]);
@@ -922,11 +941,11 @@ namespace Tangra.OCR.GpsBoxSprite
                 int ms10Even2 = (GetTwoDigitInteger(evenLines[1][5], evenLines[1][6]) * 100 + GetTwoDigitInteger(evenLines[1][7], evenLines[1][8])) * 10 + (evenLines[1][9] ?? 0);
 
                 string evenOcredChars =
-                    string.Join("", evenLines[0].Select(x => x.HasValue ? x.Value.ToString() : " ")) + " " +
-                    string.Join("", evenLines[1].Select(x => x.HasValue ? x.Value.ToString() : " "));
+                    string.Join("", evenLines[0].Select(x => x.HasValue && x.Value != -1 ? x.Value.ToString() : " ")) + " " +
+                    string.Join("", evenLines[1].Select(x => x.HasValue && x.Value != -1 ? x.Value.ToString() : " "));
 
-                CurrentOcredOddFieldTimeStamp = new GpxBoxSpriteVtiTimeStamp(yearOdd, monthOdd, dayOdd, hourOdd, minOdd, secOdd, ms10Odd1, ms10Odd2, oddOcredChars, !EvenBeforeOdd);
-                CurrentOcredEvenFieldTimeStamp = new GpxBoxSpriteVtiTimeStamp(yearEven, monthEven, dayEven, hourEven, minEven, secEven, ms10Even1, ms10Even2, evenOcredChars, EvenBeforeOdd);
+                CurrentOcredOddFieldTimeStamp = new GpxBoxSpriteVtiTimeStamp(yearOdd, monthOdd, dayOdd, hourOdd, minOdd, secOdd, ms10Odd1, ms10Odd2, oddOcredChars, !EvenBeforeOdd, DuplicatedFields);
+                CurrentOcredEvenFieldTimeStamp = new GpxBoxSpriteVtiTimeStamp(yearEven, monthEven, dayEven, hourEven, minEven, secEven, ms10Even1, ms10Even2, evenOcredChars, EvenBeforeOdd, DuplicatedFields);
             }
         }
 

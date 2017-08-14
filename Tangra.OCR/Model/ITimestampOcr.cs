@@ -34,7 +34,7 @@ namespace Tangra.OCR
         bool RequiresCalibration { get; }
 
         bool ProcessCalibrationFrame(int frameNo, uint[] data);
-		Dictionary<string, uint[]> GetCalibrationReportImages();
+		Dictionary<string, Tuple<uint[], int, int>> GetCalibrationReportImages();
 	    List<string> GetCalibrationErrors();
         uint[] GetLastUnmodifiedImage();
 		TimestampOCRData InitializationData { get; }
@@ -47,5 +47,7 @@ namespace Tangra.OCR
         string LastFailedReason { get; }
 
         Bitmap GetOCRDebugImage();
+        Bitmap GetOCRCalibrationDebugImage();
+        void PrepareFailedCalibrationReport();
     }
 }

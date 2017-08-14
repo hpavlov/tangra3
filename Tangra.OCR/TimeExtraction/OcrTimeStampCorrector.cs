@@ -70,6 +70,7 @@ namespace Tangra.OCR.TimeExtraction
 
 			double fieldDuration;
             bool returnBlank;
+            bool isDuplicateFrame = false;
 
 			if (!evenBeforeOdd)
 			{
@@ -87,6 +88,7 @@ namespace Tangra.OCR.TimeExtraction
                     else
                     {
                         // Duplicate or dropped frame detected. No corrections requied.
+                        isDuplicateFrame = true;
                     }
                 }
 			    else
@@ -100,7 +102,12 @@ namespace Tangra.OCR.TimeExtraction
                             return false;
                         }
                         else
-                            oddTimestampToCheck = new DateTime(1, 1, 1, oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds).AddMilliseconds(Math.Min(10000, oddFieldOSD.Milliseconds10) / 10.0f);
+                        {
+                            if (oddFieldOSD.ContainsDate)
+                                oddTimestampToCheck = new DateTime(oddFieldOSD.Year, oddFieldOSD.Month, oddFieldOSD.Day, oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds).AddMilliseconds(Math.Min(10000, oddFieldOSD.Milliseconds10) / 10.0f); 
+                            else
+                                oddTimestampToCheck = new DateTime(1, 1, 1, oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds).AddMilliseconds(Math.Min(10000, oddFieldOSD.Milliseconds10) / 10.0f); 
+                        }
                     }
 
                     fieldDuration = Math.Abs(new TimeSpan(oddTimestampToCheck.Ticks - evenFieldTimestamp.Ticks).TotalMilliseconds);
@@ -133,20 +140,28 @@ namespace Tangra.OCR.TimeExtraction
                     else
                     {
                         // Duplicate or dropped frame detected. No corrections requied.
+                        isDuplicateFrame = true;
                     }
 			    }
 			    else
 			    {
                     if (!IsFieldDurationOkay(fieldDuration))
                     {
-                        if (!TryCorrectTimestamp(m_PrevOddTicks, evenFieldTimestamp, evenFieldOSD, frameStep, null, aavIntegratedFields != null))
+                        if (
+                            !TryCorrectTimestamp(m_PrevOddTicks, evenFieldTimestamp, evenFieldOSD, frameStep, null,
+                                aavIntegratedFields != null))
                         {
                             Trace.WriteLine(correctionDebugInfo);
                             Trace.WriteLine("IOTA-VTI Correction Failed: Cannot correct field duration PrevOdd -> CurrEven.");
                             return false;
                         }
                         else
-                            evenTimestampToCheck = new DateTime(1, 1, 1, evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds).AddMilliseconds(Math.Min(10000, evenFieldOSD.Milliseconds10) / 10.0f);
+                        {
+                            if (evenFieldOSD.ContainsDate)
+                                evenTimestampToCheck = new DateTime(evenFieldOSD.Year, evenFieldOSD.Month, evenFieldOSD.Day, evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds).AddMilliseconds(Math.Min(10000, evenFieldOSD.Milliseconds10) / 10.0f);
+                            else
+                                evenTimestampToCheck = new DateTime(1, 1, 1, evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds).AddMilliseconds(Math.Min(10000, evenFieldOSD.Milliseconds10) / 10.0f);
+                        }                            
                     }
 
                     fieldDuration = Math.Abs(new TimeSpan(evenTimestampToCheck.Ticks - oddFieldTimestamp.Ticks).TotalMilliseconds);
@@ -164,7 +179,7 @@ namespace Tangra.OCR.TimeExtraction
 			    }
 			}
 
-            if (oddFieldOSD.ContainsFrameNumbers)
+            if (oddFieldOSD.ContainsFrameNumbers && !isDuplicateFrame)
             {
                 var aavFrameNoCorr = aavIntegratedFields.HasValue ? (aavIntegratedFields.Value - 2) : 0;
 
@@ -208,7 +223,82 @@ namespace Tangra.OCR.TimeExtraction
 			return true;
 		}
 
-        // Note this method only looks at exact duplicate or dropped frames, assuming that all timestamp digits have been recognized correctly
+	    public bool TryToCorrectDuplicateField(int frameNo, int frameStep, IVtiTimeStamp oddFieldOSD, IVtiTimeStamp evenFieldOSD, ref DateTime frameTimestamp, out string correctionDebugInfo)
+	    {
+            if (m_PrevFrameNo == -1 || m_PrevOddTicks == -1 || m_PrevEvenTicks == -1)
+            {
+                correctionDebugInfo = "Cannot correct. m_PrevFrameNo == -1 || m_PrevOddTicks == -1 || m_PrevEvenTicks == -1";
+                return false;
+            }
+
+            if (oddFieldOSD.ContainsDate)
+            {
+                correctionDebugInfo = string.Format("IOTA-VTI Correction Attempt for Frame {0}. {1:D4}-{2:D2}-{3:D2} {4:D2}:{5:D2}:{6:D2}.{7:D4} ({8}) - {9:D4}-{10:D2}-{11:D2} {12:D2}:{13:D2}:{14:D2}.{15:D4} ({16}). FrameStep: {17}. Previous: {18:D4}-{19:D2}-{20:D2} {21:D2}:{22:D2}:{23:D2}.{24:D4} ({25}) - {26:D4}-{27:D2}-{28:D2} {29:D2}:{30:D2}:{31:D2}.{32:D4} ({33})",
+                        frameNo,
+                        oddFieldOSD.Year, oddFieldOSD.Month, oddFieldOSD.Day, oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds, oddFieldOSD.Milliseconds10, oddFieldOSD.FrameNumber,
+                        evenFieldOSD.Year, evenFieldOSD.Month, evenFieldOSD.Day, evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds, evenFieldOSD.Milliseconds10, evenFieldOSD.FrameNumber,
+                        frameStep,
+                        m_PrevOddFieldOSD.Year, m_PrevOddFieldOSD.Month, m_PrevOddFieldOSD.Day, m_PrevOddFieldOSD.Hours, m_PrevOddFieldOSD.Minutes, m_PrevOddFieldOSD.Seconds, m_PrevOddFieldOSD.Milliseconds10, m_PrevOddFieldNo,
+                        m_PrevEvenFieldOSD.Year, m_PrevEvenFieldOSD.Month, m_PrevEvenFieldOSD.Day, m_PrevEvenFieldOSD.Hours, m_PrevEvenFieldOSD.Minutes, m_PrevEvenFieldOSD.Seconds, m_PrevEvenFieldOSD.Milliseconds10, m_PrevEvenFieldNo);
+            }
+            else
+            {
+                correctionDebugInfo = string.Format("IOTA-VTI Correction Attempt for Frame {0}. {1:D2}:{2:D2}:{3:D2}.{4:D4} ({5}) - {6:D2}:{7:D2}:{8:D2}.{9:D4} ({10}). FrameStep: {11}. Previous: {12:D2}:{13:D2}:{14:D2}.{15:D4} ({16}) - {17:D2}:{18:D2}:{19:D2}.{20:D4} ({21})",
+                        frameNo,
+                        oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds, oddFieldOSD.Milliseconds10, oddFieldOSD.FrameNumber,
+                        evenFieldOSD.Hours, evenFieldOSD.Minutes, evenFieldOSD.Seconds, evenFieldOSD.Milliseconds10, evenFieldOSD.FrameNumber,
+                        frameStep,
+                        m_PrevOddFieldOSD.Hours, m_PrevOddFieldOSD.Minutes, m_PrevOddFieldOSD.Seconds, m_PrevOddFieldOSD.Milliseconds10, m_PrevOddFieldNo,
+                        m_PrevEvenFieldOSD.Hours, m_PrevEvenFieldOSD.Minutes, m_PrevEvenFieldOSD.Seconds, m_PrevEvenFieldOSD.Milliseconds10, m_PrevEvenFieldNo);
+            }
+
+            float knownFrameDuration = m_VideoFormat == VideoFormat.PAL
+                        ? 2 * VtiTimeStampComposer.FIELD_DURATION_PAL
+                        : 2 * VtiTimeStampComposer.FIELD_DURATION_NTSC;
+
+            var fieldDuration = Math.Abs(new TimeSpan(frameTimestamp.Ticks - m_PrevEvenTicks).TotalMilliseconds / 2.0) - (frameStep - 1) * knownFrameDuration;
+
+            bool returnBlank;
+            if (IsDuplicatedOrDroppedFrames(m_PrevOddFieldOSD, m_PrevEvenFieldOSD, oddFieldOSD, evenFieldOSD, frameStep, knownFrameDuration, null, out returnBlank))
+            {
+                if (returnBlank)
+                {
+                    // The Duplicate/Dropped frame engine decided it is safer to return a blank frame
+                    return false;
+                }
+                else
+                {
+                    // Duplicate or dropped frame detected. No corrections requied.
+                }
+            }
+            else
+            {
+                if (!IsFieldDurationOkay(fieldDuration))
+                {
+                    long fieldDistance = (long)Math.Round((10000 * (m_VideoFormat == VideoFormat.PAL ? VtiTimeStampComposer.FIELD_DURATION_PAL : VtiTimeStampComposer.FIELD_DURATION_NTSC)));
+
+                    if (!TryCorrectTimestamp(m_PrevOddTicks + fieldDistance, frameTimestamp, oddFieldOSD, frameStep, null, false))
+                    {
+                        Trace.WriteLine(correctionDebugInfo);
+                        Trace.WriteLine("IOTA-VTI Correction Failed: Cannot correct field duration PrevEven -> CurrOdd.");
+                        return false;
+                    }
+                }
+            }
+
+            if (oddFieldOSD.ContainsDate)
+            {
+                frameTimestamp = new DateTime(oddFieldOSD.Year, oddFieldOSD.Month, oddFieldOSD.Day, oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds).AddMilliseconds(Math.Min(10000, oddFieldOSD.Milliseconds10) / 10.0f);
+            }
+            else
+            {
+                frameTimestamp = new DateTime(1, 1, 1, oddFieldOSD.Hours, oddFieldOSD.Minutes, oddFieldOSD.Seconds).AddMilliseconds(Math.Min(10000, oddFieldOSD.Milliseconds10) / 10.0f);
+            }
+
+            return true;
+	    }
+
+	    // Note this method only looks at exact duplicate or dropped frames, assuming that all timestamp digits have been recognized correctly
         // It is also looking for exactly one single dropped frame
         private bool IsDuplicatedOrDroppedFrames(IVtiTimeStamp prefFrameField1, IVtiTimeStamp prefFrameField2, IVtiTimeStamp field1, IVtiTimeStamp field2, int frameStep, float knownFrameDurationMS, int? aavIntegratedFields, out bool returnBlank)
         {

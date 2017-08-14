@@ -23,11 +23,13 @@ namespace Tangra.VideoOperations
 {
 	public partial class frmOsdOcrCalibrationFailure : Form
 	{
-		private Dictionary<string, uint[]> Images;
+		private Dictionary<string, Tuple<uint[], int, int>> Images;
 
         private uint[] LastUnmodifiedImage;
 
 		private ITimestampOcr m_TimestampOCR;
+
+        public Bitmap OCRDebugImage;
 
 		public ITimestampOcr TimestampOCR
 		{
@@ -38,7 +40,8 @@ namespace Tangra.VideoOperations
 			    if (m_TimestampOCR != null)
 			    {
                     Images = m_TimestampOCR.GetCalibrationReportImages();
-                    LastUnmodifiedImage = m_TimestampOCR.GetLastUnmodifiedImage();			        
+                    LastUnmodifiedImage = m_TimestampOCR.GetLastUnmodifiedImage();
+                    OCRDebugImage = m_TimestampOCR.GetOCRCalibrationDebugImage();
 			    }
 			}
 		}
@@ -47,7 +50,7 @@ namespace Tangra.VideoOperations
 
 		public bool CanSendReport()
 		{
-			return Images != null && Images.Count > 0;
+            return (Images != null && Images.Count > 0) || OCRDebugImage != null;
 		}
 
 		public frmOsdOcrCalibrationFailure()
@@ -96,7 +99,7 @@ namespace Tangra.VideoOperations
 
 			try
 			{
-				SendOcrErrorReport(m_TimestampOCR, Images, LastUnmodifiedImage, tbxEmail.Text);
+                SendOcrErrorReport(m_TimestampOCR, Images, LastUnmodifiedImage, OCRDebugImage, tbxEmail.Text);
 			}
 			catch (Exception ex)
 			{
@@ -118,7 +121,7 @@ namespace Tangra.VideoOperations
 			}
 		}
 
-		public static void SendOcrErrorReport(ITimestampOcr timestampOCR, Dictionary<string, uint[]> images, uint[] lastUnmodifiedImage, string email)
+        public static void SendOcrErrorReport(ITimestampOcr timestampOCR, Dictionary<string, Tuple<uint[], int, int>> images, uint[] lastUnmodifiedImage, Bitmap ocdDebugImage, string email)
 		{
 			string tempDir = Path.GetFullPath(Path.GetTempPath() + @"\" + Guid.NewGuid().ToString());
 			string tempFile = Path.GetTempFileName();
@@ -134,12 +137,14 @@ namespace Tangra.VideoOperations
 
 				foreach (string key in images.Keys)
 				{
-					uint[] pixels = images[key];
+					uint[] pixels = images[key].Item1;
 					Bitmap img = null;
 					if (pixels.Length == fieldAreaWidth * fieldAreaHeight)
 						img = Pixelmap.ConstructBitmapFromBitmapPixels(pixels, fieldAreaWidth, fieldAreaHeight);
 					else if (pixels.Length == frameWidth * frameHeight)
 						img = Pixelmap.ConstructBitmapFromBitmapPixels(pixels, frameWidth, frameHeight);
+                    else if (pixels.Length == images[key].Item2 * images[key].Item3)
+                        img = Pixelmap.ConstructBitmapFromBitmapPixels(pixels, images[key].Item2, images[key].Item3);
 
 					if (img != null)
 						img.Save(Path.GetFullPath(string.Format(@"{0}\{1}", tempDir, key)), ImageFormat.Bmp);
@@ -150,6 +155,9 @@ namespace Tangra.VideoOperations
 					Bitmap fullFrame = Pixelmap.ConstructBitmapFromBitmapPixels(lastUnmodifiedImage, frameWidth, frameHeight);
 					fullFrame.Save(Path.GetFullPath(string.Format(@"{0}\full-frame.bmp", tempDir)), ImageFormat.Bmp);
 				}
+
+                if (ocdDebugImage != null)
+                    ocdDebugImage.Save(Path.GetFullPath(string.Format(@"{0}\ocr-debug-image.bmp", tempDir)), ImageFormat.Bmp);
 
 				ZipUnzip.Zip(tempDir, tempFile, false);
 				byte[] attachment = File.ReadAllBytes(tempFile);

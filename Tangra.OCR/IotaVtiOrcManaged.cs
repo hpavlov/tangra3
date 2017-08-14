@@ -36,7 +36,7 @@ namespace Tangra.OCR
 		private bool m_TVSafeModeGuess;
         internal IotaVtiOcrProcessor m_Processor;
 
-		private Dictionary<string, uint[]> m_CalibrationImages = new Dictionary<string, uint[]>();
+        private Dictionary<string, Tuple<uint[], int, int>> m_CalibrationImages = new Dictionary<string, Tuple<uint[], int, int>>();
 		private List<string> m_CalibrationErrors = new List<string>(); 
 	    private uint[] m_LatestFrameImage;
 		private bool m_UseNativePreProcessing;
@@ -254,8 +254,19 @@ namespace Tangra.OCR
 
         public Bitmap GetOCRDebugImage()
         {
-            // TODO:
+            // NOTE: Add images from current frame OCR for visual inspection if required
             return null;
+        }
+
+        public Bitmap GetOCRCalibrationDebugImage()
+        {
+            // NOTE: Add calibration signature images for visual inspection if required
+            return null;
+        }
+
+        public void PrepareFailedCalibrationReport()
+        {
+            // NOTE: Add calibration frames OSD position data here if required
         }
 
         public bool ExtractTime(int frameNo, int frameStep, uint[] oddPixels, uint[] evenPixels, int width, int height, out DateTime time)
@@ -439,11 +450,11 @@ namespace Tangra.OCR
                         {
                             uint[] pixelsOriginal = new uint[data.Length];
                             Array.Copy(data, pixelsOriginal, data.Length);
-                            m_CalibrationImages.Add("LocateTimestampPositionOrg.bmp", pixelsOriginal);
+                            AddErrorImage("LocateTimestampPositionOrg.bmp", pixelsOriginal, 0, 0);
 
                             uint[] pixelsPreProcessed = new uint[data.Length];
                             Array.Copy(preProcessedPixels, pixelsPreProcessed, data.Length);
-                            m_CalibrationImages.Add("LocateTimestampPositionProcessed.bmp", pixelsPreProcessed);
+                            AddErrorImage("LocateTimestampPositionProcessed.bmp", pixelsPreProcessed, 0, 0);
                         }
                     }
 
@@ -569,32 +580,32 @@ namespace Tangra.OCR
             {
 				uint[] pixelsEven = new uint[m_FieldAreaWidth * m_FieldAreaHeight];
 				Array.Copy(m_EvenFieldPixelsPreProcessed, pixelsEven, m_EvenFieldPixelsPreProcessed.Length);
-				m_CalibrationImages.Add(string.Format(@"{0}-even.bmp", frameNo.ToString("0000000")), pixelsEven);
+                AddErrorImage(string.Format(@"{0}-even.bmp", frameNo.ToString("0000000")), pixelsEven, m_FieldAreaWidth, m_FieldAreaHeight);
 
 				uint[] pixelsOdd = new uint[m_FieldAreaWidth * m_FieldAreaHeight];
 				Array.Copy(m_OddFieldPixelsPreProcessed, pixelsOdd, m_OddFieldPixelsPreProcessed.Length);
-				m_CalibrationImages.Add(string.Format(@"{0}-odd.bmp", frameNo.ToString("0000000")), pixelsOdd);
+                AddErrorImage(string.Format(@"{0}-odd.bmp", frameNo.ToString("0000000")), pixelsOdd, m_FieldAreaWidth, m_FieldAreaHeight);
 
 				uint[] pixelsEvenOrg = new uint[m_FieldAreaWidth * m_FieldAreaHeight];
 				Array.Copy(m_EvenFieldPixels, pixelsEvenOrg, m_EvenFieldPixels.Length);
-				m_CalibrationImages.Add(string.Format(@"ORG-{0}-even.bmp", frameNo.ToString("0000000")), pixelsEvenOrg);
+                AddErrorImage(string.Format(@"ORG-{0}-even.bmp", frameNo.ToString("0000000")), pixelsEvenOrg, m_FieldAreaWidth, m_FieldAreaHeight);
 
 				uint[] pixelsOddOrg = new uint[m_FieldAreaWidth * m_FieldAreaHeight];
 				Array.Copy(m_OddFieldPixels, pixelsOddOrg, m_OddFieldPixelsPreProcessed.Length);
-				m_CalibrationImages.Add(string.Format(@"ORG-{0}-odd.bmp", frameNo.ToString("0000000")), pixelsOddOrg);
+                AddErrorImage(string.Format(@"ORG-{0}-odd.bmp", frameNo.ToString("0000000")), pixelsOddOrg, m_FieldAreaWidth, m_FieldAreaHeight);
 
                 uint[] pixelsEvenNoLChD = new uint[m_FieldAreaWidth * m_FieldAreaHeight];
                 Array.Copy(m_EvenFieldPixelsDebugNoLChD, pixelsEvenNoLChD, m_EvenFieldPixels.Length);
-                m_CalibrationImages.Add(string.Format(@"NLChD-{0}-even.bmp", frameNo.ToString("0000000")), pixelsEvenNoLChD);
+                AddErrorImage(string.Format(@"NLChD-{0}-even.bmp", frameNo.ToString("0000000")), pixelsEvenNoLChD, m_FieldAreaWidth, m_FieldAreaHeight);
 
                 uint[] pixelsOddNoLChD = new uint[m_FieldAreaWidth * m_FieldAreaHeight];
                 Array.Copy(m_OddFieldPixelsDebugNoLChD, pixelsOddNoLChD, m_OddFieldPixelsPreProcessed.Length);
-                m_CalibrationImages.Add(string.Format(@"NLChD-{0}-odd.bmp", frameNo.ToString("0000000")), pixelsOddNoLChD);
+                AddErrorImage(string.Format(@"NLChD-{0}-odd.bmp", frameNo.ToString("0000000")), pixelsOddNoLChD, m_FieldAreaWidth, m_FieldAreaHeight);
             }
 
 		    if (!wasCalibrated && m_Processor.IsCalibrated)
 		    {
-                m_TimeStampComposer = new VtiTimeStampComposer(m_Processor.VideoFormat, m_InitializationData.IntegratedAAVFrames, m_Processor.EvenBeforeOdd, m_VideoController, this, () => m_Processor.CurrentImage);
+                m_TimeStampComposer = new VtiTimeStampComposer(m_Processor.VideoFormat, m_InitializationData.IntegratedAAVFrames, m_Processor.EvenBeforeOdd, false /* Duplicated fields not supported for IOTA-VTI */, m_VideoController, this, () => m_Processor.CurrentImage);
 		    }
 
 		    return m_Processor.IsCalibrated && !m_ForceErrorReport;
@@ -624,13 +635,13 @@ namespace Tangra.OCR
 
 		    if (!wasCalibrated && m_Processor.IsCalibrated)
 		    {
-                m_TimeStampComposer = new VtiTimeStampComposer(m_Processor.VideoFormat, m_InitializationData.IntegratedAAVFrames, m_Processor.EvenBeforeOdd, m_VideoController, this, () => m_Processor.CurrentImage);
+                m_TimeStampComposer = new VtiTimeStampComposer(m_Processor.VideoFormat, m_InitializationData.IntegratedAAVFrames, m_Processor.EvenBeforeOdd, false /* Duplicated fields not supported for IOTA-VTI */, m_VideoController, this, () => m_Processor.CurrentImage);
 		    }
 
             return m_Processor.IsCalibrated;
 	    }
 
-	    public Dictionary<string, uint[]> GetCalibrationReportImages()
+        public Dictionary<string, Tuple<uint[], int, int>> GetCalibrationReportImages()
 		{
 			return m_CalibrationImages;
 		}
@@ -682,9 +693,9 @@ namespace Tangra.OCR
             get { return m_CalibrationErrors.Count; }
         }
 
-        public void AddErrorImage(string fileName, uint[] pixels)
+        public void AddErrorImage(string fileName, uint[] pixels, int width, int height)
         {
-            m_CalibrationImages.Add(fileName, pixels);
+            m_CalibrationImages.Add(fileName, Tuple.Create(pixels, width, height));
         }
 
         public void AddErrorText(string error)

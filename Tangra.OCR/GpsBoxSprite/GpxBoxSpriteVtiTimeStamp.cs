@@ -8,7 +8,10 @@ namespace Tangra.OCR.GpsBoxSprite
 {
     public class GpxBoxSpriteVtiTimeStamp : IVtiTimeStamp
     {
-        internal GpxBoxSpriteVtiTimeStamp(int year, int month, int day, int hour, int min, int sec, int ms10First, int ms10Second, string ocredChars, bool isOddField)
+        internal GpxBoxSpriteVtiTimeStamp(
+            int year, int month, int day, 
+            int hour, int min, int sec, int ms10First, int ms10Second, 
+            string ocredChars, bool isOddField, bool useFirstMs10)
         {
             Year = year;
             Month = month;
@@ -19,16 +22,18 @@ namespace Tangra.OCR.GpsBoxSprite
             Milliseconds10First = ms10First;
             Milliseconds10Second = ms10Second;
             m_IsOddField = isOddField;
-            Milliseconds10 = isOddField ? ms10First : ms10Second; /* For the normal 'Odd' fields, the end timestamp is the first millis */
+            m_UseFirstMs10 = useFirstMs10;
+            Milliseconds10 = isOddField || useFirstMs10 ? ms10First : ms10Second; /* For the normal 'Odd' fields, the end timestamp is the first millis */
             OcredCharacters = ocredChars;
         }
 
         public GpxBoxSpriteVtiTimeStamp Clone()
         {
-            return new GpxBoxSpriteVtiTimeStamp(Year, Month, Day, Hours, Minutes, Seconds, Milliseconds10First, Milliseconds10Second, OcredCharacters, m_IsOddField);
+            return new GpxBoxSpriteVtiTimeStamp(Year, Month, Day, Hours, Minutes, Seconds, Milliseconds10First, Milliseconds10Second, OcredCharacters, m_IsOddField, m_UseFirstMs10);
         }
 
         private bool m_IsOddField;
+        private bool m_UseFirstMs10;
 
         public bool ContainsFrameNumbers 
         {

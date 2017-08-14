@@ -19,7 +19,7 @@ namespace Tangra.OCR
         private IVideoController m_VideoController;
         private TimestampOCRData m_InitializationData;
 
-        private Dictionary<string, uint[]> m_CalibrationImages = new Dictionary<string, uint[]>();
+        private Dictionary<string, Tuple<uint[], int, int>> m_CalibrationImages = new Dictionary<string, Tuple<uint[], int, int>>();
         private List<string> m_CalibrationErrors = new List<string>();
         private uint[] m_LatestFrameImage;
 
@@ -41,6 +41,8 @@ namespace Tangra.OCR
         private int m_ImageHeight;
         private int m_MinCalibrationFrames;
 
+        private bool m_ForceErrorReport;
+
         public void Initialize(TimestampOCRData initializationData, IVideoController videoController, int performanceMode)
         {
 			m_InitializationData = initializationData;
@@ -51,6 +53,10 @@ namespace Tangra.OCR
             m_ImageHeight = initializationData.FrameHeight;
 
             m_MinCalibrationFrames = (int)Math.Ceiling(m_InitializationData.VideoFrameRate);
+
+            m_ForceErrorReport = initializationData.ForceErrorReport;
+            m_CalibrationImages.Clear();
+            m_CalibrationErrors.Clear();
         }
 
         public bool ExtractTime(int frameNo, int frameStep, uint[] rawData, bool debug, out DateTime time)
@@ -65,7 +71,7 @@ namespace Tangra.OCR
 
                 // NOTE: Image needs to be split and processed separately, otherwise the 
 
-                var data = PreProcessImageForOCR(rawData, m_TopMostLine, m_BottomMostLine);
+                var data = PreProcessImageForOCR(frameNo, rawData, m_TopMostLine, m_BottomMostLine);
 
                 m_Processor.Process(data, frameNo, debug);
                 LastOddFieldOSD = m_Processor.CurrentOcredOddFieldTimeStamp;
@@ -100,6 +106,13 @@ namespace Tangra.OCR
                 : null;
         }
 
+        public Bitmap GetOCRCalibrationDebugImage()
+        {
+            return m_Processor != null
+                ? m_Processor.GetBlockSignaturesImage()
+                : null;
+        }
+
         public bool RequiresCalibration
         {
             get { return true; }
@@ -121,7 +134,7 @@ namespace Tangra.OCR
             // will be included in this error report. See the IotaVtiOcrManaged implementation for how to add calibration images to the dictionary
 
 
-            var calibFrame = ProcessCalibrationFrame(data, m_OsdLineVerticals, m_OsdBlocksLeftAndWidth);
+            var calibFrame = ProcessCalibrationFrame(frameNo, data, m_OsdLineVerticals, m_OsdBlocksLeftAndWidth);
             m_CalibrationFrames.Add(calibFrame);
 
             if (m_CalibrationFrames.Count > 1 && m_OsdLineVerticals == null)
@@ -197,22 +210,23 @@ namespace Tangra.OCR
 
                 if (m_Processor != null && m_Processor.IsCalibrated)
                 {
-                    m_TimeStampComposer = new VtiTimeStampComposer(m_Processor.VideoFormat, m_InitializationData.IntegratedAAVFrames, m_Processor.EvenBeforeOdd, m_VideoController, this, () => m_Processor.CurrentImage);
+                    m_TimeStampComposer = new VtiTimeStampComposer(m_Processor.VideoFormat, m_InitializationData.IntegratedAAVFrames, m_Processor.EvenBeforeOdd, m_Processor.DuplicatedFields, m_VideoController, this, () => m_Processor.CurrentImage);
                     return true;
                 }
                     
             }
 
-            if (m_CalibrationFrames.Count > m_MinCalibrationFrames + 5)
-            {
-                InitiazliationError = "Could not calibrate after the maximum calibration frames have been reached.";
-                return true;
-            }
-
             return false;
         }
 
-        private uint[] PreProcessImageForOCR(uint[] data, int? topMostLine, int? bottomMostLine)
+        public void PrepareFailedCalibrationReport()
+        {
+            // NOTE: Add calibration frames OSD position data here if required
+            if (m_Processor != null)
+                m_Processor.PrepareCalibrationFailedReport(this);
+        }
+
+        private uint[] PreProcessImageForOCR(int frameNo, uint[] data, int? topMostLine, int? bottomMostLine)
         {
             m_LatestFrameImage = data;
 
@@ -233,7 +247,7 @@ namespace Tangra.OCR
 
                 string error = null;
                 idx = 0;
-                var pproc = PrepareOsdVideoFields(roi, m_InitializationData.FrameWidth, bottom - top, (int)Math.Round(0.8 * averageDetectedOsdHeight), ref error);
+                var pproc = PrepareOsdVideoFields(frameNo, roi, m_InitializationData.FrameWidth, bottom - top, (int)Math.Round(0.8 * averageDetectedOsdHeight), ref error);
                 for (int i = top * m_InitializationData.FrameWidth; i < bottom * m_InitializationData.FrameWidth; i++, idx++)
                 {
                     rv[i] = pproc[idx];
@@ -297,10 +311,10 @@ namespace Tangra.OCR
             LargeChunkDenoiser.RemoveSmallHeightNoise(dataOut, width, height, 15);
         }
 
-        private uint[] PrepareOsdVideoFields(uint[] data, int width, int height, int minFrameOsdDigitHeight, ref string error)
+        private uint[] PrepareOsdVideoFields(int frameNo, uint[] data, int width, int height, int minFrameOsdDigitHeight, ref string error)
         {
             // TODO: This is suboptimal. Need to make the OCR work with the two separate fields from the start
-            var fieldHeight = height / 2;
+            var fieldHeight = (int)Math.Ceiling(height / 2.0);
             uint[] oddFieldPixels = new uint[width * fieldHeight];
             uint[] evenFieldPixels = new uint[width * fieldHeight];
             for (int y = 0; y < height; y++)
@@ -315,6 +329,16 @@ namespace Tangra.OCR
 
             var preProcessedOddPixels = PreProcessImageOSDForOCR(oddFieldPixels, width, fieldHeight, minFrameOsdDigitHeight / 2, ref error);
             var preProcessedEvenPixels = PreProcessImageOSDForOCR(evenFieldPixels, width, fieldHeight, minFrameOsdDigitHeight / 2, ref error);
+
+
+            if (m_ForceErrorReport || (m_Processor != null && !m_Processor.IsCalibrated))
+            {
+                AddErrorImage(string.Format(@"{0}-even.bmp", frameNo.ToString("0000000")), preProcessedEvenPixels, width, fieldHeight);
+                AddErrorImage(string.Format(@"{0}-odd.bmp", frameNo.ToString("0000000")), preProcessedOddPixels, width, fieldHeight);
+
+                AddErrorImage(string.Format(@"ORG-{0}-even.bmp", frameNo.ToString("0000000")), evenFieldPixels, width, fieldHeight);
+                AddErrorImage(string.Format(@"ORG-{0}-odd.bmp", frameNo.ToString("0000000")), oddFieldPixels, width, fieldHeight);
+            }
 
             var preProcessedPixels = new uint[width * height];
             for (int y = 0; y < height; y++)
@@ -597,7 +621,7 @@ namespace Tangra.OCR
         private int? m_TopMostLine = null;
         private int? m_BottomMostLine = null;
 
-        private OcrCalibrationFrame ProcessCalibrationFrame(uint[] rawData, Tuple<int, int>[] osdLineVerticals, Tuple<decimal, decimal>[] osdLineLeftAndWidths)
+        private OcrCalibrationFrame ProcessCalibrationFrame(int frameNo, uint[] rawData, Tuple<int, int>[] osdLineVerticals, Tuple<decimal, decimal>[] osdLineLeftAndWidths)
         {
             m_TopMostLine = null;
             m_BottomMostLine = null;
@@ -608,7 +632,7 @@ namespace Tangra.OCR
                 m_BottomMostLine = osdLineVerticals.Select(x => x.Item2).Max();
             }
 
-            var data = PreProcessImageForOCR(rawData, m_TopMostLine, m_BottomMostLine);
+            var data = PreProcessImageForOCR(frameNo, rawData, m_TopMostLine, m_BottomMostLine);
 
             int minWhiteLevel = 127; //PreProcessed image will only have 0 and 255 pixels, so we always use 127 here
 
@@ -1001,7 +1025,7 @@ namespace Tangra.OCR
         private static int MAX_BLOCK_WIDTH = 16;
 
 
-        public Dictionary<string, uint[]> GetCalibrationReportImages()
+        public Dictionary<string, Tuple<uint[], int, int>> GetCalibrationReportImages()
         {
             return m_CalibrationImages;
         }
@@ -1034,9 +1058,9 @@ namespace Tangra.OCR
             get { return m_CalibrationErrors.Count; }
         }
 
-        public void AddErrorImage(string fileName, uint[] pixels)
+        public void AddErrorImage(string fileName, uint[] pixels, int width, int height)
         {
-            m_CalibrationImages[fileName] = pixels;
+            m_CalibrationImages[fileName] = Tuple.Create(pixels, width, height);
         }
 
         public void AddErrorText(string error)

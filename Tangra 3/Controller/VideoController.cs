@@ -638,7 +638,7 @@ namespace Tangra.Controller
 
                                     if (m_TimestampOCR.InitiazliationError != null)
                                     {
-                                        // This doesn't like like what the OCR engine is expecting. Abort ....
+                                        // This doesn't look like what the OCR engine is expecting. Abort ....
                                         m_TimestampOCR = null;
                                         m_NumberFailedOcredVtiOsdFrames++;
                                         return false;
@@ -652,7 +652,10 @@ namespace Tangra.Controller
                                         return true;
 
                                     if (calibrationFramesProcessed > maxCalibrationFieldsToAttempt)
+                                    {
+                                        m_TimestampOCR.PrepareFailedCalibrationReport();
                                         return true;
+                                    }
 
                                     return false;
                                 });
@@ -760,10 +763,12 @@ namespace Tangra.Controller
                 if (ShowDialog(frm) == DialogResult.OK)
                 {
                     var images = m_TimestampOCR.GetCalibrationReportImages();
+                    var lastImage = m_TimestampOCR.GetLastUnmodifiedImage();
+                    var ocrDebugImage = m_TimestampOCR.GetOCRDebugImage();
                     bool reportSendingErrored = false;
                     try
                     {
-                        frmOsdOcrCalibrationFailure.SendOcrErrorReport(m_TimestampOCR, images, null, frm.tbxEmail.Text);
+                        frmOsdOcrCalibrationFailure.SendOcrErrorReport(m_TimestampOCR, images, lastImage, ocrDebugImage, frm.tbxEmail.Text);
                     }
                     catch (Exception ex)
                     {
