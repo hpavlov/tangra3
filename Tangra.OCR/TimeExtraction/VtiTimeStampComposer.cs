@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using Tangra.Model.Helpers;
 using Tangra.Model.VideoOperations;
+using Tangra.OCR.GpsBoxSprite;
 using Tangra.OCR.IotaVtiOsdProcessor;
 
 namespace Tangra.OCR.TimeExtraction
@@ -250,6 +251,28 @@ namespace Tangra.OCR.TimeExtraction
                         frameTimestamp2 = frameTimestamp1;
                         failedReason += ". " + correctionInfo;
                     }                    
+                }
+                else
+                { 
+                    // If this is the first time we extract, make sure duration is correct, before registering it as successful
+                    var fieldDuration = (((GpxBoxSpriteVtiTimeStamp)oddFieldOSD).Milliseconds10First - ((GpxBoxSpriteVtiTimeStamp)oddFieldOSD).Milliseconds10Second) / 10.0;
+                    if (fieldDuration < 0) fieldDuration += 1000;
+
+                    if (m_VideoFormat == VideoFormat.PAL &&
+                        (Math.Abs(fieldDuration - FIELD_DURATION_PAL) > 1.0))
+                    {
+                        // PAL field is not 20.00 ms
+                        failedValidation = true;
+                        failedReason = string.Format("PAL field of first OCR-ed frame is not 20.00 ms. It is {0} ms. ", frameDuration);
+                    }
+
+                    if (m_VideoFormat == VideoFormat.NTSC && 
+                        (Math.Abs(fieldDuration - FIELD_DURATION_NTSC) > 1.0))
+                    {
+                        // NTSC field is not 16.68 ms
+                        failedValidation = true;
+                        failedReason = string.Format("NTSC field of first OCR-ed frame is not 33.36 ms. It is {0} ms. ", frameDuration);
+                    }
                 }
 
                 if (failedValidation)

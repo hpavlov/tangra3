@@ -76,7 +76,7 @@ namespace Tangra.OCR.GpsBoxSprite
         static int[] TWOLINE_LINE2_INDEXES = new int[] { 0, 1, 2, 3, 5, 9, 10, 11, 12, 14 };
 
         static int MAX_UNRECOGNIZED_SIGNATURES_PERCENT = 8;
-        static int MIN_RECOGNIZED_DIGITS_ZERO_TO_NINE = 8;
+        static int MIN_RECOGNIZED_DIGITS_ZERO_TO_NINE = 6;
 
         private double m_UnrecognSignPerc = double.NaN;
 
@@ -928,8 +928,11 @@ namespace Tangra.OCR.GpsBoxSprite
                 int ms10Odd2 = (GetTwoDigitInteger(oddLines[1][5], oddLines[1][6]) * 100 + GetTwoDigitInteger(oddLines[1][7], oddLines[1][8])) * 10 + (oddLines[1][9] ?? 0);
 
                 string oddOcredChars =
-                    string.Join("", oddLines[0].Select(x => x.HasValue && x.Value != -1 ? x.Value.ToString() : " ")) + " " +
-                    string.Join("", oddLines[1].Select(x => x.HasValue && x.Value != -1 ? x.Value.ToString() : " "));
+                    string.Format("{0}{1}:{2}{3}:{4}{5} {6}{7}/{8}{9}/{10}{11} {12}{13}{14}{15}.{16} {17}{18}{19}{20}.{21}",
+                        oddLines[0][0].Char(), oddLines[0][1].Char(), oddLines[0][2].Char(), oddLines[0][3].Char(), oddLines[0][4].Char(), oddLines[0][5].Char(),
+                        oddLines[0][6].Char(), oddLines[0][7].Char(), oddLines[0][8].Char(), oddLines[0][9].Char(), oddLines[0][10].Char(), oddLines[0][11].Char(),
+                        oddLines[1][0].Char(),oddLines[1][1].Char(),oddLines[1][2].Char(),oddLines[1][3].Char(),oddLines[1][4].Char(),
+                        oddLines[1][5].Char(),oddLines[1][6].Char(),oddLines[1][7].Char(),oddLines[1][8].Char(),oddLines[1][9].Char());
 
                 int yearEven = GetTwoDigitInteger(evenLines[0][10], evenLines[0][11]) + 2000;
                 int monthEven = GetTwoDigitInteger(evenLines[0][8], evenLines[0][9]);
@@ -941,8 +944,11 @@ namespace Tangra.OCR.GpsBoxSprite
                 int ms10Even2 = (GetTwoDigitInteger(evenLines[1][5], evenLines[1][6]) * 100 + GetTwoDigitInteger(evenLines[1][7], evenLines[1][8])) * 10 + (evenLines[1][9] ?? 0);
 
                 string evenOcredChars =
-                    string.Join("", evenLines[0].Select(x => x.HasValue && x.Value != -1 ? x.Value.ToString() : " ")) + " " +
-                    string.Join("", evenLines[1].Select(x => x.HasValue && x.Value != -1 ? x.Value.ToString() : " "));
+                    string.Format("{0}{1}:{2}{3}:{4}{5} {6}{7}/{8}{9}/{10}{11} {12}{13}{14}{15}.{16} {17}{18}{19}{20}.{21}",
+                        evenLines[0][0].Char(), evenLines[0][1].Char(), evenLines[0][2].Char(), evenLines[0][3].Char(), evenLines[0][4].Char(), evenLines[0][5].Char(),
+                        evenLines[0][6].Char(), evenLines[0][7].Char(), evenLines[0][8].Char(), evenLines[0][9].Char(), evenLines[0][10].Char(), evenLines[0][11].Char(),
+                        evenLines[1][0].Char(), evenLines[1][1].Char(), evenLines[1][2].Char(), evenLines[1][3].Char(), evenLines[1][4].Char(),
+                        evenLines[1][5].Char(), evenLines[1][6].Char(), evenLines[1][7].Char(), evenLines[1][8].Char(), evenLines[1][9].Char());
 
                 CurrentOcredOddFieldTimeStamp = new GpxBoxSpriteVtiTimeStamp(yearOdd, monthOdd, dayOdd, hourOdd, minOdd, secOdd, ms10Odd1, ms10Odd2, oddOcredChars, !EvenBeforeOdd, DuplicatedFields);
                 CurrentOcredEvenFieldTimeStamp = new GpxBoxSpriteVtiTimeStamp(yearEven, monthEven, dayEven, hourEven, minEven, secEven, ms10Even1, ms10Even2, evenOcredChars, EvenBeforeOdd, DuplicatedFields);
@@ -995,4 +1001,16 @@ namespace Tangra.OCR.GpsBoxSprite
                 line.DrawLegend(graphics);
         }
     }
+
+    public static class DigitExtensions
+    {
+        public static char Char(this int? digit)
+        {
+            if (digit.HasValue)
+                return digit.ToString().Last();
+            else
+                return ' ';
+        }
+    }
+
 }

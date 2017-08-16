@@ -222,6 +222,14 @@ namespace Tangra.OCR
         public void PrepareFailedCalibrationReport()
         {
             // NOTE: Add calibration frames OSD position data here if required
+
+            if (m_LatestRawCalibrationFrame != null)
+            {
+                string error = null;
+                var expectedScaledOsdHeight = (int)Math.Round(15.0 * 576 / m_InitializationData.FrameHeight);
+                PreProcessImageOSDForOCR(m_LatestFrameImage, m_ImageWidth, m_ImageHeight, expectedScaledOsdHeight, ref error, this);
+            }
+
             if (m_Processor != null)
                 m_Processor.PrepareCalibrationFailedReport(this);
         }
@@ -258,6 +266,9 @@ namespace Tangra.OCR
             }
             else
             {
+                // TODO: Consider locating the black background, of present, to cut out the remainder of the image.
+                //LocateBlackOSDBackground(data, m_InitializationData.FrameWidth, m_InitializationData.FrameHeight);
+                
                 string error = null;
                 // Based on an experimentally determined nominal height of 15 pixels for a standard PAL frame height of 576
                 var expectedScaledOsdHeight = (int)Math.Round(15.0 * 576 / m_InitializationData.FrameHeight);
@@ -354,7 +365,39 @@ namespace Tangra.OCR
             return preProcessedPixels;
         }
 
+        private void LocateBlackOSDBackground(uint[] data, int width, int height)
+        {
+            //// GPSBOXSPRITE may have a black background behind the OSD. We try to locate it here
+            
+
+            //// skip black area at the left of the image
+            //for (int x0 = 0; x0 < width && data[x0 + width * height / 2] == 0; x0++)
+            
+            //for (int x = x0; x < width; x++)
+            //{
+            //    int startedY = 0;
+            //    for (int y = height / 2; y < height; y++)
+            //    {
+            //        var isBlack = data[x + width * y] == 0;
+
+            //        if (!started)
+            //        {
+            //            started = isBlack;
+            //        }
+            //        else
+            //        {
+                        
+            //        }
+            //    }    
+            //}            
+        }
+
         public static uint[] PreProcessImageOSDForOCR(uint[] data, int width, int height, int maxNoiseHeight, ref string error)
+        {
+            return PreProcessImageOSDForOCR(data, width, height, maxNoiseHeight, ref error, null);
+        }
+
+        private static uint[] PreProcessImageOSDForOCR(uint[] data, int width, int height, int maxNoiseHeight, ref string error, ICalibrationErrorProcessor logger)
         {
             uint[] preProcessedPixels = new uint[data.Length];
             Array.Copy(data, preProcessedPixels, data.Length);
@@ -374,16 +417,27 @@ namespace Tangra.OCR
                 return null;
             }
 
+            if (logger != null) logger.AddErrorImage("pp-median-corrected.bmp", preProcessedPixels.ToArray(), width, height);
+
             uint[] blurResult = BitmapFilter.GaussianBlur(preProcessedPixels, 8, width, height);
+
+            if (logger != null) logger.AddErrorImage("pp-gauss-blur.bmp", blurResult.ToArray(), width, height);
+
             uint average = 128;
             uint[] sharpenResult = BitmapFilter.Sharpen(blurResult, 8, width, height, out average);
+
+            if (logger != null) logger.AddErrorImage("pp-sharpened.bmp", sharpenResult.ToArray(), width, height);
 
             // Binerize and Inverse
             for (int i = 0; i < sharpenResult.Length; i++)
             {
                 sharpenResult[i] = sharpenResult[i] > average ? (uint)0 : (uint)255;
             }
+            if (logger != null) logger.AddErrorImage("pp-binerized.bmp", sharpenResult.ToArray(), width, height);
+
             uint[] denoised = BitmapFilter.Denoise(sharpenResult, 8, width, height, out average, false);
+
+            if (logger != null) logger.AddErrorImage("pp-denoised.bmp", denoised.ToArray(), width, height);
 
             for (int i = 0; i < denoised.Length; i++)
             {
@@ -395,6 +449,8 @@ namespace Tangra.OCR
             {
                 preProcessedPixels[i] = preProcessedPixels[i] < 127 ? (uint)255 : (uint)0;
             }
+            if (logger != null) logger.AddErrorImage("pp-final.bmp", preProcessedPixels.ToArray(), width, height);
+
             return preProcessedPixels;
         }
 
@@ -518,13 +574,97 @@ namespace Tangra.OCR
             return rv;
         }
 
-        private Dictionary<int, List<Tuple<int, int>>> DetermineOsdLineVerticals(uint[] data, int minWhiteLevel)
+        private Tuple<int[], int[], int[], int[]> ScoreVerticalLines(uint[] data, int minWhiteLevel, Func<uint, uint, uint, uint, uint, uint, uint, Tuple<bool, bool>> scoreCallback)
         {
             var scoresTop = new List<int>();
             var scoresBottom = new List<int>();
             var scoreLines = new List<int>();
+            var topLimit = m_ImageHeight / 2;
 
-            for (int y = m_ImageHeight / 2; y < m_ImageHeight - 1; y++)
+            for (int y = topLimit; y < m_ImageHeight - 1; y++)
+            {
+                int scoreTop = 0;
+                int scoreBot = 0;
+                for (int x = 0; x < m_ImageWidth/2; x++)
+                {
+                    var top3Pixel = data[x + (y - 3) * m_ImageWidth];
+                    var top2Pixel = data[x + (y - 2) * m_ImageWidth];
+                    var topPixel = data[x + (y - 1) * m_ImageWidth];
+                    var currPixel = data[x + y * m_ImageWidth];
+                    var botPixel = data[x + (y + 1) * m_ImageWidth];
+                    var bot2Pixel = data[x + (y + Math.Min(2, m_ImageHeight - y - 1)) * m_ImageWidth];
+                    var bot3Pixel = data[x + (y + Math.Min(3, m_ImageHeight - y - 1)) * m_ImageWidth];
+
+                    var score = scoreCallback(top3Pixel, top2Pixel, topPixel, currPixel, botPixel, bot2Pixel, bot3Pixel);
+                    if (score.Item1) scoreTop--;
+                    if (score.Item2) scoreBot--;
+                }
+
+                scoresTop.Add(scoreTop);
+                scoresBottom.Add(scoreBot);
+                scoreLines.Add(y);
+            }
+
+            var bestTopLines = scoreLines.ToArray();
+            var bestTopLineScores = scoresTop.ToArray();
+            var bestBotLines = scoreLines.ToArray();
+            var bestBotLineScores = scoresBottom.ToArray();
+
+            Array.Sort(bestTopLineScores, bestTopLines);
+            Array.Sort(bestBotLineScores, bestBotLines);
+
+            return Tuple.Create(bestTopLines, bestBotLineScores, bestBotLines, bestBotLineScores);
+        }
+
+        private Dictionary<int, List<Tuple<int, int>>> DetermineOsdLineVerticalsEx(uint[] data, int minWhiteLevel)
+        {
+            // NOTE: data has been already pre-processed with large chunk noice removed so background is zero
+
+            var scores = new Dictionary<int, int>();
+            var topLimit = m_ImageHeight / 2;
+
+            for (int y = 0; y < m_ImageHeight - 1; y++)
+            {
+                scores[y] = 0;
+
+                for (int x = 0; x < m_ImageWidth; x++)
+                {
+                    var currPixel = data[x + y * m_ImageWidth];
+                    if (currPixel > minWhiteLevel) 
+                        scores[y]++;
+                }
+            }
+
+            var lines = new List<Tuple<int, int>>();
+
+            for (int y = topLimit; y < m_ImageHeight - 1; y++)
+            {
+                if (scores[y] > 0)
+                {
+                    int fromY = y;
+                    do
+                    {
+                        y++;
+                    }
+                    while(scores.ContainsKey(y) && scores[y] > 0);
+                    lines.Add(Tuple.Create(fromY, y));
+                }
+            }
+
+            return new Dictionary<int, List<Tuple<int, int>>>();
+        }
+
+        private Dictionary<int, List<Tuple<int, int>>> DetermineOsdLineVerticals(uint[] data, int minWhiteLevel)
+        {
+            // NOTE: This is a possible alternative way of finding the vertical lines
+            //DetermineOsdLineVerticalsEx(data, minWhiteLevel);
+
+            var scoresTop = new List<int>();
+            var scoresBottom = new List<int>();
+            var scoreLines = new List<int>();
+            var topLimit = m_ImageHeight / 2;
+
+            for (int y = topLimit; y < m_ImageHeight - 1; y++)
             {
                 int scoreTop = 0;
                 int scoreBot = 0;
@@ -620,9 +760,12 @@ namespace Tangra.OCR
 
         private int? m_TopMostLine = null;
         private int? m_BottomMostLine = null;
+        private uint[] m_LatestRawCalibrationFrame;
 
         private OcrCalibrationFrame ProcessCalibrationFrame(int frameNo, uint[] rawData, Tuple<int, int>[] osdLineVerticals, Tuple<decimal, decimal>[] osdLineLeftAndWidths)
         {
+            m_LatestRawCalibrationFrame = rawData.ToArray();
+
             m_TopMostLine = null;
             m_BottomMostLine = null;
 
@@ -642,7 +785,7 @@ namespace Tangra.OCR
 
             if (osdLineVerticals == null || osdLineVerticals.Length == 0)
             {
-                var detectedOsdLines = new List<OsdLineConfig>();            
+                var detectedOsdLines = new List<OsdLineConfig>();
                 var candidates = DetermineOsdLineVerticals(data, minWhiteLevel);
 
                 foreach (var pair in candidates.Values)
@@ -811,7 +954,7 @@ namespace Tangra.OCR
                         var contWidth = x - boxStart;
                         if (contWidth > maxBlockWidth)
                         {
-                            var attachedBoxes = (int)(contWidth / nomWidthFromHeight);
+                            var attachedBoxes = Math.Max(1, (int)(contWidth / nomWidthFromHeight));
                             var aveWidth = contWidth / attachedBoxes;
                             var rem = contWidth - (aveWidth * attachedBoxes);
                             if (aveWidth >= minBlockWidth && rem < minBlockWidth / 3)

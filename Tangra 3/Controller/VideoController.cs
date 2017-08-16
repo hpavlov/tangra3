@@ -1051,41 +1051,51 @@ namespace Tangra.Controller
                 g.DrawString(output, s_OCRPrintFont, Brushes.Lime, m_AstroImage.Width - size.Width - 10, 10);
 
                 DateTime ocrTimeStamp = OCRTimestamp(DebugOCR);
-                output = string.Format("OCR: {0}", ocrTimeStamp.Year != 1 ? ocrTimeStamp.ToString("yyyy-MM-dd HH:mm:ss.fff") : ocrTimeStamp.ToString("HH:mm:ss.fff"));
+                output = string.Format("{0}", ocrTimeStamp.Year != 1 ? ocrTimeStamp.ToString("yyyy-MM-dd HH:mm:ss.fff") : ocrTimeStamp.ToString("HH:mm:ss.fff"));
                 size = g.MeasureString(output, s_OCRPrintFont);
                 g.FillRectangle(Brushes.DarkSlateGray, m_AstroImage.Width - size.Width - 10, 10 + size.Height + vertPading, size.Width, size.Height);
                 g.DrawString(output, s_OCRPrintFont, Brushes.Lime, m_AstroImage.Width - size.Width - 10, 10 + size.Height + vertPading);
 
+                int i = 1;
                 if (m_TimestampOCR.LastOddFieldOSD != null)
                 {
-                    output = string.Format("Odd: {0}", m_TimestampOCR.LastOddFieldOSD.AsFullString());
-                    size = g.MeasureString(output, s_OCRPrintFont);
-                    g.FillRectangle(Brushes.DarkSlateGray, m_AstroImage.Width - size.Width - 10, 10 + 2 * (size.Height + vertPading), size.Width, size.Height);
-                    g.DrawString(output, s_OCRPrintFont, Brushes.Lime, m_AstroImage.Width - size.Width - 10, 10 + 2 * (size.Height + vertPading));
+                    if (DebugOCR)
+                    {
+                        i++;
+                        output = string.Format("Odd: {0}", m_TimestampOCR.LastOddFieldOSD.AsFullString());
+                        size = g.MeasureString(output, s_OCRPrintFont);
+                        g.FillRectangle(Brushes.DarkSlateGray, m_AstroImage.Width - size.Width - 10, 10 + i * (size.Height + vertPading), size.Width, size.Height);
+                        g.DrawString(output, s_OCRPrintFont, Brushes.Yellow, m_AstroImage.Width - size.Width - 10, 10 + i * (size.Height + vertPading));
+                    }
 
+                    i++;
                     output = string.Format("Odd OCR: {0}", m_TimestampOCR.LastOddFieldOSD.OcredCharacters);
                     size = g.MeasureString(output, s_OCRPrintFont);
-                    g.FillRectangle(Brushes.DarkSlateGray, m_AstroImage.Width - size.Width - 10, 10 + 3 * (size.Height + vertPading), size.Width, size.Height);
-                    g.DrawString(output, s_OCRPrintFont, Brushes.Lime, m_AstroImage.Width - size.Width - 10, 10 + 3 * (size.Height + vertPading));
+                    g.FillRectangle(Brushes.DarkSlateGray, m_AstroImage.Width - size.Width - 10, 10 + i * (size.Height + vertPading), size.Width, size.Height);
+                    g.DrawString(output, s_OCRPrintFont, Brushes.Yellow, m_AstroImage.Width - size.Width - 10, 10 + i * (size.Height + vertPading));
                 }
 
                 if (m_TimestampOCR.LastEvenFieldOSD != null)
                 {
-                    output = string.Format("Even: {0}", m_TimestampOCR.LastEvenFieldOSD.AsFullString());
-                    size = g.MeasureString(output, s_OCRPrintFont);
-                    g.FillRectangle(Brushes.DarkSlateGray, m_AstroImage.Width - size.Width - 10, 10 + 4 * (size.Height + vertPading), size.Width, size.Height);
-                    g.DrawString(output, s_OCRPrintFont, Brushes.Lime, m_AstroImage.Width - size.Width - 10, 10 + 4 * (size.Height + vertPading));
+                    if (DebugOCR)
+                    {
+                        i++;
+                        output = string.Format("Even: {0}", m_TimestampOCR.LastEvenFieldOSD.AsFullString());
+                        size = g.MeasureString(output, s_OCRPrintFont);
+                        g.FillRectangle(Brushes.DarkSlateGray, m_AstroImage.Width - size.Width - 10, 10 + i * (size.Height + vertPading), size.Width, size.Height);
+                        g.DrawString(output, s_OCRPrintFont, Brushes.Yellow, m_AstroImage.Width - size.Width - 10, 10 + i * (size.Height + vertPading));
+                    }
 
+                    i++;
                     output = string.Format("Even OCR: {0}", m_TimestampOCR.LastEvenFieldOSD.OcredCharacters);
                     size = g.MeasureString(output, s_OCRPrintFont);
-                    g.FillRectangle(Brushes.DarkSlateGray, m_AstroImage.Width - size.Width - 10, 10 + 5 * (size.Height + vertPading), size.Width, size.Height);
-                    g.DrawString(output, s_OCRPrintFont, Brushes.Lime, m_AstroImage.Width - size.Width - 10, 10 + 5 * (size.Height + vertPading));                    
+                    g.FillRectangle(Brushes.DarkSlateGray, m_AstroImage.Width - size.Width - 10, 10 + i * (size.Height + vertPading), size.Width, size.Height);
+                    g.DrawString(output, s_OCRPrintFont, Brushes.Yellow, m_AstroImage.Width - size.Width - 10, 10 + i * (size.Height + vertPading));                    
                 }
 
                 if (!string.IsNullOrWhiteSpace(m_TimestampOCR.LastFailedReason))
                 {
                     var tokens = m_TimestampOCR.LastFailedReason.Split(".".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-                    int i = 0;
                     foreach(var token in tokens)
                     {
                         if (string.IsNullOrWhiteSpace(token)) continue;
