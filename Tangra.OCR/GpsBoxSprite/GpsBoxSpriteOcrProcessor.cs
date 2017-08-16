@@ -957,7 +957,14 @@ namespace Tangra.OCR.GpsBoxSprite
 
         private int? OCRBlockDigit(decimal[,] pixels, int width, int height)
         {
-            // 1) Find the closest signature
+            // 1) OCR the single block directly
+            var singleBlockOCR = OCRBlockSignatureDigit(pixels, width, height);
+            var ocrDigit = singleBlockOCR.Item1;
+
+            if (ocrDigit != null)
+                return ocrDigit;
+
+            // 2) Find the closest signature
             var diffs = m_Signatures.Select(x => Tuple.Create(ComputeBlockDifference(x.Signature, pixels), x.Digit));
             var sigDiffs = diffs.Select(x => x.Item1).ToArray();
             var sigDigits = diffs.Select(x => x.Item2).ToArray();
@@ -965,32 +972,6 @@ namespace Tangra.OCR.GpsBoxSprite
             var ocrDigitSig = sigDigits[0];
             var ocrDigitSig2 = sigDigits[1];
             var ocrDigitSig3 = sigDigits[2];
-
-            // 2) OCR the single block directly
-            var singleBlockOCR = OCRBlockSignatureDigit(pixels, width, height);
-            var ocrDigit = singleBlockOCR.Item1;
-
-            /* 
-             * NOTE: It seems that the direct block recognition works best
-             *       Signatures appear to be adding noise and sometimes lead to wrong recognition
-             *       
-            if (ocrDigitSig == ocrDigit)
-                return ocrDigit;
-
-            if (ocrDigitSig2 == ocrDigit)
-                return ocrDigit;
-
-            if (ocrDigitSig == ocrDigitSig2)
-                return ocrDigitSig;
-
-            if (ocrDigitSig == ocrDigitSig3)
-                return ocrDigitSig;
-
-            if (ocrDigitSig2 == ocrDigitSig3)
-                return ocrDigitSig2; */
-
-            if (ocrDigit != null)
-                return ocrDigit;
 
             return ocrDigitSig;
         }
