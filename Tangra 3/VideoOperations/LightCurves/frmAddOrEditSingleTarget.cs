@@ -258,7 +258,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 		private bool GetFitInMatrix(ITrackedObjectPsfFit gaussian, ref int matirxSize, float preselectedAperture)
         {
-            rbGuidingStar.Text = "Guiding Star";
+            rbGuidingStar.Text = "Guiding/Comparison Star";
             m_IsBrightEnoughForAutoGuidingStar = false;
 
 			if (m_Aperture == null)
@@ -306,7 +306,7 @@ namespace Tangra.VideoOperations.LightCurves
 
                 if (m_AutoStarsInArea.Count == 0)
                 {
-                    rbGuidingStar.Text = "Guiding Star";
+                    rbGuidingStar.Text = "Guiding/Comparison Star";
 
                     // There are no stars that are bright enough. Simply let the user do what they want, but still try to default to a sensible aperture size
 					MeasurementsHelper measurement = ReduceLightCurveOperation.DoConfiguredMeasurement(m_ProcessingPixels, m_Aperture.Value, m_AstroImage.Pixelmap.BitPixCamera, m_AstroImage.Pixelmap.MaxSignalValue, 3.0, ref matirxSize);
@@ -392,7 +392,7 @@ namespace Tangra.VideoOperations.LightCurves
                 }
                 else if (m_AutoStarsInArea.Count > 1)
                 {
-                    rbGuidingStar.Text = "Guiding Star";
+                    rbGuidingStar.Text = "Guiding/Comparison Star";
 
                     // There are more stars found.
                     double xBest = m_Gaussian != null
@@ -790,7 +790,7 @@ namespace Tangra.VideoOperations.LightCurves
                 pnlUDLR.Visible = true;
                 pnlAutoFitSize.Enabled = false;
                 if (!m_IsBrightEnoughForAutoGuidingStar)
-                    rbGuidingStar.Text = "Guiding Star";
+                    rbGuidingStar.Text = "Guiding/Comparison Star";
                 else
 					rbGuidingStar.Text = "Comparison Star";
                 pnlUDLR.BringToFront();
@@ -800,7 +800,7 @@ namespace Tangra.VideoOperations.LightCurves
                 pnlUDLR.Visible = false;
                 pnlAutoFitSize.Enabled = true;
                 if (!m_IsBrightEnoughForAutoGuidingStar)
-					rbGuidingStar.Text = "Guiding Star";
+                    rbGuidingStar.Text = "Guiding/Comparison Star";
                 else
 					rbGuidingStar.Text = "Guiding/Comparison Star";
                 pnlUDLR.SendToBack();                
