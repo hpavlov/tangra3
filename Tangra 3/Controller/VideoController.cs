@@ -680,6 +680,7 @@ namespace Tangra.Controller
                             finally
                             {
                                 FileProgressManager.EndFileOperation();
+                                StatusChanged("Ready");
                             }
                         }
 
@@ -1057,8 +1058,11 @@ namespace Tangra.Controller
                 g.DrawString(output, s_OCRPrintFont, Brushes.Lime, m_AstroImage.Width - size.Width - 10, 10 + size.Height + vertPading);
 
                 int i = 1;
+                int correctionsMade = 0;
                 if (m_TimestampOCR.LastOddFieldOSD != null)
                 {
+                    correctionsMade += m_TimestampOCR.LastOddFieldOSD.NumberOfCorrectedDifferences;
+
                     if (DebugOCR)
                     {
                         i++;
@@ -1077,6 +1081,8 @@ namespace Tangra.Controller
 
                 if (m_TimestampOCR.LastEvenFieldOSD != null)
                 {
+                    correctionsMade += m_TimestampOCR.LastEvenFieldOSD.NumberOfCorrectedDifferences;
+
                     if (DebugOCR)
                     {
                         i++;
@@ -1093,6 +1099,15 @@ namespace Tangra.Controller
                     g.DrawString(output, s_OCRPrintFont, Brushes.Yellow, m_AstroImage.Width - size.Width - 10, 10 + i * (size.Height + vertPading));                    
                 }
 
+                if (correctionsMade > 0)
+                {
+                    i++;
+                    output = string.Format("{0} corrections made to raw OCRed chars.", correctionsMade);
+                    size = g.MeasureString(output, s_OCRPrintFont);
+                    g.FillRectangle(Brushes.DarkSlateGray, m_AstroImage.Width - size.Width - 10, 10 + i * (size.Height + vertPading), size.Width, size.Height);
+                    g.DrawString(output, s_OCRPrintFont, Brushes.Yellow, m_AstroImage.Width - size.Width - 10, 10 + i * (size.Height + vertPading));                                                                                   
+                }
+
                 if (!string.IsNullOrWhiteSpace(m_TimestampOCR.LastFailedReason))
                 {
                     var tokens = m_TimestampOCR.LastFailedReason.Split(".".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
@@ -1102,8 +1117,8 @@ namespace Tangra.Controller
                         output = token;
                         i++;
                         size = g.MeasureString(output, s_OCRPrintFont);
-                        g.FillRectangle(Brushes.DarkSlateGray, m_AstroImage.Width - size.Width - 10, 10 + (6 + i) * (size.Height + vertPading), size.Width, size.Height);
-                        g.DrawString(output, s_OCRPrintFont, Brushes.Orange, m_AstroImage.Width - size.Width - 10, 10 + (6 + i) * (size.Height + vertPading));                                            
+                        g.FillRectangle(Brushes.DarkSlateGray, m_AstroImage.Width - size.Width - 10, 10 + i * (size.Height + vertPading), size.Width, size.Height);
+                        g.DrawString(output, s_OCRPrintFont, Brushes.Orange, m_AstroImage.Width - size.Width - 10, 10 + i * (size.Height + vertPading));                                            
                     }
                 }
 

@@ -141,7 +141,8 @@ namespace Tangra.OCR.GpsBoxSprite
             if (m_UnrecognSignPerc < MAX_UNRECOGNIZED_SIGNATURES_PERCENT)
             {
                 var dictChars = m_Signatures.Where(x => x.Digit != null).GroupBy(x => x.Digit).ToDictionary(x => x.Key, y => y.ToList());
-                var sigLocated94Percent = dictChars.Keys.Min() >= 0 && dictChars.Keys.Count >= MIN_RECOGNIZED_DIGITS_ZERO_TO_NINE;
+                bool isLastCalibrationFrame = m_CalibrationFrames.Count == TangraConfig.Settings.Generic.MaxCalibrationFieldsToAttempt;
+                var sigLocated94Percent = (isLastCalibrationFrame || dictChars.Keys.Min() >= 0) && dictChars.Keys.Count >= MIN_RECOGNIZED_DIGITS_ZERO_TO_NINE;
                 if (sigLocated94Percent)
                 {
                     // Remove the potentially bad matches from the signatures
@@ -910,7 +911,7 @@ namespace Tangra.OCR.GpsBoxSprite
 
         private int GetTwoDigitInteger(int? tens, int? ones)
         {
-            return (tens ?? 0) * 10 + (ones ?? 0);
+            return (tens ?? 0) * 10 + (ones.HasValue && ones.Value >= 0 ? ones.Value : 0);
         }
 
         private void ExtractTwoLineLayoutTime(List<List<int?>> oddLines, List<List<int?>> evenLines)

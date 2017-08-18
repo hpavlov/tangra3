@@ -64,6 +64,8 @@ namespace Tangra.OCR.GpsBoxSprite
 
         public string OcredCharacters { get; private set; }
 
+        public int NumberOfCorrectedDifferences { get; set; }
+
         public void Correct(int hours, int minutes, int seconds, int milliseconds10)
         {
             Hours = hours;

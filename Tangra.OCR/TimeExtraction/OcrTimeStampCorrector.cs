@@ -418,7 +418,7 @@ namespace Tangra.OCR.TimeExtraction
                     fieldToCorrect.CorrectDate(expectedDateTime.Year, expectedDateTime.Month, expectedDateTime.Day);
 
                 fieldToCorrect.Correct(expectedDateTime.Hour, expectedDateTime.Minute, expectedDateTime.Second, (int) Math.Round((expectedDateTime.Ticks%10000000)/1000.0));
-
+                fieldToCorrect.NumberOfCorrectedDifferences = (int)numberDifferences;
 				return true;
 			}
 			else

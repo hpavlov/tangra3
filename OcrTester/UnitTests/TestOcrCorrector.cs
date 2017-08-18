@@ -119,6 +119,8 @@ namespace OcrTester.UnitTests
 
         public string OcredCharacters { get; set; }
 
+        public int NumberOfCorrectedDifferences { get; set; }
+
         public void Correct(int hours, int minutes, int seconds, int milliseconds10)
         {
             Hours = hours;

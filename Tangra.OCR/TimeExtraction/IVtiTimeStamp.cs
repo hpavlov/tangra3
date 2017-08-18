@@ -28,6 +28,7 @@ namespace Tangra.OCR.TimeExtraction
         void Correct(int hours, int minutes, int seconds, int milliseconds10);
         void CorrectDate(int year, int month, int day);
         void CorrectFrameNumber(int frameNo);
+        int NumberOfCorrectedDifferences { get; set; }
     }
 
     public static class IVtiTimeStampExtensions
@@ -96,6 +97,8 @@ namespace Tangra.OCR.TimeExtraction
         public int Day { get; private set; }
 
         public string OcredCharacters { get; private set; }
+
+        public int NumberOfCorrectedDifferences { get; set; }
 
         public void Correct(int hours, int minutes, int seconds, int milliseconds10)
         {

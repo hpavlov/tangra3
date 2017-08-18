@@ -161,6 +161,8 @@ namespace Tangra.OCR.IotaVtiOsdProcessor
 
         public string OcredCharacters { get; private set; }
 
+        public int NumberOfCorrectedDifferences { get; set; }
+
         public bool ContainsFrameNumbers
         {
             get { return true; }
