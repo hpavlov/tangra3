@@ -123,7 +123,7 @@ namespace OcrTester
             throw new NotImplementedException();
         }
 
-        void IVideoController.UpdateZoomedImage(Bitmap zoomedBitmap, ImagePixel center)
+        void IVideoController.UpdateZoomedImage(Bitmap zoomedBitmap, ImagePixel center, Pixelmap zoomPixelmap = null)
         {
             throw new NotImplementedException();
         }
