@@ -313,7 +313,13 @@ namespace Tangra.Model.Astro
 
         public const int BytesPerDisplayBitmapPixel = 3;
 
-        public Bitmap GetZoomImagePixels(int x0, int y0, Color saturationColor, TangraConfig.SaturationSettings saturationLevels)
+	    public Bitmap GetZoomImagePixels(int x0, int y0, Color saturationColor, TangraConfig.SaturationSettings saturationLevels)
+	    {
+	        Pixelmap zoomPixelmap;
+	        return GetZoomImagePixels(x0, y0, saturationColor, saturationLevels, out zoomPixelmap);
+	    }
+
+	    public Bitmap GetZoomImagePixels(int x0, int y0, Color saturationColor, TangraConfig.SaturationSettings saturationLevels, out Pixelmap zoomPixelmap)
         {
             int height = m_Pixelmap.Height;
             int width = m_Pixelmap.Width;
@@ -323,6 +329,7 @@ namespace Tangra.Model.Astro
 
             if (y0 > height - 16) y0 = height - 16;
             Bitmap featureBitmap = new Bitmap(31 * 8, 31 * 8, PixelFormat.Format24bppRgb);
+            uint[] zoomPixels = new uint[31 * 8 * 31 * 8];
 
             uint saturationLevel = saturationLevels.GetSaturationForBpp(m_Pixelmap.BitPixCamera, m_Pixelmap.MaxSignalValue);
 
@@ -363,6 +370,8 @@ namespace Tangra.Model.Astro
 
 									int zoomedIdx = zoomedData.Stride * zoomedY + zoomedX * AstroImage.BytesPerDisplayBitmapPixel;
 
+								    zoomPixels[zoomedX + 31 * 8 * zoomedY] = pixelVal;
+
 									if (pixelVal > saturationLevel)
 									{
 										// Saturation detected
@@ -389,6 +398,7 @@ namespace Tangra.Model.Astro
                 featureBitmap.UnlockBits(zoomedData);
             }
 
+            zoomPixelmap = new Pixelmap(31*8, 31*8, m_Pixelmap.BitPixCamera, zoomPixels, featureBitmap, null);
             return featureBitmap;
         }
 

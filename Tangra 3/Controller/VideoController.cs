@@ -853,7 +853,7 @@ namespace Tangra.Controller
 		}
 
         public void SetImage(Pixelmap currentPixelmap, int currentFrameId, RenderFrameContext frameContext, bool isOldFrameRefreshed)
-		{
+        {
             m_AstroImage = new AstroImage(currentPixelmap);
             m_CurrentFrameContext = frameContext;
 
@@ -1522,9 +1522,9 @@ namespace Tangra.Controller
 			m_MainForm.Invoke(new Action(callback));
 		}
 
-        public void UpdateZoomedImage(Bitmap zoomedBitmap, ImagePixel center)
+        public void UpdateZoomedImage(Bitmap zoomedBitmap, ImagePixel center, Pixelmap displayPixelmap = null)
         {
-			ApplyDisplayModeAdjustments(zoomedBitmap);
+			ApplyDisplayModeAdjustments(zoomedBitmap, false, displayPixelmap);
 
             m_ZoomedImageView.UpdateImage(zoomedBitmap);
 
@@ -2483,8 +2483,9 @@ namespace Tangra.Controller
 			{
 				if (m_AstroImage != null)
 				{
-					Bitmap zoomedBmp = m_AstroImage.GetZoomImagePixels(pixel.X, pixel.Y, TangraConfig.Settings.Color.Saturation, TangraConfig.Settings.Photometry.Saturation);
-					UpdateZoomedImage(zoomedBmp, pixel);
+				    Pixelmap zoomPixelmap;
+                    Bitmap zoomedBmp = m_AstroImage.GetZoomImagePixels(pixel.X, pixel.Y, TangraConfig.Settings.Color.Saturation, TangraConfig.Settings.Photometry.Saturation, out zoomPixelmap);
+                    UpdateZoomedImage(zoomedBmp, pixel, zoomPixelmap);
 
 				}
 				else
