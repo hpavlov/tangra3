@@ -871,10 +871,12 @@ namespace Tangra.OCR
 
             int probeWidth = (int)minBlockWidth;
 
+            int rightMostProbeLocation = (int)(0.6 * m_ImageWidth); // NOTE: OSD will not extend more than 60% on the horizontal (typically)
+
             decimal startLeftPos = 0;
-            decimal endRightPos = m_ImageWidth - maxBlockWidth - 1;
+            decimal endRightPos = rightMostProbeLocation - maxBlockWidth - 1;
             #region Find start end horizontal lines
-            for (int i = 0; i < m_ImageWidth - maxBlockWidth - probeWidth; i++)
+            for (int i = 0; i < rightMostProbeLocation - maxBlockWidth - probeWidth; i++)
             {
                 int conseqHorWhites = 0;
                 for (int j = i; j < i + probeWidth; j++)
@@ -896,7 +898,7 @@ namespace Tangra.OCR
                 }
             }
 
-            for (int i = 0; i < m_ImageWidth - maxBlockWidth - probeWidth; i++)
+            for (int i = 0; i < rightMostProbeLocation - maxBlockWidth - probeWidth; i++)
             {
 
                 int conseqHorWhites = 0;
@@ -904,7 +906,7 @@ namespace Tangra.OCR
                 {
                     for (int y = lineTop; y < lineBottom; y++)
                     {
-                        if ((double)subPixelData.GetWholePixelAt(m_ImageWidth - j, y) > minWhiteLevel)
+                        if ((double)subPixelData.GetWholePixelAt(rightMostProbeLocation - j, y) > minWhiteLevel)
                         {
                             conseqHorWhites++;
                             break;
@@ -914,7 +916,7 @@ namespace Tangra.OCR
 
                 if (conseqHorWhites == probeWidth)
                 {
-                    endRightPos = m_ImageWidth - i + minBlockWidth;
+                    endRightPos = rightMostProbeLocation - i + minBlockWidth;
                     break;
                 }
             }
