@@ -325,6 +325,9 @@ namespace Tangra.OCR.GpsBoxSprite
         private void CategorizeCalibrationBlocks(List<Tuple<decimal[,], decimal[,]>> blocks)
         {
             var allBlocks = blocks.Select(x => x.Item1).Union(m_CalibrationBlocks.Select(x => x.Item2)).ToArray();
+            if (allBlocks.Length == 0) 
+                return;
+
             m_BlockHeight = allBlocks[0].GetLength(0);
             m_BlockWidth = allBlocks[0].GetLength(1);
 
@@ -675,6 +678,9 @@ namespace Tangra.OCR.GpsBoxSprite
  
         internal Bitmap GetBlockSignaturesImage()
         {
+            if (m_Signatures == null || m_Signatures.Count == 0) 
+                return null;
+
             Bitmap bmp = new Bitmap(m_Signatures.Count * 2 * m_BlockWidth, (3 + m_BlockHeight) * m_BlockHeight, PixelFormat.Format32bppArgb);
 
             for (int i = 0; i < m_Signatures.Count; i++)
