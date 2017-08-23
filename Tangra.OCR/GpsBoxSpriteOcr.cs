@@ -4,6 +4,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using Tangra.Model.Helpers;
 using Tangra.Model.Image;
@@ -148,15 +149,40 @@ namespace Tangra.OCR
                     var medianConfig = DeterimineMedianOsdLinePositions(linesSoFar, ref numOsdLines);
                     if (medianConfig.BoxTops.Length == numOsdLines && medianConfig.BoxBottoms.Length == numOsdLines)
                     {
-                        var topsSorted = medianConfig.BoxTops.ToList();
-                        var bottomsSorted = medianConfig.BoxBottoms.ToList();
+                        var topsSorted = medianConfig.BoxTops.Select(x => (int)x).ToList();
+                        var bottomsSorted = medianConfig.BoxBottoms.Select(x => (int)x).ToList();
                         topsSorted.Sort();                        
                         bottomsSorted.Sort();
 
-                        m_OsdLineVerticals = new Tuple<int, int>[numOsdLines];
+                        int[] lineHeights = new int[numOsdLines];
+                        int[] lineGaps = new int[numOsdLines - 1];
+
                         for (int i = 0; i < numOsdLines; i++)
                         {
-                            m_OsdLineVerticals[i] = Tuple.Create((int)topsSorted[i], (int)bottomsSorted[i]);
+                            lineHeights[i] = bottomsSorted[i] - topsSorted[i];
+                            if (i < numOsdLines - 1)
+                                lineGaps[i] = topsSorted[i + 1] - bottomsSorted[i];
+                        }
+
+                        // Logic to remove 'fake' lines if they are too high. Distance between lines should be small and consistent. 
+                        // Pick first two lines starting from bottom which are a certain distance apart
+
+                        for (int i = numOsdLines - 1; i>0; i--)
+                        {
+                            var height2 = lineHeights[i];
+                            var height1 = lineHeights[i - 1];
+                            var gap = lineGaps[i - 1];
+                            if (Math.Abs(height2 - height1) < 2 &&
+                                height2 <= MAX_VIABLE_HEIGHT_PIXELS &&
+                                height1 <= MAX_VIABLE_HEIGHT_PIXELS &&
+                                gap <= MAX_VIABLE_GAP &&
+                                m_ImageHeight - bottomsSorted[i] < MAX_VIABLE_HEIGHT_PIXELS /* Bottom line must be close to the bottom of the image */)
+                            {
+                                m_OsdLineVerticals = new Tuple<int, int>[2];
+                                m_OsdLineVerticals[0] = Tuple.Create(topsSorted[i - 1], bottomsSorted[i - 1]);
+                                m_OsdLineVerticals[1] = Tuple.Create(topsSorted[i], bottomsSorted[i]);
+                                break;                            
+                            }
                         }
                     }                    
                 }
@@ -616,7 +642,7 @@ namespace Tangra.OCR
             return Tuple.Create(bestTopLines, bestBotLineScores, bestBotLines, bestBotLineScores);
         }
 
-        private Dictionary<int, List<Tuple<int, int>>> DetermineOsdLineVerticalsEx(uint[] data, int minWhiteLevel)
+        private Tuple<int[], int[]> DetermineOsdLineVerticalsEx(uint[] data, int minWhiteLevel)
         {
             // NOTE: data has been already pre-processed with large chunk noice removed so background is zero
 
@@ -627,7 +653,7 @@ namespace Tangra.OCR
             {
                 scores[y] = 0;
 
-                for (int x = 0; x < m_ImageWidth; x++)
+                for (int x = 0; x < m_ImageWidth / 2; x++)
                 {
                     var currPixel = data[x + y * m_ImageWidth];
                     if (currPixel > minWhiteLevel) 
@@ -635,30 +661,31 @@ namespace Tangra.OCR
                 }
             }
 
-            var lines = new List<Tuple<int, int>>();
+            var tops = new List<int>();
+            var bottoms = new List<int>();
+
+            const int MIN_SCORE = 10; // The millis OSD row has 10 characters. If they are all 1's this gives a minimum positive score of 10
 
             for (int y = topLimit; y < m_ImageHeight - 1; y++)
             {
-                if (scores[y] > 0)
+                if (scores[y] > MIN_SCORE)
                 {
                     int fromY = y;
                     do
                     {
                         y++;
                     }
-                    while(scores.ContainsKey(y) && scores[y] > 0);
-                    lines.Add(Tuple.Create(fromY, y));
+                    while (y < m_ImageHeight - 1 && scores.ContainsKey(y) && scores[y] > MIN_SCORE);
+                    tops.Add(fromY);
+                    bottoms.Add(y);
                 }
             }
 
-            return new Dictionary<int, List<Tuple<int, int>>>();
+            return Tuple.Create(tops.ToArray(), bottoms.ToArray());
         }
 
-        private Dictionary<int, List<Tuple<int, int>>> DetermineOsdLineVerticals(uint[] data, int minWhiteLevel)
+        private Tuple<int[], int[]> DetermineOsdLineVerticalsOld(uint[] data, int minWhiteLevel)
         {
-            // NOTE: This is a possible alternative way of finding the vertical lines
-            //DetermineOsdLineVerticalsEx(data, minWhiteLevel);
-
             var scoresTop = new List<int>();
             var scoresBottom = new List<int>();
             var scoreLines = new List<int>();
@@ -731,6 +758,20 @@ namespace Tangra.OCR
             var topCandidates = tops.Where(kvp => kvp.Value > topScoreThreashold).Select(kvp => kvp.Key).ToArray();
             var botCandidates = bottoms.Where(kvp => kvp.Value > botScoreThreashold).Select(kvp => kvp.Key).ToArray();
 
+            return Tuple.Create(topCandidates, botCandidates);
+        }
+
+        private Dictionary<int, List<Tuple<int, int>>> DetermineOsdLineVerticals(uint[] data, int minWhiteLevel)
+        {
+            var lineProbes = DetermineOsdLineVerticalsEx(data, minWhiteLevel);
+            if (lineProbes.Item1.Length < 2)
+            {
+                lineProbes = DetermineOsdLineVerticalsOld(data, minWhiteLevel);
+            }
+
+            var topCandidates = lineProbes.Item1;
+            var botCandidates = lineProbes.Item2;
+
             var pairs = new Dictionary<int, List<Tuple<int, int>>>();
 
             foreach (var potTop in topCandidates)
@@ -738,7 +779,7 @@ namespace Tangra.OCR
                 foreach (var potBot in botCandidates)
                 {
                     var distancePix = potBot - potTop;
-                    if (distancePix > MIN_VIABLE_HEIGHT_PIXELS)
+                    if (distancePix > MIN_VIABLE_HEIGHT_PIXELS && distancePix < MAX_VIABLE_HEIGHT_PIXELS)
                     {
                         List<Tuple<int, int>> exEntry;
                         if (!pairs.TryGetValue(distancePix, out exEntry) &&
@@ -1163,6 +1204,8 @@ namespace Tangra.OCR
         //       but what if the timestamp is on 3 or 4 lines ??
         private static int MAX_TOP_BOTTOM_EDGES_TO_CONSIDER = 15;
         private static int MIN_VIABLE_HEIGHT_PIXELS = 7;
+        private static int MAX_VIABLE_HEIGHT_PIXELS = 40;
+        private static int MAX_VIABLE_GAP = 12;
         private static decimal MAX_GAP_PIXELS = 3.0M;
         private static decimal MIN_DIGIT_BOX_FULLNESS_PERCENTAGE = 0.15M;
         private static decimal PERCENT_WHITE_AT_EDGE_START = 0.35M;

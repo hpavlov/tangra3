@@ -727,9 +727,11 @@ namespace Tangra.OCR.GpsBoxSprite
         private decimal ComputeBlockDifference(decimal[,] block1, decimal[,] block2)
         {
             decimal diff = 0;
-            for (int y = 0; y < m_BlockHeight; y++)
+            int maxHeight = Math.Min(block1.GetLength(0), block2.GetLength(0));
+            int maxWidth = Math.Min(block1.GetLength(1), block2.GetLength(1));
+            for (int y = 0; y < maxHeight; y++)
             {
-                for (int x = 0; x < m_BlockWidth; x++)
+                for (int x = 0; x < maxWidth; x++)
                 {
                     diff += Math.Abs(block1[y, x] - block2[y, x]);
                 }
