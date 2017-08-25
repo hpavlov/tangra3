@@ -1140,37 +1140,93 @@ namespace Tangra.OCR
             Array.Sort(arrScores, arrWidths);
             widthAve = arrWidths[0];
 
+            
             // Try to locate the gaps between
             var data = new Dictionary<decimal, decimal>();
+            var fullnessData = new Dictionary<decimal, decimal>();
             for (decimal width = widthAve - 2; width <= widthAve + 2; width += 0.025m)
             {
-                decimal lineScore = 0;
-
+                var vals = new List<Tuple<decimal, decimal>>();
                 foreach (var cfg in rv)
                 {
                     var boxesFrom = cfg.Left;
                     var boxesTo = cfg.Right;
+                    var vertTop = (int) Math.Ceiling(cfg.Top);
+                    var vertBottom = Math.Floor(cfg.Bottom);
                     var numBoxPositions = (int)Math.Round((boxesTo - boxesFrom) / width);
 
                     for (int i = 0; i < numBoxPositions; i++)
                     {
                         decimal x = cfg.Left + i * width;
-                        for (int y = (int)Math.Ceiling(cfg.Top); y < Math.Floor(cfg.Bottom); y++)
+                        decimal boxFullness = 0M;
+                        decimal lineScore = 0;
+                        for (int j = 0; j < width; j++)
                         {
-                            lineScore += subPixelData.GetWholePixelAt(x, y);
+                            for (int y = vertTop; y < vertBottom; y++)
+                            {
+                                if (j == 0)
+                                    lineScore += subPixelData.GetWholePixelAt(x, y) > minWhiteLevel ? 1 : 0;
+
+                                boxFullness += subPixelData.GetWholePixelAt(x + j, y) > minWhiteLevel ? 1 : 0;
+                            }
                         }
+
+                        var fullnesPercent = boxFullness * 100M/ (width * (vertBottom - vertTop));
+                        vals.Add(Tuple.Create(lineScore, fullnesPercent));
                     }
                 }
 
-                data.Add(width, lineScore);
+                decimal totalLineScore = 0M;
+                decimal totalFullness = 0M;
+                int totalFull = 0;
+                const int MIN_FULLNESS_PERCENT = 10;
+                for (int i = 0; i < vals.Count - 1; i++)
+                {
+                    var curr = vals[i];
+                    var next = vals[i + 1];
+                    if (curr.Item2 > MIN_FULLNESS_PERCENT && next.Item2 > MIN_FULLNESS_PERCENT)
+                    {
+                        totalLineScore += next.Item1;
+                        totalFullness += curr.Item2;
+                        totalFull++;
+                    }
+                }
+
+                totalLineScore = vals.Sum(x => x.Item1);
+                data.Add(width, totalLineScore);
+                fullnessData.Add(width, totalFullness);
             }
 
             var arrKeys = data.Keys.ToArray();
             var arrWeights = data.Values.ToArray();
             Array.Sort(arrWeights, arrKeys);
 
+
+            var arrKeysF = fullnessData.Keys.ToArray();
+            var arrWeightsF = fullnessData.Values.ToArray();
+            Array.Sort(arrWeightsF, arrKeysF);
+
+            var lstKeysF = arrKeysF.ToList();
+            var lstKeys = arrKeys.ToList();
+
             decimal boxesLeft = rv[0].Left;
-            decimal boxWidth = arrKeys[0];
+            const int TOP_SCORES_TO_CONSIDER = 10;
+
+            decimal[] topWidths = new decimal[2 * TOP_SCORES_TO_CONSIDER];
+            decimal[] topWidthCombinedScore = new decimal[2 * TOP_SCORES_TO_CONSIDER];
+
+            for (int i = 0; i < TOP_SCORES_TO_CONSIDER; i++)
+            {
+                topWidths[i] = arrKeys[i];
+                topWidthCombinedScore[i] = i + lstKeysF.IndexOf(arrKeys[i]);
+            }
+            for (int i = 0; i < TOP_SCORES_TO_CONSIDER; i++)
+            {
+                topWidths[i + TOP_SCORES_TO_CONSIDER] = arrKeysF[i];
+                topWidthCombinedScore[i + TOP_SCORES_TO_CONSIDER] = i + lstKeys.IndexOf(arrKeysF[i]);
+            }
+            Array.Sort(topWidthCombinedScore, topWidths);
+            decimal boxWidth = topWidths[0];
 
             foreach (var cfg in rv)
             {

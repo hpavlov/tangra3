@@ -60,11 +60,23 @@ namespace Tangra.OCR
 
 	    internal class SmallHeightDenoiseContext : IDenoiser
 	    {
-	        public int MaxNoiseChunkHeight;
+	        private int m_MaxNoiseChunkHeight;
+            private int m_MinUpperBoundNoiseChunkPixels;
+	        public int MaxNoiseChunkHeight
+	        {
+	            get { return m_MaxNoiseChunkHeight; }
+	            set
+	            {
+	                m_MaxNoiseChunkHeight = value;
+                    m_MinUpperBoundNoiseChunkPixels = 6 * value * value;
+	            }
+	        }
 
 	        public bool IdentifyNoise(Context context)
 	        {
-	            return (context.ObjectPixelsYTo - context.ObjectPixelsYFrom) <= MaxNoiseChunkHeight;
+                return 
+                    (context.ObjectPixelsYTo - context.ObjectPixelsYFrom) <= m_MaxNoiseChunkHeight ||
+                    context.ObjectPixelsCount > m_MinUpperBoundNoiseChunkPixels;
 	        }
 	    }
 
