@@ -2061,7 +2061,7 @@ namespace Tangra.VideoOperations.LightCurves
     {
         public static LCMeasurementFooter Empty = new LCMeasurementFooter();
 
-        private static int SERIALIZATION_VERSION = 11;
+        private static int SERIALIZATION_VERSION = 12;
 
         internal byte[] AveragedFrameBytes;
     	internal int AveragedFrameWidth;
@@ -2087,6 +2087,8 @@ namespace Tangra.VideoOperations.LightCurves
 	    internal int DataBitPix;
 		internal uint DataAav16NormVal;
         internal int AAVStackedFrameRate;
+        internal int FitsDynamicFromValue;
+        internal int FitsDynamicToValue;
 
         internal LCMeasurementFooter(
 			Pixelmap averagedFrame, 
@@ -2106,7 +2108,9 @@ namespace Tangra.VideoOperations.LightCurves
 			bool aavNtpNoFittingUsed,
 			int dataBitPix,
 			uint dataAav16NormVal,
-            int aavStackedFrameRate)
+            int aavStackedFrameRate,
+            int fitsDynamicFromValue,
+            int fitsDynamicToValue)
         {
 			AveragedFrameBytes = averagedFrame.DisplayBitmapPixels;
         	AveragedFrameWidth = averagedFrame.Width;
@@ -2132,6 +2136,9 @@ namespace Tangra.VideoOperations.LightCurves
 	        DataBitPix = dataBitPix;
 	        DataAav16NormVal = dataAav16NormVal;
             AAVStackedFrameRate = aavStackedFrameRate;
+
+            FitsDynamicFromValue = fitsDynamicFromValue;
+            FitsDynamicToValue = fitsDynamicToValue;
         }
 
         internal LCMeasurementFooter(BinaryReader reader)
@@ -2180,6 +2187,8 @@ namespace Tangra.VideoOperations.LightCurves
 			DataBitPix = 8;
 			DataAav16NormVal = 0;
             AAVStackedFrameRate = 0;
+            FitsDynamicFromValue = -1;
+            FitsDynamicToValue = -1;
 
 			if (version > 1)
 			{
@@ -2237,6 +2246,12 @@ namespace Tangra.VideoOperations.LightCurves
 	                                            {
 													AavNtpFitOneSigmaError = reader.ReadSingle();
 		                                            AavNtpNoFittingUsed = reader.ReadBoolean();
+
+                                                    if (version > 11)
+                                                    {
+                                                        FitsDynamicFromValue = reader.ReadInt32();
+                                                        FitsDynamicToValue = reader.ReadInt32();
+                                                    }
 	                                            }
                                             }
 										}
@@ -2316,6 +2331,9 @@ namespace Tangra.VideoOperations.LightCurves
 
 	        writer.Write(AavNtpFitOneSigmaError);
 	        writer.Write(AavNtpNoFittingUsed);
+
+            writer.Write(FitsDynamicFromValue);
+            writer.Write(FitsDynamicToValue);
         }
     }
 

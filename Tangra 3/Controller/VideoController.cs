@@ -227,22 +227,19 @@ namespace Tangra.Controller
 				() => new SingleBitmapFileFrameStream(bitmapBytes, width, height));
 		}
 
-		public bool OpenFitsFileSequence(string folderName)
-		{
-            TangraContext.Current.IsFitsStream = false;
-		    TangraContext.Current.IsAviFile = false;
-
-		    string[] fitsFiles = null;
-		    try
-		    {
-		        fitsFiles = Directory.GetFiles(folderName, "*.fit*", SearchOption.TopDirectoryOnly);
-		    }
-		    catch (Exception ex)
-		    {
-		        Trace.WriteLine(ex.GetFullStackTrace());
+	    public bool OpenFitsFileSequence(string folderName)
+	    {
+            string[] fitsFiles = null;
+            try
+            {
+                fitsFiles = Directory.GetFiles(folderName, "*.fit*", SearchOption.TopDirectoryOnly);
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex.GetFullStackTrace());
                 ShowMessageBox("Please specify a valid folder path. '" + folderName + "' appears to be invalid.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
-		    }
+            }
 
             if (fitsFiles.Length == 0)
             {
@@ -263,41 +260,49 @@ namespace Tangra.Controller
 
                 fitsFiles = frm.GetSortedFiles();
 
-	            try
-	            {
-					return OpenVideoFileInternal(
-						folderName,
-						() =>
-						{
-							bool hasNegativePixels;
-							FITSFileSequenceStream stream = FITSFileSequenceStream.OpenFolder(fitsFiles, frm.TimeStampReader, false, out hasNegativePixels);
+                return OpenFitsFileSequence(folderName, fitsFiles, frm.TimeStampReader);
+            }
+	    }
 
-							if (hasNegativePixels && CheckWithUserAboutNegativePixels())
-							{
-                                stream = FITSFileSequenceStream.OpenFolder(fitsFiles, frm.TimeStampReader, true, out hasNegativePixels);
-							}
+	    public bool OpenFitsFileSequence(string folderName, string[] sortedFitsFiles, IFITSTimeStampReader fitsTimeStampReader, int firstFrameNo = 0)
+		{
+            TangraContext.Current.IsFitsStream = false;
+		    TangraContext.Current.IsAviFile = false;
 
-                            TangraContext.Current.IsFitsStream = true;
-                            TangraContext.Current.IsAviFile = false;
-							return stream;
-						});
- 
-	            }
-	            catch (Exception ex)
-	            {
-		            Trace.WriteLine(ex.GetFullStackTrace());
+            try
+            {
+                return OpenVideoFileInternal(
+                    folderName,
+                    () =>
+                    {
+                        bool hasNegativePixels;
+                        FITSFileSequenceStream stream = FITSFileSequenceStream.OpenFolder(sortedFitsFiles, fitsTimeStampReader, false, firstFrameNo, out hasNegativePixels);
 
-					MessageBox.Show(
-						m_MainForm,
-						"Error opening FITS files: " + ex.Message,
-						"Tangra",
-						MessageBoxButtons.OK,
-						MessageBoxIcon.Error,
-						MessageBoxDefaultButton.Button1);
+                        if (hasNegativePixels && CheckWithUserAboutNegativePixels())
+                        {
+                            stream = FITSFileSequenceStream.OpenFolder(sortedFitsFiles, fitsTimeStampReader, true, firstFrameNo, out hasNegativePixels);
+                        }
 
-		            return false;
-	            }
-           }
+                        TangraContext.Current.IsFitsStream = true;
+                        TangraContext.Current.IsAviFile = false;
+                        return stream;
+                    });
+
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex.GetFullStackTrace());
+
+                MessageBox.Show(
+                    m_MainForm,
+                    "Error opening FITS files: " + ex.Message,
+                    "Tangra",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error,
+                    MessageBoxDefaultButton.Button1);
+
+                return false;
+            }
         }
 
 		public bool OpenBitmapFileSequence(string folderName)

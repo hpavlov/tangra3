@@ -265,7 +265,17 @@ namespace Tangra.Video.FITS
             }
             else
             {
-                throw new NotImplementedException();
+                var startTimestampCard = m_AllCards.FirstOrDefault(x => x.Card.Key == config.TimeStampHeader);
+                var endTimestampCard = m_AllCards.FirstOrDefault(x => x.Card.Key == config.TimeStamp2Header);
+
+                if (startTimestampCard != null && endTimestampCard != null)
+                {
+                    return
+                        VerifyTimeStamp(startTimestampCard.Card.Value, config.TimeStampFormat) &&
+                        VerifyTimeStamp(endTimestampCard.Card.Value, config.TimeStamp2Format);
+                }
+                else
+                    return false;
             }
         }
 
@@ -280,18 +290,37 @@ namespace Tangra.Video.FITS
                 }
             }
 
-            for (int i = 0; i < cbxExposure.Items.Count; i++)
+            if (config.ExposureHeader != null)
             {
-                if (((HeaderEntry)cbxExposure.Items[i]).Card.Key == config.ExposureHeader)
+                for (int i = 0; i < cbxExposure.Items.Count; i++)
                 {
-                    cbxExposure.SelectedIndex = i;
-                    break;
+                    if (((HeaderEntry)cbxExposure.Items[i]).Card.Key == config.ExposureHeader)
+                    {
+                        cbxExposure.SelectedIndex = i;
+                        break;
+                    }
+                }
+            }
+
+            if (config.TimeStamp2Header != null)
+            {
+                for (int i = 0; i < cbxTimeStamp2.Items.Count; i++)
+                {
+                    if (((HeaderEntry)cbxTimeStamp2.Items[i]).Card.Key == config.TimeStamp2Header)
+                    {
+                        cbxTimeStamp2.SelectedIndex = i;
+                        break;
+                    }
                 }
             }
 
             cbxTimeStampFormat.SelectedIndex = cbxTimeStampFormat.Items.IndexOf(config.TimeStampFormat);
             if (cbxTimeStampFormat.SelectedIndex == -1)
                 cbxTimeStampFormat.Text = config.TimeStampFormat;
+
+            cbxTimeStamp2Format.SelectedIndex = cbxTimeStamp2Format.Items.IndexOf(config.TimeStamp2Format);
+            if (cbxTimeStamp2Format.SelectedIndex == -1)
+                cbxTimeStamp2Format.Text = config.TimeStamp2Format;
 
             if (config.FileHash == m_FilesHash || m_CardNamesHash == config.CardNamesHash)
             {
@@ -303,6 +332,8 @@ namespace Tangra.Video.FITS
                 cbxExposureUnits.SelectedIndex = -1;
                 cbxTimestampType.SelectedIndex = -1;
             }
+
+            rbStartEndTimestamp.Checked = !config.IsTimeStampAndExposure;
         }
 
         private void cbxTimeStampFormat_SelectedIndexChanged(object sender, EventArgs e)
@@ -407,6 +438,23 @@ namespace Tangra.Video.FITS
 
                 DialogResult = DialogResult.OK;
                 Close();
+            }
+        }
+
+        private void rbStartEndTimestamp_CheckedChanged(object sender, EventArgs e)
+        {
+            if (rbStartEndTimestamp.Checked)
+            {
+                pnlEndTimeStamp.BringToFront();
+                pnlExposure.SendToBack();
+                cbxTimestampType.SelectedIndex = (int)TangraConfig.TimeStampType.StartExposure;
+                cbxTimestampType.Enabled = false;
+            }
+            else
+            {
+                pnlExposure.BringToFront();
+                pnlEndTimeStamp.SendToBack();
+                cbxTimestampType.Enabled = true;
             }
         }
     }

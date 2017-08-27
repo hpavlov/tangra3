@@ -25,23 +25,23 @@ namespace Tangra.Video.FITS
         private uint m_MinPixelValueFirstImage;
         private uint m_MaxPixelValueFirstImage;
         private bool m_ZeroOutNegativePixels = false;
-        private FITSTimeStampReader m_TimeStampReader = null;
+        private IFITSTimeStampReader m_TimeStampReader = null;
 
-        public static FITSFileSequenceStream OpenFolder(string[] fitsFiles, FITSTimeStampReader timeStampReader, bool zeroOutNegativeValues, out bool hasNegativePixels)
+        public static FITSFileSequenceStream OpenFolder(string[] fitsFiles, IFITSTimeStampReader timeStampReader, bool zeroOutNegativeValues, int firstFrameNo, out bool hasNegativePixels)
         {
 			UsageStats.Instance.ProcessedFitsFolderFiles++;
 			UsageStats.Instance.Save();
 
-            var rv = new FITSFileSequenceStream(fitsFiles, timeStampReader, zeroOutNegativeValues, out hasNegativePixels);
+            var rv = new FITSFileSequenceStream(fitsFiles, timeStampReader, zeroOutNegativeValues, firstFrameNo, out hasNegativePixels);
 	        rv.FileName = Path.GetDirectoryName(fitsFiles[0]);
 	        return rv;
         }
 
-        private FITSFileSequenceStream(string[] fitsFiles, FITSTimeStampReader timeStampReader, bool zeroOutNegativeValues, out bool hasNegativePixels)
+        private FITSFileSequenceStream(string[] fitsFiles, IFITSTimeStampReader timeStampReader, bool zeroOutNegativeValues, int firstFrameNo, out bool hasNegativePixels)
         {
             m_FitsFilesList.AddRange(fitsFiles);
 
-            FirstFrame = 0;
+            FirstFrame = firstFrameNo;
             LastFrame = m_FitsFilesList.Count - 1;
             CountFrames = m_FitsFilesList.Count;
             m_ZeroOutNegativePixels = zeroOutNegativeValues;

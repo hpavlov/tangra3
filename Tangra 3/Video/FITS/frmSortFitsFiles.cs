@@ -116,7 +116,7 @@ namespace Tangra.Video.FITS
                         DateTime? timestamp = null;
                         try
                         {
-                            timestamp = FITSHelper.ParseExposure(hdr, TimeStampReader, out isMidPoint, out fitsExposure);
+                            timestamp = FITSHelper.ParseExposure(m_FitsFiles[i], hdr, TimeStampReader, out isMidPoint, out fitsExposure);
                         }
                         catch (Exception ex)
                         {
@@ -133,7 +133,7 @@ namespace Tangra.Video.FITS
 
                             try
                             {
-                                timestamp = FITSHelper.ParseExposure(hdr, TimeStampReader, out isMidPoint, out fitsExposure);
+                                timestamp = FITSHelper.ParseExposure(m_FitsFiles[i], hdr, TimeStampReader, out isMidPoint, out fitsExposure);
                             }
                             catch (Exception ex)
                             {

@@ -93,6 +93,8 @@ namespace Tangra.VideoOperations.LightCurves
 	    private int m_AavNtpTimestampError = -1;
 	    private float m_AavNtpFitOneSigmaError = float.NaN;
         private int m_AavStackedFrameRate;
+        private int m_FitsDynamicFromValue;
+        private int m_FitsDynamicToValue;
 
         private LCState m_BackedUpSelectMeasuringStarsState = null;
 
@@ -1287,6 +1289,8 @@ namespace Tangra.VideoOperations.LightCurves
             m_AavFrameIntegration = m_VideoController.IsAstroAnalogueVideo ? m_VideoController.AstroAnalogueVideoIntegratedAAVFrames : -1;
 			m_AavNativeVideoFormat = m_VideoController.IsAstroAnalogueVideo ? m_VideoController.AstroVideoNativeVideoStandard : string.Empty;
             m_AavStackedFrameRate = m_VideoController.IsAstroAnalogueVideo ? m_VideoController.AstroAnalogueVideoStackedFrameRate : 0;
+            m_FitsDynamicFromValue = m_VideoController.DynamicFromValue;
+            m_FitsDynamicToValue = m_VideoController.DynamicToValue;
 
 			if (LightCurveReductionContext.Instance.DebugTracking)
 			{
@@ -1989,7 +1993,9 @@ namespace Tangra.VideoOperations.LightCurves
 				TangraConfig.Settings.AAV.NtpTimeUseDirectTimestamps,
 				PSFFit.BitPix,
 				PSFFit.NormVal,
-                m_AavStackedFrameRate);
+                m_AavStackedFrameRate,
+                m_FitsDynamicFromValue,
+                m_FitsDynamicToValue);
 
 			return LCFile.FlushOnTheFlyOutputFile(finalHeader, footer, m_VideoController);
 		}

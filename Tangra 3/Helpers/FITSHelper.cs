@@ -27,7 +27,7 @@ namespace Tangra.Helpers
 
         internal delegate void LoadFitsDataCallback<TData>(Array dataArray, int height, int width, double bzero, out TData[,] pixels, out TData medianValue, out Type pixelDataType, out bool hasNegPix);
 
-        public static bool LoadFloatingPointFitsFile(string fileName, FITSTimeStampReader timeStampReader, bool zeroOutNegativePixels, out float[,] pixels, out float medianValue, out Type pixelDataType, out float exposureSeconds, out bool hasNegativePixels, CheckOpenedFitsFileCallback callback)
+        public static bool LoadFloatingPointFitsFile(string fileName, IFITSTimeStampReader timeStampReader, bool zeroOutNegativePixels, out float[,] pixels, out float medianValue, out Type pixelDataType, out float exposureSeconds, out bool hasNegativePixels, CheckOpenedFitsFileCallback callback)
 		{
             return LoadFitsFileInternal<float>(fileName, timeStampReader, out pixels, out medianValue, out pixelDataType, out exposureSeconds, out hasNegativePixels, callback, (Array dataArray, int height, int width, double bzero, out float[,] ppx, out float median, out Type dataType, out bool hasNegPix) =>
 			{
@@ -35,7 +35,7 @@ namespace Tangra.Helpers
 			});
 		}
 
-        public static bool Load16BitFitsFile(string fileName, FITSTimeStampReader timeStampReader, bool zeroOutNegativePixels, out uint[,] pixels, out uint medianValue, out Type pixelDataType, out bool hasNegativePixels, CheckOpenedFitsFileCallback callback)
+        public static bool Load16BitFitsFile(string fileName, IFITSTimeStampReader timeStampReader, bool zeroOutNegativePixels, out uint[,] pixels, out uint medianValue, out Type pixelDataType, out bool hasNegativePixels, CheckOpenedFitsFileCallback callback)
 		{
 		    float exposureSeconds;
             return LoadFitsFileInternal<uint>(fileName, timeStampReader, out pixels, out medianValue, out pixelDataType, out exposureSeconds, out hasNegativePixels, callback, (Array dataArray, int height, int width, double bzero, out uint[,] ppx, out uint median, out Type dataType, out bool hasNegPix) =>
@@ -44,7 +44,7 @@ namespace Tangra.Helpers
 				});
 		}
 
-        private static bool LoadFitsFileInternal<TData>(string fileName, FITSTimeStampReader timeStampReader, out TData[,] pixels, out TData medianValue, out Type pixelDataType, out float frameExposure, out bool hasNegativePixels, CheckOpenedFitsFileCallback callback, LoadFitsDataCallback<TData> loadDataCallback)
+        private static bool LoadFitsFileInternal<TData>(string fileName, IFITSTimeStampReader timeStampReader, out TData[,] pixels, out TData medianValue, out Type pixelDataType, out float frameExposure, out bool hasNegativePixels, CheckOpenedFitsFileCallback callback, LoadFitsDataCallback<TData> loadDataCallback)
 		{
 			Fits fitsFile = new Fits();
 
@@ -82,7 +82,7 @@ namespace Tangra.Helpers
                 double? fitsExposure = null;
                 try
                 {
-                    ParseExposure(imageHDU.Header, timeStampReader, out isMidPoint, out fitsExposure);
+                    ParseExposure(fileName, imageHDU.Header, timeStampReader, out isMidPoint, out fitsExposure);
                 }
                 catch (Exception ex)
                 {
@@ -96,12 +96,12 @@ namespace Tangra.Helpers
 			}
 		}
 
-	    public static DateTime? ParseExposure(Header header, FITSTimeStampReader timeStampReader, out bool isMidPoint, out double? fitsExposure)
+        public static DateTime? ParseExposure(string fileName, Header header, IFITSTimeStampReader timeStampReader, out bool isMidPoint, out double? fitsExposure)
 	    {
 	        if (timeStampReader == null)
                 return ParseExposureInternal(header, out isMidPoint, out fitsExposure);
             else
-                return timeStampReader.ParseExposure(header, out isMidPoint, out fitsExposure);
+                return timeStampReader.ParseExposure(fileName, header, out isMidPoint, out fitsExposure);
 	    }
 
 	    private static DateTime? ParseExposureInternal(Header header, out bool isMidPoint, out double? fitsExposure)
@@ -173,7 +173,7 @@ namespace Tangra.Helpers
 
 		private static Regex FITS_DATE_REGEX = new Regex("(?<DateStr>\\d\\d\\d\\d\\-\\d\\d\\-\\d\\dT\\d\\d:\\d\\d:\\d\\d(\\.\\d+)?)");
         public static void Load16BitFitsFile(
-            string fileName, FITSTimeStampReader timeStampReader, bool zeroOutNegativePixels, Action<BasicHDU> fitsFileLoadedCallback,
+            string fileName, IFITSTimeStampReader timeStampReader, bool zeroOutNegativePixels, Action<BasicHDU> fitsFileLoadedCallback,
             out uint[] pixelsFlat, out int width, out int height, out int bpp, out DateTime? timestamp, 
             out double? exposure, out uint minPixelValue, out uint maxPixelValue, out bool hasNegativePixels)
 		{
@@ -205,7 +205,7 @@ namespace Tangra.Helpers
 					try
 					{
 						bool isMidPoint = false;
-                        fitsTimestamp = ParseExposure(imageHDU.Header, timeStampReader, out isMidPoint, out fitsExposure);					    
+                        fitsTimestamp = ParseExposure(fileName, imageHDU.Header, timeStampReader, out isMidPoint, out fitsExposure);					    
 					}
 					catch (Exception ex)
 					{

@@ -982,6 +982,7 @@
     <Compile Include="Video\FITS\frmSortFitsFiles.Designer.cs">
       <DependentUpon>frmSortFitsFiles.cs</DependentUpon>
     </Compile>
+    <Compile Include="Video\FITS\IFITSTimeStampReader.cs" />
     <Compile Include="Video\frmIntegrationDetection.cs">
       <SubType>Form</SubType>
     </Compile>

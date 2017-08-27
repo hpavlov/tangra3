@@ -20,6 +20,7 @@ using Tangra.Model.Video;
 using Tangra.OCR;
 using Tangra.Video;
 using Tangra.Video.AstroDigitalVideo;
+using Tangra.Video.FITS;
 using Tangra.VideoOperations.LightCurves;
 using Tangra.VideoOperations.LightCurves.Tracking;
 
@@ -35,6 +36,7 @@ namespace Tangra.Controller
 		private LCFile m_lcFile = null;
 
 		private LightCurveContext m_Context;
+        private int m_FrameNoCorr;
 
         public LightCurveController(Form mainFormView, VideoController videoController, AddinsController addinsController)
         {
@@ -47,7 +49,7 @@ namespace Tangra.Controller
 
         public void MoveToFrameNoIntegrate(int selectedFrameNo)
         {
-			m_VideoController.MoveToFrame(selectedFrameNo);
+            m_VideoController.MoveToFrame(m_FrameNoCorr + selectedFrameNo);
         }
 
         public void LoadLightCurve()
@@ -66,11 +68,16 @@ namespace Tangra.Controller
             }
         }
 
-        private string GetVideoFileMatchingLcFile(LCFile lcFile, string pathToLCFile)
+        private object GetVideoFileMatchingLcFile(LCFile lcFile, string pathToLCFile)
         {
             if (File.Exists(lcFile.Header.PathToVideoFile) &&
                 TestWhetherVideoFileMatchesLcHeader(lcFile.Header.PathToVideoFile, lcFile.Header))
                 return lcFile.Header.PathToVideoFile;
+
+            if (lcFile.Header.GetVideoFileFormat() == VideoFileFormat.FITS &&
+                Directory.Exists(lcFile.Header.PathToVideoFile) &&
+                lcFile.Data.Count > 0)
+                return TestWhetherFITSFolderMatchesLcHeader(lcFile.Header.PathToVideoFile, lcFile.Data[0]);
 
 
             string nextGuess = Path.GetFullPath(Path.GetDirectoryName(pathToLCFile) + "\\" + Path.GetFileName(lcFile.Header.PathToVideoFile));
@@ -85,6 +92,24 @@ namespace Tangra.Controller
                 return nextGuess;
 
             return null;
+        }
+
+        private static string[] TestWhetherFITSFolderMatchesLcHeader(string dirName, List<LCMeasurement> measurements)
+        {
+            var resolvedFitsFiles = new List<string>();
+            foreach (var fileName in measurements.Select(x => x.CurrFileName).ToArray())
+            {
+                if (string.IsNullOrWhiteSpace(fileName))
+                    return null;
+
+                var fullExpectedName = Path.GetFullPath(dirName + @"\" + fileName);
+                if (!File.Exists(fullExpectedName))
+                    return null;
+
+                resolvedFitsFiles.Add(fullExpectedName);
+            }
+
+            return resolvedFitsFiles.ToArray();
         }
 
         private static bool TestWhetherVideoFileMatchesLcHeader(string fileName, LCMeasurementHeader header)
@@ -134,13 +159,28 @@ namespace Tangra.Controller
                     ReduceLightCurveOperation operation = (ReduceLightCurveOperation)m_VideoController.SetOperation<ReduceLightCurveOperation>(this, false);
                     operation.SetLCFile(lcFile);
 
-                    string videoFile = GetVideoFileMatchingLcFile(lcFile, fileName);
-                    if (!string.IsNullOrEmpty(videoFile) &&
-                        File.Exists(videoFile))
+                    object videoFile = GetVideoFileMatchingLcFile(lcFile, fileName);
+                    if (videoFile is string && 
+                        !string.IsNullOrEmpty((string)videoFile) &&
+                        File.Exists((string)videoFile))
                     {
-                        if (m_VideoController.OpenVideoFile(videoFile, new TangraOpenFileArgs { FrameRate = lcFile.Header.FramesPerSecond, BitPix = lcFile.Footer.DataBitPix, SerTiming = lcFile.Header.SerTimingType }))
+                        if (m_VideoController.OpenVideoFile((string)videoFile, new TangraOpenFileArgs { FrameRate = lcFile.Header.FramesPerSecond, BitPix = lcFile.Footer.DataBitPix, SerTiming = lcFile.Header.SerTimingType }))
                         {
                             TangraContext.Current.CanPlayVideo = false;
+                            m_VideoController.UpdateViews();
+                        }
+                    }
+                    else if (videoFile is string[] &&
+                        ((string[])videoFile).Length > 0)
+                    {
+                        var fitsFiles = (string[])videoFile;
+                        if (m_VideoController.OpenFitsFileSequence(Path.GetDirectoryName(fitsFiles[0]), fitsFiles, new LCFITSTimeStampReader(lcFile)))
+                        {
+                            m_FrameNoCorr = -1 * (int)lcFile.Data[0][0].CurrFrameNo;
+                            TangraContext.Current.CanPlayVideo = false;
+                            if (lcFile.Footer.FitsDynamicFromValue != -1 && lcFile.Footer.FitsDynamicToValue != -1)
+                                m_VideoController.SetDisplayIntensifyMode(DisplayIntensifyMode.Dynamic, lcFile.Footer.FitsDynamicFromValue, lcFile.Footer.FitsDynamicToValue);
+
                             m_VideoController.UpdateViews();
                         }
                     }
