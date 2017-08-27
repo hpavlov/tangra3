@@ -56,6 +56,7 @@
             this.miTargetPSFViewer = new System.Windows.Forms.ToolStripMenuItem();
             this.miFrameStatusData = new System.Windows.Forms.ToolStripMenuItem();
             this.miIntegrationDetection = new System.Windows.Forms.ToolStripMenuItem();
+            this.miTimestampOCR = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
             this.miAstrometryTools = new System.Windows.Forms.ToolStripMenuItem();
             this.miFastMotionFitting = new System.Windows.Forms.ToolStripMenuItem();
@@ -121,7 +122,6 @@
             this.openAdvFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.saveFrameDialog = new System.Windows.Forms.SaveFileDialog();
             this.timerCommandArgs = new System.Windows.Forms.Timer(this.components);
-            this.miTimestampOCR = new System.Windows.Forms.ToolStripMenuItem();
             this.mainMenu.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.panelRight.SuspendLayout();
@@ -442,6 +442,13 @@
             this.miIntegrationDetection.Size = new System.Drawing.Size(219, 22);
             this.miIntegrationDetection.Text = "Video Integration Detection";
             this.miIntegrationDetection.Click += new System.EventHandler(this.miIntegrationDetection_Click);
+            // 
+            // miTimestampOCR
+            // 
+            this.miTimestampOCR.Name = "miTimestampOCR";
+            this.miTimestampOCR.Size = new System.Drawing.Size(219, 22);
+            this.miTimestampOCR.Text = "Timestamp OCR Validator";
+            this.miTimestampOCR.Click += new System.EventHandler(this.miTimestampOCR_Click);
             // 
             // toolStripMenuItem2
             // 
@@ -1034,13 +1041,6 @@
             // timerCommandArgs
             // 
             this.timerCommandArgs.Tick += new System.EventHandler(this.timerCommandArgs_Tick);
-            // 
-            // miTimestampOCR
-            // 
-            this.miTimestampOCR.Name = "miTimestampOCR";
-            this.miTimestampOCR.Size = new System.Drawing.Size(219, 22);
-            this.miTimestampOCR.Text = "Timestamp OCR";
-            this.miTimestampOCR.Click += new System.EventHandler(this.miTimestampOCR_Click);
             // 
             // frmMain
             // 

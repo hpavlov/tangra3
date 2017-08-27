@@ -330,7 +330,7 @@ namespace Tangra
 
             m_VideoController.NewFrameDisplayed();
 
-			CompleteRenderFrame();
+            CompleteRenderFrame(frameContext);
 
 			Update();
 
@@ -340,7 +340,7 @@ namespace Tangra
                 NotificationManager.Instance.NotifyCurrentFrameChanged(m_CurrentFrameId);
 		}
 
-		private void CompleteRenderFrame()
+		private void CompleteRenderFrame(RenderFrameContext context)
 		{
 			pictureBox.Image = m_VideoContext.Pixelmap.DisplayBitmap;
 
@@ -361,7 +361,7 @@ namespace Tangra
 		    {
                 using (Graphics g = Graphics.FromImage(m_VideoContext.Pixelmap.DisplayBitmap))
                 {
-                    m_VideoController.RunCustomRenderers(g);
+                    m_VideoController.RunCustomRenderers(g, context.IsLastFrame);
                     g.Save();
                 }
 		    }
@@ -1433,6 +1433,8 @@ namespace Tangra
             if (m_VideoController.HasTimestampOCR())
             {
                 m_VideoController.DebugOCR = debugOCR;
+                m_VideoController.OCRScore = 0;
+                m_VideoController.OCRScoredFrames = 0;
                 m_VideoController.RegisterOverlayRenderer(m_VideoController.PrintOCRedTimeStamp);
 
                 // If OCR engine has been initialized then redraw the frame to show the boxes around the numbers

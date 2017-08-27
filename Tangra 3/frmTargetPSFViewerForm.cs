@@ -387,7 +387,7 @@ namespace Tangra
 
 		private static Pen s_AperturePen = new Pen(Color.FromArgb(80, Color.Yellow.R, Color.Yellow.G, Color.Yellow.B));
 
-		internal void RenderOverlay(Graphics g)
+		internal void RenderOverlay(Graphics g, bool isLastFrame)
 		{
 			float x0 = (float)m_PSFFit.XCenter;
 			float y0 = (float)m_PSFFit.YCenter;

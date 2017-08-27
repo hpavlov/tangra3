@@ -1041,7 +1041,7 @@ namespace Tangra.Controller
 
 	    private static Font s_OCRPrintFont = new Font(FontFamily.GenericMonospace, 10);
 
-        internal void PrintOCRedTimeStamp(Graphics g)
+        internal void PrintOCRedTimeStamp(Graphics g, bool isLastFrame)
         {
             if (m_TimestampOCR != null)
             {
@@ -1051,7 +1051,7 @@ namespace Tangra.Controller
                 g.FillRectangle(Brushes.DarkSlateGray, m_AstroImage.Width - size.Width - 10, 10, size.Width, size.Height);
                 g.DrawString(output, s_OCRPrintFont, Brushes.Lime, m_AstroImage.Width - size.Width - 10, 10);
 
-                DateTime ocrTimeStamp = OCRTimestamp(DebugOCR);
+                DateTime ocrTimeStamp = OCRTimestamp(DebugOCR);                
                 output = string.Format("{0}", ocrTimeStamp.Year != 1 ? ocrTimeStamp.ToString("yyyy-MM-dd HH:mm:ss.fff") : ocrTimeStamp.ToString("HH:mm:ss.fff"));
                 size = g.MeasureString(output, s_OCRPrintFont);
                 g.FillRectangle(Brushes.DarkSlateGray, m_AstroImage.Width - size.Width - 10, 10 + size.Height + vertPading, size.Width, size.Height);
@@ -1121,6 +1121,21 @@ namespace Tangra.Controller
                         g.DrawString(output, s_OCRPrintFont, Brushes.Orange, m_AstroImage.Width - size.Width - 10, 10 + i * (size.Height + vertPading));                                            
                     }
                 }
+                else
+                {
+                    // If this is not an OCR error then give it up to 5 points minus the corrections made
+                    OCRScore += (5 - correctionsMade);
+                    OCRScoredFrames++;
+                }
+
+                if (isLastFrame)
+                {
+                    output = string.Format("Total Score: {0:0.000}%", OCRScore * 100.0 / (5 * OCRScoredFrames));
+                    i++;
+                    size = g.MeasureString(output, s_OCRPrintFont);
+                    g.FillRectangle(Brushes.DarkSlateGray, m_AstroImage.Width - size.Width - 10, 10 + i * (size.Height + vertPading), size.Width, size.Height);
+                    g.DrawString(output, s_OCRPrintFont, Brushes.WhiteSmoke, m_AstroImage.Width - size.Width - 10, 10 + i * (size.Height + vertPading));
+                }
 
                 var dbgImage = m_TimestampOCR.GetOCRDebugImage();
                 if (dbgImage != null)
@@ -1133,14 +1148,14 @@ namespace Tangra.Controller
 	        get { return m_CustomOverlayRenderer != null && m_CurrentOperation == null; }
 	    }
 
-		internal void RunCustomRenderers(Graphics g)
+		internal void RunCustomRenderers(Graphics g, bool isLastFrame)
 		{
 			if (m_CustomOverlayRenderer != null && m_CurrentOperation == null)
 			{
 				// Run custom overlay renderers when no operation is selected
 				try
 				{
-					m_CustomOverlayRenderer(g);
+                    m_CustomOverlayRenderer(g, isLastFrame);
 				}
 				catch (Exception ex)
 				{
@@ -1194,7 +1209,7 @@ namespace Tangra.Controller
                 {
                     using (Graphics g = Graphics.FromImage(m_MainForm.pictureBox.Image))
                     {
-                        RunCustomRenderers(g);
+                        RunCustomRenderers(g, false);
                         g.Save();
                     }
                 }                
@@ -2859,9 +2874,12 @@ namespace Tangra.Controller
             m_FramePlayer.SetFlipSettings(flipVertically, flipHorizontally);
 		}
 
-		public delegate void RenderOverlayCallback(Graphics g);
+		public delegate void RenderOverlayCallback(Graphics g, bool isLastFrame);
 
 	    internal bool DebugOCR;
+
+	    internal int OCRScore;
+	    internal int OCRScoredFrames;
 
 	    internal void RegisterOverlayRenderer(RenderOverlayCallback callback)
 		{
