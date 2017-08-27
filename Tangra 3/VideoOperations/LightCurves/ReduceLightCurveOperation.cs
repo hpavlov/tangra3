@@ -611,7 +611,8 @@ namespace Tangra.VideoOperations.LightCurves
 							? m_DisplaySettings.TargetPens[m_StateMachine.SelectedMeasuringStar]
                             : Pens.WhiteSmoke;
 
-						Bitmap zoomedBmp = m_AstroImage.GetZoomImagePixels(star.X, star.Y, TangraConfig.Settings.Color.Saturation, TangraConfig.Settings.Photometry.Saturation);
+                        Pixelmap zoomPixelmap;
+                        Bitmap zoomedBmp = m_AstroImage.GetZoomImagePixels(star.X, star.Y, TangraConfig.Settings.Color.Saturation, TangraConfig.Settings.Photometry.Saturation, out zoomPixelmap);
                         using (Graphics gz = Graphics.FromImage(zoomedBmp))
                         {
                             float x = 8.0f * (float)(star.XDouble - star.X - 0.5f) + 16 * 8;
@@ -640,7 +641,7 @@ namespace Tangra.VideoOperations.LightCurves
                             gz.Save();
                         }
 
-						m_VideoController.UpdateZoomedImage(zoomedBmp, star);
+                        m_VideoController.UpdateZoomedImage(zoomedBmp, star, zoomPixelmap);
                     }
                     else
                     {

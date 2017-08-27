@@ -662,7 +662,7 @@ namespace Tangra
 
 		private void miTools_DropDownOpening(object sender, EventArgs e)
 		{
-			miFrameStatusData.Checked = m_VideoController.IsAdvStatusFormVisible || m_VideoController.IsAavStatusFormVisible;
+            miFrameStatusData.Checked = m_VideoController.IsAdvStatusFormVisible || m_VideoController.IsAavStatusFormVisible || m_VideoController.IsFitsStatusFormVisible;
 		    miTargetPSFViewer.Checked = m_VideoController.IsTargetPSFViewerFormVisible;
 		}
 

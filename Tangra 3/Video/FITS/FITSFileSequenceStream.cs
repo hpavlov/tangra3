@@ -37,12 +37,12 @@ namespace Tangra.Video.FITS
 	        return rv;
         }
 
-        private FITSFileSequenceStream(string[] fitsFiles, IFITSTimeStampReader timeStampReader, bool zeroOutNegativeValues, int firstFrameNo, out bool hasNegativePixels)
+        private FITSFileSequenceStream(string[] fitsFiles, IFITSTimeStampReader timeStampReader, bool zeroOutNegativeValues, int firstFrame, out bool hasNegativePixels)
         {
             m_FitsFilesList.AddRange(fitsFiles);
 
-            FirstFrame = firstFrameNo;
-            LastFrame = m_FitsFilesList.Count - 1;
+            FirstFrame = firstFrame;
+            LastFrame = m_FitsFilesList.Count - 1 + firstFrame;
             CountFrames = m_FitsFilesList.Count;
             m_ZeroOutNegativePixels = zeroOutNegativeValues;
             m_TimeStampReader = timeStampReader;
@@ -95,7 +95,7 @@ namespace Tangra.Video.FITS
         public string GetFrameFileName(int index)
         {
             if (index >= 0 && index < m_FitsFilesList.Count)
-                return Path.GetFileName(m_FitsFilesList[index]);
+                return Path.GetFileName(m_FitsFilesList[index - FirstFrame]);
 
             return null;
         }
@@ -119,7 +119,7 @@ namespace Tangra.Video.FITS
 
             var cards = new Dictionary<string, string>();
 
-            FITSHelper.Load16BitFitsFile(m_FitsFilesList[index], m_TimeStampReader, m_ZeroOutNegativePixels,
+            FITSHelper.Load16BitFitsFile(m_FitsFilesList[index - FirstFrame], m_TimeStampReader, m_ZeroOutNegativePixels,
                 (hdu) =>
                 {
                     var cursor = hdu.Header.GetCursor();

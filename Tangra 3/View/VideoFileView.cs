@@ -106,8 +106,10 @@ namespace Tangra.View
 			m_MainForm.btn1FrPlus.Enabled = TangraContext.Current.HasVideoLoaded && TangraContext.Current.CanScrollFrames;
             m_MainForm.btn1SecMinus.Enabled = TangraContext.Current.HasVideoLoaded && TangraContext.Current.CanScrollFrames && !TangraContext.Current.UndefinedFrameRate;
             m_MainForm.btn1SecPlus.Enabled = TangraContext.Current.HasVideoLoaded && TangraContext.Current.CanScrollFrames && !TangraContext.Current.UndefinedFrameRate;
-			
-			m_MainForm.miFrameStatusData.Enabled = TangraContext.Current.HasVideoLoaded && (TangraContext.Current.UsingADV || TangraContext.Current.IsSerFile);
+
+            m_MainForm.miFrameStatusData.Enabled = TangraContext.Current.HasVideoLoaded && (TangraContext.Current.UsingADV || TangraContext.Current.IsSerFile || TangraContext.Current.IsFitsStream);
+		    if (TangraContext.Current.IsFitsStream) m_MainForm.miFrameStatusData.Text = "FITS &Header Viewer"; 
+            else m_MainForm.miFrameStatusData.Text = "Frame &Data Viewer";
 			m_MainForm.tsbtnIntensify.Visible = TangraContext.Current.HasVideoLoaded;
 			m_MainForm.miTargetPSFViewer.Enabled = TangraContext.Current.HasVideoLoaded;
             m_MainForm.miIntegrationDetection.Enabled = TangraContext.Current.HasVideoLoaded && !TangraContext.Current.UsingADV && !TangraContext.Current.IsSerFile;

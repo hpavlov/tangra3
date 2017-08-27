@@ -625,7 +625,7 @@ namespace Tangra.VideoOperations.LightCurves
                 {
                     DateTime? frame1 = m_Header.GetFrameTime(m_MinDisplayedFrame);
 
-                    for (uint i = m_MinDisplayedFrame + 1; i < m_MaxDisplayedFrame; i++)
+                    for (uint i = m_MinDisplayedFrame; i < m_MaxDisplayedFrame; i++)
                     {
                         DateTime? frame2 = m_Header.GetFrameTime(i + 1);
 

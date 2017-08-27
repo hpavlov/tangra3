@@ -36,7 +36,6 @@ namespace Tangra.Controller
 		private LCFile m_lcFile = null;
 
 		private LightCurveContext m_Context;
-        private int m_FrameNoCorr;
 
         public LightCurveController(Form mainFormView, VideoController videoController, AddinsController addinsController)
         {
@@ -49,7 +48,7 @@ namespace Tangra.Controller
 
         public void MoveToFrameNoIntegrate(int selectedFrameNo)
         {
-            m_VideoController.MoveToFrame(m_FrameNoCorr + selectedFrameNo);
+            m_VideoController.MoveToFrame(selectedFrameNo);
         }
 
         public void LoadLightCurve()
@@ -174,9 +173,8 @@ namespace Tangra.Controller
                         ((string[])videoFile).Length > 0)
                     {
                         var fitsFiles = (string[])videoFile;
-                        if (m_VideoController.OpenFitsFileSequence(Path.GetDirectoryName(fitsFiles[0]), fitsFiles, new LCFITSTimeStampReader(lcFile)))
+                        if (m_VideoController.OpenFitsFileSequence(Path.GetDirectoryName(fitsFiles[0]), fitsFiles, new LCFITSTimeStampReader(lcFile), (int)lcFile.Data[0][0].CurrFrameNo))
                         {
-                            m_FrameNoCorr = -1 * (int)lcFile.Data[0][0].CurrFrameNo;
                             TangraContext.Current.CanPlayVideo = false;
                             if (lcFile.Footer.FitsDynamicFromValue != -1 && lcFile.Footer.FitsDynamicToValue != -1)
                                 m_VideoController.SetDisplayIntensifyMode(DisplayIntensifyMode.Dynamic, lcFile.Footer.FitsDynamicFromValue, lcFile.Footer.FitsDynamicToValue);
