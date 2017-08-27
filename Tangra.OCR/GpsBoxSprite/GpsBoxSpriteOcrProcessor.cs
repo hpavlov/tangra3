@@ -80,6 +80,8 @@ namespace Tangra.OCR.GpsBoxSprite
 
         private double m_UnrecognSignPerc = double.NaN;
 
+        internal bool InitSuccess { get; private set; }
+
         public GpsBoxSpriteOcrProcessor(List<OcrCalibrationFrame> calibrationFrames, Tuple<int, int>[] topBottoms, Tuple<decimal, decimal>[] leftWidths, int frameWidth, int frameHeight)
         {
             m_FrameWidth = frameWidth;
@@ -88,23 +90,22 @@ namespace Tangra.OCR.GpsBoxSprite
             if (topBottoms.Length == 2)
             {
                 if (IsToLineConfiguration(calibrationFrames, topBottoms))
+                {
                     CreateTwoLineConfiguration(topBottoms, leftWidths);
+                    InitSuccess = true;
+
+                    m_CalibrationFrames.AddRange(calibrationFrames);
+
+                    foreach (var configFrame in calibrationFrames)
+                        ExtractBlockNumbers(configFrame.ProcessedPixels);
+
+
+                    m_Signatures.Clear();
+                    var allBlocks = m_CalibrationBlocks.Select(x => x.Item1).Union(m_CalibrationBlocks.Select(x => x.Item2)).ToList();
+                    CategorizeInitialCalibrationBlocks(allBlocks);
+                    AttemptCalibration();
+                }
             }
-            else
-            {
-                return;
-            }
-
-            m_CalibrationFrames.AddRange(calibrationFrames);
-
-            foreach (var configFrame in calibrationFrames)
-                ExtractBlockNumbers(configFrame.ProcessedPixels);
-
-
-            m_Signatures.Clear();
-            var allBlocks = m_CalibrationBlocks.Select(x => x.Item1).Union(m_CalibrationBlocks.Select(x => x.Item2)).ToList();
-            CategorizeInitialCalibrationBlocks(allBlocks);
-            AttemptCalibration();
         }
 
         private void AttemptCalibration()
@@ -745,8 +746,8 @@ namespace Tangra.OCR.GpsBoxSprite
         {
             var twoLineSamples = lineConfigs.Select(x => x.DetectedOsdLines).Where(x => x != null && x.Length == 2);
             
-            var line1Samples = twoLineSamples.SelectMany(x => x).Where(x => x.Top - topBottoms[0].Item1 < x.BoxHeight / 3).ToArray();
-            var line2Samples = twoLineSamples.SelectMany(x => x).Where(x => x.Top - topBottoms[1].Item1 < x.BoxHeight / 3).ToArray();
+            var line1Samples = twoLineSamples.SelectMany(x => x).Where(x => Math.Abs(x.Top - topBottoms[0].Item1) < x.BoxHeight / 3).ToArray();
+            var line2Samples = twoLineSamples.SelectMany(x => x).Where(x => Math.Abs(x.Top - topBottoms[1].Item1) < x.BoxHeight / 3).ToArray();
 
             double line1Score = 0;
             for (int i = 0; i < TWOLINE_LINE1_INDEXES.Length; i++)

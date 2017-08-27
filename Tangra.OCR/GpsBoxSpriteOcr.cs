@@ -207,7 +207,20 @@ namespace Tangra.OCR
 
                         widthList.Sort();
                         widthList = widthList.Skip(1).Take(widthList.Count - 2).ToList();
+                        
+                        if (widthList.Count >= 10)
+                        {
+                            // If we have at least 10 samples and most are around the median, then remove outliers
+                            var medianWidth = widthList.Median();
+                            var medianWidthSigma = (decimal)Math.Sqrt((double)widthList.Select(x => (x - medianWidth) * (x - medianWidth)).Sum() / (leftList.Count - 1));
+                            var aroundMedianList = widthList.Where(x => Math.Abs(x - medianWidth) < medianWidthSigma).ToList();
+                            if (aroundMedianList.Count*1.0/widthList.Count > 0.75)
+                            {
+                                widthList = aroundMedianList;
+                            }
+                        }
                     }
+
                     var averageLeft = leftList.Average();
                     var averageWidth = widthList.Average();
 
@@ -230,10 +243,15 @@ namespace Tangra.OCR
             if (m_OsdLineVerticals != null && m_OsdBlocksLeftAndWidth != null)
             {
                 if (m_Processor == null)
-                    TryInitializeProcessor();
+                {
+                    var goodCalibrationFrames = m_CalibrationFrames.Where(x => IsGoodCalibrationFrame(x)).ToList();
+                    TryInitializeProcessor(goodCalibrationFrames);
+                }
                 else
-                    m_Processor.ProcessCalibrationFrame(calibFrame);
-
+                {
+                    if (IsGoodCalibrationFrame(calibFrame)) 
+                        m_Processor.ProcessCalibrationFrame(calibFrame);
+                }
                 if (m_Processor != null && m_Processor.IsCalibrated)
                 {
                     m_TimeStampComposer = new VtiTimeStampComposer(m_Processor.VideoFormat, m_InitializationData.IntegratedAAVFrames, m_Processor.EvenBeforeOdd, m_Processor.DuplicatedFields, m_VideoController, this, () => m_Processor.CurrentImage);
@@ -243,6 +261,23 @@ namespace Tangra.OCR
             }
 
             return false;
+        }
+
+        private bool IsGoodCalibrationFrame(OcrCalibrationFrame frame)
+        {
+            if (m_OsdLineVerticals == null || m_OsdBlocksLeftAndWidth == null)
+                return false;
+
+            // Good calibration frame needs to contain all lines at the correct vertical position
+            if (!m_OsdLineVerticals.All(cfg => frame.DetectedOsdLines.Any(x => x.Top - cfg.Item1 < x.BoxHeight / 3)))
+                return false;
+
+            var verticallyPositionedLines = frame.DetectedOsdLines.Where(x => m_OsdLineVerticals.Any(cfg => Math.Abs(x.Top - cfg.Item1) < x.BoxHeight / 3)).ToArray();
+
+            frame.DetectedOsdLines = verticallyPositionedLines;
+
+            // Good calibration frame needs to have its box width be very close to the accepted box width
+            return verticallyPositionedLines.All(x => Math.Abs(x.BoxWidth - m_OsdBlocksLeftAndWidth[0].Item2) < 1.0M);
         }
 
         public void PrepareFailedCalibrationReport()
@@ -480,7 +515,7 @@ namespace Tangra.OCR
             return preProcessedPixels;
         }
 
-        private void TryInitializeProcessor()
+        private void TryInitializeProcessor(List<OcrCalibrationFrame> goodCalibrationFrames)
         {
             InitiazliationError = null;
 
@@ -494,7 +529,9 @@ namespace Tangra.OCR
 
                 try
                 {
-                    m_Processor = new GpsBoxSpriteOcrProcessor(m_CalibrationFrames, m_OsdLineVerticals, m_OsdBlocksLeftAndWidth, m_ImageWidth, m_ImageHeight);
+                    m_Processor = new GpsBoxSpriteOcrProcessor(goodCalibrationFrames, m_OsdLineVerticals, m_OsdBlocksLeftAndWidth, m_ImageWidth, m_ImageHeight);
+                    if (!m_Processor.InitSuccess)
+                        m_Processor = null;
                 }
                 catch (Exception ex)
                 {
@@ -826,6 +863,7 @@ namespace Tangra.OCR
 
             if (osdLineVerticals == null || osdLineVerticals.Length == 0)
             {
+                #region Detect Lines
                 var detectedOsdLines = new List<OsdLineConfig>();
                 var candidates = DetermineOsdLineVerticals(data, minWhiteLevel);
 
@@ -865,14 +903,15 @@ namespace Tangra.OCR
                     bucketData.Add(cfg);
                     weightedConfigs[bucketKeys] = bucketData;
                 }
-                
+
                 foreach (var kvp in weightedConfigs)
                 {
                     var maxScore = kvp.Value.Max(x => x.FullnessScore);
                     selectedOsdLines.Add(kvp.Value.FirstOrDefault(x => x.FullnessScore == maxScore));
                 }
-            }
-            else if (osdLineLeftAndWidths == null)
+                #endregion
+            }            
+            else
             {
                 var confirmedOsdLinesInFrame = new List<Tuple<decimal, decimal, decimal, decimal>>();
                 foreach (var osdLine in osdLineVerticals)
@@ -883,12 +922,8 @@ namespace Tangra.OCR
                 if (confirmedOsdLinesInFrame.Count > 0)
                 {
                     var osdLineConfigs = RefineOsdLinePositions(subPixelData, confirmedOsdLinesInFrame.ToArray(), minWhiteLevel);
-                    if (osdLineConfigs != null) selectedOsdLines.AddRange(osdLineConfigs);                    
+                    if (osdLineConfigs != null) selectedOsdLines.AddRange(osdLineConfigs);
                 }
-            }
-            else
-            {
-                selectedOsdLines = new List<OsdLineConfig>();
             }
 
             return new OcrCalibrationFrame()
