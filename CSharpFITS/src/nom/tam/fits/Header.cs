@@ -1095,9 +1095,21 @@ namespace nom.tam.fits
         public virtual HeaderCard FindCard(String key)
         {
           HeaderCard card = (HeaderCard)cards[key];
-          if(card != null)
+          if (card != null)
           {
-            cursor.Key = key;
+              cursor.Key = key;
+          }
+          else
+          {
+              foreach (object cardKey in cards.Keys)
+              {
+                  if (((HeaderCard)cards[cardKey]).Key == key)
+                  {
+                      card = (HeaderCard)cards[cardKey];
+                      cursor.Key = cardKey;
+                      break;
+                  }
+              }
           }
           return card;
         }

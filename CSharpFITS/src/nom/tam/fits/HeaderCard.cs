@@ -302,14 +302,16 @@ namespace nom.tam.fits
             // change suggested in .97 version:
             // Non-key/value pair lines are treated as keyed comments
             if (key.Equals("COMMENT") || key.Equals("HISTORY") ||
-                !card.Substring(8, (10) - (8)).Equals("= "))
+                !card.Substring(8, (10) - (9)).Equals("="))
 			{
 				comment = card.Substring(8).Trim();
 				return ;
 			}
-			
+
+            var valPos = card.Substring(8, (10) - (8)).Equals("= ") ? 10 : 9;
+
 			// extract the value/comment part of the string
-			String valueAndComment = card.Substring(10).Trim();
+            String valueAndComment = card.Substring(valPos).Trim();
 			
 			// If there is no value/comment part, we are done.
 			if (valueAndComment.Length == 0)
