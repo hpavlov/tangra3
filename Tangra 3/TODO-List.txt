@@ -15,6 +15,9 @@ Features:
 
   - Make it possible to Zoom the main image with factors of 0.5 to 2.0.
   - Make it possible to vertical flip when doing photometry. In the more generic case - make it possible for all pre-processing (defects, flips, brightness/contrast etc) to be done before any operation
+  - Make it possible to crop FITS files into smaller size frames
+  - Make it possible to define a background area not in an annulus but in an arbitraty location
+  - Add support for FITS cubes
 
   ?) Make it possible to select 2 locations on the light curve (the D and R datapoint) 
   ?) Make it possible to display both the D and R frame number and times on the LightCurve form  
