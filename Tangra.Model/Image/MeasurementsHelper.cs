@@ -220,8 +220,7 @@ namespace Tangra.Model.Image
                     if (GetImagePixelsCallback != null)
                     {
                         backgroundArea = GetImagePixelsCallback(x0Int, y0Int, 71);
-                        side = 34;
-                        offset = (71 - side) / 2;
+                        offset += 17;
                     }
                     double bgFromAnnulus = GetBackground(backgroundArea, m_Aperture, m_XCenter + offset, m_YCenter + offset, bgAnnulusFactor);
 		            m_TotalBackground = (uint) Math.Round(m_TotalPixels*(float) bgFromAnnulus);

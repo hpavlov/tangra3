@@ -2,7 +2,7 @@
 ---------------------
 vNext (UNRELEASED)
 - Made it possible to mask a contaminated area of the video, e.g. trees or defects, so it doesn't interfere with astrometry.
-
+- Fixed a problem with the computation of Average Background, which may return biased values if very brights objects are between 17 and 35 pixels away.
 
 v3.6.7 (2017-07-20)
 - Fixed a problem where IOTA-VTI OCR would return the timestamp from the 'wrong' field if field numbers are not read correctly.
