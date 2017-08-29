@@ -1428,6 +1428,17 @@ namespace Tangra
         {
             bool debugOCR = Control.ModifierKeys == Keys.Control;
 
+            if (m_VideoController.ShowMessageBox(
+                    "This function can be used to test existing OCR functionality with your videos. Follow these steps:\r\n\r\n" + 
+                     "* Select the OCR engine and if it fails to initialise then send an error report when suggested.\r\n" +
+                     "* Press 'Play' and wait until the whole video has finished playing with every frame OCR-ed.\r\n" + 
+                     "* Compare the displayed OCR-ed timestamp of the last frame at the top right with the actual timestamp in the video. If the test was successful they should match.\r\n" +
+                     "* Record the 'Total Score' in percentage reported at the top.\r\n" + 
+                     "* If the Total Score is too low or there are too many OCR errors then report the issue.\r\n\r\n" + 
+                     "Press 'OK' to begin the test or 'Cancel' to exit.", 
+                    "Timestamp OCR Validator", MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.Cancel)
+                return;
+
             m_VideoController.InitializeTimestampOCR();
 
             if (m_VideoController.HasTimestampOCR())
