@@ -676,7 +676,7 @@ namespace Tangra
 			{
 				m_VideoController.ToggleSerStatusForm();
 			}
-            else if (m_VideoController.IsFitsSequence)
+            else if (m_VideoController.IsFitsSequence || m_VideoController.IsFitsFile)
             {
                 m_VideoController.ToggleFitsStatusForm();
             }
@@ -1079,7 +1079,7 @@ namespace Tangra
         private void miOpenFitsSequence_Click(object sender, EventArgs e)
         {
 	        var frm = new frmChooseFitsFolder();
-	        frm.tbxFolderPath.Text = TangraConfig.Settings.LastUsed.FitsSeqenceLastFolderLocation;
+            frm.SelectedFolderPath = TangraConfig.Settings.LastUsed.FitsSeqenceLastFolderLocation;
             bool retry = true;
             while (retry)
             {
@@ -1088,10 +1088,10 @@ namespace Tangra
                 {
                     m_VideoController.CloseOpenedVideoFile();
 
-                    if (m_VideoController.OpenFitsFileSequence(frm.tbxFolderPath.Text) ||
-                        (Control.ModifierKeys == Keys.Control && m_VideoController.OpenBitmapFileSequence(frm.tbxFolderPath.Text)))
+                    if (m_VideoController.OpenFitsFileSequence(frm.SelectedFolderPath) ||
+                        (Control.ModifierKeys == Keys.Control && m_VideoController.OpenBitmapFileSequence(frm.SelectedFolderPath)))
                     {
-                        TangraConfig.Settings.LastUsed.FitsSeqenceLastFolderLocation = frm.tbxFolderPath.Text;
+                        TangraConfig.Settings.LastUsed.FitsSeqenceLastFolderLocation = frm.SelectedFolderPath;
                         TangraConfig.Settings.Save();
 
                         if (tsmiDynamic.Checked)

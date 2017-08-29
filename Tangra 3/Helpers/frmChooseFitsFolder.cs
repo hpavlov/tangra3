@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Model.Config;
 
 namespace Tangra.Helpers
 {
@@ -21,13 +22,32 @@ namespace Tangra.Helpers
 			InitializeComponent();
 		}
 
+        public string SelectedFolderPath
+        {
+            get { return cbxFolderPath.Text; }
+            set { cbxFolderPath.Text = value; }
+        }
+
 		private void btnBrowseForFolder_Click(object sender, EventArgs e)
 		{
-			if (Directory.Exists(tbxFolderPath.Text))
-				openFitsSequenceDialog.SelectedPath = tbxFolderPath.Text;
+			if (Directory.Exists(cbxFolderPath.Text))
+                openFitsSequenceDialog.SelectedPath = cbxFolderPath.Text;
 
 			if (openFitsSequenceDialog.ShowDialog(this) == DialogResult.OK)
-				tbxFolderPath.Text = openFitsSequenceDialog.SelectedPath;
+                cbxFolderPath.Text = openFitsSequenceDialog.SelectedPath;
 		}
+
+	    private void frmChooseFitsFolder_Load(object sender, EventArgs e)
+	    {
+	        cbxFolderPath.Items.Clear();
+
+	        foreach (string recentFilePath in TangraConfig.Settings.RecentFiles.Lists[RecentFileType.FitsSequence])
+	        {
+	            if (Directory.Exists(recentFilePath))
+	            {
+	                cbxFolderPath.Items.Add(recentFilePath);
+	            }
+	        }
+	    }
 	}
 }

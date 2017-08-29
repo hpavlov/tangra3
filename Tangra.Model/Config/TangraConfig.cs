@@ -58,7 +58,8 @@ namespace Tangra.Model.Config
 		Video,
 		LightCurve,
 		MPCReport,
-		Spectra
+		Spectra,
+        FitsSequence
 	}
 
 	public class RecentFilesConfig
@@ -70,6 +71,7 @@ namespace Tangra.Model.Config
 			Lists.Add(RecentFileType.LightCurve, new List<string>());
 			Lists.Add(RecentFileType.MPCReport, new List<string>());
 			Lists.Add(RecentFileType.Spectra, new List<string>());
+            Lists.Add(RecentFileType.FitsSequence, new List<string>());
         }
 
 		internal RecentFilesConfig(RecentFilesConfig copyFrom)
@@ -81,6 +83,7 @@ namespace Tangra.Model.Config
 				Lists[RecentFileType.LightCurve].AddRange(copyFrom.Lists[RecentFileType.LightCurve]);
 				Lists[RecentFileType.MPCReport].AddRange(copyFrom.Lists[RecentFileType.MPCReport]);
 				Lists[RecentFileType.Spectra].AddRange(copyFrom.Lists[RecentFileType.Spectra]);
+                Lists[RecentFileType.FitsSequence].AddRange(copyFrom.Lists[RecentFileType.FitsSequence]);
 			}
 		}
 
@@ -105,6 +108,7 @@ namespace Tangra.Model.Config
 			Lists[RecentFileType.LightCurve].Clear();
 			Lists[RecentFileType.MPCReport].Clear();
 			Lists[RecentFileType.Spectra].Clear();
+            Lists[RecentFileType.FitsSequence].Clear();
 
 			string[] lines = savedContent.Split('\n');
 			foreach(string line in lines)
@@ -153,6 +157,7 @@ namespace Tangra.Model.Config
 				Lists[RecentFileType.LightCurve].Clear();
 				Lists[RecentFileType.MPCReport].Clear();
 				Lists[RecentFileType.Spectra].Clear();
+                Lists[RecentFileType.FitsSequence].Clear();
 			}
 		}	
 	}

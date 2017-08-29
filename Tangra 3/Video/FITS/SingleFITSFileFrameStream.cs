@@ -7,10 +7,12 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using nom.tam.fits;
 using Tangra.Controller;
 using Tangra.Helpers;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
+using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.Model.Video;
 using Tangra.Model.VideoOperations;
@@ -36,6 +38,8 @@ namespace Tangra.Video.FITS
         private uint m_MinPixelValue;
         private uint m_MaxPixelValue;
 
+        private Dictionary<string, string> m_Cards = new Dictionary<string, string>();
+
         public static SingleFITSFileFrameStream OpenFile(string fileName, bool zeroOutNegativePixels, out bool hasNegativePixels)
 		{
 			uint[] pixelsFlat;
@@ -47,14 +51,31 @@ namespace Tangra.Video.FITS
 		    uint minPixelValue;
             uint maxPixelValue;
 
-            FITSHelper.Load16BitFitsFile(fileName, null, zeroOutNegativePixels, null, out pixelsFlat, out width, out height, out bpp, out timestamp, out exposure, out minPixelValue, out maxPixelValue, out hasNegativePixels);
+            var cards = new Dictionary<string, string>();
+
+            FITSHelper.Load16BitFitsFile(fileName, null, zeroOutNegativePixels, 
+                (hdu) =>
+                {
+                    var cursor = hdu.Header.GetCursor();
+                    while (cursor.MoveNext())
+                    {
+                        HeaderCard card = hdu.Header.FindCard((string)cursor.Key);
+                        if (card != null && !string.IsNullOrWhiteSpace(card.Key) && card.Key != "END")
+                        {
+                            if (cards.ContainsKey(card.Key))
+                                cards[card.Key] += "\r\n" + card.Value;
+                            else
+                                cards.Add(card.Key, card.Value);                        
+                        }                            
+                    }
+                }, out pixelsFlat, out width, out height, out bpp, out timestamp, out exposure, out minPixelValue, out maxPixelValue, out hasNegativePixels);
 
 		    TangraContext.Current.RenderingEngine = SINGLE_FITS_FILE_ENGINE;
 
-            return new SingleFITSFileFrameStream(pixelsFlat, width, height, bpp, exposure, minPixelValue, maxPixelValue);
+            return new SingleFITSFileFrameStream(pixelsFlat, width, height, bpp, exposure, minPixelValue, maxPixelValue, cards);
 		}
 
-		private SingleFITSFileFrameStream(uint[] flatPixels, int width, int height, int bpp, double? exposure, uint minPixelValue, uint maxPixelValue)
+		private SingleFITSFileFrameStream(uint[] flatPixels, int width, int height, int bpp, double? exposure, uint minPixelValue, uint maxPixelValue, IDictionary<string, string> cards)
 		{
 			m_FlatPixels = flatPixels;
 			m_Width = width;
@@ -68,6 +89,9 @@ namespace Tangra.Video.FITS
 
 		    m_MinPixelValue = minPixelValue;
 		    m_MaxPixelValue = maxPixelValue;
+
+            if (cards != null)
+                foreach (var kvp in cards) m_Cards.Add(kvp.Key, kvp.Value);
 		}
 
 		#region IFrameStream Members
@@ -149,6 +173,13 @@ namespace Tangra.Video.FITS
 
 			Pixelmap rv = new Pixelmap(m_Width, m_Height, m_Bpp, flatPixelsCopy, displayBitmap, displayBitmapBytes);
 		    rv.UnprocessedPixels = m_FlatPixels;
+
+		    if (m_Cards != null && m_Cards.Count > 0)
+		    {
+                rv.FrameState.AdditionalProperties = new SafeDictionary<string, object>();
+                foreach (string key in m_Cards.Keys)
+                    rv.FrameState.AdditionalProperties.Add(key, m_Cards[key]);		        
+		    }
 
 			return rv;
 		}

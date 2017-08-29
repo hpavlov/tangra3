@@ -127,7 +127,12 @@ namespace Tangra.Video.FITS
                     {
                         HeaderCard card = hdu.Header.FindCard((string)cursor.Key);
                         if (card != null && !string.IsNullOrWhiteSpace(card.Key) && card.Key != "END")
-                            cards.Add(card.Key, card.Value);                        
+                        {
+                            if (cards.ContainsKey(card.Key))
+                                cards[card.Key] += "\r\n" + card.Value;
+                            else
+                                cards.Add(card.Key, card.Value);
+                        }                        
                     }
                 },
                 out pixelsFlat, out width, out height, out bpp, out timestamp, out exposure, out minPixelValue, out maxPixelValue, out hasNegativePixels);

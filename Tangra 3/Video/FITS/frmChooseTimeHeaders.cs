@@ -314,11 +314,15 @@ namespace Tangra.Video.FITS
                 }
             }
 
-            cbxTimeStampFormat.SelectedIndex = cbxTimeStampFormat.Items.IndexOf(config.TimeStampFormat);
+            if (config.TimeStampFormat != null)
+                cbxTimeStampFormat.SelectedIndex = cbxTimeStampFormat.Items.IndexOf(config.TimeStampFormat);
+
             if (cbxTimeStampFormat.SelectedIndex == -1)
                 cbxTimeStampFormat.Text = config.TimeStampFormat;
 
-            cbxTimeStamp2Format.SelectedIndex = cbxTimeStamp2Format.Items.IndexOf(config.TimeStamp2Format);
+            if (config.TimeStamp2Format != null)
+                cbxTimeStamp2Format.SelectedIndex = cbxTimeStamp2Format.Items.IndexOf(config.TimeStamp2Format);
+
             if (cbxTimeStamp2Format.SelectedIndex == -1)
                 cbxTimeStamp2Format.Text = config.TimeStamp2Format;
 

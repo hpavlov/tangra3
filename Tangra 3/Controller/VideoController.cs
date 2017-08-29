@@ -501,13 +501,13 @@ namespace Tangra.Controller
                 {
                     ToggleSerStatusForm(true);
                 }
-                else if (IsFitsSequence && !IsFitsStatusFormVisible)
+                else if ((IsFitsSequence || IsFitsFile) && !IsFitsStatusFormVisible)
                 {
                     ToggleFitsStatusForm(true);
                 }
 
 				if (!string.IsNullOrEmpty(fileName))
-					RegisterRecentFile(RecentFileType.Video, fileName);
+                    RegisterRecentFile(IsFitsSequence ? RecentFileType.FitsSequence : RecentFileType.Video, fileName);
 
 				m_ImageTool = ImageTool.SwitchTo<ArrowTool>(null, m_ImageToolView, m_ImageTool);
                 m_AddinsController.SetFileInfoProvider(this);
@@ -1266,6 +1266,11 @@ namespace Tangra.Controller
 	    {
 			get { return m_FramePlayer.Video.Engine == "FITS-SEQ"; }
 	    }
+
+        public bool IsFitsFile
+        {
+            get { return m_FramePlayer.Video.Engine == SingleFITSFileFrameStream.SINGLE_FITS_FILE_ENGINE; }
+        }
 
         public bool SupportsSoftwareIntegration
         {
