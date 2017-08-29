@@ -1,8 +1,11 @@
 ﻿Tangra3 Release Notes
 ---------------------
-vNext (UNRELEASED)
+v3.6.8 (2017-08-29)
+- Added timestamp OCR reader for GPS-BOX-SPRITE video time inserter.
 - Made it possible to mask a contaminated area of the video, e.g. trees or defects, so it doesn't interfere with astrometry.
-- Fixed a problem with the computation of Average Background, which may return biased values if very brights objects are between 17 and 35 pixels away.
+- Fixed a problem with the computation of Average Background which may return biased values if very brights objects are nearby. The problem was mostly noticable in 16-bit videos and FITS sequences.
+- A number of improvements to the handling of FITS sequences and various non-standard or malformed FITS header values.
+- Now maintaining a list of recently viewed FITS sequences, similarly to the recent video files menu item.
 
 v3.6.7 (2017-07-20)
 - Fixed a problem where IOTA-VTI OCR would return the timestamp from the 'wrong' field if field numbers are not read correctly.
