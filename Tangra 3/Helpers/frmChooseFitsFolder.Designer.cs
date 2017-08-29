@@ -41,9 +41,9 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(13, 12);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(299, 13);
+            this.label1.Size = new System.Drawing.Size(202, 13);
             this.label1.TabIndex = 1;
-            this.label1.Text = "Path to the folder containing FITS exposures ordered by name";
+            this.label1.Text = "Path to the folder containing FITS images";
             // 
             // btnBrowseForFolder
             // 
