@@ -47,7 +47,7 @@
             // 
             // btnBrowseForFolder
             // 
-            this.btnBrowseForFolder.Location = new System.Drawing.Point(382, 31);
+            this.btnBrowseForFolder.Location = new System.Drawing.Point(467, 33);
             this.btnBrowseForFolder.Name = "btnBrowseForFolder";
             this.btnBrowseForFolder.Size = new System.Drawing.Size(33, 23);
             this.btnBrowseForFolder.TabIndex = 2;
@@ -58,7 +58,7 @@
             // btnOK
             // 
             this.btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btnOK.Location = new System.Drawing.Point(127, 66);
+            this.btnOK.Location = new System.Drawing.Point(167, 66);
             this.btnOK.Name = "btnOK";
             this.btnOK.Size = new System.Drawing.Size(75, 23);
             this.btnOK.TabIndex = 3;
@@ -68,7 +68,7 @@
             // btnCancel
             // 
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(208, 66);
+            this.btnCancel.Location = new System.Drawing.Point(248, 66);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 4;
@@ -86,14 +86,14 @@
             this.cbxFolderPath.FormattingEnabled = true;
             this.cbxFolderPath.Location = new System.Drawing.Point(12, 33);
             this.cbxFolderPath.Name = "cbxFolderPath";
-            this.cbxFolderPath.Size = new System.Drawing.Size(362, 21);
+            this.cbxFolderPath.Size = new System.Drawing.Size(449, 21);
             this.cbxFolderPath.TabIndex = 5;
             // 
             // frmChooseFitsFolder
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(433, 101);
+            this.ClientSize = new System.Drawing.Size(512, 101);
             this.Controls.Add(this.cbxFolderPath);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOK);

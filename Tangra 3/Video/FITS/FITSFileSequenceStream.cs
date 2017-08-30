@@ -8,6 +8,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using nom.tam.fits;
 using Tangra.Helpers;
 using Tangra.Model.Config;
@@ -40,6 +41,10 @@ namespace Tangra.Video.FITS
         private FITSFileSequenceStream(string[] fitsFiles, IFITSTimeStampReader timeStampReader, bool zeroOutNegativeValues, int firstFrame, out bool hasNegativePixels)
         {
             m_FitsFilesList.AddRange(fitsFiles);
+
+            var firstNumeredFrameNo = GetFirstImageNumberOfConsistentlyNamedFiles();
+            if (firstFrame == 0 && firstNumeredFrameNo.HasValue)
+                firstFrame = firstNumeredFrameNo.Value;
 
             FirstFrame = firstFrame;
             LastFrame = m_FitsFilesList.Count - 1 + firstFrame;
@@ -98,6 +103,32 @@ namespace Tangra.Video.FITS
                 return Path.GetFileName(m_FitsFilesList[index - FirstFrame]);
 
             return null;
+        }
+
+        private static Regex NUMBERED_FITS_FILE = new Regex(@"(\d+)$", RegexOptions.Singleline | RegexOptions.Compiled);
+
+        private int? GetFirstImageNumberOfConsistentlyNamedFiles()
+        {
+            int? firstFrameNo = null;
+            int prevFrameNo = -1;
+            foreach (string fileName in m_FitsFilesList)
+            {
+                var fileNameOnly = Path.GetFileNameWithoutExtension(fileName);
+                var match = NUMBERED_FITS_FILE.Match(fileNameOnly);
+                if (!match.Success)
+                    return null;
+                int thisFrameNo = int.Parse(match.Groups[1].Value);
+                if (firstFrameNo == null)
+                {
+                    firstFrameNo = thisFrameNo;
+                }
+                else if (prevFrameNo + 1 != thisFrameNo)
+                    return null;
+
+                prevFrameNo = thisFrameNo;
+            }
+
+            return firstFrameNo;
         }
 
         public bool SupportsFrameFileNames
