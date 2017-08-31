@@ -28,13 +28,15 @@ namespace Tangra.ImageTools
             ResizingTopLeft,
             ResizingBottomRight,
             ResizingTopRight,
-            ResizingBottomLeft
+            ResizingBottomLeft,
+            Moving
         }
 
 	    protected VideoController m_VideoController;
 
         private static int s_FrameWidth = 3;
         private bool m_DraggingCorner;
+        private Point m_MoveShift;
 
 		private string m_DisplayText;
         
@@ -203,6 +205,14 @@ namespace Tangra.ImageTools
                         m_StateTransition = SizerState.ResizingRight;
                     }
                 }
+                else if (x1 > s_FrameWidth && x1 < m_UserFrame.Width - s_FrameWidth && y1 > s_FrameWidth && y1 < m_UserFrame.Height - s_FrameWidth)
+                {
+                    if (m_StateTransition != SizerState.Moving)
+                    {
+                        m_VideoController.SetPictureBoxCursor(Cursors.SizeAll);
+                        m_StateTransition = SizerState.Moving;
+                    }
+                }
                 else
                 {
                     if (m_StateTransition != SizerState.Normal)
@@ -265,6 +275,20 @@ namespace Tangra.ImageTools
 				{
                     m_UserFrame.Width = posX - m_UserFrame.Left;
 				}
+                else if (m_State == SizerState.Moving)
+                {
+                    var xx = posX - m_MoveShift.X;
+                    var yy = posY - m_MoveShift.Y;
+
+                    m_UserFrame.X = Math.Min(TangraContext.Current.FrameWidth - m_UserFrame.Width - 1, Math.Max(0, xx));
+                    m_UserFrame.Y = Math.Min(TangraContext.Current.FrameHeight - m_UserFrame.Height - 1, Math.Max(0, yy));
+
+                    if (xx < 0 || xx > TangraContext.Current.FrameWidth - m_UserFrame.Width)
+                        m_MoveShift.X = Math.Min(m_UserFrame.Width - 1, Math.Max(0, location.X - m_UserFrame.X));
+
+                    if (yy < 0 || yy > TangraContext.Current.FrameHeight - m_UserFrame.Height)
+                        m_MoveShift.Y = Math.Min(m_UserFrame.Height - 1, Math.Max(0, location.Y - m_UserFrame.Y));
+                }
 
 				TriggerRedraw();
 			}
@@ -278,6 +302,7 @@ namespace Tangra.ImageTools
             {
                 m_DraggingCorner = true;
                 m_State = m_StateTransition;
+                m_MoveShift = new Point(location.X - m_UserFrame.X, location.Y - m_UserFrame.Y);
 
 	            TriggerRedraw();
             }
