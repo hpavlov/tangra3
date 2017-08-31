@@ -13,6 +13,7 @@ using System.Windows.Forms;
 using Tangra.Controller;
 using Tangra.Helpers;
 using Tangra.ImageTools;
+using Tangra.Model.Config;
 using Tangra.Model.Context;
 using Tangra.Model.VideoOperations;
 using Tangra.VideoOperations.LightCurves;
@@ -115,7 +116,9 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
                 return;
             }
 
-            if (folderBrowserDialog.ShowDialog(this) == DialogResult.OK)
+            string selectedPath;
+
+            if (m_VideoController.ShowBrowseFolderDialog("Select Output Directory", TangraConfig.Settings.LastUsed.FitsExportLastFolderLocation, out selectedPath) == DialogResult.OK)
             {
                 btnExport.Enabled = false;
                 if (roiSelector != null) roiSelector.Enabled = false;
@@ -128,8 +131,11 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
 
                 pnlEnterTimes.Visible = false;
 
+                TangraConfig.Settings.LastUsed.FitsExportLastFolderLocation = selectedPath;
+                TangraConfig.Settings.Save();
+
                 m_Operation.StartExport(
-                    folderBrowserDialog.SelectedPath,
+                    selectedPath,
                     rbCube.Checked,
                     (int)nudFirstFrame.Value,
                     (int)nudLastFrame.Value,

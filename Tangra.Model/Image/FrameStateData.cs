@@ -27,6 +27,7 @@ namespace Tangra.Model.Image
         public bool IsVtiOsdCalibrationFrame;
 
 		public Dictionary<string, object> AdditionalProperties;
+	    public object Tag;
 
 		public bool IsEmpty()
 		{

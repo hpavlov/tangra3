@@ -614,7 +614,7 @@ namespace Tangra.VideoOperations.Astrometry
 			AstrometryContext.Current.StarMap = starMap;
 			AstrometryContext.Current.StarMapConfig = starMapConfig;
 
-			m_VideoController.RedrawCurrentFrame(false, true);
+			m_VideoController.RedrawCurrentFrame(false, true, false);
 		}
 
 		private void AreaTypeSelectionChanged(object sender, EventArgs e)

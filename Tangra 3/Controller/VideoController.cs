@@ -1177,7 +1177,7 @@ namespace Tangra.Controller
             RedrawCurrentFrame(m_ShowFields);
         }
 
-		public void RedrawCurrentFrame(bool showFields, bool reloadImage = false)
+        public void RedrawCurrentFrame(bool showFields, bool reloadImage = false, bool reprocess = true)
 		{
             if (m_AstroImage != null &&
                 m_AstroImage.Pixelmap != null)
@@ -1192,8 +1192,11 @@ namespace Tangra.Controller
                 }
 				else if (reloadImage)
 				{
-					// NOTE: Applying pre-processing here will break the Astrometry overlays
-					m_MainForm.pictureBox.Image = m_AstroImage.Pixelmap.CreateNewDisplayBitmap();
+                    var newBmp = m_AstroImage.Pixelmap.CreateNewDisplayBitmap();
+				    if (reprocess)
+                        ApplyDisplayModeAdjustments(newBmp, false, m_AstroImage.Pixelmap);    
+
+                    m_MainForm.pictureBox.Image = newBmp;
 				}
 				else
                     m_MainForm.pictureBox.Image = m_AstroImage.Pixelmap.DisplayBitmap;
@@ -2633,6 +2636,15 @@ namespace Tangra.Controller
 			fileName = ofd.FileName;
 			return rv;
 		}
+
+	    public DialogResult ShowBrowseFolderDialog(string title, string selectedFolder, out string folderPath)
+	    {
+            var frm = new frmChooseFolder(title, selectedFolder);
+	        frm.StartPosition = FormStartPosition.CenterParent;
+	        DialogResult rv = frm.ShowDialog(m_MainFormView);
+	        folderPath = frm.SelectedFolderPath;
+	        return rv;
+	    }
 
 		public void ShowTangraSettingsDialog(bool showCatalogRequiredHint, bool showLocationRequiredHint)
 		{

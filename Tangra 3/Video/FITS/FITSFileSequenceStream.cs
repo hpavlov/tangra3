@@ -149,10 +149,12 @@ namespace Tangra.Video.FITS
             bool hasNegativePixels;
 
             var cards = new Dictionary<string, string>();
+            BasicHDU fitsImage = null;
 
             FITSHelper.Load16BitFitsFile(m_FitsFilesList[index - FirstFrame], m_TimeStampReader, m_ZeroOutNegativePixels,
                 (hdu) =>
                 {
+                    fitsImage = hdu;
                     var cursor = hdu.Header.GetCursor();
                     while (cursor.MoveNext())
                     {
@@ -188,6 +190,7 @@ namespace Tangra.Video.FITS
 				rv.FrameState.ExposureInMilliseconds = exposure.HasValue ? (float)(exposure.Value * 1000.0) : 0;
 			}
 
+            rv.FrameState.Tag = fitsImage;
             rv.FrameState.AdditionalProperties = new SafeDictionary<string, object>();
             foreach (string key in cards.Keys)
                 rv.FrameState.AdditionalProperties.Add(key, cards[key]);

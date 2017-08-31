@@ -126,7 +126,9 @@ namespace nom.tam.fits
               throw new HeaderCardException("Keyword too long");
             }
           }
-    			
+
+          if (string.IsNullOrEmpty(val)) val = null;
+
           if(val != null)
           {
             val = val.Trim();

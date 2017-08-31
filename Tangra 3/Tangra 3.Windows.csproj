@@ -350,6 +350,12 @@
     <Compile Include="Helpers\frmChooseFitsFolder.Designer.cs">
       <DependentUpon>frmChooseFitsFolder.cs</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\frmChooseFolder.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Helpers\frmChooseFolder.Designer.cs">
+      <DependentUpon>frmChooseFolder.cs</DependentUpon>
+    </Compile>
     <Compile Include="Helpers\frmLongRunningOperation.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -1123,6 +1129,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Helpers\frmChooseFitsFolder.resx">
       <DependentUpon>frmChooseFitsFolder.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Helpers\frmChooseFolder.resx">
+      <DependentUpon>frmChooseFolder.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Helpers\frmLongRunningOperation.resx">
       <DependentUpon>frmLongRunningOperation.cs</DependentUpon>

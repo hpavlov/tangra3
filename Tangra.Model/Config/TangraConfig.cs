@@ -667,6 +667,7 @@ namespace Tangra.Model.Config
 
             public List<SameSizeApertureConfig> SameSizeApertures = new List<SameSizeApertureConfig>();
 	        public string FitsSeqenceLastFolderLocation;
+            public string FitsExportLastFolderLocation;
             public string FitsTimestampFormat;
 	        public string EmailAddressForErrorReporting;
 

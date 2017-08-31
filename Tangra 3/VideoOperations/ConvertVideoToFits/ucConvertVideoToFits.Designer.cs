@@ -50,7 +50,6 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             this.label1 = new System.Windows.Forms.Label();
             this.cbxEveryFrame = new System.Windows.Forms.ComboBox();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.pnlEnterTimes = new System.Windows.Forms.Panel();
             this.btn1FrMinus = new System.Windows.Forms.Button();
             this.btn1FrPlus = new System.Windows.Forms.Button();
@@ -364,7 +363,6 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
         private System.Windows.Forms.RadioButton rbROI;
         private System.Windows.Forms.GroupBox gbxSection;
         private System.Windows.Forms.SaveFileDialog saveFileDialog;
-        private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog;
         private System.Windows.Forms.Panel pnlEnterTimes;
         private System.Windows.Forms.Button btn1FrMinus;
         private System.Windows.Forms.Button btn1FrPlus;

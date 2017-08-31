@@ -340,7 +340,7 @@ namespace Tangra.VideoOperations.Astrometry
 				m_IdentifiedObjects = objectResolver.IdentifiedObjects;
 				m_UnknownObjects = objectResolver.UnknownObjects;
 
-				m_VideoController.RedrawCurrentFrame(false, true);
+				m_VideoController.RedrawCurrentFrame(false, true, false);
 			}
 		}
 		void m_ViewControl_OnSaveUnitTestData(object sender, ucAstrometryObjectInfo.SaveUnitTestDataEventArgs e)
@@ -731,7 +731,7 @@ namespace Tangra.VideoOperations.Astrometry
 			if (!m_VeryFirstTimeDrawn)
 			{
 				m_VeryFirstTimeDrawn = true;
-				m_VideoController.RedrawCurrentFrame(false, true);
+				m_VideoController.RedrawCurrentFrame(false, true, false);
 			}
 
 			AstrometryContext.Current.CurrentAstrometricFit = m_AstrometricFit;

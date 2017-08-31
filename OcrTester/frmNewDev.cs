@@ -113,7 +113,7 @@ namespace OcrTester
             throw new NotImplementedException();
         }
 
-        void IVideoController.RedrawCurrentFrame(bool showFields, bool reloadImage)
+        void IVideoController.RedrawCurrentFrame(bool showFields, bool reloadImage, bool reprocess)
         {
             throw new NotImplementedException();
         }
