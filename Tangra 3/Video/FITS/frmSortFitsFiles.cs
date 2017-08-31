@@ -114,13 +114,16 @@ namespace Tangra.Video.FITS
                         bool isMidPoint;
                         double? fitsExposure = null;
                         DateTime? timestamp = null;
-                        try
+                        if (TimeStampReader != null)
                         {
-                            timestamp = FITSHelper.ParseExposure(m_FitsFiles[i], hdr, TimeStampReader, out isMidPoint, out fitsExposure);
-                        }
-                        catch (Exception ex)
-                        {
-                            Trace.WriteLine(ex.ToString());
+                            try
+                            {
+                                timestamp = FITSHelper.ParseExposure(m_FitsFiles[i], hdr, TimeStampReader, out isMidPoint, out fitsExposure);
+                            }
+                            catch (Exception ex)
+                            {
+                                Trace.WriteLine(ex.ToString());
+                            }
                         }
 
                         if (i == 0 && (!fitsExposure.HasValue || !timestamp.HasValue))
