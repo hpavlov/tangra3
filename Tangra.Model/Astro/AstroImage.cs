@@ -454,7 +454,7 @@ namespace Tangra.Model.Astro
 					fit.FWHM >= minFWHM &&
 					fit.FWHM <= maxFWHM &&
 					distanceFromCenter < MIN_DISTANCE_OF_PEAK_PIXEL_FROM_CENTER &&
-					fit.IMax > aboveNoiseLevelRequired)
+                    (fit.IMax > aboveNoiseLevelRequired || float.IsNaN(aboveNoiseLevelRequired)))
 				{
 					//not good for lost tracking allow higher FWHM
 
