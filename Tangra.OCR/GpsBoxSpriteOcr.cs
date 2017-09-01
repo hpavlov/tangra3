@@ -38,6 +38,11 @@ namespace Tangra.OCR
             return "GPS-BOX-SPRITE";
         }
 
+        public bool TimeStampHasDatePart
+        {
+            get { return true; }
+        }
+
         private int m_ImageWidth;
         private int m_ImageHeight;
         private int m_MinCalibrationFrames;

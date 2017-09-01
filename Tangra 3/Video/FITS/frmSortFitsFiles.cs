@@ -114,34 +114,23 @@ namespace Tangra.Video.FITS
                         bool isMidPoint;
                         double? fitsExposure = null;
                         DateTime? timestamp = null;
-                        if (TimeStampReader != null)
-                        {
-                            try
-                            {
-                                timestamp = FITSHelper.ParseExposure(m_FitsFiles[i], hdr, TimeStampReader, out isMidPoint, out fitsExposure);
-                            }
-                            catch (Exception ex)
-                            {
-                                Trace.WriteLine(ex.ToString());
-                            }
-                        }
 
-                        if (i == 0 && (!fitsExposure.HasValue || !timestamp.HasValue))
+                        if (i == 0)
                         {
                             var frm = new frmChooseTimeHeaders(hdr, GetOrderedFitsFileHash());
                             if (frm.ShowDialog(this) == DialogResult.OK)
                             {
                                 TimeStampReader = frm.TimeStampReader;
                             }
+                        }
 
-                            try
-                            {
-                                timestamp = FITSHelper.ParseExposure(m_FitsFiles[i], hdr, TimeStampReader, out isMidPoint, out fitsExposure);
-                            }
-                            catch (Exception ex)
-                            {
-                                Trace.WriteLine(ex.ToString());
-                            }
+                        try
+                        {
+                            timestamp = FITSHelper.ParseExposure(m_FitsFiles[i], hdr, TimeStampReader, out isMidPoint, out fitsExposure);
+                        }
+                        catch (Exception ex)
+                        {
+                            Trace.WriteLine(ex.ToString());
                         }
 
                         m_FitsTimestamps[i] = timestamp;

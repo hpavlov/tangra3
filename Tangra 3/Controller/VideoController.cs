@@ -824,6 +824,22 @@ namespace Tangra.Controller
             return ocredTimeStamp;
 	    }
 
+	    public DateTime GetNextFrameOCRTimestamp()
+	    {
+	        DateTime ocredTimeStamp = DateTime.MinValue;
+
+	        int frameNo = m_CurrentFrameId + m_FramePlayer.FrameStep;
+            var pixelmap = m_FramePlayer.GetFrame(frameNo, true);
+	        var astroImage = new AstroImage(pixelmap);
+            var osdPixels = astroImage.GetOcrPixels();
+
+            if (!m_TimestampOCR.ExtractTime(frameNo, m_FramePlayer.FrameStep, osdPixels, false, out ocredTimeStamp))
+                return DateTime.MinValue;
+            else
+                return ocredTimeStamp;
+
+	    }
+
         public bool AssertOCRTimestamp(DateTime calculatedTimeStamp, bool showPopUp)
         {
             string errorMessage = null;
@@ -1284,6 +1300,11 @@ namespace Tangra.Controller
 	    {
             return m_TimestampOCR != null;
 	    }
+
+        public bool OCRTimeStampHasDatePart()
+        {
+            return m_TimestampOCR != null && m_TimestampOCR.TimeStampHasDatePart;
+        }
 
 		public bool HasEmbeddedTimeStamps()
 		{

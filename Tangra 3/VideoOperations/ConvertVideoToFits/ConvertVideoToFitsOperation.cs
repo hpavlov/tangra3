@@ -90,6 +90,7 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
         private int m_FirstFrame;        
         private int m_LastFrame;
         private DateTime? m_PrevOCRedTimeStamp = null;
+        private DateTime? m_AttachDateToOCR = null;
 
         public void NextFrame(int frameNo, MovementType movementType, bool isLastFrame, AstroImage astroImage, int firstFrameInIntegrationPeriod, string fileName)
         {
@@ -105,8 +106,25 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
                     m_OCRedTimeStamp = m_VideoController.OCRTimestamp();
 
                     timestamp = m_OCRedTimeStamp;
+                    if (m_AttachDateToOCR.HasValue)
+                    {
+                        timestamp = m_AttachDateToOCR.Value.Date.Add(timestamp.TimeOfDay);
+                        if (m_PrevOCRedTimeStamp.HasValue && m_PrevOCRedTimeStamp.Value > timestamp &&
+                            timestamp.Hour == 23 && timestamp.Hour == 0)
+                        {
+                            timestamp = timestamp.AddDays(1);
+                            m_AttachDateToOCR = m_AttachDateToOCR.Value.AddDays(1);
+                        }
+                    }
+
                     if (m_PrevOCRedTimeStamp.HasValue)
-                        exposureSeconds = (float)new TimeSpan(timestamp.Ticks - m_PrevOCRedTimeStamp.Value.Ticks).TotalSeconds;
+                        exposureSeconds = (float) new TimeSpan(timestamp.Ticks - m_PrevOCRedTimeStamp.Value.Ticks).TotalSeconds;
+                    else
+                    {
+                        var nextTimeStamp = m_VideoController.GetNextFrameOCRTimestamp();
+                        if (nextTimeStamp != DateTime.MinValue)
+                            exposureSeconds = (float)new TimeSpan(nextTimeStamp.TimeOfDay.Ticks - timestamp.TimeOfDay.Ticks).TotalSeconds;
+                    }
                     m_PrevOCRedTimeStamp = timestamp;
                 }
                 else
@@ -143,7 +161,7 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             m_Status = ConvertVideoToFitsState.Converting;
             m_FirstFrame = firstFrame;
             m_LastFrame = lastFrame;
-            m_ConvertVideoToFitsController.StartExport(fileName, fitsCube, roi, timeBase, m_VideoController.HasTimestampOCR());
+            m_ConvertVideoToFitsController.StartExport(fileName, fitsCube, roi, timeBase, m_VideoController.HasTimestampOCR(), m_VideoController.OCRTimeStampHasDatePart());
 
             m_VideoController.PlayVideo(m_FirstFrame, (uint)step);
         }
@@ -163,6 +181,11 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
         {
             m_EndFrameTime = endTime;
             m_EndTimeFrame = frameNo;
+        }
+
+        public void SetAttachDateToOCR(DateTime date)
+        {
+            m_AttachDateToOCR = date.Date;
         }
 
         public DialogResult EnteredTimeIntervalLooksOkay()
@@ -278,15 +301,19 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             return DialogResult.OK;
         }
 
-        public bool HasEmbeddedTimeStamps()
+        public bool HasEmbeddedTimeStamps(out bool hasDatePart)
         {
+            hasDatePart = false;
             if (m_VideoController.HasEmbeddedTimeStamps())
                 return true;
 
             m_VideoController.InitializeTimestampOCR();
 
             if (m_VideoController.HasTimestampOCR())
+            {
+                hasDatePart = m_VideoController.OCRTimeStampHasDatePart();
                 return true;
+            }
             else
             {
                 m_Status = ConvertVideoToFitsState.EnteringTimes;

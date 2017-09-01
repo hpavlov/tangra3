@@ -49,5 +49,7 @@ namespace Tangra.OCR
         Bitmap GetOCRDebugImage();
         Bitmap GetOCRCalibrationDebugImage();
         void PrepareFailedCalibrationReport();
+
+        bool TimeStampHasDatePart { get; }
     }
 }

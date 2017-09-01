@@ -32,6 +32,11 @@ namespace Tangra.OCR
             return "KIWI-OSD";
         }
 
+        public bool TimeStampHasDatePart
+        {
+            get { return false; }
+        }
+
         public void Initialize(TimestampOCRData initializationData, IVideoController videoController, int performanceMode)
         {
             m_InitializationData = initializationData;

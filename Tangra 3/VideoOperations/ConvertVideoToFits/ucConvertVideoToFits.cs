@@ -30,6 +30,7 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
         private int m_FirstTimeFrame;
         private int m_LastTimeFrame;
         private bool m_FirstTimeSet;
+        private bool m_EnterOCRAttachDate;
 
         public ucConvertVideoToFits()
         {
@@ -97,8 +98,11 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
                 return;
             }
 
-            if (!m_Operation.HasEmbeddedTimeStamps())
+            bool hasDatePart;
+            if (!m_Operation.HasEmbeddedTimeStamps(out hasDatePart))
                 PrepareToEnterStartTime();
+            else if (!hasDatePart)
+                PrepareToEnterStartDate();
             else
                 StartExport(UsedTimeBase.EmbeddedTimeStamp);
         }
@@ -166,6 +170,23 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             m_LastTimeFrame = -1;
         }
 
+        private void PrepareToEnterStartDate()
+        {
+            var ocrTime = m_VideoController.OCRTimestamp();
+            ucUtcTime.DateTimeUtc = DateTime.UtcNow.Date.Add(ocrTime.TimeOfDay);
+            pnlEnterTimes.Visible = true;
+            lblTimesHeader.Text = "Enter the UTC date of the first exported frame:";
+            btnNextTime.Text = "Start Export";
+            m_EnterOCRAttachDate = true;
+
+            ucUtcTime.FocusDateControl();
+
+            // Split the video in fields for interlaced video
+            m_ShowingFields = false;
+            m_VideoController.ToggleShowFieldsMode(m_ShowingFields);
+            UpdateShowingFieldControls();
+        }
+
         private void UpdateShowingFieldControls()
         {
             if (m_ShowingFields)
@@ -222,7 +243,14 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
 
         private void btnNextTime_Click(object sender, EventArgs e)
         {
-            if (!m_FirstTimeSet)
+            if (m_EnterOCRAttachDate)
+            {
+
+                DateTime dateToAttachToOCR = ucUtcTime.DateTimeUtc.Date;
+                m_Operation.SetAttachDateToOCR(dateToAttachToOCR);
+                StartExport(UsedTimeBase.EmbeddedTimeStamp);
+            }
+            else if (!m_FirstTimeSet)
 			{
 				if (IsDuplicatedFrame(m_CurrFrameNo))
 				{

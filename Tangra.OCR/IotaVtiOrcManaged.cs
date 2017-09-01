@@ -55,6 +55,11 @@ namespace Tangra.OCR
 			return "IOTA-VTI";
 		}
 
+        public bool TimeStampHasDatePart
+        {
+            get { return false; }
+        }
+
 		public void Initialize(TimestampOCRData initializationData, IVideoController videoController, int performanceMode)
 		{
 			m_InitializationData = initializationData;

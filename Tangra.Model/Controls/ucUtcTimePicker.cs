@@ -80,6 +80,12 @@ namespace Tangra.Model.Controls
             tbxHours.SelectAll();
         }
 
+        public void FocusDateControl()
+        {
+            dtpDate.Select();
+            dtpDate.Focus();
+        }
+
         private void tbxHours_TextChanged(object sender, EventArgs e)
         {
             int intVal;

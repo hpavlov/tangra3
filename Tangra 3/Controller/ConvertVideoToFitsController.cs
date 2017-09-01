@@ -29,7 +29,6 @@ namespace Tangra.Controller
         private bool m_FitsCube;
 
         private string m_DateObsComment;
-        private string m_TimeObsComment;
         private string m_Note;
         private bool m_IsFitsSequence;
 
@@ -39,7 +38,7 @@ namespace Tangra.Controller
 			m_VideoController = videoController;
 		}
 
-        internal void StartExport(string fileName, bool fitsCube, Rectangle roi, UsedTimeBase timeBase, bool usesOCR)
+        internal void StartExport(string fileName, bool fitsCube, Rectangle roi, UsedTimeBase timeBase, bool usesOCR, bool ocrHasDatePart)
         {
             m_FrameWidth = TangraContext.Current.FrameWidth;
             m_FrameHeight = TangraContext.Current.FrameHeight;
@@ -59,8 +58,6 @@ namespace Tangra.Controller
 
             m_Note = string.Format("Converted from {0} file.", m_VideoController.GetVideoFileFormat());
             if (m_Note.Length > HeaderCard.MAX_VALUE_LENGTH) m_Note = m_Note.Substring(0, HeaderCard.MAX_VALUE_LENGTH);
-            m_DateObsComment = "Date (yyyy-MM-dd)";
-            m_TimeObsComment = "Time (HH:mm:ss.fff)";
 
             if (m_UsesROI)
             {
@@ -70,20 +67,20 @@ namespace Tangra.Controller
 
             if (timeBase == UsedTimeBase.UserEnterred)
             {
-                m_DateObsComment = "Date based on user entered VTI-OSD of a reference frame (yyyy-MM-dd)";
-                m_TimeObsComment = "Time based on user entered VTI-OSD of a reference frame (HH:mm:ss.fff)";
+                m_DateObsComment = "Date and Time are user entered & computed";
             }
             else if (timeBase == UsedTimeBase.EmbeddedTimeStamp)
             {
                 if (usesOCR)
                 {
-                    m_DateObsComment = "Date based on the ORC-ed VTI-OSD timestamp of the frame (yyyy-MM-dd)";
-                    m_TimeObsComment = "Time based on the ORC-ed VTI-OSD timestamp of the frame (HH:mm:ss.fff)";                    
+                    if (ocrHasDatePart)
+                        m_DateObsComment = "Date and Time are ORC-ed";
+                    else
+                        m_DateObsComment = "Time is ORC-ed, Date is user entered";
                 }
                 else if (!m_IsFitsSequence)
                 {
-                    m_DateObsComment = "Date of the frame as saved by the video recorder (yyyy-MM-dd)";
-                    m_TimeObsComment = "Time of the frame as saved by the video recorder (HH:mm:ss.fff)";
+                    m_DateObsComment = "Date and Time are saved by recorder";
                 }
             }
         }
@@ -96,7 +93,7 @@ namespace Tangra.Controller
                 astroImage.Pixelmap.FrameState.Tag != null &&
                 astroImage.Pixelmap.FrameState.Tag is BasicHDU)
             {
-                ProcessFitsFrame(fileName, astroImage.Pixelmap.FrameState.Tag as BasicHDU, timeStamp, exposureSeconds);
+                ProcessFitsFrame(fileName, astroImage.Pixelmap.FrameState.Tag as BasicHDU);
             }
             else
             {
@@ -147,7 +144,7 @@ namespace Tangra.Controller
             return subpixels;
         }
 
-        internal void ProcessFitsFrame(string fileName, BasicHDU fitsImage, DateTime timeStamp, float exposureSeconds)
+        internal void ProcessFitsFrame(string fileName, BasicHDU fitsImage)
         {
             object data = null;
             if (m_UsesROI)
@@ -258,11 +255,9 @@ namespace Tangra.Controller
 
             hdr.AddValue("NOTES", m_Note, null);
 
-            if (exposureSeconds > 0)
-                hdr.AddValue("EXPOSURE", exposureSeconds.ToString("0.000", CultureInfo.InvariantCulture), "Exposure, seconds");
+            hdr.AddValue("EXPOSURE", exposureSeconds.ToString("0.000", CultureInfo.InvariantCulture), "Exposure, seconds");
 
-            hdr.AddValue("DATEOBS", timeStamp.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), m_DateObsComment);
-            hdr.AddValue("TIMEOBS", timeStamp.ToString("HH:mm:ss.fff", CultureInfo.InvariantCulture), m_TimeObsComment);                
+            hdr.AddValue("DATE-OBS", timeStamp.ToString("yyyy-MM-ddTHH:mm:ss.fff", CultureInfo.InvariantCulture), m_DateObsComment);           
 
             hdr.AddValue("TANGRAVE", string.Format("{0} v{1}", VersionHelper.AssemblyProduct, VersionHelper.AssemblyFileVersion), "Tangra version");
             hdr.AddValue("END", null, null);
