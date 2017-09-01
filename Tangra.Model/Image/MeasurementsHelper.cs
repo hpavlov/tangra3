@@ -860,7 +860,6 @@ namespace Tangra.Model.Image
         {
             // Method 2: Use Average and remove points until 
 
-            List<float> allBgResiduals = new List<float>();
             uint sum = 0;
 
             for (int i = 0; i < allBgReadings.Count; i++)
@@ -873,22 +872,29 @@ namespace Tangra.Model.Image
                 // Compute the average value
                 average = 1.0 * sum / allBgReadings.Count;
                 double sqVariance = 0;
-                allBgResiduals.Clear();
                 // Compute the residuals
                 for (int i = 0; i < allBgReadings.Count; i++)
                 {
                     float residual = (float)(allBgReadings[0] - average);
-                    allBgResiduals.Add(residual);
                     sqVariance += residual * residual;
                 }
                 sqVariance = Math.Sqrt(sqVariance / (allBgReadings.Count - 1));
                 sqVariance = sqVariance * m_RejectionBackgoundPixelsStdDevCoeff;
 
+                var median = allBgReadings.Median();
+
+                var avMedRatio = average/median;
+                if (avMedRatio < 1) avMedRatio = 1 / avMedRatio;
+                var outierRemovalCenter = avMedRatio > 1.5 ? median : average; // Hardcoded factor of 1.5
+
                 numRemovedPoints = 0;
                 // Remove all points beyond RejectionBackgoundPixelsStdDevCoeff * sigma
+                // NOTE: variance is calculated around the AVERAGE value
+                //       however removal could be done around the MEDIAN value which deals better with contamination
+                //       from very bright nearby stars in 16-bit images
                 for (int i = allBgReadings.Count - 1; i >= 0; i--)
                 {
-                    if (Math.Abs(allBgResiduals[i]) > sqVariance)
+                    if (Math.Abs(allBgReadings[i] - outierRemovalCenter) > sqVariance)
                     {
                         numRemovedPoints++;
                         allBgReadings.RemoveAt(i);
@@ -896,17 +902,14 @@ namespace Tangra.Model.Image
                 }
 
                 sum = 0;
-                if (numRemovedPoints > 0)
+                for (int i = 0; i < allBgReadings.Count; i++)
                 {
-                    for (int i = 0; i < allBgReadings.Count; i++)
-                    {
-                        sum += allBgReadings[i];
-                    }
+                    sum += allBgReadings[i];
                 }
             }
             while (numRemovedPoints > 0 && allBgReadings.Count > 0);
 
-            return average;
+            return 1.0 * sum / allBgReadings.Count; ;
         }
 
 		public NotMeasuredReasons MeasureObject(
