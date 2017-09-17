@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Tangra.StarCatalogues;
 
-namespace Tangra.Astrometry.Tests.Calibration
+namespace Tangra.Tests.Calibration
 {
     public class TestStar : IStar
     {

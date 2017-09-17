@@ -61,7 +61,7 @@ namespace Tangra.Video.FITS
             uint minPixelValue;
             uint maxPixelValue;
 
-            FITSHelper.Load16BitFitsFile(m_FitsFilesList[0], m_TimeStampReader, zeroOutNegativeValues, null, out pixelsFlat, out width, out height, out bpp, out timestamp, out exposure, out minPixelValue, out maxPixelValue, out hasNegativePixels);
+            FITSHelper.Load16BitFitsFile(m_FitsFilesList[0], null, m_TimeStampReader, zeroOutNegativeValues, null, out pixelsFlat, out width, out height, out bpp, out timestamp, out exposure, out minPixelValue, out maxPixelValue, out hasNegativePixels);
 
             m_MinPixelValueFirstImage = minPixelValue;
             m_MaxPixelValueFirstImage = maxPixelValue;
@@ -151,7 +151,7 @@ namespace Tangra.Video.FITS
             var cards = new Dictionary<string, string>();
             BasicHDU fitsImage = null;
 
-            FITSHelper.Load16BitFitsFile(m_FitsFilesList[index - FirstFrame], m_TimeStampReader, m_ZeroOutNegativePixels,
+            FITSHelper.Load16BitFitsFile(m_FitsFilesList[index - FirstFrame], null, m_TimeStampReader, m_ZeroOutNegativePixels,
                 (hdu) =>
                 {
                     fitsImage = hdu;
@@ -170,32 +170,7 @@ namespace Tangra.Video.FITS
                 },
                 out pixelsFlat, out width, out height, out bpp, out timestamp, out exposure, out minPixelValue, out maxPixelValue, out hasNegativePixels);
 
-            byte[] displayBitmapBytes = new byte[Width * Height];
-            byte[] rawBitmapBytes = new byte[(Width * Height * 3) + 40 + 14 + 1];
-
-            uint[] flatPixelsCopy = new uint[pixelsFlat.Length];
-            Array.Copy(pixelsFlat, flatPixelsCopy, pixelsFlat.Length);
-
-            TangraCore.PreProcessors.ApplyPreProcessingPixelsOnly(pixelsFlat, flatPixelsCopy, Width, Height, BitPix, 0 /* No normal value for FITS files */, exposure.HasValue ? (float)exposure.Value : 0);
-
-            TangraCore.GetBitmapPixels(Width, Height, flatPixelsCopy, rawBitmapBytes, displayBitmapBytes, true, (ushort)BitPix, 0);
-
-            Bitmap displayBitmap = Pixelmap.ConstructBitmapFromBitmapPixels(displayBitmapBytes, Width, Height);
-
-            Pixelmap rv = new Pixelmap(Width, Height, BitPix, flatPixelsCopy, displayBitmap, displayBitmapBytes);
-            rv.UnprocessedPixels = pixelsFlat;
-			if (HasUTCTimeStamps)
-			{
-			    rv.FrameState.CentralExposureTime = timestamp.HasValue ? timestamp.Value : DateTime.MinValue;
-				rv.FrameState.ExposureInMilliseconds = exposure.HasValue ? (float)(exposure.Value * 1000.0) : 0;
-			}
-
-            rv.FrameState.Tag = fitsImage;
-            rv.FrameState.AdditionalProperties = new SafeDictionary<string, object>();
-            foreach (string key in cards.Keys)
-                rv.FrameState.AdditionalProperties.Add(key, cards[key]);
-
-            return rv;
+            return FitsStreamHelper.BuildFitsPixelmap(Width, Height, pixelsFlat, BitPix, HasUTCTimeStamps, exposure, timestamp, fitsImage, cards);
         }
 
         public int RecommendedBufferSize

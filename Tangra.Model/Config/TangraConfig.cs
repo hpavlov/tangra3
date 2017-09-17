@@ -12,6 +12,7 @@ using System.IO.IsolatedStorage;
 using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
+using Tangra.Model.Helpers;
 
 namespace Tangra.Model.Config
 {
@@ -649,6 +650,8 @@ namespace Tangra.Model.Config
 			public double Latitude = double.NaN;
 
             public string[] CustomFITSTimeStampFormats = new string[0];
+            public string[] CustomFITSDateFormats = new string[0];
+            public string[] CustomFITSTimeFormats = new string[0];
 		}
 
         [Serializable]
@@ -669,6 +672,8 @@ namespace Tangra.Model.Config
 	        public string FitsSeqenceLastFolderLocation;
             public string FitsExportLastFolderLocation;
             public string FitsTimestampFormat;
+            public string FitsDateFormat;
+            public string FitsTimeFormat;
 	        public string EmailAddressForErrorReporting;
 
 	        public double FocalLength;
@@ -2361,9 +2366,15 @@ namespace Tangra.Model.Config
             public ExposureUnit ExposureUnit;
             public string TimeStampHeader;
             public string TimeStampFormat;
+            public string TimeStampHeader2;
+            public string TimeStampFormat2;
+            public bool TimeStampIsDateTimeParts;
             public TimeStampType TimeStampType;
             public string TimeStamp2Header;
             public string TimeStamp2Format;
+            public string TimeStamp2Header2;
+            public string TimeStamp2Format2;
+            public bool TimeStamp2IsDateTimeParts;
             public bool IsTimeStampAndExposure;
             public string FileHash;
             public string CardNamesHash;
@@ -2388,17 +2399,50 @@ namespace Tangra.Model.Config
                 while (Items.Count > 10) Items.RemoveAt(Items.Count - 1);
 
 	            Items.Add(config);
+
+                Settings.Generic.CustomFITSTimeStampFormats = AddValueToListIfNoPresent(Settings.Generic.CustomFITSTimeStampFormats, config.TimeStampFormat, config.TimeStamp2Format, FITSTimeStampReader.STANDARD_TIMESTAMP_FORMATS);
+                Settings.Generic.CustomFITSDateFormats = AddValueToListIfNoPresent(Settings.Generic.CustomFITSDateFormats, config.TimeStampFormat, config.TimeStamp2Format, FITSTimeStampReader.STANDARD_DATE_FORMATS);
+                Settings.Generic.CustomFITSTimeFormats = AddValueToListIfNoPresent(Settings.Generic.CustomFITSTimeFormats, config.TimeStampFormat2, config.TimeStamp2Format2, FITSTimeStampReader.STANDARD_TIME_FORMATS);
+	        }
+
+            private string[] AddValueToListIfNoPresent(string[] currList, string newValue1, string newValue2, string[] additionaExcludeList)
+	        {
+                var currLst = new List<string>(currList);
+
+                var newVals = new string[] { newValue1, newValue2 };
+                foreach (string newValue in newVals)
+                {
+	                if (!string.IsNullOrWhiteSpace(newValue) &&
+	                    !currList.Contains(newValue) &&
+	                    !additionaExcludeList.Contains(newValue))
+	                {	                
+	                    currLst.Add(newValue);
+	                }                    
+                }
+
+                return currLst.ToArray();
 	        }
 
             private bool IsSameConfig(FITSFieldConfig item1, FITSFieldConfig item2)
             {
                 return
                     item1.IsTimeStampAndExposure == item2.IsTimeStampAndExposure &&
+                    item1.TimeStampIsDateTimeParts == item2.TimeStampIsDateTimeParts &&
+                    item1.TimeStamp2IsDateTimeParts == item2.TimeStamp2IsDateTimeParts &&
                     string.Equals(item1.ExposureHeader, item2.ExposureHeader, StringComparison.Ordinal) &&
                     string.Equals(item1.TimeStampFormat, item2.TimeStampFormat, StringComparison.Ordinal) &&
                     string.Equals(item1.TimeStampHeader, item2.TimeStampHeader, StringComparison.Ordinal) &&
+                    (
+                        !item1.TimeStampIsDateTimeParts ||
+                        (string.Equals(item1.TimeStampFormat2, item2.TimeStampFormat2, StringComparison.Ordinal) && string.Equals(item1.TimeStampHeader2, item2.TimeStampHeader2, StringComparison.Ordinal))
+                    ) &&
                     string.Equals(item1.TimeStamp2Format, item2.TimeStamp2Format, StringComparison.Ordinal) &&
                     string.Equals(item1.TimeStamp2Header, item2.TimeStamp2Header, StringComparison.Ordinal) &&
+                    (
+                        !item1.TimeStamp2IsDateTimeParts ||
+                        (string.Equals(item1.TimeStamp2Format2, item2.TimeStamp2Format2, StringComparison.Ordinal) && string.Equals(item1.TimeStamp2Header2, item2.TimeStamp2Header2, StringComparison.Ordinal))
+
+                    ) &&
                     item1.TimeStampType == item2.TimeStampType &&
                     item1.ExposureUnit == item2.ExposureUnit;
             }

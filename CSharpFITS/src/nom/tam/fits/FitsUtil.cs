@@ -88,6 +88,12 @@ namespace nom.tam.fits
 			return size + Padding(size);
 		}
 
+        /// <summary>Total size of blocked FITS element</summary>
+        public static long AddPadding(long size)
+        {
+            return size + Padding(size);
+        }
+
         // change suggested in .99 version: 
         /// <summary>Check if a file seems to be compressed.</summary>
 		public static bool IsCompressed(String filename)

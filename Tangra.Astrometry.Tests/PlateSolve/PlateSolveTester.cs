@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tangra.Astrometry;
 using Tangra.Astrometry.Recognition;
 using Tangra.Model.Astro;
 using Tangra.Model.Config;
@@ -11,7 +12,7 @@ using Tangra.Model.Image;
 using Tangra.Model.VideoOperations;
 using Tangra.StarCatalogues;
 
-namespace Tangra.Astrometry.Tests.PlateSolve
+namespace Tangra.Tests.PlateSolve
 {
     public class MockedOperationNotifier : IOperationNotifier
     {

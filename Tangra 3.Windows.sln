@@ -32,7 +32,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{11702315
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagnitudeFitter", "Tools\MagnitudeFitter\MagnitudeFitter.csproj", "{3AAB5637-59FF-4E45-9CE6-FF5A03F9B1D0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangra.Astrometry.Tests", "Tangra.Astrometry.Tests\Tangra.Astrometry.Tests.csproj", "{5DD2E70B-5955-4CEB-987C-695853F026CD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangra.Tests", "Tangra.Astrometry.Tests\Tangra.Tests.csproj", "{5DD2E70B-5955-4CEB-987C-695853F026CD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

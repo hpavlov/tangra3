@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using nom.tam.fits;
 using nom.tam.util;
 using Tangra.Helpers;
+using Tangra.Model.Helpers;
 
 namespace Tangra.Video.FITS
 {

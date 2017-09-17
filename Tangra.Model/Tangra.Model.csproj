@@ -170,6 +170,8 @@
     <Compile Include="Helpers\AstroConvert.cs" />
     <Compile Include="Helpers\DebugContext.cs" />
     <Compile Include="Helpers\Extensions.cs" />
+    <Compile Include="Helpers\FITSHelper.cs" />
+    <Compile Include="Helpers\FITSTimeStampReader.cs" />
     <Compile Include="Helpers\JulianDayHelper.cs" />
     <Compile Include="Helpers\PositionMemento.cs" />
     <Compile Include="Helpers\TangraCore.cs" />
@@ -218,7 +220,12 @@
       <DependentUpon>ucUtcTimePicker.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\CSharpFITS\CSharpFITS.csproj">
+      <Project>{93c93a99-d18f-495e-8ac9-6b6f6f7f273e}</Project>
+      <Name>CSharpFITS</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

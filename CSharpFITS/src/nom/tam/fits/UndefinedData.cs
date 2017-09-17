@@ -22,7 +22,7 @@ namespace nom.tam.fits
 	{
     #region Properties
 		/// <summary>Get the size in bytes of the data</summary>
-		override internal int TrueSize
+		override internal long TrueSize
 		{
 			get
 			{

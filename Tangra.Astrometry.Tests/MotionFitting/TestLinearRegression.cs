@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using Tangra.Model.Numerical;
 
-namespace Tangra.Astrometry.Tests.MotionFitting
+namespace Tangra.Tests.MotionFitting
 {
     [TestFixture]
     public class TestLinearRegression

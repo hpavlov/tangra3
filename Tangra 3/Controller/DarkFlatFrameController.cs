@@ -17,6 +17,7 @@ using Tangra.Model.Image;
 using Tangra.PInvoke;
 using nom.tam.fits;
 using nom.tam.util;
+using Tangra.Model.Helpers;
 
 namespace Tangra.Controller
 {

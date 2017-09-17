@@ -32,11 +32,11 @@ namespace nom.tam.fits
 	{
         /// <summary>Get the size in bytes of the data 
         /// </summary>
-		override internal int TrueSize
+		override internal long TrueSize
 		{
 			get
 			{
-				return (int) byteSize;
+				return byteSize;
 			}
 			
 		}
@@ -365,7 +365,7 @@ namespace nom.tam.fits
 				{
 					double pos = i.Position;
 					//pos = i.Seek((int)byteSize) - pos;
-                    i.Seek((int)byteSize);
+                    i.Seek(byteSize);
 				}
 				catch(IOException e)
 				{

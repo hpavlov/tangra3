@@ -40,7 +40,7 @@ namespace nom.tam.fits
 			}
 		}
 		/// <summary>Get the size of the data in the HDU sans padding.</summary>
-		override internal int TrueSize
+		override internal long TrueSize
 		{
 			get
 			{

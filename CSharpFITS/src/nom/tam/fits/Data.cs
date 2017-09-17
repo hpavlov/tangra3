@@ -47,7 +47,7 @@ namespace nom.tam.fits
 			}
         }
 
-		internal abstract int TrueSize{get;}
+		internal abstract long TrueSize{get;}
 		/// <summary>Get the size of the data element in bytes</summary>
 		virtual public long Size
 		{
@@ -90,7 +90,7 @@ namespace nom.tam.fits
 		/// <summary>The starting location of the data when last read</summary>
 		protected internal long fileOffset = - 1;
 		/// <summary>The size of the data when last read</summary>
-		protected internal int dataSize;
+		protected internal long dataSize;
 		/// <summary>The inputstream used.</summary>
 		protected internal RandomAccess input;
     #endregion

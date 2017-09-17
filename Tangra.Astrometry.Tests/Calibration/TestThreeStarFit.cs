@@ -5,12 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Tangra.Astrometry;
 using Tangra.Model.Astro;
 using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.StarCatalogues;
 
-namespace Tangra.Astrometry.Tests.Calibration
+namespace Tangra.Tests.Calibration
 {
     [TestFixture]
     public class TestThreeStarFit

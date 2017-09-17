@@ -7,8 +7,8 @@
     <ProjectGuid>{5DD2E70B-5955-4CEB-987C-695853F026CD}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Tangra.Astrometry.Tests</RootNamespace>
-    <AssemblyName>Tangra.Astrometry.Tests</AssemblyName>
+    <RootNamespace>Tangra.Tests</RootNamespace>
+    <AssemblyName>Tangra.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -63,6 +63,8 @@
   <ItemGroup>
     <Compile Include="Calibration\TestStar.cs" />
     <Compile Include="Calibration\TestThreeStarFit.cs" />
+    <Compile Include="FITS\TestFitsNegativePixelHandling.cs" />
+    <Compile Include="FITS\TestFitsTimeStampReader.cs" />
     <Compile Include="MotionFitting\TestFastMotionFitter.cs" />
     <Compile Include="MotionFitting\TestFlyByMotionFitter.cs" />
     <Compile Include="MotionFitting\TestLinearRegression.cs" />
@@ -79,6 +81,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CSharpFITS\CSharpFITS.csproj">
+      <Project>{93c93a99-d18f-495e-8ac9-6b6f6f7f273e}</Project>
+      <Name>CSharpFITS</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Tangra.Astrometry\Tangra.Astrometry.csproj">
       <Project>{dd1aea51-7b2f-483e-b2d2-a892762a405c}</Project>
       <Name>Tangra.Astrometry</Name>
@@ -88,6 +94,7 @@
       <Name>Tangra.Model</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

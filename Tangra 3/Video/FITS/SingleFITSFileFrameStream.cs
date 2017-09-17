@@ -53,7 +53,7 @@ namespace Tangra.Video.FITS
 
             var cards = new Dictionary<string, string>();
 
-            FITSHelper.Load16BitFitsFile(fileName, null, zeroOutNegativePixels, 
+            FITSHelper.Load16BitFitsFile(fileName, null, null, zeroOutNegativePixels, 
                 (hdu) =>
                 {
                     var cursor = hdu.Header.GetCursor();

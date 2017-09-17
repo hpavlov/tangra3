@@ -10,7 +10,7 @@ using NUnit.Framework;
 using Tangra.Model.Astro;
 using Tangra.Model.Helpers;
 
-namespace Tangra.Astrometry.Tests
+namespace Tangra.Tests
 {
 	[TestFixture]
 	public class TestPsfFit

@@ -75,7 +75,7 @@ namespace nom.tam.fits
 		}
 
     /// <summary>Return the size of the data section</summary>
-		override internal int TrueSize
+		override internal long TrueSize
 		{
 			get
 			{

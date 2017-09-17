@@ -11,6 +11,7 @@ using System.Text;
 using System.Windows.Forms;
 using nom.tam.fits;
 using Tangra.Model.Config;
+using Tangra.Model.Helpers;
 
 namespace Tangra.Video.FITS
 {
@@ -18,6 +19,7 @@ namespace Tangra.Video.FITS
     {
         internal FITSTimeStampReader TimeStampReader;
         private List<HeaderEntry> m_AllCards = new List<HeaderEntry>();
+        private FitsTimestampHelper m_TimeStampHelper;
  
         private string m_FilesHash;
         private string m_CardNamesHash;
@@ -92,22 +94,8 @@ namespace Tangra.Video.FITS
                 cbxTimeStamp2Format.SelectedIndex = 0;
             }
 
-            TryIdentifyPreviousConfigApplyingForCurrentFiles();
-        }
-
-        public class HeaderEntry
-        {
-            public HeaderCard Card;
-
-            public HeaderEntry(HeaderCard card)
-            {
-                Card = card;
-            }
-
-            public override string ToString()
-            {
-                return Card.Key;
-            }
+            m_TimeStampHelper = new FitsTimestampHelper(m_FilesHash, m_AllCards, UseRecentFITSConfig);
+            m_TimeStampHelper.TryIdentifyPreviousConfigApplyingForCurrentFiles();
         }
 
         private void cbxTimeStamp_SelectedIndexChanged(object sender, EventArgs e)
@@ -145,19 +133,6 @@ namespace Tangra.Video.FITS
 
         private bool m_TimeStampMappingValid = false;
 
-        private bool VerifyTimeStamp(string value, string format)
-        {
-            try
-            {
-                var parsedTimestamp = DateTime.ParseExact(value, format, CultureInfo.InvariantCulture);
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
         private void VerifyTimeStamp()
         {
             m_TimeStampMappingValid = false;
@@ -166,7 +141,7 @@ namespace Tangra.Video.FITS
             {
                 string value = entry.Card.Value;
                 string format = cbxTimeStampFormat.Text;
-                m_TimeStampMappingValid = VerifyTimeStamp(value, format);
+                m_TimeStampMappingValid = m_TimeStampHelper.VerifyTimeStamp(value, format);
             }
 
             if (m_TimeStampMappingValid)
@@ -185,7 +160,7 @@ namespace Tangra.Video.FITS
             {
                 string value = entry.Card.Value;
                 string format = cbxTimeStamp2Format.Text;
-                m_TimeStamp2MappingValid = VerifyTimeStamp(value, format);
+                m_TimeStamp2MappingValid = m_TimeStampHelper.VerifyTimeStamp(value, format);
             }
 
             if (m_TimeStamp2MappingValid)
@@ -196,19 +171,6 @@ namespace Tangra.Video.FITS
 
         private bool m_ExposureValid = false;
 
-        private bool VerifyExposure(string value)
-        {
-            try
-            {
-                var parsedValue = double.Parse(value, CultureInfo.InvariantCulture);
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
         private void VerifyExposure()
         {
             m_ExposureValid = false;
@@ -216,67 +178,13 @@ namespace Tangra.Video.FITS
             if (entry != null)
             {
                 string value = entry.Card.Value;
-                m_ExposureValid = VerifyExposure(value);
+                m_ExposureValid = m_TimeStampHelper.VerifyExposure(value);
             }
 
             if (m_ExposureValid)
                 pbxExposureOK.BringToFront();
             else
                 pbxExposureWarning.BringToFront();
-        }
-
-        void TryIdentifyPreviousConfigApplyingForCurrentFiles()
-        {
-            if (TangraConfig.Settings.RecentFITSFieldConfig.Items.Count > 0)
-            {
-                var sameHashConfig = TangraConfig.Settings.RecentFITSFieldConfig.Items.FirstOrDefault(x => x.FileHash == m_FilesHash);
-                if (sameHashConfig != null && RecentFITSConfigMatches(sameHashConfig))
-                {
-                    UseRecentFITSConfig(sameHashConfig);
-                    return;
-                }
-
-                foreach (var config in TangraConfig.Settings.RecentFITSFieldConfig.Items)
-                {
-                    if (RecentFITSConfigMatches(config))
-                    {
-                        UseRecentFITSConfig(config);
-                        return;
-                    }
-                }
-            }
-        }
-
-        private bool RecentFITSConfigMatches(TangraConfig.FITSFieldConfig config)
-        {
-            if (config.IsTimeStampAndExposure)
-            {
-                var exposureCard = m_AllCards.FirstOrDefault(x => x.Card.Key == config.ExposureHeader);
-                var timestampCard = m_AllCards.FirstOrDefault(x => x.Card.Key == config.TimeStampHeader);
-
-                if (exposureCard != null && timestampCard != null)
-                {
-                    return 
-                        VerifyExposure(exposureCard.Card.Value) &&
-                        VerifyTimeStamp(timestampCard.Card.Value, config.TimeStampFormat);
-                }
-                else
-                    return false;
-            }
-            else
-            {
-                var startTimestampCard = m_AllCards.FirstOrDefault(x => x.Card.Key == config.TimeStampHeader);
-                var endTimestampCard = m_AllCards.FirstOrDefault(x => x.Card.Key == config.TimeStamp2Header);
-
-                if (startTimestampCard != null && endTimestampCard != null)
-                {
-                    return
-                        VerifyTimeStamp(startTimestampCard.Card.Value, config.TimeStampFormat) &&
-                        VerifyTimeStamp(endTimestampCard.Card.Value, config.TimeStamp2Format);
-                }
-                else
-                    return false;
-            }
         }
 
         private void UseRecentFITSConfig(TangraConfig.FITSFieldConfig config)

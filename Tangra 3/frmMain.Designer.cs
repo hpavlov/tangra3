@@ -1025,7 +1025,8 @@
             // openVideoFileDialog
             // 
             this.openVideoFileDialog.DefaultExt = "avi";
-            this.openVideoFileDialog.Filter = "All Supported Files (*.avi;*.adv;*.aav;*.ser)|*.avi;*.adv;*.aav;*.ser";
+            this.openVideoFileDialog.Filter = "All Supported Files (*.avi;*.adv;*.aav;*.ser;*.fit;*.fits)|*.avi;*.adv;*.aav;*.se" +
+    "r;*.fit;*.fits";
             // 
             // displayFrameTimer
             // 

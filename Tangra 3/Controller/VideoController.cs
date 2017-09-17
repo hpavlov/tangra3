@@ -368,12 +368,23 @@ namespace Tangra.Controller
                         {
 	                        try
 	                        {
-								bool hasNegativePixels;
-								frameStream = SingleFITSFileFrameStream.OpenFile(fileName, false, out hasNegativePixels);
-								if (hasNegativePixels && CheckWithUserAboutNegativePixels())
-								{
-									frameStream = SingleFITSFileFrameStream.OpenFile(fileName, true, out hasNegativePixels);
-								}
+	                            var cubeType = FITSHelper.GetFitsCubeType(fileName);
+	                            switch (cubeType)
+	                            {
+	                                case FITSHelper.FitsCubeType.NotACube:
+								        bool hasNegativePixels;
+								        frameStream = SingleFITSFileFrameStream.OpenFile(fileName, false, out hasNegativePixels);
+								        if (hasNegativePixels && CheckWithUserAboutNegativePixels())
+								        {
+									        frameStream = SingleFITSFileFrameStream.OpenFile(fileName, true, out hasNegativePixels);
+								        }
+	                                    break;
+                                    case FITSHelper.FitsCubeType.ThreeAxisCube:
+                                        frameStream = ThreeAxisFITSCubeFrameStream.OpenFile(fileName, this);
+	                                    break;
+                                    case FITSHelper.FitsCubeType.MultipleHDUsCube:
+                                        break;
+	                            }
 	                        }
 							catch (Exception ex)
 							{

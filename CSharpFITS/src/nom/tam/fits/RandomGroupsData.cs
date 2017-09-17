@@ -27,7 +27,7 @@ namespace nom.tam.fits
     #region Properties
 		/// <summary>Get the size of the actual data element. 
 		/// </summary>
-		override internal int TrueSize
+		override internal long TrueSize
 		{
 			get
 			{

@@ -343,7 +343,7 @@
     <Compile Include="Helpers\CrossPlaform.cs" />
     <Compile Include="Helpers\DuplicateFrameAvoider.cs" />
     <Compile Include="Helpers\Extensions.cs" />
-    <Compile Include="Helpers\FITSHelper.cs" />
+    <Compile Include="Helpers\FitsStreamHelper.cs" />
     <Compile Include="Helpers\frmChooseFitsFolder.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -969,12 +969,19 @@
     <Compile Include="Video\AstroDigitalVideo\UI\AdvTagValuePair.cs" />
     <Compile Include="Video\BMPFileSequenceStream.cs" />
     <Compile Include="Video\FITS\FITSFileSequenceStream.cs" />
-    <Compile Include="Video\FITS\FITSTimeStampReader.cs" />
+    <Compile Include="Video\FITS\FitsTimestampHelper.cs" />
+    <Compile Include="Video\FITS\LCFITSTimeStampReader.cs" />
     <Compile Include="Video\FITS\frmChooseTimeHeaders.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Video\FITS\frmChooseTimeHeaders.Designer.cs">
       <DependentUpon>frmChooseTimeHeaders.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Video\FITS\frmDefineFitsCube3D.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Video\FITS\frmDefineFitsCube3D.Designer.cs">
+      <DependentUpon>frmDefineFitsCube3D.cs</DependentUpon>
     </Compile>
     <Compile Include="Video\FITS\frmFitsHeaderPopup.cs">
       <SubType>Form</SubType>
@@ -988,7 +995,19 @@
     <Compile Include="Video\FITS\frmSortFitsFiles.Designer.cs">
       <DependentUpon>frmSortFitsFiles.cs</DependentUpon>
     </Compile>
-    <Compile Include="Video\FITS\IFITSTimeStampReader.cs" />
+    <Compile Include="Video\FITS\ThreeAxisFITSCubeFrameStream.cs" />
+    <Compile Include="Video\FITS\ucFitsTimeStampConfigurator.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Video\FITS\ucFitsTimeStampConfigurator.Designer.cs">
+      <DependentUpon>ucFitsTimeStampConfigurator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Video\FITS\ucNegativePixelsTreatment.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Video\FITS\ucNegativePixelsTreatment.Designer.cs">
+      <DependentUpon>ucNegativePixelsTreatment.cs</DependentUpon>
+    </Compile>
     <Compile Include="Video\frmIntegrationDetection.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -1377,11 +1396,20 @@
     <EmbeddedResource Include="Video\FITS\frmChooseTimeHeaders.resx">
       <DependentUpon>frmChooseTimeHeaders.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Video\FITS\frmDefineFitsCube3D.resx">
+      <DependentUpon>frmDefineFitsCube3D.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Video\FITS\frmFitsHeaderPopup.resx">
       <DependentUpon>frmFitsHeaderPopup.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Video\FITS\frmSortFitsFiles.resx">
       <DependentUpon>frmSortFitsFiles.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Video\FITS\ucFitsTimeStampConfigurator.resx">
+      <DependentUpon>ucFitsTimeStampConfigurator.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Video\FITS\ucNegativePixelsTreatment.resx">
+      <DependentUpon>ucNegativePixelsTreatment.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Video\frmIntegrationDetection.resx">
       <DependentUpon>frmIntegrationDetection.cs</DependentUpon>

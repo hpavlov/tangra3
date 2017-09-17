@@ -9,7 +9,7 @@ using NUnit.Framework;
 using Tangra.Model.Helpers;
 using Tangra.Model.Numerical;
 
-namespace Tangra.Astrometry.Tests.MotionFitting
+namespace Tangra.Tests.MotionFitting
 {
     [TestFixture]
     public class TestFastMotionFitter
