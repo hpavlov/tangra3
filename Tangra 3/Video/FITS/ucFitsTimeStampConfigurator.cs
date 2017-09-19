@@ -163,6 +163,38 @@ namespace Tangra.Video.FITS
             }
         }
 
+        internal void UseRecentFitsConfig2(TangraConfig.FITSFieldConfig config)
+        {
+            rbSeparateDateTime.Checked = config.TimeStamp2IsDateTimeParts;
+
+            for (int i = 0; i < cbxTimeStamp.Items.Count; i++)
+            {
+                if (((HeaderEntry)cbxTimeStamp.Items[i]).Card.Key == config.TimeStamp2Header)
+                {
+                    cbxTimeStamp.SelectedIndex = i;
+                    break;
+                }
+            }
+
+            if (config.TimeStamp2Format != null)
+                cbxTimeStampFormat.SelectedIndex = cbxTimeStampFormat.Items.IndexOf(config.TimeStamp2Format);
+
+            if (config.TimeStamp2IsDateTimeParts)
+            {
+                for (int i = 0; i < cbxSecondCard.Items.Count; i++)
+                {
+                    if (((HeaderEntry)cbxSecondCard.Items[i]).Card.Key == config.TimeStamp2Header2)
+                    {
+                        cbxSecondCard.SelectedIndex = i;
+                        break;
+                    }
+                }
+
+                if (config.TimeStamp2Format2 != null)
+                    cbxSecondCardFormat.SelectedIndex = cbxSecondCardFormat.Items.IndexOf(config.TimeStamp2Format2);
+            }
+        }
+
         private void rbSeparateDateTime_CheckedChanged(object sender, EventArgs e)
         {
             m_SeparateDateTimeMode = rbSeparateDateTime.Checked;
@@ -223,7 +255,7 @@ namespace Tangra.Video.FITS
 
         private void cbxTimeStampFormat_SelectedIndexChanged(object sender, EventArgs e)
         {
-            VerifyTimeStamp();
+            
         }
 
         public bool ValidateInput()
@@ -332,6 +364,24 @@ namespace Tangra.Video.FITS
         }
 
         private void cbxSecondCardFormat_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            
+        }
+
+        public void SetTimeStampType(TangraConfig.TimeStampType? timeStampType, bool changable)
+        {
+            if (timeStampType.HasValue)
+                cbxTimestampType.SelectedIndex = (int)timeStampType;
+
+            cbxTimestampType.Enabled = changable;
+        }
+
+        private void cbxTimeStampFormat_TextChanged(object sender, EventArgs e)
+        {
+            VerifyTimeStamp();
+        }
+
+        private void cbxSecondCardFormat_TextChanged(object sender, EventArgs e)
         {
             VerifyTimeStamp();
         }

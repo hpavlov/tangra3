@@ -38,6 +38,8 @@
             this.lblHeight = new System.Windows.Forms.Label();
             this.lblFrames = new System.Windows.Forms.Label();
             this.pnlExposure = new System.Windows.Forms.Panel();
+            this.pbxExposureWarning = new System.Windows.Forms.PictureBox();
+            this.pbxExposureOK = new System.Windows.Forms.PictureBox();
             this.tbxExposureValue = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
@@ -46,14 +48,12 @@
             this.btnOK = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.pbxExposureWarning = new System.Windows.Forms.PictureBox();
-            this.pbxExposureOK = new System.Windows.Forms.PictureBox();
             this.ucTimestampControl = new Tangra.Video.FITS.ucFitsTimeStampConfigurator();
             this.ucNegativePixelsTreatment = new Tangra.Video.FITS.ucNegativePixelsTreatment();
             this.pnlExposure.SuspendLayout();
-            this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbxExposureWarning)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbxExposureOK)).BeginInit();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // cbxNaxisOrder
@@ -148,10 +148,32 @@
             this.pnlExposure.Controls.Add(this.label6);
             this.pnlExposure.Controls.Add(this.cbxExposure);
             this.pnlExposure.Controls.Add(this.cbxExposureUnits);
-            this.pnlExposure.Location = new System.Drawing.Point(31, 156);
+            this.pnlExposure.Location = new System.Drawing.Point(31, 163);
             this.pnlExposure.Name = "pnlExposure";
             this.pnlExposure.Size = new System.Drawing.Size(434, 100);
             this.pnlExposure.TabIndex = 8;
+            // 
+            // pbxExposureWarning
+            // 
+            this.pbxExposureWarning.BackColor = System.Drawing.Color.Transparent;
+            this.pbxExposureWarning.Image = ((System.Drawing.Image)(resources.GetObject("pbxExposureWarning.Image")));
+            this.pbxExposureWarning.Location = new System.Drawing.Point(2, 34);
+            this.pbxExposureWarning.Name = "pbxExposureWarning";
+            this.pbxExposureWarning.Size = new System.Drawing.Size(16, 16);
+            this.pbxExposureWarning.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pbxExposureWarning.TabIndex = 11;
+            this.pbxExposureWarning.TabStop = false;
+            // 
+            // pbxExposureOK
+            // 
+            this.pbxExposureOK.BackColor = System.Drawing.Color.Transparent;
+            this.pbxExposureOK.Image = ((System.Drawing.Image)(resources.GetObject("pbxExposureOK.Image")));
+            this.pbxExposureOK.Location = new System.Drawing.Point(2, 34);
+            this.pbxExposureOK.Name = "pbxExposureOK";
+            this.pbxExposureOK.Size = new System.Drawing.Size(16, 16);
+            this.pbxExposureOK.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pbxExposureOK.TabIndex = 10;
+            this.pbxExposureOK.TabStop = false;
             // 
             // tbxExposureValue
             // 
@@ -210,7 +232,7 @@
             // 
             // btnOK
             // 
-            this.btnOK.Location = new System.Drawing.Point(349, 364);
+            this.btnOK.Location = new System.Drawing.Point(348, 354);
             this.btnOK.Name = "btnOK";
             this.btnOK.Size = new System.Drawing.Size(75, 23);
             this.btnOK.TabIndex = 19;
@@ -221,7 +243,7 @@
             // btnCancel
             // 
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(430, 364);
+            this.btnCancel.Location = new System.Drawing.Point(429, 354);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 18;
@@ -232,46 +254,24 @@
             // 
             this.groupBox1.Controls.Add(this.ucTimestampControl);
             this.groupBox1.Controls.Add(this.pnlExposure);
-            this.groupBox1.Location = new System.Drawing.Point(17, 87);
+            this.groupBox1.Location = new System.Drawing.Point(17, 65);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(488, 271);
+            this.groupBox1.Size = new System.Drawing.Size(488, 279);
             this.groupBox1.TabIndex = 20;
             this.groupBox1.TabStop = false;
             // 
-            // pbxExposureWarning
-            // 
-            this.pbxExposureWarning.BackColor = System.Drawing.Color.Transparent;
-            this.pbxExposureWarning.Image = ((System.Drawing.Image)(resources.GetObject("pbxExposureWarning.Image")));
-            this.pbxExposureWarning.Location = new System.Drawing.Point(2, 34);
-            this.pbxExposureWarning.Name = "pbxExposureWarning";
-            this.pbxExposureWarning.Size = new System.Drawing.Size(16, 16);
-            this.pbxExposureWarning.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pbxExposureWarning.TabIndex = 11;
-            this.pbxExposureWarning.TabStop = false;
-            // 
-            // pbxExposureOK
-            // 
-            this.pbxExposureOK.BackColor = System.Drawing.Color.Transparent;
-            this.pbxExposureOK.Image = ((System.Drawing.Image)(resources.GetObject("pbxExposureOK.Image")));
-            this.pbxExposureOK.Location = new System.Drawing.Point(2, 34);
-            this.pbxExposureOK.Name = "pbxExposureOK";
-            this.pbxExposureOK.Size = new System.Drawing.Size(16, 16);
-            this.pbxExposureOK.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-            this.pbxExposureOK.TabIndex = 10;
-            this.pbxExposureOK.TabStop = false;
-            // 
             // ucTimestampControl
             // 
-            this.ucTimestampControl.Location = new System.Drawing.Point(30, 15);
+            this.ucTimestampControl.Location = new System.Drawing.Point(30, 22);
             this.ucTimestampControl.Name = "ucTimestampControl";
             this.ucTimestampControl.Size = new System.Drawing.Size(443, 134);
             this.ucTimestampControl.TabIndex = 9;
             // 
             // ucNegativePixelsTreatment
             // 
-            this.ucNegativePixelsTreatment.Location = new System.Drawing.Point(11, 53);
+            this.ucNegativePixelsTreatment.Location = new System.Drawing.Point(20, 354);
             this.ucNegativePixelsTreatment.Name = "ucNegativePixelsTreatment";
-            this.ucNegativePixelsTreatment.Size = new System.Drawing.Size(389, 33);
+            this.ucNegativePixelsTreatment.Size = new System.Drawing.Size(266, 22);
             this.ucNegativePixelsTreatment.TabIndex = 21;
             this.ucNegativePixelsTreatment.Visible = false;
             // 
@@ -279,7 +279,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(527, 399);
+            this.ClientSize = new System.Drawing.Size(521, 388);
             this.Controls.Add(this.ucNegativePixelsTreatment);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.btnOK);
@@ -298,9 +298,9 @@
             this.Text = "Define 3D FITS Cube";
             this.pnlExposure.ResumeLayout(false);
             this.pnlExposure.PerformLayout();
-            this.groupBox1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pbxExposureWarning)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbxExposureOK)).EndInit();
+            this.groupBox1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 

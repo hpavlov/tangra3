@@ -11,19 +11,55 @@ namespace Tangra.Tests.FITS
     [TestFixture]
     public class TestFitsNegativePixelHandling
     {
-        [Test]
-        public void TestTimeStampExposure()
+        private void RunTest(Array pixels, Type type)
         {
             uint medianVal;
             Type dataType;
             bool hasNegPix;
 
+            short minValue;
+            uint maxValue;
+            int bz = 0;
+            FITSHelper.Load16BitImageData(pixels, 3, 2, bz, out medianVal, out dataType, out hasNegPix, out minValue, out maxValue);
+
+            Assert.AreEqual(type, dataType);
+            Assert.AreEqual(true, hasNegPix);
+            Assert.AreEqual(-13, minValue);
+            Assert.AreEqual(34, maxValue);
+
+            bz = -10;
+            FITSHelper.Load16BitImageData(pixels, 3, 2, bz, out medianVal, out dataType, out hasNegPix, out minValue, out maxValue);
+            Assert.AreEqual(-13, minValue);
+            Assert.AreEqual(24, maxValue);
+
+
+            bz = -14;
+            FITSHelper.Load16BitImageData(pixels, 3, 2, bz, out medianVal, out dataType, out hasNegPix, out minValue, out maxValue);
+            Assert.AreEqual(-13, minValue);
+            Assert.AreEqual(20, maxValue);
+            Assert.AreEqual(true, hasNegPix); // Zeroing out negative pixels doesn't change the fact that there are negative pixels
+        }
+
+        [Test]
+        public void TestNegativePixelDetection_Int16()
+        {
             Array pixels = new Array[3];
             pixels.SetValue(new short[2] { -3, 5 }, 0);
             pixels.SetValue(new short[2] { 0, -13 }, 1);
             pixels.SetValue(new short[2] { 34, 12 }, 2);
 
-            FITSHelper.Load16BitImageData(pixels, false, 3, 2, 0, out medianVal, out dataType, out hasNegPix);
+            RunTest(pixels, typeof(short));
+        }
+
+        [Test]
+        public void TestNegativePixelDetection_Float()
+        {
+            Array pixels = new Array[3];
+            pixels.SetValue(new float[2] { -3, 5 }, 0);
+            pixels.SetValue(new float[2] { 0, -13 }, 1);
+            pixels.SetValue(new float[2] { 34, 12 }, 2);
+
+            RunTest(pixels, typeof (float));
         }
     }
 }

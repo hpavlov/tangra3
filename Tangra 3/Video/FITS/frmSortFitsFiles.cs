@@ -11,6 +11,7 @@ using System.Text;
 using System.Windows.Forms;
 using nom.tam.fits;
 using nom.tam.util;
+using Tangra.Controller;
 using Tangra.Helpers;
 using Tangra.Model.Helpers;
 
@@ -28,6 +29,8 @@ namespace Tangra.Video.FITS
 
         private string m_OrderedFitsFileHash;
 
+        private VideoController m_VideoController;
+
         private string GetOrderedFitsFileHash()
         {
             if (m_OrderedFitsFileHash == null)
@@ -44,9 +47,15 @@ namespace Tangra.Video.FITS
             return m_OrderedFitsFileHash;
         }
 
-        public frmSortFitsFiles()
+        private frmSortFitsFiles()
         {
             InitializeComponent();
+        }
+
+        public frmSortFitsFiles(VideoController videoController)
+            : this()
+        {
+            m_VideoController = videoController;
         }
 
         internal void SetFiles(string[] fitsFiles)
@@ -118,7 +127,7 @@ namespace Tangra.Video.FITS
 
                         if (i == 0)
                         {
-                            var frm = new frmChooseTimeHeaders(hdr, GetOrderedFitsFileHash());
+                            var frm = new frmChooseTimeHeaders(m_FitsFiles[i], GetOrderedFitsFileHash(), m_VideoController);
                             if (frm.ShowDialog(this) == DialogResult.OK)
                             {
                                 TimeStampReader = frm.TimeStampReader;

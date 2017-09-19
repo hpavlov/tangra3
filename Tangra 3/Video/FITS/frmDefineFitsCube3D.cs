@@ -19,15 +19,13 @@ namespace Tangra.Video.FITS
     {
         public FITSTimeStampReader TimeStampReader { get; private set; }
 
-        public bool ZeroOutNegativePixels { get; private set; }
-
         public int WidthIndex { get; private set; }
 
         public int HeightIndex { get; private set; }
 
         public int FrameIndex { get; private set; }
 
-        public uint MinPixelValue { get; private set; }
+        public short MinPixelValue { get; private set; }
         
         public uint MaxPixelValue { get; private set; }
 
@@ -35,7 +33,7 @@ namespace Tangra.Video.FITS
 
         public int BitPix { get; private set; }
 
-        public uint BZero { get; private set; }
+        public int NegPixCorrection { get; private set; }
 
         private BasicHDU m_ImageHDU;
 
@@ -98,15 +96,15 @@ namespace Tangra.Video.FITS
             lblHeight.Text = m_ImageHDU.Axes[HeightIndex].ToString();
             lblWidth.Text = m_ImageHDU.Axes[WidthIndex].ToString();
 
-            uint minPixelValue;
-            uint maxPixelBalue;
+            short minPixelValue;
+            uint maxPixelValue;
             bool hasNegativePixels;
             int bpp;
-            uint bzero;
+            int bzero;
             m_VideoController.SetCursor(Cursors.WaitCursor);
             try
             {
-                ParseFirstFrame(false, out minPixelValue, out maxPixelBalue, out bpp, out bzero, out hasNegativePixels);
+                ParseFirstFrame(out minPixelValue, out maxPixelValue, out bpp, out bzero, out hasNegativePixels);
             }
             finally
             {
@@ -115,11 +113,13 @@ namespace Tangra.Video.FITS
 
             if (hasNegativePixels)
                 ucNegativePixelsTreatment.Initialise(bzero, minPixelValue);
+            else
+                NegPixCorrection = 0;
 
             ucNegativePixelsTreatment.Visible = hasNegativePixels;
 
             MinPixelValue = minPixelValue;
-            MaxPixelValue = maxPixelBalue;
+            MaxPixelValue = maxPixelValue;
             HasNegativePixels = hasNegativePixels;
             BitPix = bpp;
         }
@@ -258,15 +258,20 @@ namespace Tangra.Video.FITS
             TangraConfig.Settings.RecentFITSFieldConfig.Register(config);
             TangraConfig.Settings.Save();
 
-            // TODO: This should be more a involved configuration
-            ZeroOutNegativePixels = HasNegativePixels && ucNegativePixelsTreatment.ZeroOut;
+            if (HasNegativePixels)
+            {
+                NegPixCorrection = ucNegativePixelsTreatment.NegPixCorrection;
+
+                MaxPixelValue = (uint)((int)MaxPixelValue - NegPixCorrection);
+                BitPix = FITSHelper.GetBppForMaxPixelValue(MaxPixelValue);
+            }
 
             DialogResult = DialogResult.OK;
             Close();
         }
 
-        private bool Load16BitFitsFile(string fileName, IFITSTimeStampReader timeStampReader, bool zeroOutNegativePixels,
-            out uint[,] pixels, out int width, out int height, out uint medianValue, out Type pixelDataType, out bool hasNegativePixels,
+        private bool Load16BitFitsFile(string fileName, IFITSTimeStampReader timeStampReader,
+            out uint[,] pixels, out int width, out int height, out uint medianValue, out Type pixelDataType, out bool hasNegativePixels, out short minValue, out uint maxValue,
             FITSHelper.CheckOpenedFitsFileCallback callback)
         {
             float frameExposure;
@@ -277,9 +282,10 @@ namespace Tangra.Video.FITS
             return FITSHelper.LoadFitsDataInternal(
                 m_ImageHDU,
                 GetFirstFramePixelArray(), fileName, timeStampReader,
-                out pixels, out medianValue, out pixelDataType, out frameExposure, out hasNegativePixels, callback, (Array dataArray, int h, int w, double bzero, out uint[,] ppx, out uint median, out Type dataType, out bool hasNegPix) =>
+                out pixels, out medianValue, out pixelDataType, out frameExposure, out hasNegativePixels, out minValue, out maxValue, callback, 
+                (Array dataArray, int h, int w, double bzero, out uint[,] ppx, out uint median, out Type dataType, out bool hasNegPix, out short minV, out uint maxV) =>
                 {
-                    ppx = FITSHelper.Load16BitImageData(dataArray, zeroOutNegativePixels, m_ImageHDU.Axes[HeightIndex], m_ImageHDU.Axes[WidthIndex], (uint)bzero, out median, out dataType, out hasNegPix);
+                    ppx = FITSHelper.Load16BitImageData(dataArray, m_ImageHDU.Axes[HeightIndex], m_ImageHDU.Axes[WidthIndex], (int)bzero, out median, out dataType, out hasNegPix, out minV, out maxV);
                 });
         }
 
@@ -304,18 +310,17 @@ namespace Tangra.Video.FITS
             throw new NotImplementedException();
         }
 
-        private void ParseFirstFrame(bool zeroOutNegPixels, out uint minPixelValue, out uint maxPixelValue, out int bpp, out uint bzero, out bool hasNegativePixels)
+        private void ParseFirstFrame(out short minPixelValue, out uint maxPixelValue, out int bpp, out int bzero, out bool hasNegativePixels)
         {
             uint[] pixelsFlat;
             int width;
             int height;
             DateTime? timestamp;
             double? exposure;
-            uint bz = 0;
+            int bz = 0;
             var cards = new Dictionary<string, string>();
 
             FITSHelper.Load16BitFitsFile(null, Load16BitFitsFile, null,
-                zeroOutNegPixels,
                 (hdu) =>
                 {
                     var cursor = hdu.Header.GetCursor();

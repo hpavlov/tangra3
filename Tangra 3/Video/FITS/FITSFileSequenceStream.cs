@@ -23,22 +23,21 @@ namespace Tangra.Video.FITS
     {
         private List<string> m_FitsFilesList = new List<string>();
 
-        private uint m_MinPixelValueFirstImage;
+        private short m_MinPixelValueFirstImage;
         private uint m_MaxPixelValueFirstImage;
-        private bool m_ZeroOutNegativePixels = false;
         private IFITSTimeStampReader m_TimeStampReader = null;
 
-        public static FITSFileSequenceStream OpenFolder(string[] fitsFiles, IFITSTimeStampReader timeStampReader, bool zeroOutNegativeValues, int firstFrameNo, out bool hasNegativePixels)
+        public static FITSFileSequenceStream OpenFolder(string[] fitsFiles, IFITSTimeStampReader timeStampReader, int firstFrameNo)
         {
 			UsageStats.Instance.ProcessedFitsFolderFiles++;
 			UsageStats.Instance.Save();
 
-            var rv = new FITSFileSequenceStream(fitsFiles, timeStampReader, zeroOutNegativeValues, firstFrameNo, out hasNegativePixels);
+            var rv = new FITSFileSequenceStream(fitsFiles, timeStampReader, firstFrameNo);
 	        rv.FileName = Path.GetDirectoryName(fitsFiles[0]);
 	        return rv;
         }
 
-        private FITSFileSequenceStream(string[] fitsFiles, IFITSTimeStampReader timeStampReader, bool zeroOutNegativeValues, int firstFrame, out bool hasNegativePixels)
+        private FITSFileSequenceStream(string[] fitsFiles, IFITSTimeStampReader timeStampReader, int firstFrame)
         {
             m_FitsFilesList.AddRange(fitsFiles);
 
@@ -49,7 +48,6 @@ namespace Tangra.Video.FITS
             FirstFrame = firstFrame;
             LastFrame = m_FitsFilesList.Count - 1 + firstFrame;
             CountFrames = m_FitsFilesList.Count;
-            m_ZeroOutNegativePixels = zeroOutNegativeValues;
             m_TimeStampReader = timeStampReader;
 
             uint[] pixelsFlat;
@@ -58,10 +56,11 @@ namespace Tangra.Video.FITS
             int bpp;
 			DateTime? timestamp;
 			double? exposure;
-            uint minPixelValue;
+            short minPixelValue;
             uint maxPixelValue;
+            bool hasNegativePixels;
 
-            FITSHelper.Load16BitFitsFile(m_FitsFilesList[0], null, m_TimeStampReader, zeroOutNegativeValues, null, out pixelsFlat, out width, out height, out bpp, out timestamp, out exposure, out minPixelValue, out maxPixelValue, out hasNegativePixels);
+            FITSHelper.Load16BitFitsFile(m_FitsFilesList[0], null, m_TimeStampReader, null, out pixelsFlat, out width, out height, out bpp, out timestamp, out exposure, out minPixelValue, out maxPixelValue, out hasNegativePixels);
 
             m_MinPixelValueFirstImage = minPixelValue;
             m_MaxPixelValueFirstImage = maxPixelValue;
@@ -144,14 +143,14 @@ namespace Tangra.Video.FITS
             int bpp;
 			DateTime? timestamp;
 			double? exposure;
-            uint minPixelValue;
+            short minPixelValue;
             uint maxPixelValue;
             bool hasNegativePixels;
 
             var cards = new Dictionary<string, string>();
             BasicHDU fitsImage = null;
 
-            FITSHelper.Load16BitFitsFile(m_FitsFilesList[index - FirstFrame], null, m_TimeStampReader, m_ZeroOutNegativePixels,
+            FITSHelper.Load16BitFitsFile(m_FitsFilesList[index - FirstFrame], null, m_TimeStampReader,
                 (hdu) =>
                 {
                     fitsImage = hdu;
@@ -211,7 +210,7 @@ namespace Tangra.Video.FITS
 
         public uint MinPixelValue
         {
-            get { return m_MinPixelValueFirstImage; }
+            get { return m_MinPixelValueFirstImage > 0 ? (uint)m_MinPixelValueFirstImage : 0; }
         }
 
         public uint MaxPixelValue

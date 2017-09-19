@@ -11,27 +11,36 @@ namespace Tangra.Video.FITS
 {
     public partial class ucNegativePixelsTreatment : UserControl
     {
-        public bool ZeroOut { get; private set; }
+        public int NegPixCorrection { get; private set; }
+
+        private int m_BZero;
+        private int m_MinPixelValue;
 
         public ucNegativePixelsTreatment()
         {
             InitializeComponent();
         }
 
-        public void Initialise(uint bzero, uint minPixelValue)
+        public void Initialise(int bzero, short minPixelValue)
         {
-            nudBZero.Minimum = minPixelValue;
-            nudBZero.Value = minPixelValue;
+            rbMinPixVal.Text = minPixelValue.ToString();
+            m_BZero = bzero;
+            m_MinPixelValue = minPixelValue;
 
-            if (bzero == 0)
-                rbBZero.Checked = true;
-            else
-                rbZeroOut.Checked = true;
+            UpdateNegPixCorrection();
         }
 
-        private void rbBZero_CheckedChanged(object sender, EventArgs e)
+        private void rbZero_CheckedChanged(object sender, EventArgs e)
         {
+            UpdateNegPixCorrection();
+        }
 
+        private void UpdateNegPixCorrection()
+        {
+            if (rbZero.Checked)
+                NegPixCorrection = 0;
+            else
+                NegPixCorrection = m_MinPixelValue;
         }
     }
 }

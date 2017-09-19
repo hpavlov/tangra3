@@ -29,78 +29,51 @@
         private void InitializeComponent()
         {
             this.label1 = new System.Windows.Forms.Label();
-            this.rbBZero = new System.Windows.Forms.RadioButton();
-            this.rbZeroOut = new System.Windows.Forms.RadioButton();
-            this.nudBZero = new System.Windows.Forms.NumericUpDown();
-            ((System.ComponentModel.ISupportInitialize)(this.nudBZero)).BeginInit();
+            this.rbMinPixVal = new System.Windows.Forms.RadioButton();
+            this.rbZero = new System.Windows.Forms.RadioButton();
             this.SuspendLayout();
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(3, 10);
+            this.label1.Location = new System.Drawing.Point(3, 3);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(128, 13);
+            this.label1.Size = new System.Drawing.Size(135, 13);
             this.label1.TabIndex = 25;
-            this.label1.Text = "Negative Pixels Handling:";
+            this.label1.Text = "Zero-out negative pixels at:";
             // 
-            // rbBZero
+            // rbMinPixVal
             // 
-            this.rbBZero.AutoSize = true;
-            this.rbBZero.Location = new System.Drawing.Point(137, 8);
-            this.rbBZero.Name = "rbBZero";
-            this.rbBZero.Size = new System.Drawing.Size(54, 17);
-            this.rbBZero.TabIndex = 26;
-            this.rbBZero.TabStop = true;
-            this.rbBZero.Text = "BZero";
-            this.rbBZero.UseVisualStyleBackColor = true;
-            this.rbBZero.CheckedChanged += new System.EventHandler(this.rbBZero_CheckedChanged);
+            this.rbMinPixVal.AutoSize = true;
+            this.rbMinPixVal.Checked = true;
+            this.rbMinPixVal.Location = new System.Drawing.Point(144, 1);
+            this.rbMinPixVal.Name = "rbMinPixVal";
+            this.rbMinPixVal.Size = new System.Drawing.Size(58, 17);
+            this.rbMinPixVal.TabIndex = 26;
+            this.rbMinPixVal.TabStop = true;
+            this.rbMinPixVal.Text = "-10000";
+            this.rbMinPixVal.UseVisualStyleBackColor = true;
             // 
-            // rbZeroOut
+            // rbZero
             // 
-            this.rbZeroOut.AutoSize = true;
-            this.rbZeroOut.Location = new System.Drawing.Point(311, 8);
-            this.rbZeroOut.Name = "rbZeroOut";
-            this.rbZeroOut.Size = new System.Drawing.Size(67, 17);
-            this.rbZeroOut.TabIndex = 27;
-            this.rbZeroOut.TabStop = true;
-            this.rbZeroOut.Text = "Zero Out";
-            this.rbZeroOut.UseVisualStyleBackColor = true;
-            // 
-            // nudBZero
-            // 
-            this.nudBZero.Location = new System.Drawing.Point(197, 7);
-            this.nudBZero.Maximum = new decimal(new int[] {
-            0,
-            0,
-            0,
-            0});
-            this.nudBZero.Minimum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            -2147483648});
-            this.nudBZero.Name = "nudBZero";
-            this.nudBZero.ReadOnly = true;
-            this.nudBZero.Size = new System.Drawing.Size(67, 20);
-            this.nudBZero.TabIndex = 28;
-            this.nudBZero.Value = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            -2147483648});
+            this.rbZero.AutoSize = true;
+            this.rbZero.Location = new System.Drawing.Point(222, 1);
+            this.rbZero.Name = "rbZero";
+            this.rbZero.Size = new System.Drawing.Size(31, 17);
+            this.rbZero.TabIndex = 27;
+            this.rbZero.Text = "0";
+            this.rbZero.UseVisualStyleBackColor = true;
+            this.rbZero.CheckedChanged += new System.EventHandler(this.rbZero_CheckedChanged);
             // 
             // ucNegativePixelsTreatment
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.nudBZero);
-            this.Controls.Add(this.rbZeroOut);
-            this.Controls.Add(this.rbBZero);
+            this.Controls.Add(this.rbZero);
+            this.Controls.Add(this.rbMinPixVal);
             this.Controls.Add(this.label1);
             this.Name = "ucNegativePixelsTreatment";
-            this.Size = new System.Drawing.Size(424, 33);
-            ((System.ComponentModel.ISupportInitialize)(this.nudBZero)).EndInit();
+            this.Size = new System.Drawing.Size(277, 21);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -109,8 +82,7 @@
         #endregion
 
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.RadioButton rbBZero;
-        private System.Windows.Forms.RadioButton rbZeroOut;
-        private System.Windows.Forms.NumericUpDown nudBZero;
+        private System.Windows.Forms.RadioButton rbMinPixVal;
+        private System.Windows.Forms.RadioButton rbZero;
     }
 }

@@ -33,14 +33,14 @@ namespace Tangra.Video.FITS
         private int m_Width;
         private int m_Height;
         private int m_Bpp;
+        private int m_BZero;
+        private int m_NegPixCorrection;
         
         private FITSTimeStampReader m_TimeStampReader;
-        private bool m_ZeroOutNegativePixels;
 
-        private uint m_MinPixelValue;
+        private short m_MinPixelValue;
         private uint m_MaxPixelValue;
-        private uint m_BZero;
-
+        
         private double m_ExposureSeconds;
         private DateTime m_FirstFrameMidTime;
 
@@ -71,9 +71,9 @@ namespace Tangra.Video.FITS
                 if (videoController.ShowDialog(frm) == DialogResult.OK)
                 {
                     fitsStream = new ThreeAxisFITSCubeFrameStream(
-                        fitsFile, bufferedFile, imageHDU, frm.TimeStampReader, frm.ZeroOutNegativePixels,
+                        fitsFile, bufferedFile, imageHDU, frm.TimeStampReader,
                         frm.WidthIndex, frm.HeightIndex, frm.FrameIndex,
-                        frm.MinPixelValue, frm.MaxPixelValue, frm.BitPix);
+                        frm.MinPixelValue, frm.MaxPixelValue, frm.BitPix, frm.NegPixCorrection);
                 }
             }
             finally
@@ -87,9 +87,9 @@ namespace Tangra.Video.FITS
 
         private ThreeAxisFITSCubeFrameStream(
             Fits fitsFile, BufferedFile bufferedFile, BasicHDU imageHDU, 
-            FITSTimeStampReader timeStampReader, bool zeroOutNegativePixels,
+            FITSTimeStampReader timeStampReader,
             int widthIndex, int heightIndex, int frameIndex,
-            uint minPixelValue, uint maxPixelValue, int bitPix)
+            short minPixelValue, uint maxPixelValue, int bitPix, int negPixCorrection)
         {
             bool isMidPoint;
             double? exposureSecs;
@@ -104,7 +104,6 @@ namespace Tangra.Video.FITS
 
             m_FitsFile = fitsFile;
             m_TimeStampReader = timeStampReader;
-            m_ZeroOutNegativePixels = zeroOutNegativePixels;
 
             m_BufferedFile = bufferedFile;
             m_ImageHDU = imageHDU;
@@ -119,6 +118,7 @@ namespace Tangra.Video.FITS
 
             m_ArrayData = (Array)m_ImageHDU.Data.DataArray;
             m_BZero = FITSHelper.GetBZero(m_ImageHDU);
+            m_NegPixCorrection = negPixCorrection;
 
             m_Cards = new Dictionary<string, string>();
             var cursor = m_ImageHDU.Header.GetCursor();
@@ -149,7 +149,9 @@ namespace Tangra.Video.FITS
             uint median;
             Type dataType;
             bool hasNegPix;
-            uint[,] pixData = FITSHelper.Load16BitImageData(frameData, m_ZeroOutNegativePixels, m_Height, m_Width, m_BZero, out median, out dataType, out hasNegPix);
+            short minValue;
+            uint maxValue;
+            uint[,] pixData = FITSHelper.Load16BitImageData(frameData, m_Height, m_Width, m_BZero - m_NegPixCorrection, out median, out dataType, out hasNegPix, out minValue, out maxValue);
             var pixelsFlat = Pixelmap.ConvertFromXYToFlatArray(pixData, Width, Height);
 
             DateTime timestamp = m_FirstFrameMidTime.AddSeconds(index*m_ExposureSeconds);
@@ -178,7 +180,7 @@ namespace Tangra.Video.FITS
 
         public uint MinPixelValue
         {
-            get { return m_MinPixelValue; }
+            get { return m_MinPixelValue > 0 ? (uint)m_MinPixelValue : 0; }
         }
 
         public uint MaxPixelValue

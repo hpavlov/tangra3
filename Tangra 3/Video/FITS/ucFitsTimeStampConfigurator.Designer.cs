@@ -74,7 +74,7 @@
             this.cbxSecondCardFormat.Name = "cbxSecondCardFormat";
             this.cbxSecondCardFormat.Size = new System.Drawing.Size(181, 21);
             this.cbxSecondCardFormat.TabIndex = 41;
-            this.cbxSecondCardFormat.SelectedIndexChanged += new System.EventHandler(this.cbxSecondCardFormat_SelectedIndexChanged);
+            this.cbxSecondCardFormat.TextChanged += new System.EventHandler(this.cbxSecondCardFormat_TextChanged);
             // 
             // cbxSecondCardType
             // 
@@ -160,7 +160,7 @@
             this.cbxTimeStampFormat.Name = "cbxTimeStampFormat";
             this.cbxTimeStampFormat.Size = new System.Drawing.Size(181, 21);
             this.cbxTimeStampFormat.TabIndex = 31;
-            this.cbxTimeStampFormat.SelectedIndexChanged += new System.EventHandler(this.cbxTimeStampFormat_SelectedIndexChanged);
+            this.cbxTimeStampFormat.TextChanged += new System.EventHandler(this.cbxTimeStampFormat_TextChanged);
             // 
             // cbxTimestampType
             // 

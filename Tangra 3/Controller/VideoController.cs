@@ -248,7 +248,7 @@ namespace Tangra.Controller
             }
             else
             {
-                var frm = new frmSortFitsFiles();
+                var frm = new frmSortFitsFiles(this);
                 frm.SetFiles(fitsFiles);
                 frm.StartPosition = FormStartPosition.CenterParent;
                 frm.ShowDialog(m_MainForm);
@@ -275,19 +275,12 @@ namespace Tangra.Controller
                     folderName,
                     () =>
                     {
-                        bool hasNegativePixels;
-                        FITSFileSequenceStream stream = FITSFileSequenceStream.OpenFolder(sortedFitsFiles, fitsTimeStampReader, false, firstFrameNo, out hasNegativePixels);
-
-                        if (hasNegativePixels && CheckWithUserAboutNegativePixels())
-                        {
-                            stream = FITSFileSequenceStream.OpenFolder(sortedFitsFiles, fitsTimeStampReader, true, firstFrameNo, out hasNegativePixels);
-                        }
+                        FITSFileSequenceStream stream = FITSFileSequenceStream.OpenFolder(sortedFitsFiles, fitsTimeStampReader, firstFrameNo);
 
                         TangraContext.Current.IsFitsStream = true;
                         TangraContext.Current.IsAviFile = false;
                         return stream;
                     });
-
             }
             catch (Exception ex)
             {
@@ -373,11 +366,10 @@ namespace Tangra.Controller
 	                            {
 	                                case FITSHelper.FitsCubeType.NotACube:
 								        bool hasNegativePixels;
-								        frameStream = SingleFITSFileFrameStream.OpenFile(fileName, false, out hasNegativePixels);
-								        if (hasNegativePixels && CheckWithUserAboutNegativePixels())
-								        {
-									        frameStream = SingleFITSFileFrameStream.OpenFile(fileName, true, out hasNegativePixels);
-								        }
+								        frameStream = SingleFITSFileFrameStream.OpenFile(fileName, out hasNegativePixels);
+	                                    if (hasNegativePixels)
+	                                        InformUserAboutNegativePixels();
+
 	                                    break;
                                     case FITSHelper.FitsCubeType.ThreeAxisCube:
                                         frameStream = ThreeAxisFITSCubeFrameStream.OpenFile(fileName, this);
@@ -418,15 +410,15 @@ namespace Tangra.Controller
 				});
 	    }
 
-        private bool CheckWithUserAboutNegativePixels()
+        private void InformUserAboutNegativePixels()
         {
-            return MessageBox.Show(
+            MessageBox.Show(
                 m_MainForm, 
-                "Negative pixel values have been found in this FITS file. Do you want to zero out all negative values?", 
+                "Negative pixel values have been found in this FITS file. They will be zeroed out?", 
                 "Tangra", 
-                MessageBoxButtons.YesNo, 
-                MessageBoxIcon.Warning, 
-                MessageBoxDefaultButton.Button1) == DialogResult.Yes;
+                MessageBoxButtons.OK, 
+                MessageBoxIcon.Information, 
+                MessageBoxDefaultButton.Button1);
         }
 
 		public bool OpenVideoFileInternal(string fileName, Func<IFrameStream> frameStreamFactoryMethod)

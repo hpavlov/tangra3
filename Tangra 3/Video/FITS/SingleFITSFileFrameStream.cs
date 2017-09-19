@@ -35,12 +35,12 @@ namespace Tangra.Video.FITS
         private float m_Exposure;
 		private uint[] m_FlatPixels;
 
-        private uint m_MinPixelValue;
+        private short m_MinPixelValue;
         private uint m_MaxPixelValue;
 
         private Dictionary<string, string> m_Cards = new Dictionary<string, string>();
 
-        public static SingleFITSFileFrameStream OpenFile(string fileName, bool zeroOutNegativePixels, out bool hasNegativePixels)
+        public static SingleFITSFileFrameStream OpenFile(string fileName, out bool hasNegativePixels)
 		{
 			uint[] pixelsFlat;
 			int width;
@@ -48,12 +48,12 @@ namespace Tangra.Video.FITS
 			int bpp;
 			DateTime? timestamp;
 			double? exposure;
-		    uint minPixelValue;
+		    short minPixelValue;
             uint maxPixelValue;
 
             var cards = new Dictionary<string, string>();
 
-            FITSHelper.Load16BitFitsFile(fileName, null, null, zeroOutNegativePixels, 
+            FITSHelper.Load16BitFitsFile(fileName, null, null, 
                 (hdu) =>
                 {
                     var cursor = hdu.Header.GetCursor();
@@ -75,7 +75,7 @@ namespace Tangra.Video.FITS
             return new SingleFITSFileFrameStream(pixelsFlat, width, height, bpp, exposure, minPixelValue, maxPixelValue, cards);
 		}
 
-		private SingleFITSFileFrameStream(uint[] flatPixels, int width, int height, int bpp, double? exposure, uint minPixelValue, uint maxPixelValue, IDictionary<string, string> cards)
+		private SingleFITSFileFrameStream(uint[] flatPixels, int width, int height, int bpp, double? exposure, short minPixelValue, uint maxPixelValue, IDictionary<string, string> cards)
 		{
 			m_FlatPixels = flatPixels;
 			m_Width = width;
@@ -226,7 +226,7 @@ namespace Tangra.Video.FITS
 
         public uint MinPixelValue
         {
-            get { return m_MinPixelValue; }
+            get { return m_MinPixelValue > 0 ? (uint)m_MinPixelValue : 0; }
         }
 
         public uint MaxPixelValue

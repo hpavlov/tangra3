@@ -20,28 +20,40 @@ namespace Tangra.Model.Helpers
 	{
 		public delegate bool CheckOpenedFitsFileCallback(BasicHDU imageHDU);
 
-        public delegate void LoadFitsDataCallback<TData>(Array dataArray, int height, int width, double bzero, out TData[,] pixels, out TData medianValue, out Type pixelDataType, out bool hasNegPix);
+        public delegate void LoadFitsDataCallback<TData>(Array dataArray, int height, int width, double bzero, out TData[,] pixels, out TData medianValue, out Type pixelDataType, out bool hasNegPix, out short minRawValue, out uint maxVal);
 
-        public static bool LoadFloatingPointFitsFile(string fileName, IFITSTimeStampReader timeStampReader, bool zeroOutNegativePixels, out float[,] pixels, out float medianValue, out Type pixelDataType, out float exposureSeconds, out bool hasNegativePixels, CheckOpenedFitsFileCallback callback)
-		{
-            return LoadFitsFileInternal<float>(fileName, timeStampReader, out pixels, out medianValue, out pixelDataType, out exposureSeconds, out hasNegativePixels, callback, (Array dataArray, int height, int width, double bzero, out float[,] ppx, out float median, out Type dataType, out bool hasNegPix) =>
+        public static bool LoadFloatingPointFitsFile(string fileName, IFITSTimeStampReader timeStampReader, out float[,] pixels, out float medianValue, out Type pixelDataType, out float exposureSeconds, out bool hasNegativePixels, CheckOpenedFitsFileCallback callback)
+        {
+            short minRawValue_discarded;
+            uint maxVal_discarded;
+            return LoadFitsFileInternal<float>(
+                fileName, timeStampReader, out pixels, out medianValue, out pixelDataType, out exposureSeconds, out hasNegativePixels, out minRawValue_discarded, out maxVal_discarded, callback, 
+                (Array dataArray, int height, int width, double bzero, out float[,] ppx, out float median, out Type dataType, out bool hasNegPix, out short minV, out uint maxV) =>
 			{
-                ppx = LoadFloatImageData(dataArray, zeroOutNegativePixels, height, width, (float)bzero, out median, out dataType, out hasNegPix);
+                float minFV_discarded;
+                float maxFV_discarded;
+                ppx = LoadFloatImageData(dataArray, height, width, (float)bzero, out median, out dataType, out hasNegPix, out minFV_discarded, out maxFV_discarded);
+			    minV = 0;
+			    maxV = 0;
 			});
 		}
 
-        public delegate bool Load16BitFitsFileCallback(string fileName, IFITSTimeStampReader timeStampReader, bool zeroOutNegativePixels, out uint[,] pixels, out int width, out int height, out uint medianValue, out Type pixelDataType, out bool hasNegativePixels, CheckOpenedFitsFileCallback callback);
+        public delegate bool Load16BitFitsFileCallback(string fileName, IFITSTimeStampReader timeStampReader, out uint[,] pixels, out int width, out int height, out uint medianValue, out Type pixelDataType, out bool hasNegativePixels, out short minRawValue, out uint maxValue, CheckOpenedFitsFileCallback callback);
 
-        public static bool Load16BitFitsFile(string fileName, IFITSTimeStampReader timeStampReader, bool zeroOutNegativePixels, out uint[,] pixels, out uint medianValue, out Type pixelDataType, out bool hasNegativePixels, CheckOpenedFitsFileCallback callback)
+        public static bool Load16BitFitsFile(string fileName, IFITSTimeStampReader timeStampReader, out uint[,] pixels, out uint medianValue, out Type pixelDataType, out bool hasNegativePixels, out short minRawValue, out uint maxValue, CheckOpenedFitsFileCallback callback)
 		{
 		    float exposureSeconds;
-            return LoadFitsFileInternal<uint>(fileName, timeStampReader, out pixels, out medianValue, out pixelDataType, out exposureSeconds, out hasNegativePixels, callback, (Array dataArray, int height, int width, double bzero, out uint[,] ppx, out uint median, out Type dataType, out bool hasNegPix) =>
+            return LoadFitsFileInternal<uint>(fileName, timeStampReader, out pixels, out medianValue, out pixelDataType, out exposureSeconds, out hasNegativePixels, out minRawValue, out maxValue, callback, 
+                (Array dataArray, int height, int width, double bzero, out uint[,] ppx, out uint median, out Type dataType, out bool hasNegPix, out short minV, out uint maxV) =>
 				{
-                    ppx = Load16BitImageData(dataArray, zeroOutNegativePixels, height, width, (uint)bzero, out median, out dataType, out hasNegPix);
+                    ppx = Load16BitImageData(dataArray, height, width, (int)bzero, out median, out dataType, out hasNegPix, out minV, out maxV);
 				});
 		}
 
-        private static bool LoadFitsFileInternal<TData>(string fileName, IFITSTimeStampReader timeStampReader, out TData[,] pixels, out TData medianValue, out Type pixelDataType, out float frameExposure, out bool hasNegativePixels, CheckOpenedFitsFileCallback callback, LoadFitsDataCallback<TData> loadDataCallback)
+        private static bool LoadFitsFileInternal<TData>(
+            string fileName, IFITSTimeStampReader timeStampReader, 
+            out TData[,] pixels, out TData medianValue, out Type pixelDataType, out float frameExposure, out bool hasNegativePixels, out short minRawValue, out uint maxVal,
+            CheckOpenedFitsFileCallback callback, LoadFitsDataCallback<TData> loadDataCallback)
 		{
 			Fits fitsFile = new Fits();
 
@@ -51,19 +63,22 @@ namespace Tangra.Model.Helpers
 
 				BasicHDU imageHDU = fitsFile.GetHDU(0);
 			    Array pixelsArray = (Array) imageHDU.Data.DataArray;
-                return LoadFitsDataInternal<TData>(imageHDU, pixelsArray, fileName, timeStampReader, out pixels, out medianValue, out pixelDataType, out frameExposure, out hasNegativePixels, callback, loadDataCallback);
+                return LoadFitsDataInternal<TData>(
+                    imageHDU, pixelsArray, fileName, timeStampReader, 
+                    out pixels, out medianValue, out pixelDataType, out frameExposure, out hasNegativePixels, out minRawValue, out maxVal,
+                    callback, loadDataCallback);
 			}
 		}
 
-        public static uint GetBZero(BasicHDU imageHDU)
+        public static int GetBZero(BasicHDU imageHDU)
 	    {
-            uint bzero = 0;
+            int bzero = 0;
             HeaderCard bZeroCard = imageHDU.Header.FindCard("BZERO");
             if (bZeroCard != null && !string.IsNullOrWhiteSpace(bZeroCard.Value))
             {
                 try
                 {
-                    bzero = (uint)double.Parse(bZeroCard.Value.Replace(',', '.'));
+                    bzero = (int)double.Parse(bZeroCard.Value.Replace(',', '.'), CultureInfo.InvariantCulture);
                 }
                 catch
                 { }
@@ -72,7 +87,10 @@ namespace Tangra.Model.Helpers
             return bzero;
 	    }
 
-        public static bool LoadFitsDataInternal<TData>(BasicHDU imageHDU, Array pixelsArray, string fileName, IFITSTimeStampReader timeStampReader, out TData[,] pixels, out TData medianValue, out Type pixelDataType, out float frameExposure, out bool hasNegativePixels, CheckOpenedFitsFileCallback callback, LoadFitsDataCallback<TData> loadDataCallback)
+        public static bool LoadFitsDataInternal<TData>(
+            BasicHDU imageHDU, Array pixelsArray, string fileName, IFITSTimeStampReader timeStampReader, 
+            out TData[,] pixels, out TData medianValue, out Type pixelDataType, out float frameExposure, out bool hasNegativePixels,  out short minRawValue, out uint maxVal,
+            CheckOpenedFitsFileCallback callback, LoadFitsDataCallback<TData> loadDataCallback)
 	    {
             hasNegativePixels = false;
 
@@ -82,10 +100,12 @@ namespace Tangra.Model.Helpers
                 medianValue = default(TData);
                 pixelDataType = typeof(TData);
                 frameExposure = 0;
+                minRawValue = 0;
+                maxVal = 0;
                 return false;
             }
 
-            uint bzero = GetBZero(imageHDU);
+            int bzero = GetBZero(imageHDU);
 
             bool isMidPoint;
             double? fitsExposure = null;
@@ -99,7 +119,7 @@ namespace Tangra.Model.Helpers
             }
             frameExposure = fitsExposure.HasValue ? (float)fitsExposure.Value : 0;
 
-            loadDataCallback(pixelsArray, imageHDU.Axes[0], imageHDU.Axes[1], bzero, out pixels, out medianValue, out pixelDataType, out hasNegativePixels);
+            loadDataCallback(pixelsArray, imageHDU.Axes[0], imageHDU.Axes[1], bzero, out pixels, out medianValue, out pixelDataType, out hasNegativePixels, out minRawValue, out maxVal);
 
             return true;
 	    }
@@ -207,9 +227,9 @@ namespace Tangra.Model.Helpers
 
 		private static Regex FITS_DATE_REGEX = new Regex("(?<DateStr>\\d\\d\\d\\d\\-\\d\\d\\-\\d\\dT\\d\\d:\\d\\d:\\d\\d(\\.\\d+)?)");
         public static void Load16BitFitsFile(
-            string fileName, Load16BitFitsFileCallback loadFitsFileCallback, IFITSTimeStampReader timeStampReader, bool zeroOutNegativePixels, Action<BasicHDU> fitsFileLoadedCallback,
+            string fileName, Load16BitFitsFileCallback loadFitsFileCallback, IFITSTimeStampReader timeStampReader, Action<BasicHDU> fitsFileLoadedCallback,
             out uint[] pixelsFlat, out int width, out int height, out int bpp, out DateTime? timestamp, 
-            out double? exposure, out uint minPixelValue, out uint maxPixelValue, out bool hasNegativePixels)
+            out double? exposure, out short minPixelValue, out uint maxPixelValue, out bool hasNegativePixels)
 		{
 			int pixWidth = 0;
 			int pixHeight = 0;
@@ -231,8 +251,7 @@ namespace Tangra.Model.Helpers
                 try
                 {
                     bool isMidPoint = false;
-                    fitsTimestamp = ParseExposure(fileName, imageHDU.Header, timeStampReader, out isMidPoint,
-                        out fitsExposure);
+                    fitsTimestamp = ParseExposure(fileName, imageHDU.Header, timeStampReader, out isMidPoint, out fitsExposure);
                 }
                 catch (Exception ex)
                 {
@@ -253,13 +272,14 @@ namespace Tangra.Model.Helpers
                 loadFitsFileCallback(
                     fileName,
                     timeStampReader,
-                    zeroOutNegativePixels,
                     out pixels,
                     out overwrittenWidth,
                     out overwrittenHeight,
                     out medianValue,
                     out pixelDataType,
                     out hasNegativePixels,
+                    out minPixelValue,
+                    out maxPixelValue,
                     checkFileCallback
                 );
 
@@ -271,11 +291,12 @@ namespace Tangra.Model.Helpers
                 Load16BitFitsFile(
                     fileName,
                     timeStampReader,
-                    zeroOutNegativePixels,
                     out pixels,
                     out medianValue,
                     out pixelDataType,
                     out hasNegativePixels,
+                    out minPixelValue,
+                    out maxPixelValue,
                     checkFileCallback
                 );
 
@@ -283,14 +304,11 @@ namespace Tangra.Model.Helpers
                 height = pixHeight;
             }
 
-
 			pixelsFlat = new uint[width * height];
 
 			timestamp = fitsTimestamp;
 			exposure = fitsExposure;
 
-            maxPixelValue = 0;
-            minPixelValue = uint.MaxValue;
             uint mask = (uint)(((uint)1 << pixBpp) - 1);            
             if (pixelDataType == typeof (float) || pixelDataType == typeof (double))
             {
@@ -305,20 +323,12 @@ namespace Tangra.Model.Helpers
                     uint val = pixels[x, y];
                     if (mask > 0) val = val & mask;
 					pixelsFlat[x + y * width] = val;
-                    if (maxPixelValue < val) maxPixelValue = val;
-                    if (minPixelValue > val) minPixelValue = val;
 				}
-			}		
+			}
 
-            if (maxPixelValue < 256)
-				bpp = 8;
-            else if (maxPixelValue < 4096)
-				bpp = 12;
-            else if (maxPixelValue < 16384)
-				bpp = 14;
-            else if (maxPixelValue < 65535)
-                bpp = 16;
-            else
+            bpp = GetBppForMaxPixelValue(maxPixelValue);
+
+            if (bpp == 32)
             {
                 int shift = Math.Max(0, (int)Math.Ceiling(pixBpp / 16.0) - 1);
 
@@ -331,12 +341,24 @@ namespace Tangra.Model.Helpers
                 }
 
                 bpp = 16;
-            }
-				
+            }	
 		}
 
-        
-        private static float[,] LoadFloatImageData(Array dataArray, bool zeroOutNegativePixels, int height, int width, float bzero, out float medianValue, out Type dataType, out bool hasNegPix)
+	    public static int GetBppForMaxPixelValue(uint maxPixelValue)
+	    {
+	        if (maxPixelValue < 256)
+				return 8;
+            else if (maxPixelValue < 4096)
+				return 12;
+            else if (maxPixelValue < 16384)
+				return 14;
+            else if (maxPixelValue < 65535)
+                return 16;
+            else
+                return 32;
+	    }
+
+        private static float[,] LoadFloatImageData(Array dataArray, int height, int width, float bzero, out float medianValue, out Type dataType, out bool hasNegPix, out float minRawValue, out float maxValue)
 		{
 			var medianCalcList = new List<float>();
 
@@ -344,6 +366,8 @@ namespace Tangra.Model.Helpers
 
 			dataType = null;
             hasNegPix = false;
+            minRawValue = float.MaxValue;
+            maxValue = 0;
 
 			for (int y = 0; y < height; y++)
 			{
@@ -370,11 +394,10 @@ namespace Tangra.Model.Helpers
 
 				for (int x = 0; x < width; x++)
 				{
+				    if (minRawValue > dataRow[x]) minRawValue = dataRow[x];
+
                     float val = (float)(bzero + dataRow[x]);
-				    if (zeroOutNegativePixels)
-				        if (val < 0) val = 0;
-				    else
-                        if (!hasNegPix && val < 0) hasNegPix = true;				        
+				    if (!hasNegPix && val < 0) hasNegPix = true;
 
 					data[x, height - y - 1] = val;
 					medianCalcList.Add(val);
@@ -389,6 +412,8 @@ namespace Tangra.Model.Helpers
 					medianValue = medianCalcList[medianCalcList.Count / 2];
 				else
 					medianValue = (medianCalcList[medianCalcList.Count / 2] + medianCalcList[1 + (medianCalcList.Count / 2)]) / 2;
+
+			    maxValue = medianCalcList[medianCalcList.Count - 1];
 			}
 			else
 				medianValue = 0;
@@ -398,14 +423,15 @@ namespace Tangra.Model.Helpers
 		}
 
 		public static uint[,] Load16BitImageData(
-            Array dataArray, bool zeroOutNegativePixels, 
-            int height, int width, uint bzero, 
-            out uint medianValue, out Type dataType, out bool hasNegPix)
+            Array dataArray, int height, int width, int bzero,
+            out uint medianValue, out Type dataType, out bool hasNegPix, out short minRawValue, out uint maxVal)
 		{
 			var medianCalcList = new List<uint>();
 
 			dataType = null;
 		    hasNegPix = false;
+            maxVal = 0;
+            minRawValue = short.MaxValue;
 
 			uint[,] data = new uint[width, height];
 
@@ -461,17 +487,16 @@ namespace Tangra.Model.Helpers
 				{
 				    uint val;
 
-                    if (zeroOutNegativePixels)
+                    if (minRawValue > dataRow[x]) minRawValue = dataRow[x];
+
+                    int intVal = bzero + dataRow[x];
+                    if (intVal < 0)
                     {
-                        int intVal = (int)(bzero + (int)dataRow[x]);
-                        if (intVal < 0) intVal = 0;
-                        val = (uint) intVal;
+                        intVal = 0;
+                        if (!hasNegPix) hasNegPix = true;
                     }
-                    else
-                    {
-                        val = (uint)(bzero + (int)dataRow[x]);
-                        if (bzero == 0 && !hasNegPix && dataRow[x] < 0) hasNegPix = true;                        
-                    }
+
+                    val = (uint)intVal;
 
                     data[x, height - y - 1] = val;
 					medianCalcList.Add(val);
@@ -486,6 +511,8 @@ namespace Tangra.Model.Helpers
 					medianValue = medianCalcList[medianCalcList.Count / 2];
 				else
 					medianValue = (medianCalcList[medianCalcList.Count / 2] + medianCalcList[1 + (medianCalcList.Count / 2)]) / 2;
+
+                maxVal = medianCalcList[medianCalcList.Count - 1];
 			}
 			else
 				medianValue = 0;
