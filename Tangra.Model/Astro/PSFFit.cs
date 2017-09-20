@@ -1282,6 +1282,9 @@ namespace Tangra.Model.Astro
 	        if (m_SNR.HasValue)
 	            return m_SNR.Value;
 
+	        if (!IsSolved)
+	            return double.NaN;
+
 	        double peakPixel = 0;
             var bgValues = new List<double>();
 
