@@ -1286,8 +1286,13 @@ namespace Tangra.Controller
 
 	    public bool IsFitsSequence
 	    {
-			get { return m_FramePlayer.Video.Engine == "FITS-SEQ"; }
+            get { return m_FramePlayer.Video.Engine == FITSFileSequenceStream.FITS_SEQUENCE_ENGINE; }
 	    }
+
+        public bool IsFitsCube
+        {
+            get { return m_FramePlayer.Video.Engine == ThreeAxisFITSCubeFrameStream.CUBE_3D_FITS_FILE_ENGINE; }
+        }
 
         public bool IsFitsFile
         {
@@ -1314,7 +1319,7 @@ namespace Tangra.Controller
 			return (IsAstroDigitalVideo && !IsAstroAnalogueVideo) ||
 			       (IsAstroAnalogueVideo && AstroAnalogueVideoHasOcrOrNtpData) ||
                    (IsSerVideo && (((SERVideoStream)m_FramePlayer.Video).HasUTCTimeStamps || ((SERVideoStream)m_FramePlayer.Video).HasFireCaptureTimeStamps)) ||
-				   (IsFitsSequence && ((FITSFileSequenceStream)m_FramePlayer.Video).HasUTCTimeStamps);
+                   ((m_FramePlayer.Video is IFITSStream) && ((IFITSStream)m_FramePlayer.Video).HasUTCTimeStamps);
 		}
 
 		public bool HasSystemTimeStamps()

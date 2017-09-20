@@ -83,6 +83,8 @@ namespace Tangra.Video.FITS
 			m_Bpp = bpp;
 		    m_Exposure = exposure.HasValue ? (float)exposure.Value : 0;
 
+		    HasUTCTimeStamps = false; // TODO: Add support for timestamps for single FITS files
+
 			m_FirstFrame = 0;
 			m_LastFrame = 0;
 			m_NumFrames = 1;
@@ -234,5 +236,6 @@ namespace Tangra.Video.FITS
             get { return m_MaxPixelValue; }
         }
 
+        public bool HasUTCTimeStamps { get; private set; }
     }
 }

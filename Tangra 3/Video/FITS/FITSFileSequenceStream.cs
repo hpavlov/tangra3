@@ -21,6 +21,8 @@ namespace Tangra.Video.FITS
 {
     internal class FITSFileSequenceStream : IDisposable, IFrameStream, IFITSStream
     {
+        internal const string FITS_SEQUENCE_ENGINE = "FITS-Cube3D";
+
         private List<string> m_FitsFilesList = new List<string>();
 
         private short m_MinPixelValueFirstImage;
@@ -191,7 +193,7 @@ namespace Tangra.Video.FITS
 
         public string Engine
         {
-            get { return "FITS-SEQ"; }
+            get { return FITS_SEQUENCE_ENGINE; }
         }
 
         public string FileName { get; private set; }

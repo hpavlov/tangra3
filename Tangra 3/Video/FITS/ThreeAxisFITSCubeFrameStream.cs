@@ -18,7 +18,7 @@ namespace Tangra.Video.FITS
 {
     internal class ThreeAxisFITSCubeFrameStream : IDisposable, IFrameStream, IFITSStream
     {
-        internal const string CUBE_3D_FITS_FILE_ENGINE = "FITS.Cube.3D";
+        internal const string CUBE_3D_FITS_FILE_ENGINE = "FITS-Cube3D";
 
         private Fits m_FitsFile;
         private BufferedFile m_BufferedFile;
@@ -29,6 +29,9 @@ namespace Tangra.Video.FITS
         private int m_HeightIndex;
         private int m_WidthIndex;
         private int m_FrameIndex;
+
+        private int m_CurrentFrameIndex;
+        private string m_FileName;
 
         private int m_Width;
         private int m_Height;
@@ -71,7 +74,7 @@ namespace Tangra.Video.FITS
                 if (videoController.ShowDialog(frm) == DialogResult.OK)
                 {
                     fitsStream = new ThreeAxisFITSCubeFrameStream(
-                        fitsFile, bufferedFile, imageHDU, frm.TimeStampReader,
+                        fileName, fitsFile, bufferedFile, imageHDU, frm.TimeStampReader,
                         frm.WidthIndex, frm.HeightIndex, frm.FrameIndex,
                         frm.MinPixelValue, frm.MaxPixelValue, frm.BitPix, frm.NegPixCorrection);
                 }
@@ -86,17 +89,22 @@ namespace Tangra.Video.FITS
         }
 
         private ThreeAxisFITSCubeFrameStream(
-            Fits fitsFile, BufferedFile bufferedFile, BasicHDU imageHDU, 
+            string fileName, Fits fitsFile, BufferedFile bufferedFile, BasicHDU imageHDU, 
             FITSTimeStampReader timeStampReader,
             int widthIndex, int heightIndex, int frameIndex,
             short minPixelValue, uint maxPixelValue, int bitPix, int negPixCorrection)
         {
+            m_FileName = fileName;
+
             bool isMidPoint;
             double? exposureSecs;
             var startExposure = timeStampReader.ParseExposure(null, imageHDU.Header, out isMidPoint, out exposureSecs);
 
-            m_ExposureSeconds = exposureSecs.Value;
-            m_FirstFrameMidTime = startExposure.Value;
+            if (startExposure.HasValue && exposureSecs.HasValue)
+            {
+                m_ExposureSeconds = exposureSecs.Value;
+                m_FirstFrameMidTime = startExposure.Value;                
+            }
 
             m_MinPixelValue = minPixelValue;
             m_MaxPixelValue = maxPixelValue;
@@ -133,6 +141,11 @@ namespace Tangra.Video.FITS
                         m_Cards.Add(card.Key, card.Value);
                 }
             }
+
+
+            HasUTCTimeStamps = startExposure.HasValue;
+
+            VideoFileType = string.Format("FITS.{0}::Cube3D", bitPix);
         }
 
         public Pixelmap GetPixelmap(int index)
@@ -143,6 +156,8 @@ namespace Tangra.Video.FITS
             if (m_FrameIndex != 0 || m_HeightIndex != 1 || m_WidthIndex != 2)
                 // Currently the only supported 3D cube is FrameIndex - Height - Width
                 return null;
+
+            m_CurrentFrameIndex = index;
 
             var frameData = m_ArrayData.GetValue(index) as Array;
 
@@ -218,10 +233,7 @@ namespace Tangra.Video.FITS
             get { return 1; }
         }
 
-        public string VideoFileType
-        {
-            get { return "FITS Cube"; }
-        }
+        public string VideoFileType { get; private set; }
 
         public Pixelmap GetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging)
         {
@@ -235,7 +247,7 @@ namespace Tangra.Video.FITS
 
         public string FileName
         {
-            get { return null; }
+            get { return m_FileName; }
         }
 
         public uint GetAav16NormVal()
@@ -257,5 +269,7 @@ namespace Tangra.Video.FITS
         {
             throw new NotSupportedException();
         }
+
+        public bool HasUTCTimeStamps { get; private set; }
     }
 }

@@ -9,5 +9,6 @@ namespace Tangra.Video.FITS
     {
         uint MinPixelValue { get; }
         uint MaxPixelValue { get; }
+        bool HasUTCTimeStamps { get; }
     }
 }

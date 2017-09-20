@@ -490,6 +490,15 @@ namespace Tangra
 				{
 					if (m_VideoController.OpenVideoFile(fileName))
 					{
+                        if ((m_VideoController.IsFitsCube || m_VideoController.IsFitsFile) && tsmiDynamic.Checked)
+                        {
+                            var frmDynRange = new frmDefineDisplayDynamicRange(m_VideoController);
+                            frmDynRange.StartPosition = FormStartPosition.Manual;
+                            frmDynRange.Left = Left + (Width - frmDynRange.Width) / 2;
+                            frmDynRange.Top = Top + (Height - frmDynRange.Height) / 2;
+                            frmDynRange.ShowDialog(this);
+                        }
+
 						if (runDefaultAction && !SelectVideoOperation())
 						{
 							// User cancelled astrometry
