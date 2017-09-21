@@ -57,7 +57,7 @@
             // rbZero
             // 
             this.rbZero.AutoSize = true;
-            this.rbZero.Location = new System.Drawing.Point(222, 1);
+            this.rbZero.Location = new System.Drawing.Point(236, 1);
             this.rbZero.Name = "rbZero";
             this.rbZero.Size = new System.Drawing.Size(31, 17);
             this.rbZero.TabIndex = 27;

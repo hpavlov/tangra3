@@ -153,13 +153,11 @@ namespace Tangra.Video.FITS
             if (index < 0 || index >= m_NumFrames)
                 return null;
 
-            if (m_FrameIndex != 0 || m_HeightIndex != 1 || m_WidthIndex != 2)
-                // Currently the only supported 3D cube is FrameIndex - Height - Width
-                return null;
-
             m_CurrentFrameIndex = index;
 
-            var frameData = m_ArrayData.GetValue(index) as Array;
+            var frameData = FITSHelper.GetPixelsFrom3DCube(m_ArrayData, index, m_FrameIndex, m_HeightIndex, m_WidthIndex, m_NumFrames, m_Height, m_Width);
+            if (frameData == null)
+                return null;
 
             uint median;
             Type dataType;

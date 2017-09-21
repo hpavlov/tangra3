@@ -15,17 +15,20 @@ namespace Tangra.Video.FITS
 
         private int m_BZero;
         private int m_MinPixelValue;
+        private double m_MinPixelPercent;
 
         public ucNegativePixelsTreatment()
         {
             InitializeComponent();
         }
 
-        public void Initialise(int bzero, short minPixelValue)
+        public void Initialise(int bzero, short minPixelValue, uint maxPixelValue)
         {
-            rbMinPixVal.Text = minPixelValue.ToString();
             m_BZero = bzero;
             m_MinPixelValue = minPixelValue;
+            m_MinPixelPercent = 100.0 * minPixelValue / (maxPixelValue - minPixelValue);
+
+            rbMinPixVal.Text = string.Format("{0} ({1:0.0}%)", minPixelValue, m_MinPixelPercent);
 
             UpdateNegPixCorrection();
         }

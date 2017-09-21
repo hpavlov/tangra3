@@ -431,9 +431,13 @@ namespace Tangra.Model.Helpers
 			dataType = null;
 		    hasNegPix = false;
             maxVal = 0;
+            medianValue = 0;
             minRawValue = short.MaxValue;
 
 			uint[,] data = new uint[width, height];
+
+		    if (dataArray == null)
+		        return data;
 
 			for (int y = 0; y < height; y++)
 			{
@@ -519,5 +523,150 @@ namespace Tangra.Model.Helpers
 
 			return data;
 		}
+
+	    public static Array GetPixelsFrom3DCube(Array cube, int index, int framePos, int heightPos, int widthPos, int totalFrames, int height, int width)
+	    {
+            switch (framePos)
+            {
+                case 0:
+                    var frameArr = cube.GetValue(index) as Array;
+                    if (heightPos == 1)
+                        return frameArr;
+                    else if (heightPos == 2)
+                    {
+                        var pixType = (frameArr.GetValue(0) as Array).GetValue(0).GetType();
+                        var rv = Array.CreateInstance(typeof(Array), height);
+                        for (int i = 0; i < height; i++)
+                        {
+                            rv.SetValue(Array.CreateInstance(pixType, width), i);
+                        }
+
+                        for (int w = 0; w < width; w++)
+                        {
+                            var wArr = frameArr.GetValue(w) as Array;
+                            for (int h = 0; h < height; h++)
+                            {
+                                (rv.GetValue(h) as Array).SetValue(wArr.GetValue(h), w);
+                            }
+                        }
+
+                        return rv;
+                    }
+                        
+                    break;
+
+                case 1:
+                    if (heightPos == 0)
+                    {
+                        Array rv = null;
+
+                        for (int h = 0; h < height; h++)
+                        {
+                            var fwArr = cube.GetValue(h) as Array;
+                            for (int w = 0; w < width; w++)
+                            {
+                                var wArr = fwArr.GetValue(index) as Array;
+                                if (rv == null)
+                                {
+                                    var pixType = wArr.GetValue(0).GetType();
+                                    rv = Array.CreateInstance(typeof(Array), height);
+                                    for (int i = 0; i < height; i++)
+                                    {
+                                        rv.SetValue(Array.CreateInstance(pixType, width), i);
+                                    }
+                                }
+
+                                (rv.GetValue(h) as Array).SetValue(wArr.GetValue(w), w);
+                            }
+                        }
+
+                        return rv;
+                    }
+                    else if (heightPos == 2)
+                    {
+                        Array rv = null;
+
+                        for (int w = 0; w < width; w++) 
+                        {
+                            var fhArr = cube.GetValue(w) as Array;
+                            for (int h = 0; h < height; h++)
+                            {
+                                var hArr = fhArr.GetValue(index) as Array;
+                                if (rv == null)
+                                {
+                                    var pixType = hArr.GetValue(0).GetType();
+                                    rv = Array.CreateInstance(typeof(Array), height);
+                                    for (int i = 0; i < height; i++)
+                                    {
+                                        rv.SetValue(Array.CreateInstance(pixType, width), i);
+                                    }
+                                }
+
+                                (rv.GetValue(h) as Array).SetValue(hArr.GetValue(h), w);
+                            }
+                        }
+
+                        return rv;
+                    }
+                    break;
+
+                case 2:
+                    if (heightPos == 0)
+                    {
+                        Array rv = null;
+
+                        for (int h = 0; h < height; h++)
+                        {
+                            var wfArr = cube.GetValue(h) as Array;
+                            for (int w = 0; w < width; w++)                            
+                            {
+                                var fArr = wfArr.GetValue(w) as Array;
+                                if (rv == null)
+                                {
+                                    var pixType = fArr.GetValue(index).GetType();
+                                    rv = Array.CreateInstance(typeof(Array), height);
+                                    for (int i = 0; i < height; i++)
+                                    {
+                                        rv.SetValue(Array.CreateInstance(pixType, width), i);
+                                    }
+                                }
+
+                                (rv.GetValue(h) as Array).SetValue(fArr.GetValue(index), w);
+                            }
+                        }
+
+                        return rv;
+                    }
+                    else if (heightPos == 1)
+                    {
+                        Array rv = null;
+
+                        for (int w = 0; w < width; w++)
+                        {
+                            var hfArr = cube.GetValue(w) as Array;
+                            for (int h = 0; h < height; h++)
+                            {
+                                var fArr = hfArr.GetValue(h) as Array;
+                                if (rv == null)
+                                {
+                                    var pixType = fArr.GetValue(index).GetType();
+                                    rv = Array.CreateInstance(typeof(Array), height);
+                                    for (int i = 0; i < height; i++)
+                                    {
+                                        rv.SetValue(Array.CreateInstance(pixType, width), i);
+                                    }
+                                }
+
+                                (rv.GetValue(h) as Array).SetValue(fArr.GetValue(index), w);
+                            }
+                        }
+
+                        return rv;
+                    }
+                    break;
+            }
+
+            return null;
+	    }
 	}
 }

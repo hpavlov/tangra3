@@ -96,7 +96,7 @@ namespace Tangra.Video.FITS
             m_TimeStampHelper.TryIdentifyPreviousConfigApplyingForCurrentFiles();
 
             if (hasNegativePixels)
-                ucNegativePixelsTreatment.Initialise(bzero, minPixelValue);
+                ucNegativePixelsTreatment.Initialise(bzero, minPixelValue, maxPixelValue);
             else
                 NegPixCorrection = 0;
 

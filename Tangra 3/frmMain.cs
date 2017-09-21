@@ -494,11 +494,11 @@ namespace Tangra
                         {
                             var frmDynRange = new frmDefineDisplayDynamicRange(m_VideoController);
                             frmDynRange.StartPosition = FormStartPosition.Manual;
-                            frmDynRange.Left = Left + (Width - frmDynRange.Width) / 2;
+                            frmDynRange.Left = Left + pictureBox.Width + 10;
                             frmDynRange.Top = Top + (Height - frmDynRange.Height) / 2;
                             frmDynRange.ShowDialog(this);
                         }
-
+                        
 						if (runDefaultAction && !SelectVideoOperation())
 						{
 							// User cancelled astrometry

@@ -77,7 +77,6 @@ namespace Tangra.Video.FITS
             m_CardNamesHash = Convert.ToBase64String(hash);
 
             cbxNaxisOrder.SelectedIndex = 0;
-            cbxNaxisOrder.Enabled = false; // Only supporting FrameIndex-Height-Width configuration for now
             cbxExposure.Items.AddRange(m_AllCards.ToArray());
 
             cbxExposureUnits.Items.Clear();
@@ -112,7 +111,7 @@ namespace Tangra.Video.FITS
             }
 
             if (hasNegativePixels)
-                ucNegativePixelsTreatment.Initialise(bzero, minPixelValue);
+                ucNegativePixelsTreatment.Initialise(bzero, minPixelValue, maxPixelValue);
             else
                 NegPixCorrection = 0;
 
@@ -135,28 +134,28 @@ namespace Tangra.Video.FITS
                     break;
                 case 1:
                     FrameIndex = 0;
-                    HeightIndex = 2;
                     WidthIndex = 1;
+                    HeightIndex = 2;
                     break;
                 case 2:
+                    WidthIndex = 0;
+                    HeightIndex = 1;
                     FrameIndex = 2;
-                    HeightIndex = 0;
-                    WidthIndex = 1;
                     break;
                 case 3:
+                    HeightIndex = 0;
+                    WidthIndex = 1;
                     FrameIndex = 2;
-                    HeightIndex = 1;
-                    WidthIndex = 0;
                     break;
                 case 4:
-                    FrameIndex = 1;
-                    HeightIndex = 0;
-                    WidthIndex = 2;
-                    break;
-                case 5:
+                    WidthIndex = 0;
                     FrameIndex = 1;
                     HeightIndex = 2;
-                    WidthIndex = 0;
+                    break;
+                case 5:
+                    HeightIndex = 0;
+                    FrameIndex = 1;
+                    WidthIndex = 2;
                     break;
             }
 
@@ -291,23 +290,10 @@ namespace Tangra.Video.FITS
 
         private Array GetFirstFramePixelArray()
         {
-            switch (FrameIndex)
-            {
-                case 0:
-                    var frame = ((Array) m_ImageHDU.Data.DataArray).GetValue(0) as Array;
-                    if (HeightIndex == 1 && WidthIndex == 2)
-                        return frame;
-
-                    break;
-
-                case 1:
-                    break;
-
-                case 2:
-                    break;
-            }
-
-            throw new NotImplementedException();
+            return FITSHelper.GetPixelsFrom3DCube(
+                (Array)m_ImageHDU.Data.DataArray, 0, 
+                FrameIndex, HeightIndex, WidthIndex,
+                m_ImageHDU.Axes[FrameIndex], m_ImageHDU.Axes[HeightIndex], m_ImageHDU.Axes[WidthIndex]);
         }
 
         private void ParseFirstFrame(out short minPixelValue, out uint maxPixelValue, out int bpp, out int bzero, out bool hasNegativePixels)
