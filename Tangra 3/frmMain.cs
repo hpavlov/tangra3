@@ -1061,10 +1061,9 @@ namespace Tangra
 				if (filedata != null)
 				{
 					var filename = filedata.FirstOrDefault();
-					if (filename != null)
+					if (filename != null && File.Exists(filename))
 					{
-						// MessageBox.Show(filename);
-						// TODO: Make the drag-drop of files to work
+					    OpenTangraFile(filename);
 					}
 				}
 			}

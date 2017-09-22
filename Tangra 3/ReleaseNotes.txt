@@ -1,5 +1,8 @@
 ﻿Tangra3 Release Notes
 ---------------------
+vNext (Unreleased)
+- Made it possible to drag and drop files in Tangra to open them
+
 v3.6.8 (2017-08-29)
 - Added timestamp OCR reader for GPS-BOX-SPRITE video time inserter.
 - Made it possible to mask a contaminated area of the video, e.g. trees or defects, so it doesn't interfere with astrometry.
