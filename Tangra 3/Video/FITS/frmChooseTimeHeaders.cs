@@ -27,6 +27,22 @@ namespace Tangra.Video.FITS
         private string m_CardNamesHash;
         private VideoController m_VideoController;
 
+        private bool m_PixelMappingReviewed;
+
+        private int m_BelowZeroCorr;
+
+        public short MinPixelValue { get; private set; }
+
+        public uint[] Pixels { get; private set; }
+
+        public int BZero { get; private set; }
+
+        public uint MaxPixelValue { get; private set; }
+
+        public bool HasNegativePixels { get; private set; }
+
+        public int BitPix { get; private set; }
+
         public frmChooseTimeHeaders()
         {
             InitializeComponent();
@@ -40,19 +56,39 @@ namespace Tangra.Video.FITS
             short minPixelValue;
             uint maxPixelValue;
             bool hasNegativePixels;
-            Type valueType;
-            uint medianValue;
+            int width;
+            int height;
+            int bpp;
+            uint[] pixels;
+            DateTime? timestamp;
+            double? exposure;
 
             BasicHDU imageHDU = null;
             m_VideoController.SetCursor(Cursors.WaitCursor);
             try
             {
-                uint[,] pixels;
-                FITSHelper.Load16BitFitsFile(fileName, null, out pixels, out medianValue, out valueType, out hasNegativePixels, out minPixelValue, out maxPixelValue,
-                    (hdu) =>
+                
+                FITSHelper.Load16BitFitsFile(fileName, null, null, (hdu) =>
                     {
                         imageHDU = hdu;
-                        return true;
+                    },
+                    out pixels, out width, out height, out bpp, out timestamp, out exposure, out minPixelValue, out maxPixelValue, out hasNegativePixels);
+
+                uint[,] pixelsArr;
+                Type pixelDataType;
+                uint medianValue;
+                float frameExposure;
+
+                BZero = FITSHelper.GetBZero(imageHDU);
+                m_BelowZeroCorr = Math.Max(BZero, Math.Abs(minPixelValue) - BZero);
+
+                FITSHelper.LoadFitsDataInternal(
+                    imageHDU,
+                    (Array)imageHDU.Data.DataArray, fileName, null,
+                    out pixelsArr, out medianValue, out pixelDataType, out frameExposure, out hasNegativePixels, out minPixelValue, out maxPixelValue, null,
+                    (Array dataArray, int h, int w, double bz, out uint[,] ppx, out uint median, out Type dataType, out bool hasNegPix, out short minV, out uint maxV) =>
+                    {
+                        ppx = FITSHelper.Load16BitImageData(dataArray, height, width, m_BelowZeroCorr, out median, out dataType, out hasNegPix, out minV, out maxV);
                     });
             }
             finally
@@ -60,7 +96,6 @@ namespace Tangra.Video.FITS
                 m_VideoController.SetCursor(Cursors.Default);
             }
 
-            int bzero = FITSHelper.GetBZero(imageHDU);
             m_FilesHash = filesHash;
 
             var hasher = new SHA1CryptoServiceProvider();
@@ -96,11 +131,22 @@ namespace Tangra.Video.FITS
             m_TimeStampHelper.TryIdentifyPreviousConfigApplyingForCurrentFiles();
 
             if (hasNegativePixels)
-                ucNegativePixelsTreatment.Initialise(bzero, minPixelValue, maxPixelValue);
+            {
+                NegPixCorrection = minPixelValue;
+            }
             else
+            {
+                // No requirement to review the pixel mapping if there are no negative pixels
+                // We can go with the defaults
+                m_PixelMappingReviewed = true;
                 NegPixCorrection = 0;
+            }
 
-            ucNegativePixelsTreatment.Visible = hasNegativePixels;
+            Pixels = pixels;
+            MinPixelValue = minPixelValue;
+            MaxPixelValue = maxPixelValue;
+            HasNegativePixels = hasNegativePixels;
+            BitPix = bpp;
         }
 
         private void cbxExposure_SelectedIndexChanged(object sender, EventArgs e)
@@ -186,6 +232,16 @@ namespace Tangra.Video.FITS
                     return;                    
                 }
 
+                if (HasNegativePixels && !m_PixelMappingReviewed)
+                {
+                    if (!ReviewPixelMapping())
+                    {
+                        MessageBox.Show("As there are negative pixels you need to confirm the pixel value mapping before continuing.");
+                        btnPixelValueMapping.Focus();
+                        return;
+                    }
+                }
+
                 var singleTimeStampConfig = ucTimestampControl.GetSelectedInput();
 
                 var config = new TangraConfig.FITSFieldConfig()
@@ -268,6 +324,24 @@ namespace Tangra.Video.FITS
                 pnlExposure.Visible = true;
                 ucTimestampControl.SetTimeStampType(null, true);
             }
+        }
+
+        private bool ReviewPixelMapping()
+        {
+            var frm = new frmDefinePixelMapping(Pixels, NegPixCorrection, BZero, MinPixelValue, MaxPixelValue, BitPix);
+            if (m_VideoController.ShowDialog(frm) != DialogResult.OK)
+                return false;
+
+            NegPixCorrection = frm.NegPixCorrection;
+            MaxPixelValue = frm.MaxPixelValue;
+            BitPix = frm.BitPix;
+            m_PixelMappingReviewed = true;
+            return true;
+        }
+
+        private void btnPixelValueMapping_Click(object sender, EventArgs e)
+        {
+            ReviewPixelMapping();
         }
     }
 }

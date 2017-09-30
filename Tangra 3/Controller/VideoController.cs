@@ -260,11 +260,11 @@ namespace Tangra.Controller
 
                 fitsFiles = frm.GetSortedFiles();
 
-                return OpenFitsFileSequence(folderName, fitsFiles, frm.TimeStampReader);
+                return OpenFitsFileSequence(folderName, fitsFiles, frm.TimeStampReader, frm.BitPix, frm.NegPixCorrection);
             }
 	    }
 
-	    public bool OpenFitsFileSequence(string folderName, string[] sortedFitsFiles, IFITSTimeStampReader fitsTimeStampReader, int firstFrameNo = 0)
+	    public bool OpenFitsFileSequence(string folderName, string[] sortedFitsFiles, IFITSTimeStampReader fitsTimeStampReader, int? bitBix, int negPixCorrection, int firstFrameNo = 0)
 		{
             TangraContext.Current.IsFitsStream = false;
 		    TangraContext.Current.IsAviFile = false;
@@ -275,7 +275,7 @@ namespace Tangra.Controller
                     folderName,
                     () =>
                     {
-                        FITSFileSequenceStream stream = FITSFileSequenceStream.OpenFolder(sortedFitsFiles, fitsTimeStampReader, firstFrameNo);
+                        FITSFileSequenceStream stream = FITSFileSequenceStream.OpenFolder(sortedFitsFiles, fitsTimeStampReader, firstFrameNo, bitBix, negPixCorrection);
 
                         TangraContext.Current.IsFitsStream = true;
                         TangraContext.Current.IsAviFile = false;

@@ -29,17 +29,19 @@ namespace Tangra.Video.FITS
         private uint m_MaxPixelValueFirstImage;
         private IFITSTimeStampReader m_TimeStampReader = null;
 
-        public static FITSFileSequenceStream OpenFolder(string[] fitsFiles, IFITSTimeStampReader timeStampReader, int firstFrameNo)
+        private int m_NegPixCorrection;
+
+        public static FITSFileSequenceStream OpenFolder(string[] fitsFiles, IFITSTimeStampReader timeStampReader, int firstFrameNo, int? bitBix, int negPixCorrection)
         {
 			UsageStats.Instance.ProcessedFitsFolderFiles++;
 			UsageStats.Instance.Save();
 
-            var rv = new FITSFileSequenceStream(fitsFiles, timeStampReader, firstFrameNo);
+            var rv = new FITSFileSequenceStream(fitsFiles, timeStampReader, firstFrameNo, bitBix, negPixCorrection);
 	        rv.FileName = Path.GetDirectoryName(fitsFiles[0]);
 	        return rv;
         }
 
-        private FITSFileSequenceStream(string[] fitsFiles, IFITSTimeStampReader timeStampReader, int firstFrame)
+        private FITSFileSequenceStream(string[] fitsFiles, IFITSTimeStampReader timeStampReader, int firstFrame, int? bitBix, int negPixCorrection)
         {
             m_FitsFilesList.AddRange(fitsFiles);
 
@@ -51,6 +53,7 @@ namespace Tangra.Video.FITS
             LastFrame = m_FitsFilesList.Count - 1 + firstFrame;
             CountFrames = m_FitsFilesList.Count;
             m_TimeStampReader = timeStampReader;
+            m_NegPixCorrection = negPixCorrection;
 
             uint[] pixelsFlat;
             int width;
@@ -69,7 +72,7 @@ namespace Tangra.Video.FITS
 
             Width = width;
             Height = height;
-            BitPix = bpp;
+            BitPix = bitBix ?? bpp;
 
 	        HasUTCTimeStamps = timestamp.HasValue;
 
@@ -152,7 +155,9 @@ namespace Tangra.Video.FITS
             var cards = new Dictionary<string, string>();
             BasicHDU fitsImage = null;
 
-            FITSHelper.Load16BitFitsFile(m_FitsFilesList[index - FirstFrame], null, m_TimeStampReader,
+            FITSHelper.Load16BitFitsFile(m_FitsFilesList[index - FirstFrame],
+                null, 
+                m_TimeStampReader,
                 (hdu) =>
                 {
                     fitsImage = hdu;
@@ -166,10 +171,11 @@ namespace Tangra.Video.FITS
                                 cards[card.Key] += "\r\n" + card.Value;
                             else
                                 cards.Add(card.Key, card.Value);
-                        }                        
+                        }                      
                     }
                 },
-                out pixelsFlat, out width, out height, out bpp, out timestamp, out exposure, out minPixelValue, out maxPixelValue, out hasNegativePixels);
+                out pixelsFlat, out width, out height, out bpp, out timestamp, out exposure, out minPixelValue, out maxPixelValue, out hasNegativePixels,
+                m_NegPixCorrection);
 
             return FitsStreamHelper.BuildFitsPixelmap(Width, Height, pixelsFlat, BitPix, HasUTCTimeStamps, exposure, timestamp, fitsImage, cards);
         }

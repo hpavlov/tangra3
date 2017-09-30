@@ -48,6 +48,7 @@ using nom.tam.util;
 using Tangra.VideoOperations.Astrometry.MotionFitting;
 using Tangra.VideoOperations.ConvertVideoToAav;
 using Tangra.VideoOperations.ConvertVideoToFits;
+using frmDefinePixelMapping = Tangra.Video.FITS.frmDefinePixelMapping;
 
 namespace Tangra
 {
@@ -492,7 +493,7 @@ namespace Tangra
 					{
                         if ((m_VideoController.IsFitsCube || m_VideoController.IsFitsFile) && tsmiDynamic.Checked)
                         {
-                            var frmDynRange = new frmDefineDisplayDynamicRange(m_VideoController);
+                            var frmDynRange = new frmDefineDynamicRange(m_VideoController);
                             frmDynRange.StartPosition = FormStartPosition.Manual;
                             frmDynRange.Left = Left + pictureBox.Width + 10;
                             frmDynRange.Top = Top + (Height - frmDynRange.Height) / 2;
@@ -906,7 +907,7 @@ namespace Tangra
 
 			if (tsmiDynamic.Checked)
 			{
-				var frm = new frmDefineDisplayDynamicRange(m_VideoController);
+                var frm = new frmDefineDynamicRange(m_VideoController);
                 frm.StartPosition = FormStartPosition.Manual;
                 frm.Left = Left + pictureBox.Width + 10;
                 frm.Top = Top + (Height - frm.Height) / 2;
@@ -1104,7 +1105,7 @@ namespace Tangra
 
                         if (tsmiDynamic.Checked)
                         {
-                            var frmDynRange = new frmDefineDisplayDynamicRange(m_VideoController);
+                            var frmDynRange = new frmDefineDynamicRange(m_VideoController);
                             frmDynRange.StartPosition = FormStartPosition.Manual;
                             frmDynRange.Left = Left + pictureBox.Width + 10;
                             frmDynRange.Top = Top + (Height - frm.Height) / 2;

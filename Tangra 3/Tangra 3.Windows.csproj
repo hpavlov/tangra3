@@ -691,11 +691,11 @@
     <Compile Include="VideoOperations\Spectroscopy\ViewSpectraStates\SpectraViewerStateManager.cs" />
     <Compile Include="VideoTools\AavFileCreator.cs" />
     <Compile Include="VideoTools\BackgroundModelGenerator.cs" />
-    <Compile Include="VideoTools\frmDefineDisplayDynamicRange.cs">
+    <Compile Include="VideoTools\frmDefineDynamicRange.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="VideoTools\frmDefineDisplayDynamicRange.Designer.cs">
-      <DependentUpon>frmDefineDisplayDynamicRange.cs</DependentUpon>
+    <Compile Include="VideoTools\frmDefineDynamicRange.Designer.cs">
+      <DependentUpon>frmDefineDynamicRange.cs</DependentUpon>
     </Compile>
     <Compile Include="VideoTools\frmFileInformation.cs">
       <SubType>Form</SubType>
@@ -970,6 +970,12 @@
     <Compile Include="Video\BMPFileSequenceStream.cs" />
     <Compile Include="Video\FITS\FITSFileSequenceStream.cs" />
     <Compile Include="Video\FITS\FitsTimestampHelper.cs" />
+    <Compile Include="Video\FITS\frmDefinePixelMapping.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Video\FITS\frmDefinePixelMapping.Designer.cs">
+      <DependentUpon>frmDefinePixelMapping.cs</DependentUpon>
+    </Compile>
     <Compile Include="Video\FITS\LCFITSTimeStampReader.cs" />
     <Compile Include="Video\FITS\frmChooseTimeHeaders.cs">
       <SubType>Form</SubType>
@@ -1284,8 +1290,8 @@
     <EmbeddedResource Include="VideoOperations\Spectroscopy\ucSpectroscopy.resx">
       <DependentUpon>ucSpectroscopy.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="VideoTools\frmDefineDisplayDynamicRange.resx">
-      <DependentUpon>frmDefineDisplayDynamicRange.cs</DependentUpon>
+    <EmbeddedResource Include="VideoTools\frmDefineDynamicRange.resx">
+      <DependentUpon>frmDefineDynamicRange.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VideoTools\frmFileInformation.resx">
       <DependentUpon>frmFileInformation.cs</DependentUpon>
@@ -1395,6 +1401,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Video\FITS\frmChooseTimeHeaders.resx">
       <DependentUpon>frmChooseTimeHeaders.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Video\FITS\frmDefinePixelMapping.resx">
+      <DependentUpon>frmDefinePixelMapping.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Video\FITS\frmDefineFitsCube3D.resx">
       <DependentUpon>frmDefineFitsCube3D.cs</DependentUpon>

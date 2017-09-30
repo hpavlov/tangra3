@@ -82,6 +82,11 @@ namespace Tangra.Video.FITS
 
         public FITSTimeStampReader TimeStampReader { get; private set; }
 
+        public short MinPixelValue { get; private set; }
+        public uint MaxPixelValue { get; private set; }
+        public int BitPix { get; private set; }
+        public int NegPixCorrection { get; private set; }
+
         internal class FitsFileFormatInfoRecord
         {
             public string FirstFile;
@@ -130,8 +135,13 @@ namespace Tangra.Video.FITS
                             var frm = new frmChooseTimeHeaders(m_FitsFiles[i], GetOrderedFitsFileHash(), m_VideoController);
                             if (frm.ShowDialog(this) == DialogResult.OK)
                             {
-                                TimeStampReader = frm.TimeStampReader;
+                                TimeStampReader = frm.TimeStampReader;                                
                             }
+
+                            MinPixelValue = frm.MinPixelValue;
+                            MaxPixelValue = frm.MaxPixelValue;
+                            BitPix = frm.BitPix;
+                            NegPixCorrection = frm.NegPixCorrection;
                         }
 
                         try

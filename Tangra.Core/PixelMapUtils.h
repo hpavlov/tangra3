@@ -44,6 +44,8 @@ DLL_PUBLIC HRESULT PreProcessingLowPassDifferenceFilter(unsigned int* pixels, in
 DLL_PUBLIC HRESULT GetRotatedFrameDimentions(int width, int height, double angleDegrees,int* newWidth,int* newHeight);
 DLL_PUBLIC HRESULT RotateFrame(int width, int height, double angleDegrees, unsigned int* originalPixels, int destWidth, int destHeight, unsigned int* pixels, BYTE* bitmapPixels, BYTE* bitmapBytes, int dataBpp, unsigned int normalisationValue);
 
+DLL_PUBLIC HRESULT EnsurePixelRange(unsigned int* pixels, int width, int height, int bpp, unsigned int normVal);
+
 #ifdef __cplusplus
 } // __cplusplus defined.
 #endif

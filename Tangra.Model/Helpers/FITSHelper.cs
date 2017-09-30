@@ -40,13 +40,13 @@ namespace Tangra.Model.Helpers
 
         public delegate bool Load16BitFitsFileCallback(string fileName, IFITSTimeStampReader timeStampReader, out uint[,] pixels, out int width, out int height, out uint medianValue, out Type pixelDataType, out bool hasNegativePixels, out short minRawValue, out uint maxValue, CheckOpenedFitsFileCallback callback);
 
-        public static bool Load16BitFitsFile(string fileName, IFITSTimeStampReader timeStampReader, out uint[,] pixels, out uint medianValue, out Type pixelDataType, out bool hasNegativePixels, out short minRawValue, out uint maxValue, CheckOpenedFitsFileCallback callback)
+        public static bool Load16BitFitsFile(string fileName, IFITSTimeStampReader timeStampReader, out uint[,] pixels, out uint medianValue, out Type pixelDataType, out bool hasNegativePixels, out short minRawValue, out uint maxValue, CheckOpenedFitsFileCallback callback, int negPixelCorrection = 0)
 		{
 		    float exposureSeconds;
             return LoadFitsFileInternal<uint>(fileName, timeStampReader, out pixels, out medianValue, out pixelDataType, out exposureSeconds, out hasNegativePixels, out minRawValue, out maxValue, callback, 
                 (Array dataArray, int height, int width, double bzero, out uint[,] ppx, out uint median, out Type dataType, out bool hasNegPix, out short minV, out uint maxV) =>
 				{
-                    ppx = Load16BitImageData(dataArray, height, width, (int)bzero, out median, out dataType, out hasNegPix, out minV, out maxV);
+                    ppx = Load16BitImageData(dataArray, height, width, (int)bzero - negPixelCorrection, out median, out dataType, out hasNegPix, out minV, out maxV);
 				});
 		}
 
@@ -229,7 +229,7 @@ namespace Tangra.Model.Helpers
         public static void Load16BitFitsFile(
             string fileName, Load16BitFitsFileCallback loadFitsFileCallback, IFITSTimeStampReader timeStampReader, Action<BasicHDU> fitsFileLoadedCallback,
             out uint[] pixelsFlat, out int width, out int height, out int bpp, out DateTime? timestamp, 
-            out double? exposure, out short minPixelValue, out uint maxPixelValue, out bool hasNegativePixels)
+            out double? exposure, out short minPixelValue, out uint maxPixelValue, out bool hasNegativePixels, int negPixelCorrection = 0)
 		{
 			int pixWidth = 0;
 			int pixHeight = 0;
@@ -297,7 +297,8 @@ namespace Tangra.Model.Helpers
                     out hasNegativePixels,
                     out minPixelValue,
                     out maxPixelValue,
-                    checkFileCallback
+                    checkFileCallback,
+                    negPixelCorrection
                 );
 
                 width = pixWidth;

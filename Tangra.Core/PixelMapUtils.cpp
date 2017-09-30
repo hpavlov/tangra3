@@ -1240,3 +1240,20 @@ __uint64 GetUInt64Average(unsigned int aLo, unsigned int aHi, unsigned int bLo, 
 {
 	return GetUInt64Average(((__uint64)aHi) << 32 + (__uint64)aLo, ((__uint64)bHi) << 32 + (__uint64)bLo);
 };
+
+HRESULT EnsurePixelRange(unsigned int* pixels, int width, int height, int bpp, unsigned int normVal)
+{
+	int minValue;
+	int maxValue;
+	GetMinMaxValuesForBpp(bpp, normVal, &minValue, &maxValue);
+	
+	unsigned int uiMaxValue = (unsigned int)maxValue;
+	
+	for(int idx = 0; idx < width * height; idx++)
+	{
+		unsigned int val = pixels[idx];
+		if (val > uiMaxValue) pixels[idx] = uiMaxValue;
+	}
+	return S_OK;
+}
+

@@ -48,8 +48,8 @@
             this.btnOK = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.btnPixelValueMapping = new System.Windows.Forms.Button();
             this.ucTimestampControl = new Tangra.Video.FITS.ucFitsTimeStampConfigurator();
-            this.ucNegativePixelsTreatment = new Tangra.Video.FITS.ucNegativePixelsTreatment();
             this.pnlExposure.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbxExposureWarning)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbxExposureOK)).BeginInit();
@@ -59,14 +59,15 @@
             // cbxNaxisOrder
             // 
             this.cbxNaxisOrder.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxNaxisOrder.Enabled = false;
             this.cbxNaxisOrder.FormattingEnabled = true;
             this.cbxNaxisOrder.Items.AddRange(new object[] {
-            "Frames - Height - Width",
-            "Frames - Width - Height",
-            "Width - Height - Frames",
-            "Height - Width - Frames",
-            "Width - Frames - Height",
-            "Height - Frames - Width"});
+            "Frame - Height - Width",
+            "Frame - Width - Height",
+            "Width - Height - Frame",
+            "Height - Width - Frame",
+            "Width - Frame - Height",
+            "Height - Frame - Width"});
             this.cbxNaxisOrder.Location = new System.Drawing.Point(90, 26);
             this.cbxNaxisOrder.Name = "cbxNaxisOrder";
             this.cbxNaxisOrder.Size = new System.Drawing.Size(158, 21);
@@ -260,6 +261,16 @@
             this.groupBox1.TabIndex = 20;
             this.groupBox1.TabStop = false;
             // 
+            // btnPixelValueMapping
+            // 
+            this.btnPixelValueMapping.Location = new System.Drawing.Point(17, 354);
+            this.btnPixelValueMapping.Name = "btnPixelValueMapping";
+            this.btnPixelValueMapping.Size = new System.Drawing.Size(123, 23);
+            this.btnPixelValueMapping.TabIndex = 22;
+            this.btnPixelValueMapping.Text = "Pixel Value Mapping";
+            this.btnPixelValueMapping.UseVisualStyleBackColor = true;
+            this.btnPixelValueMapping.Click += new System.EventHandler(this.btnPixelValueMapping_Click);
+            // 
             // ucTimestampControl
             // 
             this.ucTimestampControl.Location = new System.Drawing.Point(30, 22);
@@ -267,20 +278,12 @@
             this.ucTimestampControl.Size = new System.Drawing.Size(443, 134);
             this.ucTimestampControl.TabIndex = 9;
             // 
-            // ucNegativePixelsTreatment
-            // 
-            this.ucNegativePixelsTreatment.Location = new System.Drawing.Point(20, 354);
-            this.ucNegativePixelsTreatment.Name = "ucNegativePixelsTreatment";
-            this.ucNegativePixelsTreatment.Size = new System.Drawing.Size(266, 22);
-            this.ucNegativePixelsTreatment.TabIndex = 21;
-            this.ucNegativePixelsTreatment.Visible = false;
-            // 
             // frmDefineFitsCube3D
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(521, 388);
-            this.Controls.Add(this.ucNegativePixelsTreatment);
+            this.Controls.Add(this.btnPixelValueMapping);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.btnOK);
             this.Controls.Add(this.btnCancel);
@@ -328,6 +331,6 @@
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.GroupBox groupBox1;
         private ucFitsTimeStampConfigurator ucTimestampControl;
-        private ucNegativePixelsTreatment ucNegativePixelsTreatment;
+        private System.Windows.Forms.Button btnPixelValueMapping;
     }
 }

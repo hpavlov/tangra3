@@ -1,6 +1,6 @@
 ﻿namespace Tangra.VideoTools
 {
-	partial class frmDefineDisplayDynamicRange
+	partial class frmDefineDynamicRange
 	{
 		/// <summary>
 		/// Required designer variable.
@@ -163,7 +163,7 @@
             this.Controls.Add(this.tbarTo);
             this.Controls.Add(this.picHistogram);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-            this.Name = "frmDefineDisplayDynamicRange";
+            this.Name = "frmDefinePixelMapping";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Define Display Dynamic Range";

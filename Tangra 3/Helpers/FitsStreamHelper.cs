@@ -29,6 +29,8 @@ namespace Tangra.Helpers
             byte[] displayBitmapBytes = new byte[width * height];
             byte[] rawBitmapBytes = new byte[(width * height * 3) + 40 + 14 + 1];
 
+            TangraCore.PreProcessors.EnsurePixelRange(pixelsFlat, width, height, bitPix, 0);
+
             uint[] flatPixelsCopy = new uint[pixelsFlat.Length];
             Array.Copy(pixelsFlat, flatPixelsCopy, pixelsFlat.Length);
 

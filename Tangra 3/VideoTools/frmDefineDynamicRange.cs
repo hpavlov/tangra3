@@ -16,7 +16,7 @@ using Tangra.Model.Config;
 
 namespace Tangra.VideoTools
 {
-	public partial class frmDefineDisplayDynamicRange : Form
+	public partial class frmDefineDynamicRange : Form
 	{
 		private VideoController m_VideoController;
 
@@ -29,12 +29,12 @@ namespace Tangra.VideoTools
 
 		private float m_BucketFactor = 1;
 
-		public frmDefineDisplayDynamicRange()
+		public frmDefineDynamicRange()
 		{
 			InitializeComponent();
 		}
 
-		public frmDefineDisplayDynamicRange(VideoController videoController)
+        public frmDefineDynamicRange(VideoController videoController)
 		{
 			InitializeComponent();
 

@@ -44,7 +44,7 @@
             this.ucTimestampControl = new Tangra.Video.FITS.ucFitsTimeStampConfigurator();
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnOK = new System.Windows.Forms.Button();
-            this.ucNegativePixelsTreatment = new Tangra.Video.FITS.ucNegativePixelsTreatment();
+            this.btnPixelValueMapping = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.pnlExposure.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbxExposureWarning)).BeginInit();
@@ -212,20 +212,22 @@
             this.btnOK.UseVisualStyleBackColor = true;
             this.btnOK.Click += new System.EventHandler(this.btnOK_Click);
             // 
-            // ucNegativePixelsTreatment
+            // btnPixelValueMapping
             // 
-            this.ucNegativePixelsTreatment.Location = new System.Drawing.Point(15, 370);
-            this.ucNegativePixelsTreatment.Name = "ucNegativePixelsTreatment";
-            this.ucNegativePixelsTreatment.Size = new System.Drawing.Size(277, 21);
-            this.ucNegativePixelsTreatment.TabIndex = 6;
-            this.ucNegativePixelsTreatment.Visible = false;
+            this.btnPixelValueMapping.Location = new System.Drawing.Point(15, 371);
+            this.btnPixelValueMapping.Name = "btnPixelValueMapping";
+            this.btnPixelValueMapping.Size = new System.Drawing.Size(123, 23);
+            this.btnPixelValueMapping.TabIndex = 23;
+            this.btnPixelValueMapping.Text = "Pixel Value Mapping";
+            this.btnPixelValueMapping.UseVisualStyleBackColor = true;
+            this.btnPixelValueMapping.Click += new System.EventHandler(this.btnPixelValueMapping_Click);
             // 
             // frmChooseTimeHeaders
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(475, 406);
-            this.Controls.Add(this.ucNegativePixelsTreatment);
+            this.Controls.Add(this.btnPixelValueMapping);
             this.Controls.Add(this.btnOK);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.groupBox1);
@@ -260,8 +262,8 @@
         private System.Windows.Forms.Button btnOK;
         private System.Windows.Forms.PictureBox pbxExposureWarning;
         private System.Windows.Forms.PictureBox pbxExposureOK;
-        private ucNegativePixelsTreatment ucNegativePixelsTreatment;
         private ucFitsTimeStampConfigurator ucTimestampControl2;
         private ucFitsTimeStampConfigurator ucTimestampControl;
+        private System.Windows.Forms.Button btnPixelValueMapping;
     }
 }
