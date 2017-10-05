@@ -36,6 +36,8 @@ namespace Tangra.Video
 
             pnlResult.Visible = false;
             pnlResult.SendToBack();
+
+            btnCorrectInterlaced.Visible = false;
 	    }
 
 	    public frmIntegrationDetection(VideoController videoController, int startFrameId)
