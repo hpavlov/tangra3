@@ -146,7 +146,7 @@ namespace Tangra.Video.FITS
 
                         try
                         {
-                            timestamp = FITSHelper.ParseExposure(m_FitsFiles[i], hdr, TimeStampReader, out isMidPoint, out fitsExposure);
+                            timestamp = FITSHelper2.ParseExposure(m_FitsFiles[i], hdr, TimeStampReader, out isMidPoint, out fitsExposure);
                         }
                         catch (Exception ex)
                         {

@@ -125,7 +125,7 @@ namespace Tangra.Video.FITS
             m_Width = m_ImageHDU.Axes[widthIndex];
 
             m_ArrayData = (Array)m_ImageHDU.Data.DataArray;
-            m_BZero = FITSHelper.GetBZero(m_ImageHDU);
+            m_BZero = FITSHelper2.GetBZero(m_ImageHDU);
             m_NegPixCorrection = negPixCorrection;
 
             m_Cards = new Dictionary<string, string>();
@@ -155,17 +155,11 @@ namespace Tangra.Video.FITS
 
             m_CurrentFrameIndex = index;
 
-            var frameData = FITSHelper.GetPixelsFrom3DCube(m_ArrayData, index, m_FrameIndex, m_HeightIndex, m_WidthIndex, m_NumFrames, m_Height, m_Width);
+            var frameData = FITSHelper2.GetPixelsFrom3DCube(m_ArrayData, index, m_FrameIndex, m_HeightIndex, m_WidthIndex, m_NumFrames, m_Height, m_Width);
             if (frameData == null)
                 return null;
 
-            uint median;
-            Type dataType;
-            bool hasNegPix;
-            short minValue;
-            uint maxValue;
-            uint[,] pixData = FITSHelper.Load16BitImageData(frameData, m_Height, m_Width, m_BZero - m_NegPixCorrection, out median, out dataType, out hasNegPix, out minValue, out maxValue);
-            var pixelsFlat = Pixelmap.ConvertFromXYToFlatArray(pixData, Width, Height);
+            uint[] pixelsFlat = FITSHelper2.Load16BitImageData(frameData, m_Height, m_Width, m_BZero - m_NegPixCorrection, 0);
 
             DateTime timestamp = m_FirstFrameMidTime.AddSeconds(index*m_ExposureSeconds);
             return FitsStreamHelper.BuildFitsPixelmap(Width, Height, pixelsFlat, BitPix, true, m_ExposureSeconds, timestamp, m_ImageHDU, m_Cards);

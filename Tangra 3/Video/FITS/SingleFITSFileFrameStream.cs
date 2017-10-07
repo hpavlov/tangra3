@@ -42,37 +42,13 @@ namespace Tangra.Video.FITS
 
         public static SingleFITSFileFrameStream OpenFile(string fileName, out bool hasNegativePixels)
 		{
-			uint[] pixelsFlat;
-			int width;
-			int height;
-			int bpp;
-			DateTime? timestamp;
-			double? exposure;
-		    short minPixelValue;
-            uint maxPixelValue;
-
-            var cards = new Dictionary<string, string>();
-
-            FITSHelper.Load16BitFitsFile(fileName, null, null, 
-                (hdu) =>
-                {
-                    var cursor = hdu.Header.GetCursor();
-                    while (cursor.MoveNext())
-                    {
-                        HeaderCard card = hdu.Header.FindCard((string)cursor.Key);
-                        if (card != null && !string.IsNullOrWhiteSpace(card.Key) && card.Key != "END")
-                        {
-                            if (cards.ContainsKey(card.Key))
-                                cards[card.Key] += "\r\n" + card.Value;
-                            else
-                                cards.Add(card.Key, card.Value);                        
-                        }                            
-                    }
-                }, out pixelsFlat, out width, out height, out bpp, out timestamp, out exposure, out minPixelValue, out maxPixelValue, out hasNegativePixels);
+            var fitsData = FITSHelper2.LoadFitsFile(fileName, null, 0);
 
 		    TangraContext.Current.RenderingEngine = SINGLE_FITS_FILE_ENGINE;
 
-            return new SingleFITSFileFrameStream(pixelsFlat, width, height, bpp, exposure, minPixelValue, maxPixelValue, cards);
+            hasNegativePixels = fitsData.PixelStats.HasNegativePixels;
+
+            return new SingleFITSFileFrameStream(fitsData.PixelsFlat, fitsData.Width, fitsData.Height, fitsData.PixelStats.BitPix, fitsData.Exposure, fitsData.PixelStats.MinPixelValue, fitsData.PixelStats.MaxPixelValue, fitsData.Cards);
 		}
 
 		private SingleFITSFileFrameStream(uint[] flatPixels, int width, int height, int bpp, double? exposure, short minPixelValue, uint maxPixelValue, IDictionary<string, string> cards)

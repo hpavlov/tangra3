@@ -20,7 +20,7 @@ namespace Tangra.Tests.FITS
             short minValue;
             uint maxValue;
             int bz = 0;
-            FITSHelper.Load16BitImageData(pixels, 3, 2, bz, out medianVal, out dataType, out hasNegPix, out minValue, out maxValue);
+            FITSHelper2.Load16BitImageData(pixels, 3, 2, bz, 0, out medianVal, out dataType, out hasNegPix, out minValue, out maxValue);
 
             Assert.AreEqual(type, dataType);
             Assert.AreEqual(true, hasNegPix);
@@ -28,13 +28,13 @@ namespace Tangra.Tests.FITS
             Assert.AreEqual(34, maxValue);
 
             bz = -10;
-            FITSHelper.Load16BitImageData(pixels, 3, 2, bz, out medianVal, out dataType, out hasNegPix, out minValue, out maxValue);
+            FITSHelper2.Load16BitImageData(pixels, 3, 2, bz, 0, out medianVal, out dataType, out hasNegPix, out minValue, out maxValue);
             Assert.AreEqual(-13, minValue);
             Assert.AreEqual(24, maxValue);
 
 
             bz = -14;
-            FITSHelper.Load16BitImageData(pixels, 3, 2, bz, out medianVal, out dataType, out hasNegPix, out minValue, out maxValue);
+            FITSHelper2.Load16BitImageData(pixels, 3, 2, bz, 0, out medianVal, out dataType, out hasNegPix, out minValue, out maxValue);
             Assert.AreEqual(-13, minValue);
             Assert.AreEqual(20, maxValue);
             Assert.AreEqual(true, hasNegPix); // Zeroing out negative pixels doesn't change the fact that there are negative pixels

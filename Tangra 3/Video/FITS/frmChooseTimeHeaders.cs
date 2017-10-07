@@ -53,43 +53,16 @@ namespace Tangra.Video.FITS
         {
             m_VideoController = videoController;
 
-            short minPixelValue;
-            uint maxPixelValue;
-            bool hasNegativePixels;
-            int width;
-            int height;
-            int bpp;
-            uint[] pixels;
-            DateTime? timestamp;
-            double? exposure;
-
-            BasicHDU imageHDU = null;
+            FITSData fitsData;
             m_VideoController.SetCursor(Cursors.WaitCursor);
             try
             {
+                fitsData = FITSHelper2.LoadFitsFile(fileName, null, 0);
+
+                BZero = FITSHelper2.GetBZero(fitsData.HDU);
+                m_BelowZeroCorr = Math.Max(BZero, Math.Abs(fitsData.PixelStats.MinPixelValue) - BZero);
                 
-                FITSHelper.Load16BitFitsFile(fileName, null, null, (hdu) =>
-                    {
-                        imageHDU = hdu;
-                    },
-                    out pixels, out width, out height, out bpp, out timestamp, out exposure, out minPixelValue, out maxPixelValue, out hasNegativePixels);
-
-                uint[,] pixelsArr;
-                Type pixelDataType;
-                uint medianValue;
-                float frameExposure;
-
-                BZero = FITSHelper.GetBZero(imageHDU);
-                m_BelowZeroCorr = Math.Max(BZero, Math.Abs(minPixelValue) - BZero);
-
-                FITSHelper.LoadFitsDataInternal(
-                    imageHDU,
-                    (Array)imageHDU.Data.DataArray, fileName, null,
-                    out pixelsArr, out medianValue, out pixelDataType, out frameExposure, out hasNegativePixels, out minPixelValue, out maxPixelValue, null,
-                    (Array dataArray, int h, int w, double bz, out uint[,] ppx, out uint median, out Type dataType, out bool hasNegPix, out short minV, out uint maxV) =>
-                    {
-                        ppx = FITSHelper.Load16BitImageData(dataArray, height, width, m_BelowZeroCorr, out median, out dataType, out hasNegPix, out minV, out maxV);
-                    });
+                fitsData = FITSHelper2.LoadFitsFile(fileName, null, BZero - m_BelowZeroCorr);
             }
             finally
             {
@@ -102,10 +75,10 @@ namespace Tangra.Video.FITS
             hasher.Initialize();
             var orderedCardNames = new List<string>();
 
-            var cursor = imageHDU.Header.GetCursor();
+            var cursor = fitsData.HDU.Header.GetCursor();
             while (cursor.MoveNext())
             {
-                var card = imageHDU.Header.FindCard((string)cursor.Key);
+                var card = fitsData.HDU.Header.FindCard((string)cursor.Key);
                 if (card != null)
                 {
                     m_AllCards.Add(new HeaderEntry(card));                   
@@ -130,9 +103,9 @@ namespace Tangra.Video.FITS
             ucTimestampControl2.SetTimeStampType(TangraConfig.TimeStampType.EndExposure, false);
             m_TimeStampHelper.TryIdentifyPreviousConfigApplyingForCurrentFiles();
 
-            if (hasNegativePixels)
+            if (fitsData.PixelStats.HasNegativePixels)
             {
-                NegPixCorrection = minPixelValue;
+                NegPixCorrection = fitsData.PixelStats.MinPixelValue;
             }
             else
             {
@@ -142,11 +115,11 @@ namespace Tangra.Video.FITS
                 NegPixCorrection = 0;
             }
 
-            Pixels = pixels;
-            MinPixelValue = minPixelValue;
-            MaxPixelValue = maxPixelValue;
-            HasNegativePixels = hasNegativePixels;
-            BitPix = bpp;
+            Pixels = fitsData.PixelsFlat;
+            MinPixelValue = fitsData.PixelStats.MinPixelValue;
+            MaxPixelValue = fitsData.PixelStats.MaxPixelValue;
+            HasNegativePixels = fitsData.PixelStats.HasNegativePixels;
+            BitPix = fitsData.PixelStats.BitPix;
         }
 
         private void cbxExposure_SelectedIndexChanged(object sender, EventArgs e)

@@ -32,6 +32,8 @@ namespace Tangra.Video.FITS
 
 	    private uint[] m_MinValAdjImagePixels;
 
+	    private int m_PosMinValCorrection;
+
         public int NegPixCorrection { get; private set; }
 
         public int BitPix { get; private set; }
@@ -51,6 +53,9 @@ namespace Tangra.Video.FITS
 		    m_MinPixelValue = minPixelValue;
 		    m_BZero = bZero;
 		    NegPixCorrection = negPixCorrection;
+            if (m_MinPixelValue + m_BZero > 0)
+                m_PosMinValCorrection = -1 * (m_MinPixelValue + m_BZero);
+
             m_MinValAdjImagePixels = minValAdjImagePixels;
 
 		    if (bitPix <= 8)
@@ -62,7 +67,7 @@ namespace Tangra.Video.FITS
 		    else
 		        rb16Bit.Checked = true;
 
-            nudZeroPoint.Minimum = minPixelValue + m_BZero;
+            nudZeroPoint.Minimum = m_MinPixelValue + m_BZero;
 		    nudZeroPoint.Maximum = Math.Max(0, bZero);
             nudZeroPoint.SetNUDValue(negPixCorrection);
 
@@ -103,14 +108,14 @@ namespace Tangra.Video.FITS
 			{
 				for (int i = 0; i < pixels.Length; i++)
 				{
-                    AddDistributionEntry((int)pixels[i] + m_MinPixelValue + m_BZero- NegPixCorrection);
+                    AddDistributionEntry((int)pixels[i] + m_MinPixelValue + m_BZero - NegPixCorrection + m_PosMinValCorrection);
 				}
 			}
 			else
 			{
 				for (int i = 0; i < pixels.Length; i++)
 				{
-                    int val = (int)pixels[i] + m_MinPixelValue + m_BZero - NegPixCorrection;
+                    int val = (int)pixels[i] + m_MinPixelValue + m_BZero - NegPixCorrection + m_PosMinValCorrection;
                     int bucket = (int)Math.Round(val * m_BucketFactor);
 
                     AddDistributionEntry(bucket);
@@ -234,7 +239,8 @@ namespace Tangra.Video.FITS
 
         private void nudZeroPoint_ValueChanged(object sender, EventArgs e)
         {
-            NegPixCorrection = (int)nudZeroPoint.Value;
+            NegPixCorrection = (int)nudZeroPoint.Value + m_PosMinValCorrection;
+            
             ReCalculateAll();
         }
 

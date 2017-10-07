@@ -55,28 +55,18 @@ namespace Tangra.Video.FITS
             m_TimeStampReader = timeStampReader;
             m_NegPixCorrection = negPixCorrection;
 
-            uint[] pixelsFlat;
-            int width;
-            int height;
-            int bpp;
-			DateTime? timestamp;
-			double? exposure;
-            short minPixelValue;
-            uint maxPixelValue;
-            bool hasNegativePixels;
+            var fitsData = FITSHelper2.LoadFitsFile(m_FitsFilesList[0], m_TimeStampReader, m_NegPixCorrection);
 
-            FITSHelper.Load16BitFitsFile(m_FitsFilesList[0], null, m_TimeStampReader, null, out pixelsFlat, out width, out height, out bpp, out timestamp, out exposure, out minPixelValue, out maxPixelValue, out hasNegativePixels);
+            m_MinPixelValueFirstImage = fitsData.PixelStats.MinPixelValue;
+            m_MaxPixelValueFirstImage = fitsData.PixelStats.MaxPixelValue;
 
-            m_MinPixelValueFirstImage = minPixelValue;
-            m_MaxPixelValueFirstImage = maxPixelValue;
+            Width = fitsData.Width;
+            Height = fitsData.Height;
+            BitPix = bitBix ?? fitsData.PixelStats.RawBitPix;
 
-            Width = width;
-            Height = height;
-            BitPix = bitBix ?? bpp;
+            HasUTCTimeStamps = fitsData.Timestamp.HasValue;
 
-	        HasUTCTimeStamps = timestamp.HasValue;
-
-            VideoFileType = string.Format("FITS.{0}::SEQ", bpp);
+            VideoFileType = string.Format("FITS.{0}::SEQ", fitsData.PixelStats.RawBitPix);
         }
 
         public int Width { get; private set; }
@@ -142,42 +132,12 @@ namespace Tangra.Video.FITS
 
         public Pixelmap GetPixelmap(int index)
         {
-            uint[] pixelsFlat;
-            int width;
-            int height;
-            int bpp;
-			DateTime? timestamp;
-			double? exposure;
-            short minPixelValue;
-            uint maxPixelValue;
-            bool hasNegativePixels;
+            var fitsData = FITSHelper2.LoadFitsFile(m_FitsFilesList[index - FirstFrame], m_TimeStampReader, m_NegPixCorrection);
 
-            var cards = new Dictionary<string, string>();
-            BasicHDU fitsImage = null;
+            if (Width != fitsData.Width || Height != fitsData.Height)
+                throw new ApplicationException(string.Format("Expected a {0}x{1} image but found {2}x{3} in '{4}'", Width, Height, fitsData.Width, fitsData.Height, m_FitsFilesList[index - FirstFrame]));
 
-            FITSHelper.Load16BitFitsFile(m_FitsFilesList[index - FirstFrame],
-                null, 
-                m_TimeStampReader,
-                (hdu) =>
-                {
-                    fitsImage = hdu;
-                    var cursor = hdu.Header.GetCursor();
-                    while (cursor.MoveNext())
-                    {
-                        HeaderCard card = hdu.Header.FindCard((string)cursor.Key);
-                        if (card != null && !string.IsNullOrWhiteSpace(card.Key) && card.Key != "END")
-                        {
-                            if (cards.ContainsKey(card.Key))
-                                cards[card.Key] += "\r\n" + card.Value;
-                            else
-                                cards.Add(card.Key, card.Value);
-                        }                      
-                    }
-                },
-                out pixelsFlat, out width, out height, out bpp, out timestamp, out exposure, out minPixelValue, out maxPixelValue, out hasNegativePixels,
-                m_NegPixCorrection);
-
-            return FitsStreamHelper.BuildFitsPixelmap(Width, Height, pixelsFlat, BitPix, HasUTCTimeStamps, exposure, timestamp, fitsImage, cards);
+            return FitsStreamHelper.BuildFitsPixelmap(Width, Height, fitsData.PixelsFlat, BitPix, HasUTCTimeStamps, fitsData.Exposure, fitsData.Timestamp, fitsData.HDU, fitsData.Cards);
         }
 
         public int RecommendedBufferSize

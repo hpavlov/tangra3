@@ -361,20 +361,20 @@ namespace Tangra.Controller
                         {
 	                        try
 	                        {
-	                            var cubeType = FITSHelper.GetFitsCubeType(fileName);
+	                            var cubeType = FITSHelper2.GetFitsCubeType(fileName);
 	                            switch (cubeType)
 	                            {
-	                                case FITSHelper.FitsCubeType.NotACube:
+	                                case FitsCubeType.NotACube:
 								        bool hasNegativePixels;
 								        frameStream = SingleFITSFileFrameStream.OpenFile(fileName, out hasNegativePixels);
 	                                    if (hasNegativePixels)
 	                                        InformUserAboutNegativePixels();
 
 	                                    break;
-                                    case FITSHelper.FitsCubeType.ThreeAxisCube:
+                                    case FitsCubeType.ThreeAxisCube:
                                         frameStream = ThreeAxisFITSCubeFrameStream.OpenFile(fileName, this);
 	                                    break;
-                                    case FITSHelper.FitsCubeType.MultipleHDUsCube:
+                                    case FitsCubeType.MultipleHDUsCube:
                                         break;
 	                            }
 	                        }

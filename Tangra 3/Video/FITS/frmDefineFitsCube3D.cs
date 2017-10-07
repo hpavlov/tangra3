@@ -343,7 +343,7 @@ namespace Tangra.Video.FITS
 
         private Array GetFirstFramePixelArray()
         {
-            return FITSHelper.GetPixelsFrom3DCube(
+            return FITSHelper2.GetPixelsFrom3DCube(
                 (Array)m_ImageHDU.Data.DataArray, 0, 
                 FrameIndex, HeightIndex, WidthIndex,
                 m_ImageHDU.Axes[FrameIndex], m_ImageHDU.Axes[HeightIndex], m_ImageHDU.Axes[WidthIndex]);
@@ -379,7 +379,7 @@ namespace Tangra.Video.FITS
             bzero = bz;
             MinPixelValue = minPixelValue;
             BZero = bz;
-
+            
             FITSHelper.Load16BitFitsFile(null, Load16BitFitsFileWithNegativePixels, null, null, out pixelsFlat, out width, out height, out bpp, out timestamp, out exposure, out minPixelValue, out maxPixelValue, out hasNegativePixels);
         }
 
