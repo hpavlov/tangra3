@@ -1,7 +1,14 @@
 ﻿Tangra3 Release Notes
 ---------------------
-vNext (Unreleased)
-- Made it possible to drag and drop files in Tangra to open them
+v3.6.9 (2017-10-07)
+- Made it possible to drag and drop files in Tangra to open them.
+- Added support for FITS 3D-Cubes.
+- Improved the handling of timestamps of FITS files supporting more formats and allowing for separate date and time headers.
+- Now the pixel range from FITS files can be mapped to Tangra pixel range allowing for change of the zero point and bits per pixel.
+- Made it possible to flip horizontally and vertically FITS files when opening them.
+- Implemented a 'Crop FITS Images' operation for FITS sequences.
+- Improvements to the 'Convert to FITS' operation.
+- Fixed a number of crashes and made minor improvements.
 
 v3.6.8 (2017-08-29)
 - Added timestamp OCR reader for GPS-BOX-SPRITE video time inserter.
