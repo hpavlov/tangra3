@@ -80,18 +80,18 @@ namespace Tangra.View
 			m_MainForm.miExportToBMP.Enabled = TangraContext.Current.HasAnyFileLoaded;
 			m_MainForm.miExportToCSV.Enabled = TangraContext.Current.HasAnyFileLoaded;
 
-            m_MainForm.miExportVideoToFITS.Enabled = TangraContext.Current.HasVideoLoaded;
+            m_MainForm.miExportVideoToFITS.Enabled = TangraContext.Current.HasVideoLoaded && TangraContext.Current.CanStartNewOperation;
 		    if (TangraContext.Current.IsFitsStream)
                 m_MainForm.miExportVideoToFITS.Text = "&Crop FITS Images";
             else
                 m_MainForm.miExportVideoToFITS.Text = "&Convert Video to FITS";
 
-            m_MainForm.miConvertVideoToAAV.Enabled = TangraContext.Current.HasVideoLoaded && TangraContext.Current.IsAviFile;
+            m_MainForm.miConvertVideoToAAV.Enabled = TangraContext.Current.HasVideoLoaded && TangraContext.Current.IsAviFile && TangraContext.Current.CanStartNewOperation;
 
-			m_MainForm.miReduceLightCurve.Enabled = TangraContext.Current.HasAnyFileLoaded && !TangraContext.Current.OperationInProgress;
-            m_MainForm.miAstrometry.Enabled = TangraContext.Current.HasAnyFileLoaded && !TangraContext.Current.OperationInProgress;
-			m_MainForm.miSpectroscopy.Enabled = TangraContext.Current.HasAnyFileLoaded && !TangraContext.Current.OperationInProgress;
-            m_MainForm.miMakeDarkFlat.Enabled = TangraContext.Current.HasAnyFileLoaded && !TangraContext.Current.OperationInProgress;
+            m_MainForm.miReduceLightCurve.Enabled = TangraContext.Current.HasAnyFileLoaded && TangraContext.Current.CanStartNewOperation;
+            m_MainForm.miAstrometry.Enabled = TangraContext.Current.HasAnyFileLoaded && TangraContext.Current.CanStartNewOperation;
+            m_MainForm.miSpectroscopy.Enabled = TangraContext.Current.HasAnyFileLoaded && TangraContext.Current.CanStartNewOperation;
+            m_MainForm.miMakeDarkFlat.Enabled = TangraContext.Current.HasAnyFileLoaded && TangraContext.Current.CanStartNewOperation;
 
             m_MainForm.miLoadDark.Enabled = TangraContext.Current.HasAnyFileLoaded && TangraContext.Current.CanLoadDarkFrame && !TangraContext.Current.OperationInProgress;
             m_MainForm.miLoadMasterDark.Enabled = TangraContext.Current.HasAnyFileLoaded && TangraContext.Current.CanLoadDarkFrame && !TangraContext.Current.OperationInProgress;

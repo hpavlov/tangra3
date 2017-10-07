@@ -44,6 +44,7 @@ namespace Tangra.Model.Context
 			}
 		}
 		public bool HasImageLoaded;
+        public bool HasLightCurveLoaded;
 		public bool CanChangeTool = true;
 		public bool CanPlayVideo = true;
         public bool UndefinedFrameRate = false;
@@ -82,6 +83,11 @@ namespace Tangra.Model.Context
 		{
 			get { return HasVideoLoaded || HasImageLoaded; }
 		}
+
+	    public bool CanStartNewOperation
+	    {
+	        get { return !HasLightCurveLoaded && !OperationInProgress; }
+	    }
 
 		public int FrameWidth = 0;
 		public int FrameHeight = 0;
@@ -125,6 +131,7 @@ namespace Tangra.Model.Context
 		{
 			HasVideoLoaded = false;
 			HasImageLoaded = false;
+		    HasLightCurveLoaded = false;
 			CanChangeTool = false;
 			CanChangeTool = false;
 
