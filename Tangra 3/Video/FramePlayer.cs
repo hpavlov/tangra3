@@ -953,6 +953,32 @@ namespace Tangra.Video
 			}
 		}
 
+	    public static void TranslateFlipRotate(RotateFlipType flipRotateFlipType, out bool flipVertically, out bool flipHorizontally)
+	    {
+	        switch (flipRotateFlipType)
+	        {
+	            case RotateFlipType.RotateNoneFlipXY:
+	                flipVertically = true;
+	                flipHorizontally = true;
+                    break;
+
+                case RotateFlipType.RotateNoneFlipY:
+	                flipVertically = true;
+	                flipHorizontally = false;
+                    break;
+
+                case RotateFlipType.RotateNoneFlipX:
+	                flipVertically = false;
+	                flipHorizontally = true;
+                    break;
+
+                default:
+	                flipVertically = false;
+	                flipHorizontally = false;
+	                break;
+	        }
+	    }
+
 		public void RotateVideo(float angle)
 		{
 			// This is an experimental code

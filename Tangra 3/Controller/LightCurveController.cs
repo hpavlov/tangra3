@@ -69,6 +69,10 @@ namespace Tangra.Controller
 
         private object GetVideoFileMatchingLcFile(LCFile lcFile, string pathToLCFile)
         {
+            if (lcFile.Header.GetVideoFileFormat() == VideoFileFormat.FITS)
+                // For now don't support opening FITS files for LightCurves as it is more complicated
+                return null;
+
             if (File.Exists(lcFile.Header.PathToVideoFile) &&
                 TestWhetherVideoFileMatchesLcHeader(lcFile.Header.PathToVideoFile, lcFile.Header))
                 return lcFile.Header.PathToVideoFile;
@@ -158,6 +162,10 @@ namespace Tangra.Controller
                     ReduceLightCurveOperation operation = (ReduceLightCurveOperation)m_VideoController.SetOperation<ReduceLightCurveOperation>(this, false);
                     operation.SetLCFile(lcFile);
 
+                    bool flipVertically;
+                    bool flipHorizontally;
+                    FramePlayer.TranslateFlipRotate(lcFile.Footer.RotateFlipType, out flipVertically, out flipHorizontally);
+
                     object videoFile = GetVideoFileMatchingLcFile(lcFile, fileName);
                     if (videoFile is string && 
                         !string.IsNullOrEmpty((string)videoFile) &&
@@ -173,7 +181,7 @@ namespace Tangra.Controller
                         ((string[])videoFile).Length > 0)
                     {
                         var fitsFiles = (string[])videoFile;
-                        if (m_VideoController.OpenFitsFileSequence(Path.GetDirectoryName(fitsFiles[0]), fitsFiles, new LCFITSTimeStampReader(lcFile), null, 0, (int)lcFile.Data[0][0].CurrFrameNo))
+                        if (m_VideoController.OpenFitsFileSequence(Path.GetDirectoryName(fitsFiles[0]), fitsFiles, new LCFITSTimeStampReader(lcFile), null, 0, flipVertically, flipHorizontally, (int)lcFile.Data[0][0].CurrFrameNo))
                         {
                             TangraContext.Current.CanPlayVideo = false;
                             if (lcFile.Footer.FitsDynamicFromValue != -1 && lcFile.Footer.FitsDynamicToValue != -1)

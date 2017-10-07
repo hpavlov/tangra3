@@ -2061,7 +2061,7 @@ namespace Tangra.VideoOperations.LightCurves
     {
         public static LCMeasurementFooter Empty = new LCMeasurementFooter();
 
-        private static int SERIALIZATION_VERSION = 12;
+        private static int SERIALIZATION_VERSION = 13;
 
         internal byte[] AveragedFrameBytes;
     	internal int AveragedFrameWidth;
@@ -2090,6 +2090,8 @@ namespace Tangra.VideoOperations.LightCurves
         internal int FitsDynamicFromValue;
         internal int FitsDynamicToValue;
 
+        internal RotateFlipType RotateFlipType;
+
         internal LCMeasurementFooter(
 			Pixelmap averagedFrame, 
             TangraConfig config, 
@@ -2110,7 +2112,8 @@ namespace Tangra.VideoOperations.LightCurves
 			uint dataAav16NormVal,
             int aavStackedFrameRate,
             int fitsDynamicFromValue,
-            int fitsDynamicToValue)
+            int fitsDynamicToValue,
+            RotateFlipType rotateFlipType)
         {
 			AveragedFrameBytes = averagedFrame.DisplayBitmapPixels;
         	AveragedFrameWidth = averagedFrame.Width;
@@ -2139,6 +2142,8 @@ namespace Tangra.VideoOperations.LightCurves
 
             FitsDynamicFromValue = fitsDynamicFromValue;
             FitsDynamicToValue = fitsDynamicToValue;
+
+            RotateFlipType = rotateFlipType;
         }
 
         internal LCMeasurementFooter(BinaryReader reader)
@@ -2189,6 +2194,7 @@ namespace Tangra.VideoOperations.LightCurves
             AAVStackedFrameRate = 0;
             FitsDynamicFromValue = -1;
             FitsDynamicToValue = -1;
+            RotateFlipType = RotateFlipType.RotateNoneFlipNone;
 
 			if (version > 1)
 			{
@@ -2251,6 +2257,11 @@ namespace Tangra.VideoOperations.LightCurves
                                                     {
                                                         FitsDynamicFromValue = reader.ReadInt32();
                                                         FitsDynamicToValue = reader.ReadInt32();
+
+                                                        if (version > 12)
+                                                        {
+                                                            RotateFlipType = (RotateFlipType)reader.ReadInt32();
+                                                        }
                                                     }
 	                                            }
                                             }
@@ -2334,6 +2345,8 @@ namespace Tangra.VideoOperations.LightCurves
 
             writer.Write(FitsDynamicFromValue);
             writer.Write(FitsDynamicToValue);
+
+            writer.Write((int)RotateFlipType);
         }
     }
 

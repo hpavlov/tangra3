@@ -39,6 +39,10 @@ namespace Tangra.Video.FITS
 
         public int NegPixCorrection { get; private set; }
 
+        public bool FlipVertically { get; private set; }
+
+        public bool FlipHorizontally { get; private set; }
+
         private BasicHDU m_ImageHDU;
 
         private bool m_PixelMappingReviewed;
@@ -281,6 +285,9 @@ namespace Tangra.Video.FITS
             config.CardNamesHash = m_CardNamesHash;
             TangraConfig.Settings.RecentFITSFieldConfig.Register(config);
             TangraConfig.Settings.Save();
+
+            FlipVertically = cbxFlipVertically.Checked;
+            FlipHorizontally = cbxFlipHorizontally.Checked;
 
             DialogResult = DialogResult.OK;
             Close();

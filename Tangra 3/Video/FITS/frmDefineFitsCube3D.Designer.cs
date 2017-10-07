@@ -48,8 +48,10 @@
             this.btnOK = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.btnPixelValueMapping = new System.Windows.Forms.Button();
             this.ucTimestampControl = new Tangra.Video.FITS.ucFitsTimeStampConfigurator();
+            this.btnPixelValueMapping = new System.Windows.Forms.Button();
+            this.cbxFlipHorizontally = new System.Windows.Forms.CheckBox();
+            this.cbxFlipVertically = new System.Windows.Forms.CheckBox();
             this.pnlExposure.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbxExposureWarning)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbxExposureOK)).BeginInit();
@@ -233,7 +235,7 @@
             // 
             // btnOK
             // 
-            this.btnOK.Location = new System.Drawing.Point(348, 354);
+            this.btnOK.Location = new System.Drawing.Point(348, 379);
             this.btnOK.Name = "btnOK";
             this.btnOK.Size = new System.Drawing.Size(75, 23);
             this.btnOK.TabIndex = 19;
@@ -244,7 +246,7 @@
             // btnCancel
             // 
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(429, 354);
+            this.btnCancel.Location = new System.Drawing.Point(429, 379);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 18;
@@ -261,16 +263,6 @@
             this.groupBox1.TabIndex = 20;
             this.groupBox1.TabStop = false;
             // 
-            // btnPixelValueMapping
-            // 
-            this.btnPixelValueMapping.Location = new System.Drawing.Point(17, 354);
-            this.btnPixelValueMapping.Name = "btnPixelValueMapping";
-            this.btnPixelValueMapping.Size = new System.Drawing.Size(123, 23);
-            this.btnPixelValueMapping.TabIndex = 22;
-            this.btnPixelValueMapping.Text = "Pixel Value Mapping";
-            this.btnPixelValueMapping.UseVisualStyleBackColor = true;
-            this.btnPixelValueMapping.Click += new System.EventHandler(this.btnPixelValueMapping_Click);
-            // 
             // ucTimestampControl
             // 
             this.ucTimestampControl.Location = new System.Drawing.Point(30, 22);
@@ -278,11 +270,43 @@
             this.ucTimestampControl.Size = new System.Drawing.Size(443, 134);
             this.ucTimestampControl.TabIndex = 9;
             // 
+            // btnPixelValueMapping
+            // 
+            this.btnPixelValueMapping.Location = new System.Drawing.Point(17, 379);
+            this.btnPixelValueMapping.Name = "btnPixelValueMapping";
+            this.btnPixelValueMapping.Size = new System.Drawing.Size(190, 23);
+            this.btnPixelValueMapping.TabIndex = 22;
+            this.btnPixelValueMapping.Text = "Pixel Value Mapping";
+            this.btnPixelValueMapping.UseVisualStyleBackColor = true;
+            this.btnPixelValueMapping.Click += new System.EventHandler(this.btnPixelValueMapping_Click);
+            // 
+            // cbxFlipHorizontally
+            // 
+            this.cbxFlipHorizontally.AutoSize = true;
+            this.cbxFlipHorizontally.Location = new System.Drawing.Point(116, 350);
+            this.cbxFlipHorizontally.Name = "cbxFlipHorizontally";
+            this.cbxFlipHorizontally.Size = new System.Drawing.Size(99, 17);
+            this.cbxFlipHorizontally.TabIndex = 76;
+            this.cbxFlipHorizontally.Text = "Flip Horizontally";
+            this.cbxFlipHorizontally.UseVisualStyleBackColor = true;
+            // 
+            // cbxFlipVertically
+            // 
+            this.cbxFlipVertically.AutoSize = true;
+            this.cbxFlipVertically.Location = new System.Drawing.Point(18, 350);
+            this.cbxFlipVertically.Name = "cbxFlipVertically";
+            this.cbxFlipVertically.Size = new System.Drawing.Size(87, 17);
+            this.cbxFlipVertically.TabIndex = 77;
+            this.cbxFlipVertically.Text = "Flip Vertically";
+            this.cbxFlipVertically.UseVisualStyleBackColor = true;
+            // 
             // frmDefineFitsCube3D
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(521, 388);
+            this.ClientSize = new System.Drawing.Size(521, 414);
+            this.Controls.Add(this.cbxFlipHorizontally);
+            this.Controls.Add(this.cbxFlipVertically);
             this.Controls.Add(this.btnPixelValueMapping);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.btnOK);
@@ -332,5 +356,7 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private ucFitsTimeStampConfigurator ucTimestampControl;
         private System.Windows.Forms.Button btnPixelValueMapping;
+        protected internal System.Windows.Forms.CheckBox cbxFlipHorizontally;
+        protected internal System.Windows.Forms.CheckBox cbxFlipVertically;
     }
 }

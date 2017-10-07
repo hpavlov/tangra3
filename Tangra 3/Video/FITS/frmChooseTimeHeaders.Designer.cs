@@ -45,6 +45,8 @@
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnOK = new System.Windows.Forms.Button();
             this.btnPixelValueMapping = new System.Windows.Forms.Button();
+            this.cbxFlipHorizontally = new System.Windows.Forms.CheckBox();
+            this.cbxFlipVertically = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.pnlExposure.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbxExposureWarning)).BeginInit();
@@ -195,7 +197,7 @@
             // btnCancel
             // 
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(387, 368);
+            this.btnCancel.Location = new System.Drawing.Point(387, 394);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 4;
@@ -204,7 +206,7 @@
             // 
             // btnOK
             // 
-            this.btnOK.Location = new System.Drawing.Point(306, 368);
+            this.btnOK.Location = new System.Drawing.Point(306, 394);
             this.btnOK.Name = "btnOK";
             this.btnOK.Size = new System.Drawing.Size(75, 23);
             this.btnOK.TabIndex = 5;
@@ -214,19 +216,41 @@
             // 
             // btnPixelValueMapping
             // 
-            this.btnPixelValueMapping.Location = new System.Drawing.Point(15, 371);
+            this.btnPixelValueMapping.Location = new System.Drawing.Point(15, 397);
             this.btnPixelValueMapping.Name = "btnPixelValueMapping";
-            this.btnPixelValueMapping.Size = new System.Drawing.Size(123, 23);
+            this.btnPixelValueMapping.Size = new System.Drawing.Size(197, 23);
             this.btnPixelValueMapping.TabIndex = 23;
             this.btnPixelValueMapping.Text = "Pixel Value Mapping";
             this.btnPixelValueMapping.UseVisualStyleBackColor = true;
             this.btnPixelValueMapping.Click += new System.EventHandler(this.btnPixelValueMapping_Click);
             // 
+            // cbxFlipHorizontally
+            // 
+            this.cbxFlipHorizontally.AutoSize = true;
+            this.cbxFlipHorizontally.Location = new System.Drawing.Point(113, 367);
+            this.cbxFlipHorizontally.Name = "cbxFlipHorizontally";
+            this.cbxFlipHorizontally.Size = new System.Drawing.Size(99, 17);
+            this.cbxFlipHorizontally.TabIndex = 74;
+            this.cbxFlipHorizontally.Text = "Flip Horizontally";
+            this.cbxFlipHorizontally.UseVisualStyleBackColor = true;
+            // 
+            // cbxFlipVertically
+            // 
+            this.cbxFlipVertically.AutoSize = true;
+            this.cbxFlipVertically.Location = new System.Drawing.Point(15, 367);
+            this.cbxFlipVertically.Name = "cbxFlipVertically";
+            this.cbxFlipVertically.Size = new System.Drawing.Size(87, 17);
+            this.cbxFlipVertically.TabIndex = 75;
+            this.cbxFlipVertically.Text = "Flip Vertically";
+            this.cbxFlipVertically.UseVisualStyleBackColor = true;
+            // 
             // frmChooseTimeHeaders
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(475, 406);
+            this.ClientSize = new System.Drawing.Size(475, 429);
+            this.Controls.Add(this.cbxFlipHorizontally);
+            this.Controls.Add(this.cbxFlipVertically);
             this.Controls.Add(this.btnPixelValueMapping);
             this.Controls.Add(this.btnOK);
             this.Controls.Add(this.btnCancel);
@@ -265,5 +289,7 @@
         private ucFitsTimeStampConfigurator ucTimestampControl2;
         private ucFitsTimeStampConfigurator ucTimestampControl;
         private System.Windows.Forms.Button btnPixelValueMapping;
+        protected internal System.Windows.Forms.CheckBox cbxFlipHorizontally;
+        protected internal System.Windows.Forms.CheckBox cbxFlipVertically;
     }
 }

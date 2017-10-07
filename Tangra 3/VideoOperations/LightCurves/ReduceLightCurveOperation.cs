@@ -21,17 +21,18 @@ using Tangra.Model.Image;
 using Tangra.Model.ImageTools;
 using Tangra.Model.Video;
 using Tangra.Model.VideoOperations;
-using Tangra.OCR;
 using Tangra.Video;
 using Tangra.VideoOperations.LightCurves;
 using Tangra.Config;
 using Tangra.ImageTools;
+using Tangra.PInvoke;
 using Tangra.VideoOperations.LightCurves.Helpers;
 using Tangra.VideoOperations.LightCurves.Measurements;
 using Tangra.VideoOperations.LightCurves.MutualEvents;
 using Tangra.VideoOperations.LightCurves.Tracking;
 using Tangra.Resources;
 using Tangra.Video.SER;
+using TangraCore = Tangra.OCR.TangraCore;
 
 
 namespace Tangra.VideoOperations.LightCurves
@@ -1976,6 +1977,9 @@ namespace Tangra.VideoOperations.LightCurves
 				m_AveragedFrame = new AveragedFrame(m_StackedAstroImage);
 			}
 
+            PreProcessingInfo preProcessingInfo;
+            PInvoke.TangraCore.PreProcessors.PreProcessingGetConfig(out preProcessingInfo);
+
 			LCMeasurementFooter footer = new LCMeasurementFooter(
 				m_AveragedFrame.Pixelmap,
 				TangraConfig.Settings,
@@ -1996,7 +2000,8 @@ namespace Tangra.VideoOperations.LightCurves
 				PSFFit.NormVal,
                 m_AavStackedFrameRate,
                 m_FitsDynamicFromValue,
-                m_FitsDynamicToValue);
+                m_FitsDynamicToValue,
+                preProcessingInfo.RotateFlipType);
 
 			return LCFile.FlushOnTheFlyOutputFile(finalHeader, footer, m_VideoController);
 		}

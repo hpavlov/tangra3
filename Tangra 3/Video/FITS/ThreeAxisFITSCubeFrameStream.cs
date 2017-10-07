@@ -73,6 +73,8 @@ namespace Tangra.Video.FITS
                 var frm = new frmDefineFitsCube3D(imageHDU, fitsFileHash, videoController);
                 if (videoController.ShowDialog(frm) == DialogResult.OK)
                 {
+                    videoController.SetFlipSettings(frm.FlipVertically, frm.FlipHorizontally);
+
                     fitsStream = new ThreeAxisFITSCubeFrameStream(
                         fileName, fitsFile, bufferedFile, imageHDU, frm.TimeStampReader,
                         frm.WidthIndex, frm.HeightIndex, frm.FrameIndex,

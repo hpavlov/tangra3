@@ -82,6 +82,9 @@ namespace Tangra.Video.FITS
 
         public FITSTimeStampReader TimeStampReader { get; private set; }
 
+        public bool FlipVertically { get; private set; }
+        public bool FlipHorizontally { get; private set; }
+
         public short MinPixelValue { get; private set; }
         public uint MaxPixelValue { get; private set; }
         public int BitPix { get; private set; }
@@ -135,7 +138,9 @@ namespace Tangra.Video.FITS
                             var frm = new frmChooseTimeHeaders(m_FitsFiles[i], GetOrderedFitsFileHash(), m_VideoController);
                             if (frm.ShowDialog(this) == DialogResult.OK)
                             {
-                                TimeStampReader = frm.TimeStampReader;                                
+                                TimeStampReader = frm.TimeStampReader;
+                                FlipVertically = frm.FlipVertically;
+                                FlipHorizontally = frm.FlipHorizontally;
                             }
 
                             MinPixelValue = frm.MinPixelValue;

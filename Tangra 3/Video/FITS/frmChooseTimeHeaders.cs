@@ -13,12 +13,15 @@ using nom.tam.fits;
 using Tangra.Controller;
 using Tangra.Model.Config;
 using Tangra.Model.Helpers;
+using Tangra.PInvoke;
 
 namespace Tangra.Video.FITS
 {
     public partial class frmChooseTimeHeaders : Form
     {
         internal FITSTimeStampReader TimeStampReader;
+        internal bool FlipVertically;
+        internal bool FlipHorizontally;
         internal int NegPixCorrection;
         private List<HeaderEntry> m_AllCards = new List<HeaderEntry>();
         private FitsTimestampHelper m_TimeStampHelper;
@@ -237,6 +240,9 @@ namespace Tangra.Video.FITS
                 TangraConfig.Settings.RecentFITSFieldConfig.Register(config);
                 TangraConfig.Settings.Save();
 
+                FlipVertically = cbxFlipVertically.Checked;
+                FlipHorizontally = cbxFlipHorizontally.Checked;
+
                 DialogResult = DialogResult.OK;
                 Close();
             }
@@ -272,6 +278,9 @@ namespace Tangra.Video.FITS
                 config.CardNamesHash = m_CardNamesHash;
                 TangraConfig.Settings.RecentFITSFieldConfig.Register(config);
                 TangraConfig.Settings.Save();
+
+                FlipVertically = cbxFlipVertically.Checked;
+                FlipHorizontally = cbxFlipHorizontally.Checked;
 
                 DialogResult = DialogResult.OK;
                 Close();
