@@ -731,6 +731,7 @@
     </Compile>
     <Compile Include="VideoTools\VideoModelUtils.cs" />
     <Compile Include="Video\AstroDigitalVideoStreamV2.cs" />
+    <Compile Include="Video\AstroDigitalVideo\AavFileHelper.cs" />
     <Compile Include="Video\AstroDigitalVideo\AdvToAviConverter.cs" />
     <Compile Include="Video\AstroDigitalVideo\frmAdv2Viewer.cs">
       <SubType>Form</SubType>

@@ -8,6 +8,7 @@ v3.6.9 (2017-10-07)
 - Made it possible to flip horizontally and vertically FITS files when opening them.
 - Implemented a 'Crop FITS Images' operation for FITS sequences.
 - Improvements to the 'Convert to FITS' operation.
+- Added detection and correction of MaxPixelValue issues for affected AAV files.
 - Fixed a number of crashes and made minor improvements.
 
 v3.6.8 (2017-08-29)

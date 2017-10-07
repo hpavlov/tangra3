@@ -328,6 +328,9 @@ namespace Tangra.Controller
 	        if (fileExtension != null) 
                 fileExtension = fileExtension.ToLower();
 
+	        if (fileExtension == ".aav")
+	            AavFileHelper.CheckAndCorrectBadMaxPixelValue(fileName, this);
+
 		    return OpenVideoFileInternal(
 				fileName, 
 				() =>
