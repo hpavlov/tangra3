@@ -10,6 +10,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Helpers;
 using Tangra.Model.Config;
 
 namespace Tangra.VideoOperations.LightCurves
@@ -36,7 +37,7 @@ namespace Tangra.VideoOperations.LightCurves
 
                 cbxColorScheme.SelectedIndex = (int)m_DisplaySettings.ColorScheme;
                 cbxTangraTargetColors.Checked = m_DisplaySettings.UseTangraTargetColors;
-                nudPointSize.Value = (decimal)m_DisplaySettings.DatapointSize;
+                nudPointSize.SetNUDValue(m_DisplaySettings.DatapointSize);
             	cbxDrawGrid.Checked = m_DisplaySettings.DrawGrid;
 				cbxDrawInvalidDatapoints.Checked = m_DisplaySettings.DrawInvalidDataPoints;
 

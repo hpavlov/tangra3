@@ -62,9 +62,24 @@
             // nudPointSize
             // 
             this.nudPointSize.Location = new System.Drawing.Point(92, 212);
+            this.nudPointSize.Maximum = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            this.nudPointSize.Minimum = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
             this.nudPointSize.Name = "nudPointSize";
             this.nudPointSize.Size = new System.Drawing.Size(39, 20);
             this.nudPointSize.TabIndex = 55;
+            this.nudPointSize.Value = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
             this.nudPointSize.ValueChanged += new System.EventHandler(this.nudPointSize_ValueChanged);
             // 
             // cbxColorScheme
