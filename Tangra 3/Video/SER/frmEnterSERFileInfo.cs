@@ -53,11 +53,25 @@ namespace Tangra.Video.SER
 				cbxBitPix.Items.Add("14");
 				cbxBitPix.Items.Add("16");
 
-				int selIndex = cbxBitPix.Items.IndexOf(TangraConfig.Settings.LastUsed.SerFileLastBitPix.ToString());
-				if (selIndex != -1)
-					cbxBitPix.SelectedIndex = selIndex;
-				else
-					cbxBitPix.SelectedIndex = 4;
+			    switch(info.PixelDepthPerPlane)
+			    {
+			        case 12:
+                        cbxBitPix.SelectedIndex = 1;
+			            break;
+                    case 14:
+                        cbxBitPix.SelectedIndex = 2;
+                        break;
+                    case 16:
+                        cbxBitPix.SelectedIndex = 3;
+                        break;
+                    default:
+				        int selIndex = cbxBitPix.Items.IndexOf(TangraConfig.Settings.LastUsed.SerFileLastBitPix.ToString());
+				        if (selIndex != -1)
+					        cbxBitPix.SelectedIndex = selIndex;
+				        else
+					        cbxBitPix.SelectedIndex = 4;
+			            break;
+			    }
 			}
 
 			nudFrameRate.SetNUDValue(TangraConfig.Settings.LastUsed.SerFileLastFrameRate);
