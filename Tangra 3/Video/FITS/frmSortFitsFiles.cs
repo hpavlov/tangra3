@@ -210,8 +210,8 @@ namespace Tangra.Video.FITS
             m_SortedByTimeStamp = true;
             if (m_FilesWithExposure == 0 && m_FilesWithoutExposure > 0)
             {
-                // No longer need this warning - it is handled by FITS Time Headers Dialog
-                //MessageBox.Show("None of the FITS files have a saved exposure and they have been ordered by file name!", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                // Not sorting by timestamp and using filenames instead, because
+                // FITS heades were set to be ignored by the user in the Choose FITS Headers dialog
                 m_SortedByTimeStamp = false;
             }
             else if (m_FilesWithExposure > 0 && m_FilesWithoutExposure > 0)
