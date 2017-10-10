@@ -17,7 +17,7 @@ namespace Tangra.Tests.FITS
             Type dataType;
             bool hasNegPix;
 
-            short minValue;
+            int minValue;
             uint maxValue;
             int bz = 0;
             FITSHelper2.Load16BitImageData(pixels, 3, 2, bz, 0, out medianVal, out dataType, out hasNegPix, out minValue, out maxValue);

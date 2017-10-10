@@ -85,7 +85,7 @@ namespace Tangra.Video.FITS
         public bool FlipVertically { get; private set; }
         public bool FlipHorizontally { get; private set; }
 
-        public short MinPixelValue { get; private set; }
+        public int MinPixelValue { get; private set; }
         public uint MaxPixelValue { get; private set; }
         public int BitPix { get; private set; }
         public int NegPixCorrection { get; private set; }
