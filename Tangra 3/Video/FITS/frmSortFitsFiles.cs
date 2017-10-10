@@ -98,8 +98,6 @@ namespace Tangra.Video.FITS
 
         private void frmSortFitsFiles_Shown(object sender, EventArgs e)
         {
-            TimeStampReader = null;
-
             if (m_FitsFiles.Length > 0)
             {
                 var frm = new frmChooseTimeHeaders(m_FitsFiles[0], GetOrderedFitsFileHash(), m_VideoController);
@@ -122,6 +120,7 @@ namespace Tangra.Video.FITS
                 }
             }
 
+
             m_FitsHeaders = new Header[m_FitsFiles.Length];
             m_FitsTimestamps = new DateTime?[m_FitsFiles.Length];
 
@@ -129,7 +128,8 @@ namespace Tangra.Video.FITS
             pbar.Maximum = m_FitsFiles.Length;
             pbar.Value = 0;
 
-            var fileSizeInfo = new Dictionary<string, FitsFileFormatInfoRecord>();            
+            var fileSizeInfo = new Dictionary<string, FitsFileFormatInfoRecord>();
+            TimeStampReader = null;
                                   
             for (int i = 0; i < m_FitsFiles.Length; i++)
             {
