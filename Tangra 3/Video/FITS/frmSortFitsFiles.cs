@@ -98,6 +98,29 @@ namespace Tangra.Video.FITS
 
         private void frmSortFitsFiles_Shown(object sender, EventArgs e)
         {
+            if (m_FitsFiles.Length > 0)
+            {
+                var frm = new frmChooseTimeHeaders(m_FitsFiles[0], GetOrderedFitsFileHash(), m_VideoController);
+                if (frm.ShowDialog(this) == DialogResult.OK)
+                {
+                    TimeStampReader = frm.TimeStampReader;
+                    FlipVertically = frm.FlipVertically;
+                    FlipHorizontally = frm.FlipHorizontally;
+                    MinPixelValue = frm.MinPixelValue;
+                    MaxPixelValue = frm.MaxPixelValue;
+                    BitPix = frm.BitPix;
+                    NegPixCorrection = frm.NegPixCorrection;
+                }
+                else
+                {
+                    Array.Clear(m_FitsFiles, 0, m_FitsFiles.Length);
+                    DialogResult = DialogResult.Cancel;
+                    Close();
+                    return;
+                }
+            }
+
+
             m_FitsHeaders = new Header[m_FitsFiles.Length];
             m_FitsTimestamps = new DateTime?[m_FitsFiles.Length];
 
@@ -107,7 +130,7 @@ namespace Tangra.Video.FITS
 
             var fileSizeInfo = new Dictionary<string, FitsFileFormatInfoRecord>();
             TimeStampReader = null;
-
+                                  
             for (int i = 0; i < m_FitsFiles.Length; i++)
             {
                 try
@@ -132,30 +155,17 @@ namespace Tangra.Video.FITS
                         bool isMidPoint;
                         double? fitsExposure = null;
                         DateTime? timestamp = null;
-
-                        if (i == 0)
+                        
+                        if (TimeStampReader != null)
                         {
-                            var frm = new frmChooseTimeHeaders(m_FitsFiles[i], GetOrderedFitsFileHash(), m_VideoController);
-                            if (frm.ShowDialog(this) == DialogResult.OK)
+                            try
                             {
-                                TimeStampReader = frm.TimeStampReader;
-                                FlipVertically = frm.FlipVertically;
-                                FlipHorizontally = frm.FlipHorizontally;
+                                timestamp = FITSHelper2.ParseExposure(m_FitsFiles[i], hdr, TimeStampReader, out isMidPoint, out fitsExposure);
                             }
-
-                            MinPixelValue = frm.MinPixelValue;
-                            MaxPixelValue = frm.MaxPixelValue;
-                            BitPix = frm.BitPix;
-                            NegPixCorrection = frm.NegPixCorrection;
-                        }
-
-                        try
-                        {
-                            timestamp = FITSHelper2.ParseExposure(m_FitsFiles[i], hdr, TimeStampReader, out isMidPoint, out fitsExposure);
-                        }
-                        catch (Exception ex)
-                        {
-                            Trace.WriteLine(ex.ToString());
+                            catch (Exception ex)
+                            {
+                                Trace.WriteLine(ex.ToString());
+                            }
                         }
 
                         m_FitsTimestamps[i] = timestamp;
@@ -200,12 +210,13 @@ namespace Tangra.Video.FITS
             m_SortedByTimeStamp = true;
             if (m_FilesWithExposure == 0 && m_FilesWithoutExposure > 0)
             {
-                MessageBox.Show("None of the FITS files have a saved exposure and they have been ordered by file name!", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                // Not sorting by timestamp and using filenames instead, because
+                // FITS heades were set to be ignored by the user in the Choose FITS Headers dialog
                 m_SortedByTimeStamp = false;
             }
             else if (m_FilesWithExposure > 0 && m_FilesWithoutExposure > 0)
                 MessageBox.Show(string.Format("{0} out of {1} of the FITS files have a missing exposure (checked headers: EXPOSURE, EXPTIME and RAWTIME). Please treat the reported timestamps with suspicion and expect inconsistencies.", m_FilesWithoutExposure, m_FilesWithoutExposure + m_FilesWithExposure), "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-
+            DialogResult = DialogResult.OK;
             Close();
         }
     }

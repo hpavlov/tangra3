@@ -44,7 +44,7 @@ namespace Tangra.Video.FITS
 
         public bool HasNegativePixels { get; private set; }
 
-        public int BitPix { get; private set; }
+        public int BitPix { get; private set; }       
 
         public frmChooseTimeHeaders()
         {
@@ -285,6 +285,15 @@ namespace Tangra.Video.FITS
                 DialogResult = DialogResult.OK;
                 Close();
             }
+            else
+            {
+                FlipVertically = cbxFlipVertically.Checked;
+                FlipHorizontally = cbxFlipHorizontally.Checked;
+
+                DialogResult = DialogResult.OK;
+                Close();
+            }
+
         }
 
         private void rbStartEndTimestamp_CheckedChanged(object sender, EventArgs e)
@@ -325,5 +334,15 @@ namespace Tangra.Video.FITS
         {
             ReviewPixelMapping();
         }
+
+        private void rbNoTimestamp_CheckedChanged(object sender, EventArgs e)
+        {
+            bool enabled = !rbNoTimestamp.Checked;
+            ucTimestampControl2.Enabled = enabled;
+            ucTimestampControl.Enabled = enabled;
+            pnlExposure.Enabled = enabled;
+
+        }
+        
     }
 }

@@ -251,16 +251,20 @@ namespace Tangra.Controller
                 var frm = new frmSortFitsFiles(this);
                 frm.SetFiles(fitsFiles);
                 frm.StartPosition = FormStartPosition.CenterParent;
-                frm.ShowDialog(m_MainForm);
-                if (!string.IsNullOrWhiteSpace(frm.ErrorMessage))
+
+                if (frm.ShowDialog(m_MainForm) == DialogResult.OK)
                 {
-                    ShowMessageBox(frm.ErrorMessage, "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return false;
+                    if (!string.IsNullOrWhiteSpace(frm.ErrorMessage))
+                    {
+                        ShowMessageBox(frm.ErrorMessage, "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return false;
+                    }
+                    fitsFiles = frm.GetSortedFiles();
+
+                    return OpenFitsFileSequence(folderName, fitsFiles, frm.TimeStampReader, frm.BitPix, frm.NegPixCorrection, frm.FlipVertically, frm.FlipHorizontally);
                 }
-
-                fitsFiles = frm.GetSortedFiles();
-
-                return OpenFitsFileSequence(folderName, fitsFiles, frm.TimeStampReader, frm.BitPix, frm.NegPixCorrection, frm.FlipVertically, frm.FlipHorizontally);
+                else
+                    return false;
             }
 	    }
 

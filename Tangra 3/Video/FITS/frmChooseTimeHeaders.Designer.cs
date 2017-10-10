@@ -40,13 +40,14 @@
             this.label3 = new System.Windows.Forms.Label();
             this.cbxExposure = new System.Windows.Forms.ComboBox();
             this.cbxExposureUnits = new System.Windows.Forms.ComboBox();
-            this.ucTimestampControl2 = new Tangra.Video.FITS.ucFitsTimeStampConfigurator();
-            this.ucTimestampControl = new Tangra.Video.FITS.ucFitsTimeStampConfigurator();
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnOK = new System.Windows.Forms.Button();
             this.btnPixelValueMapping = new System.Windows.Forms.Button();
             this.cbxFlipHorizontally = new System.Windows.Forms.CheckBox();
             this.cbxFlipVertically = new System.Windows.Forms.CheckBox();
+            this.rbNoTimestamp = new System.Windows.Forms.RadioButton();
+            this.ucTimestampControl2 = new Tangra.Video.FITS.ucFitsTimeStampConfigurator();
+            this.ucTimestampControl = new Tangra.Video.FITS.ucFitsTimeStampConfigurator();
             this.groupBox1.SuspendLayout();
             this.pnlExposure.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbxExposureWarning)).BeginInit();
@@ -68,7 +69,7 @@
             // rbStartEndTimestamp
             // 
             this.rbStartEndTimestamp.AutoSize = true;
-            this.rbStartEndTimestamp.Location = new System.Drawing.Point(207, 18);
+            this.rbStartEndTimestamp.Location = new System.Drawing.Point(165, 18);
             this.rbStartEndTimestamp.Name = "rbStartEndTimestamp";
             this.rbStartEndTimestamp.Size = new System.Drawing.Size(137, 17);
             this.rbStartEndTimestamp.TabIndex = 2;
@@ -179,21 +180,6 @@
             this.cbxExposureUnits.TabIndex = 10;
             this.cbxExposureUnits.SelectedIndexChanged += new System.EventHandler(this.cbxExposureUnits_SelectedIndexChanged);
             // 
-            // ucTimestampControl2
-            // 
-            this.ucTimestampControl2.Location = new System.Drawing.Point(6, 170);
-            this.ucTimestampControl2.Name = "ucTimestampControl2";
-            this.ucTimestampControl2.Size = new System.Drawing.Size(434, 134);
-            this.ucTimestampControl2.TabIndex = 8;
-            this.ucTimestampControl2.Visible = false;
-            // 
-            // ucTimestampControl
-            // 
-            this.ucTimestampControl.Location = new System.Drawing.Point(7, 19);
-            this.ucTimestampControl.Name = "ucTimestampControl";
-            this.ucTimestampControl.Size = new System.Drawing.Size(434, 134);
-            this.ucTimestampControl.TabIndex = 7;
-            // 
             // btnCancel
             // 
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
@@ -244,11 +230,39 @@
             this.cbxFlipVertically.Text = "Flip Vertically";
             this.cbxFlipVertically.UseVisualStyleBackColor = true;
             // 
+            // rbNoTimestamp
+            // 
+            this.rbNoTimestamp.AutoSize = true;
+            this.rbNoTimestamp.Location = new System.Drawing.Point(320, 18);
+            this.rbNoTimestamp.Name = "rbNoTimestamp";
+            this.rbNoTimestamp.Size = new System.Drawing.Size(138, 17);
+            this.rbNoTimestamp.TabIndex = 76;
+            this.rbNoTimestamp.TabStop = true;
+            this.rbNoTimestamp.Text = "None (Sort by Filename)";
+            this.rbNoTimestamp.UseVisualStyleBackColor = true;
+            this.rbNoTimestamp.CheckedChanged += new System.EventHandler(this.rbNoTimestamp_CheckedChanged);
+            // 
+            // ucTimestampControl2
+            // 
+            this.ucTimestampControl2.Location = new System.Drawing.Point(7, 170);
+            this.ucTimestampControl2.Name = "ucTimestampControl2";
+            this.ucTimestampControl2.Size = new System.Drawing.Size(434, 134);
+            this.ucTimestampControl2.TabIndex = 8;
+            this.ucTimestampControl2.Visible = false;
+            // 
+            // ucTimestampControl
+            // 
+            this.ucTimestampControl.Location = new System.Drawing.Point(7, 19);
+            this.ucTimestampControl.Name = "ucTimestampControl";
+            this.ucTimestampControl.Size = new System.Drawing.Size(434, 134);
+            this.ucTimestampControl.TabIndex = 7;
+            // 
             // frmChooseTimeHeaders
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(475, 429);
+            this.Controls.Add(this.rbNoTimestamp);
             this.Controls.Add(this.cbxFlipHorizontally);
             this.Controls.Add(this.cbxFlipVertically);
             this.Controls.Add(this.btnPixelValueMapping);
@@ -291,5 +305,6 @@
         private System.Windows.Forms.Button btnPixelValueMapping;
         protected internal System.Windows.Forms.CheckBox cbxFlipHorizontally;
         protected internal System.Windows.Forms.CheckBox cbxFlipVertically;
+        private System.Windows.Forms.RadioButton rbNoTimestamp;
     }
 }
