@@ -34,7 +34,7 @@ namespace Tangra.Video.FITS
 
         private int m_BelowZeroCorr;
 
-        public short MinPixelValue { get; private set; }
+        public int MinPixelValue { get; private set; }
 
         public uint[] Pixels { get; private set; }
 

@@ -35,7 +35,7 @@ namespace Tangra.Video.FITS
         private float m_Exposure;
 		private uint[] m_FlatPixels;
 
-        private short m_MinPixelValue;
+        private int m_MinPixelValue;
         private uint m_MaxPixelValue;
 
         private Dictionary<string, string> m_Cards = new Dictionary<string, string>();
@@ -51,7 +51,7 @@ namespace Tangra.Video.FITS
             return new SingleFITSFileFrameStream(fitsData.PixelsFlat, fitsData.Width, fitsData.Height, fitsData.PixelStats.BitPix, fitsData.Exposure, fitsData.PixelStats.MinPixelValue, fitsData.PixelStats.MaxPixelValue, fitsData.Cards);
 		}
 
-		private SingleFITSFileFrameStream(uint[] flatPixels, int width, int height, int bpp, double? exposure, short minPixelValue, uint maxPixelValue, IDictionary<string, string> cards)
+		private SingleFITSFileFrameStream(uint[] flatPixels, int width, int height, int bpp, double? exposure, int minPixelValue, uint maxPixelValue, IDictionary<string, string> cards)
 		{
 			m_FlatPixels = flatPixels;
 			m_Width = width;

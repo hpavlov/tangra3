@@ -25,7 +25,7 @@ namespace Tangra.Video.FITS
 
         private List<string> m_FitsFilesList = new List<string>();
 
-        private short m_MinPixelValueFirstImage;
+        private int m_MinPixelValueFirstImage;
         private uint m_MaxPixelValueFirstImage;
         private IFITSTimeStampReader m_TimeStampReader = null;
 

@@ -38,7 +38,7 @@ namespace Tangra.Model.Helpers
         public int BitPix;
         public int BZero;
         public Type PixelType;
-        public short MinPixelValue;
+        public int MinPixelValue;
         public uint MaxPixelValue;
         public uint MedianPixelValue;
         public bool HasNegativePixels;
@@ -257,7 +257,7 @@ namespace Tangra.Model.Helpers
             uint median;
             Type dataType;
             bool hasNegPix;
-            short minValue;
+            int minValue;
             uint maxValue;
 
             return Load16BitImageData(dataArray, height, width, bzero, mask, out median, out dataType, out hasNegPix, out minValue, out maxValue);
@@ -266,7 +266,7 @@ namespace Tangra.Model.Helpers
 
         public static uint[] Load16BitImageData(
             Array dataArray, int height, int width, int bzero, uint mask,
-            out uint medianValue, out Type dataType, out bool hasNegPix, out short minRawValue, out uint maxVal)
+            out uint medianValue, out Type dataType, out bool hasNegPix, out int minRawValue, out uint maxVal)
         {
             var medianCalcList = new List<uint>();
 
@@ -274,7 +274,7 @@ namespace Tangra.Model.Helpers
             hasNegPix = false;
             maxVal = 0;
             medianValue = 0;
-            minRawValue = short.MaxValue;
+            minRawValue = int.MaxValue;
 
             uint[] data = new uint[width * height];
 
