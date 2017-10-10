@@ -339,7 +339,17 @@ namespace Tangra.Video.SER
 
 			using (var memStr = new MemoryStream(rawBitmapBytes))
 			{
-				Bitmap displayBitmap = (Bitmap)Bitmap.FromStream(memStr);
+                Bitmap displayBitmap;
+
+                try
+                {
+                    displayBitmap = (Bitmap)Bitmap.FromStream(memStr);
+                }
+                catch (Exception ex)
+                {
+                    Trace.WriteLine(ex.GetFullStackTrace());
+                    displayBitmap = new Bitmap(Width, Height);
+                }
 
 				var rv = new Pixelmap(Width, Height, BitPix, pixels, displayBitmap, displayBitmapBytes);
                 rv.UnprocessedPixels = unprocessedPixels;
