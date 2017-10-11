@@ -1,5 +1,10 @@
 ﻿Tangra3 Release Notes
 ---------------------
+v3.6.10 (2017-10-11)
+- Fixed a problem where some FITS sequences recorded by SharpCap could not be open in Tangra.
+- Fixed an issue where opening a 12-bit SER files may open it by default as 8-bit.
+- Other minor fixes and improvements.
+
 v3.6.9 (2017-10-07)
 - Made it possible to drag and drop files in Tangra to open them.
 - Added support for FITS 3D-Cubes.
