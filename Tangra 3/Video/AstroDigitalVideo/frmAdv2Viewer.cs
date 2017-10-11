@@ -830,6 +830,23 @@ namespace Tangra.Video.AstroDigitalVideo
 
         internal delegate void OnProgressDelegate(int percentDone, int argument);
 
+        internal delegate DialogResult MessageBoxDelegate(string message, MessageBoxButtons buttons, MessageBoxIcon icon);
+
+        private DialogResult InvokeMessageBox(string message, MessageBoxButtons buttons, MessageBoxIcon icon)
+        {
+            try
+            {
+                return (DialogResult)Invoke(new MessageBoxDelegate((m, b, i) =>
+                {
+                    return MessageBox.Show(this, m, "Tangra 3", b, i);
+                }), new object[] { message, buttons, icon });
+            }
+            catch (InvalidOperationException)
+            { }
+
+            return DialogResult.Abort;
+        }
+
         internal bool SaveAsAviFile(string fileName, int firstFrame, int lastFrame, AdvToAviConverter converter, bool tryCodec, bool isCalibrationStream, double msPerFrame, double addedGamma, OnProgressDelegate progressCallback)
         {
             IAviSaver saver = AdvToAviConverterFactory.CreateConverter(converter);
@@ -853,19 +870,16 @@ namespace Tangra.Video.AstroDigitalVideo
                 }
                 else
                 {
-                    MessageBox.Show(
+                    InvokeMessageBox(
                         "There is insufficient timing information in this file to convert it to AVI. This could be caused by an old file format or trying to make an AVI from a single frame.",
-                        "Tangra 3",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Error);
 
                     return false;
                 }
 
-                if (MessageBox.Show(
-                    this,
+                if (InvokeMessageBox(
                     "Please note that the AVI export is doing resampling of the original video which will typically cause frames to duplicated and/or dropped.\r\n\r\nThis export function is meant to be used for video streaming (i.e. sharing the video for viewing on the Internet) and should not be used to convert the video to another format for measuring in another software. If you want to measure the video in another software either measure it directly as ADV/AAV file (if supported) or export it to a FITS file sequence from the main file menu and measure the FITS images.\r\n\r\nDo you wish to continue?",
-                    "Tangra",
                     MessageBoxButtons.YesNo,
                     MessageBoxIcon.Warning) != DialogResult.Yes)
                     return false;

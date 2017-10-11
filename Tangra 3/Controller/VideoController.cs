@@ -435,12 +435,14 @@ namespace Tangra.Controller
 		public bool OpenVideoFileInternal(string fileName, Func<IFrameStream> frameStreamFactoryMethod)
 		{
 			TangraContext.Current.UsingADV = false;
+		    TangraContext.Current.IsAAV2 = false;
 			TangraContext.Current.IsSerFile = false;
 		    TangraContext.Current.IsFitsStream = false;
             TangraContext.Current.IsAviFile = false;
 			TangraContext.Current.FileName = null;
 			TangraContext.Current.FileFormat = null;
 			TangraContext.Current.HasVideoLoaded = false;
+
 			m_OverlayManager.Reset();
 
 		    TangraContext.Current.CrashReportInfo.VideoFile = fileName;
@@ -481,6 +483,7 @@ namespace Tangra.Controller
 				TangraContext.Current.CanLoadFlatFrame = true;
 				TangraContext.Current.CanScrollFrames = true;
                 TangraContext.Current.IsAviFile = m_FramePlayer.IsAviVideo;
+                TangraContext.Current.IsAAV2 = m_FramePlayer.IsAstroAnalogueVideoV2;
 
 				TangraContext.Current.HasImageLoaded = true;
                 TangraContext.Current.UndefinedFrameRate = double.IsNaN(m_FramePlayer.Video.FrameRate);
