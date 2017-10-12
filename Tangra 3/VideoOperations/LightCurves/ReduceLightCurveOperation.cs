@@ -1559,13 +1559,22 @@ namespace Tangra.VideoOperations.LightCurves
 
 		public DialogResult CheckAavRate()
 	    {
-			int totalIntegratedFrames = 0;
-			for (int i = m_StartTimeFrame; i < m_EndTimeFrame; i++)
-			{
-				FrameStateData frameState = m_VideoController.GetFrameStateData(i);
+            int totalIntegratedFrames = 0;
 
-				totalIntegratedFrames += frameState.NumberIntegratedFrames.Value;
-			}
+            FileProgressManager.BeginFileOperation(m_EndTimeFrame - m_StartTimeFrame);
+		    try
+		    {
+                for (int i = m_StartTimeFrame; i < m_EndTimeFrame; i++)
+                {
+                    FrameStateData frameState = m_VideoController.GetFrameStateData(i);
+                    totalIntegratedFrames += frameState.NumberIntegratedFrames.Value;
+                    FileProgressManager.FileOperationProgress(i - m_StartTimeFrame + 1);
+                }
+		    }
+		    finally
+		    {
+                FileProgressManager.EndFileOperation();
+		    }
 
 			// The actual integration could even be of PAL or NTSC frames
 
