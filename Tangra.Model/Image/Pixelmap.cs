@@ -557,7 +557,7 @@ namespace Tangra.Model.Image
 
 			uint[] pixels = new uint[newWidth * newHeight];
 			byte[] displayBitmapBytes = new byte[newWidth * newHeight];
-			byte[] rawBitmapBytes = new byte[(newWidth * newHeight * 3) + 40 + 14 + 1];
+			byte[] rawBitmapBytes = new byte[GetBitmapBIRGBPixelArraySize(24, Width, Height) + 40 + 14 + 1];
 
 			TangraModelCore.RotateFrame(Width, Height, angleDegrees, m_Pixels, newWidth, newHeight, pixels, rawBitmapBytes, displayBitmapBytes, (short)m_BitPix, m_MaxSignalValue.HasValue ? m_MaxSignalValue.Value : 0);
 
@@ -583,5 +583,10 @@ namespace Tangra.Model.Image
 				return rv;
 			}
 		}
+
+	    public static int GetBitmapBIRGBPixelArraySize(int bpp, int width, int height)
+	    {
+	        return height * (int)Math.Floor((bpp * width + 31) / 32.0) * 4;
+	    }
 	}
 }

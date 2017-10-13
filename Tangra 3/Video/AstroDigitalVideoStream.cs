@@ -275,7 +275,7 @@ namespace Tangra.Video
 			uint[] pixels = new uint[m_Width * m_Height];
             uint[] unprocessedPixels = new uint[m_Width * m_Height];
 			byte[] displayBitmapBytes = new byte[m_Width * m_Height];
-			byte[] rawBitmapBytes = new byte[(m_Width * m_Height * 3) + 40 + 14 + 1];
+            byte[] rawBitmapBytes = new byte[Pixelmap.GetBitmapBIRGBPixelArraySize(24, Width, Height) + 40 + 14 + 1];
 			var frameInfo = new AdvFrameInfoNative();
 
 			byte[] gpsFix = new byte[256 * 16];
@@ -556,7 +556,7 @@ namespace Tangra.Video
 			uint[] pixels = new uint[m_Width * m_Height];
             uint[] unprocessedPixels = new uint[m_Width * m_Height];
 			byte[] displayBitmapBytes = new byte[m_Width * m_Height];
-			byte[] rawBitmapBytes = new byte[(m_Width * m_Height * 3) + 40 + 14 + 1];
+            byte[] rawBitmapBytes = new byte[Pixelmap.GetBitmapBIRGBPixelArraySize(24, Width, Height) + 40 + 14 + 1];
 			var frameInfo = new AdvFrameInfoNative();
 
 		    lock (m_SyncLock)

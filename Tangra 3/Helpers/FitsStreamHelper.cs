@@ -27,7 +27,7 @@ namespace Tangra.Helpers
         internal static Pixelmap BuildFitsPixelmap(int width, int height, uint[] pixelsFlat, int bitPix, bool hasUtcTimeStamps, double? exposure, DateTime? timestamp, BasicHDU fitsImage, Dictionary<string, string> cards)
 	    {
             byte[] displayBitmapBytes = new byte[width * height];
-            byte[] rawBitmapBytes = new byte[(width * height * 3) + 40 + 14 + 1];
+            byte[] rawBitmapBytes = new byte[Pixelmap.GetBitmapBIRGBPixelArraySize(24, width, height) + 40 + 14 + 1];
 
             TangraCore.PreProcessors.EnsurePixelRange(pixelsFlat, width, height, bitPix, 0);
 

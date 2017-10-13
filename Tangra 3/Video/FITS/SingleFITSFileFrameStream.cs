@@ -138,7 +138,7 @@ namespace Tangra.Video.FITS
 		public Pixelmap GetPixelmap(int index)
 		{
 			byte[] displayBitmapBytes = new byte[m_Width * m_Height];
-			byte[] rawBitmapBytes = new byte[(m_Width * m_Height * 3) + 40 + 14 + 1];
+            byte[] rawBitmapBytes = new byte[Pixelmap.GetBitmapBIRGBPixelArraySize(24, m_Width, m_Height) + 40 + 14 + 1];
 
 			uint[] flatPixelsCopy = new uint[m_FlatPixels.Length];
 			Array.Copy(m_FlatPixels, flatPixelsCopy, m_FlatPixels.Length);

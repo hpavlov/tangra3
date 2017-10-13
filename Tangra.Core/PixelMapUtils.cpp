@@ -382,13 +382,16 @@ HRESULT GetBitmapPixels(int width, int height, unsigned int* pixels, BYTE* bitma
 {
 	BYTE* pp = bitmapPixels;
 
+	int paddedRowSize = 4 * (int)floor((24 * width + 31.0)/32.0);
+	int paddedImageSize = ABS(height) * paddedRowSize;
+
 	// define the bitmap information header
 	BITMAPINFOHEADER bih;
 	bih.biSize = sizeof(BITMAPINFOHEADER);
 	bih.biPlanes = 1;
 	bih.biBitCount = 24;                          // 24-bit
 	bih.biCompression = BI_RGB;                   // no compression
-	bih.biSizeImage = width * ABS(height) * 3;    // width * height * (RGB bytes)
+	bih.biSizeImage = paddedImageSize;
 	bih.biXPelsPerMeter = 0;
 	bih.biYPelsPerMeter = 0;
 	bih.biClrUsed = 0;
@@ -413,9 +416,11 @@ HRESULT GetBitmapPixels(int width, int height, unsigned int* pixels, BYTE* bitma
 
 	bitmapPixels = bitmapPixels + sizeof(bfh) + sizeof(memBitmapInfo);
 
+
+	int rowPadding = paddedRowSize - 3 * width;
+
 	int currLinePos = 0;
-	int length = width * height;
-	bitmapPixels+=3 * (length + width);
+	bitmapPixels+=paddedImageSize + paddedRowSize;
 
 	int shiftVal = 0;
 	if (bpp == 8) shiftVal = 0;
@@ -432,7 +437,7 @@ HRESULT GetBitmapPixels(int width, int height, unsigned int* pixels, BYTE* bitma
 	while(total--) {
 		if (currLinePos == 0) {
 			currLinePos = width;
-			bitmapPixels-=6*width;
+			bitmapPixels-=2*paddedRowSize;
 		};
 
 		unsigned int val = *pixels;
@@ -458,6 +463,7 @@ HRESULT GetBitmapPixels(int width, int height, unsigned int* pixels, BYTE* bitma
 		*bitmapBytes++ = btVal;
 
 		currLinePos--;
+		if (currLinePos == 0) bitmapPixels+=rowPadding;
 	}
 
 	return S_OK;

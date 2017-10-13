@@ -236,9 +236,9 @@ namespace Tangra.Video.SER
 				throw new ApplicationException("Invalid frame position: " + index);
 
 			uint[] pixels = new uint[Width * Height];
-            uint[] unprocessedPixels = new uint[Width * Height];
+			uint[] unprocessedPixels = new uint[Width * Height];
 			byte[] displayBitmapBytes = new byte[Width * Height];
-			byte[] rawBitmapBytes = new byte[(Width * Height * 3) + 40 + 14 + 1];
+			byte[] rawBitmapBytes = new byte[Pixelmap.GetBitmapBIRGBPixelArraySize(24, Width, Height) + 40 + 14 + 1];
 
 			var frameInfo = new SerNativeFrameInfo();
 
@@ -330,7 +330,7 @@ namespace Tangra.Video.SER
 			uint[] pixels = new uint[Width * Height];
             uint[] unprocessedPixels = new uint[Width * Height];
 			byte[] displayBitmapBytes = new byte[Width * Height];
-			byte[] rawBitmapBytes = new byte[(Width * Height * 3) + 40 + 14 + 1];
+			byte[] rawBitmapBytes = new byte[Pixelmap.GetBitmapBIRGBPixelArraySize(24, Width, Height) + 40 + 14 + 1];
 			var frameInfo = new SerNativeFrameInfo();
 
             TangraCore.SERGetIntegratedFrame(startFrameNo, actualFramesToIntegrate, isSlidingIntegration, isMedianAveraging, pixels, unprocessedPixels, rawBitmapBytes, displayBitmapBytes, (ushort)BitPix, ref frameInfo);
