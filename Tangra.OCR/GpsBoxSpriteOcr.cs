@@ -684,11 +684,11 @@ namespace Tangra.OCR
             return Tuple.Create(bestTopLines, bestBotLineScores, bestBotLines, bestBotLineScores);
         }
 
-        private Tuple<int[], int[]> DetermineOsdLineVerticalsEx(uint[] data, int minWhiteLevel)
+        private Tuple<int[], int[]> DetermineOsdLineVerticalsEx(uint[] data, int minWhiteLevel, out Dictionary<int, int> scores)
         {
             // NOTE: data has been already pre-processed with large chunk noice removed so background is zero
 
-            var scores = new Dictionary<int, int>();
+            scores = new Dictionary<int, int>();
             var topLimit = m_ImageHeight / 2;
 
             for (int y = 0; y < m_ImageHeight - 1; y++)
@@ -803,9 +803,10 @@ namespace Tangra.OCR
             return Tuple.Create(topCandidates, botCandidates);
         }
 
-        private Dictionary<int, List<Tuple<int, int>>> DetermineOsdLineVerticals(uint[] data, int minWhiteLevel)
+        private Dictionary<int, List<Tuple<int, int, int>>> DetermineOsdLineVerticals(uint[] data, int minWhiteLevel)
         {
-            var lineProbes = DetermineOsdLineVerticalsEx(data, minWhiteLevel);
+            Dictionary<int, int> scores;
+            var lineProbes = DetermineOsdLineVerticalsEx(data, minWhiteLevel, out scores);
             if (lineProbes.Item1.Length < 2 || lineProbes.Item1.Length > 5)
             {
                 lineProbes = DetermineOsdLineVerticalsOld(data, minWhiteLevel);
@@ -814,7 +815,7 @@ namespace Tangra.OCR
             var topCandidates = lineProbes.Item1;
             var botCandidates = lineProbes.Item2;
 
-            var pairs = new Dictionary<int, List<Tuple<int, int>>>();
+            var pairs = new Dictionary<int, List<Tuple<int, int, int>>>();
 
             foreach (var potTop in topCandidates)
             {
@@ -823,21 +824,25 @@ namespace Tangra.OCR
                     var distancePix = potBot - potTop;
                     if (distancePix > MIN_VIABLE_HEIGHT_PIXELS && distancePix < MAX_VIABLE_HEIGHT_PIXELS)
                     {
-                        List<Tuple<int, int>> exEntry;
+                        List<Tuple<int, int, int>> exEntry;
                         if (!pairs.TryGetValue(distancePix, out exEntry) &&
                             !pairs.TryGetValue(distancePix - 1, out exEntry) &&
                             !pairs.TryGetValue(distancePix + 1, out exEntry))
                         {
-                            exEntry = new List<Tuple<int, int>>();
+                            exEntry = new List<Tuple<int, int, int>>();
                             pairs[distancePix] = exEntry;
                         }
 
-                        exEntry.Add(Tuple.Create(potTop, potBot));
+                        int score = scores.Where((kvp) => kvp.Key >= potTop && kvp.Key <= potBot).Sum(kvp => kvp.Value);
+                        exEntry.Add(Tuple.Create(potTop, potBot, score));
                     }
                 }
             }
 
             var candidates = pairs.Where(kvp => kvp.Value.Count > 1).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            if (candidates.Count == 0)
+                candidates = pairs.Where(kvp => kvp.Value.Count == 1 && (kvp.Value.First().Item3 / (kvp.Value.First().Item2 - kvp.Value.First().Item1)) > m_ImageWidth / 10).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
             return candidates;
         }
 
