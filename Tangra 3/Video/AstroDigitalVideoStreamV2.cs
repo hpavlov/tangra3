@@ -303,7 +303,7 @@ namespace Tangra.Video
                 rv.CentralExposureTime = frameInfo.UtcMidExposureTime;
                 rv.SystemTime = frameInfo.SystemTimestamp;
 
-                rv.ExposureInMilliseconds = frameInfo.Exposure / 10.0f;
+                rv.ExposureInMilliseconds = frameInfo.UtcExposureMilliseconds;
 
                 rv.NumberIntegratedFrames = 0;
                 rv.NumberStackedFrames = 0;
