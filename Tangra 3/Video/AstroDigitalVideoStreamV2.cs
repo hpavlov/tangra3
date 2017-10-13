@@ -98,6 +98,8 @@ namespace Tangra.Video
             m_MaxPixelValue = (uint)m_AdvFile.MaxPixelValue;
 
             m_FrameRate = 0;
+            m_AAVVersion = 0;
+            m_StackingRate = 0;
 
             m_Engine = "ADV2";
 
@@ -306,7 +308,12 @@ namespace Tangra.Video
                 rv.ExposureInMilliseconds = frameInfo.UtcExposureMilliseconds;
 
                 rv.NumberIntegratedFrames = 0;
-                rv.NumberStackedFrames = 0;
+                rv.NumberStackedFrames = m_StackingRate;
+
+                if (m_AAVVersion > 0 && frameInfo.Status.ContainsKey("IntegratedFrames"))
+                {
+                    rv.NumberIntegratedFrames = int.Parse(frameInfo.Status["IntegratedFrames"].ToString());
+                }
 
                 int almanacStatus = frameInfo.GPSAlmanacStatus;
                 int almanacOffset = frameInfo.GPSAlmanacOffset;
