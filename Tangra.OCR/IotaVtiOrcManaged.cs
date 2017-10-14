@@ -60,7 +60,7 @@ namespace Tangra.OCR
             get { return false; }
         }
 
-		public void Initialize(TimestampOCRData initializationData, IVideoController videoController, int performanceMode)
+        public void Initialize(TimestampOCRData initializationData, IVideoController videoController, int performanceMode, bool optionFlag)
 		{
 			m_InitializationData = initializationData;
 		    m_VideoController = videoController;

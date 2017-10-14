@@ -636,6 +636,7 @@ namespace Tangra.Model.Config
 
 			public bool OsdOcrEnabled = true;
 			public string OcrEngine = "IOTA-VTI";
+            public bool OcrEngineOptionFlag = false;
 			public bool OcrAskEveryTime = false;
 			public bool OcrInitialSetupCompleted = false;
             public int OcrMaxNumberDigitsToAutoCorrect = 3;
