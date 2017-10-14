@@ -20,6 +20,7 @@ namespace Tangra.Video.FITS
     public partial class frmSortFitsFiles : Form
     {
         private string[] m_FitsFiles;
+        private FitsType m_FitsType;
         private Header[] m_FitsHeaders;
         private DateTime?[] m_FitsTimestamps;
         private bool m_SortedByTimeStamp = false;
@@ -58,9 +59,10 @@ namespace Tangra.Video.FITS
             m_VideoController = videoController;
         }
 
-        internal void SetFiles(string[] fitsFiles)
+        internal void SetFiles(string[] fitsFiles, FitsType fitsType)
         {
             m_FitsFiles = fitsFiles;
+            m_FitsType = fitsType;
         }
 
         internal string[] GetSortedFiles()
@@ -68,7 +70,7 @@ namespace Tangra.Video.FITS
             if (m_SortedByTimeStamp)
             {
                 Array.Sort(m_FitsTimestamps, m_FitsFiles);
-                return m_FitsFiles;                
+                return m_FitsFiles;
             }
             else
             {

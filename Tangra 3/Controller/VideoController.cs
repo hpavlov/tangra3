@@ -248,8 +248,20 @@ namespace Tangra.Controller
             }
             else
             {
+                var fitsType = FITSHelper2.GetFitsType(fitsFiles[0]);
+                if (fitsType == FitsType.Invalid)
+                {
+                    ShowMessageBox("The FITS files must have either 2 axis or 3 axis with the third being an RGB selection.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
+                else if (fitsType == FitsType.RGBFrames)
+                {
+                    ShowMessageBox("Tangra currently doesn't support FITS images with 3 axis with an RGB selection.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
+
                 var frm = new frmSortFitsFiles(this);
-                frm.SetFiles(fitsFiles);
+                frm.SetFiles(fitsFiles, fitsType);
                 frm.StartPosition = FormStartPosition.CenterParent;
 
                 if (frm.ShowDialog(m_MainForm) == DialogResult.OK)

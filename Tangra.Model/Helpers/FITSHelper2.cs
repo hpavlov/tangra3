@@ -45,6 +45,13 @@ namespace Tangra.Model.Helpers
         public int RawBitPix;
     }
 
+    public enum FitsType
+    {
+        RGBFrames,
+        SingleFrame,
+        Invalid
+    }
+
     public enum FitsCubeType
     {
         NotACube,
@@ -368,6 +375,25 @@ namespace Tangra.Model.Helpers
             return data;
         }
 
+        public static FitsType GetFitsType(string fileName)
+        {
+            Fits fitsFile = new Fits();
+
+            using (BufferedFile bf = new BufferedFile(fileName, FileAccess.Read, FileShare.ReadWrite))
+            {
+                fitsFile.Read(bf);
+
+                BasicHDU imageHDU = fitsFile.GetHDU(0);
+                if (fitsFile.NumberOfHDUs == 1 && imageHDU.Axes.Length == 3 && imageHDU.Axes[0] == 3)
+                    return FitsType.RGBFrames;
+
+                if (fitsFile.NumberOfHDUs == 1 && imageHDU.Axes.Length == 2)
+                    return FitsType.SingleFrame;
+
+            }
+
+            return FitsType.Invalid;
+        }
 
         public static FitsCubeType GetFitsCubeType(string fileName)
         {
