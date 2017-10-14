@@ -48,12 +48,14 @@ namespace Tangra.OCR
         private int m_MinCalibrationFrames;
 
         private bool m_ForceErrorReport;
+        private bool m_SingleLineMode;
 
-        public void Initialize(TimestampOCRData initializationData, IVideoController videoController, int performanceMode)
+        public void Initialize(TimestampOCRData initializationData, IVideoController videoController, int performanceMode, bool optionFlag)
         {
 			m_InitializationData = initializationData;
 		    m_VideoController = videoController;
             m_Processor = null;
+            m_SingleLineMode = optionFlag; // For GPS-BOX-SPRITE, the option flag has a meaning of a single line mode
 
             m_ImageWidth = initializationData.FrameWidth;
             m_ImageHeight = initializationData.FrameHeight;
@@ -839,9 +841,12 @@ namespace Tangra.OCR
                 }
             }
 
-            var candidates = pairs.Where(kvp => kvp.Value.Count > 1).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-            if (candidates.Count == 0)
+            Dictionary<int, List<Tuple<int, int, int>>> candidates;
+            if (m_SingleLineMode)
+                //TODO: Test this furthr
                 candidates = pairs.Where(kvp => kvp.Value.Count == 1 && (kvp.Value.First().Item3 / (kvp.Value.First().Item2 - kvp.Value.First().Item1)) > m_ImageWidth / 10).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            else
+                candidates = pairs.Where(kvp => kvp.Value.Count > 1).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
             return candidates;
         }

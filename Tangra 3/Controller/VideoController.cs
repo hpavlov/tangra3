@@ -637,6 +637,7 @@ namespace Tangra.Controller
 #else
                         (int)TangraConfig.OCRMode.FullyManaged
 #endif
+ ,TangraConfig.Settings.Generic.OcrEngineOptionFlag
 );
 
                     int maxCalibrationFieldsToAttempt = TangraConfig.Settings.Generic.MaxCalibrationFieldsToAttempt;

@@ -15,6 +15,10 @@ namespace Tangra.OCR
 {
 	public class OcrExtensionManager
 	{
+        public const string IOTA_VTI = "IOTA-VTI";
+        public const string GPS_BOX_SPRITE = "GPS_BOX_SPRITE";
+        public const string KIWI_OSD = "KIWI-OSD";
+
         private AddinsController m_AddinsController;
 
         public OcrExtensionManager(AddinsController addinsController)
@@ -25,9 +29,9 @@ namespace Tangra.OCR
         public void LoadAvailableOcrEngines(ComboBox cbxOcrEngine)
         {
             var supported = new List<object>();
-            supported.Add("IOTA-VTI");
-            supported.Add("GPS-BOX-SPRITE");
-            //supported.Add("KIWI-OSD");
+            supported.Add(IOTA_VTI);
+            supported.Add(GPS_BOX_SPRITE);
+            //supported.Add(KIWI_OSD);
 
             List<ITangraAddin> addins;
             List<ITangraAddinAction> actions = m_AddinsController.GetTimestampOcrActions(out addins);
@@ -49,13 +53,13 @@ namespace Tangra.OCR
 		{
             if (TangraConfig.Settings.Generic.OcrEngine != null)
             {
-                if (TangraConfig.Settings.Generic.OcrEngine.StartsWith("IOTA-VTI"))
+                if (TangraConfig.Settings.Generic.OcrEngine.StartsWith(IOTA_VTI))
                     return new IotaVtiOrcManaged();
 
-                if (TangraConfig.Settings.Generic.OcrEngine.StartsWith("KIWI-OSD"))
+                if (TangraConfig.Settings.Generic.OcrEngine.StartsWith(KIWI_OSD))
                     return new KiwiOsdOcr();
 
-                if (TangraConfig.Settings.Generic.OcrEngine.StartsWith("GPS-BOX-SPRITE"))
+                if (TangraConfig.Settings.Generic.OcrEngine.StartsWith(GPS_BOX_SPRITE))
                     return new GpsBoxSpriteOcr();
 
                 List<ITangraAddin> addins;

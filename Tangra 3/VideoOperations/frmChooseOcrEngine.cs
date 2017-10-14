@@ -48,6 +48,7 @@ namespace Tangra.VideoOperations
 			TangraConfig.Settings.Generic.OsdOcrEnabled = cbxEnableOsdOcr.Checked;
 			TangraConfig.Settings.Generic.OcrEngine = cbxOcrEngine.Text;
 			TangraConfig.Settings.Generic.OcrAskEveryTime = cbxOcrAskEveryTime.Checked;
+            TangraConfig.Settings.Generic.OcrEngineOptionFlag = cbxEngineOptionFlag.Visible && cbxEngineOptionFlag.Checked;
 			
 			TangraConfig.Settings.Save();
 
@@ -65,5 +66,19 @@ namespace Tangra.VideoOperations
 			cbxForceErrorReport.Visible = ShowForceErrorReportOption;
 			cbxForceErrorReport.Checked = ShowForceErrorReportOption;
 		}
+
+        private void cbxOcrEngine_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cbxOcrEngine.Text == OcrExtensionManager.GPS_BOX_SPRITE)
+            {
+                cbxEngineOptionFlag.Text = "Single line mode timestamp";
+                cbxEngineOptionFlag.Visible = true;
+            }
+            else
+            {
+                cbxEngineOptionFlag.Checked = false;
+                cbxEngineOptionFlag.Visible = false;
+            }
+        }
 	}
 }
