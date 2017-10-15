@@ -256,7 +256,7 @@ namespace Tangra.Controller
                 }
                 else if (fitsType == FitsType.RGBFrames)
                 {
-                    ShowMessageBox("Tangra currently doesn't support FITS images with 3 axis with an RGB selection.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    ShowMessageBox("Tangra currently doesn't support FITS images with 3 axis with an RGB colour planes. It these files have been created in MaximDL then use the 'Convert to mono' function before opening them in Tangra.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return false;
                 }
 
