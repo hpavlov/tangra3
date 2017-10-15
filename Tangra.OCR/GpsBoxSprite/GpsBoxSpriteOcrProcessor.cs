@@ -74,6 +74,8 @@ namespace Tangra.OCR.GpsBoxSprite
 
         static int[] TWOLINE_LINE1_INDEXES = new int[] { 0, 1, 3, 4, 6, 7, 9, 10, 12, 13, 15, 16 };
         static int[] TWOLINE_LINE2_INDEXES = new int[] { 0, 1, 2, 3, 5, 9, 10, 11, 12, 14 };
+        static int[] ONELINE_INDEXES = new int[] { 0, 1, 3, 4, 6, 7, 9, 10, 12, 13, 15, 16, 18, 19, 20, 21, 23 };
+
 
         static int MAX_UNRECOGNIZED_SIGNATURES_PERCENT = 8;
         static int MIN_RECOGNIZED_DIGITS_ZERO_TO_NINE = 6;
@@ -82,14 +84,14 @@ namespace Tangra.OCR.GpsBoxSprite
 
         internal bool InitSuccess { get; private set; }
 
-        public GpsBoxSpriteOcrProcessor(List<OcrCalibrationFrame> calibrationFrames, Tuple<int, int>[] topBottoms, Tuple<decimal, decimal>[] leftWidths, int frameWidth, int frameHeight)
+        public GpsBoxSpriteOcrProcessor(List<OcrCalibrationFrame> calibrationFrames, Tuple<int, int>[] topBottoms, Tuple<decimal, decimal>[] leftWidths, int frameWidth, int frameHeight, bool isSingleLineOSD)
         {
             m_FrameWidth = frameWidth;
             m_FrameHeight = frameHeight;
 
             if (topBottoms.Length == 2)
             {
-                if (IsToLineConfiguration(calibrationFrames, topBottoms))
+                if (IsTwoLineConfiguration(calibrationFrames, topBottoms))
                 {
                     CreateTwoLineConfiguration(topBottoms, leftWidths);
                     InitSuccess = true;
@@ -104,6 +106,13 @@ namespace Tangra.OCR.GpsBoxSprite
                     var allBlocks = m_CalibrationBlocks.Select(x => x.Item1).Union(m_CalibrationBlocks.Select(x => x.Item2)).ToList();
                     CategorizeInitialCalibrationBlocks(allBlocks);
                     AttemptCalibration();
+                }
+            }
+            else if (topBottoms.Length == 1 && isSingleLineOSD)
+            {
+                if (IsOneLineConfiguration(calibrationFrames, topBottoms))
+                {
+                    // TODO:
                 }
             }
         }
@@ -742,7 +751,7 @@ namespace Tangra.OCR.GpsBoxSprite
 
         public bool IsCalibrated { get; private set; }
 
-        private bool IsToLineConfiguration(List<OcrCalibrationFrame> lineConfigs, Tuple<int, int>[] topBottoms)
+        private bool IsTwoLineConfiguration(List<OcrCalibrationFrame> lineConfigs, Tuple<int, int>[] topBottoms)
         {
             var twoLineSamples = lineConfigs.Select(x => x.DetectedOsdLines).Where(x => x != null && x.Length == 2);
             
@@ -789,6 +798,34 @@ namespace Tangra.OCR.GpsBoxSprite
 
             // The detected box positions should match at least 60% of the expected positions in order to accept this as recognized configuration
             return line1Score > 0.6 && line2Score > 0.6 && line1InvScore > 0.6 && line2InvScore > 0.6;
+        }
+
+        private bool IsOneLineConfiguration(List<OcrCalibrationFrame> lineConfigs, Tuple<int, int>[] topBottoms)
+        {
+            var twoLineSamples = lineConfigs.Select(x => x.DetectedOsdLines).Where(x => x != null && x.Length == 1);
+
+            var lineSamples = twoLineSamples.SelectMany(x => x).Where(x => Math.Abs(x.Top - topBottoms[0].Item1) < x.BoxHeight / 3).ToArray();
+
+            double line1Score = 0;
+            for (int i = 0; i < ONELINE_INDEXES.Length; i++)
+            {
+                line1Score += lineSamples.Count(x => x.BoxIndexes.Contains(ONELINE_INDEXES[i]));
+            }
+            line1Score /= (ONELINE_INDEXES.Length * lineSamples.Length);
+
+            double line1InvScore = 0;
+            int total = 0;
+            foreach (var cfg in lineSamples)
+            {
+                for (int i = 0; i < cfg.BoxIndexes.Length; i++)
+                {
+                    if (ONELINE_INDEXES.Contains(cfg.BoxIndexes[i])) line1InvScore++;
+                    total++;
+                }
+            }
+            line1InvScore /= total;
+
+            return line1Score > 0.6 && line1InvScore > 0.6;
         }
 
         private void CreateTwoLineConfiguration(Tuple<int, int>[] topBottoms, Tuple<decimal, decimal>[] leftWidths)

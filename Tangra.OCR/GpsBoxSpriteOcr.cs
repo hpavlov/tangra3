@@ -150,7 +150,7 @@ namespace Tangra.OCR
                 var linesSoFar = m_CalibrationFrames.SelectMany(x => x.DetectedOsdLines);
                 var numOsdLinesTester = m_CalibrationFrames.Select(x => x.DetectedOsdLines.Length).ToList().GroupBy(x => x).ToDictionary(x => x.Key, y => y.ToArray());
                 var numOsdLines = numOsdLinesTester.Keys.Max();
-                if (numOsdLines > 1)
+                if (numOsdLines > 0)
                 {
                     // NOTE: At least 2 samples to decide on Top/Bottom line positions
                     var medianConfig = DeterimineMedianOsdLinePositions(linesSoFar, ref numOsdLines);
@@ -158,7 +158,7 @@ namespace Tangra.OCR
                     {
                         var topsSorted = medianConfig.BoxTops.Select(x => (int)x).ToList();
                         var bottomsSorted = medianConfig.BoxBottoms.Select(x => (int)x).ToList();
-                        topsSorted.Sort();                        
+                        topsSorted.Sort();
                         bottomsSorted.Sort();
 
                         int[] lineHeights = new int[numOsdLines];
@@ -171,27 +171,39 @@ namespace Tangra.OCR
                                 lineGaps[i] = topsSorted[i + 1] - bottomsSorted[i];
                         }
 
-                        // Logic to remove 'fake' lines if they are too high. Distance between lines should be small and consistent. 
-                        // Pick first two lines starting from bottom which are a certain distance apart
-
-                        for (int i = numOsdLines - 1; i>0; i--)
+                        if (!m_SingleLineMode && numOsdLines > 1)
                         {
-                            var height2 = lineHeights[i];
-                            var height1 = lineHeights[i - 1];
-                            var gap = lineGaps[i - 1];
-                            if (Math.Abs(height2 - height1) < 2 &&
-                                height2 <= MAX_VIABLE_HEIGHT_PIXELS &&
-                                height1 <= MAX_VIABLE_HEIGHT_PIXELS &&
-                                gap <= MAX_VIABLE_GAP &&
-                                m_ImageHeight - bottomsSorted[i] < MAX_VIABLE_HEIGHT_PIXELS /* Bottom line must be close to the bottom of the image */)
+                            // Logic to remove 'fake' lines if they are too high. Distance between lines should be small and consistent. 
+                            // Pick first two lines starting from bottom which are a certain distance apart
+
+                            for (int i = numOsdLines - 1; i > 0; i--)
                             {
-                                m_OsdLineVerticals = new Tuple<int, int>[2];
-                                m_OsdLineVerticals[0] = Tuple.Create(topsSorted[i - 1], bottomsSorted[i - 1]);
-                                m_OsdLineVerticals[1] = Tuple.Create(topsSorted[i], bottomsSorted[i]);
-                                break;                            
+                                var height2 = lineHeights[i];
+                                var height1 = lineHeights[i - 1];
+                                var gap = lineGaps[i - 1];
+                                if (Math.Abs(height2 - height1) < 2 &&
+                                    height2 <= MAX_VIABLE_HEIGHT_PIXELS &&
+                                    height1 <= MAX_VIABLE_HEIGHT_PIXELS &&
+                                    gap <= MAX_VIABLE_GAP &&
+                                    m_ImageHeight - bottomsSorted[i] < MAX_VIABLE_HEIGHT_PIXELS /* Bottom line must be close to the bottom of the image */)
+                                {
+                                    m_OsdLineVerticals = new Tuple<int, int>[2];
+                                    m_OsdLineVerticals[0] = Tuple.Create(topsSorted[i - 1], bottomsSorted[i - 1]);
+                                    m_OsdLineVerticals[1] = Tuple.Create(topsSorted[i], bottomsSorted[i]);
+                                    break;
+                                }
                             }
                         }
-                    }                    
+                        else if (m_SingleLineMode && numOsdLines == 1 && m_CalibrationFrames.Count > 4)
+                        {
+                            if (lineHeights[0] <= MAX_VIABLE_HEIGHT_PIXELS &&
+                                m_ImageHeight - bottomsSorted[0] < MAX_VIABLE_HEIGHT_PIXELS /* Bottom line must be close to the bottom of the image */)
+                            {
+                                m_OsdLineVerticals = new Tuple<int, int>[1];
+                                m_OsdLineVerticals[0] = Tuple.Create(topsSorted[0], bottomsSorted[0]);
+                            }
+                        }
+                    }
                 }
             }
 
@@ -536,7 +548,7 @@ namespace Tangra.OCR
 
                 try
                 {
-                    m_Processor = new GpsBoxSpriteOcrProcessor(goodCalibrationFrames, m_OsdLineVerticals, m_OsdBlocksLeftAndWidth, m_ImageWidth, m_ImageHeight);
+                    m_Processor = new GpsBoxSpriteOcrProcessor(goodCalibrationFrames, m_OsdLineVerticals, m_OsdBlocksLeftAndWidth, m_ImageWidth, m_ImageHeight, m_SingleLineMode);
                     if (!m_Processor.InitSuccess)
                         m_Processor = null;
                 }
@@ -843,7 +855,6 @@ namespace Tangra.OCR
 
             Dictionary<int, List<Tuple<int, int, int>>> candidates;
             if (m_SingleLineMode)
-                //TODO: Test this furthr
                 candidates = pairs.Where(kvp => kvp.Value.Count == 1 && (kvp.Value.First().Item3 / (kvp.Value.First().Item2 - kvp.Value.First().Item1)) > m_ImageWidth / 10).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             else
                 candidates = pairs.Where(kvp => kvp.Value.Count > 1).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
@@ -1188,9 +1199,9 @@ namespace Tangra.OCR
                 idx++;
             }
             Array.Sort(arrScores, arrWidths);
+            // NOTE: Check an alternative weighted average from the top 2 widths: (arrWidths[0] * (arrScores[1] / Math.Max(0.000001M, arrScores[0])) + arrWidths[1]) / (1 + (arrScores[1] / Math.Max(0.000001M, arrScores[0])));
             widthAve = arrWidths[0];
 
-            
             // Try to locate the gaps between
             var data = new Dictionary<decimal, decimal>();
             var fullnessData = new Dictionary<decimal, decimal>();
