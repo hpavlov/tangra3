@@ -80,7 +80,7 @@ namespace Tangra.Video
 
 			int framesToMeasure = 65;
 			
-			int firstFrame = m_StartFrameId;
+			int firstFrame = Math.Max(0, m_StartFrameId);
 			int lastFrame = Math.Min(m_ImageProvider.LastFrame, m_StartFrameId + framesToMeasure);
 
 			progressBar1.Minimum = firstFrame;
