@@ -975,10 +975,11 @@ namespace Tangra.OCR
 
             int rightMostProbeLocation = (int)(0.6 * m_ImageWidth); // NOTE: OSD will not extend more than 60% on the horizontal (typically)
 
-            decimal startLeftPos = 0;
+            int startPosZero = (int)(1.5M * nomWidthFromHeight);
+            decimal startLeftPos = startPosZero;
             decimal endRightPos = rightMostProbeLocation - maxBlockWidth - 1;
             #region Find start end horizontal lines
-            for (int i = 0; i < rightMostProbeLocation - maxBlockWidth - probeWidth; i++)
+            for (int i = startPosZero; i < rightMostProbeLocation - maxBlockWidth - probeWidth; i++)
             {
                 int conseqHorWhites = 0;
                 for (int j = i; j < i + probeWidth; j++)
@@ -1000,7 +1001,7 @@ namespace Tangra.OCR
                 }
             }
 
-            for (int i = 0; i < rightMostProbeLocation - maxBlockWidth - probeWidth; i++)
+            for (int i = startPosZero; i < rightMostProbeLocation - maxBlockWidth - probeWidth; i++)
             {
 
                 int conseqHorWhites = 0;
@@ -1185,22 +1186,30 @@ namespace Tangra.OCR
 
             // 3) Determine the best fitting box width for all lines
             decimal heightAve = rv.Select(x => x.Bottom - x.Top).Average();
-            var lineLengths = rv.Select(x => x.Right - x.Left);
             var widthAve = 13.0M * heightAve / 32.0M; // NOTE: Nominal ratio of 13x32 from a sample image
-            var arrScores = new decimal[40];
-            var arrWidths = new decimal[40];
-            var idx = 0;
-            for (decimal i = -2; i < 2; i+=0.1m)
+            if (m_SingleLineMode && rv.Count == 1)
             {
-                var test = widthAve + i;
-                var score = lineLengths.Select(x => Math.Abs((x / test) - Math.Round(x / test))).Sum();
-                arrScores[idx] = score;
-                arrWidths[idx] = test;
-                idx++;
+                // 24 characters in a single line mode
+                widthAve = (rv[0].Right - rv[0].Left)/24.0M;
             }
-            Array.Sort(arrScores, arrWidths);
-            // NOTE: Check an alternative weighted average from the top 2 widths: (arrWidths[0] * (arrScores[1] / Math.Max(0.000001M, arrScores[0])) + arrWidths[1]) / (1 + (arrScores[1] / Math.Max(0.000001M, arrScores[0])));
-            widthAve = arrWidths[0];
+            else
+            {
+                var lineLengths = rv.Select(x => x.Right - x.Left);
+                var arrScores = new decimal[40];
+                var arrWidths = new decimal[40];
+                var idx = 0;
+                for (decimal i = -2; i < 2; i += 0.1m)
+                {
+                    var test = widthAve + i;
+                    var score = lineLengths.Select(x => Math.Abs((x / test) - Math.Round(x / test))).Sum();
+                    arrScores[idx] = score;
+                    arrWidths[idx] = test;
+                    idx++;
+                }
+                Array.Sort(arrScores, arrWidths);
+                // NOTE: Check an alternative weighted average from the top 2 widths: (arrWidths[0] * (arrScores[1] / Math.Max(0.000001M, arrScores[0])) + arrWidths[1]) / (1 + (arrScores[1] / Math.Max(0.000001M, arrScores[0])));
+                widthAve = arrWidths[0];
+            }
 
             // Try to locate the gaps between
             var data = new Dictionary<decimal, decimal>();
@@ -1215,6 +1224,8 @@ namespace Tangra.OCR
                     var vertTop = (int) Math.Ceiling(cfg.Top);
                     var vertBottom = Math.Floor(cfg.Bottom);
                     var numBoxPositions = (int)Math.Round((boxesTo - boxesFrom) / width);
+
+                    if (m_SingleLineMode && numBoxPositions != 24) continue;
 
                     for (int i = 0; i < numBoxPositions; i++)
                     {
