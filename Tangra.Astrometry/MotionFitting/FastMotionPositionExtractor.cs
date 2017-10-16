@@ -358,30 +358,34 @@ namespace Tangra.MotionFitting
                 }
             }
 
-            // Plot Axis Marks
-            var minYArcSec = (long)Math.Ceiling(minY * 3600);
-            var maxYArcSec = (long)Math.Floor(maxY * 3600);
-            for (long wholeArcSec = minYArcSec; wholeArcSec <= maxYArcSec; wholeArcSec++)
+            if (repX.Count > 0)
             {
-                int len = 1;
-                if (wholeArcSec % 60 == 0) len = 5;
-                else if (wholeArcSec % 10 == 0) len = 3;
+                // Plot Axis Marks
+                var minYArcSec = (long) Math.Ceiling(minY*3600);
+                var maxYArcSec = (long) Math.Floor(maxY*3600);
+                for (long wholeArcSec = minYArcSec; wholeArcSec <= maxYArcSec; wholeArcSec++)
+                {
+                    int len = 1;
+                    if (wholeArcSec%60 == 0) len = 5;
+                    else if (wholeArcSec%10 == 0) len = 3;
 
-                float y = fullHeight - PADDING_L - BORDER - (float)(scaleY * (wholeArcSec / 3600.0 - minY));
-                g.DrawLine(SystemPens.ControlDark, PADDING_L + 1, y, PADDING_L + 1 + len, y);
-                g.DrawLine(SystemPens.ControlDark, fullWidth - PADDING_R - 1, y, fullWidth - PADDING_R - 1 - len, y);
-            }
-            var minXSeconds = (long)Math.Ceiling(minX * SECONDS_IN_A_DAY);
-            var maxXSeconds = (long)Math.Floor(maxX * SECONDS_IN_A_DAY);
-            for (long wholeSeconds = minXSeconds; wholeSeconds <= maxXSeconds; wholeSeconds++)
-            {
-                int len = 1;
-                if (wholeSeconds % 60 == 0) len = 5;
-                else if (wholeSeconds % 10 == 0) len = 3;
+                    float y = fullHeight - PADDING_L - BORDER - (float) (scaleY*(wholeArcSec/3600.0 - minY));
+                    g.DrawLine(SystemPens.ControlDark, PADDING_L + 1, y, PADDING_L + 1 + len, y);
+                    g.DrawLine(SystemPens.ControlDark, fullWidth - PADDING_R - 1, y, fullWidth - PADDING_R - 1 - len, y);
+                }
+                var minXSeconds = (long) Math.Ceiling(minX*SECONDS_IN_A_DAY);
+                var maxXSeconds = (long) Math.Floor(maxX*SECONDS_IN_A_DAY);
+                for (long wholeSeconds = minXSeconds; wholeSeconds <= maxXSeconds; wholeSeconds++)
+                {
+                    int len = 1;
+                    if (wholeSeconds%60 == 0) len = 5;
+                    else if (wholeSeconds%10 == 0) len = 3;
 
-                float x = (float)Math.Round(PADDING_L + BORDER + (scaleX * (wholeSeconds / SECONDS_IN_A_DAY - minX)));
-                g.DrawLine(SystemPens.ControlDark, x, fullHeight - PADDING_L - 1, x, fullHeight - PADDING_L - 1 - len);
-                g.DrawLine(SystemPens.ControlDark, x, PADDING_R + 1, x, PADDING_R + 1 + len);
+                    float x = (float) Math.Round(PADDING_L + BORDER + (scaleX*(wholeSeconds/SECONDS_IN_A_DAY - minX)));
+                    g.DrawLine(SystemPens.ControlDark, x, fullHeight - PADDING_L - 1, x,
+                        fullHeight - PADDING_L - 1 - len);
+                    g.DrawLine(SystemPens.ControlDark, x, PADDING_R + 1, x, PADDING_R + 1 + len);
+                }
             }
 
             string axisText = "Time (sec)";
@@ -520,7 +524,7 @@ namespace Tangra.MotionFitting
                         m_RegressionDE.AddDataPoint(midFrameTime, entry.DEDeg, weightDE);
                     }
                 }
-
+                
                 m_RegressionRA.Solve();
                 m_RegressionDE.Solve();
             }
@@ -685,12 +689,24 @@ namespace Tangra.MotionFitting
 
         internal double MinTimeOfDayUTCInstrDelayApplied
         {
-            get { return m_Entries[0].TimeOfDayUTC - m_InstDelayTimeOfDay; }
+            get
+            {
+                if (m_Entries.Count == 0)
+                    return double.NaN;
+
+                return m_Entries[0].TimeOfDayUTC - m_InstDelayTimeOfDay;
+            }
         }
 
         internal double MaxTimeOfDayUTCInstrDelayApplied
         {
-            get { return m_Entries[m_Entries.Count - 1].TimeOfDayUTC - m_InstDelayTimeOfDay; }
+            get
+            {
+                if (m_Entries.Count == 0)
+                    return double.NaN;
+
+                return m_Entries[m_Entries.Count - 1].TimeOfDayUTC - m_InstDelayTimeOfDay;
+            }
         }
 
         internal double InclinationRA
@@ -707,6 +723,9 @@ namespace Tangra.MotionFitting
         {
             get
             {
+                if (m_Entries.Count == 0) 
+                    return double.NaN;
+
                 if (m_Weighting == WeightingMode.None)
                     return m_Entries.Min(x => x.RADeg);
                 else
@@ -718,6 +737,9 @@ namespace Tangra.MotionFitting
         {
             get
             {
+                if (m_Entries.Count == 0)
+                    return double.NaN;
+
                 if (m_Weighting == WeightingMode.None)
                     return m_Entries.Max(x => x.RADeg);
                 else
@@ -729,6 +751,9 @@ namespace Tangra.MotionFitting
         {
             get
             {
+                if (m_Entries.Count == 0) 
+                    return double.NaN;
+
                 if (m_Weighting == WeightingMode.None)
                     return m_Entries.Min(x => x.DEDeg);
                 else
@@ -740,6 +765,9 @@ namespace Tangra.MotionFitting
         {
             get
             {
+                if (m_Entries.Count == 0) 
+                    return double.NaN;
+
                 if (m_Weighting == WeightingMode.None)
                     return m_Entries.Max(x => x.DEDeg);
                 else

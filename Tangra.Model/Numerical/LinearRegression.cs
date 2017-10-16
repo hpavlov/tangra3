@@ -65,6 +65,8 @@ namespace Tangra.Model.Numerical
 
         public void Solve()
         {
+            if (m_XValues.Count < 3) return;
+
             if (m_Weights.Count > 0)
                 SolveWithWeights();
             else
@@ -308,29 +310,32 @@ namespace Tangra.Model.Numerical
                 if (hasWeights)
                     m_StdDev = Math.Sqrt(variance/weightMeanScaler);
 
-                m_MedianResidual = m_Residuals.Select(x => Math.Abs(x)).ToList().Median();
-                m_MeanResidual = m_Residuals.Select(x => Math.Abs(x)).Average();
-                if (hasWeights)
+                if (m_Residuals.Count > 0)
                 {
-                    m_MedianResidual /= Math.Sqrt(weightMeanScaler);
-                    m_MeanResidual /= Math.Sqrt(weightMeanScaler);
+                    m_MedianResidual = m_Residuals.Select(x => Math.Abs(x)).ToList().Median();
+                    m_MeanResidual = m_Residuals.Select(x => Math.Abs(x)).Average();
+                    if (hasWeights)
+                    {
+                        m_MedianResidual /= Math.Sqrt(weightMeanScaler);
+                        m_MeanResidual /= Math.Sqrt(weightMeanScaler);
+                    }
+
+                    m_ChiSquare = 0;
+                    double stdsq = m_StdDev * m_StdDev;
+                    for (int i = 0; i < m_Residuals.Count; i++)
+                    {
+                        m_ChiSquare += (m_Residuals[i] * m_Residuals[i]) / stdsq;
+                    }
+                    m_ChiSquare = m_ChiSquare / (m_Residuals.Count - 3);
+
+                    m_AverageSampleX = m_XValues.Average();
+
+                    var sumSquares = m_XValues.Sum(x => x * x);
+                    m_SS = m_XValues.Count * sumSquares - Math.Pow(m_XValues.Sum(), 2);
+
+                    m_B_Uncertainty = Math.Sqrt(variance * sumSquares / m_SS);
+                    m_A_Uncertainty = Math.Sqrt(variance * m_XValues.Count / m_SS);
                 }
-
-                m_ChiSquare = 0;
-                double stdsq = m_StdDev * m_StdDev;
-                for (int i = 0; i < m_Residuals.Count; i++)
-                {
-                    m_ChiSquare += (m_Residuals[i] * m_Residuals[i]) / stdsq;
-                }
-                m_ChiSquare = m_ChiSquare / (m_Residuals.Count - 3);
-
-                m_AverageSampleX = m_XValues.Average();
-
-                var sumSquares = m_XValues.Sum(x => x*x);
-                m_SS = m_XValues.Count * sumSquares - Math.Pow(m_XValues.Sum(), 2);
-
-                m_B_Uncertainty = Math.Sqrt(variance * sumSquares / m_SS);
-                m_A_Uncertainty = Math.Sqrt(variance * m_XValues.Count / m_SS);
 
                 if (hasWeights)
                 {
