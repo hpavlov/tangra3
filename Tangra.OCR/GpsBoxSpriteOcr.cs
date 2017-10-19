@@ -1211,25 +1211,160 @@ namespace Tangra.OCR
                 widthAve = arrWidths[0];
             }
 
+            var leftWidth = m_SingleLineMode
+                ? DetermineLeftAndWidthFromBlockMatching(subPixelData, minWhiteLevel, widthAve, rv) 
+                : DetermineLeftAndWidthFromGaps(subPixelData, minWhiteLevel, widthAve, rv);
+
+            decimal boxesLeft = leftWidth.Item1;
+            decimal boxWidth = leftWidth.Item2;
+
+            foreach (var cfg in rv)
+            {
+                cfg.BoxWidth = boxWidth;
+                cfg.Left = boxesLeft;
+
+                var fullness = new Dictionary<int, decimal>();
+
+                for (int i = -1 * (int)(boxesLeft / boxWidth); i < (m_ImageWidth - boxesLeft) / boxWidth; i++)
+                {
+                    decimal boxFullness = 0M;
+                    for (int j = 0; j < boxWidth; j++)
+                    {
+                        var x = boxesLeft + (i * boxWidth) + j;
+                        for (decimal y = cfg.Top; y < cfg.Bottom; y++)
+                        {
+                            boxFullness += subPixelData.GetWholePixelAt(x, y) > minWhiteLevel ? 1 : 0;
+                        }
+                    }
+                    fullness.Add(i, boxFullness / (boxWidth * (cfg.Bottom - cfg.Top)));
+                }
+
+                cfg.BoxIndexes = fullness.Where(kvp => kvp.Value > MIN_DIGIT_BOX_FULLNESS_PERCENTAGE).Select(kvp => kvp.Key).ToArray();
+                cfg.FullnessScore = fullness.Where(kvp => kvp.Value > MIN_DIGIT_BOX_FULLNESS_PERCENTAGE).Select(kvp => kvp.Value).Sum();
+            }
+
+            return rv;
+        }
+
+        private Tuple<decimal, decimal> DetermineLeftAndWidthFromBlockMatching(SubPixelImage subPixelData, int minWhiteLevel, decimal widthAve, List<OsdLineConfig> lineConfigs)
+        {
+            var cfg = lineConfigs[0];
+
+            var blocks = new List<Tuple<decimal, decimal>>();
+            var scores = new Dictionary<decimal, decimal>();
+
+            var vertTop = (int)Math.Ceiling(cfg.Top);
+            var vertBottom = Math.Floor(cfg.Bottom);
+
+            // 1. Identify blocks in 0.05 pixel intervals
+            decimal MIN_SCORE = 5M * (vertBottom - vertTop) / 28M;
+            decimal? startBlock = null;
+            for (decimal x = cfg.Left - 5; x <= cfg.Right + 5; x += 0.05m)
+            {
+                decimal score = 0;
+                for (int y = vertTop; y < vertBottom; y++)
+                {
+                    score += subPixelData.GetWholePixelAt(x, y) > minWhiteLevel ? 1 : 0;
+                }
+                scores[x] = score;
+                if (score > MIN_SCORE)
+                {
+                    if (startBlock == null)
+                        startBlock = x;
+                }
+                else
+                {
+                    if (startBlock != null)
+                    {
+                        blocks.Add(Tuple.Create(startBlock.Value, x));
+                        startBlock = null;
+                    }
+                }
+            }
+
+            //var unoBlocks = blocks.Where(x => (x.Item2 - x.Item1) > 0.5M * widthAve && (x.Item2 - x.Item1) < 1.5M * widthAve);
+            //var medianBlockWidth = unoBlocks.Count() > 2 ? unoBlocks.Select(x => x.Item2 - x.Item1).ToList().Median() : widthAve;
+            //int MAX_STUCK_BLOCKS = 8;
+            //var blocksClone = blocks.ToList();
+            //var scaledWidths = new List<decimal>();
+            //for (int i = 1; i <= MAX_STUCK_BLOCKS; i++)
+            //{
+            //    var items = blocksClone.Where(x => ((x.Item2 - x.Item1) / i) > 0.66M * medianBlockWidth && ((x.Item2 - x.Item1) / i) < 1.33M * medianBlockWidth).ToList();
+            //    items.ForEach(x => blocksClone.Remove(x));
+            //    scaledWidths.AddRange(items.Select(x => (x.Item2 - x.Item1)/i));
+            //}
+            //decimal averageWidth = scaledWidths.Average();
+
+            decimal averageWidth = widthAve;
+            decimal roughLeft = blocks.First().Item1;
+
+            var deltas = blocks.Select(x => x.Item1 - (Math.Round((x.Item1 - roughLeft) / averageWidth)) * averageWidth).ToList();
+            roughLeft = deltas.Average();
+
+            var numBoxPositions = (int)Math.Round((blocks.Last().Item2 - blocks.First().Item1) / averageWidth);
+
+            var topTuples = new List<Tuple<decimal, decimal>>();
+            decimal topScore = -1;
+            for (decimal width = averageWidth - 2; width <= averageWidth + 2; width += 0.025m)
+            {
+                for (decimal x = roughLeft - 2; x <= roughLeft + 2; x += 0.05m)
+                {
+                    decimal score = 0;
+                    for (int i = 0; i < numBoxPositions; i++)
+                    {
+                        var left = x + i * width;
+                        var right = x + (i + 1) * width;
+                        var containedBlock = blocks.FirstOrDefault(b => left >= b.Item1 - 0.5M && right <= b.Item2 + 0.5M);
+                        if (containedBlock != null)
+                        {
+                            var leftDiff = Math.Abs(containedBlock.Item1 - left); if (leftDiff > width) leftDiff = 0;
+                            var rightDiff = Math.Abs(containedBlock.Item2 - right); if (rightDiff > width) rightDiff = 0;
+                            score += Math.Min(leftDiff, rightDiff);
+                        }
+                    }
+
+                    if (score > topScore)
+                    {
+                        topScore = score;
+                        topTuples.Clear();
+                        topTuples.Add(Tuple.Create(x, width));
+                    }
+                    else if (score == topScore)
+                    {
+                        topTuples.Add(Tuple.Create(x, width));
+                    }
+                }
+            }
+
+            if (topTuples.Count > 1 && topTuples.GroupBy(x => x.Item2).Count() == 1)
+                return Tuple.Create(topTuples.Select(x => x.Item1).Average(), topTuples[0].Item2);
+            else if (topTuples.Count > 0)
+                return Tuple.Create(topTuples[0].Item1, topTuples[0].Item2);
+            else
+                return Tuple.Create(roughLeft, averageWidth);
+        }
+
+        private Tuple<decimal, decimal> DetermineLeftAndWidthFromGaps(SubPixelImage subPixelData, int minWhiteLevel, decimal widthAve, List<OsdLineConfig> lineConfigs)
+        {
             // Try to locate the gaps between
             var data = new Dictionary<decimal, decimal>();
             var fullnessData = new Dictionary<decimal, decimal>();
             for (decimal width = widthAve - 2; width <= widthAve + 2; width += 0.025m)
             {
                 var vals = new List<Tuple<decimal, decimal>>();
-                foreach (var cfg in rv)
+                foreach (var cfg in lineConfigs)
                 {
                     var boxesFrom = cfg.Left;
                     var boxesTo = cfg.Right;
                     var vertTop = (int) Math.Ceiling(cfg.Top);
                     var vertBottom = Math.Floor(cfg.Bottom);
-                    var numBoxPositions = (int)Math.Round((boxesTo - boxesFrom) / width);
+                    var numBoxPositions = (int) Math.Round((boxesTo - boxesFrom)/width);
 
                     if (m_SingleLineMode && numBoxPositions != 24) continue;
 
                     for (int i = 0; i < numBoxPositions; i++)
                     {
-                        decimal x = cfg.Left + i * width;
+                        decimal x = cfg.Left + i*width;
                         decimal boxFullness = 0M;
                         decimal lineScore = 0;
                         for (int j = 0; j < width; j++)
@@ -1243,7 +1378,7 @@ namespace Tangra.OCR
                             }
                         }
 
-                        var fullnesPercent = boxFullness * 100M/ (width * (vertBottom - vertTop));
+                        var fullnesPercent = boxFullness*100M/(width*(vertBottom - vertTop));
                         vals.Add(Tuple.Create(lineScore, fullnesPercent));
                     }
                 }
@@ -1281,11 +1416,11 @@ namespace Tangra.OCR
             var lstKeysF = arrKeysF.ToList();
             var lstKeys = arrKeys.ToList();
 
-            decimal boxesLeft = rv[0].Left;
+            decimal boxesLeft = lineConfigs[0].Left;
             const int TOP_SCORES_TO_CONSIDER = 10;
 
-            decimal[] topWidths = new decimal[2 * TOP_SCORES_TO_CONSIDER];
-            decimal[] topWidthCombinedScore = new decimal[2 * TOP_SCORES_TO_CONSIDER];
+            decimal[] topWidths = new decimal[2*TOP_SCORES_TO_CONSIDER];
+            decimal[] topWidthCombinedScore = new decimal[2*TOP_SCORES_TO_CONSIDER];
 
             for (int i = 0; i < TOP_SCORES_TO_CONSIDER; i++)
             {
@@ -1298,34 +1433,7 @@ namespace Tangra.OCR
                 topWidthCombinedScore[i + TOP_SCORES_TO_CONSIDER] = i + lstKeys.IndexOf(arrKeysF[i]);
             }
             Array.Sort(topWidthCombinedScore, topWidths);
-            decimal boxWidth = topWidths[0];
-
-            foreach (var cfg in rv)
-            {
-                cfg.BoxWidth = boxWidth;
-
-                var fullness = new Dictionary<int, decimal>();
-
-
-                for (int i = -1 * (int)(boxesLeft / boxWidth); i < (m_ImageWidth - boxesLeft) / boxWidth; i++)
-                {
-                    decimal boxFullness = 0M;
-                    for (int j = 0; j < boxWidth; j++)
-                    {
-                        var x = boxesLeft + (i * boxWidth) + j;
-                        for (decimal y = cfg.Top; y < cfg.Bottom; y++)
-                        {
-                            boxFullness += subPixelData.GetWholePixelAt(x, y) > minWhiteLevel ? 1 : 0;
-                        }
-                    }
-                    fullness.Add(i, boxFullness / (boxWidth * (cfg.Bottom - cfg.Top)));
-                }
-
-                cfg.BoxIndexes = fullness.Where(kvp => kvp.Value > MIN_DIGIT_BOX_FULLNESS_PERCENTAGE).Select(kvp => kvp.Key).ToArray();
-                cfg.FullnessScore = fullness.Where(kvp => kvp.Value > MIN_DIGIT_BOX_FULLNESS_PERCENTAGE).Select(kvp => kvp.Value).Sum();
-            }
-
-            return rv;
+            return Tuple.Create(boxesLeft, topWidths[0]);
         }
 
         // NOTE: This may be a good number if the timestamp is one one or two lines
