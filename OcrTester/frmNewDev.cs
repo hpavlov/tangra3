@@ -51,7 +51,7 @@ namespace OcrTester
         private void btnCalibrate_Click(object sender, EventArgs e)
         {
             var ocr = new Tangra.OCR.GpsBoxSpriteOcr();
-            ocr.Initialize(new TimestampOCRData() { FrameWidth = m_Image.Width, FrameHeight = m_Image.Height}, this, 0);
+            ocr.Initialize(new TimestampOCRData() { FrameWidth = m_Image.Width, FrameHeight = m_Image.Height}, this, 0, false);
             ocr.ProcessCalibrationFrame(0, m_InitialPixels);
             using (Graphics g = Graphics.FromImage(pictureBox1.Image))
             {

@@ -95,25 +95,29 @@ namespace Tangra.OCR.GpsBoxSprite
                 {
                     CreateTwoLineConfiguration(topBottoms, leftWidths);
                     InitSuccess = true;
-
-                    m_CalibrationFrames.AddRange(calibrationFrames);
-
-                    foreach (var configFrame in calibrationFrames)
-                        ExtractBlockNumbers(configFrame.ProcessedPixels);
-
-
-                    m_Signatures.Clear();
-                    var allBlocks = m_CalibrationBlocks.Select(x => x.Item1).Union(m_CalibrationBlocks.Select(x => x.Item2)).ToList();
-                    CategorizeInitialCalibrationBlocks(allBlocks);
-                    AttemptCalibration();
                 }
             }
             else if (topBottoms.Length == 1 && isSingleLineOSD)
             {
                 if (IsOneLineConfiguration(calibrationFrames, topBottoms))
                 {
-                    // TODO:
+                    CreateOneLineConfiguration(topBottoms, leftWidths);
+                    InitSuccess = true;
                 }
+            }
+
+            if (InitSuccess)
+            {
+                m_CalibrationFrames.AddRange(calibrationFrames);
+
+                foreach (var configFrame in calibrationFrames)
+                    ExtractBlockNumbers(configFrame.ProcessedPixels);
+
+
+                m_Signatures.Clear();
+                var allBlocks = m_CalibrationBlocks.Select(x => x.Item1).Union(m_CalibrationBlocks.Select(x => x.Item2)).ToList();
+                CategorizeInitialCalibrationBlocks(allBlocks);
+                AttemptCalibration();
             }
         }
 
@@ -834,6 +838,11 @@ namespace Tangra.OCR.GpsBoxSprite
             m_Lines.Add(new GpsBoxSpriteLineOcr(topBottoms[1].Item1, topBottoms[1].Item2, leftWidths[1].Item1, leftWidths[1].Item2, TWOLINE_LINE2_INDEXES));
         }
 
+        private void CreateOneLineConfiguration(Tuple<int, int>[] topBottoms, Tuple<decimal, decimal>[] leftWidths)
+        {
+            m_Lines.Add(new GpsBoxSpriteLineOcr(topBottoms[0].Item1, topBottoms[0].Item2, leftWidths[0].Item1, leftWidths[0].Item2, ONELINE_INDEXES));
+        }
+
         private List<Tuple<decimal[,], decimal[,]>> ExtractBlockNumbers(uint[] processedPixels)
         {
             var rv = new List<Tuple<decimal[,], decimal[,]>>();
@@ -926,6 +935,8 @@ namespace Tangra.OCR.GpsBoxSprite
 
             if (m_Lines.Count == 2)
                 ExtractTwoLineLayoutTime(oddFrameLines, evenFrameLines);
+            else if (m_Lines.Count == 1)
+                ExtractOneLineLayoutTime(oddFrameLines, evenFrameLines);
         }
 
         private static Pen[] s_Pens = Enumerable.Range(0, 256).Select(x => new Pen(Color.FromArgb(255, x, x, x))).ToArray();
@@ -1000,6 +1011,11 @@ namespace Tangra.OCR.GpsBoxSprite
                 CurrentOcredOddFieldTimeStamp = new GpxBoxSpriteVtiTimeStamp(yearOdd, monthOdd, dayOdd, hourOdd, minOdd, secOdd, ms10Odd1, ms10Odd2, oddOcredChars, !EvenBeforeOdd, DuplicatedFields);
                 CurrentOcredEvenFieldTimeStamp = new GpxBoxSpriteVtiTimeStamp(yearEven, monthEven, dayEven, hourEven, minEven, secEven, ms10Even1, ms10Even2, evenOcredChars, EvenBeforeOdd, DuplicatedFields);
             }
+        }
+
+        private void ExtractOneLineLayoutTime(List<List<int?>> oddLines, List<List<int?>> evenLines)
+        {
+            
         }
 
         private int? OCRBlockDigit(decimal[,] pixels, int width, int height)
