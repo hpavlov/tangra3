@@ -1,5 +1,9 @@
 ﻿Tangra3 Release Notes
 ---------------------
+v3.6.11 (2017-10-23)
+- Fixed a problem where processing AAV.v2 files would incorrectly claim that there is more than 5ms error when verifying manually entered timestamps.
+- Other minor fixes and improvements related to AAV.v2 files handling.
+
 v3.6.10 (2017-10-11)
 - Fixed a problem where some FITS sequences recorded by SharpCap could not be open in Tangra.
 - Fixed an issue where opening a 12-bit SER files may open it by default as 8-bit.
