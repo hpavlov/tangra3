@@ -71,6 +71,14 @@ namespace Tangra.Video.AstroDigitalVideo
                 fs.Seek(userTableOffs, SeekOrigin.Begin);
                 var userTags = ReadTagsVer1(rdr);
 
+                if (!sysTags.ContainsKey("BITPIX") ||
+                    !sysTags.ContainsKey("EFFECTIVE-FRAME-RATE") ||
+                    !sysTags.ContainsKey("NATIVE-FRAME-RATE") ||
+                    !sysTags.ContainsKey("AAV16-NORMVAL"))
+                {
+                    return false;
+                }
+
                 int bitPix = int.Parse(sysTags["BITPIX"].Item2);
                 if (bitPix == 8)
                 {
@@ -155,7 +163,9 @@ namespace Tangra.Video.AstroDigitalVideo
 
                 long sysMetaOffs = rdr.ReadInt64();
 
-                fs.Seek(9, SeekOrigin.Current);
+                long userMetaOffs = rdr.ReadInt64();
+
+                fs.Seek(1, SeekOrigin.Current);
 
                 string stream1 = ReadString(rdr);
 
@@ -177,6 +187,13 @@ namespace Tangra.Video.AstroDigitalVideo
                 fs.Seek(sysMetaOffs, SeekOrigin.Begin);
                 var sysTags = ReadTags(rdr);
 
+                fs.Seek(userMetaOffs, SeekOrigin.Begin);
+                var userTags = ReadTags(rdr);
+                foreach (var kvp in userTags)
+                {
+                    sysTags[kvp.Key] = kvp.Value;
+                }
+
                 fs.Seek(imgSecOffs + 10, SeekOrigin.Begin);
                 byte numLayouts = rdr.ReadByte();
                 for (int i = 0; i < numLayouts; i++)
@@ -188,6 +205,14 @@ namespace Tangra.Video.AstroDigitalVideo
                 int imgTagsCnt = rdr.ReadByte();
                 var imgTags = ReadTags(rdr, imgTagsCnt);
 
+                if (!sysTags.ContainsKey("BITPIX") ||
+                    !sysTags.ContainsKey("EFFECTIVE-FRAME-RATE") ||
+                    !sysTags.ContainsKey("NATIVE-FRAME-RATE") ||
+                    !sysTags.ContainsKey("AAV16-NORMVAL") ||
+                    !imgTags.ContainsKey("IMAGE-MAX-PIXEL-VALUE"))
+                {
+                    return false;
+                }
 
                 int bitPix = int.Parse(sysTags["BITPIX"].Item2);
                 if (bitPix == 8)
