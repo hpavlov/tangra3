@@ -3334,7 +3334,8 @@ namespace Tangra.Astrometry.Recognition
 
 					if (star != null &&
 						center != null &&
-						!matchedFeatureIdToStarIdIndexes.ContainsKey(ftr.FeatureId))
+						!matchedFeatureIdToStarIdIndexes.ContainsKey(ftr.FeatureId) &&
+                        !matchedPairs.ContainsKey(center) /* Close features may return ImagePixels with the same hash code, so make sure we haven't added one already */)
 					{
 						if (idx < 3)
 						{
