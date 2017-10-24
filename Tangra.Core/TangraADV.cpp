@@ -147,11 +147,11 @@ HRESULT ADVGetFrame(int frameNo, unsigned int* pixels, unsigned int* originalPix
 	HRESULT rv = ADVGetFramePixels(frameNo, pixels, frameInfo, gpsFix, userCommand, systemError);
 	if (SUCCEEDED(rv))
 	{
+		memcpy(originalPixels, pixels, g_TangraAdvFile->ImageSection->Width * g_TangraAdvFile->ImageSection->Height * sizeof(unsigned int));
+
 		if (g_UsesPreProcessing && 
 		    (!g_IsAAV || frameInfo->IntegratedFrames > 0) /*Not the first/last AAV control frame*/) 
 		{
-			memcpy(originalPixels, pixels, g_TangraAdvFile->ImageSection->Width * g_TangraAdvFile->ImageSection->Height * sizeof(unsigned int));
-			
 			return ApplyPreProcessingWithNormalValue(
 				originalPixels, pixels, g_TangraAdvFile->ImageSection->Width, g_TangraAdvFile->ImageSection->Height, g_TangraAdvFile->ImageSection->DataBpp, frameInfo->Exposure10thMs / 10000.0,
 				g_TangraAdvFile->ImageSection->NormalisationValue, bitmapPixels, bitmapBytes);

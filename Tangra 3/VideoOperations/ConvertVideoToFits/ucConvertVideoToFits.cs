@@ -15,6 +15,7 @@ using Tangra.Helpers;
 using Tangra.ImageTools;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
+using Tangra.Model.Video;
 using Tangra.Model.VideoOperations;
 using Tangra.VideoOperations.LightCurves;
 
@@ -43,11 +44,13 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             m_Operation = operation;
             m_VideoController = videoController;
 
-            nudFirstFrame.Minimum = videoController.VideoFirstFrame;
+            var videoFileFormat = m_VideoController.GetVideoFileFormat();
+
+            nudFirstFrame.Minimum = videoController.VideoFirstFrame + (videoFileFormat == VideoFileFormat.AAV ? 1 : 0);
             nudFirstFrame.Maximum = videoController.VideoLastFrame - 1;
             nudFirstFrame.Value = nudFirstFrame.Minimum;
 
-            nudLastFrame.Minimum = videoController.VideoFirstFrame;
+            nudLastFrame.Minimum = videoController.VideoFirstFrame + (videoFileFormat == VideoFileFormat.AAV ? 1 : 0);
             nudLastFrame.Maximum = videoController.VideoLastFrame - 1;
             nudLastFrame.Value = nudLastFrame.Maximum;
 

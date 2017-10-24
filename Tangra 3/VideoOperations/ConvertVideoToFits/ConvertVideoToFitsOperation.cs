@@ -78,6 +78,17 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             controlPanel.Controls.Add(m_ControlPanel);
             m_ControlPanel.Dock = DockStyle.Fill;
 
+            if (topForm.Height < 736)
+                // Make sure all controls of the panel are visible
+                topForm.Height = 736;
+
+            var videoFileFormat = m_VideoController.GetVideoFileFormat();
+            if (videoFileFormat == VideoFileFormat.AAV &&
+                m_VideoController.CurrentFrameIndex == m_VideoController.VideoFirstFrame)
+            {
+                m_VideoController.StepForward();
+            }
+
             return true;
         }
 
