@@ -382,7 +382,7 @@ HRESULT GetBitmapPixels(int width, int height, unsigned int* pixels, BYTE* bitma
 {
 	BYTE* pp = bitmapPixels;
 
-	int paddedRowSize = 4 * (int)floor((24 * width + 31.0)/32.0);
+	int paddedRowSize = 4 * static_cast<int>(std::floor((24 * width + 31.0)/32.0));
 	int paddedImageSize = ABS(height) * paddedRowSize;
 
 	// define the bitmap information header
@@ -497,7 +497,7 @@ HRESULT BitmapSplitFieldsOSD(BYTE* bitmapPixels, int firstOsdLine, int lastOsdLi
 	int a = bih.biHeight;
 	int b = -1;
 
-	bool* movedLines = (bool*)malloc(lastOsdLine - firstOsdLine);
+	bool* movedLines = (bool*)malloc(lastOsdLine - firstOsdLine + 1);
 
 	for (int i = 0; i <= lastOsdLine - firstOsdLine; i++) movedLines[i] = false;
 

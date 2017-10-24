@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Tangra.Helpers;
 using Tangra.Model.Helpers;
@@ -58,8 +59,10 @@ namespace Tangra
 
 		    Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
-			
+            Application.SetUnhandledExceptionMode(UnhandledExceptionMode.ThrowException);
 			Application.ThreadException += new System.Threading.ThreadExceptionEventHandler(Application_ThreadException);
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
 			
 			bool fatalError = false;
 			try
@@ -121,8 +124,18 @@ namespace Tangra
 
 		static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
 		{
-			frmUnhandledException.HandleExceptionNoRestart(null, e.Exception);			
+			frmUnhandledException.HandleExceptionNoRestart(null, e.Exception);
 		}
+
+        static void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+        {
+            frmUnhandledException.HandleExceptionNoRestart(null, e.Exception);
+        }
+
+        static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            frmUnhandledException.HandleExceptionNoRestart(null, e.ExceptionObject as Exception);
+        }
 
 		private static void CheckUnmanagedLibraries()
 		{
