@@ -816,10 +816,7 @@ HRESULT PreProcessingBrightnessContrast(unsigned int* pixels, int width, int hei
 	if (brightness < -255) brightness = -255;
 	if (brightness > 255) brightness = 255;
 
-	double bppBrightness = brightness;
-	if (bpp == 12) bppBrightness *= 0xF;
-	if (bpp == 14) bppBrightness *= 0x3F;
-	if (bpp == 16) bppBrightness *= 0xFF;
+	double scaledBrightness = brightness * maxValue / 0xFF;
 
 	int totalPixels = width * height;
 	unsigned int* pPixels = pixels;
@@ -831,7 +828,7 @@ HRESULT PreProcessingBrightnessContrast(unsigned int* pixels, int width, int hei
 	contrastCoeff *= contrastCoeff;
 
 	while(totalPixels--) {
-		double pixel = *pPixels + bppBrightness;
+		double pixel = *pPixels + scaledBrightness;
 		if (pixel < minValue) pixel = minValue;
 		if (pixel > maxValue) pixel = maxValue;
 

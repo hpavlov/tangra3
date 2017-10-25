@@ -190,6 +190,14 @@ namespace Tangra.VideoOperations.Astrometry
 				if (timeStamp != null && timeStamp != DateTime.MinValue)
 					ucUtcTimePicker.DateTimeUtc = timeStamp.Value;
 			}
+
+            if (format == VideoFileFormat.AAV || /* Old AAV files with manually entered timestamps */
+                (format == VideoFileFormat.AAV2 && !m_VideoController.HasEmbeddedTimeStamps()))
+            {
+                // Refresh the current frame to split the AAV timestamp for manual validation
+                // NOTE: This assumes the Split option is selected in the settings (which will be by default)
+                m_VideoController.RefreshCurrentFrame();
+            }
         }
 
 		/// <summary>
