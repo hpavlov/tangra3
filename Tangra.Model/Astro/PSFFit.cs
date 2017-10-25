@@ -390,7 +390,15 @@ namespace Tangra.Model.Astro
 
 		public void Fit(uint[,] intensity, int newMatrixSize)
 		{
-			Fit(intensity, null, newMatrixSize);
+		    try
+		    {
+                Fit(intensity, null, newMatrixSize);
+		    }
+		    catch (Exception ex)
+		    {
+		        Trace.WriteLine(ex);
+		        m_IsSolved = false;
+		    }			
 		}
 
 		public void Fit(uint[,] intensity, IBackgroundModelProvider backgroundModel, int newMatrixSize)

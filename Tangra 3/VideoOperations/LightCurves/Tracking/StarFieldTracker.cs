@@ -362,12 +362,12 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 				{
 					List<double> pivotDistances = m_PivotDistances[j];
 
-					for (int ii = 0; ii < unorderedPivotDistances.Count; ii++)
+                    for (int ii = 0; ii < Math.Min(testDistances.Count, unorderedPivotDistances.Count); ii++)
 					{
 						if (double.IsNaN(testDistances[ii])) continue;
 
 						double[] diffs = pivotDistances.Select(x => Math.Abs(x - testDistances[ii])).ToArray();
-						int[] indexes = new [] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+						int[] indexes = Enumerable.Range(0, pivotDistances.Count).ToArray();
 						Array.Sort(diffs, indexes);
 
 						if (double.IsNaN(diffs[0]) && diffs[1] < 5)
