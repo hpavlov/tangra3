@@ -13,6 +13,8 @@ namespace Tangra.Config.SettingPannels
 {
 	public partial class ucAstrometry : SettingsPannel
 	{
+	    private bool m_SettingsLoaded;
+
 		public ucAstrometry()
 		{
 			InitializeComponent();
@@ -40,6 +42,8 @@ namespace Tangra.Config.SettingPannels
             cbxDebugOutput.Checked = TangraConfig.Settings.Astrometry.SaveDebugOutput;
             cbxExportUncertainties.Checked = TangraConfig.Settings.Astrometry.ExportUncertainties;
             cbxExportHigherPositionAccuracy.Checked = TangraConfig.Settings.Astrometry.ExportHigherPositionAccuracy;
+
+		    m_SettingsLoaded = true;
 		}
 
 		public override void SaveSettings()
@@ -67,5 +71,29 @@ namespace Tangra.Config.SettingPannels
             TangraConfig.Settings.Astrometry.ExportUncertainties = cbxExportUncertainties.Checked;
             TangraConfig.Settings.Astrometry.ExportHigherPositionAccuracy = cbxExportHigherPositionAccuracy.Checked;
 		}
+
+        private void cbxExportHigherPositionAccuracy_CheckedChanged(object sender, EventArgs e)
+        {
+            if (cbxExportHigherPositionAccuracy.Checked)
+                WarnHighPrecisionAndUncertaintiesMPC();
+        }
+
+        private void cbxExportUncertainties_CheckedChanged(object sender, EventArgs e)
+        {
+            if (cbxExportUncertainties.Checked)
+                WarnHighPrecisionAndUncertaintiesMPC();
+        }
+
+	    private void WarnHighPrecisionAndUncertaintiesMPC()
+	    {
+	        if (!m_SettingsLoaded)
+	            return;
+
+	        MessageBox.Show(
+                "Uncertainties and Positions with High Precision will be displayed in Tangra but will not be exported to MPC observation files as they don't support them.", 
+                "Tangra",
+                MessageBoxButtons.OK, 
+                MessageBoxIcon.Information);
+	    }
 	}
 }

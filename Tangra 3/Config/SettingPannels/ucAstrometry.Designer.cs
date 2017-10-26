@@ -69,10 +69,10 @@
             this.cbxDebugOutput = new System.Windows.Forms.CheckBox();
             this.cbxExportUncertainties = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.cbxExportHigherPositionAccuracy = new System.Windows.Forms.CheckBox();
             this.label5 = new System.Windows.Forms.Label();
             this.nudAstrSmallestReportedUncertainty = new System.Windows.Forms.NumericUpDown();
             this.label6 = new System.Windows.Forms.Label();
+            this.cbxExportHigherPositionAccuracy = new System.Windows.Forms.CheckBox();
             this.groupBox8.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudAstrMaximumStars)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudAstrMinimumStars)).BeginInit();
@@ -684,6 +684,7 @@
             this.cbxExportUncertainties.TabIndex = 50;
             this.cbxExportUncertainties.Text = "Export uncertainties";
             this.cbxExportUncertainties.UseVisualStyleBackColor = true;
+            this.cbxExportUncertainties.CheckedChanged += new System.EventHandler(this.cbxExportUncertainties_CheckedChanged);
             // 
             // groupBox1
             // 
@@ -702,16 +703,6 @@
             this.groupBox1.TabIndex = 51;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Advanced";
-            // 
-            // cbxExportHigherPositionAccuracy
-            // 
-            this.cbxExportHigherPositionAccuracy.AutoSize = true;
-            this.cbxExportHigherPositionAccuracy.Location = new System.Drawing.Point(16, 130);
-            this.cbxExportHigherPositionAccuracy.Name = "cbxExportHigherPositionAccuracy";
-            this.cbxExportHigherPositionAccuracy.Size = new System.Drawing.Size(170, 17);
-            this.cbxExportHigherPositionAccuracy.TabIndex = 51;
-            this.cbxExportHigherPositionAccuracy.Text = "Export high accuracy positions";
-            this.cbxExportHigherPositionAccuracy.UseVisualStyleBackColor = true;
             // 
             // label5
             // 
@@ -759,6 +750,17 @@
             this.label6.Size = new System.Drawing.Size(12, 13);
             this.label6.TabIndex = 54;
             this.label6.Text = "\"";
+            // 
+            // cbxExportHigherPositionAccuracy
+            // 
+            this.cbxExportHigherPositionAccuracy.AutoSize = true;
+            this.cbxExportHigherPositionAccuracy.Location = new System.Drawing.Point(16, 130);
+            this.cbxExportHigherPositionAccuracy.Name = "cbxExportHigherPositionAccuracy";
+            this.cbxExportHigherPositionAccuracy.Size = new System.Drawing.Size(190, 17);
+            this.cbxExportHigherPositionAccuracy.TabIndex = 51;
+            this.cbxExportHigherPositionAccuracy.Text = "Export positions with high precision";
+            this.cbxExportHigherPositionAccuracy.UseVisualStyleBackColor = true;
+            this.cbxExportHigherPositionAccuracy.CheckedChanged += new System.EventHandler(this.cbxExportHigherPositionAccuracy_CheckedChanged);
             // 
             // ucAstrometry
             // 

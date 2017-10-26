@@ -389,7 +389,15 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
             {
                 foreach (string line in tbxMeasurements.Lines)
                 {
-                    m_CurrentReportFile.AddObservation(line);
+                    string lineToAdd = line;
+                    if (TangraConfig.Settings.Astrometry.ExportHigherPositionAccuracy && lineToAdd.Length > 80)
+                    {
+                        // Remove the extra signifficant digit from the RA/DE in high precision mode as those
+                        // cannot be reported to the MPC with the current OBS format
+                        lineToAdd = line.Substring(0, 43) + line.Substring(44, 12) + line.Substring(57);
+                    }
+
+                    m_CurrentReportFile.AddObservation(lineToAdd);
                 }
 
                 m_CurrentReportFile.Save();
