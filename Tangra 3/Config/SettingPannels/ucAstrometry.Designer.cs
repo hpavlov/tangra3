@@ -673,6 +673,7 @@
             this.cbxExportUncertainties.TabIndex = 50;
             this.cbxExportUncertainties.Text = "Export uncertainties";
             this.cbxExportUncertainties.UseVisualStyleBackColor = true;
+            this.cbxExportUncertainties.CheckedChanged += new System.EventHandler(this.cbxExportUncertainties_CheckedChanged);
             // 
             // groupBox1
             // 
@@ -741,12 +742,13 @@
             // cbxExportHigherPositionAccuracy
             // 
             this.cbxExportHigherPositionAccuracy.AutoSize = true;
-            this.cbxExportHigherPositionAccuracy.Location = new System.Drawing.Point(16, 119);
+            this.cbxExportHigherPositionAccuracy.Location = new System.Drawing.Point(16, 130);
             this.cbxExportHigherPositionAccuracy.Name = "cbxExportHigherPositionAccuracy";
-            this.cbxExportHigherPositionAccuracy.Size = new System.Drawing.Size(170, 17);
+            this.cbxExportHigherPositionAccuracy.Size = new System.Drawing.Size(190, 17);
             this.cbxExportHigherPositionAccuracy.TabIndex = 51;
-            this.cbxExportHigherPositionAccuracy.Text = "Export high accuracy positions";
+            this.cbxExportHigherPositionAccuracy.Text = "Export positions with high precision";
             this.cbxExportHigherPositionAccuracy.UseVisualStyleBackColor = true;
+            this.cbxExportHigherPositionAccuracy.CheckedChanged += new System.EventHandler(this.cbxExportHigherPositionAccuracy_CheckedChanged);
             // 
             // ucAstrometry
             // 
