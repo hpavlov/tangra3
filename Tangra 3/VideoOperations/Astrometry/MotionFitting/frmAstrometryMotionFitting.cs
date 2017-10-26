@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -394,7 +395,17 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                     {
                         // Remove the extra signifficant digit from the RA/DE in high precision mode as those
                         // cannot be reported to the MPC with the current OBS format
-                        lineToAdd = line.Substring(0, 43) + line.Substring(44, 12) + line.Substring(57);
+
+                        //          1         2         3         4         5         6         7         8
+                        //0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+                        //      K15FB7W  n2015 04 01.51040713 03 21.038 -41 43 17.18          13.5 R      E28 0.12 0.12
+
+                        lineToAdd = 
+                            line.Substring(0, 38) +
+                            double.Parse(line.Substring(39, 6), CultureInfo.InvariantCulture).ToString("00.00") + 
+                            line.Substring(44, 8) +
+                            double.Parse(line.Substring(52, 5), CultureInfo.InvariantCulture).ToString("00.0") + 
+                            line.Substring(57);
                     }
 
                     m_CurrentReportFile.AddObservation(lineToAdd);
