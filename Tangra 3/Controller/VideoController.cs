@@ -3218,5 +3218,60 @@ namespace Tangra.Controller
 
 	        return true;
 	    }
+
+	    private static Regex FILE_NAME_DATE_REGEX = new Regex(@"^(\d{4}\-\w+\-\d+)");
+
+	    public DateTime GetBestGuessDateTimeForCurrentFrame(DateTime? defaultValue = null)
+	    {
+	        TimeSpan ocrTimeOfDay = TimeSpan.Zero;
+	        if (HasTimestampOCR())
+	        {
+                var ocrTime = OCRTimestamp();
+	            if (OCRTimeStampHasDatePart())
+	                return ocrTime;
+
+	            ocrTimeOfDay = ocrTime.TimeOfDay;
+	        }
+
+	        var currFrameTime = GetCurrentFrameTime();
+	        if (currFrameTime != null)
+	            return currFrameTime.Value;
+
+	        if (IsAstroAnalogueVideo || IsAstroDigitalVideo)
+	        {
+	            var currFrameState = GetCurrentFrameState();
+
+	            if (currFrameState.HasValidTimeStamp)
+	                return currFrameState.CentralExposureTime.AddMilliseconds(-0.5*currFrameState.ExposureInMilliseconds);
+
+	            if (currFrameState.HasValidSystemTimeStamp)
+	                return currFrameState.SystemTime;
+
+	            if (currFrameState.HasValidNtpTimeStamp)
+	                return currFrameState.EndFrameNtpTime.AddMilliseconds(-1*currFrameState.ExposureInMilliseconds);
+	        }
+
+	        if (m_FramePlayer != null &&
+	            m_FramePlayer.Video != null &&
+	            m_FramePlayer.Video.FileName != null)
+	        {
+	            string fileName = Path.GetFileName(m_FramePlayer.Video.FileName);
+
+	            var match = FILE_NAME_DATE_REGEX.Match(fileName);
+                if (match.Success)
+                {
+                    string dateString = match.Groups[1].Value;
+                    DateTime dateVal;
+                        
+                    if (DateTime.TryParse(dateString, CultureInfo.CurrentCulture, DateTimeStyles.RoundtripKind, out dateVal))
+                        return dateVal.Date.Add(ocrTimeOfDay);
+
+                    if (DateTime.TryParse(dateString, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out dateVal))
+                        return dateVal.Date.Add(ocrTimeOfDay);
+                }
+	        }
+
+            return defaultValue.HasValue ? defaultValue.Value : DateTime.UtcNow;
+	    }
     }
 }

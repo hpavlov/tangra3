@@ -342,8 +342,8 @@ namespace Tangra.VideoOperations.LightCurves
 	    private delegate void PrepareToEnterStarTimeCallback();
 
 		private void PrepareToEnterStarTime()
-        {
-            ucUtcTime.DateTimeUtc = DateTime.Now.ToUniversalTime();
+		{
+		    ucUtcTime.DateTimeUtc = m_VideoController.GetBestGuessDateTimeForCurrentFrame();
             pnlEnterTimes.Visible = true;
             lblTimesHeader.Text = "Enter the UTC time of the first measured frame:";
             btnNextTime.Text = "Next >>";
