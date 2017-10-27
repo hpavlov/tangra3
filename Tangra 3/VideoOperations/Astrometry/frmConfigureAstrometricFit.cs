@@ -83,15 +83,18 @@ namespace Tangra.VideoOperations.Astrometry
 		    {
 		        if (timeStamp.Value.Year == 1)
 		        {
-                    // OCR-ed timestamp that doesn't contain a year
-                    utcTime.DateTimeUtc = TangraConfig.Settings.LastUsed.LastAstrometryUTCDate.Date.AddDays(timeStamp.Value.TimeOfDay.TotalDays);
+		            // OCR-ed timestamp that doesn't contain a year
+		            utcTime.DateTimeUtc = TangraConfig.Settings.LastUsed.LastAstrometryUTCDate.Date.AddDays(timeStamp.Value.TimeOfDay.TotalDays);
 		            lblOCRTimeWarning.Visible = true;
 		        }
 		        else
 		            utcTime.DateTimeUtc = timeStamp.Value;
 		    }
 		    else
-		        utcTime.DateTimeUtc = TangraConfig.Settings.LastUsed.LastAstrometryUTCDate;
+		    {
+		        utcTime.DateTimeUtc = m_VideoController.GetBestGuessDateTimeForCurrentFrame(TangraConfig.Settings.LastUsed.LastAstrometryUTCDate);
+		    }
+		        
 		    DisplayEnterTimePage();
 
 			UpdateErrorInDeg();

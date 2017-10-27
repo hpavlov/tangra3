@@ -186,9 +186,7 @@ namespace Tangra.VideoOperations.Astrometry
             }
 			else
 			{
-				DateTime? timeStamp = m_VideoController.GetCurrentFrameTime();
-				if (timeStamp != null && timeStamp != DateTime.MinValue)
-					ucUtcTimePicker.DateTimeUtc = timeStamp.Value;
+                ucUtcTimePicker.DateTimeUtc = m_VideoController.GetBestGuessDateTimeForCurrentFrame();
 			}
 
             if (format == VideoFileFormat.AAV || /* Old AAV files with manually entered timestamps */

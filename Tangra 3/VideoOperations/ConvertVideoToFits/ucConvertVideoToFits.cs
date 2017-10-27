@@ -154,7 +154,8 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
 
         private void PrepareToEnterStartTime()
         {
-            ucUtcTime.DateTimeUtc = DateTime.Now.ToUniversalTime();
+            ucUtcTime.DateTimeUtc = m_VideoController.GetBestGuessDateTimeForCurrentFrame();
+
             pnlEnterTimes.Visible = true;
             lblTimesHeader.Text = "Enter the UTC time of the first exported frame:";
             btnNextTime.Text = "Next >>";
@@ -175,8 +176,8 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
 
         private void PrepareToEnterStartDate()
         {
-            var ocrTime = m_VideoController.OCRTimestamp();
-            ucUtcTime.DateTimeUtc = DateTime.UtcNow.Date.Add(ocrTime.TimeOfDay);
+            ucUtcTime.DateTimeUtc = m_VideoController.GetBestGuessDateTimeForCurrentFrame();
+
             pnlEnterTimes.Visible = true;
             lblTimesHeader.Text = "Enter the UTC date of the first exported frame:";
             btnNextTime.Text = "Start Export";
