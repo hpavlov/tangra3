@@ -98,12 +98,15 @@
     <Compile Include="TimeExtraction\VtiTimeStampComposer.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Tangra.Functional\Tangra.Functional.fsproj">
+      <Project>{9594058a-48cd-4f49-9bdc-ff1211e46a3a}</Project>
+      <Name>Tangra.Functional</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Tangra.Model\Tangra.Model.csproj">
       <Project>{70bbc9a7-7dd9-4a4d-b972-6665c65875c6}</Project>
       <Name>Tangra.Model</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

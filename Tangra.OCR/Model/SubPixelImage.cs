@@ -36,6 +36,11 @@ namespace Tangra.OCR.Model
             get { return m_Height; }
         }
 
+        public uint[] Pixels
+        {
+            get { return m_Pixels; }
+        }
+
         public decimal GetWholePixelAt(decimal xf, decimal yf)
         {
             int x = (int)(xf);
