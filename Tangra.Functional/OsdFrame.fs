@@ -26,19 +26,21 @@ type OsdFrame (width, height, top, bottom, pixels: uint32[]) =
     member this.Pixels = pixels
     member this.Calc = SubPixelCalc (width, height, pixels)
 
+    member this.MinFullnessPerRow = (bottom - top) / 10M     
+
     member private this.IsOn x = 
-        let s = [| for y in this.Top .. this.Bottom -> (this.Calc.At x y) |] |> Array.sum
-        let on = s > (this.Bottom - this.Top) * 0.2M 
+        let s = seq { for y in this.Top .. this.Bottom -> (this.Calc.At x y) } |> Seq.sum
+        let on = s > this.MinFullnessPerRow 
         on
 
     member private this.OffOnTransition x =
         let transition = 
             if this.IsOn x 
             then 
-                let trOff = ([| for i in 1M .. 20M -> x - i/10M |] |> Seq.tryFind (fun x -> not (this.IsOn x)))
+                let trOff = seq { for i in 1M .. 20M -> x - i/10M } |> Seq.tryFind (fun x -> not (this.IsOn x))
                 if trOff.IsSome then trOff.Value + 0.1M else x - 2M
             else 
-                let trOn = [| for i in 1M .. 20M -> x + i/10M |] |> Seq.tryFind (fun x -> this.IsOn x)
+                let trOn = seq { for i in 1M .. 20M -> x + i/10M } |> Seq.tryFind (fun x -> this.IsOn x)
                 if trOn.IsSome then trOn.Value else x + 2M
         transition
 
@@ -52,15 +54,37 @@ type OsdFrame (width, height, top, bottom, pixels: uint32[]) =
         cost
 
     member this.FindLeft minLeft =
-        let leftInt = [| for i in minLeft .. this.Width -> i |]
+        let leftInt = seq { for i in minLeft .. this.Width -> i }
         let lR = leftInt |> Seq.find (fun x -> this.IsOn (decimal x))
-        let leftPrec = [| for i in -10M .. 10M -> i/10M + (decimal lR) |]
+        let leftPrec = seq { for i in -10M .. 10M -> i/10M + (decimal lR) }
         let lP = leftPrec |> Seq.find (fun x -> this.IsOn (decimal x))
         lP
 
     member this.FindWidth left approximateWidth =
         let widthProbe = [| for i in -20M .. 20M -> i/10M + approximateWidth |]
         let costs = widthProbe |> Array.map (fun w -> (w, this.WidthCost left w))
+        let bestFit = costs |> Array.minBy (fun x -> snd x)
+        fst bestFit
+
+    member private this.Combinations xs ys = [|
+        for x in xs do
+        for y in ys do
+        yield (x, y) |]
+
+    member this.FindLeftWidth approxLeft approxWidth =
+        let rndApproxLeft = round(approxLeft * 100M) / 100M
+        let rndApproxWidth = round(approxWidth * 100M) / 100M
+        let widthProbe = [| for i in -20M .. 20M -> (i * 1M)/10M + rndApproxWidth |]
+        let leftProbe = [| for i in -8M .. 8M -> (i * 2.5M)/10M + rndApproxLeft |]
+        let probes = this.Combinations leftProbe widthProbe
+        let costs = probes |> Array.map (fun p -> (p, this.WidthCost (fst p) (snd p)))
+        let bestFit = costs |> Array.minBy (fun x -> snd x)
+        fst bestFit
+
+    member this.ImproveLeft approxLeft width =
+        let rndApproxLeft = round(approxLeft * 100M) / 100M
+        let leftProbe = [| for i in -20M .. 20M -> i/10M + rndApproxLeft |]
+        let costs = leftProbe |> Array.map (fun l -> (l, this.WidthCost l width))
         let bestFit = costs |> Array.minBy (fun x -> snd x)
         fst bestFit
 
