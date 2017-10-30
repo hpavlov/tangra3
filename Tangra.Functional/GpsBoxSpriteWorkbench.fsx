@@ -1,5 +1,4 @@
 ﻿open System.IO
-open System.Math
 
 type SubPixelImage (width, height, pixels: uint32[]) =
     member this.Width = width
@@ -35,8 +34,8 @@ let loadFrame (filePath : string) =
 let frames path fromIdx toIdx = 
     [| for i in fromIdx .. toIdx -> loadFrame (path + i.ToString() + ".dat") |]
 
-let trainSet = frames @"F:\WORK\tangra3\OcrTester\AutomatedTestingImages\PixelExport\" 1 10
-let validateSet = frames @"F:\WORK\tangra3\OcrTester\AutomatedTestingImages\PixelExport\" 11 26
+let trainSet = frames @"C:\Work\Tangra3\OcrTester\AutomatedTestingImages\PixelExport\" 1 10
+let validateSet = frames @"C:\Work\Tangra3\OcrTester\AutomatedTestingImages\PixelExport\" 11 26
 
 let isOn frame x =
     let s = [| for y in frame.Top .. frame.Bottom -> (frame.Image.At x y) |] |> Array.sum
@@ -80,11 +79,12 @@ let combine2 xs ys = [|
     yield (x, y) |]
 
 let findLeftWidth frame approxLeft approxWidth =
-    let rndApproxLeft = round(approxLeft * 10M) / 10M
-    let rndApproxWidth = round(approxWidth * 10M) / 10M
-    let widthProbe = [| for i in -20M .. 20M -> i/10M + rndApproxWidth |]
-    let leftProbe = [| for i in -20M .. 20M -> i/20M + rndApproxLeft |]
+    let rndApproxLeft = round(approxLeft * 100M) / 100M
+    let rndApproxWidth = round(approxWidth * 100M) / 100M
+    let widthProbe = [| for i in -20M .. 20M -> (i * 1M)/10M + rndApproxWidth |]
+    let leftProbe = [| for i in -8M .. 8M -> (i * 2.5M)/10M + rndApproxLeft |]
     let probes = combine2 leftProbe widthProbe
+    printf "Combinations: %i" probes.Length 
     let costs = probes |> Array.map (fun p -> (p, widthCost frame (fst p) (snd p)))
     let bestFit = costs |> Array.minBy (fun x -> snd x)
     fst bestFit

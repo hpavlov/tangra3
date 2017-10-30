@@ -1191,6 +1191,7 @@ namespace Tangra.OCR
 
 
             // 2) Determine the left position accurately for all lines simultaneously
+            /*
             decimal leftFine = osdLineConstraints.Select(x => x.Item3).Average();
             lineScores.Clear();
             for (decimal x = leftFine - 1; x < leftFine + 1; x += 0.025m)
@@ -1208,6 +1209,7 @@ namespace Tangra.OCR
             
             leftFine = DetermineBlackToWhiteTransition(lineScores);
             rv.ForEach(x => x.Left = leftFine);
+            */
 
             // 3) Determine the best fitting box width for all lines
             decimal heightAve = rv.Select(x => x.Bottom - x.Top).Average();
@@ -1245,10 +1247,10 @@ namespace Tangra.OCR
             decimal boxesLeft = leftWidth.Item1;
             decimal boxWidth = leftWidth.Item2; */
 
-            decimal boxesLeft = leftFine;
-
             var osdFrame = new OsdFrame(m_ImageWidth, m_ImageHeight, rv[0].Top, rv[0].Bottom, subPixelData.Pixels);
-            decimal boxWidth = osdFrame.FindWidth(leftFine, widthAve);
+            decimal boxesLeft = osdFrame.FindLeft(25);
+            decimal boxWidth = osdFrame.FindWidth(boxesLeft, widthAve);
+            boxesLeft = osdFrame.ImproveLeft(boxesLeft, boxWidth);
 
             foreach (var cfg in rv)
             {
