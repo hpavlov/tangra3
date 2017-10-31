@@ -27,13 +27,15 @@ namespace Tangra.AstroServices
 
 			string requestUrl =
 				string.Format(
-                    TangraConfig.Settings.Urls.MPCheckServiceUrl + "?year={0}&month={1}&day={2}&which=pos&ra={3}&decl={4}&TextArea=&radius={5}&limit={6}&oc={7}&sort=d&mot=h&tmot=s&pdes=u&needed=f&ps=n&type=p",
+                    TangraConfig.Settings.Urls.MPCheckHttpsServiceUrl + "?year={0}&month={1}&day={2}&which=pos&ra={3}&decl={4}&TextArea=&radius={5}&limit={6}&oc={7}&sort=d&mot=h&tmot=s&pdes=u&needed=f&ps=n&type=p",
 					utcDate.Year, utcDate.Month, dayPart.ToString("0.000"),
 					AstroConvert.ToStringValue(raDeg / 15.0, "HH MM SS"),
 					AstroConvert.ToStringValue(deDeg, "+DD MM SS"),
                     radiusArcMin.ToString("0"),
 					magLimit.ToString("0.0"),
 					observatoryCode);
+
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
 
 			try
 			{
@@ -57,7 +59,7 @@ namespace Tangra.AstroServices
 			    {
                     List<MPCheckEntry> parsedData = ParseMPCheckResponse(responseString.Substring(startIdx + 5, endIdx - startIdx - 5));
 
-                    return parsedData;			        
+                    return parsedData;
 			    }
 			}
 			catch (Exception ex)

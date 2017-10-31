@@ -31,7 +31,7 @@ namespace Tangra.AstroServices
 					longitude.ToString("0.0000", CultureInfo.InvariantCulture),
 					latitude.ToString("0.0000", CultureInfo.InvariantCulture));
 
-            return GetCoordinates(TangraConfig.Settings.Urls.MPCEphe2ServiceUrl, postData);
+            return GetCoordinates(TangraConfig.Settings.Urls.MPCEphe2HttpsServiceUrl, postData);
 		}
 
 		public static MPEphEntry GetCoordinatesForSingleDate(string observatoryCode, string objectDesgn, DateTime utcTime)
@@ -46,11 +46,12 @@ namespace Tangra.AstroServices
 					hourOfTheDay.ToString("0.0000"),
 					observatoryCode);
 
-            return GetCoordinates(TangraConfig.Settings.Urls.MPCEphe2ServiceUrl, postData);
+            return GetCoordinates(TangraConfig.Settings.Urls.MPCEphe2HttpsServiceUrl, postData);
 		}
 
         private static MPEphEntry GetCoordinates(string requestUrl, string postData)
 		{
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
 			try
 			{
 				HttpWebRequest req = (HttpWebRequest)WebRequest.Create(requestUrl);
@@ -59,7 +60,7 @@ namespace Tangra.AstroServices
                 req.UserAgent = "Tangra, ver " + ver.ToString();
 
 			    req.Method = "POST";
-			    byte[] postBytes = Encoding.ASCII.GetBytes(postData);                
+			    byte[] postBytes = Encoding.ASCII.GetBytes(postData);
                 req.ContentType = "application/x-www-form-urlencoded";
 			    req.ContentLength = postBytes.Length;
 
