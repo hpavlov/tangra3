@@ -1840,12 +1840,12 @@ namespace Tangra.Model.Config
 
 			public void SetDefaults()
 			{
-                MPCEphe2ServiceUrl = "http://www.minorplanetcenter.net/cgi-bin/mpeph2.cgi";
-                MPCheckServiceUrl = "http://www.minorplanetcenter.net/cgi-bin/mpcheck.cgi";
+                MPCEphe2HttpsServiceUrl = "https://www.minorplanetcenter.net/cgi-bin/mpeph2.cgi";
+                MPCheckHttpsServiceUrl = "https://www.minorplanetcenter.net/cgi-bin/mpcheck.cgi";
 			}
 
-			public string MPCEphe2ServiceUrl;
-            public string MPCheckServiceUrl;
+			public string MPCEphe2HttpsServiceUrl;
+            public string MPCheckHttpsServiceUrl;
 		}
 
         [Serializable]
