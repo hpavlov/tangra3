@@ -17,10 +17,11 @@ using Tangra.OCR.TimeExtraction;
 
 namespace Tangra.OCR
 {
-    public class GpsBoxSpriteOcr : ITimestampOcr, ICalibrationErrorProcessor
+    public class GpsBoxSpriteOcr : ITimestampOcr, ITimestampOcrDebug, ICalibrationErrorProcessor
     {
         private IVideoController m_VideoController;
         private TimestampOCRData m_InitializationData;
+        private ExpectedOcrMetrics m_ExpectedOcrMetrics;
 
         private Dictionary<string, Tuple<uint[], int, int>> m_CalibrationImages = new Dictionary<string, Tuple<uint[], int, int>>();
         private List<string> m_CalibrationErrors = new List<string>();
@@ -67,6 +68,12 @@ namespace Tangra.OCR
             m_ForceErrorReport = initializationData.ForceErrorReport;
             m_CalibrationImages.Clear();
             m_CalibrationErrors.Clear();
+
+            m_ExpectedOcrMetrics = new ExpectedOcrMetrics()
+            {
+                // Based on an experimentally determined nominal height of 15 pixels for a standard PAL frame height of 576
+                MaxCharacterHeight = (int)Math.Round(15.0 * 576 / m_InitializationData.FrameHeight)
+            };
         }
 
         public bool ExtractTime(int frameNo, int frameStep, uint[] rawData, bool debug, out DateTime time)
@@ -329,7 +336,7 @@ namespace Tangra.OCR
             {
                 string error = null;
                 var expectedScaledOsdHeight = (int)Math.Round(15.0 * 576 / m_InitializationData.FrameHeight);
-                PreProcessImageOSDForOCR(m_LatestFrameImage, m_ImageWidth, m_ImageHeight, expectedScaledOsdHeight, ref error, this);
+                OcrUtils.PreProcessImageOSDForOCR(m_LatestFrameImage, m_ImageWidth, m_ImageHeight, expectedScaledOsdHeight, ref error, this);
             }
 
             if (m_Processor != null)
@@ -342,27 +349,12 @@ namespace Tangra.OCR
 
             if (topMostLine != null && bottomMostLine != null)
             {
-                // NOTE: Top and bottom most lines are known. Only pre-process the video frame lines with the VTI-OSD
-                uint[] rv = new uint[data.Length];
-                int top = Math.Max(0, topMostLine.Value - 5);
-                int bottom = Math.Max(m_InitializationData.FrameHeight, bottomMostLine.Value + 5);
-                uint[] roi = new uint[m_InitializationData.FrameWidth * (bottom - top)];
-                int idx = 0;
-                for (int i = top * m_InitializationData.FrameWidth; i < bottom * m_InitializationData.FrameWidth; i++, idx++)
-                {
-                    roi[idx] = data[i];
-                }
-
-                var averageDetectedOsdHeight = m_OsdLineVerticals.Select(x => (x.Item2 - x.Item1)).Average();
+                m_ExpectedOcrMetrics.TopMostLine = topMostLine;
+                m_ExpectedOcrMetrics.BottomMostLine = bottomMostLine;
+                m_ExpectedOcrMetrics.AverageDetectedOsdHeight = m_OsdLineVerticals.Select(x => (x.Item2 - x.Item1)).Average();
 
                 string error = null;
-                idx = 0;
-                var pproc = PrepareOsdVideoFields(frameNo, roi, m_InitializationData.FrameWidth, bottom - top, (int)Math.Round(0.8 * averageDetectedOsdHeight), ref error);
-                for (int i = top * m_InitializationData.FrameWidth; i < bottom * m_InitializationData.FrameWidth; i++, idx++)
-                {
-                    rv[i] = pproc[idx];
-                }
-
+                var rv = OcrUtils.PreProcessImageOSDForOCR(frameNo, data, m_InitializationData.FrameWidth, m_InitializationData.FrameHeight, m_ExpectedOcrMetrics.AverageDetectedOsdHeight, topMostLine.Value, bottomMostLine.Value, ref error, this);
                 if (error != null) InitiazliationError = error;
                 return rv;
             }
@@ -372,13 +364,16 @@ namespace Tangra.OCR
                 //LocateBlackOSDBackground(data, m_InitializationData.FrameWidth, m_InitializationData.FrameHeight);
                 
                 string error = null;
-                // Based on an experimentally determined nominal height of 15 pixels for a standard PAL frame height of 576
-                var expectedScaledOsdHeight = (int)Math.Round(15.0 * 576 / m_InitializationData.FrameHeight);
-                var rv = PreProcessImageOSDForOCR(data, m_InitializationData.FrameWidth, m_InitializationData.FrameHeight, expectedScaledOsdHeight, ref error);
+                var rv = OcrUtils.PreProcessImageOSDForOCR(data, m_InitializationData.FrameWidth, m_InitializationData.FrameHeight, m_ExpectedOcrMetrics.MaxCharacterHeight, ref error);
 
                 if (error != null) InitiazliationError = error;
                 return rv;
             }
+        }
+
+        public ExpectedOcrMetrics GetExpectedOcrMetrics()
+        {
+            return m_ExpectedOcrMetrics;
         }
 
         public static void PrepareOsdArea(uint[] dataIn, uint[] dataOut, uint[] dataDebugNoLChD, int width, int height)
@@ -424,48 +419,6 @@ namespace Tangra.OCR
             LargeChunkDenoiser.RemoveSmallHeightNoise(dataOut, width, height, 15);
         }
 
-        private uint[] PrepareOsdVideoFields(int frameNo, uint[] data, int width, int height, int minFrameOsdDigitHeight, ref string error)
-        {
-            // TODO: This is suboptimal. Need to make the OCR work with the two separate fields from the start
-            var fieldHeight = (int)Math.Ceiling(height / 2.0);
-            uint[] oddFieldPixels = new uint[width * fieldHeight];
-            uint[] evenFieldPixels = new uint[width * fieldHeight];
-            for (int y = 0; y < height; y++)
-            {
-                bool isOddLine = y % 2 == 0; // y is zero-based so odd/even calculations should be performed counting from zero
-                int lineNo = y / 2;
-                if (isOddLine)
-                    Array.Copy(data, y * width, oddFieldPixels, lineNo * width, width);
-                else
-                    Array.Copy(data, y * width, evenFieldPixels, lineNo * width, width);
-            }
-
-            var preProcessedOddPixels = PreProcessImageOSDForOCR(oddFieldPixels, width, fieldHeight, minFrameOsdDigitHeight / 2, ref error);
-            var preProcessedEvenPixels = PreProcessImageOSDForOCR(evenFieldPixels, width, fieldHeight, minFrameOsdDigitHeight / 2, ref error);
-
-
-            if (m_ForceErrorReport || (m_Processor != null && !m_Processor.IsCalibrated))
-            {
-                AddErrorImage(string.Format(@"{0}-even.bmp", frameNo.ToString("0000000")), preProcessedEvenPixels, width, fieldHeight);
-                AddErrorImage(string.Format(@"{0}-odd.bmp", frameNo.ToString("0000000")), preProcessedOddPixels, width, fieldHeight);
-
-                AddErrorImage(string.Format(@"ORG-{0}-even.bmp", frameNo.ToString("0000000")), evenFieldPixels, width, fieldHeight);
-                AddErrorImage(string.Format(@"ORG-{0}-odd.bmp", frameNo.ToString("0000000")), oddFieldPixels, width, fieldHeight);
-            }
-
-            var preProcessedPixels = new uint[width * height];
-            for (int y = 0; y < height; y++)
-            {
-                bool isOddLine = (y - 1) % 2 == 1; // y is zero-based so odd/even calculations should be performed counting from zero
-                int lineNo = y / 2;
-                if (isOddLine)
-                    Array.Copy(preProcessedOddPixels, lineNo * width, preProcessedPixels, y * width, width);
-                else
-                    Array.Copy(preProcessedEvenPixels, lineNo * width, preProcessedPixels, y * width, width);
-            }
-
-            return preProcessedPixels;
-        }
 
         private void LocateBlackOSDBackground(uint[] data, int width, int height)
         {
@@ -492,68 +445,6 @@ namespace Tangra.OCR
             //        }
             //    }    
             //}            
-        }
-
-        public static uint[] PreProcessImageOSDForOCR(uint[] data, int width, int height, int maxNoiseHeight, ref string error)
-        {
-            return PreProcessImageOSDForOCR(data, width, height, maxNoiseHeight, ref error, null);
-        }
-
-        private static uint[] PreProcessImageOSDForOCR(uint[] data, int width, int height, int maxNoiseHeight, ref string error, ICalibrationErrorProcessor logger)
-        {
-            uint[] preProcessedPixels = new uint[data.Length];
-            Array.Copy(data, preProcessedPixels, data.Length);
-
-            // Process the image
-            uint median = preProcessedPixels.Median();
-            for (int i = 0; i < preProcessedPixels.Length; i++)
-            {
-                int darkCorrectedValue = (int)preProcessedPixels[i] - (int)median;
-                if (darkCorrectedValue < 0) darkCorrectedValue = 0;
-                preProcessedPixels[i] = (uint)darkCorrectedValue;
-            }
-
-            if (median > 250)
-            {
-                error = "The background is too bright.";
-                return null;
-            }
-
-            if (logger != null) logger.AddErrorImage("pp-median-corrected.bmp", preProcessedPixels.ToArray(), width, height);
-
-            uint[] blurResult = BitmapFilter.GaussianBlur(preProcessedPixels, 8, width, height);
-
-            if (logger != null) logger.AddErrorImage("pp-gauss-blur.bmp", blurResult.ToArray(), width, height);
-
-            uint average = 128;
-            uint[] sharpenResult = BitmapFilter.Sharpen(blurResult, 8, width, height, out average);
-
-            if (logger != null) logger.AddErrorImage("pp-sharpened.bmp", sharpenResult.ToArray(), width, height);
-
-            // Binerize and Inverse
-            for (int i = 0; i < sharpenResult.Length; i++)
-            {
-                sharpenResult[i] = sharpenResult[i] > average ? (uint)0 : (uint)255;
-            }
-            if (logger != null) logger.AddErrorImage("pp-binerized.bmp", sharpenResult.ToArray(), width, height);
-
-            uint[] denoised = BitmapFilter.Denoise(sharpenResult, 8, width, height, out average, false);
-
-            if (logger != null) logger.AddErrorImage("pp-denoised.bmp", denoised.ToArray(), width, height);
-
-            for (int i = 0; i < denoised.Length; i++)
-            {
-                preProcessedPixels[i] = denoised[i] < 127 ? (uint)0 : (uint)255;
-            }
-
-            LargeChunkDenoiser.RemoveSmallHeightNoise(preProcessedPixels, width, height, maxNoiseHeight);
-            for (int i = 0; i < preProcessedPixels.Length; i++)
-            {
-                preProcessedPixels[i] = preProcessedPixels[i] < 127 ? (uint)255 : (uint)0;
-            }
-            if (logger != null) logger.AddErrorImage("pp-final.bmp", preProcessedPixels.ToArray(), width, height);
-
-            return preProcessedPixels;
         }
 
         private void TryInitializeProcessor(List<OcrCalibrationFrame> goodCalibrationFrames)
@@ -1514,6 +1405,11 @@ namespace Tangra.OCR
         public int ErrorCount
         {
             get { return m_CalibrationErrors.Count; }
+        }
+
+        public bool ShouldLogErrorImage
+        {
+            get { return m_ForceErrorReport || (m_Processor != null && !m_Processor.IsCalibrated);  }
         }
 
         public void AddErrorImage(string fileName, uint[] pixels, int width, int height)

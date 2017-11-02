@@ -635,6 +635,7 @@ namespace Tangra.Model.Config
 			public DisplayIntensifyMode UseDisplayIntensifyMode = DisplayIntensifyMode.Off;
 
 			public bool OsdOcrEnabled = true;
+            public bool OcrDebugModeEnabled = false;
 			public string OcrEngine = "IOTA-VTI";
             public bool OcrEngineOptionFlag = false;
 			public bool OcrAskEveryTime = false;

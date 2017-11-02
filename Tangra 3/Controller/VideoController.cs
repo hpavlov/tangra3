@@ -596,7 +596,7 @@ namespace Tangra.Controller
 	        m_OcrExtensionManager.LoadAvailableOcrEngines(cbxOcrEngine);
 	    }
 
-	    public void InitializeTimestampOCR()
+	    public void InitializeTimestampOCR(bool imageOcrRedraw = false)
         {
             m_TimestampOCR = null;
             m_NumberOcredVtiOsdFrames = 0;
@@ -640,6 +640,8 @@ namespace Tangra.Controller
 #endif
  ,TangraConfig.Settings.Generic.OcrEngineOptionFlag
 );
+                    if (imageOcrRedraw)
+                        ReplaceWithImageForORC();
 
                     int maxCalibrationFieldsToAttempt = Math.Min(VideoLastFrame - CurrentFrameIndex - 1, TangraConfig.Settings.Generic.MaxCalibrationFieldsToAttempt);
                     if (m_FramePlayer.IsAstroAnalogueVideoV2)
@@ -1101,17 +1103,71 @@ namespace Tangra.Controller
 
 	    private static Font s_OCRPrintFont = new Font(FontFamily.GenericMonospace, 10);
 
+	    private void ReplaceWithImageForORC()
+	    {
+	        using (Graphics g = Graphics.FromImage(m_MainForm.pictureBox.Image))
+	        {
+	            ReplaceWithImageForORC(g);
+	        }
+
+            m_MainForm.pictureBox.Refresh();
+	    }
+
+	    internal void ReplaceWithImageForORC(Graphics g)
+	    {
+            if (m_AstroImage != null)
+            {
+                var ocrDebug = m_TimestampOCR as ITimestampOcrDebug;
+                if (ocrDebug != null)
+                {
+                    var metrics = ocrDebug.GetExpectedOcrMetrics();
+
+                    string error = null;
+                    uint[] ocrPixels;
+                    bool showFields = false;
+                    if (metrics.BottomMostLine.HasValue && metrics.TopMostLine.HasValue)
+                    {
+                        ocrPixels = OcrUtils.PreProcessImageOSDForOCR(m_CurrentFrameId, m_AstroImage.GetOcrPixels(), m_AstroImage.Width, m_AstroImage.Height,
+                            metrics.AverageDetectedOsdHeight, metrics.TopMostLine.Value, metrics.BottomMostLine.Value, ref error, null);
+                        showFields = true;
+                    }
+                    else
+                    {
+                        ocrPixels = OcrUtils.PreProcessImageOSDForOCR(m_AstroImage.GetOcrPixels(), m_AstroImage.Width, m_AstroImage.Height, metrics.MaxCharacterHeight, ref error);    
+                    }
+                    
+                    if (ocrPixels != null && ocrPixels.Length > 0)
+                    {
+                        var bmp = Pixelmap.ConstructBitmapFromBitmapPixels(ocrPixels, m_AstroImage.Width, m_AstroImage.Height);
+                        if (showFields)
+                        {
+                            Bitmap pixelMapWithFields = BitmapFilter.ToVideoFields(bmp);
+                            g.DrawImage(pixelMapWithFields, new Point(0, 0));
+                        }
+                        else
+                        {
+                            g.DrawImage(bmp, new Point(0, 0));
+                        }
+                    }                    
+                }
+            }        
+	    }
+
         internal void PrintOCRedTimeStamp(Graphics g, bool isLastFrame)
         {
             if (m_TimestampOCR != null)
             {
+                bool debugModeEnabled = TangraConfig.Settings.Generic.OcrDebugModeEnabled;
+                if (debugModeEnabled)
+                    ReplaceWithImageForORC(g);
+
                 string output = m_TimestampOCR.OSDType();
                 var size = g.MeasureString(output, s_OCRPrintFont);
                 var vertPading = 2;
                 g.FillRectangle(Brushes.DarkSlateGray, m_AstroImage.Width - size.Width - 10, 10, size.Width, size.Height);
                 g.DrawString(output, s_OCRPrintFont, Brushes.Lime, m_AstroImage.Width - size.Width - 10, 10);
 
-                DateTime ocrTimeStamp = OCRTimestamp(DebugOCR);                
+                DateTime ocrTimeStamp = OCRTimestamp(debugModeEnabled);                
                 output = string.Format("{0}", ocrTimeStamp.Year != 1 ? ocrTimeStamp.ToString("yyyy-MM-dd HH:mm:ss.fff") : ocrTimeStamp.ToString("HH:mm:ss.fff"));
                 size = g.MeasureString(output, s_OCRPrintFont);
                 g.FillRectangle(Brushes.DarkSlateGray, m_AstroImage.Width - size.Width - 10, 10 + size.Height + vertPading, size.Width, size.Height);
@@ -1123,7 +1179,7 @@ namespace Tangra.Controller
                 {
                     correctionsMade += m_TimestampOCR.LastOddFieldOSD.NumberOfCorrectedDifferences;
 
-                    if (DebugOCR)
+                    if (debugModeEnabled)
                     {
                         i++;
                         output = string.Format("Odd: {0}", m_TimestampOCR.LastOddFieldOSD.AsFullString());
@@ -1143,7 +1199,7 @@ namespace Tangra.Controller
                 {
                     correctionsMade += m_TimestampOCR.LastEvenFieldOSD.NumberOfCorrectedDifferences;
 
-                    if (DebugOCR)
+                    if (debugModeEnabled)
                     {
                         i++;
                         output = string.Format("Even: {0}", m_TimestampOCR.LastEvenFieldOSD.AsFullString());
@@ -2962,8 +3018,6 @@ namespace Tangra.Controller
 		}
 
 		public delegate void RenderOverlayCallback(Graphics g, bool isLastFrame);
-
-	    internal bool DebugOCR;
 
 	    internal int OCRScore;
 	    internal int OCRScoredFrames;

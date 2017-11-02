@@ -13,6 +13,7 @@ namespace Tangra.OCR.TimeExtraction
 {
     public interface ICalibrationErrorProcessor
     {
+        bool ShouldLogErrorImage { get; }
         int ErrorCount { get; }
         void AddErrorImage(string fileName, uint[] pixels, int width, int height);
         void AddErrorText(string error);

@@ -112,6 +112,8 @@ namespace Tangra.Config
 			m_PropertyPages.Add(15, new ucCustomizeAstrometry());
 			m_PropertyPages.Add(16, new ucSpectroscopy());
 			m_PropertyPages.Add(17, new ucCustomizeSpectroscopy());
+
+            m_PropertyPages.Add(20, new ucAdvanced());
 		}
 
 		private void SetFormTitle(TreeNode currentNode)

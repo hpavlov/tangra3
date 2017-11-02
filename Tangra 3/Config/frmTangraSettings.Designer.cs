@@ -57,6 +57,7 @@
             treeNode16,
             treeNode17,
             treeNode18});
+            System.Windows.Forms.TreeNode treeNode20 = new System.Windows.Forms.TreeNode("Advanced & Debug");
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmTangraSettings));
             this.tvSettings = new System.Windows.Forms.TreeView();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -131,6 +132,9 @@
             treeNode19.Name = "ndCustomize";
             treeNode19.Tag = "7";
             treeNode19.Text = "Customize";
+            treeNode20.Name = "ndAdvanced";
+            treeNode20.Tag = "20";
+            treeNode20.Text = "Advanced & Debug";
             this.tvSettings.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
             treeNode1,
             treeNode5,
@@ -140,7 +144,8 @@
             treeNode12,
             treeNode13,
             treeNode14,
-            treeNode19});
+            treeNode19,
+            treeNode20});
             this.tvSettings.Size = new System.Drawing.Size(176, 359);
             this.tvSettings.TabIndex = 7;
             this.tvSettings.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.tvSettings_BeforeSelect);

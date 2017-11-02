@@ -450,8 +450,7 @@ namespace Tangra.OCR
 	            {
                     if (m_ForceErrorReport)
                     {
-                        if (m_ForceErrorReport &&
-                            !m_CalibrationImages.ContainsKey("LocateTimestampPositionOrg.bmp"))
+                        if (!m_CalibrationImages.ContainsKey("LocateTimestampPositionOrg.bmp"))
                         {
                             uint[] pixelsOriginal = new uint[data.Length];
                             Array.Copy(data, pixelsOriginal, data.Length);
@@ -696,6 +695,11 @@ namespace Tangra.OCR
         public int ErrorCount
         {
             get { return m_CalibrationErrors.Count; }
+        }
+
+        public bool ShouldLogErrorImage
+        {
+            get { return m_ForceErrorReport || !m_Processor.IsCalibrated; }
         }
 
         public void AddErrorImage(string fileName, uint[] pixels, int width, int height)

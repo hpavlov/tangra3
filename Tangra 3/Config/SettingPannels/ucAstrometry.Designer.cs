@@ -66,7 +66,6 @@
             this.label57 = new System.Windows.Forms.Label();
             this.nudMagResidual = new System.Windows.Forms.NumericUpDown();
             this.label53 = new System.Windows.Forms.Label();
-            this.cbxDebugOutput = new System.Windows.Forms.CheckBox();
             this.cbxExportUncertainties = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.label5 = new System.Windows.Forms.Label();
@@ -665,20 +664,10 @@
             this.label53.TabIndex = 34;
             this.label53.Text = "Output Band";
             // 
-            // cbxDebugOutput
-            // 
-            this.cbxDebugOutput.AutoSize = true;
-            this.cbxDebugOutput.Location = new System.Drawing.Point(16, 84);
-            this.cbxDebugOutput.Name = "cbxDebugOutput";
-            this.cbxDebugOutput.Size = new System.Drawing.Size(125, 17);
-            this.cbxDebugOutput.TabIndex = 35;
-            this.cbxDebugOutput.Text = "Enable debug output";
-            this.cbxDebugOutput.UseVisualStyleBackColor = true;
-            // 
             // cbxExportUncertainties
             // 
             this.cbxExportUncertainties.AutoSize = true;
-            this.cbxExportUncertainties.Location = new System.Drawing.Point(16, 107);
+            this.cbxExportUncertainties.Location = new System.Drawing.Point(16, 96);
             this.cbxExportUncertainties.Name = "cbxExportUncertainties";
             this.cbxExportUncertainties.Size = new System.Drawing.Size(119, 17);
             this.cbxExportUncertainties.TabIndex = 50;
@@ -695,7 +684,6 @@
             this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this.cbxExportUncertainties);
             this.groupBox1.Controls.Add(this.nudAstrAssumedUncertainty);
-            this.groupBox1.Controls.Add(this.cbxDebugOutput);
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Location = new System.Drawing.Point(234, 143);
             this.groupBox1.Name = "groupBox1";
@@ -834,7 +822,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.NumericUpDown nudNumberOfPivots;
-        private System.Windows.Forms.CheckBox cbxDebugOutput;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.NumericUpDown nudAstrAssumedUncertainty;

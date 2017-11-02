@@ -52,4 +52,17 @@ namespace Tangra.OCR
 
         bool TimeStampHasDatePart { get; }
     }
+
+    public class ExpectedOcrMetrics
+    {
+        public int MaxCharacterHeight;
+        public double AverageDetectedOsdHeight;
+        public int? TopMostLine;
+        public int? BottomMostLine;
+    }
+
+    public interface ITimestampOcrDebug
+    {
+        ExpectedOcrMetrics GetExpectedOcrMetrics();
+    }
 }
