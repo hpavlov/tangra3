@@ -37,9 +37,12 @@ type OsdFrame (width, height, topBottoms:(decimal*decimal)[], pixels: uint32[]) 
         let total = [| for i in 0 .. NumOsdLines - 1 -> i |] |> Array.map (fun l -> sumForLineVert l x) |> Array.sum 
         total > MinFullnessAllRows
 
+    let SingleLineVSum line x = 
+        seq { for y in fst topBottoms.[line] .. snd topBottoms.[line] -> (Calc.At x y) } 
+        |> Seq.sum
+
     let IsOnSingleLine line x = 
-        let s = seq { for y in fst topBottoms.[line] .. snd topBottoms.[line] -> (Calc.At x y) } |> Seq.sum
-        let on = s > MinFullnessPerRow 
+        let on = SingleLineVSum line x > MinFullnessPerRow 
         on
 
     let left = 
@@ -49,13 +52,22 @@ type OsdFrame (width, height, topBottoms:(decimal*decimal)[], pixels: uint32[]) 
         let lP = leftPrec |> Seq.find (fun x -> IsOn (decimal x))
         lP
 
+
     let rights = 
+        let Density line x1 x2 = 
+            let sum = seq { for i in x1 .. x2 -> i }
+                        |> Seq.map (fun x -> SingleLineVSum line x)
+                        |> Seq.sum
+            sum / round ((x2 - x1) / ApproximateWidth)
+
         let FindRight line =
-            //let rightInt = seq { for i = (2 * this.Width / 3 - 2 * MinOsdEdgeGap) downto 0 do yield i }
-            // TODO: The most right location should be determined by the code above
-            //       But need to fix the pre-processing for this 
-            let rightInt = seq { for i = 300 downto 0 do yield i }
-            let rR = rightInt |> Seq.find (fun x -> IsOnSingleLine line (decimal x))
+            let markerCalcArea = ApproximateWidth * 5M
+            let marker = Density line left (left + markerCalcArea)
+            let MarkerPass x = 
+                let rm = Density line (x - markerCalcArea) x
+                rm > marker * 0.33M
+            let rightInt = seq { for i = width - MinOsdEdgeGap downto 0 do yield i }
+            let rR = rightInt |> Seq.find (fun x -> IsOnSingleLine line (decimal x) && MarkerPass (decimal x))
             let rightPrec = seq { for i = 10 downto -10 do yield decimal i/10M + (decimal rR) }
             let rP = rightPrec |> Seq.find (fun x -> IsOnSingleLine line (decimal x))
             rP
@@ -117,13 +129,6 @@ type OsdFrame (width, height, topBottoms:(decimal*decimal)[], pixels: uint32[]) 
                     then x + 4M, true
                     else x, false // We are be in a 'gap', don't count it towards a cost
         abs (fst transition - x), snd transition
-
-//    member private this.OffOnRightTransCostAllLines x =
-//        let transition = 
-
-//    member private this.FullnessCostSmart x width =
-//        let verts = [| for i in 0 .. int rnd width -> i |]
-//        verts |> 
 
     member this.WidthCostAllLines (left:decimal) (width:decimal) =         
         let maxId = rights |> Array.map (fun x -> int (ceil (x - left) /width)) |> Array.max
