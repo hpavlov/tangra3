@@ -303,27 +303,24 @@ namespace Tangra.OCR
 
         public void PrepareFailedCalibrationReport()
         {
-            // NOTE: Add calibration frames OSD position data here if required
+            //// NOTE: Add calibration frames OSD position data here if required
+            //short magic = (short)(('F' << 8) + '#');
             //for (int i = 0; i < m_CalibrationFrames.Count; i++)
             //{
-            //    decimal? top = null;
-            //    decimal? bottom = null;
-            //    if (m_CalibrationFrames[i].DetectedOsdLines != null &&
-            //        m_CalibrationFrames[i].DetectedOsdLines.Length > 0)
-            //    {
-            //        top = m_CalibrationFrames[i].DetectedOsdLines.Average(x => x.Top);
-            //        bottom = m_CalibrationFrames[i].DetectedOsdLines.Average(x => x.Bottom);
-            //    }
-
-            //    string fileName = Path.GetFullPath(@"F:\WORK\tangra3\OcrTester\AutomatedTestingImages\PixelExport\" + i + ".dat");
-            //    using(FileStream fs = new FileStream(fileName, FileMode.CreateNew, FileAccess.Write))
+            //    string fileName = Path.GetFullPath(@"C:\Work\Tangra3\OcrTester\AutomatedTestingImages\PixelExport\" + i + ".dat");
+            //    using (FileStream fs = new FileStream(fileName, FileMode.CreateNew, FileAccess.Write))
             //    using (BinaryWriter wrt = new BinaryWriter(fs))
             //    {
-            //        wrt.Write(top ?? 0M);
-            //        wrt.Write(bottom ?? 0M);
+            //        wrt.Write(magic);
             //        wrt.Write(m_ImageWidth);
             //        wrt.Write(m_ImageHeight);
-            //        foreach(var pix in m_CalibrationFrames[i].ProcessedPixels)
+            //        wrt.Write(m_CalibrationFrames[i].DetectedOsdLines.Length);
+            //        foreach (var lineInfo in m_CalibrationFrames[i].DetectedOsdLines)
+            //        {
+            //            wrt.Write(lineInfo.Top);
+            //            wrt.Write(lineInfo.Bottom);
+            //        }
+            //        foreach (var pix in m_CalibrationFrames[i].ProcessedPixels)
             //            wrt.Write(pix);
             //    }
             //}
@@ -1209,13 +1206,12 @@ namespace Tangra.OCR
             
             leftFine = DetermineBlackToWhiteTransition(lineScores);
             rv.ForEach(x => x.Left = leftFine);
-            */
 
             // 3) Determine the best fitting box width for all lines
             decimal heightAve = rv.Select(x => x.Bottom - x.Top).Average();
             var widthAve = 13.0M * heightAve / 32.0M; // NOTE: Nominal ratio of 13x32 from a sample image
 
-            /*
+
             if (m_SingleLineMode && rv.Count == 1)
             {
                 // 24 characters in a single line mode
@@ -1247,10 +1243,14 @@ namespace Tangra.OCR
             decimal boxesLeft = leftWidth.Item1;
             decimal boxWidth = leftWidth.Item2; */
 
-            var osdFrame = new OsdFrame(m_ImageWidth, m_ImageHeight, rv[0].Top, rv[0].Bottom, subPixelData.Pixels);
-            decimal boxesLeft = osdFrame.FindLeft(25);
-            decimal boxWidth = osdFrame.FindWidth(boxesLeft, widthAve);
-            boxesLeft = osdFrame.ImproveLeft(boxesLeft, boxWidth);
+            var osdFrame = new OsdFrame(m_ImageWidth, m_ImageHeight, rv.Select(x => Tuple.Create(x.Top, x.Bottom)).ToArray(), subPixelData.Pixels);
+            decimal boxesLeft = osdFrame.Left;
+            decimal boxWidth = osdFrame.FindWidthAllLines(boxesLeft);
+            //boxesLeft = osdFrame.ImproveLeftAllLines(boxesLeft, boxWidth);
+
+            // Generating random values to force the calibration to fail
+            //decimal boxesLeft = 54 + (DateTime.Now.Millisecond % 27) / 13M;
+            //decimal boxWidth = 10 + (DateTime.Now.Millisecond % 17) / 7M;
 
             foreach (var cfg in rv)
             {
