@@ -66,13 +66,12 @@
             this.label57 = new System.Windows.Forms.Label();
             this.nudMagResidual = new System.Windows.Forms.NumericUpDown();
             this.label53 = new System.Windows.Forms.Label();
-            this.cbxDebugOutput = new System.Windows.Forms.CheckBox();
             this.cbxExportUncertainties = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.cbxExportHigherPositionAccuracy = new System.Windows.Forms.CheckBox();
             this.label5 = new System.Windows.Forms.Label();
             this.nudAstrSmallestReportedUncertainty = new System.Windows.Forms.NumericUpDown();
             this.label6 = new System.Windows.Forms.Label();
+            this.cbxExportHigherPositionAccuracy = new System.Windows.Forms.CheckBox();
             this.groupBox8.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudAstrMaximumStars)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudAstrMinimumStars)).BeginInit();
@@ -665,20 +664,10 @@
             this.label53.TabIndex = 34;
             this.label53.Text = "Output Band";
             // 
-            // cbxDebugOutput
-            // 
-            this.cbxDebugOutput.AutoSize = true;
-            this.cbxDebugOutput.Location = new System.Drawing.Point(16, 84);
-            this.cbxDebugOutput.Name = "cbxDebugOutput";
-            this.cbxDebugOutput.Size = new System.Drawing.Size(125, 17);
-            this.cbxDebugOutput.TabIndex = 35;
-            this.cbxDebugOutput.Text = "Enable debug output";
-            this.cbxDebugOutput.UseVisualStyleBackColor = true;
-            // 
             // cbxExportUncertainties
             // 
             this.cbxExportUncertainties.AutoSize = true;
-            this.cbxExportUncertainties.Location = new System.Drawing.Point(16, 107);
+            this.cbxExportUncertainties.Location = new System.Drawing.Point(16, 96);
             this.cbxExportUncertainties.Name = "cbxExportUncertainties";
             this.cbxExportUncertainties.Size = new System.Drawing.Size(119, 17);
             this.cbxExportUncertainties.TabIndex = 50;
@@ -694,7 +683,6 @@
             this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this.cbxExportUncertainties);
             this.groupBox1.Controls.Add(this.nudAstrAssumedUncertainty);
-            this.groupBox1.Controls.Add(this.cbxDebugOutput);
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Location = new System.Drawing.Point(234, 143);
             this.groupBox1.Name = "groupBox1";
@@ -702,16 +690,6 @@
             this.groupBox1.TabIndex = 51;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Advanced";
-            // 
-            // cbxExportHigherPositionAccuracy
-            // 
-            this.cbxExportHigherPositionAccuracy.AutoSize = true;
-            this.cbxExportHigherPositionAccuracy.Location = new System.Drawing.Point(16, 130);
-            this.cbxExportHigherPositionAccuracy.Name = "cbxExportHigherPositionAccuracy";
-            this.cbxExportHigherPositionAccuracy.Size = new System.Drawing.Size(170, 17);
-            this.cbxExportHigherPositionAccuracy.TabIndex = 51;
-            this.cbxExportHigherPositionAccuracy.Text = "Export high accuracy positions";
-            this.cbxExportHigherPositionAccuracy.UseVisualStyleBackColor = true;
             // 
             // label5
             // 
@@ -759,6 +737,16 @@
             this.label6.Size = new System.Drawing.Size(12, 13);
             this.label6.TabIndex = 54;
             this.label6.Text = "\"";
+            // 
+            // cbxExportHigherPositionAccuracy
+            // 
+            this.cbxExportHigherPositionAccuracy.AutoSize = true;
+            this.cbxExportHigherPositionAccuracy.Location = new System.Drawing.Point(16, 119);
+            this.cbxExportHigherPositionAccuracy.Name = "cbxExportHigherPositionAccuracy";
+            this.cbxExportHigherPositionAccuracy.Size = new System.Drawing.Size(170, 17);
+            this.cbxExportHigherPositionAccuracy.TabIndex = 51;
+            this.cbxExportHigherPositionAccuracy.Text = "Export high accuracy positions";
+            this.cbxExportHigherPositionAccuracy.UseVisualStyleBackColor = true;
             // 
             // ucAstrometry
             // 
@@ -832,7 +820,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.NumericUpDown nudNumberOfPivots;
-        private System.Windows.Forms.CheckBox cbxDebugOutput;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.NumericUpDown nudAstrAssumedUncertainty;

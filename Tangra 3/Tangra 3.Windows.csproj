@@ -156,6 +156,12 @@
     <Compile Include="Config\frmTangraSettings.Designer.cs">
       <DependentUpon>frmTangraSettings.cs</DependentUpon>
     </Compile>
+    <Compile Include="Config\SettingPannels\ucAdvanced.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Config\SettingPannels\ucAdvanced.Designer.cs">
+      <DependentUpon>ucAdvanced.cs</DependentUpon>
+    </Compile>
     <Compile Include="Config\SettingPannels\ucLocation.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -1070,6 +1076,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Config\frmTangraSettings.resx">
       <DependentUpon>frmTangraSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Config\SettingPannels\ucAdvanced.resx">
+      <DependentUpon>ucAdvanced.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Config\SettingPannels\ucLocation.resx">
       <DependentUpon>ucLocation.cs</DependentUpon>

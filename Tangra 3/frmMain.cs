@@ -1435,8 +1435,6 @@ namespace Tangra
 
         private void miTimestampOCR_Click(object sender, EventArgs e)
         {
-            bool debugOCR = Control.ModifierKeys == Keys.Control;
-
             if (m_VideoController.ShowMessageBox(
                     "This function can be used to test existing OCR functionality with your videos. Follow these steps:\r\n\r\n" + 
                      "* Select the OCR engine and if it fails to initialise then send an error report when suggested.\r\n" +
@@ -1448,11 +1446,10 @@ namespace Tangra
                     "Timestamp OCR Validator", MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.Cancel)
                 return;
 
-            m_VideoController.InitializeTimestampOCR();
+            m_VideoController.InitializeTimestampOCR(TangraConfig.Settings.Generic.OcrDebugModeEnabled);
 
             if (m_VideoController.HasTimestampOCR())
             {
-                m_VideoController.DebugOCR = debugOCR;
                 m_VideoController.OCRScore = 0;
                 m_VideoController.OCRScoredFrames = 0;
                 m_VideoController.RegisterOverlayRenderer(m_VideoController.PrintOCRedTimeStamp);

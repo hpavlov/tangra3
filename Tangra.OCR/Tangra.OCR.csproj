@@ -82,6 +82,7 @@
     <Compile Include="GpsBoxSprite\GpsBoxSpriteLineOcr.cs" />
     <Compile Include="GpsBoxSprite\GpsBoxSpriteOcrProcessor.cs" />
     <Compile Include="GpsBoxSprite\GpxBoxSpriteVtiTimeStamp.cs" />
+    <Compile Include="OcrUtils.cs" />
     <Compile Include="TimeExtraction\OcrTimeStampCorrector.cs" />
     <Compile Include="IotaVtiOrcManaged.cs" />
     <Compile Include="IotaVtiOsdProcessor\IotaVtiOcrCalibratedState.cs" />

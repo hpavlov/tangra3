@@ -32,6 +32,9 @@
             this.label2 = new System.Windows.Forms.Label();
             this.groupControl1 = new System.Windows.Forms.GroupBox();
             this.pnlOsdOcr = new System.Windows.Forms.Panel();
+            this.label4 = new System.Windows.Forms.Label();
+            this.nudMaxAutocorrectDigits = new System.Windows.Forms.NumericUpDown();
+            this.label3 = new System.Windows.Forms.Label();
             this.cbxOcrAskEveryTime = new System.Windows.Forms.CheckBox();
             this.cbxOcrEngine = new System.Windows.Forms.ComboBox();
             this.cbxEnableOsdOcr = new System.Windows.Forms.CheckBox();
@@ -39,13 +42,10 @@
             this.cbxRenderingEngineAttemptOrder = new System.Windows.Forms.ComboBox();
             this.nudSaturation8bit = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.nudMaxAutocorrectDigits = new System.Windows.Forms.NumericUpDown();
-            this.label4 = new System.Windows.Forms.Label();
             this.groupControl1.SuspendLayout();
             this.pnlOsdOcr.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudSaturation8bit)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMaxAutocorrectDigits)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudSaturation8bit)).BeginInit();
             this.SuspendLayout();
             // 
             // label20
@@ -78,7 +78,7 @@
             this.groupControl1.Controls.Add(this.label1);
             this.groupControl1.Location = new System.Drawing.Point(3, 3);
             this.groupControl1.Name = "groupControl1";
-            this.groupControl1.Size = new System.Drawing.Size(277, 322);
+            this.groupControl1.Size = new System.Drawing.Size(277, 319);
             this.groupControl1.TabIndex = 42;
             this.groupControl1.TabStop = false;
             this.groupControl1.Text = "Analogue Video (8 bit)";
@@ -94,6 +94,36 @@
             this.pnlOsdOcr.Name = "pnlOsdOcr";
             this.pnlOsdOcr.Size = new System.Drawing.Size(265, 109);
             this.pnlOsdOcr.TabIndex = 52;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(145, 86);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(115, 13);
+            this.label4.TabIndex = 54;
+            this.label4.Text = "wrongly identified digits";
+            // 
+            // nudMaxAutocorrectDigits
+            // 
+            this.nudMaxAutocorrectDigits.Location = new System.Drawing.Point(117, 84);
+            this.nudMaxAutocorrectDigits.Maximum = new decimal(new int[] {
+            9,
+            0,
+            0,
+            0});
+            this.nudMaxAutocorrectDigits.Name = "nudMaxAutocorrectDigits";
+            this.nudMaxAutocorrectDigits.Size = new System.Drawing.Size(28, 20);
+            this.nudMaxAutocorrectDigits.TabIndex = 53;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(24, 86);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(95, 13);
+            this.label3.TabIndex = 52;
+            this.label3.Text = "Auto-correct up to ";
             // 
             // cbxOcrAskEveryTime
             // 
@@ -168,36 +198,6 @@
             this.label1.TabIndex = 43;
             this.label1.Text = "Saturation Level:";
             // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(24, 86);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(95, 13);
-            this.label3.TabIndex = 52;
-            this.label3.Text = "Auto-correct up to ";
-            // 
-            // nudMaxAutocorrectDigits
-            // 
-            this.nudMaxAutocorrectDigits.Location = new System.Drawing.Point(117, 84);
-            this.nudMaxAutocorrectDigits.Maximum = new decimal(new int[] {
-            9,
-            0,
-            0,
-            0});
-            this.nudMaxAutocorrectDigits.Name = "nudMaxAutocorrectDigits";
-            this.nudMaxAutocorrectDigits.Size = new System.Drawing.Size(28, 20);
-            this.nudMaxAutocorrectDigits.TabIndex = 53;
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(145, 86);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(115, 13);
-            this.label4.TabIndex = 54;
-            this.label4.Text = "wrongly identified digits";
-            // 
             // ucAnalogueVideo8bit
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -210,8 +210,8 @@
             this.groupControl1.PerformLayout();
             this.pnlOsdOcr.ResumeLayout(false);
             this.pnlOsdOcr.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudSaturation8bit)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMaxAutocorrectDigits)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudSaturation8bit)).EndInit();
             this.ResumeLayout(false);
 
 		}
