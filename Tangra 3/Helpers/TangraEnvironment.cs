@@ -70,6 +70,8 @@ namespace Tangra.Helpers
         public static bool Is32BitProcess { get { return (IntPtr.Size == 4); } }
         public static string Name { get; private set; }
 
+        public static bool IsWinTangraEndOfLife { get; private set; }
+
         [DllImport("kernel32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool IsWow64Process([In] IntPtr hProcess, [Out] out bool wow64Process);
@@ -113,6 +115,8 @@ namespace Tangra.Helpers
                     Is64bit = true;
                 else
                     Is32bit = true;
+
+                IsWinTangraEndOfLife = Environment.OSVersion.Version.Major < 6;
             }
             else
             {
