@@ -1,5 +1,9 @@
 ﻿Tangra3 Release Notes
 ---------------------
+v3.6.13 (2017-11-03)
+- Disabled further updates on system running Windows XP in a preparation for upgrade to .NET 4.5
+- Fixed an issue where brightness adjustments were not applied correctly for AAV files.
+
 v3.6.12 (2017-10-25)
 - Fixed an issue when working with SER/AAV/ADV/FITS files where width*height is not a multiple of 4 (there is an odd width or height).
 - Added support for 3-axis RGB FITS sequences created by MaximDL.
