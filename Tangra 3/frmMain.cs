@@ -107,6 +107,8 @@ namespace Tangra
 #if !WIN32
 			miVideoModelling.Visible = false;
 #endif
+		    miCheckForUpdates.Visible = !CurrentOS.IsWinTangraEndOfLife;
+
 			m_AutoUpdatesController.CheckForUpdates(false);
 		}
 

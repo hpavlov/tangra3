@@ -15,6 +15,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
+using Microsoft.Win32;
 using Tangra.Helpers;
 using Tangra.Model.Config;
 using Tangra.Properties;
@@ -88,8 +89,79 @@ namespace Tangra.Controller
 		private byte MSG_ID_NO_TANGRA3_UPDATES_AVAILABLE = 14;
 		private byte MSG_ID_NEW_TANGRA3_ADDIN_UPDATE_AVAILABLE = 15;
 
+        private Version GetDotNetVersionFromRegistry()
+        {
+            try
+            {
+                using (RegistryKey ndpKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32).OpenSubKey("SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\\v4\\Full\\"))
+                {
+                    int releaseKey = Convert.ToInt32(ndpKey.GetValue("Release"));
+                    if (releaseKey >= 393273)
+                    {
+                        return new Version(4, 6);
+                    }
+                    if ((releaseKey >= 379893))
+                    {
+                        return new Version(4, 5, 2);
+                    }
+                    if ((releaseKey >= 378675))
+                    {
+                        return new Version(4, 5, 1);
+                    }
+                    if ((releaseKey >= 378389))
+                    {
+                        return new Version(4, 5);
+                    }
+                }
+            }
+            catch { }
+
+            return new Version(4, 0);
+        }
+
+
 		public void CheckForUpdates(bool manualCheck)
 		{
+		    if (CurrentOS.IsWinTangraEndOfLife)
+		    {
+		        if (!TangraConfig.Settings.Generic.TangraEndOfLifeWarningShown)
+		        {
+		            MessageBox.Show(
+                        "Tangra has reached an 'End of Update' status for versions of Windows older than Windows Vista.\r\n\r\nNo more updates will be offered or delivered. Please upgrade your Windows to receive further updates.", 
+                        "Tangra - End of Updates", 
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+		            TangraConfig.Settings.Generic.TangraEndOfLifeWarningShown = true;
+		            TangraConfig.Settings.Save();
+		        }
+
+		        var tangraUpdateLocation = Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory + @"\Tangra3Update.exe");
+		        if (File.Exists(tangraUpdateLocation))
+		        {
+		            try
+		            {
+		                File.Delete(tangraUpdateLocation);
+		            }
+                    catch
+		            { }
+		        }
+		        return;
+		    }
+
+		    if (GetDotNetVersionFromRegistry() < new Version(4, 5))
+		    {
+		        if (manualCheck || new Random((int)DateTime.Now.Ticks).Next(100) <= 5)
+		        {
+                    // Show warning message for all manual checks for update or in 5% of the automatic checks
+                    MessageBox.Show(
+                        "The next update of Tangra will require .NET version 4.5 or later which is currently not installed on this system.\r\n\r\nPlease install the latest version of the .NET Framework to receive further updates of Tangra.",
+                        "Tangra Update",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+		        }
+
+		        return;
+		    }
+
 			m_ShowNegativeResultMessage = manualCheck;
 
 			if (
@@ -106,6 +178,9 @@ namespace Tangra.Controller
 
 		private void CheckForUpdates(object state)
 		{
+		    if (CurrentOS.IsWinTangraEndOfLife)
+		        return;
+
 			try
 			{
 				m_LastUpdateTime = DateTime.Now;

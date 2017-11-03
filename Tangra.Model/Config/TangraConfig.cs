@@ -654,6 +654,8 @@ namespace Tangra.Model.Config
             public string[] CustomFITSTimeStampFormats = new string[0];
             public string[] CustomFITSDateFormats = new string[0];
             public string[] CustomFITSTimeFormats = new string[0];
+
+            public bool TangraEndOfLifeWarningShown = false;
 		}
 
         [Serializable]
