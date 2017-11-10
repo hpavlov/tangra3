@@ -1135,11 +1135,11 @@ namespace Tangra.OCR
             decimal boxWidth = leftWidth.Item2; */
 
             var osdFrame = new OsdFrame(m_ImageWidth, m_ImageHeight, rv.Select(x => Tuple.Create(x.Top, x.Bottom)).ToArray(), subPixelData.Pixels);
-            decimal boxesLeft = osdFrame.Left;
-            decimal boxWidth = osdFrame.FindWidthAllLines(boxesLeft);
-            //boxesLeft = osdFrame.ImproveLeftAllLines(boxesLeft, boxWidth);
+            var lw = osdFrame.FitLeftWidth;
+            decimal boxesLeft = lw.Item1;
+            decimal boxWidth = lw.Item2;
 
-            // Generating random values to force the calibration to fail
+            // Use the code below to generate random values to force the calibration to fail
             //decimal boxesLeft = 54 + (DateTime.Now.Millisecond % 27) / 13M;
             //decimal boxWidth = 10 + (DateTime.Now.Millisecond % 17) / 7M;
 
