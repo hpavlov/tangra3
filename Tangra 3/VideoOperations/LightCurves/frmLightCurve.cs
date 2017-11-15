@@ -2652,5 +2652,22 @@ namespace Tangra.VideoOperations.LightCurves
 				RedrawPlot();
 			}
 		}
+
+        private void miSaveAsVectorImage_Click(object sender, EventArgs e)
+        {
+            if (saveWmfFileDialog.ShowDialog(this) == DialogResult.OK)
+            {
+                using (var g = CreateGraphics())
+                {
+                    using (var img = new Metafile(saveWmfFileDialog.FileName, g.GetHdc()))
+                    using (var ig = Graphics.FromImage(img))
+                    {
+                        DrawGraph(ig);
+                    }
+
+                    g.ReleaseHdc();
+                }                
+            }
+        }
 	}
 }
