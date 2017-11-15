@@ -76,12 +76,12 @@ namespace Tangra.VideoOperations.LightCurves
                     if (m_IsFirstDraw)
                     {
                         m_IsFirstDraw = false;
-						m_LightCurveController.OnNewSelectedMeasurements(m_SelectedMeasurements);
+                        m_LightCurveController.OnNewSelectedMeasurements(m_SelectedMeasurements);
                     }
                 }
 
-				g.DrawImage(m_Graph, 0, 0);
-				g.Save();
+                g.DrawImage(m_Graph, 0, 0);
+                g.Save();
             }
         }
 
@@ -99,17 +99,25 @@ namespace Tangra.VideoOperations.LightCurves
 		private long m_MaxDisplayedFrameTimestampTicks;
 
 		private void DrawGraphOnBitmap()
-		{
+        {
+            using (Graphics g = Graphics.FromImage(m_Graph))
+            {
+                DrawGraphOnBitmap(g);
+            }
+        }
+
+        private void DrawGraphOnBitmap(Graphics g)
+        {
             if (!m_Reprocessing)
             {
                 if (m_Header.TimingType == MeasurementTimingType.EmbeddedTimeForEachFrame)
-                    DrawGraphOnBitmapByTimeStamp();
+                    DrawGraphOnBitmapByTimeStamp(g);
                 else
-                    DrawGraphOnBitmapByFrameNumber();                
+                    DrawGraphOnBitmapByFrameNumber(g);
             }
-		}
+        }
 
-		private void DrawGraphOnBitmapByTimeStamp()
+        private void DrawGraphOnBitmapByTimeStamp(Graphics g)
 		{
 			if (!LCMeasurementHeader.IsEmpty(m_Header))
 			{
@@ -145,169 +153,166 @@ namespace Tangra.VideoOperations.LightCurves
 
 			    bool drawLine = m_LightCurveController.Context.ChartType == LightCurveContext.LightCurveMode.Line;
 
-				using (Graphics g = Graphics.FromImage(m_Graph))
+				uint axisInterval = GetYAxisInterval(g);
+				if (m_LightCurveController.Context.Dirty && axisInterval != 0)
 				{
-					uint axisInterval = GetYAxisInterval(g);
-					if (m_LightCurveController.Context.Dirty && axisInterval != 0)
+					m_Header.MinAdjustedReading =
+						(int)(axisInterval * ((m_Header.MinAdjustedReading / axisInterval) - (m_Header.MinAdjustedReading > 0 ? 0 : 1)));
+					m_Header.MaxAdjustedReading =
+						(int)(axisInterval * ((m_Header.MaxAdjustedReading / axisInterval) + (m_Header.MaxAdjustedReading > 0 ? 1 : 0)));
+				}
+
+				float xTimestampScale = (float)(pnlChart.Width - m_MinX - m_MinY) / (float)(m_MaxDisplayedFrameTimestampTicks - m_MinDisplayedFrameTimestampTicks);
+				if (m_Header.MaxFrame == m_Header.MinFrame) xTimestampScale = 0;
+
+				float yScale = (float)((pnlChart.Height - 10) - m_MinY * 2) / (float)(m_Header.MaxAdjustedReading - m_Header.MinAdjustedReading);
+				if (m_Header.MaxAdjustedReading == m_Header.MinAdjustedReading) yScale = 0;
+
+				m_TimestampScaleX = xTimestampScale;
+				m_ScaleY = yScale;
+				m_MaxY = pnlChart.Height - m_MinY;
+				m_MaxX = pnlChart.Width - m_MinY; /* this is correct we are using m_MinY for the right X axis spacing */
+
+                g.FillRectangle(m_DisplaySettings.BackgroundColorBrush, 0, 0, m_Graph.Width, m_Graph.Height);
+
+				if (double.IsNaN(xTimestampScale) || double.IsNaN(xTimestampScale))
+				{
+					g.DrawString("Error: Missing or corrupted readings",
+						new Font(FontFamily.GenericSerif, 10),
+						Brushes.Pink, 10, 10);
+				}
+				else
+				{
+					float datapointFrom = m_DisplaySettings.DatapointSize / 2.0f;
+					float datapointSize = m_DisplaySettings.DatapointSize;
+
+					int idx = 0;
+					m_FramesIndex.Add((uint)m_MinDisplayedFrame);
+					m_MeasurementsIndex.Add(0);
+					double minAdjustedReading = double.MaxValue;
+
+					for (int i = 0; i < m_Header.ObjectCount; i++)
 					{
-						m_Header.MinAdjustedReading =
-							(int)(axisInterval * ((m_Header.MinAdjustedReading / axisInterval) - (m_Header.MinAdjustedReading > 0 ? 0 : 1)));
-						m_Header.MaxAdjustedReading =
-							(int)(axisInterval * ((m_Header.MaxAdjustedReading / axisInterval) + (m_Header.MaxAdjustedReading > 0 ? 1 : 0)));
-					}
+						if (!m_IncludeObjects[i]) continue;
 
-					float xTimestampScale = (float)(pnlChart.Width - m_MinX - m_MinY) / (float)(m_MaxDisplayedFrameTimestampTicks - m_MinDisplayedFrameTimestampTicks);
-					if (m_Header.MaxFrame == m_Header.MinFrame) xTimestampScale = 0;
+						PointF prevPoint = PointF.Empty;
+						List<BinnedValue> binnedValues = m_AllBinnedReadings[i];
 
-					float yScale = (float)((pnlChart.Height - 10) - m_MinY * 2) / (float)(m_Header.MaxAdjustedReading - m_Header.MinAdjustedReading);
-					if (m_Header.MaxAdjustedReading == m_Header.MinAdjustedReading) yScale = 0;
-
-					m_TimestampScaleX = xTimestampScale;
-					m_ScaleY = yScale;
-					m_MaxY = pnlChart.Height - m_MinY;
-					m_MaxX = pnlChart.Width - m_MinY; /* this is correct we are using m_MinY for the right X axis spacing */
-
-					g.Clear(m_DisplaySettings.BackgroundColor);
-
-					if (double.IsNaN(xTimestampScale) || double.IsNaN(xTimestampScale))
-					{
-						g.DrawString("Error: Missing or corrupted readings",
-							new Font(FontFamily.GenericSerif, 10),
-							Brushes.Pink, 10, 10);
-					}
-					else
-					{
-						float datapointFrom = m_DisplaySettings.DatapointSize / 2.0f;
-						float datapointSize = m_DisplaySettings.DatapointSize;
-
-						int idx = 0;
-						m_FramesIndex.Add((uint)m_MinDisplayedFrame);
-						m_MeasurementsIndex.Add(0);
-					    double minAdjustedReading = double.MaxValue;
-
-						for (int i = 0; i < m_Header.ObjectCount; i++)
+						BinnedValue currBin = null;
+						int binnedIdx = -1;
+						int nextPlotIndex = -1;
+						int readingIdx = 0;
+						bool prevReadingIsOffScreen = true;
+						foreach (LCMeasurement reading in m_LightCurveController.Context.AllReadings[i])
 						{
-							if (!m_IncludeObjects[i]) continue;
+							idx++;
+							readingIdx++;
+							bool drawThisReading = (reading.CurrFrameNo >= m_MinDisplayedFrame) && (reading.CurrFrameNo <= m_MaxDisplayedFrame);
 
-							PointF prevPoint = PointF.Empty;
-							List<BinnedValue> binnedValues = m_AllBinnedReadings[i];
-
-							BinnedValue currBin = null;
-							int binnedIdx = -1;
-							int nextPlotIndex = -1;
-							int readingIdx = 0;
-							bool prevReadingIsOffScreen = true;
-							foreach (LCMeasurement reading in m_LightCurveController.Context.AllReadings[i])
+							bool readingIsOffScreen = true;
+							float adjustedReading = -1;
+							if (m_LightCurveController.Context.Binning > 0)
 							{
-								idx++;
-								readingIdx++;
-								bool drawThisReading = (reading.CurrFrameNo >= m_MinDisplayedFrame) && (reading.CurrFrameNo <= m_MaxDisplayedFrame);
-
-								bool readingIsOffScreen = true;
-								float adjustedReading = -1;
-								if (m_LightCurveController.Context.Binning > 0)
+								if (currBin == null ||
+									currBin.ReadingIndexTo <= readingIdx)
 								{
-									if (currBin == null ||
-										currBin.ReadingIndexTo <= readingIdx)
+									binnedIdx++;
+									if (binnedIdx < binnedValues.Count)
 									{
-										binnedIdx++;
-										if (binnedIdx < binnedValues.Count)
-										{
-											currBin = binnedValues[binnedIdx];
-											nextPlotIndex = (currBin.ReadingIndexFrom + currBin.ReadingIndexTo) / 2;
-										}
+										currBin = binnedValues[binnedIdx];
+										nextPlotIndex = (currBin.ReadingIndexFrom + currBin.ReadingIndexTo) / 2;
 									}
+								}
 
-									if (nextPlotIndex == readingIdx &&
-										currBin != null)
-									{
-										adjustedReading = (float)currBin.AdjustedValue;
-										drawThisReading = true;
-										// When binning draw all points regardless of whether all points in the bin
-										// are for example off screen or not. Too difficult to handle
-										readingIsOffScreen = false;
-										prevReadingIsOffScreen = false;
-									}
-									else
-										drawThisReading = false;
-
-                                    if (!m_DisplaySettings.DrawInvalidDataPoints && currBin != null && !currBin.IsSuccessfulReading) drawThisReading = false;
+								if (nextPlotIndex == readingIdx &&
+									currBin != null)
+								{
+									adjustedReading = (float)currBin.AdjustedValue;
+									drawThisReading = true;
+									// When binning draw all points regardless of whether all points in the bin
+									// are for example off screen or not. Too difficult to handle
+									readingIsOffScreen = false;
+									prevReadingIsOffScreen = false;
 								}
 								else
+									drawThisReading = false;
+
+                                if (!m_DisplaySettings.DrawInvalidDataPoints && currBin != null && !currBin.IsSuccessfulReading) drawThisReading = false;
+							}
+							else
+							{
+								adjustedReading = reading.AdjustedReading;
+								readingIsOffScreen = reading.IsOffScreen;
+                                if (!m_DisplaySettings.DrawInvalidDataPoints && !reading.IsSuccessfulReading) drawThisReading = false;
+							}
+
+							if (drawThisReading && !readingIsOffScreen)
+							{
+								long currFrameTimestampTicks = m_Header.GetTimeForFrameFromFrameTiming((int)reading.CurrFrameNo, true).Ticks;
+								float x = m_MinX + (currFrameTimestampTicks - m_MinDisplayedFrameTimestampTicks) * m_TimestampScaleX;
+
+								float y = pnlChart.Height - (m_MinY + (adjustedReading - (int)m_Header.MinAdjustedReading) * yScale);
+
+								if (x < m_MinX || x > m_MaxX)
+									/* Excluding binned values outside the graph area */
+									continue;
+
+								if (float.IsNaN(y) || float.IsNaN(x) || float.IsInfinity(y) || float.IsInfinity(x))
+									/* Excluding NaN binned values */
+									continue;
+
+								if (adjustedReading < minAdjustedReading) minAdjustedReading = adjustedReading;
+
+								Pen pen = GetPenForTarget(i, reading.IsSuccessfulReading);
+								Brush brush = GetBrushForTarget(i, reading.IsSuccessfulReading);
+
+								if (prevPoint != PointF.Empty)
 								{
-									adjustedReading = reading.AdjustedReading;
-									readingIsOffScreen = reading.IsOffScreen;
-                                    if (!m_DisplaySettings.DrawInvalidDataPoints && !reading.IsSuccessfulReading) drawThisReading = false;
+									if (!prevReadingIsOffScreen && drawLine)
+										g.DrawLine(pen, prevPoint.X, prevPoint.Y, x, y);
 								}
+								else
+									prevPoint = new PointF();
 
-								if (drawThisReading && !readingIsOffScreen)
-								{									
-									long currFrameTimestampTicks = m_Header.GetTimeForFrameFromFrameTiming((int)reading.CurrFrameNo, true).Ticks;
-									float x = m_MinX + (currFrameTimestampTicks - m_MinDisplayedFrameTimestampTicks) * m_TimestampScaleX;
-
-									float y = pnlChart.Height - (m_MinY + (adjustedReading - (int)m_Header.MinAdjustedReading) * yScale);
-
-									if (x < m_MinX || x > m_MaxX)
-										/* Excluding binned values outside the graph area */
-										continue;
-
-									if (float.IsNaN(y) || float.IsNaN(x) || float.IsInfinity(y) || float.IsInfinity(x))
-										/* Excluding NaN binned values */
-										continue;
-
-								    if (adjustedReading < minAdjustedReading) minAdjustedReading = adjustedReading;
-
-									Pen pen = GetPenForTarget(i, reading.IsSuccessfulReading);
-									Brush brush = GetBrushForTarget(i, reading.IsSuccessfulReading);
-
-									if (prevPoint != PointF.Empty)
-									{
-										if (!prevReadingIsOffScreen && drawLine)
-											g.DrawLine(pen, prevPoint.X, prevPoint.Y, x, y);
-									}
-									else
-										prevPoint = new PointF();
-
-									prevPoint.X = x;
-									prevPoint.Y = y;
+								prevPoint.X = x;
+								prevPoint.Y = y;
 
 
-									try
-									{
-										g.FillEllipse(brush, x - datapointFrom, y - datapointFrom, datapointSize, datapointSize);
-									}
-									catch (OverflowException)
-									{ }									
-								}
-								prevReadingIsOffScreen = readingIsOffScreen;
-
-								if (i == 0 && idx % 250 == 0)
+								try
 								{
-									m_FramesIndex.Add((uint)reading.CurrFrameNo);
-									m_MeasurementsIndex.Add((uint)idx);
+									g.FillEllipse(brush, x - datapointFrom, y - datapointFrom, datapointSize, datapointSize);
 								}
+								catch (OverflowException)
+								{ }
+							}
+							prevReadingIsOffScreen = readingIsOffScreen;
+
+							if (i == 0 && idx % 250 == 0)
+							{
+								m_FramesIndex.Add((uint)reading.CurrFrameNo);
+								m_MeasurementsIndex.Add((uint)idx);
 							}
 						}
-
-                        DrawAxisByTimeStamp(g, axisInterval, minAdjustedReading);
 					}
 
-					if (!string.IsNullOrWhiteSpace(m_LightCurveController.Context.ChartTitle))
-					{
-						SizeF sizeF = g.MeasureString(m_LightCurveController.Context.ChartTitle, s_TitleFont);
-						float x0 = (pnlChart.Width - sizeF.Width) / 2;
-						float y0 = m_MinY + 6;
-						g.FillRectangle(m_DisplaySettings.BackgroundColorBrush, x0 - 2, y0 - 2, sizeF.Width + 5, sizeF.Height + 4);
-						g.DrawRectangle(m_DisplaySettings.LabelsPen, x0 - 2, y0 - 2, sizeF.Width + 5, sizeF.Height + 4);
-						g.DrawString(m_LightCurveController.Context.ChartTitle, s_TitleFont, m_DisplaySettings.LabelsBrush, x0, y0);
-					}
-
-					g.Save();
+                    DrawAxisByTimeStamp(g, axisInterval, minAdjustedReading);
 				}
-			}			
+
+				if (!string.IsNullOrWhiteSpace(m_LightCurveController.Context.ChartTitle))
+				{
+					SizeF sizeF = g.MeasureString(m_LightCurveController.Context.ChartTitle, s_TitleFont);
+					float x0 = (pnlChart.Width - sizeF.Width) / 2;
+					float y0 = m_MinY + 6;
+					g.FillRectangle(m_DisplaySettings.BackgroundColorBrush, x0 - 2, y0 - 2, sizeF.Width + 5, sizeF.Height + 4);
+					g.DrawRectangle(m_DisplaySettings.LabelsPen, x0 - 2, y0 - 2, sizeF.Width + 5, sizeF.Height + 4);
+					g.DrawString(m_LightCurveController.Context.ChartTitle, s_TitleFont, m_DisplaySettings.LabelsBrush, x0, y0);
+				}
+
+				g.Save();
+			}
 		}
 
-    	private void DrawGraphOnBitmapByFrameNumber()
+        private void DrawGraphOnBitmapByFrameNumber(Graphics g)
         {
             if (!LCMeasurementHeader.IsEmpty(m_Header))
             {
@@ -340,163 +345,160 @@ namespace Tangra.VideoOperations.LightCurves
 
                 bool drawLine = m_LightCurveController.Context.ChartType == LightCurveContext.LightCurveMode.Line;
 
-                using (Graphics g = Graphics.FromImage(m_Graph))
+                uint axisInterval = GetYAxisInterval(g);
+                if (m_LightCurveController.Context.Dirty && axisInterval != 0)
                 {
-                    uint axisInterval = GetYAxisInterval(g);
-                    if (m_LightCurveController.Context.Dirty && axisInterval != 0)
+                    m_Header.MinAdjustedReading =
+                        (int)(axisInterval * ((m_Header.MinAdjustedReading/axisInterval) - (m_Header.MinAdjustedReading > 0 ? 0 : 1)));
+                    m_Header.MaxAdjustedReading =
+                        (int)(axisInterval * ((m_Header.MaxAdjustedReading / axisInterval) + (m_Header.MaxAdjustedReading > 0 ? 1 : 0)));
+                }
+
+                float xScale = (float)(pnlChart.Width - m_MinX - m_MinY) / (float)(m_MaxDisplayedFrame - m_MinDisplayedFrame);
+                if (m_Header.MaxFrame == m_Header.MinFrame) xScale = 0;
+
+                float yScale = (float)((pnlChart.Height - 10) - m_MinY * 2) / (float)(m_Header.MaxAdjustedReading - m_Header.MinAdjustedReading);
+                if (m_Header.MaxAdjustedReading == m_Header.MinAdjustedReading) yScale = 0;
+
+                m_ScaleX = xScale;
+                m_ScaleY = yScale;
+                m_MaxY = pnlChart.Height - m_MinY;
+                m_MaxX = pnlChart.Width - m_MinY; /* this is correct we are using m_MinY for the right X axis spacing */
+
+                g.FillRectangle(m_DisplaySettings.BackgroundColorBrush, 0, 0, m_Graph.Width, m_Graph.Height);
+
+                if (double.IsNaN(xScale) || double.IsNaN(xScale))
+                {
+                    g.DrawString("Error: Missing or corrupted readings",
+                        new Font(FontFamily.GenericSerif, 10),
+                        Brushes.Pink, 10, 10);
+                }
+                else
+                {
+                    float datapointFrom = m_DisplaySettings.DatapointSize / 2.0f;
+                    float datapointSize = m_DisplaySettings.DatapointSize;
+
+                    int idx = 0;
+					m_FramesIndex.Add((uint)m_MinDisplayedFrame);
+                    m_MeasurementsIndex.Add(0);
+
+                    double minAdjustedReading = double.MaxValue;
+
+                    for (int i = 0; i < m_Header.ObjectCount; i++)
                     {
-                        m_Header.MinAdjustedReading =
-                            (int)(axisInterval * ((m_Header.MinAdjustedReading/axisInterval) - (m_Header.MinAdjustedReading > 0 ? 0 : 1)));
-                        m_Header.MaxAdjustedReading =
-                            (int)(axisInterval * ((m_Header.MaxAdjustedReading / axisInterval) + (m_Header.MaxAdjustedReading > 0 ? 1 : 0)));
-                    }
+						if (!m_IncludeObjects[i]) continue;
 
-                    float xScale = (float)(pnlChart.Width - m_MinX - m_MinY) / (float)(m_MaxDisplayedFrame - m_MinDisplayedFrame);
-                    if (m_Header.MaxFrame == m_Header.MinFrame) xScale = 0;
+                        PointF prevPoint = PointF.Empty;
+                        List<BinnedValue> binnedValues = m_AllBinnedReadings[i];
 
-                    float yScale = (float)((pnlChart.Height - 10) - m_MinY * 2) / (float)(m_Header.MaxAdjustedReading - m_Header.MinAdjustedReading);
-                    if (m_Header.MaxAdjustedReading == m_Header.MinAdjustedReading) yScale = 0;
-
-                    m_ScaleX = xScale;
-                    m_ScaleY = yScale;
-                    m_MaxY = pnlChart.Height - m_MinY;
-                    m_MaxX = pnlChart.Width - m_MinY; /* this is correct we are using m_MinY for the right X axis spacing */
-
-                    g.Clear(m_DisplaySettings.BackgroundColor);
-
-                    if (double.IsNaN(xScale) || double.IsNaN(xScale))
-                    {
-                        g.DrawString("Error: Missing or corrupted readings",
-                            new Font(FontFamily.GenericSerif, 10),
-                            Brushes.Pink, 10, 10);
-                    }
-                    else
-                    {
-                        float datapointFrom = m_DisplaySettings.DatapointSize / 2.0f;
-                        float datapointSize = m_DisplaySettings.DatapointSize;
-
-                        int idx = 0;
-						m_FramesIndex.Add((uint)m_MinDisplayedFrame);
-                        m_MeasurementsIndex.Add(0);
-
-                        double minAdjustedReading = double.MaxValue;
-
-                        for (int i = 0; i < m_Header.ObjectCount; i++)
+                        BinnedValue currBin = null;
+                        int binnedIdx = -1;
+                        int nextPlotIndex = -1;
+                        int readingIdx = -1;
+						bool prevReadingIsOffScreen = true;
+                        foreach (LCMeasurement reading in m_LightCurveController.Context.AllReadings[i])
                         {
-							if (!m_IncludeObjects[i]) continue;
-
-                            PointF prevPoint = PointF.Empty;
-                            List<BinnedValue> binnedValues = m_AllBinnedReadings[i];
-
-                            BinnedValue currBin = null;
-                            int binnedIdx = -1;
-                            int nextPlotIndex = -1;
-                            int readingIdx = -1;
-							bool prevReadingIsOffScreen = true;
-                            foreach (LCMeasurement reading in m_LightCurveController.Context.AllReadings[i])
-                            {
-                                idx++;
-                                readingIdx++;
-                                bool drawThisReading = (reading.CurrFrameNo >= m_MinDisplayedFrame) && (reading.CurrFrameNo <= m_MaxDisplayedFrame);
+                            idx++;
+                            readingIdx++;
+                            bool drawThisReading = (reading.CurrFrameNo >= m_MinDisplayedFrame) && (reading.CurrFrameNo <= m_MaxDisplayedFrame);
 								
-                                bool readingIsOffScreen = true;
-                                float adjustedReading = -1;
-                                if (m_LightCurveController.Context.Binning > 0)
+                            bool readingIsOffScreen = true;
+                            float adjustedReading = -1;
+                            if (m_LightCurveController.Context.Binning > 0)
+                            {
+                                if (currBin == null || 
+                                    currBin.ReadingIndexTo < readingIdx)
                                 {
-                                    if (currBin == null || 
-                                        currBin.ReadingIndexTo < readingIdx)
+                                    binnedIdx++;
+                                    if (binnedIdx < binnedValues.Count)
                                     {
-                                        binnedIdx++;
-                                        if (binnedIdx < binnedValues.Count)
-                                        {
-                                            currBin = binnedValues[binnedIdx];
-                                            nextPlotIndex = (currBin.ReadingIndexFrom + currBin.ReadingIndexTo) / 2;
-                                        }
+                                        currBin = binnedValues[binnedIdx];
+                                        nextPlotIndex = (currBin.ReadingIndexFrom + currBin.ReadingIndexTo) / 2;
                                     }
+                                }
 
-                                    if (nextPlotIndex == readingIdx &&
-                                        currBin != null)
-                                    {
-                                        adjustedReading = (float) currBin.AdjustedValue;
-                                        drawThisReading = true;
-										// When binning draw all points regardless of whether all points in the bin
-										// are for example off screen or not. Too difficult to handle
-                                    	readingIsOffScreen = false;
-                                    	prevReadingIsOffScreen = false;
-                                    }
-                                    else
-                                        drawThisReading = false;
-
-                                    if (!m_DisplaySettings.DrawInvalidDataPoints && currBin != null && !currBin.IsSuccessfulReading) drawThisReading = false;
+                                if (nextPlotIndex == readingIdx &&
+                                    currBin != null)
+                                {
+                                    adjustedReading = (float) currBin.AdjustedValue;
+                                    drawThisReading = true;
+									// When binning draw all points regardless of whether all points in the bin
+									// are for example off screen or not. Too difficult to handle
+                                    readingIsOffScreen = false;
+                                    prevReadingIsOffScreen = false;
                                 }
                                 else
+                                    drawThisReading = false;
+
+                                if (!m_DisplaySettings.DrawInvalidDataPoints && currBin != null && !currBin.IsSuccessfulReading) drawThisReading = false;
+                            }
+                            else
+                            {
+                                adjustedReading = reading.AdjustedReading;
+								readingIsOffScreen = reading.IsOffScreen;
+                                if (!m_DisplaySettings.DrawInvalidDataPoints && !reading.IsSuccessfulReading) drawThisReading = false;
+                            }
+
+                            if (drawThisReading && !readingIsOffScreen)
+                            {
+                                float x = m_MinX + ((int)reading.CurrFrameNo - (int)m_MinDisplayedFrame) * xScale;
+                                float y = pnlChart.Height - (m_MinY + (adjustedReading - (int)m_Header.MinAdjustedReading) * yScale);
+
+                                if (x < m_MinX || x > m_MaxX)
+                                    /* Excluding binned values outside the graph area */
+                                    continue;
+
+                                if (float.IsNaN(y) || float.IsNaN(x) || float.IsInfinity(y) || float.IsInfinity(x))
+                                    /* Excluding NaN binned values */
+                                    continue;
+
+                                if (minAdjustedReading > adjustedReading) minAdjustedReading = adjustedReading;
+
+								Pen pen = GetPenForTarget(i, reading.IsSuccessfulReading);
+								Brush brush = GetBrushForTarget(i, reading.IsSuccessfulReading);
+
+                                if (prevPoint != PointF.Empty)
                                 {
-                                    adjustedReading = reading.AdjustedReading;
-									readingIsOffScreen = reading.IsOffScreen;
-                                    if (!m_DisplaySettings.DrawInvalidDataPoints && !reading.IsSuccessfulReading) drawThisReading = false;
+                                    if (!prevReadingIsOffScreen && drawLine)
+                                        g.DrawLine(pen, prevPoint.X, prevPoint.Y, x, y);
                                 }
+                                else
+                                    prevPoint = new PointF();
 
-                                if (drawThisReading && !readingIsOffScreen)
-                                {
-                                    float x = m_MinX + ((int)reading.CurrFrameNo - (int)m_MinDisplayedFrame) * xScale;
-                                    float y = pnlChart.Height - (m_MinY + (adjustedReading - (int)m_Header.MinAdjustedReading) * yScale);
+                                prevPoint.X = x;
+                                prevPoint.Y = y;
 
-                                    if (x < m_MinX || x > m_MaxX)
-                                        /* Excluding binned values outside the graph area */
-                                        continue;
+								try
+								{
+									g.FillEllipse(brush, x - datapointFrom, y - datapointFrom, datapointSize, datapointSize);
+								}
+								catch (OverflowException)
+								{ }
+                            }
+							prevReadingIsOffScreen = readingIsOffScreen;
 
-                                    if (float.IsNaN(y) || float.IsNaN(x) || float.IsInfinity(y) || float.IsInfinity(x))
-                                        /* Excluding NaN binned values */
-                                        continue;
-
-                                    if (minAdjustedReading > adjustedReading) minAdjustedReading = adjustedReading;
-
-									Pen pen = GetPenForTarget(i, reading.IsSuccessfulReading);
-									Brush brush = GetBrushForTarget(i, reading.IsSuccessfulReading);
-
-                                    if (prevPoint != PointF.Empty)
-                                    {
-                                        if (!prevReadingIsOffScreen && drawLine)
-                                            g.DrawLine(pen, prevPoint.X, prevPoint.Y, x, y);
-                                    }
-                                    else
-                                        prevPoint = new PointF();
-
-                                    prevPoint.X = x;
-                                    prevPoint.Y = y;
-
-									try
-									{
-										g.FillEllipse(brush, x - datapointFrom, y - datapointFrom, datapointSize, datapointSize);
-									}
-									catch (OverflowException)
-									{ }                                    
-                                }
-								prevReadingIsOffScreen = readingIsOffScreen;
-
-                                if (i == 0 && idx % 250 == 0)
-                                {
-                                    m_FramesIndex.Add((uint)reading.CurrFrameNo);
-                                    m_MeasurementsIndex.Add((uint)idx);
-                                }
+                            if (i == 0 && idx % 250 == 0)
+                            {
+                                m_FramesIndex.Add((uint)reading.CurrFrameNo);
+                                m_MeasurementsIndex.Add((uint)idx);
                             }
                         }
-
-                        DrawAxis(g, axisInterval, minAdjustedReading);
                     }
 
-					if (!string.IsNullOrWhiteSpace(m_LightCurveController.Context.ChartTitle))
-					{
-						SizeF sizeF = g.MeasureString(m_LightCurveController.Context.ChartTitle, s_TitleFont);
-						float x0 = (pnlChart.Width - sizeF.Width)/2;
-						float y0 = m_MinY + 4;
-						g.FillRectangle(m_DisplaySettings.BackgroundColorBrush, x0 - 2, y0 - 2, sizeF.Width + 5, sizeF.Height + 4);
-						g.DrawRectangle(m_DisplaySettings.LabelsPen, x0 - 2, y0 - 2, sizeF.Width + 5, sizeF.Height + 4);
-						g.DrawString(m_LightCurveController.Context.ChartTitle, s_TitleFont, m_DisplaySettings.LabelsBrush, x0, y0);
-					}
-
-                    g.Save();
+                    DrawAxis(g, axisInterval, minAdjustedReading);
                 }
+
+				if (!string.IsNullOrWhiteSpace(m_LightCurveController.Context.ChartTitle))
+				{
+					SizeF sizeF = g.MeasureString(m_LightCurveController.Context.ChartTitle, s_TitleFont);
+					float x0 = (pnlChart.Width - sizeF.Width)/2;
+					float y0 = m_MinY + 4;
+					g.FillRectangle(m_DisplaySettings.BackgroundColorBrush, x0 - 2, y0 - 2, sizeF.Width + 5, sizeF.Height + 4);
+					g.DrawRectangle(m_DisplaySettings.LabelsPen, x0 - 2, y0 - 2, sizeF.Width + 5, sizeF.Height + 4);
+					g.DrawString(m_LightCurveController.Context.ChartTitle, s_TitleFont, m_DisplaySettings.LabelsBrush, x0, y0);
+				}
+
+                g.Save();
             }
         }
 
@@ -1067,8 +1069,8 @@ namespace Tangra.VideoOperations.LightCurves
 									g.FillEllipse(m_DisplaySettings.SelectionCursorColorBrush, x - datapointFrom, y - datapointFrom, datapointSize, datapointSize);
 								}
 								catch (OverflowException)
-								{ }   								
-                            }                            
+								{ }
+                            }
                         }
                     }
 
@@ -1092,8 +1094,7 @@ namespace Tangra.VideoOperations.LightCurves
             using (Graphics g = pnlChart.CreateGraphics())
             {
                 g.DrawImage(m_Graph, 0, 0);
-            }                
-
+            }
         }
 
         private void PlotMeasuredPixels()
@@ -1152,7 +1153,7 @@ namespace Tangra.VideoOperations.LightCurves
 							(float)(2 * (reading.X0 - pixelsCenterX) + 17 - radius),
 							(float)(2 * (reading.Y0 - pixelsCenterY) + 17 - radius),
 							2 * radius,
-							2 * radius);                        
+							2 * radius);
 
                     g.Save();
                 }
@@ -1194,7 +1195,7 @@ namespace Tangra.VideoOperations.LightCurves
 						psfBoxes[reading.TargetNo].Visible = true;
 						PlotSingleGaussian(psfBoxes[reading.TargetNo], reading, m_LightCurveController.Context.ReProcessApertures[i], m_DisplaySettings.TargetBrushes, m_Footer.ReductionContext.BitPix);
 					}
-				}				
+				}
 			}
         }
 
@@ -1240,7 +1241,7 @@ namespace Tangra.VideoOperations.LightCurves
                 m_SelectedMeasurements = selectedMeasurements;
 				SelectMeasurement((int)(selectedMeasurements[0].CurrFrameNo - m_Header.MinFrame));
 				DisplayCurrentMeasurements();
-			}			
+			}
 	    }
 
 
@@ -1407,7 +1408,7 @@ namespace Tangra.VideoOperations.LightCurves
                     g.Save();
                 }
 
-                menuItem.Image = bmp;                
+                menuItem.Image = bmp;
             }
         }
 

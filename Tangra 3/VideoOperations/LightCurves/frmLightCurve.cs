@@ -8,7 +8,9 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using System.Media;
@@ -2655,6 +2657,12 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void miSaveAsVectorImage_Click(object sender, EventArgs e)
         {
+            if (!string.IsNullOrEmpty(m_LCFilePath) && File.Exists(m_LCFilePath))
+            {
+                saveWmfFileDialog.InitialDirectory = Path.GetDirectoryName(m_LCFilePath);
+                saveWmfFileDialog.FileName = Path.ChangeExtension(Path.GetFileName(m_LCFilePath), ".emf");
+            }
+
             if (saveWmfFileDialog.ShowDialog(this) == DialogResult.OK)
             {
                 using (var g = CreateGraphics())
@@ -2662,11 +2670,12 @@ namespace Tangra.VideoOperations.LightCurves
                     using (var img = new Metafile(saveWmfFileDialog.FileName, g.GetHdc()))
                     using (var ig = Graphics.FromImage(img))
                     {
-                        DrawGraph(ig);
+                        ig.TextRenderingHint = TextRenderingHint.AntiAlias;
+                        DrawGraphOnBitmap(ig);
                     }
 
                     g.ReleaseHdc();
-                }                
+                }
             }
         }
 	}
