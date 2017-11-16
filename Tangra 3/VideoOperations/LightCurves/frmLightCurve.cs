@@ -2672,6 +2672,14 @@ namespace Tangra.VideoOperations.LightCurves
                     {
                         ig.TextRenderingHint = TextRenderingHint.AntiAlias;
                         DrawGraphOnBitmap(ig);
+
+                        string labelTangra = "Processed with Tangra";
+                        SizeF labelTangraSize = ig.MeasureString(labelTangra, s_BrandFont);
+
+                        using (Brush brush = new SolidBrush(Color.FromArgb(20, m_DisplaySettings.LabelsColor)))
+                        {
+                            ig.DrawString(labelTangra, s_BrandFont, brush, m_MaxX - labelTangraSize.Width - 3, m_MinY - 3 - labelTangraSize.Height);
+                        } 
                     }
 
                     g.ReleaseHdc();

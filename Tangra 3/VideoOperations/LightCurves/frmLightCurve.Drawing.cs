@@ -191,7 +191,24 @@ namespace Tangra.VideoOperations.LightCurves
 					m_MeasurementsIndex.Add(0);
 					double minAdjustedReading = double.MaxValue;
 
-					for (int i = 0; i < m_Header.ObjectCount; i++)
+				    for (int i = 0; i < m_Header.ObjectCount; i++)
+				    {
+				        if (m_LightCurveController.Context.Binning > 0)
+				        {
+				            var binnedValues = m_AllBinnedReadings[i];
+				            var minAdj = binnedValues.Min(x => x.AdjustedValue);
+				            if (minAdj < minAdjustedReading) minAdjustedReading = minAdj;
+				        }
+				        else
+				        {
+				            var readings = m_LightCurveController.Context.AllReadings[i];
+                            var minAdj = readings.Min(x => x.AdjustedReading);
+                            if (minAdj < minAdjustedReading) minAdjustedReading = minAdj;
+				        }
+				    }
+                    DrawAxisByTimeStamp(g, axisInterval, minAdjustedReading);
+
+				    for (int i = 0; i < m_Header.ObjectCount; i++)
 					{
 						if (!m_IncludeObjects[i]) continue;
 
@@ -261,8 +278,6 @@ namespace Tangra.VideoOperations.LightCurves
 									/* Excluding NaN binned values */
 									continue;
 
-								if (adjustedReading < minAdjustedReading) minAdjustedReading = adjustedReading;
-
 								Pen pen = GetPenForTarget(i, reading.IsSuccessfulReading);
 								Brush brush = GetBrushForTarget(i, reading.IsSuccessfulReading);
 
@@ -294,8 +309,6 @@ namespace Tangra.VideoOperations.LightCurves
 							}
 						}
 					}
-
-                    DrawAxisByTimeStamp(g, axisInterval, minAdjustedReading);
 				}
 
 				if (!string.IsNullOrWhiteSpace(m_LightCurveController.Context.ChartTitle))
@@ -386,6 +399,24 @@ namespace Tangra.VideoOperations.LightCurves
 
                     for (int i = 0; i < m_Header.ObjectCount; i++)
                     {
+                        if (m_LightCurveController.Context.Binning > 0)
+                        {
+                            var binnedValues = m_AllBinnedReadings[i];
+                            var minAdj = binnedValues.Min(x => x.AdjustedValue);
+                            if (minAdj < minAdjustedReading) minAdjustedReading = minAdj;
+                        }
+                        else
+                        {
+                            var readings = m_LightCurveController.Context.AllReadings[i];
+                            var minAdj = readings.Min(x => x.AdjustedReading);
+                            if (minAdj < minAdjustedReading) minAdjustedReading = minAdj;
+                        }
+                    }
+
+                    DrawAxis(g, axisInterval, minAdjustedReading);
+
+                    for (int i = 0; i < m_Header.ObjectCount; i++)
+                    {
 						if (!m_IncludeObjects[i]) continue;
 
                         PointF prevPoint = PointF.Empty;
@@ -430,6 +461,7 @@ namespace Tangra.VideoOperations.LightCurves
                                 else
                                     drawThisReading = false;
 
+
                                 if (!m_DisplaySettings.DrawInvalidDataPoints && currBin != null && !currBin.IsSuccessfulReading) drawThisReading = false;
                             }
                             else
@@ -451,8 +483,6 @@ namespace Tangra.VideoOperations.LightCurves
                                 if (float.IsNaN(y) || float.IsNaN(x) || float.IsInfinity(y) || float.IsInfinity(x))
                                     /* Excluding NaN binned values */
                                     continue;
-
-                                if (minAdjustedReading > adjustedReading) minAdjustedReading = adjustedReading;
 
 								Pen pen = GetPenForTarget(i, reading.IsSuccessfulReading);
 								Brush brush = GetBrushForTarget(i, reading.IsSuccessfulReading);
@@ -484,8 +514,6 @@ namespace Tangra.VideoOperations.LightCurves
                             }
                         }
                     }
-
-                    DrawAxis(g, axisInterval, minAdjustedReading);
                 }
 
 				if (!string.IsNullOrWhiteSpace(m_LightCurveController.Context.ChartTitle))
@@ -502,6 +530,7 @@ namespace Tangra.VideoOperations.LightCurves
             }
         }
 
+        private static Font s_BrandFont = new Font(FontFamily.GenericSansSerif, 5);
         private static Font s_AxisFont = new Font(FontFamily.GenericMonospace, 9);
 		private static Font s_TitleFont = new Font(FontFamily.GenericSerif, 11, FontStyle.Bold);
 
@@ -583,11 +612,20 @@ namespace Tangra.VideoOperations.LightCurves
                     float x = m_MinX - labelSize.Width;
                     float y = m_MaxY - (i - m_Header.MinAdjustedReading) * m_ScaleY;
                     g.DrawString(label, s_AxisFont, m_DisplaySettings.LabelsBrush, x, y - labelSize.Height / 2);
-                    if (i != m_Header.MinAdjustedReading && m_DisplaySettings.DrawGrid)
-                        g.DrawLine(m_DisplaySettings.GridLinesPen, m_MinX, y, m_MaxX, y);
+                    if (i != m_Header.MinAdjustedReading)
+                    {
+                        if (m_DisplaySettings.DrawGrid)
+                            g.DrawLine(m_DisplaySettings.GridLinesPen, m_MinX, y, m_MaxX, y);
+                        else
+                        {
+                            g.DrawLine(m_DisplaySettings.GridLinesPen, m_MinX, y, m_MinX + m_StrokeLen, y);
+                            g.DrawLine(m_DisplaySettings.GridLinesPen, m_MaxX - m_StrokeLen, y, m_MaxX, y);
+                        }
+                    }
+                        
                 }
 
-                string labelFlux = "Flux";
+                string labelFlux = "AUD";
                 SizeF labelFluxSize = g.MeasureString(labelFlux, s_AxisFont);
 
                 g.DrawString(labelFlux, s_AxisFont, m_DisplaySettings.LabelsBrush, m_MinX - labelFluxSize.Width, m_MinY - labelFluxSize.Height);
@@ -615,7 +653,13 @@ namespace Tangra.VideoOperations.LightCurves
                     {
 						if (x + labelSize.Width / 2 < m_MaxX - 2 && x - labelSize.Width / 2 > m_MinX) 
 							g.DrawString(label, s_AxisFont, m_DisplaySettings.LabelsBrush, x - labelSize.Width / 2, y);
-						if (m_DisplaySettings.DrawGrid) g.DrawLine(m_DisplaySettings.GridLinesPen, x + 1, m_MinY, x + 1, m_MaxY);
+                        if (m_DisplaySettings.DrawGrid)
+                            g.DrawLine(m_DisplaySettings.GridLinesPen, x + 1, m_MinY, x + 1, m_MaxY);
+                        else
+                        {
+                            g.DrawLine(m_DisplaySettings.GridLinesPen, x + 1, m_MinY, x + 1, m_MinY + m_StrokeLen);
+                            g.DrawLine(m_DisplaySettings.GridLinesPen, x + 1, m_MaxY - m_StrokeLen, x + 1, m_MaxY);
+                        }
                     }
                 }
 			}
@@ -644,7 +688,13 @@ namespace Tangra.VideoOperations.LightCurves
                                 float x = m_MinX + (currAxisPosTicks - m_MinDisplayedFrameTimestampTicks) * m_TimestampScaleX;
                                 float y = m_MaxY + 5;
 
-								if (m_DisplaySettings.DrawGrid) g.DrawLine(m_DisplaySettings.GridLinesPen, x + 1, m_MinY, x + 1, m_MaxY);
+								if (m_DisplaySettings.DrawGrid) 
+                                    g.DrawLine(m_DisplaySettings.GridLinesPen, x + 1, m_MinY, x + 1, m_MaxY);
+                                else
+                                {
+                                    g.DrawLine(m_DisplaySettings.GridLinesPen, x + 1, m_MinY, x + 1, m_MinY + m_StrokeLen);
+                                    g.DrawLine(m_DisplaySettings.GridLinesPen, x + 1, m_MaxY - m_StrokeLen, x + 1, m_MaxY);
+                                }
 
 								if (x + labelSize.Width / 2 < m_MaxX - 2 && x - labelSize.Width / 2 > m_MinX) 
                                     g.DrawString(label, s_AxisFont, m_DisplaySettings.LabelsBrush, x - labelSize.Width / 2, y);
@@ -721,11 +771,19 @@ namespace Tangra.VideoOperations.LightCurves
                     float x = m_MinX - labelSize.Width;
                     float y = m_MaxY - (i - m_Header.MinAdjustedReading) * m_ScaleY;
                     g.DrawString(label, s_AxisFont, m_DisplaySettings.LabelsBrush, x, y - labelSize.Height / 2);
-                    if (i != m_Header.MinAdjustedReading && m_DisplaySettings.DrawGrid)
-                        g.DrawLine(m_DisplaySettings.GridLinesPen, m_MinX, y, m_MaxX, y);
+                    if (i != m_Header.MinAdjustedReading)
+                    {
+                        if (m_DisplaySettings.DrawGrid)
+                            g.DrawLine(m_DisplaySettings.GridLinesPen, m_MinX, y, m_MaxX, y);
+                        else
+                        {
+                            g.DrawLine(m_DisplaySettings.GridLinesPen, m_MinX, y, m_MinX + m_StrokeLen, y);
+                            g.DrawLine(m_DisplaySettings.GridLinesPen, m_MaxX - m_StrokeLen, y, m_MaxX, y);
+                        }
+                    }                        
                 }
 
-                string labelFlux = "Flux";
+                string labelFlux = "AUD";
                 SizeF labelFluxSize = g.MeasureString(labelFlux, s_AxisFont);
 
                 g.DrawString(labelFlux, s_AxisFont, m_DisplaySettings.LabelsBrush, m_MinX - labelFluxSize.Width, m_MinY - labelFluxSize.Height);
@@ -749,7 +807,13 @@ namespace Tangra.VideoOperations.LightCurves
 
 					if (firstMark != m_MinDisplayedFrame && x < m_MaxX)
 					{
-						if (m_DisplaySettings.DrawGrid) g.DrawLine(m_DisplaySettings.GridLinesPen, x + 1, m_MinY, x + 1, m_MaxY);
+						if (m_DisplaySettings.DrawGrid) 
+                            g.DrawLine(m_DisplaySettings.GridLinesPen, x + 1, m_MinY, x + 1, m_MaxY);
+						else
+						{
+                            g.DrawLine(m_DisplaySettings.GridLinesPen, x + 1, m_MinY, x + 1, m_MinY + m_StrokeLen);
+                            g.DrawLine(m_DisplaySettings.GridLinesPen, x + 1, m_MaxY - m_StrokeLen, x + 1, m_MaxY);
+						}
 
 						if (x + labelSize.Width / 2 < m_MaxX - 2 && x - labelSize.Width / 2 > m_MinX) 
                             g.DrawString(label, s_AxisFont, m_DisplaySettings.LabelsBrush, x - labelSize.Width / 2, y);
@@ -781,7 +845,13 @@ namespace Tangra.VideoOperations.LightCurves
 
 								if (x + labelSize.Width / 2 < m_MaxX - 2 && x - labelSize.Width / 2 > m_MinX) 
 									g.DrawString(label, s_AxisFont, m_DisplaySettings.LabelsBrush, x - labelSize.Width / 2, y);
-								if (m_DisplaySettings.DrawGrid) g.DrawLine(m_DisplaySettings.GridLinesPen, x + 1, m_MinY, x + 1, m_MaxY);
+								if (m_DisplaySettings.DrawGrid) 
+                                    g.DrawLine(m_DisplaySettings.GridLinesPen, x + 1, m_MinY, x + 1, m_MaxY);
+								else
+								{
+                                    g.DrawLine(m_DisplaySettings.GridLinesPen, x + 1, m_MinY, x + 1, m_MinY + m_StrokeLen);
+                                    g.DrawLine(m_DisplaySettings.GridLinesPen, x + 1, m_MaxY - m_StrokeLen, x + 1, m_MaxY);
+								}
                             }
                         }
 

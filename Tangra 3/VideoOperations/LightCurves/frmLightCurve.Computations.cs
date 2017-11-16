@@ -48,6 +48,7 @@ namespace Tangra.VideoOperations.LightCurves
 
         private int m_MinX = 45;
         private int m_MinY = 25;
+        private int m_StrokeLen = 6;
         private int m_MaxY, m_MaxX;
 
         private void ReComputeSignalSeries()
