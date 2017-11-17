@@ -625,7 +625,7 @@ namespace Tangra.VideoOperations.LightCurves
                         
                 }
 
-                string labelFlux = "AUD";
+                string labelFlux = "ADU";
                 SizeF labelFluxSize = g.MeasureString(labelFlux, s_AxisFont);
 
                 g.DrawString(labelFlux, s_AxisFont, m_DisplaySettings.LabelsBrush, m_MinX - labelFluxSize.Width, m_MinY - labelFluxSize.Height);
@@ -783,7 +783,7 @@ namespace Tangra.VideoOperations.LightCurves
                     }                        
                 }
 
-                string labelFlux = "AUD";
+                string labelFlux = "ADU";
                 SizeF labelFluxSize = g.MeasureString(labelFlux, s_AxisFont);
 
                 g.DrawString(labelFlux, s_AxisFont, m_DisplaySettings.LabelsBrush, m_MinX - labelFluxSize.Width, m_MinY - labelFluxSize.Height);
