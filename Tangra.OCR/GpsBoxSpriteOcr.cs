@@ -816,6 +816,11 @@ namespace Tangra.OCR
                     }
                     if (confirmedOsdLinesInFrame.Count > 0)
                     {
+                        //var combined10FramesRaw = m_VideoController.FramePlayer.GetIntegratedFrame(frameNo, 10, false, false);
+                        //combined10FramesRaw.DisplayBitmap.Save(@"C:\Work\combined.bmp");
+                        //var data10 = PreProcessImageForOCR(frameNo, combined10FramesRaw.Pixels, m_TopMostLine, m_BottomMostLine);
+                        //var subPixel10Data = new SubPixelImage(data10, m_ImageWidth, m_ImageHeight);
+
                         var osdLineConfigs = RefineOsdLinePositions(subPixelData, confirmedOsdLinesInFrame.ToArray(), minWhiteLevel);
                         if (osdLineConfigs != null) detectedOsdLines.AddRange(osdLineConfigs);
                     }
