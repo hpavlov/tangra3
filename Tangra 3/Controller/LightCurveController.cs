@@ -218,7 +218,6 @@ namespace Tangra.Controller
                     m_LightCurveForm.SetGeoLocation(m_VideoController.GeoLocation);
                     m_LightCurveForm.Show(m_MainFormView);
                     m_LightCurveForm.Update();
-                    TangraContext.Current.HasLightCurveLoaded = true;
 
                     // TODO: Review the VideoController-LightCurveController-ReduceLightCurveOperation relation and how they are initialized
                     // TODO: Provide a clean way of initializing the controller/operation state when opening an .lc file!

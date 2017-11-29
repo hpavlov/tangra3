@@ -471,6 +471,8 @@ namespace Tangra.VideoOperations.LightCurves
 	        miExportNTPDebugData.Visible =
 		        m_LCFile.FrameTiming.Count > 0 &&
 		        m_LCFile.FrameTiming[0].FrameMidTimeNTPRaw.HasValue;
+
+            TangraContext.Current.HasLightCurveLoaded = true;
         }
 
 		private string ExplainTrackingType(TrackingType type)
