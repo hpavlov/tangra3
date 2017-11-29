@@ -603,6 +603,7 @@ namespace Tangra.Controller
             m_NumberFailedOcredVtiOsdFrames = 0;
 
             if (IsVideoWithVtiOsdTimeStamp &&
+                !TangraContext.Current.UsingIntegration && // OCR not supported when using software integration
                 (TangraConfig.Settings.Generic.OsdOcrEnabled || TangraConfig.Settings.Generic.OcrAskEveryTime))
             {
                 bool forceSaveErrorReport = false;
