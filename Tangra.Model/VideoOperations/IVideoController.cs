@@ -6,6 +6,7 @@ using System.Text;
 using System.Windows.Forms;
 using Tangra.Model.Astro;
 using Tangra.Model.Image;
+using Tangra.Model.Video;
 
 namespace Tangra.Model.VideoOperations
 {
@@ -50,5 +51,7 @@ namespace Tangra.Model.VideoOperations
 
         void RegisterExtractingOcrTimestamps();
 		void RegisterOcrError();
+
+        IFramePlayer FramePlayer { get; }
     }
 }

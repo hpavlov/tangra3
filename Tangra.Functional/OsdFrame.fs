@@ -17,7 +17,11 @@ type SubPixelCalc (width, height, pixels: uint32[]) =
         let yFactor = (1M - (yf - (decimal)y))
         let y1Factor = (yf - (decimal)y)
 
-        let sum = (decimal)this.Pixels.[x + this.Width * y] * xFactor * yFactor + (decimal)this.Pixels.[x1 + this.Width * y] * x1Factor * yFactor + (decimal)this.Pixels.[x + this.Width * y1] * xFactor * y1Factor + (decimal)this.Pixels.[x1 + this.Width * y1] * x1Factor * y1Factor
+        let sum = 
+            (decimal)this.Pixels.[x + this.Width * y] * xFactor * yFactor + 
+            (decimal)this.Pixels.[x1 + this.Width * y] * x1Factor * yFactor + 
+            (decimal)this.Pixels.[x + this.Width * y1] * xFactor * y1Factor + 
+            (decimal)this.Pixels.[x1 + this.Width * y1] * x1Factor * y1Factor
         sum
 
 type CostDelegate = delegate of decimal * decimal -> decimal
