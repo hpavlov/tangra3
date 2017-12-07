@@ -1,8 +1,9 @@
 ﻿Tangra3 Release Notes
 ---------------------
-vNext (xxxx-xx-xx)
+vNext (2017-12-07)
 - Upgraded to .NET Framework 4.5
-- Made it possible to export a light curve as a vector graphic (EMF format)
+- Made it possible to export a light curve as a vector graphic (EMF format).
+- Minor stability improvements.
 
 v3.6.13 (2017-11-03)
 - Disabled further updates on system running Windows XP in a preparation for upgrade to .NET 4.5
