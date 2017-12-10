@@ -398,11 +398,12 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
 
                         //          1         2         3         4         5         6         7         8
                         //0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
-                        //      K15FB7W  n2015 04 01.51040713 03 21.038 -41 43 17.18          13.5 R      E28 0.12 0.12
+                        //     K15FB7W  n2015 04 01.51040713 03 21.038 -41 43 17.18          13.5 R      E28 0.12 0.12
+                        //        3200  n2017 12 06.78359306 15 58.559 +41 46 52.33          11.9 R      619 0.10 0.10
 
                         lineToAdd = 
                             line.Substring(0, 38) +
-                            double.Parse(line.Substring(39, 6), CultureInfo.InvariantCulture).ToString("00.00") + 
+                            double.Parse(line.Substring(38, 6), CultureInfo.InvariantCulture).ToString("00.00") + 
                             line.Substring(44, 8) +
                             double.Parse(line.Substring(52, 5), CultureInfo.InvariantCulture).ToString("00.0") + 
                             line.Substring(57);
