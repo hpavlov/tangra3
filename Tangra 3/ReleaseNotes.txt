@@ -1,6 +1,10 @@
 ﻿Tangra3 Release Notes
 ---------------------
-vNext (2017-12-07)
+vNext (xxxx-xx-xx)
+- Fixed a problem where if positions with high precision are used in Fast Motion Astrometry, the line exported to an MPC report will have bad RA.
+- Fixed a problem where Fast Motion Astrometry will incorrectly form an MPC report line for numbered asteroids.
+
+v3.6.14 (2017-12-07)
 - Upgraded to .NET Framework 4.5
 - Made it possible to export a light curve as a vector graphic (EMF format).
 - Minor stability improvements.

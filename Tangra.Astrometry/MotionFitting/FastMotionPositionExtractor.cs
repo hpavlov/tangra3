@@ -647,7 +647,7 @@ namespace Tangra.MotionFitting
         internal string GetReport(string obsCode, string designation, DateTime obsDate, double normalTime)
         {
             MPCObsLine obsLine = new MPCObsLine(obsCode.PadLeft(3).Substring(0, 3));
-            obsLine.SetObject(designation.PadLeft(12).Substring(0, 12));
+            obsLine.SetObject(MPCObsLine.GetObjectCode(designation) ?? "            ");
 
             if (m_RegressionRA != null && m_RegressionDE != null)
             {
