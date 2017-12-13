@@ -1,6 +1,6 @@
 ﻿Tangra3 Release Notes
 ---------------------
-vNext (xxxx-xx-xx)
+v3.6.15 (2017-12-13)
 - Fixed a problem where if positions with high precision are used in Fast Motion Astrometry, the line exported to an MPC report will have a bad RA.
 - Fixed a problem where Fast Motion Astrometry will incorrectly form an MPC report line for numbered asteroids.
 - Fixed a crash during Astrometry which could happen if there are very small number of stars in the FOV.
