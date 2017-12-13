@@ -437,6 +437,9 @@ namespace Tangra.Model.Astro
 
 	    public StarMapFeature AppendFeature(int x, int y)
 	    {
+            // When appending a feature, make sure that there will be no gap in the FeatureIds
+            m_FeatureId = FeaturesCount;
+
             StarMapFeature feature = new StarMapFeature(m_FeatureId, m_Pixelmap.Width);
 
             m_FeatureId++;
