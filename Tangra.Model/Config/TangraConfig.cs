@@ -543,7 +543,7 @@ namespace Tangra.Model.Config
             public double ToleranceMinValueFullDisappearance = 1.0;
             public double ToleranceMinValue = 2.0;
 
-            public float MaxAllowedTimestampShiftInMs = 5.0f;
+            public float MaxAllowedTimestampShiftInMilliSecs = 20.0f;
             public float TimesHigherPositionToleranceForFullyOccultedStars = 2.0f;
             public float PalNtscFrameRateDifference = 0.0025f;
 
