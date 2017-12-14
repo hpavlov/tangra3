@@ -363,7 +363,7 @@ namespace Tangra.VideoOperations.LightCurves
                     string videoSystem;
                     double timeDelta = m_Header.GetAbsoluteTimeDeltaInMilliseconds(out videoSystem);
 
-                    m_TimestampDiscrepencyFlag = Math.Abs(timeDelta) > TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMs;
+                    m_TimestampDiscrepencyFlag = Math.Abs(timeDelta) > TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMilliSecs;
 
                     if (m_TimestampDiscrepencyFlag)
                     {

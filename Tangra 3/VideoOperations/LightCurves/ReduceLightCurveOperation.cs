@@ -1552,12 +1552,12 @@ namespace Tangra.VideoOperations.LightCurves
         public DialogResult EnteredTimeIntervalLooksOkay()
         {
 			if (m_VideoController.IsAstroAnalogueVideo && !m_VideoController.AstroAnalogueVideoHasOcrOrNtpData)
-		        return CheckAavRate();
+                return CheckAavRate(m_VideoController.GetVideoFileFormat());
 	        else
 		        return CheckPALOrNTSCRate();
         }
 
-		public DialogResult CheckAavRate()
+		public DialogResult CheckAavRate(VideoFileFormat videoFileFormat)
 	    {
             int totalIntegratedFrames = 0;
 
@@ -1582,16 +1582,27 @@ namespace Tangra.VideoOperations.LightCurves
 			double videoTimeInSecPAL = totalIntegratedFrames / 25.0;
 			double videoTimeInSecNTSC = totalIntegratedFrames / 29.97;
 
-			bool isTimeOk =
-				(videoTimeInSecPAL > 0 && Math.Abs((videoTimeInSecPAL - ts.TotalSeconds) * 1000) < TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMs) ||
-				(videoTimeInSecNTSC > 0 && Math.Abs((videoTimeInSecNTSC - ts.TotalSeconds) * 1000) < TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMs);
+            bool isTimeOk = false;
+            double timeDiscrepancy = 0;
+            string nativeFormat = m_VideoController.GetVideoFormat(videoFileFormat);
+            if (nativeFormat == "PAL")
+            {
+                timeDiscrepancy = Math.Abs((videoTimeInSecPAL - ts.TotalSeconds) * 1000);
+                isTimeOk = (videoTimeInSecPAL > 0 && timeDiscrepancy < TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMilliSecs);
+            }
+            else if (nativeFormat == "PAL")
+            {
+                timeDiscrepancy = Math.Abs((videoTimeInSecNTSC - ts.TotalSeconds) * 1000);
+                isTimeOk = (videoTimeInSecNTSC > 0 && timeDiscrepancy < TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMilliSecs);
+            }
 
 			if (!isTimeOk)
 			{
-				if (MessageBox.Show(
-					string.Format("The time computed from the measured number of frames in this AAV video is off by more than {0} ms from the entered time. This may indicate " +
+				if (MessageBox.Show(string.Format(
+                    "The time computed from the measured number of frames in this {0} AAV video is off by {1} ms from the entered time. This may indicate " +
 					"incorrectly entered start or end time or an almanac update or a leap second event. Do you want to enter the start and end times again?",
-					(TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMs).ToString("0.00")),
+                    nativeFormat,
+                    timeDiscrepancy.ToString("0.00")),
 					"Warning",
 					MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
 				{
@@ -1626,12 +1637,12 @@ namespace Tangra.VideoOperations.LightCurves
 			TimeSpan ts = new TimeSpan(Math.Abs(m_EndFrameTime.Ticks - m_StartFrameTime.Ticks)/*Taking ABS to handle backwards measuring*/);
 			double videoTimeInSec = (m_EndTimeFrame - m_StartTimeFrame) / acceptedVideoFrameRate;
 
-			if (m_VideoController.IsPlainAviVideo && (videoTimeInSec < 0 || Math.Abs((videoTimeInSec - ts.TotalSeconds) * 1000) > TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMs))
+            if (m_VideoController.IsPlainAviVideo && (videoTimeInSec < 0 || Math.Abs((videoTimeInSec - ts.TotalSeconds) * 1000) > TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMilliSecs))
 			{
 				if (MessageBox.Show(
 					string.Format("The time computed from the measured number of frames in this {1} video is off by more than {0} ms from the entered time. This may indicate " +
 					"incorrectly entered start or end time or an almanac update or a leap second event. Do you want to enter the start and end times again?",
-					(TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMs).ToString("0.00"),
+                    (TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMilliSecs).ToString("0.00"),
 					videoType),
 					"Warning",
 					MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
