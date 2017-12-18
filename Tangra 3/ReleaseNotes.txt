@@ -1,5 +1,8 @@
 ﻿Tangra3 Release Notes
 ---------------------
+vNext (xxxx-xx-xx)
+- Fixed a critical bug in the AVI-to-AAV conversion that leads to an incorrectly determined frame rate in a following AAV-to-FITS conversion.
+
 v3.6.15 (2017-12-13)
 - Fixed a problem where if positions with high precision are used in Fast Motion Astrometry, the line exported to an MPC report will have a bad RA.
 - Fixed a problem where Fast Motion Astrometry will incorrectly form an MPC report line for numbered asteroids.
