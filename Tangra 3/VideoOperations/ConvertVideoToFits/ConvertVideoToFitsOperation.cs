@@ -210,11 +210,22 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
         public DialogResult CheckAavRate(VideoFileFormat videoFileFormat)
         {
             int totalIntegratedFrames = 0;
-            for (int i = m_StartTimeFrame; i < m_EndTimeFrame; i++)
+            m_VideoController.SetPictureBoxCursor(Cursors.WaitCursor);
+            m_VideoController.NotifyFileProgress(-1, m_EndTimeFrame - m_StartTimeFrame);
+            try
             {
-                FrameStateData frameState = m_VideoController.GetFrameStateData(i);
+                for (int i = m_StartTimeFrame; i < m_EndTimeFrame; i++)
+                {
+                    FrameStateData frameState = m_VideoController.GetFrameStateData(i);
 
-                totalIntegratedFrames += frameState.NumberIntegratedFrames.Value;
+                    totalIntegratedFrames += frameState.NumberIntegratedFrames.Value;
+                    m_VideoController.NotifyFileProgress(i, m_EndTimeFrame - m_StartTimeFrame);
+                }
+            }
+            finally
+            {
+                m_VideoController.NotifyFileProgress(-1, 0);
+                m_VideoController.SetPictureBoxCursor(Cursors.Default);
             }
 
             // The actual integration could even be of PAL or NTSC frames
