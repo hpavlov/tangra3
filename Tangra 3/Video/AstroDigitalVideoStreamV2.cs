@@ -310,9 +310,12 @@ namespace Tangra.Video
                 rv.NumberIntegratedFrames = 0;
                 rv.NumberStackedFrames = m_StackingRate;
 
-                if (m_AAVVersion > 0 && frameInfo.Status.ContainsKey("IntegratedFrames"))
+                if (m_AAVVersion > 0)
                 {
-                    rv.NumberIntegratedFrames = int.Parse(frameInfo.Status["IntegratedFrames"].ToString());
+                    if (frameInfo.Status.ContainsKey("IntegratedFrames"))
+                        rv.NumberIntegratedFrames = int.Parse(frameInfo.Status["IntegratedFrames"].ToString());
+                    else if (frameInfo.Status.ContainsKey("FRAMES-IN-INTERVAL"))
+                        rv.NumberIntegratedFrames = int.Parse(frameInfo.Status["FRAMES-IN-INTERVAL"].ToString());
                 }
 
                 int almanacStatus = frameInfo.GPSAlmanacStatus;

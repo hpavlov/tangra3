@@ -67,7 +67,7 @@ namespace Tangra.Controller
             m_CurrAavFramePixels = new ushort[m_Width * m_Height];
 
             m_FileName = fileName;
-            m_MaxPixelValue = 0xFF * integrationInterval;
+            m_MaxPixelValue = 0x100 * integrationInterval;
 
             m_FirstVtiOsdLine = topVtiOsdRow;
             m_LastVtiOsdLine = bottomVtiOsdRow;
@@ -122,6 +122,7 @@ namespace Tangra.Controller
             m_Recorder.StatusSectionConfig.AddDefineTag("FRAMES-IN-INTERVAL", Adv2TagType.Int8);
             m_Recorder.StatusSectionConfig.AddDefineTag("NOISE-SIGNATURES", Adv2TagType.UTF8String);
             m_Recorder.StatusSectionConfig.AddDefineTag("ORIGINAL-FRAME-ID", Adv2TagType.Int32);
+            m_Recorder.StatusSectionConfig.AddDefineTag("IntegratedFrames", Adv2TagType.Int8);
 
             m_Recorder.StartRecordingNewFile(m_FileName, 0, true);
             
@@ -141,7 +142,7 @@ namespace Tangra.Controller
                     pixels = frame.Pixels.Select(x => (ushort)(integrationInterval * x)).ToArray();
                     m_Recorder.AddCalibrationFrame(pixels, true,
                         PreferredCompression.Lagarith16,
-                        new AdvRecorder.AdvStatusEntry() { AdditionalStatusTags = new[] { "VTI-OSD-CALIBRATION", (object)(byte)0, string.Empty, (object)i } },
+                        new AdvRecorder.AdvStatusEntry() { AdditionalStatusTags = new[] { "VTI-OSD-CALIBRATION", (object)(byte)0, string.Empty, (object)i, (object)(byte)0 } },
                         Adv.AdvImageData.PixelDepth16Bit);
 
                     m_VideoController.NotifyFileProgress(i - currFrame, 16);
@@ -152,7 +153,7 @@ namespace Tangra.Controller
                 pixels = frame.Pixels.Select(x => (ushort)(integrationInterval * x)).ToArray();
                 m_Recorder.AddCalibrationFrame(pixels, true,
                     PreferredCompression.Lagarith16,
-                    new AdvRecorder.AdvStatusEntry() { AdditionalStatusTags = new[] { "FIELD-CALIBRATION", (object)(byte)0, string.Empty, (object)m_FirstIntegrationPeriodStartFrameId } },
+                    new AdvRecorder.AdvStatusEntry() { AdditionalStatusTags = new[] { "FIELD-CALIBRATION", (object)(byte)0, string.Empty, (object)m_FirstIntegrationPeriodStartFrameId, (object)(byte)0 } },
                     Adv.AdvImageData.PixelDepth16Bit);
             }
             finally
@@ -376,7 +377,7 @@ namespace Tangra.Controller
 
                 m_Recorder.AddVideoFrame(m_CurrAavFramePixels, true,
                     PreferredCompression.Lagarith16,
-                    new AdvRecorder.AdvStatusEntry() { SystemErrors = errors, AdditionalStatusTags = new[] { "DATA", (object)(byte)m_FramesSoFar, noiseSignatures, (object)(int)0 } },
+                    new AdvRecorder.AdvStatusEntry() { SystemErrors = errors, AdditionalStatusTags = new[] { "DATA", (object)(byte)m_FramesSoFar, noiseSignatures, (object)(int)0, (object)(byte)m_FramesSoFar } },
                     Adv.AdvImageData.PixelDepth16Bit);
 
                 for (int i = 0; i < m_CurrAavFramePixels.Length; i++) 
