@@ -61,6 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CalibratedPhotometry\TestPhotometry.cs" />
     <Compile Include="Calibration\TestStar.cs" />
     <Compile Include="Calibration\TestThreeStarFit.cs" />
     <Compile Include="FITS\TestFitsNegativePixelHandling.cs" />
