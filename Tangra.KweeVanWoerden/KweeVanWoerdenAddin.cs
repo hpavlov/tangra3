@@ -53,7 +53,7 @@ namespace Tangra.KweeVanWoerden
 			}
 			catch (Exception ex)
 			{
-				Trace.WriteLine(ex.ToString());
+                Trace.WriteLine(string.Format("Error deserializing settings string '{0}': {1}", serializedSettings, ex.ToString()));
 			}
 
 			return new KweeVanWoerdenAddinSettings();
