@@ -1,7 +1,12 @@
-﻿#load "OsdFrame.fs"
+﻿#I @"..\packages"
+#load @"FSharp.Charting.0.91.1\FSharp.Charting.fsx"
+#load "OsdFrame.fs"
+
 open Tangra.Functional 
 open System.IO
 open System
+
+open FSharp.Charting
 
 let loadSingleLineFrame (rdr:BinaryReader) (top:int16) = 
     let bottom = rdr.ReadDecimal()
@@ -32,6 +37,9 @@ let frames path fromIdx toIdx =
 
 let trainSet = frames @"C:\Work\Tangra3\OcrTester\AutomatedTestingImages\PixelExport\" 0 26
 //let validateSet = frames @"C:\Work\Tangra3\OcrTester\AutomatedTestingImages\PixelExport\" 0 26
+
+let points = trainSet |> Array.mapi (fun i x -> (float i, float (x.FindWidth x.Left)))
+points |> Chart.Point
 
 let testStartingWidth (propFun:OsdFrame -> decimal) = 
     [| for i in 0 .. 26 -> i |]
