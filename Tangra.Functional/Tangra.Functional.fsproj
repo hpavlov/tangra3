@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Tangra.Functional</RootNamespace>
     <AssemblyName>Tangra.Functional</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Name>Tangra.Functional</Name>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -39,8 +39,14 @@
   <ItemGroup>
     <Compile Include="OsdFrame.fs" />
     <None Include="GpsBoxSpriteWorkbench.fsx" />
+    <None Include="packages.config" />
+    <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="FSharp.Charting">
+      <HintPath>..\packages\FSharp.Charting.0.91.1\lib\net45\FSharp.Charting.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <Private>True</Private>
