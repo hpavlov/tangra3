@@ -1,6 +1,10 @@
 ﻿#I @"..\packages"
 #load @"FSharp.Charting.0.91.1\FSharp.Charting.fsx"
-#load "OsdFrame.fs"
+#load "SubPixelCalc.fs"
+
+open Tangra.Functional 
+
+#load "OsdLocator.fs"
 
 open Tangra.Functional 
 open System.IO
@@ -13,7 +17,7 @@ let loadSingleLineFrame (rdr:BinaryReader) (top:int16) =
     let width = rdr.ReadInt32()
     let height = rdr.ReadInt32()
     let pix = [| for i in 1 .. width * height -> rdr.ReadUInt32() |]
-    OsdFrame(width, height, [|1, 2|] |> Array.map (fun x -> (decimal top, bottom)), pix)
+    OsdLocator(width, height, [|1, 2|] |> Array.map (fun x -> (decimal top, bottom)), pix)
 
 let loadMutipleLineFrame (rdr:BinaryReader) =
     let width = rdr.ReadInt32()
@@ -21,7 +25,7 @@ let loadMutipleLineFrame (rdr:BinaryReader) =
     let lines = rdr.ReadInt32()
     let osdLines = [| for i in 1 .. lines -> i |] |> Array.map (fun x -> rdr.ReadDecimal(),rdr.ReadDecimal())    
     let pix = [| for i in 1 .. width * height -> rdr.ReadUInt32() |]
-    OsdFrame(width, height, osdLines, pix)   
+    OsdLocator(width, height, osdLines, pix)   
 
 let loadFrame (filePath : string) =
     let fs = new FileStream(filePath, FileMode.Open)
@@ -38,20 +42,26 @@ let frames path fromIdx toIdx =
 let trainSet = frames @"C:\Work\Tangra3\OcrTester\AutomatedTestingImages\PixelExport\" 0 26
 //let validateSet = frames @"C:\Work\Tangra3\OcrTester\AutomatedTestingImages\PixelExport\" 0 26
 
-let points = trainSet |> Array.mapi (fun i x -> (float i, float (x.FindWidth x.Left)))
-points |> Chart.Point
+//let points = trainSet |> Array.mapi (fun i x -> (float i, float (x.FindWidth x.Left)))
+let points = 
+    trainSet
+    |> Array.mapi (fun i x -> i, x.StartingWidth 0 0) 
+    //|> Array.mapi (fun i x -> i, x.Left) 
+    |> Array.map (fun x -> (fst x, snd x)) 
+points |> Chart.Line
 
-let testStartingWidth (propFun:OsdFrame -> decimal) = 
+let testStartingWidth (propFun:OsdLocator -> decimal) = 
     [| for i in 0 .. 26 -> i |]
     |> Array.map (fun i -> i,propFun trainSet.[i])
     |> Seq.groupBy snd
     |> Seq.map (fun (k, v) -> k, v |> Seq.length)
     |> Array.ofSeq
 
-let compareStartingWidth (propFun1:OsdFrame -> decimal) (propFun2:OsdFrame -> decimal) = 
+let compareStartingWidth (propFun1:OsdLocator -> decimal) (propFun2:OsdLocator -> decimal) = 
     [| for i in 0 .. 26 -> i |]
     |> Array.map (fun i -> printfn "%i %f %f" i (propFun1 trainSet.[i]) (propFun2 trainSet.[i]))
 
+(*
 let compare st en = 
     let data = 
         [| for i in st .. en -> i |]
@@ -98,4 +108,4 @@ let computeLFAll st en =
         |> Seq.map (fun i -> i,computeLF i)
     for x in data do
         printfn "%d %f" (fst x) (snd x)
-    
+*)    
