@@ -218,6 +218,23 @@ namespace Tangra.Video
             }
         }
 
+        public int GetNumberOfOcrCalibrationFrames()
+        {
+            int osdCalFrames = 0;
+            for (uint i = 0; i < m_AdvFile.CalibrationSteamInfo.FrameCount; i++)
+            {
+                Adv.AdvFrameInfo advFrameInfo;
+                lock (m_SyncLock)
+                {
+                    m_AdvFile.GetCalibrationFramePixels(i, out advFrameInfo);
+                }
+                if (advFrameInfo.Status.ContainsKey("FRAME-TYPE") && Convert.ToString(advFrameInfo.Status["FRAME-TYPE"]) == "VTI-OSD-CALIBRATION")
+                    osdCalFrames++;
+            }
+
+            return osdCalFrames;
+        }
+
         public int AstroAnalogueVideoNormaliseNtpDataIfNeeded(Action<int> progressCallback, out float oneSigmaError)
         {
             int ntpError = -1;
@@ -355,7 +372,7 @@ namespace Tangra.Video
                 return new FrameStateData();
         }
 
-        public FrameStateData GetFrameStatusChannel(int index)
+        public FrameStateData GetFrameStatusChannel(int index, int stream = 0)
         {
             if (index >= m_FirstFrame + m_CountFrames)
                 throw new ApplicationException("Invalid frame position: " + index);
@@ -363,7 +380,10 @@ namespace Tangra.Video
             Adv.AdvFrameInfo advFrameInfo;
             lock (m_SyncLock)
             {
-                m_AdvFile.GetMainFramePixels((uint) index, out advFrameInfo);
+                if (stream == 0)
+                    m_AdvFile.GetMainFramePixels((uint) index, out advFrameInfo);
+                else
+                    m_AdvFile.GetCalibrationFramePixels((uint)index, out advFrameInfo);
             }
 
             return GetCurrentFrameState(advFrameInfo);

@@ -700,7 +700,7 @@ namespace Tangra.OCR
 
         public void AddErrorImage(string fileName, uint[] pixels, int width, int height)
         {
-            m_CalibrationImages.Add(fileName, Tuple.Create(pixels, width, height));
+            m_CalibrationImages[fileName] = Tuple.Create(pixels, width, height);
         }
 
         public void AddErrorText(string error)

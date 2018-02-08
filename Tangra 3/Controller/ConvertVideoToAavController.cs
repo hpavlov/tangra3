@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using Adv;
 using Tangra.Helpers;
 using Tangra.Model.Astro;
+using Tangra.Model.Config;
 using Tangra.Model.Context;
 using Tangra.Model.Helpers;
 using Tangra.Model.Image;
@@ -127,15 +128,16 @@ namespace Tangra.Controller
             m_Recorder.StartRecordingNewFile(m_FileName, 0, true);
             
             int currFrame = m_VideoController.CurrentFrameIndex;
+            int maxOcrCalibrationFramesToSave = TangraConfig.Settings.Generic.MaxCalibrationFieldsToAttempt;
             try
             {
                 m_VideoController.SetPictureBoxCursor(Cursors.WaitCursor);
-                m_VideoController.NotifyFileProgress(-1, 16);
+                m_VideoController.NotifyFileProgress(-1, maxOcrCalibrationFramesToSave);
 
                 Pixelmap frame;
                 ushort[] pixels;
 
-                for (int i = currFrame; i < Math.Min(currFrame + 16, m_VideoController.VideoLastFrame); i++)
+                for (int i = currFrame; i < Math.Min(currFrame + maxOcrCalibrationFramesToSave, m_VideoController.VideoLastFrame); i++)
                 {
                     frame = m_VideoController.GetFrame(i);
 
@@ -145,7 +147,7 @@ namespace Tangra.Controller
                         new AdvRecorder.AdvStatusEntry() { AdditionalStatusTags = new[] { "VTI-OSD-CALIBRATION", (object)(byte)0, string.Empty, (object)i, (object)(byte)0 } },
                         Adv.AdvImageData.PixelDepth16Bit);
 
-                    m_VideoController.NotifyFileProgress(i - currFrame, 16);
+                    m_VideoController.NotifyFileProgress(i - currFrame, maxOcrCalibrationFramesToSave);
                 }
 
                 frame = m_VideoController.GetFrame(m_FirstIntegrationPeriodStartFrameId);

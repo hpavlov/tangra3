@@ -640,7 +640,10 @@ namespace Tangra.Controller
 #endif
 );
 
-                    int maxCalibrationFieldsToAttempt = TangraConfig.Settings.Generic.MaxCalibrationFieldsToAttempt;
+                    int maxCalibrationFieldsToAttempt = Math.Min(VideoLastFrame - CurrentFrameIndex - 1, TangraConfig.Settings.Generic.MaxCalibrationFieldsToAttempt);
+                    if (m_FramePlayer.IsAstroAnalogueVideoV2)
+                        // Make sure we are not trying to read more AAV OCR calibration frames than what's available                         
+                        maxCalibrationFieldsToAttempt = Math.Min(((AstroDigitalVideoStreamV2)m_FramePlayer.Video).GetNumberOfOcrCalibrationFrames(), maxCalibrationFieldsToAttempt);
 
                     if (m_TimestampOCR.RequiresCalibration)
                     {
@@ -652,7 +655,7 @@ namespace Tangra.Controller
                             : (m_FramePlayer.IsAstroAnalogueVideoV2 ? 0 : CurrentFrameIndex);
 
                         var pixels = GetOsdCalibrationFrame(firstCalibrationFrame);
-                        m_TimestampOCR.ProcessCalibrationFrame(CurrentFrameIndex, pixels);
+                        m_TimestampOCR.ProcessCalibrationFrame(firstCalibrationFrame, pixels);
 
                         bool isCalibrated = true;
 
