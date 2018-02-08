@@ -152,12 +152,12 @@ namespace Tangra.VideoOperations.LightCurves
 			LightCurveReductionContext.Instance.NoiseMethod = ComboboxIndexToBackgroundMethod();
 			LightCurveReductionContext.Instance.ReductionMethod = ComboboxIndexToPhotometryReductionMethod();
 	        LightCurveReductionContext.Instance.PsfQuadratureMethod = TangraConfig.Settings.Photometry.PsfQuadrature;
-			LightCurveReductionContext.Instance.FullDisappearance = rbSpecializedTracking.Checked && cbxFullDisappearance.Checked;
+			LightCurveReductionContext.Instance.FullDisappearance = rbTrackingWithRecovery.Checked && cbxFullDisappearance.Checked;
             LightCurveReductionContext.Instance.HighFlickeringOrLargeStars = !rbFastTracking.Checked;
             LightCurveReductionContext.Instance.WindOrShaking = !rbFastTracking.Checked;
             LightCurveReductionContext.Instance.StopOnLostTracking = !rbFastTracking.Checked && cbxStopOnLostTracking.Checked;
 			LightCurveReductionContext.Instance.FieldRotation = !rbFastTracking.Checked;
-            LightCurveReductionContext.Instance.IsDriftThrough = rbSpecializedTracking.Checked && cbxDriftTrough.Checked;
+            LightCurveReductionContext.Instance.IsDriftThrough = rbTrackingWithRecovery.Checked && cbxDriftTrough.Checked;
 	        LightCurveReductionContext.Instance.LightCurveReductionSubType = ReductionSubType.Unknown;
 
 			if (rbAsteroidal.Checked)
@@ -477,6 +477,7 @@ namespace Tangra.VideoOperations.LightCurves
                 tabsOptions.TabPages.Remove(tabIntegration);
 
             TrackingModeChanged(this, EventArgs.Empty);
+            cbxFullDisappearance.Checked = true;
         }
 
 		private void rbVariableOrTransit_CheckedChanged(object sender, EventArgs e)
@@ -576,20 +577,11 @@ namespace Tangra.VideoOperations.LightCurves
 
                 cbxStopOnLostTracking.Visible = true;
 
-                if (rbSpecializedTracking.Checked)
-                {
-                    // Full Disappearance, Drift Through   
-                    cbxFullDisappearance.Visible = true;
-                    cbxDriftTrough.Visible = true;
-                    lblTrackingDescr.Visible = false;
-                }
-                else
-                {
-                    cbxFullDisappearance.Visible = false;
-                    cbxDriftTrough.Visible = false;
-                    lblTrackingDescr.Text = "Good for less-optimal conditions: faint or large stars, flickering, wind, field rotation.";
-                    lblTrackingDescr.Visible = true;
-                }
+                // Full Disappearance, Drift Through   
+                cbxFullDisappearance.Visible = true;
+                cbxDriftTrough.Visible = true;
+                lblTrackingDescr.Text = "Good for less-optimal conditions: faint or large stars, flickering, wind, field rotation.";
+                lblTrackingDescr.Visible = true;
             }
         }
     }
