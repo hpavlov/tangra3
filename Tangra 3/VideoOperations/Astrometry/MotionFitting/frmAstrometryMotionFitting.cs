@@ -112,6 +112,20 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                         return;
                     }
 
+                    if (m_DataProvider.NumberOfMeasurements < 3)
+                    {
+                        MessageBox.Show(this,
+                            "At least 3 data points are required for the Fast Motion Astrometry module. Please use a different file.",
+                            "Tangra",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Information);
+
+                        m_DataProvider = MeasurementPositionCSVProvider.Empty;
+                        lbAvailableFiles.SelectedIndex = -1;
+                        Recalculate();
+                        return;
+                    }
+
                     nudPixelsPerArcSec.ValueChanged -= nudPixelsPerArcSec_ValueChanged;
                     nudInstDelaySec.ValueChanged -= nudInstDelaySec_ValueChanged;
                     dtpDate.ValueChanged -= dtpDate_ValueChanged;
@@ -148,6 +162,20 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                     }
 
                     cbxContraintPattern.SelectedIndex = 0;
+                    if (m_DataProvider.NumberOfMeasurements < 12)
+                    {
+                        cbxContraintPattern.Enabled = false;
+
+                        MessageBox.Show(this, 
+                            "At least 12 data points are required to use constraint patterns. This file doesn't have enough data points and constraint patters have been disabled.", 
+                            "Tangra", 
+                            MessageBoxButtons.OK, 
+                            MessageBoxIcon.Information);
+                    }
+                    else
+                        cbxContraintPattern.Enabled = true;
+
+                    
 
                     Recalculate();
                 }

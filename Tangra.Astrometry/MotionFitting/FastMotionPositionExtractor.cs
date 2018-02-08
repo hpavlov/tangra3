@@ -80,49 +80,51 @@ namespace Tangra.MotionFitting
                     var chunkPosExtractor = new FastMotionChunkPositionExtractor(firstId, lastId);
                     var chunkEntries = m_AllEntries.Skip(firstId).Take(lastId - firstId + 1).Where(x => !x.ConstraintPoint).ToList();
 
+                    if (m_AllEntries.Count > 3)
+                    {
+                        if (settings.ConstraintPattern == 1)
+                        {
+                            for (int j = 0; j < defPoints; j++)
+                            {
+                                var d1 = m_AllEntries[i * defPoints + j];
+                                d1.ConstraintPoint = true;
+                                chunkEntries.Insert(j, d1);
+                                var d2 = m_AllEntries[(numEntriesPerChunk + defPoints) * numChunks + i * defPoints + j + lastChunkFill];
+                                d2.ConstraintPoint = true;
+                                chunkEntries.Add(d2);
+                            }
+                        }
+                        else if (settings.ConstraintPattern == 2)
+                        {
+                            for (int j = 0; j < defPoints; j++)
+                            {
+                                var d1 = m_AllEntries[i + numChunks * j];
+                                d1.ConstraintPoint = true;
+                                chunkEntries.Insert(j, d1);
+                                var d2 = m_AllEntries[(numEntriesPerChunk + defPoints) * numChunks + i + numChunks * j + lastChunkFill];
+                                d2.ConstraintPoint = true;
+                                chunkEntries.Add(d2);
+                            }
+                        }
+                        else if (settings.ConstraintPattern == 3)
+                        {
+                            for (int j = 0; j < defPoints; j++)
+                            {
+                                var d1 = m_AllEntries[i + numChunks * j];
+                                d1.ConstraintPoint = true;
+                                chunkEntries.Insert(j, d1);
+                                var d3 = m_AllEntries[(numEntriesPerChunk + defPoints) * numChunks + i + numChunks * j + lastChunkFill];
+                                d3.ConstraintPoint = true;
+                                chunkEntries.Add(d3);
+                            }
 
-                    if (settings.ConstraintPattern == 1)
-                    {
-                        for (int j = 0; j < defPoints; j++)
-                        {
-                            var d1 = m_AllEntries[i * defPoints + j];
-                            d1.ConstraintPoint = true;
-                            chunkEntries.Insert(j, d1);
-                            var d2 = m_AllEntries[(numEntriesPerChunk + defPoints) * numChunks + i * defPoints + j + lastChunkFill];
-                            d2.ConstraintPoint = true;
-                            chunkEntries.Add(d2);
-                        }
-                    }
-                    else if (settings.ConstraintPattern == 2)
-                    {
-                        for (int j = 0; j < defPoints; j++)
-                        {
-                            var d1 = m_AllEntries[i + numChunks * j];
-                            d1.ConstraintPoint = true;
-                            chunkEntries.Insert(j, d1);
-                            var d2 = m_AllEntries[(numEntriesPerChunk + defPoints) * numChunks + i + numChunks * j + lastChunkFill];
-                            d2.ConstraintPoint = true;
-                            chunkEntries.Add(d2);
-                        }
-                    }
-                    else if (settings.ConstraintPattern == 3)
-                    {
-                        for (int j = 0; j < defPoints; j++)
-                        {
-                            var d1 = m_AllEntries[i + numChunks * j];
-                            d1.ConstraintPoint = true;
-                            chunkEntries.Insert(j, d1);
-                            var d3 = m_AllEntries[(numEntriesPerChunk + defPoints) * numChunks + i + numChunks * j + lastChunkFill];
-                            d3.ConstraintPoint = true;
-                            chunkEntries.Add(d3);
-                        }
-
-                        var midIdx = chunkEntries.Count / 2;
-                        for (int j = 0; j < defPoints; j++)
-                        {
-                            var d2 = m_AllEntries[startMidConIdx + i + numChunks * j];
-                            d2.ConstraintPoint = true;
-                            chunkEntries.Insert(midIdx + j, d2);
+                            var midIdx = chunkEntries.Count / 2;
+                            for (int j = 0; j < defPoints; j++)
+                            {
+                                var d2 = m_AllEntries[startMidConIdx + i + numChunks * j];
+                                d2.ConstraintPoint = true;
+                                chunkEntries.Insert(midIdx + j, d2);
+                            }
                         }
                     }
 
@@ -140,7 +142,7 @@ namespace Tangra.MotionFitting
                             settings.SmallestReportedUncertaintyArcSec);
 
                         m_Chunks.Add(chunkPosExtractor);
-                    }
+                    }                  
                 }
             }
         }
