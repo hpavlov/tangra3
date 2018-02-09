@@ -341,7 +341,14 @@ namespace Tangra.View
 
 		internal void OnFileProgress(int currentValue, int maxValue)
 		{
-			m_MainForm.Invoke(new OnFileProgressCallback(HandleFileProgress), currentValue, maxValue);		
+		    try
+		    {
+                m_MainForm.Invoke(new OnFileProgressCallback(HandleFileProgress), currentValue, maxValue);		
+		    }
+		    catch (ObjectDisposedException)
+		    { }
+            catch (InvalidOperationException)
+            { }	
 		}
 
 

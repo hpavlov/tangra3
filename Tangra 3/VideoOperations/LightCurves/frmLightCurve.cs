@@ -641,6 +641,8 @@ namespace Tangra.VideoOperations.LightCurves
             m_EventTimesReport = null;
 		}
 
+	    private bool m_SavingFile;
+
 		private void SaveLCFile()
 		{
 		    m_LightCurveController.ConfigureSaveLcFileDialog(saveFileDialog);
@@ -652,6 +654,7 @@ namespace Tangra.VideoOperations.LightCurves
 				Cursor = Cursors.WaitCursor;
 			    try
 			    {
+			        m_SavingFile = true;
 			        LCFile.Save(saveFileDialog.FileName, m_Header, m_LightCurveController.Context.AllReadings, m_FrameTiming, m_Footer);
 			        m_LCFilePath = saveFileDialog.FileName;
 			        m_LightCurveController.RegisterRecentFile(RecentFileType.LightCurve, saveFileDialog.FileName);
@@ -665,7 +668,8 @@ namespace Tangra.VideoOperations.LightCurves
                     m_LightCurveController.ShowMessageBox("Error saving .lc file:\r\n\r\n" + ex.Message, "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			    }
 				finally
-				{
+			    {
+			        m_SavingFile = false;
 					Cursor = Cursors.Default;
 				}
 			}			
@@ -2397,6 +2401,13 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void frmLightCurve_FormClosing(object sender, FormClosingEventArgs e)
         {
+            if (m_SavingFile && e.CloseReason == CloseReason.UserClosing)
+            {
+                MessageBox.Show("Cannot close the Light Curve while saving a file...", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                e.Cancel = true;
+                return;
+            }
+
             if (FormWindowState.Normal == WindowState)
             {
                 PositionMemento.SaveControlPosition(this);

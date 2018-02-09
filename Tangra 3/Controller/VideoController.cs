@@ -465,7 +465,7 @@ namespace Tangra.Controller
 
 			IFrameStream frameStream = frameStreamFactoryMethod();
 
-		    if (frameStream != null)
+            if (frameStream != null && m_FramePlayer != null)
 			{
 				m_FramePlayer.OpenVideo(frameStream);
 

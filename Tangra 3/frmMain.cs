@@ -1041,8 +1041,16 @@ namespace Tangra
 
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
-            m_VideoController.ShutdownVideo();
-            m_AddinsController.FinaliseAddins();
+            if (tsProgessBar.Visible && e.CloseReason == CloseReason.UserClosing)
+            {
+                MessageBox.Show("Cannot close Tangra while opening or saving a file...", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                e.Cancel = true;
+            }
+            else
+            {
+                m_VideoController.ShutdownVideo();
+                m_AddinsController.FinaliseAddins();
+            }
         }
 
 		private void miReduceLightCurve_Click(object sender, EventArgs e)
