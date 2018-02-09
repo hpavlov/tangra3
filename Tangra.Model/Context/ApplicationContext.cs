@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using Tangra.Model.Config;
 
 namespace Tangra.Model.Context
 {
@@ -109,7 +110,7 @@ namespace Tangra.Model.Context
         public CrashReportInfo CrashReportInfo;
 
 	    public string RenderingEngine;
-	    public string ReInterlacingMode;
+        public ReInterlaceMode ReInterlacingMode;
 
 		private bool m_RestartRequest = false;
 		public bool HasRestartRequest()
@@ -169,7 +170,7 @@ namespace Tangra.Model.Context
 		    CanLoadBiasFrame = false;
 
 		    RenderingEngine = null;
-            ReInterlacingMode = null;
+            ReInterlacingMode = ReInterlaceMode.None;
 
 	        OcrErrors = 0;
             OcrExtractingTimestamps = false;

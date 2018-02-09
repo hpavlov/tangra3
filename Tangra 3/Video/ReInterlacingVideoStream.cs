@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using Tangra.Model.Config;
 using Tangra.Model.Context;
 using Tangra.Model.Image;
 using Tangra.Model.Video;
@@ -10,14 +11,6 @@ using Tangra.PInvoke;
 
 namespace Tangra.Video
 {
-    public enum ReInterlaceMode
-    {
-        None,
-        SwapFields,
-        ShiftOneField,
-        SwapAndShiftOneField
-    }
-
     public class ReInterlacingVideoStream : IFrameStream, IDisposable
     {
         public static IFrameStream Create(IFrameStream baseStream, ReInterlaceMode mode)
@@ -37,20 +30,20 @@ namespace Tangra.Video
             {
                 Mode = mode;
                 if (mode == ReInterlaceMode.SwapFields)
-                    TangraContext.Current.ReInterlacingMode = "FieldSwap";
+                    TangraContext.Current.ReInterlacingMode = ReInterlaceMode.SwapFields;
                 else if (mode == ReInterlaceMode.ShiftOneField)
                 {
-                    TangraContext.Current.ReInterlacingMode = "FieldShift";
+                    TangraContext.Current.ReInterlacingMode = ReInterlaceMode.ShiftOneField;
                     m_ShiftMode = 0;
                 }
                 else if (mode == ReInterlaceMode.SwapAndShiftOneField)
                 {
-                    TangraContext.Current.ReInterlacingMode = "FieldSwapAndShift";
+                    TangraContext.Current.ReInterlacingMode = ReInterlaceMode.SwapAndShiftOneField;
                     m_ShiftMode = 1;
                 }
                 else
                 {
-                    TangraContext.Current.ReInterlacingMode = null;
+                    TangraContext.Current.ReInterlacingMode = ReInterlaceMode.None;
                     m_ShiftMode = 0;
                 }
 

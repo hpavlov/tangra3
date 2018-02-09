@@ -300,6 +300,22 @@ namespace Tangra.VideoOperations.LightCurves
 					? (uint)1 << m_VideoContoller.VideoBitPix 
 					: m_VideoContoller.VideoAav16NormVal;
 
+            var reinterlacedStream = m_VideoContoller.FramePlayer.Video as ReInterlacingVideoStream;
+            if (reinterlacedStream != null)
+            {
+                ReInterlaceMode mode = ReInterlaceMode.None;
+
+                if (rbReInterlaceNon.Checked)
+                    mode = ReInterlaceMode.None;
+                else if (rbReInterlaceSwapFields.Checked)
+                    mode = ReInterlaceMode.SwapFields;
+                else if (rbReInterlaceShiftForward.Checked)
+                    mode = ReInterlaceMode.ShiftOneField;
+                else if (rbReInterlaceShiftAndSwap.Checked)
+                    mode = ReInterlaceMode.SwapAndShiftOneField;
+                reinterlacedStream.ChangeReInterlaceMode(mode);                
+            }
+
             m_VideoContoller.RefreshCurrentFrame();
 
 			TangraContext.Current.CrashReportInfo.ReductionContext = LightCurveReductionContext.Instance.XmlSerialize();
@@ -333,11 +349,14 @@ namespace Tangra.VideoOperations.LightCurves
             {
                 btnMoreOrLess.Text = "More Options";
 
-                if (tabsOptions.TabPages.Count == 4)
+                if (tabsOptions.TabPages.Count != 1)
                 {
                     tabsOptions.TabPages.Remove(tabIntegration);
                     tabsOptions.TabPages.Remove(tabReduction);
                     tabsOptions.TabPages.Remove(tabStretching);
+                    
+                    if (tabsOptions.TabPages.Contains(tabDefectsCorrection))
+                        tabsOptions.TabPages.Remove(tabDefectsCorrection);
                 }
             }
             else
@@ -349,6 +368,9 @@ namespace Tangra.VideoOperations.LightCurves
                     tabsOptions.TabPages.Add(tabIntegration);
                     tabsOptions.TabPages.Add(tabStretching);
                     tabsOptions.TabPages.Add(tabReduction);
+
+                    if (m_VideoContoller.FramePlayer.Video is ReInterlacingVideoStream)
+                        tabsOptions.TabPages.Add(tabDefectsCorrection);
                 }
             }
         }
@@ -478,6 +500,25 @@ namespace Tangra.VideoOperations.LightCurves
 
             TrackingModeChanged(this, EventArgs.Empty);
             cbxFullDisappearance.Checked = true;
+
+            switch (TangraContext.Current.ReInterlacingMode)
+            {
+                case ReInterlaceMode.SwapFields:
+                    rbReInterlaceSwapFields.Checked = true;
+                    break;
+                case ReInterlaceMode.ShiftOneField:
+                    rbReInterlaceShiftForward.Checked = true;
+                    break;
+                case ReInterlaceMode.SwapAndShiftOneField:
+                    rbReInterlaceShiftAndSwap.Checked = true;
+                    break;
+            }
+
+            if (!(m_VideoContoller.FramePlayer.Video is ReInterlacingVideoStream) &&
+                tabsOptions.TabPages.Contains(tabDefectsCorrection))
+            {
+                tabsOptions.TabPages.Remove(tabDefectsCorrection);
+            }                
         }
 
 		private void rbVariableOrTransit_CheckedChanged(object sender, EventArgs e)
