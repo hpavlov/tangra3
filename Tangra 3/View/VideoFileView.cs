@@ -334,7 +334,7 @@ namespace Tangra.View
 					OnFileProgressEnd();
 			}
 			else
-				OnFileProgress(currentValue);				
+				OnFileProgress(currentValue);
 		}
 
 		internal delegate void OnFileProgressCallback(int currentValue, int maxValue);
@@ -343,7 +343,7 @@ namespace Tangra.View
 		{
 		    try
 		    {
-                m_MainForm.Invoke(new OnFileProgressCallback(HandleFileProgress), currentValue, maxValue);		
+                m_MainForm.BeginInvoke(new OnFileProgressCallback(HandleFileProgress), currentValue, maxValue);
 		    }
 		    catch (ObjectDisposedException)
 		    { }
@@ -362,12 +362,12 @@ namespace Tangra.View
 
 		internal void BeginLongOperation()
 		{
-			m_MainForm.Invoke(new OnLongOperationCallback(OnLongOperation), true);	
+			m_MainForm.BeginInvoke(new OnLongOperationCallback(OnLongOperation), true);
 		}
 
 		internal void EndLongOperation()
 		{
-			m_MainForm.Invoke(new OnLongOperationCallback(OnLongOperation), false);
+            m_MainForm.BeginInvoke(new OnLongOperationCallback(OnLongOperation), false);
 		}
 		#endregion
 	}
