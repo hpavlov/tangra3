@@ -204,6 +204,12 @@
     <Compile Include="Astrometry\ThreeStarAstrometry.cs" />
     <Compile Include="MotionFitting\FastMotionPositionExtractor.cs" />
     <Compile Include="MotionFitting\FlyByMotionFitter.cs" />
+    <Compile Include="MotionFitting\frmRovingObsLocation.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MotionFitting\frmRovingObsLocation.Designer.cs">
+      <DependentUpon>frmRovingObsLocation.cs</DependentUpon>
+    </Compile>
     <Compile Include="MotionFitting\IMeasurementPositionProvider.cs" />
     <Compile Include="MotionFitting\MeasurementPositionEntry.cs" />
     <Compile Include="StarCatalogues\PPMXL\PPMXLCatalogue.cs" />
@@ -239,6 +245,9 @@
     <Compile Include="StarCatalogues\UCAC4\UCAC4Index.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="MotionFitting\frmRovingObsLocation.resx">
+      <DependentUpon>frmRovingObsLocation.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="StarCatalogues\NOMAD\nomad.idx" />
   </ItemGroup>
   <ItemGroup>

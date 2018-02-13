@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace Tangra.Helpers
+namespace Tangra.Model.Helpers
 {
     public static class ShellHelper
     {

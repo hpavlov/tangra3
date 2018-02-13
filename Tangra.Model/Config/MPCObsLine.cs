@@ -88,6 +88,8 @@ namespace Tangra.Model.Config
         // 00.1 00.1                        
         public string m_Uncertaity_81_90 = "";
 
+        public static string ROVING_OBS_CODE = "247";
+
         private MPCObsLine()
         { }
 
@@ -228,6 +230,45 @@ namespace Tangra.Model.Config
         {
             return m_Designation_1_12 + m_NewDiscoveryFlag_13 + m_Note1_14 + m_Note2_15 + m_TimeString_16_32 + m_RAString_33_44 + m_DEString_45_56 +
                    m_Reserved_57_64 + m_Magnitude_65_70 + m_MagnitudeBand_71 + m_Reserved_72_77 + m_ObsCode_78_80 + m_Uncertaity_81_90;
+        }
+
+	    public string BuildRovingObserverLine1()
+	    {
+	        string note14Overwrite = m_Note2_15 == "n" ? "n" : m_Note1_14;
+	        string note15Overwrite = "V";
+
+            return m_Designation_1_12 + m_NewDiscoveryFlag_13 + note14Overwrite + note15Overwrite + m_TimeString_16_32 + m_RAString_33_44 + m_DEString_45_56 +
+                               m_Reserved_57_64 + m_Magnitude_65_70 + m_MagnitudeBand_71 + m_Reserved_72_77 + m_ObsCode_78_80 + m_Uncertaity_81_90;	        
+	    }
+
+        public string BuildRovingObserverLine2(RovingObsLocation rovingObsLocation)
+        {
+            //Columns          Use
+            // 1 - 12          Identical to columns 1-12 of first record
+            //13        A1     Blank
+            //14               Identical to column 14 of first record
+            //15        A1     'v'
+            //16 - 32          Identical to columns 16-32 of first record
+            //33        A1     '1'
+            //34        A1     Blank
+            //35 - 44   F10.6  E longitude of observing site (to an
+            //                    appropriate number of d.p., generally to
+            //                    4 d.p.).  Decimal point in column 38.
+            //45        A1     Blank
+            //46 - 55   F10.6  Latitude (N +ve, S -ve) of observing site,
+            //                    (to an appropriate number of d.p.,
+            //                    generally to 4 d.p.).  Sign in column 46,
+            //                    decimal point in column 49.
+            //56        A1     Blank
+            //57 - 61   I5     Altitude in meters (right justified, no
+            //                    leading zeroes, e.g., '  690', not '690  '
+            //                    or '00690')
+            //62 - 77   A      Blank
+            //78 - 80   A3     '247'
+
+            return m_Designation_1_12 + " " + m_Note1_14 + "v" + m_TimeString_16_32 + "1 " +
+                   rovingObsLocation.GetMPCLongitude_35_44() + " " + rovingObsLocation.GetMPCLatitude_46_55() + " " + rovingObsLocation.GetMPCAltitude_57_61() +
+                   "                247";
         }
 
 		public DateTime GetObservationDateTime()
@@ -759,4 +800,78 @@ namespace Tangra.Model.Config
 
 	//OBSERVATORY CODE 
 	//Observatory codes are stored in columns 78-80. Lists of observatory codes are published from time to time in the MPCs. Note that new observatory codes are assigned only upon receipt of acceptable astrometric observations. 
+
+
+    public class RovingObsLocation
+    {
+        public double LongitudeInDeg;
+        public double LatitudeInDeg;
+        public double AltitudeInMeters;
+        public bool IsValid;
+
+        public string GetMPCLongitude_35_44()
+        {
+            //35 - 44   F10.6  E longitude of observing site (to an
+            //                    appropriate number of d.p., generally to
+            //                    4 d.p.).  Decimal point in column 38.
+            double lng = LongitudeInDeg;
+            if (lng < 0) lng += 360;
+
+            return ((int)lng).ToString().PadLeft(3).Substring(0, 3) +
+                   (lng - (int)lng).ToString(CultureInfo.InvariantCulture).Trim('0').PadRight(7).Substring(0, 7);
+        }
+
+        public string GetMPCLatitude_46_55()
+        {
+            //46 - 55   F10.6  Latitude (N +ve, S -ve) of observing site,
+            //                    (to an appropriate number of d.p.,
+            //                    generally to 4 d.p.).  Sign in column 46,
+            //                    decimal point in column 49.
+            double lat = LatitudeInDeg;
+            string sign = lat < 0 ? "-" : "+";
+            lat = Math.Abs(lat);
+            return
+                sign +
+                ((int)lat).ToString().PadLeft(2).Substring(0, 2) +
+                (lat - (int)lat).ToString(CultureInfo.InvariantCulture).Trim('0').PadRight(7).Substring(0, 7);
+        }
+
+        public string GetMPCAltitude_57_61()
+        {
+            //57 - 61   I5     Altitude in meters (right justified, no
+            //                    leading zeroes, e.g., '  690', not '690  '
+            //                    or '00690')
+            return ((int)Math.Round(AltitudeInMeters)).ToString().PadLeft(5);
+        }
+    }
+
+    //All "roving observer" observations are represented by a single observatory code: 247. Each "roving observer" observation consists of two 80-column records. The 247 observatory code appears on both records. The first 80-column record is otherwise identical to the format for optical observations, with one minor change: column 15 contains "V". The format of the second 80-column record is described below.
+
+    //SUMMARY OF 2ND-RECORD FORMAT:
+    //Please note that TABs must NOT be used. Columns marked as `blank' must contain spaces (ASCII 32). The format is identical for both comets and minor planets.
+
+    //   Columns          Use
+    //    1 - 12          Identical to columns 1-12 of first record
+    //   13        A1     Blank
+    //   14               Identical to column 14 of first record
+    //   15        A1     'v'
+    //   16 - 32          Identical to columns 16-32 of first record
+    //   33        A1     '1'
+    //   34        A1     Blank
+    //   35 - 44   F10.6  E longitude of observing site (to an
+    //                       appropriate number of d.p., generally to
+    //                       4 d.p.).  Decimal point in column 38.
+    //   45        A1     Blank
+    //   46 - 55   F10.6  Latitude (N +ve, S -ve) of observing site,
+    //                       (to an appropriate number of d.p.,
+    //                       generally to 4 d.p.).  Sign in column 46,
+    //                       decimal point in column 49.
+    //   56        A1     Blank
+    //   57 - 61   I5     Altitude in meters (right justified, no
+    //                       leading zeroes, e.g., '  690', not '690  '
+    //                       or '00690')
+    //   62 - 77   A      Blank
+    //   78 - 80   A3     '247'
+   
+    //   Longitudes and latitudes are geographic.
 }

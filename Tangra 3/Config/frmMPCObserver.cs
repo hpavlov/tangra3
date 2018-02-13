@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using Tangra.Config;
 using Tangra.Helpers;
 using Tangra.Model.Config;
+using Tangra.Model.Helpers;
 
 namespace Tangra.Config
 {

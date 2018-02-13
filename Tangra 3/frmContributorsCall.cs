@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Tangra.Helpers;
+using Tangra.Model.Helpers;
 
 namespace Tangra
 {

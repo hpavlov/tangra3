@@ -117,10 +117,8 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <metadata name="folderBrowserDialog.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>17, 17</value>
-  </metadata>
-  <data name="label1.Text" xml:space="preserve">
-    <value>    Please note that fast motion video astrometry reports (having the mini-normal positions 'n' flag) from the Roving Observatory Code (247) can only be submitted via the Web Form accessible from the MPC's web site:</value>
+  <data name="label6.Text" xml:space="preserve">
+    <value>    Please note that fast motion video astrometry reports (having the mini-normal positions 'n' flag) from the Roving Observatory Code can only be submitted via the Web Form accessible from the MPC's web site:
+</value>
   </data>
 </root>

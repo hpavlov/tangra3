@@ -176,6 +176,7 @@
     <Compile Include="Helpers\FITSTimeStampReader.cs" />
     <Compile Include="Helpers\JulianDayHelper.cs" />
     <Compile Include="Helpers\PositionMemento.cs" />
+    <Compile Include="Helpers\ShellHelper.cs" />
     <Compile Include="Helpers\TangraCore.cs" />
     <Compile Include="Helpers\ThreadingHelper.cs" />
     <Compile Include="ImageTools\ImageTool.cs" />

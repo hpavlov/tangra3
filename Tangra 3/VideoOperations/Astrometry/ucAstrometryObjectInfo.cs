@@ -110,6 +110,8 @@ namespace Tangra.VideoOperations.Astrometry
 
 	    private FlyByMotionFitter m_FlyByMotionFitter = new FlyByMotionFitter();
 
+	    private RovingObservatoryProvider m_RovingObservatoryProvider;
+
 		public ucAstrometryObjectInfo()
 		{
 			InitializeComponent();
@@ -136,6 +138,8 @@ namespace Tangra.VideoOperations.Astrometry
 
 			btnResolveObjects.Visible = false;
 			btnSaveUnitTestData.Visible = false;
+
+            m_RovingObservatoryProvider = new RovingObservatoryProvider(this.ParentForm);
 
 #if GET_UNIT_TEST_DATA
             btnResolveObjects.Visible = true;
@@ -1123,14 +1127,20 @@ namespace Tangra.VideoOperations.Astrometry
 
                     MPCObsHeader header = frmObserver.Header;
                     header.NET = m_MeasurementContext.StarCatalogueFacade.CatalogNETCode;
-                    m_CurrentReportFile = new MPCReportFile(saveFileDialog.FileName, header);
+                    RovingObsLocation rovingObsLocation = null;
+                    if (header.COD == MPCObsLine.ROVING_OBS_CODE)
+                    {
+
+                        rovingObsLocation = m_RovingObservatoryProvider.GetRovingObsLocation();
+                    }
+                    m_CurrentReportFile = new MPCReportFile(saveFileDialog.FileName, header, rovingObsLocation);
 
 					TangraConfig.Settings.RecentFiles.NewRecentFile(RecentFileType.MPCReport, saveFileDialog.FileName);
 					TangraConfig.Settings.Save();
                 }
                 else
                 {
-                    m_CurrentReportFile = new MPCReportFile(reportFileForm.ReportFileName);
+                    m_CurrentReportFile = new MPCReportFile(reportFileForm.ReportFileName, () => m_RovingObservatoryProvider.GetRovingObsLocation());
 
                     if (m_CurrentReportFile.Header.NET != m_MeasurementContext.StarCatalogueFacade.CatalogNETCode)
                     {

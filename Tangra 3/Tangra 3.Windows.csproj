@@ -391,6 +391,7 @@
       <DependentUpon>frmCalculatePositionForTimeOfDay.cs</DependentUpon>
     </Compile>
     <Compile Include="VideoOperations\Astrometry\MotionFitting\MeasurementPositionCSVProvider.cs" />
+    <Compile Include="VideoOperations\Astrometry\MPCReport\RovingObservatoryProvider.cs" />
     <Compile Include="VideoOperations\Astrometry\Tracking\FastMotionTracker.cs" />
     <Compile Include="VideoOperations\Astrometry\Tracking\IAstrometryTracker.cs" />
     <Compile Include="VideoOperations\Astrometry\Tracking\SlowMotionTracker.cs" />
@@ -483,7 +484,6 @@
       <DependentUpon>frmStackedPixels.cs</DependentUpon>
     </Compile>
     <Compile Include="VideoOperations\Spectroscopy\Helpers\RotationMapper.cs" />
-    <Compile Include="Helpers\ShellHelper.cs" />
     <Compile Include="Helpers\TangraFileAssociations.cs" />
     <Compile Include="Helpers\UsageStats.cs" />
     <Compile Include="Helpers\VersionHelper.cs" />

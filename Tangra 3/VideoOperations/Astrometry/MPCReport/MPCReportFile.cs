@@ -30,12 +30,18 @@ namespace Tangra.VideoOperations.Astrometry.MPCReport
 	    public MPCObsHeader Header;
 	    public List<MPCObsLine> ObsLines = new List<MPCObsLine>();
 
-        public MPCReportFile(string fileName)
+	    public RovingObsLocation RovingObservatoryLocation = new RovingObsLocation() { IsValid = false };
+
+        public MPCReportFile(string fileName, Func<RovingObsLocation> rovingObsLocationProvider)
         {
             ReportFileName = fileName;
             string[] allLines = File.ReadAllLines(fileName);
 
             Header = new MPCObsHeader(allLines);
+            if (Header.COD == MPCObsLine.ROVING_OBS_CODE)
+            {
+                RovingObservatoryLocation = rovingObsLocationProvider();
+            }
             ObsLines.Clear();
 
             int strippedLines = 0;
@@ -57,10 +63,14 @@ namespace Tangra.VideoOperations.Astrometry.MPCReport
                 MessageBox.Show(string.Format("{0} lines could not be parsed are have been stripped from the file.", strippedLines), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
-		public MPCReportFile(string fileName, MPCObsHeader header)
+	    private MPCReportFile()
+	    { }
+
+	    public MPCReportFile(string fileName, MPCObsHeader header, RovingObsLocation rovingObsLocation)
 		{
 		    ReportFileName = fileName;
 		    Header = header;
+		    RovingObservatoryLocation = rovingObsLocation;
 		}
 
 		public string LastObjectDesignation
@@ -87,9 +97,18 @@ namespace Tangra.VideoOperations.Astrometry.MPCReport
             obsLine.SetMagnitude(mag, band);
             obsLine.SetUncertainty(raUncertaintyArcSec, deUncertaintyArcSec);
 
-            string newLine = obsLine.BuildObservationASCIILine();
-            if (ObsLines.Exists(l => newLine.Equals(l.BuildObservationASCIILine(), StringComparison.Ordinal)))
-                return false;
+            if (Header.COD == MPCObsLine.ROVING_OBS_CODE)
+            {
+                string newLine1 = obsLine.BuildRovingObserverLine1();
+                if (ObsLines.Exists(l => newLine1.Equals(l.BuildObservationASCIILine(), StringComparison.Ordinal)))
+                    return false;
+            }
+            else
+            {
+                string newLine = obsLine.BuildObservationASCIILine();
+                if (ObsLines.Exists(l => newLine.Equals(l.BuildObservationASCIILine(), StringComparison.Ordinal)))
+                    return false;
+            }
 
             ObsLines.Add(obsLine);
             return true;
@@ -125,7 +144,15 @@ namespace Tangra.VideoOperations.Astrometry.MPCReport
 
             foreach (MPCObsLine obsLine in ObsLines)
             {
-                output.AppendLine(obsLine.BuildObservationASCIILine());
+                if (Header.COD == MPCObsLine.ROVING_OBS_CODE && RovingObservatoryLocation != null && RovingObservatoryLocation.IsValid)
+                {
+                    output.AppendLine(obsLine.BuildRovingObserverLine1());
+                    output.AppendLine(obsLine.BuildRovingObserverLine2(RovingObservatoryLocation));
+                }
+                else
+                {
+                    output.AppendLine(obsLine.BuildObservationASCIILine());
+                }
             }
 
             return output.ToString();

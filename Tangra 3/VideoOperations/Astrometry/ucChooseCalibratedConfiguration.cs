@@ -16,6 +16,7 @@ using Tangra.Config;
 using Tangra.Helpers;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
+using Tangra.Model.Helpers;
 using Tangra.Model.Video;
 using Tangra.Photometry;
 using Tangra.VideoOperations.Astrometry.Engine;

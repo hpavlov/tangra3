@@ -23,6 +23,8 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
     {
         public const decimal DEFAULT_ARCSEC_PER_PIXEL = 2.5M;
 
+        private RovingObservatoryProvider m_RovingObservatoryProvider;
+
         internal class AvailableFileEntry
         {
             public string FilePath { get; private set; }
@@ -50,6 +52,8 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
             foreach(var method in typeof(ErrorMethod).GetValuesDescription())
                 cbxErrorMethod.Items.Add(method);
             cbxErrorMethod.SelectedIndex = 0;
+
+            m_RovingObservatoryProvider = new RovingObservatoryProvider(this);
         }
 
 
@@ -92,11 +96,15 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
         private IMeasurementPositionProvider m_DataProvider;
         private FastMotionPositionExtractor m_PositionExtractor = new FastMotionPositionExtractor();
         private AvailableFileEntry m_SelectedEntry;
+        private bool m_LoadingData = false;
 
         private void lbAvailableFiles_SelectedIndexChanged(object sender, EventArgs e)
         {           
             if (lbAvailableFiles.SelectedIndex != -1)
             {
+                m_LoadingData = true;
+                m_RovingObservatoryProvider.ResetCurrentObcLocation();
+
                 var entry = (AvailableFileEntry) lbAvailableFiles.SelectedItem;
                 if (!ReferenceEquals(m_SelectedEntry, entry))
                 {
@@ -108,6 +116,7 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                         MessageBox.Show(this, "This file cannot be processed by the Fast Motion Astrometry module. Please use AAV files or AVI files for no-integration videos.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         m_DataProvider = MeasurementPositionCSVProvider.Empty;
                         lbAvailableFiles.SelectedIndex = -1;
+                        m_LoadingData = false;
                         Recalculate();
                         return;
                     }
@@ -122,6 +131,7 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
 
                         m_DataProvider = MeasurementPositionCSVProvider.Empty;
                         lbAvailableFiles.SelectedIndex = -1;
+                        m_LoadingData = false;
                         Recalculate();
                         return;
                     }
@@ -175,8 +185,8 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                     else
                         cbxContraintPattern.Enabled = true;
 
-                    
 
+                    m_LoadingData = false;
                     Recalculate();
                 }
             }
@@ -200,7 +210,7 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
 
         private void Recalculate()
         {
-            if (m_DataProvider != null)
+            if (m_DataProvider != null && !m_LoadingData)
             {
                 WeightingMode mode = WeightingMode.None;
                 if (rbWeightingPosAstr.Checked) mode = WeightingMode.SNR;
@@ -226,7 +236,7 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
 
                 Replot();
 
-                var lines = m_PositionExtractor.ExtractPositions(tbxObsCode.Text, tbxObjectDesign.Text, dtpDate.Value.Date);
+                var lines = m_PositionExtractor.ExtractPositions(tbxObsCode.Text, tbxObjectDesign.Text, dtpDate.Value.Date, m_RovingObservatoryProvider);
                 tbxMeasurements.Text = string.Join("\r\n", lines);
             }
         }
@@ -351,7 +361,7 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                 if (frmToD.ShowDialog(this) == DialogResult.OK)
                 {
                     // Calculate single position
-                    string reportLine = m_PositionExtractor.CalculateSingleMeasurement(tbxObsCode.Text, tbxObjectDesign.Text, dtpDate.Value.Date, (double)frmToD.nudSinglePosMea.Value);
+                    string reportLine = m_PositionExtractor.CalculateSingleMeasurement(tbxObsCode.Text, tbxObjectDesign.Text, dtpDate.Value.Date, (double)frmToD.nudSinglePosMea.Value, m_RovingObservatoryProvider);
                     if (!string.IsNullOrWhiteSpace(reportLine))
                         tbxMeasurements.Text = tbxMeasurements.Text.TrimEnd("\r\n".ToCharArray()) + "\r\n" + reportLine;
                 }
@@ -393,14 +403,15 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
 
                     MPCObsHeader header = frmObserver.Header;
                     header.NET = tbxNetCode.Text;
-                    m_CurrentReportFile = new MPCReportFile(saveFileDialog.FileName, header);
+
+                    m_CurrentReportFile = new MPCReportFile(saveFileDialog.FileName, header, m_RovingObservatoryProvider.GetRovingObsLocation());
 
                     TangraConfig.Settings.RecentFiles.NewRecentFile(RecentFileType.MPCReport, saveFileDialog.FileName);
                     TangraConfig.Settings.Save();
                 }
                 else
                 {
-                    m_CurrentReportFile = new MPCReportFile(reportFileForm.ReportFileName);
+                    m_CurrentReportFile = new MPCReportFile(reportFileForm.ReportFileName, () => m_RovingObservatoryProvider.GetRovingObsLocation());
 
                     if (m_CurrentReportFile.Header.NET != tbxNetCode.Text)
                     {

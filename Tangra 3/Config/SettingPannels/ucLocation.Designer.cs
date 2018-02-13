@@ -28,6 +28,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ucLocation));
             this.btnMPCHeader = new System.Windows.Forms.Button();
             this.tbxMPCCode = new System.Windows.Forms.TextBox();
             this.rbMPCCode = new System.Windows.Forms.RadioButton();
@@ -41,7 +42,12 @@
             this.cbxLatitude = new System.Windows.Forms.ComboBox();
             this.label32 = new System.Windows.Forms.Label();
             this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
+            this.label1 = new System.Windows.Forms.Label();
+            this.pnlRovingObsNote = new System.Windows.Forms.Panel();
+            this.label4 = new System.Windows.Forms.Label();
+            this.llMPC = new System.Windows.Forms.LinkLabel();
             this.pnlCoordinates.SuspendLayout();
+            this.pnlRovingObsNote.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnMPCHeader
@@ -61,6 +67,7 @@
             this.tbxMPCCode.Name = "tbxMPCCode";
             this.tbxMPCCode.Size = new System.Drawing.Size(56, 20);
             this.tbxMPCCode.TabIndex = 45;
+            this.tbxMPCCode.TextChanged += new System.EventHandler(this.tbxMPCCode_TextChanged);
             // 
             // rbMPCCode
             // 
@@ -165,10 +172,49 @@
             this.label32.TabIndex = 41;
             this.label32.Text = "Observer Location (Used for Ephemeris and MPC Reports)";
             // 
+            // label1
+            // 
+            this.label1.Location = new System.Drawing.Point(17, 10);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(368, 42);
+            this.label1.TabIndex = 47;
+            this.label1.Text = resources.GetString("label1.Text");
+            // 
+            // pnlRovingObsNote
+            // 
+            this.pnlRovingObsNote.Controls.Add(this.label4);
+            this.pnlRovingObsNote.Controls.Add(this.llMPC);
+            this.pnlRovingObsNote.Controls.Add(this.label1);
+            this.pnlRovingObsNote.Location = new System.Drawing.Point(21, 93);
+            this.pnlRovingObsNote.Name = "pnlRovingObsNote";
+            this.pnlRovingObsNote.Size = new System.Drawing.Size(395, 125);
+            this.pnlRovingObsNote.TabIndex = 48;
+            // 
+            // label4
+            // 
+            this.label4.Location = new System.Drawing.Point(17, 89);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(353, 34);
+            this.label4.TabIndex = 49;
+            this.label4.Text = "    You will be asked to enter the coordinates of the observing site before Tangr" +
+    "a generates the astrometry report at reduction time.";
+            // 
+            // llMPC
+            // 
+            this.llMPC.AutoSize = true;
+            this.llMPC.Location = new System.Drawing.Point(29, 56);
+            this.llMPC.Name = "llMPC";
+            this.llMPC.Size = new System.Drawing.Size(238, 13);
+            this.llMPC.TabIndex = 48;
+            this.llMPC.TabStop = true;
+            this.llMPC.Text = "https://www.minorplanetcenter.net/iau/mpc.html";
+            this.llMPC.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.llMPC_LinkClicked);
+            // 
             // ucLocation
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.pnlRovingObsNote);
             this.Controls.Add(this.btnMPCHeader);
             this.Controls.Add(this.tbxMPCCode);
             this.Controls.Add(this.rbMPCCode);
@@ -179,6 +225,8 @@
             this.Size = new System.Drawing.Size(455, 388);
             this.pnlCoordinates.ResumeLayout(false);
             this.pnlCoordinates.PerformLayout();
+            this.pnlRovingObsNote.ResumeLayout(false);
+            this.pnlRovingObsNote.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -199,5 +247,9 @@
 		private System.Windows.Forms.ComboBox cbxLatitude;
         private System.Windows.Forms.Label label32;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Panel pnlRovingObsNote;
+        private System.Windows.Forms.LinkLabel llMPC;
+        private System.Windows.Forms.Label label4;
 	}
 }

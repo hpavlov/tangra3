@@ -17,6 +17,7 @@ using Tangra.Config.SettingPannels;
 using Tangra.Controller;
 using Tangra.Helpers;
 using Tangra.Model.Config;
+using Tangra.Model.Helpers;
 using Tangra.SDK;
 
 namespace Tangra.Config.SettingPannels

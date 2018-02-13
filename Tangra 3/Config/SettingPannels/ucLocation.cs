@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Tangra.Astrometry.Recognition;
+using Tangra.Helpers;
 using Tangra.Model.Config;
 using Tangra.Model.Helpers;
 
@@ -95,5 +97,16 @@ namespace Tangra.Config.SettingPannels
 			pnlCoordinates.Enabled = rbCoordinates.Checked;
 			tbxMPCCode.Enabled = rbMPCCode.Checked;
 		}
+
+        private void llMPC_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            ShellHelper.OpenUrl("https://www.minorplanetcenter.net/iau/mpc.html");
+        }
+
+        private void tbxMPCCode_TextChanged(object sender, EventArgs e)
+        {
+            bool isRovingObsCode = tbxMPCCode.Text.Trim() == MPCObsLine.ROVING_OBS_CODE;
+            pnlRovingObsNote.Visible = isRovingObsCode;
+        }
 	}
 }

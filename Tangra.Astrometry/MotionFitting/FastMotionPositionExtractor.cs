@@ -3,6 +3,7 @@ using System.CodeDom;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Text;
 using System.Linq;
 using System.Text;
 using Tangra.Model.Config;
@@ -11,6 +12,11 @@ using Tangra.Model.Numerical;
 
 namespace Tangra.MotionFitting
 {
+    public interface IRovingObsLocationProvider
+    {
+        RovingObsLocation GetRovingObsLocation();
+    }
+
     public class FastMotionPositionExtractor
     {
         private const double SECONDS_IN_A_DAY = 60 * 60 * 24;
@@ -147,13 +153,25 @@ namespace Tangra.MotionFitting
             }
         }
 
-        public string[] ExtractPositions(string obsCode, string designation, DateTime obsDate)
+        private RovingObsLocation GetRovingObsLocation(string obsCode, IRovingObsLocationProvider rovObsLocProvider)
+        {
+            if (obsCode == MPCObsLine.ROVING_OBS_CODE)
+            {
+                return rovObsLocProvider.GetRovingObsLocation();
+            }
+            else
+                return null;
+        }
+
+        public string[] ExtractPositions(string obsCode, string designation, DateTime obsDate, IRovingObsLocationProvider rovObsLocProvider)
         {
             var lines = new List<string>();
 
+            var rovObsLocation = GetRovingObsLocation(obsCode, rovObsLocProvider);
+
             foreach (var chunk in m_Chunks)
             {
-                lines.Add(chunk.GetMidPointReport(obsCode, designation, obsDate));
+                lines.Add(chunk.GetMidPointReport(obsCode, designation, obsDate, rovObsLocation));
             }
 
             double combinedUncert = Math.Sqrt(m_Chunks.Sum(x => x.GetMidPointCombinedSQUncertainty())) * 3600.0;
@@ -162,13 +180,15 @@ namespace Tangra.MotionFitting
             return lines.ToArray();
         }
 
-        public string CalculateSingleMeasurement(string obsCode, string designation, DateTime obsDate, double timeOfDay)
+        public string CalculateSingleMeasurement(string obsCode, string designation, DateTime obsDate, double timeOfDay, IRovingObsLocationProvider rovObsLocProvider)
         {
+            var rovObsLocation = GetRovingObsLocation(obsCode, rovObsLocProvider);
+
             foreach (var chunk in m_Chunks)
             {
                 if (chunk.MinTimeOfDayUTCInstrDelayApplied <= timeOfDay && chunk.MaxTimeOfDayUTCInstrDelayApplied >= timeOfDay)
                 {
-                    return chunk.GetReport(obsCode, designation, obsDate, timeOfDay);
+                    return chunk.GetReport(obsCode, designation, obsDate, timeOfDay, rovObsLocation);
                 }
             }
 
@@ -636,17 +656,17 @@ namespace Tangra.MotionFitting
             return 0;
         }
 
-        internal string GetMidPointReport(string obsCode, string designation, DateTime obsDate)
+        internal string GetMidPointReport(string obsCode, string designation, DateTime obsDate, RovingObsLocation rovingLocation)
         {
             double closestTimeOfDay = GetMidPointDelayCorrectedTimeOfDay();
             
             var normalTime = double.Parse(closestTimeOfDay.ToString("0.000000"));
             if (double.IsNaN(normalTime) || double.IsInfinity(normalTime)) return null;
 
-            return GetReport(obsCode, designation, obsDate, normalTime);
+            return GetReport(obsCode, designation, obsDate, normalTime, rovingLocation);
         }
 
-        internal string GetReport(string obsCode, string designation, DateTime obsDate, double normalTime)
+        internal string GetReport(string obsCode, string designation, DateTime obsDate, double normalTime, RovingObsLocation rovingLocation)
         {
             MPCObsLine obsLine = new MPCObsLine(obsCode.PadLeft(3).Substring(0, 3));
             obsLine.SetObject(MPCObsLine.GetObjectCode(designation) ?? "            ");
@@ -678,7 +698,20 @@ namespace Tangra.MotionFitting
                 if (TangraConfig.Settings.Astrometry.ExportUncertainties)
                     obsLine.SetUncertainty(errRACosDE, errDE);
 
-                return obsLine.BuildObservationASCIILine();
+                if (rovingLocation != null)
+                {
+                    if (!rovingLocation.IsValid)
+                        return string.Empty;
+                    else
+                    {
+                        var line1 = obsLine.BuildRovingObserverLine1();
+                        var line2 = obsLine.BuildRovingObserverLine2(rovingLocation);
+                        return line1 + "\r\n" + line2;
+
+                    }
+                }
+                else
+                    return obsLine.BuildObservationASCIILine();
             }
 
             return null;

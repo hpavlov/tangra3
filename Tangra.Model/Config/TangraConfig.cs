@@ -700,6 +700,10 @@ namespace Tangra.Model.Config
 	        public string SpectroscopyWavelengthConfigurationname;
 
             public int ReleaseNotesDisplayedForVersion = 0;
+
+            public double? RovingLongitude;
+            public double? RovingLatitude;
+            public double? RovingAltitude;
         }
 
         [Serializable]
