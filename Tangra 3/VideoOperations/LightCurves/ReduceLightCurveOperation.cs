@@ -85,7 +85,7 @@ namespace Tangra.VideoOperations.LightCurves
         private DateTime m_OCRedTimeStamp;
 
 	    private string m_InstumentalDelaySelectedCamera;
-	    private Dictionary<int, float> m_InstumentalDelaySelectedConfig;
+        private InstrumentalDelayConfiguration m_InstumentalDelaySelectedConfig;
 
         private string m_CameraName;
         private int m_AavFrameIntegration;

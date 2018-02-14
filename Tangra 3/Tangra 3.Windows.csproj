@@ -163,6 +163,7 @@
     <Compile Include="Config\frmTangraSettings.Designer.cs">
       <DependentUpon>frmTangraSettings.cs</DependentUpon>
     </Compile>
+    <Compile Include="Config\InstrumentalDelayConfiguration.cs" />
     <Compile Include="Config\SettingPannels\ucLocation.cs">
       <SubType>UserControl</SubType>
     </Compile>

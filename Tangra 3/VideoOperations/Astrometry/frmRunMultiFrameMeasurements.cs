@@ -734,16 +734,13 @@ namespace Tangra.VideoOperations.Astrometry
 			int integration = (int)nudIntegratedFrames.Value;
 
 			string cameraModel = m_VideoController.AstroVideoCameraModel ?? AstrometryContext.Current.VideoCamera.Model;
-			Dictionary<int, float> corrections = InstrumentalDelayConfigManager.GetConfigurationForCamera(cameraModel);
+            InstrumentalDelayConfiguration corrections = InstrumentalDelayConfigManager.GetConfigurationForCameraForAstrometry(cameraModel);
 
-			float corr;
-			if (corrections.TryGetValue(integration, out corr))
+		    float? corr = corrections.CalculateDelay(integration, new DelayRequest());
+			if (corr.HasValue)
 			{
-				if (!float.IsNaN(corr))
-				{
-					cbxInstDelayCamera.SelectedIndex = cbxInstDelayCamera.Items.IndexOf(cameraModel);
-					SetKnownManualInstrumentalDelay();
-				}
+				cbxInstDelayCamera.SelectedIndex = cbxInstDelayCamera.Items.IndexOf(cameraModel);
+				SetKnownManualInstrumentalDelay();
 			}
 		}
 
@@ -758,12 +755,13 @@ namespace Tangra.VideoOperations.Astrometry
 				}
 				else
 				{
-					Dictionary<int, float> delaysConfig = InstrumentalDelayConfigManager.GetConfigurationForCamera(cbxInstDelayCamera.Text);
-					if (delaysConfig.ContainsKey((int)nudIntegratedFrames.Value))
-					{
-						nudInstrDelay.Value = -1 * (decimal)delaysConfig[(int)nudIntegratedFrames.Value];
-						cbxInstDelayUnit.SelectedIndex = 1;
-					}
+                    InstrumentalDelayConfiguration delaysConfig = InstrumentalDelayConfigManager.GetConfigurationForCameraForAstrometry(cbxInstDelayCamera.Text);
+                    float? corr = delaysConfig.CalculateDelay((int)nudIntegratedFrames.Value, new DelayRequest());
+				    if (corr.HasValue)
+				    {
+                        nudInstrDelay.Value = -1 * (decimal)corr.Value;
+                        cbxInstDelayUnit.SelectedIndex = 1;
+				    }
 					nudInstrDelay.Enabled = false;
 					cbxInstDelayUnit.Enabled = false;
 				}

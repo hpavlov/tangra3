@@ -15,6 +15,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
+using Tangra.Config;
 using Tangra.Controller;
 using Tangra.Helpers;
 using Tangra.Model.Astro;
@@ -493,29 +494,35 @@ namespace Tangra.VideoOperations.LightCurves
 			}
 
 		    double corrEndFirstField = 0;
-			if (integratedFields > 0 && Footer.InstrumentalDelayConfig.ContainsKey(integratedFields / 2))
+			if (integratedFields > 0)
 			{
-                if (Footer.AAVStackedFrameRate > 1)
-                {
-                    corrEndFirstField = ((integratedFields / 2) - 1) * videoStandardFieldDurationSec;
-                    integratedFields = 2;
-                }
+                float? corrInstrumentalDelay = Footer.InstrumentalDelayConfig.CalculateDelay(integratedFields / 2, new DelayRequest());
+                if (corrInstrumentalDelay != null)
+			    {
+                    if (Footer.AAVStackedFrameRate > 1)
+                    {
+                        corrEndFirstField = ((integratedFields / 2) - 1) * videoStandardFieldDurationSec;
+                        integratedFields = 2;
+                        corrInstrumentalDelay = Footer.InstrumentalDelayConfig.CalculateDelay(integratedFields / 2, new DelayRequest());
+                    }
 
-				double corrInstrumentalDelay = Footer.InstrumentalDelayConfig[integratedFields / 2]; // This is already negative
+			        if (corrInstrumentalDelay != null)
+			        {
+                        rv = rv.AddSeconds(corrEndFirstField + corrInstrumentalDelay.Value /* This is already negative */);
 
-                rv = rv.AddSeconds(corrEndFirstField + corrInstrumentalDelay);
+                        string prefix = "OSD ";
+                        if (Footer.AavNtpTimestampError > -1)
+                            prefix = "NTP ";
+                        else if (Footer.TimestampOCR == null && Footer.ReductionContext.HasEmbeddedTimeStamps)
+                            prefix = "";
 
-				string prefix = "OSD ";
-				if (Footer.AavNtpTimestampError > -1)
-					prefix = "NTP ";
-				else if (Footer.TimestampOCR == null && Footer.ReductionContext.HasEmbeddedTimeStamps)
-					prefix = "";
+                        correctedForInstrumentalDelayMessage = string.Format(
+                            "Instrumental delay has been applied to the times\r\n\r\nEnd of first field {0}timestamp: {1}", prefix, headerComputedTime.ToString("HH:mm:ss.fff"));
 
-				correctedForInstrumentalDelayMessage = string.Format(
-					"Instrumental delay has been applied to the times\r\n\r\nEnd of first field {0}timestamp: {1}", prefix, headerComputedTime.ToString("HH:mm:ss.fff"));
-
-                if (Footer.AAVStackedFrameRate > 1)
-                    correctedForInstrumentalDelayMessage += string.Format("\r\n\r\nThis is a non-integrated video stacked at x{0} frames", Footer.AAVStackedFrameRate);
+                        if (Footer.AAVStackedFrameRate > 1)
+                            correctedForInstrumentalDelayMessage += string.Format("\r\n\r\nThis is a non-integrated video stacked at x{0} frames", Footer.AAVStackedFrameRate);
+			        }
+			    }
 			}
 
 			return rv;
@@ -582,34 +589,44 @@ namespace Tangra.VideoOperations.LightCurves
                     }
                 }
 
-                if (integratedFields > 0 && Footer.InstrumentalDelayConfig.ContainsKey(integratedFields / 2))
+                if (integratedFields > 0)
                 {
-                    bool isAAVOCR = Header.TimingType == MeasurementTimingType.OCRedTimeForEachFrame &&
-                                    Footer.AAVFrameIntegration > 1;
+                    float? delay = Footer.InstrumentalDelayConfig.CalculateDelay(integratedFields / 2, new DelayRequest());
 
-                    if (!isAAVOCR)
+                    if (delay != null)
                     {
-                        // Apply correction: [FRAMETIME - ((1/2 * INTEGRATION PERIOD) - 1 FIELD) * (PAL or NTSC FrameRate) - GERHARD_CORRECTION(INTEGRATION PERIOD)]
-                        corrEndFirstField = -1 * (((integratedFields / 2) - 1) * videoStandardFieldDurationSec); // Half frame back sets us at the begining of the first field, then add 1 field to get to the end of the field                        
+                        bool isAAVOCR = Header.TimingType == MeasurementTimingType.OCRedTimeForEachFrame &&
+                                        Footer.AAVFrameIntegration > 1;
+
+                        if (!isAAVOCR)
+                        {
+                            // Apply correction: [FRAMETIME - ((1/2 * INTEGRATION PERIOD) - 1 FIELD) * (PAL or NTSC FrameRate) - GERHARD_CORRECTION(INTEGRATION PERIOD)]
+                            corrEndFirstField = -1 * (((integratedFields / 2) - 1) * videoStandardFieldDurationSec); // Half frame back sets us at the begining of the first field, then add 1 field to get to the end of the field                        
+                        }
+                        else
+                        {
+                            // In AAV OCR mode the timestamp that we have is already the end of the first video field so no correction required for that
+                            corrEndFirstField = 0;
+                        }
+
+                        corrTimestampHint = corrEndFirstField;
+
+                        if (Footer.AAVStackedFrameRate > 1)
+                        {
+                            // If stacking was used then the instrumental delay should be applied based on 1 frame integration (no integration)
+                            integratedFields = 2;
+                            corrEndFirstField = 0;
+                        }
+
+                        delay = Footer.InstrumentalDelayConfig.CalculateDelay(integratedFields / 2, new DelayRequest());
+
+                        if (delay != null)
+                        {
+                            corrInstrumentalDelay = corrEndFirstField + delay.Value /* This is already negative */;
+
+                            return true;                                                    
+                        }
                     }
-                    else
-                    {
-                        // In AAV OCR mode the timestamp that we have is already the end of the first video field so no correction required for that
-                        corrEndFirstField = 0;
-                    }
-
-                    corrTimestampHint = corrEndFirstField;
-
-                    if (Footer.AAVStackedFrameRate > 1)
-                    {
-                        // If stacking was used then the instrumental delay should be applied based on 1 frame integration (no integration)
-                        integratedFields = 2;
-                        corrEndFirstField = 0;
-                    }
-
-                    corrInstrumentalDelay = corrEndFirstField + Footer.InstrumentalDelayConfig[integratedFields / 2]; // This is already negative
-
-                    return true;
                 }
             }
 
@@ -2061,7 +2078,7 @@ namespace Tangra.VideoOperations.LightCurves
     {
         public static LCMeasurementFooter Empty = new LCMeasurementFooter();
 
-        private static int SERIALIZATION_VERSION = 13;
+        private static int SERIALIZATION_VERSION = 14;
 
         internal byte[] AveragedFrameBytes;
     	internal int AveragedFrameWidth;
@@ -2074,7 +2091,7 @@ namespace Tangra.VideoOperations.LightCurves
         internal float RefinedAverageFWHM;
         internal string TimestampOCR;
         internal Dictionary<int, long> ThumbPrintDict;
-	    internal Dictionary<int, float> InstrumentalDelayConfig;
+	    internal InstrumentalDelayConfiguration InstrumentalDelayConfig;
 		internal string InstrumentalDelayConfigName;
 
         internal string CameraName;
@@ -2100,7 +2117,7 @@ namespace Tangra.VideoOperations.LightCurves
             ITracker tracker,
             string timestampOCRVersion,
             Dictionary<int, long> thumbPrintDict,
-			Dictionary<int, float> instrumentalDelayConfig,
+			InstrumentalDelayConfiguration instrumentalDelayConfig,
 			string instrumentalDelayConfigName,
             string cameraName,
 			string aavNativeVideoFormat,
@@ -2180,7 +2197,7 @@ namespace Tangra.VideoOperations.LightCurves
 			RefinedAverageFWHM = float.NaN;
 			TimestampOCR = string.Empty;
 			ThumbPrintDict = new Dictionary<int, long>();
-			InstrumentalDelayConfig = new Dictionary<int, float>();
+			InstrumentalDelayConfig = new NotSupportedInstrumentalDelayConfiguration();
 	        InstrumentalDelayConfigName = string.Empty;
             CameraName = string.Empty;
             AAVFrameIntegration = -1;
@@ -2217,13 +2234,15 @@ namespace Tangra.VideoOperations.LightCurves
 						if (version > 4)
 						{
 							numRecs = reader.ReadInt32();
+						    var fixedDelaysDict = new Dictionary<int, float>();
 							for (int i = 0; i < numRecs; i++)
 							{
 								int frameIntegration = reader.ReadInt32();
 								float delayInMilliseconds = reader.ReadSingle();
-								InstrumentalDelayConfig[frameIntegration] = delayInMilliseconds;
+                                fixedDelaysDict[frameIntegration] = delayInMilliseconds;
 							}
 
+                            InstrumentalDelayConfig = new FixedDelayInstrumentalDelayConfiguration(fixedDelaysDict);
 							InstrumentalDelayConfigName = reader.ReadString();
 
                             if (version > 5)
@@ -2261,6 +2280,11 @@ namespace Tangra.VideoOperations.LightCurves
                                                         if (version > 12)
                                                         {
                                                             RotateFlipType = (RotateFlipType)reader.ReadInt32();
+
+                                                            if (version > 13)
+                                                            {
+                                                                InstrumentalDelayConfig = InstrumentalDelayConfigurationFactory.Deserialize(reader);
+                                                            }
                                                         }
                                                     }
 	                                            }
@@ -2316,12 +2340,9 @@ namespace Tangra.VideoOperations.LightCurves
 
 			if (InstrumentalDelayConfig != null)
 			{
-				writer.Write(InstrumentalDelayConfig.Count);
-				foreach (int key in InstrumentalDelayConfig.Keys)
-				{
-					writer.Write(key);
-					writer.Write(InstrumentalDelayConfig[key]);
-				}
+                // NOTE: Write and empty dictionary (the old way of storing the delays). 
+                //       The new way of storing the delays is done later below
+				writer.Write(0);
 			}
 			else
 				writer.Write((int)0);
@@ -2347,6 +2368,8 @@ namespace Tangra.VideoOperations.LightCurves
             writer.Write(FitsDynamicToValue);
 
             writer.Write((int)RotateFlipType);
+
+            InstrumentalDelayConfigurationFactory.Serialize(InstrumentalDelayConfig, writer);
         }
     }
 
