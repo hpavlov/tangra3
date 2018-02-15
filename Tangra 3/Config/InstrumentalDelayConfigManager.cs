@@ -14,12 +14,21 @@ namespace Tangra.Config
 {
     public struct DelayRequest
     {
-        public float X;
-        public float Y;
+        /// <summary>
+        /// X position from 0 to 1 (frame width adjusted)
+        /// </summary>
+        public float XPosRatio;
+
+        /// <summary>
+        /// Y position from 0 to 1 (frame height adjusted)
+        /// </summary>
+        public float YPosRatio;
     }
 
 	public static class InstrumentalDelayConfigManager
 	{
+        public const string RUNCAM = "RunCam";
+
 		private static List<string> s_SupportedCameras;
         private static Dictionary<string, InstrumentalDelayConfiguration> s_SupportedCamerasConfig;
         private static List<string> s_SupportedCamerasForAstrometry;
@@ -38,6 +47,8 @@ namespace Tangra.Config
 			Add_Mintron_NTSC_InstrumentalDelayConfig();
 			Add_PC165DNR_NTSC_InstrumentalDelayConfig();
 			Add_SCB2000N_NTSC_InstrumentalDelayConfig();
+		    Add_RunCam_PAL_InstrumentalDelayConfig();
+		    Add_RunCam_NTSC_InstrumentalDelayConfig();
 		    Add_NonIntegratingCameras_InstrumentalDelayConfig();
 
 			s_SupportedCameras.Sort();
@@ -231,6 +242,34 @@ namespace Tangra.Config
 
             s_SupportedCamerasConfig.Add(MODEL, new FixedDelayInstrumentalDelayConfiguration(delays));
 		}
+
+        private static void Add_RunCam_NTSC_InstrumentalDelayConfig()
+        {
+            const string MODEL = RUNCAM + " Astro (NTSC)";
+            s_SupportedCameras.Add(MODEL);
+            s_SupportedCamerasForAstrometry.Add(MODEL);
+            var delays = new Dictionary<int, Tuple<float, float>>();
+
+            delays.Add(1, Tuple.Create(-0.066744f * 480, 69.03f));
+            delays.Add(2, Tuple.Create(-0.067282f * 480, 102.68f));
+            delays.Add(4, Tuple.Create(-0.066563f * 480, 169.24f));
+
+            s_SupportedCamerasConfig.Add(MODEL, new ImageOffsetInstrumentalDelayConfiguration(delays));
+        }
+
+        private static void Add_RunCam_PAL_InstrumentalDelayConfig()
+        {
+            const string MODEL = RUNCAM + " Astro (PAL)";
+            s_SupportedCameras.Add(MODEL);
+            s_SupportedCamerasForAstrometry.Add(MODEL);
+            var delays = new Dictionary<int, Tuple<float, float>>();
+
+            delays.Add(1, Tuple.Create(-0.063143f * 576, 74.24f));
+            delays.Add(2, Tuple.Create(-0.062652f * 576, 114.12f));
+            delays.Add(4, Tuple.Create(-0.062463f * 576, 194.94f));
+
+            s_SupportedCamerasConfig.Add(MODEL, new ImageOffsetInstrumentalDelayConfiguration(delays));
+        }
 
 	    private static void Add_NonIntegratingCameras_InstrumentalDelayConfig()
 	    {

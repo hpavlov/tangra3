@@ -83,6 +83,12 @@ namespace Tangra.OccultTools
 	            errorMessage = m_OccultWrapper.HasSupportedVersionOfOccult(m_Settings.OccultLocation);
                 if (errorMessage == null)
                 {
+                    if (dataProvider.VideoCameraName.StartsWith("RunCam"))
+                    {
+                        ShowErrorMessage("RunCam is currently not supported by AOTA.");
+                        return;
+                    }
+
                     if (m_OccultWrapper.RunAOTA(dataProvider, m_TangraHost.ParentWindow))
                         m_AOTAFormVisible = true;
                 }

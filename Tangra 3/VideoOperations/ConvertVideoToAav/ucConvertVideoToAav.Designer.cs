@@ -270,6 +270,7 @@
             "G-Star",
             "Samsung SCB-2000",
             "PC165-DNR",
+            "RunCam Astro",
             "Unknown"});
             this.cbxCameraModel.Location = new System.Drawing.Point(60, 19);
             this.cbxCameraModel.Name = "cbxCameraModel";

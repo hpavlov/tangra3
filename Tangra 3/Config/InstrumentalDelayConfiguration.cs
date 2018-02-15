@@ -77,17 +77,47 @@ namespace Tangra.Config
     public class ImageOffsetInstrumentalDelayConfiguration : InstrumentalDelayConfiguration
     {
         internal const int TYPE = 2;
+        private static int CURRENT_VERSION = 0;
+
+        private Dictionary<int, Tuple<float, float>> m_DelayData = new Dictionary<int, Tuple<float, float>>();
+
+        public ImageOffsetInstrumentalDelayConfiguration(Dictionary<int, Tuple<float, float>> delayData)
+        {
+            foreach (var kvp in delayData)
+                m_DelayData.Add(kvp.Key, kvp.Value);
+        }
 
         public ImageOffsetInstrumentalDelayConfiguration(BinaryReader reader)
-        { }
+        {
+            var version = reader.ReadInt32();
+            int count = reader.ReadInt32();
+            for (int i = 0; i < count; i++)
+            {
+                int intFrames = reader.ReadInt32();
+                float param1 = reader.ReadSingle();
+                float param2 = reader.ReadSingle();
+                m_DelayData.Add(intFrames, Tuple.Create(param1, param2));
+            }
+        }
 
         public override void Serialize(BinaryWriter writer)
         {
-
+            writer.Write(CURRENT_VERSION);
+            writer.Write(m_DelayData.Count);
+            foreach (var entry in m_DelayData)
+            {
+                writer.Write(entry.Key);
+                writer.Write(entry.Value.Item1);
+                writer.Write(entry.Value.Item2);
+            }
         }
 
         public override float? CalculateDelay(int integratedFrames, DelayRequest request)
         {
+            Tuple<float, float> delay;
+            if (m_DelayData.TryGetValue(integratedFrames, out delay))
+                return -1 * (delay.Item1 * request.YPosRatio + delay.Item2);
+
             return null;
         }
     }

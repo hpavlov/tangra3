@@ -64,12 +64,27 @@ namespace Tangra.Config
 
 		private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
 		{
-			ShellHelper.OpenUrl("http://www.dangl.at/ausruest/vid_tim/vid_tim1.htm");
+            if (llDelaysRef.Tag != null)
+                ShellHelper.OpenUrl((string)llDelaysRef.Tag);
 		}
 
 		private void rbCorrect_CheckedChanged(object sender, EventArgs e)
 		{
 			cbxCameras.Enabled = rbCorrect.Checked;
 		}
+
+        private void cbxCameras_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cbxCameras.Text.StartsWith(InstrumentalDelayConfigManager.RUNCAM))
+            {
+                llDelaysRef.Text = "Instrumental delays by Bob Anderson";
+                llDelaysRef.Tag = "http://occultations.org/documents/RunCam-Night-Eagle-Astro-test-report.pdf";
+            }
+            else
+            {
+                llDelaysRef.Text = "Instrumental delays by Gerhard Dangl";
+                llDelaysRef.Tag = "http://www.dangl.at/ausruest/vid_tim/vid_tim1.htm";
+            }
+        }
 	}
 }

@@ -465,6 +465,24 @@ namespace Tangra.VideoOperations.LightCurves
 			}
 		}
 
+        private DelayRequest GetDelayRequest(double frameNo)
+        {
+            int occObjId = 0;
+            for (int i = 0; i < Header.ObjectCount; i++)
+            {
+                if (Footer.TrackedObjects[i].TrackingType == TrackingType.OccultedStar)
+                {
+                    occObjId = i;
+                    break;
+                }
+            }
+
+            float objectX = Data[occObjId][(int)Math.Round(frameNo - Header.MinFrame)].X0;
+            float objectY = Data[occObjId][(int)Math.Round(frameNo - Header.MinFrame)].Y0;
+
+            return new DelayRequest() { XPosRatio = objectX * 1.0f / Footer.AveragedFrameWidth, YPosRatio = objectY * 1.0f / Footer.AveragedFrameHeight };
+        }
+
 		private DateTime GetTimeForFrameFromManuallyEnteredTimesWithInstrumentalDelay(double frameNo, out string correctedForInstrumentalDelayMessage)
 		{
 			DateTime headerComputedTime = Header.GetTimeForFrameFromManuallyEnteredTimes(frameNo);
@@ -496,14 +514,16 @@ namespace Tangra.VideoOperations.LightCurves
 		    double corrEndFirstField = 0;
 			if (integratedFields > 0)
 			{
-                float? corrInstrumentalDelay = Footer.InstrumentalDelayConfig.CalculateDelay(integratedFields / 2, new DelayRequest());
+			    var delayRequest = GetDelayRequest(frameNo);
+
+                float? corrInstrumentalDelay = Footer.InstrumentalDelayConfig.CalculateDelay(integratedFields / 2, delayRequest);
                 if (corrInstrumentalDelay != null)
 			    {
                     if (Footer.AAVStackedFrameRate > 1)
                     {
                         corrEndFirstField = ((integratedFields / 2) - 1) * videoStandardFieldDurationSec;
                         integratedFields = 2;
-                        corrInstrumentalDelay = Footer.InstrumentalDelayConfig.CalculateDelay(integratedFields / 2, new DelayRequest());
+                        corrInstrumentalDelay = Footer.InstrumentalDelayConfig.CalculateDelay(integratedFields / 2, delayRequest);
                     }
 
 			        if (corrInstrumentalDelay != null)
@@ -591,7 +611,9 @@ namespace Tangra.VideoOperations.LightCurves
 
                 if (integratedFields > 0)
                 {
-                    float? delay = Footer.InstrumentalDelayConfig.CalculateDelay(integratedFields / 2, new DelayRequest());
+                    var delayRequest = GetDelayRequest(frameNo);
+
+                    float? delay = Footer.InstrumentalDelayConfig.CalculateDelay(integratedFields / 2, delayRequest);
 
                     if (delay != null)
                     {
@@ -618,7 +640,7 @@ namespace Tangra.VideoOperations.LightCurves
                             corrEndFirstField = 0;
                         }
 
-                        delay = Footer.InstrumentalDelayConfig.CalculateDelay(integratedFields / 2, new DelayRequest());
+                        delay = Footer.InstrumentalDelayConfig.CalculateDelay(integratedFields / 2, delayRequest);
 
                         if (delay != null)
                         {
