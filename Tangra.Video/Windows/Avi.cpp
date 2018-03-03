@@ -381,6 +381,6 @@ unsigned int FormatAviMessage(HRESULT code, char *buf,unsigned int len) {
 	unsigned int mlen=(unsigned int)strlen(msg);
 	if (buf==0 || len==0) return mlen;
 	unsigned int n=mlen; if (n+1>len) n=len-1;
-	strncpy(buf,msg,n); buf[n]=0;
+	strncpy_s(buf,n,msg,len); buf[n]=0;
 	return mlen;
 }

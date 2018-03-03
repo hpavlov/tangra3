@@ -70,7 +70,7 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(ProjectDir)$(Configuration)\</OutDir>
     <TargetName>TangraVideo</TargetName>
-    <IncludePath>C:\Program Files\Microsoft SDKs\Windows\v6.0\Include;$(IncludePath)</IncludePath>
+    <IncludePath>%WINDOWS_SDK6_ROOT%\Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -82,7 +82,7 @@
     <LinkIncremental>false</LinkIncremental>
     <TargetName>TangraVideo</TargetName>
     <OutDir>$(ProjectDir)$(Configuration)\</OutDir>
-    <IncludePath>C:\Program Files\Microsoft SDKs\Windows\v6.0\Include;$(IncludePath)</IncludePath>
+    <IncludePath>%WINDOWS_SDK6_ROOT%\Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -98,13 +98,14 @@
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>Vfw32.lib;Gdiplus.lib;Strmiids.lib;TangraCoredll.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>TangraVideo.def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>.\lib\Debug;C:\Program Files\Microsoft SDKs\Windows\v6.0\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\lib\Debug;%WINDOWS_SDK6_ROOT%\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(TargetDir)TangraVideo.dll" "$(TargetDir)..\..\..\Tangra 3\WindowsFiles\$(Configuration)\" /y</Command>
@@ -141,13 +142,14 @@ xcopy "$(ProjectDir)lib\$(Configuration)\TangraCore.dll" "$(SolutionDir)Tangra 3
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;TANGRAVIDEO_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>./include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>false</OptimizeReferences>
-      <AdditionalLibraryDirectories>.\lib\Release;C:\Program Files\Microsoft SDKs\Windows\v6.0\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\lib\Release;%WINDOWS_SDK6_ROOT%\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Vfw32.lib;Gdiplus.lib;Strmiids.lib;TangraCoredll.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>TangraVideo.def</ModuleDefinitionFile>
     </Link>

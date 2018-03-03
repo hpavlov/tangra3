@@ -2,7 +2,7 @@
 
 #define VERSION_MAJOR 3
 #define VERSION_MINOR 0
-#define VERSION_REVISION 28
+#define VERSION_REVISION 29
 
 struct VideoFileInfo
 {
@@ -18,7 +18,7 @@ struct VideoFileInfo
 
 
 
-HRESULT TangraVideoEnumVideoEngines(char* videoEngines);
+HRESULT TangraVideoEnumVideoEngines(char* videoEngines, int len);
 
 HRESULT TangraVideoSetVideoEngine(int videoEngine);
 
@@ -36,6 +36,6 @@ HRESULT TangraCreateNewAviFile(LPCTSTR szFileName, long width, long height, int 
 
 HRESULT TangraAviFileAddFrame(long* pixels);
 
-HRESULT TangraGetLastAviFileError(LPCTSTR szErrorMessage);
+HRESULT TangraGetLastAviFileError(char* szErrorMessage, int len);
 
 HRESULT TangraAviFileClose();

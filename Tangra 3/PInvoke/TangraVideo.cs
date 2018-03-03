@@ -75,7 +75,7 @@ namespace Tangra.PInvoke
 
 		[DllImport(LIBRARY_TANGRA_VIDEO, CallingConvention = CallingConvention.Cdecl)]
 		//HRESULT TangraVideoEnumVideoEngines(char* videoEngines);
-		private static extern int TangraVideoEnumVideoEngines([In, Out] byte[] videoEngines);
+		private static extern int TangraVideoEnumVideoEngines([In, Out] byte[] videoEngines, int buffLen);
 
 		[DllImport(LIBRARY_TANGRA_VIDEO, CallingConvention = CallingConvention.Cdecl)]
 		//HRESULT TangraVideoSetVideoEngine(int videoEngine);
@@ -111,7 +111,7 @@ namespace Tangra.PInvoke
         private static extern int TangraAviFileClose();
 
         [DllImport(LIBRARY_TANGRA_VIDEO, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int TangraGetLastAviFileError(IntPtr errorMessage);
+        private static extern int TangraGetLastAviFileError(IntPtr errorMessage, int buffLen);
 
 
 		[DllImport(LIBRARY_TANGRA_VIDEO, CallingConvention = CallingConvention.Cdecl)]
@@ -123,7 +123,7 @@ namespace Tangra.PInvoke
 		public static string[] EnumVideoEngines()
 		{
 			byte[] buffer = new byte[255];
-			TangraVideoEnumVideoEngines(buffer);
+			TangraVideoEnumVideoEngines(buffer, 255);
 
 			return Encoding.ASCII.GetString(buffer).Trim('\0').Split(';');
 		}
@@ -331,7 +331,7 @@ namespace Tangra.PInvoke
                 Marshal.Copy(errorMessage, 0, buffer, errorMessage.Length);
                 Marshal.WriteByte(buffer + errorMessage.Length, 0); // terminating null
 
-                TangraGetLastAviFileError(buffer);
+                TangraGetLastAviFileError(buffer, 200);
 
                 error = Marshal.PtrToStringAnsi(buffer);
 

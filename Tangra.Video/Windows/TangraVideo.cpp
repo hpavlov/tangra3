@@ -13,9 +13,9 @@ PAVISTREAM g_paviStream = NULL;
 PGETFRAME g_pGetFrame = NULL;
 
 
-HRESULT TangraVideoEnumVideoEngines(char* videoEngines)
+HRESULT TangraVideoEnumVideoEngines(char* videoEngines, int len)
 {
-	strcpy(videoEngines, "VideoForWindows (2Gb Limit);DirectShow");
+	strcpy_s(videoEngines, len, "VideoForWindows (2Gb Limit);DirectShow");
 	
 	return S_OK;
 }
@@ -323,9 +323,9 @@ HRESULT SetAviFileCompression(HBITMAP* bmp)
 	return rv;
 }
 
-HRESULT TangraGetLastAviFileError(char* szErrorMessage)
+HRESULT TangraGetLastAviFileError(char* szErrorMessage, int len)
 {
-	strncpy(szErrorMessage, s_LastAviErrorMessage, ERROR_BUFFER_SIZE);
+	strncpy_s(szErrorMessage, ERROR_BUFFER_SIZE, s_LastAviErrorMessage, len);
 
 	return S_OK;
 }
