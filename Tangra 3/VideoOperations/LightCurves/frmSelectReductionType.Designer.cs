@@ -74,15 +74,9 @@ namespace Tangra.VideoOperations.LightCurves
             this.rbBinning = new System.Windows.Forms.RadioButton();
             this.rbRunningAverage = new System.Windows.Forms.RadioButton();
             this.tabStretching = new System.Windows.Forms.TabPage();
+            this.ucStretching = new Tangra.VideoTools.ucPreProcessing();
             this.tabReduction = new System.Windows.Forms.TabPage();
             this.pnlBackground = new System.Windows.Forms.Panel();
-            this.ucStretching = new Tangra.VideoTools.ucPreProcessing();
-            this.tabDefectsCorrection = new System.Windows.Forms.TabPage();
-            this.gbxInterlacedSettings = new System.Windows.Forms.GroupBox();
-            this.rbReInterlaceShiftAndSwap = new System.Windows.Forms.RadioButton();
-            this.rbReInterlaceShiftForward = new System.Windows.Forms.RadioButton();
-            this.rbReInterlaceNon = new System.Windows.Forms.RadioButton();
-            this.rbReInterlaceSwapFields = new System.Windows.Forms.RadioButton();
             this.tabsOptions.SuspendLayout();
             this.tabGeneral.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -97,8 +91,6 @@ namespace Tangra.VideoOperations.LightCurves
             this.tabStretching.SuspendLayout();
             this.tabReduction.SuspendLayout();
             this.pnlBackground.SuspendLayout();
-            this.tabDefectsCorrection.SuspendLayout();
-            this.gbxInterlacedSettings.SuspendLayout();
             this.SuspendLayout();
             // 
             // rbAsteroidal
@@ -231,7 +223,6 @@ namespace Tangra.VideoOperations.LightCurves
             this.tabsOptions.Controls.Add(this.tabIntegration);
             this.tabsOptions.Controls.Add(this.tabStretching);
             this.tabsOptions.Controls.Add(this.tabReduction);
-            this.tabsOptions.Controls.Add(this.tabDefectsCorrection);
             this.tabsOptions.Location = new System.Drawing.Point(12, 9);
             this.tabsOptions.Name = "tabsOptions";
             this.tabsOptions.SelectedIndex = 0;
@@ -609,6 +600,13 @@ namespace Tangra.VideoOperations.LightCurves
             this.tabStretching.Text = "Pre-Processing";
             this.tabStretching.UseVisualStyleBackColor = true;
             // 
+            // ucStretching
+            // 
+            this.ucStretching.Location = new System.Drawing.Point(0, 0);
+            this.ucStretching.Name = "ucStretching";
+            this.ucStretching.Size = new System.Drawing.Size(370, 221);
+            this.ucStretching.TabIndex = 0;
+            // 
             // tabReduction
             // 
             this.tabReduction.BackColor = System.Drawing.Color.Transparent;
@@ -622,7 +620,7 @@ namespace Tangra.VideoOperations.LightCurves
             this.tabReduction.Padding = new System.Windows.Forms.Padding(3);
             this.tabReduction.Size = new System.Drawing.Size(370, 241);
             this.tabReduction.TabIndex = 1;
-            this.tabReduction.Text = "Reduction";
+            this.tabReduction.Text = "Reduction Settings";
             this.tabReduction.UseVisualStyleBackColor = true;
             // 
             // pnlBackground
@@ -633,79 +631,6 @@ namespace Tangra.VideoOperations.LightCurves
             this.pnlBackground.Name = "pnlBackground";
             this.pnlBackground.Size = new System.Drawing.Size(291, 40);
             this.pnlBackground.TabIndex = 6;
-            // 
-            // ucStretching
-            // 
-            this.ucStretching.Location = new System.Drawing.Point(0, 0);
-            this.ucStretching.Name = "ucStretching";
-            this.ucStretching.Size = new System.Drawing.Size(370, 221);
-            this.ucStretching.TabIndex = 0;
-            // 
-            // tabDefectsCorrection
-            // 
-            this.tabDefectsCorrection.Controls.Add(this.gbxInterlacedSettings);
-            this.tabDefectsCorrection.Location = new System.Drawing.Point(4, 22);
-            this.tabDefectsCorrection.Name = "tabDefectsCorrection";
-            this.tabDefectsCorrection.Padding = new System.Windows.Forms.Padding(3);
-            this.tabDefectsCorrection.Size = new System.Drawing.Size(370, 241);
-            this.tabDefectsCorrection.TabIndex = 4;
-            this.tabDefectsCorrection.Text = "Defects Correction";
-            this.tabDefectsCorrection.UseVisualStyleBackColor = true;
-            // 
-            // gbxInterlacedSettings
-            // 
-            this.gbxInterlacedSettings.Controls.Add(this.rbReInterlaceShiftAndSwap);
-            this.gbxInterlacedSettings.Controls.Add(this.rbReInterlaceShiftForward);
-            this.gbxInterlacedSettings.Controls.Add(this.rbReInterlaceNon);
-            this.gbxInterlacedSettings.Controls.Add(this.rbReInterlaceSwapFields);
-            this.gbxInterlacedSettings.Location = new System.Drawing.Point(6, 6);
-            this.gbxInterlacedSettings.Name = "gbxInterlacedSettings";
-            this.gbxInterlacedSettings.Size = new System.Drawing.Size(358, 229);
-            this.gbxInterlacedSettings.TabIndex = 50;
-            this.gbxInterlacedSettings.TabStop = false;
-            this.gbxInterlacedSettings.Text = "Interlaced Video Frame Grabbing Corrections";
-            // 
-            // rbReInterlaceShiftAndSwap
-            // 
-            this.rbReInterlaceShiftAndSwap.AutoSize = true;
-            this.rbReInterlaceShiftAndSwap.Location = new System.Drawing.Point(24, 93);
-            this.rbReInterlaceShiftAndSwap.Name = "rbReInterlaceShiftAndSwap";
-            this.rbReInterlaceShiftAndSwap.Size = new System.Drawing.Size(186, 17);
-            this.rbReInterlaceShiftAndSwap.TabIndex = 50;
-            this.rbReInterlaceShiftAndSwap.Text = "Swap and Shift One Field Forward";
-            this.rbReInterlaceShiftAndSwap.UseVisualStyleBackColor = true;
-            // 
-            // rbReInterlaceShiftForward
-            // 
-            this.rbReInterlaceShiftForward.AutoSize = true;
-            this.rbReInterlaceShiftForward.Location = new System.Drawing.Point(24, 70);
-            this.rbReInterlaceShiftForward.Name = "rbReInterlaceShiftForward";
-            this.rbReInterlaceShiftForward.Size = new System.Drawing.Size(135, 17);
-            this.rbReInterlaceShiftForward.TabIndex = 49;
-            this.rbReInterlaceShiftForward.Text = "Shift One Field Forward";
-            this.rbReInterlaceShiftForward.UseVisualStyleBackColor = true;
-            // 
-            // rbReInterlaceNon
-            // 
-            this.rbReInterlaceNon.AutoSize = true;
-            this.rbReInterlaceNon.Checked = true;
-            this.rbReInterlaceNon.Location = new System.Drawing.Point(24, 24);
-            this.rbReInterlaceNon.Name = "rbReInterlaceNon";
-            this.rbReInterlaceNon.Size = new System.Drawing.Size(95, 17);
-            this.rbReInterlaceNon.TabIndex = 47;
-            this.rbReInterlaceNon.TabStop = true;
-            this.rbReInterlaceNon.Text = "No Corrections";
-            this.rbReInterlaceNon.UseVisualStyleBackColor = true;
-            // 
-            // rbReInterlaceSwapFields
-            // 
-            this.rbReInterlaceSwapFields.AutoSize = true;
-            this.rbReInterlaceSwapFields.Location = new System.Drawing.Point(24, 47);
-            this.rbReInterlaceSwapFields.Name = "rbReInterlaceSwapFields";
-            this.rbReInterlaceSwapFields.Size = new System.Drawing.Size(154, 17);
-            this.rbReInterlaceSwapFields.TabIndex = 48;
-            this.rbReInterlaceSwapFields.Text = "Swap Even and Odd Fields";
-            this.rbReInterlaceSwapFields.UseVisualStyleBackColor = true;
             // 
             // frmSelectReductionType
             // 
@@ -748,9 +673,6 @@ namespace Tangra.VideoOperations.LightCurves
             this.tabReduction.PerformLayout();
             this.pnlBackground.ResumeLayout(false);
             this.pnlBackground.PerformLayout();
-            this.tabDefectsCorrection.ResumeLayout(false);
-            this.gbxInterlacedSettings.ResumeLayout(false);
-            this.gbxInterlacedSettings.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -803,11 +725,5 @@ namespace Tangra.VideoOperations.LightCurves
         private System.Windows.Forms.CheckBox cbxFullDisappearance;
         private System.Windows.Forms.CheckBox cbxDriftTrough;
         private System.Windows.Forms.Label lblTrackingDescr;
-        private System.Windows.Forms.TabPage tabDefectsCorrection;
-        private System.Windows.Forms.GroupBox gbxInterlacedSettings;
-        private System.Windows.Forms.RadioButton rbReInterlaceShiftAndSwap;
-        private System.Windows.Forms.RadioButton rbReInterlaceShiftForward;
-        private System.Windows.Forms.RadioButton rbReInterlaceNon;
-        private System.Windows.Forms.RadioButton rbReInterlaceSwapFields;
     }
 }

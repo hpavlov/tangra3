@@ -147,10 +147,10 @@ namespace Tangra.View
 
             string preProcessingInfoStr = string.Empty;
             string preProcessingInfoTooltip = string.Empty;
-		    bool usesReInterlacing = TangraContext.Current.ReInterlacingMode != ReInterlaceMode.None;
+		    bool usesReInterlacing = !string.IsNullOrEmpty(TangraContext.Current.ReInterlacingMode);
 		    if (usesReInterlacing)
 		    {
-		        preProcessingInfoStr = TangraContext.Current.ReInterlacingMode.GetTextDescription();
+		        preProcessingInfoStr = TangraContext.Current.ReInterlacingMode;
                 preProcessingInfoTooltip += string.Format("Using {0} Re-Interlacing\r\n", TangraContext.Current.ReInterlacingMode);
 		    }
 

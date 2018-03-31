@@ -11,9 +11,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Serialization;
-using Tangra.Model.Config;
 using Tangra.Model.Helpers;
-using Tangra.Video;
 using Tangra.VideoOperations.LightCurves;
 
 namespace Tangra.Helpers
@@ -148,23 +146,5 @@ namespace Tangra.Helpers
                 return memStr.ToString();
             }
         }
-
-	    public static string GetTextDescription(this ReInterlaceMode mode)
-	    {
-            if (mode == ReInterlaceMode.SwapFields)
-                return "FieldSwap";
-            else if (mode == ReInterlaceMode.ShiftOneField)
-            {
-                return "FieldShift";
-            }
-            else if (mode == ReInterlaceMode.SwapAndShiftOneField)
-            {
-                return "FieldSwapAndShift";
-            }
-            else
-            {
-                return null;
-            }
-	    }
 	}
 }

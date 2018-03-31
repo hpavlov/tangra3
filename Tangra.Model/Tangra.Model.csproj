@@ -142,7 +142,6 @@
     <Compile Include="Config\MPCObsHeader.cs" />
     <Compile Include="Config\MPCObsLine.cs" />
     <Compile Include="Config\OCRConfigEntry.cs" />
-    <Compile Include="Config\ReInterlaceMode.cs" />
     <Compile Include="Config\SerSettings.cs" />
     <Compile Include="Config\StarMapInternalConfig.cs" />
     <Compile Include="Config\TangraConfig.cs" />

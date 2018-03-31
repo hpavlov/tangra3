@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
 using Tangra.Controller;
-using Tangra.Model.Config;
-using Tangra.Model.Context;
 using Tangra.Video;
 
 namespace Tangra.VideoTools
@@ -22,19 +20,6 @@ namespace Tangra.VideoTools
         {
             m_VideoController = videoController;
             m_ReInterlacedStream = videoController.FramePlayer.Video as ReInterlacingVideoStream;
-
-            switch (TangraContext.Current.ReInterlacingMode)
-            {
-                case ReInterlaceMode.SwapFields:
-                    rbReInterlaceSwapFields.Checked = true;
-                    break;
-                case ReInterlaceMode.ShiftOneField:
-                    rbReInterlaceShiftForward.Checked = true;
-                    break;
-                case ReInterlaceMode.SwapAndShiftOneField:
-                    rbReInterlaceShiftAndSwap.Checked = true;
-                    break;
-            }
         }
 
         private void btnClose_Click(object sender, EventArgs e)
