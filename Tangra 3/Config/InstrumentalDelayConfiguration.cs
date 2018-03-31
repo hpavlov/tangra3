@@ -120,6 +120,15 @@ namespace Tangra.Config
 
             return null;
         }
+
+        public float GetYCoefficient(int integratedFrames)
+        {
+            Tuple<float, float> delay;
+            if (m_DelayData.TryGetValue(integratedFrames, out delay))
+                return delay.Item1;
+
+            return 0;
+        }
     }
 
     public class InstrumentalDelayConfigurationFactory

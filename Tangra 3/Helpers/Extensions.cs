@@ -33,13 +33,35 @@ namespace Tangra.Helpers
 
 		public static void SetNUDValue(this NumericUpDown nud, decimal value)
 		{
-			if (value < nud.Minimum)
-				nud.Value = nud.Minimum;
-			else if (value > nud.Maximum)
-				nud.Value = nud.Maximum;
-			else
-				nud.Value = value;
+			SetNUDValue(nud, value, null, null);
 		}
+
+        public static void SetNUDValue(this NumericUpDown nud, double value, IWin32Window form, string valueTitle)
+        {
+            if (!double.IsNaN(value))
+                SetNUDValue(nud, (decimal)value, form, valueTitle);
+        }
+
+        public static void SetNUDValue(this NumericUpDown nud, int value, IWin32Window form, string valueTitle)
+        {
+            SetNUDValue(nud, (decimal)value, form, valueTitle);
+        }
+
+        public static void SetNUDValue(this NumericUpDown nud, decimal value, IWin32Window form, string valueTitle)
+        {
+            if (value < nud.Minimum)
+            {
+                nud.Value = nud.Minimum;
+                if (form != null) MessageBox.Show(form, string.Format("The value of {0} for '{1}' was smaller than the minimun of {2} and the minimum was used instead.", value, valueTitle, nud.Minimum), "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            else if (value > nud.Maximum)
+            {
+                nud.Value = nud.Maximum;
+                if (form != null) MessageBox.Show(form, string.Format("The value of {0} for '{1}' was bigger than the maximum of {2} and the maximum was used instead.", value, valueTitle, nud.Maximum), "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            else
+                nud.Value = value;
+        }
 
 		public static void SetCBXIndex(this ComboBox cbx, int index)
 		{

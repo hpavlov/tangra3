@@ -48,6 +48,7 @@ namespace Tangra.VideoOperations.Astrometry
             this.cbxBackgroundMethod = new System.Windows.Forms.ComboBox();
             this.pnlAstrometry = new System.Windows.Forms.Panel();
             this.label5 = new System.Windows.Forms.Label();
+            this.ucFrameInterval = new Tangra.VideoOperations.Astrometry.ucFrameInterval();
             this.label3 = new System.Windows.Forms.Label();
             this.nudNumberMeasurements = new System.Windows.Forms.NumericUpDown();
             this.label2 = new System.Windows.Forms.Label();
@@ -81,7 +82,7 @@ namespace Tangra.VideoOperations.Astrometry
             this.gbConfig = new System.Windows.Forms.GroupBox();
             this.pnlAddins = new System.Windows.Forms.Panel();
             this.clbAddinsToRun = new System.Windows.Forms.CheckedListBox();
-            this.ucFrameInterval = new Tangra.VideoOperations.Astrometry.ucFrameInterval();
+            this.lblYCoeff = new System.Windows.Forms.Label();
             this.pnlExportConfig.SuspendLayout();
             this.pnlExportPhotometry.SuspendLayout();
             this.pnlPhotometry.SuspendLayout();
@@ -486,6 +487,15 @@ namespace Tangra.VideoOperations.Astrometry
             this.label5.TabIndex = 8;
             this.label5.Text = "Take up to";
             // 
+            // ucFrameInterval
+            // 
+            this.ucFrameInterval.Location = new System.Drawing.Point(17, 15);
+            this.ucFrameInterval.Name = "ucFrameInterval";
+            this.ucFrameInterval.Size = new System.Drawing.Size(179, 27);
+            this.ucFrameInterval.TabIndex = 0;
+            this.ucFrameInterval.Value = 1;
+            this.ucFrameInterval.FrameIntervalChanged += new System.EventHandler<Tangra.VideoOperations.Astrometry.FrameIntervalChangedEventArgs>(this.ucFrameInterval_FrameIntervalChanged);
+            // 
             // label3
             // 
             this.label3.AutoSize = true;
@@ -644,6 +654,7 @@ namespace Tangra.VideoOperations.Astrometry
             // 
             // pnlInstrDelay
             // 
+            this.pnlInstrDelay.Controls.Add(this.lblYCoeff);
             this.pnlInstrDelay.Controls.Add(this.cbxInstDelayCamera);
             this.pnlInstrDelay.Controls.Add(this.cbxInstDelayMode);
             this.pnlInstrDelay.Controls.Add(this.label12);
@@ -893,14 +904,13 @@ namespace Tangra.VideoOperations.Astrometry
             this.clbAddinsToRun.Size = new System.Drawing.Size(372, 214);
             this.clbAddinsToRun.TabIndex = 1;
             // 
-            // ucFrameInterval
+            // lblYCoeff
             // 
-            this.ucFrameInterval.Location = new System.Drawing.Point(17, 15);
-            this.ucFrameInterval.Name = "ucFrameInterval";
-            this.ucFrameInterval.Size = new System.Drawing.Size(179, 27);
-            this.ucFrameInterval.TabIndex = 0;
-            this.ucFrameInterval.Value = 1;
-            this.ucFrameInterval.FrameIntervalChanged += new System.EventHandler<Tangra.VideoOperations.Astrometry.FrameIntervalChangedEventArgs>(this.ucFrameInterval_FrameIntervalChanged);
+            this.lblYCoeff.AutoSize = true;
+            this.lblYCoeff.Location = new System.Drawing.Point(268, 41);
+            this.lblYCoeff.Name = "lblYCoeff";
+            this.lblYCoeff.Size = new System.Drawing.Size(0, 13);
+            this.lblYCoeff.TabIndex = 35;
             // 
             // frmRunMultiFrameMeasurements
             // 
@@ -1018,6 +1028,7 @@ namespace Tangra.VideoOperations.Astrometry
 		private System.Windows.Forms.NumericUpDown nudGap;
 		private System.Windows.Forms.PictureBox pboxAperturePreview;
         private System.Windows.Forms.Button btnResetApertures;
+        private System.Windows.Forms.Label lblYCoeff;
 
 	}
 }

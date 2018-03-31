@@ -47,6 +47,7 @@ namespace Tangra.VideoOperations.Astrometry
 		private VideoFileFormat m_VideoFileFormat;
 	    private string m_NativeFormat;
 		private bool m_Initialised;
+	    private double m_InstrDelayYComp;
 
         internal frmRunMultiFrameMeasurements(
 			VideoController videoController, 
@@ -436,6 +437,8 @@ namespace Tangra.VideoOperations.Astrometry
 			m_MeasurementContext.FrameTimeType = (FrameTimeType)cbxFrameTimeType.SelectedIndex;
 			m_MeasurementContext.InstrumentalDelay = (double)nudInstrDelay.Value;
 			m_MeasurementContext.InstrumentalDelayUnits = (InstrumentalDelayUnits)cbxInstDelayUnit.SelectedIndex;
+		    m_MeasurementContext.ImageHeight = plateConfig.ImageHeight;
+		    m_MeasurementContext.InstrumentalDelayYComponent = m_InstrDelayYComp;
 			m_MeasurementContext.IntegratedFramesCount = m_AavIntegration ? 1 : (int)nudIntegratedFrames.Value;
             m_MeasurementContext.IntegratedExposureSeconds = m_MeasurementContext.IntegratedFramesCount / m_VideoController.VideoFrameRate;
 			m_MeasurementContext.AavIntegration = m_AavIntegration;
@@ -752,15 +755,29 @@ namespace Tangra.VideoOperations.Astrometry
 				{
 					nudInstrDelay.Enabled = true;
 					cbxInstDelayUnit.Enabled = true;
+                    lblYCoeff.Visible = false;
 				}
 				else
 				{
+                    lblYCoeff.Visible = true;
+
                     InstrumentalDelayConfiguration delaysConfig = InstrumentalDelayConfigManager.GetConfigurationForCameraForAstrometry(cbxInstDelayCamera.Text);
                     float? corr = delaysConfig.CalculateDelay((int)nudIntegratedFrames.Value, new DelayRequest());
 				    if (corr.HasValue)
 				    {
                         nudInstrDelay.Value = -1 * (decimal)corr.Value;
-                        cbxInstDelayUnit.SelectedIndex = 1;
+                        var offsDelCgf = delaysConfig as ImageOffsetInstrumentalDelayConfiguration;
+				        if (offsDelCgf != null)
+				        {
+				            m_InstrDelayYComp = offsDelCgf.GetYCoefficient((int) nudIntegratedFrames.Value);
+				            lblYCoeff.Text = string.Format("YCoeff = {0:0.000000}", m_InstrDelayYComp);
+				        }
+				        else
+				        {
+				            lblYCoeff.Text = "";
+				            m_InstrDelayYComp = 0;
+				        }
+				        cbxInstDelayUnit.SelectedIndex = 1;
 				    }
 					nudInstrDelay.Enabled = false;
 					cbxInstDelayUnit.Enabled = false;

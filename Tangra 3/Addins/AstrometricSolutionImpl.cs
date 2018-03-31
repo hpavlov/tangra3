@@ -97,6 +97,8 @@ namespace Tangra.Addins
 
             ObservatoryCode = fieldSolveContext.ObsCode;
 		    CatalogueCode = measurementContext.StarCatalogueFacade.CatalogNETCode;
+            ImageHeight = measurementContext.ImageHeight;
+            InstrumentalDelayYComponent = measurementContext.InstrumentalDelayYComponent;
 
 		    m_MeasurementsImpl = new List<TangraAstrometricMeasurementImpl>();
 
@@ -115,7 +117,9 @@ namespace Tangra.Addins
                         Detection = mea.Detection,
                         SNR = mea.SNR,
                         UncorrectedTimeStamp = mea.FrameTimeStamp,
-                        Mag = mea.Mag
+                        Mag = mea.Mag,
+                        XPos = mea.XPos,
+                        YPos = mea.YPos
                     });
 		        }
 		    }
@@ -287,6 +291,8 @@ namespace Tangra.Addins
         public string ObjectDesignation { get; private set; }
         public double ArcSecsInPixel { get; private set; }
         public string CatalogueCode { get; private set; }
+        public double ImageHeight { get; private set; }
+        public double InstrumentalDelayYComponent { get; private set; }
 
 		public List<ITangraMatchedStar> GetAllMatchedStars()
 		{
@@ -347,6 +353,8 @@ namespace Tangra.Addins
             public double RADeg { get; internal set; }
             public double DEDeg { get; internal set; }
             public double Mag { get; internal set; }
+            public double XPos { get; internal set; }
+            public double YPos { get; internal set; }
             public double SolutionUncertaintyRACosDEArcSec { get; internal set; }
             public double SolutionUncertaintyDEArcSec { get; internal set; }
             public double FWHMArcSec { get; internal set; }

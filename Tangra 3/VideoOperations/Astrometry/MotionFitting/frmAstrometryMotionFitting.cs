@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Tangra.Config;
+using Tangra.Helpers;
 using Tangra.Model.Config;
 using Tangra.Model.Helpers;
 using Tangra.Model.Numerical;
@@ -149,8 +150,8 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                         if (!string.IsNullOrWhiteSpace(m_DataProvider.CatalogueCode)) tbxNetCode.Text = m_DataProvider.CatalogueCode;
                         if (m_DataProvider.ObservationDate.HasValue && m_DataProvider.ObservationDate.Value != DateTime.MinValue)
                             dtpDate.Value = m_DataProvider.ObservationDate.Value;
-                        nudInstDelaySec.Value = m_DataProvider.InstrumentalDelaySec;
-                        nudPixelsPerArcSec.Value = m_DataProvider.ArsSecsInPixel > 0 ? (decimal)m_DataProvider.ArsSecsInPixel : DEFAULT_ARCSEC_PER_PIXEL;
+                        nudInstDelaySec.SetNUDValue(m_DataProvider.InstrumentalDelaySec, this, "Instrumental Delay");
+                        nudPixelsPerArcSec.SetNUDValue(m_DataProvider.ArsSecsInPixel > 0 ? (decimal)m_DataProvider.ArsSecsInPixel : DEFAULT_ARCSEC_PER_PIXEL, this, "Scale, 1 pixel");
 
                         nudMeaIntervals.Value = CalculateOptimalChunks(m_DataProvider.NumberOfMeasurements);
 

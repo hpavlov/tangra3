@@ -64,6 +64,8 @@ namespace Tangra.MotionFitting
         public double RADeg { get; set; }
         public double DEDeg { get; set; }
         public double Mag { get; set; }
+        public double XPos { get; set; }
+        public double YPos { get; set; }
         public double StdDevRAArcSec { get; set; }
         public double StdDevDEArcSec { get; set; }
         public double SolutionUncertaintyRACosDEArcSec { get; set; }

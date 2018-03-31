@@ -79,6 +79,8 @@ namespace Tangra.VideoOperations.Astrometry
 		internal bool AavIntegration { get; set; }
 		internal VideoFileFormat VideoFileFormat { get; set; }
         internal string NativeVideoFormat { get; set; }
+        internal double InstrumentalDelayYComponent { get; set; }
+        internal double ImageHeight { get; set; }
 
 	    internal FittingContext ToFittingContext()
 	    {

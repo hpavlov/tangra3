@@ -37,6 +37,8 @@ namespace Tangra.SDK
         string ObjectDesignation { get; }
         double ArcSecsInPixel { get; }
         string CatalogueCode { get; }
+        double ImageHeight { get; }
+        double InstrumentalDelayYComponent { get; }
     }
 
     public interface ITangraMatchedStar
@@ -169,6 +171,8 @@ namespace Tangra.SDK
         double RADeg { get; }
         double DEDeg { get; }
         double Mag { get; }
+        double XPos { get; }
+        double YPos { get; }
         double SolutionUncertaintyRACosDEArcSec { get; }
         double SolutionUncertaintyDEArcSec { get; }
         double FWHMArcSec { get; }

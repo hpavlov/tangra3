@@ -19,9 +19,9 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
             var meaList = solution.GetAllMeasurements();
 
             var output = new StringBuilder();
-            output.AppendLine("Tangra Astrometry Export v1.0");
-            output.AppendLine("FilePath, Date, InstrumentalDelay, DelayUnits, IntegratedFrames, IntegratedExposure(sec), FrameTimeType, NativeVideoFormat, ObservatoryCode, Object, ArsSecsInPixel, CatalogueCode");
-            output.AppendLine(string.Format(CultureInfo.InvariantCulture, "\"{0}\",{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11}",
+            output.AppendLine("Tangra Astrometry Export v1.1");
+            output.AppendLine("FilePath, Date, InstrumentalDelay, DelayUnits, IntegratedFrames, IntegratedExposure(sec), FrameTimeType, NativeVideoFormat, ObservatoryCode, Object, ArsSecsInPixel, CatalogueCode, ImageHeight, InstrumentalDelayYComponent");
+            output.AppendLine(string.Format(CultureInfo.InvariantCulture, "\"{0}\",{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13}",
                 fileName,
                 meaList.Count > 0 && meaList[0].UncorrectedTimeStamp.HasValue ? meaList[0].UncorrectedTimeStamp.Value.ToString("yyyy-MM-dd") : null,
                 solution.InstrumentalDelay,
@@ -33,17 +33,19 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                 solution.ObservatoryCode,
                 solution.ObjectDesignation,
                 solution.ArcSecsInPixel,
-                solution.CatalogueCode));
+                solution.CatalogueCode,
+                solution.ImageHeight,
+                solution.InstrumentalDelayYComponent));
 
-            output.Append("FrameNo, TimeUTC(Uncorrected), Timestamp, RADeg, DEDeg, Mag, SolutionUncertaintyRA*Cos(DE)[arcsec], SolutionUncertaintyDE[arcsec], FWHM[arcsec], DetectionCertainty, SNR\r\n");
+            output.Append("FrameNo, TimeUTC(Uncorrected), Timestamp, RADeg, DEDeg, Mag, SolutionUncertaintyRA*Cos(DE)[arcsec], SolutionUncertaintyDE[arcsec], FWHM[arcsec], DetectionCertainty, SNR, X, Y\r\n");
 
             foreach (var mea in meaList)
             {
-                output.AppendFormat(CultureInfo.InvariantCulture, "{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}\r\n",
+                output.AppendFormat(CultureInfo.InvariantCulture, "{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}, {12}\r\n",
                     mea.FrameNo,
                     mea.UncorrectedTimeStamp.HasValue ? (double?)mea.UncorrectedTimeStamp.Value.TimeOfDay.TotalDays : null,
                     mea.UncorrectedTimeStamp.HasValue ? mea.UncorrectedTimeStamp.Value.ToString("[HH:mm:ss.fff]") : null,
-                    mea.RADeg, mea.DEDeg, mea.Mag, mea.SolutionUncertaintyRACosDEArcSec, mea.SolutionUncertaintyDEArcSec, mea.FWHMArcSec, mea.Detection, mea.SNR);
+                    mea.RADeg, mea.DEDeg, mea.Mag, mea.SolutionUncertaintyRACosDEArcSec, mea.SolutionUncertaintyDEArcSec, mea.FWHMArcSec, mea.Detection, mea.SNR, mea.XPos, mea.YPos);
             }
 
             bool openFileImmediately = false;

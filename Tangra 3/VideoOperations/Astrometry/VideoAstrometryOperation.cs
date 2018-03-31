@@ -916,6 +916,8 @@ namespace Tangra.VideoOperations.Astrometry
                             double I = AstrometryContext.Current.CurrentPhotometricFit.GetIntencity(new ImagePixel(255, m_AstrometryTracker.TrackedObject.PSFFit.XCenter, m_AstrometryTracker.TrackedObject.PSFFit.YCenter), out isSaturated);
                             double mag = AstrometryContext.Current.CurrentPhotometricFit.GetMagnitudeForIntencity(I);
                             measurement.Mag = mag;
+                            measurement.XPos = m_AstrometryTracker.TrackedObject.PSFFit.XCenter;
+                            measurement.YPos = m_AstrometryTracker.TrackedObject.PSFFit.YCenter;
                         }
                         else
                             measurement.Mag = double.NaN;
