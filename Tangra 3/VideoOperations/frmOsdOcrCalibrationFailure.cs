@@ -14,6 +14,7 @@ using System.ServiceModel;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using Tangra.Controller;
 using Tangra.Helpers;
 using Tangra.Model.Image;
 using Tangra.OCR;
@@ -53,9 +54,17 @@ namespace Tangra.VideoOperations
             return (Images != null && Images.Count > 0) || OCRDebugImage != null;
 		}
 
-		public frmOsdOcrCalibrationFailure()
+	    private VideoController m_VideoController;
+
+        public frmOsdOcrCalibrationFailure()
+        {
+            InitializeComponent();
+        }
+
+		public frmOsdOcrCalibrationFailure(VideoController videoController)
+            : this()
 		{
-			InitializeComponent();
+		    m_VideoController = videoController;
 		}
 
 		private void frmOsdOcrCalibrationFailure_Load(object sender, EventArgs e)
@@ -99,7 +108,7 @@ namespace Tangra.VideoOperations
 
 			try
 			{
-                SendOcrErrorReport(m_TimestampOCR, Images, LastUnmodifiedImage, OCRDebugImage, tbxEmail.Text);
+                SendOcrErrorReport(m_VideoController, "OSD OCR Calibration Error", m_TimestampOCR, Images, LastUnmodifiedImage, OCRDebugImage, tbxEmail.Text);
 			}
 			catch (Exception ex)
 			{
@@ -121,7 +130,7 @@ namespace Tangra.VideoOperations
 			}
 		}
 
-        public static void SendOcrErrorReport(ITimestampOcr timestampOCR, Dictionary<string, Tuple<uint[], int, int>> images, uint[] lastUnmodifiedImage, Bitmap ocdDebugImage, string email)
+        public static void SendOcrErrorReport(VideoController videoController, string errorMessage, ITimestampOcr timestampOCR, Dictionary<string, Tuple<uint[], int, int>> images, uint[] lastUnmodifiedImage, Bitmap ocdDebugImage, string email)
 		{
 			string tempDir = Path.GetFullPath(Path.GetTempPath() + @"\" + Guid.NewGuid().ToString());
 			string tempFile = Path.GetTempFileName();
@@ -166,12 +175,15 @@ namespace Tangra.VideoOperations
 				var address = new EndpointAddress("http://www.tangra-observatory.org/TangraErrors/ErrorReports.asmx");
 				var client = new TangraService.ServiceSoapClient(binding, address);
 				
-				string errorReportBody = "OSD OCR Calibration Error\r\n\r\n" +
+				string errorReportBody = errorMessage + "\r\n\r\n" +
 				                         "OCR OSD Engine: " + timestampOCR.NameAndVersion() + "\r\n" +
-				                         "OSD Type: " + timestampOCR.OSDType() + "\r\n\r\n" +
+				                         "OSD Type: " + timestampOCR.OSDType() + "\r\n" +
+                                         "Frames Range: [" + videoController.VideoFirstFrame + ", " + videoController.VideoLastFrame + "]\r\n" +
+                                         "File Name: " + videoController.FileName + "\r\n" +
+                                         "Video File Type:" + videoController.CurrentVideoFileType + "\r\n\r\n" + 
 										 "Contact Email: " + email + "\r\n\r\n" +
 				                         frmSystemInfo.GetFullVersionInfo();
-
+                
 				List<string> errorMesages = timestampOCR.GetCalibrationErrors();
 				if (errorMesages != null && errorMesages.Count > 0)
 					errorReportBody += "\r\n\r\n" + string.Join("\r\n", errorMesages);

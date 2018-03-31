@@ -724,7 +724,7 @@ namespace Tangra.Controller
 
                         if (forceSaveErrorReport || !isCalibrated)
                         {
-                            var frmReport = new frmOsdOcrCalibrationFailure();
+                            var frmReport = new frmOsdOcrCalibrationFailure(this);
                             frmReport.StartPosition = FormStartPosition.CenterParent;
                             frmReport.TimestampOCR = m_TimestampOCR;
                             frmReport.ForcedErrorReport = forceSaveErrorReport;
@@ -807,7 +807,11 @@ namespace Tangra.Controller
                     bool reportSendingErrored = false;
                     try
                     {
-                        frmOsdOcrCalibrationFailure.SendOcrErrorReport(m_TimestampOCR, images, lastImage, ocrDebugImage, frm.tbxEmail.Text);
+                        string message = string.Format("Encountered {0} OCR Errors.", TangraContext.Current.OcrErrors);
+                        if (m_LightCurveController != null && m_LightCurveController.Context != null && m_LightCurveController.Context.AllReadings != null)
+                            message = string.Format("Encountered {0} OCR Errors from {1} OCR-ed Frames.", TangraContext.Current.OcrErrors, m_LightCurveController.Context.AllReadings.Count);
+
+                        frmOsdOcrCalibrationFailure.SendOcrErrorReport(this, message, m_TimestampOCR, images, lastImage, ocrDebugImage, frm.tbxEmail.Text);
                     }
                     catch (Exception ex)
                     {
