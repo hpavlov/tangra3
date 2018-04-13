@@ -318,11 +318,9 @@ namespace Tangra.VideoOperations.LightCurves
 
 		internal int GetMaxApertureSize()
 		{
-			return LightCurveReductionType == LightCurveReductionType.UntrackedMeasurement
-				? 9 /* 17 would be the desired size, but it requires a fait bit of work */ :
-						ReductionMethod == TangraConfig.PhotometryReductionMethod.AperturePhotometry
-					   ? 9
-					   : 7;
+			return (LightCurveReductionType == LightCurveReductionType.UntrackedMeasurement || ReductionMethod == TangraConfig.PhotometryReductionMethod.AperturePhotometry)
+			    ? 15
+			    : 12;
 		}
     }
 }

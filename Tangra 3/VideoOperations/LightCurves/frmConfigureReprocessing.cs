@@ -537,7 +537,24 @@ namespace Tangra.VideoOperations.LightCurves
             }
 
 			m_Context.BackgroundMethod = ComboboxIndexToBackgroundMethod();
-			m_Context.SignalMethod = ComboboxIndexToPhotometryReductionMethod();
+
+            if (m_Context.BackgroundMethod != TangraConfig.BackgroundMethod.PSFBackground)
+            {
+                for (int i = 0; i < m_Context.ObjectCount; i++)
+                {
+                    float aper = m_Context.ReProcessApertures[0];
+                    float innerRadius = (float)(TangraConfig.Settings.Photometry.AnnulusInnerRadius * aper);
+                    float outernRadius = (float)Math.Sqrt(TangraConfig.Settings.Photometry.AnnulusMinPixels / Math.PI + innerRadius * innerRadius);
+                    if (outernRadius * 2 > 35)
+                    {
+                        // Aperture is too big
+                        MessageBox.Show(this, string.Format("The aperture of {0:0.00} for object {1} is too large. Decrease the aperture and/or modify background annulus settings.", aper, i + 1), "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                }                
+            }
+
+            m_Context.SignalMethod = ComboboxIndexToPhotometryReductionMethod();
 			m_Context.PsfQuadratureMethod = ComboboxIndexToPsfQuadratureMethod();
 			m_Context.Filter = (LightCurveContext.FilterType)cbxDigitalFilter.SelectedIndex;
 			m_Context.EncodingGamma = (double)nudGamma.Value;
