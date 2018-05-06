@@ -78,6 +78,7 @@ void advfgetpos64(FILE* file, __int64* pos);
 int advfsetpos64(FILE* file, const __int64* pos);
 int advfsetpos64(FILE* file, const __int64* pos, int origin);
 int advfseek(FILE* stream, __int64 off, int whence);
+__int64 advftell64(FILE* file);
 int advfclose(FILE* file);
 int advfflush(FILE* file);
 

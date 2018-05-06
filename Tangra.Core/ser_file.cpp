@@ -97,26 +97,57 @@ void SerFile::OpenFile(const char* filePath, SerLib::SerFileInfo* fileInfo, char
 	fread(&instrument[0], 40, 1, m_File);
 	fread(&telescope[0], 40, 1, m_File);
 
-	unsigned __int64 buffInt64;
-	fread(&buffInt64, 8, 1, m_File);
-	fileInfo->SequenceStartTimeLo = buffInt64 & 0xFFFFFFFF;
-	fileInfo->SequenceStartTimeHi = buffInt64 >> 32;
-
-	HasTimeStamps = ((buffInt64 >> 0x3F) & 0x01) == 0x00;
-
-	fread(&buffInt64, 8, 1, m_File);
-	fileInfo->SequenceStartTimeUTCLo = buffInt64 & 0xFFFFFFFF;
-	fileInfo->SequenceStartTimeUTCHi = buffInt64 >> 32;
-
 	m_RawFrameSize = Width * Height * m_NumPlanes * m_BytesPerPixel;
 	m_RawFrameBuffer = (unsigned char*)malloc(m_RawFrameSize + 16);
 	m_PixelsPerFrame = Width * Height;
+    
+	unsigned __int64 buffInt64;
+	fread(&buffInt64, 8, 1, m_File);
+
+	HasTimeStamps = ((buffInt64 >> 0x3F) & 0x01) == 0x00;
 
 	if (HasTimeStamps)
-		m_TimeStampStartOffset = 178 + (__int64)m_CountFrames * (__int64)m_RawFrameSize;
-	else
-		m_TimeStampStartOffset = -1;
+	{
+		// According to the SER v3 documentation, if the initial timestamp is present and the value is greater than zero
+		// then the file contains embedded timestamps. However based on real life recorded SER files this is not a sufficient indication
+		// On the top of this Tangra also requires:
+		// - The file to be large enough to actually contain the trailing records with the timestamps
+		// - The first timestamp to not be zero
 
+		m_TimeStampStartOffset = 178 + (__int64)m_CountFrames * (__int64)m_RawFrameSize;
+		advfseek(m_File, 0L, SEEK_END);
+		__int64 fileSize = advftell64(m_File);
+		if (fileSize < m_TimeStampStartOffset + (__int64)8)
+		{
+			HasTimeStamps = false;
+		}
+		else
+		{
+			__int64 timestampPosition = m_TimeStampStartOffset;
+			advfsetpos(m_File, &timestampPosition);
+			unsigned __int64 firstTimeStamp;
+			fread(&firstTimeStamp, 8, 1, m_File);
+			HasTimeStamps = firstTimeStamp > 0;
+		}
+	}
+
+	if (HasTimeStamps)
+	{
+		fileInfo->SequenceStartTimeLo = buffInt64 & 0xFFFFFFFF;
+		fileInfo->SequenceStartTimeHi = buffInt64 >> 32;
+
+		fread(&buffInt64, 8, 1, m_File);
+		fileInfo->SequenceStartTimeUTCLo = buffInt64 & 0xFFFFFFFF;
+		fileInfo->SequenceStartTimeUTCHi = buffInt64 >> 32;
+	}
+	else
+	{
+		fileInfo->SequenceStartTimeLo = 0;
+		fileInfo->SequenceStartTimeHi = 0;
+		fileInfo->SequenceStartTimeUTCLo = 0;
+		fileInfo->SequenceStartTimeUTCHi = 0;
+		m_TimeStampStartOffset = -1;
+	}
 }
 
 void SerFile::CloseFile()

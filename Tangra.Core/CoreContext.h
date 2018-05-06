@@ -142,6 +142,27 @@ int advfsetpos64(FILE* file, const __int64* pos)
 	return rv;
 }
 
+__int64 advftell64(FILE* file)
+{
+	AdvProfiling_StartHddOperation();
+	
+#ifdef MSVC
+	__int64 rv = _ftelli64(file);
+#elif __linux__
+	__int64 rv = ftello64(file);
+#elif _WIN32
+	__int64 rv = ftello64(file);
+#elif __APPLE__
+	__int64 rv = ftello(file);
+#else
+	#error Platform not supported
+#endif
+
+	AdvProfiling_EndHddOperation();
+
+	return rv;
+}
+
 __int64 advgetclockresolution()
 {
 	__int64 rv = 0;
