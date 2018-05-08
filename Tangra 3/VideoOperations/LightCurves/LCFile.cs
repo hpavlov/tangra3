@@ -117,7 +117,7 @@ namespace Tangra.VideoOperations.LightCurves
             }
         }
 
-        public static LCFile Load(string fileName, VideoController videoController)
+        public static LCFile Load(string fileName, VideoController videoController, bool doOutOfMemoryCheck = true)
         {
 			UsageStats.Instance.LightCurvesOpened++;
 			UsageStats.Instance.Save();
@@ -152,7 +152,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 					bool supressPixelLoading = false;
 
-					if (itemsInGroup > 40000 || fileInfo.Length > 100 * 1024 * 1024)
+                    if (doOutOfMemoryCheck && (itemsInGroup > 40000 || fileInfo.Length > 100 * 1024 * 1024))
 					{
 						var frm = new frmLcFileLoadOptions();
 						frm.StartPosition = FormStartPosition.CenterParent;
@@ -380,7 +380,7 @@ namespace Tangra.VideoOperations.LightCurves
 				}
 			}
 
-			return LCFile.Load(s_OnTheFlyZippedFileName, videoController);
+			return LCFile.Load(s_OnTheFlyZippedFileName, videoController, false);
         }
 
 	    private static void ReverseBackwardMeasuredFile(string fileName)
