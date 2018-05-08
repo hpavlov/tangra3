@@ -1,9 +1,15 @@
 ﻿Tangra3 Release Notes
 ---------------------
-vNext (xxxx-xx-xx)
+v3.6.16 (2018-05-08)
+- Relaxed the calculated vs entered time discrepancy for manually entered timestamps of AVI videos.
+- Improved the OCR-ing of timestamps from AAV videos.
+- Moved the "Full Disappearance" and "Drift-Through" light curve reduction flags to a more logical location with better default values.
 - Fixed a critical bug in the AVI-to-AAV conversion that leads to an incorrectly determined frame rate in a following AAV-to-FITS conversion.
 - Added support for Video Astrometry from a Roving Observatory (code 274) using MPC's two line OBS format. 
-- Made it possible to use apertures of up to 15 pixels. This doesn't apply to re-processing a saved light curves.
+- Made it possible to use apertures of up to 15 pixels. This doesn't apply to re-processing saved light curves.
+- Fixed a crash when opening a SER file with blank timestamps.
+- Fixed a crash when trying to save a large .lc file under low memory conditions.
+- Other minor bugfixes and improvements.
 
 v3.6.15 (2017-12-13)
 - Fixed a problem where if positions with high precision are used in Fast Motion Astrometry, the line exported to an MPC report will have a bad RA.
