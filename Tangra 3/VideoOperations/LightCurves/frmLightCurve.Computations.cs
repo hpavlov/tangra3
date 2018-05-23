@@ -1249,7 +1249,7 @@ namespace Tangra.VideoOperations.LightCurves
                     if (tokens.Length == 2)
                     {
                         evt.DTimeErrorMSAOTA = (int)Math.Round(double.Parse(tokens[1].Trim()) * 1000.0);
-                        string[] ttokens = tokens[0].Trim().Split(' ');
+                        string[] ttokens = tokens[0].Trim().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
                         aotaDTime = m_LCFile.Header.GetFrameTime(m_LCFile.Header.MinFrame);
                         if (aotaDTime.HasValue)
@@ -1263,7 +1263,7 @@ namespace Tangra.VideoOperations.LightCurves
                             if (tokens.Length == 2)
                             {
                                 evt.RTimeErrorMSAOTA = (int)Math.Round(double.Parse(tokens[1].Trim()) * 1000.0);
-                                ttokens = tokens[0].Trim().Split(' ');
+                                ttokens = tokens[0].Trim().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
                                 aotaRTime = m_LCFile.Header.GetFrameTime(m_LCFile.Header.MinFrame);
                                 if (aotaRTime.HasValue)

@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Windows.Forms;
 using Tangra.Model.Helpers;
 using Tangra.SDK;
 
@@ -117,6 +118,7 @@ namespace Tangra.Addins
 			catch (Exception ex)
 			{
 			    Trace.WriteLine(ex.GetFullStackTrace());
+                MessageBox.Show("Error reading data from AOTA: " + ex.Message);
 			}
 		}
 

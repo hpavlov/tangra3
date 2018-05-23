@@ -1363,7 +1363,7 @@ namespace Tangra.VideoOperations.LightCurves
             return m_InstrumentalDelayCorrectionsNotRequired.Value;
         }
 
-	    private static Regex s_RegexSourceToFileFormat = new Regex("^.+\\((?<format>(ADV|AAV|AVI|SER|FITS))\\..+\\).*$");
+	    private static Regex s_RegexSourceToFileFormat = new Regex("^.+\\((?<format>(ADV|AAV|AVI|SER|FITS))2?\\..+\\).*$");
 
 		/// <summary>
 		/// AVI|AAV|ADV|SER|FITS
