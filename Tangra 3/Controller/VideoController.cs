@@ -685,6 +685,7 @@ namespace Tangra.Controller
                                     calibrationFramesProcessed++;
 
                                     FileProgressManager.FileOperationProgress(calibrationFramesProcessed);
+                                    Application.DoEvents();
 
                                     if (isCalibrated)
                                         return true;

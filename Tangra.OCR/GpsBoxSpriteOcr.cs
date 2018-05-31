@@ -806,7 +806,7 @@ namespace Tangra.OCR
         private Dictionary<int, List<Tuple<int, int>>> DetermineOsdLineVerticals(uint[] data, int minWhiteLevel)
         {
             var lineProbes = DetermineOsdLineVerticalsEx(data, minWhiteLevel);
-            if (lineProbes.Item1.Length < 2)
+            if (lineProbes.Item1.Length < 2 || lineProbes.Item1.Length > 5)
             {
                 lineProbes = DetermineOsdLineVerticalsOld(data, minWhiteLevel);
             }
