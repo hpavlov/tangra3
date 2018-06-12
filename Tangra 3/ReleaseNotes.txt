@@ -1,5 +1,8 @@
 ﻿Tangra3 Release Notes
 ---------------------
+vNext (UNRELEASED)
+- Fixed a problem where only the first portion of the video will be processed when a sofware integration is used.
+
 v3.6.16 (2018-05-08)
 - Relaxed the calculated vs entered time discrepancy for manually entered timestamps of AVI videos.
 - Improved the OCR-ing of timestamps from AAV videos.

@@ -26,7 +26,7 @@ int IntegrationManagerGetFirstFrameToIntegrate(int producedFirstFrame, int frame
 	else
 	{
 		// Return the first frame from the current sequential batch of [frameCount] frames
-		return producedFirstFrame / frameCount;
+		return frameCount * (producedFirstFrame / frameCount);
 	}
 }
 
