@@ -107,3 +107,18 @@
                 | 1 -> this.OffOnTransitionCost
                 | _ -> this.OffOnTransitionCost
             this.CalcStartingWidth costFunWidth costFunOnOff
+
+        member private this.Combinations xs ys = [|
+            for x in xs do
+            for y in ys do
+            yield (x, y) |]
+
+        member this.FindLeftWidth approxLeft approxWidth =
+            let rndApproxLeft = round(approxLeft * 100M) / 100M
+            let rndApproxWidth = round(approxWidth * 100M) / 100M
+            let widthProbe = [| for i in -20M .. 20M -> (i * 1M)/10M + rndApproxWidth |]
+            let leftProbe = [| for i in -8M .. 8M -> (i * 2.5M)/10M + rndApproxLeft |]
+            let probes = this.Combinations leftProbe widthProbe
+            let costs = probes |> Array.map (fun p -> (p, this.WidthCost (fst p) (snd p) this.OffOnTransitionCost))
+            let bestFit = costs |> Array.minBy (fun x -> snd x)
+            fst bestFit

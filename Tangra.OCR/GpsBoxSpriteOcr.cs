@@ -1139,8 +1139,38 @@ namespace Tangra.OCR
             decimal boxesLeft = leftWidth.Item1;
             decimal boxWidth = leftWidth.Item2; */
 
-            var osdFrame = new OsdFrame(m_ImageWidth, m_ImageHeight, rv.Select(x => Tuple.Create(x.Top, x.Bottom)).ToArray(), subPixelData.Pixels);
-            var lw = osdFrame.FitLeftWidth;
+            var osdLocator = new OsdLocator(m_ImageWidth, m_ImageHeight, rv.Select(x => Tuple.Create(x.Top, x.Bottom)).ToArray(), subPixelData.Pixels);
+            var approxLeft = (double)osdLocator.Left;
+            var approxWidth = (double)osdLocator.StartingWidth(0, 0);
+
+            // -2, 2, 0.1
+            // -2, 2, 0.025
+            double[] GRID = new double[] {0.5}; //, 0.2, 0.3, 0.5 };
+            var dict = new Dictionary<Tuple<double, double>, List<int>> ();
+            for (double i = -2; i < 2; i+=0.1)
+            {
+                for (double j = -2; j < 2; j+=0.025)
+                {
+                    for (int k = 0; k < 15; k++)
+                    {
+                        var pos = approxLeft + i + k*(approxWidth + j);
+                        var key = Tuple.Create(approxLeft + i, approxWidth + j);
+
+                        foreach (var g in GRID)
+                        {
+                            var gPos = (int)Math.Round(pos/g);
+
+                            if (!dict.ContainsKey(key))
+                                dict[key] = new List<int>();    
+                            
+                            dict[key].Add(gPos);
+                        }
+                    }
+                       
+                }
+            }
+
+            var lw = osdLocator.FindLeftWidth((decimal)approxLeft, (decimal)approxWidth);
             decimal boxesLeft = lw.Item1;
             decimal boxWidth = lw.Item2;
 

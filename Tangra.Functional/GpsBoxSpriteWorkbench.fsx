@@ -45,8 +45,9 @@ let trainSet = frames @"C:\Work\Tangra3\OcrTester\AutomatedTestingImages\PixelEx
 //let points = trainSet |> Array.mapi (fun i x -> (float i, float (x.FindWidth x.Left)))
 let points = 
     trainSet
-    |> Array.mapi (fun i x -> i, x.StartingWidth 0 0) 
-    //|> Array.mapi (fun i x -> i, x.Left) 
+    //|> Array.mapi (fun i x -> i, x.StartingWidth 0 0) 
+    |> Array.mapi (fun i x -> i, x.Left) 
+    //|> Array.map (fun x -> x, x.Left) 
     |> Array.map (fun x -> (fst x, snd x)) 
 points |> Chart.Line
 
