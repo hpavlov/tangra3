@@ -3223,6 +3223,8 @@ namespace Tangra.Controller
                     if (DateTime.TryParse(dateString, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out dateVal))
                         return dateVal.Date.Add(ocrTimeOfDay);
                 }
+
+                m_TimestampOCR = null;
 	        }
 
             return defaultValue.HasValue ? defaultValue.Value : DateTime.UtcNow;

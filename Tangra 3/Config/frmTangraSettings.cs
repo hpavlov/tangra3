@@ -179,7 +179,9 @@ namespace Tangra.Config
 		{
 			if (ShowCatalogRequiredHint)
 			{
-				tvSettings.SelectedNode = tvSettings.Nodes["ndCatalogues"];
+                tvSettings.SelectedNode = tvSettings.Nodes["ndAstrometry"];
+                if (tvSettings.SelectedNode != null) 
+                    tvSettings.SelectedNode = tvSettings.SelectedNode.Nodes["ndCatalogues"];
 
 				if (TangraConfig.Settings.StarCatalogue.Catalog == TangraConfig.StarCatalog.NotSpecified)
 				{
@@ -192,7 +194,9 @@ namespace Tangra.Config
 
                     if (!StarCatalogueFacade.VerifyCurrentCatalogue(TangraConfig.Settings.StarCatalogue.Catalog, ref TangraConfig.Settings.StarCatalogue.CatalogLocation))
 					{
-						tvSettings.SelectedNode = tvSettings.Nodes["ndCatalogues"];
+                        tvSettings.SelectedNode = tvSettings.Nodes["ndAstrometry"];
+                        if (tvSettings.SelectedNode != null)
+                            tvSettings.SelectedNode = tvSettings.SelectedNode.Nodes["ndCatalogues"];
 
 						MessageBox.Show("The current star catalog location is invalid.", "Star Catalog Invalid", MessageBoxButtons.OK, MessageBoxIcon.Error);
 						m_ucStarCatalogues.tbxCatalogueLocation.Focus();
