@@ -270,7 +270,7 @@ namespace Tangra.VideoOperations.Astrometry
 			    Enabled = false;
 				try
 				{
-					if (!TangraConfig.Settings.HasSiteCoordinatesOrCOD)
+                    if (!TangraConfig.Settings.HasSiteCoordinatesOrCOD && string.IsNullOrEmpty(tbxObsCode.Text))
 					{
 						m_VideoController.ShowTangraSettingsDialog(false, true);
 
@@ -283,7 +283,7 @@ namespace Tangra.VideoOperations.Astrometry
 
                     frmIdentifyObjects frm;
 
-                    if (TangraConfig.Settings.Astrometry.UseMPCCode)
+                    if (TangraConfig.Settings.Astrometry.UseMPCCode || !string.IsNullOrEmpty(tbxObsCode.Text))
                     {
                         Context.ObsCode = tbxObsCode.Text;
                         frm = new frmIdentifyObjects(cbxObject.Text, Context.UtcTime, Context.ObsCode);

@@ -212,11 +212,15 @@ namespace Tangra.Config
 					"Please enter your site location or MPC observatory code",
 					"Information Required", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-				tvSettings.SelectedNode = tvSettings.Nodes["ndCatalogues"];
-			}
+                tvSettings.SelectedNode = tvSettings.Nodes["ndAstrometry"];
+                if (tvSettings.SelectedNode != null)
+                    tvSettings.SelectedNode = tvSettings.SelectedNode.Nodes["ndLocation"];
+            }
             else if (ShowUCAC4RequiredHint)
             {
-                tvSettings.SelectedNode = tvSettings.Nodes["ndCatalogues"];
+                tvSettings.SelectedNode = tvSettings.Nodes["ndAstrometry"];
+                if (tvSettings.SelectedNode != null)
+                    tvSettings.SelectedNode = tvSettings.SelectedNode.Nodes["ndCatalogues"];
 
                 if (TangraConfig.Settings.StarCatalogue.Catalog != TangraConfig.StarCatalog.UCAC4)
                 {
@@ -229,7 +233,9 @@ namespace Tangra.Config
 
                     if (!StarCatalogueFacade.VerifyCurrentCatalogue(TangraConfig.Settings.StarCatalogue.Catalog, ref TangraConfig.Settings.StarCatalogue.CatalogLocation))
                     {
-                        tvSettings.SelectedNode = tvSettings.Nodes["ndCatalogues"];
+                        tvSettings.SelectedNode = tvSettings.Nodes["ndAstrometry"];
+                        if (tvSettings.SelectedNode != null)
+                            tvSettings.SelectedNode = tvSettings.SelectedNode.Nodes["ndCatalogues"];
 
                         MessageBox.Show("The current star catalog location is invalid.", "Star Catalog Invalid", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         m_ucStarCatalogues.tbxCatalogueLocation.Focus();

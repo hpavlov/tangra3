@@ -2276,11 +2276,18 @@ namespace Tangra.VideoOperations.LightCurves
 
 		private void ShowPSFFits()
 		{
-			if (!m_frmPSFFits.Visible)
+			if (m_frmPSFFits != null && !m_frmPSFFits.Visible)
 			{
-				m_frmPSFFits.Show(this);
-				m_frmPSFFits.Left = this.Right;
-				m_frmPSFFits.Top = this.Top;
+			    try
+			    {
+			        m_frmPSFFits.Show(this);
+			        m_frmPSFFits.Left = this.Right;
+			        m_frmPSFFits.Top = this.Top;
+			    }
+			    catch (ObjectDisposedException)
+			    {
+			        m_frmPSFFits = null;
+			    }
 			}
 		}
 
