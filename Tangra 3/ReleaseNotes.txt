@@ -1,8 +1,10 @@
 ﻿Tangra3 Release Notes
 ---------------------
-vNext (UNRELEASED)
+v3.6.17 (2018-06-17)
+- Fixed a problem where Tangra may not correctly parse the response from AOTA and as a result the data from AOTA will not be made available for OccultWatcher.
 - Fixed a problem where only the first portion of the video will be processed when a sofware integration is used.
 - Fixed a problem where in certain cases Tangra would incorrecly believe that the 247 Roving Observer code has been used when it actually hasn't been.
+- Other minor bugfixes and improvements.
 
 v3.6.16 (2018-05-08)
 - Relaxed the calculated vs entered time discrepancy for manually entered timestamps of AVI videos.
