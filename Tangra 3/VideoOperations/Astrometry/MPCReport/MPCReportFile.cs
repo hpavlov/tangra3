@@ -66,11 +66,14 @@ namespace Tangra.VideoOperations.Astrometry.MPCReport
 	    private MPCReportFile()
 	    { }
 
-	    public MPCReportFile(string fileName, MPCObsHeader header, RovingObsLocation rovingObsLocation)
+        public MPCReportFile(string fileName, MPCObsHeader header, Func<RovingObsLocation> rovingObsLocationProvider)
 		{
 		    ReportFileName = fileName;
 		    Header = header;
-		    RovingObservatoryLocation = rovingObsLocation;
+            if (header.COD == MPCObsLine.ROVING_OBS_CODE)
+            {
+                RovingObservatoryLocation = rovingObsLocationProvider();
+            }
 		}
 
 		public string LastObjectDesignation

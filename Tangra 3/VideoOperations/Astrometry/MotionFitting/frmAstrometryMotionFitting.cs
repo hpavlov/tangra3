@@ -404,7 +404,7 @@ namespace Tangra.VideoOperations.Astrometry.MotionFitting
                     MPCObsHeader header = frmObserver.Header;
                     header.NET = tbxNetCode.Text;
 
-                    m_CurrentReportFile = new MPCReportFile(saveFileDialog.FileName, header, m_RovingObservatoryProvider.GetRovingObsLocation());
+                    m_CurrentReportFile = new MPCReportFile(saveFileDialog.FileName, header, () => m_RovingObservatoryProvider.GetRovingObsLocation());
 
                     TangraConfig.Settings.RecentFiles.NewRecentFile(RecentFileType.MPCReport, saveFileDialog.FileName);
                     TangraConfig.Settings.Save();

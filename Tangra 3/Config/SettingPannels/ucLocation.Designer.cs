@@ -44,6 +44,7 @@
             this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.label1 = new System.Windows.Forms.Label();
             this.pnlRovingObsNote = new System.Windows.Forms.Panel();
+            this.llMPForm = new System.Windows.Forms.LinkLabel();
             this.label4 = new System.Windows.Forms.Label();
             this.llMPC = new System.Windows.Forms.LinkLabel();
             this.pnlCoordinates.SuspendLayout();
@@ -182,6 +183,7 @@
             // 
             // pnlRovingObsNote
             // 
+            this.pnlRovingObsNote.Controls.Add(this.llMPForm);
             this.pnlRovingObsNote.Controls.Add(this.label4);
             this.pnlRovingObsNote.Controls.Add(this.llMPC);
             this.pnlRovingObsNote.Controls.Add(this.label1);
@@ -189,6 +191,17 @@
             this.pnlRovingObsNote.Name = "pnlRovingObsNote";
             this.pnlRovingObsNote.Size = new System.Drawing.Size(395, 125);
             this.pnlRovingObsNote.TabIndex = 48;
+            // 
+            // llMPForm
+            // 
+            this.llMPForm.AutoSize = true;
+            this.llMPForm.Location = new System.Drawing.Point(139, 36);
+            this.llMPForm.Name = "llMPForm";
+            this.llMPForm.Size = new System.Drawing.Size(56, 13);
+            this.llMPForm.TabIndex = 51;
+            this.llMPForm.TabStop = true;
+            this.llMPForm.Text = "Web Form";
+            this.llMPForm.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.llMPForm_LinkClicked);
             // 
             // label4
             // 
@@ -251,5 +264,6 @@
         private System.Windows.Forms.Panel pnlRovingObsNote;
         private System.Windows.Forms.LinkLabel llMPC;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.LinkLabel llMPForm;
 	}
 }

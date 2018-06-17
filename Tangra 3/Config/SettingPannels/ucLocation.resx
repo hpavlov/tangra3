@@ -121,6 +121,6 @@
     <value>17, 17</value>
   </metadata>
   <data name="label1.Text" xml:space="preserve">
-    <value>    Please note that fast motion video astrometry reports (having the mini-normal positions 'n' flag) from the Roving Observatory Code (247) can only be submitted via the Web Form accessible from the MPC's web site:</value>
+    <value>    Please note that fast motion video astrometry reports (having the mini-normal positions 'n' flag) from the Roving Observatory Code (247) can only be submitted via the                    accessible from the MPC's web site:</value>
   </data>
 </root>

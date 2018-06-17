@@ -154,6 +154,11 @@ namespace Tangra.MotionFitting
 
         private void llMPC_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
+            ShellHelper.OpenUrl("https://cgi.minorplanetcenter.net/cgi-bin/feedback.cgi?S=Observation%20submission%20via%20website&D=O");
+        }
+
+        private void llMPCMainSite_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
             ShellHelper.OpenUrl("https://www.minorplanetcenter.net/iau/mpc.html");
         }
     }

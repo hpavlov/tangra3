@@ -44,6 +44,7 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.llMPC = new System.Windows.Forms.LinkLabel();
             this.label6 = new System.Windows.Forms.Label();
+            this.llMPCMainSite = new System.Windows.Forms.LinkLabel();
             this.SuspendLayout();
             // 
             // label1
@@ -168,12 +169,12 @@
             // llMPC
             // 
             this.llMPC.AutoSize = true;
-            this.llMPC.Location = new System.Drawing.Point(62, 234);
+            this.llMPC.Location = new System.Drawing.Point(113, 208);
             this.llMPC.Name = "llMPC";
-            this.llMPC.Size = new System.Drawing.Size(238, 13);
+            this.llMPC.Size = new System.Drawing.Size(56, 13);
             this.llMPC.TabIndex = 50;
             this.llMPC.TabStop = true;
-            this.llMPC.Text = "https://www.minorplanetcenter.net/iau/mpc.html";
+            this.llMPC.Text = "Web Form";
             this.llMPC.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.llMPC_LinkClicked);
             // 
             // label6
@@ -184,12 +185,24 @@
             this.label6.TabIndex = 49;
             this.label6.Text = resources.GetString("label6.Text");
             // 
+            // llMPCMainSite
+            // 
+            this.llMPCMainSite.AutoSize = true;
+            this.llMPCMainSite.Location = new System.Drawing.Point(74, 237);
+            this.llMPCMainSite.Name = "llMPCMainSite";
+            this.llMPCMainSite.Size = new System.Drawing.Size(238, 13);
+            this.llMPCMainSite.TabIndex = 51;
+            this.llMPCMainSite.TabStop = true;
+            this.llMPCMainSite.Text = "https://www.minorplanetcenter.net/iau/mpc.html";
+            this.llMPCMainSite.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.llMPCMainSite_LinkClicked);
+            // 
             // frmRovingObsLocation
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(388, 317);
             this.Controls.Add(this.llMPC);
+            this.Controls.Add(this.llMPCMainSite);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.btnCancel);
@@ -230,5 +243,6 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.LinkLabel llMPC;
         private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.LinkLabel llMPCMainSite;
     }
 }

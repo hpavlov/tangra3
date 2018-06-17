@@ -1127,13 +1127,8 @@ namespace Tangra.VideoOperations.Astrometry
 
                     MPCObsHeader header = frmObserver.Header;
                     header.NET = m_MeasurementContext.StarCatalogueFacade.CatalogNETCode;
-                    RovingObsLocation rovingObsLocation = null;
-                    if (header.COD == MPCObsLine.ROVING_OBS_CODE)
-                    {
 
-                        rovingObsLocation = m_RovingObservatoryProvider.GetRovingObsLocation();
-                    }
-                    m_CurrentReportFile = new MPCReportFile(saveFileDialog.FileName, header, rovingObsLocation);
+                    m_CurrentReportFile = new MPCReportFile(saveFileDialog.FileName, header, () => m_RovingObservatoryProvider.GetRovingObsLocation());
 
 					TangraConfig.Settings.RecentFiles.NewRecentFile(RecentFileType.MPCReport, saveFileDialog.FileName);
 					TangraConfig.Settings.Save();

@@ -108,5 +108,10 @@ namespace Tangra.Config.SettingPannels
             bool isRovingObsCode = tbxMPCCode.Text.Trim() == MPCObsLine.ROVING_OBS_CODE;
             pnlRovingObsNote.Visible = isRovingObsCode;
         }
+
+        private void llMPForm_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            ShellHelper.OpenUrl("https://cgi.minorplanetcenter.net/cgi-bin/feedback.cgi?S=Observation%20submission%20via%20website&D=O");
+        }
 	}
 }
