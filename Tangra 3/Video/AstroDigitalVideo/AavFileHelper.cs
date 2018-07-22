@@ -6,8 +6,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Adv;
 using DirectShowLib.DES;
-using Tangra.Model.Helpers;
+using Tangra.Helpers;
 using Tangra.Model.VideoOperations;
 
 namespace Tangra.Video.AstroDigitalVideo
@@ -16,6 +17,8 @@ namespace Tangra.Video.AstroDigitalVideo
     {
         public static bool CheckAndCorrectBadMaxPixelValue(string fileName, IVideoController videoController)
         {
+            // FixOccuRecEveryFrameSavedInPeriod(fileName);
+
             try
             {
                 byte aavVer;
@@ -39,7 +42,7 @@ namespace Tangra.Video.AstroDigitalVideo
             }
             catch (Exception ex)
             {
-                Trace.WriteLine(ex.GetFullStackTrace());
+                Trace.WriteLine(Model.Helpers.Extensions.GetFullStackTrace(ex));
                 return false;
             }
         }
@@ -322,6 +325,134 @@ namespace Tangra.Video.AstroDigitalVideo
             byte len = rdr.ReadByte();
             byte[] strBytes = rdr.ReadBytes(len);
             return Encoding.UTF8.GetString(strBytes);
+        }
+
+        private static void FixOccuRecEveryFrameSavedInPeriod(string fileLocation)
+        {
+            string fileLocationOut = Path.GetFullPath(Path.GetDirectoryName(fileLocation) + @"\" + Path.GetFileName(fileLocation) + "-fixed.aav");
+
+            int FRAME_WIDTH = 720;
+            int FRAME_HEIGHT = 576;
+            int FRAME_PIXELS = FRAME_WIDTH * FRAME_HEIGHT;
+            int INTEGRATION = 4;
+            int FIRST_FRAME_IN_PERIOD = 1;
+            int FIRST_OSD_LINE = 541;
+            int LAST_OSD_LINE = 577;
+            List<uint> BAD_FRAMES = new List<uint>( new[] { 1404u });
+
+            var aaFile = new AdvFile2(fileLocation);
+            var frame = new ushort[FRAME_PIXELS];
+            List<ushort[]> calFrames = new List<ushort[]>();
+            List<ushort[]> frames = new List<ushort[]>();
+
+            for (uint i = 0; i < aaFile.CalibrationSteamInfo.FrameCount; i++)
+            {
+                var calPix = aaFile.GetCalibrationFramePixels(i);
+                for (int j = 0; j < FRAME_PIXELS; j++)
+                    frame[j] = (ushort)calPix[j];
+                calFrames.Add(frame.ToArray());
+            }
+
+            for (int j = 0; j < FRAME_PIXELS; j++)
+            {
+                frame[j] = 0;
+            }
+
+            uint[] pixels = null;
+            for (uint i = 1; i < aaFile.MainSteamInfo.FrameCount; i++)
+            {
+                if (!BAD_FRAMES.Contains(i))
+                {
+                    pixels = aaFile.GetMainFramePixels(i);
+                }
+                
+                for (int j = 0; j < FRAME_PIXELS; j++)
+                {
+                    if (j < FIRST_OSD_LINE * FRAME_WIDTH)
+                    {
+                        frame[j] += (ushort)pixels[j];
+                    }
+                    else
+                    {
+                        frame[j] = (ushort)pixels[j];
+                    }
+
+                }
+                if ((i - (FIRST_FRAME_IN_PERIOD + INTEGRATION - 1)) % INTEGRATION == 0)
+                {
+                    frames.Add(frame.ToArray());
+
+                    for (int j = 0; j < FRAME_PIXELS; j++)
+                    {
+                        frame[j] = 0;
+                    }
+                }
+            }
+
+            var recorder = new AdvRecorder();
+            recorder.ImageConfig.SetImageParameters(
+                (ushort)aaFile.Width,
+                (ushort)aaFile.Height,
+                16,
+                aaFile.MaxPixelValue);
+
+            recorder.FileMetaData.RecorderSoftwareName = "Tangra";
+            recorder.FileMetaData.RecorderSoftwareVersion = VersionHelper.AssemblyVersion;
+            recorder.FileMetaData.CameraModel = "Unknown";
+            recorder.FileMetaData.CameraSensorInfo = "Unknown";
+
+            var frameRate = 25.00;
+            recorder.FileMetaData.NativeFrameRate = frameRate;
+            recorder.FileMetaData.EffectiveFrameRate = 25.0 / INTEGRATION;
+
+            var nativeStandards = string.Empty;
+            if (Math.Abs(frameRate - 25.0) < 0.1)
+                nativeStandards = "PAL";
+            else if (Math.Abs(frameRate - 29.97) < 0.1)
+                nativeStandards = "NTSC";
+            recorder.FileMetaData.AddUserTag("NATIVE-VIDEO-STANDARD", nativeStandards);
+            recorder.FileMetaData.AddUserTag("FRAME-COMBINING", "Binning");
+            recorder.FileMetaData.AddUserTag("OSD-FIRST-LINE", FIRST_OSD_LINE.ToString());
+            recorder.FileMetaData.AddUserTag("OSD-LAST-LINE", LAST_OSD_LINE.ToString());
+            recorder.FileMetaData.AddUserTag("AAV-VERSION", "2");
+            recorder.FileMetaData.AddUserTag("AAV16-NORMVAL", (256 * INTEGRATION).ToString());
+
+            recorder.FileMetaData.AddCalibrationStreamTag("TYPE", "VTI-OSD-CALIBRATION");
+            recorder.FileMetaData.AddUserTag("OSD-FIRST-LINE", FIRST_OSD_LINE.ToString());
+            recorder.FileMetaData.AddUserTag("OSD-LAST-LINE", LAST_OSD_LINE.ToString());
+
+            recorder.StatusSectionConfig.RecordSystemErrors = true;
+            recorder.StatusSectionConfig.AddDefineTag("FRAME-TYPE", Adv2TagType.UTF8String);
+            recorder.StatusSectionConfig.AddDefineTag("FRAMES-IN-INTERVAL", Adv2TagType.Int8);
+            recorder.StatusSectionConfig.AddDefineTag("NOISE-SIGNATURES", Adv2TagType.UTF8String);
+            recorder.StatusSectionConfig.AddDefineTag("ORIGINAL-FRAME-ID", Adv2TagType.Int32);
+            recorder.StatusSectionConfig.AddDefineTag("IntegratedFrames", Adv2TagType.Int8);
+
+            recorder.StartRecordingNewFile(fileLocationOut, 0, true);
+
+            int calFrameId = 0;
+            foreach (var calFrame in calFrames)
+            {
+                recorder.AddCalibrationFrame(calFrame, true,
+                    PreferredCompression.Lagarith16,
+                    new AdvRecorder.AdvStatusEntry() { AdditionalStatusTags = new[] { "VTI-OSD-CALIBRATION", (object)(byte)0, string.Empty, (object)calFrameId, (object)(byte)0 } },
+                    Adv.AdvImageData.PixelDepth16Bit);
+                calFrameId++;
+            }
+
+            foreach (var mFrame in frames)
+            {
+                recorder.AddVideoFrame(mFrame, true,
+                    PreferredCompression.Lagarith16,
+                    new AdvRecorder.AdvStatusEntry()
+                    {
+                        SystemErrors = "",
+                        AdditionalStatusTags = new[] { "DATA", (object)(byte)8, string.Empty, (object)(int)0, (object)(byte)8 }
+                    },
+                    Adv.AdvImageData.PixelDepth16Bit);
+            }
+
+            recorder.FinishRecording();
         }
     }
 }
