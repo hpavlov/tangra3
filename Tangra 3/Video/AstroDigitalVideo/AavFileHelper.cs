@@ -334,17 +334,16 @@ namespace Tangra.Video.AstroDigitalVideo
             int FRAME_WIDTH = 720;
             int FRAME_HEIGHT = 576;
             int FRAME_PIXELS = FRAME_WIDTH * FRAME_HEIGHT;
-            int INTEGRATION = 4;
+            int INTEGRATION = 2;
             int FIRST_FRAME_IN_PERIOD = 1;
-            int FIRST_OSD_LINE = 541;
-            int LAST_OSD_LINE = 577;
-            List<uint> BAD_FRAMES = new List<uint>( new[] { 1404u });
+            int FIRST_OSD_LINE = 536;
+            int LAST_OSD_LINE = 617;
+            List<uint> BAD_FRAMES = new List<uint>();
 
             var aaFile = new AdvFile2(fileLocation);
             var frame = new ushort[FRAME_PIXELS];
             List<ushort[]> calFrames = new List<ushort[]>();
-            List<ushort[]> frames = new List<ushort[]>();
-
+            
             for (uint i = 0; i < aaFile.CalibrationSteamInfo.FrameCount; i++)
             {
                 var calPix = aaFile.GetCalibrationFramePixels(i);
@@ -358,36 +357,47 @@ namespace Tangra.Video.AstroDigitalVideo
                 frame[j] = 0;
             }
 
-            uint[] pixels = null;
-            for (uint i = 1; i < aaFile.MainSteamInfo.FrameCount; i++)
+            int totalIntegratedFrames = 0;
+            string tmpBuffFileName = Path.GetTempFileName();
+            using (var tmpFile = File.Create(tmpBuffFileName))
+            using (var bw = new BinaryWriter(tmpFile))
             {
-                if (!BAD_FRAMES.Contains(i))
+                uint[] pixels = null;
+                for (uint i = 1; i < aaFile.MainSteamInfo.FrameCount; i++)
                 {
-                    pixels = aaFile.GetMainFramePixels(i);
-                }
-                
-                for (int j = 0; j < FRAME_PIXELS; j++)
-                {
-                    if (j < FIRST_OSD_LINE * FRAME_WIDTH)
+                    if (!BAD_FRAMES.Contains(i))
                     {
-                        frame[j] += (ushort)pixels[j];
+                        pixels = aaFile.GetMainFramePixels(i);
                     }
-                    else
-                    {
-                        frame[j] = (ushort)pixels[j];
-                    }
-
-                }
-                if ((i - (FIRST_FRAME_IN_PERIOD + INTEGRATION - 1)) % INTEGRATION == 0)
-                {
-                    frames.Add(frame.ToArray());
 
                     for (int j = 0; j < FRAME_PIXELS; j++)
                     {
-                        frame[j] = 0;
+                        if (j < FIRST_OSD_LINE * FRAME_WIDTH)
+                        {
+                            frame[j] += (ushort)pixels[j];
+                        }
+                        else
+                        {
+                            frame[j] = (ushort)pixels[j];
+                        }
+
+                    }
+                    if ((i - (FIRST_FRAME_IN_PERIOD + INTEGRATION - 1)) % INTEGRATION == 0)
+                    {
+                        for (int j = 0; j < frame.Length; j++)
+                        {
+                            bw.Write(frame[j]);
+                        }
+
+                        totalIntegratedFrames++;
+                        for (int j = 0; j < FRAME_PIXELS; j++)
+                        {
+                            frame[j] = 0;
+                        }
                     }
                 }
             }
+
 
             var recorder = new AdvRecorder();
             recorder.ImageConfig.SetImageParameters(
@@ -440,17 +450,28 @@ namespace Tangra.Video.AstroDigitalVideo
                 calFrameId++;
             }
 
-            foreach (var mFrame in frames)
+            using (var tmpFile = File.OpenRead(tmpBuffFileName))
+            using (var rdr = new BinaryReader(tmpFile))
             {
-                recorder.AddVideoFrame(mFrame, true,
-                    PreferredCompression.Lagarith16,
-                    new AdvRecorder.AdvStatusEntry()
+                for (int i = 0; i < totalIntegratedFrames; i++)
+                {
+                    for (int j = 0; j < frame.Length; j++)
                     {
-                        SystemErrors = "",
-                        AdditionalStatusTags = new[] { "DATA", (object)(byte)8, string.Empty, (object)(int)0, (object)(byte)8 }
-                    },
-                    Adv.AdvImageData.PixelDepth16Bit);
+                        frame[j] = rdr.ReadUInt16();
+                    }
+
+                    recorder.AddVideoFrame(frame, true,
+                        PreferredCompression.Lagarith16,
+                        new AdvRecorder.AdvStatusEntry()
+                        {
+                            SystemErrors = "",
+                            AdditionalStatusTags = new[] { "DATA", (object)(byte)8, string.Empty, (object)(int)0, (object)(byte)8 }
+                        },
+                        Adv.AdvImageData.PixelDepth16Bit);
+                }
             }
+
+            File.Delete(tmpBuffFileName);
 
             recorder.FinishRecording();
         }
