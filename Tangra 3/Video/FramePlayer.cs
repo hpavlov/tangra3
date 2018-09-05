@@ -856,6 +856,15 @@ namespace Tangra.Video
 	        }
 	    }
 
+        public bool AstroAnalogueVideoHasOcrCalibrationFrames
+        {
+            get
+            {
+                return
+                    (IsAstroAnalogueVideoV2 && ((AstroDigitalVideoStreamV2)m_VideoStream).GetNumberOfOcrCalibrationFrames() > 20);
+            }
+        }
+
 		public bool AstroAnalogueVideoHasNtpData
 		{
 			get

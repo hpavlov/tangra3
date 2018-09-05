@@ -93,6 +93,7 @@ namespace Tangra.Model.Video
 		bool AstroAnalogueVideoHasNtpData { get; }
 		int AstroAnalogueVideoNormaliseNtpDataIfNeeded(Action<int> progressCallback, out float oneSigmaError);
         int AstroAnalogueVideoIntegratedAAVFrames { get; }
+        bool AstroAnalogueVideoHasOcrCalibrationFrames { get; }
         int AstroAnalogueVideoStackedFrameRate { get; }
         int CurrentFrameIndex { get; }
 	    string AstroVideoCameraModel { get; }
