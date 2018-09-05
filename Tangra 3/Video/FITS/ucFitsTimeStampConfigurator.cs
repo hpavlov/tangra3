@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Data;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Tangra.Model.Config;
 using Tangra.Model.Helpers;
@@ -38,6 +39,7 @@ namespace Tangra.Video.FITS
         internal void Initialise(List<HeaderEntry> allCards, string fileHash, string cardsHash, FitsTimestampHelper timestampHelper)
         {
             m_AllCards = allCards;
+            m_AllCards.Sort((x, y) => string.Compare(x.Card.Key, y.Card.Key, StringComparison.InvariantCultureIgnoreCase));
             m_FilesHash = fileHash;
             m_CardNamesHash = cardsHash;
             m_TimeStampHelper = timestampHelper;
@@ -301,6 +303,8 @@ namespace Tangra.Video.FITS
                 VerifySingleTimeStamp();
         }
 
+        private Regex TIMESTAMP_FORMAT_EXTRACTOR = new Regex(@"\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}\.(\d+)", RegexOptions.Compiled | RegexOptions.Singleline);
+
         private void VerifySingleTimeStamp()
         {
             m_TimeStampMappingValid = false;
@@ -310,6 +314,19 @@ namespace Tangra.Video.FITS
                 string value = entry.Card.Value;
                 string format = cbxTimeStampFormat.Text;
                 m_TimeStampMappingValid = m_TimeStampHelper.VerifyTimeStamp(value, format);
+                if (!m_TimeStampMappingValid)
+                {
+                    var match = TIMESTAMP_FORMAT_EXTRACTOR.Match(value);
+                    if (match.Success)
+                    {
+                        format = "yyyy-MM-ddTHH:mm:ss.".PadRight(20 + match.Groups[1].Value.Length, 'f');
+                        m_TimeStampMappingValid = m_TimeStampHelper.VerifyTimeStamp(value, format);
+                        if (m_TimeStampMappingValid)
+                        {
+                            cbxTimeStampFormat.Text = format;
+                        }
+                    }
+                }
             }
 
             if (m_TimeStampMappingValid)

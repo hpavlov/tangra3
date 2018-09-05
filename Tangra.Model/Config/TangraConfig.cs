@@ -2403,6 +2403,7 @@ namespace Tangra.Model.Config
 	            }
 
                 while (Items.Count > 10) Items.RemoveAt(Items.Count - 1);
+	            Items.RemoveAll(x => x.FileHash == config.FileHash);
 
 	            Items.Add(config);
 
