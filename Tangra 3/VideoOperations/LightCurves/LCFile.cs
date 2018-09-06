@@ -169,6 +169,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 	                bool showProgress = true; //(totalObjects * itemsInGroup) / 100 > 100;
                     bool notSupported = false;
+                    bool fileCorrupted = false;
 
                     ThreadingHelper.RunTaskWaitAndDoEvents(
                         delegate()
@@ -226,6 +227,10 @@ namespace Tangra.VideoOperations.LightCurves
                             {
                                 notSupported = true;
                             }
+                            catch (EndOfStreamException)
+                            {
+                                fileCorrupted = true;
+                            }
                             finally
                             {
                                 if (showProgress)
@@ -236,7 +241,14 @@ namespace Tangra.VideoOperations.LightCurves
 
                     if (notSupported)
                         MessageBox.Show(
-                            "This file is incompatible with your current version of Tangra.",
+                            "This .lc file is incompatible with your current version of Tangra.",
+                            "Cannot load light curve",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error);
+
+                    if (fileCorrupted)
+                        MessageBox.Show(
+                            "This .lc file is either corrupted or incomplete and cannot be opened by Tangra.",
                             "Cannot load light curve",
                             MessageBoxButtons.OK,
                             MessageBoxIcon.Error);
