@@ -1119,7 +1119,12 @@ namespace Tangra.VideoOperations.LightCurves
 								m_OldLineBackup.Add(i, m_Graph.GetPixel(intX, i));
                         }
 
-						g.DrawLine(m_DisplaySettings.SelectionCursorColorPen, intX, m_MinY, intX, m_MaxY);
+                        try
+                        {
+                            g.DrawLine(m_DisplaySettings.SelectionCursorColorPen, intX, m_MinY, intX, m_MaxY);
+                        }
+                        catch (OverflowException)
+                        { }						
 
                         for (int i = 0; i < m_Header.ObjectCount; i++)
                         {
