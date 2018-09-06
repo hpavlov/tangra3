@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 using Tangra.Model.Helpers;
 
 namespace Tangra.StarCatalogues.UCAC4
@@ -62,6 +63,10 @@ namespace Tangra.StarCatalogues.UCAC4
 					idx++;
 					string zoneFile = Path.GetFullPath(string.Format("{0}\\z{1}", catalogLocation, (idx + 1).ToString("000")));
 					FileInfo fi = new FileInfo(zoneFile);
+				    if (!fi.Exists)
+				    {
+                        MessageBox.Show(null, string.Format("Cannnot find UCAC4 file '{0}'\r\nPlease ensure that you have all necessary catalogue files!", zoneFile), "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				    }
 					int numStarsInZone = (int)fi.Length / UCAC4Entry.Size;
 
 					ZoneIndex[idx] = new UCAC4BinIndexEntry(idx, numStarsInZone, rdr);
