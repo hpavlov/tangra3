@@ -331,16 +331,18 @@ namespace Tangra.Video.AstroDigitalVideo
         {
             string fileLocationOut = Path.GetFullPath(Path.GetDirectoryName(fileLocation) + @"\" + Path.GetFileName(fileLocation) + "-fixed.aav");
 
-            int FRAME_WIDTH = 720;
-            int FRAME_HEIGHT = 576;
-            int FRAME_PIXELS = FRAME_WIDTH * FRAME_HEIGHT;
-            int INTEGRATION = 2;
-            int FIRST_FRAME_IN_PERIOD = 1;
-            int FIRST_OSD_LINE = 536;
-            int LAST_OSD_LINE = 617;
+            int FIRST_FRAME_IN_PERIOD = 2;
             List<uint> BAD_FRAMES = new List<uint>();
 
             var aaFile = new AdvFile2(fileLocation);
+
+            int FIRST_OSD_LINE = int.Parse(aaFile.SystemMetadataTags["OSD-FIRST-LINE"]);
+            int LAST_OSD_LINE = int.Parse(aaFile.SystemMetadataTags["OSD-LAST-LINE"]);
+            int INTEGRATION = (int)Math.Round(double.Parse(aaFile.SystemMetadataTags["NATIVE-FRAME-RATE"]) / double.Parse(aaFile.SystemMetadataTags["EFFECTIVE-FRAME-RATE"]));
+            int FRAME_WIDTH = int.Parse(aaFile.SystemMetadataTags["WIDTH"]);
+            int FRAME_HEIGHT = int.Parse(aaFile.SystemMetadataTags["HEIGHT"]);
+            int FRAME_PIXELS = FRAME_WIDTH * FRAME_HEIGHT;
+
             var frame = new ushort[FRAME_PIXELS];
             List<ushort[]> calFrames = new List<ushort[]>();
             
