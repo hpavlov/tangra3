@@ -690,7 +690,7 @@ namespace Tangra.Controller
                                     if (isCalibrated)
                                         return true;
 
-                                    if (calibrationFramesProcessed > maxCalibrationFieldsToAttempt)
+                                    if (calibrationFramesProcessed > maxCalibrationFieldsToAttempt || i + 1 == maxCalibrationFieldsToAttempt)
                                     {
                                         m_TimestampOCR.PrepareFailedCalibrationReport();
                                         return true;
