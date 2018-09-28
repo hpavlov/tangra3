@@ -469,6 +469,14 @@ namespace Tangra.Controller
 			{
 				m_FramePlayer.OpenVideo(frameStream);
 
+                if (GetVideoFileFormat() == VideoFileFormat.AVI && string.IsNullOrEmpty(GetVideoFormat(VideoFileFormat.AVI)))
+                {
+                    ShowMessageBox(
+                        string.Format("The frame rate of this avi file is {0:0.000} fps which is neither PAL nor NTSC standard. Some operations in Tangra may not work correctly with this file!", frameStream.FrameRate),
+                        "Tangra",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                };
+
 				if (!string.IsNullOrEmpty(fileName))
 				{
 					TangraContext.Current.FileName = Path.GetFileName(fileName);
