@@ -242,7 +242,7 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
                 timeDiscrepancy = Math.Abs((videoTimeInSecPAL - ts.TotalSeconds) * 1000);
                 isTimeOk = (videoTimeInSecPAL > 0 && timeDiscrepancy < TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMilliSecs);
             }
-            else if (nativeFormat == "PAL")
+            else if (nativeFormat == "NTSC")
             {
                 timeDiscrepancy = Math.Abs((videoTimeInSecNTSC - ts.TotalSeconds) * 1000);
                 isTimeOk = (videoTimeInSecNTSC > 0 && timeDiscrepancy < TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMilliSecs);
