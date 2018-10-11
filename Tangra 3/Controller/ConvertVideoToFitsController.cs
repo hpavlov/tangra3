@@ -12,6 +12,7 @@ using Tangra.Helpers;
 using Tangra.Model.Astro;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
+using Tangra.Model.Video;
 using Tangra.VideoOperations.LightCurves;
 
 namespace Tangra.Controller
@@ -32,6 +33,13 @@ namespace Tangra.Controller
         private string m_Note;
         private bool m_IsFitsSequence;
 
+        private bool m_ExportAs8BitFloat;
+        private uint m_NormalValue;
+
+        private string m_VideoCamera;
+        private string m_NativeFormat;
+        private int m_IntegrationRate;
+
         public ConvertVideoToFitsController(Form mainFormView, VideoController videoController)
 		{
 			m_MainFormView = mainFormView;
@@ -44,8 +52,28 @@ namespace Tangra.Controller
             m_FrameHeight = TangraContext.Current.FrameHeight;
             m_IsFitsSequence = m_VideoController.IsFitsSequence;
 
+            if (m_VideoController.IsAstroAnalogueVideo)
+                m_IntegrationRate = m_VideoController.AstroAnalogueVideoIntegratedAAVFrames;
+            else
+                m_IntegrationRate = 0;
+
+            m_NativeFormat = m_VideoController.GetVideoFormat(m_VideoController.GetVideoFileFormat());
+            m_VideoCamera = m_VideoController.AstroVideoCameraModel;
+
             m_RegionOfInterest = roi;
             m_UsesROI = roi.Width != m_FrameWidth || roi.Height != m_FrameHeight;
+
+            m_ExportAs8BitFloat = false;
+            m_NormalValue = m_VideoController.EffectiveMaxPixelValue;
+            var videoFormat = m_VideoController.GetVideoFileFormat();
+            if (videoFormat == VideoFileFormat.AAV || videoFormat == VideoFileFormat.AAV2 || videoFormat == VideoFileFormat.AVI)
+            {
+                if (m_VideoController.VideoBitPix == 8 || m_VideoController.EffectiveMaxPixelValue > 255)
+                {
+                    // For video from analogue cameras we export as 8-bit floating point numbers
+                    m_ExportAs8BitFloat = true;
+                }
+            }   
 
             m_FitsCube = fitsCube;
             if (!fitsCube)
@@ -87,7 +115,7 @@ namespace Tangra.Controller
 
         internal void ProcessFrame(int frameNo, AstroImage astroImage, DateTime timeStamp, float exposureSeconds)
         {
-            string fileName = Path.GetFullPath(string.Format("{0}\\{1}_{2}.fit", m_FolderName, frameNo.ToString().PadLeft(5, '0'), timeStamp.ToString("yyyy-MMM-dd_HHmmss_fff")));
+            string fileName = Path.GetFullPath(string.Format("{0}\\{1}_{2}.fits", m_FolderName, frameNo.ToString().PadLeft(5, '0'), timeStamp.ToString("yyyy-MMM-dd_HHmmss_fff")));
             
             if (m_IsFitsSequence &&
                 astroImage.Pixelmap.FrameState.Tag != null &&
@@ -196,6 +224,26 @@ namespace Tangra.Controller
             return bimg;
         }
 
+        private float[][] SaveNormalizedFloatImageData(int width, int height, uint[] data)
+        {
+            float[][] bimg = new float[height][];
+
+            for (int y = 0; y < height; y++)
+            {
+                bimg[y] = new float[width];
+
+                for (int x = 0; x < width; x++)
+                {
+                    if (m_NormalValue > 255)
+                        bimg[y][x] = (float)Math.Min(255, Math.Max(0, data[x + (height - y - 1) * width] * 255.0 / m_NormalValue));
+                    else
+                        bimg[y][x] = (float)Math.Min(255, Math.Max(0, data[x + (height - y - 1) * width]));
+                }
+            }
+
+            return bimg;
+        }
+
         internal void SaveFitsFrame(string fileName, Header header, int width, int height, object data)
         {
             Fits f = new Fits();
@@ -205,11 +253,14 @@ namespace Tangra.Controller
             nom.tam.fits.Header hdr = imageHDU.Header;
             hdr.AddValue("SIMPLE", "T", null);
 
+            hdr.AddValue("BZERO", 0, null);
+            hdr.AddValue("BSCALE", 1, null);
+
             hdr.AddValue("NAXIS", 2, null);
             hdr.AddValue("NAXIS1", width, null);
             hdr.AddValue("NAXIS2", height, null);
 
-            string[] RESERVED_KEYS = new string[] { "SIMPLE", "NAXIS", "NAXIS1", "NAXIS2", "END" };
+            string[] RESERVED_KEYS = new string[] { "SIMPLE", "NAXIS", "NAXIS1", "NAXIS2", "BZERO", "BSCALE", "END" };
 
             var cursor = header.GetCursor();
             while (cursor.MoveNext())
@@ -240,14 +291,19 @@ namespace Tangra.Controller
         {
             Fits f = new Fits();
 
-            object data = SaveImageData(width, height, framePixels);
+            object data = m_ExportAs8BitFloat
+                ? (object)SaveNormalizedFloatImageData(width, height, framePixels) 
+                : (object)SaveImageData(width, height, framePixels);
 
             BasicHDU imageHDU = Fits.MakeHDU(data);
 
             nom.tam.fits.Header hdr = imageHDU.Header;
             hdr.AddValue("SIMPLE", "T", null);
 
-            hdr.AddValue("BITPIX", 32, null);
+            hdr.AddValue("BITPIX", m_ExportAs8BitFloat ? -32 : 32, null);
+
+            hdr.AddValue("BZERO", 0, null);
+            hdr.AddValue("BSCALE", 1, null);
 
             hdr.AddValue("NAXIS", 2, null);
             hdr.AddValue("NAXIS1", width, null);
@@ -257,7 +313,18 @@ namespace Tangra.Controller
 
             hdr.AddValue("EXPOSURE", exposureSeconds.ToString("0.000", CultureInfo.InvariantCulture), "Exposure, seconds");
 
-            hdr.AddValue("DATE-OBS", timeStamp.ToString("yyyy-MM-ddTHH:mm:ss.fff", CultureInfo.InvariantCulture), m_DateObsComment);           
+            hdr.AddValue("DATE-OBS", timeStamp.ToString("yyyy-MM-ddTHH:mm:ss.fff", CultureInfo.InvariantCulture), m_DateObsComment);
+
+            hdr.AddValue("CAMERA", m_VideoCamera, "Video camera model (observer specified)");
+
+            if (m_ExportAs8BitFloat)
+            {
+                hdr.AddValue("VIDEOFMT", m_NativeFormat, "Native analogue video format");
+                if (m_IntegrationRate > 0)
+                {
+                    hdr.AddValue("INTGRRTE", m_IntegrationRate.ToString(), "Integration rate in video frames");                    
+                }
+            }
 
             hdr.AddValue("TANGRAVE", string.Format("{0} v{1}", VersionHelper.AssemblyProduct, VersionHelper.AssemblyFileVersion), "Tangra version");
             hdr.AddValue("END", null, null);

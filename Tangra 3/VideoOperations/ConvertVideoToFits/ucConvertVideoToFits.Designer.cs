@@ -69,7 +69,7 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             // 
             this.rbCube.AutoSize = true;
             this.rbCube.Enabled = false;
-            this.rbCube.Location = new System.Drawing.Point(23, 47);
+            this.rbCube.Location = new System.Drawing.Point(122, 24);
             this.rbCube.Name = "rbCube";
             this.rbCube.Size = new System.Drawing.Size(76, 17);
             this.rbCube.TabIndex = 12;
@@ -82,10 +82,10 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             this.rbSequence.Checked = true;
             this.rbSequence.Location = new System.Drawing.Point(23, 24);
             this.rbSequence.Name = "rbSequence";
-            this.rbSequence.Size = new System.Drawing.Size(119, 17);
+            this.rbSequence.Size = new System.Drawing.Size(72, 17);
             this.rbSequence.TabIndex = 11;
             this.rbSequence.TabStop = true;
-            this.rbSequence.Text = "FITS File Sequence";
+            this.rbSequence.Text = "FITS Files";
             this.rbSequence.UseVisualStyleBackColor = true;
             // 
             // nudFirstFrame
@@ -123,16 +123,17 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             // btnCancel
             // 
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(132, 284);
+            this.btnCancel.Location = new System.Drawing.Point(132, 231);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(106, 23);
             this.btnCancel.TabIndex = 27;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
             // pbar
             // 
-            this.pbar.Location = new System.Drawing.Point(10, 318);
+            this.pbar.Location = new System.Drawing.Point(10, 265);
             this.pbar.Name = "pbar";
             this.pbar.Size = new System.Drawing.Size(228, 15);
             this.pbar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
@@ -141,7 +142,7 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             // 
             // btnExport
             // 
-            this.btnExport.Location = new System.Drawing.Point(10, 284);
+            this.btnExport.Location = new System.Drawing.Point(10, 231);
             this.btnExport.Name = "btnExport";
             this.btnExport.Size = new System.Drawing.Size(116, 23);
             this.btnExport.TabIndex = 26;
@@ -155,7 +156,7 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             this.gbxFormat.Controls.Add(this.rbCube);
             this.gbxFormat.Location = new System.Drawing.Point(10, 0);
             this.gbxFormat.Name = "gbxFormat";
-            this.gbxFormat.Size = new System.Drawing.Size(228, 78);
+            this.gbxFormat.Size = new System.Drawing.Size(228, 53);
             this.gbxFormat.TabIndex = 29;
             this.gbxFormat.TabStop = false;
             this.gbxFormat.Text = "Output Format";
@@ -164,9 +165,9 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             // 
             this.gbxFrameSize.Controls.Add(this.rbFullFrame);
             this.gbxFrameSize.Controls.Add(this.rbROI);
-            this.gbxFrameSize.Location = new System.Drawing.Point(10, 84);
+            this.gbxFrameSize.Location = new System.Drawing.Point(10, 59);
             this.gbxFrameSize.Name = "gbxFrameSize";
-            this.gbxFrameSize.Size = new System.Drawing.Size(228, 78);
+            this.gbxFrameSize.Size = new System.Drawing.Size(228, 52);
             this.gbxFrameSize.TabIndex = 30;
             this.gbxFrameSize.TabStop = false;
             this.gbxFrameSize.Text = "Frame Size";
@@ -186,7 +187,7 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             // rbROI
             // 
             this.rbROI.AutoSize = true;
-            this.rbROI.Location = new System.Drawing.Point(21, 47);
+            this.rbROI.Location = new System.Drawing.Point(113, 24);
             this.rbROI.Name = "rbROI";
             this.rbROI.Size = new System.Drawing.Size(109, 17);
             this.rbROI.TabIndex = 12;
@@ -203,7 +204,7 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             this.gbxSection.Controls.Add(this.label27);
             this.gbxSection.Controls.Add(this.nudLastFrame);
             this.gbxSection.Controls.Add(this.label26);
-            this.gbxSection.Location = new System.Drawing.Point(10, 168);
+            this.gbxSection.Location = new System.Drawing.Point(10, 117);
             this.gbxSection.Name = "gbxSection";
             this.gbxSection.Size = new System.Drawing.Size(228, 105);
             this.gbxSection.TabIndex = 31;
@@ -257,7 +258,7 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             this.pnlEnterTimes.Controls.Add(this.btnNextTime);
             this.pnlEnterTimes.Controls.Add(this.lblTimesHeader);
             this.pnlEnterTimes.Controls.Add(this.ucUtcTime);
-            this.pnlEnterTimes.Location = new System.Drawing.Point(3, 278);
+            this.pnlEnterTimes.Location = new System.Drawing.Point(3, 225);
             this.pnlEnterTimes.Name = "pnlEnterTimes";
             this.pnlEnterTimes.Size = new System.Drawing.Size(246, 121);
             this.pnlEnterTimes.TabIndex = 33;

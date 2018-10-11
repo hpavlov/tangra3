@@ -3197,7 +3197,14 @@ namespace Tangra.Controller
 
 	        var currFrameTime = GetCurrentFrameTime();
 	        if (currFrameTime != null)
-	            return currFrameTime.Value;
+	        {
+	            var dt = currFrameTime.Value;
+	            if (dt.Year <= 1)
+	            {
+	                dt = DateTime.Today.Add(ocrTimeOfDay);
+	            }
+	            return dt;
+	        }
 
 	        if (IsAstroAnalogueVideo || IsAstroDigitalVideo)
 	        {

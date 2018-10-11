@@ -156,15 +156,20 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
 
                 if (isLastFrame || m_LastFrame == frameNo)
                 {
-                    m_ConvertVideoToFitsController.FinishExport();
-                    m_ControlPanel.ExportFinished();
-                    m_Status = ConvertVideoToFitsState.Finished;
-                    m_VideoController.ShowMessageBox("Export completed.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    FinishExport("Export completed.");
                 }
 
                 if (m_LastFrame == frameNo)
                     m_VideoController.StopVideo();
             }
+        }
+
+        private void FinishExport(string message)
+        {
+            m_ConvertVideoToFitsController.FinishExport();
+            m_ControlPanel.ExportFinished();
+            m_Status = ConvertVideoToFitsState.Finished;
+            m_VideoController.ShowMessageBox(message, "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Information);          
         }
 
         internal void StartExport(string fileName, bool fitsCube, int firstFrame, int lastFrame, int step, Rectangle roi, UsedTimeBase timeBase)
@@ -175,6 +180,12 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             m_ConvertVideoToFitsController.StartExport(fileName, fitsCube, roi, timeBase, m_VideoController.HasTimestampOCR(), m_VideoController.OCRTimeStampHasDatePart());
 
             m_VideoController.PlayVideo(m_FirstFrame, (uint)step);
+        }
+
+        internal void CancelExport()
+        {
+            m_VideoController.StopVideo();
+            FinishExport("Export cancelled.");
         }
 
         private DateTime m_StartFrameTime;

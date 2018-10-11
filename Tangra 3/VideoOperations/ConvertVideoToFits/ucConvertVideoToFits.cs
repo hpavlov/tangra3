@@ -245,14 +245,37 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
 				"Problem found", MessageBoxButtons.OK, MessageBoxIcon.Stop);
 		}
 
+        private bool SanityCheckOCRDate()
+        {
+            if (ucUtcTime.DateTimeUtc.Date == DateTime.Now.Date)
+            {
+                if (m_VideoController.ShowMessageBox(
+                    "The date component is also exported into the FITS header. Please ensure that the selected date it correct. Press OK to continue or Cancel to go back and change the date.",
+                    "Tangra",
+                    MessageBoxButtons.OKCancel,
+                    MessageBoxIcon.Warning,
+                    MessageBoxDefaultButton.Button2) == DialogResult.Cancel)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         private void btnNextTime_Click(object sender, EventArgs e)
         {
             if (m_EnterOCRAttachDate)
             {
-
+                if (!SanityCheckOCRDate())
+                {
+                    return;
+                }
                 DateTime dateToAttachToOCR = ucUtcTime.DateTimeUtc.Date;
                 m_Operation.SetAttachDateToOCR(dateToAttachToOCR);
                 StartExport(UsedTimeBase.EmbeddedTimeStamp);
+
+                
             }
             else if (!m_FirstTimeSet)
 			{
@@ -262,18 +285,10 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
 					return;
 				}
 
-			    if (ucUtcTime.DateTimeUtc.Date == DateTime.Now.Date)
-			    {
-			        if (m_VideoController.ShowMessageBox(
-                        "The date component is also exported into the FITS header. Please ensure that the selected date it correct. Press OK to continue or Cancel to go back and change the date.", 
-                        "Tangra",
-                        MessageBoxButtons.OKCancel,
-                        MessageBoxIcon.Warning,
-                        MessageBoxDefaultButton.Button2) == DialogResult.Cancel)
-			        {
-			            return;
-			        }
-			    }
+                if (!SanityCheckOCRDate())
+                {
+                    return;
+                }
 
 				m_FirstTimeFrame = m_CurrFrameNo;
 				m_FirstTimeSet = true;
@@ -315,6 +330,11 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
 			}
 
 			UpdateShowingFieldControls();
+        }
+
+        private void btnCancel_Click(object sender, EventArgs e)
+        {
+            m_Operation.CancelExport();
         }
     }
 }
