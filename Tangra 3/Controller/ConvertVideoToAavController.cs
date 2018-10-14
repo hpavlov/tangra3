@@ -12,6 +12,7 @@ using Tangra.Model.Context;
 using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.Video.AstroDigitalVideo;
+using Tangra.VideoOperations.ConvertVideoToAav;
 
 namespace Tangra.Controller
 {
@@ -54,7 +55,7 @@ namespace Tangra.Controller
         internal void StartConversion(
             string fileName, int topVtiOsdRow, int bottomVtiOsdRow, int leftVtiOsdCol, int rightVtiOsdCol, 
             int firstIntegratedFrameId, int integrationInterval, string cameraModel, string sensorInfo,
-            bool swapTimestampFields, bool dontValidateIntegrationIntervals)
+            bool swapTimestampFields, bool dontValidateIntegrationIntervals, List<HeaderValuePair> additionalHeaders)
         {
             m_VideoController.ClearAAVConversionErrors();
 
@@ -111,6 +112,17 @@ namespace Tangra.Controller
             m_Recorder.FileMetaData.AddUserTag("AAV-VERSION", "2");
             m_Recorder.FileMetaData.AddUserTag("AAV16-NORMVAL", m_MaxPixelValue.ToString());
             m_Recorder.FileMetaData.AddUserTag("INTEGRATION-DETECTION", m_DontValidateIntegrationIntervals ? "Manual" : "Automatic");
+
+            if (additionalHeaders != null)
+            {
+                foreach (var tag in additionalHeaders)
+                {
+                    if (!string.IsNullOrWhiteSpace(tag.Header))
+                    {
+                        m_Recorder.FileMetaData.AddUserTag(tag.Header, tag.Value);
+                    }
+                }
+            }
 
             m_Recorder.FileMetaData.AddCalibrationStreamTag("TYPE", "VTI-OSD-CALIBRATION");
             m_Recorder.FileMetaData.AddCalibrationStreamTag("OSD-FIRST-LINE", topVtiOsdRow.ToString());

@@ -396,6 +396,13 @@
     <Compile Include="VideoOperations\Astrometry\Tracking\IAstrometryTracker.cs" />
     <Compile Include="VideoOperations\Astrometry\Tracking\SlowMotionTracker.cs" />
     <Compile Include="VideoOperations\ConvertVideoToAav\ConvertVideoToAavOperation.cs" />
+    <Compile Include="VideoOperations\ConvertVideoToAav\frmAdditionalHeaders.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\ConvertVideoToAav\frmAdditionalHeaders.Designer.cs">
+      <DependentUpon>frmAdditionalHeaders.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\ConvertVideoToAav\HeaderValuePair.cs" />
     <Compile Include="VideoTools\frmCorrectInterlacedDefects.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -1223,6 +1230,9 @@
     <EmbeddedResource Include="VideoOperations\Astrometry\ucChooseCalibratedConfiguration.resx">
       <DependentUpon>ucChooseCalibratedConfiguration.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\ConvertVideoToAav\frmAdditionalHeaders.resx">
+      <DependentUpon>frmAdditionalHeaders.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="VideoTools\frmCorrectInterlacedDefects.resx">
       <DependentUpon>frmCorrectInterlacedDefects.cs</DependentUpon>
     </EmbeddedResource>
@@ -1446,6 +1456,7 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Properties\DataSources\Tangra.VideoOperations.ConvertVideoToAav.HeaderValuePair.datasource" />
     <None Include="Properties\DataSources\Tangra.VideoOperations.LightCurves.InfoForms.LCFileTagValuePair.datasource" />
     <None Include="Properties\DataSources\Tangra.VideoOperations.LightCurves.LCFileSeriesEntry.datasource" />
     <None Include="Properties\DataSources\Tangra.VideoTools.TagValuePair.datasource" />

@@ -22,7 +22,7 @@ using Extensions = Tangra.Model.Helpers.Extensions;
 
 namespace Tangra.Video
 {
-    public class AstroDigitalVideoStreamV2 : IFrameStream, IDisposable
+    public class AstroDigitalVideoStreamV2 : IFrameStream, IFileHeaderProvider, IDisposable
     {
         public static IFrameStream OpenFile(string fileName, out AdvFileMetadataInfo fileMetadataInfo, out GeoLocationInfo geoLocation)
         {
@@ -443,6 +443,19 @@ namespace Tangra.Video
                 m_AdvFile.Close();
                 m_AdvFile = null;
             }
+        }
+
+        public Dictionary<string, string> GetFileHeaders()
+        {
+            var rv = new Dictionary<string, string>();
+
+            if (m_AdvFile != null)
+            {
+                m_AdvFile.SystemMetadataTags.Select(kvp => kvp).ToList().ForEach(kvp => rv[kvp.Key] = kvp.Value);
+                m_AdvFile.UserMetadataTags.Select(kvp => kvp).ToList().ForEach(kvp => rv[kvp.Key] = kvp.Value);
+            }
+
+            return rv;
         }
     }
 }

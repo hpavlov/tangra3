@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using nom.tam.fits;
 using nom.tam.util;
+using Tangra.Config;
 using Tangra.Helpers;
 using Tangra.Model.Astro;
 using Tangra.Model.Config;
@@ -40,6 +41,8 @@ namespace Tangra.Controller
         private string m_NativeFormat;
         private int m_IntegrationRate;
 
+        private Dictionary<string, Tuple<string, string>> m_AdditionalAavHeaders = new Dictionary<string, Tuple<string, string>>();
+
         public ConvertVideoToFitsController(Form mainFormView, VideoController videoController)
 		{
 			m_MainFormView = mainFormView;
@@ -66,6 +69,7 @@ namespace Tangra.Controller
             m_ExportAs8BitFloat = false;
             m_NormalValue = m_VideoController.EffectiveMaxPixelValue;
             var videoFormat = m_VideoController.GetVideoFileFormat();
+
             if (videoFormat == VideoFileFormat.AAV || videoFormat == VideoFileFormat.AAV2 || videoFormat == VideoFileFormat.AVI)
             {
                 if (m_VideoController.VideoBitPix == 8 || m_VideoController.EffectiveMaxPixelValue > 255)
@@ -73,7 +77,51 @@ namespace Tangra.Controller
                     // For video from analogue cameras we export as 8-bit floating point numbers
                     m_ExportAs8BitFloat = true;
                 }
-            }   
+            }
+
+            m_AdditionalAavHeaders.Clear();
+            var fileHeaderProvider = m_VideoController.FramePlayer.Video as IFileHeaderProvider;
+            if (fileHeaderProvider != null)
+            {                
+                var AAV_HEADERS = new Dictionary<string, string>
+                {
+                    {"LATITUDE", "LATITUDE" },
+                    {"LONGITUDE", "LONGITUD" },
+                    {"OBSERVER", "OBSERVER" }, 
+                    {"TELESCOP", "TELESCOP" },
+                    {"OBJECT", "OBJECT"},
+                    {"RA_OBJ", "RA_OBJ" },
+                    {"DEC_OBJ", "DEC_OBJ"},
+                    {"RECORDER-SOFTWARE", "REC-SOFT" },
+                    {"RECORDER-SOFTWARE-VERSION", "REC-VER" },
+                    {"ADVLIB-VERSION", "ADVLIB"}
+                };
+
+                var coppiedFromHeaderDescription = string.Format("Copied from {0} file headers", videoFormat);
+                var fileHeaders = fileHeaderProvider.GetFileHeaders();
+                fileHeaders
+                    .Where(kvp => AAV_HEADERS.ContainsKey(kvp.Key))
+                    .Select(kvp => kvp)                    
+                    .ToList()
+                    .ForEach(kvp => m_AdditionalAavHeaders[AAV_HEADERS[kvp.Key]] = Tuple.Create(kvp.Value, coppiedFromHeaderDescription));
+
+                if (videoFormat == VideoFileFormat.AAV || videoFormat == VideoFileFormat.AAV2)
+                {
+                    var camera = m_VideoCamera;
+                    if (camera.IndexOf(m_NativeFormat, StringComparison.InvariantCultureIgnoreCase) == -1)
+                    {
+                        camera = camera.Trim() + string.Format(" ({0})", m_NativeFormat);
+                    }
+                    var instumentalDelaySelectedConfig = InstrumentalDelayConfigManager.GetConfigurationForCamera(camera);
+                    float instDelay;
+                    if (instumentalDelaySelectedConfig.TryGetValue(m_VideoController.AstroAnalogueVideoIntegratedAAVFrames, out instDelay))
+                    {
+                        m_AdditionalAavHeaders["INSTDELY"] = Tuple.Create(
+                            instDelay.ToString(CultureInfo.InvariantCulture),
+                            string.Format("Instr. delay in sec. for x{0} frames integration for '{1}' camera. This has not been applied to DATE-OBS", m_VideoController.AstroAnalogueVideoIntegratedAAVFrames, camera));
+                    }
+                }
+            }
 
             m_FitsCube = fitsCube;
             if (!fitsCube)
@@ -324,6 +372,11 @@ namespace Tangra.Controller
                 {
                     hdr.AddValue("INTGRRTE", m_IntegrationRate.ToString(), "Integration rate in video frames");                    
                 }
+            }
+
+            foreach (var kvp in m_AdditionalAavHeaders)
+            {
+                hdr.AddValue(kvp.Key, kvp.Value.Item1, kvp.Value.Item2);
             }
 
             hdr.AddValue("TANGRAVE", string.Format("{0} v{1}", VersionHelper.AssemblyProduct, VersionHelper.AssemblyFileVersion), "Tangra version");

@@ -412,6 +412,13 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
                 return;
             }
 
+            List<HeaderValuePair> additionalHeaders = null;
+            var frm = new frmAdditionalHeaders();
+            if (frm.ShowDialog(this) == DialogResult.OK)
+            {
+                additionalHeaders = frm.Headers;
+            }
+
             saveFileDialog.FileName = Path.GetFileName(Path.ChangeExtension(m_VideoController.CurrentVideoFileName, ".aav"));
 
             if (saveFileDialog.ShowDialog(this) == DialogResult.OK)
@@ -435,7 +442,8 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
                     cbxCameraModel.Text,
                     cbxSensorInfo.Text,
                     rbFirstFieldBottom.Checked,
-                    m_ManualIntegrationConfig);
+                    m_ManualIntegrationConfig,
+                    additionalHeaders);
             }
         }
 

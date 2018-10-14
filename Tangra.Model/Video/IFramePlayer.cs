@@ -19,8 +19,6 @@ namespace Tangra.Model.Video
         int firstFrameInIntegrationPeriod,
         string frameFileName);
 
-
-
 	public interface IVideoFrameRenderer
 	{
 		void PlayerStarted();
@@ -51,6 +49,11 @@ namespace Tangra.Model.Video
 	    bool SupportsSoftwareIntegration { get; }
         bool SupportsFrameFileNames { get; }
 	}
+
+    public interface IFileHeaderProvider
+    {
+        Dictionary<string, string> GetFileHeaders();
+    }
 
 	public class GeoLocationInfo
 	{
