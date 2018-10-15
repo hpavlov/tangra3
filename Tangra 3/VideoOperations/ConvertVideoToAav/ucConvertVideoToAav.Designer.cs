@@ -385,7 +385,7 @@
             this.Controls.Add(this.btnConvert);
             this.Controls.Add(this.gbxSection);
             this.Name = "ucConvertVideoToAav";
-            this.Size = new System.Drawing.Size(590, 390);
+            this.Size = new System.Drawing.Size(236, 390);
             this.gbxSection.ResumeLayout(false);
             this.gbxSection.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudFirstFrame)).EndInit();

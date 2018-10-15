@@ -53,6 +53,7 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
             controlPanel.Controls.Clear();
             controlPanel.Controls.Add(m_ControlPanel);
             m_ControlPanel.Dock = DockStyle.Fill;
+            topForm.Height = 722;
 
             TangraContext.Current.CanPlayVideo = false;
             m_VideoController.UpdateViews();
