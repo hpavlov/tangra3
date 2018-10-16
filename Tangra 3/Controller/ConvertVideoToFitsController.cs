@@ -174,11 +174,11 @@ namespace Tangra.Controller
             else
             {
                 uint[] pixels = astroImage.Pixelmap.UnprocessedPixels ?? astroImage.Pixelmap.Pixels;
-                ProcessFrame(fileName, pixels, timeStamp, exposureSeconds);
+                ProcessFrame(frameNo, fileName, pixels, timeStamp, exposureSeconds);
             }
         }
 
-        internal void ProcessFrame(string fileName, uint[] pixels, DateTime timeStamp, float exposureSeconds)
+        internal void ProcessFrame(int frameNo, string fileName, uint[] pixels, DateTime timeStamp, float exposureSeconds)
         {
             if (m_UsesROI)
             {
@@ -192,11 +192,11 @@ namespace Tangra.Controller
                     }
                 }
 
-                SaveFitsFrame(fileName, m_RegionOfInterest.Width, m_RegionOfInterest.Height, subpixels, timeStamp, exposureSeconds);
+                SaveFitsFrame(frameNo, fileName, m_RegionOfInterest.Width, m_RegionOfInterest.Height, subpixels, timeStamp, exposureSeconds);
             }
             else
             {
-                SaveFitsFrame(fileName, m_RegionOfInterest.Width, m_RegionOfInterest.Height, pixels, timeStamp, exposureSeconds);
+                SaveFitsFrame(frameNo, fileName, m_RegionOfInterest.Width, m_RegionOfInterest.Height, pixels, timeStamp, exposureSeconds);
             } 
         }
 
@@ -335,7 +335,7 @@ namespace Tangra.Controller
         }
 
 
-        internal void SaveFitsFrame(string fileName, int width, int height, uint[] framePixels, DateTime timeStamp, float exposureSeconds)
+        internal void SaveFitsFrame(int frameNo, string fileName, int width, int height, uint[] framePixels, DateTime timeStamp, float exposureSeconds)
         {
             Fits f = new Fits();
 
@@ -357,7 +357,10 @@ namespace Tangra.Controller
             hdr.AddValue("NAXIS1", width, null);
             hdr.AddValue("NAXIS2", height, null);
 
-            hdr.AddValue("NOTES", m_Note, null);
+            hdr.AddValue("AAVFILE", m_VideoController.FileName, null);
+            hdr.AddValue("AAVFRAME", frameNo, null);
+
+            hdr.AddValue("NOTES", "No instrumental delay has been applied to DATE-OBS.", null);
 
             hdr.AddValue("EXPOSURE", exposureSeconds.ToString("0.000", CultureInfo.InvariantCulture), "Exposure, seconds");
 

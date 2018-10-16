@@ -164,7 +164,7 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             ucUtcTime.FocusHourControl();
 
             // Split the video in fields for interlaced video
-            m_ShowingFields = m_VideoController.IsPlainAviVideo;
+            m_ShowingFields = m_VideoController.IsPlainAviVideo || m_VideoController.IsAstroAnalogueVideo;
 
             m_VideoController.MoveToFrame((int)nudFirstFrame.Value);
             m_VideoController.ToggleShowFieldsMode(m_ShowingFields);

@@ -245,28 +245,22 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             double videoTimeInSecPAL = totalIntegratedFrames / 25.0;
             double videoTimeInSecNTSC = totalIntegratedFrames / 29.97;
 
-            bool isTimeOk = false;
-            double timeDiscrepancy = 0;
-            string nativeFormat = m_VideoController.GetVideoFormat(videoFileFormat);
-            if (nativeFormat == "PAL")
-            {
-                timeDiscrepancy = Math.Abs((videoTimeInSecPAL - ts.TotalSeconds) * 1000);
-                isTimeOk = (videoTimeInSecPAL > 0 && timeDiscrepancy < TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMilliSecs);
-            }
-            else if (nativeFormat == "NTSC")
-            {
-                timeDiscrepancy = Math.Abs((videoTimeInSecNTSC - ts.TotalSeconds) * 1000);
-                isTimeOk = (videoTimeInSecNTSC > 0 && timeDiscrepancy < TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMilliSecs);
-            }
+            double timeDiscrepancy_PAL = Math.Abs((videoTimeInSecPAL - ts.TotalSeconds) * 1000);
+            bool isTimeOk_PAL = (videoTimeInSecPAL > 0 && timeDiscrepancy_PAL < TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMilliSecs);;
+
+            double timeDiscrepancy_NTSC = Math.Abs((videoTimeInSecNTSC - ts.TotalSeconds) * 1000);
+            bool isTimeOk_NTSC = (videoTimeInSecNTSC > 0 && timeDiscrepancy_NTSC < TangraConfig.Settings.Special.MaxAllowedTimestampShiftInMilliSecs);
+
+            bool isTimeOk = isTimeOk_NTSC || isTimeOk_PAL;
+            double timeDiscrepancy = Math.Min(timeDiscrepancy_PAL, timeDiscrepancy_NTSC);
 
             if (!isTimeOk)
             {
                 if (MessageBox.Show(
                     string.Format(
-                        "The time computed from the measured number of frames in this {0} AAV video is off by {1} ms from the entered time. This may indicate " +
+                        "The time computed from the measured number of frames in this AAV video is off by {0} ms from the entered time. This may indicate " +
                         "incorrectly entered start or end time or an almanac update or a leap second event. Please enter the start and end times again. The export operation can " +
                         "only continute if the times match exactly.",
-                        nativeFormat,
                         timeDiscrepancy.ToString("0.00")),
                     "Error",
                     MessageBoxButtons.RetryCancel, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1) == DialogResult.Retry)
