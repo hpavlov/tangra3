@@ -40,8 +40,9 @@ namespace Tangra.Controller
         private string m_VideoCamera;
         private string m_NativeFormat;
         private int m_IntegrationRate;
+        private VideoFileFormat m_VideoFormat;
 
-        private Dictionary<string, Tuple<string, string>> m_AdditionalAavHeaders = new Dictionary<string, Tuple<string, string>>();
+        private Dictionary<string, Tuple<string, string>> m_AdditionalFileHeaders = new Dictionary<string, Tuple<string, string>>();
 
         public ConvertVideoToFitsController(Form mainFormView, VideoController videoController)
 		{
@@ -68,9 +69,9 @@ namespace Tangra.Controller
 
             m_ExportAs8BitFloat = false;
             m_NormalValue = m_VideoController.EffectiveMaxPixelValue;
-            var videoFormat = m_VideoController.GetVideoFileFormat();
+            m_VideoFormat = m_VideoController.GetVideoFileFormat();
 
-            if (videoFormat == VideoFileFormat.AAV || videoFormat == VideoFileFormat.AAV2 || videoFormat == VideoFileFormat.AVI)
+            if (m_VideoFormat == VideoFileFormat.AAV || m_VideoFormat == VideoFileFormat.AAV2 || m_VideoFormat == VideoFileFormat.AVI)
             {
                 if (m_VideoController.VideoBitPix == 8 || m_VideoController.EffectiveMaxPixelValue > 255)
                 {
@@ -79,7 +80,7 @@ namespace Tangra.Controller
                 }
             }
 
-            m_AdditionalAavHeaders.Clear();
+            m_AdditionalFileHeaders.Clear();
             var fileHeaderProvider = m_VideoController.FramePlayer.Video as IFileHeaderProvider;
             if (fileHeaderProvider != null)
             {                
@@ -97,15 +98,15 @@ namespace Tangra.Controller
                     {"ADVLIB-VERSION", "ADVLIB"}
                 };
 
-                var coppiedFromHeaderDescription = string.Format("Copied from {0} file headers", videoFormat);
+                var coppiedFromHeaderDescription = string.Format("Copied from {0} file headers", m_VideoFormat);
                 var fileHeaders = fileHeaderProvider.GetFileHeaders();
                 fileHeaders
                     .Where(kvp => AAV_HEADERS.ContainsKey(kvp.Key))
                     .Select(kvp => kvp)                    
                     .ToList()
-                    .ForEach(kvp => m_AdditionalAavHeaders[AAV_HEADERS[kvp.Key]] = Tuple.Create(kvp.Value, coppiedFromHeaderDescription));
+                    .ForEach(kvp => m_AdditionalFileHeaders[AAV_HEADERS[kvp.Key]] = Tuple.Create(kvp.Value, coppiedFromHeaderDescription));
 
-                if (videoFormat == VideoFileFormat.AAV || videoFormat == VideoFileFormat.AAV2)
+                if (m_VideoFormat == VideoFileFormat.AAV || m_VideoFormat == VideoFileFormat.AAV2)
                 {
                     var camera = m_VideoCamera;
                     if (camera.IndexOf(m_NativeFormat, StringComparison.InvariantCultureIgnoreCase) == -1)
@@ -116,7 +117,7 @@ namespace Tangra.Controller
                     float instDelay;
                     if (instumentalDelaySelectedConfig.TryGetValue(m_VideoController.AstroAnalogueVideoIntegratedAAVFrames, out instDelay))
                     {
-                        m_AdditionalAavHeaders["INSTDELY"] = Tuple.Create(
+                        m_AdditionalFileHeaders["INSTDELY"] = Tuple.Create(
                             instDelay.ToString(CultureInfo.InvariantCulture),
                             string.Format("Instr. delay in sec. for x{0} frames integration for '{1}' camera. This has not been applied to DATE-OBS", m_VideoController.AstroAnalogueVideoIntegratedAAVFrames, camera));
                     }
@@ -357,27 +358,34 @@ namespace Tangra.Controller
             hdr.AddValue("NAXIS1", width, null);
             hdr.AddValue("NAXIS2", height, null);
 
-            hdr.AddValue("AAVFILE", m_VideoController.FileName, null);
-            hdr.AddValue("AAVFRAME", frameNo, null);
-
-            hdr.AddValue("NOTES", "No instrumental delay has been applied to DATE-OBS.", null);
-
             hdr.AddValue("EXPOSURE", exposureSeconds.ToString("0.000", CultureInfo.InvariantCulture), "Exposure, seconds");
 
             hdr.AddValue("DATE-OBS", timeStamp.ToString("yyyy-MM-ddTHH:mm:ss.fff", CultureInfo.InvariantCulture), m_DateObsComment);
 
             hdr.AddValue("CAMERA", m_VideoCamera, "Video camera model (observer specified)");
 
-            if (m_ExportAs8BitFloat)
+            hdr.AddValue("FILENAME", m_VideoController.FileName, null);
+            hdr.AddValue("FRAMENO", frameNo, null);
+
+            if (m_VideoFormat == VideoFileFormat.AAV || m_VideoFormat == VideoFileFormat.AAV2)
             {
-                hdr.AddValue("VIDEOFMT", m_NativeFormat, "Native analogue video format");
-                if (m_IntegrationRate > 0)
+                hdr.AddValue("NOTES", "No instrumental delay has been applied to DATE-OBS.", null);
+
+                if (m_ExportAs8BitFloat)
                 {
-                    hdr.AddValue("INTGRRTE", m_IntegrationRate.ToString(), "Integration rate in video frames");                    
+                    hdr.AddValue("VIDEOFMT", m_NativeFormat, "Native analogue video format");
+                    if (m_IntegrationRate > 0)
+                    {
+                        hdr.AddValue("INTGRRTE", m_IntegrationRate.ToString(), "Integration rate in video frames");
+                    }
                 }
             }
+            else
+            {
+                hdr.AddValue("NOTES", string.Format("Converted from {0} file.", m_VideoFormat), null);
+            }
 
-            foreach (var kvp in m_AdditionalAavHeaders)
+            foreach (var kvp in m_AdditionalFileHeaders)
             {
                 hdr.AddValue(kvp.Key, kvp.Value.Item1, kvp.Value.Item2);
             }
