@@ -1,5 +1,11 @@
 ﻿Tangra3 Release Notes
 ---------------------
+v3.6.18 (2018-10-19)
+- Improvements to handling of AAV files and convertion of video from AVI to AAV.
+- Improvements to convertion of video to FITS format.
+- Tangra will now warn the user when opening an AVI file with a framerate that is not PAL or NTSC.
+- Minor bugfixes and improvements.
+
 v3.6.17 (2018-06-17)
 - Fixed a problem where Tangra may not correctly parse the response from AOTA and as a result the data from AOTA will not be made available for OccultWatcher.
 - Fixed a problem where only the first portion of the video will be processed when a sofware integration is used.
