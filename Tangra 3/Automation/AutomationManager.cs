@@ -55,7 +55,10 @@ namespace Tangra.Automation
 
         private void RunIntegrationDetection()
         {
-            // TODO:
+            using (var instrDetection = new AutomatedIntegrationDetection(m_Arguments))
+            {
+                instrDetection.Run();
+            }
         }
     }
 }

@@ -12,6 +12,7 @@ using System.Text;
 using Tangra.Helpers;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
+using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.Model.Video;
 using Tangra.PInvoke;
@@ -75,6 +76,40 @@ namespace Tangra.Video
                 ? lastError.Message 
                 : "None of the rendering engines was able to open the file.");
 		}
+
+	    internal static VideoStream OpenFileForAutomation(string fileName, int videoEngineId)
+	    {
+            List<string> allEngines = TangraVideo.EnumVideoEngines().ToList();
+
+            var allEnginesByAttemptOrder = new List<string>(allEngines);
+            allEnginesByAttemptOrder.RemoveAt(videoEngineId);
+            allEnginesByAttemptOrder.Insert(0, allEngines[videoEngineId]);
+
+            Dictionary<int, string> allEnginesByIndex = allEnginesByAttemptOrder.ToDictionary(x => allEngines.IndexOf(x), x => x);
+
+            foreach (int engineIdx in allEnginesByIndex.Keys)
+            {
+                try
+                {
+                    TangraVideo.SetVideoEngine(engineIdx);
+
+                    VideoFileInfo fileInfo = TangraVideo.OpenFile(fileName);
+
+                    var rv = new VideoStream(fileInfo, fileName);
+
+                    // Try to load the first frame to be sure that it is going to work, before accepting this video engine for rendering
+                    rv.GetPixelmap(fileInfo.FirstFrame);
+
+                    return rv;
+                }
+                catch (Exception ex)
+                {
+                    Trace.WriteLine(ex.GetFullStackTrace());
+                }
+            }
+
+            return null;
+	    }
 
 		private string m_FileName;
 		private VideoFileInfo m_OpenedFileInfo;

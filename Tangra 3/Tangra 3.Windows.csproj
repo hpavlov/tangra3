@@ -139,6 +139,7 @@
     <Compile Include="Addins\SingleMeasurement.cs" />
     <Compile Include="Addins\TangraDrawingSettings.cs" />
     <Compile Include="Addins\TangraHostDelegate.cs" />
+    <Compile Include="Automation\AutomatedIntegrationDetection.cs" />
     <Compile Include="Automation\AutomationManager.cs" />
     <Compile Include="Config\frmChooseFirstTimeOcrSettings.cs">
       <SubType>Form</SubType>
@@ -287,6 +288,7 @@
     <Compile Include="Controller\DarkFlatFrameController.cs" />
     <Compile Include="Controller\SpectraReductionContext.cs" />
     <Compile Include="Controller\SpectroscopyController.cs" />
+    <Compile Include="Automation\AutomationVideoPlayer.cs" />
     <Compile Include="Controller\VideoController.cs" />
     <Compile Include="Controller\VideoOperationController.cs" />
     <Compile Include="Controller\AddinsController.cs" />
