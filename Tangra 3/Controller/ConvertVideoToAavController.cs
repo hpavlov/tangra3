@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -18,6 +19,56 @@ namespace Tangra.Controller
 {
     public class ConvertVideoToAavController
     {
+        internal class DetectionInfo
+        {
+            public int TotalFrames;
+
+            private int m_DetectedIntervals;
+            private int m_DetectionsSinceLastFurther;
+            public int DetectedIntervals
+            {
+                get { return m_DetectedIntervals; }
+                set
+                {
+                    m_DetectedIntervals = value;
+                    m_DetectionsSinceLastFurther++;
+                }
+            }
+
+            public int DetectionsSinceLastFurther
+            {
+                get { return m_DetectionsSinceLastFurther; }
+            }
+
+            public int AssumedIntervals;
+
+            private int m_FurtherDetectedIntervals;
+            public int FurtherDetectedIntervals
+            {
+                get { return m_FurtherDetectedIntervals; }
+                set
+                {
+                    m_FurtherDetectedIntervals = value;
+                    m_DetectionsSinceLastFurther = 0;
+                }
+            }
+
+            public int EarlyDetections;
+            public int ErrorDetections;
+            public int IntegrationInterval;
+
+            public void Clear(int integrationInterval)
+            {
+                TotalFrames = 0;
+                DetectedIntervals = 0;
+                AssumedIntervals = 0;
+                FurtherDetectedIntervals = 0;
+                EarlyDetections = 0;
+                ErrorDetections = 0;
+                IntegrationInterval = integrationInterval;
+            }
+        }
+
         private Form m_MainFormView;
         private VideoController m_VideoController;
         private string m_FileName;
@@ -41,6 +92,8 @@ namespace Tangra.Controller
         private int m_LeftVtiOsdCol = 0;
         private int m_RightVtiOsdCol = 0;
         private bool m_DontValidateIntegrationIntervals;
+
+        private DetectionInfo m_DetectionInfo = new DetectionInfo();
 
         private ushort[] m_CurrAavFramePixels;
 
@@ -81,6 +134,8 @@ namespace Tangra.Controller
             m_DontValidateIntegrationIntervals = dontValidateIntegrationIntervals;
             m_NextExpectedIntegrationPeriodStartFrameId = firstIntegratedFrameId + integrationInterval;
             m_FramesSoFar = 0;
+
+            m_DetectionInfo.Clear(m_IntegrationPeriod);
 
             m_Recorder = new AdvRecorder();
             m_Recorder.ImageConfig.SetImageParameters(
@@ -179,6 +234,8 @@ namespace Tangra.Controller
 
         private bool IsNewIntegrationPeriod(int frameNo, AstroImage image)
         {
+            m_DetectionInfo.TotalFrames++;
+
             if (m_DontValidateIntegrationIntervals)
             {
                 if (frameNo == m_FirstIntegrationPeriodStartFrameId)
@@ -263,8 +320,11 @@ namespace Tangra.Controller
                     else if (!newInterval && frameNo == m_NextExpectedIntegrationPeriodStartFrameId)
                         m_VideoController.RegisterAAVConversionError();
 
-                    if (newInterval) 
+                    if (newInterval)
+                    {
                         m_NextExpectedIntegrationPeriodStartFrameId = frameNo + m_IntegrationPeriod;
+                        m_DetectionInfo.DetectedIntervals++;
+                    }
 
                     return newInterval;
                 }
@@ -302,24 +362,40 @@ namespace Tangra.Controller
                             if (nextExpectedResidual < residual && nextNewExpectedResidual > variance)
                             {
                                 m_NextExpectedIntegrationPeriodStartFrameId = frameNo + m_IntegrationPeriod;
+                                m_DetectionInfo.DetectedIntervals++;
+                                m_DetectionInfo.EarlyDetections++;
                                 return true;
                             }
                         }
                         else if (frameNo == m_NextExpectedIntegrationPeriodStartFrameId)
                         {
                             m_NextExpectedIntegrationPeriodStartFrameId = frameNo + m_IntegrationPeriod;
+                            m_DetectionInfo.DetectedIntervals++;
                             return true;
                         }
                     }
                     else if (frameNo == m_NextExpectedIntegrationPeriodStartFrameId)
                     {
+                        m_NextExpectedIntegrationPeriodStartFrameId += m_IntegrationPeriod;
+
                         // Unidentified integration period. Look at this further 
                         var nextFrameResidual = GetFutureFrameNoisePatternResidual(frameNo + 1, median);
                         var nextNewExpectedResidual = GetFutureFrameNoisePatternResidual(frameNo + m_IntegrationPeriod, median);
 
                         if (nextFrameResidual < residual && nextNewExpectedResidual > variance)
                         {
-                            return true;
+                            // NOTE: If the integration rate has been misidentified by a factor of 2, every second time
+                            // we will find that the next future integration boundary will be correct. Need to protect against this type of thing. 
+
+                            if (m_DetectionInfo.FurtherDetectedIntervals > 0 && /* Already had at least one 'further detected' interval */
+                                m_DetectionInfo.DetectionsSinceLastFurther < 2 /* We haven't had more than one normally detected intervals since the last 'further detection' */)
+                            {
+                                // Register an error but still accept the interval
+                                m_VideoController.RegisterAAVConversionError();
+                            }
+
+                            m_DetectionInfo.FurtherDetectedIntervals++;
+                            return true;                                
                         }
 
                         m_VideoController.RegisterAAVConversionError();
@@ -336,6 +412,7 @@ namespace Tangra.Controller
                     while (frameNo >= m_NextExpectedIntegrationPeriodStartFrameId)
                         m_NextExpectedIntegrationPeriodStartFrameId += m_IntegrationPeriod;
 
+                    m_DetectionInfo.AssumedIntervals++;
                     return true;
                 }
             }
