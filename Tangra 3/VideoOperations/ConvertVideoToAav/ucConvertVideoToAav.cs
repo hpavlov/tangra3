@@ -351,24 +351,27 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
 
         private void btnDetectIntegrationRate_Click(object sender, EventArgs e)
         {
-            var frm = new frmIntegrationDetection(m_VideoController, (int)nudFirstFrame.Value);
-            frm.StartPosition = FormStartPosition.CenterParent;
-            DialogResult res = frm.ShowDialog(this);
-
-            if (res == DialogResult.OK)
+            var intDetController = new IntegrationDetectionController(m_VideoController, (int)nudFirstFrame.Value);
+            using (var frm = new frmIntegrationDetection(intDetController, m_VideoController))
             {
-                if (frm.IntegratedFrames != null)
-                {
-                    nudIntegratedFrames.SetNUDValue(frm.IntegratedFrames.Interval);
-                    nudStartingAtFrame.SetNUDValue(frm.IntegratedFrames.StartingAtFrame);
+                frm.StartPosition = FormStartPosition.CenterParent;
+                DialogResult res = frm.ShowDialog(this);
 
-                    m_State = AavConfigState.ReadyToConvert;
-                    var reinterlacedStream = m_VideoController.FramePlayer.Video as ReInterlacingVideoStream;
-                    if (reinterlacedStream != null && (reinterlacedStream.Mode == ReInterlaceMode.ShiftOneField || reinterlacedStream.Mode == ReInterlaceMode.SwapFields))
-                        rbFirstFieldBottom.Checked = true;
-                    UpdateControlState(); 
-                    return;
-                }
+                if (res == DialogResult.OK)
+                {
+                    if (frm.IntegratedFrames != null)
+                    {
+                        nudIntegratedFrames.SetNUDValue(frm.IntegratedFrames.Interval);
+                        nudStartingAtFrame.SetNUDValue(frm.IntegratedFrames.StartingAtFrame);
+
+                        m_State = AavConfigState.ReadyToConvert;
+                        var reinterlacedStream = m_VideoController.FramePlayer.Video as ReInterlacingVideoStream;
+                        if (reinterlacedStream != null && (reinterlacedStream.Mode == ReInterlaceMode.ShiftOneField || reinterlacedStream.Mode == ReInterlaceMode.SwapFields))
+                            rbFirstFieldBottom.Checked = true;
+                        UpdateControlState();
+                        return;
+                    }
+                }            
             }
 
             if (m_VideoController.ShowMessageBox(

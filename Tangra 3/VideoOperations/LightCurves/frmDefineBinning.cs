@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Controller;
 using Tangra.Model.Video;
 using Tangra.Video;
 using Tangra.VideoOperations.LightCurves.Helpers;
@@ -29,17 +30,20 @@ namespace Tangra.VideoOperations.LightCurves
 
             var provider = new LCFileImagePixelProvider(LCFile);
 
-            var frm = new frmIntegrationDetection(provider, (int)LCFile.Header.MinFrame);
-            frm.StartPosition = FormStartPosition.CenterParent;
-            if (frm.ShowDialog(this) == DialogResult.OK &&
-                frm.IntegratedFrames != null)
+            var intDetController = new IntegrationDetectionController(provider, (int)LCFile.Header.MinFrame);
+            using (var frm = new frmIntegrationDetection(intDetController, null))
             {
-                nudNumFramesToBin.Value = frm.IntegratedFrames.Interval;
-                nudReferenceFrame.Value = frm.IntegratedFrames.StartingAtFrame;
+                frm.StartPosition = FormStartPosition.CenterParent;
+                if (frm.ShowDialog(this) == DialogResult.OK &&
+                    frm.IntegratedFrames != null)
+                {
+                    nudNumFramesToBin.Value = frm.IntegratedFrames.Interval;
+                    nudReferenceFrame.Value = frm.IntegratedFrames.StartingAtFrame;
 
-                nudNumFramesToBin.BackColor = Color.Honeydew;
-                nudReferenceFrame.BackColor = Color.Honeydew;
-            }
+                    nudNumFramesToBin.BackColor = Color.Honeydew;
+                    nudReferenceFrame.BackColor = Color.Honeydew;
+                }    
+            }            
         }
 
         private void frmDefineBinning_Load(object sender, EventArgs e)

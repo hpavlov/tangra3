@@ -641,38 +641,41 @@ namespace Tangra.VideoOperations.Astrometry
 
 		private void btnDetectIntegration_Click(object sender, EventArgs e)
 		{
-			frmIntegrationDetection frm = new frmIntegrationDetection(m_VideoController, m_VideoController.CurrentFrameIndex);
-			frm.StartPosition = FormStartPosition.CenterParent;
-			DialogResult res = frm.ShowDialog(this);
+            var intDetController = new IntegrationDetectionController(m_VideoController, m_VideoController.CurrentFrameIndex);
+		    using (var frm = new frmIntegrationDetection(intDetController, m_VideoController))
+		    {
+                frm.StartPosition = FormStartPosition.CenterParent;
+                DialogResult res = frm.ShowDialog(this);
 
-			if (res == DialogResult.OK)
-			{
-				if (frm.IntegratedFrames != null)
-				{
-					m_VideoAstrometry.MovingToFirstIntegratedFrame();
-					cbxInstDelayMode.SelectedIndex = 0; // Set delay type to automatic
-					nudIntegratedFrames.SetNUDValue(frm.IntegratedFrames.Interval);
-					m_VideoController.MoveToFrame(frm.IntegratedFrames.StartingAtFrame);
+                if (res == DialogResult.OK)
+                {
+                    if (frm.IntegratedFrames != null)
+                    {
+                        m_VideoAstrometry.MovingToFirstIntegratedFrame();
+                        cbxInstDelayMode.SelectedIndex = 0; // Set delay type to automatic
+                        nudIntegratedFrames.SetNUDValue(frm.IntegratedFrames.Interval);
+                        m_VideoController.MoveToFrame(frm.IntegratedFrames.StartingAtFrame);
 
-				    SyncTimeStampControlWithExpectedFrameTime();
+                        SyncTimeStampControlWithExpectedFrameTime();
 
-					btnDetectIntegration.Enabled = false;
-				}
-			}
-			else if (res == DialogResult.Cancel)
-			{
-				if ((MovementExpectation)cbxExpectedMotion.SelectedIndex != MovementExpectation.Slow)
-				{
-					MessageBox.Show(
-						this,
-						"When measuring fast moving objects it is absolutely essential to move the video to the first frame of an integration interval " +
-					    "before starting the measurements. Press 'Cancel' now and ensure that you have manually positioned to the first frame of the next " +
-					    "integration interval before you continue.",
-						"Warning",
-						MessageBoxButtons.OK,
-						MessageBoxIcon.Warning);
-				}
-			}
+                        btnDetectIntegration.Enabled = false;
+                    }
+                }
+                else if (res == DialogResult.Cancel)
+                {
+                    if ((MovementExpectation)cbxExpectedMotion.SelectedIndex != MovementExpectation.Slow)
+                    {
+                        MessageBox.Show(
+                            this,
+                            "When measuring fast moving objects it is absolutely essential to move the video to the first frame of an integration interval " +
+                            "before starting the measurements. Press 'Cancel' now and ensure that you have manually positioned to the first frame of the next " +
+                            "integration interval before you continue.",
+                            "Warning",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning);
+                    }
+                }
+		    }
 		}
 
 		private void linkExamples_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)

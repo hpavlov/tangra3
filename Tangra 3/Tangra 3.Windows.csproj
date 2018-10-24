@@ -280,6 +280,7 @@
     <Compile Include="Controller\AutoUpdatesController.cs" />
     <Compile Include="Controller\ConvertVideoToAavController.cs" />
     <Compile Include="Controller\ConvertVideoToFitsController.cs" />
+    <Compile Include="Controller\IntegrationDetectionController.cs" />
     <Compile Include="Controller\IRequiresAddinsController.cs" />
     <Compile Include="Controller\LightCurveContext.cs" />
     <Compile Include="Controller\LightCurveController.cs" />

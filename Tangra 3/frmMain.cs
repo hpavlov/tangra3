@@ -1417,9 +1417,12 @@ namespace Tangra
 
         private void miIntegrationDetection_Click(object sender, EventArgs e)
         {
-            frmIntegrationDetection frm = new frmIntegrationDetection(m_VideoController, m_VideoController.CurrentFrameIndex);
-            frm.StartPosition = FormStartPosition.CenterParent;
-            frm.ShowDialog(this);
+            var intDetController = new IntegrationDetectionController(m_VideoController, m_VideoController.CurrentFrameIndex);
+            using (var frm = new frmIntegrationDetection(intDetController, m_VideoController))
+            {
+                frm.StartPosition = FormStartPosition.CenterParent;
+                frm.ShowDialog(this);                
+            }
         }
 
         private void miConvertVideoToAAV_Click(object sender, EventArgs e)
