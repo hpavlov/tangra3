@@ -10,6 +10,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Tangra.Automation;
 using Tangra.Helpers;
 using Tangra.Model.Helpers;
 using Tangra.PInvoke;
@@ -23,7 +24,7 @@ namespace Tangra
 		/// The main entry point for the application.
 		/// </summary>
 		[STAThread]
-		static void Main()
+        static void Main(string[] args)
 		{
             Trace.WriteLine(string.Format("Starting Tangra v{0}", ((AssemblyFileVersionAttribute)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyFileVersionAttribute), true)[0]).Version));
 
@@ -91,7 +92,8 @@ namespace Tangra
 
 		static bool ExecuteNonUICommandLineActions()
 		{
-			string action = Environment.GetCommandLineArgs().Length > 1 ? Environment.GetCommandLineArgs()[1].Trim('"') : null;
+		    string[] args = Environment.GetCommandLineArgs();
+			string action = args.Length > 1 ? args[1].Trim('"') : null;
 
 		    if (CurrentOS.IsWindows)
 		    {
@@ -105,6 +107,14 @@ namespace Tangra
                     {
                         fileAssociation.Associate(false);
                     }
+
+                    var manager = new AutomationManager(args);
+                    if (manager.IsAutomationCommand)
+                    {
+                        manager.Run();
+                        return true;
+                    }
+
                 }
                 catch (Exception ex)
                 {

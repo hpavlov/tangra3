@@ -168,6 +168,7 @@
     <Compile Include="Helpers\AngleUtility.cs" />
     <Compile Include="Helpers\AssemblyHelper.cs" />
     <Compile Include="Helpers\AstroConvert.cs" />
+    <Compile Include="Helpers\CommandLineParser.cs" />
     <Compile Include="Helpers\DebugContext.cs" />
     <Compile Include="Helpers\Extensions.cs" />
     <Compile Include="Helpers\FITSHelper.cs" />

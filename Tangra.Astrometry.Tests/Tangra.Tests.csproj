@@ -66,6 +66,7 @@
     <Compile Include="Calibration\TestThreeStarFit.cs" />
     <Compile Include="FITS\TestFitsNegativePixelHandling.cs" />
     <Compile Include="FITS\TestFitsTimeStampReader.cs" />
+    <Compile Include="Helpers\TestCommandLineParser.cs" />
     <Compile Include="MotionFitting\TestFastMotionFitter.cs" />
     <Compile Include="MotionFitting\TestFlyByMotionFitter.cs" />
     <Compile Include="MotionFitting\TestLinearRegression.cs" />
