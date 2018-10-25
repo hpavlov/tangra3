@@ -25,6 +25,11 @@ namespace Tangra.VideoOperations.LightCurves.Helpers
             get { return m_LCFile.Footer.AveragedFrameWidth; }
         }
 
+        public int FirstFrame
+        {
+            get { return (int)m_LCFile.Header.MinFrame; }
+        }
+
         public int LastFrame
         {
             get { return (int)m_LCFile.Header.MaxFrame; }

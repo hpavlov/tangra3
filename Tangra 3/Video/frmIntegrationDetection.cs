@@ -305,6 +305,7 @@ namespace Tangra.Video
     {
         int Width { get; }
         int Height { get; }
+        int FirstFrame { get; }
         int LastFrame { get; }
         int[,] GetPixelArray(int frameNo, Rectangle rect);
     }

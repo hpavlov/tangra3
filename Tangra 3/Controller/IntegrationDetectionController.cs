@@ -46,6 +46,8 @@ namespace Tangra.Controller
 
         public event Action<int> OnProgress;
 
+        public event Action<int, int[,]> OnFramePixels;
+
         private bool m_IsRunning;
 
         private IntegrationDetectionController()
@@ -113,6 +115,15 @@ namespace Tangra.Controller
             }
         }
 
+        private void RaiseOnFramePixels(int framNo, int[,] pixels)
+        {
+            Action<int, int[,]> invoker = OnFramePixels;
+            if (invoker != null && m_IsRunning)
+            {
+                invoker.Invoke(framNo, pixels);
+            }
+        }
+
         public void RunMeasurements()
         {
             m_IsRunning = true;
@@ -137,7 +148,6 @@ namespace Tangra.Controller
                 int lastFrame = Math.Min(m_ImageProvider.LastFrame, StartFrameId + framesToMeasure);
 
                 RaiseOnBeginProgress(firstFrame, lastFrame - 1);
-
 
                 int[,] pixels1 = null;
                 int[,] pixels2 = null;
@@ -172,6 +182,7 @@ namespace Tangra.Controller
                         if (pixels1 == null)
                         {
                             pixels1 = m_ImageProvider.GetPixelArray(i, testRect);
+                            RaiseOnFramePixels(i, pixels1);
                         }
                         else
                         {
@@ -183,6 +194,7 @@ namespace Tangra.Controller
                         }
 
                         pixels2 = m_ImageProvider.GetPixelArray(i + 1, testRect);
+                        RaiseOnFramePixels(i + 1, pixels1);
 
                         double sigmaSum = 0;
                         for (int x = 0; x < 32; x++)

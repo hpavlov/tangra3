@@ -141,6 +141,7 @@
     <Compile Include="Addins\TangraHostDelegate.cs" />
     <Compile Include="Automation\AutomatedIntegrationDetection.cs" />
     <Compile Include="Automation\AutomationManager.cs" />
+    <Compile Include="Automation\IntegrationDetection\PixDetFile.cs" />
     <Compile Include="Config\frmChooseFirstTimeOcrSettings.cs">
       <SubType>Form</SubType>
     </Compile>

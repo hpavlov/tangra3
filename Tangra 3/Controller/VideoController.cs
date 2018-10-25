@@ -2940,6 +2940,11 @@ namespace Tangra.Controller
 			get { return m_FramePlayer.Video.Height; }
 		}
 
+	    int IImagePixelProvider.FirstFrame
+	    {
+            get { return m_FramePlayer.Video.FirstFrame; }
+	    }
+
 		int IImagePixelProvider.LastFrame
 		{
 			get { return m_FramePlayer.Video.LastFrame; }
