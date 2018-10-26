@@ -32,7 +32,7 @@ namespace Tangra.Automation.IntegrationDetection
 
         private static byte CURRENT_VERSION = 1;
 
-        private static int CURRENT_PIX_FRAME_SIZE = (32 * 32 + 1) * 4;
+        private static int CURRENT_PIX_FRAME_SIZE = 32 * 32 + 4;
 
         public PixDetFile(string fileName, FileAccess fileAccess)
         {
@@ -122,6 +122,27 @@ namespace Tangra.Automation.IntegrationDetection
             m_Writer.Write(m_TotalFrames);
         }
 
+        public void AddFramePixels(int frameId, int[] pixels)
+        {
+            if (!m_IsWrite) throw new InvalidOperationException("Must be in write mode to write data.");
+            if (pixels.Length != 32 * 32)
+            {
+                throw new InvalidOperationException("Pixel array much be 32x32 pixels");
+            }
+
+            m_Writer.Write(frameId);
+            for (int y = 0; y < 32; y++)
+            {
+                for (int x = 0; x < 32; x++)
+                {
+                    var btData = (byte)pixels[x + 32 * y];
+                    m_Writer.Write(btData);
+                }
+            }
+
+            m_TotalFrames++;
+        }
+
         public void AddFramePixels(int frameId, int[,] pixels)
         {
             if (!m_IsWrite) throw new InvalidOperationException("Must be in write mode to write data.");
@@ -136,7 +157,8 @@ namespace Tangra.Automation.IntegrationDetection
             {
                 for (int x = 0; x < 32; x++)
                 {
-                    m_Writer.Write(pixels[x, y]);
+                    var btData = (byte) pixels[x, y];
+                    m_Writer.Write(btData);
                 }
             }
 
@@ -191,7 +213,7 @@ namespace Tangra.Automation.IntegrationDetection
             {
                 for (int x = 0; x < 32; x++)
                 {
-                    pixels[x, y] = m_Reader.ReadInt32();
+                    pixels[x, y] = (int)m_Reader.ReadByte();
                 }
             }
             return pixels;

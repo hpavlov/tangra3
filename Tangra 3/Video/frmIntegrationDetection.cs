@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using Tangra.Automation.IntegrationDetection;
 using Tangra.Controller;
 using Tangra.Model.Helpers;
 using Tangra.Model.Image;
@@ -23,7 +25,11 @@ namespace Tangra.Video
 
         private PotentialIntegrationFit m_FoundIntegration;
 
-        public frmIntegrationDetection(IntegrationDetectionController integrationDetectionController, VideoController videoController)
+	    private bool m_AllowPixDetExport;
+
+	    private List<Tuple<int, List<int>>> m_PixelsToSave = new List<Tuple<int, List<int>>>();
+
+        public frmIntegrationDetection(IntegrationDetectionController integrationDetectionController, VideoController videoController, bool allowPixDetExport = false)
 	    {
             InitializeComponent();
 
@@ -35,6 +41,11 @@ namespace Tangra.Video
             m_IntegrationDetectionController.OnBeginProgress += m_IntegrationDetectionController_OnBeginProgress;
             m_IntegrationDetectionController.OnProgress += m_IntegrationDetectionController_OnProgress;
 
+            m_AllowPixDetExport = allowPixDetExport;
+            if (m_AllowPixDetExport)
+            {
+                m_IntegrationDetectionController.OnFramePixels += m_IntegrationDetectionController_OnFramePixels;    
+            }
 
             picFrameSpectrum.Image = new Bitmap(picFrameSpectrum.Width, picFrameSpectrum.Height);
             picSigmas.Image = new Bitmap(picSigmas.Width, picSigmas.Height);
@@ -59,6 +70,11 @@ namespace Tangra.Video
                     m_IntegrationDetectionController.OnFrameData -= OnFrameData;
                     m_IntegrationDetectionController.OnBeginProgress -= m_IntegrationDetectionController_OnBeginProgress;
                     m_IntegrationDetectionController.OnProgress -= m_IntegrationDetectionController_OnProgress;
+
+                    if (m_AllowPixDetExport)
+                    {
+                        m_IntegrationDetectionController.OnFramePixels -= m_IntegrationDetectionController_OnFramePixels;
+                    }
 
                     m_IntegrationDetectionController.Dispose();
                 }
@@ -258,6 +274,24 @@ namespace Tangra.Video
 			picSigmas.Refresh();
 		}
 
+
+        void m_IntegrationDetectionController_OnFramePixels(int frameNo, int[,] pixels)
+        {
+            if (m_AllowPixDetExport)
+            {
+                var pixLst = new List<int>();
+                for (int y = 0; y < 32; y++)
+                {
+                    for (int x = 0; x < 32; x++)
+                    {
+                        pixLst.Add(pixels[x, y]);
+                    }
+                }
+
+                m_PixelsToSave.Add(Tuple.Create(frameNo, pixLst));
+            }
+        }
+
 		private void picSigmas_MouseDown(object sender, MouseEventArgs e)
 		{
             if (e.Button == MouseButtons.Middle)
@@ -297,6 +331,28 @@ namespace Tangra.Video
                 {
                     StartMeasurements();
                 }                
+            }
+        }
+
+        private void btnAccept_MouseDown(object sender, MouseEventArgs e)
+        {
+            // Easter egg to save a .pixdet file
+            if (m_AllowPixDetExport && e.Button == MouseButtons.Middle && Control.ModifierKeys == Keys.Control)
+            {
+                saveFileDialog.FileName = Path.ChangeExtension(Path.GetFileName(m_VideoController.CurrentVideoFileName), ".pixdet");
+
+                if (saveFileDialog.ShowDialog(this) == DialogResult.OK)
+                {
+                    using (var pixdet = new PixDetFile(saveFileDialog.FileName, FileAccess.Write))
+                    {
+                        pixdet.WriteHeader(m_VideoController.CurrentVideoFileName, m_IntegrationDetectionController.StartFrameId);
+                        foreach (var entry in m_PixelsToSave)
+                        {
+                            pixdet.AddFramePixels(entry.Item1, entry.Item2.ToArray());
+                        }
+                        pixdet.WriteFooter(m_FoundIntegration.Interval, m_FoundIntegration.StartingAtFrame, m_FoundIntegration.Certainty, m_FoundIntegration.AboveSigmaRatio);                        
+                    }
+                }
             }
         }
 	}

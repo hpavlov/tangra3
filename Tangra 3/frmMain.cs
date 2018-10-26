@@ -1418,7 +1418,7 @@ namespace Tangra
         private void miIntegrationDetection_Click(object sender, EventArgs e)
         {
             var intDetController = new IntegrationDetectionController(m_VideoController, m_VideoController.CurrentFrameIndex);
-            using (var frm = new frmIntegrationDetection(intDetController, m_VideoController))
+            using (var frm = new frmIntegrationDetection(intDetController, m_VideoController, true))
             {
                 frm.StartPosition = FormStartPosition.CenterParent;
                 frm.ShowDialog(this);                

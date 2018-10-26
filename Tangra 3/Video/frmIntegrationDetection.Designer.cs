@@ -21,6 +21,7 @@
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.timer = new System.Windows.Forms.Timer(this.components);
             this.pnlResult = new System.Windows.Forms.Panel();
+            this.btnCorrectInterlaced = new System.Windows.Forms.Button();
             this.btnReject = new System.Windows.Forms.Button();
             this.lblCertainty = new System.Windows.Forms.Label();
             this.lblStartingAt = new System.Windows.Forms.Label();
@@ -31,7 +32,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.picSigmas = new System.Windows.Forms.PictureBox();
             this.picFrameSpectrum = new System.Windows.Forms.PictureBox();
-            this.btnCorrectInterlaced = new System.Windows.Forms.Button();
+            this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.pnlResult.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picSigmas)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picFrameSpectrum)).BeginInit();
@@ -65,6 +66,16 @@
             this.pnlResult.Name = "pnlResult";
             this.pnlResult.Size = new System.Drawing.Size(488, 78);
             this.pnlResult.TabIndex = 5;
+            // 
+            // btnCorrectInterlaced
+            // 
+            this.btnCorrectInterlaced.Location = new System.Drawing.Point(332, 5);
+            this.btnCorrectInterlaced.Name = "btnCorrectInterlaced";
+            this.btnCorrectInterlaced.Size = new System.Drawing.Size(156, 23);
+            this.btnCorrectInterlaced.TabIndex = 8;
+            this.btnCorrectInterlaced.Text = "Correct Interlaced Defects";
+            this.btnCorrectInterlaced.UseVisualStyleBackColor = true;
+            this.btnCorrectInterlaced.Click += new System.EventHandler(this.btnCorrectInterlaced_Click);
             // 
             // btnReject
             // 
@@ -133,6 +144,7 @@
             this.btnAccept.Text = "Accept";
             this.btnAccept.UseVisualStyleBackColor = true;
             this.btnAccept.Click += new System.EventHandler(this.btnAccept_Click);
+            this.btnAccept.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btnAccept_MouseDown);
             // 
             // label1
             // 
@@ -160,15 +172,10 @@
             this.picFrameSpectrum.TabIndex = 2;
             this.picFrameSpectrum.TabStop = false;
             // 
-            // btnCorrectInterlaced
+            // saveFileDialog
             // 
-            this.btnCorrectInterlaced.Location = new System.Drawing.Point(332, 5);
-            this.btnCorrectInterlaced.Name = "btnCorrectInterlaced";
-            this.btnCorrectInterlaced.Size = new System.Drawing.Size(156, 23);
-            this.btnCorrectInterlaced.TabIndex = 8;
-            this.btnCorrectInterlaced.Text = "Correct Interlaced Defects";
-            this.btnCorrectInterlaced.UseVisualStyleBackColor = true;
-            this.btnCorrectInterlaced.Click += new System.EventHandler(this.btnCorrectInterlaced_Click);
+            this.saveFileDialog.DefaultExt = "pixdet";
+            this.saveFileDialog.Filter = "PixDet files (*.pixdet)|*.pixdet|All files (*.*)|*.*";
             // 
             // frmIntegrationDetection
             // 
@@ -210,5 +217,6 @@
 		private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btnReject;
         private System.Windows.Forms.Button btnCorrectInterlaced;
+        private System.Windows.Forms.SaveFileDialog saveFileDialog;
 	}
 }
