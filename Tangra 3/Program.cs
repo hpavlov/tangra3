@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Tangra.Automation;
@@ -58,6 +59,23 @@ namespace Tangra
 			}
 			#endregion
 
+            var manager = new AutomationManager(args);
+            if (manager.IsAutomationCommand)
+            {
+                ConsoleHelper.InitConsoleHandles();
+
+                try
+                {
+                    manager.Run();
+                }
+                finally
+                {
+                    ConsoleHelper.ReleaseConsoleHandles();
+                }
+
+                return;
+            }
+
 		    Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
             Application.SetUnhandledExceptionMode(UnhandledExceptionMode.ThrowException);
@@ -107,14 +125,6 @@ namespace Tangra
                     {
                         fileAssociation.Associate(false);
                     }
-
-                    var manager = new AutomationManager(args);
-                    if (manager.IsAutomationCommand)
-                    {
-                        manager.Run();
-                        return true;
-                    }
-
                 }
                 catch (Exception ex)
                 {

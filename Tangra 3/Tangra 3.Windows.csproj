@@ -278,6 +278,7 @@
       <DependentUpon>ucTracking.cs</DependentUpon>
     </Compile>
     <Compile Include="Config\InstrumentalDelayConfigManager.cs" />
+    <Compile Include="ConsoleHelper.cs" />
     <Compile Include="Controller\AstrometryController.cs" />
     <Compile Include="Controller\AutoUpdatesController.cs" />
     <Compile Include="Controller\ConvertVideoToAavController.cs" />

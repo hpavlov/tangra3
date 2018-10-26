@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tangra.Controller;
 using Tangra.Video;
 
 namespace Tangra.Automation.IntegrationDetection
@@ -90,6 +91,19 @@ namespace Tangra.Automation.IntegrationDetection
             m_TotalFrames = m_Reader.ReadInt32();
         }
 
+        public PotentialIntegrationFit GetStoredIntegrationFit()
+        {
+            if (m_IsWrite) throw new InvalidOperationException("Must be in read mode.");
+
+            return new PotentialIntegrationFit()
+            {
+                Interval = m_Interval,
+                StartingAtFrame = m_StartingAtFrame,
+                Certainty = m_Certainty,
+                AboveSigmaRatio = m_AboveSigmaRatio
+            };
+        }
+
         public void WriteHeader(string originalFile, int firstFrameId)
         {
             if (!m_IsWrite) throw new InvalidOperationException("Must be in write mode to write data.");
@@ -119,6 +133,11 @@ namespace Tangra.Automation.IntegrationDetection
             m_Writer.Write(m_StartingAtFrame);
             m_Writer.Write(m_Certainty);
             m_Writer.Write(m_AboveSigmaRatio);
+            // Writes the total frames in the footer
+            m_Writer.Write(m_TotalFrames);
+
+            // Writes the total frames in the header
+            m_File.Seek(4 + 1, SeekOrigin.Begin);
             m_Writer.Write(m_TotalFrames);
         }
 

@@ -19,6 +19,7 @@ namespace Tangra.Automation
         private IImagePixelProvider m_PixelImageProvider;
 
         private PixDetFile m_PixDetFile;
+        private PotentialIntegrationFit m_ExpectedFit;
 
         private int m_StartFrameNo;
         private string m_RecordFileName;
@@ -48,10 +49,14 @@ namespace Tangra.Automation
 
             if (".pixdet".Equals(Path.GetExtension(m_VideoFileName), StringComparison.InvariantCultureIgnoreCase))
             {
-                m_PixelImageProvider = new PixDetFile(m_VideoFileName, FileAccess.Read);
+                var pixdet = new PixDetFile(m_VideoFileName, FileAccess.Read);
+                m_ExpectedFit = pixdet.GetStoredIntegrationFit();
+                m_PixelImageProvider = pixdet;
             }
             else
             {
+                m_ExpectedFit = null;
+
                 var videoPlayer = new AutomationVideoPlayer();
                 if (!videoPlayer.OpenVideo(m_VideoFileName))
                 {
@@ -110,6 +115,29 @@ namespace Tangra.Automation
             {
                 m_PixDetFile.WriteFooter(fit.Interval, fit.StartingAtFrame, fit.Certainty, fit.AboveSigmaRatio);
                 m_PixDetFile.Dispose();
+            }
+
+            if (m_ExpectedFit != null)
+            {
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine();
+                Console.WriteLine("[Integration Detection] " + m_VideoFileName);
+
+                Console.ForegroundColor = m_ExpectedFit.Interval == fit.Interval ? ConsoleColor.Green : ConsoleColor.Red;
+                Console.WriteLine("[Detected Interval] Expected:{0} Actual:{1}", m_ExpectedFit.Interval, fit.Interval);
+
+                Console.ForegroundColor = m_ExpectedFit.StartingAtFrame == fit.StartingAtFrame ? ConsoleColor.Green : ConsoleColor.Red;
+                Console.WriteLine("[Starting At Frame] Expected:{0} Actual:{1}", m_ExpectedFit.StartingAtFrame, fit.StartingAtFrame);
+
+                Console.ForegroundColor = Math.Abs(m_ExpectedFit.Certainty - fit.Certainty) < 0.1 ? ConsoleColor.Green : ConsoleColor.Red;
+                Console.WriteLine("[Certainty] Expected:{0} Actual:{1}", m_ExpectedFit.Certainty, fit.Certainty);
+
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine();
+            }
+            else
+            {
+                // TODO: Console.Write (green = detected; red = failed to detect)
             }
 
             m_RunFinished.Set();
