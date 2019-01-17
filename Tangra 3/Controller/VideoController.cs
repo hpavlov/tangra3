@@ -54,6 +54,7 @@ namespace Tangra.Controller
         public double FrameRate { get; set; }
         public int BitPix { get; set; }
         public SerUseTimeStamp SerTiming { get; set; }
+        public bool GrayScaleRGB { get; set; }
     }
 
 	public class VideoController : IDisposable, IVideoFrameRenderer, IVideoController, IImagePixelProvider, IFileInfoProvider

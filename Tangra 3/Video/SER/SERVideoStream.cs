@@ -48,7 +48,7 @@ namespace Tangra.Video.SER
 			byte[] instrument = new byte[40];
 			byte[] telescope = new byte[40];
 
-			TangraCore.SEROpenFile(fileName, ref fileInfo, observer, instrument, telescope, false);
+			TangraCore.SEROpenFile(fileName, ref fileInfo, observer, instrument, telescope, false, false);
 
 		    string fireCaptureLogFileName = Path.ChangeExtension(fileName, ".txt");
 		    var fireCaptureTimeStamps = new Dictionary<int, DateTime>();
@@ -91,11 +91,13 @@ namespace Tangra.Video.SER
             int bitPix;
             double frameRate;
             SerUseTimeStamp serTiming;
+            bool grayScaleRGB;
             if (args != null)
             {
                 bitPix = args.BitPix;
                 frameRate = args.FrameRate;
                 serTiming = args.SerTiming;
+                grayScaleRGB = args.GrayScaleRGB;
             }
             else
             {
@@ -107,11 +109,12 @@ namespace Tangra.Video.SER
                 frameRate = frmInfo.FrameRate;
                 bitPix = frmInfo.BitPix;
                 serTiming = frmInfo.UseEmbeddedTimeStamps;
+                grayScaleRGB = frmInfo.UseGrayScaleRGB;
             }
 
             TangraCore.SERCloseFile();
 
-            var rv = new SERVideoStream(fileName, frameRate, bitPix, serTiming, fireCaptureTimeStamps);
+            var rv = new SERVideoStream(fileName, frameRate, bitPix, grayScaleRGB, serTiming, fireCaptureTimeStamps);
 
             equipmentInfo.Instrument = rv.Instrument;
             equipmentInfo.Observer = rv.Observer;
@@ -133,7 +136,7 @@ namespace Tangra.Video.SER
 		private SerFrameInfo m_CurrentFrameInfo;
 	    private Dictionary<int, DateTime> m_FireCaptureTimeStamps;
 
-        private SERVideoStream(string fileName, double frameRate, int cameraBitPix, SerUseTimeStamp useTimeStamp, Dictionary<int, DateTime> fireCaptureTimeStamps)
+        private SERVideoStream(string fileName, double frameRate, int cameraBitPix, bool grayScaleRGB, SerUseTimeStamp useTimeStamp, Dictionary<int, DateTime> fireCaptureTimeStamps)
 		{
 			m_FileInfo = new SerFileInfo();
 
@@ -141,7 +144,7 @@ namespace Tangra.Video.SER
 			byte[] instrument = new byte[40];
 			byte[] telescope = new byte[40];
 
-			TangraCore.SEROpenFile(fileName, ref m_FileInfo, observer, instrument, telescope, false);
+            TangraCore.SEROpenFile(fileName, ref m_FileInfo, observer, instrument, telescope, false, grayScaleRGB);
 
 			m_FileName = fileName;
 

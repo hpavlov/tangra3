@@ -31,6 +31,8 @@ namespace Tangra.Video.SER
 
 		internal SerUseTimeStamp UseEmbeddedTimeStamps;
 
+	    internal bool UseGrayScaleRGB = false;
+
 		public frmEnterSERFileInfo(SerFileInfo info, bool hasFireCaptureTimestamps)
 		{
 			InitializeComponent();
@@ -74,6 +76,9 @@ namespace Tangra.Video.SER
 			    }
 			}
 
+            cbxColourHandling.SelectedIndex = 0;
+            cbxColourHandling.Enabled = info.NumPlanes == 3;
+
 			nudFrameRate.SetNUDValue(TangraConfig.Settings.LastUsed.SerFileLastFrameRate);
 		    pnlFrameRate.Visible = !hasEmbeddedTimeStamps;
 
@@ -94,6 +99,7 @@ namespace Tangra.Video.SER
 			FrameRate = (double) nudFrameRate.Value;
 			BitPix = Convert.ToInt32(cbxBitPix.SelectedItem);
 			UseEmbeddedTimeStamps = (SerUseTimeStamp) cbxTimeSource.SelectedIndex;
+		    UseGrayScaleRGB = cbxColourHandling.SelectedIndex == 1; 
 
 			TangraConfig.Settings.LastUsed.SerFileLastBitPix = BitPix;
 			TangraConfig.Settings.LastUsed.SerFileLastFrameRate = FrameRate;

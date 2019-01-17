@@ -42,6 +42,7 @@ namespace SerLib
 		int SequenceStartTimeUTCLo;
 		int SequenceStartTimeUTCHi;
 		unsigned int NormalisationValue;
+		int NumPlanes;
 	};
 	
 	struct SerFrameInfo
@@ -67,6 +68,7 @@ namespace SerLib
 			int m_PixelsPerFrame;
 			int m_CountFrames;
 			__int64 m_TimeStampStartOffset;
+			bool m_GrayScaleRGB;
 		
 		private:
 			unsigned char* m_RawFrameBuffer;
@@ -85,7 +87,7 @@ namespace SerLib
 			SerFile();
 			~SerFile();
 			
-			void OpenFile(const char* filePath, SerLib::SerFileInfo* fileInfo, char* observer, char* instrument, char* telescope, bool checkMagic);
+			void OpenFile(const char* filePath, SerLib::SerFileInfo* fileInfo, char* observer, char* instrument, char* telescope, bool checkMagic, bool greyScaleRGB);
 			void CloseFile();
 			HRESULT GetFrame(int frameNo, unsigned int* pixels, unsigned int cameraBitPix, SerLib::SerFrameInfo* frameInfo);
 			HRESULT GetFrameInfo(int frameNo, SerLib::SerFrameInfo* frameInfo);
@@ -98,7 +100,7 @@ extern "C"
 {
 #endif
 
-DLL_PUBLIC HRESULT SEROpenFile(char* fileName, SerLib::SerFileInfo* fileInfo, char* observer, char* instrument, char* telescope, bool checkMagic);
+DLL_PUBLIC HRESULT SEROpenFile(char* fileName, SerLib::SerFileInfo* fileInfo, char* observer, char* instrument, char* telescope, bool checkMagic, bool greyScaleRGB);
 DLL_PUBLIC HRESULT SERCloseFile();
 DLL_PUBLIC HRESULT SERGetFrame(int frameNo, unsigned int* pixels, unsigned int* originalPixels, BYTE* bitmapPixels, BYTE* bitmapBytes, unsigned int cameraBitPix, SerLib::MarshalledSerFrameInfo* frameInfo);		
 DLL_PUBLIC HRESULT SERGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging, unsigned int* pixels, unsigned int* originalPixels, BYTE* bitmapBytes, BYTE* bitmapDisplayBytes, unsigned int cameraBitPix, SerLib::MarshalledSerFrameInfo* frameInfo);

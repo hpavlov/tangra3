@@ -33,7 +33,7 @@ SerFile::~SerFile()
 }
 
 
-void SerFile::OpenFile(const char* filePath, SerLib::SerFileInfo* fileInfo, char* observer, char* instrument, char* telescope, bool checkMagic)
+void SerFile::OpenFile(const char* filePath, SerLib::SerFileInfo* fileInfo, char* observer, char* instrument, char* telescope, bool checkMagic, bool greyScaleRGB)
 {
 	m_File = fopen(filePath, "rb");
 
@@ -58,9 +58,16 @@ void SerFile::OpenFile(const char* filePath, SerLib::SerFileInfo* fileInfo, char
 	m_ColourId = buffInt;
 
 	if (m_ColourId == ColourFormat_RGB || m_ColourId == ColourFormat_BGR)
+	{
 		m_NumPlanes = 3;
+		m_GrayScaleRGB = greyScaleRGB;
+	}
 	else
+	{
 		m_NumPlanes = 1;
+	}
+		
+	fileInfo->NumPlanes = m_NumPlanes;
 
 	fread(&buffInt, 4, 1, m_File);
 	fileInfo->LittleEndian = buffInt;
@@ -221,7 +228,7 @@ HRESULT SerFile::GetFrameInfo(int frameNo, SerLib::SerFrameInfo* frameInfo)
 
 HRESULT SerFile::ProcessRawFrame(unsigned int* pixels, unsigned int cameraBitPix)
 {
-	if (m_NumPlanes = 1) {
+	if (m_NumPlanes == 1) {
 		if (m_BytesPerPixel == 1) {
 			unsigned char* charBuff = (unsigned char*)m_RawFrameBuffer;
 			for(int idx = 0; idx < m_PixelsPerFrame; idx++) {
@@ -240,8 +247,73 @@ HRESULT SerFile::ProcessRawFrame(unsigned int* pixels, unsigned int cameraBitPix
 				shortBuff++;
 			}
 		}
-
 		return S_OK;
+		
+	} else if (m_NumPlanes == 3) {
+		if (m_BytesPerPixel == 1) {
+			unsigned char* charBuff = (unsigned char*)m_RawFrameBuffer;
+			for(int idx = 0; idx < m_PixelsPerFrame; idx++) {
+				if (m_GrayScaleRGB)
+				{
+					unsigned char r = *charBuff; charBuff++;
+					unsigned char g = *charBuff; charBuff++;
+					unsigned char b = *charBuff; charBuff++;
+				
+					if (m_ColourId == ColourFormat_BGR)
+					{
+						*pixels = (unsigned char)(.299 * b + .587 * g + .114 * r);	
+					}
+					else
+					{
+						*pixels = (unsigned char)(.299 * r + .587 * g + .114 * b);
+					}
+				}
+				else
+				{
+					*pixels = *charBuff; charBuff+=3;	
+				}
+				
+				pixels++;
+			}
+		} else if (m_BytesPerPixel == 2) {
+			int shiftVal = Bpp - cameraBitPix;
+
+			unsigned short* shortBuff = (unsigned short*)m_RawFrameBuffer;
+			for(int idx = 0; idx < m_PixelsPerFrame; idx++) {
+				
+				if (m_GrayScaleRGB)
+				{
+					unsigned short r = *shortBuff; shortBuff++;
+					unsigned short g = *shortBuff; shortBuff++;
+					unsigned short b = *shortBuff; shortBuff++;
+				
+					if (shiftVal > 0)
+					{
+						 r = (r >> shiftVal);
+						 g = (g >> shiftVal);
+						 b = (b >> shiftVal);
+					}
+				
+					if (m_ColourId == ColourFormat_BGR)
+					{
+						*pixels = (unsigned short)(.299 * b + .587 * g + .114 * r);	
+					}
+					else
+					{
+						*pixels = (unsigned short)(.299 * r + .587 * g + .114 * b);
+					}
+				}
+				else
+				{
+					*pixels = *shortBuff; shortBuff+=3;	
+					if (shiftVal > 0) *pixels = (*pixels >> shiftVal);
+				}
+				
+				pixels++;
+			}
+		}
+		return S_OK;
+		
 	} else {
 		return E_NOTIMPL;
 	}
@@ -251,12 +323,12 @@ HRESULT SerFile::ProcessRawFrame(unsigned int* pixels, unsigned int cameraBitPix
 
 SerLib::SerFile* m_SerFile = NULL;
 
-HRESULT SEROpenFile(char* fileName, SerLib::SerFileInfo* fileInfo, char* observer, char* instrument, char* telescope, bool checkMagic)
+HRESULT SEROpenFile(char* fileName, SerLib::SerFileInfo* fileInfo, char* observer, char* instrument, char* telescope, bool checkMagic, bool greyScaleRGB)
 {
 	SERCloseFile();
 
 	m_SerFile = new SerLib::SerFile();
-	m_SerFile->OpenFile(fileName, fileInfo, observer, instrument, telescope, checkMagic);
+	m_SerFile->OpenFile(fileName, fileInfo, observer, instrument, telescope, checkMagic, greyScaleRGB);
 
 	return S_OK;
 }

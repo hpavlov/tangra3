@@ -39,6 +39,8 @@
             this.pnlFrameRate = new System.Windows.Forms.Panel();
             this.label5 = new System.Windows.Forms.Label();
             this.cbxTimeSource = new System.Windows.Forms.ComboBox();
+            this.cbxColourHandling = new System.Windows.Forms.ComboBox();
+            this.label6 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.nudFrameRate)).BeginInit();
             this.pnlFrameRate.SuspendLayout();
             this.SuspendLayout();
@@ -112,7 +114,7 @@
             // 
             // btnOK
             // 
-            this.btnOK.Location = new System.Drawing.Point(59, 113);
+            this.btnOK.Location = new System.Drawing.Point(64, 133);
             this.btnOK.Name = "btnOK";
             this.btnOK.Size = new System.Drawing.Size(75, 23);
             this.btnOK.TabIndex = 6;
@@ -123,7 +125,7 @@
             // btnCancel
             // 
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(140, 113);
+            this.btnCancel.Location = new System.Drawing.Point(145, 133);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 7;
@@ -135,7 +137,7 @@
             this.pnlFrameRate.Controls.Add(this.label2);
             this.pnlFrameRate.Controls.Add(this.nudFrameRate);
             this.pnlFrameRate.Controls.Add(this.label3);
-            this.pnlFrameRate.Location = new System.Drawing.Point(8, 74);
+            this.pnlFrameRate.Location = new System.Drawing.Point(8, 101);
             this.pnlFrameRate.Name = "pnlFrameRate";
             this.pnlFrameRate.Size = new System.Drawing.Size(231, 21);
             this.pnlFrameRate.TabIndex = 8;
@@ -161,11 +163,34 @@
             this.cbxTimeSource.Size = new System.Drawing.Size(143, 21);
             this.cbxTimeSource.TabIndex = 10;
             // 
+            // cbxColourHandling
+            // 
+            this.cbxColourHandling.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxColourHandling.FormattingEnabled = true;
+            this.cbxColourHandling.Items.AddRange(new object[] {
+            "Monochrome",
+            "Grayscale"});
+            this.cbxColourHandling.Location = new System.Drawing.Point(119, 73);
+            this.cbxColourHandling.Name = "cbxColourHandling";
+            this.cbxColourHandling.Size = new System.Drawing.Size(143, 21);
+            this.cbxColourHandling.TabIndex = 12;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(23, 76);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(85, 13);
+            this.label6.TabIndex = 11;
+            this.label6.Text = "Colour Handling:";
+            // 
             // frmEnterSERFileInfo
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(278, 153);
+            this.ClientSize = new System.Drawing.Size(291, 167);
+            this.Controls.Add(this.cbxColourHandling);
+            this.Controls.Add(this.label6);
             this.Controls.Add(this.cbxTimeSource);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.pnlFrameRate);
@@ -199,5 +224,7 @@
         private System.Windows.Forms.Panel pnlFrameRate;
 		private System.Windows.Forms.Label label5;
 		private System.Windows.Forms.ComboBox cbxTimeSource;
+        private System.Windows.Forms.ComboBox cbxColourHandling;
+        private System.Windows.Forms.Label label6;
 	}
 }

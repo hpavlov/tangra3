@@ -451,6 +451,7 @@ namespace Tangra.PInvoke
 		public int SequenceStartTimeUTCLo;
 		public int SequenceStartTimeUTCHi;
 		public uint NormalisationValue;
+        public int NumPlanes;
 	};
 
 	[StructLayout(LayoutKind.Sequential)]
@@ -563,8 +564,8 @@ namespace Tangra.PInvoke
 
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
-        // DLL_PUBLIC HRESULT SEROpenFile(char* fileName, SerLib::SerFileInfo* fileInfo, char* observer, char* instrument, char* telescope, bool checkMagic);
-		public static extern int SEROpenFile(string fileName, [In, Out] ref SerFileInfo fileInfo, [In, Out] byte[] observer, [In, Out] byte[] instrument, [In, Out] byte[] telescope, bool checkMagic);
+        // DLL_PUBLIC HRESULT SEROpenFile(char* fileName, SerLib::SerFileInfo* fileInfo, char* observer, char* instrument, char* telescope, bool checkMagic, bool grayScaleRGB);
+        public static extern int SEROpenFile(string fileName, [In, Out] ref SerFileInfo fileInfo, [In, Out] byte[] observer, [In, Out] byte[] instrument, [In, Out] byte[] telescope, bool checkMagic, bool grayScaleRGB);
 
 		[DllImport(LIBRARY_TANGRA_CORE, CallingConvention = CallingConvention.Cdecl)]
         // DLL_PUBLIC HRESULT SERCloseFile();
