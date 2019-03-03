@@ -610,13 +610,17 @@ namespace Tangra.Video.AstroDigitalVideo
         {
             string fileLocationOut = Path.GetFullPath(Path.GetDirectoryName(fileLocation) + @"\" + Path.GetFileName(fileLocation) + "-fixed.aav");
 
-            int FIRST_FRAME_IN_PERIOD = 0;
-            int ACTUAL_INTEGRATION = 2;
+            int FIRST_FRAME_IN_PERIOD = 13;
+            int ACTUAL_INTEGRATION = 32;
 
             var aaFile = new AdvFile2(fileLocation);
 
-            int FIRST_OSD_LINE = int.Parse(aaFile.UserMetadataTags["OSD-FIRST-LINE"]);
-            int LAST_OSD_LINE = int.Parse(aaFile.UserMetadataTags["OSD-LAST-LINE"]);
+            int FIRST_OSD_LINE = aaFile.UserMetadataTags.ContainsKey("OSD-FIRST-LINE")
+                ? int.Parse(aaFile.UserMetadataTags["OSD-FIRST-LINE"])
+                : int.Parse(aaFile.SystemMetadataTags["OSD-FIRST-LINE"]);
+            int LAST_OSD_LINE = aaFile.UserMetadataTags.ContainsKey("OSD-LAST-LINE")
+                ? int.Parse(aaFile.UserMetadataTags["OSD-LAST-LINE"])
+                : int.Parse(aaFile.SystemMetadataTags["OSD-LAST-LINE"]);
             int FRAME_WIDTH = int.Parse(aaFile.SystemMetadataTags["WIDTH"]);
             int FRAME_HEIGHT = int.Parse(aaFile.SystemMetadataTags["HEIGHT"]);
             int FRAME_PIXELS = FRAME_WIDTH * FRAME_HEIGHT;
