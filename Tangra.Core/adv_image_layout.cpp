@@ -148,6 +148,7 @@ void AdvImageLayout::AddOrUpdateTag(const char* tagName, const char* tagValue)
 		m_BytesLayout = FullImageRaw;
 		if (0 == strcmp("FULL-IMAGE-DIFFERENTIAL-CODING", tagValue)) m_BytesLayout = FullImageDiffCorrWithSigns;
 		IsDiffCorrLayout = m_BytesLayout == FullImageDiffCorrWithSigns;
+		IsStatusChannelOnly = 0 == strcmp("STATUS-CHANNEL-ONLY", tagValue);
 	}
 
 	if (0 == strcmp("SECTION-DATA-COMPRESSION", tagName))
@@ -317,7 +318,7 @@ void AdvImageLayout::GetDataFromDataBytes(enum GetByteMode mode, unsigned char* 
 	{		
 		size_t size = qlz_size_decompressed((char*)(data + startOffset));
 		// MaxFrameBufferSize
-		qlz_decompress((char*)(data + startOffset), m_DecompressedPixels, m_StateDecompress);		
+		qlz_decompress((char*)(data + startOffset), m_DecompressedPixels, m_StateDecompress);
 		layoutData = (unsigned char*)m_DecompressedPixels;
 	}
 	else  if (0 == strcmp(Compression, "LAGARITH16"))
@@ -329,23 +330,26 @@ void AdvImageLayout::GetDataFromDataBytes(enum GetByteMode mode, unsigned char* 
 	bool crcOkay;
 	int readIndex = 0;
 
-	if (Bpp == 12)
+	if (!IsStatusChannelOnly)
 	{
-		GetPixelsFrom12BitByteArray(layoutData, prevFrame, pixels, mode, &readIndex, &crcOkay);
-	}
-	else if (Bpp == 16)
-	{
-		if (IsDiffCorrLayout)
-			GetPixelsFrom16BitByteArrayDiffCorrLayout(layoutData, prevFrame, pixels, &readIndex, &crcOkay);
-		else
-			GetPixelsFrom16BitByteArrayRawLayout(layoutData, prevFrame, pixels, &readIndex, &crcOkay);
-	}
-	else if (Bpp == 8)
-	{
-		if (IsDiffCorrLayout)
-			GetPixelsFrom8BitByteArrayDiffCorrLayout(layoutData, prevFrame, pixels, &readIndex, &crcOkay);
-		else
-			GetPixelsFrom8BitByteArrayRawLayout(layoutData, prevFrame, pixels, &readIndex, &crcOkay);
+		if (Bpp == 12)
+		{
+			GetPixelsFrom12BitByteArray(layoutData, prevFrame, pixels, mode, &readIndex, &crcOkay);
+		}
+		else if (Bpp == 16)
+		{
+			if (IsDiffCorrLayout)
+				GetPixelsFrom16BitByteArrayDiffCorrLayout(layoutData, prevFrame, pixels, &readIndex, &crcOkay);
+			else
+				GetPixelsFrom16BitByteArrayRawLayout(layoutData, prevFrame, pixels, &readIndex, &crcOkay);
+		}
+		else if (Bpp == 8)
+		{
+			if (IsDiffCorrLayout)
+				GetPixelsFrom8BitByteArrayDiffCorrLayout(layoutData, prevFrame, pixels, &readIndex, &crcOkay);
+			else
+				GetPixelsFrom8BitByteArrayRawLayout(layoutData, prevFrame, pixels, &readIndex, &crcOkay);
+		}
 	}
 }
 void AdvImageLayout::GetPixelsFrom8BitByteArrayDiffCorrLayout(unsigned char* layoutData, unsigned int* prevFrame, unsigned int* pixelsOut, int* readIndex, bool* crcOkay)

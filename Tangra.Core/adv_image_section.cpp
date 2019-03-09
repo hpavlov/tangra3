@@ -159,7 +159,10 @@ void AdvImageSection::GetDataFromDataBytes(unsigned char* data, unsigned int* pr
 	sectionData++;
 
 	AdvImageLayout* imageLayout = GetImageLayoutById(layoutId);	
-	imageLayout->GetDataFromDataBytes(byteMode, data, prevFrame, pixels, sectionDataLength - 2, startOffset + 2);
+	if (!imageLayout->IsStatusChannelOnly)
+	{
+		imageLayout->GetDataFromDataBytes(byteMode, data, prevFrame, pixels, sectionDataLength - 2, startOffset + 2);
+	}
 }
 
 }

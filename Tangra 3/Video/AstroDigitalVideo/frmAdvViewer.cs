@@ -194,7 +194,10 @@ namespace Tangra.Video.AstroDigitalVideo
 					systemTime = AdvFile.ADV_ZERO_DATE_REF.AddMilliseconds(long.Parse(tagValue)).ToString("dd-MMM-yyyy HH:mm:ss.fff");
 					tagValue = systemTime;
 				}
-					
+				else if (statusTag.Name == "SystemTimeFileTime" && !string.IsNullOrEmpty(tagValue))
+				{
+					tagValue = DateTime.FromFileTime(long.Parse(tagValue)).ToString("dd-MMM-yyyy HH:mm:ss.ffffff");
+				}
 
 				if (statusTag.Name == "GPSTrackedSatellites" && !string.IsNullOrEmpty(tagValue))
 					numSatellites = int.Parse(tagValue);

@@ -58,6 +58,7 @@ namespace AdvLib
 	
 		const char* Compression;
 		bool IsDiffCorrLayout;
+		bool IsStatusChannelOnly;
 		int KeyFrame;
 		
 		int MaxFrameBufferSize;
