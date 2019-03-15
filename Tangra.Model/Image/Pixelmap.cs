@@ -274,7 +274,48 @@ namespace Tangra.Model.Image
 			return bmp;			
 		}
 
-		public static Bitmap ConstructBitmapFromBitmapPixels(byte[,] pixels, int width, int height)
+	    public static Bitmap ConstructBitmapFromBitmapPixels(ushort[,] pixels)
+	    {
+	        int width = pixels.GetLength(0);
+            int height = pixels.GetLength(1);
+
+            var bmp = new Bitmap(width, height, PixelFormat.Format24bppRgb);
+
+            // GDI+ still lies to us - the return format is BGR, NOT RGB.
+            BitmapData bmData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+
+            int stride = bmData.Stride;
+            System.IntPtr Scan0 = bmData.Scan0;
+
+            unsafe
+            {
+                byte* p = (byte*)(void*)Scan0;
+
+                int nOffset = stride - bmp.Width * 3;
+
+                for (int y = 0; y < bmp.Height; ++y)
+                {
+                    for (int x = 0; x < bmp.Width; ++x)
+                    {
+                        byte color;
+                        color = (byte)(pixels[x, y]);
+
+                        p[0] = color;
+                        p[1] = color;
+                        p[2] = color;
+
+                        p += 3;
+                    }
+                    p += nOffset;
+                }
+            }
+
+            bmp.UnlockBits(bmData);
+
+            return bmp;
+	    }
+
+	    public static Bitmap ConstructBitmapFromBitmapPixels(byte[,] pixels, int width, int height)
 		{
 			var bmp = new Bitmap(width, height, PixelFormat.Format24bppRgb);
 

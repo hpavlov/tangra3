@@ -20,6 +20,8 @@ using Tangra.Model.Numerical;
 using Tangra.Model.Video;
 using Tangra.PInvoke;
 using Tangra.Video.AstroDigitalVideo;
+using Tangra.View.CustomRenderers;
+using Tangra.View.CustomRenderers.AavTimeAnalyser;
 
 namespace Tangra.Video
 {
@@ -53,12 +55,20 @@ namespace Tangra.Video
                 int version = TangraCore.ADV2GetFormatVersion(fileName);
 
                 IFrameStream rv;
-                if (version == 1)
-                    rv = new AstroDigitalVideoStream(fileName, ref fileMetadataInfo, ref geoLocation);
-                else
-                    rv = AstroDigitalVideoStreamV2.OpenFile(fileName, out fileMetadataInfo, out geoLocation);
+			    if (version == 1)
+			    {
+			        var adv1 = new AstroDigitalVideoStream(fileName, ref fileMetadataInfo, ref geoLocation);
+			        if (adv1.IsStatusChannelOnly)
+			        {
+                        TangraContext.Current.CustomRenderer = new AavStatusChannelOnlyRenderer(adv1);
+			            return null;
+			        }
+			        rv = adv1;
+			    }
+			    else
+			        rv = AstroDigitalVideoStreamV2.OpenFile(fileName, out fileMetadataInfo, out geoLocation);
 
-                TangraContext.Current.RenderingEngine = fileMetadataInfo.Engine == "AAV" ? "AstroAnalogueVideo" : "AstroDigitalVideo";
+			    TangraContext.Current.RenderingEngine = fileMetadataInfo.Engine == "AAV" ? "AstroAnalogueVideo" : "AstroDigitalVideo";
 
 				if (fileMetadataInfo.Engine == "AAV")
 					UsageStats.Instance.ProcessedAavFiles++;
@@ -99,6 +109,7 @@ namespace Tangra.Video
 
 		private int m_AlmanacOffsetLastFrame;
 		private bool m_AlamanacOffsetLastFrameIsGood;
+	    private bool m_IsStatusChannelOnly;
 
 		private AdvFrameInfo m_CurrentFrameInfo;
 
@@ -163,6 +174,8 @@ namespace Tangra.Video
 
 			    int.TryParse(GetFileTag("FRAME-STACKING-RATE"), out m_StackingRate);
 			    if (m_StackingRate == 1) m_StackingRate = 0; // Video stacked at x1 is a non-stacked video
+
+			    m_IsStatusChannelOnly = GetFileTag("STATUS-CHANNEL-ONLY") == "1";
 			}
 			else
 			{
@@ -227,7 +240,6 @@ namespace Tangra.Video
 		{
             get { return m_IntegratedAAVFrames; }
 		}
-
 
         public int AAVStackingRate
         {
@@ -649,6 +661,11 @@ namespace Tangra.Video
 				return m_NtpDataAvailable.Value;
 			}
 		}
+
+	    public bool IsStatusChannelOnly
+	    {
+	        get { return m_IsStatusChannelOnly; }
+	    }
 
 		private bool m_UseNtpTimeAsCentralExposureTime = false;
 		private long m_CalibratedNtpTimeZeroPoint;

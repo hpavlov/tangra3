@@ -1073,6 +1073,14 @@
     </Compile>
     <Compile Include="Video\SingleBitmapFileFrameStream.cs" />
     <Compile Include="Video\VideoStream.cs" />
+    <Compile Include="View\CustomRenderers\AavTimeAnalyser\AavStatusChannelOnlyRenderer.cs" />
+    <Compile Include="View\CustomRenderers\AavTimeAnalyser\AavTimeAnalyser.cs" />
+    <Compile Include="View\CustomRenderers\AavTimeAnalyser\frmAavStatusChannelOnlyView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\CustomRenderers\AavTimeAnalyser\frmAavStatusChannelOnlyView.Designer.cs">
+      <DependentUpon>frmAavStatusChannelOnlyView.cs</DependentUpon>
+    </Compile>
     <Compile Include="View\ImageToolView.cs" />
     <Compile Include="View\VideoFileView.cs" />
     <Compile Include="View\ZoomedImageView.cs" />
@@ -1458,6 +1466,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Video\SER\frmSerStatusPopup.resx">
       <DependentUpon>frmSerStatusPopup.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="View\CustomRenderers\AavTimeAnalyser\frmAavStatusChannelOnlyView.resx">
+      <DependentUpon>frmAavStatusChannelOnlyView.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config">
       <SubType>Designer</SubType>

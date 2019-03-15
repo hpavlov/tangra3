@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using Tangra.Model.Video;
 
 namespace Tangra.Model.Context
 {
@@ -111,6 +112,8 @@ namespace Tangra.Model.Context
 	    public string RenderingEngine;
 	    public string ReInterlacingMode;
 
+	    public ICustomRenderer CustomRenderer;
+
 		private bool m_RestartRequest = false;
 		public bool HasRestartRequest()
 		{
@@ -181,6 +184,7 @@ namespace Tangra.Model.Context
 
 		    OperationInProgress = false;
 			CanProcessLightCurvePixels = false;
+		    CustomRenderer = null;
 
 		    CrashReportInfo = new CrashReportInfo();
 		}

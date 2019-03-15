@@ -209,6 +209,7 @@
     <Compile Include="VideoOperations\IVideoOperation.cs" />
     <Compile Include="VideoOperations\VideoOperationBase.cs" />
     <Compile Include="Video\FramePlayerTypes.cs" />
+    <Compile Include="Video\ICustomRenderer.cs" />
     <Compile Include="Video\IFramePlayer.cs" />
     <Compile Include="Video\VideoFileFormat.cs" />
   </ItemGroup>

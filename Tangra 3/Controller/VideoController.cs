@@ -554,6 +554,11 @@ namespace Tangra.Controller
 			}
 			else
 			{
+			    if (TangraContext.Current.CustomRenderer != null)
+			    {
+			        TangraContext.Current.CustomRenderer.ShowModal(this);
+			    }
+
 				// TODO: Show error message	
 			}
 
