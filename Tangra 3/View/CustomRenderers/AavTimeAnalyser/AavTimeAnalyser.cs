@@ -40,17 +40,23 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
         public List<TimeAnalyserEntry> Entries = new List<TimeAnalyserEntry>();
         public List<TimeAnalyserEntry> DebugFrames = new List<TimeAnalyserEntry>();
 
-        public float MinDeltaMs;
-
-        public float MaxDeltaMs;
+        public float MinDeltaNTPMs;
+        public float MaxDeltaNTPMs;
+        public float MinDeltaNTPErrorMs;
+        public float MaxDeltaNTPErrorMs;
+        public float MinDeltaSystemTimeMs;
+        public float MaxDeltaSystemTimeMs;
+        public float MinDeltaSystemFileTimeMs;
+        public float MaxDeltaSystemFileTimeMs;
 
         public DateTime FromDateTime;
-
         public DateTime ToDateTime;
+        public bool IsDataReady { get; private set; }
 
         public AavTimeAnalyser(AstroDigitalVideoStream aav)
         {
             m_Aav = aav;
+            IsDataReady = false;
         }
 
         public void Initialize(Action<int, int> progressCallback)
@@ -125,24 +131,21 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                         if (SYSTEM_TIME_TAG != null && statusSection.TagValues.TryGetValue(SYSTEM_TIME_TAG, out tagVal))
                         {
                             entry.SystemTime = AdvFile.ADV_ZERO_DATE_REF.AddMilliseconds(long.Parse(tagVal));
-                            // TODO: Detect Date Change and factor into Delta
                             entry.DeltaSystemTimeMs = (float)new TimeSpan(entry.SystemTime.Ticks - referenceTimeTicks).TotalMilliseconds;
                         }
                         if (SYSTEM_TIME_FT_TAG != null && statusSection.TagValues.TryGetValue(SYSTEM_TIME_FT_TAG, out tagVal))
                         {
                             entry.SystemTimeFileTime = DateTime.FromFileTime(long.Parse(tagVal));
-                            // TODO: Detect Date Change and factor into Delta
                             entry.DeltaSystemFileTimeMs = (float)new TimeSpan(entry.SystemTimeFileTime.Ticks - referenceTimeTicks).TotalMilliseconds;
                         }
                         if (NTP_TIME_TAG != null && statusSection.TagValues.TryGetValue(NTP_TIME_TAG, out tagVal))
                         {
                             entry.NTPTime = AdvFile.ADV_ZERO_DATE_REF.AddMilliseconds(long.Parse(tagVal));
-                            // TODO: Detect Date Change and factor into Delta
                             entry.DeltaNTPTimeMs = (float)new TimeSpan(entry.NTPTime.Ticks - referenceTimeTicks).TotalMilliseconds;
                         }
                         if (NTP_ERROR_TAG != null && statusSection.TagValues.TryGetValue(NTP_ERROR_TAG, out tagVal))
                         {
-                            entry.NTPErrorMs = int.Parse(tagVal) / 2;
+                            entry.NTPErrorMs = 3 * int.Parse(tagVal) / 10.0f; // 0.1MS converted to MS and then taken as 3-Sigma
                         }
 
                         Entries.Add(entry);
@@ -174,7 +177,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                                 else
                                 {
                                     entry.IsOutlier = true;
-                                    Trace.WriteLine("Outlier: " + entry.DeltaSystemTimeMs);
+                                    Trace.WriteLine("SystemTime Outlier: " + entry.DeltaSystemTimeMs);
                                 }
                             }
                             if (entry.DeltaSystemTimeMs < minDeltaSys)
@@ -184,7 +187,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                                 else
                                 {
                                     entry.IsOutlier = true;
-                                    Trace.WriteLine("Outlier: " + entry.DeltaSystemTimeMs);
+                                    Trace.WriteLine("SystemTime Outlier: " + entry.DeltaSystemTimeMs);
                                 }
                             }
                             if (entry.DeltaSystemFileTimeMs > maxDeltaSysF)
@@ -194,7 +197,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                                 else
                                 {
                                     entry.IsOutlier = true;
-                                    Trace.WriteLine("Outlier: " + entry.DeltaSystemFileTimeMs);
+                                    Trace.WriteLine("SystemFileTime Outlier: " + entry.DeltaSystemFileTimeMs);
                                 }
                             }
                             if (entry.DeltaSystemFileTimeMs < minDeltaSysF)
@@ -204,7 +207,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                                 else
                                 {
                                     entry.IsOutlier = true;
-                                    Trace.WriteLine("Outlier: " + entry.DeltaSystemFileTimeMs);
+                                    Trace.WriteLine("SystemFileTime Outlier: " + entry.DeltaSystemFileTimeMs);
                                 }
                             }
                             if (entry.DeltaNTPTimeMs > maxDeltaNtp)
@@ -214,7 +217,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                                 else
                                 {
                                     entry.IsOutlier = true;
-                                    Trace.WriteLine("Outlier: " + entry.DeltaNTPTimeMs);
+                                    Trace.WriteLine("NTPTime Outlier: " + entry.DeltaNTPTimeMs);
                                 }
                             }
                             if (entry.DeltaNTPTimeMs < minDeltaNtp)
@@ -224,7 +227,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                                 else
                                 {
                                     entry.IsOutlier = true;
-                                    Trace.WriteLine("Outlier: " + entry.DeltaNTPTimeMs);
+                                    Trace.WriteLine("NTPTime Outlier: " + entry.DeltaNTPTimeMs);
                                 }
                             }
                             if (entry.NTPErrorMs > maxNtpError)
@@ -234,7 +237,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                                 else
                                 {
                                     entry.IsOutlier = true;
-                                    Trace.WriteLine("Outlier: " + entry.NTPErrorMs);
+                                    Trace.WriteLine("NtpError Outlier: " + entry.NTPErrorMs);
                                 }
                             }
                             if (-entry.NTPErrorMs < minNtpError)
@@ -244,7 +247,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                                 else
                                 {
                                     entry.IsOutlier = true;
-                                    Trace.WriteLine("Outlier: " + -entry.NTPErrorMs);
+                                    Trace.WriteLine("NtpError Outlier: " + -entry.NTPErrorMs);
                                 }
                             }
                         }
@@ -261,8 +264,14 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                 Trace.WriteLine(string.Format("MinDeltaSysF: {0:0.0}, MaxDeltaSysF: {1:0.0}", minDeltaSysF, maxDeltaSysF));
                 Trace.WriteLine(string.Format("MinDeltaNtp: {0:0.0}, MaxDeltaNtp: {1:0.0}", minDeltaNtp, maxDeltaNtp));
 
-                MinDeltaMs = Math.Min(Math.Min(Math.Min(minDeltaSys, minDeltaSysF), minDeltaNtp), minNtpError);
-                MaxDeltaMs = Math.Max(Math.Max(Math.Max(maxDeltaSys, maxDeltaSysF), maxDeltaNtp), maxNtpError);
+                MinDeltaNTPMs = minDeltaNtp;
+                MaxDeltaNTPMs = maxDeltaNtp;
+                MinDeltaNTPErrorMs = minNtpError;
+                MaxDeltaNTPErrorMs = maxNtpError;
+                MinDeltaSystemTimeMs = minDeltaSys;
+                MaxDeltaSystemTimeMs = maxDeltaSys;
+                MinDeltaSystemFileTimeMs = minDeltaSysF;
+                MaxDeltaSystemFileTimeMs = maxDeltaSysF;
 
                 if (Entries.Count > 0)
                 {
@@ -270,6 +279,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                     ToDateTime = Entries.Last().ReferenceTime;
                 }
 
+                IsDataReady = true;
                 progressCallback(0, 0);
             });
         }

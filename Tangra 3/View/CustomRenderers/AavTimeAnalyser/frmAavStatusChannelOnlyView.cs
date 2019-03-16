@@ -16,9 +16,36 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
 {
     public partial class frmAavStatusChannelOnlyView : Form
     {
+        internal enum GraphType
+        {
+            gtNone,
+            gtTimeDeltasLines,
+            gtTimeDeltasDots
+        }
+
+        internal enum GridlineStyle
+        {
+            Line,
+            Tick
+        }
+
+        internal class GraphConfig
+        {
+            public GridlineStyle GridlineStyle = GridlineStyle.Line;
+        }
+
+        private GraphType m_GrapthType = GraphType.gtNone;
+
         private VideoController m_VideoController;
         private AstroDigitalVideoStream m_Aav;
         private AavTimeAnalyser m_TimeAnalyser;
+
+        private int m_LastGraphWidth;
+        private int m_LastGraphHeight;
+
+        const float MIN_PIX_DIFF = 1f;
+
+        private GraphConfig m_GraphConfig = new GraphConfig();
 
         private static Font m_TitleFont = new Font(DefaultFont, FontStyle.Bold);
 
@@ -74,33 +101,106 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
 
         private void DrawGraph()
         {
-            Cursor = Cursors.WaitCursor;
-            try
+            if (!m_TimeAnalyser.IsDataReady) return;
+
+            switch (m_GrapthType)
             {
-                var image = new Bitmap(pbGraph.Width, pbGraph.Height, PixelFormat.Format24bppRgb);
+                case GraphType.gtTimeDeltasLines:
+                case GraphType.gtTimeDeltasDots:
+                    DrawTimeDeltasGraph();
+                    break;
+            }
+        }
+
+        private void DrawTimeDeltasGraph()
+        {
+            Cursor = Cursors.WaitCursor;
+
+            bool plotSystemTime = rbSystemTime.Checked;
+            bool plotOccuRecTime = cbxNtpTime.Checked;
+            bool plotNtpError = cbxNtpError.Checked;
+            int graphWidth = pbGraph.Width;
+            int graphHeight = pbGraph.Height;
+            var image = new Bitmap(graphWidth, graphHeight, PixelFormat.Format24bppRgb);
+
+            bool ellipses = m_GrapthType == GraphType.gtTimeDeltasDots;
+            bool tickGridlines = m_GraphConfig.GridlineStyle == GridlineStyle.Tick;
+
+            Task.Run(() =>
+            {
+                Pen SysTimePen = Pens.Red;
+                Brush SysTimeBrush = Brushes.Red;
+                Pen NtpTimePen = Pens.LimeGreen;
+                Brush NtpTimeBrush = Brushes.LimeGreen;
+                Pen NtpErrorPen = Pens.DarkKhaki;
+                Brush NtpErrorBrush = Brushes.DarkKhaki;
+
+                float maxDelta = 0;
+                float minDelta = 0;
+                if (plotSystemTime)
+                {
+                    minDelta = m_TimeAnalyser.MinDeltaSystemTimeMs;
+                    maxDelta = m_TimeAnalyser.MaxDeltaSystemTimeMs;
+                }
+                else
+                {
+                    minDelta = m_TimeAnalyser.MinDeltaSystemFileTimeMs;
+                    maxDelta = m_TimeAnalyser.MaxDeltaSystemFileTimeMs;
+                }
+
+                if (plotOccuRecTime)
+                {
+                    minDelta = Math.Min(minDelta, m_TimeAnalyser.MinDeltaNTPMs);
+                    maxDelta = Math.Max(maxDelta, m_TimeAnalyser.MaxDeltaNTPMs);
+                }
+
+                if (plotNtpError)
+                {
+                    minDelta = Math.Min(minDelta, m_TimeAnalyser.MinDeltaNTPErrorMs);
+                    maxDelta = Math.Max(maxDelta, m_TimeAnalyser.MaxDeltaNTPErrorMs);
+                }
 
                 using (var g = Graphics.FromImage(image))
                 {
                     float padding = 10;
                     float paddingX = 40;
                     float paddingY = 25;
-                    float width = pbGraph.Width - padding - paddingX;
-                    float height = pbGraph.Height - 2 * paddingY;
-                    float yFactor = height / (m_TimeAnalyser.MaxDeltaMs - m_TimeAnalyser.MinDeltaMs);
+                    float width = graphWidth - padding - paddingX;
+                    float height = graphHeight - 2 * paddingY;
+                    float yFactor = height / (maxDelta - minDelta);
                     float xFactor = width / (m_TimeAnalyser.Entries.Count);
 
-                    g.FillRectangle(Brushes.WhiteSmoke, 0, 0, pbGraph.Width, pbGraph.Height);
+                    g.FillRectangle(Brushes.WhiteSmoke, 0, 0, graphWidth, graphHeight);
 
                     for (int ya = -2000; ya < 2000; ya += 100)
                     {
-                        float y = pbGraph.Height - paddingY - yFactor * (ya - m_TimeAnalyser.MinDeltaMs);
-                        if (y < paddingY || y > pbGraph.Height - paddingY) continue;
+                        float y = graphHeight - paddingY - yFactor * (ya - minDelta);
+                        if (y < paddingY || y > graphHeight - paddingY) continue;
 
-                        g.DrawLine(Pens.Gray, paddingX, y, pbGraph.Width - padding, y);
+                        if (tickGridlines && ya != 0 /* The zero grid line is fully drawn even in 'tick' mode */)
+                        {
+                            g.DrawLine(Pens.Gray, paddingX, y, paddingX + 5, y);
+                            g.DrawLine(Pens.Gray, graphWidth - padding - 5, y, graphWidth - padding, y);
+                        }
+                        else
+                        {
+                            g.DrawLine(Pens.Gray, paddingX, y, graphWidth - padding, y);
+                        }
+                        
                         if (ya == 0)
                         {
-                            g.DrawLine(Pens.Gray, paddingX, y - 1, pbGraph.Width - padding, y - 1);
-                            g.DrawLine(Pens.Gray, paddingX, y + 1, pbGraph.Width - padding, y + 1);
+                            if (tickGridlines)
+                            {
+                                g.DrawLine(Pens.Gray, paddingX, y - 1, paddingX + 5, y - 1);
+                                g.DrawLine(Pens.Gray, graphWidth - padding - 5, y - 1, graphWidth - padding, y - 1);
+                                g.DrawLine(Pens.Gray, paddingX, y + 1, paddingX + 5, y + 1);
+                                g.DrawLine(Pens.Gray, graphWidth - padding - 5, y + 1, graphWidth - padding, y + 1);
+                            }
+                            else
+                            {
+                                g.DrawLine(Pens.Gray, paddingX, y - 1, graphWidth - padding, y - 1);
+                                g.DrawLine(Pens.Gray, paddingX, y + 1, graphWidth - padding, y + 1);
+                            }
                             var sizF = g.MeasureString("0", DefaultFont);
                             g.DrawString("0", DefaultFont, Brushes.Black, paddingX - sizF.Width - 5, y - sizF.Height / 2);
                         }
@@ -119,96 +219,217 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                     float y3pb = 0;
                     float xp = 0;
 
+                    float y1 = 0;
+                    float y2 = 0;
+                    float y3t = 0;
+                    float y3b = 0;
+
                     foreach (var entry in m_TimeAnalyser.Entries)
                     {
                         if (entry.IsOutlier) continue;
 
                         float x = paddingX + idx * xFactor;
-                        float y1 = pbGraph.Height - paddingY - yFactor * (entry.DeltaNTPTimeMs - m_TimeAnalyser.MinDeltaMs);
-                        float y2 = pbGraph.Height - paddingY - yFactor * (entry.DeltaSystemFileTimeMs - m_TimeAnalyser.MinDeltaMs);
-                        float y3t = pbGraph.Height - paddingY - yFactor * (entry.NTPErrorMs - m_TimeAnalyser.MinDeltaMs);
-                        float y3b = pbGraph.Height - paddingY - yFactor * (-entry.NTPErrorMs - m_TimeAnalyser.MinDeltaMs);
+                        bool plotted = false;
+                        bool calcOnly = idx == 0;
 
-                        if (idx > 0)
+                        if (plotNtpError)
                         {
-                            g.DrawLine(Pens.LightGray, xp, y3pt, x, y3t);
-                            g.DrawLine(Pens.LightGray, xp, y3pb, x, y3b);
-                            g.DrawLine(Pens.LimeGreen, xp, y1p, x, y1);
-                            g.DrawLine(Pens.Red, xp, y2p, x, y2);
+                            y3t = graphHeight - paddingY - yFactor * (entry.NTPErrorMs - minDelta);
+                            y3b = graphHeight - paddingY - yFactor * (-entry.NTPErrorMs - minDelta);
+                            if (!calcOnly && (x - xp > MIN_PIX_DIFF || Math.Abs(y3t - y3pt) > MIN_PIX_DIFF || Math.Abs(y3b - y3pb) > MIN_PIX_DIFF))
+                            {
+                                if (ellipses)
+                                {
+                                    g.FillEllipse(NtpErrorBrush, x - 1, y3t - 1, 2, 2);
+                                    g.FillEllipse(NtpErrorBrush, x - 1, y3b - 1, 2, 2);
+                                }
+                                else
+                                {
+                                    g.DrawLine(NtpErrorPen, xp, y3pt, x, y3t);
+                                    g.DrawLine(NtpErrorPen, xp, y3pb, x, y3b); 
+                                }
+                                plotted = true;
+                            }
                         }
 
-                        y1p = y1;
-                        y2p = y2;
-                        y3pt = y3t;
-                        y3pb = y3b;
-                        xp = x;
+                        if (plotOccuRecTime)
+                        {
+                            y1 = graphHeight - paddingY - yFactor * (entry.DeltaNTPTimeMs - minDelta);
+                            if (!calcOnly && (x - xp > MIN_PIX_DIFF || Math.Abs(y1 - y1p) > MIN_PIX_DIFF))
+                            {
+                                if (ellipses)
+                                {
+                                    g.FillEllipse(NtpTimeBrush, x - 1, y1 - 1, 2, 2);
+                                }
+                                else
+                                {
+                                    g.DrawLine(NtpTimePen, xp, y1p, x, y1);
+                                }
+                                plotted = true;
+                            }
+                        }
+
+                        if (plotSystemTime)
+                            y2 = graphHeight - paddingY - yFactor * (entry.DeltaSystemTimeMs - minDelta);
+                        else
+                            y2 = graphHeight - paddingY - yFactor * (entry.DeltaSystemFileTimeMs - minDelta);
+
+                        if (!calcOnly && (x - xp > MIN_PIX_DIFF || Math.Abs(y2 - y2p) > MIN_PIX_DIFF))
+                        {
+                            if (ellipses)
+                            {
+                                g.FillEllipse(SysTimeBrush, x - 1, y2 - 1, 2, 2);
+                            }
+                            else
+                            {
+                                g.DrawLine(SysTimePen, xp, y2p, x, y2);
+                            }
+                            plotted = true;
+                        }
+
+                        if (plotted || idx == 0)
+                        {
+                            y1p = y1;
+                            y2p = y2;
+                            y3pt = y3t;
+                            y3pb = y3b;
+                            xp = x;
+                        }
 
                         idx++;
                     }
 
-                    g.DrawRectangle(Pens.Black, paddingX, paddingY, pbGraph.Width - padding - paddingX, pbGraph.Height - 2 * paddingY);
+                    g.DrawRectangle(Pens.Black, paddingX, paddingY, graphWidth - padding - paddingX, graphHeight - 2 * paddingY);
 
-                    var title = string.Format("Time anaysis of {0:0.0} million data points recorded between {1} UT and {2} UT", m_TimeAnalyser.Entries.Count / 1000000.0, m_TimeAnalyser.FromDateTime.ToString("dd-MMM HH:mm"), m_TimeAnalyser.ToDateTime.ToString("dd-MMM HH:mm"));
+                    var title = string.Format("Time Delta analysis of {0:0.0} million data points recorded between {1} UT and {2} UT", m_TimeAnalyser.Entries.Count / 1000000.0, m_TimeAnalyser.FromDateTime.ToString("dd-MMM HH:mm"), m_TimeAnalyser.ToDateTime.ToString("dd-MMM HH:mm"));
                     var sizeF = g.MeasureString(title, m_TitleFont);
                     g.DrawString(title, m_TitleFont, Brushes.Black, (width - sizeF.Width) / 2 + paddingX, (paddingY - sizeF.Height) / 2);
 
                     var thirdW = width / 3;
+                    int legPos = -1;
                     for (int i = 0; i < 3; i++)
                     {
                         string legend = "";
                         Pen legendPen = Pens.Black;
                         if (i == 0)
                         {
-                            legend = "GetSystemTimePreciseAsFileTime()";
-                            legendPen = Pens.Red;
+                            legend = plotSystemTime ? "GetSystemTime()" : "GetSystemTimePreciseAsFileTime()";
+                            legendPen = SysTimePen;
                         }
                         else if (i == 1)
                         {
-                            legend = "OccuRec's NTP-based Time Keeping";
-                            legendPen = Pens.LimeGreen;
+                            if (plotOccuRecTime)
+                            {
+                                legend = "OccuRec's Time Keeping (NTP reference)";
+                                legendPen = NtpTimePen;
+                            }
+                            else continue;
                         }
                         else if (i == 2)
                         {
-                            legend = "Max NTP Error";
-                            legendPen = Pens.LightGray;
+                            if (plotNtpError)
+                            {
+                                legend = "Max 1-Sigma NTP Error";
+                                legendPen = NtpErrorPen;
+                            }
+                            else continue;
                         }
 
+                        legPos++;
+
                         sizeF = g.MeasureString(legend, m_TitleFont);
-                        var y = paddingY + height + sizeF.Height/2;
+                        var y = paddingY + height + sizeF.Height / 2;
                         var yl = paddingY + height + sizeF.Height;
-                        g.DrawString(legend, m_TitleFont, Brushes.Black, (thirdW - sizeF.Width) / 2 + paddingX + i * thirdW + 15, y);
-                        g.DrawLine(legendPen, (thirdW - sizeF.Width) / 2 + paddingX + i * thirdW, yl - 1, 6 + (thirdW - sizeF.Width) / 2 + paddingX + i * thirdW, yl - 1);
-                        g.DrawLine(legendPen, (thirdW - sizeF.Width) / 2 + paddingX + i * thirdW, yl, 6 + (thirdW - sizeF.Width) / 2 + paddingX + i * thirdW, yl);
-                        g.DrawLine(legendPen, (thirdW - sizeF.Width) / 2 + paddingX + i * thirdW, yl + 1, 6 + (thirdW - sizeF.Width) / 2 + paddingX + i * thirdW, yl + 1);
+                        g.DrawString(legend, m_TitleFont, Brushes.Black, (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW + 15, y);
+                        g.DrawLine(legendPen, (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW, yl - 1, 6 + (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW, yl - 1);
+                        g.DrawLine(legendPen, (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW, yl, 6 + (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW, yl);
+                        g.DrawLine(legendPen, (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW, yl + 1, 6 + (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW, yl + 1);
                     }
 
                     g.Save();
                 }
-
-                if (pbGraph.Image != null)
-                {
-                    pbGraph.Image.Dispose();
-                }
-
-                pbGraph.Image = image;
-                pbGraph.Update();
-            }
-            finally
+            }).ContinueWith((r) =>
             {
-                Cursor = Cursors.Default;
-            }
+                if (r.IsCompleted)
+                {
+                    this.Invoke(new Action(() =>
+                    {
+                        if (pbGraph.Image != null)
+                        {
+                            pbGraph.Image.Dispose();
+                        }
+
+                        pbGraph.Image = image;
+                        pbGraph.Update();
+
+                        m_LastGraphWidth = pbGraph.Width;
+                        m_LastGraphHeight = pbGraph.Height;
+
+                        Cursor = Cursors.Default;
+                    }));
+                }
+                else
+                {
+                    Cursor = Cursors.Default;
+                }
+            });
+
         }
 
         private void resizeUpdateTimer_Tick(object sender, EventArgs e)
         {
             resizeUpdateTimer.Enabled = false;
 
-            DrawGraph();
+            if (m_LastGraphWidth != pbGraph.Width || m_LastGraphHeight != pbGraph.Height)
+            {
+                DrawGraph();
+            }
         }
 
         private void frmAavStatusChannelOnlyView_ResizeEnd(object sender, EventArgs e)
         {
             resizeUpdateTimer.Enabled = true;
+        }
+
+        private void cbxGraphType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cbxGraphType.SelectedIndex == 0)
+            {
+                m_GrapthType = GraphType.gtTimeDeltasLines;
+            }
+            else if (cbxGraphType.SelectedIndex == 1)
+            {
+                m_GrapthType = GraphType.gtTimeDeltasDots;
+            }
+
+            DrawGraph();
+        }
+
+        private void TimeDeltasTimeSourceChanged(object sender, EventArgs e)
+        {
+            if (m_GrapthType != GraphType.gtNone)
+            {
+                DrawGraph();
+            }
+        }
+
+        private void GridlinesStyleChanged(object sender, EventArgs e)
+        {
+            if (sender == miCompleteGridlines)
+            {
+                m_GraphConfig.GridlineStyle = GridlineStyle.Line;
+            }
+            else if (sender == miTickGridlines)
+            {
+                m_GraphConfig.GridlineStyle = GridlineStyle.Tick;
+            }
+
+            foreach (ToolStripMenuItem item in ((sender as ToolStripMenuItem).OwnerItem as ToolStripMenuItem).DropDownItems)
+            {
+                item.Checked = (item == (sender as ToolStripMenuItem));
+            }
+
+            DrawGraph();
         }
     }
 }
