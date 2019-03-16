@@ -556,6 +556,9 @@ namespace Tangra.Controller
 			{
 			    if (TangraContext.Current.CustomRenderer != null)
 			    {
+                    if (!string.IsNullOrEmpty(fileName))
+                        RegisterRecentFile(RecentFileType.Video, fileName);
+
 			        TangraContext.Current.CustomRenderer.ShowModal(this);
 			    }
 

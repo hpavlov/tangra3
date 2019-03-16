@@ -5,6 +5,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -45,6 +46,8 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
 
         const float MIN_PIX_DIFF = 1f;
 
+        private bool m_IsDataReady;
+
         private GraphConfig m_GraphConfig = new GraphConfig();
 
         private static Font m_TitleFont = new Font(DefaultFont, FontStyle.Bold);
@@ -62,46 +65,74 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
             m_TimeAnalyser = new AavTimeAnalyser(aav);
         }
 
-        private void UpdateProgressBar(int val, int max)
+        private void UpdateProgressBarImpl(int val, int max, ProgressBar pbar, Action onFinished)
         {
             if (val == 0 && max == 0)
             {
-                pbLoadData.Visible = false;
-                DrawGraph();
+                pbar.Visible = false;
+                onFinished();
             }
             else if (val == 0 && max > 0)
             {
-                pbLoadData.Maximum = max;
-                pbLoadData.Value = 0;
-                pbLoadData.Visible = true;
+                pbar.Maximum = max;
+                pbar.Value = 0;
+                pbar.Visible = true;
+                tabControl.SelectedTab = tabOverview;
             }
             else
             {
-                pbLoadData.Value = Math.Min(val, max);
-                pbLoadData.Update();
+                pbar.Value = Math.Min(val, max);
+                pbar.Update();
             }
+        }
+
+        private void UpdateProgressBar(int val, int max)
+        {
+            UpdateProgressBarImpl(val, max, pbLoadData, OnTimeAnalysisDataReady);
+        }
+
+        private void UpdateExportProgressBar(int val, int max)
+        {
+            UpdateProgressBarImpl(val, max, pbLoadData, OnExportFinished);
         }
 
         private void frmAavStatusChannelOnlyView_Load(object sender, EventArgs e)
         {
-            Text = m_Aav.FileName;
+            Text = string.Format("AAV Time Analysis: {0}", m_Aav.FileName);
 
+            m_IsDataReady = false;
             pbLoadData.Visible = true;
+            Height = Height + 10 + (Math.Max(480, m_Aav.Height) - pbOcrErrorFrame.Height);
+            Width = 10 + Math.Max(800, m_Aav.Width);
 
             m_TimeAnalyser.Initialize((val, max) =>
             {
                 this.Invoke(new Action<int, int>(UpdateProgressBar), val, max);
             });
+        }
 
-            // TODO: Extract all times in memory, to plot them easier
-            // TODO: Have a tab with plotted times
-            // TODO: Have a tab with debug images + all status channel data under it
-            // TODO: Tab with export in CSV
+        private void OnTimeAnalysisDataReady()
+        {
+            nudOcrErrorFrame.Enabled = m_TimeAnalyser.DebugFrames.Count > 0;
+            if (nudOcrErrorFrame.Enabled)
+            {
+                nudOcrErrorFrame.Maximum = m_TimeAnalyser.DebugFrames.Count - 1;
+                nudOcrErrorFrame.Minimum = 0;
+                nudOcrErrorFrame.Value = 0;
+            }
+
+            cbxGraphType.SelectedIndex = 0;
+            m_IsDataReady = true;
+            
+            ShowOcrErrorFrame();
+
+            tabControl.SelectedTab = tabGraphs;
+            DrawGraph();
         }
 
         private void DrawGraph()
         {
-            if (!m_TimeAnalyser.IsDataReady) return;
+            if (!m_IsDataReady) return;
 
             switch (m_GrapthType)
             {
@@ -217,7 +248,9 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                     float y2p = 0;
                     float y3pt = 0;
                     float y3pb = 0;
-                    float xp = 0;
+                    float xp1 = 0;
+                    float xp2 = 0;
+                    float xp3 = 0;
 
                     float y1 = 0;
                     float y2 = 0;
@@ -229,14 +262,13 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                         if (entry.IsOutlier) continue;
 
                         float x = paddingX + idx * xFactor;
-                        bool plotted = false;
                         bool calcOnly = idx == 0;
 
                         if (plotNtpError)
                         {
                             y3t = graphHeight - paddingY - yFactor * (entry.NTPErrorMs - minDelta);
                             y3b = graphHeight - paddingY - yFactor * (-entry.NTPErrorMs - minDelta);
-                            if (!calcOnly && (x - xp > MIN_PIX_DIFF || Math.Abs(y3t - y3pt) > MIN_PIX_DIFF || Math.Abs(y3b - y3pb) > MIN_PIX_DIFF))
+                            if (!calcOnly && (x - xp3 > MIN_PIX_DIFF || Math.Abs(y3t - y3pt) > MIN_PIX_DIFF || Math.Abs(y3b - y3pb) > MIN_PIX_DIFF))
                             {
                                 if (ellipses)
                                 {
@@ -245,17 +277,19 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                                 }
                                 else
                                 {
-                                    g.DrawLine(NtpErrorPen, xp, y3pt, x, y3t);
-                                    g.DrawLine(NtpErrorPen, xp, y3pb, x, y3b); 
+                                    g.DrawLine(NtpErrorPen, xp3, y3pt, x, y3t);
+                                    g.DrawLine(NtpErrorPen, xp3, y3pb, x, y3b); 
                                 }
-                                plotted = true;
+                                xp3 = x;
+                                y3pt = y3t;
+                                y3pb = y3b;
                             }
                         }
 
                         if (plotOccuRecTime)
                         {
                             y1 = graphHeight - paddingY - yFactor * (entry.DeltaNTPTimeMs - minDelta);
-                            if (!calcOnly && (x - xp > MIN_PIX_DIFF || Math.Abs(y1 - y1p) > MIN_PIX_DIFF))
+                            if (!calcOnly && (x - xp1 > MIN_PIX_DIFF || Math.Abs(y1 - y1p) > MIN_PIX_DIFF))
                             {
                                 if (ellipses)
                                 {
@@ -263,9 +297,10 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                                 }
                                 else
                                 {
-                                    g.DrawLine(NtpTimePen, xp, y1p, x, y1);
+                                    g.DrawLine(NtpTimePen, xp1, y1p, x, y1);
                                 }
-                                plotted = true;
+                                xp1 = x;
+                                y1p = y1;
                             }
                         }
 
@@ -274,7 +309,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                         else
                             y2 = graphHeight - paddingY - yFactor * (entry.DeltaSystemFileTimeMs - minDelta);
 
-                        if (!calcOnly && (x - xp > MIN_PIX_DIFF || Math.Abs(y2 - y2p) > MIN_PIX_DIFF))
+                        if (!calcOnly && (x - xp2 > MIN_PIX_DIFF || Math.Abs(y2 - y2p) > MIN_PIX_DIFF))
                         {
                             if (ellipses)
                             {
@@ -282,18 +317,21 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                             }
                             else
                             {
-                                g.DrawLine(SysTimePen, xp, y2p, x, y2);
+                                g.DrawLine(SysTimePen, xp2, y2p, x, y2);
                             }
-                            plotted = true;
+                            xp2 = x;
+                            y2p = y2;
                         }
 
-                        if (plotted || idx == 0)
+                        if (idx == 0)
                         {
                             y1p = y1;
                             y2p = y2;
                             y3pt = y3t;
                             y3pb = y3b;
-                            xp = x;
+                            xp1 = x;
+                            xp2 = x;
+                            xp3 = x;
                         }
 
                         idx++;
@@ -329,7 +367,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                         {
                             if (plotNtpError)
                             {
-                                legend = "Max 1-Sigma NTP Error";
+                                legend = "Max 3-Sigma NTP Error";
                                 legendPen = NtpErrorPen;
                             }
                             else continue;
@@ -430,6 +468,44 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
             }
 
             DrawGraph();
+        }
+
+        private void ShowOcrErrorFrame()
+        {
+            if (!m_IsDataReady || m_TimeAnalyser.DebugFrames.Count == 0) return;
+
+            var frame = m_TimeAnalyser.DebugFrames[(int)nudOcrErrorFrame.Value];
+            lblOcrText.Text = string.Format("[{0}]           [{1}]", frame.OrcField1, frame.OrcField2);
+            pbOcrErrorFrame.Image = frame.DebugImage;
+        }
+
+        private void nudOcrErrorFrame_ValueChanged(object sender, EventArgs e)
+        {
+            ShowOcrErrorFrame();
+        }
+
+        private string m_ExportFileName;
+
+        private void miExport_Click(object sender, EventArgs e)
+        {
+            saveFileDialog.FileName = Path.ChangeExtension(m_Aav.FileName, "csv");
+
+            if (saveFileDialog.ShowDialog(this) == DialogResult.OK)
+            {
+                m_ExportFileName = saveFileDialog.FileName;
+                m_TimeAnalyser.ExportData(
+                    m_ExportFileName,
+                    (val, max) =>
+                    {
+                        this.Invoke(new Action<int, int>(UpdateExportProgressBar), val, max);
+                    }
+                );
+            }
+        }
+
+        private void OnExportFinished()
+        {
+            Process.Start(m_ExportFileName);
         }
     }
 }

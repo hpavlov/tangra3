@@ -33,38 +33,46 @@
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabOverview = new System.Windows.Forms.TabPage();
             this.pbLoadData = new System.Windows.Forms.ProgressBar();
-            this.tabGraph = new System.Windows.Forms.TabPage();
-            this.pnlGraph = new System.Windows.Forms.Panel();
+            this.tabGraphs = new System.Windows.Forms.TabPage();
             this.pbGraph = new System.Windows.Forms.PictureBox();
-            this.tabOCRErrors = new System.Windows.Forms.TabPage();
-            this.tabExport = new System.Windows.Forms.TabPage();
-            this.resizeUpdateTimer = new System.Windows.Forms.Timer(this.components);
-            this.cbxGraphType = new System.Windows.Forms.ComboBox();
+            this.pnlGraph = new System.Windows.Forms.Panel();
             this.pnlTimeDeltaConfig = new System.Windows.Forms.Panel();
-            this.cbxNtpError = new System.Windows.Forms.CheckBox();
-            this.cbxNtpTime = new System.Windows.Forms.CheckBox();
-            this.rbSystemTimeAsFileTime = new System.Windows.Forms.RadioButton();
             this.rbSystemTime = new System.Windows.Forms.RadioButton();
+            this.rbSystemTimeAsFileTime = new System.Windows.Forms.RadioButton();
+            this.cbxNtpTime = new System.Windows.Forms.CheckBox();
+            this.cbxNtpError = new System.Windows.Forms.CheckBox();
+            this.cbxGraphType = new System.Windows.Forms.ComboBox();
+            this.tabOCRErrors = new System.Windows.Forms.TabPage();
+            this.pbOcrErrorFrame = new System.Windows.Forms.PictureBox();
+            this.pnlOcrErrorControl = new System.Windows.Forms.Panel();
+            this.lblOcrText = new System.Windows.Forms.Label();
+            this.nudOcrErrorFrame = new System.Windows.Forms.NumericUpDown();
+            this.resizeUpdateTimer = new System.Windows.Forms.Timer(this.components);
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.graphsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gridlinesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.miCompleteGridlines = new System.Windows.Forms.ToolStripMenuItem();
             this.miTickGridlines = new System.Windows.Forms.ToolStripMenuItem();
+            this.miExport = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.tabControl.SuspendLayout();
             this.tabOverview.SuspendLayout();
-            this.tabGraph.SuspendLayout();
-            this.pnlGraph.SuspendLayout();
+            this.tabGraphs.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbGraph)).BeginInit();
+            this.pnlGraph.SuspendLayout();
             this.pnlTimeDeltaConfig.SuspendLayout();
+            this.tabOCRErrors.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pbOcrErrorFrame)).BeginInit();
+            this.pnlOcrErrorControl.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudOcrErrorFrame)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl
             // 
             this.tabControl.Controls.Add(this.tabOverview);
-            this.tabControl.Controls.Add(this.tabGraph);
+            this.tabControl.Controls.Add(this.tabGraphs);
             this.tabControl.Controls.Add(this.tabOCRErrors);
-            this.tabControl.Controls.Add(this.tabExport);
             this.tabControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl.Location = new System.Drawing.Point(0, 24);
             this.tabControl.Name = "tabControl";
@@ -78,7 +86,7 @@
             this.tabOverview.Location = new System.Drawing.Point(4, 22);
             this.tabOverview.Name = "tabOverview";
             this.tabOverview.Padding = new System.Windows.Forms.Padding(3);
-            this.tabOverview.Size = new System.Drawing.Size(749, 498);
+            this.tabOverview.Size = new System.Drawing.Size(807, 524);
             this.tabOverview.TabIndex = 0;
             this.tabOverview.Text = "Overview";
             this.tabOverview.UseVisualStyleBackColor = true;
@@ -89,30 +97,20 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.pbLoadData.Location = new System.Drawing.Point(17, 17);
             this.pbLoadData.Name = "pbLoadData";
-            this.pbLoadData.Size = new System.Drawing.Size(715, 23);
+            this.pbLoadData.Size = new System.Drawing.Size(773, 23);
             this.pbLoadData.TabIndex = 0;
             // 
-            // tabGraph
+            // tabGraphs
             // 
-            this.tabGraph.Controls.Add(this.pbGraph);
-            this.tabGraph.Controls.Add(this.pnlGraph);
-            this.tabGraph.Location = new System.Drawing.Point(4, 22);
-            this.tabGraph.Name = "tabGraph";
-            this.tabGraph.Padding = new System.Windows.Forms.Padding(3);
-            this.tabGraph.Size = new System.Drawing.Size(807, 524);
-            this.tabGraph.TabIndex = 1;
-            this.tabGraph.Text = "Graph";
-            this.tabGraph.UseVisualStyleBackColor = true;
-            // 
-            // pnlGraph
-            // 
-            this.pnlGraph.Controls.Add(this.pnlTimeDeltaConfig);
-            this.pnlGraph.Controls.Add(this.cbxGraphType);
-            this.pnlGraph.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlGraph.Location = new System.Drawing.Point(3, 3);
-            this.pnlGraph.Name = "pnlGraph";
-            this.pnlGraph.Size = new System.Drawing.Size(801, 34);
-            this.pnlGraph.TabIndex = 0;
+            this.tabGraphs.Controls.Add(this.pbGraph);
+            this.tabGraphs.Controls.Add(this.pnlGraph);
+            this.tabGraphs.Location = new System.Drawing.Point(4, 22);
+            this.tabGraphs.Name = "tabGraphs";
+            this.tabGraphs.Padding = new System.Windows.Forms.Padding(3);
+            this.tabGraphs.Size = new System.Drawing.Size(807, 524);
+            this.tabGraphs.TabIndex = 1;
+            this.tabGraphs.Text = "Graphs";
+            this.tabGraphs.UseVisualStyleBackColor = true;
             // 
             // pbGraph
             // 
@@ -124,41 +122,15 @@
             this.pbGraph.TabIndex = 0;
             this.pbGraph.TabStop = false;
             // 
-            // tabOCRErrors
+            // pnlGraph
             // 
-            this.tabOCRErrors.Location = new System.Drawing.Point(4, 22);
-            this.tabOCRErrors.Name = "tabOCRErrors";
-            this.tabOCRErrors.Size = new System.Drawing.Size(749, 498);
-            this.tabOCRErrors.TabIndex = 2;
-            this.tabOCRErrors.Text = "OCR Errors";
-            this.tabOCRErrors.UseVisualStyleBackColor = true;
-            // 
-            // tabExport
-            // 
-            this.tabExport.Location = new System.Drawing.Point(4, 22);
-            this.tabExport.Name = "tabExport";
-            this.tabExport.Size = new System.Drawing.Size(749, 498);
-            this.tabExport.TabIndex = 3;
-            this.tabExport.Text = "Export";
-            this.tabExport.UseVisualStyleBackColor = true;
-            // 
-            // resizeUpdateTimer
-            // 
-            this.resizeUpdateTimer.Interval = 250;
-            this.resizeUpdateTimer.Tick += new System.EventHandler(this.resizeUpdateTimer_Tick);
-            // 
-            // cbxGraphType
-            // 
-            this.cbxGraphType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxGraphType.FormattingEnabled = true;
-            this.cbxGraphType.Items.AddRange(new object[] {
-            "Time Deltas - Lines",
-            "Time Deltas - Dots"});
-            this.cbxGraphType.Location = new System.Drawing.Point(6, 7);
-            this.cbxGraphType.Name = "cbxGraphType";
-            this.cbxGraphType.Size = new System.Drawing.Size(159, 21);
-            this.cbxGraphType.TabIndex = 0;
-            this.cbxGraphType.SelectedIndexChanged += new System.EventHandler(this.cbxGraphType_SelectedIndexChanged);
+            this.pnlGraph.Controls.Add(this.pnlTimeDeltaConfig);
+            this.pnlGraph.Controls.Add(this.cbxGraphType);
+            this.pnlGraph.Dock = System.Windows.Forms.DockStyle.Top;
+            this.pnlGraph.Location = new System.Drawing.Point(3, 3);
+            this.pnlGraph.Name = "pnlGraph";
+            this.pnlGraph.Size = new System.Drawing.Size(801, 34);
+            this.pnlGraph.TabIndex = 0;
             // 
             // pnlTimeDeltaConfig
             // 
@@ -171,31 +143,15 @@
             this.pnlTimeDeltaConfig.Size = new System.Drawing.Size(625, 33);
             this.pnlTimeDeltaConfig.TabIndex = 1;
             // 
-            // cbxNtpError
+            // rbSystemTime
             // 
-            this.cbxNtpError.AutoSize = true;
-            this.cbxNtpError.Checked = true;
-            this.cbxNtpError.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbxNtpError.Location = new System.Drawing.Point(512, 9);
-            this.cbxNtpError.Name = "cbxNtpError";
-            this.cbxNtpError.Size = new System.Drawing.Size(73, 17);
-            this.cbxNtpError.TabIndex = 0;
-            this.cbxNtpError.Text = "NTP Error";
-            this.cbxNtpError.UseVisualStyleBackColor = true;
-            this.cbxNtpError.CheckedChanged += new System.EventHandler(this.TimeDeltasTimeSourceChanged);
-            // 
-            // cbxNtpTime
-            // 
-            this.cbxNtpTime.AutoSize = true;
-            this.cbxNtpTime.Checked = true;
-            this.cbxNtpTime.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbxNtpTime.Location = new System.Drawing.Point(338, 9);
-            this.cbxNtpTime.Name = "cbxNtpTime";
-            this.cbxNtpTime.Size = new System.Drawing.Size(158, 17);
-            this.cbxNtpTime.TabIndex = 1;
-            this.cbxNtpTime.Text = "OccuRec\'s Reference Time";
-            this.cbxNtpTime.UseVisualStyleBackColor = true;
-            this.cbxNtpTime.CheckedChanged += new System.EventHandler(this.TimeDeltasTimeSourceChanged);
+            this.rbSystemTime.AutoSize = true;
+            this.rbSystemTime.Location = new System.Drawing.Point(177, 8);
+            this.rbSystemTime.Name = "rbSystemTime";
+            this.rbSystemTime.Size = new System.Drawing.Size(82, 17);
+            this.rbSystemTime.TabIndex = 3;
+            this.rbSystemTime.Text = "SystemTime";
+            this.rbSystemTime.UseVisualStyleBackColor = true;
             // 
             // rbSystemTimeAsFileTime
             // 
@@ -210,20 +166,102 @@
             this.rbSystemTimeAsFileTime.UseVisualStyleBackColor = true;
             this.rbSystemTimeAsFileTime.CheckedChanged += new System.EventHandler(this.TimeDeltasTimeSourceChanged);
             // 
-            // rbSystemTime
+            // cbxNtpTime
             // 
-            this.rbSystemTime.AutoSize = true;
-            this.rbSystemTime.Location = new System.Drawing.Point(177, 8);
-            this.rbSystemTime.Name = "rbSystemTime";
-            this.rbSystemTime.Size = new System.Drawing.Size(82, 17);
-            this.rbSystemTime.TabIndex = 3;
-            this.rbSystemTime.Text = "SystemTime";
-            this.rbSystemTime.UseVisualStyleBackColor = true;
+            this.cbxNtpTime.AutoSize = true;
+            this.cbxNtpTime.Checked = true;
+            this.cbxNtpTime.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cbxNtpTime.Location = new System.Drawing.Point(338, 9);
+            this.cbxNtpTime.Name = "cbxNtpTime";
+            this.cbxNtpTime.Size = new System.Drawing.Size(158, 17);
+            this.cbxNtpTime.TabIndex = 1;
+            this.cbxNtpTime.Text = "OccuRec\'s Reference Time";
+            this.cbxNtpTime.UseVisualStyleBackColor = true;
+            this.cbxNtpTime.CheckedChanged += new System.EventHandler(this.TimeDeltasTimeSourceChanged);
+            // 
+            // cbxNtpError
+            // 
+            this.cbxNtpError.AutoSize = true;
+            this.cbxNtpError.Checked = true;
+            this.cbxNtpError.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cbxNtpError.Location = new System.Drawing.Point(512, 9);
+            this.cbxNtpError.Name = "cbxNtpError";
+            this.cbxNtpError.Size = new System.Drawing.Size(73, 17);
+            this.cbxNtpError.TabIndex = 0;
+            this.cbxNtpError.Text = "NTP Error";
+            this.cbxNtpError.UseVisualStyleBackColor = true;
+            this.cbxNtpError.CheckedChanged += new System.EventHandler(this.TimeDeltasTimeSourceChanged);
+            // 
+            // cbxGraphType
+            // 
+            this.cbxGraphType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxGraphType.FormattingEnabled = true;
+            this.cbxGraphType.Items.AddRange(new object[] {
+            "Time Deltas - Lines",
+            "Time Deltas - Dots"});
+            this.cbxGraphType.Location = new System.Drawing.Point(6, 7);
+            this.cbxGraphType.Name = "cbxGraphType";
+            this.cbxGraphType.Size = new System.Drawing.Size(159, 21);
+            this.cbxGraphType.TabIndex = 0;
+            this.cbxGraphType.SelectedIndexChanged += new System.EventHandler(this.cbxGraphType_SelectedIndexChanged);
+            // 
+            // tabOCRErrors
+            // 
+            this.tabOCRErrors.Controls.Add(this.pbOcrErrorFrame);
+            this.tabOCRErrors.Controls.Add(this.pnlOcrErrorControl);
+            this.tabOCRErrors.Location = new System.Drawing.Point(4, 22);
+            this.tabOCRErrors.Name = "tabOCRErrors";
+            this.tabOCRErrors.Size = new System.Drawing.Size(807, 524);
+            this.tabOCRErrors.TabIndex = 2;
+            this.tabOCRErrors.Text = "OCR Errors";
+            this.tabOCRErrors.UseVisualStyleBackColor = true;
+            // 
+            // pbOcrErrorFrame
+            // 
+            this.pbOcrErrorFrame.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pbOcrErrorFrame.Location = new System.Drawing.Point(0, 41);
+            this.pbOcrErrorFrame.Name = "pbOcrErrorFrame";
+            this.pbOcrErrorFrame.Size = new System.Drawing.Size(807, 483);
+            this.pbOcrErrorFrame.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.pbOcrErrorFrame.TabIndex = 1;
+            this.pbOcrErrorFrame.TabStop = false;
+            // 
+            // pnlOcrErrorControl
+            // 
+            this.pnlOcrErrorControl.Controls.Add(this.lblOcrText);
+            this.pnlOcrErrorControl.Controls.Add(this.nudOcrErrorFrame);
+            this.pnlOcrErrorControl.Dock = System.Windows.Forms.DockStyle.Top;
+            this.pnlOcrErrorControl.Location = new System.Drawing.Point(0, 0);
+            this.pnlOcrErrorControl.Name = "pnlOcrErrorControl";
+            this.pnlOcrErrorControl.Size = new System.Drawing.Size(807, 41);
+            this.pnlOcrErrorControl.TabIndex = 0;
+            // 
+            // lblOcrText
+            // 
+            this.lblOcrText.AutoSize = true;
+            this.lblOcrText.Location = new System.Drawing.Point(114, 17);
+            this.lblOcrText.Name = "lblOcrText";
+            this.lblOcrText.Size = new System.Drawing.Size(0, 13);
+            this.lblOcrText.TabIndex = 1;
+            // 
+            // nudOcrErrorFrame
+            // 
+            this.nudOcrErrorFrame.Location = new System.Drawing.Point(10, 11);
+            this.nudOcrErrorFrame.Name = "nudOcrErrorFrame";
+            this.nudOcrErrorFrame.Size = new System.Drawing.Size(70, 20);
+            this.nudOcrErrorFrame.TabIndex = 0;
+            this.nudOcrErrorFrame.ValueChanged += new System.EventHandler(this.nudOcrErrorFrame_ValueChanged);
+            // 
+            // resizeUpdateTimer
+            // 
+            this.resizeUpdateTimer.Interval = 250;
+            this.resizeUpdateTimer.Tick += new System.EventHandler(this.resizeUpdateTimer_Tick);
             // 
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.graphsToolStripMenuItem});
+            this.graphsToolStripMenuItem,
+            this.miExport});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(815, 24);
@@ -253,7 +291,7 @@
             this.miCompleteGridlines.CheckOnClick = true;
             this.miCompleteGridlines.CheckState = System.Windows.Forms.CheckState.Checked;
             this.miCompleteGridlines.Name = "miCompleteGridlines";
-            this.miCompleteGridlines.Size = new System.Drawing.Size(152, 22);
+            this.miCompleteGridlines.Size = new System.Drawing.Size(126, 22);
             this.miCompleteGridlines.Text = "&Complete";
             this.miCompleteGridlines.Click += new System.EventHandler(this.GridlinesStyleChanged);
             // 
@@ -261,9 +299,20 @@
             // 
             this.miTickGridlines.CheckOnClick = true;
             this.miTickGridlines.Name = "miTickGridlines";
-            this.miTickGridlines.Size = new System.Drawing.Size(152, 22);
+            this.miTickGridlines.Size = new System.Drawing.Size(126, 22);
             this.miTickGridlines.Text = "&Ticks";
             this.miTickGridlines.Click += new System.EventHandler(this.GridlinesStyleChanged);
+            // 
+            // miExport
+            // 
+            this.miExport.Name = "miExport";
+            this.miExport.Size = new System.Drawing.Size(52, 20);
+            this.miExport.Text = "&Export";
+            this.miExport.Click += new System.EventHandler(this.miExport_Click);
+            // 
+            // saveFileDialog
+            // 
+            this.saveFileDialog.DefaultExt = "cvs";
             // 
             // frmAavStatusChannelOnlyView
             // 
@@ -282,11 +331,16 @@
             this.ResizeEnd += new System.EventHandler(this.frmAavStatusChannelOnlyView_ResizeEnd);
             this.tabControl.ResumeLayout(false);
             this.tabOverview.ResumeLayout(false);
-            this.tabGraph.ResumeLayout(false);
-            this.pnlGraph.ResumeLayout(false);
+            this.tabGraphs.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pbGraph)).EndInit();
+            this.pnlGraph.ResumeLayout(false);
             this.pnlTimeDeltaConfig.ResumeLayout(false);
             this.pnlTimeDeltaConfig.PerformLayout();
+            this.tabOCRErrors.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pbOcrErrorFrame)).EndInit();
+            this.pnlOcrErrorControl.ResumeLayout(false);
+            this.pnlOcrErrorControl.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudOcrErrorFrame)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
@@ -298,9 +352,8 @@
 
         private System.Windows.Forms.TabControl tabControl;
         private System.Windows.Forms.TabPage tabOverview;
-        private System.Windows.Forms.TabPage tabGraph;
+        private System.Windows.Forms.TabPage tabGraphs;
         private System.Windows.Forms.TabPage tabOCRErrors;
-        private System.Windows.Forms.TabPage tabExport;
         private System.Windows.Forms.ProgressBar pbLoadData;
         private System.Windows.Forms.Panel pnlGraph;
         private System.Windows.Forms.PictureBox pbGraph;
@@ -316,5 +369,11 @@
         private System.Windows.Forms.ToolStripMenuItem gridlinesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem miCompleteGridlines;
         private System.Windows.Forms.ToolStripMenuItem miTickGridlines;
+        private System.Windows.Forms.Panel pnlOcrErrorControl;
+        private System.Windows.Forms.Label lblOcrText;
+        private System.Windows.Forms.NumericUpDown nudOcrErrorFrame;
+        private System.Windows.Forms.PictureBox pbOcrErrorFrame;
+        private System.Windows.Forms.ToolStripMenuItem miExport;
+        private System.Windows.Forms.SaveFileDialog saveFileDialog;
     }
 }

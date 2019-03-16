@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using Tangra.Controller;
 using Tangra.Model.Video;
 using Tangra.Model.VideoOperations;
@@ -22,6 +23,8 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
         public void ShowModal(IVideoController videoController)
         {
             var frm = new frmAavStatusChannelOnlyView((VideoController)videoController, m_AAV);
+            frm.StartPosition = FormStartPosition.CenterParent;
+
             ((VideoController)videoController).ShowForm(frm);
         }
     }

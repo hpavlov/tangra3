@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -51,12 +52,10 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
 
         public DateTime FromDateTime;
         public DateTime ToDateTime;
-        public bool IsDataReady { get; private set; }
 
         public AavTimeAnalyser(AstroDigitalVideoStream aav)
         {
             m_Aav = aav;
-            IsDataReady = false;
         }
 
         public void Initialize(Action<int, int> progressCallback)
@@ -279,7 +278,33 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                     ToDateTime = Entries.Last().ReferenceTime;
                 }
 
-                IsDataReady = true;
+                progressCallback(0, 0);
+            });
+        }
+
+        public void ExportData(string fileName, Action<int, int> progressCallback)
+        {
+            Task.Run(() =>
+            {
+                progressCallback(0, Entries.Count);
+
+                var output = new StringBuilder();
+                output.AppendLine("Delta SystemTimePreciseAdFileTime (ms),Delta SystemTime(ms),Delta OccuRecTime (ms),3-Sigma NTP Error(ms)");
+
+                int i = 0;
+                foreach (var entry in Entries)
+                {
+                    output.AppendFormat(CultureInfo.InvariantCulture, "{0:0.000},{1:0.0},{2:0.000},{3:0.0}\r\n", entry.DeltaSystemFileTimeMs, entry.DeltaSystemTimeMs, entry.DeltaNTPTimeMs, entry.NTPErrorMs);
+
+                    i++;
+                    if (i % 100 == 0)
+                    {
+                        progressCallback(i, Entries.Count);
+                    }
+                }
+
+                File.WriteAllText(fileName, output.ToString());
+
                 progressCallback(0, 0);
             });
         }
