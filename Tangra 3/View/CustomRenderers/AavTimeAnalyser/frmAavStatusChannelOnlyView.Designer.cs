@@ -28,15 +28,22 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmAavStatusChannelOnlyView));
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabOverview = new System.Windows.Forms.TabPage();
+            this.pbLoadData = new System.Windows.Forms.ProgressBar();
             this.tabGraph = new System.Windows.Forms.TabPage();
             this.tabDebugFrames = new System.Windows.Forms.TabPage();
             this.tabExport = new System.Windows.Forms.TabPage();
-            this.pbLoadData = new System.Windows.Forms.ProgressBar();
+            this.pnlGraph = new System.Windows.Forms.Panel();
+            this.pbGraph = new System.Windows.Forms.PictureBox();
+            this.resizeUpdateTimer = new System.Windows.Forms.Timer(this.components);
             this.tabControl.SuspendLayout();
             this.tabOverview.SuspendLayout();
+            this.tabGraph.SuspendLayout();
+            this.pnlGraph.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pbGraph)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl
@@ -63,8 +70,18 @@
             this.tabOverview.Text = "Overview";
             this.tabOverview.UseVisualStyleBackColor = true;
             // 
+            // pbLoadData
+            // 
+            this.pbLoadData.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.pbLoadData.Location = new System.Drawing.Point(17, 17);
+            this.pbLoadData.Name = "pbLoadData";
+            this.pbLoadData.Size = new System.Drawing.Size(715, 23);
+            this.pbLoadData.TabIndex = 0;
+            // 
             // tabGraph
             // 
+            this.tabGraph.Controls.Add(this.pnlGraph);
             this.tabGraph.Location = new System.Drawing.Point(4, 22);
             this.tabGraph.Name = "tabGraph";
             this.tabGraph.Padding = new System.Windows.Forms.Padding(3);
@@ -91,14 +108,28 @@
             this.tabExport.Text = "Export";
             this.tabExport.UseVisualStyleBackColor = true;
             // 
-            // pbLoadData
+            // pnlGraph
             // 
-            this.pbLoadData.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.pbLoadData.Location = new System.Drawing.Point(17, 17);
-            this.pbLoadData.Name = "pbLoadData";
-            this.pbLoadData.Size = new System.Drawing.Size(715, 23);
-            this.pbLoadData.TabIndex = 0;
+            this.pnlGraph.Controls.Add(this.pbGraph);
+            this.pnlGraph.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlGraph.Location = new System.Drawing.Point(3, 3);
+            this.pnlGraph.Name = "pnlGraph";
+            this.pnlGraph.Size = new System.Drawing.Size(743, 492);
+            this.pnlGraph.TabIndex = 0;
+            // 
+            // pbGraph
+            // 
+            this.pbGraph.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pbGraph.Location = new System.Drawing.Point(0, 0);
+            this.pbGraph.Name = "pbGraph";
+            this.pbGraph.Size = new System.Drawing.Size(743, 492);
+            this.pbGraph.TabIndex = 0;
+            this.pbGraph.TabStop = false;
+            // 
+            // resizeUpdateTimer
+            // 
+            this.resizeUpdateTimer.Interval = 250;
+            this.resizeUpdateTimer.Tick += new System.EventHandler(this.resizeUpdateTimer_Tick);
             // 
             // frmAavStatusChannelOnlyView
             // 
@@ -112,8 +143,12 @@
             this.Name = "frmAavStatusChannelOnlyView";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Load += new System.EventHandler(this.frmAavStatusChannelOnlyView_Load);
+            this.ResizeEnd += new System.EventHandler(this.frmAavStatusChannelOnlyView_ResizeEnd);
             this.tabControl.ResumeLayout(false);
             this.tabOverview.ResumeLayout(false);
+            this.tabGraph.ResumeLayout(false);
+            this.pnlGraph.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pbGraph)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -126,5 +161,8 @@
         private System.Windows.Forms.TabPage tabDebugFrames;
         private System.Windows.Forms.TabPage tabExport;
         private System.Windows.Forms.ProgressBar pbLoadData;
+        private System.Windows.Forms.Panel pnlGraph;
+        private System.Windows.Forms.PictureBox pbGraph;
+        private System.Windows.Forms.Timer resizeUpdateTimer;
     }
 }
