@@ -55,6 +55,7 @@
             this.miTickGridlines = new System.Windows.Forms.ToolStripMenuItem();
             this.miExport = new System.Windows.Forms.ToolStripMenuItem();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.miSubset = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl.SuspendLayout();
             this.tabOverview.SuspendLayout();
             this.tabGraphs.SuspendLayout();
@@ -271,6 +272,7 @@
             // graphsToolStripMenuItem
             // 
             this.graphsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miSubset,
             this.gridlinesToolStripMenuItem});
             this.graphsToolStripMenuItem.Name = "graphsToolStripMenuItem";
             this.graphsToolStripMenuItem.Size = new System.Drawing.Size(56, 20);
@@ -291,7 +293,7 @@
             this.miCompleteGridlines.CheckOnClick = true;
             this.miCompleteGridlines.CheckState = System.Windows.Forms.CheckState.Checked;
             this.miCompleteGridlines.Name = "miCompleteGridlines";
-            this.miCompleteGridlines.Size = new System.Drawing.Size(126, 22);
+            this.miCompleteGridlines.Size = new System.Drawing.Size(152, 22);
             this.miCompleteGridlines.Text = "&Complete";
             this.miCompleteGridlines.Click += new System.EventHandler(this.GridlinesStyleChanged);
             // 
@@ -299,7 +301,7 @@
             // 
             this.miTickGridlines.CheckOnClick = true;
             this.miTickGridlines.Name = "miTickGridlines";
-            this.miTickGridlines.Size = new System.Drawing.Size(126, 22);
+            this.miTickGridlines.Size = new System.Drawing.Size(152, 22);
             this.miTickGridlines.Text = "&Ticks";
             this.miTickGridlines.Click += new System.EventHandler(this.GridlinesStyleChanged);
             // 
@@ -313,6 +315,13 @@
             // saveFileDialog
             // 
             this.saveFileDialog.DefaultExt = "cvs";
+            // 
+            // miSubset
+            // 
+            this.miSubset.Name = "miSubset";
+            this.miSubset.Size = new System.Drawing.Size(152, 22);
+            this.miSubset.Text = "&Subset";
+            this.miSubset.Click += new System.EventHandler(this.miSubset_Click);
             // 
             // frmAavStatusChannelOnlyView
             // 
@@ -375,5 +384,6 @@
         private System.Windows.Forms.PictureBox pbOcrErrorFrame;
         private System.Windows.Forms.ToolStripMenuItem miExport;
         private System.Windows.Forms.SaveFileDialog saveFileDialog;
+        private System.Windows.Forms.ToolStripMenuItem miSubset;
     }
 }

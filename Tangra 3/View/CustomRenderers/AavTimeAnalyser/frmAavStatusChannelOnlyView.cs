@@ -43,6 +43,8 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
 
         private int m_LastGraphWidth;
         private int m_LastGraphHeight;
+        private int? m_PlotFromIndex = null;
+        private int? m_PlotToIndex = null;
 
         const float MIN_PIX_DIFF = 1f;
 
@@ -168,28 +170,75 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
 
                 float maxDelta = 0;
                 float minDelta = 0;
+
+                bool isSubset = m_PlotFromIndex.HasValue && m_PlotToIndex.HasValue;
+                IEnumerable<TimeAnalyserEntry> subsetEnum = null;
+                if (isSubset)
+                {
+                    subsetEnum = m_TimeAnalyser.Entries.Skip(m_PlotFromIndex.Value).Take(m_PlotToIndex.Value);
+                }
+                
                 if (plotSystemTime)
                 {
-                    minDelta = m_TimeAnalyser.MinDeltaSystemTimeMs;
-                    maxDelta = m_TimeAnalyser.MaxDeltaSystemTimeMs;
+                    if (isSubset)
+                    {
+                        minDelta = subsetEnum.Min(x => x.DeltaSystemTimeMs);
+                        maxDelta = subsetEnum.Max(x => x.DeltaSystemTimeMs);
+                    }
+                    else
+                    {
+                        minDelta = m_TimeAnalyser.MinDeltaSystemTimeMs;
+                        maxDelta = m_TimeAnalyser.MaxDeltaSystemTimeMs;
+                    }
                 }
                 else
                 {
-                    minDelta = m_TimeAnalyser.MinDeltaSystemFileTimeMs;
-                    maxDelta = m_TimeAnalyser.MaxDeltaSystemFileTimeMs;
+                    if (isSubset)
+                    {
+                        minDelta = subsetEnum.Min(x => x.DeltaSystemFileTimeMs);
+                        maxDelta = subsetEnum.Max(x => x.DeltaSystemFileTimeMs);
+                    }
+                    else
+                    {
+                        minDelta = m_TimeAnalyser.MinDeltaSystemFileTimeMs;
+                        maxDelta = m_TimeAnalyser.MaxDeltaSystemFileTimeMs;
+                    }
                 }
 
                 if (plotOccuRecTime)
                 {
-                    minDelta = Math.Min(minDelta, m_TimeAnalyser.MinDeltaNTPMs);
-                    maxDelta = Math.Max(maxDelta, m_TimeAnalyser.MaxDeltaNTPMs);
+                    if (isSubset)
+                    {
+                        var minNtpDelta = subsetEnum.Min(x => x.DeltaNTPTimeMs);
+                        var maxNtpDelta = subsetEnum.Max(x => x.DeltaNTPTimeMs);
+                        minDelta = Math.Min(minDelta, minNtpDelta);
+                        maxDelta = Math.Max(maxDelta, maxNtpDelta);
+                    }
+                    else
+                    {
+                        minDelta = Math.Min(minDelta, m_TimeAnalyser.MinDeltaNTPMs);
+                        maxDelta = Math.Max(maxDelta, m_TimeAnalyser.MaxDeltaNTPMs);
+                    }
                 }
 
                 if (plotNtpError)
                 {
-                    minDelta = Math.Min(minDelta, m_TimeAnalyser.MinDeltaNTPErrorMs);
-                    maxDelta = Math.Max(maxDelta, m_TimeAnalyser.MaxDeltaNTPErrorMs);
+                    if (isSubset)
+                    {
+                        var maxNtpErr = subsetEnum.Max(x => x.NTPErrorMs);
+                        minDelta = Math.Min(minDelta, -maxNtpErr);
+                        maxDelta = Math.Max(maxDelta, maxNtpErr);
+                    }
+                    else
+                    {
+                        minDelta = Math.Min(minDelta, m_TimeAnalyser.MinDeltaNTPErrorMs);
+                        maxDelta = Math.Max(maxDelta, m_TimeAnalyser.MaxDeltaNTPErrorMs);
+                    }
                 }
+
+                // Extend the Y range by 50ms for better display
+                minDelta -= 50;
+                maxDelta += 50;
 
                 using (var g = Graphics.FromImage(image))
                 {
@@ -199,7 +248,9 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                     float width = graphWidth - padding - paddingX;
                     float height = graphHeight - 2 * paddingY;
                     float yFactor = height / (maxDelta - minDelta);
-                    float xFactor = width / (m_TimeAnalyser.Entries.Count);
+                    float minX = m_PlotFromIndex.HasValue ? m_PlotFromIndex.Value : 0;
+                    float maxX = m_PlotToIndex.HasValue ? m_PlotToIndex.Value : m_TimeAnalyser.Entries.Count - 1;
+                    float xFactor = width / (maxX - minX + 1);
 
                     g.FillRectangle(Brushes.WhiteSmoke, 0, 0, graphWidth, graphHeight);
 
@@ -260,8 +311,18 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                     foreach (var entry in m_TimeAnalyser.Entries)
                     {
                         if (entry.IsOutlier) continue;
+                        if (m_PlotFromIndex.HasValue && m_PlotFromIndex.Value > idx)
+                        {
+                            idx++;
+                            continue;
+                        }
+                        if (m_PlotToIndex.HasValue && m_PlotToIndex.Value < idx)
+                        {
+                            idx++;
+                            continue;
+                        }
 
-                        float x = paddingX + idx * xFactor;
+                        float x = paddingX + (idx - minX) * xFactor;
                         bool calcOnly = idx == 0;
 
                         if (plotNtpError)
@@ -506,6 +567,25 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
         private void OnExportFinished()
         {
             Process.Start(m_ExportFileName);
+        }
+
+        private void miSubset_Click(object sender, EventArgs e)
+        {
+            var frm = new frmChooseSubset(m_TimeAnalyser);
+            if (frm.ShowDialog(this) == DialogResult.OK)
+            {
+                if (frm.From == 0 && frm.To == m_TimeAnalyser.Entries.Count - 1)
+                {
+                    m_PlotFromIndex = null;
+                    m_PlotToIndex = null;
+                }
+                else
+                {
+                    m_PlotFromIndex = frm.From;
+                    m_PlotToIndex = frm.To;
+                }
+                DrawGraph();
+            }
         }
     }
 }
