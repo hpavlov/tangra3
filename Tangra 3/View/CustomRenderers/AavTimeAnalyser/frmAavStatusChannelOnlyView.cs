@@ -21,7 +21,8 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
         {
             gtNone,
             gtTimeDeltasLines,
-            gtTimeDeltasDots
+            gtTimeDeltasDots,
+            gtSystemUtilisation
         }
 
         internal enum GridlineStyle
@@ -141,6 +142,9 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                 case GraphType.gtTimeDeltasLines:
                 case GraphType.gtTimeDeltasDots:
                     DrawTimeDeltasGraph();
+                    break;
+                case GraphType.gtSystemUtilisation:
+                    DrawSystemUtilisationGraph();
                     break;
             }
         }
@@ -475,6 +479,148 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
 
         }
 
+
+        private void DrawSystemUtilisationGraph()
+        {
+            Cursor = Cursors.WaitCursor;
+
+            int graphWidth = pbGraph.Width;
+            int graphHeight = pbGraph.Height;
+
+            bool tickGridlines = m_GraphConfig.GridlineStyle == GridlineStyle.Tick;
+
+            var image = new Bitmap(graphWidth, graphHeight, PixelFormat.Format24bppRgb);
+
+            Task.Run(() =>
+            {
+                Pen CpuPen = Pens.Blue;
+                Pen DisksPen = Pens.Red;
+
+                using (var g = Graphics.FromImage(image))
+                {
+                    float padding = 10;
+                    float paddingX = 45;
+                    float paddingY = 25;
+                    float width = graphWidth - padding - paddingX;
+                    float height = graphHeight - 2*paddingY;
+                    float yFactor = height/100.0f; // 100% Max
+                    float minX = 0;
+                    float maxX = m_TimeAnalyser.SystemUtilisation.Count - 1;
+                    float xFactor = width/(maxX - minX + 1);
+
+                    g.FillRectangle(Brushes.WhiteSmoke, 0, 0, graphWidth, graphHeight);
+
+                    for (int ya = 0; ya <= 100; ya += 10)
+                    {
+                        float y = graphHeight - paddingY - yFactor * ya;
+                        if (y < paddingY || y > graphHeight - paddingY) continue;
+
+                        if (tickGridlines && ya != 0 /* The zero grid line is fully drawn even in 'tick' mode */)
+                        {
+                            g.DrawLine(Pens.Gray, paddingX, y, paddingX + 5, y);
+                            g.DrawLine(Pens.Gray, graphWidth - padding - 5, y, graphWidth - padding, y);
+                        }
+                        else
+                        {
+                            g.DrawLine(Pens.Gray, paddingX, y, graphWidth - padding, y);
+                        }
+
+                        if (ya % 20 == 0)
+                        {
+                            var label = string.Format("{0}%", ya);
+                            var sizF = g.MeasureString(label, DefaultFont);
+                            g.DrawString(label, DefaultFont, Brushes.Black, paddingX - sizF.Width - 5, y - sizF.Height / 2);
+                        }
+                    }
+
+                    int idx = 0;
+                    float xp = 0;
+                    float y1p = 0;
+                    float y2p = 0;
+
+                    foreach (var utilEntry in m_TimeAnalyser.SystemUtilisation)
+                    {
+                        float x = paddingX + idx * xFactor;
+                        float y1 = graphHeight - paddingY - yFactor * utilEntry.CpuUtilisation;
+                        float y2 = graphHeight - paddingY - yFactor * Math.Min(100, utilEntry.DiskUtilisation); // NOTE: Disk utilisation of more than 100% is possible when there are more than 1 disks
+
+                        if (idx > 0)
+                        {
+                            g.DrawLine(CpuPen, xp, y1p, x, y1);
+                            g.DrawLine(DisksPen, xp, y2p, x, y2);
+                        }
+
+                        xp = x;
+                        y1p = y1;
+                        y2p = y2;
+
+                        idx++;
+                    }
+
+                    g.DrawRectangle(Pens.Black, paddingX, paddingY, graphWidth - padding - paddingX, graphHeight - 2 * paddingY);
+
+                    var title = string.Format("System utilisation between {0} UT and {1} UT", m_TimeAnalyser.FromDateTime.ToString("dd-MMM HH:mm"), m_TimeAnalyser.ToDateTime.ToString("dd-MMM HH:mm"));
+                    var sizeF = g.MeasureString(title, m_TitleFont);
+                    g.DrawString(title, m_TitleFont, Brushes.Black, (width - sizeF.Width) / 2 + paddingX, (paddingY - sizeF.Height) / 2);
+
+                    var thirdW = width / 3;
+                    int legPos = -1;
+                    for (int i = 0; i < 2; i++)
+                    {
+                        string legend = "";
+                        Pen legendPen = Pens.Black;
+                        if (i == 0)
+                        {
+                            legend = "CPU Utilisation";
+                            legendPen = CpuPen;
+                        }
+                        else if (i == 1)
+                        {
+                            legend = "All Disks Utilisation";
+                            legendPen = DisksPen;
+                        }
+
+                        legPos++;
+
+                        sizeF = g.MeasureString(legend, m_TitleFont);
+                        var y = paddingY + height + sizeF.Height / 2;
+                        var yl = paddingY + height + sizeF.Height;
+                        g.DrawString(legend, m_TitleFont, Brushes.Black, (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW + 15, y);
+                        g.DrawLine(legendPen, (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW, yl - 1, 6 + (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW, yl - 1);
+                        g.DrawLine(legendPen, (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW, yl, 6 + (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW, yl);
+                        g.DrawLine(legendPen, (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW, yl + 1, 6 + (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW, yl + 1);
+                    }
+
+                    g.Save();
+                }
+
+            }).ContinueWith((r) =>
+            {
+                if (r.IsCompleted)
+                {
+                    this.Invoke(new Action(() =>
+                    {
+                        if (pbGraph.Image != null)
+                        {
+                            pbGraph.Image.Dispose();
+                        }
+
+                        pbGraph.Image = image;
+                        pbGraph.Update();
+
+                        m_LastGraphWidth = pbGraph.Width;
+                        m_LastGraphHeight = pbGraph.Height;
+
+                        Cursor = Cursors.Default;
+                    }));
+                }
+                else
+                {
+                    Cursor = Cursors.Default;
+                }
+            });
+        }
+
         private void resizeUpdateTimer_Tick(object sender, EventArgs e)
         {
             resizeUpdateTimer.Enabled = false;
@@ -495,10 +641,17 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
             if (cbxGraphType.SelectedIndex == 0)
             {
                 m_GrapthType = GraphType.gtTimeDeltasLines;
+                pnlTimeDeltaConfig.Visible = true;
             }
             else if (cbxGraphType.SelectedIndex == 1)
             {
                 m_GrapthType = GraphType.gtTimeDeltasDots;
+                pnlTimeDeltaConfig.Visible = true;
+            }
+            else if (cbxGraphType.SelectedIndex == 2)
+            {
+                m_GrapthType = GraphType.gtSystemUtilisation;
+                pnlTimeDeltaConfig.Visible = false;
             }
 
             DrawGraph();

@@ -50,12 +50,12 @@
             this.resizeUpdateTimer = new System.Windows.Forms.Timer(this.components);
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.graphsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.miSubset = new System.Windows.Forms.ToolStripMenuItem();
             this.gridlinesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.miCompleteGridlines = new System.Windows.Forms.ToolStripMenuItem();
             this.miTickGridlines = new System.Windows.Forms.ToolStripMenuItem();
             this.miExport = new System.Windows.Forms.ToolStripMenuItem();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.miSubset = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl.SuspendLayout();
             this.tabOverview.SuspendLayout();
             this.tabGraphs.SuspendLayout();
@@ -199,7 +199,8 @@
             this.cbxGraphType.FormattingEnabled = true;
             this.cbxGraphType.Items.AddRange(new object[] {
             "Time Deltas - Lines",
-            "Time Deltas - Dots"});
+            "Time Deltas - Dots",
+            "System Utilisation"});
             this.cbxGraphType.Location = new System.Drawing.Point(6, 7);
             this.cbxGraphType.Name = "cbxGraphType";
             this.cbxGraphType.Size = new System.Drawing.Size(159, 21);
@@ -278,13 +279,20 @@
             this.graphsToolStripMenuItem.Size = new System.Drawing.Size(56, 20);
             this.graphsToolStripMenuItem.Text = "&Graphs";
             // 
+            // miSubset
+            // 
+            this.miSubset.Name = "miSubset";
+            this.miSubset.Size = new System.Drawing.Size(120, 22);
+            this.miSubset.Text = "&Subset";
+            this.miSubset.Click += new System.EventHandler(this.miSubset_Click);
+            // 
             // gridlinesToolStripMenuItem
             // 
             this.gridlinesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.miCompleteGridlines,
             this.miTickGridlines});
             this.gridlinesToolStripMenuItem.Name = "gridlinesToolStripMenuItem";
-            this.gridlinesToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.gridlinesToolStripMenuItem.Size = new System.Drawing.Size(120, 22);
             this.gridlinesToolStripMenuItem.Text = "&Gridlines";
             // 
             // miCompleteGridlines
@@ -293,7 +301,7 @@
             this.miCompleteGridlines.CheckOnClick = true;
             this.miCompleteGridlines.CheckState = System.Windows.Forms.CheckState.Checked;
             this.miCompleteGridlines.Name = "miCompleteGridlines";
-            this.miCompleteGridlines.Size = new System.Drawing.Size(152, 22);
+            this.miCompleteGridlines.Size = new System.Drawing.Size(126, 22);
             this.miCompleteGridlines.Text = "&Complete";
             this.miCompleteGridlines.Click += new System.EventHandler(this.GridlinesStyleChanged);
             // 
@@ -301,7 +309,7 @@
             // 
             this.miTickGridlines.CheckOnClick = true;
             this.miTickGridlines.Name = "miTickGridlines";
-            this.miTickGridlines.Size = new System.Drawing.Size(152, 22);
+            this.miTickGridlines.Size = new System.Drawing.Size(126, 22);
             this.miTickGridlines.Text = "&Ticks";
             this.miTickGridlines.Click += new System.EventHandler(this.GridlinesStyleChanged);
             // 
@@ -315,13 +323,6 @@
             // saveFileDialog
             // 
             this.saveFileDialog.DefaultExt = "cvs";
-            // 
-            // miSubset
-            // 
-            this.miSubset.Name = "miSubset";
-            this.miSubset.Size = new System.Drawing.Size(152, 22);
-            this.miSubset.Text = "&Subset";
-            this.miSubset.Click += new System.EventHandler(this.miSubset_Click);
             // 
             // frmAavStatusChannelOnlyView
             // 

@@ -32,14 +32,35 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
         public bool IsOutlier;
     }
 
+    public class SystemUtilisationEntry
+    {
+        public float CpuUtilisation;
+        public float DiskUtilisation;
+        public float FreeMemory;
+    }
+
     public class AavTimeAnalyser
     {
         private AstroDigitalVideoStream m_Aav;
         private FileStream m_File;
         private BinaryReader m_Reader;
 
+        private int m_AppliedNtpTimeCorr = 0;
+        private float m_FrameDurationMs = 40;
+
+        // The NTP time has already an applied fixed correction before it is saved in the AAV file. The time we would like to plot is based on the NTP timestamp at the end of the frame
+        // We subtract half a frame duration to get the expected mid-frame time. We do not correct for:
+        //    A) The the unknown delay between the moment the frame has been received by the frame grabber and the moment the frame was made available to OccuRec for recording
+        //    B) The elapsed time from the actual optical exposure to the moment the frame has been timestamped by IOTA-VTI
+        private float m_CorrNtpTimeMs = 60 - 20; // By default assume PAL and 60ms default config in OccuRec for CAPHNTP-TIMING-CORRECTION
+
+        // The system time recorded by OccuRec is the time when we received the frame. We correct it for half frame duration to make it the expected mid-frame time
+        // This is something that any recording software could (and should) do. We do not correct for the unknown acqusition delay - (A) above
+        private float m_CorrSystemTimeMs = -20; // By default assume PAL
+
         public List<TimeAnalyserEntry> Entries = new List<TimeAnalyserEntry>();
         public List<TimeAnalyserEntry> DebugFrames = new List<TimeAnalyserEntry>();
+        public List<SystemUtilisationEntry>  SystemUtilisation = new List<SystemUtilisationEntry>();
 
         public float MinDeltaNTPMs;
         public float MaxDeltaNTPMs;
@@ -50,12 +71,31 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
         public float MinDeltaSystemFileTimeMs;
         public float MaxDeltaSystemFileTimeMs;
 
+        public float MaxFreeMemoryMb;
+        public float MinFreeMemoryMb;
+        public float MaxDiskUsage;
+
         public DateTime FromDateTime;
         public DateTime ToDateTime;
 
         public AavTimeAnalyser(AstroDigitalVideoStream aav)
         {
             m_Aav = aav;
+
+            float frameRate = 40;
+            if (float.TryParse(m_Aav.GetFileTag("NATIVE-FRAME-RATE"), out frameRate))
+            {
+                m_FrameDurationMs = 1000.0f / frameRate;
+            }
+
+            int ntpAppliedCorr = 60;
+            if (int.TryParse(m_Aav.GetFileTag("CAPHNTP-TIMING-CORRECTION"), out ntpAppliedCorr))
+            {
+                m_AppliedNtpTimeCorr = ntpAppliedCorr;
+            }
+
+            m_CorrNtpTimeMs = ntpAppliedCorr - frameRate / 2.0f;
+            m_CorrSystemTimeMs = -frameRate / 2.0f;
         }
 
         public void Initialize(Action<int, int> progressCallback)
@@ -67,12 +107,22 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                 var aavFile = AdvFile.OpenFile(m_Aav.FileName);
                 aavFile.Close();
 
+                // This is the system timestamp retrieved by the system when the frame was saved to disk.
                 var SYSTEM_TIME_TAG = aavFile.StatusSection.TagDefinitions.SingleOrDefault(x => x.Name == "SystemTime");
+
+                // This is the system timestamp retrieved by the system when the frame was received.
                 var SYSTEM_TIME_FT_TAG = aavFile.StatusSection.TagDefinitions.SingleOrDefault(x => x.Name == "SystemTimeFileTime");
+
+                // This is the NTP timestamp retrieved by the system when the frame was received. It has been corrected for the configured 'Calibration Correction' in OccuRec
                 var NTP_TIME_TAG = aavFile.StatusSection.TagDefinitions.SingleOrDefault(x => x.Name == "NTPEndTimestamp");
+
                 var NTP_ERROR_TAG = aavFile.StatusSection.TagDefinitions.SingleOrDefault(x => x.Name == "NTPTimestampError");
                 var OCR_DEBUG_1_TAG = aavFile.StatusSection.TagDefinitions.SingleOrDefault(x => x.Name == "StartFrameTimestamp");
                 var OCR_DEBUG_2_TAG = aavFile.StatusSection.TagDefinitions.SingleOrDefault(x => x.Name == "EndFrameTimestamp");
+
+                 var CPU_USAGE_TAG = aavFile.StatusSection.TagDefinitions.SingleOrDefault(x => x.Name == "CpuUtilisation");
+                 var DISK_USAGE_TAG = aavFile.StatusSection.TagDefinitions.SingleOrDefault(x => x.Name == "DisksUtilisation");
+                 var FREE_MEMORY_TAG = aavFile.StatusSection.TagDefinitions.SingleOrDefault(x => x.Name == "FreeMemoryMb");
 
                 float maxDeltaSys = 0;
                 float minDeltaSys = 0;
@@ -82,6 +132,9 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                 float minDeltaNtp = 0;
                 float maxNtpError = 0;
                 float minNtpError = 0;
+                float maxFreeMemory = 0;
+                float minFreeMemory = float.MaxValue;
+                float maxDiskUsage = 0;
 
                 using (FileStream file = new FileStream(m_Aav.FileName, FileMode.Open, FileAccess.Read, FileShare.Read))
                 using (BinaryReader reader = new BinaryReader(file))
@@ -129,22 +182,22 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
 
                         if (SYSTEM_TIME_TAG != null && statusSection.TagValues.TryGetValue(SYSTEM_TIME_TAG, out tagVal))
                         {
-                            entry.SystemTime = AdvFile.ADV_ZERO_DATE_REF.AddMilliseconds(long.Parse(tagVal));
+                            entry.SystemTime = AdvFile.ADV_ZERO_DATE_REF.AddMilliseconds(long.Parse(tagVal)).AddMilliseconds(m_CorrSystemTimeMs);
                             entry.DeltaSystemTimeMs = (float)new TimeSpan(entry.SystemTime.Ticks - referenceTimeTicks).TotalMilliseconds;
                         }
                         if (SYSTEM_TIME_FT_TAG != null && statusSection.TagValues.TryGetValue(SYSTEM_TIME_FT_TAG, out tagVal))
                         {
-                            entry.SystemTimeFileTime = DateTime.FromFileTime(long.Parse(tagVal));
+                            entry.SystemTimeFileTime = DateTime.FromFileTime(long.Parse(tagVal)).AddMilliseconds(m_CorrSystemTimeMs);
                             entry.DeltaSystemFileTimeMs = (float)new TimeSpan(entry.SystemTimeFileTime.Ticks - referenceTimeTicks).TotalMilliseconds;
                         }
                         if (NTP_TIME_TAG != null && statusSection.TagValues.TryGetValue(NTP_TIME_TAG, out tagVal))
                         {
-                            entry.NTPTime = AdvFile.ADV_ZERO_DATE_REF.AddMilliseconds(long.Parse(tagVal));
+                            entry.NTPTime = AdvFile.ADV_ZERO_DATE_REF.AddMilliseconds(long.Parse(tagVal)).AddMilliseconds(m_CorrNtpTimeMs);
                             entry.DeltaNTPTimeMs = (float)new TimeSpan(entry.NTPTime.Ticks - referenceTimeTicks).TotalMilliseconds;
                         }
                         if (NTP_ERROR_TAG != null && statusSection.TagValues.TryGetValue(NTP_ERROR_TAG, out tagVal))
                         {
-                            entry.NTPErrorMs = 3 * int.Parse(tagVal) / 10.0f; // 0.1MS converted to MS and then taken as 3-Sigma
+                            entry.NTPErrorMs = 3 * int.Parse(tagVal) / 10.0f; // Value recorded in 0.1MS, converted to MS and then taken as 3-Sigma
                         }
 
                         Entries.Add(entry);
@@ -251,6 +304,26 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                             }
                         }
 
+                        if (CPU_USAGE_TAG != null && statusSection.TagValues.TryGetValue(CPU_USAGE_TAG, out tagVal))
+                        {
+                            float cpuUsage = float.Parse(tagVal, CultureInfo.InvariantCulture);
+                            float diskUsage = 0;
+                            float freeMemory = 0;
+                            if (DISK_USAGE_TAG != null && statusSection.TagValues.TryGetValue(DISK_USAGE_TAG, out tagVal))
+                            {
+                                diskUsage = float.Parse(tagVal, CultureInfo.InvariantCulture);
+                                if (maxDiskUsage < diskUsage) maxDiskUsage = diskUsage;
+                            }
+
+                            if (FREE_MEMORY_TAG != null && statusSection.TagValues.TryGetValue(FREE_MEMORY_TAG, out tagVal))
+                            {
+                                freeMemory = float.Parse(tagVal, CultureInfo.InvariantCulture);
+                                if (maxFreeMemory < freeMemory) maxFreeMemory = freeMemory;
+                                if (minFreeMemory > freeMemory) minFreeMemory = freeMemory;
+                            }
+                            SystemUtilisation.Add(new SystemUtilisationEntry() { CpuUtilisation = cpuUsage, DiskUtilisation = diskUsage, FreeMemory = freeMemory });
+                        }
+
                         i++;
                         if (i % 100 == 0)
                         {
@@ -271,6 +344,9 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                 MaxDeltaSystemTimeMs = maxDeltaSys;
                 MinDeltaSystemFileTimeMs = minDeltaSysF;
                 MaxDeltaSystemFileTimeMs = maxDeltaSysF;
+                MinFreeMemoryMb = minFreeMemory;
+                MaxFreeMemoryMb = maxFreeMemory;
+                MaxDiskUsage = maxDiskUsage;
 
                 if (Entries.Count > 0)
                 {
