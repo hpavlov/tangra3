@@ -200,7 +200,9 @@
             this.cbxGraphType.Items.AddRange(new object[] {
             "Time Deltas - Lines",
             "Time Deltas - Dots",
-            "System Utilisation"});
+            "System Utilisation",
+            "NTP Updates",
+            "NTP Updates & Unapplied"});
             this.cbxGraphType.Location = new System.Drawing.Point(6, 7);
             this.cbxGraphType.Name = "cbxGraphType";
             this.cbxGraphType.Size = new System.Drawing.Size(159, 21);
@@ -282,7 +284,7 @@
             // miSubset
             // 
             this.miSubset.Name = "miSubset";
-            this.miSubset.Size = new System.Drawing.Size(120, 22);
+            this.miSubset.Size = new System.Drawing.Size(152, 22);
             this.miSubset.Text = "&Subset";
             this.miSubset.Click += new System.EventHandler(this.miSubset_Click);
             // 
@@ -292,7 +294,7 @@
             this.miCompleteGridlines,
             this.miTickGridlines});
             this.gridlinesToolStripMenuItem.Name = "gridlinesToolStripMenuItem";
-            this.gridlinesToolStripMenuItem.Size = new System.Drawing.Size(120, 22);
+            this.gridlinesToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.gridlinesToolStripMenuItem.Text = "&Gridlines";
             // 
             // miCompleteGridlines

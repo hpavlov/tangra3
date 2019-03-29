@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Tangra.Model.Image;
 using Tangra.PInvoke;
@@ -39,6 +40,13 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
         public float FreeMemory;
     }
 
+    public class NtpUpdateEntry
+    {
+        public bool Updated;
+        public float Delta;
+        public float Latency;
+    }
+
     public class AavTimeAnalyser
     {
         private AstroDigitalVideoStream m_Aav;
@@ -61,6 +69,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
         public List<TimeAnalyserEntry> Entries = new List<TimeAnalyserEntry>();
         public List<TimeAnalyserEntry> DebugFrames = new List<TimeAnalyserEntry>();
         public List<SystemUtilisationEntry>  SystemUtilisation = new List<SystemUtilisationEntry>();
+        public List<NtpUpdateEntry> NtpUpdates = new List<NtpUpdateEntry>(); 
 
         public float MinDeltaNTPMs;
         public float MaxDeltaNTPMs;
@@ -183,11 +192,16 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                         if (SYSTEM_TIME_TAG != null && statusSection.TagValues.TryGetValue(SYSTEM_TIME_TAG, out tagVal))
                         {
                             entry.SystemTime = AdvFile.ADV_ZERO_DATE_REF.AddMilliseconds(long.Parse(tagVal)).AddMilliseconds(m_CorrSystemTimeMs);
+                            if (entry.SystemTime.Day + 1 == entry.ReferenceTime.Day)
+                            {
+                                entry.ReferenceTime = entry.ReferenceTime.AddDays(-1);
+                                referenceTimeTicks = entry.ReferenceTime.Ticks;
+                            }
                             entry.DeltaSystemTimeMs = (float)new TimeSpan(entry.SystemTime.Ticks - referenceTimeTicks).TotalMilliseconds;
                         }
                         if (SYSTEM_TIME_FT_TAG != null && statusSection.TagValues.TryGetValue(SYSTEM_TIME_FT_TAG, out tagVal))
                         {
-                            entry.SystemTimeFileTime = DateTime.FromFileTime(long.Parse(tagVal)).AddMilliseconds(m_CorrSystemTimeMs);
+                            entry.SystemTimeFileTime = new DateTime(long.Parse(tagVal)).AddMilliseconds(m_CorrSystemTimeMs);
                             entry.DeltaSystemFileTimeMs = (float)new TimeSpan(entry.SystemTimeFileTime.Ticks - referenceTimeTicks).TotalMilliseconds;
                         }
                         if (NTP_TIME_TAG != null && statusSection.TagValues.TryGetValue(NTP_TIME_TAG, out tagVal))
@@ -354,8 +368,32 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                     ToDateTime = Entries.Last().ReferenceTime;
                 }
 
+                var logFileName = Path.ChangeExtension(m_Aav.FileName, ".log");
+                if (File.Exists(logFileName))
+                {
+                    ExtractNTPLogData(logFileName);
+                }
+
                 progressCallback(0, 0);
             });
+        }
+
+        Regex NtpRegex = new Regex("Time (\\*NOT\\* )?Updated:\\s*Delta = ([0-9\\.\\-]+).*Latency = ([0-9\\.\\-]+)", RegexOptions.Compiled);
+
+        private void ExtractNTPLogData(string fileName)
+        {
+            var lines = File.ReadAllLines(fileName);
+            foreach (var line in lines)
+            {
+                var match = NtpRegex.Match(line);
+                if (match.Success)
+                {
+                    var updated = match.Groups[1].Value != "*NOT* ";
+                    float delta = float.Parse(match.Groups[2].Value);
+                    float latency = float.Parse(match.Groups[3].Value);
+                    NtpUpdates.Add(new NtpUpdateEntry() { Delta = delta, Latency = latency, Updated = updated });
+                }
+            }
         }
 
         public void ExportData(string fileName, Action<int, int> progressCallback)
