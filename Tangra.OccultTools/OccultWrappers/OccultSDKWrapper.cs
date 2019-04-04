@@ -270,6 +270,10 @@ namespace Tangra.OccultTools.OccultWrappers
                         if (!string.IsNullOrEmpty(cameraName))
                             ShieldedCall(() => m_AotaInstance.Set_VideoCamera(cameraName));
                     }
+                    else
+                    {
+                        MessageBox.Show(parentWindow, "The times to be given to AOTA are not corrected for instrumental delays.\r\n\r\nThis means that you are expected to select the video camera and apply these instrumental delays in AOTA.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
 
                     // Now go and set any comparison stars
                     for (int i = 0; i < dataProvider.NumberOfMeasuredComparisonObjects; i++)

@@ -596,17 +596,17 @@ namespace Tangra.VideoOperations.LightCurves
 
                 if (integratedFields > 0 && Footer.InstrumentalDelayConfig.ContainsKey(integratedFields / 2))
                 {
-                    bool isAAVOCR = Header.TimingType == MeasurementTimingType.OCRedTimeForEachFrame &&
+                    bool isAAVEnbedded = Header.TimingType == MeasurementTimingType.EmbeddedTimeForEachFrame &&
                                     Footer.AAVFrameIntegration > 1;
 
-                    if (!isAAVOCR)
+                    if (isAAVEnbedded)
                     {
                         // Apply correction: [FRAMETIME - ((1/2 * INTEGRATION PERIOD) - 1 FIELD) * (PAL or NTSC FrameRate) - GERHARD_CORRECTION(INTEGRATION PERIOD)]
                         corrEndFirstField = -1 * (((integratedFields / 2) - 1) * videoStandardFieldDurationSec); // Half frame back sets us at the begining of the first field, then add 1 field to get to the end of the field                        
                     }
                     else
                     {
-                        // In AAV OCR mode the timestamp that we have is already the end of the first video field so no correction required for that
+                        // In AAV OCR (or manual) mode the timestamp that we have is already the end of the first video field so no correction required for that
                         corrEndFirstField = 0;
                     }
 
