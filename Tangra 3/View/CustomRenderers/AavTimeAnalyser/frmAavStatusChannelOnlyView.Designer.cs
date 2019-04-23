@@ -56,6 +56,7 @@
             this.miTickGridlines = new System.Windows.Forms.ToolStripMenuItem();
             this.miExport = new System.Windows.Forms.ToolStripMenuItem();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.tbxAnalysisDetails = new System.Windows.Forms.TextBox();
             this.tabControl.SuspendLayout();
             this.tabOverview.SuspendLayout();
             this.tabGraphs.SuspendLayout();
@@ -84,6 +85,7 @@
             // tabOverview
             // 
             this.tabOverview.Controls.Add(this.pbLoadData);
+            this.tabOverview.Controls.Add(this.tbxAnalysisDetails);
             this.tabOverview.Location = new System.Drawing.Point(4, 22);
             this.tabOverview.Name = "tabOverview";
             this.tabOverview.Padding = new System.Windows.Forms.Padding(3);
@@ -284,7 +286,7 @@
             // miSubset
             // 
             this.miSubset.Name = "miSubset";
-            this.miSubset.Size = new System.Drawing.Size(152, 22);
+            this.miSubset.Size = new System.Drawing.Size(120, 22);
             this.miSubset.Text = "&Subset";
             this.miSubset.Click += new System.EventHandler(this.miSubset_Click);
             // 
@@ -294,7 +296,7 @@
             this.miCompleteGridlines,
             this.miTickGridlines});
             this.gridlinesToolStripMenuItem.Name = "gridlinesToolStripMenuItem";
-            this.gridlinesToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.gridlinesToolStripMenuItem.Size = new System.Drawing.Size(120, 22);
             this.gridlinesToolStripMenuItem.Text = "&Gridlines";
             // 
             // miCompleteGridlines
@@ -326,6 +328,21 @@
             // 
             this.saveFileDialog.DefaultExt = "cvs";
             // 
+            // tbxAnalysisDetails
+            // 
+            this.tbxAnalysisDetails.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbxAnalysisDetails.BackColor = System.Drawing.SystemColors.Info;
+            this.tbxAnalysisDetails.Location = new System.Drawing.Point(17, 17);
+            this.tbxAnalysisDetails.Multiline = true;
+            this.tbxAnalysisDetails.Name = "tbxAnalysisDetails";
+            this.tbxAnalysisDetails.ReadOnly = true;
+            this.tbxAnalysisDetails.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.tbxAnalysisDetails.Size = new System.Drawing.Size(773, 485);
+            this.tbxAnalysisDetails.TabIndex = 1;
+            this.tbxAnalysisDetails.Visible = false;
+            // 
             // frmAavStatusChannelOnlyView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -343,6 +360,7 @@
             this.ResizeEnd += new System.EventHandler(this.frmAavStatusChannelOnlyView_ResizeEnd);
             this.tabControl.ResumeLayout(false);
             this.tabOverview.ResumeLayout(false);
+            this.tabOverview.PerformLayout();
             this.tabGraphs.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pbGraph)).EndInit();
             this.pnlGraph.ResumeLayout(false);
@@ -388,5 +406,6 @@
         private System.Windows.Forms.ToolStripMenuItem miExport;
         private System.Windows.Forms.SaveFileDialog saveFileDialog;
         private System.Windows.Forms.ToolStripMenuItem miSubset;
+        private System.Windows.Forms.TextBox tbxAnalysisDetails;
     }
 }

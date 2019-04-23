@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Tangra.Controller;
+using Tangra.Model.Helpers;
 using Tangra.Video;
 
 namespace Tangra.View.CustomRenderers.AavTimeAnalyser
@@ -133,6 +134,43 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
 
             tabControl.SelectedTab = tabGraphs;
             DrawGraph();
+
+            AnalyseData();
+
+            tbxAnalysisDetails.Visible = true;
+        }
+
+        private void AnalyseData()
+        {
+            tbxAnalysisDetails.Clear();
+
+            var nonOutliers = m_TimeAnalyser.Entries.Where(x => !x.IsOutlier).ToList();
+            var medianSystemFileTime = nonOutliers.Select(x => x.DeltaSystemFileTimeMs).Median();
+            double medianSystemFileTimeVariance = nonOutliers.Sum(x => (medianSystemFileTime - x.DeltaSystemFileTimeMs) * (medianSystemFileTime - x.DeltaSystemFileTimeMs));
+            medianSystemFileTimeVariance = Math.Sqrt(medianSystemFileTimeVariance / nonOutliers.Count);
+
+            var medianSystemTime = nonOutliers.Select(x => x.DeltaSystemTimeMs).Median();
+            double medianSystemTimeVariance = nonOutliers.Sum(x => (medianSystemTime - x.DeltaSystemTimeMs) * (medianSystemTime - x.DeltaSystemTimeMs));
+            medianSystemTimeVariance = Math.Sqrt(medianSystemTimeVariance / nonOutliers.Count);
+
+            var medianNtpDiff = nonOutliers.Select(x => Math.Abs(x.DeltaSystemTimeMs - x.DeltaNTPTimeMs)).Median();
+
+            tbxAnalysisDetails.AppendText(string.Format("SystemTimeAsFileTime: {0:0.0} ms +/- {1:0.00} ms    SystemTime: {2:0.0} ms +/- {3:0.00} ms    MedianNTPDiff: {4:0.0} ms\r\n\r\n", medianSystemFileTime, medianSystemFileTimeVariance, medianSystemTime, medianSystemTimeVariance, medianNtpDiff));
+            tbxAnalysisDetails.AppendText(string.Format("Acqusition Delay: {0:0.0} ms    RecordingDelay: {1:0.0} ms\r\n\r\n", medianSystemFileTime, medianSystemTime - medianSystemFileTime));
+
+            for (int i = 0; i < m_TimeAnalyser.Entries.Count; i++)
+            {
+                var ol = m_TimeAnalyser.Entries[i];
+
+                var delta = ol.DeltaSystemFileTimeMs - medianSystemFileTime;
+                if (Math.Abs(delta) > 6 * medianSystemFileTimeVariance)
+                {
+                    var ol2 = i == 0 ? m_TimeAnalyser.Entries[1] : m_TimeAnalyser.Entries[i - 1];
+                    var utilEntry = ol.UtilisationEntry;
+                    if (utilEntry == null) utilEntry = m_TimeAnalyser.Entries.Last(x => x.UtilisationEntry != null).UtilisationEntry;
+                    tbxAnalysisDetails.AppendText(string.Format("Outlier at {0}, FrameNo: {1} Delta: {2:0.0} ms; Non-Acquisition Delay: {3:0.0} ms; CPU: {4:0.0}% Disks: {5:0.0}%  {6}\r\n", ol.SystemTimeFileTime.ToString("HH:mm:ss.fff"), ol.FrameNo, delta, (ol2.DeltaNTPTimeMs - ol2.DeltaSystemFileTimeMs) - (ol.DeltaNTPTimeMs - ol.DeltaSystemFileTimeMs), utilEntry.CpuUtilisation, utilEntry.DiskUtilisation, ol.DebugImage != null ? "OCR-ERR:" + ol.OrcField1 + "  " + ol.OrcField2 : null));
+                }
+            }
         }
 
         private void DrawGraph()

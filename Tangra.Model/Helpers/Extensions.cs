@@ -114,12 +114,14 @@ namespace Tangra.Model.Helpers
 			return data[data.Count / 2];
 		}
 
-        public static T Median<T>(this IList<T> list)
+        public static T Median<T>(this IEnumerable<T> list)
         {
-            if (list.Count == 0) return default(T);
-            if (list.Count == 1) return list[0];
+            var enumerable = list as T[] ?? list.ToArray();
 
-            T[] copy = list.ToArray();
+            if (enumerable.Length == 0) return default(T);
+            if (enumerable.Length == 1) return enumerable[0];
+
+            T[] copy = enumerable.ToArray();
             Array.Sort(copy);
 
             return copy[copy.Length / 2];

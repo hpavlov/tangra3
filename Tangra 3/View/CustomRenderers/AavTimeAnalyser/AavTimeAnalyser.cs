@@ -31,6 +31,9 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
         public float DeltaSystemFileTimeMs;
         public float DeltaNTPTimeMs;
         public bool IsOutlier;
+
+        public int FrameNo;
+        public SystemUtilisationEntry UtilisationEntry;
     }
 
     public class SystemUtilisationEntry
@@ -150,6 +153,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                 {
                     int i = 0;
                     string tagVal;
+                    List<TimeAnalyserEntry> entriesWithNoUtil = new List<TimeAnalyserEntry>();
 
                     foreach (var idx in aavFile.Index.Index)
                     {
@@ -185,6 +189,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                         sectionDataLength = data[dataOffset] + (data[dataOffset + 1] << 8) + (data[dataOffset + 2] << 16) + (data[dataOffset + 3] << 24);
                         AdvStatusData statusSection = (AdvStatusData)aavFile.StatusSection.GetDataFromDataBytes(data, null, sectionDataLength, dataOffset + 4);
 
+                        entry.FrameNo = i;
                         entry.ExposureMs = (float)(exposure / 10.0);
                         entry.ReferenceTime = AdvFile.ADV_ZERO_DATE_REF.AddMilliseconds(frameTimeMsSince2010).AddMilliseconds(-1 * entry.ExposureMs / 2);
                         long referenceTimeTicks = entry.ReferenceTime.Ticks;
@@ -194,6 +199,13 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                             entry.SystemTime = AdvFile.ADV_ZERO_DATE_REF.AddMilliseconds(long.Parse(tagVal)).AddMilliseconds(m_CorrSystemTimeMs);
                             if (entry.SystemTime.Day + 1 == entry.ReferenceTime.Day)
                             {
+                                // Fixing a date-change bug in OccuRec (var 1)
+                                entry.ReferenceTime = entry.ReferenceTime.AddDays(-1);
+                                referenceTimeTicks = entry.ReferenceTime.Ticks;
+                            }
+                            if (entry.SystemTime.Day == entry.ReferenceTime.Day && entry.ReferenceTime.Hour - entry.SystemTime.Hour == 23)
+                            {
+                                // Fixing a date-change bug in OccuRec (var 2)
                                 entry.ReferenceTime = entry.ReferenceTime.AddDays(-1);
                                 referenceTimeTicks = entry.ReferenceTime.Ticks;
                             }
@@ -219,6 +231,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                         if (imageData != null)
                         {
                             entry.DebugImage = BitmapFilter.ToVideoFields(Pixelmap.ConstructBitmapFromBitmapPixels(imageData.ImageData));
+                            entry.IsOutlier = true;
 
                             if (OCR_DEBUG_1_TAG != null && statusSection.TagValues.TryGetValue(OCR_DEBUG_1_TAG, out tagVal))
                             {
@@ -283,7 +296,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                                 else
                                 {
                                     entry.IsOutlier = true;
-                                    Trace.WriteLine("NTPTime Outlier: " + entry.DeltaNTPTimeMs);
+                                    //Trace.WriteLine("NTPTime Outlier: " + entry.DeltaNTPTimeMs);
                                 }
                             }
                             if (entry.DeltaNTPTimeMs < minDeltaNtp)
@@ -293,7 +306,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                                 else
                                 {
                                     entry.IsOutlier = true;
-                                    Trace.WriteLine("NTPTime Outlier: " + entry.DeltaNTPTimeMs);
+                                    //Trace.WriteLine("NTPTime Outlier: " + entry.DeltaNTPTimeMs);
                                 }
                             }
                             if (entry.NTPErrorMs > maxNtpError)
@@ -303,7 +316,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                                 else
                                 {
                                     entry.IsOutlier = true;
-                                    Trace.WriteLine("NtpError Outlier: " + entry.NTPErrorMs);
+                                    //Trace.WriteLine("NtpError Outlier: " + entry.NTPErrorMs);
                                 }
                             }
                             if (-entry.NTPErrorMs < minNtpError)
@@ -313,7 +326,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                                 else
                                 {
                                     entry.IsOutlier = true;
-                                    Trace.WriteLine("NtpError Outlier: " + -entry.NTPErrorMs);
+                                    //Trace.WriteLine("NtpError Outlier: " + -entry.NTPErrorMs);
                                 }
                             }
                         }
@@ -335,8 +348,12 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                                 if (maxFreeMemory < freeMemory) maxFreeMemory = freeMemory;
                                 if (minFreeMemory > freeMemory) minFreeMemory = freeMemory;
                             }
-                            SystemUtilisation.Add(new SystemUtilisationEntry() { CpuUtilisation = cpuUsage, DiskUtilisation = diskUsage, FreeMemory = freeMemory });
+                            var currUtilisationEntry = new SystemUtilisationEntry() { CpuUtilisation = cpuUsage, DiskUtilisation = diskUsage, FreeMemory = freeMemory };
+                            SystemUtilisation.Add(currUtilisationEntry);
+                            entriesWithNoUtil.ForEach(x => x.UtilisationEntry = currUtilisationEntry);
+                            entriesWithNoUtil.Clear();
                         }
+                        entriesWithNoUtil.Add(entry);
 
                         i++;
                         if (i % 100 == 0)
