@@ -1171,7 +1171,7 @@ namespace Tangra.VideoOperations.LightCurves
             }
         }
 
-        void ILightCurveDataProvider.SetFoundOccultationEvent(int eventId, float dFrame, float rFrame, float dFrameErrorMinus, float dFrameErrorPlus, float rFrameErrorMinus, float rFrameErrorPlus, string dTime, string rTime, bool cameraDelaysKnownToAOTA)
+        void ILightCurveDataProvider.SetFoundOccultationEvent(int eventId, float dFrame, float rFrame, float dFrameErrorMinus, float dFrameErrorPlus, float rFrameErrorMinus, float rFrameErrorPlus, string dTime, string rTime, bool cameraDelaysKnownToAOTA, int framesIntegrated)
 		{
 			if (m_EventTimesReport != null)
 			{
@@ -1304,7 +1304,9 @@ namespace Tangra.VideoOperations.LightCurves
                         frm.CameraNameTangra = m_LCFile.Footer.CameraName;
                         frm.CameraNameAOTA = m_EventTimesReport.CameraName;
                         frm.TangraKnowsCameraDelays = m_EventTimesReport.TangraCanApplyInstrumentalDelays == InstrumentalDelayStatus.Yes;
+                        frm.TangraIntegration = m_EventTimesReport.ExposureUnit == "Frames" ? string.Format("x{0}", (int)Math.Round(m_EventTimesReport.ExposureDuration)) : string.Format("{0} {1}", m_EventTimesReport.ExposureDuration, m_EventTimesReport.ExposureUnit);
                         frm.AOTAKnowsCameraDelays = cameraDelaysKnownToAOTA;
+                        frm.AOTAIntegration = string.Format("x{0}", framesIntegrated);
 					    frm.ShowDialog(this);
 
                         evt.ReportTangraTimesRatherThanAOTATimes = frm.UseTangrasTimes;

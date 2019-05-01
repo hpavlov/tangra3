@@ -33,6 +33,10 @@ namespace Tangra.VideoOperations.LightCurves.Report
 
         internal bool AOTAKnowsCameraDelays;
 
+        internal string TangraIntegration;
+
+        internal string AOTAIntegration;
+
         internal bool UseTangrasTimes;
 
         private void frmChooseTimesToReport_Load(object sender, EventArgs e)
@@ -46,6 +50,8 @@ namespace Tangra.VideoOperations.LightCurves.Report
             lblCameraNameAOTA.Text = CameraNameAOTA;
             lblDelaysAppliedTangra.Text = TangraKnowsCameraDelays.HasValue ? (TangraKnowsCameraDelays.Value ? "Yes" : "No") : "Not Required";
             lblDelaysAppliedAOTA.Text = AOTAKnowsCameraDelays ? "Yes" : "No";
+            lblTangraIntegration.Text = "Integration: " + TangraIntegration;
+            lblAOTAIntegration.Text = "Integration: " + AOTAIntegration;
         }
 
         private void btnReportTangra_Click(object sender, EventArgs e)

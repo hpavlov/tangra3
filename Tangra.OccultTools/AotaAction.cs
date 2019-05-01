@@ -155,7 +155,8 @@ namespace Tangra.OccultTools
                                     result.EventResults[i].R_FrameUncertPlus,
                                     result.EventResults[i].D_UTC,
                                     result.EventResults[i].R_UTC,
-                                    result.CameraResult.CameraDelaysKnownToAOTA);
+                                    result.CameraResult.CameraDelaysKnownToAOTA,
+                                    result.CameraResult.FramesIntegrated);
                             }
                         }
                     }

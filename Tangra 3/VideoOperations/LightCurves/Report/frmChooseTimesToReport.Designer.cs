@@ -31,29 +31,31 @@
             this.btnReportTangra = new System.Windows.Forms.Button();
             this.btnReportAOTA = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.lblDTimeTangra = new System.Windows.Forms.Label();
-            this.lblRTimeTangra = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.lblRTimeAOTA = new System.Windows.Forms.Label();
-            this.lblDTimeAOTA = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.lblCameraNameTangra = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
-            this.lblDelaysAppliedTangra = new System.Windows.Forms.Label();
+            this.lblCameraNameTangra = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.lblRTimeTangra = new System.Windows.Forms.Label();
+            this.lblDTimeTangra = new System.Windows.Forms.Label();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.lblCameraNameAOTA = new System.Windows.Forms.Label();
             this.lblDelaysAppliedAOTA = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
-            this.lblCameraNameAOTA = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.lblDTimeAOTA = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.lblRTimeAOTA = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.lblDelaysAppliedTangra = new System.Windows.Forms.Label();
+            this.lblTangraIntegration = new System.Windows.Forms.Label();
+            this.lblAOTAIntegration = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnReportTangra
             // 
-            this.btnReportTangra.Location = new System.Drawing.Point(21, 224);
+            this.btnReportTangra.Location = new System.Drawing.Point(21, 239);
             this.btnReportTangra.Name = "btnReportTangra";
             this.btnReportTangra.Size = new System.Drawing.Size(166, 23);
             this.btnReportTangra.TabIndex = 0;
@@ -63,7 +65,7 @@
             // 
             // btnReportAOTA
             // 
-            this.btnReportAOTA.Location = new System.Drawing.Point(217, 224);
+            this.btnReportAOTA.Location = new System.Drawing.Point(217, 239);
             this.btnReportAOTA.Name = "btnReportAOTA";
             this.btnReportAOTA.Size = new System.Drawing.Size(168, 23);
             this.btnReportAOTA.TabIndex = 1;
@@ -73,6 +75,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.lblTangraIntegration);
             this.groupBox1.Controls.Add(this.label7);
             this.groupBox1.Controls.Add(this.lblCameraNameTangra);
             this.groupBox1.Controls.Add(this.label3);
@@ -81,54 +84,28 @@
             this.groupBox1.Controls.Add(this.lblDTimeTangra);
             this.groupBox1.Location = new System.Drawing.Point(19, 71);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(168, 125);
+            this.groupBox1.Size = new System.Drawing.Size(168, 140);
             this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Tangra";
             // 
-            // groupBox2
+            // label7
             // 
-            this.groupBox2.Controls.Add(this.lblCameraNameAOTA);
-            this.groupBox2.Controls.Add(this.lblDelaysAppliedAOTA);
-            this.groupBox2.Controls.Add(this.label10);
-            this.groupBox2.Controls.Add(this.label1);
-            this.groupBox2.Controls.Add(this.lblDTimeAOTA);
-            this.groupBox2.Controls.Add(this.label4);
-            this.groupBox2.Controls.Add(this.lblRTimeAOTA);
-            this.groupBox2.Location = new System.Drawing.Point(217, 71);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(168, 125);
-            this.groupBox2.TabIndex = 3;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "AOTA";
+            this.label7.AutoSize = true;
+            this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label7.Location = new System.Drawing.Point(9, 115);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(95, 13);
+            this.label7.TabIndex = 6;
+            this.label7.Text = "Delays Applied:";
             // 
-            // lblDTimeTangra
+            // lblCameraNameTangra
             // 
-            this.lblDTimeTangra.AutoSize = true;
-            this.lblDTimeTangra.Location = new System.Drawing.Point(28, 25);
-            this.lblDTimeTangra.Name = "lblDTimeTangra";
-            this.lblDTimeTangra.Size = new System.Drawing.Size(100, 13);
-            this.lblDTimeTangra.TabIndex = 0;
-            this.lblDTimeTangra.Text = "12 34 12.85 +- 0.01";
-            // 
-            // lblRTimeTangra
-            // 
-            this.lblRTimeTangra.AutoSize = true;
-            this.lblRTimeTangra.Location = new System.Drawing.Point(28, 47);
-            this.lblRTimeTangra.Name = "lblRTimeTangra";
-            this.lblRTimeTangra.Size = new System.Drawing.Size(100, 13);
-            this.lblRTimeTangra.TabIndex = 4;
-            this.lblRTimeTangra.Text = "12 34 12.85 +- 0.01";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(9, 25);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(16, 13);
-            this.label2.TabIndex = 4;
-            this.label2.Text = "D";
+            this.lblCameraNameTangra.Location = new System.Drawing.Point(9, 78);
+            this.lblCameraNameTangra.Name = "lblCameraNameTangra";
+            this.lblCameraNameTangra.Size = new System.Drawing.Size(153, 13);
+            this.lblCameraNameTangra.TabIndex = 5;
+            this.lblCameraNameTangra.Text = "12 34 12.85 +- 0.01";
             // 
             // label3
             // 
@@ -140,6 +117,78 @@
             this.label3.TabIndex = 5;
             this.label3.Text = "R";
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(9, 25);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(16, 13);
+            this.label2.TabIndex = 4;
+            this.label2.Text = "D";
+            // 
+            // lblRTimeTangra
+            // 
+            this.lblRTimeTangra.AutoSize = true;
+            this.lblRTimeTangra.Location = new System.Drawing.Point(28, 47);
+            this.lblRTimeTangra.Name = "lblRTimeTangra";
+            this.lblRTimeTangra.Size = new System.Drawing.Size(100, 13);
+            this.lblRTimeTangra.TabIndex = 4;
+            this.lblRTimeTangra.Text = "12 34 12.85 +- 0.01";
+            // 
+            // lblDTimeTangra
+            // 
+            this.lblDTimeTangra.AutoSize = true;
+            this.lblDTimeTangra.Location = new System.Drawing.Point(28, 25);
+            this.lblDTimeTangra.Name = "lblDTimeTangra";
+            this.lblDTimeTangra.Size = new System.Drawing.Size(100, 13);
+            this.lblDTimeTangra.TabIndex = 0;
+            this.lblDTimeTangra.Text = "12 34 12.85 +- 0.01";
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.lblAOTAIntegration);
+            this.groupBox2.Controls.Add(this.lblCameraNameAOTA);
+            this.groupBox2.Controls.Add(this.lblDelaysAppliedAOTA);
+            this.groupBox2.Controls.Add(this.label10);
+            this.groupBox2.Controls.Add(this.label1);
+            this.groupBox2.Controls.Add(this.lblDTimeAOTA);
+            this.groupBox2.Controls.Add(this.label4);
+            this.groupBox2.Controls.Add(this.lblRTimeAOTA);
+            this.groupBox2.Location = new System.Drawing.Point(217, 71);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(168, 140);
+            this.groupBox2.TabIndex = 3;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "AOTA";
+            // 
+            // lblCameraNameAOTA
+            // 
+            this.lblCameraNameAOTA.Location = new System.Drawing.Point(12, 78);
+            this.lblCameraNameAOTA.Name = "lblCameraNameAOTA";
+            this.lblCameraNameAOTA.Size = new System.Drawing.Size(153, 13);
+            this.lblCameraNameAOTA.TabIndex = 12;
+            this.lblCameraNameAOTA.Text = "12 34 12.85 +- 0.01";
+            // 
+            // lblDelaysAppliedAOTA
+            // 
+            this.lblDelaysAppliedAOTA.AutoSize = true;
+            this.lblDelaysAppliedAOTA.Location = new System.Drawing.Point(106, 115);
+            this.lblDelaysAppliedAOTA.Name = "lblDelaysAppliedAOTA";
+            this.lblDelaysAppliedAOTA.Size = new System.Drawing.Size(25, 13);
+            this.lblDelaysAppliedAOTA.TabIndex = 11;
+            this.lblDelaysAppliedAOTA.Text = "Yes";
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label10.Location = new System.Drawing.Point(12, 115);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(95, 13);
+            this.label10.TabIndex = 10;
+            this.label10.Text = "Delays Applied:";
+            // 
             // label1
             // 
             this.label1.AutoSize = true;
@@ -149,6 +198,15 @@
             this.label1.Size = new System.Drawing.Size(16, 13);
             this.label1.TabIndex = 9;
             this.label1.Text = "R";
+            // 
+            // lblDTimeAOTA
+            // 
+            this.lblDTimeAOTA.AutoSize = true;
+            this.lblDTimeAOTA.Location = new System.Drawing.Point(31, 25);
+            this.lblDTimeAOTA.Name = "lblDTimeAOTA";
+            this.lblDTimeAOTA.Size = new System.Drawing.Size(100, 13);
+            this.lblDTimeAOTA.TabIndex = 6;
+            this.lblDTimeAOTA.Text = "12 34 12.85 +- 0.01";
             // 
             // label4
             // 
@@ -169,15 +227,6 @@
             this.lblRTimeAOTA.TabIndex = 8;
             this.lblRTimeAOTA.Text = "12 34 12.85 +- 0.01";
             // 
-            // lblDTimeAOTA
-            // 
-            this.lblDTimeAOTA.AutoSize = true;
-            this.lblDTimeAOTA.Location = new System.Drawing.Point(31, 25);
-            this.lblDTimeAOTA.Name = "lblDTimeAOTA";
-            this.lblDTimeAOTA.Size = new System.Drawing.Size(100, 13);
-            this.lblDTimeAOTA.TabIndex = 6;
-            this.lblDTimeAOTA.Text = "12 34 12.85 +- 0.01";
-            // 
             // label5
             // 
             this.label5.ForeColor = System.Drawing.Color.Red;
@@ -189,65 +238,36 @@
     "er from the times returned by AOTA. Which times do you want to use for your repo" +
     "rt?";
             // 
-            // lblCameraNameTangra
-            // 
-            this.lblCameraNameTangra.Location = new System.Drawing.Point(9, 78);
-            this.lblCameraNameTangra.Name = "lblCameraNameTangra";
-            this.lblCameraNameTangra.Size = new System.Drawing.Size(153, 13);
-            this.lblCameraNameTangra.TabIndex = 5;
-            this.lblCameraNameTangra.Text = "12 34 12.85 +- 0.01";
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label7.Location = new System.Drawing.Point(9, 98);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(95, 13);
-            this.label7.TabIndex = 6;
-            this.label7.Text = "Delays Applied:";
-            // 
             // lblDelaysAppliedTangra
             // 
             this.lblDelaysAppliedTangra.AutoSize = true;
-            this.lblDelaysAppliedTangra.Location = new System.Drawing.Point(123, 169);
+            this.lblDelaysAppliedTangra.Location = new System.Drawing.Point(123, 186);
             this.lblDelaysAppliedTangra.Name = "lblDelaysAppliedTangra";
             this.lblDelaysAppliedTangra.Size = new System.Drawing.Size(25, 13);
             this.lblDelaysAppliedTangra.TabIndex = 7;
             this.lblDelaysAppliedTangra.Text = "Yes";
             // 
-            // lblDelaysAppliedAOTA
+            // lblTangraIntegration
             // 
-            this.lblDelaysAppliedAOTA.AutoSize = true;
-            this.lblDelaysAppliedAOTA.Location = new System.Drawing.Point(106, 98);
-            this.lblDelaysAppliedAOTA.Name = "lblDelaysAppliedAOTA";
-            this.lblDelaysAppliedAOTA.Size = new System.Drawing.Size(25, 13);
-            this.lblDelaysAppliedAOTA.TabIndex = 11;
-            this.lblDelaysAppliedAOTA.Text = "Yes";
+            this.lblTangraIntegration.Location = new System.Drawing.Point(9, 95);
+            this.lblTangraIntegration.Name = "lblTangraIntegration";
+            this.lblTangraIntegration.Size = new System.Drawing.Size(153, 13);
+            this.lblTangraIntegration.TabIndex = 7;
+            this.lblTangraIntegration.Text = "TangraIntegration";
             // 
-            // label10
+            // lblAOTAIntegration
             // 
-            this.label10.AutoSize = true;
-            this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label10.Location = new System.Drawing.Point(12, 98);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(95, 13);
-            this.label10.TabIndex = 10;
-            this.label10.Text = "Delays Applied:";
-            // 
-            // lblCameraNameAOTA
-            // 
-            this.lblCameraNameAOTA.Location = new System.Drawing.Point(12, 78);
-            this.lblCameraNameAOTA.Name = "lblCameraNameAOTA";
-            this.lblCameraNameAOTA.Size = new System.Drawing.Size(153, 13);
-            this.lblCameraNameAOTA.TabIndex = 12;
-            this.lblCameraNameAOTA.Text = "12 34 12.85 +- 0.01";
+            this.lblAOTAIntegration.Location = new System.Drawing.Point(13, 95);
+            this.lblAOTAIntegration.Name = "lblAOTAIntegration";
+            this.lblAOTAIntegration.Size = new System.Drawing.Size(153, 13);
+            this.lblAOTAIntegration.TabIndex = 13;
+            this.lblAOTAIntegration.Text = "AOTAIntegration";
             // 
             // frmChooseTimesToReport
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(405, 268);
+            this.ClientSize = new System.Drawing.Size(405, 285);
             this.ControlBox = false;
             this.Controls.Add(this.lblDelaysAppliedTangra);
             this.Controls.Add(this.label5);
@@ -292,5 +312,7 @@
         private System.Windows.Forms.Label lblCameraNameTangra;
         private System.Windows.Forms.Label lblDelaysAppliedTangra;
         private System.Windows.Forms.Label lblCameraNameAOTA;
+        private System.Windows.Forms.Label lblTangraIntegration;
+        private System.Windows.Forms.Label lblAOTAIntegration;
     }
 }
