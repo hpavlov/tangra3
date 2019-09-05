@@ -356,10 +356,11 @@ HRESULT SERGetFrame(int frameNo, unsigned int* pixels, unsigned int* originalPix
 		marshalledFrameInfo->TimeStampUtcHi = frameInfo.TimeStampUtcHi;
 
 		if (SUCCEEDED(rv)) {
+			
+			memcpy(originalPixels, pixels, m_SerFile->Width * m_SerFile->Height * sizeof(unsigned int));
+
 			if (g_UsesPreProcessing)
 			{
-				memcpy(originalPixels, pixels, m_SerFile->Width * m_SerFile->Height * sizeof(unsigned int));
-				
 				return ApplyPreProcessingWithNormalValue(
 					originalPixels, pixels, 
 					m_SerFile->Width, 
@@ -368,7 +369,7 @@ HRESULT SERGetFrame(int frameNo, unsigned int* pixels, unsigned int* originalPix
 					0 /* Not Supported */, 
 					m_SerFile->NormalisationValue, 
 					bitmapPixels, 
-					bitmapBytes);					
+					bitmapBytes);
 			}
 			else
 				return GetBitmapPixels(
