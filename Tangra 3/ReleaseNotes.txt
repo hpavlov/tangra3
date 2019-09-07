@@ -1,8 +1,9 @@
 ﻿Tangra3 Release Notes
 ---------------------
-v3.6.19 (2019-xx-xx)
+v3.6.19 (2019-09-07)
 - Added support for SER files with RGB and BGR pixel format.
-- Fixed a problem where converting SER files to FITS would result in all black images.
+- Fixed a problem where converting SER files to FITS would result in all images being black.
+- How providing additional guidance when processing AAV light curves in AOTA to ensure the instrumental delays have been accounted for correctly by the user.
 
 v3.6.18 (2018-10-19)
 - Improvements to handling of AAV files and convertion of video from AVI to AAV.

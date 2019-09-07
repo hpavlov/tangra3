@@ -126,7 +126,7 @@ namespace Tangra.OccultTools
 
 		public string Version
 		{
-			get { return "1.0"; }
+			get { return "1.1"; }
 		}
 
 		public string Description
