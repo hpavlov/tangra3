@@ -53,8 +53,6 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
     public class AavTimeAnalyser
     {
         private AstroDigitalVideoStream m_Aav;
-        private FileStream m_File;
-        private BinaryReader m_Reader;
 
         private int m_AppliedNtpTimeCorr = 0;
         private float m_FrameDurationMs = 40;
@@ -435,6 +433,26 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                 }
 
                 File.WriteAllText(fileName, output.ToString());
+
+                progressCallback(0, 0);
+                progressCallback(0, SystemUtilisation.Count);
+
+                output = new StringBuilder();
+                output.AppendLine("Cpu Utilisation (%), Disk Utilisation (%), Free Memory(Mb)");
+
+                i = 0;
+                foreach (var entry in SystemUtilisation)
+                {
+                    output.AppendFormat(CultureInfo.InvariantCulture, "{0:0.000},{1:0.0},{2:0.000}\r\n", entry.CpuUtilisation, entry.DiskUtilisation, entry.FreeMemory);
+
+                    i++;
+                    if (i % 100 == 0)
+                    {
+                        progressCallback(i, SystemUtilisation.Count);
+                    }
+                }
+
+                File.WriteAllText("Utilisation_" + fileName, output.ToString());
 
                 progressCallback(0, 0);
             });
