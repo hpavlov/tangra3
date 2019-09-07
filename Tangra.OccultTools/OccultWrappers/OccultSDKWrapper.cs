@@ -272,7 +272,7 @@ namespace Tangra.OccultTools.OccultWrappers
                     }
                     else
                     {
-                        MessageBox.Show(parentWindow, "The times to be given to AOTA are not corrected for instrumental delays.\r\n\r\nThis means that you are expected to select the video camera and apply these instrumental delays in AOTA.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show(parentWindow, "The times to be given to AOTA are not corrected for instrumental delays.\r\n\r\nThis means that you are expected to select the video camera and frame reate from the 'Camera corrections' section in tab '6. Camera corrections & final times' and apply the instrumental delays in AOTA.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     }
 
                     // Now go and set any comparison stars
