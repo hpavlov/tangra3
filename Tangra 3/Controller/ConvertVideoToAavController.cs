@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
 using Adv;
 using Tangra.Helpers;
 using Tangra.Model.Astro;
@@ -84,6 +85,7 @@ namespace Tangra.Controller
         private int[,] m_ThisPixels = new int[32, 32];
 
         private Dictionary<int, double> m_SigmaDict = new Dictionary<int, double>();
+        private List<double> m_AcceptedNewIntSigmas = new List<double>();
         private int m_NextExpectedIntegrationPeriodStartFrameId = -1;
         private int m_FirstIntegrationPeriodStartFrameId = -1;
         private int m_IntegrationPeriod = 1;
@@ -357,8 +359,9 @@ namespace Tangra.Controller
                         if (frameNo < m_NextExpectedIntegrationPeriodStartFrameId)
                         {
                             // New early integration period. This can be right if:
-                            // 1) The old expected intergation frame has a smaller residual than this one
-                            // 2) The next new frame under the new conditions passes the condition for a new integration frame
+                            // (A)
+                            //     1) The old expected intergation frame has a smaller residual than this one
+                            //     2) The next new frame under the new conditions passes the condition for a new integration frame
                             var nextExpectedResidual = GetFutureFrameNoisePatternResidual(m_NextExpectedIntegrationPeriodStartFrameId, median);
                             var nextNewExpectedResidual = GetFutureFrameNoisePatternResidual(frameNo + m_IntegrationPeriod, median);
 
@@ -367,13 +370,43 @@ namespace Tangra.Controller
                                 m_NextExpectedIntegrationPeriodStartFrameId = frameNo + m_IntegrationPeriod;
                                 m_DetectionInfo.DetectedIntervals++;
                                 m_DetectionInfo.EarlyDetections++;
+                                m_AcceptedNewIntSigmas.Add(residual);
                                 return true;
+                            }
+
+                            // (B) The next new frame under the new conditions, is past the last frame in the video
+                            if (frameNo + m_IntegrationPeriod > m_VideoController.VideoLastFrame)
+                            {
+                                m_NextExpectedIntegrationPeriodStartFrameId = frameNo + m_IntegrationPeriod;
+                                m_DetectionInfo.DetectedIntervals++;
+                                m_DetectionInfo.EarlyDetections++;
+                                m_AcceptedNewIntSigmas.Add(residual);
+                                return true;
+                            }
+
+                            // (C) 
+                            //      1) All residuals have been very strong (SNR > 3)
+                            //      2) This is a very strong residual as well
+                            if (m_AcceptedNewIntSigmas.Count >= 3 && residual > 3 * variance)
+                            {
+                                var med2 = m_AcceptedNewIntSigmas.Median();
+                                var var2 = Math.Sqrt(m_AcceptedNewIntSigmas.Sum(x => (x - med2) * (x - med2)) / (m_AcceptedNewIntSigmas.Count - 1));
+                                var sigma2 = Math.Abs(med2 - residual);
+                                if (sigma2 < 2 * var2)
+                                {
+                                    m_NextExpectedIntegrationPeriodStartFrameId = frameNo + m_IntegrationPeriod;
+                                    m_DetectionInfo.DetectedIntervals++;
+                                    m_DetectionInfo.EarlyDetections++;
+                                    m_AcceptedNewIntSigmas.Add(residual);
+                                    return true;
+                                }
                             }
                         }
                         else if (frameNo == m_NextExpectedIntegrationPeriodStartFrameId)
                         {
                             m_NextExpectedIntegrationPeriodStartFrameId = frameNo + m_IntegrationPeriod;
                             m_DetectionInfo.DetectedIntervals++;
+                            m_AcceptedNewIntSigmas.Add(residual);
                             return true;
                         }
                     }
@@ -398,12 +431,13 @@ namespace Tangra.Controller
                             }
 
                             m_DetectionInfo.FurtherDetectedIntervals++;
-                            return true;                                
+                            m_AcceptedNewIntSigmas.Add(residual);
+                            return true;
                         }
 
                         m_VideoController.RegisterAAVConversionError();
                         return false;
-                    }                    
+                    }
                 }
             }
             else
@@ -453,6 +487,8 @@ namespace Tangra.Controller
                 string errors = null;
                 if (m_FramesSoFar != m_IntegrationPeriod)
                 {
+                    m_VideoController.RegisterAAVConversionError();
+
                     // Normalize the value during  the conversion
                     for (int y = 0; y < m_Height; y++)
                     {
