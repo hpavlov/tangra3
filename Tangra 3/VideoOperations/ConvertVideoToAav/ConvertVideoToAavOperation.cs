@@ -81,10 +81,10 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
                     m_ControlPanel.EndConversion();
 
                     m_VideoController.StopVideo();
-                    m_ControlPanel.UpdateProgress(m_LastFrameNo, m_LastFrameNo);
+                    m_ControlPanel.UpdateProgress(m_LastFrameNo - m_FirstFrameNo, m_LastFrameNo - m_FirstFrameNo);
                 }
                 else
-                    m_ControlPanel.UpdateProgress(frameNo - m_FirstFrameNo, m_LastFrameNo);
+                    m_ControlPanel.UpdateProgress(frameNo - m_FirstFrameNo, m_LastFrameNo - m_FirstFrameNo);
             }
         }
 

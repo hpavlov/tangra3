@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using Tangra.Model.Config;
+using Tangra.Model.Context;
 using Tangra.Model.Image;
 using Tangra.Model.Video;
 using Tangra.Video.SER;
@@ -61,7 +62,7 @@ namespace Tangra.Video.AstroDigitalVideo
 		}
 
 
-		public void OverlayStateForFrame(Bitmap currentImage, FrameStateData state, int currentFrameNo, bool isAstroDigitalVideo, bool isAstroAnalogueVideo)
+        public void OverlayStateForFrame(Bitmap currentImage, FrameStateData state, RenderFrameContext context, bool isAstroDigitalVideo, bool isAstroAnalogueVideo)
 		{			
 			using (Graphics g = Graphics.FromImage(currentImage))
 			{
@@ -69,15 +70,15 @@ namespace Tangra.Video.AstroDigitalVideo
                     ComputeFontSizeAndTimeStampPosition(g, currentImage.Width, currentImage.Height);
 
 				if (isAstroDigitalVideo)
-					OverlayADVState(g, currentImage, state, currentFrameNo);	
+                    OverlayADVState(g, currentImage, state, context);	
 				else if (isAstroAnalogueVideo)
-					OverlayAAVState(g, currentImage, state, currentFrameNo);
+                    OverlayAAVState(g, currentImage, state, context);
 			}
 
-		    m_LastFrameNo = currentFrameNo;
+            m_LastFrameNo = context.CurrentFrameIndex;
 		}
 
-		private void OverlayADVState(Graphics g, Bitmap currentImage, FrameStateData state, int currentFrameNo)
+        private void OverlayADVState(Graphics g, Bitmap currentImage, FrameStateData state, RenderFrameContext context)
 		{
 			if (TangraConfig.Settings.ADVS.OverlayTimestamp)
 			{
@@ -91,7 +92,7 @@ namespace Tangra.Video.AstroDigitalVideo
 			int numTopLines = 0;
 
             if (TangraConfig.Settings.ADVS.OverlayObjectName && m_AdvFileMetadataInfo != null && !string.IsNullOrWhiteSpace(m_AdvFileMetadataInfo.ObjectName) &&
-                (!m_ObjectInfoDisplayed || m_FirstFrameNo == currentFrameNo))
+                (!m_ObjectInfoDisplayed || m_FirstFrameNo == context.CurrentFrameIndex))
             {
                 string objectNameStr = string.Format(" {0}", m_AdvFileMetadataInfo.ObjectName);
                 g.DrawString(objectNameStr, s_PropertiesFont, s_PropertiesGreenBrush, 10, 10 + numTopLines * (s_PropertiesFont.Size + 5));
@@ -100,7 +101,7 @@ namespace Tangra.Video.AstroDigitalVideo
                 m_ObjectInfoDisplayed = true;
             }
 
-			if (m_LastFrameNo + 1 != currentFrameNo)
+            if (m_LastFrameNo + 1 != context.CurrentFrameIndex)
 				// When frames jump we stop displaying the message
 				m_FramesLeftToDiplayMessage = 0;
 
@@ -109,11 +110,11 @@ namespace Tangra.Video.AstroDigitalVideo
 				state.Messages.Trim().Length > 0)
 			{
 				m_LastMessage = state.Messages.Trim();
-				m_FramesLeftToDiplayMessage = 10;
+                m_FramesLeftToDiplayMessage = context.MovementType == MovementType.Step ? 1 : 10;
 			}
 
 			if ((TangraConfig.Settings.ADVS.OverlayAdvsInfo || TangraConfig.Settings.ADVS.OverlayCameraInfo || TangraConfig.Settings.ADVS.OverlayGeoLocation) &&
-				(!m_EquipmentInfoDisplayed || m_FirstFrameNo == currentFrameNo))
+                (!m_EquipmentInfoDisplayed || m_FirstFrameNo == context.CurrentFrameIndex))
 			{
 				int numLines = 0;
 				int lineNo = 0;
@@ -171,7 +172,7 @@ namespace Tangra.Video.AstroDigitalVideo
 			
 		}
 
-		private void OverlayAAVState(Graphics g, Bitmap currentImage, FrameStateData state, int currentFrameNo)
+        private void OverlayAAVState(Graphics g, Bitmap currentImage, FrameStateData state, RenderFrameContext context)
 		{
 			if (TangraConfig.Settings.AAV.Overlay_Timestamp)
 			{
@@ -185,7 +186,7 @@ namespace Tangra.Video.AstroDigitalVideo
             int numTopLines = 0;
 
             if (TangraConfig.Settings.AAV.Overlay_ObjectName && m_AdvFileMetadataInfo != null && !string.IsNullOrWhiteSpace(m_AdvFileMetadataInfo.ObjectName) &&
-                (!m_ObjectInfoDisplayed || m_FirstFrameNo == currentFrameNo))
+                (!m_ObjectInfoDisplayed || m_FirstFrameNo == context.CurrentFrameIndex))
             {
                 string objectNameStr = string.Format(" {0}", m_AdvFileMetadataInfo.ObjectName);
                 g.DrawString(objectNameStr, s_PropertiesFont, s_PropertiesGreenBrush, 10, 10 + numTopLines * (s_PropertiesFont.Size + 5));
@@ -194,7 +195,7 @@ namespace Tangra.Video.AstroDigitalVideo
                 m_ObjectInfoDisplayed = true;
             }
 
-			if (m_LastFrameNo + 1 != currentFrameNo)
+            if (m_LastFrameNo + 1 != context.CurrentFrameIndex)
 				// When frames jump we stop displaying the message
 				m_FramesLeftToDiplayMessage = 0;
 
@@ -203,11 +204,11 @@ namespace Tangra.Video.AstroDigitalVideo
 				state.Messages.Trim().Length > 0)
 			{
 				m_LastMessage = state.Messages.Trim();
-				m_FramesLeftToDiplayMessage = 10;
+                m_FramesLeftToDiplayMessage = context.MovementType == MovementType.Step ? 1 : 10;
 			}
 
 			if ((TangraConfig.Settings.AAV.Overlay_AdvsInfo || TangraConfig.Settings.AAV.Overlay_CameraInfo) &&
-				(!m_EquipmentInfoDisplayed || m_FirstFrameNo == currentFrameNo))
+                (!m_EquipmentInfoDisplayed || m_FirstFrameNo == context.CurrentFrameIndex))
 			{
 				int numLines = 0;
 				int lineNo = 0;

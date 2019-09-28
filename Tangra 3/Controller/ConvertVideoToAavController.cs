@@ -131,6 +131,7 @@ namespace Tangra.Controller
 
             m_IntegrationPeriod = integrationInterval;
             m_FirstIntegrationPeriodStartFrameId = firstIntegratedFrameId;
+            m_FirstFrameInInterval = firstIntegratedFrameId;
             m_DontValidateIntegrationIntervals = dontValidateIntegrationIntervals;
             m_NextExpectedIntegrationPeriodStartFrameId = firstIntegratedFrameId + integrationInterval;
             m_FramesSoFar = 0;
@@ -188,6 +189,8 @@ namespace Tangra.Controller
             m_Recorder.StatusSectionConfig.RecordSystemErrors = true;
             m_Recorder.StatusSectionConfig.AddDefineTag("FRAME-TYPE", Adv2TagType.UTF8String);
             m_Recorder.StatusSectionConfig.AddDefineTag("FRAMES-IN-INTERVAL", Adv2TagType.Int8);
+            m_Recorder.StatusSectionConfig.AddDefineTag("FIRST-INTERVAL-FRAME", Adv2TagType.Int32);
+            m_Recorder.StatusSectionConfig.AddDefineTag("LAST-INTERVAL-FRAME", Adv2TagType.Int32);
             m_Recorder.StatusSectionConfig.AddDefineTag("NOISE-SIGNATURES", Adv2TagType.UTF8String);
             m_Recorder.StatusSectionConfig.AddDefineTag("ORIGINAL-FRAME-ID", Adv2TagType.Int32);
             m_Recorder.StatusSectionConfig.AddDefineTag("IntegratedFrames", Adv2TagType.Int8);
@@ -211,7 +214,7 @@ namespace Tangra.Controller
                     pixels = frame.Pixels.Select(x => (ushort)(integrationInterval * x)).ToArray();
                     m_Recorder.AddCalibrationFrame(pixels, true,
                         PreferredCompression.Lagarith16,
-                        new AdvRecorder.AdvStatusEntry() { AdditionalStatusTags = new[] { "VTI-OSD-CALIBRATION", (object)(byte)0, string.Empty, (object)i, (object)(byte)0 } },
+                        new AdvRecorder.AdvStatusEntry() { AdditionalStatusTags = new[] { "VTI-OSD-CALIBRATION", (object)(byte)0, (object)(int)0, (int)(byte)0, string.Empty, (object)i, (object)(byte)0 } },
                         Adv.AdvImageData.PixelDepth16Bit);
 
                     m_VideoController.NotifyFileProgress(i - currFrame, maxOcrCalibrationFramesToSave);
@@ -222,7 +225,7 @@ namespace Tangra.Controller
                 pixels = frame.Pixels.Select(x => (ushort)(integrationInterval * x)).ToArray();
                 m_Recorder.AddCalibrationFrame(pixels, true,
                     PreferredCompression.Lagarith16,
-                    new AdvRecorder.AdvStatusEntry() { AdditionalStatusTags = new[] { "FIELD-CALIBRATION", (object)(byte)0, string.Empty, (object)m_FirstIntegrationPeriodStartFrameId, (object)(byte)0 } },
+                    new AdvRecorder.AdvStatusEntry() { AdditionalStatusTags = new[] { "FIELD-CALIBRATION", (object)(byte)0, (object)(int)0, (int)(byte)0, string.Empty, (object)m_FirstIntegrationPeriodStartFrameId, (object)(byte)0 } },
                     Adv.AdvImageData.PixelDepth16Bit);
             }
             finally
@@ -439,6 +442,9 @@ namespace Tangra.Controller
         }
 
         private int m_FramesSoFar;
+        private int m_FirstFrameInInterval;
+        private int m_LastFrameInInterval;
+
         internal void ProcessFrame(int frameNo, AstroImage image)
         {
             bool isNewIntegrationPeroiod = IsNewIntegrationPeriod(frameNo, image);
@@ -447,11 +453,22 @@ namespace Tangra.Controller
                 string errors = null;
                 if (m_FramesSoFar != m_IntegrationPeriod)
                 {
-                    m_VideoController.RegisterAAVConversionError();
-
                     // Normalize the value during  the conversion
-                    for (int i = 0; i < m_CurrAavFramePixels.Length; i++)
-                        m_CurrAavFramePixels[i] = (ushort)Math.Round(m_CurrAavFramePixels[i] * 1.0 * m_IntegrationPeriod / m_FramesSoFar);
+                    for (int y = 0; y < m_Height; y++)
+                    {
+                        for (int x = 0; x < m_Width; x++)
+                        {
+                            if (y >= m_FirstVtiOsdLine && y <= m_LastVtiOsdLine && x >= m_LeftVtiOsdCol && x <= m_RightVtiOsdCol)
+                            {
+                                // VTI pixels have been already normalized when added, so no need to normalize them further
+                            }
+                            else
+                            {
+                                // Normalize a non VTI pixel
+                                m_CurrAavFramePixels[y * m_Width + x] = (ushort)Math.Round(m_CurrAavFramePixels[y * m_Width + x] * 1.0 * m_IntegrationPeriod / m_FramesSoFar);
+                            }
+                        }
+                    }
 
                     errors = string.Format("{0} frames detected in the current interval", m_FramesSoFar);
                 }
@@ -459,7 +476,7 @@ namespace Tangra.Controller
                 string noiseSignatures = string.Empty;
                 if (m_SigmaDict.Count >= m_IntegrationPeriod)
                 {
-                    for (int i = frameNo - m_IntegrationPeriod + 1; i <= frameNo; i++)
+                    for (int i = frameNo - m_FramesSoFar + 1; i <= frameNo; i++)
                     {
                         if (m_SigmaDict.ContainsKey(i))
                             noiseSignatures += string.Format("{0}={1:0.00};", i, m_SigmaDict[i]);
@@ -468,13 +485,14 @@ namespace Tangra.Controller
 
                 m_Recorder.AddVideoFrame(m_CurrAavFramePixels, true,
                     PreferredCompression.Lagarith16,
-                    new AdvRecorder.AdvStatusEntry() { SystemErrors = errors, AdditionalStatusTags = new[] { "DATA", (object)(byte)m_FramesSoFar, noiseSignatures, (object)(int)0, (object)(byte)m_FramesSoFar } },
+                    new AdvRecorder.AdvStatusEntry() { SystemErrors = errors, AdditionalStatusTags = new[] { "DATA", (object)(byte)m_FramesSoFar, (object)(int)m_FirstFrameInInterval, (object)(int)m_LastFrameInInterval, noiseSignatures, (object)(int)0, (object)(byte)m_FramesSoFar } },
                     Adv.AdvImageData.PixelDepth16Bit);
 
                 for (int i = 0; i < m_CurrAavFramePixels.Length; i++) 
                     m_CurrAavFramePixels[i] = 0;
 
                 m_FramesSoFar = 0;
+                m_FirstFrameInInterval = frameNo;
             }
 
             bool copyAllOsdLines = isNewIntegrationPeroiod || frameNo == m_FirstIntegrationPeriodStartFrameId;
@@ -504,6 +522,7 @@ namespace Tangra.Controller
             }
 
             m_FramesSoFar++;
+            m_LastFrameInInterval = frameNo;
         }
 
         internal void FinishedConversion()

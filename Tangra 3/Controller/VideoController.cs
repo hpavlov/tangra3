@@ -1084,7 +1084,7 @@ namespace Tangra.Controller
             get { return m_FramePlayer.FramesToIntegrate; }
         }
 
-		public void OverlayStateForFrame(Bitmap displayBitmap, int frameId)
+        public void OverlayStateForFrame(Bitmap displayBitmap, RenderFrameContext context)
 		{
             if (m_CurrentOperation != null &&
                 m_CurrentOperation.AvoidImageOverlays)
@@ -1092,7 +1092,7 @@ namespace Tangra.Controller
                 // The current operation doesn't want overlays displayed
             }
             else
-				m_OverlayManager.OverlayStateForFrame(displayBitmap, m_FrameState, frameId, IsAstroDigitalVideo, IsAstroAnalogueVideo);
+                m_OverlayManager.OverlayStateForFrame(displayBitmap, m_FrameState, context, IsAstroDigitalVideo, IsAstroAnalogueVideo);
 		}
 
         public void CompleteRenderFrame(Graphics g)

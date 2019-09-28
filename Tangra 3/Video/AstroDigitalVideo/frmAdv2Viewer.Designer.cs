@@ -948,6 +948,7 @@
             this.lvFrameStatusData.TabIndex = 21;
             this.lvFrameStatusData.UseCompatibleStateImageBehavior = false;
             this.lvFrameStatusData.View = System.Windows.Forms.View.Details;
+            this.lvFrameStatusData.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lvFrameStatusData_KeyDown);
             // 
             // lblFrameId
             // 

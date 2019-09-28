@@ -1014,5 +1014,18 @@ namespace Tangra.Video.AstroDigitalVideo
 			headerRow = header.ToString();
 			return output.ToString();
 		}
+
+        private void lvFrameStatusData_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (lvFrameStatusData.SelectedItems.Count == 1 && e.Control && e.KeyCode == Keys.C)
+            {
+                var textToCopy = "";
+                for (int i = 0; i < lvFrameStatusData.SelectedItems[0].SubItems.Count; i++)
+                {
+                    textToCopy += lvFrameStatusData.SelectedItems[0].SubItems[i].Text + "\t";
+                }
+                Clipboard.SetText(textToCopy);
+            }
+        }
     }
 }

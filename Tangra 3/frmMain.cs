@@ -349,7 +349,7 @@ namespace Tangra
 
 			if (m_VideoController.HasAstroImageState)
 			{
-				m_VideoController.OverlayStateForFrame(m_VideoContext.Pixelmap.DisplayBitmap, m_CurrentFrameId);
+                m_VideoController.OverlayStateForFrame(m_VideoContext.Pixelmap.DisplayBitmap, context);
 			}
 
             using (Graphics g = Graphics.FromImage(m_VideoContext.Pixelmap.DisplayBitmap))
