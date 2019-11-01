@@ -9,6 +9,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 using Tangra.Helpers;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
@@ -48,6 +49,12 @@ namespace Tangra.Video
 
                     VideoFileInfo fileInfo = TangraVideo.OpenFile(fileName);
 
+                    if (fileInfo.Height < 0)
+                    {
+                        MessageBox.Show("This appears to be a top-down DIB bitmap which is not supported by Tangra. If this video was recorded with ASICAP then please either use a different recording software or a different file format such as SER, FITS or ADV.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        throw new NotSupportedException("Top-down DIB bitmaps are not supported by Tangra.");
+                    }
+
                     TangraContext.Current.RenderingEngine = allEnginesByIndex[engineIdx];
 
                     var rv = new VideoStream(fileInfo, fileName);
@@ -69,7 +76,7 @@ namespace Tangra.Video
                 catch (Exception ex)
                 {
                     lastError = ex;
-                }		        
+                }
 		    }
 
             throw new InvalidVideoFileException(lastError != null 
