@@ -4,12 +4,14 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.VisualBasic.Devices;
 using Tangra.Controller;
 using Tangra.Model.Helpers;
 using Tangra.Video;
@@ -25,7 +27,8 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
             gtTimeDeltasDots,
             gtSystemUtilisation,
             gtNtpUpdates,
-            gtNtpUpdatesInclUnapplied
+            gtNtpUpdatesInclUnapplied,
+            gtZoomedTotalDelta
         }
 
         internal enum GridlineStyle
@@ -53,6 +56,10 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
         const float MIN_PIX_DIFF = 1f;
 
         private bool m_IsDataReady;
+
+        private float m_MedianSystemFileTime;
+
+        private List<float> m_OneMinIntervalData = new List<float>();
 
         private GraphConfig m_GraphConfig = new GraphConfig();
 
@@ -143,10 +150,11 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
         private void AnalyseData()
         {
             tbxAnalysisDetails.Clear();
+            m_OneMinIntervalData.Clear();
 
             var nonOutliers = m_TimeAnalyser.Entries.Where(x => !x.IsOutlier).ToList();
-            var medianSystemFileTime = nonOutliers.Select(x => x.DeltaSystemFileTimeMs).Median();
-            double medianSystemFileTimeVariance = nonOutliers.Sum(x => (medianSystemFileTime - x.DeltaSystemFileTimeMs) * (medianSystemFileTime - x.DeltaSystemFileTimeMs));
+            m_MedianSystemFileTime = nonOutliers.Select(x => x.DeltaSystemFileTimeMs).Median();
+            double medianSystemFileTimeVariance = nonOutliers.Sum(x => (m_MedianSystemFileTime - x.DeltaSystemFileTimeMs) * (m_MedianSystemFileTime - x.DeltaSystemFileTimeMs));
             medianSystemFileTimeVariance = Math.Sqrt(medianSystemFileTimeVariance / nonOutliers.Count);
 
             var medianSystemTime = nonOutliers.Select(x => x.DeltaSystemTimeMs).Median();
@@ -155,14 +163,16 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
 
             var medianNtpDiff = nonOutliers.Select(x => Math.Abs(x.DeltaSystemTimeMs - x.DeltaNTPTimeMs)).Median();
 
-            tbxAnalysisDetails.AppendText(string.Format("SystemTimeAsFileTime: {0:0.0} ms +/- {1:0.00} ms    SystemTime: {2:0.0} ms +/- {3:0.00} ms    MedianNTPDiff: {4:0.0} ms\r\n\r\n", medianSystemFileTime, medianSystemFileTimeVariance, medianSystemTime, medianSystemTimeVariance, medianNtpDiff));
-            tbxAnalysisDetails.AppendText(string.Format("Acqusition Delay: {0:0.0} ms    RecordingDelay: {1:0.0} ms\r\n\r\n", medianSystemFileTime, medianSystemTime - medianSystemFileTime));
+            tbxAnalysisDetails.AppendText(string.Format("SystemTimeAsFileTime: {0:0.0} ms +/- {1:0.00} ms    SystemTime: {2:0.0} ms +/- {3:0.00} ms    MedianNTPDiff: {4:0.0} ms\r\n\r\n", m_MedianSystemFileTime, medianSystemFileTimeVariance, medianSystemTime, medianSystemTimeVariance, medianNtpDiff));
+            tbxAnalysisDetails.AppendText(string.Format("Acqusition Delay: {0:0.0} ms    RecordingDelay: {1:0.0} ms\r\n\r\n", m_MedianSystemFileTime, medianSystemTime - m_MedianSystemFileTime));
+
+            ComputeMedianAndErrorForAllOneMinuteIntervals(nonOutliers);
 
             for (int i = 0; i < m_TimeAnalyser.Entries.Count; i++)
             {
                 var ol = m_TimeAnalyser.Entries[i];
 
-                var delta = ol.DeltaSystemFileTimeMs - medianSystemFileTime;
+                var delta = ol.DeltaSystemFileTimeMs - m_MedianSystemFileTime;
                 if (Math.Abs(delta) > 6 * medianSystemFileTimeVariance)
                 {
                     var ol2 = i == 0 ? m_TimeAnalyser.Entries[1] : m_TimeAnalyser.Entries[i - 1];
@@ -171,6 +181,28 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                     tbxAnalysisDetails.AppendText(string.Format("Outlier at {0}, FrameNo: {1} Delta: {2:0.0} ms; Non-Acquisition Delay: {3:0.0} ms; CPU: {4:0.0}% Disks: {5:0.0}%  {6}\r\n", ol.SystemTimeFileTime.ToString("HH:mm:ss.fff"), ol.FrameNo, delta, (ol2.DeltaNTPTimeMs - ol2.DeltaSystemFileTimeMs) - (ol.DeltaNTPTimeMs - ol.DeltaSystemFileTimeMs), utilEntry.CpuUtilisation, utilEntry.DiskUtilisation, ol.DebugImage != null ? "OCR-ERR:" + ol.OrcField1 + "  " + ol.OrcField2 : null));
                 }
             }
+        }
+
+        private void ComputeMedianAndErrorForAllOneMinuteIntervals(List<TimeAnalyserEntry> nonOutliers)
+        {
+            var varianceList = new List<double>();
+            DateTime? startIntervalTime = null;
+            for (int i = 0; i < nonOutliers.Count; i++)
+            {
+                if (startIntervalTime == null) startIntervalTime = nonOutliers[i].SystemTimeFileTime;
+                m_OneMinIntervalData.Add(nonOutliers[i].DeltaSystemFileTimeMs);
+                if (nonOutliers[i].SystemTimeFileTime > startIntervalTime.Value.AddMinutes(1) || i == nonOutliers.Count - 1)
+                {
+                    var oneMinMedianSystemTime = m_OneMinIntervalData.Median();
+                    double diff = oneMinMedianSystemTime - m_MedianSystemFileTime;
+                    varianceList.Add(diff);
+                    startIntervalTime = null;
+                    m_OneMinIntervalData.Clear();
+                }
+            }
+
+            tbxAnalysisDetails.AppendText(string.Format("SystemTimeAsFileTime 1-Min Median Delta: {0:0.0} ms / {1:0.00} ms\r\n\r\n", varianceList.Max(), varianceList.Min()));
+           
         }
 
         private void DrawGraph()
@@ -189,6 +221,9 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                 case GraphType.gtNtpUpdates:
                 case GraphType.gtNtpUpdatesInclUnapplied:
                     DrawNtpUpdatesGraph();
+                    break;
+                case GraphType.gtZoomedTotalDelta:
+                    DrawZoomedTimeDeltasGraph();
                     break;
             }
         }
@@ -522,6 +557,264 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
             });
         }
 
+        private void DrawZoomedTimeDeltasGraph()
+        {
+            Cursor = Cursors.WaitCursor;
+
+            Pen MedianPen = new Pen(Brushes.Blue, 2);
+            MedianPen.DashCap = DashCap.Round;
+            Brush MedianBrush = Brushes.Blue;
+            Brush SysTimeBrush = Brushes.Chocolate;
+
+            int graphWidth = pbGraph.Width;
+            int graphHeight = pbGraph.Height;
+            var image = new Bitmap(graphWidth, graphHeight, PixelFormat.Format24bppRgb);
+
+            bool tickGridlines = m_GraphConfig.GridlineStyle == GridlineStyle.Tick;
+            float yScalePaddingCoeff = 1.2f;
+
+            Task.Run(() =>
+            {
+                var deltas = m_TimeAnalyser.Entries.Where(x => !x.IsOutlier).Select(x => x.DeltaSystemFileTimeMs).ToList();
+
+                float minDelta = deltas.Min();
+                float maxDelta = deltas.Max();
+                float b = (maxDelta - minDelta) * yScalePaddingCoeff;
+                float m = (maxDelta + minDelta)/2;
+                minDelta = m - b/2.0f;
+                maxDelta = m + b/2.0f;
+                TimeSpan medianInterval = TimeSpan.FromMinutes((int)nudMedianInterval.Value);
+                DateTime? medianStartInterval = null;
+                int medianStartIntervalIndex = 0;
+                List<float> medianCalsList = new List<float>();
+
+                using (var g = Graphics.FromImage(image))
+                {
+                    float padding = 10;
+                    float paddingY = 25;
+                    float height = graphHeight - 2 * paddingY;
+                    float yFactor = height / (maxDelta - minDelta);
+
+                    int interval = GetReadableLabelYAxisTickInterval(g, yFactor);
+
+                    int yGridFrom = (int)Math.Floor((m - b) / interval) * interval;
+                    int yGridTo = (int)Math.Ceiling((m + b) / interval) * interval;
+
+                    float paddingX = GetXAsisPaddingToFitYLabels(g, yGridFrom, yGridTo);
+                    float width = graphWidth - padding - paddingX;
+
+                    float minX = 0;
+                    float maxX = m_TimeAnalyser.Entries.Count - 1;
+                    float xFactor = width / (maxX - minX + 1);
+
+                    g.FillRectangle(Brushes.WhiteSmoke, 0, 0, graphWidth, graphHeight);
+
+                    int idx = 0;
+
+                    float y2 = 0;
+                    float xp2 = 0;
+                    float y2p = 0;
+
+                    var totalHours = (float)(m_TimeAnalyser.Entries[m_TimeAnalyser.Entries.Count - 1].SystemTimeFileTime - m_TimeAnalyser.Entries[0].SystemTimeFileTime).TotalHours;
+                    int? intervalX = GetReadableLabelXAxisTickInterval(g, xFactor * m_TimeAnalyser.Entries.Count / totalHours, totalHours);
+                    var nextTick = DateTime.MaxValue;
+                    if (intervalX != null)
+                    {
+                        nextTick = m_TimeAnalyser.Entries[0].SystemTimeFileTime.Date;
+                        while (nextTick < m_TimeAnalyser.Entries[0].SystemTimeFileTime)
+                        {
+                            nextTick = nextTick.AddHours(intervalX.Value);
+                        }
+                    }
+
+                    var medianData = new List<Tuple<float, float>>();
+
+                    foreach (var entry in m_TimeAnalyser.Entries)
+                    {
+                        if (entry.IsOutlier) continue;
+
+                        if (!medianStartInterval.HasValue)
+                        {
+                            medianStartInterval = entry.SystemTimeFileTime;
+                            medianStartIntervalIndex = idx;
+                        }
+
+                        float x = paddingX + (idx - minX) * xFactor;
+                        bool calcOnly = idx == 0;
+
+                        y2 = graphHeight - paddingY - yFactor * (entry.DeltaSystemFileTimeMs - minDelta);
+
+                        if (!calcOnly && (x - xp2 > MIN_PIX_DIFF || Math.Abs(y2 - y2p) > MIN_PIX_DIFF))
+                        {
+                            g.FillEllipse(SysTimeBrush, x - 1, y2 - 1, 2, 2);
+
+                            xp2 = x;
+                            y2p = y2;
+                        }
+
+                        if (idx == 0)
+                        {
+                            y2p = y2;
+                            xp2 = x;
+                        }
+
+                        if (entry.SystemTimeFileTime - medianStartInterval > medianInterval)
+                        {
+                            var median = medianCalsList.Median();
+                            var ym = graphHeight - paddingY - yFactor*(median - minDelta);
+                            var xm = paddingX + ((idx + medianStartIntervalIndex) / 2.0f - minX) * xFactor;
+                            
+                            medianData.Add(Tuple.Create(xm, ym));
+
+                            medianCalsList.Clear();
+                            medianStartInterval = entry.SystemTimeFileTime;
+                            medianStartIntervalIndex = idx;
+                        }
+                        else
+                        {
+                            medianCalsList.Add(entry.DeltaSystemFileTimeMs);
+                        }
+
+                        if (intervalX != null && nextTick < entry.SystemTimeFileTime)
+                        {
+                            g.DrawLine(Pens.Gray, x, graphHeight - paddingY + 1, x, graphHeight - paddingY - 5);
+
+                            var label = string.Format("{0} UT", nextTick.Hour);
+                            var lblSiz = g.MeasureString(label, DefaultFont);
+                            g.DrawString(label, DefaultFont, Brushes.Black, x - lblSiz.Width / 2, graphHeight - paddingY + 5);
+
+                            nextTick = nextTick.AddHours(intervalX.Value);
+                        }
+
+                        idx++;
+                    }
+
+                    for (int i = 0; i < medianData.Count - 1; i++)
+                    {
+                        g.FillEllipse(MedianBrush, medianData[i].Item1 - 2, medianData[i].Item2 - 2, 5, 5);
+                        g.DrawLine(MedianPen, medianData[i].Item1, medianData[i].Item2, medianData[i  + 1].Item1, medianData[i + 1].Item2);
+                    }
+
+                    SizeF sizF;
+                    for (int ya = yGridFrom; ya < yGridTo; ya += interval)
+                    {
+                        float y = graphHeight - paddingY - yFactor * (ya - minDelta);
+                        if (y < paddingY || y > graphHeight - paddingY) continue;
+
+                        if (tickGridlines && ya != 0 /* The zero grid line is fully drawn even in 'tick' mode */)
+                        {
+                            g.DrawLine(Pens.Gray, paddingX, y, paddingX + 5, y);
+                            g.DrawLine(Pens.Gray, graphWidth - padding - 5, y, graphWidth - padding, y);
+                        }
+                        else
+                        {
+                            g.DrawLine(Pens.Gray, paddingX, y, graphWidth - padding, y);
+                        }
+
+                        if (ya == 0)
+                        {
+                            if (tickGridlines)
+                            {
+                                g.DrawLine(Pens.Gray, paddingX, y - 1, paddingX + 5, y - 1);
+                                g.DrawLine(Pens.Gray, graphWidth - padding - 5, y - 1, graphWidth - padding, y - 1);
+                                g.DrawLine(Pens.Gray, paddingX, y + 1, paddingX + 5, y + 1);
+                                g.DrawLine(Pens.Gray, graphWidth - padding - 5, y + 1, graphWidth - padding, y + 1);
+                            }
+                            else
+                            {
+                                g.DrawLine(Pens.Gray, paddingX, y - 1, graphWidth - padding, y - 1);
+                                g.DrawLine(Pens.Gray, paddingX, y + 1, graphWidth - padding, y + 1);
+                            }
+                            sizF = g.MeasureString("0", DefaultFont);
+                            g.DrawString("0", DefaultFont, Brushes.Black, paddingX - sizF.Width - 5, y - sizF.Height / 2);
+                        }
+                        else
+                        {
+                            var label = string.Format("{0} ms", ya);
+                            sizF = g.MeasureString(label, DefaultFont);
+                            g.DrawString(label, DefaultFont, Brushes.Black, paddingX - sizF.Width - 5, y - sizF.Height / 2);
+                        }
+                    }
+
+                    g.DrawRectangle(Pens.Black, paddingX, paddingY, graphWidth - padding - paddingX, graphHeight - 2 * paddingY);
+
+                    var title = string.Format("Time Delta analysis of {0:0.0} million data points recorded between {1} UT and {2} UT", m_TimeAnalyser.Entries.Count / 1000000.0, m_TimeAnalyser.FromDateTime.ToString("dd-MMM HH:mm"), m_TimeAnalyser.ToDateTime.ToString("dd-MMM HH:mm"));
+                    var sizeF = g.MeasureString(title, m_TitleFont);
+                    g.DrawString(title, m_TitleFont, Brushes.Black, (width - sizeF.Width) / 2 + paddingX, (paddingY - sizeF.Height) / 2);
+                }
+            })
+            .ContinueWith((r) =>
+            {
+                if (r.IsCompleted)
+                {
+                    this.Invoke(new Action(() =>
+                    {
+                        if (pbGraph.Image != null)
+                        {
+                            pbGraph.Image.Dispose();
+                        }
+
+                        pbGraph.Image = image;
+                        pbGraph.Update();
+
+                        m_LastGraphWidth = pbGraph.Width;
+                        m_LastGraphHeight = pbGraph.Height;
+
+                        Cursor = Cursors.Default;
+                    }));
+                }
+                else
+                {
+                    Cursor = Cursors.Default;
+                }
+            });
+        }
+
+        private int GetReadableLabelYAxisTickInterval(Graphics g, float yFactor)
+        {
+            var sizF = g.MeasureString("123", DefaultFont);
+            var probeInts = new [] { 1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000 };
+            for (int i = 0; i < probeInts.Length; i++)
+            {
+                if (probeInts[i] * yFactor > sizF.Height*2)
+                {
+                    return probeInts[i];
+                }
+            }
+
+            return (int)Math.Pow(10, (int) Math.Ceiling(Math.Log10(sizF.Height*2)));
+        }
+
+        private int? GetReadableLabelXAxisTickInterval(Graphics g, float xFactorPerHour, float totalHours)
+        {
+            if (totalHours > 4)
+            {
+                var sizF = g.MeasureString("12 UT", DefaultFont);
+
+                var probeInts = new[] { 1, 2, 3, 5 };
+                for (int i = 0; i < probeInts.Length; i++)
+                {
+                    if (probeInts[i] * xFactorPerHour > sizF.Width * 2)
+                    {
+                        return probeInts[i];
+                    }
+                }
+            }
+            else
+            {
+                // TODO: half hour marks?
+            }
+
+            return null;
+        }
+
+        private int GetXAsisPaddingToFitYLabels(Graphics g, int yFrom, int yTo)
+        {
+            var sizF1 = g.MeasureString(string.Format("{0} ms", yFrom), DefaultFont);
+            var sizF2 = g.MeasureString(string.Format("{0} ms", yTo), DefaultFont);
+
+            return (int) Math.Ceiling(Math.Max(sizF1.Width, sizF2.Width)) + 10;
+        }
 
         private void DrawSystemUtilisationGraph()
         {
@@ -862,26 +1155,37 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
             {
                 m_GrapthType = GraphType.gtTimeDeltasLines;
                 pnlTimeDeltaConfig.Visible = true;
+                pnlTimeMedianConfig.Visible = false;
             }
             else if (cbxGraphType.SelectedIndex == 1)
             {
                 m_GrapthType = GraphType.gtTimeDeltasDots;
                 pnlTimeDeltaConfig.Visible = true;
+                pnlTimeMedianConfig.Visible = false;
             }
             else if (cbxGraphType.SelectedIndex == 2)
             {
                 m_GrapthType = GraphType.gtSystemUtilisation;
                 pnlTimeDeltaConfig.Visible = false;
+                pnlTimeMedianConfig.Visible = false;
             }
             else if (cbxGraphType.SelectedIndex == 3)
             {
                 m_GrapthType = GraphType.gtNtpUpdates;
                 pnlTimeDeltaConfig.Visible = false;
+                pnlTimeMedianConfig.Visible = false;
             }
             else if (cbxGraphType.SelectedIndex == 4)
             {
                 m_GrapthType = GraphType.gtNtpUpdatesInclUnapplied;
                 pnlTimeDeltaConfig.Visible = false;
+                pnlTimeMedianConfig.Visible = false;
+            }
+            else if (cbxGraphType.SelectedIndex == 5)
+            {
+                m_GrapthType = GraphType.gtZoomedTotalDelta;
+                pnlTimeDeltaConfig.Visible = false;
+                pnlTimeMedianConfig.Visible = true;
             }
 
             DrawGraph();

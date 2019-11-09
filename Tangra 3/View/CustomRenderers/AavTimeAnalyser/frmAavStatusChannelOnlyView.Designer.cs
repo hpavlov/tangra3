@@ -33,6 +33,7 @@
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabOverview = new System.Windows.Forms.TabPage();
             this.pbLoadData = new System.Windows.Forms.ProgressBar();
+            this.tbxAnalysisDetails = new System.Windows.Forms.TextBox();
             this.tabGraphs = new System.Windows.Forms.TabPage();
             this.pbGraph = new System.Windows.Forms.PictureBox();
             this.pnlGraph = new System.Windows.Forms.Panel();
@@ -42,6 +43,10 @@
             this.cbxNtpTime = new System.Windows.Forms.CheckBox();
             this.cbxNtpError = new System.Windows.Forms.CheckBox();
             this.cbxGraphType = new System.Windows.Forms.ComboBox();
+            this.pnlTimeMedianConfig = new System.Windows.Forms.Panel();
+            this.label2 = new System.Windows.Forms.Label();
+            this.nudMedianInterval = new System.Windows.Forms.NumericUpDown();
+            this.label1 = new System.Windows.Forms.Label();
             this.tabOCRErrors = new System.Windows.Forms.TabPage();
             this.pbOcrErrorFrame = new System.Windows.Forms.PictureBox();
             this.pnlOcrErrorControl = new System.Windows.Forms.Panel();
@@ -56,13 +61,14 @@
             this.miTickGridlines = new System.Windows.Forms.ToolStripMenuItem();
             this.miExport = new System.Windows.Forms.ToolStripMenuItem();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.tbxAnalysisDetails = new System.Windows.Forms.TextBox();
             this.tabControl.SuspendLayout();
             this.tabOverview.SuspendLayout();
             this.tabGraphs.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbGraph)).BeginInit();
             this.pnlGraph.SuspendLayout();
             this.pnlTimeDeltaConfig.SuspendLayout();
+            this.pnlTimeMedianConfig.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudMedianInterval)).BeginInit();
             this.tabOCRErrors.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbOcrErrorFrame)).BeginInit();
             this.pnlOcrErrorControl.SuspendLayout();
@@ -103,6 +109,21 @@
             this.pbLoadData.Size = new System.Drawing.Size(773, 23);
             this.pbLoadData.TabIndex = 0;
             // 
+            // tbxAnalysisDetails
+            // 
+            this.tbxAnalysisDetails.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbxAnalysisDetails.BackColor = System.Drawing.SystemColors.Info;
+            this.tbxAnalysisDetails.Location = new System.Drawing.Point(17, 17);
+            this.tbxAnalysisDetails.Multiline = true;
+            this.tbxAnalysisDetails.Name = "tbxAnalysisDetails";
+            this.tbxAnalysisDetails.ReadOnly = true;
+            this.tbxAnalysisDetails.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.tbxAnalysisDetails.Size = new System.Drawing.Size(773, 485);
+            this.tbxAnalysisDetails.TabIndex = 1;
+            this.tbxAnalysisDetails.Visible = false;
+            // 
             // tabGraphs
             // 
             this.tabGraphs.Controls.Add(this.pbGraph);
@@ -129,6 +150,7 @@
             // 
             this.pnlGraph.Controls.Add(this.pnlTimeDeltaConfig);
             this.pnlGraph.Controls.Add(this.cbxGraphType);
+            this.pnlGraph.Controls.Add(this.pnlTimeMedianConfig);
             this.pnlGraph.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlGraph.Location = new System.Drawing.Point(3, 3);
             this.pnlGraph.Name = "pnlGraph";
@@ -143,7 +165,7 @@
             this.pnlTimeDeltaConfig.Controls.Add(this.cbxNtpError);
             this.pnlTimeDeltaConfig.Location = new System.Drawing.Point(171, 0);
             this.pnlTimeDeltaConfig.Name = "pnlTimeDeltaConfig";
-            this.pnlTimeDeltaConfig.Size = new System.Drawing.Size(625, 33);
+            this.pnlTimeDeltaConfig.Size = new System.Drawing.Size(606, 33);
             this.pnlTimeDeltaConfig.TabIndex = 1;
             // 
             // rbSystemTime
@@ -204,12 +226,64 @@
             "Time Deltas - Dots",
             "System Utilisation",
             "NTP Updates",
-            "NTP Updates & Unapplied"});
+            "NTP Updates & Unapplied",
+            "Zoomed Time Deltas"});
             this.cbxGraphType.Location = new System.Drawing.Point(6, 7);
             this.cbxGraphType.Name = "cbxGraphType";
             this.cbxGraphType.Size = new System.Drawing.Size(159, 21);
             this.cbxGraphType.TabIndex = 0;
             this.cbxGraphType.SelectedIndexChanged += new System.EventHandler(this.cbxGraphType_SelectedIndexChanged);
+            // 
+            // pnlTimeMedianConfig
+            // 
+            this.pnlTimeMedianConfig.Controls.Add(this.label2);
+            this.pnlTimeMedianConfig.Controls.Add(this.nudMedianInterval);
+            this.pnlTimeMedianConfig.Controls.Add(this.label1);
+            this.pnlTimeMedianConfig.Location = new System.Drawing.Point(171, 0);
+            this.pnlTimeMedianConfig.Name = "pnlTimeMedianConfig";
+            this.pnlTimeMedianConfig.Size = new System.Drawing.Size(625, 33);
+            this.pnlTimeMedianConfig.TabIndex = 2;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(150, 10);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(23, 13);
+            this.label2.TabIndex = 2;
+            this.label2.Text = "min";
+            // 
+            // nudMedianInterval
+            // 
+            this.nudMedianInterval.Location = new System.Drawing.Point(103, 7);
+            this.nudMedianInterval.Maximum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.nudMedianInterval.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.nudMedianInterval.Name = "nudMedianInterval";
+            this.nudMedianInterval.Size = new System.Drawing.Size(41, 20);
+            this.nudMedianInterval.TabIndex = 1;
+            this.nudMedianInterval.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.nudMedianInterval.ValueChanged += new System.EventHandler(this.TimeDeltasTimeSourceChanged);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(13, 9);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(83, 13);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "Median Interval:";
             // 
             // tabOCRErrors
             // 
@@ -320,28 +394,13 @@
             // miExport
             // 
             this.miExport.Name = "miExport";
-            this.miExport.Size = new System.Drawing.Size(52, 20);
+            this.miExport.Size = new System.Drawing.Size(53, 20);
             this.miExport.Text = "&Export";
             this.miExport.Click += new System.EventHandler(this.miExport_Click);
             // 
             // saveFileDialog
             // 
             this.saveFileDialog.DefaultExt = "cvs";
-            // 
-            // tbxAnalysisDetails
-            // 
-            this.tbxAnalysisDetails.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbxAnalysisDetails.BackColor = System.Drawing.SystemColors.Info;
-            this.tbxAnalysisDetails.Location = new System.Drawing.Point(17, 17);
-            this.tbxAnalysisDetails.Multiline = true;
-            this.tbxAnalysisDetails.Name = "tbxAnalysisDetails";
-            this.tbxAnalysisDetails.ReadOnly = true;
-            this.tbxAnalysisDetails.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tbxAnalysisDetails.Size = new System.Drawing.Size(773, 485);
-            this.tbxAnalysisDetails.TabIndex = 1;
-            this.tbxAnalysisDetails.Visible = false;
             // 
             // frmAavStatusChannelOnlyView
             // 
@@ -366,6 +425,9 @@
             this.pnlGraph.ResumeLayout(false);
             this.pnlTimeDeltaConfig.ResumeLayout(false);
             this.pnlTimeDeltaConfig.PerformLayout();
+            this.pnlTimeMedianConfig.ResumeLayout(false);
+            this.pnlTimeMedianConfig.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudMedianInterval)).EndInit();
             this.tabOCRErrors.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pbOcrErrorFrame)).EndInit();
             this.pnlOcrErrorControl.ResumeLayout(false);
@@ -407,5 +469,9 @@
         private System.Windows.Forms.SaveFileDialog saveFileDialog;
         private System.Windows.Forms.ToolStripMenuItem miSubset;
         private System.Windows.Forms.TextBox tbxAnalysisDetails;
+        private System.Windows.Forms.Panel pnlTimeMedianConfig;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.NumericUpDown nudMedianInterval;
+        private System.Windows.Forms.Label label1;
     }
 }
