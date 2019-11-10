@@ -61,6 +61,8 @@
             this.miTickGridlines = new System.Windows.Forms.ToolStripMenuItem();
             this.miExport = new System.Windows.Forms.ToolStripMenuItem();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.label3 = new System.Windows.Forms.Label();
+            this.nudDensityThreshold = new System.Windows.Forms.NumericUpDown();
             this.tabControl.SuspendLayout();
             this.tabOverview.SuspendLayout();
             this.tabGraphs.SuspendLayout();
@@ -74,6 +76,7 @@
             this.pnlOcrErrorControl.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudOcrErrorFrame)).BeginInit();
             this.menuStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudDensityThreshold)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl
@@ -148,9 +151,9 @@
             // 
             // pnlGraph
             // 
+            this.pnlGraph.Controls.Add(this.pnlTimeMedianConfig);
             this.pnlGraph.Controls.Add(this.pnlTimeDeltaConfig);
             this.pnlGraph.Controls.Add(this.cbxGraphType);
-            this.pnlGraph.Controls.Add(this.pnlTimeMedianConfig);
             this.pnlGraph.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlGraph.Location = new System.Drawing.Point(3, 3);
             this.pnlGraph.Name = "pnlGraph";
@@ -236,6 +239,8 @@
             // 
             // pnlTimeMedianConfig
             // 
+            this.pnlTimeMedianConfig.Controls.Add(this.nudDensityThreshold);
+            this.pnlTimeMedianConfig.Controls.Add(this.label3);
             this.pnlTimeMedianConfig.Controls.Add(this.label2);
             this.pnlTimeMedianConfig.Controls.Add(this.nudMedianInterval);
             this.pnlTimeMedianConfig.Controls.Add(this.label1);
@@ -258,11 +263,6 @@
             this.nudMedianInterval.Location = new System.Drawing.Point(103, 7);
             this.nudMedianInterval.Maximum = new decimal(new int[] {
             10,
-            0,
-            0,
-            0});
-            this.nudMedianInterval.Minimum = new decimal(new int[] {
-            1,
             0,
             0,
             0});
@@ -402,6 +402,28 @@
             // 
             this.saveFileDialog.DefaultExt = "cvs";
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(206, 10);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(92, 13);
+            this.label3.TabIndex = 1;
+            this.label3.Text = "Density Theshold:";
+            // 
+            // nudDensityThreshold
+            // 
+            this.nudDensityThreshold.Location = new System.Drawing.Point(304, 7);
+            this.nudDensityThreshold.Maximum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.nudDensityThreshold.Name = "nudDensityThreshold";
+            this.nudDensityThreshold.Size = new System.Drawing.Size(41, 20);
+            this.nudDensityThreshold.TabIndex = 3;
+            this.nudDensityThreshold.ValueChanged += new System.EventHandler(this.TimeDeltasTimeSourceChanged);
+            // 
             // frmAavStatusChannelOnlyView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -435,6 +457,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudOcrErrorFrame)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudDensityThreshold)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -473,5 +496,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.NumericUpDown nudMedianInterval;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.NumericUpDown nudDensityThreshold;
+        private System.Windows.Forms.Label label3;
     }
 }

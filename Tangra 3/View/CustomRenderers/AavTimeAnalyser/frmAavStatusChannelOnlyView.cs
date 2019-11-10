@@ -565,10 +565,12 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
             MedianPen.DashCap = DashCap.Round;
             Brush MedianBrush = Brushes.Blue;
             Brush SysTimeBrush = Brushes.Chocolate;
+            int densityThreshold = (int)nudDensityThreshold.Value;
 
             int graphWidth = pbGraph.Width;
             int graphHeight = pbGraph.Height;
             var image = new Bitmap(graphWidth, graphHeight, PixelFormat.Format24bppRgb);
+            var densityMonitor = new int[graphWidth, graphHeight];
 
             bool tickGridlines = m_GraphConfig.GridlineStyle == GridlineStyle.Tick;
             float yScalePaddingCoeff = 1.2f;
@@ -577,8 +579,49 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
             {
                 var deltas = m_TimeAnalyser.Entries.Where(x => !x.IsOutlier).Select(x => x.DeltaSystemFileTimeMs).ToList();
 
-                float minDelta = deltas.Min();
-                float maxDelta = deltas.Max();
+                int idx = 0;
+
+                float minDeltaTryRun = float.MaxValue;
+                float maxDeltaTryRun = float.MinValue;
+
+                if (densityThreshold > 0)
+                {
+                    // Dry run to determine actual min/max Y values
+
+                    float xFactorDry = graphWidth * 1.0f / (m_TimeAnalyser.Entries.Count - 1 - 0 + 1);
+                    float minDeltaDry = deltas.Min();
+                    float maxDeltaDry = deltas.Max();
+                    float yFactorDry = graphHeight / (maxDeltaDry - minDeltaDry);
+                    var densityMonitorDry = new int[graphWidth, graphHeight];
+
+                    foreach (var entry in m_TimeAnalyser.Entries)
+                    {
+                        if (entry.IsOutlier) continue;
+
+                        float x = idx * xFactorDry;
+                        float y = graphHeight - yFactorDry * (entry.DeltaSystemFileTimeMs - minDeltaDry);
+
+                        int xi = (int)x;
+                        int yi = (int)y;
+
+                        if (xi >= 0 && xi < graphWidth && yi >= 0 && yi < graphHeight && densityMonitorDry[xi, yi] <= densityThreshold)
+                        {
+                            densityMonitorDry[xi, yi]++;
+
+                            if (densityMonitorDry[xi, yi] > densityThreshold)
+                            {
+                                if (minDeltaTryRun > entry.DeltaSystemFileTimeMs) minDeltaTryRun = entry.DeltaSystemFileTimeMs;
+                                if (maxDeltaTryRun < entry.DeltaSystemFileTimeMs) maxDeltaTryRun = entry.DeltaSystemFileTimeMs;
+                            }
+                        }
+
+                        idx++;
+                    }
+                }
+
+                float minDelta = densityThreshold > 0 ? minDeltaTryRun : deltas.Min();
+                float maxDelta = densityThreshold > 0 ? maxDeltaTryRun : deltas.Max();
+
                 float b = (maxDelta - minDelta) * yScalePaddingCoeff;
                 float m = (maxDelta + minDelta)/2;
                 minDelta = m - b/2.0f;
@@ -609,7 +652,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
 
                     g.FillRectangle(Brushes.WhiteSmoke, 0, 0, graphWidth, graphHeight);
 
-                    int idx = 0;
+                    idx = 0;
 
                     float y2 = 0;
                     float xp2 = 0;
@@ -646,7 +689,20 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
 
                         if (!calcOnly && (x - xp2 > MIN_PIX_DIFF || Math.Abs(y2 - y2p) > MIN_PIX_DIFF))
                         {
-                            g.FillEllipse(SysTimeBrush, x - 1, y2 - 1, 2, 2);
+                            int xi = (int) x;
+                            int yi = (int) y2;
+                            if (xi < 0) xi = 0; if (xi > graphWidth - 1) xi = graphWidth - 1;
+                            if (yi < 0) yi = 0; if (yi > graphHeight - 1) yi = graphHeight - 1;
+
+                            if (densityMonitor[xi, yi] <= densityThreshold)
+                            {
+                                densityMonitor[xi, yi]++;
+
+                                if (densityMonitor[xi, yi] > densityThreshold)
+                                {
+                                    g.FillEllipse(SysTimeBrush, x - 1, y2 - 1, 2, 2);
+                                }
+                            }
 
                             xp2 = x;
                             y2p = y2;
@@ -658,21 +714,24 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                             xp2 = x;
                         }
 
-                        if (entry.SystemTimeFileTime - medianStartInterval > medianInterval)
+                        if (medianInterval != TimeSpan.Zero)
                         {
-                            var median = medianCalsList.Median();
-                            var ym = graphHeight - paddingY - yFactor*(median - minDelta);
-                            var xm = paddingX + ((idx + medianStartIntervalIndex) / 2.0f - minX) * xFactor;
-                            
-                            medianData.Add(Tuple.Create(xm, ym));
+                            if (entry.SystemTimeFileTime - medianStartInterval > medianInterval)
+                            {
+                                var median = medianCalsList.Median();
+                                var ym = graphHeight - paddingY - yFactor * (median - minDelta);
+                                var xm = paddingX + ((idx + medianStartIntervalIndex) / 2.0f - minX) * xFactor;
 
-                            medianCalsList.Clear();
-                            medianStartInterval = entry.SystemTimeFileTime;
-                            medianStartIntervalIndex = idx;
-                        }
-                        else
-                        {
-                            medianCalsList.Add(entry.DeltaSystemFileTimeMs);
+                                medianData.Add(Tuple.Create(xm, ym));
+
+                                medianCalsList.Clear();
+                                medianStartInterval = entry.SystemTimeFileTime;
+                                medianStartIntervalIndex = idx;
+                            }
+                            else
+                            {
+                                medianCalsList.Add(entry.DeltaSystemFileTimeMs);
+                            }
                         }
 
                         if (intervalX != null && nextTick < entry.SystemTimeFileTime)
@@ -689,10 +748,13 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                         idx++;
                     }
 
-                    for (int i = 0; i < medianData.Count - 1; i++)
+                    if (medianInterval != TimeSpan.Zero)
                     {
-                        g.FillEllipse(MedianBrush, medianData[i].Item1 - 2, medianData[i].Item2 - 2, 5, 5);
-                        g.DrawLine(MedianPen, medianData[i].Item1, medianData[i].Item2, medianData[i  + 1].Item1, medianData[i + 1].Item2);
+                        for (int i = 0; i < medianData.Count - 1; i++)
+                        {
+                            g.FillEllipse(MedianBrush, medianData[i].Item1 - 2, medianData[i].Item2 - 2, 5, 5);
+                            g.DrawLine(MedianPen, medianData[i].Item1, medianData[i].Item2, medianData[i + 1].Item1, medianData[i + 1].Item2);
+                        }
                     }
 
                     SizeF sizF;
