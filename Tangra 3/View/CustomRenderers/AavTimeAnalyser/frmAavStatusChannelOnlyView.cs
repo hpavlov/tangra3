@@ -28,7 +28,8 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
             gtSystemUtilisation,
             gtNtpUpdates,
             gtNtpUpdatesInclUnapplied,
-            gtZoomedTotalDelta
+            gtZoomedTotalDelta,
+            gtDeltaBucketIntervals
         }
 
         internal enum GridlineStyle
@@ -224,6 +225,9 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                     break;
                 case GraphType.gtZoomedTotalDelta:
                     DrawZoomedTimeDeltasGraph();
+                    break;
+                case GraphType.gtDeltaBucketIntervals:
+                    DrawDeltaBucketsGraph();
                     break;
             }
         }
@@ -878,6 +882,141 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
             return (int) Math.Ceiling(Math.Max(sizF1.Width, sizF2.Width)) + 10;
         }
 
+        private void DrawDeltaBucketsGraph()
+        {
+            Cursor = Cursors.WaitCursor;
+
+            Brush SysTimeBrush = Brushes.Chocolate;
+            Pen BucketBorderPen = Pens.Blue;
+
+            int graphWidth = pbGraph.Width;
+            int graphHeight = pbGraph.Height;
+            var image = new Bitmap(graphWidth, graphHeight, PixelFormat.Format24bppRgb);
+
+            float bucketSize = (float)nudDeltaBucketInterval.Value;
+
+            Task.Run(() =>
+            {
+                var distribution = new Dictionary<int, float>();
+                var deltas = m_TimeAnalyser.Entries.Where(x => !x.IsOutlier).Select(x => x.DeltaSystemFileTimeMs).ToList();
+                var median = deltas.Median();
+                for (int i = 0; i < deltas.Count; i++)
+                {
+                    var offset = deltas[i] - median;
+                    int bucketSign = Math.Sign(offset);
+                    offset = Math.Abs(offset);
+
+                    int bucketNo = 0;
+                    offset = (offset - bucketSize/2.0f);
+                    if (offset > 0) bucketNo = bucketSign * (1 + (int)Math.Floor(offset / bucketSize));
+                    if (distribution.ContainsKey(bucketNo))
+                    {
+                        distribution[bucketNo]++;
+                    }
+                    else
+                    {
+                        distribution[bucketNo] = 1;
+                    }
+                }
+
+                var allValues = distribution.Values.ToArray();
+
+                // Normalisation
+                var totalDataPoints = allValues.Sum();
+                foreach (var key in distribution.Keys.ToArray())
+                {
+                    distribution[key] = distribution[key] * 100.0f / totalDataPoints;
+                    // Remove entried smaller than 0.1%
+                    if (distribution[key] < 0.1) distribution.Remove(key);
+                }
+
+                var allKeys = distribution.Keys.ToArray();
+                float minX = allKeys.Min() - 2;
+                float maxX = allKeys.Max() + 1;
+
+                
+
+                float padding = 10;
+                float paddingY = 25;
+                float height = graphHeight - 2 * paddingY;
+                float yFactor = height / (distribution.Values.Max() * 1.25f);
+
+                float paddingX = 50;
+                float width = graphWidth - padding - paddingX;
+
+                float xFactor = width / (maxX - minX);
+
+                using (var g = Graphics.FromImage(image))
+                {
+                    g.FillRectangle(Brushes.WhiteSmoke, 0, 0, graphWidth, graphHeight);
+
+                    for (int i = 0; i < 100; i++)
+                    {
+                        var y = graphHeight - paddingY - yFactor * i;
+                        if (y < paddingY) break;
+
+                        g.DrawLine(Pens.Gray, paddingX, y, graphWidth - padding, y);
+                        if (i % 5 == 0)
+                        {
+                            g.DrawLine(Pens.Gray, paddingX, y + 1, graphWidth - padding, y + 1);
+                            var label = string.Format("{0} %", i);
+                            var lblSiz = g.MeasureString(label, DefaultFont);
+                            g.DrawString(label, DefaultFont, Brushes.Black, paddingX - lblSiz.Width - 5, y - lblSiz.Height / 2);
+                        }
+                    }
+
+                    foreach (var kvp in distribution)
+                    {
+                        var key = kvp.Key;
+                        var x1 = paddingX + ((key - 1) - minX) * xFactor;
+                        var y = graphHeight - paddingY - yFactor * kvp.Value;
+                        g.FillRectangle(SysTimeBrush, x1, y, xFactor, graphHeight - paddingY - y);
+                        g.DrawRectangle(BucketBorderPen, x1, y, xFactor, graphHeight - paddingY - y);
+
+                        var xTick = x1 + xFactor / 2.0f;
+                        g.DrawLine(Pens.Gray, xTick, graphHeight - paddingY + 3, xTick, graphHeight - paddingY - 2);
+
+                        // TODO: Check if labels should be every, every second, every third etc tick based on label width
+                        var label = key == 0 ? "0" : string.Format("{0} ms", key * bucketSize);
+                        if (key > 0) label = "+" + label;
+                        var lblSiz = g.MeasureString(label, DefaultFont);
+                        g.DrawString(label, DefaultFont, Brushes.Black, xTick - lblSiz.Width / 2, graphHeight - paddingY + 5);
+                    }
+
+                    g.DrawRectangle(Pens.Black, paddingX, paddingY, graphWidth - padding - paddingX, graphHeight - 2 * paddingY);
+
+                    var title = string.Format("Destribution around median of {0:0.0} million data points recorded between {1} UT and {2} UT", m_TimeAnalyser.Entries.Count / 1000000.0, m_TimeAnalyser.FromDateTime.ToString("dd-MMM HH:mm"), m_TimeAnalyser.ToDateTime.ToString("dd-MMM HH:mm"));
+                    var sizeF = g.MeasureString(title, m_TitleFont);
+                    g.DrawString(title, m_TitleFont, Brushes.Black, (width - sizeF.Width) / 2 + paddingX, (paddingY - sizeF.Height) / 2);
+                }
+            })
+            .ContinueWith((r) =>
+            {
+                if (r.IsCompleted)
+                {
+                    this.Invoke(new Action(() =>
+                    {
+                        if (pbGraph.Image != null)
+                        {
+                            pbGraph.Image.Dispose();
+                        }
+
+                        pbGraph.Image = image;
+                        pbGraph.Update();
+
+                        m_LastGraphWidth = pbGraph.Width;
+                        m_LastGraphHeight = pbGraph.Height;
+
+                        Cursor = Cursors.Default;
+                    }));
+                }
+                else
+                {
+                    Cursor = Cursors.Default;
+                }
+            });
+        }
+
         private void DrawSystemUtilisationGraph()
         {
             Cursor = Cursors.WaitCursor;
@@ -1218,36 +1357,49 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                 m_GrapthType = GraphType.gtTimeDeltasLines;
                 pnlTimeDeltaConfig.Visible = true;
                 pnlTimeMedianConfig.Visible = false;
+                pnlTimeBucketsConfig.Visible = false;
             }
             else if (cbxGraphType.SelectedIndex == 1)
             {
                 m_GrapthType = GraphType.gtTimeDeltasDots;
                 pnlTimeDeltaConfig.Visible = true;
                 pnlTimeMedianConfig.Visible = false;
+                pnlTimeBucketsConfig.Visible = false;
             }
             else if (cbxGraphType.SelectedIndex == 2)
             {
                 m_GrapthType = GraphType.gtSystemUtilisation;
                 pnlTimeDeltaConfig.Visible = false;
                 pnlTimeMedianConfig.Visible = false;
+                pnlTimeBucketsConfig.Visible = false;
             }
             else if (cbxGraphType.SelectedIndex == 3)
             {
                 m_GrapthType = GraphType.gtNtpUpdates;
                 pnlTimeDeltaConfig.Visible = false;
                 pnlTimeMedianConfig.Visible = false;
+                pnlTimeBucketsConfig.Visible = false;
             }
             else if (cbxGraphType.SelectedIndex == 4)
             {
                 m_GrapthType = GraphType.gtNtpUpdatesInclUnapplied;
                 pnlTimeDeltaConfig.Visible = false;
                 pnlTimeMedianConfig.Visible = false;
+                pnlTimeBucketsConfig.Visible = false;
             }
             else if (cbxGraphType.SelectedIndex == 5)
             {
                 m_GrapthType = GraphType.gtZoomedTotalDelta;
                 pnlTimeDeltaConfig.Visible = false;
                 pnlTimeMedianConfig.Visible = true;
+                pnlTimeBucketsConfig.Visible = false;
+            }
+            else if (cbxGraphType.SelectedIndex == 6)
+            {
+                m_GrapthType = GraphType.gtDeltaBucketIntervals;
+                pnlTimeDeltaConfig.Visible = false;
+                pnlTimeMedianConfig.Visible = false;
+                pnlTimeBucketsConfig.Visible = true;
             }
 
             DrawGraph();

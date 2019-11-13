@@ -37,16 +37,18 @@
             this.tabGraphs = new System.Windows.Forms.TabPage();
             this.pbGraph = new System.Windows.Forms.PictureBox();
             this.pnlGraph = new System.Windows.Forms.Panel();
+            this.pnlTimeMedianConfig = new System.Windows.Forms.Panel();
+            this.nudDensityThreshold = new System.Windows.Forms.NumericUpDown();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.nudMedianInterval = new System.Windows.Forms.NumericUpDown();
+            this.label1 = new System.Windows.Forms.Label();
             this.pnlTimeDeltaConfig = new System.Windows.Forms.Panel();
             this.rbSystemTime = new System.Windows.Forms.RadioButton();
             this.rbSystemTimeAsFileTime = new System.Windows.Forms.RadioButton();
             this.cbxNtpTime = new System.Windows.Forms.CheckBox();
             this.cbxNtpError = new System.Windows.Forms.CheckBox();
             this.cbxGraphType = new System.Windows.Forms.ComboBox();
-            this.pnlTimeMedianConfig = new System.Windows.Forms.Panel();
-            this.label2 = new System.Windows.Forms.Label();
-            this.nudMedianInterval = new System.Windows.Forms.NumericUpDown();
-            this.label1 = new System.Windows.Forms.Label();
             this.tabOCRErrors = new System.Windows.Forms.TabPage();
             this.pbOcrErrorFrame = new System.Windows.Forms.PictureBox();
             this.pnlOcrErrorControl = new System.Windows.Forms.Panel();
@@ -61,22 +63,26 @@
             this.miTickGridlines = new System.Windows.Forms.ToolStripMenuItem();
             this.miExport = new System.Windows.Forms.ToolStripMenuItem();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.label3 = new System.Windows.Forms.Label();
-            this.nudDensityThreshold = new System.Windows.Forms.NumericUpDown();
+            this.pnlTimeBucketsConfig = new System.Windows.Forms.Panel();
+            this.label4 = new System.Windows.Forms.Label();
+            this.nudDeltaBucketInterval = new System.Windows.Forms.NumericUpDown();
+            this.label5 = new System.Windows.Forms.Label();
             this.tabControl.SuspendLayout();
             this.tabOverview.SuspendLayout();
             this.tabGraphs.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbGraph)).BeginInit();
             this.pnlGraph.SuspendLayout();
-            this.pnlTimeDeltaConfig.SuspendLayout();
             this.pnlTimeMedianConfig.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudDensityThreshold)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMedianInterval)).BeginInit();
+            this.pnlTimeDeltaConfig.SuspendLayout();
             this.tabOCRErrors.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbOcrErrorFrame)).BeginInit();
             this.pnlOcrErrorControl.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudOcrErrorFrame)).BeginInit();
             this.menuStrip1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudDensityThreshold)).BeginInit();
+            this.pnlTimeBucketsConfig.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudDeltaBucketInterval)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl
@@ -151,6 +157,7 @@
             // 
             // pnlGraph
             // 
+            this.pnlGraph.Controls.Add(this.pnlTimeBucketsConfig);
             this.pnlGraph.Controls.Add(this.pnlTimeMedianConfig);
             this.pnlGraph.Controls.Add(this.pnlTimeDeltaConfig);
             this.pnlGraph.Controls.Add(this.cbxGraphType);
@@ -159,6 +166,76 @@
             this.pnlGraph.Name = "pnlGraph";
             this.pnlGraph.Size = new System.Drawing.Size(801, 34);
             this.pnlGraph.TabIndex = 0;
+            // 
+            // pnlTimeMedianConfig
+            // 
+            this.pnlTimeMedianConfig.Controls.Add(this.nudDensityThreshold);
+            this.pnlTimeMedianConfig.Controls.Add(this.label3);
+            this.pnlTimeMedianConfig.Controls.Add(this.label2);
+            this.pnlTimeMedianConfig.Controls.Add(this.nudMedianInterval);
+            this.pnlTimeMedianConfig.Controls.Add(this.label1);
+            this.pnlTimeMedianConfig.Location = new System.Drawing.Point(171, 0);
+            this.pnlTimeMedianConfig.Name = "pnlTimeMedianConfig";
+            this.pnlTimeMedianConfig.Size = new System.Drawing.Size(625, 33);
+            this.pnlTimeMedianConfig.TabIndex = 2;
+            // 
+            // nudDensityThreshold
+            // 
+            this.nudDensityThreshold.Location = new System.Drawing.Point(304, 7);
+            this.nudDensityThreshold.Maximum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.nudDensityThreshold.Name = "nudDensityThreshold";
+            this.nudDensityThreshold.Size = new System.Drawing.Size(41, 20);
+            this.nudDensityThreshold.TabIndex = 3;
+            this.nudDensityThreshold.ValueChanged += new System.EventHandler(this.TimeDeltasTimeSourceChanged);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(206, 10);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(92, 13);
+            this.label3.TabIndex = 1;
+            this.label3.Text = "Density Theshold:";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(150, 10);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(23, 13);
+            this.label2.TabIndex = 2;
+            this.label2.Text = "min";
+            // 
+            // nudMedianInterval
+            // 
+            this.nudMedianInterval.Location = new System.Drawing.Point(103, 7);
+            this.nudMedianInterval.Maximum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.nudMedianInterval.Name = "nudMedianInterval";
+            this.nudMedianInterval.Size = new System.Drawing.Size(41, 20);
+            this.nudMedianInterval.TabIndex = 1;
+            this.nudMedianInterval.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.nudMedianInterval.ValueChanged += new System.EventHandler(this.TimeDeltasTimeSourceChanged);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(13, 9);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(83, 13);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "Median Interval:";
             // 
             // pnlTimeDeltaConfig
             // 
@@ -230,60 +307,13 @@
             "System Utilisation",
             "NTP Updates",
             "NTP Updates & Unapplied",
-            "Zoomed Time Deltas"});
+            "Zoomed Time Deltas",
+            "Delta Bucket Intervals (%)"});
             this.cbxGraphType.Location = new System.Drawing.Point(6, 7);
             this.cbxGraphType.Name = "cbxGraphType";
             this.cbxGraphType.Size = new System.Drawing.Size(159, 21);
             this.cbxGraphType.TabIndex = 0;
             this.cbxGraphType.SelectedIndexChanged += new System.EventHandler(this.cbxGraphType_SelectedIndexChanged);
-            // 
-            // pnlTimeMedianConfig
-            // 
-            this.pnlTimeMedianConfig.Controls.Add(this.nudDensityThreshold);
-            this.pnlTimeMedianConfig.Controls.Add(this.label3);
-            this.pnlTimeMedianConfig.Controls.Add(this.label2);
-            this.pnlTimeMedianConfig.Controls.Add(this.nudMedianInterval);
-            this.pnlTimeMedianConfig.Controls.Add(this.label1);
-            this.pnlTimeMedianConfig.Location = new System.Drawing.Point(171, 0);
-            this.pnlTimeMedianConfig.Name = "pnlTimeMedianConfig";
-            this.pnlTimeMedianConfig.Size = new System.Drawing.Size(625, 33);
-            this.pnlTimeMedianConfig.TabIndex = 2;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(150, 10);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(23, 13);
-            this.label2.TabIndex = 2;
-            this.label2.Text = "min";
-            // 
-            // nudMedianInterval
-            // 
-            this.nudMedianInterval.Location = new System.Drawing.Point(103, 7);
-            this.nudMedianInterval.Maximum = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
-            this.nudMedianInterval.Name = "nudMedianInterval";
-            this.nudMedianInterval.Size = new System.Drawing.Size(41, 20);
-            this.nudMedianInterval.TabIndex = 1;
-            this.nudMedianInterval.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.nudMedianInterval.ValueChanged += new System.EventHandler(this.TimeDeltasTimeSourceChanged);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(13, 9);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(83, 13);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Median Interval:";
             // 
             // tabOCRErrors
             // 
@@ -402,27 +432,56 @@
             // 
             this.saveFileDialog.DefaultExt = "cvs";
             // 
-            // label3
+            // pnlTimeBucketsConfig
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(206, 10);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(92, 13);
-            this.label3.TabIndex = 1;
-            this.label3.Text = "Density Theshold:";
+            this.pnlTimeBucketsConfig.Controls.Add(this.label4);
+            this.pnlTimeBucketsConfig.Controls.Add(this.nudDeltaBucketInterval);
+            this.pnlTimeBucketsConfig.Controls.Add(this.label5);
+            this.pnlTimeBucketsConfig.Location = new System.Drawing.Point(171, 0);
+            this.pnlTimeBucketsConfig.Name = "pnlTimeBucketsConfig";
+            this.pnlTimeBucketsConfig.Size = new System.Drawing.Size(615, 33);
+            this.pnlTimeBucketsConfig.TabIndex = 3;
             // 
-            // nudDensityThreshold
+            // label4
             // 
-            this.nudDensityThreshold.Location = new System.Drawing.Point(304, 7);
-            this.nudDensityThreshold.Maximum = new decimal(new int[] {
-            10,
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(151, 12);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(20, 13);
+            this.label4.TabIndex = 5;
+            this.label4.Text = "ms";
+            // 
+            // nudDeltaBucketInterval
+            // 
+            this.nudDeltaBucketInterval.Location = new System.Drawing.Point(104, 8);
+            this.nudDeltaBucketInterval.Maximum = new decimal(new int[] {
+            50,
             0,
             0,
             0});
-            this.nudDensityThreshold.Name = "nudDensityThreshold";
-            this.nudDensityThreshold.Size = new System.Drawing.Size(41, 20);
-            this.nudDensityThreshold.TabIndex = 3;
-            this.nudDensityThreshold.ValueChanged += new System.EventHandler(this.TimeDeltasTimeSourceChanged);
+            this.nudDeltaBucketInterval.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.nudDeltaBucketInterval.Name = "nudDeltaBucketInterval";
+            this.nudDeltaBucketInterval.Size = new System.Drawing.Size(41, 20);
+            this.nudDeltaBucketInterval.TabIndex = 4;
+            this.nudDeltaBucketInterval.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.nudDeltaBucketInterval.ValueChanged += new System.EventHandler(this.TimeDeltasTimeSourceChanged);
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(14, 11);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(82, 13);
+            this.label5.TabIndex = 3;
+            this.label5.Text = "Bucket Interval:";
             // 
             // frmAavStatusChannelOnlyView
             // 
@@ -445,11 +504,12 @@
             this.tabGraphs.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pbGraph)).EndInit();
             this.pnlGraph.ResumeLayout(false);
-            this.pnlTimeDeltaConfig.ResumeLayout(false);
-            this.pnlTimeDeltaConfig.PerformLayout();
             this.pnlTimeMedianConfig.ResumeLayout(false);
             this.pnlTimeMedianConfig.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudDensityThreshold)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMedianInterval)).EndInit();
+            this.pnlTimeDeltaConfig.ResumeLayout(false);
+            this.pnlTimeDeltaConfig.PerformLayout();
             this.tabOCRErrors.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pbOcrErrorFrame)).EndInit();
             this.pnlOcrErrorControl.ResumeLayout(false);
@@ -457,7 +517,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudOcrErrorFrame)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudDensityThreshold)).EndInit();
+            this.pnlTimeBucketsConfig.ResumeLayout(false);
+            this.pnlTimeBucketsConfig.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudDeltaBucketInterval)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -498,5 +560,9 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.NumericUpDown nudDensityThreshold;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Panel pnlTimeBucketsConfig;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.NumericUpDown nudDeltaBucketInterval;
+        private System.Windows.Forms.Label label5;
     }
 }
