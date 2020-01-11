@@ -1050,6 +1050,12 @@
     <Compile Include="Video\SER\frmCheckTimeStampsIntegrity.Designer.cs">
       <DependentUpon>frmCheckTimeStampsIntegrity.cs</DependentUpon>
     </Compile>
+    <Compile Include="Video\SER\frmSerTimestampExposure.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Video\SER\frmSerTimestampExposure.Designer.cs">
+      <DependentUpon>frmSerTimestampExposure.cs</DependentUpon>
+    </Compile>
     <Compile Include="Video\SER\SERVideoStream.cs" />
     <Compile Include="Video\SER\frmEnterSERFileInfo.cs">
       <SubType>Form</SubType>
@@ -1472,6 +1478,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Video\SER\frmSerStatusPopup.resx">
       <DependentUpon>frmSerStatusPopup.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Video\SER\frmSerTimestampExposure.resx">
+      <DependentUpon>frmSerTimestampExposure.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="View\CustomRenderers\AavTimeAnalyser\frmAavStatusChannelOnlyView.resx">
       <DependentUpon>frmAavStatusChannelOnlyView.cs</DependentUpon>

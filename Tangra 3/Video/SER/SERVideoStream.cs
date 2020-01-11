@@ -37,6 +37,13 @@ namespace Tangra.Video.SER
         FireCaptureLog
 	}
 
+    public enum SerTimeStampReference
+    {
+        StartFrame,
+        MidFrame,
+        EndFrame
+    }
+
 	public class SERVideoStream : IFrameStream
 	{
         public static SERVideoStream OpenFile(string fileName, IWin32Window parentForm, TangraOpenFileArgs args, out SerEquipmentInfo equipmentInfo)
@@ -124,6 +131,15 @@ namespace Tangra.Video.SER
             {
                 var frmCheckTS = new frmCheckTimeStampsIntegrity(rv);
                 frmCheckTS.ShowDialog(parentForm);
+
+                if (rv.HasTimeStamps || rv.HasUTCTimeStamps)
+                {
+                    var frmTsExp = new frmSerTimestampExposure(frmCheckTS.MedianExposure);
+                    frmTsExp.ShowDialog(parentForm);
+
+                    var derivedFrameRate = 1000.0 / frmTsExp.ConfirmedExposure;
+                    rv = new SERVideoStream(fileName, derivedFrameRate, bitPix, grayScaleRGB, serTiming, fireCaptureTimeStamps, frmTsExp.ConfirmedTimeReference);
+                }
             }
             return rv;
 		}
@@ -132,11 +148,12 @@ namespace Tangra.Video.SER
 		private SerFileInfo m_FileInfo;
 		private string m_FileName;
 	    internal SerUseTimeStamp UseTimeStamp { get; private set; }
+        internal SerTimeStampReference TimeStampReference { get; private set; }
 
 		private SerFrameInfo m_CurrentFrameInfo;
 	    private Dictionary<int, DateTime> m_FireCaptureTimeStamps;
 
-        private SERVideoStream(string fileName, double frameRate, int cameraBitPix, bool grayScaleRGB, SerUseTimeStamp useTimeStamp, Dictionary<int, DateTime> fireCaptureTimeStamps)
+        private SERVideoStream(string fileName, double frameRate, int cameraBitPix, bool grayScaleRGB, SerUseTimeStamp useTimeStamp, Dictionary<int, DateTime> fireCaptureTimeStamps, SerTimeStampReference timeStampReference = SerTimeStampReference.MidFrame)
 		{
 			m_FileInfo = new SerFileInfo();
 
@@ -150,8 +167,9 @@ namespace Tangra.Video.SER
 
 			BitPix = cameraBitPix;
 			FrameRate = frameRate;
-			MillisecondsPerFrame = 1000 / frameRate;
+			MillisecondsPerFrame = 1000.0 / frameRate;
 			UseTimeStamp = useTimeStamp;
+            TimeStampReference = timeStampReference;
             m_FireCaptureTimeStamps = fireCaptureTimeStamps;
 
 			Observer = Encoding.UTF8.GetString(observer).Trim();
@@ -280,7 +298,20 @@ namespace Tangra.Video.SER
 			        }
                     else if (UseTimeStamp == SerUseTimeStamp.SerEmbeddedUtcTime)
 			        {
-                        rv.FrameState.CentralExposureTime = m_CurrentFrameInfo.TimeStampUtc;
+			            switch (TimeStampReference)
+			            {
+			                case SerTimeStampReference.StartFrame:
+                                rv.FrameState.CentralExposureTime = m_CurrentFrameInfo.TimeStampUtc.AddMilliseconds(MillisecondsPerFrame * 0.5);
+			                    break;
+
+                            case SerTimeStampReference.EndFrame:
+                                rv.FrameState.CentralExposureTime = m_CurrentFrameInfo.TimeStampUtc.AddMilliseconds(MillisecondsPerFrame * -0.5);
+			                    break;
+
+                            default:
+                                rv.FrameState.CentralExposureTime = m_CurrentFrameInfo.TimeStampUtc;
+			                    break;
+			            }
 			        }
 			    }
 

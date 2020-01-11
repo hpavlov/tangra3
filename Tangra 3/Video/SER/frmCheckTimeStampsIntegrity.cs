@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Model.Helpers;
 using Tangra.PInvoke;
 
 namespace Tangra.Video.SER
@@ -13,6 +14,8 @@ namespace Tangra.Video.SER
     public partial class frmCheckTimeStampsIntegrity : Form
     {
         private SERVideoStream m_Stream;
+
+        public double MedianExposure { get; private set; }
 
         public frmCheckTimeStampsIntegrity()
         {
@@ -31,13 +34,14 @@ namespace Tangra.Video.SER
 
             progressBar.Maximum = m_Stream.LastFrame;
             progressBar.Minimum = m_Stream.FirstFrame;
+            var exposures = new List<double>();
 
             for (int i = m_Stream.FirstFrame; i <= m_Stream.LastFrame; i++)
             {
                 SerFrameInfo frameInfo = m_Stream.SerFrameInfoOnly(i);
 
-                TimeSpan ts;
-                TimeSpan tsUtc;
+                TimeSpan ts = TimeSpan.Zero;
+                TimeSpan tsUtc = TimeSpan.Zero;
                 if (prevFrameInfo != null)
                 {
                     ts = new TimeSpan(frameInfo.TimeStampUtc.Ticks - prevFrameInfo.TimeStampUtc.Ticks);
@@ -69,6 +73,11 @@ namespace Tangra.Video.SER
                             break;
                         }
                     }
+
+                    if (m_Stream.HasUTCTimeStamps && tsUtc != TimeSpan.Zero)
+                        exposures.Add(tsUtc.TotalMilliseconds);
+                    else if (ts != TimeSpan.Zero)
+                        exposures.Add(ts.TotalMilliseconds);
                 }
 
                 prevFrameInfo = frameInfo;
@@ -82,6 +91,8 @@ namespace Tangra.Video.SER
             progressBar.Value = m_Stream.LastFrame;
             progressBar.Update();
             Application.DoEvents();
+
+            MedianExposure = exposures.Median();
 
             Close();
         }
