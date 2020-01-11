@@ -50,6 +50,13 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
         public float Latency;
     }
 
+    public class MeinbergAdvLogEntry
+    {
+        public DateTime Time;
+        public float? Delay;
+        public string PeerIP;
+    }
+
     public class AavTimeAnalyser
     {
         private AstroDigitalVideoStream m_Aav;
@@ -71,6 +78,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
         public List<TimeAnalyserEntry> DebugFrames = new List<TimeAnalyserEntry>();
         public List<SystemUtilisationEntry>  SystemUtilisation = new List<SystemUtilisationEntry>();
         public List<NtpUpdateEntry> NtpUpdates = new List<NtpUpdateEntry>(); 
+        public List<MeinbergAdvLogEntry> MeinbergAdvLog = new List<MeinbergAdvLogEntry>();
 
         public float MinDeltaNTPMs;
         public float MaxDeltaNTPMs;
@@ -122,6 +130,9 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
 
                 // This is the system timestamp retrieved by the system when the frame was received.
                 var SYSTEM_TIME_FT_TAG = aavFile.StatusSection.TagDefinitions.SingleOrDefault(x => x.Name == "SystemTimeFileTime");
+
+                // This is the OCR-ed time with the full precision (0.1 ms for IOTA-VTI) rather than only the 1 ms from the AAVv1 timestamp
+                var OCR_TIME_TAG = aavFile.StatusSection.TagDefinitions.SingleOrDefault(x => x.Name == "OcrTime");
 
                 // This is the NTP timestamp retrieved by the system when the frame was received. It has been corrected for the configured 'Calibration Correction' in OccuRec
                 var NTP_TIME_TAG = aavFile.StatusSection.TagDefinitions.SingleOrDefault(x => x.Name == "NTPEndTimestamp");
@@ -189,7 +200,16 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
 
                         entry.FrameNo = i;
                         entry.ExposureMs = (float)(exposure / 10.0);
-                        entry.ReferenceTime = AdvFile.ADV_ZERO_DATE_REF.AddMilliseconds(frameTimeMsSince2010).AddMilliseconds(-1 * entry.ExposureMs / 2);
+
+                        if (OCR_TIME_TAG != null && statusSection.TagValues.TryGetValue(OCR_TIME_TAG, out tagVal))
+                        {
+                            entry.ReferenceTime = new DateTime(long.Parse(tagVal));
+                        }
+                        else
+                        {
+                            entry.ReferenceTime = AdvFile.ADV_ZERO_DATE_REF.AddMilliseconds(frameTimeMsSince2010).AddMilliseconds(-1 * entry.ExposureMs / 2);
+                        }
+
                         long referenceTimeTicks = entry.ReferenceTime.Ticks;
 
                         if (SYSTEM_TIME_TAG != null && statusSection.TagValues.TryGetValue(SYSTEM_TIME_TAG, out tagVal))
@@ -389,6 +409,12 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                     ExtractNTPLogData(logFileName);
                 }
 
+                var meinbergFileName = Path.GetFullPath(Path.GetDirectoryName(m_Aav.FileName) + @"\ntsmadvlog.txt");
+                if (File.Exists(meinbergFileName))
+                {
+                    ExtractMeinbergLogData(meinbergFileName);
+                }
+
                 progressCallback(0, 0);
             });
         }
@@ -409,6 +435,61 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                     NtpUpdates.Add(new NtpUpdateEntry() { Delta = delta, Latency = latency, Updated = updated });
                 }
             }
+        }
+
+        private void ExtractMeinbergLogData(string fileName)
+        {
+            MeinbergAdvLogEntry entry = null;
+
+            var lines = File.ReadAllLines(fileName);
+            foreach (var line in lines)
+            {
+                var tokens = line.Split(' ');
+                if (tokens.Length == 4)
+                {
+                    DateTime dt;
+                    if (DateTime.TryParseExact(tokens[0] + " " + tokens[1], "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out dt))
+                    {
+                        if (dt > FromDateTime && dt < ToDateTime)
+                        {
+                            if (entry == null || entry.Time != dt)
+                            {
+                                if (entry != null) MeinbergAdvLog.Add(entry);
+                                entry = new MeinbergAdvLogEntry() { Time = dt };
+                            }
+
+                            int type;
+                            if (int.TryParse(tokens[2], out type))
+                            {
+                                if (type == 1)
+                                {
+                                    // IP Address of Peer
+                                    entry.PeerIP = tokens[3];
+                                }
+                                else if (type == 2)
+                                {
+                                    // Delay (ms)
+                                    float delay = float.NaN;
+                                    if (float.TryParse(tokens[3], NumberStyles.Float, CultureInfo.InvariantCulture, out delay))
+                                    {
+                                        entry.Delay = delay;
+                                    }
+                                }
+                                else if (type == 3)
+                                {
+                                    // Polling interval
+                                }
+                                else if (type == 0)
+                                {
+                                    // local Stratum
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (entry != null) MeinbergAdvLog.Add(entry);
         }
 
         public void ExportData(string fileName, Action<int, int> progressCallback)

@@ -23,8 +23,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
         internal enum GraphType
         {
             gtNone,
-            gtTimeDeltasLines,
-            gtTimeDeltasDots,
+            gtTimeDeltas,
             gtSystemUtilisation,
             gtNtpUpdates,
             gtNtpUpdatesInclUnapplied,
@@ -41,6 +40,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
         internal class GraphConfig
         {
             public GridlineStyle GridlineStyle = GridlineStyle.Line;
+            public bool ConnectionLines = false;
         }
 
         private GraphType m_GrapthType = GraphType.gtNone;
@@ -212,8 +212,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
 
             switch (m_GrapthType)
             {
-                case GraphType.gtTimeDeltasLines:
-                case GraphType.gtTimeDeltasDots:
+                case GraphType.gtTimeDeltas:
                     DrawTimeDeltasGraph();
                     break;
                 case GraphType.gtSystemUtilisation:
@@ -243,7 +242,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
             int graphHeight = pbGraph.Height;
             var image = new Bitmap(graphWidth, graphHeight, PixelFormat.Format24bppRgb);
 
-            bool ellipses = m_GrapthType == GraphType.gtTimeDeltasDots;
+            bool ellipses = !m_GraphConfig.ConnectionLines;
             bool tickGridlines = m_GraphConfig.GridlineStyle == GridlineStyle.Tick;
 
             Task.Run(() =>
@@ -569,6 +568,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
             MedianPen.DashCap = DashCap.Round;
             Brush MedianBrush = Brushes.Blue;
             Brush SysTimeBrush = Brushes.Chocolate;
+            Pen SysTimePen = Pens.Chocolate;
             int densityThreshold = (int)nudDensityThreshold.Value;
 
             int graphWidth = pbGraph.Width;
@@ -576,12 +576,24 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
             var image = new Bitmap(graphWidth, graphHeight, PixelFormat.Format24bppRgb);
             var densityMonitor = new int[graphWidth, graphHeight];
 
+            bool ellipses = !m_GraphConfig.ConnectionLines;
             bool tickGridlines = m_GraphConfig.GridlineStyle == GridlineStyle.Tick;
             float yScalePaddingCoeff = 1.2f;
 
             Task.Run(() =>
             {
-                var deltas = m_TimeAnalyser.Entries.Where(x => !x.IsOutlier).Select(x => x.DeltaSystemFileTimeMs).ToList();
+                bool isSubset = m_PlotFromIndex.HasValue && m_PlotToIndex.HasValue;
+                List<TimeAnalyserEntry> subsetEnum = null;
+                if (isSubset)
+                {
+                    subsetEnum = m_TimeAnalyser.Entries.Skip(m_PlotFromIndex.Value).Take(m_PlotToIndex.Value).ToList();
+                }
+                else
+                {
+                    subsetEnum = m_TimeAnalyser.Entries;
+                }
+
+                var deltas = subsetEnum.Where(x => !x.IsOutlier).Select(x => x.DeltaSystemFileTimeMs).ToList();
 
                 int idx = 0;
 
@@ -592,13 +604,13 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                 {
                     // Dry run to determine actual min/max Y values
 
-                    float xFactorDry = graphWidth * 1.0f / (m_TimeAnalyser.Entries.Count - 1 - 0 + 1);
+                    float xFactorDry = graphWidth * 1.0f / (subsetEnum.Count() - 1 - 0 + 1);
                     float minDeltaDry = deltas.Min();
                     float maxDeltaDry = deltas.Max();
                     float yFactorDry = graphHeight / (maxDeltaDry - minDeltaDry);
                     var densityMonitorDry = new int[graphWidth, graphHeight];
 
-                    foreach (var entry in m_TimeAnalyser.Entries)
+                    foreach (var entry in subsetEnum)
                     {
                         if (entry.IsOutlier) continue;
 
@@ -651,7 +663,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                     float width = graphWidth - padding - paddingX;
 
                     float minX = 0;
-                    float maxX = m_TimeAnalyser.Entries.Count - 1;
+                    float maxX = subsetEnum.Count - 1;
                     float xFactor = width / (maxX - minX + 1);
 
                     g.FillRectangle(Brushes.WhiteSmoke, 0, 0, graphWidth, graphHeight);
@@ -662,13 +674,13 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                     float xp2 = 0;
                     float y2p = 0;
 
-                    var totalHours = (float)(m_TimeAnalyser.Entries[m_TimeAnalyser.Entries.Count - 1].SystemTimeFileTime - m_TimeAnalyser.Entries[0].SystemTimeFileTime).TotalHours;
-                    int? intervalX = GetReadableLabelXAxisTickInterval(g, xFactor * m_TimeAnalyser.Entries.Count / totalHours, totalHours);
+                    var totalHours = (float)(subsetEnum[subsetEnum.Count - 1].SystemTimeFileTime - subsetEnum[0].SystemTimeFileTime).TotalHours;
+                    int? intervalX = GetReadableLabelXAxisTickInterval(g, xFactor * subsetEnum.Count / totalHours, totalHours);
                     var nextTick = DateTime.MaxValue;
                     if (intervalX != null)
                     {
-                        nextTick = m_TimeAnalyser.Entries[0].SystemTimeFileTime.Date;
-                        while (nextTick < m_TimeAnalyser.Entries[0].SystemTimeFileTime)
+                        nextTick = subsetEnum[0].SystemTimeFileTime.Date;
+                        while (nextTick < subsetEnum[0].SystemTimeFileTime)
                         {
                             nextTick = nextTick.AddHours(intervalX.Value);
                         }
@@ -676,7 +688,26 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
 
                     var medianData = new List<Tuple<float, float>>();
 
-                    foreach (var entry in m_TimeAnalyser.Entries)
+                    if (m_TimeAnalyser.MeinbergAdvLog.Count > 1)
+                    {
+                        peerPens.Clear();
+                        var timeInterval = subsetEnum[subsetEnum.Count - 1].ReferenceTime - subsetEnum[0].ReferenceTime;
+                        
+                        for (int i = 1; i < m_TimeAnalyser.MeinbergAdvLog.Count; i++)
+                        {
+                            var meinbergLogPrev = m_TimeAnalyser.MeinbergAdvLog[i - 1];
+                            var meinbergLog = m_TimeAnalyser.MeinbergAdvLog[i];
+                            if (meinbergLog.PeerIP != meinbergLogPrev.PeerIP || meinbergLog.PeerIP == null)
+                            {
+                                var x = paddingX + (float)(width * (meinbergLogPrev.Time - subsetEnum[0].ReferenceTime).TotalSeconds / timeInterval.TotalSeconds);
+
+                                // Peer IP Changed
+                                g.DrawLine(GetPenForPeerIP(meinbergLog.PeerIP), x, paddingY + 1, x, graphHeight - paddingY);
+                            }
+                        }
+                    }
+
+                    foreach (var entry in subsetEnum)
                     {
                         if (entry.IsOutlier) continue;
 
@@ -702,9 +733,16 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                             {
                                 densityMonitor[xi, yi]++;
 
-                                if (densityMonitor[xi, yi] > densityThreshold)
+                                if (ellipses)
                                 {
-                                    g.FillEllipse(SysTimeBrush, x - 1, y2 - 1, 2, 2);
+                                    if (densityMonitor[xi, yi] > densityThreshold)
+                                    {
+                                        g.FillEllipse(SysTimeBrush, x - 1, y2 - 1, 2, 2);
+                                    }
+                                }
+                                else
+                                {
+                                    g.DrawLine(SysTimePen, xp2, y2p, x, y2);
                                 }
                             }
 
@@ -804,7 +842,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
 
                     g.DrawRectangle(Pens.Black, paddingX, paddingY, graphWidth - padding - paddingX, graphHeight - 2 * paddingY);
 
-                    var title = string.Format("Time Delta analysis of {0:0.0} million data points recorded between {1} UT and {2} UT", m_TimeAnalyser.Entries.Count / 1000000.0, m_TimeAnalyser.FromDateTime.ToString("dd-MMM HH:mm"), m_TimeAnalyser.ToDateTime.ToString("dd-MMM HH:mm"));
+                    var title = string.Format("Time Delta analysis of {0:0.0} million data points recorded between {1} UT and {2} UT", subsetEnum.Count / 1000000.0, subsetEnum.Min(x => x.SystemTimeFileTime).ToString("dd-MMM HH:mm"), subsetEnum.Max(x => x.SystemTimeFileTime).ToString("dd-MMM HH:mm"));
                     var sizeF = g.MeasureString(title, m_TitleFont);
                     g.DrawString(title, m_TitleFont, Brushes.Black, (width - sizeF.Width) / 2 + paddingX, (paddingY - sizeF.Height) / 2);
                 }
@@ -834,6 +872,21 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                     Cursor = Cursors.Default;
                 }
             });
+        }
+
+        Dictionary<string, Pen> peerPens = new Dictionary<string, Pen>(); 
+
+        private Pen GetPenForPeerIP(string ipAddress)
+        {
+            if (ipAddress ==  null) return Pens.DarkGray;
+
+            var pens = new Pen[] { Pens.Blue, Pens.Green, Pens.Purple, Pens.Aqua, Pens.Crimson, Pens.DodgerBlue, Pens.HotPink };
+            Pen pen;
+            if (peerPens.Count >= pens.Length) return Pens.Black;
+            if (peerPens.TryGetValue(ipAddress, out pen)) return pen;
+            pen = pens[peerPens.Count];
+            peerPens[ipAddress] = pen;
+            return pen;
         }
 
         private int GetReadableLabelYAxisTickInterval(Graphics g, float yFactor)
@@ -1354,47 +1407,40 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
         {
             if (cbxGraphType.SelectedIndex == 0)
             {
-                m_GrapthType = GraphType.gtTimeDeltasLines;
+                m_GrapthType = GraphType.gtTimeDeltas;
                 pnlTimeDeltaConfig.Visible = true;
                 pnlTimeMedianConfig.Visible = false;
                 pnlTimeBucketsConfig.Visible = false;
             }
             else if (cbxGraphType.SelectedIndex == 1)
             {
-                m_GrapthType = GraphType.gtTimeDeltasDots;
-                pnlTimeDeltaConfig.Visible = true;
-                pnlTimeMedianConfig.Visible = false;
-                pnlTimeBucketsConfig.Visible = false;
-            }
-            else if (cbxGraphType.SelectedIndex == 2)
-            {
                 m_GrapthType = GraphType.gtSystemUtilisation;
                 pnlTimeDeltaConfig.Visible = false;
                 pnlTimeMedianConfig.Visible = false;
                 pnlTimeBucketsConfig.Visible = false;
             }
-            else if (cbxGraphType.SelectedIndex == 3)
+            else if (cbxGraphType.SelectedIndex == 2)
             {
                 m_GrapthType = GraphType.gtNtpUpdates;
                 pnlTimeDeltaConfig.Visible = false;
                 pnlTimeMedianConfig.Visible = false;
                 pnlTimeBucketsConfig.Visible = false;
             }
-            else if (cbxGraphType.SelectedIndex == 4)
+            else if (cbxGraphType.SelectedIndex == 3)
             {
                 m_GrapthType = GraphType.gtNtpUpdatesInclUnapplied;
                 pnlTimeDeltaConfig.Visible = false;
                 pnlTimeMedianConfig.Visible = false;
                 pnlTimeBucketsConfig.Visible = false;
             }
-            else if (cbxGraphType.SelectedIndex == 5)
+            else if (cbxGraphType.SelectedIndex == 4)
             {
                 m_GrapthType = GraphType.gtZoomedTotalDelta;
                 pnlTimeDeltaConfig.Visible = false;
                 pnlTimeMedianConfig.Visible = true;
                 pnlTimeBucketsConfig.Visible = false;
             }
-            else if (cbxGraphType.SelectedIndex == 6)
+            else if (cbxGraphType.SelectedIndex == 5)
             {
                 m_GrapthType = GraphType.gtDeltaBucketIntervals;
                 pnlTimeDeltaConfig.Visible = false;
@@ -1487,6 +1533,19 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                 }
                 DrawGraph();
             }
+        }
+
+        private void DataPointConnectionStyleChanged(object sender, EventArgs e)
+        {
+            foreach (ToolStripMenuItem item in ((sender as ToolStripMenuItem).OwnerItem as ToolStripMenuItem).DropDownItems)
+            {
+                item.Checked = (item == (sender as ToolStripMenuItem));
+            }
+
+            m_GraphConfig.ConnectionLines = miLineConnections.Checked;
+
+            DrawGraph();
+
         }
     }
 }

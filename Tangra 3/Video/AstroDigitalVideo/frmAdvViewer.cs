@@ -196,8 +196,12 @@ namespace Tangra.Video.AstroDigitalVideo
 				}
 				else if (statusTag.Name == "SystemTimeFileTime" && !string.IsNullOrEmpty(tagValue))
 				{
-					tagValue = DateTime.FromFileTime(long.Parse(tagValue)).ToString("dd-MMM-yyyy HH:mm:ss.ffffff");
+                    tagValue = new DateTime(long.Parse(tagValue)).ToString("dd-MMM-yyyy HH:mm:ss.ffffff");
 				}
+                else if (statusTag.Name == "OcrTime" && !string.IsNullOrEmpty(tagValue))
+                {
+                    tagValue = new DateTime(long.Parse(tagValue)).ToString("dd-MMM-yyyy HH:mm:ss.ffff");
+                }
 
 				if (statusTag.Name == "GPSTrackedSatellites" && !string.IsNullOrEmpty(tagValue))
 					numSatellites = int.Parse(tagValue);

@@ -37,6 +37,10 @@
             this.tabGraphs = new System.Windows.Forms.TabPage();
             this.pbGraph = new System.Windows.Forms.PictureBox();
             this.pnlGraph = new System.Windows.Forms.Panel();
+            this.pnlTimeBucketsConfig = new System.Windows.Forms.Panel();
+            this.label4 = new System.Windows.Forms.Label();
+            this.nudDeltaBucketInterval = new System.Windows.Forms.NumericUpDown();
+            this.label5 = new System.Windows.Forms.Label();
             this.pnlTimeMedianConfig = new System.Windows.Forms.Panel();
             this.nudDensityThreshold = new System.Windows.Forms.NumericUpDown();
             this.label3 = new System.Windows.Forms.Label();
@@ -63,15 +67,16 @@
             this.miTickGridlines = new System.Windows.Forms.ToolStripMenuItem();
             this.miExport = new System.Windows.Forms.ToolStripMenuItem();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.pnlTimeBucketsConfig = new System.Windows.Forms.Panel();
-            this.label4 = new System.Windows.Forms.Label();
-            this.nudDeltaBucketInterval = new System.Windows.Forms.NumericUpDown();
-            this.label5 = new System.Windows.Forms.Label();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.miNoConnections = new System.Windows.Forms.ToolStripMenuItem();
+            this.miLineConnections = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl.SuspendLayout();
             this.tabOverview.SuspendLayout();
             this.tabGraphs.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbGraph)).BeginInit();
             this.pnlGraph.SuspendLayout();
+            this.pnlTimeBucketsConfig.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudDeltaBucketInterval)).BeginInit();
             this.pnlTimeMedianConfig.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudDensityThreshold)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMedianInterval)).BeginInit();
@@ -81,8 +86,6 @@
             this.pnlOcrErrorControl.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudOcrErrorFrame)).BeginInit();
             this.menuStrip1.SuspendLayout();
-            this.pnlTimeBucketsConfig.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudDeltaBucketInterval)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl
@@ -166,6 +169,57 @@
             this.pnlGraph.Name = "pnlGraph";
             this.pnlGraph.Size = new System.Drawing.Size(801, 34);
             this.pnlGraph.TabIndex = 0;
+            // 
+            // pnlTimeBucketsConfig
+            // 
+            this.pnlTimeBucketsConfig.Controls.Add(this.label4);
+            this.pnlTimeBucketsConfig.Controls.Add(this.nudDeltaBucketInterval);
+            this.pnlTimeBucketsConfig.Controls.Add(this.label5);
+            this.pnlTimeBucketsConfig.Location = new System.Drawing.Point(171, 0);
+            this.pnlTimeBucketsConfig.Name = "pnlTimeBucketsConfig";
+            this.pnlTimeBucketsConfig.Size = new System.Drawing.Size(615, 33);
+            this.pnlTimeBucketsConfig.TabIndex = 3;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(151, 12);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(20, 13);
+            this.label4.TabIndex = 5;
+            this.label4.Text = "ms";
+            // 
+            // nudDeltaBucketInterval
+            // 
+            this.nudDeltaBucketInterval.Location = new System.Drawing.Point(104, 8);
+            this.nudDeltaBucketInterval.Maximum = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
+            this.nudDeltaBucketInterval.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.nudDeltaBucketInterval.Name = "nudDeltaBucketInterval";
+            this.nudDeltaBucketInterval.Size = new System.Drawing.Size(41, 20);
+            this.nudDeltaBucketInterval.TabIndex = 4;
+            this.nudDeltaBucketInterval.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.nudDeltaBucketInterval.ValueChanged += new System.EventHandler(this.TimeDeltasTimeSourceChanged);
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(14, 11);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(82, 13);
+            this.label5.TabIndex = 3;
+            this.label5.Text = "Bucket Interval:";
             // 
             // pnlTimeMedianConfig
             // 
@@ -302,8 +356,7 @@
             this.cbxGraphType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxGraphType.FormattingEnabled = true;
             this.cbxGraphType.Items.AddRange(new object[] {
-            "Time Deltas - Lines",
-            "Time Deltas - Dots",
+            "Time Deltas",
             "System Utilisation",
             "NTP Updates",
             "NTP Updates & Unapplied",
@@ -382,6 +435,7 @@
             // 
             this.graphsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.miSubset,
+            this.toolStripMenuItem1,
             this.gridlinesToolStripMenuItem});
             this.graphsToolStripMenuItem.Name = "graphsToolStripMenuItem";
             this.graphsToolStripMenuItem.Size = new System.Drawing.Size(56, 20);
@@ -390,7 +444,7 @@
             // miSubset
             // 
             this.miSubset.Name = "miSubset";
-            this.miSubset.Size = new System.Drawing.Size(120, 22);
+            this.miSubset.Size = new System.Drawing.Size(191, 22);
             this.miSubset.Text = "&Subset";
             this.miSubset.Click += new System.EventHandler(this.miSubset_Click);
             // 
@@ -400,7 +454,7 @@
             this.miCompleteGridlines,
             this.miTickGridlines});
             this.gridlinesToolStripMenuItem.Name = "gridlinesToolStripMenuItem";
-            this.gridlinesToolStripMenuItem.Size = new System.Drawing.Size(120, 22);
+            this.gridlinesToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
             this.gridlinesToolStripMenuItem.Text = "&Gridlines";
             // 
             // miCompleteGridlines
@@ -409,7 +463,7 @@
             this.miCompleteGridlines.CheckOnClick = true;
             this.miCompleteGridlines.CheckState = System.Windows.Forms.CheckState.Checked;
             this.miCompleteGridlines.Name = "miCompleteGridlines";
-            this.miCompleteGridlines.Size = new System.Drawing.Size(126, 22);
+            this.miCompleteGridlines.Size = new System.Drawing.Size(152, 22);
             this.miCompleteGridlines.Text = "&Complete";
             this.miCompleteGridlines.Click += new System.EventHandler(this.GridlinesStyleChanged);
             // 
@@ -417,7 +471,7 @@
             // 
             this.miTickGridlines.CheckOnClick = true;
             this.miTickGridlines.Name = "miTickGridlines";
-            this.miTickGridlines.Size = new System.Drawing.Size(126, 22);
+            this.miTickGridlines.Size = new System.Drawing.Size(152, 22);
             this.miTickGridlines.Text = "&Ticks";
             this.miTickGridlines.Click += new System.EventHandler(this.GridlinesStyleChanged);
             // 
@@ -432,56 +486,32 @@
             // 
             this.saveFileDialog.DefaultExt = "cvs";
             // 
-            // pnlTimeBucketsConfig
+            // toolStripMenuItem1
             // 
-            this.pnlTimeBucketsConfig.Controls.Add(this.label4);
-            this.pnlTimeBucketsConfig.Controls.Add(this.nudDeltaBucketInterval);
-            this.pnlTimeBucketsConfig.Controls.Add(this.label5);
-            this.pnlTimeBucketsConfig.Location = new System.Drawing.Point(171, 0);
-            this.pnlTimeBucketsConfig.Name = "pnlTimeBucketsConfig";
-            this.pnlTimeBucketsConfig.Size = new System.Drawing.Size(615, 33);
-            this.pnlTimeBucketsConfig.TabIndex = 3;
+            this.toolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miNoConnections,
+            this.miLineConnections});
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(191, 22);
+            this.toolStripMenuItem1.Text = "DataPoint Connection";
             // 
-            // label4
+            // miNoConnections
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(151, 12);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(20, 13);
-            this.label4.TabIndex = 5;
-            this.label4.Text = "ms";
+            this.miNoConnections.Checked = true;
+            this.miNoConnections.CheckOnClick = true;
+            this.miNoConnections.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.miNoConnections.Name = "miNoConnections";
+            this.miNoConnections.Size = new System.Drawing.Size(152, 22);
+            this.miNoConnections.Text = "None";
+            this.miNoConnections.Click += new System.EventHandler(this.DataPointConnectionStyleChanged);
             // 
-            // nudDeltaBucketInterval
+            // miLineConnections
             // 
-            this.nudDeltaBucketInterval.Location = new System.Drawing.Point(104, 8);
-            this.nudDeltaBucketInterval.Maximum = new decimal(new int[] {
-            50,
-            0,
-            0,
-            0});
-            this.nudDeltaBucketInterval.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.nudDeltaBucketInterval.Name = "nudDeltaBucketInterval";
-            this.nudDeltaBucketInterval.Size = new System.Drawing.Size(41, 20);
-            this.nudDeltaBucketInterval.TabIndex = 4;
-            this.nudDeltaBucketInterval.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.nudDeltaBucketInterval.ValueChanged += new System.EventHandler(this.TimeDeltasTimeSourceChanged);
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(14, 11);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(82, 13);
-            this.label5.TabIndex = 3;
-            this.label5.Text = "Bucket Interval:";
+            this.miLineConnections.CheckOnClick = true;
+            this.miLineConnections.Name = "miLineConnections";
+            this.miLineConnections.Size = new System.Drawing.Size(152, 22);
+            this.miLineConnections.Text = "Lines";
+            this.miLineConnections.Click += new System.EventHandler(this.DataPointConnectionStyleChanged);
             // 
             // frmAavStatusChannelOnlyView
             // 
@@ -504,6 +534,9 @@
             this.tabGraphs.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pbGraph)).EndInit();
             this.pnlGraph.ResumeLayout(false);
+            this.pnlTimeBucketsConfig.ResumeLayout(false);
+            this.pnlTimeBucketsConfig.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudDeltaBucketInterval)).EndInit();
             this.pnlTimeMedianConfig.ResumeLayout(false);
             this.pnlTimeMedianConfig.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudDensityThreshold)).EndInit();
@@ -517,9 +550,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudOcrErrorFrame)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
-            this.pnlTimeBucketsConfig.ResumeLayout(false);
-            this.pnlTimeBucketsConfig.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudDeltaBucketInterval)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -564,5 +594,8 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.NumericUpDown nudDeltaBucketInterval;
         private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem miNoConnections;
+        private System.Windows.Forms.ToolStripMenuItem miLineConnections;
     }
 }
