@@ -1,5 +1,9 @@
 ﻿Tangra3 Release Notes
 ---------------------
+v3.6.20 (2020-01-15)
+- Now allowing the user to specify the time reference (Start/Mid/End Frame) for SER timestamps.
+- Added a QHY Image Header Viewer that automatically shows up for compatible QHY videos.
+
 v3.6.19 (2019-09-07)
 - Added support for SER files with RGB and BGR pixel format.
 - Fixed a problem where converting SER files to FITS would result in all images being black.

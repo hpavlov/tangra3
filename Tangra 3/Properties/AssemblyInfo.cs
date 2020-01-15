@@ -22,7 +22,7 @@ using Tangra.Helpers;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Hristo Pavlov")]
 [assembly: AssemblyProduct("Tangra")]
-[assembly: AssemblyCopyright("Tangra is developed in 2012-2019 by Hristo Pavlov and other contributors")]
+[assembly: AssemblyCopyright("Tangra is developed in 2012-2020 by Hristo Pavlov and other contributors")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -44,9 +44,9 @@ using Tangra.Helpers;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("3.6.0.19")]
-[assembly: AssemblyFileVersion("3.6.19")]
-[assembly: ReleaseDate("2019-09-07")]
+[assembly: AssemblyVersion("3.6.0.20")]
+[assembly: AssemblyFileVersion("3.6.20")]
+[assembly: ReleaseDate("2020-01-15")]
 //[assembly: BetaReleaseAttribute()]
 [assembly: TangraCoreVersionRequired("3.0.122")]
 [assembly: TangraVideoVersionRequired("3.0.29")]
