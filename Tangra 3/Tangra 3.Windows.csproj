@@ -376,6 +376,7 @@
       <DependentUpon>frmLongRunningOperation.cs</DependentUpon>
     </Compile>
     <Compile Include="Helpers\LongOperationsManager.cs" />
+    <Compile Include="Helpers\QHYImageHeader.cs" />
     <Compile Include="ImageTools\frmIdentifiedStarAction.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -740,6 +741,12 @@
     </Compile>
     <Compile Include="VideoTools\frmGenerateStarFieldVideoModel.Designer.cs">
       <DependentUpon>frmGenerateStarFieldVideoModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoTools\frmQhyHeaderViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoTools\frmQhyHeaderViewer.Designer.cs">
+      <DependentUpon>frmQhyHeaderViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="VideoTools\HotPixelCorrector.cs" />
     <Compile Include="VideoTools\MaskAreaSelector.cs" />
@@ -1348,6 +1355,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="VideoTools\frmGenerateStarFieldVideoModel.resx">
       <DependentUpon>frmGenerateStarFieldVideoModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoTools\frmQhyHeaderViewer.resx">
+      <DependentUpon>frmQhyHeaderViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VideoTools\ucImageDefectSettings.resx">
       <DependentUpon>ucImageDefectSettings.cs</DependentUpon>

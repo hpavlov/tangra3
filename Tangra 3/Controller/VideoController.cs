@@ -80,6 +80,7 @@ namespace Tangra.Controller
 	    private frmSerStatusPopup m_SerStatusForm;
 	    private frmFitsHeaderPopup m_FitsStatusForm;
 	    private frmTargetPSFViewerForm m_TargetPSFViewerForm;
+	    private frmQhyHeaderViewer m_QhyHeaderForm;
 
 		private AdvOverlayManager m_OverlayManager = new AdvOverlayManager();
 
@@ -127,6 +128,9 @@ namespace Tangra.Controller
 		private uint m_DynamicMaxPixelValue = 0;
 
 		private List<Action<int, bool>> m_OnStoppedCallbacks = new List<Action<int, bool>>();
+
+		private int m_NewFileStreamId;
+		private int m_QhyCheckedFileStreamId;
 
 		public VideoController(Form mainFormView, VideoFileView videoFileView, ZoomedImageView zoomedImageView, ImageToolView imageToolView, Panel pnlControlerPanel)
 		{
@@ -423,6 +427,8 @@ namespace Tangra.Controller
                             frameStream = ReInterlacingVideoStream.Create(frameStream, ReInterlaceMode.None);
                         }
 
+
+                        m_NewFileStreamId = frameStream != null ? frameStream.GetHashCode() : 0;
                         return frameStream;
                     }
                     catch (IOException ioex)
@@ -949,6 +955,19 @@ namespace Tangra.Controller
 
             if (m_FitsStatusForm != null && m_FitsStatusForm.Visible)
                 m_FitsStatusForm.ShowStatus(m_FrameState);
+
+            if (m_QhyCheckedFileStreamId != m_NewFileStreamId)
+            {
+                HideQhyHeaderForm();
+                if (QHYImageHeader.IsAvailable(m_AstroImage))
+                {
+                    ToggleQhyHeaderForm(true);
+                }
+                m_QhyCheckedFileStreamId = m_NewFileStreamId;
+            }
+
+            if (m_QhyHeaderForm != null && m_QhyHeaderForm.Visible)
+                m_QhyHeaderForm.ShowImageHeader(m_AstroImage);
 
 	        if (!isOldFrameRefreshed)
 	        {
@@ -2006,6 +2025,12 @@ namespace Tangra.Controller
                 m_FitsStatusForm.Hide();	        
 	    }
 
+        private void HideQhyHeaderForm()
+        {
+            if (m_QhyHeaderForm != null && m_QhyHeaderForm.Visible)
+                m_QhyHeaderForm.Hide();
+        }
+
 		private void ToggleAstroVideoStatusForm(bool forceShow)
 		{
 			if (IsAstroDigitalVideo)
@@ -2248,6 +2273,54 @@ namespace Tangra.Controller
 				m_TargetPSFViewerForm.ShowTargetPSF(m_TargetPsfFit, m_FramePlayer.Video.BitPix, m_FramePlayer.Video.GetAav16NormVal(), m_TargetBackgroundPixels);
         }
 
+        public void ToggleQhyHeaderForm()
+        {
+            ToggleQhyHeaderForm(false);
+        }
+
+        public void ToggleQhyHeaderForm(bool forceShow)
+        {
+            if (m_QhyHeaderForm == null)
+                m_QhyHeaderForm = new frmQhyHeaderViewer(this);
+
+            if (m_FramePlayer.Video != null && !m_QhyHeaderForm.Visible)
+            {
+                try
+                {
+                    m_QhyHeaderForm.Show(m_MainFormView);
+                }
+                catch (ObjectDisposedException)
+                {
+                    m_QhyHeaderForm = new frmQhyHeaderViewer(this);
+                    m_QhyHeaderForm.Show(m_MainFormView);
+                }
+
+                PositionQhyHeaderViewerForm();
+
+                ShowQhyImageHeader();
+            }
+            else
+            {
+                m_QhyHeaderForm.Hide();
+            }
+        }
+
+        private void PositionQhyHeaderViewerForm()
+        {
+            if (m_QhyHeaderForm != null &&
+                m_QhyHeaderForm.Visible)
+            {
+                m_QhyHeaderForm.Left = m_MainFormView.Right;
+                m_QhyHeaderForm.Top = m_MainFormView.Top + (m_MainFormView.Height - m_QhyHeaderForm.Height);
+            }
+        }
+
+        private void ShowQhyImageHeader()
+        {
+            if (m_QhyHeaderForm != null && m_FramePlayer.Video != null)
+                m_QhyHeaderForm.ShowImageHeader(m_AstroImage);
+        }
+
 		public void ShowFSTSFileViewer()
 		{
 			UsageStats.Instance.FSTSFileViewerInvoked++;
@@ -2305,6 +2378,7 @@ namespace Tangra.Controller
             PositionSerStatusForm();
 		    PositionTargetPSFViewerForm();
             PositionFitsStatusForm();
+            PositionQhyHeaderViewerForm();
 		}
 
 		public bool IsAdvStatusFormVisible
@@ -2340,6 +2414,14 @@ namespace Tangra.Controller
                 return m_TargetPSFViewerForm != null && m_TargetPSFViewerForm.Visible;
             }
 	    }
+
+        public bool IsQhyHeaderFormVisible
+        {
+            get
+            {
+                return m_QhyHeaderForm != null && m_QhyHeaderForm.Visible;
+            }
+        }
 
         public bool IsSerStatusFormVisible
         {
