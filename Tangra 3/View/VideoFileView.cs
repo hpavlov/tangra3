@@ -276,10 +276,28 @@ namespace Tangra.View
 
 		public void UpdateVideoSizeAndLengthControls()
 		{
-			int width = Math.Max(800, TangraContext.Current.FrameWidth + m_ExtraWidth);
-			int height = Math.Max(600, TangraContext.Current.FrameHeight + m_ExtraHeight);
+            var mainFormScreen = Screen.FromControl(m_MainForm);
+            // Max form size is 80% of the current screen, unless it is smaller than 600x800
+		    var maxWidthOnScreen = Math.Min((int) (0.8 * mainFormScreen.WorkingArea.Width), TangraContext.Current.FrameWidth + m_ExtraWidth);
+            var maxHeightOnScreen = Math.Min((int)(0.8 * mainFormScreen.WorkingArea.Height), TangraContext.Current.FrameHeight + m_ExtraHeight);
+		    if ((maxWidthOnScreen < TangraContext.Current.FrameWidth + m_ExtraWidth) ||
+		        (maxHeightOnScreen < TangraContext.Current.FrameHeight + m_ExtraHeight))
+		    {
+		        // The image will not be shown in full. Calculate a default size of the form so the image
+                // is 'hidden' proportionally.
+                var scale = Math.Min(maxWidthOnScreen / (1.0 * (TangraContext.Current.FrameWidth + m_ExtraWidth)), maxHeightOnScreen / (1.0 * (TangraContext.Current.FrameHeight + m_ExtraHeight)));
+		        maxWidthOnScreen = (int) (scale*(TangraContext.Current.FrameWidth + m_ExtraWidth));
+                maxHeightOnScreen = (int)(scale * (TangraContext.Current.FrameHeight + m_ExtraHeight));
+		    }
+            int width = Math.Max(800, maxWidthOnScreen);
+            int height = Math.Max(600, maxHeightOnScreen);
+
 			m_MainForm.Width = width;
 			m_MainForm.Height = height;
+
+            // Position the form
+            m_MainForm.Left = Math.Max(0, (int)(0.66 * (mainFormScreen.WorkingArea.Width - width) / 2));
+            m_MainForm.Top = Math.Max(0, (mainFormScreen.WorkingArea.Height - height) / 2);
 
 			m_MainForm.scrollBarFrames.Minimum = TangraContext.Current.FirstFrame;
 			m_MainForm.scrollBarFrames.Maximum = TangraContext.Current.LastFrame;
