@@ -86,7 +86,7 @@
             this.nudExposureMs.DecimalPlaces = 2;
             this.nudExposureMs.Location = new System.Drawing.Point(108, 3);
             this.nudExposureMs.Maximum = new decimal(new int[] {
-            1000,
+            60000,
             0,
             0,
             0});
@@ -94,7 +94,7 @@
             this.nudExposureMs.Size = new System.Drawing.Size(69, 20);
             this.nudExposureMs.TabIndex = 21;
             this.nudExposureMs.Value = new decimal(new int[] {
-            25,
+            0,
             0,
             0,
             0});
