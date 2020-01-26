@@ -1,5 +1,9 @@
 ﻿Tangra3 Release Notes
 ---------------------
+v3.6.21 (2020-01-26)
+- Fixed a crash when opening SER files with a single exposure greater than 1 sec.
+- Made Tangra respond better to opening videos with frame size larger than the screen resolution.
+
 v3.6.20 (2020-01-15)
 - Now allowing the user to specify the time reference (Start/Mid/End Frame) for SER timestamps.
 - Added a QHY Image Header Viewer that automatically shows up for compatible QHY videos.
