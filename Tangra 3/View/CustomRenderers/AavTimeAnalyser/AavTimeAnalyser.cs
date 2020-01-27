@@ -231,7 +231,9 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                         }
                         if (SYSTEM_TIME_FT_TAG != null && statusSection.TagValues.TryGetValue(SYSTEM_TIME_FT_TAG, out tagVal))
                         {
-                            entry.SystemTimeFileTime = new DateTime(long.Parse(tagVal)).AddMilliseconds(m_CorrSystemTimeMs);
+                            // SystemTimeAsFileTime has a microsecond precision. However the IOTA-VTI reference time precision is only 0.1 ms
+                            // so here we are rounding the SystemTimeAsFileTime value to the nearest 0.1 ms for correctness
+                            entry.SystemTimeFileTime = new DateTime(1000 * (long.Parse(tagVal) / 1000)).AddMilliseconds(m_CorrSystemTimeMs);
                             entry.DeltaSystemFileTimeMs = (float)new TimeSpan(entry.SystemTimeFileTime.Ticks - referenceTimeTicks).TotalMilliseconds;
                         }
                         if (NTP_TIME_TAG != null && statusSection.TagValues.TryGetValue(NTP_TIME_TAG, out tagVal))

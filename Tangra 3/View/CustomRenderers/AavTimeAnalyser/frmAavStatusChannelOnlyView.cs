@@ -486,7 +486,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
 
                     g.DrawRectangle(Pens.Black, paddingX, paddingY, graphWidth - padding - paddingX, graphHeight - 2 * paddingY);
 
-                    var title = string.Format("Time Delta analysis of {0:0.0} million data points recorded between {1} UT and {2} UT", m_TimeAnalyser.Entries.Count / 1000000.0, m_TimeAnalyser.FromDateTime.ToString("dd-MMM HH:mm"), m_TimeAnalyser.ToDateTime.ToString("dd-MMM HH:mm"));
+                    var title = GetTitle(m_TimeAnalyser.Entries, "Time Delta analysis");
                     var sizeF = g.MeasureString(title, m_TitleFont);
                     g.DrawString(title, m_TitleFont, Brushes.Black, (width - sizeF.Width) / 2 + paddingX, (paddingY - sizeF.Height) / 2);
 
@@ -586,7 +586,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                 List<TimeAnalyserEntry> subsetEnum = null;
                 if (isSubset)
                 {
-                    subsetEnum = m_TimeAnalyser.Entries.Skip(m_PlotFromIndex.Value).Take(m_PlotToIndex.Value).ToList();
+                    subsetEnum = m_TimeAnalyser.Entries.Skip(m_PlotFromIndex.Value).Take(m_PlotToIndex.Value - m_PlotFromIndex.Value).ToList();
                 }
                 else
                 {
@@ -682,7 +682,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                         nextTick = subsetEnum[0].SystemTimeFileTime.Date;
                         while (nextTick < subsetEnum[0].SystemTimeFileTime)
                         {
-                            nextTick = nextTick.AddHours(intervalX.Value);
+                            nextTick = nextTick.AddSeconds(intervalX.Value);
                         }
                     }
 
@@ -780,11 +780,11 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                         {
                             g.DrawLine(Pens.Gray, x, graphHeight - paddingY + 1, x, graphHeight - paddingY - 5);
 
-                            var label = string.Format("{0} UT", nextTick.Hour);
+                            var label = intervalX.Value >= 3600 ? string.Format("{0} UT", nextTick.Hour) : (intervalX.Value >= 60 ? string.Format("{0}:{1:00} UT", nextTick.Hour, nextTick.Minute) : string.Format("{0}:{1:00}:{2:00} UT", nextTick.Hour, nextTick.Minute, nextTick.Second));
                             var lblSiz = g.MeasureString(label, DefaultFont);
                             g.DrawString(label, DefaultFont, Brushes.Black, x - lblSiz.Width / 2, graphHeight - paddingY + 5);
 
-                            nextTick = nextTick.AddHours(intervalX.Value);
+                            nextTick = nextTick.AddSeconds(intervalX.Value);
                         }
 
                         idx++;
@@ -842,7 +842,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
 
                     g.DrawRectangle(Pens.Black, paddingX, paddingY, graphWidth - padding - paddingX, graphHeight - 2 * paddingY);
 
-                    var title = string.Format("Time Delta analysis of {0:0.0} million data points recorded between {1} UT and {2} UT", subsetEnum.Count / 1000000.0, subsetEnum.Min(x => x.SystemTimeFileTime).ToString("dd-MMM HH:mm"), subsetEnum.Max(x => x.SystemTimeFileTime).ToString("dd-MMM HH:mm"));
+                    var title = GetTitle(subsetEnum, "Time Delta analysis");
                     var sizeF = g.MeasureString(title, m_TitleFont);
                     g.DrawString(title, m_TitleFont, Brushes.Black, (width - sizeF.Width) / 2 + paddingX, (paddingY - sizeF.Height) / 2);
                 }
@@ -915,13 +915,33 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                 {
                     if (probeInts[i] * xFactorPerHour > sizF.Width * 2)
                     {
-                        return probeInts[i];
+                        return probeInts[i] * 3600;
+                    }
+                }
+            }
+            else if (totalHours > 0.03333333 /*2 min*/)
+            {
+                var sizF = g.MeasureString("12:30 UT", DefaultFont);
+                var probeInts = new[] { 1, 5, 10, 20, 30 };
+                for (int i = 0; i < probeInts.Length; i++)
+                {
+                    if (probeInts[i] * xFactorPerHour / 60 > sizF.Width * 2)
+                    {
+                        return probeInts[i] * 60;
                     }
                 }
             }
             else
             {
-                // TODO: half hour marks?
+                var sizF = g.MeasureString("12:30:30 UT", DefaultFont);
+                var probeInts = new[] { 1, 5, 10, 20, 30 };
+                for (int i = 0; i < probeInts.Length; i++)
+                {
+                    if (probeInts[i] * xFactorPerHour / 3600 > sizF.Width * 2)
+                    {
+                        return probeInts[i];
+                    }
+                }
             }
 
             return null;
@@ -1038,7 +1058,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
 
                     g.DrawRectangle(Pens.Black, paddingX, paddingY, graphWidth - padding - paddingX, graphHeight - 2 * paddingY);
 
-                    var title = string.Format("Destribution around median of {0:0.0} million data points recorded between {1} UT and {2} UT", m_TimeAnalyser.Entries.Count / 1000000.0, m_TimeAnalyser.FromDateTime.ToString("dd-MMM HH:mm"), m_TimeAnalyser.ToDateTime.ToString("dd-MMM HH:mm"));
+                    var title = GetTitle(m_TimeAnalyser.Entries, "Destribution around median");
                     var sizeF = g.MeasureString(title, m_TitleFont);
                     g.DrawString(title, m_TitleFont, Brushes.Black, (width - sizeF.Width) / 2 + paddingX, (paddingY - sizeF.Height) / 2);
                 }
@@ -1545,7 +1565,38 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
             m_GraphConfig.ConnectionLines = miLineConnections.Checked;
 
             DrawGraph();
+        }
 
+        private string GetTitle(List<TimeAnalyserEntry> subsetEnum, string analysisType)
+        {
+            string numUnits = null;
+            decimal totalNum = 0;
+            if (subsetEnum.Count > 1000000.0)
+            {
+                numUnits = "million";
+                totalNum = subsetEnum.Count / 1000000.0M;
+            }
+            else if (subsetEnum.Count > 1000.0)
+            {
+                numUnits = "thousand";
+                totalNum = subsetEnum.Count / 1000.0M;
+            }
+            else
+            {
+                numUnits = "";
+                totalNum = subsetEnum.Count;
+            }
+
+            var timeFrom = subsetEnum.Min(x => x.SystemTimeFileTime);
+            var timeTo = subsetEnum.Max(x => x.SystemTimeFileTime);
+
+            var timeFormat = "dd-MMM HH:mm";
+            if ((timeTo - timeFrom).TotalMinutes < 5)
+            {
+                timeFormat = "dd-MMM HH:mm:ss";
+            }
+
+            return string.Format("{0} of {1:0.0} {2} data points recorded between {3} UT and {4} UT", analysisType, totalNum, numUnits, timeFrom.ToString(timeFormat), timeTo.ToString(timeFormat));
         }
     }
 }
