@@ -1,5 +1,8 @@
 ﻿Tangra3 Release Notes
 ---------------------
+v3.6.22 (2020-02-10)
+- Updated AdvLib to version 2.1a to support DVTI-CAM and ROI-based video frames.
+
 v3.6.21 (2020-01-26)
 - Fixed a crash when opening SER files with a single exposure greater than 1 sec.
 - Made Tangra respond better to opening videos with frame size larger than the screen resolution.
