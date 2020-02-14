@@ -13,6 +13,7 @@ using Adv;
 using Tangra.Helpers;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
+using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.Model.Video;
 using Tangra.PInvoke;
@@ -139,10 +140,17 @@ namespace Tangra.Video
                 m_Engine = string.Format("AAV{0}", aavVersion);
             }
 
-            this.geoLocation = new GeoLocationInfo()
+            this.geoLocation = new GeoLocationInfo();
+            double lng;
+            double lat;
+            if (
+                double.TryParse(GetFileTag("LONGITUDE"), NumberStyles.Float, CultureInfo.InvariantCulture, out lng) &&
+                double.TryParse(GetFileTag("LATITUDE"), NumberStyles.Float, CultureInfo.InvariantCulture, out lat))
             {
-                //TODO
-            };
+                this.geoLocation.Altitude = GetFileTag("ALTITUDE");
+                this.geoLocation.Longitude = AstroConvert.ToStringValue(lng, "DD°MM'SS.T\"");
+                this.geoLocation.Latitude = AstroConvert.ToStringValue(lat, "DD°MM'SS.T\"");
+            }
 
             geoLocation = this.geoLocation;
         }
@@ -298,7 +306,7 @@ namespace Tangra.Video
                     }
                     catch (Exception ex)
                     {
-                        Trace.WriteLine(ex.GetFullStackTrace());
+                        Trace.WriteLine(Adv.Extensions.GetFullStackTrace(ex));
                         displayBitmap = new Bitmap(m_Width, m_Height);
                     }
                 }

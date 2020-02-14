@@ -1,5 +1,9 @@
 ﻿Tangra3 Release Notes
 ---------------------
+v3.6.23 (2020-02-14)
+- Fixed random broken AAV file loading.
+- Now displaying geographical location overlay on the first frame for ADV v2 files.
+
 v3.6.22 (2020-02-10)
 - Updated AdvLib to version 2.1a to support DVTI-CAM and ROI-based video frames.
 
