@@ -155,6 +155,10 @@ namespace Tangra.Controller
                     else
                         m_DateObsComment = "Time is ORC-ed, Date is user entered";
                 }
+                else if (m_VideoFormat == VideoFileFormat.ADV || m_VideoFormat == VideoFileFormat.ADV2)
+                {
+                    m_DateObsComment = "Date and Time are mid-frame recorded";
+                }
                 else if (!m_IsFitsSequence)
                 {
                     m_DateObsComment = "Date and Time are saved by recorder";

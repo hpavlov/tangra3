@@ -3151,7 +3151,7 @@ namespace Tangra.Controller
 	        return rv;
 	    }
 
-	    private static Regex s_RegexSourceToFileFormat = new Regex("^(?<format>(ADV|AAV2?|AVI|SER|FITS))\\..+$");
+	    private static Regex s_RegexSourceToFileFormat = new Regex("^(?<format>(ADV2?|AAV2?|AVI|SER|FITS))\\..+$");
 
 		/// <summary>
 		/// AVI|AAV|ADV|SER|FITS
@@ -3184,7 +3184,7 @@ namespace Tangra.Controller
 		/// <returns></returns>
 		internal string GetVideoFormat(VideoFileFormat videoFileFormat)
 		{
-			if (videoFileFormat == VideoFileFormat.ADV || videoFileFormat == VideoFileFormat.SER)
+            if (videoFileFormat == VideoFileFormat.ADV || videoFileFormat == VideoFileFormat.ADV2 || videoFileFormat == VideoFileFormat.SER)
 				return "Digital";
             if (videoFileFormat.IsAAV())
 				return  AstroVideoNativeVideoStandard;

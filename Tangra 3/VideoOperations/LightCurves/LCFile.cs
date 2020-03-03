@@ -1369,7 +1369,7 @@ namespace Tangra.VideoOperations.LightCurves
             if (!m_InstrumentalDelayCorrectionsNotRequired.HasValue)
             {
                 VideoFileFormat format = GetVideoFileFormat();
-                m_InstrumentalDelayCorrectionsNotRequired = format == VideoFileFormat.ADV || format == VideoFileFormat.FITS;                
+                m_InstrumentalDelayCorrectionsNotRequired = format == VideoFileFormat.ADV || format == VideoFileFormat.FITS;
             }
 
             return m_InstrumentalDelayCorrectionsNotRequired.Value;
@@ -1407,7 +1407,7 @@ namespace Tangra.VideoOperations.LightCurves
 		/// <returns></returns>
 		internal string GetVideoFormat(VideoFileFormat videoFileFormat)
 		{
-			if (videoFileFormat == VideoFileFormat.ADV || videoFileFormat == VideoFileFormat.SER)
+            if (videoFileFormat == VideoFileFormat.ADV || videoFileFormat == VideoFileFormat.ADV2 || videoFileFormat == VideoFileFormat.SER)
 				return "Digital";
             if (videoFileFormat.IsAAV() && LcFile != null)
 				return LcFile.Footer.AAVNativeVideoFormat;

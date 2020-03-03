@@ -29,7 +29,8 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 
 		private void frmCompleteReductionInfoForm_Load(object sender, EventArgs e)
 		{
-		    bool isAdvFile = m_lcFile.Header.GetVideoFileFormat() == VideoFileFormat.ADV;
+		    var videoFileFormat = m_lcFile.Header.GetVideoFileFormat();
+            bool isAdvFile = videoFileFormat == VideoFileFormat.ADV || videoFileFormat == VideoFileFormat.ADV2;
 
 			lblFileName.Text = Path.GetFileName(m_lcFile.Header.PathToVideoFile);
 			lblSource.Text = m_lcFile.Header.SourceInfo;

@@ -169,7 +169,7 @@ namespace Tangra.VideoOperations.ConvertVideoToFits
             m_ConvertVideoToFitsController.FinishExport();
             m_ControlPanel.ExportFinished();
             m_Status = ConvertVideoToFitsState.Finished;
-            m_VideoController.ShowMessageBox(message, "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Information);          
+            m_VideoController.ShowMessageBox(message, "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         internal void StartExport(string fileName, bool fitsCube, int firstFrame, int lastFrame, int step, Rectangle roi, UsedTimeBase timeBase)

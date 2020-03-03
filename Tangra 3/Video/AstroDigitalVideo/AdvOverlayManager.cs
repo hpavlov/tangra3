@@ -127,14 +127,20 @@ namespace Tangra.Video.AstroDigitalVideo
 
 				if (TangraConfig.Settings.ADVS.OverlayAdvsInfo && m_AdvFileMetadataInfo != null)
 				{
-					g.DrawString(m_AdvFileMetadataInfo.Recorder, s_PropertiesFont, s_PropertiesWhiteBrush, 10, startingY + lineNo * (s_PropertiesFont.Size + 5));
-					lineNo++;
-					if (!string.IsNullOrEmpty(m_AdvFileMetadataInfo.AdvrVersion))
+                    if (!string.IsNullOrEmpty(m_AdvFileMetadataInfo.AdvrVersion) && !string.IsNullOrEmpty(m_AdvFileMetadataInfo.Recorder) && string.IsNullOrEmpty(m_AdvFileMetadataInfo.HtccFirmareVersion))
+				    {
+                        g.DrawString(string.Format("{0} v{1}", m_AdvFileMetadataInfo.Recorder, m_AdvFileMetadataInfo.AdvrVersion), s_PropertiesFont, s_PropertiesWhiteBrush, 10, startingY + lineNo * (s_PropertiesFont.Size + 5));
+				    }
+                    else if (!string.IsNullOrEmpty(m_AdvFileMetadataInfo.AdvrVersion) && !string.IsNullOrEmpty(m_AdvFileMetadataInfo.HtccFirmareVersion))
 					{
 						g.DrawString(
 							string.Format("ADVR v{0} HTCC v{1}", m_AdvFileMetadataInfo.AdvrVersion, m_AdvFileMetadataInfo.HtccFirmareVersion),
 							s_PropertiesFont, s_PropertiesWhiteBrush, 10, startingY + lineNo * (s_PropertiesFont.Size + 5));
 					}
+                    else
+                    {
+                        g.DrawString(m_AdvFileMetadataInfo.Recorder, s_PropertiesFont, s_PropertiesWhiteBrush, 10, startingY + lineNo * (s_PropertiesFont.Size + 5));
+                    }
 					lineNo++;
 				}
 
@@ -143,7 +149,7 @@ namespace Tangra.Video.AstroDigitalVideo
 					if (!string.IsNullOrEmpty(m_AdvFileMetadataInfo.SensorInfo))
 						g.DrawString(m_AdvFileMetadataInfo.SensorInfo, s_PropertiesFont, s_PropertiesWhiteBrush, 10, startingY + lineNo * (s_PropertiesFont.Size + 5));
 					lineNo++;
-					if (!string.IsNullOrEmpty(m_AdvFileMetadataInfo.Camera))
+                    if (!string.IsNullOrEmpty(m_AdvFileMetadataInfo.Camera) && m_AdvFileMetadataInfo.Camera != m_AdvFileMetadataInfo.SensorInfo)
 						g.DrawString(m_AdvFileMetadataInfo.Camera, s_PropertiesFont, s_PropertiesWhiteBrush, 10, startingY + lineNo * (s_PropertiesFont.Size + 5));
 					lineNo++;
 				}
