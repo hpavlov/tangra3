@@ -62,14 +62,26 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.graphsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.miSubset = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.miNoConnections = new System.Windows.Forms.ToolStripMenuItem();
+            this.miLineConnections = new System.Windows.Forms.ToolStripMenuItem();
             this.gridlinesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.miCompleteGridlines = new System.Windows.Forms.ToolStripMenuItem();
             this.miTickGridlines = new System.Windows.Forms.ToolStripMenuItem();
             this.miExport = new System.Windows.Forms.ToolStripMenuItem();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.miNoConnections = new System.Windows.Forms.ToolStripMenuItem();
-            this.miLineConnections = new System.Windows.Forms.ToolStripMenuItem();
+            this.miDimentions = new System.Windows.Forms.ToolStripMenuItem();
+            this.mi640 = new System.Windows.Forms.ToolStripMenuItem();
+            this.mi800 = new System.Windows.Forms.ToolStripMenuItem();
+            this.mi960 = new System.Windows.Forms.ToolStripMenuItem();
+            this.mi1024 = new System.Windows.Forms.ToolStripMenuItem();
+            this.mi1280 = new System.Windows.Forms.ToolStripMenuItem();
+            this.mi1400 = new System.Windows.Forms.ToolStripMenuItem();
+            this.mi1440 = new System.Windows.Forms.ToolStripMenuItem();
+            this.mi1600 = new System.Windows.Forms.ToolStripMenuItem();
+            this.mi1856 = new System.Windows.Forms.ToolStripMenuItem();
+            this.mi1920 = new System.Windows.Forms.ToolStripMenuItem();
+            this.mi2048 = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl.SuspendLayout();
             this.tabOverview.SuspendLayout();
             this.tabGraphs.SuspendLayout();
@@ -436,7 +448,8 @@
             this.graphsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.miSubset,
             this.toolStripMenuItem1,
-            this.gridlinesToolStripMenuItem});
+            this.gridlinesToolStripMenuItem,
+            this.miDimentions});
             this.graphsToolStripMenuItem.Name = "graphsToolStripMenuItem";
             this.graphsToolStripMenuItem.Size = new System.Drawing.Size(56, 20);
             this.graphsToolStripMenuItem.Text = "&Graphs";
@@ -447,44 +460,6 @@
             this.miSubset.Size = new System.Drawing.Size(191, 22);
             this.miSubset.Text = "&Subset";
             this.miSubset.Click += new System.EventHandler(this.miSubset_Click);
-            // 
-            // gridlinesToolStripMenuItem
-            // 
-            this.gridlinesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.miCompleteGridlines,
-            this.miTickGridlines});
-            this.gridlinesToolStripMenuItem.Name = "gridlinesToolStripMenuItem";
-            this.gridlinesToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
-            this.gridlinesToolStripMenuItem.Text = "&Gridlines";
-            // 
-            // miCompleteGridlines
-            // 
-            this.miCompleteGridlines.Checked = true;
-            this.miCompleteGridlines.CheckOnClick = true;
-            this.miCompleteGridlines.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.miCompleteGridlines.Name = "miCompleteGridlines";
-            this.miCompleteGridlines.Size = new System.Drawing.Size(152, 22);
-            this.miCompleteGridlines.Text = "&Complete";
-            this.miCompleteGridlines.Click += new System.EventHandler(this.GridlinesStyleChanged);
-            // 
-            // miTickGridlines
-            // 
-            this.miTickGridlines.CheckOnClick = true;
-            this.miTickGridlines.Name = "miTickGridlines";
-            this.miTickGridlines.Size = new System.Drawing.Size(152, 22);
-            this.miTickGridlines.Text = "&Ticks";
-            this.miTickGridlines.Click += new System.EventHandler(this.GridlinesStyleChanged);
-            // 
-            // miExport
-            // 
-            this.miExport.Name = "miExport";
-            this.miExport.Size = new System.Drawing.Size(53, 20);
-            this.miExport.Text = "&Export";
-            this.miExport.Click += new System.EventHandler(this.miExport_Click);
-            // 
-            // saveFileDialog
-            // 
-            this.saveFileDialog.DefaultExt = "cvs";
             // 
             // toolStripMenuItem1
             // 
@@ -501,7 +476,7 @@
             this.miNoConnections.CheckOnClick = true;
             this.miNoConnections.CheckState = System.Windows.Forms.CheckState.Checked;
             this.miNoConnections.Name = "miNoConnections";
-            this.miNoConnections.Size = new System.Drawing.Size(152, 22);
+            this.miNoConnections.Size = new System.Drawing.Size(103, 22);
             this.miNoConnections.Text = "None";
             this.miNoConnections.Click += new System.EventHandler(this.DataPointConnectionStyleChanged);
             // 
@@ -509,9 +484,144 @@
             // 
             this.miLineConnections.CheckOnClick = true;
             this.miLineConnections.Name = "miLineConnections";
-            this.miLineConnections.Size = new System.Drawing.Size(152, 22);
+            this.miLineConnections.Size = new System.Drawing.Size(103, 22);
             this.miLineConnections.Text = "Lines";
             this.miLineConnections.Click += new System.EventHandler(this.DataPointConnectionStyleChanged);
+            // 
+            // gridlinesToolStripMenuItem
+            // 
+            this.gridlinesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miCompleteGridlines,
+            this.miTickGridlines});
+            this.gridlinesToolStripMenuItem.Name = "gridlinesToolStripMenuItem";
+            this.gridlinesToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
+            this.gridlinesToolStripMenuItem.Text = "&Gridlines";
+            // 
+            // miCompleteGridlines
+            // 
+            this.miCompleteGridlines.Checked = true;
+            this.miCompleteGridlines.CheckOnClick = true;
+            this.miCompleteGridlines.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.miCompleteGridlines.Name = "miCompleteGridlines";
+            this.miCompleteGridlines.Size = new System.Drawing.Size(126, 22);
+            this.miCompleteGridlines.Text = "&Complete";
+            this.miCompleteGridlines.Click += new System.EventHandler(this.GridlinesStyleChanged);
+            // 
+            // miTickGridlines
+            // 
+            this.miTickGridlines.CheckOnClick = true;
+            this.miTickGridlines.Name = "miTickGridlines";
+            this.miTickGridlines.Size = new System.Drawing.Size(126, 22);
+            this.miTickGridlines.Text = "&Ticks";
+            this.miTickGridlines.Click += new System.EventHandler(this.GridlinesStyleChanged);
+            // 
+            // miExport
+            // 
+            this.miExport.Name = "miExport";
+            this.miExport.Size = new System.Drawing.Size(53, 20);
+            this.miExport.Text = "&Export";
+            this.miExport.Click += new System.EventHandler(this.miExport_Click);
+            // 
+            // saveFileDialog
+            // 
+            this.saveFileDialog.DefaultExt = "cvs";
+            // 
+            // miDimentions
+            // 
+            this.miDimentions.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mi640,
+            this.mi800,
+            this.mi960,
+            this.mi1024,
+            this.mi1280,
+            this.mi1400,
+            this.mi1440,
+            this.mi1600,
+            this.mi1856,
+            this.mi1920,
+            this.mi2048});
+            this.miDimentions.Name = "miDimentions";
+            this.miDimentions.Size = new System.Drawing.Size(191, 22);
+            this.miDimentions.Text = "Dimentions";
+            this.miDimentions.DropDownOpening += new System.EventHandler(this.miDimentions_DropDownOpening);
+            // 
+            // mi640
+            // 
+            this.mi640.Name = "mi640";
+            this.mi640.Size = new System.Drawing.Size(152, 22);
+            this.mi640.Text = "640×480";
+            this.mi640.Click += new System.EventHandler(this.SetFormSize);
+            // 
+            // mi800
+            // 
+            this.mi800.Name = "mi800";
+            this.mi800.Size = new System.Drawing.Size(152, 22);
+            this.mi800.Text = "800×600";
+            this.mi800.Click += new System.EventHandler(this.SetFormSize);
+            // 
+            // mi960
+            // 
+            this.mi960.Name = "mi960";
+            this.mi960.Size = new System.Drawing.Size(152, 22);
+            this.mi960.Text = "960×720";
+            this.mi960.Click += new System.EventHandler(this.SetFormSize);
+            // 
+            // mi1024
+            // 
+            this.mi1024.Name = "mi1024";
+            this.mi1024.Size = new System.Drawing.Size(152, 22);
+            this.mi1024.Text = "1024×768";
+            this.mi1024.Click += new System.EventHandler(this.SetFormSize);
+            // 
+            // mi1280
+            // 
+            this.mi1280.Name = "mi1280";
+            this.mi1280.Size = new System.Drawing.Size(152, 22);
+            this.mi1280.Text = "1280×960";
+            this.mi1280.Click += new System.EventHandler(this.SetFormSize);
+            // 
+            // mi1400
+            // 
+            this.mi1400.Name = "mi1400";
+            this.mi1400.Size = new System.Drawing.Size(152, 22);
+            this.mi1400.Text = "1400×1050";
+            this.mi1400.Click += new System.EventHandler(this.SetFormSize);
+            // 
+            // mi1440
+            // 
+            this.mi1440.Name = "mi1440";
+            this.mi1440.Size = new System.Drawing.Size(152, 22);
+            this.mi1440.Text = "1440×1080";
+            this.mi1440.Click += new System.EventHandler(this.SetFormSize);
+            // 
+            // mi1600
+            // 
+            this.mi1600.Name = "mi1600";
+            this.mi1600.Size = new System.Drawing.Size(152, 22);
+            this.mi1600.Text = "1600×1200";
+            this.mi1600.Click += new System.EventHandler(this.SetFormSize);
+            // 
+            // mi1856
+            // 
+            this.mi1856.Name = "mi1856";
+            this.mi1856.Size = new System.Drawing.Size(152, 22);
+            this.mi1856.Text = "1856×1392";
+            this.mi1856.Click += new System.EventHandler(this.SetFormSize);
+            // 
+            // mi1920
+            // 
+            this.mi1920.Name = "mi1920";
+            this.mi1920.Size = new System.Drawing.Size(152, 22);
+            this.mi1920.Text = "1920×1440";
+            this.mi1920.Click += new System.EventHandler(this.SetFormSize);
+            // 
+            // mi2048
+            // 
+            this.mi2048.Name = "mi2048";
+            this.mi2048.Size = new System.Drawing.Size(152, 22);
+            this.mi2048.Tag = "";
+            this.mi2048.Text = "2048×1536";
+            this.mi2048.Click += new System.EventHandler(this.SetFormSize);
             // 
             // frmAavStatusChannelOnlyView
             // 
@@ -597,5 +707,17 @@
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem miNoConnections;
         private System.Windows.Forms.ToolStripMenuItem miLineConnections;
+        private System.Windows.Forms.ToolStripMenuItem miDimentions;
+        private System.Windows.Forms.ToolStripMenuItem mi640;
+        private System.Windows.Forms.ToolStripMenuItem mi800;
+        private System.Windows.Forms.ToolStripMenuItem mi960;
+        private System.Windows.Forms.ToolStripMenuItem mi1024;
+        private System.Windows.Forms.ToolStripMenuItem mi1280;
+        private System.Windows.Forms.ToolStripMenuItem mi1400;
+        private System.Windows.Forms.ToolStripMenuItem mi1440;
+        private System.Windows.Forms.ToolStripMenuItem mi1600;
+        private System.Windows.Forms.ToolStripMenuItem mi1856;
+        private System.Windows.Forms.ToolStripMenuItem mi1920;
+        private System.Windows.Forms.ToolStripMenuItem mi2048;
     }
 }

@@ -1598,5 +1598,36 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
 
             return string.Format("{0} of {1:0.0} {2} data points recorded between {3} UT and {4} UT", analysisType, totalNum, numUnits, timeFrom.ToString(timeFormat), timeTo.ToString(timeFormat));
         }
+
+        private void SetFormSize(object sender, EventArgs e)
+        {
+            var mi = sender as ToolStripMenuItem;
+            if (mi != null)
+            {
+                string[] toks = mi.Text.Split('×');
+                int width, heigh;
+                if (toks.Length == 2 && 
+                    int.TryParse(toks[0].Trim(), out width) &&
+                    int.TryParse(toks[1].Trim(), out heigh))
+                {
+                    this.Width = width;
+                    this.Height = heigh;
+                    DrawGraph();
+                }
+            }
+        }
+
+        private void miDimentions_DropDownOpening(object sender, EventArgs e)
+        {
+            var currRes = string.Format("{0}×{1}", this.Width, this.Height);
+            foreach (var di in miDimentions.DropDownItems)
+            {
+                var mi = di as ToolStripMenuItem;
+                if (mi != null)
+                {
+                    mi.Checked = mi.Text == currRes;
+                }
+            }
+        }
     }
 }
