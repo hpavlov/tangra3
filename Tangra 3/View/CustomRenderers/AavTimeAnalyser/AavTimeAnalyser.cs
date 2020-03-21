@@ -116,6 +116,12 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
             m_CorrSystemTimeMs = -frameRate / 2.0f;
         }
 
+        public void AddData(AstroDigitalVideoStream aav, Action<int, int> progressCallback)
+        {
+            m_Aav = aav;
+            Initialize(progressCallback);
+        }
+
         public void Initialize(Action<int, int> progressCallback)
         {
             Task.Run(() =>
@@ -248,7 +254,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
 
                         Entries.Add(entry);
 
-                        if (imageData != null)
+                        if (imageData != null && DebugFrames.Count < 10 /* Limit debug frames to 10 to save RAM */)
                         {
                             entry.DebugImage = BitmapFilter.ToVideoFields(Pixelmap.ConstructBitmapFromBitmapPixels(imageData.ImageData));
                             entry.IsOutlier = true;
@@ -442,6 +448,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
         private void ExtractMeinbergLogData(string fileName)
         {
             MeinbergAdvLogEntry entry = null;
+            MeinbergAdvLog.Clear();
 
             var lines = File.ReadAllLines(fileName);
             foreach (var line in lines)
@@ -494,50 +501,92 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
             if (entry != null) MeinbergAdvLog.Add(entry);
         }
 
-        public void ExportData(string fileName, Action<int, int> progressCallback)
+        public void ExportData(string fileName, Action<int, int, Exception> progressCallback)
         {
             Task.Run(() =>
             {
-                progressCallback(0, Entries.Count);
+                progressCallback(0, Entries.Count, null);
 
-                var output = new StringBuilder();
-                output.AppendLine("Delta SystemTimePreciseAdFileTime (ms),Delta SystemTime(ms),Delta OccuRecTime (ms),3-Sigma NTP Error(ms)");
-
-                int i = 0;
-                foreach (var entry in Entries)
+                try
                 {
-                    output.AppendFormat(CultureInfo.InvariantCulture, "{0:0.000},{1:0.0},{2:0.000},{3:0.0}\r\n", entry.DeltaSystemFileTimeMs, entry.DeltaSystemTimeMs, entry.DeltaNTPTimeMs, entry.NTPErrorMs);
-
-                    i++;
-                    if (i % 100 == 0)
+                    using (var fs = new FileStream(fileName, FileMode.CreateNew))
+                    using (TextWriter wrt = new StreamWriter(fs))
                     {
-                        progressCallback(i, Entries.Count);
+                        wrt.WriteLine("Delta SystemTimePreciseAsFileTime (ms),Delta SystemTime(ms),Delta OccuRecTime (ms),3-Sigma NTP Error(ms)");
+
+                        int i = 0;
+                        foreach (var entry in Entries)
+                        {
+                            wrt.WriteLine("{0:0.000},{1:0.0},{2:0.000},{3:0.0}", entry.DeltaSystemFileTimeMs, entry.DeltaSystemTimeMs, entry.DeltaNTPTimeMs, entry.NTPErrorMs);
+
+                            i++;
+                            if (i % 100 == 0)
+                            {
+                                progressCallback(i, Entries.Count, null);
+                            }
+                        }
+                    }
+
+                    progressCallback(0, 0, null);
+                    progressCallback(0, SystemUtilisation.Count, null);
+
+                    using (var fs = new FileStream("Utilisation_" + fileName, FileMode.CreateNew))
+                    using (TextWriter wrt = new StreamWriter(fs))
+                    {
+                        wrt.WriteLine("Cpu Utilisation (%), Disk Utilisation (%), Free Memory(Mb)");
+                        int i = 0;
+                        foreach (var entry in SystemUtilisation)
+                        {
+                            wrt.WriteLine("{0:0.000},{1:0.0},{2:0.000}", entry.CpuUtilisation, entry.DiskUtilisation, entry.FreeMemory);
+
+                            i++;
+                            if (i % 100 == 0)
+                            {
+                                progressCallback(i, SystemUtilisation.Count, null);
+                            }
+                        }
                     }
                 }
-
-                File.WriteAllText(fileName, output.ToString());
-
-                progressCallback(0, 0);
-                progressCallback(0, SystemUtilisation.Count);
-
-                output = new StringBuilder();
-                output.AppendLine("Cpu Utilisation (%), Disk Utilisation (%), Free Memory(Mb)");
-
-                i = 0;
-                foreach (var entry in SystemUtilisation)
+                catch (Exception ex)
                 {
-                    output.AppendFormat(CultureInfo.InvariantCulture, "{0:0.000},{1:0.0},{2:0.000}\r\n", entry.CpuUtilisation, entry.DiskUtilisation, entry.FreeMemory);
-
-                    i++;
-                    if (i % 100 == 0)
-                    {
-                        progressCallback(i, SystemUtilisation.Count);
-                    }
+                    progressCallback(0, 0, ex);
                 }
 
-                File.WriteAllText("Utilisation_" + fileName, output.ToString());
+                progressCallback(0, 0, null);
+            });
+        }
 
-                progressCallback(0, 0);
+        public void ExportTimeDeltasData(string fileName, Action<int, int, Exception> progressCallback)
+        {
+            Task.Run(() =>
+            {
+                progressCallback(0, Entries.Count, null);
+
+                try
+                {
+                    using (var fs = new FileStream(fileName, FileMode.CreateNew))
+                    using (TextWriter wrt = new StreamWriter(fs))
+                    {
+                        wrt.WriteLine("Reference Time, Delta (ms)");
+                        int i = 0;
+                        foreach (var entry in Entries)
+                        {
+                            wrt.WriteLine("{0},{1:0.000}", entry.ReferenceTime.ToString("yyyy-MMM-dd HH:mm:ss.ffff"), entry.DeltaSystemFileTimeMs);
+
+                            i++;
+                            if (i % 100 == 0)
+                            {
+                                progressCallback(i, Entries.Count, null);
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    progressCallback(0, 0, ex);
+                }
+
+                progressCallback(0, 0, null);
             });
         }
     }

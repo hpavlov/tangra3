@@ -12,8 +12,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.VisualBasic.Devices;
+using Tangra.Addins;
 using Tangra.Controller;
+using Tangra.Model.Context;
 using Tangra.Model.Helpers;
+using Tangra.Model.Video;
+using Tangra.PInvoke;
 using Tangra.Video;
 
 namespace Tangra.View.CustomRenderers.AavTimeAnalyser
@@ -41,6 +45,8 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
         {
             public GridlineStyle GridlineStyle = GridlineStyle.Line;
             public bool ConnectionLines = false;
+            public bool ForPublication = false;
+            public bool IncludeMeinbergData = true;
         }
 
         private GraphType m_GrapthType = GraphType.gtNone;
@@ -64,7 +70,8 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
 
         private GraphConfig m_GraphConfig = new GraphConfig();
 
-        private static Font m_TitleFont = new Font(DefaultFont, FontStyle.Bold);
+        private static Font s_TitleFont = new Font(DefaultFont, FontStyle.Bold);
+        private static Font s_LargeAxisFont = new Font(DefaultFont.FontFamily, DefaultFont.Size * 2);
 
         public frmAavStatusChannelOnlyView()
         {
@@ -105,8 +112,13 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
             UpdateProgressBarImpl(val, max, pbLoadData, OnTimeAnalysisDataReady);
         }
 
-        private void UpdateExportProgressBar(int val, int max)
+        private void UpdateExportProgressBar(int val, int max, Exception ex)
         {
+            if (ex != null)
+            {
+                MessageBox.Show(ex.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
             UpdateProgressBarImpl(val, max, pbLoadData, OnExportFinished);
         }
 
@@ -209,6 +221,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
         private void DrawGraph()
         {
             if (!m_IsDataReady) return;
+            cbMeinbergData.Visible = m_TimeAnalyser.MeinbergAdvLog.Count > 0;
 
             switch (m_GrapthType)
             {
@@ -487,8 +500,8 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                     g.DrawRectangle(Pens.Black, paddingX, paddingY, graphWidth - padding - paddingX, graphHeight - 2 * paddingY);
 
                     var title = GetTitle(m_TimeAnalyser.Entries, "Time Delta analysis");
-                    var sizeF = g.MeasureString(title, m_TitleFont);
-                    g.DrawString(title, m_TitleFont, Brushes.Black, (width - sizeF.Width) / 2 + paddingX, (paddingY - sizeF.Height) / 2);
+                    var sizeF = g.MeasureString(title, s_TitleFont);
+                    g.DrawString(title, s_TitleFont, Brushes.Black, (width - sizeF.Width) / 2 + paddingX, (paddingY - sizeF.Height) / 2);
 
                     var thirdW = width / 3;
                     int legPos = -1;
@@ -522,10 +535,10 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
 
                         legPos++;
 
-                        sizeF = g.MeasureString(legend, m_TitleFont);
+                        sizeF = g.MeasureString(legend, s_TitleFont);
                         var y = paddingY + height + sizeF.Height / 2;
                         var yl = paddingY + height + sizeF.Height;
-                        g.DrawString(legend, m_TitleFont, Brushes.Black, (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW + 15, y);
+                        g.DrawString(legend, s_TitleFont, Brushes.Black, (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW + 15, y);
                         g.DrawLine(legendPen, (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW, yl - 1, 6 + (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW, yl - 1);
                         g.DrawLine(legendPen, (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW, yl, 6 + (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW, yl);
                         g.DrawLine(legendPen, (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW, yl + 1, 6 + (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW, yl + 1);
@@ -649,9 +662,17 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
 
                 using (var g = Graphics.FromImage(image))
                 {
+                    Font axisFont = DefaultFont;
+                    if (m_GraphConfig.ForPublication)
+                    {
+                        axisFont = s_LargeAxisFont;
+                    }
+
                     float padding = 10;
-                    float paddingY = 25;
-                    float height = graphHeight - 2 * paddingY;
+                    float paddingYTop = padding + (m_GraphConfig.ForPublication ? 0 : s_TitleFont.Height + 2);
+                    float paddingYBottom = padding + 2 + axisFont.Height;
+
+                    float height = graphHeight - paddingYTop - paddingYBottom;
                     float yFactor = height / (maxDelta - minDelta);
 
                     int interval = GetReadableLabelYAxisTickInterval(g, yFactor);
@@ -659,7 +680,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                     int yGridFrom = (int)Math.Floor((m - b) / interval) * interval;
                     int yGridTo = (int)Math.Ceiling((m + b) / interval) * interval;
 
-                    float paddingX = GetXAsisPaddingToFitYLabels(g, yGridFrom, yGridTo);
+                    float paddingX = GetXAsisPaddingToFitYLabels(g, yGridFrom, yGridTo, axisFont);
                     float width = graphWidth - padding - paddingX;
 
                     float minX = 0;
@@ -667,6 +688,10 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                     float xFactor = width / (maxX - minX + 1);
 
                     g.FillRectangle(Brushes.WhiteSmoke, 0, 0, graphWidth, graphHeight);
+                    if (m_GraphConfig.ForPublication)
+                    {
+                        g.DrawRectangle(Pens.Black, 0, 0, graphWidth - 1, graphHeight - 1);
+                    }
 
                     idx = 0;
 
@@ -688,7 +713,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
 
                     var medianData = new List<Tuple<float, float>>();
 
-                    if (m_TimeAnalyser.MeinbergAdvLog.Count > 1)
+                    if (m_TimeAnalyser.MeinbergAdvLog.Count > 1 && m_GraphConfig.IncludeMeinbergData)
                     {
                         peerPens.Clear();
                         var timeInterval = subsetEnum[subsetEnum.Count - 1].ReferenceTime - subsetEnum[0].ReferenceTime;
@@ -702,7 +727,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                                 var x = paddingX + (float)(width * (meinbergLogPrev.Time - subsetEnum[0].ReferenceTime).TotalSeconds / timeInterval.TotalSeconds);
 
                                 // Peer IP Changed
-                                g.DrawLine(GetPenForPeerIP(meinbergLog.PeerIP), x, paddingY + 1, x, graphHeight - paddingY);
+                                g.DrawLine(GetPenForPeerIP(meinbergLog.PeerIP), x, paddingYTop + 1, x, graphHeight - paddingYBottom);
                             }
                         }
                     }
@@ -720,7 +745,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                         float x = paddingX + (idx - minX) * xFactor;
                         bool calcOnly = idx == 0;
 
-                        y2 = graphHeight - paddingY - yFactor * (entry.DeltaSystemFileTimeMs - minDelta);
+                        y2 = graphHeight - paddingYBottom - yFactor * (entry.DeltaSystemFileTimeMs - minDelta);
 
                         if (!calcOnly && (x - xp2 > MIN_PIX_DIFF || Math.Abs(y2 - y2p) > MIN_PIX_DIFF))
                         {
@@ -761,7 +786,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                             if (entry.SystemTimeFileTime - medianStartInterval > medianInterval)
                             {
                                 var median = medianCalsList.Median();
-                                var ym = graphHeight - paddingY - yFactor * (median - minDelta);
+                                var ym = graphHeight - paddingYBottom - yFactor * (median - minDelta);
                                 var xm = paddingX + ((idx + medianStartIntervalIndex) / 2.0f - minX) * xFactor;
 
                                 medianData.Add(Tuple.Create(xm, ym));
@@ -778,11 +803,11 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
 
                         if (intervalX != null && nextTick < entry.SystemTimeFileTime)
                         {
-                            g.DrawLine(Pens.Gray, x, graphHeight - paddingY + 1, x, graphHeight - paddingY - 5);
+                            g.DrawLine(Pens.Gray, x, graphHeight - paddingYBottom + 1, x, graphHeight - paddingYBottom - 5);
 
                             var label = intervalX.Value >= 3600 ? string.Format("{0} UT", nextTick.Hour) : (intervalX.Value >= 60 ? string.Format("{0}:{1:00} UT", nextTick.Hour, nextTick.Minute) : string.Format("{0}:{1:00}:{2:00} UT", nextTick.Hour, nextTick.Minute, nextTick.Second));
-                            var lblSiz = g.MeasureString(label, DefaultFont);
-                            g.DrawString(label, DefaultFont, Brushes.Black, x - lblSiz.Width / 2, graphHeight - paddingY + 5);
+                            var lblSiz = g.MeasureString(label, axisFont);
+                            g.DrawString(label, axisFont, Brushes.Black, x - lblSiz.Width / 2, graphHeight - paddingYBottom + 5);
 
                             nextTick = nextTick.AddSeconds(intervalX.Value);
                         }
@@ -802,8 +827,8 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                     SizeF sizF;
                     for (int ya = yGridFrom; ya < yGridTo; ya += interval)
                     {
-                        float y = graphHeight - paddingY - yFactor * (ya - minDelta);
-                        if (y < paddingY || y > graphHeight - paddingY) continue;
+                        float y = graphHeight - paddingYBottom - yFactor * (ya - minDelta);
+                        if (y < paddingYBottom || y > graphHeight - paddingYBottom) continue;
 
                         if (tickGridlines && ya != 0 /* The zero grid line is fully drawn even in 'tick' mode */)
                         {
@@ -829,22 +854,25 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                                 g.DrawLine(Pens.Gray, paddingX, y - 1, graphWidth - padding, y - 1);
                                 g.DrawLine(Pens.Gray, paddingX, y + 1, graphWidth - padding, y + 1);
                             }
-                            sizF = g.MeasureString("0", DefaultFont);
-                            g.DrawString("0", DefaultFont, Brushes.Black, paddingX - sizF.Width - 5, y - sizF.Height / 2);
+                            sizF = g.MeasureString("0", axisFont);
+                            g.DrawString("0", axisFont, Brushes.Black, paddingX - sizF.Width - 5, y - sizF.Height / 2);
                         }
                         else
                         {
                             var label = string.Format("{0} ms", ya);
-                            sizF = g.MeasureString(label, DefaultFont);
-                            g.DrawString(label, DefaultFont, Brushes.Black, paddingX - sizF.Width - 5, y - sizF.Height / 2);
+                            sizF = g.MeasureString(label, axisFont);
+                            g.DrawString(label, axisFont, Brushes.Black, paddingX - sizF.Width - 5, y - sizF.Height / 2);
                         }
                     }
 
-                    g.DrawRectangle(Pens.Black, paddingX, paddingY, graphWidth - padding - paddingX, graphHeight - 2 * paddingY);
+                    g.DrawRectangle(Pens.Black, paddingX, paddingYTop, graphWidth - padding - paddingX, graphHeight - paddingYTop - paddingYBottom);
 
-                    var title = GetTitle(subsetEnum, "Time Delta analysis");
-                    var sizeF = g.MeasureString(title, m_TitleFont);
-                    g.DrawString(title, m_TitleFont, Brushes.Black, (width - sizeF.Width) / 2 + paddingX, (paddingY - sizeF.Height) / 2);
+                    if (!m_GraphConfig.ForPublication)
+                    {
+                        var title = GetTitle(subsetEnum, "Time Delta analysis");
+                        var sizeF = g.MeasureString(title, s_TitleFont);
+                        g.DrawString(title, s_TitleFont, Brushes.Black, (width - sizeF.Width) / 2 + paddingX, (paddingYTop - sizeF.Height) / 2);
+                    }
                 }
             })
             .ContinueWith((r) =>
@@ -947,10 +975,10 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
             return null;
         }
 
-        private int GetXAsisPaddingToFitYLabels(Graphics g, int yFrom, int yTo)
+        private int GetXAsisPaddingToFitYLabels(Graphics g, int yFrom, int yTo, Font font)
         {
-            var sizF1 = g.MeasureString(string.Format("{0} ms", yFrom), DefaultFont);
-            var sizF2 = g.MeasureString(string.Format("{0} ms", yTo), DefaultFont);
+            var sizF1 = g.MeasureString(string.Format("{0} ms", yFrom), font);
+            var sizF2 = g.MeasureString(string.Format("{0} ms", yTo), font);
 
             return (int) Math.Ceiling(Math.Max(sizF1.Width, sizF2.Width)) + 10;
         }
@@ -991,6 +1019,8 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                         distribution[bucketNo] = 1;
                     }
                 }
+
+                btnExportBuckets.Tag = Tuple.Create(distribution.Select(x => x).ToDictionary(x => x.Key, x => x.Value), bucketSize, median);
 
                 var allValues = distribution.Values.ToArray();
 
@@ -1059,8 +1089,8 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                     g.DrawRectangle(Pens.Black, paddingX, paddingY, graphWidth - padding - paddingX, graphHeight - 2 * paddingY);
 
                     var title = GetTitle(m_TimeAnalyser.Entries, "Destribution around median");
-                    var sizeF = g.MeasureString(title, m_TitleFont);
-                    g.DrawString(title, m_TitleFont, Brushes.Black, (width - sizeF.Width) / 2 + paddingX, (paddingY - sizeF.Height) / 2);
+                    var sizeF = g.MeasureString(title, s_TitleFont);
+                    g.DrawString(title, s_TitleFont, Brushes.Black, (width - sizeF.Width) / 2 + paddingX, (paddingY - sizeF.Height) / 2);
                 }
             })
             .ContinueWith((r) =>
@@ -1170,8 +1200,8 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                     g.DrawRectangle(Pens.Black, paddingX, paddingY, graphWidth - padding - paddingX, graphHeight - 2 * paddingY);
 
                     var title = string.Format("System utilisation between {0} UT and {1} UT", m_TimeAnalyser.FromDateTime.ToString("dd-MMM HH:mm"), m_TimeAnalyser.ToDateTime.ToString("dd-MMM HH:mm"));
-                    var sizeF = g.MeasureString(title, m_TitleFont);
-                    g.DrawString(title, m_TitleFont, Brushes.Black, (width - sizeF.Width) / 2 + paddingX, (paddingY - sizeF.Height) / 2);
+                    var sizeF = g.MeasureString(title, s_TitleFont);
+                    g.DrawString(title, s_TitleFont, Brushes.Black, (width - sizeF.Width) / 2 + paddingX, (paddingY - sizeF.Height) / 2);
 
                     var thirdW = width / 3;
                     int legPos = -1;
@@ -1192,10 +1222,10 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
 
                         legPos++;
 
-                        sizeF = g.MeasureString(legend, m_TitleFont);
+                        sizeF = g.MeasureString(legend, s_TitleFont);
                         var y = paddingY + height + sizeF.Height / 2;
                         var yl = paddingY + height + sizeF.Height;
-                        g.DrawString(legend, m_TitleFont, Brushes.Black, (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW + 15, y);
+                        g.DrawString(legend, s_TitleFont, Brushes.Black, (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW + 15, y);
                         g.DrawLine(legendPen, (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW, yl - 1, 6 + (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW, yl - 1);
                         g.DrawLine(legendPen, (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW, yl, 6 + (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW, yl);
                         g.DrawLine(legendPen, (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW, yl + 1, 6 + (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW, yl + 1);
@@ -1235,6 +1265,24 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
         {
             Cursor = Cursors.WaitCursor;
 
+            List<NtpUpdateEntry> ntpUpdates = m_TimeAnalyser.NtpUpdates.ToList();
+
+            if (m_GraphConfig.ForPublication)
+            {
+                // Remove top 0.1% of the ouliers in Publication mode
+                var latentcies = ntpUpdates.Select(x => x.Latency).ToList();
+                latentcies.Sort();
+                double maxLatencyToPlot = latentcies[Math.Min(latentcies.Count - 1, (int)Math.Round(latentcies.Count * 0.99))];
+                if (ntpUpdates[0].Latency > maxLatencyToPlot)
+                    ntpUpdates[0].Latency = ntpUpdates.First(x => x.Latency < maxLatencyToPlot).Latency;
+
+                for (int i = 1; i < ntpUpdates.Count; i++)
+                {
+                    if (ntpUpdates[i].Latency > maxLatencyToPlot)
+                        ntpUpdates[i].Latency = ntpUpdates[i - 1].Latency;
+                }
+            }
+
             int graphWidth = pbGraph.Width;
             int graphHeight = pbGraph.Height;
 
@@ -1248,10 +1296,10 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                 Pen DeltaPen = Pens.DarkOrchid;
                 Pen LatencyPen = Pens.Red;
 
-                var minDelta = m_TimeAnalyser.NtpUpdates.Where(x => x.Updated || includeUnapplied).Min(x => x.Delta);
-                var maxDelta = m_TimeAnalyser.NtpUpdates.Where(x => x.Updated || includeUnapplied).Max(x => x.Delta);
-                var minLatency = m_TimeAnalyser.NtpUpdates.Min(x => x.Latency);
-                var maxLatency = m_TimeAnalyser.NtpUpdates.Max(x => x.Latency);
+                var minDelta = ntpUpdates.Where(x => x.Updated || includeUnapplied).Min(x => x.Delta);
+                var maxDelta = ntpUpdates.Where(x => x.Updated || includeUnapplied).Max(x => x.Delta);
+                var minLatency = ntpUpdates.Min(x => x.Latency);
+                var maxLatency = ntpUpdates.Max(x => x.Latency);
 
                 var minY = Math.Min(minLatency, minDelta);
                 var maxY = Math.Max(maxLatency, maxDelta);
@@ -1261,11 +1309,12 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                     float padding = 10;
                     float paddingX = 45;
                     float paddingY = 25;
+
                     float width = graphWidth - padding - paddingX;
                     float height = graphHeight - 2 * paddingY;
                     float yFactor = height / (1.2f * (maxY - minY));
                     float minX = 0;
-                    float maxX = m_TimeAnalyser.NtpUpdates.Count - 1;
+                    float maxX = ntpUpdates.Count - 1;
                     float xFactor = width / (maxX - minX + 1);
 
                     g.FillRectangle(Brushes.WhiteSmoke, 0, 0, graphWidth, graphHeight);
@@ -1316,7 +1365,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                     float y1p = 0;
                     float y2p = 0;
 
-                    foreach (var utilEntry in m_TimeAnalyser.NtpUpdates)
+                    foreach (var utilEntry in ntpUpdates)
                     {
                         float x = paddingX + idx * xFactor;
                         float y1 = graphHeight - paddingY - yFactor * (utilEntry.Delta - minY);
@@ -1324,9 +1373,12 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
 
                         if (idx > 0)
                         {
-                            if (utilEntry.Updated || includeUnapplied)
+                            if (!m_GraphConfig.ForPublication)
                             {
-                                g.DrawLine(DeltaPen, x1p, y1p, x, y1);
+                                if (utilEntry.Updated || includeUnapplied)
+                                {
+                                    g.DrawLine(DeltaPen, x1p, y1p, x, y1);
+                                }
                             }
 
                             g.DrawLine(LatencyPen, x2p, y2p, x, y2);
@@ -1347,8 +1399,8 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                     g.DrawRectangle(Pens.Black, paddingX, paddingY, graphWidth - padding - paddingX, graphHeight - 2 * paddingY);
 
                     var title = string.Format("OccuRec NTP updates between {0} UT and {1} UT", m_TimeAnalyser.FromDateTime.ToString("dd-MMM HH:mm"), m_TimeAnalyser.ToDateTime.ToString("dd-MMM HH:mm"));
-                    var sizeF = g.MeasureString(title, m_TitleFont);
-                    g.DrawString(title, m_TitleFont, Brushes.Black, (width - sizeF.Width) / 2 + paddingX, (paddingY - sizeF.Height) / 2);
+                    var sizeF = g.MeasureString(title, s_TitleFont);
+                    g.DrawString(title, s_TitleFont, Brushes.Black, (width - sizeF.Width) / 2 + paddingX, (paddingY - sizeF.Height) / 2);
 
                     var thirdW = width / 3;
                     int legPos = -1;
@@ -1369,10 +1421,10 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
 
                         legPos++;
 
-                        sizeF = g.MeasureString(legend, m_TitleFont);
+                        sizeF = g.MeasureString(legend, s_TitleFont);
                         var y = paddingY + height + sizeF.Height / 2;
                         var yl = paddingY + height + sizeF.Height;
-                        g.DrawString(legend, m_TitleFont, Brushes.Black, (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW + 15, y);
+                        g.DrawString(legend, s_TitleFont, Brushes.Black, (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW + 15, y);
                         g.DrawLine(legendPen, (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW, yl - 1, 6 + (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW, yl - 1);
                         g.DrawLine(legendPen, (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW, yl, 6 + (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW, yl);
                         g.DrawLine(legendPen, (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW, yl + 1, 6 + (thirdW - sizeF.Width) / 2 + paddingX + legPos * thirdW, yl + 1);
@@ -1514,26 +1566,8 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
 
         private string m_ExportFileName;
 
-        private void miExport_Click(object sender, EventArgs e)
-        {
-            saveFileDialog.FileName = Path.ChangeExtension(m_Aav.FileName, "csv");
-
-            if (saveFileDialog.ShowDialog(this) == DialogResult.OK)
-            {
-                m_ExportFileName = saveFileDialog.FileName;
-                m_TimeAnalyser.ExportData(
-                    m_ExportFileName,
-                    (val, max) =>
-                    {
-                        this.Invoke(new Action<int, int>(UpdateExportProgressBar), val, max);
-                    }
-                );
-            }
-        }
-
         private void OnExportFinished()
         {
-            Process.Start(m_ExportFileName);
         }
 
         private void miSubset_Click(object sender, EventArgs e)
@@ -1610,8 +1644,8 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                     int.TryParse(toks[0].Trim(), out width) &&
                     int.TryParse(toks[1].Trim(), out heigh))
                 {
-                    this.Width = width;
-                    this.Height = heigh;
+                    this.Width = width + (this.Width - pbGraph.Width);
+                    this.Height = heigh + (this.Height - pbGraph.Height);
                     DrawGraph();
                 }
             }
@@ -1619,7 +1653,7 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
 
         private void miDimentions_DropDownOpening(object sender, EventArgs e)
         {
-            var currRes = string.Format("{0}×{1}", this.Width, this.Height);
+            var currRes = string.Format("{0}×{1}", pbGraph.Width, pbGraph.Height);
             foreach (var di in miDimentions.DropDownItems)
             {
                 var mi = di as ToolStripMenuItem;
@@ -1629,5 +1663,113 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                 }
             }
         }
+
+        private void btnExportBuckets_Click(object sender, EventArgs e)
+        {
+            if (m_GrapthType == GraphType.gtDeltaBucketIntervals)
+            {
+                var data = btnExportBuckets.Tag as Tuple<Dictionary<int, float>, float, float>;
+                if (data != null)
+                {
+                    saveFileDialog.FileName = Path.GetFullPath(Path.GetDirectoryName(m_Aav.FileName) + @"\" + Path.GetFileNameWithoutExtension(m_Aav.FileName) + "_buckets.txt");
+                    if (saveFileDialog.ShowDialog(this) == DialogResult.OK)
+                    {
+                        var bld = new StringBuilder();
+                        bld.AppendFormat("{0}\r\n", data.Item2);
+                        bld.AppendFormat("{0}\r\n", data.Item3);
+                        foreach (var kvp in data.Item1)
+                        {
+                            bld.AppendFormat("{0} = {1}\r\n", kvp.Key, kvp.Value);
+                        }
+
+                        File.WriteAllText(saveFileDialog.FileName, bld.ToString());
+                    }
+                }
+            }
+        }
+
+        private void miAddMoreData_Click(object sender, EventArgs e)
+        {
+            openFileDialog.InitialDirectory = Path.GetDirectoryName(m_Aav.FileName);
+            if (openFileDialog.ShowDialog(this) == DialogResult.OK)
+            {
+                int version = TangraCore.ADV2GetFormatVersion(openFileDialog.FileName);
+
+                if (version == 1)
+                {
+                    AdvFileMetadataInfo fileMetadataInfo = new AdvFileMetadataInfo();
+                    GeoLocationInfo geoLocation = new GeoLocationInfo();
+
+                    var adv1 = new AstroDigitalVideoStream(openFileDialog.FileName, ref fileMetadataInfo, ref geoLocation);
+                    if (adv1.IsStatusChannelOnly)
+                    {
+                        m_TimeAnalyser.AddData(adv1, (val, max) =>
+                        {
+                            this.Invoke(new Action<int, int>(UpdateProgressBar), val, max);
+                        });
+                    }
+                    else
+                    {
+                        MessageBox.Show("Tangra", "Not an AAV Status Channel-Only file.", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Tangra", "Not an AAV ver 1 file.", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void miPublicationMode_CheckedChanged(object sender, EventArgs e)
+        {
+            m_GraphConfig.ForPublication = miPublicationMode.Checked;
+            DrawGraph();
+        }
+
+        private void miCopyToClipboard_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetImage(pbGraph.Image);
+        }
+
+        private void cbMeinbergData_CheckedChanged(object sender, EventArgs e)
+        {
+            m_GraphConfig.IncludeMeinbergData = cbMeinbergData.Checked;
+            DrawGraph();
+        }
+
+        private void miExportAll_Click(object sender, EventArgs e)
+        {
+            saveFileDialog.FileName = Path.ChangeExtension(m_Aav.FileName, "csv");
+
+            if (saveFileDialog.ShowDialog(this) == DialogResult.OK)
+            {
+                m_ExportFileName = saveFileDialog.FileName;
+                m_TimeAnalyser.ExportData(
+                    m_ExportFileName,
+                    (val, max, ex) =>
+                    {
+                        this.Invoke(new Action<int, int, Exception>(UpdateExportProgressBar), val, max, ex);
+                    }
+                );
+            }
+        }
+
+        private void miExportTimeDeltaOnly_Click(object sender, EventArgs e)
+        {
+            saveFileDialog.FileName = Path.ChangeExtension(m_Aav.FileName, "csv");
+
+            if (saveFileDialog.ShowDialog(this) == DialogResult.OK)
+            {
+                m_ExportFileName = saveFileDialog.FileName;
+                m_TimeAnalyser.ExportTimeDeltasData(
+                    m_ExportFileName,
+                    (val, max, ex) =>
+                    {
+                        this.Invoke(new Action<int, int, Exception>(UpdateExportProgressBar), val, max, ex);
+                    }
+                );
+            }
+        }
+
     }
 }
