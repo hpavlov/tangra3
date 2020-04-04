@@ -45,6 +45,7 @@ using Tangra.VideoTools;
 using Tangra.View;
 using nom.tam.fits;
 using nom.tam.util;
+using Tangra.Controls;
 using Tangra.VideoOperations.Astrometry.MotionFitting;
 using Tangra.VideoOperations.ConvertVideoToAav;
 using Tangra.VideoOperations.ConvertVideoToFits;
@@ -1475,6 +1476,23 @@ namespace Tangra
             }
             else
                 MessageBox.Show("Could not initialize the timestamp OCR engine.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        private void ImageShrinkOrScrollClicked(object sender, EventArgs e)
+        {
+            var currItem = sender as ToolStripMenuItem;
+            if (currItem != null && !currItem.Checked)
+            {
+                miShrinkToFit.Checked = false;
+                miScrollImage.Checked = false;
+
+                currItem.Checked = true;
+
+                if (miShrinkToFit.Checked)
+                    pictureBox.DisplayMode = ImageDisplayMode.Shrink;
+                else if (miScrollImage.Checked)
+                    pictureBox.DisplayMode = ImageDisplayMode.Scroll;
+            }
         }
 	}
 }

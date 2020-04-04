@@ -13,6 +13,12 @@ using System.Windows.Forms;
 
 namespace Tangra.Controls
 {
+    public enum ImageDisplayMode
+    {
+        Scroll,
+        Shrink
+    }
+
     public partial class ImagePanel : UserControl
     {
         public ImagePanel()
@@ -23,38 +29,43 @@ namespace Tangra.Controls
             this.SetStyle(ControlStyles.AllPaintingInWmPaint |
               ControlStyles.UserPaint | ControlStyles.ResizeRedraw |
               ControlStyles.UserPaint | ControlStyles.DoubleBuffer, true);
+
+            this.DisplayMode = ImageDisplayMode.Shrink;
+            this.MouseWheel += OnMouseWheel;
         }
 
-        int viewRectWidth, viewRectHeight; // view window width and height
+        private int m_ViewRectWidth;
+        private int m_ViewRectHeight;
+        private float m_Scale;
 
-        Size canvasSize = new Size(60, 40);
+        private Size m_CanvasSize = new Size(60, 40);
+
         public Size CanvasSize
         {
-            get { return canvasSize; }
+            get { return m_CanvasSize; }
             set
             {
-                canvasSize = value;
-                displayScrollbar();
-                setScrollbarValues();
+                m_CanvasSize = value;
+                RecalculateScaleAndScrollbars();
                 Invalidate();
             }
         }
 
-        private object m_SyncLock = new object();
+        private readonly object m_SyncLock = new object();
 
-        Bitmap image;
+        private Bitmap m_Image;
+
         public Bitmap Image
         {
-            get { return image; }
+            get { return m_Image; }
             set 
             {
                 lock (m_SyncLock)
                 {
-                    image = value;
+                    m_Image = value;
                 }
 
-                displayScrollbar();
-                setScrollbarValues(); 
+                RecalculateScaleAndScrollbars();
                 Invalidate();
             }
         }
@@ -66,63 +77,108 @@ namespace Tangra.Controls
             set{interMode=value;}
         }
 
+        private ImageDisplayMode m_DisplayMode;
+
+        public ImageDisplayMode DisplayMode
+        {
+            get { return m_DisplayMode; }
+            set
+            {
+                if (m_DisplayMode == value)
+                {
+                    return;
+                }
+
+                m_DisplayMode = value;
+
+                RecalculateScaleAndScrollbars();
+                Invalidate();
+            }
+        }
+
+        private void OnMouseWheel(object sender, MouseEventArgs e)
+        {
+            if (m_DisplayMode == ImageDisplayMode.Scroll)
+            {
+                // TODO: Implement mouse wheel zoom in/out
+                // m_ZoomScale += (e.Delta / 5000.0f);
+            }
+        }
+
         protected override void OnLoad(EventArgs e)
         {
-            displayScrollbar();
-            setScrollbarValues();
+            RecalculateScaleAndScrollbars();
             base.OnLoad(e);
         }
 
         protected override void OnResize(EventArgs e)
         {
-            displayScrollbar();
-            setScrollbarValues();
+            RecalculateScaleAndScrollbars();
             base.OnResize(e);
         }
 
         protected override void OnPaint(PaintEventArgs e)
         {
-             base.OnPaint(e);
+            base.OnPaint(e);
 
-            
-            if(image != null)
+            if(m_Image != null)
             {
                 lock (m_SyncLock)
                 {
-                    if (image != null)
+                    if (m_Image != null)
                     {
                         Rectangle srcRect, distRect;
 
                         Point pt = new Point((int)(hScrollBar1.Value), (int)(vScrollBar1.Value));
-                        if (canvasSize.Width < viewRectWidth && canvasSize.Height < viewRectHeight)
+                        if (m_CanvasSize.Width < m_ViewRectWidth && m_CanvasSize.Height < m_ViewRectHeight)
                         {
-                            srcRect = new Rectangle(0, 0, canvasSize.Width, canvasSize.Height); // view all image
-                            if (viewRectWidth == canvasSize.Width + 1 && viewRectHeight == canvasSize.Height + 1)
+                            srcRect = new Rectangle(0, 0, m_CanvasSize.Width, m_CanvasSize.Height); // view all image
+                            if (m_ViewRectWidth == m_CanvasSize.Width + 1 && m_ViewRectHeight == m_CanvasSize.Height + 1)
                             {
                                 try
                                 {
-                                    e.Graphics.DrawImage(image, 0, 0);
+                                    e.Graphics.DrawImage(m_Image, 0, 0);
                                 }
-                                catch(ArgumentException)
-                                { }
+                                catch (ArgumentException)
+                                {
+                                }
 
                                 return;
                             }
                         }
                         else
-                            srcRect = new Rectangle(pt, new Size((int)(viewRectWidth), (int)(viewRectHeight))); // view a portion of image
+                        {
+                            srcRect = new Rectangle(pt, new Size((int)(m_ViewRectWidth), (int)(m_ViewRectHeight))); // view a portion of image
+                        }
+
+                        if (m_Scale < 1 && this.DisplayMode == ImageDisplayMode.Shrink)
+                        {
+                            Matrix mxs = new Matrix();
+                            mxs.Scale(m_Scale, m_Scale);
+
+                            Graphics gs = e.Graphics;
+                            gs.InterpolationMode = interMode;
+                            gs.Transform = mxs;
+                            try
+                            {
+                                gs.DrawImage(m_Image, new PointF(0, 0));
+                            }
+                            catch (ArgumentException)
+                            { }
+
+                            return;
+                        }
 
                         distRect = new Rectangle((int)(-srcRect.Width / 2), -srcRect.Height / 2, srcRect.Width, srcRect.Height); // the center of apparent image is on origin
 
                         Matrix mx = new Matrix(); // create an identity matrix
-                        mx.Translate(viewRectWidth / 2.0f, viewRectHeight / 2.0f, MatrixOrder.Append); // move image to view window center
-
+                        mx.Translate(m_ViewRectWidth / 2.0f, m_ViewRectHeight / 2.0f, MatrixOrder.Append); // move image to view window center
                         Graphics g = e.Graphics;
                         g.InterpolationMode = interMode;
                         g.Transform = mx;
                         try
                         {
-                            g.DrawImage(image, distRect, srcRect, GraphicsUnit.Pixel);
+                            g.DrawImage(m_Image, distRect, srcRect, GraphicsUnit.Pixel);
                         }
                         catch (ArgumentException)
                         { }
@@ -132,20 +188,30 @@ namespace Tangra.Controls
 
         }
 
-        private void displayScrollbar()
+        private void RecalculateScaleAndScrollbars()
         {
-            viewRectWidth = this.Width;
-            viewRectHeight = this.Height;
+            DisplayScrollbar();
+            SetScrollbarValues();
 
-            if (image != null)
+            var vertScale = m_ViewRectHeight * 1.0f / m_CanvasSize.Height;
+            var horScale = m_ViewRectWidth * 1.0f / m_CanvasSize.Width;
+            m_Scale = Math.Min(vertScale, horScale);
+        }
+
+        private void DisplayScrollbar()
+        {
+            m_ViewRectWidth = this.Width;
+            m_ViewRectHeight = this.Height;
+
+            if (m_Image != null)
             {
                 lock (m_SyncLock)
                 {
-                    if (image != null)
+                    if (m_Image != null)
                     {
                         try
                         {
-                            canvasSize = image.Size;
+                            m_CanvasSize = m_Image.Size;
                         }
                         catch (ArgumentException)
                         {
@@ -156,58 +222,58 @@ namespace Tangra.Controls
             }
 
             // If the zoomed image is wider than view window, show the HScrollBar and adjust the view window
-            if (viewRectWidth > canvasSize.Width)
+            if (m_DisplayMode != ImageDisplayMode.Scroll || m_ViewRectWidth > m_CanvasSize.Width)
             {
                 hScrollBar1.Visible = false;
-	            viewRectHeight = Height;
+	            m_ViewRectHeight = Height;
             }
             else
             {
                 hScrollBar1.Visible = true;
-                viewRectHeight = Height - hScrollBar1.Height;
+                m_ViewRectHeight = Height - hScrollBar1.Height;
             }
 
             // If the zoomed image is taller than view window, show the VScrollBar and adjust the view window
-            if (viewRectHeight > canvasSize.Height)
+            if (m_DisplayMode != ImageDisplayMode.Scroll || m_ViewRectHeight > m_CanvasSize.Height)
             {
                 vScrollBar1.Visible = false;
-				viewRectWidth = Width;
+				m_ViewRectWidth = Width;
             }
             else
             {
                 vScrollBar1.Visible = true;
-                viewRectWidth = Width - vScrollBar1.Width;
+                m_ViewRectWidth = Width - vScrollBar1.Width;
             }
 
 			// Check for horizontal scrollbar one more time as the width may have changed due to showing a vertical scroll bar
-			if (viewRectWidth > canvasSize.Width)
+            if (m_DisplayMode != ImageDisplayMode.Scroll || m_ViewRectWidth > m_CanvasSize.Width)
 			{
 				hScrollBar1.Visible = false;
-				viewRectHeight = Height;
+				m_ViewRectHeight = Height;
 			}
 			else
 			{
 				hScrollBar1.Visible = true;
-				viewRectHeight = Height - hScrollBar1.Height;
+				m_ViewRectHeight = Height - hScrollBar1.Height;
 			}
 
             // Set up scrollbars
             hScrollBar1.Location = new Point(0, Height - hScrollBar1.Height);
-            hScrollBar1.Width = viewRectWidth;
+            hScrollBar1.Width = m_ViewRectWidth;
             vScrollBar1.Location = new Point(Width - vScrollBar1.Width, 0);
-            vScrollBar1.Height = viewRectHeight;
+            vScrollBar1.Height = m_ViewRectHeight;
         }
 
-        private void setScrollbarValues()
+        private void SetScrollbarValues()
         {
             // Set the Maximum, Minimum, LargeChange and SmallChange properties.
             this.vScrollBar1.Minimum = 0;
             this.hScrollBar1.Minimum = 0;
 
             // If the offset does not make the Maximum less than zero, set its value. 
-            if ((canvasSize.Width - viewRectWidth) > 0)
+            if ((m_CanvasSize.Width - m_ViewRectWidth) > 0)
             {
-                this.hScrollBar1.Maximum =(int)( canvasSize.Width) - viewRectWidth;
+                this.hScrollBar1.Maximum =(int)( m_CanvasSize.Width) - m_ViewRectWidth;
             }
             // If the VScrollBar is visible, adjust the Maximum of the 
             // HSCrollBar to account for the width of the VScrollBar.  
@@ -223,9 +289,9 @@ namespace Tangra.Controls
             this.hScrollBar1.Maximum += this.hScrollBar1.LargeChange;
 
             // If the offset does not make the Maximum less than zero, set its value.    
-            if ((canvasSize.Height - viewRectHeight) > 0)
+            if ((m_CanvasSize.Height - m_ViewRectHeight) > 0)
             {
-                this.vScrollBar1.Maximum = (int)(canvasSize.Height) - viewRectHeight;
+                this.vScrollBar1.Maximum = (int)(m_CanvasSize.Height) - m_ViewRectHeight;
             }
 
             // If the HScrollBar is visible, adjust the Maximum of the 
@@ -244,18 +310,28 @@ namespace Tangra.Controls
 
 		public Point GetImageLocation(Point mousePoint)
 		{
-		    if (image != null)
+		    if (m_Image != null)
 		    {
 		        lock (m_SyncLock)
 		        {
-		            if (image != null)
+		            if (m_Image != null)
 		            {
                         try
                         {
-                            int x = mousePoint.X + (hScrollBar1.Visible ? hScrollBar1.Value : (this.Image != null && !vScrollBar1.Visible ? (this.Image.Width - viewRectWidth) / 2 : 0));
-                            int y = mousePoint.Y + (vScrollBar1.Visible ? vScrollBar1.Value : (this.Image != null && !hScrollBar1.Visible ? (this.Image.Height - viewRectHeight) / 2 : 0));
+                            if (m_DisplayMode == ImageDisplayMode.Scroll || m_Scale >= 1.0)
+                            {
+                                int x = mousePoint.X + (hScrollBar1.Visible ? hScrollBar1.Value : (this.Image != null && !vScrollBar1.Visible ? (this.Image.Width - m_ViewRectWidth) / 2 : 0));
+                                int y = mousePoint.Y + (vScrollBar1.Visible ? vScrollBar1.Value : (this.Image != null && !hScrollBar1.Visible ? (this.Image.Height - m_ViewRectHeight) / 2 : 0));
 
-                            return new Point(x, y);
+                                return new Point(x, y);
+                            }
+                            else if (m_DisplayMode == ImageDisplayMode.Shrink)
+                            {
+                                int x = (int)Math.Round(mousePoint.X / m_Scale);
+                                int y = (int)Math.Round(mousePoint.Y / m_Scale);
+
+                                return new Point(x, y);
+                            }
                         }
                         catch (ArgumentException)
                         { }

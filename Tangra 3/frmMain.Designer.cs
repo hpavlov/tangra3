@@ -121,6 +121,9 @@
             this.openAdvFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.saveFrameDialog = new System.Windows.Forms.SaveFileDialog();
             this.timerCommandArgs = new System.Windows.Forms.Timer(this.components);
+            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
+            this.miShrinkToFit = new System.Windows.Forms.ToolStripMenuItem();
+            this.miScrollImage = new System.Windows.Forms.ToolStripMenuItem();
             this.pictureBox = new Tangra.Controls.ImagePanel();
             this.mainMenu.SuspendLayout();
             this.statusStrip.SuspendLayout();
@@ -279,33 +282,33 @@
             // miExportToFits
             // 
             this.miExportToFits.Name = "miExportToFits";
-            this.miExportToFits.Size = new System.Drawing.Size(168, 22);
+            this.miExportToFits.Size = new System.Drawing.Size(169, 22);
             this.miExportToFits.Text = "Export to &FITS";
             this.miExportToFits.Click += new System.EventHandler(this.miExportToFits_Click);
             // 
             // miExportToBMP
             // 
             this.miExportToBMP.Name = "miExportToBMP";
-            this.miExportToBMP.Size = new System.Drawing.Size(168, 22);
+            this.miExportToBMP.Size = new System.Drawing.Size(169, 22);
             this.miExportToBMP.Text = "Export to &BMP";
             this.miExportToBMP.Click += new System.EventHandler(this.miExportToBMP_Click);
             // 
             // miExportToCSV
             // 
             this.miExportToCSV.Name = "miExportToCSV";
-            this.miExportToCSV.Size = new System.Drawing.Size(168, 22);
+            this.miExportToCSV.Size = new System.Drawing.Size(169, 22);
             this.miExportToCSV.Text = "Save &Pixels as CSV";
             this.miExportToCSV.Click += new System.EventHandler(this.miExportToCSV_Click);
             // 
             // toolStripMenuItem4
             // 
             this.toolStripMenuItem4.Name = "toolStripMenuItem4";
-            this.toolStripMenuItem4.Size = new System.Drawing.Size(165, 6);
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(166, 6);
             // 
             // miShowFields
             // 
             this.miShowFields.Name = "miShowFields";
-            this.miShowFields.Size = new System.Drawing.Size(168, 22);
+            this.miShowFields.Size = new System.Drawing.Size(169, 22);
             this.miShowFields.Text = "Show Fie&lds";
             this.miShowFields.Click += new System.EventHandler(this.miShowFields_Click);
             // 
@@ -418,7 +421,7 @@
             this.toolStripMenuItem5,
             this.miVideoModelling});
             this.miTools.Name = "miTools";
-            this.miTools.Size = new System.Drawing.Size(47, 20);
+            this.miTools.Size = new System.Drawing.Size(46, 20);
             this.miTools.Text = "&Tools";
             this.miTools.DropDownOpening += new System.EventHandler(this.miTools_DropDownOpening);
             // 
@@ -481,7 +484,7 @@
             // miAbsoluteFlux
             // 
             this.miAbsoluteFlux.Name = "miAbsoluteFlux";
-            this.miAbsoluteFlux.Size = new System.Drawing.Size(206, 22);
+            this.miAbsoluteFlux.Size = new System.Drawing.Size(207, 22);
             this.miAbsoluteFlux.Text = "&Absolute Flux Calibration";
             this.miAbsoluteFlux.Click += new System.EventHandler(this.miAbsoluteFlux_Click);
             // 
@@ -728,6 +731,9 @@
             // 
             this.tsbtnIntensify.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.tsbtnIntensify.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miScrollImage,
+            this.miShrinkToFit,
+            this.toolStripSeparator6,
             this.tsmiInverted,
             this.miJupiterGlow,
             this.tsmiHueIntensity,
@@ -1030,11 +1036,33 @@
             // 
             this.timerCommandArgs.Tick += new System.EventHandler(this.timerCommandArgs_Tick);
             // 
+            // toolStripSeparator6
+            // 
+            this.toolStripSeparator6.Name = "toolStripSeparator6";
+            this.toolStripSeparator6.Size = new System.Drawing.Size(199, 6);
+            // 
+            // miShrinkToFit
+            // 
+            this.miShrinkToFit.Checked = true;
+            this.miShrinkToFit.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.miShrinkToFit.Name = "miShrinkToFit";
+            this.miShrinkToFit.Size = new System.Drawing.Size(202, 22);
+            this.miShrinkToFit.Text = "Shrink to Fit";
+            this.miShrinkToFit.Click += new System.EventHandler(this.ImageShrinkOrScrollClicked);
+            // 
+            // miScrollImage
+            // 
+            this.miScrollImage.Name = "miScrollImage";
+            this.miScrollImage.Size = new System.Drawing.Size(202, 22);
+            this.miScrollImage.Text = "Scroll";
+            this.miScrollImage.Click += new System.EventHandler(this.ImageShrinkOrScrollClicked);
+            // 
             // pictureBox
             // 
             this.pictureBox.AllowDrop = true;
             this.pictureBox.BackColor = System.Drawing.SystemColors.ControlDark;
             this.pictureBox.CanvasSize = new System.Drawing.Size(60, 40);
+            this.pictureBox.DisplayMode = Tangra.Controls.ImageDisplayMode.Shrink;
             this.pictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pictureBox.Image = null;
             this.pictureBox.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
@@ -1195,6 +1223,9 @@
         private System.Windows.Forms.ToolStripMenuItem miAstrometryTools;
         private System.Windows.Forms.ToolStripMenuItem miFastMotionFitting;
         protected internal System.Windows.Forms.ToolStripMenuItem miTimestampOCR;
+        private System.Windows.Forms.ToolStripMenuItem miScrollImage;
+        private System.Windows.Forms.ToolStripMenuItem miShrinkToFit;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
 	}
 }
 
