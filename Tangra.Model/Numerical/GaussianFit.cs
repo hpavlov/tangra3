@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using Tangra.Model.Helpers;
 
 namespace Tangra.Model.Numerical
 {
@@ -19,7 +20,10 @@ namespace Tangra.Model.Numerical
         private double m_X0;
 
         public GaussianFit()
-        { }
+        {
+            m_IMax = double.MinValue;
+            m_X0 = Double.NaN;
+        }
 
         public double IBackground
         {
@@ -59,6 +63,12 @@ namespace Tangra.Model.Numerical
         {
             m_XValues.Add(x);
             m_YValues.Add(y);
+
+            if (y > m_IMax)
+            {
+                m_IMax = y;
+                m_X0 = x;
+            }
         }
 
         public void Solve()
@@ -72,8 +82,6 @@ namespace Tangra.Model.Numerical
                     if (iter == NumberIterations)
                     {
                         m_IBackground = 0.0; /* assume no backgnd intensity at first... */
-                        m_IMax = m_YValues.Max();
-                        m_X0 = m_XValues.Average();
                         double halfMax = m_IMax / 2;
                         double x1 = double.MaxValue;
                         double x2 = double.MinValue;

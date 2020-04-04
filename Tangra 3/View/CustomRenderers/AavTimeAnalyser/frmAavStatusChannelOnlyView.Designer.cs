@@ -93,6 +93,7 @@
             this.miAddMoreData = new System.Windows.Forms.ToolStripMenuItem();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.btnLoadFromFile = new System.Windows.Forms.Button();
             this.tabControl.SuspendLayout();
             this.tabOverview.SuspendLayout();
             this.tabGraphs.SuspendLayout();
@@ -183,10 +184,10 @@
             // 
             // pnlGraph
             // 
-            this.pnlGraph.Controls.Add(this.pnlTimeMedianConfig);
             this.pnlGraph.Controls.Add(this.pnlTimeBucketsConfig);
             this.pnlGraph.Controls.Add(this.pnlTimeDeltaConfig);
             this.pnlGraph.Controls.Add(this.cbxGraphType);
+            this.pnlGraph.Controls.Add(this.pnlTimeMedianConfig);
             this.pnlGraph.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlGraph.Location = new System.Drawing.Point(3, 3);
             this.pnlGraph.Name = "pnlGraph";
@@ -279,6 +280,7 @@
             // 
             // pnlTimeBucketsConfig
             // 
+            this.pnlTimeBucketsConfig.Controls.Add(this.btnLoadFromFile);
             this.pnlTimeBucketsConfig.Controls.Add(this.btnExportBuckets);
             this.pnlTimeBucketsConfig.Controls.Add(this.label4);
             this.pnlTimeBucketsConfig.Controls.Add(this.nudDeltaBucketInterval);
@@ -729,6 +731,16 @@
             this.openFileDialog.DefaultExt = "aav";
             this.openFileDialog.Filter = "AAV Files (*.aav)|*.aav";
             // 
+            // btnLoadFromFile
+            // 
+            this.btnLoadFromFile.Location = new System.Drawing.Point(270, 6);
+            this.btnLoadFromFile.Name = "btnLoadFromFile";
+            this.btnLoadFromFile.Size = new System.Drawing.Size(109, 23);
+            this.btnLoadFromFile.TabIndex = 7;
+            this.btnLoadFromFile.Text = "Load Data from File";
+            this.btnLoadFromFile.UseVisualStyleBackColor = true;
+            this.btnLoadFromFile.Click += new System.EventHandler(this.btnLoadFromFile_Click);
+            // 
             // frmAavStatusChannelOnlyView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -836,5 +848,6 @@
         private System.Windows.Forms.CheckBox cbMeinbergData;
         private System.Windows.Forms.ToolStripMenuItem miExportAll;
         private System.Windows.Forms.ToolStripMenuItem miExportTimeDeltaOnly;
+        private System.Windows.Forms.Button btnLoadFromFile;
     }
 }

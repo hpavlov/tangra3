@@ -115,7 +115,7 @@ namespace Tangra.Video
 
 	    private object m_SyncLock = new object();
 
-		private AstroDigitalVideoStream(string fileName, ref AdvFileMetadataInfo fileMetadataInfo, ref GeoLocationInfo geoLocation)
+		internal AstroDigitalVideoStream(string fileName, ref AdvFileMetadataInfo fileMetadataInfo, ref GeoLocationInfo geoLocation)
 		{
 			CheckAdvFileFormat(fileName, ref fileMetadataInfo, ref geoLocation);
 

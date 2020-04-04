@@ -16,6 +16,7 @@ using Tangra.Addins;
 using Tangra.Controller;
 using Tangra.Model.Context;
 using Tangra.Model.Helpers;
+using Tangra.Model.Numerical;
 using Tangra.Model.Video;
 using Tangra.PInvoke;
 using Tangra.Video;
@@ -32,7 +33,8 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
             gtNtpUpdates,
             gtNtpUpdatesInclUnapplied,
             gtZoomedTotalDelta,
-            gtDeltaBucketIntervals
+            gtDeltaBucketIntervals,
+            gtUserBucketsPSF
         }
 
         internal enum GridlineStyle
@@ -240,6 +242,9 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                     break;
                 case GraphType.gtDeltaBucketIntervals:
                     DrawDeltaBucketsGraph();
+                    break;
+                case GraphType.gtUserBucketsPSF:
+                    DrawUserBucketsPSF();
                     break;
             }
         }
@@ -1120,6 +1125,157 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
             });
         }
 
+        private List<Tuple<float, long>> userBucketsList = new List<Tuple<float, long>>();
+
+        private void DrawUserBucketsPSF()
+        {
+            Cursor = Cursors.WaitCursor;
+
+            Brush SysTimeBrush = Brushes.Chocolate;
+            Pen BucketBorderPen = Pens.Blue;
+            Pen GaussuanPen = new Pen(Color.Blue, 3);
+
+            int graphWidth = pbGraph.Width;
+            int graphHeight = pbGraph.Height;
+            var image = new Bitmap(graphWidth, graphHeight, PixelFormat.Format24bppRgb);
+
+            Task.Run(() =>
+            {
+                float minX = userBucketsList.Min(x => x.Item1) - 2;
+                float maxX = userBucketsList.Max(x => x.Item1) + 1;
+
+                Font axisFont = DefaultFont;
+                if (m_GraphConfig.ForPublication)
+                {
+                    axisFont = s_LargeAxisFont;
+                }
+
+                float padding = 10;
+                float paddingYTop = padding + (m_GraphConfig.ForPublication ? 0 : s_TitleFont.Height + 2);
+                float paddingYBottom = padding + 2 + axisFont.Height;
+
+                float height = graphHeight - paddingYTop - paddingYBottom;
+                float yFactor = height / (userBucketsList.Max(x => x.Item2) * 1.25f);
+
+                float paddingX = 10;
+                float width = graphWidth - padding - paddingX;
+
+                float xFactor = width / (maxX - minX);
+
+                using (var g = Graphics.FromImage(image))
+                {
+                    g.FillRectangle(Brushes.WhiteSmoke, 0, 0, graphWidth, graphHeight);
+
+                    GaussianFit fit = new GaussianFit();
+                    foreach (var kvp in userBucketsList)
+                    {
+                        fit.AddPoint(kvp.Item1, kvp.Item2);
+                    }
+                    fit.Solve();
+
+                    var barWidth = xFactor * (userBucketsList[1].Item1 - userBucketsList[0].Item1);
+                    float? prevFitX = null;
+                    float? prevFitY = null;
+
+                    foreach (var kvp in userBucketsList)
+                    {
+                        var key = kvp.Item1;
+                        var x1 = paddingX + ((key - 1) - minX) * xFactor;
+                        var y = graphHeight - paddingYBottom - yFactor * kvp.Item2;
+                        g.FillRectangle(SysTimeBrush, x1, y, barWidth, graphHeight - paddingYBottom - y);
+                        g.DrawRectangle(BucketBorderPen, x1, y, barWidth, graphHeight - paddingYBottom - y);
+
+                        var yf = (float)(graphHeight - paddingYBottom - yFactor * fit.ValueForX(kvp.Item1));
+                        if (prevFitX.HasValue)
+                        {
+                            g.DrawLine(GaussuanPen, prevFitX.Value, prevFitY.Value, x1 + barWidth / 2.0f, yf);
+                        }
+                        prevFitX = x1 + barWidth/2.0f;
+                        prevFitY = yf;
+
+                        if (!m_GraphConfig.ForPublication)
+                        {
+                            var xTick = x1 + barWidth / 2.0f;
+                            g.DrawLine(Pens.Gray, xTick, graphHeight - paddingYBottom + 3, xTick, graphHeight - paddingYBottom - 2);
+                        }
+                    }
+
+                    g.DrawRectangle(Pens.Black, paddingX, paddingYTop, graphWidth - padding - paddingX, graphHeight - paddingYBottom - paddingYTop);
+
+                    if (!m_GraphConfig.ForPublication)
+                    {
+                        var title = GetTitle(m_TimeAnalyser.Entries, "Destribution around median");
+                        var sizeF = g.MeasureString(title, s_TitleFont);
+                        g.DrawString(title, s_TitleFont, Brushes.Black, (width - sizeF.Width)/2 + paddingX, (paddingYBottom - sizeF.Height)/2);
+                    }
+                    else
+                    {
+                        var centralItemIdx = userBucketsList.FindIndex(x => Math.Abs(x.Item1 - fit.X0) <= 0.1);
+                        var centralItem = userBucketsList[centralItemIdx].Item1;
+                        var title = string.Format("{0:0.0}", centralItem);
+                        var sizeF0 = g.MeasureString(title, axisFont);
+                        var xa0 = paddingX + ((centralItem - 1) - minX) * xFactor + barWidth / 2.0f;
+                        g.DrawLine(Pens.Gray, xa0, graphHeight - paddingYBottom + 3, xa0, graphHeight - paddingYBottom - 2);
+                        g.DrawString(title, axisFont, Brushes.Black, xa0 - sizeF0.Width / 2, graphHeight - paddingYBottom + 5);
+                        var xprev = xa0;
+                        for (int i = centralItemIdx; i < userBucketsList.Count; i++)
+                        {
+                            var xVal = userBucketsList[i].Item1;
+                            var xa = paddingX + ((xVal - 1) - minX) * xFactor + barWidth / 2.0f;
+                            if (xa - xprev > sizeF0.Width*1.5)
+                            {
+                                title = string.Format("{0:0.0}", xVal);
+                                var sizeF = g.MeasureString(title, axisFont);
+                                g.DrawLine(Pens.Gray, xa, graphHeight - paddingYBottom + 3, xa, graphHeight - paddingYBottom - 2);
+                                g.DrawString(title, axisFont, Brushes.Black, xa - sizeF.Width / 2, graphHeight - paddingYBottom + 5);
+                                xprev = xa;
+                                
+                            }
+                        }
+                        xprev = xa0;
+                        for (int i = centralItemIdx; i >= 0; i--)
+                        {
+                            var xVal = userBucketsList[i].Item1;
+                            var xa = paddingX + ((xVal - 1) - minX) * xFactor + barWidth / 2.0f;
+                            if (xprev - xa > sizeF0.Width * 1.5)
+                            {
+                                title = string.Format("{0:0.0}", xVal);
+                                var sizeF = g.MeasureString(title, axisFont);
+                                g.DrawLine(Pens.Gray, xa, graphHeight - paddingYBottom + 3, xa, graphHeight - paddingYBottom - 2);
+                                g.DrawString(title, axisFont, Brushes.Black, xa - sizeF.Width / 2, graphHeight - paddingYBottom + 5);
+                                xprev = xa;
+                            }
+                        }
+                    }
+                }
+            })
+            .ContinueWith((r) =>
+            {
+                if (r.IsCompleted)
+                {
+                    this.Invoke(new Action(() =>
+                    {
+                        if (pbGraph.Image != null)
+                        {
+                            pbGraph.Image.Dispose();
+                        }
+
+                        pbGraph.Image = image;
+                        pbGraph.Update();
+
+                        m_LastGraphWidth = pbGraph.Width;
+                        m_LastGraphHeight = pbGraph.Height;
+
+                        Cursor = Cursors.Default;
+                    }));
+                }
+                else
+                {
+                    Cursor = Cursors.Default;
+                }
+            });
+        }
+
         private void DrawSystemUtilisationGraph()
         {
             Cursor = Cursors.WaitCursor;
@@ -1690,6 +1846,8 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
 
         private void miAddMoreData_Click(object sender, EventArgs e)
         {
+            openFileDialog.Filter = "AAV Files (*.aav)|*.aav";
+            openFileDialog.DefaultExt = "aav";
             openFileDialog.InitialDirectory = Path.GetDirectoryName(m_Aav.FileName);
             if (openFileDialog.ShowDialog(this) == DialogResult.OK)
             {
@@ -1768,6 +1926,26 @@ namespace Tangra.View.CustomRenderers.AavTimeAnalyser
                         this.Invoke(new Action<int, int, Exception>(UpdateExportProgressBar), val, max, ex);
                     }
                 );
+            }
+        }
+
+        private void btnLoadFromFile_Click(object sender, EventArgs e)
+        {
+            openFileDialog.Filter = "All Files (*.*)|*.*";
+            openFileDialog.DefaultExt = "";
+
+            if (openFileDialog.ShowDialog(this) == DialogResult.OK)
+            {
+                var lines = File.ReadAllLines(openFileDialog.FileName);
+                userBucketsList.Clear();
+                foreach (var line in lines)
+                {
+                    var toks = line.Split(',');
+                    userBucketsList.Add(Tuple.Create(float.Parse(toks[0]), long.Parse(toks[1])));
+                }
+
+                m_GrapthType = GraphType.gtUserBucketsPSF;
+                DrawGraph();
             }
         }
 
