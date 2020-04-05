@@ -168,6 +168,7 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -212,6 +213,9 @@
     </Compile>
     <Compile Include="MotionFitting\IMeasurementPositionProvider.cs" />
     <Compile Include="MotionFitting\MeasurementPositionEntry.cs" />
+    <Compile Include="StarCatalogues\GaiaOnline\GaiaDR2Entry.cs" />
+    <Compile Include="StarCatalogues\GaiaOnline\GaiaTapCatalogue.cs" />
+    <Compile Include="StarCatalogues\GaiaOnline\GaiaVizieRCatalogue.cs" />
     <Compile Include="StarCatalogues\PPMXL\PPMXLCatalogue.cs" />
     <Compile Include="StarCatalogues\PPMXL\PPMXLEntry.cs" />
     <Compile Include="StarCatalogues\PPMXL\PPMXLFileIterator.cs" />

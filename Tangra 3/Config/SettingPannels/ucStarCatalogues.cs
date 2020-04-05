@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -45,7 +46,7 @@ namespace Tangra.Config.SettingPannels
 			{
 				TangraConfig.StarCatalog chosenCatalogue = (TangraConfig.StarCatalog)(cbxCatalogue.SelectedIndex + 1);
 
-				if (!Directory.Exists(tbxCatalogueLocation.Text))
+				if (chosenCatalogue != TangraConfig.StarCatalog.GaiaDR2Online && !Directory.Exists(tbxCatalogueLocation.Text))
 				{
 					tbxCatalogueLocation.Focus();
 					MessageBox.Show(
@@ -61,13 +62,31 @@ namespace Tangra.Config.SettingPannels
 				if (!m_CatalogValidator.IsValidCatalogLocation(chosenCatalogue, ref path))
 				{
 					tbxCatalogueLocation.Focus();
-					MessageBox.Show(
-						this,
-						string.Format("Selected folder does not contain the {0} catalogue", chosenCatalogue),
-						"Tangra", 
-						MessageBoxButtons.OK, 
-						MessageBoxIcon.Error);
-					return false;
+
+				    if (chosenCatalogue == TangraConfig.StarCatalog.GaiaDR2Online)
+				    {
+                        var rv = MessageBox.Show(
+                            this,
+                            string.Format("'{0}' does look like a valid API Token. Do you want to use it anyway?", path),
+                            "Tangra",
+                            MessageBoxButtons.YesNo,
+                            MessageBoxIcon.Warning,
+                            MessageBoxDefaultButton.Button2);
+
+				        return rv == DialogResult.Yes;
+				    }
+				    else
+				    {
+                        MessageBox.Show(
+                            this,
+                            string.Format("Selected folder does not contain the {0} catalogue", chosenCatalogue),
+                            "Tangra",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error);
+
+                        return false;
+
+				    }
 				}
 
 				tbxCatalogueLocation.Text = path;
@@ -151,10 +170,33 @@ namespace Tangra.Config.SettingPannels
 					cbxCatalogPhotometryBand.Items.Clear();
 					cbxCatalogPhotometryBand.Items.AddRange(m_CatalogValidator.MagnitudeBandsForCatalog(catalog));
 					break;
+
+                case TangraConfig.StarCatalog.GaiaDR2Online:
+                    cbxCatalogPhotometryBand.Items.Clear();
+                    cbxCatalogPhotometryBand.Items.AddRange(m_CatalogValidator.MagnitudeBandsForCatalog(catalog));
+                    break;
 			}
 
 			if (cbxCatalogPhotometryBand.Items.Count > 0)
 				cbxCatalogPhotometryBand.SelectedIndex = 0;
+
+		    if (catalog == TangraConfig.StarCatalog.GaiaDR2Online)
+		    {
+                btnBrowseLocation.Visible = false;
+                lblCatalogPath.Text = "API Token";
+		        pnlGaiaAIPNotes.Visible = true;
+		    }
+		    else
+		    {
+                lblCatalogPath.Text = "Path";
+		        btnBrowseLocation.Visible = true;
+                pnlGaiaAIPNotes.Visible = false;
+		    }
 		}
+
+        private void OpenLinkLabelLink(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            ShellHelper.OpenUrl((sender as LinkLabel).Text);
+        }
 	}
 }

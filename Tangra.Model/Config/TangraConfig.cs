@@ -2175,7 +2175,8 @@ namespace Tangra.Model.Config
 			NOMAD = 2,
 			UCAC3 = 3,
 			PPMXL = 4,
-			UCAC4 = 5
+			UCAC4 = 5,
+            GaiaDR2Online = 6
 		}
 
         [Serializable]
@@ -2201,6 +2202,8 @@ namespace Tangra.Model.Config
 						return "PPMXL";
 					case StarCatalog.UCAC4:
 						return "UCAC4";
+                    case StarCatalog.GaiaDR2Online:
+                        return "GAIA-DR2";
 					default:
 						throw new ArgumentOutOfRangeException("catalog");
 				}

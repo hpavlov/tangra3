@@ -65,7 +65,7 @@ namespace Tangra.StarCatalogues.UCAC2
     	}
 
     	[FieldOffset(32)] /* Overwrite the 2M id*/
-    		private uint m_UCAC2;
+    	private uint m_UCAC2;
 
     	public void InitUCAC2Entry(uint ucac2No)
     	{

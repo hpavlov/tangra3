@@ -4,16 +4,55 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Microsoft.Win32;
 
 namespace Tangra.Model.Helpers
 {
     public static class ShellHelper
     {
+        private static string defaultBrowser = null;
+
         public static void OpenUrl(string url)
         {
+            string browser = string.Empty;
+            RegistryKey key = null;
             try
             {
-                Process.Start(url);
+                key = Registry.ClassesRoot.OpenSubKey(@"ChromeHTML\shell\open\command");
+                if (key != null)
+                {
+                    // Get default Browser
+                    browser = key.GetValue(null).ToString().ToLower().Trim(new[] {'"'});
+                }
+                if (!browser.EndsWith("exe"))
+                {
+                    //Remove all after the ".exe"
+                    defaultBrowser = browser.Substring(0, browser.LastIndexOf(".exe", StringComparison.InvariantCultureIgnoreCase) + 4);
+                }
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex);
+                defaultBrowser = null;
+            }
+            finally
+            {
+                if (key != null)
+                {
+                    key.Close();
+                }
+            }
+
+            try
+            {
+                if (defaultBrowser != null)
+                {
+                    Process.Start(defaultBrowser, url);
+                }
+                else
+                {
+                    Process.Start(url);
+                }
             }
             catch
             {

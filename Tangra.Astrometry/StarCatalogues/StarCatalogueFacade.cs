@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using Tangra.Model.Config;
 using Tangra.StarCatalogues;
+using Tangra.StarCatalogues.GaiaOnline;
 using Tangra.StarCatalogues.NOMAD;
 using Tangra.StarCatalogues.PPMXL;
 using Tangra.StarCatalogues.UCAC2;
@@ -60,7 +61,11 @@ namespace Tangra.Astrometry.Recognition
                 else if (m_Settings.Catalog == TangraConfig.StarCatalog.UCAC4)
                 {
                     return UCAC4Catalogue.CatalogMagnitudeBands;
-                }                
+                }
+                else if (m_Settings.Catalog == TangraConfig.StarCatalog.GaiaDR2Online)
+                {
+                    return GaiaTapCatalogue.CatalogMagnitudeBands;
+                }
 
 			    return new CatalogMagnitudeBand[]{ };
             }
@@ -98,6 +103,13 @@ namespace Tangra.Astrometry.Recognition
                 List<IStar> ucac4Stars = cat.GetStarsInRegion(raDeg, deDeg, diameterDeg, limitMag, epoch);
                 return (List<IStar>)ucac4Stars;
             }
+            else if (m_Settings.Catalog == TangraConfig.StarCatalog.GaiaDR2Online)
+            {
+                // NOTE: m_Settings.CatalogLocation actually contains the API Token
+                GaiaTapCatalogue cat = new GaiaTapCatalogue(m_Settings.CatalogLocation);
+                List<IStar> gaiaDr2Stars = cat.GetStarsInRegion(raDeg, deDeg, diameterDeg, limitMag, epoch);
+                return (List<IStar>)gaiaDr2Stars;
+            }
 			return null;
 		}
 
@@ -123,6 +135,10 @@ namespace Tangra.Astrometry.Recognition
             {
                 return UCAC4Catalogue.ConvertMagnitude(measuredMag, vrColorIndex, catalogMagBand, magOutputBand);
             }
+            else if (m_Settings.Catalog == TangraConfig.StarCatalog.GaiaDR2Online)
+            {
+                return GaiaTapCatalogue.ConvertMagnitude(measuredMag, vrColorIndex, catalogMagBand, magOutputBand);
+            }
 
             return double.NaN;
         }
@@ -144,6 +160,8 @@ namespace Tangra.Astrometry.Recognition
                 return PPMXLCatalogue.IsValidCatalogLocation(ref folderPath);
             else if (catalog == TangraConfig.StarCatalog.UCAC4)
                 return UCAC4Catalogue.IsValidCatalogLocation(ref folderPath);
+            else if (catalog == TangraConfig.StarCatalog.GaiaDR2Online)
+                return GaiaTapCatalogue.IsValidApiToken(ref folderPath);
 
 			return false;
 		}
@@ -209,6 +227,8 @@ namespace Tangra.Astrometry.Recognition
                 return PPMXLCatalogue.CatalogMagnitudeBands;
             else if (catalog == TangraConfig.StarCatalog.UCAC4)
                 return UCAC4Catalogue.CatalogMagnitudeBands;
+            else if (catalog == TangraConfig.StarCatalog.GaiaDR2Online)
+                return GaiaTapCatalogue.CatalogMagnitudeBands;
 
 			return new object[] { };
 		}
