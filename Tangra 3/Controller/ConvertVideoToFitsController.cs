@@ -80,49 +80,7 @@ namespace Tangra.Controller
                 }
             }
 
-            m_AdditionalFileHeaders.Clear();
-            var fileHeaderProvider = m_VideoController.FramePlayer.Video as IFileHeaderProvider;
-            if (fileHeaderProvider != null)
-            {                
-                var AAV_HEADERS = new Dictionary<string, string>
-                {
-                    {"LATITUDE", "LATITUDE" },
-                    {"LONGITUDE", "LONGITUD" },
-                    {"OBSERVER", "OBSERVER" }, 
-                    {"TELESCOP", "TELESCOP" },
-                    {"OBJECT", "OBJECT"},
-                    {"RA_OBJ", "RA_OBJ" },
-                    {"DEC_OBJ", "DEC_OBJ"},
-                    {"RECORDER-SOFTWARE", "REC-SOFT" },
-                    {"RECORDER-SOFTWARE-VERSION", "REC-VER" },
-                    {"ADVLIB-VERSION", "ADVLIB"}
-                };
-
-                var coppiedFromHeaderDescription = string.Format("Copied from {0} file headers", m_VideoFormat);
-                var fileHeaders = fileHeaderProvider.GetFileHeaders();
-                fileHeaders
-                    .Where(kvp => AAV_HEADERS.ContainsKey(kvp.Key))
-                    .Select(kvp => kvp)                    
-                    .ToList()
-                    .ForEach(kvp => m_AdditionalFileHeaders[AAV_HEADERS[kvp.Key]] = Tuple.Create(kvp.Value, coppiedFromHeaderDescription));
-
-                if (m_VideoFormat == VideoFileFormat.AAV || m_VideoFormat == VideoFileFormat.AAV2)
-                {
-                    var camera = m_VideoCamera;
-                    if (camera.IndexOf(m_NativeFormat, StringComparison.InvariantCultureIgnoreCase) == -1)
-                    {
-                        camera = camera.Trim() + string.Format(" ({0})", m_NativeFormat);
-                    }
-                    var instumentalDelaySelectedConfig = InstrumentalDelayConfigManager.GetConfigurationForCamera(camera);
-                    float instDelay;
-                    if (instumentalDelaySelectedConfig.TryGetValue(m_VideoController.AstroAnalogueVideoIntegratedAAVFrames, out instDelay))
-                    {
-                        m_AdditionalFileHeaders["INSTDELY"] = Tuple.Create(
-                            instDelay.ToString(CultureInfo.InvariantCulture),
-                            string.Format("Instr. delay in sec. for x{0} frames integration for '{1}' camera. This has not been applied to DATE-OBS", m_VideoController.AstroAnalogueVideoIntegratedAAVFrames, camera));
-                    }
-                }
-            }
+            m_AdditionalFileHeaders = m_VideoController.GetAdditionalFileHeaders();
 
             m_FitsCube = fitsCube;
             if (!fitsCube)
@@ -148,21 +106,7 @@ namespace Tangra.Controller
             }
             else if (timeBase == UsedTimeBase.EmbeddedTimeStamp)
             {
-                if (usesOCR)
-                {
-                    if (ocrHasDatePart)
-                        m_DateObsComment = "Date and Time are ORC-ed";
-                    else
-                        m_DateObsComment = "Time is ORC-ed, Date is user entered";
-                }
-                else if (m_VideoFormat == VideoFileFormat.ADV || m_VideoFormat == VideoFileFormat.ADV2)
-                {
-                    m_DateObsComment = "Date and Time are mid-frame recorded";
-                }
-                else if (!m_IsFitsSequence)
-                {
-                    m_DateObsComment = "Date and Time are saved by recorder";
-                }
+                m_DateObsComment = m_VideoController.GetEmbeddedDateTimeComment();
             }
         }
 
@@ -277,7 +221,7 @@ namespace Tangra.Controller
             return bimg;
         }
 
-        private float[][] SaveNormalizedFloatImageData(int width, int height, uint[] data)
+        private static float[][] SaveNormalizedFloatImageData(int width, int height, uint[] data, uint normalValue)
         {
             float[][] bimg = new float[height][];
 
@@ -287,8 +231,8 @@ namespace Tangra.Controller
 
                 for (int x = 0; x < width; x++)
                 {
-                    if (m_NormalValue > 255)
-                        bimg[y][x] = (float)Math.Min(255, Math.Max(0, data[x + (height - y - 1) * width] * 255.0 / m_NormalValue));
+                    if (normalValue > 255)
+                        bimg[y][x] = (float)Math.Min(255, Math.Max(0, data[x + (height - y - 1) * width] * 255.0 / normalValue));
                     else
                         bimg[y][x] = (float)Math.Min(255, Math.Max(0, data[x + (height - y - 1) * width]));
                 }
@@ -339,13 +283,41 @@ namespace Tangra.Controller
             }
         }
 
-
         internal void SaveFitsFrame(int frameNo, string fileName, int width, int height, uint[] framePixels, DateTime timeStamp, float exposureSeconds)
+        {
+            SaveFitsFrame(frameNo, fileName, width, height, framePixels, timeStamp, exposureSeconds, m_DateObsComment,
+                m_ExportAs8BitFloat, 
+                m_NormalValue,
+                m_VideoFormat,
+                m_NativeFormat,
+                m_IntegrationRate,
+                m_VideoCamera,
+                m_VideoController.FileName,
+                m_AdditionalFileHeaders);
+        }
+
+        internal static void SaveFitsFrame(
+            int frameNo, 
+            string fileName, 
+            int width, 
+            int height, 
+            uint[] framePixels, 
+            DateTime timeStamp, 
+            float exposureSeconds, 
+            string timeStampComment,
+            bool exportAs8BitFloat,
+            uint normalValue,
+            VideoFileFormat videoFileFormat,
+            string nativeFormat,
+            int integrationRate,
+            string videoCamera,
+            string originalFileName,
+            Dictionary<string, Tuple<string, string>> additionalFileHeaders)
         {
             Fits f = new Fits();
 
-            object data = m_ExportAs8BitFloat
-                ? (object)SaveNormalizedFloatImageData(width, height, framePixels) 
+            object data = exportAs8BitFloat
+                ? (object)SaveNormalizedFloatImageData(width, height, framePixels, normalValue) 
                 : (object)SaveImageData(width, height, framePixels);
 
             BasicHDU imageHDU = Fits.MakeHDU(data);
@@ -353,7 +325,7 @@ namespace Tangra.Controller
             nom.tam.fits.Header hdr = imageHDU.Header;
             hdr.AddValue("SIMPLE", "T", null);
 
-            hdr.AddValue("BITPIX", m_ExportAs8BitFloat ? -32 : 32, null);
+            hdr.AddValue("BITPIX", exportAs8BitFloat ? -32 : 32, null);
 
             hdr.AddValue("BZERO", 0, null);
             hdr.AddValue("BSCALE", 1, null);
@@ -364,32 +336,32 @@ namespace Tangra.Controller
 
             hdr.AddValue("EXPOSURE", exposureSeconds.ToString("0.000", CultureInfo.InvariantCulture), "Exposure, seconds");
 
-            hdr.AddValue("DATE-OBS", timeStamp.ToString("yyyy-MM-ddTHH:mm:ss.fff", CultureInfo.InvariantCulture), m_DateObsComment);
+            hdr.AddValue("DATE-OBS", timeStamp.ToString("yyyy-MM-ddTHH:mm:ss.fff", CultureInfo.InvariantCulture), timeStampComment);
 
-            hdr.AddValue("CAMERA", m_VideoCamera, "Video camera model (observer specified)");
+            hdr.AddValue("CAMERA", videoCamera, "Video camera model (observer specified)");
 
-            hdr.AddValue("FILENAME", m_VideoController.FileName, null);
+            hdr.AddValue("FILENAME", originalFileName, null);
             hdr.AddValue("FRAMENO", frameNo, null);
 
-            if (m_VideoFormat == VideoFileFormat.AAV || m_VideoFormat == VideoFileFormat.AAV2)
+            if (videoFileFormat == VideoFileFormat.AAV || videoFileFormat == VideoFileFormat.AAV2)
             {
                 hdr.AddValue("NOTES", "No instrumental delay has been applied to DATE-OBS.", null);
 
-                if (m_ExportAs8BitFloat)
+                if (exportAs8BitFloat)
                 {
-                    hdr.AddValue("VIDEOFMT", m_NativeFormat, "Native analogue video format");
-                    if (m_IntegrationRate > 0)
+                    hdr.AddValue("VIDEOFMT", nativeFormat, "Native analogue video format");
+                    if (integrationRate > 0)
                     {
-                        hdr.AddValue("INTGRRTE", m_IntegrationRate.ToString(), "Integration rate in video frames");
+                        hdr.AddValue("INTGRRTE", integrationRate.ToString(), "Integration rate in video frames");
                     }
                 }
             }
             else
             {
-                hdr.AddValue("NOTES", string.Format("Converted from {0} file.", m_VideoFormat), null);
+                hdr.AddValue("NOTES", string.Format("Converted from {0} file.", videoFileFormat), null);
             }
 
-            foreach (var kvp in m_AdditionalFileHeaders)
+            foreach (var kvp in additionalFileHeaders)
             {
                 hdr.AddValue(kvp.Key, kvp.Value.Item1, kvp.Value.Item2);
             }

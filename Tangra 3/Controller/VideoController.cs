@@ -25,6 +25,7 @@ using Tangra.VideoOperations.LightCurves.Tracking;
 using Tangra.VideoTools;
 using nom.tam.fits;
 using nom.tam.util;
+using Tangra.Config;
 using Tangra.ImageTools;
 using Tangra.Model.Astro;
 using Tangra.Model.Config;
@@ -2814,28 +2815,6 @@ namespace Tangra.Controller
 			m_MainForm.ShowSettings(showCatalogRequiredHint, showLocationRequiredHint);
 		}
 
-        internal delegate T SetFITSDataDelegate<T>(uint clr);
-
-        private T[][] SaveImageData<T>(Pixelmap pixelmap, SetFITSDataDelegate<T> setValue)
-        {
-            int height = pixelmap.Height;
-            int width = pixelmap.Width;
-
-            T[][] bimg = new T[height][];
-
-            for (int y = 0; y < height; y++)
-            {
-                bimg[y] = new T[width];
-
-                for (int x = 0; x < width; x++)
-                {
-                    bimg[y][x] = setValue(pixelmap[x, height - y - 1]);
-                }
-            }
-
-            return bimg;
-        }
-
         public void ExportToFits(Pixelmap pixelmap)
         {
             int fitsBitDepth = 8;
@@ -2873,45 +2852,64 @@ namespace Tangra.Controller
 				UsageStats.Instance.ExportToFITSUsed++;
 				UsageStats.Instance.Save();
 
-                Fits f = new Fits();
+                fileName = sfd.FileName;
 
-                object data = null;
-                if (fitsBitDepth == 16)
+                bool exportAs8BitFloat = false;
+                DateTime timeStamp;
+                float exposure;
+
+                int integrationRate = 0;
+                if (this.IsAstroAnalogueVideo)
+                    integrationRate = this.AstroAnalogueVideoIntegratedAAVFrames;
+                
+                var videoFormat = this.GetVideoFileFormat();
+                var nativeFormat = this.GetVideoFormat(videoFormat);
+                var videoCamera = this.AstroVideoCameraModel;
+                var normalValue = this.EffectiveMaxPixelValue;
+
+                if (videoFormat == VideoFileFormat.AAV || videoFormat == VideoFileFormat.AAV2 || videoFormat == VideoFileFormat.AVI)
                 {
-                    data = SaveImageData<short>(pixelmap, delegate(uint val) { return (short)val; });
+                    if (this.VideoBitPix == 8 || this.EffectiveMaxPixelValue > 255)
+                    {
+                        // For video from analogue cameras we export as 8-bit floating point numbers
+                        exportAs8BitFloat = true;
+                    }
                 }
-                else if (fitsBitDepth == 8)
+
+                var additionalFileHeaders = GetAdditionalFileHeaders();
+
+                string dateObsComment = null;
+                if (this.HasEmbeddedTimeStamps())
                 {
-                    data = SaveImageData<byte>(pixelmap, delegate(uint val) { return (byte)val; });
+                    dateObsComment = GetEmbeddedDateTimeComment();
+                    timeStamp = pixelmap.FrameState.CentralExposureTime;
+                    exposure = pixelmap.FrameState.ExposureInMilliseconds / 1000.0f;
                 }
-                else if (fitsBitDepth == 32)
+                else
                 {
-                    data = SaveImageData<uint>(pixelmap, delegate(uint val) { return val; });
+                    dateObsComment = "No Date and Time available";
+                    timeStamp = DateTime.MinValue;
+                    exposure = 0;
                 }
 
-                BasicHDU imageHDU = Fits.MakeHDU(data);
-
-                nom.tam.fits.Header hdr = imageHDU.Header;
-                hdr.AddValue("SIMPLE", "T", null);
-
-                // Options include unsigned 8-bit (8), signed 16 bit (16), signed 32 bit (32), 32-bit IEEE float (-32), and 64-bit IEEE float (-64). The standard format is 16
-                hdr.AddValue("BITPIX", fitsBitDepth, null);
-                hdr.AddValue("NAXIS", 2, null);
-                hdr.AddValue("NAXIS1", pixelmap.Width, null);
-                hdr.AddValue("NAXIS2", pixelmap.Height, null);
-
-                var hrdForm = new frmFITSHeader(hdr);
-                if (hrdForm.ShowDialog() == DialogResult.Cancel) return;
-
-                f.AddHDU(imageHDU);
-
-                // Write a FITS file.
-                using (BufferedFile bf = new BufferedFile(sfd.FileName, FileAccess.ReadWrite, FileShare.ReadWrite))
-                {
-                    f.Write(bf);
-                    bf.Flush();
-                }
-            }            
+                ConvertVideoToFitsController.SaveFitsFrame(
+                    m_CurrentFrameId, 
+                    fileName,
+                    pixelmap.Width,
+                    pixelmap.Height,
+                    pixelmap.Pixels,
+                    timeStamp,
+                    exposure,
+                    dateObsComment,
+                    exportAs8BitFloat,
+                    normalValue,
+                    videoFormat,
+                    nativeFormat, 
+                    integrationRate,
+                    videoCamera,
+                    this.FileName,
+                    additionalFileHeaders);
+            }
         }
 
 		public void RegisterOcrError()
@@ -3339,6 +3337,87 @@ namespace Tangra.Controller
 	        }
 
             return defaultValue.HasValue ? defaultValue.Value : DateTime.UtcNow;
+	    }
+
+        public Dictionary<string, Tuple<string, string>> GetAdditionalFileHeaders()
+	    {
+            var additionalFileHeaders = new Dictionary<string, Tuple<string, string>>();
+
+            var fileHeaderProvider = this.FramePlayer.Video as IFileHeaderProvider;
+            if (fileHeaderProvider != null)
+            {
+                var AAV_HEADERS = new Dictionary<string, string>
+                {
+                    {"LATITUDE", "LATITUDE" },
+                    {"LONGITUDE", "LONGITUD" },
+                    {"OBSERVER", "OBSERVER" }, 
+                    {"TELESCOP", "TELESCOP" },
+                    {"OBJECT", "OBJECT"},
+                    {"RA_OBJ", "RA_OBJ" },
+                    {"DEC_OBJ", "DEC_OBJ"},
+                    {"RECORDER-SOFTWARE", "REC-SOFT" },
+                    {"RECORDER-SOFTWARE-VERSION", "REC-VER" },
+                    {"ADVLIB-VERSION", "ADVLIB"}
+                };
+
+                var videoFormat = this.GetVideoFileFormat();
+                var nativeFormat = this.GetVideoFormat(videoFormat);
+                var videoCamera = this.AstroVideoCameraModel;
+
+                var coppiedFromHeaderDescription = string.Format("Copied from {0} file headers", videoFormat);
+                var fileHeaders = fileHeaderProvider.GetFileHeaders();
+                fileHeaders
+                    .Where(kvp => AAV_HEADERS.ContainsKey(kvp.Key))
+                    .Select(kvp => kvp)
+                    .ToList()
+                    .ForEach(kvp => additionalFileHeaders[AAV_HEADERS[kvp.Key]] = Tuple.Create(kvp.Value, coppiedFromHeaderDescription));
+
+                if (videoFormat == VideoFileFormat.AAV || videoFormat == VideoFileFormat.AAV2)
+                {
+                    var camera = videoCamera;
+                    if (camera.IndexOf(nativeFormat, StringComparison.InvariantCultureIgnoreCase) == -1)
+                    {
+                        camera = camera.Trim() + string.Format(" ({0})", nativeFormat);
+                    }
+                    var instumentalDelaySelectedConfig = InstrumentalDelayConfigManager.GetConfigurationForCamera(camera);
+                    float instDelay;
+                    if (instumentalDelaySelectedConfig.TryGetValue(this.AstroAnalogueVideoIntegratedAAVFrames, out instDelay))
+                    {
+                        additionalFileHeaders["INSTDELY"] = Tuple.Create(
+                            instDelay.ToString(CultureInfo.InvariantCulture),
+                            string.Format("Instr. delay in sec. for x{0} frames integration for '{1}' camera. This has not been applied to DATE-OBS", this.AstroAnalogueVideoIntegratedAAVFrames, camera));
+                    }
+                }
+            }
+
+            return additionalFileHeaders;
+	    }
+
+	    public string GetEmbeddedDateTimeComment()
+	    {
+	        string dateObsComment = null;
+            if (this.HasEmbeddedTimeStamps())
+            {
+                var videoFormat = this.GetVideoFileFormat();
+
+                if (this.HasTimestampOCR())
+                {
+                    if (this.OCRTimeStampHasDatePart())
+                        dateObsComment = "Date and Time are ORC-ed";
+                    else
+                        dateObsComment = "Time is ORC-ed, Date is user entered";
+                }
+                else if (videoFormat == VideoFileFormat.ADV || videoFormat == VideoFileFormat.ADV2)
+                {
+                    dateObsComment = "Date and Time are mid-frame recorded";
+                }
+                else if (!this.IsFitsSequence)
+                {
+                    dateObsComment = "Date and Time are saved by recorder";
+                }
+            }
+
+            return dateObsComment;
 	    }
     }
 }

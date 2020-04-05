@@ -315,12 +315,6 @@
     <Compile Include="frmAbout.Designer.cs">
       <DependentUpon>frmAbout.cs</DependentUpon>
     </Compile>
-    <Compile Include="frmFITSHeader.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmFITSHeader.Designer.cs">
-      <DependentUpon>frmFITSHeader.cs</DependentUpon>
-    </Compile>
     <Compile Include="frmContributorsCall.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -1180,9 +1174,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmAbout.resx">
       <DependentUpon>frmAbout.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmFITSHeader.resx">
-      <DependentUpon>frmFITSHeader.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmContributorsCall.resx">
       <DependentUpon>frmContributorsCall.cs</DependentUpon>
