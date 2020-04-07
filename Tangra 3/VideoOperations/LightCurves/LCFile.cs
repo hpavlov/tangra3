@@ -128,136 +128,153 @@ namespace Tangra.VideoOperations.LightCurves
             using (var deflateStream = new DeflateStream(inFile, CompressionMode.Decompress, true))
             using (var reader = new BinaryReader(deflateStream))
             {
-                short version = reader.ReadInt16();
-                if (version > LC_FILE_VERSION)
+                try
                 {
-                    MessageBox.Show("This light curve file requires a newer version of Tangra.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return null;
-                }
+                    short version = reader.ReadInt16();
+                    if (version > LC_FILE_VERSION)
+                    {
+                        MessageBox.Show("This light curve file requires a newer version of Tangra.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return null;
+                    }
 
-                var lcFile = new LCFile
-	            {
-		            LcFileFormatVersion = version, 
-					Header = new LCMeasurementHeader(reader)
-	            };
+                    var lcFile = new LCFile
+                    {
+                        LcFileFormatVersion = version,
+                        Header = new LCMeasurementHeader(reader)
+                    };
 
-	            byte totalObjects = reader.ReadByte();
+                    byte totalObjects = reader.ReadByte();
 
-                lcFile.Data = new List<List<LCMeasurement>>(new List<LCMeasurement>[] { new List<LCMeasurement>(), new List<LCMeasurement>(), new List<LCMeasurement>(), new List<LCMeasurement>() });
-            	lcFile.FrameTiming = new List<LCFrameTiming>();
+                    lcFile.Data = new List<List<LCMeasurement>>(new List<LCMeasurement>[] { new List<LCMeasurement>(), new List<LCMeasurement>(), new List<LCMeasurement>(), new List<LCMeasurement>() });
+                    lcFile.FrameTiming = new List<LCFrameTiming>();
 
-                if (totalObjects > 0)
-                {
-                    int itemsInGroup = reader.ReadInt32();
+                    if (totalObjects > 0)
+                    {
+                        int itemsInGroup = reader.ReadInt32();
 
-					bool supressPixelLoading = false;
+                        bool supressPixelLoading = false;
 
-                    if (doOutOfMemoryCheck && (itemsInGroup > 40000 || fileInfo.Length > 100 * 1024 * 1024))
-					{
-						var frm = new frmLcFileLoadOptions();
-						frm.StartPosition = FormStartPosition.CenterParent;
-						videoController.ShowDialog(frm);
-
-						supressPixelLoading = frm.rbSkipPixels.Checked;
-					}
-
-					TangraContext.Current.CanProcessLightCurvePixels = !supressPixelLoading;
-
-                    if (itemsInGroup < lcFile.Header.MeasuredFrames) 
-                        // Generally should not happen but it could!
-                        lcFile.Header.MeasuredFrames = (uint)itemsInGroup;
-
-	                bool showProgress = true; //(totalObjects * itemsInGroup) / 100 > 100;
-                    bool notSupported = false;
-                    bool fileCorrupted = false;
-
-                    ThreadingHelper.RunTaskWaitAndDoEvents(
-                        delegate()
+                        if (doOutOfMemoryCheck && (itemsInGroup > 40000 || fileInfo.Length > 100 * 1024 * 1024))
                         {
-                            if (showProgress)
-                                FileProgressManager.BeginFileOperation(totalObjects * itemsInGroup);
+                            var frm = new frmLcFileLoadOptions();
+                            frm.StartPosition = FormStartPosition.CenterParent;
+                            videoController.ShowDialog(frm);
 
-                            try
-                            {
-                                int idx = 0;
-                                for (int i = 0; i < 4; i++)
-                                    lcFile.Data[i] = new List<LCMeasurement>();
+                            supressPixelLoading = frm.rbSkipPixels.Checked;
+                        }
 
-                                LCMeasurement prevMeasurement = LCMeasurement.Empty;
+                        TangraContext.Current.CanProcessLightCurvePixels = !supressPixelLoading;
 
-                                int lastFrameNo = -1;
-                                uint firstFrameNo = 0;
+                        if (itemsInGroup < lcFile.Header.MeasuredFrames)
+                            // Generally should not happen but it could!
+                            lcFile.Header.MeasuredFrames = (uint)itemsInGroup;
 
-                                for (int j = 0; j < itemsInGroup; j++)
-                                {
-									if (version > 2 &&
-										lcFile.Header.TimingType != MeasurementTimingType.UserEnteredFrameReferences)
-									{
-										var frameTiming = new LCFrameTiming(reader);
-										lcFile.FrameTiming.Add(frameTiming);
-									}
+                        bool showProgress = true; //(totalObjects * itemsInGroup) / 100 > 100;
+                        bool notSupported = false;
+                        bool fileCorrupted = false;
 
-                                    LCMeasurement measurement = LCMeasurement.Empty;
-
-                                    for (int i = 0; i < totalObjects; i++)
-                                    {
-										measurement = new LCMeasurement(reader, prevMeasurement, lcFile.Header.PsfGroupIds[i], j == 0 ? null : (uint?)(firstFrameNo + j), supressPixelLoading);
-                                        prevMeasurement = measurement;
-
-                                        if (j == 0) firstFrameNo = prevMeasurement.CurrFrameNo;    
-
-                                        if (lastFrameNo != (int)measurement.CurrFrameNo)
-                                            lcFile.Data[i].Add(measurement);
-                                        else
-                                            // This shouldn't happen, but this is a fix if it happens. Overwrite the last frame measurement if the measurement is repeated
-                                            lcFile.Data[i][lcFile.Data[i].Count - 1] = measurement;
-
-                                        if (showProgress)
-                                        {
-                                            idx++;
-                                            if (idx % 100 == 0)
-                                                FileProgressManager.FileOperationProgress(idx);
-                                        }
-                                    }
-
-                                    lastFrameNo =(int)measurement.CurrFrameNo;
-                                }
-                            }
-                            catch (NotSupportedException)
-                            {
-                                notSupported = true;
-                            }
-                            catch (EndOfStreamException)
-                            {
-                                fileCorrupted = true;
-                            }
-                            finally
+                        ThreadingHelper.RunTaskWaitAndDoEvents(
+                            delegate()
                             {
                                 if (showProgress)
-                                    FileProgressManager.EndFileOperation();
-                            }
-                        },
-                            150);
+                                    FileProgressManager.BeginFileOperation(totalObjects * itemsInGroup);
 
-                    if (notSupported)
-                        MessageBox.Show(
-                            "This .lc file is incompatible with your current version of Tangra.",
-                            "Cannot load light curve",
-                            MessageBoxButtons.OK,
-                            MessageBoxIcon.Error);
+                                try
+                                {
+                                    int idx = 0;
+                                    for (int i = 0; i < 4; i++)
+                                        lcFile.Data[i] = new List<LCMeasurement>();
 
-                    if (fileCorrupted)
-                        MessageBox.Show(
+                                    LCMeasurement prevMeasurement = LCMeasurement.Empty;
+
+                                    int lastFrameNo = -1;
+                                    uint firstFrameNo = 0;
+
+                                    for (int j = 0; j < itemsInGroup; j++)
+                                    {
+                                        if (version > 2 &&
+                                            lcFile.Header.TimingType != MeasurementTimingType.UserEnteredFrameReferences)
+                                        {
+                                            var frameTiming = new LCFrameTiming(reader);
+                                            lcFile.FrameTiming.Add(frameTiming);
+                                        }
+
+                                        LCMeasurement measurement = LCMeasurement.Empty;
+
+                                        for (int i = 0; i < totalObjects; i++)
+                                        {
+                                            measurement = new LCMeasurement(reader, prevMeasurement, lcFile.Header.PsfGroupIds[i], j == 0 ? null : (uint?)(firstFrameNo + j), supressPixelLoading);
+                                            prevMeasurement = measurement;
+
+                                            if (j == 0) firstFrameNo = prevMeasurement.CurrFrameNo;
+
+                                            if (lastFrameNo != (int)measurement.CurrFrameNo)
+                                                lcFile.Data[i].Add(measurement);
+                                            else
+                                                // This shouldn't happen, but this is a fix if it happens. Overwrite the last frame measurement if the measurement is repeated
+                                                lcFile.Data[i][lcFile.Data[i].Count - 1] = measurement;
+
+                                            if (showProgress)
+                                            {
+                                                idx++;
+                                                if (idx % 100 == 0)
+                                                    FileProgressManager.FileOperationProgress(idx);
+                                            }
+                                        }
+
+                                        lastFrameNo = (int)measurement.CurrFrameNo;
+                                    }
+                                }
+                                catch (NotSupportedException)
+                                {
+                                    notSupported = true;
+                                }
+                                catch (EndOfStreamException)
+                                {
+                                    fileCorrupted = true;
+                                }
+                                catch (InvalidDataException)
+                                {
+                                    fileCorrupted = true;
+                                }
+                                finally
+                                {
+                                    if (showProgress)
+                                        FileProgressManager.EndFileOperation();
+                                }
+                            },
+                                150);
+
+                        if (notSupported)
+                            MessageBox.Show(
+                                "This .lc file is incompatible with your current version of Tangra.",
+                                "Cannot load light curve",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+
+                        if (fileCorrupted)
+                            MessageBox.Show(
+                                "This .lc file is either corrupted or incomplete and cannot be opened by Tangra.",
+                                "Cannot load light curve",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+                    }
+
+                    lcFile.Footer = new LCMeasurementFooter(reader);
+                    lcFile.Header.LcFile = lcFile;
+
+                    return lcFile;
+                }
+                catch (InvalidDataException)
+                {
+                    MessageBox.Show(
                             "This .lc file is either corrupted or incomplete and cannot be opened by Tangra.",
                             "Cannot load light curve",
                             MessageBoxButtons.OK,
                             MessageBoxIcon.Error);
+
+                    return null;
                 }
-
-                lcFile.Footer = new LCMeasurementFooter(reader);
-                lcFile.Header.LcFile = lcFile;
-
-                return lcFile;
             }
         }
 
