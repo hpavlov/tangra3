@@ -329,7 +329,7 @@ namespace Tangra.ImageTools
 			StarCatalogueFacade facade = new StarCatalogueFacade(TangraConfig.Settings.StarCatalogue);
 			m_CatalogueStars = facade.GetStarsInRegion(
 				m_FieldSolveContext.RADeg, m_FieldSolveContext.DEDeg,
-				2.5 * m_Image.GetMaxFOVInArcSec() / 3600.0, m_FieldSolveContext.LimitMagn, (float)m_FieldSolveContext.Epoch);
+                2.5 * m_Image.GetMaxFOVInArcSec() / 3600.0, m_FieldSolveContext.LimitMagn, (float)m_FieldSolveContext.Epoch, m_VideoController.Win32MainWindow);
 
 			m_Eta = GetUserCameraConfigParam("rotation", 0.0);
 			m_FLength = m_FieldSolveContext.FocalLength;

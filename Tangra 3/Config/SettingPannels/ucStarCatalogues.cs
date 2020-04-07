@@ -46,7 +46,7 @@ namespace Tangra.Config.SettingPannels
 			{
 				TangraConfig.StarCatalog chosenCatalogue = (TangraConfig.StarCatalog)(cbxCatalogue.SelectedIndex + 1);
 
-				if (chosenCatalogue != TangraConfig.StarCatalog.GaiaDR2Online && !Directory.Exists(tbxCatalogueLocation.Text))
+				if (chosenCatalogue != TangraConfig.StarCatalog.GaiaDR2 && !Directory.Exists(tbxCatalogueLocation.Text))
 				{
 					tbxCatalogueLocation.Focus();
 					MessageBox.Show(
@@ -63,7 +63,7 @@ namespace Tangra.Config.SettingPannels
 				{
 					tbxCatalogueLocation.Focus();
 
-				    if (chosenCatalogue == TangraConfig.StarCatalog.GaiaDR2Online)
+				    if (chosenCatalogue == TangraConfig.StarCatalog.GaiaDR2)
 				    {
                         var rv = MessageBox.Show(
                             this,
@@ -171,7 +171,7 @@ namespace Tangra.Config.SettingPannels
 					cbxCatalogPhotometryBand.Items.AddRange(m_CatalogValidator.MagnitudeBandsForCatalog(catalog));
 					break;
 
-                case TangraConfig.StarCatalog.GaiaDR2Online:
+                case TangraConfig.StarCatalog.GaiaDR2:
                     cbxCatalogPhotometryBand.Items.Clear();
                     cbxCatalogPhotometryBand.Items.AddRange(m_CatalogValidator.MagnitudeBandsForCatalog(catalog));
                     break;
@@ -180,7 +180,7 @@ namespace Tangra.Config.SettingPannels
 			if (cbxCatalogPhotometryBand.Items.Count > 0)
 				cbxCatalogPhotometryBand.SelectedIndex = 0;
 
-		    if (catalog == TangraConfig.StarCatalog.GaiaDR2Online)
+		    if (catalog == TangraConfig.StarCatalog.GaiaDR2)
 		    {
                 btnBrowseLocation.Visible = false;
                 lblCatalogPath.Text = "API Token";

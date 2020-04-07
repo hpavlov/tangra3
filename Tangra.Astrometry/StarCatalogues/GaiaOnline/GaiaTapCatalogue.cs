@@ -1,22 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.UI;
+using System.Windows.Forms;
 using System.Xml;
 using Tangra.Model.Config;
+using Tangra.Model.Helpers;
 using Tangra.StarCatalogues.UCAC4;
 
 namespace Tangra.StarCatalogues.GaiaOnline
 {
     public class GaiaTapCatalogue
     {
+        public class WindowWrapper : IWin32Window
+        {
+            public WindowWrapper(IntPtr handle)
+            {
+                m_Hwnd = handle;
+            }
+
+            public IntPtr Handle
+            {
+                get { return m_Hwnd; }
+            }
+
+            private IntPtr m_Hwnd;
+        }
+
         private static CatalogMagnitudeBand JohnsonVFromMagnitudeBand = new CatalogMagnitudeBand(GaiaDR2Entry.BAND_ID_V, "Johnson V - Computed from G and BP-RP");
         private static CatalogMagnitudeBand CousinsRFromMagnitudeBand = new CatalogMagnitudeBand(GaiaDR2Entry.BAND_ID_R, "Cousins R - Computed from G and BP-RP");
 
@@ -26,15 +45,11 @@ namespace Tangra.StarCatalogues.GaiaOnline
         {
             // https://gea.esac.esa.int/archive/documentation/GDR2/Data_processing/chap_cu5pho/sec_cu5pho_calibr/ssec_cu5pho_PhotTransf.html
 
-            if (magOutputBand == TangraConfig.MagOutputBand.JohnsonV)
-            {
-                // G − V  = -0.01760 - 0.006860(BP-RP) - 0.1732(BP-RP)*(BP-RP);
-            }
+            if (catalogMagBand == GaiaDR2Entry.BAND_ID_R && magOutputBand == TangraConfig.MagOutputBand.CousinsR) return measuredMag;
+            if (catalogMagBand == GaiaDR2Entry.BAND_ID_R && magOutputBand == TangraConfig.MagOutputBand.JohnsonV) return ColourIndexTables.GetVFromRAndVR(measuredMag, vrColorIndex);
 
-            if (magOutputBand == TangraConfig.MagOutputBand.CousinsR)
-            {
-                // G − R  = -0.003226 + 0.3833(BP-RP) - 0.1345(BP-RP)*(BP-RP);
-            }
+            if (catalogMagBand == GaiaDR2Entry.BAND_ID_V && magOutputBand == TangraConfig.MagOutputBand.CousinsR) return ColourIndexTables.GetRFromVAndVR(measuredMag, vrColorIndex);
+            if (catalogMagBand == GaiaDR2Entry.BAND_ID_V && magOutputBand == TangraConfig.MagOutputBand.JohnsonV) return measuredMag;
 
             return double.NaN;
         }
@@ -55,104 +70,141 @@ namespace Tangra.StarCatalogues.GaiaOnline
         private string authToken;
         private string tapUrl;
 
+        private string dataDirectory = Path.GetFullPath(string.Format("{0}\\Tangra3\\GaiaDR2", Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)));
+
         public GaiaTapCatalogue(string authToken, string tapUrl = "https://gaia.aip.de/tap")
         {
             this.authToken = authToken;
             this.tapUrl = tapUrl.TrimEnd('/');
+
+            if (!Directory.Exists(dataDirectory))
+            {
+                try
+                {
+                    Directory.CreateDirectory(dataDirectory);
+                }
+                catch (Exception ex)
+                {
+                    Trace.WriteLine(ex.GetFullStackTrace());
+                }
+            }
         }
 
-        public List<IStar> GetStarsInRegion(double raDeg, double deDeg, double radiusDeg, double limitMag, float epoch)
+        public List<IStar> GetStarsInRegion(double raDeg, double deDeg, double radiusDeg, double limitMag, float epoch, IWin32Window parentWindow)
         {
             GaiaDR2Entry.TargetEpoch = epoch;
-            return GetGaiaTapData(raDeg, deDeg, radiusDeg, limitMag);
-        }
 
-        // REST 
-        //  How to use TAP on the command line
-        //  TAP can also be used with a HTTP command line client. Here we use HTTPie, but there are a lot of other similar clients (e.g. curl).
+            var requestKey = GetRequestKey(raDeg, deDeg, radiusDeg, limitMag);
+            List<IStar> rv = LoadFromCache(requestKey);
 
-        //  # retrieve the job list
-        //  http https://gaia.aip.de/tap/async
-
-        //  # submit an asyncronous job (using PostgreSQL and the 5 minutes queue)
-        //  http -f --follow POST https://gaia.aip.de/tap/async \
-        //      QUERY="SELECT ra, dec FROM gdr2.gaia_source WHERE random_index < 100" \
-        //      LANG="postgresql-9.6" QUEUE="5m" PHASE="RUN"
-
-        //  # get all the information about a job
-        //  http https://gaia.aip.de/tap/async/78d9c528-8cf0-46e3-8a5b-ec151229a30b
-
-        //  # check the status of a job
-        //  http https://gaia.aip.de/tap/async/78d9c528-8cf0-46e3-8a5b-ec151229a30b/phase
-
-        //  # get the results of a job as csv or votable
-        //  http https://gaia.aip.de/tap/async/78d9c528-8cf0-46e3-8a5b-ec151229a30b/results/csv
-        //  http https://gaia.aip.de/tap/async/78d9c528-8cf0-46e3-8a5b-ec151229a30b/results/votable
-
-        //  # archive the job (this deletes the database table and frees up space)
-        //  http --follow DELETE https://gaia.aip.de/tap/async/78d9c528-8cf0-46e3-8a5b-ec151229a30b
-        //  As with the Python interface, you can also use your personal token to authenticate with the system to use your personal account (and your personal joblist, quota etc.). To do so, you need to send the token as part of the Authorization header with every HTTP request.
-
-        //  http https://gaia.aip.de/tap/async Authorization:"Token c1a67d3db8b1c93e55573aa1a8a2133a5e65c301"
-
-        private List<IStar> GetGaiaTapData(double raDeg, double deDeg, double radiusDeg, double limitMag, int limitStars = 2000)
-        {
-            var rv = new List<IStar>();
-
-            var request = (HttpWebRequest)HttpWebRequest.Create(tapUrl + "/sync");
-            request.Method = "POST";
-            request.ContentType = "application/x-www-form-urlencoded";
-            request.Headers.Add(HttpRequestHeader.Authorization, "Token " + authToken);
-            request.UserAgent = "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)";
-
-            NameValueCollection outgoingQueryString = HttpUtility.ParseQueryString(String.Empty);
-
-            var QUERY = @"SELECT solution_id, designation, source_id, ref_epoch, ra, ra_error, dec, dec_error, parallax, parallax_error, pmra, pmra_error, pmdec, pmdec_error, phot_g_mean_mag, bp_rp, phot_variable_flag
-            FROM gdr2.gaia_source
-            WHERE pos @ scircle(spoint(RADIANS({0}), RADIANS({1})), RADIANS({2})) AND(phot_g_mean_mag <= {3}) LIMIT {4}";
-            outgoingQueryString.Add("QUERY", string.Format(QUERY, raDeg, deDeg, radiusDeg, limitMag, limitStars));
-            outgoingQueryString.Add("LANG", "postgresql-9.6");
-
-            string postdata = outgoingQueryString.ToString();
-
-            ASCIIEncoding ascii = new ASCIIEncoding();
-            byte[] postBytes = ascii.GetBytes(postdata);
-
-            request.ContentLength = postBytes.Length;
-
-            using (Stream postStream = request.GetRequestStream())
+            if (rv == null || rv.Count == 0)
             {
-                postStream.Write(postBytes, 0, postBytes.Length);
-                postStream.Flush();
-                postStream.Close();
-            }
+                var frm = new frmGaiaRestCaller(tapUrl, authToken, raDeg, deDeg, radiusDeg, limitMag);
+                var res = frm.ShowDialog(parentWindow ?? new WindowWrapper(Process.GetCurrentProcess().MainWindowHandle));
 
-            using (var response = (HttpWebResponse) request.GetResponse())
-            {
-                if (response.StatusCode == HttpStatusCode.OK)
+                if (res != DialogResult.OK)
                 {
-                    using (var responseStr = response.GetResponseStream())
+                    rv = frm.DownloadedStars;
+                    if (rv != null && rv.Any())
                     {
-                        if (responseStr != null)
-                        {
-                            var responseString = new StreamReader(responseStr).ReadToEnd();
-                            var xmlDoc = new XmlDocument();
-                            xmlDoc.LoadXml(responseString);
-
-                            var nodes = xmlDoc.SelectNodes("//*[name() ='TABLEDATA']/*[name() = 'TR']");
-                            if (nodes != null)
-                            {
-                                foreach (XmlNode node in nodes)
-                                {
-                                    rv.Add(new GaiaDR2Entry(node));
-                                }
-                            }
-                        }
+                        SaveToCache(requestKey, rv);
                     }
                 }
             }
 
             return rv;
+        }
+
+        private static string INVALID_FILENAME_CHARS = new string(Path.GetInvalidFileNameChars()) + new string(Path.GetInvalidPathChars());
+
+        private static Regex INVALID_FILENAME_CHARS_REGEX = new Regex(string.Format("[{0}]", Regex.Escape(INVALID_FILENAME_CHARS)));
+
+        private string GetRequestKey(double raDeg, double deDeg, double radiusDeg, double limitMag)
+        {
+            var unescapedString = string.Format("{0} {1} {2:0.00} {3:0.0}", 
+                AstroConvert.ToStringValue(raDeg / 15, "REC"),
+                AstroConvert.ToStringValue(deDeg, "DEC"),
+                radiusDeg, limitMag);
+
+            return INVALID_FILENAME_CHARS_REGEX.Replace(unescapedString, "");
+        }
+
+        private static string CACHE_MAGIC = "GaiaDR2Cache";
+        private static int CACHE_VERSION = 1;
+
+
+        private List<IStar> LoadFromCache(string requestKey)
+        {
+            List<IStar> rv = null;
+
+            try
+            {
+                string dataFileName = Path.GetFullPath(dataDirectory + "\\" + requestKey);
+                if (File.Exists(dataFileName))
+                {
+                    rv = new List<IStar>();
+
+                    using (var fs = new FileStream(dataFileName, FileMode.Open, FileAccess.Read))
+                    using (var br = new BinaryReader(fs, Encoding.ASCII))
+                    {
+                        try
+                        {
+                            var magic = br.ReadString();
+                            var version = br.ReadInt32();
+                            var noStars = br.ReadInt32();
+
+                            if (magic == CACHE_MAGIC)
+                            {
+                                if (version >= 1)
+                                {
+                                    for (int i = 0; i < noStars; i++)
+                                    {
+                                        var star = new GaiaDR2Entry(br);
+                                        rv.Add(star);
+                                    }
+                                }
+                            }
+                        }
+                        catch { }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex);
+            }
+
+            return rv;
+        }
+
+        private void SaveToCache(string requestKey, List<IStar> stars)
+        {
+            try
+            {
+                string dataFileName = Path.GetFullPath(dataDirectory + "\\" + requestKey);
+
+                using (var fs = new FileStream(dataFileName, FileMode.Create, FileAccess.Write))
+                using (var bw = new BinaryWriter(fs, Encoding.ASCII))
+                {
+                    bw.Write(CACHE_MAGIC);
+                    bw.Write(CACHE_VERSION);
+                    bw.Write(stars.Count);
+
+                    foreach (var star in stars)
+                    {
+                        try
+                        {
+                            var gdr2Star = (GaiaDR2Entry)star;
+                            gdr2Star.Serialize(bw);
+                        }
+                        catch { }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex);
+            }
         }
     }
 }

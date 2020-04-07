@@ -344,8 +344,11 @@ namespace Tangra.VideoOperations.Astrometry
 			{
 				if (objInfo.FittedStar != null)
 				{
-                    if (TangraConfig.Settings.StarCatalogue.Catalog == TangraConfig.StarCatalog.PPMXL)
-					    lblObjectName.Text = objInfo.FittedStar.StarNo.ToString(); // PPMXL numbers are too large so to save space don't add the catalog name
+				    if (TangraConfig.Settings.StarCatalogue.Catalog == TangraConfig.StarCatalog.PPMXL ||
+				        TangraConfig.Settings.StarCatalogue.Catalog == TangraConfig.StarCatalog.GaiaDR2)
+				    {
+                        lblObjectName.Text = objInfo.FittedStar.StarNo.ToString(); // PPMXL & GaiaDR2 numbers are too large so to save space don't add the catalog name
+				    }
                     else
 						lblObjectName.Text = string.Format("{0} {1}", TangraConfig.Settings.StarCatalogue.Catalog, objInfo.FittedStar.StarNo);
 					lblX.Text = objInfo.FittedStar.x.ToString("0.0");

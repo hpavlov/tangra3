@@ -340,20 +340,23 @@ namespace Tangra.VideoOperations.Astrometry
             Context.LimitMagn = (double)nudFaintestMag.Value;
 
             float epoch = Context.UtcTime.Year + Context.UtcTime.DayOfYear / 365.25f;
-
+            double areaDeg = (Context.ErrFoVs + 1.0) * m_Image.GetMaxFOVInArcSec() / 3600.0;
 
             if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceInfo())
-                Trace.WriteLine(string.Format("Loading stars in region ({0}, {1})",
+                Trace.WriteLine(string.Format("Loading stars in region ({0}, {1}) {2:0.00} deg, {3:0.0} mag",
                                               AstroConvert.ToStringValue(Context.RADeg / 15, "REC"),
-                                              AstroConvert.ToStringValue(Context.DEDeg, "DEC")));
+                                              AstroConvert.ToStringValue(Context.DEDeg, "DEC"),
+                                              areaDeg,
+                                              Context.LimitMagn));
 
             var facade = new StarCatalogueFacade(TangraConfig.Settings.StarCatalogue);
             m_CatalogueStars = facade.GetStarsInRegion(
                 Context.RADeg,
                 Context.DEDeg,
-                (Context.ErrFoVs + 1.0) * m_Image.GetMaxFOVInArcSec() / 3600.0,
+                areaDeg,
                 Context.LimitMagn,
-                epoch);
+                epoch,
+                this);
 
             Context.CatalogueStars = m_CatalogueStars;
             Context.StarCatalogueFacade = facade;

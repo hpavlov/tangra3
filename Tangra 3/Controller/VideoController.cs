@@ -100,6 +100,11 @@ namespace Tangra.Controller
 		private AddinsController m_AddinsController;
 	    private frmMain m_MainForm;
 
+        internal IWin32Window Win32MainWindow
+	    {
+	        get { return m_MainForm; }
+	    }
+
 		private RenderOverlayCallback m_CustomOverlayRenderer;
 
         private OcrExtensionManager m_OcrExtensionManager;
@@ -2817,23 +2822,19 @@ namespace Tangra.Controller
 
         public void ExportToFits(Pixelmap pixelmap)
         {
-            int fitsBitDepth = 8;
             string filter;
 
             if (pixelmap.BitPixCamera == 8)
             {
                 filter = "FITS Image 8 bit (*.fit;*.fits)|*.fit;*.fits";
-                fitsBitDepth = 8;
             }
             else if (pixelmap.BitPixCamera <= 16)
             {
                 filter = "FITS Image 16 bit (*.fit;*.fits)|*.fit;*.fits";
-                fitsBitDepth = 16;
             }
             else
             {
                 filter = "FITS Image 32 bit (*.fit;*.fits)|*.fit;*.fits";
-                fitsBitDepth = 32;
             }
 
             string fileName = string.Empty;

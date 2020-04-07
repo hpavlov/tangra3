@@ -213,6 +213,12 @@
     </Compile>
     <Compile Include="MotionFitting\IMeasurementPositionProvider.cs" />
     <Compile Include="MotionFitting\MeasurementPositionEntry.cs" />
+    <Compile Include="StarCatalogues\GaiaOnline\frmGaiaRestCaller.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StarCatalogues\GaiaOnline\frmGaiaRestCaller.Designer.cs">
+      <DependentUpon>frmGaiaRestCaller.cs</DependentUpon>
+    </Compile>
     <Compile Include="StarCatalogues\GaiaOnline\GaiaDR2Entry.cs" />
     <Compile Include="StarCatalogues\GaiaOnline\GaiaTapCatalogue.cs" />
     <Compile Include="StarCatalogues\GaiaOnline\GaiaVizieRCatalogue.cs" />
@@ -251,6 +257,9 @@
   <ItemGroup>
     <EmbeddedResource Include="MotionFitting\frmRovingObsLocation.resx">
       <DependentUpon>frmRovingObsLocation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StarCatalogues\GaiaOnline\frmGaiaRestCaller.resx">
+      <DependentUpon>frmGaiaRestCaller.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="StarCatalogues\NOMAD\nomad.idx" />
   </ItemGroup>

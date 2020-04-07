@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -15,6 +16,8 @@ namespace Tangra.StarCatalogues.GaiaOnline
     {
         public static Guid BAND_ID_V = new Guid("4523635F-43DC-4D76-901A-505D7A26667E");
         public static Guid BAND_ID_R = new Guid("C7728E02-1FE2-4506-A25E-BBA6D5370BA6");
+
+        private static int SerialisationVersion = 1;
 
         private string m_SolutionId;
         private string m_Designation;
@@ -187,29 +190,53 @@ namespace Tangra.StarCatalogues.GaiaOnline
             }
         }
 
+        // Magnitude conversions for GaiaDR2 from
+        // https://gea.esac.esa.int/archive/documentation/GDR2/Data_processing/chap_cu5pho/sec_cu5pho_calibr/ssec_cu5pho_PhotTransf.html
+
         public double MagR
         {
             get
             {
-                // G − R  = -0.003226 + 0.3833(BP-RP) - 0.1345(BP-RP)*(BP-RP);
+                // G − R  = -0.003226 + 0.3833(BP-RP) - 0.1345(BP-RP)*(BP-RP) +/- 0.04840;
                 return m_phot_g_mean_mag + 0.003226 - 0.3833 * m_bp_rp + 0.1345* m_bp_rp* m_bp_rp;
             }
         }
 
-        public double MagB { get { return double.NaN; } }
+        public double MagB
+        {
+            get
+            {
+                // G − BT = -0.02441 - 0.4899(BP-RP) - 0.9740(BP-RP)(BP-RP) + 0.2496(BP-RP)(BP-RP)(BP-RP) +/- 0.07293 
+                return m_phot_g_mean_mag + 0.02441 + 0.4899 * m_bp_rp + 0.9740 * m_bp_rp * m_bp_rp - 0.2496 * m_bp_rp * m_bp_rp;
+            }
+        }
 
         public double MagV
         {
             get
             {
-                // G − V  = -0.01760 - 0.006860(BP-RP) - 0.1732(BP-RP)*(BP-RP);
+                // G − V  = -0.01760 - 0.006860(BP-RP) - 0.1732(BP-RP)*(BP-RP) +/- 0.04585;
                 return m_phot_g_mean_mag + 0.01760 + 0.006860 * m_bp_rp + 0.1732 * m_bp_rp * m_bp_rp;
             }
         }
 
-        public double MagJ { get { return double.NaN; } }
+        public double MagJ
+        {
+            get
+            {
+                //G − J = -0.01883 + 1.394(BP-RP) - 0.07893(BP-RP)(BP-RP) +/- 0.05246;
+                return m_phot_g_mean_mag + 0.01883 - 1.394 * m_bp_rp + 0.07893 * m_bp_rp * m_bp_rp;
+            }
+        }
 
-        public double MagK { get { return double.NaN; } }
+        public double MagK
+        {
+            get
+            {
+                //G − KS = -0.1885 + 2.092(BP-RP) - 0.1345(BP-RP)(BP-RP) +/- 0.08281;
+                return m_phot_g_mean_mag + 0.1885 + -2.092 * m_bp_rp + 0.1345 * m_bp_rp * m_bp_rp;
+            }
+        }
 
         public string GetStarDesignation(int alternativeId)
         {
@@ -224,6 +251,57 @@ namespace Tangra.StarCatalogues.GaiaOnline
                 return MagR;
             else
                 return Mag;
+        }
+
+        public void Serialize(BinaryWriter bw)
+        {
+            bw.Write(SerialisationVersion);
+
+            bw.Write(m_SolutionId);
+            bw.Write(m_Designation);
+            bw.Write(m_SourceId);
+            bw.Write(m_RefEpoch);
+            bw.Write(m_RaDeg);
+            bw.Write(m_RaErrMas);
+            bw.Write(m_DeDeg);
+            bw.Write(m_DeErrMas);
+            bw.Write(m_ParalaxMas);
+            bw.Write(m_ParalaxErrMas);
+            bw.Write(m_PmRaMasYear);
+            bw.Write(m_PmRaErrMasYear);
+            bw.Write(m_PmDeMasYear);
+            bw.Write(m_PmDeErrMasYear);
+            bw.Write(m_phot_g_mean_mag);
+            bw.Write(m_bp_rp);
+            bw.Write(m_phot_variable_flag);
+        }
+
+        public GaiaDR2Entry(BinaryReader br)
+        {
+            var version = br.ReadInt32();
+
+            m_SolutionId = br.ReadString();
+            m_Designation = br.ReadString();
+            m_SourceId = br.ReadString();
+            m_RefEpoch = br.ReadSingle();
+            m_RaDeg = br.ReadDouble();
+            m_RaErrMas = br.ReadDouble();
+            m_DeDeg = br.ReadDouble();
+            m_DeErrMas = br.ReadDouble();
+            m_ParalaxMas = br.ReadDouble();
+            m_ParalaxErrMas = br.ReadDouble();
+            m_PmRaMasYear = br.ReadDouble();
+            m_PmRaErrMasYear = br.ReadDouble();
+            m_PmDeMasYear = br.ReadDouble();
+            m_PmDeErrMasYear = br.ReadDouble();
+            m_phot_g_mean_mag = br.ReadDouble();
+            m_bp_rp = br.ReadDouble();
+            m_phot_variable_flag = br.ReadString();
+
+            if (version > 1)
+            {
+                // TODO: Version specific loading, when and if implemented
+            }
         }
     }
 }

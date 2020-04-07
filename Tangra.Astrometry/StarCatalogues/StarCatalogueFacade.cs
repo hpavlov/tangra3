@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 using Tangra.Model.Config;
 using Tangra.StarCatalogues;
 using Tangra.StarCatalogues.GaiaOnline;
@@ -62,7 +63,7 @@ namespace Tangra.Astrometry.Recognition
                 {
                     return UCAC4Catalogue.CatalogMagnitudeBands;
                 }
-                else if (m_Settings.Catalog == TangraConfig.StarCatalog.GaiaDR2Online)
+                else if (m_Settings.Catalog == TangraConfig.StarCatalog.GaiaDR2)
                 {
                     return GaiaTapCatalogue.CatalogMagnitudeBands;
                 }
@@ -71,7 +72,7 @@ namespace Tangra.Astrometry.Recognition
             }
 	    }
 
-		public List<IStar> GetStarsInRegion(double raDeg, double deDeg, double diameterDeg, double limitMag, float epoch)
+		public List<IStar> GetStarsInRegion(double raDeg, double deDeg, double diameterDeg, double limitMag, float epoch, IWin32Window parentWindow = null)
 		{
 			if (m_Settings.Catalog == TangraConfig.StarCatalog.UCAC2)
 			{
@@ -103,11 +104,11 @@ namespace Tangra.Astrometry.Recognition
                 List<IStar> ucac4Stars = cat.GetStarsInRegion(raDeg, deDeg, diameterDeg, limitMag, epoch);
                 return (List<IStar>)ucac4Stars;
             }
-            else if (m_Settings.Catalog == TangraConfig.StarCatalog.GaiaDR2Online)
+            else if (m_Settings.Catalog == TangraConfig.StarCatalog.GaiaDR2)
             {
                 // NOTE: m_Settings.CatalogLocation actually contains the API Token
                 GaiaTapCatalogue cat = new GaiaTapCatalogue(m_Settings.CatalogLocation);
-                List<IStar> gaiaDr2Stars = cat.GetStarsInRegion(raDeg, deDeg, diameterDeg, limitMag, epoch);
+                List<IStar> gaiaDr2Stars = cat.GetStarsInRegion(raDeg, deDeg, diameterDeg, limitMag, epoch, parentWindow);
                 return (List<IStar>)gaiaDr2Stars;
             }
 			return null;
@@ -135,7 +136,7 @@ namespace Tangra.Astrometry.Recognition
             {
                 return UCAC4Catalogue.ConvertMagnitude(measuredMag, vrColorIndex, catalogMagBand, magOutputBand);
             }
-            else if (m_Settings.Catalog == TangraConfig.StarCatalog.GaiaDR2Online)
+            else if (m_Settings.Catalog == TangraConfig.StarCatalog.GaiaDR2)
             {
                 return GaiaTapCatalogue.ConvertMagnitude(measuredMag, vrColorIndex, catalogMagBand, magOutputBand);
             }
@@ -160,7 +161,7 @@ namespace Tangra.Astrometry.Recognition
                 return PPMXLCatalogue.IsValidCatalogLocation(ref folderPath);
             else if (catalog == TangraConfig.StarCatalog.UCAC4)
                 return UCAC4Catalogue.IsValidCatalogLocation(ref folderPath);
-            else if (catalog == TangraConfig.StarCatalog.GaiaDR2Online)
+            else if (catalog == TangraConfig.StarCatalog.GaiaDR2)
                 return GaiaTapCatalogue.IsValidApiToken(ref folderPath);
 
 			return false;
@@ -227,7 +228,7 @@ namespace Tangra.Astrometry.Recognition
                 return PPMXLCatalogue.CatalogMagnitudeBands;
             else if (catalog == TangraConfig.StarCatalog.UCAC4)
                 return UCAC4Catalogue.CatalogMagnitudeBands;
-            else if (catalog == TangraConfig.StarCatalog.GaiaDR2Online)
+            else if (catalog == TangraConfig.StarCatalog.GaiaDR2)
                 return GaiaTapCatalogue.CatalogMagnitudeBands;
 
 			return new object[] { };

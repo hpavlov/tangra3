@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Tangra.Model.Video;
 
@@ -180,6 +181,18 @@ namespace Tangra.Model.Helpers
             return 
                 format == VideoFileFormat.AAV || 
                 format == VideoFileFormat.AAV2;
+        }
+
+        public static void IgnoreFaults(this Task task)
+        {
+            task.ContinueWith((t) =>
+            {
+                if (t != null && t.Exception != null)
+                {
+                    Trace.WriteLine(t.Exception);
+                }
+            },
+            TaskContinuationOptions.OnlyOnFaulted);
         }
     }
 }
