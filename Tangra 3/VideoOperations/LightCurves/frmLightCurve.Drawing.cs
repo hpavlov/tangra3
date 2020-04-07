@@ -756,6 +756,8 @@ namespace Tangra.VideoOperations.LightCurves
                 float yMin = m_MaxY - (float)(i - intensityFrom) * m_ScaleY;
                 float yMax = m_MaxY - (float)(i - intensityTo) * m_ScaleY;
 
+                var axisLabels = new List<Tuple<string, float, float>>();
+
                 while (i < m_Header.MaxAdjustedReading)
                 {
                     float magnitude = (float)m_LightCurveController.Context.MagnitudeConverter.ComputeMagnitude(i);
@@ -767,10 +769,22 @@ namespace Tangra.VideoOperations.LightCurves
                     if (i > m_Header.MinAdjustedReading && m_DisplaySettings.DrawGrid)
                     {
                         g.DrawLine(m_DisplaySettings.GridLinesPen, m_MinX, y, m_MaxX, y);
-                        g.DrawString(label, s_AxisFont, m_DisplaySettings.LabelsBrush, x, y - labelSize.Height / 2);
+                        axisLabels.Insert(0, Tuple.Create(label, x, y - labelSize.Height / 2));
                     }
 
                     i *= intensityFactor;
+                }
+
+                float prevPlottedLblBottom = 0;
+                for (int j = 0; j < axisLabels.Count; j++)
+                {
+                    var entry = axisLabels[j];
+                    SizeF labelSize = g.MeasureString(entry.Item1, s_AxisFont);
+                    if (prevPlottedLblBottom < entry.Item3 - labelSize.Height/2)
+                    {
+                        g.DrawString(entry.Item1, s_AxisFont, m_DisplaySettings.LabelsBrush, entry.Item2, entry.Item3 - labelSize.Height / 2);
+                        prevPlottedLblBottom = entry.Item3 + labelSize.Height / 2;
+                    }
                 }
 
                 string labelFlux = "Mag";

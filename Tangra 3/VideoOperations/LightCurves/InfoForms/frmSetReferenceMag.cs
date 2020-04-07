@@ -245,19 +245,19 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
             rb3.Checked = false;
             rb4.Checked = false;
 
-            if (m_Intensities.Length > 0 && !double.IsNaN(referenceMags[0]) && !double.IsInfinity(referenceMags[0]) && calculatedMags[0] > -20 && calculatedMags[0] < 30)
+            if (m_Intensities.Length > 0 && referenceMags.Length > 0 && !double.IsNaN(referenceMags[0]) && !double.IsInfinity(referenceMags[0]) && calculatedMags[0] > -20 && calculatedMags[0] < 30)
             {
                 nudMag1.Value = Convert.ToDecimal(calculatedMags[0]);
             }
-            if (m_Intensities.Length > 1 && !double.IsNaN(referenceMags[1]) && !double.IsInfinity(referenceMags[1]) && calculatedMags[1] > -20 && calculatedMags[1] < 30)
+            if (m_Intensities.Length > 1 && referenceMags.Length > 1 && !double.IsNaN(referenceMags[1]) && !double.IsInfinity(referenceMags[1]) && calculatedMags[1] > -20 && calculatedMags[1] < 30)
             {
                 nudMag2.Value = Convert.ToDecimal(calculatedMags[1]);
             }
-            if (m_Intensities.Length > 2 && !double.IsNaN(referenceMags[2]) && !double.IsInfinity(referenceMags[2]) && calculatedMags[2] > -20 && calculatedMags[2] < 30)
+            if (m_Intensities.Length > 2 && referenceMags.Length > 2 && !double.IsNaN(referenceMags[2]) && !double.IsInfinity(referenceMags[2]) && calculatedMags[2] > -20 && calculatedMags[2] < 30)
             {
                 nudMag3.Value = Convert.ToDecimal(calculatedMags[2]);
             }
-            if (m_Intensities.Length > 3 && !double.IsNaN(referenceMags[3]) && !double.IsInfinity(referenceMags[3]) && calculatedMags[3] > -20 && calculatedMags[3] < 30)
+            if (m_Intensities.Length > 3 && referenceMags.Length > 3 && !double.IsNaN(referenceMags[3]) && !double.IsInfinity(referenceMags[3]) && calculatedMags[3] > -20 && calculatedMags[3] < 30)
             {
                 nudMag4.Value = Convert.ToDecimal(calculatedMags[3]);
             }
