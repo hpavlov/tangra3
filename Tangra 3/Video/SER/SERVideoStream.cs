@@ -57,6 +57,12 @@ namespace Tangra.Video.SER
 
 			TangraCore.SEROpenFile(fileName, ref fileInfo, observer, instrument, telescope, false, false);
 
+            if (fileInfo.CountFrames == 0)
+            {
+                MessageBox.Show(parentForm, "This file has no video frames in it.", "Error opening SER file", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return null;
+            }
+
 		    string fireCaptureLogFileName = Path.ChangeExtension(fileName, ".txt");
 		    var fireCaptureTimeStamps = new Dictionary<int, DateTime>();
 		    if (File.Exists(fireCaptureLogFileName))
