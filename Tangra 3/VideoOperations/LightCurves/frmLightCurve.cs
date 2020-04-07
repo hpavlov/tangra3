@@ -62,6 +62,7 @@ namespace Tangra.VideoOperations.LightCurves
 
             m_DisplaySettings.Load();
             m_DisplaySettings.Initialize();
+		    miShowZeroADULevel.Checked = TangraConfig.Settings.Generic.ShowZeroADULevel;
 
         	picTarget1Pixels.Image = new Bitmap(34, 34);
 			picTarget2Pixels.Image = new Bitmap(34, 34);
@@ -2704,6 +2705,17 @@ namespace Tangra.VideoOperations.LightCurves
 
                     g.ReleaseHdc();
                 }
+            }
+        }
+
+        private void miShowZeroADULevel_CheckedChanged(object sender, EventArgs e)
+        {
+            if (TangraConfig.Settings.Generic.ShowZeroADULevel != miShowZeroADULevel.Checked)
+            {
+                TangraConfig.Settings.Generic.ShowZeroADULevel = miShowZeroADULevel.Checked;
+                TangraConfig.Settings.Save();
+
+                RedrawPlot();
             }
         }
 	}

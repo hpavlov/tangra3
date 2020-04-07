@@ -18,6 +18,48 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmLightCurve));
             this.pnlLegend = new System.Windows.Forms.Panel();
+            this.pnlSmallGraph = new Tangra.Controls.SmoothPanel();
+            this.pnlMeasurementDetails = new System.Windows.Forms.Panel();
+            this.lblMagnitude1 = new System.Windows.Forms.Label();
+            this.lblMagnitude2 = new System.Windows.Forms.Label();
+            this.lblMagnitude3 = new System.Windows.Forms.Label();
+            this.lblMagnitude4 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.pnlGeoLocation = new System.Windows.Forms.Panel();
+            this.tbxGeoLocation = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.lblInstDelayWarning = new System.Windows.Forms.Label();
+            this.lblSN4 = new System.Windows.Forms.Label();
+            this.lblSN3 = new System.Windows.Forms.Label();
+            this.lblSN2 = new System.Windows.Forms.Label();
+            this.lblSN1 = new System.Windows.Forms.Label();
+            this.lblSNLBL4 = new System.Windows.Forms.Label();
+            this.lblSNLBL3 = new System.Windows.Forms.Label();
+            this.lblSNLBL2 = new System.Windows.Forms.Label();
+            this.lblSNLBL1 = new System.Windows.Forms.Label();
+            this.lblFrameNo = new System.Windows.Forms.Label();
+            this.picTarget4PSF = new System.Windows.Forms.PictureBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.pnlBinInfo = new System.Windows.Forms.Panel();
+            this.label3 = new System.Windows.Forms.Label();
+            this.lblBinNo = new System.Windows.Forms.Label();
+            this.lblFrameTime = new System.Windows.Forms.Label();
+            this.pb4 = new System.Windows.Forms.PictureBox();
+            this.picTarget4Pixels = new System.Windows.Forms.PictureBox();
+            this.pb3 = new System.Windows.Forms.PictureBox();
+            this.picTarget3PSF = new System.Windows.Forms.PictureBox();
+            this.picTarget1Pixels = new System.Windows.Forms.PictureBox();
+            this.pb2 = new System.Windows.Forms.PictureBox();
+            this.picTarget3Pixels = new System.Windows.Forms.PictureBox();
+            this.picTarget1PSF = new System.Windows.Forms.PictureBox();
+            this.picTarget2Pixels = new System.Windows.Forms.PictureBox();
+            this.picTarget2PSF = new System.Windows.Forms.PictureBox();
+            this.pb1 = new System.Windows.Forms.PictureBox();
+            this.lblMeasurement1 = new System.Windows.Forms.Label();
+            this.lblMeasurement2 = new System.Windows.Forms.Label();
+            this.lblMeasurement3 = new System.Windows.Forms.Label();
+            this.lblMeasurement4 = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
             this.sbZoomStartFrame = new System.Windows.Forms.HScrollBar();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
@@ -103,64 +145,17 @@
             this.miIncludeObj1 = new System.Windows.Forms.ToolStripMenuItem();
             this.pnlMain = new System.Windows.Forms.Panel();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.pnlChart = new Tangra.Controls.SmoothPanel();
+            this.btnZoomIn = new System.Windows.Forms.Button();
+            this.btnZoomOut = new System.Windows.Forms.Button();
             this.hintTimer = new System.Windows.Forms.Timer(this.components);
             this.saveImageDialog = new System.Windows.Forms.SaveFileDialog();
             this.saveCSVDialog = new System.Windows.Forms.SaveFileDialog();
             this.firstFrameTimer = new System.Windows.Forms.Timer(this.components);
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.saveWmfFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.pnlChart = new Tangra.Controls.SmoothPanel();
-            this.btnZoomIn = new System.Windows.Forms.Button();
-            this.btnZoomOut = new System.Windows.Forms.Button();
-            this.pnlSmallGraph = new Tangra.Controls.SmoothPanel();
-            this.pnlMeasurementDetails = new System.Windows.Forms.Panel();
-            this.lblMagnitude1 = new System.Windows.Forms.Label();
-            this.lblMagnitude2 = new System.Windows.Forms.Label();
-            this.lblMagnitude3 = new System.Windows.Forms.Label();
-            this.lblMagnitude4 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.pnlGeoLocation = new System.Windows.Forms.Panel();
-            this.tbxGeoLocation = new System.Windows.Forms.TextBox();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.lblInstDelayWarning = new System.Windows.Forms.Label();
-            this.lblSN4 = new System.Windows.Forms.Label();
-            this.lblSN3 = new System.Windows.Forms.Label();
-            this.lblSN2 = new System.Windows.Forms.Label();
-            this.lblSN1 = new System.Windows.Forms.Label();
-            this.lblSNLBL4 = new System.Windows.Forms.Label();
-            this.lblSNLBL3 = new System.Windows.Forms.Label();
-            this.lblSNLBL2 = new System.Windows.Forms.Label();
-            this.lblSNLBL1 = new System.Windows.Forms.Label();
-            this.lblFrameNo = new System.Windows.Forms.Label();
-            this.picTarget4PSF = new System.Windows.Forms.PictureBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.pnlBinInfo = new System.Windows.Forms.Panel();
-            this.label3 = new System.Windows.Forms.Label();
-            this.lblBinNo = new System.Windows.Forms.Label();
-            this.lblFrameTime = new System.Windows.Forms.Label();
-            this.pb4 = new System.Windows.Forms.PictureBox();
-            this.picTarget4Pixels = new System.Windows.Forms.PictureBox();
-            this.pb3 = new System.Windows.Forms.PictureBox();
-            this.picTarget3PSF = new System.Windows.Forms.PictureBox();
-            this.picTarget1Pixels = new System.Windows.Forms.PictureBox();
-            this.pb2 = new System.Windows.Forms.PictureBox();
-            this.picTarget3Pixels = new System.Windows.Forms.PictureBox();
-            this.picTarget1PSF = new System.Windows.Forms.PictureBox();
-            this.picTarget2Pixels = new System.Windows.Forms.PictureBox();
-            this.picTarget2PSF = new System.Windows.Forms.PictureBox();
-            this.pb1 = new System.Windows.Forms.PictureBox();
-            this.lblMeasurement1 = new System.Windows.Forms.Label();
-            this.lblMeasurement2 = new System.Windows.Forms.Label();
-            this.lblMeasurement3 = new System.Windows.Forms.Label();
-            this.lblMeasurement4 = new System.Windows.Forms.Label();
+            this.miShowZeroADULevel = new System.Windows.Forms.ToolStripMenuItem();
             this.pnlLegend.SuspendLayout();
-            this.panel2.SuspendLayout();
-            this.menuStrip1.SuspendLayout();
-            this.statusStrip1.SuspendLayout();
-            this.pnlMain.SuspendLayout();
-            this.panel1.SuspendLayout();
-            this.pnlChart.SuspendLayout();
             this.pnlSmallGraph.SuspendLayout();
             this.pnlMeasurementDetails.SuspendLayout();
             this.pnlGeoLocation.SuspendLayout();
@@ -177,6 +172,12 @@
             ((System.ComponentModel.ISupportInitialize)(this.picTarget2Pixels)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picTarget2PSF)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pb1)).BeginInit();
+            this.panel2.SuspendLayout();
+            this.menuStrip1.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
+            this.pnlMain.SuspendLayout();
+            this.panel1.SuspendLayout();
+            this.pnlChart.SuspendLayout();
             this.SuspendLayout();
             // 
             // pnlLegend
@@ -188,762 +189,6 @@
             this.pnlLegend.Name = "pnlLegend";
             this.pnlLegend.Size = new System.Drawing.Size(704, 87);
             this.pnlLegend.TabIndex = 1;
-            // 
-            // panel2
-            // 
-            this.panel2.Controls.Add(this.sbZoomStartFrame);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel2.Location = new System.Drawing.Point(0, 0);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(704, 19);
-            this.panel2.TabIndex = 3;
-            // 
-            // sbZoomStartFrame
-            // 
-            this.sbZoomStartFrame.Dock = System.Windows.Forms.DockStyle.Top;
-            this.sbZoomStartFrame.Location = new System.Drawing.Point(0, 0);
-            this.sbZoomStartFrame.Name = "sbZoomStartFrame";
-            this.sbZoomStartFrame.Size = new System.Drawing.Size(704, 16);
-            this.sbZoomStartFrame.TabIndex = 2;
-            this.sbZoomStartFrame.ValueChanged += new System.EventHandler(this.hScrollBar1_ValueChanged);
-            this.sbZoomStartFrame.MouseCaptureChanged += new System.EventHandler(this.sbZoomStartFrame_MouseCaptureChanged);
-            // 
-            // imageList1
-            // 
-            this.imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
-            this.imageList1.TransparentColor = System.Drawing.Color.White;
-            this.imageList1.Images.SetKeyName(0, "minus15x15.bmp");
-            this.imageList1.Images.SetKeyName(1, "plus15x15.bmp");
-            this.imageList1.Images.SetKeyName(2, "m15x15.bmp");
-            // 
-            // menuStrip1
-            // 
-            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.lightCurveToolStripMenuItem,
-            this.miData,
-            this.processToolStripMenuItem,
-            this.miAddins});
-            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
-            this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(704, 24);
-            this.menuStrip1.TabIndex = 3;
-            this.menuStrip1.Text = "menuStrip1";
-            // 
-            // lightCurveToolStripMenuItem
-            // 
-            this.lightCurveToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.miLoad,
-            this.miSave,
-            this.exportToCSVToolStripMenuItem,
-            this.toolStripMenuItem2,
-            this.miLightCurveInformation});
-            this.lightCurveToolStripMenuItem.Name = "lightCurveToolStripMenuItem";
-            this.lightCurveToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
-            this.lightCurveToolStripMenuItem.Text = "&File";
-            // 
-            // miLoad
-            // 
-            this.miLoad.Name = "miLoad";
-            this.miLoad.Size = new System.Drawing.Size(201, 22);
-            this.miLoad.Text = "&Load Light Curve";
-            this.miLoad.Click += new System.EventHandler(this.miLoad_Click);
-            // 
-            // miSave
-            // 
-            this.miSave.Name = "miSave";
-            this.miSave.Size = new System.Drawing.Size(201, 22);
-            this.miSave.Text = "&Save Light Curve";
-            this.miSave.Click += new System.EventHandler(this.miSave_Click);
-            // 
-            // exportToCSVToolStripMenuItem
-            // 
-            this.exportToCSVToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.miExportTangraCSV,
-            this.miSaveAsImage,
-            this.miSaveAsVectorImage,
-            this.toolStripSeparator1,
-            this.miCopyToClipboard});
-            this.exportToCSVToolStripMenuItem.Name = "exportToCSVToolStripMenuItem";
-            this.exportToCSVToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
-            this.exportToCSVToolStripMenuItem.Text = "&Export Light Curve";
-            // 
-            // miExportTangraCSV
-            // 
-            this.miExportTangraCSV.Name = "miExportTangraCSV";
-            this.miExportTangraCSV.Size = new System.Drawing.Size(239, 22);
-            this.miExportTangraCSV.Text = "Save as &CSV File";
-            this.miExportTangraCSV.Click += new System.EventHandler(this.miExportTangraCSV_Click);
-            // 
-            // miSaveAsImage
-            // 
-            this.miSaveAsImage.Name = "miSaveAsImage";
-            this.miSaveAsImage.Size = new System.Drawing.Size(239, 22);
-            this.miSaveAsImage.Text = "Save as &Image File";
-            this.miSaveAsImage.Click += new System.EventHandler(this.miSaveAsImage_Click);
-            // 
-            // miSaveAsVectorImage
-            // 
-            this.miSaveAsVectorImage.Name = "miSaveAsVectorImage";
-            this.miSaveAsVectorImage.Size = new System.Drawing.Size(239, 22);
-            this.miSaveAsVectorImage.Text = "Save as Vector Image File (EMF)";
-            this.miSaveAsVectorImage.Click += new System.EventHandler(this.miSaveAsVectorImage_Click);
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(236, 6);
-            // 
-            // miCopyToClipboard
-            // 
-            this.miCopyToClipboard.Name = "miCopyToClipboard";
-            this.miCopyToClipboard.Size = new System.Drawing.Size(239, 22);
-            this.miCopyToClipboard.Text = "Copy &Plot to Clipboard";
-            this.miCopyToClipboard.Click += new System.EventHandler(this.miCopyToClipboard_Click);
-            // 
-            // toolStripMenuItem2
-            // 
-            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(198, 6);
-            // 
-            // miLightCurveInformation
-            // 
-            this.miLightCurveInformation.Name = "miLightCurveInformation";
-            this.miLightCurveInformation.Size = new System.Drawing.Size(201, 22);
-            this.miLightCurveInformation.Text = "Light Curve &Information";
-            this.miLightCurveInformation.Click += new System.EventHandler(this.miLightCurveInformation_Click);
-            // 
-            // miData
-            // 
-            this.miData.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.miShowZoomedAreas,
-            this.miShowPSFFits,
-            this.miBackgroundHistograms,
-            this.toolStripSeparator3,
-            this.miOutlierRemoval,
-            this.miCurrDataPoint,
-            this.toolStripSeparator5,
-            this.miReprocess,
-            this.miFullReprocess,
-            this.miAdjustMeasurements,
-            this.toolStripSeparator2,
-            this.miNoiseDistribution,
-            this.miPixelDistribution,
-            this.miExportNTPDebugData});
-            this.miData.Name = "miData";
-            this.miData.Size = new System.Drawing.Size(43, 20);
-            this.miData.Text = "&Data";
-            // 
-            // miShowZoomedAreas
-            // 
-            this.miShowZoomedAreas.CheckOnClick = true;
-            this.miShowZoomedAreas.Name = "miShowZoomedAreas";
-            this.miShowZoomedAreas.Size = new System.Drawing.Size(234, 22);
-            this.miShowZoomedAreas.Text = "Show &Measured Pixel Areas";
-            this.miShowZoomedAreas.Click += new System.EventHandler(this.miShowZoomedAreas_Click);
-            // 
-            // miShowPSFFits
-            // 
-            this.miShowPSFFits.CheckOnClick = true;
-            this.miShowPSFFits.Name = "miShowPSFFits";
-            this.miShowPSFFits.Size = new System.Drawing.Size(234, 22);
-            this.miShowPSFFits.Text = "Show PSF Fits";
-            this.miShowPSFFits.Click += new System.EventHandler(this.miShowPSFFits_Click);
-            // 
-            // miBackgroundHistograms
-            // 
-            this.miBackgroundHistograms.CheckOnClick = true;
-            this.miBackgroundHistograms.Name = "miBackgroundHistograms";
-            this.miBackgroundHistograms.Size = new System.Drawing.Size(234, 22);
-            this.miBackgroundHistograms.Text = "Show &Background Histograms";
-            this.miBackgroundHistograms.Click += new System.EventHandler(this.miBackgroundHistograms_Click);
-            // 
-            // toolStripSeparator3
-            // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(231, 6);
-            // 
-            // miOutlierRemoval
-            // 
-            this.miOutlierRemoval.CheckOnClick = true;
-            this.miOutlierRemoval.Name = "miOutlierRemoval";
-            this.miOutlierRemoval.Size = new System.Drawing.Size(234, 22);
-            this.miOutlierRemoval.Text = "Automatic Outlier Removal";
-            this.miOutlierRemoval.CheckedChanged += new System.EventHandler(this.miOutlierRemoval_CheckedChanged);
-            // 
-            // miCurrDataPoint
-            // 
-            this.miCurrDataPoint.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.miSetInvalidDataPoint,
-            this.miSetValidDataPoint});
-            this.miCurrDataPoint.Name = "miCurrDataPoint";
-            this.miCurrDataPoint.Size = new System.Drawing.Size(234, 22);
-            this.miCurrDataPoint.Text = "Modify Current Data Point";
-            this.miCurrDataPoint.DropDownOpening += new System.EventHandler(this.miCurrDataPoint_DropDownOpening);
-            // 
-            // miSetInvalidDataPoint
-            // 
-            this.miSetInvalidDataPoint.Name = "miSetInvalidDataPoint";
-            this.miSetInvalidDataPoint.Size = new System.Drawing.Size(128, 22);
-            this.miSetInvalidDataPoint.Text = "Set &Invalid";
-            this.miSetInvalidDataPoint.Click += new System.EventHandler(this.miSetInvalidDataPoint_Click);
-            // 
-            // miSetValidDataPoint
-            // 
-            this.miSetValidDataPoint.Name = "miSetValidDataPoint";
-            this.miSetValidDataPoint.Size = new System.Drawing.Size(128, 22);
-            this.miSetValidDataPoint.Text = "Set &Valid";
-            this.miSetValidDataPoint.Click += new System.EventHandler(this.miSetValidDataPoint_Click);
-            // 
-            // toolStripSeparator5
-            // 
-            this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(231, 6);
-            // 
-            // miReprocess
-            // 
-            this.miReprocess.Name = "miReprocess";
-            this.miReprocess.Size = new System.Drawing.Size(234, 22);
-            this.miReprocess.Text = "Quick &Re-Process";
-            this.miReprocess.Click += new System.EventHandler(this.miReprocess_Click);
-            // 
-            // miFullReprocess
-            // 
-            this.miFullReprocess.Name = "miFullReprocess";
-            this.miFullReprocess.Size = new System.Drawing.Size(234, 22);
-            this.miFullReprocess.Text = "&Full Re-Process";
-            this.miFullReprocess.Click += new System.EventHandler(this.miFullReprocess_Click);
-            // 
-            // miAdjustMeasurements
-            // 
-            this.miAdjustMeasurements.Name = "miAdjustMeasurements";
-            this.miAdjustMeasurements.Size = new System.Drawing.Size(234, 22);
-            this.miAdjustMeasurements.Text = "&Edit Measurements";
-            this.miAdjustMeasurements.Click += new System.EventHandler(this.miAdjustMeasurements_Click);
-            // 
-            // toolStripSeparator2
-            // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(231, 6);
-            // 
-            // miNoiseDistribution
-            // 
-            this.miNoiseDistribution.Name = "miNoiseDistribution";
-            this.miNoiseDistribution.Size = new System.Drawing.Size(234, 22);
-            this.miNoiseDistribution.Text = "&Reduced Data Distribution";
-            this.miNoiseDistribution.Click += new System.EventHandler(this.miNoiseDistribution_Click);
-            // 
-            // miPixelDistribution
-            // 
-            this.miPixelDistribution.Name = "miPixelDistribution";
-            this.miPixelDistribution.Size = new System.Drawing.Size(234, 22);
-            this.miPixelDistribution.Text = "Frame &Pixels Distribution";
-            this.miPixelDistribution.Click += new System.EventHandler(this.miPixelDistribution_Click);
-            // 
-            // miExportNTPDebugData
-            // 
-            this.miExportNTPDebugData.Name = "miExportNTPDebugData";
-            this.miExportNTPDebugData.Size = new System.Drawing.Size(234, 22);
-            this.miExportNTPDebugData.Text = "Export NTP vs OCR-ed Times";
-            this.miExportNTPDebugData.Visible = false;
-            this.miExportNTPDebugData.Click += new System.EventHandler(this.miExportNTPDebugData_Click);
-            // 
-            // processToolStripMenuItem
-            // 
-            this.processToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.miDisplaySettings,
-            this.miAddTitle,
-            this.xAxisLabelsToolStripMenuItem,
-            this.yAxisLabelsToolStripMenuItem,
-            this.miLightCurvePlot});
-            this.processToolStripMenuItem.Name = "processToolStripMenuItem";
-            this.processToolStripMenuItem.Size = new System.Drawing.Size(75, 20);
-            this.processToolStripMenuItem.Text = "&Customize";
-            // 
-            // miDisplaySettings
-            // 
-            this.miDisplaySettings.Name = "miDisplaySettings";
-            this.miDisplaySettings.Size = new System.Drawing.Size(159, 22);
-            this.miDisplaySettings.Text = "&Display Settings";
-            this.miDisplaySettings.Click += new System.EventHandler(this.miDisplaySettings_Click);
-            // 
-            // miAddTitle
-            // 
-            this.miAddTitle.Name = "miAddTitle";
-            this.miAddTitle.Size = new System.Drawing.Size(159, 22);
-            this.miAddTitle.Text = "Set Graph Title";
-            this.miAddTitle.Click += new System.EventHandler(this.miAddTitle_Click);
-            // 
-            // xAxisLabelsToolStripMenuItem
-            // 
-            this.xAxisLabelsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.miXAxisUserFrameNumbers,
-            this.miXAxisUserTime});
-            this.xAxisLabelsToolStripMenuItem.Name = "xAxisLabelsToolStripMenuItem";
-            this.xAxisLabelsToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
-            this.xAxisLabelsToolStripMenuItem.Text = "&X Axis Labels";
-            // 
-            // miXAxisUserFrameNumbers
-            // 
-            this.miXAxisUserFrameNumbers.Name = "miXAxisUserFrameNumbers";
-            this.miXAxisUserFrameNumbers.Size = new System.Drawing.Size(159, 22);
-            this.miXAxisUserFrameNumbers.Text = "&Frame Numbers";
-            this.miXAxisUserFrameNumbers.Click += new System.EventHandler(this.miXAxisUserFrameNumbers_Click);
-            // 
-            // miXAxisUserTime
-            // 
-            this.miXAxisUserTime.Name = "miXAxisUserTime";
-            this.miXAxisUserTime.Size = new System.Drawing.Size(159, 22);
-            this.miXAxisUserTime.Text = "&Time";
-            this.miXAxisUserTime.Click += new System.EventHandler(this.miXAxisUserTime_Click);
-            // 
-            // yAxisLabelsToolStripMenuItem
-            // 
-            this.yAxisLabelsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.miYAxisFlux,
-            this.miYAxisMags});
-            this.yAxisLabelsToolStripMenuItem.Name = "yAxisLabelsToolStripMenuItem";
-            this.yAxisLabelsToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
-            this.yAxisLabelsToolStripMenuItem.Text = "&Y Axis Labels";
-            // 
-            // miYAxisFlux
-            // 
-            this.miYAxisFlux.Checked = true;
-            this.miYAxisFlux.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.miYAxisFlux.Name = "miYAxisFlux";
-            this.miYAxisFlux.Size = new System.Drawing.Size(137, 22);
-            this.miYAxisFlux.Text = "&Flux";
-            this.miYAxisFlux.Click += new System.EventHandler(this.miYAxisFlux_Click);
-            // 
-            // miYAxisMags
-            // 
-            this.miYAxisMags.Name = "miYAxisMags";
-            this.miYAxisMags.Size = new System.Drawing.Size(137, 22);
-            this.miYAxisMags.Text = "&Magnitudes";
-            this.miYAxisMags.Click += new System.EventHandler(this.miYAxisMags_Click);
-            // 
-            // miLightCurvePlot
-            // 
-            this.miLightCurvePlot.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.miLightCurveLine,
-            this.miLightCurveScatter});
-            this.miLightCurvePlot.Name = "miLightCurvePlot";
-            this.miLightCurvePlot.Size = new System.Drawing.Size(159, 22);
-            this.miLightCurvePlot.Text = "Light Curve Plot";
-            // 
-            // miLightCurveLine
-            // 
-            this.miLightCurveLine.Checked = true;
-            this.miLightCurveLine.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.miLightCurveLine.Name = "miLightCurveLine";
-            this.miLightCurveLine.Size = new System.Drawing.Size(110, 22);
-            this.miLightCurveLine.Text = "&Line";
-            this.miLightCurveLine.Click += new System.EventHandler(this.miLightCurveLine_Click);
-            // 
-            // miLightCurveScatter
-            // 
-            this.miLightCurveScatter.Name = "miLightCurveScatter";
-            this.miLightCurveScatter.Size = new System.Drawing.Size(110, 22);
-            this.miLightCurveScatter.Text = "&Scatter";
-            this.miLightCurveScatter.Click += new System.EventHandler(this.miLightCurveScatter_Click);
-            // 
-            // miAddins
-            // 
-            this.miAddins.Name = "miAddins";
-            this.miAddins.Size = new System.Drawing.Size(61, 20);
-            this.miAddins.Text = "&Add-ins";
-            // 
-            // saveFileDialog
-            // 
-            this.saveFileDialog.DefaultExt = "lc";
-            this.saveFileDialog.Filter = "Tangra Light Curves (*.lc)|*.lc";
-            // 
-            // statusStrip1
-            // 
-            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.tslblSignalType,
-            this.tslblNormalisation,
-            this.tslblBinning,
-            this.miIncludeObject});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 492);
-            this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(704, 22);
-            this.statusStrip1.TabIndex = 4;
-            this.statusStrip1.Text = "statusStrip";
-            // 
-            // tslblSignalType
-            // 
-            this.tslblSignalType.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.miSignalDividedByNoise,
-            this.miSignalDividedByBackground,
-            this.toolStripSeparator4,
-            this.miNoiseOnly,
-            this.miSignalMinusNoise,
-            this.miSignalOnly});
-            this.tslblSignalType.Name = "tslblSignalType";
-            this.tslblSignalType.Size = new System.Drawing.Size(159, 20);
-            this.tslblSignalType.Text = "Signal-minus-Background";
-            // 
-            // miSignalDividedByNoise
-            // 
-            this.miSignalDividedByNoise.Name = "miSignalDividedByNoise";
-            this.miSignalDividedByNoise.Size = new System.Drawing.Size(262, 22);
-            this.miSignalDividedByNoise.Text = "Signal-divided by-Noise ( % )";
-            this.miSignalDividedByNoise.Click += new System.EventHandler(this.SignalMenuItemChecked);
-            // 
-            // miSignalDividedByBackground
-            // 
-            this.miSignalDividedByBackground.Name = "miSignalDividedByBackground";
-            this.miSignalDividedByBackground.Size = new System.Drawing.Size(262, 22);
-            this.miSignalDividedByBackground.Text = "Signal-divided by-Background ( % )";
-            this.miSignalDividedByBackground.Click += new System.EventHandler(this.SignalMenuItemChecked);
-            // 
-            // toolStripSeparator4
-            // 
-            this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(259, 6);
-            // 
-            // miNoiseOnly
-            // 
-            this.miNoiseOnly.Name = "miNoiseOnly";
-            this.miNoiseOnly.Size = new System.Drawing.Size(262, 22);
-            this.miNoiseOnly.Text = "Background-Only";
-            this.miNoiseOnly.Click += new System.EventHandler(this.SignalMenuItemChecked);
-            // 
-            // miSignalMinusNoise
-            // 
-            this.miSignalMinusNoise.Checked = true;
-            this.miSignalMinusNoise.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.miSignalMinusNoise.Name = "miSignalMinusNoise";
-            this.miSignalMinusNoise.Size = new System.Drawing.Size(262, 22);
-            this.miSignalMinusNoise.Text = "Signal-minus-Background";
-            this.miSignalMinusNoise.Click += new System.EventHandler(this.SignalMenuItemChecked);
-            // 
-            // miSignalOnly
-            // 
-            this.miSignalOnly.Name = "miSignalOnly";
-            this.miSignalOnly.Size = new System.Drawing.Size(262, 22);
-            this.miSignalOnly.Text = "Signal-Only";
-            this.miSignalOnly.Click += new System.EventHandler(this.SignalMenuItemChecked);
-            // 
-            // tslblNormalisation
-            // 
-            this.tslblNormalisation.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.normalisationToolStripMenuItem,
-            this.miNoNormalization});
-            this.tslblNormalisation.Name = "tslblNormalisation";
-            this.tslblNormalisation.Size = new System.Drawing.Size(114, 20);
-            this.tslblNormalisation.Text = "No Normalisation";
-            // 
-            // normalisationToolStripMenuItem
-            // 
-            this.normalisationToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.miNormalisation1,
-            this.miNormalisation2,
-            this.miNormalisation3,
-            this.miNormalisation4,
-            this.miNormalizationSeparator,
-            this.miNormalisationMethod});
-            this.normalisationToolStripMenuItem.Name = "normalisationToolStripMenuItem";
-            this.normalisationToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
-            this.normalisationToolStripMenuItem.Text = "      Normalisation";
-            this.normalisationToolStripMenuItem.DropDownOpening += new System.EventHandler(this.normalisationToolStripMenuItem_DropDownOpening);
-            // 
-            // miNormalisation1
-            // 
-            this.miNormalisation1.Name = "miNormalisation1";
-            this.miNormalisation1.Size = new System.Drawing.Size(194, 22);
-            this.miNormalisation1.Text = "Use Object 1";
-            this.miNormalisation1.Click += new System.EventHandler(this.NormalizationMenuItemChecked);
-            // 
-            // miNormalisation2
-            // 
-            this.miNormalisation2.Name = "miNormalisation2";
-            this.miNormalisation2.Size = new System.Drawing.Size(194, 22);
-            this.miNormalisation2.Text = "Use Object 2";
-            this.miNormalisation2.Click += new System.EventHandler(this.NormalizationMenuItemChecked);
-            // 
-            // miNormalisation3
-            // 
-            this.miNormalisation3.Name = "miNormalisation3";
-            this.miNormalisation3.Size = new System.Drawing.Size(194, 22);
-            this.miNormalisation3.Text = "Use Object 3";
-            this.miNormalisation3.Click += new System.EventHandler(this.NormalizationMenuItemChecked);
-            // 
-            // miNormalisation4
-            // 
-            this.miNormalisation4.Name = "miNormalisation4";
-            this.miNormalisation4.Size = new System.Drawing.Size(194, 22);
-            this.miNormalisation4.Text = "Use Object 4";
-            this.miNormalisation4.Click += new System.EventHandler(this.NormalizationMenuItemChecked);
-            // 
-            // miNormalizationSeparator
-            // 
-            this.miNormalizationSeparator.Name = "miNormalizationSeparator";
-            this.miNormalizationSeparator.Size = new System.Drawing.Size(191, 6);
-            // 
-            // miNormalisationMethod
-            // 
-            this.miNormalisationMethod.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.miNormalisationLinearFit,
-            this.miNormalisation1DataPoints,
-            this.miNormalisation4DataPoints,
-            this.miNormalisation8DataPoints,
-            this.miNormalisation16DataPoints});
-            this.miNormalisationMethod.Name = "miNormalisationMethod";
-            this.miNormalisationMethod.Size = new System.Drawing.Size(194, 22);
-            this.miNormalisationMethod.Text = "Normalisation Method";
-            // 
-            // miNormalisationLinearFit
-            // 
-            this.miNormalisationLinearFit.Name = "miNormalisationLinearFit";
-            this.miNormalisationLinearFit.Size = new System.Drawing.Size(207, 22);
-            this.miNormalisationLinearFit.Text = "Linear Fit";
-            this.miNormalisationLinearFit.Click += new System.EventHandler(this.OnNormalisationMethodChanged);
-            // 
-            // miNormalisation1DataPoints
-            // 
-            this.miNormalisation1DataPoints.Name = "miNormalisation1DataPoints";
-            this.miNormalisation1DataPoints.Size = new System.Drawing.Size(207, 22);
-            this.miNormalisation1DataPoints.Text = "Data Point per Data Point";
-            this.miNormalisation1DataPoints.Click += new System.EventHandler(this.OnNormalisationMethodChanged);
-            // 
-            // miNormalisation4DataPoints
-            // 
-            this.miNormalisation4DataPoints.Checked = true;
-            this.miNormalisation4DataPoints.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.miNormalisation4DataPoints.Name = "miNormalisation4DataPoints";
-            this.miNormalisation4DataPoints.Size = new System.Drawing.Size(207, 22);
-            this.miNormalisation4DataPoints.Text = "4 Data Points Average";
-            this.miNormalisation4DataPoints.Click += new System.EventHandler(this.OnNormalisationMethodChanged);
-            // 
-            // miNormalisation8DataPoints
-            // 
-            this.miNormalisation8DataPoints.Name = "miNormalisation8DataPoints";
-            this.miNormalisation8DataPoints.Size = new System.Drawing.Size(207, 22);
-            this.miNormalisation8DataPoints.Text = "8 Data Points Average";
-            this.miNormalisation8DataPoints.Click += new System.EventHandler(this.OnNormalisationMethodChanged);
-            // 
-            // miNormalisation16DataPoints
-            // 
-            this.miNormalisation16DataPoints.Name = "miNormalisation16DataPoints";
-            this.miNormalisation16DataPoints.Size = new System.Drawing.Size(207, 22);
-            this.miNormalisation16DataPoints.Text = "16 Data Points Average";
-            this.miNormalisation16DataPoints.Click += new System.EventHandler(this.OnNormalisationMethodChanged);
-            // 
-            // miNoNormalization
-            // 
-            this.miNoNormalization.Checked = true;
-            this.miNoNormalization.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.miNoNormalization.Name = "miNoNormalization";
-            this.miNoNormalization.Size = new System.Drawing.Size(168, 22);
-            this.miNoNormalization.Text = "No Normalisation";
-            this.miNoNormalization.Click += new System.EventHandler(this.NormalizationMenuItemChecked);
-            // 
-            // tslblBinning
-            // 
-            this.tslblBinning.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.binningToolStripMenuItem,
-            this.miNoBinning});
-            this.tslblBinning.Name = "tslblBinning";
-            this.tslblBinning.Size = new System.Drawing.Size(80, 20);
-            this.tslblBinning.Text = "No Binning";
-            // 
-            // binningToolStripMenuItem
-            // 
-            this.binningToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.miBinning4,
-            this.miBinning8,
-            this.miBinning16,
-            this.miBinning32,
-            this.miBinning64,
-            this.toolStripMenuItem1,
-            this.miCustomBinning});
-            this.binningToolStripMenuItem.Name = "binningToolStripMenuItem";
-            this.binningToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
-            this.binningToolStripMenuItem.Text = "      Binning";
-            // 
-            // miBinning4
-            // 
-            this.miBinning4.Name = "miBinning4";
-            this.miBinning4.Size = new System.Drawing.Size(127, 22);
-            this.miBinning4.Text = "  4 Frames";
-            this.miBinning4.Click += new System.EventHandler(this.BinningMenuItemChecked);
-            // 
-            // miBinning8
-            // 
-            this.miBinning8.Name = "miBinning8";
-            this.miBinning8.Size = new System.Drawing.Size(127, 22);
-            this.miBinning8.Text = "  8 Frames";
-            this.miBinning8.Click += new System.EventHandler(this.BinningMenuItemChecked);
-            // 
-            // miBinning16
-            // 
-            this.miBinning16.Name = "miBinning16";
-            this.miBinning16.Size = new System.Drawing.Size(127, 22);
-            this.miBinning16.Text = "16 Frames";
-            this.miBinning16.Click += new System.EventHandler(this.BinningMenuItemChecked);
-            // 
-            // miBinning32
-            // 
-            this.miBinning32.Name = "miBinning32";
-            this.miBinning32.Size = new System.Drawing.Size(127, 22);
-            this.miBinning32.Text = "32 Frames";
-            this.miBinning32.Click += new System.EventHandler(this.BinningMenuItemChecked);
-            // 
-            // miBinning64
-            // 
-            this.miBinning64.Name = "miBinning64";
-            this.miBinning64.Size = new System.Drawing.Size(127, 22);
-            this.miBinning64.Text = "64 Frames";
-            this.miBinning64.Click += new System.EventHandler(this.BinningMenuItemChecked);
-            // 
-            // toolStripMenuItem1
-            // 
-            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(124, 6);
-            // 
-            // miCustomBinning
-            // 
-            this.miCustomBinning.Name = "miCustomBinning";
-            this.miCustomBinning.Size = new System.Drawing.Size(127, 22);
-            this.miCustomBinning.Text = "Custom";
-            this.miCustomBinning.Click += new System.EventHandler(this.BinningMenuItemChecked);
-            // 
-            // miNoBinning
-            // 
-            this.miNoBinning.Checked = true;
-            this.miNoBinning.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.miNoBinning.Name = "miNoBinning";
-            this.miNoBinning.Size = new System.Drawing.Size(137, 22);
-            this.miNoBinning.Text = " No Binning";
-            this.miNoBinning.Click += new System.EventHandler(this.BinningMenuItemChecked);
-            // 
-            // miIncludeObject
-            // 
-            this.miIncludeObject.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.miIncludeObj4,
-            this.miIncludeObj3,
-            this.miIncludeObj2,
-            this.miIncludeObj1});
-            this.miIncludeObject.Image = ((System.Drawing.Image)(resources.GetObject("miIncludeObject.Image")));
-            this.miIncludeObject.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.miIncludeObject.Name = "miIncludeObject";
-            this.miIncludeObject.Size = new System.Drawing.Size(118, 20);
-            this.miIncludeObject.Text = "Include Objects";
-            // 
-            // miIncludeObj4
-            // 
-            this.miIncludeObj4.Name = "miIncludeObj4";
-            this.miIncludeObj4.Size = new System.Drawing.Size(118, 22);
-            this.miIncludeObj4.Text = "Object 4";
-            this.miIncludeObj4.Click += new System.EventHandler(this.HandleIncludeExcludeObject);
-            // 
-            // miIncludeObj3
-            // 
-            this.miIncludeObj3.Name = "miIncludeObj3";
-            this.miIncludeObj3.Size = new System.Drawing.Size(118, 22);
-            this.miIncludeObj3.Text = "Object 3";
-            this.miIncludeObj3.Click += new System.EventHandler(this.HandleIncludeExcludeObject);
-            // 
-            // miIncludeObj2
-            // 
-            this.miIncludeObj2.Name = "miIncludeObj2";
-            this.miIncludeObj2.Size = new System.Drawing.Size(118, 22);
-            this.miIncludeObj2.Text = "Object 2";
-            this.miIncludeObj2.Click += new System.EventHandler(this.HandleIncludeExcludeObject);
-            // 
-            // miIncludeObj1
-            // 
-            this.miIncludeObj1.Name = "miIncludeObj1";
-            this.miIncludeObj1.Size = new System.Drawing.Size(118, 22);
-            this.miIncludeObj1.Text = "Object 1";
-            this.miIncludeObj1.Click += new System.EventHandler(this.HandleIncludeExcludeObject);
-            // 
-            // pnlMain
-            // 
-            this.pnlMain.Controls.Add(this.panel1);
-            this.pnlMain.Controls.Add(this.pnlLegend);
-            this.pnlMain.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlMain.Location = new System.Drawing.Point(0, 24);
-            this.pnlMain.Name = "pnlMain";
-            this.pnlMain.Size = new System.Drawing.Size(704, 468);
-            this.pnlMain.TabIndex = 5;
-            // 
-            // panel1
-            // 
-            this.panel1.Controls.Add(this.pnlChart);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(0, 0);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(704, 381);
-            this.panel1.TabIndex = 3;
-            // 
-            // hintTimer
-            // 
-            this.hintTimer.Interval = 3000;
-            // 
-            // saveImageDialog
-            // 
-            this.saveImageDialog.DefaultExt = "png";
-            this.saveImageDialog.Filter = "Bitmap (*.bmp)|*.bmp|JPEG Image (*.jpg)|*.jpg|PNG Image (*.png)|*.png";
-            // 
-            // saveCSVDialog
-            // 
-            this.saveCSVDialog.DefaultExt = "csv";
-            this.saveCSVDialog.Filter = "Comma Separated Values (*.csv)|*.csv";
-            // 
-            // firstFrameTimer
-            // 
-            this.firstFrameTimer.Interval = 250;
-            this.firstFrameTimer.Tick += new System.EventHandler(this.firstFrameTimer_Tick);
-            // 
-            // saveWmfFileDialog
-            // 
-            this.saveWmfFileDialog.DefaultExt = "emf";
-            this.saveWmfFileDialog.Filter = "Enhanced Metafile (*.emf)|*.emf";
-            // 
-            // pnlChart
-            // 
-            this.pnlChart.BackColor = System.Drawing.Color.White;
-            this.pnlChart.Controls.Add(this.btnZoomIn);
-            this.pnlChart.Controls.Add(this.btnZoomOut);
-            this.pnlChart.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlChart.Location = new System.Drawing.Point(0, 0);
-            this.pnlChart.Name = "pnlChart";
-            this.pnlChart.Size = new System.Drawing.Size(704, 381);
-            this.pnlChart.TabIndex = 1;
-            this.pnlChart.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pnlChart_MouseClick);
-            this.pnlChart.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.pnlChart_PreviewKeyDown);
-            // 
-            // btnZoomIn
-            // 
-            this.btnZoomIn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnZoomIn.BackColor = System.Drawing.SystemColors.Control;
-            this.btnZoomIn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnZoomIn.ImageIndex = 1;
-            this.btnZoomIn.ImageList = this.imageList1;
-            this.btnZoomIn.Location = new System.Drawing.Point(647, 5);
-            this.btnZoomIn.Name = "btnZoomIn";
-            this.btnZoomIn.Size = new System.Drawing.Size(16, 16);
-            this.btnZoomIn.TabIndex = 1;
-            this.btnZoomIn.TabStop = false;
-            this.btnZoomIn.UseVisualStyleBackColor = false;
-            this.btnZoomIn.Click += new System.EventHandler(this.btnZoomIn_Click);
-            // 
-            // btnZoomOut
-            // 
-            this.btnZoomOut.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnZoomOut.BackColor = System.Drawing.SystemColors.Control;
-            this.btnZoomOut.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnZoomOut.ImageKey = "minus15x15.bmp";
-            this.btnZoomOut.ImageList = this.imageList1;
-            this.btnZoomOut.Location = new System.Drawing.Point(665, 5);
-            this.btnZoomOut.Name = "btnZoomOut";
-            this.btnZoomOut.Size = new System.Drawing.Size(16, 16);
-            this.btnZoomOut.TabIndex = 0;
-            this.btnZoomOut.TabStop = false;
-            this.btnZoomOut.UseVisualStyleBackColor = false;
-            this.btnZoomOut.Click += new System.EventHandler(this.btnZoomOut_Click);
             // 
             // pnlSmallGraph
             // 
@@ -1412,6 +657,771 @@
             this.lblMeasurement4.Size = new System.Drawing.Size(0, 13);
             this.lblMeasurement4.TabIndex = 15;
             // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.sbZoomStartFrame);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel2.Location = new System.Drawing.Point(0, 0);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(704, 19);
+            this.panel2.TabIndex = 3;
+            // 
+            // sbZoomStartFrame
+            // 
+            this.sbZoomStartFrame.Dock = System.Windows.Forms.DockStyle.Top;
+            this.sbZoomStartFrame.Location = new System.Drawing.Point(0, 0);
+            this.sbZoomStartFrame.Name = "sbZoomStartFrame";
+            this.sbZoomStartFrame.Size = new System.Drawing.Size(704, 16);
+            this.sbZoomStartFrame.TabIndex = 2;
+            this.sbZoomStartFrame.ValueChanged += new System.EventHandler(this.hScrollBar1_ValueChanged);
+            this.sbZoomStartFrame.MouseCaptureChanged += new System.EventHandler(this.sbZoomStartFrame_MouseCaptureChanged);
+            // 
+            // imageList1
+            // 
+            this.imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
+            this.imageList1.TransparentColor = System.Drawing.Color.White;
+            this.imageList1.Images.SetKeyName(0, "minus15x15.bmp");
+            this.imageList1.Images.SetKeyName(1, "plus15x15.bmp");
+            this.imageList1.Images.SetKeyName(2, "m15x15.bmp");
+            // 
+            // menuStrip1
+            // 
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.lightCurveToolStripMenuItem,
+            this.miData,
+            this.processToolStripMenuItem,
+            this.miAddins});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(704, 24);
+            this.menuStrip1.TabIndex = 3;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // lightCurveToolStripMenuItem
+            // 
+            this.lightCurveToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miLoad,
+            this.miSave,
+            this.exportToCSVToolStripMenuItem,
+            this.toolStripMenuItem2,
+            this.miLightCurveInformation});
+            this.lightCurveToolStripMenuItem.Name = "lightCurveToolStripMenuItem";
+            this.lightCurveToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
+            this.lightCurveToolStripMenuItem.Text = "&File";
+            // 
+            // miLoad
+            // 
+            this.miLoad.Name = "miLoad";
+            this.miLoad.Size = new System.Drawing.Size(201, 22);
+            this.miLoad.Text = "&Load Light Curve";
+            this.miLoad.Click += new System.EventHandler(this.miLoad_Click);
+            // 
+            // miSave
+            // 
+            this.miSave.Name = "miSave";
+            this.miSave.Size = new System.Drawing.Size(201, 22);
+            this.miSave.Text = "&Save Light Curve";
+            this.miSave.Click += new System.EventHandler(this.miSave_Click);
+            // 
+            // exportToCSVToolStripMenuItem
+            // 
+            this.exportToCSVToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miExportTangraCSV,
+            this.miSaveAsImage,
+            this.miSaveAsVectorImage,
+            this.toolStripSeparator1,
+            this.miCopyToClipboard});
+            this.exportToCSVToolStripMenuItem.Name = "exportToCSVToolStripMenuItem";
+            this.exportToCSVToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
+            this.exportToCSVToolStripMenuItem.Text = "&Export Light Curve";
+            // 
+            // miExportTangraCSV
+            // 
+            this.miExportTangraCSV.Name = "miExportTangraCSV";
+            this.miExportTangraCSV.Size = new System.Drawing.Size(239, 22);
+            this.miExportTangraCSV.Text = "Save as &CSV File";
+            this.miExportTangraCSV.Click += new System.EventHandler(this.miExportTangraCSV_Click);
+            // 
+            // miSaveAsImage
+            // 
+            this.miSaveAsImage.Name = "miSaveAsImage";
+            this.miSaveAsImage.Size = new System.Drawing.Size(239, 22);
+            this.miSaveAsImage.Text = "Save as &Image File";
+            this.miSaveAsImage.Click += new System.EventHandler(this.miSaveAsImage_Click);
+            // 
+            // miSaveAsVectorImage
+            // 
+            this.miSaveAsVectorImage.Name = "miSaveAsVectorImage";
+            this.miSaveAsVectorImage.Size = new System.Drawing.Size(239, 22);
+            this.miSaveAsVectorImage.Text = "Save as Vector Image File (EMF)";
+            this.miSaveAsVectorImage.Click += new System.EventHandler(this.miSaveAsVectorImage_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(236, 6);
+            // 
+            // miCopyToClipboard
+            // 
+            this.miCopyToClipboard.Name = "miCopyToClipboard";
+            this.miCopyToClipboard.Size = new System.Drawing.Size(239, 22);
+            this.miCopyToClipboard.Text = "Copy &Plot to Clipboard";
+            this.miCopyToClipboard.Click += new System.EventHandler(this.miCopyToClipboard_Click);
+            // 
+            // toolStripMenuItem2
+            // 
+            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(198, 6);
+            // 
+            // miLightCurveInformation
+            // 
+            this.miLightCurveInformation.Name = "miLightCurveInformation";
+            this.miLightCurveInformation.Size = new System.Drawing.Size(201, 22);
+            this.miLightCurveInformation.Text = "Light Curve &Information";
+            this.miLightCurveInformation.Click += new System.EventHandler(this.miLightCurveInformation_Click);
+            // 
+            // miData
+            // 
+            this.miData.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miShowZoomedAreas,
+            this.miShowPSFFits,
+            this.miBackgroundHistograms,
+            this.toolStripSeparator3,
+            this.miOutlierRemoval,
+            this.miCurrDataPoint,
+            this.toolStripSeparator5,
+            this.miReprocess,
+            this.miFullReprocess,
+            this.miAdjustMeasurements,
+            this.toolStripSeparator2,
+            this.miNoiseDistribution,
+            this.miPixelDistribution,
+            this.miExportNTPDebugData});
+            this.miData.Name = "miData";
+            this.miData.Size = new System.Drawing.Size(43, 20);
+            this.miData.Text = "&Data";
+            // 
+            // miShowZoomedAreas
+            // 
+            this.miShowZoomedAreas.CheckOnClick = true;
+            this.miShowZoomedAreas.Name = "miShowZoomedAreas";
+            this.miShowZoomedAreas.Size = new System.Drawing.Size(234, 22);
+            this.miShowZoomedAreas.Text = "Show &Measured Pixel Areas";
+            this.miShowZoomedAreas.Click += new System.EventHandler(this.miShowZoomedAreas_Click);
+            // 
+            // miShowPSFFits
+            // 
+            this.miShowPSFFits.CheckOnClick = true;
+            this.miShowPSFFits.Name = "miShowPSFFits";
+            this.miShowPSFFits.Size = new System.Drawing.Size(234, 22);
+            this.miShowPSFFits.Text = "Show PSF Fits";
+            this.miShowPSFFits.Click += new System.EventHandler(this.miShowPSFFits_Click);
+            // 
+            // miBackgroundHistograms
+            // 
+            this.miBackgroundHistograms.CheckOnClick = true;
+            this.miBackgroundHistograms.Name = "miBackgroundHistograms";
+            this.miBackgroundHistograms.Size = new System.Drawing.Size(234, 22);
+            this.miBackgroundHistograms.Text = "Show &Background Histograms";
+            this.miBackgroundHistograms.Click += new System.EventHandler(this.miBackgroundHistograms_Click);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(231, 6);
+            // 
+            // miOutlierRemoval
+            // 
+            this.miOutlierRemoval.CheckOnClick = true;
+            this.miOutlierRemoval.Name = "miOutlierRemoval";
+            this.miOutlierRemoval.Size = new System.Drawing.Size(234, 22);
+            this.miOutlierRemoval.Text = "Automatic Outlier Removal";
+            this.miOutlierRemoval.CheckedChanged += new System.EventHandler(this.miOutlierRemoval_CheckedChanged);
+            // 
+            // miCurrDataPoint
+            // 
+            this.miCurrDataPoint.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miSetInvalidDataPoint,
+            this.miSetValidDataPoint});
+            this.miCurrDataPoint.Name = "miCurrDataPoint";
+            this.miCurrDataPoint.Size = new System.Drawing.Size(234, 22);
+            this.miCurrDataPoint.Text = "Modify Current Data Point";
+            this.miCurrDataPoint.DropDownOpening += new System.EventHandler(this.miCurrDataPoint_DropDownOpening);
+            // 
+            // miSetInvalidDataPoint
+            // 
+            this.miSetInvalidDataPoint.Name = "miSetInvalidDataPoint";
+            this.miSetInvalidDataPoint.Size = new System.Drawing.Size(128, 22);
+            this.miSetInvalidDataPoint.Text = "Set &Invalid";
+            this.miSetInvalidDataPoint.Click += new System.EventHandler(this.miSetInvalidDataPoint_Click);
+            // 
+            // miSetValidDataPoint
+            // 
+            this.miSetValidDataPoint.Name = "miSetValidDataPoint";
+            this.miSetValidDataPoint.Size = new System.Drawing.Size(128, 22);
+            this.miSetValidDataPoint.Text = "Set &Valid";
+            this.miSetValidDataPoint.Click += new System.EventHandler(this.miSetValidDataPoint_Click);
+            // 
+            // toolStripSeparator5
+            // 
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(231, 6);
+            // 
+            // miReprocess
+            // 
+            this.miReprocess.Name = "miReprocess";
+            this.miReprocess.Size = new System.Drawing.Size(234, 22);
+            this.miReprocess.Text = "Quick &Re-Process";
+            this.miReprocess.Click += new System.EventHandler(this.miReprocess_Click);
+            // 
+            // miFullReprocess
+            // 
+            this.miFullReprocess.Name = "miFullReprocess";
+            this.miFullReprocess.Size = new System.Drawing.Size(234, 22);
+            this.miFullReprocess.Text = "&Full Re-Process";
+            this.miFullReprocess.Click += new System.EventHandler(this.miFullReprocess_Click);
+            // 
+            // miAdjustMeasurements
+            // 
+            this.miAdjustMeasurements.Name = "miAdjustMeasurements";
+            this.miAdjustMeasurements.Size = new System.Drawing.Size(234, 22);
+            this.miAdjustMeasurements.Text = "&Edit Measurements";
+            this.miAdjustMeasurements.Click += new System.EventHandler(this.miAdjustMeasurements_Click);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(231, 6);
+            // 
+            // miNoiseDistribution
+            // 
+            this.miNoiseDistribution.Name = "miNoiseDistribution";
+            this.miNoiseDistribution.Size = new System.Drawing.Size(234, 22);
+            this.miNoiseDistribution.Text = "&Reduced Data Distribution";
+            this.miNoiseDistribution.Click += new System.EventHandler(this.miNoiseDistribution_Click);
+            // 
+            // miPixelDistribution
+            // 
+            this.miPixelDistribution.Name = "miPixelDistribution";
+            this.miPixelDistribution.Size = new System.Drawing.Size(234, 22);
+            this.miPixelDistribution.Text = "Frame &Pixels Distribution";
+            this.miPixelDistribution.Click += new System.EventHandler(this.miPixelDistribution_Click);
+            // 
+            // miExportNTPDebugData
+            // 
+            this.miExportNTPDebugData.Name = "miExportNTPDebugData";
+            this.miExportNTPDebugData.Size = new System.Drawing.Size(234, 22);
+            this.miExportNTPDebugData.Text = "Export NTP vs OCR-ed Times";
+            this.miExportNTPDebugData.Visible = false;
+            this.miExportNTPDebugData.Click += new System.EventHandler(this.miExportNTPDebugData_Click);
+            // 
+            // processToolStripMenuItem
+            // 
+            this.processToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miDisplaySettings,
+            this.miAddTitle,
+            this.xAxisLabelsToolStripMenuItem,
+            this.yAxisLabelsToolStripMenuItem,
+            this.miLightCurvePlot,
+            this.miShowZeroADULevel});
+            this.processToolStripMenuItem.Name = "processToolStripMenuItem";
+            this.processToolStripMenuItem.Size = new System.Drawing.Size(75, 20);
+            this.processToolStripMenuItem.Text = "&Customize";
+            // 
+            // miDisplaySettings
+            // 
+            this.miDisplaySettings.Name = "miDisplaySettings";
+            this.miDisplaySettings.Size = new System.Drawing.Size(187, 22);
+            this.miDisplaySettings.Text = "&Display Settings";
+            this.miDisplaySettings.Click += new System.EventHandler(this.miDisplaySettings_Click);
+            // 
+            // miAddTitle
+            // 
+            this.miAddTitle.Name = "miAddTitle";
+            this.miAddTitle.Size = new System.Drawing.Size(187, 22);
+            this.miAddTitle.Text = "Set Graph Title";
+            this.miAddTitle.Click += new System.EventHandler(this.miAddTitle_Click);
+            // 
+            // xAxisLabelsToolStripMenuItem
+            // 
+            this.xAxisLabelsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miXAxisUserFrameNumbers,
+            this.miXAxisUserTime});
+            this.xAxisLabelsToolStripMenuItem.Name = "xAxisLabelsToolStripMenuItem";
+            this.xAxisLabelsToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.xAxisLabelsToolStripMenuItem.Text = "&X Axis Labels";
+            // 
+            // miXAxisUserFrameNumbers
+            // 
+            this.miXAxisUserFrameNumbers.Name = "miXAxisUserFrameNumbers";
+            this.miXAxisUserFrameNumbers.Size = new System.Drawing.Size(159, 22);
+            this.miXAxisUserFrameNumbers.Text = "&Frame Numbers";
+            this.miXAxisUserFrameNumbers.Click += new System.EventHandler(this.miXAxisUserFrameNumbers_Click);
+            // 
+            // miXAxisUserTime
+            // 
+            this.miXAxisUserTime.Name = "miXAxisUserTime";
+            this.miXAxisUserTime.Size = new System.Drawing.Size(159, 22);
+            this.miXAxisUserTime.Text = "&Time";
+            this.miXAxisUserTime.Click += new System.EventHandler(this.miXAxisUserTime_Click);
+            // 
+            // yAxisLabelsToolStripMenuItem
+            // 
+            this.yAxisLabelsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miYAxisFlux,
+            this.miYAxisMags});
+            this.yAxisLabelsToolStripMenuItem.Name = "yAxisLabelsToolStripMenuItem";
+            this.yAxisLabelsToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.yAxisLabelsToolStripMenuItem.Text = "&Y Axis Labels";
+            // 
+            // miYAxisFlux
+            // 
+            this.miYAxisFlux.Checked = true;
+            this.miYAxisFlux.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.miYAxisFlux.Name = "miYAxisFlux";
+            this.miYAxisFlux.Size = new System.Drawing.Size(137, 22);
+            this.miYAxisFlux.Text = "&Flux";
+            this.miYAxisFlux.Click += new System.EventHandler(this.miYAxisFlux_Click);
+            // 
+            // miYAxisMags
+            // 
+            this.miYAxisMags.Name = "miYAxisMags";
+            this.miYAxisMags.Size = new System.Drawing.Size(137, 22);
+            this.miYAxisMags.Text = "&Magnitudes";
+            this.miYAxisMags.Click += new System.EventHandler(this.miYAxisMags_Click);
+            // 
+            // miLightCurvePlot
+            // 
+            this.miLightCurvePlot.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miLightCurveLine,
+            this.miLightCurveScatter});
+            this.miLightCurvePlot.Name = "miLightCurvePlot";
+            this.miLightCurvePlot.Size = new System.Drawing.Size(187, 22);
+            this.miLightCurvePlot.Text = "Light Curve Plot";
+            // 
+            // miLightCurveLine
+            // 
+            this.miLightCurveLine.Checked = true;
+            this.miLightCurveLine.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.miLightCurveLine.Name = "miLightCurveLine";
+            this.miLightCurveLine.Size = new System.Drawing.Size(110, 22);
+            this.miLightCurveLine.Text = "&Line";
+            this.miLightCurveLine.Click += new System.EventHandler(this.miLightCurveLine_Click);
+            // 
+            // miLightCurveScatter
+            // 
+            this.miLightCurveScatter.Name = "miLightCurveScatter";
+            this.miLightCurveScatter.Size = new System.Drawing.Size(110, 22);
+            this.miLightCurveScatter.Text = "&Scatter";
+            this.miLightCurveScatter.Click += new System.EventHandler(this.miLightCurveScatter_Click);
+            // 
+            // miAddins
+            // 
+            this.miAddins.Name = "miAddins";
+            this.miAddins.Size = new System.Drawing.Size(61, 20);
+            this.miAddins.Text = "&Add-ins";
+            // 
+            // saveFileDialog
+            // 
+            this.saveFileDialog.DefaultExt = "lc";
+            this.saveFileDialog.Filter = "Tangra Light Curves (*.lc)|*.lc";
+            // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tslblSignalType,
+            this.tslblNormalisation,
+            this.tslblBinning,
+            this.miIncludeObject});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 492);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(704, 22);
+            this.statusStrip1.TabIndex = 4;
+            this.statusStrip1.Text = "statusStrip";
+            // 
+            // tslblSignalType
+            // 
+            this.tslblSignalType.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miSignalDividedByNoise,
+            this.miSignalDividedByBackground,
+            this.toolStripSeparator4,
+            this.miNoiseOnly,
+            this.miSignalMinusNoise,
+            this.miSignalOnly});
+            this.tslblSignalType.Name = "tslblSignalType";
+            this.tslblSignalType.Size = new System.Drawing.Size(159, 20);
+            this.tslblSignalType.Text = "Signal-minus-Background";
+            // 
+            // miSignalDividedByNoise
+            // 
+            this.miSignalDividedByNoise.Name = "miSignalDividedByNoise";
+            this.miSignalDividedByNoise.Size = new System.Drawing.Size(262, 22);
+            this.miSignalDividedByNoise.Text = "Signal-divided by-Noise ( % )";
+            this.miSignalDividedByNoise.Click += new System.EventHandler(this.SignalMenuItemChecked);
+            // 
+            // miSignalDividedByBackground
+            // 
+            this.miSignalDividedByBackground.Name = "miSignalDividedByBackground";
+            this.miSignalDividedByBackground.Size = new System.Drawing.Size(262, 22);
+            this.miSignalDividedByBackground.Text = "Signal-divided by-Background ( % )";
+            this.miSignalDividedByBackground.Click += new System.EventHandler(this.SignalMenuItemChecked);
+            // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(259, 6);
+            // 
+            // miNoiseOnly
+            // 
+            this.miNoiseOnly.Name = "miNoiseOnly";
+            this.miNoiseOnly.Size = new System.Drawing.Size(262, 22);
+            this.miNoiseOnly.Text = "Background-Only";
+            this.miNoiseOnly.Click += new System.EventHandler(this.SignalMenuItemChecked);
+            // 
+            // miSignalMinusNoise
+            // 
+            this.miSignalMinusNoise.Checked = true;
+            this.miSignalMinusNoise.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.miSignalMinusNoise.Name = "miSignalMinusNoise";
+            this.miSignalMinusNoise.Size = new System.Drawing.Size(262, 22);
+            this.miSignalMinusNoise.Text = "Signal-minus-Background";
+            this.miSignalMinusNoise.Click += new System.EventHandler(this.SignalMenuItemChecked);
+            // 
+            // miSignalOnly
+            // 
+            this.miSignalOnly.Name = "miSignalOnly";
+            this.miSignalOnly.Size = new System.Drawing.Size(262, 22);
+            this.miSignalOnly.Text = "Signal-Only";
+            this.miSignalOnly.Click += new System.EventHandler(this.SignalMenuItemChecked);
+            // 
+            // tslblNormalisation
+            // 
+            this.tslblNormalisation.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.normalisationToolStripMenuItem,
+            this.miNoNormalization});
+            this.tslblNormalisation.Name = "tslblNormalisation";
+            this.tslblNormalisation.Size = new System.Drawing.Size(114, 20);
+            this.tslblNormalisation.Text = "No Normalisation";
+            // 
+            // normalisationToolStripMenuItem
+            // 
+            this.normalisationToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miNormalisation1,
+            this.miNormalisation2,
+            this.miNormalisation3,
+            this.miNormalisation4,
+            this.miNormalizationSeparator,
+            this.miNormalisationMethod});
+            this.normalisationToolStripMenuItem.Name = "normalisationToolStripMenuItem";
+            this.normalisationToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.normalisationToolStripMenuItem.Text = "      Normalisation";
+            this.normalisationToolStripMenuItem.DropDownOpening += new System.EventHandler(this.normalisationToolStripMenuItem_DropDownOpening);
+            // 
+            // miNormalisation1
+            // 
+            this.miNormalisation1.Name = "miNormalisation1";
+            this.miNormalisation1.Size = new System.Drawing.Size(194, 22);
+            this.miNormalisation1.Text = "Use Object 1";
+            this.miNormalisation1.Click += new System.EventHandler(this.NormalizationMenuItemChecked);
+            // 
+            // miNormalisation2
+            // 
+            this.miNormalisation2.Name = "miNormalisation2";
+            this.miNormalisation2.Size = new System.Drawing.Size(194, 22);
+            this.miNormalisation2.Text = "Use Object 2";
+            this.miNormalisation2.Click += new System.EventHandler(this.NormalizationMenuItemChecked);
+            // 
+            // miNormalisation3
+            // 
+            this.miNormalisation3.Name = "miNormalisation3";
+            this.miNormalisation3.Size = new System.Drawing.Size(194, 22);
+            this.miNormalisation3.Text = "Use Object 3";
+            this.miNormalisation3.Click += new System.EventHandler(this.NormalizationMenuItemChecked);
+            // 
+            // miNormalisation4
+            // 
+            this.miNormalisation4.Name = "miNormalisation4";
+            this.miNormalisation4.Size = new System.Drawing.Size(194, 22);
+            this.miNormalisation4.Text = "Use Object 4";
+            this.miNormalisation4.Click += new System.EventHandler(this.NormalizationMenuItemChecked);
+            // 
+            // miNormalizationSeparator
+            // 
+            this.miNormalizationSeparator.Name = "miNormalizationSeparator";
+            this.miNormalizationSeparator.Size = new System.Drawing.Size(191, 6);
+            // 
+            // miNormalisationMethod
+            // 
+            this.miNormalisationMethod.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miNormalisationLinearFit,
+            this.miNormalisation1DataPoints,
+            this.miNormalisation4DataPoints,
+            this.miNormalisation8DataPoints,
+            this.miNormalisation16DataPoints});
+            this.miNormalisationMethod.Name = "miNormalisationMethod";
+            this.miNormalisationMethod.Size = new System.Drawing.Size(194, 22);
+            this.miNormalisationMethod.Text = "Normalisation Method";
+            // 
+            // miNormalisationLinearFit
+            // 
+            this.miNormalisationLinearFit.Name = "miNormalisationLinearFit";
+            this.miNormalisationLinearFit.Size = new System.Drawing.Size(207, 22);
+            this.miNormalisationLinearFit.Text = "Linear Fit";
+            this.miNormalisationLinearFit.Click += new System.EventHandler(this.OnNormalisationMethodChanged);
+            // 
+            // miNormalisation1DataPoints
+            // 
+            this.miNormalisation1DataPoints.Name = "miNormalisation1DataPoints";
+            this.miNormalisation1DataPoints.Size = new System.Drawing.Size(207, 22);
+            this.miNormalisation1DataPoints.Text = "Data Point per Data Point";
+            this.miNormalisation1DataPoints.Click += new System.EventHandler(this.OnNormalisationMethodChanged);
+            // 
+            // miNormalisation4DataPoints
+            // 
+            this.miNormalisation4DataPoints.Checked = true;
+            this.miNormalisation4DataPoints.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.miNormalisation4DataPoints.Name = "miNormalisation4DataPoints";
+            this.miNormalisation4DataPoints.Size = new System.Drawing.Size(207, 22);
+            this.miNormalisation4DataPoints.Text = "4 Data Points Average";
+            this.miNormalisation4DataPoints.Click += new System.EventHandler(this.OnNormalisationMethodChanged);
+            // 
+            // miNormalisation8DataPoints
+            // 
+            this.miNormalisation8DataPoints.Name = "miNormalisation8DataPoints";
+            this.miNormalisation8DataPoints.Size = new System.Drawing.Size(207, 22);
+            this.miNormalisation8DataPoints.Text = "8 Data Points Average";
+            this.miNormalisation8DataPoints.Click += new System.EventHandler(this.OnNormalisationMethodChanged);
+            // 
+            // miNormalisation16DataPoints
+            // 
+            this.miNormalisation16DataPoints.Name = "miNormalisation16DataPoints";
+            this.miNormalisation16DataPoints.Size = new System.Drawing.Size(207, 22);
+            this.miNormalisation16DataPoints.Text = "16 Data Points Average";
+            this.miNormalisation16DataPoints.Click += new System.EventHandler(this.OnNormalisationMethodChanged);
+            // 
+            // miNoNormalization
+            // 
+            this.miNoNormalization.Checked = true;
+            this.miNoNormalization.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.miNoNormalization.Name = "miNoNormalization";
+            this.miNoNormalization.Size = new System.Drawing.Size(168, 22);
+            this.miNoNormalization.Text = "No Normalisation";
+            this.miNoNormalization.Click += new System.EventHandler(this.NormalizationMenuItemChecked);
+            // 
+            // tslblBinning
+            // 
+            this.tslblBinning.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.binningToolStripMenuItem,
+            this.miNoBinning});
+            this.tslblBinning.Name = "tslblBinning";
+            this.tslblBinning.Size = new System.Drawing.Size(80, 20);
+            this.tslblBinning.Text = "No Binning";
+            // 
+            // binningToolStripMenuItem
+            // 
+            this.binningToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miBinning4,
+            this.miBinning8,
+            this.miBinning16,
+            this.miBinning32,
+            this.miBinning64,
+            this.toolStripMenuItem1,
+            this.miCustomBinning});
+            this.binningToolStripMenuItem.Name = "binningToolStripMenuItem";
+            this.binningToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
+            this.binningToolStripMenuItem.Text = "      Binning";
+            // 
+            // miBinning4
+            // 
+            this.miBinning4.Name = "miBinning4";
+            this.miBinning4.Size = new System.Drawing.Size(127, 22);
+            this.miBinning4.Text = "  4 Frames";
+            this.miBinning4.Click += new System.EventHandler(this.BinningMenuItemChecked);
+            // 
+            // miBinning8
+            // 
+            this.miBinning8.Name = "miBinning8";
+            this.miBinning8.Size = new System.Drawing.Size(127, 22);
+            this.miBinning8.Text = "  8 Frames";
+            this.miBinning8.Click += new System.EventHandler(this.BinningMenuItemChecked);
+            // 
+            // miBinning16
+            // 
+            this.miBinning16.Name = "miBinning16";
+            this.miBinning16.Size = new System.Drawing.Size(127, 22);
+            this.miBinning16.Text = "16 Frames";
+            this.miBinning16.Click += new System.EventHandler(this.BinningMenuItemChecked);
+            // 
+            // miBinning32
+            // 
+            this.miBinning32.Name = "miBinning32";
+            this.miBinning32.Size = new System.Drawing.Size(127, 22);
+            this.miBinning32.Text = "32 Frames";
+            this.miBinning32.Click += new System.EventHandler(this.BinningMenuItemChecked);
+            // 
+            // miBinning64
+            // 
+            this.miBinning64.Name = "miBinning64";
+            this.miBinning64.Size = new System.Drawing.Size(127, 22);
+            this.miBinning64.Text = "64 Frames";
+            this.miBinning64.Click += new System.EventHandler(this.BinningMenuItemChecked);
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(124, 6);
+            // 
+            // miCustomBinning
+            // 
+            this.miCustomBinning.Name = "miCustomBinning";
+            this.miCustomBinning.Size = new System.Drawing.Size(127, 22);
+            this.miCustomBinning.Text = "Custom";
+            this.miCustomBinning.Click += new System.EventHandler(this.BinningMenuItemChecked);
+            // 
+            // miNoBinning
+            // 
+            this.miNoBinning.Checked = true;
+            this.miNoBinning.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.miNoBinning.Name = "miNoBinning";
+            this.miNoBinning.Size = new System.Drawing.Size(137, 22);
+            this.miNoBinning.Text = " No Binning";
+            this.miNoBinning.Click += new System.EventHandler(this.BinningMenuItemChecked);
+            // 
+            // miIncludeObject
+            // 
+            this.miIncludeObject.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miIncludeObj4,
+            this.miIncludeObj3,
+            this.miIncludeObj2,
+            this.miIncludeObj1});
+            this.miIncludeObject.Image = ((System.Drawing.Image)(resources.GetObject("miIncludeObject.Image")));
+            this.miIncludeObject.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.miIncludeObject.Name = "miIncludeObject";
+            this.miIncludeObject.Size = new System.Drawing.Size(118, 20);
+            this.miIncludeObject.Text = "Include Objects";
+            // 
+            // miIncludeObj4
+            // 
+            this.miIncludeObj4.Name = "miIncludeObj4";
+            this.miIncludeObj4.Size = new System.Drawing.Size(118, 22);
+            this.miIncludeObj4.Text = "Object 4";
+            this.miIncludeObj4.Click += new System.EventHandler(this.HandleIncludeExcludeObject);
+            // 
+            // miIncludeObj3
+            // 
+            this.miIncludeObj3.Name = "miIncludeObj3";
+            this.miIncludeObj3.Size = new System.Drawing.Size(118, 22);
+            this.miIncludeObj3.Text = "Object 3";
+            this.miIncludeObj3.Click += new System.EventHandler(this.HandleIncludeExcludeObject);
+            // 
+            // miIncludeObj2
+            // 
+            this.miIncludeObj2.Name = "miIncludeObj2";
+            this.miIncludeObj2.Size = new System.Drawing.Size(118, 22);
+            this.miIncludeObj2.Text = "Object 2";
+            this.miIncludeObj2.Click += new System.EventHandler(this.HandleIncludeExcludeObject);
+            // 
+            // miIncludeObj1
+            // 
+            this.miIncludeObj1.Name = "miIncludeObj1";
+            this.miIncludeObj1.Size = new System.Drawing.Size(118, 22);
+            this.miIncludeObj1.Text = "Object 1";
+            this.miIncludeObj1.Click += new System.EventHandler(this.HandleIncludeExcludeObject);
+            // 
+            // pnlMain
+            // 
+            this.pnlMain.Controls.Add(this.panel1);
+            this.pnlMain.Controls.Add(this.pnlLegend);
+            this.pnlMain.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlMain.Location = new System.Drawing.Point(0, 24);
+            this.pnlMain.Name = "pnlMain";
+            this.pnlMain.Size = new System.Drawing.Size(704, 468);
+            this.pnlMain.TabIndex = 5;
+            // 
+            // panel1
+            // 
+            this.panel1.Controls.Add(this.pnlChart);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(0, 0);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(704, 381);
+            this.panel1.TabIndex = 3;
+            // 
+            // pnlChart
+            // 
+            this.pnlChart.BackColor = System.Drawing.Color.White;
+            this.pnlChart.Controls.Add(this.btnZoomIn);
+            this.pnlChart.Controls.Add(this.btnZoomOut);
+            this.pnlChart.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlChart.Location = new System.Drawing.Point(0, 0);
+            this.pnlChart.Name = "pnlChart";
+            this.pnlChart.Size = new System.Drawing.Size(704, 381);
+            this.pnlChart.TabIndex = 1;
+            this.pnlChart.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pnlChart_MouseClick);
+            this.pnlChart.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.pnlChart_PreviewKeyDown);
+            // 
+            // btnZoomIn
+            // 
+            this.btnZoomIn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnZoomIn.BackColor = System.Drawing.SystemColors.Control;
+            this.btnZoomIn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnZoomIn.ImageIndex = 1;
+            this.btnZoomIn.ImageList = this.imageList1;
+            this.btnZoomIn.Location = new System.Drawing.Point(647, 5);
+            this.btnZoomIn.Name = "btnZoomIn";
+            this.btnZoomIn.Size = new System.Drawing.Size(16, 16);
+            this.btnZoomIn.TabIndex = 1;
+            this.btnZoomIn.TabStop = false;
+            this.btnZoomIn.UseVisualStyleBackColor = false;
+            this.btnZoomIn.Click += new System.EventHandler(this.btnZoomIn_Click);
+            // 
+            // btnZoomOut
+            // 
+            this.btnZoomOut.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnZoomOut.BackColor = System.Drawing.SystemColors.Control;
+            this.btnZoomOut.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnZoomOut.ImageKey = "minus15x15.bmp";
+            this.btnZoomOut.ImageList = this.imageList1;
+            this.btnZoomOut.Location = new System.Drawing.Point(665, 5);
+            this.btnZoomOut.Name = "btnZoomOut";
+            this.btnZoomOut.Size = new System.Drawing.Size(16, 16);
+            this.btnZoomOut.TabIndex = 0;
+            this.btnZoomOut.TabStop = false;
+            this.btnZoomOut.UseVisualStyleBackColor = false;
+            this.btnZoomOut.Click += new System.EventHandler(this.btnZoomOut_Click);
+            // 
+            // hintTimer
+            // 
+            this.hintTimer.Interval = 3000;
+            // 
+            // saveImageDialog
+            // 
+            this.saveImageDialog.DefaultExt = "png";
+            this.saveImageDialog.Filter = "Bitmap (*.bmp)|*.bmp|JPEG Image (*.jpg)|*.jpg|PNG Image (*.png)|*.png";
+            // 
+            // saveCSVDialog
+            // 
+            this.saveCSVDialog.DefaultExt = "csv";
+            this.saveCSVDialog.Filter = "Comma Separated Values (*.csv)|*.csv";
+            // 
+            // firstFrameTimer
+            // 
+            this.firstFrameTimer.Interval = 250;
+            this.firstFrameTimer.Tick += new System.EventHandler(this.firstFrameTimer_Tick);
+            // 
+            // saveWmfFileDialog
+            // 
+            this.saveWmfFileDialog.DefaultExt = "emf";
+            this.saveWmfFileDialog.Filter = "Enhanced Metafile (*.emf)|*.emf";
+            // 
+            // miShowZeroADULevel
+            // 
+            this.miShowZeroADULevel.CheckOnClick = true;
+            this.miShowZeroADULevel.Name = "miShowZeroADULevel";
+            this.miShowZeroADULevel.Size = new System.Drawing.Size(187, 22);
+            this.miShowZeroADULevel.Text = "Show Zero ADU Level";
+            this.miShowZeroADULevel.CheckedChanged += new System.EventHandler(this.miShowZeroADULevel_CheckedChanged);
+            // 
             // frmLightCurve
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1436,14 +1446,6 @@
             this.Move += new System.EventHandler(this.frmLightCurve_Move);
             this.Resize += new System.EventHandler(this.frmLightCurve_Resize);
             this.pnlLegend.ResumeLayout(false);
-            this.panel2.ResumeLayout(false);
-            this.menuStrip1.ResumeLayout(false);
-            this.menuStrip1.PerformLayout();
-            this.statusStrip1.ResumeLayout(false);
-            this.statusStrip1.PerformLayout();
-            this.pnlMain.ResumeLayout(false);
-            this.panel1.ResumeLayout(false);
-            this.pnlChart.ResumeLayout(false);
             this.pnlSmallGraph.ResumeLayout(false);
             this.pnlMeasurementDetails.ResumeLayout(false);
             this.pnlMeasurementDetails.PerformLayout();
@@ -1463,6 +1465,14 @@
             ((System.ComponentModel.ISupportInitialize)(this.picTarget2Pixels)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.picTarget2PSF)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pb1)).EndInit();
+            this.panel2.ResumeLayout(false);
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
+            this.pnlMain.ResumeLayout(false);
+            this.panel1.ResumeLayout(false);
+            this.pnlChart.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1607,5 +1617,6 @@
 		private System.Windows.Forms.ToolStripMenuItem miNormalisation8DataPoints;
         private System.Windows.Forms.ToolStripMenuItem miSaveAsVectorImage;
         private System.Windows.Forms.SaveFileDialog saveWmfFileDialog;
+        private System.Windows.Forms.ToolStripMenuItem miShowZeroADULevel;
     }
 }

@@ -151,6 +151,8 @@ namespace Tangra.VideoOperations.LightCurves
 	        if (minValue == int.MaxValue) minValue = totalMinValue;
 			if (maxValue == int.MinValue) maxValue = totalMaxValue;
 
+            if (TangraConfig.Settings.Generic.ShowZeroADULevel && minValue > 1) minValue = 1;
+
             m_Header.MinAdjustedReading = minValue;
             m_Header.MaxAdjustedReading = maxValue;
 
