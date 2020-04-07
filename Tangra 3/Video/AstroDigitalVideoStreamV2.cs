@@ -277,9 +277,15 @@ namespace Tangra.Video
             lock (m_SyncLock)
             {
                 if (streamId == 0)
-                    pixels = m_AdvFile.GetMainFramePixels((uint)index, out advFrameInfo);
+                {
+                    if (index >= m_AdvFile.MainSteamInfo.FrameCount) index = m_AdvFile.MainSteamInfo.FrameCount - 1;
+                    pixels = m_AdvFile.GetMainFramePixels((uint) index, out advFrameInfo);
+                }
                 else if (streamId == 1)
-                    pixels = m_AdvFile.GetCalibrationFramePixels((uint)index, out advFrameInfo);
+                {
+                    if (index >= m_AdvFile.CalibrationSteamInfo.FrameCount) index = m_AdvFile.CalibrationSteamInfo.FrameCount - 1;
+                    pixels = m_AdvFile.GetCalibrationFramePixels((uint) index, out advFrameInfo);
+                }
                 else
                     throw new ArgumentOutOfRangeException("streamId");
 
@@ -391,7 +397,10 @@ namespace Tangra.Video
                 if (stream == 0)
                     m_AdvFile.GetMainFramePixels((uint) index, out advFrameInfo);
                 else
+                {
+                    if (index >= m_AdvFile.CalibrationSteamInfo.FrameCount) index = m_AdvFile.CalibrationSteamInfo.FrameCount - 1;
                     m_AdvFile.GetCalibrationFramePixels((uint)index, out advFrameInfo);
+                }
             }
 
             return GetCurrentFrameState(advFrameInfo);

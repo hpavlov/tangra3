@@ -196,14 +196,20 @@ namespace Tangra.VideoOperations.LightCurves
 				        if (m_LightCurveController.Context.Binning > 0)
 				        {
 				            var binnedValues = m_AllBinnedReadings[i];
-				            var minAdj = binnedValues.Min(x => x.AdjustedValue);
-				            if (minAdj < minAdjustedReading) minAdjustedReading = minAdj;
+				            if (binnedValues.Any())
+				            {
+                                var minAdj = binnedValues.Min(x => x.AdjustedValue);
+                                if (minAdj < minAdjustedReading) minAdjustedReading = minAdj;
+				            }
 				        }
 				        else
 				        {
 				            var readings = m_LightCurveController.Context.AllReadings[i];
-                            var minAdj = readings.Min(x => x.AdjustedReading);
-                            if (minAdj < minAdjustedReading) minAdjustedReading = minAdj;
+				            if (readings.Any())
+				            {
+                                var minAdj = readings.Min(x => x.AdjustedReading);
+                                if (minAdj < minAdjustedReading) minAdjustedReading = minAdj;
+				            }
 				        }
 				    }
                     DrawAxisByTimeStamp(g, axisInterval, minAdjustedReading);
@@ -402,14 +408,20 @@ namespace Tangra.VideoOperations.LightCurves
                         if (m_LightCurveController.Context.Binning > 0)
                         {
                             var binnedValues = m_AllBinnedReadings[i];
-                            var minAdj = binnedValues.Min(x => x.AdjustedValue);
-                            if (minAdj < minAdjustedReading) minAdjustedReading = minAdj;
+                            if (binnedValues.Any())
+                            {
+                                var minAdj = binnedValues.Min(x => x.AdjustedValue);
+                                if (minAdj < minAdjustedReading) minAdjustedReading = minAdj;
+                            }
                         }
                         else
                         {
                             var readings = m_LightCurveController.Context.AllReadings[i];
-                            var minAdj = readings.Min(x => x.AdjustedReading);
-                            if (minAdj < minAdjustedReading) minAdjustedReading = minAdj;
+                            if (readings.Any())
+                            {
+                                var minAdj = readings.Min(x => x.AdjustedReading);
+                                if (minAdj < minAdjustedReading) minAdjustedReading = minAdj;
+                            }
                         }
                     }
 
