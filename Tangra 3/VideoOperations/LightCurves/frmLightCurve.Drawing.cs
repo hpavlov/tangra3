@@ -501,8 +501,13 @@ namespace Tangra.VideoOperations.LightCurves
 
                                 if (prevPoint != PointF.Empty)
                                 {
-                                    if (!prevReadingIsOffScreen && drawLine)
-                                        g.DrawLine(pen, prevPoint.X, prevPoint.Y, x, y);
+                                    try
+                                    {
+                                        if (!prevReadingIsOffScreen && drawLine)
+                                            g.DrawLine(pen, prevPoint.X, prevPoint.Y, x, y);
+                                    }
+                                    catch (OverflowException)
+                                    { }
                                 }
                                 else
                                     prevPoint = new PointF();
