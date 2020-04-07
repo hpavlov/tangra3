@@ -333,7 +333,7 @@ namespace Tangra.VideoOperations.LightCurves
             {
                 btnMoreOrLess.Text = "More Options";
 
-                if (tabsOptions.TabPages.Count == 4)
+                if (tabsOptions.TabPages.Count != 1)
                 {
                     tabsOptions.TabPages.Remove(tabIntegration);
                     tabsOptions.TabPages.Remove(tabReduction);
@@ -346,7 +346,7 @@ namespace Tangra.VideoOperations.LightCurves
 
                 if (tabsOptions.TabPages.Count == 1)
                 {
-                    tabsOptions.TabPages.Add(tabIntegration);
+                    if (m_VideoContoller.SupportsSoftwareIntegration) tabsOptions.TabPages.Add(tabIntegration);
                     tabsOptions.TabPages.Add(tabStretching);
                     tabsOptions.TabPages.Add(tabReduction);
                 }
