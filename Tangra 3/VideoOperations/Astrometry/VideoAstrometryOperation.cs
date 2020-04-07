@@ -511,6 +511,12 @@ namespace Tangra.VideoOperations.Astrometry
 				m_VeryFirstTimeDrawn = false;
 			}
 
+		    if (m_Context == null)
+		    {
+                // Initial frame positioning without actually measuring yet
+		        return;
+		    }
+
 			EnsureDistBasedMatcher();
 
 			m_MovingToFirstIntegratedFrameFlag = false;
