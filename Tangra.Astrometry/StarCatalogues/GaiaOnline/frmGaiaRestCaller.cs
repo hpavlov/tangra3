@@ -431,7 +431,11 @@ namespace Tangra.StarCatalogues.GaiaOnline
 
         private void UpdateStatusCallback(string message, JobStaus? newJobStatus)
         {
-            lblStatusMessage.Text = string.Format("{0}: {1}", currentState, message);
+            if (currentState != JobStaus.Queued)
+                lblStatusMessage.Text = string.Format("{0}: {1}", currentState, message);
+            else
+                lblStatusMessage.Text = message;
+
             if (newJobStatus != null)
             {
                 currentState = newJobStatus.Value;

@@ -465,6 +465,15 @@ namespace Tangra.StarCatalogues.UCAC4
             }
         }
 
+        public bool IsForInitialPlateSolve
+        {
+            get
+            {
+                // We only all star for the initial plate solve
+                return true;
+            }
+        }
+
         public string GetStarDesignation(int alternativeId)
         {
             return string.Concat("4U ", m_Zone.ToString().PadLeft(3, '0'), "-", m_StarInZone.ToString().PadLeft(7, '0'));

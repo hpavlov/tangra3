@@ -397,6 +397,7 @@ namespace Tangra.StarCatalogues.UCAC3
 					return double.NaN;
 			}
 		}
+
     	public double MagV
     	{
     		get
@@ -407,6 +408,15 @@ namespace Tangra.StarCatalogues.UCAC3
     			return Math.Round(0.552*jk + 1.578*f - 0.0560*f*f + 0.001562*f*f*f - 1.76, 2);
     		}
     	}
+
+        public bool IsForInitialPlateSolve
+        {
+            get
+            {
+                // We only all star for the initial plate solve
+                return true;
+            }
+        }
 
     	public string GetStarDesignation(int alternativeId)
     	{

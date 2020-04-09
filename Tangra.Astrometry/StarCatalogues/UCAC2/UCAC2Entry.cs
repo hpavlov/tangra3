@@ -230,6 +230,15 @@ namespace Tangra.StarCatalogues.UCAC2
 			}
 		}
 
+        public bool IsForInitialPlateSolve
+        {
+            get
+            {
+                // We only all star for the initial plate solve
+                return true;
+            }
+        }
+
     	public double EpochRA
     	{
     		get { return EpRAm / 1000.0 + 1975; }

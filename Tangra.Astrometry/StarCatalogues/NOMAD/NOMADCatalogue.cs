@@ -14,7 +14,7 @@ using Tangra.StarCatalogues;
 
 namespace Tangra.StarCatalogues.NOMAD
 {
-    public class NOMADCatalogue
+    public class NOMADCatalogue : IStarCatalogue
     {
         private string m_CatalogLocation;
         private NOMADIndex m_Index;

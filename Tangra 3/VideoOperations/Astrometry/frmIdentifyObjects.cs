@@ -137,7 +137,10 @@ namespace Tangra.VideoOperations.Astrometry
                 }
                 else
                 {
-                    IdentifiedObjects = MPCheck.CheckRegion(m_UtcTime, m_Fit.RA0Deg, m_Fit.DE0Deg, m_FovArcMin, m_MagLimit, string.IsNullOrEmpty(m_ObsCode) ? "500" : m_ObsCode);
+                    var obsCode = m_ObsCode;
+                    if (string.IsNullOrWhiteSpace(obsCode)) obsCode = TangraConfig.Settings.Astrometry.MPCObservatoryCode;
+                    if (string.IsNullOrWhiteSpace(obsCode)) obsCode = "500";
+                    IdentifiedObjects = MPCheck.CheckRegion(m_UtcTime, m_Fit.RA0Deg, m_Fit.DE0Deg, m_FovArcMin, m_MagLimit, obsCode);
 
                     
                     // MPCheck is a low positional precision service. Check each object position with the more accurate MPEph2 service

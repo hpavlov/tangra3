@@ -22,6 +22,7 @@ namespace Tangra.StarCatalogues
         double MagV { get; }
 		double MagJ { get; }
 		double MagK { get; }
+        bool IsForInitialPlateSolve { get; }
         string GetStarDesignation(int alternativeId);
         double GetMagnitudeForBand(Guid magBandId);
     }
@@ -97,6 +98,11 @@ namespace Tangra.StarCatalogues
 		{
 			get { return double.NaN; }
 		}
+
+        public bool IsForInitialPlateSolve
+        {
+            get { return true; }
+        }
 
         public double GetMagnitudeForBand(Guid magBandId)
         {

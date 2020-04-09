@@ -348,7 +348,8 @@ namespace Tangra.ImageTools
 			m_CalibrationContext = new CalibrationContext();
 			m_CalibrationContext.StarMap = AstrometryContext.Current.StarMap;
 			m_CalibrationContext.PreliminaryFit = m_SolvedPlate;
-			m_FieldSolveContext.CatalogueStars = m_CatalogueStars;
+            // For plate solving, only used stars appropriate for initial plate solve (e.g. matched GaiaDR2 stars)
+			m_FieldSolveContext.CatalogueStars = m_CatalogueStars.Where(x => x.IsForInitialPlateSolve).ToList();
 			m_CalibrationContext.FieldSolveContext = m_FieldSolveContext;
 			m_CalibrationContext.PlateConfig = m_Image;
 

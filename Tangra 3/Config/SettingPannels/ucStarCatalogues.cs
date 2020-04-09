@@ -11,6 +11,8 @@ using System.Windows.Forms;
 using Tangra.Astrometry.Recognition;
 using Tangra.Model.Config;
 using Tangra.Model.Helpers;
+using Tangra.StarCatalogues.GaiaOnline;
+using Tangra.VideoTools;
 
 namespace Tangra.Config.SettingPannels
 {
@@ -32,6 +34,8 @@ namespace Tangra.Config.SettingPannels
 
 			cbxCatalogue.SelectedIndex = (int)TangraConfig.Settings.StarCatalogue.Catalog - 1;
 			tbxCatalogueLocation.Text = TangraConfig.Settings.StarCatalogue.CatalogLocation;
+            cbxUseGaia.Checked = TangraConfig.Settings.StarCatalogue.UseGaiaDR2;
+            tbxGaiaAPIToken.Text = TangraConfig.Settings.StarCatalogue.GaiaAPIToken;
 			if (Guid.Empty != TangraConfig.Settings.StarCatalogue.CatalogMagnitudeBandId)
 			{
 				CatalogMagnitudeBand bnd = cbxCatalogPhotometryBand.Items.Cast<CatalogMagnitudeBand>().FirstOrDefault(mb => mb.Id == TangraConfig.Settings.StarCatalogue.CatalogMagnitudeBandId);
@@ -46,7 +50,7 @@ namespace Tangra.Config.SettingPannels
 			{
 				TangraConfig.StarCatalog chosenCatalogue = (TangraConfig.StarCatalog)(cbxCatalogue.SelectedIndex + 1);
 
-				if (chosenCatalogue != TangraConfig.StarCatalog.GaiaDR2 && !Directory.Exists(tbxCatalogueLocation.Text))
+				if (!Directory.Exists(tbxCatalogueLocation.Text))
 				{
 					tbxCatalogueLocation.Focus();
 					MessageBox.Show(
@@ -63,33 +67,38 @@ namespace Tangra.Config.SettingPannels
 				{
 					tbxCatalogueLocation.Focus();
 
-				    if (chosenCatalogue == TangraConfig.StarCatalog.GaiaDR2)
-				    {
+                    MessageBox.Show(
+                        this,
+                        string.Format("Selected folder does not contain the {0} catalogue", chosenCatalogue),
+                        "Tangra",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+
+                    return false;
+				}
+
+				tbxCatalogueLocation.Text = path;
+
+			    if (cbxUseGaia.Checked)
+			    {
+                    var token = tbxGaiaAPIToken.Text;
+			        if (!GaiaTapCatalogue.IsValidApiToken(ref token))
+			        {
                         var rv = MessageBox.Show(
                             this,
-                            string.Format("'{0}' does look like a valid API Token. Do you want to use it anyway?", path),
+                            string.Format("'{0}' does look like a valid API Token. Do you want to use it anyway?", tbxGaiaAPIToken.Text),
                             "Tangra",
                             MessageBoxButtons.YesNo,
                             MessageBoxIcon.Warning,
                             MessageBoxDefaultButton.Button2);
 
-				        return rv == DialogResult.Yes;
-				    }
-				    else
-				    {
-                        MessageBox.Show(
-                            this,
-                            string.Format("Selected folder does not contain the {0} catalogue", chosenCatalogue),
-                            "Tangra",
-                            MessageBoxButtons.OK,
-                            MessageBoxIcon.Error);
-
-                        return false;
-
-				    }
-				}
-
-				tbxCatalogueLocation.Text = path;
+			            if (rv != DialogResult.Yes)
+			            {
+                            tbxGaiaAPIToken.Focus();
+			                return false;
+			            }
+			        }
+			    }
 			}
 
 			return true;
@@ -102,6 +111,8 @@ namespace Tangra.Config.SettingPannels
 				TangraConfig.Settings.StarCatalogue.Catalog = (TangraConfig.StarCatalog)(cbxCatalogue.SelectedIndex + 1);
 				TangraConfig.Settings.StarCatalogue.CatalogLocation = tbxCatalogueLocation.Text;
 				TangraConfig.Settings.StarCatalogue.CatalogMagnitudeBandId = ((CatalogMagnitudeBand)cbxCatalogPhotometryBand.SelectedItem).Id;
+			    TangraConfig.Settings.StarCatalogue.UseGaiaDR2 = cbxUseGaia.Checked;
+			    TangraConfig.Settings.StarCatalogue.GaiaAPIToken = tbxGaiaAPIToken.Text;
 			}
 		}
 
@@ -142,61 +153,55 @@ namespace Tangra.Config.SettingPannels
 
 		private void cbxCatalogue_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			// For each supported catalog we provide custom options for magnitude band to use for photometry
-			TangraConfig.StarCatalog catalog = (TangraConfig.StarCatalog)(cbxCatalogue.SelectedIndex + 1);
-			switch (catalog)
-			{
-				case TangraConfig.StarCatalog.UCAC3:
-					cbxCatalogPhotometryBand.Items.Clear();
-					cbxCatalogPhotometryBand.Items.AddRange(m_CatalogValidator.MagnitudeBandsForCatalog(catalog));
-					break;
-
-				case TangraConfig.StarCatalog.UCAC2:
-					cbxCatalogPhotometryBand.Items.Clear();
-					cbxCatalogPhotometryBand.Items.AddRange(m_CatalogValidator.MagnitudeBandsForCatalog(catalog));
-					break;
-
-				case TangraConfig.StarCatalog.NOMAD:
-					cbxCatalogPhotometryBand.Items.Clear();
-					cbxCatalogPhotometryBand.Items.AddRange(m_CatalogValidator.MagnitudeBandsForCatalog(catalog));
-					break;
-
-				case TangraConfig.StarCatalog.PPMXL:
-					cbxCatalogPhotometryBand.Items.Clear();
-					cbxCatalogPhotometryBand.Items.AddRange(m_CatalogValidator.MagnitudeBandsForCatalog(catalog));
-					break;
-
-				case TangraConfig.StarCatalog.UCAC4:
-					cbxCatalogPhotometryBand.Items.Clear();
-					cbxCatalogPhotometryBand.Items.AddRange(m_CatalogValidator.MagnitudeBandsForCatalog(catalog));
-					break;
-
-                case TangraConfig.StarCatalog.GaiaDR2:
-                    cbxCatalogPhotometryBand.Items.Clear();
-                    cbxCatalogPhotometryBand.Items.AddRange(m_CatalogValidator.MagnitudeBandsForCatalog(catalog));
-                    break;
-			}
-
-			if (cbxCatalogPhotometryBand.Items.Count > 0)
-				cbxCatalogPhotometryBand.SelectedIndex = 0;
-
-		    if (catalog == TangraConfig.StarCatalog.GaiaDR2)
-		    {
-                btnBrowseLocation.Visible = false;
-                lblCatalogPath.Text = "API Token";
-		        pnlGaiaAIPNotes.Visible = true;
-		    }
-		    else
-		    {
-                lblCatalogPath.Text = "Path";
-		        btnBrowseLocation.Visible = true;
-                pnlGaiaAIPNotes.Visible = false;
-		    }
+		    UpdateCatalogueMagniudeBands();
 		}
 
         private void OpenLinkLabelLink(object sender, LinkLabelLinkClickedEventArgs e)
         {
             ShellHelper.OpenUrl((sender as LinkLabel).Text);
         }
+
+        private void cbxUseGaia_CheckedChanged(object sender, EventArgs e)
+        {
+            pnlGaiaAIPNotes.Visible = cbxUseGaia.Checked;
+            UpdateCatalogueMagniudeBands();
+        }
+
+	    private void UpdateCatalogueMagniudeBands()
+	    {
+            // For each supported catalog we provide custom options for magnitude band to use for photometry
+            TangraConfig.StarCatalog catalog = (TangraConfig.StarCatalog)(cbxCatalogue.SelectedIndex + 1);
+            bool useGaia = cbxUseGaia.Checked;
+            switch (catalog)
+            {
+                case TangraConfig.StarCatalog.UCAC3:
+                    cbxCatalogPhotometryBand.Items.Clear();
+                    cbxCatalogPhotometryBand.Items.AddRange(m_CatalogValidator.MagnitudeBandsForCatalog(catalog, useGaia));
+                    break;
+
+                case TangraConfig.StarCatalog.UCAC2:
+                    cbxCatalogPhotometryBand.Items.Clear();
+                    cbxCatalogPhotometryBand.Items.AddRange(m_CatalogValidator.MagnitudeBandsForCatalog(catalog, useGaia));
+                    break;
+
+                case TangraConfig.StarCatalog.NOMAD:
+                    cbxCatalogPhotometryBand.Items.Clear();
+                    cbxCatalogPhotometryBand.Items.AddRange(m_CatalogValidator.MagnitudeBandsForCatalog(catalog, useGaia));
+                    break;
+
+                case TangraConfig.StarCatalog.PPMXL:
+                    cbxCatalogPhotometryBand.Items.Clear();
+                    cbxCatalogPhotometryBand.Items.AddRange(m_CatalogValidator.MagnitudeBandsForCatalog(catalog, useGaia));
+                    break;
+
+                case TangraConfig.StarCatalog.UCAC4:
+                    cbxCatalogPhotometryBand.Items.Clear();
+                    cbxCatalogPhotometryBand.Items.AddRange(m_CatalogValidator.MagnitudeBandsForCatalog(catalog, useGaia));
+                    break;
+            }
+
+            if (cbxCatalogPhotometryBand.Items.Count > 0)
+                cbxCatalogPhotometryBand.SelectedIndex = 0;
+	    }
 	}
 }

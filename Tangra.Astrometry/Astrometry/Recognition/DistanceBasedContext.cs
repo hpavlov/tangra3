@@ -167,6 +167,7 @@ namespace Tangra.Astrometry.Recognition
         {
         	Stopwatch sw = new Stopwatch();
         	sw.Start();
+            var pyramidStars = new List<IStar>();
             try
             {
                 Dictionary<int, ulong> debugResolvesdStarsWithAppliedExclusions =
@@ -180,9 +181,11 @@ namespace Tangra.Astrometry.Recognition
                 if (m_ManualPairs != null && m_ManualPairs.Count > 0)
                     alwaysIncludeStars = m_ManualPairs.Values.Select(x => x.StarNo).ToList();
 
+                pyramidStars = m_CelestialPyramidStars.Where(x => x.IsForInitialPlateSolve || (alwaysIncludeStars != null && alwaysIncludeStars.Contains(x.StarNo))).ToList();
+
                 m_Distributor = BuildPyramidMatchingByMagnitude(
                     m_RA0Deg, m_DE0Deg,
-                    m_CelestialPyramidStars, 
+                    pyramidStars, 
                     m_PlateConfig,
 					m_Settings,
 					debugResolvesdStarsWithAppliedExclusions,
@@ -196,8 +199,8 @@ namespace Tangra.Astrometry.Recognition
 
                 if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
 				    Trace.WriteLine(string.Format(
-					    "Building pyramid pairs from a total of {0} stars. Time taken: {1:0}ms", 
-					    m_CelestialAllStars.Count, sw.ElapsedMilliseconds));
+					    "Building pyramid pairs from a total of {0} stars. Time taken: {1:0}ms. Total of {2} stars for astrometric solution.",
+                        pyramidStars.Count, sw.ElapsedMilliseconds, m_CelestialAllStars.Count));
 
 				if (m_Distributor != null)
 				{
@@ -730,7 +733,7 @@ namespace Tangra.Astrometry.Recognition
 							.ToList();
 
                         if (TangraConfig.Settings.TraceLevels.PlateSolving.TraceVerbose())
-						    Trace.WriteLine(string.Format("Limitting alignment stars to {0} start up to mag {1:0.0}", m_CelestialPyramidStars.Count, m_DetectedLimitingMagnitude));
+						    Trace.WriteLine(string.Format("Limitting alignment stars to {0} stars up to mag {1:0.0}", m_CelestialPyramidStars.Count, m_DetectedLimitingMagnitude));
 					}
 					InitializePyramidMatching();
 				}				

@@ -16,7 +16,7 @@ using Tangra.StarCatalogues;
 
 namespace Tangra.StarCatalogues.UCAC2
 {
-    public class UCAC2Catalogue
+    public class UCAC2Catalogue : IStarCatalogue
     {
         public static bool IsValidCatalogLocation(ref string folderPath)
         {

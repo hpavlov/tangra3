@@ -32,7 +32,7 @@ namespace Tangra.ImageTools
 			: this()
 		{
 			m_Stars = new List<IStar>();
-			m_Stars.AddRange(stars);
+			m_Stars.AddRange(stars.Where(x => x.IsForInitialPlateSolve).ToList());
 
 			m_SelectedStars = selectedStars;
 			lvStars.Items.Clear();

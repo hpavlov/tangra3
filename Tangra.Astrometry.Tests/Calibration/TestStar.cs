@@ -40,6 +40,8 @@ namespace Tangra.Tests.Calibration
 
         public double MagK { get; private set; }
 
+        public bool IsForInitialPlateSolve { get; private set; }
+
         public string GetStarDesignation(int alternativeId)
         {
             return string.Empty;

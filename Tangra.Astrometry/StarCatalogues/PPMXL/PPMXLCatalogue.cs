@@ -12,7 +12,7 @@ using Tangra.StarCatalogues;
 
 namespace Tangra.StarCatalogues.PPMXL
 {
-    public class PPMXLCatalogue
+    public class PPMXLCatalogue : IStarCatalogue
     {
         public static bool IsValidCatalogLocation(ref string folderPath)
         {

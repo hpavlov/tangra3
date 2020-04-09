@@ -29,7 +29,10 @@
 		private void InitializeComponent()
 		{
             this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
+            this.cbxUseGaia = new System.Windows.Forms.CheckBox();
             this.pnlGaiaAIPNotes = new System.Windows.Forms.Panel();
+            this.label6 = new System.Windows.Forms.Label();
+            this.tbxGaiaAPIToken = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -47,8 +50,21 @@
             this.pnlGaiaAIPNotes.SuspendLayout();
             this.SuspendLayout();
             // 
+            // cbxUseGaia
+            // 
+            this.cbxUseGaia.AutoSize = true;
+            this.cbxUseGaia.Location = new System.Drawing.Point(199, 22);
+            this.cbxUseGaia.Name = "cbxUseGaia";
+            this.cbxUseGaia.Size = new System.Drawing.Size(175, 17);
+            this.cbxUseGaia.TabIndex = 50;
+            this.cbxUseGaia.Text = "Use GaiaDR2 positions (Online)";
+            this.cbxUseGaia.UseVisualStyleBackColor = true;
+            this.cbxUseGaia.CheckedChanged += new System.EventHandler(this.cbxUseGaia_CheckedChanged);
+            // 
             // pnlGaiaAIPNotes
             // 
+            this.pnlGaiaAIPNotes.Controls.Add(this.label6);
+            this.pnlGaiaAIPNotes.Controls.Add(this.tbxGaiaAPIToken);
             this.pnlGaiaAIPNotes.Controls.Add(this.label5);
             this.pnlGaiaAIPNotes.Controls.Add(this.label4);
             this.pnlGaiaAIPNotes.Controls.Add(this.label3);
@@ -56,16 +72,33 @@
             this.pnlGaiaAIPNotes.Controls.Add(this.llRegisterAccount);
             this.pnlGaiaAIPNotes.Controls.Add(this.label1);
             this.pnlGaiaAIPNotes.Controls.Add(this.llObtainToken);
-            this.pnlGaiaAIPNotes.Location = new System.Drawing.Point(6, 160);
+            this.pnlGaiaAIPNotes.Location = new System.Drawing.Point(-1, 149);
             this.pnlGaiaAIPNotes.Name = "pnlGaiaAIPNotes";
-            this.pnlGaiaAIPNotes.Size = new System.Drawing.Size(381, 143);
+            this.pnlGaiaAIPNotes.Size = new System.Drawing.Size(381, 192);
             this.pnlGaiaAIPNotes.TabIndex = 49;
             this.pnlGaiaAIPNotes.Visible = false;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(7, 10);
+            this.label6.Name = "label6";
+            this.label6.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.label6.Size = new System.Drawing.Size(58, 13);
+            this.label6.TabIndex = 54;
+            this.label6.Text = "API Token";
+            // 
+            // tbxGaiaAPIToken
+            // 
+            this.tbxGaiaAPIToken.Location = new System.Drawing.Point(7, 26);
+            this.tbxGaiaAPIToken.Name = "tbxGaiaAPIToken";
+            this.tbxGaiaAPIToken.Size = new System.Drawing.Size(324, 20);
+            this.tbxGaiaAPIToken.TabIndex = 51;
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(8, 113);
+            this.label5.Location = new System.Drawing.Point(4, 164);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(149, 13);
             this.label5.TabIndex = 53;
@@ -74,7 +107,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(8, 64);
+            this.label4.Location = new System.Drawing.Point(4, 115);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(269, 13);
             this.label4.TabIndex = 52;
@@ -83,7 +116,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(8, 39);
+            this.label3.Location = new System.Drawing.Point(4, 90);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(145, 13);
             this.label3.TabIndex = 51;
@@ -93,7 +126,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label2.Location = new System.Drawing.Point(3, 3);
+            this.label2.Location = new System.Drawing.Point(4, 61);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(246, 13);
             this.label2.TabIndex = 50;
@@ -102,7 +135,7 @@
             // llRegisterAccount
             // 
             this.llRegisterAccount.AutoSize = true;
-            this.llRegisterAccount.Location = new System.Drawing.Point(150, 38);
+            this.llRegisterAccount.Location = new System.Drawing.Point(146, 89);
             this.llRegisterAccount.Name = "llRegisterAccount";
             this.llRegisterAccount.Size = new System.Drawing.Size(185, 13);
             this.llRegisterAccount.TabIndex = 2;
@@ -113,7 +146,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(8, 89);
+            this.label1.Location = new System.Drawing.Point(4, 140);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(139, 13);
             this.label1.TabIndex = 1;
@@ -122,7 +155,7 @@
             // llObtainToken
             // 
             this.llObtainToken.AutoSize = true;
-            this.llObtainToken.Location = new System.Drawing.Point(147, 88);
+            this.llObtainToken.Location = new System.Drawing.Point(143, 139);
             this.llObtainToken.Name = "llObtainToken";
             this.llObtainToken.Size = new System.Drawing.Size(181, 13);
             this.llObtainToken.TabIndex = 0;
@@ -188,8 +221,7 @@
             "NOMAD (Local Disk)",
             "UCAC3 (Local Disk)",
             "PPMXL (Local Disk)",
-            "UCAC4 (Local Disk)",
-            "Gaia DR2 (Online gaia.aip.de)"});
+            "UCAC4 (Local Disk)"});
             this.cbxCatalogue.Location = new System.Drawing.Point(6, 19);
             this.cbxCatalogue.Name = "cbxCatalogue";
             this.cbxCatalogue.Size = new System.Drawing.Size(176, 21);
@@ -209,6 +241,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.cbxUseGaia);
             this.Controls.Add(this.pnlGaiaAIPNotes);
             this.Controls.Add(this.cbxCatalogPhotometryBand);
             this.Controls.Add(this.label58);
@@ -245,5 +278,8 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label6;
+        protected internal System.Windows.Forms.TextBox tbxGaiaAPIToken;
+        private System.Windows.Forms.CheckBox cbxUseGaia;
 	}
 }

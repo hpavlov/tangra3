@@ -2176,8 +2176,7 @@ namespace Tangra.Model.Config
 			NOMAD = 2,
 			UCAC3 = 3,
 			PPMXL = 4,
-			UCAC4 = 5,
-            GaiaDR2 = 6
+			UCAC4 = 5
 		}
 
         [Serializable]
@@ -2186,29 +2185,8 @@ namespace Tangra.Model.Config
 			public StarCatalog Catalog = StarCatalog.NotSpecified;
 			public string CatalogLocation = string.Empty;
 			public Guid CatalogMagnitudeBandId = Guid.Empty;
-
-			public static string GetNETCode(StarCatalog catalog)
-			{
-				switch (catalog)
-				{
-					case StarCatalog.NotSpecified:
-						return string.Empty;
-					case StarCatalog.UCAC2:
-						return "UCAC2";
-					case StarCatalog.UCAC3:
-						return "UCAC3";
-					case StarCatalog.NOMAD:
-						return "NOMAD";
-					case StarCatalog.PPMXL:
-						return "PPMXL";
-					case StarCatalog.UCAC4:
-						return "UCAC4";
-                    case StarCatalog.GaiaDR2:
-                        return "GAIA-DR2";
-					default:
-						throw new ArgumentOutOfRangeException("catalog");
-				}
-			}
+            public string GaiaAPIToken = string.Empty;
+            public bool UseGaiaDR2 = false;
 		}
 
 		public class MPCHeaderSettings

@@ -326,6 +326,14 @@ namespace Tangra.StarCatalogues.NOMAD
 			}
 		}
 
+        public bool IsForInitialPlateSolve
+        {
+            get
+            {
+                // We only all star for the initial plate solve
+                return true;
+            }
+        }
 
     	public double GetMagnitudeForBand(Guid magBandId)
     	{

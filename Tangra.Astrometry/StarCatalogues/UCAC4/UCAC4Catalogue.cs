@@ -13,7 +13,7 @@ using Tangra.StarCatalogues;
 
 namespace Tangra.StarCatalogues.UCAC4
 {
-    public class UCAC4Catalogue
+    public class UCAC4Catalogue : IStarCatalogue
     {
         public static bool IsValidCatalogLocation(ref string folderPath)
         {

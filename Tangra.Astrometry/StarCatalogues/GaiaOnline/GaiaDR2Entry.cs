@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -66,6 +67,10 @@ namespace Tangra.StarCatalogues.GaiaOnline
             // 16 <FIELD name="phot_variable_flag" ucd="meta.code;src.var" arraysize="4000" datatype="char" />
             m_SolutionId = data[0];
             m_Designation = data[1];
+            if (m_Designation != null)
+            {
+                m_Designation = m_Designation.Replace("Gaia", "").Replace("DR2", "").Trim();
+            }
             m_SourceId = data[2];
             if (!float.TryParse(data[3], NumberStyles.Float, CultureInfo.InvariantCulture, out m_RefEpoch))
             {
@@ -130,7 +135,33 @@ namespace Tangra.StarCatalogues.GaiaOnline
             }
 
             m_phot_variable_flag = data[16];
+
+            m_MatchedStarDesignation = null;
         }
+
+        public GaiaDR2Entry(GaiaDR2Entry clone, string matchedDesignation)
+        {
+            m_SolutionId = clone.m_SolutionId;
+            m_Designation = clone.m_Designation;
+            m_SourceId = clone.m_SourceId;
+            m_RefEpoch = clone.m_RefEpoch;
+            m_RaDeg = clone.m_RaDeg;
+            m_RaErrMas = clone.m_RaErrMas;
+            m_DeDeg = clone.m_DeDeg;
+            m_DeErrMas = clone.m_DeErrMas;
+            m_ParalaxMas = clone.m_ParalaxMas;
+            m_ParalaxErrMas = clone.m_ParalaxErrMas;
+            m_PmRaMasYear = clone.m_PmRaMasYear;
+            m_PmRaErrMasYear = clone.m_PmRaErrMasYear;
+            m_PmDeMasYear = clone.m_PmDeMasYear;
+            m_PmDeErrMasYear = clone.m_PmDeErrMasYear;
+            m_phot_g_mean_mag = clone.m_phot_g_mean_mag;
+            m_bp_rp = clone.m_bp_rp;
+            m_phot_variable_flag = clone.m_phot_variable_flag;
+            m_MatchedStarDesignation = matchedDesignation;
+        }
+
+        private string m_MatchedStarDesignation;
 
         private static double s_targetEpoch;
 
@@ -238,9 +269,18 @@ namespace Tangra.StarCatalogues.GaiaOnline
             }
         }
 
+        public bool IsForInitialPlateSolve
+        {
+            get
+            {
+                // We only use matched star for the initial plate solve
+                return m_MatchedStarDesignation != null;
+            }
+        }
+
         public string GetStarDesignation(int alternativeId)
         {
-            return m_Designation;
+            return m_MatchedStarDesignation ?? m_Designation;
         }
 
         public double GetMagnitudeForBand(Guid magBandId)
@@ -302,6 +342,8 @@ namespace Tangra.StarCatalogues.GaiaOnline
             {
                 // TODO: Version specific loading, when and if implemented
             }
+
+            m_MatchedStarDesignation = null;
         }
     }
 }

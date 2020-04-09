@@ -344,13 +344,26 @@ namespace Tangra.VideoOperations.Astrometry
 			{
 				if (objInfo.FittedStar != null)
 				{
-				    if (TangraConfig.Settings.StarCatalogue.Catalog == TangraConfig.StarCatalog.PPMXL ||
-				        TangraConfig.Settings.StarCatalogue.Catalog == TangraConfig.StarCatalog.GaiaDR2)
+                    IStar matchedStar = m_CatalogueStars.FirstOrDefault(s => s.StarNo == objInfo.FittedStar.StarNo);
+
+				    if (matchedStar != null)
 				    {
-                        lblObjectName.Text = objInfo.FittedStar.StarNo.ToString(); // PPMXL & GaiaDR2 numbers are too large so to save space don't add the catalog name
+				        lblObjectName.Text = matchedStar.GetStarDesignation(0);
 				    }
-                    else
-						lblObjectName.Text = string.Format("{0} {1}", TangraConfig.Settings.StarCatalogue.Catalog, objInfo.FittedStar.StarNo);
+				    else
+				    {
+                        if (TangraConfig.Settings.StarCatalogue.Catalog == TangraConfig.StarCatalog.PPMXL ||
+                            TangraConfig.Settings.StarCatalogue.UseGaiaDR2)
+                        {
+                            // PPMXL & GaiaDR2 numbers are too large so to save space don't add the catalog name
+                            lblObjectName.Text = objInfo.FittedStar.StarNo.ToString();
+                        }
+                        else
+                        {
+                            lblObjectName.Text = string.Format("{0} {1}", TangraConfig.Settings.StarCatalogue.Catalog, objInfo.FittedStar.StarNo);
+                        }
+				    }
+
 					lblX.Text = objInfo.FittedStar.x.ToString("0.0");
 					lblY.Text = objInfo.FittedStar.y.ToString("0.0");
 
@@ -361,7 +374,6 @@ namespace Tangra.VideoOperations.Astrometry
 
 						double colorJKIndex = double.NaN;
 
-						IStar matchedStar = m_CatalogueStars.FirstOrDefault(s => s.StarNo == objInfo.FittedStar.StarNo);
 						if (matchedStar != null)
 							colorJKIndex = matchedStar.MagJ - matchedStar.MagK;
 						else
@@ -400,8 +412,23 @@ namespace Tangra.VideoOperations.Astrometry
 					}
 					else
 					{
-						lblObjectName.Text = "Unknown Object";
-						lblMag.Text = "";
+                        // Search for a star 1" away from the clicked position
+                        var idStar = m_CatalogueStars.Where(x => Math.Abs(x.RADeg - objInfo.RADeg) < 1.0 / 3600 && Math.Abs(x.DEDeg - objInfo.DEDeg) < 1.0).ToList();
+                        if (idStar.Count == 0)
+                        {
+                            // Search for a star 2" away from the clicked position
+                            idStar = m_CatalogueStars.Where(x => Math.Abs(x.RADeg - objInfo.RADeg) < 2.0 / 3600 && Math.Abs(x.DEDeg - objInfo.DEDeg) < 2.0).ToList();
+                        }
+					    if (idStar.Count == 1)
+					    {
+                            lblObjectName.Text = idStar[0].GetStarDesignation(0) + "?";
+                            lblMag.Text = string.Format("R = {0:0.0}?", idStar[0].MagR);
+					    }
+					    else
+					    {
+                            lblObjectName.Text = "Unknown Object";
+                            lblMag.Text = "";
+					    }
 					}
 
 					lblResRaTitle.Text = "Std.Dev RA =";

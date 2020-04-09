@@ -206,6 +206,15 @@ namespace Tangra.StarCatalogues.PPMXL
             get { return m_kMag; }
         }
 
+        public bool IsForInitialPlateSolve
+        {
+            get
+            {
+                // We only all star for the initial plate solve
+                return true;
+            }
+        }
+
         public string GetStarDesignation(int alternativeId)
         {
             // PPMXL number and HHDDMM.S+DDMMSS designations

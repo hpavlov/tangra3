@@ -203,6 +203,7 @@
     <Compile Include="Astrometry\Recognition\PyramidStarsDensityDistributor.cs" />
     <Compile Include="Astrometry\Recognition\ulonglong.cs" />
     <Compile Include="Astrometry\ThreeStarAstrometry.cs" />
+    <Compile Include="AstroServices\NovaAstrometryNet.cs" />
     <Compile Include="MotionFitting\FastMotionPositionExtractor.cs" />
     <Compile Include="MotionFitting\FlyByMotionFitter.cs" />
     <Compile Include="MotionFitting\frmRovingObsLocation.cs">
@@ -219,9 +220,11 @@
     <Compile Include="StarCatalogues\GaiaOnline\frmGaiaRestCaller.Designer.cs">
       <DependentUpon>frmGaiaRestCaller.cs</DependentUpon>
     </Compile>
+    <Compile Include="StarCatalogues\GaiaOnline\GaiaCatalogue.cs" />
     <Compile Include="StarCatalogues\GaiaOnline\GaiaDR2Entry.cs" />
     <Compile Include="StarCatalogues\GaiaOnline\GaiaTapCatalogue.cs" />
     <Compile Include="StarCatalogues\GaiaOnline\GaiaVizieRCatalogue.cs" />
+    <Compile Include="StarCatalogues\IStarCatalogue.cs" />
     <Compile Include="StarCatalogues\PPMXL\PPMXLCatalogue.cs" />
     <Compile Include="StarCatalogues\PPMXL\PPMXLEntry.cs" />
     <Compile Include="StarCatalogues\PPMXL\PPMXLFileIterator.cs" />
