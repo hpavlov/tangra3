@@ -248,7 +248,9 @@ namespace Tangra.VideoOperations.LightCurves
                 pnlMeasureZoomOptions.Visible = m_StateMachine.VideoOperation.IsMeasuring;
             }
 
-            UpdateLCData();            
+            UpdateStackedSelection();
+
+            UpdateLCData();
         }
 
 		internal void SetupLCFileInfo(LCFile lcFile)
@@ -833,5 +835,32 @@ namespace Tangra.VideoOperations.LightCurves
             m_StoppedAtFrameNo = m_StateMachine.VideoOperation.SkipNextFrames(10, false);
         }
 
+        private void btnStackedSelection_Click(object sender, EventArgs e)
+        {
+            m_StateMachine.VideoOperation.ToggleStackedSelection();
+            UpdateState(); 
+        }
+
+        private void UpdateStackedSelection()
+        {
+            if (m_StateMachine.VideoOperation.CanShowStackedSelection())
+            {
+                bool stacked = m_StateMachine.VideoOperation.IsStackedSelectionEnabled;
+                if (stacked)
+                {
+                    btnStackedSelection.Image = Tangra.Properties.Resources.Stack1;
+                    m_VideoController.RedrawCurrentFrame(false);
+                }
+                else
+                {
+                    btnStackedSelection.Image = Tangra.Properties.Resources.Stack3;
+                    m_VideoController.RefreshCurrentFrame();
+                }
+            }
+            else
+            {
+                pnlStackedSelection.Visible = false;
+            }
+        }
     }
 }

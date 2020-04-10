@@ -97,6 +97,9 @@ namespace Tangra.VideoOperations.LightCurves
         private int m_FitsDynamicFromValue;
         private int m_FitsDynamicToValue;
 
+        private bool m_StackedSelection;
+        private Bitmap m_StackedSelectionFrame;
+
         private LCState m_BackedUpSelectMeasuringStarsState = null;
 
         private MeasuringZoomImageType MeasuringZoomImageType = MeasuringZoomImageType.Stripe;
@@ -119,6 +122,8 @@ namespace Tangra.VideoOperations.LightCurves
 		{
 			m_LightCurveController = lightCurveController;
 			m_DebugMode = debugMode;
+
+            m_StackedSelection = TangraConfig.Settings.Photometry.UseStackedSelection;
 
 			m_DisplaySettings = new TangraConfig.LightCurvesDisplaySettings();
 			m_DisplaySettings.Load();
@@ -414,7 +419,33 @@ namespace Tangra.VideoOperations.LightCurves
         { }
 
         public void PreDraw(System.Drawing.Graphics g)
-        { }
+        {
+            if (CanShowStackedSelection() && m_StackedSelection)
+            {
+                if (m_StackedSelectionFrame == null)
+                {
+                    m_VideoController.SetCursor(Cursors.WaitCursor);
+                    try
+                    {
+                        m_StackedSelectionFrame = m_VideoController.StackFrames(100);
+                    }
+                    finally
+                    {
+                        m_VideoController.SetCursor(Cursors.Default);
+                    }
+                }
+
+                if (m_StackedSelectionFrame != null)
+                {
+                    g.DrawImage(m_StackedSelectionFrame, new Point(0, 0));
+                    for (int i = 0; i < 5; i++)
+                    {
+                        var pen = i == 0 || i == 4 ? Pens.DodgerBlue : Pens.Lime;
+                        g.DrawRectangle(pen, i, i, g.VisibleClipBounds.Width - 1 - 2 * i, g.VisibleClipBounds.Height - 1 - 2 * i);
+                    }
+                }
+            }
+        }
 
         private int[] m_ManualTrackingDeltaX = new int[4];
 		private int[] m_ManualTrackingDeltaY = new int[4];
@@ -2208,6 +2239,38 @@ namespace Tangra.VideoOperations.LightCurves
 
 			return m_CurrFrameNo;
 		}
+
+        public bool ToggleStackedSelection()
+        {
+            m_StackedSelection = !m_StackedSelection;
+            
+            TangraConfig.Settings.Photometry.UseStackedSelection = m_StackedSelection;
+            TangraConfig.Settings.Save();
+
+            m_StackedSelectionFrame = null;
+            return m_StackedSelection;
+        }
+
+        public bool IsStackedSelectionEnabled
+        {
+            get { return m_StackedSelection; }
+        }
+
+        public bool CanShowStackedSelection()
+        {
+            return m_VideoController != null && m_VideoController.SupportsSoftwareIntegration && 
+                   (m_StateMachine == null ||
+                   m_StateMachine.CurrentState == LightCurvesState.SelectMeasuringStars ||
+                   m_StateMachine.CurrentState == LightCurvesState.SelectTrackingStars ||
+                   m_StateMachine.CurrentState == LightCurvesState.ReadyToRun);
+        }
+
+        public override void DisplayIntensifyModeChanged()
+        {
+            base.DisplayIntensifyModeChanged();
+
+            m_StackedSelectionFrame = null;
+        }
     }
 
     internal enum MeasuringZoomImageType

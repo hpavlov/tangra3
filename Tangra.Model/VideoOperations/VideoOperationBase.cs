@@ -16,5 +16,9 @@ namespace Tangra.Model.VideoOperations
         public virtual void MouseDown(Point location) { }
         public virtual void MouseUp(Point location) { }
         public virtual void MouseDoubleClick(Point location) { }
+
+        public virtual void DisplayIntensifyModeChanged()
+        {
+        }
     }
 }

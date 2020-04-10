@@ -450,6 +450,8 @@ namespace Tangra.Model.Config
 			public double MaxResidualStellarMags = 0.3;
 
 		    public static float REJECTION_BACKGROUND_PIXELS_STD_DEV = 6.0f;
+
+            public bool UseStackedSelection = true;
 		}
 
 		public enum TrackingEngine

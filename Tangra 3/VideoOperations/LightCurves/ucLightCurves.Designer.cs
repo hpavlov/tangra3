@@ -31,6 +31,7 @@ namespace Tangra.VideoOperations.LightCurves
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ucLightCurves));
             this.pnlProcessing = new System.Windows.Forms.Panel();
             this.pnlEnterTimes = new System.Windows.Forms.Panel();
             this.btn1FrMinus = new System.Windows.Forms.Button();
@@ -40,7 +41,9 @@ namespace Tangra.VideoOperations.LightCurves
             this.btnNextTime = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this.lblTimesHeader = new System.Windows.Forms.Label();
+            this.ucUtcTime = new Tangra.Model.Controls.ucUtcTimePicker();
             this.gbxCorrections = new System.Windows.Forms.GroupBox();
+            this.btnSkip10Frames = new System.Windows.Forms.Button();
             this.btnSkipThisFrame = new System.Windows.Forms.Button();
             this.lblPartiallySuccessfulFrames = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
@@ -60,6 +63,8 @@ namespace Tangra.VideoOperations.LightCurves
             this.label1 = new System.Windows.Forms.Label();
             this.lblUsedTrackerLabel = new System.Windows.Forms.Label();
             this.pnlUserAction = new System.Windows.Forms.Panel();
+            this.pnlStackedSelection = new System.Windows.Forms.Panel();
+            this.btnStackedSelection = new System.Windows.Forms.Button();
             this.lblMeasurementType = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.btnAddObject = new System.Windows.Forms.Button();
@@ -91,14 +96,14 @@ namespace Tangra.VideoOperations.LightCurves
             this.lblInfo = new System.Windows.Forms.Label();
             this.pnlViewLightCurve = new System.Windows.Forms.Panel();
             this.timerMoveToFirstFrame = new System.Windows.Forms.Timer(this.components);
-            this.ucUtcTime = new Tangra.Model.Controls.ucUtcTimePicker();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.ucCorrSelection = new Tangra.VideoOperations.LightCurves.ucCorrSelection();
-            this.btnSkip10Frames = new System.Windows.Forms.Button();
             this.pnlProcessing.SuspendLayout();
             this.pnlEnterTimes.SuspendLayout();
             this.gbxCorrections.SuspendLayout();
             this.pnlMeasureZoomOptions.SuspendLayout();
             this.pnlUserAction.SuspendLayout();
+            this.pnlStackedSelection.SuspendLayout();
             this.pnlSelectedObject.SuspendLayout();
             this.pnlMeasuringSelection.SuspendLayout();
             this.pnlTrackingSelection.SuspendLayout();
@@ -208,6 +213,16 @@ namespace Tangra.VideoOperations.LightCurves
             this.lblTimesHeader.TabIndex = 31;
             this.lblTimesHeader.Text = "Enter the UTC time of the first measured frame";
             // 
+            // ucUtcTime
+            // 
+            this.ucUtcTime.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.ucUtcTime.BackColor = System.Drawing.SystemColors.Control;
+            this.ucUtcTime.DateTimeUtc = new System.DateTime(2012, 9, 26, 11, 56, 14, 265);
+            this.ucUtcTime.Location = new System.Drawing.Point(5, 41);
+            this.ucUtcTime.Name = "ucUtcTime";
+            this.ucUtcTime.Size = new System.Drawing.Size(239, 26);
+            this.ucUtcTime.TabIndex = 30;
+            // 
             // gbxCorrections
             // 
             this.gbxCorrections.Controls.Add(this.btnSkip10Frames);
@@ -220,6 +235,15 @@ namespace Tangra.VideoOperations.LightCurves
             this.gbxCorrections.TabStop = false;
             this.gbxCorrections.Text = "Manual Corrections";
             this.gbxCorrections.Visible = false;
+            // 
+            // btnSkip10Frames
+            // 
+            this.btnSkip10Frames.Location = new System.Drawing.Point(103, 70);
+            this.btnSkip10Frames.Name = "btnSkip10Frames";
+            this.btnSkip10Frames.Size = new System.Drawing.Size(92, 23);
+            this.btnSkip10Frames.TabIndex = 48;
+            this.btnSkip10Frames.Text = "Skip 10 Frames";
+            this.btnSkip10Frames.Click += new System.EventHandler(this.btnSkip10Frames_Click);
             // 
             // btnSkipThisFrame
             // 
@@ -389,6 +413,7 @@ namespace Tangra.VideoOperations.LightCurves
             // 
             // pnlUserAction
             // 
+            this.pnlUserAction.Controls.Add(this.pnlStackedSelection);
             this.pnlUserAction.Controls.Add(this.lblMeasurementType);
             this.pnlUserAction.Controls.Add(this.label10);
             this.pnlUserAction.Controls.Add(this.btnAddObject);
@@ -408,6 +433,25 @@ namespace Tangra.VideoOperations.LightCurves
             this.pnlUserAction.Size = new System.Drawing.Size(249, 289);
             this.pnlUserAction.TabIndex = 5;
             this.pnlUserAction.Tag = "4,3";
+            // 
+            // pnlStackedSelection
+            // 
+            this.pnlStackedSelection.Controls.Add(this.btnStackedSelection);
+            this.pnlStackedSelection.Location = new System.Drawing.Point(185, 5);
+            this.pnlStackedSelection.Name = "pnlStackedSelection";
+            this.pnlStackedSelection.Size = new System.Drawing.Size(61, 63);
+            this.pnlStackedSelection.TabIndex = 47;
+            // 
+            // btnStackedSelection
+            // 
+            this.btnStackedSelection.Image = ((System.Drawing.Image)(resources.GetObject("btnStackedSelection.Image")));
+            this.btnStackedSelection.Location = new System.Drawing.Point(3, 0);
+            this.btnStackedSelection.Name = "btnStackedSelection";
+            this.btnStackedSelection.Size = new System.Drawing.Size(50, 50);
+            this.btnStackedSelection.TabIndex = 46;
+            this.btnStackedSelection.Tag = "";
+            this.toolTip1.SetToolTip(this.btnStackedSelection, "Toggle Stacked Image View");
+            this.btnStackedSelection.Click += new System.EventHandler(this.btnStackedSelection_Click);
             // 
             // lblMeasurementType
             // 
@@ -695,31 +739,12 @@ namespace Tangra.VideoOperations.LightCurves
             this.timerMoveToFirstFrame.Interval = 500;
             this.timerMoveToFirstFrame.Tick += new System.EventHandler(this.timerMoveToFirstFrame_Tick);
             // 
-            // ucUtcTime
-            // 
-            this.ucUtcTime.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ucUtcTime.BackColor = System.Drawing.SystemColors.Control;
-            this.ucUtcTime.DateTimeUtc = new System.DateTime(2012, 9, 26, 11, 56, 14, 265);
-            this.ucUtcTime.Location = new System.Drawing.Point(5, 41);
-            this.ucUtcTime.Name = "ucUtcTime";
-            this.ucUtcTime.Size = new System.Drawing.Size(239, 26);
-            this.ucUtcTime.TabIndex = 30;
-            // 
             // ucCorrSelection
             // 
             this.ucCorrSelection.Location = new System.Drawing.Point(24, 15);
             this.ucCorrSelection.Name = "ucCorrSelection";
             this.ucCorrSelection.Size = new System.Drawing.Size(176, 53);
             this.ucCorrSelection.TabIndex = 0;
-            // 
-            // btnSkip10Frames
-            // 
-            this.btnSkip10Frames.Location = new System.Drawing.Point(103, 70);
-            this.btnSkip10Frames.Name = "btnSkip10Frames";
-            this.btnSkip10Frames.Size = new System.Drawing.Size(92, 23);
-            this.btnSkip10Frames.TabIndex = 48;
-            this.btnSkip10Frames.Text = "Skip 10 Frames";
-            this.btnSkip10Frames.Click += new System.EventHandler(this.btnSkip10Frames_Click);
             // 
             // ucLightCurves
             // 
@@ -740,6 +765,7 @@ namespace Tangra.VideoOperations.LightCurves
             this.pnlMeasureZoomOptions.PerformLayout();
             this.pnlUserAction.ResumeLayout(false);
             this.pnlUserAction.PerformLayout();
+            this.pnlStackedSelection.ResumeLayout(false);
             this.pnlSelectedObject.ResumeLayout(false);
             this.pnlSelectedObject.PerformLayout();
             this.pnlMeasuringSelection.ResumeLayout(false);
@@ -815,6 +841,9 @@ namespace Tangra.VideoOperations.LightCurves
 		private ucCorrSelection ucCorrSelection;
 		private System.Windows.Forms.Button btnSkipThisFrame;
         private System.Windows.Forms.Button btnSkip10Frames;
+        private System.Windows.Forms.Button btnStackedSelection;
+        private System.Windows.Forms.Panel pnlStackedSelection;
+        private System.Windows.Forms.ToolTip toolTip1;
 
     }
 }

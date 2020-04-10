@@ -1528,6 +1528,8 @@
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
     <None Include="img\spectra_logo.bmp" />
+    <None Include="img\Stack1.png" />
+    <None Include="img\Stack3.png" />
     <Content Include="license.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -1710,6 +1710,24 @@ namespace Tangra.Controller
 			}
         }
 
+	    public Bitmap StackFrames(int stackedFrames)
+	    {
+	        try
+	        {
+                var frameNo = Math.Max(FramePlayer.CurrentFrameIndex, FramePlayer.Video.FirstFrame);
+	            stackedFrames = Math.Min(stackedFrames, FramePlayer.Video.CountFrames);
+
+                var intPixMap = FramePlayer.GetIntegratedFrame(frameNo, stackedFrames, false, false);
+                ApplyDisplayModeAdjustments(intPixMap.DisplayBitmap, true, intPixMap);
+                return intPixMap.DisplayBitmap;
+	        }
+	        catch (Exception ex)
+	        {
+                Trace.WriteLine(ex);
+	            return null;
+	        }
+	    }
+
 		internal Pixelmap GetFrame(int frameId)
 		{
 			return m_FramePlayer.GetFrame(frameId, true);
@@ -1852,6 +1870,9 @@ namespace Tangra.Controller
                 !m_FramePlayer.IsRunning &&
 				m_FramePlayer.Video != null)
 			{
+			    if (m_CurrentOperation != null)
+			        m_CurrentOperation.DisplayIntensifyModeChanged();
+
 				m_FramePlayer.RefreshCurrentFrame();
 			}
 		}
